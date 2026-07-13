@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/AC-Sampler_Accelerate_and_Correct_Diffusion_Sampling_with_Metropolis-Hastings_Algorithm.pdf
+project_link: null
+code_link: null
 aliases:
 - AC-Sampler
 acceptance: accepted
@@ -41,7 +43,7 @@ paradigm: 通过定理4.1将密度比分解为可计算项，并训练时间依�
 > - unconditional CIFAR‑10 上，NFE 为 15.8，对比 17，变化 -1.2。
 > - unconditional CIFAR‑10 (EDM Heun) 上，FID 为 1.97，对比 2.01，变化 -0.04。
 
-## 概述
+## 概要
 
 扩散模型在图像生成等任务中展现出强大能力，但其迭代去噪过程通常需要数百个时间步，导致采样速度缓慢；同时，反向过程的近似误差会沿时间步累积，使生成分布偏离真实数据分布。AC‑Sampler 针对这一瓶颈，提出了一种无需微调扩散模型的加速与校正框架。核心思路是：不再从纯噪声开始逐步去噪，而是在一个中间时间步启动基于 Metropolis‑Hastings（MH）校正的 Metropolis‑调整 Langevin（MALA）马尔可夫链，利用训练好的时间依赖判别器估计任意时间步的真实边缘密度比，从而可计算 MH 接受概率；通过接受/拒绝机制，使样本分布向该时间步的真实边缘分布收敛，同时跳过大量前置去噪步骤，将加速与误差校正统一起来。
 
@@ -49,7 +51,7 @@ paradigm: 通过定理4.1将密度比分解为可计算项，并训练时间依�
 
 在实验上，AC‑Sampler 以更少的时间步（NFE）取得优于或持平基线的质量：CIFAR‑10 无条件生成仅用 15.8 NFE 达到 FID 2.38（基线 17 NFE 下 FID 3.23）；CelebA‑HQ 256×256 无条件生成以 98.3 NFE 取得 FID 6.6；与 EDM 等基础采样器结合后，FID 进一步降至 1.97（NFE 26.19 vs 基线 35）。该方法可与 DPM‑v3、DG 等加速和校正方法兼容，在 ImageNet 条件生成及 Stable Diffusion 文生图等任务中均稳定提升采样效率与样本保真度。
 
-## 背景与动机
+### 背景与动机
 
 扩散模型通过迭代去噪将高斯噪声逐步转换为数据样本，已经成为高保真生成的主流范式。然而，这种逐步反向采样在实用中面临两个紧耦合的瓶颈：**采样效率低**——通常需要成百上千个时间步才能获得逼真图像；**分布偏移**——反向过程的近似误差会沿轨迹累积，使最终生成分布偏离真实的边缘分布，表现为模式坍塌或伪影。现有方法通常将加速与校正视为独立任务分别处理：加速器（如DDIM、DPM++/DPM‑v3）利用 ODE 离散化跳过中间步，但以牺牲精度为代价；校正器（如DG、DiffRS、Restart）通过判别器引导或拒绝采样改善分布对齐，却往往需要额外的训练开销或与加速策略不兼容，未能将两者统一在一个理论框架下。
 
@@ -61,7 +63,7 @@ paradigm: 通过定理4.1将密度比分解为可计算项，并训练时间依�
 
 综上，AC‑Sampler 的提出源自三个观察：（1）扩散采样的速度瓶颈源于对早期纯噪声步的冗余计算；（2）现有加速方法因忽略累积误差而需要额外的校正后处理；（3）MH 算法天然适合在中间步构造稳态分布，但需解决密度比估计问题。通过引入时间依赖判别器和定理4.1的密度比分解，本文使得“加速＋校正”成为一套无需微调、正交于其他加速器的通用解法。
 
-## 核心创新
+## 核心方法与创新机理
 
 AC‑Sampler针对扩散模型采样速度慢、反向过程近似误差累积两大瓶颈，提出**中间时间步直接启动MALA链 + Metropolis‑Hastings校正**的统一框架，无需对预训练扩散模型做任何微调。核心思想可归纳为一个因果调节旋钮：不从纯噪声开始逐步去噪，而是在中间时间步$\tau$处构造基于分数的Langevin提案分布，利用MH接受/拒绝机制将样本修正到该时间步的真实边缘分布$q_\tau$，从而跳过大段去噪步骤，同时消除分布偏移。
 
@@ -78,9 +80,9 @@ AC‑Sampler针对扩散模型采样速度慢、反向过程近似误差累积�
 
 需注意的局限：该方法需额外训练一个时间依赖判别器，超参数（如$\tau$、信噪比SNR）需针对任务手动调节；理论分析依赖最优判别器与无限链长假设，实际中只能近似满足。尽管存在这些成本，AC‑Sampler通过改变采样起始点、引入可计算密度比的判别器、施加MH校正，成功将扩散采样加速与分布校正融为一体，展现出明晰的创新逻辑和实证收益。
 
-## 整体框架
+### 整体框架
 
-![[obsidian-vault/assets/figures/papers/repair_max_kWl13kRJTQ_AC_Sampler/figures/001_Figure_1.jpg]]
+![[assets/figures/papers/repair_max_kWl13kRJTQ_AC_Sampler/figures/001_Figure_1.jpg]]
 *Figure 1: Overall figure of AC-Sampler*
 
 AC‑Sampler 是一种无需微调扩散模型即可同时实现采样加速与分布校正的架构。其核心思想是：不从纯噪声开始执行数百步去噪迭代，而是先将样本快速推至某个中间时间步 $\tau$，在该截面上构造一条 **Metropolis‑Adjusted Langevin Algorithm (MALA)** 马尔可夫链，利用 **Metropolis‑Hastings (MH)** 校正使链的稳态分布逼近该时间步的真实边缘分布 $q_\tau$，从而跳过大量低效的去噪步骤，并矫正由反向过程近似误差累积导致的分布偏移。
@@ -121,7 +123,7 @@ AC‑Sampler 的管线由五个模块顺次组成，其输入为预训练的扩�
 
 综上，AC‑Sampler 通过“**快进→中间截面 MALA 链 + MH 校正→快出**”的架构，将扩散采样的加速与误差校正统一在单一框架内，无需对原扩散模型重新训练，并与现行主流的加速和校正策略高度兼容。
 
-## 核心模块与公式推导
+### 核心模块与公式推导
 
 AC‑Sampler 的核心思想是跳过从高斯先验 $t = T$ 逐步去噪至 $t = 0$ 的低效过程，改为**在中间时间步 $\tau$ 启动 Metropolis‑Hastings (MH) 校正的 Markov 链**，使生成样本直接逼近该时间步的真实边缘分布 $q_{\tau}(\mathbf{x}_{\tau})$，随后再用少量去噪步转换到图像空间。整个框架包含以下联动模块（Figure 1）：
 
@@ -187,21 +189,21 @@ $$ D_{KL}(q_0 || p_0^{\theta,\phi^*,(l+1)}) \leq D_{KL}(q_0 || p_0^{\theta,\phi^
 
 综上，AC‑Sampler 通过**密度比分解 + 判别器估计 + MALA 提案**将扩散采样的加速与校正统一在无需微调扩散模型的框架下，使得在有限 NFE 下同时实现速度提升和分布对齐成为可能。
 
-## 实验与分析
+## 实验与关键发现
 
-![[obsidian-vault/assets/figures/papers/repair_max_kWl13kRJTQ_AC_Sampler/figures/003_Table_1.jpg]]
+![[assets/figures/papers/repair_max_kWl13kRJTQ_AC_Sampler/figures/003_Table_1.jpg]]
 *Table 1: Performance on unconditional CIFAR-10 generation. Values that are better compared to the baseline are highlighted in bold*
 
-![[obsidian-vault/assets/figures/papers/repair_max_kWl13kRJTQ_AC_Sampler/figures/004_Table_2.jpg]]
+![[assets/figures/papers/repair_max_kWl13kRJTQ_AC_Sampler/figures/004_Table_2.jpg]]
 *Table 2: Performance on unconditional CIFAR-10 generation with (Top) correction and (Bottom) acceleration methods*
 
-![[obsidian-vault/assets/figures/papers/repair_max_kWl13kRJTQ_AC_Sampler/figures/005_Table_3.jpg]]
+![[assets/figures/papers/repair_max_kWl13kRJTQ_AC_Sampler/figures/005_Table_3.jpg]]
 *Table 3: FID and NFE on unconditional CelebA-HQ 256 generation*
 
-![[obsidian-vault/assets/figures/papers/repair_max_kWl13kRJTQ_AC_Sampler/figures/002_Figure_2.jpg]]
+![[assets/figures/papers/repair_max_kWl13kRJTQ_AC_Sampler/figures/002_Figure_2.jpg]]
 *Figure 2: FID–NFE graph on uncond. CIFAR-10: (Top) Correction methods (Bottom) Acceleration methods*
 
-![[obsidian-vault/assets/figures/papers/repair_max_kWl13kRJTQ_AC_Sampler/figures/012_Figure_5.jpg]]
+![[assets/figures/papers/repair_max_kWl13kRJTQ_AC_Sampler/figures/012_Figure_5.jpg]]
 *Figure 5: Effect of an Figure 6: Mode cover MH correction on AC- with different τ in 25- Sampler. Gaussian toy experiment*
 
 AC‑Sampler 的核心主张是通过中间时间步的 MH 校正同时实现采样加速与分布校正，且无需微调扩散模型。下面从多类基准的主结果出发，分析性能增益的来源、消融证据以及当前方法的局限。
@@ -249,7 +251,7 @@ AC‑Sampler 设计为插拔式模块，可与现有加速（DPM‑v3）和校�
 
 综上所述，AC‑Sampler 通过引入一个简洁的 MH 校正环，在多个生成基准上实现了采样加速与分布精度的同步提升。消融实验明确了 MH 校正、propose‑until‑accept 和判别器质量对最终性能的关键作用，同时局限性分析为其工程化落地和进一步改进提供了切入点。
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 AC-Sampler 处于扩散模型采样加速与分布校正两条路线的交叉位置，但并非简单的增量改造，而是通过 Metropolis-Hastings (MH) 校正将两者统一为一个 **无需微调扩散模型** 的插件式框架。在方法谱系上，它既不属于纯 ODE/SDE 加速器（DDIM、DPM++、DPM-v3、EDM），也不属于纯校正器（DG、DiffRS、Restart），而是作为 **第三极**：利用中间时间步的 MALA 马尔可夫链，借助时间依赖判别器估计的密度比，同时对采样轨迹进行“跳步加速”与“误差校正”。这种设计使得 AC-Sampler 可以与现有加速/校正器正交叠加，如 Table 1 和 Table 2 所示，在 EDM Heun、DPM-v3、DG 等基线上均稳定提升 FID 并降低 NFE，具备广泛的即插即用能力。
 
@@ -290,10 +292,11 @@ AC-Sampler 处于扩散模型采样加速与分布校正两条路线的交叉位
 
 以上问题表明，AC-Sampler 作为将 MCMC 校正引入扩散采样的先行框架，其“跳步+校正”的核心思路仍存在大量优化空间，尤其在自动化、跨模态迁移以及理论完备性方面，值得后续工作探索。
 
+### 相关样本
+
+- [[analysis/ICLR_2026/Adaptive_Moments_are_Surprisingly_Effective_for_Plug-and-Play_Diffusion_Sampling.md|Adaptive Moments]]：同属 diffusion sampling 样本，可对照 MCMC 校正与梯度矩估计稳定化。
+
+
 ## 原文 PDF
 
-## 相关样本
-
-- [[obsidian-vault/analysis/ICLR_2026/Adaptive_Moments_are_Surprisingly_Effective_for_Plug-and-Play_Diffusion_Sampling.md|Adaptive Moments]]：同属 diffusion sampling 样本，可对照 MCMC 校正与梯度矩估计稳定化。
-
-![[obsidian-vault/paperPDFs/ICLR_2026/AC-Sampler_Accelerate_and_Correct_Diffusion_Sampling_with_Metropolis-Hastings_Algorithm.pdf]]
+![[paperPDFs/ICLR_2026/AC-Sampler_Accelerate_and_Correct_Diffusion_Sampling_with_Metropolis-Hastings_Algorithm.pdf]]

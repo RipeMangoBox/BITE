@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/FLUX_Reason_6M_PRISM_Bench_A_Million_Scale_Text_to_Image_Reasoning_Dataset_and_Comprehensive_Benchmark.pdf
+project_link: null
+code_link: https://github.com/rongyaofang/prism-bench
 openreview_forum_id: cPzgZnpVbN
 aliases:
 - FR6PB
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | FLUX-Reason-6M 与 PRISM-Bench：百万级文本到图像推理数据集及综合基准 |
 | 英文题名 | FLUX-Reason-6M & PRISM-Bench: A Million-Scale Text-to-Image Reasoning Dataset and Comprehensive Benchmark |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=cPzgZnpVbN); [GitHub](https://github.com/rongyaofang/prism-bench) |
+| Links | [paper](https://openreview.net/forum?id=cPzgZnpVbN) · [GitHub](https://github.com/rongyaofang/prism-bench) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | FLUX-Reason-6M (合成数据集) & PRISM-Bench (评估基准) |
 | Dataset | PRISM-Bench (GPT-4.1 judge), GenEval |
@@ -41,7 +43,7 @@ claims:
 > - PRISM-Bench (GPT-4.1 judge) 上，Overall Avg 为 BAGEL + FLUX-Reason-6M+GCoT (73.3)，对比 BAGEL (65.1)，变化 +8.2。
 > - GenEval 上，Overall 为 BAGEL + FLUX-Reason-6M+GCoT (0.86)，对比 BAGEL (0.82)，变化 +0.04。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -67,7 +69,7 @@ claims:
 
 尽管取得显著进展，所有模型在文本渲染和长文本指令遵循方面仍有巨大挑战。数据集由 FLUX.1-dev 合成，可能带有该模型的风格偏差；PRISM-Bench 每个轨道仅包含 100 个提示，覆盖面有限。开放问题包括：如何将 GCoT 监督直接融入生成模型的推理过程而非仅用于训练标注、该范式能否扩展到视频和 3D 生成、以及如何防止 VLM 评委体系下的 reward hacking。
 
-## 背景与动机
+
 
 文本到图像（T2I）生成模型近年来取得了显著进展，以 **SDXL**（Podell et al., 2023）、**Qwen-Image**（Wu et al., 2025）为代表的开源模型，以及 **Gemini2.5-Flash-Image**（Google, 2025c）、**GPT-Image-1**（OpenAI, 2025b）等闭源模型，在图像质量和基础语义对齐上已展现出令人瞩目的能力。然而，当前 T2I 领域面临一个核心瓶颈：**开源 T2I 数据集普遍缺乏大规模、高质量且以推理为重点的结构化标注**。现有数据集多采用单一平铺式图像描述，无法为模型提供显式的组合推理与可控生成监督，导致模型在需要复杂推理的任务——如精确文本渲染、多对象空间关系理解、情感表达和创意概念融合——上表现乏力。
 
@@ -77,7 +79,9 @@ claims:
 
 通过 VLM 驱动的合成数据管线构建这一覆盖六维且包含显式推理链的百万级数据集，本文旨在系统性地弥补数据与基准缺口，为 T2I 模型的复杂推理能力提供可扩展的训练监督和可信的评估框架。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作的核心创新在于通过系统性地重构文本到图像（T2I）生成的数据标注范式与评估体系，解决了当前领域因缺乏推理导向的大规模高质量数据及多维饱和指标而导致的能力瓶颈。其关键创新点体现在以下三个“changed slots”上。
 
@@ -100,7 +104,7 @@ claims:
 - **语言覆盖的扩展**：现有数据集多为纯英文标注，限制了非英语场景下的生成能力。FLUX-Reason-6M 对全部 20M 标注进行了系统性的中英双语翻译，且在文本渲染数据中保留原文字符串，为跨语言生成提供了直接监督。
 - **评估基准的可靠性**：PRISM-Bench 摒弃了易饱和且与人类判断相关性低的传统指标（如 CLIPScore），采用 GPT-4.1 和 Qwen2.5-VL-72B 作为 VLM 评委，对图文对齐度与美学质量进行精细评分。经 10 名人类评估者验证，VLM 评分与人类判断的 Spearman’s ρ 最高达 0.982，远超 CLIPScore，确保了基准的区分度与可靠性，避免了指标偏向问题。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l47_https_openreview_net_forum_id_cPzgZnpVbN/figures/003_Figure_2.jpg]]
 *Figure 2: An overview of FLUX-Reason-6M data curation pipeline. The entire process was completed using 128 A100 GPUs over a period of 4 months*
@@ -134,7 +138,7 @@ FLUX-Reason-6M 提供的 GCoT 标注直接对应 PRISM-Bench 各轨道所考察�
 
 当前开源 T2I 数据集普遍缺失大规模、高质量且以推理为重点的结构化标注，而现有评估基准仅覆盖有限维度且指标易饱和。FLUX-Reason-6M 通过 VLM 驱动的合成管线，以六维分类标签、类别特定密集描述和 GCoT 三个粒度层次的标注，系统性地弥补了这一数据缺口。PRISM-Bench 则通过 VLM 评委与人类评估的高度相关性（Spearman's ρ 最高达 0.982，表 3）验证了其作为可靠评估工具的区分度，显著优于传统 CLIPScore。
 
-## 核心模块与公式推导
+
 
 ### 数据管线核心模块
 
@@ -192,7 +196,9 @@ Table 6 和 Table 7 的消融实验揭示了 GCoT 的因果作用：
 2. PRISM-Bench 每轨道仅 100 个提示，覆盖面可能不足以反映所有长尾场景。
 3. 所有模型在文本渲染和长文本指令遵循方面仍存在巨大挑战，即使最先进的闭源模型也有显著提升空间。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：PRISM-Bench 上的模型性能全景
 
@@ -240,7 +246,9 @@ GCoT 的增益在多个维度上表现一致：想象力（66.9→72.4）、实�
 
 4. **基准覆盖的局限性**：PRISM-Bench 每个轨道仅包含 100 条提示，虽然已展现出强区分度，但对于长尾场景和对抗性测试用例的覆盖可能不足，评估结果的完备性需要在更大规模的测试集上进一步验证。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位与基线关系
 
@@ -286,6 +294,8 @@ FLUX-Reason-6M 相对于传统数据集的三个核心改变槽位如下：
 - **跨模态扩展**：该数据集的六维特征体系和 GCoT 标注范式能否迁移到视频生成、3D 内容生成等任务，尚未得到验证。
 - **VLM 评委的 reward hacking 风险**：随着 VLM 评委的广泛使用，模型可能通过对抗性生成来“欺骗”评委，导致评价体系失效。如何建立鲁棒的防过拟合机制是一个紧迫问题。
 - **更大规模模型下的 GCoT 增益**：在更大参数量的扩散模型或自回归生成范式下，GCoT 是否仍能带来一致且显著的提升，需要进一步实验验证。
+
+
 
 ## 原文 PDF
 

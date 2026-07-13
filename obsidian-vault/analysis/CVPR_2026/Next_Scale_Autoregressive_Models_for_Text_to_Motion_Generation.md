@@ -45,7 +45,7 @@ claims:
 > - KIT-ML 上，Top-1 ↑ 0.442 (best)；Top-3 ↑ 0.791 (best)。
 > - User Study (text-to-motion) 上，文本对齐偏好率 71.5%。
 
-## 概述
+## 概要
 
 文本到运动生成的核心挑战在于，模型必须在生成运动序列的初期就建立可靠的**全局语义结构**——例如动作的重复次数、顺序动作模式等。现有方法（扩散模型、掩码Transformer、下一token自回归）在生成初期缺乏对长程语义的显式规划能力，导致全局一致性缺失，且这一缺陷无法通过后续局部精炼来弥补。
 
@@ -61,7 +61,7 @@ MoScale 通过三项关键设计实现突破：（1）**层次化尺度间因果
 
 在标准基准上，MoScale 取得了领先性能：HumanML3D 上 Top-1 准确率达到 **0.540**，MM-Dist 降至 **2.830**；KIT-ML 上 Top-1 和 Top-3 分别达到 **0.442** 和 **0.791**。用户研究中，MoScale 在文本对齐（71.5%）和运动质量（73.3%）上均显著优于先前方法。消融实验证实，层次化精炼是文本对齐提升的主要驱动力——仅此一项便将 Top-1 从基础模型的 0.481 提升至 0.534。
 
-## 背景与动机
+
 
 ### 文本到运动生成的核心挑战
 
@@ -83,7 +83,9 @@ MoScale 通过三项关键设计实现突破：（1）**层次化尺度间因果
 
 这一设计的关键洞察在于：**层次化因果生成提供了全局语义支架**，使模型在有限数据条件下也能可靠地捕捉长程语义依赖，克服了此前方法在长程文本-运动对齐上的根本瓶颈。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题根源：全局语义支架的缺失
 
@@ -138,7 +140,7 @@ $$\tilde{\mathbf{f}}_k = \mathsf{down}\left(\mathbf{f} - \tilde{\hat{\mathbf{f}}
 
 这些创新共同构成了MoScale的核心竞争力：通过层次化因果生成提供全局语义支架，克服了此前方法在有限数据下难以捕捉长程语义的瓶颈，在HumanML3D和KIT-ML两个标准基准上均取得SOTA性能，并在用户研究中以71.5%的文本对齐偏好率和73.3%的运动质量偏好率显著优于先前方法。
 
-## 整体框架
+
 
 MoScale 提出了一种从粗到细的层次化自回归生成范式，其核心思想在于：**先锁定全局语义结构，再逐步细化局部细节**。与传统的下一token自回归（逐帧左到右预测）不同，MoScale 将运动序列建模为多个时间尺度的离散token组，按尺度由粗到细依次生成，从而在生成初期就强制模型依赖文本语义进行全局运动规划。
 
@@ -183,7 +185,7 @@ Figure 1的定性对比直观展示了框架优势：MoScale能准确捕捉“�
 ![[assets/figures/papers/paper_list_l3_https_openaccess_thecvf_com_content_CVPR2026_html_Zheng_Next_Scale_Autor/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of MoScale. (a) MoScale encodes motion sequences into discrete tokens from coarse to fine through multi-scale quantization. (b) It autoregressively predicts tokens at the next scale, conditioned on the prefix and text inputs, using hierarchical scalewise causal attention. (c) Within each scale, MoScale performs temporal refinement to further improve token quality and consistency*
 
-## 核心模块与公式推导
+
 
 ### 问题形式化：从下一Token到下一尺度
 
@@ -264,7 +266,9 @@ $$\tilde{\mathbf{f}}_k = \mathsf{down}\left(\mathbf{f} - \tilde{\hat{\mathbf{f}}
 ![[assets/figures/papers/paper_list_l3_https_openaccess_thecvf_com_content_CVPR2026_html_Zheng_Next_Scale_Autor/figures/001_Figure_1.jpg]]
 *Figure 1: MoScale accurately captures global semantic structure in text descriptions, such as two jumping jacks and sequential actions including turn around, pick things up, and turn around, where prior methods fail to align with the text. Our next-scale autoregressive design with hierarchical causality enables MoScale to preserve these long-range semantics while maintaining realistic motion*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -328,7 +332,9 @@ Figure 1的定性对比直观展示了MoScale的核心优势：对于“two jump
 
 ![[assets/figures/papers/paper_list_l3_https_openaccess_thecvf_com_content_CVPR2026_html_Zheng_Next_Scale_Autor/figures/005_Figure.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 生成范式迁移：从下一token到下一尺度
 
@@ -375,6 +381,8 @@ MoScale引入了两个互补的精炼机制，与现有方法的“单次前向�
 4. **数量词精确遵循**：尽管MoScale在全局语义捕捉上显著优于先前方法，但对数量词（如“两个”、“三次”）的精确遵循能力仍有提升空间。这是否需要引入显式的计数监督或结构化语义解析？
 
 5. **物理约束集成**：将物理合理性约束（如足部滑动惩罚、接触一致性）融入层次化精炼过程，能否在不牺牲文本对齐质量的前提下提升运动真实性？
+
+
 
 ## 原文 PDF
 

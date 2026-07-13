@@ -44,7 +44,7 @@ claims:
 > [!tip] 效果简介
 > - HUMANISE (all actions) 上，goal dist. ↓ 1.008 vs 1.383 (w/o L_o) (-0.375)；action score ↑ 3.59±1.38 vs 2.29±1.43 (w/o L_a) (+1.30)；goal dist. ↓ 1.008 vs 1.406 (GT_action) (-0.398)。
 
-## 概述
+## 概要
 
 三维场景中的人体运动生成是构建智能虚拟角色的关键能力。现有的人-场景交互（HSI）数据集规模有限、运动质量参差不齐，且普遍缺乏语义标注，严重阻碍了语言指令感知的通用化运动学习。HUMANISE 针对这一瓶颈，提出了一个大规模、语义丰富的合成数据集，并配套设计了语言与场景双条件生成模型。
 
@@ -54,7 +54,7 @@ claims:
 
 **局限与待验证点**：模型在处理多相似物体或复杂空间关系时仍会出现目标定位错误；语言描述基于固定模板生成，对自由形式指令的泛化能力需进一步验证；当前仅覆盖坐、站起、躺下、行走四类动作，且未显式建模物理碰撞，生成结果可能存在穿透或悬浮现象。
 
-## 背景与动机
+
 
 ### 问题背景：语言引导的三维场景人体运动生成
 
@@ -85,7 +85,9 @@ claims:
 
 这种“数据-模型协同设计”的策略，使得模型不仅能够从大规模语义数据中学习丰富的交互模式，还能通过辅助任务获得可解释的空间与动作感知能力，为语言引导的三维人体运动生成建立了新的基准。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 HUMANISE 的核心创新在于将语言条件显式引入三维场景中的人体运动生成，并通过**多模态自注意力融合**与**双辅助任务**解决了“语言-场景-运动”三者对齐的瓶颈。其相对现有工作的关键改变槽位（changed slots）体现在以下三个层面。
 
@@ -126,7 +128,7 @@ HUMANISE 将场景编码器从 PointNet++ 升级为 **Point Transformer**（Zhao
 
 三个改变槽位形成递进关系：更强的场景编码器提供更丰富的几何特征，自注意力融合实现语言与场景的细粒度对齐，双辅助损失则从目标定位和动作语义两个维度约束条件嵌入，最终使 cVAE 生成的运动同时符合语言描述和三维场景上下文。这一设计无需依赖真实动作类别或目标中心作为中间监督，实现了端到端的语言条件运动生成。
 
-## 整体框架
+
 
 HUMANISE 采用 **条件变分自编码器（cVAE）** 框架，以三维场景点云和语言描述为条件，生成符合场景上下文的人体运动序列。整体 pipeline 由四个核心阶段构成：**条件编码、运动编码、潜在空间采样与运动解码**，并通过两个辅助任务增强条件嵌入的语义与空间理解能力。
 
@@ -174,7 +176,7 @@ $\mathcal{L}_{kl}$ 为 KL 散度，约束潜在空间分布接近标准正态分
 ![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2210_09729/figures/004_Figure_3.jpg]]
 *Figure 3: Illustration of the proposed generative model. It adopts the cVAE framework and incorporates a motion encoder and decoder to generate human motions. The condition is learned from the joint embedding of the 3D scene and language description with auxiliary tasks of 3D location grounding and action recognition*
 
-## 核心模块与公式推导
+
 
 ### 整体框架：条件变分自编码器
 
@@ -222,7 +224,9 @@ $$\mathcal{L}_{rec} = \mathcal{L}_{t} + \alpha_{r} \mathcal{L}_{r} + \alpha_{p} 
 
 消融实验提供了因果证据：去除 $\mathcal{L}_{o}$ 后，目标距离从 1.008 上升至 1.383；去除 $\mathcal{L}_{a}$ 后，动作得分从 3.59±1.38 降至 2.29±1.43。完全去除所有辅助损失（w/o aux. loss）则导致模型无法生成正确动作或定位到正确交互对象，生成质量得分显著降低。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -297,7 +301,9 @@ $$\mathcal{L}_{rec} = \mathcal{L}_{t} + \alpha_{r} \mathcal{L}_{r} + \alpha_{p} 
 ![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2210_09729/figures/012_Figure.jpg]]
 *Figure: A2: Motions aligned with scenes in Replica [Straub et al., 2019]*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定义与基线对比
 
@@ -376,6 +382,8 @@ HUMANISE 的方法存在明确的适用边界，这些边界定义了其方法�
 4. **无标注场景泛化**：如何将模型直接应用于真实扫描场景，而无需依赖人工标注的场景分割？这可能需要结合三维视觉基础模型（如 3D-LLM）实现自动场景理解。
 
 5. **自然语言泛化**：如何突破模板化描述的局限，使模型能够理解自由形式的自然语言指令？这需要构建包含多样化语言描述的数据集，或利用大语言模型进行描述增强。
+
+
 
 ## 原文 PDF
 

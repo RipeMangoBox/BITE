@@ -5,6 +5,8 @@ paper_level: A
 venue: 3DV
 year: 2025
 pdf_ref: paperPDFs/3DV_2025/Interactive_Humanoid_Online_Full_Body_Motion_Reaction_Synthesis_with_Social_Affordance_Canonicalization_and_Forecasting.pdf
+project_link: https://yunzeliu.github.io/iHuman/
+code_link: null
 aliases:
 - SACF
 - IHOFBMRSSACF
@@ -41,7 +43,7 @@ claims:
 > - InterHuman 上，FID 14.7。
 > - Chi3D 上，FID 12.8。
 
-## 概述
+## 概要
 
 本文提出了一项新任务——**在线全身动作反应合成**（Online Full-Body Motion Reaction Synthesis），目标是在仅能访问人类表演者历史动作的在线设定下，由人形机器人实时生成自然、及时且符合社会规范的全身反应动作。该任务面临两个核心瓶颈：其一，反应者只能基于过去观察进行决策，信息短视导致难以做出及时反应；其二，人类表演者的动作模式高度多样，直接学习从观察到反应的映射极为困难。
 
@@ -49,7 +51,7 @@ claims:
 
 实验表明，该方法在自建的HHI（人-人交互）和CoChair（人-物-人交互）数据集以及公开的InterHuman、Chi3D数据集上，所有评估指标均显著优于现有基线方法。消融实验进一步验证了社会可供性规范化的关键作用——移除该模块后，FID指标从13.3急剧上升至34.5。此外，该方法参数量小，可实现约25 FPS的实时推理。
 
-## 背景与动机
+
 
 ### 问题背景：在线全身动作反应合成
 
@@ -79,7 +81,9 @@ claims:
 
 该方法统一处理有/无物体的交互场景，并在HHI、InterHuman、Chi3D三个数据集上一致优于现有最佳基线（Table 2）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作提出了一项新的任务——**在线全身动作反应合成**，并针对该任务中两个根本瓶颈设计了系统性的解决方案。核心瓶颈在于：**（1）在线设定下反应者仅能访问过去观测，信息短视导致难以做出及时反应；（2）人类表演者的动作模式高度多样，直接学习从表演者到反应者的映射极其困难。** 为此，方法引入了两个相互协同的关键创新。
 
@@ -121,7 +125,7 @@ claims:
 
 上述两个创新并非孤立运作，而是形成协同效应：规范化简化了动作分布，使得预测模块更容易学习未来可供性的演化规律；预测模块提供的未来信息，又使规范化后的表示能够支撑更及时、更合理的反应生成。最终，规范化的完整社会可供性 $A_{cf}$ 通过 4D Transformer 自编码器直接解码为反应者动作 $\hat{s_r} = 4DNet(A_{cf})$，训练采用关节位置和速度的联合 MSE 损失。
 
-## 整体框架
+
 
 本文提出了一套面向在线全身动作反应合成的完整框架，其核心设计围绕“社会可供性”（Social Affordance）的表示、规范化与预测展开。整体流水线由五个关键模块串联构成，形成从原始表演者运动到反应者动作的端到端生成路径。
 
@@ -139,9 +143,9 @@ claims:
 ### 补充图表
 
 ![[assets/figures/papers/paper_list_l1660_Interactive_Humanoid_Online_Full_Body_Motion_Reaction_Synthesis_with_Soc/figures/004_Figure_3.jpg]]
-*Figure 3: Social Affordance Canonicalization. Given a sequence, we first select a social affordance carrier and build the carrier-centric representation. Then we can compute the social affordance representation. We propose to learn the local frame for carrier and canonicalize social affordance to simplify the distribution. Then a motion encoder and decoder are used to generate reactions*
+*Figure 3：载体中心表示、局部框架规范化与反应动作生成流程。*
 
-## 核心模块与公式推导
+
 
 ### 模块总览
 
@@ -193,7 +197,7 @@ $$\mathbf{F}_{l} \gets \mathrm{Equiv\text{-}FrameNet}(c, H_{in}, \mathbf{V}_{in}
 在线反应合成的核心瓶颈在于：预测阶段反应者仅能观测表演者的过去动作（Figure 4 右），而训练阶段可访问完整序列（Figure 4 左）。为解决这一信息不对称，引入社会可供性预测模块（Sec 4.4）：
 
 ![[assets/figures/papers/paper_list_l1660_Interactive_Humanoid_Online_Full_Body_Motion_Reaction_Synthesis_with_Soc/figures/005_Figure_4.jpg]]
-*Figure 4: Social Affordance Forecasting. At the training stage, the humanoid reactor can access all motions of the actor. At the prediction stage in the real world, the humanoid reactor can only observe the past motions of the human actor. The forecasting module can anticipate the motions that the human will take*
+*Figure 4：社会可供性预测以历史观测推断未来动作，缓解在线短视。*
 
 - 训练时，基于前 $i$ 帧历史预测未来 $K$ 帧的表演者动作，并与真实未来动作计算监督损失；
 - 推理时，将预测的未来动作与历史观测拼接，构建“完整”的社会可供性 $A_{cf}$，使反应者能基于想象的未来进行规划。
@@ -214,19 +218,12 @@ $$Loss = MSE(s_r - \hat{s_r}) + MSE(ds_r - \hat{ds_r})$$
 
 其中 $s_r$ 为真实反应动作，$ds_r$ 为真实关节速度，$\hat{s_r}$ 和 $\hat{ds_r}$ 为对应的预测值。同时约束位置和速度有助于生成更平滑、物理上更合理的动作序列。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1660_Interactive_Humanoid_Online_Full_Body_Motion_Reaction_Synthesis_with_Soc/figures/012_Figure_8.jpg]]
-*Figure 8: Visualization results of learned local frame. The local frames are roughly consistent across different chairs*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 实验设置
 
 为验证所提方法的有效性，作者在**四个数据集**上进行了全面评估，包括自建的 **HHI** 和 **CoChair** 数据集，以及公开的 **InterHuman** 和 **Chi3D** 数据集。HHI 是首个大规模全身动作反应数据集，具备明确的动作反馈；CoChair 则是首个大规模多人-物体交互数据集（见 Table 1 对比）。所有实验均在**在线设定**下进行，即反应者只能访问表演者的历史动作信息，确保了比较的公平性。
 
-![[assets/figures/papers/paper_list_l1660_Interactive_Humanoid_Online_Full_Body_Motion_Reaction_Synthesis_with_Soc/figures/003_Table_1.jpg]]
-*Table 1: Dataset comparisons. We compare our iHuman dataset with existing multi-human interaction datasets. Object refers to human-object-human interaction. Whole-body refers to wholebody motion capture. Actor&Reactor refers to whether there is an obvious initiator of the action. Motions is the total number of motion clips. Verbs is the number of interaction categories. Duration refers to the total time of each dataset*
 
 评估指标涵盖生成质量与物理合理性：采用 **FID（Fréchet Inception Distance）** 衡量生成动作分布与真实分布的差异，同时引入**穿透深度（Penetration depth）** 评估 CoChair 场景中人-物交互的物理合理性，并通过用户偏好研究（User Preference）进行主观评价。
 
@@ -244,7 +241,7 @@ $$Loss = MSE(s_r - \hat{s_r}) + MSE(ds_r - \hat{ds_r})$$
 Table 2 展示了在 HHI、InterHuman 和 Chi3D 三个数据集上的定量结果。**本方法在所有指标上均一致优于现有最佳基线**：
 
 ![[assets/figures/papers/paper_list_l1660_Interactive_Humanoid_Online_Full_Body_Motion_Reaction_Synthesis_with_Soc/figures/006_Table_2.jpg]]
-*Table 2: Quantitative results on HHI, InterHuman, and Chi3D. Our method consistently outperforms the previous method in all metrics*
+*Table 2：方法在 HHI、InterHuman 与 Chi3D 上的定量结果。*
 
 - 在 HHI 上，FID 达到 **13.3**，用户偏好率 **67.2%**；
 - 在 InterHuman 上，FID 达到 **14.7**，用户偏好率 **50.6%**；
@@ -253,10 +250,8 @@ Table 2 展示了在 HHI、InterHuman 和 Chi3D 三个数据集上的定量结�
 定性可视化（Figure 6、Figure 7）进一步表明，本方法能生成**更及时的反应动作**，并更好地捕捉手部运动细节。
 
 ![[assets/figures/papers/paper_list_l1660_Interactive_Humanoid_Online_Full_Body_Motion_Reaction_Synthesis_with_Soc/figures/009_Figure_6.jpg]]
-*Figure 6: Visualization results on HHI. Our method can generate more prompt reactions and can better capture hand motion*
+*Figure 6：在 HHI 上生成更及时且手部动作更准确的反应。*
 
-![[assets/figures/papers/paper_list_l1660_Interactive_Humanoid_Online_Full_Body_Motion_Reaction_Synthesis_with_Soc/figures/010_Figure_7.jpg]]
-*Figure 7: Visualization gallery of our method on InterHuman (left) and Chi3D(right). The deep black one is generated by our method*
 
 #### 人-物-人交互场景
 
@@ -265,12 +260,12 @@ Table 3 报告了 CoChair 数据集上的定量结果。本方法在 FID 和穿�
 - 穿透深度仅为 **0.9**。
 
 ![[assets/figures/papers/paper_list_l1660_Interactive_Humanoid_Online_Full_Body_Motion_Reaction_Synthesis_with_Soc/figures/008_Table_3.jpg]]
-*Table 3: Quantitative results on CoChair dataset*
+*Table 3：CoChair 数据集上的生成质量与穿透深度比较。*
 
 Figure 5 的定性结果显示，本方法能够生成**更合理的抓握动作**，并与人类表演者实现更好的协作。
 
 ![[assets/figures/papers/paper_list_l1660_Interactive_Humanoid_Online_Full_Body_Motion_Reaction_Synthesis_with_Soc/figures/007_Figure_5.jpg]]
-*Figure 5: Visualization results on CoChair. Our method can provide a more reasonable grasp and better collaboration with the human actor*
+*Figure 5：CoChair 上的抓握与双人协作定性结果。*
 
 ### 消融实验
 
@@ -283,8 +278,6 @@ Table 4 的消融研究验证了各设计组件的必要性。其中**最关键�
 
 Table 5 显示，本方法的参数量显著低于对比基线，且能够实现约 **25 FPS** 的实时推理，满足人形机器人在线交互的实时性需求。
 
-![[assets/figures/papers/paper_list_l1660_Interactive_Humanoid_Online_Full_Body_Motion_Reaction_Synthesis_with_Soc/figures/015_Table_5.jpg]]
-*Table 5: Our method is significantly more lightweight and can achieve real-time inference at approximately 25 FPS*
 
 ### 关键图表结论
 
@@ -293,14 +286,7 @@ Table 5 显示，本方法的参数量显著低于对比基线，且能够实现
 - **Figure 8**：学习到的局部框架在不同椅子之间大致保持一致，验证了等变框架学习的泛化能力；
 - **Figure 5/Figure 6**：定性结果直观展示了本方法在反应及时性、手部动作捕捉和物体抓握合理性方面的优势。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1660_Interactive_Humanoid_Online_Full_Body_Motion_Reaction_Synthesis_with_Soc/figures/011_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l1660_Interactive_Humanoid_Online_Full_Body_Motion_Reaction_Synthesis_with_Soc/figures/013_Figure_9.jpg]]
-*Figure 9: Visualization results of Motion Forecasting with object(left) and without object(right)*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 与现有基线的结构性差异
 
@@ -325,6 +311,8 @@ Table 5 显示，本方法的参数量显著低于对比基线，且能够实现
 ### 开放问题
 
 当前验证分析中未提取到明确的开放问题。基于方法设计逻辑，以下问题值得关注：(1) 社会可供性规范化框架能否推广到更多样化的载体类型（如可变形物体、移动平台）？(2) 预测模块的误差传播对反应质量的影响是否需要显式的不确定性建模？(3) 该方法在真实人形机器人平台上的部署效果如何，仿真到现实的迁移差距有多大？这些问题需要在后续研究中加以探索。
+
+
 
 ## 原文 PDF
 

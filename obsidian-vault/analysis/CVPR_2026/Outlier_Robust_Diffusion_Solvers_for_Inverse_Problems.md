@@ -42,7 +42,7 @@ claims:
 > - CelebA 256×256 Gaussian deblurring, σ=0.05, ρ=0.02 上，PSNR↑ 29.38±1.78 (Robust-CG), 29.27±1.68 (Robust-GD) vs 22.06 (DPS) (+7.32 (Robust-CG vs DPS))。
 > - CelebA 256×256 Inpainting (random 70%), σ=0.05, ρ=0.10 上，PSNR↑ 31.20 (Robust-CG) vs 15.60±1.94 (DAPS) (+15.60)。
 
-## 概述
+## 概要
 
 基于扩散模型的逆问题求解器在图像修复、超分辨率等任务中取得了显著进展，但现有方法普遍依赖平方ℓ₂保真项（即 $\|\mathbf{y} - \mathcal{A}(\bar{\mathbf{x}}_0)\|_2^2$），对测量中的离群值（outliers）高度敏感。当观测数据以概率 $\rho$ 被任意值替换时，平方损失会因少数大幅偏离的残差而严重扭曲优化方向，导致重建质量急剧退化。这一瓶颈在真实场景中尤为突出——传感器故障、传输错误或对抗干扰都可能引入此类离群污染。
 
@@ -52,7 +52,7 @@ claims:
 
 实验覆盖线性逆问题（超分辨率、随机修复、高斯/运动去模糊）和非线性去模糊，在 CelebA、FFHQ、ImageNet 三个数据集上验证。在典型设置下（高斯噪声 $\sigma=0.05$，污染率 $\rho=0.02$），Robust-CG 在 CelebA 高斯去模糊任务上达到 **29.38 dB PSNR**，比 DPS 的 22.06 dB 高出 **7.32 dB**；在随机修复任务（$\rho=0.10$）上达到 **31.20 dB**，比 DAPS 的 15.60 dB 高出 **15.60 dB**。消融实验进一步证实：将显式噪声估计与 Huber 损失嵌入 DPS 和 DiffPIR 后，Robust-DPS 与 Robust-DiffPIR 均显著优于原始基线，验证了核心组件的独立有效性。
 
-## 背景与动机
+
 
 ### 扩散模型求解逆问题的基本范式
 
@@ -81,7 +81,9 @@ $$y_i = \begin{cases} \xi_i, & \text{if } i \in \mathcal{C} \\ (\mathcal{A}(\mat
 
 因此，核心瓶颈在于：如何在扩散采样框架下构建对离群点鲁棒的优化目标，同时保持对高斯噪声的有效抑制。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈分析：ℓ₂ 保真项在离群污染下的脆弱性
 
@@ -131,7 +133,7 @@ $$ \alpha_j = \frac{\boldsymbol{g}_j^{\mathrm{T}} \boldsymbol{g}_j}{\frac{1}{r_t
 
 两项 changed slot 形成因果闭环：**Huber 损失 + 显式噪声估计**解决了“保真项对离群值敏感”的瓶颈，**共轭梯度法**解决了“梯度下降对学习率敏感”的工程瓶颈。两者的结合使得方法在离群污染场景下（ρ=0.02–0.10）相比现有 DM 逆问题求解器获得 5–15 dB 的 PSNR 增益，且 Huber 阈值 δ 在 $\{0.005, 0.01, 0.02, 0.04\}$ 范围内性能波动小于 0.5 dB（表 10），表现出良好的参数鲁棒性。
 
-## 整体框架
+
 
 本文提出的 Robust-GD 与 Robust-CG 方法在扩散模型逆问题求解的通用流程中插入了两个关键模块：**显式噪声估计**与**鲁棒目标函数构建**，从而在测量包含离群污染时保持重建质量。整体 pipeline 如图 1 所示，每个时间步 $t_i$ 的处理流程如下：
 
@@ -150,7 +152,7 @@ $$ \alpha_j = \frac{\boldsymbol{g}_j^{\mathrm{T}} \boldsymbol{g}_j}{\frac{1}{r_t
 ![[assets/figures/papers/paper_list_l908_https_arxiv_org_abs_2605_09477/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of our proposed Robust-GD and Robust-CG methods. At each timestep*
 
-## 核心模块与公式推导
+
 
 ### 3.1 观测模型与离群污染建模
 
@@ -249,7 +251,9 @@ $$
 
 为验证各组件可独立迁移，本文将显式噪声估计与 Huber 损失嵌入到两个代表性基线中，得到 **Robust-DPS** 和 **Robust-DiffPIR**。消融结果（表 13）表明，在 CelebA Gaussian deblurring（$\rho=0.10$）任务上，Robust-DPS 达到 27.70 PSNR 而原始 DPS 仅 22.06，证明两个核心模块均对性能提升有独立贡献。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果：离群污染下的鲁棒重建
 
@@ -318,7 +322,9 @@ $$
 ![[assets/figures/papers/paper_list_l908_https_arxiv_org_abs_2605_09477/figures/003_Figure_3.jpg]]
 *Figure 3: Visualization results of our methods and other DMbased approaches for the super-resolution task, with Gaussian noise (σ = 0.05) and a contamination fraction of*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有扩散模型逆问题求解器的关系
 
@@ -368,6 +374,8 @@ $$
 - **共轭梯度优化**：将 CG 方法引入扩散逆问题，替代手工调参的梯度下降，提供了更稳定的优化路径。
 
 后续工作可沿两个方向延伸：（1）**更复杂的污染模型**（结构化离群、对抗性污染）与更强的鲁棒损失函数；（2）**理论层面**的鲁棒恢复保证，将压缩感知中的鲁棒恢复理论扩展到扩散先验约束下的逆问题。
+
+
 
 ## 原文 PDF
 

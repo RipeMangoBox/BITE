@@ -5,6 +5,8 @@ paper_level: A
 venue: AAAI
 year: 2024
 pdf_ref: paperPDFs/AAAI_2024/UNIMASKM_A_Unified_Masked_Autoencoder_with_Patchified_Skeletons_for_Motion_Synthesis.pdf
+project_link: null
+code_link: null
 aliases:
 - UM
 - UNIMASKM
@@ -40,7 +42,7 @@ claims:
 > - Human3.6M (20% occlusion) 上，MPJPE (mm) 74.5 @ 400ms, 120.5 @ 1000ms vs 86.8 @ 400ms, 129.1 @ 1000ms (MotionMixer) (-12.3 @ 400ms, -8.6 @ 1000ms)。
 > - Human3.6M Motion Completion (90% future joints masked) 上，MPJPE reduction 12.54% lower than CrossViT vs CrossViT (adapted for completion) (-12.54% relative)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -61,8 +63,6 @@ UNIMASK-M 提出了一种统一的掩码自编码器框架，将各类运动合�
 
 UNIMASK-M 属于确定性掩码自编码器路线，与扩散模型（如 **MDM** (Tevet et al., 2022)）和条件变分自编码器（如 **U-CVAE** (Cai et al., ICCV 2021)）等方法形成互补——前者以高效的单次前向推理见长，后者在多样本生成方面具有优势。该框架为统一运动合成提供了一个简洁而有效的范式，但其确定性本质限制了多样化输出的能力，且当前验证范围局限于 Human3.6M 和 LaFAN1 两个数据集。
 
-## 背景与动机
-
 ### 人体运动合成的任务碎片化困境
 
 人体运动合成涵盖多种条件生成任务，包括**运动预测**（给定历史序列预测未来姿态）、**运动内插**（给定首尾关键帧填充中间过渡）和**运动完成**（从部分观测重建完整运动）。这些任务在动画制作、虚拟现实和机器人交互等应用中均有重要价值，但现有方法普遍采用**任务特定设计**：运动预测通常依赖自回归模型（如**SiMLPe** (Guo et al., WACV 2023)、**ST-DGCN** (Ma et al., CVPR 2022)），运动内插则需要双向推理架构（如Oreshkin et al., arXiv 2022），而运动完成又需专门的跨模态注意力机制（如**CrossViT**）。这种碎片化范式导致每个任务都需要单独训练模型，缺乏统一的框架支撑。
@@ -79,7 +79,7 @@ UNIMASK-M 属于确定性掩码自编码器路线，与扩散模型（如 **MDM*
 
 2. **姿态分解**：借鉴 ViT 将图像分解为补丁的思想，将人体骨架分解为**基于肢体的补丁**（腿、手臂、躯干等），独立投影为令牌序列。这种部件级分解使得模型能够以任意身体部件组合为条件进行生成，从根本上提升了对部分遮挡的鲁棒性，同时利用姿态部件间的时空自注意力捕捉运动关联。
 
-## 核心创新
+## 核心方法与创新机理
 
 UNIMASK-M 的核心创新在于将人体运动合成重新表述为一个统一的掩码重建问题，并通过三个关键设计实现任务通用性与对部分身体条件的鲁棒性。
 
@@ -100,8 +100,6 @@ UNIMASK-M 通过不同的掩码模式将运动预测、内插、完成等任务�
 不同于自回归模型使用的因果掩码，UNIMASK-M 的 ViT 编码器-解码器采用标准双向自注意力，能够同时捕捉所有补丁令牌之间的时空关系，且被掩码的补丁在编码阶段不被丢弃。网络输出预测相对于插值参考运动的偏移量，最终结果为 $\mathbf{Y} = f_{\theta}(\mathbf{X}_{fill}) + \mathbf{X}_{ref}$，这一 Delta 策略为重建提供了稳定的基准。
 
 综上，UNIMASK-M 通过姿态补丁化、显式掩码嵌入和课程学习三个 changed slots，在保持架构简洁的前提下，实现了单一模型在多任务上的统一高性能，并在遮挡条件下展现出显著优于任务特定模型的鲁棒性。
-
-## 整体框架
 
 UNIMASK-M 将各类人体运动合成任务统一为一个**掩码重建问题**，其核心思想源于将 ViT 的图像补丁分解策略迁移至人体姿态，并借鉴 MAE 的自监督重建范式。整个 pipeline 围绕“部分已知骨架 → 完整运动序列”这一条件生成逻辑展开，通过单一确定性模型适应预测、内插、完成等多种掩码模式，无需为不同任务设计独立的因果或双向结构。
 
@@ -153,8 +151,6 @@ UNIMASK-M 的主干由五个紧密衔接的模块组成，形成“分解 → �
 ![[assets/figures/papers/paper_list_l1819_UNIMASKM_A_Unified_Masked_Autoencoder_with_Patchified_Skeletons_for_Moti/figures/001_Figure_1.jpg]]
 *Figure 1: Unified architecture for different human motion synthesis tasks. Green and purple skeletons denote a known skeleton joint, while light red and green represents our model prediction over a masked joint*
 
-## 核心模块与公式推导
-
 ### 问题形式化与输出策略
 
 UNIMASK-M 将各类姿态条件运动合成任务统一为掩码重建问题：给定已知运动 $\bar{\mathbf{X}_q} = \mathbf{X} \odot (1 - \mathbf{M})$，目标是重建被掩码的缺失关节 $\mathbf{X}_m = \mathbf{X} \odot \mathbf{M}$，其中 $\mathbf{M}$ 为二值掩码矩阵。
@@ -205,10 +201,7 @@ UNIMASK-M 采用标准 ViT 自注意力机制构建编码器和解码器。与�
 ![[assets/figures/papers/paper_list_l1819_UNIMASKM_A_Unified_Masked_Autoencoder_with_Patchified_Skeletons_for_Moti/figures/004_Figure_3.jpg]]
 *Figure 3: Mixed embedding strategy. The mixed embeddings are obtained by summing (i) a masking token to identify the masked patches*
 
-![[assets/figures/papers/paper_list_l1819_UNIMASKM_A_Unified_Masked_Autoencoder_with_Patchified_Skeletons_for_Moti/figures/003_Figure_4.jpg]]
-*Figure 4: Adaption of UNIMASK-M using DCT and TempMLP. First, we apply Discrete Cosine Transformation (DCT) and Inverted DCT (IDCT) to encode and decode the given motion. Additionally, we adopt a Temporal MLP (TempMLP) module to refine the predicted pose sequence through M blocks of fully connected layers (FC), Layer Normalization (LN) and a residual connection*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验结果
 
@@ -274,7 +267,7 @@ UNIMASK-M 在多项运动合成任务上展现出竞争力或领先的性能，�
 ![[assets/figures/papers/paper_list_l1819_UNIMASKM_A_Unified_Masked_Autoencoder_with_Patchified_Skeletons_for_Moti/figures/008_Figure_6.jpg]]
 *Figure 6: Visual comparison of the inbetweening task with (Oreshkin et al. 2022) . We show the predicted motion trace for both (Oreshkin et al. 2022) (top row) and our UNIMASK-M (bottom row). The results show that our predicted trace (red) is closer to the ground-truth trace (green)*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/EnergyMoGen_Compositional_Human_Motion_Generation_with_Energy_Based_Diffusion_Model_in_Latent_Space.pdf
+project_link: https://jiro-zhang.github.io/EnergyMoGen/
+code_link: null
 aliases:
 - ECHMGEBDMLS
 tags:
@@ -42,7 +44,7 @@ claims:
 > - KIT-ML 上，R-Precision Top-3 ↑ 0.772 (ENERGYMOGEN) vs 0.772 (FineMoGen) (0.000 (tied best))。
 > - MTT (Compositional Generation) 上，R@3 ↑ 28.0 (Ours + SEF) vs 25.4 (Ours single-text baseline) (+2.6)。
 
-## 概述
+## 概要
 
 人体动作生成领域面临一个核心瓶颈：**潜在扩散模型在组合多个语义概念生成连贯动作时存在困难**。根本原因在于，现有方法将动作编码为固定数量的潜在向量，这些向量与动作帧之间缺乏显式对应关系，导致无法支持逐帧的组合操作——当文本描述包含“边走边挥手”或“坐下但不弯腰”等多概念指令时，模型难以在潜在空间中精确融合这些语义。
 
@@ -54,7 +56,7 @@ claims:
 
 值得注意的是，该方法仍存在局限性：对训练中未见过的全新概念组合表现不佳；固定数量的潜在向量限制了更精细的逐帧组合操作；生成多样性在部分指标上尚未全面超越所有基线方法。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -74,7 +76,9 @@ claims:
 
 然而，单纯在潜在空间中组合能量分布面临**语义不一致**与**运动失真**的权衡：基于去噪网络的“潜在感知”能量组合能保持运动平滑度，但文本对齐能力有限；基于交叉注意力的“语义感知”能量组合能提升文本一致性，却容易引入脚步滑动和动作抖动。本文的动机正是通过协同融合这两种互补的能量谱系，在保持运动质量的同时实现多概念的精确语义组合。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ENERGYMOGEN 的核心创新在于将潜在扩散模型的去噪过程重新解释为基于能量的采样，并围绕这一视角构建了三个相互协同的关键机制，从而首次在连续潜在空间中实现了多语义概念的可组合人体动作生成。
 
@@ -107,7 +111,7 @@ $$\hat{\epsilon}_\theta(z_t, t, \mathbb{C}, \mathbf{c}_{1,n}) = \lambda_l \epsil
 - **能量项融合**：从单一能量项（仅无分类器引导）转变为 SEF 线性加权融合三种互补分数。
 - **推理过程**：从标准 DDPM 逆向过程转变为基于能量的 MCMC 类采样，通过加权分数求和实现多概念协同生成。
 
-## 整体框架
+
 
 ENERGYMOGEN 的整体 pipeline 由三个核心模块串联构成：**运动变分自编码器（Motion VAE）**、**基于能量化交叉注意力的潜在扩散模型（LDM）**，以及**协同能量融合（Synergistic Energy Fusion, SEF）**框架。Figure 2 给出了完整的架构示意。
 
@@ -152,7 +156,7 @@ $$\hat{\epsilon}_\theta(z_t, t, \mathbb{C}, \mathbf{c}_{1,n}) = \lambda_l \epsil
 ![[assets/figures/papers/paper_list_l1857_EnergyMoGen_Compositional_Human_Motion_Generation_with_Energy_Based_Diff/figures/018_Figure_7.jpg]]
 *Figure 7: Visual results of energy distributions. For a clear illustration, energy distributions are calculated with interpolation and Gaussian smoothing and then visualized as contour maps. (a) Concept 1, (b) Concept 2, (c) Compositional motion generation, (d) Multiconcept motion generation. Similar regions are highlighted in red*
 
-## 核心模块与公式推导
+
 
 ### 3.1 运动变分自编码器（Motion VAE）
 
@@ -216,7 +220,9 @@ $$\hat{\epsilon}_\theta(z_t, t, \mathbb{C}, \mathbf{c}_{1,n}) = \lambda_l \epsil
 ![[assets/figures/papers/paper_list_l1857_EnergyMoGen_Compositional_Human_Motion_Generation_with_Energy_Based_Diff/figures/008_Figure_5.jpg]]
 *Figure 5: Analysis of the latent distribution. For a clear illustration, energy distributions are calculated with interpolation and Gaussian smoothing, then visualized as contour maps. Motions in the 4th row are generated from texts, i.e., “a person is walking forward and waving both arms” and “a person is walking to the right”, which is created by composing the multiple concepts into a single text via (a) Conjunction and (b) Negation. Similar regions are highlighted in red*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能对比
 
@@ -274,7 +280,9 @@ Table 4 和 Table 6 分别展示了将能量组合方法应用于骨架级扩散
 ![[assets/figures/papers/paper_list_l1857_EnergyMoGen_Compositional_Human_Motion_Generation_with_Energy_Based_Diff/figures/014_Table_9.jpg]]
 *Table 9: Ablation of step size in Adaptive Gradient Descent on MTT [50]*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从骨架扩散到潜在空间能量组合
 
@@ -337,6 +345,8 @@ ENERGYMOGEN 的组合生成能力存在明确的适用边界：
 4. **更大规模组合数据的泛化验证**：当前组合生成评估主要在 MTT 数据集上进行，其概念组合的规模和多样性有限。该方法在更大规模、更复杂的组合动作数据集上的泛化能力尚待验证。
 
 5. **语义感知组合的物理约束注入**：能否在语义感知的能量函数中显式嵌入物理约束（如足部接触、关节限制），从梯度层面抑制脚步滑动和动作抖动，而非仅依赖 SEF 的事后融合？
+
+
 
 ## 原文 PDF
 

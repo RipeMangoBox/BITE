@@ -5,6 +5,8 @@ paper_level: A
 venue: SIGGRAPH
 year: 2024
 pdf_ref: paperPDFs/SIGGRAPH_2024/Iterative_Motion_Editing_with_Natural_Language.pdf
+project_link: null
+code_link: null
 aliases:
 - MBIMES
 - IMENL
@@ -41,7 +43,7 @@ claims:
 > - User Study (Table 1) 上，StrucSim (↑) 为 4.33，对比 2.77 (MDM-Edit)，变化 +1.56。
 > - User Study (Table 1) 上，Fidelity (↑) 为 4.52，对比 1.72 (MoMask-Edit)，变化 +2.80。
 
-## 概述
+## 概要
 
 **核心问题**：现有文本驱动的运动生成模型（如MDM、MoMask）虽能根据全局文本描述合成运动，但缺乏对局部运动编辑的细粒度控制。当用户希望“把腿踢得更高”或“让动作更快”时，直接修改输入文本提示会导致生成结果不可预测，且往往完全改变原始运动结构，无法在保留源运动上下文的前提下实现精确编辑。
 
@@ -51,7 +53,7 @@ claims:
 
 **方法定位**：该方法属于**结构化中间表示 + 扩散生成**的技术路线，通过将模糊的自然语言编辑意图映射到预定义的、可精确执行的算子空间，解决了文本到运动编辑的可控性瓶颈。其核心创新不在于扩散模型本身，而在于MEO作为“语言-运动”之间的结构化桥梁，以及LLM程序合成在运动编辑任务中的新颖应用。
 
-## 背景与动机
+
 
 文本驱动的三维人体运动生成近年来取得了显著进展，扩散模型与掩码生成模型已能根据自然语言描述合成逼真的运动序列。然而，这些模型本质上是从文本到运动的“一次性”生成范式：用户提供一个描述性提示，模型输出完整运动。当用户对生成结果不满意、希望进行局部调整时，现有工具几乎无法提供有效的支持。
 
@@ -61,7 +63,9 @@ claims:
 
 **本文的动机**正是解决上述矛盾：如何设计一个系统，既能通过自然语言接受编辑指令，又能实现可预测、精确的运动编辑，同时最大程度保留原始运动的结构？作者的核心洞察是：将运动编辑的语义空间约束到一组有限的、预定义的运动编辑算子（Motion Editing Operators, MEOs）上。MEOs将编辑意图形式化为空间约束（如关节目标位置）和时间约束（如动作速度调整），从而在自然语言的灵活性与关键帧编辑的精确性之间建立桥梁。借助大语言模型（LLM）的程序合成能力，系统可将自然语言指令自动翻译为MEO程序，再通过扩散填充模型在约束条件下生成连贯的编辑运动。这一设计使得迭代式、对话式的运动精修成为可能——用户可像“教练”一样逐步指导角色动作的改进（Figure 1）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作的核心创新在于将非结构化的自然语言运动编辑转化为一个**结构化、可预测的两阶段流水线**：首先通过大语言模型（LLM）的程序合成能力，将模糊的编辑指令映射为一组预定义的运动编辑算子（Motion Editing Operators, MEOs），随后由扩散模型在关键帧约束下完成运动填充。
 
@@ -104,7 +108,7 @@ $$\mathcal{L} = \mathbb{E}_{\mathbf{X}, t} [ \| \mathbf{X} - G(\mathbf{X}_t, \ma
 
 需要指出，MEO 的预定义集合构成了编辑能力的硬边界：系统无法表达超出算子词汇表的编辑意图（如物理动力学层面的“跳得更用力”或风格化调整“更优雅”）。此外，系统依赖准确的运动上下文描述 $E_{ctx}$ 来消解指令歧义，错误或不完整的描述可能导致编辑失败。扩散填充模型在涉及复杂动力学变化时，也可能产生物理不一致的运动。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2312_11538/figures/002_Figure_2.jpg]]
 *Figure 2: System overview: Our system uses a LLM to translate a natural language editing instruction (??) into source code for a Python program that executes motion editing operations (MEOs). Our MEO execution engine applies MEOs to the source motion by first generating motion constraints (e.g., keyframes, retiming constraints). In the case shown above, E describes a sub-movement that should start at the beginning of the motion and lead to a pose in the future; the engine determines the explicit frame requiring editing. A diffusion-based motion infilling step then produces output motions that embody the desired edit, preserve the original motion when possible, and look realistic. Our system can be us...*
@@ -135,7 +139,7 @@ $$\mathcal{L} = \mathbb{E}_{\mathbf{X}, t} [ \| \mathbf{X} - G(\mathbf{X}_t, \ma
 
 Figure 2 展示了完整的系统架构：用户指令经LLM转化为MEO程序，执行引擎生成约束后，扩散模型完成运动填充，最终输出编辑结果。
 
-## 核心模块与公式推导
+
 
 ### 系统流水线模块
 
@@ -176,7 +180,9 @@ $$G(\text{input}=\mathbf{M} \odot \mathbf{X} + (1-\mathbf{M}) \odot q(\mathbf{X}
 
 其中 $\mathbf{M}$ 为二进制掩码，标记需要保留的上下文帧（值为1）和需要填充的编辑区域（值为0）。输入分支将上下文区域保持为原始运动，编辑区域填充为带噪运动；条件分支仅提供上下文区域的干净运动作为引导信号。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 用户研究：编辑保真度与结构保持的权衡突破
 
@@ -224,7 +230,9 @@ $$G(\text{input}=\mathbf{M} \odot \mathbf{X} + (1-\mathbf{M}) \odot q(\mathbf{X}
 ![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2312_11538/figures/006_Figure_6.jpg]]
 *Figure 6: (b) Edit: As you jump, kick both legs out to the side. (d) Edit: Synchronize your arms. Figure 6: Handling natural-language instructions. Starting from a source motion (left column, in purple) and editing instruction (italicized), our system produces plausible motions (right column, blue) that preserve the structure of the original motion and abide by the editing instruction*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心问题定位：文本驱动运动编辑的“保真度-结构”困境
 
@@ -271,6 +279,8 @@ $$G(\text{input}=\mathbf{M} \odot \mathbf{X} + (1-\mathbf{M}) \odot q(\mathbf{X}
 3. **关键帧选取的智能化**：当前系统依赖关节位置极值选取关键帧，这在复杂运动（如多关节协调动作）中可能不够鲁棒。更智能的运动理解方法（如基于相位的运动分割、基于学习的显著性检测）可能改进关键帧选取质量。
 
 4. **风格化编辑的语义映射**：如何将“更优雅”等抽象风格描述映射为可执行的MEO组合或参数调整？这可能需要学习风格标签与运动特征之间的对应关系，或引入风格迁移技术作为MEO的补充。
+
+
 
 ## 原文 PDF
 

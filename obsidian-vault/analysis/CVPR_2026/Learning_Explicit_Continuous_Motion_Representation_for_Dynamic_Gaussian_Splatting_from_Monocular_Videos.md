@@ -43,7 +43,7 @@ claims:
 > - iPhone 上，mPSNR / mSSIM / mLPIPS 20.17 / 0.729 / 0.274 vs SoM, MoSca, SplineGS, MarbleGS, HiMoR, MoDec-GS (所有对比方法均低于本方法) (最佳 (准确差值未解析))。
 > - NVIDIA 上，PSNR / SSIM / LPIPS 27.81 / 0.871 / 0.049 vs 所有对比方法 (均低于本方法) (最佳 (准确差值未解析))。
 
-## 概述
+## 概要
 
 单目视频动态场景的新视图合成是计算机视觉与图形学中的核心挑战。现有基于3D高斯泼溅（3DGS）的动态方法通常将运动建模为逐时间戳的仿射变换，或仅对位置轨迹施加连续性约束，**未能显式建模动态高斯的位置与朝向在连续时间上的平滑变形轨迹**，导致在复杂运动区域出现非连续朝向变化和长期运动干扰，产生严重伪影。此外，固定数量的运动基无法适应局部运动复杂度的差异，进一步加剧了表达能力的不足。
 
@@ -56,7 +56,7 @@ claims:
 
 在iPhone和NVIDIA两个动态场景数据集上，SE3-BSplineGS在mPSNR、mSSIM、mLPIPS等指标上均大幅领先先前SOTA方法（Table 1）。消融实验证实，SE(3) B样条运动基相较于SoM的SE(3)姿态变换（mPSNR 18.17）和MoSca的运动支架（mPSNR 19.26）有显著提升（Table 3），而移除自适应控制、软分段重建或SDS先验均导致性能明显下降（Table 2），验证了各组件的必要性。方法同时展示了良好的跨场景泛化能力，但在大非刚性运动场景下仍存在失效风险（Figure 7）。
 
-## 背景与动机
+
 
 ### 动态场景新视图合成的挑战
 
@@ -84,7 +84,9 @@ claims:
 
 通过这些设计，SE3-BSplineGS在iPhone和NVIDIA两个基准数据集上均取得了显著优于先前SOTA方法的新视图合成质量，验证了显式连续运动表示在单目动态高斯泼溅中的关键作用。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作 **SE3-BSplineGS** 的核心创新在于首次将**显式连续 SE(3) 运动表示**引入单目动态高斯泼溅，并辅以**自适应运动基控制**与**软分段重建**，系统性地解决了现有方法中运动轨迹不连续、运动基密度固定导致的复杂区域伪影问题。以下从四个关键维度展开分析。
 
@@ -153,7 +155,7 @@ $$\mathcal{L}_{sds} = \mathbb{E}_{t,\epsilon} \left[ \| \omega(t) (\epsilon_{\ph
 
 这些创新并非孤立存在，而是形成了一条完整的因果链：**连续 SE(3) 轨迹提供运动建模的数学基础，自适应控制确保表达能力与效率的平衡，软分段重建与扩散先验分别从时序一致性和多视图一致性两个维度补充约束**，共同实现了单目动态新视图合成的显著提升。
 
-## 整体框架
+
 
 SE3-BSplineGS 的整体流程围绕“显式连续运动表示”展开，将单目视频重建为可驱动的高斯泼溅场景。图2给出了完整的模块关系与数据流。
 
@@ -206,7 +208,7 @@ $$\mathcal{L} = \lambda_{rec}\mathcal{L}_{rec} + \lambda_{geo}\mathcal{L}_{geo} 
 ![[assets/figures/papers/paper_list_l1028_https_arxiv_org_abs_2603_25058/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of our method. We first initialize static Gaussians via depth reprojection and dynamic Gaussians from tracking points, by modeling their transformations with learnable SE(3) B-spline Motion Bases. We then adjust the number of motion bases and control points based on an adaptive control mechanism. Next, we employ a soft segment reconstruction strategy to fuse dynamic Gaussians at different reference timestamps to the observation timestamp, and further supplement the monocular video with scene-level multi-view cues derived from a multi-view diffusion model*
 
-## 核心模块与公式推导
+
 
 **SE3-BSplineGS** 的核心设计围绕一个关键瓶颈展开：现有单目动态高斯泼溅方法未能显式建模高斯的位置与朝向连续变形轨迹，且缺乏对运动基密度的自适应控制，导致复杂运动区域出现非连续朝向变形和长期运动干扰。该方法通过三个紧密耦合的模块——SE(3) 累积B样条运动基、自适应控制机制和软分段重建——构建了统一的连续运动表示，并辅以多视图扩散先验缓解单目过拟合。
 
@@ -275,7 +277,9 @@ $$\mathcal{L} = \lambda_{\text{rec}}\mathcal{L}_{\text{rec}} + \lambda_{\text{ge
 ![[assets/figures/papers/paper_list_l1028_https_arxiv_org_abs_2603_25058/figures/016_Figure_10.jpg]]
 *Figure 10: Effect of soft segmentation reconstruction*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -340,7 +344,9 @@ Table 6 比较了控制点修剪策略：本方法采用“选择最小修剪误
 ![[assets/figures/papers/paper_list_l1028_https_arxiv_org_abs_2603_25058/figures/012_Table_5.jpg]]
 *Table 5: Effect of 2D prior errors. “w/ Prior pert.” indicates that the 2D tracking prior is perturbed by adding random noise within the range of [-15, 15]*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线工作的关系
 
@@ -374,6 +380,8 @@ Table 6 比较了控制点修剪策略：本方法采用“选择最小修剪误
 *   **自适应控制的泛化性：** 自适应控制机制的超参数（如修剪间隔 `N_prune=500`，误差阈值 `ε_prune=5.0`）对不同场景的敏感度如何？能否设计完全自适应的、无需手动调节阈值的控制策略，以应对包含多个运动速度不同物体的复杂场景？
 *   **更强先验的集成：** 当前使用的 Zero123-xl-diffusers 是一个图像扩散模型。能否将其替换为更强大的**视频扩散模型**，以提供时序上更一致的多视图先验，从而更好地处理动态场景和被遮挡区域？
 *   **多模态数据扩展：** 该方法目前仅使用单目 RGB 视频。是否可以将该框架扩展到**多目视频**或融合**深度传感器数据**，以从根本上解决单目重建中的尺度模糊性和遮挡问题，从而应对更具挑战性的大幅度非刚性运动场景？
+
+
 
 ## 原文 PDF
 

@@ -43,7 +43,7 @@ claims:
 > - Box-smoke (Gas) 上，TD 0.84 (Ground Truth) vs 4.01 (D-3DGS ) (-3.17)；AUOP (Area Under Outlier Percentage) 0.3 (Ground Truth) vs 37.9 (D-3DGS ) (-37.6)。
 > - All scenes (Monocular) 上，PSNR (db) N/A (Benchmark) vs 21.7 (D-3DGS), 22.7 (4DGS) (—)。
 
-## 概述
+## 概要
 
 动态新视角合成（DyNVS）领域近年来在光度重建质量上取得了显著进展，但现有基准几乎完全忽略了场景的**物理一致性**——即重建结果是否遵循真实的物理运动规律。这一缺失的根源在于，当前数据集仅提供多视角RGB图像，缺乏用于评估物理真实性的地面真实物理信息（如三维轨迹和物理参数），导致对方法的评价停留在视觉层面，无法诊断其在复杂动态场景下的根本性缺陷。
 
@@ -53,7 +53,7 @@ claims:
 
 PhysGaia在运动复杂度和视觉真实感方面均显著优于现有物理基准：动态得分0.444（最高），FID 207.8（最低），KID 0.118（最低），为动态场景重建领域提供了更具挑战性和诊断力的评估平台。
 
-## 背景与动机
+
 
 ### 动态新视角合成的现状与瓶颈
 
@@ -87,7 +87,9 @@ PhysGaia作为基准工作，其定位在于为现有DyNVS方法提供统一的�
 
 PhysGaia的独特贡献在于填补了评估体系中的“物理真值”空缺。与上述方法侧重于重建算法本身不同，PhysGaia提供了物理模拟器生成的精确三维轨迹和材料参数，使得对物理一致性的定量诊断成为可能。这一基准不仅暴露了现有方法在复杂多体交互场景下的根本性缺陷，也为未来物理感知的动态重建方法指明了方向。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PhysGaia 的核心创新在于将动态新视角合成（DyNVS）的评估范式从**单一的光度真实推进到物理一致性**。这一转变通过以下三个相互关联的关键改进实现。
 
@@ -105,7 +107,7 @@ PhysGaia 的核心创新在于将动态新视角合成（DyNVS）的评估范式
 
 **核心因果链条**：物理求解器提供精确真值 → 多体多材料场景暴露方法缺陷 → 专用物理度量实现定量评估。这一链条使 PhysGaia 成为一个“压力测试”基准：现有方法在 PhysGaia 上的表现显著下降（Table 4, Table E），尤其在高动态的气体和流变物质场景中，揭示了其物理真实性的根本不足。
 
-## 整体框架
+
 
 PhysGaia 构建了一套以物理模拟器为核心、路径追踪渲染器为桥梁、多模态真值生成为输出的完整数据流水线，其设计目标是为动态新视角合成（DyNVS）任务提供兼具光度真实与物理真实的多体交互基准。
 
@@ -166,7 +168,7 @@ PhysGaia 的评估体系分为两个维度：
 ![[assets/figures/papers/paper_list_l2239_https_arxiv_org_abs_2506_02794/figures/004_Figure_2.jpg]]
 *Figure 2: Examples from the proposed physics-aware benchmark, PhysGaia. They exhibit complex physical interactions between multiple objects composed of diverse materials such as liquid, gas, rheological substance, and textile. More importantly, our benchmark enables evaluation of physics realism to foster physics reasoning in dynamic scenes*
 
-## 核心模块与公式推导
+
 
 ### 物理模拟管线
 
@@ -222,7 +224,9 @@ $$
 
 物理模拟生成的三维粒子轨迹经路径追踪渲染器生成多视角 RGB 图像，每个像素采样 256 条光线。稀疏视角的相机位姿通过 COLMAP 从渲染图像中重建，为高斯泼溅等下游方法提供初始化点云。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 基准特性验证：运动复杂度与真实感
 
@@ -288,7 +292,9 @@ Table 7 展示了逆物理参数估计任务的结果。**PAC-NeRF** 和 **GIC**
 ![[assets/figures/papers/paper_list_l2239_https_arxiv_org_abs_2506_02794/figures/003_Table_2.jpg]]
 *Table 2: Comparison with physics-simulated datasets for the DyNVS task. Our PhysGaia benchmark offers diverse materials, multi-body interactions, and complete physical ground truth (parameters and trajectories)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 基准构建的方法学定位
 
@@ -324,6 +330,8 @@ PhysGaia 揭示的开放问题指向三个关键方向：
 2. **细尺度物理建模**：基于仿真的方法如何更好地捕捉复杂材料响应（如流变物质的粘弹性应力分解 $\pmb{\sigma} = \pmb{\sigma}_{\mathrm{elastic}} + \pmb{\sigma}_{\mathrm{viscous}}$）或细尺度交互（如飞溅）？现有 MLP 和网格表示在流体飞溅等细粒度动态上表现失败（Section 5.2.1）。
 
 3. **物理感知的重建架构**：现有方法（D-3DGS、4DGS、STG、MoSca、SoM）在 PhysGaia 上表现显著下降，尤其在高动态场景中（Tables 4-5），表明需要将物理先验（如动量守恒 $\rho \left( \frac{\partial \mathbf{u}}{\partial t} + (\mathbf{u} \cdot \nabla) \mathbf{u} \right) = -\nabla p + \mu \nabla^2 \mathbf{u} + \rho \mathbf{g}$）显式嵌入重建架构，而非仅依赖数据驱动的变形场。
+
+
 
 ## 原文 PDF
 

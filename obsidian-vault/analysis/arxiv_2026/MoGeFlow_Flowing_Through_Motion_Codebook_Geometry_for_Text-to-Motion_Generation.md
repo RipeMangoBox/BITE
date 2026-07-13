@@ -43,7 +43,7 @@ claims:
 > - KIT‑ML (test set, repeat‑20) 上，R‑Precision Top‑1 ↑ 0.496±.003 vs SALAD 0.463±.003 (+0.033)；FID ↓ 0.130±.005 vs SALAD 0.208±.010 (‑0.078)。
 > - MotionMillion (test set) 上，R@1 ↑ 0.91 vs ScaMo (previous best) (best reported)。
 
-## 概述
+## 概要
 
 文本到运动生成的核心挑战在于从自然语言描述合成高质量、语义对齐的三维人体运动序列。近年来，基于离散运动码的方法——先将运动压缩为离散令牌序列，再学习文本条件的生成先验——取得了显著进展。然而，这类方法的生成先验普遍将码书条目视为无序的类别标签，忽略了冻结运动码书嵌入空间中蕴含的物理运动几何结构，导致生成过程无法有效利用码间的邻近关系与解码器因果性。
 
@@ -51,7 +51,7 @@ claims:
 
 在 HumanML3D 测试集上，MoGeFlow 取得最高 R-Precision Top-1（0.592）和最佳 MultiModal Distance（2.599）；在 KIT-ML 上取得最佳 R-Precision 和 FID（0.130）；在 MotionMillion 上取得最佳 R@1/2/3 和 FID。消融实验进一步验证了 PartVQ 几何接口与连续流先验的互补性：用通用 RVQ 替换 PartVQ 接口大幅降低验证集 R@3（0.860→0.838）和 FID（0.081→0.169），而在相同 PartVQ 接口下，离散扩散先验的表现也弱于连续流先验。
 
-## 背景与动机
+
 
 ### 文本到运动生成的核心挑战
 
@@ -92,7 +92,9 @@ MoGeFlow的设计动机源于一个关键问题：**能否在保留离散运动�
 
 这一设计使得MoGeFlow既能利用连续流匹配在几何感知空间中的建模能力，又能保留离散运动分词器的高效解码接口，从而在文本-运动对齐与生成质量上取得突破。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MoGeFlow 的核心创新可归结为一个**生成域的切换**：将文本条件运动先验从传统的**离散码索引空间（类别预测）**迁移至冻结运动码书的**连续嵌入空间（流匹配生成）**，并在终端通过最近邻投影恢复有效离散码序列以供冻结解码器使用。这一切换并非简单的表示变换，而是建立在对运动码书几何结构的系统诊断之上。
 
@@ -143,7 +145,7 @@ MoGeFlow 与现有离散运动码方法的根本区别在于**生成域的选择
 
 消融实验（Table 4）直接验证了这一设计选择的必要性：在相同 PartVQ 接口下，离散类别扩散先验仅取得验证集 R@3 **0.826** / FID **0.083**，而 MoGeFlow‑S 的连续流先验达到 **0.860** / **0.081**，证明连续流更好地利用了码书几何。用通用 RVQ 替换 PartVQ 接口后，验证集 R@3 从 0.860 降至 **0.838**，FID 从 0.081 恶化至 **0.169**，表明 PartVQ 提供的结构化几何对性能至关重要。
 
-## 整体框架
+
 
 MoGeFlow 的生成管线围绕一个核心洞察展开：冻结的运动码书嵌入空间中存在可度量、非随机且解码器因果的几何结构。基于此，MoGeFlow 将生成域从传统的离散类别预测切换到连续码嵌入空间中的流匹配生成，仅在终端通过最近邻投影恢复到有效离散码序列，供冻结解码器使用。整个管线由五个模块构成，数据流清晰且各模块职责分明。
 
@@ -186,7 +188,7 @@ $$\mathbf{Y}_0 \sim \mathcal{N}(0,I),\ \tilde{\mathbf{Y}}_1 = \Phi_\theta^1(\mat
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2606_11656/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of MoGeFlow. A frozen PartVQ tokenizer inherited from KV-Control maps motion into decoderbound code embeddings over data-derived joint groups, descriptively named root, upper arms, right leg, upper neck, left leg, and head. These groups are statistically discovered rather than manually predefined left/right or upper/lower body partitions. MoGeFlow learns a text-conditioned continuous flow over structured motion-code frames, projects terminal states to valid entries of each group-specific codebook, and decodes them with the frozen motion decoder*
 
-## 核心模块与公式推导
+
 
 MoGeFlow 的核心设计围绕一个关键因果操作展开：**将生成域从离散类别预测切换为冻结运动码书嵌入空间中的连续流匹配**，仅在终端通过最近邻投影恢复有效离散码序列。这一设计保留了离散分词器紧凑、有效的解码接口，同时使生成过程能够利用码书嵌入空间的几何结构。
 
@@ -251,7 +253,9 @@ $$\tilde{v} = v_\theta(\mathbf{Y}^n,\tau_n,h(\varnothing)) + s\left[v_\theta(\ma
 
 其中 $s$ 为引导强度，$h(\varnothing)$ 为空文本嵌入。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要定量结果
 
@@ -308,7 +312,9 @@ Figure 2 展示了多阶段文本提示下的生成运动可视化对比。在�
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2606_11656/figures/002_Table_1.jpg]]
 *Table 1: Quantitative comparisons with recent representative and state-of-the-art methods on the HumanML3D (upper half) and KIT-ML (lower half) datasets. Symbol “±” denotes the half-width of the 95% confidence interval under the repeat-20 evaluation protocol. Text in bold and underline denotes the best and second-best generated-motion results for R-Precision, FID, and MultiModal Distance, respectively. Diversity is reported as a reference metric where values closer to real motion are preferred. Real motion is shown as a reference and is not included when ranking generated methods*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -347,6 +353,8 @@ MoGeFlow 的适用性受以下设计选择约束：
 3. **跨模态扩展**：码书空间流方法能否扩展到可控运动生成、交互式生成或多模态条件（音频-运动、视频-运动）？冻结码书嵌入空间作为统一的运动表示界面，理论上可接受不同模态的条件信号。
 
 4. **高效架构设计**：更高效的流匹配架构（如线性注意力、状态空间模型）能否在减少参数量的同时保持或提升几何感知生成能力？容量缩放实验提示 FID 改善需要更大模型，但架构创新可能改变这一效率瓶颈。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/NitroGen_An_Open_Foundation_Model_for_Generalist_Gaming_Agents.pdf
+project_link: null
+code_link: null
 aliases:
 - NitroGen
 tags:
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | NitroGen：面向通用游戏代理的开放基础模型 |
 | 英文题名 | NitroGen: An Open Foundation Model for Generalist Gaming Agents |
 | 会议/期刊 | CVPR 2026 |
-| Links | [paper](https://arxiv.org/abs/2601.02427) · [arXiv](https://arxiv.org/abs/2410.24164) |
+| Links | [paper](https://arxiv.org/abs/2601.02427) · [paper](https://arxiv.org/abs/2410.24164) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction #topic/benchmarks_datasets_evaluation |
 | Method | NitroGen |
 | Dataset | Multi-game benchmark, Isometric roguelike, 3D action-RPG, Gamepad action extraction benchmark |
@@ -41,7 +43,7 @@ claims:
 > - Isometric roguelike (held-out game, varying data quantity) 上，任务完成率相对提升 10% vs from scratch training (+10%)。
 > - 3D action-RPG (held-out game, low-data regime 30h) 上，任务完成率相对提升 up to 52% vs from scratch training (+52%)。
 
-## 概述
+## 概要
 
 通用游戏代理面临一个核心瓶颈：缺乏大规模、多样化的带动作标签的视频数据集，以及统一的跨游戏评估基准，导致现有方法难以从视觉输入学习可泛化的游戏策略。NitroGen 通过一个关键的因果杠杆解决了这一问题——利用玩家直播中常见的输入覆盖层（input overlay）自动提取动作标签，将互联网上公开的游戏视频转变为大规模行为克隆训练数据。
 
@@ -55,8 +57,6 @@ claims:
 NitroGen 的方法定位介于“单游戏专用策略”与“依赖语言模型的复合系统”之间，构建了首个面向通用游戏的视觉-动作基础模型。其训练范式采用视觉-动作 Transformer（SigLIP 2 ViT + DiT）结合流匹配目标，在互联网规模数据上端到端训练，无需针对特定游戏微调即可展现跨游戏能力。同时，配套构建的通用模拟器通过拦截系统时钟实现帧级同步控制，为任意商业游戏提供统一的 Gymnasium API，填补了跨游戏评估基准的空白。
 
 需要指出的是，当前模型仅基于纯视觉-动作映射，不支持自然语言指令，且数据集偏向动作 RPG 和平台跳跃等游戏类型，对策略、模拟等依赖复杂规划或键盘操作的游戏泛化能力尚待验证。这些限制指明了后续扩展的方向。
-
-## 背景与动机
 
 ### 通用游戏代理的核心瓶颈
 
@@ -100,7 +100,7 @@ NitroGen 的核心洞察在于识别了一种被忽视的大规模数据来源�
 
 这种设计哲学——纯粹从视觉到动作的映射、大规模跨游戏数据、统一的评估接口——使得 NitroGen 成为一个真正意义上的游戏基础模型：预训练后无需微调即可在多种游戏上展现非平凡的操作能力，而经过少量微调后，在未见过的游戏上可获得最高 52% 的相对任务成功率提升。
 
-## 核心创新
+## 核心方法与创新机理
 
 NitroGen 的核心创新在于**将通用游戏代理的训练从“人工演示驱动”转变为“互联网数据驱动”**，通过三个关键环节的系统性重构，突破了此前通用游戏代理面临的数据规模瓶颈。
 
@@ -127,8 +127,6 @@ NitroGen 将模型设计为统一的**视觉-动作 Transformer**：以 SigLIP 2
 
 综上，NitroGen 的创新本质在于**将数据、模型、评估三个维度同时从“游戏特定”推向“跨游戏通用”**，其因果杠杆是覆盖层动作提取技术——正是这一技术使得互联网海量游戏视频能够转化为可用的训练信号，从而支撑起通用视觉-动作基础模型的训练。
 
-## 整体框架
-
 NitroGen 的整体框架由三个核心组件构成，它们协同工作，形成一个从互联网视频数据到通用游戏代理的端到端流水线（Figure 1）。
 
 ![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2601_02427/figures/001_Figure_1.jpg]]
@@ -148,12 +146,7 @@ NitroGen 的整体框架由三个核心组件构成，它们协同工作，形�
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2601_02427/figures/002_Figure.jpg]]
-*Figure: (a) Examples of gamepad overlay videos. Gamepad cropping Action extraction*
-
 ![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2601_02427/figures/003_Figure.jpg]]
-
-## 核心模块与公式推导
 
 ### 互联网规模视频-动作数据集构建
 
@@ -211,7 +204,7 @@ $$a_{t + 1/k} = a_{t} + \frac{1}{k} \pi_{\theta}(a_{t}, \psi_{\phi}(o), t)$$
 
 ![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2601_02427/figures/005_Figure.jpg]]
 
-## 实验与分析
+## 实验与关键发现
 
 ### 动作解析流水线精度验证
 
@@ -280,7 +273,7 @@ NitroGen 的核心主张是：仅通过互联网视频的行为克隆预训练�
 ![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2601_02427/figures/006_Figure_3.jpg]]
 *Figure 3: Distribution of the NitroGen dataset across games and genres. After filtering, the NitroGen dataset contains 40,000 hours of gameplay videos spanning more than 1,000 games. (a) Hours per game shows broad coverage, with 846 games having over one hour of data, 91 games with over 100 hours, and 15 games exceeding 1,000 hours each. (b) Genre distribution reveals Action-RPG games are most common (34.9% of total hours), followed by Platformer (18.4%) and Action-Adventure (9.2%) games, with the remainder distributed across seven genres*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 核心突破：从人工演示到互联网规模的行为克隆
 

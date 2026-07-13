@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Multi_View_Encoders_for_Performance_Prediction_in_LLM_Based_Agentic_Workflows.pdf
+project_link: null
+code_link: null
 openreview_forum_id: 7oeKDZsmWp
 aliases:
 - AP
@@ -42,7 +44,7 @@ claims:
 > - Overall Average (same) 上，Utility 为 76.33，对比 73.54 (best baseline)，变化 +2.79 (+3.79%)。
 > - Workflow Optimization (Average over MATH, GSM8K, MBPP, HumanEval, MMLU) 上，Accuracy (optimized workflow score) 为 74.43，对比 Random 62.56 / GCN 68.42 / GAT 71.00，变化 vs Random +11.87, vs GCN +6.01, vs GAT +3.43。
 
-## 概述
+## 概要
 
 **核心问题**：LLM 驱动的智能体工作流（agentic workflow）由多个智能体通过有向无环图组织协作，其最终执行性能高度依赖工作流的结构设计、代码实现与提示词配置。然而，获取真实性能标签（如任务成功率）需要反复调用 LLM 进行昂贵评估，导致标注数据极为稀缺。在此设定下，构建一个通用且可靠的性能预测器，以替代高成本的试错执行，成为关键瓶颈。
 
@@ -56,7 +58,7 @@ claims:
 
 **方法定位**：Agentic Predictor 属于轻量级预测器，区别于基于 LLM 推理或单视图图神经网络的传统方案。其多视图编码与无监督预训练策略使其在标注稀缺、工作流异构的设定下具备显著优势，并可嵌入任意搜索算法以加速智能体工作流的自动优化。
 
-## 背景与动机
+
 
 ### 问题背景：LLM智能体工作流的性能预测困境
 
@@ -85,7 +87,9 @@ claims:
 
 这一方法定位在现有工作（如FLORA-Bench的One For All统一预测器）的基础上，首次将多视图表示学习与无监督预训练引入智能体工作流性能预测任务，旨在从根本上缓解标注稀缺带来的预测困难，并为预测器引导的工作流搜索与优化奠定基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈
 
@@ -124,7 +128,7 @@ Agentic Predictor 的核心创新可概括为 **“多视图融合捕获异构�
 - 跨域预训练依赖大量未标注异构工作流，**并非所有领域都能轻松获取此类数据**。
 - 在 HotpotQA 等复杂多跳推理任务上，**迁移表现低于部分基线**，原因待进一步分析。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l41_https_openreview_net_forum_id_7oeKDZsmWp/figures/003_Figure_2.jpg]]
 *Figure 2: Overview of our Agentic Predictor framework. A (a) multi-view workflow encoder is designed to encode a set of agentic workflows from graph, code, and prompt aspects into unified representations, which serve as features for training the predictor. In the (b) pretraining phase, the encoder learns these representations on unlabeled workflows spanning diverse tasks and domains, using cross-domain unsupervised pretraining objectives. In the (c) predictor-guided search phase, a performance predictor is trained on a small (workflow configuration, performance) dataset to classify configurations as pass or fail, and subsequently guides the search toward promising configurations*
@@ -163,7 +167,7 @@ $$\mathcal{L}_{pred} = -\frac{1}{N}\sum_{i=1}^{N}[e_i\log\hat{e}_i + (1-e_i)\log
 
 与现有预测框架相比，Agentic Predictor 在四个维度上具有独特优势（Table 1）：同时具备多视图表示、无监督预训练、轻量级预测器和搜索算法无关性。消融实验证实，三视图组合（代码+图+提示）在所有任务中均优于任何单视图或双视图组合（Table 4），而跨域无监督预训练策略使模型在仅使用 10% 标注数据时，准确率仍高于 73%，比所有基线高出超过 10 个百分点（Figure 3）。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化
 
@@ -223,7 +227,9 @@ $$\mathcal{L}_{pred} = -\frac{1}{N}\sum_{i=1}^{N}[e_i\log\hat{e}_i + (1-e_i)\log
 
 对于连续性能评分，则使用均方误差损失。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与验证逻辑
 
@@ -364,7 +370,9 @@ LLM智能体工作流性能预测的核心瓶颈在于：工作流本身具有�
 ![[assets/figures/papers/paper_list_l41_https_openreview_net_forum_id_7oeKDZsmWp/figures/012_Table_9.jpg]]
 *Table 9: Comparison between Agentic Predictor and LLM-based few-show classification*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -422,6 +430,8 @@ Agentic Predictor 相对于基线的方法论改进可归纳为五个关键槽�
 6. **工具集泛化**：预测器是否能够推广至未见过的新工具集或动态变化的工作流范式（例如需要在线插入/删除智能体的场景）？这涉及对图结构动态性和节点特征分布偏移的鲁棒性研究。
 
 7. **连续性能预测**：将预测目标从二元成功/失败扩展至连续性能评分（如准确率、F1值等）时，当前的编码器-预测器架构需要哪些调整？多视图表示是否仍能提供有效的信息增益？
+
+
 
 ## 原文 PDF
 

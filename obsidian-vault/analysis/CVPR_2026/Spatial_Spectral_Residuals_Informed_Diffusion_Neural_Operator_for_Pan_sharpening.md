@@ -42,7 +42,7 @@ claims:
 > - GF-2 reduced resolution 上，PSNR↑ 44.228 vs 最佳对比方法 (最优)。
 > - QuickBird reduced resolution 上，PSNR↑ 38.864 vs 最佳对比方法 (最优)。
 
-## 概述
+## 概要
 
 全色锐化（Pan-sharpening）旨在将低分辨率多光谱图像（LRMS）与高分辨率全色图像（PAN）融合，生成高分辨率多光谱图像（HRMS）。现有基于扩散模型的方法虽然生成质量优异，但其去噪骨干普遍依赖自注意力机制，计算复杂度高达 $O(N^2)$，导致在大尺度场景下内存溢出、推理速度严重受限，难以部署于资源受限的卫星平台（Figure 1）。
 
@@ -50,7 +50,7 @@ claims:
 
 在 WorldView-3、GF-2 和 QuickBird 等多个基准数据集上，SRINO 在 PSNR、SAM、ERGAS 等指标上全面超越包括 **PanDiff**（Meng et al., IEEE TGRS 2023）、**U-Know-DiffPan**（Kim et al., CVPR 2025）和 **SSDiff**（Zhong et al., NeurIPS 2024）在内的 SOTA 方法（Table 1, Table 2）。消融实验证实，空间与光谱残差的联合引导是关键设计，且残差引导策略优于传统梯度引导（Table 3, Figure 7）。
 
-## 背景与动机
+
 
 全色锐化（Pan-sharpening）旨在将高空间分辨率的全色（PAN）图像与低空间分辨率的多光谱（LRMS）图像融合，生成高空间分辨率的多光谱（HRMS）图像。这一任务是遥感图像处理中的基础性难题，其核心挑战在于如何在注入空间细节的同时保持光谱信息的保真度。
 
@@ -64,7 +64,9 @@ claims:
 
 具体而言，本文试图回答以下问题：（1）如何构建一个计算高效的扩散去噪骨干，使其复杂度远低于自注意力机制？（2）如何设计一种内嵌的引导范式，替代外部梯度引导，实现像素级空间细节与光谱保真度的闭环动态优化？这两个问题的解决，将推动扩散式全色锐化方法向高效、高保真和可部署化方向迈出关键一步。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SRINO 的核心创新在于将全色锐化任务中的扩散生成过程从离散像素空间提升到**连续函数空间**，并以此为基础构建了两项关键改进：**高效神经算子去噪骨干**和**空间-光谱一致性残差内部引导机制**。
 
@@ -93,7 +95,7 @@ $$\kappa(\phi(\xi),\phi(\eta_i)) = \frac{\exp\left(\frac{\langle W_q\phi(\xi), W
 
 这种“预训练-适配”范式使得模型既能继承函数空间的强泛化能力，又能以极低的计算代价完成下游任务特化，在 WorldView-3、GF-2、QuickBird 等主流基准上均取得最优性能。
 
-## 整体框架
+
 
 SRINO 采用**两阶段训练流水线**，将扩散过程从离散像素空间提升到连续函数空间，并通过内部残差反馈替代传统的外部梯度引导。如图3所示，第一阶段在函数空间预训练条件扩散模型，学习分辨率无关的高质量空间-光谱先验；第二阶段通过三重引导适配将冻结的去噪骨干注入全色锐化任务。
 
@@ -111,7 +113,7 @@ SRINO 采用**两阶段训练流水线**，将扩散过程从离散像素空间�
 ![[assets/figures/papers/paper_list_l2597_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_Spatial_Spectral/figures/003_Figure_3.jpg]]
 *Figure 3: Framework overview of the proposed SRINO, which is implemented through a two-stage training pipeline. Firstly, we pretrain a conditional diffusion model built with Galerkin-type operator layers on high-resolution references to learn high-quality spatial and spectral representations. Subsequently, we introduce a triple guidance adaptation (TGA) strategy, including cross-modality feature V, pixel-wise spatial and spectral consistency residuals, R(t)spa and R(t)spe , to fine-tune the model for generating corresponding HRMS images*
 
-## 核心模块与公式推导
+
 
 SRINO 的核心由两个技术模块构成：**Galerkin 型神经算子去噪骨干**（Stage I）与**三重引导适配机制**（Stage II）。前者将扩散过程提升到连续函数空间，以线性注意力替代标准自注意力，实现分辨率无关的生成先验；后者通过像素级空间-光谱一致性残差的内部反馈，驱动纹理丰富和光谱真实的高分辨率多光谱图像生成。
 
@@ -201,7 +203,9 @@ $$\mathcal{L}_{\mathrm{II}} = \mathbb{E}_{t, \mathbf{X}_0, \varepsilon} \| \math
 ![[assets/figures/papers/paper_list_l2597_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_Spatial_Spectral/figures/002_Figure_2.jpg]]
 *Figure 2: Schematic illustration of the previous gradient-guided strategy and our spatial-spectral residuals informed paradigm. The former uses the gradients of unsupervised losses to update the noise prediction, risking gradient conflicts and requiring tedious weight tuning. Instead, our approach directly incorporates the element-wise spatial-spectral residuals as additional inputs to the denoising network, enabling directed generation of texture-rich and spectrally realistic products*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -253,7 +257,9 @@ Figure 1 展示了所提 Galerkin 型神经算子去噪框架与传统注意力�
 ![[assets/figures/papers/paper_list_l2597_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_Spatial_Spectral/figures/007_Figure_5.jpg]]
 *Figure 5: Feature maps across different denoiser layers*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 扩散全色锐化的演进脉络与SRINO的定位
 
@@ -289,6 +295,8 @@ SRINO的去噪骨干借鉴了神经算子（Neural Operator）领域的思想，
 2. **扩散步数的理论下界：** 当前25步DDIM采样是经验选择，是否存在理论保证的更少步数方案？
 3. **跨传感器泛化能力：** 论文实验限于单一传感器内的训练-测试划分，SRINO学习到的算子映射能否泛化到未见过的传感器配置？
 4. **与物理模型的融合：** 空间和光谱残差目前基于像素级差异计算，是否可引入传感器成像的物理退化模型（如MTF、光谱响应函数）来增强残差的物理可解释性？
+
+
 
 ## 原文 PDF
 

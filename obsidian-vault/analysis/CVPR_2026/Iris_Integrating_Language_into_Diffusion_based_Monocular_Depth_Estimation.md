@@ -43,7 +43,7 @@ claims:
 > - KITTI 上，AbsRel ↓ 10.4 (Marigold + Text Train&Infer) vs 10.7 (Marigold* 无文本) (-0.3)。
 > - ETH3D 上，AbsRel ↓ 6.5 (Marigold + Text Train&Infer) vs 6.9 (Marigold* 无文本) (-0.4)。
 
-## 概述
+## 概要
 
 单目深度估计是三维视觉的基础任务，但纯视觉方法长期受困于**纹理歧义、可见性歧义和光照干扰**——同一张二维图像可能对应多种截然不同的三维场景，尤其在小目标、遮挡或与背景纹理相似的区域，视觉信号本身难以提供足够的约束来消除模糊。
 
@@ -59,8 +59,6 @@ claims:
 
 Iris 的局限性同样值得关注：训练依赖合成数据（HyperSim、Virtual KITTI），与真实场景存在域间隙；文本描述由视觉语言模型自动生成，可能引入噪声与幻觉；模型依赖预训练 Stable Diffusion 和 CLIP，计算开销较高；且仅在扩散式深度估计器上验证，向其他范式的推广尚未探索。
 
-## 背景与动机
-
 单目深度估计旨在从单张二维图像中恢复场景的三维几何结构，是自动驾驶、机器人导航和增强现实等应用的基础感知能力。然而，纯视觉方法面临一个根本性困境：**纹理歧义、可见性歧义和光照干扰**使得同一张二维图像可以对应无限多种三维场景。尤其在目标面积小、被遮挡或与背景纹理相似的区域，视觉信号本身难以提供足够的约束来唯一确定深度，导致现有方法在这些区域频繁失效。
 
 近年来，基于扩散模型的深度估计方法（如 **Marigold**、**Lotus** 系列和 **E2E-FT**）展现了强大的生成先验优势。这些方法将深度估计建模为以图像为条件的去噪扩散过程，利用预训练扩散模型隐式学习到的三维结构先验来提升深度预测质量。然而，它们本质上仍然是**纯视觉驱动**的：条件信号仅来自图像本身，未能显式引入关于场景中物体类别、大小、空间关系和整体布局的高层语义先验。当图像中的视觉线索不足以区分前景与背景、或无法可靠地感知微小透明物体时，这些方法的解空间仍然过大，导致预测偏差。
@@ -69,7 +67,7 @@ Iris 的核心动机正是弥补这一缺口。**文本到图像预训练的扩�
 
 这一思路不仅是对现有扩散深度估计框架的自然扩展，更揭示了多模态融合在密集预测任务中的潜力：语言不再仅仅是高层语义的载体，而是可以直接参与低层几何推理的约束信号。
 
-## 核心创新
+## 核心方法与创新机理
 
 Iris的核心创新在于将**场景的语言描述作为额外条件**注入扩散模型的去噪过程，从而将文本到图像预训练中隐式习得的三维场景先验显式化为深度估计能力。这一策略的实质是**约束解空间**：纯视觉单目深度估计本质上是病态的——同一二维图像可对应多种三维场景，尤其在纹理歧义、遮挡、光照干扰或小目标区域，视觉信号不足以唯一确定深度。语言描述通过提供物体存在性、类别、大小、空间关系和场景结构等高层语义先验，有效缩小了从二维图像到三维深度的映射解空间。
 
@@ -102,8 +100,6 @@ $$\mathbf{z}_{t-1} = \frac{1}{\sqrt{\alpha_t}} \left( \mathbf{z}_t - \frac{1-\al
 ### 与相关工作的区别
 
 区别于传统的视觉-语言融合方法（通常在特征层面做跨模态注意力），Iris的创新在于**利用扩散模型预训练阶段已嵌入的语言-三维结构关联**，通过条件扩散的形式将语言直接作为去噪过程的引导信号。这不同于简单的多模态特征拼接，而是利用了扩散模型在文本到图像生成中习得的隐式三维理解能力。
-
-## 整体框架
 
 Iris 的核心思想是将场景的语言描述作为额外条件，注入扩散模型的去噪过程，从而约束单目深度估计的解空间。整个框架由四个冻结或可训练的模块串联构成，形成“图像-文本-深度”三模态条件生成管道。
 
@@ -143,11 +139,6 @@ Iris 的核心思想是将场景的语言描述作为额外条件，注入扩散
 *Table 5: Inference using fixed template text input. The results show that the model achieves comparable, or even better, performance than the Marigold baseline when using fixed prompts instead of user-provided text. This finding suggests that, even when user-provided descriptions are unavailable, incorporating language during training itself might enhance the depth estimator’s generalization and overall performance*
 
 ### 补充图表
-
-![[assets/figures/papers/paper_list_l2526_https_arxiv_org_abs_2411_16750/figures/001_Figure_1.jpg]]
-*Figure 1: Integrating language into diffusion models enhances monocular depth estimation by providing an additional condition (rather than images alone) associated with plausible 3D scenes, thus reducing the solution space for depth estimation. This conditional distribution is initially learned during text-to-image generation pre-training of diffusion models, as to generate images under different viewpoints and layouts that accurately reflect the text, the model needs to implicitly model the size and shape of specified objects, their spatial relationship, and the structure of the scene. Then the conditional distribution is associated with plausible 3D scenes during fine-tuning with image-text-depth p...*
-
-## 核心模块与公式推导
 
 Iris 的核心设计是在现有扩散深度估计框架中，**仅变更条件输入**：在图像潜变量与噪声深度潜变量拼接的基础上，额外拼接由冻结 CLIP 文本编码器编码的场景语言描述，作为去噪 U-Net 的条件。该方法可视为一种通用适配策略，不改变扩散模型的主体架构，因此可无缝应用于 Marigold、Lotus、E2E-FT 等多种扩散深度估计基线。
 
@@ -202,7 +193,7 @@ $$\mathbf{z}_{t-1} = \frac{1}{\sqrt{\alpha_t}} \left( \mathbf{z}_t - \frac{1-\al
 ![[assets/figures/papers/paper_list_l2526_https_arxiv_org_abs_2411_16750/figures/002_Figure_2.jpg]]
 *Figure 2: Language improves the depth perception of specified insignificant (and potentially ambiguous) regions*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -268,7 +259,7 @@ Figure 6展示了通过逐步追加细节描述来迭代优化深度预测的能
 ![[assets/figures/papers/paper_list_l2526_https_arxiv_org_abs_2411_16750/figures/017_Table_6.jpg]]
 *Table 6: Training with different numbers of text captions per image. For images annotated with multiple captions, a caption is randomly sampled for each training iteration. While adding more captions initially slightly improves performance, the benefit quickly saturates, yielding only minor gains beyond a certain point*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 在扩散深度估计谱系中的位置
 

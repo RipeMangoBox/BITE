@@ -5,6 +5,7 @@ paper_level: A
 venue: ECCV
 year: 2024
 pdf_ref: paperPDFs/ECCV_2024/Better_Call_SAL_Towards_Learning_to_Segment_Anything_in_Lidar.pdf
+code_link: https://github.com/nv-dvl/segment-anything-lidar
 project_link: https://research.nvidia.com/labs/dvl/projects/sal
 aliases:
 - SSAL
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | SAL：面向激光雷达的通用目标分割 |
 | 英文题名 | Better Call SAL: Towards Learning to Segment Anything in Lidar |
 | 会议/期刊 | ECCV 2024 |
-| Links | [paper](https://arxiv.org/abs/2403.13129); [GitHub](https://github.com/nv-dvl/segment-anything-lidar); [Project](https://research.nvidia.com/labs/dvl/projects/sal) |
+| Links | [paper](https://arxiv.org/abs/2403.13129) · [GitHub](https://github.com/nv-dvl/segment-anything-lidar) · [Project](https://research.nvidia.com/labs/dvl/projects/sal) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | SAL (Segment Anything in Lidar) |
 | Dataset | SemanticKITTI (Frustum Eval), SemanticKITTI (Full) |
@@ -42,7 +43,7 @@ claims:
 > - SemanticKITTI (Frustum Eval) 上，PQ (零样本LPS, 默认类别) 为 33.1 (SAL)，对比 27.5 (SAM+DBS+CLIP)，变化 +5.6。
 > - SemanticKITTI (Full) 上，PQ (零样本LPS, 默认类别) 为 24.8 (SAL)，对比 8.2 (SAM+DBS+CLIP)，变化 +16.6。
 
-## 概述
+## 概要
 
 激光雷达（Lidar）全景分割模型长期受限于预定义的固定类别词汇表，无法适应开放世界中动态变化的语义需求。与此同时，构建通用的三维分割模型面临一个根本性瓶颈：缺乏无需人工标注的大规模训练数据。**SAL**（Segment Anything in Lidar）正是在这一背景下提出的——它首次实现了无需任何人工监督的零样本激光雷达全景分割。
 
@@ -50,7 +51,7 @@ SAL的核心洞察在于**将分割与识别解耦**：利用2D视觉基础模�
 
 在类不可知分割任务上，仅使用覆盖14%点云的伪标签训练的SAL，达到了完全监督模型**91%的性能**（62.8 vs 69.0 PQ）。在零样本激光雷达全景分割任务上，SAL在SemanticKITTI和nuScenes数据集上分别达到全监督基线的**42%**和**54%**，显著优于直接提升SAM掩码的基线方法。这些结果表明，通过蒸馏2D基础模型的知识，在3D领域实现通用、可提示的分割是可行的，为激光雷达感知从封闭集走向开放世界迈出了关键一步。
 
-## 背景与动机
+
 
 ### 激光雷达全景分割的封闭世界困境
 
@@ -77,7 +78,9 @@ SAL的核心洞察在于**将分割与识别解耦**：利用2D视觉基础模�
 
 这一范式的意义在于：SAL首次证明了**完全摆脱人工标注、仅依赖2D基础模型蒸馏即可在激光雷达域实现零样本全景分割**的可行性，为构建真正通用的3D感知基础模型开辟了新路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈与因果机制
 
@@ -153,7 +156,7 @@ SAL处于**2D基础模型驱动的3D自监督感知**这一新兴研究方向的
 4. **评估不一致**：现有数据集对stuff类的实例标注粒度与SAL的输出不一致，可能导致stuff性能被低估。
 5. **传感器依赖**：方法依赖多模态标定传感器设置，标定误差和同步问题可能影响伪标签质量。能否扩展到其他传感器类型（如4D雷达）并实现跨传感器泛化，仍是一个开放问题。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2403_13129/figures/002_Figure_2.jpg]]
 *Figure 2: SAL overview: Given a Lidar scan and a class vocabulary prompt, specified as a list of per-class free-form text descriptions (left), SAL segments and classifies objects (things and stuff classes). As labeled data for training such a model does not exist, we supervise SAL by distilling off-the-shelf vision foundation models to Lidar (right)*
@@ -198,7 +201,7 @@ $$\mathcal{L}_{\mathtt{SAL}} = \mathcal{L}_{obj} + \mathcal{L}_{seg} + \mathcal{
 
 推理阶段，模型对输入点云预测一组实例掩码及其 CLIP token，然后将文本提示通过 CLIP 文本编码器编码，与预测 token 计算点积相似度，实现零样本分类。整个过程无需任何人工标注数据参与。
 
-## 核心模块与公式推导
+
 
 ### 伪标签引擎 (Pseudo-label Engine)
 
@@ -243,7 +246,9 @@ $$PQ = RQ \times SQ$$
 
 其中 $RQ$ 为识别质量（Recognition Quality），衡量实例匹配的正确性；$SQ$ 为分割质量（Segmentation Quality），衡量匹配实例的 IoU 均值。该指标用于统一评估 things 和 stuff 类的全景分割性能。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -349,7 +354,9 @@ Table A.2揭示了文本提示工程对零样本分类的显著影响。通过�
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2403_13129/figures/013_Table.jpg]]
 *Table: B.1: Pseudo-label statistics. We outline the label coverage of point clouds, the total, max, and mean number of instances per scan, and the ratio of things/stuff instances on the full point cloud and point cloud areas that overlap with the camera view frustum (Filter Frustum). As can be seen, due to the single-camera setup, pseudo-label coverage in SemanticKITTI [6] is very low (14% of points). Even though nuScenes [18] dataset provides 3 6 0 ^ { \circ } view coverage, only 48% are labeled due to blind spots. Even when only retaining points, that overlap with the camera view frustum (SemanticKITTI, Filter Frustum), we observe coverage of 89%. This can be explained by mistakes (e.g., false n...*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -382,6 +389,8 @@ SAL 的核心创新在于将激光雷达全景分割从“封闭类别监督学�
 **完全无监督的评估范式。** 零样本 LPS 的评估目前仍依赖人工标注的真值。在完全无人工标注的开放世界中，如何客观评估分割质量（尤其是 stuff 类的实例粒度）是一个基础性难题。
 
 **向其他3D任务的拓展。** SAL 的自监督蒸馏范式——利用2D基础模型生成伪标签，通过 Transformer 解码器蒸馏至3D骨干——是否可迁移至3D目标追踪、轨迹预测或4D场景理解，是值得探索的方向。
+
+
 
 ## 原文 PDF
 

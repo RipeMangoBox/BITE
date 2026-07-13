@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2025
 pdf_ref: paperPDFs/ICLR_2025/Eliminating_Oversaturation_and_Artifacts_of_High_Guidance_Scales_in_Diffusion_Models.pdf
+project_link: http://probml.github.io/book2
+code_link: null
 aliases:
 - APGA
 - EOAHGSDM
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 消除扩散模型高引导尺度下的过饱和与伪影 |
 | 英文题名 | Eliminating Oversaturation and Artifacts of High Guidance Scales in Diffusion Models |
 | 会议/期刊 | ICLR 2025 |
-| Links | [paper](https://openreview.net/forum?id=e2ONKX6qzJ) · [Project](http://probml.github.io/book2) · [arXiv](https://arxiv.org/abs/2112.03111) |
+| Links | [paper](https://openreview.net/forum?id=e2ONKX6qzJ) · [Project](http://probml.github.io/book2) · [paper](https://arxiv.org/abs/2112.03111) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/diffusion_image_video |
 | Method | Adaptive Projected Guidance (APG) |
 | Dataset | EDM2-S, DiT-XL/2, Stable Diffusion XL, EDM2-S across guidance scales |
@@ -41,11 +43,11 @@ claims:
 > - DiT-XL/2 (class-conditional ImageNet, w=4) 上，FID↓ 9.34 vs 19.14 (-9.80)。
 > - Stable Diffusion XL (text-to-image, w=15) 上，FID↓ 25.35 vs 26.29 (-0.94)。
 
-## 概述
+## 概要
 
 扩散模型在高引导尺度下生成图像时普遍出现过饱和与不真实伪影，这一问题严重限制了**分类器自由引导**（Classifier-Free Guidance, CFG）的实际可用引导范围。本文揭示了一个关键瓶颈：CFG的更新方向可以分解为平行于和正交于条件模型预测的两个分量——正交分量是提升图像质量的主要来源，而平行分量仅增加饱和度且在高引导尺度下乘以大于1的增益因子，导致过饱和。基于此洞察，本文提出**自适应投影引导**（Adaptive Projected Guidance, APG），通过正交投影降低平行分量权重，辅以更新幅度重缩放和反向动量，在保持CFG质量增益的同时显著缓解过饱和问题。实验表明，APG在多种扩散模型（EDM2、DiT-XL/2、Stable Diffusion XL等）上一致改善FID、Recall和饱和度指标，且保持与CFG相当的精度，有效扩展了引导尺度的可用范围。
 
-## 背景与动机
+
 
 扩散模型已成为图像生成领域的核心范式，其采样过程可被统一描述为一个常微分方程（ODE）：
 
@@ -75,7 +77,9 @@ $$
 
 这一发现揭示了CFG过饱和的因果机制：随着 $w$ 增大，平行分量的增益因子不断放大，导致像素值趋向饱和。基于此洞察，本文提出 **自适应投影引导（Adaptive Projected Guidance, APG）**，通过降低平行分量权重并结合重新缩放与反向动量，在保持CFG质量增益的同时显著缓解过饱和问题，从而大幅扩展扩散模型实际可用的引导尺度范围。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：CFG 高引导尺度下的过饱和与伪影
 
@@ -143,7 +147,7 @@ Table 2 的消融实验量化了三个组件的贡献（EDM2-S, $w=4$）：
 
 三者协同作用，缺一不可。正交投影是解决过饱和的核心机制，重新缩放和反向动量则分别从稳定性和多样性维度进一步提升了生成质量。
 
-## 整体框架
+
 
 APG（Adaptive Projected Guidance）是一种即插即用的采样端引导方法，旨在保持分类器自由引导（CFG）质量增益的同时，系统性地消除高引导尺度下的过饱和与伪影。其整体流程在标准扩散采样循环中嵌入三个串行模块，对CFG更新方向进行自适应调整，如图3所示。
 
@@ -175,7 +179,7 @@ APG（Adaptive Projected Guidance）是一种即插即用的采样端引导方�
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_e2ONKX6qzJ/figures/003_Figure_2.jpg]]
 *Figure 2: Influence of the parallel and orthogonal components*
 
-## 核心模块与公式推导
+
 
 ### 问题定位：CFG 更新的几何分解
 
@@ -247,7 +251,9 @@ APG 在每步采样中依次执行：① 计算条件与无条件去噪预测，
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_e2ONKX6qzJ/figures/012_Figure_10.jpg]]
 *Figure 10: Comparison of CFG and APG for text quality in generated images using Stable Diffusion 3 (Esser et al., 2024). In contrast to CFG, APG consistently produces correct spellings*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -316,7 +322,9 @@ APG在类条件生成与文本到图像生成两大类任务上，均展现出�
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_e2ONKX6qzJ/figures/024_Table_8.jpg]]
 *Table 8: Condition alignment comparison between CFG and APG*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心基线：分类器自由引导（CFG）与过饱和瓶颈
 
@@ -359,6 +367,8 @@ APG 在扩散模型引导方法的谱系中处于 **CFG 的解析改进层**。�
 2. **自适应超参数**：能否根据当前采样步的噪声水平、更新幅度等状态信息，自动调节 $\eta$、$r$ 和 $\beta$，消除手动调参负担？
 
 3. **跨模态泛化**：APG 在视频生成、3D 生成等更多样化条件生成任务中的有效性尚未验证，其与新兴引导范式（如基于能量的引导、对比引导）的结合潜力也待探索。
+
+
 
 ## 原文 PDF
 

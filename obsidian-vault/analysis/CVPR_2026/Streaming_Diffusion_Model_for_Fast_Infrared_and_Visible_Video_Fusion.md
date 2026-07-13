@@ -43,7 +43,7 @@ claims:
 > - M3SVD 上，VIF 0.926 vs 0.866 (CDDFuse) (+0.060)。
 > - VTMOT 上，VIF 1.026 vs 0.907 (CDDFuse) (+0.119)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -67,7 +67,7 @@ claims:
 
 SDMFusion处于**图像融合、视频融合与扩散模型加速**的交叉地带。在图像融合领域，它与**CDDFuse**（Zhao et al., CVPR 2023）、**DDFM**（Zhao et al., ICCV 2023）等基于自编码器或扩散模型的方法形成对比——这些方法逐帧独立处理，缺乏时序建模能力。在视频融合领域，**RCVS**（Xie et al., TMM 2024）、**TemCoCo**（Gong et al., ICCV 2025）和**UniVF**（Zhao et al., NeurIPS 2025）等近期工作开始引入时序约束，但SDMFusion通过一步扩散采样与流式记忆传播，在效率与时空一致性上实现了显著突破。在扩散模型加速方面，该方法借鉴了一步生成的思想，但将其创造性地适配至视频融合场景，并通过冻结预训练U-Net保留生成先验，避免了从头训练的高昂成本。
 
-## 背景与动机
+
 
 ### 红外与可见光视频融合的核心挑战
 
@@ -91,7 +91,9 @@ SDMFusion处于**图像融合、视频融合与扩散模型加速**的交叉地�
 
 基于这一动机，本文提出 **SDMFusion**（Streaming Diffusion Model for Infrared and Visible Video Fusion），其核心洞察在于：将预训练扩散模型的生成先验融入一步采样框架，并在潜在空间中通过流式记忆机制传播跨帧特征，从而解耦高保真度与时间稳定性的矛盾。具体而言，该方法仅需当前帧、上一帧和紧凑的记忆先验即可生成时空一致的融合视频，无需访问完整历史序列，天然适配流式处理场景。这一设计同时解决了扩散模型的高延迟问题和传统方法的时序不一致问题，为实时视频融合提供了新的技术路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SDMFusion 的核心创新在于通过**一步采样的流式扩散模型**，将预训练扩散模型的生成先验引入视频融合任务，同时显式建模时序依赖性，解决了传统方法中高保真度与时间稳定性之间的矛盾。其关键创新点可归纳为以下四个维度：
 
@@ -136,7 +138,7 @@ $$\mathcal{L}_{\mathrm{tc}} = \frac{1}{T-1} \sum_{t=2}^{T} \frac{\|(\hat{\mathbf
 
 综上，SDMFusion 通过上述四个 changed slots 的系统性创新，在保持扩散模型高保真生成能力的同时，实现了视频融合的时空一致性与实时推理效率，在 HDO、M3SVD、VTMOT、NOT-156 四个基准数据集上全面超越现有方法（Table 1）。
 
-## 整体框架
+
 
 SDMFusion 采用两阶段训练范式，将图像级融合先验与流式时序建模解耦，最终实现高效、时空一致的红外与可见光视频融合。整体流程如 Figure 2 所示。
 
@@ -163,7 +165,7 @@ $$\mathbf{z}_{\mathrm{y}} = \frac{\mathbf{z}_{\mathrm{x}} - \sqrt{1 - \bar{\alph
 
 **输入输出流。** 输入为对齐的红外-可见光视频帧对 $\{(\mathbf{I}_t, \mathbf{V}_t)\}_{t=1}^T$，经双分支编码器提取跨模态特征后进入流式扩散模型进行一步潜在校正，再通过时序适配器融入历史记忆，最终由图像解码器输出时空一致的融合视频序列 $\{\hat{\mathbf{Y}}_t\}_{t=1}^T$。
 
-## 核心模块与公式推导
+
 
 ### 两阶段训练框架
 
@@ -224,7 +226,9 @@ $$\mathcal{L}_{\mathrm{total}} = \lambda_{\mathrm{V,I}} \mathcal{L}_{\mathrm{V,I
 ![[assets/figures/papers/paper_list_l2074_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_Streaming_Diffusio/figures/001_Figure_1.jpg]]
 *Figure 1: Left: Challenges of infrared and visible video fusion: afflicted with motion artifacts and burden of high latency. Right: Our method, SDMFusion, produces consistent backgrounds and coherent object motion with high efficiency*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 5.1 实验设置
 
@@ -303,7 +307,9 @@ Table 3报告了在NOT-156数据集上的目标跟踪下游任务评估结果。
 ![[assets/figures/papers/paper_list_l2074_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_Streaming_Diffusio/figures/007_Figure_6.jpg]]
 *Figure 6: Qualitative comparisons of different ablative variants on the HDO, VTMOT, NOT-156, and M3SVD datasets*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法关系图谱
 
@@ -331,6 +337,8 @@ SDMFusion 处于**图像融合扩散模型**与**视频时序建模**两条技�
 2. **多模态扩展与记忆压缩。** 如何将双模态框架推广至红外-可见光-事件相机等多源视频融合？同时，当前记忆模块存储完整潜在特征，是否存在更高效的记忆压缩策略（如动态稀疏记忆或分层记忆）以降低计算开销？
 3. **时序一致性的理论刻画。** 当前方法通过时序一致性损失 $\mathcal{L}_{\mathrm{tc}}$ 在像素空间施加 L1 约束，这是一种启发式设计。是否存在更本质的时序一致性度量（如频域相位一致性或运动轨迹约束），可以进一步抑制长程漂移？
 4. **下游任务的闭环优化。** Table 3 显示 SDMFusion 在目标跟踪任务上取得了最优 AUC（0.3799），但融合模型并未针对跟踪任务进行端到端优化。将下游任务反馈信号纳入融合训练（如检测置信度引导的注意力调制），可能进一步释放“融合-感知”协同的潜力。
+
+
 
 ## 原文 PDF
 

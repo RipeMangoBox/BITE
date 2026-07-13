@@ -41,7 +41,7 @@ claims:
 > - HDTF 上，FID 23.471 vs 24.515 (HunyuanVideo-Avatar) (-1.044)；Sync-D 7.545 vs 7.564 (HunyuanVideo-Avatar) (-0.019)。
 > - Action Bench 上，Hit@Segment 0.854 vs 0.725 (w/o PACA from ablation) (+0.129)；Sync-C 6.893 vs 6.390 (w/o Progressive Audio Alignment from ablation) (+0.503)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有说话头像生成方法普遍将动作描述与音频输入统一处理为扁平提示，缺乏对动作执行时机的精确控制。这导致三重困境——动作与语音语义在时间上不同步、文本驱动的肢体动作与音频驱动的唇形同步相互干扰、以及微调后模型原有的文本跟随能力严重退化。
 
@@ -51,7 +51,7 @@ claims:
 
 **主要结果**：在 HDTF 测试集上，ActAvatar 取得 FID 23.471 和 Sync-D 7.545，均优于对比方法。在专门构建的 Action Bench 上，Hit@Segment 达到 0.854，Sync-C 达到 6.893，全面领先。消融实验证实，移除 PACA 后 Hit@Segment 骤降至 0.725，验证了时间-语义对齐的核心作用；移除渐进音频对齐后 Sync-C 降至 6.390，证明了深度感知缩放对唇同步的关键贡献。用户研究进一步确认了该方法在动作质量和时间正确性上的显著优势。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -79,7 +79,9 @@ claims:
 
 ActAvatar 通过三个协同设计的模块来回应这些挑战：**Phase-Aware Cross-Attention（PACA）** 实现层次化提示分解与时间-语义绑定，**Progressive Audio-Visual Alignment** 通过深度感知缩放解耦文本与音频的作用阶段，**两阶段训练策略** 解耦音频适配器学习与动作控制注入。这三者共同构成了从提示结构、模态融合到训练范式的完整技术链路。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ActAvatar 的核心创新在于通过**结构化提示分解**、**渐进式模态对齐**和**解耦训练策略**三个维度，系统性地解决了现有说话头像生成方法中“动作执行时机不可控”这一瓶颈。与采用单一全局提示、静态等权融合音频与文本的 baseline 方法不同，ActAvatar 将动作控制建模为时间-语义绑定的层次化问题，而非简单的文本到动作映射。
 
@@ -125,7 +127,7 @@ $$
 
 上述三个 changed slots 并非孤立改进，而是形成闭环协同：PACA 提供时间-语义绑定，渐进对齐解耦文本与音频的作用阶段，两阶段训练保留基础能力的同时注入动作控制。消融实验（Table 4）量化了这一协同效应——移除 PACA 后 Hit@Segment 从 0.854 降至 0.725，移除渐进音频对齐后 Sync-C 从 6.893 降至 6.390，而完整的 ActAvatar 在所有指标上达到最优。
 
-## 整体框架
+
 
 ActAvatar 的整体流程围绕一个核心矛盾展开：**文本驱动的动作生成**与**音频驱动的唇形同步**在共享的潜在空间中存在模态冲突。为解决这一问题，ActAvatar 构建了一条从结构化提示输入到时间对齐视频输出的三阶段流水线，通过层次化提示分解、渐进式多模态融合与两阶段训练策略协同工作。
 
@@ -182,7 +184,7 @@ $$\mathcal{L}_{\text{stage2}} = \mathbb{E}_{\mathbf{x}_0, t, \mathbf{x}_1} \left
 
 从输入到输出的完整数据流为：参考图像与结构化提示经 PACA 编码后注入扩散 Transformer 骨干网络，音频信号经 Wav2Vec 2.0 提取特征后通过音频适配器映射为帧对齐令牌，在每一层 Transformer 中按渐进缩放函数 $f(\ell)$ 加权注入。最终通过流匹配路径 $\mathbf{x}_t = (1 - t) \mathbf{x}_0 + t \mathbf{x}_1$ 从噪声逐步生成时间对齐的说话化身视频。
 
-## 核心模块与公式推导
+
 
 ActAvatar 的核心架构围绕三个协同模块展开：**Phase‑Aware Cross‑Attention (PACA)** 实现时间‑语义对齐，**Progressive Audio‑Visual Alignment** 消除文本驱动动作与音频驱动唇形同步之间的模态干扰，以及**两阶段训练策略**解耦能力注入过程。
 
@@ -250,7 +252,9 @@ $$
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2512_19546/figures/007_Figure_5.jpg]]
 *Figure 5: Ablation study on PACA. Top: Without PACA, the avatar remains static throughout the sequence. Bottom: With PACA, the avatar naturally walks forward*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：视觉质量与唇同步
 
@@ -299,7 +303,9 @@ Figure 3 的定性对比展示了 ActAvatar 与现有方法在 Action Bench 样�
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2512_19546/figures/001_Figure_1.jpg]]
 *Figure 1: ActAvatar generates talking avatars with precise, temporally-aligned actions across diverse scenarios and identities. Through structured text prompts, our method controls what actions to perform and when to perform them, while maintaining accurate lip synchronization with the audio*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：从“做什么”到“何时做”
 
@@ -345,6 +351,8 @@ ActAvatar 的设计隐含以下适用边界：
 2. **相位数量的自适应确定**：当前方法预设相位数量 $K$，但不同场景的最优 $K$ 可能不同。动态相位划分（如基于音频语义转折点）可能进一步提升灵活性。
 3. **与端到端音频-动作联合建模的对比**：ActAvatar 将动作控制完全交由文本提示，未探索直接从音频中预测动作时序的可能性。与端到端方法（如从语音中预测手势序列）的对比将有助于明确文本驱动的独特优势。
 4. **跨模态时序一致性度量**：论文提出的 Hit@Segment 等指标依赖于 Gemini 的自动评估，其可靠性需要更大规模的人类评估验证。建立标准化的时序动作控制基准将推动该方向的公平比较。
+
+
 
 ## 原文 PDF
 

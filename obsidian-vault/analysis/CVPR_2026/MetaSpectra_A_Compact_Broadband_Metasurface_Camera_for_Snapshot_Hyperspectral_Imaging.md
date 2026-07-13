@@ -42,7 +42,7 @@ claims:
 > - KAUST dataset 上，PSNR (dB)↑ / SSIM↑ / SAM↓ MetaSpectra+ (DWDN) 32.92 / 0.94 / 0.17; MetaSpectra+ (DDPM) 33.31 / 0.92 / 0.23 vs 2-in-1 Cam 31.14 / 0.86 / 0.24; Array-HSI 27.44 / 0.89 / 0.20; others see Table... (Best PSNR improvement +2.17 dB over 2-in-1 Cam)。
 > - Real-world HDR+Hyperspectral scenes 上，Dynamic range increase MetaSpectra+ HDR fusion achieves 11 dB increase over LDR vs Native CMOS low-dynamic range images (+11 dB)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有多功能超构表面成像系统受限于强色散像差，只能在单波长或窄带（10–100 nm）工作，难以同时实现宽带高光谱成像与其他模态（如HDR、偏振）的获取。
 
@@ -57,8 +57,6 @@ claims:
 
 **局限与待验证点**：随机交织抑制高阶衍射伪影的同时降低了衍射效率，当前原型帧率上限约 10 FPS，高速视频应用受限；更高折射率材料（如 GaN、TiO₂）的引入能否在成本可控的前提下解决光效问题，仍需进一步验证。
 
-## 背景与动机
-
 高光谱成像（Hyperspectral Imaging, HSI）旨在捕获场景在每个像素上的完整光谱响应，为材质识别、遥感、生物医学诊断等任务提供超越传统RGB图像的丰富信息。然而，传统高光谱成像系统通常依赖空间或光谱扫描机制，导致采集时间长、体积庞大，难以适应动态场景和便携式应用。近年来，快照式高光谱成像（Snapshot HSI）成为研究热点，其目标是在单次曝光中同时获取空间与光谱信息，从而消除时间扫描的瓶颈。
 
 在这一方向上，超构表面（Metasurface）因其对光场的亚波长调控能力而备受关注。超构表面由亚波长尺度的纳米结构阵列构成，能够在极薄的光学元件上实现对相位、振幅、偏振和色散的灵活编码。已有工作尝试利用单一超构表面同时完成成像与分束功能，以实现紧凑的多功能成像系统。然而，这种“单超构表面多功能”范式面临一个根本性的瓶颈：**强色散像差**。由于成像与分束功能耦合在同一元件中，超构表面固有的波长依赖性导致不同光谱通道之间产生难以补偿的空间偏移和模糊，迫使系统只能在单波长或窄带（10–100 nm）条件下工作，无法同时实现宽带高光谱成像与其他模态（如高动态范围HDR、偏振）的获取。
@@ -71,7 +69,7 @@ MetaSpectra+ 的核心动机正是打破这一耦合。其关键洞察在于：*
 
 综上所述，MetaSpectra+ 的提出旨在回答一个核心问题：**能否在保持紧凑性的前提下，实现宽带、多功能的快照高光谱成像？** 其通过光学功能解耦与双层超构表面协同设计，为这一问题提供了肯定的答案。
 
-## 核心创新
+## 核心方法与创新机理
 
 MetaSpectra+ 的核心创新在于通过**功能解耦**与**双层超构表面色散独立编码**，突破了现有多功能超构表面成像系统长期受困的窄带瓶颈。其关键创新可归纳为以下四个维度。
 
@@ -118,8 +116,6 @@ MetaSpectra+ 将上述色散控制能力与**可选光学滤波**（ND 滤光片
 
 这些创新共同构成了 MetaSpectra+ 在 KAUST 数据集上取得最高重建精度（DWDN: 32.92 dB PSNR, DDPM: 33.31 dB PSNR，超越 **2-in-1 Cam** 达 +2.17 dB）以及真实场景 HDR+ 高光谱成像中 11 dB 动态范围增益的底层技术支撑。
 
-## 整体框架
-
 MetaSpectra+ 的核心设计思想是将**成像功能**与**分束/色散控制功能**解耦，从而突破传统多功能超构表面成像系统因强色散像差导致的窄带瓶颈（通常仅 10–100 nm）。系统采用“折射透镜 + 双层超构表面”的混合光学架构，在保持紧凑性的同时，将操作带宽扩展至 450–700 nm（250 nm），几乎覆盖整个可见光波段。
 
 ### Pipeline 总览
@@ -154,8 +150,6 @@ MetaSpectra+ 的核心设计思想是将**成像功能**与**分束/色散控制
 ```
 
 该架构的关键优势在于：折射透镜承担低 F 数（f/6~12）成像任务，而双层超构表面仅负责分束与各通道独立的色散、曝光、偏振编码，二者各司其职，从而在 17 mm 总轨道长度（TTL）的紧凑空间内实现了宽带、多模态快照成像。
-
-## 核心模块与公式推导
 
 MetaSpectra+ 的光学系统由六个核心模块级联构成，其功能分工与物理建模如下。
 
@@ -234,7 +228,7 @@ $$\text{DoLP}_{HV} = |I_3 - I_4| / |I_3 + I_4|$$
 ![[assets/figures/papers/paper_list_l2086_https_arxiv_org_abs_2603_09116/figures/011_Figure_8.jpg]]
 *Figure 8: CAD model of the assembly. Numbers correspond to the items in the list of parts in Tab. 3*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -289,16 +283,10 @@ Table 1 给出了与近期快照高光谱成像系统的系统级对比。MetaSp
 ![[assets/figures/papers/paper_list_l2086_https_arxiv_org_abs_2603_09116/figures/007_Table_2.jpg]]
 *Table 2: Hyperparameters of DDPM*
 
-![[assets/figures/papers/paper_list_l2086_https_arxiv_org_abs_2603_09116/figures/014_Figure_11.jpg]]
-*Figure 11: Additional sample hyperspectral reconstruction results on the KAUST dataset. The inset numbers are PSNR (dB) for hyperspectral reconstructions*
-
-![[assets/figures/papers/paper_list_l2086_https_arxiv_org_abs_2603_09116/figures/015_Figure_12.jpg]]
-*Figure 12: Additional sample real-world results of MetaSpectra+. Inset numbers in (b) represent the dynamic range (dB) of the picture*
-
 ![[assets/figures/papers/paper_list_l2086_https_arxiv_org_abs_2603_09116/figures/010_Table_3.jpg]]
 *Table 3: List of parts*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 问题定位：多功能超构表面成像的窄带瓶颈
 

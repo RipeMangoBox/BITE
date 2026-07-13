@@ -42,7 +42,7 @@ claims:
 > [!tip] 效果简介
 > - FlashBench 上，FID 14.35 (ControlNet) vs 19.44 (SlowAdapter w/o fine-tuning, ControlNet) (-5.09)；FVD 96.08 (ControlNet) vs significantly higher (e.g., >200) (~50% reduction)；Mask IoU / Box IoU 69.15 / 75.38 (ControlNet) vs less than 60 / 65 (e.g., w/o diffusion loss) (>9 points improvement)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有多步轨迹可控视频生成方法（如 **MagicMotion** (Li et al., ICCV 2025)、**Tora** (Zhang et al., CVPR 2025)、**LeviTor** (Wang et al., CVPR 2025) 等）依赖数十步去噪过程，导致大量推理时间冗余和计算开销。直接将多步适配器应用于少步生成器，或仅使用扩散损失微调，均导致显著的视频质量退化与轨迹精度下降（图1a–c）。
 
@@ -54,7 +54,7 @@ claims:
 
 **方法定位**：FlashMotion 属于少步轨迹可控视频生成的训练框架，其技术谱系融合了扩散模型蒸馏（DMD 分布匹配）、轨迹适配器（ResNet/ControlNet 结构）与对抗训练（扩散鉴别器），在方法谱系中填补了“少步推理 + 精确轨迹控制”的空白。
 
-## 背景与动机
+
 
 ### 轨迹可控视频生成的效率瓶颈
 
@@ -76,7 +76,9 @@ claims:
 
 上述分析揭示了一个核心矛盾：**如何在保持轨迹控制精度的同时，实现少步高质量视频生成？** 现有方法要么牺牲速度（多步方法），要么牺牲质量（直接蒸馏或纯扩散微调），无法同时满足效率与质量的双重需求。FlashMotion的动机正是打破这一困境——通过引入扩散鉴别器进行对抗训练，强制对齐真实视频与生成视频的分布，弥补纯扩散损失仅提供像素级监督的不足；同时设计动态扩散损失缩放策略，平衡初期占优的扩散梯度与GAN梯度，从而消除模糊并保留轨迹控制能力。最终，FlashMotion在仅需4步去噪的条件下，实现了与多步方法相当甚至更优的视觉质量与轨迹精度，同时获得了47倍的推理加速。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FlashMotion 的核心创新在于解决“少步可控视频生成”中轨迹精度与视觉质量不可兼得的瓶颈，其关键改动可归纳为以下几个维度。
 
@@ -115,7 +117,7 @@ $$\lambda = \frac{1}{4} \times 10^{-3} \times step + 0.1$$
 
 这些创新共同构成了 FlashMotion 的因果旋钮：通过三阶段训练（先训练多步适配器 → 蒸馏少步生成器 → 混合损失微调适配器），使轨迹适配器与少步生成器的不同去噪路径对齐，在保持轨迹控制精度的同时消除少步推理带来的模糊退化。
 
-## 整体框架
+
 
 FlashMotion 的整体训练流程采用三阶段范式（图2），逐步解决将多步轨迹适配器迁移到少步生成器时面临的质量退化与轨迹精度下降问题。其核心瓶颈在于：现有多步轨迹可控视频生成方法（如 MagicMotion、Tora 等）依赖数十步去噪过程，导致大量推理时间冗余；而直接将多步适配器应用于少步生成器或仅用纯扩散损失微调，均会导致显著模糊和轨迹精度下降（图1a–c）。
 
@@ -147,7 +149,7 @@ $$\nabla \mathcal{L}_{\mathrm{DMD}} = \mathbb{E}_{t} \big( \nabla_{\theta} \math
 ![[assets/figures/papers/paper_list_l21_https_openaccess_thecvf_com_content_CVPR2026_html_Li_FlashMotion_Few_Ste/figures/003_Figure_2.jpg]]
 *Figure 2: Overview of FlashMotion training pipeline. FlashMotion is trained in three stages: (1) a SlowAdapter is first trained on the SlowGenerator with a diffusion loss; (2) a FastGenerator is distilled from the SlowGenerator under the supervision of a distribution matching [65] loss; and (3) the SlowAdapter is finetuned to align with the FastGenerator using a hybrid training strategy that combines adversarial and diffusion losses*
 
-## 核心模块与公式推导
+
 
 ### 整体训练范式
 
@@ -228,7 +230,9 @@ $$
 ![[assets/figures/papers/paper_list_l21_https_openaccess_thecvf_com_content_CVPR2026_html_Li_FlashMotion_Few_Ste/figures/004_Figure_3.jpg]]
 *Figure 3: (a) Architecture of FlashMotion. The trajectory adapter is finetuned upon the FastGenerator with a hybrid strategy that combines both diffusion and adversarial objectives. (b) Detailed illustration of our diffusion discriminator architecture. The discriminator adopts a DiT backbone cloned from the SlowGenerator, while several intermediate features from its DiT blocks are fed into an attention-based classifier to distinguish real videos from generated ones*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与实验动机
 
@@ -303,7 +307,9 @@ Figure 5 提供了上述消融的定性可视化，直观展示移除各组件�
 
 所有实验使用相同的基础模型 Wan2.2-TI2V-5B 和 DiffusionPIPE 训练框架，FlashBench 提供了统一的长序列标注，确保比较的公平性。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 多步轨迹可控视频生成基线
 
@@ -341,6 +347,8 @@ FlashMotion 通过三阶段训练范式填补了少步轨迹可控视频生成�
 2. **动态损失缩放的普适性**：$ \lambda $ 的线性调度是针对 FlashMotion 的经验设计，其在其他对抗训练蒸馏设置中的适用性需要进一步研究。
 3. **步数鲁棒性**：当前仅验证了 4 步推理，对更少步数（2 步）或更多步数（8 步）的适应性未探索。
 4. **长序列与复杂轨迹**：FlashBench 提供了长序列标注，但极端遮挡、快速运动和多目标交互场景下的鲁棒性仍需评估。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2023
 pdf_ref: paperPDFs/arxiv_2023/Dancing_Avatar_Pose_and_Text_Guided_Human_Motion_Videos_Synthesis_with_Image_Diffusion_Model.pdf
+project_link: null
+code_link: null
 aliases:
 - DAPTGHMVSIDM
 tags:
@@ -40,7 +42,7 @@ claims:
 > [!tip] 效果简介
 > - Human Motion Video Generation 上，Frame NIQE↓ 2.99 vs ControlVideo: 3.32, Follow Your Pose: 5.27 (优于ControlVideo 0.33 (10.0%))；Pose MSE↓ 1.48 vs Follow Your Pose: 10.76, ControlVideo: 30.57 (优于Follow Your Pose 9.28 (86.2%))；Text Alignment↑ 31.92 vs Follow Your Pose: 27.63, ControlVideo: 27.14 (高于最佳基线 4.29 (15.5%))。
 
-## 概述
+## 概要
 
 **核心瓶颈**：直接使用文本到视频（T2V）扩散模型生成姿态引导的人体运动视频时，单帧画质低且时间一致性不足；将文本到图像（T2I）模型改造为视频生成器存在困难，导致视频质量显著落后于T2I静态图像水平。
 
@@ -54,7 +56,7 @@ claims:
 - 文本对齐（**Text Alignment** 31.92）、帧间一致性（**Frame CLIP** 80.63）和人物外观保持（**Body CLIP** 77.43）均显著超越基线（Table 2）。
 - 消融实验证实：移除帧内对齐模块后 Body CLIP 从 77.43 降至 75.66，移除背景对齐流水线后 Background CLIP 从 81.82 降至 79.92，移除帧间对齐模块后 Frame CLIP 从 80.63 降至 78.17，三个模块对最终性能均起关键作用（Table 3）。
 
-## 背景与动机
+
 
 姿态与文本引导的人体运动视频合成旨在根据给定的姿态序列和文本描述，生成一段连续、逼真的人体运动视频。该任务在虚拟人动画、影视制作和游戏开发等领域具有广泛的应用前景，但其核心挑战在于同时满足三个维度的质量要求：单帧画质、输入条件对齐精度以及跨帧时序一致性。
 
@@ -76,7 +78,9 @@ claims:
 
 这一设计使得Dancing Avatar能够在保持T2I级单帧质量的同时，实现高精度的姿态跟随和稳定的时序连贯，从而在视频质量、输入对齐和跨帧一致性等关键指标上全面超越现有方法。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Dancing Avatar 的核心创新在于**彻底绕开了文本到视频（T2V）扩散模型的生成路径**，转而以预训练的文本到图像（T2I）扩散模型为基座，通过三个精心设计的对齐模块将单帧高质量图像生成能力转化为时序连贯的人体运动视频合成能力。这一设计直接回应了当前 T2V 模型在姿态引导人体视频生成中的根本瓶颈：单帧画质显著落后于 T2I 静态图像质量，且时间一致性不足。
 
@@ -112,7 +116,7 @@ T2V 基线直接生成连续帧，背景常出现不一致或突变。Dancing Av
 
 Dancing Avatar 的方法论贡献不在于发明新的生成模型架构，而在于 **系统性地将 T2I 模型的强图像生成能力转化为视频合成能力**。其核心洞察是：视频质量的上限由单帧质量决定，而单帧质量的最优解在 T2I 而非 T2V 模型中；时序一致性则可以通过显式的、模块化的对齐机制来注入，而非依赖视频模型内部的隐式建模。这一“强单帧 + 显式对齐”的设计范式，在 Text Alignment（31.92 vs. 最佳基线 27.63）和 Frame CLIP（80.63 vs. 最佳基线 74.64）等综合指标上的全面领先（Table 2），验证了其相对于端到端 T2V 路线的结构性优势。
 
-## 整体框架
+
 
 Dancing Avatar 的整体设计围绕一个核心瓶颈展开：直接使用文本到视频（T2V）扩散模型生成姿态引导的人体视频时，单帧画质低且时间一致性不足，而改造文本到图像（T2I）模型为 T2V 又面临巨大困难。因此，该方法选择以预训练的 T2I 扩散模型为基础，通过三个独立模块注入跨帧一致性条件，在保持单帧高质量的同时实现时序连贯。
 
@@ -129,7 +133,7 @@ Dancing Avatar 的整体设计围绕一个核心瓶颈展开：直接使用文�
 
 三个模块的职责分工明确：帧内对齐模块负责单帧人物外观一致性，帧间对齐模块负责相邻帧的细节连贯性，背景对齐流水线负责全局场景统一。三者协同工作，使得 Dancing Avatar 无需依赖 T2V 扩散模型即可生成时序连贯的高质量人体运动视频。
 
-## 核心模块与公式推导
+
 
 Dancing Avatar 的核心设计思想是将预训练文本到图像（T2I）扩散模型的强单帧生成能力转化为视频合成能力。为此，该方法构建了三个关键对齐模块，分别解决人物外观一致性、背景一致性和帧间时序连贯性问题。
 
@@ -169,7 +173,9 @@ Dancing Avatar 的核心设计思想是将预训练文本到图像（T2I）扩�
 
 **说明**：原文未提供独立的数学公式推导。上述模块均基于扩散模型的去噪框架工作，其核心机制（交叉注意力、低秩适配、ControlNet 条件注入、自回归条件生成）依赖标准扩散模型公式体系，未引入新的封闭形式公式。如需具体公式，建议手动查阅 ControlNet 和 LoRA 的原始论文。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 Dancing Avatar 在视频质量、姿态跟随精度、文本对齐和时序一致性上全面超越现有最强基线，且消融实验证实三个对齐模块各自承担不可替代的角色。
 
@@ -212,7 +218,9 @@ Table 3 和 Figure 3 分别从定量和定性角度揭示了三个对齐模块�
 ![[assets/figures/papers/paper_list_l1041_https_arxiv_org_abs_2308_07749/figures/002_Figure_2.jpg]]
 *Figure 2: Comparison between Dancing Avatar and previous state-of-the-art pose and text-guided human motion video synthesis approaches. The videos synthesized by Dancing Avatar exhibit higher video quality, alignment with inputs, and temporal coherence maintained across successive frames*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位与核心瓶颈
 
@@ -258,6 +266,8 @@ Dancing Avatar的方法设计决定了其适用边界：
 - 多人物交互场景下的身份保持和遮挡处理能力未讨论。
 - 自回归生成的最长稳定帧数未给出定量分析。
 - 与基于视频扩散模型的方法在相同计算预算下的公平比较缺失。
+
+
 
 ## 原文 PDF
 

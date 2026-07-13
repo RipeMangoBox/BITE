@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/Visual_Persona_Foundation_Model_for_Full_Body_Human_Customization.pdf
+project_link: https://cvlab-kaist.github.io/Visual-Persona
+code_link: https://github.com/
 aliases:
 - VP
 - VPFMFBHC
@@ -40,7 +42,7 @@ claims:
 > - SSHQ 上，D-H (Harmonic Mean of D-I and D-T) 6.99 vs 6.71 (StoryMaker) (+0.28)。
 > - PPR10K 上，D-H 6.85 vs 6.63 (StoryMaker) (+0.22)。
 
-## 概述
+## 概要
 
 **核心问题与瓶颈**：现有的人体定制方法（如 IP-Adapter-FaceID、InstantID、PhotoMaker）主要聚焦于面部区域的身份保持，难以在全身尺度上同时实现外观一致性与文本对齐。根本瓶颈在于：缺乏大规模、多图像的配对全身体数据集，导致模型在单图像重建训练中容易过拟合姿态、背景等身份无关属性；同时，全局特征编码方式会丢失服装纹理、体型等局部细节。
 
@@ -51,8 +53,6 @@ claims:
 **主要结果**：在 PPR10K 基准上，Visual Persona 的身份保持指标 D-I 达到 7.30（StoryMaker 为 6.80），综合指标 D-H 以 6.85 对 6.63 领先 StoryMaker（Table 2）。定性对比（Figure 5、Figure 7）显示，该方法能在大幅度姿态和表情变化下保持服装细节，生成更逼真的纹理。消融实验证实，身体部位分解使 D-H 从 6.40 提升至 6.85（Table 4），将身份嵌入 token 长度从 4×4 增加到 16×16 进一步显著提升了身份保持（Table 5）。
 
 **局限与开放问题**：方法仍受 SDXL 固有缺陷影响，可能产生不准确的身体比例（如手指融合、多余肢体），目前通过负向提示部分缓解。身份无关属性泄漏（如输入图像中被遮挡的背景元素被错误保留）是另一已知局限，论文计划通过前景分割模型改进。开放问题包括：如何彻底消除属性泄漏而不依赖手动掩码？负向提示策略能否自动化？该方法在极端遮挡或多人交互场景下的鲁棒性尚待验证。
-
-## 背景与动机
 
 ### 研究问题与核心瓶颈
 
@@ -77,7 +77,7 @@ Visual Persona 的核心洞察在于：**将人体分解为多个独立区域并
 
 Visual Persona 在方法谱系中处于**身份定制扩散模型**与**细粒度视觉特征编码**的交汇点。与仅关注面部身份的方法（如 IP-Adapter-FaceID、InstantID）相比，它将定制范围扩展至全身；与 StoryMaker 等已有的全身定制方法相比，它通过身体部位分解和跨图像训练策略，显著提升了对服装细节和纹理的保持能力，同时降低了对姿态、表情等身份无关属性的过拟合风险。在知识库定位上，该方法的核心贡献在于证明了**密集的局部身份嵌入**（通过 16×16 的 token 长度实现）和**解耦的交叉注意力注入**是全身人体定制的有效范式。
 
-## 核心创新
+## 核心方法与创新机理
 
 ### 瓶颈与因果转向
 
@@ -111,8 +111,6 @@ Visual Persona 的因果转向体现在三个相互耦合的 **changed slots** �
 尽管架构创新有效，该方法仍存在两个由基础模型继承的局限：（1）依赖 SDXL 导致生成人体可能出现手指融合、多余肢体等解剖伪影，目前仅通过负向提示缓解；（2）身份无关属性泄漏（如输入图像中被遮挡的背景元素被错误保留）尚未根本解决，论文提出通过改进前景分割模型来应对，但这一方向仍需验证。
 
 开放问题包括：能否将部位分解策略推广至多人交互场景而不依赖专门的多人类数据集？负向提示策略能否自动化或内化到模型训练中？这些问题指向了该框架从“单人定制”向“场景级人体生成”扩展的可能性。
-
-## 整体框架
 
 Visual Persona 的整体流水线围绕一个核心洞察构建：**将人体分解为多个独立区域并分别提取局部特征，能够更精细地保留全身外观细节，避免传统全局特征融合造成的信息丢失**。其架构将这一思想系统化为四个紧密衔接的模块，形成从输入图像到定制化输出的端到端流程。
 
@@ -166,8 +164,6 @@ $$L := \mathbb{E}_{z_{Y,t}, \epsilon, t, C_T, C_H^*} \left[ \left| \left| \epsil
 
 输入单人图像 → 身体部位分解（5 个部位图像）→ DINOv2 编码（局部特征）→ 身体分区 Transformer 解码器（分区交叉注意力 + 自注意力 + MLP，迭代精炼）→ 拼接为密集身份嵌入 → 与文本嵌入共同注入冻结 SDXL → 输出定制化图像。整个流程中，仅解码器和身份交叉注意力模块可训练，扩散模型与图像编码器均保持冻结，在参数效率与生成质量之间取得了平衡。
 
-## 核心模块与公式推导
-
 Visual Persona 的核心架构由四个关键模块串联构成：**身体部位分解**、**DINOv2 图像编码器**、**身体分区 Transformer 解码器**以及**解耦身份交叉注意力**。整个流程将单张人体图像转化为密集的身份嵌入，再注入冻结的 SDXL 扩散模型以合成新图像。
 
 ### 身体部位分解（Body Part Decomposition）
@@ -212,12 +208,8 @@ $$L := \mathbb{E}_{z_{Y,t},\, \epsilon,\, t,\, C_T,\, C_H^*}\left[ \big|\big| \e
 
 其中 $z_{Y,t}$ 为目标图像在时间步 $t$ 的加噪潜变量，$\epsilon$ 为添加的噪声，$C_T$ 为文本嵌入，$C_H^*$ 为堆叠身份嵌入。跨图像训练策略迫使模型学习身份本质特征而非身份无关属性（如姿态、背景），这是 Visual Persona 相较于以往重建式训练方法的关键优势（Table 3, Figure 7）。
 
-### 补充图表
 
-![[assets/figures/papers/paper_list_l7_Visual_Persona_Foundation_Model_for_Full_Body_Human_Customization/figures/017_Figure_11.jpg]]
-*Figure 11: Human Stylization and Character Customization. Figure 12. Part-Guided Full-Body Generation: Users can select a single body part from the human image as input, allowing the pre-trained T2I diffusion model to synthesize the remaining body parts, without requiring additional training*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -282,7 +274,7 @@ Visual Persona 在两个公开基准数据集上均取得了最优的身份保�
 ![[assets/figures/papers/paper_list_l7_Visual_Persona_Foundation_Model_for_Full_Body_Human_Customization/figures/013_Table_4.jpg]]
 *Table 4: Component Analysis*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 方法定位与基线关系
 

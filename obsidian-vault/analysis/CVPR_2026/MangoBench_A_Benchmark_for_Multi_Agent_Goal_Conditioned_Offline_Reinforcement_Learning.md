@@ -43,7 +43,7 @@ claims:
 > - lift-barrier 上，Success Rate (%) IHIQL (multi-goal) 82% vs GCMBC (multi-goal) 47% (+35%)。
 > - place-food 上，Success Rate (%) ICRL (超出 DP 75%) vs Diffusion Policy (DP) (+75%（相对）)。
 
-## 概述
+## 概要
 
 离线多智能体强化学习（Offline MARL）面临一个关键瓶颈：现有方法高度依赖手工设计的稠密任务奖励，难以泛化至新目标，而主流基准缺乏对多目标评估和目标条件训练的系统支持。MangoBench 作为首个面向多智能体目标条件的离线强化学习基准，通过引入**目标重标记（goal relabeling）**与**结构化目标分解**，将单智能体离线目标条件强化学习（OGCRL）扩展至完全去中心化和 CTDE（集中训练分散执行）两种多智能体范式，使算法在稀疏二值奖励下仍能学习协同策略并泛化到多个目标。
 
@@ -51,7 +51,7 @@ claims:
 
 该方法谱系将目标条件行为克隆（GCBC）、对比强化学习（CRL）和层次化隐式 Q 学习（HIQL）等单智能体基线扩展至多智能体场景，并与离线 MARL 方法 OMIGA、OMAR 的目标条件变体进行了系统对比。MangoBench 覆盖关节控制运动和多实体操作两大类任务，提供标准化 RL 数据集和多目标评估协议，为离线多智能体目标条件学习建立了首个系统性基准。
 
-## 背景与动机
+
 
 ### 离线多智能体强化学习的核心瓶颈
 
@@ -87,7 +87,9 @@ claims:
 2. **基准层面**：构建MangoBench——首个纯合作多目标离线MARL基准，覆盖联合控制运动和多实体操作两类任务，提供标准化RL数据集和多目标评估协议。
 3. **评估层面**：揭示单目标评估的潜在偏差，建立多目标评估作为衡量目标条件离线MARL算法性能的更准确、更稳定标准。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈与突破：从单智能体目标条件到多智能体离线强化学习
 
@@ -135,7 +137,7 @@ MangoBench并非提出全新算法，而是通过**目标重标记（goal relabe
 - ICRL在place-food任务上超出Diffusion Policy 75%的相对提升比例，原文仅给出相对描述，精确数值需对照Figure 2验证。
 - HIQL-CTDE性能远逊于IHIQL的结论（Table 4）仅在AntMaze-navigate任务上验证，是否适用于其他任务类型尚需进一步实验。
 
-## 整体框架
+
 
 MangoBench 构建了首个面向多智能体目标条件的离线强化学习（goal-conditioned offline MARL）框架，其核心 pipeline 由四个关键模块串联而成：**目标重标记与数据集转换** → **目标分解** → **去中心化/CTDE 训练** → **多目标评估**。
 
@@ -180,7 +182,7 @@ $$
 
 整个 pipeline 的设计围绕一个核心瓶颈展开：**离线多智能体强化学习对奖励函数高度敏感且难以泛化至新目标**。现有离线 MARL 方法（如 **OMIGA**（Wang et al., NeurIPS 2023）和 **OMAR**（Pan et al., ICML 2022））依赖手工设计的稠密奖励，在稀疏奖励下几乎完全失效（Figure 5）。MangoBench 通过目标重标记消除对手工奖励的依赖，通过目标分解实现多智能体协同下的目标条件学习，再通过多目标评估揭示算法的真实泛化能力，从而为离线 MARL 提供了一个更严格、更全面的测试平台。
 
-## 核心模块与公式推导
+
 
 MangoBench框架的核心在于将单智能体离线目标条件强化学习（OGCRL）扩展至多智能体场景，通过**目标重标记**、**目标分解**和**去中心化/CTDE训练**三个关键模块，使智能体在稀疏二值奖励下仍能学习协同策略并泛化至多个目标。
 
@@ -239,7 +241,9 @@ $$\nabla_{\theta_i} J_i = \mathbb{E}_{(\mathbf{o}, \mathbf{a}, \mathbf{g}) \sim 
 
 实验表明，GCOMIGA 和 GCOMAR 在几乎所有运动控制任务中完全失败（Figure 2），证实现有离线MARL方法无法有效处理稀疏奖励，这一发现构成了后续研究的重要出发点。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈：稀疏奖励与离线学习的根本冲突
 
@@ -295,7 +299,9 @@ Table 1 和 Table 2 从环境与奖励两个维度定位了 MangoBench 的独特
 ![[assets/figures/papers/paper_list_l2286_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_MangoBench_A_Benc/figures/009_Figure_4.jpg]]
 *Figure 4: Visualization of different reward settings. (a) Sparse reward R, (b) shaped reward*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 从单智能体目标条件RL到多智能体扩展
 
@@ -362,6 +368,8 @@ MangoBench在以下维度上填补了知识空白：
 - **开放世界目标泛化**：当前评估仅使用预定义目标，实际应用中可能需要泛化到训练时未见过的目标组合。这要求方法具备目标空间的组合泛化能力，而非简单的插值泛化。
 
 **需手动验证的点**：论文未提供HIQL-CTDE性能崩溃的深层原因分析（如梯度冲突、价值函数估计偏差等），建议读者结合Table 4的具体数值和训练曲线进一步判断CTDE失败的根本机制。
+
+
 
 ## 原文 PDF
 

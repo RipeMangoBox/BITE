@@ -43,7 +43,7 @@ claims:
 > - HPD 上，ImageReward 0.903 (DRTune+Ours, SD1.5) vs 0.842 (DRTune, SD1.5) (+0.061)。
 > - Flux.1-dev 上，ImageReward 0.961 (DRTune+Ours) vs 0.926 (DRTune) (+0.035)。
 
-## 概述
+## 概要
 
 扩散模型在奖励驱动的强化学习（RDRL）中面临一个根本性瓶颈：奖励模型对输入扰动高度非鲁棒，导致策略沿对抗方向过优化奖励，产生“奖励黑客”现象——生成图像在目标奖励模型上得分虚高，但视觉质量和与人类偏好的真实对齐度反而下降。本文揭示，这一问题的本质在于奖励函数在图像输入空间和模型参数空间中存在尖锐的局部极大值（高奖励锐度），而奖励锐度与人类偏好质量呈强负相关（PickScore 的 Pearson $r_{\text{corr}}=-0.802$，ImageReward 的 $r_{\text{corr}}=-0.669$，见 **Figure 4**）。
 
@@ -51,7 +51,7 @@ claims:
 
 实验覆盖 SD1.5、SDXL、SD3 和 Flux.1-dev 四个骨干网络，以及 ReFL、DRaFT-K、AlignProp、DRTune 四种主流 RDRL 基线。结果表明，RSA-FT 在所有组合上一致提升 HPSv2.1、PickScore 和 ImageReward 得分（例如 SD1.5 上 DRTune+Ours 的 ImageReward 从 0.842 提升至 0.903，SDXL 上 DRTune+Ours 的 HPSv2.1 从 30.04 提升至 31.58），并有效缓解奖励黑客行为。消融实验证实，联合使用图像空间和参数空间扰动比单独使用任一扰动带来更大增益，验证了两者的协同效应。此外，RSA-FT 对扰动半径超参数不敏感，训练稳定，且未引入显著的分布发散（FID/KID 评估），展现出良好的实用性和安全性。
 
-## 背景与动机
+
 
 ### 扩散模型对齐中的奖励黑客困境
 
@@ -79,7 +79,9 @@ $$S_{1}=\mathbb{E}_{\mathbf{x}\sim\mathcal{D}}\Big[r(\mathbf{x})-\min_{\|\epsilo
 
 基于上述观察，本文提出 **RSA-FT（Reward Sharpness-Aware Fine-Tuning）**：一种通过联合输入空间和参数空间扰动来平坦化奖励景观的微调方法。核心思想是将原始奖励 $r(\mathbf{x}_0, \mathbf{c})$ 替换为平坦化奖励 $r(\mathbf{x}_0 + \delta_{\mathbf{x}_0}, \mathbf{c}; \theta + \epsilon_{\theta})$，其中 $\delta_{\mathbf{x}_0}$ 为输入对抗扰动，$\epsilon_{\theta}$ 为参数 SAM 扰动。该方法无需重新训练奖励模型，可作为插件无缝集成到现有 RDRL 框架中，引导模型沿着与真实偏好一致的方向更新。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题定位：奖励黑客的对抗脆弱性根源
 
@@ -110,7 +112,7 @@ $$S_{1}=\mathbb{E}_{\mathbf{x}\sim\mathcal{D}}\Big[r(\mathbf{x})-\min_{\|\epsilo
 
 RSA-FT 与现有 RDRL 方法的根本差异在于**反馈信号的来源**：ReFL、DRaFT-K、AlignProp、DRTune 等基线方法直接最大化原始奖励模型的输出，而 RSA-FT 最大化的是经过输入-参数双重平坦化后的奖励。这一设计使得模型不再沿着奖励模型的尖锐对抗方向更新，而是沿着与人类偏好一致的平坦方向优化（Figure 3 提供了几何解释）。消融实验证实，单独使用输入空间扰动（AT）或参数空间扰动（SAM）均能带来性能提升，但**联合使用两者取得了最大增益**，验证了两种平坦化机制的协同效应（Table 6, Appendix）。
 
-## 整体框架
+
 
 RSA‑FT 的整体设计遵循一个简洁的逻辑：**奖励黑客行为的根源在于奖励模型在图像空间和参数空间中存在尖锐的局部极大值，因此通过同时平坦化这两个空间中的奖励景观，可以消除对抗性梯度，使策略沿着与真实人类偏好一致的方向更新**。图 3 从几何角度直观展示了这一思想：传统 RDRL 方法直接沿尖锐奖励表面的梯度方向最大化奖励，容易陷入对抗性区域；RSA‑FT 则从平坦化后的奖励模型中获取梯度，从而缓解奖励黑客。
 
@@ -142,7 +144,7 @@ RSA‑FT 的整体设计遵循一个简洁的逻辑：**奖励黑客行为的根
 ![[assets/figures/papers/paper_list_l2700_https_arxiv_org_abs_2603_21175/figures/010_Figure_7.jpg]]
 *Figure 7: Conceptual illustration of the RDRL framework*
 
-## 核心模块与公式推导
+
 
 ### 动机：奖励景观的局部尖锐性
 
@@ -220,7 +222,9 @@ $$\max_{\theta}\mathbb{E}_{\mathbf{c},\mathbf{x}_T\sim\mathcal{N}(0,\mathbf{I})}
 ![[assets/figures/papers/paper_list_l2700_https_arxiv_org_abs_2603_21175/figures/002_Figure_2.jpg]]
 *Figure 2: Illustration of reward hacking in RDRL (Draft-LV). The original reward model raises the HPS v2.1 score but degrades other metrics and visual quality, whereas our flattened model improves all metrics with consistent visuals*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心假设验证：奖励锐度与人类偏好的负相关
 
@@ -295,7 +299,9 @@ RSA-FT 引入了两个关键超参数：图像空间扰动半径 $\rho$ 和参�
 ![[assets/figures/papers/paper_list_l2700_https_arxiv_org_abs_2603_21175/figures/013_Table_9.jpg]]
 *Table 9: Quantitative comparison on Multi-reward scenarios*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心贡献定位
 
@@ -359,6 +365,8 @@ RSA-FT 的有效性建立在以下前提之上，这些前提同时定义了其�
 ### 在知识库中的位置
 
 RSA-FT 在扩散模型对齐的知识谱系中占据了一个独特的位置：它既不修改底层 RDRL 优化器的结构，也不重新训练或集成奖励模型，而是通过对**奖励信号的局部几何进行主动塑造**来实现对齐改进。这一思路将扩散模型对齐问题从“优化策略设计”层面向“奖励信号预处理”层面进行了有益的转移，为后续研究开辟了一个新的干预维度——奖励景观工程（reward landscape engineering）。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2024
 pdf_ref: paperPDFs/CVPR_2024/SeMoLi_What_Moves_Together_Belongs_Together.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/dvl/projects/semoli/
 aliases:
 - SeMoLi
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | SeMoLi：一起运动的属于一起 |
 | 英文题名 | SeMoLi: What Moves Together Belongs Together |
 | 会议/期刊 | CVPR 2024 |
-| Links | [paper](https://arxiv.org/abs/2402.19463); [Project](https://research.nvidia.com/labs/dvl/projects/semoli/) |
+| Links | [paper](https://arxiv.org/abs/2402.19463) · [Project](https://research.nvidia.com/labs/dvl/projects/semoli/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | SeMoLi |
 | Dataset | Waymo Open Dataset (伪标签质量), Waymo Open Dataset (移动物体检测), Argoverse2 (移动物体检测, 跨数据集) |
@@ -41,7 +42,7 @@ claims:
 > - Waymo Open Dataset (移动物体检测) 上，AP@0.4 为 57.5，对比 ~43.5 (prior heuristic approach)，变化 +14.0。
 > - Argoverse2 (移动物体检测, 跨数据集) 上，AP@0.4 为 57.6，对比 82.9 (fully supervised on Argoverse2)，变化 -25.3。
 
-## 概述
+## 概要
 
 激光雷达点云中运动实例的分割与检测，是自动驾驶感知系统的基础能力。现有方法主要依赖基于密度的启发式聚类（如DBSCAN），结合场景流或多帧信息进行后处理。这类管线存在根本性瓶颈：**聚类决策完全由手工设计的空间规则驱动，无法从数据中学习判别性运动模式**，导致稀疏点云下过分割与欠分割严重，且对背景噪声的滤除能力薄弱。
 
@@ -54,8 +55,6 @@ SeMoLi 针对上述瓶颈，将点云实例分割重新建模为**可学习的�
 - 仅在 Waymo 上训练的 SeMoLi，可直接在 Argoverse2 上泛化，移动对象 3DIoU 召回率达到 **45.8**，优于 DBSCAN++† 的 **33.3**（Table 5）。
 
 **方法定位**：SeMoLi 属于自监督/半监督点云实例分割与检测范式，其知识贡献在于将相关聚类（correlation clustering）与消息传递网络结合，构建了一个**类不可知、纯数据驱动的运动实例分割教师网络**。该方法不依赖任何类别标签，仅利用场景流估计获得的点轨迹作为运动线索，因此天然具备跨数据集迁移能力。
-
-## 背景与动机
 
 自动驾驶系统需要对周围环境中的物体进行精确的3D检测与跟踪，以保障安全导航。激光雷达（Lidar）作为核心传感器，能够提供稀疏但准确的3D点云数据。然而，构建高性能的3D目标检测器通常依赖大规模、高质量的人工标注数据，这一过程成本高昂且难以覆盖所有场景与类别。
 
@@ -78,7 +77,7 @@ SeMoLi的核心思路是：将点云聚类问题重新表述为**图分解问题
 
 通过将格式塔原则编码为可学习的图神经网络，SeMoLi能够端到端地学习类不可知（class-agnostic）的点云实例分割，无需依赖类别标签或预设的聚类参数。
 
-## 核心创新
+## 核心方法与创新机理
 
 SeMoLi 的核心创新在于将基于启发式规则的点云运动实例分割，转化为一个**数据驱动的可学习图分解问题**。其关键 changed slots 体现在以下几个层面：
 
@@ -112,8 +111,6 @@ SeMoLi 采用基于空间位置的 k 近邻（kNN）图构建，而非基于速�
 
 SeMoLi 将分割网络作为"教师"，在无标注数据上生成伪标签，用于训练 PointPillars "学生"检测器。这一闭环设计使得检测器在移动对象上达到 57.5 AP（IoU=0.4），比先前启发式方法提升 14 个点（Abstract, Table 6）。更关键的是，SeMoLi 仅在 Waymo 上训练即可泛化至 Argoverse2，移动对象 3DIoU 召回率达到 45.8，优于 DBSCAN++† 的 33.3（Table 5），证明了学习到的运动分组能力具有跨数据集的迁移性。
 
-## 整体框架
-
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2402_19463/figures/018_Figure_6.jpg]]
 *Figure 6: Overview MPN during training and evaluation: We visualize our MPN. It takes as input points from a point cloud with their corresponding spatial positions $p _ { i }$ , trajectory $t _ { i }$ , and velocities along the trajectory $v _ { i }$ . . We then extract initial node and edge features ${ \bf \bar { \Phi } } _ { h _ { i } ^ { ( 0 ) } }$ and $h _ { i j } ^ { ( 0 ) }$ , apply L MPN layers and for training apply focal loss on the final edge features $h _ { i j } ^ { ( L ) }$ . During Evaluation, we prune edges based on the final edge scores, apply correlation clustering on the remaining, and extract bounding boxes $b _ { c }$ with translation $t _ { c }$ , dimensions l w $h _ { c }$ , and heading in xy-dir...
 
@@ -128,8 +125,6 @@ SeMoLi 的整体 pipeline 围绕“以运动为线索、数据驱动地学习点
 4. **检测器训练**：将 SeMoLi 在无标注激光雷达数据上生成的伪标签作为监督信号，训练一个类别无关的 PointPillars 目标检测器（学生网络），用于最终的运动物体检测（Section 3.2）。
 
 整个框架的关键因果机制在于：**将启发式的密度聚类替换为可学习的图分解**，使伪标签质量能够随训练数据量的增加而单调提升（F1 从 50.4 升至 57.6），并具备跨数据集泛化能力（仅在 Waymo 上训练即可在 Argoverse2 上达到 45.8 的移动对象召回率）。
-
-## 核心模块与公式推导
 
 ### 3.1 图构建与节点/边特征初始化
 
@@ -179,7 +174,7 @@ $$\tilde{h}_{ij}^{(L)} = \sigma(f_f(h_{ij}^{(L)}))$$
 
 从点簇中提取紧致3D包围盒后，SeMoLi采用简单的**包围盒膨胀**策略：将包围盒膨胀至预设的最小宽度、长度和高度。消融实验表明，这一简单策略大幅提升检测性能——3DIoU F1从30.3升至53.1，而分割IoU变化不显著（Table 2）。相比之下，基于ICP的配准方法因点云和轨迹噪声导致性能下降（Table 11），进一步验证了简单膨胀策略在该场景下的有效性。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心瓶颈与验证逻辑
 
@@ -246,10 +241,7 @@ SeMoLi的核心主张是伪标签质量可随训练数据增加而单调提升�
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2402_19463/figures/011_Table_9.jpg]]
 *Table 9: SeMoLi 10 ablation modal upper bound: We report upper bound via oracle, i.e., the achievable performance with segments with at least x _ { f } interior points from GT labels*
 
-![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2402_19463/figures/012_Table_8.jpg]]
-*Table 8: Point cloud filtering. In the pre-filtering step, we remove points that appear static. We report the percentage of labeled bounding boxes that have more $\geq x _ { f }$ interior before and after filtering. A few observations: (i) even when not filtering the point cloud, a certain percentage of boxes have no interior points; those are probably occluded and extrapolated. (ii) filtering causes a big drop for static objects, as expected. (iii) after filtering we retain a high number of boxes of moving objects: 90% with at least 10 points, and 67% with at least 50. Those are those that we can obtain in the pseudo-labeling process*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 核心瓶颈与因果调控
 

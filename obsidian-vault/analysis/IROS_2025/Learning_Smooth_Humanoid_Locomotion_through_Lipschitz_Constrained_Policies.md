@@ -5,6 +5,7 @@ paper_level: A
 venue: IROS
 year: 2025
 pdf_ref: paperPDFs/IROS_2025/Learning_Smooth_Humanoid_Locomotion_through_Lipschitz_Constrained_Policies.pdf
+code_link: null
 project_link: https://lipschitz-constrained-policy.github.io/
 aliases:
 - LCPL
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 通过 Lipschitz 约束策略学习平滑仿人机器人运动 |
 | 英文题名 | Learning Smooth Humanoid Locomotion through Lipschitz-Constrained Policies |
 | 会议/期刊 | IROS 2025 |
-| Links | [paper](https://arxiv.org/abs/2410.11825); [Project](https://lipschitz-constrained-policy.github.io); [Project](https://lipschitz-constrained-policy.github.io/) |
+| Links | [paper](https://arxiv.org/abs/2410.11825) · [Project](https://lipschitz-constrained-policy.github.io) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | Lipschitz-Constrained Policies (LCP) |
 | Dataset | Fourier GR1 (IsaacGym simulation, 1000 envs, 500 steps), Fourier GR1 (sim-to-sim transfer to MuJoCo), Real-world Fourier GR1 (smooth terrain, 10s per trial) |
@@ -42,7 +43,7 @@ claims:
 > - Fourier GR1 (IsaacGym simulation, 1000 envs, 500 steps) 上，Action Jitter (rad/s^3) 为 3.21 ± 0.11，对比 Smoothness Rewards: similar smoothness (see Fig. 4)，变化 similar。
 > - Fourier GR1 (sim-to-sim transfer to MuJoCo) 上，Task Return 为 24.33 ± 1.25，对比 IsaacGym LCP: 26.03 ± 1.51，变化 -1.7。
 
-## 概述
+## 概要
 
 **核心问题**：基于无模型强化学习的仿人机器人运动控制器，在仿真训练中极易产生高频抖动的 bang-bang 控制行为。这类行为不仅导致策略无法成功迁移至真实机器人，且常用的平滑技术——如平滑奖励（Smoothness Rewards）与低通滤波（Low-pass Filters）——均不可微分、依赖大量手工调参，缺乏通用性。
 
@@ -63,7 +64,7 @@ $$\max_{\pi} J(\pi) - \lambda_{\mathrm{gp}} \mathbb{E}_{\mathbf{s}, \mathbf{a} \
 
 **局限性**：目前仅在仿人机器人步行与转向任务上验证，尚未延伸至跑、跳等更高动态技能；梯度惩罚系数 $\lambda_{\mathrm{gp}}$ 仍需手动调节；真实世界测试局限于特定地形与机器人类别。
 
-## 背景与动机
+
 
 ### 问题背景：从仿真到现实的平滑鸿沟
 
@@ -99,7 +100,9 @@ $$\max_{\pi} J(\pi) - \lambda_{\mathrm{gp}} \mathbb{E}_{\mathbf{s}, \mathbf{a} \
 
 这种方法的根本优势在于：它将平滑性从间接的奖励塑造或后处理滤波，提升为**策略函数空间上的直接约束**，从而提供了一种简单、通用且可微分的平滑行为生成方案。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈洞察：从“平滑行为”到“平滑策略函数”
 
@@ -144,7 +147,7 @@ $$
 - **参数敏感性**：$\lambda_{\mathrm{gp}}$ 仍需手动调节，不同机器人形态或任务可能需要重新搜索最优值，尚未实现自动化调参。
 - **动作空间假设**：当前策略输出目标关节位置，通过 PD 控制器转化为力矩。若直接输出力矩，梯度惩罚的效果有待进一步验证。
 
-## 整体框架
+
 
 ### 问题背景与设计动机
 
@@ -227,7 +230,7 @@ LCP 的核心贡献在于**将平滑性约束从奖励函数层面提升到策�
 ![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2410_11825/figures/001_Figure_1.jpg]]
 *Figure 1: Lipschitz-constrained policies (LCP) provide a simple and general method for training policies to produce smooth behaviors, which can be directly deployed on a wide range of real-world humanoid robots. Our policies exhibit robust behaviors that can recover from external forces and walk across irregular terrain. For full videos, please visit the project website*
 
-## 核心模块与公式推导
+
 
 ### 核心洞察：平滑策略的梯度特性
 
@@ -287,7 +290,9 @@ $$L_{\mathrm{gp}}(\pi) = \mathbb{E}_{\mathbf{s}, \mathbf{a} \sim \mathcal{D}} \l
 
 梯度惩罚系数 $\lambda_{\mathrm{gp}}$ 是 LCP 的核心超参数。消融实验（TABLE I(b), Fig. 6）表明 $\lambda_{\mathrm{gp}} = 0.002$ 在平滑度和任务回报之间取得了最佳平衡；过大的 $\lambda_{\mathrm{gp}}$ 会过度压制策略的表达能力，显著损害任务学习。目前该系数需要针对不同机器人形态手动调节，尚未实现自动化选择。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -347,7 +352,9 @@ LCP 训练的策略成功**零样本部署**到多种真实仿人机器人（Fig
 ![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2410_11825/figures/011_Table.jpg]]
 *Table: IV: Terms and weights of regularization rewards*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法关系图谱
 
@@ -406,6 +413,8 @@ LCP 与上述方法的本质差异在于：**将平滑性约束直接嵌入策�
 5. **极端 Sim-to-Real 鲁棒性**：LCP 在更极端的 sim-to-real 场景下（如高仿真误差、传感器噪声、执行器延迟）的鲁棒性边界在哪里？梯度惩罚本身是否可能放大仿真偏差对策略的影响？
 
 6. **与其他平滑技术的融合**：LCP 与平滑奖励、低通滤波等方法是否可以互补？例如，在 LCP 基础上加入轻量平滑奖励是否能进一步提升 sim-to-real 迁移性能？初步消融实验（TABLE I(a)）显示 LCP 与平滑奖励的组合效果与单独使用相当，但更系统的组合策略值得探索。
+
+
 
 ## 原文 PDF
 

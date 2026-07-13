@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/SPG_Sandwiched_Policy_Gradient_for_Masked_Diffusion_Language_Models.pdf
+project_link: https://chenyuwang-monica.github.io/spg/
+code_link: https://github.com/facebookresearch/SPG
 openreview_forum_id: 18j5Q49GwN
 aliases:
 - SSPG
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | SPG：用于掩码扩散语言模型的夹层策略梯度 |
 | 英文题名 | SPG: Sandwiched Policy Gradient for Masked Diffusion Language Models |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=18j5Q49GwN); [GitHub](https://github.com/facebookresearch/SPG); [Project](https://chenyuwang-monica.github.io/spg/) |
+| Links | [paper](https://openreview.net/forum?id=18j5Q49GwN) · [GitHub](https://github.com/facebookresearch/SPG) · [Project](https://chenyuwang-monica.github.io/spg/) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | SPG (Sandwiched Policy Gradient) |
 | Dataset | GSM8K (0-shot, length 256), MATH500 (0-shot, Countdown (0-shot, Sudoku (3-shot |
@@ -42,7 +44,7 @@ claims:
 > - MATH500 (0-shot, length 256) 上，准确率 为 40.0 (SPG w/ Mixture)，对比 37.4 (UniGRPO)，变化 +2.6。
 > - Countdown (0-shot, length 256) 上，准确率 为 70.7 (SPG w/ Mixture)，对比 52.3 (WD1)，变化 +18.4。
 
-## 概述
+## 概要
 
 扩散语言模型（dLLM）在推理与对齐任务中展现出潜力，但其对数似然不可计算，导致标准策略梯度方法无法直接应用。现有强化学习（RL）方法普遍使用证据下界（ELBO）作为代用似然，然而ELBO仅为下界，无法有效利用负奖励对不良生成进行惩罚，引入显著偏差，限制了对齐效果的上限。
 
@@ -50,7 +52,7 @@ claims:
 
 在四个数学与逻辑推理基准（GSM8K、MATH500、Countdown、Sudoku）上，SPG显著超越先前最优方法：在序列长度256设定下，GSM8K准确率提升3.6%，MATH500提升2.6%，Countdown提升18.4%，Sudoku提升27.0%。在编码任务HumanEval和MBPP上，SPG亦分别取得1.9%和4.7%的Pass@1增益。消融实验证实，混合似然估计（ELBO+EUBO）与块状掩码策略是性能提升的关键因素，且SPG在多种解码策略下均表现出强泛化性。
 
-## 背景与动机
+
 
 掩码扩散语言模型（Masked Diffusion Language Model, MDLM）通过逐步去噪生成文本，其训练依赖于最大化证据下界（ELBO）。然而，当将这类模型应用于强化学习（RL）后训练时，一个根本性瓶颈浮现：**扩散语言模型（dLLM）的真实对数似然 $\log \pi_\theta(x|c)$ 不可计算**，因为其生成过程涉及对大量潜在变量路径的积分。
 
@@ -63,7 +65,9 @@ claims:
 
 上述两个问题构成了当前 dLLM 强化学习后训练的核心瓶颈：**似然估计偏差**与**训练-推理分布错位**。本文的动机正是针对这两个缺口，提出一种能够有效利用负奖励信号、同时对齐训练与推理分布的策略梯度方法。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SPG 的核心创新在于解决了一个根本瓶颈：**扩散语言模型（dLLM）的真实对数似然 $\log\pi_\theta(x|c)$ 不可计算**，导致标准策略梯度方法无法直接应用。现有 RL 方法（如 D1、WD1）使用 ELBO 作为代用似然，但 ELBO 仅为下界，无法有效利用负奖励进行惩罚，引入显著偏差。SPG 通过两个关键的 **changed slots** 系统性地解决了这一问题。
 
@@ -111,7 +115,7 @@ $$
 
 综上，SPG 通过**夹层似然估计**和**块状掩码**这两个 changed slots，在不增加计算开销的前提下（每次梯度更新约 0.49–0.51 分钟，8×A100），系统性解决了 dLLM 中似然不可算导致的策略梯度偏差问题，在数学推理（GSM8K +3.6%、MATH500 +2.6%、Countdown +18.4%、Sudoku +27.0%）和代码生成（HumanEval +1.9%、MBPP +4.7%）任务上均取得显著提升（Table 1, Table 2）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_18j5Q49GwN/figures/005_Figure_2.jpg]]
 *Figure 2: The training process of SPG for MDLM. Left: From a prompt c, we generate responses $\{ \bar { \pmb { x } ^ { j } } \} _ { j = 1 } ^ { g }$ . We then maximize a lower bound on the likelihood $\pi _ { \pmb { \theta } } ( \bar { \pmb x } ^ { j } \mid \bar { \pmb c }$ ) for high-reward responses while minimizing an upper bound for low-reward ones. Right: The upper/lower bound of likelihood is estimated via Monte Carlo using a block-wise masking strategy, where a random block is selected for masking, with earlier blocks kept clean and later blocks fully masked. The example shows a sequence of length 9 with a block size of 3, where the current generation block is highlighted in yellow
@@ -159,7 +163,7 @@ $$\tilde{\mathcal{L}}_{\mathrm{Mix}}(x|c;\theta) = \omega\cdot\tilde{\mathcal{L}
 
 该方法的关键设计决策——夹层估计与块状掩码——共同解决了扩散语言模型 RL 训练中的两个核心瓶颈：不可算似然下的有效梯度估计，以及训练-推断分布失配。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化：组相对优势目标
 
@@ -234,7 +238,9 @@ SPG 的完整训练迭代（Algorithm 1）包含四个步骤：
 3. **夹层目标构建与梯度计算**：根据优势正负分别选择 ELBO 或混合损失（EUBO+ELBO）构建 SPG 目标，计算梯度。
 4. **策略更新**：使用计算得到的梯度更新策略参数 $\theta$。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与评估逻辑
 
@@ -339,7 +345,9 @@ SPG 的完整训练迭代（Algorithm 1）包含四个步骤：
 ![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_18j5Q49GwN/figures/032_Table_11.jpg]]
 *Table 11: Ablations on the masking strategies in Monte Carlo estimation. Our block-wise masking strategy leads to consistent improvement to random masking on both benchmarks*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：扩散语言模型的策略梯度困境
 
@@ -430,6 +438,8 @@ $$g_{\omega,k} = ((1-\omega)w(t,z_t) + \omega\rho_{\beta}) \partial_{\theta_k}\l
 5. **长序列与大规模扩展**：在更长的序列生成（>512 tokens）或更大规模模型（>8B参数）上，SPG的扩展性与稳定性如何？块状掩码策略的块大小是否需要随序列长度动态调整？
 
 6. **与其他对齐技术的协同**：SPG与偏好优化方法（如LLaDA-1.5使用的VRPO）是否存在互补性？两者能否在统一框架下结合？
+
+
 
 ## 原文 PDF
 

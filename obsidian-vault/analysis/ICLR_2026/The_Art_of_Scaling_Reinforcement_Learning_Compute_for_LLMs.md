@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/The_Art_of_Scaling_Reinforcement_Learning_Compute_for_LLMs.pdf
+project_link: null
+code_link: null
 openreview_forum_id: FMjeC9Msws
 aliases:
 - ASRLCL
@@ -41,7 +43,7 @@ claims:
 > - AIME-24 (downstream math reasoning) 上，pass rate 为 SCALERL-8B Dense at 100k GPU hours: ~0.58; SCALERL-17B×16 MoE at 50k GPU hours: ~0.67 (visual summary)，对比 ProRL (Liu et al., 2025a) on 1.5B model (lower performance, not directly comparable at same model size)，变化 Scaling model size yields substantial improvement; MoE outperforms dense with less compute.。
 > - AIME-24 (ablation: generation length scaling) 上，pass rate 为 SCALERL-34k (32k generation length): peak ~0.64 at 32k GPU hours，对比 SCALERL-14k (14k generation length): peak ~0.54 at 32k GPU hours，变化 Longer generation length raises asymptote A by ~0.10。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -83,7 +85,7 @@ Leave-One-Out 实验进一步证实，SCALERL 集成的每个组件均对最终�
 
 > **注意**：部分基线方法（如 DAPO、MiniMax）因零方差过滤后的重采样机制使用了更大的实际批次大小（1280 vs 768），可能获得了一定的计算优势，但 SCALERL 仍在公平比较条件下表现最优。
 
-## 背景与动机
+
 
 ### 推理语言模型的强化学习训练困境
 
@@ -101,7 +103,9 @@ Leave-One-Out 实验进一步证实，SCALERL 集成的每个组件均对最终�
 
 针对上述问题，本文提出以**Sigmoid饱和函数**统一建模RL训练的compute-performance曲线，并系统消融影响曲线参数的关键设计选择。核心目标是：识别出能提升渐进性能上限A的组件（如损失函数、精度配置），以及主要影响计算效率B的组件（如离策略框架、聚合方式），从而构建一个可预测、可扩展的最佳实践配方**SCALERL**，并在10万GPU小时的大规模训练中验证其可预测性与有效性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心贡献在于将RL训练的compute-performance关系形式化为可预测的**Sigmoid缩放定律**，并基于该框架系统解耦了不同设计选择对渐进性能上限A和计算效率B的差异化影响，最终集成为**SCALERL**配方。其关键创新可归纳为两个层面：**预测性框架**与**组件级因果洞察**。
 
@@ -150,7 +154,7 @@ $$\mathcal{T}_{\mathrm{SCALERL}}(\theta) = \mathbb{E}_{\{y_i\}_{i=1}^G \sim \pi_
 
 SCALERL通过同时提升A（CISPO + FP32 + 大批量）和B（PipelineRL + 零方差过滤 + 课程学习），在iid验证集上达到A = 0.61，超越了所有对比方法（Figure 2）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_FMjeC9Msws/figures/004_Figure_3.jpg]]
 *Figure 3: Interpreting eq. (1). We provide an example fit illustrating the roles of parameters A, B , and $C _ { \mathrm { m i d } } ^ { \mathrm { ^ { - } } } . C _ { \mathrm { m i d } }$ determines the compute point at which half of the total gain is achieved - smaller values correspond to faster ascent toward the asymptote. B controls the curve’s steepness, with larger values indicating greater efficiency. A represents the asymptotic performance reached at large compute scales. Further discussion is provided in Appendix A.8
@@ -200,7 +204,7 @@ SCALERL 的最终损失函数 $\mathcal{T}_{\mathrm{SCALERL}}$ 融合了以下�
 
 SCALERL 框架的核心洞察在于区分两类设计选择：**影响渐进上限 $A$ 的组件**（损失函数类型、批次大小、FP32 精度）和**主要影响计算效率 $B$ 的组件**（PipelineRL、损失聚合方式、优势归一化、零方差过滤等）。Leave-One-Out 实验（Figure 5）证实，各 LOO 变体最终达到的渐进奖励 $A$ 相近，但 SCALERL 集成方案在计算效率上显著领先——这正是通过系统性地选择提升 $A$ 和 $B$ 的组件组合实现的。
 
-## 核心模块与公式推导
+
 
 ### 基础RL算法框架
 
@@ -264,7 +268,9 @@ $$R_{\mathrm{length}}(y) = \mathrm{clip}\left(\frac{L_{\max} - |y|}{L_{\mathrm{c
 
 其中 $L_{\max}$ 为最大生成长度，$L_{\mathrm{cache}}$ 为缓存长度阈值。该惩罚仅应用于正确回答的trace，且被限制在 $[-1, 0]$ 范围内。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：SCALERL的可预测缩放与性能优势
 
@@ -422,7 +428,9 @@ SCALERL的缩放框架不仅适用于单一数学任务。在数学+代码的联
 *Figure 19: (a)Comparing upper clipping ratio of DAPO loss function. Change of $\epsilon _ { m a x }$ fundamentally changes the asymptotic performance value A. (b) CISPO clipping ratio ablations*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -473,6 +481,8 @@ SCALERL 的有效性建立在以下前提之上，超出这些边界时需谨慎
 4. **OOD 泛化的预测性缩放**：Figure 1b 仅展示了 AIME-24 这一下游任务的缩放趋势。能否为 OOD 泛化性能建立类似的预测性缩放定律，是 RL 训练从“拟合训练分布”走向“真正泛化”的关键瓶颈。
 
 > **注意**：上述开放问题均来自论文自身的讨论（§6 RELATED WORK 及 Conclusion），尚未有后续工作提供解答。若需补充最新进展，建议手动检索相关 follow-up 文献。
+
+
 
 ## 原文 PDF
 

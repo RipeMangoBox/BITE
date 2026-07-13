@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/ReVision_High_Quality_Low_Cost_Video_Generation_with_Explicit_3D_Physics_Modeling_for_Complex_Motion_and_Interaction.pdf
+project_link: https://revision-video.github.io/
+code_link: null
 aliases:
 - ReVision
 tags:
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | ReVision：通过显式3D物理建模实现高质量低成本复杂运动与交互视频生成 |
 | 英文题名 | ReVision: High-Quality, Low-Cost Video Generation with Explicit 3D Physics Modeling for Complex Motion and Interaction |
 | 会议/期刊 | arXiv 2025 |
-| Links | [paper](https://arxiv.org/abs/2504.21855) · [Project](https://revision-video.github.io/) · [arXiv](https://arxiv.org/abs/2410) |
+| Links | [paper](https://arxiv.org/abs/2504.21855) · [Project](https://revision-video.github.io/) · [paper](https://arxiv.org/abs/2410) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation #topic/vision_multimodal_applications/3d_rendering_reconstruction #topic/generative_models_diffusion |
 | Method | ReVision |
 | Dataset | VBench++, DAVIS, Dance generation |
@@ -42,7 +44,7 @@ claims:
 > - DAVIS (motion transfer) 上，CoTracker mIoU 0.80 vs 0.74 (+0.06)；Optical Flow Error 0.33 vs 0.36 (-0.03)。
 > - Dance generation (TikTok dataset) 上，SSIM / PSNR / LPIPS / FVD 0.864 / 30.08 / 0.210 / 121.26 (w/ full motion) vs VividPose: 0.758 / 29.83 / 0.261 / … (所有指标均最优)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：预训练视频扩散模型（如 Stable Video Diffusion、Wan2.1 等）缺乏显式的三维运动先验，难以生成符合物理规律的复杂肢体动作与物体交互。即使将模型规模扩展至 13B 参数（如 HunyuanVideo），仍无法可靠捕获真实世界的动态复杂性——在 VBench++ 基准上，基础模型的动态程度（Dynamic Degree）仅 43.17%–51.38%，暴露出运动生成能力的根本性不足。
 
@@ -56,8 +58,6 @@ claims:
 
 **方法定位**：ReVision 属于运动条件视频生成方法，但与 Go-with-the-Flow（Burgert et al., 2025）、MotionClone（Ling et al., 2024）、ImageConductor（Li et al., 2025）等直接注入运动信号的方法不同，其核心创新在于引入参数化 3D 运动先验模型（PMP）作为中间优化环节。PMP 利用 Transformer 架构对 SMPL-X/SMAL/点云等参数化表示的运动序列进行迭代精炼，使运动条件从“粗略草稿”升级为“物理合理的三维运动序列”，从而在运动一致性、对象一致性和形态学正确性上取得显著增益。该方法可适配多种视频扩散模型骨干（SVD、Wan2.1 等），具备良好的模型无关性。
 
-## 背景与动机
-
 视频生成领域近年来取得了显著进展，以**Stable Video Diffusion (SVD-XT-1.1)**（Blattmann et al., 2023）、**HunyuanVideo**（Kong et al., 2024）和**Wan2.1**（Wan et al., 2025）为代表的大规模预训练扩散模型，已能生成视觉质量可观的视频内容。然而，当任务涉及复杂肢体动作、精确物体交互或大幅度运动时，这些模型的输出往往暴露出一个共同瓶颈：**缺乏显式的三维运动先验**。
 
 这一瓶颈的根源在于，现有视频扩散模型主要通过在海量视频数据上学习像素级或潜在空间中的统计相关性来隐式地捕捉运动模式。这种学习范式虽然能生成流畅的视觉内容，但难以真正理解场景中物体的三维几何结构和物理约束。因此，即使模型参数量扩展至数十亿级别（如HunyuanVideo的13B参数），在生成诸如舞蹈、体育动作或多物体交互等场景时，仍频繁出现运动不连贯、形态学失真（如肢体缺失或扭曲）以及物体间遮挡关系错误等问题。论文明确指出，**大规模模型本身并不足以捕获真实世界的动态复杂性**。
@@ -66,7 +66,7 @@ claims:
 
 本文的核心动机在于：**能否为预训练视频扩散模型注入显式的、可优化的三维运动知识，从而在不重新训练庞大基础模型的前提下，显著提升其对复杂运动和物理交互的生成能力？** 这一思路的出发点是，预训练模型本身已具备强大的视觉生成能力，所欠缺的并非更多的训练数据或模型容量，而是一个能够对生成过程进行“纠偏”的运动结构化先验。通过将运动建模从隐式学习转向显式三维表示，模型有望在保持原有视觉质量的同时，实现运动一致性和物理真实性的质的飞跃。
 
-## 核心创新
+## 核心方法与创新机理
 
 ReVision的核心创新在于将**显式3D物理建模**引入预训练视频扩散模型的生成流程，形成一套“提取‑优化‑强化”（Extract–Optimize–Reinforce）的三阶段自修正流水线。其关键设计并非从头训练新模型，而是通过两个**changed slots**对现有扩散模型进行“外科手术式”的增强：
 
@@ -91,8 +91,6 @@ ReVision的核心创新在于将**显式3D物理建模**引入预训练视频扩
 
 这两个changed slots共同构成了ReVision的核心洞察：**预训练视频扩散模型并非缺乏生成复杂运动的能力，而是缺乏显式的3D运动先验来引导这一能力**。通过“先生成粗视频获取运动草稿→用参数化3D模型优化运动→将优化后的运动重新注入同一扩散模型”的闭环设计，ReVision实现了对基础模型生成能力的“自我修正”，而非依赖更大规模的模型或更多的训练数据。这一范式转换使得仅1.5B参数的ReVision-SVD在运动质量上能够超越13B参数的**HunyuanVideo**（Kong et al., 2024），同时保持与基础模型相当的推理速度。
 
-## 整体框架
-
 ReVision 的核心思想是将“提取—优化—强化”（Extract–Optimize–Reinforce）的三阶段流水线嵌入预训练视频扩散模型，为模型注入显式的参数化三维运动先验，从而解决复杂肢体动作与物体交互中运动失真、物理不一致的瓶颈。整体流程如 Figure 2 所示。
 
 ![[assets/figures/papers/paper_list_l37_https_arxiv_org_abs_2504_21855/figures/002_Figure_2.jpg]]
@@ -113,8 +111,6 @@ ReVision 的核心思想是将“提取—优化—强化”（Extract–Optimiz
 ### 模块间的因果链路
 
 三阶段之间存在清晰的因果依赖：S1 提供蕴含丰富运动模式的“草稿”，其质量决定了 S2 中 3D 提取的上限；S2 的 PMP 是运动质量跃升的关键控制变量——消融实验显示，引入 PMP 使对象一致性从 83.0 提升至 87.6，运动一致性从 94.1 提升至 96.0，形态学失败率从 27.1% 降至 14.3%（Table 7）；S3 则将优化后的运动先验反馈至生成过程，完成闭环修正。这种“生成—提取—优化—再生”的循环使 ReVision 能以仅 1.5B 参数的骨干（SVD）在运动质量上超越 13B 参数的 **HunyuanVideo**（Figure 5）。
-
-## 核心模块与公式推导
 
 ReVision 的核心架构建立在预训练视频扩散模型之上，通过扩展其条件输入通道并引入参数化运动先验模型（Parameterized Motion Prior, PMP），形成“提取‑优化‑强化”三阶段流水线。以下详述其关键模块与公式。
 
@@ -162,13 +158,10 @@ $$p_o \in \mathbb{R}^{21 \times 3}$$
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l37_https_arxiv_org_abs_2504_21855/figures/003_Figure_3.jpg]]
-*Figure 3: Motion-conditioned video generation. We enable motion-conditioned generation by introducing two extra conditioning channels: (1) part segmentation mask derived from the 3D motion sequence, and (2) its corresponding confidence map*
-
 ![[assets/figures/papers/paper_list_l37_https_arxiv_org_abs_2504_21855/figures/017_Figure_10.jpg]]
 *Figure 10: The parametric 3D mesh serves as an effective object-level prior, ensuring complete human body structures in the coarse video generated during the first stage. In the left two images, the human keypoint model fails to detect the missing right hand, which is accurately “recovered" by the parametric human mesh model. In the right two images, the human mesh model provides a more accurate prior for both blurred hands*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心定量结果：VBench++基准
 
@@ -241,7 +234,7 @@ $$p_o \in \mathbb{R}^{21 \times 3}$$
 ![[assets/figures/papers/paper_list_l37_https_arxiv_org_abs_2504_21855/figures/008_Figure_6.jpg]]
 *Figure 6: Handling occlusion. As illustrated by the two apples falling into the basket, ReVision handles occlusions by lifting and optimizing motion in 3D space, which allows explicit reasoning about object spatial relationships, effectively resolving occlusions that are ambiguous in 2D*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 与基线方法的关系
 

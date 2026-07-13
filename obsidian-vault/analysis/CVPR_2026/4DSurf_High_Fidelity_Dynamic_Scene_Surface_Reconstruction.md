@@ -42,7 +42,7 @@ claims:
 > - CMU Panoptic Ian3 上，Chamfer Overall (mm) ↓ 10.5 vs 12.5 (Dynamic-2DGS) (-2.0)。
 > - Hi4D Cheers37 上，Chamfer Overall (cm) ↓ 0.47 vs 1.81 (Sparse2DGS) (-1.34)。
 
-## 概述
+## 概要
 
 动态场景的高保真表面重建是计算机视觉中的一项核心挑战，尤其当输入仅为稀疏多视角视频时，现有方法在处理大形变、多物体交互场景时往往面临表面抖动、时间不一致以及重建质量严重退化的问题。**4DSurf** 针对这一瓶颈，提出了一套端到端的动态表面重建框架，其核心思想是：**将静态场景的SDF流理论扩展到动态高斯表示中，通过约束高斯运动与表面演化的一致性，实现时间上光滑且几何精确的重建。**
 
@@ -68,7 +68,7 @@ claims:
 
 消融研究进一步验证了各模块的贡献：SDF流正则化与高斯速度场的组合使6个Hi4D场景的平均Overall从1.49降至1.02；重叠段分割策略进一步将指标推至0.67；而采用秩64的LoRA增量运动调整（IMT-64）在几乎不损失精度的情况下（Overall 0.70），有效控制了运动场参数的存储增长。在时间稳定性方面，4DSurf 的Overall标准偏差最低仅0.18，远优于 **Sparse2DGS** 的0.68和 **Dynamic-2DGS** 的1.19，充分证明了该方法在抑制表面抖动上的有效性。
 
-## 背景与动机
+
 
 ### 动态表面重建的挑战
 
@@ -100,7 +100,9 @@ claims:
 
 通过在 CMU Panoptic 和 Hi4D 两个多人物体大形变数据集上的系统验证，4DSurf 在 Chamfer 距离指标上分别以 **49%** 和 **19%** 的优势超越现有最优方法，同时显著提升了重建表面的时间稳定性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 4DSurf 的核心创新围绕一个因果机制展开：**利用高斯速度场导出 SDF 流，并将其与由渲染深度估计的 SDF 流对齐**，从而在动态高斯泼溅框架中强制表面演化的时间一致性。这一机制直接针对现有方法的瓶颈——大形变下的表面抖动和时间不一致——提供了系统性的解决方案。具体体现在以下三个关键设计变更上：
 
@@ -126,7 +128,7 @@ $$\frac{\partial s}{\partial t} = -(\boldsymbol{\omega} \times \hat{\mathbf{x}} 
 
 这三个变更槽位协同作用：速度场提供了运动与几何的解析关联，SDF 流正则化利用该关联约束时间一致性，段分割与 IMT 则确保该框架能扩展到任意长度的复杂动态序列。消融实验证实，仅引入高斯速度场和 SDF 流正则化即可将 6 个 Hi4D 场景的平均 Overall Chamfer 距离从 1.49 降至 1.02，进一步加入段分割策略后降至 0.67，验证了每个创新模块的独立贡献。
 
-## 整体框架
+
 
 4DSurf 的整体训练流程围绕**重叠段分割**展开，将长序列动态场景重建分解为多个可控的局部子问题，并通过**高斯速度场**与**SDF 流正则化**协同约束时间一致性。图 2(a) 给出了完整的 pipeline 示意。
 
@@ -147,7 +149,7 @@ $$\frac{\partial s}{\partial t} = -(\boldsymbol{\omega} \times \hat{\mathbf{x}} 
 ![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2603_28064/figures/002_Figure_2.jpg]]
 *Figure 2: Overview: (a) Overall Training Pipeline. We first divide the sequence into N segments, each containing K+1 timesteps with one overlapping virtual timestep. For the*
 
-## 核心模块与公式推导
+
 
 ### 高斯速度场与变形建模
 
@@ -236,7 +238,9 @@ $$
 ![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2603_28064/figures/003_Figure_3.jpg]]
 *Figure 3: Incremental Motion Tuning (IMT). After training the Gaussian Velocity Field of the*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -302,7 +306,9 @@ Table 5 和 Figure 7 分析了不同 LoRA 秩对重建精度和存储开销的�
 ![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2603_28064/figures/007_Figure_5.jpg]]
 *Figure 5: Qualitative results on Hi4D [54]. We compare our methods with three baselines (Dynamic-2DGS [55], Sparse2DGS [46], FreeTimeGS [43]) at two timesteps of the Basketball13 and Fight17 scene. Bounding boxes highlight major differences*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位与核心瓶颈
 
@@ -352,6 +358,8 @@ Table 5 和 Figure 7 分析了不同 LoRA 秩对重建精度和存储开销的�
 3. **实时性潜力**：当前每段训练约 30 分钟（NVIDIA RTX 3090Ti），远未达到实时。段分割策略天然支持并行训练，但论文未探索这一方向。
 
 4. **与基于 NeRF 的方法的全面对比**：虽然包含了 Neural SDF-Flow 作为基线，但与 **NDR**（Cai et al., NeurIPS 2022）等 NeRF 动态重建方法的直接定量对比有限，仅在 CMU Panoptic 上与 Neural SDF-Flow 进行了比较。
+
+
 
 ## 原文 PDF
 

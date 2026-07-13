@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/BioX_Bridge_Model_Bridging_for_Unsupervised_Cross_Modal_Knowledge_Transfer_across_Biosignals.pdf
+project_link: null
+code_link: https://github.com/chenqi-li/BioX-Bridge
 openreview_forum_id: 1448q0s3zZ
 aliases:
 - BB
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | BioX-Bridge：跨生物信号的无监督跨模态知识迁移模型桥接 |
 | 英文题名 | BioX-Bridge: Model Bridging for Unsupervised Cross-Modal Knowledge Transfer across Biosignals |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=1448q0s3zZ); [GitHub](https://github.com/chenqi-li/BioX-Bridge) |
+| Links | [paper](https://openreview.net/forum?id=1448q0s3zZ) · [GitHub](https://github.com/chenqi-li/BioX-Bridge) |
 | Topic | #topic/representation_self_supervised_transfer #topic/representation_self_supervised_transfer/transfer_multitask_and_meta_learning |
 | Method | BioX-Bridge |
 | Dataset | ISRUC (EEG → ECG), FOG (EEG → EMG) |
@@ -42,7 +44,7 @@ claims:
 > - ISRUC (EEG → ECG) 上，F1-Weighted 为 74.02，对比 72.96 (KD)，变化 +1.06。
 > - ISRUC (EEG → ECG) 上，Trainable Parameters 为 1.8M，对比 30.4M (KD)，变化 -94.1%。
 
-## 概述
+## 概要
 
 生物信号（如脑电、心电、肌电、光电容积脉搏波）在临床诊断与健康监测中应用广泛，但不同模态的标注数据获取成本差异巨大——部分模态拥有丰富标注，而另一些模态仅有原始信号。无监督跨模态知识迁移旨在将知识从标注充足的旧模态迁移至无标注的新模态，使新模态模型无需标签即可获得预测能力。
 
@@ -59,7 +61,7 @@ BioX-Bridge 提出了一种**模型桥接**范式来解决这一问题。其**�
 
 **方法定位**：BioX-Bridge 属于参数高效的无监督跨模态知识迁移方法，可纳入**方法谱系**中“基于表征对齐的轻量级迁移”分支。与传统的 KD（Hinton et al., 2015）和 KD-Contrast（Abbaspourazad et al., 2024b）等需要完整训练学生模型的方法不同，BioX-Bridge 通过冻结两个基础模型并仅训练桥接网络，实现了训练开销的指数级降低，尤其适用于大模型时代的生物信号分析场景。
 
-## 背景与动机
+
 
 ### 生物信号的多模态挑战与基础模型
 
@@ -83,7 +85,9 @@ BioX-Bridge 提出了一种**模型桥接**范式来解决这一问题。其**�
 
 通过解决上述两个问题，BioX-Bridge 旨在实现一个**参数高效、性能鲁棒**的无监督跨模态知识迁移框架，使得在资源受限的环境中也能充分利用大型基础模型的能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 BioX-Bridge 的核心创新在于从根本上改变了无监督跨模态知识迁移的训练范式：**将“训练整个学生模型”转变为“仅训练一个轻量级桥接网络”**。这一转变解决了现有基于知识蒸馏（KD）方法的关键瓶颈——训练时必须同时运行教师和学生模型，导致极高的计算和内存开销，尤其对于大型基础模型而言，这种限制变得难以承受。
 
@@ -127,7 +131,7 @@ $$\tilde{\pmb{h}}_l^{(old)} = \mathrm{Reshape}_{N_l^{(old)} \times N_p} \left( \
 
 BioX-Bridge 的创新并非单一技术点的改进，而是通过“冻结基础模型 + 轻量桥接 + 自动位置选择”的系统性设计，实现了**参数效率与迁移性能的双赢**。该方法在三个数据集、六个迁移方向上，以 88–99% 的参数削减达到了与 KD 相当或更优的性能，同时大幅降低了训练时的计算和内存需求。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_1448q0s3zZ/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of BioX-Bridge. (a) At the training stage, the bridge learns to project intermediate representations from the new modality to the old modality, such that it mimics the output of the old modality model. (b) At the inference stage, the bridge has been constructed and enables the flow of information between the two models in order to make predictions on data from the new modality. (c) The bridge consists of a low-rank approximation module and a prototype set. The low-rank approximation module generates aggregation weights for the prototype vectors*
@@ -178,7 +182,7 @@ $$\underset{\psi}{\arg\min}\ \mathcal{L}_{align}\left(f_{\theta}^{(old)}(x^{(old
 
 整个学习流程详见 Algorithm 1，涵盖了桥接位置选择、桥接网络训练和推理三个步骤。
 
-## 核心模块与公式推导
+
 
 BioX-Bridge 的核心是将跨模态知识迁移问题转化为一个**轻量级桥接网络的训练问题**，而非传统知识蒸馏中对整个学生模型的端到端训练。框架由三个关键模块构成：**桥接位置选择**、**桥接架构设计**和**桥接训练目标**。
 
@@ -244,7 +248,9 @@ $$\underset{\psi}{\arg\min}\ \mathcal{L}_{align}\left(f_{\theta}^{(old)}(x^{(old
 
 训练过程中，旧模型和新模型参数**完全冻结**，仅更新桥接网络的参数 $\psi = \{A, B, P\}$。这从根本上消除了传统知识蒸馏中教师模型的前向推理开销，并将可训练参数量削减了 88–99%（Table 1）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能对比
 
@@ -326,7 +332,9 @@ BioX-Bridge 在三个生物信号数据集、六个跨模态迁移方向上进�
 
 ![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_1448q0s3zZ/figures/016_Table_8.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法定位与基线关系
 
@@ -422,6 +430,8 @@ BioX-Bridge 假设两种模态均存在预训练的基础模型。基础模型�
 ---
 
 **证据强度说明**：本节的核心性能声明（参数减少 88–99%、桥接位置选择提升约 3% 准确率、原型网络优于 FC-Bridge）均有 Table A1–A8 等附录表格的定量支撑，置信度较高（≥0.9）。关于配对数据量降至 20% 时 FOG 上性能急剧下降的声明，置信度为 0.9，建议在引用时核对 Figure A10 的具体数值。关于 KD-Contrast 对数据划分敏感性的开放问题，论文未给出解释，属于待验证的观察。
+
+
 
 ## 原文 PDF
 

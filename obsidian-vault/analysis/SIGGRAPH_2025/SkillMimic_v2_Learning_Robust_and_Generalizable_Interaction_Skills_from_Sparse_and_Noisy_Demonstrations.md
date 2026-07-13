@@ -5,6 +5,8 @@ paper_level: A
 venue: SIGGRAPH
 year: 2025
 pdf_ref: paperPDFs/SIGGRAPH_2025/SkillMimic_v2_Learning_Robust_and_Generalizable_Interaction_Skills_from_Sparse_and_Noisy_Demonstrations.pdf
+project_link: https://ingrid789.github.io/SkillMimicV2/
+code_link: null
 aliases:
 - SV
 - SkillMimic-V2
@@ -41,7 +43,7 @@ claims:
 > - BallPlay-M 上，Average Skill Transition Success Rate (TSR) 93.8% vs 15.1% (+78.7%)；Average ε-Neighborhood Success Rate (εNSR) 49.3% vs 18.3% (+31.0%)。
 > - ParaHome (7 skills) 上，Average Success Rate (SR) 100% vs 5.5% (+94.5%)。
 
-## 概述
+## 概要
 
 物理仿真角色从人类演示中学习交互技能时，面临一个根本瓶颈：**稀疏且带噪声的演示数据无法覆盖完整的技能变化空间**。现有RLID（Reinforcement Learning from Interaction Demonstrations）方法在参考轨迹存在物理不可达状态转移时，会遭遇“链断裂”（chain break）问题——策略在错误状态处累积偏差，导致后续动作完全失效。这一困境在上篮（Layup）、投篮（Shot）等需要记忆依赖行为的复杂技能中尤为突出，基线方法SkillMimic的成功率仅为53.3%。
 
@@ -51,7 +53,7 @@ claims:
 
 在BallPlay-M（5项篮球技能）上，完整方法达到**96.9%的平均技能成功率**，较基线提升43.6个百分点；技能转移成功率从15.1%跃升至**93.8%**。在ParaHome（7项日常交互技能）上，成功率从5.5%提升至**100%**。消融实验表明，STF是最关键的组件——移除后成功率骤降至68.67%。方法还展现出对数据噪声的强鲁棒性：在物体位置叠加σ=30mm噪声时仍保持84.9%以上的成功率，而基线完全失效。
 
-## 背景与动机
+
 
 ### 问题背景：物理仿真中交互技能的模仿学习
 
@@ -87,7 +89,9 @@ claims:
 
 这一方法在BallPlay-M（5项篮球技能）和ParaHome（7项日常交互技能）两个基准上进行了验证：完整方法在BallPlay-M上达到96.9%的平均技能成功率（基线53.3%），技能转移成功率从15.1%提升至93.8%；在ParaHome上平均成功率从5.5%提升至100%。这些结果表明，通过数据增强和结构化探索，从稀疏噪声演示中学习鲁棒交互技能是可行的。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SkillMimic-V2 的核心创新在于将**稀疏且带噪声的交互演示**转化为覆盖丰富的训练信号，使物理仿真机器人能够学习鲁棒且可泛化的交互技能。相对于基线方法 SkillMimic（Wang et al., 2024c），本工作在四个关键维度上进行了系统性改进，每个改进都针对现有 RLID 方法在稀疏演示场景下的根本性缺陷。
 
@@ -127,7 +131,7 @@ $$ \mathbf{h}_t = \theta(\mathbf{s}_{t-k}, ..., \mathbf{s}_{t-1}), \quad \mathbf
 
 在数据噪声鲁棒性方面，当物体位置叠加 $\sigma=30$mm 噪声时，SkillMimic-V2 仍保持 84.9% 以上的 SR，而基线在相同条件下完全失效（Table 4），进一步验证了结构化数据增强策略对噪声的固有容忍度。
 
-## 整体框架
+
 
 SkillMimic-V2 的整体框架围绕一个核心洞察构建：**尽管演示数据有限且噪声显著，物理世界中存在无数可行轨迹，可以自然桥接不同技能或从演示邻域涌现，形成连续的技能变化和转移空间**。通过显式构造这些轨迹并指导强化学习训练，可以将噪声演示转化为覆盖丰富的训练信号。
 
@@ -176,7 +180,7 @@ $$r_t = S(s_{t+1}, \hat{s}_{t+1}) = r_t^b \cdot r_t^o \cdot r_t^{\text{rel}} \cd
 ![[assets/figures/papers/paper_list_l1806_SkillMimic_v2_Learning_Robust_and_Generalizable_Interaction_Skills_from/figures/003_Figure_3.jpg]]
 *Figure 3: Given sparse demonstrations (e.g., two short trajectories of Shot and Dribble), there exist infinite valid but uncaptured trajectories that can either bridge between them or emerge from their neighboring states (illustrated by question marks). Our method uncovers these potential trajectories via three key steps: (1) construct a Stitched Trajectory Graph (STG) to identify possible transitions, (2) expand STG into a State Transition Field (STF) that establishes connections for arbitrary states within the demonstration neighborhood, and (3) learn a skill policy via Adaptive Trajectory Sampling (ATS) and Reinforcement Learning from Interaction Demonstrations (RLID). This enables robust skill tr...*
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题形式化与RLID基础
 
@@ -232,7 +236,9 @@ $$\mathbf{a}_t \sim \pi(\cdot | \mathbf{c}, \mathbf{s}_t, \mathbf{h}_t)$$
 
 编码器预训练后冻结，嵌入维度仅为3，在提供记忆能力的同时避免维度爆炸。消融实验表明HE对Layup等技能的成功率提升至关重要。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -323,7 +329,9 @@ Table 3 在 BallPlay-M 上系统消融了各组件（以 SM+ε-NSI 为基础，�
 ![[assets/figures/papers/paper_list_l1806_SkillMimic_v2_Learning_Robust_and_Generalizable_Interaction_Skills_from/figures/013_Table_6.jpg]]
 *Table 6: Quantitative comparison on locomotion skills*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1 问题定位：RLID范式的瓶颈
 
@@ -402,6 +410,8 @@ SkillMimic-V2 的核心洞察在于：**尽管演示数据有限且噪声显著�
 3. **真实机器人数据的适配**：在实时动态变化或高噪声的真实机器人数据中，数据增强和转移场构建规则需要如何调整？当前方法依赖物理模拟器的精确状态访问，这在真实场景中难以保证。
 
 4. **拼接轨迹的质量提升**：是否可以通过更智能的掩码策略或图结构学习进一步提高拼接轨迹的质量？当前掩码状态数量由相似度启发式决定 $N = \min(-\lfloor \log_{10}(\beta) \rfloor, N_{max})$，可能存在更优的自适应方案。
+
+
 
 ## 原文 PDF
 

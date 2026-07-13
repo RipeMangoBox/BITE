@@ -5,6 +5,8 @@ paper_level: A
 venue: NEURIPS
 year: 2024
 pdf_ref: paperPDFs/NeurIPS_2024/Applying_Guidance_in_a_Limited_Interval_Improves_Sample_and_Distribution_Quality_in_Diffusion_Models.pdf
+project_link: null
+code_link: https://github.com/kynkaat/guidance-interval
 aliases:
 - GI
 - AGLIISDQDM
@@ -42,7 +44,7 @@ claims:
 > - ImageNet-512 (EDM2-XXL) 上，FID 1.40 vs 1.81 (-0.41)；FDDINOv2 29.16 vs 33.09 (-3.93)。
 > - ImageNet-512 (DiT-XL/2) 上，FID 2.40 vs 3.04 (-0.64)。
 
-## 概述
+## 概要
 
 扩散模型在图像生成中广泛采用**无分类器引导（Classifier-Free Guidance, CFG）**来提升样本的保真度与条件对齐性，但传统做法是在整个采样链上施加恒定的引导权重。本文揭示这一策略存在根本性缺陷：**在高噪声水平（大 σ）阶段，引导会严重截断分布、导致模式丢失；在低噪声水平（小 σ）阶段，引导的正面作用微弱，却增加了不必要的计算开销**。
 
@@ -50,7 +52,7 @@ claims:
 
 实验表明，限制引导区间带来了显著的分布质量与推理效率双重提升。在 ImageNet-512 上，EDM2-XXL 的 FID 从 1.81 降至 **1.40**，FDDINOv2 从 33.09 降至 **29.16**；在 DiT-XL/2 上同样取得一致改善。定性分析进一步证实，该方法在 SD-XL 等文本到图像模型中能有效避免传统 CFG 常见的过度饱和与构图简化问题，同时带来超过 20% 的推理加速。引导区间的超参数对采样步数变化表现出良好的鲁棒性，且可通过顺序搜索高效确定。
 
-## 背景与动机
+
 
 扩散模型通过逐步去噪将高斯噪声转化为数据样本，其采样过程可描述为一个关于噪声水平 $\sigma$ 的常微分方程（ODE）：
 
@@ -68,7 +70,9 @@ $$
 
 **本文动机**正是基于这一洞察：通过将引导限制在采样链中间的连续区间内，在保持引导正面效果的同时消除其负面影响。该方法无需修改模型架构或训练流程，仅需在采样时引入两个额外的区间端点超参数 $(\sigma_{\mathrm{lo}}, \sigma_{\mathrm{hi}})$，即可同时提升生成质量与推理速度。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于对扩散模型中无分类器引导（classifier-free guidance, CFG）的施加方式进行了根本性的重新审视，提出了一种简单而高效的**引导区间（Guidance Interval）**策略。其关键洞察是：引导的正向作用并非均匀分布于整个采样链，而是主要集中在中等噪声水平区间；在高噪声阶段施加引导会破坏样本的整体布局与多样性，而在低噪声阶段施加引导则收效甚微且增加不必要的计算开销。
 
@@ -96,7 +100,7 @@ $$\mathrm{d}\mathbf{x}/\mathrm{d}\sigma = -\Big(w(\sigma) D_{\theta}(\mathbf{x}|
 
 值得注意的是，论文尝试了在引导区间内使用各种平滑权重函数来替代二元开关，但**这些测试并未改善结果**（Section 4.2）。这表明引导区间带来的收益源于“在何处施加引导”这一结构性的调度决策，而非权重函数的精细调节。这一简洁的设计选择使得方法易于实现和集成——仅需修改采样循环中的引导逻辑，无需重新训练模型或改变模型架构。
 
-## 整体框架
+
 
 本文提出的方法在概念和实现上均极为简洁：**将无分类器引导（Classifier-Free Guidance, CFG）的作用范围从整个采样链缩减为一个连续的噪声水平区间**。该方法不修改模型结构、不重新训练网络、不引入新的损失函数，仅以即插即用的方式替换标准 CFG 的恒定引导权重。
 
@@ -144,7 +148,7 @@ $$\mathrm{d}\mathbf{x}/\mathrm{d}\sigma = -\Big(w(\sigma) D_{\theta}(\mathbf{x}|
 
 论文同时验证了在引导区间内使用平滑权重函数（如线性衰减）并不能进一步改善结果，因此最终方案保持了简单的二元开关设计。
 
-## 核心模块与公式推导
+
 
 ### 背景：去噪扩散ODE
 
@@ -206,7 +210,9 @@ $$
 ![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_nAIhvNy15T/figures/003_Figure_2.jpg]]
 *Figure 2: Illustration of the detrimental effects of guidance at high σ in a synthetic 1D scenario. (a) PDFs of the unconditional (orange) and conditional (green) data distributions used in this example. (b) Activating guidance (weight*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果：ImageNet-512 类别条件生成
 
@@ -272,7 +278,9 @@ Figure 5 分别扫描了上界 $\sigma_{\text{hi}}$ 和下界 $\sigma_{\text{lo}
 ![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_nAIhvNy15T/figures/014_Figure_12.jpg]]
 *Figure 12: More SD-XL results showing the effect of changing w with our method. We limit the guidance to σ ∈ (0.28, 5.42]. Increasing w produces images with more well-defined details while maintaining the color palette and the original image composition*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -311,6 +319,8 @@ Figure 5 分别扫描了上界 $\sigma_{\text{hi}}$ 和下界 $\sigma_{\text{lo}
 - **负向提示（Negative Prompting）**：通过将无条件模型替换为负向提示条件模型来增强引导效果。本方法与负向提示正交，可在其基础上叠加使用。
 - **动态引导权重调度**：一些工作尝试让 $w$ 随采样步数变化（如线性衰减、余弦调度）。本文表明，在噪声水平坐标（$\sigma$）上而非时间步坐标上进行调度更为本质，且简单的分段常数函数已足够。
 - **蒸馏与少步采样**：本方法通过关闭低噪声区域的引导减少了无条件模型评估次数，在 SD-XL 上带来超过 20% 的推理加速（Section 4.3），与蒸馏方法在加速目标上形成互补，但实现路径完全不同——本方法不改变模型权重，仅优化采样控制流。
+
+
 
 ## 原文 PDF
 

@@ -42,7 +42,7 @@ claims:
 > - LIBERO-Plus 上，平均成功率 (%) 62.5 (MergeVLA_TIES) vs 16.3 (OpenVLA 单任务微调) (+46.2%)。
 > - RoboTwin (Setting A) 上，平均成功率 (%) 88.7 (MergeVLA_TIES, H^{(L-1)L}) vs 88.0 (MergeVLA 单任务微调) (+0.7%)。
 
-## 概述
+## 概要
 
 **核心问题**：视觉-语言-动作（VLA）模型在微调后如何合并多技能策略，使单一模型在无需重新训练的情况下胜任多种机器人操作任务？现有VLA架构在合并时面临严重冲突：LoRA适配器在VLM骨干中产生高度任务独占的更新方向（自私参数比例超过75%），同时动作专家中的自注意力层通过跨层传播累积了不可调和的任务特定差异，导致直接合并后成功率骤降至零。
 
@@ -52,7 +52,7 @@ claims:
 
 **主要结果**：MergeVLA_TIES在LIBERO基准上达到90.2%平均成功率，仅比单任务微调的MergeVLA低6.5个百分点，显著超越所有合并基线（合并基线的OpenVLA仅44.2%）。在LIBERO-Plus分布外泛化测试中达到62.5%，比单任务微调的OpenVLA高46.2个百分点。在RoboTwin跨具身设置中达到88.7%，与单任务微调持平。在真实世界SO-101机械臂上取得与单任务模型相同的90.0%成功率。这些结果表明，通过架构层面的可合并性设计，模型合并能够在多种具身和任务场景下实现接近单任务微调的性能。
 
-## 背景与动机
+
 
 ### 通用视觉-语言-动作智能体的需求与挑战
 
@@ -84,7 +84,9 @@ claims:
 
 通过这种架构层面的重新设计，MergeVLA使模型合并技术首次在VLA领域实现了实用化的性能，为构建通用视觉-语言-动作智能体开辟了新路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题诊断：架构诱导的任务干扰是VLA合并的根因
 
@@ -136,7 +138,7 @@ $$r_{\mathrm{T}, m} = \| \mathbf{P}_{\mathrm{T}}^{l} \mathbf{h}_{\mathrm{A}, m}^
 
 MergeVLA的核心创新在于**将VLA合并问题从“参数空间优化”重新定义为“架构兼容性设计”**：通过在架构层面消除LoRA的自私参数冲突和自注意力的跨层干扰，使得标准数据无关合并方法（TA、TIES、WUDI）能够直接应用于VLA模型，在仅损失6.5%成功率的情况下实现多技能统一（LIBERO: 90.2% vs. 96.7%单任务上限），且合并模型在OOD泛化（LIBERO-Plus: +46.2% vs. OpenVLA单任务微调）和跨具身迁移（RoboTwin: 88.7%）上展现出显著优势。
 
-## 整体框架
+
 
 MergeVLA 的整体设计围绕一个核心洞察展开：VLA 模型合并的根本障碍并非容量或数据不足，而是**架构诱导的任务干扰**——LoRA 微调在 VLM 骨干中产生高度任务独占的更新方向，同时动作专家的自注意力机制通过跨层信息传播累积不可调和的任务特定差异。为解决这一问题，MergeVLA 从三个层面重构了可合并性：**任务掩码稀疏激活**抑制 VLM 中的参数冲突，**交叉注意力动作专家**消除自注意力带来的跨层干扰，以及**测试时任务路由器**实现无需训练的推理时任务识别。
 
@@ -174,7 +176,7 @@ MergeVLA 的三个设计决策构成了一条完整的因果链：
 ![[assets/figures/papers/paper_list_l2403_https_arxiv_org_abs_2511_18810/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison between the structures of different VLAs. OpenVLA uses a standard VLM for token-based action generation. VLA-Adapter adds an action expert with cross- and self-attention layers. MergeVLA simplifies this design by removing non-mergeable self-attention layers for effective merging*
 
-## 核心模块与公式推导
+
 
 ### 4.1 任务掩码稀疏激活（Task-Masked VLM）
 
@@ -233,7 +235,9 @@ $$r_{\mathrm{T}, m} = \| \mathbf{P}_{\mathrm{T}}^{l} \mathbf{h}_{\mathrm{A}, m}^
 
 **关键发现**：使用价值（V）投影进行路由比使用键（K）或查询（Q）投影更可靠。仅 V 投影在 LIBERO 上平均成功率达到 **89.7%**（Table 5），而 K 或 Q 投影的路由准确率显著下降。这是因为价值投影直接编码了任务特定的输出变换，其子空间对任务身份更具判别力。路由器仅依赖初始观察，无需额外训练，但在任务切换的长周期操作中可能需要额外设计。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心问题诊断：VLA模型为何不可合并
 
@@ -332,7 +336,9 @@ Figure 8展示了逐步合并OpenVLA语言模型块时的成功率变化：当�
 ![[assets/figures/papers/paper_list_l2403_https_arxiv_org_abs_2511_18810/figures/008_Figure_6.jpg]]
 *Figure 6: Setup of the real-world SO-101 arm experiments with three cube manipulation tasks*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法脉络与基线关系
 
@@ -392,6 +398,8 @@ MergeVLA 在知识库中的定位可概括为：**首个系统性地从架构层
 3. **实证基准**：提供了 LIBERO、LIBERO-Plus、RoboTwin 和真实世界场景下的全面合并基准，为后续研究建立了评估标准。
 
 与现有工作的关系上，MergeVLA 与 **EMR**（测试时模型合并）等方向互补——前者关注架构层面的合并兼容性，后者关注推理时的动态组合策略。在更广泛的具身智能领域，MergeVLA 为多技能统一策略的学习提供了一条不同于多任务联合训练或持续学习的路径，其“合并优于遗忘”的理念可能影响后续 VLA 架构的设计选择。
+
+
 
 ## 原文 PDF
 

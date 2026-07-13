@@ -42,7 +42,7 @@ claims:
 > [!tip] 效果简介
 > - VL-RouterBench (All Datasets) 上，Rank Score (↑) 74.23±0.22 (MLP + Soft Label λ=100) vs 68.88 (Strongest) (+5.35)；Avg. Acc. (%) / Avg. Cost ($/10K) 77.49±0.56 / 1.13±0.13 (MLP) vs 78.01 / 2.72 (Strongest) (精度-0.52% / 成本-58.5%)；Avg. Acc. (%) 78.09±1.17 (VLC) vs 78.01 (Strongest) (+0.08%)。
 
-## 概述
+## 概要
 
 视觉语言模型（VLM）的快速迭代使得“为每个输入选择最合适模型”的路由问题日益重要，但该领域长期缺乏统一、可复现的基准。**VL-RouterBench** 首次构建了覆盖14个数据集、30,540个样本、17个模型（15个开源+2个API）的系统性基准，从原始推理与评分日志中提取519,180个样本–模型对的质量矩阵和成本矩阵，并设计了从数据准备、路由器训练到评估的完整管道。
 
@@ -56,7 +56,7 @@ $$t_i^{(\lambda)}(j) = \frac{\mathbf{1}\{Y_{i,j}=1\} \cdot \exp(-\lambda \cdot C
 
 **主要结果**：在 $\lambda=100$ 设置下，MLP+软标签路由器的 Rank Score 达到 74.23，较 Strongest 基线（68.88）提升 5.35 分；端到端 VLC 路由器在 Avg. Acc. 上以 78.09% 超越最强单模型（78.01%）。消融实验揭示：归一化拼接融合（Normalize-Concat）显著优于普通拼接和加权平均，LXMERT 作为多模态骨干优于 VisualBERT 和单模态 BERT，且提高文本/视觉嵌入维度可有效提升路由性能。这些发现共同指向一个明确方向——**通过改进跨模态表示和路由器架构，VLM路由存在大幅提升空间**。
 
-## 背景与动机
+
 
 ### 视觉语言模型部署中的路由困境
 
@@ -79,7 +79,9 @@ $$t_i^{(\lambda)}(j) = \frac{\mathbf{1}\{Y_{i,j}=1\} \cdot \exp(-\lambda \cdot C
 - **可控的精度-成本权衡**：引入指数衰减软标签训练策略，通过单一超参数λ连续调节路由器对精度与成本的偏好，使同一路由器架构可生成完整的Pareto前沿，满足不同部署场景的需求。
 - **揭示改进空间**：通过系统消融实验，量化多模态融合方式、编码器维度和骨干架构对路由性能的影响，明确指出当前路由方法与Oracle之间的差距主要源于跨模态表示能力的不足，为后续研究提供了明确方向。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 VL-RouterBench 的核心创新并非提出一种全新的路由器架构，而是构建了首个面向视觉语言模型（VLM）路由的统一、可复现基准，并引入了一套**精度–成本感知的软标签训练策略**，从根本上改变了路由器的训练目标与行为。
 
@@ -112,7 +114,7 @@ $$\mathcal{L}_{\mathrm{soft}}(\theta;\lambda) = \frac{1}{|\mathcal{D}_{\mathrm{t
 
 除训练策略外，VL-RouterBench 在基准构建层面也做出了关键贡献：首次将 VLM 路由评估标准化为**数据准备–路由器训练–路由器评估**的完整管道（Figure 2），覆盖 14 个数据集、30,540 样本、17 个模型，并引入 Rank Score（归一化成本与精度的调和平均）作为单一排序指标，解决了此前路由研究缺乏统一评价标准的核心瓶颈。
 
-## 整体框架
+
 
 VL-RouterBench 提出了一套完整的视觉语言模型路由评估管线，将路由问题形式化为一个带成本约束的精度最大化任务，并围绕三个核心模块构建：路由器数据准备（Router Data Preparation）、路由器训练（Router Training）和路由器评估（Router Evaluation），如 Figure 2 所示。
 
@@ -154,7 +156,7 @@ $$S(\beta) = \frac{(1+\beta) \cdot \bar{A} \cdot C_{\mathrm{norm}}}{\beta \cdot 
 ![[assets/figures/papers/paper_list_l2754_https_arxiv_org_abs_2512_23562/figures/003_Figure_3.jpg]]
 *Figure 3: Dataset distribution in VL-RouterBench. The inner ring shows the three groups, and the outer ring lists the individual datasets. The numbers in parentheses indicate the number of samples contained in each entry*
 
-## 核心模块与公式推导
+
 
 ### 路由决策的形式化
 
@@ -210,7 +212,9 @@ $$S(\beta) = \frac{(1+\beta) \cdot \bar{A} \cdot C_{\mathrm{norm}}}{\beta \cdot 
 2. **路由器训练**：使用上述软标签损失训练特征级路由器（如 MLP、Linear）或端到端路由器（如 RouterDC、VLC），通过调节 $\lambda$ 控制精度–成本权衡。
 3. **路由器评估**：在测试集上测量平均精度、平均成本和吞吐量，计算 Rank Score，并拟合精度–成本 Pareto 前沿以可视化不同工作点的权衡关系。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心结果：路由精度–成本权衡
 
@@ -287,7 +291,9 @@ VL-RouterBench 在 14 个数据集、30,540 个样本、17 个模型（15 开源
 ![[assets/figures/papers/paper_list_l2754_https_arxiv_org_abs_2512_23562/figures/012_Table.jpg]]
 *Table: A1. Performance comparison of top routers on VL-RouterBench under multi-cost framework. Other settings are the same as in Tab. 2*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 路由范式定位：从LLM路由到多模态VLM路由
 
@@ -343,6 +349,8 @@ $$S(\beta) = \frac{(1+\beta) \cdot \bar{A} \cdot C_{\mathrm{norm}}}{\beta \cdot 
 4. **开放式任务评价**：对于开放式视觉问答、图像描述生成等主观性强的任务，如何设计有效的路由评价指标（超越简单的规则化正确性判断）？
 
 5. **多图像与交互式场景扩展**：将基准扩展至多图像输入（如视频理解、多图对比）和交互式场景（如多轮视觉对话），是推动VLM路由走向实际应用的关键一步。
+
+
 
 ## 原文 PDF
 

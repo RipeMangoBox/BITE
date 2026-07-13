@@ -42,7 +42,7 @@ claims:
 > - HumanML3D (测试集) 上，R-precision Top-1 ↑ 0.426 (DPO) vs 0.415 (RLHF) (+0.011)；MM Dist ↓ 3.782 (DPO) vs 3.908 (RLHF) (-0.126)。
 > - 人类评估 (未见过的描述) 上，偏好胜率 vs MotionGPT DPO vs MotionGPT (DPO 在温度 1.0-2.0 下显著胜出)。
 
-## 概述
+## 概要
 
 文本到动作生成任务面临一个根本瓶颈：高质量运动捕捉数据的采集成本极高，导致训练数据稀缺，模型在文本-动作对齐上表现不足。本文提出 **InstructMotion**，核心思路是绕过对昂贵运动捕捉数据的依赖，转而利用廉价的非专家人类偏好标注——即让标注者比较两个生成动作的优劣——作为训练信号，直接优化生成模型。
 
@@ -56,7 +56,7 @@ claims:
 
 值得注意的是，论文明确指出 FID 指标不能准确衡量运动质量，人类偏好评估才是更可靠的判断标准。该方法目前仅在 MotionGPT 单一自回归骨干上验证，且标注者均为计算机科学研究生，结论的泛化性有待在更多样化的模型架构和用户群体上进一步检验。
 
-## 背景与动机
+
 
 文本到动作生成（Text-to-Motion Generation）旨在根据自然语言描述合成逼真的三维人体运动序列，在动画制作、虚拟现实和人机交互等领域具有重要应用价值。然而，该领域面临一个根本性瓶颈：**训练数据的稀缺性**。高质量的运动数据依赖昂贵、专业化的运动捕捉（MoCap）设备采集，导致可用数据量远小于图像或文本领域，进而造成文本-动作对齐不足——模型生成的动作品质参差不齐，常出现与文本语义不符或不逼真的情况。
 
@@ -66,7 +66,9 @@ claims:
 
 本文的核心洞察在于：**在文本到动作生成的数据稀缺条件下，利用非专家的人类偏好标注作为训练信号，可以绕过对运动捕捉数据的依赖**。具体而言，仅需标注者比较两个生成动作的优劣（而非提供专业动捕数据），即可为模型提供有效的对齐信号。这一思路将偏好学习从语言领域迁移到运动生成领域，同时通过 DPO 避免奖励模型过拟合、通过 LoRA 正则化稳定训练，形成了一套适用于稀缺数据场景的文本到动作对齐方案。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 InstructMotion 的核心创新在于**将文本到动作生成问题重新表述为偏好学习问题**，从而绕过了对昂贵运动捕捉数据的依赖。传统的文本到动作模型（如 **MotionGPT**，Zhang et al., arXiv 2023）依赖稀缺的专业动捕数据进行监督训练，导致文本-动作对齐不足。InstructMotion 通过三个关键的 changed slots 实现了范式转变：
 
@@ -99,7 +101,7 @@ $$-\mathbb{E}_{(\mathbf{x},\mathbf{y}_w,\mathbf{y}_l)\sim\mathcal{D}} \left[ \lo
 
 需要注意的是，该创新仅在 MotionGPT 自回归骨干上验证，其在扩散模型等其他生成骨架上的泛化性尚待检验。
 
-## 整体框架
+
 
 InstructMotion 的整体流程围绕一个核心瓶颈展开：**文本到动作生成模型依赖昂贵、专业化的运动捕捉数据，导致训练数据稀缺、文本-动作对齐不足**。为解决这一问题，该方法引入人类偏好作为训练信号，构建了一个包含数据采集、偏好学习和策略优化的完整管线。
 
@@ -136,7 +138,7 @@ InstructMotion 的整体流程围绕一个核心瓶颈展开：**文本到动作
 ![[assets/figures/papers/paper_list_l3310_https_openaccess_thecvf_com_content_CVPR2024W_HuMoGen_papers_Sheng_Explo/figures/001_Figure_1.jpg]]
 *Figure 1: Text-to-Motion Generation with Human Preference. We gather preferences over generated completion (i.e., motion) pairs and use them to finetune MotionGPT. In preference learning, the likelihood of preferred completion is increased while that of dispreferred completion is decreased. We explore two types of practical algorithms for preference learning. First, RLHF trains in an online manner; it trains a reward model on the data and uses it to perform RL on MotionGPT. Second, DPO trains in an offline manner with supervised learning; it directly performs MLE on the data. The online/offline aspect is related to whether or not the policy performs exploration, i.e., training on completions outside...*
 
-## 核心模块与公式推导
+
 
 ### 管道模块总览
 
@@ -219,7 +221,9 @@ $$w(\mathbf{x},\mathbf{y}_w,\mathbf{y}_l) = \sigma \big( \hat{r}_{\theta}(\mathb
 ![[assets/figures/papers/paper_list_l3310_https_openaccess_thecvf_com_content_CVPR2024W_HuMoGen_papers_Sheng_Explo/figures/002_Figure_2.jpg]]
 *Figure 2: Screenshot of the Gradio interface for data labeling*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：偏好学习有效提升文本-动作对齐
 
@@ -286,7 +290,9 @@ RLHF 表现不佳的根本原因在于数据稀缺导致的奖励模型过拟合
 ![[assets/figures/papers/paper_list_l3310_https_openaccess_thecvf_com_content_CVPR2024W_HuMoGen_papers_Sheng_Explo/figures/009_Figure_5.jpg]]
 *Figure 5: Model is robust to choices of β. Values of β increasing from 0.05 to 0.20 generally do not impact alignment*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 **InstructMotion** 将偏好学习引入文本到动作生成，其直接前身是 **MotionGPT**（Zhang et al., arXiv 2023）——一种基于自回归 Transformer 和 VQ-VAE 运动分词器的文生动作模型。MotionGPT 采用标准交叉熵损失在 HumanML3D 的文本-动作对上训练，而 InstructMotion 在此基础上叠加了人类偏好信号，通过偏好对（而非额外的运动捕捉数据）来改善文本-动作对齐。
 
@@ -315,6 +321,8 @@ InstructMotion 的几个关键设计选择直接定义了其适用边界：
 **细粒度偏好**：当前偏好标注仅给出整体优劣判断，未涉及动作特定属性（如速度、幅度、时序动态）的细粒度偏好信号。利用此类信号可能进一步提升对齐精度。
 
 **混合训练策略**：DPO 的离线特性使其无法利用策略探索生成的新样本；将在线探索与离线 DPO 结合的混合方法是否更优，尚待研究。
+
+
 
 ## 原文 PDF
 

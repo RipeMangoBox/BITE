@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Boosting_Multi_Domain_Reasoning_of_LLMs_via_Curvature_Guided_Policy_Optimization.pdf
+project_link: null
+code_link: null
 openreview_forum_id: R2EZtdHWJT
 aliases:
 - CGPOC
@@ -42,7 +44,7 @@ claims:
 > - Multi-domain (Math, Code, Science, Writing) – Qwen2.5-7B 上，AVG score (Table 1) 为 59.59，对比 best baseline，变化 significant。
 > - Math+Code subset (Qwen2.5-7B) 上，AVG (MATH500, AMC, HumanEval, MBPP) 为 73.56，对比 72.26 (FAMO)，变化 +1.30。
 
-## 概述
+## 概要
 
 多领域大语言模型（LLM）强化学习面临一个核心瓶颈：不同领域（如数学推理、代码生成、科学问答、创意写作）的梯度更新方向往往相互冲突，导致参数更新彼此抵消——一个领域的性能提升常以其他领域性能下降为代价。现有方法或直接混合数据联合训练，或通过动态损失加权平衡各领域进展，但均未有效利用参数空间的曲率信息来协调跨领域优化路径。
 
@@ -56,7 +58,7 @@ claims:
 
 **方法定位：** CGPO 属于多领域强化学习的参数更新策略优化，通过随机顺序更新隐式引入曲率引导，无需二阶优化器或额外网络模块，可与现有 RL 框架（如 GRPO）无缝集成。
 
-## 背景与动机
+
 
 ### 多领域强化学习的核心瓶颈
 
@@ -85,7 +87,9 @@ $$\theta_{t+1} = \theta_t - \mathbf{H}(\theta_t)^{-1} \mathbf{g}(\theta_t)$$
 
 上述分析揭示了一个明确的研究缺口：**如何在极低计算开销下，将曲率引导的预条件机制引入LLM的多领域RL训练**。本文的核心动机正是弥合这一缺口——设计一种轻量级方法，在不显式计算任何二阶量的前提下，隐式地利用跨领域曲率交互来促进梯度对齐，从而在多个推理领域上实现协调且高效的能力增强。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈：多领域梯度冲突
 
@@ -123,7 +127,7 @@ CGPO 的核心创新在于**将牛顿法的二阶预条件思想转化为极轻�
 - 方法效果依赖于各领域奖励信号的覆盖度和质量，创意写作等主观领域使用单一 LLM 裁判可能引入风格偏差。
 - CGPO 在预训练阶段相对于数据混合策略的优势仍是开放问题。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_R2EZtdHWJT/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of CGPO (one update step). After generating responses, computing rewards, and estimating advantages for each domain, CGPO randomly permutes the domain order and applies updates sequentially, followed by interpolation with the original model. The parameter change ∆θ can be approximately decomposed into a single-domain gradient term—capturing per-domain learning—and a cross-domain interaction term that facilitates transfer across domains. Note that CGPO introduces only negligible additional computation overhead (see Section 4.3 for details)*
@@ -163,7 +167,7 @@ CGPO 的有效性根植于一个可推导的因果链条：
 - **输出**：经多领域协调优化后的策略参数，在保持各领域性能的同时促进跨领域协同。
 - **关键控制变量**：领域排列的随机种子、混合系数 $\alpha$、学习率 $\eta$。
 
-## 核心模块与公式推导
+
 
 CGPO 的核心机制是将牛顿法中的曲率-梯度耦合思想压缩为一种无需显式计算黑塞矩阵的轻量级过程。其关键洞察在于：**顺序更新会自然诱导跨领域梯度变化，而这一变化恰好近似了黑塞矩阵与梯度的乘积**。
 
@@ -223,7 +227,9 @@ $$\mathbf{H}_i(\phi_0) \mathbf{g}_j(\phi_0) + \mathbf{H}_j(\phi_0) \mathbf{g}_i(
 - **随机化必要性**：消融实验（Table 3）证实，随机化领域顺序的平均分（59.59）显著优于固定顺序（58.48），验证了随机排列对跨领域曲率信息传播的关键作用。
 - **α 的选择**：α=1.2 在多项指标上取得最优或次优结果（Table 4），过小则曲率利用不足，过大则训练不稳定。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈：多领域强化学习中的梯度冲突
 
@@ -293,7 +299,9 @@ CGPO 在不同领域组合下的表现揭示了其对冲突程度的敏感性：
 3. **顺序策略的改进空间**：当前采用纯随机排列，但更精细的调度策略（如基于冲突程度的自适应排序）可能进一步提升性能。
 4. **预训练阶段的适用性未知**：当前验证集中于推理阶段的后训练微调，CGPO 在预训练阶段相对于数据混合策略的优势仍是开放问题。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：多领域RL中的梯度冲突瓶颈
 
@@ -355,6 +363,8 @@ $$\mathbf{H}_i(\phi_0) \mathbf{g}_j(\phi_0) + \mathbf{H}_j(\phi_0) \mathbf{g}_i(
 - 是否可以设计基于实时梯度冲突检测的自适应调度策略，替代纯随机排列以最大化跨领域交互效率？
 - 跨领域冲突的具体来源（语义差异、奖励形状、输出格式要求）如何量化并针对性地缓解？当前方法仅在参数空间中间接协调，未对冲突进行显式建模。
 - CGPO在纯预训练场景中的表现是否也能超越数据混合与采样策略，以及其与大规模多任务预训练中已有的梯度操作方法（如GradNorm、PCGrad）的关系如何？
+
+
 
 ## 原文 PDF
 

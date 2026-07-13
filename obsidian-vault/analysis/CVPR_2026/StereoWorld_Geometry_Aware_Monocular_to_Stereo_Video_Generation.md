@@ -43,7 +43,7 @@ claims:
 > - StereoWorld-11M Test Set 上，PSNR 25.9794 vs GenStereo, SVG, StereoCrafter (all lower) (显著优于所有基线)；EPE (End-Point Error) 17.4527 vs baselines have higher EPE (几何误差最低)。
 > - Human Evaluation 上，Stereo Effect (SE) 4.8 out of 5 vs GenStereo, SVG, StereoCrafter (lower scores) (主观评分最高)。
 
-## 概述
+## 概要
 
 **核心问题**：将普通单目视频转换为具有立体视觉效果的 3D 内容，是扩展 XR 内容生态的关键需求。现有主流方法（如 **GenStereo** (Qiao et al., arXiv 2025)、**StereoCrafter** (Zhao et al., arXiv 2024)）普遍采用“深度估计—视点扭曲—空洞修补”的多阶段管道，这不仅破坏了视频的自然分布，还难以保证端到端的几何一致性与视觉保真度，常导致纹理失真、色彩偏移和立体伪影。
 
@@ -53,7 +53,7 @@ claims:
 
 **方法定位**：StereoWorld 属于“基于扩散模型的端到端立体视频生成”范式，区别于传统的多阶段扭曲-修补路线。它通过改造预训练视频 DiT（Diffusion Transformer）架构，在 Rectified Flow 框架下联合优化 RGB 与深度速度场，实现了从单目视频到高质量立体视频的直接映射。
 
-## 背景与动机
+
 
 立体视频（Stereoscopic video）是沉浸式视觉体验的核心载体，广泛应用于 3D 电影、扩展现实（XR）头显及各类立体显示设备。然而，立体内容的制作长期受限于高昂的专业拍摄成本与复杂的后期处理流程——传统方案需要双摄像机精确同步、严格的基线校准（IPD 对齐）以及繁重的后期立体校正。将海量的单目视频自动转换为高质量立体视频，因此成为一个兼具学术价值与产业需求的关键问题。
 
@@ -65,7 +65,9 @@ claims:
 
 > **需人工验证**：关于 GenStereo、SVG 和 StereoCrafter 的具体技术细节（如深度估计主干网络、修补策略等），本文未提供详细对比分析，上述总结基于论文对“多阶段管道”的概括性描述，建议查阅原始文献以确认各方法的精确差异。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 StereoWorld 的核心贡献在于**将预训练的单目视频扩散模型改造为端到端的立体视频生成器**，从根本上改变了现有方法“深度估计→扭曲→修补”的多阶段范式。其关键创新可归纳为以下三个维度。
 
@@ -105,7 +107,7 @@ StereoWorld 的解决方案是**将左右视图的 VAE 潜在表示沿帧维度�
 
 消融实验（Table 3, Figure 8）证实：去除视差监督后几何精度大幅下降（EPE 和 D1-all 均变差），去除深度监督则降低非重叠区域的生成质量；完整模型在所有指标上取得最佳性能，验证了视差与深度监督的互补性。
 
-## 整体框架
+
 
 StereoWorld 旨在将预训练的单目视频扩散模型改造为一个端到端的立体视频生成器。其核心设计思路是：**将左右视图的潜在表示沿帧维度拼接，使预训练模型的 3D 时空注意力能够自然地融合跨视角信息，同时引入几何感知的正则化策略来显式约束立体几何的一致性。**
 
@@ -153,7 +155,7 @@ $$\mathcal { L } = \mathcal { L } _ { \mathrm { r g b } } + \mathcal { L } _ { \
 ![[assets/figures/papers/paper_list_l2604_https_arxiv_org_abs_2512_09363/figures/003_Figure_2.jpg]]
 *Figure 2: Overall framework of StereoWorld. Before training, we use Video Depth Anything [9] and Stereo Any Video [24] to obtain the depth maps*
 
-## 核心模块与公式推导
+
 
 ### 3.1 基础扩散框架
 
@@ -238,7 +240,9 @@ $$\mathcal { L } = \mathcal { L } _ { \mathrm { r g b } } + \mathcal { L } _ { \
 
 > **注意**：论文未详细公开时空拼接策略中超参数（如重叠比例、瓦片尺寸）的具体取值，也未讨论段间过渡在极端运动场景下的平滑性量化评估，该部分细节需手动验证。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 定量对比：全面超越现有方法
 
@@ -313,7 +317,9 @@ StereoWorld 在所有主观维度上均获得最高评分，尤其在双目一�
 ![[assets/figures/papers/paper_list_l2604_https_arxiv_org_abs_2512_09363/figures/002_Table_1.jpg]]
 *Table 1: Comparison of the stereo datasets. Existing datasets are generally not IPD-aligned (e.g., Spring, VKITTI2), while datasets that are IPD-aligned are not publicly available (e.g., 3D Movies). Our StereoWorld is the first large-scale, IPD-aligned dataset*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 从多阶段管道到端到端生成：范式迁移的因果瓶颈
 
@@ -364,6 +370,8 @@ StereoWorld 在所有主观维度上均获得最高评分，尤其在双目一�
 5. **运动遮挡鲁棒性**：当左右视图存在显著运动遮挡（如前景物体快速横穿画面）时，当前框架的几何推理能力如何？是否需要引入显式的遮挡推理模块？
 
 6. **版权与伦理合规**：大规模影视数据的收集和使用涉及版权问题，如何在保证训练数据规模的同时建立合规的数据获取和授权机制，是推动该技术走向实际应用的重要前提。
+
+
 
 ## 原文 PDF
 

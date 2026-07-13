@@ -5,6 +5,7 @@ paper_level: A
 venue: ECCV
 year: 2024
 pdf_ref: paperPDFs/ECCV_2024/Generating_Human_Interaction_Motions_in_Scenes_with_Text_Control.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/toronto-ai/tesmo/
 aliases:
 - GHIMSTC
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | 基于文本控制的场景内人物交互动作生成 |
 | 英文题名 | Generating Human Interaction Motions in Scenes with Text Control |
 | 会议/期刊 | ECCV 2024 |
-| Links | [paper](https://arxiv.org/abs/2404.10685); [Project](https://research.nvidia.com/labs/toronto-ai/tesmo/) |
+| Links | [paper](https://arxiv.org/abs/2404.10685) · [Project](https://research.nvidia.com/labs/toronto-ai/tesmo/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | TeSMo |
 | Dataset | SAMP sitting test set, User study (preference), Loco-3D-FRONT test set (navigation) |
@@ -41,7 +42,7 @@ claims:
 > - SAMP sitting test set 上，Object Penetration Ratio 为 0.0611，对比 0.1076 (DIMOS)，变化 -0.0465。
 > - User study (preference) 上，Preference rate 为 71.9%，对比 29.1% (DIMOS)，变化 +42.8%。
 
-## 概述
+## 概要
 
 场景感知的人类动作生成面临一个核心瓶颈：现有的大规模动作捕捉数据集（如HumanML3D）虽然提供了丰富的文本-动作对，但缺少场景信息，而带场景标注的人-物交互数据又极为稀缺，这使得模型难以在保持文本可控性的同时生成多样化且符合物理约束的场景兼容动作。
 
@@ -60,7 +61,7 @@ claims:
 
 本文的主要局限在于：两阶段生成可能导致骨盆轨迹与全身姿态之间的不协调；交互类型目前仅限于坐椅子等简单动作，难以处理躺下、触摸或动态物体交互；对非平面表面（如台阶、斜坡）上的交互缺乏支持。这些也为未来的一阶段统一模型和更广泛交互谱系的扩展留下了开放问题。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -88,7 +89,9 @@ claims:
 
 这一方法论的直接效果是：在SAMP坐姿测试集上，TeSMo的交互动作被**71.9%**的参与者认为优于DIMOS（Table 2），目标位置误差从0.2020降至**0.1445**，物体穿透率从0.1076降至**0.0611**；在Loco-3D-FRONT导航测试集上，根轨迹的目标到达精度和碰撞率均达到最优（Table 1）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 TeSMo 的核心创新在于**将场景感知注入预训练的文本-动作扩散模型**，而非从头训练一个场景条件模型。这一策略解决了该领域的根本瓶颈：大规模、带文本标注的人-场景交互数据集极度稀缺。通过冻结预训练基座并附加轻量级的场景感知控制分支进行微调，TeSMo 在保持文本可控性与运动质量的同时，实现了对场景约束的适应。
 
@@ -102,7 +105,7 @@ TeSMo 的核心创新在于**将场景感知注入预训练的文本-动作扩�
 
 上述创新共同构成了一个因果链条：**预训练基座保证运动质量和文本可控性 → 场景感知分支注入空间约束 → 绝对位姿表示使物理约束可微分 → 测试时引导进一步优化目标到达与碰撞避免**。消融实验（Table 3）证实了这一链条的有效性：同时使用目标到达引导和碰撞引导，导航目标位置误差从 0.1568 降至 0.1241。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2404_10685/figures/001_Figure_1.jpg]]
 *Figure 1: We present TeSMo, a method for generating diverse and plausible human-scene interactions from text input. Given a 3D scene, TeSMo generates scene-aware motions, such as walking in free space and sitting on a chair. Our model can be easily controlled using textual descriptions, start positions, and goal positions*
@@ -129,7 +132,7 @@ TeSMo 将“文本控制的场景内人物交互动作生成”分解为两个�
 
 相比于 DIMOS（Zhao et al., ICCV 2023）等基于强化学习的方法，TeSMo 的扩散模型框架天然支持文本控制，且无需为每个新场景重新训练策略。相比于 GMD（Karunratanakul et al., ICCV 2023）和 OmniControl（Xie et al., arXiv 2023）等场景无关的扩散模型，TeSMo 通过场景感知分支引入了显式的场景约束，同时通过冻结基础模型保留了文本控制的多样性。
 
-## 核心模块与公式推导
+
 
 TeSMo 将场景感知的人类动作生成分解为**导航**与**交互**两个阶段，每个阶段均基于预训练的文本-动作扩散模型，并通过附加的场景感知控制分支进行微调，从而在保持文本可控性的前提下适应场景约束。以下逐一剖析各核心模块及其关键公式。
 
@@ -201,7 +204,9 @@ $$\mathcal{T}_c = \mathrm{SDF}(\hat{\mathbf{x}}_0, S_{\mathcal{O}})$$
 
 其中 $S_{\mathcal{O}}$ 为目标物体的 3D 几何表示。这一显式碰撞惩罚是 TeSMo 在物体穿透率指标上显著优于 DIMOS（0.0611 vs 0.1076）的关键机制。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -263,7 +268,9 @@ Figure 7 展示了 TeSMo 的三项扩展能力：
 *Figure 5: Navigation generation performance. The start pose is the green arrow, and the goal pose is the red arrow. Our method more accurately reaches the goal and avoids obstacles while style is controlled by a text prompt*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 在文本-动作生成谱系中的位置
 
@@ -304,6 +311,8 @@ TeSMo 建立在文本到动作扩散模型的基础上，其核心基座是 **MD
 2. **交互谱系扩展**：将方法扩展到更丰富的交互类型（躺下、触摸、动态物体交互）需要解决两个子问题：(a) 如何获取或生成对应的训练数据；(b) 如何设计适用于不同交互类型的场景表征和目标函数。
 3. **LLM 规划器集成**：原文提出利用 LLM 规划器来指定动作序列和接触信息，这需要解决“语言指令到空间约束”的映射问题，以及如何将离散的动作序列转化为扩散模型的条件信号。
 4. **非平面表面处理**：将 2D 地板图扩展到带高度的 2.5D 或全 3D 场景表征，同时重新设计碰撞引导目标函数，是处理台阶、斜坡等场景的可能方向。
+
+
 
 ## 原文 PDF
 

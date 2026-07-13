@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Optimistic_Task_Inference_for_Behavior_Foundation_Models.pdf
+project_link: null
+code_link: https://github.com/ThomasRupf/opti-bfm
 openreview_forum_id: m5byThUSNE
 aliases:
 - OB
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 面向行为基础模型的乐观任务推断 |
 | 英文题名 | Optimistic Task Inference for Behavior Foundation Models |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=m5byThUSNE); [GitHub](https://github.com/ThomasRupf/opti-bfm) |
+| Links | [paper](https://openreview.net/forum?id=m5byThUSNE) · [GitHub](https://github.com/ThomasRupf/opti-bfm) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | OpTI-BFM |
 | Dataset | ExORL DMC (Walker, Cheetah, Quadruped), ExORL DMC |
@@ -41,7 +43,7 @@ claims:
 > - ExORL DMC (Walker, Cheetah, Quadruped) 上，Episode Return (Relative to Oracle) 为 接近 Oracle 性能（约 5 episodes 内），对比 LoLA 收敛缓慢；Random 约为 0，变化 OpTI-BFM 显著快于 LoLA，5 个 episode 内达到 Oracle 水平。
 > - ExORL DMC 上，数据效率：给定 n 个交互步骤后，利用所收集数据推断出的策略性能 为 OpTI-BFM 和其 TS 变体在所有时间和环境中均排名靠前，对比 RND 或 Random 收集的数据训练策略性能较差，变化 OpTI-BFM 收集的数据在任务推断上更高效，同等数据量下策略性能更高。
 
-## 概述
+## 概要
 
 行为基础模型（Behavior Foundation Models, BFMs）通过后继特征（Successor Features, SFs）实现了零样本策略评估：给定一个线性奖励函数 $r(s) = z^\top \phi(s)$，BFM 可以直接输出对应的最优策略，而无需额外的策略优化。然而，这一范式的实际部署面临一个关键瓶颈——**任务推断（task inference）**，即从用户指定的奖励函数中恢复任务嵌入 $z_r$ 的过程，严重依赖预先收集并全部标注的离线数据集。在实际应用中，获取大规模的状态-奖励标签成本高昂且缺乏灵活性，这限制了 BFM 从实验室走向现实场景的步伐。
 
@@ -51,7 +53,7 @@ claims:
 
 从方法谱系来看，OpTI-BFM 将 BFM 的任务推断从离线最小二乘投影（一次性闭式解）推进到在线自适应估计，建立了与线性 bandit 理论的直接联系，并提供了遗憾界（regret bound）的理论保障。与基于策略搜索的快速适应方法 **LoLA**（Sikchi et al., 2025）、基于随机网络蒸馏的无任务感知探索方法 **RND**（Burda et al., 2018）等基线相比，OpTI-BFM 在数据效率上具有显著优势，同时计算开销仅为 Oracle 推理的 4-5 倍（Nvidia RTX 4090 上 UCB 变体约 280 Hz，Thompson Sampling 变体约 360 Hz），仍在可接受范围内。
 
-## 背景与动机
+
 
 ### 行为基础模型中的任务推断瓶颈
 
@@ -78,7 +80,9 @@ $$z_{r} = \mathrm{Cov}_{\mathcal{D}}(\phi)^{-1} \mathbb{E}_{s \sim \mathcal{D}}[
 
 本文的动机正是利用 USF 框架下奖励、特征与后继特征之间的线性关系，将上述挑战形式化为一个可处理的在线学习问题，从而设计出兼具理论保障和实用效率的在线任务推断算法。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 OpTI-BFM 的核心创新在于将行为基础模型（BFM）的任务推理从**离线一次性投影**转变为**在线交互式推断**，从而从根本上改变了数据来源与标注代价的结构。这一转变由三个紧密耦合的机制驱动：
 
@@ -94,7 +98,7 @@ OpTI-BFM 的核心创新在于将行为基础模型（BFM）的任务推理从**
 
 上述三个 changed slots 共同构成了一个完整的因果闭环：USF 框架下奖励、特征与后继特征之间的线性关系（$Q_r^{\pi}(s_0, a_0) = z^{\top} \psi^{\pi}(s_0, a_0)$）将策略搜索简化为线性置信域上界问题，使得在线任务推理不仅可行，而且具备理论 regret 界保障。实验表明，OpTI-BFM 仅需 **5 个 episode（约 5k 环境步）** 即可恢复 Oracle 性能（Figure 2），远超离线方法所需的数据量，验证了在线乐观推断在标注效率上的决定性优势。
 
-## 整体框架
+
 
 OpTI-BFM 将行为基础模型（BFM）的任务推断从离线、依赖大量标注数据的范式，转变为**在线、主动的数据高效推断框架**。其核心思路是：利用 USF 框架下奖励函数与后继特征之间的线性结构，将策略搜索问题转化为线性置信域上界（UCB）优化问题，从而在交互中高效地逼近真实任务嵌入。
 
@@ -131,7 +135,7 @@ OpTI-BFM 的在线推断流程由三个紧密耦合的模块构成：
 - **Thompson Sampling 变体（OpTI-BFM-TS）**：从贝叶斯后验高斯分布 $\mathcal{N}(\hat{z}_t, V_t^{-1})$ 中采样任务嵌入，无需显式优化 UCB 目标，计算开销更低（约为 Oracle 的 4 倍 vs. 5 倍）。
 - **非平稳奖励变体**：引入遗忘因子 $\rho \in (0, 1]$，对历史数据指数加权（时刻 $s$ 的数据在时刻 $t$ 的权重为 $\rho^{t-s}$），使算法能适应奖励函数的漂移。
 
-## 核心模块与公式推导
+
 
 OpTI-BFM 的核心机制建立在 USF 框架所揭示的线性结构之上：对于特征空间内的奖励函数，其 Q 函数可表示为目标嵌入与后继特征的线性内积。这一性质将原本复杂的策略搜索问题转化为对线性函数的在线优化，从而使得带理论保障的乐观探索成为可能。本节聚焦于构成该算法的三个关键模块及其数学表述。
 
@@ -170,7 +174,9 @@ $$\arg\max_{z \in \mathcal{C}_t} \psi(s_t, z)^{\top} \hat{z}_{t-1} + \beta_t \|\
 - **Thompson Sampling 变体（OpTI-BFM-TS）**：从贝叶斯后验高斯分布 $\mathcal{N}(\hat{z}_t, V_t^{-1})$ 中直接采样任务嵌入，避免了显式求解 UCB 优化问题，计算开销更低（约为 Oracle 的 4 倍，而 UCB 版本约为 5 倍）。
 - **非平稳奖励扩展**：引入遗忘因子 $\rho \in (0, 1]$，对历史观测进行指数加权（时间步 $s$ 的数据在 $t$ 时刻的权重为 $\rho^{t-s}$），使算法能够跟踪随时间变化的奖励函数。当 $\rho < 1$ 时，旧观测的影响逐渐衰减，算法获得适应非平稳任务的能力。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：5个Episode内恢复Oracle性能
 
@@ -250,7 +256,9 @@ OpTI-BFM 的理论保障依赖于 USF 完美且奖励严格线性的假设。附
 ![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_m5byThUSNE/figures/012_Figure.jpg]]
 *Figure: (a) Absolute performance for different # of samples or gradient steps. OpTI-BFM+grad. OpTI-BFM (b) Inference speed in Hz for different # of samples or gradient steps*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心定位：从离线投影到在线线性置信域推断
 
@@ -307,6 +315,8 @@ OpTI-BFM 的理论 regret 界（附录 A）直接建立在线性 bandit 的 UCB 
 4. **主动标注预算分配**：如何结合信息阈值 $κ$ 更智能地决定何时请求奖励标签（Figure 7），以在交互成本与标注成本之间取得更优权衡，是一个有实践价值的方向。
 
 5. **USF 质量的自适应感知**：当前算法对 USF 偏差的敏感度依赖实验评估，缺乏在线检测和自适应纠正 USF 误差的机制。
+
+
 
 ## 原文 PDF
 

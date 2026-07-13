@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/VideoMind_A_Chain_of_LoRA_Agent_for_Temporal_Grounded_Video_Reasoning.pdf
+project_link: https://videomind.github.io/
+code_link: null
 openreview_forum_id: 57EwidOnSf
 aliases:
 - VideoMind
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | VideoMind：用于时间锚点视频推理的LoRA链式代理 |
 | 英文题名 | VideoMind: A Chain-of-LoRA Agent for Temporal-Grounded Video Reasoning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=57EwidOnSf); [Project](https://videomind.github.io/) |
+| Links | [paper](https://openreview.net/forum?id=57EwidOnSf) · [Project](https://videomind.github.io/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | VideoMind |
 | Dataset | CG-Bench, ReXTime, NExT-GQA, Charades-STA |
@@ -41,7 +43,7 @@ claims:
 > - ReXTime 上，Acc@IoU 为 20.20 (7B, zero-shot)，对比 17.13 (VTimeLLM 7B, fine-tuned)，变化 +3.07。
 > - NExT-GQA 上，R@0.3 IoU 为 50.2 (7B)，对比 41.2 (VideoChat-TPO 7B)，变化 +9.0。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -71,7 +73,7 @@ VideoMind 在多个基准上展现了显著的性能优势：
 
 VideoMind 属于**多模态代理推理**方法，其核心创新在于将视频推理形式化为可解释的角色链，并通过共享骨干加 LoRA 适配器实现高效的角色切换。该方法在时间锚点推理能力上显著超越了传统的单一模型直接生成范式，为长视频理解提供了一种结构化、可追溯的推理框架。
 
-## 背景与动机
+
 
 视频理解正从简单的场景分类走向复杂的时序推理。当用户提出“厨师是在什么时候往锅里加盐的？”这类问题时，模型不仅要理解画面内容，还需要在分钟级甚至小时级的长视频中，精确地锚定事件发生的起止时刻，并给出可解释的推理过程。这种能力被称为**时间锚点视频推理**（temporal-grounded video reasoning），是通往通用视频智能的关键一步。
 
@@ -89,7 +91,9 @@ VideoMind 属于**多模态代理推理**方法，其核心创新在于将视频
 
 VideoMind 的核心动机正是弥合这一差距。我们识别出时间锚点推理所需的四项关键能力——**规划**（Planning）、**定位**（Grounding）、**验证**（Verification）和**回答**（Answering），并将它们建模为一个可组合的代理工作流。然而，直接部署多个独立模型会带来沉重的计算和内存开销。为此，我们提出 **Chain-of-LoRA 机制**：在共享的骨干网络上，通过切换不同的低秩适配器（LoRA）来激活不同角色，实现无缝的角色切换。这一设计使得 VideoMind 在仅增加极少参数的条件下，获得了结构化、可解释的逐步推理能力，为长视频时间锚点推理提供了一种高效且灵活的新范式。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 1. 瓶颈洞察：从“直接回答”到“时间锚点推理”
 
@@ -149,7 +153,7 @@ VideoMind 的 Planner 角色是整个系统的“大脑”，负责根据视频�
 
 这些创新共同构成了一个**轻量、灵活且精确的时间锚点视频推理框架**，使 2B 参数的小模型在多個长视频基准上超越 GPT-4o 和 Gemini-1.5-Pro 等大规模闭源模型。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_57EwidOnSf/figures/004_Figure_2.jpg]]
 *Figure 2: The overall workflow of VideoMind. Given a video and a query, it adaptively activates different roles (e.g., Planner → Grounder → Verifier → Answerer in this case) and performs step-by-step reasoning by calling individual modules. Figure 3: Planner coordinates all the other roles based on the video and query context, offering three reasoning plans and a query rephrasing mechanism to address diverse demands*
@@ -188,7 +192,7 @@ Chain-of-LoRA 是实现多角色无缝切换的关键技术。与传统的多模
 
 尽管 VideoMind 在时间锚点推理上取得了显著进展，但框架仍存在以下局限：各角色当前独立训练，未进行联合优化，推理管道中存在误差传播的风险；音频模态未被整合，限制了对需要听觉理解的视频的支持；顺序执行多角色会引入额外延迟，尽管自动规划可部分缓解，但对长视频仍可能成为瓶颈。
 
-## 核心模块与公式推导
+
 
 VideoMind 的推理能力由四个功能独立的角色模块构成，它们共享同一个 LMM 骨干网络，并通过 Chain-of-LoRA 机制实现轻量级的角色切换。以下聚焦于 Grounder 模块的核心架构与训练目标，因为它是实现精确时间锚点的关键所在。
 
@@ -243,7 +247,9 @@ $$\mathcal{L}_{con} = -\lambda_{con} \log \frac{\exp(s_p / \tau)}{\exp(s_p / \ta
 
 三个损失项在所有金字塔层上求和，构成 Grounder 的最终训练目标。消融实验表明，这一专用的 timestamp decoder 设计在 Charades-STA 上全面优于基于文本、特殊 token、嵌入匹配和时间标记等替代方案 (Table 18)，是 VideoMind 实现精准时间锚点的核心机制。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -318,7 +324,9 @@ Table 19 和 Figure 7 揭示了不同模型规模的错误分布：2B 模型的 
 3. **推理延迟**：顺序执行多角色引入额外延迟，对长视频可能成为瓶颈（Table 24 显示 CG-Bench 平均推理时间对比）。
 4. **泛化边界**：在 Ego4D-NLQ 等特定域数据集上，zero-shot 性能与专用方法仍有差距（Table 12）。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位与核心瓶颈
 
@@ -373,6 +381,8 @@ Chain-of-LoRA 是 VideoMind 的核心效率创新。其技术方案为：所有�
 - **实时推理扩展**：Chain-of-LoRA 机制能否通过模型量化、投机解码或角色并行化等技术，扩展到实时或近实时的视频推理场景？
 - **开放域泛化**：该框架在更复杂、开放域的长视频（如未经剪辑的日常生活视频、多视角视频）上的泛化能力尚待验证。
 - **更细粒度的角色分解**：是否可以将现有四角色进一步分解为更多原子能力（如对象跟踪器、关系推理器），以应对更复杂的组合查询？
+
+
 
 ## 原文 PDF
 

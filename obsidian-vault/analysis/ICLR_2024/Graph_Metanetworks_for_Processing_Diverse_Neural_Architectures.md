@@ -5,6 +5,7 @@ paper_level: A
 venue: ICLR
 year: 2024
 pdf_ref: paperPDFs/ICLR_2024/Graph_Metanetworks_for_Processing_Diverse_Neural_Architectures.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/toronto-ai/GMN/
 aliases:
 - GMG
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 图元网络: 处理多样化神经架构 |
 | 英文题名 | Graph Metanetworks for Processing Diverse Neural Architectures |
 | 会议/期刊 | ICLR 2024 |
-| Links | [paper](https://arxiv.org/abs/2312.04501); [Project](https://research.nvidia.com/labs/toronto-ai/GMN/) |
+| Links | [paper](https://arxiv.org/abs/2312.04501) · [Project](https://research.nvidia.com/labs/toronto-ai/GMN/) |
 | Topic | #topic/representation_self_supervised_transfer #topic/representation_self_supervised_transfer/transfer_multitask_and_meta_learning |
 | Method | Graph Metanetworks (GMNs) |
 | Dataset | Varying CNNs (100% data), Diverse Architectures (100% data), Varying CNNs (OOD), Diverse Architectures (10% data) |
@@ -42,7 +43,7 @@ claims:
 > - Diverse Architectures (100% data) 上，R^2 为 0.975 ± 0.002，对比 0.957 ± 0.009 (DMC), 0.562 ± 0.020 (DeepSets)，变化 +0.018 (vs DMC)。
 > - Varying CNNs (OOD) 上，R^2 为 0.891 ± 0.037，对比 0.741 ± 0.015 (DeepSets), 0.387 ± 0.229 (DMC)，变化 +0.15 (vs DeepSets)。
 
-## 概述
+## 概要
 
 **核心问题**：元网络（metanetworks）——即以神经网络参数为输入并对其进行推理的神经网络——面临一个根本性瓶颈：现有等变元网络需要针对每种输入架构手工设计等变层，难以泛化到包含归一化层、残差连接、注意力等模块的复杂网络。当输入网络架构多样化时，手工设计的等变结构迅速失效，迫使研究者要么放弃对称性保证，要么将方法局限在简单MLP或CNN上。
 
@@ -57,8 +58,6 @@ claims:
 - 在小CNN数据集上，GMN同样超越所有先前元网络（Test τ = 0.938）。
 
 **局限性**：网络函数不变性的理论证明目前仅在计算图上严格成立，推广到参数图自同构仍为猜想；方法尚未扩展到循环架构或动态计算图；参数图的构建依赖人工设计的子图模板，每新增一种层类型需要定义新的构造规则。
-
-## 背景与动机
 
 ### 元网络的核心任务与瓶颈
 
@@ -88,7 +87,7 @@ claims:
 2. **通用等变性**：通过神经 DAG 自同构的形式化定义（Proposition 1），证明 GNN 对参数置换天然等变（Proposition 2），从而构建一个可处理任意前馈架构的通用元网络框架。
 3. **无需手工设计**：将等变性的保证从手工层设计转移至图结构本身，新增层类型只需定义其参数子图模板，GNN 自动继承等变性。
 
-## 核心创新
+## 核心方法与创新机理
 
 ### 创新动机：现有元网络的对称性瓶颈
 
@@ -178,8 +177,6 @@ GMN的处理管线由三个模块组成：
 
 - **非置换对称性**：未处理ReLU网络的缩放对称性（对权重和偏置的尺度变换会改变网络输出），这类对称性需要额外机制来保证等变性。
 
-## 整体框架
-
 图元网络（Graph Metanetworks, GMNs）的整体框架遵循一个清晰的三阶段流水线：**参数图构建 → GNN消息传递 → 下游预测**。其核心设计理念是将任意前馈神经网络转化为一种称为“参数图”的紧凑图表示，从而将元学习问题转化为图学习问题。
 
 ### 流水线总览
@@ -206,8 +203,6 @@ GMN框架的等变性建立在**神经DAG自同构**这一核心概念之上。�
 
 ![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2312_04501/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of Graph Metanetworks (GMNs) Our method converts neural network architectures into a parameter graph where edges correspond to network parameters. The bias (b) and batch-normalization parameters are incorporated via additional nodes with edges to the relevant layer’s neurons. The graph is processed by a graph neural network operating on edge attributes. Fixed-length (invariant) predictions can be extracted by pooling the output graph features*
-
-## 核心模块与公式推导
 
 ### 模块一：参数图构建
 
@@ -268,7 +263,7 @@ GMN 的等变性建立在**神经 DAG 自同构**（Neural DAG Automorphisms）�
 
 这两个命题共同保证了：当输入网络的隐藏神经元被置换（一种不影响函数表达的对称操作）时，GMN 的输出会以可预测的方式同步变换，从而无需手工为每种架构设计等变层。需要注意的是，命题 1 的严格证明目前仅针对计算图给出，推广到一般参数图（含多重边）仍是一个开放猜想（见附录 B.5）。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -336,10 +331,7 @@ Figure 8提供了OOD设置下Diverse Architectures数据集上预测准确率与
 ![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2312_04501/figures/012_Table_5.jpg]]
 *Table 5: Hyperparameters for the CIFAR-10 image classifiers that we trained for the predicting accuracy experiments in Section 5.1*
 
-![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2312_04501/figures/013_Table_6.jpg]]
-*Table 6: Additional results for predicting accuracy on the dataset of small CNNs from Unterthiner et al. (2020). We see that GMNs outperform all metanetworks. Here, we use the Graph Transformer GRIT (Ma et al., 2023) as our graph learning model for GMN, as we find it performs better than the message passing models that we tried*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 核心问题与基线谱系
 

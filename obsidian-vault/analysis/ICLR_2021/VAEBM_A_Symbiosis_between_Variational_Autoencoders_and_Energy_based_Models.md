@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2021
 pdf_ref: paperPDFs/ICLR_2021/VAEBM_A_Symbiosis_between_Variational_Autoencoders_and_Energy_based_Models.pdf
+project_link: null
+code_link: https://github.com/NVlabs/VAEBM
 aliases:
 - VAEBM
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | VAEBM：变分自编码器与能量模型的共生组合 |
 | 英文题名 | VAEBM: A Symbiosis between Variational Autoencoders and Energy-based Models |
 | 会议/期刊 | ICLR 2021 |
-| Links | [paper](https://arxiv.org/abs/2010.00654); [GitHub](https://github.com/NVlabs/VAEBM) |
+| Links | [paper](https://arxiv.org/abs/2010.00654) · [GitHub](https://github.com/NVlabs/VAEBM) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/generative_models_and_autoencoders |
 | Method | VAEBM |
 | Dataset | CIFAR-10, CelebA 64, LSUN Church 64 |
@@ -40,7 +42,7 @@ claims:
 > - CIFAR-10 上，IS↑ 为 8.43，对比 5.51 (NVAE)，变化 +2.92。
 > - CelebA 64 上，FID↓ 为 5.31，对比 14.74 (NVAE)，变化 -9.43。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -77,8 +79,6 @@ VAEBM在多个基准数据集上实现了生成质量的显著跃升：
 - **OOD检测**：在SVHN上AUROC达0.83，远超NVAE的0.42（Table 6），表明能量函数提供了有效的密度估计。
 
 消融实验确认了关键设计选择：在噪声空间进行MCMC是获取高质量样本的必要条件（直接于 $(x,z)$ 空间采样无法产出好样本），且VAEBM显著优于基于WGAN的对抗训练变体。
-
-## 背景与动机
 
 ### 深度生成模型的两条主线
 
@@ -124,7 +124,7 @@ $$h_{\psi,\theta}(\mathbf{x},\mathbf{z}) = \frac{1}{Z_{\psi,\theta}} p_{\theta}(
 
 其中 $p_{\theta}(\mathbf{x},\mathbf{z})$ 来自预训练的VAE，$E_{\psi}(\mathbf{x})$ 是待训练的能量函数。这种乘积形式使得训练可以自然地分解为两个阶段：先训练VAE至收敛，再固定VAE训练EBM。更重要的是，预训练的VAE提供了一个低维、平滑的潜在空间，使得MCMC采样可以在噪声变量空间 $(\epsilon_{\mathbf{z}}, \epsilon_{\mathbf{x}})$ 中高效进行，从而避开像素空间的缓慢混合问题。
 
-## 核心创新
+## 核心方法与创新机理
 
 VAEBM 的核心创新在于将 VAE 与 EBM 两种生成范式进行**共生组合**（symbiosis），而非简单的级联或替代。其关键洞察是：VAE 擅长捕捉数据的全局模态结构但倾向于在非数据区域分配概率质量，导致样本模糊；EBM 能够精细建模数据分布但 MCMC 采样在像素空间中混合缓慢。VAEBM 通过将两者相乘，使 VAE 提供整体结构，EBM 精炼细节并显式压低非数据区域的概率。
 
@@ -170,8 +170,6 @@ $$\partial_{\psi} L(\psi) = \mathbb{E}_{\mathbf{x}\sim p_d(\mathbf{x})}[-\partia
 
 **证据强度评估**：噪声空间重参数化 MCMC 的关键作用有 Figure 5 和 Appendix B.1 的消融实验直接支撑（置信度 0.95）；乘积形式定义的有效性通过 CIFAR-10 上 FID 从 51.67 到 12.19 的巨大提升得到验证（置信度 0.95）；两阶段训练策略的合理性由 Table 4 中与联合训练变体的对比支持（置信度 0.95）。
 
-## 整体框架
-
 VAEBM 的生成模型定义为一个共生组合：将预训练 VAE 的生成分布与一个定义在数据空间的能量模型（EBM）相乘，形成一个联合分布：
 
 $$h_{\psi,\theta}(\mathbf{x},\mathbf{z}) = \frac{1}{Z_{\psi,\theta}} p_{\theta}(\mathbf{x},\mathbf{z}) e^{-E_{\psi}(\mathbf{x})}$$
@@ -216,8 +214,6 @@ MCMC 采样（Langevin 动力学）在此噪声空间中进行，而非像素空
 | Langevin 动力学采样器 | 在噪声空间中运行 MCMC | 初始噪声、能量梯度 | 精炼后的噪声样本 |
 
 两阶段训练虽然简化了优化，但也意味着 VAE 在 EBM 训练期间不被联合微调，这可能限制了模型的最终潜力。能量函数的训练需要人工判断停止时机（当生成样本不再真实时），引入了一定的研究者偏差。
-
-## 核心模块与公式推导
 
 ### 1. 生成模型定义
 
@@ -291,7 +287,7 @@ $$\log h_{\psi,\theta}(\mathbf{x}) \geq \mathcal{L}_{\mathrm{vae}}(\mathbf{x},\t
 
 该下界将训练自然分解为VAE优化和EBM优化两部分，支撑了两阶段训练策略。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -351,9 +347,6 @@ VAEBM在生成速度上具有显著优势。在CIFAR-10上生成50个样本，VA
 ![[assets/figures/papers/paper_list_l35_https_arxiv_org_abs_2010_00654/figures/014_Figure.jpg]]
 *Figure: (a) Step size 8e-4 (b) Step size 8e-5*
 
-![[assets/figures/papers/paper_list_l35_https_arxiv_org_abs_2010_00654/figures/022_Figure_9.jpg]]
-*Figure 9: Additional visualizations of MCMC chains when sampling from the model for CIFAR-10*
-
 ![[assets/figures/papers/paper_list_l35_https_arxiv_org_abs_2010_00654/figures/019_Figure.jpg]]
 *Figure: (a) NVAE baseline (b) WGAN, initialized with NVAE decoder (c) EBM on x, MCMC initialized with NVAE samples (d) VAEBM with DKL(pθ0 (x)||hψ,θ(x)) loss*
 
@@ -371,7 +364,7 @@ VAEBM在生成速度上具有显著优势。在CIFAR-10上生成50个样本，VA
 ![[assets/figures/papers/paper_list_l35_https_arxiv_org_abs_2010_00654/figures/018_Table_8.jpg]]
 *Table 8: Important hyper-parameters for training VAEBM*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 方法沿革与基线关系
 

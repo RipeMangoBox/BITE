@@ -42,7 +42,7 @@ claims:
 > - COCO Test 上，CIDEr 142.6 vs 139.2 (PPO) (+3.4)；CIDEr 142.6 vs 137.2 (DPO) (+5.4)。
 > - MMMU 上，Accuracy (%) 74.6 vs 72.2 (PPO) (+2.4%)。
 
-## 概述
+## 概要
 
 视觉语言模型（VLM）的偏好对齐面临一个被忽视的瓶颈：**简单负样本（easy negatives）产生大而无信息量的梯度，导致概率分布向主导模式挤压（squeezing effect），破坏模型校准并造成训练不稳定**。标准 DPO 的隐式正则化不足以充分抑制这些梯度，使得对齐过程在看似收敛的损失曲线下隐藏着分布退化。
 
@@ -55,7 +55,7 @@ claims:
 
 **方法定位**：CW-DPO 在偏好优化方法谱系中独树一帜——它既不需要奖励模型（区别于 RLHF/PPO），又超越了标准 DPO 及其变体（如 V-DPO、OPA-DPO、GRPO），首次将学习动态建模与能力感知加权引入 VLM 对齐，实现了稳定高效的偏好优化。
 
-## 背景与动机
+
 
 视觉语言模型（VLMs）在图像描述、视觉问答等任务上取得了显著进展，但其生成质量与人类偏好之间仍存在明显差距。为使模型输出更符合人类期望，研究者广泛采用偏好对齐（preference alignment）技术，其中**直接偏好优化（DPO）**（Rafailov et al., NeurIPS 2023）因无需显式训练奖励模型而成为主流范式。然而，DPO 及其变体在 VLM 对齐中暴露出一个关键瓶颈：**训练不稳定与校准退化**。
 
@@ -82,7 +82,9 @@ claims:
 
 基于这一动机，论文提出 **CW-DPO（Cooling-Weighted Direct Preference Optimization）**，通过两阶段策略——约束 SFT 与冷却加权 DPO——实现动态感知的偏好对齐，从根本上缓解挤压效应，提升训练的稳定性与生成质量。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CW-DPO 的核心创新在于将偏好对齐从静态优化重新定义为**动态感知的学习过程**，通过两个高度耦合的 changed slots 解决标准 DPO 中简单负样本引发的“挤压效应”（squeezing effect）。
 
@@ -122,7 +124,7 @@ $$\bar{\ell}_{\theta}(y \mid \chi) = \frac{1}{L} \sum_{l=1}^{L} \log \pi_{\theta
 
 与现有偏好优化方法的属性对比（Table 1）进一步表明，CW-DPO 是首个**同时显式建模学习动态并引入能力感知加权**的 VLM 对齐方法，这一组合是其在多个基准上超越 **DPO**（Rafailov et al., NeurIPS 2023）、**PPO**（Kaufmann et al., 2024）和 **OPA-DPO**（Yang et al., CVPR 2025）等方法的根本原因。
 
-## 整体框架
+
 
 CW-DPO 采用两阶段优化范式，将偏好对齐显式建模为一个动力学感知的学习过程。其核心思想是：**先通过约束 SFT 平滑损失景观，再通过动态冷却权重有针对性地调节负样本梯度**，从而缓解标准 DPO 中简单负样本引起的“挤压效应”（squeezing effect）。
 
@@ -163,7 +165,7 @@ Table 1 将 CW-DPO 与代表性偏好优化方法进行了六项属性对比。C
 ![[assets/figures/papers/paper_list_l2655_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_Dynamics_Aware_P/figures/002_Figure_1.jpg]]
 *Figure 1: Two-stage optimization process of CW-DPO. Stage*
 
-## 核心模块与公式推导
+
 
 CW-DPO 由两个顺序阶段构成：**第一阶段**通过约束 SFT 平滑损失景观，**第二阶段**通过冷却加权 DPO 实现动态感知的偏好优化。以下逐一展开关键模块与核心公式。
 
@@ -236,7 +238,9 @@ $$
 
 两个阶段形成因果链条：**Stage 1** 通过约束 SFT 平滑损失景观，降低模型对负样本的初始过度自信；**Stage 2** 在此基础上利用冷却权重进一步精细化调节梯度，使偏好优化在稳定且校准良好的概率分布上进行。消融实验（Table 3）验证了两阶段的必要性：移除 Smooth SFT 导致 COCO CIDEr 下降约 5 个点，省略 CW-DPO 阶段则跨任务性能全面下降。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈验证：DPO 的“挤压效应”
 
@@ -296,7 +300,9 @@ CW-DPO 在多个视觉语言基准上取得了领先性能。**Table 2** 汇总�
 ![[assets/figures/papers/paper_list_l2655_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_Dynamics_Aware_P/figures/001_Table_1.jpg]]
 *Table 1: Comparison with representative preference optimization methods. CW-DPO uniquely integrates learning dynamics modeling and competence-aware weighting for stable VLM alignment*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有偏好优化方法的关系
 
@@ -343,6 +349,8 @@ CW-DPO 的设计基于以下前提假设，这些假设定义了其适用范围�
 3. **长周期推理任务**：CW-DPO 在交互式、长周期多模态推理任务中的适用性如何？冷却权重机制是否需要针对序列级反馈进行重新设计？
 
 4. **与在线对齐的结合**：CW-DPO 的两阶段静态训练能否与在线偏好采样（如 OPA-DPO 的策略）结合，实现训练过程中的动态负样本难度感知？
+
+
 
 ## 原文 PDF
 

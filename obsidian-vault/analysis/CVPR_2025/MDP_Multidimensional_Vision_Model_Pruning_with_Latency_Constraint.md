@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/MDP_Multidimensional_Vision_Model_Pruning_with_Latency_Constraint.pdf
+code_link: https://github.com/NVlabs/MDP
 project_link: https://github.com/NVlabs/MDP
 aliases:
 - MMDP
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | MDP：带延迟约束的多维视觉模型剪枝 |
 | 英文题名 | MDP: Multidimensional Vision Model Pruning with Latency Constraint |
 | 会议/期刊 | CVPR 2025 |
-| Links | [paper](https://arxiv.org/abs/2406.12079); [GitHub](https://github.com/NVlabs/MDP) |
+| Links | [paper](https://arxiv.org/abs/2406.12079) · [GitHub](https://github.com/NVlabs/MDP) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | MDP (Multi-Dimensional Pruning) |
 | Dataset | ImageNet (ResNet50), ImageNet (ResNet50, EagleEye setting), NuScenes (StreamPETR) |
@@ -42,7 +43,7 @@ claims:
 > - ImageNet (ResNet50, EagleEye setting) 上，Top‑1 Accuracy / FPS 为 75.0% / 3052 (Ours-70%)，对比 74.5% / 2597 (HALP-70%)，变化 +0.5% / +455。
 > - NuScenes (StreamPETR) 上，mAP / FPS 为 0.451 / 37.3 (Ours-45%)，对比 0.449 / 31.7 (Dense)，变化 +0.002 / +5.6。
 
-## 概述
+## 概要
 
 现有神经网络剪枝方法主要局限于**通道级剪枝**，难以在高剪枝比（70%–90%）下安全移除整层或整块，导致精度大幅下降。同时，延迟建模仅考虑输出通道变化，忽略输入通道的联动变化，使高剪枝比下的精度‑延迟优化严重偏离真实目标。
 
@@ -54,8 +55,6 @@ claims:
 - **Pascal VOC 检测**（SSD512‑RN50）：MDP 达到 mAP 80.0、FPS 125.4，显著超越密集基线（78.0、68.2 FPS）。
 
 消融实验进一步验证了双线性延迟建模和块分组各自独立地改善了精度‑延迟曲线，二者组合获得最佳表现。
-
-## 背景与动机
 
 深度卷积神经网络在图像分类、目标检测等视觉任务上取得了卓越性能，但其庞大的计算量与存储开销严重制约了在资源受限边缘设备上的实时部署。模型剪枝作为最直接的压缩手段之一，旨在移除冗余参数以降低推理延迟，同时尽可能保持原始精度。
 
@@ -81,7 +80,7 @@ claims:
 
 通过上述设计，MDP 在 ImageNet 分类与 NuScenes 3D 检测等任务上均展现了显著的帕累托前沿提升——在 85% 剪枝比下，ResNet50 的 Top‑1 精度达到 70.0%，FPS 达到 5262，大幅超越 HALP 的 68.6% 与 4101 FPS（Table 1）。
 
-## 核心创新
+## 核心方法与创新机理
 
 MDP 的核心创新在于将传统仅限通道级的剪枝范式重构为**通道‑层‑块联合多维剪枝**，并通过**单次全局优化**替代迭代局部搜索，从而在高剪枝比下实现精度与延迟的帕累托前沿显著提升。这一突破由三个关键 changed slots 共同支撑。
 
@@ -104,8 +103,6 @@ $$\mathbf{C}_l = \begin{bmatrix} T_l(1,1) & \cdots & T_l(1,m_l) \\ \vdots & \ddo
 $$\underset{\pmb{y},\pmb{z}}{\arg\operatorname*{max}} \sum_{l=1}^{L} \boldsymbol{z}_{\beta(l)} \cdot \left(\pmb{y_l}^{\top} \cdot \hat{\pmb{\mathcal{T}}_l}\right) \quad \text{s.t.} \quad \sum_{l=1}^{L} z_{\beta(l)} \cdot \left(\pmb{y}_l \cdot \left(\pmb{y}_{l-1}^{\top} \cdot \mathbf{C}_l\right)\right) \leq \Psi$$
 
 配合 one‑hot 约束 $\pmb{y}_l^{\top} \cdot \mathbf{1} = 1$，使用 Pyomo/MindtPy 的 Outer Approximation 方法一次性求解所有决策变量。实验显示，在单步剪枝设置下，MDP 显著优于 HALP——后者因延迟模型不准确导致性能崩溃（Table 3）。这一范式转变使得 MDP 在 ResNet50 上仅需约 5 秒即可获得全局最优剪枝结构。
-
-## 整体框架
 
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2406_12079/figures/002_Figure_2.jpg]]
 *Figure 2: Paradigm of our proposed method MDP. We start by computing layer importance and constructing latency cost matrices for each layer. We then group layers within the same block and solve an MINLP to optimize pruning decisions at both channel and block levels. Finally, we extract the pruned subnetwork and finetune it*
@@ -142,8 +139,6 @@ $$\pmb{y}_l^{\top} \cdot \mathbf{1} = 1, \forall l \in [1, L]$$
 **第五步：剪枝结构提取与微调。** 根据求解器输出的决策变量，MDP 提取对应的子网络结构——保留 $\mathbf{y}_l$ 指定的通道数，移除 $z_{\beta(l)} = 0$ 的整块——然后在原数据集上微调 $E$ 个 epoch 以恢复精度。微调超参数（学习率、epoch 数等）按经验设定，各数据集的具体配置见 Table 5。
 
 整个 pipeline 的关键优势在于**单次求解的全局性**：与 HALP 等需要多步迭代（最多 30 步）的贪婪式剪枝不同，MDP 在一个统一的优化问题中同时决定所有层的通道数和所有块的去留，从根本上避免了迭代式方法因延迟模型不准确而导致的误差累积和性能崩溃（消融实验中，HALP 在单步设置下性能显著劣化，见 Table 3）。
-
-## 核心模块与公式推导
 
 MDP 将多维剪枝形式化为一个混合整数非线性规划（MINLP），其核心由四个模块串联构成：层重要性计算、延迟矩阵构建、块分组、以及 MINLP 建模与求解。以下逐一展开。
 
@@ -199,7 +194,7 @@ $$\pmb{y}_l^{\top} \cdot \mathbf{1} = 1, \quad \forall l \in [1, L]$$
 
 > **注意**：块分组仅适用于具有残差连接的结构。对于无跳跃连接的网络层，块删除不可行，只能通过通道剪枝将其降至 1 个通道。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -216,14 +211,12 @@ Table 1 汇总了 ResNet50 在 ImageNet 上的分类结果，按相近 FPS 分�
 
 Figure 1 左图展示了 FPS 与 Top‑1 精度的帕累托前沿：MDP 的曲线在所有剪枝比下均位于 HALP 等基线之上，尤其在 85% 极端剪枝比下，MDP 以 2% 的相对精度增益和 28.3% 的 FPS 提升形成绝对支配。
 
-
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2406_12079/figures/001_Figure_1.jpg]]
 *Figure 1: MDP exhibits Pareto dominance across different tasks. In contrast to existing methods: [Left] On Imagenet classification, we achieve a 6.2% relative accuracy gain with a 2.6% FPS speedup, and even greater gains at higher pruning ratio: a 2% relative gain with a substantial 28.3% FPS speedup. [Right] On NuScenes 3D object detection, we observe a 5.6% relative mAP improvement alongside a 1.8% FPS increase*
 
 ### 目标检测结果
 
 **Pascal VOC（SSD512-RN50）**：如 Figure 3 所示，MDP 剪枝后的模型在 mAP 和 FPS 两个维度上均超越密集基线——mAP 从 78.0 提升至 80.0，FPS 从 68.2 跃升至 125.4（提升 83.9%），实现了“精度反超+大幅加速”的双重收益。在 mAP‑FLOPs 帕累托图上也呈现类似优势。
-
 
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2406_12079/figures/006_Figure_3.jpg]]
 *Figure 3: PascalVOC results with SSD512. FPS is measured on NVIDIA TITAN V with batch size of 256. Ours achieve much better mAP-FPS and mAP-FLOPs tradeoffs than the baselines. Table 2: Nuscenes results with StreamPETR. FPS is measured on NVIDIA GeForce RTX 3090 with batch size of 1. Results with similar FPS are grouped. −X% denote the pruning ratio. Ours achieve much better accuracy-FPS tradeoffs than HALP and even surpass performance of dense StreamPETR with much higher FPS*
@@ -250,7 +243,6 @@ Figure 1 右图直观展示了 MDP 在 3D 检测任务上的帕累托支配地�
 
 **跨硬件泛化**（Table 4）：在 Intel CPU Xeon E5 上的推理测试表明，MDP 剪枝模型的加速优势在 CPU 端同样成立，验证了延迟矩阵方法对硬件平台的良好适应性。
 
-
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2406_12079/figures/010_Table_4.jpg]]
 *Table 4: Results on Intel CPU Xeon E5*
 
@@ -273,16 +265,12 @@ Figure 5 展示了 MDP 剪枝后的 ResNet50 架构。高剪枝比下，MDP 不�
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2406_12079/figures/011_Figure.jpg]]
 *Figure: (a) Comparison with smaller networks on ImageNet with pruning ResNet50. Our approach of (b) Results of ours with soft masking on pruning large models across various ratios achieves a ImageNet with ResNet50. Improvement is superior accuracy-speed trade-off compared to existing observed in Top1 at a high FPS level. Topsmaller networks. Top-right is better. right is better*
 
-![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2406_12079/figures/003_Table.jpg]]
-*Table: Additionally, we declare the following entities(all 1-indexed )*
-
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2406_12079/figures/004_Table.jpg]]
 
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2406_12079/figures/012_Table_5.jpg]]
 *Table 5: Training Detail*
 
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 

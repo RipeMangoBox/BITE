@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Iterative_Training_of_Physics_Informed_Neural_Networks_with_Fourier_enhanced_Features.pdf
+project_link: null
+code_link: null
 aliases:
 - IPITPFEF
 - ITPINNFEF
@@ -41,13 +43,13 @@ claims:
 > - Viscous Burgers (nonlinear) 上，Relative L² error 为 0.0024 (IFeF)，对比 0.0049 (End-to-End training)，变化 -0.0025。
 > - Low-frequency benchmarks (Helmholtz, Convection, Reaction) 上，Relative L² error (log10 boxplot) 为 IFeF-PD/IFeF median ~10^{-4} (详见Figure 2)，对比 所有基线方法误差中位数普遍高于10^{-3}，变化 显著降低 1-2 个数量级。
 
-## 概述
+## 概要
 
 标准物理信息神经网络（PINN）在逼近偏微分方程（PDE）解时存在严重的谱偏差（spectral bias）：网络倾向于优先拟合低频成分，导致高频振荡、多尺度等特征的捕捉能力极差，数值精度难以满足要求。针对这一瓶颈，本文提出 **IFeF-PINN**（Iterative training of PINNs with Fourier-enhanced Features），核心思想是将随机傅里叶特征（Random Fourier Features, RFF）映射到隐藏层输出上，生成一个与网络宽度解耦的高维扩展基，并将训练过程分解为**上层特征基生成**与**下层线性回归**的双级联优化。对于线性PDE，下层回归问题自然约化为一个凸二次规划，存在唯一全局最优解（Proposition 1），从而在结构上突破了传统端到端PINN的非凸训练困境。理论分析进一步表明，迭代算法在适当假设下收敛到稳定点（Theorem 1），且RFF扩展基构成的特征空间严格包含原始特征空间（Theorem 2），增强了模型对高频的函数逼近能力。
 
 在实验层面，IFeF-PINN在低频谱基准上相较标准PINN、NTK、PINNsformer等基线方法取得压倒性优势：中位数相对 $L^2$ 误差普遍低至 $10^{-4}$ 量级，比端到端训练降低约两个数量级。更具说服力的高频与多尺度PDE实验中，多数基线方法无法收敛，而IFeF-PINN成功恢复高频解，例如在亥姆霍兹方程（$a_1=a_2=100$）上相对 $L^2$ 误差仅 $0.0156 \pm 0.0055$。消融分析证实，去除RFF基扩展或改为单阶段端到端训练均导致性能严重退化，而增大傅里叶特征数量 $D$ 能直接提升网络的高频表达能力。主要局限包括：非线性PDE下层优化不再保证凸性，性能提升幅度受限；算法对随机特征维度 $D$ 和缩放参数 $\sigma$ 敏感，且内存占用较高，需针对具体问题调优。
 
-## 背景与动机
+
 
 物理信息神经网络（PINN）将偏微分方程（PDE）作为软约束嵌入损失函数，使PDE求解转化为参数优化问题（Section 2.1）。考虑一般线性PDE
 $$
@@ -73,7 +75,9 @@ $$
 
 通过上述机制，IFeF-PINN旨在克服谱偏差，实现高频PDE的高精度求解，并在线性PDE情形下获得可证的全局最优逼近，为PINN在科学计算中的实用化提供重要增强。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 IFeF‑PINN 的核心创新在于将 PINN 的训练解耦为可独立优化的两级结构：上层通过随机傅里叶特征（RFF）映射生成一个与网络宽度解耦的扩展基函数集，下层在该基上求解线性回归系数。这一设计直接针对标准 PINN 的谱偏差瓶颈——多层感知机天然倾向于优先拟合低频分量，导致高频振荡解被严重平滑。通过引入可显式控制频率覆盖的 RFF 基，IFeF‑PINN 将原始网络的隐式谱表示转化为显式频率增强的线性组合，同时利用线性偏微分方程（PDE）的结构将下层问题转化为凸二次规划，从而保证全局最优系数的求解。该机制构成了四个关键 **changed slots**，分别对应特征生成、训练信息流、最优性保证与非线性扩展。
 
@@ -94,7 +98,7 @@ IFeF‑PINN 的核心创新在于将 PINN 的训练解耦为可独立优化的�
 
 综上，IFeF‑PINN 的创新点构成了一个**结构—优化—理论**三位一体的增强框架：RFF 引入显式高频基解决表示缺陷，双级联训练提供优化层次的解耦与凸性保证，理论分析则严格证明了收敛性与表达空间的扩充。这些改变使该方法在多项高频、多尺度 PDE 基准上（Table 2）成为唯一能够收敛并获得高精度的方案，而同类基线多因谱偏差彻底失效（标记为“-”）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0013_ybffyf7LE7_Iterative_Training_of_Physics-Informed_Neural_Ne/figures/001_Figure_1.jpg]]
 *Figure 1: Architecture of IFeF-PINN. The first part (in yellow) generates the nominal basis vectors, which are then extended via $\gamma _ { D }$ generating random Fourier features $\psi _ { D }$ (in green), and a linear combination of the extended basis (in blue) forms the approximated solution $u _ { \omega , \theta }$
@@ -128,7 +132,7 @@ IFeF‑PINN 的架构遵循“名义基生成 → 随机傅里叶特征扩展 �
 
 这种解耦使得隐藏层宽度与扩展基维度 $D$ 独立，允许通过增大 $D$ 灵活提升模型对高频分量的表达能力，而无需增加网络宽度。Table 1 将该框架置于现有方法的全景对比中，突显其在处理高频 PDE 时的理论保证与能力优势。
 
-## 核心模块与公式推导
+
 
 ### 模块架构与因果机制
 
@@ -203,7 +207,9 @@ $$
 - $N_u, N_f$：边界、内部配点数；$\lambda$：损失平衡权重。
 - $Q(\omega), c(\omega)$：下层二次损失的系统矩阵与向量，线性 PDE 下与 $\theta$ 无关，可精确计算。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 实验围绕谱偏差缓解这一核心瓶颈展开验证：标准 PINN 倾向于优先拟合低频分量，导致高频振荡解精度低下。IFeF-PINN 通过在隐藏层输出上施加随机傅里叶特征（RFF）映射 $\psi_D$，将学习解耦为上层基生成与下层凸回归，理论上为线性 PDE 提供全局最优的下层解（Proposition 1）。本节从主结果、消融、高频频谱恢复以及失败模式四个维度考察该机制的有效性。
 
@@ -247,7 +253,9 @@ $$
 
 综上，IFeF-PINN 通过 RFF 基扩展与双级联凸回归，显著缓解了标准 PINN 的谱偏差，在线性 PDE 上获得接近数值方法的精度，并在高频基准上将无法收敛的基线转变为可解问题。其失效主要源于非线性 PDE 的非凸下层、高内存占用以及超参数选择挑战，这些方向仍有待进一步研究。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有方法的关系及优势
 
@@ -282,6 +290,8 @@ IFeF-PINN 的设计在以下方面存在明确边界：
 - **非规则域上的泛化**：针对复杂几何或含异构边界条件的问题，RFF 扩展基是否仍保持有效表达能力，有待进一步研究。
 
 综上，IFeF-PINN 在缓解 PINN 谱偏差方面展现了清晰的机理和有效的实践方案，但其适用边界和限制也为后续改进指明了方向。对于线性 PDE，它提供了目前最优的精度保证；对于非线性情形，该框架提供了一个灵活且可扩展的基线，亟待更深入的优化技术来释放其全部潜力。
+
+
 
 ## 原文 PDF
 

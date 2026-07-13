@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2025
 pdf_ref: paperPDFs/ICLR_2025/Sitcom_Crafter_A_Plot_Driven_Human_Motion_Generation_System_in_3D_Scenes.pdf
+project_link: https://windvchen.github.io/Sitcom-Crafter
+code_link: https://github.com/nkeeline/
 aliases:
 - SCPDHMGS3S
 tags:
@@ -40,7 +42,7 @@ claims:
 > - Replica (11 scenes, 110 plots) 上，HSP (人-场景扰动) / HHP (人-人扰动) HSP 5.7529, HHP 0.1687 vs Baseline HSP 5.5119, HHP 0.1991; InterGen HSP 9.6035, HHP 0.1774; ComMDM HSP 10... (HSP略高于无交互基线但大幅优于其他；HHP最优)。
 > - InterHuman 上，HSP / HHP HSP 1.6950, HHP 0.0742 vs InterGen HSP 6.6408, HHP 0.0989; ComMDM HSP 6.2802, HHP 0.1336; Real HSP 0.0043... (HSP降低70%以上，HHP接近真实数据)。
 
-## 概述
+## 概要
 
 **问题背景** 现有3D场景下的人体运动生成方法各自为政，仅能处理单一运动类型——或为人移动（locomotion）、或为人-场景交互（human-scene interaction）、或为人-人交互（human-human interaction）。缺乏一个统一的多类型运动生成系统。更棘手的是，人-人交互生成方法在设计时并未考虑3D场景约束，导致生成的角色运动频繁与场景物体发生碰撞；同时，不同方法采用各异的身体表示与数据规范，使得系统集成面临严重的兼容性障碍。
 
@@ -50,7 +52,7 @@ claims:
 
 **局限与展望** 当前系统仍存在若干约束：相机姿势需手动设置；人-场景交互类型仅限于坐下、躺下等有限动作；三个生成模块因训练策略和数据集不同，运动过渡仍可察觉；在狭窄空间中物理约束会限制动态交互的丰富性。这些方向为后续研究留下了明确的改进空间。
 
-## 背景与动机
+
 
 ### 研究背景
 
@@ -80,7 +82,9 @@ claims:
 
 通过这些设计，Sitcom-Crafter首次实现了在3D场景中根据长情节上下文统一生成人移动、人-场景交互和人-人交互三类运动，为情景剧等应用场景提供了端到端的运动生成系统。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Sitcom-Crafter 的核心创新并非单一算法突破，而是通过**统一表示、自监督场景注入、改进标准化与分阶段训练**四个相互咬合的 changed slots，解决了多类型人体运动生成（移动、人-场景交互、人-人交互）在3D场景中集成时的**表示不一致**与**物理碰撞**两大瓶颈。
 
@@ -123,7 +127,7 @@ Sitcom-Crafter 采用**三阶段训练策略**（Table 7）：
 
 四个 changed slots 之间存在因果依赖关系：统一标记点表示是系统集成的前提；自监督SDF条件解决了场景感知问题；改进标准化消除了训练偏差；分阶段训练则化解了多目标优化的冲突。这些创新共同使得 Sitcom-Crafter 在 Replica 数据集上达到最优 HHP（0.1687，低于 InterGen 的0.1774和 ComMDM 的0.2712），在 InterHuman 数据集上将 HSP 降低了70%以上（1.6950 vs. InterGen 6.6408）。
 
-## 整体框架
+
 
 Sitcom-Crafter 是一个情节驱动的人体运动生成系统，其核心设计目标是在统一的框架内支持三类人体运动：**人移动**、**人-场景交互**和**人-人交互**。系统由八个模块组成，其中三个负责运动生成，五个负责功能增强，各模块之间通过明确的输入输出流协同工作，最终在给定的3D场景中产出协调的多角色运动序列。
 
@@ -161,7 +165,7 @@ Sitcom-Crafter 是一个情节驱动的人体运动生成系统，其核心设�
 ![[assets/figures/papers/paper_list_l1784_Sitcom_Crafter_A_Plot_Driven_Human_Motion_Generation_System_in_3D_Scenes/figures/034_Figure_26.jpg]]
 *Figure 26: More visual illustrations of the generations of the whole system guided by long plots. The plots are shown at the top, with some key motion words highlighted in green. For better illustration, we include two cameras from different angles. Each row, from left to right, shows screenshots captured at different times, progressing from earlier to more recent frames*
 
-## 核心模块与公式推导
+
 
 ### 系统模块架构
 
@@ -221,8 +225,6 @@ $$\mathbf{\tilde{x}}_{i(IG)} = \{ j_q^p, j_q^v, j^r, c^f \}$$
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l1784_Sitcom_Crafter_A_Plot_Driven_Human_Motion_Generation_System_in_3D_Scenes/figures/003_Figure_3.jpg]]
-*Figure 3: Pipeline for constructing synthetic SDF conditions. Pipeline involves extracting walkable region from data, simulating random objects around this region, and distributing binary SDF points in 3D space. This process approximates a concrete scene, as depicted on the rightmost side*
 
 ![[assets/figures/papers/paper_list_l1784_Sitcom_Crafter_A_Plot_Driven_Human_Motion_Generation_System_in_3D_Scenes/figures/004_Figure_4.jpg]]
 *Figure 4: Illustration of different canonicalization strategies. In this example, character A is initially canonicalized to the global coordinate origin, while character B is positioned relative to character A*
@@ -230,7 +232,9 @@ $$\mathbf{\tilde{x}}_{i(IG)} = \{ j_q^p, j_q^v, j^r, c^f \}$$
 ![[assets/figures/papers/paper_list_l1784_Sitcom_Crafter_A_Plot_Driven_Human_Motion_Generation_System_in_3D_Scenes/figures/009_Figure_7.jpg]]
 *Figure 7: Workflow within Generation Modules. Given the command lists derived from the Plot Comprehension module, each command is sequentially processed by the corresponding generation module based on its type and order. The motion generation of the current module is conditioned on the motion frames generated in the previous step, ensuring seamless chaining of motion segments. Note that the flowchart provides a simplified overview of the logic within the generation modules. For detailed explanations, please refer to the sections dedicated to each system module*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 系统级主结果（Replica 数据集）
 
@@ -296,7 +300,9 @@ Table 8 探索了在 InterHuman 数据之外整合 Inter-X 数据集的效果。
 
 5. **相机依赖手动设置**：系统缺乏自动化的镜头跟随机制，相机姿势仍需手动配置。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 生成模块的基线继承关系
 
@@ -348,6 +354,8 @@ Sitcom-Crafter的设计存在以下明确边界：
 5. **碰撞修正的鲁棒性**：碰撞修正模块在更复杂场景（如多角色或狭窄空间）中的成功率和局限性需要系统评估。
 6. **手部姿态语义对齐**：手部姿态检索模块如何处理指令与Inter-X数据集中无语义相似标注的情况？
 7. **分阶段训练的机制理解**：早期引入物理约束具体如何限制运动学习能力，是否存在更优的训练调度策略？
+
+
 
 ## 原文 PDF
 

@@ -33,7 +33,7 @@ claims:
 | 中文题名 | Scenethesis：面向3D场景生成的语言与视觉Agentic框架 |
 | 英文题名 | Scenethesis: A Language and Vision Agentic Framework for 3D Scene Generation |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=SzhezVoaNB) · [Project](https://research.nvidia.com/labs/dir/scenethesis/) · [arXiv](https://arxiv.org/abs/2507.02861) · [Code](https://github.com/nvidia/warp) |
+| Links | [paper](https://openreview.net/forum?id=SzhezVoaNB) · [Project](https://research.nvidia.com/labs/dir/scenethesis/) · [paper](https://arxiv.org/abs/2507.02861) · [Code](https://github.com/nvidia/warp) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction #topic/generative_models_diffusion |
 | Method | Scenethesis |
 | Dataset | 室内场景文本‑图像对齐（34 prompts, 22 indoor） |
@@ -43,7 +43,7 @@ claims:
 > - 室内场景文本‑图像对齐 上，BLIP↑ 77.17 vs 51.99 (SceneTeller) (+25.18)；VQA↑ 0.8269 vs 0.8052 (LayoutGPT) (+0.0217)。
 > - 室内场景物理合理性 上，Col‑O↓（对象级碰撞率） 0.8% vs 6.1% (Holodeck) (‑5.3%)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有学习型3D场景生成方法（如DiffuScene、LayoutGPT）受限于室内数据集分布，长尾空间关系（上方/内部/后方）欠拟合，且缺乏物理合理性约束；纯LLM布局规划（如Holodeck）虽能产生多样化布局，但因缺少视觉与物理基础，常生成方向上不合理的放置、漂浮或穿模。
 
@@ -59,8 +59,6 @@ claims:
 
 **方法谱系与知识库定位**：Scenethesis区别于两类现有方法——学习型布局生成方法（如**DiffuScene**、**LayoutGPT**、**SceneTeller**）受限于训练数据分布，难以泛化到开放域场景；LLM驱动框架（如**Holodeck** (Yang et al., 2024c)、**LayoutVLM**）缺乏物理感知，产生碰撞与不稳定放置。Scenethesis通过耦合视觉基础模型的空间先验与SDF约束优化，在免训练的前提下系统性地补足了物理合理性短板，同时保留了LLM的开放域多样性优势。与基于图像的组合式方法（如**Digital Cousins**、**MIDI**）相比，Scenethesis从文本直接生成完整场景，不依赖输入图像。
 
-## 背景与动机
-
 从文本描述生成可交互的3D场景，是具身智能、游戏开发与数字孪生等领域的核心需求。理想的场景生成系统需同时满足三个条件：**空间多样性**（能产生开放域、长尾的物体组合与布局）、**物理合理性**（无碰撞、物体稳定支撑、空间关系正确）以及**可交互性**（生成结果可直接用于下游仿真与导航任务）。然而，现有方法在这三个维度上始终处于“跷跷板”状态——任一维度的提升往往以牺牲其他维度为代价。
 
 **学习型方法的分布外困境。** 以DiffuScene、LayoutGPT为代表的扩散模型或自回归布局生成器，从3D‑FRONT等室内数据集学习物体类别共现与空间分布。这类方法在训练分布内的常见布局上表现良好，但受限于数据集的封闭性：3D‑FRONT仅覆盖约6.8K个住宅场景，长尾空间关系（如“物体置于架内”“物体悬挂于另一物体下方”“物体位于另一物体后方”）在数据中极为稀疏，导致模型在这些关系上系统性欠拟合。更根本的是，学习型方法缺乏显式的物理约束——它们输出的是统计意义上的“合理”布局，而非物理上可行的放置方案。当面对训练分布之外的提示（如非住宅场景、非常规物体组合）时，碰撞与不稳定问题急剧恶化。
@@ -71,7 +69,7 @@ claims:
 
 **Scenethesis的核心动机**正是打破这一僵局：将LLM的开放域规划能力与视觉基础模型的紧凑空间先验相耦合，在布局生成回路中嵌入一个由SDF（有符号距离场）驱动的物理感知优化环。该优化环直接操控物体的5自由度姿态，同时施加碰撞避免与稳定性约束，使物理合理性从“事后修补”升级为“内生属性”。配合基于GPT‑5的自检式判断模块进行闭环修复，框架无需任何训练即可在保持开放域多样性的同时，系统性地消除碰撞与不稳定性——这正是当前所有文本到3D场景生成方法未能达成的目标。
 
-## 核心创新
+## 核心方法与创新机理
 
 Scenethesis 的核心创新并非单一算法突破，而是将**语言规划、视觉基础与物理感知优化**耦合为一条无需训练的 agentic 流水线，系统性地解决了现有方法在开放域 3D 场景生成中“多样化布局”与“物理合理性”难以兼得的瓶颈。
 
@@ -97,8 +95,6 @@ Scenethesis 通过三个关键 changed slots 实现了上述耦合，形成一�
 
 Scenethesis 位于文本到 3D 场景生成、LLM 驱动布局规划与物理感知优化的交叉点。与 **Holodeck**（Yang et al., 2024c）等纯 LLM 框架相比，Scenethesis 的关键区别在于引入了视觉基础模型引导的物理约束优化；与 **DiffuScene** 等学习型方法相比，Scenethesis 无需训练即可泛化到室内外开放域场景，且物理合理性指标显著更优（Col‑O 0.8% vs. Holodeck 6.1%，Table 2）。在文本-图像对齐维度，Scenethesis 的 CLIP（30.71）、BLIP（77.17）和 VQA（0.8269）得分均为所有对比方法中最高（Table 1），表明视觉细化模块有效弥补了纯 LLM 规划与视觉现实之间的鸿沟。
 
-## 整体框架
-
 Scenethesis 是一种无需训练的 Agentic 流水线，将 LLM 的语言规划能力与视觉基础模型的空间先验相耦合，通过闭环的物理感知优化生成开放域、物理合理的可交互 3D 场景。整个流水线由四个核心模块串联构成，形成“规划—细化—优化—判断”的闭环回路（Figure 2）。
 
 ![[assets/figures/papers/paper_list_l61_https_openreview_net_forum_id_SzhezVoaNB/figures/002_Figure_2.jpg]]
@@ -122,11 +118,6 @@ Scenethesis 是一种无需训练的 Agentic 流水线，将 LLM 的语言规划
 
 ![[assets/figures/papers/paper_list_l61_https_openreview_net_forum_id_SzhezVoaNB/figures/012_Figure_8.jpg]]
 *Figure 8: Illustration of collision avoidance and stability maintenance. The solid-line circle indicates the 3D object’s current position, while the dotted-line circle marks its anticipated position. The black dot represents the centroid of the target object, the purple dots indicate surface nodes with negative SDF values, and the red point*
-
-![[assets/figures/papers/paper_list_l61_https_openreview_net_forum_id_SzhezVoaNB/figures/025_Figure_18.jpg]]
-*Figure 18: We provide a visual illustration of the generated scenes and their corresponding image guidance. The first column displays the image guidance, while the second and third columns show the generated scenes without and with the environment map, respectively. Note that Scenethesis focuses on layout planning for floor-supported objects. Scenethesis instantiates only the categories specified by the LLM-planned scene graph, rather than every object hinted by the image guidance—since the image generator may hallucinate extras (e.g., tiny props on a coffee table for ‘a living room with reading materials’). If any planned category is missing from the visual refinement outputs, the self-check agent tr...*
-
-## 核心模块与公式推导
 
 Scenethesis 的核心创新在于将 LLM 的语言规划能力与视觉基础模型的空间先验相耦合，并通过 SDF（有符号距离场）约束建立一个端到端的物理感知优化回路。整个流水线由四个关键模块串联而成，如 Figure 2 所示。
 
@@ -190,7 +181,7 @@ $$\mathcal { L } = \lambda _ { p } \mathcal { L } _ { p o s e } + \lambda _ { c 
 ![[assets/figures/papers/paper_list_l61_https_openreview_net_forum_id_SzhezVoaNB/figures/008_Table_3.jpg]]
 *Table 3: Outdoor Scene Qualitative Evaluation*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 文本-图像对齐与空间质量
 
@@ -265,7 +256,7 @@ Scenethesis 生成的场景可作为高质量训练数据。将 5K Scenethesis �
 
 - **多轮重规划开销**：当图像生成器与 LLM 规划不匹配时，需要多轮自检和重新规划，增加了端到端运行时间。
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 核心瓶颈与因果机制
 

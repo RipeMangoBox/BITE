@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Accelerating_Eigenvalue_Dataset_Generation_via_Chebyshev_Subspace_Filter.pdf
+project_link: null
+code_link: null
 aliases:
 - SCSFS
 - AEDGCSF
@@ -41,7 +43,7 @@ claims:
 > - Helmholtz operator, dim=6400, L=200, tol=1e-8 上，平均计算时间 (秒) 为 31.31，对比 151.7 (Eigsh)，变化 4.8× 加速。
 > - Generalized Poisson operator, dim=10000, L=400, tol=1e-12 上，平均计算时间 (秒) 为 158.49，对比 3162.28 (Eigsh)，变化 20× 加速。
 
-## 概述
+## 概要
 
 特征值数据集是大规模偏微分方程（PDE）算子学习与物理仿真中的重要基础数据。传统生成流程对数据集中每个算子的离散矩阵**独立求解特征值问题**，这一步占总体计算开销的 95% 以上。然而，现有数值求解器（Eigsh、LOBPCG、Krylov‑Schur、Jacobi‑Davidson 等）在面对高维、多特征对、高精度的批量求解时难以承受，构成训练数据驱动模型的关键效率瓶颈。
 
@@ -51,7 +53,7 @@ claims:
 
 实验表明，SCSF 在不同类型的 PDE 算子上实现了显著加速。以 Helmholtz 算子为例（矩阵维度 6400，求解 200 个特征对，容差 $10^{-8}$），SCSF 比当前最优的对比方法 ChFSI 快 **3.4 倍**，比广泛使用的传统求解器 Eigsh 快 **4.8 倍**。在广义 Poisson 算子上（维度 10000，求解 400 个特征对），加速比可达 **20 倍**。消融分析揭示了加速的两个来源：排序模块使求解时间减少 1.3–2.8 倍，迭代次数降低 5–50%；切比雪夫子空间滤波的热启动则使 ChFSI 在排序序列上持续受益，且方法在算子分布不连续等挑战场景下仍保持鲁棒性。
 
-## 背景与动机
+
 
 数据驱动的特征值求解器（如 NeurKItt）需要大规模、高精度的特征值数据集作为训练样本。这类数据集的生成流程高度依赖数值线性代数求解器：对每个参数化算子进行离散化后，独立求解矩阵的特征值问题。实验中观察到，这一独立求解步骤占整体计算开销的 95% 以上（Table 1、Figure 1）。当矩阵维度达到数千乃至上万，且需求解数百个特征对时，传统 Krylov 子空间方法（如 Eigsh、LOBPCG、Krylov–Schur）或 Jacobi–Davidson 迭代都因反复构建正交子空间而变得极为昂贵，成为数据生成的瓶颈。
 
@@ -61,7 +63,9 @@ claims:
 
 关键证据表明这一策略有效且鲁棒：在 Helmholtz 算子（dim=6400, L=200）上，SCSF 相对最好的基线 ChFSI 实现 **3.5×** 加速，相对传统求解器 Eigsh 可达 **4.8×**（Table 1）；排序模块单独带来 1.3–2.8× 求解时间缩减，并降低 5–50% 迭代次数（Table 3）；即使在不连续数据集（混合 Helmholtz 与 Poisson 算子）上，SCSF 仍全面优于所有竞争方法（Table 18），验证了框架对算子相似度变化的鲁棒性。这些结果共同表明，利用算子间相似性来重组求解顺序并复用特征空间，是从数值线性代数角度加速特征值数据集生成的高效路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 特征值数据集生成的核心瓶颈在于：对每个算子独立求解大规模特征值问题占据了总计算开销的 95% 以上，传统数值求解器在大维度、高精度要求下难以承受。SCSF 的关键创新是将批量独立求解转变为**由排序引导的串行热启动流程**，通过显式利用同一分布下算子在谱分布和不变子空间上的相似性，将昂贵的迭代收敛过程大幅压缩为廉价的继承与滤波。
 
@@ -78,7 +82,7 @@ claims:
 
 综上，SCSF 的本质贡献并非单一求解器的参数优化，而是通过**排序模块**和**继承式滤波子空间**两处模块化创新，将批量特征值求解的范式从互相独立彻底转变为强相关的谱加速流水线。该加速效果与算子间的相似度直接相关：当数据集内的矩阵完全相同时，求解仅需 2 s（Eigsh 需 151 s）；随着相似度下降，加速比逐渐向 ChFSI 基线靠拢（Table 17），恰恰印证了因果旋钮——**算子的低频谱相似性是加速的根本来源**，而截断 FFT 排序和子空间继承是对这一相似性的高效利用。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0005_rrbCQT7JKX_Accelerating_Eigenvalue_Dataset_Generation_via_C/figures/003_Figure_2.jpg]]
 *Figure 2: Algorithm Flow Diagram: a. Generation of operators to be solved. b. Discretization of operators into matrices. c. Apply SCSF algorithm to sort matrices, obtaining a sequence with strong correlations. d. Other algorithms independently solve eigenvalue problems. d1, d2, d3. SCSF algorithm utilizes Chebyshev subspace iterations to sequentially solve the eigenvalue problems. e. Assembly of eigenvalue pairs into a dataset. f. Amplification of the interval of interest through spectral transformation. g. Replacement of initial subspaces with previously solved invariant subspaces*
@@ -95,7 +99,7 @@ claims:
 
 在多种算子上的实测表明，该框架相对最佳对比方法 ChFSI 可获 3.5 倍加速（Helmholtz，dim=6400，L=200），相对传统求解器 Eigsh 可达 4.8 倍加速。排序模块单独贡献 1.3–2.8 倍加速，使迭代次数降低 5–50%。
 
-## 核心模块与公式推导
+
 
 SCSF 将原本各自独立的特征值求解任务转化为一个顺序相关的加速过程，其核心由两个模块构成：**截断 FFT 排序（Truncated FFT Sorting）** 与**切比雪夫滤波子空间迭代（Chebyshev Filtered Subspace Iteration, ChFSI）**。前者通过频域近似度量算子间的谱相似性并重排求解顺序，后者在排序后的序列上串行求解，利用前一个问题的收敛特征对作为当前问题的高质量初始子空间，再配合切比雪夫滤波放大目标谱区间，从而大幅降低迭代收敛的冗余开销。
 
@@ -148,7 +152,9 @@ $C_m(A)$ 在谱区间内快速增长，区间外保持有界，从而将原问�
 
 整个过程中，滤波操作占总计算时间的 $70\%$ 以上（Table 11），但对 $m$ 的选取不敏感（合理范围内 $m=12\sim 40$ 性能接近），保证开销受控。排序模块提供的强相关初始子空间使迭代次数减少 $5\%\sim 50\%$，总浮点操作降低 $7\%\sim 43\%$（Table 3），构成了 SCSF 整体加速的因果基础。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 总体性能表现
 
@@ -210,7 +216,9 @@ SCSF 的加速效果与数据集的相似度强相关。当所有问题相同时
 
 综上，实验系统的消融与对比证实 SCSF 的加速源于排序与 Chebyshev 滤波的协同：排序创造相似序列，滤波利用继承子空间放大目标谱区间，将大量独立求解开销转化为一次性继承与廉价滤波。该方法在所有测试条件下均保持数值精度不变（Table 15），是一种安全、高效的特征值数据生成加速方案。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 SCSF 直接承接并改造了批量特征值问题中两类本无关联的工作范式——传统独立求解策略与同分布算子间隐含的低频相似性。传统求解器（Eigsh、LOBPCG、Krylov‑Schur、Jacobi‑Davidson）以及切比雪夫滤波子空间迭代 ChFSI 均将每个特征值问题视为完全独立的计算任务：Eigsh 依赖 ARPACK 的 shift‑invert 模式，LOBPCG 利用块预条件共轭梯度，KS 和 JD 分别以谱变换 Krylov 和校正方程构建子空间，而 ChFSI 虽实现了高效的切比雪夫滤波，却仍采用随机初始子空间独立求解。这些方法完全忽略了同一分布下算子谱分布与不变子空间的接近性，致使每次求解都从零开始迭代，成为数据集生成中占比超过 95% 的瓶颈。
 
@@ -245,6 +253,8 @@ SCSF 的工作揭示了算子相似性驱动加速的可行路径，但也暴露
    虽然频域截断提供了误差的渐近衰减界，但对于排序和热启动的联合收敛性的定量分析，尤其是排序扰动如何通过初始子空间传播并影响滤波迭代收敛速率，尚缺乏严格理论支持。
 
 上述方向不仅指向 SCSF 自身的深化，也为"利用算子结构加速科学计算数据生成"这类更一般的问题提供了研究线索。
+
+
 
 ## 原文 PDF
 

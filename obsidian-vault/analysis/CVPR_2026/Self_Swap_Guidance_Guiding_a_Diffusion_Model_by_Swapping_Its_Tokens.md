@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/arxiv_2026/Self_Swap_Guidance_Guiding_a_Diffusion_Model_by_Swapping_Its_Tokens.pdf
+project_link: null
+code_link: https://github.com/VISION-SJTU/SSG
 aliases:
 - SSGS
 - SSGGDMBSIT
@@ -41,7 +43,7 @@ claims:
 > - ImageNet (无条件生成, SD1.5) 上，FID↓ 63.05 vs 74.11 (w/o guidance) (-11.06)。
 > - MS-COCO 2014 (条件生成, SDXL) 上，FID↓ 21.73 vs 45.09 (w/o guidance) (-23.36)。
 
-## 概述
+## 概要
 
 扩散模型已成为视觉生成的主流范式，但现有无条件引导方法——如 **SAG** (Hong et al., ICCV 2023)、**SEG** (Hong, NeurIPS 2024) 和 **PAG** (Ahn et al., ECCV 2024)——普遍采用全局且不加区分的扰动策略（对输入图像或注意力图注入高斯噪声）。这类粗粒度扰动忽视了网络不同层和不同时间步中表征的多样性：扰动过弱则细节提升有限，过强则引入噪声、过饱和与过度简化，导致引导尺度（guidance scale）的有效适用范围狭窄。
 
@@ -49,7 +51,7 @@ claims:
 
 实验表明，SSG 在更宽的引导尺度范围内稳定提升生成保真度。在 SDXL 无条件生成任务上，SSG 将 FID 从 119.04 降至 70.91，IS 从 9.082 提升至 16.44（Table 1）；在条件生成任务上，FID 从 45.09 降至 21.73，CLIP Score 从 0.281 提升至 0.313（Table 3），所有指标均显著优于现有方法。此外，SSG 与 Classifier-Free Guidance (CFG) 兼容，联合使用可进一步改善图像质量与提示对齐。
 
-## 背景与动机
+
 
 扩散模型已成为视觉生成领域的核心范式，其采样过程可被统一描述为从噪声分布逐步去噪的随机微分方程（SDE）。前向过程由 $d x = - \frac { \beta ( t ) } { 2 } x d t + \sqrt { \beta ( t ) } d w$ 定义，反向采样则依赖分数函数 $\nabla_x \log p_t(x)$ 进行迭代去噪。实际应用中，分数网络 $s_\theta(x_t)$ 通过去噪分数匹配目标训练，但受限于模型容量和数据规模，学习到的分数函数在低密度区域往往存在估计偏差，导致生成样本偏离真实数据分布，出现细节模糊、结构失真等问题。
 
@@ -59,7 +61,9 @@ claims:
 
 本文的核心动机正是突破这一瓶颈：**能否设计一种更精细、更可控的弱化机制，在令牌级别引入选择性扰动，从而在更宽的引导尺度范围内稳定提升生成保真度？** 这一思路的直觉在于，扩散模型中间层的令牌潜在表示（token latents）承载了丰富的语义信息，通过选择性地破坏其中语义最不相似的令牌对，可以以最小干预实现有效的模型弱化，避免全局扰动带来的过度退化。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈发现：全局噪声扰动的粒度失配
 
@@ -91,7 +95,7 @@ SSG 的核心洞察在于将扰动的控制粒度从全局下推到**令牌（to
 
 SSG 作为即插即用的推理时方法，无需额外训练或修改模型架构。在条件生成场景下，SSG 与 Classifier-Free Guidance（CFG）完全兼容，可联合使用以在保真度、多样性和提示对齐之间取得更优权衡（Table 7 显示联合使用将 FID 从 31.41 进一步降至 30.82，CLIP Score 升至 0.319）。
 
-## 整体框架
+
 
 Self-Swap Guidance（SSG）是一种推理时即插即用的无条件引导方法，无需额外训练或修改模型架构。其核心思路是：在扩散模型的前向传播中维护两个并行分支——**原始分支**（保持未修改，产生 $\epsilon_{\mathrm{ori}}$）和**退化分支**（施加令牌交换扰动，产生 $\epsilon_{\mathrm{pert}}$），然后通过引导外推公式将两者差值作为校正信号，驱动采样远离低质量区域。
 
@@ -130,7 +134,7 @@ SSG 的关键突破在于将扰动粒度从全局压缩到**令牌级**，并通
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2604_08048/figures/012_Table_5.jpg]]
 *Table 5: Importance of adversarial token swap. Swapping dissimilar tokens achieves the best generation quality overall. Random swap yields slightly worse results and swapping similar tokens perform worst, but they still substantially outperform. Figure 7. Visualising the effect of different token swap policies. Swapping dissimilar tokens further refines local details and global coherence compared to random swap. In contrast, swapping similar tokens leads to poor generation that resembles the vanilla diffusion model’s output*
 
-## 核心模块与公式推导
+
 
 ### 无条件引导的统一外推框架
 
@@ -188,7 +192,9 @@ $$\tilde{\epsilon}_{\mathrm{combined}}(x_t, y) = \epsilon_{\mathrm{cond}}(x_t, y
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2604_08048/figures/011_Figure_6.jpg]]
 *Figure 6: Visualising the effect of using different swap ratio and guidance scale values on generated images*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与设计动机验证
 
@@ -261,7 +267,9 @@ Table 3（MS-COCO 2014）和 Table 4（MS-COCO 2017）展示了 SDXL 条件生�
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2604_08048/figures/014_Table_6.jpg]]
 *Table 6: Ablation on two types of token swap*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 **核心瓶颈与因果杠杆**。现有无条件引导方法——包括 **SAG** (Hong et al., ICCV 2023)、**SEG** (Hong, NeurIPS 2024) 和 **PAG** (Ahn et al., ECCV 2024)——共享一个根本性局限：它们采用全局且不加区分的扰动策略。SAG 在输入图像上添加高斯噪声，SEG 和 PAG 则扰动注意力图。这类全局噪声注入忽视了两个关键的结构性信息：其一，扩散模型中不同网络层在不同时间步上的表示具有高度异质性；其二，同一特征图内部不同空间位置或通道的语义重要性差异显著。其直接后果是：当扰动强度不足时，弱化模型分支与原始分支差异过小，引导信号微弱，细节质量差；当扰动强度增大时，全局扰动破坏过多结构信息，导致生成图像出现噪声、过饱和或过简化等伪影。这从根本上限制了引导尺度的有效范围。
 
@@ -272,6 +280,8 @@ Table 3（MS-COCO 2014）和 Table 4（MS-COCO 2017）展示了 SDXL 条件生�
 **适用边界**。SSG 作为即插即用的推理时方法，无需额外训练或修改模型架构，可直接集成到标准扩散流水线中。当前验证范围覆盖 SD1.5 和 SDXL 在 MS-COCO 2014、MS-COCO 2017 和 ImageNet 上的无条件与条件生成任务。方法对超参数（引导尺度 $\omega$ 和交换比率 $r$）的敏感性较低，在更宽的参数范围内保持稳定性能（Figure 5），这显著优于 SAG、SEG 和 PAG 在高低尺度下的性能退化。然而，SSG 引入的额外计算开销（维护双分支前向传播及令牌相似度计算）的定量分析尚未充分展开。
 
 **开放问题**。以下方向有待进一步探索：(1) SSG 对其他生成任务（如视频生成、3D 生成）的可扩展性尚未验证；(2) 在非 U-Net 架构的扩散模型（如 DiT）上的表现有待检验；(3) 超参数 $\omega$ 和 $r$ 的自适应选择策略尚未提出，当前依赖手动调节；(4) 令牌交换的计算复杂度优化（如近似最近邻搜索）可进一步降低额外开销。
+
+
 
 ## 原文 PDF
 

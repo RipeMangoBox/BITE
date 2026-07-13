@@ -44,7 +44,7 @@ claims:
 > - OCR (Text Rendering) 上，Text Rendering Score 0.67 (SD3.5-M+SOLACE) vs 0.61 (SD3.5-M) (+0.06)。
 > - CLIPScore (DrawBench) 上，CLIPScore 0.288 vs 0.282 (+0.006)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：当前文本到图像（T2I）生成模型的后训练高度依赖外部奖励模型（如 PickScore、HPSv2）或人类偏好标注。这种范式面临两个根本性困难：一是外部监督信号难以随模型能力提升而持续扩展（scalability 瓶颈）；二是优化外部代理指标时容易发生“奖励黑客”（overoptimization），即模型在目标指标上虚高，但真实视觉质量、组合生成能力和文本对齐度反而退化。
 
@@ -60,7 +60,7 @@ claims:
 
 **知识库定位**：SOLACE 属于**自监督奖励后训练**这一新兴范式，区别于依赖 CLIP 评分、美学预测器或人类偏好模型的外部奖励路线（如 DDPO、AlignProp、FlowGRPO）。其技术谱系上承流匹配基础框架与 GRPO 策略优化，下启无需人工标注的可扩展对齐方法。
 
-## 背景与动机
+
 
 文本到图像生成领域近年来取得了显著进展，大规模扩散模型和流匹配模型已能根据自然语言描述合成高质量、多样化的图像。然而，生成结果的组合性（compositionality）、文本渲染准确性（text rendering）以及图文对齐度（text-image alignment）仍然远未达到实用级可靠性——模型常常混淆对象属性、空间关系，或无法正确渲染指定的文字。
 
@@ -87,7 +87,9 @@ SOLACE 的核心直觉简洁而深刻：**一个生成模型对自身产物的�
 
 综上，SOLACE 试图回答一个根本性问题：**能否仅凭模型对自身生成的内在自信，在无需任何外部奖励的前提下，持续改善文本到图像生成的组合性、文本渲染和图文对齐？**
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 1. 问题瓶颈与创新动机
 
@@ -162,7 +164,7 @@ SOLACE 的有效性依赖于若干关键设计选择，这些选择直接关系�
 - **全符号优势的必要性**：去除负优势（仅使用正优势）会降低组合生成、文本渲染和图文对齐性能（Table 9），说明负优势信号对约束策略更新方向至关重要。
 - **聚合奖励优于逐步奖励**：跨时间步平均的聚合奖励提供更稳定的训练信号（Table 11）。
 
-## 整体框架
+
 
 SOLACE 是一种无需外部监督的文本到图像生成后训练框架，其核心思想是将模型对自身输出的**内在自信**转化为强化学习的奖励信号。整个 pipeline 由四个紧密耦合的模块构成，形成“生成—探测—评估—优化”的闭环。
 
@@ -227,7 +229,7 @@ $$\hat{A}_t^i = \frac{R(z_0^i, c) - \operatorname*{mean}(\{R(z_0^i, c)\}_{i=1}^G
 ![[assets/figures/papers/paper_list_l2318_https_arxiv_org_abs_2603_00918/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of SOLACE. Given a text prompt c, we generate G different latents. Without decoding, we re-noise the latents using K noise probes across*
 
-## 核心模块与公式推导
+
 
 ### 3.1 流匹配基础
 
@@ -300,7 +302,9 @@ $$D_{\mathrm{KL}} = \frac{1}{2\sigma_t^2} \left\| \mu_{\theta} - \mu_{\mathrm{re
 ![[assets/figures/papers/paper_list_l2318_https_arxiv_org_abs_2603_00918/figures/012_Figure_7.jpg]]
 *Figure 7: Qualitative results of SOLACE on Wan2.1-1.3B. SOLACE produces videos with improved visual quality and prompt adherence compared to the base model*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -384,7 +388,9 @@ Table 10 对比了不同提示源对 SOLACE 效果的影响。文本密集的 OC
 ![[assets/figures/papers/paper_list_l2318_https_arxiv_org_abs_2603_00918/figures/016_Table_9.jpg]]
 *Table 9: Effect of negative advantages. Removing negative advantages (positive-only variant) degrades compositional generation, text rendering, and text-image alignment, demonstrating that the full signed advantage is important for SOLACE’s effectiveness*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法沿革与基线关系
 
@@ -427,6 +433,8 @@ SOLACE 的有效性建立在以下前提之上：
 3. **自适应超参数选择**：噪声探针数量 K 和时间步子集 ρ 目前依赖人工调参。在不依赖外部奖励的前提下，如何自动选择最优的 K 和 ρ，是方法走向实用化的关键问题。
 
 4. **内在自信的理论基础**：为什么大规模流匹配模型的去噪能力与生成质量正相关？Figure 6 提供了经验证据，但缺乏严格的理论分析。建立内在自信与生成质量之间的形式化联系，将有助于指导更优的奖励设计。
+
+
 
 ## 原文 PDF
 

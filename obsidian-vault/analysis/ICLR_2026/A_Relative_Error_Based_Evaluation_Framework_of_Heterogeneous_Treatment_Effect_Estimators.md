@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/A_Relative_Error_Based_Evaluation_Framework_of_Heterogeneous_Treatment_Effect_Estimators.pdf
+project_link: null
+code_link: null
 aliases:
 - HRREBHEF
 - REBEFHTEE
@@ -41,7 +43,7 @@ claims:
 > - IHDP 上，ε_ATE^in 为 0.090 ± 0.087，对比 0.279 (TARNet)，变化 -0.189。
 > - IHDP 上，√ε_PEHE^out 为 0.670 ± 0.150，对比 0.920 (TARNet)，变化 -0.250。
 
-## 概述
+## 概要
 
 异质性处理效应（HTE）估计的评估是因果推断中的核心挑战。现有基于相对误差的评估方法（Gao, 2025）要求所有 nuisance 参数估计量（倾向得分和结果回归模型）均以快于 $n^{-1/4}$ 的速率一致，这一条件在实践中过于严格——结果回归模型严重依赖模型外推，在治疗组与对照组分布差异大时容易产生偏差。
 
@@ -51,7 +53,7 @@ claims:
 
 **主要实验结果**：在 IHDP 和 Twins 两个基准数据集上，所提方法在 HTE 估计性能（$\sqrt{\epsilon_{\mathrm{PEHE}}}$ 和 $\epsilon_{\mathrm{ATE}}$）上取得最佳或接近最佳的结果。例如在 IHDP 上，样本外 $\sqrt{\epsilon_{\mathrm{PEHE}}}$ 为 $0.670 \pm 0.150$，显著优于 TARNet 的 $0.920 \pm 0.160$。在覆盖率和选择准确率上，该方法均优于 Gao (2025) 的方法，在 IHDP 上实现 0.96 的覆盖率和 0.80 的选择准确率。消融研究验证了约束损失 $\mathcal{L}_{\mathrm{const}}$ 对 HTE 估计精度的关键作用——去除该损失导致性能严重下降（IHDP 上 $\sqrt{\epsilon_{\mathrm{PEHE}}}^{\mathrm{out}}$ 从 0.670 升至 1.576）。
 
-## 背景与动机
+
 
 异质性处理效应（HTE）估计是因果推断的核心任务之一，其目标是在给定协变量 $X$ 的条件下估计个体处理效应 $\tau(x) = \mathbb{E}[Y(1) - Y(0) \mid X=x]$。由于真实 $\tau(x)$ 不可观测，如何评估不同 HTE 估计量的优劣成为一个关键挑战。
 
@@ -61,7 +63,9 @@ claims:
 
 **方法缺口与本文动机**：现有工作（如 Gao, 2025）未能解决结果回归模型误设定带来的鲁棒性问题，且需要样本分割，降低了数据利用效率。本文动机是提出一个更鲁棒的 HTE 评估框架，能够在倾向得分模型正确指定但结果回归模型可能不一致的情况下，仍提供有效的相对误差估计和置信区间。该框架通过三个关键设计实现：基于 Dragonnet 的共享表示架构（三个头部共享 $\Phi(X)$）、加权最小二乘损失 $\mathcal{L}_{\mathrm{wls}}$（权重依赖于倾向得分和候选 HTE 估计量之差）、以及强制倾向得分满足平衡性质的约束损失 $\mathcal{L}_{\mathrm{const}}$。总训练损失为 $\mathcal{L} = \mathcal{L}_{\mathrm{wls}} + \lambda_1 \mathcal{L}_{\mathrm{ce}} + \lambda_2 \mathcal{L}_{\mathrm{const}}$。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于设计了一个**对结果回归模型偏差鲁棒的相对误差估计框架**，从根本上放宽了现有方法（Gao, 2025）对 nuisance 参数一致性的严苛要求。
 
@@ -93,7 +97,7 @@ $$
 
 实验上，该方法在 IHDP 和 Twins 数据集上的 HTE 估计（$\sqrt{\epsilon_{\mathrm{PEHE}}}$ 和 $\epsilon_{\mathrm{ATE}}$）取得最佳或接近最佳性能（Table 1），并在覆盖率和选择准确率上均优于 Gao (2025) 的方法（Table 2, Figure 1, Figure 2）。
 
-## 整体框架
+
 
 该论文提出一个基于相对误差的鲁棒HTE评估框架，其核心创新在于通过精心设计的损失函数和神经网络架构，使得相对误差估计量在结果回归模型有偏时仍保持 $\sqrt{n}$-一致性和渐近正态性，仅需倾向得分模型以快于 $n^{-1/4}$ 的速率一致。
 
@@ -118,7 +122,7 @@ $$
 
 **与现有方法的区别**：与Gao (2025)的方法相比，本框架不需要样本分割（使用全数据集进行估计），且放松了对所有nuisance参数一致性的要求（仅需倾向得分模型一致）。消融实验（Table 5）表明，去除约束损失 $\mathcal{L}_{\text{const}}$ 会导致性能严重下降，而去除交叉熵损失 $\mathcal{L}_{\text{ce}}$ 仅导致适度性能下降，验证了各模块的关键作用。
 
-## 核心模块与公式推导
+
 
 ### 问题设定与评估指标
 
@@ -232,7 +236,9 @@ $$
 | $\check{\delta}$ | 相对误差估计量 |
 | $\tilde{\tau}(x)$ | 聚合HTE估计量 |
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：HTE估计与相对误差推断
 
@@ -286,7 +292,9 @@ $$
 ![[assets/figures/papers/iclr26_0003_gubSyVxWdG_A_Relative_Error-Based_Evaluation_Framework_of_H/figures/007_Table_3.jpg]]
 *Table 3: Running Time under Different Settings*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### Baseline/Follow-Up 关系
 
@@ -316,6 +324,8 @@ $$
 1. 如何开发自适应加权策略，以更好地利用各候选估计量的异质性优势？
 2. 如何纳入“最坏情况性能”视角以提高评估的鲁棒性，可能通过放宽强可忽略性假设（如 Huang et al., 2024 的思路）？
 3. 如何通过研究 ITE 或潜在结果联合分布，提供更全面的 HTE 评估？
+
+
 
 ## 原文 PDF
 

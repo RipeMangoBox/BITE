@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2023
 pdf_ref: paperPDFs/CVPR_2023/Trace_and_Pace_Controllable_Pedestrian_Animation_via_Guided_Trajectory_Diffusion.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/toronto-ai/trace-pace/
 aliases:
 - TP
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | Trace and Pace：基于引导轨迹扩散的可控行人动画 |
 | 英文题名 | Trace and Pace: Controllable Pedestrian Animation via Guided Trajectory Diffusion |
 | 会议/期刊 | CVPR 2023 |
-| Links | [paper](https://arxiv.org/abs/2304.01893); [Project](https://nv-tlabs.github.io/trace-pace); [Project](https://research.nvidia.com/labs/toronto-ai/trace-pace/) |
+| Links | [paper](https://arxiv.org/abs/2304.01893) · [Project](https://nv-tlabs.github.io/trace-pace) · [Project](https://research.nvidia.com/labs/toronto-ai/trace-pace/) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/planning_control |
 | Method | TRACE and PACER |
 | Dataset | ORCA-Maps (合成), nuScenes (真实数据), Flat (Crowd) 地形, 多样地形（障碍物 + 斜坡等） |
@@ -42,7 +43,7 @@ claims:
 > - nuScenes (真实数据) 上，扰动航点误差 (m) 为 TRACE Mixed w=-0.5: 0.802，对比 VAE: 0.962，变化 误差降低约 0.16m。
 > - Flat (Crowd) 地形 上，失败率 / 轨迹跟随误差 为 PACER Agent Aware + Agt Avoid 引导: 0.013 / 0.071，对比 PACER Agent Unaware 无引导: 0.252 / 0.102，变化 失败率降低 94.8%。
 
-## 概述
+## 概要
 
 **问题瓶颈**：数据驱动的行人轨迹模型在测试时难以灵活满足用户自定义控制目标（如航点、避碰、社会分组），而规则方法虽可控却缺乏真实感；同时，物理动画控制器通常针对特定任务重训练，缺乏通用性。
 
@@ -58,7 +59,7 @@ claims:
 
 **局限性**：扩散采样效率较低（单角色 1–3 秒），难以实时；多目标引导权重平衡困难，轨迹可能偏离数据流形；PACER 面对大型障碍物且无绕行路径时表现不佳，低速步态多样性不足。
 
-## 背景与动机
+
 
 行人动画是计算机视觉与图形学交叉领域的核心问题，其目标是在复杂场景中生成真实、可控的行人运动。该问题的上游是轨迹预测与规划，下游是物理仿真与动作合成，两者之间的鸿沟构成了当前方法的主要瓶颈。
 
@@ -94,7 +95,9 @@ TRACE-PACER 系统将轨迹扩散模型（TRACE）与物理动画控制器（PAC
 
 然而，当前框架仍存在明显局限：扩散采样的计算开销较大（单角色 1–3 秒），难以满足实时应用需求；多目标引导时不同损失项的权重 $\alpha$ 难以平衡，过大的总梯度可能导致轨迹偏离数据流形；PACER 在面对大型障碍物且无绕行路径时表现不佳，且低速行走动作缺乏多样性。这些问题为后续研究指明了方向，包括扩散模型的轻量化、引导过程的动态裁剪、以及更丰富的社交行为建模。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作提出 **TRACE**（可控轨迹扩散模型）与 **PACER**（物理动画控制器）构成的闭环行人动画系统，其核心创新在于将轨迹生成建模为条件扩散过程，并通过**测试时重构引导**实现灵活的用户控制，同时与基于物理的底层控制器无缝集成。以下从四个关键维度阐述相对于基线方法的根本性改进。
 
@@ -129,7 +132,7 @@ $$L_{\mathrm{sym}}(\theta) = \| \pi_{\mathrm{PACER}}(h_t, o_t, \beta, \tau_s) - 
 
 上述四个 changed slots 形成了一条清晰的因果链：**局部特征网格**提供精细的空间感知基础，**重构引导**赋予测试时任意目标的可控性，**混合训练与负采样权重**使模型适应分布外控制，而**对称运动损失**确保底层动画的自然度。这些创新共同解决了“数据驱动方法缺乏可控性，规则方法缺乏真实感”的核心瓶颈，使得系统能够在零碰撞率下实现用户指定的航点导航、障碍避碰与人群交互（Table 1, Table 3）。
 
-## 整体框架
+
 
 Trace and Pace 系统由两个核心模块构成闭环流水线：**TRACE**（高层轨迹扩散规划器）与 **PACER**（底层物理动画控制器）。TRACE 以场景历史轨迹和语义地图为条件，通过条件扩散过程生成未来轨迹；生成轨迹随后传递给 PACER，驱动物理模拟人形在三维地形中行走。PACER 的执行结果（当前状态）每隔 2 秒反馈回 TRACE 进行重规划，形成闭环控制（Sec. 3.3）。
 
@@ -150,7 +153,7 @@ Trace and Pace 系统由两个核心模块构成闭环流水线：**TRACE**（�
 ![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2304_01893/figures/003_Figure_3.jpg]]
 *Figure 3: Pipeline: Pedestrian Animation Controller (PACER)*
 
-## 核心模块与公式推导
+
 
 ### 3.1 TRACE 轨迹扩散模型
 
@@ -214,7 +217,9 @@ $$L_{\mathrm{sym}}(\theta) = \| \pi_{\mathrm{PACER}}(h_t, o_t, \beta, \tau_s) - 
 
 系统以 2 秒为周期进行闭环重规划：TRACE 根据当前状态生成新轨迹，PACER 执行并反馈实际状态。轨迹规划时间随场景复杂度变化（Figure 14），单角色约 1–3 秒，是系统实时性的主要瓶颈。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验结果
 
@@ -332,9 +337,10 @@ Table 9 消融了 PACER 的关键设计：
 ![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2304_01893/figures/014_Figure_10.jpg]]
 *Figure 10: During training, 2048 humanoids are simulated in parallel on our synthetic terrain. Figure 11. Synthetic terrains used for training PACER. From left to right: obstacles, discrete terrains, stairs (up), stairs (down), uneven terrains, and slopes*
 
-![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2304_01893/figures/005_Table.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题域与核心瓶颈
 
@@ -387,6 +393,8 @@ TRACE 与 PACER 形成分层闭环系统：TRACE 每 2 秒重新规划未来轨�
 - **复杂人群互动**：如何进一步提升智能体之间的互动建模，以处理复杂人群行为（如分组、排队、避让礼仪）？
 - **实时采样**：是否可以通过知识蒸馏、一致性模型或更轻量架构实现轨迹扩散的实时采样？
 - **跨域迁移**：TRACE 在合成数据（ORCA）和真实数据（nuScenes）上的混合训练策略能否推广到其他传感器模态或文化背景下的行人行为？
+
+
 
 ## 原文 PDF
 

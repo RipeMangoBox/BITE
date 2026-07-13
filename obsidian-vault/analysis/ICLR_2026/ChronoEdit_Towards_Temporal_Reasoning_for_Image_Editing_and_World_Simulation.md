@@ -5,6 +5,7 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/ChronoEdit_Towards_Temporal_Reasoning_for_Image_Editing_and_World_Simulation.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/toronto-ai/chronoedit/
 aliases:
 - ChronoEdit
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | ChronoEdit：面向图像编辑与世界模拟的时间推理 |
 | 英文题名 | ChronoEdit: Towards Temporal Reasoning for Image Editing and World Simulation |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://arxiv.org/abs/2510.04290); [Project](https://research.nvidia.com/labs/toronto-ai/chronoedit); [Project](https://research.nvidia.com/labs/toronto-ai/chronoedit/) |
+| Links | [paper](https://arxiv.org/abs/2510.04290) · [Project](https://research.nvidia.com/labs/toronto-ai/chronoedit) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | ChronoEdit |
 | Dataset | ImgEdit Basic-Edit Suite, PBench-Edit, Inference Speed (H100 GPU) |
@@ -41,7 +42,7 @@ claims:
 > - PBench-Edit 上，Action Fidelity ↑ 为 4.31 (ChronoEdit-14B-Think)，对比 4.01 (ChronoEdit-14B w/o Think)，变化 +0.30。
 > - Inference Speed (H100 GPU) 上，Runtime per image (s) ↓ 为 5.0 (ChronoEdit-14B-Turbo, 8 steps)，对比 35.3 (ChronoEdit-14B, 50 steps)，变化 -85.8%。
 
-## 概述
+## 概要
 
 图像编辑模型在追求视觉逼真度的同时，长期忽视了一个关键维度——**物理一致性**。现有最先进的方法在涉及世界模拟的编辑任务中频繁失败，表现为幻觉出不存在的物体、扭曲场景几何结构或破坏物体间的时空连续性（Figure 2）。这一瓶颈的根本原因在于：纯数据驱动的编辑范式缺乏显式的时序约束机制，无法对编辑过程中物体的运动轨迹和状态变化进行物理上合理的规划。
 
@@ -58,7 +59,7 @@ claims:
 
 **局限与展望**：当前方法聚焦于两帧编辑设置，对长时程交互、多物体精细操作等复杂场景的扩展能力尚未验证；评价体系主要依赖 GPT-4.1 自动评估，缺乏全面的人工主观评价。未来工作可探索将时间推理机制扩展到连续视频生成、动态 3D 世界仿真，以及根据编辑指令复杂度自适应调整推理步数的动态规划策略。
 
-## 背景与动机
+
 
 ### 图像编辑的物理一致性瓶颈
 
@@ -76,7 +77,9 @@ ChronoEdit 的提出正是为了弥合这一鸿沟。其核心动机在于：**�
 
 这一设计的关键洞察在于效率与质量的巧妙平衡：**在推理时，仅在前几个高噪声去噪步骤中使用视频推理令牌进行全局规划，随后丢弃中间帧以大幅降低计算开销。** 实验表明，在总计50步的去噪过程中，仅使用前10步进行时间推理（N_r=10），即可达到与全程推理相当的性能，同时将推理时间从55.5秒降至35.3秒（**Figure 8**）。这种“先规划、后精炼”的策略使得 ChronoEdit 在保证编辑质量与物理一致性的同时，保持了与标准图像编辑相近的效率。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ChronoEdit的核心创新在于将图像编辑任务重新定义为**两帧视频生成问题**，并引入**显式的时间推理阶段**来规划物理上合理的编辑轨迹。这一设计直接针对现有图像编辑模型的根本瓶颈：纯数据驱动的单步映射缺乏时序约束机制，导致在需要保持物体连续性和几何结构的仿真任务中频繁产生幻觉或不期望的变化（Figure 2）。
 
@@ -109,7 +112,7 @@ $$\nabla \mathcal{L}_{\mathrm{DMD}} = - \mathbb{E}_{t} \left( \int \left( s_{\ma
 
 这些创新共同构成了ChronoEdit的方法论核心：通过重新定义任务形式、引入可丢弃的时间推理令牌、以及蒸馏加速，在保持高效推理的前提下，首次为图像编辑模型赋予了显式的物理一致性推理能力。
 
-## 整体框架
+
 
 ChronoEdit 的整体框架围绕一个核心洞察展开：将图像编辑任务重新定义为**两帧视频生成问题**，从而复用预训练视频模型内嵌的时序先验，在输入图像与编辑目标之间建立物理一致的过渡轨迹。图 3 展示了该流水线的完整结构。
 
@@ -153,7 +156,7 @@ $$\nabla \mathcal{L}_{\mathrm{DMD}} = - \mathbb{E}_{t} \left( \int \left( s_{\ma
 ![[assets/figures/papers/paper_list_l42_https_arxiv_org_abs_2510_04290/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of the ChronoEdit pipeline. From right to left, the denoising process begins in the temporal reasoning stage, where the model imagines and denoises a short trajectory of intermediate frames. These intermediate frames act as reasoning tokens, guiding how the edit should unfold in a physically consistent manner. For efficiency, the reasoning tokens are discarded in the subsequent editing frame generation stage, where the target frame is further refined into the final edited image*
 
-## 核心模块与公式推导
+
 
 ### 整流流去噪骨干
 
@@ -193,7 +196,9 @@ $$
 
 其中 $s_{\mathrm{real}}$ 和 $s_{\mathrm{fake}}$ 分别为真实分布与生成分布的评分函数，$f(\mathbf{F}_{\theta}, t)$ 表示学生模型在时间步 $t$ 的一步预测结果。蒸馏后的 ChronoEdit-14B-Turbo 模型推理时间从 30.4 秒降至 5.0 秒，实现 6 倍加速，且编辑质量与原始 50 步模型相当。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 通用图像编辑能力评估
 
@@ -261,7 +266,9 @@ $$
 ![[assets/figures/papers/paper_list_l42_https_arxiv_org_abs_2510_04290/figures/006_Figure_4.jpg]]
 *Figure 4: Comparison with baseline methods. The first two rows show examples from the ImageEdit Basic-Edit Suite (Ye et al., 2025) benchmark, and the last row is from PBench-Edit, where ChronoEdit-Think is evaluated with 10 temporal reasoning steps. In both benchmarks, ChronoEdit achieves edits that more faithfully follow the given instructions while preserving scene structure and fine details*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与因果机制
 
@@ -301,6 +308,8 @@ ChronoEdit 的当前设计适用于以下场景：
 5. **泛化能力未知**：方法对于全新物体类别或真实物理交互（如碰撞、流体、柔性体变形）的泛化能力尚未系统评估。当前工作聚焦于两帧编辑，其在完整视频生成或长时间世界状态预测任务中的扩展能力仍属开放问题。
 
 6. **多步骤编辑的推理复用**：在更复杂的多步骤编辑链或交互式编辑场景中，前一阶段的时间推理令牌能否复用规划信息，以减少后续步骤的计算开销，值得深入研究。
+
+
 
 ## 原文 PDF
 

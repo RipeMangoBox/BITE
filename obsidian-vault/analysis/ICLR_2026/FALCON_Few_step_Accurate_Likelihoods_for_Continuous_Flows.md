@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/FALCON_Few_step_Accurate_Likelihoods_for_Continuous_Flows.pdf
+project_link: null
+code_link: https://github.com/danyalrehman/FALCON
 openreview_forum_id: FbssShlI4N
 aliases:
 - FFSALCF
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | FALCON：连续流的少步精确似然方法 |
 | 英文题名 | FALCON: Few-step Accurate Likelihoods for Continuous Flows |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=FbssShlI4N); [GitHub](https://github.com/danyalrehman/FALCON) |
+| Links | [paper](https://openreview.net/forum?id=FbssShlI4N) · [GitHub](https://github.com/danyalrehman/FALCON) |
 | Topic | #topic/optimization_theory_probabilistic #topic/optimization_theory_probabilistic/optimization_methods |
 | Method | FALCON (Few-step Accurate Likelihoods for Continuous Flows) |
 | Dataset | Tri-alanine (AL3), Alanine tetrapeptide (AL4), Hexa-alanine (AL6) |
@@ -42,7 +44,7 @@ claims:
 > - Alanine tetrapeptide (AL4) 上，ε-W2 (↓) 为 0.686 ± 0.047 (FALCON)，对比 5.638 ± 0.483 (ECNF++)，变化 -4.952。
 > - Hexa-alanine (AL6) 上，ε-W2 (↓) 为 0.892 ± 0.311 (FALCON)，对比 10.668 ± 0.285 (ECNF++)，变化 -9.776。
 
-## 概述
+## 概要
 
 **核心问题**：基于连续归一化流（CNF）的玻尔兹曼生成器在计算似然时，需要数千步精确的ODE积分与雅可比计算，这种极高的计算开销严重限制了其在大规模分子采样中的应用。
 
@@ -53,7 +55,7 @@ claims:
 - 在丙氨酸三肽、四肽、六肽等较大分子系统上，FALCON在能量Wasserstein距离和扭转角Wasserstein距离上显著优于ECNF++等连续流基线（Table 3），例如在六肽上能量Wasserstein距离从10.668降至0.892。
 - FALCON在所有评估指标上均优于当前最先进的离散归一化流玻尔兹曼生成器（SBG），且仅使用其1/250的样本量。
 
-## 背景与动机
+
 
 ### 玻尔兹曼生成器的核心挑战
 
@@ -94,7 +96,9 @@ $$\mathcal{L}_{\mathrm{inv}}(\theta) = \mathbb{E}_{s,t,x_s} \| x_s - X_u(X_u(x_s
 
 强制离散流映射获得数值可逆性，从而使少步似然计算成为可能。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FALCON 的核心创新在于用一套**混合训练范式**替代了传统连续归一化流（CNF）的端到端积分范式，从而在保持精确似然计算能力的同时，将推理所需的函数评估次数从数千步压缩至 4–16 步，实现了两个数量级的速度提升。这一突破可拆解为三个紧密耦合的 changed slots。
 
@@ -123,7 +127,7 @@ $$\mathcal{L}(\theta) = \mathcal{L}_{\mathrm{cfm}}(\theta) + \lambda_{\mathrm{av
 
 相较于离散归一化流基线（如 **SBG** (Tan et al., 2025a) 使用的 TARFlow），FALCON 的关键区别在于**显式保证了离散映射的可逆性**，从而使得似然计算在数学上严格成立，而非依赖重要性采样的渐近性质。这解释了为何即使 SBG 使用 250 倍样本量（$5\times10^6$ vs $2\times10^5$），其在 $\varepsilon$-W2 上的表现仍显著劣于 4 步 FALCON（Fig. 4）。
 
-## 整体框架
+
 
 FALCON 的整体框架围绕一个核心思想构建：**在离散步骤中实现数值可逆的流映射，从而绕过连续归一化流（CNF）数千步的 ODE 积分，以极少的函数评估次数完成精确的似然计算**。
 
@@ -171,7 +175,7 @@ FALCON 处于连续流与离散流方法的交叉点。表 1 从可逆性、回�
 
 **关键洞察**：FALCON 的成功并不依赖于离散映射完美复现原始连续时间流，而仅需保证映射的数值可逆性。这一洞察将问题从"逼近连续流"转化为"保证局部可逆性"，使得少步推理成为可能，同时保持了似然计算的精确性。
 
-## 核心模块与公式推导
+
 
 ### 离散流映射与可逆性条件
 
@@ -239,7 +243,9 @@ $$\log p_s^\theta(x_s) = \int_0^s \mathrm{Tr}\left[ \nabla v_\theta(x_\tau, \tau
 
 FALCON 支持后验调整推理步数，并通过不同的时间步分配策略优化性能。消融实验表明，在 8 步推理设置下，**EDM 调度器**（Karras et al., 2022）在所有评估指标上均显著优于线性、几何、余弦和切比雪夫调度器，这与扩散模型文献中的观察一致。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -307,7 +313,9 @@ Figure 3 展示了 FALCON 生成样本在重要性采样前后的能量直方图
 ![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_FbssShlI4N/figures/003_Table_1.jpg]]
 *Table 1: Related method overview*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法关系图谱
 
@@ -342,6 +350,8 @@ FALCON 的性能增益可追溯至三个相互耦合的设计选择：
 1. **单步生成可行性**：是否可以通过更强的可逆性约束或蒸馏策略实现真正的一步精确似然计算？
 2. **可逆性认证**：如何在不依赖经验验证的情况下，高效地为离散流映射的数值可逆性提供理论保证或运行时检测？
 3. **跨领域迁移**：FALCON 在贝叶斯推断、机器人学等非分子领域的表现如何？其混合训练目标是否需要领域特定的调整？
+
+
 
 ## 原文 PDF
 

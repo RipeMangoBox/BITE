@@ -42,7 +42,7 @@ claims:
 > [!tip] 效果简介
 > - Custom 150 video-text pairs (Internet + DAVIS) 上，Pick Score (%) ↑ 21.82 vs 21.01 (RAVE) (+0.81)；CLIP-T (×10⁻²) ↑ 34.64 vs 33.56 (FLATTEN) (+1.08)；CLIP-F (×10⁻²) ↑ 97.34 vs 95.48 (VideoDirector) (+1.86)。
 
-## 概述
+## 概要
 
 文本到视频编辑任务的核心挑战在于，如何在精准实现语义变换的同时，严格保持原始视频的运动一致性与背景保真度。当前主流的基于反演（inversion-based）的方法存在一个关键瓶颈：反演步骤引入的近似误差会随时间累积，导致外观漂移、运动闪烁和背景失真。FlowDirector 提出了一种**无训练、无反演**的编辑范式，将视频编辑建模为数据空间中的常微分方程（ODE）直接演化，从根本上规避了反演误差的传播。
 
@@ -50,7 +50,7 @@ claims:
 
 在包含 150 个视频-文本对的评测集上，FlowDirector 在文本对齐（CLIP-T）、时序一致性（CLIP-F）、结构保真度（WarpSSIM）和综合编辑质量（Q_edit）等指标上均显著超越 FateZero、FLATTEN、TokenFlow、RAVE 等现有无训练基线。消融实验进一步证实，DA-FC 是语义编辑能力的核心驱动力，MAD-FC 是运动一致性的关键保障，而 DAG 则以高效的多轮推断平均策略提升了编辑稳定性。该方法无需任何训练或微调，在单张 GPU 上即可完成编辑，展现出较强的实用价值。
 
-## 背景与动机
+
 
 文本到视频（T2V）生成模型近年来取得了显著进展，尤其是在基于扩散变换器（DiT）架构的视频生成基座模型（如 **Wan** 和 **CogVideoX**）出现之后，高质量的视频生成已不再遥不可及。然而，相比从零生成，对已有视频进行精准的语义编辑——即根据文本提示修改视频中的特定对象或场景，同时保持背景、结构和运动的一致性——仍然是一个极具挑战性的开放问题。
 
@@ -82,7 +82,9 @@ claims:
 
 FlowDirector 通过三个无训练流校正策略——**方向感知流校正（DA-FC）**、**运动-外观解耦校正（MAD-FC）** 和 **差分平均引导（DAG）**——分别针对上述三个挑战进行精准调控，从而在无训练、无反演的前提下实现高质量的文本到视频编辑。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FlowDirector 的核心创新在于将视频编辑重新定义为**数据空间中的直接 ODE 演化**，彻底绕过了现有方法中普遍存在的 inversion 步骤。这一范式转变解决了视频编辑领域的根本瓶颈：inversion 的近似误差会沿时间轴累积，导致外观保真度下降和运动一致性受损，表现为时序漂移与闪烁。通过直接在原生时空流形上驱动编辑过程，FlowDirector 从根本上消除了这一误差源。
 
@@ -124,7 +126,7 @@ DAG 的效率优势显著：仅需 4 轮迭代推断（约 3 分钟/41 帧）即
 
 **创新总结**：FlowDirector 的四个 changed slots 构成了一个协同的编辑控制系统——DA-FC 负责语义变换的强度与方向，MAD-FC 保障运动一致性，DAG 提升轨迹稳定性，软掩膜实现空间精准控制。这些策略共同使得编辑过程在无需训练、无需 inversion 的条件下，能够精准且稳定地完成语义变换，显著超越现有无训练基线。
 
-## 整体框架
+
 
 FlowDirector 将文本驱动的视频编辑重新建模为**数据空间中的直接 ODE 演化过程**，从根本上规避了传统 inversion-based 方法中反演近似误差带来的外观漂移与时序闪烁问题。其整体 pipeline 由四个核心模块串联构成，形成一条从源视频到编辑结果的端到端无训练推理链路。
 
@@ -171,7 +173,7 @@ $$V_{\mathrm{DAG}} = V_{\mathrm{HQ}} + w \bar{D}$$
 
 上述模块按顺序作用于每个去噪步：编辑流生成模块输出原始 $V_{\mathrm{edit}}$，经 DA-FC 校正并施加软掩膜后得到 $\hat{V}_{\mathrm{edit}}$，再经 MAD-FC 在状态空间中进行运动一致性优化，最后由 DAG 提供稳定的速度引导信号驱动 $Z_t^{\mathrm{edit}}$ 沿 ODE 轨迹演化。整个流程无需任何训练或微调，仅依赖预训练流匹配模型的一次前向推理，在单张 NVIDIA H20/H800 GPU 上即可完成编辑。
 
-## 核心模块与公式推导
+
 
 FlowDirector 将视频编辑建模为数据空间中的直接 ODE 演化，通过三个无训练流校正策略——方向感知流校正（DA-FC）、运动-外观解耦校正（MAD-FC）和差分平均引导（DAG）——精准控制编辑过程。以下按流水线模块逐一展开关键公式与变量含义。
 
@@ -273,7 +275,9 @@ $$V_{\mathrm{DAG}} = V_{\mathrm{HQ}} + w \bar{D}, \quad \bar{D} = V_{\mathrm{HQ}
 ![[assets/figures/papers/paper_list_l2311_https_arxiv_org_abs_2506_05046/figures/008_Table_2.jpg]]
 *Table 2: Ablation results for Direction-Aware Flow Correction (DA-FC), Motion-Appearance Decoupling Correction(MAD-FC) and Differential Averaging Guidance (DAG). We highlight the best values for each metric*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要定量结果
 
@@ -339,7 +343,9 @@ FlowDirector 在包含 150 个视频-文本对（来自 Internet 与 DAVIS 数�
 ![[assets/figures/papers/paper_list_l2311_https_arxiv_org_abs_2506_05046/figures/016_Figure_12.jpg]]
 *Figure 12: Qualitative comparison between the editing results of a multi-round inference averaging strategy and using a DAG. The Sample Average strategy is set to use a regular averaging strategy for 20 rounds of iterative inference at every denoising step to obtain the editing flow. The DAG setting uses 4 rounds of iterative inference to obtain a high-quality estimate and perform reinforcement-guided generation of the editing flow. Best viewed zoomed in*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有方法的谱系关系
 
@@ -411,6 +417,8 @@ FlowDirector 的编辑质量上限受限于底层 T2V 模型的能力。当基�
 
 **与其他生成范式的融合**  
 FlowDirector 的 ODE 编辑框架是否可以与扩散模型的随机微分方程（SDE）采样、或与一致性模型等快速生成范式结合？这有望在保持编辑质量的同时进一步降低计算成本。
+
+
 
 ## 原文 PDF
 

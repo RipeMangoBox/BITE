@@ -5,6 +5,8 @@ paper_level: A
 venue: ECCV
 year: 2024
 pdf_ref: paperPDFs/ECCV_2024/FreeMotion_A_Unified_Framework_for_Number_free_Text_to_Motion_Synthesis.pdf
+project_link: https://VankouF.github.io/FreeMotion
+code_link: null
 aliases:
 - FreeMotion
 tags:
@@ -39,7 +41,7 @@ claims:
 > - InterHuman test set (re-annotated single-person text) 上，FID 12.975±.171 vs 23.415±.220 (InterGen*) (-10.440 (lower is better))。
 > - InterHuman test set (two-person motion) 上，FID 6.740±.130 vs InterGen* (value not explicitly given, but claimed outperformed) (—)。
 
-## 概述
+## 概要
 
 ### 1. 问题与瓶颈
 
@@ -61,7 +63,7 @@ $$p(\mathbf{x}^{1},...,\mathbf{x}^{n}) = p(\mathbf{x}^{1}) \prod_{i=1}^{n-1} p(\
 
 在 InterHuman 测试集上，FreeMotion 在双人运动生成任务中取得了 **FID 6.740** 和 **R Precision Top1 0.326**，优于所有基线方法。在单人运动生成上，FreeMotion 的 FID 达到 **12.975**，相比为支持单人生成而修改的 InterGen*（FID 23.415）有显著提升。消融实验表明，去除交互模块后双人 FID 从 6.740 升至 10.749，验证了解耦设计的有效性；全局自注意力交互块使模型能够支持三人及以上的运动生成。定性结果进一步展示了 FreeMotion 在复杂文本理解、交互协调性以及可控空间轨迹方面的优势。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -85,7 +87,9 @@ $$p(\mathbf{x}^{1},...,\mathbf{x}^{n}) = p(\mathbf{x}^{1}) \prod_{i=1}^{n-1} p(\
 
 这一分解将多人运动生成转化为递归的条件单人生成过程——先生成第一人的运动，再以前面所有人的运动为条件生成下一人的运动，如此递归直至完成。基于这一洞察，FreeMotion旨在设计一个**人数无关的统一框架**，通过解耦的生成模块与交互模块，使得模型仅在双人数据上训练即可推理任意人数的运动，并支持灵活的空间控制。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FreeMotion 的核心创新在于将**人数无关的运动生成**问题转化为一个**递归的条件单人运动生成**过程。与现有方法直接对固定人数的联合运动分布建模不同，FreeMotion 通过以下三个关键设计实现突破：
 
@@ -143,7 +147,7 @@ $$\mathbf{x}_t = \mathbf{x}_t - \eta \nabla_{\mathbf{x}_t} \mathbf{d}$$
 
 这些设计共同使得 FreeMotion 成为首个在文本条件下实现高保真、人数无关的运动生成框架。
 
-## 整体框架
+
 
 FreeMotion 的核心设计思路是将多人运动联合生成问题转化为**递归的条件单人运动生成**。其数学基础是联合分布的条件概率分解：
 
@@ -195,7 +199,7 @@ $$\mathbf{x}_t = \mathbf{x}_t - \eta \nabla_{\mathbf{x}_t} \mathbf{d}$$
 ![[assets/figures/papers/paper_list_l1874_FreeMotion_A_Unified_Framework_for_Number_free_Text_to_Motion_Synthesis/figures/002_Figure_2.jpg]]
 *Figure 2: Overall architecture of FreeMotion, which contains a generation module and an interaction module. Given a text d, our framework can infer a motion*
 
-## 核心模块与公式推导
+
 
 ### 问题形式化：从联合分布到条件分解
 
@@ -269,7 +273,9 @@ $$\mathcal{L}_2 = \mathcal{L}_{rec} + \lambda_1 \mathcal{L}_{foot} + \lambda_2 \
 
 $\mathcal{L}_{dm}$ 用于显式建模不同人物关节之间的空间距离关系，是交互建模的关键监督信号。消融实验（Table 3）证实：两阶段设计对 FreeMotion 至关重要——同时引入交互描述（InterDes）对 FreeMotion 有益（FID 下降），但对单独使用生成模块（GM）反而有害（FID 上升），说明交互模块有效吸收了交互信息，而生成模块专注于单人运动质量。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -330,7 +336,9 @@ FreeMotion集成了显式与隐式空间控制模块。显式引导通过L2距�
 ![[assets/figures/papers/paper_list_l1874_FreeMotion_A_Unified_Framework_for_Number_free_Text_to_Motion_Synthesis/figures/008_Figure_5.jpg]]
 *Figure 5: Results of multi-person spatial control. We manually design some text prompts as well as the trajectories and leverage the integrated spatial control module to generate the results*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 **核心瓶颈与范式转换**。现有文本驱动运动生成方法均针对固定人数设计：**MDM**（Tevet et al., arXiv 2022）和**MLD**（Chen et al., CVPR 2023）仅支持单人，**InterGen**（Liang et al., arXiv 2023）仅支持双人。这种硬编码的人数限制使得模型无法扩展到任意人数场景，且空间控制机制难以从单人迁移到多人。FreeMotion 通过一个关键的因果杠杆——将多人运动联合分布分解为条件分布乘积：
 $$p(\mathbf{x}^{1},...,\mathbf{x}^{n}) = p(\mathbf{x}^{1}) \prod_{i=1}^{n-1} p(\mathbf{x}^{i+1}|\mathbf{x}^{i},...,\mathbf{x}^{1})$$
@@ -358,6 +366,8 @@ $$p(\mathbf{x}^{1},...,\mathbf{x}^{n}) = p(\mathbf{x}^{1}) \prod_{i=1}^{n-1} p(\
 2. 如何抑制多人运动生成中的穿透问题？物理模拟器辅助训练或基于穿透的显式惩罚项可能是有效手段。
 3. 能否通过合成数据或物理模拟增强多人交互理解，使模型在仅双人标注数据的情况下更好地泛化到复杂多人场景？
 4. 递归生成范式下的错误累积问题如何缓解？引入双向生成（前后向条件）或全局一致性约束可能是解决方向。
+
+
 
 ## 原文 PDF
 

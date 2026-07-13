@@ -5,6 +5,8 @@ paper_level: A
 venue: ICCV
 year: 2023
 pdf_ref: paperPDFs/ICCV_2023/Multimodal_Motion_Conditioned_Diffusion_Model_for_Skeleton_based_Video_Anomaly_Detection.pdf
+project_link: null
+code_link: https://github.com/aleflabo/MoCoDAD
 aliases:
 - MMCDMSBVAD
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | 基于骨骼的视频异常检测的多模态运动条件扩散模型 |
 | 英文题名 | Multimodal Motion Conditioned Diffusion Model for Skeleton-based Video Anomaly Detection |
 | 会议/期刊 | ICCV 2023 |
-| Links | [paper](https://arxiv.org/abs/2307.07205); [GitHub](https://github.com/aleflabo/MoCoDAD) |
+| Links | [paper](https://arxiv.org/abs/2307.07205) · [GitHub](https://github.com/aleflabo/MoCoDAD) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | MoCoDAD |
 | Dataset | UBnormal, HR-UBnormal, HR-STC, HR-Avenue |
@@ -40,7 +42,7 @@ claims:
 > - HR-UBnormal 上，AUC-ROC 为 68.4，对比 65.5 (COSKAD)，变化 +2.9。
 > - HR-STC 上，AUC-ROC 为 77.6，对比 77.1 (COSKAD)，变化 +0.5。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -78,7 +80,7 @@ MoCoDAD属于**基于重建的OCC方法**，在方法谱系中占据独特位置
 
 关键消融发现：移除过去动作条件后AUC降至54.1（接近随机水平），验证了运动条件化对检测的必要性；采用最小聚合且生成数量m>50时性能趋于饱和；多样性指标rF完全无法区分正常与异常（性能低于随机水平），进一步证实异常检测的核心在于贴近度而非多样性本身。
 
-## 背景与动机
+
 
 基于骨骼的视频异常检测（Skeleton-based VAD）旨在仅利用人体关节点坐标序列识别偏离正常模式的行为，因其对光照、背景变化的鲁棒性及隐私保护优势而受到广泛关注。该任务的主流范式是单分类（One-Class Classification, OCC）学习：仅使用正常样本训练模型，在推理时将偏离正常分布的样本判定为异常。
 
@@ -94,7 +96,9 @@ MoCoDAD属于**基于重建的OCC方法**，在方法谱系中占据独特位置
 
 扩散模型（Diffusion Probabilistic Models）在图像和运动生成领域已展现出强大的多模态分布建模能力，但在视频异常检测领域尚未被探索。MoCoDAD 首次将扩散模型引入骨架 VAD，通过在过去运动条件下生成多样化的未来运动候选，并取最小重建误差作为异常分数，有效缓解了正常行为多模态性导致的误检问题。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MoCoDAD 的核心创新在于将**条件扩散概率模型**引入基于骨骼的视频异常检测（VAD），从根本上改变了传统单分类（OCC）方法对正常行为的建模方式。其关键设计体现在以下三个“changed slots”上。
 
@@ -126,7 +130,7 @@ AE-embedding 在 UBnormal 和 HR-UBnormal 上分别取得 68.3 和 68.4 AUC，�
 - **扩散在原始关节空间**优于潜在空间（AUC 68.3 vs 54.4，Table 5），说明骨骼运动的精细空间结构在潜在压缩中丢失，直接建模关节位移对异常判别更为关键；
 - **预测（Forecasting）代理任务**优于随机插补和中间帧插补（Table 4），验证了“过去→未来”的因果条件方向最有利于暴露异常。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l42_Multimodal_Motion_Conditioned_Diffusion_Model_for_Skeleton_based_Video_A/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the proposed MoCoDAD. A sequence of N skeletal motions ( N = 6 in the example) is split into past (top-right X ^ { 1 : k } frames, k = 3 in the example) and future (top-left X ^ { k + 1 : N } frames). During training, the Forward Diffusion block adds noise to the future frames, shifting each joint by a random vector displacement of varying intensity (increasing with the diffusion timestep t). Then the Reverse Diffusion learns to estimate the noise. A key aspect of MoCoDAD is the conditioning, i.e. how to encode the past clean k frames and guide the synthesis of relevant futures*
@@ -156,7 +160,7 @@ MoCoDAD 的核心设计是将视频异常检测重新表述为一个**条件式�
 - **代理任务选择**：采用**预测未来帧**（Forecasting）作为生成目标，显著优于随机帧插补和中间帧插补（Table 4），表明“从过去推断未来”的因果结构对异常检测至关重要。
 - **扩散空间**：在**原始关节点空间**进行扩散操作，效果远优于在 VAE 潜在空间中扩散（AUC 68.3 vs. 54.4，Table 5）。潜在空间扩散在此任务中的失效原因仍是一个开放问题，可能与骨骼运动的低维流形特性及潜在变量建模的信息损失有关。
 
-## 核心模块与公式推导
+
 
 MoCoDAD 的核心由四个模块构成：**前向扩散过程**、**条件自编码器**、**U-Net 去噪网络** 和 **多模态统计聚合**。以下逐一阐述其机理与关键公式。
 
@@ -214,7 +218,9 @@ $$\mathrm{AS}[f_1:f_N] = \operatorname{mean}(S) + \log\frac{1 + \max(S)}{1 + \mi
 - **扩散空间**：原始关节点空间（AUC 68.3）远优于 VAE 潜在空间（AUC 54.4），后者几乎退化为随机水平（Table 5），提示骨骼运动的低维潜在建模在此任务中失效。
 - **多样性指标失效**：尽管异常生成理论上可能更离散，但多样性比率 $rF$ 作为异常分数时性能低于随机水平（Figure 6），原因是正常与异常条件均产生多模态生成，仅凭生成多样性无法区分。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与设计动机
 
@@ -342,7 +348,9 @@ MoCoDAD 的扩散框架通过迭代去噪生成高质量多样本，配合最小
 *Table 8: Comparison of MoCoDAD against SoA in terms of AUC-ROC on the validation set of UBnormal. OCC skeleton-based techniques (∗) are directly comparable to MoCoDAD. Supervised (†) and weakly supervised (‡) methods are also reported, grayed-out since they leverage extra annotations*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 骨架视频异常检测的方法谱系
 
@@ -384,6 +392,8 @@ MoCoDAD 在 UBnormal 基准上与监督/弱监督方法的比较（Table 2）展
 - 为何多样性指标 rF 完全无法区分正常与异常生成？是否存在其他能捕捉“生成偏离真实”这一信号的统计量？
 - 该方法对低质量骨架输入的鲁棒性如何？能否与骨架估计器联合优化或引入不确定性建模？
 - 条件扩散框架能否扩展到多模态输入（RGB + 骨架）或多演员交互场景？当前帧级聚合策略（Eq. 10）在多演员场景中的扩展性有待验证。
+
+
 
 ## 原文 PDF
 

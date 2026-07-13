@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Automatic_Image_Level_Morphological_Trait_Annotation_for_Organismal_Images.pdf
+project_link: https://osu-nlp-group.github.io/sae-trait-annotation/
+code_link: null
 aliases:
 - SGTAPMS
 - AILMTAOI
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | 生物图像自动图像级形态性状标注 |
 | 英文题名 | Automatic Image-Level Morphological Trait Annotation for Organismal Images |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=oFRbiaib5Q); [Project](https://osu-nlp-group.github.io/sae-trait-annotation/) |
+| Links | [paper](https://openreview.net/forum?id=oFRbiaib5Q) · [Project](https://osu-nlp-group.github.io/sae-trait-annotation/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | SAE-guided trait annotation pipeline (MLLM + SAE) |
 | Dataset | BIOSCAN-5M (昆虫图像), 人类评估（5分制）, Insects (Ullah et al., 2022) |
@@ -40,11 +42,11 @@ claims:
 > - 人类评估（5分制） 上，平均评分 (多图像) 为 3.91 (MLLM+SAE)，对比 3.15 (MLLM-only)，变化 +0.76。
 > - 人类评估（5分制） 上，平均评分 (单图像) 为 3.84 (MLLM+SAE)，对比 3.00 (MLLM-only)，变化 +0.84。
 
-## 概述
+## 概要
 
 本文提出了一种自动化的图像级形态性状标注流水线，旨在解决大规模生态学研究中高质量性状数据集极度匮乏的瓶颈问题。该方法利用稀疏自编码器（Sparse Autoencoder, SAE）从预训练基础模型（DINOv2）的特征中分解出单语义、空间可定位的潜在单元，并通过物种对比排序筛选出具有物种判别力的性状相关区域，最终由多模态大语言模型（MLLM）生成可解释的形态性状描述。在BIOSCAN-5M昆虫图像数据集上，该方法使用最佳配置标注了19K张图像，获得80K条形态性状描述（平均每张图像4.2条），构建了BIOSCAN-TRAITS数据集。人类评估表明，SAE引导的MLLM（多图像设置）平均评分为3.91（5分制），显著高于仅使用MLLM的3.15。此外，在BIOSCAN-TRAITS上微调BioCLIP后，在Insects基准上的零样本物种分类准确率从34.8%提升至39.9%。
 
-## 背景与动机
+
 
 形态性状（morphological traits）是生态学和进化生物学研究的核心数据，能够预测物种与环境之间的相互作用（Díaz et al., 2016; Kennedy et al., 2020; McGill et al., 2006）。研究表明，形态性状预测生态位的准确率可达85%（Pigot et al., 2020）。然而，传统性状提取依赖领域专家的手工劳动，测量简单特征就需要数分钟/标本（Hardisty et al., 2022），而全球自然历史博物馆收藏的超过30亿标本（Nelson & Ellis, 2019）使得人工标注几乎不可行。此外，人工标注还存在观察者主观性和系统偏差问题（Heberling, 2022）。
 
@@ -52,7 +54,9 @@ claims:
 
 本文的核心洞察在于：稀疏自编码器在无监督条件下从基础模型特征中分解出单语义的潜在单元，这些单元的空间激活图能精确定位有意义的形态部位；结合物种对比排序和多图像一致性约束，可自动生成高质量、可解释的性状描述，从而将大规模物种标注的图像库转化为丰富的性状数据集。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新可概括为以下三点：
 
@@ -62,7 +66,7 @@ claims:
 
 3. **端到端自动标注流水线**：该方法仅需图像及其物种标签——这种监督信息在iNaturalist（Horn et al., 2018）、TreeOfLife（Stevens et al., 2024）、Caltech-UCSD Birds-200-2011（Wah et al., 2011）等数据集中广泛可用——即可自动生成大规模、高质量的性状描述数据集。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_oFRbiaib5Q_Automatic_Image/figures/001_Figure_1.jpg]]
 *Figure 1: Given an input specimen image, we first compute dense visual representations using an off-the-shelf backbone (e.g., DINOv2). These features are passed through a pre-trained sparse autoencoder (SAE), which identifies high-activation latent units corresponding to semantically meaningful regions (Algorithm 1). We extract the spatial masks associated with these activations and overlay them on the original image to localize trait-relevant boxes. Finally, a multimodal language model (MLLM) is prompted with the annotated image to generate fine-grained morphological trait descriptions. This results in a large-scale, automatically labeled image-level trait dataset.*
@@ -75,7 +79,7 @@ claims:
 
 **步骤三：MLLM性状描述生成**。将定位后的图像区域输入多模态大语言模型（Qwen2.5-VL-72B），使用轻量级提示模板生成细粒度的形态性状描述。通过提供同一物种的多张图像，鼓励模型关注跨图像一致的共享形态特征。
 
-## 核心模块与公式推导
+
 
 ### 5.1 稀疏自编码器（SAE）
 
@@ -108,7 +112,9 @@ $$\mathcal{T}(\phi) = \|z - \tilde{z}\|_2^2 + \alpha \mathcal{R}(g(z))$$
 
 对SAE单元按物种对比分数排序，该分数优先考虑对目标物种强激活但对近缘物种弱激活的单元。高分的掩码被裁剪为紧凑的边界框，然后输入MLLM生成性状描述。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 6.1 数据集与实验设置
 
@@ -187,7 +193,9 @@ SAE+多图像MLLM的平均人类评分为3.91，显著高于仅用MLLM的3.15（
 *Table 4: Runtime and throughput of the proposed pipeline, measured on two NVIDIA H100 80GB GPUs. Times are averaged over the BIOSCAN-TRAITS workload.*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 本文方法位于以下研究交叉点：
 
@@ -198,6 +206,8 @@ SAE+多图像MLLM的平均人类评分为3.91，显著高于仅用MLLM的3.15（
 **自动性状提取**：传统方法依赖手工特征或深度学习分割（Hoyal Cuthill et al., 2019; Ariouat et al., 2025），但缺乏可解释性和可扩展性。本文提出的SAE+MLLM流水线实现了从“黑箱特征”到“可解释性状描述”的端到端自动转换。
 
 **知识库定位**：BIOSCAN-TRAITS数据集填补了大规模、高质量、带性状标注的生物图像数据集的空白。该数据集可直接用于生态学中的功能性状分析、物种分类模型训练、以及生物多样性监测等下游任务。
+
+
 
 ## 原文 PDF
 

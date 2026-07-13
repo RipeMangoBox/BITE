@@ -43,7 +43,7 @@ claims:
 > - LLFF 上，NLL↓ 0.6765 vs 9.7273 (DANE) (-9.0508)。
 > - RobustNeRF 上，PSNR↑ 26.2292 vs 26.1953 (Ensembles) (+0.0339)。
 
-## 概述
+## 概要
 
 三维场景重建的核心挑战之一，不仅在于渲染出高保真的图像，更在于让模型“知道自己的无知”：哪些区域的误差源于观测数据本身的噪声（偶然不确定性），哪些区域则是模型因训练视角不足而缺乏知识（认知不确定性）。现有神经辐射场（NeRF）的不确定性量化方法——从蒙特卡洛Dropout、深度集成到闭式似然模型——普遍存在一个根本性瓶颈：**难以在单次前向传播中同时分离两类不确定性，且常以牺牲渲染质量或大幅增加计算开销为代价**。例如，朴素集成方法需训练多个独立模型，推理速度显著下降；而基于正态分布的似然模型仅能捕获偶然不确定性，对认知不确定性无能为力。
 
@@ -57,8 +57,6 @@ claims:
 
 该工作仍存在若干局限：当前框架仅对辐射度进行不确定性建模，尚未捕获场景几何（深度、密度）的不确定性；推导依赖沿射线点颜色独立的假设；正则化系数需针对不同场景手动调节。这些开放问题指向了未来将证据框架拓展至3D高斯泼溅、显式建模点间依赖关系、以及纳入几何不确定性的研究方向。
 
-## 背景与动机
-
 神经辐射场（NeRF）已成为三维场景重建与新颖视图合成的核心范式。其基本流水线为：从相机射线采样空间点，由神经网络预测点的颜色与密度，再通过体积渲染合成像素颜色。然而，标准NeRF仅输出确定性预测，无法提供预测的可信度度量。在现实应用中——如机器人导航、自动驾驶和医疗影像——缺乏不确定性估计可能导致模型在未知或高噪声区域做出过度自信的错误预测，带来严重安全风险。
 
 不确定性通常被分解为两类：**偶然不确定性**（aleatoric uncertainty）源于数据本身的固有噪声（如光照变化、瞬态遮挡物、镜面反射），即使增加数据也无法消除；**认知不确定性**（epistemic uncertainty）则反映模型知识的不足（如训练视角未覆盖的区域），理论上可通过增加训练数据来降低。有效分离并量化这两类不确定性，对于下游任务（如主动学习、分布外检测、场景清洁）具有关键价值。
@@ -67,7 +65,7 @@ claims:
 
 Evidential NeRF的提出正是为了填补这一空白。其核心动机是：将证据深度学习（evidential deep learning）的思想引入NeRF的概率建模框架，使网络能够在一个前向传播中直接输出两类不确定性，而无需采样、集成或额外的证据回归头。这一设计旨在实现三个目标：（1）保持与基础NeRF相当的计算效率；（2）提供可解释的、分离的偶然与认知不确定性图；（3）不牺牲场景重建的保真度。
 
-## 核心创新
+## 核心方法与创新机理
 
 Evidential NeRF 的核心创新在于将证据深度学习范式无缝嵌入神经辐射场的体积渲染管线，构建了一个能够**同时且高效地分离偶然不确定性（aleatoric uncertainty, AU）与认知不确定性（epistemic uncertainty, EU）** 的概率框架。与现有方法相比，其关键突破体现在以下三个维度的结构性改变上。
 
@@ -102,8 +100,6 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{nll}} + \lambda_{\mathrm{reg}} \mathcal{L}_
 | **计算开销** | 基准水平 | 推理速度仅比最快方法慢0.04 FPS，显著优于集成方法 |
 
 这些创新使得Evidential NeRF在保持计算效率与渲染质量的同时，首次实现了对NeRF场景重建中两类不确定性的精确、高效分离，为后续的不确定性感知应用（如主动学习、场景清洁）提供了统一的概率基础。
-
-## 整体框架
 
 Evidential NeRF 构建了一个三级概率化范式，将证据学习无缝嵌入神经辐射场的体积渲染管线。其核心流程可概括为四个串联模块：**点级证据预测 → 点-像素不确定性传播 → 像素级 NIG 参数重构 → Student-t 边际似然训练**。
 
@@ -155,8 +151,6 @@ $$c \sim t\left( \gamma, \frac{\beta (\nu+1)}{\alpha \nu}, 2\alpha \right)$$
 ### 输入输出流总结
 
 整个管线以相机射线上的采样点 $(\mathbf{x}_i, \mathbf{d})$ 为输入，经单次前向传播输出像素颜色 $\bar{c}$、偶然不确定性 $U^{\mathrm{alea}}$ 和认知不确定性 $U^{\mathrm{epis}}$。与集成方法（需多次推理）相比，Evidential NeRF 的推理速度仅比最快方法慢 0.04 FPS（4.67 vs 4.71），同时显著优于所有集成基线（Table 2）。
-
-## 核心模块与公式推导
 
 ### 概率化层次演进
 
@@ -234,7 +228,7 @@ $$\mathcal{L} = -\log p(c^{\mathrm{gt}} \mid \gamma, \nu, \alpha, \beta) + \lamb
 
 正则项 $|c^{\mathrm{gt}} - \gamma| (2\nu + \alpha)$ 的核心作用：当预测误差较大时，惩罚项增大，迫使模型降低虚拟观测数 $(2\nu + \alpha)$，从而抑制错误预测的高置信度。正则化系数 $\lambda_{\mathrm{reg}}$ 需要针对不同场景手动调节（见 Table 3），这是当前方法的一个已知局限。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 实验设置与公平性保障
 
@@ -276,9 +270,6 @@ $$\mathcal{L} = -\log p(c^{\mathrm{gt}} \mid \gamma, \nu, \alpha, \beta) + \lamb
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l2122_https_arxiv_org_abs_2602_23574/figures/003_Table_1.jpg]]
-*Table 1: Quantitative results of scene reconstruction and uncertainty quantification on three datasets, averaged over three independent runs. Colored cells denote the first , second , and third best results. See per-scene statistics with standard deviations in supplementary Section 10*
-
 ![[assets/figures/papers/paper_list_l2122_https_arxiv_org_abs_2602_23574/figures/006_Table_2.jpg]]
 *Table 2: Average training time per 30k steps and inference FPS of baseline nerfacto and different UQ methods on an A6000 GPU*
 
@@ -309,7 +300,7 @@ $$\mathcal{L} = -\log p(c^{\mathrm{gt}} \mid \gamma, \nu, \alpha, \beta) + \lamb
 ![[assets/figures/papers/paper_list_l2122_https_arxiv_org_abs_2602_23574/figures/010_Figure_8.jpg]]
 *Figure 8: Mean and standard derivation of test PSNR of three runs on Horns scene, with two active sampling strategies: EUbased selection and random selection. The samples identified via epistemic uncertainty are more informative for model learning*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 概率化NeRF的三级演进谱系
 

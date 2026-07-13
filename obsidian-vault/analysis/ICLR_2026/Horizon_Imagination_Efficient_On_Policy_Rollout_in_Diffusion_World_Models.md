@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Horizon_Imagination_Efficient_On_Policy_Rollout_in_Diffusion_World_Models.pdf
+project_link: null
+code_link: https://github.com/leor-c/horizon-imagination
 openreview_forum_id: Obefq4k8iG
 aliases:
 - HIH
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | Horizon Imagination：扩散世界模型中高效的在线策略推演 |
 | 英文题名 | Horizon Imagination: Efficient On-Policy Rollout in Diffusion World Models |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=Obefq4k8iG); [GitHub](https://github.com/leor-c/horizon-imagination) |
+| Links | [paper](https://openreview.net/forum?id=Obefq4k8iG) · [GitHub](https://github.com/leor-c/horizon-imagination) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | Horizon Imagination (HI) |
 | Dataset | Atari 100K and Craftium, Craftium |
@@ -41,7 +43,7 @@ claims:
 > - Atari 100K and Craftium 上，Episodic return 为 HI (ν=4, B=16)，对比 Autoregressive (ν=1, B=32)，变化 comparable performance, using half the denoising budget。
 > - Craftium 上，FVD 为 HI parallel (ν=4, 8, 16) with B=2 to 128，对比 sequential (ν=1) or Pyramidal schedule，变化 parallel achieves lower (better) FVD under low to medium budgets; sub‑step budgets achieve competitive quality。
 
-## 概述
+## 概要
 
 **Horizon Imagination** 是一种面向扩散世界模型的高效在线策略推演方法，其核心动机在于解决扩散模型在强化学习想象（imagination）阶段的计算瓶颈：现有序列想象力要求逐帧串行去噪，每一步都需要完整的去噪预算，导致推理成本高昂，难以在实际控制任务中部署。
 
@@ -55,7 +57,7 @@ claims:
 
 **方法定位**：Horizon Imagination 属于基于扩散世界模型的模型基强化学习（MBRL）框架，在想象力效率维度推进了扩散生成在在线控制中的应用边界。其核心贡献在于将扩散去噪的预算分配从“逐帧串行”重构为“跨帧并行+调度解耦”，为扩散世界模型的实时部署提供了可行路径。
 
-## 背景与动机
+
 
 ### 扩散世界模型在强化学习中的效率瓶颈
 
@@ -84,7 +86,9 @@ claims:
 
 基于此，本文提出 **Horizon Imagination（HI）**，旨在回答以下核心问题：**能否在显著降低去噪预算的同时，维持扩散世界模型的控制性能和生成质量？** 这一问题的解决将直接推动扩散世界模型在资源受限场景中的实际部署。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Horizon Imagination 的核心创新在于将扩散世界模型的想象力过程从**串行逐帧去噪**转变为**并行多步去噪**，并通过两个关键机制——稳定动作采样和 Horizon schedule——解决了并行化带来的策略不稳定与预算-衰减耦合问题。以下从三个 changed slots 展开分析。
 
@@ -124,7 +128,7 @@ $$K_{i,j} = \mathrm{clamp}(\kappa(j-1, i-1), 0, 1)$$
 
 三个 changed slots 构成了一个相互依赖的创新体系：并行去噪提供了效率提升的可能性，稳定动作采样解决了并行化引入的策略不稳定问题，Horizon schedule 则解耦了预算与衰减周期，使子步预算成为可行。消融实验证实，缺少任一机制都会导致性能退化——替换稳定采样导致控制崩溃，使用 Pyramidal schedule 替代 Horizon schedule 则使生成质量随预算增加而恶化。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_Obefq4k8iG/figures/002_Figure_2.jpg]]
 *Figure 2: Comparison of the Pyramidal schedule (Chen et al., 2024) and the proposed Horizon schedule (transposed). Horizon fixes the decay horizon ( $\nu$ \ : = \ : 3 ) yielding consistent schedules across budgets, whereas in the Pyramidal schedule the decay horizon drifts with budget, as the two are entangled, leading to degraded generation quality at higher budgets*
@@ -160,7 +164,7 @@ $$K_{i,j} = \mathrm{clamp}(\kappa(j-1, i-1), 0, 1), \quad \kappa(t, b) = -\frac{
 
 整体框架的模块关系可概括为：表征模型提供潜空间接口，去噪器与 Horizon 调度器实现高效并行想象，稳定采样机制抑制策略噪声，奖励-终止预测器提供模拟反馈，Actor-Critic 控制器利用想象轨迹进行策略优化。
 
-## 核心模块与公式推导
+
 
 Horizon Imagination 的核心由三个相互协同的模块构成：并行去噪器、稳定动作采样机制以及 Horizon 调度策略。它们共同解决了扩散世界模型在想象力过程中计算串行化与策略诱导不稳定两大瓶颈。
 
@@ -200,7 +204,9 @@ $$A_{t} = \mathrm{sg}\left( \frac{G_t - \mathrm{symexp}(\hat{V}_t^{\pi})}{\max(1
 
 其中 $S$ 为收益分位数范围，$\mathrm{symexp}$ 为对称指数变换。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与实验动机
 
@@ -257,7 +263,9 @@ $$A_{t} = \mathrm{sg}\left( \frac{G_t - \mathrm{symexp}(\hat{V}_t^{\pi})}{\max(1
 - 稳定动作采样在连续控制任务（如 MuJoCo、DMControl）中的可行替代方案是什么？
 - Horizon Imagination 在更大规模的视频扩散世界模型（如基于 3D VAE 的潜空间模型）中，并行去噪的效率优势是否依然成立？
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题域定位
 
@@ -288,6 +296,8 @@ Horizon Imagination 处于**扩散世界模型 × 在线策略强化学习**的�
 ### 证据强度评估
 
 核心主张（并行去噪降低计算成本、稳定采样防止性能崩塌、Horizon schedule 解耦预算与衰减周期）均有**高强度证据**支撑（置信度 ≥0.95），来自受控消融实验和多环境验证。但关于该方法在更广泛条件下的适用性（连续动作、更大模型、更多环境）的证据**目前缺失**，相关结论需标注为推测性判断。
+
+
 
 ## 原文 PDF
 

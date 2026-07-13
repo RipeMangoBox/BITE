@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/ACADREASON_Exploring_the_Limits_of_Reasoning_Models_with_Academic_Research_Problems.pdf
+project_link: null
+code_link: https://github.com/OPPO-PersonalAI/Acadreason-benchmark
 aliases:
 - ABCEP
 - ACADREASON
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | ACADREASON：探索推理模型在学术研究问题上的极限 |
 | 英文题名 | ACADREASON: Exploring the Limits of Reasoning Models with Academic Research Problems |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=vl0hQuluv4); [GitHub](https://github.com/OPPO-PersonalAI/Acadreason-benchmark) |
+| Links | [paper](https://openreview.net/forum?id=vl0hQuluv4) · [GitHub](https://github.com/OPPO-PersonalAI/Acadreason-benchmark) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/language_speech_and_dialog |
 | Method | ACADREASON Benchmark Construction and Evaluation Pipeline |
 | Dataset | ACADREASON (50 questions), ACADREASON domain evaluation |
@@ -41,7 +43,7 @@ claims:
 > - ACADREASON (50 questions) 上，Pass Rate / Checklist Score 为 DeepSeek-R1: 2.0 / 23.8，对比 DeepSeek-V3: 2.0 / 15.9，变化 0 / +7.9。
 > - ACADREASON domain evaluation 上，Checklist Score 为 Law、Philosophy 领域相对较高，对比 CS、Econ 领域较低，变化 定性趋势。
 
-## 概述
+## 概要
 
 当前大语言模型（LLM）推理能力的评估存在结构性问题：主流基准如MMLU‑Pro、GPQA、GAIA均无法同时满足**领域广度**与**推理深度**的双重要求。MMLU‑Pro已趋于饱和，GPQA局限于科学领域，GAIA侧重智能体能力而缺乏深层推理，PaperBench则聚焦工程实现而非纯理论推导。这一瓶颈使得我们无法准确衡量LLM在面对真实学术研究问题时所必须具备的高级推理水平——包括多步逻辑、证明推导和符合学科范式的完整解答。
 
@@ -51,7 +53,7 @@ claims:
 
 综合来看，ACADREASON成功揭示了当前最先进LLM在学术深度推理上的真实边界：即便在获得结构化提示辅助的情况下，模型的绝对表现仍有巨大提升空间。这一基准为量化推理差距、诊断能力短板以及引导未来研究方向提供了严格的评估工具。
 
-## 背景与动机
+
 
 当前大语言模型（LLM）的能力评估主要依赖数学、编程或常识问答等基准，这些任务多以单步或浅层推理为主，且领域覆盖面窄。以MMLU‑Pro和GPQA为代表的综合或科学问题基准正在逐步饱和，难以区分顶尖模型的细微差距；而GAIA等智能体基准虽然考察工具使用与信息整合，却缺乏对严密推导和证明式思维的要求；PaperBench这类论文复现任务则偏向工程实现而非纯推理。简言之，**现有基准在领域广度和推理深度两个维度上均存在缺口：它们无法反映模型解决复杂学术研究问题所需的高级、多步推理能力。**
 
@@ -61,7 +63,9 @@ claims:
 
 综上，ACADREASON 的提出正是为了解决现有基准"量浅面窄"的瓶颈，通过构建一个可严格量化高级学术推理能力的评测框架，推动社区关注 LLM 在真实研究场景中的核心短板。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 现有推理基准（如 MMLU‑Pro、GPQA、GAIA）大多局限于狭窄领域或表层信息整合，缺乏对高阶理论推理的深度覆盖，无法客观评估语言模型解决真实学术研究问题所需的能力。ACADREASON 针对这一瓶颈，通过三个关键维度的"槽位变更"（changed slots），实现了对学术推理的系统性探测。
 
@@ -85,7 +89,7 @@ ACADREASON 将提示细分为 **背景提示、定义提示、方法论提示** 
 
 这些现象共同指向一个核心洞察：通过分领域、分提示类型的高质量标准题和自动化评估，能够清晰定位模型推理链的断裂点，暴露出当前最先进模型（甚至最强代理系统 OAgents 的通过率也仅为 34，未超过 40 的阈值）在学术推理上的巨大提升空间，为后续推理增强研究提供了可量化的基础。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0005_vl0hQuluv4_ACADREASON_Exploring_the_Limits_of_Reasoning_Mod/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the ACADREASON benchmark construction and evaluation pipeline. It consists of three stages: (1) High-Quality Academic Papers Collection – experts filter 430 papers across 5 domains into 50 top-tier theoretical works; (2) High-Reasoning Research Question Extraction – research questions are refined into formal queries with golden answers containing sufficient reasoning*
@@ -108,7 +112,7 @@ $$R_j = \frac{\sum_{q=1}^{50} \sum_{i=1}^{5} c_{q,i}}{250} \times 100 \quad \tex
 
 从输入输出流的角度看，整个框架的目标是：接受一个仅包含自然语言问题与（可选）提示的输入，经过模型或智能体系统的纯推理过程，输出结构化学术解答。系统不依赖对原始文献的在线访问，后续 URL 掩蔽实验也证实信息泄露的影响极小（OAgents 的通过率仅从 34 变为 32），从而确保评估的公平性。这一流水线为衡量当前大语言模型和智能体在高级学术推理上的真实能力提供了一个标准化、可重复的测试床。
 
-## 核心模块与公式推导
+
 
 ACADREASON 基准的构建与评估依赖于一套严格的多阶段流程，其核心在于通过专家驱动的筛选、提取与验证，将顶级学术论文转化为可评估的高推理深度问题。整个过程的核心模块与创新公式如下。
 
@@ -146,7 +150,9 @@ $$
 
 评估全部由 GPT-5-mini 作为裁判模型执行。为验证这一自动化评估的可靠性，研究方从 50 个样本中抽样 10 个，邀请三位领域专家进行双盲独立评分，计算 Cohen's κ 达 0.861，表明裁判模型与人类专家判断高度一致。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果与领域差异
 
@@ -207,7 +213,9 @@ ACADREASON基准覆盖了计算机科学、经济学、法学、数学和哲学�
 
 ACADREASON 的构建过程实施了多层质量控制：每道题目经过三领域专家就问题边界、信息完整性、学科逻辑合规性进行独立审核，确保问题可答且不依赖额外假设；评估时通过律师一致性研究和URL掩蔽测试排除了显著偏差。然而，基准规模的限制（仅50个问题，每个领域10题，且每个类别下各5个子类）意味着对模型的领域泛化能力检测仍属初步。未来若能借助半自动流水线拓展至更多学科与更早期的经典文献，则可获得更稳健的能力画像。即便如此，该基准已成功捕捉到当前最先进推理模型在真正高难度理论推理上存在的巨大鸿沟，为后续强化模型深度推理能力提供了明确的突破口。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ACADREASON 的构建动机直接源于现有评估基准的两个系统性缺失：**领域广度不足**与**推理深度欠缺**。已有的 MMLU‑Pro 侧重通用知识但趋于饱和，GPQA 聚焦科学问题但学科覆盖单一，GAIA 考察智能体协作能力但停留在信息检索与简单整合层面，PaperBench 更强调论文复现中的工程实现而非纯理论推导，DeepResearch Bench 则偏向多域信息检索后的答案整合。这些基准的共同瓶颈在于未能评估解决复杂学术研究问题所需的高级推理——即从已知理论出发进行多步证明、推导或符合学科逻辑的严谨论证的能力。
 
@@ -220,6 +228,8 @@ ACADREASON 的设计正是为了填补这一空白。如图 1 所示，其流水
 
 **开放问题**
 第一，最先进模型在 ACADREASON 上的得分仍远低于可用门槛，如何从架构、训练范式或推理时策略上系统性增强模型的高级学术推理能力？第二，能否借助 LLM 辅助的半自动流水线（例如自动提取候选论文、生成初版黄金答案）实现基准的可持续扩展，以覆盖更多学科和持续更新的研究前沿？第三，推理差距的具体根源尚待解耦：是领域相关知识储备不足、多步逻辑链的断裂，还是特定学科（如数学证明的结构、法学论证的规范性）所对应的推理范式缺失？第四，在保持独立推理要求的前提下，如何设计更丰富的外部工具或知识提示（例如结构化领域本体、定理库调用接口），使模型在不"作弊"的前提下更有效地利用领域结构？这些问题指向了 ACADREASON 作为一种研究工具的长期价值——它不仅是模型能力的"高压测试舱"，更是追问智能系统如何逼近学术前沿推理本质的起点。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Thinking_on_the_Fly_Test_Time_Reasoning_Enhancement_via_Latent_Thought_Policy_Optimization.pdf
+project_link: null
+code_link: https://github.com/ltpo2025/LTPO
 openreview_forum_id: r1WEQzkCQv
 aliases:
 - LLTPO
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 即时思考：通过潜在思维策略优化实现测试时推理增强 |
 | 英文题名 | Thinking on the Fly: Test-Time Reasoning Enhancement via Latent Thought Policy Optimization |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=r1WEQzkCQv); [GitHub](https://github.com/ltpo2025/LTPO) |
+| Links | [paper](https://openreview.net/forum?id=r1WEQzkCQv) · [GitHub](https://github.com/ltpo2025/LTPO) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/generative_models_and_autoencoders |
 | Method | LTPO (Latent Thought Policy Optimization) |
 | Dataset | AIME2024, GSM8K, MATH-500, ASDiv Aug |
@@ -42,7 +44,7 @@ claims:
 > - GSM8K 上，Accuracy 为 81.27，对比 76.88，变化 +4.39。
 > - MATH-500 上，Accuracy 为 49.00，对比 47.60，变化 +1.40。
 
-## 概述
+## 概要
 
 大型语言模型在数学推理等复杂任务上取得了显著进展，但现有潜在推理方法在挑战性、分布外任务中表现脆弱——尤其在竞赛级基准（如AIME）上，离线训练的静态投影方法准确率骤降至近乎零。核心瓶颈在于：固定的隐式推理路径无法针对每个具体问题实例进行自适应调整。
 
@@ -57,7 +59,7 @@ claims:
 
 LTPO的核心洞察在于：将推理过程从静态生成转变为测试时动态优化，利用模型自身置信度作为导航信号，在隐空间中搜索更优的推理路径。这一范式为无需额外训练即可提升LLM推理能力提供了新方向。
 
-## 背景与动机
+
 
 大语言模型（LLM）在数学推理、常识问答等任务上已展现出显著能力，但面对竞赛级数学推理等挑战性、分布外任务时，现有方法仍表现脆弱。Zero-Shot CoT 等显式思维链方法通过生成文本级推理步骤来提升模型表现，然而这类方法依赖模型自身的文本生成能力，在高度困难的推理任务上提升有限。
 
@@ -69,7 +71,9 @@ LTPO的核心洞察在于：将推理过程从静态生成转变为测试时动�
 
 本文的核心动机在于：**能否在测试时动态优化潜在思考过程，而无需任何模型参数更新或外部监督信号？** 直觉上，冻结的 LLM 本身蕴含丰富的推理知识，其输出分布可以反映对潜在推理路径的“置信度”。如果将这些隐向量视为可优化的动态参数，并利用模型自身的内在置信度作为奖励信号来引导优化，就有可能在测试时为每个问题实例找到更优的隐空间推理路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 LTPO 的核心创新在于将**测试时推理增强**重新定义为一种**无参数、在线策略优化**问题。与现有方法相比，它在三个关键维度上实现了根本性转变：
 
@@ -107,7 +111,7 @@ LTPO 实现了**完全无参数更新**：在整个优化过程中，LLM 的所�
 
 **因果机制总结**：LTPO 将推理增强从“训练阶段的知识注入”转变为“测试时的路径搜索”——通过内在置信度引导的策略梯度，在冻结模型上动态优化隐向量，使得推理能力在测试时被“激活”而非“存储”。这一机制在 SoftCoT 完全崩溃的 AIME 基准上尤为突出，验证了动态优化相比静态投影的质变优势。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0009_r1WEQzkCQv_Thinking_on_the_Fly_Test-Time_Reasoning_Enhancem/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of LTPO. The framework iteratively refines the embedding vectors of the latent thought tokens via a test-time RL loop. A confidence-based reward, calculated from the LLM’s output logits, guides the Test-time RL Module to update the latent thought vectors. After optimization, the refined vectors are concatenated with the prompt’s embeddings and passed through the LLM to generate the final answer*
@@ -138,7 +142,7 @@ LTPO（Latent Thought Policy Optimization）是一种完全在测试时运行的
 
 尽管引入了 $T$ 步迭代优化，但 LTPO 在实际推理中反而快于 Zero-Shot CoT。原因在于优化后的隐向量使模型生成显著更短的文本答案——在 AIME2024 上，LTPO 的总推理时间为 31.80 秒，而 Zero-Shot CoT 需要 62.59 秒（Table 9）。优化开销（约 20 秒）被生成令牌数的大幅减少所抵消。
 
-## 核心模块与公式推导
+
 
 LTPO 的核心机制是将推理过程抽象为一个测试时的序列决策问题，在冻结语言模型的前提下，仅对潜在思考向量（latent thought vectors）进行在线策略优化。整个框架由五个关键模块串联而成。
 
@@ -198,7 +202,9 @@ $$\pmb y = \mathrm{Decoder}\big(\mathcal{M}_{\pmb \theta}(E(\pmb x) \parallel \p
 
 上述五个模块形成一条清晰的因果链：**初始化**提供可优化的隐空间锚点 → **随机策略**注入探索噪声 → **置信度奖励**从冻结模型内部提取优化信号 → **策略梯度**将奖励转化为隐向量的定向更新 → **最终解码**将优化后的隐状态映射为显式答案。整个链条中，模型参数 $\pmb \theta$ 始终冻结，唯一被更新的变量是潜在思考向量 $\pmb H$，这从根本上保证了方法的“无参数”特性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：LTPO在挑战性基准上突破基线崩溃瓶颈
 
@@ -252,7 +258,9 @@ Table 5展示了在最大输出令牌设为64,000的扩展计算预算下，Qwen
 
 Table 8将评估拓展至数学之外的推理类型。在常识推理（StrategyQA）和符号推理（Date Understanding）上，LTPO在两个模型上均取得最优准确率。Qwen-2.5-7B-Instruct在符号推理上达76.40%，较Zero-Shot CoT的64.40%提升12个百分点。这证明测试时潜在优化机制不限于数学领域，对需要结构化推理的符号任务同样有效。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -295,6 +303,8 @@ LTPO 的有效性存在明确的适用条件与边界：
 3. **多模态与长链推理的泛化**：LTPO 目前仅在文本推理任务上验证，能否扩展到视觉-语言推理、多步工具调用等需要多种模态或更长推理链的任务？隐向量在这些场景中的表征能力和优化效率有待探索。
 
 4. **优化动态的理论理解**：REINFORCE 在隐空间中的收敛性质、奖励景观的几何结构、以及为何最佳奖励令牌优于最终迭代令牌等问题，目前缺乏理论层面的深入分析。理解这些动态有助于设计更高效的优化策略。
+
+
 
 ## 原文 PDF
 

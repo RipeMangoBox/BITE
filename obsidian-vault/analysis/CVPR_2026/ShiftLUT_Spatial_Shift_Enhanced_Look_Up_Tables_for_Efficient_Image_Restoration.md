@@ -42,7 +42,7 @@ claims:
 > - Set14 (SR x4) 上，PSNR 28.11 vs 28.01 (TinyLUT) (+0.10)。
 > - BSDS100 (SR x4) 上，PSNR 27.21 vs 27.13 (TinyLUT) (+0.08)。
 
-## 概述
+## 概要
 
 图像复原任务（超分辨率、去噪、去块效应）在边缘设备上的高效部署面临一个核心瓶颈：**基于查找表（LUT）的方法虽能实现极快推理，但其感受野受限于LUT的索引范围，而扩大感受野的现有手段（堆叠LUT层、大核分解）又导致存储与计算开销急剧膨胀**。同时，先前工作（如SPLUT）采用的双分支架构在低比特分支（LSB）上存在严重的计算冗余——深层激活稀疏度接近100%，却仍被对称地分配大量计算资源。
 
@@ -54,7 +54,7 @@ ShiftLUT针对上述瓶颈提出三条因果性改进：
 
 在4×超分辨率任务上，ShiftLUT相较先前最优的TinyLUT平均提升超过0.21 dB，且模型族在存储-精度-速度的帕累托前沿占据左上角优势区域。在去噪（噪声15）和去块效应（QF=10）任务上，ShiftLUT同样以更低的存储和延迟取得了最优PSNR。
 
-## 背景与动机
+
 
 ### 问题背景：高效图像复原与LUT方法的兴起
 
@@ -82,7 +82,9 @@ ShiftLUT针对上述瓶颈提出三条因果性改进：
 
 针对这三个问题，ShiftLUT提出了三项关键创新：**可学习空间偏移（LSS）** 以零额外成本扩大感受野；**非对称双分支架构**消除LSB分支的冗余计算；**误差界自适应采样（EAS）** 实现精度保持下的LUT压缩。这三项设计共同实现了在更小存储、更快推理的条件下超越先前最优LUT方法的复原质量。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ShiftLUT 围绕 LUT 方法在边缘设备部署中面临的三大瓶颈——感受野受限、对称双分支计算冗余、LUT 存储开销——提出了三项紧密耦合的改进，构成从特征空间重构到推理压缩的完整链路。
 
@@ -126,7 +128,7 @@ $$\mathrm { E r r o r } ( s ) = \frac { s } { s - 1 } \cdot \mathbb { E } _ { i 
 
 三项改进形成闭环：LSS 以零成本扩展感受野，为非对称架构提供性能保障；非对称架构释放的计算资源使 LSS 的通道多样性需求得以充分满足；EAS 在精度无损的前提下压缩存储并加速推理，最终使 ShiftLUT 系列模型在存储-PSNR-延迟三维空间中占据左上角最优区域（见 Figure 1）。
 
-## 整体框架
+
 
 ShiftLUT 的整体 pipeline 遵循“位分离—浅层提取—深层偏移处理—重建”的四阶段流程，如图 Figure 2(a) 所示。其核心设计哲学是**将计算资源从信息稀疏的低位分支重新分配至信息密集的高位分支**，并在深层引入可学习空间偏移以打破 LUT 方法固有的感受野瓶颈。
 
@@ -161,7 +163,7 @@ ShiftLUT 的整体 pipeline 遵循“位分离—浅层提取—深层偏移处�
 
 所有卷积层在训练后通过 TinyLUT 的可分离映射策略（SMS）转换为 1D LUT，并采用旋转集成技巧进一步扩大推理时的感受野。LSS 模块采用两阶段训练策略：第一阶段学习浮点偏移并通过双线性插值应用；第二阶段将偏移量化为固定整数偏移，推理时直接进行通道移位，完全消除在线插值开销。此外，Error-bounded Adaptive Sampling (EAS) 在离线阶段逐 LUT 自适应确定最优采样步长，并缓存插值结果，将 LUT 存储压缩超过 50% 的同时保持原始精度。
 
-## 核心模块与公式推导
+
 
 ShiftLUT 的整体架构（图2a）由三个核心模块构成：**可学习空间偏移（LSS）**、**非对称双分支架构**，以及**误差界自适应采样（EAS）**。以下逐一解析其设计原理与关键公式。
 
@@ -211,7 +213,9 @@ $$\mathrm { E r r o r } ( s ) = \frac { s } { s - 1 } \cdot \mathbb { E } _ { i 
 ![[assets/figures/papers/paper_list_l2268_https_arxiv_org_abs_2603_00906/figures/003_Figure_3.jpg]]
 *Figure 3: Local Attribution Map (LAM) visualization for a 16×16 output patch. A larger DI indicates that a wider range of pixels contributes to the output result. Our method with LSS shows larger DI and better performance than the variant without LSS*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ShiftLUT 在三个典型的低层视觉任务上进行了验证：4× 超分辨率（SISR）、灰度图像去噪（Denoising）和 JPEG 去块效应（Deblocking）。以下从主结果、消融实验和失败模式三个维度展开分析。
 
@@ -280,7 +284,9 @@ ShiftLUT 在三个典型的低层视觉任务上进行了验证：4× 超分辨�
 ![[assets/figures/papers/paper_list_l2268_https_arxiv_org_abs_2603_00906/figures/008_Table_3.jpg]]
 *Table 3: The comparison for image deblocking under a quality factor of 10 on standard benchmark datasets. The best of each metric is highlighted in Red*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与 LUT 方法谱系的关系
 
@@ -317,6 +323,8 @@ ShiftLUT 的适用边界由以下因素界定：
 3. **EAS 的可扩展性**：EAS 的在线缓冲机制在更深的网络或更高分辨率的输入下是否仍然保持低内存开销？当前验证限于标准 SR 配置，其在高分辨率或视频任务中的表现尚不明确。
 
 4. **跨任务泛化**：ShiftLUT 的设计原则（LSS、非对称架构、EAS）能否推广到其他图像复原任务或更广泛的 low-level vision 问题？
+
+
 
 ## 原文 PDF
 

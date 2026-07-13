@@ -32,7 +32,7 @@ claims:
 | 中文题名 | 矢量剪贴画的尽可能局部均匀重塑 |
 | 英文题名 | As-locally-uniform-as-possible Reshaping of Vector Clip Art |
 | 会议/期刊 | SIGGRAPH 2022 |
-| Links | [paper](https://www.cs.ubc.ca/labs/imager/tr/2022/ALUP/) · [arXiv](https://arxiv.org/abs/2103.01694) · [Project](https://adobe.com/products/illustrator) · [Code](https://inkscape.org) |
+| Links | [paper](https://www.cs.ubc.ca/labs/imager/tr/2022/ALUP/) · [paper](https://arxiv.org/abs/2103.01694) · [Project](https://adobe.com/products/illustrator) · [Code](https://inkscape.org) |
 | Topic | #topic/other_unclear |
 | Method | As-Locally-Uniform-As-Possible (ALUP) Reshaping |
 | Dataset | 用户对比研究（115个剪贴画输入） |

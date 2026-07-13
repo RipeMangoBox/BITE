@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/SketchFaceGS_Real_Time_Sketch_Driven_Face_Editing_and_Generation_with_Gaussian_Splatting.pdf
+project_link: null
 code_link: null
 aliases:
 - SketchFaceGS
@@ -42,7 +43,7 @@ claims:
 > - 100次编辑样例集 上，FID 44.60；KID (×100) 0.69 ± 0.2。
 > - 编辑身份保持测试 上，PSNR (未编辑区域) 31.12 vs SketchFaceNeRF (优于SketchFaceNeRF)。
 
-## 概述
+## 概要
 
 从稀疏、深度模糊的手绘草图实时重建具有几何一致性和高频真实感细节的3D头部模型，是计算机图形学与交互式内容创作中的核心瓶颈。传统方法或依赖逐实例优化（如基于NeRF的**SketchFaceNeRF**，Gao et al., ACM TOG 2023），或受限于单一编码器结构，难以在保证身份一致性的同时实现前馈式的实时生成与编辑。
 
@@ -50,7 +51,7 @@ claims:
 
 实验表明，SketchFaceGS在手绘草图生成集上达到FID 92.65、KID 4.00，编辑FID 44.60，端到端延迟仅0.3秒，渲染帧率高达243 FPS，在生成保真度、编辑灵活性和实时交互性方面均显著优于现有方法。
 
-## 背景与动机
+
 
 ### 问题背景：从二维草图到三维真实感头部的鸿沟
 
@@ -84,7 +85,9 @@ SketchFaceGS正是为填补这一缺口而提出。其设计动机可归纳为�
 
 简言之，SketchFaceGS试图在“抽象草图的自由度”与“三维真实感的约束”之间建立一座实时、可控的桥梁，为交互式三维头像创作和编辑提供新的技术范式。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SketchFaceGS 的核心创新在于构建了首个统一、端到端、无需优化的前馈框架，将稀疏且深度模糊的2D草图实时转化为具有几何一致性的照片级3D高斯头部模型，并支持交互式自由视角编辑。该框架通过以下三个关键机制突破，实现了从抽象草图到密集3D高斯的直接映射，从根本上改变了以往依赖逐实例优化的生成范式。
 
@@ -137,7 +140,7 @@ $$F_{\mathrm{UV-align}} = G_{c}(F_{\mathrm{UV-G}}, F_{\mathrm{UV-A}})$$
 
 这些创新共同构成了从稀疏2D草图到密集3D高斯的实时映射链路，在生成质量（FID 92.65, KID 4.00）和编辑质量（FID 44.60, KID 0.69）上均达到最优水平，同时保持了0.3秒的编辑延迟和最高243 FPS的渲染帧率。
 
-## 整体框架
+
 
 SketchFaceGS 提出了一套端到端、无需优化的前馈框架，首次实现从单张 2D 手绘草图直接生成照片级真实感 3D 高斯头部模型，并支持实时交互式编辑。该框架的核心设计思想是“粗到细”（coarse-to-fine），将抽象的草图结构与预训练 3D GAN 的强先验相结合，在保证几何一致性的同时注入高频真实感细节。
 
@@ -181,7 +184,7 @@ $$\mathbf{f}_k^{\mathrm{fused}} = (1 - \mathbf{M}_{\mathrm{UV}}^{(k)}) \odot \ma
 ![[assets/figures/papers/paper_list_l2269_https_arxiv_org_abs_2604_19202/figures/001_Figure_1.jpg]]
 *Figure 1: SketchFaceGS presents a real-time, sketch-driven editing framework tailored for 3D Gaussian Splatting (3DGS) facial heads. Starting with an original 3D face (a), sequential editing operations (b) are applied to targeted local regions. Our approach delivers photorealistic editing results (c) while preserving the 3D consistency*
 
-## 核心模块与公式推导
+
 
 SketchFaceGS 的核心由三个紧密耦合的模块构成，分别对应**粗粒度 UV 特征预测**、**细粒度 3D UV 特征增强**和**实时 UV Mask 融合编辑**。整个流水线以前馈方式运行，无需任何逐实例优化。
 
@@ -263,7 +266,9 @@ $$\mathbf{f}_{k+1}^{\mathrm{new}} = \mathrm{Layer}_k(\mathbf{f}_k^{\mathrm{fused
 ![[assets/figures/papers/paper_list_l2269_https_arxiv_org_abs_2604_19202/figures/013_Figure_8.jpg]]
 *Figure 8: Ablation study on the editing module. Our method (e) achieves the superior results compared with re-generation (c) and direct 3DGS composition (d)*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -338,7 +343,9 @@ Figure 6的编辑对比显示：**MagicQuill**（Liu et al., CVPR 2025）产生�
 ![[assets/figures/papers/paper_list_l2269_https_arxiv_org_abs_2604_19202/figures/004_Figure_3.jpg]]
 *Figure 3: Given a hand-drawn sketch and a reference image, our method produces a photorealistic 3D head (Top). Our method also support detailed local editing (Bottom)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 
@@ -373,6 +380,8 @@ SketchFaceGS 的性能建立在以下关键假设之上，这些假设同时定�
 3. **动态编辑与表情控制。** 如何在保持实时性能的前提下，将编辑能力融入动态 3D 头部动画流水线？这涉及将 UV Mask Fusion 机制与时序一致的形变场或 blendshape 参数化相结合。
 
 4. **OOD 鲁棒性与公平性评估。** 针对罕见配饰、严重遮挡等 OOD 输入，以及不同种族、年龄群体的公平性表现，需要构建更具挑战性和多样性的测试基准，并探索针对性的鲁棒训练策略。
+
+
 
 ## 原文 PDF
 

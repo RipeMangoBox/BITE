@@ -5,6 +5,7 @@ paper_level: A
 venue: SIGGRAPH
 year: 2025
 pdf_ref: paperPDFs/SIGGRAPH_2025/Neurally_Integrated_Finite_Elements_for_Differentiable_Elasticity_on_Evolving_Domains.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/toronto-ai/flexisim/
 aliases:
 - NIMF
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 面向演化域可微弹性的神经集成有限元方法 |
 | 英文题名 | Neurally Integrated Finite Elements for Differentiable Elasticity on Evolving Domains |
 | 会议/期刊 | SIGGRAPH 2025 |
-| Links | [paper](https://arxiv.org/abs/2410.09417); [Project](https://research.nvidia.com/labs/toronto-ai/flexisim/) |
+| Links | [paper](https://arxiv.org/abs/2410.09417) · [Project](https://research.nvidia.com/labs/toronto-ai/flexisim/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Neurally Integrated Mixed FEM |
 | Dataset | Dumbbell equilibrium (Section 5.1, Figure 5), Dumbbell with large stiffness ratios (Figure 6, 24), Dumbbell buckling (Figure 7), Stress minimization on bracket (Figure 10) |
@@ -42,7 +43,7 @@ claims:
 > - Dumbbell with large stiffness ratios (Figure 6, 24) 上，Convergence after 250 Newton iterations 为 Mixed FEM converges to correct equilibrium，对比 Displacement-only FEM stagnates far from equilibrium at ratios up to 10^9，变化 Qualitative improvement in convergence。
 > - Dumbbell buckling (Figure 7) 上，Buckling shape fidelity 为 Tri-quadratic Neural quadrature captures high-resolution behavior well，对比 Tri-linear Full/Clip quadrature deviates strongly at coarse resolution，变化 Closer to 64^3 reference。
 
-## 概述
+## 概要
 
 **核心问题**：在隐式表面表示的演化域上进行可微弹性模拟时，传统固定求积方案（如Full、Clip）在边界移动时会产生积分跳变或不可微，导致物理损失对几何参数的梯度消失，切断了端到端形状与拓扑优化的梯度通道。
 
@@ -61,7 +62,7 @@ claims:
 
 **主要局限**：位移自由度受限于底层形函数，无法正确模拟断开连接的浮动材料；物理感知重建缺乏全局收敛性，对初始SDF和损失函数敏感；混合FEM依赖经验性惩罚参数ε；神经求积网络需针对特定阶数和单元类型训练。
 
-## 背景与动机
+
 
 ### 隐式表面弹性模拟的核心瓶颈
 
@@ -89,7 +90,9 @@ Trusty et al.（2022）提出的旋转感知混合 FEM 通过引入独立的旋�
 
 通过将求积规则的学习转化为一个小型神经网络的训练任务，本文提出了一种**神经集成有限元方法**，使得在粗网格上也能有效模拟演化隐式域的弹性行为，并支持在统一的优化循环中同时优化形状、拓扑和材料参数。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心贡献在于打通了**从物理响应到隐式几何参数的端到端梯度通道**，使演化域上的可微弹性模拟与优化成为可能。围绕这一目标，作者在四个关键环节引入了创新设计，形成了“神经集成混合有限元”方法。
 
@@ -130,7 +133,7 @@ Trusty et al.（2022）提出的旋转感知混合 FEM 通过引入独立的旋�
 
 这些创新相互依赖、协同作用：神经求积提供可微性，混合FEM保证求解精度与收敛性，平滑预条件器稳定优化过程，分阶段调度确保收敛质量。移除任一组件都会导致系统性能显著退化或完全失效。
 
-## 整体框架
+
 
 本文提出**神经集成混合有限元（Neurally Integrated Mixed FEM）**，一个面向演化隐式域的可微弹性模拟与优化框架。该框架的核心设计目标是：在隐式表面连续变形时，打通从物理响应（位移、应力）到几何参数（SDF网格值）的**平滑、可微梯度通道**，从而支持端到端的形状、拓扑与材料并发优化。
 
@@ -175,7 +178,7 @@ $$\mathcal{L}_{\mathrm{phys}}(\Delta_t, \ell_{\mathbf{u}}, \ell_{\sigma}) := \sq
 - **输入**：目标形状（SDF或图像）、材料参数（杨氏模量、泊松比）、载荷条件（外力、固定边界）。
 - **输出**：满足物理约束的优化形状（SDF值）、材料分布（逐单元刚度），以及对应的显式网格和应力/位移场，可直接用于下游仿真或制造。
 
-## 核心模块与公式推导
+
 
 ### 3.1 隐式时间积分与弱形式
 
@@ -277,7 +280,9 @@ $$
 - **平滑预条件器**：对网格 SDF 参数和顶点位移施加高斯模糊卷积，抑制高频噪声，稳定重建优化。
 - **FlexiCubes 重建**：从可微隐式表面提取显式网格，用于渲染和边缘长度损失计算。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验验证
 
@@ -356,7 +361,9 @@ Figure 17 系统性地移除了框架的关键组件：
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2410_09417/figures/017_Figure_21.jpg]]
 *Figure 21: Statistics of integration error and conditioning max ???? /min ???? over 1000 random voxels for networks trained with order ?? and conditioning loss scaling factor ??★*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法演进脉络
 
@@ -433,6 +440,8 @@ Figure 17 系统性地移除了框架的关键组件：
 5. **神经求积的进一步优化**：网络架构和训练策略是否可以改进以降低推理开销？能否训练一个统一的网络来处理多种积分阶数或元素类型？
 
 6. **多物理场与复杂材料**：如何扩展以支持更丰富的材料模型（如塑性、黏弹性、损伤力学）以及热-力耦合等多物理场场景？
+
+
 
 ## 原文 PDF
 

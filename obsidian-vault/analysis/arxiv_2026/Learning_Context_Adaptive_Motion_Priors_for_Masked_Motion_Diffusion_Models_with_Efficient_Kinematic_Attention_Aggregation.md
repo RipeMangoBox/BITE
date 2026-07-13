@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2026
 pdf_ref: paperPDFs/arxiv_2026/Learning_Context_Adaptive_Motion_Priors_for_Masked_Motion_Diffusion_Models_with_Efficient_Kinematic_Attention_Aggregation.pdf
+project_link: null
+code_link: https://github.com/jjkislele/MMDM
 aliases:
 - MMDMM
 tags:
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 面向掩码运动扩散模型的上下文自适应运动先验学习与高效运动学注意力聚合 |
 | 英文题名 | Learning Context-Adaptive Motion Priors for Masked Motion Diffusion Models with Efficient Kinematic Attention Aggregation |
 | 会议/期刊 | arXiv 2026 |
-| Links | [paper](https://arxiv.org/abs/2603.07697) · [Code](https://github.com/jjkislele/MMDM) · [arXiv](https://arxiv.org/abs/2303.01469) |
+| Links | [paper](https://arxiv.org/abs/2603.07697) · [Code](https://github.com/jjkislele/MMDM) · [paper](https://arxiv.org/abs/2303.01469) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction #topic/generative_models_diffusion #topic/generative_models_diffusion/diffusion_image_video |
 | Method | Masked Motion Diffusion Model (MMDM) |
 | Dataset | Shelf, Campus, BUMocap, BUMocap-X |
@@ -42,7 +44,7 @@ claims:
 > - Campus 上，PCP (%) AVG 97.6±.08 vs 97.3 (JCSAT) (+0.3)。
 > - BUMocap (BU) 上，PCP↑ 96.2±.52 vs 95.5 (JCSAT) (+0.7)。
 
-## 概述
+## 概要
 
 从多视角视频中恢复准确的三维人体运动是计算机视觉中的长期难题，其核心瓶颈在于**遮挡**——当身体关键点被遮挡、二维姿态估计置信度低或三角测量误差大时，传统重建方法会严重退化。现有方案存在两个结构性缺陷：**掩码自编码器（MAE）** 只能从干净的无掩码部分重建缺失区域，无法处理噪声输入；**运动扩散模型**则要求完整序列作为输入，且计算开销巨大。两者均缺乏一个能够同时接受部分含噪输入、并高效融合关节级空间结构与姿势级时间依赖的生成式重建框架。
 
@@ -52,7 +54,7 @@ MMDM在多个公开基准上取得最优结果：在Shelf和Campus数据集上�
 
 MMDM的主要局限性在于扩散逆过程仍需数百步迭代，单次评估耗时超过7小时，难以满足实时应用需求；此外，不同任务（补全、细化、插值）目前需要分别微调，尚未统一为单一模型。未来工作可探索更高效的采样策略以压缩推理时间，以及设计统一的端到端框架来覆盖多样化运动生成任务。
 
-## 背景与动机
+
 
 从多视角视频中重建准确的三维人体运动是计算机视觉领域的长期挑战，其核心瓶颈在于**遮挡**——当人体关节被自身、他人或环境遮挡时，二维姿态估计器提供的观测信息变得稀疏、含噪且不可靠，导致三维重建结果出现严重失真。这一问题的本质是**从部分、低质量观测中推断完整、高质量运动序列**的生成式重建任务。
 
@@ -64,7 +66,9 @@ MMDM的主要局限性在于扩散逆过程仍需数百步迭代，单次评估�
 
 如图1所示，MMDM突破了传统MAE与运动扩散模型的各自局限：它不再要求输入是干净完整的，而是能够利用部分高质量数据条件生成缺失运动，在运动补全、细化与插值等多样化任务中展现统一的生成能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心贡献在于提出了一种**上下文自适应的运动先验学习框架**，其关键创新并非引入全新的生成范式，而是通过三个紧密耦合的**changed slots**，系统性地解决了现有方法在部分含噪输入下进行高质量运动重建的瓶颈。
 
@@ -109,7 +113,7 @@ MMDM的主要局限性在于扩散逆过程仍需数百步迭代，单次评估�
 
 这三个changed slots共同赋予了MMDM从部分、低质量数据中提取上下文自适应运动先验的能力，使其在运动补全、细化和插值等任务上均取得了显著优于现有方法的性能。
 
-## 整体框架
+
 
 MMDM 的设计动机源于一个核心瓶颈：**传统掩码自编码器（MAE）无法处理噪声输入，而运动扩散模型需要完整输入且计算复杂**，二者均无法在部分含噪观测条件下生成高质量人体运动。为填补这一空白，MMDM 将**掩码扩散范式**与**运动学注意力聚合（KAA）**机制融合为一个统一的生成式重建框架，其整体架构如 Figure 1 所示。
 
@@ -158,7 +162,7 @@ MMDM 的输入输出流根据下游任务灵活调整，无需改变核心网络
 
 这种设计使 MMDM 能够同时利用部分高质量数据的条件信息与扩散模型的生成能力，在运动补全、细化与插值任务上均取得了最优性能（详见实验部分 Table II–V）。
 
-## 核心模块与公式推导
+
 
 ### 3.1 运动学注意力聚合（KAA）机制
 
@@ -223,7 +227,9 @@ KAA 是 MMDM 性能提升的**因果旋钮**：它通过可学习聚合令牌将
 ![[assets/figures/papers/paper_list_l90_https_arxiv_org_abs_2603_07697/figures/004_Figure_2.jpg]]
 *Figure 2: Illustration of the reverse diffusion process in the proposed Masked Motion Diffusion Model (MMDM). It begins at iteration*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -294,7 +300,9 @@ KAA 是 MMDM 性能提升的**因果旋钮**：它通过可学习聚合令牌将
 ![[assets/figures/papers/paper_list_l90_https_arxiv_org_abs_2603_07697/figures/016_Figure_1.jpg]]
 *Figure 1: Demonstration for the reserve diffusion process at k time step. Green and blue skeletons denote the ground truth and the prediction, respectively. The masked joints are first sampled from a normal distribution and iteratively denoised*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位与核心瓶颈
 
@@ -337,6 +345,8 @@ MMDM的核心创新——**运动学注意力聚合（KAA）**——在方法谱
 3. **KAA与空间加权的内在关系**：强调投影为何对MDM有效而对MMDM几乎无增益？这是否暗示KAA本身已隐含了类似的空间加权能力？需要进一步的机制分析。
 4. **极端条件下的鲁棒性**：当输入2D姿态估计面临严重漏检或误检时，自适应掩码策略的鲁棒性如何进一步提升？是否需要引入不确定性建模或贝叶斯推断？
 5. **跨数据集泛化**：Table IV显示使用不同2D姿态估计器（AlphaPose、SimCC、OpenPose）时性能波动很小，表明模型对2D输入源具有较强的泛化性。但这种泛化性在更大规模、更多样化的运动数据上是否仍然成立，尚需验证。
+
+
 
 ## 原文 PDF
 

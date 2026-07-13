@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Keep_the_Best_Forget_the_Rest_Reliable_Alignment_with_Order_Aware_Preference_Optimization.pdf
+project_link: null
+code_link: https://github.com/pxyWaterMoon/rappo
 aliases:
 - KBFRRAOAPO
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | 保留最佳，遗忘其余：基于顺序感知偏好优化的可靠对齐 |
 | 英文题名 | Keep the Best, Forget the Rest: Reliable Alignment with Order-Aware Preference Optimization |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=LrHfYPFTtg); [GitHub](https://github.com/pxyWaterMoon/rappo) |
+| Links | [paper](https://openreview.net/forum?id=LrHfYPFTtg) · [GitHub](https://github.com/pxyWaterMoon/rappo) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/batch_offline |
 | Method | RAPPO |
 | Dataset | IMDB Sentiment Control, Real-Toxicity-Prompts, Text Summarization (GPT-4 evaluation), PKU-SafeRLHF |
@@ -40,7 +42,7 @@ claims:
 > - Real-Toxicity-Prompts 上，Toxicity % ↓ 为 2.28% (RAPPO-4)，对比 6.30% (DPO)，变化 -4.02%。
 > - Text Summarization (GPT-4 evaluation) 上，Win Rate vs DPO 为 74.5%，对比 50.0% (parity)，变化 +24.5%。
 
-## 概述
+## 概要
 
 大语言模型对齐的核心挑战之一是如何利用人类偏好信号稳定地优化策略。标准直接偏好优化（DPO）虽然避免了显式奖励建模，却对参考策略的假设高度敏感：当参考策略本身与人类偏好不一致时，偏好数据集中大量“模糊”的对比对会主导梯度信号，导致训练不稳定并扩大泛化误差。这一瓶颈源于DPO隐式奖励函数对参考策略对数比值的依赖——不可靠的参考锚点使得模型难以区分真正可信的偏好样本。
 
@@ -55,7 +57,7 @@ claims:
 
 （注：该方法尚未在超大规模（>8B）模型上充分验证，理论分析依赖于光滑性与Lipschitz假设，未来可扩展自适应丢弃策略并探索与其他对齐范式的结合。）
 
-## 背景与动机
+
 
 大规模语言模型对齐的主流范式之一是通过人类偏好数据进行微调。直接偏好优化（DPO）作为RLHF的高效替代，通过最大化偏好响应与拒绝响应之间的隐式奖励差距来直接优化策略，避免了显式奖励建模和策略梯度估计。然而，DPO的核心机制——隐式奖励函数 
 
@@ -67,7 +69,9 @@ $$r_{\theta}(x,y) = \beta \log \frac{\pi_{\theta}(y|x)}{\pi_{\mathrm{ref}}(y|x)}
 
 为填补这一缺口，RAPPO（Order‑Aware Preference Optimization）被提出。它的核心动机是：通过参考策略的对齐程度，主动识别并暂时移除每批中最高损失的、最不可靠的模糊训练对，使模型仅依据清晰的对齐样本和剩余可信任的未对齐样本进行更新。该设计并非简单丢弃数据，而是以顺序感知的方式控制梯度方差，从而在不牺牲参考指导的前提下，为训练过程提供更紧的泛化界。理论证明（Theorem 4.7）确认，RAPPO的稳定性递归界显著优于标准DPO，且其在多个实际任务上展现出一致且可观的改进：在IMDb上奖励得分提升3.5%–7.1%，在毒性控制上将毒性率从基线最优的6.30%降至2.28%，在GPT‑4评估下相对于DPO的胜率达74.5%。这些初步结果驱使进一步探索如何将顺序感知的样本筛选系统化为一种通用的、轻量的DPO增强机制。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 **根本瓶颈**。标准 DPO 隐含假设参考策略 $\pi_{\mathrm{ref}}$ 提供的偏好信号与人类偏好一致。实际上，$\pi_{\mathrm{ref}}$ 经常给出与人类偏好相悖的决策，导致大量“未对齐”偏好对混入训练（Figure 1A）。这些模糊样本的梯度贡献具有高方差，不仅主导了整体优化方向，而且放大了泛化误差，使模型在弱参考策略下性能急剧下降（Figure 1B）。现有的 DPO 变体（如 IPO、SimPO、KTO 等）通过调整损失形式或丢弃参考策略应对该问题，但未能从根本上区分并控制由参考偏差引起的噪声样本。
 
@@ -97,7 +101,7 @@ $$r_{\theta}(x,y) = \beta \log \frac{\pi_{\theta}(y|x)}{\pi_{\mathrm{ref}}(y|x)}
 
 **需注意的局限**：当前方法尚未在超过 8B 参数的模型上验证，且超参数 $q$ 和 $\tau$ 的设定仍需人工经验或网格搜索；理论分析依赖光滑性假设，实际语言模型可能不完全满足。这些点可在后续工作中进一步探索自适应丢弃策略。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0016_LrHfYPFTtg_Keep_the_Best_Forget_the_Rest_Reliable_Alignment/figures/004_Figure_3.jpg]]
 *Figure 3: RAPPO Pipeline:(1) sample mini-batch data; (2) score each mini-batch by reference alignment, splitting samples into Aligned and Unaligned; (3)unaligned samples are ranked by persample loss; (4) temporarily remove some Largest ones for this update*
@@ -151,7 +155,7 @@ $$
 
 RAPPO 并未引入新的奖励模型或复杂的对抗训练，而是通过**对现有 DPO 批次构成的轻量化改造**实现可靠对齐：先以参考对齐分数区分信度，再以单样本损失排序剔除最不可靠者。两个改变槽位（批次构成与优化目标）使其能在几乎不增加显存负担的情况下（约 25% 额外训练时间，Section D.4），将模糊样本引起的梯度方差控制在更窄范围内，从而显著提升训练稳定性与最终性能。此管道与 DPO 类方法（如 IPO、KTO、R‑DPO 等）保持兼容，可视为一种即插即用的**顺序感知偏好优化范式**。
 
-## 核心模块与公式推导
+
 
 RAPPO 的设计核心在于**批次内顺序感知的偏好筛选**。面对标准 DPO 对参考策略偏差高度敏感、模糊偏好对主导梯度信号从而损害泛化的瓶颈，该方法通过因果调节——在每步更新中依据参考对齐得分识别并暂时剔除损失最高的未对齐样本——来降低梯度方差、收紧泛化界。下面依次梳理三个关键模块，并给出驱动方法的公式及其变量含义。
 
@@ -237,7 +241,9 @@ $$
 
 RAPPO 通过“保留损失最小的 $(b-q)$ 个未对齐样本”显式最小化了 $\mathbb{E}[\max_{i\in\mathrm{Kept}_t} w(z_{t,i})]$，从而直接压缩递归不等式的右端项，最终导出比标准 DPO 更紧的泛化上界（定理4.7）。这一理论结果从根本上解释了顺序感知丢弃机制为何能同时提升训练的**稳定性**与**泛化性能**。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 
@@ -290,7 +296,9 @@ RAPPO 在四个基准任务上均取得了优于现有偏好优化方法的性�
 - **表 7**：完全展开的 SimPO 与 RAPPO 详细对比，在不同参数配置下验证了 RAPPO 的稳定优越性。
 - **表 12**：安全对齐实验的全指标细表，突显 RAPPO 在帮助性和安全性上的共同进步。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -328,6 +336,8 @@ RAPPO 提出了一个核心权衡：**在依赖有噪声的参考策略进行偏
 5. **跨范式推广**：RAPPO 的顺序感知丢弃逻辑（保留损失最小的样本）本质上是一种在线样本加权策略，是否可用于 RLHF 的 PPO 阶段，即根据即时优势信号或 TD 误差的可靠性筛选经验？这或将缓解奖励模型过度优化和策略崩溃问题。  
 
 总体而言，RAPPO 通过一个简单但有效的选择性过滤机制，缓解了 DPO 对参考模型的脆弱依赖，在多个基准上展现了更紧的理论界和一致的实证增益。将该思想扩展到更大规模模型、更松弛的理论框架以及更广泛的对齐范式，是未来工作的重要方向。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Stronger_MAS_Multi_Agent_Reinforcement_Learning_for_Collaborative_LLMs.pdf
+project_link: null
+code_link: https://github.com/pettingllms-ai/PettingLLMs
 openreview_forum_id: IdF6JqXWzx
 aliases:
 - AGATWGRPO
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | Stronger-MAS：面向协作式大语言模型的多智能体强化学习 |
 | 英文题名 | Stronger-MAS: Multi-Agent Reinforcement Learning for Collaborative LLMs |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=IdF6JqXWzx); [GitHub](https://github.com/pettingllms-ai/PettingLLMs) |
+| Links | [paper](https://openreview.net/forum?id=IdF6JqXWzx) · [GitHub](https://github.com/pettingllms-ai/PettingLLMs) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | AT-GRPO (Agent- and Turn-wise Grouped Relative Policy Optimization) |
 | Dataset | Sudoku (4×4) – Qwen3-1.7B, Sokoban (6×6) – Qwen3-8B, Plan-Path (10×10) – Qwen3-1.7B, LiveCodeBench-v6 – Qwen3-8B |
@@ -42,7 +44,7 @@ claims:
 > - Sokoban (6×6) – Qwen3-8B 上，Accuracy (%) 为 96.00，对比 9.00，变化 +87.00。
 > - Plan-Path (10×10) – Qwen3-1.7B 上，Accuracy (%) 为 96.00，对比 5.00，变化 +91.00。
 
-## 概述
+## 概要
 
 多智能体系统（MAS）通过角色分工与协作，有望突破单一大语言模型（LLM）在长程规划、推理等复杂任务中的能力边界。然而，现有方法面临两个关键瓶颈：其一，**单智能体强化学习（RL）缺乏跨角色协同**，在长程规划任务上准确率仅为14–47%；其二，**标准GRPO直接应用于MAS时**，由于各智能体在不同轮次接收的提示不同，无法形成同质比较组，导致优势估计方差大、训练不稳定，甚至出现性能倒退（如CodeContests上从17.6%降至10.3%）。
 
@@ -50,7 +52,7 @@ claims:
 
 实验结果表明，该方法在长程规划任务上实现了质的飞跃：**Sokoban 准确率从单智能体基线的9.0%提升至96.0%**，Plan-Path从5.0%提升至96.0%，Sudoku从7.0%提升至99.0%。在编码与数学推理任务上同样取得一致增益：LiveCodeBench-v6 Pass@1从22.8%提升至33.1%，AIME24准确率从18.3%提升至57.0%。消融实验进一步揭示：联合MAS环境进行RL训练至关重要（单独训练再组合仅达16%）；训练好的角色专用策略不可互换（交换后准确率从96%骤降至6%）；方法在移除稠密奖励后性能下降极小（≤4%），展现出对稀疏奖励的鲁棒性。
 
-## 背景与动机
+
 
 大语言模型（LLM）在推理与规划任务上已展现出显著能力，但单一LLM在面对长程规划、多步推理等复杂任务时仍存在明显瓶颈。近期研究表明，通过引入多智能体系统（MAS），让不同角色的LLM协同工作，可以有效提升任务完成质量。然而，现有MAS方案大多依赖提示工程或监督微调，缺乏在交互环境中通过在线强化学习（RL）持续优化协作策略的能力。
 
@@ -62,7 +64,9 @@ claims:
 
 本文的核心动机正是填补这一空白：**设计一种适用于多智能体、多轮交互的GRPO变体，使MAS中的各角色能够通过在线RL习得专业化协作策略，同时构建可扩展的训练系统以支撑异构工作流的高效执行**。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Stronger-MAS 的核心创新在于将标准 GRPO（Group Relative Policy Optimization）从单智能体场景系统性地适配到多智能体协作训练中，解决了原方法在 MAS 环境下因同质性假设被打破而导致优势估计方差大、训练不稳定的根本瓶颈。该创新通过三个紧密耦合的技术组件实现，可统一表述为 **AT-GRPO（Agent- and Turn-wise Grouped Relative Policy Optimization）** 算法。
 
@@ -128,7 +132,7 @@ AT-GRPO 在现有 LLM 多智能体训练框架中占据独特位置（Table 5 �
 
 AT-GRPO 是目前唯一同时满足**策略共享+专用双模式、多轮交互、异构角色、跨域适用**四个维度的框架。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l29_https_openreview_net_forum_id_IdF6JqXWzx/figures/004_Figure_3.jpg]]
 *Figure 3: Two sampling schemes. (a) In parallel sampling, trajectories are sampled but incomparable, leading to groups of size 1. (b) In tree sampling, branching at each turn forms a valid comparison group of size K*
@@ -176,7 +180,7 @@ Table 5 将 StrongerMAS 与现有基于 RL 的 LLM 多智能体训练框架进�
 
 **角色专用的有效性**：交换训练好的角色专用策略导致性能从 96% 骤降至 6%（Table 4），证实 RL 训练强化了角色的专业化分工，策略不可互换。
 
-## 核心模块与公式推导
+
 
 ### 问题定义与GRPO基础
 
@@ -255,7 +259,9 @@ $$\mathcal{L}(\theta^{(m)}) = -\mathbb{E}_{g \in B_{m}} \left[ \frac{1}{K} \sum_
 
 该设计支持角色共享和角色专用两种模式的统一训练，且通过GPU资源池与CPU环境池的解耦实现分布式扩展。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心结果
 
@@ -324,7 +330,9 @@ Figure 6 展示了角色专用策略训练过程中的两个关键趋势：
 3. **推理延迟线性增长**：顺序执行的 MAS 中，Wall-clock 推理延迟随智能体数量线性增加（N 倍），在延迟敏感场景下可能不适用。
 4. **贪心树搜索可能限制探索**：树结构采样中的贪心选择策略（每步选择最高奖励候选）可能导致探索不足，尤其在奖励信号稀疏的早期训练阶段。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法在现有谱系中的位置
 
@@ -377,6 +385,8 @@ AT-GRPO在知识库中的定位可概括为：**首个将GRPO的组归一化优�
 - **方法论层面**：提出了“按智能体和轮次分组”的原则，解决了MAS中优势估计方差大的瓶颈问题；配合树结构采样，在保持有效比较组的同时支持多轮交互的信用分配。
 - **系统设计层面**：构建了支持多策略并行训练和角色专用更新的分布式训练系统，为后续MAS-RL研究提供了可复用的基础设施。
 - **实证发现层面**：揭示了角色专用策略的不可互换性、联合训练的必要性、以及多轮单智能体交互的无效性，为MAS设计提供了重要的经验准则。
+
+
 
 ## 原文 PDF
 

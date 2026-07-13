@@ -43,7 +43,7 @@ claims:
 > - HPDv3 上，Spearman相关系数 ↑ / Kendall ↑ / N-MSE ↓ CHD: ρ=0.867, τ=0.778, N-MSE=0.017; CMMS: ρ=0.872, τ=0.778, N-MSE=0.018 vs FID: ρ≈0.6; CLIP-FID, DINO-FID较低; Q-Align: ρ≈0.85 (在所有指标上领先，尤其N-MSE较低)。
 > - 人类偏好基准 (HPDv2, AGIQA, HPDv3, VisForm) 上，成对偏好准确率 Acc ↑ CMMS: 74.9 (HPDv2), 71.5 (AGIQA), 61.3 (HPDv3), 66.7 (VisForm) vs ImageReward: ≤70; PickScore: ≤73.2; Q-Align: ≤73.2 (CMMS在所有基准上达到最高准确率)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有生成模型评估指标（如FID、IS）依赖连续识别特征（InceptionV3、CLIP、DINO），假设特征分布为高斯，并采用全局平均池化——这导致它们对纹理、清晰度、局部伪影等外观细节不敏感，在艺术图像、医学图像等非高斯分布场景下不可靠。
 
@@ -58,8 +58,6 @@ claims:
 - CHD在约1,000张图像时即收敛，而FID需要超过10,000张，样本效率提升约一个数量级（Figure 5）。
 - 在AGIQA、HPDv2/3和VisForm等多个基准上，CHD和CMMS均取得与人类判断的最先进相关性，显著超越FID、CLIP-FID、CMMD等传统指标（Table 1–3）。
 - CMMS仅使用合成退化训练，在人类偏好预测准确率上达到甚至超过需要人工标注的偏好模型（如ImageReward、PickScore）（Table 3）。
-
-## 背景与动机
 
 ### 生成模型评估的核心瓶颈
 
@@ -93,7 +91,7 @@ $$\mathrm{MMD}_k^2 = \mathbb{E}_{x,x'}[k(x,x')] + \mathbb{E}_{y,y'}[k(y,y')] - 2
 
 基于这一范式，本文提出两个互补的评估指标：**CHD**（Codebook Histogram Distance），一种无需训练的分布度量，通过比较真实与生成图像token的一元直方图和空间共现直方图来衡量分布差异；**CMMS**（Code Mixture Model Score），一种无参考质量评分器，仅通过合成token退化训练即可达到甚至超越需要人类标注的偏好模型。两者共同构成了一个从分布评估到单张质量预测的完整评估框架，在多个基准上实现了与人类判断的最先进一致性。
 
-## 核心创新
+## 核心方法与创新机理
 
 ### 从连续特征分布到离散Token统计：评估空间的根本切换
 
@@ -148,8 +146,6 @@ CHD的**因果有效性**在图2中得到验证：随着失真程度增加（高
 ### 创新三：高样本效率与收敛性
 
 CHD的另一关键创新在于**样本效率**。如图5所示，CHD在约1,000张图像时即收敛至稳定值，而FID需要超过10,000张样本才能稳定。这一特性源于离散token空间的低维结构化特性（词汇量4096，序列长度128），使得直方图统计在小样本下即可可靠估计，大幅降低了评估成本。
-
-## 整体框架
 
 本文提出了一种将生成模型评估从连续特征空间迁移到离散视觉token空间的新范式。其核心洞察在于：现代1D图像标记器在重建目标的驱动下，能够紧凑地编码语义与外观信息，而图像质量会自然地表现为token统计规律——高质量图像产生结构化、低熵的token模式，退化图像则呈现随机、高熵的分布。基于这一洞察，整个框架围绕“标记化→分布度量/质量回归”两条主线展开。
 
@@ -223,8 +219,6 @@ Figure 1 概括了本框架与以FID为代表的传统方法的核心差异。�
 - **分布假设自由**：非参数直方图比较无需高斯假设，在艺术、医学等非高斯分布图像上同样可靠。
 - **高样本效率**：CHD约在1,000张图像时收敛，而FID需要超过10,000张（Figure 5）。
 
-## 核心模块与公式推导
-
 ### 整体范式转换
 
 本文的核心创新在于将生成模型评估从**连续特征空间**迁移到**离散视觉token空间**。传统指标（如FID）在InceptionV3等识别编码器的连续特征上操作，假设特征服从高斯分布：
@@ -293,12 +287,7 @@ $$ q(p) = \exp(-20p), \quad p \in [0, 0.3] $$
 
 质量回归器采用轻量**Transformer编码器+MLP**架构，将退化token序列映射为标量质量分数。消融实验（Table 4）表明：(1) 以离散token作为输入显著优于像素输入；(2) 指数质量映射 $\exp(-20p)$ 为最优选择；(3) token腐败与像素增强组合训练最有效。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l748_https_arxiv_org_abs_2603_08064/figures/003_Figure_3.jpg]]
-*Figure 3: Code Mixture Model Degradation. CMMS is trained on token sequences obtained from natural images that are progressively corrupted via uniform token injection, semantic fragment swapping, and pixel-space distortions, without any human labels*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 评估基准与实验设置
 
@@ -355,13 +344,7 @@ Figure 2通过10级渐进失真实验（高斯噪声、块混洗等）定量验�
 ![[assets/figures/papers/paper_list_l748_https_arxiv_org_abs_2603_08064/figures/009_Table_4.jpg]]
 *Table 4: Ablation study of CHD (N-MSE↓) and CMMS (Acc↑)*
 
-![[assets/figures/papers/paper_list_l748_https_arxiv_org_abs_2603_08064/figures/006_Figure_4.jpg]]
-*Figure 4: Metric–human correlation on VisForm across models and domains. All metrics are normalized to [0, 1], higher is better*
-
-![[assets/figures/papers/paper_list_l748_https_arxiv_org_abs_2603_08064/figures/007_Figure_5.jpg]]
-*Figure 5: Mean CHD and FID values versus sample size. CHD converges with roughly 1,000 images, while FID needs over 10,000 samples to stabilize*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 从连续特征到离散Token：评估范式的根本转换
 

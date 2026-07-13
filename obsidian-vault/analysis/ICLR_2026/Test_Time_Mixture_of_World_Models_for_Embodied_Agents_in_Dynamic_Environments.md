@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Test_Time_Mixture_of_World_Models_for_Embodied_Agents_in_Dynamic_Environments.pdf
+project_link: null
+code_link: null
 openreview_forum_id: LQD1MrnbxH
 aliases:
 - TTTMWM
@@ -42,7 +44,7 @@ claims:
 > - ALFWorld (unseen) 上，SR (%) 为 68.83，对比 42.04 (SayCanPay)，变化 +26.79。
 > - RLBench (unseen) 上，SR (%) 为 62.75，对比 38.54 (SayCanPay)，变化 +24.21。
 
-## 概述
+## 概要
 
 **核心问题**：具身智能体在动态环境中执行任务时，依赖世界模型预测动作后果。传统混合专家（MoE）架构在部署后路由函数固定不变，当环境域发生偏移时，模型难以自适应，重新训练代价高昂。
 
@@ -52,7 +54,7 @@ claims:
 
 **主要结果**：在 VirtualHome、ALFWorld 和 RLBench 三个基准的零样本适应中，TMoW 较最强基线 **SayCanPay**（Hazra et al., 2024）平均提升 27.21% 成功率（SR），其中 VirtualHome 未见域达到 80.16%（SayCanPay 为 49.53%）。在少样本扩展场景中平均增益 25.66%。真实环境实验中，TMoW 在未见域达到 74.64% SR，远超 **FLARE**（Kim et al., 2025）的 36.04%。消融实验证实多粒度原型路由、测试时精炼和蒸馏增强均为关键设计。
 
-## 背景与动机
+
 
 具身智能体在开放世界中执行任务时，面临一个核心挑战：环境域的动态变化导致预训练世界模型的预测能力急剧退化。世界模型作为智能体规划与决策的内部模拟器，其质量直接决定任务成功率。然而，现实部署中环境布局、物体属性、任务约束等域特征持续漂移，使得单一静态世界模型难以泛化。
 
@@ -64,7 +66,9 @@ claims:
 
 本文提出的测试时世界模型混合框架（Test-time Mixture of World Models, TMoW）正是围绕上述动机展开。其核心洞见在于：**利用多粒度原型捕获层次化域语义，结合测试时原型精炼实现路由函数的在线自适应，使世界模型混合权重随环境变化动态重配置**。这一设计从根本上改变了MoE在具身智能中的部署范式——从“训练时固定、测试时僵化”转向“训练时积累、测试时适应”，为动态环境中的零样本与少样本高效适应开辟了新路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 TMoW 的核心创新在于将传统 MoE 架构中固定不变的路由函数改造为**测试时可自适应重配置的动态路由机制**，使具身智能体在无需重新训练的情况下即可适配动态变化的环境域。这一创新通过三个相互协同的“改变槽位”（changed slots）实现：
 
@@ -88,7 +92,7 @@ TMoW 提出了**蒸馏式混合增强**（distilled mixture-based model augmenta
 
 三个改变槽位协同作用，使 TMoW 在 VirtualHome 未见域的零样本适应中达到 80.16% 成功率，较最强基线 **SayCanPay**（Hazra et al., 2024）的 49.53% 提升了 30.63 个百分点（Table 1）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_LQD1MrnbxH/figures/002_Figure_2.jpg]]
 *Figure 2: Overall framework of TMoW*
@@ -115,7 +119,7 @@ TMoW 的整体框架（Figure 2）由三个协同工作的核心模块构成：
 
 整个框架的输入是当前环境观测（以图结构表示），经过图处理器编码后得到多粒度域嵌入。路由器在各层将域嵌入与对应层的原型进行余弦相似度计算，得到路由得分并据此激活 Top-K 个世界模型。被激活的世界模型（通过 LoRA 等轻量适配器实现）的输出按路由得分加权融合，最终产生下一时刻的预测。在未见域中，测试时原型精炼模块持续在线更新原型，使路由函数动态适应当前环境特征。
 
-## 核心模块与公式推导
+
 
 TMoW 框架围绕三个核心模块构建，它们共同解决了传统 MoE 架构在动态环境中路由函数固定、无法跨域复用知识的瓶颈。
 
@@ -185,7 +189,9 @@ $$
 
 其中 $\mathcal{L}_{\mathrm{TF}}$ 为教师强制损失，监督轨迹上的下一动作和观测预测。对应的新原型 $\pmb{p}^{\prime(l)}$ 从 $\mathcal{D}^{\prime}$ 中期望计算得到。消融实验表明，蒸馏增强（SR 81.56%）远优于从零训练（SR 59.84%），验证了知识复用的有效性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -257,7 +263,9 @@ TMoW通过多粒度原型路由和测试时精炼，在零样本和少样本场�
 ![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_LQD1MrnbxH/figures/005_Figure_4.jpg]]
 *Figure 4: Comparison of the routing score heatmap before (left) and after (right) test-time prototype refinement for (a) seen and (b) unseen domains*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与因果机制
 
@@ -304,6 +312,8 @@ TMoW通过多粒度原型路由和测试时精炼，在零样本和少样本场�
 **跨领域推广。** TMoW 的测试时适应思路——通过原型精炼在路由空间而非参数空间进行域适应——是否可推广到其他非具身领域的语言模型导向系统（如对话系统、代码生成）？这一推广需要重新定义“世界模型”和“原型”在非具身场景中的语义，但其核心机制具有潜在的通用性。
 
 **连续扩展中的灾难性遗忘。** 论文通过连续域扩展实验初步探索了 TMoW 在持续学习场景中的表现，但未深入分析随着世界模型数量增长，路由是否会出现退化或偏向近期域的问题。这是实际部署中不可回避的挑战。
+
+
 
 ## 原文 PDF
 

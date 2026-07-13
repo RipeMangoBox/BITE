@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/SophiaVL_R1_Reinforcing_MLLMs_Reasoning_with_Thinking_Reward.pdf
+project_link: null
+code_link: https://github.com/kxfan2002/SophiaVL-R1
 openreview_forum_id: 0tzvmjMcXC
 aliases:
 - SR
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | SophiaVL-R1：通过思考奖励增强多模态大模型推理 |
 | 英文题名 | SophiaVL-R1: Reinforcing MLLMs Reasoning with Thinking Reward |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=0tzvmjMcXC); [GitHub](https://github.com/kxfan2002/SophiaVL-R1) |
+| Links | [paper](https://openreview.net/forum?id=0tzvmjMcXC) · [GitHub](https://github.com/kxfan2002/SophiaVL-R1) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | SophiaVL-R1 |
 | Dataset | MathVista, MathVerse, MMMU, MME |
@@ -42,7 +44,7 @@ claims:
 > - MathVerse 上，Average Accuracy 为 48.8，对比 44.9 (Qwen2.5-VL-7B + GRPO)，变化 +3.9。
 > - MMMU 上，Accuracy 为 61.3，对比 56.8 (LLaVA-OneVision-72B)，变化 +4.5。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -68,7 +70,7 @@ SophiaVL-R1-7B 在多个多模态推理基准上展现出显著优势：
 - **通用能力**：在 MMMU 上达到 61.3%，超越参数量 10 倍的 LLaVA-OneVision-72B（56.8%）达 4.5 个百分点；在 MME 上达到 2403.8 分（Table 2）。
 - **消融验证**：移除信任权重或退火策略均导致所有基准上的性能下降，证实两个组件的必要性（Table 4）。训练过程中，SophiaVL-R1 的平均结果奖励提升最快且最终值最高，表明其习得了更优的推理策略（Figure 5）。
 
-## 背景与动机
+
 
 多模态大语言模型（MLLMs）在视觉推理任务上已取得显著进展，但如何系统性地增强其推理能力仍是一个开放问题。近期研究表明，强化学习（RL）可以有效提升大语言模型的推理性能，代表性工作如 DeepSeek-R1 通过 GRPO（Group Relative Policy Optimization）算法在纯文本数学推理上取得了突破。然而，将这一范式迁移到多模态场景时，一个关键瓶颈逐渐浮现。
 
@@ -86,7 +88,9 @@ SophiaVL-R1 正是针对上述缺口提出的。其核心动机可概括为三�
 
 这一设计思路——以整体过程评估替代步骤级监督，以动态信任机制缓解奖励黑客，以退火策略平衡探索与收敛——构成了 SophiaVL-R1 的方法论基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SophiaVL-R1 的核心创新在于将**过程监督信号**引入规则化强化学习范式，并通过**动态可信度调节**与**退火调度**两个机制来稳定这一信号，从而引导多模态大模型学习更可泛化的推理策略。
 
@@ -154,7 +158,7 @@ $$\gamma = \begin{cases} 1, & \mu_c \geq \mu_w \\ e^{\mu_c - \mu_w}, & \mu_c < \
 
 当前的退火策略采用固定的指数衰减调度（$T$ 为常数），更复杂的调度策略——例如基于学习进度或奖励信号质量的自适应门控机制——可能带来进一步改进。这一问题在论文中被明确列为开放方向，表明退火策略的设计空间尚未被充分探索。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_0tzvmjMcXC/figures/004_Figure_3.jpg]]
 *Figure 3: An illustration of our proposed Trust-GRPO*
@@ -189,7 +193,7 @@ SophiaVL-R1 的整体框架围绕一个核心矛盾展开：**仅依赖规则化
 *   **Figure 4** 通过具体案例验证了信任权重的必要性：在错误回答组的平均思考奖励高于正确组时，$\gamma$ 有效压低了不可靠过程信号的权重。
 *   **消融实验（Table 4）** 证实了框架各组件的因果贡献：移除信任权重（wo-trust）或同时移除信任权重与退火（wo-trust-and-annealing）均导致所有基准上的性能下降，其中 MathVista 从 71.3 分别降至 69.2 和 68.7。使用未经训练的 TRM（wo-trained-TRM）同样损害性能，表明高质量的过程奖励模型是框架生效的前提。
 
-## 核心模块与公式推导
+
 
 ### 核心模块
 
@@ -257,7 +261,9 @@ $$\begin{array} { l } { { \displaystyle \mathcal { J } _ { G R P O } ( \theta ) 
 
 信任权重的核心在于利用“正确组 vs 错误组”的思考奖励对比来动态评估 TRM 的可靠性，而非简单地将思考奖励直接合并。这一设计在消融实验 (Table 4) 中得到验证：移除信任权重 (wo-trust) 会导致所有基准性能下降；同时移除信任权重和退火 (wo-trust-and-annealing) 则进一步恶化。此外，Table 7 表明基于均值对比的信任权重设计优于基于方差的替代方案。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 
@@ -305,7 +311,9 @@ SophiaVL-R1-7B 在数学推理与通用多模态基准上均展现出显著的�
 
 3. **跨任务泛化的边界。** 尽管在 MathVista 和 MMMU 等基准上表现优异，但在某些子任务（如 MathVista 的逻辑推理 LOG 子集，35.1%）上绝对分数仍然较低，提示思考奖励模型在纯逻辑推理场景下的评估能力可能不足。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 技术脉络与基线关系
 
@@ -341,6 +349,8 @@ SophiaVL-R1 的核心贡献在于将**过程级思考质量监督**引入多模�
 2. **TRM 的跨模型泛化性**：TRM 基于 Qwen2.5-VL-3B-Instruct 训练，其在其他架构 MLLM（如 LLaVA 系列）生成的推理链上的评分一致性尚未验证。若 TRM 对特定模型族存在偏好，可能限制方法的通用性。
 3. **信任权重在多轮交互中的扩展**：当前 $\gamma$ 基于单轮采样的组内统计。在多轮对话或交互式推理场景中，如何累积历史信任信息来动态调整思考奖励权重，仍需探索。
 4. **思考奖励的维度解耦**：TRM 从五个维度（逻辑正确性、推理正确性、错误识别、语言一致性、冗余度）综合评分。各维度对最终性能的贡献是否均衡？是否存在某些维度与结果奖励更易对齐，而其他维度需要不同的信任权重策略？这一问题尚未被系统研究。
+
+
 
 ## 原文 PDF
 

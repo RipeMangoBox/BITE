@@ -43,7 +43,7 @@ claims:
 > - Waymo Open Dataset (WOD) 上，mIoU ↑ (semantic segmentation) 0.6663 (SLARM) vs 0.4876 (LSeg) (+0.1787)；EPE3D ↓ (scene flow) 0.240 (SLARM-F) vs 0.304 (STORM) (-0.064)。
 > - NuScenes 上，PSNR ↑ 26.71 (SLARM-F) vs 26.25 (STORM) (+0.46 dB)。
 
-## 概述
+## 概要
 
 SLARM 是一个面向动态场景的**流式、语言对齐的前馈重建模型**，其核心目标是解决现有方法在复杂非均匀运动建模、语义理解与实时推理部署三个维度上的根本性瓶颈。以 **STORM** (Yang et al., arXiv 2024) 为代表的前馈式动态重建方法依赖恒定速度假设，难以精确捕捉真实场景中行人的步态、车辆的变速等非均匀运动；同时，这些方法缺乏语义感知能力，且采用离线批量推理模式，无法满足自动驾驶等对延迟和内存敏感的实时应用需求。
 
@@ -53,7 +53,7 @@ SLARM 的关键洞察在于：**动态场景重建的性能瓶颈本质上受限
 
 实验结果表明，SLARM 在 Waymo Open Dataset (WOD) 上达到 **27.49 dB PSNR**，比 STORM 提高 **1.63 dB**；深度误差 (Depth RMSE) 降至 **4.57**，降低 0.90；场景流误差 (EPE3D) 降至 **0.240**，相对降低 21%；语义分割 mIoU 达到 **0.6663**，比 LSeg 提高约 18 个百分点。在 NuScenes 和 Argoverse2 数据集上的跨域泛化实验进一步验证了方法的鲁棒性。消融研究证实，三阶运动建模达到性能最优，语义损失显著降低流估计误差，而流式推理模式在保持线性时间复杂度与稳定内存占用的同时，实现了与离线模式接近的重建质量。
 
-## 背景与动机
+
 
 动态场景的实时三维重建与理解是自动驾驶与具身智能的核心技术。近年，以 3D Gaussian Splatting（3DGS）为代表的前馈式通用重建模型在静态场景上取得了快速且逼真的新视角合成效果，代表性工作如 **LGM**（Tang et al., ECCV 2024）与 **GS-LRM**（Zhang et al., ECCV 2024）。然而，当场景中包含运动物体时，这些方法面临根本性挑战：现实世界中的运动往往是非均匀、非线性的——例如行人的步态包含复杂的加速与减速过程，而现有方法对此建模能力严重不足。
 
@@ -63,7 +63,9 @@ SLARM 的关键洞察在于：**动态场景重建的性能瓶颈本质上受限
 
 基于此，SLARM 提出三个关键改进方向：引入**高阶泰勒展开运动建模**以捕获非均匀运动；通过蒸馏 **LSeg 语言对齐特征**实现语义重建；设计**窗口因果注意力机制**以实现常数延迟的流式推理。这三个方向分别对应运动表达能力、语义理解能力与在线部署能力的系统性提升。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SLARM 在现有前馈式动态重建方法的基础上，从运动建模、语义表征和推理模式三个维度进行了系统性改进，以解决真实场景中复杂非均匀运动的精确建模问题，并赋予模型语义理解与实时流式推理能力。
 
@@ -96,7 +98,7 @@ $$\mathcal{G}^{\mathrm{static}} = \{g \in \mathcal{G} \mid \|\Gamma_g(\Delta t)\
 
 三个改进维度形成协同效应：高阶运动模型提供精确的几何基础，语义蒸馏赋予场景理解能力并反向正则化运动估计，流式推理则将上述能力部署到实时应用场景。
 
-## 整体框架
+
 
 SLARM 的总体设计遵循“编码—融合—解码—语义/运动增强—流式传播”的前馈式流水线，其核心结构如 Figure 2 所示。模型以多帧 RGB 图像序列作为输入，输出一个显式的 4D 高斯泼溅（4D Gaussian Splatting, 4DGS）表示，该表示同时携带几何、光度、运动与语言对齐的语义信息。
 
@@ -121,7 +123,7 @@ SLARM 的总体设计遵循“编码—融合—解码—语义/运动增强—�
 ![[assets/figures/papers/paper_list_l44_https_arxiv_org_abs_2603_22893/figures/001_Figure_1.jpg]]
 *Figure 1: SLARM is a large feedforward Transformer using a self-supervised approach for fast and accurate inference of 3D scene flow, metric depth and language-aligned semantics in dynamic scenes. For real-time inference deployment in autonomous driving and embodied AI applications, our model also supports incremental streaming inference*
 
-## 核心模块与公式推导
+
 
 ### 1. 整体流水线：从图像到4D高斯原语
 
@@ -199,7 +201,9 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{rgb}} + \mathcal{L}_{\math
 
 其中 $\mathcal{L}_{\mathrm{rgb}}$ 为 MSE 与 LPIPS（$\lambda_{\mathrm{lpips}}=0.05$）的加权组合（Eq. (4)），$\mathcal{L}_{\mathrm{depth}}$ 为深度监督项，$\mathcal{L}_{\mathrm{sky}}$ 为天空区域正则项，$\mathcal{L}_{\mathrm{reg}}$ 为运动正则项，$\mathcal{L}_{\mathrm{feat}}$ 为语义特征对齐项。训练使用 AdamW 优化器，共 200k 次迭代。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 SLARM 在动态重建、语义分割与场景流估计三项核心任务上均取得显著提升，其性能优势源于高阶运动建模与语义蒸馏的协同作用。
 
@@ -257,7 +261,9 @@ SLARM 在 WOD 上取得 **0.6663 mIoU**，显著超越 **LSeg** 的 0.4876（提
 ![[assets/figures/papers/paper_list_l44_https_arxiv_org_abs_2603_22893/figures/012_Figure_9.jpg]]
 *Figure 9: Qualitative results on a complex outdoor scene: left shows rendered RGB, depth, 3D scene flow, and semantic map from predicted 4DGS; right displays a novel view of the 4DGS in a 3DGS visualizer*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与前馈式高斯重建方法的关系
 
@@ -298,6 +304,8 @@ SLARM 在架构范式上延续了前馈式 3D 高斯重建（feed-forward 3DGS�
 3. **语义蒸馏教师模型的选择**：Figure 7 的消融表明 LSeg 在语义连贯性和帧间连续性上优于 MaskCLIP 和 SAM-CLIP，但随着更强视觉-语言模型（如 CLIP 变体、开放词汇分割模型）的涌现，教师特征的最优选择仍是一个开放问题。该结论需要后续工作进一步验证。
 
 4. **运动阶数的理论解释**：Figure 5(c) 显示三阶运动模型达到最优，更高阶不再带来明显收益。论文将此归因于“三阶对应加加速度，足以描述真实物理运动”，但缺乏对数据集运动分布（如加速度谱、加加速度谱）的定量分析。该经验结论的理论基础需要进一步验证。
+
+
 
 ## 原文 PDF
 

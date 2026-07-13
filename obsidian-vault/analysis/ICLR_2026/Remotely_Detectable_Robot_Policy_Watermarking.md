@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Remotely_Detectable_Robot_Policy_Watermarking.pdf
+project_link: https://sites.google.com/view/robotpolicywatermarking/
+code_link: null
 openreview_forum_id: 8s5jBVybhQ
 aliases:
 - CNCC
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 可远程检测的机器人策略水印 |
 | 英文题名 | Remotely Detectable Robot Policy Watermarking |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=8s5jBVybhQ); [Project](https://sites.google.com/view/robotpolicywatermarking/) |
+| Links | [paper](https://openreview.net/forum?id=8s5jBVybhQ) · [Project](https://sites.google.com/view/robotpolicywatermarking/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/robotics |
 | Method | Colored Noise Coherency (CoNoCo) |
 | Dataset | RoboMaster Navigation (Real Robot), Velocity-Controlled VMAS Navigation (Sim), Mujoco Inverted Pendulum, Mujoco HalfCheetah |
@@ -42,7 +44,7 @@ claims:
 > - Velocity-Controlled VMAS Navigation (Sim) 上，Detection (ROC AUC) 为 high，对比 lower (some baselines fail on real robot)，变化 significant。
 > - Mujoco Inverted Pendulum 上，Detection (ROC AUC) 为 near-perfect，对比 lower (Multi-Sine high but fails anonymity)，变化 superior when combined with anonymity。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -79,7 +81,7 @@ CoNoCo 属于**远程黑盒策略水印**方法，与现有工作的关键区别
 
 CoNoCo 依赖策略的随机性来嵌入水印，**目前不能直接应用于确定性策略**。理论分析假设 LTI 系统动力学，在强非线性或快速时变场景下性能可能下降。此外，远程速度估计依赖计算机视觉方法，对遮挡和光照变化的鲁棒性有限。开放问题包括：如何扩展到确定性控制策略、如何在多运动对象场景下鲁棒提取运动 glimpse、以及对抗性带宽感知攻击的理论上限等。
 
-## 背景与动机
+
 
 ### 机器人策略溯源的黑箱困境
 
@@ -125,7 +127,9 @@ $$C_{XY}(f) = \frac{S_{XY}(f)}{\sqrt{S_{XX}(f) S_{YY}(f)}}$$
 
 由此，本文提出 **CoNoCo（Colored Noise Coherency）**：在频域嵌入有色噪声水印，通过频谱相干性进行检测，辅以频率网格搜索和重采样机制处理同步不确定性（C1），从而首次实现仅依赖远程观察的策略所有权验证。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CoNoCo 的核心创新在于将策略溯源问题从传统的“白盒审计”范式迁移至“远程黑盒检测”范式。其关键洞察是：**利用连续控制策略固有的随机性作为水印载体，在频域嵌入信号，并通过频谱相干性对线性时不变（LTI）系统动力学的不变性来抵抗物理世界的滤波效应**。这一设计直接破解了远程策略水印的核心瓶颈——物理观察鸿沟（同步不确定性、未知系统动力学、干扰与噪声）。
 
@@ -161,7 +165,7 @@ $$|C_{WG}(f)|^2 = \frac{\mathrm{SINR}(f)}{\mathrm{SINR}(f) + 1}$$
 
 其中 $\mathrm{SINR}(f) = P_S(f) / P_N(f)$。当水印功率 $P_S(f)$ 显著高于干扰加噪声功率 $P_N(f)$ 时，相干性趋近于 1，检测近乎确定。水印功率由策略的探索尺度 $\Sigma$ 直接控制，因此策略的随机性越强，可检测性越高——这恰好与连续控制策略的典型特性相吻合。当系统呈现非线性或时变特性时，CoNoCo 通过短时分析（Welch 方法分窗处理）和多维度平均（利用空间分集）来缓解频谱扩散效应，保持检测鲁棒性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_8s5jBVybhQ/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the pipeline for robot policy watermarking. In Step 1, the policy owner trains a policy, adds a watermark to it and produces a detection function to identify it. In Step 2, the watermarked policy is used by a policy user who deploys it on their own robot. In Step 3, a policy auditor aims to identify the policy used on the robot. To do so, they can only access glimpses of the policy behaviour through remote sensing, such as a camera feed; these glimpses are passed through the detection function to identify the policy*
@@ -185,7 +189,7 @@ CoNoCo 将机器人策略水印定义为一个三阶段管道（Figure 1），�
 
 **物理观察鸿沟。** Table 1 系统刻画了四种观测模态面临的三个核心挑战：C1 同步不确定性（远程传感器采样时刻与策略执行时刻不匹配）、C2 未知系统动力学（机器人自身动力学和控制器对动作信号进行滤波）、C3 干扰与噪声（环境扰动和测量噪声）。Ground Truth Action 不受任何挑战影响，但要求白盒访问；Onboard Sensors 仅受 C2 和 C3 影响；而 Remote Motion Capture 和 Remote Camera Feed 则面临全部三个挑战，是 CoNoCo 设计的核心目标场景。CoNoCo 通过频域嵌入与频谱相干性检测的组合，在仅依赖远程观察的条件下跨越了这一物理观察鸿沟。
 
-## 核心模块与公式推导
+
 
 CoNoCo 的核心机制由水印生成、水印注入、同步对齐、相干性计算和分数聚合五个模块构成。以下逐一阐述其关键公式与变量含义。
 
@@ -251,7 +255,9 @@ $$|C_{WG}(f)|^2 = \frac{\mathrm{SINR}(f)}{\mathrm{SINR}(f) + 1}$$
 
 此外，论文证明了相干性模长在线性时不变（LTI）系统滤波下具有不变性（Theorem 5.2），这是 CoNoCo 能够抵抗未知系统动力学（C2）的理论基石。对于实际中常见的线性时变（LTV）系统，CoNoCo 通过 Welch 方法的短时分析和多维度平均加以缓解。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置与评估维度
 
@@ -317,7 +323,9 @@ $$|C_{WG}(f)|^2 = \frac{\mathrm{SINR}(f)}{\mathrm{SINR}(f) + 1}$$
 | Figure 10 | 对抗性噪声攻击需要付出策略性能代价才能削弱水印 |
 | Figure 11 | 带阻滤波攻击导致策略行为严重失真（MSE +257%） |
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：物理观察鸿沟下的策略溯源
 
@@ -368,6 +376,8 @@ CoNoCo 在面对主动攻击时展现出不对称的鲁棒性。**加性噪声�
 2. **遮挡与多对象场景**：在机器人部分被遮挡或存在多个运动对象时，如何鲁棒地提取有效的运动 glimpse？这需要超越当前模板匹配方法的计算机视觉技术。
 3. **蒸馏攻击的可行性**：能否在不依赖训练数据分布的情况下，通过行为克隆或蒸馏反向推导并去除水印？这涉及水印信号是否与策略的“有用”行为在频域上可分离。
 4. **对抗性带宽感知攻击的理论上限**：如果攻击者能够通过强化学习精确学习在秘密频带内注入抵消信号，CoNoCo 的检测性能是否存在理论上的下界？当前的结构化干扰分析仅覆盖了无密钥场景。
+
+
 
 ## 原文 PDF
 

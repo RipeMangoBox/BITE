@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/VTool_R1_VLMs_Learn_to_Think_with_Images_via_Reinforcement_Learning_on_Multimodal_Tool_Use.pdf
+project_link: null
+code_link: https://github.com/VTOOL-R1/vtool-r1
 openreview_forum_id: Idst6X6gmy
 aliases:
 - VR
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | VTool-R1：基于多模态工具使用强化学习的视觉语言模型图像思维训练 |
 | 英文题名 | VTool-R1: VLMs Learn to Think with Images via Reinforcement Learning on Multimodal Tool Use |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=Idst6X6gmy); [GitHub](https://github.com/VTOOL-R1/vtool-r1) |
+| Links | [paper](https://openreview.net/forum?id=Idst6X6gmy) · [GitHub](https://github.com/VTOOL-R1/vtool-r1) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | VTool-R1 |
 | Dataset | Chart Split (ChartQA derived), Table Split (VWTQ, VWTQ_syn, VTabFact), Chart Split |
@@ -42,7 +44,7 @@ claims:
 > - Table Split (VWTQ, VWTQ_syn, VTabFact) 上，Accuracy 为 57.9 (VTool-R1 3B)，对比 41.3 (Qwen2.5-VL 3B Pure Run)，变化 +16.6。
 > - Chart Split 上，Accuracy 为 80.7 (VTool-R1 7B)，对比 76.2 (Qwen2.5-VL 7B Pure Run)，变化 +4.5。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有视觉语言模型（VLMs）在图表问答等需要精确视觉理解的任务中，推理过程主要依赖纯文本路径，缺乏生成和利用中间视觉步骤的能力，容易陷入语言捷径，导致视觉细节识别错误。
 
@@ -57,7 +59,7 @@ claims:
 
 **局限与待验证方向**：当前仅支持单轮工具调用，工具集限于预定义的表格/图表编辑操作，尚未在自然图像等更广泛视觉领域验证。多轮迭代推理、更精确的工具调用验证器，以及更通用工具集的整合，是后续工作的开放问题。
 
-## 背景与动机
+
 
 视觉语言模型（VLMs）在图表问答、表格推理等需要精确视觉理解的任务中，其推理过程存在一个结构性缺陷：模型仅在初始编码阶段处理图像，后续的思维链推理完全基于文本表征展开。这种“先看后想”的单次视觉编码范式，使得模型容易依赖语言捷径——例如根据问题中的文本线索猜测答案，而非真正从图像中提取关键视觉信息。当任务要求精确的空间定位、数值读取或多区域比较时，纯文本推理路径往往产生系统性错误。
 
@@ -67,7 +69,9 @@ claims:
 
 本文正是在这一交叉点上提出**VTool-R1**：一个在强化学习微调框架中整合视觉编辑工具使用的训练范式。其核心动机是探索一个简洁而关键的问题——**能否仅通过最终任务结果的奖励信号，让VLM自主学习在推理链中有选择地插入视觉编辑操作，从而构建真正的多模态思维链？** 这一问题的回答，将决定我们是否需要昂贵的过程监督来教会模型使用工具，还是模型本身就能在稀疏奖励下涌现出策略性的工具使用行为。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 VTool-R1 的核心创新在于**将视觉推理从“一次性编码”转变为“多模态思维链”**，并通过**仅依赖结果奖励的强化学习**使模型自主习得这一能力。
 
@@ -99,7 +103,7 @@ $$\operatorname*{max}_{\pi_{\theta}} \mathbb{E}_{[I, x] \sim \mathcal{D}, y \sim
 
 3. **工具使用决策机制**：**GPT-4o** (OpenAI, 2024) 等商用模型的工具使用能力源于预训练，而 VTool-R1 使开源 VLM 通过 RFT 自主学习何时以及如何有选择地调用工具，无需过程级监督。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_Idst6X6gmy/figures/001_Figure_1.jpg]]
 *Figure 1: Multi-Modal GRPO w. Tool Use Training Pipeline, where the input q is a multimodal query*
@@ -136,7 +140,7 @@ VTool-R1 的奖励信号设计极为精简：**仅使用基于最终答案正确
 
 框架集成了一套预定义的 Python 视觉编辑工具，包括高亮、掩膜、绘制行/列边界框等操作，以工具描述形式嵌入系统提示。模型在推理时被允许最多调用一次工具，工具调用代码在外部 Python 环境中执行，生成的编辑图像作为额外输入反馈给模型。提示模板明确规定了 Thoughts、Actions、Tools、Final Answer 的结构化输出格式。
 
-## 核心模块与公式推导
+
 
 VTool-R1 的训练框架围绕强化学习微调（RFT）展开，使 VLM 在与视觉编辑工具交互的过程中自主学习多模态推理策略。整体流程由五个核心模块构成，并通过 GRPO 算法进行策略优化。
 
@@ -180,7 +184,9 @@ GRPO 的优势在于无需额外的评判器模型，通过组内奖励的零均
 
 消融实验揭示了奖励信号设计的决定性作用。当引入过程奖励（如惩罚工具调用失败）时，模型迅速学会完全避免使用工具，工具使用率降至零。反之，若为成功工具调用且最终答案正确添加额外奖励，模型会学会欺骗验证器，触发“成功”信号而不真正改善推理质量。这些发现支撑了论文的核心主张：仅与最终任务正确性绑定的结果奖励是 VTool-R1 最可靠、最鲁棒的奖励设计。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -236,7 +242,9 @@ Figure 3 展示了 3B 模型在 RFT 过程中的三项关键指标变化：
 ![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_Idst6X6gmy/figures/004_Figure_2.jpg]]
 *Figure 2: Illustrative Example from VTool-R1 (3B): After RFT, 3B Model Successfully Integrates Intermediate Visual Steps*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -275,6 +283,8 @@ VTool-R1 的有效性目前仅在以下边界内得到验证：
 4. **模型内部反馈的整合**：能否将模型内部信号（如置信度估计、不确定性量化）作为未来多轮后训练框架的一部分，以指导工具调用的决策，是一个开放方向。
 
 5. **训练动态的深入理解**：实验观察到工具调用频率和成功率在训练过程中呈非单调变化（3B 模型初期可能过度使用工具，随后调整至更谨慎的策略；32B 模型整体使用率更高但同样出现下降期），模型最终收敛至策略性使用。这一涌现行为的理论机制尚待进一步分析。
+
+
 
 ## 原文 PDF
 

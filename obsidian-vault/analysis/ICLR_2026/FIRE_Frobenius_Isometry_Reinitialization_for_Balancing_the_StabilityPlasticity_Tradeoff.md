@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/FIRE_Frobenius_Isometry_Reinitialization_for_Balancing_the_StabilityPlasticity_Tradeoff.pdf
+project_link: https://isaac7778.github.io/fire/
+code_link: null
 openreview_forum_id: CfZLxT3zIZ
 aliases:
 - FFIR
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | FIRE：Frobenius-Isometry 再初始化以平衡稳定性-可塑性权衡 |
 | 英文题名 | FIRE: Frobenius-Isometry Reinitialization for Balancing the Stability–Plasticity Tradeoff |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=CfZLxT3zIZ); [Project](https://isaac7778.github.io/fire/) |
+| Links | [paper](https://openreview.net/forum?id=CfZLxT3zIZ) · [Project](https://isaac7778.github.io/fire/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | FIRE (Frobenius-Isometry Reinitialization) |
 | Dataset | CIFAR-10 (ResNet-18) Warm-start, Continual Learning (CIFAR-100 ViT-Tiny), Class-incremental (Tiny ImageNet VGG-16), Continual Pretraining of GPT-0.1B (60k checkpoint) |
@@ -42,7 +44,7 @@ claims:
 > - Continual Learning (CIFAR-100 ViT-Tiny) 上，Test Accuracy 为 FIRE 提供一致增益，与最佳替代方案持平，对比 S&P, DASH 等，变化 增量阶段性能下降轻微。
 > - Class-incremental (Tiny ImageNet VGG-16) 上，Test Accuracy 为 FIRE 表现稳健，无重置后性能骤降，对比 Full Reset, S&P 等，变化 避免急降。
 
-## 概述
+## 概要
 
 深度神经网络在非平稳数据流中持续训练时，面临**稳定性-可塑性困境**：既要保留从旧数据中学到的知识（稳定性），又要保持对新数据的适应能力（可塑性）。现有重初始化方法通常依赖启发式规则——保守策略无法恢复足够可塑性，激进策略则破坏已学知识——缺乏一个原则性框架来同时优化这两个相互冲突的目标。
 
@@ -50,7 +52,7 @@ claims:
 
 理论分析为两个度量提供了坚实保证：定理 1 证明 SFE 可控制输出特征协方差差异，定理 2–4 证明降低 DfI 与更平滑的损失景观、更少的休眠神经元和更高的特征有效秩直接相关。实验覆盖持续视觉学习（CIFAR-10/100、Tiny ImageNet）、大语言模型持续预训练（GPT-0.1B）和强化学习（Atari DQN、HumanoidBench SAC），FIRE 在所有场景下均超越或匹配 S&P、DASH、CBP、ReDo 等基线方法，同时保持极低的计算开销（0.06 秒 vs DASH 69 秒）和显存占用（55 MB vs DASH 2834 MB）。
 
-## 背景与动机
+
 
 深度神经网络在非平稳环境中持续学习时面临一个根本性困境：如何在保留已学知识（稳定性）与适应新数据（可塑性）之间取得平衡。当模型在新数据上继续训练时，权重会逐渐偏离初始分布，出现**可塑性丧失**——模型更新能力下降，难以有效拟合新任务或新数据分布。这一现象在持续学习、增量训练和强化学习等场景中尤为突出，严重制约了模型的长期适应能力。
 
@@ -60,7 +62,9 @@ claims:
 
 FIRE 的动机正是填补这一空白：**将稳定性-可塑性权衡显式建模为有约束的优化问题**，用两个独立且可量化的度量——平方 Frobenius 误差（SFE）和等距偏离度（DfI）——分别刻画稳定性和可塑性，并通过高效的正交 Procrustes 求解器实现无需手动调参的精确平衡。这一思路将重初始化从经验性操作提升为有理论保证的优化过程，为持续学习中的权重干预提供了统一而高效的解决方案。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FIRE 的核心创新在于将稳定性-可塑性权衡从一个启发式调参问题转化为一个**显式的约束优化问题**，并提供高效求解方案。其关键 changed slots 如下：
 
@@ -104,7 +108,7 @@ FIRE 的创新集中在**重初始化时刻的约束优化框架**，而非持�
 
 需要注意的是：当前验证限于中等规模模型（ResNet-18、ViT-Tiny、GPT-0.1B），在大规模架构上的效果有待检验；对 Transformer 仅正交化 Q/K 投影的选择尚未系统消融；重初始化时机目前依赖预设触发点，缺乏自适应触发机制。
 
-## 整体框架
+
 
 FIRE 将稳定性-可塑性权衡显式建模为一个约束优化问题，通过两个互补的度量——SFE 和 DfI——分别量化稳定性和可塑性损失，并在正交 Procrustes 问题的框架下求解最优重初始化权重。整个 pipeline 由四个核心模块串联构成：
 
@@ -120,7 +124,7 @@ FIRE 将稳定性-可塑性权衡显式建模为一个约束优化问题，通�
 
 **输入输出流**：在触发重初始化的时刻，FIRE 以当前权重 $W$ 为输入，依次经过 DfI 评估、牛顿-舒尔茨正交化迭代、缩放调整，输出重初始化后的权重 $\widetilde{W}$，随后网络在新数据上继续训练。该流程对线性层和卷积层分别处理，在 Vision Transformer 中仅对 Q、K 投影矩阵执行正交化，V、O 及 MLP 权重保持不变。整个流程的计算开销极低——仅增加不到 1% 的训练时间，且显存占用远低于基于梯度的基线方法（如 DASH 需 2834 MB，FIRE 仅需 55 MB）。
 
-## 核心模块与公式推导
+
 
 FIRE 将稳定性-可塑性权衡显式构造为约束优化问题，其方法管线由三个核心模块构成：稳定性度量 SFE、可塑性度量 DfI，以及基于牛顿-舒尔茨迭代的约束优化求解器。
 
@@ -185,7 +189,9 @@ $$X_{k+1} = 2 X_k - 1.5 X_k (X_k^\top X_k) + 0.5 X_k (X_k^\top X_k)^2$$
 
 FIRE 的计算开销极低。在对比实验中，FIRE 的墙钟时间仅约 0.06 秒，GPU 显存占用约 55 MB，而 DASH 方法需 69 秒和 2834 MB。整体上，FIRE 增加的训练时间不到 1%，在保持高效的同时实现了稳定性和可塑性的精确平衡。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -263,7 +269,9 @@ FIRE 在持续视觉学习、持续语言模型预训练和强化学习三大类
 ![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_CfZLxT3zIZ/figures/017_Table_9.jpg]]
 *Table 9: Hyperparameters for Class-Incremental Setting*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 稳定性-可塑性权衡的重初始化方法谱系
 
@@ -322,6 +330,8 @@ FIRE 的适用性受以下边界条件约束：
 3. **与经典持续学习技术的结合：** 如何将 FIRE 与经验重放、弹性权重巩固（EWC）等经典持续学习技术结合？FIRE 的正交化操作可能与 EWC 的重要性加权产生交互效应，需要系统研究。
 
 4. **自适应触发机制：** 能否在训练过程中在线自适应地决定重初始化的触发时机和强度？DfI 本身可作为可塑性丧失的监测指标，为自适应策略提供了自然基础。
+
+
 
 ## 原文 PDF
 

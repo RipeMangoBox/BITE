@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Wide_In_Narrow_Out_Revokable_Decoding_for_Efficient_and_Effective_DLLMs.pdf
+project_link: null
+code_link: https://github.com/Feng-Hong/WINO-DLLM
 aliases:
 - WNOW
 - WNORDEED
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | Wide-In, Narrow-Out：面向高效且有效 DLLM 的可撤销解码 |
 | 英文题名 | Wide-In, Narrow-Out: Revokable Decoding for Efficient and Effective DLLMs |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=XtLQHlNLxy); [GitHub](https://github.com/Feng-Hong/WINO-DLLM) |
+| Links | [paper](https://openreview.net/forum?id=XtLQHlNLxy) · [GitHub](https://github.com/Feng-Hong/WINO-DLLM) |
 | Topic | #topic/other_unclear #topic/other_unclear/general |
 | Method | Wide-In, Narrow-Out (WINO) |
 | Dataset | GSM8K, ARC-E |
@@ -42,11 +44,11 @@ claims:
 > - GSM8K 上，Steps 为 41.93，对比 256.00，变化 6.10× reduction。
 > - GSM8K 上，TPS 为 100.53，对比 17.76，变化 5.66× speedup。
 
-## 概述
+## 概要
 
 本文提出了一种名为 **Wide-In, Narrow-Out (WINO)** 的新型解码算法，旨在解决扩散大语言模型（Diffusion Large Language Models, DLLMs）在推理过程中面临的质量-速度两难困境。WINO 的核心思想是引入**可撤销解码**机制：通过一个并行的草稿-验证（draft-and-verify）流程，模型可以激进地生成多个候选 token（Wide-In），然后利用不断丰富的全局上下文重新评估这些 token，并将低质量的 token 重新掩码以进行后续精炼（Narrow-Out）。实验表明，WINO 在多种语言和视觉-语言任务上实现了显著的加速（最高达 10 倍），同时甚至提升了生成质量。例如，在 GSM8K 数学推理基准上，WINO 实现了 6 倍加速，同时准确率提升了 2.58%；在 Flickr30K 图像描述基准上，实现了 10 倍加速，同时性能更高。WINO 是一种无需训练、即插即用的解码算法。
 
-## 背景与动机
+
 
 ### 2.1 标准解码的不可逆性
 
@@ -60,7 +62,9 @@ $$ \begin{array}{c} \begin{array} { r l } & { l ^ { ( k ) } = \underset { l \in 
 
 现有的 DLLM 加速方法，如朴素并行采样（一次解码 M 个 token）、Fast-dLLM-parallel（基于置信度阈值的并行解码）和 Entropy-Bounded (EB) Sampler（基于熵约束的并行解码），虽然能提升速度，但通常以牺牲质量为代价。这些方法本质上仍然遵循不可逆的解码范式，因此无法避免早期错误累积的问题。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 WINO 的核心创新在于**打破标准 DLLM 解码的不可逆性**，通过引入一个并行的草稿-验证机制，使解码过程变得可撤销。具体来说：
 
@@ -68,7 +72,7 @@ WINO 的核心创新在于**打破标准 DLLM 解码的不可逆性**，通过�
 2. **草稿-验证机制**：包含一个宽松的草稿阈值 τ1（用于快速生成候选 token）和一个严格的验证阈值 τ2（用于重新评估并撤销低质量 token）。通过调整这两个阈值，可以控制生成速度与质量之间的平衡。
 3. **影子块（Shadow Block）与自定义注意力掩码**：在不引入信息泄露的前提下，实现了高效的并行草稿与验证。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0001_XtLQHlNLxy_Wide-In_Narrow-Out_Revokable_Decoding_for_Effici/figures/001_Figure_1.jpg]]
 *Figure 1: Demonstration of speedup and performance improvement of WINO over standard decoding and naive parallel sampling evaluated on GSM8K with LLaDA and Flickr30K with MMaDA. The standard decoding unmasks 1 token per decoding step, while the naive parallel sampling unmasks M(> 1) tokens per decoding step. We set M = 4 for GSM8K and M = 8 for Flickr30K.*
@@ -83,7 +87,7 @@ WINO 的完整解码算法如 Algorithm 1 所示。
 
 Algorithm 1 WINO Decoding for a Single Block
 
-## 核心模块与公式推导
+
 
 ### 5.1 草稿模块（Draft Module）
 
@@ -113,7 +117,9 @@ $$ y _ { \mathrm { c u r } , l } ^ { ( k ) } = \left\{ \begin{array} { l l } { \
 
 该过程迭代进行，直到当前块中不再有 [MASK] token。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 6.1 主要结果
 
@@ -205,7 +211,9 @@ Figure 5: Case Study: GSM8K Example.
 ![[assets/figures/papers/iclr26_0001_XtLQHlNLxy_Wide-In_Narrow-Out_Revokable_Decoding_for_Effici/figures/007_Table_3.jpg]]
 *Table 3: Experiment results on different generation lengths and full diffusion setting, respectively.*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 WINO 属于**扩散大语言模型（DLLMs）推理加速**这一研究方向。其核心思想——通过可撤销解码打破标准解码的不可逆性——与以下方法形成对比：
 
@@ -221,6 +229,8 @@ WINO 是一种**无需训练、即插即用**的解码算法，可以应用于�
 - 影子块会引入线性内存开销（半自回归设置下约 2.4%，全扩散设置下低于 8%）。
 - 未探讨在极长序列生成或对延迟极度敏感的场景下的表现。
 - 未讨论在不同架构或规模的基础模型上的泛化能力。
+
+
 
 ## 原文 PDF
 

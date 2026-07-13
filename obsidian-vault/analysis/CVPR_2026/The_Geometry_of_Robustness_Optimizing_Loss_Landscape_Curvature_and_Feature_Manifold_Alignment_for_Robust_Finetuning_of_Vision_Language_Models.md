@@ -43,7 +43,7 @@ claims:
 > - ImageNet-1K (Adversarial, AutoAttack APGD-CE ε=4/255) 上，Top-1 Accuracy (%) 25.44 vs 0.00 (CLIP zero-shot / Vanilla FT / WiSE-FT) (+25.44)。
 > - OOD Average (ImageNet-V2/S/R) 上，Top-1 Accuracy (%) 54.41 vs 55.58 (CLIP zero-shot) (-1.17)。
 
-## 概述
+## 概要
 
 视觉-语言模型（VLM）在微调后面临一个根本性的三元困境：提升分布内（ID）精度往往以牺牲分布外（OOD）泛化或对抗鲁棒性为代价，现有方法最多只能同时优化其中两项。**GRACE**（Gram-aligned Robustness via Adaptive Curvature Estimation）从几何视角揭示了这一权衡的本质——它源于两个相互耦合的几何失败：参数空间中的尖锐、各向异性极小值，以及特征流形在分布偏移下的不稳定变形。
 
@@ -51,7 +51,7 @@ GRACE的核心思想是通过**联合正则化损失景观曲率与特征流形�
 
 在ImageNet-1K上，GRACE（基于CLIP ViT-B/32）同时实现了**74.21%的ID精度**和**25.44%的对抗精度（AutoAttack）**，OOD平均精度**54.41%**与零样本基线基本持平，调和均值达39.69，显著优于现有对抗训练和泛化保留方法。消融实验证实，LAR-AWP单独使对抗鲁棒性提升约8.6个百分点，Gram-体积损失使OOD泛化提升约1.5个百分点，二者联合及曲率驱动的秩自适应策略实现了最佳综合性能。
 
-## 背景与动机
+
 
 ### VLM鲁棒性的三元悖论
 
@@ -87,7 +87,9 @@ $$R_{\mathrm{Rob}}(\theta) \le \hat{R}_{\mathrm{ID}}(\theta) + \underbrace{\frac
 
 这种双几何正则化策略直接对应PAC-Bayes上界中的尖锐度项和域差异项，从理论上为同时提升ID-OOD-Adversarial三维性能提供了统一框架。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GRACE的核心创新在于**从几何视角同时操控参数空间的曲率与特征空间的流形稳定性**，从而突破视觉语言模型（VLM）微调中长期存在的ID-OOD-Adversarial三元权衡。现有方法之所以失败，根源在于两个相互耦合的几何失败：参数空间中的尖锐、各向异性极小值，以及特征流形在分布偏移下的不稳定变形。GRACE通过三个紧密协作的模块化创新，将这两个几何失败转化为可联合正则化的目标。
 
@@ -121,7 +123,7 @@ GRACE的第三个关键创新在于**将LAR-AWP与GV损失统一在一个理论�
 
 Table 1的方法分类清晰揭示了GRACE的独特定位：现有方法最多同时覆盖邻近性、尖锐度、特征稳定性中的两项。例如，WiSE-FT通过权重插值保持邻近性但完全忽略尖锐度和特征稳定性，导致对抗精度为0%；TeCoA等对抗训练方法关注尖锐度但缺乏显式的特征流形约束。GRACE是首个同时显式优化这三项的方法，从根本上改变了VLM鲁棒微调的设计范式。
 
-## 整体框架
+
 
 GRACE 的整体设计源于一个核心洞察：视觉语言模型（VLM）微调中的鲁棒性三元悖论——分布内（ID）精度、分布外（OOD）泛化与对抗鲁棒性难以同时获得——根源于两个相互耦合的几何失败。其一是参数空间中尖锐、各向异性的极小值，使模型对权重扰动高度敏感；其二是特征流形在分布偏移下的不稳定变形，导致干净、对抗和OOD输入的特征表示之间出现显著域差异。现有方法通常仅针对其中一维或两维进行优化（Table 1），无法同时控制参数空间曲率和特征空间对齐。
 
@@ -142,7 +144,7 @@ $$\mathcal{L}_{\mathrm{GRACE}} = \mathcal{L}_{\mathrm{task}} + \lambda_{\mathrm{
 
 训练过程中，GRACE 在每个 mini-batch 上交替执行以下步骤（Algorithm 1）：(i) 计算干净特征与任务损失；(ii) 生成 PGD 对抗样本；(iii) 基于当前曲率估计执行若干步 LAR-AWP 内部最大化；(iv) 收集干净、对抗和 AWP 扰动下的特征，计算 Gram-体积对齐损失；(v) 将三项损失加权求和，更新 LoRA 参数。这一交替优化机制使得曲率正则化与特征对齐相互促进：更平坦的参数空间降低了对抗样本对特征表示的扰动幅度，而更稳定的特征流形又为曲率估计提供了更可靠的梯度信号。
 
-## 核心模块与公式推导
+
 
 GRACE 的整体训练目标由三项损失加权组合构成：
 
@@ -207,7 +209,9 @@ GRACE 在每个 mini-batch 上交替执行以下步骤（Algorithm 1）：
 ![[assets/figures/papers/paper_list_l2243_https_arxiv_org_abs_2603_27139/figures/008_Figure_5.jpg]]
 *Figure 5: Gram-volume feature alignment. For each input, GRACE compares clean, adversarial, and LAR-AWP-perturbed image embeddings via a small Gram matrix. The Gram-volume loss encourages these three vectors to remain close to each other (low volume) while preserving separation across different classes*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 5.1 实验设置与对比基线
 
@@ -301,7 +305,9 @@ Table 7 将GRACE与其他LoRA基微调方法进行了直接比较。在统一的
 ![[assets/figures/papers/paper_list_l2243_https_arxiv_org_abs_2603_27139/figures/009_Table_5.jpg]]
 *Table 5: Clean and adversarial evaluation on zero-shot image classification datasets (ViT-B/32). Models are trained on ImageNet; all other datasets are zero-shot. ZS Avg is the mean across the 8 datasets*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有鲁棒微调方法的系统关系
 
@@ -352,6 +358,8 @@ GRACE 的几何正则化框架开辟了若干值得探索的方向：
 3. **特征对齐策略的扩展**：Gram-体积对齐损失约束的是干净/对抗/AWP 三元组的一致性，能否与其他特征对齐策略（如对比损失、互信息最大化）结合以进一步提升 OOD 泛化，是一个开放的设计空间。
 
 4. **真实世界部署的对抗韧性**：在部署场景中，攻击者可能针对 GRACE 的几何特性设计自适应攻击（如同时扰动输入和 LoRA 权重），GRACE 对此类联合攻击的防御能力需要进一步评估。
+
+
 
 ## 原文 PDF
 

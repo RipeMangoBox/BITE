@@ -43,7 +43,7 @@ claims:
 > - ImageNet-1k (4 OOD datasets) 上，Average AUROC (↑) 97.97 vs 94.21 (NegLabel) (+3.76)。
 > - OpenOOD Near-OOD (SSB-hard, NINCO) 上，FPR95 (↓) 60.06 vs 69.45 (NegLabel) (-9.39)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有基于负标签的视觉-语言模型 OOD 检测方法（如 NegLabel）从语料库中选取与 ID 标签语义距离最远的词语作为负标签。然而，这些负标签在特定 OOD 测试集上的激活水平呈长尾分布——大量标签激活极低，甚至部分标签在 ID 样本上的激活强于 OOD 样本，从而引入检测噪声、误导 OOD 判别（图 1）。
 
@@ -55,7 +55,7 @@ claims:
 
 **局限与开放问题**：方法依赖语料库覆盖 OOD 相关词语且预训练文本编码器能理解这些词语，在医学等专业领域可能受限；测试初期若缓存队列误分类率过高（>80%），自适应可能带来负面影响。后续可探索更精细的显式加权方案、专业领域语料库构建，以及极端数据流下的性能维持能力。
 
-## 背景与动机
+
 
 ### 视觉-语言模型与OOD检测的兴起
 
@@ -83,7 +83,9 @@ $$
 
 基于此，本文提出**测试时激活负标签（Test-time Activated Negative Labels, TANL）**方法。其核心动机是：在测试过程中，通过在线识别高置信度的正（ID）样本和负（OOD）样本，动态估计语料库中每个候选标签的激活差异，从而自适应地选择在当前测试分布下激活最强的负标签。此外，本文进一步设计了激活感知评分函数，按激活强度对负标签排序后循环累加，隐式增强高激活标签的权重，从而充分利用挖掘到的激活知识，提升OOD检测的准确性和鲁棒性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 TANL 的核心创新在于揭示并利用了一个被现有负标签方法忽视的关键现象：**负标签在 OOD 样本上的激活水平是决定检测性能的瓶颈因素**。基于此洞察，TANL 在三个维度上对 NegLabel 基线进行了系统性改造。
 
@@ -128,7 +130,7 @@ $$S_{aa}(\pmb{v}) = \frac{1}{M} \sum_{m=1}^{M} \sum_{i=1}^{C} \frac{\exp(\pmb{v}
 
 三项创新协同作用，使 TANL 在 ImageNet-1k 上将平均 FPR95 从 NegLabel 的 25.40% 大幅降至 9.81%，AUROC 从 94.21 提升至 97.97（Table 1）。
 
-## 整体框架
+
 
 TANL 的整体工作流围绕一个核心闭环展开：**测试时在线估计候选负标签的激活差异 → 动态选取高激活负标签 → 激活感知评分 → 缓存高置信度样本以更新激活估计**。该闭环使得负标签的选择不再依赖静态的 ID 距离，而是持续适配当前测试分布的真实激活模式。
 
@@ -156,7 +158,7 @@ TANL 的整体工作流围绕一个核心闭环展开：**测试时在线估计�
 
 **激活感知评分的理论支撑**：推导表明（式 16），增加负标签数量 $M$ 能降低 FPR 的前提是 $p_1 - p_2 < 0$，即负标签在 OOD 上的归一化相似度高于在 ID 上。激活差异度量正是对这一条件的直接近似，从而为标签选择提供了原则性依据。
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题形式化与基线回顾
 
@@ -237,7 +239,9 @@ $$\frac{\partial FPR_{\lambda}}{\partial M} = \frac{e^{-z^2}}{2\sqrt{2\pi}} \cdo
 ![[assets/figures/papers/paper_list_l2758_https_arxiv_org_abs_2603_25250/figures/001_Figure_1.jpg]]
 *Figure 1: Activation analyses with negative labels mined in [29]. (a) Negative labels on a specific OOD dataset exhibit a long-tailed activation score distribution. Some labels activate more strongly on the ID dataset than on OOD, potentially misleading OOD detection. (b) A small subset of negative labels strongly activates on OOD, enabling effective detection. Most labels respond similarly across ID and OOD, slightly harming detection, while some activate higher on ID, significantly degrading performance. The FPR95 results are obtained with negative labels of top activations via Eq. 4. These analyses use ground truth labels from ImageNet (ID) and Places (OOD) datasets*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -305,7 +309,9 @@ Table 5 的时间复杂度分析表明，TANL 无需训练（Training 时间为 
 ![[assets/figures/papers/paper_list_l2758_https_arxiv_org_abs_2603_25250/figures/013_Table.jpg]]
 *Table: A6. Complete OOD detection results with ImageNet-1k, where a VITB/16 CLIP encoder is adopted*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -338,6 +344,8 @@ TANL 的核心假设是：（1）语料库覆盖与 OOD 分布相关的词语；
 3. **极端数据流下的稳定性**：在长时间仅出现 ID 或仅出现 OOD 样本的极端测试流下，FIFO 队列将逐渐被单一类别样本填充，激活估计的可靠性如何维持？方法是否需要引入遗忘机制或队列重置策略？
 
 4. **激活感知评分的理论最优性**：当前隐式加权方案的有效性已在实验中得到验证，但其是否为激活信息利用的理论最优形式？是否存在其他变体（如基于激活得分的直接加权归一化）能够进一步提高检测性能？
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/GTR_Turbo_Merged_Checkpoint_is_Secretly_a_Free_Teacher_for_Agentic_VLM_Training.pdf
+project_link: null
 code_link: null
 aliases:
 - GT
@@ -42,7 +43,7 @@ claims:
 > - ALFWorld 上，Average Success Rate 0.15 (GTR-Turbo KL) vs 0.16 (GTR) (-0.01)。
 > - Android-in-the-Wild 上，Success Rate (%) 80.2 (GTR-Turbo) vs 75.0 (PPO) (+5.2)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：多轮视觉语言模型（VLM）智能体的强化学习（RL）训练面临“思维崩溃”（thought collapse）的严峻挑战——由于环境奖励极度稀疏且缺乏过程监督，模型的推理输出容易退化为重复、不连贯的模板化文本。原始GTR框架通过调用外部API教师模型（如GPT-4o）提供步骤级思维指导来缓解这一问题，但代价高昂：以Points24任务为例，使用GPT-4o教师训练15,000步需要约4天时间和约150美元，且教师自身在该任务上的性能仅为17.5%（Table 1）。这种对外部大模型的依赖严重制约了Agentic VLM训练的可扩展性。
 
@@ -54,7 +55,7 @@ claims:
 
 **方法谱系与知识库定位**：GTR-Turbo属于**自持式RL训练**方法，其核心创新——以模型合并构建免费教师——与以下工作形成对比：原始**GTR**依赖外部API教师提供思维校正；**RL4VLM**（Zhai et al., NeurIPS 2025）直接将PPO应用于原始环境奖励，缺乏过程监督机制；基于静态模型的KL正则化自改进方法无法稳定提升性能（Figure 6消融实验）。在模型合并技术层面，GTR-Turbo采用**TIES合并**（Yadav et al., NeurIPS 2024），通过修剪、符号选举和选择性平均有效避免了参数干扰，相比简单线性平均显著提高了教师质量（Figure 8）。
 
-## 背景与动机
+
 
 ### 多轮VLM智能体的“思维崩溃”困境
 
@@ -78,7 +79,9 @@ $$
 
 直觉上，RL训练过程中不断产生的历史模型检查点蕴含着智能体在不同训练阶段积累的经验和知识。如果能够有效聚合这些历史检查点，就有可能得到一个性能优于当前智能体、且更为稳定的“教师模型”——该教师与当前智能体同源，无需额外训练，也不产生API调用成本。这一洞察构成了**GTR-Turbo**的核心假设：**合并历史检查点可以隐式地聚合过去的经验，得到一个在损失面更平滑、表现更好的模型，从而作为“免费教师”替代昂贵的外部API，实现高效、自主的Agentic VLM训练。**
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GTR-Turbo 的核心创新在于**将 RL 训练过程中自然产生的历史检查点转化为“免费教师”**，从而彻底消除了原始 GTR 框架对外部昂贵 API 教师模型（如 GPT-4o）的依赖。这一转变通过两个关键的技术槽位替换实现。
 
@@ -101,7 +104,7 @@ GTR-Turbo 的解决方案是**将 RL 训练过程中保存的历史检查点通�
 
 从机制层面看，GTR-Turbo 的创新可以理解为**将外部知识注入转化为内部经验聚合**。合并检查点隐式地聚合了 RL 探索过程中的多样化经验，在损失面上形成了一个更优的“重心”。这个同源教师通过 SFT 或 KL 约束向当前智能体传递思维层面的过程监督，既抑制了 RL 训练中常见的“思维崩溃”现象（**Figure 14** 的推理分数评测证实了这一点），又保留了智能体在动作空间的探索自由度——**Figure 7** 的消融实验表明，仅指导思维部分优于同时指导思维和动作，因为后者限制了模型探索，而探索正是 GTR-Turbo 自我进化的关键驱动力。
 
-## 整体框架
+
 
 GTR-Turbo 的核心思想是用RL训练过程中自然产生的历史检查点，通过模型合并技术构建一个“免费”的教师模型，替代原始GTR框架中昂贵的外部API教师（如GPT-4o），为Agentic VLM的强化学习训练提供思维层面的过程监督。整个框架由五个关键模块串联而成，形成闭环的自我进化训练流程。
 
@@ -146,7 +149,7 @@ GTR-Turbo通过将教师模型**内部化**和**自主化**，彻底消除了对
 ![[assets/figures/papers/paper_list_l2394_https_arxiv_org_abs_2512_13043/figures/004_Figure_3.jpg]]
 *Figure 3: Overview of the GTR-Turbo framework. Beyond the GTR training of VLM agents (Figure 1), GTR-Turbo stores historical checkpoints and merges them into a teacher model (blue region), and then incorporates the PPO update (orange region) with thought guidance by minimizing either SFT loss (green region) or KL divergence (purple region), enabling flexible, scalable, and self-guided agentic RL training*
 
-## 核心模块与公式推导
+
 
 ### 3.1 原始GTR框架的瓶颈
 
@@ -210,7 +213,9 @@ GTR-Turbo框架通过**Guidance Variant Selector**在SFT损失与KL散度惩罚�
 ![[assets/figures/papers/paper_list_l2394_https_arxiv_org_abs_2512_13043/figures/003_Figure_2.jpg]]
 *Figure 2: The performance comparison of the merged checkpoint and the current checkpoint on Points24. We adopt the Qwen2.5-VL-7B as the base model and highlight that model merging leads to a stronger and more stable agent*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -308,7 +313,9 @@ Figure 14 的推理分数评测显示，GTR-Turbo在训练过程中能够维持�
 
 尽管GTR-Turbo在多个基准上展现了显著优势，仍存在以下局限：需要额外GPU部署合并教师模型，存在硬件依赖；合并频率和EMA平滑系数等超参数需手动调整，暂无自适应机制；所有实验基于7B/8B规模VLM，在更大模型上的扩展性未知；在更复杂的真实世界视觉决策环境中的泛化能力有待验证。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线工作的关系
 
@@ -351,6 +358,8 @@ GTR-Turbo 的切入点是**替换教师模型的来源**：将外部 API 教师�
 4. **多智能体与多任务扩展。** 该框架是否可以扩展到多智能体系统（多个智能体共享合并教师）或需要密集奖励的多任务 RLVR 训练中？合并教师的“知识聚合”特性在多任务场景下可能具有天然优势，但尚待验证。
 
 5. **合并策略的进一步优化。** 当前使用 TIES-Merging 对所有历史检查点等权或 EMA 加权合并。是否存在基于检查点质量（如验证集奖励）的选择性合并策略，能进一步提升教师质量？
+
+
 
 ## 原文 PDF
 

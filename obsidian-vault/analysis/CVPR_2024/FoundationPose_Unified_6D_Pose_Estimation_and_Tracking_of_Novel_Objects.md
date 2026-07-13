@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2024
 pdf_ref: paperPDFs/CVPR_2024/FoundationPose_Unified_6D_Pose_Estimation_and_Tracking_of_Novel_Objects.pdf
+project_link: https://nvlabs.github.io/FoundationPose/
+code_link: https://github.com/
 aliases:
 - FoundationPose
 tags:
@@ -41,7 +43,7 @@ claims:
 > - LINEMOD (model-free pose estimation) 上，ADD-0.1d (Avg) 99.9 vs 91.5 (FS6D + ICP) (+8.4)。
 > - BOP datasets (LM-O, YCB-V, T-LESS) - model-based 上，AR score (Avg) 83.3 vs 79.7 (SurfEmb + ICP) (+3.6)。
 
-## 概述
+## 概要
 
 6D物体位姿估计与追踪是机器人操控、增强现实等应用的基础能力。现有方法高度专业化：模型驱动与模型自由、位姿估计与追踪任务各自孤立，且通常需要针对特定实例进行训练或微调，难以在新物体上实现即拍即用。同时，无纹理、严重遮挡等挑战场景下的鲁棒性不足，进一步限制了实际部署。
 
@@ -51,7 +53,7 @@ FoundationPose提出了一个统一的基础模型，同时支持模型驱动与
 
 FoundationPose仍存在若干局限：依赖外部2D检测器，虚警或漏检常成为位姿估计的瓶颈；在纹理缺失、严重遮挡与有限边缘线索叠加时，方向估计可能失效（Figure 11）；追踪模式下缺乏长期重初始化机制，可能产生累积漂移。未来方向包括将检测-位姿-追踪统一为端到端框架，以及拓展至非刚体或多物体交互场景。
 
-## 背景与动机
+
 
 6D物体位姿估计与追踪是机器人操作、增强现实等应用的核心感知任务。现有方法通常针对特定设置进行专项设计：**模型驱动**（model-based）方法依赖已知CAD模型进行渲染-比对，而**模型自由**（model-free）方法则从参考图像中重建或检索物体表示；位姿估计与追踪也往往由独立流水线处理。这种碎片化的研究格局导致三个关键缺口：
 
@@ -63,7 +65,9 @@ FoundationPose仍存在若干局限：依赖外部2D检测器，虚警或漏检�
 
 本文的核心动机在于构建一个**统一的基础模型**，同时支持模型驱动与模型自由两种设置下的位姿估计与追踪，且对新物体保持零微调（fine-tune-free）的强泛化能力。为实现这一目标，需要从数据、表示、推理三个层面进行系统性创新：利用大规模多样化合成数据打破数据瓶颈，采用统一的神经渲染桥接两种工作范式，并通过全局上下文感知的位姿推理提升鲁棒性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FoundationPose 的核心创新并非单一算法的改进，而是一套系统性重构新物体位姿估计与追踪范式的“杠杆组合”。其关键创新点可归纳为以下五个相互耦合的维度，直接对应方法体系中的 changed slots。
 
@@ -156,7 +160,7 @@ $$
 
 > **需注意**：部分消融实验的定量细节（Table 6 完整数值）在已有证据中未完全展开，建议读者查阅原文获取精确数据。
 
-## 整体框架
+
 
 FoundationPose 是一个统一的6D物体位姿估计与追踪基础模型，其核心设计目标是消除传统方法中“模型驱动/模型自由”与“位姿估计/位姿追踪”之间的任务隔离，实现对全新物体的零微调泛化。整体框架由四个关键模块串联构成，形成从数据生成到最终位姿输出的完整流水线（Figure 2）。
 
@@ -197,7 +201,7 @@ $$\mathcal{L}(i^{+}, i^{-}) = \max(\mathbf{S}(i^{-}) - \mathbf{S}(i^{+}) + \alph
 - **输出**：物体的6D位姿（旋转 $R$ 与平移 $\pmb{t}$），在追踪模式下输出逐帧连续位姿序列。
 - **关键依赖**：外部2D检测器（如CNOS或Mask R-CNN）提供物体区域；模型自由设置需提供至少4张参考图像用于神经物体场重建。
 
-## 核心模块与公式推导
+
 
 FoundationPose 的统一框架由四个核心模块构成：**LLM辅助的大规模合成数据生成**、**神经隐式物体场**、**位姿初始化与优化网络**，以及**分层姿态比较与选择**。以下逐一阐述各模块的关键设计与数学表达。
 
@@ -286,7 +290,9 @@ $$i^{*} = \underset{i \in \mathbb{S}_t, i \notin \mathbb{S}_r}{\mathrm{argmax}} 
 ![[assets/figures/papers/paper_list_l14_FoundationPose_Unified_6D_Pose_Estimation_and_Tracking_of_Novel_Objects_motion20v/figures/015_Figure_9.jpg]]
 *Figure 9: Network architecture for image feature embedding used in pose refinement and selection networks. The ResBlock is from ResNet-34 [17]*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置与公平性说明
 
@@ -345,7 +351,9 @@ Figure 11 展示了典型的失败案例：在**纹理缺失、严重遮挡、�
 
 此外，FoundationPose 依赖外部 2D 检测器（如 CNOS 或 Mask R-CNN），虚警或漏检常成为 6D 位姿估计的瓶颈，未能实现检测-位姿联合端到端。追踪模式下未引入长期重初始化机制，可能产生累积漂移。这些问题指向了未来将 2D 检测、6D 位姿估计与追踪统一为端到端框架的研究方向。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有基线方法的关系
 
@@ -398,6 +406,8 @@ FoundationPose 的提出开启了若干值得深入探索的方向：
 **轻量化神经渲染**：当前方法通过Marching Cubes提取显式网格进行渲染，这一步骤在实时性要求高的场景中可能成为瓶颈。探索直接基于神经隐式场的轻量渲染（如高效的光线步进策略或知识蒸馏为小型渲染网络），有望进一步提升实时性。
 
 **更广泛的物体类别覆盖**：FoundationPose 的训练数据主要来自3D模型数据库，覆盖的物体类别仍然有限。如何利用互联网规模的图像-视频数据（如通过自监督学习）进一步扩展基础模型的物体知识，使其能够处理真正“任意”的新物体，是一个开放且有价值的问题。
+
+
 
 ## 原文 PDF
 

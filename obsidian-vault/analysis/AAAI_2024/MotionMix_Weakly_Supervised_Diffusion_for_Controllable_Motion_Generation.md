@@ -5,6 +5,8 @@ paper_level: A
 venue: AAAI
 year: 2024
 pdf_ref: paperPDFs/AAAI_2024/MotionMix_Weakly_Supervised_Diffusion_for_Controllable_Motion_Generation.pdf
+project_link: https://nhathoang2002.github.io/MotionMix-page/
+code_link: null
 aliases:
 - MotionMix
 tags:
@@ -41,7 +43,7 @@ claims:
 > - KIT-ML (text-to-motion) 上，FID↓ 0.322±.020 (MDM + MotionMix) vs 0.497±.021 (MDM) (↑35.2%)。
 > - AIST++ (music-to-dance) 上，Beat Align.↑ 0.256±.013 (EDGE + MotionMix) vs 0.224±.025 (EDGE retrained) (↑13.3%)。
 
-## 概述
+## 概要
 
 **核心问题**：获取大规模高质量标注运动数据成本高昂，而现实世界中大量未标注或含噪声的运动数据未被有效利用，这构成了可控运动生成任务的关键瓶颈。
 
@@ -57,7 +59,7 @@ claims:
 
 **局限与展望**：方法在小规模数据集上可能性能下降，超参数 $T^*$ 和噪声范围需手动调节，且仅在高斯扩散噪声假设下验证有效。未来方向包括自适应枢轴选择、跨模态扩展及半监督场景下的进一步探索。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -92,7 +94,9 @@ claims:
 
 基于这一洞察，MotionMix 将扩散模型的去噪训练分配为两个阶段：在初始 $T - T^*$ 步使用含噪标注数据学习条件控制，在最后 $T^*$ 步使用干净未标注数据进行无条件精炼。这一设计无需额外标注校正，不引入复杂训练流程，仅通过时间步的分配策略，便实现了弱监督下的可控运动生成，为充分利用现实世界中大量不完美运动数据开辟了新路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MotionMix 的核心创新在于**将扩散模型的去噪过程按时间步拆分为两个阶段，从而在弱监督条件下实现可控运动生成**。其关键洞察是：扩散模型的分步去噪特性天然允许在不同时间步使用不同质量的数据——含噪数据在早期提供粗略的条件控制，干净数据在后期提升细节质量，两者互不干扰。
 
@@ -135,7 +139,7 @@ $$\hat{\mathbf{s}}(\mathbf{x}_t, t, c) = w \cdot f_{\theta}(\mathbf{x}_t, t, c) 
 - 在小型数据集（如 HumanAct12）上性能可能下降，方法更适用于大规模数据场景。
 - 两阶段采样引入了额外的推理步骤切换，可能略微影响推理效率。
 
-## 整体框架
+
 
 MotionMix 通过重新分配扩散模型的去噪目标，将弱监督信号注入标准扩散范式，形成“条件粗糙生成→无条件精炼”的两阶段流水线。整体框架由数据拆分与加噪、两阶段训练、两阶段采样三个核心模块串联而成，骨干扩散模型可替换。
 
@@ -196,7 +200,7 @@ MotionMix 的方法设计独立于具体扩散架构，论文在三个代表性�
 ![[assets/figures/papers/paper_list_l1818_MotionMix_Weakly_Supervised_Diffusion_for_Controllable_Motion_Generation/figures/002_Figure_2.jpg]]
 *Figure 2: (Left) Training Process. The model is trained with a mixture of noisy and clean data. A noise timestep in ranges of*
 
-## 核心模块与公式推导
+
 
 ### 3.1 扩散模型基础
 
@@ -257,7 +261,9 @@ MotionMix 本身是模型无关的框架，可适配不同的扩散模型骨干�
 
 - **音乐到舞蹈**：运动序列表示为 $\mathbf{x} = \mathrm{Concat}([\mathbf{b}, \mathbf{r}, \mathbf{p}]) \in \mathbb{R}^{N \times 151}$，其中 $\mathbf{b}$ 是二值足部接触标签（从 $\mathbf{p}$ 和 $\mathbf{r}$ 计算得出，因此不直接对其注入噪声），$\mathbf{r}$ 是根关节平移，$\mathbf{p}$ 是姿态参数。噪声同时注入 $\mathbf{p}$ 和 $\mathbf{r}$，使用从 $[20, 80]$ 采样的相同噪声步。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -378,7 +384,9 @@ MotionMix 在三个主流运动生成任务上验证其弱监督框架的有效�
 ![[assets/figures/papers/paper_list_l1818_MotionMix_Weakly_Supervised_Diffusion_for_Controllable_Motion_Generation/figures/010_Table_7.jpg]]
 *Table 7: Quantitative results of music-to-dance on the AIST++ test set. We run the evaluation 20 times. The best and the second best result are bold and underlined respectively. † denotes the EDGE model that is re-trained by us*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 在扩散生成谱系中的位置
 
@@ -406,6 +414,8 @@ MotionMix 并非提出新的扩散架构，而是提出一种**训练策略层�
 2. **跨模态扩展**：两阶段训练策略是否可推广到图像、音频等其他生成任务？扩散模型的分步特性具有通用性，但不同模态的噪声-语义对应关系可能不同。
 3. **非高斯噪声鲁棒性**：在更复杂的现实噪声模型下，当前基于高斯扩散噪声的近似策略是否仍然有效？这直接关系到方法在实际部署中的适用性。
 4. **少量高质量数据的利用**：当前设定假设零高质量标注样本。若存在少量高质量标注数据，能否通过半监督或主动学习策略进一步利用这些样本提升性能？论文在附录中尝试了结合 AIST++ 和 AMASS 的真实场景实验（Table 7），但未系统探索高质量样本的增量价值。
+
+
 
 ## 原文 PDF
 

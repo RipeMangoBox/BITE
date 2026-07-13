@@ -41,7 +41,7 @@ claims:
 > - MS-COCO 上，TPR@1%FPR（TreeRing 语义水印） 0.020 vs 0.032（UnMarker） (-0.012)；Bit Accuracy（VINE 位流水印） 0.533 vs 0.573（UnMarker） (-0.040（更接近理想值 0.5）)。
 > - DiffusionDB 上，TPR@1%FPR（语义水印平均） 0.029 vs 0.081（UnMarker） (-0.052)。
 
-## 概述
+## 概要
 
 RAVEN 揭示了一个不可见水印的根本性漏洞：**将水印去除重新定义为新视角合成问题**。其核心洞察在于——生成同一语义内容的感知一致替代“视图”，会在保持视觉保真度的同时，统计上与嵌入的水印信号解相关。
 
@@ -54,7 +54,7 @@ RAVEN 揭示了一个不可见水印的根本性漏洞：**将水印去除重新
 
 **主要结果**：在涵盖 15 种水印方案和 14 种基线攻击的广泛评估中，RAVEN 在 MS-COCO 上将 TreeRing 语义水印的 TPR@1%FPR 降至 0.020（UnMarker 为 0.032），VINE 位流水印的 Bit Accuracy 降至 0.533（更接近理想随机值 0.5），同时在 DiffusionDB 上语义水印平均 TPR@1%FPR 降至 0.029（UnMarker 为 0.081），且保持优越的感知质量。
 
-## 背景与动机
+
 
 ### 不可见水印的攻防困境
 
@@ -80,7 +80,9 @@ RAVEN 揭示了一个不可见水印的根本性漏洞：**将水印去除重新
 
 RAVEN遵循严格的无盒威胁模型：攻击者无法访问水印检测器、水印密钥或任何特权信息，不使用附加数据或训练，仅在单张水印图像上操作。这一设定对攻击方法提出了极高要求——必须在没有任何先验的条件下，实现跨水印方案、跨数据集的鲁棒去除效果。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 RAVEN 的核心创新在于将水印去除问题**重新定义为新视角合成（Novel View Synthesis）问题**，而非沿用传统的像素空间扰动、频域攻击或扩散纯化范式。这一视角转换带来了根本性的方法差异：现有方法要么在像素/频域直接破坏水印信号（对语义水印效果有限），要么通过高噪声注入进行扩散纯化（严重损害结构一致性）。RAVEN 则利用受控的视点变换，在保持语义内容的同时，天然地与嵌入的水印信号统计解相关。
 
@@ -108,7 +110,7 @@ $$\text{ViewAttn}(Q,K,V) = \text{softmax}\left(\frac{(W_Q \tilde{z}_t)(W_K z_t^{
 
 这些 changed slots 共同构成了 RAVEN 的方法论优势：在无盒威胁模型下（不访问检测器、水印密钥或任何特权信息），仅通过单张水印图像即可实现最优的水印抑制效果，同时保持感知质量。
 
-## 整体框架
+
 
 RAVEN 将水印去除重新定义为**新视角合成问题**：给定一张被嵌入不可见水印的图像，生成同一语义内容的感知一致替代“视图”，在保持视觉保真度的同时，使输出图像在统计上与嵌入的水印信号解相关。这一核心洞察暴露了不可见水印的一个根本漏洞——无需访问水印编码器、检测器或任何特权信息，仅利用公开可用的预训练扩散模型，即可实现高效的水印抑制。
 
@@ -166,7 +168,7 @@ Table 1 从有效性、质量和效率三个维度对比了 RAVEN 与现有方�
 
 ![[assets/figures/papers/paper_list_l2039_https_arxiv_org_abs_2601_08832/figures/002_Figure.jpg]]
 
-## 核心模块与公式推导
+
 
 RAVEN 将水印去除重新定义为新视角合成问题，其核心洞察在于：生成同一语义内容的感知一致替代“视图”会产生一个新图像实例，在保持视觉保真度的同时，统计上与嵌入的水印信号解相关。该方法在严格的无盒威胁模型下运行——攻击者不访问水印编码器、检测器、密钥或任何特权信息，仅使用公开可用的图像到图像扩散模型。
 
@@ -259,7 +261,9 @@ $$L_{\mathrm{final}} = \frac{\sigma_w}{\sigma_c}(L_c - \mu_c) + \mu_w$$
 ![[assets/figures/papers/paper_list_l2039_https_arxiv_org_abs_2601_08832/figures/007_Figure_3.jpg]]
 *Figure 3: Effect of strength parameter s on watermark removal. Increasing s enhances watermark suppression but degrades visual quality. Low values (s = 0.05) preserve quality but may retain watermarks, while high values introduce artifacts*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -322,7 +326,9 @@ Table 5 验证了 RAVEN 的模型无关性。在不同 Stable Diffusion Image-to
 ![[assets/figures/papers/paper_list_l2039_https_arxiv_org_abs_2601_08832/figures/015_Figure_7.jpg]]
 *Figure 7: Qualitative comparison of watermark removal methods. VAE-B [7] introduces excessive blurring that degrades fine details. Regen [47] produces visible artifacts due to high noise injection required for watermark removal. Rinse exhibits unnatural color shifts and loss of photorealism, a consequence of performing multiple regeneration passes. UnMarker [25] leaves noisy residual artifacts that compromise visual quality. CtrlGen+ [25] produces overly stylized outputs that deviate from natural appearance. In contrast, RAVEN preserves fine-grained details, natural textures, and photorealistic appearance. Note that the images for UnMarker [25] and RAVEN differ slightly from other methods due to crop...*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -353,6 +359,8 @@ RAVEN 揭示的“视点变换可解耦水印信号与语义内容”这一洞�
 2. **防御方的自适应策略**：若水印方案引入视点不变特征或几何鲁棒编码，RAVEN 的有效性将如何变化？这本质上是一场“变换-不变性”的军备竞赛。
 3. **更丰富的几何变换空间**：当前仅采用全局平移，能否结合缩放、旋转、透视变换等更精细的几何操作，在进一步增强水印抑制的同时不损害感知质量？
 4. **检测方升级的影响**：若检测方采用自适应阈值或更强大的语义水印方案（如基于对抗训练的鲁棒水印），基于视点解相关的攻击策略是否需要根本性调整？
+
+
 
 ## 原文 PDF
 

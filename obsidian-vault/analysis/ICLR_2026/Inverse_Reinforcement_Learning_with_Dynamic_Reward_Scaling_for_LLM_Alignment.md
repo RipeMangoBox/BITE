@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Inverse_Reinforcement_Learning_with_Dynamic_Reward_Scaling_for_LLM_Alignment.pdf
+project_link: null
+code_link: null
 openreview_forum_id: K0Zh6mzTzc
 aliases:
 - DI
@@ -42,7 +44,7 @@ claims:
 > - XsTest (Llama-3.1-8B) 上，refusal rate 为 99.00%，对比 91.50% (GRPO)，变化 +7.50%。
 > - WildChat (Llama-3.1-8B) 上，refusal rate 为 74.21%，对比 55.61% (GRPO)，变化 +18.60%。
 
-## 概述
+## 概要
 
 当前大语言模型（LLM）的安全对齐面临两个关键瓶颈：**安全数据集类别严重不平衡**，长尾威胁样本被主流方法忽视；**标准奖励模型是静态的**，不感知任务难度，导致优化效率低下，无法充分发挥对齐潜力。DR-IRL 针对这两个问题提出了一套统一解决方案。
 
@@ -52,7 +54,7 @@ claims:
 
 **主要结果**：在 Llama-3.1-8B 上，DR-IRL 的 StrongReject 分数达到 0.9361，相比 GRPO 提升 12.56 个百分点；在 Qwen-2-7B 上，StrongReject 分数从 0.5155 跃升至 0.8798，增幅达 36.43 个百分点。在七个有害类别中，DR-IRL 的拒绝率在每一个类别上都达到最高。消融实验证实，去除所有硬度系数会导致 StrongReject 分数下降约 4 个百分点，验证了动态权重机制的关键作用。
 
-## 背景与动机
+
 
 ### 大语言模型安全对齐的核心瓶颈
 
@@ -74,7 +76,9 @@ claims:
 
 2. **动态奖励缩放实现难度自适应优化。** 在 GRPO 优化过程中，引入基于数据硬度和模型响应性的动态奖励权重。数据硬度通过文本编码器衡量生成回复与示范回复的语义相似度，识别内容层面的困难样本；模型响应性通过影子奖励模型的奖励间隙评估模型对特定样本的区分能力。两者以乘积形式联合作用，确保只有那些内容上困难且模型高度不确定的样本才会被重点优化，从而实现高效的难度自适应对齐。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DR-IRL 的核心创新在于将**逆强化学习（IRL）**与**动态奖励缩放**相结合，针对当前 LLM 安全对齐中的两个关键瓶颈——安全数据集类别不平衡和静态奖励模型——提出了系统性的改进方案。
 
@@ -101,7 +105,7 @@ DR-IRL 的核心创新在于将**逆强化学习（IRL）**与**动态奖励缩�
 
 DR-IRL 的因果链条可概括为：**均衡的类别特定示范数据 → 类别特定影子奖励模型 → 数据硬度与模型响应性双维度难度估计 → 动态缩放的组优势函数 → 聚焦困难且不确定样本的 GRPO 优化**。这一设计同时解决了数据层面（类别不平衡）和优化层面（静态奖励、无难度感知）的双重瓶颈，从而在安全性与有用性之间实现了更优的权衡。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_K0Zh6mzTzc/figures/002_Figure_2.jpg]]
 *Figure 2: Pipeline of DR-IRL. First, we construct a balanced safety dataset covering N harm categories through designed CoD prompt templates. Next, we train a specialized shadow reward model for each category, using this dataset as demonstration data. Finally, we use these reward models to align the LLM via GRPO, dynamically scaling optimization by task difficulty at both data and model level—measuring data hardness with text encoder cosine similarity and model responsiveness with reward gaps*
@@ -140,7 +144,7 @@ $$A_i^j = \alpha_j(q) \cdot \frac{R_{j,i} - \operatorname*{mean}(\{R_{j,1},R_{j,
 
 该流水线的关键因果机制在于：均衡示范数据解决了长尾威胁的覆盖问题，类别特定奖励模型消除了跨类别的奖励干扰，而动态硬度缩放则将优化资源从已掌握的简单样本重新分配至困难且高不确定性的样本，三者协同实现了安全-有用性前沿的一致推进。
 
-## 核心模块与公式推导
+
 
 DR-IRL 的核心由三个递进模块构成：**影子奖励学习**、**双维度硬度测量**、**动态优势缩放**。以下逐一展开其关键公式与变量含义。
 
@@ -222,7 +226,9 @@ $$
 
 其中 $R_{j,i}$ 为影子奖励模型打分，分子为组内去均值归一化，$\alpha_j(q)$ 为提示 $q$ 对应的联合硬度系数。该设计使困难样本获得更大的优势权重，引导策略优先学习高价值的安全拒绝行为，同时避免在已充分掌握的简单样本上过度优化。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 安全-有用性前沿推进
 
@@ -301,7 +307,9 @@ Table 5 验证了动态硬度系数可迁移至其他对齐方法。将难度加
 ![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_K0Zh6mzTzc/figures/013_Table_8.jpg]]
 *Table 8: Pairwise-accuracy (%) of reward models on seven harm categories with Llama-3.1-8B*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 瓶颈驱动的设计动机
 
@@ -344,6 +352,8 @@ DR-IRL 处于**奖励建模增强**与**优化动态调整**的交叉点。在�
 3. **奖励-免费方法的适用性**：动态奖励缩放机制是否同样适合奖励-免费对齐方法（如 DPO 变体）而无需显式奖励模型？Table 5 中 DPO-S 的提升表明难度加权在偏好优化中也有价值，但如何在缺乏显式奖励间隙的情况下定义模型响应性 $\alpha^M$ 仍是一个开放的设计问题。
 
 4. **训练动态的理论理解**：乘积组合规则 $\alpha^D \cdot \alpha^M$ 在实验上优于加权和（Table 3），其“AND 门控”的解释具有直觉吸引力，但缺乏对训练动态（如收敛速度、梯度方差）的理论分析。理解硬度系数如何影响策略更新的偏差-方差 trade-off 可能指导更优的组合规则设计。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2023
 pdf_ref: paperPDFs/CVPR_2023/Neural_Fields_meet_Explicit_Geometric_Representations_for_Inverse_Rendering_of_Urban_Scenes.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/toronto-ai/fegr/
 aliases:
 - NFMEGRIRUS
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | 神经场与显式几何表示结合的城市场景逆渲染 |
 | 英文题名 | Neural Fields meet Explicit Geometric Representations for Inverse Rendering of Urban Scenes |
 | 会议/期刊 | CVPR 2023 |
-| Links | [paper](https://arxiv.org/abs/2304.03266); [Project](https://research.nvidia.com/labs/toronto-ai/fegr/) |
+| Links | [paper](https://arxiv.org/abs/2304.03266) · [Project](https://research.nvidia.com/labs/toronto-ai/fegr/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | FEGR |
 | Dataset | NeRF-OSR Site 1, NeRF-OSR Site 2, NeRF-OSR Site 3, Virtual Object Insertion User Study |
@@ -41,7 +42,7 @@ claims:
 > - NeRF-OSR Site 2 上，PSNR (dB) ↑ 为 17.00，对比 16.35 (NeRF-OSR)，变化 +0.65。
 > - NeRF-OSR Site 3 上，PSNR (dB) ↑ 为 17.57，对比 15.66 (NeRF-OSR)，变化 +1.91。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -63,7 +64,7 @@ FEGR 属于**基于物理的逆渲染方法**，与现有工作的关键区别�
 
 在 NeRF-OSR 数据集上，FEGR 在所有三个场景的重光照任务中均显著优于 NeRF-OSR：Site 1 的 PSNR 提升 **+2.19 dB**（21.53 vs 19.34），Site 3 提升 **+1.91 dB**（17.57 vs 15.66）。消融实验表明，显式网格的二次光线追踪与曝光补偿分别贡献了高达 1.5 dB 的增益。在虚拟物体插入的用户调研中，86.2% 的参与者偏好 FEGR 的结果（对比 Hold-Geoffroy et al., CVPR 2019），68.9% 的参与者偏好 FEGR（对比 Wang et al., ECCV 2022），验证了其在 AR/VR 应用中的实用价值。
 
-## 背景与动机
+
 
 城市场景的真实感渲染与编辑是计算机视觉和图形学中的核心挑战，其应用涵盖增强现实、虚拟现实和自动驾驶仿真。要从一组带位姿的相机图像中恢复场景的内在属性——几何结构、空间变化材质和高动态范围（HDR）光照——并支持重光照和虚拟物体插入，需要解决**逆渲染**问题。
 
@@ -75,7 +76,9 @@ FEGR 属于**基于物理的逆渲染方法**，与现有工作的关键区别�
 
 本文的动机正是填补这一缺口。我们提出 **FEGR**（Neural Fields meet Explicit Geometric Representations），一种混合延迟渲染框架：利用神经场处理一次光线，产生包含法向、基色、材质和深度的G缓冲区；同时从底层有符号距离场（SDF）中提取显式网格，借助 OptiX 高效计算二次光线的可见性，从而在城市场景中首次实现带逼真阴影的重光照和虚拟物体插入。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FEGR的核心创新在于**将神经场的高分辨率细节表达能力与显式网格的高效光线求交能力解耦并协同**，构建了一条混合延迟渲染管线，从而在城市场景逆渲染中首次实现逼真的高阶光照效果（阴影、高光）和带阴影的虚拟物体插入。
 
@@ -123,7 +126,7 @@ FEGR的解决方案是将渲染任务一分为二（Figure 2）：
 - 网格每20次迭代重新提取并重建BVH的具体计算开销，原文未给出定量数据，仅提及“增加了计算负担”。
 - 语义分割网络的具体架构和训练细节，原文未详细说明，仅提及使用了现成的语义分割网络。
 
-## 整体框架
+
 
 FEGR 的整体管线围绕一个核心设计展开：**将神经场的高分辨率细节与显式网格的高效光线求交能力解耦组合**。输入为一组已知相机位姿的 RGB 图像（可来自单一光照或多光照采集），输出包括场景几何、空间变化材质以及 HDR 环境光照，最终支持重光照、新视角合成和虚拟物体插入等应用（Figure 2）。
 
@@ -169,7 +172,7 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{render}} + \lambda_{\mathrm{depth}} \mathca
 - **每图像曝光补偿**：针对多光照数据集中相机白平衡不一致的问题，为每张图像学习一个可优化的曝光参数，移除该模块导致 PSNR 下降至 20.70。
 - **语义遮阴先验**：通过引入逐语义类的辅助反照率参数，强制环境光照解释图像中的亮度变化，避免了材质与光照的歧义分解。消融实验证实，缺少该先验时 HDR 环境光无法产生锐利阴影（Figure B）。
 
-## 核心模块与公式推导
+
 
 ### 3.1 神经本征场与HDR天空穹顶
 
@@ -263,7 +266,9 @@ $$\mathcal{L}_{\mathrm{smooth}} = \frac{1}{|\mathcal{X}|} \sum_{\mathbf{x} \in \
 
 此外，系统还优化每张图像的逐通道曝光参数，以补偿不同相机白平衡设置带来的不一致性。消融实验表明，去除曝光补偿后PSNR下降约0.8 dB。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与设计动机
 
@@ -329,7 +334,9 @@ Table 1同时包含完整的消融分析，在Site 1场景上揭示了各组件�
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2304_03266/figures/008_Table_2.jpg]]
 *Table 2: User study results of object insertion quality. Users consistently prefer ours over results from baseline methods*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 **FEGR** 处于基于神经场的逆渲染与基于显式网格的光线追踪的交汇点，其核心设计动机源于对两类方法根本性瓶颈的回应：基于 NeRF 的逆渲染管线（如 **NeRF-OSR**，Rudnev et al., ECCV 2022）受限于体积积分复杂度 $O(nm)$，无法高效渲染二次光线（阴影、高光）；而纯网格方法受限于分辨率，难以处理大规模城市场景的细节重建。FEGR 通过**混合延迟渲染管线**将二者解耦：一次光线由神经场体积渲染生成 G 缓冲区，二次光线则由从有符号距离场（SDF）提取的显式网格通过 OptiX 进行快速光线求交，从而在城市场景逆渲染中首次实现逼真的重光照与带阴影的虚拟物体插入。
 
@@ -370,6 +377,8 @@ FEGR 揭示了两个值得进一步探索的方向：
 2. **动态场景扩展**：如何将 FEGR 的混合渲染框架扩展至动态场景，例如结合动态 NeRF 的进展，使网格光追机制能处理时变几何与移动光源，是一个有前景但尚未解决的方向。
 
 *注：以上分析基于论文提供的实验证据与消融研究。部分局限（如语义分割依赖的具体精度影响）在论文中未进行定量消融，需要进一步验证。*
+
+
 
 ## 原文 PDF
 

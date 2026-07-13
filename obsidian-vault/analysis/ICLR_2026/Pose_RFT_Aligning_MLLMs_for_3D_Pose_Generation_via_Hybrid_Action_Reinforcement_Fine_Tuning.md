@@ -44,7 +44,7 @@ claims:
 > - Human3.6M 上，MPJPE (mm) ↓ 63.0 vs 69.2 (UniPose) (-6.2)。
 > - RPE 上，MPJPE (mm) ↓ 198.6 vs 213.4 (UniPose) (-14.8)。
 
-## 概述
+## 概要
 
 3D人体姿态生成在多模态大语言模型（MLLM）时代面临一个根本性的对齐困境：监督微调（SFT）的确定性回归范式天然无法处理“一对多”的语义模糊性——同一段文本描述或同一张图像可以对应多种合理的三维姿态，而SFT迫使模型预测一个折衷的“平均”输出，导致语义一致性与空间准确度双双不足。**Pose-RFT** 针对这一瓶颈，将学习范式从监督模仿转向奖励驱动的强化微调（RFT），核心思路是将姿态生成建模为**混合动作空间**（离散文本 + 连续姿态）上的强化学习问题，并设计 **HyGRPO** 算法进行组相对优势分解优化，使模型直接最大化语义和空间对齐目标。
 
@@ -54,7 +54,7 @@ claims:
 
 **方法定位**：Pose-RFT 属于强化微调范式在具身多模态生成任务上的迁移应用，其 HyGRPO 算法为混合动作空间的策略优化提供了可复用的技术方案。该方法在图像到姿态、文本到姿态及推理姿态估计三个任务维度上均验证了有效性，但奖励函数质量依赖和组归一化的计算开销仍是当前局限。
 
-## 背景与动机
+
 
 三维人体姿势生成是计算机视觉与多模态学习的交叉前沿，其核心任务是从图像或自然语言描述中恢复精确的三维人体姿态。近年来，多模态大语言模型（MLLM）的兴起为这一任务带来了新的范式——通过统一的语言接口同时处理视觉理解与姿势推理。然而，现有方法普遍采用监督微调（SFT）的确定性回归范式，这构成了一个根本性的瓶颈。
 
@@ -64,7 +64,9 @@ claims:
 
 **本文动机：从监督模仿到奖励驱动的强化微调**。受大语言模型强化微调（RFT）成功的启发，本文提出将三维姿势生成重新建模为混合动作空间下的强化学习问题。核心思想是：让模型直接最大化语义和空间对齐的奖励函数，而非模仿固定的真值标签。这一范式转变的关键在于：（1）将连续姿势输出建模为多变量高斯分布，使策略能够表达输出的不确定性；（2）设计HyGRPO算法，实现离散语言头和连续姿势头在统一奖励信号下的协同优化。通过这种方式，模型不再被迫预测“平均”输出，而是学习生成高奖励、语义和空间双重对齐的高质量姿态。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Pose-RFT 的核心创新在于将 3D 姿势生成从确定性监督模仿范式彻底转向**奖励驱动的强化微调（RFT）**，并为此设计了一套完整的混合动作强化学习框架。以下从三个层面剖析其关键创新与 changed slots。
 
@@ -118,7 +120,7 @@ Pose-RFT 定义了四种任务奖励，替代 SFT 的单一回归损失：
 
 这些创新形成了完整的因果链条：**分布建模**使策略能够表达“一对多”的姿势空间 → **HyGRPO** 提供稳定优化混合动作的算法基础 → **多维奖励**引导策略同时追求空间精度和语义对齐 → 最终弥合 SFT 的对齐差距。
 
-## 整体框架
+
 
 Pose-RFT 将 3D 人体姿势生成从监督模仿范式转向奖励驱动的强化微调范式，其核心架构围绕一个混合动作空间的多模态大语言模型（MLLM）展开。整体 pipeline 由四个关键模块串联构成：**Pose-Aware Encoder**、**Discrete Policy Head**、**Continuous Policy Head** 和 **Reward Functions**，并通过 **HyGRPO** 算法实现端到端的联合优化。
 
@@ -164,7 +166,7 @@ $$\mathcal{J}_{\mathrm{HyGRPO}} = \mathbb{E}_{q \sim \mathcal{D}, \{a_i, p_i\}_{
 ![[assets/figures/papers/paper_list_l75_https_openreview_net_forum_id_ea1U1MgbdT/figures/001_Figure_1.jpg]]
 *Figure 1: Examples and Motivation. Left: An overview of our Pose-RFT framework for multimodal 3D pose generation. Right: Illustrating the alignment gap. While SFT yields a suboptimal averaged output, RFT produces a high-reward output for superior semantic and spatial alignment*
 
-## 核心模块与公式推导
+
 
 ### 3.1 混合动作空间的强化学习建模
 
@@ -239,7 +241,9 @@ $$\mathcal{R}_{\mathrm{text}} = \cos(E(a_{\mathrm{pred}}), E(a_{\mathrm{gt}}))$$
 ![[assets/figures/papers/paper_list_l75_https_openreview_net_forum_id_ea1U1MgbdT/figures/007_Figure_4.jpg]]
 *Figure 4: Comparison between GRPO and HyGRPO. Training reward curves for pose generation. The discrete-only GRPO fails to yield improvements, whereas our proposed HyGRPO achieves consistent gains, demonstrating that a hybrid-action approach is essential for optimizing continuous pose outputs*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果：图像到姿势生成
 
@@ -301,7 +305,9 @@ Pose-RFT 在标准人体姿势估计基准上全面超越现有 MLLM 方法。**
 ![[assets/figures/papers/paper_list_l75_https_openreview_net_forum_id_ea1U1MgbdT/figures/012_Figure_8.jpg]]
 *Figure 8: Pose-RFT results on in-the-wild videos*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与先前方法的对比定位
 
@@ -340,6 +346,8 @@ Pose-RFT 的有效性建立在以下前提之上，超出这些边界时方法�
 3. **多任务能力保持**：在混合动作空间 RL 中，如何显式约束语言能力的退化？引入语言相关的正则化项或阶段性训练策略可能是可行的缓解方案。
 
 4. **跨领域泛化**：当前验证限于人体姿势生成，但混合动作空间 RL 的框架（离散文本 + 连续参数输出）理论上可泛化至其他多模态生成任务（如手部姿势、物体位姿估计），其实证验证有待开展。
+
+
 
 ## 原文 PDF
 

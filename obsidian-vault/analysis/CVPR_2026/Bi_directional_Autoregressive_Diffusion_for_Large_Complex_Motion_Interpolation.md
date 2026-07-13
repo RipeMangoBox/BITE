@@ -44,7 +44,7 @@ claims:
 > - Eval set 上，LPIPS 0.206；FID 19.03；FVD 201.47。
 > - Pixels 上，LPIPS 0.247。
 
-## 概述
+## 概要
 
 ### 问题背景与核心瓶颈
 
@@ -88,7 +88,7 @@ ARVFI 处于**扩散模型视频插帧**与**自回归生成**的交叉点。其
 
 ARVFI 无法正确处理具有物理场景交互的运动，例如球落地弹跳、周期性摆动的摆锤等，表明该方法缺乏对物理先验的建模能力。
 
-## 背景与动机
+
 
 视频插帧（Video Frame Interpolation, VFI）旨在从两帧或多帧输入中生成时间上连续的中间帧，是视频增强与生成领域的核心任务之一。近年来，扩散模型在图像和视频生成中展现出强大的能力，促使研究者将其引入视频插帧任务。然而，现有的扩散插帧方法在面临**大复杂运动**（如大幅度肢体动作、快速物体位移、遮挡与形变）时，仍存在根本性瓶颈。
 
@@ -112,7 +112,9 @@ ARVFI 无法正确处理具有物理场景交互的运动，例如球落地弹�
 
 综上，ARVFI 通过“双向自回归扩散 + DINOv3 语义运动引导”的双重设计，旨在在大复杂运动场景下实现**一致、连贯且高质量**的视频插帧。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ARVFI 的核心创新可归结为两个相互协同的“因果旋钮”：**双向自回归插帧策略**与**基于 DINOv3 的鲁棒运动表示**。二者分别从生成顺序和运动建模两个维度，系统性地解决了现有扩散插帧方法在“大复杂运动”场景下的瓶颈。
 
@@ -152,7 +154,7 @@ ARVFI 将运动估计与帧生成拆分为**两个独立的扩散 Transformer**�
 - **物理交互场景失效**：ARVFI 无法正确处理涉及物理场景交互的运动（如球落地弹跳、摆锤周期性摆动），这表明纯数据驱动的运动表示缺乏物理先验。
 - **极端条件未验证**：实验聚焦于大复杂运动场景，在低纹理、极端光照等条件下的鲁棒性需手动验证。
 
-## 整体框架
+
 
 ARVFI 将复杂运动下的视频插帧分解为两个阶段：**运动表示插值**与**条件帧生成**，两者均以**双向自回归**方式执行，从两帧输入逐步向时间中心生成。
 
@@ -211,7 +213,7 @@ ARVFI 采用“软”自回归生成方案（Algorithm 1），核心机制包括
 ![[assets/figures/papers/paper_list_l985_https_openaccess_thecvf_com_content_CVPR2026_html_Ma_Bi_directional_Auto/figures/003_Figure_3.jpg]]
 *Figure 3: The proposed ARVFI consists of two main stages: motion representations interpolation and the conditional intermediate frame generation. ARVFI interpolates in a bi-directional autoregressive manner. To implement it, the ARVFI gradually denoises from input frames to the middle ones, coupling with a bi-directional causal attention mask to ensure each interpolation is only based on previous interpolation (see red arrows) rather than unprocessed noise. By this means, ARVFI interpolates the intermediate DINOv3 features as motion representations first, and then conditionally generates intermediate frames*
 
-## 核心模块与公式推导
+
 
 ### 3.1 扩散基础与训练目标
 
@@ -265,7 +267,9 @@ $$\mathcal{L}_{sim} = \|d_0\cdot d - d_0\cdot\hat{d}\|_2 + \|d_1\cdot d - d_1\cd
 
 这种设计使得帧生成过程中的每个 token 能够同时关注帧内信息和运动对应信息，从而在保持视觉质量的同时确保运动一致性。该模块是连接两个阶段的关键桥梁，将第一阶段估计的抽象运动表示转化为对像素生成的直接约束。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能对比
 
@@ -321,7 +325,9 @@ ARVFI 并非在所有场景下都表现完美。论文明确指出，该方法�
 ![[assets/figures/papers/paper_list_l985_https_openaccess_thecvf_com_content_CVPR2026_html_Ma_Bi_directional_Auto/figures/008_Figure_6.jpg]]
 *Figure 6: Interpolated sequence in [42] dataset. FCVG [42] interpolates based on linearly interpolated matching results across input frames; Wan [33] utilizes a more advanced backbone, the diffusion transformer, to interpolate intermediate frames directly. These methods cannot solve large complex motions, producing unnatural motions and object deformations (see red boxes). In contrast, our ARVFI can effectively and consistently deal with large complex motions, producing interpolation results with superior accuracy and visual quality*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从光流插帧到双向自回归扩散插帧
 
@@ -371,6 +377,8 @@ ARVFI 处于三个研究方向的交叉地带，其贡献可分别定位：
 - 探索将 DINOv3 运动表示与显式几何约束（如深度、法线）融合，以增强对三维运动和遮挡的建模能力。
 
 此外，ARVFI 的双向自回归策略为更广泛的视频生成任务提供了可迁移的范式——任何需要从两端向中间逐步生成时序内容的任务（如视频补全、视角插值）都可能受益于这一调度策略和软掩膜机制。
+
+
 
 ## 原文 PDF
 

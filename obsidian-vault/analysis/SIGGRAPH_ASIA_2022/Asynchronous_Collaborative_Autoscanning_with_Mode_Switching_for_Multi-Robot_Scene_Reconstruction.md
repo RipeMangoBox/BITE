@@ -33,7 +33,7 @@ claims:
 | 中文题名 | 模式切换的异步协同自动扫描方法用于多机器人场景重建 |
 | 英文题名 | Asynchronous Collaborative Autoscanning with Mode Switching for Multi-Robot Scene Reconstruction |
 | 会议/期刊 | SIGGRAPH ASIA 2022 |
-| Links | [paper](https://arxiv.org/abs/2210.04413) · [Project](https://www.nokov.com/) · [arXiv](https://arxiv.org/abs/2210.04413") |
+| Links | [paper](https://arxiv.org/abs/2210.04413) · [Project](https://www.nokov.com/) · [paper](https://arxiv.org/abs/2210.04413") |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Asynchronous Collaborative Autoscanning with Mode Switching |
 | Dataset | Front3D / MatterPort3D, Front3D |

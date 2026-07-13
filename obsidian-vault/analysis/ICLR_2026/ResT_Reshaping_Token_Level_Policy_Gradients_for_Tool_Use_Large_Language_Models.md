@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/ResT_Reshaping_Token_Level_Policy_Gradients_for_Tool_Use_Large_Language_Models.pdf
+project_link: null
+code_link: https://github.com/1229095296/ResT_Tool_use_LLM
 openreview_forum_id: gNZlaKRWki
 aliases:
 - ResT
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | ResT：重塑工具使用大语言模型的Token级策略梯度 |
 | 英文题名 | ResT: Reshaping Token-Level Policy Gradients for Tool-Use Large Language Models |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=gNZlaKRWki); [GitHub](https://github.com/1229095296/ResT_Tool_use_LLM) |
+| Links | [paper](https://openreview.net/forum?id=gNZlaKRWki) · [GitHub](https://github.com/1229095296/ResT_Tool_use_LLM) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | ResT |
 | Dataset | BFCL Multi-Turn, BFCL Single-Turn |
@@ -41,7 +43,7 @@ claims:
 > - BFCL Multi-Turn 上，Overall Acc 为 44.25%，对比 GRPO 38.88%，变化 +5.37%。
 > - BFCL Multi-Turn 上，Overall Acc 为 50.38%，对比 GPT-4o 50.00%，变化 +0.38%。
 
-## 概述
+## 概要
 
 工具使用已成为大语言模型（LLM）与外部世界交互的核心能力，但通过强化学习（RL）训练工具调用策略时面临一个关键瓶颈：**稀疏的结局奖励与均匀的Token处理方式导致策略梯度方差高、训练效率低**。在多轮工具调用场景中，工具名、参数等结构化Token是决定任务成败的核心要素，其熵值通常较低；而推理链（CoT）Token的熵值较高，对最终奖励的边际贡献相对分散。然而，现有方法（如GRPO）对所有Token施加均匀的梯度权重，使得关键结构化Token的奖励信号被稀释，训练不稳定且样本效率低下。
 
@@ -49,7 +51,7 @@ claims:
 
 在BFCL和API-Bank两个主流工具使用基准上，ResT展现出显著优势：在BFCL多轮整体准确率上，基于Qwen3-4B的ResT达到50.38%，**相较GRPO提升8.76个百分点**，并**以0.38%的优势超越GPT-4o**（50.00%）；在单轮场景下，ResT超越GPT-4o达4.11%。消融实验进一步证实，动态奖励缩放、CoT梯度更新和课程学习三者均对最终性能有实质性贡献——移除任一组件的性能下降幅度在4.36%至6.54%之间。训练动态分析表明，ResT在保持可比奖励水平的同时，实现了显著更低且更平滑的策略熵，验证了该方法在降低梯度方差和稳定训练方面的有效性。
 
-## 背景与动机
+
 
 工具使用能力是大型语言模型（LLM）在实际部署中的核心需求之一。然而，当前基于强化学习（RL）的工具使用策略优化面临一个关键瓶颈：**稀疏的结局奖励与均匀的Token处理方式导致策略梯度方差高、训练效率低下**。具体而言，工具调用任务中决定成败的关键结构化Token——如工具名称、参数键值——其奖励信号被大量高熵的推理文本所稀释，使得模型难以高效地从稀疏反馈中学习。
 
@@ -57,7 +59,9 @@ claims:
 
 ResT的动机正源于此。其核心洞察是：**低熵的结构化Token是奖励的核心决定因素**——工具名和参数取值通常具有高度确定的格式，模型在这些位置的概率分布集中（低熵），而它们的正确与否直接决定了任务成败。ResT通过**熵感知的Token级梯度重新加权**与**课程学习**，渐进地调节不同区域Token对梯度更新的贡献：训练初期强调低熵的结构化Token以快速建立正确的工具调用模式，随后逐步将梯度权重转移至高熵的推理Token以优化决策逻辑。这一设计旨在同时实现稳定训练与样本高效的工具使用策略优化。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ResT的核心创新在于**将工具使用任务的策略梯度从均匀的Token级更新重塑为熵感知的差异化更新**，并通过三个紧密结合的“changed slots”实现这一目标：
 
@@ -96,7 +100,7 @@ GRPO等基线方法对序列中所有Token赋予均匀的策略梯度贡献权�
 
 三个changed slots形成因果闭环：**密集的逐轮规则奖励**提供了丰富的学习信号；**熵感知的Token重加权**将这些信号精准导向对任务成功最关键的结构化Token；**课程学习**则确保模型在掌握工具调用格式后，仍能发展出必要的推理能力。这一组合使ResT在相同数据预算下，相比GRPO在BFCL上提升最高达**8.76%**，并在4B模型上超越GPT-4o。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_gNZlaKRWki/figures/001_Figure_1.jpg]]
 *Figure 1: ResT decomposes multi-turn tool-use tasks into single-turn tasks and further reshapes the policy gradient according to the average entropy in different regions, enabling dense and effective reward signals*
@@ -115,7 +119,7 @@ ResT 的整体设计围绕一个核心矛盾展开：工具使用任务中，稀
 
 综上，ResT 的流水线通过“分解获取密集信号→规则评分提供结构化反馈→熵感知重加权降低方差→课程学习引导能力迁移”的因果链条，实现了工具使用策略优化的稳定性与样本效率的双重提升。整个框架的输入为多轮工具调用对话，输出为经 Token 级重加权策略梯度优化后的模型参数，各模块间的数据流关系可参照 Figure 1 的示意。
 
-## 核心模块与公式推导
+
 
 ### 理论动机：Token级梯度方差与熵的关系
 
@@ -195,7 +199,9 @@ ResT的完整训练流程包含五个关键模块：
 
 这一流水线使得ResT在稀疏结局奖励的工具使用场景中，实现了稳定且样本高效的策略优化。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -252,7 +258,9 @@ Table 4进一步考察了初始化策略与课程对齐的交互效应。在Qwen
 *Figure 9: Figure F.1: Learning curves for ResT and GRPO during training steps. The training dynamics show that ResT achieves a significantly lower and smoother policy entropy compared to GRPO, while maintaining comparable reward performance and longer responses*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 工具使用LLM的强化学习基线谱系
 
@@ -282,6 +290,8 @@ ResT的设计依赖于以下前提条件，这些条件界定了其适用边界�
 2. **课程学习的自动化**：当前课程学习依赖预设的权重调度策略。能否根据在线熵估计自适应地调度权重变化，使课程学习完全自动化，值得进一步探索。
 3. **复杂规划与错误恢复的鲁棒性**：该方法在多步规划、工具调用失败后的错误恢复等更复杂场景中的鲁棒性尚未充分验证。
 4. **动态工具集的适应性**：当可用工具集在推理时动态变化时，Token区域划分和权重初始化策略是否需要重新设计，是一个实际部署中需要解决的问题。
+
+
 
 ## 原文 PDF
 

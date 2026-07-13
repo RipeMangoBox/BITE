@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Compose_Your_Policies_Improving_Diffusion_based_or_Flow_based_Robot_Policies_via_Test_time_Distribution_level_Composition.pdf
+project_link: https://sagecao1125.github.io/GPC-Site/
+code_link: null
 openreview_forum_id: TnLFRhLuZ6
 aliases:
 - GPCG
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 组合你的策略：通过测试时分布级组合改进基于扩散或流式的机器人策略 |
 | 英文题名 | Compose Your Policies! Improving Diffusion-based or Flow-based Robot Policies via Test-time Distribution-level Composition |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=TnLFRhLuZ6); [Project](https://sagecao1125.github.io/GPC-Site/) |
+| Links | [paper](https://openreview.net/forum?id=TnLFRhLuZ6) · [Project](https://sagecao1125.github.io/GPC-Site/) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | General Policy Composition (GPC) |
 | Dataset | Robomimic & PushT, RoboTwin 2.0, Real-world Clean Table |
@@ -41,7 +43,7 @@ claims:
 > - RoboTwin 2.0 上，Average Success Rate 为 0.72 (RDT+DPpcd)，对比 0.65 (DPpcd)，变化 +7%。
 > - Real-world Clean Table 上，Successes / 20 trials 为 14/20，对比 12/20 (DPimg) and 7/20 (DPpcd)，变化 +2 and +7。
 
-## 概述
+## 概要
 
 机器人策略学习面临一个根本性瓶颈：单个扩散或流式策略受限于有限的训练数据和模型容量，难以在所有任务上表现优异。不同预训练策略往往具有互补的失败模式——一个策略在视觉模态上表现良好，另一个则在点云输入上更鲁棒——但直接收集大规模交互数据或进行在线微调的成本过高，使得单一策略无法充分利用所有可用的预训练知识。
 
@@ -55,7 +57,7 @@ $$\hat{s}_{\mathrm{comp}}(\tau_t, t, c) = \sum_{i=1}^{n} w_i s_{\theta}(\tau_t, 
 
 **方法定位**：GPC 属于测试时组合方法，可与多种主流扩散或流式策略（DP、MP、FP、Florence-Policy、π0、DP3、RDT 等）兼容。相比需要训练或微调的集成方法，GPC 仅引入约 0.04 秒的推理延迟增量（每动作块从 0.09 秒增至 0.13 秒），且权重搜索的模拟时间开销（约 2.5 小时）远低于训练成本。该方法在处理异构动作块长度和推理步数方面也展现出兼容性。
 
-## 背景与动机
+
 
 机器人操作策略的学习在过去几年取得了显著进展，特别是基于扩散模型和流匹配模型的生成式策略，如 **Diffusion Policy**（Chi et al., 2023）、**Florence Policy**（Reuss et al., 2024）和 **π0**（Black et al., 2024）等，在多样化的操作任务上展现了令人瞩目的性能。这些策略将动作生成立为一个条件分布建模问题，通过迭代去噪或流匹配从噪声中逐步恢复出高质量的动作轨迹。然而，尽管单个策略在其擅长领域表现优异，它们在面对不同任务、不同感知模态或不同架构选择时，往往呈现出**互补的失败模式**：一个策略在某个任务上成功，在另一个任务上却可能失败；基于图像的策略和基于点云的策略各有其感知盲区；不同网络架构的策略也各有其归纳偏置的优劣。
 
@@ -65,7 +67,9 @@ $$\hat{s}_{\mathrm{comp}}(\tau_t, t, c) = \sum_{i=1}^{n} w_i s_{\theta}(\tau_t, 
 
 本文的核心动机正是源于这一观察：**不同策略往往具有互补的失败模式，单独使用任何单一策略都无法充分利用所有可用的预训练知识**。如果能够在测试时，通过某种方式将多个预训练策略的分布分数进行组合，就有可能在不增加训练成本的情况下，构建出一个超越任一父策略的更强大策略。这一思路将策略改进的焦点从“训练更好的单一模型”转移到了“测试时组合现有模型”，为机器人策略的性能提升开辟了一条低成本、高灵活性的新路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈
 
@@ -91,7 +95,7 @@ GPC 框架自然延伸到叠加原理，支持逻辑与（Logical AND）和逻�
 
 GPC 可与异构的动作块长度和推理步数兼容。当两个策略的动作块长度不同时（如 $H_A \geq H_B$），GPC 采样长度为 $H_A$ 的共享噪声轨迹，仅在重叠的前 $H_B$ 步进行凸分数组合，尾部保持策略 A 的分数不变。此机制使 GPC 能够灵活组合具有不同设计选择的预训练策略，无需修改其架构或训练流程。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_TnLFRhLuZ6/figures/003_Figure_1.jpg]]
 *Figure 1: Illustration of General Policy Composition. (a) Distributions from pre-trained stateof-the-art diffusion- or flow-based policies can be composed to construct a stronger policy without additional training, with a test-time search over composition weights picking the best parent-policy mix; score composition corresponds to the product of probabilistic density functions (PDFs), steering sampling toward consensus regions. (b) GPC can yield consistent gains across a diverse set of tasks. (c) We find the optimal weight when composing two models can vary depending on the task*
@@ -139,7 +143,7 @@ $$\tau_{t-1} = \alpha_t \tau_t + \beta_t \hat{s}_{\mathrm{comp}}(\tau_t, t, c) +
 
 GPC 还支持**叠加组合算子**的扩展：除凸组合外，框架可自然衔接逻辑 OR（按 softmax 加权）和逻辑 AND（强制策略间分数梯度一致）等更强的组合方式。实验表明，逻辑 AND 组合在 Robomimic 上可带来比凸组合更显著的性能提升（如 DP+MP 的 AND 组合平均成功率达 64.92，远超基线的 39.19，见 Table 4）。此外，GPC 兼容异构的动作块长度和推理步数：当两个策略的动作块长度不同时，在重叠部分进行凸组合，非重叠部分保留较长策略的原始分数，即可实现无缝融合。
 
-## 核心模块与公式推导
+
 
 ### 核心模块
 
@@ -177,7 +181,9 @@ $$\mathbb{E} \| x_{\hat{s}}(T) - x^{*}(T) \| \leqslant \left( \int_0^T e^{2\int_
 
 > **注意**：以上公式均来自原文 Section 3-5 的推导，变量含义严格以原文定义为准。关于最优权重的解析求解、组合算子的进一步设计等仍为开放问题，文中未提供闭式解。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设定
 
@@ -273,7 +279,9 @@ GPC 支持**异构动作块长度**和**不同推理步数**的组合。**Table 
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_TnLFRhLuZ6/figures/020_Table_10.jpg]]
 *Table 10: Experiments on Robomimic and PushT with GPC under convex score combination, Logical AND and Logical OR*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有方法的关系
 
@@ -347,6 +355,8 @@ GPC 的核心定位是**训练无关（training-free）**的测试时增强框�
 6. **组合泛化性的理论理解**：组合策略的泛化能力与各父策略训练数据分布之间的关系尚不明确。能否通过组合来提升对未见场景的泛化性？这需要理解分数组合在分布外样本上的行为。
 
 7. **异构动作空间的组合**：当前 GPC 通过重叠部分组合分数来处理异构动作块长度，但更根本的挑战在于不同策略可能输出不同维度的动作空间（如位置控制 vs. 速度控制）。如何在这些异构空间中进行组合仍是一个开放问题。
+
+
 
 ## 原文 PDF
 

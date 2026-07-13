@@ -5,6 +5,8 @@ paper_level: A
 venue: PAMI
 year: 2025
 pdf_ref: paperPDFs/PAMI_2025/MotionVerse_A_Unified_Multimodal_Framework_for_Motion_Comprehension_Generation_and_Editing.pdf
+project_link: null
+code_link: null
 aliases:
 - MotionVerse
 tags:
@@ -41,7 +43,7 @@ claims:
 > - MotionX (Text-to-Motion) 上，FID 0.010 vs N/A (优于多数基线，FID略高于MoMask) (N/A)。
 > - MotionX (Motion-to-Text) 上，BLEU@4 15.8 vs N/A (最优) (N/A)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -80,7 +82,7 @@ MotionVerse属于“统一多模态运动框架”这一新兴范式。与**Moti
 
 尽管MotionVerse在统一性上取得突破，仍需注意以下局限：统一架构在个别指标（如T2M的FID）上略逊于单任务专用模型（如MoMask），多任务学习与单任务专精之间仍需权衡；T5-Large相比T5-Base未带来显著增益，表明当前任务规模可能已饱和；评估限于公开数据集，未在真实交互或机器人场景中验证。开放问题包括：延迟并行策略能否自适应调整延迟量、模态隔离效果能否用梯度冲突等量化指标进一步验证、框架能否扩展至音频和场景上下文等更多模态。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -104,7 +106,9 @@ MotionVerse属于“统一多模态运动框架”这一新兴范式。与**Moti
 
 具体而言，MotionVerse引入了三个关键设计：采用**残差向量量化（RVQ）**生成多流运动令牌，以层次化方式保留运动细节；设计**延迟并行建模策略**，在控制计算复杂度的同时有效捕获流间依赖；构建**模态隔离的双塔架构**，为运动和文本分别分配独立的参数空间，从根本上缓解模态干扰。这一设计使得单一模型能够覆盖8类运动任务，在多个基准上取得有竞争力的结果，为通用运动智能提供了新的技术路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MotionVerse 的核心创新在于通过三个关键设计，首次将单人运动与交互式运动的理解、生成与编辑统一到一个框架中，并有效抑制了多任务与多模态带来的干扰。
 
@@ -152,7 +156,7 @@ $$x' = h + \mathrm{FFN}(\mathrm{LN}(x, \theta_{\mathrm{ln2}}^{\mathrm{u}}); \the
 
 在多任务指令微调阶段，MotionVerse 引入了**任务特定的运动塔（TMT）**，为每个子任务（文本到运动、运动到文本、运动预测、运动编辑等）分配独立的输出头。消融实验（**Tables 12-14**）显示，移除 TMT（wo-TMT）会导致各子任务性能一致下降，尤其在运动反应和编辑任务上退化最为明显，验证了任务隔离对统一多任务框架的必要性。
 
-## 整体框架
+
 
 MotionVerse 是一个以多流离散运动令牌和模态隔离架构为核心的统一框架，旨在让大语言模型（LLM）在单人和多人场景下同时胜任运动理解、生成和编辑等多类任务。框架由三个关键组件构成，并通过三阶段训练流水线完成端到端学习。
 
@@ -212,7 +216,7 @@ $$h = x + \mathrm{MHSA}(\mathrm{LN}(x, \theta_{\mathrm{ln1}}^{\mathrm{u}}); \the
 ![[assets/figures/papers/paper_list_l1801_MotionVerse_A_Unified_Multimodal_Framework_for_Motion_Comprehension_Gene/figures/004_Figure_3.jpg]]
 *Figure 3: Architecture of the proposed MotionVerse framework: Integrating Textural and Multi-stream Motion Tokens via Modality-Aware Autoregressive Transformers (Three-Stream Example)*
 
-## 核心模块与公式推导
+
 
 MotionVerse 由三个核心模块构成：残差向量量化运动标记器、延迟并行LLM骨干网络、以及模态隔离的Motion-Fusion模块。以下逐一展开其设计逻辑与关键公式。
 
@@ -310,7 +314,9 @@ MotionVerse采用三阶段渐进训练策略：
 ![[assets/figures/papers/paper_list_l1801_MotionVerse_A_Unified_Multimodal_Framework_for_Motion_Comprehension_Gene/figures/005_Figure_4.jpg]]
 *Figure 4: Architecture of Residual Vector Quantization Variation Autoencoder (RVQ-VAE), which discretizes continuous motions into L token sequences*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -392,7 +398,9 @@ Tables 12-14 同时对比了 T5-Base 和 T5-Large 作为 LLM 主干。T5-Large �
 ![[assets/figures/papers/paper_list_l1801_MotionVerse_A_Unified_Multimodal_Framework_for_Motion_Comprehension_Gene/figures/014_Table_8.jpg]]
 *Table 8: Quantitative evaluation results of the motion editing (Edit) task on MotionFix dataset*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与因果机制
 
@@ -432,6 +440,8 @@ MotionVerse处于“统一运动基础模型”这一新兴技术路线的关键
 4. **超长序列扩展性**：当生成时间跨度极大的运动序列时，延迟并行策略的线性注意力假设是否仍然成立？是否需要引入记忆压缩或分块自回归机制？
 
 5. **三阶段训练的最优配比**：令牌器训练、对齐预训练、指令微调三个阶段的数据比例和任务采样策略是否存在最优设计？论文未对此进行系统消融，该方向可能蕴含进一步的性能提升空间。
+
+
 
 ## 原文 PDF
 

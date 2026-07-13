@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Flock_A_Knowledge_Graph_Foundation_Model_via_Learning_on_Random_Walks.pdf
+project_link: null
+code_link: https://github.com/jw9730/flock
 aliases:
 - FKGFMLRW
 - FAKGFM
@@ -34,7 +36,7 @@ code_url: https://github.com/jw9730/flock
 | 中文题名 | FLOCK：基于随机游走学习的知识图谱基础模型 |
 | 英文题名 | Flock A Knowledge Graph Foundation Model via Learning on Random Walks |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=1cGOCIOKQd) / [code](https://github.com/jw9730/flock) |
+| Links | [paper](https://openreview.net/forum?id=1cGOCIOKQd) · [code](https://github.com/jw9730/flock) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/graph_neural_networks |
 | Method | 基于随机游走序列编码的概率性节点-关系等变模型 |
 | Dataset | 54 KGs, PETALS |
@@ -44,21 +46,23 @@ code_url: https://github.com/jw9730/flock
 > - 在54个知识图谱的零样本实体预测中，FLOCK平均MRR达0.391，Hits@10达0.560，均超越SOTA。
 > - 在54个知识图谱的零样本关系预测中，FLOCK平均MRR达0.881，Hits@1达0.817，显著领先。
 
-## 概述
+## 概要
 
 FLOCK是一种基于随机游走学习的知识图谱基础模型。它针对确定性节点-关系等变模型难以区分结构同构但语义不同关系的问题，使用随机游走采样、匿名化记录、双向GRU序列编码和注意力共识聚合，在分布意义上保持等变性，同时通过推理时随机性打破对称。论文报告FLOCK在PETALS诊断数据集上达到100%准确率，并在54个知识图谱的零样本实体预测和关系预测中取得领先平均MRR。
 
-## 背景与动机
+
 
 知识图谱（KG）中的零样本链接预测要求模型泛化到训练时未见过的实体和关系。现有知识图谱基础模型（KGFM），如ULTRA、TRIX、MOTIF和InGram，均采用确定性节点-关系等变性作为归纳偏置。然而，确定性等变性存在根本性的表达能力瓶颈：它强制要求结构同构但语义不同的关系（例如“喜欢”与“不喜欢”）具有相同的表示。如图1所示，在一个《星球大战》角色关系图中，若仅从图结构看，like与dislike关系完全对称，确定性等变模型无法区分它们。这一限制导致模型在需要区分语义对立关系的任务上表现不佳。因此，核心瓶颈在于：如何在保留跨KG泛化所需的等变归纳偏置的同时，突破确定性等变带来的表达力天花板。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 核心洞察：概率性节点-关系等变性（Probabilistic Node-Relation Equivariance）能够替代确定性等变性，因为它在分布意义上保持等变性，同时通过推理时的结构化随机性打破对称性，从而使KGFM成为通用逼近器成为可能。
 
 具体而言，FLOCK放弃了传统的两阶段消息传递架构，转而采用随机游走序列编码。通过从查询节点出发采样多条随机游走，对游走序列进行匿名化记录，并用双向GRU处理这些序列，FLOCK能够捕获节点和关系的局部结构上下文。由于每次推理时随机游走的采样结果不同，模型在保持等变性的同时获得了区分结构同构但语义不同关系的能力。论文通过命题4.1证明FLOCK是等变链接级函数的通用逼近器，这是现有KGFM所不具备的理论保证。
 
-## 整体框架
+
 
 ![[assets/figures/papers/86c8fa7c-7e04-4d85-b896-b3a320e2a1b2/figures/002_Figure_2.jpg]]
 *Figure 2: An overview. In each updating step, FLOCK (1) samples random walks on the KG (two walks indicated by red and teal, respectively), (2) anonymizes the encountered nodes and relations via a recording protocol (for each walk, nodes are anonymized as 1 , 2 , $\ldots$ . and relations as $\alpha , \beta , \ldots$ ) , and (3) feeds the sequences in a sequence processor to compute node and relation representations. (4) A consensus protocol then pools them back to the original KG’s nodes and relations
@@ -73,7 +77,7 @@ FLOCK的整体框架如图2所示，包含五个核心模块：
 
 整个流程在推理时重复多次（集成），最终取平均预测结果。
 
-## 核心模块与公式推导
+
 
 **自适应游走数量**：为适应不同规模的目标KG，FLOCK根据图大小动态调整基础游走数量：
 $$n = n_{train} \times \text{harmonic mean}(|V|/|V|_{train}, |E|/|E|_{train})$$
@@ -91,7 +95,9 @@ $$\mathbb{P}(V_{i+2}=v|V_{i+1}=w,V_i=u) = \begin{cases} \frac{1}{\deg(w)-1} & \t
 $$\mathbb{P}(|\varphi(G)((h,r,t)) - X_\theta(G,(h,r,?))(t)| < \epsilon) > 1 - \delta$$
 该公式表明，通过增加游走数量和集成次数，FLOCK可以任意精度逼近目标函数，这是其通用逼近能力的理论基石。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 **主要结果**：FLOCK在54个知识图谱的零样本实体预测和关系预测任务上均取得SOTA。![[assets/figures/papers/86c8fa7c-7e04-4d85-b896-b3a320e2a1b2/figures/004_Table_1.jpg]]
 *Table 1: PETALS accuracies*
@@ -115,7 +121,9 @@ $$\mathbb{P}(|\varphi(G)((h,r,t)) - X_\theta(G,(h,r,?))(t)| < \epsilon) > 1 - \d
 
 **计算成本**：FLOCK参数量为801,969，单批次训练时间1.3秒，GPU内存占用27.89 GB，高于基线方法但仍在可接受范围内。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 FLOCK属于知识图谱基础模型（KGFM）谱系，其直接父系为ULTRA和TRIX。与这些方法相比，FLOCK在三个关键槽位上进行了根本性替换：
 
@@ -128,6 +136,8 @@ FLOCK引入的新机制包括：均匀无回溯随机游走、匿名化记录函
 在知识库中，FLOCK应被创建为M__Method节点，与以下节点建立边：belongs_to_task指向Zero-shot Link Prediction；modifies_slot指向Probabilistic Node-Relation Equivariance和Random Walk Sequence Encoding；compares_against指向ULTRA、TRIX、MOTIF和InGram；evaluates_on指向PETALS；uses_dataset指向FB15k-237、WN18RR和CoDEx Medium。
 
 未来工作可沿以下方向展开：探索更高效的随机游走采样策略以降低计算成本；将FLOCK扩展到超大规模KG；研究概率性等变性与图神经网络其他归纳偏置的结合。
+
+
 
 ## 原文 PDF
 

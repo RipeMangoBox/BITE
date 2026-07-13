@@ -42,7 +42,7 @@ claims:
 > - T-LESS 上，AR 34.1 vs 36.9 (RayPose) (-2.8)。
 > - TUD-L 上，AR 56.8 vs 48.3 (RayPose) (+8.5)。
 
-## 概述
+## 概要
 
 未见物体姿态估计的核心瓶颈在于：现有方法依赖显式特征匹配，匹配不可靠时精度急剧下降；而多视图基础模型由于缺乏物体3D几何信息且假设外观一致性，在真实查询图像与渲染模板视图之间存在域差异时，姿态预测严重偏离。PoseGAM 针对这一瓶颈，提出一种几何感知的多视图前馈框架，将物体几何信息——显式点云图与学习几何特征——通过视图图映射与交叉注意力注入多视图网络，同时依托涵盖19万个物体、多种挑战场景的大规模合成数据集进行端到端训练，从而直接、鲁棒地预测物体绝对位姿，无需显式匹配步骤。
 
@@ -50,7 +50,7 @@ claims:
 
 方法层面，PoseGAM 以 DINOv2 编码多视图图像令牌，PTv3 点云网络提取全局几何特征并按视图重排为特征图，经交叉注意力与多视图令牌交互，弥合了 RGB 预训练与 3D 模态的鸿沟，同时充分利用 VGGT 的多视图架构预训练权重。该方法在范式上从“显式匹配 + 几何求解”转向“端到端前馈直接预测”，在几何信息利用上从“仅 2D-3D 对应”升级为“点图与学习特征的视图级融合”，构成未见物体姿态估计的新基线。
 
-## 背景与动机
+
 
 未见物体姿态估计（unseen object pose estimation）面临一个根本性瓶颈：**现有方法普遍依赖显式特征匹配**——先建立查询图像与物体模型之间的2D-3D对应关系，再通过PnP等几何求解器计算位姿。这类范式（如**OSOP**、**ZS6D**、**MegaPose**、**GenFlow**、**GigaPose**、**FoundPose**、**RayPose**）在匹配不可靠时精度急剧下降，而匹配不可靠在纹理稀疏、遮挡严重或光照变化剧烈的真实场景中恰恰是常态。
 
@@ -58,7 +58,9 @@ claims:
 
 上述两条路径的困境指向同一个因果杠杆：**如何将物体3D几何信息有效注入多视图推理框架，同时弥合RGB预训练与3D模态之间的鸿沟**。这正是PoseGAM的核心动机——通过显式点云图与学习几何特征的双重注入机制，使网络能够在端到端的前馈过程中直接、鲁棒地预测绝对位姿，从而绕开显式匹配的脆弱环节。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PoseGAM 的核心创新在于**将物体几何信息注入多视图架构，实现端到端的前馈位姿预测**，从而绕开了传统方法对显式特征匹配的依赖。具体而言，该方法在以下四个维度上形成了相对于现有工作的关键突破。
 
@@ -103,7 +105,7 @@ $$\mathrm{CA}(Q \gets \mathbf{multiview~tokens}, KV \gets \mathbf{geometry~token
 
 这一数据策略使得网络在训练阶段即暴露于广泛的域差异，从而在推理时对真实查询图像的外观不一致具有更强的容忍度。
 
-## 整体框架
+
 
 PoseGAM 将未见物体姿态估计重新定义为**端到端前馈多视图推理任务**，彻底摒弃了传统方法中显式特征匹配与几何求解（如 PnP）的级联范式。其核心输入为一张查询图像 $I_{\text{query}}$ 和物体 3D 模型 $\mathcal{M}$，输出为物体到相机的刚体变换 $T_{\text{query}}$：
 
@@ -132,7 +134,7 @@ $$T_{\text{query}} = \mathrm{Network}(I_{\text{query}}; \mathcal{T}, \mathcal{V}
 ![[assets/figures/papers/paper_list_l2058_https_arxiv_org_abs_2512_10840/figures/001_Figure_1.jpg]]
 *Figure 1: PoseGAM aligns CAD models with the query image. Given the input CAD models, PoseGAM accurately estimates object poses that align with their spatial arrangements in the query image. Objects on the red plane indicate the initial CAD poses, while those on the green plane represent the poses after estimation*
 
-## 核心模块与公式推导
+
 
 PoseGAM 的核心目标是从查询图像 $I_{\mathrm{query}}$ 和物体模型 $\mathcal{M}$ 直接预测物体到相机的变换矩阵 $T_{\mathrm{query}}$，其整体范式定义为：
 
@@ -194,7 +196,9 @@ $$T_{\mathrm{query}} = [\mathbf{R}, \mathbf{t}] = [\mathbf{R}_{\mathrm{norm}}, \
 
 物体到相机的最终位姿 $T_{\mathrm{query}}$ 由矩阵求逆得到。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -292,7 +296,9 @@ PoseGAM模型参数量约**1.5B**，训练需4块A100 GPU约8天。推理阶段�
 ![[assets/figures/papers/paper_list_l2058_https_arxiv_org_abs_2512_10840/figures/003_Figure_3.jpg]]
 *Figure 3: Examples from the constructed object pose estimation dataset. The leftmost column shows the object mesh after texture rebaking. The four columns on the right illustrate the four types of rendered image data*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 范式迁移：从显式匹配到端到端前馈推理
 
@@ -345,6 +351,8 @@ PoseGAM 的设计假设和实验设定定义了其当前的适用边界：
 3. **数据效率**：是否可以通过自监督学习或少样本微调减少对大规模合成数据的依赖，使方法能快速适配新物体？
 4. **动态场景**：如何处理存在运动模糊或动态光照的查询图像？能否结合时序信息对视频中的物体进行平滑位姿跟踪？
 5. **轻量化部署**：在保持几何感知能力的前提下，如何通过模型压缩或知识蒸馏降低推理成本，使方法适用于实时机器人应用？
+
+
 
 ## 原文 PDF
 

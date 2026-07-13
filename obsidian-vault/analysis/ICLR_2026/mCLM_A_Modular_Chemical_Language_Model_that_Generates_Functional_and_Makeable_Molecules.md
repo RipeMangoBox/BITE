@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/mCLM_A_Modular_Chemical_Language_Model_that_Generates_Functional_and_Makeable_Molecules.pdf
+project_link: null
+code_link: https://github.com/blender-nlp/mCLM
 openreview_forum_id: r2HG3xOMJI
 aliases:
 - mCLM
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | mCLM：一种生成功能性且可合成分子的模块化化学语言模型 |
 | 英文题名 | mCLM: A Modular Chemical Language Model that Generates Functional and Makeable Molecules |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=r2HG3xOMJI); [GitHub](https://github.com/blender-nlp/mCLM) |
+| Links | [paper](https://openreview.net/forum?id=r2HG3xOMJI) · [GitHub](https://github.com/blender-nlp/mCLM) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/generative_models_and_autoencoders |
 | Method | mCLM |
 | Dataset | 122 FDA-approved drugs (ADMET properties), 122 FDA-approved drugs, QM9 molecules |
@@ -41,7 +43,7 @@ claims:
 > - 122 FDA-approved drugs 上，Synthesizability (Makeability) 为 98.23%，对比 85.39% (MoleculeSTM)，变化 +12.84 pp。
 > - QM9 molecules 上，Synthesizability (Makeability) 为 100.0%，对比 62.0% (DGAE)，变化 +38.0 pp。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -64,7 +66,7 @@ mCLM 的核心洞察在于**将分子 tokenization 的粒度从原子提升至�
 
 在 122 个 FDA 批准药物（包含未见过的构建块）上，mCLM 实现了 **15.0% 的平均 ADMET 性能改进**，远超所有基线方法，包括 GPT-5 和 Gemini-2.5-Flash 等通用大语言模型。在可合成性方面，mCLM 生成的分子的可合成性达到 **98.23%**，而 MoleculeSTM 仅为 85.39%，且 mCLM 的分子 **100% 有效**。消融实验进一步验证了构建块级 tokenization 和 GNN 编码的必要性：移除 GNN 编码器导致平均性能降至 -7.53%，使用非合成 tokenizer（BRICS 算法）则进一步恶化至 -19.0%。在 QM9 数据集上，mCLM 使用合成保证构建块实现了 **100% 可合成性**，而基于向量量化的 DGAE 仅为 62%，充分证明了构建块方法相对于传统 VQ 方法的优势。
 
-## 背景与动机
+
 
 ### 分子生成的计算-物理鸿沟
 
@@ -94,7 +96,9 @@ mCLM 的核心动机在于**将合成约束从生成后验证前移至 tokenizat
 
 通过这种“双语”建模——自然语言描述功能需求，构建块序列表示可合成分子——mCLM 在生成前就同时保证了功能相关性与合成可行性，从而在数字设计与物理合成之间建立了直接链路。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 mCLM 的核心创新在于将分子生成的重心从“生成后验证可合成性”前移至“生成前保证可合成性”，并通过构建块级别的 tokenization 实现功能知识与合成约束的联合编码。这一设计直接回应了当前分子生成领域的根本瓶颈：原子级表示（如 SMILES）难以捕获功能语义，且生成分子大多不可合成，导致计算预测与物理世界之间存在巨大鸿沟。
 
@@ -130,7 +134,7 @@ mCLM 的根本洞察在于：**构建块既是功能的载体，也是合成的�
 
 > **注意**：mCLM 当前仅在约 1000 个最常用构建块的词汇上进行训练，且合成保证依赖于三种特定反应类型。扩展到更大词汇、更多反应类型以及更复杂的分子骨架（如天然产物）时的泛化能力，尚需进一步验证。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_r2HG3xOMJI/figures/003_Figure_3.jpg]]
 *Figure 3: An overview of the tokenization process. A functional molecule is first processed by the synthesis-guaranteed tokenizer to produce a set of building blocks compatible with automated modular synthesis. These blocks are then evaluated via a structure coverage check to determine whether they fully reconstruct the original molecule. If coverage is complete, the blocks are used directly for pretraining. Otherwise, the molecule is reprocessed using a rule-based tokenizer to ensure full representation for training purposes*
@@ -167,7 +171,7 @@ mCLM 的推理并非单步完成，而是采用**迭代推理模块**（Figure 4
 
 整体数据流可概括为：**输入**为自然语言指令（如“降低该分子的 DILI 风险”）和目标分子结构 → **tokenization** 将分子转换为构建块序列 → **GNN 编码**注入结构信息 → **LLM 解码**生成优化后的构建块序列 → **迭代评估**驱动多轮优化 → **输出**为可合成的优化分子。训练数据通过从文献中提取分子的功能描述和合成约束，并将构建块序列嵌入自然语言句子中构建而成（Figure 7）。
 
-## 核心模块与公式推导
+
 
 ### 合成保证 Tokenizer
 
@@ -208,7 +212,9 @@ $$\log \mathrm{it}(P_{\theta}(v \mid \mathbf{x}_{1...i-1})) = \begin{cases} \mat
 
 mCLM 采用逐步优化策略进行多目标分子改进：给定输入分子和需要优化的属性目标，模型评估当前分子的各项属性，针对未达标的属性迭代生成修改后的分子。推理时，输出词汇表被限制在 582 个合成保证构建块内，确保生成的分子 100% 有效且天生兼容自动化合成平台。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验结果
 
@@ -289,7 +295,9 @@ mCLM 的迭代推理模块（**Figure 4**）展示了在“fallen angel”药物
 *Table 7: Performance (AUC) of individual models and the ensemble across six selected ADMET tasks*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 分子生成范式的粒度跃迁
 
@@ -340,6 +348,8 @@ mCLM 开辟了若干值得深入探索的方向：
 - **合成空间扩展**：当前合成保证 tokenizer 仅支持三种反应类型。能否将其扩展以包括更多的自动化反应类型，从而大幅扩展可合成的化学空间？
 
 - **System 2 推理**：如何将化学推理从当前的模式匹配提升到更深层次的因果推理、反事实推理和冲突声明消解？这是通往真正化学智能的重要阶梯。
+
+
 
 ## 原文 PDF
 

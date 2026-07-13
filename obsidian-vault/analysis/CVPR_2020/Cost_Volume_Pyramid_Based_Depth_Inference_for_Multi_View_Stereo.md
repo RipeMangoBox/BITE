@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2020
 pdf_ref: paperPDFs/CVPR_2020/Cost_Volume_Pyramid_Based_Depth_Inference_for_Multi_View_Stereo.pdf
+project_link: null
+code_link: https://github.com/JiayuYANG/CVP-MVSNet
 aliases:
 - CMCVPBMVSN
 - CVPBDIMVS
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 基于代价体金字塔的多视图立体深度推断 |
 | 英文题名 | Cost Volume Pyramid Based Depth Inference for Multi-View Stereo |
 | 会议/期刊 | CVPR 2020 |
-| Links | [paper](https://arxiv.org/abs/1912.08329); [GitHub](https://github.com/JiayuYANG/CVP-MVSNet) |
+| Links | [paper](https://arxiv.org/abs/1912.08329) · [GitHub](https://github.com/JiayuYANG/CVP-MVSNet) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | CVP-MVSNet（Cost Volume Pyramid based Multi-View Stereo Network） |
 | Dataset | DTU, DTU (相同深度图尺寸640), Tanks and Temples |
@@ -41,15 +43,13 @@ claims:
 > - DTU (相同深度图尺寸640) 上，Runtime (s) 为 0.37，对比 Point-MVSNet: 2.03，变化 快约6倍。
 > - DTU (相同深度图尺寸640) 上，GPU Memory (MB) 为 1416，对比 Point-MVSNet: 8989，变化 内存减少约6倍。
 
-## 概述
+## 概要
 
 基于多视图图像的深度推断是三维重建的核心任务。传统方法依赖手工设计的相似性度量与全局优化，而近年来的学习型多视图立体（MVS）方法虽然在精度上取得了显著突破，却普遍面临**内存需求大**与**运行速度慢**的双重瓶颈——这源于它们通常在单一固定分辨率下构建完整代价体，其内存开销与分辨率立方成正比，严重限制了在高分辨率场景下的实际部署。
 
 本文提出 **CVP-MVSNet**（Cost Volume Pyramid based Multi-View Stereo Network），核心思路是**以粗到细的方式构建代价体金字塔**，替代传统的固定分辨率单一代价体。该方法的关键洞察在于：深度采样间隔与图像分辨率之间存在直接关联——过密的深度采样无法提供额外的区分性信息。基于此，CVP-MVSNet 在金字塔的每一层仅构建局部部分代价体用于深度残差估计，并结合多尺度 3D CNN 正则化，在显著降低计算与内存开销的同时提升深度估计精度。
 
 在 DTU 数据集上，CVP-MVSNet 取得 **0.351 mm** 的整体误差，优于包括 **MVSNet**（Yao et al., ECCV 2018）、**R-MVSNet**（Yao et al., CVPR 2019）和 **Point-MVSNet**（Chen et al., ICCV 2019）在内的所有深度学习方法。相比直接竞争的粗到细基线 Point-MVSNet，在输出相同尺寸深度图时，GPU 内存消耗和运行时间均**降低约 6 倍**（1416 MB vs 8989 MB，0.37 s vs 2.03 s）。在 Tanks and Temples 基准上，平均 F-score 达到 **54.03**，显著超过 Point-MVSNet 的 48.27，验证了其良好的泛化能力。消融实验进一步表明，两级金字塔结构与对应 0.5 像素偏移的深度采样间隔组合可带来最佳重建质量。
-
-## 背景与动机
 
 多视图立体（Multi-View Stereo, MVS）是三维计算机视觉中的核心问题，其目标是从一组已知相机参数的图像中恢复场景的稠密三维结构。传统几何方法在强纹理区域表现良好，但在弱纹理、镜面反射或遮挡区域往往难以获得可靠重建。近年来，基于深度学习的方法通过将可微单应性变换与3D卷积网络结合，显著提升了重建的鲁棒性和精度。
 
@@ -59,7 +59,7 @@ claims:
 
 基于上述洞察，本文提出**CVP-MVSNet**（Cost Volume Pyramid based Multi-View Stereo Network），核心动机是：通过构建代价体金字塔，以粗到细的方式迭代优化深度残差，从而在每一层级仅构建与当前分辨率匹配的局部部分代价体。这一设计使得计算和内存开销从立方级降低至可控范围，同时避免了冗余采样带来的信息退化。论文的核心主张可概括为：**深度采样策略应当由目标像素偏移量（如0.5像素）决定，而非固定的采样数目；代价体的构建应当遵循金字塔结构，而非单一分辨率。**
 
-## 核心创新
+## 核心方法与创新机理
 
 CVP-MVSNet 的核心创新在于通过**代价体金字塔**的粗到细构建，从根本上改变了多视图立体匹配中代价体的组织方式与深度推断流程。相比以固定分辨率代价体为核心的基线方法，该方法在三个关键维度上实现了结构性改变。
 
@@ -78,8 +78,6 @@ CVP-MVSNet 的核心创新在于通过**代价体金字塔**的粗到细构建�
 ### 创新机制的内在联系
 
 上述三个改变并非孤立存在，而是通过代价体金字塔的粗到细结构形成因果链条：图像金字塔的轻量特征提取降低了每一层的计算基数；分辨率自适应的深度采样策略确保了每一层代价体仅包含具有区分性的深度假设；局部部分代价体的构建则将计算和内存开销集中在最需要细化的区域。三者共同实现了精度与效率的双重提升——在 DTU 数据集上取得整体误差 0.351 mm，优于所有对比的深度学习方法（Table 1）；在 Tanks and Temples 基准上平均 F-score 达到 54.03，显著超过 Point-MVSNet 的 48.27（Table 3）。
-
-## 整体框架
 
 CVP-MVSNet 的整体设计围绕一个核心洞察展开：**深度采样间隔与图像分辨率存在直接关联**——过密的采样无法提供额外的区分性信息，反而造成计算冗余。基于此，方法构建了一个**代价体金字塔**，以粗到细的方式迭代优化深度残差，替代传统固定分辨率的单一代价体。
 
@@ -104,8 +102,6 @@ CVP-MVSNet 的整体设计围绕一个核心洞察展开：**深度采样间隔�
 ### 关键设计决策
 
 方法在**两级金字塔结构**与**0.5 像素深度偏移间隔**的组合下取得最佳重建质量（Table 4）。相比 Point-MVSNet 的点云操作范式，CVP-MVSNet 在规则 3D 代价体上进行多尺度卷积，实现了更紧凑、更快速且精度更高的深度推断。在输出相同尺寸深度图时，GPU 内存消耗和运行时间均降低约 6 倍（Table 2），同时 DTU 整体误差降至 0.351 mm（Table 1）。
-
-## 核心模块与公式推导
 
 ### 3.1 特征提取网络
 
@@ -167,12 +163,11 @@ $$ \text{Loss} = \sum_{l=0}^{L} \sum_{\mathbf{p} \in \Omega} \|\mathbf{D}_{\text
 
 其中 $\Omega$ 为有效像素集合，$\mathbf{D}_{\text{GT}}^l$ 为对应层级的真实深度图。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 定量重建精度
 
 **DTU数据集。** CVP-MVSNet在DTU基准上取得了整体误差0.351 mm，优于所有对比的深度学习方法，包括直接基线**Point-MVSNet**（Chen et al., ICCV 2019）的0.376 mm（Table 1）。在分项指标上，本方法在平均完整度（Mean Completeness）和整体重建质量上排名第一，平均准确度（Mean Accuracy）排名第二。
-
 
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_1912_08329/figures/005_Table_1.jpg]]
 *Table 1: Quantitative results of reconstruction quality on DTU dataset (lower is better). Our method outperforms all methods on Mean Completeness and Overall reconstruction quality and achieved second best on Mean Accuracy*
@@ -183,7 +178,6 @@ $$ \text{Loss} = \sum_{l=0}^{L} \sum_{\mathbf{p} \in \Omega} \|\mathbf{D}_{\text
 
 Table 2给出了在相同硬件环境（NVIDIA TITAN RTX）下运行官方评估代码的效率对比。当输出相同尺寸深度图（640）时，CVP-MVSNet的推理时间为0.37秒，GPU内存占用1416 MB；而Point-MVSNet分别为2.03秒和8989 MB——本方法在保持相近精度的同时，速度提升约6倍，内存需求降低约6倍。当使用相同输入图像尺寸时，CVP-MVSNet以1.72秒的运行时间和8795 MB的GPU内存取得了最优重建质量（0.351 mm），而Point-MVSNet需3.04秒和13081 MB。
 
-
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_1912_08329/figures/008_Table_2.jpg]]
 *Table 2: Comparison of reconstruction quality, GPU memory usage and runtime on DTU dataset for different input sizes. GPU memory usage and runtime are obtained by running the official evaluation code of baselines on a same machine with a NVIDIA TITAN RTX graphics card. For the same size of depth maps (Ours-640, Ours-800) and a performance similar to Point-MVSNet [5], our method is 6 times faster and consumes 6 times smaller GPU memory. For the same size of input images (Ours), our method achieves the best reconstruction with the shortest time and a reasonable GPU memory usage. Table 3: Performance on Tanks and Temples [21] on November 12, 2019. Our results outperform Point-MVSNet [5], which is the s...*
 
@@ -191,13 +185,11 @@ Table 2给出了在相同硬件环境（NVIDIA TITAN RTX）下运行官方评估
 
 Table 4报告了关键设计参数对DTU数据集上整体误差的影响：
 
-
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_1912_08329/figures/010_Table_4.jpg]]
 *Table 4: Parameter sensitivity on DTU dataset. a) Accuracy as a function of the number of pyramid levels. b) Accuracy as a function of the interval setting*
 
 - **金字塔层数（Table 4a）：** 两级金字塔结构取得最佳重建质量（0.351 mm）。当层数增加到三层或更多时，性能反而下降，表明过深的金字塔可能引入误差累积。
 - **深度采样间隔（Table 4b）：** 深度残差搜索中对应0.5像素或1像素偏移的采样间隔效果最优（均为0.351 mm）。过小的间隔（0.25像素）因采样点过于密集、特征区分度不足而导致性能下降；过大的间隔（2像素）则因搜索粒度过粗而损失精度。这一结果直接验证了Figure 4所揭示的核心机制：适当的深度采样使投影点携带可区分的特征信息，而过密采样产生的邻近投影点特征高度相似，无法提供额外判别力。
-
 
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_1912_08329/figures/004_Figure_4.jpg]]
 *Figure 4: Interpolation of two sampling points from four feature points in source view. (a) Densely sampled depth will result in very close (\< 0.5 pixel) locations which have similar feature. (b) Points projected using appropriate depth sampling carry distinguishable information*
@@ -205,7 +197,6 @@ Table 4报告了关键设计参数对DTU数据集上整体误差的影响：
 ### 定性结果
 
 Figure 5展示了DTU扫描9的点云和法线图对比。蓝色矩形区域表明，CVP-MVSNet的重建完整度优于Point-MVSNet；橙色矩形区域的局部法线图进一步显示，本方法在保持表面平滑的同时保留了更多高频细节。Tanks and Temples数据集上的定性重建结果见Figure 7。
-
 
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_1912_08329/figures/007_Figure_5.jpg]]
 *Figure 5: Qualitative results of scan 9 of DTU dataset. The upper row shows the point clouds and the bottom row shows the normal map corresponding to the orange rectangle. As highlighted in the blue rectangle, the completeness of our results is better than those provided by Point-MVSNet[5]. The normal map (orange rectangle) further shows that our results are smoother on surfaces while maintaining more high-frequency details*
@@ -217,18 +208,10 @@ Figure 5展示了DTU扫描9的点云和法线图对比。蓝色矩形区域表�
 
 当前分析材料中未提供明确的失败案例或系统性局限讨论。从消融实验可间接推断：本方法对金字塔层数和深度采样间隔较为敏感，在实际部署时需针对具体场景调优这两个超参数。此外，论文提出的开放问题是将代价体金字塔集成到可学习的结构从运动框架中，暗示当前方法仍依赖已知的相机参数，尚未形成端到端的完整三维重建管线。
 
-### 补充图表
 
-![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_1912_08329/figures/001_Figure_1.jpg]]
-*Figure 1: Point clouds reconstructed by state-of-the-art methods [5, 43] and our CVP-MVSNet. Best viewed on screen*
 
-![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_1912_08329/figures/006_Figure.jpg]]
-*Figure: R-MVSNet [43] Point-MVSNet [5] Ours Ground truth*
 
-![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_1912_08329/figures/009_Figure_6.jpg]]
-*Figure 6: Additional results from DTU dataset. Best viewed on screen. (a) Train*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 问题定位与核心瓶颈
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/SAM_3D_3Dfy_Anything_in_Images.pdf
+project_link: null
+code_link: https://github.com/facebookresearch/sam-3d-objects
 aliases:
 - S3
 - S33AI
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | SAM 3D: 图像中的万物三维化 |
 | 英文题名 | SAM 3D: 3Dfy Anything in Images |
 | 会议/期刊 | CVPR 2026 |
-| Links | [paper](https://arxiv.org/abs/2511.16624) · [Code](https://github.com/facebookresearch/sam-3d-objects) · [arXiv](http://arxiv.org/abs/1311.2524) |
+| Links | [paper](https://arxiv.org/abs/2511.16624) · [Code](https://github.com/facebookresearch/sam-3d-objects) · [paper](http://arxiv.org/abs/1311.2524) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | SAM 3D |
 | Dataset | SA-3DAO, ISO3D, Aria Digital Twin, Human Preference |
@@ -41,7 +43,7 @@ claims:
 > - SA-3DAO 上，Chamfer (↓) 0.0400 vs 0.0937 (Hi3DGen) (-0.0537)。
 > - ISO3D (Perceptual Similarity) 上，ULIP (↑) 0.1488 vs 0.1529 (TripoSG) (接近（-0.0041）)。
 
-## 概述
+## 概要
 
 从单张自然图像重建场景中每个物体的三维几何、纹理和空间布局，是通向视觉世界模型的关键一步。然而，该任务长期受困于一个根本瓶颈：真实图像与高质量3D标注的配对数据极度稀缺——标注物体的精确形状、姿态和纹理需要专业3D艺术家，成本高昂、规模受限，导致现有方法难以在遮挡、杂乱的真实场景中实现视觉标定的三维重建。
 
@@ -50,8 +52,6 @@ SAM 3D 的核心洞察在于借鉴人类视觉中的“熟悉物体”线索—�
 在架构上，SAM 3D 采用两阶段设计：Geometry Model（基于 Mixture-of-Transformers 的1.2B参数流变换器）联合预测物体的粗略体素形状（$64^3$ 分辨率）与6D姿态/缩放参数；Texture & Refinement Model（600M参数稀疏潜在流变换器）则以粗略形状为条件，进一步细化几何细节并合成纹理。两阶段共享一个深度感知VAE的潜在空间，可统一解码为网格或3D高斯泼溅。
 
 实验结果表明，在艺术家标注的真实几何基准 SA-3DAO 上，SAM 3D 的 F1@0.01 达到 0.2344，较此前最佳方法 **Hi3DGen**（Ye et al., 2025）的 0.1629 相对提升 43.7%；Chamfer 距离从 0.0937 降至 0.0400。在 Aria Digital Twin 的布局评测中，联合预测的 ADD-S@0.1 达到 0.7673，显著优于两阶段管线方法（0.5992）。在真实图像的人类偏好测试中，SAM 3D 在场景级和物体级重建上均取得至少 5:1 的胜率。消融实验进一步证实，多阶段训练的每个环节——MITL-3DO SFT/DPO、Art-3DO SFT/DPO——均为性能提升贡献了不可替代的增益。
-
-## 背景与动机
 
 ### 核心瓶颈：自然图像的3D数据壁垒
 
@@ -84,7 +84,7 @@ SAM 3D 的核心洞察在于：**利用大规模合成数据训练基础形状�
 
 后续章节将依次展开模型架构、数据引擎、训练范式与实验验证，展示SAM 3D如何在真实图像人类偏好测试中取得至少5:1的胜率，并在SA-3DAO基准上将形状F1@0.01从最佳竞争方法的0.1629提升至0.2344（相对提升43.7%）。
 
-## 核心创新
+## 核心方法与创新机理
 
 SAM 3D 的核心创新在于系统性地打破了自然图像三维重建的“数据壁垒”，通过借鉴大语言模型的多阶段训练范式，将大规模合成预训练与真实世界对齐有机结合。具体而言，其关键创新体现在三个相互耦合的维度上。
 
@@ -130,8 +130,6 @@ SAM 3D 突破了传统依赖3D艺术家直接创建网格的标注瓶颈，设�
 
 在真实图像人类偏好测试中，SAM 3D 以至少5:1的胜率显著优于 **Trellis**（Xiang et al., 2025）、**Hunyuan3D-2.1**（Hunyuan3D et al., 2025）和 **MIDI**（Huang et al., 2025）（Figure 8）。在 SA-3DAO 基准上，F1@0.01 从最佳竞争方法 **Hi3DGen**（Ye et al., 2025）的 0.1629 提升至 0.2344，相对提升43.7%（Table 2）。
 
-## 整体框架
-
 SAM 3D 的目标是将单张 RGB 自然图像中的物体转化为可组合的三维场景——对每个目标物体同时预测其几何形状、表面纹理以及在世界坐标系中的六自由度布局（旋转、平移、缩放），从而实现完整的场景重建（Figure 1）。
 
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2511_16624/figures/001_Figure_1.jpg]]
@@ -155,8 +153,6 @@ SAM 3D 的目标是将单张 RGB 自然图像中的物体转化为可组合的�
 
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2511_16624/figures/020_Figure_15.jpg]]
 *Figure 15: Reward model data recovery pipeline. The diagram shows how we use reward mdoels to increase N in best-of-N search to improve the chance of a successful annotation on challenging tail inputs. We use both a VLM and also DPO implicit reward as reward models*
-
-## 核心模块与公式推导
 
 SAM 3D 采用两阶段生成架构，将单张图像重建为可组合的3D场景。第一阶段由 **Geometry Model** 联合预测物体的粗略形状与6D布局参数；第二阶段由 **Texture & Refinement Model** 在粗略形状基础上细化几何细节并合成纹理。两个阶段共享 **DINOv2** 编码器提取的视觉特征，并通过共享潜在空间的 **3D VAE 解码器** 输出网格或3D高斯泼溅。
 
@@ -209,7 +205,7 @@ $$\mathcal{L}_S(\theta) = \mathbb{E}_{\mathbf{x}_0 \sim \mathsf{N}(0,I), \tau \d
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2511_16624/figures/006_Figure_5.jpg]]
 *Figure 5: Life of an example going through the data collection pipeline. We streamline annotation by breaking it into subtasks: annotators first choose target objects (Stage 1); rank and select 3D model candidates (Stage 2); then pose these models within a 2.5D scene (Stage 3). Stages 2 and 3 use model-in-the-loop*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心定量结果：形状重建
 
@@ -276,13 +272,10 @@ SAM 3D 联合预测物体形状与 6D 布局（旋转、平移、缩放），在
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2511_16624/figures/024_Table_7.jpg]]
 *Table 7: Training stage knockout. The impact of training on MITL and 3D artist-generated data*
 
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2511_16624/figures/014_Figure_10.jpg]]
-*Figure 10: Data engine with additional iterations. The plots show Elo scores of different models; a 400 point Elo difference corresponds to 10:1 odds in a preference test. Models were (a) checkpoints around 3 weeks apart, indicating cumulative improvements as we scale and add different stages and (b) post-trained (SFT) using expanded training data*
-
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2511_16624/figures/028_Table_10.jpg]]
 *Table 10: Rotation representation. Ablation on the representation used during pretraining. We report Chamfer distances and ICP rotation error*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 方法谱系：从单阶段生成到两阶段联合推理
 

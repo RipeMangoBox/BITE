@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Accelerated_Learning_with_Linear_Temporal_Logic_using_Differentiable_Simulation.pdf
+project_link: null
+code_link: null
 aliases:
 - DRLLR
 - ALLTLUDS
@@ -41,7 +43,7 @@ claims:
 > - Cheetah 上，Probability of LTL satisfaction (Pr) 为 >0.9，对比 PPO gets suboptimal policy, SAC fails，变化 higher satisfaction probability。
 > - Cheetah (reward machines) 上，Return 为 differentiable RM (SHAC, CRM) significantly outperforms all discrete RM baselines，对比 HRM+RS (discrete RM)，变化 superior returns。
 
-## 概述
+## 概要
 
 利用线性时序逻辑（LTL）描述复杂强化学习任务时，离散的自动机接受条件通常产生稀疏奖励信号，而人工设计的密集奖励容易破坏规范的正确性。本文引入一种端到端框架——可微分强化学习与线性时序逻辑（∂RLs），首次将LTL形式规范与可微分仿真器深度集成，通过概率软标签将离散自动机状态和奖励转化为对动作可微的形式，从而利用一阶梯度信息显著加速策略学习。
 
@@ -49,7 +51,7 @@ claims:
 
 仍需人工验证的方面包括部分可微混合系统（如物理仿真可微但控制模块离散）的扩展可行性，以及超参数β与信号函数设计的自动化方法。
 
-## 背景与动机
+
 
 将任务目标以线性时序逻辑（LTL）公式形式化，为强化学习（RL）提供了一种可解释且组合性强的规范方式，尤其适用于需要时序约束与长期安全性的连续控制问题。但在实际中，从LTL规范中导出训练信号通常面临**奖励稀疏性**这一瓶颈：传统做法基于离散的Büchi自动机接受条件产生二值奖励（如图1中间散点所示），不提供有效的梯度信息，导致无模型的PPO、SAC等算法在复杂非线性任务上收敛缓慢、方差高，甚至完全失败（如Cheetah环境中SAC无法学到有意义策略）。如果为缓解稀疏性而引入手工设计的密集奖励，则极易偏离原始LTL语义，破坏规范的正确性。
 
@@ -57,7 +59,9 @@ claims:
 
 针对上述缺口，本文的动机是：通过一种**概率化软标签机制**，将LTL导出的离散自动机转换为可微的马尔可夫转移函数，在保持规范语义正确性的前提下，构造出对策略参数可微的奖励与折扣信号。这使策略优化能够同时利用模型梯度（一阶信息）与自动机结构，从而突破稀疏奖励的瓶颈。正式的理论分析保证离散与可微LTL回报之间的差异存在一个**可调节的上界**（定理2），为可微近似的可靠性提供了定量依据。在Hopper、Cheetah、Ant等多个接触丰富的高维任务中，这一方法使策略满足LTL规范的概率（Pr）在2000万步内超过0.8–0.9，回报达到离散基线（PPO）的两倍左右，且不需要任何启发式奖励塑形。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 基于线性时序逻辑（LTL）形式规范的强化学习面临一个根本矛盾：**LTL 派生的奖励信号通常高度稀疏**，而手工设计的密集奖励又极易破坏规范正确性。可微分仿真器能提供状态-动作梯度的精确信道，但直接将离散的自动机接受条件嵌入可微管线，会导致关键的梯度断裂。本文的核心创新正是在于 **将离散的 Büchi 自动机“软标签化”，使得 LTL 规范天然产生的奖励与自动机状态转移对连续动作可微**，从而将低方差的一阶梯度信号引入策略优化，在保持规范语义不变的前提下实现学习效率的质变。
 
@@ -76,7 +80,7 @@ claims:
 
 该创新的**核心效力源于处理“稀疏规范—连续控制”的结构性鸿沟**，其薄弱点亦很明确：依赖完全可微的环境（含状态标签函数），无法直接处理离散状态 MDP 或含有不可微模块的混合系统；同时超参数 β 的选择在理论正确性与收敛稳定性之间缺乏自动化方案，大型自动机带来的转换矩阵显存占用也构成扩展瓶颈。这些限制恰好为后续研究划定了靶点。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0005_zbdhhlIy8o_Accelerated_Learning_with_Linear_Temporal_Logic/figures/003_Figure_1.jpg]]
 *Figure 1: LTL Returns and Derivatives. Left: The parking scenario where the car must brake to stop in the parking area without entering the grass field ($\varphi_$p$). Middle: LTL satisfaction probability and return estimates from discrete and differentiable LTL formulations as functions of deceleration. Right: LTL return gradients with respect to deceleration and their standard deviation. The key challenge in learning from LTL arises from slightly-sloped regions and sharp changes in the returns produced by discrete LTL rewards. Our differentiable LTL approach not only smooths these abrupt changes but also enables the use of low-variance first-order gradient estimates essential for efficient learning.*
@@ -105,7 +109,7 @@ claims:
 
 这一管线对“完全可微”假设的依赖也构成了其主要限制：当仿真或自动机中存在不可微模块时，难以直接适用；当 LDBA 状态空间过大时，转换矩阵可能超出 GPU 显存。这些边界需要在工程实现中给予注意。
 
-## 核心模块与公式推导
+
 
 可微LTL强化学习（∂RLs）的整体流水线包括：将LTL公式编译为限确定Büchi自动机（LDBA）；构造产品MDP以将自动机离散状态嵌入连续控制问题的状态‑动作空间；通过软标签技术赋予自动机状态转移以概率可微性；基于软自动机状态计算可微奖励与折扣因子；最后在可微仿真器上通过反向传播或一阶梯度算法进行策略优化。整个链条的关键在于**将离散的自动机接受条件转变为对动作连续可微的奖励信号**，从而利用低方差的梯度信息加速学习。
 
@@ -143,7 +147,9 @@ $$
 - **可微奖励与折扣**：从软自动机状态导出对动作可微的$R^{\text{diff}}$和$\Gamma^{\text{diff}}$。
 - **梯度优化**：利用可微仿真器进行BPTT或梯度上升，大幅加速规范满足策略的学习（在hopper任务中逼近$Pr>0.8$所需步数仅为PPO的1/5）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 **实验设置与公平性**。所有比较均在相同的连续控制环境和LTL规范下进行，各算法超参数均单独调优以确保公平。可微RL基线（SHAC、AHAC）使用本文提出的可微LTL奖励，模型无关基线（PPO、SAC）使用原始的离散LTL奖励。评估的核心指标为 **LTL满足概率（Pr）**，其取值范围在0到1之间，等价于期望折扣回报。
 
@@ -204,7 +210,9 @@ $$
 
 **综上所述**，实验充分证明通过软标签将 LTL 自动机可微化，可以解决复杂接触丰富连续控制任务中的稀疏规范奖励瓶颈，主要性能提升来自梯度低方差与密集的方向引导；系统的脆弱性则集中在可微性假设和自动机规模上。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 本工作提出的 **∂RLs（Differentiable Reinforcement Learning with LTL）** 属于将形式化时序逻辑规范融入强化学习的谱系，处于 **从离散奖励到可微奖励的关键转折点**。此前利用线性时序逻辑（LTL）的 RL 方法（例如 PPO、SAC 与奖励机 RM 的结合）普遍采用基于 Büchi‐接受条件的离散、状态依赖的奖励函数（式 (2)）。这种离散奖励虽能精确刻画规范满足性，却造成了 **极度稀疏的奖励信号**：接受状态与非接受状态之间缺乏平滑的中间梯层，导致模型无关的 RL 算法收敛极慢或陷入次优，Hopper 环境中 PPO 需 1 亿步才能逼近 ∂RLs 在 2000 万步达到的满足概率（Pr > 0.8），Cheetah 等复杂规范下 SAC 甚至完全失败。
 
@@ -235,6 +243,8 @@ $$
 7. **与 STL/稠密奖励的联合**：是否能够吸收 STL 鲁棒性分数的稠密引导优势，同时通过自动机保持马尔可夫性和长程正确性？
 
 总体而言，∂RLs 在“可微奖励代替离散奖励”这一瓶颈上提供了具备理论界和显著经验增益的方案，且与奖励机自然兼容，但向更一般系统、更大规模和更低使用门槛的拓展仍面临实质挑战。后续工作应着重于部分可微桥接、自动机规模控制和信号自学习，才能将这一谱系推向实际部署。
+
+
 
 ## 原文 PDF
 

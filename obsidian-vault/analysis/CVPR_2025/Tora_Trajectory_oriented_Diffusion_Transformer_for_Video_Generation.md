@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/Tora_Trajectory_oriented_Diffusion_Transformer_for_Video_Generation.pdf
+project_link: null
+code_link: https://github.com/alibaba/Tora
 aliases:
 - Tora
 tags:
@@ -40,7 +42,7 @@ claims:
 > [!tip] 效果简介
 > - 128-frame motion-controllable video generation 上，Trajectory Error (↓) 11.72 vs 38.39 (MotionCtrl) (-26.67)；FVD (↓) 494 vs 565 (OpenSora-based DragNUWA) (-71)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：基于UNet的视频扩散模型在生成超过16帧的长视频时，运动控制能力显著退化——轨迹误差随帧数增加急剧上升，且DiT架构虽在可扩展性上优于UNet，但缺乏有效的运动引导机制，导致生成的运动随机、失真，无法遵循用户指定的物体轨迹。
 
@@ -50,7 +52,7 @@ claims:
 
 **主要结果**：在128帧生成设定下，Tora的轨迹误差（TrajError）仅为11.72，相较最佳UNet基线MotionCtrl的38.39降低约3.3倍；FVD为494，较MotionCtrl的731降低32.4%。与DiT基线OpenSora-based DragNUWA相比，TrajError从21.75降至11.72，FVD从565降至494，验证了所提运动模块与DiT架构的良好兼容性。消融实验进一步证实了3D运动VAE压缩、自适应归一化融合和两阶段训练策略各自的关键贡献。
 
-## 背景与动机
+
 
 ### 视频生成范式的演进与运动控制瓶颈
 
@@ -86,7 +88,9 @@ DiT架构的引入为视频生成带来了可扩展性优势，**OpenSora**（Zh
 
 - **充分利用DiT的可扩展性**：使运动控制能力随模型规模和生成长度同步提升，突破UNet架构在长视频生成中的性能衰减问题，实现128帧乃至更长视频的精确运动控制。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Tora 的核心创新在于首次将面向轨迹的运动控制能力引入基于 Diffusion Transformer（DiT）的视频生成框架，解决了现有 UNet 基模型在长视频运动控制上精度不足、以及 DiT 基模型缺乏有效运动引导机制的双重瓶颈。其关键创新体现在三个“changed slots”上：
 
@@ -110,7 +114,7 @@ MGF 首先通过堆叠的卷积层从运动潜在块中提取层次化特征 $f_
 
 上述三个创新槽位协同作用，使 Tora 在 128 帧生成设定下实现了轨迹误差（TrajError）仅 11.72，较最佳 UNet 基线 MotionCtrl 的 38.39 降低约 3.3 倍；FVD 为 494，较 MotionCtrl 的 731 降低 32.4%（Table 1）。与 OpenSora-based DragNUWA 这一 DiT 基线相比，TrajError 从 21.75 降至 11.72，FVD 从 565 降至 494，充分验证了所提运动模块与 DiT 架构的良好兼容性。
 
-## 整体框架
+
 
 Tora 的整体架构围绕三个核心组件构建：**轨迹提取器**（Trajectory Extractor, TE）、**时空 DiT**（Spatial-Temporal DiT, ST-DiT）和**运动引导融合器**（Motion-guidance Fuser, MGF）。其设计目标是将任意用户指定的轨迹条件无缝注入扩散Transformer的去噪过程，使生成的视频在保持高视觉质量的同时精确遵循给定运动路径。
 
@@ -159,10 +163,8 @@ Tora采用两阶段训练策略（Table 4消融验证其有效性）：
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2407_21705/figures/003_Figure_3.jpg]]
-*Figure 3: Overview of the Tora Architecture. We introduce two novel modules: the Trajectory Extractor and the Motion-guidance Fuser. The Trajectory Extractor uses a 3D motion VAE to embed trajectory vectors into the same latent space as video patches, preserving motion information across frames. It then employs stacked convolutional layers to extract hierarchical motion features. The Motion-guidance Fuser utilizes adaptive normalization layers to integrate these multi-level motion conditions into the corresponding DiT blocks, ensuring that generated videos consistently follow defined trajectories. Our method leverages the scalability of DiT, enabling the creation of motioncontrollable videos of exten...*
 
-## 核心模块与公式推导
+
 
 Tora 的整体架构由三个核心组件构成：轨迹提取器（Trajectory Extractor, TE）、时空 DiT（Spatial-Temporal DiT, ST-DiT）以及运动引导融合器（Motion-guidance Fuser, MGF）。其设计目标是将任意用户指定的轨迹编码为与视频块共享潜在空间的时空运动特征，并自适应地注入 DiT 的去噪过程，从而实现对生成视频中物体运动的精确控制。
 
@@ -217,7 +219,9 @@ $$h_i = \mathrm{CrossAttn}([h_{i-1}, f_i]) + h_{i-1}$$
 
 消融实验（Table 3）表明，自适应归一化在轨迹误差和视频质量（FVD）上均优于通道拼接和交叉注意力方案，验证了仿射变换式融合在运动控制任务中的有效性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要定量结果
 
@@ -272,7 +276,9 @@ Table 5的用户研究进一步验证了Tora的感知质量：在指令遵循（
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2407_21705/figures/012_Table_5.jpg]]
 *Table 5: Win rates of Tora compared to OpenSora-v1.2, CogVideoX, Vidu, and Kling in terms of Physics Simulation, Sensory Quality, and Instruction Following*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题瓶颈：从UNet到DiT的运动控制鸿沟
 
@@ -331,6 +337,8 @@ Tora采用**两阶段训练策略**：第一阶段使用稠密光流训练，让
 **4. 数据效率与标注成本**
 
 两阶段训练策略虽然有效，但第一阶段对稠密光流标注的依赖增加了数据准备成本。如何降低对精细光流标注的依赖——例如通过弱监督或自监督运动表征学习——同时保持运动控制效果，是推动方法实用化的关键开放问题。
+
+
 
 ## 原文 PDF
 

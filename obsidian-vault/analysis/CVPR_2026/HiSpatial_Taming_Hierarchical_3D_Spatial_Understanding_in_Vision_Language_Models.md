@@ -42,7 +42,7 @@ claims:
 > - CV-Bench-3D 上，Accuracy (%) 97.58 (HiSpatial-3B RGB-XYZ) vs 95.92 (RoboRefer-8B-SFT, best existing) (+1.66)。
 > - Custom Spatial VQA - Object-to-Camera Distance (L1) 上，Accuracy (%) 92.18 (HiSpatial-3B) vs 58.63 (RoboRefer-8B-SFT) (+33.55)。
 
-## 概述
+## 概要
 
 视觉语言模型（VLM）在通用视觉理解任务上已取得显著进展，但在精确、可度量的三维空间理解方面仍存在根本性瓶颈：现有模型缺乏统一的层次化空间认知框架，且受制于大规模、多样化的3D空间标注数据的缺失。HiSpatial 针对这一核心问题，提出了一个原则性的四层次认知框架，将3D空间智能分解为**几何感知（Level 0）→ 物体属性理解（Level 1）→ 空间关系推理（Level 2）→ 抽象空间问题求解（Level 3）**的递进式层次结构，并构建了自动化数据流水线以生成覆盖全部层次的超大规模空间VQA数据。
 
@@ -50,7 +50,7 @@ claims:
 
 **方法定位**：HiSpatial以PaliGemma2-3B为基础架构，通过添加3D点云分支（正弦编码 + 可学习patchify层 + 融合投影器）扩展为RGB-XYZ多模态VLM，在约500万张图像、4500万个物体实例、20亿QA对的大规模层次化空间数据上进行监督微调。与依赖相对深度或纯RGB输入的现有空间模型不同，HiSpatial直接利用度量尺度3D坐标作为辅助输入，从数据与架构两个维度系统性提升了VLM的空间智能。
 
-## 背景与动机
+
 
 ### 三维空间理解：从感知到认知的鸿沟
 
@@ -82,7 +82,9 @@ claims:
 
 这种“层次化任务设计 + 大规模自动化数据 + 度量级3D输入”的组合，使得仅3B参数的HiSpatial模型能够在多个空间理解基准上超越专门的空间模型和大型专有系统，同时验证了层级间任务依赖关系的存在——移除底层任务会导致高层性能的显著退化，这为未来3D空间智能VLM的设计提供了明确的指导方向。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 与现有空间VLM相比，HiSpatial的核心创新并非单一技术点的修补，而是从**任务定义、数据构造、模型输入**三个维度对3D空间理解进行系统性重构。这些创新点构成了一个相互强化的闭环：层次化任务分类指导数据生成，大规模数据支撑模型训练，度量级点云输入则让模型真正“感知”物理世界。
 
@@ -129,7 +131,7 @@ claims:
 
 这种“任务-数据-模型”三位一体的设计，使仅3B参数的HiSpatial在多个空间理解基准上超越了更大的通用模型（如GPT-5、Gemini-2.5-Pro）和专门的空间专家模型（如SpatialRGPT-8B、MM-Spatial-3B），同时还在通用VQA基准上相比基础模型PaliGemma2-3B提升了**+19.81个百分点**（Table 4），说明层次化空间训练对整体视觉理解具有正向迁移效应。
 
-## 整体框架
+
 
 HiSpatial 的整体框架围绕一个核心洞察展开：**3D 空间认知可以被解耦为四个递进式层次，层次间存在因果依赖关系**。基于这一认知，方法设计了一条“数据构建→层次化任务设计→度量点云增强→监督微调”的完整流水线，如 Figure 2 和 Figure 3 所示。
 
@@ -196,7 +198,7 @@ HiSpatial 将 3D 空间智能形式化为四个递进层次（Figure 2 右），
 ![[assets/figures/papers/paper_list_l2396_https_arxiv_org_abs_2603_25411/figures/001_Figure_1.jpg]]
 *Figure 1: Trained on our large-scale spatial VQA data, our model develops hierarchical 3D spatial intelligence from geometric perception to abstract reasoning (left), and achieves state-of-the-art results on multiple spatial benchmarks (top-right). We also uncover clear inter-level task dependencies in spatial supervised fine-tuning (bottom-right), offering guidance for designing future 3D spatially intelligent VLMs*
 
-## 核心模块与公式推导
+
 
 HiSpatial 的架构核心是在标准视觉语言模型（VLM）基础上引入一个 **度量尺度3D点云分支**，并通过四个流水线模块完成从2D图像到层次化空间VQA数据的全自动构造。以下聚焦于模型端的关键模块与唯一显式给出的训练公式。
 
@@ -243,7 +245,9 @@ $$\mathcal{L} = -\sum_{t=1}^{T} \log P_{\theta}(\mathbf{y}_t \mid \mathbf{y}_{<t
 
 > **注意**：论文未给出点云 patchify 层或融合投影器的具体结构细节公式，也未推导损失函数的梯度形式。上述公式 $\mathcal{L}$ 是论文中唯一显式给出的数学表达式（Eq. 1），其余模块以架构描述和工程流程为主。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -294,7 +298,9 @@ HiSpatial在多个空间理解基准上全面超越现有空间专家模型和�
 ![[assets/figures/papers/paper_list_l2396_https_arxiv_org_abs_2603_25411/figures/015_Figure_6.jpg]]
 *Figure 6: Examples of our model’s responses on unseen images*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有空间VLM的关系
 
@@ -326,6 +332,8 @@ HiSpatial 的核心定位是**以小博大**：仅使用 **3B参数**的模型�
 - **层级解耦与优化**：课程学习或分层微调策略是否能进一步解耦层次间的依赖，使高层任务在不牺牲底层能力的前提下获得更大增益？
 - **多视角/时序扩展**：当模型扩展到多视角或多帧视频场景时，如何高效融合时序与多视角的度量3D线索？点云分支是否需要引入跨帧对齐机制？
 - **与具身智能的桥接**：HiSpatial的空间理解能力（特别是Level 2空间关系与Level 3抽象推理）能否直接迁移到具身场景中的导航、操控等任务？是否需要额外的具身对齐训练？
+
+
 
 ## 原文 PDF
 

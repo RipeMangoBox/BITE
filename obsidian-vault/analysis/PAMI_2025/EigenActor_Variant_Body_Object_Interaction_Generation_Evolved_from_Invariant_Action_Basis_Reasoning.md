@@ -5,6 +5,8 @@ paper_level: A
 venue: PAMI
 year: 2025
 pdf_ref: paperPDFs/PAMI_2025/EigenActor_Variant_Body_Object_Interaction_Generation_Evolved_from_Invariant_Action_Basis_Reasoning.pdf
+project_link: null
+code_link: null
 aliases:
 - EVBOIGEFIABR
 tags:
@@ -40,7 +42,7 @@ claims:
 > - FullBodyManipulation 上，R-Precision (Top-3) ↑ 0.73；FID ↓ 0.62；MM-Dist ↓ 3.75。
 > - GRAB 上，R-Precision (Top-3) ↑ 0.66。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -78,7 +80,7 @@ EigenActor在三个大规模数据集（HIMO、FullBodyManipulation、GRAB）上
 
 这些结果一致表明，将文本到HOI分解为动作基元推断与交互风格演化两个阶段，是提升生成质量的有效因果调控路径。
 
-## 背景与动机
+
 
 文本驱动的人体-物体交互（Text-to-HOI）生成旨在根据自然语言指令合成与指定物体进行物理交互的3D全身人体运动序列。该任务在具身智能、虚拟现实和机器人学习等领域具有重要应用价值，但其核心挑战在于跨越文本语义与3D物理交互之间的巨大模态鸿沟。
 
@@ -88,7 +90,9 @@ EigenActor 的核心洞察在于：具有相同交互意图的HOI样本——例
 
 基于此动机，EigenActor 提出了一种新颖的两阶段推理框架：首先从文本指令推断物体无关的动作特异性规范身体运动，将其作为共享的动作先验基元；然后基于该动作基元，结合文本语义与物体几何信息，丰富物体特异性的交互风格残差，从而生成既符合语义意图又具备物理真实感的完整HOI序列。这种分解策略显式建模了动作先验与物体风格先验，使模型能够在小样本场景下保持鲁棒性，并在语义一致性与交互真实性两个关键维度上取得显著提升。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 EigenActor 的核心创新在于将文本到人体-物体交互（Text-to-HOI）的生成任务从传统的单阶段直接映射，重构为**两阶段解耦推理范式**。这一范式基于一个关键洞察：同一交互意图（如“举起椅子”与“举起杯子”）下的 HOI 样本，封装了相似的动作特异性身体运动模式，但展现出不同的物体特异性交互风格。因此，先学习共享的动作模式基元，再基于该基元演化出物体特异性的交互风格，可从机理上缩小文本与 3D 运动之间的跨模态鸿沟。
 
@@ -104,7 +108,7 @@ EigenActor 的核心创新在于将文本到人体-物体交互（Text-to-HOI）
 
 相较于现有方法（如 **HIMO-Gen** (Lv et al., ECCV 2024)、**CHOIS** (Li et al., ECCV 2024)、**InterDiff** (Xu et al., ICCV 2023) 等）的直接映射策略，EigenActor 的解耦设计在语义一致性和交互真实性上均取得了显著提升。消融实验证实，推断的动作基元可接近真实基元的性能，而接触部分推断与交互优化模块对交互质量有决定性贡献。
 
-## 整体框架
+
 
 EigenActor 将文本到人体-物体交互（text-to-HOI）生成建模为一个扩散驱动的条件生成框架，其核心创新在于将身体运动推理分解为两个序贯阶段：**动作特异性运动推断**与**物体特异性交互推断**。该分解的动机源于一个关键观察：具有相同交互意图的 HOI 样本（如“举起椅子”与“举起杯子”）封装了相似的动作特异性身体运动模式，但展现不同的物体特异性交互风格。因此，先学习共享的动作基元，再基于物体条件演化交互风格，可有效缓解直接映射带来的跨模态差距与语义一致性瓶颈。
 
@@ -144,7 +148,7 @@ $$\pmb{o}^{k-1} = \frac{1}{\sqrt{\gamma_k}} \pmb{o}^k - \sqrt{\frac{1}{\gamma_k}
 
 该分解式框架的关键优势在于：动作特异性运动先验使模型在小样本场景下仍能保持语义一致性（仅用 10% 训练数据时 FID 相对基线 HIMO-Gen 降低约 50%），而物体特异性交互扩散与接触部分推断共同保障了交互的真实性与物理合理性。
 
-## 核心模块与公式推导
+
 
 EigenActor 将文本到人体-物体交互（Text-to-HOI）生成任务分解为两个核心模块：**BodyNet**（身体姿态推理）和 **ObjectNet**（物体运动规划），二者以级联方式协同工作。
 
@@ -222,7 +226,9 @@ $\gamma_k$ 为物体运动扩散的噪声调度参数。
 ![[assets/figures/papers/paper_list_l1800_EigenActor_Variant_Body_Object_Interaction_Generation_Evolved_from_Invar/figures/004_Figure_4.jpg]]
 *Figure 4: ObjectNet Module Overview. ObjectNet contains three components: contact part inference, object motion diffusion, and hand-object interaction optimization. Contact part inference analyzes object-specific hand-contactable parts for the following object-hand interaction planning. Object motion diffusion infers 3D object movements from inferred body poses and contact parts. Interaction optimization integrates inferred 3D body-object co-movements and improves the realism of the manipulation between them*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -299,7 +305,9 @@ EigenActor在小样本场景下展现出显著优势（Fig. 6）。仅使用10%�
 
 ![[assets/figures/papers/paper_list_l1800_EigenActor_Variant_Body_Object_Interaction_Generation_Evolved_from_Invar/figures/020_Table_6.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位与核心瓶颈
 
@@ -359,6 +367,8 @@ EigenActor 在运动生成层面继承了扩散模型在人体运动合成中的
 3. **多智能体拓展**：分解式先验策略能否自然泛化至多物体、多人交互场景？动作基元是否可以在多智能体间共享或组合？
 4. **更丰富的几何表示**：当前使用点云或体素等显式几何特征。更丰富的物体表示（如隐式神经场、图神经网络编码的部件结构）是否能进一步提升交互风格的多样性和语义对齐精度？
 5. **零样本泛化**：如何使模型在面对训练中未见过的物体类别时，仍能推断合理的动作基元并演化出可信的交互风格？这可能需要将物体几何理解与动作知识进行更彻底的解耦。
+
+
 
 ## 原文 PDF
 

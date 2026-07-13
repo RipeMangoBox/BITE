@@ -41,7 +41,7 @@ claims:
 > - N3DV 上，PSNR (dB)↑ 32.53 (MoRGS-l) vs 所有在线基线 (最优 QUEEN) (最高)。
 > - Meet Room 上，PSNR (dB)↑ 31.79 vs 所有在线基线 (最优 QUEEN-l†) (最高)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：在线动态3D场景重建方法通常仅依赖光度损失驱动高斯更新，缺乏显式运动监督。这导致高斯运动追逐像素残差而非真实三维动态——动态高斯运动被低估，静态高斯产生冗余运动，严重损害时间一致性。
 
@@ -54,7 +54,7 @@ claims:
 
 **主要结果**：在N3DV数据集上，MoRGS-l 以 32.53 dB PSNR 达到在线方法最优（Tab. 1）；在Meet Room数据集上同样取得最高PSNR 31.79 dB（Tab. 2）。消融实验表明，光流引导贡献 +0.52 dB（N3DV）和 +1.15 dB（Meet Room），运动偏移场进一步贡献 +0.36 dB 和 +0.66 dB，运动置信度再贡献 +0.32 dB 和 +0.58 dB（Tab. 4）。在静态区域的时间一致性指标 mTV 上，MoRGS 显著优于 3DGStream 和 QUEEN（Tab. 3）。
 
-## 背景与动机
+
 
 动态3D场景的流式重建在虚拟现实、增强现实和沉浸式通信等应用中需求迫切。在线方法需要从连续的视频帧中增量式地构建和更新场景表示，同时兼顾渲染质量、训练速度和存储开销。3D高斯泼溅（3D Gaussian Splatting, 3DGS）凭借其显式点基表示和高效可微光栅化，为快速、高质量的静态场景重建提供了新范式，其像素颜色通过深度排序的Alpha混合渲染：
 
@@ -74,7 +74,9 @@ $$\mathcal { A } _ { t } = \mathcal { A } _ { t - 1 } + \mathcal { R } _ { t }$$
 
 MoRGS的核心动机在于：**引入轻量但显式的运动信号，使高斯更新遵循真实场景动力学**。其关键洞察是：稀疏视角上的光流可作为运动正则化信号，通过可学习的运动偏移场补偿视图间的不一致性，并利用运动置信度选择性更新动态高斯，从而在保持在线效率的同时，显著提升渲染质量、运动保真度和时间一致性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 现有在线动态场景重建方法（如 **3DGStream** (Sun et al., CVPR 2024)、**QUEEN** (Girish et al., NeurIPS 2024) 等）仅依赖光度损失驱动高斯属性更新，缺乏显式的运动监督信号。这导致一个根本性瓶颈：高斯运动追逐像素残差而非真实三维动态——动态高斯运动被低估，静态高斯产生冗余运动，严重损害时间一致性。
 
@@ -94,7 +96,7 @@ MoRGS 的核心创新在于引入**稀疏运动线索引导的逐高斯运动推
 
 三者的协同效应可通过 Fig. 3 直观验证：无流引导时高斯运动完全偏离真实动态；仅加稀疏流虽恢复方向一致性，但运动仍错误传播到无关高斯；加入偏移场后运动精准定位；再加入置信度后静态区域更新被彻底抑制。
 
-## 整体框架
+
 
 MoRGS 提出了一种在线动态场景重建框架，其核心思路是在逐帧增量更新高斯属性的同时，显式建模每高斯的三维运动，从而将高斯更新与真实场景动力学对齐。框架由四个紧密协作的模块构成一个闭环流水线。
 
@@ -118,7 +120,7 @@ MoRGS 提出了一种在线动态场景重建框架，其核心思路是在逐�
 ![[assets/figures/papers/paper_list_l978_https_arxiv_org_abs_2603_25042/figures/001_Figure_1.jpg]]
 *Figure 1: The proposed MoRGS framework for streamable dynamic scene reconstruction achieves superior rendering quality by explicitly modeling per-Gaussian motion. The left figures ((a),(b)) show the high-quality rendering and the corresponding Gaussian motion updates compared to [7, 24]. The right figure (c) is the performance comparison with previous state-of-the-art methods [6–8, 13, 24, 30]*
 
-## 核心模块与公式推导
+
 
 MoRGS 的核心创新在于为在线动态场景重建引入**显式的逐高斯运动推理**，通过三个紧密协作的模块——流引导运动学习、运动偏移场、运动置信度——解决纯光度损失下高斯运动追逐像素残差而非真实三维动态的根本瓶颈。
 
@@ -199,7 +201,9 @@ $$\mathcal { L } _ { \mathrm { t o t a l } } = \mathcal { L } _ { \mathrm { r e 
 ![[assets/figures/papers/paper_list_l978_https_arxiv_org_abs_2603_25042/figures/003_Figure_3.jpg]]
 *Figure 3: Per-Gaussian Motion Visualization. We visualize per-Gaussian motion under (a) no flow guidance, (b) sparse flow guidance only, (c) sparse flow guidance with motion offset, and (d) sparse flow guidance with both motion offset and motion confidence, while (e) and (f) show the learned motion confidence map and motion offset map, respectively*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -259,7 +263,9 @@ Fig. 3 的逐高斯运动可视化清晰地呈现了运动学习从“盲目追�
 ![[assets/figures/papers/paper_list_l978_https_arxiv_org_abs_2603_25042/figures/006_Figure_4.jpg]]
 *Figure 4: Qualitative Results. A visualization of various scenes in N3DV and Meet Room dataset. We include additional video results in the supplementary material*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 在线动态3DGS重建方法谱系
 
@@ -303,6 +309,8 @@ MoRGS 的有效性建立在以下前提之上，这些前提也划定了其适�
 ### 5. 知识库定位总结
 
 MoRGS 在动态3DGS重建的知识谱系中占据**“显式运动引导的在线流式重建”**这一节点。其核心贡献——稀疏光流运动正则化、运动偏移场、运动置信度选择性更新——构成了一个完整的运动推理闭环，解决了在线方法中“运动学习缺乏物理约束”这一瓶颈问题。该方法为后续工作提供了两个可扩展的方向：（1）将运动监督信号从稀疏光流扩展到更丰富的运动先验（如深度、场景流）；（2）将运动偏移场和置信度机制推广到相机运动场景的运动解耦。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/CoNavBench_Collaborative_Long_Horizon_Vision_Language_Navigation_Benchmark.pdf
+project_link: https://navcraft.github.io/
+code_link: null
 openreview_forum_id: bMrH2PFMsi
 aliases:
 - CoNavBench
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | CoNavBench：协作长程视觉语言导航基准 |
 | 英文题名 | CoNavBench: Collaborative Long-Horizon Vision-Language Navigation Benchmark |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=bMrH2PFMsi); [Project](https://navcraft.github.io/) |
+| Links | [paper](https://openreview.net/forum?id=bMrH2PFMsi) · [Project](https://navcraft.github.io/) |
 | Topic | #topic/benchmarks_datasets_evaluation #topic/benchmarks_datasets_evaluation/benchmark_eval |
 | Method | NavCraft |
 | Dataset | CoNavBench Step-by-step Subtasks |
@@ -41,7 +43,7 @@ claims:
 > - CoNavBench Step-by-step Subtasks 上，SPL↑ 为 16.88 (Collaborative Qwen2.5-VL-3B Finetuned)，对比 13.81 (Single-Agent Qwen2.5-VL-3B Finetuned)，变化 +3.07。
 > - CoNavBench Step-by-step Subtasks 上，NE↓ 为 5.79 (Collaborative Qwen2.5-VL-3B Finetuned)，对比 6.74 (Single-Agent Qwen2.5-VL-3B Finetuned)，变化 -0.95。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有视觉语言导航（VLN）基准与系统均局限于单智能体顺序执行范式。当任务路径较长时，单机器人必须依次完成所有子任务，导致总耗时线性增长且存在大量空闲等待。多机器人并行协作天然具备缩短完成时间的潜力，但此前缺少对协作场景中任务交接时机、路径交接区域以及机器人间干扰的系统建模与评估基准。
 
@@ -51,7 +53,7 @@ claims:
 
 **主要结果**：在步骤级子任务协议下，微调的 Qwen2.5-VL-3B 模型在协作模式下成功率达 35.02%，相比单智能体基线 29.65% 提升 5.37 个百分点（相对提升 18.11%），SPL 从 13.81 提升至 16.88，导航误差 NE 从 6.74 降至 5.79。零样本模型在高等级指令下成功率极低（仅 4.30%），微调后升至 12.90%，表明视觉语言模型在长程协调推理方面仍有较大提升空间。
 
-## 背景与动机
+
 
 视觉语言导航（VLN）旨在使具身智能体依据自然语言指令在三维环境中移动并完成指定任务。近年来，VLN 基准在指令复杂度、任务长度和场景多样性上持续扩展，从单步目标导航演进至长程多阶段任务。然而，现有基准和系统均基于**单智能体顺序执行**范式：无论指令多么冗长、子任务多么分散，仅由一台机器人按序完成所有阶段（Figure 1a）。这一设计导致两个根本性瓶颈：
 
@@ -64,7 +66,9 @@ claims:
 
 Figure 2 的基准统计揭示了协作的潜在收益：跨目标类别的协作效率增益（相对于单智能体基线）平均约为 **20%**，且增益分布因类别而异，表明协作效益与任务结构高度相关。这一观察进一步强化了系统性建模协作场景的必要性——不同类别的任务对协作的敏感度不同，需要基准提供多样化的协作类型和场景配置以支持通用性评估。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CoNavBench与NavCraft的核心创新在于将协作长程视觉语言导航从“单智能体顺序执行”的既有范式，推进为“多智能体并行接力”的新范式。这一转变并非简单的数量扩展，而是围绕**任务并行化、协作收益验证与场景图约束调度**三个层面构建了系统性解决方案。
 
@@ -97,7 +101,7 @@ NavCraft采用**NavCraft-S → NavCraft-C**的两阶段层级设计，将单智�
 
 CoNavBench的协作设计带来了可观的效率增益。基准统计显示，跨类别的平均协作效率增益约为20%（Figure 2）。在下游导航策略评估中，微调后的Qwen2.5-VL-3B在步骤级协议下，协作策略成功率从单智能体的29.65%提升至35.02%，相对提升18.11%（Table 2, Table 3），同时SPL从13.81升至16.88，NE从6.74降至5.79，三项指标一致验证了协作机制的有效性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_bMrH2PFMsi/figures/005_Figure_3.jpg]]
 *Figure 3: NavCraft pipeline for CoNavBench benchmark data generation and scheduling*
@@ -146,7 +150,7 @@ NavCraft-C通过迭代搜索交接区域$x$，并借助**效率工具库**（Eff
 
 NavCraft流水线的设计哲学可概括为“**场景图约束下的效率驱动生成**”：场景图提供空间可达性与距离的确定性验证基础，两阶段层级代理确保协作方案的质量下限，而严格的负载比较准则避免了为协作而协作的无效并行化。这一闭环使得CoNavBench能够以可控的成本（GPT-4o-mini仅$0.360即可达到26.56%的协作任务生成成功率，见Table 4）持续产出规模可扩展的协作导航数据。
 
-## 核心模块与公式推导
+
 
 CoNavBench 的数据生成与协作调度由 **NavCraft** 平台完成，其核心由四个模块构成：场景图生成、单智能体基任务生成（NavCraft-S）、协作任务生成（NavCraft-C），以及贯穿全流程的效率工具库。
 
@@ -226,7 +230,9 @@ $$
 
 该条件通过场景图上的效率工具库进行可达性验证和距离计算，确保协作方案在拓扑层面具有实际收益。消融实验表明，若跳过此迭代效率检查而直接生成双智能体任务，常导致一个机器人几乎闲置，单机器人顺序执行反而更高效（见附录 A.13.1 的失败案例分析）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 基准统计与协作效率
 
@@ -278,7 +284,9 @@ Table 4 对比了不同 LLM 作为 NavCraft 生成代理的性能、效率与成
 *Figure 2: CoNavBench benchmark. (a) Collaborative efficiency by category. Violin plots show the distribution of category-wise efficiency gain over a single-robot baseline, yielding an average gain of 20% across categories. (b) Category and collaboration-type distribution. The benchmark covers a broad and balanced set of household target-object categories (outer ring) and two collaboration types (inner ring), evidencing rich object diversity that supports generalizable evaluation*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 任务定义与基准定位
 
@@ -319,6 +327,8 @@ $$\min\{J_{r_1}^{\mathrm{A1}}, J_{r_1}^{\mathrm{A2}}\} < C_{\mathrm{solo}}$$
 3. **几何感知的场景图增强**：如何在符号化场景图中集成物体尺寸、可通过宽度等几何约束，使交接区域选择在物理层面可行？
 4. **协作涌现与计划给定的权衡**：当前基准将协作结构作为先验输入，未来是否应设计更开放的任务格式，让策略自主决定何时协作、与谁协作？
 5. **视觉语言模型的长程推理瓶颈**：高层级指令下成功率极低（零样本不足 5%，微调后约 12%），如何通过记忆增强、结构化状态表示或课程学习提升模型的长程协调能力？
+
+
 
 ## 原文 PDF
 

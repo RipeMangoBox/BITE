@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Multimodal_Aligned_Semantic_Knowledge_for_Unpaired_Image_text_Matching.pdf
+project_link: null
+code_link: null
 openreview_forum_id: d3CISVVO6v
 aliases:
 - MASKUITM
@@ -41,7 +43,7 @@ claims:
 > - Flickr30k 上，R@1 Image Annotation 为 12.1，对比 10.4 (MACK^{VG-M})，变化 +1.7。
 > - MSCOCO 上，Rs (sum of all recalls) 为 209.5，对比 205.2 (MACK^{VG-M})，变化 +4.3。
 
-## 概述
+## 概要
 
 **核心问题**：非配对图文匹配（Unpaired Image-Text Matching）无需成对标注数据，但现有方法面临两个关键瓶颈——无法为训练中未见的分布外（OOD）词构建语义对应的视觉原型，且忽略了不同词关联的视觉区域表示存在显著的分布方差差异，导致匹配精度受限。
 
@@ -51,7 +53,7 @@ claims:
 
 **主要结果**：在Flickr30K和MSCOCO两个标准基准上，MASK在非配对设置下均取得最优性能——Flickr30K图像检索R@1达到4.8（较MACK^VG-M提升1.0），MSCOCO的Rs达到209.5（提升4.3）。作为重排序模块时，CLIP+MASK在Flickr30K上Rs达534.3，ALBEF+MASK在MSCOCO上Rs达436.2，均显著优于原始模型及其他重排序方法。消融实验表明，原型一致性对比损失对性能贡献最大，OOD词原型构造机制同样带来可观的增益。
 
-## 背景与动机
+
 
 图文匹配（Image-Text Matching）是跨模态理解的核心任务，其目标是在图像与文本之间建立语义对应关系。传统配对匹配方法依赖大规模人工标注的图文对进行训练，但此类数据的获取成本高昂，且覆盖的视觉概念有限。为突破这一限制，非配对图文匹配（Unpaired Image-Text Matching）逐渐成为研究热点——它仅需独立收集的图像和文本数据，无需成对标注。
 
@@ -67,7 +69,9 @@ claims:
 
 基于这一洞察，本文提出**MASK（Multimodal Aligned Semantic Knowledge）**框架，核心思路是：以预训练词嵌入为桥梁，通过关系保持的等距映射将视觉原型空间与词嵌入空间对齐，从而为OOD词构造有意义的视觉原型，并引入原型一致性对比学习来结构正则化特征空间，显著缓解分布方差带来的负面影响。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MASK 的核心创新在于将预训练词嵌入作为跨模态语义对齐的桥梁，系统性地解决了非配对图文匹配中两个相互关联的瓶颈：**分布外（OOD）词无法获得有意义的视觉原型**，以及**不同词关联的视觉区域表示存在显著的分布方差差异**。
 
@@ -120,7 +124,7 @@ $$
 | 特征正则化 | 无原型级对比学习 | $\mathcal{L}_{cl}$ 以原型为中心降低类内方差 |
 | 区域表示 | 直接使用 Faster-RCNN 原始特征 | PAE+FRM 提取高内聚低耦合表示并保留信息 |
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_d3CISVVO6v/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison between existing matching paradigms and our proposed unpaired framework*
@@ -164,7 +168,7 @@ $$\hat{s}^k = ZS(\tilde{s}^k) + \alpha \cdot ZS(s^k)$$
 $$\mathcal{L} = \mathcal{L}_{ir} + \lambda_1 \mathcal{L}_{cm} + \lambda_2 \mathcal{L}_{cl}$$
 其中 $\mathcal{L}_{ir}$ 为信息保留损失（推动隐分布趋向标准正态并最小化重建误差），$\mathcal{L}_{cm}$ 为跨模态对齐损失（拉近预测词嵌入与真实词嵌入，同时保持区域表示间的语义关系），$\mathcal{L}_{cl}$ 为原型一致性对比损失（以原型为类中心最大化类内相似度、最小化类间相似度）。消融实验表明，$\mathcal{L}_{cl}$ 对性能的贡献最大，且 $\lambda_1 = \lambda_2$ 时取得最佳整体性能。
 
-## 核心模块与公式推导
+
 
 MASK 框架的核心由四个关键模块构成：Prototype-Aware Encoder (PAE)、Feature Restoration Module (FRM)、Modality Transfer Model (MTM) 以及 OOD Prototype Construction。这些模块协同工作，将非配对场景下的视觉区域表示与词嵌入空间进行语义对齐，并为分布外词构造有意义的视觉原型。
 
@@ -242,7 +246,9 @@ $$\hat{s}^k = ZS(\tilde{s}^k) + \alpha \cdot ZS(s^k) \tag{Eq.15}$$
 
 消融实验确定 $\alpha = 0.15$ 时取得最佳重排序性能（Table 6）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 非配对图文匹配主结果
 
@@ -324,7 +330,9 @@ Figure 3对比了MACK与MASK的原型区域表示经t-SNE降维后的语义分�
 ![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_d3CISVVO6v/figures/011_Table_8.jpg]]
 *Table 8: Overview of the model architectures integrated into the MASK framework*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与非配对图文匹配方法的关系
 
@@ -372,6 +380,8 @@ MASK 还可作为一种**重排序（re-ranking）插件**，与现有预训练�
 3. **词形变化的鲁棒处理**：如何有效处理 OOD 单词的时态和复数变体，避免将其误认为是具有独立视觉意义的新词？可能的方案包括引入子词级（subword）嵌入或词形还原（lemmatization）预处理。
 
 4. **跨数据集迁移的稳定性**：MASK 在跨数据集重排序实验中（Table 9）的性能表现需要进一步验证其在不同数据分布下的稳定性，特别是在域差异较大的场景中，知识库的覆盖度可能成为瓶颈。
+
+
 
 ## 原文 PDF
 

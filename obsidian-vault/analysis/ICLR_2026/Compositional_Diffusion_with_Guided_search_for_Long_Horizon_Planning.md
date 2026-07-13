@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Compositional_Diffusion_with_Guided_search_for_Long_Horizon_Planning.pdf
+project_link: https://cdgsearch.github.io/
+code_link: null
 openreview_forum_id: b8avf4F2hn
 aliases:
 - CDGSC
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 面向长视界规划的组合扩散与引导搜索 |
 | 英文题名 | Compositional Diffusion with Guided search for Long-Horizon Planning |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=b8avf4F2hn); [Project](https://cdgsearch.github.io/) |
+| Links | [paper](https://openreview.net/forum?id=b8avf4F2hn) · [Project](https://cdgsearch.github.io/) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/diffusion_image_video |
 | Method | Compositional Diffusion with Guided Search (CDGS) |
 | Dataset | OGBench PointMaze (Giant), OGBench AntMaze (Giant), AntSoccer (Arena, 17D), Rearrangement Memory (Task 1) |
@@ -42,7 +44,7 @@ claims:
 > - OGBench AntMaze (Giant) 上，Success Rate (%) 为 85±3，对比 HIQL 21±2，变化 +64。
 > - AntSoccer (Arena, 17D) 上，Success Rate (%) 为 69±1，对比 GSC (17D) 65±3，变化 +4。
 
-## 概述
+## 概要
 
 **核心问题：组合生成中的模式平均困境。** 将多个短视界局部模型组合以生成长视界全局计划，是机器人规划、全景图像生成与长视频生成等领域的共性范式。然而，当局部条件分布呈现多模态时，现有的朴素组合采样方法会强制对不兼容的局部模式进行平均——即“模式平均”（mode averaging）——导致生成的全局计划中出现局部不可行或全局不连贯的片段。这一瓶颈根植于组合扩散采样的信息传递机制：重叠变量的边际分数仅通过相邻因子的条件分数取平均来近似，当候选模式序列不一致时，该平均操作将产生偏离真实分布的过渡区域。
 
@@ -52,7 +54,7 @@ claims:
 
 **主要结果概览。** 在机器人长视界规划基准 OGBench 上，CDGS 在巨型迷宫任务中大幅超越朴素组合方法 GSC（PointMaze Giant: 87% vs 29%）和逆强化学习基线 HIQL（AntMaze Giant: 85% vs 21%），达到与预言机相当的性能。在任务与运动规划（TAMP）的 Rearrangement Memory 任务中，CDGS 的成功率（0.42）显著优于基于搜索和提示的基线（如 GSC 无任务规划仅 0.07）。在全景图像生成中，CDGS 实现了与 Sync-Diffusion 相当的感知相似度，同时拥有更优的风格相似度与提示对齐度。在长视频生成中，CDGS 在 350 帧（7 倍扩展视界）上保持了 91.67 的主体一致性得分，与 50 帧的 CogVideoX-2B 基线接近。消融实验与缩放分析表明，移除规划细化（PR）模块会导致性能显著下降，而增大批次大小和重采样步数可平滑提升成功率，验证了搜索机制的有效性与可扩展性。
 
-## 背景与动机
+
 
 ### 长视界规划中的组合生成困境
 
@@ -92,7 +94,9 @@ $$\nabla \log p(\tau) := \sum_{j=1}^M \nabla \log p(y_j) + \sum_{i=1}^N (1 - d_i
 
 本文的动机由此明确：**在扩散去噪过程中嵌入引导搜索**，通过种群级别的迭代重采样和基于似然的剪枝，实现局部-全局信息的高效传递，从而在保持局部可行性的同时确保全局计划的连贯性。这一思路将扩散模型的生成能力与基于种群的搜索策略相结合，为解决长视界规划中的模式平均问题提供了新的路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CDGS 的核心创新在于将**基于种群的引导搜索直接嵌入扩散去噪过程**，以解决长视界组合规划中的**模式平均**问题。当局部技能分布呈现多模态时，朴素组合采样会强制不兼容的局部模式相互妥协，导致生成的中间状态落入低似然区域，产生不可行的局部转移或状态幻觉。CDGS 通过三个相互协同的机制消除这一瓶颈：
 
@@ -126,7 +130,7 @@ CDGS 维护 $B$ 个候选计划组成的种群，在去噪过程中持续探索�
 
 消融实验（Table 1, Table 4, Table 5 中 CDGS w/o PR vs 完整 CDGS）一致表明，移除规划细化（PR，即剪枝模块）会导致性能显著下降，验证了剪枝在长视界任务中的必要性。在 Rearrangement Memory 任务上，GSC（无任务规划，等价于 CDGS w/o RP 和 PR）的成功率仅为 0.07，而完整 CDGS 达到 0.42（Table 3），差距达 6 倍。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l28_https_openreview_net_forum_id_b8avf4F2hn/figures/002_Figure_1.jpg]]
 *Figure 1: Compositional Diffusion with Guided Search (CDGS) composes short-horizon plan distributions to sample long-horizon goal-directed plans directly at inference. Unlike na¨ıve compositional sampling, it explores diverse plans and filters locally inconsistent paths to avoid “mode averaging”, yielding globally coherent plans*
@@ -152,7 +156,7 @@ CDGS（Compositional Diffusion with Guided Search）构建了一个在扩散去�
 
 框架的性能由两个关键控制旋钮调节：**批次大小 $B$** 决定种群探索的广度，**重采样步数 $U$** 决定信息沿计划链传播的深度。消融实验表明，两者协同作用：仅增大 $B$ 而不增加 $U$ 时，运动规划成功率的提升有限；而 $U$ 的增加仅在 $B$ 足够大时才能有效提升任务规划成功率（Figure 5c-d）。移除剪枝模块（即 CDGS w/o PR）会导致性能显著下降，验证了基于似然的候选筛选对于消除模式平均的必要性。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化：因子图与组合扩散
 
@@ -237,7 +241,9 @@ CDGS 的第二个关键创新是在组合分数计算中嵌入 **迭代重采样
 
 这一设计使得 CDGS 能够从多模态的局部计划分布中采样出全局连贯的长视界计划，而朴素组合方法（如 **GSC**, Mishra et al., CoRL 2023）则因缺乏搜索和剪枝机制，在局部多模态场景下会因模式平均产生不可行计划（**Figure 3 (b)** 对比 **Figure 3 (d)**）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈验证：模式平均如何导致计划失败
 
@@ -339,7 +345,9 @@ CDGS的性能随推理计算量平滑扩展（Figure 5右）：
 
 所有机器人规划实验均基于100次试验和3个随机种子进行成功率评估，基线性能直接采用原始论文报告的值（如OGBench、CompDiffuser、HIQL等），确保了比较的公平性。图像和视频生成实验使用相同的预训练扩散模型和提示词，评估指标为领域标准（LPIPS、Style-loss、CLIP score、VBench）。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：组合生成中的模式平均瓶颈
 
@@ -397,6 +405,8 @@ CDGS 的方法论贡献在于将**基于种群的引导搜索**直接嵌入扩�
 3. **跨领域迁移**：CDGS 的组合搜索框架是否可应用于其他需要序列决策的领域，如自然语言规划（将句子级生成组合为段落）、蛋白质序列设计（将局部结构模块组合为全局折叠）？这些领域的局部可行性度量需要重新定义。
 
 4. **理论分析**：DDIM 反演曲率作为局部可行性度量的理论保证尚未建立。该度量在什么条件下与真实似然单调相关？是否存在反例导致剪枝错误地丢弃可行计划？
+
+
 
 ## 原文 PDF
 

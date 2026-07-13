@@ -5,6 +5,8 @@ paper_level: A
 venue: ECCV
 year: 2024
 pdf_ref: paperPDFs/ECCV_2024/DragAnything_Motion_Control_for_Anything_using_Entity_Representation.pdf
+project_link: https://weijiawu.github.io/draganything_page/
+code_link: null
 aliases:
 - DragAnything
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | DragAnything：基于实体表示的任意物体运动控制 |
 | 英文题名 | DragAnything: Motion Control for Anything using Entity Representation |
 | 会议/期刊 | ECCV 2024 |
-| Links | [paper](https://arxiv.org/abs/2403.07420); [Project](https://weijiawu.github.io/draganything_page/) |
+| Links | [paper](https://arxiv.org/abs/2403.07420) · [Project](https://weijiawu.github.io/draganything_page/) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/generative_models_and_autoencoders |
 | Method | DragAnything |
 | Dataset | VIPSeg val 256x256, User Study |
@@ -40,7 +42,7 @@ claims:
 > - VIPSeg val 256x256 上，FVD 为 494.8，对比 519.3 (DragNUWA)，变化 -24.5。
 > - VIPSeg val 256x256 上，ObjMC 为 305.7，对比 324.6 (DragNUWA)，变化 -18.9。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -62,7 +64,7 @@ DragAnything 以 **SVD（Stable Video Diffusion）** 为基础视频生成模型
 
 DragAnything 仍存在明显局限：大范围或快速运动下可能出现外观失真（Figure 10）；实体表示仅限于2D轨迹，无法处理深度旋转和3D姿态变化；依赖交互式分割模型 SAM 获取实体掩码，对遮挡严重或语义模糊的实体准确性下降。开放问题包括：如何将2D轨迹控制扩展到3D场景以支持物体姿态和深度控制；如何利用更强的视频生成基础模型（如 SORA）提升运动生成的鲁棒性；以及在多实体复杂交互场景下保持运动的一致性与独立性。
 
-## 背景与动机
+
 
 ### 任务背景：轨迹驱动的视频运动控制
 
@@ -98,7 +100,9 @@ DragAnything 的核心动机正是突破这一瓶颈——**直接操纵物体�
 
 此外，DragAnything 还引入了 **2D 高斯图表示**，根据实体的中心坐标和半径生成高斯权重图，使模型更关注实体的中心区域，进一步增强了运动控制的精度和稳定性。这两种表示的融合构成了 DragAnything 运动控制信号的核心。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DragAnything 的核心创新在于用**实体语义表示**替代了现有方法中普遍使用的像素级或区域级轨迹表示，从根本上改变了运动控制的条件信号形态。这一转变解决了此前方法无法实现精确实体级运动控制的瓶颈问题。
 
@@ -132,7 +136,7 @@ $$\mathcal{L}_{\theta} = \sum_{i=1}^L \mathbf{M} \| \epsilon - \epsilon_{\theta}
 
 Figure 3 的玩具实验直观展示了创新效果：DragNUWA 仅拖拽对应像素区域，导致非目标区域异常变形；而 DragAnything 的实体表示实现了精确的实体级运动控制，前景与背景运动得以分离。在 VIPSeg 验证集上，DragAnything 的 ObjMC 达到 305.7，显著优于 DragNUWA 的 324.6（Table 1）。用户研究中，DragAnything 在运动控制上的人类投票偏好超越 DragNUWA 26%（Figure 8），进一步验证了实体表示在感知质量上的优势。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l26_DragAnything_Motion_Control_for_Anything_using_Entity_Representation/figures/004_Figure_4.jpg]]
 *Figure 4: DragAnything Framework. The architecture includes two parts: 1) Entity Semantic Representation Extraction. Latent features from the Diffusion Model are extracted based on entity mask indices to serve as corresponding entity representations. 2) Main Framework for DragAnything. Utilizing the corresponding entity representations and 2D Gaussian representations to control the motion of entities*
@@ -173,7 +177,7 @@ $$\mathcal{L}_{\theta} = \sum_{i=1}^L \mathbf{M} \| \epsilon - \epsilon_{\theta}
 
 实体表示与 2D 高斯表示之间存在明确的互补关系：实体表示提供**语义层面的身份信息**（“这是什么物体”），而 2D 高斯图提供**空间注意力引导**（“物体的核心在哪里”）。消融实验（Table 2）表明，单独使用任一种表示均不如两者组合——组合方案取得了最优 ObjMC 305.7。这一结果验证了语义定位与空间聚焦协同作用的必要性。
 
-## 核心模块与公式推导
+
 
 ### 1. 任务形式化
 
@@ -216,7 +220,9 @@ $$\mathcal{L}_{\theta} = \sum_{i=1}^L \mathbf{M} \left\| \epsilon - \epsilon_{\t
 
 其中 $\mathbf{M}$ 为目标实体区域的二值掩码，使得损失仅在实体区域进行优化。消融实验（Table 3）表明，引入损失掩码将 ObjMC 从 311.1 降至 305.7（降低约 5.4），FVD 和 FID 也有相应改善。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 评估协议与基准
 
@@ -297,7 +303,9 @@ Figure 9 展示了 DragAnything 支持多样化的运动控制模式，包括前
 ![[assets/figures/papers/paper_list_l26_DragAnything_Motion_Control_for_Anything_using_Entity_Representation/figures/011_Figure.jpg]]
 *Figure: demonstrate that our DragAnything achieves SOTA performance for User Study, surpassing the previous state of the art (DragNUWA) by 26% in human voting*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：从像素拖拽到实体语义控制
 
@@ -344,6 +352,8 @@ DragAnything 的因果调节变量是将**目标表示**从像素/区域级升�
 2. **更强基础模型的适配**：当更强的视频生成基础模型（如 SORA）可用时，如何迁移实体表示机制以支持更大范围、更鲁棒的运动生成？
 
 3. **多实体交互的一致性**：在多实体复杂交互场景下，如何保持各实体运动的一致性与独立性，避免实体间运动信号的相互干扰？
+
+
 
 ## 原文 PDF
 

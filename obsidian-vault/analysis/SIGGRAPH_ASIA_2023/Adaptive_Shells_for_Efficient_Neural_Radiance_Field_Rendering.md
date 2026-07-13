@@ -5,6 +5,7 @@ paper_level: A
 venue: "SIGGRAPH Asia"
 year: 2023
 pdf_ref: paperPDFs/SIGGRAPH_ASIA_2023/Adaptive_Shells_for_Efficient_Neural_Radiance_Field_Rendering.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/toronto-ai/adaptive-shells/
 aliases:
 - AS
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 自适应壳体用于高效的神经辐射场渲染 |
 | 英文题名 | Adaptive Shells for Efficient Neural Radiance Field Rendering |
 | 会议/期刊 | SIGGRAPH Asia 2023 |
-| Links | [paper](https://arxiv.org/abs/2311.10091); [Project](https://research.nvidia.com/labs/toronto-ai/adaptive-shells/) |
+| Links | [paper](https://arxiv.org/abs/2311.10091) · [Project](https://research.nvidia.com/labs/toronto-ai/adaptive-shells/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Adaptive Shells |
 | Dataset | Shelly, DTU |
@@ -42,7 +43,7 @@ claims:
 > - Shelly 上，LPIPS ↓ 为 0.079，对比 0.125 (Instant NGP)，变化 -0.046。
 > - Shelly 上，FPS ↑ 为 262.69，对比 85.16 (Instant NGP)，变化 ~3.1x。
 
-## 概述
+## 概要
 
 神经辐射场（NeRF）通过体积渲染实现了逼真的新视角合成，但其核心瓶颈在于：传统方法对所有空间区域进行统一密集采样，导致大量计算浪费在实表面区域。即使采用空体素跳过等加速策略，占据区域仍需多次采样，且网格加速结构带来显著内存开销。此外，MLP的平滑偏差使其难以学习尖锐的密度函数，进一步限制了效率与质量的平衡。
 
@@ -52,7 +53,7 @@ claims:
 
 方法在方法谱系中定位于 **NeRF加速与表面-体积混合表示** 的交汇点：它继承 NeuS 的SDF-密度转换框架，但通过空间变化核和显式壳提取，将体积渲染限制在窄带内，实现了从纯体积渲染到近表面渲染的平滑过渡。与 MobileNeRF、BakedSDF 等烘焙方法不同，本方法无需预计算纹理，保持了神经表示的连续性和可微性。
 
-## 背景与动机
+
 
 神经辐射场（NeRF）及其变体在新视角合成与场景重建领域取得了突破性进展，但其核心瓶颈在于体积渲染的计算效率：传统方法对所有空间区域进行统一密集采样，导致大量计算浪费在对渲染贡献极小的区域。尽管已有加速方案（如空体素跳过）能够减少无效采样，但在占据区域内仍需多次采样才能获得准确结果，且基于网格的加速结构内存开销显著。更根本地，现有方法难以同时高效处理场景中两类截然不同的区域——具有清晰几何的实表面（如皮肤、家具）和具有模糊几何的半透明结构（如毛发、叶子）。
 
@@ -62,7 +63,9 @@ claims:
 
 **核心洞察**。场景中不同区域应当采用不同的渲染方式：模糊几何需要体渲染以处理半透明和复杂形状，而实表面可以用单次采样精确表示。基于此，本文提出学习一个空间变化的核大小，自动适应区域复杂度，并据此提取显式的窄带壳体，在壳体内进行自适应采样——实表面区域仅需1个样本，模糊区域自适应增加样本数，从而在提升或保持图像质量的同时大幅减少计算量，实现实时渲染。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Adaptive Shells 的核心创新在于将**空间自适应核大小（spatially-varying kernel size）** 与**显式窄带壳提取**结合，形成一种从体积渲染到表面渲染平滑过渡的混合表示。这一设计直接回应了传统神经辐射场的根本瓶颈：统一密集采样策略在实表面区域造成大量冗余计算，而现有加速方法（如 Instant NGP 的空体素跳过）仍无法在占据区域内减少样本数。
 
@@ -90,7 +93,7 @@ Adaptive Shells 的核心创新在于将**空间自适应核大小（spatially-v
 - 帧率从 Instant NGP 的 85.16 FPS 提升至 **262.69 FPS**（约 3.1 倍），样本数减少最多 3 倍（Table 1）。
 - 消融实验证实，空间变化核相比全局核在 PSNR 上提升约 **1.7 dB**（34.26 → 36.02），且自适应壳相比固定 SDF 阈值壳获得更好的质量-速度权衡（Table 4）。
 
-## 整体框架
+
 
 Adaptive Shells 的完整管线分为两大阶段：**第一阶段**在全光线体积渲染下联合训练几何网络与辐射场，同时学习一个空间自适应的核大小场；**第二阶段**基于学到的 SDF 与核大小场，通过水平集演化提取显式的窄带壳体网格，随后在壳内进行高效的窄带渲染与微调（见 Figure 3 概览）。
 
@@ -152,7 +155,7 @@ $$\omega(f) = \frac{1}{2} \big( 1 + \cos(\pi \operatorname{clamp}(f / \zeta, -1,
 
 该管线的核心因果链条为：**空间自适应核大小 → 自适应壳体宽度 → 窄带采样 → 计算量大幅降低 + 质量保持/提升**。在 Shelly 数据集上，该方法以 262.69 FPS 的速度实现 36.02 PSNR，相比 Instant NGP（85.16 FPS, 33.48 PSNR）实现了约 3.1 倍加速和 +2.54 dB 的质量提升（Table 1, Table 2）。
 
-## 核心模块与公式推导
+
 
 ### 3.1 体积渲染基础
 
@@ -224,7 +227,9 @@ $$( f , 1 / s , \mathbf{f}_{\mathrm{geo}} , \mathbf{n} ) = \mathrm{NN}_{\theta}^
 
 $$\mathbf{c} = \mathrm{NN}_{\theta}^{\mathrm{rad}} ( [ \gamma ( \mathbf{d} ) , \mathbf{f}_{\mathrm{geo}} , \mathbf{n} , \mathbf{x} ] )$$
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -310,7 +315,9 @@ Figure 12 展示了该方法在下游应用中的潜力。显式壳网格使表�
 ![[assets/figures/papers/paper_list_l31_https_arxiv_org_abs_2311_10091/figures/024_Table_5.jpg]]
 *Table 5: Per-scene quantitative results on DTU data set. We report the PSNR, LPIPS and SSIM results for each scene and compare them with baselines*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心思想定位
 
@@ -390,6 +397,8 @@ Adaptive Shells 相对于基线方法的关键技术槽位变化如下：
 4. **动态场景扩展**：该方法是否适用于动态场景或可变形物体？文中已展示简单蒙皮变形（Figure 12），但更复杂的动态场景（如非刚性变形、拓扑变化）仍需探索。
 
 5. **移动端部署**：能否在移动设备上通过进一步优化（如量化、蒸馏）实现实时渲染？当前帧率（40-300 FPS）在 RTX 4090 上测得，移动端部署需要显著的工程优化。
+
+
 
 ## 原文 PDF
 

@@ -44,7 +44,7 @@ claims:
 > - VerseControl4D (联合控制) 上，旋转误差 RotErr 0.890 vs 5.006 (Perception-as-Control) / 7.560 (Yume) / 1.361 (Uni3C) (-4.116 相对于 Perception-as-Control)；平移误差 TransErr 3.103 vs 8.767 (Perception-as-Control) / 8.735 (Yume) / 7.731 (Uni3C) (-5.664 相对于 Perception-as-Control)；对象运动控制误差 ObjMC 2.507 vs 6.556 (Perception-as-Control) / 7.959 (Yume) / 5.883 (Uni3C) (-4.049 相对于 Perception-as-Control)。
 > - VerseControl4D 静态场景 (仅相机控制) 上，VBench-I2V Overall Score 86.80 vs 84.04 (ViewCrafter) / 85.33 (FlashWorld) / 78.12 (Voyager) (+1.47 相对于最佳基线 FlashWorld)。
 
-## 概述
+## 概要
 
 **核心问题**：现有视频世界模型缺乏统一的4D几何表示，难以在共享世界坐标系下同时精确控制相机运动与多对象运动。主流控制信号（如2D边界框、光流、深度图）具有视点依赖性和非刚性，而3D边界框或参数化模型（如SMPL-X）则过于刚硬或类别受限，无法兼顾通用性与精度。
 
@@ -54,8 +54,6 @@ claims:
 - 在联合相机与对象运动控制的 VerseControl4D 基准上，VerseCrafter 取得 VBench-I2V 总体 **88.10** 分，旋转误差 **0.890**、平移误差 **3.103**、对象运动控制误差 **2.507**，全面优于 Perception-as-Control、Uni3C 和 Yume。
 - 在仅相机控制的静态场景测试中，总体得分 **86.80**，旋转误差 **0.650**、平移误差 **2.587**，显著超越 ViewCrafter、Voyager 和 FlashWorld 等最佳基线。
 - 消融实验证实：3D高斯轨迹在对象运动控制上明显优于3D边界框和3D点轨迹；深度信息的引入对恢复正确遮挡关系至关重要；解耦的背景与前景控制是维持静态背景稳定性的关键。
-
-## 背景与动机
 
 视频世界模型旨在从给定输入（如图像、文本或动作指令）生成逼真且可控的动态视频，其核心挑战在于如何在统一的几何框架下同时精确控制相机运动与多对象运动。近年来，基于扩散模型的视频生成取得了显著进展，涌现出两类主要的控制范式：**仅相机控制**与**仅对象运动控制**。然而，将二者统一到一个共享世界坐标系中的方法仍然缺失，这构成了当前视频世界模型的核心瓶颈。
 
@@ -76,7 +74,7 @@ VerseCrafter 针对这一瓶颈，提出**4D Geometric Control** 表示——将
 
 通过将 4D Geometric Control 渲染为多通道 4D 控制图（背景 RGB/深度、轨迹 RGB/深度、软合并掩码），并经由轻量 GeoAdapter 注入冻结的视频扩散主干（Wan2.1-14B），VerseCrafter 实现了视角一致且精确遵循相机与对象运动的高质量视频生成。这一设计从几何表示层面解决了联合控制的根本矛盾，为视频世界模型走向统一 4D 可控生成提供了新路径。
 
-## 核心创新
+## 核心方法与创新机理
 
 VerseCrafter 的核心创新在于，它首次为视频世界模型引入了一套统一的 **4D几何控制（4D Geometric Control）** 表示，将相机运动与多对象运动纳入同一个共享世界坐标系中进行精确控制。这一设计直击现有方法的瓶颈：2D 控制信号（如边界框、掩码、光流）视点依赖且非刚性，而 3D 边界框或参数化模型（如 SMPL-X）又过于刚硬或类别受限，无法在保持视觉质量的同时，实现视角一致的相机与多对象联合控制。
 
@@ -125,8 +123,6 @@ $$x_{n+1} = \mathcal{B}_n(x_n) + \mathcal{G}_m(\mathbf{g}) \mathbf{W}_0^{(m)}$$
 ### 创新边界与局限
 
 尽管 4D 几何控制实现了相机与多对象运动的统一操控，当前的对象表示仍限于单个 3D 高斯的椭圆体级别控制，无法实现精细的 6D 姿态或部件级关节控制。背景点云基于第一帧重建，作为近似静态的几何支架，难以处理大规模非刚性背景变形。此外，生成过程中未施加显式物理约束，可能导致物理直觉上不合理的运动。这些局限为未来工作指明了方向：引入多部分组成的高斯或骨架驱动变形以实现精细关节控制，显式建模动态背景的非刚性变形，以及融入物理先验提升复杂交互的合理性。
-
-## 整体框架
 
 VerseCrafter 的整体设计遵循“显式4D几何状态构建—多通道控制图渲染—冻结视频扩散主干条件注入”的三阶段范式。其核心思路是：将动态场景抽象为共享世界坐标系下的**4D几何控制表示**，再通过渲染将其转化为扩散模型可消费的控制信号，从而在保持强视频先验的同时，实现相机运动与多对象运动的精确、解耦控制。
 
@@ -183,8 +179,6 @@ VerseCrafter 的整体设计遵循“显式4D几何状态构建—多通道控�
 ![[assets/figures/papers/paper_list_l2624_https_arxiv_org_abs_2601_05138/figures/002_Figure_2.jpg]]
 *Figure 2: Framework of VerseCrafter. Given an input image and a text prompt, we estimate depth and obtain user-specified object masks to construct 4D Geometric Control consisting of a static background point cloud and per-object 3D Gaussian trajectories in a shared world coordinate frame. A camera trajectory is specified in the shared frame, and together with the 4D Geometric Control, rendered into per-frame background RGB/depth, 3D Gaussian trajectory RGB/depth, and a soft merged mask, forming multi-channel 4D control maps. The 4D control maps are encoded and fed into the proposed GeoAdapter, which conditions a frozen Wan2.1-14B backbone together with text embeddings from umT5, enabling geometry-con...*
 
-## 核心模块与公式推导
-
 VerseCrafter 的核心由两个紧密耦合的模块构成：**4D几何控制表示**（4D Geometric Control）和**GeoAdapter条件注入分支**。前者将动态场景抽象为共享世界坐标系下的显式4D几何状态，后者将渲染得到的多通道控制图编码后注入冻结的视频扩散模型，实现精确的相机与多对象运动控制。
 
 ### 4D几何控制表示
@@ -236,7 +230,7 @@ $$
 ![[assets/figures/papers/paper_list_l2624_https_arxiv_org_abs_2601_05138/figures/013_Figure_9.jpg]]
 *Figure 9: Detailed architecture of VerseCrafter. Background RGB & depth maps and 3D Gaussian trajectory RGB & depth maps are first encoded by the frozen Wan Encoder. The soft merged mask is rearranged into latent-aligned channels, and all geometry latents are then concatenated along the channel dimension to form a unified spatio-temporal geometry feature. This feature is patchified into tokens and processed by the GeoAdapter branch. At selected Wan-DiT blocks, GeoAdapter outputs are passed through zero-initialized linear layers and added to the backbone tokens as residual modulations, enabling geometry-consistent control over camera motion and multi-object motion*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 实验设置与评估基准
 
@@ -326,13 +320,7 @@ VerseCrafter基于冻结的**Wan2.1 T2V-14B**潜在视频扩散主干构建，�
 ![[assets/figures/papers/paper_list_l2624_https_arxiv_org_abs_2601_05138/figures/003_Figure_3.jpg]]
 *Figure 3: Construction pipeline of VerseControl4D. Starting from Sekai-Real-HQ and SpatialVID-HQ, we extract 81-frame clips and apply quality filtering. For each retained clip, Qwen2.5- VL-72B, Grounded-SAM2, and MegaSAM provide captions, object masks, depth, and camera trajectory, which are lifted into background/object point clouds, from which 3D Gaussian trajectories are fitted, and then rendered into background/trajectory maps and a soft merged mask that constitute our 4D control maps*
 
-![[assets/figures/papers/paper_list_l2624_https_arxiv_org_abs_2601_05138/figures/020_Figure_15.jpg]]
-*Figure 15: Additional analysis of control fidelity and boundary cases. (a) Orientation controllability. Two success cases on rigid anisotropic objects and one failure case on a human-like subject. (b) Dynamic background modeling. Two success cases on moderate background dynamics and one failure case on highly non-rigid background motion. (c) Articulated and non-rigid object controllability. Two examples showing effective coarse object-level control on articulated and non-rigid objects*
-
-![[assets/figures/papers/paper_list_l2624_https_arxiv_org_abs_2601_05138/figures/021_Figure_16.jpg]]
-*Figure 16: Additional analysis of geometry coverage and robustness. (a) Single-view vs. multi-view input. Multi-view reconstruction improves geometry coverage and novel-view faithfulness. (b) Robustness to monocular-depth errors. Even with noisier depth and distorted point clouds, the generated videos remain visually similar and preserve the main scene structure*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 问题定位：视频世界模型的4D几何控制缺口
 

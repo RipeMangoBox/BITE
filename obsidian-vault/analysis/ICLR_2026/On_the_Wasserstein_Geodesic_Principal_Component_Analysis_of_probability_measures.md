@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/On_the_Wasserstein_Geodesic_Principal_Component_Analysis_of_probability_measures.pdf
+project_link: null
+code_link: null
 openreview_forum_id: OJupg4mDjS
 aliases:
 - WGPCAPM
@@ -36,7 +38,10 @@ claims:
 | Method |  |
 | Dataset | |
 
-## 概述
+> [!tip] 效果简介
+> 本笔记的既有实验指标、对比结果与适用边界见“实验与关键发现”；本轮仅统一结构，不改写证据。
+
+## 概要
 
 本文研究 Wasserstein 空间中概率测度集合的**主成分分析（PCA）**，提出 **Wasserstein 测地线主成分分析（GPCA）**，旨在识别 Wasserstein 空间中最能捕捉数据变异模式的测地线。与传统的切空间 PCA（TPCA）不同，GPCA 直接在弯曲的测地线流形上进行降维，而非在一点处的线性化切空间中近似。
 
@@ -44,7 +49,7 @@ claims:
 
 **主要结果**：在高斯设定下，GPCA 在合成数据上恢复了已知的测地线结构，且与 TPCA 相比目标函数改进通常小于 1%，表明 TPCA 在局部已是良好近似。在真实数据实验中，GPCA 成功从 MNIST 数字、3D 点云（椅子、灯具）和彩色图像中恢复出语义上有意义的变异模式（如数字粗细、物体尺寸、颜色变化），而 TPCA 因线性化扭曲可能导致非正交交叉。正则化消融实验表明，正交性约束系数 $\lambda_O = 1.0$ 对恢复有区分力的第二主成分至关重要。
 
-## 背景与动机
+
 
 在经典的主成分分析（PCA）中，给定一组欧几里得空间中的点，目标是寻找低维仿射子空间以最小化投影误差。当数据点不再是向量，而是概率分布时，这一范式需要被重新建立：数据空间变为具有适当度量的概率测度空间，而线性子空间则被推广为测地线。
 
@@ -54,7 +59,9 @@ Wasserstein 距离因其在比较概率分布时能保持几何结构的能力�
 
 本文从两个互补的层面回应上述挑战。在**高斯分布**情形下，利用 Bures-Wasserstein 几何将问题提升到可逆线性映射空间，从而将测地线 PCA 转化为一个可精确求解的优化问题。在**绝对连续分布**情形下，提出一种基于神经网络的测地线参数化方法，通过 Otto 几何的视角将 Wasserstein 测地线表示为微分同胚群中水平线段的投影，并设计相应的正则化策略以保证多个主成分的正交相交。这两个层面的统一框架使得 GPCA 既能享受高斯情形下的精确性与理论可分析性，又能扩展到高维真实数据中的经验分布，从而在理论上弥合了 Wasserstein 几何的非线性结构与实际降维需求之间的鸿沟。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GPCA 的核心创新在于将主成分分析从 Wasserstein 空间的切空间线性近似**提升为真正的测地线流形优化**，从而在弯曲的统计流形上直接寻找数据变异的主方向。这一转变在两个层次上展开，分别对应不同的数据模态与计算策略。
 
@@ -92,7 +99,7 @@ $$\frac{BW_2^2(\Sigma, \Sigma')}{BW_{2,\bar{\Sigma}}^2(\Sigma, \Sigma')} = 1 - \
 
 目前的分析未提供 GPCA 与 TPCA 之外其他潜在基线（如 log-Euclidean PCA 或 Cholesky 系数上的欧氏 PCA）的定量对比。若需完整评估 GPCA 的创新性边界，建议补充与这些替代流形 PCA 方法的实验比较。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_OJupg4mDjS/figures/018_Figure_17.jpg]]
 *Figure 17: For the lamp (left) and the chair (right) experiment, each point cloud is embedded in the plane according to its projection times onto the first and second principal components computed by the POINTNET + PCA method*
@@ -121,7 +128,7 @@ $$\mathscr{L}(f_{\psi_2}, \varphi_{\theta_2}, t_1^2, \ldots, t_n^2) + \lambda_I 
 
 **输入输出流。** 输入为一组概率测度（高斯分布或经验分布），输出为 Wasserstein 空间中的主测地线及其参数化。对于高斯情形，输出为 $S_d^{++}$ 上的测地线路径；对于一般测度，输出为经 MLP 参数化的微分同胚和标量函数，可沿测地线采样生成分布序列。
 
-## 核心模块与公式推导
+
 
 ### GPCA 目标函数
 
@@ -187,7 +194,9 @@ $$
 
 该公式揭示了当协方差矩阵接近锥边界（即 $a$ 与 $b$ 差异悬殊）或方向角 $\theta$ 偏离时，切线 PCA 的线性化近似与真实测地线距离之间的偏差会显著增大。这为 GPCA 相对于 TPCA 的优势提供了理论依据。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 5.1 高斯分布上的 GPCA 与 TPCA 对比
 
@@ -251,7 +260,9 @@ Table 2 展示了不同 $\lambda_O$ 值对正交性正则化值和第二成分�
 ![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_OJupg4mDjS/figures/019_Figure_18.jpg]]
 *Figure 18: GPCA scores obtained on 60 new point clouds of chairs (never seen during training) and 60 point clouds of cars (left) / planes (right). The separation of the histograms indicates that GPCA can be used for outlier detection*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与切空间 PCA（TPCA）的关系
 
@@ -292,6 +303,8 @@ GPCA 位于 Wasserstein 几何与非线性降维的交叉点，其方法谱系�
 - **下游潜在方向**：Wasserstein 空间中的非线性降维、概率测度集合的生成建模、基于测地线主成分的分布插值与外推。
 
 > **注意**：论文未引用具体基线工作的作者/会议/年份信息（如 MPGD 等），上述平行方法的描述仅基于论文内部的定性讨论。如需补充具体文献元数据，需手动检索验证。
+
+
 
 ## 原文 PDF
 

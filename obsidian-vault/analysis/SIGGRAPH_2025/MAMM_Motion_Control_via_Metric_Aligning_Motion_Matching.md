@@ -5,6 +5,8 @@ paper_level: A
 venue: SIGGRAPH
 year: 2025
 pdf_ref: paperPDFs/SIGGRAPH_2025/MAMM.pdf
+project_link: https://ataga101.github.io/mamm-project-page/
+code_link: null
 aliases:
 - MAMM
 tags:
@@ -31,8 +33,6 @@ claims:
 >
 >思考2：motion phase本身就是种轨迹保证，不过偏向周期性。MAMM是否有机会将其扩充为非周期性？前提是找出motion phase路线在哪些任务上有巨大优势，才有价值继续研究。最好是一类或者多类任务，类似于MAMM能适配多种轨迹控制。
 
-
-
 >[!TODO] #ripe
 >从MoCapAnything v1 -> v2的优化过程，思考MAMM的优化，哪些部分能够换成learnable，然后能获得哪些新的能力，解决什么新问题？
 
@@ -41,12 +41,16 @@ claims:
 | 中文题名    | 基于度量对齐运动匹配的运动控制                                                                                     |
 | 英文题名    | MAMM: Motion Control via Metric-Aligning Motion Matching                                            |
 | 会议/期刊   | SIGGRAPH 2025                                                                                       |
-| Links   | [paper](https://arxiv.org/abs/2505.19976); [Project](https://ataga101.github.io/mamm-project-page/) |
+| Links   | [paper](https://arxiv.org/abs/2505.19976) · [Project](https://ataga101.github.io/mamm-project-page/) |
 | Topic   | #topic/motion_animation #topic/motion_animation/human_motion_generation                             |
 | Method  | Metric-Aligning Motion Matching (MAMM)                                                              |
 | Dataset | Mixamo/Adobe动画资产（运动序列）；手绘曲线、合成波形、音频、运动等控制序列（无需标准benchmark，单样本优化验证）                                  |
 
-## 概述
+
+> [!tip] 效果简介
+> 量化结果、消融证据与适用边界见“实验与关键发现”。
+
+## 概要
 
 **问题瓶颈**：传统运动控制方法依赖手工定义或学习得到的跨域映射，需要大规模配对数据集和耗时训练，难以处理任意控制序列对齐。
 
@@ -55,8 +59,6 @@ claims:
 **方法定位**：MAMM 是一个统一的优化框架，接受草图、波形、标签、音频、运动等多种控制序列，仅需单个原始运动序列和控制序列即可在数秒内生成高质量对齐，无需任务特定训练或算法重新设计。其核心机制是通过最优传输优化域内距离结构对齐（Gromov-Wasserstein损失与Wasserstein损失的平衡），从根本上解决跨域对应问题。
 
 **主要结果**：方法在多种控制模态下均能生成自然且结构一致的对齐运动，并通过消融实验验证了关键超参数（α、λ）对控制服从度与运动自然度的调节作用。
-
-## 背景与动机
 
 运动控制是计算机动画领域的核心挑战，其目标是根据给定的控制信号（如手绘曲线、音频、语义标签或另一段运动）驱动角色运动，使生成的运动既忠实于控制意图，又保持运动本身的自然性。这一任务在游戏、影视、虚拟人交互等场景中具有广泛需求。
 
@@ -89,7 +91,7 @@ claims:
 
 这一框架从根本上绕开了传统方法对跨域映射的依赖，为运动控制提供了一种轻量、灵活且通用的解决方案。
 
-## 核心创新
+## 核心方法与创新机理
 
 MAMM的核心创新在于**从“学习跨域映射”转向“对齐域内度量”**，从而彻底规避了传统运动控制方法对配对数据和任务特定设计的依赖。这一转变通过三个关键changed slots实现：
 
@@ -135,8 +137,6 @@ MAMM仅需**单个原始运动序列和单个控制序列**即可完成对齐，
 
 这三个changed slots之间存在因果依赖关系：**FSUGW度量对齐机制**（slot 1）是核心使能技术，它天然地消除了对跨域映射和配对数据的需求，从而直接导致了**统一控制框架**（slot 2）和**单样本无监督能力**（slot 3）的实现。换言之，MAMM的通用性和数据效率并非独立设计，而是度量对齐范式的自然产物。
 
-## 整体框架
-
 Metric-Aligning Motion Matching (MAMM) 是一个统一的优化框架，其核心思想在于：**仅利用原始运动域与控制序列域各自内部的距离（度量）结构，通过最优传输建立跨域对应，从而避免显式的跨域映射定义或配对训练数据**（Fig. 1）。给定任意原始运动序列 $X$ 和控制序列 $Y$，MAMM 输出对齐后的运动 $X'$，使 $X'$ 在保持原始运动内容的同时，其内部时序结构与 $Y$ 的结构相匹配（Fig. 2）。
 
 ![[assets/figures/papers/MAMM_Motion_Control_via_Metric-Aligning_Motion_Matching_234bebcdacd3/figures/002_Figure_2.jpg]]
@@ -177,8 +177,6 @@ MAMM 的优化流程采用**由粗到精策略**与**FSUGW 块交替迭代**相�
 ### 方法定位
 
 MAMM 在概念上与基于示例的运动合成方法 **GenMM**（Li et al., SIGGRAPH 2023）共享 patch 操作，但将任务从“运动到运动”的相似度匹配推广至**任意控制序列对齐**。其关键区别在于：GenMM 依赖双向相似度匹配，而 MAMM 通过 FSUGW 最优传输仅利用域内距离结构，无需手工定义跨域映射或大规模配对标注数据，可在数秒内完成高质量对齐。
-
-## 核心模块与公式推导
 
 ### 问题形式化与运动表示
 
@@ -245,7 +243,7 @@ MAMM 支持用户通过关键帧对对齐进行精细控制（§3.3.1）：
 ![[assets/figures/papers/MAMM_Motion_Control_via_Metric-Aligning_Motion_Matching_234bebcdacd3/figures/006_Figure_5.jpg]]
 *Figure 5: Example of controlling aligned motion with soft keyframes. (a) Users can specify keyframe poses, such as "hands-up horse rider" and "hands-down horse rider," using our interface. For simplicity, users select poses from original sequence, although our method does not impose strict constraints on keyframe selection. (b) When motion curve approaches keyframe, algorithm ensures that corresponding poses in aligned motion closely match keyframe poses. (c) Conversely, when curve is distant from keyframe, algorithm selects alternative poses, such as "side-step" poses, which differ from keyframe poses. This illustrates how soft keyframes can influence motion in both positive and negative contexts. F...*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 应用验证：多模态控制序列对齐
 
@@ -287,19 +285,13 @@ MAMM 有两个关键超参数：α 平衡控制服从度与运动自然度，λ 
 ![[assets/figures/papers/MAMM_Motion_Control_via_Metric-Aligning_Motion_Matching_234bebcdacd3/figures/003_Figure_3.jpg]]
 *Figure 3: Explanation of the fused semi-unbalanced Gromov-Wasserstein (FSUGW) objective and algorithm to minimize it. ???? constrains $X ^ { \prime }$ to resemble ?? via transport plan ?? and ?????? encourages ?? to be metric-aligning, which leads to structural similarity between $X ^ { \prime }$ and ?? . We optimize FSUGW objective with alternating steps, where the first step optimizes ?? with $X ^ { \prime }$ fixed, and second step optimizes $X ^ { \prime }$ over fixed ??
 
-![[assets/figures/papers/MAMM_Motion_Control_via_Metric-Aligning_Motion_Matching_234bebcdacd3/figures/010_Figure_11.jpg]]
-*Figure 11: Examples of sketches created by user study participants. Colored squares represent keyframes. For the animated results of each curve, please refer to the supplementary materials*
-
-![[assets/figures/papers/MAMM_Motion_Control_via_Metric-Aligning_Motion_Matching_234bebcdacd3/figures/004_Figure_4.jpg]]
-*Figure 4: Demonstration of character motion control using sketched curve. Character’s movement follows abstract structure of the curve. Additional examples are available in supplementary video*
-
 ![[assets/figures/papers/MAMM_Motion_Control_via_Metric-Aligning_Motion_Matching_234bebcdacd3/figures/008_Figure_8.jpg]]
 *Figure 8: Examples of motion-to-motion alignment, where original motion is synchronized with control motion. First example aligns stepping motion to step with different skeletal structure and style, matching both frequency and phase. Second example aligns nonperiodic combat sequence involving human and horse, demonstrating synchronized timing of combat actions. Fig. 9. Aligned motions for various ?? values with ?? and ?? fixed to 0.05 and 1.0, respectively. Small ?? (e.g., 0.2) results in natural motion but occasionally ignores control inputs, such as style changes within the same segmentation label. Conversely, ?? value of 1.0 leads to aligned motions with segments that exhibit no movement*
 
 ![[assets/figures/papers/MAMM_Motion_Control_via_Metric-Aligning_Motion_Matching_234bebcdacd3/figures/009_Figure_10.jpg]]
 *Figure 10: Aligned motions for various ?? values with ?? fixed at 0.8. When ?? is small (e.g., 0), aligned motion includes segments where poses remain unchanged, deviating from the overall dynamics of the original motion. By contrast, large ?? (e.g., ∞) ensures that distribution of aligned motion patches closely matches original motion, often at the expense of adhering to control sequence*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 **核心定位：无监督度量对齐范式**
 

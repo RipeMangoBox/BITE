@@ -43,7 +43,7 @@ claims:
 > - PIEbench (face/stylization subset) 上，δ_smooth↓ 0.098 vs 0.143 (ConceptSliders) (−0.045)；CLIP-Dir↑ 0.382 vs 0.186 (ConceptSliders) (+0.196)。
 > - PIEbench (material subset) 上，δ_smooth↓ 0.350 vs 2.577 (MARBLE) (−2.227)。
 
-## 概述
+## 概要
 
 指令驱动的图像编辑模型近年来取得了显著进展，用户仅需通过自然语言指令即可对图像进行修改。然而，现有方法存在一个关键瓶颈：它们仅能通过文本指令控制编辑的**内容**（“编辑什么”），却缺乏对编辑**程度**（“编辑多少”）的精细、连续控制。用户只能获得离散的“有编辑/无编辑”二元结果，无法像操作滑块一样平滑地调节编辑强度——例如，无法将“增加微笑”的指令从微妙的嘴角上扬连续过渡到灿烂的笑容。
 
@@ -53,7 +53,7 @@ claims:
 
 在方法谱系上，Kontinuous Kontext 属于**推理时连续控制**与**参数高效微调**的交叉范式：它以 **Flux Kontext**（DiT架构的指令编辑模型）为基座，通过训练秩-4 LoRA适配器和4层MLP强度投影器实现强度注入，区别于基于LoRA权重插值（ConceptSliders）、扩散特征空间插值（Freemorph）或视频帧插值（WAN-Video）的编辑后插值路线。该方法也存在明确局限：对本质上离散的编辑（如物体插入/移除）不适用，继承了基模型在精确几何变换上的弱点，且无法实现编辑强度的外推（s > 1 时编辑效果不再增强）。
 
-## 背景与动机
+
 
 ### 指令驱动图像编辑的现状与瓶颈
 
@@ -87,7 +87,9 @@ claims:
 
 通过将连续强度控制注入指令驱动编辑模型，Kontinuous Kontext 填补了“编辑内容”与“编辑程度”之间的控制鸿沟，为图像编辑提供了更细粒度的表达维度。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Kontinuous Kontext 的核心创新在于**首次将标量编辑强度作为显式控制维度引入指令驱动的图像编辑模型**，并通过调制空间注入机制实现统一、连续的强度控制。与现有方法相比，其关键突破体现在以下三个层面。
 
@@ -123,7 +125,7 @@ Kontinuous Kontext 通过**统一的强度投影器 + LoRA 适配**方案解决�
 
 **需要手动验证的点**：论文未提供与 ConceptSliders、MARBLE 等基线方法的详细架构对比（如参数量、训练数据规模），建议在阅读完整论文时核实这些方法的实现细节，以确保公平性评估的准确性。
 
-## 整体框架
+
 
 Kontinuous Kontext 的整体 pipeline 围绕一个核心目标展开：在指令驱动的图像编辑模型中引入**标量编辑强度**这一连续控制维度，使用户能够像调节“滑块”一样精细控制编辑的程度。整个框架分为两个关键阶段：**合成数据集构建**与**强度感知模型训练**。
 
@@ -170,7 +172,7 @@ $$\mathcal{L}_{\theta} = \mathbb{E}_{t \sim p(t), x, e, s, y_s} \left[ \| v_{\th
 ![[assets/figures/papers/paper_list_l2320_https_arxiv_org_abs_2510_08532/figures/001_Figure_1.jpg]]
 *Figure 1: Kontinuous Kontext produces smooth edit trajectories across diverse attributes given an image, instruction, and an edit scalar strength. Unlike prior methods that require attribute-specific training, ours is a unified approach to enable fine-grained control*
 
-## 核心模块与公式推导
+
 
 ### 关键模块设计
 
@@ -240,7 +242,9 @@ $$D_{\text{clip-dir}} = \frac{\sum_{i=0}^{N} (d_i / s_i)}{N}$$
 ![[assets/figures/papers/paper_list_l2320_https_arxiv_org_abs_2510_08532/figures/007_Figure_7.jpg]]
 *Figure 7: Adding text embeddings into the slider projector improves smoothness of edit transitions*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -332,7 +336,9 @@ Kontinuous Kontext 继承了 Flux Kontext 在精确几何操作上的弱点，�
 ![[assets/figures/papers/paper_list_l2320_https_arxiv_org_abs_2510_08532/figures/009_Table_1.jpg]]
 *Table 1: Baseline comparison*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位：指令驱动图像编辑的连续控制维度
 
@@ -400,6 +406,8 @@ Kontinuous Kontext 的核心技术决策可归纳为“**在调制空间而非�
 ### 知识库定位总结
 
 Kontinuous Kontext 在方法谱系中的核心贡献是**发现了调制空间作为连续编辑强度控制接口的潜力**，并通过轻量级投影器实现了校准后的统一控制。它既避免了编辑后插值方法的身份不一致和突变问题（δ_smooth 从 0.371 降至 0.329，Table 1a），又克服了领域特定方法需要为每个属性单独训练的局限性。该方法为指令驱动图像编辑引入了一个新的连续控制维度，其“调制空间注入”的设计范式可能对更广泛的生成模型可控性研究具有启发意义。
+
+
 
 ## 原文 PDF
 

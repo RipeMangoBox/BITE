@@ -44,7 +44,7 @@ claims:
 > - ScanQA (val) 上，CIDEr 103.0 vs 95.5 (BAGEL-7B-FT) (+7.5)。
 > - VSI-Bench 上，整体平均得分 55.4 vs 48.4 (SpatialMLLM-4B) (+7.0)。
 
-## 概述
+## 概要
 
 三维场景理解与生成长期被视为两个独立任务：理解模型依赖显式的三维输入（如点云、体素），而生成模型则专注于纹理合成，缺乏对三维空间关系的显式度量。这种割裂导致统一的多模态模型在空间推理、相对距离判断等任务上表现受限——仅靠纹理生成不足以构建完整的几何认知。
 
@@ -58,7 +58,7 @@ Omni-View 的核心洞察是“生成促进理解”：通过将生成过程拆�
 
 实验表明，Omni-View 在空间推理基准 **VSI-Bench** 上以平均 55.4 分排名第一，显著超过现有方法；在 **SQA3D** 上 EM 提升 2 点，在 **ScanQA** 上 CIDEr 提升 7.5。消融实验进一步验证：纹理模块的自回归生成使外观顺序任务提升 4.1 点，几何模块使相对距离等任务显著改善，而 D2S 训练策略对理解性能的贡献超过类似 Ross3D 的视觉重建方法。同时，Omni-View 在新颖视图合成与场景生成任务上取得了最高的 PSNR 和 SSIM，且保持理解性能不降，证实了“生成促进理解”范式的有效性。
 
-## 背景与动机
+
 
 三维场景理解是实现具身智能与环境交互的核心能力，要求模型能够同时处理多视角图像、理解空间关系并回答复杂查询。近年来，多模态大语言模型（MLLM）在二维视觉推理上取得了显著进展，但在三维场景理解中仍面临根本性瓶颈：**统一多模态模型缺乏显式的几何度量和时空建模能力，仅依靠纹理生成不足以完全理解三维空间关系**。
 
@@ -66,7 +66,9 @@ Omni-View 的核心洞察是“生成促进理解”：通过将生成过程拆�
 
 本文的核心洞察是 **“生成促进理解”**：通过将生成模型拆分为纹理模块与几何模块，利用自回归生成和深度/姿态估计任务迫使模型学习几何约束和时空一致性，并将这些从生成中习得的表示注入理解模型，实现理解与生成能力的协同增长。Omni-View 正是基于这一思想，在 BAGEL 的基础上引入双模块生成架构与两阶段训练策略，首次在多视图图像的统一框架下验证了生成能力对三维理解的促进作用。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Omni-View 的核心创新在于通过**“生成促进理解”**的机制，首次在统一多模态模型中显式引入几何与时空约束，从而突破现有方法在三维场景理解中的瓶颈。其关键设计围绕**双模块生成架构**与**两阶段训练策略**展开。
 
@@ -104,7 +106,7 @@ Omni-View 采用两阶段训练策略，实现理解与生成的协同增长：
 
 Omni-View 的创新本质在于：通过**双模块架构**将纹理生成与几何估计解耦，利用**自回归生成和 D2S 训练**注入时空约束，再通过**共享多模态自注意力**将这些生成过程中习得的几何与时空表示注入理解模型，最终实现“生成促进理解”的协同效应。这一设计使 Omni-View 在不依赖三维场景输入的条件下，在 VSI-Bench 空间推理基准上达到 55.4 的平均得分，超越所有现有方法。
 
-## 整体框架
+
 
 Omni-View 的整体框架以 BAGEL 的统一多模态理解-生成架构为基础，将其扩展至基于多视角图像的三维场景。如图 1 所示，系统由**理解模型**和**生成模型**两大组件构成，而生成模型又被进一步拆分为两个功能专一的模块：**纹理模块**和**几何模块**。这种“理解-生成”双体架构的核心设计理念是“生成促进理解”——通过让生成模型显式地学习几何与时空约束，并将这些约束通过特征交互注入理解模型，从而实现两类能力的协同增长。
 
@@ -129,7 +131,7 @@ $$[F_{dep}; \hat{g}] = GeometryModule([F_{tex}; N_{dep}; q_{cam}], F_{und})$$
 ![[assets/figures/papers/paper_list_l54_https_openreview_net_forum_id_pDu6u9cnEB/figures/001_Figure_1.jpg]]
 *Figure 1: Architecture of Omni-View. Building upon Bagel (Deng et al., 2025), Omni-View consists of an understanding model and a generation model. The generation model is further composed of two specialized modules: one for texture and one for geometry. Trained via a two-stage process, Omni-View shows high effectiveness in scene understanding and novel view synthesis. Crucially, it unlocks the benefits of its generative capabilities to enhance the model’s understanding performance*
 
-## 核心模块与公式推导
+
 
 ### 理解模型 (Understanding Model)
 
@@ -199,7 +201,9 @@ Omni-View 的核心设计在于纹理模块与几何模块的分离。消融实�
 ![[assets/figures/papers/paper_list_l54_https_openreview_net_forum_id_pDu6u9cnEB/figures/029_Figure_2.jpg]]
 *Figure 2: Generation in grid*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验结果
 
@@ -267,7 +271,9 @@ Omni-View 在三维场景理解、空间推理和生成任务上均展现出显�
 ![[assets/figures/papers/paper_list_l54_https_openreview_net_forum_id_pDu6u9cnEB/figures/008_Table_7.jpg]]
 *Table 7: Effect of training stage 2. The results in Table 7 show that stage 2 can significantly improve the scene generation performance of the model*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 基线关系与差异化贡献
 
@@ -302,6 +308,8 @@ Omni-View 处于**统一多模态理解与生成**和**三维场景表征学习*
 - **统一多模态模型谱系**：继承自 BAGEL 的理解-生成一体化范式，但首次将几何估计作为生成任务的一部分显式建模，为后续统一模型引入更多三维先验提供了可复用的架构模板。
 - **自回归三维生成**：将 Diffusion Forcing 与 D2S 课程策略结合，为三维场景的自回归生成提供了新的训练范式，其“从稠密到稀疏”的参考图像调度策略可迁移至其他需要时序建模的三维生成任务。
 - **多任务互促学习**：通过共享的多模态自注意力机制，验证了纹理合成、深度估计、相机姿态估计和理解任务间的正向迁移，为多任务三维基础模型的训练策略设计提供了实证依据。
+
+
 
 ## 原文 PDF
 

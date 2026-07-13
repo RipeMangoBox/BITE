@@ -43,7 +43,7 @@ claims:
 > - Point Odyssey (3D Point Tracking) 上，APD↑ 80.17 vs 68.72 (St4RTrack) (+11.45)；EPE↓ 16.07 vs 29.70 (St4RTrack) (-13.63)。
 > - Dynamic Replica (3D Point Tracking) 上，APD↑ 80.65 vs 68.13 (St4RTrack) (+12.52)。
 
-## 概述
+## 概要
 
 从视频序列重建动态场景的完整三维几何是计算机视觉中的一项基本挑战。现有方法通常采用逐帧或逐对的局部推理策略，无法有效聚合整个时间序列的全局几何信息，导致被遮挡区域的重建不完整且缺乏时空一致性。Complet4R 将这一任务重新定义为**几何完整4D重建**（Geometric Complete 4D Reconstruction）——一个统一的补全与重建框架：对于每一帧，模型利用所有其他帧的观测来补全被遮挡的几何区域，从而隐式地实现跨时间的一致性，无需显式的运动估计或逐对跟踪。
 
@@ -51,7 +51,7 @@ Complet4R 的核心设计是一个基于解码器（decoder-only）的全局 Tra
 
 在 SAIL-VOS 3D-test 基准的 4D 完整重建任务上，Complet4R 相比基线 St4RTrack（Sucar et al., ICCV 2025）在 Accuracy Mean 上获得约 45% 相对提升（0.92 → 0.50），Completion Mean 实现数量级改进（2.67 → 0.26）。在 Point Odyssey 和 Dynamic Replica 的 3D 点跟踪任务上，APD 指标分别提升 11.45 和 12.52 个百分点。定性结果表明，Complet4R 能够成功补全在当前帧被遮挡但在其他帧可见的几何区域，而基线方法仅能给出不完整的重建。
 
-## 背景与动机
+
 
 ### 从静态重建到动态世界的鸿沟
 
@@ -88,7 +88,9 @@ Complet4R的出发点正是对这一瓶颈的突破。其核心洞察在于：**
 
 Complet4R通过引入**聚合令牌**和**全局Transformer架构**来应对这些挑战，将4D重建从局部推理的局限中解放出来，迈向全局一致的几何完整重建。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Complet4R 的核心创新在于将“几何完整4D重建”重新定义为一个**全局聚合驱动的补全任务**，而非传统的逐帧或成对重建。其关键设计是让模型从整个视频序列中为每一帧聚合所有其他帧的几何信息，从而直接输出包含被遮挡区域的完整三维几何，无需显式的运动估计或帧间跟踪。这一思想通过以下四个关键槽位的改变得以实现：
 
@@ -128,7 +130,7 @@ Complet4R 处于**视频驱动的稠密几何重建**与**时空补全**的交�
 
 在4D完整重建任务上，Complet4R 显著超越 **St4RTrack**（序列模式和成对模式），在 SAIL-VOS 3D-test 上 Accuracy Mean 从 0.92 降至 0.50（相对提升约45%），Completion Mean 从 2.67 降至 0.26（数量级改进）。在3D点跟踪任务上，Complet4R 同样优于 **St4RTrack、MonST3R** (Zhang et al., arXiv 2024) 和 **SpaTracker** (Xiao et al., CVPR 2024)，在 Point Odyssey 上 APD 达到 80.17（+11.45），EPE 降至 16.07（-13.63）。
 
-## 整体框架
+
 
 Complet4R 是一个基于解码器架构的全局 Transformer 框架，将几何完整 4D 重建形式化为统一的跨帧聚合补全任务。其核心设计理念是：对于任意目标时间戳，利用所有其他帧的观测信息，直接聚合出包含遮挡区域的完整三维几何表示，从而隐式实现时空一致性，无需显式的运动估计或逐对跟踪。
 
@@ -182,7 +184,7 @@ $$\mathcal { L } = \lambda \mathcal { L } _ { \mathrm { p o i n t } } + \mathcal
 ![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2603_27300/figures/002_Figure_2.jpg]]
 *Figure 2: Geometric 4D complete reconstruction from observations. Given input frames, Complet4R aggregates contextual information across all timestamps. Consequently, at each timestamp T , the reconstructed scene incorporates the geometry from frame T along with complementary information from all other frames*
 
-## 核心模块与公式推导
+
 
 ### 问题形式化与统一映射
 
@@ -236,7 +238,9 @@ $$\mathcal { L } _ { \mathrm { p o i n t } } = \displaystyle \sum _ { i = 1 } ^ 
 ![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2603_27300/figures/003_Figure_3.jpg]]
 *Figure 3: Architecture Overview. By concatenating special aggregation tokens, Complet4R identifies the specific timestamp for aggregation. The Aggregation head then outputs the positions of 3D points from other views at this timestamp, aggregating 3D point maps across frames to form a complete geometric representation*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 4D完整重建：主实验结果
 
@@ -303,7 +307,9 @@ Table 3的消融实验系统验证了三个核心设计选择的有效性，所�
 ![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2603_27300/figures/017_Figure_8.jpg]]
 *Figure 8: More Qualitative Results for 3D Dynamic Point Tracking. The first column shows the input images; the second and third columns display the tracking trajectories produced by our method at successive time steps. The smooth trajectories demonstrate strong spatiotemporal geometric consistency*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定义的范式转换
 
@@ -366,6 +372,8 @@ Complet4R 的核心假设是：场景中所有区域至少在某帧中被观测�
 4. **与生成式方法的融合**：Figure 7将Complet4R与**DreamScene4D**进行了定性对比，展示了更高的重建质量。但DreamScene4D代表了一类基于生成先验的4D重建方法，Complet4R的纯几何聚合思路是否能与生成式先验互补，是一个值得探索的方向。
 
 5. **多模态扩展**：当前方法仅依赖RGB输入，未来可考虑融合深度传感器、IMU等多模态信号，以增强在纹理缺失或光照极端场景下的鲁棒性。
+
+
 
 ## 原文 PDF
 

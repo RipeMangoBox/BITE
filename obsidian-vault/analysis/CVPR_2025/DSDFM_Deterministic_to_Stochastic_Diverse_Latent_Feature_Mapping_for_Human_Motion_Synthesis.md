@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/DSDFM_Deterministic_to_Stochastic_Diverse_Latent_Feature_Mapping_for_Human_Motion_Synthesis.pdf
+project_link: null
+code_link: null
 aliases:
 - DDSDLFM
 - DSDLFMHMS
@@ -42,7 +44,7 @@ claims:
 > - HumanAct12 Unconditional 上，FID↓ 12.86 vs 13.03 (Modi) (-1.31%)；Diversity↑ 18.41 vs 17.57 (Modi) (+4.78%)。
 > - HumanAct12 Action-to-Motion 上，FID↓ 0.068 vs 0.072 (MotionDiffuse) (-5.6%)；Accuracy↑ 0.994 vs 0.991 (MotionDiffuse) (+0.3%)。
 
-## 概述
+## 概要
 
 ### 问题定位
 
@@ -86,7 +88,7 @@ DSDFM 属于**基于潜空间的生成式人体运动合成方法**，其知识�
 
 > **注意**：本文未提供发表年份与会议信息，以上定位基于分析文本中的方法对比与引用推断，建议在正式引用时核实原始论文的发表状态。
 
-## 背景与动机
+
 
 人体运动合成旨在生成自然、逼真且多样化的人体动作序列，在动画制作、虚拟现实、人机交互等领域具有广泛应用。近年来，深度生成模型在该领域取得了显著进展，其中基于分数的生成模型（Score-based Generative Models, SGMs）和流匹配（Flow Matching）方法展现出强大的生成能力。然而，这些方法在人体运动生成中面临一个核心瓶颈：**训练过程采用曲线轨迹，导致训练不稳定、采样效率低，且难以同时保证生成质量与多样性**。
 
@@ -96,7 +98,9 @@ DSDFM 属于**基于潜空间的生成式人体运动合成方法**，其知识�
 
 本文的动机正是源于对这一困境的深入观察。作者提出 DSDFM（Deterministic-to-Stochastic Diverse Latent Feature Mapping），其核心思路是将确定性映射与随机多样性生成**解耦**：在训练阶段，通过最优传输（Optimal Transport）将高斯分布到潜空间的映射线性化，使模型仅需学习直线漂移量，从而消除复杂的去噪或分数估计过程，实现稳定高效的训练；在推理阶段，引入可调噪声水平的随机微分方程（DivSDE），复用确定性映射的输出进行二次计算，在无需额外训练的前提下实现多样性增强。这种“先确定、后随机”的设计哲学，使得模型既能享受直线轨迹带来的训练与采样效率优势，又能获得可控的生成多样性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DSDFM 的核心创新在于将人体运动生成中的**确定性映射**与**随机多样性生成**解耦为两个独立阶段，从而在无需重新训练的情况下同时保证生成质量、多样性与采样效率。相较于现有基于分数的生成模型（SGMs）和流匹配方法，DSDFM 在以下三个关键维度上实现了根本性改变：
 
@@ -136,7 +140,7 @@ DivSDE 的关键优势在于**直接复用 DerODE 的确定性输出** $\widetil
 
 这种“确定性骨架 + 随机性外挂”的架构设计，使得 DSDFM 在保持高质量生成的同时，实现了训练与推理的双重高效，为人体运动合成提供了一种更优雅且实用的解决方案。
 
-## 整体框架
+
 
 DSDFM（Deterministic-to-Stochastic Diverse Latent Feature Mapping）将人体运动合成分解为两个解耦的阶段，分别对应**潜空间重建**与**多样化生成**，其总览如 **Figure 2** 所示。第一阶段（红色箭头）通过 VQVAE 学习人体运动的紧凑潜表征；第二阶段（绿色箭头）先利用确定性常微分方程（DerODE）建立高斯分布到潜空间的直线映射，再在推理时注入可控的随机微分方程（DivSDE）以产生多样化输出。两阶段分离的核心动机在于：传统基于分数的生成模型（SGMs）与流匹配方法依赖弯曲的 SDE 训练轨迹，导致训练不稳定、采样效率低，且生成质量与多样性难以兼得。DSDFM 将确定性直线映射与随机多样性生成解耦，从而无需重新训练即可灵活调节多样性。
 
@@ -189,7 +193,7 @@ $$
 
 这一 pipeline 将训练复杂度压缩至直线路径上的漂移预测，同时将多样性控制完全置于推理阶段，实现了训练稳定性、采样效率与生成多样性的分离优化。
 
-## 核心模块与公式推导
+
 
 DSDFM 由两个核心阶段构成：第一阶段通过 VQVAE 学习人体运动的紧凑潜空间表征；第二阶段通过确定性特征映射（DerODE）与随机多样化生成（DivSDE）实现从高斯噪声到多样化运动潜变量的高效转换。以下分别阐述各模块的设计逻辑与关键公式。
 
@@ -255,7 +259,9 @@ $$
 
 其中 $\varepsilon \sim \mathcal{N}(0,I)$，$\Delta t$ 为时间步长。该更新包含三项：漂移项将 $z$ 推向原点，确定性引导项利用 $\widetilde{z}_{0,i}$ 提供结构约束，噪声项通过 $\eta$ 调节多样性强度。DivSDE 直接借用 DerODE 已计算的结果，无需重新引入其他训练过程，实现了确定性映射与随机多样性的解耦。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 评估设置
 
@@ -351,7 +357,9 @@ Figure 3 展示了 DSDFM 在不同设置下的生成结果，包括无条件生�
 ![[assets/figures/papers/paper_list_l1856_DSDFM_Deterministic_to_Stochastic_Diverse_Latent_Feature_Mapping_for_Hum/figures/011_Figure_6.jpg]]
 *Figure 6: Qualitative results of DSDFM. We present the diverse human motion sequences under different actions*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：分数生成模型的瓶颈
 
@@ -442,6 +450,8 @@ DSDFM在人体运动生成领域的方法谱系中占据以下位置：
 - **多样性控制**：从“训练时隐式学习”演进为“推理时显式注入”，属于**可控多样性**分支。
 
 该方法的核心贡献在于**通过最优传输实现训练与推理的机制分离**，为生成模型的设计提供了一个可泛化的范式：确定性映射负责质量，随机注入负责多样性，两者独立优化、协同工作。
+
+
 
 ## 原文 PDF
 

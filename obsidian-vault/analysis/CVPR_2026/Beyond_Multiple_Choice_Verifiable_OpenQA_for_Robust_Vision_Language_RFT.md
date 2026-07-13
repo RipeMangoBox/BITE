@@ -43,7 +43,7 @@ claims:
 > - 四项基准上OpenQA准确率平均提升 上，OpenQA Accuracy 约+6个百分点 vs MCQA训练 (+6pp)。
 > - ReVeL评判准确率 vs 纯LLM Judge 上，Overall Judging Accuracy ReVeL: 98.5% vs LLM Judge: 97.3% (GPT-4.1 mini) (+1.2pp, FPR从2.0%降至0.3%)。
 
-## 概述
+## 概要
 
 视觉语言模型（VLM）的评估与强化微调（RFT）长期依赖多项选择题（MCQA）格式。然而，MCQA中的选项为模型提供了可利用的捷径信号：模型可以通过选项间的相对比较、位置记忆和排除法猜出正确答案，而非依赖真正的知识或推理能力。这种**选项依赖性**导致两个严重后果：其一，MCQA评估指标系统性虚高，相对开放域评估（OpenQA）最高可达20个百分点；其二，在RFT过程中，模型利用选项捷径的行为被作为正奖励信号强化，进一步损害开放域泛化能力，拉大MCQA与OpenQA之间的表现差距。
 
@@ -51,7 +51,7 @@ claims:
 
 实验证据支撑了这一方案的有效性：在MCQA数据上进行RFT会提升选择题分数但损害开放域表现（MMMU上3B和7B模型的MCQA-OpenQA差距均扩大）；而使用ReVeL改写后的OpenQA数据进行训练，使OpenQA准确率平均提升约6个百分点，同时MCQA分数保持竞争力，整体得分（40.4）显著超过MCQA训练基线（36.3）。大规模评估进一步揭示，从MCQA切换到OpenQA后，包括GPT-5在内的最强模型也出现大幅准确率下降（MMMU上GPT-5下降19.8个百分点），表明MCQA分数虚高是一个普遍性挑战，而非仅影响特定模型。
 
-## 背景与动机
+
 
 ### 选择题评估的隐性代价
 
@@ -93,7 +93,9 @@ GPT-5在MMMU基准上从MCQA切换到OpenQA后准确率下降19.8个百分点（
 
 因此，本文提出ReVeL框架，通过将MCQA问题按答案类型分类并分别设计改写策略，在保留可验证性的前提下消除选项依赖，从而对齐评估与训练的信号来源。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题根源：MCQA格式的选项依赖性
 
@@ -140,7 +142,7 @@ ReVeL的核心技术洞察在于：通过将MCQA问题按答案类型分为四�
 
 实验表明，Qwen2.5-VL-7B经ReVeL OpenQA训练后，在四项基准上的综合得分达到40.4，显著超过MCQA训练的36.3（+4.1），且OpenQA准确率提升约6个百分点，同时MCQA分数保持竞争力（Table 6）。这一结果验证了格式转换作为核心创新的有效性——不是通过更强的模型或更多的数据，而是通过消除评估和训练中的结构性偏差来实现鲁棒的性能提升。
 
-## 整体框架
+
 
 ReVeL 的核心设计目标是将 MCQA 数据转换为可确定性验证的开放问答（OpenQA）格式，从而消除选项带来的评估失真与训练偏差。框架按 **分流与分类 → 基于提示的改写 → 混合评估与验证** 三阶段流水线组织，如图 5 所示。
 
@@ -180,7 +182,7 @@ ReVeL 的核心设计目标是将 MCQA 数据转换为可确定性验证的开�
 ![[assets/figures/papers/paper_list_l739_https_arxiv_org_abs_2511_17405/figures/021_Figure_10.jpg]]
 *Figure 10: This prompt is used to filter out questions that exhibit characteristics such as option dependency, subjectivity and under-specification in stage 1 of our pipeline*
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题形式化与选项依赖的量化
 
@@ -239,7 +241,9 @@ $$\text{Over-True Ratio} = \frac{\text{Number of answers with >1 correct option}
 ![[assets/figures/papers/paper_list_l739_https_arxiv_org_abs_2511_17405/figures/010_Table_5.jpg]]
 *Table 5: Examples of our ReVeL Pipeline applied to different question types. Each quadrant displays an original multiple-choice question and its OpenQA counterpart*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：MCQA分数虚高与RFT的捷径强化
 
@@ -326,7 +330,9 @@ $$\text{Over-True Ratio} = \frac{\text{Number of answers with >1 correct option}
 ![[assets/figures/papers/paper_list_l739_https_arxiv_org_abs_2511_17405/figures/018_Figure_7.jpg]]
 *Figure 7: Illustration of the Option-Anchoring Phenomenon. Left (Standard MCQA): when "Egg tempera" is an available option, the AI model analyzes the painting’s features—such as its matte finish and delicate colors—and concludes they are characteristic of egg tempera. Right (NOTA setting): the same model is presented with the same painting, but the "Egg tempera" option is removed and replaced with "None of the above options are correct". The model’s reasoning now shifts, describing the painting’s texture and detail as characteristic of oil paint*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -373,6 +379,8 @@ ReVeL的适用边界由以下条件界定：
 4. **改写质量保证机制。** 随着模型能力增强，改写环节引入的错误是否会显著减少，还是需要额外的质量保证机制（如人工抽检、多模型交叉验证）？这一问题在当前工作中未得到系统回答。
 
 5. **选项锚定效应的深层机制。** 论文通过NOTA替换实验（Figure 7）揭示了“选项锚定现象”——模型会根据可用选项调整推理方向。但这一现象的认知机制和跨模型泛化规律尚未被系统研究，理解其深层原因可能为设计更鲁棒的评估格式提供新思路。
+
+
 
 ## 原文 PDF
 

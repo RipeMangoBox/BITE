@@ -5,6 +5,7 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/SimULi_Real_Time_LiDAR_and_Camera_Simulation_with_Unscented_Transforms.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/sil/projects/simuli/
 aliases:
 - SimULi
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | SimULi：基于无迹变换的实时激光雷达与相机仿真 |
 | 英文题名 | SimULi: Real-Time LiDAR and Camera Simulation with Unscented Transforms |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://arxiv.org/abs/2510.12901); [Project](https://research.nvidia.com/labs/sil/projects/simuli); [Project](https://research.nvidia.com/labs/sil/projects/simuli/) |
+| Links | [paper](https://arxiv.org/abs/2510.12901) · [Project](https://research.nvidia.com/labs/sil/projects/simuli) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | SimULi |
 | Dataset | Waymo Interp, Waymo Dynamic, PandaSet Reconstruction |
@@ -41,7 +42,7 @@ claims:
 > - Waymo Dynamic 上，PSNR 为 32.35，对比 30.60 (SplatAD)，变化 +1.75。
 > - Waymo Interp 上，MP/s (camera rendering speed) 为 156.90，对比 49.98 (SplatAD)，变化 +106.92。
 
-## 概述
+## 概要
 
 自动驾驶仿真面临一个核心瓶颈：现有方法无法在实时性约束下同时高质量渲染任意相机模型（如鱼眼镜头）与激光雷达数据。由于跨传感器数据存在天然不一致性，将相机和激光雷达信息编码到同一表示中会迫使模型牺牲某一模态的精度——要么相机质量下降，要么激光雷达几何失真。
 
@@ -51,7 +52,7 @@ SimULi 针对这一瓶颈提出了一个因果性解决方案：**因子化3D高
 
 该方法在方法谱系中处于 3D 高斯溅射与多传感器联合仿真的交汇点。与 **SplatAD**（统一高斯表示，仅支持针孔相机）和 **NeuRAD**（Tonderski et al., CVPR 2024，基于 NeRF 的联合表示）不同，SimULi 通过因子化表示解耦传感器特性；与 **3DGUT**（Wu et al., CVPR 2025，支持畸变相机但无激光雷达）相比，SimULi 扩展了激光雷达渲染能力并引入自动瓦片策略。其自动瓦片策略无需手工启发即可适应任意旋转激光雷达模型，这一能力在先前的 SplatAD 中需要针对每种传感器单独设计。
 
-## 背景与动机
+
 
 自动驾驶系统的闭环仿真与感知模型训练，高度依赖对多模态传感器数据的高保真重建与实时渲染。激光雷达（LiDAR）与相机是当前自动驾驶感知栈的两大核心传感器，前者提供精确的三维几何信息，后者捕获丰富的视觉外观。然而，现有方法在同时处理这两种模态时，始终面临一个根本性瓶颈：**无法在实时渲染的前提下，同时支持任意相机模型（如鱼眼镜头、卷帘快门）与激光雷达数据的高质量合成**。这一瓶颈迫使现有方案必须在某一模态的精度上做出妥协。
 
@@ -63,7 +64,9 @@ SimULi 针对这一瓶颈提出了一个因果性解决方案：**因子化3D高
 
 在上述背景下，**SimULi** 提出了一个统一的实时传感器仿真框架，其核心动机是通过**因子化表示**打破跨传感器不一致性带来的精度瓶颈，并通过**自动化瓦片策略**与**无迹变换相机渲染**实现对任意传感器配置的实时支持。该方法不追求在单一表示中融合两种模态，而是让相机与激光雷达各自拥有独立的高斯粒子集，再通过几何锚定损失进行耦合，从而在保持实时渲染的前提下，同时提升两种模态的合成质量。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SimULi 的核心创新在于通过**因子化表示**与**渲染效率优化**两个维度，系统性地解决了现有联合相机-激光雷达仿真方法中模态精度互斥与实时性不足的双重瓶颈。
 
@@ -98,7 +101,7 @@ $$\mathcal{L}_{anchor} = \frac{1}{n} \sum_{i \in G_c}^{n} \| \mu_i - NN(\mu_i, G
 - **重建质量**：Waymo Interp 上 PSNR 30.15 dB，超越 SplatAD 2.33 dB（Table 1）；PandaSet 上 PSNR 29.76 dB，超越 SplatAD 1.18 dB（Table 3）
 - **参数效率**：SimULi 全局高斯数量上限为 4M，低于 SplatAD 的 5M，却同时实现了更快渲染与更高精度
 
-## 整体框架
+
 
 SimULi 的整体流程围绕一个核心设计展开：**将相机与激光雷达信息编码到两个独立的 3D 高斯粒子集中**，通过最近邻锚定损失进行耦合，从而在统一的动态场景图下实现跨模态的实时渲染与联合优化。
 
@@ -166,7 +169,7 @@ $$\mathcal { L } _ { \mathrm { r e g } } : = \mathcal { L } _ { \mathrm { e n t 
 
 整个框架的模块间关系可概括为：场景图分解为表示提供可控性基础 → 因子化高斯集独立编码各模态信息 → 相机渲染器（基于无迹变换）和激光雷达渲染器（自动瓦片+射线剔除）并行工作 → 锚定损失实现跨模态几何耦合 → 多任务重建损失与正则化项联合驱动优化。这一设计使得 SimULi 在使用比 SplatAD 更少的高斯粒子（4M vs 5M）的条件下，实现了 1.5–20 倍的渲染加速和高达 40% 的误差降低。
 
-## 核心模块与公式推导
+
 
 ### 1. 场景表示：因子化3D高斯
 
@@ -243,7 +246,9 @@ $$\mathcal{L}_{reg} := \mathcal{L}_{entropy} + \mathcal{L}_{TV} + \lambda_{drift
 
 包含熵正则（鼓励激光雷达高斯的二值不透明度）、总变分正则、身份漂移惩罚、尺度正则和透明度正则。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -321,7 +326,9 @@ SimULi 在三个主流自动驾驶仿真基准上进行了评估：**Waymo Inter
 ![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2510_12901/figures/022_Table_8.jpg]]
 *Table 8: LiDAR Projection. We compare our LiDAR projection strategy to linearization and Monte Carlo sampling alternatives. Our results are near-identical to Monte Carlo sampling despite projecting far fewer points per Gaussian*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 技术脉络与工作定位
 
@@ -378,6 +385,8 @@ SimULi 对SplatAD的突破在于**因子化表示**：将相机高斯集 $G_c$ �
 4. **非刚性动态建模。** 将现有的非刚性物体建模方案（如可变形高斯）集成到因子化框架中，需要处理相机高斯与激光雷达高斯的独立变形以及锚定关系的动态维护，这涉及表示层面的非平凡设计。
 
 5. **自动瓦片策略的进一步泛化。** 将基于CDF的自动瓦片从旋转激光雷达推广到任意扫描模式的传感器，需要在方位-仰角二维空间上设计高效的瓦片划分算法，并验证其在不同传感器上的负载均衡效果。
+
+
 
 ## 原文 PDF
 

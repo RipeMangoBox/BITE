@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/Ref4D_VideoBench_Four_Dimensional_Reference_Based_Evaluation_of_Text_to_Video_Generative_Models.pdf
+project_link: null
 code_link: "https://github.com/TAILab-W/Ref4D-VideoBench"
 aliases:
 - RV
@@ -42,7 +43,7 @@ claims:
 > [!tip] 效果简介
 > - Ref4D-VideoBench human correlation 上，SRCC (Semantic) 0.822 vs Q-Align 0.317 (最佳无参考基线) (+0.505)；SRCC (Motion) 0.659 vs Q-Align 0.358 (最佳无参考基线) (+0.301)；SRCC (Event) 0.755 vs 最强无参考基线 0.220 (from Tab.1) (+0.535)。
 
-## 概述
+## 概要
 
 文本到视频（T2V）生成模型近年来迅速发展，但如何可靠地评估生成视频的质量仍是一个核心瓶颈。现有主流方法采用无参考评估范式，仅依赖文本提示对生成视频进行整体质量或维度评分。然而，这类方法缺乏样本级的显式时空证据，难以对目标行为偏差、时间不一致、常识违规等细粒度失败进行可解释的归因，导致评估可信度与诊断能力不足。
 
@@ -54,7 +55,7 @@ claims:
 
 该框架的局限性在于强依赖高质量参考视频的可用性，在无法获得对应参考的开放场景中适用性受限；世界知识评估依赖 MLLM 生成规则和评分，其偏见可能传递到最终分数。未来工作方向包括探索无参考或弱监督扩展、设计更可解释的非线性聚合器，以及将评估框架直接用于生成模型的对齐训练。
 
-## 背景与动机
+
 
 ### 文本到视频生成评估的现状与瓶颈
 
@@ -76,7 +77,9 @@ claims:
 
 基于这一洞察，本文提出 **Ref4D-VideoBench**，一个基于参考视频的四维评估基准。该框架从参考视频中提取四类结构化证据——**实体-属性列表**（语义维度）、**前景/背景运动统计量**（运动维度）、**事件边界与事件图**（事件时间维度）、**物理/因果/安全规则**（世界知识维度）——并针对每个维度设计显式的原子指标，最终通过学习的线性聚合器输出可解释的四维评分。这一设计使得评估结果不仅与人类判断高度对齐，还能逐维度、逐指标地诊断生成模型的失败模式，为模型改进提供明确的优化方向。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 1. 问题瓶颈：无参考评估的证据缺失
 
@@ -124,7 +127,7 @@ Ref4D-VideoBench 构建了四个相互补充的评估维度，每个维度对应
 - **线性聚合假设**：维度分数的线性聚合假设原子指标与人类评分之间为线性关系，可能无法捕捉更复杂的非线性交互。
 - **MLLM 的偏见传递**：世界知识评估依赖 MLLM 生成规则和进行 VQA 评分，其偏见和幻觉可能传递到最终分数，需要进一步验证和校准。
 
-## 整体框架
+
 
 Ref4D-VideoBench 的核心设计理念是将视频生成评估从“文本-视频对齐”范式转变为“参考-视频一致性检查”范式。其整体 pipeline 如图 1 所示，以一对**参考视频**和**生成视频**为输入，通过统一的**证据提取前置模块**为四个评估维度提供结构化时空证据，随后各维度独立计算可解释的原子指标，最终输出四维评估分数。
 
@@ -157,12 +160,9 @@ $$S^{(d)}(x) = w^{(d)\top} f^{(d)}(x) + b^{(d)}$$
 
 这一设计使评估结果既具备样本级的细粒度诊断能力（每个原子指标均可单独回溯），又在维度层面与人类判断保持高度一致。
 
-### 补充图表
 
-![[assets/figures/papers/paper_list_l2210_https_openaccess_thecvf_com_content_CVPR2026_html_Wei_Ref4D_VideoBench_F/figures/001_Figure_1.jpg]]
-*Figure 1: Overview of the Ref4D-VideoBench evaluation framework. Given a reference video and a generated video, our framework: (i) extracts entity–attribute evidence for basic semantic alignment; (ii) segments videos into events and constructs event graphs for event temporal consistency; (iii) computes foreground/background motion statistics and freezing indicators for motion consistency; (iv) derives per-video world knowledge rules, converts them into targeted visual question answering (VQA) items with an MLLM, and scores the responses to assess world knowledge consistency. The framework outputs four-dimensional scores for basic semantic alignment, motion consistency, event temporal consistency, and...*
 
-## 核心模块与公式推导
+
 
 ### 1. 评估框架总览
 
@@ -251,7 +251,9 @@ $$S_{\text{world}} = \frac{\sum_{q \in B^{+}} \alpha_q \tilde{c}_q}{\sum_{q \in 
 
 消融实验（Table 4）表明，移除基于参考视频构建的规则库后，SRCC 从 0.847 剧降至 0.406，验证了参考驱动规则库是该维度的核心驱动力。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：四维人类相关性评估
 
@@ -299,7 +301,9 @@ Figure 4 以羚羊追逐场景为例展示了框架的逐样本诊断能力。**
 
 需要指出以下限制：(1) 框架强依赖高质量参考视频，对于无法获得对应参考的开放场景适用性受限；(2) 线性聚合器假设原子指标与人类评分间为线性关系，可能遗漏非线性交互；(3) 世界知识评估依赖 MLLM 生成规则并进行 VQA 评分，其偏见和幻觉可能传递至最终分数；(4) 当前数据集规模为 600 个视频，主题覆盖有限，泛化性需进一步验证。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有评估范式的关键差异
 
@@ -346,6 +350,8 @@ Ref4D‑VideoBench 处于**参考驱动视频评估**的新兴节点，与以下
 - **评估到优化的闭环**：Ref4D‑VideoBench 的原子指标是否可直接用作生成模型对齐训练（如 RLHF）的奖励函数？这需要验证原子指标的可微性、平滑性及其对生成质量的因果影响。
 
 **总结**：Ref4D‑VideoBench 通过引入参考视频作为结构化时空证据，在评估可信度、可解释性和诊断能力上实现了对无参考范式的显著超越。其适用边界明确，开放问题指向无参考扩展、聚合器改进和评估-优化闭环等方向，为视频生成评估领域提供了清晰的后续研究路标。
+
+
 
 ## 原文 PDF
 

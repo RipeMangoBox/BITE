@@ -5,6 +5,8 @@ paper_level: A
 venue: SIGGRAPH
 year: 2025
 pdf_ref: paperPDFs/SIGGRAPH_2025/Motion_Inversion_for_Video_Customization.pdf
+project_link: https://wileewang.github.io/MotionInversion/
+code_link: null
 aliases:
 - MIVC
 tags:
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 面向视频定制的运动反演 |
 | 英文题名 | Motion Inversion for Video Customization |
 | 会议/期刊 | SIGGRAPH 2025 |
-| Links | [paper](https://arxiv.org/abs/2403.20193); [Project](https://wileewang.github.io/MotionInversion/) |
+| Links | [paper](https://arxiv.org/abs/2403.20193) · [Project](https://wileewang.github.io/MotionInversion/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | Motion Inversion |
 | Dataset | DAVIS, WebVID, 在线视频（Video evaluation set） |
@@ -42,7 +44,7 @@ claims:
 > - Video evaluation set (DAVIS, WebVID, online sources) 上，Text Similarity 为 0.3113，变化 best result among compared methods。
 > - Video evaluation set (DAVIS, WebVID, online sources) 上，FID 为 550.38，变化 lowest (best) among compared methods。
 
-## 概述
+## 概要
 
 视频定制生成的核心挑战在于从参考视频中提取运动模式并将其可靠地迁移至不同外观的生成对象上。现有方法的根本瓶颈在于缺乏显式且时序解耦的运动表示——运动与外观特征在模型内部高度纠缠，导致跨类别运动迁移时出现外观泄露或运动失真。
 
@@ -52,7 +54,7 @@ claims:
 
 实验结果表明，该方法在运动保真度、文本相似度、FID和用户偏好四项指标上均优于所有对比基线，验证了时序解耦运动表示在视频定制任务中的有效性。
 
-## 背景与动机
+
 
 视频生成模型的快速发展使得从文本描述生成逼真视频成为可能，但如何在保持生成内容多样性的同时精确控制视频中的运动模式，仍是一个尚未解决的核心挑战。现有方法面临一个根本性瓶颈：**缺乏显式且时序解耦的运动表示**。在标准文本到视频（T2V）扩散模型中，运动信息隐式地编码在时间注意力模块的跨帧交互中，与外观特征深度纠缠。这种耦合导致两个直接后果：其一，从参考视频中提取的运动特征不可避免地携带了源对象的形状、纹理等静态外观信息；其二，将提取到的运动模式迁移至不同对象类别时，外观残留会污染生成结果，导致运动迁移的可靠性显著下降。
 
@@ -60,7 +62,9 @@ claims:
 
 本文的核心动机源于一个关键洞察：**时间变压器模块中的自注意力计算天然具备建模帧间关系的能力，但需要一种精心设计的调制信号来引导其聚焦于运动而非外观**。具体而言，影响注意力图的查询-键（Query-Key）交互决定了哪些帧之间建立强关联，而值（Value）聚合则决定了传递到输出特征的具体信息内容。通过在这两个环节分别注入结构化的运动嵌入，可以从机制层面实现对运动模式的解耦控制。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于提出了一种**显式、时序解耦的运动表示**，并配套设计了**双重外观去偏机制**，从而解决了现有视频定制方法中运动与外观特征纠缠的瓶颈问题。
 
@@ -102,7 +106,7 @@ $$\tilde{\mathbf{m}}_i^V[:, j, :] = \begin{cases} \mathbf{m}_i^V[:, j, :], & j=1
 
 这两种策略协同工作：查询-键嵌入从注意力机制层面阻止外观信息进入全局关系建模，值嵌入差分则从特征层面消除局部运动表示中的静态外观残留。消融实验证实，同时使用两类嵌入并配合差分运算，才能获得最佳的文本-视频相似度和运动保真度。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l22_Motion_Inversion_for_Video_Customization/figures/001_Figure_1.jpg]]
 *Figure 1: Applications of the proposed Motion Embeddings for customized video generation. Our method supports a wide range of motion types, including various camera movements and object motions. In each example, the first row shows the source video, while the second row shows the output. Please refer to the supplementary videos for clearer visualization*
@@ -149,7 +153,7 @@ $$\tilde{\mathbf{m}}_i^V[:, j, :] = \begin{cases} \mathbf{m}_i^V[:, j, :], & j=1
 
 框架的性能瓶颈在于运动与外观的纠缠问题。两个设计决策构成了因果调节的枢纽：其一，运动查询-键嵌入显式排除空间维度（$H$ 和 $W$），使其仅能捕获全局时序关系，从根本上阻断了外观信息的注入路径（Figure 3 左）；其二，运动值嵌入虽保留空间维度以捕获局部动态，但通过推理阶段的差分运算去除静态外观，仅保留帧间变化量（Figure 3 右）。这两个策略协同工作，实现了运动与外观的时序解耦，是方法能够跨对象类别进行可靠运动迁移的核心机制。
 
-## 核心模块与公式推导
+
 
 ### 时间变压器中的自注意力基础
 
@@ -197,7 +201,9 @@ $$\tilde{\mathbf{m}}_i^V[:, j, :] = \begin{cases} \mathbf{m}_i^V[:, j, :], & j=1
 
 消融实验（Figure 6、Figure 7）验证了这一双重设计的必要性：单独使用任一类嵌入均导致文本-视频相似度和运动保真度下降，而去除差分运算同样显著损害生成质量。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 定量评估
 
@@ -246,7 +252,9 @@ $$\tilde{\mathbf{m}}_i^V[:, j, :] = \begin{cases} \mathbf{m}_i^V[:, j, :], & j=1
 - **模型依赖性**：运动表示高度依赖所使用的基础T2V模型，对模型内部参数的改动较为敏感，跨模型泛化能力有待验证。
 
 以上局限表明，进一步分离实例级运动并降低对特定模型的依赖是未来改进的潜在方向。
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有运动定制方法的异同
 
@@ -292,6 +300,8 @@ Motion Inversion 在视频生成知识库中的定位可概括为：
 - **技术路线**：基于预训练 T2V 扩散模型的时间注意力调制，通过可学习的运动嵌入实现时序关系的显式控制。
 - **核心贡献**：首次提出通过结构设计（去空间维度）和运算策略（帧间差分）主动消除运动表示中的外观偏差，为运动与外观的解耦提供了可验证的技术方案。
 - **证据强度**：定量实验（Table 1）显示，该方法在文本相似度（0.3113）、运动保真度（0.9552）、FID（550.38）和用户偏好（39.35%）四项指标上均优于所有对比基线；消融实验（Figure 6, Figure 7）进一步验证了双重去偏设计的必要性。
+
+
 
 ## 原文 PDF
 

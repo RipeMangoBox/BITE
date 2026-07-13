@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2024
 pdf_ref: paperPDFs/arxiv_2024/MoGenTS_Motion_Generation_based_on_Spatial_Temporal_Joint_Modeling.pdf
+project_link: null
+code_link: null
 aliases:
 - MoGenTS
 tags:
@@ -40,7 +42,7 @@ claims:
 > - HumanML3D 上，FID↓ 0.033±.001 vs 0.045±.002 (MMM) (−0.012 (26.7% relative))；R-Precision Top-1↑ 0.529±.003 vs 0.521±.002 (MoMask) (+0.008 (1.5%))；R-Precision Top-2↑ 0.719±.002 vs 0.713±.002 (MoMask) (+0.006 (0.8%))。
 > - KIT-ML 上，FID↓ 0.143±.009 vs 0.404±.027 (MLD) (−0.261 (64.6%))；R-Precision Top-1↑ 0.445±.004 vs 0.417±.004 (MotionDiffuse) (+0.028 (6.7%))；R-Precision Top-2↑ 0.671±.006 vs 0.628±.004 (M2DM) (+0.043 (6.8%))。
 
-## 概述
+## 概要
 
 文本到运动生成的核心瓶颈在于**运动量化**：现有方法将整帧姿态压缩为单个码本向量，编码难度高且丢失关节间的空间关系，导致量化近似误差较大。MoGenTS 提出**逐关节量化**，将运动序列组织为二维时空 token 图，从根本上降低每个码本的编码复杂度，同时保留关节的空间分布。
 
@@ -54,8 +56,6 @@ claims:
 消融实验进一步验证了各组件的因果贡献：二维时空掩码相较一维掩码将 FID 从 0.088 降至 0.054；加入空间注意力后 FID 降至 0.038；再加入时间注意力达到最优 FID 0.033。逐关节量化相比全身量化在 MPJPE 上从 29.5 mm 大幅降至 13.8 mm，量化精度提升显著。推理速度约 181 ms/句，与主流方法可比。
 
 MoGenTS 的方法定位属于**离散 token 生成**范式，与 T2M-GPT、MoMask、MMM 等基于 VQ-VAE + Transformer 的路线一脉相承，但通过将量化粒度从“全身”推进到“关节”级别，并配套设计二维掩码与二维注意力机制，在生成质量与文本对齐上建立了新的最优水平。
-
-## 背景与动机
 
 ### 问题背景
 
@@ -93,7 +93,7 @@ MoGenTS 的核心洞察在于**改变量化粒度**：将量化对象从“整�
 
 实验结果表明，MoGenTS 在 HumanML3D 上 FID 较先前最优方法（MMM）降低 26.6%，在 KIT-ML 上降低 29.9%，同时在 R-Precision、MM-Dist 等文本对齐指标上全面超越现有方法，验证了逐关节时空联合建模范式的有效性。
 
-## 核心创新
+## 核心方法与创新机理
 
 MoGenTS 的核心创新在于将运动生成的量化粒度从**整帧姿态**下推至**独立关节**，由此将一维序列建模重构为**二维时空联合建模**。这一粒度迁移带来了三个连锁性的架构变化，构成方法的核心壁垒。
 
@@ -136,8 +136,6 @@ $$\mathcal{A}_{s\text{-}t} = \mathrm{SoftMax}(Q \cdot K / \sqrt{d} + \mathbf{P})
 
 MoGenTS 的核心创新并非单一技术的堆砌，而是**量化粒度的根本性改变**引发的一系列架构连锁反应。将运动从“一维姿态序列”重构为“二维关节-时间 token 图”后，二维卷积编码器、二维位置编码、二维掩码策略和分解式时空注意力等成熟操作得以自然引入，形成了一套高度协同的建模范式。这一设计思路在 HumanML3D 和 KIT-ML 两个基准上均取得了显著的 FID 提升（分别相对先前最优降低 26.6% 和 29.9%），且各组件在消融实验中均表现出独立且互补的增益，验证了创新设计的有效性。
 
-## 整体框架
-
 MoGenTS 提出一种“量化-掩码-生成”三阶段流水线，核心创新在于将运动表示从传统的**整帧姿态量化**转变为**逐关节二维时空 token 图**建模。图 1 展示了整体流程：
 
 1. **运动量化阶段**：给定一段人体运动序列，首先将其组织为“关节-时间”二维结构。通过一个**空间-时间二维联合 VQ-VAE**（Joint VQ-VAE），将每个关节在每一帧的旋转信息独立编码为潜在向量，再经向量量化映射到共享码本中的离散索引，最终形成一张 $T \times J$ 的二维 token 图（$T$ 为帧数，$J$ 为关节数）。该量化器的编码器和解码器均采用二维卷积网络，直接操作二维特征图，保留关节间的空间拓扑关系。
@@ -157,8 +155,6 @@ MoGenTS 提出一种“量化-掩码-生成”三阶段流水线，核心创新�
 
 ![[assets/figures/papers/paper_list_l93_https_arxiv_org_abs_2409_17686/figures/001_Figure_1.jpg]]
 *Figure 1: Framework overview. (a) In motion quantization, human motion is quantized into a spatial-temporal 2D token map by a joint VQ-VAE. (b) In motion generation, a temporal-spatial 2D masking is performed to obtain a masked map, and then a spatial-temporal 2D transformer is designed to infer the masked tokens*
-
-## 核心模块与公式推导
 
 ### 3.1 运动量化：时空二维联合 VQ-VAE
 
@@ -224,15 +220,7 @@ $$\mathcal{L}_{\mathrm{mask}} = - \sum_{\mathrm{mask}} \sum_{i=1}^{C} y_i \log(\
 $$\mathrm{logits} = (1 + s) \cdot \mathrm{logits}_{\mathrm{con}} - s \cdot \mathrm{logits}_{\mathrm{un}}$$
 其中 $\mathrm{logits}_{\mathrm{con}}$ 为条件（文本）输出 logits，$\mathrm{logits}_{\mathrm{un}}$ 为无条件输出 logits，引导尺度 $s = 4$。训练时以 10% 概率丢弃文本条件进行无条件训练，推理时通过外推增强文本-运动对齐。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l93_https_arxiv_org_abs_2409_17686/figures/002_Figure_2.jpg]]
-*Figure 2: The structure of our spatial-temporal 2D Joint VQ-VAE for motion quantization*
-
-![[assets/figures/papers/paper_list_l93_https_arxiv_org_abs_2409_17686/figures/003_Figure_3.jpg]]
-*Figure 3: The temporal-spatial masking strategy (a) and the spatial-temporal attention (b) for motion generation*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制验证
 
@@ -310,18 +298,7 @@ MoGenTS 的设计源于对现有运动量化方法一个根本性瓶颈的识别
 ![[assets/figures/papers/paper_list_l93_https_arxiv_org_abs_2409_17686/figures/007_Table_3.jpg]]
 *Table 3: Ablation study on HumanML3D dataset*
 
-![[assets/figures/papers/paper_list_l93_https_arxiv_org_abs_2409_17686/figures/008_Figure_5.jpg]]
-*Figure 5: Motion Editing. The edited regions are indicated in green*
-
-![[assets/figures/papers/paper_list_l93_https_arxiv_org_abs_2409_17686/figures/009_Table_4.jpg]]
-*Table 4: Computational overhead of different methods*
-
-![[assets/figures/papers/paper_list_l93_https_arxiv_org_abs_2409_17686/figures/010_Table_5.jpg]]
-*Table 5: Evaluation of motion quantization on (a) Humanml3D dataset and (b) KIT-ML dataset. MPJPE is measured in millimeters*
-
-![[assets/figures/papers/paper_list_l93_https_arxiv_org_abs_2409_17686/figures/012_Figure.jpg]]
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 问题瓶颈与核心洞察
 

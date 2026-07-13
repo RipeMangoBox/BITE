@@ -43,7 +43,7 @@ claims:
 > - HumanScore Leaderboard (Overall Score) 上，Overall Seedance 1.0 Pro fast vs Real Videos (-3.2)。
 > - Human Preference Alignment 上，Spearman's ρ HumanScore vs Human Judgment (~1.0)。
 
-## 概述
+## 概要
 
 现有视频生成评估体系长期聚焦于像素级视觉质量与语义对齐——例如成像质量、美学分数、主体一致性等维度——却系统性地忽略了一个关键问题：**生成的人体运动是否在生物力学上正确**。随着人体网格恢复方法误差持续收敛、视频生成模型逼真度快速提升（图2），肉眼已越来越难以分辨真实视频与AI生成视频中细微的运动异常（图1）。这一瓶颈意味着，仅凭视觉质量基准无法检测那些“看起来合理但动起来不自然”的生成缺陷。
 
@@ -52,8 +52,6 @@ HumanScore 的核心洞察在于：**生物力学忠实度是区分真实与生�
 实验证据支撑了这一设计逻辑。真实视频在 HumanScore 总分上达到 94.3，所有生成模型的得分均低于该值（Table 1），证明指标能有效区分合成运动。HumanScore 得分与人类偏好的 Spearman 相关系数接近 1.0（图7），表明自动评估与人类判断高度一致。此外，生物力学指标与 VBench 各评估轴之间仅存在中弱相关性（Table 2），确认其评估的是与现有基准互补的维度。
 
 在方法谱系中，HumanScore 不属于生成模型本身，而是一个**评估框架**，其定位介于视频质量基准（如 VBench）与人体运动分析工具之间。它通过标准化运动集策展、系统化提示工程和全自动化指标计算三个模块，为视频生成模型提供可解释的生物力学评分。该框架不依赖人工裁判，且在不同姿态估计器、容忍度设置和权重配置下均保持模型排名的鲁棒性。
-
-## 背景与动机
 
 ### 视频生成与评估的现状
 
@@ -73,7 +71,7 @@ HumanScore 的出发点是填补上述空白：通过构建一套以**生物力�
 
 核心思路是将人体运动解构为三个层次——**解剖正确性**（身体结构是否合理）、**运动学正确性**（关节运动范围和骨骼稳定性）和**动力学正确性**（运动平滑度和极值），并在每个层次上定义可解释的量化指标。这种分层设计使得评估不仅能给出总体得分，还能定位具体是哪个层次、哪类运动出现了问题，为模型改进提供明确的反馈信号。
 
-## 核心创新
+## 核心方法与创新机理
 
 HumanScore 的核心创新在于将视频生成评估从传统的像素级视觉质量与语义对齐，转向**生物力学正确性**这一此前被忽视的维度。现有基准测试（如 VBench、T2V-CompBench、Video-Bench）主要评估成像质量、美学质量和主体一致性等视觉层面指标，无法检测 AI 生成视频中细微的、非自然的运动缺陷。HumanScore 通过解构人体运动为解剖、运动学和动力学三个层次，定义了六项可解释的生物力学指标，填补了这一空白。
 
@@ -114,8 +112,6 @@ HumanScore 并非替代现有基准，而是提供了互补的评估维度。Tab
 2. **系统化提示设计**：通过提示工程确保生成视频背景干净、全身可见、相机静止、单人聚焦，有效缓解模型特定偏差（如背景、相机运动、多人物），保证不同模型生成视频的可比较性。
 3. **全自动化评估**：所有指标均基于现成的人体姿态估计器自动计算，避免主观裁判偏差，并通过大规模人类偏好研究验证了与人类判断的高度一致性（Spearman 相关系数接近 1.0，见 Figure 7）。
 
-## 整体框架
-
 HumanScore 的评估流水线由三个串行模块构成：**运动集策展** → **提示设计** → **多层次指标计算**。Figure 3 给出了完整流程概览。
 
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2604_20157/figures/003_Figure_3.jpg]]
@@ -150,8 +146,6 @@ HumanScore 的评估流水线由三个串行模块构成：**运动集策展** �
 - **公平性保障**：所有模型使用完全相同的标准化提示，提示工程专门针对模型特定偏差进行了缓解，确保生成视频的可比较性。
 - **全自动化**：指标计算无需人工介入，避免主观裁判偏差；其与人类判断的一致性通过大规模人类偏好研究验证（Spearman 相关系数接近 1.0，Figure 7）。
 - **骨骼拟合两阶段流水线**（Figure 11）：第一阶段用预训练检测器从单目视频推断 87 个 3D 关键点，第二阶段通过迭代优化将生物力学人体骨骼模型拟合到这些关键点上，为后续所有指标提供结构化运动表示。
-
-## 核心模块与公式推导
 
 HumanScore 将生物力学评估解构为三个独立模块，分别对应解剖正确性、运动学正确性和动力学正确性，每个模块包含两项可解释指标（Figure 6）。
 
@@ -224,7 +218,7 @@ $$r = \frac{1}{T} \sum_{t} b_{t}, \quad s = \frac{\sum_{t} m_{t}}{\max(1, \sum_{
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2604_20157/figures/004_Figure_5.jpg]]
 *Figure 5: Prompt Design. Different models tend to have different biases when generating videos, which may lead to unnatural scenes, truncated bodies, moving cameras, or multiple people. We experimented extensively with prompt engineering to mitigate these model biases and obtain the most stable motions in the generated videos, which facilitates metric calculation. Best viewed when zoomed in*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -283,10 +277,7 @@ HumanScore 对 12 个前沿视频生成模型进行了系统评估，涵盖解�
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2604_20157/figures/002_Figure_2.jpg]]
 *Figure 2: The performance of human mesh recovery methods is converging at low errors and video generators are becoming more realistic*
 
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2604_20157/figures/001_Figure_1.jpg]]
-*Figure 1: Real or AI? This figure compares frames from real videos alongside AIgenerated ones from modern video generators. Can you tell which is which? Processed full videos are in supplementary material and answers are in the footnote1. HumanScore is designed to automatically detect subtle biomechanical violations produced by AI video generators, even when they are imperceptible to the human eye*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 问题域定位：从视觉质量到生物力学正确性
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/Joint_3D_Geometry_Reconstruction_and_Motion_Generation_for_4D_Synthesis_from_a_Single_Image.pdf
+project_link: https://ivg-yanranzhang.github.io/MoRe4D/
+code_link: https://github.com/Zhangyr2022/MoRe4D
 aliases:
 - J3GRMG4SFSI
 tags:
@@ -39,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - VBench 上，Dynamic Degree 1.0000 vs 0.7708 (4Real) (+0.2292)；Aesthetic Quality 0.5613 vs 0.4938 (4Real) (+0.0675)；Subject Consistency 0.8241 vs 0.8042 (GenXD) (+0.0199)。
 
-## 概述
+## 概要
 
 单张图像到4D动态场景的合成是视觉生成领域的前沿难题。现有方法普遍将几何重建与运动生成解耦为两个独立阶段，形成了两种主流范式，但各自存在根本性瓶颈：**generate-then-reconstruct** 方法先合成多视角视频再重建几何，由于生成的视频缺乏严格的几何一致性，重建阶段容易出现结构崩溃和时空碎片化；**reconstruct-then-generate** 方法则先重建静态三维资产再施加运动，受限于预设的静态几何，难以生成大规模、自主性的动态场景。这一“几何-运动解耦”困境构成了当前4D合成的核心瓶颈。
 
@@ -53,7 +55,7 @@ claims:
 
 在 VBench 基准上，MoRe4D 展现出显著的性能优势：动态程度达到 1.00，较 **4Real**（Yu et al., NeurIPS 2024）的 0.77 提升 0.23；美学质量达到 0.56，较 4Real 的 0.49 提升 0.07；主体一致性达到 0.82，较 **GenXD**（Zhao et al., ICLR 2025）的 0.80 提升 0.02；成像质量达到 0.59，较 **Free4D**（Liu et al., ICCV 2025）的 0.36 提升 0.24。消融实验进一步验证，移除运动感知模块导致动态得分从 0.90 降至 0.85，移除深度隐变量使一致性从 0.87 降至 0.86，证实了各组件对运动幅度和结构一致性的关键作用。
 
-## 背景与动机
+
 
 ### 4D内容生成的范式困境
 
@@ -82,7 +84,9 @@ claims:
 
 这种联合生成策略在VBench基准上展现出显著优势：动态程度达到1.0（对比4Real的0.77），美学质量达到0.56（对比4Real的0.49），并在VLM评估的运动-几何耦合得分上以3.35大幅领先Free4D（1.17）和Gen3C（2.01）（Table 1, Table A）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MoRe4D的核心突破在于**将几何重建与运动生成从解耦的两阶段范式推进为单一扩散模型内的联合推理**，从根本上解决了现有4D合成方法中时空不一致与泛化能力受限的瓶颈。
 
@@ -127,7 +131,7 @@ MPM是MoRe4D实现几何约束与视觉先验相互正则化的核心机制。�
 
 MoRe4D的联合生成框架在时空一致性上显著优于串行流水线。附录Figure A对比了MoRe4D与“Wan2.1-I2V视频生成 + DELTA跟踪/VGGT重建”的级联方案：串行方法因视频生成误差与跟踪/重建误差的累积，出现明显的碎片化伪影；MoRe4D的联合推理则保持了连贯的时空结构。这一对比直接证明了耦合设计的必要性——当运动与几何在统一扩散过程中相互约束时，二者能够实现有效的相互正则化，避免了解耦范式中的误差传播。
 
-## 整体框架
+
 
 MoRe4D 提出了一种**紧耦合的重建-再生成（advanced reconstruct-then-generate）**范式，核心思路是将几何重建与运动生成统一在一个扩散框架内，从根本上避免解耦范式中的时空不一致问题。整个 pipeline 由三个关键模块串联构成，其输入输出流如图3所示。
 
@@ -155,7 +159,7 @@ $$\Delta \tilde{x}_t = \frac{\alpha_x \cdot \Delta x_t}{z}, \quad \Delta \tilde{
 ![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2512_05044v1/figures/001_Figure_1.jpg]]
 *Figure 1: MoRe4D for 4D synthesis from a single image. Most existing paradigms either suffer from geometric inconsistencies (generatethen-reconstruct) or are constrained by animating a pre-determined static geometry (vanilla reconstruct-then-generate). Our MoRe4D advances by tightly coupling geometric modeling and motion generation, effectively achieving consistent 4D motion and geometry*
 
-## 核心模块与公式推导
+
 
 ### 4D场景表示：密集点云轨迹
 
@@ -212,7 +216,9 @@ $$\mathbf{F}' = \mathrm{Attn}(\gamma_1 \alpha_1 \odot \mathrm{LN}(\mathbf{F}_t^i
 
 为适配扩散模型的隐空间操作，4D-STraG配备了一个运动敏感VAE，将相对运动位移变换为RGB运动图进行编码，以及从生成的RGB运动图恢复点轨迹。该VAE在重建保真度上表现优异（Figure C），确保了隐空间生成结果能够精确解码为三维运动轨迹。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -288,7 +294,9 @@ MoRe4D在VBench基准上进行了系统的定量对比。由于不同基线方�
 ![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2512_05044v1/figures/002_Figure_2.jpg]]
 *Figure 2: TrajScene-60K curation pipeline. We curate videos from WebVid-10M, filtered via VLMs for structured motion and countable entities. Dense 4D point tracks are extracted and refined via depth filtering and Gaussian Splatting, producing 60K high-quality 4D scenes*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题瓶颈：解耦范式的结构性缺陷
 
@@ -346,6 +354,8 @@ MoRe4D揭示的开放问题指向4D生成领域的几个关键方向：
 - **轻量级表示**：密集点云轨迹的存储和计算开销随 $T \times N$ 线性增长。稀疏轨迹、高效神经场（如3D Gaussian Splatting的时序扩展）或分层运动表示能否在保证质量的同时降低计算成本？
 
 - **物理合理性**：模型目前从数据中隐式学习运动模式，但缺乏对物理约束（碰撞、遮挡、重力）的显式建模。能否在训练或推理中引入物理模拟器，使生成的4D场景具备物理合理性？
+
+
 
 ## 原文 PDF
 

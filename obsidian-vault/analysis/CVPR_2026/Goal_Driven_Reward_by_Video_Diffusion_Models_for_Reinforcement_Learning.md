@@ -43,7 +43,7 @@ claims:
 > - Meta-World Bin Picking (dense) 上，episode return 822 vs 398 (Dense Reward) (+424)。
 > - Meta-World Shelf Place (dense) 上，episode return 814 vs 154 (Dense Reward) (+660)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -75,7 +75,7 @@ GenReward 在奖励建模领域占据了一个独特位置。与基于视觉-语
 
 消融实验确认了两个奖励通道的必要性：移除视频级奖励或帧级FB奖励均导致性能显著下降。值得注意的是，即使生成的视频存在幻觉（如物体瞬移），GenReward 仍能提供有效的奖励引导，体现出一定的鲁棒性。
 
-## 背景与动机
+
 
 ### 问题背景：强化学习的奖励设计瓶颈
 
@@ -117,7 +117,9 @@ GenReward 在奖励建模领域占据了一个独特位置。与基于视觉-语
 
 这种设计使得GenReward具备三个关键特性：**基于生成模型**（无需专家演示）、**动作感知**（利用前向-后向表示建模状态-动作到目标的到达关系）、**分层奖励**（视频级粗粒度引导 + 帧级细粒度引导），从而在复杂操作任务中显著超越现有奖励模型。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GenReward的核心创新在于将**预训练视频扩散模型（VDM）的世界知识**转化为强化学习的内在奖励信号，从而**完全替代手工奖励工程**。与现有奖励模型相比，GenReward在两个关键维度上实现了根本性变革：
 
@@ -145,7 +147,7 @@ GenReward的最终奖励为$`r^{\mathrm{gen}} = \alpha \cdot r^{\mathrm{video}} 
 
 综上，GenReward通过“生成式目标视频驱动 + 动作感知帧级到达概率”的双层奖励架构，实现了从“手工设计”到“生成式引导”的范式转变，在Meta-World和DCS等多个基准上显著超越现有方法。
 
-## 整体框架
+
 
 GenReward 的核心思路是利用预训练视频扩散模型的世界知识来驱动强化学习智能体的行为学习，从而绕过手工设计奖励函数的瓶颈。整个框架由三个层级递进的模块构成，形成从粗粒度视频模仿到细粒度目标达成的奖励信号链。
 
@@ -170,7 +172,7 @@ $$r^{\mathrm{gen}} = \alpha \cdot r^{\mathrm{video}} + \beta \cdot r^{\mathrm{FB
 ![[assets/figures/papers/paper_list_l2681_https_arxiv_org_abs_2512_00961/figures/004_Figure_4.jpg]]
 *Figure 4: Illustration of experimental setups in our experiments with generated videos and image observations from environments*
 
-## 核心模块与公式推导
+
 
 GenReward 的奖励生成管线由五个核心模块串联构成，从生成式先验提取到策略训练形成闭环。
 
@@ -234,7 +236,9 @@ $$r^{\mathrm{gen}} = \alpha \cdot r^{\mathrm{video}} + \beta \cdot r^{\mathrm{FB
 ![[assets/figures/papers/paper_list_l2681_https_arxiv_org_abs_2512_00961/figures/008_Figure_7.jpg]]
 *Figure 7: Showcase of selecting the goal image from the video generated with the prompt pick up the blue fork using CLIP. The highlighted area represents the video frames that are more relevant to the task. The frame with the highest similarity reflects the frame-level goal*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果：GenReward 在复杂操作任务上显著超越现有奖励模型
 
@@ -299,7 +303,9 @@ Table E（Supplementary Material）对比了各方法在 Meta-World Pick Place �
 ![[assets/figures/papers/paper_list_l2681_https_arxiv_org_abs_2512_00961/figures/014_Table.jpg]]
 *Table: D. Performance of GenReward variants on DCS Walker Walk*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有奖励模型的关系
 
@@ -330,6 +336,8 @@ GenReward 处于“生成模型驱动的强化学习奖励设计”这一交叉�
 **前向-后向表示的扩展性。** FB 表示当前建模的是从 $(s,a)$ 到单个目标帧的到达概率。能否扩展到多步目标状态序列——即学习到达一系列子目标的概率——是一个值得探索的方向。这将使 GenReward 能够处理需要多步规划的长程任务。
 
 **Sim-to-Real 的域差距。** 所有实验均在模拟器中进行。生成视频与真实机器人观测之间的域差距如何处理，是该方法走向实际应用必须面对的问题。可能的思路包括：在真实机器人数据上微调视频扩散模型、使用域随机化生成视频、或在奖励计算中引入域自适应模块。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,7 @@ paper_level: A
 venue: SIGGRAPH
 year: 2022
 pdf_ref: paperPDFs/SIGGRAPH_2022/ASE_Large_Scale_Reusable_Adversarial_Skill_Embeddings_for_Physically_Simulated_Characters.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/toronto-ai/ASE/
 aliases:
 - ASEA
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | ASE：大规模可复用对抗技能嵌入用于物理模拟角色 |
 | 英文题名 | ASE: Large-Scale Reusable Adversarial Skill Embeddings for Physically Simulated Characters |
 | 会议/期刊 | SIGGRAPH 2022 |
-| Links | [paper](https://arxiv.org/abs/2205.01906); [Project](https://research.nvidia.com/labs/toronto-ai/ASE/) |
+| Links | [paper](https://arxiv.org/abs/2205.01906) · [Project](https://research.nvidia.com/labs/toronto-ai/ASE/) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/generative_models_and_autoencoders |
 | Method | Adversarial Skill Embeddings (ASE) |
 | Dataset | Reach, Speed, Steering, Location |
@@ -42,7 +43,7 @@ claims:
 > - Speed 上，Normalized Return 为 0.93±0.01，对比 0.95±0.01 (Scratch)，变化 -0.02 (Scratch 略高，但利用非自然行为)。
 > - Steering 上，Normalized Return 为 0.90±0.01，对比 0.91±0.01 (Scratch)，变化 -0.01 (Scratch 略高，但利用非自然行为)。
 
-## 概述
+## 概要
 
 物理模拟角色的运动控制面临一个根本性瓶颈：**为每个新任务从零开始训练控制策略**，导致样本效率低下、任务复杂度受限，且运动风格难以自动保持自然。现有方法或依赖单一任务的运动跟踪，或使用对抗运动先验（AMP）指导风格，但均**无法复用已学得的运动技能**，缺乏结构化的技能表示空间。
 
@@ -62,7 +63,7 @@ $$\max_{\pi} -D_{\mathrm{JS}}\left(d^{\pi}(\mathbf{s},\mathbf{s}') \| d^{M}(\mat
 
 **主要局限**包括：基于 GAN 的预训练存在模式崩塌风险；部分生成运动存在高频抖动；恢复动作的逼真度有限；训练需要约十年仿真经验，样本效率有待提升。**开放问题**指向采用扩散模型等替代分布匹配方法、提升恢复策略自然度、以及扩展到更复杂的多步组合任务。
 
-## 背景与动机
+
 
 ### 问题背景：物理角色动画的技能获取瓶颈
 
@@ -90,7 +91,9 @@ $$\max_{\pi} -D_{\mathrm{JS}}\left(d^{\pi}(\mathbf{s},\mathbf{s}') \| d^{M}(\mat
 
 这一设计使得运动技能成为可复用资产：一次预训练，多次迁移。角色在完成 Reach、Speed、Steering、Location、Strike 等不同任务时，均能保持与数据集一致的自然运动风格，同时取得具有竞争力的任务回报。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ASE 的核心创新在于将**对抗模仿学习**与**无监督技能发现**融合为一个统一的预训练目标，从而在大规模无结构运动数据集上构建一个可复用、可组合且多样化的技能嵌入空间。该空间直接作为下游任务中高层策略的动作空间，使角色无需额外运动数据即可完成新任务并保持自然运动风格。
 
@@ -154,7 +157,7 @@ $$
 - **恢复动作逼真度**：由于数据集不包含起身动作，恢复策略虽有效但动作的自然度有限。
 - **任务复杂度验证不足**：目前仅在单角色、单步任务上验证，尚未扩展到需要长序列技能组合的多步任务或多角色交互场景。
 
-## 整体框架
+
 
 ASE 框架采用**两阶段设计**：预训练阶段学习可复用的低层技能嵌入，迁移阶段利用该嵌入完成下游任务。整个系统的核心思路是将对抗模仿学习与无监督技能发现统一在一个预训练目标中，从而在无需结构化运动标签的大规模数据上构建一个兼具多样性、可解释性和可组合性的技能空间。
 
@@ -204,7 +207,7 @@ ASE 框架采用**两阶段设计**：预训练阶段学习可复用的低层技
 ![[assets/figures/papers/paper_list_l45_https_arxiv_org_abs_2205_01906/figures/005_Figure_4.jpg]]
 *Figure 4: Our framework is used to learn skill embeddings for a 37 degrees-offreedom humanoid character, equipped with a sword and shield*
 
-## 核心模块与公式推导
+
 
 ### 两阶段框架总览
 
@@ -286,7 +289,9 @@ $$r_t = w_G r^G(\mathbf{s}_t, \mathbf{a}_t, \mathbf{s}_{t+1}, \mathbf{g}) - w_S 
 
 低层策略使用 PPO 算法进行训练（Section 6.6），价值函数（critic）用于优势估计和 TD($\lambda$) 更新。为增强策略的鲁棒性，训练时以 10% 概率从随机跌倒状态开始 episode（Section 6.5），使策略学会从异常姿态中恢复。Figure 14 显示，预训练后的低层策略能在平均 0.31 秒内从跌倒中恢复，最大恢复时间 4.1 秒，尽管数据集中不包含起身动作。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -353,7 +358,9 @@ Table 1 报告了 ASE 与各基线模型在五个下游任务上的归一化回�
 ![[assets/figures/papers/paper_list_l45_https_arxiv_org_abs_2205_01906/figures/011_Figure_11.jpg]]
 *Figure 11: Learning curves comparing performance on downstream tasks using diferent low-level policies. We compare ASE to policies that are trained from scratch for each tasks (Scratch), as well as to low-level policies trained without the skill discovery objective (No SD), without the diversity objective (No Div.), and with both objectives disabled (No SD + No Div.). The skill discovery objective is crucial for learning efective skill representations. The policies trained from scratch o en achieve higher returns by exploiting unnatural behaviors (see Figure 8)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法定位与谱系
 
@@ -414,6 +421,8 @@ ASE 的有效性建立在以下前提之上：
 5. **运动质量的形式化度量**：论文主要依赖定性观察和下游任务性能来评估运动质量。如何建立更客观、可量化的运动自然度指标，以更公平地比较 ASE 与 Scratch 等方法？
 
 6. **样本效率的进一步提升**：能否通过离线预训练、元学习或模型-based 方法减少所需的仿真经验，使 ASE 更接近人类“看几次就能学会”的技能获取方式？
+
+
 
 ## 原文 PDF
 

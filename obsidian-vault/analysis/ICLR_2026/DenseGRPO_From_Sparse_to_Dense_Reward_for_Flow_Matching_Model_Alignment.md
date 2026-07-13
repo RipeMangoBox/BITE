@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/DenseGRPO_From_Sparse_to_Dense_Reward_for_Flow_Matching_Model_Alignment.pdf
+project_link: null
+code_link: null
 openreview_forum_id: nIwFge9nW0
 aliases:
 - DenseGRPO
@@ -41,15 +43,13 @@ claims:
 > - Visual Text Rendering 上，OCR Acc 为 0.95，对比 0.92 (Flow-GRPO)，变化 +0.03。
 > - Human Preference Alignment 上，PickScore 为 24.64，对比 23.31 (Flow-GRPO)，变化 +1.33。
 
-## 概述
+## 概要
 
 现有基于GRPO的流匹配模型对齐方法（如Flow-GRPO、DanceGRPO）面临一个核心瓶颈：它们仅在整个去噪轨迹终点生成单一的稀疏奖励信号，并将该终端奖励不加区分地应用于所有中间步骤的优化。这种全局反馈与每个去噪步骤的细粒度贡献之间存在严重的不匹配（mismatch），导致策略学习被误导。
 
 DenseGRPO针对这一瓶颈提出了两个关键改进。首先，它利用流匹配模型ODE采样器的确定性映射性质，将中间潜变量解码为对应的干净图像，借助现成的奖励模型评估其未来价值，然后通过计算相邻步骤间的奖励增益（$\Delta R_t^i = R_{t-1}^i - R_t^i$）获得精确的逐步稠密奖励，从而为每个去噪步骤提供与其贡献对齐的反馈信号。其次，它提出了一种奖励感知的探索空间校准策略，根据估计的稠密奖励分布，自适应调整SDE采样器中每个时间步的噪声强度 $\psi(t)$，以平衡正负奖励的探索空间，使环境探索更加合理。
 
 在组合图像生成（GenEval）、视觉文本渲染（OCR Acc）和人类偏好对齐（PickScore）三个基准任务上，DenseGRPO均取得了优于Flow-GRPO等基线方法的结果。例如，在GenEval上达到0.97（+0.02），OCR Acc达到0.95（+0.03），PickScore达到24.64（+1.33）。消融实验证实，逐步稠密奖励和时间步特定的噪声校准各自对性能提升均有显著贡献。该方法还展现出良好的泛化性，在FLUX.1-dev、高分辨率SD 3.5-M以及扩散模型SD 1.5上均可带来一致的性能增益。
-
-## 背景与动机
 
 ### 流匹配模型与偏好对齐
 
@@ -82,7 +82,7 @@ $$
 
 2. **奖励感知的探索空间校准**：基于稠密奖励的分布，动态调整每个时间步的噪声强度 $\psi(t)$，使正负奖励样本数量保持平衡，从而为每个去噪阶段创造合适的探索空间。
 
-## 核心创新
+## 核心方法与创新机理
 
 DenseGRPO 的核心创新在于将现有基于 GRPO 的流匹配模型对齐方法从**稀疏终端奖励**升级为**逐步稠密奖励**，并配套设计了**奖励感知的探索空间校准**机制。这两个 changed slot 共同解决了 Flow-GRPO（Liu et al., 2025）等现有方法中全局反馈信号与每个去噪步骤细粒度贡献不匹配（mismatch）的根本瓶颈。
 
@@ -119,8 +119,6 @@ $$\sigma_t = \psi(t)$$
 校准过程（Algorithm 1）通过迭代调整各时间步的噪声强度来平衡正负奖励数量：当某时间步的正负奖励数量差小于阈值 $\varepsilon_1$ 时，增加 $\psi(t)$ 以扩大探索；反之则减小 $\psi(t)$ 以收缩探索。这一设计使 SDE 采样器能够在所有时间步创造更合理的探索空间，消融实验验证了其有效性（Fig. 6b）。
 
 值得注意的是，Flow-GRPO+CoCA（Liao et al., 2025）虽然也尝试改进奖励分配，但其基于潜在相似度的轨迹级分配方法仍停留在全局层面，未能实现 DenseGRPO 的步骤级精确反馈。
-
-## 整体框架
 
 ![[assets/figures/papers/paper_list_l29_https_openreview_net_forum_id_nIwFge9nW0/figures/002_Figure_1.jpg]]
 *Figure 1: (a) Existing approaches only predict a single, sparse reward at the end of the denoising trajectory, which is naively applied to optimize all intermediate steps. (b) DenseGRPO estimates step-wise rewards of individual steps, densifying the feedback signal for the denoising process*
@@ -167,8 +165,6 @@ $$\sigma_t = \psi(t)$$
 **模块间的数据流关系**
 
 整个框架的数据流可概括为：SDE 采样器生成轨迹 → ODE 去噪模块将中间潜变量映射为干净图像 → 奖励模型评估各步奖励 → 稠密奖励计算模块输出 $\Delta R_t^i$ → 优势计算模块生成步骤级优势 → 策略更新。探索空间校准模块则通过监测稠密奖励分布，反馈调节 SDE 采样器的噪声强度，形成闭环优化。
-
-## 核心模块与公式推导
 
 ### 核心瓶颈：稀疏奖励的反馈‑贡献失配
 
@@ -238,14 +234,13 @@ $$\sigma_t = \psi(t) \tag{Eq. 11}$$
 | $\hat{A}_t^i = \frac{\Delta R_t^i - \mathrm{mean}(\{\Delta R_t^i\})}{\mathrm{std}(\{\Delta R_t^i\})}$ | 基于稠密奖励的组归一化优势 | Eq. 10 |
 | $\sigma_t = \psi(t)$ | 时间步特定的 SDE 噪声水平 | Eq. 11 |
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主要结果
 
 DenseGRPO 在三个核心基准任务上均取得最优表现，验证了稠密奖励与探索校准机制的有效性。
 
 **组合图像生成（Compositional Image Generation）** 任务使用 GenEval 指标评估模型对复杂组合指令的遵循能力。DenseGRPO 达到 **0.97**，较 Flow-GRPO 的 0.95 提升 0.02（Table 1）。这表明逐步奖励信号使模型在每个去噪步骤都能获得与局部贡献对齐的反馈，从而更精确地执行组合约束。
-
 
 ![[assets/figures/papers/paper_list_l29_https_openreview_net_forum_id_nIwFge9nW0/figures/008_Table_1.jpg]]
 *Table 1: Performance on Compositional Image Generation, Visual Text Rendering, and Human Preference benchmarks, evaluated by task performance on test prompts, and by image quality and preference scores on DrawBench prompts. ImgRwd: ImageReward; UniRwd: UnifiedReward. UniRwd*: our evaluation results of the official checkpoints and our method with UnifiedReward. 1*
@@ -256,14 +251,12 @@ DenseGRPO 在三个核心基准任务上均取得最优表现，验证了稠密�
 
 Figure 4 的训练曲线进一步揭示：DenseGRPO 在三个任务上的学习速度和最终收敛水平均持续优于 Flow-GRPO 和 Flow-GRPO+CoCA，尤其在人类偏好对齐任务上，优势随训练步数增加而扩大。Figure 5 的定性对比显示，DenseGRPO 在颜色准确性、文本保真度和内容对齐方面均产生更高质量的输出。
 
-
 ![[assets/figures/papers/paper_list_l29_https_openreview_net_forum_id_nIwFge9nW0/figures/011_Figure_4.jpg]]
 *Figure 4: Comparison of learning curves. Figures (a) to (c) correspond to the tasks of compositional image generation, visual text rendering, and human preference alignment, respectively*
 
 ### 消融实验
 
 Figure 6 系统验证了 DenseGRPO 三个关键设计的独立贡献，所有消融均以 PickScore 为评价指标。
-
 
 ![[assets/figures/papers/paper_list_l29_https_openreview_net_forum_id_nIwFge9nW0/figures/026_Figure_6.jpg]]
 *Figure 6: Ablation studies on our critical designs. (a) Step-wise dense reward aligns with contribution, surpassing trajectory-wise sparse reward. (b) Our time-specific noise level enables a suitable exploration space. (c) Increased ODE denoising steps (n) improve dense reward accuracy, yielding superior results. The vertical axis denotes the PickScore results. The horizontal axis of (a) and (b) is training steps, while the horizontal axis of (c) denotes training time for training cost comparison*
@@ -278,7 +271,6 @@ Figure 6 系统验证了 DenseGRPO 三个关键设计的独立贡献，所有消
 
 Figure 9 展示了 DenseGRPO 在不同模型和分辨率上的泛化能力。在 FLUX.1-dev 模型上，DenseGRPO 的 PickScore 训练曲线始终高于 Flow-GRPO；在 SD 3.5-M 的 1024×1024 高分辨率设定下，DenseGRPO 同样保持一致的性能优势；在扩散模型（diffusion model）上的实验也证实了该方法的跨架构适用性。这表明基于 ODE 的稠密奖励估计和探索空间校准策略不依赖于特定的流匹配架构，具有较好的通用性。
 
-
 ![[assets/figures/papers/paper_list_l29_https_openreview_net_forum_id_nIwFge9nW0/figures/033_Figure_9.jpg]]
 *Figure 9: Performance of DenseGRPO compared with Flow-GRPO on additional models: (a) FLUX.1-dex, (b) SD 3.5-M on 1024 × 1024 resolution, and (c) diffusion model*
 
@@ -288,16 +280,7 @@ Figure 9 展示了 DenseGRPO 在不同模型和分辨率上的泛化能力。在
 
 探索空间校准策略依赖预热步骤和超参数 $\varepsilon_1$、$\varepsilon_2$（Algorithm 1），这些参数控制正负奖励数量平衡的容忍度和噪声调整步长。在不同任务或奖励模型下，最优参数可能发生变化，需要额外调参成本。该策略的自适应调整方案及其理论解释仍有待进一步研究。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l29_https_openreview_net_forum_id_nIwFge9nW0/figures/031_Figure_30.jpg]]
-*Figure 30: (a) Performance on FLUX.1-dev*
-
-![[assets/figures/papers/paper_list_l29_https_openreview_net_forum_id_nIwFge9nW0/figures/032_Figure_31.jpg]]
-*Figure 31: (b) Performance on SD 3.5-M (1024)*
-
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 与基线方法的关系
 

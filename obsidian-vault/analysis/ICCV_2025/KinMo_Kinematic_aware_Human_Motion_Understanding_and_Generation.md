@@ -5,6 +5,8 @@ paper_level: A
 venue: ICCV
 year: 2025
 pdf_ref: paperPDFs/ICCV_2025/KinMo_Kinematic_aware_Human_Motion_Understanding_and_Generation.pdf
+project_link: https://andypinxinliu.github.io/KinMo
+code_link: null
 aliases:
 - KinMo
 tags:
@@ -41,7 +43,7 @@ claims:
 > - HumanML3D (dissimilar subset) 上，R@1 (Text-motion retrieval) 57.73 (KinMo RoBERTa) vs 47.00 (TMR) (+10.73)。
 > - HumanML3D (small batches) 上，R@1 (Text-motion retrieval) 72.88 (KinMo RoBERTa) vs 67.16 (TMR) (+5.72)。
 
-## 概述
+## 概要
 
 **核心问题**：现有文本-运动学习方法仅依赖全局动作描述，导致文本与运动模态之间存在显著模糊性——一段“挥手”的文本可能对应数十种运动姿态，而模型无法捕捉局部肢体运动与细粒度运动学动态，从根本上限制了理解与生成的能力。
 
@@ -57,7 +59,7 @@ claims:
 
 **方法定位**：KinMo 属于文本-运动联合学习的方法谱系，其核心贡献在于将运动学先验结构化为可学习的层次文本表示。与仅使用全局文本的 **TMR**、基于扩散的 **MDM**、基于掩码的 **MoMask** 等基线相比，KinMo 在不改变骨干生成器（MoMask）的前提下，通过注入运动学感知的层次语义实现了显著的性能提升。
 
-## 背景与动机
+
 
 ### 文本驱动人体运动理解的模态鸿沟
 
@@ -80,7 +82,9 @@ claims:
 
 简言之，KinMo 的核心洞察在于：**将运动学结构显式地注入文本-运动学习框架，是突破当前全局描述瓶颈、实现细粒度运动理解与生成的关键路径**。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 KinMo 的核心创新在于将人体运动从传统的全局关节表示重新组织为**面向运动学组（Kinematic Group）的层次化表示**，并通过**多级文本描述**与**层次化跨模态对齐**来系统性地缩小文本-运动模态差距。这一设计直接回应了现有方法仅依赖全局动作描述所导致的模糊性瓶颈——全局文本无法捕捉局部肢体的细粒度运动学动态，从而限制了理解与生成的精度。
 
@@ -122,7 +126,7 @@ KinMo 的核心创新在于将人体运动从传统的全局关节表示重新�
 
 由于 KinMo 的运动表示和文本描述均以运动学组为粒度，它首次使模型能够针对特定身体部位进行**文本驱动的运动编辑**（如“将左臂改为上举”）和**关节轨迹控制**（如指定骨盆的运动路径）。轨迹控制通过 ControlNet 架构实现，CNN 空间编码器处理目标关节位置信息，复制生成器将其注入生成过程。在骨盆轨迹控制任务上，KinMo 将 FID 从 MDM 的 0.544 降至 0.103（Table 11），实现了数量级的提升。
 
-## 整体框架
+
 
 KinMo 的整体框架围绕一个核心思想构建：**将人体运动按运动学树分解为六个独立组件，并构建与之对应的层次化文本描述，通过从粗到精的多级对齐与生成过程，显著缩小文本与运动之间的模态差距**。该框架由四个关键模块串联而成，形成一条从运动表示、数据标注、文本‑运动对齐到条件生成与控制的完整流水线。
 
@@ -185,7 +189,7 @@ $$
 
 整个框架的数据流可以概括为：**原始关节点运动 → 运动学组表示** 与 **全局动作文本 → 运动推理器 → 层次化文本描述** 两条支线，在 **HTMA 编码器** 中通过层次化跨注意力对齐，最终汇入 **掩码运动生成器** 完成粗‑细生成，并可选择性地接入 **ControlNet** 实现轨迹控制或局部编辑。这一设计使得 KinMo 在统一的框架下同时支持文本‑运动检索、运动生成、局部编辑和轨迹控制四项任务。
 
-## 核心模块与公式推导
+
 
 KinMo 的核心由三个层次化模块构成：运动学组表示、层次化文本‑运动对齐（HTMA）以及粗‑细生成过程。以下按管线顺序梳理关键公式与变量含义。
 
@@ -260,7 +264,9 @@ $$\mathcal{L}_{\mathrm{control}} = \mathbb{E}\left[ \frac{\sum_i \sum_j m_{ij} |
 ![[assets/figures/papers/paper_list_l1890_KinMo_Kinematic_aware_Human_Motion_Understanding_and_Generation/figures/017_Figure_9.jpg]]
 *Figure 9: Motion Trajectory Control. We adopt a ControlNet architecture to condition the generator with the provided trajectory of the target joint during the generation. We utilize a CNN encoder to process the spatial position information and feed it as the input condition into the control generator network*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -322,7 +328,9 @@ Table 11 展示了轨迹控制结果：在仅控制骨盆轨迹（无测试时�
 ![[assets/figures/papers/paper_list_l1890_KinMo_Kinematic_aware_Human_Motion_Understanding_and_Generation/figures/019_Table_9.jpg]]
 *Table 9: Cross-Attention Order of Descriptions for Text-Motion Retrieval*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位与核心瓶颈
 
@@ -370,6 +378,8 @@ KinMo 建立在多条技术路线之上，其关键改进点可通过以下维�
 4. **语义对齐指标与人类判断的相关性**：论文提出了 HTMA‑S 等语义对齐指标，但这些自动指标与人类对编辑质量的主观判断之间的相关性尚未被系统研究。
 
 5. **低质量描述的量化退化**：运动推理器生成质量对下游任务性能的具体量化退化曲线（如描述准确率与 FID 的函数关系）未被刻画，这对实际部署中的容错设计至关重要。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Temperature_as_a_Meta_Policy_Adaptive_Temperature_in_LLM_Reinforcement_Learning.pdf
+project_link: null
+code_link: null
 openreview_forum_id: AoTHU2OmS6
 aliases:
 - TTAMPO
@@ -42,7 +44,7 @@ claims:
 > - Avg. over AIME24, MATH-500, AMC23, Minerva, OlympiadBench 上，Pass@8 为 63.8 (TAMPO)，对比 62.1 (GRPO T_s=1.2)，变化 +1.7。
 > - ECQA (CommonsenseQA) 上，Pass@1 为 76.12 (TAMPO)，对比 75.07 (GRPO)，变化 +1.05。
 
-## 概述
+## 概要
 
 在大语言模型（LLM）的强化学习（RL）微调中，采样温度是控制策略探索-利用平衡的关键超参数。现有方法通常采用固定温度或简单的启发式调度（如从 0.9 线性增加到 1.5），无法适应训练过程中动态变化的探索需求，导致策略优化受限。本文提出 **TAMPO（Temperature Adaptive Meta Policy Optimization）**，将温度建模为一个可学习的元策略，通过轨迹反馈在线自适应地调整温度分布，无需额外采样开销。
 
@@ -50,7 +52,7 @@ TAMPO 的核心洞见在于：每条轨迹都隐含地编码了一个使其似�
 
 在五个数学推理基准（AIME24、MATH-500、AMC23、Minerva、OlympiadBench）上，TAMPO 的平均 Pass@1 达到 44.5，平均 Pass@8 达到 63.8，均优于所有固定温度和启发式调度基线（Table 1）。在常识推理任务 ECQA 上，TAMPO 同样取得一致的性能提升（Table 4）。消融实验表明，EMA 系数 α=0.05 和元策略的 Top-p 采样（p=0.7）是实现稳定自适应的关键配置（Table 2, Table 3）。TAMPO 仅额外维护一个轻量级的温度优势列表，几乎不增加计算开销，且推理时丢弃元策略，保持了部署的简洁性。
 
-## 背景与动机
+
 
 ### 温度在大语言模型生成中的核心作用
 
@@ -81,7 +83,9 @@ $$\ell_T(\tau_i) = \frac{1}{|\tau_i|} \sum_{t=1}^{|\tau_i|} \log \pi_{\theta, T}
 
 基于上述观察，本文提出将温度本身视为一个可学习的**元策略（meta-policy）**，通过轨迹反馈动态调整温度分布。核心思路是：利用内循环中已生成的轨迹，计算其在各候选温度下的似然，结合轨迹优势信号推导温度特定优势，从而在不增加额外采样开销的前提下，在线更新温度元策略，使其与策略优化目标对齐。这一设计将温度从固定的超参数提升为训练过程中自适应演化的控制变量，有望突破现有方法的探索-利用平衡瓶颈。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 TAMPO 的核心创新在于将采样温度从固定的超参数或启发式调度提升为**可学习的元策略（meta-policy）**，使其能够在线、自适应地响应训练过程中动态变化的探索-利用需求。
 
@@ -120,7 +124,7 @@ $$\mathcal{A}_i^{(T_k)} = \hat{\ell}_{T_k}(\tau_i) \cdot A_i$$
 
 实验表明，TAMPO 在五个数学推理基准上的平均 Pass@1（44.5）和 Pass@8（63.8）均优于所有固定温度和启发式调度基线，验证了自适应温度元策略的有效性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_AoTHU2OmS6/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of Temperature Adaptive Meta Policy Optimization (TAMPO). The framework operates through a hierarchical two-loop process. In the inner loop, the LLM policy is optimized with critic-free RL (e.g., GRPO) using rollouts sampled at the temperature chosen by the metapolicy. In the outer loop, the meta-policy is updated by evaluating trajectory likelihoods under virtual temperatures, deriving temperature-specific advantages ( $\mathcal { A } _ { i } ^ { ( T _ { k } ) } = \hat { \ell } _ { T _ { k } } ( \tau _ { i } ) \cdot \boldsymbol { A } _ { i }$ for trajectory $\tau _ { i }$ w.r.t. virtual temperature $T _ { k }$ ) , and reinforcing those that yield high-advantage rollouts (see §3). This d...
@@ -188,7 +192,7 @@ $$\pi_s(T_k) = \frac{\tilde{A}_s^{(T_k)}}{\sum_{j=1}^{K} \tilde{A}_s^{(T_j)}}, \
 
 该框架的轻量性体现在元策略仅维护一个温度优势列表（$K$ 个标量），几乎不增加训练计算开销，且无需为温度适应生成额外轨迹。
 
-## 核心模块与公式推导
+
 
 TAMPO 将温度视为一个可学习的元策略，通过分层双循环架构实现采样温度的在线自适应。其核心由内循环策略优化与外循环元策略更新两个模块构成，二者共享轨迹数据，无需额外采样。
 
@@ -242,7 +246,9 @@ $$\pi_s(T_k) = \frac{\tilde{A}_s^{(T_k)}}{\sum_{j=1}^{K} \tilde{A}_s^{(T_j)}}, \
 
 元策略模型极其轻量：仅维护一个长度为 $K$ 的温度优势列表，训练时几乎不引入额外计算开销，推理时直接丢弃。所有实验均使用相同的基模型、训练数据、训练步数和超参数，TAMPO 的增益完全来自温度的自适应调度。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -292,7 +298,9 @@ Table 1 报告了 TAMPO 与各基线在五个数学推理基准上的对比。TA
 3. **RL 算法兼容性**：TAMPO 目前集成于 GRPO 框架，与其他 RL 算法（如 PPO）的兼容性未经验证。
 4. **任务覆盖**：仅在数学推理和常识推理任务上测试，未在代码生成、安全对齐等领域验证。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有温度控制策略的关系
 
@@ -340,6 +348,8 @@ TAMPO 的双循环架构在形式上与分层强化学习（Hierarchical RL）�
 - 候选温度集合能否根据训练进程和任务特性自动调整？例如，在训练早期自动扩展高温区域以增强探索，后期收窄至低温区域以促进收敛。
 - 在更复杂的奖励结构（如基于人类偏好的 RLHF）中，温度元策略是否仍然有效？奖励信号的稀疏性和噪声特性可能与数学推理中的规则奖励存在本质差异。
 - 温度元策略与策略本身的熵正则化是否存在冗余或冲突？能否在统一的优化框架下联合学习？
+
+
 
 ## 原文 PDF
 

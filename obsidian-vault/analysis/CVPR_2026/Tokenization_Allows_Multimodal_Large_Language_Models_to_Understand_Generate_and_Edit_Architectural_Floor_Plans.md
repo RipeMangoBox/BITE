@@ -42,7 +42,7 @@ claims:
 > - RPLAN (生成任务) 上，Micro IoU 0.709 vs 0.589 (ChatHouseDiffusion) (+0.120)；FID ↓ 1.91 vs 11.3 (ChatHouseDiffusion) (-9.39)。
 > - RPLAN (编辑任务) 上，△IoU (编辑精度) 0.608 vs 0.053 (FLUX.1-Kontext-dev) (+0.555)。
 
-## 概述
+## 概要
 
 建筑平面图设计长期面临一个核心瓶颈：现有方法将布局合成视为纯视觉过程，缺乏对房间实例级别的显式推理，导致全局空间连贯性差、可控制性弱，且理解、生成与编辑任务被割裂在不同模型中处理。**HouseMind** 针对这一瓶颈，提出将建筑平面图分解为轮廓与房间实例，并通过分层矢量量化（VQ-VAE）将连续几何转化为离散空间令牌——一种“空间语言”。这些令牌与语义标签交织为结构化序列，使多模态大语言模型（LLM）能够在统一的**自回归框架**中联合建模文本、几何与拓扑关系，从而以单一架构执行理解、生成与编辑三项任务。
 
@@ -52,7 +52,7 @@ claims:
 
 **方法定位**：HouseMind 属于“离散标记化 + 自回归 LLM”范式，区别于扩散模型（如 ChatHouseDiffusion）和纯视觉多模态模型（如 LLaVA、Qwen-VL 系列）。它将平面图生成重新定义为序列建模问题，以房间实例为最小推理单元，实现了细粒度的文本控制与精确的空间编辑。然而，当前编辑能力仍限于添加/删除房间等简单操作，尚未建模门窗等功能构件，生成结果也未对齐人类设计偏好与美学约束——这些构成了后续研究的主要开放方向。
 
-## 背景与动机
+
 
 建筑平面图设计是建筑信息建模（BIM）与空间规划的核心环节，直接影响居住舒适度、能源效率与施工可行性。传统上，平面图设计依赖专业建筑师的手工绘制或规则驱动的生成系统，前者耗时且难以批量探索，后者则受限于预定义模板，缺乏对复杂空间语义的灵活建模能力。
 
@@ -68,7 +68,9 @@ claims:
 
 **HouseMind** 的提出正是为了应对这一挑战。其核心动机是：将平面图从连续像素空间“翻译”为大语言模型（LLM）可理解的离散令牌序列，从而将理解、生成与编辑统一为同一自回归序列建模问题。通过引入分层矢量量化（VQ‑VAE）将建筑轮廓与房间实例分别编码为结构化空间令牌，并与语义标签交织形成统一序列，HouseMind 使 LLM 能够在文本、几何与拓扑的联合空间中执行多模态空间推理，实现从“看、说、画、改”的全链路能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 从连续像素到离散房间实例令牌：空间表示的范式转换
 
@@ -105,7 +107,7 @@ $$Z = [z_o, \ell_{r_1}, z_{r_1}, ..., \ell_{r_N}, z_{r_N}]$$
 
 消融实验（Table 4）证实了该设计的必要性：完整三阶段管道获得最低验证损失（0.0830），移除阶段一或阶段二均导致损失上升。这表明，**嵌入初始化和多模态预训练并非可选的优化手段，而是实现稳健跨模态对齐的必要条件**。
 
-## 整体框架
+
 
 HouseMind 将建筑平面图的理解、生成与编辑统一为单一序列建模问题，其核心在于**层次化离散标记化**与**多模态对齐**两大设计，使轻量级 LLM 能够在同一自回归框架中执行空间推理。
 
@@ -165,7 +167,7 @@ $$p\big(Z^{tgt} \mid Z^{src}, s\big) = \prod_t p\big(Z_t^{tgt} \mid Z^{src}, Z_{
 ![[assets/figures/papers/paper_list_l2347_https_arxiv_org_abs_2603_11640/figures/002_Figure_2.jpg]]
 *Figure 2: Understanding: given a prompt, an outline, and an existing floor plan, the model outputs a textual description, a bubble diagram, and structured JSON capturing spatial semantics. Generation: given a prompt and an outline, the model produces a complete, coherent floor plan. Editing: given a prompt, an outline, and a reference floor plan, the model outputs an updated plan aligned with the editing intent*
 
-## 核心模块与公式推导
+
 
 ### 3.1 平面图的结构化分解与离散表示
 
@@ -228,7 +230,9 @@ HouseMind 的训练分为三个顺序阶段（图 Figure 3）：
 ![[assets/figures/papers/paper_list_l2347_https_arxiv_org_abs_2603_11640/figures/010_Figure.jpg]]
 *Figure: A.1. VQ-VAE tokenization framework. The outline branch encodes the global boundary, while the conditional room branch encodes each room with outline context to capture spatial relations*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要定量结果
 
@@ -289,7 +293,9 @@ HouseMind 在理解、生成与编辑三项核心任务上均取得显著优势�
 ![[assets/figures/papers/paper_list_l2347_https_arxiv_org_abs_2603_11640/figures/015_Figure.jpg]]
 *Figure: D.1. Result distribution across tasks. HouseMind-O maintains stable, high-performance distributions in understanding and generation, with the bimodal ∆IoU in editing mainly caused by unclear spatial instructions*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 任务定位：从视觉合成到空间推理的范式迁移
 
@@ -385,6 +391,8 @@ HouseMind 使用 Qwen3-0.6B 作为 LLM 骨干，参数量仅 0.6B，远小于通
 5. **轻量化部署**：0.6B 的 LLM 骨干已经较小，但 VQ-VAE 编码器-解码器和三阶段训练流程是否可进一步压缩，以适应移动端或 Web 端实时交互场景？
 
 6. **多模态空间推理的泛化**：HouseMind 的“离散化+LLM”范式能否推广到其他结构化空间推理任务，如电路布局、家具摆放、城市地块规划？这需要验证 VQ-VAE 标记化在不同空间领域中的可迁移性。
+
+
 
 ## 原文 PDF
 

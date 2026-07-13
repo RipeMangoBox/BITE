@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Astra_General_Interactive_World_Model_with_Autoregressive_Denoising.pdf
+project_link: https://eternalevan.github.io/Astra-project/
+code_link: https://github.com/EternalEvan/Astra
 aliases:
 - Astra
 tags:
@@ -29,7 +31,7 @@ claims:
 | 中文题名 | Astra：基于自回归去噪的通用交互式世界模型 |
 | 英文题名 | Astra: General Interactive World Model with Autoregressive Denoising |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=8UZpmrxoLG); [GitHub](https://github.com/EternalEvan/Astra); [Project](https://eternalevan.github.io/Astra-project/) |
+| Links | [paper](https://openreview.net/forum?id=8UZpmrxoLG) · [GitHub](https://github.com/EternalEvan/Astra) · [Project](https://eternalevan.github.io/Astra-project/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | Astra |
 | Dataset | Astra-Bench |
@@ -39,11 +41,11 @@ claims:
 > - Astra-Bench 上，Subject Consistency ↑ 为 0.939，对比 Wan-2.1: 0.827, Matrix-Game: 0.923, YUME: 0.933，变化 +0.006 vs YUME。
 > - Astra-Bench 上，Background Consistency ↑ 为 0.945，对比 Wan-2.1: 0.843, Matrix-Game: 0.939, YUME: 0.927，变化 +0.006 vs Matrix-Game。
 
-## 概述
+## 概要
 
 Astra 是一种通用的交互式世界模型，旨在根据外部动作输入（如相机位姿、机器人控制指令、键盘鼠标操作）动态生成连贯的视频序列。该模型采用自回归去噪框架，将预训练的视频扩散模型（Wan-2.1）与动作感知适配器（ACT-Adapter）相结合，通过逐块自回归预测实现即时动作响应。核心创新包括：噪声增强历史记忆（noise-as-mask）策略以削弱视觉惯性、混合动作专家（MoAE）以统一处理异构动作模态，以及动作自由引导（AFG）以放大动作信号效果。在Astra-Bench和CityWalker等基准测试中，Astra在指令跟随、主体一致性、背景一致性、运动平滑度、美学质量和成像质量六个指标上均优于现有方法。
 
-## 背景与动机
+
 
 现有视频生成模型（如Sora、Wan-2.1）在生成高质量视频方面取得了显著进展，但存在一个根本性瓶颈：**缺乏交互性**。这些模型无法根据外部动作输入动态调整生成内容，且难以在长时间预测中平衡历史一致性与动作响应性。具体而言：
 
@@ -51,7 +53,9 @@ Astra 是一种通用的交互式世界模型，旨在根据外部动作输入�
 - **异构动作模态挑战**：不同应用场景（自动驾驶、机器人操作、相机控制）使用不同结构和尺度的动作表示（如7维相机位姿、7维机器人动作、离散键盘鼠标输入），单一模型难以统一处理。
 - **长时预测一致性**：自回归生成过程中误差会逐步累积，极长序列的质量和一致性难以保证。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Astra 的核心洞察在于：**通过噪声增强历史记忆削弱视觉惯性，迫使模型在生成未来帧时同时依赖历史上下文和动作信号；混合动作专家统一处理异构动作模态**。具体创新点包括：
 
@@ -60,7 +64,7 @@ Astra 的核心洞察在于：**通过噪声增强历史记忆削弱视觉惯性
 3. **混合动作专家（MoAE）**：通过可学习路由将不同模态映射到专用专家，输出聚合为统一动作嵌入。
 4. **动作自由引导（AFG）**：训练时随机丢弃动作条件，推理时通过外推计算引导速度场，放大动作效果。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__image_and_video_generation__b001_8UZpmrxoLG_Astra_General/figures/001_Figure_1.jpg]]
 
@@ -72,7 +76,7 @@ Astra 的整体框架如Figure 2和Figure 3所示。模型采用自回归去噪�
 
 **Figure 4**: Mixture of Action Experts (MoAE). Action signals from diverse modalities are projected into a shared space, augmented with a history mask, and routed to modality-specialized experts. A dynamic router selects top-k experts, whose outputs are aggregated into unified embeddings and fed into the Flow Transformer, enabling versatile and precise action-conditioned generation.
 
-## 核心模块与公式推导
+
 
 ### 5.1 自回归生成目标
 
@@ -110,7 +114,9 @@ $$v_{\mathrm{guided}} = v_\theta(z_t, t, \emptyset) + s \cdot \left( v_\theta(z_
 - **MoAE路由与专家**：由线性路由器和MLP专家组成，支持相机控制（7或12维向量）、机器人动作（7维向量）和导航命令（离散键盘鼠标输入）。
 - **Flow Transformer (DiT)**：基于Wan-2.1的30层流Transformer骨干，冻结除自注意力层外的所有参数。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 6.1 主要定量结果
 
@@ -203,7 +209,9 @@ Astra仅需366.8M可训练参数，是所有比较方法中最少的。
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__image_and_video_generation__b001_8UZpmrxoLG_Astra_General/figures/022_Table_5.jpg]]
 *Table 5: Table B: Parameter comparison. Astra introduces the smallest parameter overhead among all methods, adding only lightweight adapters while preserving the efficiency of the frozen backbone.*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 Astra 属于交互式世界模型（Interactive World Model）这一新兴研究方向，其方法谱系可定位如下：
 
@@ -216,6 +224,8 @@ Astra 属于交互式世界模型（Interactive World Model）这一新兴研究
 **Table C**: Comparative overview of various world model methods, detailing their respective domains of application, supported control modalities, and interaction horizons.
 
 Astra在探索、机器人操作、自动驾驶和相机控制等多个领域均展现出优越性能，支持8-10秒的交互时长，并通过噪声记忆和输入打包技术（Zhang & Agrawala, 2025）实现了长时预测的一致性。
+
+
 
 ## 原文 PDF
 

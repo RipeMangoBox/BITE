@@ -44,7 +44,7 @@ claims:
 > - ImageNet-100 (DiT-XL/2, 2× downsampling) 上，Acc@1 BiGain_TD 78.42% vs ToDo 69.34% (+9.08%)。
 > - ImageNet-1K (2K subset, SD-2.0, 70% merging) 上，Acc@1 BiGain_TM 44.50% vs ToMe 37.35% (+7.15%)。
 
-## 概述
+## 概要
 
 扩散模型在生成任务上表现卓越，但其高昂的计算成本催生了多种令牌压缩加速方法。现有方案（如 **ToMe** (Bolya et al., 2023)、**ToDo** (Smith et al., 2024?)）仅以生成质量为优化目标，忽略了模型潜在的判别能力——当压缩率升高时，分类准确率急剧恶化，而生成视觉质量仍可接受。这一瓶颈源于压缩策略对高频判别信息（边缘、纹理）的无差别丢弃。
 
@@ -63,8 +63,6 @@ claims:
 - 频率感知 KV 选择消融证实：仅保留高频或低频令牌均导致分类崩溃（Acc@1 分别仅 26.56% 和 45.58%），验证了平衡频谱保留的必要性。
 
 BiGain 为扩散模型在联合生成与判别场景下的高效部署提供了统一的压缩范式，但其联合使用增益非叠加，且超参数需手动调节，自适应机制仍有待探索。
-
-## 背景与动机
 
 ### 扩散模型的生成与判别双重角色
 
@@ -114,7 +112,7 @@ BiGain处于扩散模型加速与判别能力保护的交叉点，与现有工�
 
 BiGain的独特贡献在于：首次将频率感知原则系统性地引入扩散模型的令牌压缩，通过拉普拉斯滤波器实现无训练的频谱感知，同时兼顾生成与判别双重目标。该方法不依赖额外训练或模型架构修改，可直接插入现有的U-Net和DiT骨干网络。
 
-## 核心创新
+## 核心方法与创新机理
 
 BiGain 的核心创新在于将**频率感知**引入扩散模型的令牌压缩，通过解耦高频细节与低频语义，首次在加速推理的同时**兼顾生成保真度与判别效用**。现有加速方法（如 ToMe、ToDo）仅以生成质量为目标，导致压缩后分类准确率急剧下降（例如 COCO-2017 上基线方法准确率崩坏），而 BiGain 通过两个训练无关（training‑free）的即插即用算子逆转了这一困境。
 
@@ -153,8 +151,6 @@ $$\mathcal{D}_{\alpha, s}(Z)[i] = \alpha Z[\mathrm{nearest}(i)] + (1-\alpha) \fr
 ### 频率感知设计的核心洞察
 
 所有创新的共同基础是**将特征映射至频率感知表示，解耦高频细节与低频/中频语义**。拉普拉斯滤波器作为令牌评分在所有合并率下均优于全局统计量、频谱 DFT 和余弦相似度（Table 8），直接验证了频率感知设计的必要性。这一洞察使 BiGain 成为首个在扩散模型加速中明确以**平衡频谱保留**为设计准则的框架，而非仅追求生成质量的单目标优化。
-
-## 整体框架
 
 BiGain 是一个免训练、即插即用的统一令牌压缩框架，旨在同时保留扩散模型的生成质量与判别能力。其核心洞察在于**频率分离**：将隐藏特征映射至频率感知表示，解耦高频细节（边缘、纹理）与低频/中频内容（形状、布局、语义），从而在压缩过程中实现**平衡频谱保留**——合并低频冗余令牌，保护承载判别信息的高频令牌。
 
@@ -222,8 +218,6 @@ BiGain 的压缩模块无缝嵌入扩散分类器的推理管线。对于输入�
 ![[assets/figures/papers/paper_list_l841_https_arxiv_org_abs_2603_12240/figures/001_Figure_1.jpg]]
 *Figure 1: Framework of our BiGainTM method. A Laplacian filter is applied to hidden-state tokens to compute local frequency scores. In each spatial stride, the lowest-scoring token is selected as a destination token, while the others form the source set. Destination and source tokens are gathered globally, and a bipartite matching selects top source-destination pairs*
 
-## 核心模块与公式推导
-
 ### 3.1 扩散模型预备与分类协议
 
 扩散模型的前向过程逐步向干净图像 $\mathbf{x}_0$ 注入高斯噪声，其条件分布为：
@@ -289,7 +283,7 @@ $$Q_{\text{full}}, \quad K_{\downarrow} = \mathcal{D}_{\alpha, s}(K), \quad V_{\
 ![[assets/figures/papers/paper_list_l841_https_arxiv_org_abs_2603_12240/figures/012_Figure_6.jpg]]
 *Figure 6: Comparison of token merging schemes. Left: ToMe [4]; Right: Our BiGainTM. Merging is applied with a merge ratio 90% at the highest-resolution latent layer of the U-Net transformer in Stable Diffusion 2.0 at denoising step t = 200. Grayscale indicates merged tokens*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心发现：频率感知压缩实现生成与判别的双重增益
 
@@ -346,9 +340,6 @@ BiGain 提供两种快速变体以进一步降低计算开销（Table 7）：自
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l841_https_arxiv_org_abs_2603_12240/figures/002_Figure_2.jpg]]
-*Figure 2: Impact of token compression on diffusion models as our motivation on COCO2017 and ImageNet-100. Left: ToMe [4] (baseline) vs. Laplacian-Gated Merge (ours) as the merge ratio increases. Right: ToDo [26] (baseline) vs. Interpolate-Extrapolate KV-Downsampling (ours) as the downsample factor grows. Curves report percent change relative to the uncompressed model (↑ better; for FID we plot −∆FID%). Blue: classification accuracy. Orange: generation quality (FID)*
-
 ![[assets/figures/papers/paper_list_l841_https_arxiv_org_abs_2603_12240/figures/005_Table_1.jpg]]
 *Table 1: Classification accuracy (Acc@1) on Pets dataset under similar FLOPs reduction*
 
@@ -358,7 +349,7 @@ BiGain 提供两种快速变体以进一步降低计算开销（Table 7）：自
 ![[assets/figures/papers/paper_list_l841_https_arxiv_org_abs_2603_12240/figures/013_Table_8.jpg]]
 *Table 8: Ablation over token scoring heuristics for Stable Diffusion 2.0. Top-1 acc. (%) on Pets dataset across merge ratios. Local Laplacian signals outperform global or spectral metrics*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 核心问题定位：扩散模型加速中的“判别-生成”失衡
 

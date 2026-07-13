@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Spilled_Energy_in_Large_Language_Models.pdf
+project_link: null
+code_link: http://github.com/OmnAI-Lab/spilled-energy/
 openreview_forum_id: EXFKk4Y3yc
 aliases:
 - SE
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 大型语言模型中的能量溢出 |
 | 英文题名 | Spilled Energy in Large Language Models |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=EXFKk4Y3yc); [GitHub](http://github.com/OmnAI-Lab/spilled-energy/) |
+| Links | [paper](https://openreview.net/forum?id=EXFKk4Y3yc) · [GitHub](http://github.com/OmnAI-Lab/spilled-energy/) |
 | Topic | #topic/safety_alignment_fairness_privacy #topic/safety_alignment_fairness_privacy/trustworthy_machine_learning |
 | Method | Spilled Energy (溢出能量) |
 | Dataset | 合成算术 (Math Sums, 13-digit), 9 个标准基准 (HotpotQA, TriviaQA, Movies 等), MNLI (LLaMA 模型) |
@@ -42,7 +44,7 @@ claims:
 > - 9 个标准基准 (HotpotQA, TriviaQA, Movies 等) 上，平均 AuROC 为 73.16 (LLaMA-Instruct, Spilled ΔE Min)，对比 51.29 (p(true)), 64.16 (Orgad et al. Mean), 54.62 (Logit E^ℓ Max)，变化 +21.87 vs p(true), +9.00 vs Orgad et al.。
 > - MNLI (LLaMA 模型) 上，AuROC 为 99.97 (Spilled ΔE Min)，对比 60.33 (Orgad et al.)，变化 +39.64。
 
-## 概述
+## 概要
 
 大型语言模型（LLM）在生成文本时容易产生幻觉——包括事实性错误、推理失败和偏见输出。检测这些错误面临两个核心瓶颈：其一，传统的softmax置信度或logit概率无法可靠地跨任务、跨数据集指示生成内容的正确性；其二，基于探测分类器（probing classifier）的方法虽然性能较好，但需要针对每个任务和数据集训练额外的分类器，缺乏泛化性且引入训练开销。
 
@@ -54,7 +56,7 @@ claims:
 
 值得注意的是，该方法仍存在一定局限：溢出能量可能在标点符号和句子开头token上产生误报，且当前仅在所测试的模型架构上得到验证，对其他架构的泛化性尚需进一步确认。
 
-## 背景与动机
+
 
 大型语言模型（LLM）在广泛任务中展现出卓越能力，但其输出仍频繁出现幻觉——包括事实性错误、偏见和推理失败。这些错误在表面上与正确输出难以区分，严重制约了LLM在高可靠性场景中的部署。
 
@@ -64,7 +66,9 @@ claims:
 
 本文的动机正是从能量基模型（Energy-Based Model, EBM）的视角重新审视LLM的解码过程。将LLM的softmax分类器重新解释为EBM后，序列概率可通过链式法则分解为多个交互的EBM。理论上，相邻时间步的边际能量与条件能量应当相等，但在实际LLM实现中，两者之间存在不匹配——即“溢出能量”（spilled energy）。这一溢出量与模型输出的正确性高度相关，从而提供了一种完全无需训练、仅从输出logits计算得到的幻觉检测信号。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 从分类器到能量基模型的重新解释
 
@@ -108,7 +112,7 @@ $$\Delta E_{\theta}(\mathbf{x}_{i:1}) \triangleq -E_{\theta}^{m}(\mathbf{x}_{i:1
 
 此外，论文还提出了缩放溢出能量 $\Delta \bar{E}_s(\mathbf{x}_{i:1}) = |E_{\theta}^{m}(\mathbf{x}_{i:1})| \Delta E_{\theta}(\mathbf{x}_{i:1})$，将溢出能量与边际能量的绝对值相乘，组合两种度量（Section 4.2）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0011_EXFKk4Y3yc_Spilled_Energy_in_Large_Language_Models/figures/006_Figure_6.jpg]]
 *Figure 6: (d) MNLI MathFigure 2: How energy spills in LLMs. (a) Language Modeling p ( $\mathbf { x } _ { i : 1 }$ ) Hotpotqa WC is attained as a decomposition problem following the chain rule of probability, implemented as autoregressive: we recursively apply a discriminative classifier over the vocabulary V to attain generative modeling with larger context size i.e. p ( $\mathbf { x } _ { i } | \mathbf { x } _ { i - 1 : 1 }$ ) . (b) We reinterpret each discriminative classifier as a generative EBM, finding a connection between two quantities that should be the same across time steps yet are different. We call this difference “the spilled energy” $\Delta E _ { \pmb { \theta } } ( \mathbf { x } _ { i : 1 }$...
@@ -131,7 +135,7 @@ $$\Delta E_{\theta}(\mathbf{x}_{i:1}) \triangleq -E_{\theta}^{m}(\mathbf{x}_{i:1
 
 整个pipeline的输入仅为LLM在生成过程中的logits序列和答案token区间，输出为一个无需训练的幻觉检测分数。该框架在LLaMA、Mistral、Gemma等多个模型系列上均得到了验证（Table 1, Table 3），且对预训练和指令微调变体均有效。
 
-## 核心模块与公式推导
+
 
 ### 能量基模型（EBM）重解释
 
@@ -182,7 +186,9 @@ $$\Delta \bar{E}_s(\mathbf{x}_{i:1}) = |E_{\theta}^{m}(\mathbf{x}_{i:1})| \cdot 
 3. **溢出能量计算**：按 Eq. 8 计算相邻步间能量差。
 4. **答案 token 定位与池化**：识别生成序列中精确答案所在的 token 区间 $[u, w]$（Section 4.2），在该区间上应用 Min/Max/Mean 池化聚合溢出能量或边际能量，得到单一检测值。消融实验表明，精确的答案 token 定位可带来约 24% 的性能提升（Table 2），而 Min 池化策略整体优于 Max 和 Mean（Section 5.2）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 合成算术任务：溢出能量的分离能力
 
@@ -249,7 +255,9 @@ Table 3 展示了在 Gemma-Instruct 1B 和 4B 上的结果。溢出能量在 Gem
 *Figure 7: ROC curves for Hallucination Detection across models (rows) on Math Sums with different error ranges in the answer (columns, decreasing range left to right). All sums are performed on 13-digit integers. Legend: Spilled (ours) Spilled ∆E Logit Eℓ Marginal $\bar { \boldsymbol { E } } ^ { m }$
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有幻觉检测方法的关系
 
@@ -288,6 +296,8 @@ Table 3 展示了在 Gemma-Instruct 1B 和 4B 上的结果。溢出能量在 Gem
 - **解码时干预**：能否利用溢出能量在解码过程中直接干预生成过程以减少幻觉？例如，当检测到高溢出能量时触发重新采样或回溯机制。
 
 - **任务扩展**：对于代码生成、翻译、摘要等结构化或半结构化任务，溢出能量的有效性如何？是否需要针对不同任务设计特定的池化策略或答案定位方法？
+
+
 
 ## 原文 PDF
 

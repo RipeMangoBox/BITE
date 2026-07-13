@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/TokenHSI_Unified_Synthesis_of_Physical_Human_Scene_Interactions_through_Task_Tokenization.pdf
+project_link: https://liangpan99.github.io/TokenHSI
+code_link: null
 aliases:
 - TokenHSI
 tags:
@@ -40,7 +42,7 @@ claims:
 > - Skill Composition: Climb+Carry 上，Success Rate (%) 99.2 vs CML 68.3, CML (dual) 51.3 (vs CML +30.9)。
 > - Object Shape Variation: Chair 上，Success Rate (%) 88.8 vs AdaptNet 84.5 (+4.3)。
 
-## 概述
+## 概要
 
 物理仿真下的角色控制是构建真实人-场景交互（Human-Scene Interaction, HSI）的关键技术。然而，现有方法通常为单一任务（如跟随路径、坐下、攀爬或搬运物体）独立设计专用策略，缺乏多技能的统一与泛化能力。当面对需要多技能协同的复杂任务——例如在复杂地形上搬运物体，或顺序执行多个子任务的长程任务——这些孤立训练的控制器难以有效组合与迁移。这一瓶颈的根源在于，传统策略架构将角色本体感知与任务观测耦合为单一联合状态，并通过固定长度的MLP网络处理，导致不同任务之间的运动知识无法共享。
 
@@ -48,7 +50,7 @@ claims:
 
 实验表明，TokenHSI在四项基础HSI技能（Follow、Sit、Climb、Carry）上全面超越或持平单任务专用策略，尤其在Carry任务上将成功率从83.1%提升至92.2%（Table 1）。在技能组合任务中，TokenHSI的优势更为显著：Climb+Carry组合任务的成功率达到99.2%，而基线方法CML仅为68.3%（Table 2）。此外，通过冻结预训练参数并仅训练新增任务令牌与零初始化适配器层，TokenHSI能够高效适应物体形状变化、地形变化乃至长程任务完成等更具挑战性的场景，展现出较强的泛化能力和样本效率。
 
-## 背景与动机
+
 
 物理仿真角色与三维场景的交互（Physical Human-Scene Interaction, HSI）是计算机图形学与具身智能交叉领域的核心挑战，其目标是在物理模拟器中驱动力学角色完成诸如路径跟随、坐下、攀爬、搬运等多样化任务。近年来，基于强化学习（RL）的运动控制方法取得了显著进展，但现有工作普遍存在一个结构性瓶颈：**控制器通常为单一任务独立设计，缺乏多技能统一与泛化能力**。例如，一个能精准跟随路径的角色策略，往往无法同时完成搬运箱子或攀爬障碍等任务，更难以应对需要多技能协同的复杂组合场景。
 
@@ -58,7 +60,9 @@ claims:
 
 **TokenHSI的核心动机**正是针对上述缺口：通过重新设计观测表示与策略架构，实现单一网络对多项基础HSI技能的统一学习，并支持以极低的参数代价高效适应到更复杂的组合与泛化任务。其关键洞察在于**解耦本体感知与任务观测**——将角色自身的运动状态建模为独立的共享本体感知令牌（proprioception token），而将不同任务的特定观测分别编码为独立的任务令牌。借助Transformer编码器的可变长输入支持和掩码注意力机制，共享的本体感知令牌能够在不同任务间传递运动知识，而掩码机制则抑制无关任务令牌的干扰，从而在单网络中实现高效的多任务联合训练与跨技能知识迁移。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 TokenHSI 的核心创新在于通过**任务标记化（Task Tokenization）** 将物理人-场景交互（HSI）建模从“单一任务专用策略”范式转变为 **“统一 Transformer 多任务策略 + 轻量适应”** 范式。其关键设计变更体现在以下四个维度：
 
@@ -78,7 +82,7 @@ TokenHSI 的核心创新在于通过**任务标记化（Task Tokenization）** �
 
 在将预训练技能迁移到新任务（如技能组合、物体/地形形状变化）时，基线方法要么从头训练（Scratch），要么全量微调（Finetune），或依赖专门设计的适应架构（AdaptNet）。TokenHSI 提出**冻结预训练组件**（$T^{prop}$、编码器 $\phi$、输出嵌入 $e$、动作头 $H$），仅训练**新增任务令牌**和**动作头中插入的零初始化适配器层** $\xi^A$。这一轻量适应策略在 Climb+Carry 技能组合任务上达到 99.2% 成功率（CML 仅 68.3%），在地形变化搬运任务上达到 74.0%（AdaptNet 为 63.4%），同时训练参数量远小于全量微调，实现了效率与性能的双重优势。
 
-## 整体框架
+
 
 TokenHSI 构建了一个两阶段统一框架，通过将人-场景交互建模为可组合的**任务令牌**，在单个 Transformer 网络中实现多技能学习与高效策略适应。如图 2 所示，整体流程分为**基础技能学习**（左）与**策略适应**（右）两个阶段。
 
@@ -115,7 +119,7 @@ TokenHSI 构建了一个两阶段统一框架，通过将人-场景交互建模�
 ![[assets/figures/papers/paper_list_l1751_TokenHSI_Unified_Synthesis_of_Physical_Human_Scene_Interactions_through/figures/002_Figure_2.jpg]]
 *Figure 2: TokenHSI consists of two stages: (left) foundational skill learning and (right) policy adaptation. Through multi-task policy training, the proposed framework learns versatile interaction skills in a single transformer network. Theses learned skills can be flexibly adapted to more challenging HSI tasks by training the lightweight modules, e.g., Tnew, Tc, and*
 
-## 核心模块与公式推导
+
 
 ### 3.1 多令牌观测空间构建
 
@@ -170,7 +174,9 @@ $$r_{t}^{f+c} = \begin{cases} 0.0, & \|x_{t}^{obj.2d} - x_{t}^{root.2d}\| > 0.7 
 
 其中 $r_t^f$ 为路径跟随奖励，$r_t^{c.pick}$ 为搬运拾取奖励，权重各0.5实现技能平衡。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 基础技能统一学习
 
@@ -230,7 +236,9 @@ TokenHSI 首先在四项基础人-场景交互技能（路径跟随 Follow、坐
 ![[assets/figures/papers/paper_list_l1751_TokenHSI_Unified_Synthesis_of_Physical_Human_Scene_Interactions_through/figures/013_Table.jpg]]
 *Table: A. The overview of all 12 tasks implemented in this paper. Key settings for each task are summarized, including the number of task tokens, the construction of reference motion and object datasets, the episode length, and early termination conditions. The available termination conditions contain character fall, object fall, path distance, and interaction early termination (IET). A slash (/) indicates that the specific configuration is not applicable*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与设计动机
 
@@ -287,6 +295,8 @@ AdaptNet 是专门设计的策略适应架构基线。在物体形状变化（Ch
 ### 方法谱系总结
 
 TokenHSI 在物理 HSI 合成领域的方法谱系中占据了“统一多技能策略”这一节点。其上游是单任务专用控制器（AMP 系列）和组合动作学习方法（CML），下游则指向更自主、更少人工干预的交互合成系统。核心贡献在于通过 Transformer 令牌化机制优雅地解决了多技能统一与高效适应的问题，但距离完全自主的复杂场景交互仍有距离。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/Motion2Motion_Cross_topology_Motion_Transfer_with_Sparse_Correspondence.pdf
+project_link: null
+code_link: null
 aliases:
 - Motion2Motion
 tags:
@@ -42,7 +44,7 @@ claims:
 > - Cross-species Skeleton Transfer 上，FID 0.492 vs 1.68 (Pose-to-Motion) (-1.188)。
 > - User Study (5-point Likert) 上，Motion Quality 4.36 ± 0.18 vs 3.55 ± 0.22 (WalkTheDog) (+0.81)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：跨拓扑运动迁移的核心困难在于源骨骼与目标骨骼之间的拓扑不一致性——关节数量、层级结构、语义对应均不相同，无法建立直接的一对一骨骼映射。同时，缺乏跨拓扑的大规模配对运动数据，使得数据驱动的监督学习方法难以泛化到未见过的骨架组合。
 
@@ -52,7 +54,7 @@ claims:
 
 **主要结果**：在相似骨架和跨物种两种设置下，Motion2Motion 的 FID 指标均显著优于基线（相似骨架：0.033 vs. 0.389；跨物种：0.492 vs. 1.68）。用户研究进一步表明，该方法在运动质量（4.36/5.0）和对齐度上均显著领先。消融实验验证了稀疏绑定的有效性——仅 6.1% 的绑定率即可在运动保真度与解剖合理性之间取得最佳平衡。
 
-## 背景与动机
+
 
 ### 问题背景：跨拓扑运动迁移的核心挑战
 
@@ -81,7 +83,9 @@ claims:
 
 这一设计使得 Motion2Motion 能够处理从同物种（蟒蛇→眼镜王蛇）到跨物种（蟒蛇→霸王龙、火烈鸟→猴）的极端拓扑变化，在运动质量、时间一致性和多样性上均显著优于现有基线。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Motion2Motion 的核心创新在于将跨拓扑运动迁移重新定义为**基于运动补丁的条件匹配问题**，而非传统的神经网络回归或优化问题。这一范式转换带来了五个关键维度的突破：
 
@@ -123,7 +127,7 @@ $$
 
 这些创新共同构成了一个**轻量、灵活且无需训练**的跨拓扑运动迁移框架，其核心洞见在于：未绑定关节的运动模式可由绑定关节的运动补丁通过匹配-混合推断得出，无需建立密集对应或依赖大规模配对数据。
 
-## 整体框架
+
 
 Motion2Motion 将跨拓扑运动迁移建模为一个**基于运动补丁的条件匹配与混合问题**，其核心思想是：通过用户指定的少量骨骼对应关系作为空间条件，引导源运动在目标骨骼上的重构，而无需密集对应或大规模预训练。
 
@@ -155,7 +159,7 @@ Motion2Motion 将跨拓扑运动迁移建模为一个**基于运动补丁的条�
 ![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2506_03901/figures/002_Figure_2.jpg]]
 *Figure 2: System overview of Motion2Motion. (A) The source motion sequence $\mathbf { S } \in \mathbb { R } ^ { F _ { s } \times D _ { s } }$ , . (B) The source sequence is divided into overlapping motion patches $\mathcal { P } ^ { ( s ) }$ . (C) Each source patch is projected to the target skeleton space via sparse mapping and noise initialization, serving as the query for retrieval. For each source patch, we retrieve target patches (D) from a pre-built motion patch database $\dot { \varphi } ( \bar { t }$ ) , based on sparse correspondences. (E) The matched target patches are averaged for blending. (F) The retargeted motion $\widehat { \mathbf { T } } \in \mathbb { R } ^ { F _ { s } \times D _ { t } }$ is...
 
-## 核心模块与公式推导
+
 
 Motion2Motion 将跨拓扑运动迁移形式化为一个**条件化的运动补丁匹配与混合**问题，其核心流程由七个模块串联构成，整体框架如 Fig. 2 所示。
 
@@ -217,7 +221,9 @@ $$\mathbf{P}^{\mathrm{match}} \gets \underset{\mathbf{P}\in\mathcal{P}^{(t)}}{\m
 
 其中绑定率定义为匹配对应数量相对于源和目标骨骼关节总数的百分比。消融实验表明，绑定率在 6.1% 左右时运动保真度和解剖合理性达到最佳平衡——过小则缺乏一致性约束，过大则引入不匹配骨骼的干扰（见 Fig. 13）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要定量结果
 
@@ -308,7 +314,9 @@ Motion2Motion 在相似骨骼迁移与跨物种迁移两个核心场景下均取
 ![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2506_03901/figures/011_Figure_8.jpg]]
 *Figure 8: Cross skeletal organisms transfer (limbless → biped). The diverse retargeted results of the same skeleton are shown in different colors. (A) Source motion of an anaconda. (B) Retargeted motion on the limbless skeleton (king-cobra). (C) Retargeted motion on the biped skeleton (raptor). The frames in (B) and (C) correspond to specific moments from (A), demonstrating the transformation from a limbless to a bipedal structure with semantically and temporally aligned motion*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有基线的对比定位
 
@@ -359,6 +367,8 @@ Motion2Motion 的有效性建立在以下几个前提条件之上，这些条件
 - **扩展到物理动画**：该匹配-混合框架能否应用于基于物理的角色动画，包括布料和毛发动力学？这需要将运动补丁的概念从骨骼运动扩展到变形场，并处理物理约束的满足问题。
 
 - **极端拓扑的泛化验证**：在昆虫骨架、多足生物、软体动物等更极端的拓扑结构上系统评估方法的有效性，以确定其泛化边界。这同时需要扩展骨骼对应定义，以处理非标准关节类型（如球形关节、弹性连接）。
+
+
 
 ## 原文 PDF
 

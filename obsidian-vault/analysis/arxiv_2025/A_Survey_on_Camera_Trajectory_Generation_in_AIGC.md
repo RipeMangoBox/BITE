@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/A_Survey_on_Camera_Trajectory_Generation_in_AIGC.pdf
+project_link: null
+code_link: null
 aliases:
 - SCTGA
 tags:
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | AIGC中相机轨迹生成综述 |
 | 英文题名 | A Survey on Camera Trajectory Generation in AIGC |
 | 会议/期刊 | arXiv 2025 |
-| Links | [paper](https://arxiv.org/abs/2506.00974) · [arXiv](https://arxiv.org/abs/1811.08086) |
+| Links | [paper](https://arxiv.org/abs/2506.00974) · [paper](https://arxiv.org/abs/1811.08086) |
 | Topic | #topic/vision_multimodal_applications #topic/generative_models_diffusion #topic/vision_multimodal_applications/image_and_video_generation |
 | Method |  |
 | Dataset |  |
@@ -40,7 +42,7 @@ claims:
 > - 提供了四类主要方法（规则、优化、机器学习、混合）的详细对比表格（表1-4），清晰展现了技术脉络和差异。
 > - 首次系统收集并比较了定量和定性评估指标（表5-6），并分析了现有数据集的特征与不足（表7）。
 
-## 概述
+## 概要
 
 相机轨迹生成是连接三维场景与二维屏幕画面的核心桥梁，其本质是在高维连续空间中寻找一条同时满足几何约束、物理可行性、视觉美学与叙事意图的路径。该综述系统梳理了从规则驱动到数据驱动的技术演进脉络，首次将相机表示明确划分为三个抽象层次——高层自然语言、中层镜头注解、低层数学表示，并揭示了这一层次选择构成了领域最根本的因果调节旋钮：抽象层次越高，用户表达越便捷但精确控制越困难；抽象层次越低，数学可优化性越强但语义表达越匮乏。
 
@@ -50,7 +52,7 @@ claims:
 
 展望未来，将生成式AI的语义理解能力与经典方法的精确控制能力深度融合，构建大规模真实世界标注数据集，并开发专门针对相机轨迹的多维度评估基准，将是推动该领域从合成环境走向真实应用的关键路径。
 
-## 背景与动机
+
 
 ### 1. AIGC 中的相机控制：一个被低估的核心问题
 
@@ -92,7 +94,9 @@ claims:
 
 通过这一综述，我们希望为研究者提供一个理解该领域全貌的“地图”，并激发更多跨范式、跨层次的创新工作。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本综述的核心创新不在于提出一种新的算法，而在于**首次为相机轨迹生成领域构建了一个系统化的认知框架**，将碎片化的研究整合到一个统一的分析视角下。其关键贡献体现在以下几个维度：
 
@@ -125,7 +129,7 @@ claims:
 
 **需注意**：本综述未进行新的实验验证，所有评估数据均来自原始论文，不同方法间的比较可能受实验设置差异影响，相关结论需结合具体方法论文进行交叉验证。
 
-## 整体框架
+
 
 本综述构建了一个三维分析框架，从**表示（Representation）**、**生成方法（Generation Method）**和**评估（Evaluation）**三个正交维度对相机轨迹生成领域进行系统梳理。该框架的核心逻辑在于：表示层定义了“如何描述相机轨迹”，方法层解决“如何生成轨迹”，评估层则回答“如何衡量轨迹质量”。三个维度之间并非线性串联，而是通过**抽象层次的选择**形成因果关联——表示层的抽象程度直接决定了方法层的搜索空间结构和优化难度，进而影响评估层可采用的度量方式。
 
@@ -180,7 +184,7 @@ claims:
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2506_00974/figures/021_Figure_17.jpg]]
 *Figure 17: The architecture of the model [Jiang et al. 2021] for generating camera trajectories based on a reference video and key points*
 
-## 核心模块与公式推导
+
 
 本节从相机轨迹生成的技术栈出发，梳理支撑该领域的核心数学表示与关键公式。由于该综述本身不提出新方法，以下公式均来自其所覆盖的代表性工作，按表示层（低层数学表示）与优化/评估层组织。
 
@@ -282,7 +286,9 @@ $$E _ { \mathrm { t o t a l } } = \sum _ { i = 0 } ^ { N } \bigg [ \alpha _ { \r
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2506_00974/figures/007_Figure_6.jpg]]
 *Figure 6: Drone configuration in the DTS model, showcasing its 7D parameterization [Galvane et al. 2018]*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 本综述未进行新的实验，所有评估数据均来自原始论文，因此不同方法间的比较可能受实验设置差异影响。本节从方法谱系、评估体系与数据集三个维度对现有工作进行系统对比，揭示领域现状与瓶颈。
 
@@ -367,7 +373,9 @@ $$
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2506_00974/figures/039_Table_7.jpg]]
 *Table 7: Dataset Comparison*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1 表示层级的谱系分化：从语义到几何的三层抽象
 
@@ -420,6 +428,8 @@ $$\operatorname*{maximize} F(f_1(q), f_2(q), \ldots, f_n(q)) \quad \mathrm{s.t.}
 **优化轴**：如何在动态多目标场景中实现**实时、美学感知、物理可行的联合优化**。当前优化方法（式7-18）的代价函数设计仍以手工加权为主，生成式AI（扩散模型、视觉-语言模型）的引入为长时域规划和全局一致性提供了新可能，但计算效率与实时性需求的矛盾尚未解决。
 
 **评估轴**：亟需构建**大规模、多样化、具有丰富相机运动标注的真实世界数据集**，并开发涵盖美学、连续性和叙事维度的专用评估度量。这一基础设施的缺失已成为制约整个领域从方法探索走向系统落地的根本瓶颈。
+
+
 
 ## 原文 PDF
 

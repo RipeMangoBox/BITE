@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Detecting_Temporal_Misalignment_Attacks_in_Multimodal_Fusion_for_Autonomous_Driving.pdf
+project_link: null
+code_link: https://github.com/shahriar0651/AION
 openreview_forum_id: SWlCJab9gZ
 aliases:
 - DTMAMFAD
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 面向自动驾驶多模态融合的时间错位攻击检测 |
 | 英文题名 | Detecting Temporal Misalignment Attacks in Multimodal Fusion for Autonomous Driving |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=SWlCJab9gZ); [GitHub](https://github.com/shahriar0651/AION) |
+| Links | [paper](https://openreview.net/forum?id=SWlCJab9gZ) · [GitHub](https://github.com/shahriar0651/AION) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | AION |
 | Dataset | KITTI, nuScenes |
@@ -40,7 +42,7 @@ claims:
 > - KITTI 上，AUROC (camera‑only attacks) 为 0.9493，对比 N/A，变化 N/A。
 > - nuScenes 上，AUROC (LiDAR‑only attacks) 为 0.9495，对比 N/A，变化 N/A。
 
-## 概述
+## 概要
 
 自动驾驶系统依赖相机与激光雷达等多模态传感器融合来实现精确的环境感知。然而，现有的融合流水线普遍采用 ROS2 的 ApproximateTimeSynchroniser 等近似时间同步机制，这些机制完全忽略了时间维度的安全性——攻击者只需篡改传感器时间戳，即可迫使系统将语义上不一致的跨模态数据配对融合，从而破坏感知输出。这种时间错位攻击（Temporal Misalignment Attack, TMA）可以绕过所有现有的语义/空间一致性防御，构成自动驾驶安全的真实瓶颈。
 
@@ -53,7 +55,7 @@ claims:
 
 AION 也存在明确局限：对恒定延迟攻击（所有模态被同步偏移相同时间）检测能力有限，因为此时跨模态语义仍然一致；当前方案仅覆盖相机与激光雷达两种传感器；异常阈值需在不同场景下重新标定以保证低误报率。这些限制为未来的防御扩展指明了方向。
 
-## 背景与动机
+
 
 自动驾驶系统依赖多模态传感器融合实现可靠的场景理解，其中相机与激光雷达的精确时间同步是融合质量的前提。在典型的 ROS2 中间件架构中，融合节点使用近似时间同步器（ApproximateTimeSynchroniser）将不同传感器的时间戳对齐：对于每一帧相机消息，同步器选择时间戳最接近的激光雷达帧进行配对，即 $j^{\star}(i) = \arg \min_k \big| t_C^{(i)} - t_L^{(k)} \big|$。然而，这一时间同步机制本身构成了一个被长期忽视的攻击面。
 
@@ -63,7 +65,9 @@ AION 也存在明确局限：对恒定延迟攻击（所有模态被同步偏移
 
 **本文的核心动机**正是填补这一防御空白。关键洞察在于：正常操作下，相机与激光雷达的跨模态表示沿时间轴应呈现平滑过渡；而时间错位攻击会破坏这种连续性，表现为跨模态相似度矩阵中对齐路径偏离对角线、累积奖励/代价值显著恶化。基于这一洞察，AION 提出了两个互补机制：连续性感知对比学习（CACL）迫使共享多模态表示沿时间轴平滑过渡，以及基于动态时间规整（DTW）的检测模块直接从对齐路径的奖励/代价中量化时间错位程度。该方法无需依赖统一时钟基准或外部时间源，仅通过跨模态时序一致性即可检测异常。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：时间维度防御空白
 
@@ -104,7 +108,7 @@ AION 的检测机制不依赖任何统一时钟基准，而是利用 CACL 训练
 - **中高置信度（0.9）**：DTW 对齐路径偏离对角线的机制在良性/攻击场景的对比中得到验证，但缺乏对极端边界情况的定量分析。
 - **需人工核实**：对恒定延迟攻击（所有模态被同步偏移相同时间）的检测能力有限，因为此时跨模态语义仍然一致，仅靠表示空间的时序一致性难以识别。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0012_SWlCJab9gZ_Detecting_Temporal_Misalignment_Attacks_in_Multi/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the proposed defense AION against any TMA attack*
@@ -132,7 +136,7 @@ AION 对每个观察窗口（默认 $w=3$，采样底数 $\psi=2$）输出一个
 
 AION 针对七类 TMA 攻击策略（表 1）设计：Constant（恒定延迟）、Random（随机替换）、Jitter（带噪声的随机抖动）、Reversal（时间戳反转）、Burst（突发性批量延迟）、Drift（累积漂移延迟）和 Scheduler（调度器级别操纵）。这些攻击覆盖了时间戳冻结、替换、随机化、重排序和渐进偏移等典型操纵模式，AION 无需针对单一攻击类型训练，而是通过时间一致性这一通用信号实现统一检测。
 
-## 核心模块与公式推导
+
 
 ### 威胁模型与攻击面
 
@@ -203,7 +207,9 @@ $\lambda_{ij}$ 的作用机制：当 $|i-j|$ 较小（近负对），$\tanh$ 值
 
 这两种基线分别仅利用时间戳信息或仅利用特征相关性，均无法捕捉跨模态时间一致性的细粒度变化，为 AION 的 DTW 方案提供了对比基准。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现
 
@@ -247,7 +253,9 @@ AION 存在明确的检测盲区：当所有传感器被施加相同的恒定延
 *Figure 4: ROC curves with AUROC scores of AION under TMA attacks across KITTI and nuScenes, evaluated on camera, lidar, and both camera–lidar modalities*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与已有防御方法的关系
 
@@ -282,6 +290,8 @@ AION 的检测能力建立在以下核心假设之上，当这些假设不成立
 3. **多车队列与大规模部署**：在车路协同或多车队列场景中，AION 的阈值一致性与误报率控制如何保证？不同车辆传感器配置、安装误差和网络延迟的差异可能导致异常得分的分布偏移。
 
 4. **对抗性适应攻击**：当前评估假设攻击者不了解 AION 的检测机制。如果攻击者知晓 CACL 的训练策略和 DTW 的评分逻辑，是否可能设计出既能破坏感知输出又能保持相似度矩阵对角线结构的自适应攻击？这需要进一步的安全性分析。
+
+
 
 ## 原文 PDF
 

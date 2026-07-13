@@ -44,7 +44,7 @@ claims:
 > - Hi-CNA 变化检测 (CD) - SNU-Net 上，IoU / F1 DMCRD 50.00 / 66.67 vs DMSE 45.62 / 62.66 (+4.38 / +4.01)。
 > - WHU Building 语义分割 (SS) 上，IoU / F1 Ours (MCRD) 41.88 / 59.04 vs Ours (MSE) 40.59 / 57.74 (+1.29 / +1.30)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：遥感图像生成方法长期面临三大割裂——语义分割（SS）与变化检测（CD）任务各用各的生成框架，无法统一；绝大多数方法仅支持 RGB 三通道，对多光谱数据无能为力；训练损失（MSE）对标注噪声和重尾离群值高度敏感，导致生成的图像-掩码对质量不稳定。现有代表性方法如 **SemGAN**（Li et al., CVPR 2021）、**SatSynth**（Toker et al., CVPR 2024）仅面向语义分割，**ChangeAnywhere**（Tang and Chen, arXiv 2024）、**Changen**（Zheng et al., ICCV 2023）、**ChangeDiff**（Zang et al., AAAI 2025）仅面向变化检测，且均缺乏对多光谱输入和噪声鲁棒训练的联合支持（Table 1）。
 
@@ -57,7 +57,7 @@ claims:
 
 **方法定位**：RDF-MIG 属于“生成数据增强”路线，但与现有方法的关键区别在于其**损失函数层面的鲁棒性改造**和**输入层面的多光谱兼容设计**，而非简单的架构堆叠。它不改变下游分割/检测模型本身，而是通过提供高质量、严格对齐的合成图像-掩码对来提升下游性能，具有模型无关的即插即用特性。
 
-## 背景与动机
+
 
 遥感图像的语义分割与变化检测是环境监测、城市规划、灾害评估等应用的核心任务。然而，构建高质量的像素级标注数据集成本极高，尤其在变化检测任务中，需要成对的双时相图像及其精确的变化区域掩码，标注难度远大于单时相语义分割。这一数据瓶颈严重制约了下游模型性能的提升。
 
@@ -73,7 +73,9 @@ claims:
 
 针对上述问题，本文提出 **RDF-MIG**（Robust Diffusion Framework for Masked Image Generation），一个统一的鲁棒扩散生成框架。其设计动机源于以下核心洞察：通过联合建模图像特征与掩码的分布，并引入信息论意义下的相关熵准则作为扩散训练目标，可以在抑制离群值影响的同时，生成高质量、严格对齐的图像-掩码对，从而同时增强语义分割和变化检测任务。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 RDF-MIG 的核心创新围绕一个瓶颈和三个技术支点展开：**现有遥感图像生成方法无法同时支持语义分割（SS）与变化检测（CD）两种任务，且缺乏对多光谱数据的原生支持和对训练噪声的鲁棒性**。本文通过联合建模图像特征与掩码分布，并在扩散训练中引入相关熵准则，从任务泛化性、光谱兼容性、训练鲁棒性三个维度实现了系统性突破。
 
@@ -99,7 +101,7 @@ $$\mathbf{g}_{\text{mcrd},\theta} = \mathbb{E}[\rho \sigma^{-2} \exp(-\frac{e^2}
 
 **消融实验直接验证了 MCRD 的因果效应**：在相同训练设置下，仅将 MSE 替换为 MCRD（$\sigma=0.2, \rho=0.08$），Hi-CNA 语义分割 IoU 从 42.28 提升至 44.13（+1.85），变化检测 IoU 从 45.62 提升至 50.00（+4.38）（Table 4）；在标签噪声场景下，MCRD 相对 MSE 的优势进一步扩大（Table 5），且持续优于 Huber 损失（$\delta=0.2$），证实了相关熵准则在扩散训练中的鲁棒性优势。
 
-## 整体框架
+
 
 RDF‑MIG 的整体 pipeline 围绕一个核心目标构建：**联合建模多光谱图像特征与语义掩码的分布**，从而同时生成适用于语义分割（SS）和变化检测（CD）的高质量、严格对齐的图像‑掩码对。整个框架由三个关键模块串联组成，形成“压缩‑生成‑重建”的信息流。
 
@@ -142,7 +144,7 @@ RDF‑MIG 的整体 pipeline 围绕一个核心目标构建：**联合建模多�
 ![[assets/figures/papers/paper_list_l916_https_openaccess_thecvf_com_content_CVPR2026_html_Cao_RDF_MIG_A_Robust_D/figures/002_Figure_1.jpg]]
 *Figure 1: Method Workflow: (a) training, (b) inference, (c) comparison of MCRD vs. other losses (curves and gradients). With a carefully designed FCF strategy and robust loss, RDF-MIG effectively models the joint distribution of image features and masks, enabling the generation of high-quality, strictly aligned image–mask pairs for training semantic segmentation and change detection models*
 
-## 核心模块与公式推导
+
 
 RDF-MIG 的核心由三个模块串联构成：**特征压缩融合（FCF）**、**扩散模型** 和 **pix2pix 解码器**。其中，扩散模型的训练目标被重新设计为**最大相关熵鲁棒扩散（MCRD）损失**，这是本文最关键的创新点。
 
@@ -208,7 +210,9 @@ $$\mathcal{L}_G = -\mathbb{E}_{\mathbf{y}}[\log D(\mathbf{y}, G(\mathbf{y}))] + 
 
 其中 $\mathbf{y}$ 为扩散模型输出的融合特征图，$\mathbf{x}$ 为真实多光谱图像。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -267,7 +271,9 @@ Figure 3 展示了真实样本与 RDF-MIG 合成样本的视觉对比。合成�
 ![[assets/figures/papers/paper_list_l916_https_openaccess_thecvf_com_content_CVPR2026_html_Cao_RDF_MIG_A_Robust_D/figures/006_Figure_2.jpg]]
 *Figure 2: Semantic segmentation uses U-Net, and change detection uses SNU-Net. Based on the original dataset, synthetic images are introduced at different proportions (e.g., with 100 original images, 20% adds 20 synthetic images, for a total of 120 ), after which the same model is trained on the merged datasets and performance is compared*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位：遥感图像-掩码联合生成的统一框架
 
@@ -299,6 +305,8 @@ MCRD 与 MSE 的关系并非对立，而是**小误差下的渐进对齐**：泰
 - MCRD 核宽 $\sigma$ 的自适应选择策略（如基于数据噪声水平自动估计）能否进一步减少人工调节？
 - 在更大规模数据集上，FCF 的可学习融合权重是否比固定均匀权重带来显著提升？
 - 当前解码器采用 pix2pix 架构，更先进的图像重建模型（如扩散解码器）能否进一步提升生成质量？
+
+
 
 ## 原文 PDF
 

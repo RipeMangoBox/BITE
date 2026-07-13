@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2026
 pdf_ref: paperPDFs/arxiv_2026/PALUM_Part_based_Attention_Learning_for_Unified_Motion_Retargeting.pdf
+project_link: null
+code_link: null
 aliases:
 - PALUM
 tags:
@@ -39,7 +41,7 @@ claims:
 > - Mixamo Intra-Structural Retargeting (seen/unseen skeletons × seen/unseen motion... 上，MSE (归一化后) 0.00272 vs MoMa 0.01100; PAN 0.00898; R²ET 0.00487 (相对于MoMa降低0.00828 (-75.3%))。
 > - Mixamo Cross-Structural Retargeting (seen/unseen 平均值) 上，MSE (归一化后) 0.00567 vs MoMa 0.02340; PAN 0.01436 (相对于MoMa降低0.01773 (-75.8%))。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -61,7 +63,7 @@ PALUM在方法谱系中处于**基于学习的统一动作重定向**分支。�
 
 在Mixamo数据集上的实验表明，PALUM在跨结构动作重定向上的平均MSE误差为**0.00567**，相较于最强基线MoMa的0.02340**相对降低约75.8%**（Table 1）。内部结构重定向的平均MSE为**0.00272**，同样显著优于所有基线方法。消融实验进一步验证了组间共享关节连接的关键作用：去除共享连接后，内部结构误差从0.00272升至0.00377，并出现头部异常倾斜等运动伪影（Table 2, Figure 5）。
 
-## 背景与动机
+
 
 动作重定向（Motion Retargeting）旨在将源角色的运动序列迁移至具有不同骨骼结构的目标角色，是计算机动画与角色驱动的核心技术。随着虚拟人、游戏、影视制作对多样化角色需求的激增，手工为每个骨骼拓扑重新制作动画已不可行，自动化重定向方法成为产业刚需。然而，人体骨骼在关节数量、骨骼长度比例和拓扑连接上呈现高度异构性——例如，标准Mixamo骨架可能包含65个关节，而SMPL模型仅24个关节，MetaHuman则可达上百个关节——这使得统一处理不同骨骼结构成为长期瓶颈。
 
@@ -71,7 +73,9 @@ PALUM在方法谱系中处于**基于学习的统一动作重定向**分支。�
 
 针对这些缺口，本文提出**PALUM（Part-based Attention Learning for Unified Motion Retargeting）**。核心思路是将骨骼按生物力学原理划分为六个语义部位（左右臂、左右腿、脊椎、头部），并在相邻部位间共享髋部和脊椎连接关节，以此在部位独立性与全身协调性之间取得平衡。在每个部位内部，通过空间注意力池化（Spatial Attention Pooling）从可变数量的关节中提取固定维度的运动特征，再经由时序Transformer编码器捕获跨部位交互与时序动态，最终通过交叉注意力解码器将运动表征映射至目标骨架。配合循环一致性损失保持运动语义，PALUM实现了无需手工指定关节对应、可处理任意关节数和拓扑结构的统一动作重定向框架。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PALUM 的核心创新在于通过**部位感知的注意力学习**，首次实现了无需手工指定关节对应关系的统一动作重定向。与现有方法相比，其关键设计变更体现在以下四个维度：
 
@@ -107,7 +111,7 @@ $$\mathcal{L}_{cyc} = \frac{1}{T \times B \times M \times D} \sum |\mathbf{H}_A 
 
 上述四个 changed slots 共同指向一个核心洞察：**人体运动呈现部位局部性**——同一肢体内关节高度相关，不同部位间交互较弱。PALUM 通过部位内注意力池化提取关键特征，通过组间共享连接维持全身协调，通过循环一致性保持运动语义，从而在无需任何手工关节对应的情况下，实现了对不同关节数量和拓扑结构的统一动作重定向。
 
-## 整体框架
+
 
 PALUM 的整体流程围绕一个**编码器-解码器架构**构建，其核心设计目标是实现与骨骼拓扑无关的统一动作重定向。该框架将源骨架的动作序列映射到任意目标骨架上，无论两者的关节数量、骨骼比例或拓扑结构是否相同。
 
@@ -160,7 +164,7 @@ PALUM 的整体流程围绕一个**编码器-解码器架构**构建，其核心
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2601_07272/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of our motion retargeting framework. (a) Encoder-decoder architecture: The transformer encoder processes source motion sequences through multiple attention pooling layers to extract skeleton-agnostic motion representations. These representations are fed to an MLP that outputs key-value pairs for cross-attention in the transformer decoder. The decoder takes uniformly sampled noise and skeleton-specific embeddings to generate target motion sequences. Note that the target skeleton shown in this pipeline includes pauldron joints, demonstrating our method’s capability to handle diverse skeletal topologies. (b) Training pipeline: The model is trained using reconstruction and cycle consis...*
 
-## 核心模块与公式推导
+
 
 PALUM 的核心架构由四个关键模块串联构成：关节语义分组、空间注意力编码、时序 Transformer 编码与交叉注意力解码。以下逐一剖析各模块的机制与关键公式。
 
@@ -222,7 +226,9 @@ $$\mathcal{L}_{total} = \mathcal{L}_{rec} + \lambda_{cyc} \mathcal{L}_{cyc} + \l
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2601_07272/figures/005_Figure_4.jpg]]
 *Figure 4: Qualitative results of our method and the baselines. Our method preserves the natural motion dynamics and joint relationships*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -276,7 +282,9 @@ Figure 4展示了各方法的定性对比。PALUM生成的运动保持了自然�
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2601_07272/figures/003_Figure_3.jpg]]
 *Figure 3: T-pose examples after our joint elimination strategy. (1) Warrok: the pauldron joints are named as ”RightArmourx” (x=1,2,3,4,5) in the BVH file, so they match our ”RightArm” joint name selection and they are preserved. (2) BigVegas: the hair joints are named as ”HeadTop Endx” (x=1,2), which match our ”Head” joint name selection, so they are preserved*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位与核心瓶颈
 
@@ -326,6 +334,8 @@ PALUM 的四个关键设计槽位及其消融验证：
 3. **拓扑泛化边界**：如何将该框架推广到四足动物、多足动物或任意拓扑的非人形骨骼？部位分组的定义是否需要自适应学习？
 4. **表征容量**：注意力池化的固定维度表征是否足以保留极端姿态或快速复杂运动的细节？是否需要根据运动复杂度自适应调整查询数量？
 5. **评估基准局限**：当前评估仅基于 Mixamo 数据集，缺乏在更广泛骨架类型（如不同体型比例、非人形角色）上的标准化基准。
+
+
 
 ## 原文 PDF
 

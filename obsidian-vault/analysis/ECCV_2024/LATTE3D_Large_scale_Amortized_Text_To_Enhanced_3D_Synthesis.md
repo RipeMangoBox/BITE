@@ -5,6 +5,8 @@ paper_level: A
 venue: ECCV
 year: 2024
 pdf_ref: paperPDFs/ECCV_2024/LATTE3D_Large_scale_Amortized_Text_To_Enhanced_3D_Synthesis.pdf
+project_link: https://research.nvidia.com/labs/toronto-ai/LATTE3D/
+code_link: null
 aliases:
 - LATTE3D
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | 大规模摊销文本到增强3D合成 |
 | 英文题名 | LATTE3D: Large-scale Amortized Text-To-Enhanced 3D Synthesis |
 | 会议/期刊 | ECCV 2024 |
-| Links | [paper](https://arxiv.org/abs/2403.15385); [Project](https://research.nvidia.com/labs/toronto-ai/LATTE3D/) |
+| Links | [paper](https://arxiv.org/abs/2403.15385) · [Project](https://research.nvidia.com/labs/toronto-ai/LATTE3D/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Latte3D |
 | Dataset | Seen prompts (gpt-101k subset), Unseen prompts (DreamFusion subset) |
@@ -40,7 +42,7 @@ claims:
 > - Seen prompts (gpt-101k subset) 上，User preference rate over Latte3D 为 Latte3D (baseline)，对比 MVDream 36min: 48.5% over Latte3D，变化 Latte3D achieves comparable user preference at much lower cost。
 > - Unseen prompts (DreamFusion subset) 上，Render-FID 为 190.00 (Latte3D 400ms)，对比 MVDream 36min: 143.44，变化 MVDream better quality but ~5400x slower inference。
 
-## 概述
+## 概要
 
 现有摊销文本到3D方法（如**ATT3D**，Lorraine et al., 2023）受限于两个关键瓶颈：无法捕捉高频几何与纹理细节，且难以扩展至大规模提示集，导致生成质量差和泛化能力弱。其根源在于训练过程缺乏3D知识注入——仅依赖单视图Stable Diffusion 2.1作为扩散先验，无形状正则化，且模型从头训练。
 
@@ -58,7 +60,7 @@ Latte3D的核心洞察是：**将3D知识系统性地引入摊销优化的全过
 
 **主要局限**：组合提示下常退化为单一对象；薄特征几何细节可能因阶段间体积-表面转换而丢失；第二阶段几何冻结限制了进一步几何调整。
 
-## 背景与动机
+
 
 ### 文本到3D生成范式演进
 
@@ -91,7 +93,9 @@ Latte3D的核心洞察是：**将3D知识系统性地引入摊销优化的全过
 
 这些设计使Latte3D能够在包含约101k提示的大规模数据集（gpt-101k）上稳定训练，在保持与逐提示优化方法（如MVDream 36分钟优化）相当的用户偏好的同时，实现约5400倍的推理加速，重新定义了文本到3D生成的速度-质量权衡边界。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Latte3D 的核心创新在于将**3D知识系统性地注入摊销优化框架**，通过两阶段摊销（体素与表面）和点云退火策略，在400ms内生成高质量纹理网格，同时将训练提示集规模从~2400扩展至~101k。以下是相对基线方法的关键创新点：
 
@@ -141,7 +145,7 @@ $$\mathcal{L}_{\mathrm{train}} = (1-\alpha) \mathcal{L}_{\mathrm{SDS}} + \alpha 
 
 这些创新共同实现了**5400倍推理加速**（400ms vs 36min）的同时，保持与逐提示优化方法MVDream相当的用户偏好（Table 2, Fig. 7），并在未见提示上展现出强泛化能力。
 
-## 整体框架
+
 
 Latte3D 提出一种两阶段摊销式文本到 3D 生成框架，将神经场生成与表面细化统一为单次前馈推理，在约 400ms 内从文本提示直接输出带纹理的三角网格。其核心设计思路是将 3D 知识注入摊销优化过程，通过 3D 感知扩散先验、形状正则化和 3D 重建预训练三个关键机制，使模型能够稳定处理超 10 万规模的大规模提示集。
 
@@ -207,7 +211,7 @@ Latte3D 包含两个核心网络（Fig. 4, Fig. A.1）：
 
 该框架的核心瓶颈突破在于：通过两阶段摊销将原本需要 36 分钟优化的 MVDream 级质量压缩至 400ms 推理，同时利用 3D 数据作为强先验（gpt-101k 数据集包含 101k 提示和 34k 形状）实现大规模泛化。
 
-## 核心模块与公式推导
+
 
 ### 3D重建预训练
 
@@ -245,7 +249,9 @@ $$\mathcal{L}_{\mathrm{train}} = (1-\alpha) \mathcal{L}_{\mathrm{SDS}} + \alpha 
 
 为实现推理时仅使用文本输入，训练过程中采用点云退火策略：逐渐将输入的真实点云替换为虚拟点云，使模型学会在缺乏真实几何输入时仍能生成高质量形状。消融实验表明，退火训练后使用虚拟输入的用户偏好达到51.2%（Table 4）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 性能与效率的核心权衡
 
@@ -329,7 +335,9 @@ Latte3D 支持可选的测试时优化（test-time optimization），为用户�
 ![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2403_15385/figures/021_Table.jpg]]
 *Table: B.4: Ablation over whether we use upsampling on the latent triplanes during stage-2 using α = .9 on the realistic animals with samples shown in Fig. C.12. Upsampling the triplane gets better performance*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从逐提示优化到大规模摊销生成
 
@@ -378,6 +386,8 @@ Latte3D 的适用边界由以下约束定义：
 4. **对3D数据的依赖程度**：形状正则化损失和重建预训练均依赖3D资产库，能否通过更强的2D先验（如视频扩散模型的多视图一致性）减少这种依赖？这是一个基础性问题——2D监督能否完全替代3D监督在几何学习中的作用。
 
 5. **测试时优化的上限**：当前测试时优化（Fig. 8）在600步内持续改善 FID 和 CLIP 分数，其收敛行为和最优步数尚未被充分探索。理解这一动态有助于在质量和成本之间做出更精细的权衡。
+
+
 
 ## 原文 PDF
 

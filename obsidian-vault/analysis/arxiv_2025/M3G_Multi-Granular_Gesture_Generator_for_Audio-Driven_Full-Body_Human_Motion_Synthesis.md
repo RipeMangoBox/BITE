@@ -41,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - BEAT 上，FGD (Fréchet Gesture Distance) 4.784e-1 vs State-of-the-art (CaMN, EMAGE, etc.) (Significantly lower (best among all compared methods))；MSE (Mean Squared Error) 7.291e-8 vs State-of-the-art (CaMN, EMAGE, etc.) (Significantly lower)；LVD (Lips-Voice Distance) 7.439e-8 vs State-of-the-art (Significantly lower)。
 
-## 概述
+## 概要
 
 现有基于VQ‑VAE的音频驱动手势生成方法普遍假设每个动作Token仅表示单帧静态姿态，无法建模具有不同持续时间的完整手势模式。这一单粒度假设导致生成的动作缺乏表现力和时序一致性，构成了该领域的核心瓶颈。
 
@@ -51,7 +51,7 @@ claims:
 
 该方法在动作表示范式上引入了从单帧静态到多粒度动态的关键转变，为音频驱动的全身动作合成提供了新的技术路径。
 
-## 背景与动机
+
 
 ### 问题背景：音频驱动的全身手势生成
 
@@ -76,7 +76,9 @@ claims:
 
 这一思路直接催生了本文提出的**M3G（Multi-Granular Gesture Generator）**框架，其核心创新——**多粒度VQ-VAE（MGVQ-VAE）**和**多粒度Token预测器**——正是围绕“多粒度动作模式编码与生成”这一因果机制展开的。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 M3G 的核心创新在于**用多粒度离散潜空间替代传统的单帧静态姿态 Token 表示**，使模型能够显式建模具有不同持续时间的完整手势模式，从而突破现有 VQ‑VAE 方法在表现力与时序一致性上的瓶颈。
 
@@ -117,7 +119,7 @@ M3G 通过 MGVQ‑VAE 将全身动作序列在不同时间粒度下编码为共�
 
 粒度数量选择实验（Table 2）进一步表明，随着粒度数量从 1 增至 4，性能持续提升（FGD: $4.784\times10^{-1}$，MSE: $7.291\times10^{-8}$），但继续增加粒度会导致性能下降，揭示出粒度层次与表示容量之间存在最优权衡。
 
-## 整体框架
+
 
 M3G 采用两阶段训练范式，将音频驱动的全身手势生成分解为动作离散化与条件预测两个子问题。第一阶段训练**多粒度 VQ‑VAE（MGVQ‑VAE）**，学习全身动作的离散多粒度潜在表示；第二阶段训练**多粒度令牌预测器**，从音频与文本特征中预测这些离散令牌。
 
@@ -160,7 +162,7 @@ $$\hat{\mathbf{q}}_i^{parts} = \text{MLP}(\tilde{\mathbf{h}}_i^{parts} + \hat{\m
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2505_08293/figures/002_Figure_2.jpg]]
 *Figure 2: The Overall Workflow of M3G. We illustrate the workflow in two stages: 1. Training MGVQ-VAE to learn discrete latent representations of motions, as known as tokens, for encode and reconstruction. 2. Training Multi-Granular Token Predictor to predict the discrete latent representations from audio*
 
-## 核心模块与公式推导
+
 
 M3G 采用两阶段训练范式：第一阶段训练**多粒度 VQ-VAE（MGVQ-VAE）**，学习全身动作的离散多粒度潜在表示；第二阶段训练**多粒度令牌预测器**，从音频和文本特征中预测这些离散令牌。
 
@@ -223,7 +225,9 @@ $$\hat{\mathbf{q}}_i^{parts} = \text{MLP}(\tilde{\mathbf{h}}_i^{parts} + \hat{\m
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2505_08293/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of gesture sequences with expressive motion patterns in different granularities*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 整体性能对比
 
@@ -283,7 +287,9 @@ Figure 3展示了18名参与者在40个随机片段上的A/B测试结果。参�
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2505_08293/figures/007_Figure_4.jpg]]
 *Figure 4: Qualitative results*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与因果机制
 
@@ -322,6 +328,8 @@ M3G 的两阶段流水线——先训练 **MGVQ‑VAE** 学习离散多粒度潜
 2. **长时序一致性**：多粒度Token能否有效建模段落级甚至篇章级的时序依赖，从而保证长时间手势序列的风格一致性？
 3. **跨域泛化**：该方法在不同语言、情感强度和说话风格条件下的泛化性能如何？是否需要域适应策略？
 4. **与生成式大模型的结合**：能否将多粒度离散表示与扩散模型或大型语言模型结合，利用后者的强先验进一步提升手势生成的自然度和可控性？
+
+
 
 ## 原文 PDF
 

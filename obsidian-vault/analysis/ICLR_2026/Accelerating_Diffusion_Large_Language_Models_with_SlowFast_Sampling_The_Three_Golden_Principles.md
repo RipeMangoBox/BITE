@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Accelerating_Diffusion_Large_Language_Models_with_SlowFast_Sampling_The_Three_Golden_Principles.pdf
+project_link: null
+code_link: https://github.com/LiangrunFlora/Slow-Fast-Sampling
 aliases:
 - SS
 - ADLLMSSTGP
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 慢快采样加速扩散大语言模型：三条黄金法则 |
 | 英文题名 | Accelerating Diffusion Large Language Models with SlowFast Sampling: The Three Golden Principles |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=Uh17FiwF4q); [GitHub](https://github.com/LiangrunFlora/Slow-Fast-Sampling) |
+| Links | [paper](https://openreview.net/forum?id=Uh17FiwF4q) · [GitHub](https://github.com/LiangrunFlora/Slow-Fast-Sampling) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/language_speech_and_dialog |
 | Method | SlowFast Sampling |
 | Dataset | GSM8K, GPQA, MMLU-pro, HumanEval |
@@ -41,7 +43,7 @@ claims:
 > - GPQA 上，TPS 为 16.36，对比 3.31，变化 +4.94× speedup。
 > - MMLU-pro 上，TPS 为 23.14，对比 9.15，变化 +2.53× speedup。
 
-## 概述
+## 概要
 
 扩散语言模型（dLLM）在生成质量上表现出色，但其推理效率一直受制于解码采样策略的静态性。现有方案（如基于置信度的低置信度重掩码或半自回归分块解码）通常采用全局统一的恒定采样速度，无法感知令牌生成过程中的动态差异，导致大量冗余计算与有限的加速效果。本文发现扩散语言模型在令牌生成中呈现出三条可量化的内在规律——**确定性原理**、**收敛性原理**与**位置性原理**——从而为设计自适应采样策略提供了因果抓手。
 
@@ -49,7 +51,7 @@ claims:
 
 实验表明，SlowFast Sampling 在多个数学与代码基准上实现了**几乎无损的显著加速**。在 GPQA 基准上，仅 SlowFast 策略便将 LLaDA 8B 的推理吞吐量提升至 15.63 倍；进一步结合 dLLM‑Cache 后，吞吐量达到 54.75 tokens/s（34.22 倍加速），精度仅有轻微下降。在 GSM8K、MMLU‑pro、HumanEval 等任务上，吞吐量也分别获得 3.20×、2.53× 和 3.15× 的提升，且输出分数与基线基本持平。这些结果表明，基于令牌置信度动态调整采样节奏，能够在不牺牲生成质量的前提下，使扩散语言模型的推理效率提升一个数量级以上。
 
-## 背景与动机
+
 
 扩散语言模型通过逐步去噪生成文本，理论上具备强大的并行生成潜力。但在实践中，现有解码采样策略普遍采用静态的设计范式：低置信度重掩码（如Fast-dLLM）在每一步基于全局置信度统一选取固定数量的令牌解码，半自回归分块策略则按固定长度块推进。这些方法忽视了令牌生成过程中的内在动态性——不同位置的令牌在扩散过程中确定性演化的速度存在显著差异。这种静态、全局一致的策略缺乏对令牌确定性变化规律的适应能力，构成了扩散语言模型推理效率的关键瓶颈。
 
@@ -59,7 +61,9 @@ claims:
 
 需要指出的是，三条黄金法则基于8B规模模型的观察得出，其在更大规模模型或极端生成长度场景下的普适性尚待进一步验证。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 现有扩散语言模型的推理瓶颈在于**静态、全局一致的采样策略**——无论是基于低置信度的重掩码还是半自回归分块，每步都以固定的规则选取令牌，无法感知不同位置在不同解码阶段的动态确定性差异。SlowFast 采样的核心创新正是打破这种静态性，利用扩散模型内在的令牌行为规律，设计了一套**两阶段自适应解码框架**，在几乎不牺牲生成质量的前提下将吞吐量提升一个数量级以上。
 
@@ -98,7 +102,7 @@ SlowFast 的核心机制是将每个解码周期分解为**慢速探索 (Slow/Ex
 
 综上，SlowFast 采样的核心创新可以归结为：**以自适应收敛边界为中心，将静态一刀切的解码策略替换为基于令牌确定性、收敛趋势和位置聚集性的动态慢快协同调度**，在保持生成质量的同时实现了推理吞吐量的数量级跃升。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0005_Uh17FiwF4q_Accelerating_Diffusion_Large_Language_Models_wit/figures/005_Figure_3.jpg]]
 
@@ -114,7 +118,7 @@ SlowFast 采样策略针对上述瓶颈，将扩散解码重构为**慢速探索
 
 在上述流程之上，SlowFast 可进一步集成**独立的 dLLM‑Cache** 组件，该组件对已缓存的特征进行键‑值匹配复用，跳过对不变上下文的重复计算，从而在几乎不损耗精度的情况下将吞吐量再提升近一倍。整个框架的输入为提示 $\mathbf{c}$ 与全掩码序列，输出为逐位置解码后的完整文本；内部状态流由慢速阶段的置信度计算→稳定性判定→加速阶段的并行解码与缓存→区间更新闭合为一个循环。
 
-## 核心模块与公式推导
+
 
 SlowFast 采样建立在扩散大语言模型（dLLM）的**低置信度重掩码**策略之上，并引入两阶段动态采样：**慢速探索**与**快速加速**。下面仅列出与该方法直接相关的核心模块及关键公式，变量含义随公式给出。
 
@@ -169,7 +173,9 @@ SlowFast 在探索阶段沿用该策略的核心机制：每一步根据模型�
 
 以上公式和模块构成 SlowFast 采样的核心推理流水线。所有符号均与原文式 (5)–(10) 保持一致，未引入任何文中未明确给出的推导。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果：吞吐量大幅提升与质量几乎无损
 
@@ -222,7 +228,9 @@ SlowFast 采样在多个基准上展现出可观的解码加速，且生成质�
 
 - **动态窗口与自适应案例**（Figure 10、11）：两个定性案例分别展示了 SlowFast 在发生"位置跳跃"和出现非连续高置信度块时，仍能通过动态调整稳定区间正确覆盖后续区域，并自适应地加速多个独立区块的解码，揭示了方法应对序列生成多样性的能力。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线及后续工作的关系
 
@@ -252,6 +260,8 @@ SlowFast Sampling 直接回应了现有扩散语言模型（dLLM）解码策略�
 1. **采样步数效率再压缩**：当前扩散总步数 N 仍是固定的，能否结合连续时间公式或自适应步数缩减，让 SlowFast 在更少的总步数下工作，是进一步提升吞吐量的关键方向。  
 2. **极长序列下的稳定性泛化**：式 (8) 的方差阈值在数百令牌范围内已验证鲁棒，但对于数千甚至更长序列，收敛终点的估计可能受远上下文干扰，需要重新审视端点预测的局部性假设。  
 3. **内存效率协同**：SlowFast 的动态区间与缓存机制天然适合与稀疏注意力、令牌剪枝等技术结合，联合优化后的内存占用‑吞吐量 trade‑off 值得深入探索。
+
+
 
 ## 原文 PDF
 

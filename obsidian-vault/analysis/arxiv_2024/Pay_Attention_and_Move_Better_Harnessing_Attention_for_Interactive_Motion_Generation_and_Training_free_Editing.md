@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2024
 pdf_ref: paperPDFs/arxiv_2024/Pay_Attention_and_Move_Better_Harnessing_Attention_for_Interactive_Motion_Generation_and_Training_free_Editing.pdf
+project_link: https://lhchen.top/MotionCLR
+code_link: null
 aliases:
 - PAMBHAIMGTFE
 tags:
@@ -41,7 +43,7 @@ claims:
 > - HVerb / HVerb-wild 上，in-place replacement unedited part preserving (MPJPE, mm) 57.9 (HVerb) / 59.8 (HVerb-wild) vs 75.3 (MotionFix-C) / 120.2 (MotionFix-R) (~ -17.4 (HVerb) / -60.4 (HVerb-wild))。
 > - Example-based motion generation 上，FID 0.427 vs 0.461 (Diffusion manipulation) (-0.034)。
 
-## 概述
+## 概要
 
 文本驱动的三维人体运动生成旨在从自然语言描述中合成逼真且多样化的动作序列。现有运动扩散模型通常将文本条件压缩为单一全局嵌入，缺乏对词级文本-运动对应关系的显式建模。这一瓶颈导致模型无法进行细粒度的交互式编辑——用户难以精确控制“何时、何处、以何种强度”执行特定动作。
 
@@ -53,7 +55,7 @@ claims:
 
 **局限与展望：** 当前方法在处理生成模型幻觉方面仍然有限，动作计数在复杂序列中仍可能出错，编辑效果在极端权重调整下可能引入运动伪影。未来工作可探索将该范式扩展到语言对话式交互的运动生成，以及增强模型对生成幻觉的鲁棒性。
 
-## 背景与动机
+
 
 ### 文本驱动运动生成的进展与瓶颈
 
@@ -85,7 +87,9 @@ claims:
 
 基于上述分析，本文提出 **MotionCLR**，旨在通过显式建模词级交叉注意力和帧间自注意力，构建一个同时支持高质量运动生成与灵活免训练编辑的统一框架。核心动机在于：**将注意力机制从隐式的模型内部组件升级为显式的可控接口，使运动生成与编辑共享同一套注意力表示，从而实现交互式的、训练无关的运动操纵**。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MotionCLR 的核心创新在于**显式建模词级文本-运动对应关系**，并由此衍生出一套**免训练的注意力图编辑范式**。与现有运动扩散模型将文本条件压缩为单一全局 token 或混合注入时间步的做法不同，MotionCLR 在架构层面进行了三项关键解耦（changed slots），从而实现了细粒度的语义控制。
 
@@ -107,7 +111,7 @@ MotionCLR 的核心创新在于**显式建模词级文本-运动对应关系**�
 
 上述三项架构解耦共同构成了注意力图编辑的因果基础。由于交叉注意力图精确编码了词级语义的时间定位，**替换交叉注意力图**即可在原位将动作 A 替换为动作 B，同时保留未编辑部分的完整性（HVerb 上 MPJPE 仅 57.9 mm，较 MotionFix-C 的 75.3 mm 降低 17.4 mm）。通过缩放交叉注意力权重（$\mathbf{A}_{:,i} \times (1 + \alpha)$）可实现动作的**连续强度控制**（强调/去强调）。而纯化的自注意力图则支持**序列移位**和**风格迁移**——通过沿时间轴移动自注意力图来改变动作顺序，或通过混合不同运动的自注意力图来转移运动风格。所有编辑操作均无需额外训练，仅通过操纵预训练模型内部的注意力图即可完成。
 
-## 整体框架
+
 
 MotionCLR 的整体架构围绕一个类 U‑Net 的去噪网络构建，其核心原子单元为 **CLR 块（CLR Block）**。如 Figure 2(a) 所示，网络由多个下采样和上采样块堆叠而成，每个采样块包含两个 CLR 块，并在其前后分别执行下采样或上采样操作。
 
@@ -146,7 +150,7 @@ MotionCLR 的整体架构围绕一个类 U‑Net 的去噪网络构建，其核�
 ![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2410_18977/figures/058_Figure_30.jpg]]
 *Figure 30: The illustration of motion style transfer process. (a) Direct generating style reference: The style information is generated directly using the query (Q), key (K), and value (V) from the style reference motion sequence (blue). (b) Direct generating content reference: The content information is generated directly from the content reference motion sequence (orange). (c) Generating transferred result: The final transferred motion sequence combines the style from the style reference sequence with the content from the content reference sequence, using Q from the style reference (blue) and K, V from the content reference (orange)*
 
-## 核心模块与公式推导
+
 
 ### 3.1 CLR 基础模块
 
@@ -208,7 +212,9 @@ $$
 ![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2410_18977/figures/004_Figure_4.jpg]]
 *Figure 4: (c) Motion sequence shifting via shifting self-attention map. We adjust the sequence order of the motion sequence via shifting the attention map along the temporal axis. Figure 4: Diagram of motion editing via manipulating attention maps*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 生成性能主结果
 
@@ -281,7 +287,9 @@ Figure 15比较了基于注意力图与基于根轨迹的动作计数错误率�
 ![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2410_18977/figures/020_Table_6.jpg]]
 *Table 6: Comparison of motion style transfer across baselines. The “Gen.” and “Inv.” settings represent the editing during generation and DDIM inversion Song et al. [2021] (following Raab et al. [2024a]) settings*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 技术路线与基线定位
 
@@ -319,6 +327,8 @@ MotionCLR 的 CLR 块（Figure 2）实现了三项对基线架构的关键改造
 3. **多模态注意力一致性**：当前方法仅利用文本-运动交叉注意力，而 CLIP 嵌入本身已包含视觉-语言对齐先验。探索如何引入视觉模态的注意力约束，可能进一步提升编辑的语义保真度。
 
 4. **更大规模预训练的潜力**：论文采用 CLIP-ViT-B 作为文本编码器，且训练数据限于 HumanML3D 等中小规模运动数据集。若将架构迁移至更大规模的运动-文本配对数据，并结合更强的语言模型，词级对应关系的鲁棒性和泛化能力有望显著提升，但计算成本和注意力图可解释性之间的平衡需要审慎评估。
+
+
 
 ## 原文 PDF
 

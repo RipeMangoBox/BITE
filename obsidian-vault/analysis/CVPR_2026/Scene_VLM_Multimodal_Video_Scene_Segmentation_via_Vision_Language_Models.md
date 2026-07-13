@@ -43,7 +43,7 @@ claims:
 > - BBC Planet Earth 上，AP 45.8 vs 43.6 (TranS4mer) (+2.2)。
 > - VidChapters-7M 上，F1 32.2 vs 28.4 (Chapter-LLaMA) (+3.8)。
 
-## 概述
+## 概要
 
 视频场景分割旨在将长视频自动划分为叙事连贯的片段，是视频理解中的基础任务。现有方法普遍存在**视觉中心偏差**——过度依赖视觉帧而忽略对话、字幕等文本叙事线索，同时采用**逐点独立分类范式**，对每个镜头单独预测边界，缺乏序列因果推理能力和可解释性。
 
@@ -51,7 +51,7 @@ claims:
 
 在 **MovieNet-318** 基准上，Scene-VLM 相较先前最佳方法 **TranS4mer**（Islam et al., CVPR 2023）实现了 **+6 AP** 和 **+13.7 F1** 的显著提升；在 BBC Planet Earth 上的零样本泛化亦取得最优结果。消融实验证实：移除视觉输入导致 F1 从 62.1 骤降至 32.0，上下文-聚焦窗口设计有效防止了序列边缘的性能崩溃，而仅需 35 个标注样本即可消除解释生成中的格式错误和幻觉。
 
-## 背景与动机
+
 
 ### 问题背景：视频场景分割的核心挑战
 
@@ -85,7 +85,9 @@ claims:
 
 3. **赋予可解释性**：利用 VLM 的生成能力，不仅输出边界决策，还能从 token 级 logits 中提取置信度，并可进一步对齐生成自然语言解释，使场景分割从黑箱预测走向透明推理。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Scene-VLM 的核心创新在于将视频场景分割从传统的**逐点独立分类范式**重构为**因果顺序预测任务**，并首次引入视觉-语言模型（VLM）作为序列预测器，实现多模态联合推理与可解释输出。
 
@@ -121,7 +123,7 @@ Scene-VLM 的 VLM 架构天然支持**生成场景边界决策的自然语言解
 
 Table 1 将 Scene-VLM 与代表性方法进行了能力维度的系统对比，凸显其全面性：同时支持顺序预测、置信度评分、可解释性、电影级场景分割和视频章节划分五项关键能力，而所有 baseline 方法均存在至少两项缺失。
 
-## 整体框架
+
 
 Scene-VLM 将视频场景分割重新定义为**视觉-语言模型（VLM）的顺序预测任务**。其核心 pipeline 由四个紧密耦合的模块构成：多模态镜头表征构建、上下文-聚焦窗口划分、VLM 序列预测、以及置信度提取。此外，模型可通过额外对齐微调，为每个边界决策生成自然语言解释。
 
@@ -176,7 +178,7 @@ $$\mathrm{conf}_i = \frac{p_i(\mathrm{Yes})}{p_i(\mathrm{Yes}) + p_i(\mathrm{No}
 ![[assets/figures/papers/paper_list_l2416_https_openaccess_thecvf_com_content_CVPR2026_html_Berman_Scene_VLM_Multi/figures/001_Figure_1.jpg]]
 *Figure 1: Video scene segmentation with Scene-VLM. We present Scene-VLM, the first vision-language model (VLM) framework fine-tuned for video scene segmentation. Scene-VLM jointly processes visual frames, dialogue, and metadata from consecutive shots to sequentially predict scene boundaries with associated confidence scores, and can be aligned to produce coherent post-hoc explanations for its decisions*
 
-## 核心模块与公式推导
+
 
 Scene-VLM 将视频场景分割重构为**因果顺序预测**任务，其核心由五个紧密耦合的模块构成。
 
@@ -235,7 +237,9 @@ $$\frac{1}{|\mathcal{V}|} \sum_{j \in \mathcal{V}} A_{ij}$$
 
 Figure 3 的注意力分布可视化揭示了两个关键发现：(a) 聚合注意力中视觉模态占主导地位，且模型高度依赖先前输出的预测 token；(b) 长度归一化后，字幕和角色 ID 的贡献与视觉 token 可比，证明文本模态在细粒度推理中同样发挥重要作用。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -323,7 +327,9 @@ Table 9 评估了基础 Scene-VLM 与经解释对齐微调的 Scene-VLM + Explai
 ![[assets/figures/papers/paper_list_l2416_https_openaccess_thecvf_com_content_CVPR2026_html_Berman_Scene_VLM_Multi/figures/015_Table_8.jpg]]
 *Table 8: Results on Video Chaptering. Under matched backbones Scene-VLM outperforms Chapter-LLaMA across all metrics. Chapter-LLaMA with its original LLaMA backbone is listed in gray for reference*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位：视频场景分割的范式迁移
 
@@ -380,6 +386,8 @@ Scene-VLM 是首个同时覆盖全部五项能力的方法。但其适用边界�
 2. **推理与预测的融合**：当前的解释生成是通过额外微调实现的“事后解释”（post-hoc explanation），而非预测过程中的“内省推理”。论文提出未来可结合强化学习，将显式推理步骤融入预测过程，使模型在做出边界决策时同时生成推理链，从而同时提升准确性和可解释性。这一方向与近期推理增强语言模型（如 o1 系列）的思路一致。
 
 此外，从知识库定位角度看，Scene-VLM 开创了“VLM for Video Structuring”这一子方向。其核心洞察——利用 VLM 的跨模态推理能力将视频结构化任务重构为序列预测问题——具有可迁移性：视频摘要、精彩片段检测、叙事弧线分析等任务同样涉及对长视频序列的结构化理解，可能受益于类似的范式迁移。
+
+
 
 ## 原文 PDF
 

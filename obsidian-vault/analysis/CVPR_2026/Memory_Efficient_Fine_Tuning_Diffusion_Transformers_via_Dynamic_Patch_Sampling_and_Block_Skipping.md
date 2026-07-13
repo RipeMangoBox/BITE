@@ -43,7 +43,7 @@ claims:
 > - DreamBooth (30 subjects, SANA) 上，DINO / CLIP-I / CLIP-T 0.7388 / 0.8043 / 0.3240 (30% skip, 512×512) vs LoRA 0.7374 / 0.8108 / 0.3254 (1024×1024) (DINO +0.0014, CLIP-I -0.0065, CLIP-T -0.0014)。
 > - CustomConcept101 (FLUX) 上，DINO / CLIP-I / CLIP-T (50% skip, 256×256) 0.6137 / 0.7513 / 0.3056 vs LoRA 0.6726 / 0.7961 / 0.2937 (512×512) (DINO -0.0589, CLIP-I -0.0448, CLIP-T +0.0119)。
 
-## 概述
+## 概要
 
 扩散变换器（DiT）微调的核心瓶颈在于其巨大的内存消耗——完整的前向/反向传播需要同时保留所有基础模型参数、激活值和优化器状态，而传统参数高效微调方法（PEFT）虽减少了可训练参数量，却仍需通过整个网络反向传播，内存开销依然居高不下。**DiT-BlockSkip** 针对这一瓶颈提出了两条相互协同的优化路径：**动态块采样**在训练阶段根据扩散时间步自适应调整裁剪块大小并缩放至固定低分辨率，从而显著降低前向/反向传播中的激活内存；**块跳过机制**则通过交叉注意力掩码分析识别出对主体身份保存至关重要的中间层块，仅对未跳过块注入LoRA可调参数，同时利用预计算的残差特征补偿跳过块的信息损失，并将跳过块参数从GPU卸载，直接削减参数内存和优化器状态内存。
 
@@ -51,7 +51,7 @@ claims:
 
 实验结果表明，在FLUX模型上，DiT-BlockSkip以30%的跳过比和256×256训练分辨率取得了与全分辨率LoRA（512×512）高度接近的主体与文本保真度（DINO 0.7194 vs 0.7324，CLIP-I 0.8036 vs 0.8146），同时训练内存从35.99 GiB降至20.78 GiB；当跳过比提升至50%时，内存进一步降至10.42 GiB，降幅达71%。在SANA模型上，该方法以30%跳过比在CustomConcept101数据集上取得了最高的CLIP-I（0.7826），且训练内存仅3.10 GiB，相比LoRA的8.35 GiB降低62.9%。消融实验证实，动态块采样优于固定缩放，残差特征预计算是块跳过机制有效性的关键使能因素，而跳过中间层块会导致主体身份严重丢失，验证了中层块对个性化信息编码的核心作用。
 
-## 背景与动机
+
 
 扩散变换器（Diffusion Transformer, DiT）已成为文生图领域的主流架构，其规模化扩展带来了显著的生成质量提升。然而，当用户希望将预训练DiT个性化微调至特定主体时——例如通过DreamBooth范式注入新概念——内存消耗问题变得极为突出。核心瓶颈在于：微调过程必须保留完整的前向/反向传播计算图和整个基础模型参数。即使采用参数高效微调（PEFT）方法（如LoRA）大幅削减可训练参数量，反向传播仍需流经全部Transformer块，导致激活内存和参数内存开销居高不下。当训练分辨率提升至512×512甚至1024×1024时，这一矛盾进一步激化——在FLUX上，标准LoRA微调需占用约36 GiB GPU内存，严重限制了普通用户的可用性。
 
@@ -59,7 +59,9 @@ claims:
 
 本文的核心洞察源于一项关键观察：在DiT的交叉注意力层中，**中间层块对主体身份编码起着决定性作用**。当对连续14个中间层块的交叉注意力进行掩码时，生成图像中的主体完全消失，语义距离达到最大（Figure 3）。相比之下，掩码浅层或深层块的影响相对轻微。这一发现揭示了一个因果机制——主体特定信息主要驻留在DiT的中间表示层，而浅层和深层块承载的更多是通用视觉特征或高频细节。基于此，本文提出**DiT-BlockSkip**，通过两个协同机制直击内存瓶颈：**动态块采样**根据扩散时间步自适应调整训练分辨率，同时捕获全局结构与局部细节；**块跳过与残差特征预计算**仅微调关键块，并利用预存储的残差特征补偿跳过块的信息损失，从而在将训练内存降低71%的同时，保持与全模型微调相当的主体保真度。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DiT-BlockSkip 的核心创新在于**从传统“减少可训练参数”转向“直接削减前向/反向传播路径”**，通过两个协同的 *changed slots* 实现 DiT 个性化微调的内存大幅降低，同时保持与全模型微调相当的保真度。
 
@@ -97,7 +99,7 @@ DiT-BlockSkip 的核心创新在于**从传统“减少可训练参数”转向�
 
 **与基线的本质差异**：HollowedNet 虽也使用层跳过和残差预计算，但其源于 U-Net，无法有效识别 DiT 中的关键块，导致性能显著下降（Table 2）；LISA、LoRA-FA 等仅减少优化器内存或部分参数，未触及激活内存瓶颈。DiT-BlockSkip 通过**识别并保留关键中层块 + 残差补偿跳过块**，实现了内存与保真度的帕累托改进。
 
-## 整体框架
+
 
 DiT-BlockSkip 的整体 pipeline 由三个核心模块串联构成：**动态块采样（Dynamic Patch Sampling）**、**基于交叉注意力掩码的块选择与残差预计算（Block Selection & Residual Feature Precomputation）**，以及**未跳过块的 LoRA 微调（Fine-Tuning Unskipped Blocks with LoRA）**。图 2 给出了完整的流程示意。
 
@@ -114,7 +116,7 @@ DiT-BlockSkip 的整体 pipeline 由三个核心模块串联构成：**动态块
 ![[assets/figures/papers/paper_list_l899_https_arxiv_org_abs_2603_20755/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the proposed method. (a) The dynamic patch sampling applies different patch sizes for each diffusion timestep, enabling the model to learn both global structure and fine-grained details depending on the noise level. Cropped patches of various sizes are resized to the same fixed resolution*
 
-## 核心模块与公式推导
+
 
 DiT-BlockSkip 围绕两条因果链路降低 DiT 微调的内存瓶颈：**动态块采样**从输入端压缩训练分辨率，**块跳过与残差特征预计算**从模型端削减前向/反向传播中的参数与激活内存。两条链路协同作用，使训练内存在 FLUX 上从 LoRA 的 35.99 GiB 降至 10.42 GiB（50% 跳过比），降幅约 71%。
 
@@ -163,7 +165,9 @@ $$f_{i+l}' = f_i' + \Delta f_{i, i+l} = f_i' + (f_{i+l} - f_i)$$
 ![[assets/figures/papers/paper_list_l899_https_arxiv_org_abs_2603_20755/figures/010_Figure_7.jpg]]
 *Figure 7: Qualitative ablation results of block skipping with and without residual features*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要定量结果
 
@@ -231,7 +235,9 @@ $$f_{i+l}' = f_i' + \Delta f_{i, i+l} = f_i' + (f_{i+l} - f_i)$$
 ![[assets/figures/papers/paper_list_l899_https_arxiv_org_abs_2603_20755/figures/008_Table_3.jpg]]
 *Table 3: User preference on subject fidelity and text fidelity*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与参数高效微调（PEFT）方法的关系
 
@@ -283,6 +289,8 @@ DiT-BlockSkip 的核心定位是在扩散变换器（DiT）的个性化微调场
 4. **关键块识别的自动化**：当前块选择依赖预先的交叉注意力掩码分析和语义距离优化（Eq. 2, Algorithm 1），能否将该过程自动化并适应不同的个性化任务，而无需针对每个新主体或新模型重复分析？这直接关系到方法的实际部署便捷性。
 
 5. **预计算开销的进一步压缩**：残差特征预计算需要完整前向传播一次，能否通过部分前向传播或特征压缩技术进一步降低预计算阶段的内存和时间开销？
+
+
 
 ## 原文 PDF
 

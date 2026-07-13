@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/STAR_Bench_Probing_Deep_Spatio_Temporal_Reasoning_as_Audio_4D_Intelligence.pdf
+project_link: https://internlm.github.io/StarBench
+code_link: https://github.com/InternLM/StarBench
 openreview_forum_id: Ts6j3GoZDE
 aliases:
 - SB
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | STAR-Bench：探索深度时空推理作为音频4D智能 |
 | 英文题名 | STAR-Bench: Probing Deep Spatio-Temporal Reasoning as Audio 4D Intelligence |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=Ts6j3GoZDE); [GitHub](https://github.com/InternLM/StarBench); [Project](https://internlm.github.io/StarBench) |
+| Links | [paper](https://openreview.net/forum?id=Ts6j3GoZDE) · [GitHub](https://github.com/InternLM/StarBench) · [Project](https://internlm.github.io/StarBench) |
 | Topic | #topic/benchmarks_datasets_evaluation #topic/benchmarks_datasets_evaluation/benchmark_eval |
 | Method | STAR-BENCH |
 | Dataset | STAR-BENCH (Overall), Foundational Perception, Temporal Reasoning |
@@ -42,7 +44,7 @@ claims:
 > - STAR-BENCH (Overall) 上，MA (%) 为 49.59 (Gemini 2.5 Pro)，对比 24.32 (Random Guess)，变化 +25.27。
 > - Foundational Perception 上，MA (%) 为 75.60 (Human) / 46.64 (Gemini 2.5 Pro)，对比 25.33 (Random Guess)，变化 +50.27 (Human) / +21.31 (Gemini 2.5 Pro)。
 
-## 概述
+## 概要
 
 ### 问题背景与核心瓶颈
 
@@ -62,7 +64,7 @@ claims:
 
 **空间推理的双耳信息困境**：通道分离输入相比原生输入对多数模型带来的提升极为有限（Table 6），证实当前音频模型缺乏有效利用双耳空间线索的机制，这是空间推理任务整体低迷的结构性原因。
 
-## 背景与动机
+
 
 音频理解是构建具身智能与多模态感知系统的关键环节。人类能够从日常声学信号中提取丰富的时空信息——例如判断声源的运动方向、感知距离变化、追踪多个同时发生的声学事件——这种能力可被称为“音频4D智能”。然而，当前主流的音频理解基准与模型是否真正具备此类深度时空推理能力，仍是一个未被充分检验的问题。
 
@@ -74,7 +76,9 @@ claims:
 
 上述缺口共同指向一个核心问题：**现有基准与模型尚未系统性地评估和构建“音频4D智能”所需的三项核心能力——精细感知、知识推理与跨片段时空整合**。STAR-Bench的提出正是为了填补这一空白，通过程序合成与真人标注的融合，首次构建了一个层次化、可量化、且专注于语言难以描述线索的深度时空推理基准。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 STAR-Bench 的核心创新在于首次系统定义了**音频4D智能**的概念，并通过层次化基准设计，将评估重心从传统语义理解转向**语言难以描述的精细声学时空线索**。这一转向直指现有音频基准的根本性瓶颈。
 
@@ -103,7 +107,7 @@ STAR-Bench 引入**多次扰动提示的鲁棒性评估**，报告平均准确�
 
 为保证数据质量，STAR-Bench 设计了四阶段标注流水线（Figure 5）：分类体系构建与数据采集 → AI 辅助自动过滤（基础规则 + LLM + MLLM 三级漏斗）→ 人工标注与质量控制（交叉验证 + 专家抽检）→ 最终验证（仅保留至少 2/3 专家独立正确回答的题目）。这一流程确保了基准的生态效度和标签可靠性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_Ts6j3GoZDE/figures/001_Figure_1.jpg]]
 *Figure 1: (Left): A comparison between humans and the Gemini 2.5 Pro with and without audio captions on various audio benchmarks. Our STAR-Bench evaluates linguistically hard-to-describe audio cues. See Appendix B.1 for audio caption details. (Right): The three core abilities required to solve tasks in the STAR-Bench benchmark*
@@ -151,7 +155,7 @@ STAR-BENCH 的数据构建整合了程序合成与真人标注两条路径（图
 
 表 2 汇总了 19 个模型的评估结果。人类总体准确率达 **79.11%**，最佳闭源模型 Gemini 2.5 Pro 仅为 **49.59%**，随机猜测基线为 24.32%，揭示出巨大的性能差距。开源模型表现尤为薄弱，在时间推理消融实验中即使大幅简化任务，准确率仍接近随机水平（图 9），显示出感知敏感度与知识推理能力的根本性不足。
 
-## 核心模块与公式推导
+
 
 ### 3.1 基准任务体系的双层架构
 
@@ -200,7 +204,9 @@ $$6 \times 20 = 120$$
 
 这些公式揭示了基础感知任务设计的核心原则：通过控制声学参数的组合空间，系统覆盖感知范围与辨别灵敏度的关键维度，从而实现对模型感知能力的细粒度诊断。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 整体性能全景：人类与模型之间的巨大鸿沟
 
@@ -248,7 +254,9 @@ Table 6 对比了原生输入（Native Input）与通道分离输入（Channel-w
 
 所有模型在STAR-BENCH上均表现出严重的输出不稳定性。以Gemini 2.5 Pro为例，其全正确率（ACR）比平均准确率（AA）低约25个百分点，意味着即使是最佳模型，在相同问题的多次评估中也频繁产生不一致的答案。多数开源模型的ACR接近零，说明其输出在轻微提示扰动下即发生翻转。这一发现对音频语言模型在实际部署中的可靠性提出了严峻质疑，也验证了STAR-BENCH采用多次扰动评估策略的必要性。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位：从语义理解到物理时空推理的跨越
 
@@ -290,6 +298,8 @@ STAR-BENCH 的设计边界决定了其适用场景和局限：
 2. **细粒度声学描述训练**：如何使开源模型获得生成细粒度声学描述（如“声源从左侧 30 度以每秒 5 米的速度接近”）的能力，从而将感知与知识推理桥接？当前开源模型在这方面的训练数据和方法均严重缺失。
 3. **视觉中心幻觉的消除**：现有模型在处理听觉输入时倾向于将其错误解释为视觉经验（如将空间方位判断转化为对“画面”的想象），这种跨模态幻觉的机制和解决方案尚不清楚。
 4. **多模态 4D 智能的协同架构**：在包含视觉、触觉等多传感模态的环境中，音频 4D 智能如何与其他模态协同以实现更鲁棒的物理世界推理？这需要超越单一模态基准的评估框架。
+
+
 
 ## 原文 PDF
 

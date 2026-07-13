@@ -42,7 +42,7 @@ claims:
 > - ENeRF-Outdoor 上，PSNR / SSIM² / LPIPS 25.82 / 0.872 / 0.233 vs see Table 1。
 > - SelfCap 上，PSNR / SSIM² / LPIPS 28.14 / 0.960 / 0.192 vs see Table 1。
 
-## 概述
+## 概要
 
 动态场景的新视角合成面临一个根本性瓶颈：现有基于运动的高斯泼溅方法对时间可见性和运动建模采用无差别统一公式——高斯形衰减与无约束线性运动。这迫使表示平坦的长时间可见性需要多个重叠原语，优化过程会反复插入新高斯；同时，静止原语必须学习极小速度以避免累积漂移，但实际优化无法收敛到绝对零速度，残余运动长期累积造成显著空间偏移。静态与动态区域因此难以在同一表示中获得高质量重建。
 
@@ -55,7 +55,7 @@ SharpTimeGS 的核心洞察是：高斯原语的运动幅度和时间可见性�
 
 在方法谱系中，SharpTimeGS 属于显式 4D 高斯表示路线，与 Deformable-3DGS（Yang et al., CVPR 2024）的形变场方法、Ex4DGS（Lee et al., NeurIPS 2024）和 4DGS（Yang et al., ICLR 2024）的 4D 运动方法、STGS（Li et al., CVPR 2024）的时空特征方法以及 FreeTimeGS（Wang et al., CVPR 2025）的自由运动方法形成对比。其关键区别在于通过可学习寿命参数从根本上拆分静态与动态行为，而非在统一公式下通过优化间接逼近。消融实验证实，寿命调制、速度感知初始化、密集化策略和完整 4D 表示各自均对最终质量有显著贡献（Table 2, Figure 5）。
 
-## 背景与动机
+
 
 动态视角合成（dynamic view synthesis）的核心挑战在于同时保持静态区域的长期稳定性和动态区域的瞬时表现力。近年来，基于3D高斯泼溅（3D Gaussian Splatting, 3DGS）的方法因其显式表示和实时渲染能力受到广泛关注，并已从静态场景扩展到4D动态场景。然而，现有运动基础方法（motion-based methods）在统一处理静态与动态区域时暴露出一个根本性瓶颈。
 
@@ -68,7 +68,9 @@ SharpTimeGS 的核心洞察是：高斯原语的运动幅度和时间可见性�
 
 **SharpTimeGS的动机。** 本文提出一个核心洞察：高斯原语的运动幅度和时间可见性应当与其寿命强相关。通过引入可学习的寿命参数并据此调制可见性函数和运动公式，可以自然地将静态和动态行为解耦——长寿命原语自动冻结，短寿命原语保留充分的表现力。这一设计从根本上消除了静态漂移与动态近似冗余之间的冲突，使得同一表示框架能够同时实现清晰的静态背景和锐利的动态前景。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SharpTimeGS 的核心创新在于引入**可学习的寿命参数**（lifespan parameters），从根本上重构了动态高斯泼溅中两个纠缠的建模环节——时间可见性轮廓与运动公式，从而将静态与动态区域的表示解耦到统一的框架内。
 
@@ -113,7 +115,7 @@ $$X_t = X + \frac{v}{f(\sigma_t, r)} (t - T), \quad f(\sigma_t, r) = 1.0 + \max\
 
 SharpTimeGS 的创新并非在现有框架上叠加新模块，而是通过**重新定义高斯原语的时间行为**，将“寿命”确立为连接可见性与运动的统一控制变量。这一设计使得长寿命原语自动收敛为稳定的静态表示，短寿命原语保留充分的动态表现力，从而在同一4D高斯表示中自然解耦动静建模——这是对现有动态高斯方法“统一公式”范式的根本性修正。
 
-## 整体框架
+
 
 SharpTimeGS 的整体流程围绕“寿命调制”这一核心思想构建，将动态场景表示为一系列具有时间感知能力的4D高斯原语，并通过四个关键模块协同完成从多视角视频到新视角渲染的端到端优化。图2展示了方法的完整流水线。
 
@@ -140,7 +142,7 @@ $$s = \lambda_e E + \lambda_o O + \lambda_l \left(1 - \exp\left(-\frac{\|v\|+1}{
 ![[assets/figures/papers/paper_list_l43_https_arxiv_org_abs_2602_02989/figures/002_Figure_2.jpg]]
 *Figure 2: The pipeline of our method. We represent a dynamic scene using Gaussian primitives whose temporal visibility adapts to the actual lifespan of each point. To achieve this, we introduce a lifespan-dependent parameter r that modulates the temporal Gaussian, allowing a single primitive to accurately model its full lifespan. Moreover, through the modulation terms*
 
-## 核心模块与公式推导
+
 
 SharpTimeGS 的核心设计围绕一个关键洞察展开：高斯原语的运动幅度和时间可见性应与其寿命强相关。长寿命原语（静态区域）应保持稳定、时间不变；短寿命原语（动态区域）则可具有较大运动和快速淡入淡出。为此，方法引入可学习的每原语寿命参数，并重构了时间可见性轮廓与运动公式，从根本上拆分静态与动态行为。
 
@@ -183,7 +185,9 @@ $$s = \lambda_e E + \lambda_o O + \lambda_l \left(1 - \exp\left(-\frac{\|v\|+1}{
 
 该得分综合了重建误差 $E$、不透明度 $O$ 和归一化速度/寿命比。短寿命高速原语获得更高替换权重，从而优先为动态区域分配容量，增强其表达能力。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -231,7 +235,9 @@ SharpTimeGS 在三个覆盖室内外、不同动态复杂度的基准数据集�
 1. 如何利用更强的几何先验或正则化加速训练，实现更快速的场景重建？
 2. 如何在保持表示质量的同时集成材质和反射属性以支持重照明？
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 技术脉络与基线关系
 
@@ -291,6 +297,8 @@ SharpTimeGS 在动态场景表示领域做出了以下可定位的贡献：
 | 全指标 SOTA | 三个基准的量化对比（Table 1） | 强 | Neural3DV、ENeRF-Outdoor、SelfCap 上 PSNR/SSIM²/LPIPS 均最优 |
 | 各模块贡献 | 消融实验（Table 2） | 强 | 四个模块分别消融，均有显著下降 |
 | 实时渲染能力 | 单卡 FPS 报告 | 中 | 仅报告了 4K 分辨率 ≥100 FPS，未提供多分辨率/多场景的系统性测试 |
+
+
 
 ## 原文 PDF
 

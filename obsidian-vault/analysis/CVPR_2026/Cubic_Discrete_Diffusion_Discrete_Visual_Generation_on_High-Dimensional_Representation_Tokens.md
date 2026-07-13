@@ -42,7 +42,7 @@ claims:
 > [!tip] 效果简介
 > - ImageNet 256×256 class‑conditional generation 上，gFID (with classifier‑free guidance) 1.88 (CubiD‑XXL) vs 1.95 (VFM‑Tok‑XXL) (-0.07)；gFID (without guidance) 2.02 (CubiD‑XXL) vs 2.04 (CubiD‑XL / VFM‑Tok‑3B) (-0.02)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -66,7 +66,7 @@ claims:
 
 CubiD 处于**离散扩散生成**与**高维表示学习**的交叉地带。与经典离散扩散方法 **MaskGIT**（Chang et al., CVPR 2022）按空间位置掩码不同，CubiD 将掩码粒度下沉至元素级别；与自回归方法 **VAR**（Tian et al., arXiv 2024）的逐尺度预测不同，CubiD 以固定步数的并行细化替代了顺序生成。相较于 VFM-Tok 等需要重组压缩的高维令牌生成基线，CubiD 是首个**直接以原生高维表示令牌（768d）进行离散生成**的方法，无需降维或空间压缩（Table 5）。
 
-## 背景与动机
+
 
 ### 离散视觉生成的两条路径
 
@@ -98,7 +98,9 @@ CubiD 的出发点是一个直接的观察：**高维表示令牌本质上是一
 
 CubiD 是首个直接在高维原生表示令牌（768d）上进行离散生成的方法。与此相对，现有离散方法（如 MaskGIT、VAR）均工作在压缩后的低维空间（通常 $\leq 32$ 维），而 VFM-Tok 虽涉及高维令牌但需额外重组压缩步骤。CubiD 在 ImageNet 256×256 上以 768 维离散令牌取得 1.88 gFID（Table 5），证明了高维离散生成在计算和语义上均可行。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CubiD 的核心创新在于将高维表示令牌重新定义为一个统一的 **h×w×d 三维建模空间**，并通过细粒度掩码扩散打破了传统离散生成方法中空间位置与特征维度的刚性边界。以下从瓶颈突破、关键机制和设计决策三个层面展开。
 
@@ -149,7 +151,7 @@ Table 4e 显示模型从 946M 扩展至 3.7B 参数时 gFID 从 5.25 持续降�
 
 **局限提示**：当前实验仅覆盖 256×256 分辨率的 class-conditional 生成，更高分辨率或文本到图像场景下的元素级掩码计算开销是否可控，仍需进一步验证。
 
-## 整体框架
+
 
 CubiD 的整体 pipeline 围绕“高维连续表示 → 逐维离散化 → 三维掩码扩散建模 → 迭代解码”这一核心流程构建，旨在打破低维令牌生成对语义丰富性的瓶颈，同时避免高维空间下自回归建模的指数级步数灾难。
 
@@ -195,7 +197,7 @@ $$\mathcal{L} = -\mathbb{E}_{\mathbf{q}, \mathbf{M}} \left[ \sum_{i \in \mathbf{
 ![[assets/figures/papers/cubid_cvpr2026_20260622/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of discrete visual generation approaches.(a) Low-dimensional token generation:Both methods operate at the spatial level—autoregressive requires h × w sequential steps,while discrete diffusion achieves parallel generation in T\<h ×w iterations.(b)High-dimensional token generation:Autoregressive becomes intractable (h X w X d steps),and standard discrete diffusion cannot model intra-position dependencies. Our Cubic Discrete Diffusion performs fine-grained masking across the entire 3D tensor—any dimension at any position can be masked and predicted independently-enabling effcient generation in T\< h ×w ×d iterations while capturing both spatial and dimensional correlations*
 
-## 核心模块与公式推导
+
 
 CubiD 将高维表示令牌生成建模为三维张量上的细粒度掩码扩散过程。其核心由三个紧密耦合的模块构成：**逐维量化**将连续特征转化为离散令牌，**三维掩码采样器**在 h×w×d 张量上施加元素级掩码，**双向 Transformer** 从部分观测中并行预测所有被掩码位置。
 
@@ -255,7 +257,9 @@ Table 4b 的消融实验揭示了掩码粒度的核心地位。按维度掩码�
 ![[assets/figures/papers/cubid_cvpr2026_20260622/figures/004_Figure_4.jpg]]
 *Figure 4: InferenceprocessofCubiD.Toprowshowsthelatenttokenstate(white:masked,pink:unmasked),botomrowshows correspondingdecodedimages.uringgeneration,CubiDstartsfromafullyasedtensor(O%)andprogressvelyunmasktkensuntil reachingacompleteimage(O0%).Atachiteration,themodelpredictsallmaskedtokensinparalelandrandomlyunmasksasubset. The percentagesshowtheprogessthroughgenerationsteps.Generationtakeshundredsofterationsregardlessoffeaturedimensioality makingigh-dmensioaletegneratiomputatioallfeasibl.Thsualizatidemostratesacoarse-tfnegeeratiooces, where early iterations establish overall structure and later iterations refine details*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈验证：高维离散化的语义保持
 
@@ -313,7 +317,9 @@ Table 5 汇总了 ImageNet 256×256 类别条件生成的主要结果。CubiD-XX
 ![[assets/figures/papers/cubid_cvpr2026_20260622/figures/002_Figure.jpg]]
 *Figure: Figur2.Generatedsamples fromCubiD.Clas-conditioal generatioresultsonImageNet256×256usinghigh-dimensionalrepresentation tokens from DINOv2-B encoder,demonstrating fine details and textures across diverse categories*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：高维离散生成的核心瓶颈
 
@@ -391,6 +397,8 @@ CubiD 的提出不仅解决了一个具体的技术问题，更开启了一系�
 **（4）文本到图像及视频生成的扩展。** CubiD 的掩码扩散框架在理论上支持任意条件信号——只需将条件嵌入注入双向 Transformer 的注意力层。验证该方法在文本到图像生成上的有效性，以及将 $h \times w \times d$ 张量扩展为 $t \times h \times w \times d$ 用于视频生成，是直接且重要的下一步。
 
 **（5）量化策略的理论分析。** 逐维量化的成功依赖于“预训练特征维度已充分解耦”这一经验假设。对这一假设进行更深入的理论分析——例如研究不同编码器的维度间互信息、量化误差的传播特性——可能指导更优的离散化策略设计，甚至催生专门为逐维量化优化的编码器架构。
+
+
 
 ## 原文 PDF
 

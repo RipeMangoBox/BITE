@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Global_Resolution_Optimal_Multi_Draft_Speculative_Sampling_via_Convex_Optimization.pdf
+project_link: null
+code_link: null
 openreview_forum_id: gpsczXOsHn
 aliases:
 - GR
@@ -42,7 +44,7 @@ claims:
 > - Llama-3 70B/8B (time limit 10 ms/token) 上，acceptance rate (%) 为 85.65 (τ=1e‑3) / 85.10 (τ=1e‑4)，对比 ≤ 83.94 (best other solver)，变化 +1.71% / +1.16%。
 > - Gemma‑2 27B/2B (multi‑step SpecTr) 上，walltime speedup (over vanilla) 为 1.98× (K=4, L=8)，对比 1.0，变化 +98%。
 
-## 概述
+## 概要
 
 **问题瓶颈**：多草案投机采样（multi‑draft speculative sampling）的验证准则本质上是一个最优传输线性规划（OTLP），其变量规模随词汇表大小 $V$ 和草案数 $n$ 呈指数增长（$V^{n+1}$），导致无法直接存储或求解。现有方法要么退化为启发式近似，要么依赖通用 LP/最大流求解器，在毫秒级单 token 时间预算内远不能达到最优接受率。
 
@@ -60,7 +62,7 @@ claims:
 
 **局限与开放问题**：当前算法严格依赖 i.i.d. 草案假设，对非 i.i.d. 草案（如不替换采样或独立不同草案）的子模最小化步骤缺乏高效实现；截断集大小受限于 L‑BFGS‑B 的迭代代价，在高温或大 $(k,n)$ 组合下失败率升高。如何为非 i.i.d. 草案设计可证近似的多面体算法，以及失败时自动切换至混合策略，是后续工作的关键方向。
 
-## 背景与动机
+
 
 ### 投机采样与多草案验证
 
@@ -97,7 +99,9 @@ $$\alpha^* = 1 + \min_{H \subseteq \mathcal{V}} \psi(H), \quad \psi(H) = \sum_{i
 
 上述进展揭示了一个关键缺口：能否从子集选择的最优解 $H^*$ 出发，反向重构出完整的运输计划，同时避免回到指数规模的原始 OTLP？本文的核心动机正是填补这一缺口——通过建立子集选择、互补松弛性与多面体理论之间的深层联系，将指数规模的 OTLP 分解为两个仅依赖低维参数的凸优化问题，从而在保证任意精度的前提下，将求解时间压缩至实际可用的毫秒级。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 创新动机：从指数灾难到可解规模
 
@@ -135,7 +139,7 @@ $$\alpha^* = 1 + \min_{H \subseteq \mathcal{V}} \psi(H), \quad \psi(H) = \sum_{i
 
 **证据强度评估**：互补松弛分解（Theorem 5.1）和外系统闭式解（Theorem 6.2）均有严格数学证明支撑，置信度极高；截断凸函数的近似保证（Lemma 6.6）提供了误差上界，但截断集选取的“最小 $T$”策略在部分 $(k,n)$ 组合下可能导致优化器无法在时间预算内收敛（失败率上升，Figure 5），这是算法的主要失效模式。当前算法严格依赖 i.i.d. 草稿假设以维持 $\psi$ 的子模性和 $q$-凸性；对于非 i.i.d. 草稿方案，子模最小化步骤缺乏高效实现（Table 5），这是向更广泛草稿策略扩展的主要障碍。
 
-## 整体框架
+
 
 Global Resolution 求解器的核心思路是将原始指数规模的 OTLP（变量数量为 $V^{n+1}$）分解为三个可高效求解的独立模块，最终通过凸优化在任意精度下重构出近似最优的运输计划。整个 pipeline 的输入为目标分布 $p(i)$、草稿分布 $p_{\text{draft}}(\bar{i})$ 以及可接受集 $A_i$，输出为满足 OTLP 约束的运输计划 $C_{i,\bar{i}}$，其接受率可在给定误差阈值 $\tau$ 内逼近理论最优值 $\alpha^*$。
 
@@ -166,7 +170,7 @@ Global Resolution 求解器的核心思路是将原始指数规模的 OTLP（变
 
 整个 pipeline 的瓶颈在于凸优化步骤，其代价由截断集大小 $|T|$ 决定。实验表明，在 $\tau = 10^{-3}$ 的设置下，Global Resolution 在 Llama-3 上的平均求解时间为 70.75 ms/token（$k=10, n=5$），相比通用 LP 求解器加速约四个数量级（Table 1），同时接受率达到 85.65%，超过所有对比求解器（Table 2）。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化：从 OTLP 到子集选择
 
@@ -234,7 +238,9 @@ $$\Theta_T((\alpha_i)) = \sum_{\bar{i} \in T^n} p_{\mathrm{draft}}(\bar{i}) \log
 
 截断集 $T$ 的大小决定了凸优化的代价与精度。**Algorithm 1** 根据目标误差阈值 $\tau$ 自适应选择最小 $T$，使得 $\gamma_T \leq \tau$（内层）且 $\varepsilon_T \leq \tau$（外层），随后使用 L‑BFGS‑B 求解器最小化对应的凸函数。**Lemma 6.6** 给出了近似保证：最终构造的运输计划 $C$ 在 OTLP 等式约束上的总 $L_1$ 偏差不超过 $\alpha + 2\beta$，最优接受率偏差不超过 $\alpha + \beta$，其中 $\alpha, \beta$ 为求解器误差。实际中取 $\tau = 10^{-3}$ 或 $10^{-4}$ 即可在毫秒级时间内达到超过 90% 的最优接受率。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：求解速度与接受率的双重突破
 
@@ -296,7 +302,9 @@ $$\Theta_T((\alpha_i)) = \sum_{\bar{i} \in T^n} p_{\mathrm{draft}}(\bar{i}) \log
 ![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_gpsczXOsHn/figures/006_Table.jpg]]
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题根源：多草案投机采样的指数规模瓶颈
 
@@ -360,6 +368,8 @@ Figure 5 揭示了算法在目标模型温度升高时的脆弱性：当温度�
 3. **自适应截断集**：当前截断集大小由硬编码限制决定，是否可以通过自适应梯度信息或随机采样进一步降低凸函数的优化代价？这可能使算法在高温或大 $k$ 场景下保持可靠性。
 
 4. **与 SpecTr 等框架的深度集成**：Table 4 显示在多步框架中 Global Resolution 实现了 1.98× 的墙上时间加速，但块效率（每调用一次目标模型解码的 token 数）仍有提升空间。如何在多步调度中更好地利用 Global Resolution 的精度优势？
+
+
 
 ## 原文 PDF
 

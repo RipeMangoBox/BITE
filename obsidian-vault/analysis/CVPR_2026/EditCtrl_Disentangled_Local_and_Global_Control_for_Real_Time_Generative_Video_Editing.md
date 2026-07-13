@@ -44,7 +44,7 @@ claims:
 > - VPBench-Inp (DAVIS) 上，PSNR↑ 23.17 (EditCtrl 1.3B) vs 22.62 (VACE 1.3B) (+0.55)。
 > - VPBench-Inp (VPBench) 上，PSNR↑ 25.44 (EditCtrl 1.5B) vs 22.62 (VACE 1.3B) (+2.82)。
 
-## 概述
+## 概要
 
 现有的生成式视频编辑方法，如 **ReVideo**（Mou et al., NeurIPS 2024）、**VideoPainter**（Bian et al., CVPR 2025）以及 **VACE**（Jiang et al., ICCV 2025），在修复视频时始终处理完整的时空上下文，导致计算开销巨大，尤其对于局部、稀疏的编辑任务。全注意力机制使得计算成本不随修复蒙版的大小而缩放，无法实现实时性能。
 
@@ -54,8 +54,6 @@ claims:
 
 EditCtrl 的主要局限在于：高运动场景下可能产生伪影和不正确的场景交互；当编辑蒙版非常大时，细粒度编辑变得困难；背景下采样至固定 256×256 分辨率在极端长宽比或复杂场景下可能丢失细节；以及基于光流的内容传播在长期编辑中可能出现误差累积。
 
-## 背景与动机
-
 生成式视频编辑旨在根据文本提示和用户指定的编辑区域，对视频进行局部内容修改，同时保持未编辑区域的完整性和整体时间一致性。这一任务在增强现实、视频后期制作和交互式内容创作中具有广泛的应用前景。然而，当前的主流方法面临一个根本性的效率瓶颈：**现有生成式视频编辑方法在修复视频时始终处理完整的时空上下文，导致计算开销巨大，尤其对于局部、稀疏的编辑**。全注意力机制使得计算成本不随修复蒙版的大小而缩放，无法实现实时性能。
 
 具体而言，以 **VACE**（Jiang et al., ICCV 2025）为代表的全注意力视频编辑方法，在去噪过程中对视频所有帧的全空间进行全注意力计算，其计算量与视频分辨率成正比，而与实际需要编辑的区域大小无关。这意味着，即使用户仅希望修改画面中一个微小的物体，系统仍需处理整个视频的所有令牌，造成严重的计算浪费。类似地，**ReVideo**（Mou et al., NeurIPS 2024）和 **VideoPainter**（Bian et al., CVPR 2025）等基于扩散模型的方法同样继承了这一全注意力范式，难以在消费级硬件上实现实时交互。传统的视频修复方法如 **ProPainter**（Zhou et al., ICCV 2023）虽然不依赖生成模型，但其基于流传播的机制缺乏对高层语义和文本引导编辑的支持，无法满足生成式编辑的需求。
@@ -64,7 +62,7 @@ EditCtrl 的主要局限在于：高运动场景下可能产生伪影和不正�
 
 EditCtrl 的核心动机正是打破这一计算与编辑区域大小无关的僵局。其核心洞察在于：**利用冻结预训练视频扩散模型上的轻量适配器（局部编码器和全局嵌入器），可以在不修改基础模型权重的情况下实现计算按需分配，既保持了生成质量，又大幅提升了效率，并能灵活组合其他控制变体**。通过将上下文编码解耦为仅处理蒙版区域局部令牌的局部编码器 $c_\phi$，和通过下采样背景提供全局线索的全局嵌入器 $G_\psi$，EditCtrl 实现了计算量与编辑大小成正比的理想缩放特性，为实时生成式视频编辑开辟了新的可能。
 
-## 核心创新
+## 核心方法与创新机理
 
 EditCtrl 的核心创新在于将生成式视频编辑的计算范式从“全注意力全局处理”转变为“按需局部计算 + 轻量全局引导”的解耦架构。这一转变直接回应了现有方法的根本瓶颈：**计算成本不随编辑区域大小缩放**。
 
@@ -104,8 +102,6 @@ $$\mathcal{L} = \begin{cases} \mathcal{L}_{\phi}, & \text{if } k < n, \\ \mathca
 ### 效率与质量的量化突破
 
 这一系列创新带来的直接结果是：EditCtrl 在 VPBench-Edit 基准上的吞吐量达到 **4.67 FPS**（1.5B 模型），而全注意力基线 VACE（1.3B 模型）仅为 **0.66 FPS**，加速比超过 **7 倍**。更关键的是，在实现这一效率飞跃的同时，EditCtrl 的编辑质量（PSNR 24.16 vs 23.84）和文本对齐度均超越全注意力基线，验证了“解耦局部-全局控制”这一核心洞察的正确性：**全注意力中的大量计算实际上是冗余的，轻量级的全局线索足以替代昂贵的全局注意力计算**。
-
-## 整体框架
 
 EditCtrl 的整体设计围绕一个核心原则展开：**计算量应与编辑区域大小成正比，而非整个视频的分辨率**。为此，框架将视频编辑任务解耦为局部生成与全局一致性两个正交的子问题，并分别通过轻量级适配器在冻结的预训练视频扩散模型上实现。
 
@@ -172,8 +168,6 @@ EditCtrl 的效率优势来自两个相互协同的设计决策：
 
 ![[assets/figures/papers/paper_list_l864_https_arxiv_org_abs_2602_15031/figures/001_Figure_1.jpg]]
 *Figure 1: EditCtrl: A Real-time Generative Video Editing Pipeline. EditCtrl supports complex, prompt-guided edits on 4K videos, simultaneously handling an arbitrary number of user-defined masks (Top). To maintain real-time performance, our inference pipeline dynamically allocates compute proportional to the edit mask size (Middle). EditCtrl also intelligently propagates object edits from initial frames into the future (after the orange line), ensuring high temporal and object consistency in the resulting edit (Bottom)*
-
-## 核心模块与公式推导
 
 EditCtrl 的核心设计思想是将视频编辑的控制信号解耦为**局部上下文**与**全局上下文**两个独立通路，使得去噪计算仅作用于编辑蒙版区域，从而将计算复杂度从整个视频分辨率降低为与蒙版面积成正比。整个框架建立在冻结的预训练文本到视频扩散模型之上，仅训练轻量级适配器，不修改基础模型权重。
 
@@ -242,7 +236,7 @@ $$ \mathcal{L} = \begin{cases} \mathcal{L}_{\phi}, & \text{if } k < n, \\ \mathc
 ![[assets/figures/papers/paper_list_l864_https_arxiv_org_abs_2602_15031/figures/003_Figure_3.jpg]]
 *Figure 3: EditCtrl: Local and Global Control Modules. Given the source video*
 
-## 实验与分析
+## 实验与关键发现
 
 EditCtrl 的核心实验目标是在保持或超越全注意力基线编辑质量的同时，验证其计算效率的显著提升。所有实验均在 NVIDIA A6000Ada GPU 上进行，FPS 测量仅统计扩散模型推理吞吐量（排除 VAE 编解码时间），且统一使用 25 步 DDPM 去噪，确保公平比较。
 
@@ -283,22 +277,13 @@ EditCtrl 在以下场景表现出局限性（图 8）：(a) **高运动场景**�
 ![[assets/figures/papers/paper_list_l864_https_arxiv_org_abs_2602_15031/figures/009_Figure_6.jpg]]
 *Figure 6: Local and Global Adapter Ablation. Removing adapter components harms video editing quality, but together they let EditCtrl perform comparably to a method operating with full-attention*
 
-![[assets/figures/papers/paper_list_l864_https_arxiv_org_abs_2602_15031/figures/010_Figure_7.jpg]]
-*Figure 7: Editing complex timelapse 21:9 ultrawide footage. EditCtrl can also be used with additional conditioning LoRAs (DiffSynth-Studio, 2025)*
-
 ![[assets/figures/papers/paper_list_l864_https_arxiv_org_abs_2602_15031/figures/011_Figure_8.jpg]]
 *Figure 8: Failure Modes for EditCtrl on High Motion (a) & Inaccurate Masks (b)*
 
 ![[assets/figures/papers/paper_list_l864_https_arxiv_org_abs_2602_15031/figures/012_Figure_9.jpg]]
 *Figure 9: Content Propagation for Augmented Reality. EditCtrl is particularly suitable for deployment in augmented reality applications given its low latency and ability to propagate content to match the user’s movement*
 
-![[assets/figures/papers/paper_list_l864_https_arxiv_org_abs_2602_15031/figures/013_Figure_10.jpg]]
-*Figure 10: Additional Multi-Prompt Generation Visualizations*
-
-![[assets/figures/papers/paper_list_l864_https_arxiv_org_abs_2602_15031/figures/014_Figure_11.jpg]]
-*Figure 11: Additional Content Propagation Visualizations*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 与基线方法的关系
 

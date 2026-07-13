@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/WMPO_World_Model_based_Policy_Optimization_for_Vision_Language_Action_Models.pdf
+project_link: https://wm-po.github.io/
+code_link: null
 openreview_forum_id: qE2FyvRvuF
 aliases:
 - WWMBPO
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | WMPO：基于世界模型的视觉-语言-动作策略优化 |
 | 英文题名 | WMPO: World Model-based Policy Optimization for Vision-Language-Action Models |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=qE2FyvRvuF); [Project](https://wm-po.github.io/) |
+| Links | [paper](https://openreview.net/forum?id=qE2FyvRvuF) · [Project](https://wm-po.github.io/) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | WMPO (World Model-based Policy Optimization) |
 | Dataset | Mimicgen (Coffee, StackThree, ThreePieceAssembly, Square), Disruption Scenarios (Position, Background, Texture), Real-world Square insertion (5mm clearance) |
@@ -42,7 +44,7 @@ claims:
 > - Mimicgen (Coffee, StackThree, ThreePieceAssembly, Square) 上，Success rate (%) 为 57.6 (P=1280 mean)，对比 42.4 (DPO), 43.5 (GRPO)，变化 +15.2 over DPO, +14.1 over GRPO。
 > - Disruption Scenarios (Position, Background, Texture) 上，Success rate (%) mean across disruption types 为 29.6 (Ours)，对比 24.2 (DPO), 26.3 (GRPO), 26.7 (Base)，变化 +5.4 over DPO, +3.3 over GRPO, +2.9 over Base。
 
-## 概述
+## 概要
 
 将强化学习应用于视觉-语言-动作（VLA）模型时，面临两大核心瓶颈：**物理交互样本效率极低**——真实机器人轨迹采集成本高昂，难以支撑在线策略优化所需的大量试错；**离策略价值估计偏差**——离线RL方法（如DPO）虽能利用已有数据，但受限于分布偏移，无法有效探索和纠错。
 
@@ -58,7 +60,7 @@ WMPO（World Model-based Policy Optimization）通过一个关键因果调节变
 
 WMPO为VLA模型提供了一条无需昂贵物理交互、样本高效且具备自我纠错能力的策略优化路径，其像素空间世界模型的设计使其可直接复用VLA的预训练视觉知识，避免潜在空间转换带来的信息损失。
 
-## 背景与动机
+
 
 ### 问题背景：VLA策略优化的两难困境
 
@@ -89,7 +91,9 @@ WMPO的核心动机源于一个关键洞察：**如果能够构建一个足够�
 
 WMPO通过三个技术支柱回应这些挑战：基于大规模机器人轨迹预训练的**像素空间视频扩散世界模型**，在少量策略自身行为数据上微调的**策略行为对齐机制**，以及结合稀疏奖励模型与**组相对策略优化（GRPO）**的完全想象内在线策略优化框架。这一设计使VLA策略得以在零物理交互的条件下，从大规模想象的试错经验中涌现出演示数据中不存在的自我纠错行为。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 WMPO 针对将强化学习应用于视觉-语言-动作（VLA）模型时面临的两大瓶颈——物理交互样本效率极低和离策略价值估计偏差——提出了一套系统性的解决方案。其核心创新并非单一技术的堆砌，而是围绕**像素空间世界模型**构建的完整在线策略优化闭环，使 VLA 的 RL 训练完全脱离真实环境交互。
 
@@ -133,7 +137,7 @@ $$r_{i,t}(\theta) = \frac{\pi_{\theta}(a_{i,t} \mid s_{i,t})}{\pi_{\theta_{\math
 
 上述创新并非孤立存在，而是形成了正向反馈循环：像素空间世界模型使 VLA 的预训练知识得以保留，噪声帧条件和帧级动作控制保障了想象轨迹的视觉质量，策略行为对齐确保想象内容与当前策略相关，而去除 KL 正则的 GRPO 则充分利用这些高质量想象轨迹探索新行为。这一协同效应在实验中体现为 WMPO 策略涌现出的自我纠错能力——这是演示数据中不存在的行为，也是纯模仿学习或离线 RL 方法无法获得的。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_qE2FyvRvuF/figures/002_Figure_2.jpg]]
 *Figure 2: WMPO starts from an initial state $s _ { 0 }$ . The overall training procedure consists of three components: (1) Imagined Trajectory Generation, where policy model $\pi _ { \theta _ { \mathrm { o l d } } }$ and world model $p _ { \phi }$ interact alternately to generate a full imagined trajectory; (2) Trajectory Sampling, where multiple trajectories are sampled and evaluated by the reward model $R _ { \psi }$ ; and (3) Policy Update, where the policy parameters θ are optimized via Eq. 4. This process is iteratively repeated throughout training
@@ -174,7 +178,7 @@ $$\mathcal{L}(\theta) = \mathbb{E}_{s_0 \sim \mathcal{D}, \{\tau_i\}_{i=1}^{G} \
 
 整个训练流程（Figure 2）以迭代方式执行：策略在想象中更新后，其行为数据被用于微调世界模型，更新后的世界模型再为下一轮策略优化提供更准确的想象环境，形成闭环。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化
 
@@ -230,7 +234,9 @@ $$\mathcal{L}(\theta) = \mathbb{E}_{s_0 \sim \mathcal{D}, \{\tau_i\}_{i=1}^{G} \
 
 去除KL正则化并采用动态采样策略，既降低了内存消耗，又使GRPO训练保持稳定。整个训练流程在想象轨迹生成、轨迹采样和策略更新三个模块间迭代循环。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与解决路径
 
@@ -310,7 +316,9 @@ WMPO在所有扰动类型上均取得最优，平均成功率29.6%，比DPO高�
 
 4. **任务与模型泛化**：全部实验基于OpenVLA架构和Mimicgen/真实世界插入任务，推广到其他VLA模型或更复杂任务（如POMDP设定）有待验证。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与解决思路
 
@@ -368,6 +376,8 @@ WMPO将GRPO完全迁移到世界模型内部执行，并做出关键修改：**�
 3. **终身学习的稳定性-塑性权衡**：世界模型与策略交替更新的框架在更大规模、更长时间迭代下的稳定性和塑性如何？是否存在灾难性遗忘或模型崩溃的风险？
 4. **更少样本的行为对齐**：能否进一步降低世界模型微调所需的真实轨迹数量，实现更少样本的策略行为对齐，从而进一步降低真实交互成本？
 5. **跨形态泛化**：像素空间世界模型的应用范围能否拓展到更广泛的机器人形态（如双臂、移动操作）和传感器模态（如深度、触觉），而不仅仅是RGB视觉？
+
+
 
 ## 原文 PDF
 

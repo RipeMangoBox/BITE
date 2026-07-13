@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/3DGUT_Enabling_Distorted_Cameras_and_Secondary_Rays_in_Gaussian_Splatting.pdf
+code_link: https://github.com/nv-tlabs/3dgrut
 project_link: https://research.nvidia.com/labs/toronto-ai/3DGUT/
 aliases:
 - 33GUT
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 3DGUT: 在3D高斯泼溅中启用畸变相机与次级光线 |
 | 英文题名 | 3DGUT: Enabling Distorted Cameras and Secondary Rays in Gaussian Splatting |
 | 会议/期刊 | CVPR 2025 |
-| Links | [paper](https://arxiv.org/abs/2412.12507); [GitHub](https://github.com/nv-tlabs/3dgrut); [Project](https://research.nvidia.com/labs/toronto-ai/3DGUT); [Project](https://research.nvidia.com/labs/toronto-ai/3DGUT/) |
+| Links | [paper](https://arxiv.org/abs/2412.12507) · [GitHub](https://github.com/nv-tlabs/3dgrut) · [Project](https://research.nvidia.com/labs/toronto-ai/3DGUT) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | 3DGUT (3D Gaussian Unscented Transform) |
 | Dataset | MipNeRF360, Scannet++ (fisheye), Waymo (distorted + rolling shutter) |
@@ -42,7 +43,7 @@ claims:
 > - MipNeRF360 上，FPS↑ 为 265 (Ours)，对比 52 (3DGRT)，变化 +213。
 > - Scannet++ (fisheye) 上，PSNR↑ 为 29.11 (Ours sorted)，对比 28.15 (FisheyeGS)，变化 +0.96。
 
-## 概述
+## 概要
 
 3D高斯泼溅（3DGS）凭借其高保真度与实时渲染能力，已成为新视角合成的主流方法。然而，3DGS的核心光栅化管线依赖于EWA splatting对投影函数的一阶线性化近似，这使其天然受限于两个关键瓶颈：**（1）无法处理强非线性相机模型**（如鱼眼镜头、径向畸变）和**时间依赖的传感器效应**（如滚动快门），因为每种相机模型都需要单独推导雅可比矩阵；**（2）不支持次级光线**（反射、折射），因为其渲染表达与光线追踪方法在数学上不对齐。这些限制将3DGS牢牢锁定在针孔相机与直接光照的范围内，阻碍了它在自动驾驶、机器人、AR/VR等广泛使用复杂相机的场景中的应用。
 
@@ -50,7 +51,7 @@ claims:
 
 在方法谱系中，3DGUT位于3DGS光栅化方法与3DGRT光线追踪方法的交汇点：它继承光栅化的效率优势，同时获得追踪方法的灵活性与物理正确性。实验结果表明，在标准针孔相机数据集（MipNeRF360、Tanks & Temples）上，3DGUT收敛到与3DGS相当的质量（LPIPS仅差约0.02），同时保持超过200 FPS的渲染速度；在鱼眼相机数据集Scannet++上，3DGUT以PSNR 29.11显著优于专门为该相机模型推导雅可比的FisheyeGS（28.15），且仅使用38%的高斯粒子；在Waymo自动驾驶数据集（畸变相机+滚动快门）上，3DGUT同样超越3DGRT。这些结果验证了核心洞察：**通过UT近似粒子而非近似投影，可以用统一的、无需模型定制的框架，精确处理任意非线性相机与次级光线，同时保持实时渲染能力**。
 
-## 背景与动机
+
 
 ### 3D高斯泼溅的核心假设与局限
 
@@ -78,7 +79,9 @@ $$\Sigma' = J_{[:2,:3]} W \Sigma W^T J_{[:2,:3]}^T$$
 
 Figure 1 直观展示了这一动机：在原始畸变鱼眼视图上训练（而非去畸变后裁剪训练）可利用全部像素提升视觉质量，同时插入的反射球与折射雕像则体现了次级光线效果的潜力。Figure 2 对比了蒙特卡洛采样、EWA线性化与UT三种投影策略的本质差异，清晰地揭示了UT“近似分布而非近似函数”的核心思想。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 3DGUT 的核心创新在于用一套统一的数学工具——Unscented Transform (UT)——同时解决了 3D Gaussian Splatting (3DGS) 在**非线性相机模型**、**时间依赖传感器效应**和**次级光线**三个维度上的根本性限制。其关键洞察是：**近似粒子分布，而非近似投影函数**。
 
@@ -127,7 +130,7 @@ $$\tau_{\mathrm{max}} = \frac{(\pmb{\mu} - \pmb{o})^{T} \pmb{\Sigma}^{-1} \pmb{d
 
 在鱼眼相机数据集 Scannet++ 上，这一协同效应的直接体现是：3DGUT 以仅 38% 的高斯粒子数量（0.38M vs 1.07M）显著超越专门为等距鱼眼模型推导雅可比的 **FisheyeGS** (Liao et al., arXiv 2024)，PSNR 达到 29.11 vs 28.15（Table 3）。
 
-## 整体框架
+
 
 3DGUT 在保留 3DGS 高帧率光栅化管线的前提下，通过三个核心改造将渲染表达从“近似投影函数”迁移到“近似粒子分布”，从而统一支持任意非线性相机模型、滚动快门效应以及次级光线效果。整体管线由四个关键模块串联构成，输入为经过 SFM 标定的多视角图像与对应相机参数，输出为任意目标视点的渲染图像。
 
@@ -160,7 +163,7 @@ $$\tau_{\mathrm{max}} = \frac{(\pmb{\mu} - \pmb{o})^{T} \pmb{\Sigma}^{-1} \pmb{d
 ![[assets/figures/papers/paper_list_l49_https_arxiv_org_abs_2412_12507/figures/011_Figure_8.jpg]]
 *Figure 8: Scenes trained with different methods and rendered using 3DGRT [34]. Our method is the most consistent with the tracing approach, allowing for seamless hybrid rendering with splatting for primary and tracing for secondary rays*
 
-## 核心模块与公式推导
+
 
 ### 4.1 无迹变换投影（ESTIMATE2DGAUSSIAN）
 
@@ -216,7 +219,9 @@ $$ \mathcal{L} = \mathcal{L}_2 + 0.2 \mathcal{L}_{\mathrm{SSIM}} $$
 
 稠密化阶段的梯度来源也做了适配：原始3DGS使用2D屏幕空间梯度，3DGUT遵循3DGRT的做法，替换为**3D位置梯度除以到相机距离的一半**，以适配3D空间中的粒子评估范式。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置与对比基准
 
@@ -292,7 +297,9 @@ $$ \mathcal{L} = \mathcal{L}_2 + 0.2 \mathcal{L}_{\mathrm{SSIM}} $$
 ![[assets/figures/papers/paper_list_l49_https_arxiv_org_abs_2412_12507/figures/024_Table_8.jpg]]
 *Table 8: Per-scene evaluation results of our methods on the Scannet++ dataset*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的谱系关系
 
@@ -382,6 +389,8 @@ $$c(\pmb{o},\pmb{d}) = \sum_{i=1}^{N} c_i(\pmb{d}) \alpha_i \prod_{j=1}^{i-1} (1
 ### 4. 知识库定位总结
 
 3DGUT 的核心知识贡献在于提出了一个**统一的投影-渲染框架**，其关键洞察是：**通过 UT 近似粒子分布而非近似投影函数**。这一框架将 3DGS 的适用边界从“针孔相机 + 主光线”扩展到“任意非线性相机 + 次级光线”，同时保持了光栅化的高帧率优势。在知识谱系中，3DGUT 是 3DGS 和 3DGRT 之间的桥梁——它继承了前者的光栅化效率，对齐了后者的渲染表达，从而实现了两者的优势互补。
+
+
 
 ## 原文 PDF
 

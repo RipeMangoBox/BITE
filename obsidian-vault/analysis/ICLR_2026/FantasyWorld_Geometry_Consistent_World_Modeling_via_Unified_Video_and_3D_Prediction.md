@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/FantasyWorld_Geometry_Consistent_World_Modeling_via_Unified_Video_and_3D_Prediction.pdf
+project_link: https://fantasy-amap.github.io/fantasy-world/
+code_link: null
 openreview_forum_id: 3q9vHEqsNx
 aliases:
 - FantasyWorld
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | FantasyWorld：通过统一视频与3D预测实现几何一致性世界建模 |
 | 英文题名 | FantasyWorld: Geometry-Consistent World Modeling via Unified Video and 3D Prediction |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=3q9vHEqsNx); [Project](https://fantasy-amap.github.io/fantasy-world/) |
+| Links | [paper](https://openreview.net/forum?id=3q9vHEqsNx) · [Project](https://fantasy-amap.github.io/fantasy-world/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | FANTASYWORLD |
 | Dataset | WorldScore static (Small camera motion), WorldScore static (Large camera motion) |
@@ -41,7 +43,7 @@ claims:
 > - WorldScore static (Small camera motion) 上，Photo Consist. 为 86.11 ± 7.97，对比 85.48 ± 20.98 (Uni3C)，变化 +0.63。
 > - WorldScore static (Small camera motion) 上，Style Consist. 为 94.22 ± 9.11，对比 88.32 ± 18.47 (Uni3C)，变化 +5.90。
 
-## 概述
+## 概要
 
 当前视频基础模型虽具备强大的想象力先验，却普遍缺乏显式的三维几何监督，导致生成内容在空间一致性与结构保真度上存在明显短板——视角变化稍大即出现撕裂、空洞或风格漂移。与此同时，现有方法将视频生成与三维感知视为弱耦合的两阶段流程，不仅无法相互增强，还常依赖按场景优化的后处理（如NeRF或3DGS），计算开销大、泛化能力弱。
 
@@ -53,7 +55,7 @@ FANTASYWORLD针对上述瓶颈，提出一种统一前馈框架：在冻结的�
 
 当前方法仍存在若干局限：仅支持固定长度片段生成，无法处理长范围连续视频；主要面向静态或准静态场景，对强非刚体运动与时变结构尚未验证；原生相机控制能力弱于部分基线，需通过后处理显式重建增强；训练数据规模约180K视频，域外泛化边界有待进一步探索。
 
-## 背景与动机
+
 
 ### 视频基础模型的想象力先验与空间感知缺口
 
@@ -69,7 +71,9 @@ FANTASYWORLD针对上述瓶颈，提出一种统一前馈框架：在冻结的�
 
 本文的核心动机在于回答一个关键问题：**如何在不牺牲视频生成创造力的前提下，为其注入可靠的几何基础？** 具体而言，我们希望复用冻结的视频扩散模型，从中提取去噪后期语义丰富、结构可靠的特征，并在此基础上嵌入可训练的几何分支，实现视频潜变量与隐式三维场的联合前向推理。通过双向交叉注意力机制，让几何线索约束视频生成、视频先验反哺几何预测，从而将“想象”与“感知”统一在单个骨干网络中。这一思路的关键洞察在于：去噪后期的视频潜变量已经蕴含了丰富的场景结构信息，通过“反向”DPT 解码策略（从深到浅上采样）利用这些稳定特征，能够在保持视频创造力的同时，高效端到端地产生几何一致且可泛化的三维感知表示，充当世界模型的核心桥梁。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FANTASYWORLD 的核心创新在于将视频生成与三维感知统一在一个前馈框架中，关键思路是**在冻结的视频基础模型内部嵌入可训练的几何分支**，使想象先验与几何一致性在特征层面相互增强，而非像现有方法那样将二者弱耦合或依赖按场景优化。
 
@@ -116,7 +120,7 @@ FANTASYWORLD 在解码策略和相机控制上同样做出了针对性改变：
 
 这些结果表明，FANTASYWORLD 通过**在冻结视频骨干中嵌入可训练几何分支并辅以双向交叉注意力**，成功将想象与感知统一在单个前馈模型中，为世界模型提供了高效且可泛化的几何一致性桥梁。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l41_https_openreview_net_forum_id_3q9vHEqsNx/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of FANTASYWORLD. Inputs (image, text, camera) are processed by PCBs and stacked IRG blocks, where an asymmetric dual-branch design couples video synthesis with 3D reasoning. The model outputs geometry-consistent video frames and task-agnostic 3D features*
@@ -169,7 +173,7 @@ FANTASYWORLD 采用两阶段训练以稳定地桥接视频与几何空间：
 
 相机控制采用简化的偏移预测策略：仅生成偏移 $\beta_i$ 并以加法方式注入视频潜变量 $f_i = f_{i-1} + \beta_i$，而非完整自适应层归一化（AdaLN）同时预测缩放和偏移。这一简化设计在保持相机可控性的同时降低了适配器复杂度。
 
-## 核心模块与公式推导
+
 
 ### 3.1 预备条件模块（Preconditioning Blocks, PCB）
 
@@ -216,7 +220,9 @@ $$\mathcal{L}_{\mathrm{total}} = \mathbb{E}_{z_0,\epsilon,t,c}\Big[\|\epsilon_\t
 
 相机外参通过变换到第一帧坐标系进行规范对齐 $\tilde{E}_i = E_i E_0^{-1}$，全局尺度则使用有效点的平均半径进行归一化 $s = \frac{1}{|\mathcal{V}|} \sum_{(i,p) \in \mathcal{V}} \|\tilde{X}_{i,p}^w\|_2$。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制验证
 
@@ -278,7 +284,9 @@ FANTASYWORLD 的设计根植于一个明确诊断：当前视频基础模型虽�
 | FANTASYWORLD 在多视角一致性上优于近期基线 | Table 1：3D/Photo/Style 一致性均取得最高分，且标准差更低 | 0.95 |
 | 定性结果支持定量发现 | Figure 4、Figure 5：基线出现撕裂、空洞、风格漂移，FANTASYWORLD 保持结构连贯 | 0.95 |
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 瓶颈与动机
 
@@ -336,6 +344,8 @@ FANTASYWORLD 的当前设计存在以下适用边界：
 4. **通用下游任务表示。** 该隐式三维特征能否作为导航、操作等通用下游任务的可复用表示，从而减少任务特定的微调？这需要在下游任务基准上进行系统性评估。
 
 5. **几何一致性与用户控制的权衡。** 在不降低生成质量的前提下，如何更好地平衡几何一致性与用户控制能力（如精确的相机和对象操控）？后处理显式重建提供了一条路径，但端到端的可控生成仍是开放挑战。
+
+
 
 ## 原文 PDF
 

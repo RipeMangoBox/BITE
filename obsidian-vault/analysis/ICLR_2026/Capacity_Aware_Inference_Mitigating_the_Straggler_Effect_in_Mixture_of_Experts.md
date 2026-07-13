@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Capacity_Aware_Inference_Mitigating_the_Straggler_Effect_in_Mixture_of_Experts.pdf
+project_link: null
+code_link: https://github.com/CASE-Lab-UMD/Capacity-Aware-MoE
 openreview_forum_id: LuYFpySWA2
 aliases:
 - CAICATDCAED
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 容量感知推理：缓解混合专家模型中的掉队者效应 |
 | 英文题名 | Capacity-Aware Inference: Mitigating the Straggler Effect in Mixture of Experts |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=LuYFpySWA2); [GitHub](https://github.com/CASE-Lab-UMD/Capacity-Aware-MoE) |
+| Links | [paper](https://openreview.net/forum?id=LuYFpySWA2) · [GitHub](https://github.com/CASE-Lab-UMD/Capacity-Aware-MoE) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/algorithms |
 | Method | Capacity-Aware Inference (含 Capacity-Aware Token Drop 和 Capacity-Aware Expanded Drop) |
 | Dataset | 8 benchmarks avg (OBQA, PIQA, RTE, WinoGrande, BoolQ, ARC-C, HellaSwag, MMLU) on OLMoE, MoE single layer speedup (OLMoE, Token Drop), 8 benchmarks avg on Mixtral-8×7B-Instruct, End-to-end inference (Mixtral-8×7B-Instruct, Expanded Drop) |
@@ -42,7 +44,7 @@ claims:
 > - MoE single layer speedup (OLMoE, Token Drop) 上，Speedup ratio 为 1.30× (γ=2.0)，对比 1.00×，变化 30%。
 > - 8 benchmarks avg on Mixtral-8×7B-Instruct 上，Average Accuracy 为 0.2% improvement (Expanded Drop, γ=1.5)，对比 Dropless，变化 +0.2%。
 
-## 概述
+## 概要
 
 混合专家（Mixture of Experts, MoE）模型通过稀疏激活机制在扩展模型容量的同时控制计算成本，但其推理效率受限于一个根本性瓶颈：令牌到专家的分配严重不均衡，导致部分专家过载、部分专家欠载，整体时延由负载最重的专家决定——即“掉队者效应”（Straggler Effect）。Figure 1 展示了这一现象：在 OLMoE 模型上，部分专家的归一化负载远超平均值，形成显著的负载差异。
 
@@ -63,7 +65,7 @@ claims:
 
 方法的局限性在于：当 γ<1.0 时性能骤降，限制了极低负载场景的应用；且方法假设专家并行与 All-to-All 通信，通信开销未完全消除。后续值得探索的方向包括自适应动态调整 γ、扩展丢弃中候选专家数 m 的最优权衡、以及与训练阶段负载均衡损失的联合优化。
 
-## 背景与动机
+
 
 ### 混合专家模型推理中的“掉队者效应”
 
@@ -94,7 +96,9 @@ $$\max(\{N_i\}_{i=1}^{n}) = \begin{cases} \gamma < 1: \bar{N} \\ \gamma \geq 1: 
 
 这一形式化为容量感知推理提供了理论锚点：当 $\gamma \geq 1$ 时，最高负载被限制在 $\gamma \bar{N}$ 以内，推理时延可控；当 $\gamma < 1$ 时，所有专家负载被强制均衡至 $\bar{N}$，但性能可能急剧下降（Figure 12）。因此，寻找在精度-速度权衡曲面上最优的容量系数与令牌选择策略，构成了本文方法设计的核心驱动力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 创新动机：掉队者效应与负载失衡
 
@@ -140,7 +144,7 @@ Table 3 显示，设备级约束在 Qwen3-MoE 上以 $\gamma=1.0$ 达到平均�
 
 **需要手动验证的点**：扩展丢弃中候选专家数 $m$ 与负载均衡、精度之间的最优权衡曲面尚未系统探索，文中仅基于经验分析选择了不限制最大专家数的策略。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0012_LuYFpySWA2_Capacity-Aware_Inference_Mitigating_the_Straggle/figures/003_Figure_3.jpg]]
 *Figure 3: Illustration of Capacity-Aware Token Drop (a) and Expanded Drop (b). Both methods first select experts based on gating scores. In Token Drop, tokens exceeding the local device capacity are discarded prior to All-to-All communication. Expanded Drop enhances expert utilization by allowing each token to consider additional m candidate experts on the same device while still enforcing strict local capacity constraints*
@@ -176,7 +180,7 @@ Table 3 显示，设备级约束在 Qwen3-MoE 上以 $\gamma=1.0$ 达到平均�
 
 Token Drop最初在专家级别施加容量约束，但Expanded Drop的自然扩展是将约束提升到设备粒度：同一设备上所有专家的令牌总数不超过 $n_l \cdot \gamma \bar{N}$。设备级约束允许令牌在同一设备内的专家间自由流动，从而更充分地利用欠载专家的计算资源。Table 3显示，在Qwen3-MoE上，设备级约束（$\gamma=1.0$）的平均性能（74.8）优于专家级约束（$\gamma=1.5$ 的73.9），且允许使用更低的容量系数，获得更高的加速比。
 
-## 核心模块与公式推导
+
 
 ### 3.1 MoE 推理基础
 
@@ -270,7 +274,9 @@ $$
 
 > **注意**：Algorithm 1 和 Algorithm 2 的具体伪代码细节需查阅原文附录 E，此处不逐行复现。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与关键控制变量
 
@@ -329,7 +335,9 @@ Figure 6的时延分解表明，容量感知推理主要缩短了专家计算、
 ![[assets/figures/papers/iclr26_0012_LuYFpySWA2_Capacity-Aware_Inference_Mitigating_the_Straggle/figures/005_Figure_4.jpg]]
 *Figure 4: Speedup of a single MoE layer compared to the baseline without capacity constraints, achieved through two capacity-aware inference methods: Token Drop and Expanded Drop*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 在MoE推理加速技术谱系中的位置
 
@@ -363,6 +371,8 @@ Figure 6的时延分解表明，容量感知推理主要缩短了专家计算、
 5. **与训练侧优化的协同**：容量感知推理与训练阶段的负载均衡损失是否可以联合优化？例如，在训练时引入容量感知的令牌丢弃作为数据增强，使模型提前适应推理时的令牌丢弃模式，可能进一步缩小性能差距。
 
 6. **长序列生成场景**：在自回归生成中，随着序列增长，令牌分布可能发生漂移，固定的容量系数可能不再适用。如何设计序列长度自适应的容量调度策略仍是一个开放问题。
+
+
 
 ## 原文 PDF
 

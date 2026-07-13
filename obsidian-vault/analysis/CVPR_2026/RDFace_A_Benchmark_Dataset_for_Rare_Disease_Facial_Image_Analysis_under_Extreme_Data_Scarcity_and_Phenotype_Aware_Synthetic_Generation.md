@@ -44,7 +44,7 @@ claims:
 > - RDFace Few-shot (99 classes) 上，5-way 1-shot Accuracy 29.88% (DenseNet with DreamBooth augmentation) vs 26.20% (DenseNet, Real only) (+3.68%)。
 > - Synthetic data fidelity (DreamBooth) 上，BioBERT Overall Phenotype Similarity Score 0.8404 ± 0.0748 vs N/A (compared to real-real similarity) (N/A)。
 
-## 概述
+## 概要
 
 罕见病（Rare Diseases, RDs）的诊断长期面临“数据荒漠”困境：全球已知约7,000种罕见病，但公开可用的面部图像数据集极度匮乏，每种疾病的训练样本通常仅有1–7张。标准监督学习与少样本学习在此类极端低数据场景下准确率极低，且不同罕见病的面部表型高度相似，进一步加剧了分类难度。
 
@@ -54,7 +54,7 @@ claims:
 
 在方法谱系与知识库定位上，RDFace并非提出新的分类架构，而是为罕见病面部诊断领域建立了首个系统性的基准评估范式。它将**ResNet-152**（He et al., CVPR 2016）、**DenseNet-169**（Huang et al., CVPR 2017）、**FaceNet**（Schroff et al., CVPR 2015）、**VGG-16**（Simonyan & Zisserman, ICLR 2015）、**Swin Transformer**（Liu et al., ICCV 2021）和**CLIP**（Radford et al., ICML 2021）等预训练视觉骨干与**Prototypical Networks**（Snell et al., NeurIPS 2017）少样本学习框架统一纳入评测，并系统对比了DreamBooth、FastGAN、MixUp（Zhang et al., ICLR 2018）和CutMix（Yun et al., ICCV 2019）等数据增强策略。与先前代表性诊断系统**DeepGestalt**（Gurovich et al., Nat. Med. 2019）相比，RDFace在极端低数据条件下的分类性能提供了更全面的参照基线。该框架的独特贡献在于将合成数据的生成、筛选与下游任务评估耦合为一个闭环，为数据稀缺场景下的医学影像分析提供了可复现的评估模板。
 
-## 背景与动机
+
 
 罕见病的诊断长期面临“诊断奥德赛”困境——患者平均需经历5–7年、咨询多达8位医生才能获得确诊。近年来，基于面部图像的深度学习辅助诊断系统（如 **DeepGestalt**（Gurovich et al., *Nat. Med.* 2019））展现出将面部形态学特征与潜在遗传综合征关联的潜力，为缩短诊断周期提供了新路径。然而，这类系统的有效训练高度依赖大规模、高质量标注的面部图像数据集。
 
@@ -64,7 +64,9 @@ claims:
 
 上述困境揭示了一个更深层的洞察：**在极端低样本场景中，仅增加数据量并不能保证性能提升；合成数据的表型保真度和临床一致性才是决定下游泛化能力的关键调节变量**。这引出了本文的核心动机——构建一个系统性的基准框架，同时解决数据稀缺和合成数据质量控制两个相互嵌套的挑战。具体而言，本文提出 RDFace 基准数据集（覆盖103种罕见病、456张儿童面部图像），并设计了一套**表型感知的合成数据增强评估流水线**：利用 DreamBooth（类条件扩散模型）为每类疾病生成表型条件合成图像，再通过面部关键点余弦相似度筛选高保真样本，最终在标准监督分类和少样本学习两种范式下验证合成增强的实际收益。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 针对罕见病面部诊断中**极端数据稀缺**（每类仅1–7张训练样本）且**不同疾病表型高度相似**的核心瓶颈，RDFace 提出了一套以**表型感知合成数据增强**为核心的创新框架。与现有方法相比，其关键创新体现在以下三个维度。
 
@@ -104,7 +106,7 @@ RDFace 的贡献在于**将扩散模型的条件生成能力与临床表型保�
 
 **需要人工验证**：论文未与基于文本提示工程的扩散模型变体（如 ControlNet、IP-Adapter）进行对比，也未探索将面部关键点条件显式注入生成过程的可控生成方案，这些方向可能进一步提升表型保真度。
 
-## 整体框架
+
 
 RDFace 构建了一套面向极端数据稀缺场景的罕见病面部图像分析评估框架，其核心设计围绕三个递进环节：**真实数据基准化**、**表型感知合成增强**、以及**多维度诊断评估**。整体流程如 Figure 3 所示。
 
@@ -150,7 +152,7 @@ RDFace 构建了一套面向极端数据稀缺场景的罕见病面部图像分�
 - **训练**：真实训练集 ∪ Top-n 增强集 → 骨干网络微调
 - **输出**：Top-1/Top-5 分类准确率、n-way k-shot 准确率、BioBERT 表型相似度评分、专家可信度评审结果
 
-## 核心模块与公式推导
+
 
 RDFace 的评估框架由六个核心模块串联构成，形成“数据构建→预处理→生成→筛选→表型验证→下游诊断”的闭环流水线。各模块职责明确，且筛选与验证模块直接服务于“表型保真度优先于数据量”这一核心洞察。
 
@@ -193,7 +195,9 @@ $$\operatorname{std}(x_1, \ldots, x_n) = \sqrt{\frac{1}{n-1} \sum_{i=1}^{n} (x_i
 
 该公式确保了在极低样本量条件下标准差估计的无偏性，与 RDFace 的数据稀缺特性相匹配。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 1. 仅使用真实数据的诊断基线
 
@@ -276,7 +280,9 @@ $$\operatorname{std}(x_1, \ldots, x_n) = \sqrt{\frac{1}{n-1} \sum_{i=1}^{n} (x_i
 ![[assets/figures/papers/paper_list_l779_https_arxiv_org_abs_2604_03454/figures/029_Figure_S.9.jpg]]
 *Figure S.9: Top-k accuracy comparison using FastGAN-generated data. Each subplot shows Top-1, Top-5, Top-10, and Top-30 accuracy across synthetic cutoffs for six backbone models. Compared to DreamBooth, FastGAN augmentation results in less consistent or degraded performance across most settings*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 任务定位与核心瓶颈
 
@@ -343,6 +349,8 @@ RDFace 的方法贡献不在于提出新的分类架构，而在于**构建了�
 2. DreamBooth 增强的增益饱和现象是否源于生成模型本身的模式坍塌，还是筛选策略的局限性？是否存在更优的合成-真实样本混合策略？
 3. 能否设计更鲁棒的合成图像筛选策略，自动识别并剔除可能引入临床误导信息的生成样本？
 4. 该框架能否扩展到多模态数据（基因序列、临床文本），并在更大规模、更多样化的罕见病群体中验证？
+
+
 
 ## 原文 PDF
 

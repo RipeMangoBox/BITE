@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/BimArt_A_Unified_Approach_for_the_Synthesis_of_3D_Bimanual_Interaction_with_Articulated_Objects.pdf
+project_link: null
+code_link: null
 aliases:
 - BUAS3BIAO
 tags:
@@ -40,7 +42,7 @@ claims:
 > - HOI4D (Pliers) 上，Con. Score 0.966 vs 0.485 (CAMS-X) (+0.481)。
 > - HOI4D (Scissors) 上，Art. Score 0.853 vs 0.167 (CAMS-X) (+0.686)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有方法在合成双手与铰接物体的交互时，普遍依赖参考抓握姿态、粗糙的手部轨迹或分阶段处理抓握与关节运动，难以在一个统一模型中同时生成物体的刚体运动与关节运动，且无法泛化到不同物体类别。这导致生成的双手动作在物理合理性（穿透严重）与接触准确性上存在明显缺陷。
 
@@ -52,7 +54,7 @@ claims:
 
 **局限与展望**：当前方法仅支持包含两个铰接部件的物体，扩散采样速度较慢，且对未见物体类别的泛化能力有限。未来方向包括利用多模态大语言模型实现零样本泛化、引入更快的扩散采样策略，以及将生成过程与物理模拟器结合以产生完全符合物理定律的交互动作。
 
-## 背景与动机
+
 
 在增强现实、机器人示教和具身智能等领域，逼真的三维双手交互生成是核心能力之一。与单手操作不同，双手交互要求两只手在空间和时间上高度协调，同时还要与物体的运动（包括刚体位移和关节变化）保持物理一致的接触关系。当操作对象为包含可动部件的铰接物体（如笔记本电脑、剪刀、钳子）时，问题的复杂性进一步上升：生成模型不仅要理解手-物体的接触模式，还必须感知物体部件的运动状态，并据此调整双手的抓握与操作策略。
 
@@ -62,7 +64,9 @@ claims:
 
 针对上述缺口，BimArt 的核心动机是：**以距离为基础的双手接触图作为中间生成先验，结合归一化的分部点基集（BPS）特征，实现多样化且物理上可信的双手运动生成，无需任何参考抓握**。其关键洞察在于：逐帧的距离接触图编码了丰富的双手抓握与操作模式，其细粒度的空间约束能够指导扩散模型生成符合接触逻辑的运动；而分部感知的归一化 BPS 确保了对大小迥异的物体部件进行等分辨率编码，这对于铰接物体的双手交互至关重要。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 BimArt 的核心创新在于通过**以距离为基础的双手接触图作为中间生成先验**，并结合**归一化的分部点基集（BPS）特征**，首次在单一模型中实现了无需参考抓握的、同时涵盖物体刚体运动与关节运动的逼真双手交互生成。其关键设计围绕四个 changed slots 展开。
 
@@ -84,7 +88,7 @@ BimArt 的核心创新在于通过**以距离为基础的双手接触图作为�
 
 综上，BimArt 通过上述四个 changed slots 的系统性创新，在 ARCTIC 和 HOI4D 数据集上全面超越 CAMS-B、MDM-B、OMOMO-B 等基线方法，尤其在穿透率（Pen 1cm 仅 2.03% vs CAMS-B 的 42.5%）和关节接触率（Art 85.57% vs CAMS-B 76.70%）上取得显著提升（Table 1），并首次展示了跨类别的统一双手交互生成能力（Table 2）。
 
-## 整体框架
+
 
 BimArt 采用三阶段流水线，将关节物体的 7-DoF 轨迹（6D 全局位姿 + 1D 关节角）作为唯一输入，输出逐帧的双手 MANO 参数，全程无需参考抓握或粗糙手部轨迹。
 
@@ -107,7 +111,7 @@ BimArt 采用三阶段流水线，将关节物体的 7-DoF 轨迹（6D 全局位
 ![[assets/figures/papers/paper_list_l1730_BimArt_A_Unified_Approach_for_the_Synthesis_of_3D_Bimanual_Interaction_w/figures/002_Figure_2.jpg]]
 *Figure 2: Overview. BimArt takes N frames of object trajectories as input and generates N frames of 3D bimanual interactions. The object features (articulation-aware BPS features O, 6D global states G, and the object scale*
 
-## 核心模块与公式推导
+
 
 BimArt 的生成流水线由五个核心模块构成，各模块之间通过归一化分部 BPS 特征和距离接触图紧密耦合。以下按数据流顺序逐一说明其设计逻辑与关键公式。
 
@@ -218,7 +222,9 @@ $$l_{\mathrm{acc}} = \sum_{\mathbf{h}_i \in \hat{\Xi}} \| \mathbf{h}_i - 2 \cdot
 ![[assets/figures/papers/paper_list_l1730_BimArt_A_Unified_Approach_for_the_Synthesis_of_3D_Bimanual_Interaction_w/figures/004_Figure_4.jpg]]
 *Figure 4: Different BPS Sampling Strategies. Top left*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -274,7 +280,9 @@ BimArt 在两个核心基准上展现了显著的双手交互物理合理性优�
 ![[assets/figures/papers/paper_list_l1730_BimArt_A_Unified_Approach_for_the_Synthesis_of_3D_Bimanual_Interaction_w/figures/013_Table_6.jpg]]
 *Table 6: Contact Map Error (in cm) due to BPS mapping. We present the average and per-category contact map errors resulting from the sparse mapping of BPS features. Both part-agnostic BPS (PA-BPS) and the proposed part BPS (P-BPS) achieve a denser mapping compared to BPS features without scale normalization (U-BPS), resulting in smaller contact map errors. The proposed part-based BPS method further enhances mapping density for the top part of the object (which corresponds to the movable part in canonical space), by allocating equal feature dimensions to individual parts irrespective of their surface area*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1 与现有工作的关系
 
@@ -308,6 +316,8 @@ BimArt 的设计存在以下明确边界：
 2. **高效采样策略。** 引入 DDIM、潜在扩散模型（Latent Diffusion）或一致性模型（Consistency Models）等加速采样技术，将生成延迟降低至实时或近实时水平。
 3. **物理模拟耦合。** 将扩散生成过程与物理模拟器（如 Isaac Gym）结合，在生成阶段或后处理阶段引入物理约束，确保输出动作满足接触力、摩擦锥和动量守恒等物理定律。
 4. **多部件与可变形物体扩展。** 将分部 BPS 表示泛化到任意数量的铰接部件，或引入基于图的物体表示以支持可变形物体的交互生成。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Multi_agent_Coordination_via_Flow_Matching.pdf
+project_link: null
+code_link: https://github.com/DongsuLeeTech/mac-flow
 openreview_forum_id: 2L6MffR0ut
 aliases:
 - MF
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 基于流匹配的多智能体协调 |
 | 英文题名 | Multi-agent Coordination via Flow Matching |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=2L6MffR0ut); [GitHub](https://github.com/DongsuLeeTech/mac-flow) |
+| Links | [paper](https://openreview.net/forum?id=2L6MffR0ut) · [GitHub](https://github.com/DongsuLeeTech/mac-flow) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | MAC-Flow |
 | Dataset | SMACv1 & SMACv2 (discrete control), MA-MuJoCo (continuous control, 4 tasks, 16 datasets), MPE Spread (continuous control) |
@@ -42,7 +44,7 @@ claims:
 > - MA-MuJoCo (continuous control, 4 tasks, 16 datasets) 上，Average Return 为 2749.4，对比 MADiff: 2430.2，变化 +319.2。
 > - MPE Spread (continuous control) 上，Average Normalized Score 为 65.8，对比 MADiff: 49.2，变化 +16.6。
 
-## 概述
+## 概要
 
 离线多智能体强化学习的核心瓶颈在于**联合动作分布的表达力与推理效率之间的根本冲突**：扩散模型能够捕获复杂的多模态协调模式，但每步推理需数十次网络前传；高斯策略推理仅需单步，却无法表达多智能体间的依赖结构。现有方法始终在“表达力”与“实时推理”之间做权衡，缺乏同时兼顾二者的解决方案。
 
@@ -52,7 +54,7 @@ claims:
 
 **方法定位**：MAC-Flow属于集中训练-分散执行框架下的离线MARL方法，其方法谱系与知识库定位详见后续章节。
 
-## 背景与动机
+
 
 ### 离线多智能体强化学习的核心挑战
 
@@ -80,7 +82,9 @@ claims:
 
 这一解耦设计的关键洞察在于：**蒸馏损失通过 2-Wasserstein 距离上界联合策略与因子化策略的分布差异，进而由 Q 函数的 Lipschitz 性质控制性能退化**（Proposition 4.2、4.3），从而在理论上保证了因子化过程的可控性。最终，MAC-Flow 在保持与扩散方法可比甚至更优性能的同时，将推理复杂度降至 $O(1)$，实现了性能与推理速度的帕累托改善（Figure 1）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MAC-Flow的核心创新在于**将表达力学习与价值优化解耦**，通过两阶段流程系统性地解决了离线多智能体强化学习中“联合动作分布表达力”与“推理效率”之间的根本性权衡。这一设计在三个关键维度上相对于既有基线实现了结构性改变。
 
@@ -125,7 +129,7 @@ MAC-Flow将这一耦合拆解为两个独立阶段（Figure 2）：
 
 综上，MAC-Flow通过“流匹配联合建模→IGM约束蒸馏”的两阶段解耦设计，在保持扩散级表达力的同时实现了高斯级的推理效率，并以Wasserstein距离理论为蒸馏退化提供了可量化的安全边界。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_2L6MffR0ut/figures/002_Figure_2.jpg]]
 *Figure 2: Overview diagram of proposed solution. Our solution, MAC-Flow, composes of two stages. The first stage models the joint action distribution via flow-matching to capture inter-agent dependencies, thereby facilitating the extraction of coordination behaviors more effectively than treating individual policies. For the next stage, individual critics are trained under the individual-global-max principle, thereby embedding behaviors for multi-agent coordination. At the second stage, practicality is highlighted by deriving individual policies for decentralized execution from a flow-based joint policy via Q maximization and BC distillation*
@@ -188,7 +192,7 @@ $$\mathcal{L}_{\mathrm{Flow-BC}}(\phi) = \mathbb{E}_{\mathbf{x}^0 \sim \mathbf{p
 
 MAC-Flow 的性能保证依赖于两个关键假设：Q 函数的 Lipschitz 连续性与 IGM 可分解性。在强交互、反协同场景（如 XOR 任务，Figure 15）中，IGM 原理失效，导致蒸馏策略退化为近似均匀的乘积分布。此外，超参数 $\alpha$ 对性能敏感，需针对不同任务仔细调节。
 
-## 核心模块与公式推导
+
 
 ### 4.1 两阶段架构概览
 
@@ -256,7 +260,9 @@ $$\Big| \mathbb{E}_{\mathbf{a} \sim \pi_{\mathbf{w}}(\mathbf{o})} [Q_{\mathrm{to
 
 **关键假设与局限**：上述保证依赖于两个前提——(1) Q 函数的 Lipschitz 连续性；(2) IGM 可分解性假设。在强交互、反协同场景（如 XOR 任务，Figure 15）中，IGM 原理失效，因子化策略会退化为近似均匀的积分布，性能大幅下降。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能与推理速度权衡
 
@@ -321,7 +327,9 @@ Figure 3通过一个教学示例验证了理论分析的核心命题。Figure 3(
 
 ![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_2L6MffR0ut/figures/020_Table_7.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心瓶颈与因果机制
 
@@ -379,6 +387,8 @@ Figure 16 的收益博弈实验揭示了交互强度对蒸馏效果的影响：�
 4. **生成模型的选择空间**：本文采用流匹配的最简单变体（条件速度场匹配位移向量），未探索更先进的生成建模技术（如扩散模型与流匹配的混合、基于分数的生成模型）能否在表达力上带来进一步提升，同时保持蒸馏的可行性。
 
 5. **大规模系统的维度灾难**：联合流模型的输入维度为 $I \cdot d_a$（$I$ 为智能体数，$d_a$ 为动作维度）。在大规模系统中，能否通过图神经网络、注意力机制或分层建模来缓解维度爆炸，同时保持联合分布的建模精度？
+
+
 
 ## 原文 PDF
 

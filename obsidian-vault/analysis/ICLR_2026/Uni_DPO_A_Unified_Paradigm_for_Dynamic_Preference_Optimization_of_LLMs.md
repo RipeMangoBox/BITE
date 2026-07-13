@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Uni_DPO_A_Unified_Paradigm_for_Dynamic_Preference_Optimization_of_LLMs.pdf
+project_link: null
+code_link: https://github.com/pspdada/Uni-DPO
 openreview_forum_id: G7DBGlgjjp
 aliases:
 - UD
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | Uni-DPO：大语言模型动态偏好优化的统一范式 |
 | 英文题名 | Uni-DPO: A Unified Paradigm for Dynamic Preference Optimization of LLMs |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=G7DBGlgjjp); [GitHub](https://github.com/pspdada/Uni-DPO) |
+| Links | [paper](https://openreview.net/forum?id=G7DBGlgjjp) · [GitHub](https://github.com/pspdada/Uni-DPO) |
 | Topic | #topic/optimization_theory_probabilistic #topic/optimization_theory_probabilistic/optimization_methods |
 | Method | Uni-DPO |
 | Dataset | AlpacaEval 2.0, Arena-Hard, Math Reasoning (Average 8 tasks), MME (Multimodal) |
@@ -42,7 +44,7 @@ claims:
 > - Arena-Hard 上，Win Rate (WR%) 为 67.1，对比 59.1 (SimPO)，变化 +8.0。
 > - Math Reasoning (Average 8 tasks) 上，Accuracy (%) 为 56.80，对比 53.73 (SimPO)，变化 +3.07。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -78,7 +80,7 @@ Uni-DPO 在文本理解、数学推理和多模态三个领域均一致超越 DP
 
 该方法依赖外部专家评分信号，超参数 $\gamma$ 和 $\tau_{\mathrm{ref}}$ 可能需要针对不同任务进行调整，且未在 70B+ 超大规模模型上进一步验证可扩展性。未来工作可探索更精细的数据质量估计方法，以及 $\mathcal{L}_{\mathrm{c-NLL}}$ 在不同领域的最优强度配置。
 
-## 背景与动机
+
 
 ### 偏好优化中的数据利用瓶颈
 
@@ -108,7 +110,9 @@ $$\mathcal{L}_{\mathrm{DPO}} = -\mathbb{E}_{(x,y_w,y_l)\sim D}\left[ \log \sigma
 
 这种双视角加权机制引导优化轨迹朝向更能反映人类偏好的区域（Figure 3），从根本上解决了 DPO 类方法的数据利用效率问题。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Uni-DPO 的核心创新在于将偏好优化从“平等对待所有样本”的静态范式，转变为**基于数据质量与模型学习动态的联合自适应重加权**范式。其关键设计围绕三个相互协同的 changed slots 展开。
 
@@ -149,7 +153,7 @@ $$\mathcal{L}_{\mathrm{c \cdot NLL}} = - \Big[ \mathbf{1}\big( \log \pi_{\mathrm
 
 三个 changed slots 通过**乘法组合**形成统一目标（Eq. (4)），在四象限样本空间中实现差异化处理（Figure 4）：高质量且困难样本获得最大权重，低质量或已拟合样本被有效抑制。这种“数据质量 × 模型动态”的双视角机制，使优化轨迹持续聚焦于最能反映人类偏好且尚未被学习的区域（Figure 3），从而在文本理解、数学推理和多模态任务上一致超越 DPO 和 SimPO（Table 1, Table 2, Table D.4）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_G7DBGlgjjp/figures/004_Figure_3.jpg]]
 *Figure 3: Comparison of DPO and Uni-DPO objectives. The Uni-DPO objective introduces a dual-perspective weighting mechanism, including a quality-aware weight $w _ { \mathrm { q u a l } }$ , a performance-based weight $w _ { \mathrm { p e r f } }$ . and a calibrated negative log-likelihood term $\bar { \mathcal { L } } _ { \mathrm { c - N L I } }$ that emphasizes challenging and high-quality positive samples. Left: schematic illustration of the two objectives. Right: compared with DPO, Uni-DPO dynamically reweights data pairs during training, guiding the optimization trajectory toward regions that better reflect human preference
@@ -183,7 +187,7 @@ $$
 
 **输入输出流：** 整个管线接收偏好数据集 $D$（包含提示 $x$、正样本 $y_w$、负样本 $y_l$ 及其外部评分 $S_w, S_l$）、参考模型 $\pi_{\mathrm{ref}}$ 和当前策略模型 $\pi_\theta$，输出标量损失值。训练过程中，$w_{\mathrm{perf}}$ 随策略模型更新而动态变化，$w_{\mathrm{qual}}$ 在数据预处理阶段固定，二者联合实现了训练全程的自适应数据利用。
 
-## 核心模块与公式推导
+
 
 Uni-DPO 的训练目标由三个核心模块构成：质量权重（Quality Weighting Factor）、性能权重（Performance Weighting Factor）和校准负对数似然损失（Calibrated NLL Loss）。整体损失函数为：
 
@@ -272,7 +276,9 @@ $w_{\mathrm{qual}}$ 和 $w_{\mathrm{perf}}$ 以乘法方式结合，形成对训
 
 数据质量（评分边际）与学习难度（奖励边际）并非天然对齐（Spearman 相关系数 $\rho$ 较低，Figure 4b），因此双视角加权机制是必要的——它确保训练资源集中于“高质量且尚未学好”的样本，同时抑制低质量或已过拟合样本的影响。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 
@@ -340,8 +346,6 @@ Table 3 的系统消融实验证实了 Uni-DPO 四个核心组件的独立贡献
 ![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_G7DBGlgjjp/figures/023_Table_6.jpg]]
 *Table 6: Table D.1: Evaluation benchmarks for textual understanding. The baseline model refers to the model being compared against. A unified judge model GPT-4o 2024-05-13 is employed across benchmarks to ensure fairness*
 
-![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_G7DBGlgjjp/figures/025_Table_8.jpg]]
-*Table 8: Table D.5: Mathematical reasoning evaluation and comparison with additional methods. We compare SFT methods, alignment methods, and RL-based methods on the Qwen2.5-Math-7B model. Results with † are from Zhang et al. (2025a), and those with ∗ are from Cui et al. (2025). The remaining are from our evaluations. Our Uni-DPO consistently and significantly outperforms the baseline model, SFT-style methods, and other alignment approaches. In particular, Iterative DPO applies seven DPO iterations and thus uses roughly seven times more training data than Uni-DPO, whereas Uni-DPO uses only one iteration. Uni-DPO surpasses Iterative DPO on almost all benchmarks as well as on the average score, demonst...*
 
 ![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_G7DBGlgjjp/figures/026_Table_9.jpg]]
 *Table 9: Table D.6: Result of textual understanding in Qwen2.5 model. WR denotes the Win Rate, LC denotes the Length-Controlled win rate, and Acc. denotes the Accuracy. The best results are highlighted in bold. The results show that our Uni-DPO method consistently outperforms SimPO across various model sizes and benchmarks*
@@ -349,7 +353,9 @@ Table 3 的系统消融实验证实了 Uni-DPO 四个核心组件的独立贡献
 ![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_G7DBGlgjjp/figures/028_Table_10.jpg]]
 *Table 10: Table D.7: Calibrated negative log-likelihood loss $\mathcal { L } _ { \mathbf { c } \mathbf { . } \mathbf { N L L } }$ ablation results. The full c-NLL loss delivers substantial performance gains, and each of the two indicator functions makes a meaningful contribution to the overall improvement, which demonstrates the effectiveness of our proposed loss function
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1 方法沿革与基线关系
 
@@ -400,6 +406,8 @@ Uni-DPO 的适用边界由以下因素界定：
 3. **不同偏好优化策略的系统性影响**：Uni-DPO 的双视角加权机制是否可推广到其他偏好优化框架（如 KTO、ORPO），以及各组件在不同数据分布下的相对贡献，值得进一步分析。
 
 4. **训练效率与权重计算开销**：$w_{\mathrm{perf}}$ 需要在每个训练步计算策略的对数概率，其计算开销在大规模数据下的影响未在论文中量化讨论。
+
+
 
 ## 原文 PDF
 

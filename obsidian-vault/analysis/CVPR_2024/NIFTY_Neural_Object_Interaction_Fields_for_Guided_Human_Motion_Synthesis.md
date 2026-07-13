@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2024
 pdf_ref: paperPDFs/CVPR_2024/NIFTY_Neural_Object_Interaction_Fields_for_Guided_Human_Motion_Synthesis.pdf
+project_link: https://nileshkulkarni.github.io/nifty
+code_link: https://github.com/
 aliases:
 - NNIFTS
 - NNOIFGHMS
@@ -41,7 +43,7 @@ claims:
 > - User Study (Sitting + Lifting) 上，preference rate vs SAMP NIFTY vs SAMP (87.2% preference for NIFTY)；preference rate vs cVAE NIFTY vs cVAE (HUMANISE) (89.4% preference for NIFTY)；preference rate vs cMDM NIFTY vs cMDM (86.3% preference for NIFTY)。
 > - Lifting (Table 1) 上，% D2O ≤2cm / Foot Skating 99.6 / 0.00 vs cMDM (lower values, exact not provided) (improved over baselines)。
 
-## 概述
+## 概要
 
 ### 问题背景与瓶颈
 
@@ -76,8 +78,6 @@ NIFTY 的关键创新在于将“交互知识”从扩散模型的生成能力�
 
 当前方法仅处理“最后一英里”的接触启动，不涉及物体操控或后续动作链；对新物体类型需重新训练，扩展成本较高；测试时引导需生成多个样本并择优，推理时间较长（约 34 秒/样本）。未来方向包括将交互场引导扩展到连续交互序列、通过元学习实现快速迁移，以及降低推理代价以实现实时应用。
 
-## 背景与动机
-
 ### 问题背景
 
 生成自然、物理合理的人体运动是计算机视觉与图形学中的核心挑战之一。当人体需要与场景中的物体发生交互时——例如坐在椅子上、举起箱子——运动生成问题变得更加复杂。这类**场景感知的人体运动生成**不仅要求运动本身流畅自然，还必须满足与目标物体的几何约束（无穿透、准确接触）和语义约束（交互姿态符合物体功能）。
@@ -104,7 +104,7 @@ NIFTY 的核心动机源于一个关键洞察：**交互知识可以被编码为
 
 同时，为了解决训练数据的瓶颈，NIFTY 还提出了一套基于预训练运动模型的自动化合成数据管线，使得整个方法能够在有限的标注锚点姿态基础上，生成大规模、多样化的交互运动数据用于训练。
 
-## 核心创新
+## 核心方法与创新机理
 
 NIFTY 的核心创新在于引入了一个**可学习的神经物体交互场（Object Interaction Field）**，并将其梯度作为**测试时引导信号**注入到物体条件扩散模型的去噪过程中。这一设计直接回应了现有方法的核心瓶颈：即使扩散模型生成了接近物体的运动，在“最后一英里”的接触阶段仍会出现穿透、悬浮或姿态语义错误，且这些方法严重依赖稀缺的高质量交互数据。
 
@@ -136,8 +136,6 @@ NIFTY 构建了一条**自动化合成数据管线**：以少量锚点姿态（�
 
 需注意，NIFTY 的创新聚焦于“最后一英里”的接触启动阶段，不涉及物体操控或连续交互序列的生成。对新物体类型需重新执行完整的锚点选择-数据生成-模型训练流程，扩展成本较高。此外，合成数据管线依赖 HuMoR 的先验，可能引入倾向性偏差（如生成不自然的后退运动）。
 
-## 整体框架
-
 NIFTY 的整体管线由三个核心模块串联构成：**物体条件扩散模型**（Motion Diffusion Model, M_θ）、**物体交互场**（Object Interaction Field, F_ϕ）以及**自动化合成数据管线**。三者的协作逻辑是“先合成训练数据，再训练生成与引导模型，最后在采样时联合推理”。
 
 ### 模块关系与数据流
@@ -161,8 +159,6 @@ NIFTY 的整体管线由三个核心模块串联构成：**物体条件扩散模
 4.  重复上述去噪-引导步骤直至完成所有扩散步。为提升鲁棒性，实际推理时并行生成 10 个样本，选择引导目标函数得分最优者作为最终输出。
 
 这一框架的核心优势在于：**交互知识被参数化在神经场中，仅在采样时以梯度形式注入扩散模型**，使得生成过程无需依赖大量真实交互数据，即可在“最后一英里”阶段同时满足精确的物体接触和自然的运动过渡。
-
-## 核心模块与公式推导
 
 NIFTY 由三个关键模块构成：**物体条件扩散模型** ($M_\theta$)、**物体交互场** ($F_\phi$) 和**自动合成数据管线**。前两者在采样时协同工作：扩散模型负责从噪声中生成人体运动序列，交互场则通过梯度引导将该序列推向几何与语义合理的交互状态。
 
@@ -208,7 +204,7 @@ $$\tilde{\tau}^0 = \hat{\tau}^0 - \alpha \nabla_{\tau^k} G(\hat{\tau}^0)$$
 ![[assets/figures/papers/paper_list_l1723_NIFTY_Neural_Object_Interaction_Fields_for_Guided_Human_Motion_Synthesis/figures/003_Figure_3.jpg]]
 *Figure 3: Interaction Field Visualization. We query the field in several locations with a sitting pose (a subset shown in grey) and visualize the output for pelvis, feet, and neck joints. All cylinders are oriented towards the chair, indicating the correction vector’s magnitude and direction. This correction is due to the misalignment between the sitting pose and chair position*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 实验设置与评估协议
 
@@ -272,9 +268,6 @@ NIFTY 的实验结果一致表明：**将交互知识编码为可学习的神经
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l1723_NIFTY_Neural_Object_Interaction_Fields_for_Guided_Human_Motion_Synthesis/figures/005_Figure_5.jpg]]
-*Figure 5: User Study. NIFTY is preferred ≥ 82.7% of the time for sitting and ≥81.6% for lifting compared to baselines. Our motions are also nearly indistinguishable from synthetic data trajectories*
-
 ![[assets/figures/papers/paper_list_l1723_NIFTY_Neural_Object_Interaction_Fields_for_Guided_Human_Motion_Synthesis/figures/006_Table_1.jpg]]
 *Table 1: Quantitative Comparison. NIFTY outperforms baselines on both sitting and lifting. Our diffusion model, guided by the learned interaction field, generates motions that reach the object (D2O) with few penetrations and realistic contacts. Motions are realistic with low foot skating and the final interaction pose is similar to synthetic data with low skeleton distance*
 
@@ -284,10 +277,7 @@ NIFTY 的实验结果一致表明：**将交互知识编码为可学习的神经
 ![[assets/figures/papers/paper_list_l1723_NIFTY_Neural_Object_Interaction_Fields_for_Guided_Human_Motion_Synthesis/figures/008_Table_2.jpg]]
 *Table 2: Ablation Study. Our full interaction field (NIFTY) predicts an offset vector is compared to an ablation that predicts a single scalar distance (Distance OIF). We also compare against a non-parameteric nearest-neighbor (NN) field that assumes access to all interaction training poses at test time*
 
-![[assets/figures/papers/paper_list_l1723_NIFTY_Neural_Object_Interaction_Fields_for_Guided_Human_Motion_Synthesis/figures/004_Figure_4.jpg]]
-*Figure 4: Generated Synthetic Data. Motion sequences from one tree rollout are visualized for one sitting anchor pose. The middle shows a bird’s-eye view of the pelvis joint trajectories in light pink. All trajectories end in the same sitting pose, yet start at diverse locations around the chair. We highlight a few trajectories in blue and show full-body motions from the corresponding generations on the left and right sides. The full dataset contains many trees for different objects and humans*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 

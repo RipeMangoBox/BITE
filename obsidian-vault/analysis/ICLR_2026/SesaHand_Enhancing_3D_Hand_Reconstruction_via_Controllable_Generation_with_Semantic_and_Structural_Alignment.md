@@ -34,7 +34,7 @@ claims:
 | 中文题名 | SesaHand：通过语义和结构对齐的可控生成增强3D手部重建 |
 | 英文题名 | SesaHand: Enhancing 3D Hand Reconstruction via Controllable Generation with Semantic and Structural Alignment |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=sKMgGQQy7g) · [Code](https://arxiv.org/abs/2504.06084) · [Project](https://llava-vl.github.io/blog/2024-01-30-llava-next/) · [arXiv](https://arxiv.org/abs/2504.06084") |
+| Links | [paper](https://openreview.net/forum?id=sKMgGQQy7g) · [Code](https://arxiv.org/abs/2504.06084) · [Project](https://llava-vl.github.io/blog/2024-01-30-llava-next/) · [paper](https://arxiv.org/abs/2504.06084") |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction #topic/generative_models_diffusion #topic/representation_self_supervised_transfer |
 | Method | SesaHand |
 | Dataset | MSCOCO, HIC, ReIH |
@@ -44,7 +44,7 @@ claims:
 > - HIC 上，MPVPE 14.70 (InterWild*+Ours) vs 15.30 (InterWild*) (-3.9%)。
 > - ReIH 上，MPVPE 13.01 (InterWild*+Ours) vs 13.99 (InterWild*) (-7.0%)。
 
-## 概述
+## 概要
 
 真实场景下的3D手部重建长期受制于训练数据的不足：现有合成数据集缺乏纹理与环境多样性，且常缺失手臂与交互物体，导致手部-人体对齐困难。近期工作尝试利用视觉语言模型（VLM）与可控扩散模型生成手部图像来扩充数据，但VLM生成的图像描述存在“过度思考”问题——引入大量无关细节，使扩散模型的注意力偏离手部区域，反而降低了生成质量。
 
@@ -55,8 +55,6 @@ claims:
 实验表明，SesaHand在MSCOCO数据集上取得FID 18.63、FID-H 17.77，其中FID-H较先前最优方法**AttentionHand**（Park et al., ECCV 2024）降低约34.4%，KID-H降低约44.2%。将SesaHand生成的图像用于微调3D手部重建方法**InterWild**（Moon, ICCV 2023），在HIC和ReIH数据集上分别实现MPVPE降低3.9%和7.0%，验证了生成数据对下游任务的有效增益。消融实验进一步确认，语义提取、结构融合与注意力增强三个模块对性能提升均有独立贡献。
 
 方法谱系上，SesaHand以**ControlNet**（Zhang et al., ICCV 2023）为条件生成骨干，在文本提示生成与结构信息注入两个关键环节进行了针对性改进，相比AttentionHand在生成质量与训练效率（0.44 s/iter vs. 27.25 s/iter）上均取得显著优势。当前方法的主要局限包括极小尺寸手部区域生成模糊、手物接触边界偶发不自然融合，以及对预训练扩散模型人类先验的依赖。
-
-## 背景与动机
 
 ### 3D手部重建的数据瓶颈
 
@@ -82,7 +80,7 @@ claims:
 
 这一双重对齐策略不仅直接提升了生成图像的质量，更重要的是，生成的图像可作为高质量增强数据，显著改善下游三维手部重建方法在真实场景中的性能。
 
-## 核心创新
+## 核心方法与创新机理
 
 SesaHand 的核心创新在于从**语义对齐**与**结构对齐**两个维度系统性地解决现有可控手部图像生成中的瓶颈。与直接使用 VLM 生成图像描述的前沿方法 **AttentionHand**（Park et al., ECCV 2024）相比，SesaHand 在三个关键环节上进行了根本性改进。
 
@@ -108,8 +106,6 @@ SesaHand 的核心创新在于从**语义对齐**与**结构对齐**两个维度
 ### 创新点的因果机制
 
 三个 changed slot 之间存在清晰的因果递进关系：**语义提取**消除了 VLM 过度思考带来的注意力分散，使模型在全局层面聚焦人体；**结构融合**利用自注意力图中的几何先验强化身体-手部对齐；**注意力增强**进一步在局部层面精炼手部细节。消融实验（Table 3）定量验证了这一递进逻辑——逐步添加语义提取、结构融合和注意力增强，FID 从 21.04 降至 19.83、19.05，最终达到 18.63，FID-H 同步降至 17.77。此外，该设计在训练效率上也具有显著优势：SesaHand 的训练速度（0.44 s/iter）远快于 AttentionHand（27.25 s/iter），因为后者需要逐样本优化文本嵌入，而 SesaHand 的语义提取在推理时完成，无需额外训练开销。
-
-## 整体框架
 
 SesaHand 的整体 pipeline 围绕一个核心洞察构建：**人类行为语义能有效抑制 VLM 的过度思考，使生成过程保持对人类相关区域的专注；而扩散模型内部的自注意力图蕴含丰富的几何与结构信息，将其层次化融合可显著改善手部与身体的对齐**。基于此，方法从语义对齐和结构对齐两个维度增强可控手部图像生成。
 
@@ -154,11 +150,6 @@ $$\mathrm{P_f = Composer(P_{pose}, P_{action}, P_{hand.action}, P_{env})}$$
 
 ![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_sKMgGQQy7g/figures/031_Figure_16.jpg]]
 *Figure 16: Qualitative result on a challenging hand-object interaction (fingering a guitar). The real image is randomly chosen from Pexels. The text prompt is generated using our CoT pipeline and the hand mesh image is rendered by HaMeR*
-
-![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_sKMgGQQy7g/figures/001_Figure_1.jpg]]
-*Figure 1: (a) We present a controllable hand image generation method that generates diverse hand images with semantic and structural alignment. (b) 3D hand reconstruction performance in the wild can be improved with better semantic- and structural- aligned generated images*
-
-## 核心模块与公式推导
 
 SesaHand 以预训练扩散模型为基础，通过 ControlNet（Zhang et al., ICCV 2023）引入手部网格图像作为空间条件，实现可控生成。其训练目标为标准的噪声预测均方误差：
 
@@ -208,19 +199,10 @@ $$\phi_i'(z_t, c_f) = M_{cross} V_i$$
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_sKMgGQQy7g/figures/002_Figure_2.jpg]]
-*Figure 2: (a) Comparison of hand image generation with VLM-generated caption (top) and human behavior semantics (bottom). Overthinking in VLM captions leads to attention shifts toward irrelevant objects in later denoising steps, while human behavior semantics guide the model to focus on human-related regions, generating more plausible hand images. (b) CoT inference in human behavior semantics extraction pipeline*
-
 ![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_sKMgGQQy7g/figures/014_Figure_10.jpg]]
 *Figure 10: Visualization of attention maps in UNet Decoder early and later blocks with VLMgenerated image caption (top) and human behavior semantics (bottom). VLM-generated caption causes attention deviation towards irrelevant objects in later denoising steps, while human behavior semantics enables more focused attention on human- and hand-related regions*
 
-![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_sKMgGQQy7g/figures/003_Figure_3.jpg]]
-*Figure 3: Hierarchical Structural Fusion. Multilevel self-attention maps are extracted from the ControlNet encoder and middle blocks, which capture the structural information of the input image. These maps are aggregated and applied to obtain the refined feature fed to the Decoder*
-
-![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_sKMgGQQy7g/figures/004_Figure_4.jpg]]
-*Figure 4: Hand Structure Attention Enhancement. Applying the enhancement (bottom) effectively highlights the local structural humanand hand-related features compared to the original cross-attention maps (top)*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 核心性能瓶颈的验证
 
@@ -291,13 +273,7 @@ Table 4报告了训练速度对比：SesaHand的每迭代训练时间为**0.44�
 ![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_sKMgGQQy7g/figures/006_Table_1.jpg]]
 *Table 1: Quantitative comparisons on MSCOCO*
 
-![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_sKMgGQQy7g/figures/007_Table_2.jpg]]
-*Table 2: Quantitative comparisons of 3D hand reconstruction methods with and without our generated images. ∗ indicates our re-implemented results*
-
-![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_sKMgGQQy7g/figures/011_Figure_7.jpg]]
-*Figure 7: Ablation examples. SE, SF, and AE denote semantics extraction, structural fusion, and attention enhancement*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 任务谱系：从可控生成到手部感知生成
 

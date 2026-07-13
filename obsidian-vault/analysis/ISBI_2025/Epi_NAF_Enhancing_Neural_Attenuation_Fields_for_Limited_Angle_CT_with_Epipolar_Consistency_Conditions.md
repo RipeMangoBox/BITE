@@ -5,6 +5,8 @@ paper_level: A
 venue: ISBI
 year: 2025
 pdf_ref: paperPDFs/ISBI_2025/Epi_NAF_Enhancing_Neural_Attenuation_Fields_for_Limited_Angle_CT_with_Epipolar_Consistency_Conditions.pdf
+project_link: null
+code_link: null
 aliases:
 - Epi-NAF
 tags:
@@ -40,7 +42,7 @@ claims:
 > - Abdomen CT 60° 上，PSNR/SSIM 为 26.1/.863，对比 25.75/.858，变化 +0.35/+0.005。
 > - Chest CT 90° 上，PSNR/SSIM 为 25.73/.856，对比 24.78/.834，变化 +0.95/+0.022。
 
-## 概述
+## 概要
 
 有限角度CT（Limited-Angle CT, LACT）重建是计算成像中的一个核心挑战：当X射线投影仅能在受限的角度范围内采集时，重建问题变为严重欠定，导致传统解析方法（如FDK）和迭代方法（如SART、ASD-POCS）产生严重的条纹伪影和结构失真。近年来，基于神经衰减场（Neural Attenuation Field, NAF）的方法将CT重建转化为连续三维衰减系数场的优化问题，在稀疏视角和有限角度场景下展现出优于传统方法的潜力。然而，vanilla NAF在优化过程中仅依赖有限角度范围内的输入投影进行监督，未观测角度区域完全缺乏约束，导致重建结果出现模糊、细节丢失，甚至在低密度区域“幻觉”出高密度伪结构。
 
@@ -50,7 +52,7 @@ claims:
 
 实验表明，在四个CT扫描数据集（胸部、腹部、足部、颌骨）及多种有限角度配置（45°、60°、90°、120°）下，Epi-NAF的PSNR和SSIM指标均一致优于vanilla NAF。以胸部CT 60°设定为例，PSNR从20.4提升至21.57，SSIM从0.678提升至0.724。定性结果中，Epi-NAF显著抑制了vanilla NAF在低密度区域产生的高密度伪影，重建图像更接近真实CT。该方法的主要局限在于：有限角度重建本质上仍为严重欠定问题，重建结果依然存在一定程度的模糊；正则化权重 $\lambda$ 和预热轮次等超参数仅给出经验设定，缺乏系统性敏感性分析；$\mathcal{L}_{\mathrm{ECC}}$ 在其他神经场CT框架上的即插即用特性尚未实验验证。
 
-## 背景与动机
+
 
 ### 有限角度CT重建的核心困境
 
@@ -80,7 +82,9 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{Recon}} + \lambda \mathcal{L}_{\mathrm{ECC}
 
 这一设计将几何先验无缝嵌入神经场优化框架，使监督信息从有限角度区域“流动”至全角度范围（Figure 2），从而显著抑制vanilla NAF在未约束区域的伪影生成。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Epi-NAF 的核心创新在于将 **X 射线成像中固有的极线一致性条件（Epipolar Consistency Conditions, ECC）** 引入神经衰减场（Neural Attenuation Field, NAF）的优化框架，作为一项即插即用的正则化损失 $ \mathcal{L}_{\mathrm{ECC}} $，以解决有限角度 CT（Limited-Angle CT, LACT）重建中**未观测角度区域缺乏约束**这一根本瓶颈。
 
@@ -121,7 +125,7 @@ $$ \mathcal{L}_{\mathrm{ECC}} = \left\| \sum_{j=1}^{N_s} \Delta_{0,j} \delta_0 -
 
 需要指出的是，ECC 本身并非本文首次提出，其在传统 CT 重建中已有理论基础。Epi-NAF 的贡献在于**首次将 ECC 作为可微分损失项集成到神经场 CT 重建框架中**，实现了端到端的隐式正则化。论文声称 $ \mathcal{L}_{\mathrm{ECC}} $ 可作为即插即用模块应用于任意基于神经场的 CT 框架，但这一泛化能力目前仅在与 NAF 的结合中得到了验证，其在其他架构（如 SNAF、IntraTomo 等）上的有效性仍有待实验证实。
 
-## 整体框架
+
 
 Epi-NAF 的整体训练流程在 vanilla NAF 的基础上引入了一条关键的正则化通路，将有限角度输入投影的监督信号传播至全角度范围。其核心架构由四个模块串联构成：
 
@@ -151,7 +155,7 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{Recon}} + \lambda \mathcal{L}_{\mathrm{ECC}
 ![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2411_06181v1/figures/002_Figure_2.jpg]]
 *Figure 2: Epi-NAF Method Overview. On the left part of the figure, we mark the limited-angle region of the provided projections in green, and the unseen projections region in red. Epi-NAF comprises two loss terms: (1) ${ \mathcal { L } } _ { \mathrm { r e c o n } }$ . , based on the $L _ { 2 }$ difference between the predicted and ground-truth intensity values (green pixels), and (2) our novel $\mathcal { L } _ { \mathrm { E C C } }$ , which enforces consistency in the derivatives in the t direction of line integrals along corresponding epipolar lines (blue pixels). Crucially, projection (iii) receives direct supervision from the input, which is propagated to projections (i) and (ii) via the ECC loss. This...
 
-## 核心模块与公式推导
+
 
 ### 方法总览
 
@@ -195,7 +199,9 @@ $$\mathcal{L}_{\mathrm{ECC}} = \left\| \sum_{j=1}^{N_s} \Delta_{0,j} \delta_0 - 
 
 在每次训练迭代中，除从有限角度输入投影采样射线外，还从整个 180° 范围随机采样一对投影角度，计算 L_ECC。这一机制将输入投影的监督信息传播至全角度范围的预测投影，从而正则化未被直接观测的角度区域，缓解 vanilla NAF 在未观测角度缺乏约束导致的模糊和伪影问题。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 定量评估
 
@@ -230,7 +236,9 @@ Epi-NAF 的核心消融即与 vanilla NAF 的直接对比：后者仅使用重�
 - **指标提升的临床意义存疑**：在部分设置下 PSNR/SSIM 的绝对提升较小（如腹部 60° 仅 +0.35 dB / +0.005），标准全参考指标可能无法捕捉临床诊断中关键的局部结构保真度改善。需要任务驱动的评估（如病灶检测率）来验证实际临床价值。
 - **几何假设限制**：当前 ECC 损失依赖于圆形/半圆形锥束 CT 轨迹的极线几何关系，其在非理想几何标定或自由扫描轨迹（如 C 型臂）下的适用性尚未验证。实际噪声投影下的鲁棒性也需要进一步评估。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系
 
@@ -282,6 +290,8 @@ Epi-NAF 的适用边界由以下条件界定：
 4. **鲁棒性验证**：在实际噪声投影和非理想几何标定条件下，极线一致性条件的鲁棒性如何？是否需要额外的校正模块（如几何标定网络或去噪预处理）来保证 $L_{\text{ECC}}$ 的有效性？
 
 5. **临床相关性评估**：PSNR/SSIM 的提升在部分场景下幅度有限，需要任务驱动的评估（如病灶检测率、诊断准确率）来验证 ECC 正则化带来的改进是否具有临床意义。
+
+
 
 ## 原文 PDF
 

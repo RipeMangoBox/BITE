@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Latent_Visual_Reasoning.pdf
+project_link: https://vincentleebang.github.io/lvr-project-page/
+code_link: https://github.com/VincentLeebang/lvr
 aliases:
 - LVRL
 - LVR
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 潜在视觉推理 |
 | 英文题名 | Latent Visual Reasoning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=j84WR5ORsC); [GitHub](https://github.com/VincentLeebang/lvr); [Project](https://vincentleebang.github.io/lvr-project-page/) |
+| Links | [paper](https://openreview.net/forum?id=j84WR5ORsC) · [GitHub](https://github.com/VincentLeebang/lvr) · [Project](https://vincentleebang.github.io/lvr-project-page/) |
 | Topic | #topic/other_unclear #topic/other_unclear/general |
 | Method | Latent Visual Reasoning (LVR) |
 | Dataset | MMVP (Qwen2.5-VL-7B), V* (Qwen2.5-VL-7B), V*_D.A. (Qwen2.5-VL-7B), V*_R.P. (Qwen2.5-VL-7B) |
@@ -41,7 +43,7 @@ claims:
 > - V* (Qwen2.5-VL-7B) 上，Accuracy 为 81.7 (LVR 8 Steps)，对比 N/A (exceeds all baselines)，变化 +2.7 (vs base model on V*_D.A.)。
 > - V*_D.A. (Qwen2.5-VL-7B) 上，Accuracy 为 84.4 (LVR 8 Steps)，对比 81.7 (estimated from +2.7% claim)，变化 +2.7。
 
-## 概述
+## 概要
 
 当前多模态大语言模型虽已集成先进的视觉编码器，但受限于模态投影偏差与跨模态注意力干扰，其对视觉细节的捕获常与文本查询脱节，形成从视觉输入到最终答案的根本性断层。现有范式——“思考图像”（Think about Images）在纯文本空间进行推理，“用图像思考”（Think with Images）则依赖外部工具操作图像——均未能使视觉信号深度参与核心推理过程，跨模态理解能力因此受限。
 
@@ -53,7 +55,7 @@ LVR 的训练采用两阶段策略。**监督微调（SFT）**阶段，利用边
 
 当前 LVR 仍存在若干局限：主要面向单图像场景，在多图像任务上表现欠佳；可变长度的潜在推理中止机制尚不稳定（可学习的 Latent End Token 易导致性能崩溃），固定步数虽可靠但缺乏灵活性；SFT 阶段依赖边界框标注，制约了训练数据的可扩展性；额外推理步骤带来的计算开销亦有待量化分析。后续工作可聚焦于多帧/多图像扩展、更鲁棒的自适应中止条件，以及利用无监督数据预训练等方向。
 
-## 背景与动机
+
 
 当前多模态大语言模型（MLLMs）虽然普遍集成了高性能视觉编码器，但在视觉信息向文本答案转换的关键路径上仍存在根本性断层。由于模态投影偏差、跨模态注意力失衡以及语言模型内部的模态干扰，骨干LLM往往无法稳定捕获与文本查询最相关的视觉细节，导致模型在面对细粒度视觉理解任务（如空间关系判别、目标计数）时频繁失败。这一瓶颈的根源在于，视觉信号与文本生成之间始终缺乏直接、共享的推理空间，推理过程被单向压缩到离散的文本token侧，连续视觉语义中的丰富信息在早期投影后便被冻结。
 
@@ -63,7 +65,9 @@ LVR 的训练采用两阶段策略。**监督微调（SFT）**阶段，利用边
 
 初步验证证明了该动机的迫切性与可行性：在MMVP基准上，LVR仅通过4步潜在推理便将Qwen2.5-VL基线的准确率从66.67%提升至72.0%，揭示了单纯依靠文本空间推理的潜力瓶颈；而在V*系列任务中，LVR（8步）的表现全面超越所有开源基线，进一步说明直接建模视觉语义对于细粒度理解任务具有不可替代的价值。因此，LVR并非对现有MLLM架构的颠覆，而是对其内置联合语义潜力的激活，促使模型真正实现“看到即推理”的跨模态协同。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 当前多模态大模型虽已集成先进的视觉编码器，但受限于模态投影偏差、跨模态注意力偏差与模态干扰，骨干语言模型往往无法捕获与文本查询最为相关的视觉细节，导致从视觉输入到最终文本答案之间存在根本性的信息断层。现有“Think about Images”与“Think with Images”两种范式本质上仍以文本空间推理为主导，未能真正弥合视觉信号与文本生成之间的鸿沟。
 
@@ -126,7 +130,7 @@ LVR 的核心创新直接转化为显著的性能提升：
 
 这些结果共同表明，LVR 不仅仅是一种架构上的小修小补，它切实开拓了多模态大模型从“思考图像”到“在视觉空间中思考”的新范式，并且在无需外部工具或额外视觉处理的条件下，实现了更紧密的跨模态联合推理。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0015_j84WR5ORsC_Latent_Visual_Reasoning/figures/002_Figure_2.jpg]]
 *Figure 2: Training and inference pipeline of LVR. The overall framework closely follows a standard MLLM. Images are encoded into tokens by a visual encoder and mapped into a joint semantic space with text embeddings. During the SFT stage, bounding boxes are provided to identify query-relevant visual tokens, which supervise the last hidden states in the LVR process. Here, only the LLM’s last hidden states are passed forward for latent reasoning, optimized with a mean squared error (MSE) loss. The LVR process is wrapped with special tokens that indicate reasoning mode. Once all query-relevant visual tokens are consumed, the model exits LVR and resumes standard text generation with cross-entropy loss. D...*
@@ -153,7 +157,7 @@ LVR 采用两阶段训练管道来建立上述能力：
 
 整个框架并未引入额外的投影头（消融实验表明 LLM 原生即可对齐视觉与文本语义），也无需依赖外部图像编辑工具，仅在标准 MLLM 内部通过控制解码流程和损失函数，实现了视觉信号与文本生成之间的深层耦合。
 
-## 核心模块与公式推导
+
 
 **瓶颈与机制**  
 当前多模态大模型（MLLM）普遍存在“视觉–文本断层”——即便视觉编码器足够强大，骨干 LLM 依然难以捕获与文本查询高度相关的视觉细节。Latent Visual Reasoning（LVR）将推理空间从纯文本 token 扩展至连续视觉 token，通过让 LLM 在潜在空间中直接重建查询相关的视觉语义，并将重建的视觉信号作为后续文本生成的上下文，从根本上打通跨模态联合推理。
@@ -207,7 +211,9 @@ PPO 风格的目标函数在此基础上施加 clip 操作与 KL 惩罚，保证
 
 这些结果表明 LVR 的潜力在于其简洁的主干对齐机制，而动态、自适应长度的潜在推理中止策略仍是开放难题。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -255,7 +261,9 @@ PPO 风格的目标函数在此基础上施加 clip 操作与 KL 惩罚，保证
 
 实验基于开源模型Qwen2.5‑VL、公开数据集（Visual CoT、ViRL）以及Hugging Face Trainer与DeepSpeed实现，训练时冻结视觉编码器和多模态投影器，仅更新LLM参数。这些选择有助于保证对比的公平性与结果的复现性。然而，部分子任务（如V*_D.A.和V*_R.P.）的提升幅度来自对基线得分的推算，文中未直接报告基线的精确值，对应断言需交叉核对原始数据方可确认。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 LVR 的提出本质上是对“文本空间推理”与“借助外部工具推理”两种主流范式的根本性突破。当前多模态大模型虽然配备先进视觉编码器，但因模态投影偏差与跨模态注意力偏差，骨干语言模型常难以捕获与文本查询最相关的视觉细节，导致视觉输入与最终答案之间存在断层。已有的“Think about Images”（如 Vision‑R1）仅以文本 token 进行推理，视觉信号被冻结在编码器输出之后无法动态修正；“Think with Images”（如 PAPO、PixelReasoner）则依赖外部工具对图像进行操作，虽然可引入额外视觉信息，但引入了工具调度与执行延迟，且推理过程并非内在统一于语言模型。LVR 放弃了这两种思路，转而将推理空间从离散文本 token 扩展至连续的视觉 token：语言模型在潜在空间中直接重建查询相关的视觉语义，而后将重建的视觉信号作为后续文本生成的条件，从而从根本上打通视觉与语言的联合推理。
 
@@ -266,6 +274,8 @@ LVR 的提出本质上是对“文本空间推理”与“借助外部工具推�
 基于以上特性，LVR 的适用边界与当前局限也十分清晰。第一，范式目前主要针对单图像、单轮问答任务设计，实验覆盖的基准（MMVP、V*、CV‑Bench 等）均为单图场景；在多图像推理（如 Relative Reflect）上表现不足，需要跨图像数据增强等补充技术。第二，推理过程的长度控制尚未达到灵活自适应：固定步数策略虽然可靠，但缺乏任务相关的动态性；可学习的中止 token 与模式切换损失均未能稳定工作，意味着可变长度潜在推理仍是开放问题。第三，监督微调的数据高度依赖边界框标注（用于标记查询相关区域），限制了训练规模的可扩展性——尽管 RL 阶段不再需要框标注，但 SFT 的质量仍受限于人工标注数据的覆盖度。第四，论文仅在视觉问答领域验证了有效性，尚未探索视频理解、具身推理等包含时间序列或多模态输入的更复杂场景。第五，计算开销与推理延迟未给出定量分析；高步数潜在推理需要额外前向传播，可能增加显存占用和响应时间，对部署环境的约束尚不明确。
 
 综合来看，LVR 在方法谱系上可被定位为一种“原生多模态联合推理”的测试时增强技术，它既不同于纯文本推理的“Think about Images”路线，也不同于借助外部工具的“Think with Images”路线，而是利用语言模型已有的语义空间完成视觉信号的重建与补充。其知识库贡献在于：首次系统验证了将连续视觉 token 纳入语言模型内部循环推理的可行性，并通过详细的消融与强化学习实验揭示了最优设计应遵循“少即多”原则——即不应引入繁复的外部映射或强行切换，而应信任语言模型自身对联合语义的表征能力。然而，当前方法仍存在多帧扩展不力、长度控制不稳定、数据依赖性强等瓶颈，未来工作需围绕以下方向展开：① 研究适用于多图像、视频序列的跨帧潜在推理，通过交叉注意力或时空 token 聚合实现联合视觉语义恢复；② 设计基于置信度估计或上下文动态中止的条件机制，取代固定步数，实现可变长推理；③ 探索利用大规模无监督图文对进行预训练（例如以图文匹配度作为重建质量的弱监督信号），减少对精细框标注的依赖；④ 评估潜在推理在不同模态（如音频、触觉）中的迁移能力，推动全模态统一推理；⑤ 量化推理效率，通过蒸馏、稀疏化或提前退出策略在性能与成本之间取得平衡。对于更复杂的数学、规划类任务，LVR 是否需要与结构化外部工具协同仍有待验证，这可能是该范式下一个重要的交叉点。
+
+
 
 ## 原文 PDF
 

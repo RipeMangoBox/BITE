@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/EUBRL_Epistemic_Uncertainty_Directed_Bayesian_Reinforcement_Learning.pdf
+project_link: null
+code_link: null
 openreview_forum_id: KASqlcI6Nm
 aliases:
 - EUBRL
@@ -41,7 +43,7 @@ claims:
 > - Loop (2 Loops) 上，Average Return 为 395，对比 394 (RMAX)，变化 +1。
 > - DeepSea (stochastic) 上，Success Rate 为 perfectly solves without failure，对比 其他方法随尺寸增长成功率骤降，变化 显著提升。
 
-## 概述
+## 概要
 
 强化学习中的高效探索是长期存在的核心挑战。现有探索策略——无论是基于乐观主义的频率派方法（如 RMAX、MBIE-EB），还是基于后验采样的贝叶斯方法（如 PSRL、BOSS）——在稀疏奖励、长时程和随机环境中效率低下。根本瓶颈在于不确定性量化不足：这些方法无法精细区分认知不确定性（可通过更多数据减少）与偶然不确定性（环境固有噪声），导致不必要的探索和缓慢收敛。
 
@@ -57,7 +59,7 @@ $$r_b^{\mathrm{EUBRL}}(s,a) := \left(1 - P(U = 1 | s,a)\right) r_b(s,a) + P(U = 
 
 EUBRL 的方法定位是**表格型贝叶斯强化学习**，其算法流程（Algorithm 1）包含三个核心模块：信念更新（利用共轭先验在封闭形式下更新后验）、策略求解（构造带认知引导奖励的 MDP 并通过值迭代求解）、以及定时重置与策略更新。当前方法依赖 Dirichlet/Normal 先验组合以取得近 minimax 最优性（Corollary 1），但存在若干已知局限：先验错误指定下可能陷入次优策略（附录 K 给出两臂 Bandit 反例）；Normal-Gamma 先验在确定性 MDP 中可能导致认知不确定性不足（Proposition 1）；认知不确定性估计目前限于表格型表示，扩展至函数逼近和大规模问题仍需进一步研究。
 
-## 背景与动机
+
 
 强化学习（RL）的核心挑战之一是在探索与利用之间取得平衡。智能体必须主动探索未知状态-动作对以收集信息，同时利用已有知识最大化累积奖励。这一矛盾在**稀疏奖励、长时程依赖和随机环境**中尤为尖锐——现有探索策略在这些场景下效率低下，往往导致不必要的探索和缓慢收敛。
 
@@ -92,7 +94,9 @@ $$r_b^{\mathrm{EUBRL}}(s,a) = (1-P_U(s,a))\, r_b(s,a) + P_U(s,a)\, \mathcal{E}_b
 
 本文从理论和实验两个层面验证这一思路的有效性：理论上证明 EUBRL 在无限时域折扣 MDP 上同时取得近 minimax 最优的遗憾界和样本复杂度；实验上在 Chain、Loop、DeepSea、LazyChain 等稀疏/长时程/随机任务上以显著优势超越多种贝叶斯和频率派基线。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈：探索-利用的耦合困境
 
@@ -125,7 +129,7 @@ EUBRL 的关键 changed slot 在于**奖励函数的语义重构**（见 Section
 
 VBRB 虽与 EUBRL 思路相近，但使用方差而非互信息形式的认知不确定性，且缺乏不确定性概率 $P_U$ 的动态调节，导致探索效率不足（消融实验证实互信息比方差更具探索性）。EUBRL 通过 Dirichlet/Normal 先验组合实现认知不确定性的封闭形式计算（Corollary 1），在 Chain、Loop、DeepSea、LazyChain 等任务上以显著优势超越所有基线（Tables 1, 3; Figures 1–3），尤其在随机 DeepSea 上实现了零失败率的完美求解。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0010_KASqlcI6Nm_EUBRL_Epistemic_Uncertainty_Directed_Bayesian_Re/figures/007_Figure_4.jpg]]
 *Figure 4: Comparison between standard RL and our formulation as represented by probabilistic graphical models (PGMs). We introduce the variable of “uncertainty” U, which partitions the optimality O into distinct cases: one is when certain, the other is when uncertain*
@@ -176,7 +180,7 @@ $$
 
 > **注意**：上述 pipeline 描述基于表格型表示和精确值迭代求解器。在函数逼近或近似求解器下的扩展，其近似误差如何传播至遗憾界，目前仅有初步分解（Appendix B.3），完整的理论分析仍待完善。
 
-## 核心模块与公式推导
+
 
 ### 3.1 认知不确定性建模
 
@@ -256,7 +260,9 @@ $$\widetilde{\mathcal{O}}\left( \left( \frac{S A}{\epsilon^2 (1-\gamma)^3} + \fr
 
 两者均与已知下界匹配，达到近 minimax 最优。当先验为均匀且有界时（如 Dirichlet + Normal 组合），EUBRL 实例化后直接满足该最优性（Corollary 1）。需注意，若使用 Normal-Gamma 先验且环境（近）确定性，认知不确定性可能不足以保证准乐观性，导致理论退化（Proposition 1 所指）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -309,7 +315,9 @@ EUBRL 在四个具有代表性的稀疏奖励/长时程环境上进行评估：C
 
 实验趋势与理论界高度一致：Theorem 2 和 Theorem 3 证明 EUBRL 在无限时域折扣 MDP 上取得近 minimax 最优的 $\widetilde{\mathcal{O}}(\sqrt{SAT}/(1-\gamma)^{1.5} + S^2A/(1-\gamma)^2)$ 遗憾界和样本复杂度界。实验中的样本效率优势（尤其在 DeepSea 和 LazyChain 上随规模增大而扩大的差距）为上述理论提供了实证支撑。Theorem 1 中认知抵抗项 $\Re^t(s)$ 自适应减小每步遗憾的机制，在实验中体现为 EUBRL 在探索-利用切换上的平滑性和低方差特性。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -340,6 +348,8 @@ EUBRL 的理论保证和实证性能依赖于先验的合理指定。分析揭�
 **近似求解器的理论缺口**：论文在 Appendix B.3 中给出了近似求解器下的遗憾分解，将近似误差 $V^{\pi_t}(s) - V^{\hat{\pi}_t}(s)$ 作为附加项。然而，该分解未给出近似误差与认知不确定性之间的联合界。在实际中，当认知不确定性较高时，值函数估计本身可能更不准确，近似误差与认知不确定性存在耦合。完整的近似理论分析仍待完善。
 
 **多层级认知不确定性的建模**：当前框架将转移不确定性和奖励不确定性通过单一函数 $h$ 聚合为标量。在复杂环境中，不同来源的不确定性可能具有不同的时间尺度和结构特性。如何在多层级（如状态抽象、选项、子目标）上捕获和利用认知不确定性，以最小化手工设计奖励的需求，是更具雄心的研究方向。
+
+
 
 ## 原文 PDF
 

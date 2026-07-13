@@ -46,7 +46,7 @@ claims:
 > - HumanML3D (perturbed text) 上，FID_P↓ 0.155 vs 1.754 (-1.599)。
 > - HumanML3D (prediction discrepancy) 上，FID_D↓ 0.021 vs 1.443 (-1.422)。
 
-## 概述
+## 概要
 
 文本到运动生成（Text-to-Motion）模型近年来取得了显著进展，但在实际部署中暴露出一个关键瓶颈：**对输入文本的微小扰动极度敏感**。用户使用同义词替换（如将“walk”替换为“stroll”）或微调措辞时，现有模型往往生成完全不同的、甚至错误的运动序列。SATO论文通过系统分析揭示了这一现象的根源——预训练的CLIP文本编码器在扰动前后注意力模式不稳定，导致对关键运动描述词的关注发生偏移，进而引发运动生成误差的级联放大（见Figure 2的token修改示例）。
 
@@ -56,15 +56,13 @@ claims:
 
 SATO的方法定位属于**模型微调型鲁棒性增强框架**，区别于单纯的数据增强或对抗训练方法。其核心创新在于首次将注意力层面的稳定性约束引入文本到运动生成任务，并设计了一套可微分、可优化的损失体系来实现这一目标。该方法可适配于不同类型的基线模型（如基于VQ-VAE的T2M-GPT和基于掩码建模的MoMask），展现了良好的通用性。
 
-## 背景与动机
-
 文本到运动生成（Text-to-Motion）旨在从自然语言描述中合成三维人体动作序列，在动画制作、虚拟现实和人机交互等领域具有广泛应用。近年来，基于 VQ-VAE、扩散模型和生成式掩码建模的方法显著提升了生成质量，代表性工作包括 **T2M‑GPT**（Zhang et al., arXiv 2023）、**MoMask**（Guo et al., arXiv 2023）和 **MotionDiffuse**（Zhang et al., arXiv 2022）。
 
 然而，现有模型存在一个被忽视的关键瓶颈：**对文本输入的微小扰动极度敏感**。当用户输入中出现同义词替换、语序调整等细微变化时，模型常常产生灾难性的错误预测。SATO 论文通过 token 修改实验揭示了这一现象的根源——预训练的 CLIP 文本编码器在处理扰动文本时，其注意力分布会发生显著偏移，导致模型不再关注关键的运动描述词，进而引发生成误差的级联放大。在 HumanML3D 基准上，基线模型 T2M‑GPT 在原始文本上 FID 低至 0.141，但在扰动文本上 FID_P 急剧恶化至 1.754，充分说明了稳定性问题的严重性。
 
 现有工作的一个共同缺陷在于：它们普遍冻结 CLIP 文本编码器，未对文本表示的鲁棒性进行任何约束或优化。这导致模型在训练过程中从未见过扰动输入，也缺乏应对文本变化的机制。SATO 的核心洞察在于，一个稳定的文本到运动模型应当满足三个数学约束：**注意力机制的 top‑k 鲁棒性**、**预测分布的稳定性**，以及**与原模型预测的接近性**。基于此，SATO 提出了一个包含扰动模块、稳定注意力模块和预训练教师模块的三组件框架，通过解冻 CLIP 并引入可微替代损失 $\mathcal{L}_{\mathrm{Topk}}$ 进行端到端优化，在保持生成准确性的同时大幅提升对文本扰动的鲁棒性。
 
-## 核心创新
+## 核心方法与创新机理
 
 SATO的核心创新在于首次将文本到运动模型的稳定性形式化为三个可优化的数学约束，并通过“解冻CLIP + 注意力top‑k对齐 + 扰动一致性训练”的组合策略实现端到端优化。相较于现有方法普遍冻结CLIP文本编码器且缺乏对输入扰动的显式建模，SATO在以下四个关键维度上引入了结构性改变：
 
@@ -91,8 +89,6 @@ SATO引入一个冻结的预训练T2M‑GPT作为教师模型，通过预测接�
 **创新点的内在逻辑链条**
 
 上述四个changed slot并非孤立存在，而是形成了一条因果闭环：解冻CLIP（slot 1）使注意力可优化 → $\mathcal{L}_{\mathrm{Topk}}$（slot 2）从注意力层面稳定特征提取 → 扰动模块（slot 3）从预测层面增强鲁棒性 → 教师模块（slot 4）防止稳定性训练损害原始性能。消融实验（Table 5）证实，同时启用 $\mathcal{L}_2$（稳定注意力）和 $\mathcal{L}_3$（扰动一致性）时达到最优稳定性（FID_P 0.155, FID_D 0.010），单独使用任一损失均无法达到同等效果，验证了该闭环设计的必要性。
-
-## 整体框架
 
 SATO (Stable Text-to-Motion Framework) 是一个即插即用的文本到运动稳定性框架，可适配当前所有采用文本编码器与Transformer层的生成方法。其核心架构由三个模块串联构成：**扰动模块 (Perturbation Module)**、**稳定注意力模块 (Stable Attention Module)** 和**预训练教师模块 (Pretrained Teacher Module)**，如 Figure 3 所示。
 
@@ -126,8 +122,6 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{trans}} + \lambda_{1} \cdot \mathcal{L}_{1}
 ### 关键设计决策
 
 与现有工作中普遍冻结 CLIP 文本编码器的做法不同，SATO **解冻 CLIP 模块**进行微调，使其能够学习更稳定的注意力模式。这一改变是稳定注意力约束得以生效的前提，但论文未对解冻可能引发的灾难性遗忘风险进行深入分析。此外，SATO 框架在 T2M‑GPT 和 MoMask 两种不同架构的基线上均得到验证，初步展示了其即插即用的通用性。
-
-## 核心模块与公式推导
 
 ### 问题形式化与稳定性三约束
 
@@ -206,7 +200,7 @@ $$\mathcal{L} = \mathcal{L}_{\text{trans}} + \lambda_1 \cdot \mathcal{L}_1 + \la
 
 **预训练教师模块（Pretrained Teacher Module）** 引入冻结的原始T2M‑GPT作为教师，仅通过 $\mathcal{L}_1$ 损失在训练时约束学生模型，不参与推理。该模块是平衡准确性与鲁棒性的关键——消融实验（Table 5）显示，同时使用 $\mathcal{L}_2$ 和 $\mathcal{L}_3$ 可将扰动文本FID_P降至0.155，预测差异FID_D降至0.010，达到最优稳定性。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验：扰动鲁棒性的定量评估
 
@@ -278,9 +272,6 @@ Table 8分析了三个辅助损失权重$\lambda_1$、$\lambda_2$、$\lambda_3$�
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2405_01461/figures/010_Table_5.jpg]]
 *Table 5: Ablation study results of SATO stability component. We conducted six separate ablation studies on three different loss functions. Bold indicates the best results*
 
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2405_01461/figures/014_Figure_7.jpg]]
-*Figure 7: Attention visual examples. We compared the visualizations of attention vectors from the text encoder for T2M-GPT and SATO (T2M-GPT) before and after textual perturbations. In our visualizations, darker shades of red indicate higher attention weights. Additionally, we quantified the attention differences induced by perturbations using Jensen-Shannon Divergence (JSD). Our model exhibits a smaller JSD when the text is perturbed, indicating that our model possesses better attention stability*
-
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2405_01461/figures/009_Figure_5.jpg]]
 *Figure 5: Model stability evaluation under different perturbations. It can be observed that across all levels of perturbation, SATO (T2M-GPT) consistently outperforms T2M-GPT in terms of stability metrics. Even when subjected to significant perturbation, our model maintains excellent stability*
 
@@ -290,10 +281,7 @@ Table 8分析了三个辅助损失权重$\lambda_1$、$\lambda_2$、$\lambda_3$�
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2405_01461/figures/001_Figure_1.jpg]]
 *Figure 1: Comparisons on ???????? and ???????? . The closer the model is to the origin, the better. The arrow indicates the effect of our method on the model. Our SATO framework can make the text-to-motion model more stable*
 
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2405_01461/figures/008_Table_4.jpg]]
-*Table 4: Dataset analysis. We analyzed the replacement rates (sentences, vocabulary). Additionally, we calculated the cosine similarity (Co-Sim) before and after replacement to ensure the validity of our substitutions*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 基线关系与核心改进
 

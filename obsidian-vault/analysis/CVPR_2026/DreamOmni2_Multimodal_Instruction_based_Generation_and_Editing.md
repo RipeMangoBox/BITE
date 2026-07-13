@@ -42,7 +42,7 @@ claims:
 > - DreamOmni2 Benchmark (Editing) 上，Concrete Object Editing Success (Gemini eval.) 0.5854 vs OmniGen2, Kontext, etc. (outperforms all baselines)；Abstract Attribution Editing Success (Human eval.) 0.6829 vs Nano Banana, GPT-4o, etc. (outperforms commercial models)。
 > - DreamOmni2 Benchmark (Generation) 上，Concrete Object Generation Success (Human eval.) 0.6098 vs Nano Banana, GPT-4o (outperforms commercial model Nano Banana)；Abstract Attribution Generation Success (Human eval.) 0.6829 vs OmniGen2, DreamO, etc. (significantly outperforms open-source models)。
 
-## 概述
+## 概要
 
 DreamOmni2 针对当前指令式图像编辑与生成的两个关键瓶颈提出了统一解决方案：**（1）** 现有编辑方法仅依赖单一文本指令，难以精确描述纹理、材质、姿态等复杂细节，需要参考图像作为补充；**（2）** 主体驱动生成仅能组合具体对象，无法处理抽象属性。两任务均不支持多模态输入与抽象属性迁移。
 
@@ -52,7 +52,7 @@ DreamOmni2 针对当前指令式图像编辑与生成的两个关键瓶颈提出
 
 **方法定位**：DreamOmni2 属于多模态指令驱动的统一生成-编辑框架，区别于仅支持文本指令或单参考图像的方法。其数据构造与多图像处理机制为后续研究提供了可复用的技术路径。
 
-## 背景与动机
+
 
 图像生成与编辑领域近年来取得了显著进展，扩散模型（Diffusion Models）和自回归模型的出现使得文本到图像（T2I）的生成质量与可控性大幅提升。在此基础上，指令式图像编辑（Instruction-based Editing）和主体驱动生成（Subject-driven Generation）成为两个重要的研究方向。前者允许用户通过自然语言指令对已有图像进行修改，后者则要求模型根据提供的参考图像生成包含特定主体或属性的新图像。
 
@@ -62,7 +62,9 @@ DreamOmni2 针对当前指令式图像编辑与生成的两个关键瓶颈提出
 
 上述缺口催生了一个核心问题：**能否将编辑与生成统一为多模态指令驱动任务，使模型能够同时理解文本指令与多张参考图像，并覆盖从具体对象到抽象属性的完整概念谱系？** DreamOmni2 正是围绕这一问题展开，其动机在于通过三阶段数据合成流水线、多图像区分机制以及视觉语言模型（VLM）联合训练，构建一个能够精确执行多模态指令的统一框架。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DreamOmni2 的核心创新在于将图像编辑与生成统一为**多模态指令驱动**任务，并通过三项关键设计突破现有方法的瓶颈：**覆盖抽象属性的数据合成流水线**、**多参考图像区分机制**、以及**VLM 联合训练增强指令理解**。
 
@@ -95,7 +97,7 @@ DreamOmni2 的核心创新在于将图像编辑与生成统一为**多模态指�
 
 DreamOmni2 以 **Flux.1 Kontext** 作为基础统一模型，通过 Editing LoRA 和 Generation LoRA 分别激活多模态编辑与生成能力，在不破坏 Kontext 原始功能的前提下实现两类任务的统一。这一设计使模型在 DreamOmni2 基准的编辑和生成任务上全面超越现有开源模型（如 OmniGen2、DreamO），并达到或接近商业级模型 GPT-4o 和 Nano Banana 的水平。
 
-## 整体框架
+
 
 DreamOmni2 将多模态指令驱动的图像编辑与生成统一为一个端到端框架，其核心由**三阶段数据合成流水线**、**多参考图像编码机制**以及**VLM 联合训练**三大模块构成，整体输入输出流如图 Figure 4 所示。
 
@@ -139,7 +141,7 @@ DreamOmni2 将多模态指令驱动的图像编辑与生成统一为一个端到
 
 为在不破坏 Kontext 原始功能的前提下激活多模态编辑/生成能力，DreamOmni2 分别训练 **Editing LoRA** 和 **Generation LoRA**，通过低秩适配实现高效微调。训练成本方面，VLM 微调约需 10 A100 小时，LoRA 训练约需 384 A100 小时，对计算资源有一定要求。
 
-## 核心模块与公式推导
+
 
 DreamOmni2 的核心技术架构围绕三个关键模块展开：面向多模态训练数据合成的特征混合机制、支持多参考图像区分的索引与位置编码方案，以及提升复杂指令理解能力的 VLM 联合训练框架。
 
@@ -183,7 +185,9 @@ DreamOmni2 以 **Flux.1 Kontext**（Batifol et al., arXiv 2025）为基础模型
 ![[assets/figures/papers/paper_list_l2307_https_openaccess_thecvf_com_content_CVPR2026_html_Xia_DreamOmni2_Multimo/figures/002_Figure_2.jpg]]
 *Figure 2: The overview of DreamOmni2’s training data construction. (1) In stage 1, we use a feature mixing scheme to leverage the base model’s T2I capabilities, creating high-quality data pairs with concrete objects and abstract attributes. (2) In stage 2, we generate multimodal instruction-based editing data. Using stage 1 data, we train an extraction model to simulate objects or attributes in the target image and generate a reference image based on instructions. Additionally, we use an instruction-based editing model to modify the extracted objects or attributes in the target image to be different, creating the source image. This generates training pairs from reference and source images to the targ...*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 评估体系与基准
 
@@ -251,7 +255,9 @@ Table 5 消融了针对多参考图像输入的编码方案。对比三种配置
 - **Table 4**：VLM 联合训练是提升复杂指令理解能力的关键设计，四项指标均有大幅提升。
 - **Table 5**：索引编码与位置编码偏移的协同设计是解决多图像混淆的核心机制，缺一不可。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有基线的关键差异
 
@@ -294,6 +300,8 @@ DreamOmni2 处于**多模态指令式图像生成与编辑**的交叉领域，�
 - **下游影响**：为多模态指令驱动的视觉内容创作提供了可复现的技术路线，其数据合成策略和编码方案可被后续工作借鉴，用于扩展至视频、3D 等多模态生成任务。
 
 与商业级模型（**GPT-4o** (OpenAI 2025)、**Nano Banana** (Google 2025)）相比，DreamOmni2 在抽象属性编辑和具体对象生成任务上达到或接近其水平，但作为开源模型，其技术细节完全透明，为社区提供了可复现、可改进的基础。
+
+
 
 ## 原文 PDF
 

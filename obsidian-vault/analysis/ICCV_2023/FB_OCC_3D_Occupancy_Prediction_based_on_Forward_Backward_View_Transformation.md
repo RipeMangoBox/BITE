@@ -5,6 +5,8 @@ paper_level: A
 venue: ICCV
 year: 2023
 pdf_ref: paperPDFs/ICCV_2023/FB_OCC_3D_Occupancy_Prediction_based_on_Forward_Backward_View_Transformation.pdf
+project_link: null
+code_link: https://github.com/NVlabs/FB-BEV
 aliases:
 - FB-OCC
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | 基于前后向视图变换的3D占用预测 |
 | 英文题名 | FB-OCC: 3D Occupancy Prediction based on Forward-Backward View Transformation |
 | 会议/期刊 | ICCV 2023 |
-| Links | [paper](https://arxiv.org/abs/2307.01492); [GitHub](https://github.com/NVlabs/FB-BEV) |
+| Links | [paper](https://arxiv.org/abs/2307.01492) · [GitHub](https://github.com/NVlabs/FB-BEV) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | FB-OCC |
 | Dataset | Occ3D-nuScenes (test set), Occ3D-nuScenes (val set), Occ3D-nuScenes (val set, scaling comparison) |
@@ -40,7 +42,7 @@ claims:
 > - Occ3D-nuScenes (val set) 上，mIoU 为 52.79 (单模型Version K)，对比 BEVFormer (26.88)，变化 +25.91。
 > - Occ3D-nuScenes (val set, scaling comparison) 上，mIoU 为 Version I (130.8M) 48.90, Version J (428.8M) 50.47, Version K (1200.0M) 52.79，对比 Version H (67.8M) 42.06，变化 逐步提升至+10.73。
 
-## 概述
+## 概要
 
 **FB-OCC** 是 CVPR 2023 端到端自动驾驶研讨会中提出的单目 3D 占用预测方法，在 Occ3D-nuScenes 挑战赛中以 **54.19% mIoU** 排名第一。该方法直面一个核心瓶颈：大规模视觉模型在有限 3D 标注数据上严重过拟合，且现有单一种类的视图变换——前向投影（LSS 范式）或后向投影（BEVFormer 范式）——难以同时高效构建密集几何表示并捕捉全局语义。
 
@@ -50,7 +52,7 @@ FB-OCC 的核心洞察在于将两类视图变换串联为因果闭环：**前�
 
 **方法定位**：FB-OCC 属于单目相机输入的密集 3D 占用预测方法，其联合视图变换架构区别于仅前向投影的 **MonoScene**（Cao et al., CVPR 2022）、仅后向投影的 **BEVFormer**（Li et al., ECCV 2022）以及挑战赛基线 **CTF-Occ**（Tian et al., arXiv 2023）。通过大规模骨干网络（InternImage-H，1.2B 参数）和高分辨率输入（960×1760），该方法将占用预测的性能边界大幅推高，但需注意测试集成绩为 7 模型集成结果，且训练需 32 块 A100 GPU，复现成本极高。
 
-## 背景与动机
+
 
 三维占用预测（3D Occupancy Prediction）旨在将自动驾驶场景的周围环境表示为稠密的体素网格，并为每个体素赋予语义类别标签。与仅预测少数前景类别的3D目标检测不同，占用预测要求模型对空间中所有占据区域进行完整语义重建，这对下游规划与决策至关重要。然而，该任务面临两个根本性瓶颈。
 
@@ -60,7 +62,9 @@ FB-OCC 的核心洞察在于将两类视图变换串联为因果闭环：**前�
 
 针对上述瓶颈，FB-OCC的核心动机是：能否设计一种联合视图变换机制，使前向投影的几何先验与后向投影的语义建模能力互补，同时通过大规模2D预训练缓解3D数据不足的问题？具体而言，FB-OCC提出**前向-后向联合视图变换**：先通过前向投影生成稀疏但几何准确的初始3D体素，将其压缩为富含语义先验的BEV查询，再以此查询指导深度感知的后向投影，从稀疏表示中恢复密集几何信息。此外，FB-OCC通过在Objects365（200万2D检测图像）上的大规模预训练，以及在nuScenes上的深度估计与2D语义分割联合预训练（2D语义标签由SAM自动生成），有效缓解了大模型在有限3D数据上的过拟合问题。该方法最终在Occ3D-nuScenes测试集上达到54.19% mIoU，排名挑战赛第一。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FB-OCC 的核心创新在于**解决大规模视觉模型在有限3D数据上过拟合严重**这一瓶颈，通过**前向-后向联合视图变换**和**大规模预训练**两个因果旋钮，使大模型在3D占用预测任务上发挥优势。
 
@@ -106,7 +110,7 @@ FB-OCC 验证了模型规模与性能的正向关系：从67.8M参数的Version 
 | 损失函数 | 仅交叉熵或焦点损失 | 距离感知焦点损失 + Dice损失 + 几何/语义亲和力损失 + Lovász-Softmax损失 + 深度监督损失 + 2D语义损失 |
 | 模型规模 | ResNet-50/VoVNet-99（≤100M参数），256×704输入 | InternImage-H（1.2B参数），960×1760输入，0.4m体素分辨率 |
 
-## 整体框架
+
 
 FB-OCC 的整体架构围绕 **前向-后向联合视图变换** 这一核心设计展开，旨在解决单一种类视图变换难以同时高效构建密集几何表示与捕捉全局语义的瓶颈。其 pipeline 由四个主要模块串联构成：**Image Backbone → F-VTM（前向视图变换）→ B-VTM（后向视图变换）→ Voxel Encoder + Occupancy Head**，如 Figure 1 所示。
 
@@ -133,7 +137,7 @@ F-VTM 的体素特征与 B-VTM 优化后的 BEV 特征在 Voxel Encoder 中融�
 
 整个 pipeline 的信息流可概括为：**多相机图像 → 骨干特征 → 深度分布引导的前向投影（稀疏 3D 体素）→ BEV 压缩（富含语义先验的查询）→ 深度感知的后向交叉注意力（密集 BEV 优化）→ 体素-BEV 融合 → 语义占用预测**。这一设计使前向投影的几何准确性与后向投影的语义丰富性形成互补，是 FB-OCC 取得领先性能的结构性基础。
 
-## 核心模块与公式推导
+
 
 ### 3.1 整体架构概览
 
@@ -198,7 +202,9 @@ $$mIoU = \frac{1}{C} \sum_{c=1}^{C} \frac{TP_c}{TP_c + FP_c + FN_c}$$
 - **语义监督**：2D 语义标签由 **SAM (Segment Anything Model)** 通过框提示与 LiDAR 点提示自动标注生成。
 - **联合优化**：通过 $L_d$ 和 $L_s$ 共同优化，使骨干网络同时学习几何结构与语义信息，缓解大规模模型在有限 3D 数据上的过拟合问题。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能与挑战赛结果
 
@@ -263,7 +269,9 @@ Version F的实验结果表明，联合预训练相较仅深度预训练带来�
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2307_01492/figures/005_Table_2.jpg]]
 *Table 2: Results of models at different scales*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 技术路线溯源
 
@@ -309,6 +317,8 @@ FB-OCC 的视图变换设计融合了单目 3D 感知的两条主流路线：**�
 2. **长期时序融合的效率**：16 帧历史信息带来显著增益（Version E），但当前采用 3D 变换对齐不同时间步的体素特征，计算和存储开销随帧数线性增长。是否存在更高效的时序压缩或选择性记忆机制？
 3. **占用预测的不确定性校准**：当前输出为确定性语义标签，未建模预测置信度。在下游规划任务中，不确定性估计对于安全决策至关重要——例如，远距离或遮挡区域的低置信度预测应触发保守策略。
 4. **大规模预训练的边际收益**：模型从 67.8M 扩展到 1.2B 参数，mIoU 从 42.06 提升至 52.79（+10.73），但参数量增长约 17.7 倍。在资源受限场景下，是否存在更高效的缩放策略或知识蒸馏方案？
+
+
 
 ## 原文 PDF
 

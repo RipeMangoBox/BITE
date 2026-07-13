@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Benefits_and_Limitations_of_Communication_in_Multi_Agent_Reasoning.pdf
+project_link: null
+code_link: null
 openreview_forum_id: 0aPIVJUz5T
 aliases:
 - BLCMAR
@@ -41,7 +43,7 @@ claims:
 > - PARITY (state tracking) 上，Accuracy 为 Prefix Sum accuracy remains high (~0.8 at max length)，对比 Majority Voting and CoA accuracy degrade as sequence length increases，变化 Prefix Sum consistently outperforms, especially at larger N。
 > - k-hop reasoning (100/500 facts) 上，Accuracy 为 Iterative Query accuracy stays >0.90 at 20 hops (500 facts)，对比 Majority Voting accuracy drops to ~0.30 at 20 hops (500 facts)，变化 +0.60 at 20 hops。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -80,7 +82,7 @@ claims:
 
 当前理论分析基于UHAT模型假设，向实际软注意力Transformer的精确映射仍有待完善。实验局限于少数LLM和构造性任务，在更广泛的推理场景（如图可达性、约束满足）中的泛化性尚未建立。关键开放问题包括：如何将理论上的最优协议转化为可端到端学习的多智能体系统；在近似准确而非精确计算的要求下，投票方法的性能下界能否进一步放松；以及多令牌消息场景下通信预算的精确边界如何刻画。
 
-## 背景与动机
+
 
 ### 单智能体推理的规模化瓶颈
 
@@ -105,7 +107,9 @@ claims:
 
 论文的核心洞察在于：**深度的减少只有通过增加通信才能实现**，且这种折衷在不同任务族中呈现质的差异——某些任务（如关联回忆）几乎不需要通信即可并行化，而另一些任务（如多跳推理）的深度下界与智能体数量无关，通信成本高昂且不可避免。这一发现为多智能体系统的设计提供了可预测的指导原则，而非依赖经验试错。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作首次从**Transformer表达性理论**出发，对多智能体推理系统进行了严格的形式化分析，揭示了其根本性的**深度-通信折衷（depth-communication tradeoff）**。核心创新在于：不再将多智能体系统视为启发式工程实践，而是将其建模为可证明边界的计算协议，从而精确刻画了“何时多智能体有效”“何时无效”以及“代价是什么”。
 
@@ -142,7 +146,7 @@ claims:
 
 这些创新将多智能体推理从经验性探索提升到了**可预测、可优化、可证明**的理论层面，为后续的多智能体LLM系统设计提供了原则性指导。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_0aPIVJUz5T/figures/001_Table_1.jpg]]
 *Table 1: Summary of results. w denotes the number of agents. N represents the length of the input. Size corresponds to total computation. Depth loosely corresponds to wall-clock time. Communication refers to the overall amount of communication between agents. We will define these formally in Section 3. O(·) indicates existence of a protocol; Θ(·) indicates that we prove it optimal*
@@ -206,7 +210,7 @@ $$\frac{\text{Size}(N)}{w(N)} \leq \text{Depth}(N)$$
 
 实验部分采用预训练大语言模型（Llama-3.3-70B-Instruct-Turbo 和 Llama-3.1-8B-Instruct-Turbo），通过提示词赋予模型在协议中的角色和任务指令。通信协议采用硬编码方式实现，与 **Chain-of-Agent**（Zhang et al., 2024b）的实现类似。基线方法包括**多数投票法**（Wang et al., 2022）和单智能体思维链。所有实验重复 100 次（随机种子 42），超参数在验证子集上调整，确保比较公平性。
 
-## 核心模块与公式推导
+
 
 ### 3.1 多智能体系统的形式化定义
 
@@ -276,7 +280,9 @@ $$s(N) = 2^{\Omega(N^{1/(4d)})}$$
 
 其中 $d$ 为电路深度。该指数级下界解释了为什么多数投票在长序列状态跟踪任务中性能急剧下降（Figure 4(a)）：独立智能体无法通过简单投票有效聚合全局状态信息。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -340,7 +346,9 @@ Figure 4b 展示了 PARITY 任务中计算深度与总通信量之间的关系�
 *Figure 7: (a) Llama-70B accuracy on PARITY for different sequence lengths. Prefix Sum represents the theoretically optimal communication protocol*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心贡献与理论定位
 
@@ -399,6 +407,8 @@ Figure 4b 展示了 PARITY 任务中计算深度与总通信量之间的关系�
 - **多令牌消息的影响**：当前形式化假设单令牌通信消息。多令牌消息（如自然语言中间结果）是否会影响通信预算的精确边界，特别是在长消息场景中？前缀和协议中的中间组合步骤可能受益于更丰富的消息表示。
 
 - **实际系统设计的启示**：论文提出的前缀和式级联（prefix-sum–style cascade）和迭代查询协议对实际多智能体系统设计具有潜在指导意义。前者通过迭代摘要减少最终智能体的瓶颈，后者为多跳推理提供了结构化的查询-响应模式。这些思想如何融入现有的多智能体框架（如AutoGen、CrewAI）值得进一步探索。
+
+
 
 ## 原文 PDF
 

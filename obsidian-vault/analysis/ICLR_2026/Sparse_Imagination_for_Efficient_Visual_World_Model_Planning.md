@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Sparse_Imagination_for_Efficient_Visual_World_Model_Planning.pdf
+project_link: null
+code_link: null
 openreview_forum_id: faxcxKINBC
 aliases:
 - SI
@@ -42,7 +44,7 @@ claims:
 > - PointMaze (60 episodes) 上，成功率 (%) 为 100.0% (Drop 50%)，对比 98.3% (Full)，变化 +1.7%。
 > - Meta-World (50 tasks × 15 trials) 上，成功率 All (%) 为 47.73% (Drop 50%)，对比 48.80% (Full)，变化 -1.07%。
 
-## 概述
+## 概要
 
 视觉世界模型通过预测未来状态来指导机器人规划，但其推理过程需要处理ViT编码器产生的大量patch token，自注意力计算的二次复杂度成为限制规划效率的核心瓶颈。在PushT等任务中，使用全部token的基线方法（Full-Patch, **DINO-WM**, Zhou et al., 2024）单次规划迭代耗时高达173秒，难以满足实时机器人部署需求。
 
@@ -61,7 +63,7 @@ claims:
 
 **方法谱系与定位**：Sparse Imagination属于基于模型的视觉规划方法，其世界模型继承自DINO-WM（Zhou et al., 2024）的ViT编码+Transformer预测框架，但在推理效率和鲁棒性上做出关键改进。相较于仅使用CLS token的单向量表示基线（Caron et al., 2021），稀疏想象保留了空间分布信息；相较于SmolVLA（Shukor et al., 2025）等纯策略方法，它通过规划显式优化未来轨迹。该方法可无缝替换全量规划，适用于基于采样的CEM规划器和基于梯度的MPC-GD规划器，并兼容多种自监督ViT编码器（MoCo-v3, MAE, DINOv3）。
 
-## 背景与动机
+
 
 ### 视觉世界模型规划的效率瓶颈
 
@@ -94,7 +96,9 @@ claims:
 
 基于这一洞察，本文提出**稀疏想象（Sparse Imagination）**框架，其核心思想是：训练世界模型适应任意稀疏token子集，并在推理阶段通过可控的随机dropout实现规划效率与性能之间的灵活权衡。该方法无需复杂的token选取模块，仅通过两个关键设计——随机分组注意力训练和推理时动态随机丢弃——即可在多个仿真和真实世界机器人任务上取得与全量token基线相近的成功率，同时将规划时间降低约50%。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 创新动机：视觉世界模型规划的 token 冗余瓶颈
 
@@ -134,7 +138,7 @@ Sparse Imagination 在多个维度上实现了对基线的实质性改进：
 
 当前方法需要用户预先指定固定的 $p$ 值，无法根据任务难度或场景动态在线调整。附录中探索的不确定性感知自适应 dropout（Ada-Rand）在 Wall 环境中展示了潜力——自动达到 95.0% 成功率且平均 drop ratio 仅 26.1%（Table 9），但该方向仍处于初步阶段。此外，在极高稀疏度（$p > 70\%$）下成功率明显下降，表明信息保留与计算效率之间存在根本权衡。如何设计动态稀疏策略、将稀疏想象推广至扩散模型规划器等更广泛的视觉决策框架，是值得进一步探索的开放问题。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_faxcxKINBC/figures/001_Figure_1.jpg]]
 *Figure 1: Sparse Imagination. Sparse imagination accelerates planning by performing model predictive control (MPC) rollouts on a random subset of visual tokens. A new dropout pattern is dynamically sampled at each MPC iteration, and both predictions and optimization for CEM are computed using only the selected patches to improve efficiency and robustness*
@@ -166,7 +170,7 @@ $$\mathcal{L}_{\mathrm{mpc}} = ||\hat{z}_{t+H} - z_g||^2$$
 
 值得注意的是，随机采样策略的鲁棒性源于视觉 token 中状态信息的高度冗余——信息论分析表明，即便丢弃 50% 的 token，视觉 token 与真实状态之间的 nHSIC 值仍保持高水平，单个随机 token 的预测能力已可与 CLS token 媲美。这一特性解释了为何简单的随机丢弃能够在多个环境中一致优于基于学习、基于注意力或聚类合并等复杂 token 选取方法。
 
-## 核心模块与公式推导
+
 
 ### 方法架构
 
@@ -198,7 +202,9 @@ $$\mathcal{L}_{\mathrm{mpc}} = ||\hat{z}_{t+H} - z_g||^2$$
 
 **分组注意力训练的必要性**：随机分组注意力是使世界模型适应稀疏输入的关键训练策略。若采用标准全量注意力训练，模型在推理时遭遇token缺失会产生显著的分布偏移，导致预测误差急剧上升并最终损害规划成功率。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能与效率权衡
 
@@ -274,7 +280,9 @@ $$\operatorname{nHSIC}(X,Y) = \frac{\widehat{\mathrm{HSIC}}(X,Y)}{\sqrt{\widehat
 4. **聚类方法的低效**：**Table 7** 显示，token聚类合并方法（如ATC）不仅成功率低（41.7%），规划时间反而长于dropout方法——聚类本身的计算开销抵消了token减少带来的加速收益。
 5. **盲点问题的根本局限**：随机采样虽然避免了盲点，但并未从根本上解决重要性采样方法的缺陷。如何结合静态重要性与随机探索，仍是一个开放问题。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法脉络与基线关系
 
@@ -342,6 +350,8 @@ $$\operatorname{nHSIC}(X,Y) = \frac{\widehat{\mathrm{HSIC}}(X,Y)}{\sqrt{\widehat
 稀疏想象在视觉世界模型规划领域占据了一个独特且实用的位置：它证明了**简单的随机策略在效率-鲁棒性权衡上优于复杂的确定性方法**。这一发现挑战了“更智能的token选取必然带来更好性能”的直觉，其深层原因在于ViT patch token中状态信息的高度冗余分布（nHSIC分析，Figure 7）以及静态重要性在动态任务中的根本缺陷。
 
 该方法可作为视觉MPC规划的标准加速模块，与现有世界模型框架（如DINO-WM）和策略引导方法（如VLA）无缝集成，为实时机器人部署提供了即插即用的效率提升方案。
+
+
 
 ## 原文 PDF
 

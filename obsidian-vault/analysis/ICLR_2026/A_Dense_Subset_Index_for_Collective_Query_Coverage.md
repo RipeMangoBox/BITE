@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/A_Dense_Subset_Index_for_Collective_Query_Coverage.pdf
+project_link: null
+code_link: https://github.com/structlearning/DISCo
 aliases:
 - DDISC
 - DSICQC
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 面向集体查询覆盖的稠密子集索引 |
 | 英文题名 | A Dense Subset Index for Collective Query Coverage |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=cUdODCFjUM); [GitHub](https://github.com/structlearning/DISCo) |
+| Links | [paper](https://openreview.net/forum?id=cUdODCFjUM) · [GitHub](https://github.com/structlearning/DISCo) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/language_speech_dialog |
 | Method | DISCO (Dense Index for Set Coverage) |
 | Dataset | MS-Marco, HotpotQA, 2WikiMultihopQA |
@@ -41,7 +43,7 @@ claims:
 > - HotpotQA 上，Error(F) (K=2) 为 0.68，对比 Exact Greedy: 0.00，变化 DISCO 的 Error(F) 最低（除贪心变体外）。
 > - HotpotQA 上，MAP (K=2) 为 0.84，对比 Exact Greedy: 0.86，变化 DISCO 的 MAP 最高（除贪心变体外）。
 
-## 概述
+## 概要
 
 传统稠密检索（如 ColBERT）的核心瓶颈在于其独立地对每个语料项进行评分，忽略了多跳问答等场景中多个语料项必须协作才能覆盖查询的需求。独立 top-K 检索会引入冗余，无法保证对查询的集体覆盖。针对此问题，本文提出 DISCO（Dense Index for Set Coverage），将检索目标从独立项的最大化 MaxSim 分数，转变为最大化一个单调子模的集体覆盖目标函数 $F(S,Q) = \sum_{\mathbf{q} \in Q} \max_{\mathbf{x} \in \cup_{c \in S} X_c} \mathbf{q}^\top \mathbf{x}$。
 
@@ -51,15 +53,13 @@ DISCO 的核心方法创新在于：通过将边际增益表示为提升向量�
 
 DISCO 的主要局限性在于：索引内存消耗显著高于 PLAID 等基线（需维护 $R=8$ 个副本索引），当前覆盖目标函数未考虑公平性和多样性，且尚未设计用于处理动态演变的语料库。
 
-## 背景与动机
-
 传统稠密检索系统（如 ColBERT）的核心瓶颈在于其**独立评分假设**：每个语料项被孤立地评估与查询的相关性（通过 MaxSim 分数），然后返回全局 top-K 结果。这种范式在需要多个文档协同覆盖查询信息的多跳问答（如 HotpotQA）、事实验证（FEVER）等场景中暴露出根本性缺陷。独立 top-K 检索不可避免地引入冗余——多个高分文档可能覆盖相同的查询子空间，而查询中未被覆盖的原子向量（如多跳问题中的中间实体或关系）则被忽略，导致**集体覆盖**能力缺失。
 
 现有方法的缺口在于：检索目标函数 $\operatorname{MaxSim}(Q,X) = \sum_{\mathbf{q} \in Q} \max_{\mathbf{x} \in X} \mathbf{q}^\top \mathbf{x}$ 仅衡量单个文档对查询的匹配程度，无法建模子集 $S$ 对查询原子向量的联合覆盖。虽然理论上可以通过子模函数最大化（贪心算法具有 $(1-1/e)$ 近似保证）来解决此问题，但精确贪心每轮需遍历整个语料库计算边际增益，在大规模场景下计算成本不可接受。现有的贪心变体（Lazy Greedy、Stochastic Greedy）虽有一定加速，但仍需多次扫描语料，延迟远高于可索引的检索方法。
 
 本文的动机是：**能否将子模覆盖的贪心选择过程转化为可索引的近似最近邻（ANN）检索问题，从而在保持贪心算法覆盖率保证的同时，实现亚线性时间的集体覆盖检索？** 核心洞察在于：边际增益 $F(c \mid S,Q) = \sum_{\mathbf{q} \in Q} \max_{\mathbf{x} \in X_c} [\mathbf{q}^\top \mathbf{x} - \max_{u \in S} \max_{\mathbf{x}' \in X_u} \mathbf{q}^\top \mathbf{x}']_+$ 可以表示为提升向量空间中点积的 hinge 函数之和。通过随机投影（random hyperplane projection）将 hinge 函数近似为可索引的点积形式，贪心的每轮选择等价于在 $R$ 个投影空间中查询与当前状态依赖的提升查询向量最相似的语料项。基于此，本文提出 DISCO（Dense Index for Set Coverage）系统，通过构建 $R$ 个 IVF 索引副本，将迭代式贪心选择转化为一系列 ANN 检索，在覆盖率匹配精确贪心的同时实现超过 100 倍的加速。
 
-## 核心创新
+## 核心方法与创新机理
 
 DISCO 的核心创新在于将检索目标从独立项评分转变为集体覆盖最大化，并通过一系列技术手段将这一理论上复杂的目标转化为可高效索引的近似最近邻（ANN）检索问题，从而在亚线性时间内实现高覆盖子集的检索。
 
@@ -86,8 +86,6 @@ DISCO 的核心创新在于将检索目标从独立项评分转变为集体覆�
 
 **理论保证**：Algorithm 2 享有理论上的最优性保证，其期望覆盖率至少为最优覆盖率的 $(1 - 1/e - \delta)$ 倍（Theorem 4, Eq. (9)）。
 
-## 整体框架
-
 DISCO（Dense Index for Set Coverage）是一个面向集体查询覆盖的稠密子集检索系统，其核心动机在于解决传统稠密检索（如 ColBERT）独立评分每个语料项、忽略多跳问答等场景中多个语料项必须协作覆盖查询需求的根本瓶颈。独立 top-K 检索会引入冗余，无法保证对查询的集体覆盖。
 
 **核心因果机制**：DISCO 将检索目标从独立项的最大化 MaxSim 分数转变为最大化一个单调子模的覆盖目标函数 $F(S,Q) = \sum_{\mathbf{q} \in Q} \max_{\mathbf{x} \in \cup_{c \in S} X_c} \mathbf{q}^\top \mathbf{x}$（Eq. (2)），该函数衡量子集 $S$ 对查询原子向量的集体覆盖程度。通过将边际增益表示为提升向量空间中点积的 hinge 函数之和（Eq. (3)），并利用随机投影（Eq. (6)）将 hinge 函数近似为可索引的点积形式，从而将子模覆盖的贪心选择过程转化为一系列近似最近邻（ANN）检索问题，实现亚线性时间的高覆盖子集检索。
@@ -112,8 +110,6 @@ DISCO（Dense Index for Set Coverage）是一个面向集体查询覆盖的稠�
 - **查询处理模块**：接收查询 $Q$，通过迭代式 ANN 检索逐步构建覆盖子集 $S$，每轮依赖索引模块和当前覆盖状态。
 
 **关键设计决策**：DISCO 将检索目标从独立项的最大化转变为集体覆盖最大化，通过提升向量表示编码覆盖状态，利用随机投影将边际增益近似为可索引的点积形式，并通过多副本索引和早期池化实现高效检索。这种设计使得 DISCO 能够在亚线性时间内检索到高覆盖子集，在覆盖率和查询延迟之间取得最佳权衡（Figure 2），匹配贪心基线的覆盖率同时速度提升超过 100 倍。
-
-## 核心模块与公式推导
 
 本节聚焦 DISCO 方法的核心技术模块，包括问题形式化、边际增益的近似表示、以及基于近似最近邻检索（ANN）的高效贪心选择算法。
 
@@ -185,7 +181,7 @@ $$
 
 该流程将贪心算法的复杂度从 $\Theta(K|C|)$ 降低到 $\Theta(K \cdot (R \cdot n' + |\text{candidates}|))$，其中 $n'$ 是每 token 探测的质心数，$|\text{candidates}|$ 是 ANN 返回的候选集大小，通常远小于 $|C|$。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主要结果：覆盖率与效率的权衡
 
@@ -222,16 +218,13 @@ DISCO 的核心近似在于使用 R 个随机超平面将 hinge 函数形式的�
 ![[assets/figures/papers/iclr26_0002_cUdODCFjUM_A_Dense_Subset_Index_for_Collective_Query_Covera/figures/011_Table_2.jpg]]
 *Table 2: In the table below, the aggregate contractual principal amount of loans on nonaccrual status and/or more than 90 days past due (which excludes loans carried at zero fair value and considered uncollectible) exceeds the related fair value primarily because the firm regularly purchases loans, such as distressed loans, at values significantly below the contractual principal amounts*
 
-![[assets/figures/papers/iclr26_0002_cUdODCFjUM_A_Dense_Subset_Index_for_Collective_Query_Covera/figures/012_Figure_8.jpg]]
-*Figure 8: Example of table QA taken from Kumar et al. (2025). Note that the question has poor match or coverage by any single table element, but there is a small collection S of table elements that collectively cover large (colored) spans of the question. Current practice linearizes such tables into text for LLMs, polluting the match scores with much extraneous noise from irrelevant parts of the table*
-
 ![[assets/figures/papers/iclr26_0002_cUdODCFjUM_A_Dense_Subset_Index_for_Collective_Query_Covera/figures/014_Table_4.jpg]]
 *Table 4: BEIR. BEIR comprises heterogeneous retrieval tasks spanning multiple domains. We use the following large-corpus subsets*
 
 ![[assets/figures/papers/iclr26_0002_cUdODCFjUM_A_Dense_Subset_Index_for_Collective_Query_Covera/figures/015_Table_11.jpg]]
 *Table 11: LoTTE. LoTTE targets out-of-domain generalization with six topic-stratified corpora constructed from Stack Exchange communities. Each corpus provides two query sets (search and forum); we use the forum queries derived from question titles. Table 11: LoTTE dataset. The fraction column is the proportion of queries with | $S _ { \mathrm { g o l d } }$ ( Q ) | > 1*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 DISCO 的提出直接针对传统稠密检索（如 ColBERTv2、PLAID）在**多跳问答与证据协作场景下的结构性缺陷**。传统方法（如 MaxSim 分数）独立地对每个语料项评分，忽略了多个语料项必须协作才能覆盖查询的需求，导致独立 top-K 检索引入冗余，无法保证集体覆盖。DISCO 将检索目标从独立项的最大化 MaxSim 分数（`max_{S:|S|=K} Σ_{c∈S} MaxSim(Q, X_c)`）转变为最大化一个单调子模的覆盖目标函数 `F(S,Q) = Σ_{q∈Q} max_{x∈∪_{c∈S} X_c} q^T x`（Eq. 2），该函数衡量子集 S 对查询原子向量的集体覆盖程度。
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: TMLR
 year: 2025
 pdf_ref: paperPDFs/TMLR_2025/MoReact_Generating_Reactive_Motion_from_Textual_Descriptions.pdf
+project_link: https://xiyan-xu.github.io/MoReactWebPage/
+code_link: https://github.com/tr3e/InterGen
 aliases:
 - MGRMFTD
 tags:
@@ -39,7 +41,7 @@ claims:
 > - InterHuman 上，FID ↓ 2.412 ±0.050 vs InterGen 7.207 ±0.114 (-4.795)；Diversity → 7.775 ±0.046 (最接近 Real 7.799) vs InterGen 7.692 ±0.038 (+0.083)。
 > - CHI3D 上，Accuracy ↑ 0.687 ±0.014 vs InterGen 0.531 ±0.017 (+0.156)；FID ↓ 10.801 ±0.313 vs MDM 13.850 ±0.375 (-3.049)。
 
-## 概述
+## 概要
 
 文本驱动的反应式运动生成（text-driven reaction generation）旨在根据演员的动作与自然语言描述，合成另一交互者（反应者）的合理全身运动。现有方法面临的核心瓶颈在于**无法有效解耦全局轨迹与局部运动**，且对文本语义信息的利用不充分，导致生成结果中出现交互错位、语义不一致等问题（Figure 1）。
 
@@ -49,7 +51,7 @@ MoReact 的核心洞察是：**全局轨迹是局部运动与交互真实性的�
 
 在 InterHuman 和 CHI3D 两个基准数据集上，MoReact 在 FID、R-precision 和 Diversity 等关键指标上均显著优于 **InterGen**（Liang et al., 2024）与 **MDM**（Tevet et al., 2023）等基线方法。消融实验进一步证实，运动学损失、交互损失、阈值策略以及两阶段框架本身对生成质量的提升均至关重要（Table 2）。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -70,7 +72,9 @@ MoReact 的动机源于一个关键观察：**全局轨迹对反应运动的交�
 
 基于上述观察，MoReact 提出将反应生成**解耦为两阶段顺序生成**：首先生成反应者的全局轨迹，再基于该轨迹合成全身局部运动。这一设计从根本上改变了生成管线：全局轨迹不再是局部运动的附属产物，而是作为局部运动的**先验基础**被优先确定。同时，MoReact 引入**加权交互图损失**，在扩散去噪过程中动态突出近距离关节对的相对运动，从而强化文本描述中关键交互（如握手、击掌）的物理一致性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MoReact 的核心创新在于将反应运动生成解耦为**全局轨迹→局部运动**的两阶段顺序扩散框架，并辅以**加权交互图损失**与**修复式轨迹融入机制**，从而系统性地解决了现有方法中交互错位与语义不一致的瓶颈。
 
@@ -122,7 +126,7 @@ $$L_{\mathrm{full}} = \lambda_{\mathrm{R}} L_{\mathrm{R}} + I(t \leq \bar{t}) (\
 
 这些创新共同构成了 MoReact 的技术骨架：**两阶段解耦**确立生成顺序的因果正确性，**加权交互损失**精细建模接触区域的相对运动，**修复机制**保证轨迹一致性，**损失门控**优化训练信号质量。三者协同作用，使 MoReact 在 InterHuman 和 CHI3D 数据集上均取得最优的 FID（2.412 与 10.801）与 Accuracy（0.687），同时生成多样性最接近真实分布（Table 1）。
 
-## 整体框架
+
 
 MoReact 将文本驱动的反应运动生成解耦为**两阶段顺序扩散管线**，其核心设计动机源于一个关键观察：对反应者全局轨迹施加噪声，比在局部运动上施加同等强度噪声对交互真实性的破坏更严重（Figure 1(b)），且全局轨迹的下降直接暗示反应者应当跌倒而非站立（Figure 1(c)）。据此，MoReact 确立了“先全局轨迹、后局部运动”的生成策略。
 
@@ -161,7 +165,7 @@ $$\hat{\mathbf{x}}_0 = (1 - M) \odot \tilde{\mathbf{x}}_0 + M \odot \mathbf{g}$$
 - **阶段二输入**：演员运动 + 文本 + 阶段一轨迹。  
 - **最终输出**：反应者全身运动序列，其中全局轨迹被显式约束，局部运动由扩散模型合成。
 
-## 核心模块与公式推导
+
 
 ### 问题定义与运动表示
 
@@ -238,7 +242,9 @@ $$\hat{\mathbf{x}}_0 = (1 - M) \odot \tilde{\mathbf{x}}_0 + M \odot \mathbf{g}$$
 
 该操作在扩散去噪的每一步执行，将已知的轨迹信息“注入”到估计的干净运动中，使生成过程始终受到轨迹的引导（Sec. 3.4, Eq. 8）。这一机制是两阶段框架能够解耦全局与局部运动生成的关键技术环节。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与动机验证
 
@@ -337,7 +343,9 @@ Figure 4 展示了 MoReact 对反应者全局轨迹的控制能力。通过修�
 ![[assets/figures/papers/paper_list_l1929_MoReact_Generating_Reactive_Motion_from_Textual_Descriptions/figures/013_Table.jpg]]
 *Table: E.2: Quantitative comparison of different interaction loss designs. Our weighted interaction loss consistently outperforms InterGen (Liang et al., 2024) and ReMoS (Ghosh et al., 2024) losses on R-precision, FID, and MM Dist, demonstrating its superior effectiveness in generating realistic reactions*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有方法的谱系关系
 
@@ -403,6 +411,8 @@ MoReact 的方法贡献可归纳为三个“调控旋钮”（causal knobs），
 5. **稀疏文本条件**：在更稀疏的文本描述（如仅给出“做出反应”而非完整动作描述）条件下，模型是否仍能生成合理反应？这涉及反应生成的内在不确定性与多模态建模能力。
 
 6. **轨迹扩散模型的预测目标选择**：Table E.1 表明预测噪声（$\epsilon$）优于直接预测干净数据（$x_0$），这一现象是否在更广泛的运动生成任务中普遍成立？其理论根源值得深挖。
+
+
 
 ## 原文 PDF
 

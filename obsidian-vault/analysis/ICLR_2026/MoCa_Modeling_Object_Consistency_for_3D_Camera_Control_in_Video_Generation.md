@@ -43,7 +43,7 @@ claims:
 > - RealEstate10K 上，FID↓ 207.4 vs 225.2 (AC3D) (-17.8)；CLIPSIM↑ 0.312 vs 0.309 (AC3D) (+0.003)；OC↑ 94.9% vs 95.1% (AC3D) (-0.2%)。
 > - VidGen 上，FVD↓ 1643.7 vs 1712.0 (AC3D) (-68.3)；CLIPSIM↑ 0.349 vs 0.345 (AC3D) (+0.004)；OC↑ 94.7% vs 93.5% (AC3D) (+1.2%)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有相机可控视频生成方法（如 **MotionCtrl** (Wang et al., 2024b)、**CameraCtrl** (He et al., 2024)、**AC3D** (Bahmani et al., 2024a)）主要在2D像素空间直接集成相机条件，缺乏对底层3D场景的隐式理解。这导致生成视频中对象的视图、外观和运动难以保持一致——尤其在复杂动态场景下，纹理崩塌和对象失真问题突出。
 
@@ -54,8 +54,6 @@ claims:
 **主要结果**：在 RealEstate10K 静态场景数据集上，MoCa 的 FID 达到 **207.4**（AC3D 为 225.2），FVD 为 **667.9**，均优于对比方法。在动态场景数据集 VidGen 上，MoCa 的 CLIPSIM（**0.349**）和对象一致性 OC（**94.7%**）均超过 AC3D（0.345, 93.5%），同时运动平滑度 MS（98.3%）保持稳定。消融实验证实，语义引导策略的移除会导致严重对象失真，高频对象掩码是实现运动解耦的关键组件。
 
 **局限性**：MoCa 目前仅支持文本到视频的相机控制，未扩展至图像、视频编辑等多模态输入；此外，方法无法精确控制运动对象在生成帧中的具体位置。
-
-## 背景与动机
 
 ### 视频生成中的相机控制需求
 
@@ -93,7 +91,7 @@ MoCa 的核心动机源自一个关键洞察：**3D 场景中平滑的相机运�
 
 这种“以 2D 约束反推 3D 感知”的策略，使得 MoCa 无需显式的 3D 重建模块，即可在生成过程中隐式学习相机与场景之间的 3D 关系，从而在保持计算效率的同时显著提升对象一致性表现。
 
-## 核心创新
+## 核心方法与创新机理
 
 MoCa 的核心创新在于将 3D 相机控制的视频生成问题重新定义为**对象一致性建模问题**，通过显式约束对象在视图、外观和运动三个维度上的一致性，隐式地学习相机与场景之间的 3D 关系，从而桥接 2D 像素空间与 3D 世界的鸿沟。与现有方法在 2D 像素空间直接集成相机条件不同，MoCa 通过以下四个关键设计（changed slots）实现了突破：
 
@@ -122,8 +120,6 @@ $$\mathrm{DWT}( \mathbf{X} ) \to \{ \mathbf{LL}, \mathbf{LH}, \mathbf{HL}, \math
 通过丢弃低频分量 $\mathbf{LL}$ 并经由逆小波变换重建高频增强表示 $\mathbf{X}_{\mathrm{high}} = \mathrm{iDWT}( 0, \mathbf{LH}, \mathbf{HL}, \mathbf{HH} )$，得到对象感知掩码，该掩码能够精确捕获前景对象的结构与位置（Figure 7）。随后通过混合条件融合策略，将相机运动信号与对象运动信号解耦注入。在相机运动与文本指定的对象运动方向冲突的场景中（如鸟从右向左飞而镜头向右平移），MoCa 成功解耦两种运动，不扭曲对象运动方向（Figure 5）。消融实验中移除高频建模后，对象一致性和背景一致性均明显下降（Table 2, W/O HIGH-FREQUENCY MODELING），证实该机制是运动一致性的关键使能器。
 
 **因果机制总结**：上述四个 changed slots 并非孤立改进，而是围绕“对象一致性建模”这一核心洞察形成因果链条——Plücker 嵌入和交叉注意力融合提供了精确的几何基础（视图一致性），语义引导策略在此基础上稳定了对象的纹理与结构（外观一致性），而高频运动解耦则确保对象运动不被相机运动污染（运动一致性）。三者协同作用，使得 MoCa 无需显式 3D 重建即可在 2D 生成过程中注入 3D 空间感知。
-
-## 整体框架
 
 MoCa 是一个双分支融合框架，核心目标是通过显式建模对象一致性来桥接 2D 像素空间与 3D 场景之间的鸿沟。其设计动机源于一个关键观察：现有相机可控视频生成方法在 2D 像素空间直接集成相机条件，缺乏对底层 3D 场景的隐式理解，导致生成视频中对象的视图、外观和运动出现不一致，尤其在复杂动态场景下表现为纹理崩塌和对象失真。MoCa 的核心洞察在于：3D 场景中平滑的相机运动映射到 2D 视频时，必然产生一致的对象视图、外观和运动；反过来，通过约束这三种 2D 投影中的一致性，可以反向注入 3D 空间感知，从而绕开显式 3D 重建的需求。
 
@@ -155,11 +151,6 @@ MoCa 的整体架构由两个并行分支构成：**ReferenceNet** 和 **Denoisi
 **需要人工验证**：论文未明确披露 ReferenceNet 与 DenoisingNet 之间特征交互的具体层级和维度细节，上述数据流描述基于 Figure 2 的架构概览推断，建议对照原文方法部分确认。
 
 ### 补充图表
-
-![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_DZcpnudp7f/figures/001_Figure_1.jpg]]
-*Figure 1: This figure outlines the core requirements for high-quality camera-controllable video generation: consistent object view, appearance, and motion. The foreground object should remain visible and retain its structure during camera movement, with stable texture and natural motion. Existing methods often fail to satisfy all three aspects simultaneously, whereas our approach demonstrates strong performance across all criteria*
-
-## 核心模块与公式推导
 
 MoCa 围绕对象一致性建模这一核心洞察，构建了三个关键模块：**相机条件模块**（视图一致性）、**语义引导策略**（外观一致性）和**对象感知运动解耦**（运动一致性）。这三个模块通过一个双分支框架（ReferenceNet + DenoisingNet）协同工作，将 3D 场景中平滑相机运动所隐含的空间关系，通过 2D 投影中的一致性约束反向注入生成过程。
 
@@ -202,7 +193,7 @@ $$\mathbf{X}_{\mathrm{high}} = \mathrm{iDWT}(0, \mathbf{LH}, \mathbf{HL}, \mathb
 ![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_DZcpnudp7f/figures/009_Figure_7.jpg]]
 *Figure 7: This figure presents a visualization of applying high-frequency decomposition to visual features in a latent space. Our strategy yields an object-aware mask that effectively captures the structure and localization of the foreground object. As shown in the right case, our high-frequency decomposition can accurately extract the structure of all objects, even in scenes containing multiple objects of different classes*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 1. 实验设置
 
@@ -258,13 +249,10 @@ MoCa 通过 Plücker 嵌入建立几何可解释的相机-像素对应，通过�
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_DZcpnudp7f/figures/011_Figure.jpg]]
-*Figure: A lion pride resting under the shade of an acacia tree, the cubs playfully wrestling. A serene underwater scene featuring a sea turtle swimming through a coral reef. The turtle is with its greenish-brown shell*
-
 ![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_DZcpnudp7f/figures/012_Figure_10.jpg]]
 *Figure 10: More qualitative comparison between our method and existing approaches*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 问题定位与核心瓶颈
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: NeurIPS
 year: 2020
 pdf_ref: paperPDFs/NEURIPS_2020/Learning_Deformable_Tetrahedral_Meshes_for_3D_Reconstruction.pdf
+project_link: https://nv-tlabs.github.io/DefTet/
+code_link: null
 aliases:
 - DTMD
 - LDTM3R
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 学习可变形四面体网格用于三维重建 |
 | 英文题名 | Learning Deformable Tetrahedral Meshes for 3D Reconstruction |
 | 会议/期刊 | NeurIPS 2020 |
-| Links | [paper](https://research.nvidia.com/labs/toronto-ai/DefTet/files/main.pdf); [Project](https://nv-tlabs.github.io/DefTet/) |
+| Links | [paper](https://research.nvidia.com/labs/toronto-ai/DefTet/files/main.pdf) · [Project](https://nv-tlabs.github.io/DefTet/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Deformable Tetrahedral Meshes (DEFTET) |
 | Dataset | ShapeNet 点云重建（13类）, ShapeNet 点云重建（推理时间）, 单图像三维重建（2D监督，ShapeNet 13类）, 单图像三维重建推理时间 |
@@ -41,7 +43,7 @@ claims:
 > - ShapeNet 点云重建（推理时间） 上，Inference time (ms) ↓ 为 61.39，对比 OccNet 728.36，变化 -667.0。
 > - 单图像三维重建（2D监督，ShapeNet 13类） 上，Chamfer distance (×10⁻³) ↓ 为 3.6 (DEFTET), 3.1 (DEFTET+MTet)，对比 DIB-R 3.0, DVR 3.0，变化 比DIB-R差+0.6，比DVR差+0.6；DEFTET+MTet接近。
 
-## 概述
+## 概要
 
 三维重建的核心瓶颈在于现有几何表示无法同时满足**高分辨率细节、任意拓扑适应性与内存/推理效率**的三角权衡。体素网格内存随分辨率立方增长；隐函数表示（如**Occupancy Networks**，Mescheder et al., CVPR 2019）虽能处理任意拓扑，但需昂贵的后处理（如Marching Cubes）提取网格，推理耗时高；传统网格变形方法（如**Pixel2Mesh**，Wang et al., ECCV 2018）拓扑固定，难以重建复杂结构。
 
@@ -53,7 +55,7 @@ claims:
 
 **主要局限**：当前方法依赖启发式正则化（AMIPS、体积损失）防止四面体翻转，无法严格保证非退化；网格分辨率在初始化时固定，缺乏自适应细分能力；在2D监督下，颜色重建PSNR仍低于NeRF（Figure 8）。这些方向构成了后续工作的开放问题。
 
-## 背景与动机
+
 
 三维重建是计算机视觉与图形学中的核心问题，其目标是从稀疏或不完整的观测（如点云、单张图像）中恢复完整的三维几何。这一任务的关键瓶颈在于**几何表示的选择**：表示方法决定了重建精度、推理速度、内存开销以及后续应用的便利性。
 
@@ -81,7 +83,9 @@ claims:
 
 这一设计直接回应了现有方法的三难困境，为三维重建提供了一种新的表示范式。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DEFTET 的核心创新在于**将三维重建重新表述为一个联合优化四面体占用与顶点形变的问题**，从而在单一可微框架内同时解决几何表示的精度、拓扑灵活性和推理效率这三个此前难以兼得的矛盾。
 
@@ -121,7 +125,7 @@ DEFTET 的另一个重要创新是设计了**针对可变形四面体的可微�
 
 尽管创新显著，DEFTET 仍存在若干边界条件：网格分辨率在初始化时固定，缺乏自适应细分能力；四面体非退化依赖启发式正则化（$L_{\mathrm{vol}}$ 和 $L_{\mathrm{amips}}$），无法严格保证；在 2D 监督下颜色重建的 PSNR 仍低于 NeRF，限制了视角合成质量（Figure 8）。这些局限指向了未来工作方向，包括层次化四面体结构和更严格的几何约束设计。
 
-## 整体框架
+
 
 DEFTET 的整体流程围绕一个核心思想展开：**将三维重建问题转化为对固定拓扑四面体网格的联合占用预测与顶点形变**。其 pipeline 由五个关键模块串联而成，输入可以是点云或单张图像，输出为可直接使用的水密四面体网格，无需任何后处理步骤。
 
@@ -146,7 +150,7 @@ pipeline 的起点是一个单位立方体，通过 QuarTet（Doran et al., SIGG
 
 **输入输出流总结**：输入（点云/图像）→ 特征编码 → 联合预测（顶点偏移 + 四面体占用）→ 表面提取 → 水密网格输出。整个流程端到端可微，推理时间仅约 61 ms（点云重建，Table 1），比 OccNet 快 14 倍。
 
-## 核心模块与公式推导
+
 
 ### 流水线总览
 
@@ -210,7 +214,9 @@ $$M_j = \sum_{k=1}^{L} m_k; \quad R_j = \sum_{k=1}^{L} m_k C_j^k$$
 
 消融实验表明，**体积损失 $L_{\mathrm{vol}}$** 和 **AMIPS 损失 $L_{\mathrm{amips}}$** 对防止四面体翻转和退化至关重要（置信度 0.85）。移除顶点形变（即 FIXEDTET 变体）会导致点云重建 IoU 从 76.35 骤降至 68.98（Table 1），证明形变模块是精度增益的主要来源。在 DEFTET 预测后施加 Marching Tet（MTet）提取更精确的等值面，可将单图像重建的 Chamfer 距离从 $3.6 \times 10^{-3}$ 进一步降至 $3.1 \times 10^{-3}$（Table 2）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 DEFTET在点云重建、单图像2D监督重建和四面体网格化三个任务上进行了验证，核心指标和消融结果指向一个共同的因果机制：**联合优化四面体占用与顶点形变**是同时获得高精度、快推理和直接水密网格输出的关键。
 
@@ -264,7 +270,9 @@ DEFTET不仅用于重建，还可作为四面体网格化工具。在AMIPS畸变
 - **Table 3 & Figure 6**：DEFTET作为四面体网格化工具，在畸变和距离指标上优于传统方法，运行时间大幅领先。
 - **Figure 8**：视角合成PSNR低于NeRF，揭示颜色预测能力的不足。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题域与瓶颈定位
 
@@ -327,6 +335,8 @@ DEFTET 在速度-精度权衡上建立了新的帕累托前沿：
 ### 知识库定位总结
 
 DEFTET 处于**可微几何表示**和**学习式三维重建**的交叉点，其核心贡献在于将四面体网格从传统几何处理的离线工具（TetGen/TetWild）转变为可端到端学习的表示。方法谱系上，它继承了体素方法的显式空间划分、隐式方法的占用预测思想、以及网格变形方法的顶点优化，但通过**固定拓扑+动态占用+自由形变**的组合突破了各流派的固有局限。后续工作若需水密四面体输出或追求推理速度，DEFTET 可作为强基线；若追求极致视角合成质量，仍需参考 NeRF 系方法。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2024
 pdf_ref: paperPDFs/CVPR_2024/WHAM_Reconstructing_World_grounded_Humans_with_Accurate_3D_Motion.pdf
+project_link: null
+code_link: null
 aliases:
 - WWGHAM
 - WHAM
@@ -40,7 +42,7 @@ claims:
 > - 3DPW 上，PA-MPJPE (mm) 35.9 (WHAM ViT) vs 44.4 (HMR2.0) (-8.5)；Accel (m/s^2) 6.6 (WHAM ViT) vs 18.1 (HMR2.0) (-11.5)。
 > - EMDB 2 (Global) 上，W-MPJPE100 (mm) 354.8 (WHAM w/ DPVO) vs 2231.4 (DPVO+HMR2.0) (-1876.6)；Jitter (10m/s^3) 22.5 (WHAM w/ DPVO) vs 2987.6 (TRACE) (-2965.1)；Foot Sliding (mm) 4.4 (WHAM w/ DPVO) vs 370.7 (TRACE) (-366.3)。
 
-## 概述
+## 概要
 
 从单目视频中恢复准确、平滑且世界坐标系一致的3D人体运动，是计算机视觉领域的一项长期挑战。现有方法普遍面临一个核心瓶颈：在动态相机拍摄的野外视频中，难以同时实现全局坐标系下精确的人体轨迹估计与无足部滑动的自然运动重建。基于回归的方法（如**TRACE**）往往产生不合理的足部滑动，而基于优化的方法（如**SLAHMR**）虽能改善轨迹，但计算代价极高（<0.1 fps），且整体精度仍落后于单帧方法。
 
@@ -48,7 +50,7 @@ WHAM（World-grounded Humans with Accurate Motion）针对这一瓶颈，提出�
 
 在多个野外基准测试中，WHAM取得了全面的最优结果。在3DPW数据集上，WHAM（ViT）的PA-MPJPE达到35.9 mm，较单帧SOTA方法HMR2.0降低8.5 mm，加速度误差（Accel）更是从18.1 m/s²降至6.6 m/s²。在EMDB 2的全局轨迹估计中，WHAM的W-MPJPE100仅为354.8 mm，而DPVO+HMR2.0的组合高达2231.4 mm；足部滑动指标（FS）从TRACE的370.7 mm骤降至4.4 mm，抖动量（Jitter）亦从2987.6降至22.5。消融实验证实，特征集成、2D-to-3D预训练、相机角速度以及轨迹细化四个关键组件对最终性能均有显著贡献。此外，WHAM以约200 fps的核心推理速度运行，在精度与效率之间取得了突出平衡。
 
-## 背景与动机
+
 
 从单目视频中恢复准确、平滑且世界坐标系一致的3D人体运动是计算机视觉的核心挑战之一，在AR/VR、运动分析、人机交互等领域具有广泛应用。近年来，基于单帧图像的人体姿态与形状（HPS）估计方法取得了长足进步，代表性工作如 **HMR2.0** 和 **CLIFF** 等在标准基准上实现了令人印象深刻的每帧精度。然而，这些方法逐帧独立预测，缺乏时间一致性约束，导致输出运动存在明显抖动，加速度误差（Accel）普遍高达 18–31 m/s²。
 
@@ -60,7 +62,9 @@ WHAM（World-grounded Humans with Accurate Motion）针对这一瓶颈，提出�
 
 WHAM 正是针对上述缺口提出的解决方案。其核心动机在于：利用大规模运动捕捉数据（AMASS）生成的合成2D关键点序列预训练运动先验，再通过特征集成器融合图像上下文以提升精度，同时引入相机角速度辅助的轨迹解码与接触感知细化，从根本上解决足部滑动问题，实现在线、高效且准确的全局3D人体运动重建。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 WHAM 的核心创新在于**系统性地解决了动态相机下全局人体运动重建的两个根本矛盾**：运动上下文与视觉上下文的融合，以及全局轨迹精度与足部物理一致性的协调。相较于现有方法，WHAM 在以下四个关键维度上实现了突破。
 
@@ -99,7 +103,7 @@ $$
 
 与 **TCMR** 等使用双向 RNN 的方法不同，WHAM 采用**单向 RNN** 架构，使其能以 200 fps 的核心速度进行在线推理，显著快于基于优化的 **SLAHMR**（<0.1 fps）。这使 WHAM 成为首个同时满足高精度、全局一致性、物理合理性和实时性要求的 3D 人体运动重建方法。
 
-## 整体框架
+
 
 WHAM 采用在线推理架构，以视频帧序列为输入，端到端输出相机坐标系下的精确 3D 人体姿态与形状，以及世界坐标系下的全局轨迹。其核心设计遵循“运动上下文与视觉上下文融合”的理念，通过单向循环神经网络实现逐帧递归预测，避免了对未来帧的依赖，从而支持实时应用。
 
@@ -131,7 +135,7 @@ WHAM 采用两阶段训练方案（Figure 3）。第一阶段在 AMASS 运动捕
 ![[assets/figures/papers/paper_list_l18_WHAM_Reconstructing_World_grounded_Humans_with_Accurate_3D_Motion_motion20v2/figures/003_Figure_3.jpg]]
 *Figure 3: WHAM’s Two-Stage Training Scheme. During pretaining, we generate synthetic 2D keypoint sequences from AMASS [32] and train a motion encoder and decoder on the generated data (top). We then leverage video datasets with ground truth SMPL parameters, for which there is much less data. We use the fixedweight pre-trained image encoder and keypoints detector ( ) to extract image features and 2D keypoints. In this stage, we train the feature integration network while fine-tuning the motion encoder and motion/trajectory decoders, marked (bottom)*
 
-## 核心模块与公式推导
+
 
 WHAM 采用在线推理架构，通过单向循环神经网络（RNN）对视频帧进行逐帧处理，递归地预测 SMPL 参数、相机平移和全局运动参数。其核心设计围绕三个关键模块展开：运动上下文提取、运动-图像特征融合，以及接触感知的全局轨迹估计。
 
@@ -173,7 +177,9 @@ $$\tau^{(t)} = \sum_{i=0}^{t-1} \Gamma^{(i)} v^{(i)}$$
 
 接触感知细化显著减少了足部滑动现象：在 EMDB 2 基准上，移除该模块后足部滑动指标 FS 从 4.4 mm 上升至 6.5 mm（见 Table 4）。需要指出的是，当前接触估计仅考虑足部，无法处理手部支撑等身体其他部位的接触场景，这是 WHAM 的一个已知局限。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能验证
 
@@ -249,7 +255,9 @@ Figure 8 展示了 WHAM 在全局运动估计中的典型失败案例。分析�
 ![[assets/figures/papers/paper_list_l18_WHAM_Reconstructing_World_grounded_Humans_with_Accurate_3D_Motion_motion20v2/figures/012_Figure_7.jpg]]
 *Figure 7: Qualitative comparison between WHAM and after removal of contact-aware trajectory refinement (w/o traj. ref.)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位与因果瓶颈
 
@@ -303,6 +311,8 @@ WHAM 在以下条件下表现优越：
 2. 能否利用更丰富的场景信息（如稠密 3D 重建或单目深度估计）进一步提升全局一致性？
 3. 接触感知细化能否从足部扩展到全身接触点（手、膝盖、臀部），以支持更广泛的交互场景？
 4. 在完全没有相机角速度信息的情况下，WHAM 的轨迹估计能否通过纯视觉线索保持鲁棒？
+
+
 
 ## 原文 PDF
 

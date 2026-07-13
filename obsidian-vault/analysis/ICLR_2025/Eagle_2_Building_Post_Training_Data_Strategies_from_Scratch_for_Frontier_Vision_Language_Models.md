@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2025
 pdf_ref: paperPDFs/ICLR_2025/Eagle_2_Building_Post_Training_Data_Strategies_from_Scratch_for_Frontier_Vision_Language_Models.pdf
+project_link: null
+code_link: https://github.com/NVlabs/EAGLE?tab=readme-ov-file
 aliases:
 - E2TM
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | Eagle 2：从零开始构建前沿视觉语言模型的后训练数据策略 |
 | 英文题名 | Eagle 2: Building Post-Training Data Strategies from Scratch for Frontier Vision-Language Models |
 | 会议/期刊 | ICLR 2025 |
-| Links | [paper](https://arxiv.org/abs/2501.14818); [GitHub](https://github.com/NVlabs/EAGLE?tab=readme-ov-file) |
+| Links | [paper](https://arxiv.org/abs/2501.14818) · [GitHub](https://github.com/NVlabs/EAGLE?tab=readme-ov-file) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | Eagle 2 (数据策略+三阶段训练+Tiled MoVE架构) |
 | Dataset | 13-benchmark average (from Table 6), 14 diverse benchmarks, ChartQA, OCRBench, MathVista |
@@ -40,7 +42,7 @@ claims:
 > - 14 diverse benchmarks 上，Overall win 为 Eagle2-9B wins all 14 benchmarks，对比 InternVL2-8B，变化 outperforms on 14/14。
 > - 14 diverse benchmarks 上，Overall win 为 Eagle2-9B wins 9/14 benchmarks，对比 Qwen2-VL-7B，变化 leads on 9/14 and OpenCompass。
 
-## 概述
+## 概要
 
 当前开源视觉语言模型（VLM）社区在模型权重公开方面取得了显著进展，但一个核心瓶颈始终存在：**关键的后训练数据策略与实现细节仍不透明，且数据多样性与质量不足，导致开源模型性能普遍落后于闭源前沿模型**。Eagle 2 直面这一瓶颈，将数据策略作为后训练的核心杠杆，系统性地构建了一套从零开始的数据收集、精炼与训练流水线。
 
@@ -54,8 +56,6 @@ claims:
 - **最终性能定位**：Eagle2-9B 在 14 项多模态基准上全面超越 InternVL2-8B 和 MiniCPM-v2.6，在 9/14 基准上领先 Qwen2-VL-7B，并在 ChartQA、OCRBench、MathVista 上超越 GPT-4o，在 DocVQA、MMStar、AI2D 等基准上接近 GPT-4o（Table 7）。
 
 这一系列结果证明，通过系统化的数据策略结合三阶段训练配方，可以在有限资源下逼近甚至超越更大规模闭源模型的表现。
-
-## 背景与动机
 
 ### 视觉语言模型后训练的透明度困境
 
@@ -73,7 +73,7 @@ claims:
 
 Eagle 2 的方法论建立在一个简单而激进的原则之上——**“多样性优先，后求精炼”（Diversity first, then quality）**。这一原则贯穿数据策略的始终：首先通过大规模被动收集与主动搜索，从180余个来源汇聚覆盖10个类别的多样化数据；随后通过规则化过滤、聚类子集选择、数据增强等精炼手段逐步提升数据质量。这种“先广撒网，后精筛选”的策略，使得模型能够在有限的计算资源下，最大化地吸收视觉-语言知识的广度与精确度。
 
-## 核心创新
+## 核心方法与创新机理
 
 Eagle 2 的核心创新并非单一算法突破，而是一套以**数据策略为第一性杠杆**的系统化工程方案。其设计哲学围绕“多样性优先，后求精炼”展开，通过三个紧密耦合的维度，将后训练从传统的“模型微调”重新定义为“知识注入与精炼”的闭环过程。
 
@@ -102,8 +102,6 @@ Eagle 2 将传统的两阶段训练（MLP 对齐 + 全模型 SFT）重构为三�
 ### 4. 平衡感知数据打包：提升训练效率与稳定性
 
 针对朴素贪心背包算法（如 LLaMa-Factory 所用）导致的长短序列分离、训练不稳定问题，Eagle 2 设计了**平衡感知贪心背包算法**。该算法在打包时优先保证每个包内序列长度分布均匀，在加速训练 2-3 倍的同时，进一步提升了模型性能（如 ChartQA 从 84.7 提升至 **86.4**，OCRBench 从 855 提升至 **868**）。
-
-## 整体框架
 
 ![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2501_14818/figures/011_Figure.jpg]]
 *Figure: (a) Knapsacks of naive greedy knapsack method. (b) Knapsacks of balanced knapsack method*
@@ -149,8 +147,6 @@ Stage-1.5 与 Stage-2 之间形成**迭代反馈闭环**（Figure 8）：Stage-1
 ### 数据打包
 
 训练时采用**平衡感知贪心背包算法**，在传统贪心背包中引入长度均匀性约束，确保每个训练包内同时包含长序列和短序列，避免朴素贪心方法导致的包间长度分布不均问题，从而加速训练并提升性能。
-
-## 核心模块与公式推导
 
 ### 数据收集与相似度评分
 
@@ -200,7 +196,7 @@ $$S _ { k } = \frac { 1 } { N } \sum _ { i = 1 } ^ { N } \operatorname* { m a x 
 
 该设计在 12/14 项基准上带来正向收益，尤其在文档理解（DocVQA）、图表问答（ChartQA）和 OCR 任务上提升显著（Table 6）。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -294,15 +290,12 @@ Table 7 展示了 Eagle2-9B 在 14 项多模态基准上与当前主流开源及
 ![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2501_14818/figures/008_Figure_7.jpg]]
 *Figure 7: | Our three most commonly used data augmentation methods.These methods rely on rule-based approaches or utilize VLM models for automatic labeling. Table 3 | Two samples with same "Extract LATEX from image" task but with different format*
 
-![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2501_14818/figures/005_Table_2.jpg]]
-*Table 2: Eagle 2: Building Post-Training Data Strategies from Scratch for Frontier Vision-Language Models (b) Summary of the additional Stage 1.5 datasets Table 2 | Dataset used in Eagle 2. Dataset in Magenta is internal data*
-
 ![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2501_14818/figures/009_Table_4.jpg]]
 *Table 4: | We present our three-stage training settings, where Eagle2-9B/2B/1B builds upon Qwen2.5- 32B/7B/1.5B/0.5B [27], respectively. *: For small scale model with 0.5/1.5B LLM, we only use SigLIP as visual encoder and learning rate of 4 $\times$ 1 $0 ^ { - 5 }$ in Stage-1.5 & 2*
 
 ![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2501_14818/figures/013_Table.jpg]]
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 与现有训练范式的继承与突破
 

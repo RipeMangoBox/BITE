@@ -5,6 +5,7 @@ paper_level: A
 venue: NeurIPS
 year: 2021
 pdf_ref: paperPDFs/NEURIPS_2021/Deep_Marching_Tetrahedra_a_Hybrid_Representation_for_High_Resolution_3D_Shape_Synthesis.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/toronto-ai/DMTet/
 aliases:
 - DMTD
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 深度行进四面体：一种用于高分辨率3D形状合成的混合表示 |
 | 英文题名 | Deep Marching Tetrahedra: a Hybrid Representation for High-Resolution 3D Shape Synthesis |
 | 会议/期刊 | NeurIPS 2021 |
-| Links | [paper](https://arxiv.org/abs/2111.04276); [Project](https://nv-tlabs.github.io/DMTet/); [Project](https://research.nvidia.com/labs/toronto-ai/DMTet/) |
+| Links | [paper](https://arxiv.org/abs/2111.04276) · [Project](https://nv-tlabs.github.io/DMTet/) · [Project](https://research.nvidia.com/labs/toronto-ai/DMTet/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Deep Marching Tetrahedra (DMTET) |
 | Dataset | Animal Shape Dataset (Coarse Voxel to High-Res Mesh) |
@@ -42,7 +43,7 @@ claims:
 > - Animal Shape Dataset (Coarse Voxel to High-Res Mesh) 上，Normal Consistency (↑) 为 0.918，对比 0.901 (ConvOnet) / 0.876 (DECOR-Retv.)，变化 +0.017 / +0.042。
 > - Animal Shape Dataset (Coarse Voxel to High-Res Mesh) 上，Light Field Distance (LFD) (↓) 为 2823，对比 3220 (ConvOnet) / 3689 (DECOR-Retv.)，变化 -397 / -866。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有基于神经隐式场（如占用场或有符号距离函数）的三维形状生成方法在训练时无法直接在显式表面上施加监督，导致重建结果丢失几何细节并产生伪影；而直接生成显式网格的方法则受限于预设拓扑，难以处理复杂变化的拓扑结构。
 
@@ -56,7 +57,7 @@ claims:
 - 在点云重建任务（ShapeNet 风格）上，DMTET 的 Chamfer L1 达到 0.77，优于 ConvONet（0.95）、DefTet（0.97）、Mesh R-CNN（1.01）等，且推理速度约比 ConvONet 快 6.7 倍（Table 3）。
 - 消融实验证实，体积细分和表面细分是精细几何重建的关键模块，去除两者会使 Chamfer L1 从 0.77 退化至 0.81（Table 3）。
 
-## 背景与动机
+
 
 ### 3D 形状生成的核心瓶颈：隐式与显式表示的两难
 
@@ -84,7 +85,9 @@ Deep Marching Tetrahedra（DMTET）的核心动机正是弥合上述鸿沟。其
 
 这一混合表示架构使得损失函数可以首次直接定义在显式曲面之上——Chamfer 距离、法向一致性、对抗损失等均作用于最终三角网格——而梯度却能穿透 MT 层，反向传播至隐式 SDF 和顶点变形参数，实现几何与拓扑的联合优化。论文的实验表明，这种端到端可微设计在粗糙体素超分辨任务上，较 ConvOnet 在 Chamfer L2 距离上提升约 9.6%（0.75 vs 0.83），推理速度更是快约 6.7 倍（129ms vs 866ms），验证了混合表示在质量与效率上的双重优势。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DMTET 的核心创新在于构建了一条从**隐式场到显式网格的端到端可微通路**，使损失函数能够直接定义在最终输出的三角网格上，从而在保留隐式表示对任意拓扑建模能力的同时，获得显式表面监督带来的几何细节保真度。这一设计通过三个紧密耦合的“changed slots”实现，从根本上区别于既有方法。
 
@@ -122,7 +125,7 @@ DMTET 提出的**可微行进四面体（Marching Tetrahedra, MT）层**从根�
 
 DMTET 的三个 changed slots 形成了因果链条：顶点 SDF 表示提供了精确的隐式表面编码 → 可微 MT 层将隐式编码无损转换为显式网格并允许表面损失直接监督 → 可学习细分机制在训练过程中动态提升分辨率。这一设计使得 DMTET 在推理速度上比 ConvOnet 快约 6.7 倍（129ms vs 866ms），同时在所有几何指标上大幅领先，证明了混合表示在效率与质量之间的优越平衡。
 
-## 整体框架
+
 
 DMTET 的整体 pipeline 遵循“隐式编码—可微等值面提取—显式表面监督”的端到端范式，其核心设计在于将可变形四面体网格上的有符号距离函数（SDF）作为中间表示，通过可微的行进四面体层桥接隐式场与显式网格，从而在保留拓扑灵活性的同时实现对表面几何的直接损失监督。
 
@@ -168,7 +171,7 @@ $$L = \lambda_{\text{cd}} L_{\text{cd}} + \lambda_{\text{normal}} L_{\text{norma
 
 整体数据流可概括为：**输入点云 → PVCNN 特征体积 → MLP 初始 SDF → GCN 迭代细化（含网格变形与体积细分） → 可微 MT 层提取显式网格 → 可学习表面细分 → 判别器评估与多损失反向传播**。该流程实现了从粗糙输入到高分辨率三角网格的由粗到精（coarse-to-fine）合成，且在推理时无需进行等值面查询或后处理优化，推理速度较基于隐式场的方法（如 ConvOnet）快约 6.7 倍。
 
-## 核心模块与公式推导
+
 
 ### 3.1 可变形四面体网格与隐式SDF表示
 
@@ -236,7 +239,9 @@ $$L_{\mathrm{SDF}} = \sum_{v_i \in V_T} |s(v_i) - \text{SDF}(v_i, M_{gt})|^2$$
 
 $$L_{\mathrm{def}} = \sum_{v_i \in V_T} ||\Delta v_i||_2$$
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果：粗糙体素超分辨率
 
@@ -318,7 +323,9 @@ Figure 8 和 Figure 9 对比了 DMTET 与 Marching Cubes (MC) 和 Marching Tetra
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2111_04276/figures/003_Figure_3.jpg]]
 *Figure 3: Three unique surface configurations in MT. Vertex color indicates the sign of signed distance value. Notice that flipping the signs of all vertices will result in the same surface configuration. Position of the vertex is linearly interpolated along the edges with sign change*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法演进脉络
 
@@ -366,6 +373,8 @@ DMTET 的核心贡献在于通过**可微行进四面体层**将隐式场与显�
 4. **与新兴表示的融合。** 3D Gaussian Splatting 等新兴显式表示在渲染质量上表现出色，DMTET 的混合表示思想能否与之结合，在保持高分辨率几何的同时获得更优的渲染效果，是潜在的研究方向。
 
 5. **训练稳定性与损失平衡。** 总损失包含五个加权项（Chamfer、法向一致性、GAN、SDF 正则化、变形正则化），各系数对训练稳定性和最终质量的影响机制尚需系统消融研究。
+
+
 
 ## 原文 PDF
 

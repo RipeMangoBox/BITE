@@ -42,7 +42,7 @@ claims:
 > - CCGR MINI (in-domain) 上，Rank-1 / mAP / mINP 83.6 / 74.2 / 62.2 (GaitMax) vs 80.7 / 65.8 / 59.8 (BigGait) (+2.9 / +8.4 / +2.4)。
 > - CASIA-B (out-of-domain, trained on CCPG) 上，Rank-1 accuracy (%) per condition: NM / BG / CL / Mean 85.6 / 86.9 / 46.2 / 72.9 (GaitMax) vs 77.4 / 71.5 / 33.6 / 60.8 (BigGait) (+8.2 / +15.4 / +12.6 / +12.1)。
 
-## 概述
+## 概要
 
 步态识别在远距离身份认证中具有独特优势，但现有方法长期受困于两种范式的割裂：**语义范式**（如GaitSet、BigGait）对帧序列进行顺序不变的全局池化，虽能捕获结构上下文，却彻底丢弃了步态作为时序过程的运动学动态；**运动学范式**（如基于光流的方法）虽保留了时序信息，却易受噪声干扰且缺乏长程建模能力。两者均难以同时捕获全局上下文与细粒度时空动态，且容易过拟合到衣着、视角等扰动因素，导致跨域泛化能力不足。
 
@@ -50,7 +50,7 @@ claims:
 
 实验结果表明，GaitMax在多个基准上显著超越现有最佳方法。在域内评估中，CCPG上达到89.6%的平均Rank-1准确率，CCGR MINI上mAP提升+8.4%；在跨域泛化场景下优势更为突出——CASIA-B上CL条件相比BigGait提升**+12.6%**，SUSTech1K上提升**+11.3%**，验证了运动学建模与扰动解耦的共同作用对鲁棒性的关键贡献。消融实验进一步证实，GauPE相比标准RoPE带来+3.1%的平均提升，CDLoss在同时使用多个扰动属性时提升**+11.0%**。
 
-## 背景与动机
+
 
 步态识别旨在通过个体的行走模式进行身份辨识，因其远距离、非侵入的特性在安防监控等领域具有重要应用价值。然而，现实场景中衣着变化、携带物品、视角差异等扰动因素的存在，使得步态识别系统的鲁棒性面临严峻挑战。当前主流的步态识别方法可归纳为两大范式，二者均存在结构性缺陷。
 
@@ -62,7 +62,9 @@ claims:
 
 针对上述缺口，本文提出 **GaitMax**，其核心动机是通过**语义与运动学的双重性**统一两大范式：一方面保留语义分支的全局上下文捕获能力，另一方面引入人体中心化的运动学分支，持续跟踪身体部位的时空轨迹，实现长程精确运动理解。同时，为抑制扰动因素的干扰，GaitMax 利用自然语言描述显式解耦步态嵌入与外观变化，从而在跨域场景下实现鲁棒性的大幅提升。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GaitMax 的核心创新在于通过**双分支统一框架**同时捕获全局语义与细粒度运动学动态，并引入**条件去相关损失**实现步态嵌入与扰动因素的显式解耦。相对于现有方法，GaitMax 在以下四个关键维度上实现了范式性突破。
 
@@ -116,7 +118,7 @@ Figure 4 展示了 GCaption 的标注样例，涵盖主体相关（衣着、性�
 1. **融合策略简单**：语义与运动学分支采用直接拼接融合，消融实验（Table 5）显示在 CL 条件下运动学单分支反而高出融合方案 +2.2%，表明简单拼接并非最优，缺乏自适应融合机制；
 2. **GCaption 覆盖不足**：标注主要覆盖静态外观属性，未充分描述步速、过渡姿态等时序动态变化，可能限制 CDLoss 对动态干扰的抑制能力。
 
-## 整体框架
+
 
 GaitMax 的核心设计动机源于现有步态识别中两种范式的根本性对立：**语义范式**（如 GaitSet、BigGait）通过时序池化获得顺序不变的全局结构表示，但丢弃了运动学动态过程；**运动学范式**（如基于光流的方法）虽能捕获时序动态，却易受噪声干扰且缺乏长程建模能力。GaitMax 的关键洞察在于，这两种范式并非互斥，而是互补——语义总结提供全局上下文，运动学过程提供细粒度时空轨迹，二者的统一是突破鲁棒性瓶颈的因果路径。
 
@@ -165,7 +167,7 @@ GaitMax 的双分支设计并非简单的多流融合，而是对“运动表征
 ![[assets/figures/papers/paper_list_l1084_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_Unlocking_Motion/figures/001_Figure_1.jpg]]
 *Figure 1: Gait Representation Paradigms: From Semantic to Our Unified Approach. (a) Existing Dominant Methods (Semantic Paradigm): These methods encode frame-level motion cues into an order-invariant embedding, capturing global structural context but discarding sequential dynamics. (b) Our Unified Model (Semantic + Kinematic): We introduce a kinematic embedding that models part-wise temporal dependencies, forming a latent representation of fine-grained motion dynamics. Our model unifies this kinematic branch with a complementary semantic branch to capture both process and global-level motion information*
 
-## 核心模块与公式推导
+
 
 ### 3.1 总体学习目标
 
@@ -242,7 +244,9 @@ $$\mathcal{L}_{\mathrm{tot}} = \gamma_{\mathrm{id}} \mathcal{L}_{\mathrm{id}} + 
 
 CDLoss 的运作依赖于对扰动因素的文本描述。为此，作者构建了 **GCaption** 数据集，利用最优 VLM（Gemini-2-Flash-Lite）逐帧标注衣着、视角、携带物等属性。为保证序列级一致性，采用嵌入空间聚合机制：对同一序列的 8 帧独立标注后，计算文本嵌入的均值向量，选择嵌入最接近该均值的帧标注作为整段序列的标注。评估表明，VLM 生成标注与人工标注的平均嵌入相似度达 93.7%（Figure 5），验证了标注质量。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -307,7 +311,9 @@ GaitMax 采用冻结的 DINOv3 作为视觉骨干，在所有实验中保持一�
 ![[assets/figures/papers/paper_list_l1084_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_Unlocking_Motion/figures/010_Figure_5.jpg]]
 *Figure 5: Embedding Similarity of VLM-Generated and Human-Annotated Captions. Similarity scores between the text embeddings (via OpenCLIP [5]) of VLM-generated captions and human-annotated ground truth. Scores are shown for seven attributes (vertical axis) across 165 sequences (horizontal axis). Color encodes similarity to human ground truth embeddings. Each row is sorted independently to highlight variation across samples*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 步态识别的两种范式及其瓶颈
 
@@ -360,6 +366,8 @@ GaitMax 的核心定位是**统一这两种互补范式**：保留语义分支�
 4. **去相关范式的推广**：CDLoss 的显式统计去相关范式是否可推广到域泛化、公平性学习等其他需要解耦的表示学习场景？该范式的理论性质和收敛保证值得进一步研究。
 
 5. **VLM 标注的可靠性边界**：GCaption 依赖 VLM 的零样本标注能力，在极端光照、遮挡或非典型外观下的标注质量需要更系统的评估和校准机制。
+
+
 
 ## 原文 PDF
 

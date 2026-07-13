@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/IRG_MotionLLM_Interleaving_Motion_Generation_Assessment_and_Refinement_for_Text_to_Motion_Generation.pdf
+project_link: null
+code_link: https://github.com/HumanMLLM/IRG-MotionLLM
 aliases:
 - IM
 - IRG-MotionLLM
@@ -41,7 +43,7 @@ claims:
 > - HumanML3D 上，R-Precision Top-1 0.535 (Ours S3) vs 0.496 (MotionLLM) (+0.039)；FID 0.111 (Ours S2) vs 0.198 (MotionLLM) (-0.087)；MM-Dist 2.885 (Ours S2) vs 3.029 (MotionLLM) (-0.144)。
 > - KIT-ML 上，R-Precision Top-1 0.445 (Ours S3) vs 0.391 (MotionLLM §) (+0.054)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -70,7 +72,7 @@ IRG-MotionLLM 属于 **VQ-VAE + 运动感知大语言模型** 的技术路线：
 
 当前方法存在若干局限：VQVAE 离散化可能丢失细粒度运动细节；运动评估仅关注文本-运动对齐，未涵盖物理真实性；模型在高度复杂的多动作序列上可能遗漏个别子动作。未来工作可探索将物理真实性评估内化为 UniMoLM 的原生能力、在更大规模基础 LLM 和更丰富数据集上扩展 IRMoGen，以及引入额外保真度奖励缓解 RL 训练导致的 FID 恶化。
 
-## 背景与动机
+
 
 文本到运动生成（Text-to-Motion Generation）的目标是根据自然语言描述合成逼真的三维人体运动序列。该任务在电影制作、游戏开发、虚拟现实和机器人仿真等领域具有广泛的应用前景。近年来，基于向量量化（VQ）的运动感知大语言模型（Motion-aware LLMs，亦称 UniMoLM）逐渐成为该领域的主流范式——它们将连续运动序列离散化为运动标记（motion tokens），并扩展预训练大语言模型的词汇表，从而在统一的文本-运动空间中进行理解和生成。
 
@@ -80,7 +82,9 @@ IRG-MotionLLM 属于 **VQ-VAE + 运动感知大语言模型** 的技术路线：
 
 为实现这一目标，本文面临两个关键挑战：其一，如何为现有文本-运动数据集自动构造包含评估与细化标注的训练数据；其二，如何设计有效的训练策略，使模型逐步获得并强化交错推理能力。针对第一个挑战，本文设计了自动数据引擎，通过生成目标分析、构造不同对齐水平的负样本对以及评估/细化指令来获得 IRMoGen 标注。针对第二个挑战，本文提出了三阶段训练方案：IRMoGen 初始化（Stage‑1）、IRMoGen‑CoT 学习（Stage‑2）和基于 GRPO 的强化学习（Stage‑3），逐步赋予并增强模型的原生交错推理能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈与因果机制
 
@@ -127,7 +131,7 @@ IRG-MotionLLM 属于 **VQ-VAE + 运动感知大语言模型** 的技术路线：
 - 在更大规模基础 LLM 和更丰富的文本-运动数据集上扩展 IRMoGen 会带来怎样的表现？
 - RL 训练造成的 FID 恶化是否可以通过引入额外的保真度奖励来缓解？
 
-## 整体框架
+
 
 ### 核心设计动机
 
@@ -200,7 +204,7 @@ IRG-MotionLLM 的整体 pipeline 由三个核心模块串联构成，形成“�
 ![[assets/figures/papers/paper_list_l1834_IRG_MotionLLM_Interleaving_Motion_Generation_Assessment_and_Refinement_f/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of our proposed IRG-MotionLLM.Given a goal text and reasoning instruction as input, our IRG-MotionLLM is able to perform Text-Motion Interleaved Reasoning until a satisfactory motion is generated. The reasoning process includes multiple moves, i.e., an initial analysis on the goal, followed by multiple rounds of motion Generation, Assessment, and Refinement. The model can also adaptively make plans for the next move*
 
-## 核心模块与公式推导
+
 
 ### 3.1 运动标记化与统一词汇表
 
@@ -255,10 +259,10 @@ $$R ( o ) = \\sum _ { i = 1 } ^ { G } \\frac { \\pi _ { \\theta } ( o _ { i } | 
 ![[assets/figures/papers/paper_list_l1834_IRG_MotionLLM_Interleaving_Motion_Generation_Assessment_and_Refinement_f/figures/003_Figure_3.jpg]]
 *Figure 3: The IRMoGen-CoT Template*
 
-![[assets/figures/papers/paper_list_l1834_IRG_MotionLLM_Interleaving_Motion_Generation_Assessment_and_Refinement_f/figures/012_Figure_7.jpg]]
-*Figure 7: The inference pipeline for performing IRMoGen on our Stage-1 model. Our Stage-1 model can perform interleaved reasoning Stage-1: IRMoGen-Initialization Input Outputacross generation, assessment and refinement tasks by sequentially using prompts of different tasks together with the outputs from previous Basic Tasks Improving Taskssteps. To determine when to stop, extra scripts or manual interventions are needed to check the refinement instruction. D.M.G: Direct Goal AnalysisMotion Generation. M.R.I: Motion Refinement Instructing. I.M.R: Instruction-guided Motion Refinement*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -348,7 +352,9 @@ Table 10 在 AToM-general 基准上评估了 IRG-MotionLLM 作为文本-运动�
 ![[assets/figures/papers/paper_list_l1834_IRG_MotionLLM_Interleaving_Motion_Generation_Assessment_and_Refinement_f/figures/011_Figure_6.jpg]]
 *Figure 6: Visualization results.Native interleaved reasoning enables IRG-MotionLLM to: (1) recognize the misalignment between previously generated motion and the goal text and provide proper refinement instructions; (2) refine the motion based on previous reasoning. Such characteristics help our method more accurately follow the details of the goal text than existing methods. The human figures are colored from light to dark to indicate the progression of time. Zoom in for the best view*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法归类与谱系定位
 
@@ -418,6 +424,8 @@ IRG-MotionLLM 的三阶段训练方案是其区别于基线的方法论核心：
 5. **作为奖励模型的泛化应用**：IRG-MotionLLM 作为文本-运动对齐奖励模型的能力能否推广到其他运动生成器（如扩散模型）的 RLAIF 训练中？Table 10 的初步探索表明这一方向具有潜力，但需要更系统的验证。
 
 6. **推理鲁棒性**：在输入文本存在扰动或模糊表述时，IRMoGen 的交错推理链是否仍能保持稳定？Figure 12 和 Figure 15 的初步评估提示了该问题，但缺乏定量分析。
+
+
 
 ## 原文 PDF
 

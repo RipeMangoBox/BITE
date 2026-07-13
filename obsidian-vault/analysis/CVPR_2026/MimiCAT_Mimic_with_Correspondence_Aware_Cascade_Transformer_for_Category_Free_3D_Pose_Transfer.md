@@ -44,7 +44,7 @@ claims:
 > - Cross-Category Transfer (CCT) 上，PMD (×100) / ELS 4.264 / 0.927 vs 所有基线更高 PMD、更低 ELS（见 Table 2） (PMD 降低，ELS 提升)。
 > - User Study (Perceptual) 上，Pose Similarity (1-5) 4.076 vs TapMO 3.292, SFPT 3.364, CGT 2.310, NPT 1.884 (+0.712 over TapMO)。
 
-## 概述
+## 概要
 
 3D 姿态迁移旨在将源角色的姿态“复制”到目标角色上，使目标角色做出相同的动作。传统方法通常依赖手工标注的一对一关键点对应，这在角色属于同一类别（如人形对人形）时尚可工作，但一旦跨越类别——例如将人类的挥手动作迁移到鸟类或四足动物身上——骨架拓扑、肢体数量和比例的巨大差异会导致严重的区域错位与失真。**MimiCAT** 正是为解决这一“类别无关”（category‑free）的姿态迁移难题而提出。
 
@@ -57,7 +57,7 @@ claims:
 
 **主要结果**：在构建的大规模多类别数据集 PokeAnimDB 上，MimiCAT 在**人形‑人形（H2H）**和**跨类别迁移（CCT）**两种设定下均显著优于现有方法。CCT 设定下，MimiCAT 取得 PMD 4.264（×100）和 ELS 0.927，感知用户研究中的姿态相似度得分达到 4.076/5，几何质量得分达到 4.102/5，相比最强基线 TapMO 分别提升 0.712 和 0.497。消融实验进一步证实，文本引导的对应监督、Frobenius 旋转初始化以及姿态先验正则化都是不可或缺的关键设计。
 
-## 背景与动机
+
 
 3D 姿态迁移的目标是将源角色的姿态“复制”到目标角色上，同时保持目标角色自身的几何结构不变。这一任务在动画制作、游戏开发和虚拟现实等领域具有广泛的应用需求。然而，传统的姿态迁移方法通常假设源角色和目标角色属于同一类别（如均为标准人形骨架），依赖手工标注的一对一关键点对应关系来驱动变形。
 
@@ -81,7 +81,9 @@ claims:
 2. **从硬对应走向软对应**：跨类别迁移天然需要多对多的软对应——一个源关键点可能影响多个目标关键点。通过 Sinkhorn 算法生成双随机对应矩阵，可以更灵活地建模这种不确定性。
 3. **构建大规模多样化数据集**：现有公开数据集在角色类别和动画覆盖上十分有限。本文构建了 **PokeAnimDB**，包含 975 个角色、28,809 个姿态，覆盖人形、四足、鸟类、鱼类、昆虫等广泛类别（见 Table 1），为跨类别迁移研究提供了必要的数据基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MimiCAT 的核心创新在于将**文本驱动的语义对应**与**形状条件级联 Transformer** 深度结合，从根本上改变了跨类别 3D 姿态迁移中关键点对应关系的建立方式。相较于现有方法，MimiCAT 在三个关键环节实现了突破性改进。
 
@@ -124,7 +126,7 @@ MimiCAT 的级联架构不仅解决了对应关系问题，还通过两个互补
 
 综上，MimiCAT 通过**文本驱动的软对应 + Frobenius 旋转初始化 + 形状条件生成 + 姿态先验正则化**的四位一体设计，使 3D 姿态迁移首次突破了类别壁垒，在无需手工对应标注的前提下实现了跨人形、四足、鸟类等完全不同类别角色的高质量姿态迁移。
 
-## 整体框架
+
 
 MimiCAT 采用**级联 Transformer 架构**实现类别无关的 3D 姿态迁移，其核心思路是：先学习源角色与目标角色关键点之间的**多对多软对应关系**，再以此为桥梁将源姿态变换迁移到目标角色上。整个流水线由两个级联的 Transformer 模块和一个基于文本的对应监督机制组成，输入为一对“源姿态 + 目标角色”，输出为目标角色按源姿态变形后的网格。
 
@@ -162,7 +164,7 @@ MimiCAT 的训练采用**文本引导的对应真值**作为核心监督（Eq. 5
 ![[assets/figures/papers/paper_list_l1030_https_arxiv_org_abs_2511_18370/figures/001_Figure_1.jpg]]
 *Figure 1: MimiCAT for category-free 3D pose transfer. Given source character with desired poses (left), our model faithfully transfers the given pose to the target characters (right) across completely different categories, proportions and topologies, without requirement of manually labeled correspondence*
 
-## 核心模块与公式推导
+
 
 MimiCAT 的核心由两个级联的 Transformer 模块构成：**对应 Transformer (G)** 和 **姿态迁移 Transformer (H)**，辅以基于矩阵-Fisher 分布的**姿态先验 Transformer (F)** 进行正则化。整个流水线以线性混合蒙皮（LBS）为基础变形框架。
 
@@ -259,7 +261,9 @@ $$
 ![[assets/figures/papers/paper_list_l1030_https_arxiv_org_abs_2511_18370/figures/007_Figure_6.jpg]]
 *Figure 6: Correspondence visualization. We visualize correspondences from source characters (left) to category-free targets (right). Compared with the hierarchical correspondence algorithm [67, 75], our text-guided correspondence yields more coherent and semantically consistent part alignments across characters*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -318,7 +322,9 @@ Figure 9 展示了三个关键设计选择的消融定性结果：
 ![[assets/figures/papers/paper_list_l1030_https_arxiv_org_abs_2511_18370/figures/014_Figure.jpg]]
 *Figure: A3. Qualitative results of MimiCAT (part II). We present pose transfer results across a wide range of character categories, with each example rendered from three viewpoints. From left to right: the canonical character followed by its transferred results under five different poses. The 1st row shows the source character and the five input poses; the 2nd–6th rows show the corresponding transferred poses for each target character*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有姿态迁移方法的谱系关系
 
@@ -365,6 +371,8 @@ MimiCAT 的能力边界由以下因素共同定义：
 **时序建模与运动生成。** 将 MimiCAT 从单帧姿态迁移扩展到运动序列生成，需要引入显式的时序建模机制。论文展示了与文本到运动模型（如 MDM、MLD）的零样本集成（Figure 8），但帧间一致性仍依赖外部运动模型。设计内生的时序一致性约束（如速度场正则化或时序 Transformer）可进一步提升动画级输出的稳定性。
 
 **跨模态泛化。** 当前文本驱动的对应机制依赖 CLIP 的固定嵌入空间。随着多模态基础模型的快速演进，探索更强的视觉-语言对齐模型（如 SigLIP、多模态大语言模型）来替代 CLIP，可能进一步提升语义对应的准确性和跨类别泛化能力。
+
+
 
 ## 原文 PDF
 

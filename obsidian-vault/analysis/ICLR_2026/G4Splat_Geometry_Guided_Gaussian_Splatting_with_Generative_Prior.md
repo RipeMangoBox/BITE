@@ -42,7 +42,7 @@ claims:
 > - ScanNet++ (5 input views) 上，PSNR↑ 18.69 vs 13.58 (MAtCha) (+5.11)。
 > - DeepBlending (5 input views) 上，PSNR↑ 16.76 vs 14.74 (MAtCha) (+2.02)。
 
-## 概述
+## 概要
 
 **核心问题**：稀疏视图下的3D场景重建面临严重的形状-外观歧义。现有方法将3D高斯泼溅与生成先验结合时，普遍缺乏可靠的几何监督与有效的多视图一致性机制，导致观测区域与未观测区域的重建质量均不理想——漂浮高斯密集、几何结构破碎、渲染伪影显著。这一瓶颈在5视图等极度稀疏的设置下尤为突出。
 
@@ -52,7 +52,7 @@ claims:
 
 **方法定位**：G4Splat以**MAtCha**（Guédon et al., 2025）为骨架，继承其图表对齐初始化与稀疏视图训练目标，但在深度监督来源、可见性掩码估计、新视点选择策略、多视图修复一致性及结构损失计算五个关键环节进行了根本性改造，将平面几何约束系统性地注入生成重建管线，属于“几何引导的生成式3DGS”方法。
 
-## 背景与动机
+
 
 ### 稀疏视图三维重建的核心挑战
 
@@ -84,7 +84,9 @@ claims:
 - 将几何引导贯穿于可见性估计、新视图选择与扩散修复的全流程，显著减轻多视图不一致问题；
 - 在保持生成先验补全能力的同时，使重建结果在已观测和未观测区域均达到高质量几何与外观。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 G4Splat 的核心创新在于将**尺度精确的平面几何约束**系统性地注入生成式高斯基元重建管线，从而解决稀疏视图下观测区域与未观测区域均面临的形状-外观歧义问题。与现有方法（如 MAtCha）仅依赖 SfM 导出的噪声深度监督不同，G4Splat 从场景中普遍存在的平面结构出发，构建了一套完整的几何引导机制，贯穿深度估计、可见性判定、新视点选择与多视图修复等关键环节。
 
@@ -119,7 +121,7 @@ G4Splat 采用与 MAtCha 相同的总训练损失形式 $\mathcal{L}_{\mathrm{to
 
 上述改进并非孤立生效，而是形成正向反馈循环：平面感知深度图提供可靠的几何初始化 → 可见性网格准确识别缺失区域 → 平面感知新视点选择优化观测覆盖 → 几何引导修复生成一致内容 → 增强的结构损失约束训练过程。消融实验（Table 3）定量验证了这一协同效应：仅加入生成先验（GP）时 CD 为 10.60；补充平面感知几何建模（PM）后 CD 降至 6.61；再引入几何引导的生成管线（PP）后 PSNR 进一步提升至 23.90，证明各模块的叠加贡献。
 
-## 整体框架
+
 
 G4Splat 的整体流程围绕一个核心洞察展开：场景中普遍存在的平面结构可以从部分观测中可靠地推断完整平面的深度，结合全局平面融合可获得跨视图一致的尺度精确深度；将这种几何引导贯穿可见性估计、新视图选择与修复过程，可显著减轻多视图不一致，实现高质量的场景补全。
 
@@ -162,7 +164,7 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{rgb}} + \mathcal{L}_{\math
 ![[assets/figures/papers/paper_list_l83_https_openreview_net_forum_id_kdPmsMVhZf/figures/014_Table.jpg]]
 *Table: A2: Quantitative results of our method integrated with different diffusion models*
 
-## 核心模块与公式推导
+
 
 G4Splat 的核心架构建立在 **MAtCha** (Guédon et al., 2025) 的图表对齐初始化与稀疏视图训练目标之上，通过三个关键模块注入几何引导：**平面感知几何建模**、**几何引导的生成管线**、以及**迭代训练循环**。整体训练损失沿用 MAtCha 的形式：
 
@@ -246,7 +248,9 @@ G4Splat 采用两阶段迭代训练（见 Figure 2）：
 ![[assets/figures/papers/paper_list_l83_https_openreview_net_forum_id_kdPmsMVhZf/figures/013_Figure.jpg]]
 *Figure: Incon. Results View1 Con. Results View2 (Ours) Figure A3: Training results with inconsistent (Incon.) vs. consistent (Con.) multi-view inpainting. Training Gaussian representations with inconsistent inpainting leads to black shadows in non-consistent regions, while our method significantly reduces such artifacts, yielding sharper and cleaner renderings*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -315,7 +319,9 @@ Table 4 报告了各方法的运行时间对比。G4Splat 的完整管线在计�
 ![[assets/figures/papers/paper_list_l83_https_openreview_net_forum_id_kdPmsMVhZf/figures/012_Table.jpg]]
 *Table: A1: Quantitative results on varying numbers of input views in the Replica dataset. Our method consistently outperforms baselines regardless of the number of input views*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 技术脉络与继承关系
 
@@ -362,6 +368,8 @@ G4Splat 对 MAtCha 的五项改造构成了一个因果闭环，其逻辑链条�
 4. **实时部署的加速。** 如何进一步减小几何引导管线带来的计算开销，使方法能更快速地部署于实时应用？可能的优化方向包括：平面提取的轻量化、可见性网格的稀疏化、以及新视图选择的近似搜索策略。
 
 5. **生成先验与几何约束的更深层融合。** 当前框架中，生成先验（扩散模型）和几何约束（平面深度）是串行协作的。能否在扩散模型的去噪过程中直接注入几何条件，使生成结果天然满足多视图几何一致性，而非在生成后再进行几何引导的选择与过滤？
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/LSA_Layer_wise_Sparsity_Allocation_for_Large_Language_Model_Pruning_Based_on_Minimal_Linear_Reconstruction_Error.pdf
+project_link: null
+code_link: https://github.com/BeiYazi0/LSA
 openreview_forum_id: xq3lza5IjN
 aliases:
 - LWSAL
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | LSA：基于最小线性重构误差的大语言模型逐层稀疏度分配剪枝 |
 | 英文题名 | LSA: Layer-wise Sparsity Allocation for Large Language Model Pruning Based on Minimal Linear Reconstruction Error |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=xq3lza5IjN); [GitHub](https://github.com/BeiYazi0/LSA) |
+| Links | [paper](https://openreview.net/forum?id=xq3lza5IjN) · [GitHub](https://github.com/BeiYazi0/LSA) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Layer-wise Sparsity Allocation (LSA) |
 | Dataset | WikiText, 7 zero-shot tasks |
@@ -42,7 +44,7 @@ claims:
 > - WikiText 上，Perplexity 为 12.45，对比 20.36 (Uniform)，变化 -7.91。
 > - 7 zero-shot tasks 上，Mean Accuracy (%) 为 44.77，对比 42.75 (Uniform)，变化 +2.02。
 
-## 概述
+## 概要
 
 大语言模型（LLM）剪枝面临一个核心瓶颈：现有逐层稀疏度分配方法（如 **OWL**（Yin et al., 2024）和 **DLP**（Chen et al., 2025））依赖 Wanda 式权重评分及人工设计的缩减函数来估计层重要性。这不仅需要手动选择评分指标和缩减函数，而且无法在块级或投影级粒度下稳定分配非均匀稀疏度——一旦尝试更细粒度的分配，性能会显著退化。
 
@@ -50,7 +52,7 @@ claims:
 
 在 70% 整体稀疏度下，LSA 在语言建模困惑度上显著优于均匀稀疏度及 OWL、DLP 等方法（例如 LLaMA1-7B 上 SparseGPT 剪枝后困惑度从 27.18 降至 17.57，LLaMA1-13B 上从 20.36 降至 12.45），在七项零样本任务平均准确率上也取得一致提升。更重要的是，LSA 支持投影级和块级非均匀分配，在 LLaMA3-8B 等模型上实现了超越层级的性能，而 OWL 和 DLP 在相同粒度下则出现严重退化。
 
-## 背景与动机
+
 
 大语言模型（LLMs）在推理时面临巨大的计算和存储开销，剪枝是缓解这一问题的核心技术之一。非结构化剪枝通过移除单个权重来压缩模型，而逐层剪枝方法（layer-wise pruning）的核心挑战在于如何为不同层分配合适的稀疏度——即确定哪些层可以剪掉更多权重，哪些层需要保留更多参数。
 
@@ -68,7 +70,9 @@ $$D ^ { l } = \frac { \sum _ { i = 1 } ^ { c _ { o } } \sum _ { j = 1 } ^ { c _ 
 
 LSA方法通过计算每层在移除50%最不重要权重后的最小线性重构误差，天然支持层、块、投影三级非均匀分配，且对超参数不敏感，从而系统性地解决了上述瓶颈。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：现有逐层分配依赖间接代理与人工设计
 
@@ -124,7 +128,7 @@ LSA引入的唯一超参数是稀疏度范围控制参数 $\beta$，用于将重
 
 LSA的核心创新可概括为**用优化驱动的直接冗余度量替代启发式的间接代理评估**。这一转变使得稀疏度分配不再受限于人工设计的评分函数和缩减策略，同时天然解锁了更细粒度的分配能力，且对超参数具有显著的鲁棒性。实验证据（Table 4, Table 5）表明，在70%整体稀疏度下，LSA在语言建模困惑度和七项零样本任务准确率上均显著优于均匀稀疏度以及OWL、DLP等先进逐层分配方法。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l47_https_openreview_net_forum_id_xq3lza5IjN/figures/001_Figure_1.jpg]]
 *Figure 1: (a) illustrates the weight with minimal linear reconstruction error (LRE) for linear layers within FFN and attention blocks. (b) denotes the layer-wise LRE across all Transformer layers, computed by assuming removing 50% of the weights that contribute least to the reconstruction error in each layer. (c) represents the allocation of different sparsity rates based on the principle that layers with lower reconstruction error should exhibit lower sparsity*
@@ -174,7 +178,7 @@ $$I^{l} = 1 - \frac{\mathbf{E}^{l}}{\sum_{i} \mathbf{E}^{i}}$$
 
 这一框架的核心优势在于：线性重构误差作为冗余度的直接度量，避免了权重评分和缩减函数选择带来的不确定性，且对内部剪枝比率 $p$（≤70% 时）和 $\beta$ 超参数均表现出较强的鲁棒性。
 
-## 核心模块与公式推导
+
 
 LSA 的方法核心在于**用最小线性重构误差（Linear Reconstruction Error, LRE）直接量化各计算单元的冗余度**，从而绕过现有逐层分配方法对权重评分和人工缩减函数的依赖。整个流程由三个关键模块串联构成。
 
@@ -230,7 +234,9 @@ $$
 
 > **注意**：结构化剪枝场景下，线性重构误差等价于矩阵 $\mathbf{S}$ 中被剪枝通道索引子矩阵的元素之和（Eq 3），这是 Algorithm 1 贪心选择子矩阵的理论基础（Figure 2 展示了 25% 结构化稀疏度下的子矩阵选择过程）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心问题与实验设计逻辑
 
@@ -322,7 +328,9 @@ LSA 的剪枝度量计算时间与均匀基线相当甚至更低。在 LLaMA1-30
 ![[assets/figures/papers/paper_list_l47_https_openreview_net_forum_id_xq3lza5IjN/figures/015_Table_9.jpg]]
 *Table 9: WikiText perplexity of various LLMs pruned by Uniform and Ours using Wanda*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1 问题定位：逐层剪枝中的冗余度量瓶颈
 
@@ -361,6 +369,8 @@ LSA在LLM剪枝方法谱系中占据**稀疏度分配策略**这一细分位置�
 - **与微调恢复的关系**：Table 8显示LSA剪枝后的模型经LoRA微调可大幅恢复性能（LLaMA1-7B困惑度从20.66降至12.27），表明LSA保留的权重结构对后续恢复训练友好。
 
 **开放问题**：当前分析中未发现论文明确指出的局限性声明或未来工作方向。需要进一步验证的问题包括：(1) LSA在更高稀疏度（>80%）下的性能退化模式；(2) 误差计算对校准数据分布的敏感性；(3) 与量化、N:M稀疏等压缩技术的组合效果（文中提及Appendix C有相关实验，但本部分未覆盖其具体结果，需手动核实）。
+
+
 
 ## 原文 PDF
 

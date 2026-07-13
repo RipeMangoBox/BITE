@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/MobileH2R_Learning_Generalizable_Human_to_Mobile_Robot_Handover_Exclusively_from_Scalable_and_Diverse_Synthetic_Data.pdf
+project_link: https://MobileH2R.github.io
+code_link: null
 aliases:
 - MobileH2R
 tags:
@@ -40,7 +42,7 @@ claims:
 > - n0 (复杂人体运动) 上，成功率 (%) 53.40 vs 32.90 (GenH2R reprod.) (+20.5%)。
 > - s0 (真实mocap数据) 上，成功率 (%) 77.78 vs 61.11 (GenH2R reprod.) (+16.7%)。
 
-## 概述
+## 概要
 
 人向移动机器人（mobile robot）的物体交接（handover）要求机器人同时协调**移动基座**与**机械臂**的动作，并在动态人类面前保持安全交互。然而，现有方法面临两大瓶颈：**大规模、多样化且安全的合成训练数据匮乏**，以及**缺乏有效的端到端移动底盘-机械臂协同交接策略学习方法**。
 
@@ -53,7 +55,7 @@ MobileH2R 围绕三个关键模块构建：
 
 实验表明，MobileH2R 在所有测试场景下均显著优于基线方法，**成功率提升至少 15%**（Table 1）。消融实验进一步验证了各设计选择的有效性：将演示数量从 1k 扩展到 100k 可使成功率平均提升 3.3%（Table 2）；未来障碍避免与视觉神经损失使人体接触率降低约 1/3，成功率提升 11.6%（Table 3）。在真实世界实验中，MobileH2R 同样展现出稳定的 sim-to-real 迁移能力（Table 5, Table 9）。
 
-## 背景与动机
+
 
 人机交接（Human-to-Robot Handover）是服务机器人实现物理协作的核心环节，要求机器人在动态环境中安全、高效地从人类手中接过物体。然而，当机器人具备移动能力时，交接任务面临双重挑战：机器人不仅需要精准控制机械臂末端抵达交接位置，还必须协调移动底盘的位姿以应对人的运动，确保在接近过程中不发生碰撞。现有方法大多依赖真实世界遥操作或人类演示数据进行策略学习，但这类数据的采集成本高昂、场景覆盖有限，难以支撑大规模训练，导致策略在未见人体运动、新物体或复杂场景下的泛化能力严重不足。
 
@@ -61,7 +63,9 @@ MobileH2R 围绕三个关键模块构建：
 
 上述缺口共同构成了一个根本性瓶颈：**大规模、多样化且安全的合成训练数据匮乏，同时缺乏有效的模拟器中端到端移动底盘-机械臂协同交接策略学习方法**。针对这一瓶颈，MobileH2R 提出了一条完整的合成数据驱动框架，核心假设是：**可泛化的移动交接技能可以在模拟器中仅使用高质量合成数据（人体运动、物体资产和机器人演示）进行开发，无需真实世界演示**。该框架通过三个技术模块协同作用——可扩展的全身运动合成管线、安全且利于模仿的演示自动生成方法，以及融合4D场景信息的模仿学习策略——从数据、演示到策略层面系统性地填补了上述缺口。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MobileH2R 的核心创新在于构建了一套全合成数据驱动的端到端移动交接框架，通过三大关键槽位（changed slots）的系统性升级，解决了从固定基座交接向移动基座-机械臂协同交接泛化的瓶颈。
 
@@ -93,7 +97,7 @@ $$\mathcal{L} = \lambda_{1} \mathcal{L}_{\mathrm{base}} + \lambda_{2} \mathcal{L
 
 **证据强度评估**：上述创新点均有消融实验支撑（置信度0.95），核心结论来自Table 1-4的多维度对比。需注意当前框架基于Galbot机器人（3-DoF全向基座+7-DoF臂）验证，对其他形态的泛化性尚未检验。
 
-## 整体框架
+
 
 MobileH2R 构建了一套从合成数据生成到移动机器人交接策略学习的完整流水线，其核心逻辑是：**在模拟器中仅使用高质量合成数据（人体运动、物体资产与机器人演示）开发可泛化的交接技能，无需任何真实世界演示**。框架由三个紧密耦合的模块组成（Figure 1、Figure 2）：
 
@@ -110,7 +114,7 @@ MobileH2R 构建了一套从合成数据生成到移动机器人交接策略学�
 
 **关键设计决策**：与固定基座端到端方法 GenH2R（仅输出 6D 臂部动作）相比，MobileH2R 将动作空间扩展为 9D 协调控制，避免了通过逆运动学间接求解基座动作带来的信息损失；与基于抓取估计与规划的“Grasp Selection + Trajectory Planning”非端到端基线相比，MobileH2R 的端到端范式消除了模块间误差累积，在复杂人体运动场景（n0）中成功率提升达 20.5%（Table 1）。
 
-## 核心模块与公式推导
+
 
 ### 模块一：可扩展多样化全身交接运动合成管线
 
@@ -160,7 +164,9 @@ $$
 ![[assets/figures/papers/paper_list_l1741_MobileH2R_Learning_Generalizable_Human_to_Mobile_Robot_Handover_Exclusiv/figures/003_Figure_3.jpg]]
 *Figure 3: Visualization for the vision neural loss. The Pose Prediction Network takes vision inputs and predicts the object pose. The prediction error is defined as the vision neural loss. The Vision-State Recovery Estimator takes states as input and estimates the vision neural loss, guiding the state-based trajectory optimization towards imitation-friendly demonstration generation*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 4.1 整体性能对比
 
@@ -211,7 +217,9 @@ Table 5 展示了真实世界实验的定量结果。MobileH2R 在简单与复�
 ![[assets/figures/papers/paper_list_l1741_MobileH2R_Learning_Generalizable_Human_to_Mobile_Robot_Handover_Exclusiv/figures/017_Table_9.jpg]]
 *Table 9: User study for sim-to-real experiments. our method and GenH2R(reprod.) method were evaluated by five individuals for six objects in both the simple and complex settings. Failure scenarios included collisions with the human body, dropping on the ground, or exceeding the time limit*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有基线的系统化关系
 
@@ -247,6 +255,8 @@ MobileH2R 的成功建立在一组明确的技术前提之上，这些前提也�
 3. **感知鲁棒性增强**：如何通过训练中注入随机扰动或结合少量真实数据微调，增强策略对真实世界感知噪声的鲁棒性？合成数据与真实数据的混合训练策略值得探索。
 4. **安全探索机制**：是否可以在保持安全性的前提下引入强化学习，以应对更动态、对抗性的人类行为？这需要在安全约束与探索效率之间找到平衡点。
 5. **sim2real 鸿沟弥合**：如何将合成数据与真实数据混合训练，以进一步缩小 sim2real 鸿沟并提高在非结构化环境中的表现？当前 sim2real 实验仅覆盖有限场景（Table 5），更广泛的真实世界评估是必要的。
+
+
 
 ## 原文 PDF
 

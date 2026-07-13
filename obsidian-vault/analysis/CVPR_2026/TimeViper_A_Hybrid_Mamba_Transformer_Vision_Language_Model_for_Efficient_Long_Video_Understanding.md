@@ -42,7 +42,7 @@ claims:
 > - Charades-STA 上，mIoU 37.9 (TimeViper w/ TransV) vs 34.6 (VTimeLLM) (+3.3)。
 > - VDC 上，avg. score 39.1 (TimeViper w/ TransV) vs 39.0 (AuroraCap) (+0.1)。
 
-## 概述
+## 概要
 
 长视频理解面临的核心瓶颈在于：现有基于Transformer的视觉语言模型因自注意力的 $O(n^2)$ 计算复杂度，难以高效扩展至数千乃至上万帧。视觉token在LLM内部存在严重冗余，且深层计算成为主要效率障碍。**TimeViper** 针对这一问题，提出了一种**混合Mamba-Transformer架构**，结合状态空间模型（SSM）的 $O(n)$ 线性复杂度与自注意力机制的上下文表达能力，从根本上缓解长序列建模的计算压力。
 
@@ -50,7 +50,7 @@ claims:
 
 在效率方面，TransV在4096帧时将GPU内存占用降低54.8%，预填充时间减少15.7%，并使模型能够处理超过10,000帧的长视频（Figure 5, Figure 6）。在性能方面，TimeViper在VideoMME（56.9）、Charades-STA（mIoU 37.9）、VDC（39.1）和LVBench（35.6）等长视频理解基准上，取得了与Transformer基线相当甚至更优的结果（Table 2），同时保持了显著的推理效率优势。
 
-## 背景与动机
+
 
 长视频理解是多模态大语言模型（MLLM）走向实际应用的关键能力，涵盖小时级视频问答、时间定位和详细描述等任务。然而，现有基于Transformer的MLLM面临一个根本性瓶颈：**自注意力机制的O(n²)计算复杂度**使得处理长视觉序列时效率急剧下降。随着视频帧数增加，视觉token数量线性增长，LLM内部的长序列处理成为主要计算瓶颈，严重阻碍了视频帧数的扩展。
 
@@ -60,7 +60,9 @@ claims:
 
 TimeViper正是针对上述缺口提出的解决方案。其核心动机源于一个关键发现：在混合MLLM中，视觉信息在浅层逐渐聚合到指令token，使得深层视觉token高度冗余（Figure 4显示深层几乎100%冗余）。基于此，TimeViper在LLM内部引入**TransV模块**，通过门控交叉注意力将冗余视觉token的信息显式转移到指令token中，在保留关键视觉信息的同时大幅压缩视觉token数量，使模型能处理超过10,000帧的长视频，并保持与Transformer基线相当的性能。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 TimeViper 的核心创新围绕一个被揭示的关键现象展开：**视觉信息在混合 Mamba-Transformer LLM 的深层会高度聚合到指令 token 中，导致视觉 token 在深层几乎完全冗余**。基于这一发现，TimeViper 在两个关键维度上对现有长视频理解模型进行了重构。
 
@@ -106,7 +108,7 @@ TransV 带来的效率提升是实质性的（Figure 5, Figure 6）：
 
 消融实验（Table 1）验证了 TransV 设计的每个关键选择：若仅使用 ToMe 而无 TransV 进行 token 转移，Charades mIoU 从 40.5 骤降至 26.1；引入 TransV 后恢复至 38.1，证明 token 信息转移而非简单丢弃是保持性能的关键。
 
-## 整体框架
+
 
 TimeViper 的整体 pipeline 围绕“在混合 Mamba-Transformer LLM 内部主动压缩视觉 token”这一核心思想构建，其设计目标是在保持长视频理解能力的前提下，突破 Transformer 自注意力机制的 O(n²) 计算瓶颈。模型由四个关键模块串联构成，形成从原始视频帧到最终文本响应的端到端流。
 
@@ -135,7 +137,7 @@ $$X_1^{l+1} = X_1^l + \tanh(\alpha_l) \tilde{X}_1^l$$
 ![[assets/figures/papers/paper_list_l787_https_arxiv_org_abs_2511_16595/figures/001_Figure_1.jpg]]
 *Figure 1: We present TimeViper, a hybrid Mamba-Transformer vision-language model for efficient long video understanding. We reveal the severe vision token redundancy and a vision-to-text information aggregation phenomenon in hybrid models. To this end, we introduce TransV, the first token-transfer module that compresses vision tokens into text tokens inside the LLM, enabling the model to process over 10,000 frames. Benefitting from the Mamba layers’ O(n) computation and O(1) cache cost, TimeViper generates 40.1% more tokens per second than Qwen3 [97] when processing 32k input tokens (approximately 2k frames at 16 tokens per frame) and producing 1k output tokens with batch size 32. TimeViper delivers...*
 
-## 核心模块与公式推导
+
 
 TimeViper 的核心设计围绕两个关键模块展开：**混合 Mamba-Transformer LLM 骨干**和**内部视觉Token压缩模块 TransV**。前者通过状态空间模型（SSM）与自注意力机制的混合实现长序列的高效建模，后者在LLM内部显式地将冗余视觉Token信息转移到指令Token中，从而大幅压缩视觉Token数量。
 
@@ -187,7 +189,9 @@ $$[X_0^{l+1}, X_1^{l+1}, Y_{:t}^{l+1}] = \begin{bmatrix} 1 & 0 & 0 \\ 1 & 1 & 0 
 ![[assets/figures/papers/paper_list_l787_https_arxiv_org_abs_2511_16595/figures/004_Figure_4.jpg]]
 *Figure 4: Illustration of token redundancy. We compare performance under different vision-token dropping rates p using uniform dropping and attention-guided dropping strategies. In the hybrid MLLM, vision token redundancy increases progressively with layer depth, allowing more aggressive token removal in deeper layers with minimal performance loss*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：视觉Token冗余与信息聚合现象
 
@@ -278,7 +282,9 @@ Figure 7展示了测试时增加输入帧数的扩展性。模型训练时使用
 ![[assets/figures/papers/paper_list_l787_https_arxiv_org_abs_2511_16595/figures/011_Figure_9.jpg]]
 *Figure 9: Qualitative results of TimeViper on three long video understanding tasks. (1) MCQ: The model demonstrates reasoning capability by correctly answering a multi-choice question about the video’s content. (2) TVG: It accurately localizes the temporal boundaries for a specific event, reaching an IoU of 0.75. (3) VDC: The model generates a detailed description that showcases its fine-grained comprehension. Green text highlights accurate detailed descriptions. Some output in the middle is omitted for brevity*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 
@@ -349,6 +355,8 @@ TimeViper的设计选择决定了其适用的场景边界：
 5. **规模化行为**：在更大规模数据（>50M样本）和更大模型尺寸（>13B参数）下，混合架构的线性复杂度优势能否持续保持？TransV的压缩-性能权衡曲线是否会发生变化？这需要更大规模的实验验证。
 
 6. **与长上下文技术的结合**：TransV的token压缩与RoPE外推、位置编码插值等长上下文技术是否存在协同效应？两者的结合能否进一步扩展可处理视频的时长上限？
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/DualFlow_Unified_Multi_Modal_Interactive_Reactive_3D_Motion_Generation_via_Rectified_Flow.pdf
+project_link: https://gprerit96.github.io/dualflow-page
+code_link: null
 aliases:
 - DualFlow
 tags:
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | DualFlow：基于整流流的统一多模态交互与反应式3D运动生成 |
 | 英文题名 | DualFlow: Unified Multi-Modal Interactive & Reactive 3D Motion Generation via Rectified Flow |
 | 会议/期刊 | arXiv 2025 |
-| Links | [paper](https://arxiv.org/abs/2509.24099) · [Project](https://gprerit96.github.io/dualflow-page) · [arXiv](https://arxiv.org/abs/2210.02747) |
+| Links | [paper](https://arxiv.org/abs/2509.24099) · [Project](https://gprerit96.github.io/dualflow-page) · [paper](https://arxiv.org/abs/2210.02747) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction #topic/generative_models_diffusion |
 | Method | DualFlow |
 | Dataset | MDD, InterHuman-AS |
@@ -41,7 +43,7 @@ claims:
 > - MDD (Reactive Task, 反应生成, text+music) 上，R-Precision@3 0.471 (DualFlow Both) vs 0.219 (DuoLando Both) (+115%)；FID 0.686 vs 0.698 (DuoLando Both) (-1.7%)。
 > - InterHuman-AS (Text Interactive) 上，R-Precision@1 0.437 vs 0.113 (InterGen) (+287%)。
 
-## 概述
+## 概要
 
 双人运动生成面临一个核心瓶颈：现有方法将**交互式生成**（两人同步合成）与**反应式生成**（一人响应另一人动作）视为两个独立任务，采用互不兼容的架构，且仅支持文本或音乐等单一模态条件。此外，主流的扩散模型依赖多步随机去噪，采样效率低、误差累积严重。
 
@@ -55,7 +57,7 @@ DualFlow 提出了一种**统一框架**来解决上述问题。其核心思路�
 
 实验结果验证了上述设计的有效性：在 MDD 数据集的交互任务上，DualFlow 的 R-Precision@3 达到 0.513（InterGen 为 0.302），FID 为 0.415；在反应任务上，FID 为 0.686，MMDist 为 1.056（DuoLando 分别为 0.698 和 2.113）。在 InterHuman-AS 文本交互任务上，R-Precision@1 达到 0.437，远超 InterGen 的 0.113。消融实验进一步证实，RAG 模块、对比损失和同步损失对性能均有显著贡献。
 
-## 背景与动机
+
 
 **核心瓶颈：交互与反应式两人运动生成的分离与低效**
 
@@ -69,7 +71,9 @@ DualFlow 针对上述瓶颈提出了系统性的解决方案。在生成范式�
 
 DualFlow 的核心洞察在于：将交互与反应式两人运动生成统一到整流流框架，并利用LLM驱动的多层次检索和对比学习锐化运动表示的语义边界，可以在极少采样步数下生成高度同步且语义一致的协调运动。实验证据充分支撑了这一洞察——在MDD数据集的交互任务上，DualFlow的R-Precision@3达到0.513，显著优于InterGen的0.302（+69.9%），FID降至0.415；在反应任务上，FID为0.686，MMDist为1.056，远超DuoLando的0.698和2.113（Table 1）。在InterHuman-AS数据集上，文本条件下的R-Precision@1达到0.437，相较InterGen的0.113提升287%（Table 2）。消融实验进一步验证了各组件的因果贡献：完全移除RAG模块导致交互任务FID从0.415升至0.622（Table 7），去除三元组对比损失使FID恶化至0.783（Table 4），去除同步损失则使交互和反应任务的FID分别升至0.472和0.774（Table 8）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DualFlow 的核心创新在于将**交互式**与**反应式**两人运动生成统一至单一整流流框架，并通过三个关键机制突破现有方法的瓶颈。
 
@@ -124,7 +128,7 @@ DualFlow 采用双分支 Transformer 架构，通过**可切换掩码机制**实
 
 这些创新协同作用，使 DualFlow 在 MDD 交互任务上 R-Precision@3 达到 0.513（InterGen 为 0.302），反应任务 FID 降至 0.686（DuoLando 为 0.698），同时保持仅需 20 步的高效推理。
 
-## 整体框架
+
 
 DualFlow 是一个基于整流流（Rectified Flow）的统一多模态框架，首次将交互式（Interactive）与反应式（Reactive）两人运动生成整合到单一架构中。整体 pipeline 由三个核心阶段构成：**多模态条件编码与运动检索**、**双分支 Transformer 生成网络**、以及**对比整流流优化与几何正则化**。
 
@@ -166,7 +170,7 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{CRF}} + \lambda_{\mathrm{g
 ![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2509_24099/figures/001_Figure_1.jpg]]
 *Figure 1: Our DualFlow model unifies two tasks: (a) Interactive Motion Generation, which synthesizes synchronized two-person interactions, (b) Reactive Motion Generation, which generates responsive motions for Person B (red) conditioned on Person A’s (blue) movements. The generation process is conditioned jointly on text, music, and the retrieved motion samples*
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题形式化
 
@@ -284,7 +288,9 @@ $$\mathcal{L}_{\text{total}} = \mathcal{L}_{\text{CRF}} + \lambda_{\text{geo}}\m
 ![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2509_24099/figures/010_Table_5.jpg]]
 *Table 5: Examples of input text decomposed into three fine-grained, semantically focused descriptions using LLM for MDD Dataset*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验：双人交互与反应式生成
 
@@ -354,7 +360,9 @@ Fig. 5 的可视化对比显示，InterGen 在交互生成中产生手部间距�
 ![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2509_24099/figures/004_Figure_3.jpg]]
 *Figure 3: User study results*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线工作的关系
 
@@ -402,6 +410,8 @@ DualFlow 的设计假设和实验设置界定了其有效范围：
 4. **少样本风格泛化**：当前框架依赖大规模标注数据训练。能否通过检索库的动态更新或元学习策略，实现少样本甚至零样本的风格泛化到新的舞蹈流派或交互模式？
 
 5. **多人扩展**：对比整流流的训练策略是否能迁移到更多人数（如群组舞蹈）或更复杂的物理交互场景？双分支架构的对称设计在多人场景中需要重新设计注意力机制和同步损失。
+
+
 
 ## 原文 PDF
 

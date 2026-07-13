@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Emergent_Hierarchical_Reasoning_in_LLMs_through_Reinforcement_Learning.pdf
+project_link: https://tiger-ai-lab.github.io/Hierarchical-Reasoner/
+code_link: null
 openreview_forum_id: NlkykTqAId
 aliases:
 - HHACA
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 强化学习驱动的大语言模型涌现层次推理 |
 | 英文题名 | Emergent Hierarchical Reasoning in LLMs through Reinforcement Learning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=NlkykTqAId); [Project](https://tiger-ai-lab.github.io/Hierarchical-Reasoner/) |
+| Links | [paper](https://openreview.net/forum?id=NlkykTqAId) · [Project](https://tiger-ai-lab.github.io/Hierarchical-Reasoner/) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | HICRA (Hierarchy-Aware Credit Assignment) |
 | Dataset | AIME24, AIME25, Math500, AMC23 |
@@ -42,7 +44,7 @@ claims:
 > - AIME25 上，Pass@1 为 65.1，对比 60.0，变化 +5.1。
 > - Math500 上，Pass@1 为 89.0，对比 83.0，变化 +6.0。
 
-## 概述
+## 概要
 
 大语言模型在强化学习（RL）推理训练中涌现出层次化的推理结构：模型首先巩固低层的过程执行技能，随后学习瓶颈转移到高层战略规划的探索与掌握。然而，现有的RL算法（如GRPO）对所有token施加各向同性的优化压力，不区分token的层次功能，导致优化信号被稀释，高层策略探索效率低下。
 
@@ -56,7 +58,7 @@ claims:
 
 **方法定位：** HICRA位于RL信用分配方法的改进线上，通过在GRPO框架内引入层次感知的优势调制，将优化目标分布从各向同性拉伸为各向异性，使概率质量集中在战略维度。其有效性依赖于基础模型的过程可靠性——当基础模型程序性技能不足时（如Llama-3.1-Instruct），策略放大可能失效。
 
-## 背景与动机
+
 
 ### 大语言模型的推理瓶颈：从“能执行”到“会规划”
 
@@ -81,7 +83,9 @@ claims:
 
 这一设计直接针对RL训练中“优化信号被低层token稀释”的瓶颈，通过将信用分配与token的语义功能绑定，而非统计不确定性，实现了更高效、更精准的推理能力提升。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 HICRA 的核心创新在于**识别并放大了 RL 训练中高层战略规划 tokens 的学习信号**，从而将优化压力从均匀分布转向对推理性能瓶颈的定向突破。
 
@@ -123,7 +127,7 @@ HICRA 的另一个关键创新是**基于语义功能的规划 token 识别**，
 
 HICRA 通过各向异性的目标分布将概率质量集中在规划 tokens 维度，本质上将策略梯度更新从“均匀探索”转变为“战略探索”。这一机制的有效性得到了 Placebo HICRA 实验的验证：使用随机 n-gram 替代 Strategic Grams 时，性能显著下降，证明规划 token 识别的必要性而非优势放大本身在起作用。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_NlkykTqAId/figures/002_Figure_1.jpg]]
 *Figure 1: (Left) LLM reasoning mirrors a human-like hierarchical reasoning: high-level strategic planning and low-level procedural executions. (Right) Hierarchical reasoning emerges during RL training via a two-phase dynamic. Phase ① consolidates low-level skills, marked by a token-entropy drop in execution tokens. The learning frontier then shifts to Phase ②, where the model explores and masters high-level planning, marked by increased semantic diversity, sustained reasoning enhancement and length scaling*
@@ -166,7 +170,7 @@ $$\nabla \mathcal{I}(\theta) = \mathbb{E} \left[ \hat{A}_{i,t}^{\mathrm{HICRA}} 
 
 这一框架的核心设计选择在于：**仅修改信用分配（优势函数），不引入额外的损失项或奖励塑形**，从而保持与 GRPO 训练流程的高度兼容性。
 
-## 核心模块与公式推导
+
 
 ### 方法总览
 
@@ -220,7 +224,9 @@ $$\pi^{*}(o_{i,t} | \mathbf{q}, \mathbf{o}_{i,<t}) \propto \pi_{\theta_{old}}(o_
 
 HICRA 与熵正则化、高熵优势放大等方法的关键差异在于目标维度。熵正则化对所有 tokens 施加无差别的熵奖励，虽然提高了 token 级熵，但未能提升准确率，反而导致序列长度失控增长。高熵优势放大仅以统计不确定性为代理，但实验表明仅有不到 10% 的高熵 tokens 具有规划功能。HICRA 直接定位到规划 tokens 的语义功能，避免了在大量低层执行 tokens 上的无效探索。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果：HICRA在文本与多模态推理上的全面增益
 
@@ -267,7 +273,9 @@ Figure 11在MiMO-VL上的实验进一步巩固了这一结论：在该VLM上，t
 
 HICRA的有效性存在明确的边界条件：**它依赖于基座模型的过程可靠性**。Figure 14展示了HICRA在Llama-3.1-Instruct-8B上的失败案例。当基座模型的程序性技能不足时（该模型在RL训练初期表现出消失的优势和混乱的训练动态），对规划tokens的策略放大反而适得其反，语义熵趋势与Qwen模型相反。这一发现提示，HICRA适用于已具备基本执行能力的模型，其价值在于加速高层战略探索，而非弥补底层技能的缺失。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -305,6 +313,8 @@ HICRA 的有效性存在明确的边界条件，其核心前提是**基础模型
 2. **自适应层次发现**：如何设计模型感知的层次方法，根据基础模型的过程可靠性自动决定是否以及如何施加层次化的信用分配？能否实现完全无监督的层次结构发现，无需预定义 Strategic Grams？
 3. **语义熵作为通用度量**：论文表明语义熵与验证准确率强相关，且在 Pass@8 饱和时仍能揭示 HICRA 的持续探索优势（Figure 11, MiMO-VL）。语义熵是否可以作为更通用的探索质量度量指标，指导 RL 训练的早停或超参数选择？
 4. **规模化行为**：两阶段动态（先过程巩固，后战略探索）在更大规模模型上是否依然成立？模型规模是否会影响两个阶段的相对时长和转换时机？
+
+
 
 ## 原文 PDF
 

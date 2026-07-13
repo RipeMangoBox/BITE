@@ -43,7 +43,7 @@ claims:
 > - RealEstate10K 上，PSNR (extrapolative, 2-view) 17.41 vs 14.36 (NoPoSplat) (+3.05)。
 > - DTU (large model comparison) 上，PSNR (1-view) 15.56 vs 14.04 (ViewCrafter) (+1.52)。
 
-## 概述
+## 概要
 
 少样本新视角合成（Novel View Synthesis, NVS）在推理性场景下面临一个根本性矛盾：前馈式方法（如 **PixelSplat** (Charatan et al., 2024)、**MVSplat** (Chen et al., 2024)）依赖代价体或显式几何投影，在参考视角凸包内的插值区域表现良好，但无法合成未观测区域的内容；生成式方法（如 **LucidDreamer** (Chung et al., 2023)、**GenWarp** (Seo et al., 2024)）虽能通过变形-修复范式外推到新视角，却受限于训练域内的相机位姿分布，且缺乏显式几何对齐机制，导致生成的图像与底层三维几何失配。大模型方法（如 **ViewCrafter** (Yu et al., 2024)）虽展现出一定的外推能力，但推理时间长、几何一致性弱，难以满足实际应用需求。
 
@@ -51,7 +51,7 @@ claims:
 
 在 DTU 零样本外推设置下，MoAI 在双视图条件下达到 **15.58 PSNR**，较最优基线 NoPoSplat (13.58) 提升 **+2.00 dB**；在 RealEstate10K 域内外推设置下达到 **17.41 PSNR**，较 NoPoSplat (14.36) 提升 **+3.05 dB**。消融实验证实，逐一添加点图条件、网格条件化和跨模态注意力注入，PSNR 从 16.55 逐步提升至 17.41，各模块均带来持续增益。模型对几何条件的噪声和稀疏性高度鲁棒，在 80% 点掩码或 15% 高斯噪声下仍保持稳定性能。
 
-## 背景与动机
+
 
 新视角合成（Novel View Synthesis, NVS）旨在从稀疏的参考图像中生成任意目标视角下的场景外观。近年来，前馈式方法（如 **PixelSplat** (Charatan et al., 2024)、**MVSplat** (Chen et al., 2024)）通过端到端可微渲染取得了显著进展，但其本质依赖从参考视角到目标视角的可投影区域，无法合成未观测区域（即外推场景）的内容。另一方面，基于生成式先验的变形-修复（warping-and-inpainting）方法（如 **LucidDreamer** (Chung et al., 2023)、**GenWarp** (Seo et al., 2024)）虽能对外推区域进行合理填充，却面临两个核心瓶颈：其一，生成过程仅作用于图像域，缺乏显式的几何约束，导致生成图像与场景几何失配；其二，修复过程仅依赖2D语义线索，在大幅视点变化和几何噪声下容易产生不一致的结构。
 
@@ -61,7 +61,9 @@ claims:
 
 针对上述缺口，本文提出 **MoAI（Cross-modal Attention Instillation）**，一种基于扩散模型的联合图像-几何生成框架。核心动机在于：**让图像生成与几何修复形成协同多任务学习——图像网络提供聚焦的语义注意力图，帮助几何网络捕获细粒度跨视角对应；几何网络的完成任务本身具有更强的结构确定性，反过来为图像生成提供正则化，约束其生成过程，从而使两者天然对齐。** 同时，通过基于邻近性的网格条件化（proximity-based mesh conditioning）滤除错误投影，增强对应条件的可靠性。这一设计使得MoAI在无位姿设定下，既能实现推理性外推，又能保证生成图像与几何的严格一致。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MoAI 的核心创新在于将新视角合成（NVS）从“图像生成”或“几何预测”的单一范式，重新构建为**图像与几何的协同多任务扩散框架**，并通过**跨模态注意力注入**实现两者的内在对齐。以下从三个关键维度拆解相对现有基线的根本性改变。
 
@@ -99,7 +101,7 @@ $$\mathbf{c^{t}} = [\mathcal{E}(X_{t}^{\mathrm{II}}), D_{t}^{\mathrm{II}}, N_{t}
 
 三个 changed slots 形成递进关系：**任务范式**从单模态转向联合扩散奠定框架基础；**跨模态注意力注入**作为核心机制实现图像与几何的内在对齐；**网格条件化**提升输入条件的可靠性，为对齐提供更稳健的几何先验。三者协同使得 MoAI 在零样本外推（DTU 双视图 PSNR 15.58 vs. NoPoSplat 13.58）和域内外推（RealEstate10K PSNR 17.41 vs. NoPoSplat 14.36）任务上均取得显著领先，同时展现出对几何噪声和稀疏性的高度鲁棒性（Table 5-6, Figure 10-11）。
 
-## 整体框架
+
 
 MoAI 采用**变形-修复（warping-and-inpainting）**范式，将其从单图像域同时扩展到多视图图像域与几何域，构建了一个**图像与几何联合生成的扩散框架**。整体 pipeline 由三个核心阶段串联而成：现成几何预测 → 对应条件构建 → 双分支扩散修复。
 
@@ -147,7 +149,7 @@ $$\mathbf{c^{t}} = [\mathcal{E}(X_{t}^{\Pi}), D_{t}^{\Pi}, N_{t}^{\Pi}, M_{t}], 
 
 同时应用法线掩码，剔除法线方向与目标视角方向偏差超过 90° 的网格面片，有效滤除错误投影，提升外推场景下的条件质量。
 
-## 核心模块与公式推导
+
 
 MoAI 框架围绕三个核心模块构建：**图像-几何双分支扩散架构**、**跨模态注意力注入（MoAI）** 和 **基于邻近性的网格条件化**。以下逐一展开其设计逻辑与关键公式。
 
@@ -196,7 +198,9 @@ $$\mathbf{c^{t}} = [\mathcal{E}(X_{t}^{\mathrm{II}}), D_{t}^{\mathrm{II}}, N_{t}
 ![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_vjvwYexMQn/figures/002_Figure_2.jpg]]
 *Figure 2: Training methodology. Our method conducts cross-modal attention instillation, replacing the spatial attention maps of geometry denoising networks with those of image denoising networks, so that the image generation U-Net learns a more robust representation aligned with the geometry completion task. On the other hand, the geometry prediction networks leverage the rich semantics from image features to enhance geometry completion capability*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -272,7 +276,9 @@ Figure 13 展示了 MoAI 在极端外推视角（目标相机与参考视角夹�
 
 当前方法的一个潜在局限在于其对现成几何预测模型（如 **VGGT**）的依赖。若参考视角的几何预测质量较差（如纹理缺失区域或极端视角变化），投影点图和网格条件的可靠性将降低，可能影响外推和对齐性能。文中未对此进行专项消融，但 Table 5 和 Table 6 的鲁棒性实验间接表明，MoAI 对几何噪声和稀疏性具有相当程度的容忍度。在域外城市数据（Figure 12, MegaDepth, CityScapes）上的泛化结果进一步说明，即使几何预测模型的训练域与测试域不匹配，MoAI 仍能保持高保真度的新视角合成能力。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从变形-修复到跨模态对齐生成
 
@@ -327,6 +333,8 @@ MoAI 依赖现成几何预测模型（VGGT，Wang et al., 2024; 2025）提供初
 **域外泛化的边界。** Figure 12 展示了在城市数据（MegaDepth, CityScapes）上的泛化结果，但缺乏大规模域外定量评估。MoAI 在室内场景（RealEstate10K）训练后向室外场景迁移的性能边界尚需进一步验证。
 
 **多模态对齐的度量。** 当前评估主要依赖图像质量指标（PSNR/SSIM/LPIPS），对几何对齐的评估仅通过可视化（Figure 14 使用 DepthAnything V3 进行对齐验证）。缺乏直接量化图像-几何对齐程度的指标，这限制了方法在精确对齐要求场景中的可信度。
+
+
 
 ## 原文 PDF
 

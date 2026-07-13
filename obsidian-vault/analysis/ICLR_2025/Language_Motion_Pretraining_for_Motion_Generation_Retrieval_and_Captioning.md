@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2025
 pdf_ref: paperPDFs/ICLR_2025/Language_Motion_Pretraining_for_Motion_Generation_Retrieval_and_Captioning.pdf
+project_link: null
+code_link: null
 aliases:
 - LLMPLTLFLM
 - LAMP
@@ -41,7 +43,7 @@ claims:
 > - HumanML3D 上，FID 0.032 vs 0.045 (MoMask) (-28.9%)；R Precision Top1 0.557 vs 0.521 (MoMask) (+6.9%)；Motion-Text Retrieval R@1 67.18 vs 58.17 (T2M) (+9.01)。
 > - KIT-ML 上，FID 0.141 vs 0.204 (MoMask) (-30.9%)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -71,8 +73,6 @@ LaMP 属于**语言-运动联合预训练**范式，区别于以下主流路线�
 
 LaMP 的关键增量在于：通过显式的语言-运动预训练对齐，为运动生成提供运动信息丰富的文本特征，同时以统一的预训练骨干支撑生成、检索、描述三个任务，形成闭环的跨模态理解与生成框架。
 
-## 背景与动机
-
 ### 问题背景
 
 文本驱动的三维人体运动生成旨在根据自然语言描述合成逼真的动作序列，在动画制作、虚拟人交互、游戏开发等领域具有广泛的应用前景。该任务的核心挑战在于实现语言与运动两种异质模态之间的精确对齐——文本描述往往包含复杂的时序语义（如“先向前走两步，然后转身挥手”），而运动数据则是高维连续时间序列，二者之间存在显著的语义鸿沟。
@@ -92,7 +92,7 @@ LaMP 的关键增量在于：通过显式的语言-运动预训练对齐，为�
 
 基于此动机，本文提出 **LaMP（Language-Motion Pretraining）**，一种统一的语言-运动预训练框架，通过四个互补的代理任务——运动-文本对比学习、运动-文本匹配、运动引导文本生成和文本引导运动生成——联合优化文本和运动编码器，实现对运动语义的深度对齐。在此基础上，LaMP 衍生出三个下游模型：**LaMP-T2M**（文本到运动生成）、**LaMP-Feat**（运动-文本双向检索）和 **LaMP-M2T**（运动描述生成），将预训练对齐能力统一应用于生成、检索和描述三大任务。
 
-## 核心创新
+## 核心方法与创新机理
 
 ### 从语言-视觉到语言-运动的文本空间迁移
 
@@ -134,8 +134,6 @@ LaMP 预训练产出的特征同时赋能三个下游任务，无需为每个任
 ### 新评估指标 LaMP-BertScore
 
 针对现有指标难以评估生成运动语义一致性的问题，作者提出了 LaMP-BertScore：将生成的运动输入 LaMP-M2T 获取其文本描述，再与真实文本计算 BertScore。该指标直接衡量生成运动与文本条件的语义对齐程度，弥补了 FID 等分布层面指标的不足。但需注意，该指标依赖自训练的描述模型，可能存在自我增强偏差，需要外部独立验证。
-
-## 整体框架
 
 LaMP 的核心思想是通过语言-运动联合预训练，构建一个统一的多任务框架，使文本和运动序列在共享的表示空间中对齐。整体架构围绕三个关键设计展开：运动离散化、跨模态对齐预训练，以及面向下游任务的适配器。
 
@@ -188,8 +186,6 @@ $$l_f = (1 + \alpha) \cdot l_c - \alpha \cdot l_{uc}$$
 
 ![[assets/figures/papers/paper_list_l1901_Language_Motion_Pretraining_for_Motion_Generation_Retrieval_and_Captioni/figures/001_Figure_1.jpg]]
 *Figure 1: LaMP overview. We conduct joint training for contrastive learning, matching, and bidirectional text-motion translation by leveraging the textual features extracted from tokenized text descriptions via the text transformer and the motion features derived from the motion transformer*
-
-## 核心模块与公式推导
 
 ### 运动离散化：VQ-VAE 令牌化
 
@@ -265,10 +261,7 @@ LaMP-M2T 将预训练 LaMP 的运动 Transformer 输出的运动特征 $f_m$ 通
 ![[assets/figures/papers/paper_list_l1901_Language_Motion_Pretraining_for_Motion_Generation_Retrieval_and_Captioni/figures/011_Figure.jpg]]
 *Figure: A1: Overview of VQVAE*
 
-![[assets/figures/papers/paper_list_l1901_Language_Motion_Pretraining_for_Motion_Generation_Retrieval_and_Captioni/figures/013_Table.jpg]]
-*Table: Figure A2: (Left) Details in LaMP. Motion transformer consists of self-attention layers and cross-attention layers (interact with query tokens), while text transformer only has self-attention layers. (Right) LaMP extracts text features as condition signals. Table A1: The quantitative results of text-to-motion generation on the KIT-ML dataset with LaMP pretrained on HumanML3D (the first row) and KIT-ML (the second row)*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 核心性能瓶颈
 
@@ -353,7 +346,7 @@ $$l_f = (1 + \alpha) \cdot l_c - \alpha \cdot l_{uc}$$
 ![[assets/figures/papers/paper_list_l1901_Language_Motion_Pretraining_for_Motion_Generation_Retrieval_and_Captioni/figures/003_Figure_3.jpg]]
 *Figure 3: Heatmap of similarity matrix. The diagonal represents positive sample pairs, with darker colors indicating better quality*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 核心瓶颈与因果机制
 

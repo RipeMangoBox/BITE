@@ -5,6 +5,7 @@ paper_level: A
 venue: Whitepaper
 year: 2025
 pdf_ref: paperPDFs/WHITEPAPER_2025/Cosmos_Transfer2_5_World_Simulation_With_Video_Foundation_Models_for_Physical_AI.pdf
+code_link: https://github.com/nvidia-cosmos/cosmos-transfer2.5
 project_link: https://www.nvidia.com/en-us/ai/cosmos/
 aliases:
 - CP5
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | Cosmos-Predict2.5：面向物理AI的基于视频基础模型的世界模拟 |
 | 英文题名 | Cosmos-Predict2.5: World Simulation With Video Foundation Models for Physical AI |
 | 会议/期刊 | Whitepaper 2025 |
-| Links | [paper](https://d1qx31qr3h6wln.cloudfront.net/publications/World_Simulation_with_Video_Foundation_Models_for_Physical_AI.pdf); [GitHub](https://github.com/nvidia-cosmos/cosmos-transfer2.5); [Project](https://www.nvidia.com/en-us/ai/cosmos/) |
+| Links | [paper](https://d1qx31qr3h6wln.cloudfront.net/publications/World_Simulation_with_Video_Foundation_Models_for_Physical_AI.pdf) · [GitHub](https://github.com/nvidia-cosmos/cosmos-transfer2.5) · [Project](https://www.nvidia.com/en-us/ai/cosmos/) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | Cosmos-Predict2.5 |
 | Dataset | PAI-Bench-Predict-Text2World, PAI-Bench-Predict-Image2World, Transfer Model Quality, Real-Robot Policy Testing (10 scenarios) |
@@ -42,7 +43,7 @@ claims:
 > - PAI-Bench-Predict-Image2World 上，Overall Score 为 0.810 (Cosmos-Predict2.5-2B post-trained)，对比 N/A (best in benchmark)，变化 N/A。
 > - Transfer Model Quality 上，Quality Score 为 9.31 (Cosmos-Transfer2.5-2B Uniform Weights)，对比 9.24 (Cosmos-Transfer1-7B Uniform Weights)，变化 +0.07。
 
-## 概述
+## 概要
 
 **问题背景**：构建能够真实模拟物理世界动态的视频世界模型，是通向具身智能与物理AI的关键路径。然而，现有方法普遍面临视频生成质量不足、对复杂指令的语义跟随能力弱、长时序生成一致性差，以及缺乏面向物理AI场景的统一训练框架等瓶颈。前代模型**Cosmos-Predict1**采用扩散模型训练范式与T5文本编码器，其生成真实感和语义对齐能力受限，且缺少针对机器人、自动驾驶等物理领域的专用后训练策略。
 
@@ -52,7 +53,7 @@ claims:
 
 **主要结果**：在PAI-Bench基准上，后训练后的Cosmos-Predict2.5-2B在Text2World和Image2World模式下分别取得0.768和0.810的Overall Score，超越前代及外部模型。Cosmos-Transfer2.5-2B以仅约1/3.5的参数量，在多种控制条件下获得9.31的质量分数，优于7B的前代模型（9.24）。在真实机器人策略评估中，使用Cosmos-Transfer2.5生成数据增强后，策略在10个测试场景中成功率达24/30，远超基础策略（1/30）和常规增强策略（5/30）。强化学习后训练使VideoAlign奖励分数在Text2World下从1.08提升至1.69，在Image2World下从0.23提升至0.42，人类投票也一致确认质量改善。在自动驾驶多视图生成和动作条件视频预测等下游任务上，模型同样展现出显著的性能优势。
 
-## 背景与动机
+
 
 **物理AI的核心挑战：世界仿真器的缺位**
 
@@ -78,7 +79,9 @@ claims:
 
 通过上述多维度的协同改进，Cosmos-Predict2.5旨在构建一个更统一、更可控、更高质量的视频世界仿真器，为物理AI的下游应用（如机器人策略学习、自动驾驶仿真）提供更可靠的生成式数据支撑。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Cosmos-Predict2.5 的核心创新在于对前代 Cosmos-Predict1 世界模型进行了系统性的范式重构，通过四个关键槽位的变更，从根本上解决了视频质量不足、指令跟随弱和生成不一致等瓶颈。
 
@@ -116,7 +119,7 @@ Cosmos-Predict2.5 采用 **WAN2.1 VAE** 作为视频分词器，压缩率为 $4 
 
 上述创新构成了一个相互增强的系统：流匹配提供了更稳定的训练动力学和更快的推理收敛；Cosmos-Reason1 编码器强化了物理场景的语义理解；精简的位置编码释放了泛化潜力；而领域后训练体系则使通用世界模型能够精准适配物理 AI 的多样化需求。这一组合最终使 2B 参数的 Cosmos-Predict2.5 在 PAI-Bench Text2World 和 Image2World 基准上分别达到 0.768 和 0.810 的 Overall Score，超越了前代模型及部分外部模型（Table 8, Table 9）。
 
-## 整体框架
+
 
 Cosmos-Predict2.5是一个面向物理AI的统一世界模拟框架，其核心设计目标是通过架构、数据和训练策略的系统性改进，解决前代模型在视频质量、指令跟随和生成一致性上的瓶颈。该框架以**流匹配（Flow Matching）**为训练范式，以**Cosmos-Reason1视觉语言模型**为语义编码器，在单一模型中统一了Text2World、Image2World和Video2World三种生成模式。
 
@@ -167,7 +170,7 @@ Cosmos-Predict2.5的生成主干基于潜在空间中的DiT（Diffusion Transfor
 
 所有模式均通过统一的流匹配去噪网络处理，条件信息（文本嵌入、条件帧）在潜在空间中通过交叉注意力和帧替换机制注入。
 
-## 核心模块与公式推导
+
 
 ### 流匹配训练范式
 
@@ -209,7 +212,9 @@ $$t_s = \frac{\beta t}{1 + (\beta - 1) t}$$
 
 在 Image2World 和 Video2World 模式下，模型采用**帧替换策略**：将生成序列的前几帧直接替换为条件帧，以强制时序一致性。为区分条件帧与待生成帧，每个输入 token 由原始 token 与一个二值掩码 token 拼接而成，掩码标记该位置是否为条件输入。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能：PAI-Bench 基准
 
@@ -283,7 +288,9 @@ Cosmos-Transfer2.5-2B 在多模态控制条件下以 **3.5 倍更小的体积**�
 ![[assets/figures/papers/paper_list_l38_https_d1qx31qr3h6wln_cloudfront_net_publications_World_Simulation_with_V/figures/012_Table_7.jpg]]
 *Table 7: Training efficiency with 4096 NVIDIA H100 GPUs where the video resolution is 720p and number of frames is 93*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与前代模型的关系
 
@@ -328,6 +335,8 @@ Cosmos-Predict2.5 的能力边界可从以下维度界定：
 3. 如何构建涵盖复杂多智能体交互、长期推理的综合物理 AI 世界模型基准？
 4. 小型模型（2B）的优势能否通过蒸馏等方式迁移到更大模型，或反之？
 5. 通过生成数据增强训练的策略（Table 11 中 24/30 的成功率）在更多机器人任务和真实世界部署中的泛化能力如何？
+
+
 
 ## 原文 PDF
 

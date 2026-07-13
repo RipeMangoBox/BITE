@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2024
 pdf_ref: paperPDFs/CVPR_2024/DiffSHEG_A_Diffusion_Based_Approach_for_Real_Time_Speech_driven_Holistic_3D_Expression_and_Gesture_Generation.pdf
+project_link: https://jeremycjm.github.io/proj/DiffSHEG
+code_link: null
 aliases:
 - DiffSHEG_A_Diffu
 tags:
@@ -41,7 +43,7 @@ claims:
 > - SHOW 上，FMD↓ 0.00184 vs TalkSHOW (Re-train) 0.00278 / LS3DCG* 0.00230 (相比于TalkSHOW降低0.00094（33.8%）)。
 > - BEAT (User Study) 上，用户偏好百分比（真实感/同步/多样性） 在BEAT和SHOW上四个指标均获得约60%~80%的显著偏好 vs CaMN, DiffGesture, DSG, LDA (一致领先于所有基线)。
 
-## 概述
+## 概要
 
 语音驱动的共语手势与面部表情生成是虚拟人交互的核心技术，但现有方法面临一个根本性瓶颈：**表情与手势的联合分布被忽视**。主流方案要么将二者分别独立建模（两个独立模型），要么采用多任务学习但解码器间缺乏显式交互，导致生成的动作协调性差、多样性不足。同时，确定性回归模型难以拟合语音到手势的一对多映射关系，进一步限制了生成的自然度与表现力。
 
@@ -50,8 +52,6 @@ DiffSHEG 针对上述瓶颈提出了一个统一的扩散生成框架，核心�
 定量实验表明，DiffSHEG 在 BEAT 和 SHOW 两个数据集上的 Fréchet 动作距离（FMD/FGD）全面优于所有基线方法——在 BEAT 上 FMD 降至 324.67，相比最强基线 LDA（SIGGRAPH 2023）的 688.25 降低了 52.8%；在 SHOW 上 FMD 为 0.00184，相比重新训练的 TalkSHOW（0.00278）降低了 33.8%。消融实验进一步证实，单向信息流、梯度截断和残差融合块均对性能有显著贡献。用户研究显示，DiffSHEG 在动作真实感、手势-语音同步、表情-语音同步和多样性四个维度上均获得约 60%~80% 的显著偏好，一致领先于 CaMN（Habibie et al., ECCV 2022）、DiffGesture（Zhu et al., CVPR 2023）、DiffuseStyleGesture（Yang et al., IJCAI 2023）和 LDA 等基线方法。定性比较中，DiffSHEG 生成的动作更敏捷、多样，且能与语音的语义重音对齐（如对“journalist”“never”等词产生对应的强调手势），无基线中常见的抖动或迟钝问题。
 
 方法目前仍存在一些局限：生成质量高度依赖训练数据质量，数据中的抖动或异常动作会被复现；尚未在更多样化的说话人、语言或情绪场景下验证泛化能力；扩散生成的固有随机性偶尔可能导致不自然的手势，尤其在数据稀疏区域；当前方案未显式建模物理约束（如穿模），在极端姿态下可能产生不合理的身体交叉。这些方向为后续研究提供了明确的改进空间。
-
-## 背景与动机
 
 **语音驱动的虚拟人动作生成**是构建沉浸式数字人的核心技术，要求面部表情与身体手势在语义、韵律和情感层面与语音信号高度同步。近年来，该领域从早期的规则驱动系统逐步演进为数据驱动的深度生成范式，但一个根本性问题始终悬而未决：**表情与手势应如何联合生成？**
 
@@ -76,7 +76,7 @@ DiffSHEG 针对上述瓶颈提出了一个统一的扩散生成框架，核心�
 
 基于上述分析，本文提出 **DiffSHEG**，旨在回答以下核心问题：**能否设计一个统一的扩散框架，通过显式建模表情到手势的单向信息流，捕捉二者的联合分布，同时实现任意长度的实时流式推理？** 这一问题的解决将推动语音驱动数字人从“可用”走向“自然且富有表现力”的新阶段。
 
-## 核心创新
+## 核心方法与创新机理
 
 DiffSHEG 的核心创新并非引入全新的生成范式，而是在统一的扩散模型框架内，通过**三个关键设计**系统性地解决了语音驱动整体3D表情与手势生成中长期存在的“联合建模缺失”问题，从而在动作协调性、多样性与实时性上形成突破。
 
@@ -104,8 +104,6 @@ DiffSHEG 的核心创新并非引入全新的生成范式，而是在统一的�
 | **长序列推理** | 训练时依赖历史帧或固定初始姿态 | FOPPAS：无需训练的外推式部分自回归采样 | 任意长度实时流式推理（>30 FPS） |
 
 > **注意**：FOPPAS 的累积误差在多分钟超长序列中的可控性，以及 UniEG 在极度复杂情感场景下的充分性，仍属于开放问题，需进一步验证。
-
-## 整体框架
 
 DiffSHEG 提出了一种**统一的扩散模型框架**，用于从语音中同时生成任意长度的整体 3D 表情与手势。其核心设计动机在于：现有方法通常将表情与手势视为两个独立任务（分别建模或多任务解码器无交互），忽略了二者的联合分布，导致动作不协调且多样性不足；同时，确定性模型难以拟合语音到手势的一对多映射。DiffSHEG 通过在统一扩散去噪网络中引入**单向表情到手势的信息流（UniEG）**，使表情预测显式地成为手势生成的上下文，从而捕捉联合分布。
 
@@ -139,11 +137,6 @@ DiffSHEG 的训练在固定长度片段上进行，不依赖历史帧。为实�
 
 ![[assets/figures/papers/paper_list_l1846_DiffSHEG_A_Diffusion_Based_Approach_for_Real_Time_Speech_driven_Holistic/figures/002_Figure_2.jpg]]
 *Figure 2: DiffSHEG framework overview. Left: Audio Encoders and UniEG-Transformer Generator. Given an audio clip, we encode the audio into a low-level feature Mel-Spectrogram and a high-level HuBERT feature. An audio encoder learns a mid-level representation of speech. The audio features are concatenated with other optional temporal conditions and then fed into the UniEG Transformer Denoiser. The denoising block fuses the conditions with noisy motion at diffusion step t and feeds it into style-aware transformers to get the predicted noises. The uni-directional condition flow is enforced from expression to gesture for joint distribution learning. Right: The detailed architecture of style-aware Transfo...*
-
-![[assets/figures/papers/paper_list_l1846_DiffSHEG_A_Diffusion_Based_Approach_for_Real_Time_Speech_driven_Holistic/figures/001_Figure_1.jpg]]
-*Figure 1: DiffSHEG is a unified co-speech expression and gesture generation system based on diffusion models. It captures the joint expression-gesture distribution by enabling the uni-directional information flow from expression to gesture inside the model*
-
-## 核心模块与公式推导
 
 ### 扩散先验基础
 
@@ -213,12 +206,9 @@ FOPPAS（Fast Outpainting-based Partial Autoregressive Sampling）是 DiffSHEG �
 - **DDIM 加速**：通过去噪扩散隐式模型（DDIM）减少采样步数，提升推理速度。
 - **最后两步线性混合**：对相邻片段的重叠区域进行线性混合，进一步消除边界不连续性。
 
-![[assets/figures/papers/paper_list_l1846_DiffSHEG_A_Diffusion_Based_Approach_for_Real_Time_Speech_driven_Holistic/figures/003_Figure_3.jpg]]
-*Figure 3: Illustration for outpainting-based arbitrary long sequence inference. Given a previous clip, we generate current clip by outpainting the remaining frames (light blue) according to the overlaping frames (deep blue). Each row of blue bar represents a motion clip from a single sampling process*
-
 在单张 Nvidia 3090 GPU 上，FOPPAS 可实现超过 30 FPS 的实时流式推理，且无需在训练时依赖历史帧，灵活性优于自回归扩散基线。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -232,9 +222,6 @@ DiffSHEG 在两个主流数据集上均取得了大幅领先的 Fréchet 距离�
 ### 用户主观评估
 
 用户研究为定量指标提供了关键的感知验证。在 BEAT 和 SHOW 两个数据集上，评估者对动作真实感、手势-语音同步、表情-语音同步和动作多样性四个维度进行偏好选择，DiffSHEG 在所有维度和数据集上均获得了约 **60%~80%** 的显著偏好（Figure 7）。这一结果尤其值得注意：即使基线方法（如 CaMN、DiffGesture、DSG、LDA）在对比时被独立补全了表情数据，用户仍然一致偏好 DiffSHEG 的整体输出，说明联合建模带来的协调性提升是可被人类清晰感知的。
-
-![[assets/figures/papers/paper_list_l1846_DiffSHEG_A_Diffusion_Based_Approach_for_Real_Time_Speech_driven_Holistic/figures/009_Figure_7.jpg]]
-*Figure 7: Results of the user study. The chart shows user preference percentage in terms of four metrics: realism, gesture-speech synchronism, expression-speech synchronism, and motion diversity. In both datasets and all metrics, our method is dominantly preferred. DSG and DG are the abbreviations of DiffuseStyleGesture and DiffuseGesture*
 
 ### 定性分析：语义对齐与动作多样性
 
@@ -260,12 +247,6 @@ DiffSHEG 在两个主流数据集上均取得了大幅领先的 Fréchet 距离�
 
 音频编码器的多层特征融合策略对性能影响显著。消融实验显示，移除可学习的中层编码器（w/o Mid）使 BEAT 上的 FGD 从 438.93 骤增至 613.86，退化幅度远超移除 HuBERT（w/o Hubert）或 Mel-spectrogram（w/o Mel）的版本（Table 3）。这表明低层声学特征与高层语义特征的中间融合层是性能瓶颈，而非单一特征的缺失。此外，运动-语音残差融合块在训练效率上带来了 2~4 倍的收敛加速，且最终损失更低（Figure 10），说明该设计不仅改善了最终性能，还显著降低了训练成本。
 
-![[assets/figures/papers/paper_list_l1846_DiffSHEG_A_Diffusion_Based_Approach_for_Real_Time_Speech_driven_Holistic/figures/017_Table_3.jpg]]
-*Table 3: Audio encoder ablation results. ↓: smaller is better. †: closer to GT is better*
-
-![[assets/figures/papers/paper_list_l1846_DiffSHEG_A_Diffusion_Based_Approach_for_Real_Time_Speech_driven_Holistic/figures/013_Figure_10.jpg]]
-*Figure 10: The training loss of our DiffSHEG on the (a) SHOW and (b) BEAT datasets with and without the motion-speech residual block. We can see that our motion-speech residual block helps the diffusion training process converge much faster*
-
 ### 推理效率与实时性
 
 FOPPAS 推理管道在单张 Nvidia 3090 GPU 上实现了超过 30 FPS 的实时流式生成（Section 4.4），且无需在训练时依赖历史帧。与自回归扩散基线相比，这一外推式部分自回归采样策略在灵活性和推理速度之间取得了实用平衡，使扩散模型在实时交互场景中的部署成为可能。
@@ -274,12 +255,7 @@ FOPPAS 推理管道在单张 Nvidia 3090 GPU 上实现了超过 30 FPS 的实时
 
 尽管整体性能优异，DiffSHEG 仍存在若干可复现的局限。首先，方法对训练数据质量高度敏感：若训练集包含抖动或异常动作（如 BEAT 女性角色的部分片段），生成结果也会复现类似瑕疵。其次，扩散生成固有的随机性在数据稀疏区域偶尔会导致不自然的手势。此外，当前方案未显式建模物理约束（如身体自交叉），在极端姿态下可能产生不合理的穿模现象。这些失败模式指向了未来工作的直接方向：在保持多样性与表现力的前提下，引入对训练噪声的鲁棒机制和物理合理性约束。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1846_DiffSHEG_A_Diffusion_Based_Approach_for_Real_Time_Speech_driven_Holistic/figures/008_Figure.jpg]]
-*Figure: Realism Gesture-Speech Sync Expression-Speech Sync Diversity*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 

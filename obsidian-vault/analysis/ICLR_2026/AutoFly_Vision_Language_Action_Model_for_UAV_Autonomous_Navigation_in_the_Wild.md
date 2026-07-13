@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/AutoFly_Vision_Language_Action_Model_for_UAV_Autonomous_Navigation_in_the_Wild.pdf
+project_link: https://xiaolousun.github.io/AutoFly
+code_link: null
 openreview_forum_id: 88RKxlFUNY
 aliases:
 - AutoFly
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | AutoFly：面向野外无人机自主导航的视觉-语言-动作模型 |
 | 英文题名 | AutoFly: Vision-Language-Action Model for UAV Autonomous Navigation in the Wild |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=88RKxlFUNY); [Project](https://xiaolousun.github.io/AutoFly) |
+| Links | [paper](https://openreview.net/forum?id=88RKxlFUNY) · [Project](https://xiaolousun.github.io/AutoFly) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | AutoFly |
 | Dataset | Our Dataset (Overall), Sim-to-Real (Indoor) |
@@ -41,7 +43,7 @@ claims:
 > - Our Dataset (Overall) 上，CR 为 21.9，对比 OpenVLA 24.5，变化 -2.6。
 > - Our Dataset (Overall) 上，PER 为 77.3，对比 OpenVLA 75.1，变化 +2.2。
 
-## 概述
+## 概要
 
 无人机自主导航的核心挑战在于：**现有视觉-语言导航（VLN）系统依赖逐步式的精确航点指令，无法在仅有粗略方向引导和未知动态环境中进行自主决策、三维避障与空间推理**。这一瓶颈限制了无人机在野外、森林等非结构化场景中的实际部署能力。
 
@@ -57,7 +59,7 @@ claims:
 
 **证据强度：** 核心结论均有严格消融实验支撑，置信度达 0.95 以上；仿真到真实环境的迁移实验（室内 60%，室外 55%）进一步验证了方法的实用性。需注意，当前方法在全局探索能力、360 度感知范围以及与环境交互的自适应学习方面仍存在局限。
 
-## 背景与动机
+
 
 无人机在野外环境中的自主导航是机器人领域的核心挑战之一，要求系统同时具备目标识别、三维空间推理和动态避障能力。近年来，视觉-语言-动作（Vision-Language-Action, VLA）模型在具身智能任务中展现出强大的泛化潜力，为无人机视觉语言导航（VLN）开辟了新路径。
 
@@ -67,7 +69,9 @@ claims:
 
 AutoFly的动机正是填补这一空间推理缺口。其核心洞察在于：**通过引入伪深度编码器，赋予VLA模型三维空间推理能力**，使其能够基于简短的粗略指令端到端地执行障碍物避免、目标识别和路径规划，摆脱对精确逐步指令的依赖，在未知环境下实现鲁棒自主飞行。这一设计选择由因果性消融实验强力支撑：移除伪深度编码器后，成功率立即下降3.9%，碰撞率上升2.6%；而在动态障碍物场景中，伪深度编码器带来的增益更为显著——成功率提升9.9%，碰撞率降低9.5%（Table 8）。更重要的是，简单的数据扩充、更强的RGB编码器或增加训练数据均无法替代这一几何推理能力（Table 9），证明三维空间理解是无人机VLA导航中不可替代的关键要素。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 AutoFly的核心创新在于赋予VLA模型**三维空间几何理解能力**，使其摆脱对精确逐步导航指令的依赖，在仅有粗略方向引导的未知动态环境中实现端到端自主飞行。这一能力通过三个关键设计实现，构成一个完整的因果链条。
 
@@ -98,7 +102,7 @@ AutoFly采用**渐进式两阶段训练范式**，区别于基线模型的单阶
 
 值得注意的是，简单的替代方案无法弥补伪深度编码器的增益。Table 9表明，增加1000条额外训练数据仅提升1.2%成功率，使用更强的RGB编码器仅提升0.7%，均远低于伪深度编码器带来的3.9%增益。这证明**显式的几何推理能力不可被更多数据或更强的语义特征所替代**，是野外未知环境下鲁棒导航的刚需。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_88RKxlFUNY/figures/002_Figure_2.jpg]]
 *Figure 2: Framework of AutoFly. AutoFly takes RGB observations and linguistic instructions as inputs and directly outputs high-level actions. These actions, combined with initial actions derived from coarse-grained positional or directional information, form action sequences*
@@ -138,7 +142,7 @@ AutoFly 采用渐进式两阶段训练策略（Section 3.4）：
 
 实际部署中，模型运行于远程服务器，通过局域网与无人机通信（Figure 13）。系统采用多进程并行推理流水线（Figure 14）：视觉处理管线与 LLM 推理管线并发执行——在初始串行周期后，第 $t+1$ 帧的视觉处理与第 $t$ 帧的 LLM 推理重叠进行，将单帧延迟从 120ms 降至 85ms，实现约 15 FPS 的实时控制。
 
-## 核心模块与公式推导
+
 
 AutoFly 的核心架构由五个模块级联构成，形成从单目感知到连续动作的端到端流水线。
 
@@ -168,7 +172,9 @@ $$\mathbf{a}^l = \mathrm{De-Tokenizer}(\hat{\mathbf{a}}^l)$$
 
 **训练范式** 采用两阶段策略：第一阶段基于 Prismatic-VLMs 的 prism-siglip-7b 配置进行视觉-语言对齐预训练；第二阶段联合微调伪深度编码器与 VLA 骨干，使用自回归训练范式和标准交叉熵损失，使模型能够利用几何空间线索进行导航决策。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 4.1 评估指标与实验设置
 
@@ -254,7 +260,9 @@ $$\mathrm { S R } = | \mathcal { S } | / N , \quad \mathrm { C R } = | \mathcal 
 
 4. **仿真到真实的感知差距**：真实场景中的光照变化、纹理差异和传感器噪声导致深度估计质量下降，室外场景成功率（55%）低于室内（60%），提示伪深度编码器对域偏移的鲁棒性仍有提升空间。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1 问题定位：从逐步指令到粗略引导的范式跃迁
 
@@ -345,6 +353,8 @@ Sim-to-Real 迁移实验（Table 3）显示，室内场景成功率为 60%，室
 3. **在线学习与自适应**：如何在训练中引入强化学习或在线适应机制，使模型能够通过与环境的交互学习更鲁棒的行为策略，特别是在高度动态场景中？
 
 4. **指令粒度的自适应**：当前模型在“粗略指令”设定下表现出色，但如何在指令信息量变化时自适应调整依赖程度——当有更详细指令时充分利用，当仅有模糊引导时保持鲁棒——仍是一个开放问题。
+
+
 
 ## 原文 PDF
 

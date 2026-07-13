@@ -41,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - TASTE-Rob (Single Hand subset) 上，FVD (Full Frame) 13.8；FID (Full Frame) 58.2；CLIP Score (Full Frame) 0.96。
 
-## 概述
+## 概要
 
 手物交互（Hand-Object Interaction, HOI）视频生成是具身智能与视觉内容合成的关键交叉问题。现有方法普遍依赖二维控制信号（如点轨迹、光流、边界框等），缺乏对三维空间几何与运动线索的直接建模能力，导致生成视频中手物交互不真实、几何变形频繁，且难以利用合成三维数据降低采集成本。**HVG-3D** 针对这一瓶颈，提出将控制维度从二维提升至三维：引入显式的三维点云序列与三维跟踪序列作为条件信号，通过一个可训练的三维 ControlNet 将几何与运动线索注入冻结的图像到视频扩散骨干网络，实现三维条件驱动的高保真、物理一致的手物交互视频生成。
 
@@ -51,8 +51,6 @@ claims:
 
 目前该方法仍限于固定 49 帧的生成，长序列合成能力与跨场景泛化性有待进一步验证，且尚未与机器人操作策略形成闭环集成。
 
-## 背景与动机
-
 手物交互（Hand-Object Interaction, HOI）视频生成是计算机视觉与机器人领域的关键技术，其核心目标是根据给定的控制信号合成真实且时序连贯的交互视频。这项技术对于机器人操作策略学习、增强现实以及人类行为模拟等下游任务具有重要价值。然而，当前该领域面临一个核心瓶颈：**现有方法普遍依赖2D控制信号，缺乏空间表达能力，难以充分利用合成3D数据，导致手物交互不真实、几何变形频繁，且数据收集成本高昂**。
 
 具体而言，当前主流的手物交互视频生成方法——包括通用视频生成模型如 **CogVideoX**、**Wan 2.2**、**Kling**，以及专用交互生成方法如 **DaS**、**InterDyn**——均采用2D控制信号作为条件输入，例如点轨迹、光流、边界框或分割掩码。这些2D信号虽然易于从真实视频中提取，但存在根本性的维度缺陷：它们无法完整表达三维空间中手与物体的几何结构与运动关系。这导致生成结果中频繁出现手部穿透物体、物体形状畸变、交互动作不符合物理约束等问题。此外，2D条件信号的提取精度受限于视角遮挡和深度缺失，使得模型难以从合成仿真数据中获益，而仿真数据恰恰是缓解真实数据稀缺和高标注成本的关键途径。
@@ -61,7 +59,7 @@ claims:
 
 针对上述问题，**HVG-3D** 提出了一个根本性的思路转变：**将控制信号的维度从2D提升到3D**。该工作的核心洞察是，通过引入显式的三维条件信号——具体为3D点云序列和3D跟踪序列——并设计专门的3D ControlNet将这些几何与运动线索直接注入扩散模型，可以使模型具备显式的三维空间推理能力。这一设计不仅能够从根本上改善交互生成的几何准确性，更重要的是，它架起了一座连接真实域与仿真域的桥梁：模型可以接受来自真实视频提取的3D条件，也可以接受来自仿真器的合成3D条件，从而实现了数据来源的统一和互补。这种桥接能力使得HVG-3D能够充分利用仿真数据中精确、廉价的3D标注，同时保持对真实场景的泛化能力，为解决手物交互视频生成中的数据稀缺和几何变形难题提供了新的范式。
 
-## 核心创新
+## 核心方法与创新机理
 
 HVG-3D 的核心创新在于将手物交互视频生成的控制维度从二维提升到三维，通过显式的几何与运动条件信号驱动扩散模型，从根本上解决了现有方法中交互不真实和几何变形的问题。
 
@@ -94,8 +92,6 @@ HVG-3D 的另一重要创新在于其**混合训练数据构建管道**。该管
 | 损失函数 | 标准扩散损失 | 掩码加权扩散损失，强调手物交互区域 |
 
 这些创新点的因果作用在消融实验中得到了明确验证：去除 3D 点云条件后 PSNR 从 24.15 骤降至 18.44，去除 3D 跟踪视频后降至 22.76（Table 3），证明三维几何与运动线索是生成高质量手物交互视频的核心驱动力。
-
-## 整体框架
 
 HVG-3D 是一个统一的**三维条件手物交互视频合成框架**，其核心设计在于将控制维度从传统的2D信号提升到显式3D几何与运动表示，从而桥接真实域与仿真域的数据鸿沟。整个框架由两大组件构成：(i) 一个3D感知的扩散生成架构，(ii) 一个混合数据构建管道，用于从真实视频和仿真数据中提取并构建输入图像与3D条件信号（Figure 2）。
 
@@ -138,8 +134,6 @@ $$L = \sum_{i=1}^{n} \mathbb{E}_{\varepsilon} \left( \left| \left( Z_{gt} - Z_{\
 其中 $Z_{gt}$ 为真实视频的潜在表示，$Z_{\varepsilon}$ 为去噪预测，$M^{i}$ 为手物交互区域的二值掩码。通过 $(1 + M^{i})$ 的加权机制，损失函数对手物区域施加更高的重建精度要求，同时抑制背景区域的干扰，引导模型聚焦于交互过程的学习。
 
 训练使用**AdamW**优化器，学习率 $1 \times 10^{-4}$，在8张H20 GPU上训练20个epoch。
-
-## 核心模块与公式推导
 
 ### 3.1 问题形式化与条件信号
 
@@ -187,12 +181,7 @@ $$L = \sum_{i=1}^{n} \mathbb{E}_{\varepsilon} \left( \left| \left( Z_{gt} - Z_{\
 
 所有数据源经统一预处理后，生成配对的 $I_{0}$、$P$ 和 $\tau$，送入 3D ControlNet 增强的扩散骨干进行端到端训练。训练采用 AdamW 优化器，学习率 $1 \times 10^{-4}$，在 8 块 H20 GPU 上训练 20 个 epoch。这一管道使模型在推理时既可接受仿真器提供的精确 3D 条件，也可接受从真实视频估计的带噪 3D 条件，实现了域间桥接。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2521_https_arxiv_org_abs_2604_03305/figures/001_Figure_1.jpg]]
-*Figure 1: Illustration of 3D-conditioned hand–object interaction video generation with our proposed HVG-3D framework. HVG-3D synthesizes realistic and temporally coherent hand–object interaction videos by conditioning on explicit 3D signals. The top two rows display generated results using 3D point cloud and pose conditions extracted from real-world egocentric videos. The bottom two rows show results where 3D conditions are obtained from simulated hand–object sequences, demonstrating the framework’s flexibility in accepting both real and synthetic 3D inputs. For each example, the leftmost column shows the input image and 3D condition, while subsequent columns depict selected frames from the generated...*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -244,7 +233,7 @@ Figure 4 以可视化方式呈现了各方法在全帧和手物掩码区域的 F
 ![[assets/figures/papers/paper_list_l2521_https_arxiv_org_abs_2604_03305/figures/005_Figure_3.jpg]]
 *Figure 3: Qualitative comparison of video generation performance. HVG-3D is capable of generating videos with highly accurate motions and superior visual quality, while further ensuring that both the hand and the object remain free from geometric deformation. A level of performance that current state-of-the-art general-purpose video generation models are unable to achieve*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 与现有基线的对比定位
 

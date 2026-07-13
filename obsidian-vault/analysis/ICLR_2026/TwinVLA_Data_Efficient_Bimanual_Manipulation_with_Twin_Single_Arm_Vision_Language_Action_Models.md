@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/TwinVLA_Data_Efficient_Bimanual_Manipulation_with_Twin_Single_Arm_Vision_Language_Action_Models.pdf
+project_link: https://jellyho.github.io/TwinVLA/
+code_link: null
 openreview_forum_id: jG9W6nAwVz
 aliases:
 - TwinVLA
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | TwinVLA：基于双单臂视觉-语言-动作模型的数据高效双臂操作 |
 | 英文题名 | TwinVLA: Data-Efficient Bimanual Manipulation with Twin Single-Arm Vision-Language-Action Models |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=jG9W6nAwVz); [Project](https://jellyho.github.io/TwinVLA/) |
+| Links | [paper](https://openreview.net/forum?id=jG9W6nAwVz) · [Project](https://jellyho.github.io/TwinVLA/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | TwinVLA |
 | Dataset | 真实世界 Fold towel 任务 Second Fold 子任务, Tabletop-Sim Put X cube into Y pot 多任务, RoboTwin 2.0 平均 Easy |
@@ -41,7 +43,7 @@ claims:
 > - Tabletop-Sim Put X cube into Y pot 多任务 上，成功率 为 0.806，对比 RDT-1B: 0.555，变化 +0.251。
 > - RoboTwin 2.0 平均 Easy 上，平均成功率 为 0.420，对比 RDT-1B: 0.345，变化 +0.075。
 
-## 概述
+## 概要
 
 双臂操作（Bimanual Manipulation）要求两个机械臂在空间与时间上紧密协调，但现有的视觉-语言-动作（VLA）模型几乎完全基于单臂数据训练。直接将其扩展为单体双臂模型面临三重瓶颈：**大规模公开双臂数据集极度匮乏**，从零训练整体式策略需要高昂的计算开销，且隐式全局注意力难以有效捕捉双臂间的复杂耦合关系。
 
@@ -55,7 +57,7 @@ TwinVLA 提出了一种**模块化协调范式**：将预训练的单臂 VLA 复
 
 方法定位：TwinVLA 属于**模块化 VLA 组合**方法，区别于整体式双臂 VLA（如 RDT-1B）和大规模专有数据驱动方案（如 π0）。其通过选择性模块复制、联合注意力融合和 MoE 共享处理三个设计原则，在数据与计算双重约束下实现了有竞争力的双臂协调性能。
 
-## 背景与动机
+
 
 双臂操作是机器人迈向通用灵巧操作的关键能力。然而，当前主流的视觉-语言-动作（VLA）模型大多基于单臂数据训练，难以有效迁移至双臂场景。其核心瓶颈在于：双臂任务要求左右臂在时空维度上紧密协调，而单臂模型缺乏对跨臂耦合关系的显式建模能力。直接扩展单臂架构至双臂（如整体式VLA）面临双重困境——一方面，大规模公开双臂数据集严重匮乏；另一方面，从头预训练一个整体式双臂模型需要海量双臂数据与计算资源，使其难以在学术或中小规模场景中落地。
 
@@ -63,7 +65,9 @@ TwinVLA 提出了一种**模块化协调范式**：将预训练的单臂 VLA 复
 
 上述现状揭示了一个根本性矛盾：双臂协调的能力需求与双臂数据的稀缺性之间存在巨大鸿沟。本文的核心动机在于回答一个关键问题——**能否将单臂VLA的预训练能力模块化地组合为双臂策略，从而大幅降低对双臂数据的依赖？** 这一思路的直觉来源是人类双臂协调的认知机制：人类并非学习一个“整体式双臂控制器”，而是通过左右臂各自的能力基础，配合跨臂信息交换来实现协调。TwinVLA正是基于这一洞察，提出通过复制预训练单臂VLA形成左右臂分支，并引入联合注意力机制实现跨臂协同，从而在无需任何双臂预训练的条件下，仅用少量微调数据即达到有竞争力的双臂操作性能。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 TwinVLA的核心创新在于将双臂操作问题**解耦为“单臂预训练能力复制 + 跨臂协调注入”**的模块化组合范式，而非从头构建整体式双臂模型。这一设计直接回应了领域核心瓶颈：大规模双臂数据极度稀缺，而直接扩展单臂模型又难以有效捕捉双臂间的复杂耦合关系。
 
@@ -99,7 +103,7 @@ TwinVLA通过复制预训练单臂VLA形成左/右臂专用分支，而非像**R
 
 TwinVLA仅需约800小时公开单臂数据集预训练SingleVLA，再通过50条目标双臂任务示范进行微调，而RDT-1B需要约2400小时混合数据，**π0**（Black et al., 2024）则需要超过10,000小时专有数据。在计算资源方面，TwinVLA仅需约25 H100 GPU-days，而RDT-1B和π0均超过1000 H100 GPU-days。这一效率提升源于模块化设计：单臂预训练能力被完整继承，微调阶段仅需学习跨臂协调这一增量能力。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_jG9W6nAwVz/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of TwinVLA. Inspired by humans’ two-arm coordination for bimanual manipulation, TwinVLA duplicates a VLM backbone pretrained on cross-embodiment single-arm data (Left) to form two arm-specific branches linked via Joint Attention (Right). Shared inputs (ego-centric views, language instructions) are routed via a mixture-of-experts (MoE) to improve computational efficiency. Only the VLM backbone is duplicated, keeping the increase in model size minimal*
@@ -119,7 +123,7 @@ TwinVLA 的核心设计理念是将预训练的单臂 VLA 能力模块化地组�
 
 整个流程可概括为：共享编码 → 双分支 VLM 联合推理（MoE 处理共享令牌 + 联合注意力跨臂交互）→ 共享动作头解码 → 双臂动作块输出。仅复制 VLM 骨干，视觉编码器和动作头保持共享，使模型参数量增加最小化。
 
-## 核心模块与公式推导
+
 
 TwinVLA 的核心架构由三个设计原则驱动：选择性模块复制、跨臂信息融合、以及共享输入的高效处理。以下逐一展开其关键模块与支撑公式。
 
@@ -159,7 +163,9 @@ $$A_t^{\tau + \delta} = A_t^\tau + \delta v_\theta(A_t^\tau, h_t, d_t)$$
 
 步长 $\delta = 1/n$，论文中取 $n=10$，从随机噪声逐步去噪生成最终的双臂动作序列。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能对比
 
@@ -218,7 +224,9 @@ TwinVLA的主要失败模式集中在以下方面：首先，双臂视觉差异�
 ![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_jG9W6nAwVz/figures/028_Table_6.jpg]]
 *Table 6: Training hyperparameters for baseline models*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 基线关系与定位
 
@@ -253,6 +261,8 @@ TwinVLA 的模块化协调范式为双臂操作开辟了若干值得探索的方
 - **模块化范式的可扩展性**：TwinVLA 的“复制+联合注意力”范式是否适用于更多机械臂（三臂及以上）或异构机器人系统（如臂-手协同、移动操作），其扩展时的注意力复杂度和协调机制设计值得进一步研究。
 
 - **预训练知识的保留与适应平衡**：注意力重新加权机制使初始微调损失降低约 40%，但如何在更广泛的微调数据量和任务多样性下保持预训练知识的有效保留，仍需系统性的探索。
+
+
 
 ## 原文 PDF
 

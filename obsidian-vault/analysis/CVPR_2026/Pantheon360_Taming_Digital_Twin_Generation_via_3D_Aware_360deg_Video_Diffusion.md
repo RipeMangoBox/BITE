@@ -42,7 +42,7 @@ claims:
 > [!tip] 效果简介
 > - Web360 上，FVD↓ 356.151 vs 380.080 (GEN3C) (23.929)；SSIM↑ 0.746 vs 0.583 (GEN3C) (0.163)；PSNR↑ 22.838 vs 20.730 (GEN3C) (2.108)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有透视视频生成模型受限于有限视场，在长轨迹或多视角探索时需重复“臆测”不可见区域，导致跨视角不一致与时序漂移。360°视频虽能提供全场景上下文，却面临等距矩形投影（ERP）畸变与精确几何控制的双重难题——如何让生成模型既享有全景视野，又严格服从用户指定的相机轨迹，是数字孪生与沉浸式内容生成的核心瓶颈。
 
@@ -52,7 +52,7 @@ claims:
 
 **主要结果**：在Web360数据集单视图360°视频生成任务上，Pantheon360在所有指标上显著超越基线——FVD降至356.15（GEN3C为380.08），SSIM提升至0.746（GEN3C为0.583），几何一致性指标MET3R降至0.2840（GEN3C为0.3496）。在Habitat稀疏视图生成任务上同样取得最优几何一致性。双锚点潜变量融合在插值任务上达到PSNR 28.95，有效缓解了3D Cache质量不足导致的几何不一致。与GenEX的对比表明，显式3D Cache框架在长时生成中保持稳定质量与几何精度，不会出现快速退化。
 
-## 背景与动机
+
 
 数字孪生与沉浸式内容创作对可控、一致的3D场景视频生成提出了迫切需求。现有视频扩散模型在透视视频生成上取得了显著进展，但其视场范围（FoV）存在根本性局限：当相机沿长轨迹移动或进行多视角探索时，模型必须反复“臆测”视野外的不可见区域，导致跨视角几何不一致和时序漂移。如图Figure 2所示，透视锚帧在穿越至房间背面时缺乏完整场景上下文，生成结果出现严重伪影；而360°锚帧天然覆盖全场景信息，能够准确生成被遮挡区域。
 
@@ -62,7 +62,9 @@ claims:
 
 本文的核心动机在于：若能构建一个显式的3D几何骨架来强制执行全局一致性，便可将复杂的3D推理与逼真纹理合成解耦——让扩散模型专注于纹理细化，而由3D骨架保证几何正确性。这一思路构成了Pantheon360的设计基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Pantheon360的核心创新在于通过**显式3D Cache**将复杂的3D几何推理与逼真纹理合成解耦，从而在保持360°全景视野的同时实现精确的相机轨迹控制。这一设计直接回应了透视视频生成模型的两个根本瓶颈：有限视场导致的跨视角不一致，以及缺乏几何约束造成的时序漂移。
 
@@ -88,7 +90,7 @@ Pantheon360的训练数据从带已知位姿的透视视频数据集切换至**3
 
 与同为360°世界模型的**GenEX**（Lu et al., ICLR 2025）相比，Pantheon360的关键差异在于控制粒度：GenEX仅支持高层动作控制（如“前进”“左转”），缺乏精确的轨迹跟随能力，且生成质量随帧数增加快速退化（Figure 7）；Pantheon360通过显式3D Cache实现了对任意用户定义相机轨迹的精确跟随，并在长时生成中保持稳定的质量与几何精度。与并发工作**CamPVG**相比，Pantheon360在真实场景数据上进行了全面验证，而非仅限于合成数据。
 
-## 整体框架
+
 
 Pantheon360 的整体设计围绕一个核心解耦思路展开：将复杂的 3D 几何推理与逼真的纹理合成分离，使视频扩散模型专注于纹理细化，而由显式 3D Cache 强制全局几何一致性。该框架基于预训练的潜变量视频扩散模型 SVD (Blattmann et al., 2023) 构建，但引入了一套由显式 3D 场景表征引导的鲁棒条件注入机制。
 
@@ -124,7 +126,7 @@ $$L = \mathbb{E}_{y_{\text{equi}}, v_{\text{equi}}, c_{\text{img}}, t, \epsilon}
 ![[assets/figures/papers/paper_list_l2560_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Pantheon360_Tamin/figures/001_Figure_1.jpg]]
 *Figure 1: Pantheon360: Controllable 360° Video Generation. Given sparse or single 360° input images, Pantheon360 generates temporally consistent 360° videos along user-defined camera trajectories with precise geometric control. Top: From sparse views or a single view, our method synthesizes smooth videos following diverse camera trajectories across varied scenes, demonstrating flexible trajectory control from minimal input. Bottom: Our framework enables practical applications, including video stabilization (left, transforming shaky footage into smooth output) and motion interpolation (right, generating smooth transitions between distant anchor frames marked in red)*
 
-## 核心模块与公式推导
+
 
 ### 问题形式化
 
@@ -201,7 +203,9 @@ Pantheon360处于**360°视频生成**与**3D感知视频扩散**的交叉地带
 ![[assets/figures/papers/paper_list_l2560_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Pantheon360_Tamin/figures/002_Figure_2.jpg]]
 *Figure 2: Motivation for Using 360° Images for Generation. Left: When traversing to the back of the room, 360° anchor frames provide complete scene context, enabling accurate generation of occluded regions. In contrast, perspective anchor frames have a limited field-of-view and must hallucinate unseen areas, leading to significant artifacts. Right: Generating 360° outputs in a single pass ensures global coherence and cross-view consistency. Our method maintains consistent object structures (red boxes highlight the same door/cabinet viewed from different angles), while GEN3C’s perspective-based generation produces geometrically inconsistent results across views*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -281,7 +285,9 @@ Figure 5 展示了在 Google Street View 上的视频合成应用。Pantheon360 
 
 这些失败模式直接指向了方法的核心权衡：显式 3D Cache 提供了强大的几何约束，但其质量瓶颈也成为了系统性能的上限。未来的改进方向包括结合更强的 3D 基础模型以提升稀疏输入下的重建鲁棒性，以及引入显式运动表征以实现物体级别的动态控制。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：从透视生成到全景生成的范式迁移
 
@@ -325,6 +331,8 @@ Pantheon360 的生成质量存在一个根本性的上游依赖：初始3D Cache
 2. **3D Cache 鲁棒性**：结合更强的3D基础模型（如更大规模的 DUSt3R 变体或多视图立体匹配），能否提升极端稀疏输入下的几何支架质量？
 3. **多模态条件扩展**：该框架能否扩展到文本描述、语义地图等多模态条件，实现更丰富的可控生成？
 4. **大视差场景保真度**：对于快速运动或大幅度视差场景，当前的几何支架是否足以保持所有区域（尤其是 ERP 投影边缘）的逼真度？是否需要自适应分辨率或局部细化机制？
+
+
 
 ## 原文 PDF
 

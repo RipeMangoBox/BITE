@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/REI_Bench_Can_Embodied_Agents_Understand_Vague_Human_Instructions_in_Task_Planning.pdf
+project_link: https://jcx0110.github.io/rei-bench-project
+code_link: null
 openreview_forum_id: vmBIF25KLf
 aliases:
 - TOCCT
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | REI-Bench：具身代理能否理解任务规划中模糊的人类指令？ |
 | 英文题名 | REI-Bench: Can Embodied Agents Understand Vague Human Instructions in Task Planning? |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=vmBIF25KLf); [Project](https://jcx0110.github.io/rei-bench-project) |
+| Links | [paper](https://openreview.net/forum?id=vmBIF25KLf) · [Project](https://jcx0110.github.io/rei-bench-project) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/planning_control |
 | Method | Task-Oriented Context Cognition (TOCC) |
 | Dataset | REI-Bench, REI-Bench (Standard Context) |
@@ -42,7 +44,7 @@ claims:
 > - REI-Bench 上，Average Success Rate Improvement by TOCC on LLaMA3.1-8B+SayCan 为 TOCC，对比 No TOCC (vanilla)，变化 +6.5%。
 > - REI-Bench (Standard Context) 上，Object Omission Error Rate (Implicit REs) reduction by TOCC 为 40.1%，对比 53.9%，变化 -13.8%。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -71,7 +73,7 @@ claims:
 
 当前工作仅聚焦于指代表达这一种语言模糊类型，未涉及指示语、句法模糊等其他形式；实验在AI2-THOR模拟器上进行，且受限于7B–9B参数级别的端侧部署约束，更大模型的行为有待验证。如何将分析扩展到多模态感知环境、长时域任务以及更大规模模型，是值得进一步探索的方向。
 
-## 背景与动机
+
 
 ### 具身任务规划中的指令模糊性挑战
 
@@ -100,7 +102,9 @@ claims:
 
 基于上述分析，本文的核心动机在于：**解耦指代消解与任务规划**，让 LLM 先专注于理解“到底要做什么”，再生成可执行的动作序列。为此，我们提出了 **Task-Oriented Context Cognition（TOCC）** 方法，它通过在规划前插入一个独立的“上下文认知”步骤，将模糊的人类指令重写为清晰、无歧义的显式指令 $I_{\mathrm{clear}}$，然后再输入到原有的规划器中。这一设计不改变规划器本身的结构，仅通过调整输入信息的质量来提升整体鲁棒性，兼顾了效果与部署效率。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 现有LLM驱动机器人任务规划器在解析多轮人机对话中的**隐含指称表达（Implicit Referring Expressions）**时存在严重能力缺口，导致对象遗漏率急剧上升，任务成功率最高下降**36.9%**（Abstract）。本工作的核心洞察在于：**LLM并非缺乏语言理解能力，而是在规划生成过程中过度分配注意力，抑制了其对模糊指称的解析能力**。证据来自Figure 3中行：当通过人类反思提示显式引导LLM进行指称消解时，LLM能够正确识别隐含指称所指的对象。
 
@@ -114,7 +118,7 @@ claims:
 
 值得注意的是，AP在某些Explicit REs场景下反而导致性能下降，这一反直觉现象（Section 4.3）进一步印证了核心洞察：简单地让LLM“意识到”模糊性并不足够，关键在于在规划前完成指称消解。移除上下文记忆的消融实验则证实，上下文是隐含指称解析的必要条件——在Explicit REs下性能与TOCC相当，但在Mixed REs下急剧下降（Section 4.3）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_vmBIF25KLf/figures/002_Table_1.jpg]]
 *Table 1: Comparison of REI-Bench with existing datasets and benchmarks*
@@ -164,7 +168,7 @@ TOCC 在 LLaMA3.1-8B+SayCan 上实现了平均 6.5% 的成功率提升（Figure 
 
 **需要人工核实**：Figure 1 的框架示意图中是否明确标注了 TOCC 模块与规划器之间的解耦关系，以及 *I_clear* 在流水线中的位置。若图示不够清晰，建议在正文中补充对模块间数据流的文字描述。
 
-## 核心模块与公式推导
+
 
 TOCC 的设计动机源于一个关键发现：LLM 在直接生成规划时，其注意力过度分配给动作序列的生成，导致其固有的语言理解能力被抑制——即 LLM 实际上具备解析隐式指代表达的能力，但在联合执行规划与指代消解时无法有效调用该能力。Figure 3 的中行实验证实了这一点：当人类提供反射性提示引导 LLM 先解析指代时，LLM 能够正确识别目标对象。
 
@@ -183,7 +187,9 @@ TOCC 的设计动机源于一个关键发现：LLM 在直接生成规划时，�
 
 该解耦设计的因果机制在于：将指代消解从规划生成的注意力竞争中剥离，使 LLM 在两个阶段分别集中处理语言理解与动作规划，从而显著降低因指代解析失败导致的对象遗漏错误。Table 3 的消融实验验证了这一机制——TOCC 在 Implicit REs 条件下将对象遗漏错误率从 53.9% 降至 40.1%，而移除上下文记忆的对照组（-Context）则出现对象遗漏率的急剧上升，进一步证实上下文在指代消解阶段的关键作用。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈：隐式指代表达式导致任务成功率大幅下降
 
@@ -244,7 +250,9 @@ Figure 6展示了一个典型失败案例（Mixed REs & Short Context，LLaMA3.1
 ![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_vmBIF25KLf/figures/015_Figure_4.jpg]]
 *Figure 4: Success rate (%) of three task planner frameworks, SayCan, DAG-Plan, and HPE, using three LLMs (GPT-4o-mini, LLaMA3.1-8B, DeepSeekMath-7B), together with an additional “GPT-4o + SayCan” planner and a human baseline on the REI dataset. Explicit, Mixed, and Implicit REs denote three levels of implicit REs in human instructions, and Standard, Noised, and Short Contexts represent three context memory types*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：模糊指代在任务规划中的瓶颈
 
@@ -290,6 +298,8 @@ TOCC 的本质是**输入槽位变换**：将规划器的输入从原始模糊�
 2. 随着 LLM 规划器能力提升，分析能否扩展到长周期、多目标任务？
 3. 融入视觉和空间感知等多模态信息后，模糊指令的解释机制会如何变化？
 4. TOCC 能否适配更大规模 LLM，或在零样本设定下无需显式提示工程即可工作？
+
+
 
 ## 原文 PDF
 

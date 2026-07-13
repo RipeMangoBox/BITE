@@ -5,6 +5,8 @@ paper_level: A
 venue: 3DV
 year: 2024
 pdf_ref: paperPDFs/3DV_2024/MACS_Mass_Conditioned_3D_Hand_and_Object_Motion_Synthesis.pdf
+project_link: null
+code_link: null
 aliases:
 - MMC3HOMS
 tags:
@@ -39,7 +41,7 @@ claims:
 > - 用户研究（感知运动质量） 上，真实感评分（1-10） 6.01±2.08 vs VAE: 5.10±2.24, VAEGAN: 4.54±2.39 (高于VAE约0.91)。
 > - 加速度分布相似度（质量条件化效果） 上，Wasserstein距离（acc. dist.） 0.006-0.012（随质量而变化） vs ours w/o cond: 0.061-0.089 (降低约一个数量级)。
 
-## 概述
+## 概要
 
 合成逼真的三维手-物体交互运动是计算机视觉与图形学中的关键挑战。现有方法主要关注运动学层面的动作生成，却普遍忽略了物体的内在物理属性——尤其是**质量**——对操作策略的根本性影响。这一缺失导致生成的动作缺乏物理合理性：轻质物体与重质物体的抓取方式、运动速度应截然不同，但现有模型无法体现这种差异。
 
@@ -54,7 +56,7 @@ claims:
 
 MACS在方法谱系中定位于**物理感知的运动生成**，将扩散模型的生成能力与物理约束相结合，为后续探索物体物理属性与人类操作行为之间的关系提供了新的视角。
 
-## 背景与动机
+
 
 三维手-物体交互运动合成是计算机视觉与图形学中的核心问题，旨在生成逼真的手部动作序列以操作目标物体。该技术在机器人学习、增强现实和虚拟化身动画等领域具有广泛的应用前景。然而，现有方法普遍存在一个关键缺陷：**忽略了物体的物理属性，特别是质量**。
 
@@ -62,7 +64,9 @@ MACS在方法谱系中定位于**物理感知的运动生成**，将扩散模型
 
 MACS（Mass Conditioned 3D Hand and Object Motion Synthesis）是首个将物体质量作为显式条件引入三维手-物体运动合成的方法。其核心动机在于：**质量是影响手-物体交互模式的关键物理量**。通过在级联扩散模型中显式建模质量条件，并利用合成的接触标签进行优化，MACS使生成的手部动作和抓取方式能够自动适应不同质量的物体——轻物体时接触集中于指尖，重物体时接触扩展至整个手掌区域。该方法即使在训练中未见过的物体形状上，也能根据给定的质量值生成合理的操作行为，展现出一定的泛化能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MACS 的核心创新在于首次将**物体质量**作为显式物理条件引入三维手-物体交互运动合成，使生成的动作策略和接触模式能够自动适应不同质量。这一创新通过三个关键的 **changed slots** 实现：
 
@@ -91,7 +95,7 @@ MACS 的核心创新在于首次将**物体质量**作为显式物理条件引�
 
 三个 changed slots 形成了一条完整的因果链：**质量条件** → 扩散模型生成质量适应的关节运动和对象轨迹 → **ConNet** 预测质量敏感的接触区域 → **几何损失与接触损失** 在训练和拟合阶段强化物理约束。这条因果链使 MACS 在用户研究中获得 6.01±2.08 的真实感评分，显著优于 VAE（5.10±2.24）和 VAEGAN（4.54±2.39）基线（Table 6），并且对训练中未见过的物体形状也展现出一定的质量条件化泛化能力（Figure 8）。
 
-## 整体框架
+
 
 MACS 采用**级联扩散模型**架构，将质量条件化的三维手-物体运动合成分解为两个顺序阶段：对象轨迹生成与手部运动合成，最后通过拟合优化输出与物体物理交互的手部网格。图 2 展示了完整的 pipeline 结构。
 
@@ -122,9 +126,9 @@ TrajDiff 的输出直接作为 HandDiff 的条件输入，形成**轨迹→手�
 ### 补充图表
 
 ![[assets/figures/papers/paper_list_l1656_MACS_Mass_Conditioned_3D_Hand_and_Object_Motion_Synthesis/figures/002_Figure_2.jpg]]
-*Figure 2: The proposed framework. The object trajectory synthesis stage accepts as input the conditional mass value m and action label a along with a Gaussian noise sampled from N (0, I), and outputs an object trajectory. The hand motion synthesis stage accepts a, m and the synthesized trajectory as conditions along with a gaussian noise sampled from*
+*Figure 2：质量条件驱动的物体轨迹、接触与手部运动两阶段生成框架。*
 
-## 核心模块与公式推导
+
 
 ### 整体框架
 
@@ -195,15 +199,15 @@ $$\mathcal{L}_{\text{ratio}} = \| \mathbf{r} - \hat{\mathbf{r}} \|_2^2 + \| \mat
 ### 补充图表
 
 ![[assets/figures/papers/paper_list_l1656_MACS_Mass_Conditioned_3D_Hand_and_Object_Motion_Synthesis/figures/013_Figure_7.jpg]]
-*Figure 7: (left) Example visualizations of the contacts synthesized by ConNet, given conditioning mass values of 0.18 kg (top) and 4.9 kg (bottom). With heavier mass, the contact region spans the entire palm region whereas contacts concentrate around the fingertips for a light object. (right) Example visualizations of 3D object manipulation given user input trajectories of S curve (top) and infinity curve (bottom). Thanks to the RatioNet, the object manipulation speed matches our intuition i.e. slower manipulation speed with heavier objects, and vice versa. See our supplementary video for the sequential visualizations*
+*Figure 7：不同质量条件改变手掌与指尖的接触区域。*
 
-![[assets/figures/papers/paper_list_l1656_MACS_Mass_Conditioned_3D_Hand_and_Object_Motion_Synthesis/figures/003_Figure_3.jpg]]
-*Figure 3: Definition of the template vertices*
 
 ![[assets/figures/papers/paper_list_l1656_MACS_Mass_Conditioned_3D_Hand_and_Object_Motion_Synthesis/figures/007_Figure_6.jpg]]
-*Figure 6: Schematic visualization of the user input trajectory processing stage*
+*Figure 6：用户输入轨迹的处理与质量条件控制流程。*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果
 
@@ -241,8 +245,6 @@ MACS的核心目标是验证质量条件化能否使合成的手-物体交互运
 
 5. **数据采集成本高**：依赖有标记的3D手部和物体运动数据，采集过程需要专业动捕设备和标记物（Figure 5），限制了方法向更大规模、更多样化场景的扩展。
 
-![[assets/figures/papers/paper_list_l1656_MACS_Mass_Conditioned_3D_Hand_and_Object_Motion_Synthesis/figures/008_Figure_5.jpg]]
-*Figure 5: Image of our markered sphere and recording example*
 
 ### 开放问题
 
@@ -257,27 +259,21 @@ MACS的核心目标是验证质量条件化能否使合成的手-物体交互运
 ### 补充图表
 
 ![[assets/figures/papers/paper_list_l1656_MACS_Mass_Conditioned_3D_Hand_and_Object_Motion_Synthesis/figures/011_Table_6.jpg]]
-*Table 6: Results of the user study (perceptual motion quality)*
+*Table 6：用户研究中的感知运动质量比较。*
 
-![[assets/figures/papers/paper_list_l1656_MACS_Mass_Conditioned_3D_Hand_and_Object_Motion_Synthesis/figures/012_Table_4.jpg]]
-*Table 4: Wasserstein distances between the acceleration distributions (“acc. dist”) of the generated and ground-truth motions*
 
-![[assets/figures/papers/paper_list_l1656_MACS_Mass_Conditioned_3D_Hand_and_Object_Motion_Synthesis/figures/010_Table_3.jpg]]
-*Table 3: Wasserstein distances between the acceleration distributions (“acc. dist”) of the generated motions and ground-truth motions. Combining both*
 
 ![[assets/figures/papers/paper_list_l1656_MACS_Mass_Conditioned_3D_Hand_and_Object_Motion_Synthesis/figures/006_Table_2.jpg]]
-*Table 2: Physical plausibility measurement of our full model and its trimmed versions vs VAE and VAE-GAN*
+*Table 2：完整模型及消融版本的物理合理性比较。*
 
-![[assets/figures/papers/paper_list_l1656_MACS_Mass_Conditioned_3D_Hand_and_Object_Motion_Synthesis/figures/009_Table_5.jpg]]
-*Table 5: Wasserstein distances between the acceleration distributions (“acc. dist”) of ground-truth trajectory and the generated from RatioNet (Ours). We also show the same metric computed on the interpolated subdivided trajectory with an equal length*
 
 ![[assets/figures/papers/paper_list_l1656_MACS_Mass_Conditioned_3D_Hand_and_Object_Motion_Synthesis/figures/005_Figure_4.jpg]]
-*Figure 4: Grasp synthesis with different object masses. Our method can generate sequences influenced by masses close (in black) and far (in red) from the training dataset. Note that in the case of small masses, hands can support the object with fingertips and release the object for some time; the hands are generally more mobile. The situation is different for moderate and large masses: A larger area supporting the object is necessary, and the hands are less mobile*
+*Figure 4：不同物体质量产生不同支撑方式与抓取姿态。*
 
-![[assets/figures/papers/paper_list_l1656_MACS_Mass_Conditioned_3D_Hand_and_Object_Motion_Synthesis/figures/014_Figure_8.jpg]]
-*Figure 8: Example visualizations of 3D manipulations of the objects unseen during the training, given conditioning mass value of 0.2kg (top) and 5.0kg (bottom). MACS adapts to unseen shapes thanks to its mass-conditioned synthesized hand contacts*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的对比定位
 
@@ -324,6 +320,8 @@ MACS 的适用性受限于以下关键边界条件：
 4. **从观察到预测的闭环**：能否从观察到的操作动作中反推物体质量，进而用于自监督或弱监督学习，是一个具有应用价值的方向。这涉及逆物理推理与运动生成的联合建模。
 
 5. **实时推理能力**：当前框架需要离线训练多个网络并进行拟合优化，推理速度可能无法满足实时交互应用的需求。网络架构的轻量化或端到端训练策略值得探索。
+
+
 
 ## 原文 PDF
 

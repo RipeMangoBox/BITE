@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2022
 pdf_ref: paperPDFs/CVPR_2022/A_ViT_Adaptive_Tokens_for_Efficient_Vision_Transformer.pdf
+project_link: https://a-vit.github.io/
+code_link: null
 aliases:
 - A-ViT
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | A-ViT：面向高效视觉Transformer的自适应令牌 |
 | 英文题名 | A-ViT: Adaptive Tokens for Efficient Vision Transformer |
 | 会议/期刊 | CVPR 2022 |
-| Links | [paper](https://arxiv.org/abs/2112.07658); [Project](https://a-vit.github.io/) |
+| Links | [paper](https://arxiv.org/abs/2112.07658) · [Project](https://a-vit.github.io/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | A-ViT |
 | Dataset | ImageNet-1K |
@@ -40,7 +42,7 @@ claims:
 > - ImageNet-1K 上，Top-1准确率 (相比DeiT) 为 仅下降0.3% (DeiT-Tiny & DeiT-Small) 或 71.3% / 78.9% (A-ViT-T/S finetuned)，对比 72.2% (DeiT-Tiny) / 79.8% (DeiT-Small) 估计，变化 -0.3% (最大)。
 > - ImageNet-1K 上，平均Token深度 / FLOPs / Top-1 Acc. (对比其他动态方法) 为 A-ViT-T: Avg. depth 7.23, FLOPs 0.8G, Top-1 71.0，对比 DynamicViT等: 更浅或更深但精度更低/更高FLOPs，变化 更好的精度-效率权衡。
 
-## 概述
+## 概要
 
 标准Vision Transformer（ViT）对所有图像块（token）均等对待，在每一层对所有token执行密集的自注意力和前馈计算。这一固定计算范式忽略了图像内容在空间上的信息差异性——背景、纹理均匀区域等大量token对最终分类贡献甚微，却消耗了与语义关键区域相同的计算资源。A-ViT针对这一瓶颈，提出了一种**无需额外参数的自适应token计算机制**：在每个Transformer块内部，复用现有MLP层中嵌入向量的单一维度，通过sigmoid函数为每个token生成一个停止概率；当某token的累积停止分数达到阈值时，该token在后续层中被提前移除并屏蔽注意力，从而实现**细粒度的空间自适应推理**。
 
@@ -49,8 +51,6 @@ claims:
 在方法定位上，A-ViT属于**动态推理**与**自适应计算时间（ACT）** 的交叉。不同于**DynamicViT**（Rao et al., NeurIPS 2021）基于Gumbel-softmax的token稀疏化——后者在固定层数后一次性丢弃token——A-ViT允许不同token在不同深度独立停止，更灵活地匹配图像局部复杂度。相较于传统**ACT**（Graves, arXiv 2016）在层级对所有token同时停止，A-ViT的token级细粒度停止使平均深度减少约3层，额外降低25%的FLOPs。与**PonderNet**（Banino et al., ICML Workshop 2021）的几何分布采样停止相比，A-ViT的确定性累积停止机制在训练稳定性上更具优势。
 
 主要结果：在ImageNet-1K上，A-ViT使DeiT-Tiny的吞吐量提升62%，DeiT-Small提升38%，而Top-1准确率仅下降0.3%。可视化分析表明，学习到的停止深度与图像语义高度对齐——信息丰富的目标区域被处理得更深，背景区域则被提前终止，验证了自适应计算的有效性和可解释性。
-
-## 背景与动机
 
 ### 视觉Transformer的计算冗余困境
 
@@ -80,7 +80,7 @@ claims:
 
 核心假设是：**通过在每个Transformer块中借用单一嵌入维度计算token级停止概率，可以在不牺牲模型容量的前提下实现高效的自适应推理**。这一设计使得A-ViT能够直接部署于现成硬件平台，无需定制稀疏计算支持即可获得显著的吞吐量提升。
 
-## 核心创新
+## 核心方法与创新机理
 
 A-ViT 的核心创新在于为视觉Transformer引入**空间自适应的token级动态计算机制**，使不同图像区域能够根据其信息量在不同深度提前停止处理。这一设计直击标准ViT对所有token进行同等深度密集计算的根本瓶颈，实现了细粒度的计算资源分配。
 
@@ -118,8 +118,6 @@ $$\mathcal{L}_{\mathrm{distr.}} = \mathrm{KL}(\mathcal{H} || \mathcal{H}^{\mathr
 
 这些创新共同实现了在几乎不损失准确率的前提下显著提升推理效率：DeiT-Tiny吞吐量提升62%，DeiT-Small提升38%，准确率仅下降0.3%。
 
-## 整体框架
-
 ![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2112_07658/figures/001_Figure_1.jpg]]
 *Figure 1: We introduce A-ViT, a method to enable adaptive token computation for vision transformers. We augment the vision transformer block with adaptive halting module that computes a halting probability per token. The module reuses the parameters of existing blocks and it borrows a single neuron from the last dense layer in each block to compute the halting probability, imposing no extra parameters or computations. A token is discarded once reaching the halting condition. Via adaptively halting tokens, we perform dense compute only on the active tokens deemed informative for the task. As a result, successive blocks in vision transformers gradually receive less tokens, leading to faster inference....*
 
@@ -154,8 +152,6 @@ $$\mathcal{L}_{\text{overall}} = \mathcal{L}_{\text{task}} + \alpha_p \mathcal{L
 其中 $\mathcal{L}_{\text{ponder}} = \frac{1}{K} \sum_{k=1}^{K} (N_k + r_k)$ 鼓励令牌尽早停止，$\mathcal{L}_{\text{distr.}} = \text{KL}(\mathcal{H} \| \mathcal{H}^{\text{target}})$ 通过 KL 散度将各层停止分数的分布约束到目标高斯分布，引导平均停止深度收敛至预设值。
 
 **模块间数据流关系**：图像 → Patch Embedding → 活跃令牌序列 → [Transformer Block + Halting Module] × L 层（逐层递减令牌数）→ 类令牌均值场聚合 → 分类器输出。随着推理深度增加，被判定为信息量低的令牌逐步退出计算，形成“漏斗式”的令牌流，后续层仅对保留的语义关键区域进行密集计算。
-
-## 核心模块与公式推导
 
 ### 整体推理流程
 
@@ -226,7 +222,7 @@ $$\mathcal{L}_{\mathrm{overall}} = \mathcal{L}_{\mathrm{task}} + \alpha_p \mathc
 
 其中 $\alpha_p$ 和 $\alpha_d$ 分别是 Ponder 损失和分布正则项的权重超参数。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主要结果
 
@@ -237,7 +233,6 @@ A-ViT 在 ImageNet-1K 上以几乎可忽略的精度代价换取了显著的吞�
 ### 定性分析
 
 **Figure 3** 展示了不同图像上动态 token 深度的分布：token 计算量的分配与视觉特征高度对齐，信息丰富的区域（如物体主体）被自适应地处理到更深层，而背景区域则提前停止。**Figure 4(a)** 进一步从空间位置角度量化了 token 平均深度分布，**Figure 4(b)** 则展示了各层停止分数的统计特征。**Figure 5** 对比了“困难”与“简单”样本：具有均匀背景的简单样本平均 token 深度显著更低，验证了 A-ViT 根据图像复杂度自适应分配计算的能力。
-
 
 ![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2112_07658/figures/006_Figure_5.jpg]]
 *Figure 5: Visual comparison of hard and easy samples from the ImageNet-1K validation set determined by average token depth. Note that all images above be correctly classified – only difference is that hard samples require more depths for tokens to process their semantic information. Tokens in the left images exit approximately 5 layers later compared to the right images*
@@ -268,15 +263,11 @@ A-ViT 在 ImageNet-1K 上以几乎可忽略的精度代价换取了显著的吞�
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2112_07658/figures/015_Figure_8.jpg]]
-*Figure 8: Additional examples across a more diverse set of image categories – original image (left) and the dynamic token depth (right) of A-ViT-T on the ImageNet-1K validation set. Again adaptive tokens can quickly cater to informative regions while filtering out complex backgrounds, e . g . , completely ignoring human faces and focusing on the coats, see the first two image on the first row. Even for a very small informative region of the target object, the computation can still be effectively allocated towards it, see the first golf-cart class sample of the last row as an example*
-
 ![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2112_07658/figures/008_Table.jpg]]
 
 ![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2112_07658/figures/009_Table.jpg]]
 
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 核心谱系定位
 

@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2019
 pdf_ref: paperPDFs/CVPR_2019/Devil_is_in_the_Edges_Learning_Semantic_Boundaries_from_Noisy_Annotations.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/toronto-ai/STEAL/
 aliases:
 - SSTEAL
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 细节在于边缘：从噪声标注中学习语义边界 |
 | 英文题名 | Devil is in the Edges: Learning Semantic Boundaries from Noisy Annotations |
 | 会议/期刊 | CVPR 2019 |
-| Links | [paper](https://arxiv.org/abs/1904.07934); [Project](https://nv-tlabs.github.io/STEAL/); [Project](https://research.nvidia.com/labs/toronto-ai/STEAL/) |
+| Links | [paper](https://arxiv.org/abs/1904.07934) · [Project](https://nv-tlabs.github.io/STEAL/) · [Project](https://research.nvidia.com/labs/toronto-ai/STEAL/) |
 | Topic | #topic/optimization_theory_probabilistic #topic/optimization_theory_probabilistic/learning_theory |
 | Method | STEAL (Semantically Thinned Edge Alignment Learning) |
 | Dataset | SBD re-annotated test set (high-quality), SBD original test set, Cityscapes val |
@@ -42,7 +43,7 @@ claims:
 > - SBD re-annotated test set (high-quality) 上，AP 为 62.57，对比 ~43.96 (CASENet)，变化 +18.61。
 > - SBD original test set 上，MF(ODS) mean 为 75.6，对比 71.88 (CASENet, inferred)，变化 +3.72。
 
-## 概述
+## 概要
 
 **问题瓶颈**：当前语义边界数据集普遍存在标注噪声，人工标注的边界往往比真实边界更粗且位置不准。标准方法直接使用带噪标注训练加权二元交叉熵损失，缺乏对边界形状的显式约束，导致学习到的边界预测过厚且对齐精度不足。
 
@@ -56,7 +57,7 @@ claims:
 - 在 Cityscapes val 上，STEAL 预测的边界比 **DeepLab v3+**（Chen et al., ECCV 2018）分割掩码提取的边缘在严格匹配阈值下高 **4.2%**（Fig. 5）。
 - 当训练标注存在 8px 模拟噪声时，主动对齐使 MF(ODS) 从 46.26% 大幅提升至 **56.41%**，验证了其对标注质量的鲁棒性（Table 4）。
 
-## 背景与动机
+
 
 ### 语义边界检测的任务定位与瓶颈
 
@@ -88,7 +89,9 @@ claims:
 
 这两条途径——边界方向的局部约束与标注的全局迭代对齐——**均不改变主干网络结构**，可作为即插即用的模块叠加于现有检测器之上。其核心洞察在于：通过显式建模边界形状先验和标注不确定性，可以在不增加推理复杂度的前提下，显著提升边界清晰度和检测精度，并支持粗标注数据的自动精化。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 STEAL 的核心创新在于**不改变主干网络**的前提下，通过两个互补的“变更槽”（Changed Slots）系统性地解决语义边界检测中的标注噪声与边界过厚问题：
 
@@ -133,7 +136,7 @@ $$\frac{\partial \phi}{\partial t} = g_k (\kappa + c) |\nabla \phi| + \nabla g_k
 
 两个变更槽形成互补：**NMS 损失层**提供局部的、边界法线方向的形状约束，使网络本身具备预测细边界的能力；**主动对齐**则从全局标注层面迭代消除训练目标中的系统误差。二者协同使得 STEAL 在高质量重新标注的 SBD 测试集上将 CASENet 的 MF(ODS) 从 63.52% 提升至 68.15%（+4.63%），AP 提升超过 18 个百分点（Table 1），且该方法可即插即用于任意现有语义边界检测网络。
 
-## 整体框架
+
 
 STEAL（Semantically Thinned Edge Alignment Learning）是一个即插即用的语义边界学习框架，其核心设计目标是从带噪声的标注中学习细粒度、高精度的语义边界。该框架由两条互补的技术路径构成：**边界细化层（Boundary Thinning Layer）及其配套损失函数**，以及**主动对齐（Active Alignment）机制**。前者在局部尺度上约束边界预测的形状，后者在全局尺度上迭代修正训练标注的质量。
 
@@ -156,7 +159,7 @@ STEAL（Semantically Thinned Edge Alignment Learning）是一个即插即用的�
 
 **关键设计决策**：主动对齐在网络精度趋于平稳后才引入，以减少计算开销；边界细化层仅在训练时使用，推理时被移除，主干网络直接输出细化后的边界预测。
 
-## 核心模块与公式推导
+
 
 STEAL 的核心由三个功能模块构成：**边界细化层 (Boundary Thinning Layer)**、**主动对齐 (Active Alignment)** 以及一个**组合损失函数**。这些模块可插入任意现有语义边界检测网络（如 **CASENet**, Yu et al., CVPR 2017）之上，无需修改主干网络。
 
@@ -218,7 +221,9 @@ $$\frac{\partial \phi}{\partial t} = g_k (\kappa + c) |\nabla \phi| + \nabla g_k
 
 在推理阶段，给定一个粗分割掩码，可利用训练好的网络和水平集演化（设 $\lambda=0, c=1$）进行 $t$ 次迭代，使掩码边界与网络预测的语义边界对齐，从而生成精化掩码。该过程无需额外训练。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计逻辑
 
@@ -299,9 +304,10 @@ Figure 3展示了STEAL预测边界与CASENet及Ground Truth的视觉对比，STE
 ![[assets/figures/papers/paper_list_l51_https_arxiv_org_abs_1904_07934/figures/004_Table_4.jpg]]
 *Table 4: Effect of Active Alignment on the SBD dataset. Score (%) represents mean over all classes*
 
-![[assets/figures/papers/paper_list_l51_https_arxiv_org_abs_1904_07934/figures/009_Table.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心基线定位
 
@@ -339,6 +345,8 @@ STEAL 的两条互补途径分别对应不同的技术传统：
 - **计算效率**：主动对齐需在训练中周期性执行水平集演化（可在网络精度趋于平稳后引入，或每 n 次迭代执行一次以节省计算），在移动端或实时系统中，仅使用 NMS 损失（无主动对齐）可能是更实际的选择，但性能会有所下降。
 - **任务迁移性**：边界细化层和主动对齐是否可迁移到深度边界估计、实例分割边缘等像素级预测任务，尚待验证。
 - **粗到精细化与人工精修的定量比较**：论文未提供精化效率与质量相对于人工精修的定量对比。
+
+
 
 ## 原文 PDF
 

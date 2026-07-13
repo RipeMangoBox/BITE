@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/DistDF_Time_series_Forecasting_Needs_Joint_distribution_Wasserstein_Alignment.pdf
+project_link: null
+code_link: https://github.com/Master-PLC/DistDF
 openreview_forum_id: VrdLwUmzBy
 aliases:
 - DistDF
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | DistDF：时间序列预测需要联合分布Wasserstein对齐 |
 | 英文题名 | DistDF: Time-series Forecasting Needs Joint-distribution Wasserstein Alignment |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=VrdLwUmzBy); [GitHub](https://github.com/Master-PLC/DistDF) |
+| Links | [paper](https://openreview.net/forum?id=VrdLwUmzBy) · [GitHub](https://github.com/Master-PLC/DistDF) |
 | Topic | #topic/time_series_dynamical_systems #topic/time_series_dynamical_systems/time_series_forecasting |
 | Method | DistDF |
 | Dataset | ETTm1, ETTh1, ECL, Traffic |
@@ -41,7 +43,7 @@ claims:
 > - ETTh1 上，MSE 为 0.430，对比 0.442 (TimeBridge)，变化 0.012 lower。
 > - ECL 上，MSE 为 0.172，对比 0.176 (TimeBridge)，变化 0.004 lower。
 
-## 概述
+## 概要
 
 时间序列预测的标准训练目标——均方误差（MSE）——存在一个被长期忽视的结构性问题：它假设标签序列的每个未来时间步相互独立，从而忽略了标签内部的自相关结构。这一疏忽使得MSE成为真实负对数似然的有偏估计，即产生**自相关偏差**（Theorem 3.1）。尽管频域变换（如FreDF）和主成分分析（如Time-o1）等方法试图通过去相关来缓解该问题，但它们仅保证边缘去相关，条件自相关依然存在，偏差并未消除（Figure 1）。
 
@@ -49,7 +51,7 @@ claims:
 
 DistDF作为一种即插即用的学习目标，可与各类预测模型结合。实验覆盖多个主流模型（TimeBridge、Fredformer、iTransformer等）和数据集（ETT、ECL、Traffic等），结果表明DistDF一致优于标准MSE训练及其他学习目标（Table 1、Table 2）。消融实验证实，均值对齐与协方差对齐具有协同效应，二者联合使用方能取得最佳性能（Table 3）。此外，DistDF在自回归预测和概率预测设定下同样表现稳健（Table 16、Table 17）。
 
-## 背景与动机
+
 
 时间序列预测的核心任务是根据历史观测 $X$ 预测未来序列 $Y$。当前主流的深度学习预测方法几乎无一例外地采用均方误差（MSE）作为训练目标：
 
@@ -79,7 +81,9 @@ $$\mathrm{Bias} = \| Y_{|X} - \hat{Y}_{|X} \|_{\Sigma_{|X}^{-1}}^2 - \| Y_{|X} -
 
 这引出了本文的核心动机：能否设计一种学习目标，直接对齐预测分布与标签分布之间的**条件依赖关系**，从而绕过自相关偏差？具体而言，需要解决两个关键问题：如何度量两个条件分布之间的差异，以及如何使该度量可微且适用于梯度优化训练。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DistDF 的核心创新在于**将时间序列预测的学习目标从逐点误差最小化转向联合分布对齐**，从而从根本上解决 MSE 损失函数忽略标签序列自相关结构所导致的似然估计偏差问题。
 
@@ -129,7 +133,7 @@ $$\mathcal{B}(\Sigma_{X,Y}, \Sigma_{X,\hat{Y}}) = \mathrm{Tr}(\Sigma_{X,Y} + \Si
 
 DistDF 仅量化联合分布的一阶矩（均值）和二阶矩（协方差）差异，丢弃了预测与标签序列之间的逐元素对应关系。因此，其独立作为损失函数时效果受限，通常需要与 MSE 结合作为正则项（$\alpha$ 取较小正值如 0.001–0.1）才能发挥最佳性能。在高维多元场景下，协方差矩阵的计算开销也值得关注。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0009_VrdLwUmzBy_DistDF_Time-series_Forecasting_Needs_Joint-distr/figures/003_Figure_1.jpg]]
 *Figure 1: The conditional correlation of label components given X, where the forecast horizon is set to $\mathrm { \bar { T } = 1 9 2 }$ . The correlation matrices are computed for the raw labels (a), the frequency components in FreDF (b) (Wang et al., 2025g) and the principal components in Time-o1 (c) (Wang et al., 2025f)
@@ -176,7 +180,7 @@ DistDF 的 pipeline 设计由两条理论保证驱动：
 
 DistDF 仅量化联合分布的一阶矩（均值）和二阶矩（协方差）差异，丢弃了预测与标签序列之间的逐元素对应关系。因此，$\mathcal{L}_{\mathrm{dist}}$ 独立作为损失函数时效果受限，通常需要与 MSE 结合作为正则项才能发挥最佳性能——消融实验中 $\alpha=1$（纯 BW 损失）的表现通常弱于 $\alpha<1$ 的设置。
 
-## 核心模块与公式推导
+
 
 ### 自相关偏差的数学刻画
 
@@ -228,7 +232,9 @@ $$
 
 其中 $\mathcal{L}_{\mathrm{dist}}$ 即为Bures-Wasserstein差异，$\alpha \in [0,1]$ 控制分布对齐的强度。MSE项保留了逐元素对应关系，弥补了BW差异仅量化一阶矩和二阶矩差异而丢弃逐时间步对齐信息的局限。消融实验表明，均值对齐与协方差对齐具有协同效应，二者联合（DistDF）优于各自单独使用（Table 3）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 长期预测主结果
 
@@ -297,7 +303,9 @@ Figure 3展示了DistDF应用于TimeBridge、Fredformer、iTransformer、FreTS�
 
 附录中的Table 16和Table 17进一步验证了DistDF在自回归预测和概率预测设定下的有效性。在这些非标准DF场景中，DistDF依然稳定提升性能，表明联合分布对齐的思想具有跨任务迁移能力。但需注意，这些结果的置信度（0.9）略低于主要实验，建议在实际应用中针对具体任务进行验证。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有方法的关系
 
@@ -341,6 +349,8 @@ DistDF 的适用性受以下条件约束：
 3. **非高斯扩展**：能否将框架推广至更一般的分布族？例如，使用切片 Wasserstein 距离或最大均值差异（MMD）替代 Bures-Wasserstein，可能放宽高斯假设但需重新建立条件对齐的理论保证。
 
 4. **与架构设计的协同**：当前 DistDF 作为模型无关的损失函数插件，与具体架构解耦。是否存在与 DistDF 原理协同的架构设计（如显式建模条件协方差结构的预测头），可进一步放大分布对齐的收益？
+
+
 
 ## 原文 PDF
 

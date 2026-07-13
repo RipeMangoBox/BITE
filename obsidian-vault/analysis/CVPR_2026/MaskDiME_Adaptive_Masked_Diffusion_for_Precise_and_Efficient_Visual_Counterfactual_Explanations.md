@@ -41,15 +41,13 @@ claims:
 > [!tip] 效果简介
 > - CelebA Smile 上，推理速度提升 >30× vs DiME，>2.5× vs FastDiME vs 1× (DiME, FastDiME) (>30×)；多样性 σ_L 0.0395 vs 0.2139 (DiME)；0.0174 (ACE l1) (-0.1744 vs DiME)；GPU内存占用 ~1/10 of ACE and RCSB vs ACE, RCSB (全量) (约 90% 减少)。
 
-## 概述
+## 概要
 
 视觉反事实解释旨在回答“如果输入图像的某部分不同，模型决策是否会改变”这一关键问题。现有基于扩散模型的反事实生成方法面临两个结构性瓶颈：**计算成本高昂**与**空间编辑精度不足**。以 **DiME**（Jeanneret et al., ACCV 2022）为代表的早期工作采用嵌套去噪，导致推理复杂度高达 $O(T^2)$，难以实用化；而后续方法（如 **FastDiME**，Weng et al., ECCV 2024）虽将复杂度降至线性，却依赖静态像素差掩码，无法在反向扩散过程中自适应聚焦于决策关键区域，产生全局或散乱的编辑，缺乏对因果机制的精确刻画。
 
 **MaskDiME** 针对上述瓶颈提出了一种无训练的扩散框架，其核心机制是**自适应双掩码**（Adaptive Dual-mask）：在反向扩散的每一步，基于分类器损失梯度动态生成噪声级掩码 $M^z$ 和清洗级掩码 $M^x$，将梯度引导的更新严格限制在决策相关像素上，同时保留原图背景的语义一致性。这一设计将传统扩散反事实的全局更新转化为**决策驱动的局部编辑**，在保持单步线性复杂度 $O(T)$ 的同时，实现了空间聚焦的精准修改。
 
 在 CelebA、BDD100K 和 ImageNet 等多领域基准上，MaskDiME 取得了 100% 的 Flip Rate 和最低的 FID（CelebA Smile 上仅 0.71），推理速度较 DiME 提升超过 30 倍，GPU 显存占用仅为 ACE 和 RCSB 的约十分之一。消融实验进一步证实，移除自适应掩码后 FID 飙升至 95.76、Flip Rate 骤降至 55.2%，而恢复双掩码机制可将决策一致性指标 COUT 从 −0.16 提升至 0.87，验证了动态空间约束是性能突破的关键因果杠杆。
-
-## 背景与动机
 
 ### 视觉反事实解释的需求与矛盾
 
@@ -71,7 +69,7 @@ claims:
 
 具体而言，MaskDiME 设计了**自适应双掩码机制**：基于分类器梯度动态生成噪声级掩码 $M^z$ 和清洗级掩码 $M^x$，分别在去噪更新和背景保留两个层面控制编辑范围。噪声级掩码约束梯度引导的去噪过程仅在决策关键区域进行，清洗级掩码则将非编辑区域与原图混合以保持结构一致性。配合基于 Tweedie 公式的一步清洗图像估计，MaskDiME 以单步线性复杂度 $O(T)$ 和无训练方式，实现了高保真、决策驱动的局部图像编辑。
 
-## 核心创新
+## 核心方法与创新机理
 
 ### 瓶颈定位：扩散反事实生成的效率-精度困境
 
@@ -113,8 +111,6 @@ Figure 3 的热力图可视化揭示了 MaskDiME 自适应双掩码与现有策�
 
 消融实验（Table 4）量化了这一创新的贡献：移除自适应掩码和梯度缩放后，方法退化为全局扩散，FID 飙升至 95.76，Flip Rate 仅 55.2%；恢复双掩码（ρ=1）将 FID 降至 0.71，决策一致性 COUT 升至 0.81；进一步细化清洗掩码混合比（ρ=0.5）使 COUT 提升至 0.87，同时保持 FID 不变。
 
-## 整体框架
-
 MaskDiME 将视觉反事实生成建模为**训练无关的图像编辑任务**，其核心 pipeline 由四个紧密耦合的模块构成，整体流程如图2所示。
 
 **输入与初始化**：给定原始图像 $x$、目标类别 $y$ 和预训练分类器 $C$，首先通过前向扩散过程将 $x$ 加噪至起始时间步 $\tau$，得到噪声图像 $z_\tau = \tilde{z}_\tau$，同时保留完整的前向噪声轨迹 $\{\tilde{z}_t\}_{t=1}^\tau$ 作为后续反向去噪的参考基准。
@@ -153,8 +149,6 @@ $$x_{t-1} = M_t^x \odot \hat{x}_0^{(t-1)} + (1 - M_t^x) \odot x$$
 
 ![[assets/figures/papers/paper_list_l897_https_arxiv_org_abs_2602_18792/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of MaskDiME. We illustrate a complete counterfactual generation process (No*
-
-## 核心模块与公式推导
 
 MaskDiME 将反事实生成建模为一种受空间约束的图像编辑任务。其核心由四个紧密协作的模块构成：前向扩散加噪、梯度引导反向去噪、自适应双掩码生成，以及清洗图像估计与混合。整体流程遵循从原图到反事实图像的线性时间推理范式。
 
@@ -220,13 +214,10 @@ $$G_t = \left| \nabla_{z_t}^{\mathrm{class}} \right|_{\mathrm{avg}} \in \mathbb{
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l897_https_arxiv_org_abs_2602_18792/figures/001_Figure_1.jpg]]
-*Figure 1: Previous methods such as DiME [20] and FastDiME [45] produce global or scattered edits, whereas our MaskDiME achieves localized, decision-relevant modifications consistent with the classifier’s saliency map, computed via SmoothGrad [39]*
-
 ![[assets/figures/papers/paper_list_l897_https_arxiv_org_abs_2602_18792/figures/003_Figure_3.jpg]]
 *Figure 3: Heatmap visualization of diffusion trajectories with different masking strategies. Each column shows noisy samples*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主要定量结果
 
@@ -269,18 +260,7 @@ Figure 5 将 MaskDiME 与 ACE l₁ 进行定性对比。ACE 的像素差掩码�
 
 本文未系统报告失败案例。从方法机理推断，当分类器梯度在空间上噪声较大或分散时（如 ImageNet 多类场景），自适应掩码可能无法准确定位决策关键区域，导致编辑效果下降——这一推测需要手动验证。此外，所有评估依赖感知相似度指标（FID、LPIPS）和分类器一致性指标（COUT），当反事实修改区域占比较小时，这些指标可能因大范围未修改背景而偏向乐观，实际编辑质量仍需人工评判佐证。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l897_https_arxiv_org_abs_2602_18792/figures/004_Table_1.jpg]]
-*Table 1: CelebA and CelebA-HQ assessment. We report results extracted from DiVE [32], STEEX [18], DiME [20], ACE [21], FastDiME [45], LDCE [9], TiME [22], and RCSB [40]. Best and second-best results are shown in bold and underline, respectively*
-
-![[assets/figures/papers/paper_list_l897_https_arxiv_org_abs_2602_18792/figures/006_Table_2.jpg]]
-*Table 2: BDD assessment. We extract results from STEEX [18], ACE [21] and TiME [22], where results marked with † are directly reported from ACE. Best and second-best results are shown in bold and underline, respectively*
-
-![[assets/figures/papers/paper_list_l897_https_arxiv_org_abs_2602_18792/figures/007_Table_3.jpg]]
-*Table 3: ImageNet Assessement. We extract results from ACE [21], LDCE [9], and RCSB [40], where results marked with † (e.g. DVCE [1]) are directly reported from RCSB. Best and second-best results are shown in bold and underline, respectively*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 扩散反事实生成的技术演进
 

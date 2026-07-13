@@ -43,7 +43,7 @@ claims:
 > - VBench 上，Quality Score 0.8185 (Teacher) / 0.8163 (Distill) vs 0.8019 (ReuseDiffuse) / 0.7981 (FIFO) (+0.0166 / +0.0204 (Teacher vs baselines))；Subject Consistency 0.9622 vs 0.9501 (ReuseDiffuse) / 0.9412 (FIFO) (+0.0121 / +0.0210)；Dynamic Degree 0.5240 (Teacher) / 0.7040 (Distill) vs 0.2900 (ReuseDiffuse) / 0.3094 (FIFO) (+0.2340 / +0.3946 (Teacher))。
 > - Inference Speed 上，FPS 16 vs N/A。
 
-## 概述
+## 概要
 
 现有基于 DiT 的文本到视频（T2V）生成模型面临一个根本性瓶颈：自注意力机制的二次计算复杂度与离线批处理范式，使得在低延迟约束下生成长视频极为困难，难以支撑实时交互应用。同时，自回归生成范式在视频质量上普遍弱于双向全注意力扩散模型。StreamDiT 针对这一矛盾，提出了一套从训练框架到模型架构再到推理加速的完整解决方案。
 
@@ -56,7 +56,7 @@ claims:
 
 **方法定位**：StreamDiT 处于流式视频生成与 DiT 架构的交汇点，通过“缓冲流匹配 + 变时间嵌入 + 窗口注意力 + 分段蒸馏”四位一体的设计，首次在 DiT 范式下实现了高质量实时流式 T2V 生成，并支持无限时长流式输出与交互式提示词导航。
 
-## 背景与动机
+
 
 ### 文本到视频生成中的“实时”困境
 
@@ -83,7 +83,9 @@ StreamDiT 的提出源于一个关键洞察：**流式生成不应是训练后�
 
 StreamDiT 通过在流匹配框架中引入**移动缓冲区**和**混合分块训练**策略，统一了均匀噪声、对角线噪声等多种去噪方案，使模型能够泛化到流式推理场景。配合**变时间嵌入**和**窗口注意力**的架构改进，以及**分段多步蒸馏**的加速策略，最终在 4B 参数规模下实现了 512p 分辨率、16 FPS 的实时流式文本到视频生成，且质量显著优于现有流式基线方法。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 StreamDiT 的核心创新在于将标准流匹配（Flow Matching）从“全量批处理”范式重构为“移动缓冲区渐进去噪”范式，并通过三个关键改造槽位（changed slots）实现这一转变。这些改造并非孤立的技术点，而是围绕一个统一的因果机制：**让模型在训练中学会处理逐帧不同的噪声等级，从而在推理时能够以分块流式的方式逐步生成视频，同时保持与全注意力模型相近的质量**。
 
@@ -107,7 +109,7 @@ StreamDiT 的蒸馏策略针对分块结构进行了专门设计。教师模型�
 
 上述四个改造槽位构成了一个紧密耦合的创新链条：**变时间嵌入**使模型能够处理逐帧差异化的噪声等级，这是**缓冲流匹配**训练的架构前提；**混合分块训练**让模型在多种分块配置下均能泛化，为流式推理提供了灵活性；**窗口注意力**降低了计算复杂度，使流式推理在硬件上可行；**分段多步蒸馏**则将推理步数压缩至极致，最终实现实时性能。四个改造相互依赖，缺一不可——如果仅替换注意力机制而不改变时间条件和训练框架，模型将无法在流式场景下保持一致性；如果仅改变训练框架而不进行蒸馏，推理延迟将无法满足实时要求。
 
-## 整体框架
+
 
 StreamDiT 构建了一条从文本提示到实时视频流的完整生成管线，其核心设计围绕**缓冲流匹配（Buffered Flow Matching）** 训练框架与**变时间嵌入 DiT 骨干网络**展开，并通过多步蒸馏实现推理加速。整个系统由五个关键模块串联而成，形成“文本编码 → 潜变量初始化 → 缓冲区分块去噪 → 潜变量解码 → 流式输出”的处理链路。
 
@@ -140,7 +142,7 @@ StreamDiT 构建了一条从文本提示到实时视频流的完整生成管线�
 ![[assets/figures/papers/paper_list_l2225_https_arxiv_org_abs_2507_03745/figures/002_Figure_2.jpg]]
 *Figure 2: Illustration of StreamDiT partitioning. We partition the buffer to K reference frames and N chunks. Each chunk has c frames and s micro denoising steps*
 
-## 核心模块与公式推导
+
 
 ### 3.1 缓冲流匹配（Buffered Flow Matching）
 
@@ -212,7 +214,9 @@ $$\tau_i \sim \mathrm{Uniform}\left( \left[ \frac{T}{N} \cdot (i-1), \frac{T}{N}
 ![[assets/figures/papers/paper_list_l2225_https_arxiv_org_abs_2507_03745/figures/016_Figure_12.jpg]]
 *Figure 12: Denoising trajectory change with text guidance update: As denoising progresses toward the final stages, it becomes increasingly difficult to deviate from the outcome dictated by the original text guidance*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -277,7 +281,9 @@ $$\tau_i \sim \mathrm{Uniform}\left( \left[ \frac{T}{N} \cdot (i-1), \frac{T}{N}
 ![[assets/figures/papers/paper_list_l2225_https_arxiv_org_abs_2507_03745/figures/012_Figure_8.jpg]]
 *Figure 8: Infinite streaming. We generate a 5-minute video to demonstrate the potential for infinite streaming*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有流式生成方法的关系
 
@@ -322,6 +328,8 @@ StreamDiT 的适用边界由其设计选择直接决定：
 4. **动态分块策略**：混合分块训练中的分块方案是否需要根据视频内容动态调整？例如，高运动场景可能需要更小的 chunk size 以保证运动质量，而静态场景可以使用更大的 chunk size 以提升效率。
 
 5. **高帧率扩展**：该方法能否扩展到高分辨率、高帧率（如 60 FPS）的实时生成？这需要在窗口注意力和缓冲流匹配框架中重新平衡计算复杂度与生成质量。
+
+
 
 ## 原文 PDF
 

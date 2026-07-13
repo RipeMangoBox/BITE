@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/From_Sparse_to_Dense_Spatio_Temporal_Fusion_for_Multi_View_3D_Human_Pose_Estimation_with_DenseWarper.pdf
+project_link: null
+code_link: https://github.com/lingli1724/DenseWarper-ICLR2026
 openreview_forum_id: MLs6ThXmcz
 aliases:
 - From_Sparse_to_D
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 从稀疏到密集：面向多视图3D人体姿态估计的时空融合方法DenseWarper |
 | 英文题名 | From Sparse to Dense: Spatio-Temporal Fusion for Multi-View 3D Human Pose Estimation with DenseWarper |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=MLs6ThXmcz); [GitHub](https://github.com/lingli1724/DenseWarper-ICLR2026) |
+| Links | [paper](https://openreview.net/forum?id=MLs6ThXmcz) · [GitHub](https://github.com/lingli1724/DenseWarper-ICLR2026) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | DenseWarper |
 | Dataset | Human3.6M (GT 2D), Human3.6M (CPN 2D), Human3.6M (SimpleBaseline), MPI-INF-3DHP (SimpleBaseline) |
@@ -41,7 +43,7 @@ claims:
 > - Human3.6M (CPN 2D) 上，MPJPE (mm) 为 33.6，对比 35.8 (Adafuse Full)，变化 -2.2。
 > - Human3.6M (SimpleBaseline) 上，P-MPJPE (mm) 为 19.4，对比 20.7 (Adafuse Full)，变化 -1.3。
 
-## 概述
+## 概要
 
 多视图3D人体姿态估计长期依赖**同步密集输入**——每个时间步所有相机同时采集图像，经2D姿态检测、空间融合与三角测量获得3D骨架。这一范式存在三个关键瓶颈：**计算冗余**（所有视图全帧处理）、**时间信息利用不充分**（逐帧独立推理）、**输出帧率受限于单相机帧率**。传统提升帧率的方法依赖关键点插值（如MCC、SLERP），仅在3D骨架层面做线性平滑，无法引入新的空间信息，精度上限受制于原始输入质量。
 
@@ -53,7 +55,7 @@ DenseWarper（ICLR 2026）提出了一种根本性的范式转换：**稀疏交�
 
 **局限与开放问题**：方法依赖已知相机参数和较高相机帧率（≥50fps）；当时序间隔显著增大或出现非均匀间隔时性能下降（最大非均匀间隔12帧时MPJPE升至31.58 mm）。该范式能否推广至其他多视图3D任务（物体检测、场景重建）、如何在部分视图失效或严重遮挡下保持鲁棒性、以及能否集成自适应采样策略，仍有待探索。
 
-## 背景与动机
+
 
 多视图3D人体姿态估计（3D HPE）是计算机视觉领域的核心任务，其目标是从多个同步相机捕获的图像中恢复精确的3D关节点位置。传统方法遵循一个基本假设：**所有相机必须在每个时间步同步采集密集图像**，然后通过三角测量或体积重建获得3D姿态。这一范式虽然在Human3.6M和MPI-INF-3DHP等基准上取得了显著进展，但存在三个深层瓶颈：
 
@@ -67,7 +69,9 @@ DenseWarper（ICLR 2026）提出了一种根本性的范式转换：**稀疏交�
 
 **本文动机**。针对上述瓶颈，本文提出一个根本性的范式转换：**稀疏交错输入**（Sparse Interleaved Input）。核心思想是打破“空间同步”的约束，让每个视图在不同时间步交错采样，从而将时空信息分散到多个视图中。通过设计专门的时空融合模块，从这些稀疏交错信号中恢复密集、高精度的3D姿态序列，同时将输出帧率提升至$M \times f$。这一范式不仅降低了单帧计算量，更首次将多视图系统的时间分辨率潜力转化为实际性能增益。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DenseWarper 的核心创新在于用**稀疏交错输入范式**替代传统同步密集多视图输入，并通过**对极几何空间融合**与**可变形时序融合**两个模块，将稀疏输入转化为密集高精度输出，从而同时解决计算冗余、时间信息利用不足和单相机帧率受限三个瓶颈。
 
@@ -112,7 +116,7 @@ $$\tilde{\mathbf{H}}_{V_j}^n = \sum_{d=1}^5 \mathbf{Warper}(\boldsymbol{\Phi}_{V
 
 **需要手动验证**：论文未在极端低帧率（如 <10 fps）或无标定条件下验证方法的泛化性，这些场景下的性能边界仍需进一步研究。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_MLs6ThXmcz/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the DenseWarper architecture. A sliding window is used to sample sparse interleaved images, with a 2D pose estimation model generating initial heatmaps for each view. Missing information is filled to create uncorrected heatmaps. These are then spatially fused and corrected using an epipolar geometry-based method, yielding a spatially fused heatmap. Deformable convolutions are then applied for temporal fusion. Finally, the resulting spatiotemporally enriched heatmap is processed via triangulation to obtain accurate 3D keypoints*
@@ -143,7 +147,7 @@ $$
 
 整个框架的因果机制可概括为：稀疏交错采样打破了同步密集输入的帧率瓶颈 → 对极几何空间融合利用多视图几何约束补偿空间信息损失 → Warper 通过可变形时序对齐补偿时间信息损失 → 二者协同将稀疏输入“稠密化”为高时空一致性的输出。
 
-## 核心模块与公式推导
+
 
 ### 3.1 稀疏交错输入范式
 
@@ -198,7 +202,9 @@ $$\tilde{\mathbf{H}}_{V_j}^n = \sum_{d=1}^5 \mathbf{Warper}(\boldsymbol{\Phi}_{V
 
 为支持实时增量处理，DenseWarper采用滑动窗口机制。任意视角完成采样后即可立即处理，通过缓存已计算的热图避免重复推理。这一设计使得系统延迟不随窗口长度线性增长，保证了实际部署中的效率。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -251,7 +257,9 @@ DenseWarper在Human3.6M和MPI-INF-3DHP两个标准基准上均取得了state-of-
 2. **2D检测器依赖。** 所有实验均基于给定的2D检测器（GT/CPN/SimpleBaseline），未探讨单视图2D检测失败或严重遮挡场景下的鲁棒性。若某视图的2D热图完全错误，对极几何校正可能引入噪声而非修正。
 3. **标定依赖。** 方法依赖已知相机参数计算对极几何约束，未在无标定条件下验证。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 输入范式的根本转变
 
@@ -318,6 +326,8 @@ DenseWarper的性能建立在几个关键前提之上，这些前提定义了其
 - **自适应采样策略**：能否根据运动速度动态调整交错间隔？在运动缓慢时增大间隔以降低计算量，在快速运动时缩小间隔以保证精度，这种自适应机制可进一步优化效率-精度权衡。
 
 - **无标定场景拓展**：当前方法依赖已知相机参数。若能结合自标定或弱标定技术，将稀疏交错输入范式拓展到野外场景，将大幅扩展其应用范围。
+
+
 
 ## 原文 PDF
 

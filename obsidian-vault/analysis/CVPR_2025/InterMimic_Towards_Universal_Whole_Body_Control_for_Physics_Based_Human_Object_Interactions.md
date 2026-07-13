@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/InterMimic_Towards_Universal_Whole_Body_Control_for_Physics_Based_Human_Object_Interactions.pdf
+code_link: null
 project_link: https://sirui-xu.github.io/InterMimic
 aliases:
 - ITUWBCPBHOI
@@ -41,7 +42,7 @@ claims:
 > - OMOMO-Train (success rate) 上，Succ. (%) 90.7 vs 23.9 (no distillation, no PPO) (+66.8)。
 > - OMOMO-Test (zero-shot) 上，Succ. (%) 98.1 (Transformer) vs 95.5 (MLP) (+2.6)。
 
-## 概述
+## 概要
 
 物理模拟下的人-物交互（HOI）模仿面临双重瓶颈：其一，大规模动作捕捉（MoCap）数据普遍存在接触伪影、手部缺失等不精确性，直接用于强化学习（RL）模仿会导致不真实的动力学；其二，训练单个策略掌握多样交互需要极高的样本效率，而不同人体形状带来的重定向挑战进一步加剧了扩展难度。
 
@@ -56,7 +57,7 @@ InterMimic 提出“先完美、再扩展”的课程式教师-学生蒸馏框�
 
 InterMimic 的方法定位介于物理仿真 HOI 模仿与大规模技能学习之间：它不直接依赖原始 MoCap 进行端到端 RL，而是通过教师策略的局部修正与统一化身参考，构建了一个可扩展的蒸馏流水线，为后续下游应用（如机器人遥操作、运动细化、运动生成）提供了物理上可信的交互基座。
 
-## 背景与动机
+
 
 物理模拟下的人体-物体交互（Physics-based Human-Object Interaction, HOI）是计算机图形学与具身智能的核心挑战之一。其目标是在物理仿真器中驱动虚拟化身，使其不仅能复现运动学层面的参考动作，还能在接触、碰撞、重力等物理约束下产生真实可信的交互行为。这一能力对于构建可迁移至真实机器人的全身操控技能至关重要。
 
@@ -70,7 +71,9 @@ InterMimic 的方法定位介于物理仿真 HOI 模仿与大规模技能学习�
 
 InterMimic 的核心动机正是打破这一僵局：**先求完美，再求规模。** 具体而言，通过课程式的教师-学生蒸馏框架，将不精确的原始 MoCap 逐步修正为物理可信的参考，再通过蒸馏实现策略的规模化——让单个统一策略掌握跨越数十种物体、数百种交互的全身操控技能。这一思路将重定向与修正嵌入教师策略的训练过程，使修正后的高质量参考成为学生策略的可扩展学习信号，最终实现从“模仿数据”到“超越数据”的跨越。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 InterMimic 的核心创新在于将“先完美、再扩展”的课程式教师-学生蒸馏框架引入物理模拟人体-物体交互（HOI）模仿，从根本上解决了大规模 MoCap 数据的不精确性与策略扩展性之间的矛盾。与现有方法（如 **SkillMimic**（Wang et al., CVPR 2025）的单阶段 RL 直接模仿、**PhysHOI**（Wang et al., 2023）的物理模拟）相比，InterMimic 在以下四个关键维度上实现了结构性改变。
 
@@ -102,7 +105,7 @@ InterMimic 提出 Physical State Initialization（PSI）（Section 3.2），创�
 
 一个常被忽视的创新是将 HOI 重定向直接嵌入教师策略的模仿过程。通过体现感知的关节位置代价 $E_p^h = \langle \Delta_p^h, \mathbf{w}_d \rangle$ 和旋转代价 $E_\theta^h = \langle \Delta_\theta^h, \mathbf{1} - \mathbf{w}_d \rangle$（Section 3.2），权重 $\mathbf{w}_d$ 与关节点到物体距离成反比——靠近物体时更重视位置对齐，远离时更重视旋转对齐。这一设计使不同人体形状的受试者数据被统一映射到规范化身模型，无需额外的重定向预处理步骤。Figure 4 的定性对比显示，教师策略在修正原始 MoCap 中多部位交互错误的同时，输出优于 PhysHOI 的物理可信结果。
 
-## 整体框架
+
 
 InterMimic 采用 **“先完美、再扩展”** 的两阶段课程式教师-学生蒸馏框架（Figure 2），将大规模、带噪声的 MoCap 数据逐步修正为物理可信的交互参考，再通过蒸馏实现单一策略对多样交互技能的规模化掌握。
 
@@ -135,7 +138,7 @@ $$L(\psi) = \mathbb{E}_t \left[ \min\left( r_t(\psi) A_t, \text{clip}(r_t(\psi),
 - **输入**：学生策略的观测状态 $\boldsymbol{s}_t = \{ \boldsymbol{s}_t^s, \boldsymbol{s}_t^g \}$，其中 $\boldsymbol{s}_t^s$ 为本体感知（关节旋转、位置、角速度、速度、物体几何、接触标记），$\boldsymbol{s}_t^g$ 为目标状态（未来 $t+k$ 时刻的相对与绝对参考姿态）。
 - **输出**：人体关节的目标位置/旋转指令，驱动物理仿真器中的人体模型与物体进行交互。
 
-## 核心模块与公式推导
+
 
 InterMimic 的两阶段框架（图 2）由六个核心模块串联而成，其设计逻辑围绕“先完美、再扩展”的课程式蒸馏展开。
 
@@ -226,7 +229,9 @@ Table 2 的对比显示：Transformer 在 OMOMO 测试集上成功率 98.1% vs M
 ![[assets/figures/papers/paper_list_l1740_InterMimic_Towards_Universal_Whole_Body_Control_for_Physics_Based_Human/figures/003_Figure_3.jpg]]
 *Figure 3: (i) Visualization of reference contact markers that accommodate varied contact distances: red to promote contact, green for neutral areas where contact is neither promoted nor penalized, and blue to penalize contact. (ii) Initializing the rollout with reference (RSI) or reference corrected via simulation (PSI)*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与实验设计逻辑
 
@@ -287,7 +292,9 @@ Table 2 对比了 MLP 与 Transformer 学生策略的性能差异。Transformer 
 ![[assets/figures/papers/paper_list_l1740_InterMimic_Towards_Universal_Whole_Body_Control_for_Physics_Based_Human/figures/001_Figure_1.jpg]]
 *Figure 1: InterMimic enables physically simulated humans to perform interactions with dynamic and diverse objects. It supports highlydynamic, multi-object interactions and scalable skill learning (Top), making it adaptable for versatile downstream applications (Bottom): it can translate whole-body loco-manipulation skills to a humanoid robot [24, 81], perfect interaction MoCap data, and bridge kinematic generation, e.g., predicting future interactions from past (InterDiff [101]) or generating interactions given text prompts (InterDreamer [102])*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与直接 RL 模仿基线的对比
 
@@ -357,6 +364,8 @@ Transformer 学生策略相比 MLP 展现出显著的序列建模优势（Table 
 2. **仿真到现实的迁移**：该 teacher-student 蒸馏策略能否直接迁移到真实人形机器人，面对观测噪声和执行器差异？Figure 1 提及了在 Humanoid 机器人上的遥操作应用，但论文未提供定量评估。
 3. **与生成模型的深度整合**：Figure 6 展示了与 HOI-Diff（文本到 HOI）和 InterDiff（交互预测）的零样本结合，但这一整合的鲁棒性和可控性尚未系统评估。
 4. **多物体并行交互的扩展**：Figure 1 展示了多物体并行交互的能力，但论文未提供该场景下的定量指标和失败模式分析，需手动验证其实际效果。
+
+
 
 ## 原文 PDF
 

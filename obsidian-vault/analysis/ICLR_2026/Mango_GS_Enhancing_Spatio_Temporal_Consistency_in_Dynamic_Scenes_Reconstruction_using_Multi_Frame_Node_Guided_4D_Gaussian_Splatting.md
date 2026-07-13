@@ -43,7 +43,7 @@ claims:
 > - HyperNeRF-vrig 上，PSNR / MS-SSIM / tLPIPS 26.2 / 0.78 / 0.0196 vs 未提供具体对比值 (三项指标均为最优)；FPS / Storage (MB) 149.5 / 60 vs 未提供具体对比值 (实时渲染，存储量较低)。
 > - HyperNeRF-vrig (效率对比) 上，速度与tLPIPS/MS-SSIM 速度比MotionGS与TimeFormer快3倍以上，同时tLPIPS和MS-SSIM更优 vs MotionGS, TimeFormer (3× 加速 + 更好的时间一致性)。
 
-## 概述
+## 概要
 
 动态场景的神经渲染面临一个核心瓶颈：现有4D高斯溅射（4DGS）方法普遍采用**逐帧独立优化**策略，模型倾向于记忆每一帧的瞬时外观，而非学习底层的运动规律。这导致在快速或复杂运动场景下，渲染结果出现时间不一致、模糊和伪影，严重制约了动态重建的时空一致性。
 
@@ -55,7 +55,7 @@ claims:
 
 **局限性**方面，当前固定时间窗口难以捕获超过T=6帧的长程运动依赖；在极端非刚性形变下，节点-高斯的语义邻域仍可能出现传播误差；尚未验证在在线流式长视频场景下的适应性。这些方向为后续工作留下了明确的改进空间。
 
-## 背景与动机
+
 
 ### 动态场景重建的核心矛盾
 
@@ -85,7 +85,9 @@ Mango-GS的动机由此展开——通过三个层面的设计突破现有瓶颈
 
 这一设计将时间建模的计算负载限制在稀疏节点集上（默认2048个初始节点），同时通过语义感知的k-NN将运动高效传播至密集高斯云，在保持实时渲染能力的前提下，显著提升了动态场景的时空一致性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Mango‑GS 的核心创新在于**将动态场景的运动建模从“逐帧记忆”转向“节点级时序推理”**。现有 4D 高斯溅射方法（如 **4D Gaussians**（Wu et al., CVPR 2024）、**Deformable 3DGS**（Yang et al., CVPR 2024））普遍采用逐帧 MLP 预测每个高斯的变形，模型倾向于记忆每一帧的瞬时外观，而非学习底层的运动规律。这导致在快速或复杂运动下出现时间不一致、模糊和伪影。Mango‑GS 通过三个相互耦合的机制设计，系统性地改变了这一范式。
 
@@ -156,7 +158,7 @@ $$\mathcal{L} = 0.8 \times \mathcal{L}_{\mathrm{frame}} + 0.2 \times \mathcal{L}
 
 **组件消融实验（Table 3）** 直接验证了上述创新的累积效果：逐步加入解耦节点表示、时间注意力网络、硬帧损失和运动损失，PSNR、SSIM、LPIPS 和 tLPIPS 均持续提升。
 
-## 整体框架
+
 
 Mango-GS 将动态场景建模为**规范空间 3D 高斯点云的可变形表示**。其核心管线由五个模块串联构成：解耦控制节点初始化、学习型 k-NN 关联、时间注意力网络、高斯变形传播以及可微分渲染。整个模型以端到端方式优化，训练时引入时间输入掩码策略与组合损失函数。
 
@@ -194,7 +196,7 @@ Mango-GS 将动态场景建模为**规范空间 3D 高斯点云的可变形表�
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_N4VKlSxCLc/figures/001_Figure_1.jpg]]
 *Figure 1: An overview of the Mango-GS framework. Our method is driven by a set of decoupled control nodes, each comprising a canonical position and a feature code. A dense 3D Gaussian cloud is associated with these nodes via a learned k-NN relationship based on both position and features. A temporal attention network takes the canonical node positions and a time window [0, T ] as input, processing them through MLP layers and temporal attention blocks to predict the nodes’ deformations over the entire time window. This learned motion is then propagated back to the Gaussian cloud to produce the final dynamic scene representation for each frame. The entire model is optimized end-to-end with a temporal i...*
 
-## 核心模块与公式推导
+
 
 Mango-GS将动态场景建模为规范3D高斯点云的变形，其核心设计围绕三个关键模块展开：解耦控制节点表示、学习型k-NN关联机制，以及多帧时间注意力网络。以下逐一剖析各模块的数学表述与设计动机。
 
@@ -277,7 +279,9 @@ $$\mathcal{L}_{\text{motion}} = \lambda_{\text{diff}} \mathcal{L}_{\text{diff}} 
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_N4VKlSxCLc/figures/009_Figure_6.jpg]]
 *Figure 6: Overview of multi-frame group sampling strategies. Colored blocks with number denote real frames, and gray blocks with F indicate placeholder timestamps. A row of blocks represents the T -frame training window*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -346,7 +350,9 @@ Figure 4和Figure 5分别展示了Neural 3D Video和HyperNeRF-vrig数据集上�
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_N4VKlSxCLc/figures/012_Table_6.jpg]]
 *Table 6: Per-scene reconstruction quality of Mango-GS on the HyperNeRF-vrig dataset*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -385,6 +391,8 @@ Mango-GS 立足于动态高斯溅射（4DGS）的两条技术路线交汇点：*
 4. **跨表示推广**：节点引导的多帧建模思想是否可推广到其他显式场景表示（如 3D 高斯点云的其他变体、基于 mesh 的表示）或大规模动态场景（如自动驾驶场景的动态重建）？这需要验证控制节点机制在不同表示密度和运动复杂度下的可迁移性。
 
 5. **节点数量的自适应**：Table 5 显示控制节点数从 2048 增加到 4096 时性能下降（可能因过拟合），当前采用固定初始数量。能否设计自适应节点剪枝或增长策略，根据场景运动复杂度动态调整节点密度？
+
+
 
 ## 原文 PDF
 

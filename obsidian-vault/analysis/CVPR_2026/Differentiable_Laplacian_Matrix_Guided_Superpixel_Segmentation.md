@@ -42,13 +42,13 @@ claims:
 > - NYUv2 上，Compactness (CO), Boundary Recall (BR) Laplacian variants outperform baselines (both with and without EC) vs SCN, AINet, CDS, SSM (趋势与BSDS500一致，CO和BR提升)。
 > - BSDS500 (no EC) 上，Average Excess Components (XC_avg), Average Stray Pixels (Stray_avg) All Laplacian variants show substantially lower fragmentation vs SCN, AINet, CDS, SSM (碎片化指标降低数倍至数十倍)。
 
-## 概述
+## 概要
 
 深度超像素分割方法长期面临一个结构性瓶颈：网络输出的像素分配概率往往产生碎片化、不连通的超像素，必须借助不可微的强制连通性（Enforced Connectivity, EC）后处理来修复。这一后处理步骤切断了端到端梯度流，使超像素生成无法与下游任务联合优化。本文提出**可微拉普拉斯矩阵引导的超像素分割**，核心思路是将每个超像素的像素分配概率建模为图，通过最大化该图拉普拉斯矩阵的迹来隐式减少零特征值重数，从而在训练中直接促进空间连通性。
 
 该方法将三个可微损失项——**图拉普拉斯损失**（$\mathcal{L}_{\mathrm{LAP}}$）、**最小语义距离损失**（$\mathcal{L}_{\mathrm{MSD}}$）和**加权重建损失**（$\mathcal{L}_{\mathrm{WR}}$）——集成到现有深度超像素架构中，无需修改网络结构。在BSDS500和NYUv2上的实验表明，加入拉普拉斯损失后，**SCN**（Yang et al., CVPR 2020）、**AINet**（Wang et al., ICCV 2021）、**CDS**（Xu et al., AAAI 2024）和**SSM**（Jia et al., IEEE SPL 2025）四种基线模型在不使用EC的情况下，紧凑度（CO）和边界召回率（BR）均超越原始版本，而分割精度（ASA）和边界精度（BP）仅受极小影响。碎片化指标上，拉普拉斯变体的平均超出分量数和平均游离像素数较基线降低数倍至数十倍，证实$\mathcal{L}_{\mathrm{LAP}}$是连通性提升的主要驱动因素。该方法显著减少了对不可微后处理的依赖，推动超像素生成向完全端到端可微迈进。
 
-## 背景与动机
+
 
 ### 超像素：从传统到深度学习的范式转移
 
@@ -80,7 +80,9 @@ claims:
 
 基于这一核心思想，论文提出了三个可微损失项的组合：图拉普拉斯损失（L_LAP）驱动连通性、最小语义距离损失（L_MSD）强化语义边界、加权重建损失（L_WR）聚焦边界难例。这些损失可直接集成到现有架构（SCN、AINet、CDS、SSM）中，无需修改网络结构，保证了公平比较和广泛适用性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作的核心创新并非提出一种新的超像素分割架构，而是提出一套**可微的损失函数体系**，直接解决深度超像素模型长期依赖不可微后处理的瓶颈问题。这套损失函数可即插即用地集成到现有架构中，从训练阶段根本性地提升超像素的空间连通性与语义边界精度。
 
@@ -129,7 +131,7 @@ $$\mathcal{L}(\boldsymbol{\theta}; \mathbf{x}, \mathbf{y}) = \mathcal{L}_{\mathr
 
 其中 $\lambda_{\mathrm{LAP}}=360$、$\lambda_{\mathrm{MSD}}=10^{-3}$、$\lambda_{\mathrm{WR}}=1$，$\mathcal{L}_{\mathrm{base}}$ 为各基线架构的专有损失。
 
-## 整体框架
+
 
 本文提出一种**可微拉普拉斯矩阵引导的超像素分割**方法，其核心思想是将超像素连通性约束从不可微的后处理阶段迁移至端到端训练过程中。整体框架由一个通用的超像素分配网络和三个可微损失函数构成，无需修改现有网络架构即可集成。
 
@@ -156,7 +158,7 @@ $$
 ![[assets/figures/papers/paper_list_l2118_https_openaccess_thecvf_com_content_CVPR2026_html_Juybari_Differentiable/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of superpixels from a deep learning model (CDS) under Enforced Connectivity (EC) post-processing and the same model with graph-Laplacian (LAP) regularization. Our proposed LAP yields more compact superpixels, more precise boundaries, and fewer excess components without requiring EC*
 
-## 核心模块与公式推导
+
 
 ### 整体框架：通用超像素分配网络
 
@@ -220,7 +222,9 @@ $$\mathcal{L}(\boldsymbol{\theta}; \mathbf{x}, \mathbf{y}) = \mathcal{L}_{\mathr
 
 其中 $\lambda_{\mathrm{LAP}} = 360$，$\lambda_{\mathrm{MSD}} = 10^{-3}$，$\lambda_{\mathrm{WR}} = 1$。$\lambda_{\mathrm{LAP}}$ 取值较大，反映了连通性正则化在整体优化中的主导地位；消融实验证实，$\mathcal{L}_{\mathrm{LAP}}$ 是连通性提升的主要驱动因素（移除后碎片化指标显著恶化），而单独使用 $\mathcal{L}_{\mathrm{MSD}}$ 或 $\mathcal{L}_{\mathrm{WR}}$ 无法消除碎片化，三者需协同作用。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 1. 评估协议与碎片化度量
 
@@ -316,7 +320,9 @@ Figure 1 和 Figure 6 提供了可视化证据：
 - **网格约束的固有限制**：方法依赖固定的 16×16 网格划分和 3×3 局部搜索窗，可能限制超像素形状对非规则纹理或细长物体的适应性。
 - **下游任务验证缺失**：当前评估仅聚焦超像素分割本身，未在实例分割、目标检测等下游任务中验证端到端联合优化的实际增益。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 一、方法在超像素分割谱系中的位置
 
@@ -381,6 +387,8 @@ Figure 1 和 Figure 6 提供了可视化证据：
 5. **跨任务迁移**：所提损失函数在其他视觉任务中是否能提供端到端的区域级表示？例如，在实例分割中，连通性约束可能有助于生成完整的实例掩码；在目标检测中，紧凑的超像素可能作为高质量的候选区域。这些跨任务迁移的潜力尚未被验证。
 
 6. **与视觉基础模型的结合**：随着 SAM、DINOv2 等视觉基础模型的兴起，超像素分割能否作为这些模型的下游适配层？图拉普拉斯损失的可微性使其天然适合与基础模型的嵌入空间进行联合微调，这可能开辟超像素在交互式分割和开放词汇场景中的新应用。
+
+
 
 ## 原文 PDF
 

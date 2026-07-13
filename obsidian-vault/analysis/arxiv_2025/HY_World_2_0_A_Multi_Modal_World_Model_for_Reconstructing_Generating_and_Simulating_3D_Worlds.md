@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/HY_World_2_0_A_Multi_Modal_World_Model_for_Reconstructing_Generating_and_Simulating_3D_Worlds.pdf
+project_link: https://3d-models.hunyuan.tencent.com/world/
+code_link: https://github.com/Tencent-Hunyuan/HY-World-2.0
 aliases:
 - HY-World-2.0
 - HY-World
@@ -41,7 +43,7 @@ claims:
 > - Image‑to‑Panorama (I2P) 上，CLIP‑I 0.844 vs - (最佳)。
 > - Single‑view 3D Reconstruction (Tanks‑and‑Temples) 上，点云 F1‑score 41.43 vs – (优于所有视频生成方法) (-)。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -80,7 +82,7 @@ HY-World 2.0建立在多个前沿工作的基础之上，并通过关键模块�
 
 HY-World 2.0仍存在若干局限：深度对齐中的异常检测可能将整条视频标记为离群值导致失效；天空分割（SAM3）在阴天或夜间场景可能出错；管线依赖多个大规模预训练模型，整体鲁棒性受限于这些组件的性能；端到端世界生成耗时约10分钟（NVIDIA H20），离实时交互仍有距离。这些局限指向若干开放问题，包括如何自适应恢复被误判的离群视频、如何在复杂光照下稳定天空掩码、如何进一步降低管线延迟，以及能否将轨迹规划与强化学习结合以自监督方式发现最优探索路径。
 
-## 背景与动机
+
 
 ### 3D世界模型的演进与割裂
 
@@ -106,7 +108,9 @@ HY-World 2.0仍存在若干局限：深度对齐中的异常检测可能将整�
 
 针对上述瓶颈，HY-World 2.0的动机明确：**构建首个开源、系统化的多模态世界模型，在同一框架内无缝统一世界生成与世界重建**。其核心洞察在于：将视频扩散模型的生成式先验与前馈重建模型的几何严谨性融合为一体化管线——通过全景生成建立世界初始化，利用场景解析与轨迹规划确定探索路径，借助记忆机制实现一致的世界扩展，最终通过深度对齐与定制3DGS优化合成可导航的3D表达。这一设计既可利用扩散模型先验提升生成世界的逼真度和可探索范围，又能通过前馈多模态重建保证多视图输入的几何精确性，从而在开源范式下弥合生成与重建之间的鸿沟。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 HY-World 2.0 的核心创新在于通过四阶段管线将**视频扩散模型的生成式先验**与**前馈多模态重建的几何严谨性**深度融合，解决了现有3D世界模型在生成与重建任务间的严重割裂。其关键创新体现在以下五个维度的**changed slots**上，每个改进均直接服务于“统一生成与重建”这一核心目标。
 
@@ -150,7 +154,7 @@ HY-World 2.0 的核心创新在于通过四阶段管线将**视频扩散模型�
 
 上述五个 changed slots 共同构成了 HY-World 2.0 的核心创新体系：**生成侧**通过隐式全景映射和 Keyframe-VAE 提升视觉先验的质量，**一致性与扩展侧**通过双重记忆机制保证多轨迹世界的几何与纹理连贯性，**重建侧**通过归一化编码和深度-法线耦合保证多视图输入的几何精确性，**合成侧**通过定制化 3DGS 优化实现高效渲染。这一体系使得 HY-World 2.0 成为首个在同一框架内统一高质量世界生成与精确世界重建的开源多模态世界模型，在多项基准上达到开源方法最优，与闭源模型 **Marble**（World Labs, 2025）性能相当。
 
-## 整体框架
+
 
 HY‑World 2.0 是一个多模态世界模型，将**世界生成**与**世界重建**统一于同一框架之内。其核心设计围绕一条四阶段管线展开，同时以升级的前馈重建模型为补充，使系统既能从稀疏输入（文本或单视图图像）合成可导航的 3D 场景，又能从多视图观测中恢复精确的几何表示。该框架的总体架构如 **Figure 2** 所示。
 
@@ -203,7 +207,7 @@ HY‑World 2.0 是一个多模态世界模型，将**世界生成**与**世界�
 
 整个管线将扩散模型的生成式先验与前馈重建的几何严谨性有机融合：全景生成与视频扩散提供丰富的动态先验以扩展可探索范围，而 WorldMirror 2.0 的深度对齐与归一化编码则确保多视图输入的几何精确性。这一设计直接回应了现有 3D 世界模型在生成与重建任务间长期割裂的瓶颈——生成方法难以保持几何一致性，重建方法缺乏对未见区域的生成式先验。
 
-## 核心模块与公式推导
+
 
 HY-World 2.0 的四阶段管线由六个核心模块构成：**HY-Pano 2.0**（全景生成）、**WorldNav**（轨迹规划）、**WorldStereo 2.0**（世界扩展）、**WorldMirror 2.0**（前馈重建）、**World Composition**（世界融合）与 **WorldLens**（渲染平台）。各模块通过关键公式将扩散先验与几何约束耦合，以下逐一剖析。
 
@@ -273,7 +277,9 @@ $$\mathcal{L}_{\mathrm{GS}} = \mathcal{L}_{\mathrm{color}} + \mathcal{L}_{\mathr
 ![[assets/figures/papers/HY-World_2.0_A_Multi-Modal_World_Model_for_Reconstructing_Generating_and_Simulat_6a92b680015f/figures/012_Figure_9.jpg]]
 *Figure 9: Keyframe-VAE in WorldStereo 2.0 versus a standard Video-VAE [64]. Unlike (a) Video-VAE, which performs spatio-temporal compression, (b) Keyframe-VAE applies spatial-only compression to better preserve high-frequency details and reduce artifacts essentially caused by Video-VAE encoding (e.g., motion blur and geometric distortion). Specifically, Keyframe-VAE loops the causal padding-based image encoding over ( 1 + $T _ { k f }$ ) times with a sparse frame set ( $T _ { k f } \ll T _ { v i d }$ ) that spans the same viewpoint changes by sampling at larger temporal intervals*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能全景
 
@@ -342,7 +348,9 @@ Figure 19 的定性消融揭示了轨迹规划对世界完整性的关键作用�
 ![[assets/figures/papers/HY-World_2.0_A_Multi-Modal_World_Model_for_Reconstructing_Generating_and_Simulat_6a92b680015f/figures/014_Figure_11.jpg]]
 *Figure 11: Illustration of the RoPE [59] modification in SSM++. Target frames are spatially concatenated with their corresponding retrieved reference views along the horizontal axis (resulting in width 2W ). Crucially, each retrieved view inherits the temporal index of its paired target frame before being fed into the main DiT branch*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 任务定位与核心瓶颈
 
@@ -397,6 +405,8 @@ HY-World 2.0 是对 **HY-World 1.0**（Team HunyuanWorld, arXiv 2025）的全面
 3. **实时交互式世界生成**：当前约10分钟的延迟限制了交互式应用，进一步降低管线延迟（如模型量化、更激进的蒸馏、异步管线化）是工程化方向。
 4. **轨迹规划的自主学习**：当前 WorldNav 依赖五种启发式轨迹模式，能否将轨迹规划与强化学习结合，以自监督方式发现最优探索路径，是提升世界覆盖效率的潜在方向。
 5. **多模态输入的深度融合**：当前重建模式未充分利用生成式先验（反之亦然），探索生成与重建的更深层次耦合（如用生成先验填补重建缺失区域）可能进一步提升统一框架的能力边界。
+
+
 
 ## 原文 PDF
 

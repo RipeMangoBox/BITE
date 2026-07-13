@@ -5,6 +5,8 @@ paper_level: A
 venue: SIGGRAPH ASIA
 year: 2024
 pdf_ref: paperPDFs/SIGGRAPH_ASIA_2024/Shuai_et_al_Reconstructing_Close_Human_Interactions_from_Multiple_Views.pdf
+project_link: https://github.com/zju3dv/CloseMoCap
+code_link: https://github.com/zju3dv/CloseMoCap"
 aliases:
 - RCHIFMV
 tags:
@@ -41,7 +43,7 @@ claims:
 > - Hi4D 上，MPJPE 20.28；PCK@50 98.29。
 > - Panoptic 上，AP_25 86.16。
 
-## 概述
+## 概要
 
 ### 问题背景与核心瓶颈
 
@@ -70,7 +72,7 @@ claims:
 
 当前方法仍存在若干局限：（1）仅以2D关键点热图为输入，未利用Part Affinity Fields等肢体连接信息；（2）仅输出身体关键点，缺少手部和面部细节；（3）训练过程未融入时序或空间运动先验，仅在推理时进行简单时序过滤；（4）高度依赖前端2D关键点估计质量。未来方向包括融合2D肢体关联特征、引入参数化人体模型与时序运动先验，以及在更大规模动态场景中维持实时性与鲁棒性。
 
-## 背景与动机
+
 
 多视角3D人体姿态估计是计算机视觉与图形学交叉领域的核心问题，其目标是从一组已标定的多视角图像中恢复场景中所有个体的精确三维骨骼姿态。这一技术在角色动画、自由视点视频合成、运动分析等应用中具有广泛需求。然而，当场景中多个个体发生近距离交互（如拥抱、握手、双人舞蹈）时，现有方法面临两类根本性挑战。
 
@@ -82,7 +84,9 @@ claims:
 
 上述三重挑战共同构成了本文的核心研究动机：**如何设计一种既能消除近距离交互下的特征歧义，又能摆脱对真实标注数据依赖的多视角多人3D姿态估计方法？** 本文提出的CloseMoCap系统正是围绕这一核心问题展开。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CloseMoCap 的核心创新在于通过**锚点引导的条件体积**（anchor-guided feature volumes）和**两阶段网络结构**，系统性地解决了近距离人体交互下的特征歧义问题，同时实现了**完全脱离真实数据的合成训练范式**，展现出极强的泛化能力。
 
@@ -112,7 +116,7 @@ CloseMoCap 将传统的单阶段特征体积到关键点概率体积的直接回
 
 CloseMoCap 的输入仅为2D关键点热图，而非原始图像。这一设计使得网络训练完全摆脱对真实多视角图像的依赖：只需利用已知的3D姿态数据和相机参数，即可合成多视角2D热图-3D姿态对进行训练（Section 3.4, Fig. 7）。该方法在CHI3D数据集上以94.30%的3DPCK@50mm大幅超越所有基线方法，在Hi4D数据集上更以零训练样本取得最低MPJPE=20.28mm和最高PCK@50=98.29%（Table 1, Table 2），充分证明了其强大的跨数据集泛化能力。
 
-## 整体框架
+
 
 CloseMoCap 的整体 pipeline 遵循“2D 感知 → 3D 中心估计 → 条件体积构建 → 两阶段 3D 回归”的递进结构，其核心设计目标是**在近距离人体交互场景下消除特征歧义，并实现完全脱离真实标注数据的训练**。
 
@@ -138,7 +142,7 @@ CloseMoCap 的整体 pipeline 遵循“2D 感知 → 3D 中心估计 → 条件�
 ![[assets/figures/papers/paper_list_l1809_Shuai_et_al_Reconstructing_Close_Human_Interactions_from_Multiple_Views/figures/001_Figure_1.jpg]]
 *Figure 1: Our system is designed to recover the 3D poses of individuals engaging in close-range interactions, utilizing input from multiple calibrated cameras. We introduce a novel learning-based approach that effectively handles occlusions and interactions between individuals at close quarters. The standout feature of our system, which allows it to be trained without real data, enables the system to handle various scenes, camera configurations, and number of individuals. Our system facilitates a broad range of real applications, such as character animation (top-right) and free-viewpoint video synthesis (bottom-right)*
 
-## 核心模块与公式推导
+
 
 CloseMoCap 的核心是一个**3D条件体积网络**，它接收多视角2D关键点热图，输出场景中每个个体的3D姿态。整个管线由三个紧密耦合的模块组成：特征体积构建、两阶段姿态估计网络，以及合成数据训练策略。以下按模块拆解其数学形式与设计逻辑。
 
@@ -215,7 +219,9 @@ $$L^{i} = \lambda \mathrm{FocalLoss}(\hat{\mathbf{H}}^{i}, \mathbf{H}^{i}) + \fr
 ![[assets/figures/papers/paper_list_l1809_Shuai_et_al_Reconstructing_Close_Human_Interactions_from_Multiple_Views/figures/002_Figure_2.jpg]]
 *Figure 2: Challenges in pose estimation with close proximity. This image highlights that when two individuals are in close proximity, it becomes difficult to obtain accurate 2D pose estimates due to heavy inter-person occlusion and keypoint association ambiguity. Moreover, in learning-based methods that directly regress 3D poses from feature volumes, the similarity in constructed volumes due to their spatial closeness complicates keypoint distinction for regression networks*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -280,7 +286,9 @@ Fig. 11对比了本方法与关联式方法的定性结果：传统自顶向下�
 ![[assets/figures/papers/paper_list_l1809_Shuai_et_al_Reconstructing_Close_Human_Interactions_from_Multiple_Views/figures/012_Figure_9.jpg]]
 *Figure 9: Evaluation on Hi4D [Yin et al. 2023] with tight thresholds. We report 3DPCKs with a tight threshold from 0 to 100mm. The results show that our method outperforms others by a large margin even in tight thresholds. The notations of methods follow those in Tab. 2*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法族谱与核心差异
 
@@ -345,6 +353,8 @@ CloseMoCap 的有效性建立在以下关键假设之上，这些假设定义了
 **（4）扩展至更大规模动态场景的实时处理。** 在篮球场等大尺度、多人的动态场景中（如Fig. 12所示），如何维持系统的实时性和鲁棒性是一个开放挑战。这涉及：自适应体积范围调整（根据个体在场景中的分布动态调整体积大小和位置）、计算效率优化（稀疏体积表示、级联分辨率）、以及多人场景的并行化处理策略。
 
 **（5）减少对多视角的依赖。** 消融实验（Table 5）表明，视角数从8减至4时MPJPE从19.22mm增至28.85mm，性能下降明显。探索如何在更少视角（如2-3个）下维持可接受的精度，将扩展方法的实际部署范围。这可能涉及更强的时序先验、场景几何约束、或与单目人体姿态估计方法的融合。
+
+
 
 ## 原文 PDF
 

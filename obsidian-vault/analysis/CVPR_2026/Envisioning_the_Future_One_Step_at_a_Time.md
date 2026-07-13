@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/Envisioning_the_Future_One_Step_at_a_Time.pdf
+project_link: http://compvis.github.io/myriad
+code_link: https://github.com/markusebke/python-billiards
 aliases:
 - EFOSAT
 tags:
@@ -42,7 +44,7 @@ claims:
 > - OWM 上，minADE (Best-within-5min) 0.013 vs 0.066 (MAGI-1) (-0.053)。
 > - PhysicsIQ 上，minADE_5 0.115 vs 0.116 (Wan2.2) (-0.001)。
 
-## 概述
+## 概要
 
 现有视频生成模型和潜在空间模拟器在预测未来时，需要同时建模稠密的外观和运动，这种“可视化税”导致计算开销巨大，难以在开放结尾场景中进行大规模、高效率的未来假设探索。**Myriad** 提出了一种根本性的范式转换：将视觉运动预测形式化为**稀疏点轨迹上的自回归扩散模型**，完全避免像素级渲染，使推理聚焦于运动动力学本身。
 
@@ -52,7 +54,7 @@ claims:
 
 该方法的主要局限在于依赖静态相机假设、训练监督受限于现成点追踪器的质量，且预测时间跨度目前限于数秒量级。尽管如此，Myriad 在运动空间中进行高效推演的能力，为开放世界中的快速决策、反事实推理和物理规划开辟了新路径。
 
-## 背景与动机
+
 
 ### 视觉运动预测的现状与瓶颈
 
@@ -81,7 +83,9 @@ claims:
 
 这一范式转变使得模型在开放世界运动预测基准上以 **2200 samples/min** 的吞吐量超越视频模型逾7000倍，同时在精度上保持竞争力甚至更优，为视觉运动预测开辟了一条以效率为核心的新路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Myriad 的核心创新在于将视觉运动预测从**稠密像素生成**彻底重构为**稀疏点轨迹上的逐步自回归扩散建模**，从而绕过了视频生成模型中普遍存在的“可视化税”（visual tax）。这一范式转换带来了三个紧密耦合的关键设计变更。
 
@@ -114,7 +118,7 @@ $$\mathcal{L}_{\mathrm{FM}} = \underset{\tau, \Delta x_{t,0}^{(i)}, \Delta x_{t,
 
 这些创新共同作用，使 Myriad 在开放世界运动预测（OWM）基准上以 **2200 samples/min** 的吞吐量远超视频模型（如 MAGI-1 的 0.303 samples/min），同时在 Best-5 精度上达到 0.029，优于 MAGI-1 的 0.037（Table 1），实现了效率与精度的双重突破。
 
-## 整体框架
+
 
 Myriad 将视觉运动预测重新表述为**稀疏点轨迹上的逐步自回归扩散模型**，完全避免了稠密像素渲染的“可视化税”。其核心流程为：从单张图像和用户指定的一组查询点出发，模型以自回归方式逐步预测每个查询点在下一时刻的增量运动 $\Delta x_t^{(i)}$，在线更新轨迹 $x_t^{(i)}$，从而生成覆盖未来若干秒的完整运动假设。
 
@@ -164,7 +168,7 @@ Myriad 将视觉运动预测重新表述为**稀疏点轨迹上的逐步自回�
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2604_09527/figures/001_Figure_1.jpg]]
 *Figure 1: From a single image, our model envisions diverse, physically consistent futures in open-set environments (top). By exploring directly in motion space, it can rapidly perform thousands of counterfactual rollouts – here to select a candidate billiard shot (bottom)*
 
-## 核心模块与公式推导
+
 
 Myriad 的核心架构围绕“稀疏点轨迹的自回归扩散建模”展开，由以下关键模块串联构成。
 
@@ -230,7 +234,9 @@ $$\mathcal{L}_{\mathrm{FM}} = \underset{\tau, \Delta x_{t,0}^{(i)}, \Delta x_{t,
 
 推理时，模型维护 KV 缓存以加速逐步生成。对于每个时间步 $t$ 和每条轨迹 $i$，流匹配头以变换器输出的条件特征 $\mathbf{z}_t^{(i)}$ 为条件，从噪声中采样增量运动 $\Delta x_t^{(i)}$，并在线更新轨迹位置 $x_t^{(i)} = x_{t-1}^{(i)} + \Delta x_t^{(i)}$。消融实验（Table D）证实，50 步逐步预测（$\Delta t = 0.01\text{s}$）的终点误差为 0.00141，远优于单步预测的 0.02823，验证了逐步分解复杂交互的必要性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：开放世界与物理运动预测
 
@@ -295,7 +301,9 @@ Figure 12 分析了后验不确定性与真实误差的相关性。从像素级�
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2604_09527/figures/021_Table.jpg]]
 *Table: D. Reasoning in multiple steps. We compare predicting 0.5 s into the future using models trained with different step sizes. Our standard method integrates 50 steps, while the other models perform fewer steps. Therefore, these models require fewer autoregressive steps, yet have to model more of the dynamics internally*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系：稀疏运动预测 vs. 稠密视觉生成
 
@@ -334,6 +342,8 @@ Myriad 的设计包含若干关键假设，这些假设定义了其适用边界�
 **下游应用的优势与不足。** 在机器人操控、自动驾驶等闭环场景中，Myriad 的稀疏运动预测相比专门的闭环模型（如基于强化学习的策略网络）有哪些优势和不足？一方面，Myriad 的通用运动先验可能提供更好的场景理解和多模态未来预测；另一方面，它缺乏对具体执行器动力学和任务奖励的直接建模。在台球规划实验中（Table 2），Myriad 达到了 78% 的准确率，接近模拟器 Oracle 的 84%，但仍有 6% 的差距，这表明在需要精确物理交互的任务中，纯数据驱动的方法仍有改进空间。
 
 **串行解码的延迟。** 尽管通过 KV 缓存和融合并行变换器块已经大幅加速了推理，自回归的逐步预测特性在串行解码时仍存在一定延迟。在需要实时响应的应用中（如高频控制回路），这一延迟可能成为瓶颈。进一步的研究可以探索非自回归的解码策略或模型蒸馏技术来降低延迟。
+
+
 
 ## 原文 PDF
 

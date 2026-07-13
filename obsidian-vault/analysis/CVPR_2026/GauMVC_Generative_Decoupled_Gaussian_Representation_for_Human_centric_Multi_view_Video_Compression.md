@@ -43,7 +43,7 @@ claims:
 > - ENerf-Outdoor (Actor05) 上，BPP 0.0042 (远低于所有比较方法（不足次优方法的1/3）)；LPIPS 0.2785 (最佳感知质量)。
 > - AvatarRex 上，Face Distance 0.2205 (最佳身份保持)；Expression Similarity 0.9448 (最佳表情相似度)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -65,7 +65,7 @@ GauMVC区别于两类基线：（1）传统多视点编码标准（如**MV-HEVC*
 
 当前方法主要针对单人场景，假设人与背景可较好分离，难以直接处理多人或人-物交互场景；SMPL模型对宽松衣物等高度非刚性变形的表达能力有限；方法依赖预训练分割与姿态估计模块，在严重遮挡或复杂姿态下鲁棒性可能不足。未来方向包括扩展至多人场景、引入更具表达力的变形模型（如服装模拟），以及进一步优化关键视图的选择策略与数量。
 
-## 背景与动机
+
 
 ### 多视点视频压缩的现实需求
 
@@ -90,7 +90,9 @@ GauMVC区别于两类基线：（1）传统多视点编码标准（如**MV-HEVC*
 
 这一范式转变的关键在于：**关键问题不在于场景分离本身，而在于分离后如何高效压缩动态人体部分**。GauMVC通过SMPL参数化先验将人体运动压缩至极低维度，同时利用区域最优关键视图选择保留外观细节，在极低比特率下实现了高保真自由视点重建。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题本质：从消除低层冗余到语义感知生成式建模
 
@@ -140,7 +142,7 @@ GauMVC的核心创新体现在三个维度的范式转变：
 - **压缩性能**：在ENerf-Outdoor (Actor05)上，GauMVC的BPP仅为0.0042，不足次优方法的1/3，同时LPIPS达到0.2785，为所有方法中最佳感知质量（Table 1）
 - **可扩展性**：Figure 8直接展示了分层比特流设计带来的bpp优势——随着视点和序列长度增加，GauMVC与MV-HEVC的bpp差距持续扩大
 
-## 整体框架
+
 
 GauMVC 提出了一种**生成式解耦压缩范式**，其核心洞察在于：传统动态 3DGS 压缩方法将人体运动视为通用变形或光流，忽略了人体运动固有的低维语义结构与骨骼约束，导致编码冗余极高。GauMVC 通过显式解耦场景为**静态背景**与**动态人体**两个独立层次，将压缩问题从“消除低层冗余”转变为“语义感知的生成式建模”——编码器仅需传输背景模型、稀疏关键视图和紧凑的姿态参数，解码器利用 SMPL 先验生成式地重建任意视点与时刻的图像。
 
@@ -177,7 +179,7 @@ GauMVC 的分层比特流设计是其压缩效率的结构性保障：**背景�
 ![[assets/figures/papers/paper_list_l2255_https_openaccess_thecvf_com_content_CVPR2026_html_Yan_GauMVC_Generative/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of our generative decoupled compression framework. Given multi-view video input, our method decomposes the scene into a static background and a dynamic human. The background is represented by a consistent 3D Gaussian field, while human appearance and motion are encoded by a few key views and SMPL parameters. At the decoder, these inputs produce an SMPL-driven Gaussian avatar, which is fused with the background for high-fidelity reconstruction*
 
-## 核心模块与公式推导
+
 
 GauMVC将人中心多视点视频压缩分解为**静态批次**与**动态批次**两条并行管线，二者在解码端通过分层alpha合成融合。以下按模块顺序给出关键公式与变量含义。
 
@@ -245,7 +247,9 @@ $$I_v^t = F_v^t \cdot \alpha_v^t + B_v^t \cdot (1 - \alpha_v^t)$$
 ![[assets/figures/papers/paper_list_l2255_https_openaccess_thecvf_com_content_CVPR2026_html_Yan_GauMVC_Generative/figures/003_Figure_3.jpg]]
 *Figure 3: Dynamic batch pipeline. The dynamic branch models human motion and appearance. It first extracts and compresses SMPL parameters for pose and shape, then generates a personalized Gaussian avatar from key views through region-wise fusion, enabling compact and high-fidelity free-viewpoint video synthesis*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能对比
 
@@ -294,7 +298,9 @@ GauMVC 在 ENerf-Outdoor 和 AvatarRex 两个代表性人中心多视点数据�
 ![[assets/figures/papers/paper_list_l2255_https_openaccess_thecvf_com_content_CVPR2026_html_Yan_GauMVC_Generative/figures/009_Figure_7.jpg]]
 *Figure 7: Identity editing on Owlii-in-Scene. Identity is changed by swapping key views with fixed motion*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心创新：从运动场压缩到语义生成式编码
 
@@ -326,6 +332,8 @@ GauMVC 的核心调控旋钮（causal knob）是将压缩范式从“编码高�
 - **更丰富的变形模型**：能否采用更具表达力的变形模型（如服装物理模拟或隐式变形场）来改善非刚性细节的压缩质量，同时保持参数量的紧凑性？
 - **关键视图优化**：关键视图的选择和数量是否能进一步优化以减少比特率？是否存在理论上的率失真下界？
 - **与神经场编码的融合**：当前背景高斯压缩采用剪枝+标量量化+熵编码，是否可借鉴基于神经场的隐式压缩方法（如 INR-based 压缩）进一步降低背景比特率？
+
+
 
 ## 原文 PDF
 

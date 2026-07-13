@@ -43,7 +43,7 @@ claims:
 > - Tanks&Temples 上，PSNR 23.79 vs 23.14 (3DGS) (+0.65)。
 > - Deep Blending 上，PSNR 29.70 vs 29.41 (3DGS) (+0.29)。
 
-## 概述
+## 概要
 
 3D高斯泼溅（3D Gaussian Splatting, 3DGS）在新视角合成领域取得了显著进展，但其密度控制策略存在一个被忽视的瓶颈：**仅依赖梯度的范数（magnitude）而忽略了梯度的方向一致性**。这导致两个相互制约的问题——大型高斯因内部梯度方向冲突而无法被有效分裂（过重建），以及方向一致区域的高斯被过度克隆（过密化），造成计算与存储资源的浪费。
 
@@ -51,7 +51,7 @@ claims:
 
 在Mip-NeRF360、Tanks&Temples和Deep Blending三个标准数据集上，GDAGS的PSNR分别达到28.02、23.79和29.70，全面优于3DGS基线，同时内存占用更低。值得注意的是，GDAGS仅需Pixel-GS的20%–50%内存即可达到相近或更优的渲染质量。消融实验验证了非线性权重函数相较线性替代方案的显著优势，以及指数幂参数$p=15$在质量与效率之间的最佳折衷。该方法还展现出良好的泛化性，可即插即用地集成到MCMC-3DGS和Compact-3DGS等3DGS变体中并带来一致的性能提升。
 
-## 背景与动机
+
 
 ### 3D高斯泼溅的密度控制瓶颈
 
@@ -81,7 +81,9 @@ claims:
 
 基于此，本文提出**GDAGS（Gradient-Direction-Aware Gaussian Splatting）** ，通过计算每个高斯的GCR并将其映射为非线性动态权重，对原始梯度范数进行方向感知调制，从而在分裂与克隆操作中实现差异化控制：在分裂时放大方向冲突高斯的权重以促进细节重建，在克隆时采用逆策略抑制方向一致高斯的过度增殖。这一设计在不牺牲渲染质量的前提下，显著降低了内存开销，实现了几何精度与存储效率的平衡。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GDAGS 的核心创新在于将**梯度方向感知**引入 3DGS 的密度控制决策，解决了原始 3DGS 仅依赖梯度范数而忽略方向一致性的根本缺陷。该方法的三个关键 changed slots 构成了一个完整的因果链条：
 
@@ -115,7 +117,7 @@ $$w_i = \alpha + \beta \cdot (1 - \mathcal{C}_i)^p$$
 
 消融实验（Table 2）直接验证了非线性权重函数相对于线性替代方案 $w_i = 2 - \mathcal{C}_i$（GDAGS-L）的优越性：非线性形式通过幂次 $p$ 放大了 GCR 微小差异的影响，使得权重函数对方向冲突更加敏感，同时更有效地抑制方向一致高斯的权重。这一设计选择是 GDAGS 性能提升的关键因素之一。
 
-## 整体框架
+
 
 GDAGS 在 3DGS 的密度控制流程中插入了一个轻量的**方向感知调制模块**，不改变原始训练管线的主体结构，仅替换密度化决策所依赖的梯度度量。整体流水线如 Figure 2 所示，包含三个串联的功能模块：
 
@@ -130,7 +132,7 @@ GDAGS 在 3DGS 的密度控制流程中插入了一个轻量的**方向感知调
 
 整个模块作为 3DGS 密度化步骤的即插即用替换，计算开销集中在 GCR 的逐像素梯度聚合上，不引入额外的可学习参数。超参数 $\alpha$、$\beta$、$p$ 在所有数据集和场景上保持固定，无需场景特定调优。
 
-## 核心模块与公式推导
+
 
 ### 3DGS 密度控制的原始机制与瓶颈
 
@@ -187,7 +189,9 @@ $$\tilde{\nabla}_{\mu_i} L = w_i \cdot \nabla_{\mu_i} L$$
 ![[assets/figures/papers/paper_list_l84_https_openreview_net_forum_id_6qDxK4Gz7F/figures/011_Figure_7.jpg]]
 *Figure 7: Corresponding curves of weights for different hyperparameters*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -279,7 +283,9 @@ Table 4的效率分析表明，GDAGS的训练时间在三个数据集上均为�
 ![[assets/figures/papers/paper_list_l84_https_openreview_net_forum_id_6qDxK4Gz7F/figures/018_Figure_11.jpg]]
 *Figure 11: Qualitative results of GDAGS and baseline models in sparse views*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -324,6 +330,8 @@ GDAGS 的核心假设是：每个高斯能够接收到来自多个像素的充�
 3. **稀疏视图场景的量化评估**：在稀疏视图对比中，能否引入量化指标（如边缘保持指数）以更客观地评估 GDAGS 对几何边界的改善，而非仅依赖定性可视化？
 
 4. **自适应参数调整**：GDAGS 的权重函数是否可以在训练过程中自适应调整参数 $p$ 和 $\beta$，例如根据当前迭代的高斯数量轨迹或梯度分布统计量动态调节，从而消除手动调参的需要？
+
+
 
 ## 原文 PDF
 

@@ -43,7 +43,7 @@ claims:
 > - 3DSRBench (allocentric) 上，left/right 准确率 79.94% vs 77.94% (APC-Num) (+2.00%)。
 > - COCOSPATIAL (egocentric) 上，left/right 准确率 89.83% vs – (–)。
 
-## 概述
+## 概要
 
 视觉语言模型（VLM）在空间推理任务中展现出巨大潜力，但现有研究主要聚焦于以观察者自身为参照的**自我中心**（egocentric）视角。在许多实际应用——如机器人导航、增强现实和多智能体协作——中，系统需要从外部观察者或对象的视角理解空间关系，即**异中心**（allocentric）空间推理。然而，当前 VLM 在以对象为中心的异中心视角下存在强烈的自我中心偏置，难以执行视点变换，导致空间推理性能大幅下降。
 
@@ -51,7 +51,7 @@ claims:
 
 实验结果表明，SymPL 在多个基准测试上全面超越此前最佳方法：在 COMFORT# 异中心测试中，left/right 准确率达 **69.00%**（较 GPT-5 提升 19.17 个百分点），closer 准确率达 **97.33%**（提升 13.08 个百分点），visibility 和 facing 类别分别领先最强基线 27.31 和 19.25 个百分点。此外，SymPL 在自我中心空间推理的 COCOSPATIAL 基准上也达到最高水平（left/right 89.83%，above/below 94.33%），证明了该方法对多视角推理的一致有效性。
 
-## 背景与动机
+
 
 空间推理是视觉语言模型（VLM）走向具身智能与复杂场景理解的核心能力之一。然而，现有 VLM 在空间推理上存在一个关键瓶颈：**模型在以对象为中心的异中心（allocentric）视角下表现出强烈的自我中心（egocentric）偏置**。换言之，当要求模型从场景中某个参考对象（如一个人）的视角出发，判断其他对象的相对方位、距离、可见性或朝向时，VLM 往往无法正确执行视点变换（viewpoint transformation），导致推理性能大幅下降。
 
@@ -61,7 +61,9 @@ claims:
 
 本文的核心动机在于：**与其强迫 VLM 学会视点变换，不如将异中心推理问题重构为 VLM 擅长的任务**。具体而言，SymPL 将复杂的空间关系推理转化为一个**符号布局（symbolic layout）问题**——通过正交投影将 3D 场景映射为 2D 平面，将对象抽象为无特征彩色圆形，利用线性或圆形边界对空间进行二分区着色，最终将原始的空间关系查询转化为“目标对象位于哪种颜色区域”的定位问题。这一策略绕开了 VLM 的视点变换短板，转而利用其在简化视觉线索和位置判断上的强项，从而在异中心空间推理上取得显著突破。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：异中心空间推理中的自我中心偏置
 
@@ -110,7 +112,7 @@ SymPL 处于空间推理与 VLM 推理增强的交叉领域，其定位如下：
 
 SymPL 的独特贡献在于：它不试图让 VLM “学会”视点变换，而是通过符号布局重构**绕过**这一困难，将问题转化为 VLM 已有的能力范畴。这种“问题重构”范式为 VLM 的空间推理能力扩展提供了新的思路。
 
-## 整体框架
+
 
 SymPL 的核心思想是将视觉语言模型（VLM）难以直接处理的异中心空间推理问题，重构为 VLM 擅长的符号布局定位问题。整个框架由**两阶段流水线**构成：空间信息提取与问题重构，后者通过**投影、抽象、二分区、定位**四个关键因子逐步将原始场景转化为简化的颜色分区布局。
 
@@ -143,7 +145,7 @@ SymPL 的核心思想是将视觉语言模型（VLM）难以直接处理的异�
 ![[assets/figures/papers/paper_list_l2398_https_arxiv_org_abs_2602_19117/figures/001_Figure_1.jpg]]
 *Figure 1: SymPL reformulates allocentric questions into symboliclayout questions using four factors-projection, abstraction, bipartition, and localization-enabling significantly improved spatial reasoning under allocentric settings*
 
-## 核心模块与公式推导
+
 
 SymPL 的核心思想是将异中心空间推理问题重构为符号布局问题，其推理流水线由两个阶段、四个关键因子构成。以下按模块顺序展开，并给出关键公式定义。
 
@@ -190,7 +192,9 @@ $$U = \{ v_{r}, p_{r}, p_{i} \mid i = 1, 2, \ldots, n \}$$
 ![[assets/figures/papers/paper_list_l2398_https_arxiv_org_abs_2602_19117/figures/003_Figure_3.jpg]]
 *Figure 3: Partition rule based on spatial reasoning category. Directional comparisons adopt a linear partition, while distance comparisons employ a circular one*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与设计动机
 
@@ -264,7 +268,9 @@ Figure 6 的错误分解揭示了当前流水线的主要失败模式：**最频
 ![[assets/figures/papers/paper_list_l2398_https_arxiv_org_abs_2602_19117/figures/009_Figure_5.jpg]]
 *Figure 5: Ablation results of each key factor. (a) projection, (b) abstraction, (c) bipartition, (d) localization. The darker bar indicates the configuration used in SymPL*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1 问题定位：从自我中心偏置到符号化视点解耦
 
@@ -305,6 +311,8 @@ SymPL 的提出打开了若干值得进一步探索的方向：
 3. **向 Embodied AI 的泛化。** 该方法在室内外导航、机器人操作等 Embodied AI 任务中的泛化能力尚未验证。这些场景通常涉及更复杂的 3D 几何、动态遮挡和实时性要求，SymPL 的多模块流水线能否满足这些约束需要进一步研究。
 
 4. **大规模多对象场景与遮挡推理。** 当前流水线在处理包含数十个对象的场景时，符号布局的视觉清晰度可能下降（颜色区分饱和、圆形符号重叠）。是否可以通过分层分区、遮挡显式建模或注意力引导的符号筛选来扩展至更复杂的场景配置？
+
+
 
 ## 原文 PDF
 

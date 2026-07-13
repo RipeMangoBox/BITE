@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/CitySeeker_How_Do_VLMs_Explore_Embodied_Urban_Navigation_with_Implicit_Human_Needs.pdf
+project_link: null
+code_link: null
 openreview_forum_id: hzf23XSDcs
 aliases:
 - CBBBCMERAM
@@ -42,7 +44,7 @@ claims:
 > - CitySeeker (Overall) 上，TCE 为 Qwen2.5-VL-32B: 2.6%，对比 Random Choice: 0.7%，变化 +1.9%。
 > - CitySeeker (BCR improvement) 上，TCP 为 Qwen2.5-VL-32B with combined BCR: 27.38%，对比 Qwen2.5-VL-32B without BCR: 19.9%，变化 +7.48%。
 
-## 概述
+## 概要
 
 CitySeeker是一项面向具身城市导航的基准测试，核心挑战在于**隐性需求驱动的视觉定位**——模型需将“我渴了”这类抽象人类意图映射为具体的可导航POI（如便利店、饮水机），而非遵循“前方左转找到星巴克”这样的显式指令。该基准覆盖7个认知难度递增的任务类别（从Basic POI到Abstract Demand与Semantic Preference），在8个全球城市的6,440条轨迹上实施评估。
 
@@ -54,7 +56,7 @@ CitySeeker是一项面向具身城市导航的基准测试，核心挑战在于*
 
 **方法定位**：CitySeeker采用ReAct风格的“观察-思考-行动-反思”循环，智能体在每步独立决策，不依赖持久记忆。BCR策略通过基于置信度的回溯触发（$\bar{s} < 0.75$）、拓扑认知图构建、Neo4j图数据库检索等手段，模拟人类的空间元认知过程，为空间智能研究提供了可操作的干预框架。
 
-## 背景与动机
+
 
 ### 隐性需求：城市导航中被忽视的认知鸿沟
 
@@ -72,7 +74,9 @@ CitySeeker基准的提出正是为了填补这一空白。如图1所示，该基
 
 这一诊断将问题焦点从传统的感知-控制流水线转移到了**空间智能**（spatial intelligence）的深层挑战：VLMs能否学习从第一人称视角的街景观察中构建内在的空间信念，并动态更新以支持长距离目标导向导航？CitySeeker的设计正是为了将这一根本问题置于可量化评估的框架之内。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CitySeeker的核心创新在于将城市导航任务从**显式目标指令**转向**隐性人类需求驱动**，并针对该范式下VLM暴露出的系统性缺陷，提出了一套**认知启发式增强策略（BCR）**。这并非模型架构层面的创新，而是任务定义、评估框架与推理时策略的三层重构。
 
@@ -120,7 +124,7 @@ BCR策略的组合并非简单加性。组合策略（B2+B3+C1+R3）将Qwen2.5-V
 
 BCR策略本质上是**推理时的启发式补丁**，并未改变VLM自身的空间推理能力。核心因果杠杆——模型是否具备城市生活常识（如功能可供性推理）和鲁棒的空间心理模型——仍未被触及。如何将人类水平的常识推理注入VLM，以及如何实现真正的认知地图式内在空间表征，是CitySeeker揭示的根本性开放问题。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_hzf23XSDcs/figures/005_Figure_4.jpg]]
 *Figure 4: The CitySeeker Implicit-Need-Driven Embodied Urban Navigation Framework. 4 EVALUATION ON CITYSEEKER*
@@ -159,7 +163,7 @@ CitySeeker基准包含6,440条轨迹，覆盖全球8个城市区域（包括北�
 
 评测指标包括任务完成率（TCP，以距目标50米内为成功）、严格完成率（TCE，精确到达目标节点）、任务完成覆盖率（TCC）、路径长度加权成功率（SPL）和归一化动态时间规整距离（nDTW）等。
 
-## 核心模块与公式推导
+
 
 ### 导航任务形式化
 
@@ -221,7 +225,9 @@ $$\phi(a) = \mathbb{I}_{\theta_a \in \Theta_{optimal}} \cdot \cos(\theta_a - \th
 
 **记忆检索**基于Neo4j图数据库实现，包含三种检索模式：拓扑检索沿图结构查询关联节点、空间检索按邻近度召回位置、历史轨迹查找提供当前回合内的短期路径记忆。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 评估设置与基线
 
@@ -299,7 +305,9 @@ CitySeeker基准在8个全球城市区域上构建了6,440条导航轨迹，涵�
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_hzf23XSDcs/figures/017_Table_8.jpg]]
 *Table 8: Navigation Instruction Categories and Examples*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有视觉语言导航基准的关系
 
@@ -357,6 +365,8 @@ BCR 策略的有效性存在明确的边界条件：
 3. VLM 能否通过学习获得类似认知地图的内在空间表征，而非依赖外部图结构？这触及空间智能研究的根本问题。
 4. BCR 策略的组合优化空间远未穷尽，如何找到特定场景下的最优策略组合？
 5. 跨城市泛化能力如何提升？语言本地化实验表明语言偏见并非城市间性能差异的主要驱动因素，暗示更深层的视觉和文化因素在起作用。
+
+
 
 ## 原文 PDF
 

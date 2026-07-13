@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/Exploring_Spatiotemporal_Feature_Propagation_for_Video_Level_Compressive_Spectral_Reconstruction_Dataset_Model_and_Benchmark.pdf
+project_link: null
 code_link: "https://github.com/nju-cite/DynaSpec"
 aliases:
 - PS
@@ -44,7 +45,7 @@ claims:
 > - DynaSpec 上，PSNR (dB) 41.82 (领先所有对比方法)；SSIM 0.9904 (领先所有对比方法)。
 > - 模型效率 上，Params (M) 2.48 (参数显著低于视频/ViT方法)。
 
-## 概述
+## 概要
 
 压缩光谱成像（SCI）通过将三维高光谱数据立方体编码为二维测量图像，以低成本和紧凑光路实现快速光谱采集。然而，从单帧测量中重建完整的高光谱图像是一个高度不适定问题：空间-光谱信息的压缩丢失导致重建结果存在不确定性，而逐帧独立处理进一步破坏了视频序列的时间一致性，表现为光谱强度曲线的剧烈抖动（Figure 1）。这一瓶颈的根源在于，单帧方法无法利用相邻帧间的互补信息来补偿被遮挡或混叠的光谱特征。
 
@@ -56,7 +57,7 @@ claims:
 
 **方法定位**：PG-SVRT属于视频级压缩光谱重建方法，与单帧方法（如CST、MST、s2-Transformer、DADF、DPU）和通用视频恢复方法（如VRT）形成对比。其关键改进在于将重建范围从单帧扩展至多帧序列，以时空特征传播替代单纯的空间自注意力，并通过桥接令牌和价值共享机制在控制计算开销的同时增强跨域信息交互。
 
-## 背景与动机
+
 
 ### 压缩光谱成像的核心矛盾
 
@@ -102,7 +103,9 @@ $$Y_i(h,w) = \sum_{c=1}^{C} \Phi(h,w-\sigma(c)) \cdot X_i(h,w,c) \quad \text{(DD
 
 核心洞察在于：利用固定编码模式在相邻帧间产生的互补特征，通过“先空间后时间”的渐进式注意力传播，可以在不显著增加计算开销的前提下，补偿单帧信息缺失并增强时序一致性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PG-SVRT 的核心创新在于将压缩光谱重建从**单帧图像级**拓展至**多帧视频级**，并围绕“固定编码模式在相邻帧间产生互补信息”这一因果机制，设计了一套渐进式时空特征传播框架。与逐帧独立重建的方法相比，该方法在以下四个关键维度上实现了系统性改变：
 
@@ -116,7 +119,7 @@ PG-SVRT 的核心创新在于将压缩光谱重建从**单帧图像级**拓展�
 
 上述四个 changed slots 并非孤立改进，而是形成了一条因果链：**MGDP** 首先建模压缩退化过程以解耦帧内编码信息（Eq. 4），为后续模块提供退化感知特征；**CDPA** 在此基础上通过空间-时间渐进式注意力实现跨域特征传播；**MDFFN** 进一步强化域内特征提取；**桥接令牌**则确保整个流程的计算可行性。模块消融实验完整验证了这一因果链：逐步添加 MGDP、CDPA 和 MDFFN，PSNR 从 39.97 dB 依次提升至 41.30 dB、41.41 dB，最终达到 41.52 dB（Table 3）。
 
-## 整体框架
+
 
 PG‑SVRT 采用基于 U‑Net 的编码器‑解码器主干，将视频级压缩光谱重建组织为三个核心模块的串行级联：**掩码引导的退化感知 (MGDP)**、**跨域传播注意力 (CDPA)** 与 **多域前馈网络 (MDFFN)**（图 3）。输入为多帧压缩测量序列 $\{Y_i\}_{i=1}^T$ 及其对应的物理编码掩码 $\Phi$，输出为重建的高光谱视频帧 $\{\hat{X}_i\}_{i=1}^T$。
 
@@ -148,7 +151,7 @@ $$Y_{in} = \text{Concat}\big(\text{Conv}(W_m(\Phi, \Phi_p) \odot F_m(Y)),\; Y\bi
 ![[assets/figures/papers/paper_list_l820_https_arxiv_org_abs_2603_00611/figures/001_Figure_1.jpg]]
 *Figure 1: Spectral compressive imaging and reconstruction. (a) SCI principle. (b) Image-based methods, with issues of uncertain reconstruction and temporal inconsistency (flickering intensity curves). (c) Video-based reconstruction, where information complementarity enhances completeness and temporal consistency (smooth intensity curves)*
 
-## 核心模块与公式推导
+
 
 PG-SVRT 以 U-Net 为主干架构，由三个关键组件构成：**MGDP**（Mask-Guided Degradation Perception，掩码引导的退化感知）、**CDPA**（Cross-Domain Propagated Attention，跨域传播注意力）和 **MDFFN**（Multi-Domain Feed-Forward Network，多域前馈网络）。整体框架如 Figure 3 所示。
 
@@ -203,7 +206,9 @@ $$O(\text{CDPA}) = 4THWC^2 + 4THWN_BC + 2T^2HWC$$
 
 MDFFN 替代常规 FFN，将光谱特征划分为多个头（head），**分别在空间域和时间域独立执行自注意力**，最后进行融合，有效增强域内特征提取能力。其结构如 Figure 4(b) 所示。消融实验表明，相比普通 3D 卷积或单域处理，MDFFN 在 PSNR 和 SAM 指标上均有提升（Table 6）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置与评估协议
 
@@ -285,7 +290,9 @@ PG-SVRT 在两种数据集上进行评估：公开的 **KAIST** 数据集和本�
 ![[assets/figures/papers/paper_list_l820_https_arxiv_org_abs_2603_00611/figures/006_Figure_5.jpg]]
 *Figure 5: Measurements of different SCI systems*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 从单帧图像到多帧视频的重建范式迁移
 
@@ -328,6 +335,8 @@ PG-SVRT 的关键范式转换在于将学习范围从单帧图像扩展至多帧
 3. **物理模型融合**：MGDP 目前仅使用掩码先验进行退化感知，能否将神经渲染或更精细的物理成像模型融入以进一步提升真实场景的细节重建？这可能是弥合仿真-真实差距的关键路径。
 
 4. **计算效率的进一步优化**：虽然 PG-SVRT 以 2.48M 参数和每帧 28.18 GFLOPs 实现了高效推理，但桥接令牌机制本质上是一种低秩近似，其信息压缩比与重建精度的理论边界尚未被严格刻画。
+
+
 
 ## 原文 PDF
 

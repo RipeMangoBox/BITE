@@ -5,6 +5,8 @@ paper_level: A
 venue: AAAI
 year: 2026
 pdf_ref: paperPDFs/AAAI_2026/InterMoE_Individual_Specific_3D_Human_Interaction_Generation_via_Dynamic_Temporal_Selective_MoE.pdf
+project_link: null
+code_link: https://github.com/Lighten001/InterMoE
 aliases:
 - InterMoE
 tags:
@@ -40,7 +42,7 @@ claims:
 > - InterHuman 上，FID ↓ 4.677 (‑9%（相对最佳对比方法）)；R‑Precision Top‑1 ↑ 0.512；MM‑Dist ↓ 3.762。
 > - InterX 上，FID ↓ 0.297 (‑22%（相对最佳对比方法）)；R‑Precision Top‑1 ↑ 0.427；MM‑Dist ↓ 3.011。
 
-## 概述
+## 概要
 
 三维人机交互生成旨在根据文本描述合成双人交互运动序列，其核心挑战在于**同时保留个体独有特征与严格遵循文本语义**。现有方法或采用标准前馈网络，或引入固定的混合专家（MoE）路由（如 Token‑Choice 与 Expert‑Choice），但这些机制对时间维度的非均匀重要性缺乏感知，导致动作趋同、身份混淆和语义对齐不足。
 
@@ -52,7 +54,7 @@ claims:
 
 **局限与展望**：当前框架未显式施加物理约束，偶尔产生穿透、抖动和脚部滑动等微小瑕疵；且仅处理人‑人交互，尚未扩展到人‑物、人‑动物等更广泛的交互类型。如何引入物理先验、适配更多样交互场景以及支撑长序列多智能体生成，是值得进一步探索的开放问题。
 
-## 背景与动机
+
 
 三维人机交互生成旨在根据文本描述合成双人或多人的三维动作序列，在虚拟现实、游戏角色动画、人机协作仿真等领域具有重要应用价值。该任务的核心难点在于同时满足两个高度耦合的需求：**语义保真度**（生成的动作必须严格遵循文本描述中的交互语义）与**个体特异性**（交互双方需保持各自独立的运动风格与身份特征，避免动作趋同或身份混淆）。
 
@@ -67,7 +69,9 @@ claims:
 
 针对上述缺口，本文提出 **InterMoE**，核心思路是通过**动态时间选择性混合专家**机制，使每个专家能够自适应地从批级时间池中选择关键帧进行处理，同时引入协同路由器融合文本语义与运动学特征来指导分配决策，从而在保持个体身份的同时实现高语义保真度的交互生成。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 InterMoE 的核心创新在于用**动态时间选择性混合专家（Dynamic Temporal‑Selective MoE）**替代传统 Transformer 块中的标准前馈网络（FFN），以解决三维人机交互生成中个体身份混淆与文本语义对齐不足的双重瓶颈。该模块由两个关键子机制构成：**协同路由器（Synergistic Router）**与**动态时间选择（Dynamic Temporal Selection）**，二者共同实现“文本‑运动协同路由 + 可学习容量 + 批级关键帧自适应分配”的独特范式。
 
@@ -107,7 +111,7 @@ InterMoE 相对于强基线 **InterGen**（Liang et al., CVPR 2024）的核心�
 
 当前设计未显式施加物理约束，偶尔产生穿透、抖动和脚部滑动等微小瑕疵。如何引入物理先验（如碰撞检测、接触力学）以进一步减少伪影，是值得探索的方向。此外，动态时间选择 MoE 在多智能体（>2 人）交互中的扩展性和效率仍需验证。
 
-## 整体框架
+
 
 InterMoE 的整体生成流程遵循“编码—扩散去噪—解码”的范式，并在去噪阶段引入动态时间选择性混合专家（Dynamic Temporal‑Selective MoE）以同时保留个体身份特征与文本语义保真度。整个框架由三个核心模块串联构成：
 
@@ -139,7 +143,7 @@ InterMoE 的整体生成流程遵循“编码—扩散去噪—解码”的范�
 ![[assets/figures/papers/paper_list_l1664_InterMoE_Individual_Specific_3D_Human_Interaction_Generation_via_Dynamic/figures/002_Figure_2.jpg]]
 *Figure 2: The overall framework of the InterMoE. (a) Causal-Skeletal VAE to encode/decode individual motions; (b) Two Cooperative MoE Denoisers to interactively perform denoising; (c) Our proposed Synergistic Router and Dynamic Temporal-Selective Expert mechanism. The router guides multiple experts to select and process critical temporal features of the motion sequence dynamically*
 
-## 核心模块与公式推导
+
 
 ### 3.1 因果骨骼 VAE（Causal‑Skeletal VAE）
 
@@ -224,7 +228,9 @@ $$m_s^{\mathrm{out}} = \sum_{e=1}^N \mathbf{G}_{e,s} \, E(m_s), \quad m_s \in \m
 ![[assets/figures/papers/paper_list_l1664_InterMoE_Individual_Specific_3D_Human_Interaction_Generation_via_Dynamic/figures/001_Figure_1.jpg]]
 *Figure 1: Compared with conventional MoE mechanisms, Token-Choice inaccurately generates the “extends” action, and Expert-Choice has low overall kinematic quality. Our framework leverages the Synergistic Router and Dynamic Temporal Selection mechanism to generate 3D human interactions that exhibit both high semantic fidelity and robust preservation of individual-specific characteristics*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -283,11 +289,7 @@ InterMoE 在 InterHuman 和 InterX 两个双人交互数据集上进行了全面
 ![[assets/figures/papers/paper_list_l1664_InterMoE_Individual_Specific_3D_Human_Interaction_Generation_via_Dynamic/figures/006_Table_3.jpg]]
 *Table 3: Ablation results of the MoE type*
 
-![[assets/figures/papers/paper_list_l1664_InterMoE_Individual_Specific_3D_Human_Interaction_Generation_via_Dynamic/figures/008_Table_4.jpg]]
-*Table 4: Ablation results of the expert number*
 
-![[assets/figures/papers/paper_list_l1664_InterMoE_Individual_Specific_3D_Human_Interaction_Generation_via_Dynamic/figures/007_Table_5.jpg]]
-*Table 5: Ablation results of the expectation of the number of experts allocated per feature Cexp*
 
 ![[assets/figures/papers/paper_list_l1664_InterMoE_Individual_Specific_3D_Human_Interaction_Generation_via_Dynamic/figures/009_Table_6.jpg]]
 *Table 6: Quantitative results on the HumanML3D test set, demonstrate the generalization of our InterMoE framework*
@@ -295,7 +297,9 @@ InterMoE 在 InterHuman 和 InterX 两个双人交互数据集上进行了全面
 ![[assets/figures/papers/paper_list_l1664_InterMoE_Individual_Specific_3D_Human_Interaction_Generation_via_Dynamic/figures/013_Table_7.jpg]]
 *Table 7: User study results*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 
@@ -328,6 +332,8 @@ InterMoE 的核心贡献在于将混合专家（MoE）机制引入三维人-人�
 - **层级时间抽象。** 针对超长时序生成，引入层级时间抽象或记忆机制（如 temporal pyramid、recurrent memory bank）可能有助于支撑稳定的长期交互推理，同时缓解批级路由的计算压力。
 - **多智能体路由扩展。** 在三人及以上交互中，专家分配策略可能需要从当前的批级平面路由升级为图结构路由或层级路由，以在保持个体身份的同时控制计算复杂度。
 - **通用性验证。** Table 6 中 HumanML3D 单人数据集上的泛化实验已初步验证了 InterMoE 模块的插拔式提升能力，但更多基线（如 MDM、MLD 等）和更多数据集上的系统性验证将有助于确立该方法的通用性边界。
+
+
 
 ## 原文 PDF
 

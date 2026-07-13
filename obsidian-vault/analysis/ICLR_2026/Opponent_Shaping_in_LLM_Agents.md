@@ -5,6 +5,8 @@ paper_level: B
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Opponent_Shaping_in_LLM_Agents.pdf
+project_link: null
+code_link: null
 aliases:
 - OSLA
 tags:
@@ -40,23 +42,25 @@ cited_by: 2
 > - 在IMP中，塑形者平均奖励为0.99，基线为-0.03，提升超过34倍。
 > - 在合作性游戏C-IPD中，塑形者奖励达5.88，基线为1.0，提升488%。
 
-## 概述
+## 概要
 
 本文提出ShapeLLM，将对手塑形引入LLM智能体。方法把传统多智能体强化学习中的状态和动作表示替换为结构化自然语言提示与文本生成动作，并用PPO和LoRA对塑形者进行参数高效更新。其核心证据来自重复正规型博弈实验：塑形者利用回合间历史捕捉对手学习轨迹，在多个竞争性和合作性博弈中获得高于独立PPO基线的奖励。
 
-## 背景与动机
+
 
 在多智能体强化学习中，对手塑形（Opponent Shaping, OS）旨在让一个智能体通过自身行为策略性地影响对手的学习动态，从而引导对手朝向对己方有利的方向更新策略。经典的OS方法如LOLA（Learning with Opponent-Learning Awareness）通过计算对手梯度的高阶导数来实现塑形，但面临可扩展性差、需要对手模型等瓶颈。后续的模型无关OS方法（Lu et al., 2022; Khan et al., 2024）虽降低了计算复杂度，但仍依赖表格策略或循环神经网络，无法直接应用于基于Transformer的大语言模型（LLM）智能体。
 
 现有LLM在博弈中的研究（如Akata et al., 2025）主要关注单次博弈或固定策略的重复博弈，尚未探索智能体能否通过交互主动改变对手的学习轨迹。核心瓶颈在于：LLM的离散文本输出、高维参数空间以及缺乏显式的对手模型，使得传统OS算法无法直接迁移。因此，本文提出ShapeLLM，首次将对手塑形引入LLM智能体领域。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 核心洞察：LLM智能体可以通过结构化自然语言提示编码回合内与回合间的历史交互信息，从而间接观察对手的参数更新方向，实现模型无关的对手塑形，因为回合间历史包含了对手策略变化的痕迹，从而使塑形者无需显式梯度即可影响对手学习成为可能。
 
 具体而言，ShapeLLM将传统OS中的向量化状态替换为自然语言提示，将直接动作选择替换为文本生成，并通过LoRA微调实现参数高效更新。这一设计使得原本需要高阶导数的塑形过程，转化为基于PPO的强化学习问题，大幅降低了应用门槛。
 
-## 整体框架
+
 
 ![[assets/figures/papers/d8d14098-7c88-4b22-b93c-e89703540ffb/figures/001_Figure_1.jpg]]
 *Figure 1: Schematic representation of a trial. Each box corresponds to an episode (a game played for T rounds). Same-colored boxes represent episodes within the same parallel environment. Within each environment, episodes occur sequentially as indicated by the arrows. The shaper updates its parameters using the experience collected throughout the entire trial*
@@ -69,7 +73,7 @@ cited_by: 2
 3. **PPO微调模块**：使用PPO算法对塑形者的LLM进行LoRA微调，奖励为博弈收益减去KL散度惩罚，以保持生成稳定性。
 4. **试验组织模块**：管理并行环境与回合的调度，确保塑形者能够跨回合积累经验。
 
-## 核心模块与公式推导
+
 
 **模块1：策略分布**
 
@@ -95,7 +99,9 @@ $$\mathcal{L}(\theta) = \mathbb{E}_t \left[ \min(r_t(\theta) A_t, \text{clip}(r_
 
 其中r_t(θ)为重要性采样比率，A_t为优势函数，β为KL系数。该目标在塑形者与朴素学习者之间非对称更新：仅塑形者更新参数，朴素学习者保持固定或独立PPO更新。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 实验在五个经典重复正规型博弈上进行：IPD（囚徒困境）、IMP（匹配硬币）、ICG（斗鸡博弈）、C-IPD（合作性囚徒困境）和ISH（猎鹿博弈）。基模型为gemma-2-2b-it，使用LoRA（秩2）微调。
 
@@ -114,7 +120,9 @@ $$\mathcal{L}(\theta) = \mathbb{E}_t \left[ \min(r_t(\theta) A_t, \text{clip}(r_
 
 **跨模型验证**：使用Llama-3.2-1B-Instruct进行初步验证，结果与gemma-2-2b-it一致，提示ShapeLLM可能具有一定的架构泛化能力（置信度0.6）。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ShapeLLM属于模型无关对手塑形（Model-free opponent shaping）方法谱系，直接继承自Lu et al. (2022)和Khan et al. (2024)的工作，并受到LOLA (Foerster et al., 2018)的概念启发。
 
@@ -125,6 +133,8 @@ ShapeLLM属于模型无关对手塑形（Model-free opponent shaping）方法谱
 - **训练配方**：从标准PPO修改为PPO + LoRA + 非对称更新（创新性：中）。
 
 **知识库定位**：ShapeLLM是“LLM智能体对手塑形”这一种子任务的首个方法，评估于重复正规型博弈数据集。其父方法为模型无关对手塑形，基线包括独立PPO学习者和LOLA。未来工作可沿以下方向展开：扩展到连续动作空间、更复杂的博弈环境、以及多智能体塑形场景。当前证据表明，ShapeLLM在简单矩阵博弈中有效，但跨架构泛化能力仍需更多验证。
+
+
 
 ## 原文 PDF
 

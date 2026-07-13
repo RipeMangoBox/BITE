@@ -5,6 +5,8 @@ paper_level: A
 venue: TPAMI
 year: 2024
 pdf_ref: paperPDFs/TPAMI_2024/PoseScript_Linking_3D_Human_Poses_and_Natural_Language.pdf
+project_link: https://europe.naverlabs.com/research/computer-vision/posescript/
+code_link: null
 aliases:
 - PoseScript
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | PoseScript: 连接三维人体姿态与自然语言 |
 | 英文题名 | PoseScript: Linking 3D Human Poses and Natural Language |
 | 会议/期刊 | TPAMI 2024 |
-| Links | [paper](https://arxiv.org/abs/2210.11795); [Project](https://europe.naverlabs.com/research/computer-vision/posescript/) |
+| Links | [paper](https://arxiv.org/abs/2210.11795) · [Project](https://europe.naverlabs.com/research/computer-vision/posescript/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | PoseScript (带自动描述管线的数据集) |
 | Dataset | PoseScript-H test |
@@ -40,7 +42,7 @@ claims:
 > - PoseScript-H test 上，text-to-pose R@10 为 57.9 ± 0.3，对比 35.7 ± 0.9，变化 +22.2。
 > - PoseScript-H test 上，pose generation FID 为 0.04，对比 0.29，变化 -0.25。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有三维人体姿态数据集普遍缺乏细粒度的自然语言描述，导致姿态数据的语义理解停留在数值层面，难以支撑跨模态检索、文本条件生成等需要丰富语义对齐的下游任务。
 
@@ -55,7 +57,7 @@ claims:
 
 **主要结果一览**：PoseScript 支持三类多模态应用（Fig. 1）：文本到姿态检索、文本条件姿态生成、以及姿态描述生成。在跨模态检索任务上，结合 Transformer 文本编码器与镜像增强后，mRecall 可达 45.3；生成模型在预训练策略加持下实现了高保真的文本条件姿态合成。整体上，PoseScript 以极低的人工标注成本（每姿态约 3 分钟，共约 6,000 条人工描述）撬动了显著的性能增益，为三维人体姿态的语义理解提供了可复用的数据基础。
 
-## 背景与动机
+
 
 三维人体姿态理解是计算机视觉与图形学的核心问题，其应用涵盖动作识别、运动生成、人机交互等领域。近年来，大规模运动捕捉数据集（如 AMASS）的出现极大地推动了对人体运动的建模能力，但这些数据集普遍存在一个关键缺口：**缺乏与三维姿态对应的细粒度自然语言描述**。现有的文本-姿态配对数据要么仅提供粗粒度的动作标签（如“行走”“跳跃”），要么局限于特定场景的简短指令，无法捕捉姿态层面丰富的空间关系和身体部位配置信息。
 
@@ -65,7 +67,9 @@ claims:
 
 PoseScript 正是在这一背景下提出的。其核心动机是：**能否通过自动化管线，从三维关键点数据中提取结构化的语义信息，并据此生成大规模、多样化的自然语言描述，从而弥补人工标注在规模和覆盖度上的不足？** 这一思路的关键洞察在于，三维姿态的底层几何关系（关节角度、相对位置、身体部位接触等）可以被分解为少量可组合的语义基元（称为 posecode），再通过语言规则组合成自然语言句子。这种“从几何到语义再到语言”的管线，使得以极低成本生成数十万条姿态描述成为可能，为后续的跨模态预训练提供了数据基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PoseScript 的核心创新在于通过 **changed slots** 策略，系统性地解决了三维人体姿态与自然语言之间的语义鸿沟问题，其关键突破体现在以下三个层面：
 
@@ -96,7 +100,7 @@ PoseScript 引入了针对人体姿态对称性的数据增强策略：对姿态
 
 上述三个 changed slots 并非孤立存在，而是形成了互补的增强链条：**自动描述管线**提供了规模化的语义监督基础，**Transformer 编码器**提升了模型对复杂语义的建模能力，**镜像增强**则利用领域先验进一步挖掘数据潜力。三者的协同作用使得 PoseScript 在跨模态检索和生成任务上均取得了显著超越基线的性能。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2210_11795/figures/002_Figure_2.jpg]]
 *Figure 2: Examples of pose descriptions from PoseScript, produced by human annotators (left) and by our automatic captioning pipeline (right)*
@@ -132,7 +136,7 @@ PoseScript 的核心贡献是构建了一条连接 3D 人体姿态与自然语�
 
 整个框架的输入端为 AMASS 运动捕捉数据库中的 3D 人体姿态（经最远点采样选取 100,000 个高多样性姿态），输出端涵盖：给定自然语言查询的 3D 姿态检索结果、给定文本条件的 3D 姿态生成样本，以及给定姿态的自然语言描述。**核心因果机制**在于：大规模自动描述预训练（PoseScript-A）弥补了人工标注的规模瓶颈，再在人工描述（PoseScript-H）上微调，使检索平均召回率从 23.0% 提升至 40.9%（+78%），生成 FID 从 0.29 降至 0.04。
 
-## 核心模块与公式推导
+
 
 ### 1. 自动标注管线（Captioning Pipeline）
 
@@ -185,7 +189,9 @@ $$\mathcal{L} = \mathcal{L}_R(p, \hat{p}) + \mathcal{L}_{KL}(\mathcal{N}_p, \mat
 
 上述两个下游模型均遵循统一的训练策略：先在大规模自动描述数据 PoseScript-A（约 100k 姿态 × 3 描述）上预训练，再在人工标注数据 PoseScript-H（6,283 条描述）上微调。这是本文最关键的因果调节变量——仅用人工数据从头训练时，检索平均召回率仅 23.0%，而预训练后微调可提升至 40.9%（+78%）；姿态生成 FID 从 0.29 大幅降至 0.04。数据量消融实验（Fig. 15）进一步表明，增加自动标注数据量持续提升检索性能，而仅增加人工数据则很快饱和，验证了大规模自动标注预训练的核心价值。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -316,7 +322,9 @@ TABLE X 对比了不同预训练配置（均在 PoseScript-H 微调前评估，�
 *Table: SUMMARY OF THE AUTOMATIC CAPTION VERSIONS. ✓ SYMBOLS INDICATE WHEN CHARACTERISTICS APPLY TO EACH CAPTION VERSION. ALL MODELS WERE TRAINED ON A POOL OF 3 CAPTIONS PER POSE (MULTIPLICITY). MEAN RECALL RESULTS ARE AVERAGED OVER 3 RUNS OF MODELS TRAINED WITH THE BI-GRU CONFIGURATION*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与设计动机
 
@@ -363,6 +371,8 @@ PoseScript 的设计存在以下已知局限性，需要在应用中审慎评估
 - **大规模多模态模型利用**：能否借助文本-图像等大规模多模态模型（如 CLIP 的图像分支）填补活动语义、环境上下文等数据缺口？
 - **稀有姿态处理**：如何通过数据增强、课程学习或生成式建模改进对自接触、倒立等稀有姿态的覆盖和生成质量？
 - **下游任务迁移**：基于文本的身体语义先验在动作识别、运动预测、人机交互等下游任务中的应用前景如何？PoseScript 的文本条件姿态生成模型已初步展示了在 SMPL 拟合中作为语义先验的潜力（Fig. 12），但系统性的下游评估仍有待开展。
+
+
 
 ## 原文 PDF
 

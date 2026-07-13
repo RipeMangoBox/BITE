@@ -44,7 +44,7 @@ claims:
 > - ImageNet-100 上，$\operatorname{Acc}_{S\to\mathcal{D}}$ (ResNetAP-10) 35.3±0.5 (IPC=20) vs MGD*: 33.2±0.5 (+2.1)。
 > - ImageWoof 上，$\operatorname{Acc}_{S\to\mathcal{D}}$ (ResNetAP-10) 38.3±0.4 (IPC=10) vs MGD*: 37.0±0.4 (+1.3)。
 
-## 概述
+## 概要
 
 数据集蒸馏旨在将大规模真实数据集压缩为极少量合成样本，同时保持下游模型训练的有效性。近年来，基于扩散模型的无训练蒸馏方法因其免去昂贵优化过程而受到关注，但现有方法（如**MGD**）仅依赖欧几里得空间中的模式引导，将生成轨迹简单吸引向聚类质心，忽略了扩散流形的内在几何结构。这导致合成样本偏离真实数据流形，产生结构异常、语义模糊或多样性不足的生成结果。
 
@@ -52,7 +52,7 @@ claims:
 
 实验结果表明，ManifoldGD在所有IPC设置下均一致优于现有无训练方法，并在部分场景下超越基于训练的蒸馏方法。在ImageNette（IPC=50）上达到78.4%的分类准确率，较MGD提升0.9个百分点；在ImageNet-100（IPC=20）上达到35.3%，提升2.1个百分点；在更具挑战性的ImageNet-1k全量数据集上，IPC=1时准确率为3.1%，IPC=50时达21.4%，均保持对DiT和MGD的优势。消融研究进一步证实，层次分裂聚类、流形投影校正以及指数退火半径调度各自对性能有显著贡献，且框架对扩散调度器不敏感，在DDIM下同样有效。
 
-## 背景与动机
+
 
 ### 数据集蒸馏的核心矛盾
 
@@ -106,7 +106,9 @@ MGD的另一个局限在于IPC质心的选择策略。MGD采用简单的K-means�
 
 通过将流形几何约束与层次模式表征相结合，ManifoldGD在保持无训练推理效率的同时，显著提升了合成样本的质量、代表性和多样性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ManifoldGD 的核心创新在于**将扩散生成轨迹约束在数据流形上**，从而解决现有无训练扩散蒸馏方法（如 MGD）因忽略流形几何结构而导致的生成样本偏离真实分布的问题。其关键设计围绕三个相互耦合的 changed slots 展开。
 
@@ -134,7 +136,7 @@ $$g_{manifold}^{t}(x_{t};c) = g_{mode}^{t}(x_{t};c) - P_{\mathcal{N}_{t}} g_{mod
 
 上述三个 changed slots 形成递进协同：层次聚类提供多尺度语义锚点 → 局部邻域构造与退火调度提供可靠的流形估计基础 → 切空间投影将语义引导修正为流形一致的方向。这一协同使得 ManifoldGD 在完全无训练的条件下，生成的样本具有更低的 FID、更高的代表性和多样性（Fig. 5），并在多个 ImageNet 子集上一致优于现有无训练方法（Tab. 1, Tab. 2）。
 
-## 整体框架
+
 
 ManifoldGD 构建了一套**完全免训练、仅推理**的数据集蒸馏流水线，其核心目标是在不更新预训练扩散模型参数的前提下，生成既忠实于数据流形又具备类内多样性的合成样本。整个框架围绕一个关键瓶颈展开：现有免训练模式引导方法（如 MGD）仅依赖欧几里得空间中的吸引力将生成样本拉向类质心，但忽略了扩散流形的几何结构，导致生成轨迹偏离数据流形，产生低质量、重复或语义模糊的样本。ManifoldGD 通过在每个去噪时间步**估计局部流形的切空间并消除法向分量**，将模式引导修正为流形一致的切向引导，从而约束生成过程始终保持在数据流形上。
 
@@ -186,7 +188,7 @@ ManifoldGD 构建了一套**完全免训练、仅推理**的数据集蒸馏流�
 
 ![[assets/figures/papers/paper_list_l2691_https_arxiv_org_abs_2602_23295/figures/001_Figure.jpg]]
 
-## 核心模块与公式推导
+
 
 ### 整体框架：无训练扩散蒸馏的流形约束范式
 
@@ -278,7 +280,9 @@ ManifoldGD 的核心贡献在于将**局部流形几何估计**引入扩散引�
 ![[assets/figures/papers/paper_list_l2691_https_arxiv_org_abs_2602_23295/figures/015_Figure_9.jpg]]
 *Figure 9: VAE feature space and IPC illustration for Nette IPC=10. Agglomerative clustering outputs IPC cluster centroids that near the edge of the feature cloud whereas Divisive clustering outputs IPC centroids that are near the mean of the feature cloud*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -352,7 +356,9 @@ ManifoldGD 在多个 ImageNet 子集上以硬标签协议进行了系统评估�
 ![[assets/figures/papers/paper_list_l2691_https_arxiv_org_abs_2602_23295/figures/003_Figure_3.jpg]]
 *Figure 3: Qualitative evolution of generated samples across denoising timesteps (t). Comparison between MGD [37] and our ManifoldGD shows that early timesteps (t>25) capture coarse semantic structure via mode guidance, while later stages (t≤20) refine geometry and texture under manifold constraints. ManifoldGD consistently yields sharper, more coherent generations with enhanced semantic fidelity and contrast. The zoomed insets (red boxes) highlight that MGD [37] often blurs key regions (e.g., missing eyes and unclear nose in the dog, coarse floor textures in the church), whereas ManifoldGD preserves fine-grained (e.g., different reflections from chairs and colored windows) lighting variations, reflec...*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有方法的谱系关系
 
@@ -391,6 +397,8 @@ ManifoldGD 的谱系定位可从三个维度理解：
 - **与复杂条件生成的结合**：ManifoldGD 目前处理的是类别条件生成。将流形约束扩展到更复杂的条件场景（如文本到图像生成），需要解决条件信号与流形几何的联合建模问题——如何在语义引导和几何保真度之间建立统一的约束框架。
 
 - **曲率感知的流形估计**：当前线性切空间近似在高曲率区域可能失效。引入曲率感知的局部几何估计（如基于黎曼度量的二阶近似）有望进一步提升生成样本的几何保真度，但会显著增加计算复杂度。
+
+
 
 ## 原文 PDF
 

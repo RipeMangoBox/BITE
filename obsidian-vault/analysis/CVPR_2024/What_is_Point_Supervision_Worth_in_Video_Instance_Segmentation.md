@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2024
 pdf_ref: paperPDFs/CVPR_2024/What_is_Point_Supervision_Worth_in_Video_Instance_Segmentation.pdf
+project_link: null
+code_link: null
 aliases:
 - WIPSWVIS
 tags:
@@ -40,7 +42,7 @@ claims:
 > - YouTube-VIS 2021 上，AP 为 48.5，对比 55.3，变化 -6.8 (87.7%)。
 > - OVIS 上，AP 为 28.6，对比 39.4，变化 -10.8 (72.6%)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：视频实例分割（VIS）的密集掩码标注成本极高，而稀疏点监督下模型难以获取精确的目标边界和负样本，导致决策边界学习困难。
 
@@ -52,8 +54,6 @@ claims:
 
 **方法定位**：PointVIS 属于弱监督 VIS，标注成本介于无监督方法（如 VIS-Unsup）和图像级弱监督方法（如 VISC，Liu et al., CVPR 2021）之间，但性能显著优于两者。其伪标签生成管线可嵌入现有基于查询的 VIS 框架（如 MinVIS，Huang et al., arXiv 2022），无需修改网络结构。
 
-## 背景与动机
-
 视频实例分割（VIS）要求同时检测、分割和跟踪视频中的对象实例，是视频理解的核心任务之一。近年来，全监督方法在该领域取得了显著进展，但其成功高度依赖密集的实例掩码标注——标注者需要为每一帧的每一个目标绘制精确的像素级轮廓。这种标注方式成本极高：一个短视频中仅标注单个对象实例就可能需要数十分钟，而完整标注一个标准VIS数据集所需的人力成本往往令人望而却步。标注瓶颈已成为制约VIS方法向更大规模、更多类别扩展的根本性障碍。
 
 面对这一瓶颈，现有工作主要沿两个方向探索降低标注成本：**无监督方法**（如VIS-Unsup）完全放弃标注，但性能与全监督存在巨大鸿沟；**弱监督方法**（如VISC，Liu et al., CVPR 2021）使用图像级标签，但缺乏空间定位信息导致边界精度严重不足。一个关键但未被充分探索的问题是：**是否存在一种标注代价极低、却能保留密集掩码大部分性能的监督形式？**
@@ -62,7 +62,7 @@ claims:
 
 本文的核心动机正是系统性地探究点监督在VIS中的价值边界：**仅需极稀疏的点标注，究竟能恢复全监督性能的多大比例？正点和负点各自扮演什么角色？** 通过回答这些问题，我们希望为VIS社区提供一个标注效率与性能之间的量化参考，并揭示点监督中负样本的关键作用——这一发现可能改变人们对“标注什么最重要”的认知。
 
-## 核心创新
+## 核心方法与创新机理
 
 PointVIS 的核心创新在于将视频实例分割的标注需求从**密集逐帧掩码**压缩为**每对象一个正点（及可选负点）**，并通过“提案-匹配-自训练”三阶段框架将稀疏点监督转化为高质量伪掩码，从而恢复全监督 87% 以上的性能。以下从三个 **changed slot** 展开其相对于全监督基线 **MinVIS**（Huang et al., arXiv 2022）的关键差异。
 
@@ -93,8 +93,6 @@ $$\mathcal{L}_{\mathrm{match}} = \lambda_1 \mathcal{L}_{\mathrm{ann}} + \lambda_
 ### 创新总结
 
 PointVIS 的三处 changed slot——稀疏点标注、提案-匹配伪标签生成、自训练——形成了一条完整的低标注依赖 VIS 技术路径。其核心洞察在于：**负点比正点对性能贡献更大，且负点位置比正点位置更关键**（Table 4），这一发现为极低标注场景下的实例分割提供了重要的设计指引。
-
-## 整体框架
 
 PointVIS 的整体流程由三个核心模块串联构成：**类无关时空提案生成**、**基于点的时空匹配器**与**自训练**（Figure 2）。其设计逻辑是：利用 COCO 预训练的图像分割模型提供的丰富形状先验，在无需任何视频掩码标注的条件下生成密集的时空提案；再通过点标注驱动的匹配器为每个目标对象分配最优提案，从而构造高质量的伪掩码；最后借助自训练缩小图像预训练模型与视频域之间的分布差异。
 
@@ -134,8 +132,6 @@ PointVIS 的整体流程由三个核心模块串联构成：**类无关时空提
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2404_01990v1/figures/001_Figure_1.jpg]]
 *Figure 1: Point-supervised video instance segmentation in this work (YoutubeVIS-2021). Top: point-level annotations in the training set (pseudo masks generated from our method overlaid); Bottom: mask predictions in the validation set*
 
-## 核心模块与公式推导
-
 PointVIS 通过三个级联模块将稀疏点标注转化为稠密伪掩码，进而训练标准的视频实例分割模型。其核心逻辑是：先利用图像预训练模型生成类无关的时空提案以提供形状先验和负样本，再通过点驱动的匹配器将提案与点标注配对生成高质量伪掩码，最后以自训练弥合图像到视频的领域差距。
 
 ### 类无关时空提案生成
@@ -172,7 +168,7 @@ $$\mathcal{L}_{\mathrm{ann}}(\mathbf{G}_j, \mathbf{R}_{\sigma(j)}) = \sum_{t=1}^
 
 图像预训练模型与视频域之间存在分布差异。PointVIS 在首轮伪掩码生成后，用伪掩码微调视频实例分割模型，再以微调后模型重新生成伪标签。此轮自训练中，掩码度分数被替换为模型自身的置信度分数，因为微调后的模型已适应视频域。Table 2 显示自训练将 mAP 从 46.1 进一步提升至 47.3。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -207,13 +203,10 @@ Figure 4展示了OVIS数据集上的典型失败案例。伪掩码存在两类�
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2404_01990v1/figures/006_Table_2.jpg]]
 *Table 2: Effects of each component on YouTube-VIS 2019 [58] val-dev*
 
-![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2404_01990v1/figures/007_Table_3.jpg]]
-*Table 3: Analysis of point selection bias on YouTube-VIS 2019 [58] val-dev. Table 4. Effects of additional points on YouTube-VIS 2019 [58] val-dev. “DPPointMatcher” means Dense Pseudo via Point Matcher. “CINeg” means enforcing additional negative point loss*
-
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2404_01990v1/figures/008_Table_6.jpg]]
 *Table 6: PointVIS (P1N1) with subsampled video frames on YouTube-VIS 2019 validation set (w/o self-training)*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 任务定位与核心差异
 

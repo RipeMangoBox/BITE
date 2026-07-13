@@ -46,7 +46,7 @@ claims:
 > - CoMPAS3D Proficiency Estimation 上，Dyadic Accuracy / Macro F1 Qwen2.5-VL: 84.63 / 84.53; LLaVA: 83.14 / 82.64; InternVL3: 75.91 / 75.20 vs Zero-shot最佳: Qwen2.5-VL 48.72 / 38.87 (Fine-tuned vs Zero-shot: Accuracy +35.91, F1 +45.66 (Qwen2.5-VL))。
 > - CoMPAS3D Follower Generation — 运动学指标 上，FID_k (↓) / Div_k (↑) / BAS (↑) Groundtruth: 0.00 / 8.741 / 0.1552 vs Duolando: 10.47 / 7.964 / 0.2201; InterGen: 23.23 / 8.594 / 0.1970 (Duolando FID_k=10.47 (vs GT 0.00), InterGen FID_k=23.23; 两者运动学指标可比)。
 
-## 概述
+## 概要
 
 现有交互式运动生成研究面临一个关键瓶颈：评估体系严重依赖运动学指标（如 $FID_k$、$BED$、$BAS$ 等），这些指标能够衡量生成动作在运动学特征空间中的分布相似性和节拍对齐程度，却完全无法捕捉动作的**语义可辨识性**（生成的跟舞动作在共享动作词汇内能否被识别为特定舞步）以及**熟练度适配性**（生成动作是否匹配目标舞者的技能水平）。与此同时，已公开的双人舞蹈数据集普遍缺乏细粒度动作标注和熟练度层级划分，使得这类语义层面的评估无从开展。
 
@@ -62,7 +62,7 @@ CoMPAS3D 针对上述缺口提出了系统性的解决方案。其核心思路�
 
 在方法谱系上，CoMPAS3D 并非提出新的生成模型，而是构建了一个**数据集+评估框架**的基础设施，包含三个基准任务：动作分类（类比转写）、熟练度估计（类比流利度评估）和跟舞生成（类比对话应答）。其评估框架融合了传统运动学指标、基于微调 VLM 的语义客观指标，以及源自真实竞赛评审准则的 6 维主观评估，为交互式运动生成领域提供了更全面的评测基准。
 
-## 背景与动机
+
 
 ### 问题背景：交互式运动生成的评估盲区
 
@@ -86,7 +86,9 @@ CoMPAS3D 针对上述缺口提出了系统性的解决方案。其核心思路�
 
 这一框架使得我们首次能够揭示一个关键事实：**现有运动生成方法在运动学指标上表现与真实数据可比，但在语义维度上存在巨大鸿沟**——生成动作的可辨识性远低于真实舞蹈，且无法有效适配目标熟练度层级。这一发现表明，仅依赖运动学指标优化生成模型可能导致“听起来像但不知所云”的运动序列，而CoMPAS3D提供的语义评估维度为生成模型的实质性改进指明了方向。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CoMPAS3D的核心创新在于将双人即兴舞蹈的评估从纯运动学层面提升至语义层面，其关键突破可概括为三个紧密耦合的“changed slots”：**数据集特性**、**客观评估指标**和**主观评估维度**。这三个维度共同解决了一个根本瓶颈——现有评估体系无法衡量生成动作在共享动作词汇内的可辨识性（move legibility）和对搭档熟练度水平的适配性（proficiency appropriateness）。
 
@@ -134,7 +136,7 @@ CoMPAS3D的创新形成了一个完整的因果链路：**专家标注的数据�
 - 客观语义指标（Move F1、Proficiency F1）与人工判断之间的直接相关性未正式测量，这一局限在当前运动生成评估领域普遍存在，需要后续研究补充。
 - 动作标注由单一专家完成（经第二位专家抽样验证），标注者偏差可能存在，尽管Cohen's Kappa=0.752表明一致性良好。
 
-## 整体框架
+
 
 CoMPAS3D 的整体框架围绕一个核心类比构建：**将双人即兴舞蹈视为口语对话**。基于这一类比，论文将动作分类类比为语音转写（transcription），将熟练度估计类比为流利度评估（fluency assessment），将跟舞生成类比为对话响应生成（dialogue response generation）。框架由三个层次构成：**数据集层**、**基准任务层**和**评估层**，三者形成闭环——数据集提供专家标注的“语料”，基准任务定义可操作的预测目标，评估层则将任务输出转化为可量化的语义指标。
 
@@ -194,7 +196,7 @@ CoMPAS3D 是首个公开的即兴双人舞蹈数据集，包含约3小时的 sal
 
 值得注意的是，框架在评估生成动作时采用**两阶段验证策略**：先在真实数据上确认 VLM 评估器的可靠性（Table 2），再将其应用于生成数据（Table 4），从而确保语义指标的测量效度。Table 4 的核心发现——生成方法在 Move F1 上远低于真实数据（InterGen 7.69 vs GT 53.55），同时运动学指标表现可比（Table 3：Duolando $FID_k$=10.47）——直接验证了框架的核心主张：**运动学指标无法捕捉语义层面的生成质量缺陷**。
 
-## 核心模块与公式推导
+
 
 ### 三层基准任务框架
 
@@ -276,7 +278,9 @@ $$BAS$$
 
 **需注意的限制**：客观语义指标（Move F1、Proficiency F1）与人工判断之间的直接相关性尚未量化测量，这一缺失在当前运动生成评估领域普遍存在，需后续研究补全。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计逻辑
 
@@ -374,7 +378,9 @@ CoMPAS3D的实验体系围绕一个核心论证链条展开：**先验证VLM自�
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2507_19684/figures/002_Table_1.jpg]]
 *Table 1: Comparison of publicly available dance datasets capturing human-human interaction (HHI). T¯/s represents the average duration per sequence in seconds. Pairs/Genre highlights the depth of coverage within a single movement vocabulary: DD100 captures 0.5 pairs per genre across 10 ballroom styles, and InterDance’s pairs per genre is unknown across 15 genres, whereas CoMPAS3D dedicates all 9 pairs to a single genre, similar to a richly annotated dataset in English rather than shallow coverage across multiple languages*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 任务定义与类比框架
 
@@ -442,6 +448,8 @@ CoMPAS3D 的评估框架包含三个层级，逐层从运动学表层深入到�
 5. **音乐性细粒度评估**：当前 $BAS$ 仅衡量节拍对齐，如何评估生成动作对旋律、乐器、情绪等音乐维度的响应？
 6. **跨舞种泛化**：该评估框架能否迁移至 salsa 以外的舞种或其他即兴双人互动领域（如武术对练、手语对话）？
 7. **安全风险**：若数据集被用于开发与真人共舞的机器人，需通过虚拟/增强现实或物理仿真器进行接触事故规避测试。
+
+
 
 ## 原文 PDF
 

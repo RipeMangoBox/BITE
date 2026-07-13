@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2024
 pdf_ref: paperPDFs/arxiv_2024/MotionShop_Zero_Shot_Motion_Transfer_in_Video_Diffusion_Models_with_Mixture_of_Score_Guidance.pdf
+project_link: null
+code_link: null
 aliases:
 - MSGM
 - MotionShop
@@ -42,7 +44,7 @@ claims:
 > - MotionBench 上，Motion Fidelity 0.913 vs 0.887 (DMT) (+2.9%)；Temporal Consistency 0.928 vs not directly reported (N/A)；Text Similarity 0.314 vs 0.328 (VMC) (-0.014)。
 > - User Study (N=50) 上，Human Preference (Text Alignment / Motion Fidelity / Temporal Consistency) 0.41 / 0.43 / 0.38 vs best competitors (not explicitly listed) (N/A)。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -84,7 +86,7 @@ MSG属于**零样本、无训练的视频运动迁移方法**，直接操作于�
 
 当前方法存在以下已知局限：①仅在CogVideoX单骨干网络上验证，泛化性待确认；②强度参数和MSG权重 $w_\text{MSG}$ 需手动调节。开放问题包括：参考运动表示 $\mathcal{M}(z^*)$ 的具体计算流程是否依赖额外的对齐或归一化；MSG权重在不同场景下的自动调节策略；以及该方法向更长视频或更高分辨率生成的扩展路径。
 
-## 背景与动机
+
 
 ### 问题背景：视频运动迁移的核心挑战
 
@@ -120,7 +122,9 @@ MotionShop 的核心洞察来源于对扩散模型条件得分函数（condition
 
 这一框架不仅提供了理论上的优雅性，更在实际效果上取得了显著突破——在 MotionBench 基准上，MSG 以 0.913 的 Motion Fidelity 超越 DMT（0.887）达 2.9%，同时保持了 0.928 的 Temporal Consistency。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MotionShop 的核心创新在于将视频运动迁移重新定义为**扩散模型得分空间中的势能混合问题**，从而在完全零样本的条件下实现高保真运动迁移。与现有方法相比，这一框架在三个关键维度上实现了突破。
 
@@ -168,7 +172,7 @@ $$U _ { \mathrm { M S G } } ( z _ { t } ) = U _ { \mathrm { c o n t e n t } } ( 
 
 这一创新框架不仅实现了性能突破，更重要的是提供了一种**可解释的运动迁移范式**：将运动视为得分空间中的势能扰动，通过混合势能驱动生成过程，从而在无需训练的条件下实现灵活、高保真的运动迁移。
 
-## 整体框架
+
 
 MotionShop 将零样本运动迁移建模为扩散模型得分空间中的势能混合问题，其整体框架由三个串行模块构成：**参考运动提取**、**MSG 得分混合与引导**、以及**修正的朗之万动力学采样**（Figure 3）。
 
@@ -213,7 +217,7 @@ $$U_{\mathrm{MSG}}(z_t) = U_{\mathrm{content}}(z_t) + v_{\mathrm{MSG}} \big[ U_{
 
 整个框架直接运行在预训练的 CogVideoX 模型上，无需额外训练、微调或 LoRA 适配，实现了完全的零样本运动迁移。
 
-## 核心模块与公式推导
+
 
 ### 3.1 扩散模型得分函数基础
 
@@ -286,7 +290,9 @@ $$dz = \frac{\epsilon}{2} \nabla \log p(z) dt + \sqrt{\epsilon} d\bar{w}_t$$
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2412_05355/figures/010_Figure_9.jpg]]
 *Figure 9: Comparison of different guidance mechanisms. Comparing our Mixture of Score Guidance (MSG) against Classifier-Free Guidance (CFG, baseline without reference) and Unconditional Score Guidance (USG, using reference video’s unconditional score)*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 定量主结果
 
@@ -353,7 +359,9 @@ Table 2 展示了 MotionBench 数据集中不同运动类别的视频分布。�
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2412_05355/figures/005_Figure.jpg]]
 *Figure: “A motorcycle driven by a robot, cruising through a desert” “A pair of miniature medieval knights” “A raindrop clinging to a green leaf, reflecting its surroundings like a tiny mirror.”*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：零样本运动迁移的核心瓶颈
 
@@ -417,6 +425,8 @@ MotionShop 的方法架构包含三个关键设计选择，每个选择都对应
 ---
 
 **人工核实提示**：上述方法谱系中涉及的基线方法（MotionDirector、DMT、VMC、MotionInversion）的具体作者、会议和年份信息在提供的分析材料中未明确给出，建议查阅原始论文进行补充。
+
+
 
 ## 原文 PDF
 

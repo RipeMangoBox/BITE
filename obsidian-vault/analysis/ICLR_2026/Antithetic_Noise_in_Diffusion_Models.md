@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Antithetic_Noise_in_Diffusion_Models.pdf
+project_link: null
+code_link: https://github.com/jjia131/Antithetic-Noise-in-Diffusion-Models-page
 aliases:
 - ANDM
 tags:
@@ -29,7 +31,7 @@ claims:
 | 中文题名 | 扩散模型中的对偶噪声 |
 | 英文题名 | Antithetic Noise in Diffusion Models |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=9yFORC1tu3); [GitHub](https://github.com/jjia131/Antithetic-Noise-in-Diffusion-Models-page) |
+| Links | [paper](https://openreview.net/forum?id=9yFORC1tu3) · [GitHub](https://github.com/jjia131/Antithetic-Noise-in-Diffusion-Models-page) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/generative_models_and_autoencoders |
 | Method | Antithetic Noise in Diffusion Models |
 | Dataset | CIFAR-10, CelebA-HQ, DPS Inpainting, DPS Super-resolution |
@@ -39,11 +41,11 @@ claims:
 > - CelebA-HQ 上，Brightness CI length (efficiency) 为 0.15 (130.69)，对比 1.77，变化 效率提升130.69倍。
 > - DPS Inpainting 上，L1 efficiency 为 1.54，对比 1.0，变化 效率提升54%。
 
-## 概述
+## 概要
 
 本文发现并系统验证了一个简单而普适的现象：在扩散模型中，将每个初始高斯噪声向量 z 与其相反数 -z 配对（对偶采样），生成的图像对之间存在强负相关。这一现象在 U-Net、DiT、一致性模型、VAE、Glow 等多种架构以及 CIFAR-10、CelebA-HQ、LSUN-Church、ImageNet 等多个数据集上均被观测到。基于此，作者提出了对偶蒙特卡洛（Antithetic Monte Carlo, AMC）估计器，用于扩散模型的不确定性量化，在像素级统计量上实现了相对于普通蒙特卡洛最高 136 倍的效率提升，置信区间最多缩窄 90%。此外，对偶噪声设计还能在不增加计算开销的前提下提升图像编辑质量和生成多样性。
 
-## 背景与动机
+
 
 扩散模型中的初始高斯噪声是采样过程的唯一随机性来源。然而，现有工作多针对特定任务优化初始噪声，缺乏对其普遍性质的理论认识。本文的核心动机是系统理解初始噪声的特性，并利用其内在结构实现方差缩减。
 
@@ -59,7 +61,9 @@ claims:
 \mathbf { y } _ { t - 1 } = \sqrt { \alpha _ { t - 1 } } \left( \frac { \mathbf { y } _ { t } - \sqrt { 1 - \alpha _ { t } } \epsilon _ { \theta } ^ { ( t ) } ( \mathbf { y } _ { t } ) } { \sqrt { \alpha _ { t } } } \right) + \sqrt { 1 - \alpha _ { t - 1 } } \epsilon _ { \theta } ^ { ( t ) } ( \mathbf { y } _ { t } )
 \]
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于：
 
@@ -69,7 +73,7 @@ claims:
 
 3. **推广到K-对偶和随机化拟蒙特卡洛（RQMC）**：将对偶思想推广到更一般的负相关噪声设计，进一步提升了方差缩减效果。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_generative_models_diffusion__generative_models_and_autoencoders__b001_9yFORC1tu3_Antithet/figures/001_Figure_1.jpg]]
 *Figure 1: Use antithetic noise −z and z (with condition c) to generate visually “opposite” images.*
@@ -84,7 +88,7 @@ claims:
 
 4. **对偶平均与估计**：计算每对对偶样本的平均值，再对所有K个平均值取平均得到AMC估计。
 
-## 核心模块与公式推导
+
 
 ### 5.1 对偶蒙特卡洛估计器
 
@@ -160,7 +164,9 @@ AS(f) = 1 - \frac{\int_{-1}^{1} (0.5 f(-x) + 0.5 f(x) - \bar{f})^2 dx}{\int_{-1}
 
 该得分衡量一维函数仿射反对称程度，1表示完美仿射反对称，0表示仿射对称。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 6.1 核心实验结果
 
@@ -241,7 +247,9 @@ AS(f) = 1 - \frac{\int_{-1}^{1} (0.5 f(-x) + 0.5 f(x) - \bar{f})^2 dx}{\int_{-1}
 ![[assets/figures/papers/iclr26_generative_models_diffusion__generative_models_and_autoencoders__b001_9yFORC1tu3_Antithet/figures/011_Table_5.jpg]]
 *Table 5: DDPM standard Pearson correlation coefficients for PN and RR pairs*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 本文的方法属于**扩散模型不确定性量化**与**蒙特卡洛方差缩减**的交叉领域。与现有工作的关系如下：
 
@@ -266,6 +274,8 @@ AS(f) = 1 - \frac{\int_{-1}^{1} (0.5 f(-x) + 0.5 f(x) - \bar{f})^2 dx}{\int_{-1}
 - 对偶噪声方法在更复杂的生成任务（如视频、3D、音频）中是否同样有效？
 - 如何自适应地选择最优的K-对偶或RQMC配置以最大化方差缩减？
 - 对偶噪声方法能否与其他初始噪声优化技术结合以取得更好效果？
+
+
 
 ## 原文 PDF
 

@@ -44,7 +44,7 @@ claims:
 > - Qwen Image 上，PSNR 30.62 (Ours N=7) vs 28.58 (TaylorSeer N=6) (+2.04)。
 > - HunyuanVideo 上，PSNR 21.10 (Ours N=7) vs 18.25 (TeaCache l=0.4) (+2.85)。
 
-## 概述
+## 概要
 
 扩散Transformer（DiT）已成为高保真图像与视频生成的主流架构，但其多步迭代去噪特性导致极高的计算成本。现有的加速方法中，**预测型特征缓存**（如TaylorSeer、FoCa）通过跳过部分DiT前向计算来降低开销，然而这些方法的本质均可统一为一种**固定系数的线性组合**——系数由泰勒展开或BDF2等数值公式先验决定，缺乏对具体模型和去噪步长的适应性，在高加速比下质量退化严重。
 
@@ -54,7 +54,7 @@ claims:
 
 在FLUX.1-dev上，L²P实现了**4.55倍FLOPs降低和4.15倍延迟加速**，PSNR达到31.459，较TaylorSeer（29.328）提升+2.131 dB；在Qwen Image上加速比可达7.18倍，PSNR提升+2.04 dB；在HunyuanVideo视频生成上PSNR提升+2.85 dB。消融实验进一步表明，该方法具有极高的数据效率（仅5个样本即可超越基线）和语义无关性（使用无意义图像训练仍保持高性能），证明其学习到的是**特征演化的内在动态模式**而非数据语义。
 
-## 背景与动机
+
 
 扩散Transformer（DiT）已成为文本到图像与视频生成的主流架构，但其推理速度受限于多步去噪过程中大量Transformer模块的重复计算。为缓解这一瓶颈，**特征缓存（Feature Caching）** 方法被提出，其核心思路是：在部分去噪步骤跳过昂贵的DiT前向计算，转而利用已缓存的历史特征来近似当前步骤的特征表示。
 
@@ -87,7 +87,9 @@ $$\text{Projection Fidelity} = 1 - \frac{\|\mathcal{F}(x_t) - \mathcal{F}^*(x_t)
 
 基于上述分析，本文提出核心主张：**将预测系数的选择从“固定公式先验”转变为“数据驱动学习”**。具体而言，设计一个可学习的线性预测器 **L²P（Learnable Linear Predictor）**，用参数化的权重矩阵 $W$ 替代手工设计的固定系数 $\alpha_j$，通过最小化预测特征与真实特征之间的MSE损失来端到端学习最优线性组合。该方法仅需约50张图像和20秒训练时间，即可在多个DiT模型上实现显著的加速与质量提升。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：固定公式的线性组合天花板
 
@@ -143,7 +145,7 @@ L²P 属于**预测型特征缓存**范式，与以下基线方法构成直接�
 
 L²P 的核心贡献在于揭示了预测型缓存方法中“固定系数”这一被忽视的设计瓶颈，并通过极简的可学习线性预测器实现了对最优预测的有效逼近，在 DiT 特征缓存加速领域建立了新的方法论基线。
 
-## 整体框架
+
 
 L²P 的整体框架由两个对称的阶段构成：**离线训练**与**在线推理**，二者共享同一个轻量级可学习线性预测器，如图2所示。
 
@@ -181,7 +183,7 @@ L²P 的整体框架由两个对称的阶段构成：**离线训练**与**在线
 ![[assets/figures/papers/paper_list_l839_https_arxiv_org_abs_2604_26365/figures/007_Figure_7.jpg]]
 *Figure 7: Illustration of Different Semantic Prompts*
 
-## 核心模块与公式推导
+
 
 ### 3.1 现有预测型缓存方法的统一线性形式
 
@@ -242,7 +244,9 @@ $$W^* = \arg\min_W \mathbb{E}\left[ \|\hat{\mathcal{F}}(x_t) - \mathcal{F}(x_t)\
 ![[assets/figures/papers/paper_list_l839_https_arxiv_org_abs_2604_26365/figures/004_Figure_3.jpg]]
 *Figure 3: MSE Loss Comparison Across Intervals. Logarithmic comparison of MSE loss between our method, TaylorSeer, and FoCa for predictions at different step intervals*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果：文本到图像生成
 
@@ -306,7 +310,9 @@ Figure 4 展示了不同方法在相同 prompt 下的生成结果对比。在多
 ![[assets/figures/papers/paper_list_l839_https_arxiv_org_abs_2604_26365/figures/013_Figure_8.jpg]]
 *Figure 8: Qualitative Comparison of Early, Middle, and Late Frames From Generated Videos. On HunyuanVideo*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 预测型缓存方法的统一线性形式
 
@@ -343,6 +349,8 @@ L²P的适用边界由以下因素界定：
 2. **高分辨率/长序列扩展**：在更高分辨率图像或更长视频序列上，线性表示假设是否依然保持高保真度？HunyuanVideo上的初步结果（Table 5）显示L²P在视频生成中同样有效，但更极端的序列长度仍有待验证。
 3. **与少步生成方法的叠加**：L²P能否与基于蒸馏的少步生成方法（如一致性模型、LCM）结合，实现特征缓存与采样步数减少的叠加加速？
 4. **细粒度权重设计**：是否可以将可学习系数从全局共享推广到token级别或层级别的细粒度权重，以进一步提升预测精度？
+
+
 
 ## 原文 PDF
 

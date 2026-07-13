@@ -42,7 +42,7 @@ claims:
 > - GSO 数据集（多视图合成） 上，PSNR / SSIM / LPIPS (分辨率 512) 28.95 / 0.953 / 0.039 vs GS-LRM: 30.52 / 0.952 / 0.050 ; LGM: 21.44 / 0.832 / 0.122 (256) (PSNR -1.57 vs GS-LRM ; SSIM +0.001 ; LPIPS -0.011)。
 > - 与SOTA方法的效率对比 上，推理时间 / CLIP_sim <1 min / 0.2748 vs OmniPhysGS: >12 h / 0.2091 ; DreamPhysics: >0.5 h / 0.2291 (推理时间缩短几十到几百倍，CLIP_sim 更高)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有物理感知4D内容生成方法（如 **OmniPhysGS** (Lin et al., arXiv 2025) 和 **DreamPhysics** (Huang et al., AAAI 2025)）依赖两个关键前提：① 需要多视图图像经逐场景优化获得预重建的3D高斯表示；② 物理属性需手动指定或通过基于分数蒸馏采样（SDS）的迭代优化从视频扩散模型中蒸馏。这导致计算成本极高（单场景需数小时）、生成速度慢，且难以泛化到新物体。
 
@@ -51,8 +51,6 @@ claims:
 **方法定位**：PhysGM 采用两阶段训练范式。第一阶段在 PhysAssets 数据集上进行监督预训练，使 Transformer 模型同时学习几何重建与物理属性预测的联合先验；第二阶段引入直接偏好优化（DPO），通过自动构建的偏好对（利用 SAM-2 分割和 CoTracker-3 轨迹提取对候选模拟排序）微调物理属性预测分布，使其与人类感知真实感对齐。这一设计从根本上消除了对可微模拟器和逐场景迭代的依赖。
 
 **主要结果**：在 PhysAssets 数据集的5种材料上，PhysGM（含 DPO）平均 CLIP_sim 达 0.2748，用户偏好率（UPR）达 42.8%，显著超越 OmniPhysGS（0.2091 / 10%）和 DreamPhysics（0.2291 / 17.2%）。更重要的是，PhysGM 的端到端推理时间小于1分钟，相比基于优化的基线方法（>12小时 / >0.5小时）实现了数十至数百倍的加速，同时保持更高的视觉真实感。
-
-## 背景与动机
 
 ### 问题背景
 
@@ -78,7 +76,7 @@ claims:
 
 基于以上动机，本文提出 **PhysGM**——一个面向前馈4D合成的大规模物理高斯模型，首次实现了从单张图像到物理真实4D动画的端到端前馈生成，推理时间控制在1分钟以内。
 
-## 核心创新
+## 核心方法与创新机理
 
 PhysGM 的核心创新在于将物理感知的 4D 内容生成**重新定义为前馈推理问题**，从而根本性地消除了现有方法对逐场景优化、预重建 3D 表示和可微物理模拟器的依赖。这一范式转变通过三个关键机制实现：
 
@@ -108,8 +106,6 @@ $$L_{\mathrm{DPO}}(\pi_{\omega}, \pi_{\mathrm{ref}}) = -\mathbb{E}_{(\mathbf{z},
 | 推理时间 | >12 小时 / >0.5 小时 | <1 分钟 |
 
 这一创新使得 PhysGM 首次实现了从单张图像出发、在 1 分钟内完成从 3D 重建到物理模拟的全流程，推理速度提升数十至数百倍，同时在 CLIP_sim 和用户偏好率（UPR）上均显著超越基于优化的基线方法。
-
-## 整体框架
 
 PhysGM 的核心设计理念是将物理驱动的 4D 动态合成重构为一个**前馈推理问题**，从根本上消除传统方法对逐场景优化和可微模拟器的依赖。其整体框架可概括为一条端到端的生成流水线：从稀疏视角图像输入出发，经过多模态标记化与 Transformer 特征编码，由两个并行头部联合预测 3D 高斯表示和物理属性分布，随后以采样得到的参数初始化 MPM 模拟器，直接生成物理合理的 4D 动态序列。整个推理过程无需任何迭代优化，单次前馈即可在 **1 分钟内**完成从单张图像到高保真 4D 动画的全流程生成（Figure 1）。
 
@@ -156,8 +152,6 @@ $$L_{\mathrm{DPO}}(\pi_{\omega}, \pi_{\mathrm{ref}}) = -\mathbb{E}_{(\mathbf{z},
 ### 框架的关键优势
 
 这一整体设计带来了三个核心优势：**（1）消除优化瓶颈**——单次前馈替代了传统方法中耗时数小时的逐场景 SDS 迭代；**（2）联合预测的物理先验**——几何与物理属性的协同学习使两者相互促进，避免了分离式流水线的误差累积；**（3）偏好驱动的质量对齐**——DPO 微调在不依赖可微模拟器的前提下，有效弥合了仿真参数与感知真实度之间的鸿沟。
-
-## 核心模块与公式推导
 
 PhysGM 的核心架构由一个 Transformer 主干和两个并行解码头部构成，辅以 MPM 物理模拟器，实现从图像到 4D 动画的单次前馈推理。
 
@@ -240,13 +234,10 @@ $$p_1 = \beta \log \frac{\pi_{\omega}(\phi_w|\mathbf{z})}{\pi_{\mathrm{ref}}(\ph
 ![[assets/figures/papers/paper_list_l2567_https_arxiv_org_abs_2508_13911/figures/002_Figure_2.jpg]]
 *Figure 2: Pipeline of PhysGM. The model conditions on one or four input views and their corresponding camera parameters, which are processed by a transformer-based model to produce output tokens. These tokens then decoded by two parallel heads: (1) a DPT Head predicting the initial 3D Gaussian scene parameters ψ, and (2) a Physics Head that predicts a distribution over the object’s physical properties θ. The sampled parameters (ψ, θ) initialize a Material Point Method (MPM) simulator to generate the final dynamic sequence. The entire architecture is trained in a two-stage paradigm: first, supervised pre-training on ground-truth data establishes a well generative prior. Subsequently, a DPO-based fine-...*
 
-![[assets/figures/papers/paper_list_l2567_https_arxiv_org_abs_2508_13911/figures/003_Figure_3.jpg]]
-*Figure 3: Preference calculation. We use SAM-2 [39] for segmentation and CoTracker-3 for trajectory extraction across the GT and simulated videos. The extracted point tracks quantify the fidelity of each candidate to the GT, yielding a ranked preference tuple*
-
 ![[assets/figures/papers/paper_list_l2567_https_arxiv_org_abs_2508_13911/figures/016_Figure_9.jpg]]
 *Figure 9: Multi-view generation using MVAdapter. Given a single frontal view image as input (left), MVAdapter [13] generates three auxiliary views: rear, left, and right (right three panels). These synthesized views, together with the input frontal view, provide comprehensive angular coverage for our 3D Gaussian reconstruction and physics prediction pipeline. The generated views maintain consistent geometry and appearance while capturing different perspectives of the object*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -300,7 +291,7 @@ Table 4 将 PhysGM 与现有物理参数预测方法进行了多维度对比。P
 
 PhysGM 的开源方向指向若干关键问题：如何扩展架构以预测空间变化的物理属性，实现更精细的局部变形控制？如何进一步加速 MPM 模拟或采用更高效的物理引擎以降低端到端生成时延？如何缩小仿真到真实的 gap，提升在真实世界场景中的部署鲁棒性？DPO 训练中基于点轨迹的自动化偏好标注方法是否总是与人类感知一致，需要进一步的人因验证。
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 问题定位：物理感知4D合成的范式跃迁
 

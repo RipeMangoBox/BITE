@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/SASFT_Sparse_Autoencoder_guided_Supervised_Finetuning_to_Mitigate_Unexpected_Code_Switching_in_LLMs.pdf
+project_link: null
+code_link: https://github.com/Aatrox103/SASFT
 openreview_forum_id: BQOFU9qO5j
 aliases:
 - SASFT
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | SASFT：基于稀疏自编码器引导的监督微调以缓解大语言模型中的非预期语码转换 |
 | 英文题名 | SASFT: Sparse Autoencoder-guided Supervised Finetuning to Mitigate Unexpected Code-Switching in LLMs |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=BQOFU9qO5j); [GitHub](https://github.com/Aatrox103/SASFT) |
+| Links | [paper](https://openreview.net/forum?id=BQOFU9qO5j) · [GitHub](https://github.com/Aatrox103/SASFT) |
 | Topic | #topic/representation_self_supervised_transfer #topic/representation_self_supervised_transfer/representation_learning |
 | Method | SASFT |
 | Dataset | Chinese CS Ratio (any→zh), Russian CS Ratio (any→ru), Korean CS Ratio (any→ko), MMLU |
@@ -41,7 +43,7 @@ claims:
 > - Russian CS Ratio (any→ru) 上，Code-Switching Ratio (%) 为 0.22，对比 0.57，变化 -61%。
 > - Korean CS Ratio (any→ko) 上，Code-Switching Ratio (%) 为 0.00，对比 0.36，变化 -100%。
 
-## 概述
+## 概要
 
 多语言大语言模型（LLM）在生成过程中常出现**非预期语码转换**（unexpected code-switching）——模型在回答某种语言的问题时，毫无征兆地切换至另一种语言输出。这一现象在多种主流模型与语言对中普遍存在（Figure 2），成为多语言 LLM 部署中的一项关键可靠性问题。
 
@@ -55,7 +57,7 @@ claims:
 
 方法层面，SASFT 的核心模块包括：（1）通过单语度量 $\nu$ 从 SAE 中识别各语言排名靠前的特异性特征；（2）在 SFT 训练时，对非目标语言样本计算所选特征的预激活值超出阈值 $\alpha_j$ 的部分，作为辅助损失 $\mathcal{L}_{\text{reduce}}$ 与交叉熵损失联合优化。消融实验进一步证实，同时作用于多层和多特征的 SASFT 比单层或单特征方案效果更好且更稳定（Figure 6, Figure 7）。
 
-## 背景与动机
+
 
 ### 现象：多语言大模型中的非预期语码转换
 
@@ -83,7 +85,9 @@ claims:
 
 SASFT 的核心洞察是：**利用稀疏自编码器从模型残差流中提取出各语言对应的特异性特征方向，在监督微调时引入辅助损失，强制模型在生成非目标语言内容时将对应无关语言特征的预激活值压至预估计的均值以下**。通过将特征抑制直接嵌入训练目标，SASFT 使模型在参数更新过程中学会主动维持合理的特征激活水平，从而在推理时无需任何外部干预即可抑制非预期语码转换。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SASFT 的核心创新在于将**语言特异性特征的预激活值**作为可优化的因果旋钮，在监督微调过程中内化对不相关语言特征的抑制，从而在根本上阻断语码转换的发生。与标准 SFT 仅依赖交叉熵损失不同，SASFT 通过引入辅助损失，强制模型在生成非目标语言内容时，将无关语言特征的预激活值压制在预估计的阈值以下。
 
@@ -120,7 +124,7 @@ SASFT 的干预对象并非任意模型参数，而是通过稀疏自编码器�
 
 SFT+Penalty 和 SFT+GRPO 虽试图抑制语码转换，但均未触及问题的因果根源——语言特异性特征的异常预激活。因果验证实验（Figure 4, Figure 22）已确立双向因果关系：方向消融降低中文特征预激活值可显著减少切换至中文的比率，方向增强提高这些特征值则可在原本无切换的样本中诱发出语码转换。SASFT 正是在这一因果发现的基础上，将特征压制从推理时的外部干预转化为训练时的内部学习目标，从而实现了对语码转换的根本性抑制。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_BQOFU9qO5j/figures/013_Figure_5.jpg]]
 *Figure 5: SASFT operates in two steps: First, it identifies language-specific features in LLMs (left), then leverages these features as training signals to reduce code-switching behavior (right)*
@@ -165,7 +169,7 @@ SASFT 的整体流程分为两个阶段：**语言特异性特征识别**与**�
 - **输入**：多语言指令数据集 $\mathcal{D}$，包含目标语言 $L$ 及其他语言 $j$ 的样本。
 - **输出**：微调后的模型 $L^*$，在保持多语言能力（以六个多语言基准衡量）的前提下，显著降低非预期语码转换比率（以 Unicode 脚本检测计算，公式 (2)）。
 
-## 核心模块与公式推导
+
 
 ### 语言特异性特征识别
 
@@ -221,7 +225,9 @@ $$L_{\mathrm{training}} = L_{\mathrm{cross-entropy}} + \lambda L_{\mathrm{reduce
 
 其中 $\lambda$ 为平衡两项损失的权重系数。通过反向传播，该联合损失同时优化语言建模质量和对非目标语言特征的抑制能力，使得模型在训练阶段内化了对不相关语言特征的主动压制，从而在推理时无需外部干预即可减少非预期语码转换。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -298,7 +304,9 @@ $$\mathbf{x}' \gets \mathbf{x} + \lambda \mathbf{d}$$
 ![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_BQOFU9qO5j/figures/030_Table_8.jpg]]
 *Table 8: Optimal GRPO learning rates and training times*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与因果杠杆
 
@@ -345,6 +353,8 @@ SASFT 的技术路线可概括为“SAE 引导的表征约束范式”，其流�
 3. **语码转换方向的非对称性。** 论文聚焦于“任意语言→中文/俄语/韩语”的切换方向，未讨论反向切换（如中文→其他语言）是否同样适用。语言特异性特征在不同切换方向上是否对称地发挥作用，尚需进一步验证。
 
 4. **与推理时干预的关系。** SASFT 将抑制逻辑内化至训练阶段，避免了推理时的外部干预。但论文未比较 SASFT 与推理时方向消融在计算开销、部署灵活性等方面的优劣，也未讨论两者是否可以互补使用。
+
+
 
 ## 原文 PDF
 

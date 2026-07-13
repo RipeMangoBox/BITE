@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/A_General_Spatio_Temporal_Backbone_with_Scalable_Contextual_Pattern_Bank_for_Urban_Continual_Forecasting.pdf
+project_link: null
+code_link: https://github.com/Aoyu-Liu/STBP
 aliases:
 - GSTBSCPBUCF
 - STBP
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 面向城市持续预测的通用时空骨干网络与可扩展上下文模式库 |
 | 英文题名 | A General Spatio-Temporal Backbone with Scalable Contextual Pattern Bank for Urban Continual Forecasting |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=LHSea6DI8U); [GitHub](https://github.com/Aoyu-Liu/STBP) |
+| Links | [paper](https://openreview.net/forum?id=LHSea6DI8U) · [GitHub](https://github.com/Aoyu-Liu/STBP) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/time_series |
 | Method | STBP |
 | Dataset | PEMS-Stream, CA-Stream |
@@ -41,7 +43,7 @@ claims:
 > - PEMS-Stream 上，RMSE Avg. 为 20.52±0.11，对比 25.30 (EAC)，变化 -18.89%。
 > - PEMS-Stream 上，MAPE Avg. 为 15.65±0.21，对比 19.14 (EAC)，变化 -18.23%。
 
-## 概述
+## 概要
 
 本文聚焦于**城市持续时空预测**（Continual Spatio-Temporal Forecasting, CSTF）问题，其核心挑战在于：随着时间推移，传感器网络会动态扩展（节点增加、分布漂移），模型必须在适应新数据的同时不遗忘已学知识。现有方法在骨干网络建模能力（如堆叠图卷积与时间卷积）与稳定性-适应性平衡机制（如直接参数扩展或提示拼接）上存在瓶颈，导致难以处理长期分布漂移和动态变化的时空相关性。
 
@@ -49,7 +51,7 @@ claims:
 
 在三个真实流式数据集（PEMS-Stream、CA-Stream、AIR-Stream）上的实验表明，STBP在所有指标上均超越现有持续学习方法（如EAC、STRAP等）。具体地，其在PEMS-Stream上的平均MAE为12.31±0.07（比最佳基线EAC降低21.44%），在CA-Stream上为15.77±0.09（降低21.93%），在AIR-Stream上为23.64±0.23（降低2.35%）。消融实验证实，移除DLGA模块或模式库参数扩展均会导致性能显著下降，验证了各组件的必要性。
 
-## 背景与动机
+
 
 城市时空数据（如交通流量、空气质量）的持续预测（Continual Spatio-Temporal Forecasting, CSTF）面临一个根本性矛盾：数据分布和传感器网络拓扑结构随时间动态演化，但模型必须在保留历史知识的同时高效适应新场景。现有方法在这一问题上存在两个关键瓶颈。
 
@@ -61,7 +63,9 @@ claims:
 
 **现有方法的缺口**还体现在计算效率上：传统图注意力机制的二次复杂度（O(N²)）在大规模节点扩展场景下难以承受。STBP通过随机特征映射将注意力复杂度降至线性（O(N)），同时引入模式库作为额外键，在不牺牲建模能力的前提下实现了可扩展性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 STBP 的核心创新在于将**通用时空骨干网络**与**可扩展上下文模式库 (Contextual Pattern Bank)** 解耦并协同，从而在持续学习场景中同时解决骨干网络建模能力不足与稳定性-适应性平衡机制缺失两大瓶颈。
 
@@ -76,7 +80,7 @@ STBP 的核心创新在于将**通用时空骨干网络**与**可扩展上下文
 
 **核心证据**：在 PEMS-Stream、CA-Stream 和 AIR-Stream 三个数据集上，STBP 的平均 MAE 分别比最佳基线（EAC）降低 **21.44%**、**21.93%** 和 **2.35%**。在少样本场景（10%数据）下，PEMS-Stream 和 CA-Stream 上的 MAE 分别降低 **12.22%** 和 **13.32%**。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0002_LHSea6DI8U_A_General_Spatio-Temporal_Backbone_with_Scalable/figures/002_Figure_2.jpg]]
 *Figure 2: The overall workflow and architecture of STBP*
@@ -95,7 +99,7 @@ STBP（Spatio-Temporal Backbone with Pattern Bank）的整体架构由两个解�
 
 **效率特征**：DLGA 的线性注意力机制将计算复杂度从 $O(N^2)$ 降至 $O(N)$，使得 STBP 在面对 CA-Stream 数据集从 480 节点扩展到 1698 节点的剧烈拓扑变化时仍能保持高效。效率对比实验（Figure 8）显示，STBP 的平均训练时间显著低于未使用线性注意力的版本和重新训练版本。
 
-## 核心模块与公式推导
+
 
 STBP 的核心架构由两大模块构成：一个**冻结的通用时空骨干网络**（General Spatio-Temporal Backbone）和一个**可扩展的上下文模式库**（Contextual Pattern Bank）。其核心设计理念是将通用知识提取与增量适应解耦。
 
@@ -163,7 +167,9 @@ $$\mathrm{MAPE} = \frac{1}{n} \sum_{i=1}^n \left|\frac{y_i - \hat{y}_i}{y_i}\rig
 
 STBP 的核心因果链为：骨干网络（FreNet + DLGA）提取稳定的频域表征和动态空间相关性 → 冻结骨干网络以保留通用知识 → 模式库通过参数增量扩展捕获节点级异质性和新分布 → 门控和注意力机制实现模式库与骨干的协同。这一设计直接针对现有方法在“骨干网络建模能力不足”和“稳定性-适应性平衡缺失”两个瓶颈。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -211,7 +217,9 @@ STBP的线性图注意力（DLGA）将计算复杂度从二次降低到线性。
 ![[assets/figures/papers/iclr26_0002_LHSea6DI8U_A_General_Spatio-Temporal_Backbone_with_Scalable/figures/021_Table_5.jpg]]
 *Table 5: Topological dynamics and evaluation purposes of the datasets*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 STBP 在持续时空预测（CSTF）方法谱系中的定位，核心在于将“通用骨干网络”与“可扩展上下文模式库”解耦，从而同时解决了现有方法在骨干建模能力不足和稳定性-适应性平衡机制缺失两个瓶颈。
 
@@ -222,6 +230,8 @@ STBP 在持续时空预测（CSTF）方法谱系中的定位，核心在于将�
 **局限与开放问题**。STBP 当前存在几个明确的边界条件。首先，它仅支持单任务持续学习设置，无法直接处理多任务或跨领域场景。其次，尽管 DLGA 通过随机特征映射将图注意力复杂度从二次降至线性（公式：$\mathrm{Attention}(\mathbf{Q},\mathbf{K},\mathbf{V},\mathbf{P}_\tau^{(2)}) \approx (\phi(\mathbf{Q})\phi(\mathbf{K})^\top + \phi(\mathbf{Q})\phi(\mathbf{P}_\tau^{(2)})^\top)\mathbf{V}$），但其在源域和目标域之间存在显著结构差异时的鲁棒性尚未验证。第三，当前持续学习方法（包括 STBP）通常假设增量任务来自相似领域，这与现实世界中动态异构的环境存在差距，跨领域分布漂移会带来特征空间不对齐和灾难性遗忘加剧的双重挑战。
 
 由此引出的开放问题包括：如何将 STBP 扩展到跨领域持续时空预测？在跨领域场景下，如何引入显式的领域自适应机制以更好地区分领域特定特征和共享特征？能否探索跨领域共享的上下文模式库以在保持效率的同时增强适应性？以及如何将 STBP 与大型语言模型（LLMs）结合以提升时空和时间序列预测的性能？这些问题的解决将决定 STBP 从受控实验环境向真实城市部署场景迁移的可能性。
+
+
 
 ## 原文 PDF
 

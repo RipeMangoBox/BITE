@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Diffusion_Language_Model_Knows_the_Answer_Before_It_Decodes.pdf
+project_link: null
+code_link: https://github.com/pixeli99/Prophet
 openreview_forum_id: g88nt4ieTG
 aliases:
 - PECD
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 扩散语言模型在解码前已知答案 |
 | 英文题名 | Diffusion Language Model Knows the Answer Before It Decodes |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=g88nt4ieTG); [GitHub](https://github.com/pixeli99/Prophet) |
+| Links | [paper](https://openreview.net/forum?id=g88nt4ieTG) · [GitHub](https://github.com/pixeli99/Prophet) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/diffusion_image_video |
 | Method | Prophet (Early Commit Decoding) |
 | Dataset | MMLU (LLaDA-8B), GSM8K (LLaDA-8B) |
@@ -42,7 +44,7 @@ claims:
 > - MMLU (LLaDA-8B) 上，加速比 为 2.34×，对比 1×，变化 +1.34×。
 > - GSM8K (LLaDA-8B) 上，准确率 (%) 为 77.9，对比 77.1，变化 +0.8。
 
-## 概述
+## 概要
 
 扩散语言模型（Diffusion Language Models, DLMs）通过迭代去噪生成文本，其推理速度受限于大量精炼步骤。本文揭示了一个关键瓶颈：**模型在解码早期即内部收敛到正确答案，导致后续大量步骤成为冗余计算**。例如，在GSM8K上，使用一半精炼步骤即可正确解码97.2%的样本（随机重掩码），在MMLU上该比例达99%。
 
@@ -52,7 +54,7 @@ claims:
 
 Prophet专为具有可识别答案区域的任务（数学推理、代码生成、规划）设计，其增益源于模型内在的早期收敛属性，而非对基线方法的结构性优势。
 
-## 背景与动机
+
 
 扩散语言模型（Diffusion Language Models, DLMs）通过迭代精炼噪声序列来生成文本，在数学推理、代码生成等结构化任务中展现出强大能力。然而，这类模型的核心瓶颈在于推理效率：标准解码流程需执行全部预设的 $T_{\text{max}}$ 步精炼，每一步都包含完整的模型前向计算，导致推理延迟远高于自回归模型。
 
@@ -64,7 +66,9 @@ Prophet专为具有可识别答案区域的任务（数学推理、代码生成�
 
 本文提出**Prophet**（Early Commit Decoding），一种无训练的快速解码范式。其核心思路是将扩散解码重新建模为答案区域上的最优停止问题：在每个精炼步骤，计算答案区域的平均置信度差距 $\bar{g}_t = \frac{1}{|\mathcal{A}|} \sum_{i \in \mathcal{A}} g_{t,i}$（其中 $g_{t,i} = L_{t,i}^{(1)} - L_{t,i}^{(2)}$ 为位置 $i$ 的top-2 logit差值），当该指标超过基于解码进度 $p$ 的分阶段阈值 $\tau(p)$ 时，立即终止精炼并一次性提交所有剩余token。这一机制无需修改模型结构或权重，仅需在解码循环中插入轻量的置信度检查，即可实现最高3.4倍的解码步骤减少（Dream-7B在Sudoku上），同时保持甚至略微提升生成质量（GSM8K上准确率从77.1%提升至77.9%）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：扩散语言模型的冗余迭代
 
@@ -111,7 +115,7 @@ Prophet 的核心创新在于**将解码重新定义为答案区域上的最优�
 
 Prophet 专为具有可识别答案区域的任务设计（如数学推理、代码生成、规划），对于无明确答案边界的开放式生成任务，模型可能不会在早期表现出明显收敛，方法的适用性有待验证。当前实现依赖预定义的答案区域长度，利用了任务先验知识，虽有向动态语义提取扩展的潜力，但尚未实现。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l40_https_openreview_net_forum_id_g88nt4ieTG/figures/003_Figure_3.jpg]]
 *Figure 3: (b) w/ suffix prompt (low-confidence remasking) (c) w/o suffix prompt (random remasking)*
@@ -145,7 +149,7 @@ Prophet 嵌入标准 DLM 解码循环，由三个核心模块串联构成：
 
 Prophet 的有效性建立在 DLM 的**答案早熟收敛**现象之上：模型在精炼步骤完成一半前，答案区域的 top-1 预测即已稳定为正确答案。对于开放式生成任务（无明确答案边界），该现象不一定成立，方法需进一步扩展。
 
-## 核心模块与公式推导
+
 
 ### 扩散语言模型解码流水线
 
@@ -183,7 +187,9 @@ $$\tau(p) = \begin{cases} \tau_{\mathrm{high}} & \mathrm{if } p < 0.33 \\ \tau_{
 
 Prophet 作为解码层级的提前终止策略，可与蒸馏加速（**SDTT**，Deschenaux & Gulcehre, 2025）和系统加速（**Fast-dLLM**，Wu et al., 2026）正交叠加。例如，SDTT + Prophet 在 GSM8K 上实现 $3.21\times$ 加速，Fast-dLLM + Prophet 达到 $7.66\times$ 加速，验证了不同加速维度的乘法增益效应。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：性能保持与加速的帕累托前沿
 
@@ -278,7 +284,9 @@ Table 5 展示了一个简单算术问题的解码轨迹，揭示了“答案早
 ![[assets/figures/papers/paper_list_l40_https_openreview_net_forum_id_g88nt4ieTG/figures/020_Table_6.jpg]]
 *Table 6: Configurations used in our runs. We keep only parameters relevant to our method: base budget ( L , T , ${ \tilde { B } }$ ) and PROPHET’s confidence schedule defined in Eq. 5*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心机制定位
 
@@ -322,6 +330,8 @@ Prophet直接对标标准全步解码（Full-step decoding），后者固定执�
 3. **开放式生成扩展**：早期答案收敛现象在无固定格式的开放式生成任务中是否仍然存在？如何定义和检测“隐式答案区域”？
 4. **阈值调度优化**：连续或可学习的阈值调度能否进一步提升效率与质量的权衡？分阶段调度与线性衰减调度在GSM8K上表现可比（77.4% vs. 77.9%，Table 7），暗示增益主要源于收敛属性而非特定调度，但更精细的调度仍有探索空间。
 5. **跨架构泛化**：早期收敛现象在不同DLM架构（如不同噪声调度、不同重掩码策略）和更大规模模型上的表现规律尚待系统研究。
+
+
 
 ## 原文 PDF
 

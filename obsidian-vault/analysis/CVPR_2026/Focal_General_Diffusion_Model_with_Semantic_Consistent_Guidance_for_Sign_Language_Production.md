@@ -43,7 +43,7 @@ claims:
 > - USTC-CSL Split-I 上，BLEU-1 92.04 vs Sign-IDD (+1.51%)。
 > - USTC-CSL Split-II 上，BLEU-1 43.61 vs Sign-IDD (N/A (absolute SOTA))。
 
-## 概述
+## 概要
 
 **问题瓶颈**：手语生成（SLP）中的 Gloss-to-Pose (G2P) 子任务面临一个核心矛盾——现有方法（包括自回归框架和扩散模型）普遍采用全局建模策略，忽视关节级别的细粒度空间依赖，导致生成姿态的局部细节失真；同时，训练过程仅依赖回归损失，缺乏有效的跨模态语义监督，使得生成序列的语义一致性难以保证。
 
@@ -56,7 +56,7 @@ claims:
 
 **主要结果**：在 PHOENIX14T 测试集上，FGDM 的 WER 降至 70.70%，较此前最优的扩散方法 **Sign-IDD**（Tang et al., AAAI 2025）降低 8.45%，同时 BLEU-4 达到 9.67% 的新 SOTA。消融实验表明，引入 Focal 阶段使 WER 相对基线降低 5.85%，叠加 SCG 后进一步降至 9.06%，验证了各组件的独立贡献。在 USTC-CSL 数据集上，FGDM 同样在两个划分方案上全面超越现有方法。
 
-## 背景与动机
+
 
 手语生成（Sign Language Production, SLP）旨在将口语文本自动转化为连续的手语姿态序列，是打破聋人与听人之间沟通壁垒的关键技术。典型的 SLP 流程包含两个串联子任务：文本到注释（Text-to-Gloss, T2G）和注释到姿态（Gloss-to-Pose, G2P）。其中 G2P 负责将离散的手语注释序列映射为连续、自然的人体关键点坐标，其生成质量直接决定最终手语的可懂度与自然度。本文聚焦于 G2P 这一核心环节。
 
@@ -66,7 +66,9 @@ claims:
 
 针对这些缺口，本文提出**分层扩散模型（Focal-General Diffusion Model, FGDM）**，核心动机是将 G2P 分解为两个阶段：先通过 Focal 阶段建模关节级空间-时间依赖，再通过 General 阶段实现全局序列的连贯聚合。同时引入**语义一致性引导（Semantic Consistent Guidance, SCG）**，在扩散训练过程中注入基于 CTC 对齐的跨模态语义监督，在不牺牲生成多样性的前提下显著提升语义保真度。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FGDM 的核心创新在于对 Gloss-to-Pose (G2P) 去噪过程的依赖结构进行重新设计，并引入跨模态语义监督，从而系统性地解决了现有方法的两大瓶颈：**全局建模偏差导致的关节级细节失真**，以及**缺乏语义监督导致的生成姿态与语义不一致**。
 
@@ -120,7 +122,7 @@ $$\mathcal{L} = \mathcal{L}_{joint} + \lambda \cdot \mathcal{L}_{bone} + \gamma 
 
 值得注意的是，当前语义掩码生成器 $\mathcal{MG}(\cdot)$ 仅采用简单的线性层实现，其表达能力有限，可能无法充分挖掘 gloss 特征中的语义信息。此外，FGDM 目前仅针对 G2P 子任务设计，尚未涵盖从文本到姿态的完全端到端建模。
 
-## 整体框架
+
 
 FGDM 的核心设计理念是将姿态去噪过程分解为“先局部关节建模、再全局序列聚合”的两个阶段，并引入跨模态语义一致性引导，从而克服现有 G2P 方法因全局偏差导致的局部细节失真和语义不一致问题。
 
@@ -156,7 +158,7 @@ SCG 的独特之处在于，它在扩散训练过程中首次引入了跨模态�
 ![[assets/figures/papers/paper_list_l989_https_openaccess_thecvf_com_content_CVPR2026_html_Yu_Focal_General_Diffu/figures/001_Figure_1.jpg]]
 *Figure 1: Top: Illustration pipeline of SLP, including T2G and G2P. T2G converts text into glosses, while G2P maps each gloss to its corresponding pose sequence and generates smooth transitions to ensure naturalness. This work primarily focuses on G2P. Bottom: Comparison with existing methods on the challenging PHOENIX14T [5] dataset. Our approach achieves new SOTA results across all metrics on both DEV and TEST sets*
 
-## 核心模块与公式推导
+
 
 ### 1. 两阶段去噪框架
 
@@ -231,7 +233,9 @@ $$X_{t'} = \sqrt{\bar{a}_{t'}} \cdot \hat{X}_0 + \sqrt{1 - \bar{a}_{t'} - \sigma
 ![[assets/figures/papers/paper_list_l989_https_openaccess_thecvf_com_content_CVPR2026_html_Yu_Focal_General_Diffu/figures/003_Figure_3.jpg]]
 *Figure 3: Illustration of ASGCN. Taking the i-th frame as an example, ASGCN constructs a frame-wise adaptive adjacency matrix by integrating (a) contextual correlations*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心主张与证据强度
 
@@ -283,7 +287,9 @@ Figure 4 对比了 FGDM 与 PT、Sign-IDD 的生成质量。在放大区域 (a)�
 1. 语义掩码生成器 $\mathcal{MG}(\cdot)$ 目前仅使用线性层实现，表达能力有限，可能无法充分挖掘语义信息来指导图结构。
 2. 方法仅针对 G2P 子任务，尚未涵盖文本到姿态的完全端到端建模，实际部署时需依赖上游 T2G 模块的质量。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法继承与基线关系
 
@@ -324,6 +330,8 @@ FGDM 的适用边界受以下因素制约：
 2. **语义掩码生成网络的增强**：能否设计更强大的语义掩码生成网络（如引入注意力机制或图神经网络），以进一步提升关节级建模精度，是直接的技术延伸方向。
 
 3. **端到端扩展**：将 FGDM 的 Focal–General 范式扩展至完整的文本到姿态生成流程，实现 T2G 与 G2P 的联合优化，是向实用化迈进的关键步骤。
+
+
 
 ## 原文 PDF
 

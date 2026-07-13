@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/MedLesionVQA_A_Multimodal_Benchmark_Emulating_Clinical_Visual_Diagnosis_for_Body_Surface_Health.pdf
+project_link: null
+code_link: https://github.com/bytedance/MedLesionVQA
 aliases:
 - MBEF
 - MedLesionVQA
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | MedLesionVQA：面向体表健康的模拟临床视觉诊断多模态基准 |
 | 英文题名 | MedLesionVQA: A Multimodal Benchmark Emulating Clinical Visual Diagnosis for Body Surface Health |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=BYtqk6AVuL); [GitHub](https://github.com/bytedance/MedLesionVQA) |
+| Links | [paper](https://openreview.net/forum?id=BYtqk6AVuL) · [GitHub](https://github.com/bytedance/MedLesionVQA) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/health |
 | Method | MedLesionVQA Benchmark and Evaluation Framework |
 | Dataset | MedLesionVQA validation set, MedLesionVQA test set, Lesion Recognition (subset), Suggestion & Treatment (subset) |
@@ -41,7 +43,7 @@ claims:
 > - MedLesionVQA test set 上，Average accuracy (AVG_test) 为 N/A，对比 Gemini-2.5-pro: not reported; GPT-4V: 0.4915; Qwen2.5-VL-72B: 0.4904; InternVL2.5-78B: 0.4757，变化 Top open-source model around 0.49。
 > - Lesion Recognition (subset) 上，Accuracy 为 N/A，对比 Gemini-2.5-pro: 0.4902; GPT-4V: 0.4071; Senior physicians: 0.6826，变化 Best model ~49%。
 
-## 概述  
+## 概要
 当前多模态大模型在模拟医生对体表皮损的视觉诊断流程时暴露出关键的感知与推理短板，尤其是细粒度的皮损类型、部位及属性识别能力严重不足，导致整体准确率大幅落后于临床医生。现有的医学视觉问答基准大多仅覆盖疾病分类或依赖公开数据，缺乏对逐步诊断能力的系统性评估。针对这一缺口，本文构建了 **MedLesionVQA**——一个细粒度、逐级对齐临床工作流的体表健康多模态基准，旨在系统量化模型在真实视觉诊断场景中的真实水平。  
 
 该基准基于 **12,000 余张院内真实患者图像** 和 **19,000 组经专家验证的问答对**，覆盖 **94 种皮损类型、110 个身体区域及 96 种疾病**，并定义了从“识别→理解→决策”的 **七项核心视觉诊断能力**（皮损/属性/部位识别、空间关系判断、皮损推理、疾病诊断、建议与治疗），其中识别类任务占比达 61%。数据注释由资深医生依据层级词典逐步完成，问答通过模板自动生成后经人工审核修正，并使用经医生校验的 LLM 自动评分系统（与人类专家评分一致率达 94.7%，加权 Cohen’s κ 为 0.8825），保证了评估的可靠性和可扩展性。  
@@ -50,7 +52,7 @@ claims:
 
 整体而言，在 MedLesionVQA 的验证集上，表现最好的多模态模型 Gemini‑2.5‑pro 平均准确率仅为 **56.24%**，显著低于主治医生（61.44%）和资深专家（73.21%），开源的顶尖模型则在 49% 上下。少样本提示与链式思维推理仅带来边际提升，未能实质性缩小差距。这些结果一致指明，未来工作的核心挑战在于：**提升模型对细粒度医学视觉概念的识别与对齐能力，并弥补其在专科知识上的系统性缺口**，从而真正实现面向临床的可靠视觉诊断。
 
-## 背景与动机
+
 
 体表疾病的临床诊断高度依赖医生的视觉检查，涉及对皮损类型、形态属性、分布位置的逐层识别与推理。随着多模态大语言模型的快速演进，其在医学视觉理解上的潜在价值受到广泛关注，但现有研究表明，这类模型在模拟真实临床诊断流程时仍存在严重短板。尤其是在需要从图像中精确识别细微视觉特征的环节，模型准确率远低于执业医师，而其生成流畅文本的能力往往掩盖了底层视觉理解的匮乏——例如，在纯文本驱动的治疗建议任务上，模型可以达到 $82.4\%$ 的准确率，但在必须依赖图像输入的皮损识别任务上，最佳模型准确率也仅为 $49\%$（见 **Table 2** 与 **Section 4.2 Insight 1/2**）。这种图文表现分化的现象揭示出：视觉模态的对齐与细粒度概念理解是当前模型的真正瓶颈。
 
@@ -58,7 +60,9 @@ claims:
 
 为填补上述断层，本文构建 MedLesionVQA 基准，直接模拟医生门诊中的视觉诊断工作流，并据此定义七项逐级深入的核心能力：皮损识别、属性识别、部位识别、空间关系推理、皮损推理、疾病诊断以及建议与治疗。其中，前三项纯识别类任务占比高达 $61\%$，从设计上强制模型必须从图像中直接提取视觉证据，而非依靠统计共现或文本线索作答。通过引入 $12K$ 内部真实患者图像和 $19K$ 专家验证的问答对，并控制纯文本输入进行消融实验，该基准有力证实了视觉模态是限制多模态大模型临床实用性的首要瓶颈——即便是表现最强的 Gemini‑2.5‑pro，其总准确率 $56.2\%$ 仍显著落后于主治医师的 $61.4\%$ 和专家的 $73.2\%$（**Table 2**）。与此同时，领域专用模型出现微调后泛化衰退（如 LLaVA‑med‑v1.5‑7B 较通用版本下降 $18$ 个百分点，见 **Section 4.2 Insight 4**）以及错误集中表现为“知识缺失”（GPT‑4V 错误中 $94.2\%$ 归因于此，见 **Figure 5**），进一步表明现有训练范式在注入和保持医学视觉知识上面临严峻挑战。因此，MedLesionVQA 不仅提供了一个评估缺口，更从因果层面阐明了推进医学视觉理解需要突破的方向。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MedLesionVQA 的核心创新并非引入新的模型架构，而是通过一系列有针对性的基准设计，将评估的焦点从当前多模态大模型易于“伪装”的文本生成能力，转移至其薄弱的细粒度视觉理解上。相对于现有基准，它在五个关键维度上实现了根本性改变，从而构建了一条清晰的因果链：暴露视觉瓶颈 → 量化模型与医生的真实差距 → 揭示失败模式。以下逐项剖析这些创新及其验证机制。
 
@@ -74,7 +78,7 @@ MedLesionVQA 的核心创新并非引入新的模型架构，而是通过一系�
 **因果验证设计：通过消融与对比锁定视觉薄弱环节**  
 在基准本身之外，研究还内建了关键的消融实验作为因果验证。通过构造纯文本版本与图文版本对比（Table 2, text‑only rows），发现模型在移除视觉输入后，建议与治疗分数几乎不变（82.4%→81.2%），但视觉识别能力全面崩溃，进一步确认了模型对视觉信息的利用不足。同时，领域专用模型的退化现象（LLaVA‑med‑v1.5‑7B 比通用 LLaVA‑v1.5‑7B 低 **18%**，Insight 4）揭示了现有医学微调可能过拟合表面关联而牺牲了泛化视觉特征，为未来医学多模态模型的训练策略提供了明确的改进方向。对 GPT-4V 的错误分布分析（Figure 5）更是直接量化了问题的根源：**94.2% 的错误源于知识缺失**，即模型缺乏对特定视觉细节及其医学含义的验证与对齐能力，而非文本理解或格式错误。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0016_BYtqk6AVuL_MedLesionVQA_A_Multimodal_Benchmark_Emulating_Cl/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of MedLesionVQA. The benchmark is designed to emulate the visual diagnostic workflow of physicians (top-left), covering seven core abilities with fine-grained annotations. Expert physicians with over 20 years of experience validated annotations (middle), which include detailed identification of 94 lesion types, 96 diseases, and 110 body regions (bottom)*
@@ -105,7 +109,7 @@ MedLesionVQA 的设计核心是**模拟临床医生的视觉诊断工作流**，
 
 综上，MedLesionVQA 的整体框架不仅在数据规模（12K 图像）和标注粒度（94 皮损、110 部位、96 疾病）上超越以往基准，更重要的是其**以七项视觉诊断能力为轴心的管线设计**：从底层视觉识别到高层临床决策，每一步均可独立评估，从而揭示了当前多模态大模型“会说不会看”的深层缺陷。
 
-## 核心模块与公式推导
+
 
 ### 关键模块：基准构建流水线
 
@@ -145,7 +149,9 @@ MedLesionVQA 并非提出新的模型架构，而是构建一套面向体表健�
 
 **因果机理**：上述指标的核心作用在于将人类专家的评判标准“固化”为可量化的自动评分管线，从而保证基准在评估不同模型时具有同一参照系。若裁判本身与专家偏差过大，所有模型得分将失去意义；而高一致性（95% 一致率、$\kappa_w = 0.8825$）证明该管线能够可靠复现临床判断，使后续模型性能差异可归因于模型自身的视觉-推理能力，而非评分噪声。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果：模型与医生的性能差距
 
@@ -183,7 +189,9 @@ Table 2 的系统性对比建立了当前模型的性能上限与能力分布�
 ![[assets/figures/papers/iclr26_0016_BYtqk6AVuL_MedLesionVQA_A_Multimodal_Benchmark_Emulating_Cl/figures/006_Figure_4.jpg]]
 *Figure 4: Results of 10 representative MLLMs across the 7 ability dimensions defined in MedLesionVQA*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 MedLesionVQA 的定位并非提出一个新的多模态模型，而是构建一个严格、细粒度的评估框架，用以测量当前 MLLM 在模拟皮肤科医生视觉诊断流程时的真实能力。因此，本节重点分析该基准在已有方法和知识库中的位置、其暴露的系统性瓶颈，以及由此引出的适用边界与开放问题。
 
@@ -227,6 +235,8 @@ MedLesionVQA 的定位并非提出一个新的多模态模型，而是构建一�
 6. **引入外部知识缓解知识缺失**：GPT‑4V 的错误分布提示模型极度缺乏图像关联的医学知识。未来的模型是否可以集成结构化知识库（如皮肤病学图谱、药品说明）或检索外部文献，在推理时动态补充细粒度事实，而不仅仅依赖参数记忆？
 
 综上，MedLesionVQA 不仅明确了现有 MLLM 与医生在视觉诊断上的真实差距，还为下一阶段的方法创新与评估设定了一系列严格且可操作的里程碑。
+
+
 
 ## 原文 PDF
 

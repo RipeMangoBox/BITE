@@ -42,7 +42,7 @@ claims:
 > - LVBench (32 frames) 上，TTFT Speedup SegMo (CAS+LSP) vs Baseline (2.83×)。
 > - LVBench (64 frames) 上，TTFT Speedup SegMo (CAS+LSP) vs Baseline (3.43×)。
 
-## 概述
+## 概要
 
 长视频理解任务中，视觉大语言模型（VLM）需处理海量视觉 token，其自注意力机制的 $O(N^2)$ Prefill 计算成本随视频长度急剧膨胀，形成难以逾越的推理延迟墙。现有方案或通过均匀采样牺牲精度换取速度，或依赖全量通信的模型并行引入高昂延迟，陷入精度与延迟的刚性权衡。
 
@@ -57,7 +57,7 @@ SegMo 提出了一种**算法-系统协同设计**方法论，从 VLM 注意力�
 
 > **方法定位**：SegMo 属于推理系统层面的稀疏化-并行化联合优化方法，与单纯基于 token 剪枝或传统张量并行的方案正交，可视为对现有 VLM 推理栈的即插即用增强。其场景感知的稀疏化策略与 **MPGD**（He et al., CVPR 2023）等基于均匀采样的方案形成对比，而通信免并行的设计则区别于依赖全局 KV Cache 共享的全量并行方案。
 
-## 背景与动机
+
 
 ### 长视频 VLM 推理的性能墙
 
@@ -92,7 +92,9 @@ SegMo 的核心动机源自对 VLM 注意力模式的四项实证观察（见 Fi
 
 通过将稀疏化和并行化统一在一个优化框架下，SegMo 旨在打破现有方法普遍存在的精度-延迟权衡困境。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SegMo 的核心创新在于**算法-系统协同设计**：它不是孤立地优化稀疏化或并行化，而是通过两个深度耦合的组件——内容感知稀疏化（CAS）与局部凝聚段并行（LSP）——统一解决长视频 VLM 推理中精度与延迟的“跷跷板”困境。
 
@@ -135,7 +137,7 @@ CAS 在 CPU 上运行，LSP 在 GPU 上运行，两者通过生产者-消费者�
 
 这一系列 changed slots 的协同效应体现在：CAS 的非均匀帧分配天然适配 LSP 的场景级并行粒度，而 LSP 的通信免预填充特性使 CAS 的精度增益不因并行化而被延迟代价抵消。最终系统在 LVBench 上实现最高 12.00% 精度提升，同时达到 3.55× 的 Prefill 加速（Table 1, Table 2），打破了精度-延迟的固有权衡。
 
-## 整体框架
+
 
 SegMo 的推理流水线遵循**算法-系统协同设计**原则，将视频大语言模型（VLM）的长视频推理拆分为两个解耦的物理域：CPU 端的**内容感知稀疏化（Content-Aware Sparsification, CAS）** 与 GPU 端的**局部凝聚段并行（Locally-Cohesive Segment Parallelism, LSP）**，二者通过多线程生产者-消费者流水线重叠执行，以隐藏 CPU 预处理延迟（Figure 5, Figure 6）。
 
@@ -173,7 +175,7 @@ SegMo 的推理流水线遵循**算法-系统协同设计**原则，将视频大
 ![[assets/figures/papers/paper_list_l782_https_openaccess_thecvf_com_content_CVPR2026_html_Li_SegMo_Co_Designing/figures/001_Figure_1.jpg]]
 *Figure 1: SegMo unifies CAS (Accuracy) and LSP (Latency) to break the Accuracy-Latency Trade-off. The system utilizes Local Cohesion for communication-free parallelism. Validated on longvideo benchmarks, SegMo achieves a peak accuracy and prefill acceleration gains of 12.00% and 3.55×, respectively*
 
-## 核心模块与公式推导
+
 
 ### 问题形式化
 
@@ -233,7 +235,9 @@ LSP 模块运行在 GPU 端，利用 VLM 注意力的局部凝聚特性实现通
 ![[assets/figures/papers/paper_list_l782_https_openaccess_thecvf_com_content_CVPR2026_html_Li_SegMo_Co_Designing/figures/002_Figure_3.jpg]]
 *Figure 3: Non-Uniform VLM Attention: Highlighted Top-5 relevant scenes (e.g., 1, 7, 8, 10, 16) motivate the Relevance metric*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -284,7 +288,9 @@ Figure 7 展示了 SegMo 的多线程生产者-消费者流水线设计。CAS �
 ![[assets/figures/papers/paper_list_l782_https_openaccess_thecvf_com_content_CVPR2026_html_Li_SegMo_Co_Designing/figures/010_Figure_8.jpg]]
 *Figure 8: Qualitative visualization*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：长视频 VLM 推理的精度-延迟权衡
 
@@ -319,6 +325,8 @@ SegMo 的方法论贡献不仅在于稀疏化和并行化的独立创新，更�
 **全局上下文完整性**：GCI 仅使用头部帧作为全局映射，可能遗漏需要跨场景密集推理的任务（如跨场景人物关系推理、长时序因果链分析）。对于此类任务，轻量级全局上下文可能不足以替代完整的跨场景注意力。
 
 **任务泛化性**：当前验证集中在视频问答（VideoQA）任务上，方法对视频描述生成（captioning）、视频定位（grounding）等其他 video-LLM 应用的适用性尚未得到实验检验。
+
+
 
 ## 原文 PDF
 

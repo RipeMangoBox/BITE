@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/Unified_Camera_Positional_Encoding_for_Camera_Controllable_Video_Generation.pdf
+project_link: null
+code_link: https://github.com/chengzhag/UCPE
 aliases:
 - UUCPE
 - UCPECCVG
@@ -42,7 +44,7 @@ claims:
 > - Synthesized dataset 上，Trainable Parameters ↓ 35.6M vs ReCamMaster (~355M) (90% fewer)；Lens Control (k1 error) ↓ 0.129 vs ReCamMaster (fails to reproduce intended distortion) (qualitative improvement)。
 > - RealEstate10K (Out-of-distribution) 上，Rotation Error (RotErr) ↓ 0.56 vs best competing method (lowest (see Table 2))；Video Quality (Q-Align) ↑ 0.9694 vs CameraCtrl / AC3D (higher)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -71,7 +73,7 @@ UCPE 在方法谱系中处于**射线级、模型无关**的位置编码范式�
 
 当前 UCPE 依赖精确的位姿监督，且未覆盖变焦、聚焦、景深等镜头属性。对训练时未见过的极端投影模型（如等距柱状投影 ERP），生成质量明显下降。未来方向包括：扩展至更多镜头属性、减少对位姿监督的依赖、与 NeRF/3DGS 表示的结合，以及在视频到视频任务中的验证。
 
-## 背景与动机
+
 
 ### 相机可控视频生成的兴起与核心挑战
 
@@ -103,7 +105,9 @@ Figure 2 对比了三种主流的相机编码范式及其各自的不足：
 
 这两种编码的结合，使得UCPE能够在异构相机设置下实现精确的可控生成，同时仅增加极少的可训练参数（约35.5M，占7.3B基座模型的0.5%）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：从相机空间到射线空间的范式转移
 
@@ -150,7 +154,7 @@ $$\mathbf{D}_t^{\mathrm{UCPE}} = \mathrm{blkdiag}(\mathbf{D}_t^{\mathrm{Ray}},\;
 
 UCPE 处于**相机可控生成**与**位置编码设计**的交叉点。相较于直接参数化方法（**ReCamMaster**），UCPE 提供了物理可解释的几何编码；相较于 Plücker 编码方法（**CameraCtrl**、**AC3D**、**Wan CameraCtrl**），UCPE 通过射线级粒度和模型无关设计突破了针孔假设的限制；相较于相对投影编码（**PRoPE**、**GTA**），UCPE 通过局部射线坐标系的构建统一了任意透镜的几何推理。其核心贡献在于首次实现了对异构相机几何（6-DoF 位姿、内参、畸变）的统一位置编码，为扩散 Transformer 提供了与相机模型无关的可控生成能力。
 
-## 整体框架
+
 
 UCPE 的整体设计遵循一个核心原则：将扩散 Transformer 中的几何推理从相机空间迁移到射线空间，并通过轻量适配器注入预训练模型，从而在不破坏原有先验的前提下实现跨相机模型的精确可控生成。整个框架围绕三个相互协作的模块构建：**相对射线编码（Relative Ray Encoding, RRE）**、**绝对方向编码（Absolute Orientation Encoding, AOE）** 和 **空间注意力适配器（Spatial Attention Adapter）**。
 
@@ -197,7 +201,7 @@ $$\mathbf{D}_t^{\mathrm{UCPE}} = \mathrm{blkdiag}\big( \mathbf{D}_t^{\mathrm{Ray
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2512_07237/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of Spatial Attention Adapter. The adapter injects UCPE into pretrained Transformers through a lightweight branch that preserves pretrained priors. It constructs hybrid encoding from the world-to-ray transform*
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题形式化：从相机模型到世界空间射线
 
@@ -280,7 +284,9 @@ $$\mathbf{D}_t^{\mathrm{UCPE}} = \mathrm{blkdiag}\big(\mathbf{D}_t^{\mathrm{Ray}
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2512_07237/figures/011_Figure.jpg]]
 *Figure: D.1. Implementation of Baseline And Ablation Models. (a) ReCamMaster injects per-frame camera parameters into each Transformer block after spatial repetition. (b) Wan CameraCtrl injects Plucker-encoded rays into video tokens using a convolutional ¨ adapter. (c) Our UCPE ablations insert a spatial attention adapter before, after, or in parallel with the original self-attention module*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -359,7 +365,9 @@ $$\mathbf{D}_t^{\mathrm{UCPE}} = \mathrm{blkdiag}\big(\mathbf{D}_t^{\mathrm{Ray}
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2512_07237/figures/012_Table.jpg]]
 *Table: D.1. Inference latency comparison. Latencies are measured on a single NVIDIA A800 GPU, with corresponding frame counts and resolutions provided for reference*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心瓶颈与动机
 
@@ -422,6 +430,8 @@ UCPE在方法谱系中的定位，可以通过编码粒度和投影模型两个�
 3. **与3D表示的融合**：UCPE的射线空间编码与NeRF、3D Gaussian Splatting等基于射线的3D表示存在天然的接口。是否可以将UCPE与这些表示无缝结合，用于更高质量的3D感知视频生成或新视角合成？
 
 4. **视频到视频任务的适配**：在视频到视频任务中，输入视频本身携带的相机运动信息如何与UCPE的显式控制信号协调，是一个尚未探索的问题。
+
+
 
 ## 原文 PDF
 

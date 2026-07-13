@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/ToolWeaver_Weaving_Collaborative_Semantics_for_Scalable_Tool_Use_in_Large_Language_Models.pdf
+project_link: null
+code_link: https://github.com/Fwibo/ToolWeaver
 openreview_forum_id: Ge1DKuzWTO
 aliases:
 - ToolWeaver
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | ToolWeaver：为大规模语言模型中的可扩展工具使用编织协同语义 |
 | 英文题名 | ToolWeaver: Weaving Collaborative Semantics for Scalable Tool Use in Large Language Models |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=Ge1DKuzWTO); [GitHub](https://github.com/Fwibo/ToolWeaver) |
+| Links | [paper](https://openreview.net/forum?id=Ge1DKuzWTO) · [GitHub](https://github.com/Fwibo/ToolWeaver) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/generative_models_and_autoencoders |
 | Method | ToolWeaver |
 | Dataset | ToolBench retrieval (I3), ToolBench end-to-end (I3), WikiText-2 (language modeling) |
@@ -41,7 +43,7 @@ claims:
 > - ToolBench end-to-end (I3) 上，SoPR 为 52.19，对比 36.34 (ToolGen)，变化 +15.85。
 > - ToolBench end-to-end (I3) 上，SoWR (vs GPT-4o-mini) 为 59.02，对比 49.18 (ToolGen)，变化 +9.84。
 
-## 概述
+## 概要
 
 大规模语言模型（LLM）在工具使用方面面临一个根本性的可扩展瓶颈：主流的“一工具一标记”生成式范式为每个工具分配一个独立的原子标记，导致词汇量随工具数量线性增长，且标记间的语义隔离使模型难以从稀疏的独立工具ID共现中学习协同关系。当工具库规模扩展到数万级别时，这一瓶颈在复杂多工具协同场景中尤为突出。
 
@@ -53,7 +55,7 @@ claims:
 
 在方法谱系上，ToolWeaver处于工具检索与生成式工具使用的交叉地带。与经典的检索式方法（如**BM25**、稠密嵌入相似度**EmbSim**、有监督检索器**ToolRetriever** (Qin et al., 2023)）相比，ToolWeaver将工具选择直接融入LLM的生成过程，避免了独立检索器的级联误差；与生成式基线**ToolGen**相比，它用组合码替代原子标记，从根本上解决了词汇爆炸和语义隔离问题。当前工作的主要局限在于实验仅在ToolBench上进行，跨数据集的泛化性尚待验证；工具协同模式依赖历史轨迹的共现统计，冷启动场景下协同信号可能不足。
 
-## 背景与动机
+
 
 大规模语言模型（LLM）通过调用外部工具，显著扩展了其在复杂推理与真实世界交互中的能力边界。然而，随着可用工具数量的急剧膨胀——例如 ToolBench 数据集包含近 47,000 个 API——如何高效地将海量工具集成到 LLM 中，已成为制约工具增强型智能体走向实用的核心瓶颈。
 
@@ -78,7 +80,9 @@ ToolWeaver 的核心洞察是：**将工具的内在功能语义与外在共现�
 
 实现上述构想需要解决三个关键挑战。第一，如何将工具文档的语义信息与历史使用轨迹中的协同信号有机融合到向量量化的码本学习中？第二，如何确保层次化码本的每一层都能得到有效利用，避免码本坍缩（codebook collapse）导致的表示容量浪费？第三，如何将学习到的离散工具表示无缝集成到 LLM 的生成框架中，使模型能够准确地生成有效的工具码序列？ToolWeaver 通过协作感知的码本学习、基于 Sinkhorn-Knopp 的均匀映射约束、以及两阶段生成对齐，系统性地回应了这些挑战。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ToolWeaver 的核心创新在于**将工具的离散表示从“原子标记”范式重构为“组合式层次化码序列”**，并将工具间的协同模式显式编码到码本学习中，从而系统性地解决了现有生成式工具使用方法的可扩展性瓶颈。
 
@@ -134,7 +138,7 @@ $$\mathcal{L}_{\mathrm{retrieval}} = -\mathbb{E}_{(q,d)}[\log P(\iota_d | q)]$$
 
 消融实验为这些创新提供了强有力的因果证据：语义初始化（即使用 RQ-VAE 编码工具文档语义）使检索 NDCG 提升超过 20 个点，构成工具表示的基础；在此基础上引入协同引导后，性能进一步提升，且提升幅度与任务复杂度正相关——在复杂的多工具 I3 任务上最为显著。协同正则化权重 $\lambda$ 的敏感性分析进一步验证了核心假设：$\lambda=1$ 时性能达到峰值，过小则协同信号不足，过大则压制了工具内在语义，说明**平衡内在语义与外在协同模式**是 ToolWeaver 成功的关键机制。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_Ge1DKuzWTO/figures/001_Figure_1.jpg]]
 *Figure 1: An overview of the ToolWeaver framework. (a) We contrast the standard “one-token-pertool” method, which creates a massive flat vocabulary, with our compositional approach that scales logarithmically. (b) Our model leverages collaborative signals between tools (e.g., Realtime Weather and Air Quality) for complex reasoning where “one-token-per-tool” representations fail. (c) The ToolWeaver architecture learns these structured representations through a collaborativeaware vector quantization process, which are then integrated into an LLM*
@@ -162,7 +166,7 @@ ToolWeaver 的整体流程围绕一个核心瓶颈展开：传统“一工具一
 
 整体来看，框架的输入包括：工具文档语料、历史使用轨迹、以及用户查询。输出为：层次化工具码序列，直接集成在 LLM 的生成文本中，无需额外的检索器模块。图 1 展示了从“一工具一标记”到组合式表示的对比，以及协同信号如何在复杂多工具推理场景中发挥作用。
 
-## 核心模块与公式推导
+
 
 ToolWeaver 的核心由三个模块构成：**结构化标记化**、**协同图构建**，以及**两阶段生成对齐**。其关键创新在于将工具的内在功能语义与外在共现模式联合编码到层次化码本中，使模型能通过共享的父码学习工具间的协同性。
 
@@ -214,7 +218,9 @@ $$\mathcal{L}_{\mathrm{retrieval}} = -\mathbb{E}_{(q,d)}[\log P(\iota_d | q)]$$
 
 推理时采用受限解码：预计算所有有效工具码序列的前缀树，引导束搜索确保生成的码序列始终对应有效工具。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验设置
 
@@ -301,7 +307,9 @@ ToolWeaver 的推理延迟随码本深度 $L$ 线性增长，但绝对开销很�
 1. 所有实验均在 ToolBench 数据集上进行，未在其他工具使用基准（如 API-Bank）上验证，跨数据集的泛化性未知。
 2. 工具协同模式的学习依赖于历史使用轨迹的共现统计，对于新工具或冷启动场景，协同信号可能不足，需要额外机制支持。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题根因与核心调控变量
 
@@ -340,6 +348,8 @@ ToolWeaver在生成式工具使用范式上对 **ToolGen** (Wang et al., 2024b) 
 2. **协同信号的泛化边界**：协同引导是否有助于模型泛化到未曾同时使用过但功能相关的工具对（例如两个功能相似但来自不同域的API），文中未做专门分析。
 3. **码本结构的自适应设计**：层次化码本的最优深度 $L$ 和宽度 $K$ 是否可以根据工具库的统计特性（如工具总数、共现稀疏度）自动确定，而非依赖人工调参。
 4. **与其他工具增强范式的融合**：ToolWeaver目前仅与生成式方法对比，其组合码表示是否可以与检索式方法的优势互补（如在检索阶段利用码的层次结构加速候选集筛选），值得探索。
+
+
 
 ## 原文 PDF
 

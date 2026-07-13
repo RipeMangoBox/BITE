@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Web_CogReasoner_Towards_Multimodal_Knowledge_Induced_Cognitive_Reasoning_for_Web_Agents.pdf
+project_link: https://Gnonymous.github.io/Web-CogReasoner
+code_link: null
 openreview_forum_id: siXHlHBYIe
 aliases:
 - WC
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | Web-CogReasoner：面向网页智能体的多模态知识诱导认知推理 |
 | 英文题名 | Web-CogReasoner: Towards Multimodal Knowledge-Induced Cognitive Reasoning for Web Agents |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=siXHlHBYIe); [Project](https://Gnonymous.github.io/Web-CogReasoner) |
+| Links | [paper](https://openreview.net/forum?id=siXHlHBYIe) · [Project](https://Gnonymous.github.io/Web-CogReasoner) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | Web-CogReasoner |
 | Dataset | Web-CogBench, VisualWebBench, WebVoyager, Online-Mind2Web Cross-Task |
@@ -42,7 +44,7 @@ claims:
 > - VisualWebBench 上，Overall Avg 为 86.3，对比 Qwen2.5-VL-7B (76.0)，变化 +10.3。
 > - WebVoyager 上，Overall Success Rate 为 30.2%，对比 OpenWebVoyagerMax (26.2%)，变化 +4.0%。
 
-## 概述
+## 概要
 
 **核心瓶颈**：现有通用多模态大模型在网页交互任务中面临感知与推理脱节的困境。这些模型缺乏对网页任务的系统性知识基础，难以在复杂、动态的网页环境中进行可靠的元素识别、语义理解和目标导向的决策规划，导致泛化能力不足。
 
@@ -52,7 +54,7 @@ claims:
 
 **主要结果**：在自建基准 **Web-CogBench** 上，Web-CogReasoner 取得 **84.4%** 的综合得分，显著高于相同基座模型 Qwen2.5-VL-7B（69.8%）和视觉专长模型 UI-TARs-7B-SFT（46.4%）。在真实网页任务 **WebVoyager** 上，以最少平均步骤（**4.73步**）成功完成任务，优于闭源商业模型。消融实验证实，课程学习带来累积增益（记忆能力+17.9，理解能力+11.3），移除 KCoT 后在线成功率从 42.9% 骤降至 25.35%，验证了知识框架与推理机制的关键作用。
 
-## 背景与动机
+
 
 网页智能体（Web Agent）旨在自主感知网页界面、理解任务目标并执行操作序列以完成用户指令，是通向通用人工智能的关键能力之一。近年来，基于多模态大模型（LVM）的网页智能体取得了显著进展，但其在复杂网页交互场景中的可靠性仍远未达到实用要求。
 
@@ -68,7 +70,9 @@ claims:
 
 本文的动机正源于此：**能否通过受认知科学启发的知识框架，系统性地弥合网页智能体的感知-推理鸿沟？** 借鉴布卢姆分类学（Bloom's Taxonomy）将学习分解为“知识内容学习”与“认知过程”两阶段的思想，本文提出 **Web-CogReasoner**——一个以多模态知识诱导认知推理为核心的网页智能体。其核心思路是：首先通过分层构建事实、概念、程序性知识（对应“是什么”），再以知识驱动链式思维（Knowledge-driven CoT）激活结构化知识（对应“怎么做”），最终实现从感知、理解到执行的完整认知链路。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Web-CogReasoner 的核心创新在于将网页智能体的学习过程显式分解为**知识内容学习**与**认知过程**两个阶段，并以此为基础构建了一套完整的训练与推理体系。这一设计直接回应了现有通用多模态大模型的核心瓶颈：**缺乏对网页任务的系统性知识基础，导致感知与推理脱节**。具体而言，该方法在四个关键维度上实现了相对于基线的根本性改变：
 
@@ -95,7 +99,7 @@ Web-CogReasoner 的核心创新在于将网页智能体的学习过程显式分�
 
 综合来看，Web-CogReasoner 的创新并非单一技术的改进，而是通过**知识分层建模 + 课程学习训练 + KCoT 推理激活**的联合作用，构建了从感知到理解再到执行的完整认知闭环。这一设计使得基于相同基座模型 Qwen2.5-VL-7B 训练的 Web-CogReasoner 在 Web-CogBench 上取得 84.4% 的综合得分，显著高于基座本身的 69.8% 和视觉专长模型 UI-TARs 的 46.4%，验证了知识注入相对于纯视觉端到端方法的根本性优势。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_siXHlHBYIe/figures/002_Figure_1.jpg]]
 *Figure 1: Visualization of the Web-CogKnowledge Framework along with the experimental results*
@@ -145,7 +149,7 @@ Web-CogReasoner 采用监督微调，在专门构建的 Web-CogDataset 上进行
 
 在每个交互步骤 $t$，智能体接收**网页截图**与**无障碍树（AX Tree）** 作为多模态观测，经 KCoT 推理生成结构化计划，最终映射为具体动作执行。动作空间分为两类：元素级操作（点击、输入、双击、滚动等）和页面级控制（导航指令、弹窗关闭等）。
 
-## 核心模块与公式推导
+
 
 ### 部分可观测马尔可夫决策过程建模
 
@@ -189,7 +193,9 @@ $$2^n - 1$$
 
 该组合策略用于构造多样化的弹窗关闭训练样本，提升模型对页面异常状态的鲁棒性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 瓶颈与因果机制
 
@@ -239,7 +245,9 @@ $$2^n - 1$$
 
 评估采用多个 LVM 评委进行互评可靠性分析，三项任务的 Within-1-Point 一致性高达 96%–98.7%，人工代理分析亦达 94.4%–96.7%（Table 14），确保了评分的客观性。在线评估采用统一脚本，排除了因环境差异导致的偏差。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1 问题定位：从通用感知到知识诱导认知
 
@@ -286,6 +294,8 @@ Web-CogReasoner 的方法贡献可从四个维度进行定位：
 - **弱监督下的推理质量保持**：在更少监督信号下（如仅提供任务目标而无专家轨迹），知识驱动推理的质量能否维持？这关系到方法在实际部署中的可行性。
 
 - **与商业模型的差距弥合**：知识注入在 7B 规模上展现了显著增益，但这一增益能否在更大规模模型上复现？是否存在知识框架与模型规模的交互效应，使得更大模型能从知识注入中获得更高收益？
+
+
 
 ## 原文 PDF
 

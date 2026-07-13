@@ -32,7 +32,7 @@ claims:
 | 中文题名 | 木工设计与制造计划的协同优化 |
 | 英文题名 | Co-optimization of Design and Fabrication Plans for Carpentry |
 | 会议/期刊 | SIGGRAPH 2022 |
-| Links | [paper](https://arxiv.org/abs/2107.12265) · [arXiv](https://arxiv.org/abs/2107.12265") |
+| Links | [paper](https://arxiv.org/abs/2107.12265) · [paper](https://arxiv.org/abs/2107.12265") |
 | Topic | #topic/other_unclear |
 | Method | ICEE (Iterative Contraction and Expansion on E-graphs) with Bag-of-Parts (BOP) E-graph |
 | Dataset | 多个木质家具模型（Bookcase, Frame, Loom, Jungle Gym 等）, 五个代表性模型（Frame, Jungle Gym, L-Frame, Table, Window）, 16个家具模型 |

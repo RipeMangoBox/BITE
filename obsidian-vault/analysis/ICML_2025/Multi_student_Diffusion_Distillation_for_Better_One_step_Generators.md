@@ -5,6 +5,8 @@ paper_level: A
 venue: ICML
 year: 2025
 pdf_ref: paperPDFs/ICML_2025/Multi_student_Diffusion_Distillation_for_Better_One_step_Generators.pdf
+project_link: https://research.nvidia.com/labs/toronto-ai/MSD/
+code_link: null
 aliases:
 - MSDM
 - MSDDBOSG
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 多学生扩散蒸馏实现更优一步生成器 |
 | 英文题名 | Multi-student Diffusion Distillation for Better One-step Generators |
 | 会议/期刊 | ICML 2025 |
-| Links | [paper](https://arxiv.org/abs/2410.23274); [Project](https://research.nvidia.com/labs/toronto-ai/MSD/) |
+| Links | [paper](https://arxiv.org/abs/2410.23274) · [Project](https://research.nvidia.com/labs/toronto-ai/MSD/) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/diffusion_image_video |
 | Method | Multi-Student Distillation (MSD) |
 | Dataset | ImageNet-64x64, MS-COCO2014 |
@@ -41,7 +43,7 @@ claims:
 > - ImageNet-64x64 上，FID 为 2.37 (MSD 4 students, DM only)，对比 2.62 (DMD, single student)，变化 -0.25。
 > - ImageNet-64x64 上，FID 为 2.88 (MSD 4 smaller students, ADM)，对比 11.67 (4 smaller students without TSM, ADM)，变化 -8.79。
 
-## 概述
+## 概要
 
 单步扩散蒸馏旨在将多步扩散教师模型压缩为一步生成器，以大幅降低推理延迟。然而，单一学生模型受限于架构容量，难以高质量覆盖所有多样性条件输入，导致生成质量与推理速度之间存在难以调和的权衡。本文提出**多学生蒸馏（Multi-Student Distillation, MSD）**框架，核心思想是将条件空间划分为多个不相交的子集，每个子集由一个独立的学生生成器负责，从而在不增加单次推理延迟的前提下，显著提升整体有效模型容量。
 
@@ -51,8 +53,6 @@ MSD 的关键机制包括三个层面：
 3. **教师分数匹配预训练（TSM）**：为小型学生模型引入轻量级的分数匹配预训练阶段，使其权重初始化接近教师的去噪输出，从而为后续蒸馏提供良好起点。
 
 实验表明，MSD 在 ImageNet-64×64 类别条件生成上，使用 4 个同规模学生取得 FID 1.20（单步），优于单学生基线 DMD2 的 1.28；在零样本 COCO2014 文本生成上取得 FID 8.20，优于 DMD2 的 8.35，且推理延迟保持 0.09 秒不变。消融研究进一步验证，性能提升源于容量增加而非等效大批量训练，且学生数量从 1 增至 8 时 FID 持续下降。MSD 框架具有通用性，可应用于分布匹配蒸馏和一致性蒸馏等多种单步蒸馏方法。
-
-## 背景与动机
 
 ### 扩散模型的一步生成困境
 
@@ -80,7 +80,7 @@ MSD 的关键机制包括三个层面：
 
 基于此，本文提出**多学生蒸馏（Multi-Student Distillation, MSD）**框架，通过引入多个学生模型、条件空间分区与多阶段蒸馏策略，在不增加单次推理延迟的前提下突破单一学生的容量限制，实现更优的一步生成质量。
 
-## 核心创新
+## 核心方法与创新机理
 
 ### 瓶颈洞察：单一学生模型的容量天花板
 
@@ -154,8 +154,6 @@ MSD 作为“即插即用”的框架升级，其通用性在两类蒸馏方法�
 
 在 ImageNet-64×64 上，MSD 使用 4 个同规模学生（ADM 阶段）取得 FID 1.20，显著优于单学生基线 DMD2 的 1.28；在零样本 COCO2014 文本生成上取得 FID 8.20，优于 DMD2 的 8.35，且推理延迟保持 0.09s 不变。消融研究进一步证实，性能提升源于有效模型容量的增加，而非等效大 batch 效应——4 学生每学生 batch size 32 的 FID（2.53）优于单学生 batch size 128 的 FID（2.60）。
 
-## 整体框架
-
 **Multi-Student Distillation (MSD)** 是一个通用的单步扩散蒸馏框架，其核心思想是将一个预训练的多步教师扩散模型蒸馏为 **K 个单步学生生成器**，每个学生仅负责条件输入空间的一个子集，从而在不增加单次推理延迟的前提下提升整体有效模型容量。
 
 ### 框架工作流
@@ -213,8 +211,6 @@ $$
 
 MSD 是一个 **即插即用框架**，可应用于任意条件单步扩散蒸馏方法。除分布匹配蒸馏（DMD/DMD2）外，论文在 2D 玩具实验中验证了 MSD 同样适用于一致性蒸馏（CTM），随着学生数量从 1 增加到 8，生成分布与教师分布的 L1 距离持续下降（Figure 4, Figure 6），验证了框架的通用性。
 
-## 核心模块与公式推导
-
 ### 3.1 分布匹配蒸馏基础
 
 MSD 的蒸馏基础建立在分布匹配蒸馏（Distribution Matching Distillation, DMD）之上。其核心思想是：在扩散模型的不同噪声时间步 $t$ 上，最小化学生生成器输出分布 $p_{t,\mathrm{fake}}$ 与教师模型输出分布 $p_{t,\mathrm{real}}$ 之间的反向 KL 散度。该目标可形式化为：
@@ -263,7 +259,7 @@ $$\mathcal { L } _ { \mathrm { T S M } } = \mathbb { E } _ { t } [ \lambda _ { t
 
 该损失在多个噪声水平上匹配教师模型的去噪输出 $\mu_{\mathrm{teacher}}$，为后续的单步蒸馏提供良好的初始化。完整的三阶段流程（TSM → DM → ADM）如 Figure 3 所示。消融实验表明，4 个小型学生若不经过 TSM 预训练直接进行 ADM，FID 高达 11.67；加入 TSM 后 FID 降至 2.88（Table 1），验证了 TSM 对小模型蒸馏的关键作用。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -326,9 +322,6 @@ MSD 框架的通用性在一致性蒸馏（Consistency Distillation）上得到�
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2410_23274/figures/002_Figure_2.jpg]]
-*Figure 2: Samples on high guidance-scale text-to-image generations from the SD v1.5 teacher and different sized students, with full training details in App. D. The same-sized student has comparable quality to the teacher. The smaller student, trained on a subset of dog-related data, achieves faster generation while still having decent qualities. The same-sized student is trained with DM stage only, whereas the smaller student is trained with TSM and DM stages (see Fig. 3). See additional samples in Fig. 12*
-
 ![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2410_23274/figures/009_Table_4.jpg]]
 *Table 4: Glossary and notation*
 
@@ -341,7 +334,7 @@ MSD 框架的通用性在一致性蒸馏（Consistency Distillation）上得到�
 ![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2410_23274/figures/017_Table_8.jpg]]
 *Table 8: Hyperparameter details for different sized student models of the SD v1.5 architecture. Only the diffusion model part is measured since the text encoder and the VAE remain frozen. Unspecified hyperparameters remain the same as the teacher. Latency is measured on a single NVIDIA RTX 4090 GPU*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 方法谱系：从单学生蒸馏到多学生容量扩展
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2025
 pdf_ref: paperPDFs/ICLR_2025/No_Training_No_Problem_Rethinking_Classifier_Free_Guidance_for_Diffusion_Models.pdf
+project_link: http://probml.github.io/book2
+code_link: null
 aliases:
 - ICGITSGT
 - NTNPRCFGDM
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 无需训练：重新思考扩散模型的无分类器引导 |
 | 英文题名 | No Training, No Problem: Rethinking Classifier-Free Guidance for Diffusion Models |
 | 会议/期刊 | ICLR 2025 |
-| Links | [paper](https://openreview.net/forum?id=b3CzCCCILJ) · [Project](http://probml.github.io/book2) · [arXiv](https://arxiv.org/abs/2112.03111) |
+| Links | [paper](https://openreview.net/forum?id=b3CzCCCILJ) · [Project](http://probml.github.io/book2) · [paper](https://arxiv.org/abs/2112.03111) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/diffusion_image_video |
 | Method | Independent Condition Guidance (ICG) 和 Time-step Guidance (TSG) |
 | Dataset | Stable Diffusion, DiT-XL/2, EDM2-XS, DiT-XL/2 unconditional |
@@ -41,7 +43,7 @@ claims:
 > - DiT-XL/2 (ImageNet class-conditional) 上，FID 5.50 vs 5.56 (-0.06)。
 > - EDM2-XS (ImageNet) 上，FID 3.35 vs 3.36 (-0.01)。
 
-## 概述
+## 概要
 
 扩散模型的无分类器引导（Classifier-Free Guidance, CFG）已成为提升生成质量的关键技术，但其标准实现存在一个根本性瓶颈：需要训练一个单独的无条件模型，或在训练过程中随机丢弃条件信息。这不仅降低了训练效率，还使得CFG天然无法应用于无条件生成模型。
 
@@ -54,7 +56,7 @@ claims:
 
 在方法谱系上，ICG和TSG处于推断时引导技术的交汇点：ICG延续了CFG的条件-无条件混合范式，但将无条件分支的获取方式从“训练时准备”转变为“推断时构造”；TSG则开辟了全新的引导信号来源——时间嵌入扰动，使引导机制不再依赖任何条件信息，从而扩展了CFG类技术的适用范围。
 
-## 背景与动机
+
 
 扩散模型通过逐步去噪从高斯噪声中生成高质量样本，其核心是学习数据分布的得分函数 $\nabla_{z_t} \log p_t(z_t)$。条件扩散模型进一步引入条件信息 $y$（如类别标签、文本描述），学习条件得分 $\nabla_{z_t} \log p_t(z_t | y)$，以实现可控生成。然而，条件模型直接生成的样本往往在保真度与多样性之间存在权衡，引导（guidance）技术应运而生。
 
@@ -77,7 +79,9 @@ $$\nabla_{z_t} \log p_t(z_t | \hat{y}) \approx \nabla_{z_t} \log p_t(z_t)$$
 
 基于这一原理，本文提出**独立条件引导（Independent Condition Guidance, ICG）**，用独立于 $z_t$ 的随机条件向量（如高斯噪声）替代无条件模型输出，从而在纯条件模型上直接实现CFG等效效果。进一步，本文发现对时间步骤嵌入施加高斯扰动可以产生类似CFG的引导信号，由此提出**时间步引导（Time-step Guidance, TSG）**，将引导能力扩展到无条件模型，且不依赖任何特定网络架构。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于提出了两种全新的推断时引导方法——**独立条件引导 (ICG)** 与**时间步引导 (TSG)**，它们从根本上改变了扩散模型中引导信号的获取方式，完全消除了对额外训练的需求。
 
@@ -115,7 +119,7 @@ $$\nabla_{z_t} \log \hat{p}_t(z_t) = \nabla_{z_t} \log p_t(z_t) + \frac{1 - w_{\
 
 ICG 和 TSG 作用于扩散模型的不同组件——前者操控条件向量，后者操控时间嵌入——因此二者天然兼容。实验表明，联合使用 ICG 和 TSG 可以进一步提升生成质量，验证了两种引导机制的互补性。
 
-## 整体框架
+
 
 本文提出两种无需额外训练的引导方法，均可在推理阶段直接应用于预训练扩散模型，无需修改训练目标或模型权重。两种方法共享一个核心思想：通过构造一个“参考输出”来模拟无引导时的预测，然后利用条件输出与参考输出之间的差异形成引导信号，从而提升生成质量。
 
@@ -212,7 +216,7 @@ ICG 和 TSG 作用于模型的不同输入维度——ICG 修改条件向量，T
 ![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_b3CzCCCILJ/figures/002_Figure_1.jpg]]
 *Figure 1: Comparison between CFG and ICG for (a) Stable Diffusion (Rombach et al., 2022) and (b) DiT-XL/2 (Peebles & Xie, 2022). Both CFG and ICG significantly improve the image quality of the baseline. Also note the similarity between the outputs of CFG and ICG, confirming our theoretical analysis in Section 4*
 
-## 核心模块与公式推导
+
 
 ### 3.1 标准无分类器引导（CFG）的瓶颈
 
@@ -290,7 +294,9 @@ $$\nabla_{z_t} \log \hat{p}_t(z_t) = \nabla_{z_t} \log p_t(z_t) + \frac{1 - w_{\
 
 ICG和TSG均可独立使用，也可组合（Table 4验证了两者的兼容性）。两者共享相同的计算特征：每步采样需要**两次模型前向传播**，计算成本约为标准采样的两倍，与标准CFG一致。这是当前方法的主要局限之一。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：ICG 与 CFG 等价性验证
 
@@ -354,7 +360,9 @@ ICG 和 TSG 与 CFG 共享一个根本性局限：每步采样需两次模型前
 ![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_b3CzCCCILJ/figures/018_Table_8.jpg]]
 *Table 8: Comparison between TSG and other guidance methods. TSG achieves better quality compared to SAG and PAG while requiring no specific assumption about the underlying architecture of the diffusion model*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -418,6 +426,8 @@ $$\nabla_{z_t} \log \hat{p}_t(z_t) = \nabla_{z_t} \log p_t(z_t) + \frac{1 - w_{\
 4. **与先进采样器的协同**：结合更先进的采样算法（如DPM-Solver、高阶ODE求解器）是否能进一步提升ICG/TSG的性能或降低计算开销？
 
 5. **最优超参数的自动化**：TSG的 $s$、$\alpha$ 和应用层选择目前依赖手动调参。是否存在理论指导或自动化搜索策略来确定这些超参数？
+
+
 
 ## 原文 PDF
 

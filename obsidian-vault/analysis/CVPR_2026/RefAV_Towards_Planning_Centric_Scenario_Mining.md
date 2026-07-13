@@ -42,7 +42,7 @@ claims:
 > - RefAV (Argoverse 2 Sensor dataset) 上，HOTA-Temporal 50.1 (RefProg + LE3DE2E tracks) vs 37.2 (LLM API Black Box + LE3DE2E tracks) (+12.9)；HOTA-Track 51.1 (RefProg + LE3DE2E tracks) vs 39.2 (LLM API Black Box + LE3DE2E tracks) (+11.9)。
 > - nuPrompt 上，AMOTA 0.321 (RefProg) vs 0.259 (PromptTrack) (+0.062)。
 
-## 概述
+## 概要
 
 自动驾驶系统的安全验证面临一个核心瓶颈：如何从海量非结构化驾驶日志中，高效且精确地检索出那些涉及复杂多智能体交互的安全关键场景？这本质上是一个“大海捞针”问题——自然语言描述的罕见场景（如“雨天中一辆车在自车路径上左转”）散落在数千小时的传感器数据中，现有方法难以同时兼顾语义理解的灵活性与时空定位的精确性。
 
@@ -52,7 +52,7 @@ claims:
 
 本文的主要贡献可概括为三点：（1）揭示了现有 VLM 在组合时空推理上的根本性不足；（2）提出了基于程序合成的模块化场景挖掘范式，以可解释、可组合的方式桥接语言理解与精确时空定位；（3）构建了大规模、多样化的场景挖掘基准 RefAV，为规划中心的安全验证提供了系统化评估平台。
 
-## 背景与动机
+
 
 自动驾驶系统的安全验证需要大规模、多样化的场景测试。然而，从海量非结构化驾驶日志中高效且精确地检索复杂的多智能体安全关键场景，本质上是一个“大海捞针”问题。现有的场景挖掘方法主要依赖基于规则的分类器或手工设计的特征，难以应对自然语言描述的灵活性和组合性。
 
@@ -62,7 +62,9 @@ claims:
 
 针对上述缺口，本文的核心动机是：**能否将复杂的指称表达解构为基本运动原语的组合，并通过程序合成桥接语言理解与精确的时空定位？** 这一思路不仅能够利用大语言模型（LLM）的语义理解能力，还能借助预定义的原子动作 API 保证检索的精确性和可解释性，同时保持跨数据集的零样本泛化能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 RefAV 的核心创新在于**将自然语言场景挖掘重构为程序合成问题**，提出 **Referential Tracking by Program Synthesis (RefProg)** 方法。该方法通过一个关键的 **changed slot**——语言理解与决策机制的根本转变——实现了对复杂多智能体安全关键场景的精确检索。
 
@@ -80,7 +82,7 @@ RefProg 的突破在于将复杂的指称表达**分解为可组合的原子动�
 
 值得注意的是，RefProg 还引入了视觉工具（如 SigLIPv2）来识别被跟踪对象的视觉属性（如颜色），部分弥补了纯轨迹推理在视觉语义理解上的不足，但这一扩展仍属于程序合成框架内的模块化增强，而非对核心机制的改变。
 
-## 整体框架
+
 
 RefAV 提出了一种面向规划中心的场景挖掘范式，其核心挑战在于从海量非结构化驾驶日志中高效且精确地检索复杂的多智能体安全关键场景——即“大海捞针”问题。直接复用现成的视觉语言模型（VLMs）效果很差，因为它们缺乏细粒度的组合推理和运动理解能力。
 
@@ -115,7 +117,7 @@ RefProg 的核心洞察在于**程序合成作为语言与时空定位之间的�
 ![[assets/figures/papers/paper_list_l2089_https_arxiv_org_abs_2505_20981/figures/001_Figure_1.jpg]]
 *Figure 1: Scenario Mining Problem Setup. Given a natural language prompt such as vehicle making left turn through ego-vehicle’s path while it is raining, our problem setup requires models to determine whether the described scenario occurs within a 20-second driving log, and if so, precisely localize the referred object in 3D space and time from raw sensor data (LiDAR, 360◦ ring cameras, and HD maps). Based on the example above, a VLM should localize the start and end timestamps and 3D location of the red Mini Cooper executing a “Pittsburgh left” through the ego-vehicle’s path with a 3D track. Notably, the “Pittsburgh left” is a regional driving practice where a driver quickly makes a left turn before...*
 
-## 核心模块与公式推导
+
 
 RefProg 采用双路解耦架构（Figure 4），将感知与推理分离：一条路径运行离线3D感知模型生成高质量轨迹，另一条路径通过LLM将自然语言查询合成为可执行程序，最后通过程序执行器对轨迹进行精确过滤与分类。
 
@@ -157,7 +159,9 @@ $$s_{\mathrm{modified}} = s_{\mathrm{cosine}} - \frac{0.05}{\mathrm{len}(\mathrm
 
 这些启发式公式在RefProg中被更精确的程序化逻辑所取代，但其设计思路揭示了纯相似度匹配方法的固有局限——缺乏对时序结构和组合语义的显式建模。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心问题与评估设置
 
@@ -267,7 +271,9 @@ $$s_{\mathrm{modified}} = s_{\mathrm{cosine}} - \frac{0.05}{\mathrm{len}(\mathrm
 ![[assets/figures/papers/paper_list_l2089_https_arxiv_org_abs_2505_20981/figures/010_Figure_5.jpg]]
 *Figure 5: Manual Annotation Tool. We create an annotation tool to assist with labeling manually defined scenarios. Our tool allows us to quickly annotate multi-object referential tracks in AV2*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：从“大海捞针”到程序化组合推理
 
@@ -307,6 +313,8 @@ RefProg 的方法论贡献在于提出了一种**零样本、程序化、模块�
 ### 与下游任务的连接前景
 
 RefAV 的工作开启了场景挖掘与规划验证之间的闭环可能性。一个值得探索的开放问题是：**场景挖掘方法是否能与下游规划或接管预测任务进行端到端联合优化**？例如，可以将 RefProg 检索出的高价值安全关键场景，直接用于训练或测试规划器的鲁棒性，从而形成一个以“规划为中心”的数据飞轮。此外，如何在大规模部署中进一步降低 LLM 程序合成的 token 消耗和延迟，使实时或在线上应用成为可能，也是该方法走向工业级应用必须跨越的工程门槛。
+
+
 
 ## 原文 PDF
 

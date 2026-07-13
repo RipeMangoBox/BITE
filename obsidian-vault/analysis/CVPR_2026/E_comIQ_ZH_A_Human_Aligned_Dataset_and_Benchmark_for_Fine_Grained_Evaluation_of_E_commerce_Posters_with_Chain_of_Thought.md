@@ -43,7 +43,7 @@ claims:
 > - E-comIQ-18k test set 上，Overall PLCC 0.425 (E-comIQ-M) vs 0.035 (Qwen2.5-VL-7B) (+0.390)；Overall SRCC 0.433 (E-comIQ-M) vs 0.119 (Qwen2.5-VL-7B) (+0.314)；Overall Acc@0.5 55.6% (E-comIQ-M) vs 29.3% (Qwen2.5-VL-7B) (+26.3%)。
 > - E-comIQ-Bench (human scores) 上，Overall human score 3.65 (SeeDream, best generative model) vs 3.78 (Original merchant poster) (-0.13)。
 
-## 概述
+## 概要
 
 电商海报是商品推广的核心视觉载体，其质量直接影响用户的购买决策。然而，现有自动化评估工具主要面向通用美学或失真度量，缺乏对电商海报功能性、多维度质量标准的理解——尤其是中文文字的正确性与可读性。数据分析表明，文本维度在44.8%的弱项案例中成为瓶颈，且与总体质量的相关性最高（Pearson ρ=0.67），这使得低效的人工审查至今难以替代。
 
@@ -57,7 +57,7 @@ claims:
 
 本工作为电商海报的自动化细粒度评估提供了首个基准数据集和专用模型，但模型的无参考设计使其无法直接量化主体身份保真度，且在分布外生成数据上的泛化能力仍有待提升。
 
-## 背景与动机
+
 
 电商海报是连接商品与消费者的核心视觉媒介，其质量直接影响用户的点击意愿与购买决策。随着AIGC技术的爆发，商家和平台开始大规模采用生成式模型批量制作海报，这使得自动化质量评估成为刚需——人工审查不仅成本高昂，且难以在实时上架流程中规模化部署。然而，现有的自动化评估工具在这一场景中暴露出系统性缺陷。
 
@@ -71,7 +71,9 @@ claims:
 
 基于以上分析，本文的核心动机明确：**构建首个面向电商海报的多维度评估数据集E-comIQ-18k，并提供专家校准的思维链（CoT）理由，以此训练一个能够对齐人类专家细粒度判断的专用评估模型E-comIQ-M。** 该模型将电商海报质量解耦为对象、背景、文本、布局四个功能维度，并通过两阶段训练（监督微调SFT + 生成式重排序策略优化GRPO）学会在输出评分的同时给出可解释的诊断推理，从而填补自动化评估与人工审查之间的鸿沟。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈与动机
 
@@ -126,7 +128,7 @@ E-comIQ-M相对于现有baseline的核心创新可归纳为四个“changed slot
 3. **奖励函数**：从简单交叉熵损失升级为精度项+分布项的组合奖励，显式建模层级跨越惩罚与子评分向量几何约束；
 4. **输出粒度**：从单一美学评分升级为四维功能评分+总体评分，嵌入思维链自然语言解释。
 
-## 整体框架
+
 
 E-comIQ-ZH 的整体框架由三个紧密协同的模块构成：**数据集构建**、**评估模型训练**与**生成模型基准测试**。框架的核心设计逻辑是：先通过专家标注将电商海报质量解耦为四个功能维度，再借助思维链理由将专家判断显式化，最后用两阶段训练让多模态语言模型学会对齐这些细粒度标准。
 
@@ -164,7 +166,7 @@ $$R_{\mathrm{score}}(x, y) = \lambda_{\mathrm{score}} R_{\mathrm{acc}}(x, y) + (
 ![[assets/figures/papers/paper_list_l2738_https_arxiv_org_abs_2602_21698/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the E-comIQ-ZH framework. (a–c) E-comIQ-Dataset: multi-dimensional expert annotations with Chain-of-Thought rationales. (d–e) E-comIQ-M: two-stage training via Supervised Fine-Tuning (SFT) and Generative Reranking Policy Optimization (GRPO). (f) E-comIQ-Bench: evaluation of generative models on e-commerce image generation capabilities*
 
-## 核心模块与公式推导
+
 
 E-comIQ-M 的评估流程由三个核心模块构成：**视觉编码与多模态融合**、**思维链诊断生成**，以及**结构化评分输出**。模型以 Qwen-2.5-VL-7B-Instruct 为骨干，接收电商海报图像后，首先由视觉编码器提取特征并与语言模型进行多模态融合（Section 4.1, Appendix B.1）。随后，模型在 `<think>` 块中生成中文自然语言诊断，逐维度解释评分依据；最终在 `<answer>` 块中输出包含五个维度（Object, Background, Text, Layout, Overall）的 JSON 结构化评分（Appendix B.1, Fig. 13）。
 
@@ -197,7 +199,9 @@ $$R_{\mathrm{dist}}(x, y) = \exp\left(-\alpha \cdot \|\vec{v}_{\mathrm{pred}}(y)
 ![[assets/figures/papers/paper_list_l2738_https_arxiv_org_abs_2602_21698/figures/003_Figure_3.jpg]]
 *Figure 3: An illustration of our human-AI collaborative pipeline for generating diagnostic Chain-of-Thought (CoT) rationales*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 1. 数据集构建与统计特征
 
@@ -286,7 +290,9 @@ Table 5 系统分析了训练阶段和奖励函数设计的影响：
 ![[assets/figures/papers/paper_list_l2738_https_arxiv_org_abs_2602_21698/figures/001_Figure_1.jpg]]
 *Figure 1: Qualitative comparison of E-comIQ-M with leading MLLMs on a challenging e-commerce image. While other powerful models like Gemini 2.5 Pro [10] and Q-Insight [24] overlook critical flaws, our E-comIQ-M accurately identifies the subtle stroke-level corruption. This leads to a more human-aligned low score for the text dimension (1.0), demonstrating its superior finegrained diagnostic capabilities*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心思想与差异化定位
 
@@ -333,6 +339,8 @@ E-comIQ-M 的适用边界受以下因素约束：
 - **分布外鲁棒性增强**：针对 E-comIQ-Bench 上的低一致性（ρ≈0.34），是否需要引入生成式对抗样本、领域自适应训练或测试时校准策略？GRPO 的困难子集筛选策略（当前基于评分方差）是否可扩展为基于生成模型特性的主动采样？
 - **跨领域迁移**：当前四维评分框架（对象、背景、文本、布局）的维度定义在多大程度上可泛化至服装展示、房产渲染、食品摄影等垂直 AIGC 场景？各领域可能需要定制化的维度定义和相应的知识注入策略。
 - **动态内容扩展**：若将评估对象从单张图像扩展至视频或交互式内容，评分维度需如何重构？例如，视频海报可能需引入“时序一致性”和“动效质量”维度，标注协议和 CoT 生成流程也需相应调整。
+
+
 
 ## 原文 PDF
 

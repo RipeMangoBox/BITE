@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Difficult_Examples_Hurt_Unsupervised_Contrastive_Learning_A_Theoretical_Perspective.pdf
+project_link: null
+code_link: null
 openreview_forum_id: 5LMdnUdAoy
 aliases:
 - DACLFSRMTTSC
@@ -42,7 +44,7 @@ claims:
 > - CIFAR-100 上，Accuracy (%) 为 60.31 (SimCLR Removing)，对比 59.95 (SimCLR Baseline)，变化 +0.36。
 > - STL-10 上，Accuracy (%) 为 76.10 (SimCLR Removing)，对比 75.98 (SimCLR Baseline)，变化 +0.12。
 
-## 概述
+## 概要
 
 无监督对比学习中的**困难样本**（不同类别但相似度高的样本对）在预训练时容易被错误聚类，从而损害下游分类的泛化性能。本文从理论层面揭示了这一问题的本质机制，并提出了一个系统性的解决框架。
 
@@ -58,7 +60,7 @@ claims:
 
 **局限性**：理论分析依赖于谱对比损失与 InfoNCE 等价的假设，实验验证主要集中在小规模数据集，困难样本选择需引入额外超参数（posHigh, posLow），在极端噪声场景下效果可能受限。
 
-## 背景与动机
+
 
 无监督对比学习通过拉近正样本对、推远负样本对来学习表征，已成为自监督学习的核心范式之一。然而，现有方法通常平等对待所有样本对，忽视了样本对之间固有的难度差异。一个关键的现象是：**困难样本对**——即来自不同类别但特征相似度高的样本对——在预训练过程中容易被错误聚类，从而损害下游分类任务的泛化性能。
 
@@ -70,7 +72,9 @@ claims:
 
 综上，本文的动机源于一个明确的因果链条：困难样本对 → 错误聚类 → 误差界扩大 → 下游性能下降。基于这一认知，作者提出了一个完整的困难感知对比学习框架，包含困难样本选择、样本移除、边际调整和温度缩放等模块，旨在从理论和实践两个层面系统解决困难样本的负面影响。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作的核心创新在于**首次从理论层面揭示了困难样本（高相似度的异类样本对）对无监督对比学习的损害机制**，并基于相似图建模提出了一套统一的困难样本感知对比学习框架。该框架包含三个可独立使用亦可组合的“因果旋钮”：困难样本移除、边际调整和温度缩放，其理论有效性均通过线性探测误差界的严格推导得到保证。
 
@@ -133,7 +137,7 @@ $$p_{i,j} := \mathbf{1}_{[Sim_{posLow} \leq s_{ij} < Sim_{posHigh}]}$$
 
 将边际调整和温度缩放与选择机制整合的组合损失（Eq. 16）在多个数据集上取得一致且显著的提升：TinyImagenet 上较 SimCLR 基线提升 +10.42%（Table 4），在长尾数据集 TinyImagenet-LT 上提升 +4.28%（Table 6）。该方法不仅适用于 SimCLR，也可无缝集成到 MoCo 框架中（Table 5），展现出良好的跨架构泛化性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l39_https_openreview_net_forum_id_5LMdnUdAoy/figures/006_Figure_3.jpg]]
 *Figure 3: Modeling of difficult examples. The similarity between same-class samples is α (a), the similarity between different-class difficult samples is $\gamma \left( \mathrm { c } \right$) , and the similarity between other samples is $\beta \left( \mathbf { b } \right$) . The adjacency matrix of a 4-sample subset is shown in (d)
@@ -226,7 +230,7 @@ $$p_{i,j} := \mathbf{1}_{[Sim_{posLow} \leq s_{ij} < Sim_{posHigh}]}$$
 
 > **注意**：理论分析依赖于谱对比损失与 InfoNCE 等价的假设，以及标签可从增强中恢复的假设。实验验证主要在小规模数据集上进行，大规模场景下的效果尚需更多证据。
 
-## 核心模块与公式推导
+
 
 ### 3.1 理论建模：相似图与误差界
 
@@ -338,7 +342,9 @@ $$
 
 **超参数设置**：边际因子 $\sigma = 0.1$ 在 CIFAR-100 上取得最佳性能（Figure 5(a)）；温度缩放因子 $\rho = 0.7$ 在 CIFAR-100 上取得最佳性能（Figure 5(b)），且显著优于极大温度（等同于丢弃困难样本）和基础温度（Table 9）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：困难样本的系统性损害与修复
 
@@ -417,7 +423,9 @@ $$
 ![[assets/figures/papers/paper_list_l39_https_openreview_net_forum_id_5LMdnUdAoy/figures/002_Figure_1.jpg]]
 *Figure 1: (mixed) difficult examples improves performance*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 理论基座：谱对比损失与矩阵分解的等价性
 
@@ -479,6 +487,8 @@ $$\mathcal { L } _ { \mathrm { m f } } ( F ) : = \| \bar { \pmb { A } } - F \bol
 3. **超参数的自适应机制**：当前 $posHigh$ 和 $posLow$ 作为固定百分位数超参数，在跨数据集和跨任务迁移时需要手动调节。开发基于数据统计特性或训练动态的自适应选择机制是一个有价值的方向。
 
 4. **困难样本影响的更细粒度刻画**：当前理论将困难样本的影响统一建模为 $\gamma - \beta$ 的差异，但不同困难样本对下游任务的损害程度可能存在异质性。如何识别和处理“最有危害”的困难样本子集，值得进一步研究。
+
+
 
 ## 原文 PDF
 

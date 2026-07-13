@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/CameraCtrl_II_Dynamic_Scene_Exploration_with_Camera_controlled_Video_Diffusion_Models.pdf
+project_link: https://hehao13.github.io/Projects-CameraCtrl-II/
+code_link: https://github.com/
 aliases:
 - CI
 - CIDSECCVDM
@@ -41,7 +43,7 @@ claims:
 > - Camera-controlled I2V Generation (Mixed Test Set) 上，FVD↓ 73.11 vs 199.53 (CameraCtrl) (-126.42)；Motion strength↑ 698.51 vs 133.37 (CameraCtrl) (+565.14)；TransErr↓ 0.1527 vs 0.2812 (CameraCtrl) (-0.1285)。
 > - Camera-controlled T2V Generation (Mixed Test Set) 上，FVD↓ 641.23 vs 987.34 (AC3D) (-346.11)；TransErr↓ 0.1892 vs 0.2976 (AC3D) (-0.1084)。
 
-## 概述
+## 概要
 
 现有相机控制视频生成方法在赋予用户自由控制虚拟摄像机轨迹的能力方面取得了显著进展，但其核心瓶颈在于：一旦引入相机控制信号，预训练视频扩散模型原本具备的动态内容生成能力——尤其是前景物体的自然运动——会出现大幅退化。同时，这些方法通常只能生成固定长度的短视频片段，无法基于先前已生成的内容与用户实时指定的新相机轨迹进行连续的场景探索，严重限制了可探索的空间范围与场景类型的多样性。
 
@@ -57,7 +59,7 @@ claims:
 
 本方法也存在已知局限：当相机运动路径与场景几何（如栅栏等遮挡物）发生冲突时，模型因缺乏物理感知能力，可能产生穿模或结构破损等反物理结果；复杂相机轨迹下的整体几何一致性仍有提升空间；模型蒸馏虽大幅加速推理，但会引入相机控制精度的损失，质量-速度的平衡问题尚未完全解决。
 
-## 背景与动机
+
 
 ### 问题背景：相机可控视频生成的兴起与瓶颈
 
@@ -83,7 +85,9 @@ claims:
 
 为实现这一目标，本文从三个维度进行系统性突破：（1）构建首个大规模动态视频相机轨迹数据集REALCAM，为模型提供动态场景下的相机-像素对应监督；（2）设计轻量级相机注入机制，仅在扩散模型初始层引入相机信号，最大限度保留预训练模型的动态生成先验；（3）提出基于干净前序片段条件的自回归扩展方法，实现多片段间的外观一致性。这三个设计共同构成了从数据、模型到推理的完整解决方案，使得相机可控视频生成首次能够处理真实世界中的动态场景。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CAMERACTRL II 的核心创新在于系统性地解耦了**相机控制精度**与**动态内容保真度**之间的固有冲突。现有相机控制视频生成方法（如 **CameraCtrl** (He et al., arXiv 2024)、**MotionCtrl** (Wang et al., SIGGRAPH 2024)）在注入相机参数后，前景物体的运动强度会急剧衰减，且仅能生成固定长度的短视频片段。CAMERACTRL II 通过以下三个关键设计突破这一瓶颈：
 
@@ -126,7 +130,7 @@ Table 5 的消融实验提供了关键对比：采用干净条件帧（Clean Con
 
 这些创新共同构成了一个完整的解决方案：轻量级注入保留了预训练模型的动态生成能力，REALCAM 数据集提供了动态场景下的相机控制学习信号，而干净历史条件的自回归扩展则打通了多片段连续探索的技术链路。
 
-## 整体框架
+
 
 CAMERACTRL II 的核心目标是实现**相机可控的动态场景视频生成与连续探索**。其整体 pipeline 可抽象为三个相互衔接的阶段：数据基础构建、单片段相机控制生成、多片段自回归扩展。
 
@@ -160,7 +164,7 @@ CAMERACTRL II 的核心目标是实现**相机可控的动态场景视频生成�
 
 整个框架围绕一个核心洞察展开：**将相机控制信号仅叠加在扩散模型的初始层，可避免对生成过程的过度约束，从而完整保留预训练模型的动态生成能力**。这一设计在架构层面体现为轻量级注入（仅初始层 patchify + element-wise addition），在数据层面体现为动态视频标注的必要性（静态数据导致运动强度从 306.99 骤降至 129.40），在扩展层面体现为干净条件帧策略（外观一致性 0.8654 vs 加噪策略的 0.8032）。
 
-## 核心模块与公式推导
+
 
 ### 3.1 基础扩散框架
 
@@ -209,7 +213,9 @@ $$\hat{\epsilon}_{\theta}(z_{t}, c, s, t) = \epsilon_{\theta}(z_{t}, \phi_{text}
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2503_10592/figures/003_Figure_3.jpg]]
 *Figure 3: Model architecture of CAMERACTRL II. (a) Given a pretrained video diffusion model, CAMERACTRL II adds an extra camera patchify layer at the initial of the model. It takes the Plucker embedding as input, outputs camera features with the same shape of the visual ¨ features. Both features are element-wisely added before the first DiT layer. (b) Features belonging to the previous video clip are kept clean, while current features are noised. After concatenation, features are sent to a camera control DiT; we only compute the loss of the current clip’s tokens. We omit the text encoder for both figures, and the camera features for the second figure*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -267,7 +273,9 @@ CAMERACTRL II 的主要失败模式出现在相机运动路径与场景几何发
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2503_10592/figures/012_Figure_7.jpg]]
 *Figure 7: Failure case visualization. A fence is on the intended camera trajectory. CAMERACTRL II strictly follows the trajectory and generate a video where the structure of the fence is damaged, which is anti-reality*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -306,6 +314,8 @@ $$\hat{\epsilon}_{\theta}(z_{t}, c, s, t) = \epsilon_{\theta}(z_{t}, \phi_{text}
 3. **蒸馏质量保持**：APT 一步蒸馏带来的控制精度损失是否可通过更大的蒸馏 batch size、更多的计算资源或改进的蒸馏损失函数来缓解？这指向一个更一般的问题——如何在少步采样框架下保持条件生成的质量。
 
 4. **SfM 依赖的鲁棒性**：REALCAM 的标注质量受限于 VGGSfM 的性能上限。对于动态前景占比高、运动模糊严重或纹理稀疏的视频，是否需要引入额外的深度传感器数据或自监督深度估计作为补充监督信号？
+
+
 
 ## 原文 PDF
 

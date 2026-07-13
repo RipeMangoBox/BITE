@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/UALM_Unified_Audio_Language_Model_for_Understanding_Generation_and_Reasoning.pdf
+project_link: https://research.nvidia.com/labs/adlr/UALM
+code_link: https://github.com/NVIDIA/audio-intelligence/tree/main/UALM
 openreview_forum_id: TsdlOjcQNu
 aliases:
 - UUALM
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | UALM：面向理解、生成和推理的统一音频语言模型 |
 | 英文题名 | UALM: Unified Audio Language Model for Understanding, Generation and Reasoning |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=TsdlOjcQNu); [GitHub](https://github.com/NVIDIA/audio-intelligence/tree/main/UALM); [Project](https://research.nvidia.com/labs/adlr/UALM) |
+| Links | [paper](https://openreview.net/forum?id=TsdlOjcQNu) · [GitHub](https://github.com/NVIDIA/audio-intelligence/tree/main/UALM) · [Project](https://research.nvidia.com/labs/adlr/UALM) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/generative_models_and_autoencoders |
 | Method | UALM (Unified Audio Language Model) |
 | Dataset | AudioCaps, SongDescriber, MMAU-v0.5.15.25 |
@@ -42,7 +44,7 @@ claims:
 > - SongDescriber 上，OVL↑ 为 4.07 (UALM-Gen)，对比 3.91 (MusicGen-stereo-L)，变化 +0.16。
 > - AudioCaps 上，CL↑ 为 0.65 (UALM-Gen)，对比 0.54 (ETTA)，变化 +0.11。
 
-## 概述
+## 概要
 
 现有音频语言模型面临一个根本性瓶颈：理解与生成任务通常由独立模型分别处理，且自回归语言模型在音频生成质量上长期落后于扩散模型。更重要的是，这些模型普遍缺乏在生成任务上的多模态推理能力，无法像人类一样实现理解、生成与推理的统一。
 
@@ -54,7 +56,7 @@ UALM（Unified Audio Language Model）通过三条关键路径突破上述瓶颈
 
 值得注意的局限性包括：评估主要覆盖英文音频场景，推理能力缺乏大规模客观基准，7B模型规模和30M训练数据带来的部署成本较高。
 
-## 背景与动机
+
 
 ### 音频智能的碎片化现状
 
@@ -80,7 +82,9 @@ UALM 的核心动机是打破上述壁垒，证明一个单一的自回归语言
 
 UALM 的设计正是围绕这三个问题展开，其架构以 Qwen2.5-7B 作为主干，通过声学编码器、MLP 适配器和音频码本实现音频与文本的统一序列建模，并在后训练阶段引入推理能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 UALM 的核心创新在于通过三个关键机制，首次在单一自回归语言模型中实现了音频理解、生成与推理的统一，并打破了此前“语言模型在音频生成上落后于扩散模型”的瓶颈。
 
@@ -119,7 +123,7 @@ $$\mathcal{L}_{\mathrm{VAE}} = \mathcal{L}_{\mathrm{stereoMRSTFT}} + \mathcal{L}
 
 **创新总结**：UALM 的核心突破在于证明了自回归语言模型在音频生成上的瓶颈并非架构固有缺陷，而是数据规模、推理时引导策略和偏好对齐不足所致。通过 CFG + DPO + 数据缩放的三位一体策略，以及模态对齐和 CoT 推理的训练范式创新，UALM 首次在单一模型中实现了与扩散模型竞争甚至超越的音频生成质量，同时保持了强理解能力和文本推理能力。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l39_https_openreview_net_forum_id_TsdlOjcQNu/figures/002_Figure_2.jpg]]
 *Figure 2: UALM architecture overview and the multimodal pre-training data blending ratios*
@@ -134,7 +138,7 @@ UALM 以预训练纯文本解码器大语言模型 Qwen2.5-7B 为骨干，通过
 
 **关键设计决策**：音频生成阶段移除了传统 LM 方法中依赖的外部文本编码器，直接利用 LLM 内置 BPE 分词器处理文本提示；推理时采用分类器自由引导以增强指令遵循；并通过直接偏好优化对齐人类偏好。数据方面，音频生成预训练使用了 30M 样本（约 80k 小时），远超典型扩散模型的训练规模，是 LM 方法达到竞争性能的关键因素。
 
-## 核心模块与公式推导
+
 
 UALM 的核心由三个功能模块构成：音频生成模块（UALM-Gen）、模态对齐阶段，以及多模态推理后训练模块（UALM-Reason）。以下分别阐述其关键机制与支撑公式。
 
@@ -178,7 +182,9 @@ UALM-Reason 在基模型之上引入多模态链式思维（CoT）范式，使�
 
 该阶段通过监督微调实现，不引入额外公式，但其有效性在主观评估中得到验证：Enrichment 从 3.77 升至 4.01，Self-reflection 从 3.82 升至 4.04（Table 4）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 音频生成：自回归语言模型匹敌扩散模型
 
@@ -251,7 +257,9 @@ UALM-Reason 在推理导向生成上的主观评估结果（**Table 4**）验证
 ![[assets/figures/papers/paper_list_l39_https_openreview_net_forum_id_TsdlOjcQNu/figures/018_Table_7.jpg]]
 *Table 7: Inference Configuration*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -301,6 +309,8 @@ UALM 的几项关键设计选择直接对应了其性能突破的因果链条：
 4. **推理链中自反思的忠实性。** 在多模态推理中，模型对自身生成音频的批评和反思是否真正基于音频内容，还是仅依赖文本先验进行表面推理？是否可以将外部验证信号（如客观音频质量指标）引入循环以增强忠实性？
 
 5. **跨模态扩展的可能性。** 该统一框架是否可以扩展到其他音频相关模态（如音乐简谱、环境声事件标签、语音情感标注）的生成与推理？这需要重新审视模态对齐策略和训练数据混合比例的通用性。
+
+
 
 ## 原文 PDF
 

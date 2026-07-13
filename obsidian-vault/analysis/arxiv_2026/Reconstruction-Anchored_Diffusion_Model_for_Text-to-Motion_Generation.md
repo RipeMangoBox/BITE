@@ -46,7 +46,7 @@ claims:
 > - HumanML3D 上，FID 0.032 vs 0.116 (T2M-GPT) (-0.084)；R-Precision Top1 0.561 vs 0.491 (T2M-GPT) (+0.070)；MMDist 2.716 vs 3.118 (T2M-GPT) (-0.402)。
 > - KIT-ML 上，FID 0.172 vs 0.512 (T2M-GPT) (-0.340)；R-Precision Top1 0.464 vs 0.416 (T2M-GPT) (+0.048)；MMDist 2.653 vs 3.007 (T2M-GPT) (-0.354)。
 
-## 概述
+## 概要
 
 文本到运动生成的核心瓶颈在于：预训练的文本编码器缺乏运动特定的语义信息，导致文本嵌入与运动空间之间存在显著的表示差距；同时，扩散模型在迭代去噪过程中会产生误差累积，使生成的运动偏离真实数据流形。针对这一问题，本文提出**重建锚定扩散模型（Reconstruction-Anchored Diffusion Model, RAM）**，通过构建运动重建分支来学习一个运动中心潜在空间，并以此作为中间监督，将文本嵌入映射到该空间中。在推理阶段，RAM利用当前预测与上一步运动重建之间的残差作为负参考，引导采样远离错误区域，从而同时提升运动质量与语义对齐。
 
@@ -54,7 +54,7 @@ RAM在HumanML3D和KIT-ML两个基准数据集上取得了领先性能。在Human
 
 **方法定位**：RAM属于基于扩散的文本到运动生成方法，与MDM共享扩散解码器架构，但通过双流训练范式引入了运动潜在空间学习。相较于Salad（Hong et al., CVPR 2025）等潜在扩散方法，RAM的核心差异在于以运动重建为锚点，在训练和推理两端均利用运动潜在空间进行约束与引导。
 
-## 背景与动机
+
 
 文本到运动生成（Text-to-Motion Generation）旨在根据自然语言描述合成逼真的三维人体运动序列，在虚拟人、影视动画和人机交互等领域具有重要应用价值。该任务的核心挑战在于建立文本语义与人体运动之间的精确映射，这要求模型同时理解语言的抽象语义和运动的高维时空结构。
 
@@ -65,7 +65,9 @@ RAM在HumanML3D和KIT-ML两个基准数据集上取得了领先性能。在Human
 
 **本文动机。** 针对上述瓶颈，本文提出核心洞察：通过引入运动重建作为中间监督，将文本嵌入映射到以运动为中心（motion-centric）的潜在空间，并利用当前预测与上一步重建估计之间的残差作为负参考，引导采样过程远离错误区域。这一思路从两个层面同时解决问题——训练阶段通过学习运动潜在空间来弥合表示差距，推理阶段通过重建误差引导（Reconstructive Error Guidance, REG）来抑制误差传播。基于此，本文设计了**重建锚定扩散模型（Reconstruction-Anchored Diffusion Model, RAM）**，以统一的框架同时提升运动生成的真实感和语义对齐精度。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 RAM 的核心创新在于将**运动重建**作为中间监督锚点，系统性地解决文本到运动扩散模型中两个相互交织的瓶颈：预训练文本编码器缺乏运动特定信息导致的表示差距，以及扩散去噪过程中的误差传播。与现有方法直接依赖文本条件生成不同，RAM 通过以下四个相互协同的 **changed slots** 构建了完整的解决方案。
 
@@ -107,7 +109,7 @@ Table 5 的消融揭示了 CFG 与 REG 的功能分工：CFG 主要提升语义�
 
 四个 changed slots 形成递进式的协同体系：运动重构分支建立运动中心潜在空间（基础层），自正则化增强该空间的语义结构（优化层），运动中心对齐将文本映射到该空间（桥接层），REG 在推理时利用重建作为负参考抑制误差（推理层）。这一完整链条使得 RAM 在 HumanML3D 上取得 FID 0.032、R-Precision Top-1 56.1% 的最优性能，分别超越此前最佳的扩散方法 MDM（Tevet et al., arXiv 2022）和 VQ-VAE 方法 T2M-GPT（Zhang et al., CVPR 2023）。
 
-## 整体框架
+
 
 RAM 采用**双流训练架构**，由运动重建分支和文本驱动生成分支构成，二者共享一个基于 MDM 的运动扩散解码器。其核心设计理念是：在训练阶段学习一个运动中心的潜在空间，使文本嵌入能够准确映射到该空间；在推理阶段，利用重建误差引导（REG）抑制扩散去噪过程中的误差传播。
 
@@ -151,7 +153,7 @@ $$\hat{x}_{t,s} = D(x_t, t, z_t) + w_1 (D(x_t, t, z_t) - D(x_t, t, z_{m,t+1})) +
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2601_14788/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of RAM. During training, RAM learns a motion latent space through motion reconstruction, with self-regularization to encourage better separability between motion latents, resulting in improved semantic resolution. The text latents from the text encoder are drawn closer to corresponding motion latents through motion-centric latent alignment. At each inference step, given the last step prediction*
 
-## 核心模块与公式推导
+
 
 RAM 的核心架构由双流管道、两个关键训练目标和一种推理时引导策略构成，共同解决文本到运动生成中的表示差距与误差传播问题。
 
@@ -204,7 +206,9 @@ $$\hat{x}_{t,s} = D(x_t, t, z_t) + w_1 (D(x_t, t, z_t) - D(x_t, t, z_{m,t+1})) +
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2601_14788/figures/001_Figure_1.jpg]]
 *Figure 1: At inference time, RAM first maps a textual description onto a motion-centric latent manifold and then predicts using a diffusion model. Meanwhile, it reconstructs previous estimates that contain error patterns. By contrasting these predictions, RAM uses the reconstruction as a negative reference to drive the output away from poor estimates and towards the real data manifold. Best viewed in color*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -268,7 +272,9 @@ Figure 4 的用户调研以运动质量和语义对齐两个维度进行综合�
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2601_14788/figures/011_Table_9.jpg]]
 *Table 9: Effect of encoder latent dimension*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 在文本-运动生成谱系中的位置
 
@@ -311,6 +317,8 @@ $$\hat{x}_{t,s} = D(x_t, t, z_t) + w ( D(x_t, t, z_t) - D(x_t, t, z_{m,t+1}) )$$
 3. **多模态扩展**：运动中心潜在对齐的设计假设文本和运动共享一个以运动为主导的潜在流形。对于音乐-舞蹈生成或语音-手势生成等其他跨模态运动任务，这种非对称对齐策略是否同样有效？
 
 4. **长序列生成**：当前架构的transformer编码器-解码器受限于注意力机制的二次复杂度。对于分钟级运动序列，运动潜在空间的压缩能力（Table 9显示$d_E=128$仍保持竞争力）是否足以支持高效的长程生成？
+
+
 
 ## 原文 PDF
 

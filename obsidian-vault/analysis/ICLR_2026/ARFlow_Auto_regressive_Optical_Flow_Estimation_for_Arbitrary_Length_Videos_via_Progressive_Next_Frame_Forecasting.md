@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/ARFlow_Auto_regressive_Optical_Flow_Estimation_for_Arbitrary_Length_Videos_via_Progressive_Next_Frame_Forecasting.pdf
+project_link: null
+code_link: null
 aliases:
 - ARFlow
 tags:
@@ -39,17 +41,19 @@ claims:
 > - MPI-Sintel (Final) 上，EPE (All) 为 1.78，对比 1.91 (MEMFOF)，变化 -0.13。
 > - KITTI-2015 上，Fl (All) 为 2.85，对比 2.94 (MEMFOF)，变化 -0.09。
 
-## 概述
+## 概要
 
 ARFlow（Auto-regressive Optical Flow Estimation for Arbitrary-Length Videos via Progressive Next-Frame Forecasting）提出了一种全新的自回归多帧光流估计范式。与现有基于固定分组（group-wise）的多帧光流方法不同，ARFlow将光流估计建模为逐帧的自回归下一帧预测问题，通过记忆库存储历史光流序列，并利用多步长（stride 1, 2, 4）时间Transformer预测下一帧初始光流，再通过GRU迭代细化，实现任意长度视频的恒定内存（约2.1GB）处理。该方法在KITTI-2015和Spring官方基准上排名第一，在MPI-Sintel (Final)基准上排名第二（所有开源方法中），并可作为通用插件提升现有光流方法的性能。
 
-## 背景与动机
+
 
 **现有瓶颈**：现有基于分组的多帧光流方法（如MemFlow、StreamFlow）受限于固定的短时时间感受野（3-5帧），且分组间信息交换不足，导致性能提升有限。同时，这些方法随着视频长度增加，计算和内存开销显著增长，无法扩展到任意长度视频。
 
 **核心洞察**：将光流估计建模为自回归的下一帧预测问题，利用历史光流序列的时序一致性，通过多步长时间建模同时捕获长程和短程运动，从而突破固定分组限制，实现线性时间复杂度和恒定空间复杂度的可扩展多帧光流估计。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ARFlow的核心创新在于引入自回归预测范式，具体包括以下关键设计：
 
@@ -57,7 +61,7 @@ ARFlow的核心创新在于引入自回归预测范式，具体包括以下关�
 - **自回归多步长流细化模块（AMFR）**：通过步长2和4的级联Transformer生成多步长预测流，并与GRU输出进行可学习加权融合，同时捕获长程和短程运动信息。
 - **片段式训练策略（Clip-wise Training）**：将整个视频片段作为输入，保持时序连续性，而非传统批次训练中打乱时间戳的做法。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_iJ7cyttpVj_ARFlow_Auto-reg/figures/001_Figure_1.jpg]]
 *Figure 1: (B) Sequence-to-sequence multi-frame pipeline*
@@ -71,7 +75,7 @@ ARFlow的整体架构如Figure 3所示，包含以下主要组件：
 5. **自回归多步长流细化模块（AMFR）**：通过步长2和4的级联Transformer生成多步长预测流，并与GRU输出加权融合。
 6. **凸上采样器（Convex Upsampler）**：将1/16分辨率的流上采样到原始分辨率。
 
-## 核心模块与公式推导
+
 
 ### 5.1 自回归下一帧预测
 
@@ -127,7 +131,9 @@ $$\ell_{\mathrm{mixlap}}(y; \alpha, \beta, \mu) = -\log\left[ \frac{\alpha}{2} e
 
 $$\mathcal{L}_{\mathrm{MoL}} = \frac{1}{2HW} \sum_{h=1}^H \sum_{w=1}^W \sum_{d \in \{x,y\}} \ell_{\mathrm{mixlap}}( y_{h,w}^{(d)}; \alpha_{h,w}, \beta_{h,w}, \mu_{h,w}^{(d)} )$$
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 6.1 主要结果
 
@@ -234,7 +240,9 @@ ARFlow作为通用插件，在SEA-RAFT上集成后，在Sintel Final和KITTI-201
 - ARFlow在Spring基准上的非刚性区域（non-rigid）1px指标为17.108，远高于刚性区域（rigid）的1.436，对非刚性运动的处理能力有限。
 - ARFlow在Sintel上的大位移区域（s40+）EPE为10.749，远高于小位移区域（s0-10）的0.312，大位移估计仍是难点。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ARFlow属于多帧光流估计方法，其方法谱系定位如下：
 
@@ -246,6 +254,8 @@ ARFlow属于多帧光流估计方法，其方法谱系定位如下：
 - **兼容性评估基线**：SEA-RAFT (Wang et al., 2024b) — 使用混合拉普拉斯损失的光流方法。
 
 ARFlow的核心贡献在于将光流估计从固定分组范式转变为自回归预测范式，通过多步长时间建模同时捕获长程和短程运动，实现任意长度视频的恒定内存处理。该方法在多个基准上达到最先进性能，并可作为通用插件提升现有光流方法的性能。
+
+
 
 ## 原文 PDF
 

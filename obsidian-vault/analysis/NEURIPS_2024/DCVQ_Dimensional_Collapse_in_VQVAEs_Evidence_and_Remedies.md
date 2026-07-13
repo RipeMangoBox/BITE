@@ -41,7 +41,7 @@ claims:
 > - CIFAR-10 / CelebA (CNN & ViT, f=16) 上，Validation Loss DCVQ (多种N和d_s配置) vs Vanilla VQVAE (单码本) (DCVQ在显著更高的有效维度下取得更低的验证损失（见图9中点的位置）)。
 > - ImageNet-256 上，rFID DCVQ-8d (N=16,32) vs RQVAE (当N>16时，DCVQ-8d的rFID低于RQVAE，且有效维度更高)。
 
-## 概述
+## 概要
 
 **问题**：向量量化变分自编码器（VQVAE）及其变体（如 VQGAN、RQVAE）普遍存在**维度塌缩**（dimensional collapse）现象——尽管码本嵌入的背景维度可以高达 256 或更高，码本实际利用的有效维度通常仅 4–10 维（以 PCA 解释 99% 方差所需的主成分数度量）。这一塌缩严重限制了模型的表达能力和重建质量。
 
@@ -59,7 +59,7 @@ claims:
 
 **局限与开放问题**：工作以实证为主，尚未提供维度塌缩的理论解释；验证限于图像域，能否推广至视频、蛋白质等其他模态有待探索；更优的子空间划分策略仍为开放问题。
 
-## 背景与动机
+
 
 ### VQVAE的基本范式与隐忧
 
@@ -95,7 +95,9 @@ $$\mathrm{Effective Dim} = \min \left\{ d' : \sum_{j=1}^{d'} \lambda_{j} > 0.99 
 
 上述发现指向一个核心洞察：**VQVAE的维度偏好是结构性的，而非偶然的训练产物**。直接对抗这一偏好（如秩正则化）已被证明无效。因此，本文提出一种根本性的策略转变——不再试图让模型适应高维空间，而是将高容量需求分解为多个低维子空间，在尊重维度偏好的前提下突破瓶颈。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DCVQ（Divide-and-Conquer Vector Quantization）的核心创新在于对VQVAE量化方式的根本性重构。该方法并非引入新的损失项或正则化策略，而是通过一个简单的架构修改来规避量化过程固有的维度收缩偏差。
 
@@ -137,7 +139,7 @@ DCVQ的有效性源于它**顺应而非对抗**量化过程的维度偏好。每
 
 计算开销方面，DCVQ的额外成本几乎可忽略：在总潜在维度匹配的条件下，其训练时间与标准VQVAE基本相同（Table 10），因为量化操作的计算量与总维度呈线性关系，与是否分割无关。
 
-## 整体框架
+
 
 DCVQ 在标准 VQVAE 的编码器-量化器-解码器流水线中，仅对量化环节做最小化结构改动，将原本的单一高维最近邻量化替换为“分而治之”的多子空间独立量化，其余模块完全继承 VQVAE 的设计。
 
@@ -185,7 +187,7 @@ Figure 8 展示了这一分而治之的完整架构，Table 10 的消融实验�
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_pdf_fb28260ec5d8908f6f5be933299eb238f451d98d_pdf/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of dimensional collapse in VQVAEs. (a) Codebook entries lie in a lowdimensional subspace despite being in a high-dimensional embedding space. (b) Validation loss follows a U-shaped curve as a function of effective dimension, with the optimum at a low dimension*
 
-## 核心模块与公式推导
+
 
 ### 问题建模：VQVAE 的量化与训练
 
@@ -239,7 +241,9 @@ $$\hat{z} = [\hat{z}^{1}, \hat{z}^{2}, \dots, \hat{z}^{N}] \in \bigoplus_{i=1}^{
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_pdf_fb28260ec5d8908f6f5be933299eb238f451d98d_pdf/figures/007_Figure_6.jpg]]
 *Figure 6: Evolution of effective dimensionality over training steps for different background dimensions (d = 64, 128, 256). Top row: effective dimensionality of the codebook embeddings*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 维度塌缩的实证证据
 
@@ -299,7 +303,9 @@ DCVQ在CIFAR-10和CelebA上与标准VQVAE的对比（Figure 9）显示：DCVQ在
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_pdf_fb28260ec5d8908f6f5be933299eb238f451d98d_pdf/figures/004_Table_1.jpg]]
 *Table 1: Summary of hyperparameters explored in the large-scale controlled study*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：VQVAE的维度塌缩困境
 
@@ -333,6 +339,8 @@ DCVQ的核心贡献在于首次系统性地揭示并解决了VQVAE中普遍存�
 2. **跨模态推广**：DCVQ的分而治之策略是否适用于视频生成（时间维度的分割）、蛋白质设计（结构维度的分割）等场景？
 3. **子空间优化**：是否存在自适应的子空间维度选择策略，或基于数据特性的非均匀划分方式？
 4. **与生成质量的关联**：当前主要评估重建质量（rFID），DCVQ对下游生成任务（如自回归建模、条件生成）的影响需要进一步探索。
+
+
 
 ## 原文 PDF
 

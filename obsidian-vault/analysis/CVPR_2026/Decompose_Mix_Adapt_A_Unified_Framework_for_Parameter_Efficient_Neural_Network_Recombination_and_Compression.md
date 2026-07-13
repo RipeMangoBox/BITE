@@ -44,7 +44,7 @@ claims:
 > - ViT-B/16 50% compression on 6 fine-grained benchmarks 上，Average Accuracy (Compressed Only) 83.3 vs 81.9 (DGMR) (+1.4%)。
 > - ViT-B/16 50% compression + PEFT on 6 benchmarks 上，Average Accuracy (Compressed + PEFT) 88.8 vs 87.9 (DGMR+SSF) (+0.9%)。
 
-## 概述
+## 概要
 
 现有参数重组（Parameter Recombination, PR）方法通常将模型压缩（MC）与参数高效微调（PEFT）视为两个独立问题，分别设计专用技术，缺乏统一框架来动态平衡两者的参数预算。例如，**RECAST**（Tasnim & Plummer, ICLR 2025）虽同时支持MC和PEFT，但其混合系数被限制为向量形式，严重制约了表达力，导致在更大参数预算下性能饱和。
 
@@ -63,7 +63,7 @@ CRISP（Coefficient-gated weight Recombination by Interpolated Shared basis Proj
 
 当前方法已在ViT和LLaMA架构上验证，尚未扩展到CNN或大视觉语言模型等更广泛架构，超参数 r 和 s 仍需手动设置，缺乏自动化选择机制。代码已开源：https://github.com/appledora/CRISP-CVPR26。
 
-## 背景与动机
+
 
 ### 参数重组的两难困境
 
@@ -88,7 +88,9 @@ CRISP的出发点在于一个关键洞察：如果能将预训练权重分解为
 
 两者共享同一因子化结构，无需额外的适配器模块。这种统一设计使得参数预算可以在压缩与适应之间无缝流动，从根本上解决了现有方法“分而治之”带来的效率损失。CRISP通过引入**可配置列维度 $s$ 的混合矩阵**和**sigmoid门控机制**，突破了RECAST的向量约束瓶颈，为统一PR框架建立了新的容量-效率控制维度。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 1. 从向量到矩阵：混合系数维度的根本性扩展
 
@@ -119,7 +121,7 @@ $$\mathcal{T}_{\mathrm{CRISP}}(B_i'^r, A_i'^{rs}) = B_i'^r \left( \sigma(A_i'^{r
 
 这一设计与现有方法形成根本差异：此前的工作要么专注于PEFT（如**LoRA**、**SSF**、**DoRA**），要么专注于MC（如**Basis Sharing**、**DGMR**），即便RECAST声称同时支持两者，也因向量混合系数的表达力限制而无法在压缩后保持足够的微调潜力。CRISP的矩阵门控设计使得压缩后的模型仍保留丰富的可调自由度，这直接体现在**压缩+PEFT联合场景**中——CRISP在ViT-B/16 50%压缩设定下以88.8%的平均准确率超越最佳剪枝+PEFT组合（DGMR+SSF的87.9%）约1个百分点，验证了“压缩质量直接约束下游任务适应性”的核心论断。
 
-## 整体框架
+
 
 CRISP 围绕一个统一的因子化结构构建，该结构将预训练权重矩阵分解为**冻结的共享基矩阵（Basis Matrices）**和**可学习的门控混合矩阵（Gated Mixer Matrices）**，使模型压缩（MC）和参数高效微调（PEFT）得以在同一框架内共存，无需额外的冗余适配器。
 
@@ -164,7 +166,7 @@ $$\mathcal{L}_{\mathrm{mimicry}} = \sum_{i=1}^{N} \ell_{\mathrm{smL1}} \left( \m
 
 这一设计使得调整基矩阵的共享模式和大小即可控制压缩程度，而冻结基矩阵并更新混合矩阵即可实现微调，两者共享同一套参数化基础设施，从根本上消除了 MC 与 PEFT 之间的方法割裂。
 
-## 核心模块与公式推导
+
 
 CRISP的核心思想是将预训练权重矩阵分解为**冻结的共享基矩阵（Factorized Basis Matrices）**与**可学习的门控混合矩阵（Gated Mixer Matrices）**，通过参数化变换在同一因子化结构中统一支持模型压缩（MC）和参数高效微调（PEFT）。以下从公式推导出发，逐模块解析其设计逻辑。
 
@@ -241,7 +243,9 @@ CRISP通过同一因子化结构实现两种应用模式：
 
 对于LLaMA等大语言模型，CRISP设计了无需训练数据的基向量压缩算法（Algorithm 5）：通过重要性加权的k-means聚类对基向量进行分组，再以方差感知的方式合并聚类中心，在30%参数削减下平均准确率38.0%，较先前最优方法PruneNet提升3.1个百分点。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -315,7 +319,9 @@ Table 5显示，在匹配可训练参数预算（约150K-240K）下，CRISP的�
 ![[assets/figures/papers/paper_list_l854_https_arxiv_org_abs_2603_27383/figures/015_Figure_8.jpg]]
 *Figure 8: Robustness to initialization methods. We evaluate four standard initialization schemes (Uniform, Kaiming, Xavier, Orthogonal) for the mixer matrices A′rs during both neural mimicry retrofitting and subsequent task adaptation*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 参数重组（PR）方法的演进脉络
 
@@ -372,6 +378,8 @@ CRISP 的核心洞察在于：**通过将预训练权重分解为冻结的共享
 3. **持续学习与长尾场景**：在持续学习或长尾任务下，基矩阵和混合器的动态更新策略如何设计？冻结基矩阵 + 微调混合器的范式是否足以应对灾难性遗忘？
 4. **与正交压缩技术的深度结合**：CRISP 已展示与 PTQ 的初步组合效果，但与剪枝、知识蒸馏、量化感知训练等技术的系统结合能带来多少额外收益？
 5. **跨模态迁移**：CRISP 的因子化结构能否推广到语音、视频等多模态 Transformer，以及跨模态迁移场景中基矩阵的共享机制如何设计？
+
+
 
 ## 原文 PDF
 

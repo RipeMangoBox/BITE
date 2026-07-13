@@ -5,6 +5,8 @@ paper_level: A
 venue: ECCV
 year: 2024
 pdf_ref: paperPDFs/ECCV_2024/Large_Motion_Model_for_Unified_Multi_modal_Motion_Generation.pdf
+project_link: https://mingyuan-zhang.github.io/projects/LMM.html
+code_link: null
 aliases:
 - LMML
 - LMMUMMMG
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 面向统一多模态运动生成的大规模运动模型 |
 | 英文题名 | Large Motion Model for Unified Multi-modal Motion Generation |
 | 会议/期刊 | ECCV 2024 |
-| Links | [paper](https://doi.org/10.1007/978-3-031-72624-8_23); [Project](https://mingyuan-zhang.github.io/projects/LMM.html) |
+| Links | [paper](https://doi.org/10.1007/978-3-031-72624-8_23) · [Project](https://mingyuan-zhang.github.io/projects/LMM.html) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Large Motion Model (LMM) |
 | Dataset | HumanML3D (Text-to-Motion), HumanML3D, AMASS (Motion Prediction), 3DPW (Motion Prediction) |
@@ -41,7 +43,7 @@ claims:
 > - HumanML3D 上，Top-1 RPrecision 为 0.525 (LMM-Large)，对比 0.491 (T2M-GPT)，变化 +0.034。
 > - AMASS (Motion Prediction) 上，MPJPE@1000ms (mm) 为 63.1 (LMM-Large)，对比 see Table 4，变化 lower。
 
-## 概述
+## 概要
 
 多模态人体运动生成长期面临三个结构性瓶颈：**数据格式碎片化**（不同数据集采用SMPL、BVH、关节角度等异构表示）、**评价指标不统一**（各任务使用各自独立的度量体系）以及**任务间知识迁移困难**（单一任务模型无法复用其他任务学到的运动先验）。这些瓶颈导致现有方法普遍停留在“一任务一模型”的专家范式，泛化能力严重受限。
 
@@ -51,7 +53,7 @@ claims:
 
 实验层面，LMM在九个广泛使用的基准上取得了有竞争力的结果。在 **HumanML3D** 文本到运动生成任务上，LMM-Large实现了最低FID **0.040**（对比MDM的0.544）和最高RPrecision Top-1 **0.525**；在 **AMASS** 和 **3DPW** 运动预测任务上，1000ms的MPJPE分别降至 **63.1 mm** 和 **68.0 mm**，显著优于现有方法。消融实验证实，随机掩码预训练和ArtAttention架构是性能提升的必要组件。模型的主要局限在于音乐到舞蹈任务的FID指标未全面超越专家模型（推测因音乐数据占比较小），且最大参数量达760M，对轻量化部署不友好。
 
-## 背景与动机
+
 
 人体运动生成是计算机视觉与图形学中的核心问题，涵盖文本到运动、运动预测、音乐到舞蹈、语音手势生成等多种任务。然而，该领域长期面临三大结构性瓶颈：
 
@@ -65,7 +67,9 @@ claims:
 
 本文的核心动机是构建第一个通用多模态运动生成模型——Large Motion Model (LMM)，通过统一数据格式、部件感知注意力机制和无监督预训练策略，在单一框架内解决多任务运动生成问题，并探索大规模混合训练带来的涌现能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 LMM 的核心创新围绕三个“可变插槽”（changed slots）展开，分别对应运动表示、注意力机制与训练策略的系统性重构，使其从单任务专家模型跃迁为统一的多模态运动生成通才。
 
@@ -103,7 +107,7 @@ LMM 摒弃了单任务有监督训练范式，转而采用**无监督预训练 +
 | 训练策略 | 单任务有监督 | 无监督预训练 + 有监督微调 | 吸收异质大规模数据，解耦运动先验与条件映射 |
 | 条件输入 | 单一模态（如文本） | ImageBind 统一多模态编码 | 使文本、语音、音乐、视频条件可互换 |
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l34_https_doi_org_10_1007_978_3_031_72624_8_23/figures/005_Figure_3.jpg]]
 *Figure 3: Overall pipeline of LMM. Left: Our two-stage training procedure, including unsupervised pretraining and supervised fine-tuning. Random down-sampling and random mask strategies are applied to enhance knowledge absorption. Right: The generic inference process of LMM. The noised motion sequence and the given context are initially merged before being input into the network. LMM will then synthesize motion sequences, consistent with the provided multi-modal condition signals*
@@ -138,7 +142,7 @@ LMM 的架构以 **Transformer 扩散模型**为基础，数据流经以下核�
 
 最终，ArtAttention 的空间注意力输出 $\mathbf{Y_s}$ 与时间注意力输出 $\mathbf{Y_t}$ 相加得到模块输出 $\mathbf{Y} = \mathbf{Y_s} + \mathbf{Y_t}$，完成对运动特征的多维度融合与精炼。
 
-## 核心模块与公式推导
+
 
 LMM 的核心架构围绕三个关键设计展开：统一运动表示、ArtAttention 注意力机制，以及两阶段训练策略。以下逐一剖析其机理与公式含义。
 
@@ -207,7 +211,9 @@ $$\mathbf{C}_t \in \mathbb{R}^{L_t \times (H \cdot D)}, \quad \mathbf{C}_s \in \
 
 Read-In 层和 Read-Out 层作为数据集相关的编解码器，负责在统一中间表示与各数据集特定格式之间进行转换。这一设计将数据格式差异隔离在输入输出端，使核心网络完全与具体数据集解耦，是实现多数据集联合训练的关键工程组件。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -273,7 +279,9 @@ LMM-Large 的生成结果展示了细粒度控制能力（Figure 5）。在文�
 ![[assets/figures/papers/paper_list_l34_https_doi_org_10_1007_978_3_031_72624_8_23/figures/001_Figure_1.jpg]]
 *Figure 1: We present Large Motion Model (LMM), the first generalist multi-modal motion generation model, that can perform multiple motion generation tasks simultaneously and achieve competitive performance across nine widely used benchmarks*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 LMM 的方法谱系根植于**基于 Transformer 的扩散生成框架**与**运动感知注意力机制**两条技术路线，其直接架构基础来自 **FineMoGen**（Zhang et al., NeurIPS 2023）中的 SAMI 模块。LMM 并非简单复用，而是在三个维度上进行了结构性升级，使其从单任务专家模型跃迁为多任务通用模型。
 
@@ -313,6 +321,8 @@ LMM 的形式化定义 $\Theta = M ( \mathbf{x}, \mathbf{m}, \mathbf{c} )$ 统�
 ### 知识库定位
 
 LMM 在运动生成领域的知识图谱中占据“**通用基座模型**”的位置。与传统的单任务专家模型（如 MDM、T2M-GPT、Bailando、EDGE）不同，LMM 通过统一的运动表示和多模态条件接口，将多类运动生成任务收敛到同一参数空间中。其核心贡献不在于单一任务的指标突破，而在于**证明了大规模混合训练能够产生跨任务的涌现能力**——这一范式与 NLP 领域的 GPT 系列、CV 领域的通用视觉模型形成呼应，为运动生成领域从“任务专用模型”向“通用运动智能”的范式转变提供了首个可行方案。
+
+
 
 ## 原文 PDF
 

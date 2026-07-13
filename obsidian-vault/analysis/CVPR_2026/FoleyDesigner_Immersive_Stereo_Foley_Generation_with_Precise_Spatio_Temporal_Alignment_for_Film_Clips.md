@@ -42,7 +42,7 @@ claims:
 > - FilmStereo 上，FAD (↓) 1.88 vs 2.37 (Stable Audio) (-20.7%)；CLAP (↑) 0.679 vs 0.672 (SpatialSonic) (+1.0%)；IoU (↑) 32.2 vs 27.8 (SpatialSonic) (+15.8%)。
 > - Film Clips 上，ImageBind Score (↑) 0.402 vs 0.251 (SpatialSonic) (+60.2%)；AV-Sync (↑) 0.726 vs 0.545 (SpatialSonic) (+33.2%)。
 
-## 概述
+## 概要
 
 电影拟音（Foley）是影视后期制作中为无声画面同步添加音效的关键环节，专业拟音师需要精确控制每个声音事件的空间位置、激活时刻和声学特性，最终输出多声道环绕声。然而，现有音频生成方法面临一个核心瓶颈：**文本或图像条件缺乏精确的空间轨迹描述，视频条件方法多为单声道且无法动态追踪声源移动**，导致生成结果无法融入专业影视后期制作流程。
 
@@ -52,7 +52,7 @@ FoleyDesigner 的核心洞察在于将专业拟音工作的三级流程自动化
 
 在方法谱系上，FoleyDesigner 区别于以文本/图像为条件的立体声生成方法（如 **Stable Audio Open**、**SpatialSonic**、**See2Sound**），以及单声道拟音方法（如 **Diff-Foley**、**FoleyCrafter**），首次实现了帧级时空对齐的立体声拟音，并完整覆盖从脚本分解到专业混音的全流程。
 
-## 背景与动机
+
 
 电影后期音频制作中，拟音（Foley）是将视觉叙事转化为听觉沉浸感的关键环节。专业拟音师需要在录音棚中实时观看画面，同步执行脚步声、衣物摩擦、道具碰撞等声音表演，并通过多轨录音、空间声像定位和精细混音，最终输出与画面精确同步的立体声乃至环绕声音轨。这一流程高度依赖人工经验，耗时巨大，且难以规模化。
 
@@ -66,7 +66,9 @@ FoleyDesigner 的核心洞察在于将专业拟音工作的三级流程自动化
 
 上述缺口的根本瓶颈在于：**现有音频生成范式无法同时满足立体声空间定位和帧级时序同步的双重约束**。这促使本文提出 FoleyDesigner，通过模拟专业拟音师的三级工作流，将细粒度场景分解、时空条件生成和多智能体精炼融为一体，实现端到端的电影级立体声拟音。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FoleyDesigner 的核心创新并非单一技术点的突破，而是将专业拟音师的三级工作流（细粒度场景分解 → 分轨时空条件生成 → 多智能体诊断与混音精修）完整自动化，并辅以首个同时带有时间戳和空间标注的立体声拟音数据集 **FilmStereo**，从而在电影级 5.1 环绕声输出上实现了端到端的可控生成。其相对于现有方法的本质差异体现在三个关键维度的 **changed slots** 上。
 
@@ -102,7 +104,7 @@ $$\mathcal{T}^{(k+1)} = \mathrm{Generator}(\mathcal{V}, \mathrm{Feedback}(\mathc
 
 > **需要手动验证**：FoleyDesigner 在推理延迟方面存在明显局限——生成 3 秒立体声片段总耗时约 108 秒（单张 A6000 GPU），尚无法满足实时交互需求。此外，多目标跟踪能力有限，当前主要针对单一声源的空间定位，密集重叠并发事件的分离与定位仍是开放问题。
 
-## 整体框架
+
 
 FoleyDesigner 将专业拟音师的工作流程抽象为三个顺序衔接的功能模块，形成端到端的自动化拟音管线。如图 1 所示，该管线模拟了人工拟音从场景理解、分轨录制到后期混音的全过程，最终输出可直接用于电影制作的 5.1 环绕声音轨。
 
@@ -144,7 +146,7 @@ FoleyDesigner 将专业拟音师的工作流程抽象为三个顺序衔接的功
 ![[assets/figures/papers/paper_list_l2489_https_arxiv_org_abs_2604_05731/figures/012_Figure_1.jpg]]
 *Figure 1: FilmStereo Dataset Pipeline. The process begins with sourcing data using randomly sampled parameters to define sound event attributes, followed by a simulated sound design scenario in Step 2 to generate film foley annotations. The resulting data undergoes manual verification to ensure quality and accuracy*
 
-## 核心模块与公式推导
+
 
 FoleyDesigner 将专业拟音工作流抽象为三个序贯阶段：**细粒度影片分解**、**时空拟音生成**与**拟音精炼与专业混音**。本节聚焦前两个阶段的核心公式与关键模块，精炼阶段的混音公式见 Eq. (8)。
 
@@ -211,7 +213,9 @@ $$\mathbf{s}_{\mathrm{LFE}}(t) = \mathrm{LPF}(\mathbf{s}_{\mathrm{mix}}(t), 120\
 
 去除时空条件（w/o STC）导致 GCC 恶化 21.3%、CRW 恶化 38.8%、FAD 恶化 12.1%（Table 4），直接验证了上述时空注入机制对空间精度与生成质量的决定性作用。多智能体精炼框架使事件召回率从 68.5% 提升至 84.2%（Table 5），印证了三级流水线的协同增益。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 FoleyDesigner 在音频质量、时空对齐、电影级拟音性能及人类主观偏好等多个维度上均展现出对现有基线方法的显著优势，并通过系统的消融实验验证了各核心模块的必要性。
 
@@ -282,7 +286,9 @@ FoleyDesigner 在音频质量、时空对齐、电影级拟音性能及人类主
 ![[assets/figures/papers/paper_list_l2489_https_arxiv_org_abs_2604_05731/figures/016_Table_5.jpg]]
 *Table 5: Ablation Study on Agents Framework. Best results are highlighted. ER: Event Recall (%); LSD: Log-spectral distance (dB); LE: Loudness Error (LU); RT60E: RT60 Error (s)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有基线的关系
 
@@ -327,6 +333,8 @@ FoleyDesigner 的提出直接回应了当前音频生成领域的一个结构性
 - **跨域泛化**：FilmStereo 的 8 类音效覆盖有限，如何将时空控制能力泛化到更广泛的音效类型和场景，需要更大规模、更多样化的标注数据集支持。
 
 需要手动验证的是：论文未提供与最新视频到音频方法（如 2024-2025 年出现的基于视频扩散模型的生成方法）的直接对比，这可能是由于论文投稿时间与这些方法出现的时间窗口重叠。建议读者在定位本方法时，补充与同期工作的横向比较。
+
+
 
 ## 原文 PDF
 

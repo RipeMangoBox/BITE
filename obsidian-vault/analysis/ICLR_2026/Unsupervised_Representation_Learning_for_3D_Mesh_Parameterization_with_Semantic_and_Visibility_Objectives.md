@@ -45,7 +45,7 @@ claims:
 > - Semantic-Aware Metric 上，Hamming Distance (AS)↓ 0.3188 (Ours Sem) vs N/A (best baseline value not provided) (N/A)；Rand Index (AR)↑ 0.8151 (Ours Sem) vs N/A (N/A)；Conformality (AU)↑ 0.9123 (Ours Sem) vs N/A (N/A)。
 > - User Study (Visibility) 上，General User Preference Percentage 91.42% (Ours Vis) vs 1.43% (OptCuts) / 7.14% (FlexPara) (+84.28% vs FlexPara)。
 
-## 概述
+## 概要
 
 三维网格的UV参数化是计算机图形学中的基础问题，直接影响纹理映射、细节编辑和跨形状迁移等下游任务的质量。现有自动UV展开方法普遍以最小化几何畸变（保角性、等面积性）为核心目标，却忽视了内容创作流程中两个关键的感知标准：**语义感知性**与**可见性感知性**。前者要求UV图表与语义上有意义的3D部件对齐，否则纹理编辑和跨形状迁移将变得困难；后者要求切割缝线位于不易被观察到的遮挡区域，否则渲染后会产生明显的纹理接缝伪影。这一双重感知缺失构成了当前自动参数化方法从几何最优走向感知最优的核心瓶颈。
 
@@ -55,7 +55,7 @@ claims:
 
 实验表明，该方法在感知指标上取得显著优势：可见性感知方法在用户研究中获得**91.42%**的普通用户偏好，语义感知方法获得**74.29%**的偏好，均大幅领先基线方法（如FlexPara仅7.14%）。同时，语义感知流水线在保角性上甚至略有提升（0.9123），可见性感知流水线虽在等面积性上有所折损（0.6093 vs 基线0.6759），但通过组合流水线（0.6369）可取得良好权衡。该方法为感知驱动的自动UV参数化开辟了新方向，但语义流水线的推理耗时（约15秒）和可见性流水线的训练开销（接缝检测占90%训练时间）仍是实际部署中需要优化的问题。
 
-## 背景与动机
+
 
 三维网格参数化（UV映射）是计算机图形学与几何处理中的基础任务，其目标是将3D表面映射到2D纹理域，从而支持纹理绘制、重光照、细节迁移等下游应用。一个理想的UV映射需要同时满足多重目标：**几何保持**（低角度畸变与低面积畸变）、**语义一致性**（UV图表与3D语义部件对齐）以及**视觉无缝性**（切割缝线位于不可见或低可见性区域）。
 
@@ -69,7 +69,9 @@ claims:
 
 针对这些缺口，本文提出**Semantic-Visibility-Aware UV Parameterization**——一个无监督、可微分的框架，在保留几何低畸变特性的基础上，联合优化语义感知和可见性感知目标。核心思路是通过“分割-参数化”策略叠加感知约束：语义感知流水线利用形状直径函数（ShDF）进行3D语义分割，对每个语义部件独立训练UV映射后聚合为统一图谱；可见性感知流水线则采用环境光遮蔽（AO）作为可见性代理，设计可微的AO加权缝线损失，将切割缝线引导至遮挡/低可见性区域。两个模块可独立使用或组合部署，在不显著牺牲保角性与等面积性的前提下，生成语义一致、视觉无缝的UV图谱。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于将**语义感知**与**可见性感知**两个内容创作中的关键需求，首次形式化为可微目标函数，并嵌入到无监督几何保持UV参数化框架中。这一设计在不显著牺牲保角性与等面积性的前提下，解决了现有方法“接缝显眼”与“UV图表无语义”两大瓶颈。
 
@@ -133,7 +135,7 @@ claims:
 
 综上，本文的核心创新并非提出全新的参数化算法，而是在成熟的几何保持主干上**叠加语义与可见性两个感知约束**，通过可微形式化使其与几何目标协同优化，从而在不牺牲数学质量的前提下，大幅提升UV参数化在内容创作场景中的实用价值。
 
-## 整体框架
+
 
 本文提出一个无监督、可微分的三维网格UV参数化框架，在保持几何低畸变的基础上，联合优化语义感知与可见性感知目标。整体架构由**基础几何保持双向循环映射主干**和两个任务导向的感知模块构成：**语义感知流水线**和**可见性感知流水线**。两套流水线共享同一个预训练的基础主干，但在训练和推理阶段叠加不同的约束与计算流程。
 
@@ -189,7 +191,7 @@ claims:
 ![[assets/figures/papers/paper_list_l38_https_openreview_net_forum_id_9LYsvna4Sk/figures/011_Figure_6.jpg]]
 *Figure 6: Qualitative ablations of different UV-packing strategies. To further improve our semantic-aware UV parameterization pipeline’s output, we present alternative more advanced UV packing results (different from the one proposed in Sec. 3.3) obtained from three widely used commercial tools: (a) Autodesk Maya, (b) Blender, and (c) Houdini. The left-most column shows the 3D cow mesh segmented by PartField (Liu et al., 2025). In the Autodesk Maya result (a), each UV chart corresponding to a semantic 3D part is colored to match its counterpart on the 3D mesh. The same applies to the Blender and Houdini results. Specifically, the 3D cow is first partitioned by PartField (Liu et al., 2025) into seven...*
 
-## 核心模块与公式推导
+
 
 ### 基础UV参数化主干网络
 
@@ -271,7 +273,9 @@ $$
 ![[assets/figures/papers/paper_list_l38_https_openreview_net_forum_id_9LYsvna4Sk/figures/002_Figure_2.jpg]]
 *Figure 2: An overview of the training of the proposed semantic-aware UV parameterization method (Sec. 3.3), consisting of three stages: (i) semantic 3D partitioning, computes a per-vertex semantic partition of the input mesh using shape diameter function (Appendix A.1); (ii) geometry-preserving UV learning, applies the base UV-parameterization backbone (Sec. 3.2) independently to each semantic part to obtain per-part UV islands; and (iii) UV atlas aggregation and packing, aggregates and packs these islands into a unified UV atlas*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果分析
 
@@ -350,7 +354,9 @@ Table 7的消融直接量化了语义感知和可见性感知模块对几何保�
 ![[assets/figures/papers/paper_list_l38_https_openreview_net_forum_id_9LYsvna4Sk/figures/010_Table_5.jpg]]
 *Table 5: Quantitative ablations of different UV-packing strategies from three widely used commercial tools: Autodesk Maya, Blender, and Houdini. We use a 3D cow mesh shown in Fig. 6 to evaluate texel density and UV-space utilization of UV parameterizations packed using different UV packing strategies from the three commercial tools. Specifically, after applying our semantic-aware UV parameterization framework, we obtain UV parameterizations for each segmented 3D part, resulting in seven UV charts. Then, instead of using our default UV packing (presented in Sec. 3.3), we apply different UV packing strategies from the three commercial tools. Lastly, for each packing strategy, we compute two UV metrics...*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心基线对比与谱系定位
 
@@ -401,6 +407,8 @@ Table 7的消融直接量化了语义感知和可见性感知模块对几何保�
 4. **感知目标的联合优化**：语义感知与可见性感知在联合训练时可能存在目标冲突（如语义边界恰好位于高可见性区域）。如何设计动态权重调度或帕累托优化策略，在不同任务间取得最优平衡，是一个值得深入的方向。
 
 5. **跨域泛化**：该方法能否扩展到非刚性形状（如动态角色网格）或大规模工业资产（如包含数万部件的CAD模型），其泛化能力和计算可扩展性尚待验证。
+
+
 
 ## 原文 PDF
 

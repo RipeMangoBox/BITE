@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: "paperPDFs/ICLR_2026/Huxley_Gödel_Machine_Human_Level_Coding_Agent_Development_by_an_Approximation_of_the_Optimal_Self_Improving_Machine.pdf"
+project_link: null
+code_link: https://github.com/metauto-ai/HGM
 openreview_forum_id: T0EiEuhOOL
 aliases:
 - HGDMH
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 赫胥黎-哥德尔机器：通过近似最优自我改进机器实现人类级编码代理开发 |
 | 英文题名 | Huxley-Gödel Machine: Human-Level Coding Agent Development by an Approximation of the Optimal Self-Improving Machine |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=T0EiEuhOOL); [GitHub](https://github.com/metauto-ai/HGM) |
+| Links | [paper](https://openreview.net/forum?id=T0EiEuhOOL) · [GitHub](https://github.com/metauto-ai/HGM) |
 | Topic | #topic/representation_self_supervised_transfer #topic/representation_self_supervised_transfer/transfer_multitask_and_meta_learning |
 | Method | Huxley-Gödel Machine (HGM) |
 | Dataset | SWE-Verified-60, Polyglot, SWE-Bench Verified (full) |
@@ -41,7 +43,7 @@ claims:
 > - SWE-Verified-60 上，Allocated CPU-hours (800 evals) 为 517，对比 1231 (DGM)，变化 -714 hours (2.38× faster)。
 > - Polyglot 上，Accuracy (%) 为 30.5，对比 27.1 (DGM) / 25.4 (SICA)，变化 +3.4 over DGM, +5.1 over SICA。
 
-## 概述
+## 概要
 
 构建能够自主改进的编码代理是迈向通用人工智能的关键一步。然而，当前的自我改进方法面临一个根本性瓶颈：**元生产力-性能不匹配（Metaproductivity-Performance Mismatch）**——代理的即时基准得分无法可靠预测其长期自我改进潜力。高评分代理可能产生低产出的后代，而低评分代理有时反而能孕育出更强的谱系。
 
@@ -51,7 +53,7 @@ claims:
 
 实验表明，HGM在SWE-Verified-60和Polyglot基准上均取得了最高的最佳信念代理准确率，同时所需CPU小时数显著低于前沿方法DGM和SICA：在SWE-Verified-60上达到56.7%（比DGM高3.4个百分点），仅需517 CPU小时（2.38倍加速）；在Polyglot上达到30.5%，仅需347小时（6.86倍加速）。HGM发现的代理在SWE-bench Verified完整集上达到61.4%，超越了最优人类设计的GPT-5 mini代理；在SWE-Lite上以GPT-5运行时，匹配了人类工程化代理的最佳官方验证结果。消融实验进一步证实，HGM的CMP估计器与经验CMP的加权相关性（0.778）显著高于基于即时性能的方法（SICA为0.444），验证了谱系级信息对预测自我改进潜力的关键作用。
 
-## 背景与动机
+
 
 ### 编码代理的自我改进：从即时性能到长期潜力
 
@@ -73,7 +75,9 @@ claims:
 
 基于这一洞察，本文提出**赫胥黎-哥德尔机器（Huxley-Gödel Machine, HGM）**，通过估计谱系级CMP并使用汤普森采样（Thompson Sampling）指导自我改进搜索，从而在无需可证明性检查的前提下，有效近似最优自我改进行为。HGM同时解耦了扩展与评估决策，引入自适应调度和细粒度评估策略，从根本上突破了现有方法的刚性约束。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 HGM 的核心创新在于用**谱系级元生产力（Clade-Metaproductivity, CMP）**替代即时基准性能作为自我改进搜索的指导信号，从而解决了现有方法中普遍存在的**元生产力-性能不匹配（Metaproductivity-Performance Mismatch）**问题——即单个代理的当前评分与其长期自我改进潜力之间呈弱相关甚至无关（Figure 1 左）。
 
@@ -97,7 +101,7 @@ HGM 在三个子策略和执行范式上对基线方法进行了系统性重构�
 
 CMP 估计的有效性在相关性分析中得到验证：在 SWE-Verified-60 上，HGM 的 CMP 估计与经验 CMP 的加权 Pearson 相关系数达到 **0.778**，而 SICA 仅为 0.444（Table 1），表明谱系级信息确实比个体性能更能预测长期自我改进潜力。这一信号质量的提升直接转化为下游性能优势：HGM 在 SWE-Verified-60 上以 517 CPU 小时达到 56.7% 准确率，而 DGM 需要 1231 小时才达到 53.3%（Table 2）——**准确率提升 3.4 个百分点，同时计算效率提升 2.38 倍**。在 Polyglot 上，效率优势更为显著，达到 **6.86 倍加速**（347h vs 2385h），同时准确率从 27.1% 提升至 30.5%。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l28_https_openreview_net_forum_id_T0EiEuhOOL/figures/006_Table_2.jpg]]
 *Table 2: summarizes the three subpolicies of SICA, DGM, and HGM, which define solutions to the iterative tree search problem defined in 2. Table 4: Comparison of structured policies across self-improving methods. Each method is described by three subpolicies: Mod vs. Eval, Modification Strategy, and Evaluation Strategy*
@@ -152,7 +156,7 @@ $$\widehat{\mathrm{CMP}}(a) = \frac{n_{\text{success}}^{C}(a)}{n_{\text{success}
 
 其中 $n_{\text{success}}^{C}(a) = \sum_{a' \in C(a)} n_{\text{success}}(a')$ 和 $n_{\text{failure}}^{C}(a) = \sum_{a' \in C(a)} n_{\text{failure}}(a')$ 分别为谱系内所有代理的累计通过和失败测试数。实验表明，该估计量与经验 CMP 的加权 Pearson 相关性在 SWE-Verified-60 上达到 0.778，显著高于 SICA 的 0.444（Table 1），验证了谱系级信息对预测自我改进潜力的关键作用。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化
 
@@ -248,7 +252,9 @@ $$\widehat{\mathrm{CMP}}(a) = \frac{n_{\mathrm{success}}^{C}(a)}{n_{\mathrm{succ
 
 HGM-Async在多个CPU上同时执行选择-扩展-评估迭代。每个CPU独立运行一个迭代过程，完成后立即使用最新数据更新树的统计信息，并启动新一轮迭代。这种异步并行化使HGM在Polyglot上相比DGM实现了高达6.86倍的加速（347h vs 2385h），在SWE-Verified-60上也达到2.38倍加速（517h vs 1231h）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈：元生产力-性能不匹配
 
@@ -321,7 +327,9 @@ HGM性能优势的来源可通过两个消融维度理解：
 - **CMP估计的样本依赖性**：CMP估计依赖于谱系内累积的测试结果，在评估代价高昂或后代数量不足时可能存在估计偏差，需要较多的后代评估才能收敛。
 - **基准过拟合风险**：所发现的代理在SWE-Verified和Polyglot上表现优异，但这些基准可能无法完全代表一般编程能力，存在一定程度的过拟合可能。
 - **理论-实践差距**：定理1证明CMP先知足以实现哥德尔机器，但前提假设包括可重复试验且证明搜索不消耗预算，实际计算资源限制下仍存在近似误差。
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -368,6 +376,8 @@ HGM 的适用性受限于以下关键假设和设计选择：
 4. **元策略的提炼与迁移**。HGM 发现的自我改进轨迹是否可以提炼出一般性的元策略，用于指导其他类型的自我改进系统？例如，从成功的谱系中提取修改模式，作为新搜索的初始化或先验。
 
 5. **与人类工程师的协同**。论文展示了 HGM 发现的代理在 SWE-Bench Lite 上匹配甚至超越最佳人类设计的代理。一个自然的延伸是探索人机协同的自我改进范式——人类工程师的干预能否作为 CMP 估计的额外信号，加速搜索收敛？
+
+
 
 ## 原文 PDF
 

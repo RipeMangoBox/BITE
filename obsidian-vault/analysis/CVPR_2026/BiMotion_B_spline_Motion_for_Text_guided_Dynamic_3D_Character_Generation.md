@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/BiMotion_B_spline_Motion_for_Text_guided_Dynamic_3D_Character_Generation.pdf
+project_link: null
+code_link: null
 aliases:
 - BiMotion
 tags:
@@ -39,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - Vbench 上，OC↑ 0.187 vs 0.175 (V2M4) (+0.012)；SC↑ 0.948 vs 0.951 (AnimateAnyMesh) (-0.003)；TF↑ 0.995 vs 0.993 (AnimateAnyMesh) (+0.002)。
 
-## 概述
+## 概要
 
 文本驱动的动态3D角色生成面临一个根本性瓶颈：运动序列天然具有可变长度，而主流生成模型依赖固定容量的离散帧表示。现有方法或裁剪序列至固定长度导致运动语义不完整，或均匀下采样造成轨迹抖动与子动作碎片化——其本质矛盾在于**可变长度运动序列与固定容量生成模型之间的不兼容**。
 
@@ -49,7 +51,7 @@ BiMotion 的核心洞察是：**运动本质上是连续的，帧数仅为采样
 
 方法的主要局限在于：控制点数量固定，可能不足以表达极高频的复杂运动；假设网格拓扑不变，不支持撕裂或破碎等拓扑变化；B样条的光滑性约束偶尔会导致语义一致性指标（SC）略低于离散方法。这些局限也指明了未来的开放方向：自适应控制点数量选择、向非网格表示（如点云、NeRF）的扩展，以及结合物理约束或骨架先验以进一步提升运动合理性。
 
-## 背景与动机
+
 
 ### 问题背景：文本驱动的动态3D角色生成
 
@@ -73,7 +75,9 @@ BiMotion的核心洞察在于：**运动本质上是连续的，帧数仅仅是�
 
 基于此，BiMotion将运动生成问题重新定义为：**给定初始网格和文本提示，直接生成B样条控制点，再通过B样条插值重建任意长度的连续运动轨迹**。这一范式转换使得固定尺寸的生成模型能够完整保留运动语义，同时保持生成轨迹的光滑性和物理合理性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 BiMotion 的核心创新在于用**连续 B 样条曲线替代离散帧表示**，从根本上解决了可变长度运动序列与固定容量生成模型之间的矛盾。传统方法（如 **AnimateAnyMesh**，Wu et al., ICCV 2025）依赖逐帧的顶点位移差，必须将序列裁剪或下采样至固定长度，导致运动语义碎片化或时序抖动。BiMotion 通过以下四个关键槽位（changed slots）的重新设计，实现了完整运动语义的保留与高效生成。
 
@@ -122,7 +126,7 @@ $$\mathbf{F}_{0} = \mathbf{F}_{\mathcal{P}_{0}} + \left( w(\mathbf{F}_{\mathcal{
 
 BiMotion 的四项槽位创新构成了一个闭环系统：B 样条表示将变长运动压缩为固定控制点集，Laplacian 正则化拟合保证短序列下的自然插值，多层级嵌入保留多尺度运动细节，法向融合增强几何感知。这些设计共同实现了在固定模型容量下生成语义完整、时序连贯的动态 3D 角色运动，且推理速度与 GPU 内存占用均优于现有方法（Table 1）。
 
-## 整体框架
+
 
 BiMotion 提出了一种基于 B 样条（B-spline）的运动表示与生成框架，核心思路是将变长顶点位移序列压缩为固定数量的控制点，从而在保持完整运动语义的前提下，使固定容量的生成模型能够处理任意长度的动态网格序列。
 
@@ -160,7 +164,7 @@ BiMotion 提出了一种基于 B 样条（B-spline）的运动表示与生成框
 ![[assets/figures/papers/paper_list_l7_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_BiMotion_B_spline/figures/001_Figure_1.jpg]]
 *Figure 1: We propose BiMotion, a fast, feed-forward B-spline–based method for dynamic 3D character generation. It produces continuous, high-quality expressive motion trajectories aligned with rich textual prompts, outperforming discrete temporal sampling-based methods such as AnimateAnyMesh [96] under the same fixed-input constraint. See our project page for full motion dynamics*
 
-## 核心模块与公式推导
+
 
 ### 3.1 运动生成的问题形式化
 
@@ -254,7 +258,9 @@ $$\hat{\mathbf{V}}_{1:T} = \mathbf{V}_0 + B_{T,k} \hat{\mathcal{P}}_k$$
 ![[assets/figures/papers/paper_list_l7_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_BiMotion_B_spline/figures/012_Figure_8.jpg]]
 *Figure 8: Control-PE Ablation. Our control-PE (Bottom) captures fine motion (e.g., the lion’s tail) and reduces artifacts (red circles) compared to conventional position encoding (Middle)*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能突破：Vbench 定量评估
 
@@ -322,7 +328,9 @@ Figure 10 对比了 BiMotion 与 AnimateAnyMesh 在不同网格拓扑下的运
 ![[assets/figures/papers/paper_list_l7_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_BiMotion_B_spline/figures/005_Figure_4.jpg]]
 *Figure 4: Qualitative Comparisons. Our method (BiMotion) results in superior motion quality and is more aligned with the user-provided text prompts. Artifacts for the baseline methods are highlighted in red. Please see the supplementary material for additional results*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 BiMotion 的核心贡献在于将**可变长度运动序列的生成问题**转化为**固定容量模型可处理的连续表示学习问题**。这一设计使其在文本驱动的动态3D角色生成领域占据了一个独特的方法论位置：它既不同于依赖离散帧采样的前馈方法，也不同于需要视频中间表示的两阶段方案。
 
@@ -355,6 +363,8 @@ BiMotion的设计建立在三个核心假设之上，这些假设也划定了其
 - **真实世界泛化**：BiMotion在BIMO合成数据集上训练与评估，其在真实世界扫描数据或交互式应用中的泛化性能尚待验证。域适应或弱监督微调策略可能成为关键。
 
 - **控制粒度与语义对齐**：SC指标的轻微下降提示B样条光滑性可能与某些文本语义的精确表达存在冲突。探索自适应光滑性控制或混合表示（如B样条与稀疏关键帧结合）可能进一步提升语义对齐质量。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Towards_Bridging_the_Gap_between_Large_Scale_Pretraining_and_Efficient_Finetuning_for_Humanoid_Control.pdf
+project_link: https://lift-humanoid.github.io
+code_link: null
 openreview_forum_id: NEOTsyyYH7
 aliases:
 - LLSPEF
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 面向人形控制的大规模预训练与高效微调桥接方法 |
 | 英文题名 | Towards Bridging the Gap between Large-Scale Pretraining and Efficient Finetuning for Humanoid Control |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=NEOTsyyYH7); [Project](https://lift-humanoid.github.io) |
+| Links | [paper](https://openreview.net/forum?id=NEOTsyyYH7) · [Project](https://lift-humanoid.github.io) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | LIFT (Large-scale pretraIning and efficient FineTuning) |
 | Dataset | Booster T1 sim-to-sim finetuning (target speeds: 0.6, 1.0, 1.2, 1.5 m/s), Unitree G1 sim-to-sim finetuning (target speeds: 0.6 |
@@ -41,7 +43,7 @@ claims:
 > - Booster T1 sim-to-sim finetuning (target speeds: 0.6, 1.0, 1.2, 1.5 m/s) 上，收敛性与速度跟踪精度 为 LIFT在所有速度下收敛，稳定跟踪目标速度，身体振荡显著减少，对比 SAC快速发散；PPO逐渐退化并崩溃；FastTD3剧烈振荡不收敛；SSRL在高速度下失败，变化 LIFT显著优于所有基线。
 > - Unitree G1 sim-to-sim finetuning (target speeds: 0.6, 1.5 m/s) 上，行走稳定性和奖励性能 为 LIFT在0.6 m/s下振荡大幅减少，在1.5 m/s下成功由站立到行走，对比 基线方法性能差或发散，变化 LIFT表现出更稳定的人类行走步态。
 
-## 概述
+## 概要
 
 人形机器人的运动控制长期面临一个两难困境：**大规模预训练**需要快速、稳定的策略学习，而**高效微调**则要求在新环境中安全、数据高效地适应。当前主流的on-policy方法（如PPO）虽能借助大规模并行仿真快速收敛，但其on-policy特性导致微调时样本效率低下，且随机探索在真实环境中存在安全隐患；off-policy方法（如SAC）虽可复用数据，但在人形机器人大规模预训练中收敛缓慢、稳定性差；基于模型的方法（如MBPO）则因世界模型预测误差累积而难以可靠微调。这三类方法之间的张力构成了**预训练到高效微调之间的核心瓶颈**。
 
@@ -56,7 +58,7 @@ LIFT的三个阶段分别为：
 
 LIFT的方法定位处于**大规模off-policy预训练**与**物理信息模型基强化学习**的交叉点：它继承了SAC的样本效率与探索能力，同时利用物理先验约束世界模型预测，从而在微调阶段实现安全且数据高效的适应。与纯on-policy预训练-微调范式（PPO）和纯黑盒世界模型方法（MBPO）相比，LIFT通过**预训练算法选择**（SAC而非PPO）、**世界模型结构设计**（物理信息而非黑盒）、**探索-执行解耦**三个关键设计，系统性地解决了从大规模预训练到安全高效微调的过渡问题。
 
-## 背景与动机
+
 
 ### 人形机器人控制的规模化瓶颈
 
@@ -88,7 +90,9 @@ Off-policy 方法理论上可通过复用历史数据提升样本效率，但将
 
 这一解耦策略的可行性建立在两个关键前提之上：SAC 预训练策略提供了足够好的初始行为，使得确定性执行不会导致性能崩溃；物理信息世界模型具备足够的预测精度，使得模型内的探索能够产生有效的学习信号。消融实验证实了这两个前提的不可或缺性——去除 SAC 预训练导致策略陷入局部极差而无法收敛，去除世界模型预训练则显著拖慢训练速度（Figure 4）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 LIFT 的核心创新在于通过**预训练–微调流程中的三个关键设计变更**，系统性地桥接了大规模人形控制策略预训练与安全高效微调之间的鸿沟。这些变更并非孤立的技术点，而是围绕一个统一的因果机制展开：**将随机探索与安全数据收集解耦**。
 
@@ -134,7 +138,7 @@ $$M(q_t) \ddot{q}_t + C(q_t, \dot{q}_t) + G(q_t) = B\tau_t + \underbrace{J^\top 
 
 三者共同构成了一个闭环：SAC 预训练 → 高质量世界模型 → 安全的模型内探索 → 高效的策略微调。缺失任一环节，整个流程的性能都会显著退化或完全失败。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_NEOTsyyYH7/figures/001_Figure_1.jpg]]
 *Figure 1: Large-scale pretraIning and efficient FineTuning (LIFT) Framework. In stage (i), we implement SAC in JAX to support large-batch update and high UTD, achieving fast, robust convergence in massively parallel simulation and zero-shot deployment to a real humanoid in outdoor experiments. In stage (ii), we pretrain a physics-informed world model on the SAC data, combining Lagrangian dynamics with a residual predictor to capture contact forces and other unmodeled effects. In stage (iii), we finetune both the policy and the world model to new environments while executing only deterministic actions in the environment. Stochastic exploration is confined to rollouts within the world model. This frame...*
@@ -157,7 +161,7 @@ LIFT 将人形机器人从零训练到新环境适应的完整流程解耦为三
 
 三个阶段的依赖关系是单向且渐进的：阶段一的输出是收敛的 SAC 策略参数和全量 transition 数据集；阶段二消费该数据集，输出预训练的世界模型参数；阶段三同时加载预训练策略与世界模型，在目标环境中交替执行“真实环境确定性数据收集 → 世界模型微调 → 模型内随机探索与策略更新”的循环。这种设计使得随机探索的“风险”被完全隔离在世界模型之内，而真实环境中始终执行安全的确定性策略，从而在样本效率与部署安全性之间建立了因果解耦。
 
-## 核心模块与公式推导
+
 
 LIFT 框架由三个顺序模块构成：大规模 SAC 策略预训练、物理信息世界模型预训练、以及策略与世界模型联合微调。三个模块的因果链条为：SAC 预训练提供良好的策略初始化和世界模型训练数据；世界模型预训练将未建模动力学（接触力、耗散力矩）编码为残差网络，使模型具备精确的前向预测与不确定性估计能力；微调阶段则在真实环境中执行确定性策略以保证安全，同时将随机探索完全限制在世界模型内，利用 SAC 的随机策略在模型生成数据上更新 actor-critic，从而实现样本高效且安全的适应。
 
@@ -209,7 +213,9 @@ $$J_{\phi}^{R}(\pi_{\theta}) = \mathbb{E} \left[ \sum_{t=0}^{\infty} \gamma^t r_
 
 其中 $\mathbb{P}_{\phi}$ 为物理信息世界模型的转移概率。微调采用迭代流程：每收集 $T_{ep}$ 步真实数据后，在世界模型上执行多轮训练，随后进行策略更新，循环往复直至收敛。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 预训练性能：SAC大规模并行收敛
 
@@ -292,7 +298,9 @@ LIFT的预训练阶段采用高UTD（Update-To-Data ratio）和大批量更新�
 ![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_NEOTsyyYH7/figures/032_Table_6.jpg]]
 *Table 6: Finetune reward terms (Note: many terms disabled for sim-to-sim transfer)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与设计动机
 
@@ -327,6 +335,8 @@ LIFT的微调流程依赖物理信息世界模型的预测精度。在高度动�
 3. **异步部署效率**：当前微调采用同步的数据收集-训练循环。异步数据收集与训练能否在不引入额外复杂性的前提下进一步提高实际部署效率？这涉及off-policy数据的陈旧性与世界模型更新频率之间的权衡。
 
 4. **对象交互与复杂任务**：LIFT目前聚焦于运动控制任务。将其扩展到全身运动跟踪（Figure 16已展示初步能力）和对象交互等高级任务，需要研究世界模型对操作力学的建模能力以及安全探索机制的泛化性。
+
+
 
 ## 原文 PDF
 

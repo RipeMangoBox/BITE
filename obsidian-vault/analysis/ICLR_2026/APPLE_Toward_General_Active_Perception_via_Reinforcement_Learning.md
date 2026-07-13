@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/APPLE_Toward_General_Active_Perception_via_Reinforcement_Learning.pdf
+project_link: https://timschneider42.github.io/apple
+code_link: null
 aliases:
 - AAPPL
 - APPLE
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | APPLE：基于强化学习的通用主动感知方法 |
 | 英文题名 | APPLE: Toward General Active Perception via Reinforcement Learning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=hU2gT2Ucua); [Project](https://timschneider42.github.io/apple) |
+| Links | [paper](https://openreview.net/forum?id=hU2gT2Ucua) · [Project](https://timschneider42.github.io/apple) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | APPLE (Active Perception Policy Learning) |
 | Dataset | MHSB (触觉分类), CircleSquare (视觉分类), TactileMNIST (触觉分类), TactileMNISTVolume (触觉体积回归) |
@@ -40,19 +42,21 @@ claims:
 > - CircleSquare (视觉分类) 上，最终预测准确率 为 97% (APPLE-SAC), 96% (APPLE-CrossQ)，对比 随机猜测 (HAM), 68% (APPLE-RND)，变化 +29% (vs APPLE-RND)。
 > - TactileMNIST (触觉分类) 上，最终预测准确率 为 87% (APPLE-SAC), 89% (APPLE-CrossQ)，对比 74% (APPLE-RND)，变化 +15% (APPLE-CrossQ vs RND)。
 
-## 概述
+## 概要
 
 本文提出 **APPLE (Active Perception Policy Learning)**，一个将强化学习与监督学习相结合的通用主动感知框架。APPLE 将主动感知建模为部分可观测马尔可夫决策过程（POMDP），通过联合优化基于 Transformer 的感知模块和决策策略，使智能体能够在与环境交互的过程中主动采集信息并推断目标属性。该方法仅需可微损失函数和 POMDP 环境即可应用，不限于特定任务。
 
 APPLE 的两个变体——APPLE-SAC（基于 SAC Haarnoja et al. (2018)）和 APPLE-CrossQ（基于 CrossQ Bhatt et al. (2019)）——在触觉分类、体积回归、物体定位和视觉分类等五个基准任务上进行了评估。实验结果表明，APPLE 在多个任务上显著优于现有基线方法 HAM (Fleer et al., 2020) 和随机策略基线。
 
-## 背景与动机
+
 
 **现有瓶颈**：现有主动感知方法通常针对特定任务设计，依赖贪婪信息增益启发式或假设物体静止，缺乏通用性。例如，HAM (Fleer et al., 2020) 使用基于 REINFORCE 的 LSTM 模型，在简单任务上表现良好，但在需要更复杂探索策略的任务上难以超越随机猜测。
 
 **核心动机**：主动感知问题天然适合 POMDP 框架——智能体必须在不确定性下行动，通过主动采集信息来减少关于目标属性的模糊性。然而，现有方法未能充分利用监督学习信号与强化学习策略之间的协同效应。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 APPLE 的核心创新在于：
 
@@ -62,7 +66,7 @@ APPLE 的核心创新在于：
 
 3. **奖励函数设计**：总奖励 $\tilde{r}(h_t, y^*_t, a_t, y_t) = r(h_t, a_t) - \ell(y^*_t, y_t)$，其中 $r(h_t, a_t)$ 用于正则化动作（如动作幅度惩罚），$\ell(y^*_t, y_t)$ 是可微预测损失。这种设计使得预测损失既作为监督信号又作为奖励信号的一部分。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_reinforcement_learning_planning_agents__deep_rl__b001_hU2gT2Ucua_APPLE_Toward_General_Act/figures/001_Figure_1.jpg]]
 *Figure 1: Our method Active Perception Policy Learning (APPLE) aims to infer properties, such as object classes, of its environment based on limited per-step information. To do so, it jointly optimizes an action policy for information gathering and a prediction model for inference. Both the action policy and prediction models use a shared transformer-based backbone to process input sequences. Shown at the top are four benchmark tasks we use to evaluate APPLE.*
@@ -81,7 +85,7 @@ APPLE 的整体框架如 Figure 1 和 Figure 2 所示：
 - **策略头 (Policy Head)**：从隐藏状态输出控制动作 $a_t$
 - **Q 网络 (Critic)**：估计动作价值，用于策略优化（SAC/CrossQ）
 
-## 核心模块与公式推导
+
 
 ### 5.1 主动感知目标函数
 
@@ -118,7 +122,9 @@ $$\mathcal{L}_{\mathrm{critic}} = \mathbb{E}_{\mathcal{D}} \left[ \frac{1}{2} \l
 - **CircleSquare 二分类交叉熵损失**：$\ell(y_t^*, y_t) = -\sum_{c \in \{\mathrm{circle, square}\}} \delta(y_t^*, c) \log(p_c(y_t))$
 - **TactileMNIST 10分类交叉熵损失**：$\ell(\dot{\boldsymbol{y}}_t, \boldsymbol{y}_t) = -\sum_{c=1}^{10} \delta(\boldsymbol{y}_t^*, c) \log(p_c(\boldsymbol{y}_t))$
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 6.1 主要实验结果
 
@@ -201,7 +207,9 @@ $$\mathcal{L}_{\mathrm{critic}} = \mathbb{E}_{\mathcal{D}} \left[ \frac{1}{2} \l
 ![[assets/figures/papers/iclr26_reinforcement_learning_planning_agents__deep_rl__b001_hU2gT2Ucua_APPLE_Toward_General_Act/figures/003_Figure_3.jpg]]
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 APPLE 属于主动感知与强化学习交叉领域的方法。其核心思想源于 Bajcsy (1988) 的主动感知概念，并受到 Mnih et al. (2014) 的 Recurrent Models of Visual Attention (RAM) 和 Fleer et al. (2020) 的 Haptic Attention Model (HAM) 的启发。
 
@@ -216,6 +224,8 @@ APPLE 属于主动感知与强化学习交叉领域的方法。其核心思想�
 - APPLE 在物体姿态估计、形状重建或材料属性推断等任务上的表现如何？
 - 将 APPLE 与好奇心驱动的内在奖励方法（如 ICM 或 RND）结合是否能加速学习？
 - APPLE 能否通过域随机化等技术实现从仿真到真实的迁移？
+
+
 
 ## 原文 PDF
 

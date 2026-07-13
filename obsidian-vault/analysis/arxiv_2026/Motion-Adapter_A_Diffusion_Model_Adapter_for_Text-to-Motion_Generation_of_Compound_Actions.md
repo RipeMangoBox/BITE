@@ -47,7 +47,7 @@ claims:
 > - 用户研究（User Study） 上，感知质量（Perceptual Quality, PQ） 89.67% (Motion-Adapter_MDM) vs 57.78% (STMC) (+31.89%)。
 > - 复合动作数据集（Compound Action Dataset） 上，FID 3.592±.086 (Motion-Adapter_MDM) vs 所有基线方法均获得更高（更差）的FID (显著降低)。
 
-## 概述
+## 概要
 
 文本到动作生成（Text-to-Motion Generation）旨在从自然语言描述中合成三维人体运动序列。现有扩散模型在生成单一动作时表现良好，但在面对**复合动作**（compound actions，即同时执行多个动作，如“一边挥手一边跑步”）时暴露出两个深层瓶颈：**灾难性遗忘**与**注意力坍塌**。灾难性遗忘指早期生成的动作在后续时序融合和去噪过程中被覆盖；注意力坍塌则表现为交叉注意力图失去空间特异性，无法可靠地对应身体部位，导致动作合成失败。
 
@@ -61,7 +61,7 @@ claims:
 
 该方法在方法谱系上属于**扩散模型适配器**路线，与基于运动编辑（SALAD, MDM, MotionDiffuse）、运动先验（PriorMDM）或空间运动组合（STMC）等方案形成互补。其独特优势在于仅需单动作数据训练、不依赖复合动作标注或 LLM 文本分解，即可实现多部位并行动作生成。
 
-## 背景与动机
+
 
 ### 问题背景：文本到动作生成中的复合动作挑战
 
@@ -103,7 +103,9 @@ claims:
 
 通过这种“适配器提取掩码 + 掩码引导去噪”的范式，Motion-Adapter 使得预训练扩散模型无需任何微调即可从单动作能力泛化到复合动作生成，为文本到动作生成领域提供了一种新的解决思路。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Motion-Adapter 的核心创新在于**将解耦交叉注意力图转化为结构掩码，以即插即用的方式引导预训练扩散模型生成复合动作**，而无需修改骨干网络参数或引入复合动作标注数据。其关键设计围绕三个 changed slots 展开，直接回应了现有方法在复合动作生成中面临的双重瓶颈——灾难性遗忘与注意力坍塌。
 
@@ -145,7 +147,7 @@ Motion-Adapter 的另一个关键创新在于**掩码生成与施加的时序约
 
 用户研究结果（Table III）为上述创新提供了强有力的实证支持：Motion-Adapter_MDM 的保真度达到 9.27，远超第二高的 STMC（4.02）；感知质量达 89.67%，而 STMC 仅为 57.78%。消融实验进一步表明，移除 Motion-Adapter 或取消掩码时序约束均导致所有自动指标显著退化，验证了适配器及其时序策略的不可替代性。
 
-## 整体框架
+
 
 Motion-Adapter 采用“适配器外挂 + 预训练骨干冻结”的范式，在不修改文本到动作扩散模型参数的前提下，通过注入结构掩码引导去噪过程，使模型具备生成复合动作的能力。其整体流水线由三个核心模块串联构成：解耦交叉注意力网络、结构掩码生成模块，以及掩码去噪集成模块。
 
@@ -173,7 +175,7 @@ Motion-Adapter 采用“适配器外挂 + 预训练骨干冻结”的范式，�
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2604_16135/figures/004_Figure_3.jpg]]
 *Figure 3: Overview of the Motion-Adapter integrated into the diffusion model at step t*
 
-## 核心模块与公式推导
+
 
 Motion-Adapter 由两个核心模块构成：**解耦交叉注意力网络**与**结构掩码生成模块**。前者负责从文本词元中提取与身体部位对应的注意力图，后者将这些注意力图转化为可嵌入扩散去噪过程的结构掩码。
 
@@ -223,7 +225,9 @@ $$ x _ { t - 1 } = x _ { t - 1 } * ( 1 - M a s k _ { t - 1 } ^ { c _ { i } } ) +
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2604_16135/figures/002_Figure_2.jpg]]
 *Figure 2: Comparison of attention maps from SALAD [3] and our Motion-Adapter. SALAD’s maps are averaged across all Transformer layers at step 40, while ours are taken from the third cross-attention layer at step 750*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 评估基准与设置
 
@@ -289,7 +293,9 @@ Table IV 和 Figure 12 报告了关键消融结果，验证了两个核心设计
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2604_16135/figures/008_Figure_6.jpg]]
 *Figure 6: Qualitative comparison of compound actions combining ’greeting’ with ’walking’ or ’running’. Later frames are rendered with increased transparency for clarity, and arrows indicate motion direction*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -331,6 +337,8 @@ Motion-Adapter 的有效性受以下边界条件约束：
 3. **评价偏差的缓解**：论文指出，定量评估中使用的评价模型原本针对简单动作训练，存在偏差。作者通过在复合动作数据集上微调评价模型以缓解该问题，但重训数据仍可能引入分布偏差。如何建立更公正的复合动作评价体系，是一个值得关注的问题。
 
 4. **掩码时序策略的自适应**：当前的掩码生成和停止时间步（t > 750 生成，t > 250 停止施加）是固定阈值。这些阈值是否可自适应地根据文本复杂度或运动长度动态调整，以进一步提升复合动作的连贯性和自然度，是一个值得研究的方向。
+
+
 
 ## 原文 PDF
 

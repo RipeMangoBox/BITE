@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/MrRoPE_Mixed_radix_Rotary_Position_Embedding.pdf
+project_link: null
+code_link: null
 openreview_forum_id: 1J63FJYJKg
 aliases:
 - MPMRRP
@@ -42,7 +44,7 @@ claims:
 > - Infinite-Bench KV Retrieval (100K‑128K) 上，Accuracy 为 27%，对比 9% (YaRN)，变化 +18%。
 > - Infinite-Bench QA Dialogue (100K‑128K) 上，Accuracy 为 22%，对比 10% (YaRN)，变化 +12%。
 
-## 概述
+## 概要
 
 ### 背景与瓶颈
 
@@ -72,7 +74,7 @@ MrRoPE-Pro 在多项长上下文基准上取得显著提升：
 
 这些结果表明，递进式基数转换策略能系统性地突破 RoPE 的上下文窗口限制，为长文本大语言模型的部署提供了无需训练的实用方案。
 
-## 背景与动机
+
 
 ### 超长序列处理中的位置外推困境
 
@@ -94,7 +96,9 @@ MrRoPE 的核心洞察在于：**将 RoPE 扩展重新理解为一种混合基�
 
 这一视角不仅统一了 PI、NTK‑aware Interpolation 和 YaRN 等方法——它们均可被映射为特定的基数转换策略——更重要的是，它揭示了一个关键调节变量：**中间维度上基数扩展因子 $\lambda_j$ 的分布策略**。正是这一策略，决定了模型能否在“保留局部细节”与“扩展全局范围”之间取得最优平衡。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题溯源：RoPE 外推失败的本质
 
@@ -136,7 +140,7 @@ $$\frac { \lambda _ { j } } { \lambda _ { j - 1 } } = \frac { c ^ { 2 } / r _ { 
 
 NTK-aware Interpolation 可视为对所有维度进行均匀基数缩放（$\lambda_j = S^{1/(D_r-1)}$），不区分高频与低频维度的不同需求。Position Interpolation (PI)（Chen et al., 2023）则通过均匀缩放位置索引进行扩展，同样缺乏维度特异性的调节。MrRoPE-Pro 首次在中间维度上引入递进式缩放，这是其在长上下文任务上显著超越 YaRN 和 NTK 方法的根本原因。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_1J63FJYJKg/figures/001_Figure_1.jpg]]
 *Figure 1: The overall framework of our work. Our key contributions are: (1) a unified theoretical framework for major RoPE-extensions, reflecting them into a specific radix conversion behavior; (2) a progressive radix conversion method MrRoPE-Pro, which outperforms other SoTA methods across various tasks*
@@ -155,7 +159,7 @@ MrRoPE 提出了一种基于混合基数转换（Mixed‑Radix Conversion）的�
 
 **关键调节变量**：中间维度的基数扩展因子 $\lambda_j$ 的分布策略是决定外推性能的核心调节变量。MrRoPE‑Pro 采用的递进式策略（$\lambda_j < \lambda_{j+1}$）与 YaRN 的回归式策略（$\lambda_j > \lambda_{j+1}$）形成根本性对立。实验证据表明，递进式策略在保留高频细节的同时，避免了低频维度的外推崩溃，从而系统性地突破上下文窗口上限——MrRoPE‑Pro 将 RoPE 的理论上下文窗口上界从约 1K 提升至 28K（见 Figure 5），并在 128K Needle‑in‑a‑Haystack 测试中保持 85% 以上的召回率，而 YaRN 在 64K 后性能急剧下降。
 
-## 核心模块与公式推导
+
 
 ### 3.1 混合基数RoPE（MrRoPE）统一框架
 
@@ -210,7 +214,9 @@ $$\frac { \lambda _ { j } } { \lambda _ { j - 1 } } = \frac { c ^ { 2 } / r _ { 
 
 该不等式表明 $\lambda_{j-1} > \lambda_j$，即YaRN的缩放因子单调递减，构成回归式基数转换。MrRoPE-Pro的递进式策略正是在此关键环节上做出了反向设计。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能验证
 
@@ -281,7 +287,9 @@ MrRoPE-Pro在多个长上下文基准上展现出对基线方法的系统性优�
 ![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_1J63FJYJKg/figures/012_Table_4.jpg]]
 *Table 4: Perplexity scores of LLaMA2-7B-chat-hf on proofpile dataset. The best and second best results are boldfaced and underlined respectively*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题根源：RoPE 外推的 OOD 困境
 
@@ -334,6 +342,8 @@ MrRoPE 提出了两种训练-自由的扩展策略：
 - 混合基数转换框架能否被证明是最优的 RoPE 扩展方式，还是仅作为现有方法的一种重新诠释？
 - 对于任意模型和上下文扩展长度，是否存在理论指导的自动 $\lambda$ 策略搜索算法，而非手工设计的递进式方案？
 - 该框架是否能无缝结合微调以进一步突破理论编码上限，并与长上下文适配器等方法结合？
+
+
 
 ## 原文 PDF
 

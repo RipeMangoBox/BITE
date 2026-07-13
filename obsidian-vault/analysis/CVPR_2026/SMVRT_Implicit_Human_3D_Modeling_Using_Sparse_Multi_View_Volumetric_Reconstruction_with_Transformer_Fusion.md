@@ -41,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - THUman2.1 上，Normal Consistency (NC) 0.940 vs 0.900 (Zins et al.) (+0.040)；Normal Consistency (NC) 0.940 vs 0.844 (MV-PIFu) (+0.096)。
 
-## 概述
+## 概要
 
 **核心问题**：从稀疏多视角图像（如4个环绕相机）重建高保真三维人体，面临两大瓶颈：一是不同视角间存在严重的自遮挡，导致局部区域（如腋下、手部）重建不完整；二是传统方法在融合多视图特征时，难以自适应地区分可见视角与遮挡视角的贡献，简单拼接或平均池化会引入噪声、丢失细节。
 
@@ -51,7 +51,7 @@ claims:
 
 **主要结果**：在THUman2.1数据集上，SMVRT的法向一致性（NC）达到**0.940**，显著优于Zins et al.的0.900和MV-PIFu的0.844；在THUman2.0数据集上，倒角距离（CD）指标相比现有方法提升约**2倍**。定性结果显示，SMVRT对手指、衣物褶皱等精细结构的重建质量明显优于基线方法（Figure 3）。消融实验证实，三阶段融合模块的完整组合是性能提升的关键，移除任一模块均导致指标显著下降（Table 4）。
 
-## 背景与动机
+
 
 从稀疏多视角图像重建高保真三维人体模型是计算机视觉与图形学中长期存在的挑战性课题。该任务在虚拟现实、增强现实、数字人建模、影视特效等应用中具有广泛需求，但其核心难点在于：当输入视图数量有限（例如2至8个环绕相机）时，如何从离散、可能存在遮挡的二维观测中，稳健地推断出完整且细节丰富的三维几何表面。
 
@@ -61,7 +61,9 @@ claims:
 
 上述缺陷共同指向一个核心瓶颈：**稀疏多视角输入下，传统方法难以有效融合跨视角特征，导致遮挡区域重建不完整、细节丢失，且简单特征聚合无法区分可见与遮挡视角的贡献**。这构成了本文的研究动机——设计一种端到端的隐式三维重建框架，通过多阶段的Transformer引导特征融合，实现视图间信息的自适应整合与表面精细结构的保留。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SMVRT 的核心创新在于针对**稀疏多视图人体重建中跨视角特征融合不充分**这一瓶颈，设计了一套三阶段注意力引导的特征融合机制。与现有方法在查询点处进行简单拼接或局部注意力融合不同，SMVRT 将融合操作前置到共享的 3D 体积网格中心，并在不同层级施加差异化融合策略，从而在避免计算冗余的同时，稳健地聚合多视角信息并保留表面精细结构。
 
@@ -91,7 +93,7 @@ SMVRT 的核心创新在于针对**稀疏多视图人体重建中跨视角特征
 
 **证据支撑**：细节保持模块消融（Table 7）是最具说服力的证据——在 QFT 中引入低层 2D 特征后，法向一致性（NC）从 0.937 提升至 0.940，IoU 从 0.950 升至 0.958。定性对比（Figure 7）也显示，无细节保持器的重建表面过于平滑，缺失了衣物褶皱等细节。
 
-## 整体框架
+
 
 SMVRT 是一个端到端的稀疏多视角人体隐式三维重建框架，其核心设计目标是在仅给定少量（2–8 个）环绕相机拍摄的 RGB 图像及相机标定的条件下，重建出高保真的人体几何表面。整个 pipeline 由五个关键模块级联构成：**多模态输入处理与 ResNet 编码器**、**交替全局-局部融合模块（AFM）**、**多视图多层级特征融合 Transformer（MMFT）**、**查询点融合 Transformer（QFT）** 以及 **隐式场解码器（MLP）**。图 1 给出了完整的架构示意。
 
@@ -122,7 +124,7 @@ QFT 输出的增强嵌入经平均池化后，与查询点的三维坐标拼接�
 ![[assets/figures/papers/paper_list_l20_https_openaccess_thecvf_com_content_CVPR2026_html_Fan_SMVRT_Implicit_Hum/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the SMVRT architecture. Given RGB images, a pretrained Sapiens model [20](not shown) generates normal and depth maps. Camera calibrations are used to compute Plucker [ ¨ 39] rays. The four inputs represent RGB, depth(D), normal(N), Plucker ¨ rays(P), from left to right. These multi-modal inputs are stacked and fed to a ResNet[15] encoder to extract multi-level 2D features. The final-level pixel features are tokenized and passed through an Alternating Fusion Module (AFM) with additional register tokens [10], utilizing either Transformer [40] or Mamba [14] blocks to produce globally regularized features. For 3D volume construction, we bilinearly sample 2D features at each grid cen...*
 
-## 核心模块与公式推导
+
 
 SMVRT 的核心创新在于三阶段注意力引导的特征融合机制，分别作用于 2D 特征增强、3D 体积构建和查询点解码三个层级，逐步解决稀疏多视图人体重建中跨视角信息整合与细节保留的难题。
 
@@ -186,7 +188,9 @@ $$\text{Loss} = -\frac{1}{BN}\sum_{i=1}^{B}\sum_{k=1}^{N}\text{BCE}(O_{\text{pre
 ![[assets/figures/papers/paper_list_l20_https_openaccess_thecvf_com_content_CVPR2026_html_Fan_SMVRT_Implicit_Hum/figures/002_Figure_2.jpg]]
 *Figure 2: Comparison of fusion strategies. (a) 3DFG [4] iteratively transforms query grids into camera spaces and fuse features sequentially by concatenation. (b) Zins et al. [50] perform local feature fusion at each query point by transformer. (c) In our SMVRT design, the first fusion MMFT occurs at grid centers to selectively choose the most relevant views, followed by QFT fusion at query points for fusing detail-preserving low-level features. (d) Our MMFT module first warps multi-view 2D features onto grid centers, where transformers are used to select the most related cameras. QFT is applied at query point to performing attentional fusion of 2D and 3D features*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能对比
 
@@ -262,7 +266,9 @@ Table 6对比了AFM模块中使用标准Transformer与Mamba的实现。两者精
 
 ![[assets/figures/papers/paper_list_l20_https_openaccess_thecvf_com_content_CVPR2026_html_Fan_SMVRT_Implicit_Hum/figures/004_Figure.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 基线对比与差异化分析
 
@@ -295,6 +301,8 @@ SMVRT 的核心定位是**稀疏多视角下的无模板隐式人体重建**，�
 **与基于 3D Gaussian Splatting 等新兴表征的关系。** 论文发表于隐式场方法活跃的时期，未涉及与 3D Gaussian Splatting 等显式表征方法的对比。SMVRT 的体积中心融合思想——在共享 3D 空间中聚合多视图信息——与 Gaussian 方法中的 3D 原语优化存在概念上的呼应，但两者的融合机制和适用场景有本质差异，值得后续工作探索。
 
 **更稀疏视角下的极限性能。** 当前实验最低配置为 2 相机，更极端的情况（单目或宽基线双目）下，SMVRT 的融合机制是否仍有效、是否需要引入时序信息或人体先验，是开放的研究问题。
+
+
 
 ## 原文 PDF
 

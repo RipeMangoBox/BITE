@@ -42,7 +42,7 @@ claims:
 > - D-RE10K (Views=4) 上，PSNR 22.38 vs 20.73 (RayZer + SAV) (+1.65)；SSIM 0.773 vs 0.711 (RayZer + SAV) (+0.062)。
 > - D-RE10K-iPhone (Views=4) 上，PSNR 20.98 vs 18.86 (Spotless-Splats) (+2.12)；LPIPS 0.298 vs 0.382 (Spotless-Splats) (-0.084)。
 
-## 概述
+## 概要
 
 **核心问题**：现有的大视角新视角合成（NVS）方法，无论是基于优化的NeRF/3DGS管线还是前馈式Transformer架构，均假设场景是静态的。在真实世界的动态环境中，移动的行人、宠物、临时杂物等瞬态物体严重破坏多视图一致性，导致渲染结果出现鬼影、幻觉几何以及相机姿态估计的不稳定。关键瓶颈在于：**如何在没有任何真实动态掩码监督的条件下，可靠地定位并剔除动态区域**，从而仅从刚性背景中学习场景表示。
 
@@ -65,8 +65,6 @@ claims:
 
 **局限与开放问题**：伪运动掩码不强制实例级分割，可能仅高亮运动部位而遗漏静止部分；当运动物体占据画面过大比例时，掩码质量和背景补全能力下降。该方法对极端大遮挡、非刚性运动、户外光照变化的鲁棒性，以及能否摆脱对预训练RayZer的依赖实现端到端训练，仍是待探索的开放问题。
 
-## 背景与动机
-
 新视角合成（Novel View Synthesis, NVS）旨在从稀疏的多视角观测中重建三维场景，并在任意目标视角下生成逼真的图像。近年来，基于前馈的大视角合成方法（如 **RayZer**）在静态场景上取得了显著进展：它们通过大规模Transformer架构，以自监督方式从无姿态、无标定的稀疏图像中直接预测相机参数和场景表示，无需显式的NeRF或3DGS等三维表示即可实现高质量的跨视角生成。然而，这些方法的成功高度依赖于一个隐含假设——**场景是静态的**。
 
 真实世界中的视觉数据远非静态。室内场景中走动的人、宠物，室外场景中移动的车辆，都构成了**瞬态物体**（transient objects）。当这些动态元素出现在训练视图中时，它们会从两个层面破坏现有多视图系统的核心假设：
@@ -81,7 +79,7 @@ claims:
 
 面对上述挑战，一个核心问题浮现：**能否在没有任何三维监督或动态掩码监督的情况下，从动态多视图图像中学习到静态场景的新视角合成？** WildRayZer的动机正是填补这一空白——设计一个自监督框架，使其能够自动发现并抑制动态物体，将监督信号集中于背景补全，从而在单次前馈推理中生成无瞬态物体的清晰新视角。
 
-## 核心创新
+## 核心方法与创新机理
 
 WildRayZer 的核心创新在于**将动态场景新视角合成重构为“分析-合成”的自监督学习问题**，在不引入任何 3D 监督或真实动态掩码的条件下，实现了对动态物体的定位与去除。其区别于现有方法的关键设计体现在以下几个 changed slots 上。
 
@@ -118,8 +116,6 @@ RayZer 的原始架构中，所有图像令牌无差别地送入场景编码器�
 | 伪掩码构建 | 无运动掩码概念 | 融合 SSIM 和 DINOv3 差异度，经聚类和 GrabCut 生成像素级二值掩码 |
 
 这些创新使 WildRayZer 在 D-RE10K（4 视图）上取得 22.38 PSNR，较次优方法 RayZer + SAV（20.73 PSNR）提升 1.65 dB；在 D-RE10K-iPhone 上达到 20.98 PSNR，较 Spotless-Splats（18.86 PSNR）提升 2.12 dB。更重要的是，所有改进均在一次前馈推理中完成，无需对每个场景进行优化。
-
-## 整体框架
 
 WildRayZer 在 RayZer 静态渲染器之上引入运动感知能力，构建了一个完全自监督的动态场景新视角合成流水线。其核心设计遵循分析-合成策略：先用一个冻结的静态渲染器解释刚性背景，再将预测残差作为运动证据，驱动运动估计与掩蔽重建的联合学习。
 
@@ -166,8 +162,6 @@ WildRayZer 在 RayZer 静态渲染器之上引入运动感知能力，构建了�
 
 ![[assets/figures/papers/paper_list_l2630_https_arxiv_org_abs_2601_10716/figures/001_Figure_1.jpg]]
 *Figure 1: Our self-supervised WildRayZer learns to render static novel views from dynamic images without any 3D or GT mask supervision. It extends the state-of-the-art self-supervised large view synthesis model RayZer to dynamic environments by adding a learned motion mask estimator and a masked 3D scene encoder*
-
-## 核心模块与公式推导
 
 ### 1. 伪运动掩码构建器（Pseudo‑Motion Mask Constructor）
 
@@ -261,10 +255,7 @@ $$\mathcal{L} = \mathcal{L}_{\text{masked}} + \lambda_{\text{mask}} \cdot \mathr
 ![[assets/figures/papers/paper_list_l2630_https_arxiv_org_abs_2601_10716/figures/004_Figure_3.jpg]]
 *Figure 3: Pseudo Motion Mask Pipeline. We fuse SSIM- and DINO-based dissimilarity into a saliency map, cluster DINO patch features to vote for dynamic patches, then refine the coarse patch mask to pixel resolution via morphological smoothing, smallcomponent removal, and GrabCut [65]*
 
-![[assets/figures/papers/paper_list_l2630_https_arxiv_org_abs_2601_10716/figures/011_Figure_6.jpg]]
-*Figure 6: Examples of Copy–paste mask augmentation. We inject synthetic transient objects (e.g., animals, household items, vehicles) into static RE10K scenes to simulate dynamic elements in otherwise static environments*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -325,28 +316,13 @@ WildRayZer 的训练与评估在两个互补的数据集上进行：**D-RE10K** 
 ![[assets/figures/papers/paper_list_l2630_https_arxiv_org_abs_2601_10716/figures/005_Table_2.jpg]]
 *Table 2: Main Results on Novel View Synthesis. We report mean performance for 2, 3, 4 input views on D-RE10K (left, static regions only) and D-RE10K-iPhone (right, full-image fidelity). Metrics are PSNR ↑, SSIM ↑, and LPIPS ↓. Cells highlighted in red, orange, and yellow denote the best, second, and third results respectively. SAV denotes Segment Any Motion in Videos [21]*
 
-![[assets/figures/papers/paper_list_l2630_https_arxiv_org_abs_2601_10716/figures/006_Figure_4.jpg]]
-*Figure 4: Qualitative Comparisons. Qualitative results on DRE10K-Mask (top two rows) and DRE10K-iPhone (bottom row). Compared to baselines, our method (1) more cleanly removes transient objects, (2) better handles cross-view completion (compare with RayZer + SAV baseline), and (3) better preserves global scene geometry (e.g., kitchens) and fine details (e.g., plants). SLS denotes Splotless-Splats [67]*
-
-![[assets/figures/papers/paper_list_l2630_https_arxiv_org_abs_2601_10716/figures/008_Table_4.jpg]]
-*Table 4: Motion-mask quality. Comparison of supervised and self-supervised motion segmentation methods under sparse-view settings. WildRayZer achieves higher mIoU and recall across different numbers of input views*
-
 ![[assets/figures/papers/paper_list_l2630_https_arxiv_org_abs_2601_10716/figures/010_Table_5.jpg]]
 *Table 5: Copy–Paste Ablation. Copy–paste alone does not transfer to real videos but improves out-of-domain generalization when combined with pseudo-masks*
 
 ![[assets/figures/papers/paper_list_l2630_https_arxiv_org_abs_2601_10716/figures/009_Figure_5.jpg]]
 *Figure 5: Qualitative Results. (1) First row: D-RE10K (no ground-truth novel views). (2) Second row: D-RE10K-iPhone. (3) Third and fourth rows: additional NVS results on DAVIS [54], where ground truth is also unavailable, demonstrating that WildRayZer generalizes to outdoor scenes and can mask unseen transient objects*
 
-![[assets/figures/papers/paper_list_l2630_https_arxiv_org_abs_2601_10716/figures/002_Table_1.jpg]]
-*Table 1: Common datasets for novel view synthesis. “Large?” marks datasets with ≥10K sequences. Static NVS datasets are large, but dynamic ones are typically tiny. D-RE10K closes this gap with 15K real, in-the-wild and dynamic indoor sequences featuring diverse transient objects (people, pets, clutter), enabling training for transient-aware NVS at scale*
-
-![[assets/figures/papers/paper_list_l2630_https_arxiv_org_abs_2601_10716/figures/014_Figure_9.jpg]]
-*Figure 9: Additional qualitative results. We show 12 extra examples to illustrate WildRayZer’s behavior across datasets. The first three rows are from D-RE10K, the next two rows demonstrate generalization to the unseen DAVIS dataset [55], and the last row shows additional real-world results on D-RE10K-iPhone*
-
-![[assets/figures/papers/paper_list_l2630_https_arxiv_org_abs_2601_10716/figures/013_Figure.jpg]]
-*Figure: Predicted Motion Mask*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 方法谱系：从静态渲染到动态解耦
 

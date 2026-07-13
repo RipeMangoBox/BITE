@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/VisionReasoner_Unified_Reasoning_Integrated_Visual_Perception_via_Reinforcement_Learning.pdf
+project_link: null
+code_link: https://github.com/JIA-Lab-research/VisionReasoner
 openreview_forum_id: QoDOwjsbAq
 aliases:
 - VisionReasoner
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | VisionReasoner：基于强化学习的统一推理整合视觉感知框架 |
 | 英文题名 | VisionReasoner: Unified Reasoning-Integrated Visual Perception via Reinforcement Learning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=QoDOwjsbAq); [GitHub](https://github.com/JIA-Lab-research/VisionReasoner) |
+| Links | [paper](https://openreview.net/forum?id=QoDOwjsbAq) · [GitHub](https://github.com/JIA-Lab-research/VisionReasoner) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | VisionReasoner |
 | Dataset | COCO val, RefCOCO val, RefCOCO+ val, RefCOCOg test |
@@ -41,7 +43,7 @@ claims:
 > - RefCOCO val 上，bbox AP 为 88.6，对比 88.8 (Qwen2.5-VL-7B)，变化 -0.2。
 > - RefCOCO+ val 上，bbox AP 为 83.6，对比 82.3 (Qwen2.5-VL-7B)，变化 +1.3。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有视觉感知任务（检测、分割、计数等）高度碎片化，依赖特定任务模型或模块，缺乏统一的框架来同时处理多种任务，且推理能力有限。
 
@@ -55,7 +57,7 @@ claims:
 
 **方法定位**：VisionReasoner 属于基于强化学习的统一视觉感知框架，以 Qwen2.5-VL 为视觉-语言骨干，结合 SAM2 分割模块和 TaskRouter 任务路由器，通过 GRPO 优化多任务推理能力。相比有监督微调（交叉熵损失）和分离式任务模型，其关键差异在于统一奖励驱动的多目标认知学习策略。
 
-## 背景与动机
+
 
 视觉感知是计算机视觉的核心任务，涵盖目标检测、实例分割、目标计数等多种形式。长期以来，这些任务依赖**特定任务模型或专用模块**（如 DQ-DETR 等检测器、SAM2 等分割器），各自独立设计架构与损失函数，缺乏统一的建模框架。近年来，大型视觉语言模型（LVLMs）如 **Qwen2.5-VL-7B**（Yang et al., 2024）和 **Qwen2-VL-7B**（Wang et al., 2024）展现了跨任务泛化的潜力，但其在视觉感知任务上的表现仍受限于两个关键瓶颈：
 
@@ -65,7 +67,9 @@ claims:
 
 针对上述问题，**VisionReasoner** 提出了一条统一的解决路径：将多种视觉感知任务重新定义为三个基础类别（检测、分割、计数），并利用**强化学习（GRPO）**配合精心设计的**统一奖励机制**，训练出具备通用多目标认知与推理能力的单一模型。其核心动机在于：通过奖励信号引导模型生成推理链，而非依赖特定任务的监督标签，从而实现跨任务的统一优化。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 VisionReasoner 的核心创新在于通过**统一奖励机制与强化学习**，将多种视觉感知任务整合到一个共享模型中，并赋予其可解释的推理能力。其关键设计突破体现在以下四个维度。
 
@@ -107,7 +111,7 @@ RL 训练要求对每个 rollout 进行预测-真值匹配以计算奖励，朴�
 
 消融实验（Figure 4）表明，非重复奖励在多个数据集上带来一致的性能增益，同时显著缩短推理响应长度——去除该奖励后模型倾向于生成更长且重复的推理过程。这揭示了奖励设计对推理效率与质量的双重调控作用。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_QoDOwjsbAq/figures/006_Figure_3.jpg]]
 *Figure 3: Illustration of VisionReasoner. (a) For a given image I and text instruction T, our model generates the expected output corresponding to the instruction. (b) For each observation o _ { i } . , we calculate the rewards (Section 3.4) and attain the optimal match of multi-objects (Section 3.5)*
@@ -159,7 +163,7 @@ $$A_i = \frac{r_i - \operatorname{mean}(\{r_1, r_2, \ldots, r_G\})}{\operatornam
 
 框架将视觉感知任务压缩为检测、分割、计数三个基础类别的洞察，源于对现有任务共性的分析。这一简化使得单一模型无需任务特定模块即可覆盖多种下游应用。训练数据仅约 7k 样本（来自 LVIS、RefCOCOg、gRefCOCO 和 LISA++），模型以 Qwen2.5-VL 和 SAM2 初始化，batch size 16，学习率 $1 \times 10^{-6}$。有限的训练数据规模既是效率优势，也可能限制某些任务上的覆盖度，这一点在论文局限性中被明确指出。
 
-## 核心模块与公式推导
+
 
 ### 3.1 强化学习目标：GRPO
 
@@ -215,7 +219,9 @@ $$\mathbf{C} = \mathcal{F}_{\mathrm{router}}(\mathbf{T})$$
 - **非重复奖励的因果机制**：RL 训练中模型倾向于生成冗长、重复的推理链以获取更高奖励。非重复奖励通过惩罚重复模式，迫使模型学习更简洁有效的推理策略，同时提升推理忠实度。人工评估显示推理轨迹的图像一致性（IC）达 97.0%，答案一致性（AC）达 90.5%。
 - **批量化匈牙利匹配**：将匹配计算从逐样本串行改为批量并行处理，在保持最优匹配质量的前提下实现 4 倍加速，使 RL 训练中的奖励计算不再成为瓶颈。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -271,7 +277,9 @@ VisionReasoner在检测、分割和计数三大类视觉感知任务上均取得
 
 当前训练数据仅约7k样本，可能限制模型在某些长尾任务上的覆盖度。过度采样可能导致过拟合（Figure 5），需要在训练中谨慎控制采样数。此外，当前评估覆盖了10个代表性任务，更全面的任务类型评估留待未来工作（Tables 14-15）。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法脉络与基线关系
 
@@ -312,6 +320,8 @@ $$\mathrm{Output} = \begin{cases} \{\mathbf{B}_i\}_{i=1}^N, & \text{if }\mathbf{
 **复杂指令的边界**：虽然定性比较显示 VisionReasoner 在复杂指令下正确定位物体，而 **DINO-X** 和 **YOLO-World** 失败（Figure 2），但这一结论仅基于有限的定性样本，尚未在标准化的复杂指令基准上进行系统验证。
 
 **开放问题**：当前框架未涉及视频理解、3D 感知等更广泛的视觉任务类型，其统一范式的可扩展性有待验证。此外，RL 训练中奖励权重的自动调优、更大规模训练数据的构建策略，以及推理链质量与任务性能之间更精细的因果关系分析，均为值得进一步探索的方向。
+
+
 
 ## 原文 PDF
 

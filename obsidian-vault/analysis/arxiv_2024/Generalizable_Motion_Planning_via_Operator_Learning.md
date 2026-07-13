@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2024
 pdf_ref: paperPDFs/arxiv_2024/Generalizable_Motion_Planning_via_Operator_Learning.pdf
+project_link: null
+code_link: https://github.com/ExistentialRobotics/PNO
 aliases:
 - PNOP
 - GMPOL
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 可泛化运动规划：基于算子学习的方法 |
 | 英文题名 | Generalizable Motion Planning via Operator Learning |
 | 会议/期刊 | arXiv 2024 |
-| Links | [paper](https://arxiv.org/abs/2410.17547) · [Code](https://github.com/ExistentialRobotics/PNO) · [arXiv](https://arxiv.org/abs/1709.05448) |
+| Links | [paper](https://arxiv.org/abs/2410.17547) · [Code](https://github.com/ExistentialRobotics/PNO) · [paper](https://arxiv.org/abs/1709.05448) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Planning Neural Operator (PNO) |
 | Dataset | Grid World, MovingAI 2D Synthetic, MovingAI 2D Real-world City, iGibson 3D Buildings |
@@ -41,7 +43,7 @@ claims:
 > - MovingAI 2D Synthetic (64²) 上，Avg. L2 Relative Error 0.1136 (PNO); 0.0698 (PNO w/ PINN) vs FNO: 0.1996; DAFNO: 0.0985 (PNO 误差比 FNO 降低 43.1%，PINN 进一步降 38.6%)。
 > - MovingAI 2D Real-world City (64², 1024²) 上，Avg. L2 Relative Error / Speedup vs FMM 0.1748 (no PINN) / ~10× speedup at 1024² vs DAFNO: 0.4090; FMM: 104.6 ms at 1024² (PNO 误差比 DAFNO 降低 57.3%，计算速度比 FMM 快约10倍)。
 
-## 概述
+## 概要
 
 运动规划是机器人学的基础问题，其核心在于寻找从起点到目标点的无碰撞路径，同时最小化某种代价（如时间或能量）。传统规划算法——包括基于搜索的A*、基于采样的RRT/RRT*以及数值Eikonal求解器（如快速行进法FMM）——在复杂、动态或高分辨率环境中面临计算开销巨大的瓶颈。近年来，神经价值函数预测器（如**VIN**，Tamar et al., NIPS 2016；**IEF2D/3D**，Li et al., 2022；**NTFields**，Ni & Qureshi, 2023a）试图通过深度学习加速这一过程，但它们普遍缺乏跨环境泛化能力和分辨率不变性：一旦环境改变或分辨率提升，模型通常需要重新训练或完全失效，无法实现零样本部署。
 
@@ -57,7 +59,7 @@ claims:
 
 PNO的方法定位处于神经算子理论、Eikonal方程求解与启发式搜索规划的交汇点。其核心贡献在于首次将运动规划中的价值函数预测形式化为算子学习问题，并通过架构创新实现了分辨率不变性、障碍物感知和目标泛化三者的统一。该工作为快速、可泛化的神经运动规划开辟了新路径，同时也揭示了若干待解决问题：当前方法依赖均匀代价假设，尚未处理非均匀代价环境；障碍膨胀层数需手工调节；在训练与测试地图分布差异过大时精度仍会下降。
 
-## 背景与动机
+
 
 ### 运动规划的核心瓶颈
 
@@ -100,7 +102,9 @@ $$\|\nabla V(\pmb x)\| = c(\pmb x)$$
 
 为实现这些目标，PNO 在 FNO 基础上引入了三个关键设计：障碍物几何的平滑编码、满足三角不等式的 Deepnorm 投影层、以及混合 PINN 损失。这些组件协同工作，使神经算子能够从代价函数空间中捕获运动规划的底层结构，而非记忆特定地图的模式。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PNO 的核心创新在于将运动规划中的价值函数近似重新定义为**从代价函数空间到价值函数空间的算子学习问题**，并围绕这一范式设计了三个关键的技术槽位（changed slots），使其区别于所有现有基线方法。
 
@@ -155,7 +159,7 @@ PNO 继承自 **FNO** (Li et al., 2021) 的频域参数化方式——Fourier �
 - 作为 A* 启发式时，障碍膨胀层数的选择目前依赖实验调参（Table 3），缺乏自适应机制。
 - 训练数据仍依赖传统数值求解器（FMM/Dijkstra）离线生成，对于极高维 C 空间（7-DOF 及以上）的数据生成成本可能成为瓶颈，这一点需要在实际应用中验证。
 
-## 整体框架
+
 
 PNO 的整体 pipeline 将运动规划中的价值函数近似重新定义为**从代价函数空间到价值函数空间的算子学习问题**。其核心流程如下：
 
@@ -192,7 +196,7 @@ $$\mathrm{Loss}(V, \hat{V}) := \|V - \hat{V}\|_{L^2} + \xi \left( \int_{x \in S}
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2410_17547/figures/002_Figure_2.jpg]]
 *Figure 2: PNO network architecture. The input to a PNO is a binary occupancy grid, which is transformed into a sign distance function (SDF) via an independently trained FNO. This, along with the original binary map is passed to a series of modified FNO layers which hard encode the obstacles. Finally, this result, along with the goal, is then fed to a projection layer (ensuring satisfaction of the triangle inequality) obtaining the final value function prediction*
 
-## 核心模块与公式推导
+
 
 ### 问题建模：从最优控制到Eikonal PDE
 
@@ -268,7 +272,9 @@ $$\mathrm{Loss}(V, \hat{V}) := \|V - \hat{V}\|_{L^2} + \xi \left( \int_{\pmb{x} 
 
 PNO的分辨率不变性源于FNO的频域学习范式。Fourier层在频域截断固定数量的低频模态进行卷积，该操作与输入/输出的空间离散化分辨率无关。因此，模型在 $64 \times 64$ 分辨率上训练后，可直接推理 $256 \times 256$ 乃至 $1024 \times 1024$ 的输入（Figure 1），实现最高16倍的超分辨率部署，且无需任何架构修改或微调。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -355,7 +361,9 @@ Table 5 汇总了不同算法在 2D 数据集上的超分辨率计算时间。�
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2410_17547/figures/001_Figure_1.jpg]]
 *Figure 1: Example of super-resolution capabilities of PNO for motion planning on a map of NYC. The operator is trained on a dataset of resolution 64 × 64 and the examples shown here (resolutions 256 × 256, 512 × 512, and 1024 × 1024) were not seen during training. See Sec. 4 for details*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 从值迭代近似到算子学习：核心范式转换
 
@@ -436,6 +444,8 @@ PNO作为A*启发式时，需引入障碍膨胀（erosion）以保证路径最�
 5. **与其他PDE解算子的统一**：PNO的障碍编码和Deepnorm投影层是否可推广到其他PDE解算子学习任务？例如，Hamilton-Jacobi方程的更一般形式可能受益于类似的几何约束注入机制。
 
 6. **训练数据多样性的系统性增强**：为缓解分布外泛化退化，能否结合生成模型（如扩散模型或GAN）在训练中引入更多样的地图拓扑，或通过数据增强策略（如随机障碍物放置、拓扑变形）提升模型的鲁棒性？
+
+
 
 ## 原文 PDF
 

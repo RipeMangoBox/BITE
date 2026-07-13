@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Independence_Test_for_Linear_Non_Gaussian_Data_and_Applications_in_Causal_Discovery.pdf
+project_link: null
+code_link: null
 openreview_forum_id: Uc1EAICxTD
 aliases:
 - LLNGIC
@@ -42,7 +44,7 @@ claims:
 > - 线性非高斯合成数据 (d=3, Student-t, n=500) 上，Test Power 为 0.97 (LiNGIC)，对比 0.85 (HSIC), 0.69 (SCIT)，变化 +0.12 (vs HSIC)。
 > - Downstream Direct-LiNGAM on synthetic Sachs data (10 nodes, Uniform noise) 上，F1 score (higher) & SHD (lower) 为 F1=0.98, SHD=0.8，对比 F1=0.97 (dCor), SHD=1.0 (dCor); F1=0.93 (HSIC-RFF), SHD=1.2，变化 F1:+0.01 vs dCor; SHD:-0.2 vs dCor。
 
-## 概述
+## 概要
 
 独立性检验是统计推断与因果发现中的核心模块。通用非参数检验（如 HSIC、dCor）虽能捕捉任意形式的依赖，但在**线性非高斯混合模型**这一常见场景下，其有限样本功效常显不足——它们未利用数据生成结构，导致对微弱依赖的区分能力受限。
 
@@ -52,7 +54,7 @@ claims:
 
 实验表明，LiNGIC 在合成线性非高斯数据上的检验功效系统性地优于 HSIC、dCor 等通用方法——尤其在重尾分布（如 Student-t）和弱依赖条件下优势显著。在下游因果发现任务（Direct-LiNGAM）中，LiNGIC 在多个噪声类型上取得了最低的 SHD。但需注意，该优势**严格依赖**线性非高斯假设；在真实 Sachs 数据上，其 F1 分数未超越 dCor，提示模型假设与实际数据的契合度仍需审慎评估。
 
-## 背景与动机
+
 
 独立性检验是统计推断与因果发现中的核心工具。给定两个随机变量 $X$ 和 $Y$，检验 $X \perp\!\!\!\perp Y$ 是否成立。通用的非参数独立性检验方法——如 Hilbert-Schmidt 独立性准则（HSIC）、距离相关（dCor）——通过核函数或距离度量捕捉 $X$ 与 $Y$ 之间的任意形式依赖。HSIC 的定义为交叉协方差算子的 Hilbert-Schmidt 范数：
 
@@ -66,7 +68,9 @@ $$\| \Sigma_{XY} \|_{\mathcal{HS}}^2 = \| \mathbb{E}_{\mathbb{P}_{XY}} [ (\psi_X
 
 本文正是基于这一观察，提出了一种专门针对线性非高斯数据的独立性检验框架，将检验条件从“捕捉任意依赖”收缩为“验证条件期望和条件方差恒定”，在保持 I 型错误控制的同时显著提升检验功效。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈：通用检验在线性非高斯结构下的功效不足
 
@@ -117,7 +121,7 @@ $$\widehat{A} = \widehat{\mu_{xx}^k \mu_{yy}^l} + \widehat{\|\mu_x^k\|^2} \wideh
 
 上述创新的有效性严格依赖于**线性混合且噪声独立非高斯**的假设。当数据包含非线性混合或高斯成分时，Theorem 4.2 的等价性不再成立，LiNGIC 的优势可能消失。在 Sachs 真实数据上的下游因果发现实验中，LiNGIC 的 F1 分数（0.22）未超越 dCor（0.29），提示模型假设对实际数据的契合度仍需进一步验证。此外，当前版本仅支持两变量独立性检验，尚未扩展至多变量联合独立性（类比 dHSIC），计算复杂度仍为 $O(n^2)$ 且未提供基于随机特征的加速版本。
 
-## 整体框架
+
 
 ### 问题设定与输入输出
 
@@ -156,7 +160,7 @@ $$\mathrm{LiNGIC}_b(\mathcal{D}) = \frac{1}{n^2} \mathrm{Tr}(K_X H L_Y H) + \fra
 
 这一简化使得 LiNGIC 在满足线性非高斯假设的场景下，能以更低的方差实现更高的检验功效，而计算复杂度仍为 $O(n^2)$，与 HSIC 同阶（Table 5）。
 
-## 核心模块与公式推导
+
 
 ### 模块一：LiNGIC 统计量构造
 
@@ -223,7 +227,9 @@ $$\widehat{A} = \widehat{\mu_{xx}^k \mu_{yy}^l} + \widehat{\|\mu_x^k\|^2} \wideh
 | $h_{ijqr}$ | 对称核函数，用于 V-统计量表达和渐近分析 |
 | $\lambda_l$ | 零假设渐近分布中的加权系数 |
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -278,7 +284,9 @@ $$\widehat{A} = \widehat{\mu_{xx}^k \mu_{yy}^l} + \widehat{\|\mu_x^k\|^2} \wideh
 
 LiNGIC 的功效优势严格依赖于两个前提：(1) 数据由独立非高斯成分线性混合生成；(2) 噪声成分的方差有限。当这些假设不满足时——例如包含非线性混合、存在高斯成分、或真实数据偏离线性非高斯模型——Theorem 4.2 的“独立 $\iff$ 条件均值与方差恒定”等价性失效。Sachs 真实数据上的 F1 退化（Table 7）正是这一边界的体现：此时 LiNGIC 可能漏检仅在高阶矩中体现的依赖关系，而 HSIC 或 dCor 等通用检验反而更鲁棒。在实际应用中，若对数据生成过程的线性非高斯性质存疑，建议将 LiNGIC 作为互补工具而非完全替代通用检验。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -317,6 +325,8 @@ LiNGIC 的理论保证建立在以下严格假设之上，任一假设的偏离�
 3. **加速近似**：是否存在基于随机特征的近似算法，可在不显著损失统计功效的前提下将计算复杂度降至 $O(n)$ 或 $O(n \log n)$？
 4. **混合高斯-非高斯场景**：当部分成分为高斯时，检验等价性是否可松弛？能否设计自适应机制，在检测到高斯成分时自动混合 LiNGIC 与 HSIC 的检验准则？
 5. **高维稀疏场景**：在成分数量远大于样本量的高维设定下，LiNGIC 的渐近分布近似质量如何？是否需要针对稀疏结构进行修正？
+
+
 
 ## 原文 PDF
 

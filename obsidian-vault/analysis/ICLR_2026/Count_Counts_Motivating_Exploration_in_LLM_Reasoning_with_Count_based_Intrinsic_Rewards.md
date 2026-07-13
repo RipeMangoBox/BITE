@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Count_Counts_Motivating_Exploration_in_LLM_Reasoning_with_Count_based_Intrinsic_Rewards.pdf
+project_link: null
+code_link: null
 openreview_forum_id: 9xIBbfItGP
 aliases:
 - CCMELRCBIR
@@ -41,7 +43,7 @@ claims:
 > - Math Reasoning (6 benchmarks avg) 上，mean@k (average) 为 DAPO+MERCI 44.9，对比 DAPO 42.2，变化 +2.7。
 > - Bird (SQL generation) 上，Greedy accuracy 为 GRPO+MERCI 63.0，对比 GRPO 60.7，变化 +2.3。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -82,7 +84,7 @@ MERCI在多个复杂推理基准上一致地提升了强基线的性能：
 3. **超参数敏感性**：内在奖励的预算控制超参数（百分位过滤比例、余弦衰减步数等）需要针对不同任务调整，缺乏自适应机制。
 4. **规模验证缺失**：尚未在更大规模模型（如 >70B）上验证方法的有效性和计算开销。
 
-## 背景与动机
+
 
 ### 大语言模型推理的强化学习瓶颈
 
@@ -115,7 +117,9 @@ MERCI在多个复杂推理基准上一致地提升了强基线的性能：
 2. **引入基于计数的伪计数估计**（Coin Flipping Network, CFN），以轻量级的方式估计状态访问新颖性，作为局部奖励不确定性的代理。
 3. **将内在探索奖励无缝集成到现有RL框架**（如GRPO、DAPO）中，通过预算控制和标准化机制，在不破坏结果奖励信号的前提下，驱动策略探索新颖的推理轨迹，缓解过早收敛问题。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MERCI的核心创新在于将**基于计数的内在探索奖励**系统性地引入大语言模型（LLM）的强化学习（RL）推理训练中，以解决现有方法因依赖稀疏结果奖励而导致的**探索不足与过早收敛**问题。其关键洞察在于，LLM自回归生成过程的**状态转移是确定性且已知的**（即下一个状态 $s'$ 就是当前状态 $s$ 与动作 $a$ 的拼接），这一特性从根本上简化了认知不确定性传播的复杂性。
 
@@ -155,7 +159,7 @@ $$\hat { A } _ { \mathrm { n e w } } ^ { i } = \begin{cases} \min(\hat { A } _ {
 
 这一设计使得MERCI在保持原有RL算法优化目标的前提下，为策略提供了有方向性的探索激励——鼓励模型访问CFN判定为新颖的推理状态，从而逃离重复且次优的推理模式。与依赖熵正则化或ε-greedy等无方向探索的基线方法相比，MERCI的探索信号由认知不确定性驱动，理论上更具针对性。实验也表明，单纯扩展GRPO的训练步数反而导致pass@k下降（从65.8降至61.6），而MERCI则有效缓解了这一过早收敛问题。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_9xIBbfItGP/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the MERCI framework. Two separate networks are used: a policy network $\pi _ { \theta }$ trained with RL, and a CFN network that provides an intrinsic reward. The CFN network, initialized from the same SFT checkpoint $\pi _ { 0 }$ , estimates state novelty to guide the exploration of $\pi _ { \theta }$
@@ -211,7 +215,7 @@ $$U ^ { h } ( s , a ) \leq \mathbb { V } _ { t } [ \hat { r } ^ { h } ( s ) ] + 
 
 该方程表明，在确定性转移下，Q值的不确定性受限于即时奖励不确定性加上下一状态的期望不确定性，而转移不确定性被完全消除。这使得原本难以在LLM规模上估计的全局Q值不确定性，退化为局部奖励不确定性的累积问题——这正是CFN伪计数估计能够有效代理的核心原因。
 
-## 核心模块与公式推导
+
 
 MERCI 的核心架构由四个协同模块构成，其设计根植于一个关键洞察：在自包含的 LLM 推理任务中，状态转移函数是确定性且已知的，这从根本上简化了认知不确定性的传播机制。
 
@@ -249,7 +253,9 @@ $$\hat { A } _ { \mathrm { n e w } } ^ { i } = \begin{cases} \min(\hat { A } _ {
 
 其中 $\gamma$ 是探索系数，采用余弦衰减策略（在第 200 步衰减至初始值的 10%），实现预算感知的探索控制。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈的实证验证：GRPO的过早收敛问题
 
@@ -304,7 +310,9 @@ Table 10考察了内在奖励系数γ的余弦衰减速度对性能的影响。�
 2. **超参数敏感性**：奖励过滤的百分位阈值、空间连贯性窗口大小、噪声抑制强度等参数需要针对任务进行调整。Table 5和Table 6显示，数学推理和SQL生成任务使用了不同的过滤配置，表明这些参数的迁移性有限，缺乏自适应机制。
 3. **确定性转移假设的边界**：当前方法在数学和SQL等自包含推理任务上验证有效，但在涉及外部工具调用或对话交互的场景中，确定性转移假设不再成立，UBE的简化推导需要重新审视。跨域实验（Table 7）虽展现了泛化潜力，但GPQA和MMLU-Pro本质上仍属于自包含推理范畴，尚未触及真正的非确定性交互场景。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 基础RL算法：GRPO与DAPO
 
@@ -354,6 +362,8 @@ MERCI的理论基础可追溯到两个源头：
 3. **细粒度信用分配**：当前内在奖励的信用分配基于相邻token簇的空间连贯性过滤，是否可以进一步细化到语法结构级别（如数学表达式的子式、代码的语句块）？
 
 4. **大规模模型验证**：论文仅在7B-8B规模模型上进行了实验。在更大规模模型（如>70B）上，CFN的伪计数估计是否仍然可靠？内在奖励信号是否会因模型自身强大的推理能力而变得冗余？这些都需要进一步验证。
+
+
 
 ## 原文 PDF
 

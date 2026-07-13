@@ -41,7 +41,7 @@ claims:
 > - LR-B2N (φ=96²) 上，HM 63.14 (MMA+LOREAL) vs 40.50 (MMA) (+22.64%)；HM 57.25 (MaPLe+LOREAL) vs 34.85 (MaPLe) (+22.40%)；HM 61.71 (MMRL+LOREAL) vs 38.90 (MMRL) (+22.81%)。
 > - LR-CE (φ=96², ImageNet) 上，Accuracy 37.65 (CoOp+LOREAL) vs 22.70 (CoOp) (+14.95%)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有视觉语言模型（VLMs）的提示学习方法在低分辨率输入下性能退化严重。当部署于边缘设备时，降低分辨率虽能节省最高 62% 的推理内存和 64% 的推理速度（图 2），但会模糊判别性视觉特征、减少视觉令牌数量，而现有方法如 **CoOp**（Zhou et al., IJCV 2022）、**MaPLe**（Khattak et al., CVPR 2023）、**MMA**（Yang et al., CVPR 2024）、**MMRL**（Guo & Gu, arXiv 2025）均未针对此场景设计，缺乏鲁棒性。
 
@@ -51,7 +51,7 @@ claims:
 
 **主要结果**：在 LR-B2N 基准上，当分辨率降至 φ=96² 时，LOREAL 为 MMA 带来 **+22.64%** 的调和平均数（HM）提升，为 MaPLe 和 MMRL 分别带来 **+22.40%** 和 **+22.81%** 的提升（表 1）。在 LR-CE 和 LR-DG 基准上也表现出一致的增益。消融实验证实 LLD 和 HLD 两者对于跨分辨率语义对齐都是必要的，其中 LLD 贡献更为显著。
 
-## 背景与动机
+
 
 ### 低分辨率推理：边缘部署的必然选择与性能陷阱
 
@@ -77,7 +77,9 @@ claims:
 
 上述分析揭示了本文的核心动机：**需要一种专门面向低分辨率场景的提示学习框架，能够在保持推理效率的同时，通过跨分辨率语义对齐来恢复低分辨率输入下的判别能力。**
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 LOREAL 的核心创新在于**首次将低分辨率鲁棒性引入视觉语言模型的提示学习范式**，通过三个紧密耦合的机制——LLM 驱动的属性语义挖掘、跨模态 meta-net 动态提示生成、以及双学生自蒸馏框架——系统性地解决了现有方法在低分辨率场景下性能崩溃的问题。
 
@@ -123,7 +125,7 @@ $$S_k = M_k(\mathbf{f}_v) = W_{\uparrow,k}(W_{\downarrow,k}(\mathbf{f}_v))$$
 
 **证据强度**：上述三个创新均有明确的消融实验支撑。移除 LLD 或 HLD 均导致 HM 显著下降（Table 6）；meta-net 瓶颈维度 $D_s=32$ 和温度参数 $T=4$ 的最优配置通过网格搜索验证（Table 5）；属性数量 $K=5$ 和平衡系数 $\lambda_1, \lambda_2$ 的影响通过实验确定（Figure 5）。
 
-## 整体框架
+
 
 LOREAL 的整体框架围绕一个核心矛盾展开：**低分辨率输入会模糊判别性视觉特征并减少视觉令牌数量，而现有提示学习方法对此缺乏鲁棒性**。为解决这一问题，LOREAL 构建了一个“属性驱动的提示自蒸馏”pipeline，其因果链条为：利用 LLM 的先验知识提取分辨率不变的宏观属性 → 通过跨模态 meta-net 将视觉特征动态注入属性提示 → 采用双学生自蒸馏框架强制跨分辨率语义对齐。
 
@@ -153,7 +155,7 @@ LOREAL 的整体框架围绕一个核心矛盾展开：**低分辨率输入会�
 ![[assets/figures/papers/paper_list_l762_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_LOREAL_Mitigating/figures/004_Figure_4.jpg]]
 *Figure 4: OurLOREALframework.(a):WeleveragetheLLMtogenerateseveralresolution-robustatributes.(b):Self-distllation framework.Weutilzethevisualembeddings toflltheprompatributesviameta-nets,thenleverageLow-LevelDistilltion(LDand High-LevelDtilltio(HLDforself-distllaion.Onlyemeta-etsareaable,andepramersof tollustratedmeatae sharedLRrepresentsLow-Resolution. (c): Inferencestage.Themodeltakes LRimagesandcontextualizes prompts withthe meta-nets*
 
-## 核心模块与公式推导
+
 
 LOREAL 的核心由三个模块构成：**LLM 驱动的属性生成**、**跨模态 Meta-Net 提示投射**，以及**双学生自蒸馏框架**。三者协同工作，使模型在低分辨率输入下仍能捕获判别性语义。
 
@@ -208,7 +210,9 @@ $$\mathcal{L}_{\text{HLD}} = \sum_{c=1}^{C} \big(\hat{y}_c^\alpha \log \hat{y}_c
 ![[assets/figures/papers/paper_list_l762_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_LOREAL_Mitigating/figures/003_Figure_3.jpg]]
 *Figure 3: ComparisonsofClasicKD[76],PromptKD[40]andourLOREAL.Theupper/lowerpartis thetraining/inferencestage.TE means the TextEncoder.LR meansLow-Resolution.(a)Classic KDofVLMs,where students are fuly-tuned.(b)PromptKD,which leverages prompts tolearing fromteachers.Both (a)and (b)aredesignedfornon-LRinference.(c)The proposedLOREAL,aprompt self-distillatinschemetosolvetheLRchallnges.Here,twostudentsarethesame modelsbutfedwithdiffrentinputs.LOREAL leveragesfiegraedtrutedancendsimultaneouslydistillfomtwolevelstooosttemodel'sobustesstodtasolutios*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 低分辨率基类到新类（LR-B2N）基准评估
 
@@ -286,7 +290,9 @@ Figure 6 展示了 LOREAL 学习到的属性令牌语义和注意力热力图。
 ![[assets/figures/papers/paper_list_l762_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_LOREAL_Mitigating/figures/012_Figure_5.jpg]]
 *Figure 5: Ablation studies on (a)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：低分辨率提示学习的空白地带
 
@@ -356,6 +362,8 @@ LOREAL 在知识库中的独特定位在于**将 LLM 的先验知识作为分辨
 5. **模态扩展性**：自蒸馏框架的双学生设计是否可扩展到视频（时序分辨率变化）、音频（采样率变化）等其他模态的低质量输入场景，有待探索。
 
 6. **训练效率权衡**：虽然推理阶段无额外开销（仅需单次前向传播，Figure 4c），但训练阶段需要两次前向传播（两个学生）和额外的蒸馏损失计算，训练时间有所增加（Table 4 中 Tra. time 数据显示了这一点）。
+
+
 
 ## 原文 PDF
 

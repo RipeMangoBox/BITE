@@ -42,7 +42,7 @@ claims:
 > - FGAesthetics 上，Pair ((Acc+F1)/2 across categories) 0.753 vs 0.699 (Charm Fine-tuned) (+0.054)；Series ((s-Acc+s-SRCC)/2 across categories) 0.600 vs 0.477 (Charm Fine-tuned) (+0.123)。
 > - AVA 上，SRCC / PLCC 0.770 / 0.781 vs 0.777 / 0.779 (Charm) (-0.007 / +0.002)。
 
-## 概述
+## 概要
 
 图像美学评估（Image Aesthetic Assessment, IAA）旨在让机器自动判断图像的视觉美感。现有IAA研究主要聚焦于**粗粒度评估**——对风格、内容差异显著的图像进行独立的绝对评分（如AVA数据集）。然而，在摄影选片、AIGC优选等实际场景中，用户面临的是视觉高度相似、美学差异微妙的**细粒度比较**问题：同一场景的多张连拍照片，哪一张更美观？在此类场景下，现有模型因难以提取判别性美学特征而性能急剧下降。
 
@@ -57,7 +57,7 @@ claims:
 
 该方法在**方法谱系**上属于“排序驱动的判别性美学学习”，区别于传统的绝对分数回归（如NIMA）或多任务学习范式（如TANet），其核心创新在于将细粒度相对排序信号与粗粒度绝对评分信号进行联合建模，实现了两类评估的平衡。
 
-## 背景与动机
+
 
 ### 图像美学评估的粗粒度现状
 
@@ -73,7 +73,9 @@ claims:
 
 基于此，本文提出 **FGAesQ**，一个从相对排序中学习判别性美学分数的新框架。FGAesQ通过三个协同模块实现这一目标：**差分保持Token化（DiffToken）** 在美学决定性区域保持原始分辨率细节，其他区域降采样以节省计算量；**对比文本辅助对齐（CTAlign）** 将视觉嵌入差与MLLM生成的对比文本嵌入对齐，增强判别性表征；**排序感知回归（RankReg）** 使用Bradley-Terry模型和ListMLE损失，将预测的成对偏好概率与真实排序对齐。同时，本文构建了 **FGAesthetics** 基准数据集，包含来自自然、AIGC和裁剪三个来源的32,217张图像、10,028个序列，为细粒度IAA研究提供了标准化评估平台。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FGAesQ 的核心创新在于将**细粒度相对排序**作为训练信号，通过三个协同设计的模块——差分保持Token化（DiffToken）、对比文本辅助对齐（CTAlign）和排序感知回归（RankReg）——使模型学习更具判别性的美学表征，从而在保持粗粒度评估能力的同时，显著提升对语义相似、美学差异微小的图像的区分能力。
 
@@ -121,7 +123,7 @@ $$\mathcal{L} = \underbrace{\delta \cdot (\lambda \mathcal{L}_{F.align} + \mathc
 
 与现有方法相比，FGAesQ 的根本区别在于**学习范式的转变**：从学习绝对美学分数转向从相对排序中学习判别性分数。这一转变使得模型不再依赖单一的绝对评分监督，而是利用图像序列中蕴含的丰富相对信息，从而在细粒度场景中获得更强的区分能力。实验结果表明，FGAesQ 在 FGAesthetics 的所有评估协议（成对级别和序列级别，三个图像源）上均取得最优性能（Table 2），同时在 AVA 粗粒度评估上保持竞争力（SRCC=0.770/PLCC=0.781，Table 3），实现了粗-细粒度评估的最佳平衡。
 
-## 整体框架
+
 
 FGAesQ 的整体设计围绕一个核心矛盾展开：细粒度美学评估中，图像间强烈的语义相似性与微小的美学差异使得标准模型难以提取判别性特征。为解决这一问题，FGAesQ 将相对排序信号作为训练的核心驱动力，构建了一个三模块协同的评估框架，如 Figure 4 所示。
 
@@ -164,7 +166,7 @@ FGAesQ 的推理流程为：输入图像经 DiffToken 进行混合分辨率 Toke
 
 消融实验（Table 5）系统验证了各模块的独立贡献：移除 CTAlign 使 Pair 从 0.753 降至 0.747、Series 从 0.600 降至 0.581；移除 RankReg 使 Pair 降至 0.742、Series 降至 0.571。三个模块的叠加效果表明，特征保持、语义对齐和排序校准在细粒度美学建模中存在互补增益。
 
-## 核心模块与公式推导
+
 
 FGAesQ 的核心设计围绕一个瓶颈展开：现有 IAA 模型在细粒度场景下，由于图像间强烈的语义相似性和微小的美学差异，难以提取判别性美学特征。为解决这一问题，FGAesQ 引入三个协同模块——差分保持Token化（DiffToken）、对比文本辅助对齐（CTAlign）和排序感知回归（RankReg），并通过两阶段训练策略将粗粒度美学感知与细粒度排序信号联合优化。
 
@@ -218,7 +220,9 @@ $$\mathcal{L} = \underbrace{\delta \cdot (\lambda \mathcal{L}_{F.align} + \mathc
 
 **消融关键发现**：移除 DiffToken 对性能影响最大，Pair 从 0.753 降至 0.666，Series 从 0.600 降至 0.423（Table 5），表明保持美学差异区域的细节是细粒度判别的核心瓶颈所在。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -291,7 +295,9 @@ $$\mathcal{L} = \underbrace{\delta \cdot (\lambda \mathcal{L}_{F.align} + \mathc
 ![[assets/figures/papers/paper_list_l2124_https_arxiv_org_abs_2603_03907/figures/004_Figure_3.jpg]]
 *Figure 3: Statistical analysis of FGAesthetics. (a) Image and series count distribution across Natural, AIGC, and Cropping. (b) Within-series similarity distributions measured by LPIPS (lowlevel) [51], DreamSim (mid-level) [9], and CLIPScore (high-level) [13] across three sources. Note that LPIPS and DreamSim are subtracted from 1, ensuring consistent polarity with CLIPScore, where higher values indicate greater similarity*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：从粗粒度到细粒度IAA的范式迁移
 
@@ -330,6 +336,8 @@ FGAesQ 的设计隐含若干适用边界，需在实际应用中审慎考量：
 **可操作反馈生成**：从“判断哪个更好”到“解释为什么更好并提供改进建议”的跨越，需要模型具备更细粒度的美学属性解耦能力。CTAlign的对齐机制为此提供了潜在基础，但需要进一步将对比文本嵌入映射到具体的视觉属性（构图、色彩、光影等），并建立属性到改进操作的因果链。
 
 **跨源泛化与域适应**：Table 8的OOD实验结果揭示了不同图像源（Natural、AIGC、Cropping）之间的域差异。AIGC图像的审美标准可能与自然图像存在系统性偏差，Cropping变体的美学判断涉及构图规则的特定知识。如何设计具备跨源泛化能力的细粒度IAA模型，或建立高效的域适应机制，值得进一步探索。
+
+
 
 ## 原文 PDF
 

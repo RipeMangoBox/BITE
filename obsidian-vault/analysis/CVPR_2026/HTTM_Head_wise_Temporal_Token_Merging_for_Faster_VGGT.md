@@ -43,7 +43,7 @@ claims:
 > - ScanNet (1000 frames) 上，Total Latency (s) 102.8 (VGGT*+HTTM) vs 724.6 (VGGT*) (约 7× 加速)。
 > - Global Attention Layers (1000 frames) 上，Matching Latency (s) 0.12 (HTTM) vs 2.31 (FastVGGT) (19.25× 更快匹配)。
 
-## 概述
+## 概要
 
 VGGT（Wang et al., CVPR 2025）是一种前馈3D重建模型，其全局注意力层需要对所有输入视图进行完全对完全（all-to-all）的令牌交互。当输入帧数增加时，令牌序列长度急剧膨胀至超过20k，注意力计算的二次复杂度使推理延迟成为主要效率瓶颈。
 
@@ -54,8 +54,6 @@ VGGT（Wang et al., CVPR 2025）是一种前馈3D重建模型，其全局注意�
 - **自适应异常值过滤**：跨头识别偏离聚合令牌的异常值并排除合并，防止精度灾难性退化。
 
 实验表明，HTTM在几乎不损失3D重建精度的前提下实现显著加速：在1000帧ScanNet场景下，总延迟从724.6秒降至102.8秒（约7×加速）；合并匹配延迟比FastVGGT快19.25倍；合并成本在同等合并率下降低4.58倍。在NRGBD等细粒度数据集上，HTTM以更短的Q/K/V序列取得了优于FastVGGT的重建质量。
-
-## 背景与动机
 
 ### 问题背景：VGGT的全局注意力瓶颈
 
@@ -97,7 +95,7 @@ VGGT（Wang et al., CVPR 2025）是一种前馈3D重建模型，其全局注意�
 
 基于这些动机，本文提出**HTTM（Head-wise Temporal Token Merging）**，一种训练无关的3D令牌合并方法，专门针对VGGT的交替注意力架构设计，目标是在几乎不损失3D重建精度的前提下实现显著的推理加速。
 
-## 核心创新
+## 核心方法与创新机理
 
 HTTM 的核心创新在于将 VGGT 全局注意力的令牌压缩从“所有头共享合并模式”升级为“每个头独立合并”的细粒度策略，并结合时空块重组与自适应异常值过滤，在几乎不损失 3D 重建精度的前提下实现最高 7× 的推理加速（Table 3）。以下从五个关键维度剖析其相对于现有方法的突破。
 
@@ -151,8 +149,6 @@ $$n_b = n_s \times n_t$$
 
 HTTM 的五个 changed slots 构成了一条完整的效率-质量优化链路：**头级合并**保护表示多样性 → **分块合并**控制计算成本 → **时序重排序**提升块内匹配质量 → **异常值过滤**防止精度崩塌 → **第一帧锚定**稳定位姿估计。这些创新相互协同，使 HTTM 在 1000 帧输入下实现 7× 加速的同时，重建质量与原始 VGGT 几乎持平（Table 3, Table 2）。
 
-## 整体框架
-
 HTTM 是一个**训练无关**的令牌压缩加速框架，专为 VGGT（Wang et al., CVPR 2025）的交替注意力架构设计。其核心目标是在全局注意力层进入注意力核之前，通过对 Q/K/V 令牌进行压缩，大幅降低二次复杂度的计算开销，同时在注意力计算完成后将令牌恢复至原始序列长度，保证下游模块不受影响。
 
 ### Pipeline 总览
@@ -204,11 +200,6 @@ HTTM 的整体流程由五个顺序模块构成，形成“重排序—合并—
 
 ![[assets/figures/papers/paper_list_l2104_https_arxiv_org_abs_2511_21317/figures/006_Figure_6.jpg]]
 *Figure 6: Overview of how HTTM accelerates attention layers by merging QKV tokens. HTTM merges and unmerges Q/K/V tokens before and after entering the attention kernel. Using temporal reordering 3.3, HTTM forms temporal blocks that consist of similar tokens (denoted with colors) and performs merging and unmerging within these blocks*
-
-![[assets/figures/papers/paper_list_l2104_https_arxiv_org_abs_2511_21317/figures/001_Figure_1.jpg]]
-*Figure 1: HTTM forms spatio-temporal merging blocks that jointly consider neighboring tokens across consecutive frames. This design exploits temporal coherence and spatial redundancy to merge tokens efficiently. With the same merging ratio, HTTM reduces the merging cost by 4.58×*
-
-## 核心模块与公式推导
 
 HTTM 的核心管线由四个模块构成：时序重排序（Temporal Reordering）、头级令牌合并（Head-wise Token Merging）、压缩注意力计算（Reduced Attention）和头级令牌反合并（Head-wise Token Unmerging），并辅以自适应异常值过滤（Adaptive Outlier Filtering）。以下逐一展开各模块的机制与关键公式。
 
@@ -265,15 +256,7 @@ $$\mathbf{O}^{(i)} = \mathcal{U}_i(\tilde{\mathbf{O}}^{(i)}) \in \mathbb{R}^{N \
 
 在目标令牌的选择上，HTTM 显式地将**第一帧的所有令牌作为目标（dst）令牌**，后续帧的令牌仅作为源（src）令牌向第一帧合并。这一设计抑制了合并方向上的歧义，使参考帧保持稳定，从而有利于相机位姿估计的稳定性（见 Figure 10）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2104_https_arxiv_org_abs_2511_21317/figures/008_Figure_8.jpg]]
-*Figure 8: Token similarity in merging blocks of size 1024. (a) Without temporal reordering, many highly similar matches lie outside of merging blocks. We can’t capture those matches unless we use a global merging block that is very costly. (b) Through temporal reordering, high-similarity matches shift inside merging blocks, leading to better merging quality*
-
-![[assets/figures/papers/paper_list_l2104_https_arxiv_org_abs_2511_21317/figures/003_Figure_3.jpg]]
-*Figure 3: Cosine similarity patterns averaged across all heads between query tokens of 4 adjacent frames. High similarities observed along the block diagonals indicate that tokens within the same spatial region (local areas) and corresponding locations across consecutive frames share highly similar features*
-
-## 实验与分析
+## 实验与关键发现
 
 HTTM 的评估围绕两个核心维度展开：**3D 重建精度保持**与**全局注意力推理加速**。实验在 7Scenes、NRGBD 和 ScanNet 三个基准上进行，所有测试均在相同 NVIDIA GPU 环境下使用 FlashAttention 和 BFloat16 精度执行，确保比较基准一致。
 
@@ -314,19 +297,10 @@ HTTM 的有效性高度依赖输入帧的时间连续性。在稀疏视角或低
 ![[assets/figures/papers/paper_list_l2104_https_arxiv_org_abs_2511_21317/figures/013_Table_3.jpg]]
 *Table 3: Latency Comparison. At 1000 frames, we are 7× faster than the baseline VGGT with FlashAttention in Bfloat16*
 
-![[assets/figures/papers/paper_list_l2104_https_arxiv_org_abs_2511_21317/figures/012_Table_4.jpg]]
-*Table 4: Averaged latency composition of Global Attention layers in HTTM and FastVGGT using comparable merging ratios over 1000 frames*
-
-![[assets/figures/papers/paper_list_l2104_https_arxiv_org_abs_2511_21317/figures/015_Table_5.jpg]]
-*Table 5: Accuracy and completeness on NRGBD with and without outlier filtering using the same token sequence length*
-
-![[assets/figures/papers/paper_list_l2104_https_arxiv_org_abs_2511_21317/figures/014_Figure_11.jpg]]
-*Figure 11: The Pareto front illustrates the trade-off between merging cost and merging quality, with color indicating the composition of the cost. Greenish points merge more frames along the temporal dimension, while redish points merge more tokens along the spatial dimension*
-
 ![[assets/figures/papers/paper_list_l2104_https_arxiv_org_abs_2511_21317/figures/002_Figure_2.jpg]]
 *Figure 2: Attention score distribution comparison between VGGT and Llama 3.1 8B[12]. The distribution of attention scores in VGGT is heavily concentrated around low values in both its early and late layers. In the middle layers, attention distribution is still more skewed towards lower values compared to Llama*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 

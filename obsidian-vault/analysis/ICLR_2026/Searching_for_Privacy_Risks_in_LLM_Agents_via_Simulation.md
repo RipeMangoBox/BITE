@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Searching_for_Privacy_Risks_in_LLM_Agents_via_Simulation.pdf
+project_link: null
+code_link: https://github.com/SALT-NLP/search_privacy_risk
 openreview_forum_id: nz4ZqbrBEi
 aliases:
 - ASFPAAI
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 通过模拟搜索LLM代理中的隐私风险 |
 | 英文题名 | Searching for Privacy Risks in LLM Agents via Simulation |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=nz4ZqbrBEi); [GitHub](https://github.com/SALT-NLP/search_privacy_risk) |
+| Links | [paper](https://openreview.net/forum?id=nz4ZqbrBEi) · [GitHub](https://github.com/SALT-NLP/search_privacy_risk) |
 | Topic | #topic/safety_alignment_fairness_privacy #topic/safety_alignment_fairness_privacy/trustworthy_machine_learning |
 | Method | Alternating Search Framework for Privacy‑Aware Agent Interactions |
 | Dataset | Testing‑100, Training‑5, Cross‑model Transfer (Table 2) |
@@ -42,7 +44,7 @@ claims:
 > - Training‑5 上，Average Leak Velocity (↓) 为 7.1% (A2, D2, targeted)，对比 76.0% (A1, D0)，变化 −91%。
 > - Cross‑model Transfer (Table 2) 上，Average Leak Velocity (↓) 为 0.0% (gpt‑4.1 defense vs. various attacks on A1D1, A2D2)，对比 3.4–76.0% (original gpt‑4.1‑mini pairing)，变化 strong defense retains <5%。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -67,7 +69,7 @@ claims:
 
 当前工作在以下方面存在局限：模拟到真实世界的系统化迁移尚未被刻画；防御搜索仅针对提示词层面优化，未涉及架构级防护；对其他隐私框架的泛化性未经验证。开放的挑战包括将搜索空间扩展到代理架构与防护栏设计、处理部分同意场景，以及将该框架应用于更广泛的安全对齐问题。
 
-## 背景与动机
+
 
 ### 问题背景：LLM代理交互中的隐私威胁
 
@@ -89,7 +91,9 @@ claims:
 
 具体而言，本文旨在回答三个关键问题：（1）能否构建一个模拟环境，忠实复现多代理间的隐私关键交互？（2）能否设计一种搜索算法，使攻击策略和防御策略在对抗中自动升级？（3）这种搜索框架能否发现人工评估者都难以识别的长尾攻击，并生成足够鲁棒的防御？
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于将LLM代理的隐私风险发现重新定义为一个**交替搜索问题**，而非依赖静态规则或人工枚举。传统隐私研究（如PrivacyLens, Shao et al., 2024）聚焦于用户-代理交互或预设恶意环境，其防御指令仅为简单的隐私提示（如“保持最高隐私标准”），攻击指令也局限于直接请求。这种静态范式无法应对动态多轮、主动诱导式攻击下代理间的自适应隐私威胁。
 
@@ -103,7 +107,7 @@ claims:
 
 上述changed slots的协同效应使攻击与防御相互提升：更强的攻击迫使防御进化，而更严格的防御又催生更隐蔽的攻击。最终，在Testing-100基准上，搜索得到的攻击-防御对（A2, D2）将平均泄漏速度从基线的**31.2%降至2.9%**（ICL迁移），降幅达91%（Table 4）。这一结果表明，将隐私风险发现转化为自动化搜索问题，能够超越人工枚举和静态分析的局限，系统性地发现并缓解LLM代理间的自适应隐私威胁。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l38_https_openreview_net_forum_id_nz4ZqbrBEi/figures/001_Figure_1.jpg]]
 *Figure 1: Our search-based framework. (I) We transform each tested privacy norm into a simulation configuration, including agent instructions and environments. (II) Initialized from the configuration, we run the simulation repeatedly to evaluate the risk that emerges from agent-agent interactions. (III) Based on simulations, we alternately search for attack strategies (data recipient instructions) and defense mechanisms (data sender instructions) by using LLMs to reflect on simulation trajectories and optimize agent instructions*
@@ -162,7 +166,7 @@ Figure 3 展示了攻击与防御策略的协同进化过程：
 
 最终A2+D2组合通过ICL迁移将平均泄漏速度从基线的31.2%降至2.9%，通过SG降至4.9%，展现了框架的泛化能力。
 
-## 核心模块与公式推导
+
 
 ### 3.1 仿真环境
 
@@ -210,7 +214,9 @@ $$(A_T, D_T) \xrightarrow{\text{攻击搜索}} (A_{T+1}, D_T) \xrightarrow{\text
 
 每次攻击搜索针对当前防御暴露新漏洞，随后的防御搜索则针对新攻击修补漏洞，二者相互驱动，使系统能够发现人工枚举难以触及的长尾风险（Section 3, Figure 3）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -283,7 +289,9 @@ $$(A_T, D_T) \xrightarrow{\text{攻击搜索}} (A_{T+1}, D_T) \xrightarrow{\text
 ![[assets/figures/papers/paper_list_l38_https_openreview_net_forum_id_nz4ZqbrBEi/figures/013_Table_8.jpg]]
 *Table 8: Leak Rate at each step while varying the backbones for attack agents in Table 1*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线工作的关系
 
@@ -328,6 +336,8 @@ $$(A_T, D_T) \xrightarrow{\text{攻击搜索}} (A_{T+1}, D_T) \xrightarrow{\text
 1. **搜索空间的扩展**：能否将搜索范围从代理指令扩展到最优代理架构、防护栏设计乃至训练目标，以构建更稳固的隐私防御体系。
 2. **部分同意场景**：当前框架假设数据主体不应分享敏感信息，但现实中存在数据主体**确实同意**分享的场景——如何处理这种“合法同意”与隐私保护的张力，仍待探索。
 3. **更广泛的安全对齐应用**：该长尾风险搜索框架能否应用于更广泛的安全对齐问题，如信息操纵、目标劫持、或代理间的恶意协作，是一个值得追踪的方向。
+
+
 
 ## 原文 PDF
 

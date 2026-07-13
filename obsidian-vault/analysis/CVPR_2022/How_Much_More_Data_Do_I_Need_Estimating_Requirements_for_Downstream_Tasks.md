@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2022
 pdf_ref: paperPDFs/CVPR_2022/How_Much_More_Data_Do_I_Need_Estimating_Requirements_for_Downstream_Tasks.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/toronto-ai/estimatingrequirements/
 aliases:
 - DREFCFMRC
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 下游任务数据需求估计：还需多少数据？ |
 | 英文题名 | How Much More Data Do I Need? Estimating Requirements for Downstream Tasks |
 | 会议/期刊 | CVPR 2022 |
-| Links | [paper](https://arxiv.org/abs/2207.01725); [Project](https://nv-tlabs.github.io/estimatingrequirements/); [Project](https://research.nvidia.com/labs/toronto-ai/estimatingrequirements/) |
+| Links | [paper](https://arxiv.org/abs/2207.01725) · [Project](https://nv-tlabs.github.io/estimatingrequirements/) · [Project](https://research.nvidia.com/labs/toronto-ai/estimatingrequirements/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Data Requirement Estimation Framework with Correction Factor and Multi‑round Collection |
 | Dataset | CIFAR10, CIFAR100, ImageNet, VOC, nuScenes (3D det / BEV seg), BDD100K, Image classification (CIFAR10/100, ImageNet) |
@@ -41,7 +42,7 @@ claims:
 > - CIFAR10, CIFAR100, ImageNet, VOC, nuScenes (3D det / BEV seg), BDD100K 上，collected / minimum required data ratio (n₀+ n̂) / (n₀+ n*) 为 with τ, T=5, Power Law/Logarithmic/Algebraic Root achieve ratios between 1 and...，对比 single‑round Power Law without τ yields ratios < 1 (under‑estimates)，变化 eliminates under‑estimation; target met with at most ~2× minimum data on diverse vision tasks。
 > - Image classification (CIFAR10/100, ImageNet) 上，frequency of bounding true data requirement 为 using all regression functions (max/min estimates) bounds true n* in over 80% o...，对比 single regression function does not consistently bound the requirement，变化 provides reliable interval estimate when only one round is available。
 
-## 概述
+## 概要
 
 下游任务的数据需求估计面临一个根本性瓶颈：**即使回归函数能够以较低误差外推模型性能曲线，直接求解目标性能对应的数据量仍会对拟合误差极度敏感**，导致所需数据量被严重高估或低估。在 ImageNet 上，四条外推曲线的精度误差仅为 1–6%，但估计的数据需求却偏离真实需求 12 万至 31 万张图像（Figure 1）。
 
@@ -57,7 +58,7 @@ claims:
 
 该方法仍存在若干限制：假设模型和数据采样策略在收集过程中保持不变；校正因子 τ 需在留出任务上调参；以及对于不满足凹单调特性的任务（如个别类别 AP 波动），回归函数的适用性有待进一步验证。
 
-## 背景与动机
+
 
 ### 问题定义：下游任务的数据需求估计
 
@@ -91,7 +92,9 @@ claims:
 
 - **校正因子 $\tau$**：在估计数据需求时，将目标性能提高一个偏置项 $\tau$（即求解 $\hat{v}(n_0 + \hat{n}; \boldsymbol{\theta}^*) \ge V^* + \tau$），以克服回归误差导致的系统性低估。$\tau$ 可在一个保留任务（如 CIFAR10）上调参确定。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 从“拟合优度”到“需求稳健性”的视角转换
 
@@ -154,7 +157,7 @@ $\tau$ 的调参在一个保留任务（CIFAR10）上完成，然后直接迁移
 3. 校正因子 $\tau$ 需在保留任务上调参，当目标任务特性与调参任务差异较大时可能不够鲁棒
 4. 模拟中以 ground truth $v(n)$ 代替实际重新训练，可能低估了重复训练引入的方差
 
-## 整体框架
+
 
 本文提出的数据需求估计框架围绕一个核心迭代循环构建：**用有限初始数据拟合性能外推函数 → 估计达到目标性能所需数据量 → 按估计量收集新数据 → 重新拟合并修正估计**，在最多 T 轮内逐步逼近真实的数据需求。图 Figure 2 展示了这一循环的宏观流程。
 
@@ -192,7 +195,7 @@ $\tau$ 的调参在一个保留任务（CIFAR10）上完成，然后直接迁移
 - **多轮迭代（$T=5$）**：单轮估计（$T=1$）无法可靠满足目标——乐观函数导致低估（比率 $<1$），悲观函数导致严重高估（如 Arctan 在 ImageNet 上首轮即估计需 450 万张图像，而实际仅需 90 万张）。多轮迭代通过逐步修正回归曲线，将收集数据量与最小需求的比率控制在 1–2 倍以内（见 Figure 3、Figure 4）。
 - **校正因子 $\tau$**：通过在目标 $V^*$ 上增加一个正的偏移量 $\tau$，抑制乐观回归函数的低估倾向。$\tau$ 需在保留任务（如 CIFAR10）上调参确定，再迁移至目标任务。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化：数据收集问题
 
@@ -240,7 +243,9 @@ $\tau$ 的作用是提高目标值，迫使乐观回归函数（如 Power Law、
 $$\frac{n_0 + \hat{n}}{n_0 + n^*}$$
 其中 $n^*$ 是满足真实得分曲线 $v(n_0 + n^*) = V^*$ 的最小数据量。比值 $<1$ 表示低估（未达目标），$>1$ 表示高估（收集了多余数据）。理想情况下比值应接近 1 且不小于 1。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 1. 实验设置与评估协议
 
@@ -264,7 +269,6 @@ $$\frac{n_0 + \hat{n}}{n_0 + n^*}$$
 
 这一悖论的根源在于 **Figure 1** 揭示的敏感性问题：四条外推曲线在 50% 数据量（60 万张）上拟合时，精度误差仅 1-6%，但估计所需数据量却偏离 12 万到 31 万张。这说明即使外推曲线整体贴近 ground truth，在目标阈值 $V^*$ 附近的微小偏差也会被反函数求解放大为巨大的数据量误估。
 
-![[assets/figures/papers/paper_list_l49_https_arxiv_org_abs_2207_01725/figures/011_Figure.jpg]]
 
 ---
 
@@ -341,15 +345,13 @@ $$\frac{n_0 + \hat{n}}{n_0 + n^*}$$
 ![[assets/figures/papers/paper_list_l49_https_arxiv_org_abs_2207_01725/figures/016_Figure_9.jpg]]
 *Figure 9: Experiments evaluating three different active learning strategies on CIFAR100 with n0 = 20% of the data set and T = 5 rounds. (Left) regression plots showing mean±standard deviation extrapolating performance. (Right) The ratio of data collected versus the minimum data needed (y-axis) for different target V ^ { * } (x-axis) in simulations*
 
-### 补充图表
 
-![[assets/figures/papers/paper_list_l49_https_arxiv_org_abs_2207_01725/figures/005_Table.jpg]]
 
-![[assets/figures/papers/paper_list_l49_https_arxiv_org_abs_2207_01725/figures/008_Table.jpg]]
 
-![[assets/figures/papers/paper_list_l49_https_arxiv_org_abs_2207_01725/figures/013_Table.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的本质区别
 
@@ -387,6 +389,8 @@ $$\frac{n_0 + \hat{n}}{n_0 + n^*}$$
 3. 当数据采集过程中模型更新时，数据需求估计应如何动态调整？
 4. 如何利用类别级或样本级指标优化每轮采样策略 $p(z)$，以在更少数据量下满足全局目标？
 5. 对于不满足凹单调特性的任务，是否有更灵活的回归模型（如非参数方法）能够可靠拟合性能曲线？
+
+
 
 ## 原文 PDF
 

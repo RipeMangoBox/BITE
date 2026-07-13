@@ -46,7 +46,7 @@ claims:
 > - MoReSet (VideoPhy2) 上，PC↑ 4.53 ± 0.69 vs SOTA models (e.g., Sora2, Veo3) (Best (highest))；SA↑ 2.73 ± 0.44 vs SOTA models (e.g., Sora2, Veo3) (Worst (lowest) - indicates OOD failure of data-driven metrics)。
 > - MoReSet (Trajan) 上，AJ↑ 0.10 ± 0.03 vs SOTA models (e.g., Sora2, Veo3) (Worst (lowest) - confirms OOD failure)。
 
-## 概述
+## 概要
 
 当前主流的文本到视频（T2V）生成模型，包括 Sora2、Veo3 和 Grok Imagine 等商业系统，虽然在视觉真实感上取得了显著进展，但其底层本质是**外观驱动的统计模式记忆**。这类模型依赖从大规模视频数据中学习到的像素关联来合成运动，缺乏对牛顿力学基本规律（如动量守恒、力与加速度关系、碰撞传递）的因果理解。因此，在面对分布外（OOD）的物理提示时，它们会频繁出现物体计数错误、动量凭空产生或消失、力学关系推断失败等违反物理定律的生成结果（见 Figure 1）。这一瓶颈的根源在于：扩散模型所逼近的数据分布本身并不编码物理因果机制，仅凭扩大模型规模或数据量无法从根本上解决物理一致性问题。
 
@@ -56,7 +56,7 @@ MoReGen（CVPR 2026）针对上述瓶颈，提出了一种**范式级转变**：
 
 在方法定位上，MoReGen 不属于扩散模型或其变体，而属于**代码驱动、物理引擎仿真的生成范式**。与之对比的基线方法覆盖了当前主流的扩散模型（Wan2.2-TI2V-5B、LTXV-2B-Distilled、CogVideoX-5B）、商业闭源系统（Veo3、Sora2、Grok Imagine），以及近期同样关注物理一致性的工作（Newton-Gen、WISA）。消融实验进一步证实，对文本解析器的监督微调（SFT）和引入评估器反馈（Feedback）均能显著提升生成质量，验证了多智能体闭环架构中每一关键组件的必要性。
 
-## 背景与动机
+
 
 ### 现有文本到视频生成范式的根本瓶颈
 
@@ -74,7 +74,9 @@ MoReGen（CVPR 2026）针对上述瓶颈，提出了一种**范式级转变**：
 
 与此同时，MoReGen 首次提出了基于物体轨迹直接测量的评估指标套件（MoRe metrics），包括动态时间规整（DTW）、归一化 DTW（DTW-N）和 Procrustes 分析。这些指标通过直接比较生成视频中关键物体的运动轨迹与真实物理仿真轨迹之间的几何差异，绕开了数据驱动指标对训练分布的先验依赖，为物理一致的视频生成和评价建立了新的基准。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MoReGen 的核心创新在于将文本到视频生成从**数据驱动的外观拟合**重构为**物理机制驱动的显式仿真**。这一范式转换通过三个关键设计槽位的改变得以实现，每条改变都直指现有扩散模型在物理一致性上的根本缺陷。
 
@@ -110,7 +112,7 @@ MoReGen 的范式创新还催生了配套的评估体系——**MoRe metrics**�
 
 关键发现是：现有数据驱动的物理评估指标（如 Trajan 的 AJ 和 VideoPhy2 的 SA）在评估物理仿真生成的视频时出现严重的**分布外失效**——MoReGen 在这些指标上得分异常低（Table 3），而 MoRe metrics 却准确反映了其轨迹保真度的优势（Table 2）。这一对比不仅验证了 MoReGen 的物理一致性，更暴露了当前评估范式的根本局限：数据驱动指标衡量的是“与训练分布有多像”，而非“与物理定律有多一致”。
 
-## 整体框架
+
 
 MoReGen 将文本到视频生成重新定义为**从自然语言到可执行物理仿真的翻译任务**，其核心因果路径从传统扩散模型的“数据外观拟合”扭转为“物理机制模拟”。系统由三个协作智能体与一个多组件评估器构成闭环，如图2所示。
 
@@ -162,7 +164,7 @@ $$\mathcal{F} = LLM( \text{``Summarize''}, \langle LLM( \text{``Traj''}, \mathca
 ![[assets/figures/papers/paper_list_l10_https_openaccess_thecvf_com_content_CVPR2026_html_Bai_MoReGen_Multi_Agen/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of our multi-agent motion-reasoning engine (MoReGen) for physics-grounded text-to-video synthesis. MoReGen focuses on achieving high-precision Newtonian motion through coordinated multi-agent reasoning. Given a natural language prompt, the text-parser agent*
 
-## 核心模块与公式推导
+
 
 MoReGen 将文本到视频生成重新定义为从自然语言到可执行物理仿真的翻译任务，其核心由三个协作智能体与一个多组件评估器构成闭环（见 Figure 2）。整个管线将自由格式的文本提示逐步转化为结构化物理规范、可执行仿真代码、渲染视频，并通过反馈机制迭代修正，从而保证生成视频的牛顿力学一致性。
 
@@ -190,7 +192,9 @@ $$ \mathcal{F} = LLM( \text{“Summarize”}, < LLM( \text{“Traj”}, \mathcal
 
 其中 $\mathcal{T}_{est}$ 为估计轨迹，$\mathcal{T}$ 为真实轨迹。三个分析维度分别为：**轨迹对齐**（由 LLM 比较估计与真实轨迹）、**物理合理性**（由 VLM 评估视频 $v_t$ 的物理正确性）、**意图一致性**（由 VLM 判断视频 $v_t$ 与原始文本 $x$ 的语义对齐程度）。最终由 LLM 将上述分析总结为可操作的改进反馈 $\mathcal{F}$，反馈至 A_coder 进入下一轮迭代修正。消融实验（Table 4）证实，引入单次评估器反馈即可在 AJ 和 OA 等指标上带来显著增益，验证了该闭环机制的有效性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 评估基准与指标设计
 
@@ -266,7 +270,9 @@ Table 4的消融实验系统验证了MoReGen架构中两个关键组件的因果
 ![[assets/figures/papers/paper_list_l10_https_openaccess_thecvf_com_content_CVPR2026_html_Bai_MoReGen_Multi_Agen/figures/001_Figure_1.jpg]]
 *Figure 1: Samples generated from selected prompts in our dataset, MoReSet, using current commercial text-to-video models. Left: OpenAI’s Sora 2 [11]; Middle: Google DeepMind’s Veo3 [18]; Right: X AI’s Grok Imagine [50]. The first row illustrates failures in object counting and momentum conservation; the second row highlights misinferred Newtonian forces; the third shows incorrect velocity and pressure computations. Even the most advanced text-to-video models lack physical reasoning abilities and are unable to follow physics rules1*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 从外观驱动到物理驱动的范式迁移
 
@@ -309,6 +315,8 @@ MoReGen 的当前能力边界由三个因素共同界定：
 3. **评估指标的人类一致性验证**：MoRe metrics 作为物理保真度的直接度量，其与人类对物理合理性的感知判断之间的一致性尚未经过系统性的人类研究验证。低 DTW 值是否必然对应人类感知中的“更物理合理”的视频，仍需实证支持。
 
 4. **渲染-物理解耦的保真度上限**：在保持物理仿真确定性的前提下，渲染真实感能提升到何种程度？是否可能在渲染阶段引入基于生成模型的视觉增强而不破坏底层轨迹的物理一致性？
+
+
 
 ## 原文 PDF
 

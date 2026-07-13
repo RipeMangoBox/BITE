@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/A_Step_to_Decouple_Optimization_in_3DGS.pdf
+project_link: https://eliottdjay.github.io/adamwgs/
+code_link: null
 aliases:
 - AG
 - SDO3
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 解耦3DGS优化的一步 |
 | 英文题名 | A Step to Decouple Optimization in 3DGS |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=oapTMDy2Yh); [Project](https://eliottdjay.github.io/adamwgs/) |
+| Links | [paper](https://openreview.net/forum?id=oapTMDy2Yh) · [Project](https://eliottdjay.github.io/adamwgs/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | AdamW-GS |
 | Dataset | MipNerf360 |
@@ -42,7 +44,7 @@ claims:
 > - MipNerf360 上，SSIM 为 0.840 (MC8)，对比 0.833 (Original MCMC)，变化 +0.007。
 > - MipNerf360 上，LPIPS 为 0.182 (MC8)，对比 0.199 (Original MCMC)，变化 -0.017。
 
-## 概述
+## 概要
 
 3DGS（3D Gaussian Splatting）的优化过程存在两种根本性的耦合问题：**更新步耦合**（Adam优化器与同步更新机制导致不可见视角下的基元仍被隐式更新）和**梯度耦合**（正则化损失与光度损失的梯度在Adam动量中混合，导致正则化控制不稳定且难以独立调节）。这两种耦合共同造成了优化效率低下、冗余基元难以自动去除、以及正则化超参数敏感等实际问题。
 
@@ -50,7 +52,7 @@ claims:
 
 实验结果表明，AdamW-GS在多个基准上取得了显著效果。在MipNerf360上，AdamW-GS (MC8)达到PSNR 28.219、SSIM 0.840、LPIPS 0.182，优于原始MCMC的27.948/0.833/0.199。更重要的是，在室外场景中，vanilla 3DGS+AdamW-GS (GS8)减少了48.4%的基元数量，同时PSNR提升0.2 dB、SSIM提升0.01；在室内场景中，同样能移除约50%的基元并保持PSNR提升0.1 dB。这种基元压缩完全通过DAR中的可控制正则化自动实现，**无需任何额外的剪枝操作**。此外，AdamW-GS作为即插即用组件，能够有效增强现有方法（如MaskGaussian、Taming-3DGS、Deformable Beta Splatting）的性能，例如将Taming-3DGS的训练时间减少近一半（从20.30分钟降至10.46分钟）。
 
-## 背景与动机
+
 
 3D高斯溅射（3DGS）在优化过程中存在两种深层耦合，严重制约了优化效率与模型精简能力。第一类是**更新步耦合**：Adam优化器与同步更新机制共同导致不可见视角下的基元也发生隐式更新。具体而言，标准Adam的动量更新（Eq. 2）对所有基元一视同仁，即使某基元在当前视角下不可见（梯度为零），其动量状态仍会因历史梯度的指数移动平均而持续变化，从而在不可见视角下产生非预期的参数漂移。第二类是**梯度耦合**：正则化损失（如不透明度和尺度的L1范数）与光度损失在Adam的动量中耦合（Eq. 6中的 $\nabla\ell + \lambda\nabla\mathcal{R}$）。这种耦合导致两个严重后果：一是正则化控制极不稳定——当超参数放大10倍时，优化完全失败，因为正则化梯度通过动量持续影响后续更新步，使得更新步过度依赖属性梯度而偏离光度梯度引导；二是冗余基元难以自动去除，因为耦合的动量状态模糊了正则化对冗余基元的定向惩罚效果。
 
@@ -60,7 +62,9 @@ claims:
 
 实验证据表明：Sparse Adam相比Adam产生更少的死基元（0.048M vs 0.232M，Table 1），说明Adam中的隐式更新确实有助于剪枝冗余基元，但Sparse Adam的探索性较差导致性能下降。AdamW-GS (MC8)在MipNerf360上达到PSNR 28.219、SSIM 0.840、LPIPS 0.182，基元数量变化+4.52%，优于原始MCMC的PSNR 27.948、SSIM 0.833、LPIPS 0.199、基元数量变化-3.75%（Table 3）。在室外场景中，vanilla 3DGS+AdamW-GS (GS8)减少48.4%的基元，同时PSNR提升0.2 dB，SSIM提升0.01。这些结果验证了解耦-重组策略的有效性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于识别并解构了3DGS优化中存在的两类耦合——**更新步耦合**（Adam与同步优化导致不可见视角下的隐式更新）与**梯度耦合**（正则化与光度损失在动量中混合）——并在此基础上提出了一种新的优化器 **AdamW-GS**。其核心洞察是：3DGS优化中的耦合可以被解耦并重新组合，从而在不依赖额外剪枝操作的情况下，实现更高效、可控的优化与冗余基元自动去除。
 
@@ -74,7 +78,7 @@ claims:
 
 这三个组件被重新组合成AdamW-GS优化器。实验证据表明，这一创新在多个基准上有效：在MipNerf360上，AdamW-GS (MC8) 达到了PSNR 28.219，SSIM 0.840，LPIPS 0.182，优于原始MCMC的27.948/0.833/0.199；在室外场景中，vanilla 3DGS+AdamW-GS (GS8) 在基元数量减少48.4%的同时，PSNR提升了0.2 dB，SSIM提升了0.01。这些结果共同支撑了核心创新点的有效性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0004_oapTMDy2Yh_A_Step_to_Decouple_Optimization_in_3DGS/figures/016_Figure_3.jpg]]
 *Figure 3: a-d: Reconstruction results visualization. More can be found in Appendix Sec.K. e-f: The Reallocated Primitive Number in 3DGS-MCMC Framework. For outdoor scenes, MC17 and MC8 differ only in the StSS sampling ratio, where MC8(StSSMC3)>MC17(StSSMC1)=MCMC-Sparse-RSR. For indoor scenes, MC8 uses StSSMC1. More information can be checked in Table 2*
@@ -97,7 +101,7 @@ AdamW-GS 是一个解耦式优化器，其整体 pipeline 并非引入新的网�
 
 **与基线方法的集成方式**：AdamW-GS 作为即插即用的优化器替换，可无缝集成到 vanilla 3DGS、3DGS-MCMC、MaskGaussian、Taming-3DGS、Deformable Beta Splatting 等不同框架中。实验表明，在所有集成场景中均观察到重建质量的提升或基元数量的减少（Table 3-9），且训练时间减少近一半（Taming-3DGS: 20.30 min → 10.46 min）。
 
-## 核心模块与公式推导
+
 
 ### 总损失函数与优化瓶颈
 
@@ -175,7 +179,9 @@ $$
 
 AdamW-GS 将上述三个组件重新组合：Sparse Adam 实现异步更新，RSR 通过状态衰减模拟隐式更新的有益部分，DAR 通过梯度解耦实现可控的正则化。论文强调，该方法的基元剪枝完全依赖于 opacity DAR，不包含额外的剪枝操作。在 MipNerf360 上，AdamW-GS (MC8) 达到 PSNR 28.219，SSIM 0.840，LPIPS 0.182，基元数量变化 +4.52%，优于原始 MCMC 的 PSNR 27.948，SSIM 0.833，LPIPS 0.199，基元数量变化 -3.75%（Table 3）。在室外场景中，vanilla 3DGS + AdamW-GS (GS8) 减少 48.4% 的基元，同时 PSNR 提升 0.2 dB，SSIM 提升 0.01。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：AdamW-GS在多个基准上实现重建质量与基元效率的双赢
 
@@ -229,7 +235,9 @@ AdamW-GS的通用性通过在多个现有方法上的集成实验得到验证。
 - **Table 4 & Figure 3**：在Deep Blending和Tank & Temples上的泛化验证表明，AdamW-GS在不同数据集和框架上具有一致的提升效果，且MCMC框架下的基元重分配更高效。
 - **Table 6 & Figure 4**：Sparse Adam将更新步骤时间降低约50%，使AdamW-GS在减少训练时间的同时保持或提升质量，这是其实用性的关键优势。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 AdamW-GS 的贡献在于识别并解耦了 3DGS 优化中的两类耦合，而非提出全新的网络架构或渲染范式。该方法直接挑战了 vanilla 3DGS 和 3DGS-MCMC 中默认的 Adam 优化器，其设计动机源于对优化过程中“更新步耦合”与“梯度耦合”的因果分析。
 
@@ -240,6 +248,8 @@ AdamW-GS 的贡献在于识别并解耦了 3DGS 优化中的两类耦合，而�
 **适用边界**：该方法的核心假设是优化耦合是性能瓶颈。这适用于需要大量基元且优化不稳定的场景（如室外场景基元减少48.4%）。然而，在 Treehill 场景中，Deformable Beta Splatting 出现过拟合，AdamW-GS 未能改善，表明当基元表示本身存在缺陷时，仅优化器层面的改进可能不足。此外，ABE-Split 和 Densification Extending 等策略表明，密化策略与优化器存在交互，需要联合调整。
 
 **局限与开放问题**：首先，RSR 的 StSS 调度依赖于场景类型（室内/室外）的手工设计，缺乏自适应机制。其次，DAR 对不透明度和尺度使用相同的裁剪阈值 `C_t`，但不同属性的梯度分布差异可能要求差异化处理。第三，AdamW-GS 虽减少了死基元，但未能完全消除，部分边界区域仍存在伪影（Figure 7）。开放问题包括：(1) 能否进一步解耦不同属性的正则化，实现更精细的控制？(2) 能否设计自适应 StSS 调度，无需手动区分场景类型？(3) 当基元表示本身存在局限时（如 Treehill 场景），优化器层面的改进能否与表示学习协同？(4) 该方法在更大规模场景或动态场景中的泛化性尚未验证。这些问题的解决需要超越优化器设计，进入基元表示和场景理解的更深层次。
+
+
 
 ## 原文 PDF
 

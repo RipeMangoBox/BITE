@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Policy_Contrastive_Decoding_for_Robotic_Foundation_Models.pdf
+project_link: https://koorye.github.io/PCD
+code_link: null
 openreview_forum_id: P9PVdWyM3U
 aliases:
 - PCDP
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 面向机器人基础模型的策略对比解码 |
 | 英文题名 | Policy Contrastive Decoding for Robotic Foundation Models |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=P9PVdWyM3U); [Project](https://koorye.github.io/PCD) |
+| Links | [paper](https://openreview.net/forum?id=P9PVdWyM3U) · [Project](https://koorye.github.io/PCD) |
 | Topic | #topic/representation_self_supervised_transfer #topic/representation_self_supervised_transfer/representation_learning |
 | Method | Policy Contrastive Decoding (PCD) |
 | Dataset | SIMPLER (9 tasks), Real-world (6 manipulation tasks) |
@@ -42,7 +44,7 @@ claims:
 > - SIMPLER (9 tasks) 上，Success Rate 为 17.9±1.4，对比 13.8±1.3，变化 +29.7% (relative)。
 > - SIMPLER (9 tasks) 上，Success Rate 为 69.6±1.7，对比 63.9±1.8，变化 +8.9% (relative)。
 
-## 概述
+## 概要
 
 现有机器人基础模型（如 OpenVLA、Octo、π0）在预训练过程中容易从观测中学习到任务无关的视觉特征（如背景、光照、物体姿态）与动作之间的**虚假相关性**。当测试环境发生分布偏移时——例如仅改变光源位置或抽屉把手方向——这些虚假相关性会导致策略成功率大幅下降（Figure 1 显示 OpenVLA 分别下降 36% 和 32%），严重制约了策略的跨场景泛化能力。
 
@@ -57,7 +59,7 @@ claims:
 
 PCD 的主要局限在于两次前向传播导致推理延迟约翻倍，且其效果依赖于目标检测与分割模型的精度；在检测失败或不完整掩码情况下可能退化至基线水平。该方法定位于**测试时后验纠正**，与 Classifier-Free Guidance (CFG) 等隐式引导方法形成互补。
 
-## 背景与动机
+
 
 机器人基础模型近年来取得了显著进展，大规模预训练使通用策略（如 OpenVLA、Octo、π0）能够在多种操作任务中展现出令人瞩目的泛化能力。然而，这些策略在实际部署中面临一个关键瓶颈：**预训练过程中容易从观测中学习到任务无关的视觉特征与动作之间的虚假相关性**。
 
@@ -67,7 +69,9 @@ PCD 的主要局限在于两次前向传播导致推理延迟约翻倍，且其�
 
 上述缺口催生了一个核心问题：**能否设计一种无需训练、即插即用的推理时校正机制，在不修改模型权重的前提下，将机器人策略的注意力从虚假特征重新引导至物体相关特征？** 这正是 Policy Contrastive Decoding（PCD）方法的出发点——通过对比原始观测与物体掩码观测下的动作概率分布，抑制虚假特征的干扰，从而提升策略在未见场景下的泛化能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：从虚假相关到因果解耦
 
@@ -108,7 +112,7 @@ PCD 的创新还体现在其对工程实现细节的低敏感性：
 
 这些特性使得 PCD 成为一个真正实用的即插即用模块，而非仅在理想条件下有效的理论方案。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_P9PVdWyM3U/figures/005_Figure_2.jpg]]
 *Figure 2: Overview of our proposed Policy Contrastive Decoding (PCD) approach. PCD serves as a plugin to redirect the robot policy’s focus toward object-relevant visual cues by contrasting action probability distributions derived from original observations p and object-masked observations ${ \hat { p } }$ . For illustrative purposes, we visualize the predictions only in the $\Delta$ x and $\Delta$ y dimensions of the robot action space [∆x, ∆y, ∆z, rotx, roty, rotz, gripper]
@@ -159,7 +163,7 @@ PCD 的推理流程由三个核心模块串联构成，如 Figure 2 所示：
 
 PCD 需要两次前向传播（原始观测 + 掩码观测），推理延迟约为基线的两倍。在 SIMPLER 环境中，OpenVLA 的单步推理时间从 0.86s 增至 1.77s，Octo 从 0.21s 增至 0.39s，π0 从 0.39s 增至 0.72s（Table 5）。真实世界实验中，整体时间开销增加约 24%（Figure 3）。
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题形式化与虚假相关
 
@@ -210,7 +214,9 @@ $$\pi_{\boldsymbol\theta}(a_t \mid \boldsymbol{l}, \boldsymbol{o}_i) \approx \fr
 
 Algorithm 1 给出了 PCD 的完整推理循环：在每步决策时，Track2Mask 生成物体掩码观测 $\hat{\mathbf{o}}_s$，分别计算原始和掩码观测下的动作概率分布（自回归策略直接获取，扩散策略通过 KDE-PM 近似），应用式 (2) 得到对比概率分布 $\pi_{\boldsymbol\theta}^*$，从中采样并执行动作。整个过程对策略模型本身是黑盒的，无需访问模型权重或进行微调。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与实验动机
 
@@ -315,7 +321,9 @@ Table 5 详细列出了三种策略在 SIMPLER 环境中集成 PCD 前后的推�
 
 Table 11 报告了 PCD 在 LIBERO-90 基准的 5 项任务上的表现。以 miniVLA 为基线，PCD 在所有任务上均实现了提升，平均成功率从 71.2% 提升至 78.0%，验证了方法在不同任务分布和策略架构下的泛化能力。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线策略的关系
 
@@ -356,6 +364,8 @@ PCD 的有效性建立在**物体掩码质量**这一关键前提之上。消融
 - **与 CFG 的融合**：如何在一个统一框架内结合 PCD 的显式后验校正与 CFG 的隐式引导，发挥二者的互补优势？
 - **复杂场景扩展**：PCD 在更复杂的任务（如灵巧操作、动态环境、多视角输入）下的有效性和扩展性如何？当前实验主要覆盖单视角桌面操作任务。
 - **通用对比解码策略**：如何在多视角、多传感器（如深度、触觉）输入下设计更通用的对比解码策略，使其不仅限于视觉掩码这一单一扰动形式？
+
+
 
 ## 原文 PDF
 

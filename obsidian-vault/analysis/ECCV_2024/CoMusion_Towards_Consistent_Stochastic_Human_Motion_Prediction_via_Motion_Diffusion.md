@@ -5,6 +5,8 @@ paper_level: A
 venue: ECCV
 year: 2024
 pdf_ref: paperPDFs/ECCV_2024/CoMusion_Towards_Consistent_Stochastic_Human_Motion_Prediction_via_Motion_Diffusion.pdf
+project_link: null
+code_link: https://github.com/jsun57/CoMusion/
 aliases:
 - CoMusion
 tags:
@@ -41,7 +43,7 @@ claims:
 > - Human3.6M 上，ADE 0.350 vs 0.372 (BeLFusion) (-0.022)；FDE 0.458 vs 0.474 (BeLFusion) (-0.016)；CMD 3.202 vs 5.988 (BeLFusion) (-2.786 (↓46.5%))。
 > - AMASS 上，CMD 9.636 vs 16.995 (BeLFusion) (-7.359 (↓43.3%))。
 
-## 概述
+## 概要
 
 人体运动预测（Human Motion Prediction, HMP）的目标是根据观察到的历史姿态序列，生成未来一段时间的合理人体运动。确定性方法只能输出单一未来，而**随机运动预测**则需捕捉未来运动的固有不确定性，生成多模态、真实且与历史一致的样本。现有随机方法（尤其是基于扩散模型的方法）面临一个核心瓶颈：它们通常预测扩散过程中的噪声而非直接预测运动，导致输入与真值差异过大，难以利用在确定性预测中非常成功的**图卷积网络-离散余弦变换（GCN-DCT）**设计；同时，缺乏平滑的未来姿态初始化，使得预测与历史运动不一致，且常需复杂的多阶段训练。
 
@@ -55,7 +57,7 @@ claims:
 
 CoMusion 的方法设计使其在**方法谱系**中处于一个独特位置：它既继承了扩散模型的多模态生成能力，又融合了确定性预测中 GCN-DCT 架构的时空建模优势，并通过预测目标与调度器的协同设计，在单阶段框架内实现了准确性与多样性的平衡。该方法为条件扩散模型在结构化时序预测任务中的应用提供了新的范式参考。
 
-## 背景与动机
+
 
 ### 人体运动预测：从确定性到随机建模
 
@@ -87,7 +89,9 @@ CoMusion 的方法设计使其在**方法谱系**中处于一个独特位置：�
 
 通过上述设计，CoMusion以单阶段、端到端的方式，在保持扩散模型多模态生成能力的同时，实现了与确定性方法相媲美的预测一致性，显著缩小了随机预测与确定性预测之间的性能鸿沟。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CoMusion 的核心创新在于将随机人体运动预测（stochastic HMP）重新表述为一个**先平滑重建、后时空优化**的两阶段问题，从而突破了现有扩散模型方法无法利用确定性预测中成功的 GCN‑DCT 设计的瓶颈。这一思路由三个相互耦合的 **changed slots** 共同实现。
 
@@ -124,7 +128,7 @@ $$ \bar{\alpha}_t = \cos\left( \frac{t/T + 1}{2} \cdot \frac{\pi}{2} \right)^2 $
 
 三者协同作用，使 CoMusion 在 Human3.6M 数据集上相较此前最优方法 **BeLFusion** 实现了 CMD 下降 46.5%、FID 下降 51.2% 的一致性飞跃（Table 1），同时在 AMASS 数据集上 CMD 下降 43.3%（Table 2），验证了该创新组合的跨数据集泛化能力。
 
-## 整体框架
+
 
 CoMusion 是一个**单阶段、端到端的条件扩散模型**，用于随机人体运动预测（stochastic HMP）。其核心思路是将扩散模型的去噪过程重新组织为“平滑初始化 + 时空精炼”的两阶段生成管线，从而在保持多模态生成能力的同时，大幅提升预测与历史运动的一致性。
 
@@ -177,7 +181,7 @@ $$\mathcal{L}_{\mathrm{final}} = \min_k \mathcal{L}_{\theta}(G^k, y_0, x)$$
 
 推理时，从纯高斯噪声 $y_T \sim \mathcal{N}(0, \mathrm{I})$ 出发，通过 $T=10$ 步 DDPM 采样迭代调用 $G_\theta$，每一步执行“$F(\cdot)$ 重建 $\to$ $R(\cdot)$ 精炼”的两阶段计算，最终输出 $\hat{y}_0$ 作为预测的未来运动。10 步扩散的设计在推理效率上具有优势（Table A.1），同时保持了生成质量。
 
-## 核心模块与公式推导
+
 
 ### 3.1 条件运动扩散建模
 
@@ -265,7 +269,9 @@ $$\mathcal{L}_{\mathrm{final}} = \min_k \mathcal{L}_{\theta}(G^k, y_0, x) \tag{1
 ![[assets/figures/papers/paper_list_l1872_CoMusion_Towards_Consistent_Stochastic_Human_Motion_Prediction_via_Motio/figures/001_Figure_1.jpg]]
 *Figure 1: Top: Three joint motion trajectories (length 20), last 10 features vary among the last-observation-padded, noisepadded and groundtruth sequences. Bottom: Their corresponding DCT values*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -334,7 +340,9 @@ CoMusion 采用仅 10 步扩散过程进行训练和推理（Figure 6），在 H
 ![[assets/figures/papers/paper_list_l1872_CoMusion_Towards_Consistent_Stochastic_Human_Motion_Prediction_via_Motio/figures/005_Figure_3.jpg]]
 *Figure 3: Left: ADE computed at each prediction frame of state-of-the-art methods. Right: CMD computed up to each prediction frame. Both experiments are conducted on Human3.6M dataset*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法脉络与核心突破
 
@@ -381,6 +389,8 @@ CoMusion 处于随机人体运动预测（stochastic HMP）的扩散模型分支
 4. **长时域与复杂场景扩展。** 当前实验设定为预测 1 秒（25 帧）的未来运动。该框架能否扩展到 5 秒以上的长时域预测？在涉及人体-物体交互或多智能体交互的场景中，GCN 的图结构是否能自然地扩展为多骨架交互图？
 
 5. **直接预测 $y_0$ 的容量上限。** 直接预测运动（而非噪声）是否在理论上限制了模型对极端多模态分布的捕捉能力？噪声预测范式允许网络通过预测一个简单的分布（高斯噪声）来间接建模复杂的数据分布，而 $y_0$ 预测则要求网络直接输出多模态的未来运动——这是否需要在网络中引入额外的随机单元（如隐变量或噪声注入）来弥补？
+
+
 
 ## 原文 PDF
 

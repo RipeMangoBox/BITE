@@ -5,6 +5,7 @@ paper_level: A
 venue: EGPGV
 year: 2025
 pdf_ref: paperPDFs/EGPGV_2025/From_Cluster_to_Desktop_A_Cache_Accelerated_INR_framework_for_Interactive_Visualization_of_Tera_Scale_Data.pdf
+code_link: null
 project_link: https://wilsoncernwq.github.io/publications/egpgv2025-cinr
 aliases:
 - CAIRF
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 从集群到桌面：一种面向太尺度数据交互可视化的缓存加速隐式神经表示框架 |
 | 英文题名 | From Cluster to Desktop: A Cache-Accelerated INR framework for Interactive Visualization of Tera-Scale Data |
 | 会议/期刊 | EGPGV 2025 |
-| Links | [paper](https://arxiv.org/abs/2504.18001); [Project](https://wilsoncernwq.github.io/publications/egpgv2025-cinr) |
+| Links | [paper](https://arxiv.org/abs/2504.18001) · [Project](https://wilsoncernwq.github.io/publications/egpgv2025-cinr) |
 | Topic | #topic/benchmarks_datasets_evaluation #topic/benchmarks_datasets_evaluation/benchmark_eval |
 | Method | Cache-Accelerated INR Rendering Framework |
 | Dataset | Magnetic (recentered 2560×1280×1280), DNS (5120×3072×15360, 0.96TB), DNS (5120×3072×15360) |
@@ -42,7 +43,7 @@ claims:
 > - Magnetic (recentered 2560×1280×1280) 上，Path Tracing FPS 为 9.4，对比 5.5，变化 1.7×。
 > - DNS (5120×3072×15360, 0.96TB) 上，Ray Marching FPS 为 ~11 (from Figure 8 top, approximate)，对比 ~1.7，变化 ~6.5×。
 
-## 概述
+## 概要
 
 **核心问题**：隐式神经表示（INR）虽然能将太字节（TB）级科学数据压缩数千倍，但在消费级GPU上进行交互式体渲染时，每帧需对数十万条光线追踪样本逐一调用网络推理，导致帧率远低于直接内存读取，难以实现流畅交互。这一瓶颈源于INR解码器的计算开销远大于缓存命中时的内存访问成本。
 
@@ -58,7 +59,7 @@ claims:
 
 **局限与开放问题**：当前缓存以全精度浮点存储，未探索半精度/混合精度；LoD选择仅依赖相机距离，对细小结构或平坦表面可能产生质量退化；尚未验证时变数据的时间缓存一致性；在集成GPU或移动设备上的效能有待评估。
 
-## 背景与动机
+
 
 ### 体积数据可视化的规模瓶颈
 
@@ -84,7 +85,9 @@ Wu et al.（IEEE TVCG 2024）的管线虽然通过宏单元（macro-cell）加�
 
 本文的核心洞察在于：将**多层级多分辨率页面表（Multi-Level Multi-Resolution Page Table, MRPD）缓存**（Hadwiger et al., 2012; Sarton et al., 2020）与**显著性优先级调度**相结合，并辅以**LoD预加载**与**随机过渡**机制，可在不显著损失重构质量的前提下，将INR渲染性能平均提升约5倍（光线行进）和约2倍（路径追踪），使太字节数据在桌面级GPU上实现交互可视化成为可能。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作针对隐式神经表示（INR）在体渲染中每帧需为数十万光线追踪样本重复推理全部数据值、导致消费级GPU上交互帧率严重受限的瓶颈，提出了**缓存加速的INR渲染框架**。其核心创新可归结为三个相互协同的**changed slots**，它们共同将渲染性能平均提升约5倍，同时保持与无缓存基线可比的重构质量。
 
@@ -104,7 +107,7 @@ Wu et al.（IEEE TVCG 2024）的管线虽然通过宏单元（macro-cell）加�
 
 这三项创新构成了一条完整的因果链：**多分辨率缓存查询**减少了对INR推理的依赖，**优先级调度**确保有限缓存容量被高效利用于视觉关键区域，而**LoD预加载与随机过渡**则平滑了性能的时间波动并提升了交互响应质量。在0.96TB的DNS数据集上，该框架实现了6444:1的压缩比，光线行进模式加速近6.5倍，路径追踪模式加速约2倍，验证了从集群端压缩到桌面端交互可视化的可行性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2504_18001/figures/002_Figure_2.jpg]]
 *Figure 2: An overview of the model architecture and hash-grid encoder. A vector of size n is constructed from each resolution grid via interpolation of nearby grid points. The resulting feature vector thus encodes a multi-resolution representation of the input, allowing for a smaller MLP*
@@ -145,7 +148,7 @@ Wu et al.（IEEE TVCG 2024）的管线虽然通过宏单元（macro-cell）加�
 
 该框架将INR的压缩优势（DNS数据集上达到6444:1压缩比）与缓存复用机制有机结合，在光线行进模式下平均获得约5倍加速，路径追踪约2倍加速，使太字节级数据在桌面端实现交互可视化成为可能。
 
-## 核心模块与公式推导
+
 
 ### 标量场映射与体素采样
 
@@ -214,7 +217,9 @@ $$40^4 \times 4 = 10.24 \text{ MB}$$
 
 当采样器在缓存中未找到所需砖块时，系统采用两级回退策略：首先尝试从更高LoD级别（即更低分辨率）的已缓存砖块中获取近似值；若仍不可得，则将该请求标记为真实未命中。每个采样步骤结束后，系统将所有真实未命中的体素坐标批量送入INR进行一次推理，而非逐体素调用网络，从而摊销推理开销。此外，系统利用缓存的回退机制，在渲染初期预加载高LoD砖块，使得初始帧即可获得可用的近似数据，大幅提升加载阶段的交互体验。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：缓存加速渲染性能
 
@@ -263,7 +268,9 @@ $$40^4 \times 4 = 10.24 \text{ MB}$$
 
 此外，当前缓存存储全精度浮点数，未探索半精度或混合精度以降低显存压力；方法尚未在动态或时变数据集上验证，缺乏时间维度上的缓存一致性支持。这些构成了当前框架的主要局限。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -304,6 +311,8 @@ $$40^4 \times 4 = 10.24 \text{ MB}$$
 - 可否利用宏单元的值域统计信息或表面检测来动态选择更优的 LoD 级别？
 - 将 3D 高斯泼溅表示与体缓存结合，是否可在类似内存预算下进一步提升交互帧率？
 - 在资源更加受限的集成 GPU 或移动设备上，该缓存框架的效能如何？
+
+
 
 ## 原文 PDF
 

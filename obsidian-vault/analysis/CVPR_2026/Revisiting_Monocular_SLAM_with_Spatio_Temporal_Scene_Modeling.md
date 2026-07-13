@@ -42,7 +42,7 @@ claims:
 > - 7-Scenes (Dense Reconstruction) 上，RMSE (m) 0.034 vs 0.052 (best baseline from VGGT-SLAM) (-34.6%)。
 > - TUM RGB-D (Uncalibrated Monocular) 上，相对帧率（FPS） 86.6 FPS vs DPV-SLAM++ / DROID-SLAM (约 3× (DPV-SLAM++) / >5× (DROID-SLAM) 更快)。
 
-## 概述
+## 概要
 
 单目视觉SLAM长期面临一个核心瓶颈：**缺乏显式的时空连续性建模**。传统方法依赖稀疏关键点与共视图，3D点检索效率低，导致关键帧数量膨胀；新兴的基于前馈深度估计的稠密方法（如MASt3R-SLAM、VGGT-SLAM）虽能生成丰富的几何先验，但每帧执行深度推断，计算量极大，难以在未标定条件下实现实时运行。
 
@@ -54,7 +54,7 @@ SLAM-MER 针对这一瓶颈提出了**时空联合的3D点查询机制**：通�
 
 SLAM-MER 以模块化 C++ 框架实现，定位、图优化、回环闭合、深度推断和重定位模块可灵活替换，为未标定单目SLAM提供了一种高效、可扩展的新范式。
 
-## 背景与动机
+
 
 ### 单目SLAM的效率瓶颈：从稠密推断到关键帧膨胀
 
@@ -68,7 +68,9 @@ SLAM-MER 以模块化 C++ 框架实现，定位、图优化、回环闭合、深
 
 本文的动机正是填补这一空白：通过引入**时空联合的3D点查询机制**，为每帧提供更丰富的3D-2D对应点，从而减少对稠密推断和过多关键帧的依赖。在此基础上，采用**混合设计**——仅对关键帧使用前馈深度估计模型（如MASt3R）生成局部3D点，结合稀疏关键点跟踪实现实时定位，并利用锚点机制构建半稠密地图。这一设计有望将帧率提升至80 FPS以上，同时保持或提高定位精度，为未标定单目SLAM提供一种新的效率-精度平衡范式。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SLAM-MER 的核心创新在于通过**时空联合的 3D 点查询机制**，重构了未标定单目 SLAM 中定位与建图的效率-精度平衡。相比于现有方法，其关键改进体现在四个维度：
 
@@ -96,7 +98,7 @@ $$\mathcal{Q}_{3D} = \mathcal{Q}_{T} \cup \mathcal{Q}_{S}$$
 
 上述四个 changed slots 共同支撑了一种**混合架构**：稀疏 3D 点用于实时定位，前馈深度模型仅在关键帧处介入以生成局部 3D 点并构建半稠密地图。这种设计使得 SLAM-MER 在 TUM RGB-D 和 7-Scenes 数据集上分别达到 86.6 FPS 和 103.2 FPS 的帧率，同时将平均 ATE 控制在 0.056 m 和 0.059 m，效率远超 MASt3R-SLAM 和 VGGT-SLAM（Table 1）。在 7-Scenes 的 office 序列上，帧率可达 100 FPS（Figure 1），充分验证了时空联合查询机制在实时性上的优势。
 
-## 整体框架
+
 
 SLAM-MER 是一个面向**未标定单目实时 SLAM** 的模块化 C++ 框架，其核心设计理念是“混合式”架构：将稀疏 3D 点用于实时定位，同时借助前馈深度估计模型为关键帧生成几何先验，并在后处理阶段通过锚点机制构建半稠密地图。该设计使得系统在保持或超越现有方法定位精度的同时，将帧率推至 80 FPS 以上，在 7-Scenes 的 office 序列上可达 100 FPS（Figure 1）。
 
@@ -138,7 +140,7 @@ SLAM-MER 的流水线由五个核心模块协同构成，其整体架构如 Figu
 
 > **注意**：SLAM-MER 的框架设计强调模块可替换性——深度估计器、视觉地点识别（VPR）、特征检测器等均可灵活替换，具体示例见补充材料。
 
-## 核心模块与公式推导
+
 
 ### 3.1 地图表示与共视图结构
 
@@ -184,7 +186,9 @@ $$D_{KL}(\mathbf{H}_k || \mathbf{H}_{k-1})$$
 ![[assets/figures/papers/paper_list_l42_https_openaccess_thecvf_com_content_CVPR2026_html_Piedade_Revisiting_Mon/figures/004_Figure_4.jpg]]
 *Figure 4: Keyframe decision criterion based on the distribution of points tracked per keyframe. When observing new parts of the scene, the histogram is skewed to the right since only the most recent keyframes have points in common with the current frame*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 SLAM-MER 在定位精度与运行效率两个维度上均展现出显著优势，其核心实验结论可概括为：**以稀疏特征实现实时定位，在帧率远超稠密基线的前提下，达到甚至超越后者的轨迹精度**。
 
@@ -233,7 +237,9 @@ Table 2 的消融实验量化了两个核心设计选择的影响：
 | Figure 1 | office 序列达 100 FPS，红色单元展示空间查询的可视化效果 |
 | Figure 5 | 稀疏定位点与锚点半稠密地图的对比，验证混合表示的有效性 |
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从稀疏特征点到混合时空建模
 
@@ -275,6 +281,8 @@ SLAM-MER 相对于上述基线的关键设计差异可归纳为四个“槽位�
 2. **位姿表示的改进空间。** VGGT-SLAM 采用的 SL(4) 流形位姿表示在回环闭合后展现出更好的全局一致性。SLAM-MER 能否集成此类表示以进一步提升大回环后的优化效果，是一个自然的研究延伸。
 3. **深度估计器的升级路径。** 论文在消融中展示了替换深度估计器的可行性（如用 VGGT 替代 MASt3R），但未系统评估不同前馈模型对定位精度的影响。更强的未标定深度估计器能否在不牺牲帧率的前提下缩小与标定方法的精度差距，值得探索。
 4. **室外大规模验证。** 当前实验局限于室内数据集，室外长序列下的尺度漂移、光照变化和动态物体对时空查询机制的冲击尚未评估——这是从“室内实时 SLAM”走向“通用实时 SLAM”必须跨越的验证鸿沟。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/AgentGym_RL_An_Open_Source_Framework_to_Train_LLM_Agents_for_Long_Horizon_Decision_Making_via_Multi_Turn_RL.pdf
+project_link: null
+code_link: https://github.com/WooooDyy/AgentGym-RL
 openreview_forum_id: ZgCCDwcGwn
 aliases:
 - SR
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | AgentGym-RL：一个训练LLM智能体进行长周期多轮决策的开源框架 |
 | 英文题名 | AgentGym-RL: An Open-Source Framework to Train LLM Agents for Long-Horizon Decision Making via Multi-Turn RL |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=ZgCCDwcGwn); [GitHub](https://github.com/WooooDyy/AgentGym-RL) |
+| Links | [paper](https://openreview.net/forum?id=ZgCCDwcGwn) · [GitHub](https://github.com/WooooDyy/AgentGym-RL) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | ScalingInter-RL |
 | Dataset | TextCraft, WebArena, Deep Search |
@@ -42,7 +44,7 @@ claims:
 > - WebArena 上，Overall Accuracy 为 26.00 (ScalingInter-7B)，对比 16.00 (GPT-4o)，变化 +10.00。
 > - Deep Search 上，Overall Score 为 38.3 (ScalingInter-7B)，对比 18.8 (Qwen2.5-7B-Instruct)，变化 +19.5。
 
-## 概述
+## 概要
 
 **问题瓶颈**：在长周期多轮决策任务中对大语言模型（LLM）智能体进行强化学习（RL）训练时，直接增加交互轮次会导致训练不稳定甚至崩溃，而限制交互轮次又会使性能过早饱和，难以完成复杂任务。
 
@@ -63,7 +65,7 @@ claims:
 - 所有模型在 SciWorld 的 Chem-Mix 子任务上得分均为零，表明现有方法缺乏处理复杂化学混合过程的能力。
 - 长周期训练中的梯度异常与训练崩溃机制仍需进一步分析和缓解。
 
-## 背景与动机
+
 
 ### 问题背景：LLM智能体的长周期决策挑战
 
@@ -93,7 +95,9 @@ $$\nabla_{\theta} J(\theta) = \mathbb{E}_{\tau \sim \pi_{\theta}} \left[ r(\tau)
 
 实验表明，基于ScalingInter-RL训练的Qwen-2.5-7B模型在27个多样化任务上平均提升33.65分，性能达到甚至超越OpenAI o3、Gemini-2.5-Pro等商用模型（见Figure 1）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作针对**长周期多轮决策中 RL 训练的根本瓶颈**提出解决方案：直接增加交互轮次进行 RL 训练会导致训练不稳定甚至崩溃，而限制交互轮次又会使性能达到平台期，难以完成复杂任务。其核心创新在于提出 **ScalingInter-RL**，一种**渐进式交互轮次扩展策略**（progressive horizon-scaling strategy）。
 
@@ -123,7 +127,7 @@ ScalingInter-RL 的**核心洞察**在于：训练初期限制交互轮次使智
 
 ScalingInter-RL 的提出与 AgentGym-RL 框架的模块化设计形成互补。框架通过解耦的环境模块、智能体模块和训练模块，为 RL 训练提供了统一的流水线；而 ScalingInter-RL 作为训练策略层面的创新，可在该框架内与多种 RL 算法（GRPO、REINFORCE++、PPO）结合使用，展现出良好的算法无关性（见 Table 4）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_ZgCCDwcGwn/figures/003_Figure_4.jpg]]
 *Figure 4: Training dynamics under different maximum interaction turns in Deep Search environment. Our ScalingInter-RL method progressively increases the interaction horizon, and ultimately achieves higher and more efficient long-term performance*
@@ -162,7 +166,7 @@ $$h_{t+1} = h_t + \delta_h$$
 
 该策略在保持训练稳定性的同时，引导智能体进行更深层次的探索，最终实现更高的长期性能（见图 4、图 6）。实验表明，ScalingInter-RL 对轮次列表和阶段转换频率等超参数不敏感，多种配置下性能波动极小（Table 3），表现出很强的鲁棒性。
 
-## 核心模块与公式推导
+
 
 ### 多轮决策的形式化建模
 
@@ -202,7 +206,9 @@ $$h_{t+1} = h_t + \delta_h$$
 
 每 $\Delta$ 训练步后按增量 $\delta_h$ 提升最大交互轮次。训练从短轮次（如 5 轮）开始，使智能体先掌握基础任务求解技能，再逐步扩展至更长轮次（如 8 轮、10 轮），在保持训练稳定性的同时引导更深层次的探索。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与动机验证
 
@@ -284,7 +290,9 @@ Figure 8 的效率分析表明，得益于阶段化设计，ScalingInter-RL 在�
 ![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_ZgCCDwcGwn/figures/023_Figure_16.jpg]]
 *Figure 16: Trajectory visualization in the WebArena task, highlighting the agent’s path through the environment, action execution, and feedback*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有工作的关系
 
@@ -323,6 +331,8 @@ Figure 8 的效率分析表明，得益于阶段化设计，ScalingInter-RL 在�
 4. **Chem-Mix 等极端子任务的突破路径**：所有模型在此类任务上得分为零，背后缺失的具体能力是什么？是化学知识的深层推理、多步合成规划，还是对实验操作序列的精确建模？这需要从任务设计和模型能力两个维度进行诊断。
 
 5. **交互效率与任务完成度的权衡**：Figure 5 显示增加测试时交互轮次能提升性能但存在平台期，而 RL Agent 又表现出过度交互问题。如何在训练阶段引导 Agent 学习高效的动作选择，而非单纯依赖更多交互轮次，是一个值得深入的方向。
+
+
 
 ## 原文 PDF
 

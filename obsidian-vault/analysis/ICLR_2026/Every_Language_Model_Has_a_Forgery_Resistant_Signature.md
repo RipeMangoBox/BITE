@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Every_Language_Model_Has_a_Forgery_Resistant_Signature.pdf
+project_link: null
+code_link: null
 openreview_forum_id: vLFqOoMBol
 aliases:
 - LMES
@@ -42,7 +44,7 @@ claims:
 > - Ellipse parameter recovery on a 1M-parameter model (hidden size 64) 上，Parameter recovery error (MSE for bias/stretch, geodesic distance for rotation) 为 Predicted bias, singular values, and rotation angles are highly accurate (small MSE/geodesic distance)，对比 Ground truth parameters extracted from model weights，变化 negligible error; slight underestimation of singular values due to epsilon smoothing。
 > - Cost analysis of ellipse extraction from OpenAI-like API (hypothetical) 上，Estimated API cost (USD) based on OpenAI pricing Sep 2025 为 babbage-002: ~$1,056; gpt-3.5-turbo: ~$150,699; llama-3-70b-instruct: ~$16,487,421，对比 N/A (absolute cost for extraction)，变化 prohibitively expensive for production models。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -69,7 +71,7 @@ claims:
 
 椭圆签名**不具有鲁棒性**：对输出进行 top-k 截断、温度缩放等修改会使签名退化。此外，其安全性依赖于椭圆提取的高计算成本，未来更高效的椭圆拟合算法可能削弱这一假设。关键开放问题包括：是否存在无需先拟合椭圆即可生成位于未知模型椭圆上输出的快速算法？epsilon 平滑导致的不可约误差如何随模型规模缩放？
 
-## 背景与动机
+
 
 语言模型正以前所未有的速度渗透内容生产链条，随之而来的一个核心问题是：给定一段文本及其对应的对数概率（logprob）向量，能否可靠地判断它出自哪一个模型？这一问题在模型版权保护、深度伪造溯源、API 滥用检测等场景中具有直接的应用价值。
 
@@ -83,7 +85,9 @@ claims:
 
 此外，椭圆签名还具备若干天然优势：它是**自然存在**的（所有现代 LM 都具备最终归一化层）、**自包含**的（验证仅需持有模型输出层的部分参数，无需输入上下文或完整权重）、**紧凑且冗余**的（每一个生成步的 logprob 输出都独立携带完整的签名信息，长度 1 的序列即可进行模型识别）。这些特性使椭圆签名在模型归因的多个维度上形成了独特的折中方案。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 从“可伪造”到“抗伪造”的范式转变
 
@@ -142,7 +146,7 @@ Table 2 系统比较了椭圆签名与现有模型归因方法在四个核心属
 
 这一类比不仅为椭圆签名的安全性提供了密码学直觉，也揭示了其应用边界：持有椭圆参数的一方可以验证输出来源，但无法伪造新输出（因为生成新输出需要完整的模型参数，而椭圆参数仅是输出层的部分信息）。这种“可验证但不可伪造”的非对称性，正是安全签名的核心要求。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_vLFqOoMBol/figures/012_Figure_8.jpg]]
 *Figure 8: An overview of the intermediate representations in both traditional (gray) and our own (yellow) parameterization of the final LM layers. Representations (boxes) are annotated the functions that map between them (arrows), as well as the space in which they reside (blue tags). Our method recovers the parameters ??, ??, ??, and ??−, which in turn give us access to the cannonical logit, ellipse, and rotated representations. Notably, the rotated representation that we recover is a pure rotation of the normalized representation*
@@ -196,7 +200,7 @@ $$(\mathbf{x} - \mathbf{b})^{\top} \mathbf{E} (\mathbf{x} - \mathbf{b}) = 1$$
 
 论文将椭圆签名类比为消息认证码（MAC）：椭球参数相当于秘密密钥，logprob 输出相当于消息，签名的位置编码在 $\mathbb{R}^\nu$ 空间中的坐标里。只有持有秘密椭圆的验证方才能检查输出是否位于椭圆上，这与密码学 MAC 中只有密钥持有者才能验证消息真伪的机制一致。
 
-## 核心模块与公式推导
+
 
 ### 椭圆签名的几何根源
 
@@ -250,7 +254,9 @@ $$C = I - \frac{1}{d} \mathbf{1} \mathbf{1}^{\top}$$
 
 椭圆签名的抗伪造性并非来自密码学假设，而是源于**椭圆提取的计算不可行性**。从 API 收集足够样本以确定椭圆所需的最小查询复杂度为 $O(d^3 \log d)$，而将样本拟合为椭圆的时间复杂度为 $O(d^6)$。对于隐藏维度 $d$ 达数千乃至上万的现代大语言模型，这一成本在实际中不可承受。这一瓶颈是椭圆签名区别于线性签名（Finlayson et al., 2024）的核心差异——后者仅需提取线性子空间约束，查询和计算成本远低于椭圆拟合。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心验证：椭圆签名可区分源模型
 
@@ -310,7 +316,9 @@ Table 2 系统比较了不同模型归因方法在四个关键属性上的表现
 
 椭圆签名是唯一同时满足自然存在、自包含、紧凑和抗伪造四项属性的方法。其核心权衡在于：牺牲了鲁棒性和隐写性，换取了零推理开销和极强的抗伪造保证。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 现有模型溯源方法概览
 
@@ -361,6 +369,8 @@ Table 2 系统总结了各方法的属性对比：椭圆签名在“自然存在
 4. **量化和混合精度的影响**：量化/混合精度推理对输出层椭圆约束的影响在本工作中仅被简单讨论，缺少系统的实验验证。低精度下归一化和线性变换的数值误差可能使椭圆约束松弛，影响签名的可区分性。
 
 5. **多模型融合场景**：当输出由多个模型协作生成（如模型集成、推测解码）时，椭圆签名的行为尚不明确。混合模型的 logprob 可能不严格位于任何单一模型的椭圆上，这既是挑战也可能成为检测模型协作的新途径。
+
+
 
 ## 原文 PDF
 

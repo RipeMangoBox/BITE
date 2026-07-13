@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/PersonalBooth_Personalized_Text_to_Motion_Generation.pdf
+code_link: null
 project_link: http://boeun-kim.github.io/page-PersonaBooth
 aliases:
 - PersonaBooth
@@ -42,7 +43,7 @@ claims:
 > - PerMo (Multiple Input + CAF) 上，FID 2.95 vs Simple averaging (3.52) (-0.57)。
 > - 100Style 上，R Precision Top1 0.20 vs MoMo 0.07 (+0.13)。
 
-## 概述
+## 概要
 
 **PersonaBooth** 针对现有文本到运动生成（Text-to-Motion, T2M）模型仅关注视觉条件而忽略文本适应，导致微调后个性遗忘和生成质量低的问题，提出了一种多模态个性化微调框架。其**核心瓶颈**在于：通用预训练数据（如 HumanML3D）与个性化数据（PerMo）之间存在显著分布差异，且从不同动作内容中提取一致的个性特征极为困难。
 
@@ -52,7 +53,7 @@ claims:
 
 **方法定位**：PersonaBooth 属于基于扩散模型的个性化运动生成方法，与零样本运动风格迁移方法 **MoMo** 和微调版本 **MCM-LDM** 形成对比。其关键创新在于首次将文本路径纳入个性化适配，并通过对比学习实现个性与内容的显式解耦。
 
-## 背景与动机
+
 
 ### 任务定义：运动个性化生成
 
@@ -84,7 +85,9 @@ claims:
 
 基于上述洞察，本文提出**PersonaBooth**框架，并构建了专门用于运动个性化评估的大规模数据集**PerMo**（5位演员、34种风格、10类动作内容、6,610个运动片段，配备网格和文本标注），为这一新任务建立了系统的评估基准。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PersonaBooth 的核心创新在于首次将个性化运动生成（Motion Personalization）建模为**文本与视觉双路径自适应**问题，并通过**可插拔的 Persona Token** 与**监督对比学习**实现个性与动作内容的解耦。相较于仅依赖视觉条件注入的现有运动风格迁移方法（如 MoMo、MCM-LDM），PersonaBooth 在以下四个关键维度上引入了结构性改变：
 
@@ -124,7 +127,7 @@ CAF 仅保留 Top-k 个最相关的输入运动进行加权融合，忽略无关
 
 PersonaBooth 的四项核心改变形成了一条完整的因果链：**Persona Token + 文本自适应**使个性信息首次进入文本条件分支；**Persona Cohesion Loss** 通过对比学习解耦个性与内容，确保特征一致性；**Self-Attention 自适应层**优化了视觉个性的注入方式；**CAF** 解决了多输入推理时的融合难题。这些创新共同使 PersonaBooth 在 PerMo 和 100Style 两个基准上均显著优于现有方法，同时仅需 50 步扩散采样（MoMo 需 100 步，MCM-LDM 需 1000 步），在推理效率上也具备明显优势。
 
-## 整体框架
+
 
 PersonaBooth 的整体 pipeline 围绕一个核心洞察构建：将“个性”（persona）建模为可插拔的文本标记与视觉特征，通过双路径自适应注入预训练的文本-运动扩散模型，实现个性化运动生成。其工作流可概括为三个阶段：**个性提取、双路径自适应注入、上下文感知融合推理**。
 
@@ -200,7 +203,7 @@ $$w_i = \begin{cases} \frac{\exp(S_i)}{\sum_n \exp(S_n)} & i \in I_{\text{Top-k}
 
 PersonaBooth 通过这一“提取-注入-融合”三段式 pipeline，在仅微调少量新增参数的前提下，实现了对预训练文本-运动扩散模型的个性化适配，既保留了预训练先验，又注入了新个性特征。
 
-## 核心模块与公式推导
+
 
 PersonaBooth 的核心架构由五个关键模块构成，围绕视觉与文本双路径自适应展开，并通过对比学习实现个性与内容的解耦。
 
@@ -267,7 +270,9 @@ $$w_i = \begin{cases} \frac{\exp(S_i)}{\sum_n \exp(S_n)} & i \in I_{\text{Top-k}
 ![[assets/figures/papers/paper_list_l1862_PersonalBooth_Personalized_Text_to_Motion_Generation/figures/004_Figure_3.jpg]]
 *Figure 3: Textual and visual adaptation. (a) Personalized Text Encoder, X . (b) t-th step of the Motion Diffusion, D. Learnable parameters are denoted by the fire icon*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心主张验证
 
@@ -351,7 +356,9 @@ CAF 的工作机制（Eq.9-11）是：计算每个输入运动与文本提示的
 ![[assets/figures/papers/paper_list_l1862_PersonalBooth_Personalized_Text_to_Motion_Generation/figures/022_Figure.jpg]]
 *Figure: (b) Jump Figure G. Examples of text descriptions in PerMo dataset (a) Scaling Factor (St, sv) (b)Textual Guidance Scale (gt) (c) Visual Guidance Scale (gv) (d) Balancing Factor (b) Figure H. Ablation study for hyperparameters st, sv, gt, gv, and b. Higher positions on the graph indicate better performance across all three metrics, FID, R-precision (Top 3), and PRA*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位：从风格迁移到运动个性化
 
@@ -385,6 +392,8 @@ PersonaBooth 的当前设计存在以下边界条件：
 3. **跨数据集泛化**：Persona Token 的多模态适应机制在更大规模预训练数据集（如结合 HumanML3D 与更多风格数据）上的泛化能力如何？当前 PerMo 的 34 种风格类别（Table A）覆盖了情绪与动作风格，但真实世界中的人体运动个性维度远不止于此，模型能否在更细粒度或跨文化的个性表达上保持有效性，尚需验证。
 
 4. **个性可组合性**：PersonaBooth 将个性建模为单一 Token，但真实个体的运动风格可能包含多个可分离维度（如“优雅”与“急促”的组合）。未来是否可解耦为多个子 Token 并支持个性插值或组合，是一个值得探索的方向。
+
+
 
 ## 原文 PDF
 

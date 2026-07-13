@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Flow_Matching_with_Injected_Noise_for_Offline_to_Online_Reinforcement_Learning.pdf
+project_link: null
+code_link: https://github.com/CTID282/FINO
 openreview_forum_id: 6wd38R8L0Z
 aliases:
 - FMINOORL
@@ -30,12 +32,15 @@ claims:
 | 中文题名 | Flow Matching with Injected Noise for Offline-to-Online Reinforcement Learning |
 | 英文题名 | Flow Matching with Injected Noise for Offline-to-Online Reinforcement Learning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=6wd38R8L0Z); [GitHub](https://github.com/CTID282/FINO) |
+| Links | [paper](https://openreview.net/forum?id=6wd38R8L0Z) · [GitHub](https://github.com/CTID282/FINO) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method |  |
 | Dataset | |
 
-## 概述
+> [!tip] 效果简介
+> 本笔记的既有实验指标、对比结果与适用边界见“实验与关键发现”；本轮仅统一结构，不改写证据。
+
+## 概要
 
 离线到在线强化学习（Offline-to-Online RL）面临一个核心瓶颈：从静态离线数据集预训练的策略往往过度拟合数据分布，导致在线微调时探索能力不足，难以有效利用环境交互信号突破离线策略的性能上限。本文提出 **FINO（Flow Matching with Injected Noise）**，通过两个关键机制解决这一问题：
 
@@ -46,7 +51,7 @@ claims:
 
 方法上，FINO 建立在 Flow Q-Learning（FQL）的框架之上，通过改造条件概率路径的方差结构实现噪声注入，并引入熵约束的自适应采样策略，在不显著增加推理开销的前提下，将离线预训练的保守性与在线探索的多样性有机统一。
 
-## 背景与动机
+
 
 ### 离线到在线强化学习的核心挑战
 
@@ -72,7 +77,9 @@ claims:
 
 通过这两个层面的协同设计，FINO 旨在在不增加数据集规模的前提下，诱导出多样化的行为模式，从而在有限的在线微调预算下实现更优的性能提升。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FINO 在 Flow Q-Learning (FQL) 的基础上引入了两个关键创新，分别作用于离线预训练和在线微调阶段，构成一个完整的离线到在线强化学习方案。
 
@@ -114,7 +121,7 @@ $$\xi_{\mathrm{new}} = \xi - \alpha_{\xi} [\mathcal{H} - \bar{\mathcal{H}}]$$
 
 消融实验（图 6 左）表明，噪声注入与熵引导采样两者缺一不可——单独使用任一组件均无法达到完整 FINO 的性能水平。与直接向动作添加噪声的基线相比，FINO 在流匹配内部注入噪声的策略带来了显著的性能增益（图 4）；与熵调控噪声缩放的替代方案相比，FINO 的熵引导采样机制也展现出明显优势（图 5）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_6wd38R8L0Z/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of FQL and FINO (ours) in terms of performance and exploration patterns on the environment antmaze-giant-navigate. The green circle and red star indicate the initial and goal states, respectively*
@@ -170,7 +177,7 @@ $$\xi_{\text{new}} = \xi - \alpha_\xi [\mathcal{H} - \bar{\mathcal{H}}],$$
 
 FINO 引入的额外计算开销主要来自熵估计和候选动作采样。如 **Figure 6** 所示，相对于骨架算法 FQL，训练时间仅有轻微增加，且该增加远小于 Cal-QL 等基线方法。在推理阶段，FINO 所需的采样次数少于 IFQL 等基线，表明额外计算并未带来显著的效率瓶颈。
 
-## 核心模块与公式推导
+
 
 FINO 在 FQL 的 flow matching 框架上引入两个关键模块：**噪声注入的离线预训练**与**熵引导的在线采样**。前者在行为克隆阶段主动扩展策略的动作支撑集，后者在在线微调阶段动态平衡探索与利用。
 
@@ -216,7 +223,9 @@ $$\mathcal{L}_\pi(\omega) = \mathbb{E}_{s \sim \mathcal{D}, z \sim \mathcal{N}(0
 
 FINO 的改动集中在 flow 策略的训练目标（注入噪声）和在线采样策略（熵引导），未修改 Q 函数更新或一步策略蒸馏的框架。消融实验（Figure 6 左）表明，噪声注入与熵引导是两个不可或缺的组件，单独移除任一均导致显著性能下降。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验：离线到在线微调性能
 
@@ -275,7 +284,9 @@ Figure 7 分析了候选动作数量 $N_{\text{sample}}$ 对性能的影响。�
 ![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_6wd38R8L0Z/figures/016_Table_3.jpg]]
 *Table 3: Task-specific hyperparameters for each baseline*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 方法沿革与基线关系
 
@@ -315,6 +326,8 @@ FINO 的设计基于以下前提，这些前提也界定了其适用范围：
 - 熵引导采样机制中的目标熵 H̄ 当前设为 −dim(A)，这一启发式设定在不同动作维度下的普适性如何？
 - FINO 在更复杂的视觉输入任务或稀疏奖励场景下的表现尚待验证。
 - 噪声注入与 flow matching 的理论联系——即注入噪声如何影响 flow 模型的概率路径和生成质量——仍需更深入的形式化分析。
+
+
 
 ## 原文 PDF
 

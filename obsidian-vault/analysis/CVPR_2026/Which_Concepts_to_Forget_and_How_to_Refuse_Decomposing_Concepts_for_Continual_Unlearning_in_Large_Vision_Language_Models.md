@@ -41,15 +41,13 @@ claims:
 > [!tip] 效果简介
 > - Safety benchmark (QA) + ImageNet-R (classification) - Vicuna 上，AR (Answer Rate) Last 88.02 vs 81.76 (O^3) (+6.26)；CRR (Context-aware Refusal Rate) Last 90.67 vs 73.03 (O^3) (+17.64)；S (Specificity) Last 96.54 vs 92.85 (O^3) (+3.69)。
 
-## 概述
+## 概要
 
 持续遗忘（Continual Unlearning）要求大型视觉-语言模型（LVLM）在序贯任务中精确移除特定视觉-指令对的知识，同时保持其余能力不变。然而，现有方法面临两个核心挑战：**不相关拒绝**（新遗忘任务覆盖先前任务的拒绝模式，导致对遗忘查询产生语义错位的拒绝）和**过度拒绝**（模型错误地拒绝本应保留的查询）。这些问题的根源在于序贯遗忘更新扭曲了LVLM中高度纠缠的共享视觉-语言表示，产生虚假关联，使模型难以精确区分遗忘上下文。
 
 针对上述瓶颈，本文提出 **CORE（COncept-aware REfuser）**，一种面向LVLM的概念感知持续遗忘框架。其核心洞察是：将遗忘类别分解为细粒度视觉属性与文本意图的概念组合，通过概念调制器精炼概念激活以抑制无关语义，再利用概念感知的混合拒绝专家生成定向拒绝，从而将拒绝行为建立在语义概念之上，减少虚假关联。在推理阶段，CORE通过校准机制根据查询与历史遗忘任务的相关性缩放拒绝贡献，有效抑制过度拒绝。
 
 在Vicuna-LVLM上的实验表明，CORE在末步遗忘准确率（Last AR）和上下文感知拒绝率（Last CRR）上分别达到 **88.02%** 和 **90.67%**，显著优于最佳基线方法 O³（AR 81.76%, CRR 73.03%），证明了其在精确遗忘和效用保留方面的优势。消融实验进一步验证了概念调制器和概念感知路由的关键作用：移除概念调制器导致Last CRR下降约15个百分点，而去除概念感知激活则使平均CRR从88.14%骤降至54.53%。在遗忘-保留权衡曲线上，CORE始终位于帕累托前沿，展现出优越的持续遗忘能力。
-
-## 背景与动机
 
 大型视觉-语言模型（LVLM）在安全对齐后仍可能保留敏感知识，持续遗忘（continual unlearning）旨在序贯地移除模型对特定视觉-指令对的知识，同时维持模型在保留任务上的通用能力。然而，现有方法面临两个核心挑战：**不相关拒绝**（irrelevant refusal）和**过度拒绝**（over-refusal）。
 
@@ -59,7 +57,7 @@ claims:
 
 **本文动机：从概念分解到概念感知拒绝。** 本文提出核心洞察：遗忘一个视觉-指令对，本质上是遗忘其背后的视觉属性与文本意图的概念组合。通过将遗忘目标分解为细粒度概念，并对概念激活进行精炼以抑制无关语义，再基于概念相关性路由到专门的拒绝专家，可以将拒绝行为建立在可解释的语义概念之上，从而减少虚假关联，实现精确且持续的遗忘。
 
-## 核心创新
+## 核心方法与创新机理
 
 CORE 的核心创新在于将 LVLM 持续遗忘从“直接操作视觉-文本特征”提升为“概念级分解与精炼驱动”的范式。其关键设计围绕以下四个 changed slots 展开：
 
@@ -78,8 +76,6 @@ CORE 的核心创新在于将 LVLM 持续遗忘从“直接操作视觉-文本�
 **4. 序贯任务间行为保持：从正则化到概念驱动的复用与校准**
 
 EWC、LwF 等基线依赖正则化项维持旧任务行为，MoEAdapter 则固定新参数，二者均未显式建模任务间的语义关系。CORE 通过任务间概念相关性 $r^{t'} = \sigma\left(\sin(\bar{E}_{\mathrm{img}}^{t}, \bar{E}_{\mathrm{img}}^{t'}) \cdot \sin(\bar{E}_{\mathrm{txt}}^{t}, \bar{E}_{\mathrm{txt}}^{t'})\right)$（Equation 5）驱动 refuser 的复用与抑制：相关任务的 refusers 被复用，无关者被抑制。推理时，校准机制根据查询与历史遗忘任务的相关性 $\beta$ 缩放 refuser 贡献 $\mathcal{P}(\bar{x}_{\mathrm{img}}) + \beta \cdot \Delta \mathcal{P}(\bar{x}_{\mathrm{img}})$（Equation 7），有效抑制过度拒绝。消融实验证实，移除概念感知激活（ACT）使 AVG CRR 从 88.14% 降至 54.53%，移除推理校准（CAL）则导致保留查询上的过度拒绝，印证了该设计的核心作用。
-
-## 整体框架
 
 CORE 将持续遗忘建模为**概念分解 → 概念精炼 → 概念感知拒绝**的三阶段流程，如图 Figure 2 所示。对于第 $t$ 个遗忘任务中的每个视觉-指令对，框架首先将其分解为细粒度视觉属性与文本意图的概念激活，随后通过概念调制器抑制无关语义、增强遗忘相关概念的响应，最后利用概念驱动的混合拒绝专家生成定向拒绝响应，并通过推理时校准抑制过度拒绝。
 
@@ -112,8 +108,6 @@ CORE 将持续遗忘建模为**概念分解 → 概念精炼 → 概念感知拒
 
 ![[assets/figures/papers/paper_list_l811_https_arxiv_org_abs_2603_21484/figures/001_Figure_1.jpg]]
 *Figure 1: Challenges in continual unlearning of large visionlanguage models emerge as sequential unlearning updates distort entangled visual-language representations, making it difficult to preserve contextually appropriate refusal behavior across tasks. (a) Irrelevant refusal: Learning new forget tasks overwrites prior refusal patterns, generating contextually misaligned refusals. (b) Over-refusal: The model inappropriately refuses retain queries*
-
-## 核心模块与公式推导
 
 CORE 框架围绕“概念分解—概念精炼—概念感知拒绝”三条主线构建，其核心由四个功能模块组成：视觉/文本概念模块、概念调制器、混合拒绝专家与路由器，以及推理校准模块。整体流程如 Figure 2 所示。
 
@@ -184,7 +178,7 @@ $$\mathcal{P}(\bar{x}_{\mathrm{img}}) + \beta \cdot \Delta \mathcal{P}(\bar{x}_{
 ![[assets/figures/papers/paper_list_l811_https_arxiv_org_abs_2603_21484/figures/011_Figure.jpg]]
 *Figure: B. Visualization of refuser activation frequency for each task (a) with and (b) without relevance guided refuser activation*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -237,13 +231,10 @@ Figure 5 展示了序贯遗忘过程中的响应变化。对于遗忘样本（�
 ![[assets/figures/papers/paper_list_l811_https_arxiv_org_abs_2603_21484/figures/010_Figure.jpg]]
 *Figure: A. Results of a different task order using Vicuna-based LVLM*
 
-![[assets/figures/papers/paper_list_l811_https_arxiv_org_abs_2603_21484/figures/012_Table.jpg]]
-*Table: B. Additional results with varying numbers of concept descriptions for each forget category*
-
 ![[assets/figures/papers/paper_list_l811_https_arxiv_org_abs_2603_21484/figures/009_Figure_6.jpg]]
 *Figure 6: Visualization of the visual and textual concept descriptions corresponding to the top-5 activations from the concept modules for each vision-language pair in forget categories. The blue and gray boxes represent descriptions from CORE with and without the concept modulator, respectively. Descriptions that do not belong to the forget category of the given sample are shown in red*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 问题定义与基线谱系
 

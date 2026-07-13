@@ -43,7 +43,7 @@ claims:
 > - Vbench (121 frames, 480p) 上，Total Score 80.76 vs 80.55 (MMPL, 14B) (+0.21)。
 > - Human study (500 frames, 480p) 上，Overall mean score (1-5) 3.69 vs 3.47 (SkyReels-V2) (+0.22)。
 
-## 概述
+## 概要
 
 长视频生成长期受困于一对根本矛盾：**长期时间一致性的维护**与**计算成本的可控性**。全序列双向注意力虽然能全局建模时空结构，但计算复杂度随帧数平方增长；自回归逐帧预测虽可控制单步开销，却因历史帧累积与误差传播导致外观漂移与运动不一致。TempoMaster 将这一困境的突破口定位于视频中普遍存在的**时间冗余**——全局连贯的动态结构仅需稀疏的关键帧即可建立，剩余中间帧可在已知全局动态和上下文依赖的条件下高效推断。
 
@@ -53,7 +53,7 @@ claims:
 
 **方法谱系与知识库定位**：TempoMaster 属于视频扩散模型中的分层生成路线，其核心创新在于将帧率作为可控的时间抽象维度引入生成过程。与自回归长视频模型（如 **MAGI-1** / Teng et al., 2025；**SkyReels-V2** / Chen et al., 2025）不同，它不依赖逐帧历史条件；与全序列双向生成方法不同，它通过多帧率训练与分层并行推理实现了长序列的高效处理。其 Multi-Mask 条件注入机制以零参数方式统一处理文本、图像、多帧等异构条件，避免了适配器或上下文学习引入的额外开销。
 
-## 背景与动机
+
 
 ### 长视频生成的核心瓶颈
 
@@ -83,7 +83,9 @@ claims:
 
 基于上述分析，本文提出 **TempoMaster**，核心动机在于：通过**下一帧率预测**（next-frame-rate prediction）范式，将长视频生成中高层次的全局动态结构与低层次的局部视觉细节彻底解耦。在最低帧率上以双向注意力一次性建立全局蓝图，随后以已生成帧为条件，逐级提升帧率并并行填充中间帧。这一设计在理论上同时继承了双向建模的全局规划能力与自回归方法的递进生成优势，同时通过层级并行化将计算复杂度从 $O(N^2)$ 降至 $O(N^2/4^K)$（$W \geq 2$ 时），为高效长视频生成提供了新的路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 TempoMaster 的核心创新在于将长视频生成重新定义为**下一帧率预测**（next-frame-rate prediction）范式，通过解耦高层次时间语义与低层次视觉细节，从根本上突破了现有方法在长期一致性与计算效率之间的两难困境。
 
@@ -117,7 +119,7 @@ $$\frac{N^{2}}{4^{K}} \cdot \sum_{i=0}^{K-1} \left( \frac{4}{W^{2}} \right)^{i}$
 
 这一设计实现了指数级加速，同时保持生成质量对并行配置的鲁棒性（Table 3）。
 
-## 整体框架
+
 
 TempoMaster 提出一种**下一帧率预测**（next‑frame‑rate prediction）范式，将长视频生成重新形式化为从粗粒度全局蓝图到细粒度局部细节的逐级细化过程。其整体 pipeline 由四个核心模块串联构成，形成“条件注入 → 多帧率扩散建模 → 时域位置编码 → 分层并行推理”的完整生成链路。
 
@@ -174,7 +176,7 @@ $$\frac{N^2}{4^K} \cdot \sum_{i=0}^{K-1} \left( \frac{4}{W^2} \right)^i$$
 ![[assets/figures/papers/paper_list_l939_https_arxiv_org_abs_2511_12578/figures/001_Figure_1.jpg]]
 *Figure 1: TempoMaster first generates a video sequence at coarse and low frame rate to establish the global dynamics and semantic structure, and subsequently refines it by predicting frames at higher rates, thereby enhancing temporal smoothness and detail. This nextframe-rate prediction paradigm results in videos with improved motion quality and temporal consistency*
 
-## 核心模块与公式推导
+
 
 ### 下一帧率预测范式
 
@@ -244,7 +246,9 @@ $$\frac{N^{2}}{4^{K}} \cdot \sum_{i=0}^{K-1} \left( \frac{4}{W^{2}} \right)^{i}$
 ![[assets/figures/papers/paper_list_l939_https_arxiv_org_abs_2511_12578/figures/004_Figure_4.jpg]]
 *Figure 4: Multi-Mask Condition. Condition frames are zeropadded to the length of the full sequence; their latent representations and a frame-wise mask that provides precise timestep information are then concatenated with the noisy latents to guide generation*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要量化结果
 
@@ -301,7 +305,9 @@ TempoMaster 在长视频与短视频两个基准上均取得最优总分。**Tab
 ![[assets/figures/papers/paper_list_l939_https_arxiv_org_abs_2511_12578/figures/008_Figure_7.jpg]]
 *Figure 7: Visualization of long-term generation stress test. Our method is capable of extending video clips with a window size comparable to autoregressive methods. Our method composes minute-long videos (exceeding 1500 frames) by extending 480 frames with 5-second overlaps*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位与核心瓶颈
 
@@ -362,6 +368,8 @@ $$t_j = t_{\mathrm{start}} + j \cdot 2^i, \quad t_{\mathrm{start}} \sim \mathcal
 3. 模型在更极端的运动场景（如体育赛事、第一人称快速移动）下的鲁棒性如何？
 
 > **注意**：上述局限与开放问题部分基于对实验设计的逻辑推断，论文未提供明确的失败案例分析。建议在实际应用中针对具体场景进行补充验证。
+
+
 
 ## 原文 PDF
 

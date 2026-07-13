@@ -42,7 +42,7 @@ claims:
 > - Talk2Car (test) 上，视觉定位 IoU (accuracy)↑ 80.12 vs 74.62 (CAVG) (绝对提升 +6.86%)。
 > - Talk2Car (emotion) 上，Valence Spearman ρ↑ 0.95 vs — (达到 SOTA) (领先已有方法)。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -70,7 +70,7 @@ claims:
 
 E3AD 以通用视觉-语言模型 **Qwen2.5-VL-7B**（Bai et al., arXiv 2025）为推理主干，通过低秩适配器注入情感与空间先验，在保持参数效率的同时实现任务特化。相较于以 **FSDrive-Finetuned**（Zeng et al., arXiv 2025）为代表的现有 VLA 范式，E3AD 首次将连续 VAD 情绪空间显式纳入决策闭环，并从自我中心与环境中心双视角构建空间理解，突破了单一视角推理的局限。其训练策略融合了监督微调与偏好对齐，为情感感知自动驾驶提供了一条可复现的技术路径。
 
-## 背景与动机
+
 
 ### 端到端自动驾驶的“情感鸿沟”
 
@@ -98,7 +98,9 @@ $$f_{\theta} : (I, C) \to \hat{\mathcal{V}} = \{\hat{b}, \hat{\tau}\}$$
 
 其中 $I$ 为多视角观测，$C$ 为自然语言指令，$\hat{b}$ 为指称目标定位，$\hat{\tau}$ 为未来轨迹航点序列。这一统一框架将情绪理解、视觉定位与路径规划纳入同一个自回归推理链条，为实现人本自动驾驶提供了形式化基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 E3AD 的核心贡献在于将**连续情绪建模**与**双通路空间推理**统一注入 VLA 框架，并辅以**三阶段一致性训练**，从而弥合现有端到端自动驾驶系统中的“情感鸿沟”。以下从三个关键维度展开其相对于现有范式的创新。
 
@@ -137,7 +139,7 @@ DPO 阶段的收益在 Figure 4 中得到验证：训练后情绪-轨迹的 Spea
 
 上述三项创新构成了 E3AD 相对于现有 VLA 范式的核心突破：连续 VAD 情绪空间为模型提供了理解人类意图的“情感维度”，双通路空间推理弥补了单一视角的感知盲区，而三阶段一致性训练则将情绪认知与驾驶行为牢固绑定。三者协同作用，使 E3AD 在轨迹规划（Table 1，ADE 相对 PTPC 降低 17.01%）和视觉定位（Table 2，Talk2Car 绝对提升 +6.86%）上均取得显著增益，同时保持了情绪估计的 SOTA 水平（Table 3，Valence Spearman ρ 达 0.95）。
 
-## 整体框架
+
 
 E3AD 的核心设计动机在于弥合现有端到端自动驾驶系统与人类乘客之间的**情感鸿沟**。传统 VLA 模型仅将多视图图像直接映射为规划输出，完全忽视指令中蕴含的情绪色彩与行为紧迫度（Figure 1a），导致系统行为机械化、缺乏共情。E3AD 通过将**连续 VAD 情绪空间建模**、**双通路空间推理**以及**一致性导向的三阶段训练**统一于一个 VLA 框架中（Figure 1b），使模型能够根据指令中的情感信息调整视觉定位与轨迹规划，最终产出更符合人类期望的安全、共情驾驶行为。
 
@@ -193,7 +195,7 @@ $$\mathcal{L}_{\mathrm{dpo}} = - \mathbb{E}_i \left[ \log \sigma \left( \beta \l
 ![[assets/figures/papers/paper_list_l2386_https_arxiv_org_abs_2512_04733/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of our E3AD. (a) Existing VLAs behave as emotion-agnostic systems, mapping multi-view images directly to a planning output without human-in-the-loop interaction or emotion understanding. (b) Our model adds explicit emotion modeling and closed-loop feedback, allowing the agent to infer intent intensity, ground referents more reliably, and adapt its plan accordingly. (c) This yields the Open-Domain E2E AD task, where the agent jointly reasons over language, emotion, perception, and navigation to enable human-centered and context-aware autonomy*
 
-## 核心模块与公式推导
+
 
 E3AD 的核心架构围绕三个关键设计展开：连续情绪建模、双通路空间推理，以及三阶段一致性训练。以下逐一剖析各模块的机理与关键公式。
 
@@ -245,7 +247,9 @@ VLA 主干输出的高层语义（目标位置、粗轨迹）经 **Action Decode
 ![[assets/figures/papers/paper_list_l2386_https_arxiv_org_abs_2512_04733/figures/003_Figure_3.jpg]]
 *Figure 3: Visualization of emotion distributions before and after augmentation. (a) Proportions of GoEmotion categories across Talk2Car splits. (b) VAD distribution of GoEmotion. (c) Incorporating driving commands enriches emotional diversity. (d) Emotion-aware augmentation expands and smooths the VAD distribution, providing broader and continuous emotion supervision*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 端到端轨迹规划主结果
 
@@ -320,7 +324,9 @@ Table 4 对比了 E3AD 与通用 VLM 基线在空间推理任务上的表现。�
 ![[assets/figures/papers/paper_list_l2386_https_arxiv_org_abs_2512_04733/figures/011_Figure_5.jpg]]
 *Figure 5: Qualitative comparison between E3AD and FSDrive-FT in emotion-rich (a), multi-agent (b), and ambiguous (c) scenes*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 任务定义与范式演进
 
@@ -393,6 +399,8 @@ E3AD 以 Qwen2.5-VL-7B 为 VLA 主干，所有实验在 8×NVIDIA H200 GPU 上�
 3. **多模态情绪融合**：若进一步引入多模态情绪信号（如车内摄像头捕捉的表情），如何有效对齐语言与视觉情感表征，避免模态不一致？例如，乘客笑着说“我快迟到了”时，语言与视觉的情绪信号可能冲突。
 
 4. **法规与伦理框架**：在自动驾驶法规与伦理框架下，车辆根据乘客情绪调整驾驶行为是否可能引发责任划分问题？如果系统因响应“着急”指令而加速导致事故，责任应由乘客、制造商还是算法承担？这需要在技术方案之外进行制度设计。
+
+
 
 ## 原文 PDF
 

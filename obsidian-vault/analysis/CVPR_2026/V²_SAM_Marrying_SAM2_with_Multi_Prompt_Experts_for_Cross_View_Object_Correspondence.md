@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/V_SAM_Marrying_SAM2_with_Multi_Prompt_Experts_for_Cross_View_Object_Correspondence.pdf
+project_link: null
+code_link: null
 aliases:
 - VS
 - VSMSMPECVOC
@@ -41,7 +43,7 @@ claims:
 > - Ego-Exo4D (v2 test) - Ego2Exo方向 上，IoU 46.3 vs 42.6 (O-MaMa) (+3.7)。
 > - DAVIS-2017 Val (20帧间隔) 上，J&F_m 78.8 vs 70.2 (PCC) (+8.6)。
 
-## 概述
+## 概要
 
 跨视角物体对应（cross-view object correspondence）要求在视角、光照、遮挡和物体姿态剧烈变化的两幅图像之间，对同一物体实例进行精确分割。现有的基础分割模型（如 SAM、SAM2）虽然具备强大的单帧提示式分割能力，但它们的提示机制高度依赖单视角空间坐标或视觉参考，无法直接应对跨视角场景下目标位置和外观的双重漂移。这一瓶颈使得基于单视角空间提示的分割模型在跨视角条件下几乎完全失效。
 
@@ -51,7 +53,7 @@ V²-SAM 的核心洞察在于：**空间提示回答“在哪里”，视觉提�
 
 在方法谱系上，V²-SAM 位于**基于提示的跨视角分割**与**多专家集成**的交汇点。它继承了 SAM2 的编码器-解码器架构，但通过几何对应和外观对齐两条互补路径重构了提示生成方式，区别于仅使用视觉参考提示的 Ref-SAM* 等扩展方法。与依赖候选匹配的 O-MaMa 和端到端方法 ObjectRelator 相比，V²-SAM 的多专家框架与 PCCS 选择器提供了更强的场景自适应能力，尤其在几何线索丰富或外观匹配困难的场景中展现出互补优势。
 
-## 背景与动机
+
 
 ### 跨视角物体对应的核心挑战
 
@@ -86,7 +88,9 @@ Segment Anything Model（SAM）及其视频扩展SAM2在图像和视频分割领
 
 进一步的，通过**多专家训练框架**和**自适应循环一致性选择器（PCCS）**，V²-SAM能够根据不同场景特性自适应地选择或融合两种提示的优势，从而在复杂跨视角场景中大幅提升分割鲁棒性。实验表明，这一设计在Ego-Exo4D上总IoU达48.0，较最佳基线O-MaMa（43.4）提升4.6个点，验证了双提示互补策略的有效性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 V²-SAM 的核心创新在于**显式解耦并融合跨视角空间提示与外观提示**，通过多专家框架与自适应选择器，解决了 SAM2 在跨视角场景中因目标位置和外观剧烈变化而无法直接迁移的根本瓶颈。
 
@@ -127,7 +131,7 @@ $$P_k^{t2q} = \mathrm{V}^2\mathrm{Anchor}(I_t, I_q; \hat{M}_{t_k})$$
 
 这些创新在 Ego-Exo4D 上带来了显著增益：V²-SAM Multi-Experts 的 Total-IoU 达 48.0，较最佳基线 O-MaMa（43.4）提升 4.6 点（Table 1）；在零样本跨数据集迁移 HANDAL-X 上，IoU 较 ObjectRelator 提升 34.4 点（77.2 vs 42.8，Table 3），验证了设计的泛化能力。
 
-## 整体框架
+
 
 V²-SAM 以 SAM2 为基础骨架，保留其 Encoder φ(·)、Prompt Encoder 和 Mask Decoder，但丢弃了与帧间记忆相关的模块，使框架聚焦于帧级跨视角对应（Section 3.1）。给定一对查询-目标图像 $(I_q, I_t)$ 以及查询视图中的物体掩码 $M_q$，系统并行生成两类跨视角提示，分别送入对应的掩码解码器，最终由一个后处理选择器输出最优预测掩码。
 
@@ -153,7 +157,7 @@ V²-SAM 以 SAM2 为基础骨架，保留其 Encoder φ(·)、Prompt Encoder 和
 ![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2511_20886/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of SAM variants in segmentation capability. Our proposed V²-SAM supports coordinate-point and visualreference prompts for cross-view segmentation*
 
-## 核心模块与公式推导
+
 
 V²-SAM 的核心在于将跨视角对应问题分解为“在哪里”和“长什么样”两个互补子问题，并设计对应的提示生成模块与多专家分割框架。以下按模块拆解其关键公式与机制。
 
@@ -246,7 +250,9 @@ $$
 ![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2511_20886/figures/003_Figure_3.jpg]]
 *Figure 3: The structure of Visual Prompt Matcher. The Structural Mapping Branch is built upon a lightweight CNN-based mask encoder and decoder. The Feature Mapping Branch leverages Transformer-based cross-attention layers, while the Res-MLP component serves as a residual multi-layer perceptron*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -303,7 +309,9 @@ Table 5展示了不同专家解码器组合的性能。Anchor Expert单独使用
 ![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2511_20886/figures/010_Figure_5.jpg]]
 *Figure 5: Ego2Exo qualitative results. From left to right: query view, predictions from the Anchor Expert, Visual Expert, and Fusion Expert, followed by the final output selected by the PCCS*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 跨视角分割的方法谱系
 
@@ -348,6 +356,8 @@ V²-SAM 的核心知识贡献可归纳为三个层次：
 ### 开放问题
 
 当前验证分析中未提取到明确的开放问题声明。基于方法设计可提出以下值得探索的方向：（1）能否将 PCCS 的“事后选择”升级为“在线门控”，使专家在推理过程中动态协作而非独立预测？（2）V²-Anchor 的稀疏锚点数量为何与性能呈负相关？是否存在自适应确定最优锚点数量的机制？（3）双提示互补机制能否推广至其他视觉基础模型的跨域适应任务？这些问题需要进一步实验验证。
+
+
 
 ## 原文 PDF
 

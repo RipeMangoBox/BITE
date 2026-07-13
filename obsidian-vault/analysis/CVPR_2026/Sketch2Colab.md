@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/Sketch2Colab.pdf
+project_link: null
+code_link: null
 aliases:
 - Sketch2Colab
 tags:
@@ -42,7 +44,7 @@ claims:
 > - CORE4D (Sketch-only) 上，FID↓ 0.509 vs 0.735 (COLLAGE) (0.226 (30.6%))；FID↓ 0.509 vs 1.025 (SKETCH2ANIM-INT) (0.516 (50.3%))。
 > - CORE4D (Average protocol) 上，Foot-skate↓ ~24% lower than COLLAGE teacher vs COLLAGE teacher (~24%)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有扩散模型在多实体交互场景中难以精确满足稀疏草图所施加的多重约束——包括关键帧对齐、关节轨迹跟踪、接触一致性及碰撞避免——且推理速度慢，无法在保持生成质量的同时实现对多约束的严格遵循。
 
@@ -54,7 +56,7 @@ claims:
 
 **局限与开放问题**：当前方法的物体交互局限于 CORE4D 数据集的有限类别，且侧重人手与物体的单点交互；对重度草图噪声或自相交轨迹等极端情况仍可能出现漂移、浮空或碰撞失败。如何扩展至任意网格与物理属性、实现多人多物协同操控，以及摆脱对扩散教师先验的依赖，是后续研究的关键方向。
 
-## 背景与动机
+
 
 ### 问题场景：从稀疏草图到多人交互动画
 
@@ -80,7 +82,9 @@ claims:
 
 Sketch2Colab 正是在这一动机下，提出以蒸馏得到的整流流学生模型为核心，配合能量引导与 CTMC 离散相位调度，实现约束精度与推理效率的双重突破。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Sketch2Colab 的核心创新在于将多约束、多实体的草图条件动画生成从“扩散采样+后验引导”的范式，重构为“整流流蒸馏+能量塑形+离散事件调度”的耦合系统。其与基线方法的本质差异可归结为三个关键维度的机制替换。
 
@@ -100,7 +104,7 @@ Sketch2Colab 的核心创新在于将多约束、多实体的草图条件动画�
 
 上述三个 changed slots 并非孤立运作，而是通过联合训练总损失 $\mathcal{L}$ 形成耦合增益。能量引导提供了逐采样步的约束梯度信号，CTMC 调度器决定了不同交互相位的能量权重分配，而整流流学生则提供了高效的前向传输基底。三者协同使得 Sketch2Colab 在仅依赖稀疏故事板草图（无文本条件）的情况下，生成的多人-物运动能够严格遵循关键帧时序、关节/端点轨迹以及物体对齐与接触要求——这是现有扩散基线无法实现的控制精度。
 
-## 整体框架
+
 
 Sketch2Colab 的目标是从稀疏的故事板草图（关键帧、关节轨迹、物体掩码）和可选文本提示出发，生成包含多人与多物体的时序连贯 3D 运动序列。整个 pipeline 围绕一个核心设计展开：**将扩散教师蒸馏为整流流学生，并通过双空间能量引导与 CTMC 离散相位调度，在快速 ODE 采样过程中精确满足多重稀疏约束**。
 
@@ -155,7 +159,7 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{RF}} + \lambda_{\mathrm{dist}}\mathcal{L}_{
 ![[assets/figures/papers/paper_list_l1754_Sketch2Colab/figures/001_Figure_1.jpg]]
 *Figure 1: Sketch-conditioned human–object–human (HOH) demonstrations with Sketch2Colab. Left→right: (a) Two people co-manipulate a table while following a sketched path; midway the model switches handling so that one character disengages and the other finishes the placement, showing that Sketch2Colab can start/stop agent motion based on joint/body trajectory cues. (b) Cooperative transport of a large box along a prescribed trajectory with on-the-fly height adjustment before placing it down. (c) A specified hand must grasp a canister and then follow a complex path. In all cases, the system is driven only by sparse storyboard keyframes (no text conditioning); the generated motions respect the keyframe...*
 
-## 核心模块与公式推导
+
 
 Sketch2Colab 的生成管线由六个核心模块串联而成，其设计围绕一个中心思想：**将冻结的扩散教师蒸馏为整流流学生，并在训练与采样过程中通过可微能量函数和 CTMC 离散调度器直接塑造数据流形**，从而在稀疏草图约束下实现精确、物理合理且高效的多人-物交互运动生成。
 
@@ -257,7 +261,9 @@ $$
 
 > **证据强度说明**：以上公式均来自论文 Sec. 3.1–3.4 的明确定义，变量含义与原文一致。消融实验（Sec. 5）证实：移除能量引导导致真实感下降 15–20%、锚点误差翻倍；禁用 CTMC 调度使足部滑动和轨迹误差上升 10–20%；这些结果直接验证了各模块的因果贡献。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -312,7 +318,9 @@ Table 2(b,c) 报告了噪声鲁棒性实验。在约 60% 的草图噪声水平�
 ![[assets/figures/papers/paper_list_l1754_Sketch2Colab/figures/004_Figure_3.jpg]]
 *Figure 3: Sketch→interaction motion: comparison of Sketch2Colab and COLLAGE (teacher) [17]. Given storyboard keyframes and joint trajectories (top), Sketch2Colab (right) generates HOH motions that closely follow the sketches, execute interaction phases at the intended times, and adhere tightly to trajectories and keyframes. In contrast, COLLAGE (teacher, middle) struggles to respect storyboard constraints such as the handover and continued motion with a single human holding the object(1st and 2nd storyboards), and fails to match fine-grained keyframe constraints (e.g., the third storyboards, where the character must lift higher while moving). Additional examples and baseline comparisons are provided...*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位与核心瓶颈
 
@@ -377,6 +385,8 @@ Sketch2Colab的物体交互能力局限于CORE4D数据集的有限类别，训�
 5. **CTMC与能量引导的推理开销优化**：当前CTMC调度和能量梯度计算增加了推理时的计算负担。是否可以设计更高效的离散调度策略或能量代理模型，在保持约束精度的同时进一步降低推理延迟？
 
 6. **交互模式的可控粒度**：当前系统对交互的刻画停留在接触/非接触的二元状态，未来是否可以引入更细粒度的交互语义（如推、拉、抬、转等操作类型），使用户能够通过草图或自然语言精确指定交互意图？
+
+
 
 ## 原文 PDF
 

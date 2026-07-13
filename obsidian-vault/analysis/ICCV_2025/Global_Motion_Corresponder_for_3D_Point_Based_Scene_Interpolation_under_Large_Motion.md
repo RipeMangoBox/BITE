@@ -5,6 +5,8 @@ paper_level: A
 venue: ICCV
 year: 2025
 pdf_ref: paperPDFs/ICCV_2025/Global_Motion_Corresponder_for_3D_Point_Based_Scene_Interpolation_under_Large_Motion.pdf
+project_link: https://junrul.github.io/gmc/
+code_link: null
 aliases:
 - GMCG
 - GMC3PBSIULM
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 大运动下基于三维点云场景插值的全局运动对应器 |
 | 英文题名 | Global Motion Corresponder for 3D Point-Based Scene Interpolation under Large Motion |
 | 会议/期刊 | ICCV 2025 |
-| Links | [paper](https://arxiv.org/abs/2508.20136); [Project](https://junrul.github.io/gmc/) |
+| Links | [paper](https://arxiv.org/abs/2508.20136) · [Project](https://junrul.github.io/gmc/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Global Motion Corresponder (GMC) |
 | Dataset | Synthetic Global-Motion Scenes (8 scenes), Synthetic Local-Motion Scenes (6 scenes), Real-World Global-Motion Scenes (3 scenes) |
@@ -41,7 +43,7 @@ claims:
 > - Synthetic Global-Motion Scenes (8 scenes) 上，SI-MPED ↓ (×10⁻³) 为 16.47，对比 824.50 (Dynamic Gaussian)，变化 -808.03。
 > - Synthetic Local-Motion Scenes (6 scenes) 上，SI-FID ↓ 为 112.62，对比 117.94 (PAPR in Motion)，变化 -5.32。
 
-## 概述
+## 概要
 
 **核心问题**：在三维场景插值中，当相邻帧之间存在大幅度全局运动时，传统基于局部最近邻的点对应关系会严重失效，导致现有动态场景重建方法无法产生合理的中间帧渲染。
 
@@ -57,7 +59,7 @@ claims:
 
 **局限性**：方法假设输入的两个时间步的三维高斯重建质量较高；训练涉及多阶段和多个超参数；目前仅支持两个已知状态间的插值与外推，尚未扩展到连续多帧序列。
 
-## 背景与动机
+
 
 ### 问题背景：三维场景插值中的大运动挑战
 
@@ -85,7 +87,9 @@ Figure 1 清晰地揭示了这一假设的脆弱性：当帧间运动较小时�
 
 本文提出 **Global Motion Corresponder (GMC)**，核心思想是：**用可学习的一元势场（unary potential field）预测每个高斯的 SE(3) 变换，将两个时间步的高斯点对齐到一个共享规范空间（shared canonical space），从而将点对应问题转化为规范空间中的最近邻匹配问题**。这一设计从根本上绕开了局部搜索的局限，使得即使在大幅度全局运动下也能建立正确的对应关系。同时，通过引入 PCA 降维的 DINO 语义特征和局部等距损失，GMC 在语义平滑性和局部刚性之间取得了平衡，实现了鲁棒的大运动插值乃至外推。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GMC 的核心创新在于**将大运动下的点对应问题从“显式匹配”转化为“隐式对齐”**。传统方法（如 Dynamic Gaussian、PAPR in Motion）依赖局部最近邻搜索或变形场微调来建立跨帧对应，这在全局运动幅度较大时极易产生错误匹配（Figure 1 中段）。GMC 的关键洞察是：**不直接匹配点对，而是学习一个一元势场（Unary Potential Field），将两个时间步的高斯点分别映射到共享规范空间**，使对应点在规范空间中自然重合，从而绕过局部搜索的歧义性。
 
@@ -126,7 +130,7 @@ DINO 特征提供了语义感知能力，使网络能够区分外观相似但语
 
 GMC 的四项创新形成了一套完整的因果链条：**DINO 语义特征**提供高层判别信息 → **一元势场 MLP** 学习 SE(3) 映射 → **共享规范空间**实现隐式对齐 → **能量损失 + 局部等距损失**联合优化确保对应质量和运动平滑性。这套机制使得 GMC 在合成全局运动场景上以 SI-FID 224.42 和 SI-MPED 16.47 显著优于 Dynamic Gaussian（283.53 / 824.50），并在真实世界全局运动场景上保持了类似的优势。
 
-## 整体框架
+
 
 GMC 的整体管道围绕一个核心思想展开：**用可学习的一元势场（Unary Potential Field）取代直接的点对点匹配，将两个时间步的高斯点云映射到一个共享规范空间（Shared Canonical Space）中完成对齐**。该方法不依赖真实运动轨迹，仅需两个时刻的多视角图像即可实现大运动下的场景插值与外推。其工作流程如图 Figure 4 所示，可分为四个阶段。
 
@@ -155,7 +159,7 @@ $$\mathcal{L}_{\mathrm{E}} = \sum_{g_i \in \mathcal{G}_0} \min_{g_j \in \mathcal
 
 **输入输出流总结：** 输入为两个时刻的多视角图像；输出为连续时间轴上任意时刻的新视角渲染图像。中间产物包括预训练的 3DGS 模型、PCA-DINO 特征、学到的 SE(3) 变换场，以及规范空间中的点对应关系。
 
-## 核心模块与公式推导
+
 
 ### 问题建模：直接匹配的困境
 
@@ -227,7 +231,9 @@ $$\mathcal{L}_{\mathrm{render}} = \beta \mathcal{L}_{\mathrm{RGB}}(\pmb{I}_0, \h
 
 其中 $\beta$ 用于平衡两个时间步的渲染贡献，$\hat{\pmb{I}}_0, \hat{\pmb{I}}_1$ 为渲染图像。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置与评估指标
 
@@ -304,7 +310,9 @@ GMC 的变换学习机制还带来了一个额外收益：通过联合优化渲�
 
 ![[assets/figures/papers/paper_list_l44_https_arxiv_org_abs_2508_20136/figures/010_Table.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈：大运动下的点对应失效
 
@@ -344,6 +352,8 @@ GMC 的变换学习机制还带来了一个额外收益：通过联合优化渲�
 4. **规范空间与高斯参数的一体化**：共享规范空间的学习目前与高斯参数的优化是分离的。是否可以进一步耦合以提升紧凑性和端到端的可训练性，是一个值得探索的方向。
 
 5. **评估指标的局限性**：所有评估基于预定义的平滑性指标（SI-FID、SI-EMD、SI-MPED），由于缺乏真实运动轨迹，无法评估轨迹的绝对准确性。这意味着 GMC 的“正确性”实际上是“视觉平滑性”的代理，而非几何真值的验证。
+
+
 
 ## 原文 PDF
 

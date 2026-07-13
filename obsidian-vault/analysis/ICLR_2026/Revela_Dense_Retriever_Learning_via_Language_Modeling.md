@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Revela_Dense_Retriever_Learning_via_Language_Modeling.pdf
+project_link: https://huggingface.co/trumancai/Revela-3b
+code_link: https://github.com/TRUMANCFY/Revela
 openreview_forum_id: e7pAjJZJWb
 aliases:
 - Revela
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | Revela：通过语言建模进行密集检索器学习 |
 | 英文题名 | Revela: Dense Retriever Learning via Language Modeling |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=e7pAjJZJWb); [GitHub](https://github.com/TRUMANCFY/Revela); [Project](https://huggingface.co/trumancai/Revela-3b) |
+| Links | [paper](https://openreview.net/forum?id=e7pAjJZJWb) · [GitHub](https://github.com/TRUMANCFY/Revela) · [Project](https://huggingface.co/trumancai/Revela-3b) |
 | Topic | #topic/representation_self_supervised_transfer #topic/representation_self_supervised_transfer/representation_learning |
 | Method | Revela |
 | Dataset | CoIR, BRIGHT, BEIR |
@@ -41,7 +43,7 @@ claims:
 > - CoIR 上，nDCG@10 为 56.1 (Revela0.5B)，对比 46.4 (E5-PT 0.3B)，变化 +9.7。
 > - BRIGHT 上，nDCG@10 为 20.1 (Revela3B)，对比 13.1 (E5-PT)，变化 +7.0。
 
-## 概述
+## 概要
 
 密集检索器（Dense Retriever）是现代信息检索系统的核心组件，但其训练通常依赖大量人工标注的查询-文档对——这一瓶颈在代码、法律等专业领域以及需要复杂推理的场景中尤为突出，严重限制了检索技术的可扩展性和普及度。
 
@@ -58,7 +60,7 @@ Revela 提出了一种全新的自监督训练范式：**通过语言建模来�
 
 在方法谱系上，Revela 位于自监督检索器训练的前沿，与 **REPLUG**（Shi et al., 2024）利用冻结语言模型困惑度进行蒸馏、**Contriever**（Izacard et al., 2022）通过对比学习生成伪查询-文档对等方案形成鲜明对比。Revela 的创新在于将检索器训练与语言建模目标统一，使检索器成为语言模型跨文档推理的有机组成部分，而非独立优化的外部模块。
 
-## 背景与动机
+
 
 密集检索器在开放域问答、代码搜索、法律信息检索等场景中已成为核心组件。然而，训练高性能密集检索器通常依赖大量人工标注的查询-文档对，这在专业领域（如代码、法律）以及需要复杂推理的场景中成本高昂且难以扩展。现有的自监督方法试图绕过这一瓶颈，但各有局限：**Contriever**（Izacard et al., 2022）通过对比学习利用文档内部结构生成伪查询-文档对，其性能在域外场景下衰减明显；**REPLUG**（Shi et al., 2024）使用冻结语言模型的困惑度作为跨文档相似度监督信号，但检索器不参与语言模型训练，梯度信号间接且稀疏；**E5-PT**（Wang et al., 2022）虽性能强劲，却依赖数百万弱监督文本对和大量计算资源。
 
@@ -66,7 +68,9 @@ Revela 提出了一种全新的自监督训练范式：**通过语言建模来�
 
 Revela的动机正源于此：**能否将语言模型的自监督NTP目标转化为检索器的训练信号？** 核心洞察是，如果将NTP的上下文从单个序列内部扩展到同一批次中的其他文档，并让检索器计算的相似度来决定跨文档注意力的权重，那么检索器就可以通过语言模型的梯度信号进行端到端优化——无需任何显式查询-文档对。这一思路将检索器训练从“构造伪监督信号”的范式转变为“让检索器参与语言建模”的范式，从根本上解耦了对标注数据的依赖。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Revela的核心创新在于将密集检索器的训练完全融入语言模型的自监督下一个token预测（Next-Token Prediction, NTP）框架中，从而彻底摆脱了对标注查询-文档对的依赖。其关键改变体现在以下四个维度：
 
@@ -100,7 +104,7 @@ Revela的训练数据构建极为简洁：将原始文本按文档切分成块�
 
 Revela的核心因果链条可概括为：**语言模型的NTP目标隐式捕捉文本内部依赖 → 通过批次内注意力将这种依赖扩展至跨文档的宏观关系 → 检索器计算的相似度作为注意力权重，将文档相关性信息注入语言建模过程 → NTP损失的梯度反向传播至检索器，驱动其学习有效的文档表征**。这一设计使得检索器训练与语言建模形成了闭环，无需任何外部标注信号。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_e7pAjJZJWb/figures/001_Figure_1.jpg]]
 *Figure 1: The framework of Revela. The retriever’s in-batch similarity scores are used as in-batch attention weights inside transformer blocks. The retriever is trained by optimizing the language modeling objective, i.e., NTP. The related patterns in red and purple sequences are highlighted in bold and underline. An example of training dynamics is illustrated at App. A*
@@ -150,7 +154,7 @@ Revela 仅需原始文本作为训练数据。具体做法是将文档切分成�
 - **困惑度蒸馏基线（REPLUG）**：使用冻结语言模型的困惑度作为跨文档相似度的监督信号，检索器训练与 LM 训练分离。Revela 则实现检索器与 LM 的联合更新。
 - **有监督/弱监督基线（E5 系列）**：依赖大规模标注查询-文档对或半结构化文本对进行训练。Revela 完全消除了对配对数据的依赖，仅使用原始文本即可达到甚至超越其性能。
 
-## 核心模块与公式推导
+
 
 ### 3.1 训练目标的范式转换
 
@@ -200,7 +204,9 @@ Revela框架的关键工程特性在于**检索器与语言模型的端到端联
 
 在具体实现层面，批次内注意力的计算通过**文档复制与注意力掩码调整**来高效完成。具体而言，将批次内的文档复制一份，其中一份用于标准自注意力的计算（产生 $\mathrm{e}_i^l$），另一份用于跨文档注意力的计算（产生 $\mathrm{b}_i^l$），并通过精心设计的注意力掩码确保：自注意力路径仅关注文档内部的前缀token，跨文档注意力路径仅关注其他文档的全部token，二者互不干扰。这种实现方式使得Revela可以直接复用现有Transformer架构的注意力算子，降低了工程集成的复杂度。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现
 
@@ -308,7 +314,9 @@ Revela展现出良好的域适应能力。在Wikipedia和代码语料的混合�
 *Table 6: Embedding models and their reference URLs*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -353,6 +361,8 @@ Revela 的性能优势在不同领域呈现**非均匀分布**：
 **多模态泛化**：现有验证仅限于文本模态。将"通过语言建模训练检索器"的范式扩展到图像、音频等多模态数据，需要重新设计跨模态的批次内注意力机制和相似度计算方式，目前尚无明确路径。
 
 **规模扩展的边界**：虽然实验显示性能随批次大小和模型规模提升（Figure 4），但更大规模（如 7B+ 参数）下的收益递减规律、联合训练中 LM 能力保留的上限、以及注意力机制的稀疏化需求，仍是开放的研究方向。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,7 @@ paper_level: A
 venue: NeurIPS
 year: 2020
 pdf_ref: paperPDFs/NEURIPS_2020/ExpandNets_Linear_Over_parameterization_to_Train_Compact_Convolutional_Networks.pdf
+code_link: https://github.com/GUOShuxuan/expandnets
 project_link: https://github.com/GUOShuxuan/expandnets
 aliases:
 - ExpandNets
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | ExpandNets：通过线性过参数化训练紧凑卷积网络 |
 | 英文题名 | ExpandNets: Linear Over-parameterization to Train Compact Convolutional Networks |
 | 会议/期刊 | NeurIPS 2020 |
-| Links | [paper](https://arxiv.org/abs/1811.10495); [GitHub](https://github.com/GUOShuxuan/expandnets) |
+| Links | [paper](https://arxiv.org/abs/1811.10495) · [GitHub](https://github.com/GUOShuxuan/expandnets) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | ExpandNets |
 | Dataset | ImageNet ILSVRC2012 validation, CIFAR-10, CIFAR-100 |
@@ -41,13 +42,13 @@ claims:
 > - ImageNet ILSVRC2012 validation 上，Top-1 accuracy (%) 为 65.62 (MobileNetV2 ExpandNet-CL)，对比 63.75 (MobileNetV2 original)，变化 +1.87。
 > - CIFAR-10 上，Top-1 accuracy (%) 为 80.27 ± 0.24 (SmallNet 7×7 ExpandNet-CK)，对比 78.63 ± 0.41 (SmallNet 7×7)，变化 +1.64。
 
-## 概述
+## 概要
 
 紧凑卷积网络（如 MobileNet、ShuffleNet 等）因参数冗余不足，在训练时面临优化困难与泛化能力弱的瓶颈。ExpandNets 提出了一种**线性过参数化**策略：在训练阶段，将紧凑网络中的每个线性层（卷积层或全连接层）替换为多个连续的线性层，不引入任何非线性激活；由于连续线性操作在代数上等价于原始单层，训练完成后可通过矩阵乘法将扩张网络无损收缩回原紧凑结构，从而在推理时完全恢复原始网络的参数量和计算量。
 
 该方法的核心洞察在于，利用线性层的代数可合并性，在训练和推理两个阶段灵活切换物理结构与计算代价——训练时通过过参数化改善优化景观与泛化性能，推理时则零信息损失地回归紧凑形态。实验表明，ExpandNets 在不使用知识蒸馏的情况下，即可超越原始紧凑网络甚至结合知识蒸馏的版本：在 ImageNet 上，ExpandNet-CL 将 MobileNet 的 Top-1 准确率从 66.48% 提升至 69.40%（+2.92 pp）；在损坏标签的泛化测试中，ExpandNet-CK 显著降低了测试误差；梯度困惑度分析进一步揭示，ExpandNet 的训练过程具有更高的最小 pairwise 梯度余弦相似度，收敛更稳定，最终泛化误差更小。
 
-## 背景与动机
+
 
 ### 紧凑网络的两难困境
 
@@ -78,7 +79,9 @@ claims:
 
 如图 1 所示，这三种策略覆盖了紧凑网络的主要线性组件，且均遵循“训练时扩张、推理时收缩”的统一范式。与知识蒸馏不同，ExpandNets 无需教师网络即可超越蒸馏方法的性能；与 ACNet 等并行扩张方法相比，ExpandNets 的序列式线性扩张具有更强的代数灵活性和更广的适用性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ExpandNets 的核心创新在于引入**训练阶段的线性过参数化**，以解决紧凑卷积网络因参数冗余不足而导致的优化困难与泛化能力弱的问题。该方法的关键洞察是：连续线性操作在代数上具有可合并性，因此可以在训练时通过扩张改善优化与泛化，在推理时则无信息损失地收缩回原始紧凑结构，实现物理结构与计算代价的灵活切换。
 
@@ -117,7 +120,7 @@ ExpandNets 的性能增益来自三个相互关联的机制：
 
 消融实验证实，扩张率 $r > 1$ 是获得性能增益的必要条件。当 $r=0.25$ 时性能下降，而 $r=2, 4, 8$ 时性能逐步提升，验证了过参数化的关键作用。$r=4$ 被选为精度与效率的最佳平衡点。扩张后的网络在训练后通过代数收缩恢复为与原始网络完全相同的结构，因此推理时参数量、MACs 和推理时间与原始网络完全一致。
 
-## 整体框架
+
 
 ExpandNets 遵循“训练时线性扩张，推理时代数收缩”的总体范式，其核心 pipeline 由四个功能模块构成，形成一条从紧凑网络出发、经可控过参数化训练、最终无损恢复原结构的闭环链路。
 
@@ -145,7 +148,7 @@ ExpandNets 遵循“训练时线性扩张，推理时代数收缩”的总体范
 
 需要指出的是，该方法**不引入任何非线性**（如激活函数）到扩张层之间，这是保证代数可收缩性的关键约束。扩张仅作用于线性层，归一化层、池化层等结构保持不变。扩张率 $r$ 是控制过参数化程度的核心超参数：$r=1$ 退化为原始网络，$r>1$ 才产生过参数化效应；实验表明 $r=4$ 在精度-效率之间取得最佳平衡。
 
-## 核心模块与公式推导
+
 
 ### 3.1 卷积层的矩阵表示
 
@@ -206,7 +209,9 @@ $$
 
 上述三种扩张策略共享同一个收缩机制：训练完成后，通过矩阵乘法或卷积核的连续卷积操作，将所有扩张层合并为原始紧凑网络的对应层。该过程是精确的代数等价变换，不引入任何近似或信息损失。收缩后的网络在参数量、MACs 和推理时间上与直接训练的紧凑网络完全相同。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能增益
 
@@ -301,7 +306,9 @@ ExpandNets 的有效性可归因于三个相互关联的机制：
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_1811_10495/figures/004_Table_2.jpg]]
 *Table 2: Top-1 accuracy (%) of MobileNets vs ExpandNets with r = 4 on CIFAR-10 and CIFAR-100*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -338,6 +345,8 @@ ExpandNets 的设计决定了其适用范围存在明确的边界条件。
 **与网络压缩技术的协同。** 线性扩张与网络剪枝、量化等压缩技术是否存在协同效应，论文未涉及。一个自然的问题是：先扩张训练再收缩，与先训练再剪枝，两者在最终模型质量和训练效率上是否存在互补或替代关系。
 
 **最优过参数化程度的理论理解。** 论文从实验角度展示了扩张率 $r$ 对性能的影响，但未提供关于最优过参数化程度的理论分析。是否存在一个理论上可刻画的最优扩张程度，能够在训练效率与最终泛化性能之间取得最佳平衡，仍是一个开放的理论问题。
+
+
 
 ## 原文 PDF
 

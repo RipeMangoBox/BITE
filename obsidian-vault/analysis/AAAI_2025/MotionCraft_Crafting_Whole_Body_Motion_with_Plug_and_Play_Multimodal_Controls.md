@@ -5,6 +5,8 @@ paper_level: A
 venue: AAAI
 year: 2025
 pdf_ref: paperPDFs/AAAI_2025/MotionCraft_Crafting_Whole_Body_Motion_with_Plug_and_Play_Multimodal_Controls.pdf
+project_link: https://cure-lab.github.io/MotionCraft
+code_link: null
 aliases:
 - MotionCraft
 tags:
@@ -39,7 +41,7 @@ claims:
 > - HumanML3D (whole-body SMPL-X, MC-Bench) 上，FID↓ 6.707 (MotionCraft-Mix) vs 7.323 (FineMoGen) (-0.616)；Top-1 R Precision↑ 0.600 (MotionCraft-Mix) vs 0.565 (FineMoGen) (+0.035)。
 > - HumanML3D (original body-only format) 上，Top-1 R Precision↑ 0.501 (MotionCraft-Basic) vs 0.504 (FineMoGen) (-0.003)。
 
-## 概述
+## 概要
 
 运动生成领域长期面临一个核心瓶颈：**不同生成任务之间存在显著的分布漂移**。文本到运动（T2M）、语音到手势（S2G）和音乐到舞蹈（M2D）等场景的运动数据在潜在空间中呈现出截然不同的分布（见Figure 2 t-SNE可视化），导致在单一模型中混合训练多模态条件时，粗粒度的文本语义与细粒度的语音/音乐低层控制信号产生优化冲突。现有方法要么针对单一任务设计，要么在融合多模态信号时缺乏对跨场景运动知识迁移的有效建模。
 
@@ -53,7 +55,7 @@ MotionCraft 针对这一瓶颈提出了**两阶段粗到细的即插即用多模
 
 当前方法的主要局限包括：缺乏帧级或细粒度的全身文本描述（尤其在 S2G 和 M2D 任务中只能使用伪文本标注）；SMPL-X 轴角表示中根旋转和根轨迹的 6D 参数影响训练稳定性；模型规模扩展受限于带标注的多模态运动数据量。这些方向为后续研究提供了明确的改进空间。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -97,7 +99,9 @@ Table 1系统对比了MotionCraft与先前方法的能力差异，揭示了现�
 
 **应用动机：** 构建统一的全身运动基准MC-Bench，将所有数据转换为SMPL-X轴角格式，为跨任务运动生成研究提供标准化评估平台，并支持未来新控制模态的灵活扩展。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MotionCraft 的核心创新在于**通过可分解的人体拓扑知识实现跨场景运动生成的泛化**，并采用**两阶段粗到细训练策略**解耦不同粒度的控制信号。与现有方法相比，其关键改进体现在以下三个维度的“changed slots”上。
 
@@ -130,7 +134,7 @@ Stage 2 中，MotionCraft 可选择性地解冻与特定控制信号相关的身
 
 **局限与待验证点**：当前 MC-Attn 中动态拓扑学习是否存在崩溃或错误收敛的失败案例，论文未提供明确分析，需进一步验证。此外，SMPL-X 轴角表示中根旋转和根轨迹的 6D 参数可能影响训练稳定性，作者已将其列为未来改进方向。
 
-## 整体框架
+
 
 MotionCraft 是一个基于扩散 Transformer 的两阶段、粗到细多模态全身运动生成框架，其核心设计目标是在统一架构下支持文本、语音、音乐等多种控制信号的即插即用式生成。框架的整体信息流如下：
 
@@ -159,7 +163,7 @@ MotionCraft 是一个基于扩散 Transformer 的两阶段、粗到细多模态�
 ![[assets/figures/papers/paper_list_l1824_MotionCraft_Crafting_Whole_Body_Motion_with_Plug_and_Play_Multimodal_Con/figures/001_Figure_1.jpg]]
 *Figure 1: We propose MotionCraft, a diffusion transformer that crafts whole-body motion with plug-and-play multimodal controls, encompassing robust motion generation abilities including Text-to-Motion, Speech-to-Gesture, and Music-to-Dance*
 
-## 核心模块与公式推导
+
 
 ### 全身运动表示
 
@@ -232,7 +236,9 @@ $$
 ![[assets/figures/papers/paper_list_l1824_MotionCraft_Crafting_Whole_Body_Motion_with_Plug_and_Play_Multimodal_Con/figures/003_Figure_2.jpg]]
 *Figure 2: The t-SNE latent space of motion in different generation tasks. It illustrates the motion distribution drifts across different generation scenarios*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与实验设计逻辑
 
@@ -308,7 +314,9 @@ MotionCraft 的实验设计围绕一个核心观察展开：不同运动生成�
 ![[assets/figures/papers/paper_list_l1824_MotionCraft_Crafting_Whole_Body_Motion_with_Plug_and_Play_Multimodal_Con/figures/009_Figure_5.jpg]]
 *Figure 5: Multimodal video generation application with our generated motions conditioned on music (upper row) or speech (lower row). We project them to 2D images to serve as motion conditions for MimicMotion (Zhang et al. 2024c)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 
@@ -343,6 +351,8 @@ MotionCraft 处于多模态全身运动生成的交汇点，其设计思路与�
 **时间打块失效的深层原因。** 为什么在运动序列中时间打块反而降低性能？论文推测与 SMPL-X 轴角表示的特殊耦合有关，但这一现象的具体机制尚不明确。如果轴角表示中各关节参数的相互依赖使得帧间压缩破坏了运动学一致性，那么这一发现可能对更广泛的运动建模范式（如基于 VQ-VAE 的离散化方法）具有警示意义。
 
 **跨任务泛化的上限。** 在有限的运动数据下，模型规模扩展已触及收益递减的拐点。一个根本性的开放问题是：在数据量不变的约束下，如何进一步提升大规模模型的跨任务泛化能力？可能的探索方向包括更高效的数据增强策略、元学习框架下的任务自适应微调，或引入物理仿真器作为额外的监督信号。
+
+
 
 ## 原文 PDF
 

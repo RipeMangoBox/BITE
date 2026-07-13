@@ -42,7 +42,7 @@ claims:
 > - AIST++ 上，FID_k ↓ 24.82 vs - (best among compared methods) (-)；BAS ↑ 0.2513 vs - (highest) (-)。
 > - OpenDanceSet 上，FID_k ↓ 23.19 vs - (best) (-)；BAS ↑ 0.2472 vs - (highest) (-)。
 
-## 概述
+## 概要
 
 3D舞蹈生成长期受困于两个根本瓶颈：① 大规模、丰富标注的多模态舞蹈数据缺失，使灵活条件生成不可行；② 缺少能够处理任意组合多样性条件（音乐、文本、关键点、轨迹）的统一生成框架，导致可控性差。现有方法（如 **Bailando** (Siyao et al., CVPR 2022)、**EDGE** (Tseng et al., arXiv 2022)、**TM2D** (Gong et al., ICCV 2023)）大多仅支持音乐条件，无法在单一模型中同时响应多种空间与风格控制信号。
 
@@ -53,8 +53,6 @@ claims:
 核心因果机制在于：**Disentangled Dance Tokenizer (DDT)** 避免早期跨模态融合，允许稀疏帧级约束直接编码为独立令牌；**Multimodal-Condition Transformer (MCT)** 不仅生成运动令牌，还同时预测被掩码的轨迹和关键点令牌，使空间监督成为内在生成目标。随机模态级掩码进一步防止模型过度依赖单一模态，强制学习细粒度空间约束。
 
 实验表明，OpenDanceNet 在 AIST++ 和 OpenDanceSet 上均取得领先的生成质量与可控性。消融实验确认，联合预测机制、多条件训练以及各项辅助损失（$\mathcal{L}_{\mathrm{traj}}$、$\mathcal{L}_{\mathrm{kpts}}$、$\mathcal{L}_{\mathrm{fk}}$、$\mathcal{L}_{\mathrm{con}}$）对空间对齐和物理合理性都不可或缺。当前方法尚未包含手指与面部表情，文本描述也尚不支持细粒度视觉-语言编辑，这些构成了未来的改进方向。
-
-## 背景与动机
 
 3D 舞蹈生成旨在从音乐或其他控制信号中自动合成逼真、多样且与输入高度对齐的人体运动序列。这项任务在虚拟人动画、游戏、影视和社交媒体内容创作中具有广泛的应用前景。然而，现有方法长期受制于两个根本性瓶颈，使得灵活、高保真的可控舞蹈生成难以实现。
 
@@ -68,7 +66,7 @@ claims:
 1. **构建 OpenDanceSet**——一个包含 100.26 小时、14 种舞蹈流派、5 种同步模态（3D 运动、音乐、2D 关键点、轨迹、文本）的大规模多模态数据集，从根本上缓解数据稀缺问题。
 2. **设计 OpenDanceNet**——一个基于掩码建模的统一框架，通过解耦舞蹈分词器（DDT）和多模态条件 Transformer（MCT）的联合预测机制，将空间信号从风格信号中解耦，并以掩码联合预测作为内在生成目标，从而在一次生成中同时满足高保真、多样性与灵活控制的需求。
 
-## 核心创新
+## 核心方法与创新机理
 
 OpenDance 的核心创新在于**从“仅音乐驱动”到“音乐+任意组合控制信号”的生成范式跨越**，其实现依赖两条相互咬合的技术路线：① 构建首个大规模、多模态标注的 3D 舞蹈数据集 OpenDanceSet，为灵活条件生成提供数据底座；② 设计解耦条件与掩码联合预测的统一框架 OpenDanceNet，使风格信号（音乐、文本）与空间信号（2D 关键点、轨迹）在同一生成过程中被精细地共同建模。
 
@@ -99,8 +97,6 @@ OpenDance 的核心创新在于**从“仅音乐驱动”到“音乐+任意组�
 ### 创新边界与局限
 
 需要指出，当前创新集中在躯干与下肢的舞蹈控制，**尚未纳入详细的手指关节和面部表情**，因此精细手势与表情控制仍是空白。此外，文本描述依赖 LLM 生成和人工标注，尚不支持具备编辑能力的细粒度视觉-语言结构，这限制了文本控制的精确度。
-
-## 整体框架
 
 OpenDanceNet 是一个基于掩码建模的统一舞蹈生成框架，其核心设计理念是**先解耦、后统一**：将风格信号（音乐、文本）与空间信号（2D 关键点、全局轨迹）分离编码，再通过多模态掩码联合预测范式将它们整合为一致的生成目标。这一设计直接回应了现有方法的两个根本瓶颈——多模态数据的缺失和灵活可控性的不足。
 
@@ -141,8 +137,6 @@ OpenDanceNet 是一个基于掩码建模的统一舞蹈生成框架，其核心�
 
 ![[assets/figures/papers/paper_list_l954_https_arxiv_org_abs_2506_07565/figures/005_Figure_4.jpg]]
 *Figure 4: Overview of OpenDanceNet, a masked-modeling-based dance generation framework. (a) We first train a Disentangled Dance Tokenizer (DDT) to quantize spatial signals (joint rotations, global trajectories, and 2D keypoints) into discrete tokens. (b) Then the Multimodal-Condition Transformer (MCT) is trained by randomly sampling subsets of control modalities and applying token-level masks over trajectories, 2D keypoints, and motion tokens, enabling the model to handle diverse condition combinations while generating coherent dance motions. (c) At inference time, OpenDanceNet supports arbitrary configurations of input conditions for flexible multimodal control, while Multi-Step Logit-Ranked Re-Mask...*
-
-## 核心模块与公式推导
 
 OpenDanceNet 的核心架构由三个紧密协作的模块构成：**解耦舞蹈分词器（DDT）**、**多模态条件 Transformer（MCT）** 以及推理阶段的 **多步对数排序重掩码与脚步优化（MS-LRM + Footstep Optimization）**。其设计哲学是“先解耦，后统一预测”——先将风格信号（音乐、文本）与空间信号（2D关键点、轨迹）分别编码为独立令牌，再通过掩码联合预测范式强制模型学习帧级约束。
 
@@ -194,7 +188,7 @@ $$\mathcal{L}_{\mathrm{CE}}^{\mathrm{mask}} = - \mathbb{E}_{Z} \sum_{i \in \math
 
 这一推理策略将迭代掩码预测的全局一致性优势与梯度优化的局部物理约束相结合，在不增加训练成本的前提下显著提升了生成运动的物理合理性。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -261,10 +255,7 @@ $$\mathcal{L}_{\mathrm{CE}}^{\mathrm{mask}} = - \mathbb{E}_{Z} \sum_{i \in \math
 ![[assets/figures/papers/paper_list_l954_https_arxiv_org_abs_2506_07565/figures/012_Table_7.jpg]]
 *Table 7: Ablation on loss functions on Transformer training*
 
-![[assets/figures/papers/paper_list_l954_https_arxiv_org_abs_2506_07565/figures/006_Figure_5.jpg]]
-*Figure 5: Different spatial control signals visualization. The top two rows use GT keypoint (only last frame) and GT trajectory as conditions, and bottom two rows use random geometry trajectory. We recommend viewing videos in supplementary*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 方法谱系：从单模态到多模态可控生成的演进
 

@@ -42,7 +42,7 @@ claims:
 > - ChartQA test 上，准确率 75.92 (95.1%) vs 78.8% (Down-Sample) (+16.3% absolute vs. Down-Sample)。
 > - MMVet test 上，准确率 64.8 (105.2%) vs 88.5% (Down-Sample) (+18.9% absolute vs. Down-Sample)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -70,8 +70,6 @@ AdaptVision属于**动态视觉token压缩**方法，与现有的静态压缩方
 
 当前框架限制为最多两轮交互，可能不足以处理需要多阶段精细视觉推理的任务。训练依赖GPT-4o作为外部奖励模型，引入评估偏差和计算成本。工具种类单一（仅边界框裁剪），未扩展到去模糊、放大等其他操作。此外，方法在其他VLM架构上的迁移能力、多轮工具调用的扩展、以及完全开源奖励模型的替代方案仍有待探索。
 
-## 背景与动机
-
 视觉语言模型（VLM）在图像问答、文档理解等任务上取得了显著进展，但其性能提升往往伴随着视觉token数量的急剧膨胀。以Qwen2.5-VL-7B-Instruct为代表的主流VLM通常将输入图像编码为大量视觉token，在推理时造成高昂的计算开销和延迟。如何在保持模型精度的前提下减少视觉token消耗，已成为VLM走向实际部署的核心瓶颈。
 
 现有高效VLM方法主要沿两条路径展开：**静态压缩**与**被动剪枝**。前者在编码阶段对图像进行固定降采样（如直接使用1/4分辨率输入），后者则基于注意力分数或跨模态相关性对视觉token进行固定比例的剪枝（如**FastV**保留50% token，**SparseVLM**保留50% token，**VisionZip**保留50% token）。这些方法的共同缺陷在于：它们对每个样本施加统一的压缩策略，完全忽略了任务复杂度的差异。对于需要细粒度视觉感知的困难问题（如ChartQA中的图表读数），过度压缩会导致关键信息丢失；而对于简单的通用场景问题，全分辨率处理又造成资源浪费。这种“一刀切”的被动策略使模型在效率与精度之间陷入两难。
@@ -82,7 +80,7 @@ AdaptVision属于**动态视觉token压缩**方法，与现有的静态压缩方
 
 **AdaptVision**正是基于这一洞察而提出。其核心思想是：让模型以低分辨率图像（25%视觉token）初始化视觉感知，然后根据任务需求自主决策——是直接基于低分辨率信息回答问题，还是调用边界框工具裁剪高分辨率区域进行深入分析。这一范式将视觉token的获取从“被动接受”转变为“主动获取”，为VLM的效率-精度权衡提供了新的解决路径。
 
-## 核心创新
+## 核心方法与创新机理
 
 AdaptVision的核心创新在于将**动态视觉获取**建模为VLM自主决策的**工具调用问题**，并通过专门设计的强化学习算法实现高效训练。与现有方法在固定token预算下被动压缩或静态剪枝不同，AdaptVision赋予模型主动判断何时需要额外视觉信息的能力，从根本上改变了视觉token的分配范式。
 
@@ -131,8 +129,6 @@ DTPO通过两个核心机制解决上述问题（Figure 3）：
 
 AdaptVision的核心优势在于：以更少的平均视觉token（33% vs. 50%+）实现了更接近原始模型（97.9%）的性能，同时保留了根据任务难度灵活分配视觉资源的自主性。
 
-## 整体框架
-
 AdaptVision 的整体设计遵循**从粗到细（coarse-to-fine）**的主动视觉获取范式，其核心思想是让 VLM 自主决定何时需要获取额外的高分辨率视觉信息，而非被动接受固定数量的视觉 token。整个 pipeline 由四个关键模块串联构成，形成“低分辨率感知—策略决策—按需工具调用—最终答案生成”的闭环。
 
 ### 低分辨率图像处理
@@ -159,11 +155,6 @@ AdaptVision 的整体设计遵循**从粗到细（coarse-to-fine）**的主动�
 
 ![[assets/figures/papers/paper_list_l2759_https_arxiv_org_abs_2512_03794/figures/002_Figure_2.jpg]]
 *Figure 2: FrameWork of AdaptVision. AdaptVision first processes a 1/4-resolution image. The model then decides whether to answer directly or invoke the bounding box tool to crop a high-resolution region for further analysis before generating the final answer*
-
-![[assets/figures/papers/paper_list_l2759_https_arxiv_org_abs_2512_03794/figures/001_Figure_1.jpg]]
-*Figure 1: Our key motivations and AdaptVision performance and efficiency. Top: Coarse-to-fine. Human visual attention mechanisms first guide the search for question-relevant regions in images, which are then subjected to detailed analysis. Down: AdaptVision achieves superior performance with significantly fewer visual tokens than previous efficient VLM methods*
-
-## 核心模块与公式推导
 
 AdaptVision的核心设计围绕三个关键模块展开：**自适应视觉获取机制**、**解耦奖励函数**和**回合解耦策略优化（DTPO）**。以下逐一阐述其原理与关键公式。
 
@@ -252,12 +243,7 @@ $$
 
 $\lambda$ 为平衡工具学习与准确率提升的超参数。在工具调用序列中，仅工具token（$1 \leq t \leq T_i$）接收工具优势信号，答案token仅接收结果优势信号，从而消除信用分配模糊。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2759_https_arxiv_org_abs_2512_03794/figures/003_Figure_3.jpg]]
-*Figure 3: Demonstration of vanilla GRPO and our DTPO. Our DTPO (1) decomposes the policy loss by turns to separately optimize tool and answer tokens, and (2) computes distinct advantages for tool and outcome rewards, enabling balanced optimization and precise credit assignment*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 主要结果：视觉token效率与性能的帕累托前沿
 
@@ -329,23 +315,11 @@ AdaptVision的核心实验在9个VQA基准上系统评估了其效率-精度权�
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l2759_https_arxiv_org_abs_2512_03794/figures/005_Figure_4.jpg]]
-*Figure 4: Comparison of Inference Time. (1) Compared to the vanilla model and VisionThink†, AdaptVision demonstrates significantly reduced inference time due to reduced visual token usage. (2) While AdaptVision requires additional generated tokens for reasoning and tool calls compared to the down-sample model, the resulting increase in inference time remains acceptable*
-
 ![[assets/figures/papers/paper_list_l2759_https_arxiv_org_abs_2512_03794/figures/006_Figure_5.jpg]]
 *Figure 5: Policy-training comparison: (a) The influence of reward design. (b) GRPO vs. DTPO*
 
-![[assets/figures/papers/paper_list_l2759_https_arxiv_org_abs_2512_03794/figures/011_Table_2.jpg]]
-*Table 2: Sensitivity analysis on λ and α*
-
 ![[assets/figures/papers/paper_list_l2759_https_arxiv_org_abs_2512_03794/figures/012_Table_3.jpg]]
 *Table 3: Comparison of different reward models*
-
-![[assets/figures/papers/paper_list_l2759_https_arxiv_org_abs_2512_03794/figures/009_Figure_8.jpg]]
-*Figure 8: Case of direct answer in AdaptVision*
-
-![[assets/figures/papers/paper_list_l2759_https_arxiv_org_abs_2512_03794/figures/010_Figure_9.jpg]]
-*Figure 9: Case of tool call in AdaptVision*
 
 ![[assets/figures/papers/paper_list_l2759_https_arxiv_org_abs_2512_03794/figures/007_Figure_6.jpg]]
 *Figure 6: Tool call ratio analysis: (a) Training curves show that DTPO learns a stable and adaptive policy, increasing tool calls for hard samples while decreasing them for simple ones. (b) Across different benchmarks, AdaptVision demonstrates a well-balanced ability to invoke tools when necessary and answer directly when possible*
@@ -353,7 +327,7 @@ AdaptVision的核心实验在9个VQA基准上系统评估了其效率-精度权�
 ![[assets/figures/papers/paper_list_l2759_https_arxiv_org_abs_2512_03794/figures/008_Figure_7.jpg]]
 *Figure 7: Case study: (1) The vanilla model yields a correct answer but consumes a large number of visual tokens; (2) The down-sample model reduces token usage but fails to answer correctly; (3) AdaptVision smartly invokes the tool to produce a correct answer with minimal visual token cost*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 核心问题定位：从被动压缩到主动获取
 

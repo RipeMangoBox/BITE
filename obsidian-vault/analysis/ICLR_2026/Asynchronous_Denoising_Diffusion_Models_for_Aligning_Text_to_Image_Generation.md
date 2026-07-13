@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Asynchronous_Denoising_Diffusion_Models_for_Aligning_Text_to_Image_Generation.pdf
+project_link: null
+code_link: https://github.com/hu-zijing/AsynDM
 aliases:
 - ADMA
 - ADDMATIG
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | 异步去噪扩散模型用于文本到图像生成的对齐 |
 | 英文题名 | Asynchronous Denoising Diffusion Models for Aligning Text-to-Image Generation |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=ZHb4bduWkM); [GitHub](https://github.com/hu-zijing/AsynDM) |
+| Links | [paper](https://openreview.net/forum?id=ZHb4bduWkM) · [GitHub](https://github.com/hu-zijing/AsynDM) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | Asynchronous Diffusion Models (AsynDM) |
 | Dataset | Animal Activity |
@@ -40,11 +42,11 @@ claims:
 > - Animal Activity 上，CLIPScore 为 0.3750，对比 0.3685 (DM)，变化 +0.0065。
 > - Animal Activity 上，ImageReward 为 0.9219，对比 0.7543 (DM)，变化 +0.1676。
 
-## 概述
+## 概要
 
 本文提出**异步扩散模型（Asynchronous Diffusion Models, AsynDM）**，一种无需微调、即插即用的方法，用于提升文本到图像生成中的文本-图像对齐效果。核心思想是：在扩散模型的去噪过程中，为不同像素分配不同的时间步（pixel-level timesteps），使提示相关区域去噪更慢、无关区域去噪更快，从而让提示相关区域能够从已经更清晰的无关区域获取更好的上下文参考。在Animal Activity、Drawbench、GenEval和MSCOCO四个提示集上，AsynDM在BERTScore、CLIPScore、ImageReward和QwenScore四个指标上均一致优于所有基线方法。
 
-## 背景与动机
+
 
 ### 2.1 同步去噪的根本瓶颈
 
@@ -56,7 +58,9 @@ claims:
 - **微调方法**：需要额外训练，计算成本高。
 - **无微调方法**：如Z-Sampling（锯齿形扩散步骤）、SEG（自注意力能量视角）、S-CFG和CFG++（改进无分类器引导）。这些方法虽然无需训练，但未从根本上解决同步去噪导致的上下文不清晰问题。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 3.1 核心洞察
 
@@ -75,7 +79,7 @@ claims:
 | 去噪过程索引 | 从T到0的逆序索引 | 从0到T的正序索引i，因为不同像素有不同的时间步t |
 | 掩码生成 | 无掩码 | 从交叉注意力图动态提取二进制掩码M，标识提示相关区域 |
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__image_and_video_generation__b001_ZHb4bduWkM_Asynchronous_/figures/001_Figure_1.jpg]]
 *Figure 1: Existing diffusion models generate images through synchronous denoising, where all pixels are simultaneously denoised step-by-step from noises to images, hindering text-to-image alignment. Asynchronous diffusion models denoise the prompt-related regions more gradually than other regions, thereby receiving clearer inter-pixel context and ultimately achieving improved alignment.*
@@ -87,7 +91,7 @@ AsynDM的整体框架如Figure 2所示，包含四个核心模块：
 3. **异步调度器**：根据掩码M为不同区域分配不同的时间步调度（凹函数 vs 线性）。
 4. **异步DDPM/DDIM采样器**：执行像素级时间步的去噪步骤，保持马尔可夫性质。
 
-## 核心模块与公式推导
+
 
 ### 5.1 像素级时间步分配
 
@@ -151,7 +155,9 @@ $$\mathbf{x}_{i+1} = \sqrt{\alpha_{\mathbf{t}_{i+1}}} \cdot \hat{\mathbf{x}}_0 +
 
 $$\hat{\mathbf{x}}_0 = \frac{1}{\sqrt{\alpha_{\mathbf{t}_i}}}(\mathbf{x}_i - \sqrt{1 - \alpha_{\mathbf{t}_i}} \cdot \epsilon_\theta(\mathbf{x}_i, \mathbf{t}_i, \mathbf{c}))$$
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 6.1 主要定量结果
 
@@ -212,7 +218,9 @@ Figure 6展示了AsynDM的两个应用：
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__image_and_video_generation__b001_ZHb4bduWkM_Asynchronous_/figures/033_Table_3.jpg]]
 *Table 3: Hyperparameters of our experiments.*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 7.1 方法谱系
 
@@ -248,6 +256,8 @@ AsynDM建立在以下基础工作上：
 - 对于包含多个对象且对象间存在复杂关系的提示，如何更精确地提取掩码？
 - 异步去噪的思想是否可以推广到视频生成、3D生成等其他生成任务？
 - 在极少数去噪步数（如T=5）下，如何进一步优化对齐效果？
+
+
 
 ## 原文 PDF
 

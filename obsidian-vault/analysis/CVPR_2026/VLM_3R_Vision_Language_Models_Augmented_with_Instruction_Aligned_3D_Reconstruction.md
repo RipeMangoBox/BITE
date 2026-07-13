@@ -43,7 +43,7 @@ claims:
 > - VSI-Bench Absolute Distance 上，Accuracy 49.4 vs 20.2 (LLaVA-OneVision-7B) (+29.2)。
 > - VSI-Bench Room Size 上，Accuracy 67.1 vs 12.3 (LLaVA-OneVision-7B) (+54.8)。
 
-## 概述
+## 概要
 
 ### 核心问题
 
@@ -64,7 +64,7 @@ claims:
 
 VLM-3R属于**视频视觉语言模型 + 隐式三维几何注入**技术路线。与依赖显式3D输入的方法（如Spatial-MLLM、VG-LLM）不同，VLM-3R直接从单目视频中恢复度量级三维结构；与使用归一化深度估计的模型（如基于VGGT的方案）相比，CUT3R提供的度量尺度和时序建模能力是实现绝对距离、房间尺寸等任务突破的关键。在知识库定位上，该方法填补了“单目视频→度量级空间理解”的能力空白，为后续具身导航、空间对话等应用提供了可扩展的基座。
 
-## 背景与动机
+
 
 ### 视觉语言模型的空间推理瓶颈
 
@@ -80,7 +80,9 @@ VLM-3R属于**视频视觉语言模型 + 隐式三维几何注入**技术路线�
 
 针对上述缺口，本文提出VLM-3R，核心动机是将度量级三维重建能力与视觉语言模型的指令调优范式深度融合。具体而言，VLM-3R引入基于**CUT3R**的几何编码器，从单目视频中隐式提取两类三维令牌——表示场景几何的**空间令牌**和编码相机运动的**视图令牌**——并通过设计的Spatial-Visual-View Fusion模块将其注入VLM的视觉表示中。这一设计使模型无需显式三维输入即可获得鲁棒的度量级空间理解和时序推理能力，在VSI-Bench上以Rank Average 60.9位列开源模型第一，并在新提出的VSTemporalI-Bench时序推理基准上取得领先性能。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 VLM-3R的核心创新在于将**度量级三维重建**与**视觉语言模型的指令调优**深度融合，使模型能够从单目视频中直接恢复隐式三维结构并注入空间推理过程，而无需依赖外部深度传感器或预建3D地图。这一设计通过三个关键模块的协同变革实现。
 
@@ -115,7 +117,7 @@ $$H_v' = H_v + H_{\mathrm{attn}}$$
 
 上述三个changed slots形成了一条清晰的因果链：**度量级几何编码器**提供了尺度感知的三维表征基础；**交叉注意力融合模块**将这些表征无损注入VLM的推理流；**大规模重建指令数据**则确保模型充分学习如何利用这些几何先验回答空间问题。三者的协同使VLM-3R在无显式3D输入的条件下，获得了鲁棒的度量级空间理解与相机动态推理能力，在VSI-Bench上以Rank Avg 60.9位列开源模型第一（Table 1）。
 
-## 整体框架
+
 
 VLM-3R 的核心设计理念是将度量级三维重建能力以隐式令牌的形式无缝注入视觉语言模型，使模型能够从单目视频中直接恢复空间结构与相机运动，而无需依赖深度传感器或预建 3D 地图。整体架构遵循“双流编码—交叉融合—联合推理”的端到端范式，如 Figure 3 所示。
 
@@ -149,7 +151,7 @@ VLM-3R 的核心设计理念是将度量级三维重建能力以隐式令牌的�
 ![[assets/figures/papers/paper_list_l2429_https_arxiv_org_abs_2505_20279/figures/001_Figure_1.jpg]]
 *Figure 1: VLM-3R: 3D Spatial-Temporal Reasoning from Monocular Video. Unlike prior video LMMs and 3D-LLMs (a) that depend on explicit 3D inputs such as depth sensors or pre-built 3D maps, VLM-3R (b) uses an end-to-end architecture with metric-scale spatial encoders that fuse scene and camera tokens to recover implicit 3D structure directly from monocular video. This design targets spatial assistance from raw camera streams and supports detailed reasoning about spatial context, instance layout, and temporal dynamics, leading to consistently stronger performance on VSI-Bench and the proposed VSTemporalI-Bench (c)*
 
-## 核心模块与公式推导
+
 
 ### 整体架构
 
@@ -179,7 +181,9 @@ $$H_v' = H_v + H_{\mathrm{attn}}$$
 
 Table 6 的消融实验揭示了各模块的因果作用：移除空间令牌使 VSI-Bench 整体评分从 60.90 降至 59.46，表明场景几何信息对结构理解任务至关重要；移除视图令牌导致评分骤降至 50.09，证明相机运动信息对方向相关任务不可或缺；用 2D-2D 融合替代 3D-2D 交叉注意力使评分降至 58.12，验证了注入三维几何信息的必要性；显式融合点云（57.87）低于令牌级融合（60.90），表明隐式令牌融合更为稳定。Table D 进一步显示，CUT3R（60.9%）显著优于归一化尺度的 VGGT（58.1%），证实度量尺度和时序建模是空间推理能力的关键瓶颈。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 空间推理主结果
 
@@ -255,7 +259,9 @@ VLM-3R的实验结果验证了核心假设：将度量级三维重建与指令�
 ![[assets/figures/papers/paper_list_l2429_https_arxiv_org_abs_2505_20279/figures/017_Table.jpg]]
 *Table: E. Base-model comparison on OpenEQA. VLM-3R improves spatial performance over its base model, with a small tradeoff on non-spatial questions. Table F. Zero-shot performance against general baselines on OpenEQA. VLM-3R remains highly competitive among strong multimodal baselines*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 一、方法在空间推理VLM谱系中的位置
 
@@ -366,6 +372,8 @@ VLM-3R在空间推理VLM谱系中的定位可概括为：
 - **下游能力**：单目视频度量级空间推理、时序空间关系理解、具身场景泛化
 - **竞争位置**：开源模型第一（VSI-Bench Rank Avg 60.9），在绝对距离和方向推理任务上显著超越同类方法
 - **未解决挑战**：动态物体推理、极端环境鲁棒性、通用能力保持的自动平衡
+
+
 
 ## 原文 PDF
 

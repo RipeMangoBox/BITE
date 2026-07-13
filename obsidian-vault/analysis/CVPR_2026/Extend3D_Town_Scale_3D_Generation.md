@@ -43,7 +43,7 @@ claims:
 > - 100 diverse images 上，SSIM↑ 0.611 vs Trellis: 0.239 (+0.372)。
 > - UrbanScene3D (45 image-mesh pairs) 上，F-score (0.05)↑ 0.694 vs EvoScene: 0.498 (+0.196)。
 
-## 概述
+## 概要
 
 **Extend3D** 是一种无需训练的城市场景规模 3D 生成流水线，旨在从单张场景图像生成大规模、多物体的 3D 场景。其核心瓶颈在于：现有的对象中心 3D 生成模型（如 **Trellis** (Xiang et al., CVPR 2025)、**Hunyuan3D-2.1** (Zhao et al., arXiv 2025)）受限于固定的潜在空间尺寸，无法直接处理多物体、大范围的场景结构；而简单地将图像域的高分辨率扩展方法（如 MultiDiffusion）迁移至 3D 域，则会导致地板消失、物体重复等严重伪影。
 
@@ -55,7 +55,7 @@ Extend3D 的核心洞察是：**沿 x/y 方向扩展潜在空间，并将其划�
 
 方法的主要局限包括：对单目深度估计器精度的依赖、欠噪 SDEdit 迭代次数在几何完整性与细节保留间的权衡，以及街景图像中 x/y 坐标显著尺度不匹配时的处理困难。
 
-## 背景与动机
+
 
 ### 对象中心 3D 生成模型的固有局限
 
@@ -73,7 +73,9 @@ Extend3D 的核心洞察是：**沿 x/y 方向扩展潜在空间，并将其划�
 
 本文的核心动机在于：**不重新训练大场景 3D 生成模型，而是通过扩展对象中心模型的潜在空间来突破其规模限制**。这一思路的关键洞察是——对象中心模型已经学会了丰富的 3D 先验知识，问题不在于模型能力不足，而在于其潜在空间的物理尺寸限制了输入范围。因此，沿 x/y 方向扩展潜在空间，并将扩展后的空间划分为重叠块进行耦合去噪，能够在保留对象中心模型强大先验的同时，实现城市场景规模的协同生成。此外，引入单目深度估计提供的点云先验进行欠噪 SDEdit 初始化，可以弥补对象中心模型对遮挡区域和大范围结构的感知偏差，从而在免训练的条件下实现大规模 3D 场景的高质量生成。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Extend3D 的核心创新在于通过**扩展潜在空间**与**重叠块耦合去噪**，使原本只能处理单个物体的 3D 生成模型能够生成城市场景规模的大范围 3D 内容。其关键设计围绕三个“changed slots”展开：潜在空间尺寸、初始化方式、以及去噪过程中的优化机制。
 
@@ -124,7 +126,7 @@ Extend3D 属于**免训练的大规模 3D 场景生成**方法，其核心思路
 - **对象中心基线**（**Trellis**, Xiang et al., CVPR 2025; **Hunyuan3D-2.1**, Zhao et al., arXiv 2025）：潜在空间固定，无法处理多物体场景；Extend3D 通过扩展潜在空间和重叠块流突破了这一限制。
 - **训练无关的场景生成方法**（**EvoScene**, Zheng et al., arXiv 2025; **SynCity**, Zheng et al., arXiv 2025）：同样免训练，但 EvoScene 依赖迭代式物体放置，SynCity 面向文本条件生成；Extend3D 则从单张图像出发，通过欠噪 SDEdit 初始化和每步优化实现了更精确的图像条件对齐与几何保真度。
 
-## 整体框架
+
 
 Extend3D 是一个免训练的大规模 3D 场景生成流水线，其核心目标是解决对象中心 3D 生成模型在城市场景规模下的根本瓶颈：固定潜在空间尺寸无法容纳多物体、大范围场景的细节表达。该流水线由两个级联阶段构成——**稀疏结构生成**与**结构潜变量生成**，二者共享一个关键机制：将潜在空间沿 x 和 y 方向扩展，并通过重叠块耦合去噪实现局部细节的协同生成。
 
@@ -167,7 +169,7 @@ $$\pmb{v}(\mathbf{Z}_t, \mathcal{T}, t) = \sum_{i,j} \phi_{i,j}^{-1}\big(\pmb{v}
 ![[assets/figures/papers/paper_list_l2482_https_arxiv_org_abs_2603_29387/figures/002_Figure_2.jpg]]
 *Figure 2: An overall pipeline of our Extend3D. Extend3D consists of two parts: sparse structure generation and structured latent generation. In the denoising part of both steps, an overlapping patch-wise flow was used (Sec. 4.1 and Fig. 3). In sparse structure generation, iterative SDEdit is used to initialize the structure (Sec. 4.2). Vector fields in both steps are optimized with priors (Sec. 4.3)*
 
-## 核心模块与公式推导
+
 
 Extend3D 的核心由四个模块构成，它们共同解决了将对象中心 3D 生成模型扩展至城市场景规模的核心瓶颈：固定潜在空间无法容纳多物体、大范围场景的细节。
 
@@ -211,7 +213,9 @@ $$\mathcal{L}_{\mathrm{SLAT}} = \mathrm{LPIPS}(\hat{\mathcal{T}}, \mathcal{T}) -
 
 消融实验（Table 5）表明，初始化与优化模块的组合使所有指标大幅提升：LPIPS 从 0.606 降至 0.240，F-score 从 0.261 升至 0.694。移除任一模块会导致场景破碎或地板消失（Figure 7 (C)）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -282,7 +286,9 @@ Figure 17 展示了 Extend3D 生成的大规模场景结果，验证了方法在
 ![[assets/figures/papers/paper_list_l2482_https_arxiv_org_abs_2603_29387/figures/015_Table_8.jpg]]
 *Table 8: Ablation study on varying number of iterations*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与对象中心 3D 生成模型的关系
 
@@ -307,6 +313,8 @@ Extend3D 的适用性受以下因素制约：
 ### 开放问题
 
 论文明确指出了两个待解决的问题：一是如何处理街景图像中 x 和 y 坐标的显著尺度不匹配，二是如何进一步改善遮挡区域的补全质量。前者可能需要引入非均匀的潜在空间扩展策略或自适应分块机制，后者则可能通过更强的几何先验（如多视图深度估计）或更精细的优化策略来解决。
+
+
 
 ## 原文 PDF
 

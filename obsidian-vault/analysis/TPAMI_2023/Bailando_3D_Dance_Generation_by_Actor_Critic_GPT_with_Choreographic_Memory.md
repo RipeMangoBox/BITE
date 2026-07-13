@@ -5,6 +5,8 @@ paper_level: A
 venue: TPAMI
 year: 2023
 pdf_ref: paperPDFs/TPAMI_2023/Bailando_3D_Dance_Generation_by_Actor_Critic_GPT_with_Choreographic_Memory.pdf
+project_link: null
+code_link: https://github.com/karpathy/
 aliases:
 - B3DGBACGCM
 tags:
@@ -41,7 +43,7 @@ claims:
 > - AIST++ test set 上，FIDk ↓ 17.59 vs 35.35 (FACT) (-17.76 (↓50.3%))；FIDg ↓ 10.10 vs 22.11 (FACT) (-12.01 (↓54.3%))；Beat Align Score ↑ 0.2720 vs 0.2109 (w/o actor-critic) (+0.0611 (↑29%))。
 > - User Study 上，Win Rate vs Bailando (CVPR2022) 78.0% vs 22.0% (remainder / 50% random) (78% wins)。
 
-## 概述
+## 概要
 
 **核心问题**：现有3D舞蹈生成方法通常直接从音乐映射到连续的3D关节位置空间，难以显式约束舞蹈姿态的空间质量，且在与多样化音乐节拍保持时间一致性方面存在瓶颈。此外，基于3D关节位置的输出需要借助逆运动学（IK）转换为关节旋转角才能驱动虚拟人，这一过程常引入人体形态失真和脚部滑步等伪影。
 
@@ -51,7 +53,7 @@ claims:
 
 **主要结果**：在AIST++测试集上，Bailando++的FIDk达到17.59，较FACT的35.35降低约50%；FIDg达到10.10，较FACT的22.11降低约54%。消融实验表明：去除量化（编排记忆）后FIDg飙升至145.51（↑135.41），证明离散码本对姿态质量的约束至关重要；去除跨条件因果注意力后FIDk增加30%；去除混合训练策略后旋转域FIDk增加122%且无法完成转身动作。用户研究中，Bailando++以≥88.5%的胜率领先于所有对比方法。
 
-## 背景与动机
+
 
 3D舞蹈生成的核心任务是根据给定的音乐片段，自动合成与之在节奏、风格和结构上高度契合的3D人体舞蹈动作序列。这一任务在虚拟人动画、游戏开发和数字内容创作中具有广泛的应用前景。然而，高质量舞蹈生成面临两大根本性瓶颈：**空间质量约束**与**时间一致性对齐**。
 
@@ -61,7 +63,9 @@ claims:
 
 为应对上述挑战，**Bailando++** 提出了一套全新的舞蹈生成范式，其核心思想是将舞蹈生成问题分解为三个子任务：首先，利用VQ-VAE构建**编排记忆**（Choreographic Memory），将连续姿态空间量化为离散的、具有编舞语义的姿态码本，从源头上约束姿态质量；其次，通过**Motion GPT**自回归地预测上下半身分离的离散姿态代码，实现音乐到舞蹈的结构化翻译；最后，引入**演员-评论家强化学习**微调机制，使用节拍对齐奖励函数显式优化运动节奏与音乐节拍的时间一致性。此外，Bailando++升级了输出表示，从3D关节位置转向SMPL关节旋转角度域，可直接驱动虚拟人，并通过混合训练策略解决了旋转域生成中的空间质量退化问题。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Bailando++ 的核心创新在于将舞蹈生成从“音乐→连续关节位置”的直接映射，重构为“音乐→离散姿态代码→旋转角序列”的分层生成范式，通过三个关键机制解决了现有方法的根本性瓶颈。
 
@@ -103,7 +107,7 @@ Motion GPT 采用**跨条件因果注意力**（Cross-conditional Causal Attenti
 
 Bailando++ 的创新可归纳为一条清晰的技术路线：**离散化姿态空间（编排记忆）→ 分层自回归生成（跨条件GPT）→ 强化学习精调（节拍对齐）→ 混合训练桥接域差异（旋转输出）**。这一路线使 Bailando++ 在 AIST++ 测试集上取得了 FIDk 17.59（FACT 的 35.35 降低 50.3%）、FIDg 10.10（FACT 的 22.11 降低 54.3%）的显著提升，并在用户研究中以 ≥88.5% 的胜率领先所有对比方法（Table I）。
 
-## 整体框架
+
 
 Bailando++ 将舞蹈生成建模为一个从音乐到离散姿态代码的自回归翻译问题，其核心管线由三个级联的子系统构成：**姿态 VQ-VAE（编排记忆）**、**上下文音乐编码器（CME）** 与 **演员-评论家动作 GPT**。
 
@@ -134,7 +138,7 @@ Bailando++ 将舞蹈生成建模为一个从音乐到离散姿态代码的自回
 ![[assets/figures/papers/2023_Bailando_3D_Dance_Generation_by_Actor_Critic_GPT_with_Choreographic_Memory_cdf67d1d7f60/figures/002_Figure_2.jpg]]
 *Figure 2: Dance generation pipeline of Bailando++. Given a piece of music, an actor-critic motion GPT autoregressively predicts the future upper-lower pose code pairs according to the music features and starting pose codes. The pose code sequence is then embedded to quantized features via a learned choreographic memory and finally decoded into a dance sequence by a CNN-based decoder*
 
-## 核心模块与公式推导
+
 
 Bailando++ 的生成管线由四个核心模块串联构成：**姿态 VQ-VAE（编排记忆）**、**上下文音乐编码器**、**运动 GPT（跨条件因果注意力）** 以及 **演员-评论家强化学习微调**。各模块之间存在清晰的信息流依赖——VQ-VAE 负责将连续姿态空间压缩为离散码本，GPT 在此基础上自回归预测未来姿态码，音乐编码器为 GPT 提供长程音频上下文，而 RL 微调则在推理阶段注入节拍对齐与身体一致性约束。
 
@@ -216,7 +220,9 @@ $$\mathcal{L}_{CE} = \frac{1}{T'} \sum_{t=0}^{T'-1} \sum_{h=u,l} \mathrm{CrossEn
 ![[assets/figures/papers/2023_Bailando_3D_Dance_Generation_by_Actor_Critic_GPT_with_Choreographic_Memory_cdf67d1d7f60/figures/014_Figure_11.jpg]]
 *Figure 11: Interpretability of choreographic memory code. The sequence of a single code is decoded to a static pose, while the sequence of two various codes is decoded to a smooth transition between two poses, which means each code represents a dancing-style pose and the decoder links poses of different codes to movements*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要定量结果
 
@@ -285,7 +291,9 @@ Bailando++ 在 AIST++ 测试集上进行了系统评估，与 **FACT** (Li et al
 ![[assets/figures/papers/2023_Bailando_3D_Dance_Generation_by_Actor_Critic_GPT_with_Choreographic_Memory_cdf67d1d7f60/figures/007_Figure_7.jpg]]
 *Figure 7: Contextual Music Encoding. In this encoding pipeline, music features in 60 fps with a length of T + 2 w are sampled and fed into a cascade of Transformer layers. The attention of the Transformer layer here aggregates adjacent music features within a ( 2 w + 1 ) )-wide sliding window. The augmented features are finally downsampled by an unshuffling operation [44] across the temporal dimension*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心瓶颈与因果机制
 
@@ -323,6 +331,8 @@ Bailando++ 的适用边界受以下因素制约：
 3. **长期舞蹈编排**：当前方法自回归预测下一帧姿态码，长期生成可能累积误差并导致舞蹈内容循环或退化。如何引入高层编排结构（如“引子-高潮-尾声”）来指导长期生成？
 
 4. **交互式舞蹈生成**：演员-评论家框架天然支持在线策略优化，这是否意味着 Bailando++ 可以扩展到实时人机共舞场景，根据用户动作动态调整生成策略？
+
+
 
 ## 原文 PDF
 

@@ -44,7 +44,7 @@ claims:
 > - Tanks & Temples 上，NLL（RGB不确定性） 0.58 vs 2.46 (Variational 3DGS) (-1.88)；PSNR 23.67 vs 23.45 (Variational 3DGS) (+0.22)。
 > - Mip-NeRF360 上，NLL 0.72 vs 2.88 (Variational 3DGS) (-2.16)。
 
-## 概述
+## 概要
 
 **背景与瓶颈**：3D高斯泼溅（3DGS）已成为实时新视角合成的事实标准，但其本质上是确定性框架——每个高斯核的协方差矩阵在优化中缺乏显式的结构化稀疏性编码。这导致两个关键缺陷：(1) 噪声主导的方向未被充分正则化，渲染质量受限于协方差的冗余自由度；(2) 无法为视图合成提供像素级的不确定性估计，限制了模型在下游任务（如主动学习、分布外检测）中的适用性。
 
@@ -60,7 +60,7 @@ claims:
 
 **方法谱系与知识库定位**：Horseshoe Splatting 将高维回归中的全局-局部收缩先验（Horseshoe, Carvalho et al., 2009）首次迁移至3D辐射场的协方差建模。相较于 NeRF 系列的不确定性方法——如 **CF-NeRF**（基于归一化流）、**S-NeRF**（贝叶斯权重推断）和 **Bayes' Ray**（拉普拉斯近似）——本方法直接作用于3DGS的高斯核参数空间，避免了额外的网络模块。在3DGS分支内，本方法区别于 **FisherRF**（基于Fisher信息的后验近似）和 **Ensemble GS**（10模型集成）的昂贵计算，通过单次变分训练即可获得校准良好的像素级不确定性。
 
-## 背景与动机
+
 
 ### 3D高斯泼溅的确定性本质与不确定性盲区
 
@@ -90,7 +90,9 @@ $$s_{ij} \mid \lambda_{ij}, \theta_j \sim \mathcal{N}(\beta_{ij}, \sigma_{ij}^2 
 
 这一设计使得模型在训练过程中**自适应地**识别并收缩不相关的尺度方向，同时保留数据支持的显著各向异性结构。最终，通过从变分后验中蒙特卡洛采样尺度参数并渲染，模型能够输出像素级的预测均值和方差，为每个像素提供校准良好的不确定性估计。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 **Horseshoe Splatting** 的核心创新在于将贝叶斯结构化稀疏性先验引入 3D 高斯泼溅（3DGS）的协方差建模，从根本上改变了尺度参数的优化行为。与确定性 3DGS（Kerbl et al., 2023）将每个高斯核的对角尺度参数 $s_{ij}$ 作为自由优化变量不同，Horseshoe Splatting 在 $s_{ij}$ 上施加全局-局部 **Horseshoe 先验**：
 
@@ -129,7 +131,7 @@ $$p(\tilde{I}_u \mid D) \approx \frac{1}{M} \sum_{m=1}^{M} p(\tilde{I}_u \mid \{
 
 Horseshoe Splatting 的创新不在于引入新的渲染管线或网络架构，而在于**将贝叶斯收缩理论中的 Horseshoe 先验与 3DGS 的协方差参数化进行精确对接**。这一对接使得原本确定性的尺度优化转变为自适应收缩的贝叶斯推断，同时实现了三个目标：(1) 结构化稀疏性——噪声方向被自动收缩；(2) 高质量渲染——显著结构被重尾保护而得以保留；(3) 校准良好的不确定性——后验预测分布自然输出像素级方差。三者并非独立设计，而是 Horseshoe 先验“尖峰-重尾”性质的统一产物，这是该方法区别于其他不确定性感知 3DGS 方法（如 FisherRF 的 Fisher 信息、Ensemble GS 的模型集成、Variational 3DGS 的通用变分推断）的根本所在。
 
-## 整体框架
+
 
 Horseshoe Splatting 以标准 3DGS 管线为基础，在其协方差建模环节插入贝叶斯层次先验与变分推断，形成**先验定义 → 变分后验近似 → 联合 ELBO 优化 → 后验预测采样**四阶段流水线，整体框架如图 2 所示。
 
@@ -179,7 +181,7 @@ Horseshoe 先验（模块一）通过其尖峰-重尾特性决定收缩行为 �
 ![[assets/figures/papers/paper_list_l30_https_openreview_net_forum_id_NHuyk9KsG6/figures/002_Figure_2.jpg]]
 *Figure 2: The framework of our proposed Horseshoe Splatting*
 
-## 核心模块与公式推导
+
 
 ### 3DGS 渲染基础
 
@@ -249,7 +251,9 @@ $$\varepsilon_{N,P}^2 = C \frac{\sigma^2}{P} \frac{k \log(e\,3N/k)}{\kappa_{\min
 ![[assets/figures/papers/paper_list_l30_https_openreview_net_forum_id_NHuyk9KsG6/figures/011_Figure_4.jpg]]
 *Figure 4: Posterior density of covariance scale*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要定量结果
 
@@ -319,7 +323,9 @@ Table 9报告了在LF *torch*场景上的计算开销。所有实验均在单张
 ![[assets/figures/papers/paper_list_l30_https_openreview_net_forum_id_NHuyk9KsG6/figures/017_Table_11.jpg]]
 *Table 11: OOD View Detection on LLFF*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有基线的关系
 
@@ -362,6 +368,8 @@ Horseshoe Splatting 的设计假设和实验验证界定了其当前的适用范
 3. **协方差结构扩展**：如何将框架扩展到更完整的协方差结构（如低秩修正 $\Sigma_i = R_i S_i S_i^T R_i^T + L_i L_i^T$），以捕获轴间相关性？这需要在 Horseshoe 先验的收缩机制与低秩因子的建模之间建立一致的贝叶斯框架。
 
 4. **不确定性驱动的主动视图选择**：Table 4 和 Table 10 已初步验证了不确定性在主动学习中的有效性。能否进一步利用结构稀疏性信息——即哪些区域的高斯核尺度被强烈收缩——来指导更高效的视图选择策略？
+
+
 
 ## 原文 PDF
 

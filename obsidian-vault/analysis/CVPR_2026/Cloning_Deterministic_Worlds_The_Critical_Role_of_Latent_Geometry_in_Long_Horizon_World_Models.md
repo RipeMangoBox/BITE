@@ -44,7 +44,7 @@ claims:
 > - Maze 9×9-DET (VD) 上，SSIM 0.7537 vs 0.5979 (+0.1558)；rFID 7.2813 vs 18.1453 (-10.8640)。
 > - Maze 9×9-DET (SD) 上，SSIM 0.8369 vs 0.8367 (+0.0002)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -69,8 +69,6 @@ GRWM 位于世界模型、表示学习与对比学习的交叉点。与标准 VA
 ### 局限性与开放问题
 
 当前 GRWM 主要针对确定性环境设计，尚未验证在部分可观察、随机或高度真实感环境中的有效性。此外，与神谕模型相比，学习到的表示仍有明显差距，表明现有几何正则化尚不足以实现近乎完美的长期预测。未来的方向包括：将几何正则化扩展到更复杂的环境、设计更强的表示学习方法以进一步缩小与神谕模型的差距，以及探索时间对比约束与其他动力学模型的结合潜力。
-
-## 背景与动机
 
 ### 世界模型与长时序预测的挑战
 
@@ -98,7 +96,7 @@ GRWM 位于世界模型、表示学习与对比学习的交叉点。与标准 VA
 
 为实现这一目标，本文引入了**时间对比学习**（temporal contrastive learning）作为几何正则化手段。时间对比学习天然鼓励时间上相近的样本在表示空间中彼此靠近，而时间上远离的样本相互推开，这与世界模型对理想潜在空间的需求高度契合。本文提出的 **Geometrically-Regularized World Models (GRWM)** 将这一思想实现为一个轻量级的即插即用模块，可无缝集成到标准自动编码器中，通过几何正则化项重塑潜在空间，从而系统性解锁现有先进动力学模型的长时序预测能力。
 
-## 核心创新
+## 核心方法与创新机理
 
 ### 1. 瓶颈重定义：从动力学模型到潜在几何结构
 
@@ -156,8 +154,6 @@ GRWM 的核心创新并非时间对比学习本身（该原理在自监督表示
 
 潜在探测实验（Table 1）定量验证了这一效果：在三个数据集上，GRWM 学习到的表示对真实物理状态的回归 MSE 均显著低于 VAE-WM（例如 MC-DET 上 GRWM 为 0.081，VAE-WM 为 0.137），表明其潜在表示与底层物理状态的结构一致性更强。
 
-## 整体框架
-
 GRWM 的核心设计理念是将**时间对比学习作为几何正则化项**，无缝集成到标准世界模型的自动编码器训练中，从而重塑潜在空间以对齐环境的物理状态流形。该方法并非提出全新的动力学模型，而是作为一个**轻量级、即插即用的几何正则化模块**，可作用于各类潜变量动力学模型之上。
 
 ### 系统流水线
@@ -195,13 +191,6 @@ GRWM 的几何正则化仅作用于自动编码器的表示学习阶段，与下
 - **输入**：长度为 $k$ 的观测帧序列（原始像素），编码器以滑动窗口方式逐帧处理。
 - **输出**：在训练阶段，输出重建帧 $\hat{o}_t$ 及用于对比损失的归一化嵌入 $\mathbf{p}'$；在滚动预测阶段，仅使用潜在表示 $z_t$ 作为动力学模型的输入与输出，解码器将预测的潜在状态还原为观测帧。
 - **评估**：在像素空间计算预测帧与真实帧之间的逐帧均方误差 $\text{MSE}(t) = \| o_t - \hat{o}_t \|_2^2$，衡量滚动预测的累积误差。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2453_https_arxiv_org_abs_2510_26782/figures/001_Figure_1.jpg]]
-*Figure 1: Representation quality is the primary bottleneck for world model fidelity. Frame-wise MSE on a simple deterministic 3D navigation environment. (Left) An oracle model using groundtruth states (black dotted) achieves near-zero error, establishing a performance upper bound. In contrast, a standard VAE-based world model (blue dashed) accumulates error rapidly. Our GRWM (green solid) significantly closes this gap by learning a more structurally aligned latent space (Right Bottom), while the VAE’s representation remains disorganized (Right Top). For further details, see Section 6*
-
-## 核心模块与公式推导
 
 ### 5.1 因果编码器-解码器架构
 
@@ -251,7 +240,7 @@ $$\text{MSE}(t) = \| o_t - \hat{o}_t \|_2^2$$
 
 该指标逐时间步计算预测观测与真实观测之间的 L2 距离，能够精确刻画误差随预测时长的累积行为。在瓶颈诊断实验中，该指标直接揭示了表示质量与动力学模型能力之间的不对称性：当动力学模型使用真实物理状态时，$\text{MSE}(t)$ 在长时序上保持近零水平，而标准 VAE 世界模型的误差则随 $t$ 快速发散。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心瓶颈验证：表示质量决定世界模型保真度
 
@@ -318,25 +307,10 @@ $$
 ![[assets/figures/papers/paper_list_l2453_https_arxiv_org_abs_2510_26782/figures/008_Table_1.jpg]]
 *Table 1: Latent probing analysis. GRWM consistently learns representations that are more predictive of the true underlying states. We report regression MSE of an MLP probe on a held-out set (lower is better)*
 
-![[assets/figures/papers/paper_list_l2453_https_arxiv_org_abs_2510_26782/figures/009_Table_2.jpg]]
-*Table 2: Supplementary perceptual metrics on Maze 9×9*
-
-![[assets/figures/papers/paper_list_l2453_https_arxiv_org_abs_2510_26782/figures/010_Table_3.jpg]]
-*Table 3: Additional Atari results*
-
-![[assets/figures/papers/paper_list_l2453_https_arxiv_org_abs_2510_26782/figures/002_Figure_2.jpg]]
-*Figure 2: Top-down visualizations of our three closed environments: M3×3-DET, M9×9-DET, and MC-DET. These maps illustrate the overall layout and are for visualization purposes only; they are not provided as input to the agent. The agent’s input is restricted to first-person observations. For a more representative depiction of the agent’s surroundings, high-angle perspective views are also included in the supplementary material, offering a better sense of the environments’ three-dimensional structure and scale*
-
-![[assets/figures/papers/paper_list_l2453_https_arxiv_org_abs_2510_26782/figures/015_Figure_9.jpg]]
-*Figure 9: High-angle perspective views of the three evaluation environments. These renderings provide an intuitive, three-dimensional understanding of the maze layouts that complements the 2D top-down maps in the main text*
-
-![[assets/figures/papers/paper_list_l2453_https_arxiv_org_abs_2510_26782/figures/014_Figure_8.jpg]]
-*Figure 8: Representative trajectories from the three datasets. Each plot shows a sample trajectory overlaid on the environment layout*
-
 ![[assets/figures/papers/paper_list_l2453_https_arxiv_org_abs_2510_26782/figures/005_Figure_6.jpg]]
 *Figure 6: Qualitative comparison of ultra long-horizon rollouts on the Maze 9x9-CE dataset. Frames are sampled every 1000 steps from a 10,000-step rollout. The baseline VAE-WM frequently gets stuck generating the same color states, failing to explore the environment effectively. In contrast, GRWM produces a coherent and diverse trajectory, successfully exploring different regions while preserving long-term temporal and structural consistency*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 世界模型中的表示瓶颈：从动力学建模到潜在几何结构
 

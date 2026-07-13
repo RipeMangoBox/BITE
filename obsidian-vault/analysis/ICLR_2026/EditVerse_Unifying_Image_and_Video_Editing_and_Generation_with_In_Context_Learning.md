@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/EditVerse_Unifying_Image_and_Video_Editing_and_Generation_with_In_Context_Learning.pdf
+project_link: null
+code_link: null
 openreview_forum_id: blJXE07r7I
 aliases:
 - EditVerse
@@ -41,7 +43,7 @@ claims:
 > - EditVerseBench 上，视频质量 (Pick Score) 为 20.07，对比 19.73 (TokenFlow)，变化 +0.34。
 > - EditVerseBench 上，帧文本对齐 为 26.73，对比 26.34 (Señorita-2M)，变化 +0.39。
 
-## 概述
+## 概要
 
 视频编辑领域长期受困于两个相互强化的瓶颈。其一，现有视频生成模型多针对单一任务（如文本到视频）设计，架构上难以灵活支持多样化的编辑任务与多模态输入。其二，高质量、多样化的指令式视频编辑数据严重稀缺，远落后于图像编辑数据的规模与质量。这两个问题形成恶性循环：架构的专用性限制了数据利用的效率，而数据的匮乏又阻碍了通用编辑能力的涌现。
 
@@ -53,7 +55,7 @@ claims:
 
 值得注意的是，EditVerse 并非在所有维度上都占据绝对优势。在图像生成（GenEval 综合评分 0.82，与 FLUX.1-dev 持平）和部分视频编辑子任务上，它与专用模型的表现相当而非超越，这反映了通用模型与专用模型之间的固有张力。此外，全自注意力机制处理长序列带来的计算开销，以及数据管道引入的噪声样本，仍是需要持续优化的方向。
 
-## 背景与动机
+
 
 视频编辑是视觉内容创作的核心需求之一。随着扩散模型在图像生成与编辑领域的成熟，研究者自然希望将这一能力扩展到视频。然而，视频编辑面临两个根本性瓶颈。
 
@@ -65,7 +67,9 @@ EditVerse 的动机正是从这两个瓶颈的交汇点出发：**能否通过�
 
 具体而言，EditVerse 提出将文本、图像和视频统一表示为交错的 token 序列，在全自注意力机制下实现跨模态上下文学习。同时引入四维旋转位置编码（RoPE），区分序列、时间、高度和宽度维度，使模型能够精确感知时空位置关系。这一设计使得图像编辑知识得以有效迁移到视频编辑，从而缓解视频编辑数据稀缺的困境，同时天然支持灵活的输入/输出配置。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 EditVerse 的核心创新在于将图像、视频与文本统一为**交错的一维 token 序列**，并在全自注意力 Transformer 中引入**四维旋转位置编码（4D RoPE）**，从而实现对多模态输入的上下文学习（in-context learning）。这一设计解决了视频编辑领域的两大瓶颈：现有架构难以灵活支持多样化的编辑任务和输入模态，而高质量指令式视频编辑数据又严重稀缺。
 
@@ -89,7 +93,7 @@ $$\mathcal{L} = \mathbb{E}_{t, \mathbf{X}_0, \mathbf{X}_1} \left| u_{\Theta}(\ma
 
 Table 5 的消融直接量化了各设计组件的贡献：去除交错格式或顺序 RoPE 均导致编辑质量（VLM 评分）、视频质量（Pick Score）和帧文本对齐三项指标全面下降。**交错格式 + 顺序 RoPE 的组合**对文本对齐和编辑质量的提升最为显著，验证了统一序列表示与四维位置编码的协同效应。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_blJXE07r7I/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of EditVerse. We design a unified framework for image and video editing and generation, which processes text and vision inputs into a unified sequence. The right part of the figure shows our positional embedding design. This framework leverages full self-attention to facilitate robust in-context learning and effective knowledge transfer among modalities*
@@ -152,7 +156,7 @@ EditVerse 采用 **2B 参数的密集 Transformer** 架构（类似 LLaMA 3）�
 
 这一统一框架的核心因果机制在于：交错序列表示提供了跨模态信息交互的结构基础，四维 RoPE 赋予了时空位置感知能力，全自注意力则驱动了从图像到视频的知识迁移——三者协同使得在图像数据上学习的编辑能力能够泛化到视频任务。
 
-## 核心模块与公式推导
+
 
 EditVerse 的核心架构由七个模块串联构成，共同实现从多模态输入到编辑/生成输出的端到端流水线。以下按数据流向逐一说明。
 
@@ -182,7 +186,9 @@ $$\mathcal{L} = \mathbb{E}_{t, \mathbf{X}_0, \mathbf{X}_1} \left| u_\Theta(\math
 
 **关键设计消融证据**（Table 5）：仅使用交错格式而不使用顺序 RoPE，或仅使用顺序 RoPE 而不使用交错格式，编辑质量和文本对齐均显著下降。两者结合时，文本对齐和编辑质量达到最优，证实了统一序列表示与四维位置编码的协同效应。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -243,7 +249,9 @@ Figure 10 和 Table 11 分析了 GPU 显存占用和推理延迟随 token 长度
 
 ![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_blJXE07r7I/figures/030_Table_10.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心设计定位
 
@@ -312,6 +320,8 @@ EditVerse 的适用边界由以下因素共同界定：
 3. **生成加速**：模型和步长蒸馏能否明显加速生成速度？
 
 4. **数据质量**：如何提升自动化数据管道的成功率（当前约 65%），减少噪声样本对训练的负面影响？
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/UDAPose_Unsupervised_Domain_Adaptation_for_Low_Light_Human_Pose_Estimation.pdf
+project_link: null
 code_link: "https://github.com/VMIL/UDAPose"
 aliases:
 - UDAPose
@@ -41,7 +42,7 @@ claims:
 > - ExLPose-test (LL-H - hard subset) 上，AP @.50:.95 28.0 vs 17.9 (CycleGAN) / 17.2 (ELLA) (+10.1 (56.4% rel.))。
 > - ExLPose-test (LL-E - extreme subset) 上，AP @.50:.95 11.7 vs 3.4 (ELLA) (+8.3 (244% rel.))。
 
-## 概述
+## 概要
 
 低光照条件下，人体姿态估计面临视觉信息严重退化的瓶颈：现有域自适应方法难以准确再现真实低光的高频噪声特性，而主流单阶段姿态估计器（如ED-Pose）在解码器中采用刚性残差求和机制，使模型过度依赖不可靠的图像线索，导致性能骤降。
 
@@ -51,7 +52,7 @@ claims:
 
 方法定位上，UDAPose区别于传统的图像增强预处理（如DarkIR、QuadPrior）和非配对图像翻译（如CycleGAN、UNIT），后者无法忠实再现低光噪声的高频统计特性；也不同于ELLA等仅依赖数据增强的低光姿态估计方法，UDAPose通过DCA实现了逐关键点的图像线索与姿态先验动态平衡，在极端低能见度下仍保持解剖学一致性。
 
-## 背景与动机
+
 
 ### 低光人体姿态估计的核心挑战
 
@@ -78,7 +79,9 @@ claims:
 
 本文的核心洞察是：**解决低光姿态估计需要同时在数据合成管线中实现“内容感知的高频噪声注入”，并在姿态解码器中引入“逐关键点的自适应信息源选择”**。前者确保训练数据覆盖真实低光的退化分布，后者使模型学会在视觉线索不可靠时自动退回到姿态先验，从而在极端低光下保持解剖学一致性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 UDAPose 的核心创新并非单一算法，而是一套**协同设计的域自适应管线**，针对低光人体姿态估计中两个相互纠缠的瓶颈——**数据域鸿沟**与**模型融合缺陷**——分别提出了对应的因果性解决方案。
 
@@ -128,7 +131,7 @@ UDAPose 位于**低光人体姿态估计 × 无监督域自适应 × 扩散模�
 1. **退化类型泛化受限**：当前框架（DHF + LCIM + DCA）专门针对光照不足引起的退化设计，难以直接泛化至其他低能见度场景（如浓雾、暴雨、严重运动模糊），需要设计新的模块合成相应退化。
 2. **计算开销大**：依赖大规模扩散模型（SD-2.1-base）导致合成管线 GPU 内存消耗高、生成时间长，限制了对新环境的快速适配。未来可探索一致性模型或蒸馏扩散模型以降低资源消耗。
 
-## 整体框架
+
 
 UDAPose 采用“数据合成—姿态估计”两阶段解耦框架，核心思路是：**在数据侧**，利用未配对的真实低光参考图像，通过稳定扩散（Stable Diffusion）模型将良好光照图像合成为高度逼真的低光训练样本，从而继承良好光照图像的精确姿态标注；**在模型侧**，通过在姿态估计器的 Transformer 解码器中引入动态控制注意力（DCA）机制，使模型能够自适应地平衡不可靠的图像线索与学习到的姿态先验。整体流程如 Figure 3 所示。
 
@@ -164,7 +167,7 @@ $$Q = w_{pose} \odot Q_{pose} \oplus w_{image} \odot Q_{image}$$
 
 训练阶段，仅使用合成低光图像及其继承的良好光照标注进行姿态估计器训练，无需任何真实低光标注或配对数据。推理阶段，训练好的模型直接应用于真实低光图像，无需额外的增强或翻译步骤。这种“合成训练—真实推理”的域自适应策略，使得 UDAPose 在保持部署简洁性的同时，显著提升了对真实低光退化的鲁棒性。
 
-## 核心模块与公式推导
+
 
 UDAPose 由两条协同管线构成：**内容感知的低光数据合成管线**（基于 Stable Diffusion 的 DHF + LCIM）和 **动态注意力融合的姿态估计管线**（基于 ED-Pose 的 DCA）。以下逐模块展开其核心公式与设计逻辑。
 
@@ -282,7 +285,9 @@ $$
 ![[assets/figures/papers/paper_list_l1037_https_arxiv_org_abs_2604_10485/figures/012_Figure_6.jpg]]
 *Figure 6: The architecture of our DCA module*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -361,7 +366,9 @@ UDAPose在多个基准上一致优于现有图像增强和域自适应方法。�
 ![[assets/figures/papers/paper_list_l1037_https_arxiv_org_abs_2604_10485/figures/002_Figure_2.jpg]]
 *Figure 2: Limitations of learning-based low-light augmentation. The first two columns show well-lit and paired low-light images from ExLPose [30]. The third and fourth columns present results from CycleGAN [80] and StyleID [9]. The last column shows our result. Low-light images are scaled to an average channel intensity of 0.4 for visualization only*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：低光人体姿态估计的瓶颈
 
@@ -418,6 +425,8 @@ UDAPose 的方法论贡献可归纳为三个相互协同的组件，各自解决
 3. **极端遮挡的鲁棒性**：DCA 在关键点大量缺失时增益减小，如何进一步改进以应对极端遮挡场景？可能的路径包括引入更强的解剖学先验（如骨骼长度约束、关节角度限制）或多帧时序信息。
 
 4. **跨任务泛化验证**：该方法是否能够作为通用域自适应框架应用于其他高层视觉任务（如实例分割、目标检测）？DHF + LCIM 的数据合成范式与 DCA 的自适应融合机制在原理上不限于姿态估计，但需要在下游任务上进行系统验证。
+
+
 
 ## 原文 PDF
 

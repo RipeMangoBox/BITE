@@ -43,7 +43,7 @@ claims:
 > - MUSIC-Duet 上，AUC 53.2 vs 36.1 (OA-SSL) (+17.1)。
 > - VGGSound-Single 上，AP 60.5 vs 51.7 (OA-SSL) (+8.8)。
 
-## 概述
+## 概要
 
 声源定位（Sound Source Localization, SSL）旨在从图像-音频对中识别发声物体的空间位置。现有方法将 SSL 建模为纯粹的视听特征匹配问题——通过对比学习或注意力机制对齐视觉与音频嵌入，输出热图或注意力图。然而，这种范式缺乏显式推理与因果验证能力，在复杂声学场景中暴露出系统性缺陷：无声物体干扰、屏外声源误判、多声源混淆等问题导致定位失效。
 
@@ -59,7 +59,7 @@ claims:
 
 该工作的主要局限在于推理成本较高（单样本约 4 秒，RTX 4090），且当前仅处理单帧图像，未利用视频时间连续性信息。
 
-## 背景与动机
+
 
 声源定位（Sound Source Localization, SSL）旨在从图像-音频对中识别发出声音的视觉区域，是视听理解的核心任务之一。现有 SSL 方法普遍将该问题建模为**视听特征匹配**——通过对比学习或注意力机制，在共享嵌入空间中寻找视觉与音频信号最相似的区域。这一范式在简单场景下有效，但其根本瓶颈在于**缺乏显式推理与因果验证**：模型仅输出概率热图或注意力图，无法解释“为何该区域是声源”，也难以区分“看起来像声源但实际无声”的物体（如静止的乐器）与“屏外声源”或“多声源混淆”等复杂情况。
 
@@ -69,7 +69,9 @@ claims:
 
 与现有工作的根本区别在于：**GAR-SSL 将 SSL 从“特征匹配”问题转变为“认知推理”问题**。传统方法（如 **OA-SSL**（Um et al., CVPR 2025））依赖对比学习训练，输出不可解释的热图；无训练方法（如 **NoPrior**（Chen et al., CVPR 2024））虽免除了训练，但仍基于冻结视觉编码器的相似度计算，缺乏语义推理。直接使用现成 MLLM（如 **Qwen2.5-Omni**（Xu et al., arXiv 2025））进行端到端定位则因缺乏结构化推理而性能有限。GAR-SSL 通过引入显式的分析-验证-精炼循环，首次使 MLLM 在 SSL 任务上超越专门训练的 SOTA 方法，同时保持零样本、免训练的特性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 范式跃迁：从特征匹配到认知推理
 
@@ -108,7 +110,7 @@ GAR-SSL 的三阶段流水线并非简单的模块堆叠，而是模拟了人类
 
 直接使用现成多模态大模型（如 **Qwen2.5-Omni**，Xu et al., arXiv 2025）进行声源定位面临两个根本问题：一是缺乏结构化的空间推理能力，难以输出精确的边界框坐标；二是单次前向推理容易产生幻觉或随机偏差。GAR-SSL 通过三阶段元推理框架解决了这些缺陷——不是简单地“询问” MLLM，而是引导其进行结构化的假设-验证-修正认知循环，将 MLLM 从黑盒预测器转变为可解释的推理引擎。
 
-## 整体框架
+
 
 GAR-SSL 将声源定位从传统的视听特征匹配重构为一种**无训练、零样本**的认知推理流水线。其核心思想是将多模态大语言模型（MLLM）视为一个具有元推理能力的智能体，通过“生成—分析—精炼”三个有序阶段，逐步从粗略的初始预测收敛到精细、可解释的定位结果。图 1 给出了框架的整体概览，图 2 则展示了各阶段内部的详细数据流与模块交互。
 
@@ -176,7 +178,7 @@ $$G = \mathbf{1}\left((k = 1) \wedge (\bar{S}_{\mathrm{av}} \geq \tau_{\mathrm{a
 ![[assets/figures/papers/paper_list_l2313_https_arxiv_org_abs_2604_06824/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the proposed Generation-Analysis-Refinement Sound Source Localization (GAR-SSL) framework. Given an image-audio pair, the model performs three metareasoning steps: Generation produces an initial bounding box and audio label, Analysis evaluates Audio-Visual Consistency through role-based reasoning, and Refinement adjusts the localization to obtain a fine-grained final bounding box. This process enables explainable and training-free audio-visual localization*
 
-## 核心模块与公式推导
+
 
 GAR-SSL 将声源定位重构为“生成—分析—精炼”三元认知推理流水线，所有操作均通过提示工程驱动 MLLM 完成，无需任何训练。整个框架由四个关键模块串联：**Stage 1 生成**、**Stage 2 分析**、**Stage 3 精炼**，以及贯穿后两个阶段的**自适应门控**与**多次采样共识**机制。
 
@@ -299,7 +301,9 @@ $$b^{\mathrm{ref}} = \left[ c_x^* - \frac{w}{2}, \; c_y^* - \frac{h}{2}, \; c_x^
 ![[assets/figures/papers/paper_list_l2313_https_arxiv_org_abs_2604_06824/figures/002_Figure_2.jpg]]
 *Figure 2: The proposed training-free framework consists of three stages: (i) Generation produces initial bounding boxes and audio classifications from image-audio pairs; (ii) Analysis evaluates consistency through role tagging, anchor voting, and scoring, repeated N times for consensus; (iii) Refinement applies adaptive gating and geometric operations to adjust localization. All operations are performed via MLLMs prompt engineering without training*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -373,7 +377,9 @@ GAR-SSL 在单声源和多声源两个场景下均显著超越了现有方法，
 ![[assets/figures/papers/paper_list_l2313_https_arxiv_org_abs_2604_06824/figures/013_Table_S.8.jpg]]
 *Table S.8: Performance comparison of various prompt variation methods on single-sound source datasets. Method 1 performs basic refinement with minimal adjustments. Method 2 incorporates audio class information for refinement. Method 3 leverages detailed analysis information including visual anchors. Ours represents the proposed meta-analysis-based method with varying iteration counts (N=1, 3, 5). Evaluated on VGGSound-Single and MUSIC-Solo datasets using CAP, CIoU@0.3, and AUC metrics*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有 SSL 方法的范式差异
 
@@ -415,6 +421,8 @@ GAR-SSL 的适用边界由其设计选择和技术约束共同决定：
 3. **跨任务泛化**：GAR 的“生成-分析-精炼”元推理范式能否推广到其他跨模态定位任务，如视频动作定位、触觉-视觉定位、文本-图像指代定位？
 4. **人机协同闭环**：元推理过程中产生的因果解释和置信度评分，能否作为主动学习中的不确定性指标，或用于人机交互中的定位修正反馈？
 5. **屏外与遮挡声源**：当声源完全不可见时，当前框架依赖视觉证据的分析机制将失效。能否引入空间音频线索（如双耳时间差）或场景上下文推理，实现对屏外声源的方位估计？
+
+
 
 ## 原文 PDF
 

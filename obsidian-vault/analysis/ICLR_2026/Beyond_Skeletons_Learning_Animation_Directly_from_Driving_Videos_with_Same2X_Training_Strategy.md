@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Beyond_Skeletons_Learning_Animation_Directly_from_Driving_Videos_with_Same2X_Training_Strategy.pdf
+project_link: https://directanimator.github.io/
+code_link: null
 aliases:
 - BSLADFDVSTS
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | 超越骨架：利用Same2X训练策略直接从驾驶视频学习动画 |
 | 英文题名 | Beyond Skeletons: Learning Animation Directly from Driving Videos with Same2X Training Strategy |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=HdEpZE3wFa); [Project](https://directanimator.github.io/) |
+| Links | [paper](https://openreview.net/forum?id=HdEpZE3wFa) · [Project](https://directanimator.github.io/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | DirectAnimator |
 | Dataset | TikTok, Unseen |
@@ -40,11 +42,11 @@ claims:
 > - TikTok 上，SSIM↑ 为 0.806，对比 0.749 (StableAnimator)，变化 +0.057。
 > - TikTok 上，FVD↓ 为 142.60，对比 140.62 (StableAnimator, best baseline)，变化 +1.98 (worse)。
 
-## 概述
+## 概要
 
 现有人体图像动画方法普遍依赖姿态估计器（如OpenPose/DWPose）抽取骨架图作为驱动信号，这类中间表示在遮挡、复杂体态或自遮挡场景下极易产生前后混淆、手部错位、肢体缺失等错误，进而导致生成伪影与身份保持困难。本文提出**DirectAnimator**，直接以原始驾驶视频像素为驱动源，规避姿态估计的误差累积。为此，方法设计了由姿态线索（Pose Cue）、人脸线索（Face Cue）和位置线索（Location Cue）组成的结构化驱动线索三元组，并通过**CueFusion DiT块**（基于自适应层归一化与门控残差连接）将这些线索注入去噪过程；同时引入**Same2X训练策略**，利用同身份数据的内部特征对齐为跨身份训练提供稳定指南，显著加速收敛。在TikTok和Unseen测试集上的实验表明，DirectAnimator在FID、SSIM、PSNR、LPIPS等主流质量指标，以及姿态关键点一致性（PLC）和面部关键点一致性（FLC）两个几何度量上均全面超越StableAnimator、MimicMotion等现有最优骨架驱动方法。图1的定性对比显示，原始像素驱动在复杂运动下大幅减少伪影；训练曲线则表明Same2X策略使跨身份阶段达到相同损失水平的速度提升约6.7倍。消融研究证实了驱动线索三元组各组分、CueFusion注入机制以及Same2X对齐损失的关键作用。该方法将人体动画生成从显式姿态估计范式转向直接的原始视频驱动，为后续研究开辟了新的技术路径。
 
-## 背景与动机
+
 
 人体图像动画的目标是根据参考人物图像和一段驱动视频，生成与驱动运动一致且保持参考身份的视频。现有主导范式依赖姿态估计器（如 OpenPose、DWPose）从驱动视频中提取 2D 骨架图、DensePose 或 SMPL 等中间表示作为驱动信号。这类骨架驱动信号在遮挡、复杂体态或自遮挡下极易出错——常见故障模式包括前-后混淆、手部错位、肢体缺失等——这些误差直接传递到生成过程，导致明显的伪影以及难以维持的参考身份一致性（Figure 1 左侧对比）。即便采用关键点置信度、ReferenceNet 等增强设计（如 MimicMotion、AnimateAnyone、StableAnimator），骨架估计的质量瓶颈依然是生成稳定性和真实感的核心短板。
 
@@ -52,7 +54,9 @@ claims:
 
 针对上述缺口，本文提出 DirectAnimator，其核心动机是用**原始驾驶视频像素直接替代骨架图作为驱动信号**，从而绕过姿态估计器的误差累积。通过对原始像素进行结构化解耦——提取去除外观细节的姿态线索（Pose Cue）、保留表情的面部线索（Face Cue）和实现空间对齐的位置线索（Location Cue）——构成“驱动线索三元组”，并设计 CueFusion DiT 块以自适应层归一化和门控残差的方式将其注入去噪过程，实现对运动和表情的可靠控制。进一步，Same2X 训练策略利用同一身份数据的内部特征对齐来引导跨身份训练，显著加速收敛（达到相同损失水平的速度提升 6.7 倍，Figure 1 右侧训练曲线），并提高跨身份泛化能力。这些设计共同构成了从“骨架驱动”到“像素驱动”的范式转换，旨在实现更鲁棒、更高效的人体动画生成。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DirectAnimator 的核心创新在于从根本上突破了人体图像动画领域对显式姿态估计器的依赖，以**原始驾驶视频像素**替代传统骨架图作为驱动信号，构建了一套从驱动表示、注入机制到训练策略的系统性革新链条。该创新链条直接瞄准了现有骨架驱动方法在遮挡、自遮挡及复杂体态下的根本瓶颈：姿态估计器（如 OpenPose/DWPose）输出的 2D 骨架图存在前-后混淆、手部错位、肢体缺失等系统性错误，这些中间表示的误差会不可逆地传递至生成网络，造成严重的生成伪影与身份漂移。DirectAnimator 通过以下三个关键 **changed slots** 绕开了这一误差链条。
 
@@ -89,7 +93,7 @@ Same2X 策略实现了**训练效率与质量的同步跃升**：Figure 1-right 
 
 这三个创新 slot 并非孤立设计，而是形成了一条因果关系闭环：**新的驱动表示（Cue Triplet）提供了丰富而鲁棒的运动/表情信号 → 精心设计的注入模块（CF-DiT）高效融合这些信号而不损伤去噪过程的稳定性 → 训练策略（Same2X）解决了跨身份场景下特征分布漂移和优化困难的根本问题**。三者共同实现了 DirectAnimator 在 FID、SSIM、PSNR、LPIPS（Table 1）以及姿态/人脸关键点一致性 PLC/FLC（Table 2）上对骨架驱动方法的全面超越，同时也将单帧预处理时间控制在可接受的 31ms 量级（Table 7），使其在推理阶段仍具竞争力。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0013_HdEpZE3wFa_Beyond_Skeletons_Learning_Animation_Directly_fro/figures/004_Figure_2.jpg]]
 *Figure 2: Overview of DirectAnimator. (a) We replace the skeleton maps with our proposed driving cue triplet: Pose Cue ( C _ { P o s e } ) , Face Cue ( C _ { F a c e } ) , and Location Cue ( C _ { L o c a t i o n } ) . A frozen VAE encoder maps the reference image, pose cue, and face cue into the latent space. Pose and face latents are each concatenated with their corresponding masks from the location cue. These features are then patchified and fed into the CF-DiT Block. (b) The CF-DiT Block injects pose and face cues via Adaptive LayerNorm with time-conditioned modulation, and uses gated residuals to ensure stable and controllable denoising*
@@ -108,7 +112,7 @@ $$e_p^G = e_p + \gamma_p \cdot e_p^M, \quad e_f^G = e_f + \gamma_f \cdot e_f^M$$
 
 **Same2X 训练策略** 为上述框架提供了从“同身份”到“跨身份”高效泛化的训练基础（图 4）。训练分为两阶段：**第一阶段**在同身份数据上训练一个“教师”模型，学习驱动像素与目标外观之间的直接映射；**第二阶段**训练跨身份的“学生”模型，其驱动线索由 StableAnimator（生成伪姿态线索）和 Face‑Adapter（生成伪人脸线索）合成。学生模型除标准去噪损失外，还被引入 **Same2X 对齐损失** $\mathcal{L}_{\text{S2X}}$，该损失最大化学生与教师在选定 DiT 块中对应 patch 嵌入的余弦相似度（公式 4），迫使跨身份模型在特征空间中模仿同身份模型的动力学。这一内部指南不仅大幅加速了训练收敛（同等损失水平下训练快了 6.7 倍），还显著提升了跨身份动画的质量与稳定性。
 
-## 核心模块与公式推导
+
 
 DirectAnimator 绕过传统姿态估计器，直接从驾驶视频的原始像素中学习动画生成，其核心设计由三个相互协同的模块构成：（1）结构化驱动线索三元组（Driving Cue Triplet）的提取；（2）基于时间条件化自适应层归一化与门控残差的 CueFusion DiT 块；（3）利用同身份特征对齐引导跨身份训练的 Same2X 训练策略。这些模块共同解决了姿态估计误差累积导致的伪影，以及跨身份训练不稳定、收敛缓慢两大瓶颈（图1左侧定性对比，图1右侧 6.7 倍训练加速）。
 
@@ -176,7 +180,9 @@ $$
 
 三个模块构成完整的因果链条：**线索三元组**为模型提供低噪声的驱动信号，**CueFusion 注入**保证信号在去噪过程中的稳定传递，**Same2X 训练**克服了跨身份学习的不稳定性。三者叠加使得 DirectAnimator 在 TikTok 和 Unseen 基准上全面超越现有骨架驱动方法（FID 降低 4‑5 点，表1），同时姿态与面部关键点一致性误差降至最低（PLC、FLC，表2）。尽管推理延迟较传统方法略高（49 帧约 152 秒），且依赖分割等前处理模型，该框架为摆脱显式姿态估计、充分利用原始视频信息开辟了新方向。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 DirectAnimator 在 TikTok 与 Unseen 两个标准测试集上被全面评估，并与代表性骨架驱动方法 (StableAnimator、MimicMotion、AnimateAnyone、UniAnimate-DiT 等) 进行对比。评测涵盖视觉质量 (FID、SSIM、PSNR、LPIPS、L1)、身份/时序一致性 (FIS/FTS、FVD)、以及几何一致性 (关键点误差 PLC、面部关键点误差 FLC)。若无特殊说明，所有实验均以 4×H20 GPU 在 512² 分辨率下训练 40K 步完成。
 
@@ -235,7 +241,9 @@ Table 6 检验了跨身份训练中的伪驱动线索质量影响。使用经�
 
 Table 7 给出单次 49 帧生成在 H20 GPU 上的耗时对比：DirectAnimator 预处理需 31 ms（Grounded SAM 分割等），总生成时间 152.80 s；StableAnimator 仅需 9.6 ms 预处理与 91.63 s 生成。这一差异源于 DirectAnimator 从视频帧提取三种线索的前处理开销，以及 DiT 骨干本身的推理成本，属于实际部署中需权衡的劣势。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 DirectAnimator 在人体图像动画（HIA）方法谱系中属于**端到端原始像素驱动**的新范式。现有主流方法——包括 StableAnimator、MimicMotion、AnimateAnyone 与 UniAnimate-DiT——均以姿态估计器（如 OpenPose、DWPose）输出的 2D 骨架图作为核心驱动信号。这类中间表示在遮挡、自遮挡或复杂体态下极易出错（前后混淆、手部错位、肢体缺失），直接导致生成帧中出现明显伪影与身份漂移（Figure 1 左）。DirectAnimator 而非沿用骨架驱动，而是直接将原始驾驶视频像素抽象为三项**结构化驱动线索三元组**：姿态线索（Pose Cue，经前景分割与频域低通滤波）、面部线索（Face Cue，裁剪并居中的面部区域）与位置线索（Location Cue，软化的人体/面部掩码），并通过 CueFusion DiT 块以时间条件自适应 LayerNorm 与门控残差的方式注入去噪过程（Figure 2）。这一设计从根本上绕过显式姿态估计的误差累积，使得模型能够从原始信号中学习更丰富的运动与表情信息。
 
@@ -260,6 +268,8 @@ DirectAnimator 在人体图像动画（HIA）方法谱系中属于**端到端原
 - **无伪标签的自监督跨身份训练**：在何种数据规模与训练范式下，可以完全摒弃第三方模型的合成标签，仅利用原始视频的自监督信号完成高质量的跨身份动画学习？
 
 > 对于推理延迟与部分细节退化问题，原文并未提供根因分析，其改善路径仍以推测为主，需后续实验验证。
+
+
 
 ## 原文 PDF
 

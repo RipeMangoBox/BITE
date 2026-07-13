@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/VideoMage_Multi_Subject_and_Motion_Customization_of_Text_to_Video_Diffusion_Models.pdf
+project_link: https://jasper0314-huang.github.io/videomage-customization
+code_link: null
 aliases:
 - VideoMage
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | VideoMage: 面向文本到视频扩散模型的多主体与运动定制 |
 | 英文题名 | VideoMage: Multi-Subject and Motion Customization of Text-to-Video Diffusion Models |
 | 会议/期刊 | CVPR 2025 |
-| Links | [paper](https://arxiv.org/abs/2503.21781); [Project](https://jasper0314-huang.github.io/videomage-customization) |
+| Links | [paper](https://arxiv.org/abs/2503.21781) · [Project](https://jasper0314-huang.github.io/videomage-customization) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | VideoMage |
 | Dataset | 多主体与运动定制, 多主体定制（Table 4） |
@@ -40,7 +42,7 @@ claims:
 > - 多主体与运动定制 上，CLIP-I 为 0.670，对比 DreamVideo: 0.655, MotionDirector: 0.653，变化 +0.015 / +0.017。
 > - 多主体与运动定制 上，DINO-I 为 0.407，对比 MotionDirector: 0.370，变化 +0.037。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -62,7 +64,7 @@ VideoMage 提出了一套解耦-融合-协同的三阶段框架来解决上述�
 
 VideoMage 属于基于 LoRA 的扩散模型定制范式，在方法谱系中处于**多概念解耦定制**与**测试时优化组合**的交汇点。与 DreamVideo（多主体+运动联合定制但缺乏外观-运动解耦）、MotionDirector（仅运动定制）和 CustomVideo/DisenStudio（仅多主体定制）相比，VideoMage 首次实现了外观与运动的显式解耦学习，并通过时空协同采样将两者有机整合，填补了多主体与运动联合定制中“解耦-组合”的技术空白。
 
-## 背景与动机
+
 
 文本到视频（T2V）扩散模型近年来取得了显著进展，使得用户能够通过自然语言描述生成高质量视频。然而，纯文本提示难以精确传达用户对特定视觉主体外观和运动模式的细粒度需求，这催生了视频定制（video customization）这一研究方向。
 
@@ -74,7 +76,9 @@ VideoMage 属于基于 LoRA 的扩散模型定制范式，在方法谱系中处�
 
 VideoMage 的动机正是填补这一空白：**实现多主体外观与运动模式的联合定制**。其核心洞察在于，通过负分类器自由引导（negative classifier-free guidance）条件化于视觉外观，可以有效解耦运动模式；同时，利用梯度融合和注意力图对齐机制，可以实现多主体 LoRA 与运动 LoRA 的协同生成。这一思路使得 VideoMage 能够首次在统一框架内，根据用户提供的多张主体图像、一段参考运动视频和一条文本提示，生成外观忠实、运动准确且时空一致的定制视频。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 VideoMage 的核心创新在于突破了现有视频定制方法仅能处理单一概念（主体身份或运动模式）的瓶颈，首次实现了多主体与运动的协同定制。其关键创新点可归纳为三个相互关联的“changed slots”：
 
@@ -124,7 +128,7 @@ $$\mathcal{L}_{attn} = \frac{1}{2} \sum_{i=1}^{2} \| \mathcal{M}_{SCA,i} - \hat{
 
 **创新总结：** 三个 changed slots 构成递进式创新链条——外观无关运动学习从源头解耦运动与外观，多主体融合策略确保多身份的空间正确绑定，时空协同采样在推理阶段实现主体与运动的无缝整合。这一组合使 VideoMage 在 DINO-I 指标上超越 MotionDirector 达 9.9%（0.407 vs 0.370），并在人类偏好研究中全面占优（Figure 6）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l8_VideoMage_Multi_Subject_and_Motion_Customization_of_Text_to_Video_Diffus/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of VideoMage. (a) Given images of multiple subjects and a reference video with desirable motion, VideoMage advances LoRAs to capture the knowledge of visual appearances and appearance-agnostic motion information, respectively. (b) With a text prompt relating the aforementioned visual and motion concepts, our spatial-temporal collaborative composition refines the input noisy latent x _ { t } for generating videos matching the desirable visual and motion information*
@@ -137,7 +141,7 @@ VideoMage 的整体 pipeline 围绕“解耦学习—融合—协同采样”三
 
 **第三阶段：时空协同采样（Spatial-Temporal Collaborative Sampling, SCS）。** 推理时，系统并行运行两条分支：主体分支使用融合后的主体 LoRA，运动分支使用运动 LoRA。SCS 通过双向注意力对齐实现协同——将主体分支的空间交叉注意力图对齐到运动分支，确保运动正确作用于对应主体区域；同时将运动分支的时间自注意力图对齐到主体分支，保证时序一致性。两条分支的预测噪声以等权重加权组合，并通过梯度引导更新潜变量，最终生成时空一致的定制视频。
 
-## 核心模块与公式推导
+
 
 ### 3.1 主体定制模块
 
@@ -242,7 +246,9 @@ $$
 
 **决定性证据**：移除 SCS（直接组合 $\theta_s$ 与 $\theta_m$ 推理）导致 DINO-I 从 0.407 骤降至 0.234（Table 2），证明 SCS 对主体身份保持至关重要。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 多主体与运动定制定量评估
 
@@ -319,7 +325,9 @@ VideoMage 在所有指标上均取得最优。其中 DINO-I 达到 0.407，相�
 *Table: (a) Weight for video preservation loss \lambda _ { 1 }*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：从单概念定制到多主体-运动联合生成
 
@@ -368,6 +376,8 @@ VideoMage 相对于代表性基线方法的核心改进体现在三个操作槽�
 3. **多主体交互的复杂性与真实性提升**：如何在不显著增加计算开销的情况下提高多主体交互的复杂性和真实性？当前的空间注意力正则化仅约束主体空间位置，未显式建模主体间的物理交互（如遮挡、碰撞），未来可引入物理先验或场景图约束。
 
 4. **运动泛化与零样本迁移**：VideoMage的运动LoRA与特定参考视频强绑定，能否实现运动模式的跨视频泛化，或从文本描述中直接合成运动模式？这需要运动表征的语义解耦和组合泛化能力。
+
+
 
 ## 原文 PDF
 

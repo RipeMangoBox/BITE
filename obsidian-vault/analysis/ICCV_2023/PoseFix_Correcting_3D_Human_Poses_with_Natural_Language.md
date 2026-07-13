@@ -5,6 +5,8 @@ paper_level: A
 venue: ICCV
 year: 2023
 pdf_ref: paperPDFs/ICCV_2023/PoseFix_Correcting_3D_Human_Poses_with_Natural_Language.pdf
+project_link: https://europe.naverlabs.com/research/computer-vision/posefix/
+code_link: null
 aliases:
 - PBVT
 - PoseFix
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | PoseFix：利用自然语言纠正3D人体姿态 |
 | 英文题名 | PoseFix: Correcting 3D Human Poses with Natural Language |
 | 会议/期刊 | ICCV 2023 |
-| Links | [paper](https://arxiv.org/abs/2309.08480); [Project](https://europe.naverlabs.com/research/computer-vision/posefix/) |
+| Links | [paper](https://arxiv.org/abs/2309.08480) · [Project](https://europe.naverlabs.com/research/computer-vision/posefix/) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/generative_models_and_autoencoders |
 | Method | PoseFix Baselines (条件VAE用于文本引导姿态编辑 与 自回归Transformer用于差异文本生成) |
 | Dataset | PoseFix test set (1239 pairs), PoseFix test set |
@@ -41,7 +43,7 @@ claims:
 > - PoseFix test set 上，ELBO (joints) ↑ 为 1.44，对比 0.61 (无预训练,无增强, GloVe+BiGRU)，变化 +0.83。
 > - PoseFix test set 上，MPJE (mm) ↓ 为 196，对比 278 (无预训练,无增强)，变化 -82 mm。
 
-## 概述
+## 概要
 
 本文聚焦于一个此前未被探索的问题：**给定一个初始3D人体姿态和一段描述其差异的自然语言指令，如何生成修正后的目标姿态**。这一任务的核心瓶颈在于缺乏成对的3D姿态和描述其差异的文本数据，使得基于文本的姿态修正研究长期处于空白状态。
 
@@ -59,7 +61,7 @@ claims:
 
 本文的主要局限包括：文本生成模型易混淆姿态 A 和 B，对接触地面或蹲伏/躺卧等特殊姿态的处理能力不足，以及当前任务仅限于静态姿态对而尚未扩展到连续运动序列。
 
-## 背景与动机
+
 
 3D人体姿态理解是计算机视觉的核心问题之一，而自然语言作为人类最自然的交互方式，正在成为姿态编辑与生成任务中日益重要的控制信号。然而，现有工作主要聚焦于从单张文本描述生成静态姿态（text-to-pose），却忽略了一个同样关键的场景：**当用户已经有一个初始姿态，希望用语言指令对其进行局部修正时，模型应当如何响应？**
 
@@ -67,7 +69,9 @@ claims:
 
 PoseFix正是针对这一空白而提出。其核心动机是：**通过构建首个大规模成对3D姿态与文本修正指令的数据集，使模型能够学习从“初始姿态 + 文本反馈”到“目标姿态”的映射，以及其逆向映射**。该数据集同时支持两项新任务：（1）文本引导的姿态编辑——根据初始姿态A和文本修饰指令生成修正后的姿态B；（2）修正文本生成——给定姿态对(A, B)，自动生成描述其差异的自然语言指令。这两项任务互为表里，共同构成了人与3D姿态之间更精细、更迭代的交互范式。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PoseFix 的核心创新在于**数据集定义与任务范式的双重开创**，而非模型架构的颠覆性突破。论文首次将“基于自然语言的3D姿态修正”形式化为两个对称任务——文本引导的姿态编辑（text-based pose editing）和差异文本生成（correctional text generation）——并为此构建了首个大规模成对数据集。
 
@@ -104,7 +108,7 @@ PoseFix 数据集的构建是使上述任务可行的关键瓶颈突破。此前
 - 自动注释管道的 paircodes/super-paircodes 分类体系是否足以覆盖真实场景中的姿态差异多样性，论文未提供与人工标注的语义覆盖度对比。
 - 数据集构建中的“缺失指令”现象（人工标注中隐含的、由运动链自然产生的变化）对模型学习的影响程度尚未量化。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2309_08480/figures/011_Figure_6.jpg]]
 *Figure 6: Overview of our baseline for correctional text generation. The bottom part represents a standard auto-regressive transformer model: the next word is predicted from the previously generated tokens. The decoder outputs a distribution of probabilities over the vocabulary for each token. The top part represents the conditioning on the pose pair: the two pose embeddings are fused together into a set of “pose tokens”, further used for conditioning via prompting or via cross-attentions in the transformer. At inference, the modifier is generated iteratively using the greedy approach*
@@ -140,7 +144,7 @@ $$\mathcal{L}_{\mathrm{pose\ editing}} = \mathcal{L}_R(B, \hat{B}) + \mathcal{L}
 - **预训练**：先在自动注释数据上预训练，再在人工注释上微调。预训练对姿态编辑任务带来 +84% 的 ELBO 提升，效果远超数据增强。
 - **数据增强**：左右翻转（无预训练时 ELBO 平均提升 37%）、PoseMix（联合 PoseScript 数据）、PoseCopy（同姿态对+空文本）以及 InstructGPT 释义生成，均在无预训练条件下效果显著，预训练后增益有限。
 
-## 核心模块与公式推导
+
 
 ### 文本引导姿态编辑基线
 
@@ -184,7 +188,9 @@ $$p(T_{l+1} \mid T_{1:l})$$
 
 推理阶段采用贪心解码策略，每次选择使负对数似然最小化的词元作为输出。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 数据集构建与语义分析
 
@@ -260,7 +266,9 @@ cVAE 基线在 PoseFix 测试集（1239 对）上的核心结论是：**初始�
 
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2309_08480/figures/012_Table.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 PoseFix 在 3D 人体姿态的文本引导编辑这一新任务上建立了首个基准，其核心贡献在于引入了一个成对的姿态-文本修正数据集，并分别基于条件 VAE 和自回归 Transformer 构建了两项基线的双向应用范式。本节梳理该方法与相关工作的继承关系、适用边界及未解决的问题。
 
@@ -293,6 +301,8 @@ PoseFix 在 3D 人体姿态的文本引导编辑这一新任务上建立了首�
 4. **动态序列扩展**：将文本引导的姿态修正从静态对扩展到时间序列，需要解决时序一致性和渐进式修正指令的生成与执行问题。
 
 5. **接触与物理约束**：当前模型缺乏对物理合理性（如地面接触、关节限制）的显式建模，如何将物理约束融入文本引导的姿态编辑是一个值得探索的方向。
+
+
 
 ## 原文 PDF
 

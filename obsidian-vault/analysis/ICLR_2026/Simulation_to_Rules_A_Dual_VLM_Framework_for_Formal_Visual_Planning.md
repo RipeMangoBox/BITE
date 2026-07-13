@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Simulation_to_Rules_A_Dual_VLM_Framework_for_Formal_Visual_Planning.pdf
+project_link: https://sites.google.com/view/vlmfp
+code_link: null
 openreview_forum_id: 7tlLpQpGlx
 aliases:
 - SRDVFFVP
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 从模拟到规则：一种用于形式化视觉规划的双VLM框架 |
 | 英文题名 | Simulation to Rules: A Dual-VLM Framework for Formal Visual Planning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=7tlLpQpGlx); [Project](https://sites.google.com/view/vlmfp) |
+| Links | [paper](https://openreview.net/forum?id=7tlLpQpGlx) · [Project](https://sites.google.com/view/vlmfp) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | VLMFP |
 | Dataset | 6 grid-world domains (average), Frozenlake, Sokoban |
@@ -41,7 +43,7 @@ claims:
 > - Frozenlake 上，Success rate 为 95.2% (Seen), 81.1% (Unseen)，对比 88.1% (Seen), 77.1% (Unseen) [CodePDDL GPT-4o]，变化 +7.1% (Seen), +4.0% (Unseen)。
 > - Sokoban 上，Success rate 为 55.8% (Seen), 25.1% (Unseen)，对比 0.0% (Seen), 0.4% (Unseen) [CodePDDL GPT-4o]，变化 +55.8% (Seen), +24.7% (Unseen)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：视觉语言模型（VLM）在直接处理空间细节和生成正确的PDDL域文件方面存在根本性局限，导致长期视觉规划任务中成功率低下。现有方法要么依赖单次生成缺乏反馈，要么无法精确感知场景中的空间关系与动作后果。
 
@@ -53,7 +55,7 @@ claims:
 
 **局限与展望**：SimVLM对全新游戏机制（如冰冻效果）的泛化能力有限；框架依赖固定PDDL域模板，向连续动作空间或开放环境的扩展仍需人工调整；GenVLM的迭代上限为4轮，EW分数不收敛时可能保留错误文件。未来方向包括提升对复杂物理动态的泛化、探索与其他形式化规划语言的兼容性。
 
-## 背景与动机
+
 
 视觉语言模型（VLMs）在跨模态理解方面取得了显著进展，但将其直接应用于长期视觉规划任务时，仍面临根本性的瓶颈：**VLMs在精细空间细节感知和正确生成形式化规划域文件方面的局限性，导致规划失败率居高不下**。具体而言，现有方法存在以下关键缺口：
 
@@ -65,7 +67,9 @@ claims:
 
 针对上述缺口，**VLMFP**的动机在于：通过将视觉规划任务分解为两个专业化阶段——一个专注于感知与动作模拟的VLM（SimVLM），另一个专注于符号推理与PDDL文件生成优化的VLM（GenVLM）——来系统性克服单一VLM的局限性。SimVLM通过微调增强空间推理能力，为GenVLM提供精确的场景描述和动作执行参考；GenVLM则利用大规模知识生成PDDL文件，并通过仿真一致性反馈进行迭代优化，从而实现从视觉观测到可执行形式化规划的无缝转换。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈洞察：从视觉感知到形式化规划的断裂
 
@@ -108,7 +112,7 @@ VLMFP的创新不仅体现在性能提升上，还表现在**多层面的泛化�
 - 框架依赖固定的PDDL域模板，扩展到完全开放或非栅格化环境时可能需要人工调整。
 - GenVLM的迭代优化最大轮次为4，当EW分数无法收敛时，返回的PDDL文件可能仍存在错误。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_7tlLpQpGlx/figures/001_Figure_1.jpg]]
 
@@ -134,7 +138,7 @@ SimVLM 和 GenVLM 的分工对应了人类解决视觉规划问题的两个认�
 
 消融实验（表 3）揭示了三个组件的因果重要性：移除预筛检使平均成功率降至 47.5%，复杂领域（如 Sokoban、Overcooked）受影响尤为严重；移除反馈机制使平均成功率降至 61.1%；而移除更新阶段对复杂领域是灾难性的，Sokoban、Package 的成功率几乎归零。这表明迭代反馈回路是框架在复杂约束下保持鲁棒性的核心机制，而非可有可无的增强。
 
-## 核心模块与公式推导
+
 
 ### 双VLM架构
 
@@ -173,7 +177,9 @@ $$m_{\mathrm{EW}}(\hat{d},\hat{p}) = 2\bigg(\Big(\frac{1}{T_{\max}}\sum_{T=1}^{T
 3. **预设筛检（Prescreening）**：过滤语法错误或结构无效的PDDL文件，确保仅有效文件进入一致性检查。消融实验表明，移除此模块使平均成功率从70.0%降至47.5%（Table 3）。
 4. **仿真一致性检查与迭代更新**：比较SimVLM与PDDL环境的执行结果，计算EW分数并生成自然语言反馈 $s$，驱动GenVLM更新PDDL文件。移除反馈机制使成功率降至61.1%，移除更新阶段则对复杂领域（Sokoban、Package、Printer、Overcooked）造成灾难性影响，成功率几乎归零（Table 3）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：VLMFP在六个网格世界领域全面超越基线
 
@@ -248,7 +254,9 @@ VLMFP在2个3D规划任务（MultiRob和Assembly）上进一步验证了框架�
 ![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_7tlLpQpGlx/figures/017_Table_11.jpg]]
 *Table 11: Dataset and Task statistics for six grid world domains*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 方法谱系与基线关系
 
@@ -287,6 +295,8 @@ VLMFP相对于CodePDDL的关键改进在于引入了**闭环反馈机制**：Sim
 2. **框架能否扩展到连续动作空间或精细操作任务？** 当前框架依赖PDDL的离散动作表示，扩展到连续控制需要与运动规划器或基于采样的规划方法集成，这涉及不同形式化语言（如PDDL+）的选择。
 3. **如何减少GenVLM在复杂约束下的生成错误？** 更强的基座VLM（如GPT-5）可能部分缓解这一问题，但根本性改进可能需要引入约束求解器作为验证器，或使用程序合成技术确保生成PDDL的语义正确性。
 4. **框架是否适用于其他形式化规划语言？** VLMFP的双VLM架构原则上与PDDL无关——SimVLM提供环境仿真，GenVLM生成形式化规范。扩展到RDDL（用于随机规划）或HTN（用于层次规划）需要重新设计输出格式和验证机制，但核心的仿真-优化循环可以保留。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: NEURIPS
 year: 2024
 pdf_ref: paperPDFs/NEURIPS_2024/PiMForce_Posture_Informed_Muscular_Force_Learning_for_Robust_Hand_Pressure_Estimation.pdf
+project_link: null
+code_link: null
 aliases:
 - PPIMFLRHPE
 tags:
@@ -40,7 +42,7 @@ claims:
 > - 同上 上，NRMSE 6.65 ± 2.11% vs 8.07 ± 2.62% (sEMG Only) (-1.42%p)；分类准确率 83.17 ± 9.38% vs 77.83 ± 11.56% (sEMG Only) (+5.34%p)。
 > - 跨用户（平面交互+捏取） 上，R² 66.71 ± 4.68% vs 49.75 (PressureVision++), 47.90 (sEMG Only) (+16.96%p (vs P++))。
 
-## 概述
+## 概要
 
 手部压力估计是人机交互、遥操作和虚拟现实中的一项关键感知能力。现有方法主要依赖前臂表面肌电信号（sEMG）推断手部压力，但面临一个根本瓶颈：仅使用前臂sEMG信号难以区分因肌肉激活模式相似但手部姿势不同而导致的压力分布差异，这严重限制了压力估计的准确性和鲁棒性。
 
@@ -54,7 +56,7 @@ claims:
 
 该方法的主要局限包括：数据集参与人数有限（21人）且性别不平衡（81%男性），可能影响跨人群泛化；实际部署时依赖视觉手势估计的质量，在复杂遮挡场景下可能引入噪声；压力估计上限为20N，无法测量更大力度。
 
-## 背景与动机
+
 
 手部压力估计是触觉感知与人机交互领域的核心任务，其目标是从可穿戴或非侵入式传感器信号中实时推断手指与手掌各区域施加的力。精确的压力感知对机器人遥操作、虚拟现实中的力反馈、假肢控制以及技能评估等应用至关重要。然而，现有方法面临一个根本性的瓶颈：**仅依赖前臂表面肌电信号（sEMG）难以区分因肌肉激活模式相似但手部姿势不同所导致的压力分布差异**。例如，用食指按压与用中指按压时，前臂sEMG信号在8通道频谱图上呈现出高度相似的模式（见附录Figure 12），这使得单一模态模型在多样抓取和交互场景下的压力估计精度和鲁棒性均受到严重制约。
 
@@ -62,7 +64,9 @@ claims:
 
 PiMForce正是基于这一因果机制设计的：3D手部姿势提供了手指关节的空间构型先验，使得模型能够分辨相似sEMG模式所对应的不同压力分布（如食指按压 vs. 中指按压）。该框架将视觉驱动的3D手部姿势估计与可穿戴sEMG信号相结合，覆盖从指尖到全手掌的9个区域，并在22种预定义手-物体交互中验证了其有效性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PiMForce 的核心创新在于**将3D手部姿势信息作为空间先验引入前臂sEMG信号处理**，以解决单一sEMG模态在压力估计中的根本瓶颈。仅使用前臂sEMG信号时，相似的肌肉激活模式可能对应不同的手部姿势和压力分布，导致模型难以区分这些歧义情况。PiMForce通过多模态融合，使模型能够利用手部空间构型信息来分辨这些相似肌肉活动背后的不同压力模式。
 
@@ -92,7 +96,7 @@ PiMForce的融合架构（Figure 2）由三个核心模块组成：
 
 这种设计使sEMG提供的生理信息与3D手部姿势提供的空间信息形成互补，显著提升了全手压力估计在多样抓取和交互场景下的准确性和鲁棒性。跨用户实验进一步验证了这一创新：PiMForce的R²达到70.06%，远超sEMG Only的47.90%（Table 3），表明多模态信息对用户泛化至关重要。
 
-## 整体框架
+
 
 PiMForce 是一个多模态手部压力估计框架，其核心设计思想是通过引入 3D 手部姿势信息来增强前臂表面肌电信号（sEMG）的表征能力。仅使用 sEMG 信号面临一个关键瓶颈：相似的肌肉激活模式可能对应截然不同的手部姿势和压力分布，导致模型难以区分这些歧义状态。PiMForce 的因果调节机制在于将 3D 手部姿势作为额外的空间先验与 sEMG 特征融合，使模型能够分辨相似肌肉活动下的不同压力模式。
 
@@ -144,7 +148,7 @@ $$L = L_c + \lambda \cdot L_r$$
 ![[assets/figures/papers/paper_list_l1798_PiMForce_Posture_Informed_Muscular_Force_Learning_for_Robust_Hand_Pressu/figures/025_Figure_13.jpg]]
 *Figure 13: Visualization of ground truth pressure and predicted pressure for the same posture using the existing PressureVision++ hand pressure prediction framework. (a) Original image from camera. (b) Input image for the PressureVision++ model. (c) Overlaied predicted pressure by PressureVision++. (d) Original predicted pressure. (e) Overlaied predicted pressure by PressureVision++, projected onto Sensel pressure array. (f) Ground truth pressure, projected onto Sensel pressure array*
 
-## 核心模块与公式推导
+
 
 PiMForce 的核心架构由三个功能模块构成，分别负责 sEMG 信号特征提取、3D 手部姿势特征提取以及多模态特征融合与压力预测。模型通过联合分类-回归损失进行端到端训练，以同时学习压力区域的存在性判断与压力数值的精确回归。
 
@@ -187,7 +191,9 @@ $$L = L_c + \lambda \cdot L_r$$
 ![[assets/figures/papers/paper_list_l1798_PiMForce_Posture_Informed_Muscular_Force_Learning_for_Robust_Hand_Pressu/figures/021_Figure_12.jpg]]
 *Figure 12: Visualization of patterns with similar EMG footprint on different postures*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -245,7 +251,9 @@ PiMForce 在自定义多模态数据集（22 种交互，21 名参与者）上�
 ![[assets/figures/papers/paper_list_l1798_PiMForce_Posture_Informed_Muscular_Force_Learning_for_Robust_Hand_Pressu/figures/002_Table_1.jpg]]
 *Table 1: Comparison with the previous datasets for hand contact and pressure estimation. We modified and updated the table from [17]. NA refers to ’not available’*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 PiMForce 处于**可穿戴肌肉感知**与**视觉手部重建**两条技术路线的交叉地带。其核心动机源于一个被现有工作忽略的瓶颈：前臂 sEMG 信号在肌肉激活模式相似但手部姿势不同时，难以分辨压力分布差异（Section 4.1）。因此，PiMForce 并非单纯改进 sEMG 解码器，而是通过引入 3D 手部姿势作为**空间先验**来解耦这一歧义。
 
@@ -282,6 +290,8 @@ PiMForce 的性能边界在实验中有清晰体现：
 - **更高密度的肌肉感知**：现有 8 通道 sEMG 阵列的空间分辨率有限。HD-EMG 或更高密度电极阵列可能捕获更精细的肌肉协同模式，尤其是在手指独立控制的场景中。
 - **轻量化与实时部署**：PiMForce 的双分支架构（2D 编码器-解码器 + 3D ResNet34）对移动设备的计算资源要求较高，如何在保持多模态增益的前提下实现模型压缩是一个工程挑战。
 - **遮挡鲁棒的手部姿势估计**：当视觉姿势估计失效时，PiMForce 退化为 sEMG Only 模型（R² 约 83.49%）。探索融合惯性传感器或利用时序信息来弥补视觉遮挡，是提升系统鲁棒性的关键路径。
+
+
 
 ## 原文 PDF
 

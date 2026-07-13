@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2024
 pdf_ref: paperPDFs/CVPR_2024/DynVideo_E_Harnessing_Dynamic_NeRF_for_Large_Scale_Motion_and_View_Change_Human_Centric_Video_Editing.pdf
+project_link: null
+code_link: null
 aliases:
 - DynVideo-E
 tags:
@@ -39,7 +41,7 @@ claims:
 > - HOSNeRF & NeuMan datasets 上，Human Preference Rate 为 显著优于所有基线，对比 SOTA 基线方法 (CoDeF, Rerender-A-Video 等)，变化 +50% ∼ +95% preference。
 > - HOSNeRF & NeuMan datasets 上，CLIPScore 为 31.31，对比 所有基线方法均低于此值，变化 大幅领先。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有视频编辑方法在人体中心视频上面临根本性矛盾——逐帧编辑难以维持长程帧间一致性，而基于 2D 表示（如神经图集、规范图像）的方法无法有效表达大规模人体运动与视角变化，导致编辑质量下降、一致性崩溃。
 
@@ -48,8 +50,6 @@ claims:
 **方法定位**：该方法引入了一套图像驱动的视频-NeRF 编辑管线，核心创新包括：（1）多视角多姿态 Score Distillation Sampling，同时从个性化 2D 扩散先验和 3D 扩散先验中蒸馏编辑信号；（2）参考图像重建损失注入目标内容；（3）文本引导的局部人体部位超分辨率提升细节质量；（4）基于最近邻特征匹配的背景风格迁移。该方法将视频编辑从 2D 帧操作范式升级为 3D 空间编辑范式。
 
 **主要结果**：在 HOSNeRF 和 NeuMan 数据集上，DynVideo-E 在人类偏好评比中领先现有 SOTA 方法 50% ∼ 95%，CLIP 分数大幅超越所有基线方法。消融实验验证了 2D 个性化先验、3D 多视角先验、重建损失和局部超分辨率等各组件的关键贡献。
-
-## 背景与动机
 
 视频编辑旨在对视频内容进行局部或全局的修改，使其符合特定的视觉风格或语义目标。近年来，基于扩散模型的图像编辑方法取得了显著进展，然而将其直接迁移至视频领域仍面临核心挑战：**帧间长程一致性与逐帧编辑之间的矛盾**。现有的视频编辑方法大多将视频视为一系列独立帧的集合，或采用基于 2D 的紧凑表示（如神经图集、规范图像），在单帧或 2D 空间中进行编辑操作，再通过某种传播机制将修改扩散至整个视频。这种范式在处理常规视频时表现尚可，但一旦面对**包含大规模人体运动与显著视角变化的人体中心视频**，其局限性便暴露无遗——2D 表示本质上无法有效聚合跨越不同姿态和视角的复杂动态信息，导致编辑结果出现纹理粘连、身份漂移、时序闪烁等一致性问题。
 
@@ -63,7 +63,7 @@ claims:
 
 基于这一洞察，本文提出 **DynVideo-E**，核心动机是**利用动态 NeRF 作为视频的 3D 表示，将视频编辑问题转化为 3D 空间中的编辑问题**。通过在 3D 动态人体空间和静态背景空间中分别执行编辑，并借助人体姿态引导的变形场将编辑结果传播至整个视频，从根本上解决大规模运动与视角变化下的长程一致性问题。同时，引入多视角多姿态的 Score Distillation Sampling（SDS）机制，从 2D 个性化扩散先验和 3D 扩散先验中蒸馏编辑信息，结合参考图像重建损失和文本引导的局部超分辨率，实现高保真度的个性化人体中心视频编辑。
 
-## 核心创新
+## 核心方法与创新机理
 
 DynVideo-E 的核心创新在于将视频编辑问题从 2D 帧空间迁移至 3D 表示空间，从根本上改变了编辑的执行域和一致性传播机制。其关键创新可归纳为以下三个层面的 changed slots：
 
@@ -91,8 +91,6 @@ DynVideo-E 将视频表示为**动态 NeRF**，包含两个解耦的 3D 空间�
 
 - **文本引导局部人体超分辨率**：区别于全局固定分辨率渲染，该方法对局部人体部位进行放大渲染并监督，有效提升有效分辨率和细节质量。消融实验表明，移除该模块后平均 CLIP 分数从 0.674 降至 0.659（Table 3）。
 - **基于 NNFM 的背景风格迁移**：使用最近邻特征匹配损失（$\mathcal{L}_{\mathrm{NNFM}}$），在 VGG 特征空间中最小化渲染特征图与参考风格图像间的余弦距离，将风格从 2D 参考图像迁移至 3D 背景模型，避免了对背景的逐帧独立编辑。
-
-## 整体框架
 
 ![[assets/figures/papers/paper_list_l37_DynVideo_E_Harnessing_Dynamic_NeRF_for_Large_Scale_Motion_and_View_Chang/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of DynVideo-E. (1) Our video-NeRF model represents the input video as a 3D dynamic human space coupled with the deformation field and a 3D static background space. (2) Orange flowchart: Given the reference subject image, we edit the animatable 3D dynamic human space under multi-view multi-pose configurations by leveraging reconstruction losses, 2D personalized diffusion priors, 3D diffusion priors, and local parts super-resolution. (3) Green flowchart: A style transfer loss in feature spaces is utilized to transfer the reference style to our 3D background model. (4) Edited videos can be accordingly rendered by volume rendering in the edited video-NeRF model under source video camer...*
@@ -129,8 +127,6 @@ DynVideo-E 的整体编辑流程围绕一个核心表示展开：**Video-NeRF �
 在源视频帧的人体姿态下，仅使用 2D SDS 损失监督随机相机视角的渲染结果，确保编辑后的外观在原始视频轨迹上保持一致性。
 
 编辑完成后，通过体积渲染即可在源视频相机位姿下生成编辑视频，亦可实现编辑后动态场景的高保真自由视点渲染。
-
-## 核心模块与公式推导
 
 ### 视频-NeRF 表示（Video-NeRF Model）
 
@@ -210,7 +206,7 @@ $$
 
 训练过程中采用三种姿态采样策略：参考姿态（与参考图像对齐）、源视频随机姿态（保持与原视频的一致性）和随机采样姿态（增强可动画性），共同构成多视角多姿态训练流程。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -258,11 +254,9 @@ Table 4 比较了各方法的编辑操作时间。基于 NeRF 的表示天然比
 ![[assets/figures/papers/paper_list_l37_DynVideo_E_Harnessing_Dynamic_NeRF_for_Large_Scale_Motion_and_View_Chang/figures/008_Figure_5.jpg]]
 *Figure 5: DynVideo-E network designs: (a) Editing Background model, (b) Original human-object model, (c) Editing human model*
 
-![[assets/figures/papers/paper_list_l37_DynVideo_E_Harnessing_Dynamic_NeRF_for_Large_Scale_Motion_and_View_Chang/figures/009_Figure.jpg]]
-
 ![[assets/figures/papers/paper_list_l37_DynVideo_E_Harnessing_Dynamic_NeRF_for_Large_Scale_Motion_and_View_Chang/figures/007_Table.jpg]]
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 问题定位：视频编辑的表示瓶颈
 

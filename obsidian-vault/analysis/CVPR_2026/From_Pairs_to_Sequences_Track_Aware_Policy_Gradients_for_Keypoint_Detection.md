@@ -41,7 +41,7 @@ claims:
 > - MegaDepth-1500 上，AUC@5° 55.8 vs 51.9 (RDD) (+3.9)。
 > - ScanNet 上，AUC@5° 16.6 vs 13.7 (RDD) (+2.9)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈：从“瞬时匹配”到“长期跟踪”的鸿沟
 
@@ -61,7 +61,7 @@ TraqPoint 将关键点检测重新定义为**序列决策问题**，提出端到
 
 在 MegaDepth 相对位姿估计基准上，TraqPoint 以 **AUC@5° = 55.8** 显著超越最强成对训练方法 RDD 的 51.9（+3.9）；在 ScanNet 上同样以 16.6 对 13.7 取得领先（+2.9）。更重要的是，序列化 RL 训练将平均关键点跟踪长度（AKTL）提升 2.3，且消融实验证实 Rank Reward 与 Distinctiveness Reward 各自对匹配精度和跟踪稳定性有不可替代的贡献——去除任一奖励均导致 AUC 和 AKTL 大幅下降。在视觉定位（Aachen Day-Night）、视觉里程计（KITTI）和三维重建（ETH）等序列任务上，TraqPoint 同样展现出全面的性能优势。
 
-## 背景与动机
+
 
 ### 关键点检测：从图像对到序列的范式鸿沟
 
@@ -85,7 +85,9 @@ TraqPoint 将关键点检测重新定义为**序列决策问题**，提出端到
 
 通过这一范式转换，TraqPoint 能够生成在结构显著区域且跨帧高度一致的关键点，从根本上提升下游序列任务（位姿估计、视觉里程计、三维重建）的性能。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 TraqPoint 的核心创新在于**将关键点检测从“成对匹配性优化”重新定义为“序列级可跟踪性优化”**，并通过强化学习框架实现这一范式转变。以下从四个关键维度展开分析。
 
@@ -119,7 +121,7 @@ TraqPoint 设计了由两个互补信号合成的**轨迹感知复合奖励**：
 
 在采样策略上，TraqPoint 提出了**混合采样机制**：结合全局 Top-K 采样（利用当前策略选择高置信度关键点）和网格采样（保证空间覆盖多样性），在利用与探索之间取得平衡。这一设计对于 RL 训练的稳定性至关重要——纯 Top-K 采样容易导致策略过早收敛到局部最优，而网格采样确保了对图像所有区域的充分探索。
 
-## 整体框架
+
 
 TraqPoint 将关键点检测重新定义为**序列决策问题**，其核心 pipeline 遵循“先描述、后检测”（describe‑then‑detect）的范式，由两条解耦的分支构成：
 
@@ -154,7 +156,7 @@ TraqPoint 将关键点检测重新定义为**序列决策问题**，其核心 pi
 ![[assets/figures/papers/paper_list_l2081_https_arxiv_org_abs_2602_20630/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of our proposed Sequence-Aware Keypoint Policy Learning framework: First, we select a reference frame from the input image sequence and perform hybrid keypoint sampling on it. Next, we leverage geometric mapping to locate the corresponding positions of the reference frame’s keypoints in other frames of the sequence. We then count the number of these keypoints visible across the entire sequence. After that, we compute per-frame rewards for each sampled point and aggregate these into a final track reward. Finally, we update the policy network’s gradients*
 
-## 核心模块与公式推导
+
 
 ### 3.1 描述符分支预训练
 
@@ -234,7 +236,9 @@ $$
 - 第二项 $\mathcal{H}(P_{\theta})$ 为空间熵正则化项，防止策略过早收敛到局部最优，$\lambda$ 为权重系数。
 - 第三项 $\mathcal{L}_w$ 为预热损失（warm-up loss），在训练初期使用成对匹配信号辅助策略收敛，$\alpha_t$ 随训练步数衰减。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 相对位姿估计
 
@@ -294,7 +298,9 @@ Figure 1 和 Figure 4 从多视角重建和特征匹配两个维度提供了直�
 ![[assets/figures/papers/paper_list_l2081_https_arxiv_org_abs_2602_20630/figures/009_Figure_5.jpg]]
 *Figure 5: Ablation study on sequence length and the number of sampled keypoints*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 
@@ -357,6 +363,8 @@ TraqPoint 采用“describe-then-detect”训练范式：先预训练描述符�
 3. **特征提取器依赖**：TraqPoint 的性能增益部分来自 DINOv3-ConvNeXt 替换 ResNet-50（Table 5 消融显示骨干网络替换贡献了 AUC 从 52.5 到 53.3 的提升），但论文未完全解耦“序列 RL 训练”与“更强骨干网络”各自的贡献比例。这一交互效应值得进一步量化分析。
 
 4. **序列长度与计算开销的权衡**：消融实验表明最优训练序列长度为 5（Figure 5），但更长序列是否能在更大时间跨度上进一步提升跟踪稳定性，同时引入多少计算开销，尚未探索。
+
+
 
 ## 原文 PDF
 

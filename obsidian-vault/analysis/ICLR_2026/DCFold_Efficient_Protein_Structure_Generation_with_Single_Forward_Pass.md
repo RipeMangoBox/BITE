@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/DCFold_Efficient_Protein_Structure_Generation_with_Single_Forward_Pass.pdf
+project_link: null
+code_link: null
 openreview_forum_id: LMsdys7t1L
 aliases:
 - DCFold
@@ -41,7 +43,7 @@ claims:
 > - Posebusters V2 上，Best RMSD <5Å (%) 为 94.29，对比 93.81 (AlphaFold3)，变化 +0.48。
 > - Posebusters V2 上，Worst RMSD <2Å (%) 为 71.43，对比 70.00 (AlphaFold3)，变化 +1.43。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -79,7 +81,7 @@ DCFold属于基于蒸馏的一致性模型方法，需依赖预训练的AlphaFol
 3. 双重一致性训练轻微降低了结构多样性，需通过其他策略补偿。
 4. 目前仅在蛋白质和蛋白-配体复合物上验证，尚未推广到核酸等其他生物分子。
 
-## 背景与动机
+
 
 蛋白质结构预测是计算生物学中的核心问题，其目标是从氨基酸序列出发，确定蛋白质在三维空间中的折叠构象。近年来，以 **AlphaFold3**（Abramson et al., 2024）为代表的深度学习模型在该领域取得了突破性进展，不仅能够高精度预测蛋白质单体结构，还支持蛋白质-配体复合物、蛋白质-蛋白质相互作用等多种生物分子体系的建模。
 
@@ -92,7 +94,9 @@ DCFold属于基于蒸馏的一致性模型方法，需依赖预训练的AlphaFol
 
 针对上述效率瓶颈，本文提出 **DCFold**，一个单步生成的蛋白质结构预测模型。其核心动机在于：**能否通过训练策略的革新，将 AlphaFold3 的多步迭代推理过程压缩为单步前向传播，同时保持预测精度不降？** 为实现这一目标，DCFold 引入了双重一致性训练（Dual Consistency）框架，联合解决扩散迭代和 Pairformer 循环两个效率瓶颈，并结合时间测地线匹配（Temporal Geodesic Matching, TGM）调度器来稳定变长序列的训练过程。最终，DCFold 在 Posebusters V2 等基准上实现了与 AlphaFold3 相当的精度，并将推理速度提升约 15 倍。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DCFold 的核心创新在于通过**双重一致性训练**（Dual Consistency）框架，将 AlphaFold3 的迭代式扩散过程和循环式 Pairformer 同时压缩为单步执行，并引入**时间测地线匹配**（TGM）调度器来稳定变长序列的训练。这一设计直接回应了 AlphaFold3 推理效率的核心瓶颈：扩散模块约 200 步采样与 Pairformer 4 次循环带来的高计算成本。
 
@@ -139,7 +143,7 @@ TGM 在 Posebusters V2 上达到 77.5% 成功率，显著优于 ECM（75.7%）�
 
 双重一致性训练依赖预训练的 AlphaFold3 进行蒸馏，无法从头训练。此外，对于长序列（>255 tokens），Pairformer 的计算占比上升，加速比从 24× 降至约 7.7×（Table 7）。双重一致性训练也轻微降低了结构多样性（Table 4），但可通过其他策略补偿。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_LMsdys7t1L/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of Dual Consistency framework (top: AlphaFold3; bottom: DCFold)*
@@ -173,7 +177,7 @@ DCFold 的 pipeline 由以下核心模块串联构成：
 
 两个阶段均使用 TGM 调度器选择训练时间对，以稳定梯度并平衡不同长度序列的学习难度（TGM 将数据维度 $D$ 纳入调度以应对变长序列的挑战）。
 
-## 核心模块与公式推导
+
 
 ### 双重一致性训练框架
 
@@ -235,7 +239,9 @@ $$\mathcal{I}(t) = \frac{2D \cdot p \left( s_{\mathrm{max}}^{1/p} - s_{\mathrm{m
 - **TGM调度器显著优于基线**：在Posebusters V2上，TGM成功率达77.5%，优于ECM（75.7%）、sCM和CD（Table 6）。且TGM的训练梯度保持平衡，而ECM呈现阶梯状不稳定模式（Figure 5）。
 - **采样器修改是单步稳定性的必要条件**：关闭噪声注入和固定缩放因子使单步ODE积分成为可能。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能：Posebusters V2 基准
 
@@ -327,7 +333,9 @@ Table 4 报告了 Posebusters V2 上的多样性和置信度指标。DCFold 的�
 *Table 9: Detailed information of binder targets in the binder hallucination experiments*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 在蛋白质结构生成谱系中的位置
 
@@ -379,6 +387,8 @@ DCFold 的性能提升可分解为三个因果组件，各自有明确的消融�
 4. **单步模型的多样性-精度权衡**：如何在保持单步生成优势的同时，恢复或超越 AlphaFold3 的多样性水平？可能的路径包括 latent space 扰动、温度调节或多头输出策略，但均需实验验证。
 
 5. **TGM 超参数的敏感性**：$C(u)$ 的单调递减函数形式、初始值 $C_0$ 和衰减率 $\beta$ 对训练稳定性和最终精度的影响尚未系统分析，这限制了 TGM 在新任务上的调参指导。
+
+
 
 ## 原文 PDF
 

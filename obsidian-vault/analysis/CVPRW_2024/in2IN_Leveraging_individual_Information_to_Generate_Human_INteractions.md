@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPRW
 year: 2024
 pdf_ref: paperPDFs/CVPRW_2024/in2IN_Leveraging_individual_Information_to_Generate_Human_INteractions.pdf
+project_link: https://pabloruizponce.github.io/in2IN
+code_link: null
 aliases:
 - ILIIGHI
 tags:
@@ -38,7 +40,7 @@ claims:
 > [!tip] 效果简介
 > - InterHuman 上，R-Precision Top1 0.455 (in2IN) vs 0.449 (MoMat-MoGen) (+0.006)；FID 5.177 (in2IN) vs 5.674 (MoMat-MoGen) (-0.497)；EID (Extrinsic Individual Diversity) 1.680 (DualMDM exponential λ=0.00875) vs 1.238 (in2IN without DualMDM, λ=0) (+0.442)。
 
-## 概述
+## 概要
 
 现有的人类交互动作生成方法通常仅依赖对整体交互的文本描述（例如“两人相互踢腿”）作为条件，这导致生成的交互动作缺乏对每个参与者个体动作的细粒度控制，难以区分和调控交互中不同人的行为差异，从而限制了生成结果的个体多样性。针对这一瓶颈，本文提出 **in2IN**，一种基于扩散模型的双人交互动作生成框架，其核心思路是将条件信号分解为整体交互描述和每个个体的细粒度动作描述，并通过条件注入策略的重新设计，使模型能够同时建模个体内动态（自注意力）和个体间动态（交叉注意力）。
 
@@ -46,7 +48,7 @@ claims:
 
 实验结果表明，in2IN 在 InterHuman 数据集上达到了当前最优水平：R-Precision Top1 为 0.455，FID 为 5.177，均优于此前最优方法 MoMat-MoGen（Zhang et al., ICCV 2023）的 0.449 和 5.674。消融实验进一步验证了多权重 CFG 的最优权重组合（$w_c=3, w_I=3, w_i=1$）以及 DualMDM 指数调度器（$\lambda=0.00875$）在个体多样性与交互质量之间的最佳平衡。
 
-## 背景与动机
+
 
 ### 人类交互动作生成的任务与挑战
 
@@ -72,7 +74,9 @@ claims:
 
 这一动机的技术直觉在于：自注意力层天然适合建模个体内部的运动依赖，而交叉注意力层适合建模个体间的协调关系。将个体描述注入自注意力、交互描述注入交叉注意力，形成了一种与问题结构高度匹配的条件注入策略。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 in2IN 的核心创新在于将**交互生成的条件空间从单一的整体交互描述分解为“整体交互描述 + 个体动作描述”**，并在扩散模型的架构、采样策略和模型组合三个层面围绕这一分解进行了系统性改造。具体而言，其创新体现在以下五个 **changed slots** 上：
 
@@ -116,7 +120,7 @@ $$\begin{array}{ll} \mathrm{constant} & w(t) = \lambda \\ \mathrm{linear} & w(t)
 
 **总结**：in2IN 的创新链条是“条件分解 → 架构适配 → 采样策略 → 模型组合”的递进关系。条件分解是因果旋钮，注意力分离注入和多权重 CFG 是架构与采样层面的实现手段，DualMDM 则通过引入外部单人类运动先验进一步放大了个体多样性。这一系列改造使 in2IN 在 InterHuman 数据集上达到 SOTA（R-Precision Top1 0.455, FID 5.177），尤其在个体动作的可控性和多样性上显著超越了仅使用整体交互描述的基线方法。
 
-## 整体框架
+
 
 in2IN 的整体生成流程围绕一个核心设计展开：**将交互条件分解为整体交互描述与个体动作描述，并在扩散模型的注意力机制中分别注入，从而解耦个体内动态与个体间动态**。基于此，论文进一步提出 DualMDM 模型组合方法，将双人交互模型与单人类运动先验融合，以提升个体动作的多样性。
 
@@ -179,7 +183,7 @@ $$
 4. 可选地，通过 DualMDM 将交互模型输出与单人类运动先验组合，以权重调度器控制个体多样性的注入程度。
 5. 最终输出两人的运动序列。
 
-## 核心模块与公式推导
+
 
 ### 3.1 条件分解与注意力注入
 
@@ -243,7 +247,9 @@ $$
 ![[assets/figures/papers/paper_list_l1707_in2IN_Leveraging_individual_Information_to_Generate_Human_INteractions/figures/003_Figure_3.jpg]]
 *Figure 3: Different weights schedulers tested for DualMDM: Exponential , Inverse Exponential, Constant, and Linear*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -298,7 +304,9 @@ Table 2 对比了四种权重调度器在个体多样性与交互质量之间的
 
 **Figure 4** 可视化了多权重 CFG 各权重的独立效应，揭示了 $w_i$ 对交互质量的非线性影响——适度的个体引导提升多样性，过强则损害连贯性，这一发现为条件权重的调参提供了直觉指导。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 
@@ -333,6 +341,8 @@ Table 2 对比了四种权重调度器在个体多样性与交互质量之间的
 **推理效率优化。** 四重采样的计算开销可以通过知识蒸馏（将多条件模型蒸馏为单次前向模型）或条件缓存技术（复用无条件输出）来降低，但这些方案在交互生成场景下的可行性和对生成质量的影响尚未被探索。
 
 **先验模型的升级路径。** 论文使用的单人运动先验并非该领域的最优模型（如基于 Transformer VAE 或 MoMask 等更先进的架构）。将更强的单人运动先验集成到 DualMDM 框架中，可能需要解决运动表示不统一（如关节点表示与 SMPL 参数表示之间的转换）和条件空间不兼容等问题。
+
+
 
 ## 原文 PDF
 

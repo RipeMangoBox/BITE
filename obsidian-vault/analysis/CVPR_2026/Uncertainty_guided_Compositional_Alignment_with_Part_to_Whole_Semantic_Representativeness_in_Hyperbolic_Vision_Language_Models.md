@@ -44,7 +44,7 @@ claims:
 > - ImageNet 零样本检索 上，R@1 48.8 (ViT-B/16) vs CLIP 40.6 (ViT-B/16)。
 > - VOC 多标签分类 上，mAP 82.14 vs 最佳基线 80.50 (约)。
 
-## 概述
+## 概要
 
 现有双曲视觉语言模型（VLMs）在建模部分与整体之间的语义关系时，通常假设所有局部区域对整体场景的语义贡献是等同的。然而，这一假设与实际情况存在显著偏差：不同局部图像对整体场景的代表性存在天然差异（Figure 1）。**MERU**（Desai et al., ICML 2023）首次将图文蕴含关系引入双曲空间，但其仅关注跨模态的整体-整体对齐；**HyCoCLIP**（Pal et al., ICLR 2024）进一步引入了模态内的部分-整体蕴含，但仍未区分各部分对整体的差异化语义贡献。这一瓶颈导致部分-整体关系建模不够精确，双曲嵌入空间的层次表达能力未被充分利用。
 
@@ -52,7 +52,7 @@ claims:
 
 实验表明，UNCHA 在零样本图像分类、检索、层次分类、多对象表示及多标签分类等任务上均一致优于先前方法。例如，在 ImageNet 零样本分类中，UNCHA（ViT-B/16）达到 48.8% Top-1 准确率，较 HyCoCLIP 提升 **+3.0** 个百分点。消融研究进一步证实，不确定性引导的对比损失、不确定性校准与熵正则化三个组件均不可或缺，移除任一组件均导致性能显著下降。此外，对双曲嵌入分布的可视化分析显示，UNCHA 使部分嵌入与整体嵌入在双曲空间中形成更明显的层次分离，部分更靠近原点而整体更远，印证了方法对双曲空间利用效率的提升。
 
-## 背景与动机
+
 
 视觉语言模型（VLMs）在图像文本对齐任务上取得了显著进展，以 **CLIP**（Radford et al., ICML 2021）为代表的欧氏空间方法通过大规模对比学习实现了强大的零样本泛化能力。然而，欧氏嵌入空间在建模概念间的层次结构和部分-整体关系方面存在天然局限：欧氏空间无法有效表征“部分蕴含于整体”的非对称语义依赖，而这正是组合理解的核心。
 
@@ -73,7 +73,9 @@ claims:
 
 基于这一直觉，本文提出 **UNCHA（Uncertainty-guided Compositional Hyperbolic Alignment）**，旨在通过双曲不确定性显式建模部分到整体的语义代表性差异，并将这种不确定性自适应地融入对比损失和蕴含损失中，从而实现更精确的部分-整体层次对齐。UNCHA不改变基础编码器架构，而是通过损失函数层面的创新，使模型学会区分不同部分的贡献强度，最终在嵌入空间中形成部分靠近原点、整体远离原点的清晰层次结构。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 UNCHA 的核心创新在于**首次将双曲不确定性显式建模为部分到整体的语义代表性度量**，并将其同时注入对比学习与蕴含推理两条路径，从而突破了现有双曲视觉语言模型（VLMs）对“所有部分对整体贡献均等”的隐含假设。
 
@@ -127,7 +129,7 @@ UNCHA 处于双曲表示学习与视觉语言对齐的交叉点，其方法谱�
 
 消融实验（Table 4）严格验证了每个创新槽位的必要性：移除不确定性感知对比损失（w/o contrastive）、移除不确定性校准（w/o uncertainty，Geeeer 分类从 68.98 降至 64.57）、移除熵正则化（w/o entropy）均导致一致的性能下降，证明三个组件相互补充、缺一不可。
 
-## 整体框架
+
 
 UNCHA（**UN**certainty-guided **C**ompositional **H**yperbolic **A**lignment）的整体框架围绕一个核心洞察构建：在双曲空间中，部分图像/文本对整体场景的语义代表性存在显著差异，而这种差异可以通过双曲半径自然量化。如图 2 所示，与先前方法 MERU（Desai et al., ICML 2023）仅建模跨模态整体蕴含、HyCoCLIP（Pal et al., ICLR 2024）进一步引入模态内部分-整体蕴含不同，UNCHA 新增了一条不确定性感知路径，使模型能够自适应地调节各部分对整体对齐的贡献强度。
 
@@ -172,7 +174,7 @@ $$L = \mathcal{L}_{\text{con}}^{\text{un}} + \lambda_{ent} \mathcal{L}_{\text{en
 ![[assets/figures/papers/paper_list_l796_https_arxiv_org_abs_2603_22042/figures/002_Figure_2.jpg]]
 *Figure 2: Comparison of UNcertainty-guided Compositional Hyperbolic Alignment (UNCHA, Ours) with prior works. MERU [10] models inter-modal entailment between whole scene image and text representations. HyCoCLIP [49] extends this to include intra-modal entailment between part and whole scene representations. UNCHA (Ours) further incorporates uncertainty to quantify the semantic representativeness of each part, enabling uncertainty-guided part–whole alignment via adaptive weighting in the contrastive objectives and uncertainty calibration through the entailment loss. In addition, entropy regularization is applied in uncertainty calibration to ensure consistent and balanced utilization of the hyperbolic...*
 
-## 核心模块与公式推导
+
 
 ### 3.1 双曲几何基础：洛伦兹模型
 
@@ -270,7 +272,9 @@ $$L = \mathcal{L}_{\mathrm{con}}^{\mathrm{un}} + \lambda_{ent} \mathcal{L}_{\mat
 ![[assets/figures/papers/paper_list_l796_https_arxiv_org_abs_2603_22042/figures/001_Figure_1.jpg]]
 *Figure 1: Varying representativeness of part images to whole scene. The relationship between each part image and the whole scene varies with its representativeness. We model this varying representativeness as uncertainty, enabling uncertainty-guided part–whole alignment in hyperbolic space*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 零样本图像分类
 
@@ -334,7 +338,9 @@ Figure 5 对比了 UNCHA 与 HyCoCLIP 的双曲嵌入分布。HyCoCLIP 的嵌入
 ![[assets/figures/papers/paper_list_l796_https_arxiv_org_abs_2603_22042/figures/012_Table_S.7.jpg]]
 *Table S.7: Full results of part-level alignment with hard negatives. Comparison across all settings of part-level alignment with hard negatives for ViT-S and ViT-B. UNCHA (Ours) consistently outperforms prior models, including the challenging ‘All Pick5’ and ‘All-Hard Negs’ settings, demonstrating its strong capability in accurately identifying and distinguishing fine-grained visual regions within images*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -384,6 +390,8 @@ UNCHA 的三个关键修改槽位构成了一个因果闭环：
 - 不确定性估计器 $u(\mathbf{x})$ 的单调变换形式是否为最优选择？是否存在更适合特定数据分布的非线性变换？
 - 熵正则化系数 $\lambda_2$ 的敏感性如何？不同数据集间是否需要自适应调整？
 - 该不确定性框架能否推广到视频时序片段对全局视频的代表性建模？
+
+
 
 ## 原文 PDF
 

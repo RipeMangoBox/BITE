@@ -41,7 +41,7 @@ claims:
 > - EMTD 上，FID↓ 69.28；FVD↓ 239.05；IQA↑ 2.11。
 > - HDTF 上，FID↓ 60.71；FVD↓ 979.88；IQA↑ 2.48。
 
-## 概述
+## 概要
 
 **研究问题**：长时音频驱动人体动画面临两大核心瓶颈。其一，长视频生成中的误差累积导致人物身份漂移、颜色偏移和场景不稳定（Figure 2）；其二，手部运动建模缺失，造成手势失真以及与音频信号的不对齐。现有方法如 **HunyuanVideo-Avatar**（Chen et al., arXiv 2025）、**OmniHuman-1**（Lin et al., ICCV 2025）等在长时间序列上普遍出现面部一致性退化、背景闪烁和手部伪影。
 
@@ -51,7 +51,7 @@ claims:
 
 **方法定位**：InfinityHuman 属于两阶段音频驱动全身动画方法，区别于单阶段直接生成的基线。其关键创新在于将姿态序列与外观表现解耦作为长期控制信号，并首次在音频驱动人体动画中引入手部专项优化。当前框架仅训练于单人连续视频，对多人交互和场景切换的支持仍需扩展。
 
-## 背景与动机
+
 
 音频驱动的人体动画旨在从语音信号中合成逼真的说话人物视频，在虚拟主播、数字人交互、电影制作等领域具有广泛应用。然而，现有方法在生成**长时间视频**时面临根本性瓶颈：随着生成时长增加，累积误差导致人物身份漂移、颜色偏移、场景不稳定等视觉退化现象（Figure 2）。这一问题的根源在于，先前工作通常将前一时刻的生成帧作为下一时刻的条件输入，误差沿时间轴逐步放大，形成“滚雪球”效应。
 
@@ -59,7 +59,9 @@ claims:
 
 上述两大缺口——**长时视觉一致性**与**手部运动保真度**——构成了本文的核心动机。InfinityHuman 的出发点是：若能引入一种结构上不受外观退化影响的控制信号来引导生成，并辅以手部特定的反馈机制，就有望同时解决身份漂移与手势失真问题。具体而言，姿态序列（pose sequence）作为纯几何信息，天然不受颜色、纹理等外观退化影响，可作为长时生成中的**无漂移引导**；同时，参考帧可作为身份锚点，锁定人物外观；而手部奖励反馈则可针对性地纠正细小关节畸变。基于这些洞察，本文提出由粗到细的两阶段框架 InfinityHuman，系统性地应对长时间音频驱动人体动画中的核心挑战。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 InfinityHuman 的核心创新并非单一模块的修补，而是针对长时音频驱动人体动画中**误差累积**与**精细部位失真**两大瓶颈，提出了一套**由粗到细的解耦生成范式**。其关键创新点可归纳为以下四个维度的 changed slots：
 
@@ -101,7 +103,7 @@ $$\mathrm{CA}_{\mathrm{mm}}(x^{\mathrm{lr}}, c_{\mathrm{text}}, c_{\mathrm{audio
 
 文本和音频条件通过独立的交叉注意力分支注入，避免了模态间的信息干扰。配合训练时的多重条件 Dropout 策略（文本和音频各以 10% 概率独立丢弃，参考图和首帧以 10% 概率丢弃），增强了模型对各条件信号的解耦感知能力，从而提升音画对齐精度和身份保持鲁棒性。
 
-## 整体框架
+
 
 InfinityHuman 提出了一种**由粗到细的两阶段生成框架**，专门解决长时间音频驱动人体动画中的视觉退化与身份漂移问题。其核心设计思路是：先以低分辨率生成与音频同步的粗粒度运动视频，再通过姿态引导的细化器将其恢复为高分辨率、身份一致的长时间输出。
 
@@ -161,7 +163,7 @@ $$\mathcal{L}_{\mathrm{hand}}(\theta) = \mathbb{E}_{c \sim p(c)} \mathbb{E}_{X_i
 
 这一框架的核心洞察在于：**姿态序列结构上不受外观退化影响，可作为长期生成中保持身份一致性和动作连贯性的无漂移引导**；同时利用参考帧建立身份锚点，并通过手部奖励机制纠正细小关节失真。
 
-## 核心模块与公式推导
+
 
 InfinityHuman 采用两阶段由粗到细的生成框架，其核心由四个关键模块构成：低分辨率音频到视频生成器（LR-A2V）、姿态引导细化器（PG-Refiner）、手部特定奖励反馈学习机制，以及多模态条件交叉注意力。以下逐一阐述各模块的设计逻辑与关键公式。
 
@@ -226,7 +228,9 @@ $$\mathcal{L}_{\mathrm{hand}}(\theta) = \mathbb{E}_{c \sim p(c)} \mathbb{E}_{X_i
 ![[assets/figures/papers/paper_list_l1066_https_openaccess_thecvf_com_content_CVPR2026_html_Li_InfinityHuman_Towar/figures/002_Figure_2.jpg]]
 *Figure 2: Progressive Degradation in Long Video Animation by Previous Methods. Existing methods suffer from cumulative errors leading to pronounced identity drift (facial inconsistencies), color shifts (hair, clothing), scene instability (background fluctuations), and hand motion artifacts. These challenges underscore the necessity of InfinityHuman’s pose-guided refiner and hand-specific optimization for producing high-fidelity, temporally coherent animations over extended sequences*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -278,7 +282,9 @@ Table 3 报告了从 10s 到 50s 的累计指标变化，这是验证长时生�
 ![[assets/figures/papers/paper_list_l1066_https_openaccess_thecvf_com_content_CVPR2026_html_Li_InfinityHuman_Towar/figures/001_Figure_1.jpg]]
 *Figure 1: InfinityHuman is an audio-driven full-body animation framework that synthesizes long-duration videos with (a) temporally consistent visual appearance, (b) expressive and style-rich hand gestures, (c) dynamic human-object interactions, and (d) emotion-controllable, audio-aligned full-body motions*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与 baseline 的关系
 
@@ -331,6 +337,8 @@ InfinityHuman 的适用边界由其训练数据分布和框架设计共同界定
 4. **实时或低延迟推理**：当前两阶段流程虽通过蒸馏实现高效推理，但实时应用场景（如虚拟主播）对延迟有更高要求。进一步压缩模型或设计单阶段等价模型是工程化方向。
 
 5. **跨身份泛化**：参考帧作为身份锚点的策略在训练身份与推理身份一致时效果最佳。对于零样本跨身份生成场景，前缀潜在参考策略的泛化能力需要进一步验证。
+
+
 
 ## 原文 PDF
 

@@ -44,7 +44,7 @@ claims:
 > - Real‑world Pick Cup task (scene diversity scaling) 上，Zero‑shot Success Rate Fisheye policy > 95% with 8 training scenes vs Pinhole policy < 60% with 8 training scenes (> +35%)。
 > - Cross‑camera transfer on six simulation tasks (Seen Param → unseen Params) 上，Average Success Rate RSA policy maintains high success across all unseen parameters vs Standard Aug. policy collapses on Params 4/5 (e.g., ~0.0 success) (RSA prevents catastrophic drop)。
 
-## 概述
+## 概要
 
 机器人操作策略高度依赖视觉输入，但相机模型的选择——尤其是鱼眼相机与标准针孔相机——对策略的空间推理、泛化能力和跨硬件迁移鲁棒性的影响，此前缺乏系统性实证研究。该工作围绕这一空白，构建了从仿真到真实世界的完整分析框架，系统拆解了四个关键因子：**相机模型**（鱼眼 vs 针孔）、**场景复杂度**（视觉特征贫乏 vs 丰富）、**场景多样性**（单场景 vs 多场景训练）以及**相机参数**（内参变化导致的几何域偏移）。
 
@@ -57,7 +57,7 @@ claims:
 
 在方法谱系上，该工作以 **Diffusion Policy**（Chi et al., RSS 2023）为模仿学习骨架，将固定尺度裁剪替换为 RSA，并在仿真中采用无预训练 ResNet-18、真实世界中采用 CLIP ViT-B/16 作为纯视觉编码器，刻意移除本体感受输入以独立评估视觉定位质量。鱼眼仿真管线基于 MuJoCo 物理引擎，通过立方体贴图→等距柱状投影→鱼眼视角的两阶段投影实现，支持 EUCM/双球面等畸变模型。整体框架定位于**视觉机器人学习的传感器选择与数据增强交叉地带**，为后续超广角视觉策略的设计提供了明确的因果机理和可复现的基准。
 
-## 背景与动机
+
 
 ### 机器人操作中的视觉感知瓶颈
 
@@ -85,7 +85,9 @@ claims:
 
 更重要的是，本文识别出跨镜头迁移失败的**核心瓶颈**——策略对物体绝对像素尺度的过拟合——并提出 **Random Scale Augmentation (RSA)** 作为针对性缓解方案。这一发现不仅解释了鱼眼相机使用中的一个关键痛点，也为未来的相机无关策略学习提供了方法论启示。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 1. 问题诊断：跨镜头迁移失败的根源是绝对尺度过拟合
 
@@ -116,7 +118,7 @@ RSA 并非对模仿学习算法架构的修改，而是作用于**数据增强�
 
 从方法论谱系来看，RSA 属于**域随机化 (Domain Randomization)** 在视觉尺度维度的定向应用。与传统的颜色抖动、随机裁剪等增强不同，RSA 专门针对相机内参变化引起的尺度域偏移问题，是对机器人操作中视觉泛化技术栈的有针对性补充。
 
-## 整体框架
+
 
 本研究构建了一套系统性的分析框架，旨在解耦并评估鱼眼相机在机器人操作策略学习中的关键属性。如图 1 所示，该框架围绕四个核心维度展开：(a) **相机模型**（鱼眼 vs. 针孔）作为主对比基线；(b) **场景复杂度**（特征贫乏 vs. 特征丰富）用于探究空间定位能力（RQ1）；(c) **场景多样性**（单场景 vs. 多场景训练）用于评估场景泛化能力（RQ2）；(d) **相机参数**（不同内参配置）用于测试跨硬件迁移能力（RQ3）。
 
@@ -147,7 +149,7 @@ RSA 并非对模仿学习算法架构的修改，而是作用于**数据增强�
 ![[assets/figures/papers/paper_list_l2646_https_arxiv_org_abs_2603_02139/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the four factors analyzed to address our Research Questions (RQs). We study: (a) Camera Model (fisheye vs. pinhole) as our primary comparison; (b) Scene Complexity (poor vs. rich) for spatial localization (RQ1); (c) Scene Diversity (1 vs. N scenes) for scene generalization (RQ2); and (d) Camera Parameters (varied intrinsics) for hardware generalization (RQ3)*
 
-## 核心模块与公式推导
+
 
 ### 鱼眼相机仿真管线
 
@@ -196,7 +198,9 @@ $$\mathrm{Normalized~Score} = \frac{\mathrm{Total~points~earned}}{\mathrm{Total~
 
 本文采用 **Diffusion Policy**（Chi et al., RSS 2023）作为视觉模仿学习的核心算法，使用 U-Net 架构和 DDIM 调度器建模多模态动作分布。为独立测试视觉定位能力，实验中移除了本体感受输入（state-free 设置），视觉编码器在仿真中使用 ResNet-18（无预训练），在真实世界中使用 CLIP ViT-B/16。动作空间在仿真中采用相对连续帧的增量动作，在真实世界中采用相对动作块首帧的相对变换。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置概览
 
@@ -271,7 +275,9 @@ Figure 10 展示了 RSA 在仿真六任务上的跨镜头泛化效果。标准�
 
 最后，真实世界实验仅覆盖三个任务和三种镜头配置（180° 训练，150°/220° 测试），RSA 在更多样化任务（如高精度装配、动态操作）和更极端镜头参数下的泛化能力仍有待验证。视觉编码器消融（Table S7）虽已证明宽 FoV 的优势独立于 ResNet 或 CLIP 等具体架构选择，但在更大规模的视觉-语言-动作模型（VLA）预训练场景下，鱼眼相机数据和 RSA 增强的系统性价值仍是开放问题。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 在模仿学习与数据增强谱系中的定位
 
@@ -313,6 +319,8 @@ RSA 的尺度采样范围 $U(0.7, 1.3)$ 是固定的。一个自然的问题是�
 
 **传感器配置的对称性：**
 本文结论是否对称地适用于其他超广角或全向视觉传感器配置（如多相机环视系统、360° 全景相机）？不同传感器配置可能引入不同的遮挡模式和几何先验，其对空间定位和泛化的影响机制值得系统研究。
+
+
 
 ## 原文 PDF
 

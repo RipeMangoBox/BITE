@@ -45,7 +45,7 @@ claims:
 > - ImageNet-Nette 上，Top-1 accuracy (ResNet10-AP) IPC-10: 68.8, IPC-20: 76.2, IPC-50: 80.6 vs MGD3: IPC-10: 66.8, IPC-20: 74.8, IPC-50: 79.5 (IPC-10: +2.0, IPC-20: +1.4, IPC-50: +1.1)。
 > - ImageNet-1K (soft-label) 上，Top-1 accuracy (ResNet-18) IPC-10: 46.3, IPC-50: 61.4 vs RDED: IPC-10: 42.0; Minimax: IPC-10: 44.3; MGD3: IPC-50: 61.3 (IPC-10: +4.3 相对于 RDED; IPC-50: +0.1 相对于 MGD3)。
 
-## 概述
+## 概要
 
 数据集蒸馏旨在将大规模数据集压缩为极小的替代集，使在该替代集上训练的模型逼近原始数据集的性能。近年来，扩散模型因其强大的生成先验被引入蒸馏流程，但现有方法面临效率与分布建模的双重瓶颈：**Minimax** 等方案需要在目标数据集上额外微调扩散模型，计算开销高昂；而 **MGD3** 等方法虽避免了微调，却忽视数据分布的整体结构与样本间多样性，导致蒸馏性能受限。
 
@@ -53,7 +53,7 @@ claims:
 
 在 ImageNet-Woof、ImageNet-Nette 和 ImageNet-1K 三个基准上，DMGD 以无训练的方式超越所有需要额外训练的 SOTA 方法，平均精度提升分别为 2.1%、5.4% 和 2.4%，验证了“解耦语义与分布、以最优传输桥接二者”这一技术路线的有效性。
 
-## 背景与动机
+
 
 ### 数据集蒸馏的核心目标
 
@@ -79,7 +79,9 @@ $$|R_{\mathcal{T}}(\theta_{\mathcal{T}}^*) - R_{\mathcal{T}}(\theta_S^*)| \le 2L
 
 基于这一理论洞察，本文提出 **DMGD（Dual Matching Guided Diffusion）** 框架，核心动机在于：**无需任何额外训练，仅在扩散采样过程中施加解耦的语义引导和分布引导，即可同时实现多样性提升和分布对齐**。语义匹配方面，通过分类器自由引导和动态软标签机制，在扩散过程的不同阶段注入可控的随机探索与语义精炼；分布匹配方面，通过最优传输损失引导采样过程向目标分布靠拢，并借助 K-means 分布近似和贪婪渐进匹配策略解决大规模数据集上的计算可行性和多样性保持问题。这一无训练、解耦的范式从根本上绕开了现有方法在效率与性能之间的折衷困境。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DMGD 的核心创新在于将数据集蒸馏解耦为**语义匹配**与**分布匹配**两个独立且可协同的引导目标，并在扩散采样过程中以**完全无训练**的方式实现二者的联合优化。相较于现有基于扩散模型的蒸馏范式，该方法在三个关键维度上实现了机制性突破。
 
@@ -130,7 +132,7 @@ $$\mathcal{L}_{\mathrm{OT}}(P_S^t, P_{\mathcal{T}}) = W_{\varepsilon}(P_S^t, P_{
 
 DMGD 的核心理论贡献在于将数据集蒸馏形式化为两个可解耦目标的联合优化问题。**Theorem 1** 为这一解耦提供了严格的理论支撑：只要语义对齐成立，风险差异的上界仅取决于分布距离，因此语义匹配与分布匹配可以作为独立模块分别设计。Figure 4 中记录的渐进蒸馏过程中最优传输损失的变化进一步验证了双目标之间不存在优化冲突——损失随蒸馏进程单调递减，表明两个引导模块能够协同工作而非相互干扰。
 
-## 整体框架
+
 
 DMGD 提出了一种**完全无训练**的双匹配引导扩散框架，将数据集蒸馏解耦为语义匹配（Semantic Matching）与分布匹配（Distribution Matching）两个协同模块，全部作用于预训练扩散模型的采样过程。其核心逻辑源于定理 1 所揭示的理论保证：在语义对齐条件下，替代数据集与原始数据集之间的风险差异由它们边缘分布的最优传输距离所界定，即
 
@@ -161,7 +163,7 @@ $$|R_{\mathcal{T}}(\theta_{\mathcal{T}}^*) - R_{\mathcal{T}}(\theta_S^*)| \le 2L
 ![[assets/figures/papers/paper_list_l2671_https_arxiv_org_abs_2605_03877/figures/002_Figure_2.jpg]]
 *Figure 2: Framework of our DMGD method. Our method establishes two guidance modules during the sampling process: semantic matching and distribution matching. In semantic matching, we propose a dynamic soft label mechanism to unlock the potential of diffusion models for diversified generation while ensuring semantic alignment. In distribution matching, we optimize optimal transport computation through distribution approximation and greedy progressive matching to enable optimal transport-based distribution alignment guidance. We present the corresponding pseudocode in the Appendix A3 Algorithm 1*
 
-## 核心模块与公式推导
+
 
 ### 理论根基：风险差异的最优传输上界
 
@@ -220,7 +222,9 @@ $$|R_{\mathcal{T}}(\theta_{\mathcal{T}}^*) - R_{\mathcal{T}}(\theta_S^*)| \le 2L
 
 其中 $\widetilde{P}_{\mathcal{T}}$ 为近似分布。误差由上界中的两项控制：合成分布与近似分布的对齐误差，以及近似分布对原始分布的逼近误差。命题 2 进一步证明，K-means 近似的 Wasserstein 误差不大于均值匹配方法，即 $W(P_T, \widetilde{P}_T^{(2)}) \leq W(P_T, \widetilde{P}_T^{(1)})$，从理论上解释了 K-means 近似优于传统均值匹配的原因。消融实验（Table 6）验证了这一结论：K-means 在 IPC-10/50/100 设置下均取得最高精度，且计算时间仅约 0.5 小时，远低于 Minimax 的约 10 小时。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -287,7 +291,9 @@ Table 4 从覆盖度（Coverage）、最优传输数据集距离（OTDD）、多
 ![[assets/figures/papers/paper_list_l2671_https_arxiv_org_abs_2605_03877/figures/018_Table_8.jpg]]
 *Table 8: Evaluation of different parameter. Results are reported as Top-1 accuracy on ResNet-10 with average pooling in ImageNet-Woof*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位与基线对比
 
@@ -347,6 +353,8 @@ DMGD 的理论框架与经典分布匹配方法（如 **DM**）存在深层联�
 3. **跨域泛化**：在更复杂的跨域数据集或无条件生成场景中，DMGD 的双匹配框架是否仍然有效？这需要验证动态软标签机制在语义边界模糊时的鲁棒性。
 
 4. **与其他生成先验的兼容性**：DMGD 目前基于 Latent Diffusion Model，其核心思想（解耦语义匹配与分布匹配）是否可迁移到其他生成范式（如自回归模型、流匹配模型）仍有待探索。
+
+
 
 ## 原文 PDF
 

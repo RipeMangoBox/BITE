@@ -45,7 +45,7 @@ claims:
 > - 100STYLE 上，NPSS (↓) OURS(2) achieves lowest NPSS among methods vs CVAE, RSMT, PhaseMIB achieve higher NPSS (Performance improvement observed across 120, 140, 160 frames)；L2 global position (↓) OURS(2) achieves lowest L2 error among methods vs CVAE, RSMT, PhaseMIB achieve higher L2 error (Lower reconstruction error across all frame lengths)；Skating (↓) OURS(5) achieves the lowest skating artifacts vs CVAE, RSMT, PhaseMIB show higher skating (Smallest foot skating across all frame lengths)。
 > - 100STYLE (style change) 上，NPSS, L2, Skating (↓) OURS(2) consistently outperforms baselines under body part style changes vs CVAE, RSMT, PhaseMIB and direct stitching (Noticeable improvement in reconstruction and skating)。
 
-## 概述
+## 概要
 
 运动中间帧生成（motion in-betweening）旨在根据给定的起始与目标姿态，自动补全中间过渡帧，是计算机动画中的核心任务。现有方法通常对全身运动进行整体建模以编码运动风格，但忽略了身体各部位在运动幅度、节奏与协调模式上的独立性。这一瓶颈导致生成的补全运动缺乏灵活性：用户无法独立调整特定肢体的运动风格，也无法在保持整体协调的前提下实现精细的肢体级可控编辑。
 
@@ -53,7 +53,7 @@ claims:
 
 在100STYLE数据集上的实验表明，所提方法在长序列（120–160帧）的重建精度（NPSS、L2全局位置误差）和脚滑指标上均优于**CVAE**（Tang et al., TOG 2022）、**RSMT**（Tang et al., SIGGRAPH 2023）和**PhaseMIB**（Starke et al., PACMCGIT 2023）等基线方法。消融研究进一步验证了分部位相位表示相对于全身运动序列编码的显著优势。此外，该方法在更换身体部位风格的场景下仍能保持肢体协调，脚滑误差低于直接拼接方式，展现出良好的风格解耦与编辑能力。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -82,7 +82,9 @@ claims:
 
 这一设计使得用户可以**独立缩放特定身体部位的相位幅度或频率**，从而在不破坏整体协调性的前提下，精细调控个别肢体的运动幅度和速度。这为风格化动画编辑提供了一种直观且强大的控制手段。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于将运动中间帧生成从**全身统一建模**转向**分部位相位解耦**，从而实现对不同肢体的独立风格控制。这一转变通过三个相互关联的机制实现，形成了一条从表示层到生成层再到控制层的完整创新链条。
 
@@ -121,7 +123,7 @@ $$X_{S}^{t+1} = X_{S}^{t} + BPMoE(z^{t+1}, X_{S}^{t}, X_{\mathcal{P}}^{t})$$
 
 这些创新共同构成了一个完整的**分部位相位表示框架**，使运动中间帧生成从“整体风格迁移”迈向“局部风格解耦与编辑”，为动画制作中的精细运动控制提供了新的技术路径。
 
-## 整体框架
+
 
 该框架采用两阶段训练策略，将运动中间帧生成任务分解为三个核心模块的协同工作：**BP Phase Autoencoder（身体部位相位自编码器）**、**BPMoE（身体部位混合专家）** 和 **Motion Sampler（运动采样器）**。整体流程如图2所示。
 
@@ -181,7 +183,7 @@ $$
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2503_08180/figures/001_Figure_1.jpg]]
 *Figure 1: We demonstrate the effectiveness of our framework in generating stylized online motion in-between. It excels at producing realistic animations that accurately reflect the target style during variations in body part movements, while also allowing adjustments to the individual body parts or overall movements. These capabilities make our framework a robust and versatile solution for stylized in-between generation through part-aware phase representation*
 
-## 核心模块与公式推导
+
 
 ### 3.1 分部位相位自编码器（BP Phase Autoencoder）
 
@@ -240,7 +242,9 @@ $$
 
 整个框架采用**两阶段训练**策略：先训练 BP Phase Autoencoder 与 BPMoE，再固定 BPMoE 训练运动采样器。分部位相位表示使得风格编码器能够捕获各肢体的独立风格特征——消融实验（Table 3）证实，基于身体部位相位的风格编码器在重建精度与脚滑指标上均显著优于基于全身运动序列的 CNN 编码器，验证了分部位表示的必要性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 4.1 实验设置
 
@@ -310,7 +314,9 @@ $$
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2503_08180/figures/006_Table_3.jpg]]
 *Table 3: Comparisons of reconstruction and foot skating between motion-based and body-part-phase-based representation*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位与核心瓶颈
 
@@ -374,6 +380,8 @@ $$
 4. **跨风格泛化**：风格编码器能否泛化到训练集中未见的运动风格？分部位相位表示是否有助于少样本或零样本的风格迁移？
 
 5. **与物理仿真融合**：在需要物理合理性的场景中（如脚与地面的接触、手持物体的运动），分部位相位如何与物理约束协同工作，避免编辑操作产生物理上不可能的运动？
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/From_movement_to_cognitive_maps_recurrent_neural_networks_reveal_how_locomotor_development_shapes_hippocampal_spatial_coding.pdf
+project_link: null
+code_link: https://github.com/marcoabrate/movement2cogmaps
 openreview_forum_id: 8bM7MkxJee
 aliases:
 - RSTADS
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 从运动到认知地图：循环神经网络揭示运动发育如何塑造海马空间编码 |
 | 英文题名 | From movement to cognitive maps: recurrent neural networks reveal how locomotor development shapes hippocampal spatial coding |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=8bM7MkxJee); [GitHub](https://github.com/marcoabrate/movement2cogmaps) |
+| Links | [paper](https://openreview.net/forum?id=8bM7MkxJee) · [GitHub](https://github.com/marcoabrate/movement2cogmaps) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | 浅层循环神经网络（RNN）海马功能模型（sequential training across developmental stages） |
 | Dataset | Rate of change model (crawl with extended gaps), Spatial tuning development (walk→run→adult), Crawl-only model |
@@ -41,7 +43,7 @@ claims:
 > - Spatial tuning development (walk→run→adult) 上，SI_r 的 JT 检验 p 值 为 顺序训练 RNN（无网格细胞），对比 实验数据趋势，变化 模型 p < 0.01，实验 p < 0.001（均显著），且 JS 距离显著低于随机打乱。
 > - Crawl-only model 上，隐藏层位置解码误差 为 顺序训练 RNN，对比 仅爬行训练模型（匹配总训练量），变化 顺序模型的解码误差明显更低，sRSA 更高，且空间特征更强。
 
-## 概述
+## 概要
 
 海马体中的位置细胞和头方向细胞是构成空间认知地图的核心神经元，但它们在发育过程中顺序涌现的驱动机制长期未明。本研究提出并验证了一个因果假说：**发育过程中运动统计特征的渐进变化——而非简单的感觉输入变化速度或训练数据量——是海马空间编码成熟的关键驱动因素**。
 
@@ -53,7 +55,7 @@ claims:
 
 本研究的方法论贡献在于将发育神经科学的“行为驱动成熟”假说转化为可操作的循环神经网络计算框架，通过课程学习将运动发育时序与空间表征涌现建立了因果联系，为理解海马-内嗅皮层环路的功能发育提供了新的计算视角。
 
-## 背景与动机
+
 
 哺乳动物在出生后早期，海马体中的空间编码神经元——位置细胞（place cells）和头方向细胞（head direction cells）——并非生来成熟，而是经历一个渐进的功能发育过程。位置细胞在幼鼠睁眼前已存在，但空间信息量低、稳定性差；头方向细胞则在睁眼后约一周才出现方向调谐。这一发育时间线的驱动机制长期悬而未决：究竟是感觉输入本身的变化速度决定了空间表征的成熟，还是动物主动运动模式的变化才是关键？
 
@@ -61,7 +63,9 @@ claims:
 
 本文的核心动机在于：利用循环神经网络（RNN）作为海马功能的可操作模型，检验“运动发育驱动空间编码发育”这一假设。具体而言，研究者首先对大鼠出生后 P11 至 P25 的运动数据进行无监督聚类，识别出三个发育运动阶段——爬行（crawl，中位年龄 P13.5）、行走（walk，P16）和奔跑（run，P20）——外加成年组（Figure 1c）。随后，通过在仿真环境中按发育顺序向浅层 RNN 呈现不同阶段的运动轨迹，观察隐藏层单元是否能够自发模拟出海马空间细胞的发育时间线。该框架将“运动模式的发育时序”作为可控变量，使得在计算模型中分离运动经验与其他发育因素成为可能。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈突破：运动发育而非感觉变化速度是空间编码涌现的驱动力
 
@@ -93,7 +97,7 @@ claims:
 
 这三个 changed slots 共同构成了从“运动发育”到“空间编码成熟”的因果链条：阶段特异性的运动统计提供了差异化的感觉运动经验，课程学习确保了表征的渐进构建，网格细胞输入则为成年位置细胞的完全成熟提供了必要的空间度量框架。
 
-## 整体框架
+
 
 ### 研究目标与核心假设
 
@@ -173,7 +177,7 @@ $$G_t^{(i)} = \frac{1}{3} \max\left(0, \sum_{a\in\{0,\pi/3,2\pi/3\}} \cos\left(2
 
 这些控制条件共同构成对核心假设的严格检验：**运动模式的发育时序和特定运动统计，而非训练数据量或感觉变化速度，是空间表征涌现的关键驱动因素**。
 
-## 核心模块与公式推导
+
 
 ### 管道架构概览
 
@@ -262,7 +266,9 @@ $$\mathrm{BIC}_{\mathrm{model}} = -2 \mathrm{LL}_{\mathrm{model}}^{(m)} + d_{\ma
 
 其中 $\mathrm{LL}_{\mathrm{model}}^{(m)}$ 为模型在指标 $m$ 上的对数似然，$d_{\mathrm{model}}$ 为模型自由参数数量，$K$ 为数据点数量。BIC 用于在原始发育模型与“变化速率”控制模型之间进行定量比较（$\Delta \text{BIC} > 10$ 表明原始模型显著更优）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 发育运动阶段的识别与仿真轨迹生成
 
@@ -356,7 +362,9 @@ Figure 3展示了模型隐藏单元与真实CA1神经元在率图（rate maps）
 ![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_8bM7MkxJee/figures/018_Figure.jpg]]
 *Figure: a b c Figure A9: Pure directional selectivity emerges at the ”walk” stage and remains stable thereafter. Diamonds indicate adult model trained with grid cell input. Non-significance was determined by one-sided pairwise Wilcoxon rank-sum tests (Wilcoxon, 1992) with Benjamini-Hochberg correction (Hollander et al., 2013) testing for increasing differences. a Percentage of RNN units classified as pure head direction (HD) cells – i.e., meeting only the criteria for directional selectivity. b Minmax normalised spatial information \mathrm { S I } _ { d } (mean±SEM) for polar maps of RNN units classified as pure HD cells. c Min-max normalised resultant vector length (RVL, mean±SEM) for polar maps o...*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心贡献与理论定位
 
@@ -404,6 +412,8 @@ Figure 3展示了模型隐藏单元与真实CA1神经元在率图（rate maps）
 5. **环境-运动交互效应**：运动发育阶段与环境特征（如丰容环境、黑暗饲养）如何交互，以影响空间表征的形成和稳定性？模型可通过改变虚拟环境复杂度来系统探究这一问题。
 
 6. **完整空间认知地图的建模**：能否通过在更复杂的任务中引入其他空间细胞类型（如网格细胞、边界细胞、目标细胞）来扩展模型，实现更完整的空间认知地图？这需要将单层RNN扩展为多模块网络，并引入更丰富的任务结构。
+
+
 
 ## 原文 PDF
 

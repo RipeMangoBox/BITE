@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/A_Rich_Knowledge_Space_for_Scalable_Deepfake_Detection.pdf
+project_link: null
+code_link: null
 aliases:
 - SSDD
 - RKSSDD
@@ -41,7 +43,7 @@ claims:
 > - 4个跨域数据集 (UADFV, WildDeepFake, DFDC, DF40-Test) 上，mAUC 为 87.79，对比 最佳基线CLIP-SVD: 82.90，变化 +4.89。
 > - GenImage (跨模型AIGC检测) 上，mACC 为 88.50，对比 最佳基线CLIP-SVD: 86.50，变化 +2.00。
 
-## 概述
+## 概要
 
 深度伪造检测面临的核心瓶颈在于：现有方法通常在单一数据集上训练，模型仅能捕捉有限的伪造痕迹，对未见过的数据泛化能力差。更关键的是，随着训练数据规模增大，传统基于CLIP的适配方法性能反而饱和甚至下降。本文提出SD²（Scalable Deepfake Detection）框架，通过构建大规模、多模态、统一预处理的数据集MMI-DD（整合11个数据集、约360万张图像），并设计多模态视觉-语言学习策略，有效解决了这一可扩展性问题。
 
@@ -49,7 +51,7 @@ SD²的核心洞察在于：将来自多个数据集的图像统一标注为五�
 
 实验结果表明：SD²在域内检测中达到mAUC 95.76%，优于最佳基线CLIP-SVD的93.82%；在跨域检测中达到mAUC 87.79%，较基线提升4.89%；在跨模型AIGC检测（GenImage）上达到mACC 88.50%。消融实验证实各组件均贡献显著，其中CLAM模块带来1.6%的AUC提升。最关键的是，随着训练数据从100K增加到3M，SD²的跨域mAUC从82.90%持续提升到87.79%，而基线方法性能饱和或下降，验证了其可扩展性。
 
-## 背景与动机
+
 
 深度伪造检测面临的核心瓶颈在于：现有方法大多在单一数据集上训练（如 FaceForensics++），导致模型仅能学习到该数据集特有的有限伪造痕迹，对未见过的伪造类型或生成方法泛化能力极差。更关键的是，随着训练数据规模的增大，传统的 CLIP 适配方法（如线性探测、全参数微调、LoRA 等）性能不仅不提升，反而出现饱和甚至下降，无法从大规模异构数据中获益。这一“数据越多，性能越差”的反直觉现象，揭示了当前方法在构建可扩展的深度伪造知识空间上的根本性缺陷。
 
@@ -59,7 +61,9 @@ SD²的核心洞察在于：将来自多个数据集的图像统一标注为五�
 
 这一设计的核心洞察在于：**伪造痕迹是多模态、多粒度的**，仅靠单一数据源或二分类目标无法捕获其全貌。通过将数据统一标注为细粒度类型，并利用 VLM 生成的多模态描述进行对齐，模型能够构建一个结构化的知识空间，其中不同类型伪造的视觉特征与对应的文本语义形成清晰的对应关系。实验证据表明（见 Table 6），当训练数据从 100K 扩展到 3M 时，SD² 的跨域 mAUC 从 82.90% 提升到 87.79%，而所有基线方法均出现饱和或下降，验证了这一思路的有效性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SD² 的核心创新在于通过构建大规模、多模态、统一预处理的数据集 MMI-DD，并设计多模态视觉-语言学习框架，从根本上解决了现有深度伪造检测方法在数据规模增大时性能饱和甚至下降的瓶颈问题。其关键改变体现在以下五个方面：
 
@@ -75,7 +79,7 @@ SD² 的核心创新在于通过构建大规模、多模态、统一预处理的
 
 **决定性证据**：消融实验（Table 5）量化了各组件的贡献：CLAM 带来 1.6% 的 AUC 提升，文本标签分离损失带来 4.61% 的提升，双对比损失进一步带来 2.94% 的提升。最终，SD² 在跨域检测中达到 mAUC 87.79%，显著优于所有基线方法（Table 3）。更重要的是，随着训练数据从 100K 增加到 3M，SD² 的性能持续提升（82.90% → 84.85% → 87.79%），而基线方法性能饱和或下降（Table 6），这直接验证了其可扩展性的核心优势。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0003_hNd5L7WnjC_A_Rich_Knowledge_Space_for_Scalable_Deepfake_Det/figures/004_Figure_3.jpg]]
 *Figure 3: Overview of our S $\mathcal { D } ^ { 2 }$ training framework. S $\mathcal { D } ^ { 2 }$ employs CLIP text and image encoders, both fine-tuned with LoRA. The Cross-Layer Attention Module (CLAM) enhances visual features by fusing low-to-high-level information. The model is optimized with three objectives: Classification Loss ( $\mathcal { L } _ { \mathrm { C } }$ ) to distinguish real and four fake types, Text Label Separation Loss ( $\mathcal { L } _ { \mathrm { S } }$ ) to enforce separation among types, and Dual Contrastive Loss ( $\mathcal { L } _ { \mathrm { D } }$ ) to align image-text pairs
@@ -97,7 +101,7 @@ SD²（Scalable Deepfake Detection）是一个基于CLIP的多模态视觉-语�
 
 **数据流与规模效应**：MMI-DD数据集整合11个数据集，包含约360万张图像，统一标注为五种类型。随着训练数据从100K增加到3M，SD²的跨域mAUC从82.90%持续提升到87.79%（Table 6），而所有基线方法（CLIP zero-shot、linear probe、full fine-tune、CLIP-SVD、LoRA）均出现性能饱和或下降（Figure 1左图）。这表明SD²的框架设计成功地将数据规模转化为检测性能的持续增益，突破了传统方法的可扩展性瓶颈。
 
-## 核心模块与公式推导
+
 
 SD² 的核心技术贡献在于三个紧密耦合的模块：跨层注意力模块（CLAM）用于增强视觉表示，以及三种互补的损失函数用于多模态对齐与分类。以下按模块逐一展开。
 
@@ -155,7 +159,9 @@ SD² 将深度伪造检测重新定义为五分类问题（REAL, FS, FR, EFS, FE
 - **优化器**：AdamW，学习率 5e-7，batch size 1024（通过梯度累积实现），训练 4 个 epoch。
 - **推理**：使用每类最简文本标签（如“a photo of a Face Swapping”），取余弦相似度最高的类别作为预测。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 域内检测性能
 
@@ -209,7 +215,9 @@ Table 7显示，分类损失权重α=2.0时性能最佳（mAUC 84.85%），α=1.
 ![[assets/figures/papers/iclr26_0003_hNd5L7WnjC_A_Rich_Knowledge_Space_for_Scalable_Deepfake_Det/figures/002_Table_1.jpg]]
 *Table 1: Summary of our integrated dataset, MMI-DD, including the numbers of real and fake images and their type annotations*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 SD² 的核心贡献在于重新定义了深度伪造检测中“知识”的构建方式——从依赖单一数据集上训练的二分类器，转向在大规模、多模态、细粒度标注数据上学习的可扩展视觉-语言框架。这一转变直接回应了现有方法的根本瓶颈：当训练数据规模增大时，传统 CLIP 适配方法的性能反而饱和或下降，表明它们无法有效利用异构数据中的丰富信息（Figure 1）。
 
@@ -218,6 +226,8 @@ SD² 的核心贡献在于重新定义了深度伪造检测中“知识”的构
 **适用边界。** SD² 的有效性建立在三个前提之上：（1）有大规模、多来源、统一标注的面部伪造数据——MMI-DD 整合了 11 个数据集、360 万张图像，人工标注为五种类型；（2）有强视觉-语言骨干（CLIP-ViT-L/14）和高质量文本生成器（InternVL2.5）；（3）训练资源充足（4 epoch, batch size 1024）。当这些条件不满足时，SD² 的优势可能减弱。例如，在 DF40-Test FE（Face Editing）子集上，SD² 的 ACC 为 90.43%，但 WildDeepFake 上仅 69.16%（Table 10），表明对某些未见过的伪造类型仍存在泛化缺口。此外，SD² 仅处理面部图像，不适用于全身伪造、音频或视频时序伪造。
 
 **局限与开放问题。** 论文未讨论公平性——数据集包含多个来源（如 KoDF 含韩国人脸），但未按人口统计群体分析检测性能差异。VLM 生成的文本描述可能引入与种族、性别等相关的虚假关联，论文虽提及通过生成全面描述来解耦，但未提供定量验证。文本标签分离损失强制不同类别嵌入正交，可能丢失类型间的语义关联（如 Face Swapping 和 Face Editing 在真实场景中可能共存）。在更大规模数据上 SD² 是否会继续提升或最终饱和，仍是开放问题。最后，SD² 的推理速度和计算开销未分析，可能限制在实时部署场景中的应用。
+
+
 
 ## 原文 PDF
 

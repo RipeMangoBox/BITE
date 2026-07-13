@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Harder_Is_Better_Boosting_Mathematical_Reasoning_via_Difficulty_Aware_GRPO_and_Multi_Aspect_Question_Reformulation.pdf
+project_link: null
+code_link: https://github.com/AMAP-ML/MathForge
 openreview_forum_id: nfURupkdRJ
 aliases:
 - MDM
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 越难越好：通过难度感知GRPO和多方面问题改写提升数学推理 |
 | 英文题名 | Harder Is Better: Boosting Mathematical Reasoning via Difficulty-Aware GRPO and Multi-Aspect Question Reformulation |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=nfURupkdRJ); [GitHub](https://github.com/AMAP-ML/MathForge) |
+| Links | [paper](https://openreview.net/forum?id=nfURupkdRJ) · [GitHub](https://github.com/AMAP-ML/MathForge) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | MathForge（DGPO + MQR） |
 | Dataset | AIME24, MATH500, Minerva, Olympiad |
@@ -41,7 +43,7 @@ claims:
 > - MATH500 上，pass@1 (4 runs average) 为 79.95，对比 72.20，变化 +7.75。
 > - Minerva 上，pass@1 (4 runs average) 为 33.36，对比 27.76，变化 +5.60。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -78,7 +80,7 @@ claims:
 
 消融实验进一步验证了各组件的独立贡献：DGAE 单独带来 +0.94% 的提升，DQW 额外贡献 +1.14%，两者合计使 DGPO 较 GRPO 提高 +2.18%；MQR 在 DGPO 基础上再提升 +2.27%，其中子问题重写策略的增益最大（+1.63%）。跨模型尺度（1.5B、3B、7B）和跨模型系列（Qwen2.5-Math、Qwen2.5、DeepSeek-Math）的实验一致表明 MathForge 的最优性，验证了方法的泛化能力。
 
-## 背景与动机
+
 
 ### 数学推理的强化学习范式
 
@@ -112,7 +114,9 @@ $$\sum_{i=1}^G |\hat{A}_{\mathrm{GR},i}| = 2G\sqrt{p(1-p)}$$
 
 两者的协同构成了一个正向循环：MQR 提供更难的训练数据，DGPO 确保这些难题获得充分的更新幅度，共同驱动模型在复杂推理任务上的突破。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作提出了 **MathForge** 框架，由两个互补的核心创新构成：**DGPO（难度感知的组策略优化）** 和 **MQR（多方面问题改写）**。二者共同形成一个“更难数据–更强算法”的协同闭环，从根本上解决了 GRPO 系列方法在数学推理强化学习中的隐式瓶颈。
 
@@ -162,7 +166,7 @@ $$\lambda_s = B_{\mathrm{v}} \cdot \frac{\exp(D_s / T)}{\sum_{s=1}^{B_{\mathrm{v
 
 MathForge 将 DGPO 与 MQR 结合，构建了一个正反馈循环：MQR 生成更难但可解的问题，DGPO 通过难度平衡的优势估计和显式加权确保这些难题获得充分的训练信号。在 Qwen2.5-Math-7B 上，MathForge 达到 42.17% 的平均基准分（+4.56% over GRPO），在 AIME24（+3.64）、MATH500（+7.75）、Minerva（+5.60）、Olympiad（+5.34）上均取得一致最优（Table 1）。该优势在 1.5B、3B、7B 及不同模型系列（Qwen、DeepSeek）上均稳定复现（Table 2），验证了方法的通用性。
 
-## 整体框架
+
 
 MathForge 是一个面向强化学习式推理验证（RLVR）的“数据–算法”协同框架，由两个正交且互补的组件构成：**难度感知组策略优化（DGPO）** 和 **多方面问题改写（MQR）**。二者的关系并非简单叠加，而是形成一条“更难数据 → 更强算法”的正反馈闭环：MQR 系统性提升训练问题的内在难度，DGPO 则从优化器层面纠正 GRPO 对困难问题的隐式压制，使模型能有效利用这些高难度样本。
 
@@ -242,7 +246,7 @@ DGPO 的损失函数（Eq. 3）在有效问题上进行 token 级平均，避免
 
 DGPO 和 MQR 各自独立有效（DGPO 较 GRPO 提升 2.18%，MQR 提升 3.43%），但二者联合（MathForge）达到 42.17% 的平均基准分，较 GRPO 基线提升 4.56 个百分点（Table 1）。这种协同并非简单的增益叠加：DGPO 的难度感知机制使模型能更有效地利用 MQR 生成的高难度样本，而 MQR 提供的更丰富训练信号又反过来放大了 DGPO 的优势。在 1.5B、3B、7B 及不同模型系列上，MathForge 均一致取得最优结果（Table 2），验证了框架的泛化性。
 
-## 核心模块与公式推导
+
 
 ### 问题定位：GRPO 优势估计的难度失衡
 
@@ -302,7 +306,9 @@ $$\mathcal{I}_{\mathrm{DGPO}}(\theta) = \mathbb{E}\left[\{q_s\}_{s=1}^B \sim \ma
 
 其中 $I_{sit}(\theta)$ 为 token 级重要性采样比，损失仅在有效问题（$B_v$）上平均，避免无效问题引起的梯度波动。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果验证
 
@@ -400,7 +406,9 @@ Figure 1 展示了 DGPO 与 GRPO 在 MATH500 上的训练动态：DGPO 的输出
 ![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_nfURupkdRJ/figures/013_Table_9.jpg]]
 *Table 9: Hyperparameter settings trained on the MATH dataset using varying base models*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心基线：GRPO 及其变体系列
 
@@ -454,6 +462,8 @@ MathForge 将 DGPO 和 MQR 组合为一个“更难数据–更强算法”的�
 - **数据与策略的同步进化。** 能否将 MQR 的重写过程内化到 RL 训练循环中，使问题难度随策略能力的提升而动态调整，实现数据生成与策略优化的在线协同？
 - **更大规模的扩展性。** 该方法在 70B+ 模型和更复杂推理任务（如竞赛级证明、研究级问题求解）上的扩展性如何？当前实验最大仅覆盖 7B 模型。
 - **难度度量的替代方案。** DQW 使用负平均奖励作为难度代理，在训练初期模型能力较弱时，该信号可能噪声较大。是否存在更鲁棒的难度度量方式（如基于模型置信度、响应熵或外部难度标注）？
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Measuring_and_Mitigating_Rapport_Bias_of_Large_Language_Models_under_Multi_Agent_Social_Interactions.pdf
+project_link: https://anonymous.4open.science/r/KAIROS-4F71
+code_link: null
 openreview_forum_id: gF31wuYdk7
 aliases:
 - KG
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 多智能体社交互动中大型语言模型融洽偏误的测量与缓解 |
 | 英文题名 | Measuring and Mitigating Rapport Bias of Large Language Models under Multi-Agent Social Interactions |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=gF31wuYdk7); [Project](https://anonymous.4open.science/r/KAIROS-4F71) |
+| Links | [paper](https://openreview.net/forum?id=gF31wuYdk7) · [Project](https://anonymous.4open.science/r/KAIROS-4F71) |
 | Topic | #topic/safety_alignment_fairness_privacy #topic/safety_alignment_fairness_privacy/trustworthy_machine_learning |
 | Method | KAIROS (用于多维社交影响评估的基准) 及配套缓解策略（包括授权/反思提示、监督微调与 GRPO 变体） |
 | Dataset | KAIROS (聚合所有类别), KAIROS (小模型) |
@@ -42,7 +44,7 @@ claims:
 > - KAIROS (小模型) 上，KAIROS 准确率 为 GRPO-MAS-NS-OR (Qwen2.5-3B) 57.9%，对比 Base (Qwen2.5-3B) 48.8%，变化 +9.1pp。
 > - KAIROS (小模型) 上，鲁棒性 (O–K Δ) 为 GRPO-MAS-NS-OR (Qwen2.5-14B) -6.5%，对比 Base (Qwen2.5-14B) -8.7%，变化 +2.2pp (改善)。
 
-## 概述
+## 概要
 
 大型语言模型（LLM）在融入多智能体社交环境时，极易受历史交互形成的“融洽关系”及当前同伴行为（支持/反对）的影响——即使同伴提供错误答案，模型也倾向于从众，导致正确预测大量损失，而纠正错误的能力不足，整体准确率显著下降。这一瓶颈的本质在于：模型将交互历史视为真实的社会信号，系统性地调节自身对社会影响的敏感性，而非基于任务正确性独立决策。
 
@@ -60,7 +62,7 @@ claims:
 
 主要限制包括：评估仅采用多项选择题格式，可能低估开放生成场景下的社会脆弱性；训练实验仅覆盖 ≤32B 的小模型；交互仍属脚本化模拟，与真实人类协同存在差距；未考虑多轮交互的长期演化效应。
 
-## 背景与动机
+
 
 大型语言模型（LLM）正越来越多地被部署于多智能体协作环境，例如群体决策、辩论与知识整合。在这些场景中，模型不仅需要独立求解任务，还必须解读、采纳或抵制来自其他智能体的信号。然而，现有研究揭示了一个关键脆弱性：LLM 极易受到社交动态的干扰，即便同伴提供的是明显错误的信息，模型也倾向于从众，从而导致大量正确预测的损失。
 
@@ -68,7 +70,9 @@ claims:
 
 为填补这一空白，本文提出了 **KAIROS**——一个用于多智能体社交互动中 LLM 融洽偏误的测量与缓解基准。KAIROS 的核心设计思路在于，通过精确控制历史交互中的融洽级别、当前回合的同伴行为（支持、强烈反对、轻微反对）以及模型自身的置信度，实现对模型社交脆弱性的细粒度评估。在此基础上，本文进一步探索了三类缓解策略：提示工程（授权提示与反思提示）、监督微调（SFT）以及基于组相对策略优化（GRPO）的强化学习，旨在提升模型在社交压力下的鲁棒性，同时保持甚至提高任务准确率。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作的核心创新在于首次系统性地将 **多智能体社交互动中的“融洽偏误”（Rapport Bias）** 概念化为可测量、可操控的评估维度，并构建了配套的缓解策略体系。其创新点并非单一技术突破，而是围绕“社会敏感性”这一瓶颈，形成了 **基准-诊断-缓解** 的完整闭环。
 
@@ -104,7 +108,7 @@ claims:
 
 综上，本工作的核心创新贡献在于定义并系统性地剖析了 LLM 的融洽偏误问题，揭示了模型规模是调节社会敏感性的首要因素，并指出了当前缓解策略在提升鲁棒性的同时会损害模型社交学习能力的结构性缺陷，为未来设计既能抵抗误导又能利用帮助的社交智能体奠定了基准。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l30_https_openreview_net_forum_id_gF31wuYdk7/figures/003_Figure_2.jpg]]
 *Figure 2: Overview of the KAIROS evaluation framework. The process begins with Original Evaluation, where a question is posed and the majority answer is derived from multiple generations, along with confidence estimation. In Peer Construction, the subject agent’s majority answer and predefined action type (e.g., support) are used to construct interactions with other agents. Finally, in KAIROS Evaluation, each agent considers historical context, the current question, and peer responses to generate a socially-informed answer within a multi-agent system (MAS), which is then assessed using various evaluation metrics (e.g., accuracy & robustness, utility, and resistance)*
@@ -142,7 +146,7 @@ $$\bar{p}_k = \hat{p}(y = k \mid \mathbf{x}) = \frac{1}{T} \sum_{t=1}^{T} \mathb
 - **监督微调**：使用模板化的正确答案和完整社交上下文进行单轮训练。
 - **GRPO 强化学习**：在组相对策略优化框架下，通过不同配置变体进行训练。关键可调节槽位包括：是否包含多智能体上下文、系统提示设计（正常提示 vs. 辩论式提示）、奖励函数（仅结果奖励 vs. 结合正确性、格式和内在声音多样性的复合奖励 $R = \lambda_{\mathrm{corr}} R_{\mathrm{corr}} + \lambda_{\mathrm{fmt}} R_{\mathrm{fmt}} + \lambda_{\mathrm{iv}} R_{\mathrm{iv}}$）、以及数据过滤策略（低置信度过滤 vs. 低正确率过滤）。训练数据与评估数据不相交，确保评估的独立性。
 
-## 核心模块与公式推导
+
 
 ### 2.1 动态评估数据构建模块
 
@@ -206,7 +210,9 @@ $$R = \lambda_{\mathrm{corr}} R_{\mathrm{corr}} + \lambda_{\mathrm{fmt}} R_{\mat
 
 值得注意的是，消融实验表明，简单的仅结果奖励（Outcome-based Reward, OR）配合正常提示（Normal System Prompt, NS）在所有 GRPO 配置中取得了最佳的准确率-鲁棒性权衡，辩论式系统提示（DS）或辩论式奖励（DR）并未带来额外增益。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈：社交融洽偏误的系统性损害
 
@@ -301,7 +307,9 @@ KAIROS 基准的核心发现是：LLM 在多智能体社交环境中普遍存在
 ![[assets/figures/papers/paper_list_l30_https_openreview_net_forum_id_gF31wuYdk7/figures/014_Table_9.jpg]]
 *Table 9: Overall results for the Knowledge category under KAIROS. Bold numbers mark per-dataset extreme (max/min) O–K ∆*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 
@@ -334,6 +342,8 @@ KAIROS 的定位处于 LLM 社会智能评估与多智能体交互研究的交�
 - **大规模验证缺失。** 更大规模模型（>32B）的 GRPO 训练是否能复现小模型的关键发现，尤其是 MAS 上下文对大模型的鲁棒性增益，尚需验证。
 
 - **跨文化扩展性。** 该评估框架是否能扩展到多语言、多文化背景，以研究不同社会规范下的融洽偏误，仍有待探索。
+
+
 
 ## 原文 PDF
 

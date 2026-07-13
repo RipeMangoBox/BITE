@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/AutoEP_LLMs_Driven_Automation_of_Hyperparameter_Evolution_for_Metaheuristic_Algorithms.pdf
+project_link: null
+code_link: https://github.com/YiZheZhang12/AutoEP
 openreview_forum_id: hit3hGBheP
 aliases:
 - AutoEP
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | AutoEP：基于大语言模型的元启发式算法超参数进化自动化 |
 | 英文题名 | AutoEP: LLMs-Driven Automation of Hyperparameter Evolution for Metaheuristic Algorithms |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=hit3hGBheP); [GitHub](https://github.com/YiZheZhang12/AutoEP) |
+| Links | [paper](https://openreview.net/forum?id=hit3hGBheP) · [GitHub](https://github.com/YiZheZhang12/AutoEP) |
 | Topic | #topic/representation_self_supervised_transfer #topic/representation_self_supervised_transfer/transfer_multitask_and_meta_learning |
 | Method | AutoEP |
 | Dataset | TSP eil51, TSP dsj1000, CVRP N=200, FSSP n20m10 |
@@ -41,7 +43,7 @@ claims:
 > - TSP dsj1000 上，Opt.gap(%) 为 3.58 (GA-2opt+AutoEP)，对比 7.14 (GA-2opt)，变化 -3.56。
 > - CVRP N=200 上，Opt.gap(%) 为 1.08 (GA-2opt+AutoEP)，对比 5.89 (GA-2opt)，变化 -4.81。
 
-## 概述
+## 概要
 
 ### 1. 问题与瓶颈
 
@@ -87,7 +89,7 @@ AutoEP 区别于 **EoH**（Liu et al., 2024）和 **ReEvo**（YE et al., NeurIPS
 - CoR 框架的级联失败风险未深入分析。
 - 能否扩展至多目标优化、带约束优化或深度神经网络超参数调优，仍为开放问题。
 
-## 背景与动机
+
 
 ### 元启发式算法的超参数困境
 
@@ -121,7 +123,9 @@ AutoEP的核心洞察是：**将LLM定位为高层监督者而非搜索算子，
 
 > **注意**：关于ELA特征的具体数学定义和CoR各Agent的详细工作机制，请参见“核心方法”章节。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 AutoEP的核心创新在于将大语言模型（LLM）从“搜索算子生成器”重新定位为“高层搜索监督者”，并构建了一个**零样本、免训练的闭环超参数控制系统**。与现有方法相比，这一范式转变体现在三个相互耦合的维度上。
 
@@ -171,7 +175,7 @@ CoR的设计带来了三重优势：
 
 AutoEP的三个创新维度——零样本在线推理、ELA驱动的状态感知、CoR结构化决策——形成了紧密的因果耦合：**ELA提供可量化的状态输入，使LLM推理能够被实证证据锚定；CoR将复杂的控制任务分解为可管理的子任务，使较小的LLM也能胜任；两者的结合使得免训练的零样本超参数控制成为可能。** 这种设计从根本上改变了超参数调优的范式：不再需要为每个新算法或新问题训练专用的调参策略，而是通过一个通用的、可解释的闭环框架，实现对任意元启发式算法的即插即用增强。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_hit3hGBheP/figures/002_Figure_2.jpg]]
 *Figure 2: The AutoEP Framework*
@@ -216,7 +220,7 @@ AutoEP 以“感知—推理—行动”的闭环模式运行：
 - **ELA 特征作为 grounding 机制**：五维 ELA 特征为 LLM 推理提供了可量化的实证基础，有效缓解幻觉问题。消融实验表明，移除 ELA 模块后性能显著下降，但仍在未调优基线之上，说明 LLM 仅凭经验池仍保留部分推理能力；同时移除 ELA 和 CoR 则性能低于基线，证实盲目调整会产生负面影响（Table 2）。
 - **CoR 推理链的效率优势**：将控制任务分解为 Strategist-Analyst-Actuator 三个子任务，使得较小的开源模型（如 Qwen3-30B）在配合 CoR 时即可达到与 GPT-o1 等超大模型相当的性能，而推理时间减少一个数量级（eil51 上 5.8 min vs. 44.7+ min，Table 3）。
 
-## 核心模块与公式推导
+
 
 AutoEP 的核心架构由三个功能模块构成闭环控制系统：**在线 ELA 特征提取模块**负责将搜索动态量化为可计算的状态向量；**经验池**存储历史状态-动作-奖励三元组，为 LLM 提供决策上下文；**多智能体推理链（CoR）** 将高层控制任务分解为 Strategist、Analyst、Actuator 三个 LLM 角色的协同推理。
 
@@ -274,7 +278,9 @@ CoR 将超参数控制分解为三个 LLM 角色的串行推理：
 
 消融实验（Table 2）证实了该分解的必要性：移除 CoR 而使用单一 LLM 直接决策，性能退化为与未调优基线相当的水平（TSP dsj1000 Opt.gap 7.11% vs 基线 7.14%），表明结构化推理链对于将搜索状态有效转化为超参数调节策略至关重要。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈验证：从静态调参到动态感知
 
@@ -361,7 +367,9 @@ CoR 将超参数控制分解为三个 LLM 角色的串行推理：
 ![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_hit3hGBheP/figures/026_Table_8.jpg]]
 *Table 8: Parameterization of each meta - heuristic algorithm*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 在超参数调优谱系中的位置
 
@@ -410,6 +418,8 @@ AutoEP 与两类LLM增强方法存在根本性差异：
 3. **极大规模问题的实用性**：在10万+城市的TSP或类似规模的问题上，ELA特征的计算开销（特别是$R^2$的二次模型拟合和分散比的空间距离计算）可能成为瓶颈。此外，CoR的推理质量是否会在搜索空间剧增时保持稳定，需要进一步验证。
 
 4. **跨领域迁移**：AutoEP的思路（在线状态感知 + LLM推理链 + 闭环控制）是否可应用于深度神经网络的超参数调优（如学习率调度、正则化强度调节）？这需要重新设计状态表征模块，可能利用训练/验证损失曲线、梯度统计量等作为“ELA”的替代。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/A_Reward_Free_Viewpoint_on_Multi_Objective_Reinforcement_Learning.pdf
+project_link: https://rl-bandits-lab.github.io/MORL-FB/
+code_link: null
 aliases:
 - MFFBMORL
 - RFVMORL
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 多目标强化学习的无奖励视角 |
 | 英文题名 | A Reward-Free Viewpoint on Multi-Objective Reinforcement Learning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=IwiwmY3Mzz); [Project](https://rl-bandits-lab.github.io/MORL-FB/) |
+| Links | [paper](https://openreview.net/forum?id=IwiwmY3Mzz) · [Project](https://rl-bandits-lab.github.io/MORL-FB/) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | MORL-FB (Forward-Backward Multi-Objective Reinforcement Learning) |
 | Dataset | HalfCheetah2d, Hopper3d, Ant3d, Humanoid2d |
@@ -41,13 +43,13 @@ claims:
 > - Hopper3d 上，UT (×10^3) 为 2.36 ± 0.01，对比 1.82 ± 0.02 (Q-Pensieve)，变化 +0.54。
 > - Ant3d 上，UT (×10^3) 为 3.43 ± 0.22，对比 1.81 ± 0.08 (Q-Pensieve)，变化 +1.62。
 
-## 概述
+## 概要
 
 多目标强化学习（MORL）的核心挑战在于，测试时所需的用户偏好往往未知且多样，而传统基于偏好条件化的方法难以在维持样本效率的同时有效泛化到未见的偏好组合。与此同时，标准无奖励探索策略（如从标准正态分布采样潜在向量 $z$）并未针对多目标奖励结构进行对齐，导致探索集中于无关区域，无法为 MORL 提供有效的行为多样性。本文从无奖励强化学习（RFRL）的视角切入，提出一种名为 MORL‑FB（Forward‑Backward Multi‑Objective Reinforcement Learning）的方法，其核心思路是将 RFRL 的训练目标作为辅助任务嵌入 MORL 框架，借助偏好引导的潜在向量探索（PG‑Explore）与直接利用观测奖励向量的辅助 Q 损失，促使模型在训练中自然地学得更广泛且更具相关性的策略表示，从而在不额外增加环境交互的前提下同步提升泛化性和样本效率。
 
 在 MO‑Gymnasium 的 6 个连续控制任务上，MORL‑FB 在 Utility（UT）、Hypervolume（HV）和 Episodic Dominance（ED）三项关键指标上均达到最优或接近最优：UT 和 HV 以显著优势超越 PD‑MORL、Q‑Pensieve、CAPQL 等十余种基准方法，且 ED 始终低于 0.5，表明在绝大部分偏好下其表现优于所有基准。聚合性能（中位数、均值、IQM）同样呈现一致的大幅领先。即使训练时仅暴露少数基础偏好向量（标准基向量与均匀分布偏好），MORL‑FB 仍能保持强大的泛化能力，而 PD‑MORL 和 Q‑Pensieve 的性能则明显退化。消融实验进一步揭示，移除辅助 Q 损失会使部分任务的 UT 跌至负值，偏好引导探索的移除则导致关键任务上 UT 下降超过 50%，证实了这两个组件的不可或缺性。此外，MORL‑FB 仅需 3M 总环境步数即可达到或超越单目标 SAC 在 21 个偏好向量上总计 63M 步数所获得的帕累托前沿，样本效率提升约一个数量级；在 Hopper 系列环境上的零样本跨目标迁移实验也验证了其表示的可迁移性。这些结果共同表明，将 RFRL 的结构化探索与多目标奖励信息有机结合的辅助任务设计，能够有效突破传统 MORL 在偏好泛化与样本利用上的根本瓶颈。
 
-## 背景与动机
+
 
 多目标强化学习（Multi-Objective Reinforcement Learning, MORL）的核心是训练能够同时优化多个可能冲突目标的策略。在实际应用中，不同用户或场景下目标的相对重要性（即**偏好向量** $\lambda$）往往在训练时未知，且测试时可能覆盖整个偏好空间。一个典型的做法是依靠**线性标量化** $f_{\lambda}(\mathbf{r}) = \lambda^{\top} \mathbf{r}$ 将多维奖励压缩为标量，然后学习一个偏好条件化的策略，最大化期望折扣回报向量 $\mathbf{V}^{\pi} := \mathbb{E}_{\pi, s_0 \sim \mu}[\sum_{t=0}^{\infty} \gamma^t \mathbf{R}(s_t, a_t)]$。挑战在于：当训练资源有限时，策略必须在大量未知偏好上同时保持高回报（**泛化能力**）和高样本效率。
 
@@ -57,7 +59,9 @@ claims:
 
 本文的核心动机正源于此：**从无奖励 RL 的视角重新审视 MORL**，将 RFRL 的前向‑后向（FB）训练目标作为辅助任务，同时引入**偏好引导的潜在向量探索（PG‑Explore）**与**基于观测奖励向量的辅助 Q 损失**，迫使学到的表示和探索行为聚焦于与多目标标量奖励相关的状态‑动作区域。该方法旨在突破现有单策略方法泛化差、多策略方法成本高的困境，在显著提升样本效率（仅需 3M 总步数即可达到单目标 SAC 在 21 个偏好上训练 63M 步的帕累托前沿水平，Figure 20）的同时，实现对未见偏好的鲁棒泛化。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 传统的多目标强化学习（MORL）方法（如 PD-MORL、Q-Pensieve）的通用范式是：策略以用户偏好 $\lambda$ 为条件，直接优化标量化奖励 $\lambda^\top \mathbf{r}$。这一范式在训练偏好覆盖不足时泛化能力受限，且未能利用无奖励强化学习（RFRL）天然蕴含的结构化辅助任务。MORL-FB 从 RFRL 视角出发，对训练范式引入了三项关键改变，构成本工作相对于所有基线（包括原始 FB）的核心创新：
 
@@ -81,7 +85,7 @@ claims:
 
 上述三项创新共同构成 **MORL‑FB** 的核心技术贡献。在 MO‑Gymnasium 的 6 个连续控制任务上，MORL‑FB 在所有指标（UT, HV, ED）上均达到最优或接近最优（Figure 2），聚合指标 IQM 和 CVaR@0.1 同样领先（Figure 3, Table 21）；在仅训练少量偏好时仍保持优越的泛化能力（Figure 4）；仅需 3M 步即可实现单目标 SAC 在 21 个偏好下总计 63M 步的帕累托前沿（Figure 20）。这些结果充分验证了 RFRL 视角下三项改变的有效性，且所有证据均来自贝叶斯超参数优化下的公平对比，结论可靠。
 
-## 整体框架
+
 
 ![[assets/figures/papers/repair_max_IwiwmY3Mzz_Reward_Free_MORL/figures/001_Figure_1.jpg]]
 *Figure 1: A motivating experiment on Deep Sea Treasure. (a)(b) Training performance (UT and HV defined in the sequel) of MORL-FB under different batch sizes for $\hat { z } _ { \lambda }$ . (c) KDE contour of return vector distributions of $\pi ( \cdot$ , z ) induced by $\hat { z } _ { \lambda }$ (with various batch sizes b) and $\hat { z } \sim \mathcal { N }$ ( 0 , $\mathbb { T } ^ { d _ { z } }$ ) This shows that $\hat { z } _ { \lambda }$ corresponds to learning for more diverse and relevant behavior in MORL than $z _ { \lambda }$ and the z sampling strategy of the original FB. The detailed configuration is provided in Appendix C
@@ -169,7 +173,7 @@ $$
 
 需要注意的是，原始 FB（即不加偏好引导、无辅助损失的 Vanilla RFRL）在所有连续控制任务上表现极为低迷，进一步佐证了上述改进的必要性（表 26，FB 行）。
 
-## 核心模块与公式推导
+
 
 MORL‑FB 将多目标 RL 视作 RFRL 的一个特例，并通过前向‑后向（FB）框架同时学习一组面向不同标量化奖励的最优策略。其核心模块包含两个表示网络、一个偏好引导的潜在向量探索机制以及两个彼此协同的损失函数。
 
@@ -236,7 +240,9 @@ $$
 
 通过上述模块的组合，MORL‑FB 将 RFRL 的辅助任务原则注入多目标 RL，以偏好引导探索破除线性约束，并借助辅助 Q 损失强化表征学习，最终在样本效率与泛化能力上取得显著提升。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 本节基于 MO-Gymnasium 中的 6 个连续控制任务（HalfCheetah2d、Hopper3d、Ant3d、Humanoid2d、Humanoid5d 等）对 MORL-FB 进行系统评估。所有算法均经贝叶斯超参数优化，在 3M 环境步数、5 个随机种子的统一协议下训练与评估（Table 26）。评估指标包括 Utility（UT，偏好平均标量化回报）、Hypervolume（HV）与 Episodic Dominance（ED），并采用与 Agarwal et al. (2021) 和 Fu et al. (2020) 一致的归一化方式。
 
@@ -284,7 +290,9 @@ MORL-FB 在所有任务上均取得最优或接近最优的 **UT** 和 **HV**，
 
 这些局限同时也是未来工作的方向，例如将其他 RFRL 技术（如基于距离保持的状态表示）整合至 MORL 中，以进一步释放无奖励视角的潜力。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 方法谱系：从 RFRL 到 MORL 的首次系统性嫁接
 
@@ -335,6 +343,8 @@ MORL‑FB 在 MO‑Gymnasium 的 6 个连续控制基准上展现了显著优势
 - **自适应偏好探索。** 当前 PG‑Explore 使用固定的均匀 $ \lambda$ 采样分布，面对动态变化的用户偏好或主动学习场景，设计能在线调整采样分布的元策略将是一重要方向。
 
 总体而言，MORL-FB 在方法谱系中开辟了“以 RFRL 作为 MORL 辅助任务”的新路径，通过偏好引导探索和辅助 Q 损失破解了原始 RFRL 方法在 MORL 下的失效问题，但其当前边界清晰——线性、全观测、相对稠密奖励的连续控制任务。上述局限与开放问题构成了未来沿该路线深化 RFRL-for-MORL 图谱的核心议题。
+
+
 
 ## 原文 PDF
 

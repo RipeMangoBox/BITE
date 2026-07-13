@@ -42,7 +42,7 @@ claims:
 > - Active Mapping of Moving Objects Benchmark (6 scenes × 4 objects × 4 motion pat... 上，Coverage (%) 81.51 (BB) / 70.73 (CBB) / 67.73 (FB) / 68.03 (SG) vs 75.89 (TO-BB) / 68.15 (TO-CBB) / 62.05 (TO-FB) / 60.79 (TO-SG) (+5.62 / +2.58 / +5.68 / +7.24)。
 > - Active Mapping of Moving Objects Benchmark 上，Completeness (cm) 0.77 (BB) / 1.11 (CBB) / 1.23 (FB) / 1.20 (SG) vs 0.90 (TO-BB) / 1.11 (TO-CBB) / 1.45 (TO-FB) / 1.41 (TO-SG) (-0.13 / 0.00 / -0.22 / -0.21)；AUC 0.75 (BB) / 0.67 (CBB) / 0.62 (FB) / 0.65 (SG) vs 0.70 (TO-BB) / 0.64 (TO-CBB) / 0.58 (TO-FB) / 0.59 (TO-SG) (+0.05 / +0.03 / +0.04 / +0.06)。
 
-## 概述
+## 概要
 
 **问题背景** 现有主动建图方法均假设场景为静态，无法处理独立运动的非合作目标。当物体自主运动时，智能体必须在估计物体运动状态的同时预测其未来轨迹，并规划自身路径以在正确的时间到达信息量最大的观测位置——视点质量同时取决于几何信息量和时间可达性，二者之间存在根本性的权衡。
 
@@ -51,8 +51,6 @@ claims:
 **方法定位** Paparazzo采用基于EKF置信度的双模式切换机制：当状态估计可靠时，系统进入Object Mapping Mode，通过前向传播候选视点并最小化联合代价 $B(\mathbf{x}, i) = -w_{\mathrm{eig}}\mathrm{EIG}(\mathbf{x}) + w_{\mathrm{sync}} C_{\mathrm{sync}}(\mathbf{x}, i)$ 来选择最优观测位姿；当EKF不确定时，系统切换至Object Tracking Mode优先稳定运动估计。权重 $w_{\mathrm{eig}}=0.8$ 和 $w_{\mathrm{sync}}=1.2$ 控制信息量与时间同步的权衡。
 
 **主要结果** 在Habitat 3.0模拟器中构建的6个场景 × 4个物体 × 4种运动模式的基准测试上，Paparazzo在所有运动模式下均一致优于基线方法：在Bouncing Ball运动下平均覆盖率达到81.51%，相比最佳基线TO（75.89%）提升5.62个百分点；在最具挑战性的Stop & Go运动模式下，覆盖率达68.03%，比TO（60.79%）提升7.24个百分点，AUC从0.59提升至0.65。Paparazzo在所有场景和运动模式下AUC均优于所有基线，说明其在整个探索过程中重建效率更高。
-
-## 背景与动机
 
 ### 问题背景：移动物体的主动建图
 
@@ -92,7 +90,7 @@ claims:
 
 通过这一设计，Paparazzo使智能体能够预先规划路径，在物体到达预测位置的同时恰好到达观测位置，实现动态场景下的高效主动重建。
 
-## 核心创新
+## 核心方法与创新机理
 
 Paparazzo的核心创新在于突破了主动建图领域长期以来“场景静态”的根本性假设，首次系统性地解决了**非合作运动目标的主动3D重建**问题。传统主动建图方法（如Random Walk、基于信息增益的贪心探索）均假设目标物体在世界坐标系中保持静止，视点选择仅需考虑当前时刻的信息量。当目标物体自主运动时，这类方法面临双重困境：智能体既无法预测物体未来的空间位置，也无法在正确的时间到达信息量最大的观测位姿。
 
@@ -134,8 +132,6 @@ $$(\mathbf{x}^*, i^*) = \underset{\mathbf{x} \in \mathcal{V}, (i-k) \le N_h}{\ar
 
 上述五个机制形成了完整的动态场景主动建图闭环：EKF提供运动预测能力，物体中心视点系确保候选视点的有效性，未来轨迹传播实现时间维度规划，联合代价函数平衡信息量与可达性，双模式切换保证系统鲁棒性。消融实验验证了每个创新组件的必要性：忽略同步代价和运动预测的RIS变体在Bouncing Ball运动下覆盖率仅67.07%（Paparazzo为81.51%），纯跟踪策略TO在Forward & Backward运动下覆盖率仅62.05%，证明了仅信息量选择或被动跟踪均不足以应对动态场景。
 
-## 整体框架
-
 Paparazzo 是一个无学习（learning-free）的主动三维重建框架，专门针对**独立运动的非合作目标**。其核心设计围绕一个根本性的瓶颈展开：现有主动建图方法均假设场景为静态，当目标物体自主运动时，智能体必须在估计物体运动状态的同时预测其未来轨迹，并规划自身路径以在正确的时间到达信息量最大的观测位置——视点质量同时取决于几何信息量和时间可达性，二者之间存在根本性的权衡。
 
 为应对这一挑战，Paparazzo 采用**基于 EKF 置信度的双模式切换机制**作为因果调控旋钮。系统在两种运行模式之间交替：
@@ -172,8 +168,6 @@ Paparazzo 的完整流水线由五个核心模块串联而成，形成“感知�
 
 ![[assets/figures/papers/paper_list_l2644_https_arxiv_org_abs_2604_19556/figures/002_Figure_2.jpg]]
 *Figure 2: Paparazzo alternates between Object Tracking Mode and Object Mapping Mode based on the confidence of the EKF motion estimate. When the filter is uncertain, the agent prioritizes acquiring stabilizing observations; once confident, it predicts future object motion, generates and propagates candidate viewpoints, and selects the optimal one*
-
-## 核心模块与公式推导
 
 Paparazzo 的核心架构围绕一个 **EKF 置信度驱动的双模式切换机制** 展开，使智能体能够在跟踪运动物体和主动建图之间自适应切换。系统包含五个关键模块，其运行逻辑如图 Figure 2 所示。
 
@@ -252,7 +246,7 @@ $$(\mathbf{x}^*, i^*) = \underset{\mathbf{x} \in \mathcal{V}, (i-k) \le N_h}{\ar
 
 Object Mapping Mode 执行过程中，系统持续监控 EKF 的 $U_k$ 和 $\mathrm{NIS}_k$。一旦置信度降至阈值以下，立即回退至 Object Tracking Mode 重新稳定运动估计，形成闭环自适应控制。该机制在物体突然改变运动方向时尤为关键——此时 EKF 预测失效，系统通过切换模式避免基于错误预测的无效探索。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 评估基准与实验设置
 
@@ -319,16 +313,13 @@ RW、RIS、TO基线共享相同的物体检测和位姿估计流程，仅视点�
 ![[assets/figures/papers/paper_list_l2644_https_arxiv_org_abs_2604_19556/figures/020_Table_4.jpg]]
 *Table 4: Reconstruction coverage (%) for Object 1 and Object 2 under the Stop & Go motion pattern. Paparazzo significantly outperforms all baselines*
 
-![[assets/figures/papers/paper_list_l2644_https_arxiv_org_abs_2604_19556/figures/023_Figure_11.jpg]]
-*Figure 11: Illustration of Stop & Go motion. Both panels show the same Stop & Go trajectory executed by the moving object. Across 300 steps, the object pauses once. (a) TO: the agent remains passive during the stop phase, losing valuable time and collecting no new viewpoints, which prevents further progress in the reconstruction. (b) Paparazzo: the agent continues to actively reposition and capture informative views even while the object is stationary, as visible from the additional exploratory camera frustums (in gray). This allows Paparazzo to maintain reconstruction progress during motion interruptions, unlike the TO baseline*
-
 ![[assets/figures/papers/paper_list_l2644_https_arxiv_org_abs_2604_19556/figures/021_Figure_9.jpg]]
 *Figure 9: Benchmark examples of active mapping of moving objects. In each scenario, the agent plans camera viewpoints around a moving target while compensating for its motion to acquire informative observations for reconstruction*
 
 ![[assets/figures/papers/paper_list_l2644_https_arxiv_org_abs_2604_19556/figures/022_Figure_10.jpg]]
 *Figure 10: Examples of object trajectories. The moving target is performing the Bouncing Ball motion in the Denmark, Greigsville, and Ribera scenes (left to right). The agent executes the Paparazzo framework while continuously adapting its motion to track and map the moving object*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 问题定位：从静态主动建图到动态目标主动建图
 

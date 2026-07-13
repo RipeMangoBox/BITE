@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Unconditional_Human_Motion_and_Shape_Generation_via_Balanced_Score_Based_Diffusion.pdf
+project_link: null
+code_link: null
 aliases:
 - BSBD
 - UHMSGBSBD
@@ -40,7 +42,7 @@ claims:
 > [!tip] 效果简介
 > - HumanML3D (test set) 上，FID↓ 1.81 (OursSMPL) vs 3.58 (MDM) (-1.77)；Diversity↑ 8.73 (OursSMPL) vs 8.14 (MDM) (+0.59)；Foot skating (%)↓ 16.31 (OursSMPL) vs 8.58 (MDM) (+7.73)。
 
-## 概述
+## 概要
 
 无条件人体运动与形状生成的核心瓶颈在于：表示人体姿态、朝向、平移和形状的SMPL参数构成一个异构特征空间，各组分的统计特性差异显著。标准扩散模型在训练时，不同特征组和不同时间步的梯度动态严重失衡，导致生成质量受限。现有方法往往依赖辅助损失或冗余特征来缓解这一问题，但缺乏对扩散训练动态本身的系统性分析。
 
@@ -52,7 +54,7 @@ claims:
 
 **局限与待验证点**：基于SMPL参数的模型脚滑动率（16.31%）仍高于使用3D关节坐标的MDM（8.58%），可能需要额外运动学约束；生成网格偶现自相交伪影（训练数据中亦存在）；楼梯行走场景下高度保持不稳定。这些问题指向物理约束与后处理优化的潜在改进方向。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -81,7 +83,9 @@ claims:
 
 最终目标是构建一个**最小化、自洽的无条件人体运动与形状生成框架**，其性能可与依赖大量工程技巧的SOTA方法相媲美，同时保持方法的简洁性和理论可解释性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作提出 **Balanced Score-Based Diffusion**，在不引入辅助损失、冗余特征或后处理步骤的条件下，通过两个关键创新使分数基扩散模型能够高效生成高质量的无条件人体运动与形状：
 
@@ -102,7 +106,7 @@ claims:
 
 **与 baseline 的核心差异**在于：baseline 沿用 EDM2 的连续不确定性加权 $\mathcal{L}_{EDM2}$ 与简单 Z 分数归一化，仅关注时间步维度的损失平衡，忽略了特征空间内部的异构性与维度差异。本方法通过**结构保持归一化**与**多维梯度均衡**两个 changed slots，将平衡性从单一时间维度扩展至特征组维度，从而在最小化模型复杂度的前提下显著提升生成质量。
 
-## 整体框架
+
 
 本文提出一种基于分数基扩散模型的无条件人体运动与形状生成方法，其核心在于不依赖辅助损失或冗余特征，仅通过**结构保持的特征归一化**与**理论驱动的梯度平衡损失加权**，即可在标准SMPL参数空间上实现高质量生成。整体pipeline由以下模块串联构成：
 
@@ -122,7 +126,7 @@ claims:
 
 该框架的关键因果机制在于：通过结构保持归一化消除特征组间的统计偏差，再通过梯度分析驱动的自适应损失权重使各特征组在不同时间步的梯度动态趋于均衡，从而让扩散模型能够高效匹配人体运动分布。消融实验（Table 1）验证了这一机制的有效性——仅改进归一化即可将FID从6.23降至3.32，叠加梯度平衡策略后进一步降至2.40。
 
-## 核心模块与公式推导
+
 
 ### 3.1 运动表示与预处理模块
 
@@ -197,7 +201,9 @@ $$\mathcal{L}_{\mathrm{final}}(\theta) = \sum_{k \in \{J, \Phi, \tau, \beta\}} \
 ![[assets/figures/papers/paper_list_l1908_Unconditional_Human_Motion_and_Shape_Generation_via_Balanced_Score_Based/figures/003_Figure_2.jpg]]
 *Figure 2: Average L2 norms of gradients with respect to*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈验证：梯度不平衡是性能劣化的根源
 
@@ -278,7 +284,9 @@ Figure 3 展示了概率流ODE框架下的系统评估。在归一化特征空�
 ![[assets/figures/papers/paper_list_l1908_Unconditional_Human_Motion_and_Shape_Generation_via_Balanced_Score_Based/figures/006_Table_3.jpg]]
 *Table 3: Hyperparameters used for all versions of our model*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -329,6 +337,8 @@ Figure 3 展示了概率流ODE框架下的系统评估。在归一化特征空�
 5. **小样本与少轮次的鲁棒性**：当前消融实验基于600 epoch的充分训练。在小批量（如batch size < 32）或更少训练轮次下，$u_\psi$ 的估计方差增大，平衡策略是否仍能稳定收敛？这关系到方法在计算资源受限场景中的实用性。
 
 6. **与其他生成范式的结合**：梯度均衡思想是否可推广至其他生成框架（如流匹配、一致性模型）？其核心在于识别并补偿损失景观中的各向异性，这一原理可能具有跨范式的适用性。
+
+
 
 ## 原文 PDF
 

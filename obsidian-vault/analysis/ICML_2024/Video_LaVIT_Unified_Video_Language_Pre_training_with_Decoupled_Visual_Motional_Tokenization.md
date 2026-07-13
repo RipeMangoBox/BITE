@@ -5,6 +5,8 @@ paper_level: A
 venue: ICML
 year: 2024
 pdf_ref: paperPDFs/ICML_2024/Video_LaVIT_Unified_Video_Language_Pre_training_with_Decoupled_Visual_Motional_Tokenization.pdf
+project_link: https://video-lavit.github.io
+code_link: null
 aliases:
 - VL
 - Video-LaVIT
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | Video-LaVIT：解耦视觉-运动标记化的统一视频-语言预训练 |
 | 英文题名 | Video-LaVIT: Unified Video-Language Pre-training with Decoupled Visual-Motional Tokenization |
 | 会议/期刊 | ICML 2024 |
-| Links | [paper](https://arxiv.org/abs/2402.03161); [Project](https://video-lavit.github.io) |
+| Links | [paper](https://arxiv.org/abs/2402.03161) · [Project](https://video-lavit.github.io) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | Video-LaVIT |
 | Dataset | VQA v2, MSVD-QA, MSRVTT-QA, Perception Test |
@@ -41,7 +43,7 @@ claims:
 > - MSVD-QA 上，Accuracy 为 73.2，对比 70.7 (Video-LLaVA)，变化 +2.5。
 > - MSRVTT-QA 上，Accuracy 为 59.3，对比 59.2 (Video-LLaVA)，变化 +0.1。
 
-## 概述
+## 概要
 
 视频-语言预训练的核心瓶颈在于如何高效编码时空动态：现有方法要么忽视运动信息，要么使用3D编码器产生过长的标记序列并带来巨大计算开销，难以扩展到长视频。Video-LaVIT 的关键观察是，视频中大部分内容在时间上高度冗余，可由运动向量刻画（Figure 1）。基于此，该方法将视频解耦为关键帧和运动向量，分别用独立的离散标记化器编码，形成交替的“视觉-运动”令牌序列，在大型语言模型中进行统一自回归预训练。
 
@@ -49,7 +51,7 @@ claims:
 
 Video-LaVIT 的方法定位在于：以 MPEG-4 运动向量作为描述时间变化的紧凑代理，通过解耦视觉语义与运动动态，仅需少量额外标记即可显著增强视频理解与生成，同时保持与图像、文本的统一框架。
 
-## 背景与动机
+
 
 ### 视频-语言预训练的核心瓶颈
 
@@ -83,7 +85,9 @@ Video-LaVIT从这一观察出发，提出将视频解耦为**关键帧（视觉�
 
 通过这种解耦设计，Video-LaVIT仅需**135个运动令牌**即可在理解与生成任务上取得高性能（Table 7），显著降低了视频编码的计算开销，同时保持与图像、文本模态的统一框架兼容性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Video-LaVIT 的核心创新在于将视频从“密集像素帧序列”重新定义为“关键帧 + 运动向量”的**解耦表示**，并围绕这一表示构建了统一的视频-语言预训练框架。其关键创新点可归纳为三个相互耦合的 changed slots。
 
@@ -119,7 +123,7 @@ $$p(y) = \sum_{y \in \mathcal{D}} \sum_{i=1}^{S} \log P_{\theta}(y_i | y_{<i})$$
 
 **总结**：Video-LaVIT 的创新链条是——用运动向量作为时间动态的紧凑代理 → 解耦视觉与运动令牌 → 分步去标记化 + EMC 恢复运动 → 统一自回归预训练。这一设计使模型在仅使用 10M 视频片段训练的情况下，在 13 个多模态基准上取得了有竞争力的表现，尤其在视频生成 FVD 指标上显著优于使用 270M 数据训练的 VideoPoet（MSR-VTT FVD: 188.36 vs. 213, Table 4）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l13_Video_LaVIT_Unified_Video_Language_Pre_training_with_Decoupled_Visual_Mo/figures/003_Figure_3.jpg]]
 *Figure 3: Illustrations for video detokenization in Video-LaVIT. (a) Training pipeline for the video detokenizer, which aims to reconstruct the original video clip using one keyframe and the subsequent motion vectors. (b) Autoregressive inference for long video decoding*
@@ -166,7 +170,7 @@ Video-LaVIT 的整体流程由三个核心阶段构成，各模块协同工作�
 - 训练计算开销仍然较高，难以直接扩展至网络级视频数据。
 - 长视频生成中不同片段的关键帧可能过于相似，因为训练数据场景变化较少，限制了多样化长视频的生成能力。
 
-## 核心模块与公式推导
+
 
 ### 3.1 视频分解与标记化
 
@@ -212,7 +216,9 @@ $$p(y) = \sum_{y \in \mathcal{D}} \sum_{i=1}^{S} \log P_{\theta}(y_i | y_{<i})$$
 
 其中 $y$ 为多模态令牌序列，$S$ 为序列长度，$\theta$ 为LLM参数（Llama 2 7B）。该目标使模型在统一的next-token prediction框架下同时学习多模态理解和生成能力。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果验证
 
@@ -299,7 +305,9 @@ Table 10检验了视频去标记器对预训练权重的依赖。使用svd-img2v
 ![[assets/figures/papers/paper_list_l13_Video_LaVIT_Unified_Video_Language_Pre_training_with_Decoupled_Visual_Mo/figures/006_Table_3.jpg]]
 *Table 3: Zero-shot understanding (↑) on the test set of Perception Test (Patraucean et al., 2024) and EgoSchema (Mangalam et al., 2024)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位与核心瓶颈
 
@@ -350,6 +358,8 @@ Video-LaVIT 的设计存在明确的适用边界：
 4. **更轻量级的运动估计**：当前依赖MPEG-4压缩过程中的运动向量提取，是否存在更轻量级的在线运动估计方案，以进一步降低标记化成本，同时保持或提升运动表示质量？
 
 5. **评估的公平性**：图像理解对比中，LLaVA-1.5采用了更高输入分辨率（336），部分数据集与训练数据存在重叠（标*），视频问答评估采用GPT助手相对评分，这些因素可能影响结论的稳健性，需在统一条件下进一步验证。
+
+
 
 ## 原文 PDF
 

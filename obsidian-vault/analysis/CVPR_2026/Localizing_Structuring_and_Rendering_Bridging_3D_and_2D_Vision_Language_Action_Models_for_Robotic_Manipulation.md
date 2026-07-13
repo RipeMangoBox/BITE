@@ -42,7 +42,7 @@ claims:
 > - RLBench (Simulation) 上，Average Success Rate (%) 80.5 vs GWM (79.6) (+0.9)。
 > - Real-world AgileX PIPER 上，Average Success Rate (%) 78.3 vs DP3 (33.3) (+45.0)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：当前机器人操作模型存在两条割裂的技术路线——2D VLA 模型（如 RT-2、OpenVLA）擅长从图像中提取语义感知，但缺乏显式 3D 空间推理能力；3D VLA 模型（如 GWM、DP3）通过点云/体素实现精确几何推理，却牺牲了视觉直观性。这一鸿沟导致两类模型均无法同时获得空间理解与视觉感知的优势。
 
@@ -55,7 +55,7 @@ claims:
 
 **方法定位**：DiffRender-VLA 属于 **3D 感知驱动的 2D VLA 增强框架**，通过可微渲染将点云几何结构转化为携带空间线索的 2D 图像，使预训练 2D VLA 无需架构改动即可获得 6-DoF 空间推理能力。其知识增量在于首次建立了从 2D VLA 损失到 3D 表示的可微梯度路径，实现了空间理解与语义感知的端到端协同优化。代码已开源（[DIFFVLA](https://github.com/zyl123456aB/DIFFVLA)）。
 
-## 背景与动机
+
 
 机器人操作正从“在已知位置拾取已知物体”向“在复杂三维环境中根据语言指令完成灵巧操作”演进。这一趋势催生了视觉语言动作模型（Vision-Language-Action, VLA），它将视觉感知、语言理解和动作生成统一为端到端可学习的策略。然而，当前 VLA 研究存在一条深刻的方法论断层：**2D VLA 与 3D VLA 各自擅长一端，却无法兼得空间推理与视觉感知**。
 
@@ -69,7 +69,9 @@ claims:
 
 该框架在 RLBench 仿真基准上取得 80.5% 的平均成功率，比现有最先进方法整体提升 +12.1%；在遮挡、杂乱、空间推理三种典型困难场景中，分别获得 11.2%、17.8%、13.4% 的性能增益。在真实机器人 AgileX PIPER 上取得 78.3% 平均成功率，相较 DP3 高出 45.0%，验证了从仿真到现实的迁移能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DiffRender-VLA 的核心创新在于构建了一条**闭环可微梯度路径**，将 3D 空间推理与 2D 视觉语言动作模型（VLA）统一在端到端学习框架中。其关键突破体现在以下三个维度的设计变更：
 
@@ -89,7 +91,7 @@ DiffRender-VLA 的核心创新在于构建了一条**闭环可微梯度路径**�
 
 在传统范式中，2D VLA 与 3D 表示之间不存在梯度传递，两者独立训练或仅通过特征拼接进行浅层融合。DiffRender-VLA 构建了完整的可微梯度路径：2D VLA 的任务损失 → 渲染图像 → 自适应视角参数 → 颜色光束编码 → 立方体定位 → 点云特征。这一闭环机制使得 3D 空间表示能够直接接收来自 2D 语义理解的监督信号，实现空间与语义的深层协同优化。消融实验表明，移除光束的可微性后，成功率从 80.5% 骤降至 74.8%，平移和旋转误差明显增大，强有力地证明了端到端梯度的必要性。
 
-## 整体框架
+
 
 DiffRender-VLA 的核心设计理念是**以可微渲染为桥梁，将 3D 空间推理能力注入 2D VLA 的语义感知流程**。如图 2 所示，框架由五个紧密耦合的模块串联而成，形成一条从点云到 6-DoF 动作的端到端可微管道。
 
@@ -125,7 +127,7 @@ DiffRender-VLA 的核心设计理念是**以可微渲染为桥梁，将 3D 空�
 ![[assets/figures/papers/paper_list_l2181_https_openaccess_thecvf_com_content_CVPR2026_html_Zhao_Localizing_Struct/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of DiffRender-VLA. The framework bridges spatial and 2D VLA paradigms through differentiable rendering: localiz-Cross Attention Action Predictioning anchors the next manipulation target, structuring encodes surrounding geometry as color-encoded differentiable features, and rendering optimizes viewpoints to project spatial semantics as interpretable, differentiable images*
 
-## 核心模块与公式推导
+
 
 DiffRender-VLA 的核心创新在于构建了一条**闭环可微梯度路径**：将 3D 空间语义嵌入可微渲染图像，使 2D VLA 的任务损失能够反向传播至 3D 表示（立方体定位、颜色光束、相机姿态），从而统一空间推理与视觉感知。该框架由五个关键模块串联而成。
 
@@ -183,7 +185,9 @@ $$\mathbf{Q}_{\mathrm{trans}}^{i} = h_{\mathrm{trans}}( \mathbf{Z}_{\mathrm{fuse
 ![[assets/figures/papers/paper_list_l2181_https_openaccess_thecvf_com_content_CVPR2026_html_Zhao_Localizing_Struct/figures/009_Figure_7.jpg]]
 *Figure 7: Adaptive viewpoint analysis validates differentiable camera poses enable task-specific optimization*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -244,7 +248,9 @@ Figure 8 的热力图分析了光束厚度与透明度参数对小型物体操�
 ![[assets/figures/papers/paper_list_l2181_https_openaccess_thecvf_com_content_CVPR2026_html_Zhao_Localizing_Struct/figures/006_Figure_5.jpg]]
 *Figure 5: Simulation Tasks for Occlusion and Clutter enviroments*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 范式定位：2D VLA 与 3D VLA 的桥接者
 
@@ -293,6 +299,8 @@ DiffRender-VLA 的核心定位在于填补 2D 视觉-语言-动作模型（VLA�
 4. **与更大规模基座模型的整合**：DiffRender-VLA 目前基于 OpenVLA 初始化，未来与更大规模 VLA 或视觉-语言模型的整合方式及性能增益尚未探索。
 
 5. **多任务与持续学习**：论文聚焦单任务训练，未讨论多任务联合训练或持续学习场景下的表现，这限制了其在开放世界机器人应用中的直接适用性。
+
+
 
 ## 原文 PDF
 

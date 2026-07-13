@@ -42,7 +42,7 @@ claims:
 > - CMU-MoCap 上，MPJPE (mm) Outperforms all baselines (exact values in Table 2) vs EqMotion, PGBIG, etc. (uniform improvement)。
 > - 3DPW 上，MPJPE (mm) improved by 4.6% @200ms, 3.3% @400ms over best baseline vs best baseline (probably EqMotion) (4.6% / 3.3% improvement)。
 
-## 概述
+## 概要
 
 人体运动预测旨在从观察到的历史姿态序列推断未来运动轨迹。近年来，多阶段渐进式猜测范式（如 **PGBIG** (Ma et al., CVPR 2022)、**EqMotion** (Xu et al., CVPR 2023)）取得了显著进展，但其核心瓶颈在于：各细化阶段参数独立、缺乏明确的停止准则，且路径依赖导致参数冗余和计算开销随深度线性增长。
 
@@ -52,7 +52,7 @@ claims:
 
 在 Human3.6M 数据集上，MotionDEQ 以不到 300K 参数在 400ms 处达到 55.3mm 预测误差，取得最优性能；训练内存消耗比对应的多阶段模型减少 2 倍以上。在 CMU-MoCap 和 3DPW 数据集上同样一致优于现有基线，验证了 DEQ 范式在人体运动预测中的有效性与效率优势。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -91,7 +91,9 @@ $$\mathbf{z}^* = f_{\boldsymbol{\theta}}(\mathbf{z}^*, \mathbf{x})$$
 - **稀疏不动点监督**：直接在最终不动点与稀疏采样的中间状态上与原始真值对齐，避免手工设计平滑目标或密集阶段监督。
 - **流式适配**：通过热启动初始猜测和轻量等变校正适配器 $\mathcal{F}_{\mathrm{ECA}}$，使模型无缝适配流式运动数据。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：多阶段渐进式猜测的“深度陷阱”
 
@@ -168,7 +170,7 @@ Figure 8(b) 显示，截断梯度显著优于不精确的 JFB（Jacobian-Free Ba
 - **推理迭代开销**：尽管训练内存恒定，推理时需 10-30 次迭代求解，在极端低延迟场景下仍有一定开销。固定点求解的收敛速度缺乏理论保证，能否通过模型设计（如单调算子）进一步减少迭代次数是开放问题。
 - **架构泛化性**：当前仅基于 EqMotion 骨干架构验证，向其他等变预测器或 Transformer/扩散模型等架构的迁移效果尚未实验。
 
-## 整体框架
+
 
 MotionDEQ 将人体运动预测重新表述为一个**共享参数的深度均衡（DEQ）不动点求解过程**，其整体 pipeline 由五个核心模块串联构成，数据流从历史观测序列出发，经特征初始化、交互图推断、初始猜测分解、DEQ 迭代细化，最终由等变输出层生成未来姿态序列。
 
@@ -217,7 +219,7 @@ MotionDEQ 的整体架构如 Figure 2 所示，包含以下五个核心模块：
 
 需要注意的是，$\mathcal{F}_{\text{ECA}}$ 依赖上一预测轮次的真值进行校准，在无法获取实时真值的离线推理中不可用；热启动机制在运动发生剧烈突变时也可能引入偏差。
 
-## 核心模块与公式推导
+
 
 ### 3.1 从渐进式猜测到不动点求解
 
@@ -299,7 +301,9 @@ $$\mathbf{H}' = \mathcal{F}_{\mathrm{DL}}(\widehat{\mathbf{Y}}_r - \mathbf{X}_{r
 ![[assets/figures/papers/paper_list_l1077_https_openaccess_thecvf_com_content_CVPR2026_html_Wei_Progressive_Guessi/figures/003_Figure_3.jpg]]
 *Figure 3: Our DEQ model adaption to streaming human motion*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 短期预测主结果
 
@@ -368,7 +372,9 @@ Figure 5 以 walkingtogether 动作为例展示了预测姿势的可视化对比
 ![[assets/figures/papers/paper_list_l1077_https_openaccess_thecvf_com_content_CVPR2026_html_Wei_Progressive_Guessi/figures/007_Table_3.jpg]]
 *Table 3: Comparison result of RNN-variants on 3DPW dataset*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 渐进式猜测范式的谱系定位
 
@@ -424,6 +430,8 @@ MotionDEQ 的适用边界受以下因素制约：
 2. **收敛速度的理论与工程优化。** 固定点求解的收敛速度是否存在理论保证？能否通过模型设计（如单调算子约束、Lipschitz 正则化）进一步减少所需迭代次数，逼近实时推理需求？
 3. **鲁棒热启动策略。** 在运动突变或无真值校准的离线场景，如何设计自适应的初始猜测机制？例如，基于运动模式切换检测动态选择冷启动或热启动策略。
 4. **多人交互与异构传感器场景。** 在多人交互运动或惯性传感器等异构数据源的流式预测中，该框架的等变/不变分解是否仍然适用？交互图的不动点求解是否会引入额外的收敛挑战？
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: 3DV
 year: 2024
 pdf_ref: paperPDFs/3DV_2024/ArtiGrasp_Physically_Plausible_Synthesis_of_Bi_Manual_Dexterous_Grasping_and_Articulation.pdf
+project_link: https://eth-ait.github.io/artigrasp/
+code_link: null
 aliases:
 - ArtiGrasp
 tags:
@@ -40,7 +42,7 @@ claims:
 > - Articulation (decoupled) 上，Articulation Success Rate (Suc.A↑) 0.55 vs 0.22 (D-Grasp) (+0.33)。
 > - Dynamic Object Grasping and Articulation 上，Task Success Rate (Suc.T↑) 0.50 vs 0.09 (D-Grasp) (+0.41)。
 
-## 概述
+## 概要
 
 **核心问题**：在物理模拟中同时实现双手灵巧抓取与铰接操作面临双重挑战——不仅需要精确的单指力控制和手腕协调来稳定抓握，还需在物体可动的前提下施加定向力以完成开合等铰接动作。直接端到端训练会导致双手相互干扰与精细动作冲突，使任务极易失败。现有方法如 **D-Grasp** 仅适用于单手抓取刚性物体，无法处理铰接任务。
 
@@ -56,7 +58,7 @@ claims:
 
 **局限性**：生成的手部姿态偶有不自然（源于参考姿势噪声与奖励权衡），仅支持单关节铰接物体，训练耗时约三天，尚未在真实机器人上验证。
 
-## 背景与动机
+### 背景与动机
 
 ### 问题背景
 
@@ -86,7 +88,7 @@ ArtiGrasp 的核心动机源于一个关键洞察：**通过单一强化学习�
 
 从更宏观的视角看，ArtiGrasp 的目标是降低双手灵巧操作合成的门槛：仅需一对静态手部参考姿势（可从动作捕捉数据或单目 RGB 图像重建中获得），即可生成完整的动态操作序列。这种“少样本”特性使其在实际应用中具有更低的部署成本，也为未来从视觉输入直接生成操作运动铺平了道路。
 
-## 核心创新
+## 核心方法与创新机理
 
 ### 瓶颈分析：双手协同抓取与铰接的物理合成难点
 
@@ -122,7 +124,7 @@ ArtiGrasp 的深层洞察在于：**抓取和铰接不应被视为两个独立�
 
 尽管创新显著，ArtiGrasp 仍存在若干限制。生成的手部姿势有时不够自然，这源于 ARCTIC 数据集的噪声标签以及任务奖励与模仿奖励之间的权衡（Figure 10）。此外，当前方法仅支持单铰接关节物体，无法处理多关节物体（如剪刀）或需要手指重新定位的任务。训练时间约三天，且未在真实机器人上验证。这些限制指向了未来的研究方向：如何引入手部姿态先验或生物力学约束来提升自然度，如何扩展至多关节物体，以及如何摆脱对静态参考姿势的依赖，实现完全自主的双手操作生成。
 
-## 整体框架
+### 整体框架
 
 ArtiGrasp 将双手抓取与铰接统一为单一强化学习策略，输入仅需一组静态手部参考姿势，输出物理模拟中连贯的双手操作运动序列。该方法的核心瓶颈在于：在物理模拟中同时实现双手抓取与铰接需要精确的手指控制和手腕协调，直接训练会因双手相互干扰和精细动作要求而导致任务失败。现有方法（如 D-Grasp）仅适用于单手抓取刚性物体，无法处理铰接任务。
 
@@ -159,12 +161,7 @@ ArtiGrasp 将双手抓取与铰接统一为单一强化学习策略，输入仅�
 
 整体而言，ArtiGrasp 通过“特征提取→策略推理→PD 控制→物理模拟”的闭环，配合课程调度和复合奖励函数，仅需静态手部参考姿势即可生成物理合理、可泛化的双手交互运动。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1653_ArtiGrasp_Physically_Plausible_Synthesis_of_Bi_Manual_Dexterous_Grasping/figures/002_Table_1.jpg]]
-*Table 1: Comparison between ours and existing methods. Ours generates two-hand manipulations using physics simulation, requires only static hand pose references (few shot), and accommodates both rigid and articulated objects with a unified policy*
-
-## 核心模块与公式推导
+### 核心模块与公式推导
 
 ArtiGrasp 的核心架构由四个紧密协作的模块构成，它们共同支撑了“单一策略统一抓取与铰接”的核心目标。
 
@@ -224,12 +221,12 @@ $$r_{\mathrm{task}} = -w_{tq} || \overline{\omega} - \omega || - w_{tx} || \math
 
 消融实验表明，缺少课程训练直接导致铰接成功率从 0.55 骤降至 0.36，角度误差从 0.57 升至 0.77（Table 5），证实了课程设计对于解决“双手协同铰接”这一核心瓶颈的决定性作用。
 
-### 补充图表
+### 多物体长序列证据
 
 ![[assets/figures/papers/paper_list_l1653_ArtiGrasp_Physically_Plausible_Synthesis_of_Bi_Manual_Dexterous_Grasping/figures/015_Figure_9.jpg]]
-*Figure 9: Long sequence with multiple objects. We show that our method can generate sequences of manipulating multiple objects. (A) Approaching the mixer with the left hand. (B) Grasping the mixer with the left hand. (C) Articulating the mixer with the right hand while the left hand is holding it. (D) Putting the mixer down on the table. (E) Approaching the box with both hands. (F) Grasping the box with both hands. (G) Relocating the box on the table and moving the left hand to the ketchup bottle. (H) Grasping the ketchup bottle with the left hand and opening the box with the right hand. (I) Relocating the ketchup bottle while the box is being held open. (J) Dropping the ketchup bottle into the box....*
+*Figure 9：跨多个物体的长序列操作，展示左右手在抓取、铰接、放置与切换目标间的连续协作。*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -278,34 +275,22 @@ Table 5 的消融实验验证了三个关键设计组件的因果贡献：
 3. **训练成本**：完整训练约需三天，且尚未在真实机器人上验证，Sim-to-Real 的域差距仍是一个开放问题。
 4. **对参考姿势的依赖**：方法需要预先提取或预测的静态手部参考姿势作为输入，尚未实现端到端从视觉直接生成操作序列。
 
-![[assets/figures/papers/paper_list_l1653_ArtiGrasp_Physically_Plausible_Synthesis_of_Bi_Manual_Dexterous_Grasping/figures/016_Figure_10.jpg]]
-*Figure 10: Unnatural hand poses (a) Some of the hand pose references we extract from the ARCTIC dataset contain unnatural hand poses. (b) Our method can output some unnatural hand poses, which can be due to noise in the hand pose references or because of the trade-off in the task objective*
 
 ### 对比公平性说明
 
 需注意 D-Grasp 原本为单手刚性物体抓取设计，其手腕控制基于逆运动学，并非为铰接任务优化。因此在铰接指标上的大幅领先部分反映了方法定位差异——ArtiGrasp 的核心贡献恰恰在于统一抓取与铰接的单一策略设计。在抓取子任务上两者性能相当，验证了统一策略并未以牺牲抓取能力为代价。
 
-### 补充图表
+### 代表性定性对比
 
 ![[assets/figures/papers/paper_list_l1653_ArtiGrasp_Physically_Plausible_Synthesis_of_Bi_Manual_Dexterous_Grasping/figures/006_Figure_3.jpg]]
-*Figure 3: Qualitative evaluation of Dynamic Object Grasping and Articulation. D-Grasp can grasp and relocate the object successfully, but fails to articulate the object. Ours is more successful at tackling this task and can articulate the object after relocation*
+*Figure 3：动态抓取与铰接定性对比；D-Grasp 能搬动物体但无法完成铰接，ArtiGrasp 在搬移后仍可继续铰接。*
 
-![[assets/figures/papers/paper_list_l1653_ArtiGrasp_Physically_Plausible_Synthesis_of_Bi_Manual_Dexterous_Grasping/figures/007_Figure_4.jpg]]
-*Figure 4: Qualitative articulation result. The hand shows some recovery ability from failure cases. Zoom in for details*
 
-![[assets/figures/papers/paper_list_l1653_ArtiGrasp_Physically_Plausible_Synthesis_of_Bi_Manual_Dexterous_Grasping/figures/008_Table_4.jpg]]
-*Table 4: Results with reconstructed hand pose references. When evaluated with predictions from images, we observe a minor drop in performance for grasping and articulation compared to mocap data. However, the overall performance shows that our method can handle noisy estimates. The asterisk (*) denotes using hand pose references from mocap*
 
-![[assets/figures/papers/paper_list_l1653_ArtiGrasp_Physically_Plausible_Synthesis_of_Bi_Manual_Dexterous_Grasping/figures/009_Figure_5.jpg]]
-*Figure 5: Motion generation. Our method can synthesize new motion sequences (c) with a noisy hand pose reference (b) reconstructed from a single RGB image (a)*
 
-![[assets/figures/papers/paper_list_l1653_ArtiGrasp_Physically_Plausible_Synthesis_of_Bi_Manual_Dexterous_Grasping/figures/013_Figure_6.jpg]]
-*Figure 6: Qualitative evaluation of grasping. When evaluated only on grasping, PD+IK often fails to successfully grasp the object. On the other hand, D-Grasp and ours succeed at the task*
 
-![[assets/figures/papers/paper_list_l1653_ArtiGrasp_Physically_Plausible_Synthesis_of_Bi_Manual_Dexterous_Grasping/figures/014_Figure_7.jpg]]
-*Figure 7: Qualitative evaluation of articulation. When evaluated only on articulation, both PD+IK and D-Grasp often fail at the task. On the other hand, our method can articulate the object successfully*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 与现有方法的关系
 

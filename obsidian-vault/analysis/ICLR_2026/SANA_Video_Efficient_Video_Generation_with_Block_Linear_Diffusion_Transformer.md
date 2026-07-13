@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/SANA_Video_Efficient_Video_Generation_with_Block_Linear_Diffusion_Transformer.pdf
+project_link: https://nvlabs.github.io/Sana/Video/
+code_link: null
 openreview_forum_id: mzAchylAtf
 aliases:
 - SV
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | SANA-Video：基于块线性扩散变换器的高效视频生成 |
 | 英文题名 | SANA-Video: Efficient Video Generation with Block Linear Diffusion Transformer |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=mzAchylAtf); [Project](https://nvlabs.github.io/Sana/Video/) |
+| Links | [paper](https://openreview.net/forum?id=mzAchylAtf) · [Project](https://nvlabs.github.io/Sana/Video/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | SANA-Video |
 | Dataset | VBench (480×832×81, T2V), VBench (T2V), VBench (I2V) |
@@ -42,7 +44,7 @@ claims:
 > - VBench (T2V) 上，Total Score 为 83.71，对比 83.31 (Wan2.1-1.3B)，变化 +0.40。
 > - VBench (I2V) 上，Total Score 为 88.02，对比 86.86 (Wan2.1-14B)，变化 +1.16。
 
-## 概述
+## 概要
 
 视频生成模型长期受限于Transformer自注意力的$O(N^2)$计算复杂度——随着空间分辨率提升和视频帧数增加，token数量急剧膨胀，使得高分辨率长视频的生成在计算与内存上均成为瓶颈。**SANA-Video**针对这一核心矛盾，提出以**线性注意力全面替代标准Softmax注意力**的架构方案，将复杂度降至$O(N)$，并在保持全局感受野的前提下，通过**块因果线性注意力与恒定内存KV缓存**实现长视频的高效自回归生成。
 
@@ -50,7 +52,7 @@ claims:
 
 在效率与性能的平衡上，SANA-Video展现出显著优势：在单张H100 GPU上生成5秒720p视频仅需**36秒**，相较Wan2.1-14B实现**53倍加速**；在480p分辨率下，VBench T2V总分**83.71**（超越Wan2.1-1.3B的83.31），I2V总分**88.02**（超越Wan2.1-14B的86.86），同时语义对齐分数分别领先**5.70**和**3.50**分。模型训练成本仅为12天×64张H100 GPU，约为同规模模型的1%。配合NVFP4量化，RTX 5090上5秒720p视频生成进一步降至**29秒**，使消费级硬件上的实时视频生成成为可能。
 
-## 背景与动机
+
 
 视频生成领域正经历从图像扩散模型到视频扩散模型的快速迁移，但这一迁移面临一个根本性的计算瓶颈：传统Transformer架构中自注意力机制的计算与内存复杂度为$O(N^2)$（$N$为序列token数）。在视频生成场景下，$N$随帧数、空间分辨率和时间维度的增加而急剧膨胀——例如一段720p、81帧的视频可产生数十万量级的token——使得全注意力机制成为高分辨率长视频生成的核心障碍。
 
@@ -64,7 +66,9 @@ claims:
 
 本文提出**SANA-Video**，旨在通过系统性地将线性注意力适配到视频扩散Transformer中，实现高效且高质量的视频生成。其核心动机是：在保持全局感受野的前提下，将自注意力全面替换为线性注意力，并结合稳定的RoPE集成策略、时空混合卷积以及恒定内存KV缓存机制，将复杂度降至$O(N)$，从而支持高分辨率长视频的高效生成。该方法在720p视频上实现4倍加速，推理延迟相比Wan2.1-14B降低53倍（36秒 vs. 1897秒），同时保持有竞争力的生成质量。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SANA-Video 的核心创新在于将视频扩散变换器的注意力机制从传统 Softmax 自注意力全面替换为**线性注意力**，并围绕这一操作设计了一整套支持高效长视频生成的架构与训练策略。其关键改动（changed slots）可归纳为以下五个维度：
 
@@ -110,7 +114,7 @@ $$O_i = \frac{\phi(Q_i) \left( \sum_{j=1}^{i-1} S_j + S_i \right)}{\phi(Q_i) \le
 
 **创新总结**：SANA-Video 以线性注意力为杠杆，系统性地重构了视频扩散模型的计算瓶颈——从 token 级注意力、时空特征提取、长序列缓存到自回归训练策略，形成了一套从 480p 到 720p、从 5 秒到分钟级视频的高效生成方案。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_mzAchylAtf/figures/005_Figure_2.jpg]]
 *Figure 2: Overview of SANA-Video. Fig.(a) A high-level block-wise autoregressive training pipeline based on our block causal KV cache. (Details in Sec. 3.3). Fig.(b) Our model pipeline, containing an Autoencoder, Re-writer, Linear DiT, and a text encoder. Fig.(c) The detailed design of the added 3D RoPE in linear attention and the temporal convolution in our Linear DiT’s Mix-FFN*
@@ -144,7 +148,7 @@ SANA-Video 采用三阶段训练策略（Sec. 3.1）：
 
 为缓解自回归生成中的曝光偏差，SANA-Video 采用 **单调递增 SNR 采样器**（Monotonically Increasing SNR Sampler），确保后序块的扩散时间步始终大于前序块；同时结合基于全局缓存的 **Self-Forcing 长训练**策略，将自回归训练扩展至 1 分钟视频（Sec. 3.4）。
 
-## 核心模块与公式推导
+
 
 ### 3.1 线性视频扩散变换器（Linear Video DiT）
 
@@ -195,7 +199,9 @@ $$O_i = \frac{\phi(Q_i) \left( \sum_{j=1}^{i-1} S_j + S_i \right)}{\phi(Q_i) \le
 
 **自 forcing 长训练**：利用块线性注意力的全局恒定缓存，在训练中对历史块使用模型自身预测而非真实潜变量，使训练与推理的分布更一致，支持扩展到分钟级视频生成。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：效率与性能的帕累托前沿
 
@@ -260,7 +266,9 @@ SANA-Video在VBench基准上实现了效率与质量的显著平衡。在480×83
 ![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_mzAchylAtf/figures/024_Table_7.jpg]]
 *Table 7: Architecture details of the proposed SANA-Video*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系与基线关系
 
@@ -311,6 +319,8 @@ SANA-Video 处于**高效视频扩散模型**这一细分方向，其核心创�
 4. **数据策略的深化**：更强的预训练数据筛选（如运动质量、美学评分）与更大规模的 SFT 数据能否进一步提升视频质量？数据效率与生成质量的关系值得深入研究。
 
 5. **与状态空间模型的融合**：线性注意力的状态累积机制与 Mamba 等状态空间模型存在形式上的相似性，两者能否在视频生成任务中互补或统一？
+
+
 
 ## 原文 PDF
 

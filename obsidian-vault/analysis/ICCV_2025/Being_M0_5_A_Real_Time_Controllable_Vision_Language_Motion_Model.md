@@ -5,6 +5,8 @@ paper_level: A
 venue: ICCV
 year: 2025
 pdf_ref: paperPDFs/ICCV_2025/Being_M0_5_A_Real_Time_Controllable_Vision_Language_Motion_Model.pdf
+project_link: https://beingbeyond.github.io/Being-M0.5
+code_link: https://github.com/ggml-org/llama.cpp
 aliases:
 - BM5
 - BM5RTCVLMM
@@ -41,7 +43,7 @@ claims:
 > - HuMo-Unseen (Instruct-to-Unseen) 上，FID 8.65 (HuMo100M训练) vs 18.62 (HumanML3D训练) (-9.97)。
 > - Left-right exchange test (Part-level control) 上，Success Rate 76% vs N/A（非部位感知方法不具备此能力）。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有视觉-语言-运动模型缺乏全面的可控性，无法同时处理多样指令、任意初始姿势、长序列、未见运动和细粒度部位控制。
 
@@ -55,7 +57,7 @@ claims:
 - 左右交换部位控制测试成功率 **76%**，验证了精确的部位感知生成能力。
 - 推理速度在多 GPU 上最低 **20 FPS**，H100 上峰值 **28.9 FPS**，满足实时要求。
 
-## 背景与动机
+
 
 ### 问题背景：从文本到视觉-语言-运动生成的演进
 
@@ -91,7 +93,9 @@ claims:
 
 这一设计使得Being-M0.5成为首个同时满足“全面可控”与“实时推理”要求的VLMM，为运动生成从学术基准走向实际部署提供了可行路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Being-M0.5 的核心创新围绕一个中心洞察展开：**将人体运动按解剖学部位分解并进行残差量化，同时在百万级多任务数据集上训练，可以在保持实时性能的前提下实现高度可控的运动生成**。这一洞察通过三个关键的技术槽位变更得以实现，共同解决了现有视觉-语言-运动模型在可控性维度上的根本瓶颈。
 
@@ -131,7 +135,7 @@ $$\mathcal{L} = \sum_{j=1}^{p} \| m_j - \tilde{m}_j \|_1 + \| m - \tilde{m} \|_1
 
 与上述创新协同工作的还有**逐帧解码策略**和基于 llama.cpp 的 4-bit 量化推理框架。模型以 7B 参数的 LLaMA-2-chat 为骨干，在 H100 GPU 上达到 28.9 FPS 的峰值推理速度，多 GPU 环境下最低 FPS 为 20，满足实时交互需求。这一架构选择在语言理解能力与计算效率之间取得了最优平衡，使得高度可控的运动生成不再以牺牲实时性为代价。
 
-## 整体框架
+
 
 Being-M0.5 构建于 **LLaVA-video-7B** 框架之上，是一个支持多模态输入/输出的视觉-语言-运动模型（VLMM）。其整体架构围绕三个核心组件展开：视觉编码器、大语言模型骨干网络和运动分词器，并通过三阶段课程训练实现全面的可控运动生成。
 
@@ -173,7 +177,7 @@ VLMM 的训练遵循**三阶段课程**：
 ![[assets/figures/papers/paper_list_l1767_Being_M0_5_A_Real_Time_Controllable_Vision_Language_Motion_Model/figures/001_Figure_1.jpg]]
 *Figure 1: Leveraging our million-scale dataset HuMo100M, we present Being-M0.5, the first real-time, controllable vision-language-motion model (VLMM) that achieves both high performance and practical efficiency. Being-M0.5 enables comprehensive controllability through five key capabilities: diverse natural language instruction following, flexible pose initialization, long-term motion sequence generation, handling of unseen motion patterns, and precise part-aware motion control*
 
-## 核心模块与公式推导
+
 
 ### 视觉编码与投影模块
 
@@ -215,7 +219,9 @@ $$\mathcal{L}(\boldsymbol{\Theta}) = -\sum_{j=1}^{L} \log P_{\boldsymbol{\Theta}
 
 其中 $\boldsymbol{\Theta}$ 为模型参数，$y_{j}$ 为第 $j$ 个目标令牌，$\mathcal{X}_{Q}$ 为多模态输入上下文，$\hat{y}_{1:j-1}$ 为已生成的前缀序列。训练遵循三阶段课程：运动-文本对齐、视觉-文本-运动对齐、运动指令微调。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 文本到运动生成主结果
 
@@ -279,7 +285,9 @@ Being-M0.5 基于 llama.cpp 推理框架，在多 GPU 环境下最低 FPS 为 **
 ![[assets/figures/papers/paper_list_l1767_Being_M0_5_A_Real_Time_Controllable_Vision_Language_Motion_Model/figures/008_Figure_4.jpg]]
 *Figure 4: Following Zhang et al. [21], we conduct additional evaluations across multiple benchmarks, including motion prediction on AMASS [48], 3DPW [49] and HuMo-MPI; motion in-between on AMASS; action-to-motion on UESTC [7] and motion-to-text on HumanML3D (HM3D) [3]. The comprehensive comparison results are presented in Figure 4*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -332,6 +340,8 @@ Being‑M0.5 的实时性能（H100 上峰值 28.9 FPS）依赖 llama.cpp 框架
 - **多人交互与复杂场景泛化**：当前模型针对单人运动设计，在多人协作（如双人舞、对抗运动）或与物体交互的场景下，部位控制是否仍然有效？这要求模型理解空间关系和社会性运动约束。
 - **低算力设备的实时性**：在移动端或嵌入式设备上，如何在不牺牲部位控制精度的前提下维持实时性能？可能需要探索更轻量的量化策略或蒸馏方案。
 - **运动学约束的显式建模**：引入物理先验（如关节角度限制、动力学方程）作为生成约束，能否减少数据噪声带来的伪影，同时不损害模型的多样性和可控性？
+
+
 
 ## 原文 PDF
 

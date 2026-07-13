@@ -42,7 +42,7 @@ claims:
 > - Curated Synthetic Test Benchmark (Rotation) 上，Rotation Accuracy 29.55%。
 > - Curated Synthetic Test Benchmark (Resize) 上，Resize Accuracy 9.17%。
 
-## 概述
+## 概要
 
 ### 1. 问题与瓶颈
 
@@ -64,7 +64,7 @@ Talk2Move 首次将**强化学习（RL）**引入文本引导的物体级几何�
 
 值得注意的是，旋转和缩放任务的绝对准确率仍然较低，表明复杂的几何变换仍是开放挑战。此外，当前方法仅在有限的任务类型和标准化模板上验证，向更复杂的组合变换和开放词汇指令的泛化有待进一步探索。
 
-## 背景与动机
+
 
 文本引导的图像编辑近年来取得了显著进展，现有方法能够根据自然语言指令调整图像的风格、颜色和局部纹理。然而，当任务从“外观编辑”转向“空间编辑”时，这些方法暴露出根本性的能力缺口：**它们难以执行物体级的几何变换**——即根据文本指令精确地平移、旋转或缩放场景中的特定物体。
 
@@ -74,7 +74,9 @@ Talk2Move 首次将**强化学习（RL）**引入文本引导的物体级几何�
 
 **Talk2Move** 的动机正是填补这一空白。其核心洞见是：将扩散模型的去噪过程形式化为马尔可夫决策过程（MDP），并引入**组相对策略优化（GRPO）** 框架。通过向去噪轨迹注入随机噪声生成多样化的采样路径，模型可以在无需成对监督的条件下探索几何动作空间。同时，专门设计的**空间感知奖励模型**——利用分割、深度估计和方向估计等专家模型——直接评估物体级的位移、旋转和缩放行为，提供可解释的几何反馈信号。这一范式将几何变换的学习从“模仿成对数据”转变为“最大化空间奖励”，从而绕开了对昂贵标注的依赖，使精确的文本驱动空间编辑成为可能。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 TALK2MOVE 的核心创新在于将文本引导的物体级几何变换问题从监督微调范式迁移至强化学习范式，并通过三个**changed slots** 实现突破。
 
@@ -114,7 +116,7 @@ $$K(t_{\text{sample}}+t_{\text{optim}})$$
 
 为增强 GRPO 训练的稳定性，TALK2MOVE 采用 SFT 冷启动策略：使用少量高质量成对数据（平移 800 对，旋转 43 对）进行 LoRA 微调（rank-64，3000 次迭代，学习率 1e-4），为扩散骨干网络嵌入基本空间编辑先验。消融实验表明，在仅 80 对标注数据的极限条件下，SFT 无法获得有意义增益，而基于小数据 SFT 检查点的 RL 仍能达到与全数据设置相当的性能，验证了 RL 范式在低数据场景下的鲁棒性。
 
-## 整体框架
+
 
 TALK2MOVE 提出了一种基于强化学习的文本引导图像编辑框架，专门解决物体级几何变换（平移、旋转、缩放）问题。其核心设计思路是将扩散去噪过程建模为马尔可夫决策过程（MDP），利用组相对策略优化（GRPO）在不依赖成对标注数据的情况下学习精确的空间操作。
 
@@ -154,7 +156,7 @@ $$\mathcal{J}_{\mathrm{GRPO}}(\theta) = \mathbb{E}\left[\frac{1}{G T}\sum_{i,t}\
 ![[assets/figures/papers/paper_list_l2726_https_arxiv_org_abs_2601_02356/figures/001_Figure_1.jpg]]
 *Figure 1: We introduce TALK2MOVE, a text-guided scene editing model for object-level geometric transformation, focusing on object translation, rotation and resizing, achieving superior results over current SOTA image editing models*
 
-## 核心模块与公式推导
+
 
 ### 问题形式化
 
@@ -209,7 +211,9 @@ $$K(t_{\text{sample}} + t_{\text{optim}})$$
 ![[assets/figures/papers/paper_list_l2726_https_arxiv_org_abs_2601_02356/figures/004_Figure_3.jpg]]
 *Figure 3: Three types of step sampling: (a) is the full sampling and optimizing GRPO [21, 40]; subsequent methods [14, 17] as in (b), use a sliding window (yellow) to reduce the optimizing steps per iteration; (c) our work introduces step-wise active sampling that select the informative steps (red) and use shortcuts to bypass the rest of the steps, reducing both the sampling and optimizing time*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -271,7 +275,9 @@ Figure 5展示了TALK2MOVE在平移、旋转和缩放任务上的定性编辑结
 ![[assets/figures/papers/paper_list_l2726_https_arxiv_org_abs_2601_02356/figures/011_Figure_5.jpg]]
 *Figure 5: Qualitative results on object translation, rotation and resize over state-of-the-art image editing models. For each task, we provide one real image editing result (source from OpenImagesV6 [11]) and one synthetic image editing result to showcase the generalization ability of TALK2MOVE*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位与核心差异
 
@@ -320,6 +326,8 @@ TALK2MOVE 的适用性受以下因素约束：
 - **多对象交互**：如何支持更复杂的多对象交互式空间编辑，例如相对位置关系的改变（“将 A 放在 B 的左侧”）？
 
 - **框架泛化**：该 RL 范式是否可以推广到其他生成式框架（如自回归模型），用于可验证的可控视觉生成任务？
+
+
 
 ## 原文 PDF
 

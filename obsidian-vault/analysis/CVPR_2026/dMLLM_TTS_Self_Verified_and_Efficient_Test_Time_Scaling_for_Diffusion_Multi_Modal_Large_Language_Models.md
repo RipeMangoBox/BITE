@@ -42,7 +42,7 @@ claims:
 > - GenEval 上，Overall (平均准确率) 0.92 (Lumina-DiMOO + dMLLM-TTS HTS, N=32, T=32, K=8) vs 0.78 (Lumina-DiMOO, 无 TTS, N=1, T=8) (+17.9%)；Overall 0.66 (MMaDA + dMLLM-TTS HTS) vs 0.51 (MMaDA, 无 TTS) (+29.4%)；Overall 0.67 (Muddit + dMLLM-TTS HTS) vs 0.53 (Muddit, 无 TTS) (+26.4%)。
 > - GenEval (效率对比) 上，推理速度提升 HTS 比 LTS 快 5×（Lumina-DiMOO）、6×（MMaDA、Muddit） vs 线性搜索（LTS） (5× - 6×)。
 
-## 概述
+## 概要
 
 扩散多模态大语言模型（dMLLMs）在文本到图像生成中展现出潜力，但其测试时计算扩展（Test-Time Scaling, TTS）面临两个核心瓶颈：**线性搜索策略导致 O(NT) 的高昂计算成本**，以及**依赖外部验证器带来的额外资源开销**。针对这些问题，本文提出 **dMLLM-TTS** 框架，通过两个关键机制实现高效且自验证的测试时扩展：
 
@@ -52,7 +52,7 @@ claims:
 
 在 GenEval 基准上，dMLLM-TTS 应用于三个代表模型（Lumina-DiMOO、MMaDA、Muddit）后，总体生成质量分别提升 **+17.9%、+29.4%、+26.4%**，同时 HTS 的推理效率最高可达线性搜索的 **6 倍**。自验证反馈在 Lumina-DiMOO 上表现与 VILA-Judge 相当，但弱于 GPT-4o，表明当前 dMLLM 的视觉理解能力仍有提升空间。该框架的局限性在于仅验证于扩散多模态大语言模型，对连续扩散模型或自回归模型的适用性尚待探索。
 
-## 背景与动机
+
 
 ### 扩散多模态大语言模型的生成瓶颈
 
@@ -75,7 +75,9 @@ claims:
 
 这两个机制协同工作：SVF 提供无外部依赖的轨迹质量信号，HTS 利用该信号实现自适应计算分配，从而在显著提升生成质量的同时实现最高 6 倍的推理加速。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 dMLLM-TTS 的核心创新在于将扩散多模态大语言模型（dMLLM）的测试时扩展重新定义为一个**自适应轨迹搜索问题**，并通过两个相互协同的 changed slots 实现高效、自验证的图文生成优化。
 
@@ -113,7 +115,7 @@ dMLLM-TTS 的完整框架在两个互补维度上扩展推理计算：**轨迹�
 
 这一设计实现了效率与质量的双赢：实验表明，HTS 在达到同等或更高生成质量的前提下，推理速度可达线性搜索的 **5–6 倍**（Lumina-DiMOO 上 5×，MMaDA 和 Muddit 上 6×），同时 Lumina-DiMOO 的 GenEval 总分从 0.78 提升至 0.92（+17.9%）。
 
-## 整体框架
+
 
 dMLLM-TTS 将测试时扩展（Test-Time Scaling, TTS）形式化为一个 **自适应轨迹搜索问题**，其核心由三个组件定义：
 
@@ -189,7 +191,7 @@ $$
 ![[assets/figures/papers/paper_list_l860_https_arxiv_org_abs_2512_19433/figures/001_Figure_1.jpg]]
 *Figure 1: dMLLM-TTS: We present the generative effects and performance improvements achieved by applying Test-Time Scaling (TTS) to dMLLMs. Images generated with TTS exhibit higher quality and stronger prompt alignment than those generated without TTS*
 
-## 核心模块与公式推导
+
 
 ### 3.1 扩散多模态大语言模型的生成范式
 
@@ -259,7 +261,9 @@ $$C_{\text{HTS}} \approx \mathcal{O}(N + T)$$
 ![[assets/figures/papers/paper_list_l860_https_arxiv_org_abs_2512_19433/figures/002_Figure_2.jpg]]
 *Figure 2: Visualization of the image generation process in dMLLMs. The first row shows the input latent masks at each step, and the second row depicts the corresponding outputs. Sampling begins with fully masked tokens (gray) and gradually fills the discrete multimodal token space with increasingly confident predictions (blue)*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验结果
 
@@ -330,7 +334,9 @@ dMLLM-TTS 在 GenEval 基准上对三个代表性 dMLLM 均实现了生成质量
 ![[assets/figures/papers/paper_list_l860_https_arxiv_org_abs_2512_19433/figures/008_Figure_7.jpg]]
 *Figure 7: Image Generation Process without (Top) and with (Bottom) dMLLM-TTS. The baseline models produce unsatisfactory text-to-image results. However, by incorporating our TTS strategies, the generation process is significantly improved*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与设计动机
 
@@ -395,6 +401,8 @@ dMLLM-TTS 的计算分配策略与 Best-of-N 采样、树搜索等方法形成�
 3. **训练时与测试时扩展的联合优化**：该测试时扩展框架与训练时扩展（模型参数量、数据规模）之间的关系如何？是否存在“计算最优”分配策略，在给定总计算预算下平衡训练与推理的投入？
 
 4. **更广泛生成任务的迁移**：HTS 的分层搜索策略是否适用于其他需要多轨迹探索的生成任务（如文本生成、代码生成）？其核心假设——早期步骤的低成本粗评估可有效预测最终质量——在不同模态中是否成立？
+
+
 
 ## 原文 PDF
 

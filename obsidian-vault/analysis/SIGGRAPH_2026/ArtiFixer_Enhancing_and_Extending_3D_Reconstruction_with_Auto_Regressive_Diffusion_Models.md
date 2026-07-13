@@ -5,6 +5,7 @@ paper_level: A
 venue: SIGGRAPH
 year: 2026
 pdf_ref: paperPDFs/SIGGRAPH_2026/ArtiFixer_Enhancing_and_Extending_3D_Reconstruction_with_Auto_Regressive_Diffusion_Models.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/sil/projects/artifixer/
 aliases:
 - AAAA
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | ArtiFixer：利用自回归扩散模型增强和扩展三维重建 |
 | 英文题名 | ArtiFixer: Enhancing and Extending 3D Reconstruction with Auto-Regressive Diffusion Models |
 | 会议/期刊 | SIGGRAPH 2026 |
-| Links | [paper](https://arxiv.org/abs/2603.00492); [Project](https://research.nvidia.com/labs/sil/projects/artifixer); [Project](https://research.nvidia.com/labs/sil/projects/artifixer/) |
+| Links | [paper](https://arxiv.org/abs/2603.00492) · [Project](https://research.nvidia.com/labs/sil/projects/artifixer) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | ArtiFixer（包含变体 ArtiFixer, ArtiFixer3D, ArtiFixer3D+） |
 | Dataset | Nerfbusters, DL3DV, Mip-NeRF 360 (9 views), DL3DV (novel content generation) |
@@ -42,7 +43,7 @@ claims:
 > - DL3DV 上，PSNR 为 20.14 (ArtiFixer3D)，对比 17.99 (DIFIX3D+ 3DGS)，变化 +2.15 dB。
 > - Mip-NeRF 360 (9 views) 上，PSNR 为 20.24 (ArtiFixer3D)，对比 16.79 (3DGS)，变化 +3.45 dB。
 
-## 概述
+## 概要
 
 ### 背景与瓶颈
 
@@ -74,7 +75,7 @@ ArtiFixer 提出了一套统一的框架，同时解决伪影修复和缺失内�
 
 ArtiFixer 虽达到交互式帧率，但仍慢于直接渲染神经场景表示；输出分辨率受骨干视频模型限制为 720p；在极长序列下的漂移和幻觉累积尚未量化评估。
 
-## 背景与动机
+
 
 三维场景重建旨在从一组稀疏的二维观测图像中恢复完整的几何与外观信息。以 3D Gaussian Splatting（3DGS）为代表的显式神经表示方法，通过将场景建模为一组可微的高斯原色，实现了高质量、实时的新视角渲染。其渲染过程可描述为沿视线方向的前向后投射合成：
 
@@ -92,7 +93,9 @@ $$C(\mathfrak{p}) = \sum_i c_i \prod_{k<i} (1 - \alpha_k)$$
 
 ArtiFixer 的动机正是打破这一僵局。其核心洞察在于：**即使高度退化的初始重建，当其渲染作为源分布的一部分并根据不透明度混合噪声时，足以同时约束生成过程并避免模式崩塌**。这一设计将退化渲染从“条件”提升为“起点”，使生成模型既能修复伪影，又能合理推断缺失内容，且该条件信号能有效支持蒸馏训练，从而简化整个流水线。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ArtiFixer 的核心创新在于重新定义了生成先验与三维重建的结合方式，通过三个关键设计突破现有方法的瓶颈：**不透明度感知的噪声混合策略**解决了生成一致性与创造力的根本矛盾；**因果自回归蒸馏**实现了长序列的高效一致生成；**精细的相机与不透明度条件注入**确保了即使输入完全退化时空洞区域仍能获得有效的几何引导。
 
@@ -142,7 +145,7 @@ ArtiFixer 提供三个递进式变体，形成完整的三维重建增强流水�
 
 这一流水线设计的关键洞察在于：高度退化的三维重建虽然自身质量不佳，但其渲染结果作为不透明度混合的源分布时，足以同时约束生成过程并避免模式崩塌；而生成器产生的干净视图又可反哺三维表示，形成“重建→生成→重建”的闭环增强。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2603_00492/figures/002_Figure_2.jpg]]
 *Figure 2: Method overview. We first train a bidirectional flow matching model that transports degraded RGB renderings into clean outputs. We encode the input RGB into latent space and mix with Gaussian noise using the rendered opacity maps to avoid mode collapse in unseen regions. We inject fine-grained opacity information and camera control along with optional clean reference views and a text prompt. In the second phase of our pipeline, we distill the teacher into an auto-regressive causal model via Self Forcing-style DMD distillation [Huang et al. 2025], which can be directly used to render novel views or used as pseudo-supervision to distill back into the underlying 3D representation*
@@ -182,7 +185,7 @@ ArtiFixer 的整体流水线围绕一个核心矛盾展开：如何让生成模�
 - **输出**：干净渲染序列（ArtiFixer）或增强后的 3DGS 重建（ArtiFixer3D/3D+）。
 - **关键约束**：退化渲染和干净渲染共享相同的相机轨迹；参考视图与目标视图的相机位姿通过 PRoPE 关联；文本提示在训练时以 10% 概率丢弃以支持无文本推理。
 
-## 核心模块与公式推导
+
 
 ### 3DGS 渲染与退化渲染生成
 
@@ -242,7 +245,9 @@ $$T_{o} := T_{r} + f_{o}(\mathrm{PixelUnshuffle}(\mathbf{O}))$$
 
 ArtiFixer3D 将自回归模型生成的干净视图一次性蒸馏回 3DGS 表示，获得显式的多视角一致 3D 重建。ArtiFixer3D+ 在此基础上重新应用生成器，以恢复 3D 蒸馏过程中损失的锐度。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -334,7 +339,9 @@ Table 4在Mip-NeRF 360上系统验证了关键设计选择：
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2603_00492/figures/019_Figure.jpg]]
 *Figure: 1 Step 3 Steps 4 Steps*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系与核心差异
 
@@ -373,6 +380,8 @@ ArtiFixer 位于**生成先验增强的3D重建**这一交叉领域，其技术�
 **自回归漂移的量化评估。** 自回归模型在极长序列下的漂移和幻觉累积需要系统性的量化研究，包括长序列下的多视角一致性退化曲线和内容漂移度量。
 
 **文本提示的利用效率。** 文本提示在稀疏设置下仅带来微小增益（+0.14 dB，Table 6），密集设置下影响可忽略。如何更有效地利用文本条件来指导未观察区域的内容生成，是提升生成合理性的潜在方向。
+
+
 
 ## 原文 PDF
 

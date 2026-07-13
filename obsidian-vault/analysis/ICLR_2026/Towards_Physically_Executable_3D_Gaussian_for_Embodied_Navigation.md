@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Towards_Physically_Executable_3D_Gaussian_for_Embodied_Navigation.pdf
+project_link: https://anonymous.4open.science/r/SAGE-3D-8764
+code_link: null
 openreview_forum_id: HB6KvsqcAn
 aliases:
 - S3SPAGE3N
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 面向具身导航的物理可执行3D高斯 |
 | 英文题名 | Towards Physically Executable 3D Gaussian for Embodied Navigation |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=HB6KvsqcAn); [Project](https://sage-3d.github.io); [Project](https://anonymous.4open.science/r/SAGE-3D-8764) |
+| Links | [paper](https://openreview.net/forum?id=HB6KvsqcAn) · [Project](https://sage-3d.github.io) · [Project](https://anonymous.4open.science/r/SAGE-3D-8764) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | SAGE-3D (Semantically and Physically Aligned Gaussian Environments for 3D Navigation) |
 | Dataset | SAGE-Bench VLN (高级指令), VLN-CE R2R Val-Unseen, 环境渲染速度 (每帧耗时) |
@@ -42,7 +44,7 @@ claims:
 > - SAGE-Bench VLN (高级指令) 上，OSR ↑ 为 0.55 (NaVILA-SAGE)，对比 0.26 (NaVILA-base)，变化 +0.29。
 > - VLN-CE R2R Val-Unseen 上，SR ↑ 为 0.38 (NaVILA-SAGE)，对比 0.29 (NaVILA-base)，变化 +0.09 (+31%)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -75,7 +77,7 @@ claims:
 
 当前方法依赖美术师创建的原始网格进行碰撞体提取，对扫描重建的真实场景需额外后处理。物理仿真能力尚未在动态物体、移动障碍物或完全非结构化环境（野外、水下）中验证。此外，所提连续性指标（CSR/ICP/PS）在导航成功率极低的模型上缺乏区分度。如何将语义-物理对齐范式推广至NeRF等其他隐式表示，以及如何实现从虚拟3DGS环境到真实世界的策略迁移，仍有待探索。
 
-## 背景与动机
+
 
 ### 具身导航的环境基础瓶颈
 
@@ -93,7 +95,9 @@ claims:
 
 针对上述缺口，本文提出**SAGE-3D（Semantically and Physically Aligned Gaussian Environments for 3D Navigation）**，其核心动机在于：通过为3DGS注入对象级语义标注与物理碰撞结构，将其从纯粹的视觉表示升级为**语义-物理对齐的可执行环境**。这一升级使得智能体能够：(1) 在照片级渲染的观测中理解对象级指令；(2) 在物理约束下执行连续导航动作；(3) 利用3DGS的高渲染效率与低显存占用，支持大规模训练。最终目标是验证：**在完全由3DGS构建的环境中训练出的VLN策略，能否在真实世界扫描场景（VLN-CE）上展现出更强的泛化能力。**
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：3DGS为何无法直接支撑具身导航
 
@@ -153,7 +157,7 @@ SAGE-3D的有效性通过以下关键实验得到验证：
 
 这些局限指向若干开放问题：如何通过课程学习或数据增强加速3DGS环境下的训练收敛？在动态物体场景下能否实时更新3DGS并维持物理仿真的实时性？该语义-物理对齐范式是否可以推广到NeRF等其他隐式表示，形成更通用的具身环境框架？
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l29_https_openreview_net_forum_id_HB6KvsqcAn/figures/003_Figure_2.jpg]]
 *Figure 2: Overview of SAGE-3D, which consists of two key components: (1) Object-Level Semantic Grounding, 3DGS data is annotated by expect at the object level, then be transformed into 2D semantic maps for path planning and instruction generation; (2) Physics-Aware Execution Jointing, where scene and object collision bodies are generated via convex hull decomposition, integrated into 3DGS to form a 3DGS-Mesh Hybrid Representation, with extensive physics simulation interfaces*
@@ -220,7 +224,7 @@ $$
 
 该框架的关键优势在于：3DGS-网格混合表示在保持照片级渲染质量（每帧 6.2 ms）的同时，提供了比传统扫描网格（每帧 16.7 ms）快 2.7 倍的渲染速度和 3.9 倍的显存节省（220 MB vs 850 MB），为大规模具身导航训练提供了高效的环境基础。
 
-## 核心模块与公式推导
+
 
 SAGE-3D 将 3DGS 升级为可执行的语义-物理对齐环境，其核心可形式化为一个转换过程：
 
@@ -262,7 +266,9 @@ $$\mathrm{PS} = 1 - \frac{1}{T-1} \sum_{t=2}^{T} \min \left( \frac{ | \Delta \th
 
 其中 $\Delta \theta_t = \theta_t - \theta_{t-1}$ 为相邻时间步的航向角变化量。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -308,7 +314,9 @@ SAGE-Bench基准包含两个核心任务：**视觉语言导航（VLN）** 与 *
 3. **场景多样性优于样本数量**：在固定数据总量下，增加场景数比增加单场景样本数对性能提升更显著，为数据高效训练提供了指导。
 4. **高级语义指令仍是瓶颈**：所有模型在高级指令下的表现显著弱于低级指令，相对关系和属性类指令尤为困难，需进一步验证（该结论基于Figure 6的SR差异，具体数值需查阅原文确认）。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位与核心瓶颈
 
@@ -352,6 +360,8 @@ SAGE-3D 提供的是**环境基础设施**而非导航策略本身。它的价�
 - **动态场景扩展**：在存在移动障碍物或动态物体的场景中，能否实时更新 3DGS 并维持物理仿真的实时性？
 - **跨表示泛化**：语义-物理对齐的范式是否可以推广到其他隐式神经表示（如 NeRF、3D Gaussian 的变体），形成更通用的具身环境框架？
 - **Sim-to-Real 迁移**：在完全虚拟的 3DGS 环境中训练出的 VLN 策略，能否通过微小的域适配（如风格迁移、物理参数校准）实现真实世界的零样本迁移？
+
+
 
 ## 原文 PDF
 

@@ -43,7 +43,7 @@ claims:
 > - Dynamic Replica 上，Dynamic Points APD↑ 93.44 vs 62.34 (SpatialTrackerV2) (+31.10)。
 > - Kubric-4D Dynamic Camera 上，Scene Flow EPE↓ 0.17 vs 1.70 (St4RTrack) (-1.53)。
 
-## 概述
+## 概要
 
 4D重建——从多帧视频中同时恢复稠密几何与运动——是自动驾驶、增强现实和机器人操作等应用的基础感知任务。然而，现有方法普遍存在三个瓶颈：**（1）无法统一处理多帧稠密几何与运动预测**，通常只能输出稀疏点跟踪或独立的两帧场景流/深度；**（2）输出缺乏度量尺度**，只能得到尺度模糊或归一化后的结果；**（3）难以利用多模态传感器数据**（如深度图、IMU位姿、雷达多普勒），限制了在真实部署场景中的精度与鲁棒性。此外，大规模高质量4D标注数据的稀缺进一步加剧了这些挑战。
 
@@ -53,7 +53,7 @@ Any4D 在多个基准上取得了领先性能。在稀疏3D点跟踪任务上，
 
 在方法谱系上，Any4D 属于**前馈多视图Transformer**家族，与 **VGGT** 等前馈几何方法共享类似的多视图注意力骨干，但其关键创新在于将几何与运动统一到因式化度量空间中，并支持多模态传感器输入。相较于需要后处理优化或多次前馈的基线（如 **MonST3R+CoTracker3** 的组合方案），Any4D 实现了真正的单次前馈推理，在效率与精度之间取得了显著突破。
 
-## 背景与动机
+
 
 从多帧视频中同时恢复稠密的3D几何与运动——即度量4D重建——是计算机视觉的核心目标之一，其应用涵盖自动驾驶、机器人导航、AR/VR以及动态场景理解。尽管近年来单目深度估计、多视图立体和运动结构恢复（SfM）各自取得了长足进步，但将这些能力统一到一个前馈框架中，并在度量尺度下输出稠密、时域一致的4D表示，仍然是一个开放难题。
 
@@ -78,7 +78,9 @@ Any4D 在多个基准上取得了领先性能。在稀疏3D点跟踪任务上，
 
 核心洞察在于，通过因式化的4D场景表示——将自我中心因素（深度、光线方向）与分配中心因素（场景流、相机姿态）分离——模型可以在部分标注的混合数据上训练，并实现鲁棒的多帧泛化。其中，**分配中心场景流**被证明是最优的4D运动参数化方式，相比3D点后运动或反向投影2D流等表示，能产生更干净的物体边界和背景运动估计（见 Table 5 和 Figure 5）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Any4D 的核心创新在于通过**因式化的度量4D场景表示**与**单次前馈多模态架构**，突破了现有4D重建方法在表示能力、传感器融合和推理效率上的根本瓶颈。其关键设计可归纳为以下五个维度的 changed slots：
 
@@ -108,7 +110,7 @@ Any4D 将输入空间从单一的 RGB 图像扩展至**RGB + 深度图 + 相机�
 
 **需要手动验证的点**：部分 baseline 方法（如 SpatialTrackerV2、St4RTrack、MonST3R+CoTracker3 等）的具体作者/年份/出处未在提供的分析材料中明确标注，如需在正式论文中引用，建议查阅原文确认完整元数据。
 
-## 整体框架
+
 
 Any4D 是一个统一的前馈 Transformer 模型，其核心设计目标是用**单次前馈推理**从任意 N 帧输入中直接输出**度量尺度稠密 4D 重建**。整体 pipeline 采用因式化表示策略，将复杂的 4D 场景解耦为全局尺度因子、自我中心（egocentric）因素和分配中心（allocentric）因素三个层次，使模型能在部分标注的混合数据上联合训练。
 
@@ -157,7 +159,7 @@ Any4D 的 pipeline 由五类功能模块串联构成（见 Figure 3）：
 ![[assets/figures/papers/paper_list_l2441_https_arxiv_org_abs_2512_10935/figures/002_Figure_2.jpg]]
 *Figure 2: Any4D’s unified capabilities overcome major limitations of existing 4D reconstruction models*
 
-## 核心模块与公式推导
+
 
 Any4D 的核心设计是将稠密度量 4D 重建分解为一组可联合预测的因子，并通过一个多视点 Transformer 在单次前馈中统一输出。其整体映射关系为：
 
@@ -215,7 +217,9 @@ $$\tilde { \mathbf { G } } ^ { \prime } { } _ { i } = \tilde { \mathbf { G } } _
 
 3. **4 视点训练对多帧泛化的必要性**：补充实验（Figure S.1）表明，仅使用 2 视点训练的模型在输入帧数增加时 EPE 显著升高，而 4 视点训练的模型在高达 64 帧输入时仍保持稳定性能。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -277,7 +281,9 @@ Any4D 在以下场景中重建质量会显著下降（Figure S.4）：
 ![[assets/figures/papers/paper_list_l2441_https_arxiv_org_abs_2512_10935/figures/015_Figure_S.4.jpg]]
 *Figure S.4: Qualitative visualizations of Any4D limitations. Videos with large camera motion inducing no visual overlap of background or scene motion dominating the image space are common failure modes for Any4D. We believe that the availability of large-scale dense scene flow and 3D tracking datasets and integrating real-time optimization is key to overcoming these limitations*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 
@@ -322,6 +328,8 @@ Any4D 的工作为以下方向留下了探索空间：
 3. **传感器受限场景的增强**：在没有雷达或深度传感器的通用平台上，能否通过自监督信号（如光度一致性、时序平滑性）进一步增强 4D 重建质量？Table 4 显示多模态输入能持续提升性能，但纯 RGB 变体在边缘区域仍存在偏移（Figure S.3）。
 
 4. **数据瓶颈的突破路径**：模型性能的进一步提升是依赖于更大规模的混合 4D 数据集，还是可以通过更好的数据增强或生成式模拟来弥补？这关系到整个领域的发展方向。
+
+
 
 ## 原文 PDF
 

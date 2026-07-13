@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Cultivating_Pluralism_In_Algorithmic_Monoculture_The_Community_Alignment_Dataset.pdf
+project_link: https://huggingface.co/datasets/facebook/community-alignment-dataset
+code_link: null
 openreview_forum_id: 4NtoAVqfhA
 aliases:
 - NCS
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 在算法单一文化中培育多元性：社区对齐数据集 |
 | 英文题名 | Cultivating Pluralism In Algorithmic Monoculture: The Community Alignment Dataset |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=4NtoAVqfhA); [Project](https://huggingface.co/datasets/facebook/community-alignment-dataset) |
+| Links | [paper](https://openreview.net/forum?id=4NtoAVqfhA) · [Project](https://huggingface.co/datasets/facebook/community-alignment-dataset) |
 | Topic | #topic/safety_alignment_fairness_privacy #topic/safety_alignment_fairness_privacy/alignment_preference |
 | Method | 负相关候选采样 (Negatively‑Correlated Sampling) |
 | Dataset | PRISM prompts (Section 3.1) + Inglehart-Welzel 价值维度, 同上, PRISM prompts, SFT+DPO on Llama-3.3-70B Instruct, SFT+GRPO on Llama-3.1-8B Instruct |
@@ -42,7 +44,7 @@ claims:
 > - 同上 上，生存价值 (Survival) 回复覆盖率 为 53%，对比 30%（温度采样平均），变化 +23%。
 > - PRISM prompts, SFT+DPO on Llama-3.3-70B Instruct 上，自我表达 (Self‑expression) 方向的胜率 (vs 原始模型) 为 0.958 ± 0.006 (NC sampling)，对比 ~0.5 (温度采样 τ=1, 1 LLM)，变化 > +0.45。
 
-## 概述
+## 概要
 
 现有对齐方法在构建偏好数据集时，候选回复几乎全部通过温度采样生成。这种独立采样策略导致候选集合高度同质化——所有回复集中在“世俗‑理性”与“自我表达”的价值端，而“传统”与“生存”价值观几乎完全缺失。大规模人类研究（五国、N=15,000）证实，人类偏好呈现显著的异质性，但21个主流LLM的回复仅与41%的人类偏好对齐，且几乎全部落在同一价值象限（Figure 1）。这一“算法单一文化”现象的根本瓶颈在于：候选集合缺乏价值观多样性，使得任何对齐方法都无法学习到多样的人类偏好。
 
@@ -50,7 +52,7 @@ claims:
 
 NC采样的效果具有决定性：仅使用一个模型，就将传统价值的平均覆盖率从温度采样的15%提升至60%，生存价值从30%提升至53%（Figure 2），且显著超越了21个模型独立温度采样的效果。更重要的是，在四种主流对齐方法（prompt‑steering、SFT、DPO、GRPO）下，使用NC采样数据集的胜率从约随机水平跃升至70–90%以上（Figure 3, Table E.1），证明候选集合多样性是对齐学习成功的必要条件。基于这一技术，本文构建并开源了Community Alignment数据集——目前最大的多语言偏好数据集，覆盖五种语言、233K偏好比较。
 
-## 背景与动机
+
 
 ### 算法单一文化：大语言模型的价值偏好同质化
 
@@ -64,7 +66,9 @@ NC采样的效果具有决定性：仅使用一个模型，就将传统价值的
 
 本文的核心洞察在于：候选回复集合的多样性——而非模型数量或对齐算法的选择——是学习多元人类偏好的关键因果杠杆。当候选回复通过**负相关采样（Negatively-Correlated Sampling）**生成时，即要求单一模型同时生成四个代表不同价值观的回复并明确要求回复间具有多样性，候选集合的价值覆盖发生根本性改变：传统价值覆盖率跃升至60%，生存价值覆盖率提升至53%（Figure 2橙色部分）。这一简单提示策略带来的帕累托改进，使得仅使用一个模型生成的候选集合，其价值多样性远超21个模型独立温度采样的效果。更重要的是，在此数据集上，所有四种主流对齐方法均能成功学习到不同价值观的偏好，胜率从随机水平跃升至70%–90%以上（Figure 3, Table E.1）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：候选回复集合的同质化
 
@@ -96,7 +100,7 @@ NC 采样的效果在多个层面得到验证：
 
 NC 采样目前完全依赖提示工程实现，其有效性受限于模型遵循指令的能力。在资源较少的语言（如印地语）上，模型可能无法充分理解“多样性”指令，导致负相关采样失效——这需要进一步的手动验证。此外，虽然 NC 采样更容易覆盖极端价值观，但在实际部署中需要谨慎控制对齐方向，防止产生不希望的价值表达。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0011_4NtoAVqfhA_Cultivating_Pluralism_In_Algorithmic_Monoculture/figures/005_Table_1.jpg]]
 *Table 1: Comparison of Community Alignment to other open-source preference datasets*
@@ -114,7 +118,7 @@ NC 采样目前完全依赖提示工程实现，其有效性受限于模型遵�
 
 **输入输出流**：流水线以日常提示（60个精心策划的提示）为输入，经NC采样生成每组四个候选回复，由人类或GPT‑4o裁判标注偏好，最终输出对齐后的模型。基于此流水线，作者构建并开源了Community Alignment数据集——目前最大的开源多语言偏好数据集，包含233K条对比、覆盖五种语言、来自3,603名标注者，且每位标注者贡献的中位会话数（26次）远超PRISM数据集（6次）（Table 1，Figure F.1）。
 
-## 核心模块与公式推导
+
 
 ### 候选回复生成：负相关采样
 
@@ -138,7 +142,9 @@ NC 采样目前完全依赖提示工程实现，其有效性受限于模型遵�
 
 若需深入理解NC采样的形式化定义，可参考论文中关于“负相关”概念的描述：候选集合中某一特定回复的纳入会降低另一个相似回复被纳入的概率。但论文未给出该概念的严格概率公式，仅通过提示工程近似实现这一原则。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈：候选回复集的价值观单一性
 
@@ -197,7 +203,9 @@ Community Alignment 数据集在规模和多语言覆盖上显著优于现有开
 ![[assets/figures/papers/iclr26_0011_4NtoAVqfhA_Cultivating_Pluralism_In_Algorithmic_Monoculture/figures/007_Table_2.jpg]]
 *Table 2: Table C.1: Accuracy of the judge model from our joint human study and model evaluation, broken down by value dimension and language*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有候选生成策略的关系
 
@@ -230,6 +238,8 @@ NC采样的有效性建立在两个前提之上：
 - **控制粒度的提升**：如何在NC采样中更精确地控制生成回复的价值观表达强度？当前方法仅能“覆盖”某价值观，但无法精细调节其表达程度（Open Questions）。
 - **多语言扩展**：能否利用回译等技术诱导模型在非英语语言中产生更丰富的价值观表达？这是将NC采样推广到全球多语言场景的关键挑战（Open Questions）。
 - **在线偏好收集的结合**：能否将NC采样与在线偏好收集方法结合，进一步提升采样效率和个性化程度？这指向了从静态数据集向动态、交互式偏好学习的演进方向（Open Questions）。
+
+
 
 ## 原文 PDF
 

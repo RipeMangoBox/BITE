@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Shuffle_R1_Efficient_RL_framework_for_Multimodal_Large_Language_Models_via_Data_centric_Dynamic_Shuffle.pdf
+project_link: https://xenozlh.github.io/Shuffle-R1
+code_link: null
 openreview_forum_id: mYP33u1QBK
 aliases:
 - SR
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | Shuffle-R1：通过数据中心动态重组实现多模态大语言模型的高效强化学习框架 |
 | 英文题名 | Shuffle-R1: Efficient RL framework for Multimodal Large Language Models via Data-centric Dynamic Shuffle |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=mYP33u1QBK); [Project](https://xenozlh.github.io/Shuffle-R1) |
+| Links | [paper](https://openreview.net/forum?id=mYP33u1QBK) · [Project](https://xenozlh.github.io/Shuffle-R1) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | Shuffle-R1 |
 | Dataset | Geometry3K (Geo3K), K12, Six visual reasoning benchmarks (MathVerse, MathVision, MathVista, WeMath, HallBench, ChartQA) |
@@ -42,7 +44,7 @@ claims:
 > - Geometry3K (Geo3K) 上，Accuracy 为 55.89 (Qwen-7B)，对比 52.60 (GRPO, Qwen-7B)，变化 +3.29。
 > - K12 上，Accuracy 为 62.22 (Qwen-3B)，对比 42.42 (Base Qwen-3B)，变化 +19.80。
 
-## 概述
+## 概要
 
 当前多模态大语言模型（MLLM）的强化学习（RL）训练面临一个核心瓶颈：**学习信号的质量分布极度不均**。标准训练范式对每条采样轨迹一视同仁，但实际中大量轨迹的优势值（Advantage）坍塌在零附近，无法提供有效的梯度更新方向；与此同时，能够产生非零梯度的“有效轨迹”比例随着训练进行持续下降，造成大量计算资源浪费。这两个现象——**优势值坍塌（Advantage Collapsing）**与**有效轨迹沉默（Rollout Silencing）**——共同导致RL训练效率低下，模型推理能力的提升受到严重制约。
 
@@ -57,7 +59,7 @@ claims:
 
 消融实验证实了 PTS 和 ABS 的独立贡献与协同效应：PTS 单独使用带来 +3.57 的准确率提升，联合 ABS 进一步增加 +1.67。理论分析从梯度期望放大、梯度范数放大和正偏差引入三个角度，为动态采样的有效性提供了形式化支撑。该方法还展现出良好的通用性，成功扩展到 32B 参数模型、指代表达理解（REC）任务以及纯文本大语言模型。
 
-## 背景与动机
+
 
 ### 多模态大语言模型RL训练的现状与瓶颈
 
@@ -83,7 +85,9 @@ claims:
 
 基于此，本文提出**数据中心动态重组（Data-centric Dynamic Shuffle）** 的核心思路：在RL训练的每个迭代中，通过动态优先级采样机制，放大高信息量的梯度信号，抑制低质量轨迹的影响，从而将有限的模型更新资源集中到最有价值的梯度信号上。这一思路催生了Shuffle-R1框架的两个关键模块——**对比度轨迹对选择（Pairwise Trajectory Sampling, PTS）** 和**基于优势的批次重组（Advantage-based Batch Shuffle, ABS）**，分别针对优势值坍塌和有效轨迹沉默这两个瓶颈进行精准干预。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Shuffle-R1 的核心创新在于将 RL 训练从**静态均匀采样**范式转变为**数据中心动态优先级采样**范式，通过两个紧密协作的模块——对比度轨迹对选择（PTS）和基于优势的批次重组（ABS）——直接控制梯度更新的来源和质量，从而系统性地解决 MLLM 强化学习训练中的两大瓶颈。
 
@@ -144,7 +148,7 @@ PTS 和 ABS 并非孤立运作，而是形成互补的级联机制。PTS 负责�
 
 Shuffle-R1 的动态采样策略虽然引入了额外的计算开销（扩展采样和批次重组），但换来了训练效率的大幅提升。Figure 7 的 wall-clock 训练曲线显示，Shuffle-R1 在早期训练阶段即大幅领先 GRPO，仅需约一半的训练步数即可达到 GRPO 的最终性能，总 GPU 时间仅增加 4%~7.7%。这种“以少量额外计算换取显著加速收敛”的特性，使 Shuffle-R1 在实际部署中具有明显的效率优势。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_mYP33u1QBK/figures/004_Figure_4.jpg]]
 *Figure 4: Overview of our proposed Shuffle-R1. After advantage calculation, we first conduct Pairwise Trajectory Sampling to obtain valuable trajectory pairs from original rollout pool, then perform Advantage-based Batch Shuffle to reshape the distribution of valid trajectories in a batch*
@@ -198,7 +202,7 @@ Shuffle-R1 的整体流程如图4所示，包含两个串行的核心模块：
 
 与 GRPO 等静态采样方法相比，Shuffle-R1 的核心差异不在于优化目标函数，而在于**梯度信号的来源控制**：PTS 通过对比度筛选决定哪些轨迹参与更新，ABS 通过自适应批次重组决定各轨迹的曝光频率。这种数据中心的视角使得 Shuffle-R1 能够在不改变基础 RL 算法（如 PPO 裁剪目标）的前提下，显著提升训练效率和最终性能——在 Geometry3K 上仅需 GRPO 约 60% 的 wall-clock GPU 时间即可达到同等精度。
 
-## 核心模块与公式推导
+
 
 ### 基础RL目标
 
@@ -274,7 +278,9 @@ ABS旨在缓解**有效轨迹沉默**（Rollout Silencing）——即产生非�
 
 PTS和ABS形成级联管道（Figure 4）：PTS首先从扩展的rollout池中筛选出高对比度轨迹对，过滤低信号样本；ABS随后对筛选后的轨迹对进行自适应批次重组，优化计算资源分配。消融实验（Table 4）证实：PTS单独使用将Geo3K准确率从42.64%提升至46.21%（+3.57），联合ABS进一步提升至47.88%（额外+1.67），验证了两模块的互补性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：两大训练瓶颈
 
@@ -401,7 +407,9 @@ Shuffle-R1 的实验效果得到了严格的理论分析支持。三个命题（
 - 评估使用相同的外部评估器 Gemini-2.0-Flash-001，报告 8 次运行的 pass@1 平均准确率
 - 扩展实验（32B、REC、纯文本 LLM）均采用与主实验相同的设置
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心贡献与差异化定位
 
@@ -450,6 +458,8 @@ Shuffle-R1 可被定位为 **数据驱动 RL 训练效率优化** 这一新兴�
 4. **与模型架构改进的协同**：本方法的数据中心理念与记忆增强、世界模型等架构改进方向是否存在协同效应？将动态优先级采样与结构化推理能力相结合，可能进一步推动多模态推理的边界。
 
 5. **理论收敛性分析**：Proposition 3 揭示了动态采样引入正偏差，但该偏差对策略梯度收敛性的长期影响尚未给出严格的收敛性保证。建立完整的理论分析框架将是重要的后续工作。
+
+
 
 ## 原文 PDF
 

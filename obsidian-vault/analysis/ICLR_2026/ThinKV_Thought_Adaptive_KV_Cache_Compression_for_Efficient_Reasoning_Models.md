@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/ThinKV_Thought_Adaptive_KV_Cache_Compression_for_Efficient_Reasoning_Models.pdf
+project_link: null
+code_link: null
 openreview_forum_id: M3CeHnZKNC
 aliases:
 - ThinKV
@@ -41,7 +43,7 @@ claims:
 > - LiveCodeBench (R1-Qwen-14B) 上，pass@1 accuracy 为 45.84 (k=1024)，对比 47.90 (FullKV 16-bit)，变化 -2.06。
 > - A100 throughput (R1-Llama-8B, 32K gen) 上，Throughput (tokens/s) 为 8412.2，对比 1450.5 (R-KV seq)，变化 5.8×。
 
-## 概述
+## 概要
 
 大型推理模型（LRM）在生成长思维链时，KV缓存随输出长度线性膨胀，迅速耗尽GPU显存，成为长推理任务部署的核心瓶颈。现有压缩方法或依赖token级注意力分数的启发式淘汰（如**H2O**、**R-KV**、**LazyEviction**），或采用统一量化策略（如**KIVI**、**PM-KVQ**），均忽视了思维链内部的推理动态结构，导致在保持精度与实现高压缩比之间难以兼顾。
 
@@ -51,7 +53,7 @@ ThinKV的核心洞察在于：思维链可被分解为三种功能类型——�
 
 实验表明，ThinKV在仅使用不到3.67%原始KV缓存存储的条件下，在AIME和LiveCodeBench等推理基准上实现近无损精度（与FullKV相比精度损失小于3.33个百分点），推理吞吐量最高提升5.8倍（Table 2），TPOT降低最高达1.68倍。该方法在ISO-batch和ISO-compression的公平设置下，系统性地优于现有量化和淘汰基线，为长推理任务的规模化部署提供了可行路径。
 
-## 背景与动机
+
 
 ### 推理模型的长输出瓶颈
 
@@ -91,7 +93,9 @@ $$\phi: \{y_0, \ldots, y_{n-1}\} \to \mathcal{T}, \; |\mathcal{T}| = 3$$
 
 上述分析表明，推理模型的思维链具有可被利用的结构化规律，而现有方法在 token 粒度的操作无法捕捉这一高层语义。ThinKV 的核心动机在于：**利用注意力稀疏性动态识别思维类型，根据思维重要性差异化分配量化精度和主动淘汰，消除 token 级启发式方法造成的关键信息意外丢失**。通过在思维粒度上统一量化和淘汰策略，ThinKV 旨在以不到 5% 的原始 KV 缓存实现近无损精度，同时通过系统级优化实现显著的吞吐量提升。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ThinKV 的核心创新在于将 KV 缓存压缩的控制粒度从传统的 token 级别提升到**思维段（thought segment）级别**，通过动态感知推理模型在思维链中表现出的注意力稀疏性模式，实施差异化的量化精度分配与渐进式淘汰。这一思路从根本上改变了现有方法在精度保持与高压缩比之间的权衡困境。
 
@@ -119,7 +123,7 @@ ThinKV 通过观察发现，注意力稀疏性在解码步上呈现**三模态�
 
 上述三个 changed slots 并非孤立改进，而是形成因果链条：思维分解提供类型标签 → TBQ 据此差异化量化 → TBE 利用类型间动态关系触发淘汰 → Continuous Thinking kernel 在系统层面高效执行淘汰而不损失吞吐。单独使用 TBQ 会导致生成长度膨胀，抵消压缩收益；ThinKV 通过联合 TBE 避免了这一问题（Table 4, Figure 10(d)）。这种“感知-决策-执行”的闭环设计，使得 ThinKV 在仅使用不到 3.67% FullKV 内存的情况下，在 AIME 和 LiveCodeBench 上实现近无损精度（Figure 8），同时将吞吐量提升至最高 5.8 倍。
 
-## 整体框架
+
 
 ThinKV 是一个面向大型推理模型（LRM）的思维自适应 KV 缓存压缩框架，其核心流程由四个关键模块串联构成：**Thought Decomposition**、**TBQ（Think Before You Quantize）**、**TBE（Think Before You Evict）** 和 **Continuous Thinking kernel**。整个 pipeline 的输入是模型在自回归生成过程中逐 token 产生的 KV 缓存，输出是经差异化量化和段粒度淘汰后的压缩缓存，最终由 Continuous Thinking 内核实现高效的内存复用。
 
@@ -143,7 +147,7 @@ ThinKV 是一个面向大型推理模型（LRM）的思维自适应 KV 缓存压
 
 整体而言，ThinKV 将“思维类型感知”作为统一的设计主线，贯穿量化精度分配、淘汰时机与粒度、以及内存管理三个维度，形成了一个从语义理解到系统实现的端到端压缩框架。
 
-## 核心模块与公式推导
+
 
 ThinKV 的核心洞察在于：推理模型的思维链可依据注意力稀疏性分解为**推理（R）、执行（E）与过渡（T）**三种思维类型。此三模态分布在多模型、多任务上稳定出现（Figure 3），且反事实重要性呈 R > E > T 的层级关系（Figure 4）。过渡思维虽不直接贡献答案，却能改变推理轨迹——完全消除将引发无限循环。基于此，ThinKV 构建了四个关键模块。
 
@@ -185,7 +189,9 @@ $$\operatorname{Mem}(KV) \propto (I + b L_{\mathrm{gen}}) \times a \beta$$
 
 其中 $I$ 为提示长度，$L_{\mathrm{gen}}$ 为生成 token 数，$a$ 为量化缩减因子，$b$ 为淘汰缩减因子，$\beta$ 为每参数字节数。ThinKV 通过联合优化 $a$ 和 $b$，在 1024 token 预算下将内存占用降至 FullKV 的 3.67% 以下（Figure 8）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 
@@ -263,7 +269,9 @@ ThinKV 在推理模型（LRM）的 KV 缓存压缩任务上，以极低的存储
 ![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_M3CeHnZKNC/figures/051_Table_12.jpg]]
 *Table 12: Throughput comparison under different batch sizes implemented in vLLM*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：长推理输出的KV缓存瓶颈
 
@@ -305,6 +313,8 @@ ThinKV的核心突破在于将压缩策略从**token级**提升到**思维级**�
 4. **混合长输入-长输出场景的协同优化**：当输入和输出均很长时，预填充压缩和ThinKV的自适应策略如何协同？预填充阶段是否也能利用思维类型信号进行差异化压缩？
 
 5. **与新兴推理架构的兼容性**：ThinKV的思维分解假设自回归生成中的注意力稀疏性模式。对于采用不同推理范式（如并行推理、树搜索）的未来LRM，该方法的有效性需要重新验证。
+
+
 
 ## 原文 PDF
 

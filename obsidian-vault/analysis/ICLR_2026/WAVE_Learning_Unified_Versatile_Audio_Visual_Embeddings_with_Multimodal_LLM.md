@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/WAVE_Learning_Unified_Versatile_Audio_Visual_Embeddings_with_Multimodal_LLM.pdf
+project_link: null
+code_link: https://github.com/TCL606/WAVE
 openreview_forum_id: MiV3WXDYJb
 aliases:
 - WAVE
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | WAVE: 基于多模态大语言模型的统一通用音视频嵌入学习 |
 | 英文题名 | WAVE: Learning Unified & Versatile Audio-Visual Embeddings with Multimodal LLM |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=MiV3WXDYJb); [GitHub](https://github.com/TCL606/WAVE) |
+| Links | [paper](https://openreview.net/forum?id=MiV3WXDYJb) · [GitHub](https://github.com/TCL606/WAVE) |
 | Topic | #topic/representation_self_supervised_transfer #topic/representation_self_supervised_transfer/representation_learning |
 | Method | WAVE |
 | Dataset | MMEB-v2-Video (Overall), MMEB-v2-Video QA (w/ separate questions), AudioCaps (A-RET), Clotho (A-RET) |
@@ -41,7 +43,7 @@ claims:
 > - MMEB-v2-Video QA (w/ separate questions) 上，Accuracy 为 72.5，对比 60.9 (Seed-1.6-Embedding)，变化 +11.6。
 > - AudioCaps (A-RET) 上，R@1 为 44.2，对比 42.2 (Mei et al., 2024)，变化 +2.0。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有多模态大语言模型（MLLM）的嵌入方法主要聚焦于静态图像，忽视了音频与同步音视频流的统一表示，导致无法构建真正的通用音视频嵌入空间。
 
@@ -51,7 +53,7 @@ claims:
 
 **方法定位**：WAVE 属于基于 MLLM 的统一嵌入学习范式，区别于 LamRA、GME、CAFe 等仅处理视觉-文本的嵌入 LLM，首次将音频与同步音视频纳入统一表示空间。其技术路线融合了多模态对比学习与指令微调，在方法谱系中处于“通用多模态嵌入大模型”节点。
 
-## 背景与动机
+
 
 多模态嵌入旨在将不同模态的数据映射到统一的向量空间，使语义相似的样本彼此靠近，从而支撑跨模态检索、问答等下游任务。近年来，基于大语言模型的嵌入方法在文本与图像领域取得了显著进展，但其焦点长期局限于静态视觉模态，对音频及同步音视频流的统一建模关注不足。这一缺口导致现有方案难以构建真正通用的音视频嵌入空间——当任务需要同时理解画面中的动作、场景以及与之同步的语音、环境声时，缺乏统一表示的模型往往顾此失彼。
 
@@ -59,7 +61,9 @@ claims:
 
 WAVE的动机正是填补上述空白：构建一个同时覆盖文本、音频、视频的统一嵌入空间，使任意模态之间均可进行语义检索与推理。为实现这一目标，WAVE在架构上引入层次化特征融合策略，聚合LLM所有层的last-token状态；在输入侧采用双音频编码器设计，分别捕捉语音和通用音频事件；在训练侧实施多模态多任务联合训练，融合检索式对比学习与指令感知的问答训练。这种“全层融合+双路音频+联合训练”的组合机制，构成了WAVE突破单一模态嵌入范式的核心因果路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 WAVE的核心创新在于将多模态大语言模型（MLLM）的嵌入能力从静态图像拓展至音频与同步音视频流，构建了首个统一文本、音频、视频三种模态的通用嵌入空间。其关键突破体现在三个互为支撑的机制上。
 
@@ -83,7 +87,7 @@ WAVE的核心创新在于将多模态大语言模型（MLLM）的嵌入能力从
 
 更进一步，WAVE利用MLLM的指令遵循能力生成**指令感知嵌入**。在视频QA任务中，使用分离问题提示（separate questions）产生的嵌入平均得分72.5，远超通用提示的51.8（Table 5），证实模型能够根据文本指令动态调整嵌入的语义焦点。Figure 2的热力图直观展示了同一视频在不同提示下生成的嵌入与不同概念文本嵌入的余弦相似度差异，揭示了指令感知嵌入的可控语义聚焦能力。
 
-## 整体框架
+
 
 WAVE 的整体架构围绕一个核心设计原则展开：将多模态大语言模型（MLLM）转化为一个统一的嵌入提取器，使其能够为文本、图像、音频和视频四种模态生成可互检索的向量表示。图1展示了完整的端到端信息流。
 
@@ -138,7 +142,7 @@ $$\mathcal{L}_{\mathsf{QA}_i} = -\log \frac{\exp(\sin(e_{s_i}, e_{t_i}) / \tau)}
 
 温度参数 $\tau$ 统一设置为 0.01。整个训练在 192 块 H20 GPU 上进行一个 epoch，总耗时约 36 小时，学习率为 $2 \times 10^{-5}$。
 
-## 核心模块与公式推导
+
 
 ### 3.1 统一嵌入提取流程
 
@@ -182,7 +186,9 @@ $$\mathcal{L}_{\mathrm{QA}} = \frac{1}{N} \sum_{i=1}^{N} \mathcal{L}_{\mathrm{QA
 
 WAVE 的关键能力之一是生成指令感知嵌入：同一视频在不同文本提示下产生不同的嵌入表示。对于多模态输入，文本提示始终作为指令输入 LLM，引导模型关注与任务相关的语义维度。这一机制使 WAVE 在视频 QA 任务上展现出显著优势——使用分离问题提示的嵌入平均得分 72.5，远超通用提示的 51.8（Table 5），验证了指令条件对嵌入语义的调控作用。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -255,7 +261,9 @@ WAVE在视频、音频及音视频多模态嵌入任务上均展现出显著优�
 ![[assets/figures/papers/paper_list_l49_https_openreview_net_forum_id_MiV3WXDYJb/figures/009_Table_8.jpg]]
 *Table 8: Results of video-to-text, audio-to-text and audio-to-video retrieval. Corresponding reference models and their scores are also provided*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位与基线对比
 
@@ -295,6 +303,8 @@ WAVE 构建于 **Qwen2.5-Omni 7B**（Xu et al., 2025）之上，继承了其 TMR
 3. **层次化融合的可泛化性**：WAVE 的全层 last-token 融合策略是否能泛化到更大规模的 MLLM 或更多模态（如 3D 点云、触觉）？融合模块的结构（当前为两层 MLP-GELU）是否需要随模型规模调整？
 
 4. **细粒度对齐的精度缺口**：指令感知嵌入与通用嵌入在细粒度多模态对齐任务（如指代表达理解、时序定位）上的性能差异尚未被系统评估，这可能是 WAVE 框架的下一个重要验证方向。
+
+
 
 ## 原文 PDF
 

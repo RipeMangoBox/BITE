@@ -32,7 +32,7 @@ claims:
 | 中文题名 | 3DGSR: 基于三维高斯泼溅的隐式表面重建 |
 | 英文题名 | 3DGSR: Implicit Surface Reconstruction with 3D Gaussian Splatting |
 | 会议/期刊 | SIGGRAPH ASIA 2024 |
-| Links | [paper](https://arxiv.org/abs/2404.00409) · [Code](https://github.com/NVlabs/tiny-cuda-nn) · [arXiv](https://arxiv.org/abs/2403.16964) |
+| Links | [paper](https://arxiv.org/abs/2404.00409) · [Code](https://github.com/NVlabs/tiny-cuda-nn) · [paper](https://arxiv.org/abs/2403.16964) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | 3DGSR |
 | Dataset | NeRF-synthetic, DTU |

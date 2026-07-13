@@ -43,7 +43,7 @@ claims:
 > - SceneBench 上，平均任务准确率增益（6任务） 无RAG基线 +1.40%（Scene-RAG平均增益） vs 无RAG基线（LongVA, Long-LLaVA, LLaVA-OneVision-7B各自基线） (+1.40%)。
 > - Video-MME 上，平均准确率增益（Overall） 无RAG基线 +10.47（Scene-RAG平均增益） vs 无RAG基线 (+10.47)。
 
-## 概述
+## 概要
 
 现有视觉语言模型（MLLMs）在长视频理解中面临一个根本性瓶颈：**长程上下文遗忘**。随着视频时长增加，模型难以有效聚合跨场景的语义信息来完成复杂推理任务。现有基准主要关注片段级（clip-level）理解，忽视了场景级（scene-level）推理对长程记忆与多模态证据整合的核心需求。
 
@@ -57,7 +57,7 @@ claims:
 
 Scene-RAG的局限性在于引入额外离线预处理开销（46分钟视频约需277秒），且长程遗忘问题尚未完全解决——在开源模型上的提升绝对值仍较小。该方法在更长视频（数小时级）上的扩展性以及与长上下文模型集成的潜力，仍有待进一步探索。
 
-## 背景与动机
+
 
 ### 长视频理解的层次性困境
 
@@ -75,7 +75,9 @@ Scene-RAG的局限性在于引入额外离线预处理开销（46分钟视频约
 
 现有检索增强生成（RAG）方法在视频理解中的应用——如Video-RAG——基于帧级相似度检索，虽能改善短程和长程推理，但在中程距离上表现挣扎（Figure 1）。其根本原因在于：帧级检索割裂了视频的语义连贯性，无法捕获场景内的事件完整性。这一观察驱动了本文的核心动机：**将视频组织为语义连贯的场景片段，构建以场景为粒度的多模态记忆库，并通过查询驱动的动态检索机制按需提供相关上下文**，从而系统性缓解长程遗忘问题。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题洞察：从帧级理解到场景级遗忘
 
@@ -116,7 +118,7 @@ Scene-RAG的创新设计在两类任务上得到验证：
 
 尽管Scene-RAG在场景级推理上取得进展，其创新仍存在边界：在开源模型上的提升绝对值较小（SceneBench约1.4%），长程遗忘问题并未完全解决。此外，场景分块引入的离线预处理开销（46分钟视频约需277秒）限制了实时应用场景的适用性。
 
-## 整体框架
+
 
 Scene-RAG 的核心设计理念是将长视频组织为语义连贯的**场景**（scene）单元，而非均匀的帧或片段序列，并围绕这些场景构建可检索的外部记忆，以缓解现有视觉语言模型（MLLM）在长程上下文推理中的遗忘问题。整个框架由三个串行阶段构成，形成一条从视频预处理到答案生成的完整流水线。
 
@@ -137,7 +139,7 @@ $$\operatorname*{min}_{x \in \mathbb{R}^n} \frac{1}{2} \sum_{t=1}^{n} (x_t - s_t
 
 值得注意的是，Scene-RAG 是一个**模型无关**的检索增强框架，可与不同的骨干 MLLM（如 LongVA、Long-LLaVA、LLaVA-OneVision-7B）配合使用，仅通过替换记忆构建与检索模块即可适配。
 
-## 核心模块与公式推导
+
 
 Scene-RAG 的核心设计动机源于一个关键观察：现有视觉语言模型在长视频理解中面临严重的长程上下文遗忘，难以有效聚合跨场景的语义信息以完成复杂推理。其因果调节变量在于模型是否具备以场景为单位的动态记忆构建与检索能力。基于此，Scene-RAG 将视频组织为语义连贯的场景片段，并通过检索增强生成机制按需提供相关场景记忆，从而缓解长程遗忘。
 
@@ -188,7 +190,9 @@ $$k = \mu_x + \alpha \sigma_x$$
 ![[assets/figures/papers/paper_list_l826_https_arxiv_org_abs_2603_27259/figures/002_Figure_2.jpg]]
 *Figure 2: We divide video information into frame, clip, scene, and video levels. For frame-level information, it focuses mainly on describing the details of the subject within the frame. Clip-level information includes temporal information but can only describe the objective behavior of objects. Scene-level information contains a lot of clip-level information and forms a complete scenario event, while video consists of a lot of scene-level content, with related scenes forming a logical storyline based on cause and effect. For convenience of quantification, we use two minutes to distinguish between clip and scene levels*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -258,7 +262,9 @@ SceneBench 包含 2,485 个视频（平均时长 1,978 秒）和 8,903 个问答
 ![[assets/figures/papers/paper_list_l826_https_arxiv_org_abs_2603_27259/figures/012_Table_7.jpg]]
 *Table 7: Runtime latency breakdown (video Length: 2,767s)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 方法谱系：从帧级检索到场景级记忆增强
 
@@ -297,6 +303,8 @@ SceneBench 在长视频理解基准谱系中占据独特位置。Table 1 的系�
 3. **场景分块的精确过滤参数**：Scene Tiling 中用于过滤短段的精确 ε 参数未明确给出，这影响方法的可复现性和在不同视频风格上的调优策略。
 
 4. **与长上下文模型的深度集成**：当前 Scene-RAG 以外部记忆形式叠加于骨干模型，未来是否可以将场景级记忆直接融入模型的长上下文窗口或训练目标中，实现更紧耦合的场景感知推理，仍是一个开放的研究问题。
+
+
 
 ## 原文 PDF
 

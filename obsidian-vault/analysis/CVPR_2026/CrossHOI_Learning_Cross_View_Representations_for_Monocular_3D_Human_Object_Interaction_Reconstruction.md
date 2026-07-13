@@ -42,15 +42,13 @@ claims:
 > - BEHAVE 上，CD_human ↓ , CD_object ↓ , Contactp ↑ , Contactr ↑ 4.27 / 7.68 / 0.687 / 0.576 (超越所有先前SOTA方法)。
 > - InterCap 上，CD_human ↓ , CD_object ↓ , Contactp ↑ , Contactr ↑ 5.17 / 8.38 / 0.724 / 0.491 (超越所有先前SOTA方法)。
 
-## 概述
+## 概要
 
 单目三维人-物交互（HOI）重建的核心瓶颈在于**人与物的相互遮挡**：被遮挡区域的几何信息完全缺失，导致重建完整性不足，尤其是接触区域的估计极不准确。现有方法仅依赖单视角图像特征，缺乏对不可见空间关系的推理能力。
 
 **CrossHOI** 的核心思路是**从单张图像生成另一个新视角的图像特征**，为单目重建补充空间几何先验，并在初始重建、接触估计和网格优化全阶段引入跨视角融合机制。具体而言，该方法利用预训练的跨视角生成器从原始视角推断出互补视角的特征表示，通过空间交叉注意力进行自适应融合以增强初始重建，再借助双向跨视角 Transformer 融合双视角的顶点特征，使模型能够在严重遮挡下更准确地预测接触区域并生成几何一致、物理合理的交互重建。
 
 在 **BEHAVE** 和 **InterCap** 两个公开数据集上，CrossHOI 在重建精度（Chamfer 距离）和接触预测（精度与召回率）方面全面超越现有 SOTA 方法（如 **CONTHO**、**HOI-TG**），尤其在严重遮挡场景下提升显著。消融实验进一步验证了跨视角特征在初始重建和接触估计两个阶段均能带来增益，且双向交叉注意力融合策略在所有融合方式中表现最优。
-
-## 背景与动机
 
 ### 单目三维人-物交互重建的核心瓶颈
 
@@ -70,7 +68,7 @@ claims:
 
 这一跨视角表征学习范式，为单目HOI重建中“从不可见到可见”的推理提供了新的技术路径。
 
-## 核心创新
+## 核心方法与创新机理
 
 CrossHOI 的核心创新在于**从单张图像显式生成另一视角的特征表示，并将跨视角互补信息系统性地注入到三维人-物交互重建的全流程中**。与现有方法仅依赖单视角特征进行重建不同，CrossHOI 通过“生成—融合—细化”三阶段机制，使模型能够在严重遮挡下感知被遮挡的接触区域和空间几何关系。
 
@@ -123,8 +121,6 @@ $$\hat{F}_{vB} = \mathrm{Softmax}\left(\frac{Q_{vB} K_{vA}^{\top}}{\sqrt{d_v}}\r
 - **全阶段注入收益最大**：在初始重建和接触估计两个阶段同时引入跨视角特征对整体性能提升最大；单独在其中任一阶段加入也能带来收益。
 - **遮挡场景增益显著**：在严重遮挡的 500 张样本上，CrossHOI 相较 CONTHO 基线在接触估计精度和召回率上分别提升 **5.6pp** 和 **6.1pp**，重建误差也显著降低。
 
-## 整体框架
-
 CrossHOI的整体流程围绕一个核心思想展开：**从单张RGB图像中生成另一个视角的图像特征，并在重建的多个阶段引入跨视角融合，以弥补单目输入中被遮挡区域的几何信息缺失**。如图2所示，整个框架由一条从图像到网格的级联通路构成，包含预训练的跨视角生成器、初始重建模块、顶点特征采样与融合模块，以及接触引导的跨视角细化模块。
 
 **输入与特征提取。** 给定单张图像 $I_A$ 及其相机内参 $K_A$，首先使用CNN骨干网络提取原始视角的图像特征 $F_A$。同时，相机内参通过一个小型MLP映射为与特征等维度的嵌入向量 $E_{K_A}$，作为位置偏置加到展平后的特征token上，形成几何感知的查询特征 $\tilde{F}_A$。这一设计使后续的跨视角映射能够显式地利用相机几何信息，而非仅依赖外观特征。
@@ -143,8 +139,6 @@ CrossHOI的整体流程围绕一个核心思想展开：**从单张RGB图像中�
 
 ![[assets/figures/papers/paper_list_l1012_https_openaccess_thecvf_com_content_CVPR2026_html_Geng_CrossHOI_Learning/figures/002_Figure_2.jpg]]
 *Figure 2: Pipeline of the proposed CrossHOI. Image features*
-
-## 核心模块与公式推导
 
 CrossHOI 围绕“从单视角推断互补视角特征”这一核心思想，构建了三个紧密协作的关键模块：**跨视角生成器**、**空间跨视角特征融合**以及**双向跨视角 Transformer**。以下逐一解析其设计逻辑与核心公式。
 
@@ -206,12 +200,7 @@ $$\mathcal{L}_{\mathrm{recon}} = \mathcal{L}_{\mathrm{init}} + \mathcal{L}_{\mat
 
 其中 $\mathcal{L}_{\mathrm{init}}$ 监督初始人体参数与物体位姿，$\mathcal{L}_{\mathrm{est}}$ 监督接触概率图，$\mathcal{L}_{\mathrm{ref}}$ 监督顶点偏移。跨视角生成器在此阶段冻结，仅作为特征提取器参与前向传播。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1012_https_openaccess_thecvf_com_content_CVPR2026_html_Geng_CrossHOI_Learning/figures/003_Figure_3.jpg]]
-*Figure 3: The training process of the cross-view generator. The image*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 整体性能对比
 
@@ -251,17 +240,8 @@ Figure 7展示了CrossHOI与HOI-TG和CONTHO在BEHAVE和InterCap数据集上的�
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l1012_https_openaccess_thecvf_com_content_CVPR2026_html_Geng_CrossHOI_Learning/figures/001_Figure_1.jpg]]
-*Figure 1: Compared with previous methods, our approach improves reconstruction accuracy in human-object occlusion scenarios by integrating cross-view features*
-
 ![[assets/figures/papers/paper_list_l1012_https_openaccess_thecvf_com_content_CVPR2026_html_Geng_CrossHOI_Learning/figures/004_Table_1.jpg]]
 *Table 1: Comparison of reconstruction quality*
-
-![[assets/figures/papers/paper_list_l1012_https_openaccess_thecvf_com_content_CVPR2026_html_Geng_CrossHOI_Learning/figures/005_Figure_4.jpg]]
-*Figure 4: Evaluation of cosine similarity scores for the cross-view pair*
-
-![[assets/figures/papers/paper_list_l1012_https_openaccess_thecvf_com_content_CVPR2026_html_Geng_CrossHOI_Learning/figures/006_Figure_5.jpg]]
-*Figure 5: Analysis of distribution-level similarity for cross-view pairs*
 
 ![[assets/figures/papers/paper_list_l1012_https_openaccess_thecvf_com_content_CVPR2026_html_Geng_CrossHOI_Learning/figures/008_Table_2.jpg]]
 *Table 2: Comparison of different vertex feature fusion strategies on the BEHAVE dataset*
@@ -275,12 +255,7 @@ Figure 7展示了CrossHOI与HOI-TG和CONTHO在BEHAVE和InterCap数据集上的�
 ![[assets/figures/papers/paper_list_l1012_https_openaccess_thecvf_com_content_CVPR2026_html_Geng_CrossHOI_Learning/figures/012_Figure_7.jpg]]
 *Figure 7: Qualitative comparison of human-object contact estimation with HOI-TG and CONTHO on the BEHAVE dataset (left) and InterCap dataset (right). Red circles indicate regions of contact prediction failure*
 
-![[assets/figures/papers/paper_list_l1012_https_openaccess_thecvf_com_content_CVPR2026_html_Geng_CrossHOI_Learning/figures/007_Figure.jpg]]
-*Figure: Front View Side View Input Image*
-
-![[assets/figures/papers/paper_list_l1012_https_openaccess_thecvf_com_content_CVPR2026_html_Geng_CrossHOI_Learning/figures/011_Figure.jpg]]
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 方法沿革与关系定位
 

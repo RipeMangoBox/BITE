@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/VADv2_End_to_End_Vectorized_Autonomous_Driving_via_Probabilistic_Planning.pdf
+project_link: null
+code_link: https://github.com/hustvl/VAD
 openreview_forum_id: 0a4dA6eUHN
 aliases:
 - VADv2
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | VADv2: 基于概率规划的端到端矢量化自动驾驶 |
 | 英文题名 | VADv2: End-to-End Vectorized Autonomous Driving via Probabilistic Planning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=0a4dA6eUHN); [GitHub](https://github.com/hustvl/VAD) |
+| Links | [paper](https://openreview.net/forum?id=0a4dA6eUHN) · [GitHub](https://github.com/hustvl/VAD) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | VADv2 |
 | Dataset | CARLA Town05 Long, NAVSIM navtest, 3DGS Closed-loop |
@@ -41,7 +43,7 @@ claims:
 > - CARLA Town05 Long 上，RC (Route Completion) 为 98.4，对比 87.3 (VAD)，变化 +11.1。
 > - NAVSIM navtest 上，PDMS 为 89.3，对比 88.0 (TransFuser)，变化 +1.3。
 
-## 概述
+## 概要
 
 现有端到端自动驾驶规划方法普遍采用确定性范式——直接从场景特征回归出单一的未来轨迹或控制信号。然而，驾驶员行为本质上是多模态和高度不确定的：在同一场景下，存在多种合理且安全的操作（如变道或保持车道），可行解空间往往是非凸的。确定性建模在此类场景下容易产生模糊甚至不安全的中间动作，导致闭环规划失败。
 
@@ -51,7 +53,7 @@ claims:
 
 主要实验结果验证了这一范式的有效性：在 CARLA Town05 Long 闭环基准上，VADv2 仅使用相机输入即达到 **DS 85.1**，显著超越此前最佳的相机方法（Rao et al., TIV 2024 的 74.9）及多数相机-激光雷达融合方法；在 NAVSIM navtest 上获得 **PDMS 89.3**；在 3DGS 闭环基准上碰撞率降至 **0.270%**。消融实验进一步证实，概率规划在所有交通密度下均优于确定性规划，且分布损失与冲突损失对模型性能至关重要。
 
-## 背景与动机
+
 
 端到端自动驾驶的核心目标是直接从传感器输入映射到驾驶动作，省去传统模块化架构中感知、预测、规划之间的手工接口。近年来，以 **UniAD**（Hu et al., Arxiv 2022）和 **VAD**（Jiang et al., ICCV 2023）为代表的矢量化端到端方法，通过将场景表示为实例级令牌，显著提升了规划的可解释性与性能。然而，这些方法在规划环节普遍采用**确定性范式**——即给定场景观测 $o$，直接回归唯一的动作序列 $a$。
 
@@ -61,7 +63,9 @@ claims:
 
 具体而言，VADv2 将连续的动作空间离散化为一个大规模的**规划词汇表**（Planning Vocabulary），每个词汇项代表一条预采样的候选轨迹；然后通过概率场函数学习场景到动作概率的映射 $p(a|o)$，并从大规模驾驶演示中通过 KL 散度监督该分布。这一范式转换使得模型能够自然输出多模态的安全动作，在非凸解空间中避免确定性回归的模糊输出问题。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 VADv2 的核心创新在于将端到端自动驾驶的规划从**确定性动作回归**重新定义为**场景条件概率分布建模**，从而系统性地应对驾驶行为中固有的多模态不确定性。这一范式转换通过三个紧密耦合的技术槽位实现，构成了方法的主干创新链。
 
@@ -101,7 +105,7 @@ $$\mathcal{L}_{\mathrm{conflict}} = \sum_{\pmb{a}\in\mathcal{V}} \mathbb{1}_{\ma
 
 推理阶段，VADv2 从预测分布中采样 Top-K 动作，通过基于规则的包裹器筛选安全动作，再由优化后处理器细化平滑轨迹。这一策略与确定性方法的单步回归加 PID 控制形成鲜明对比。消融表明，概率规划在所有交通密度下均优于确定性规划，尤其在高密度下 PDMS 领先 1.9 点（87.7 vs 85.8）（**Table 8**）。闭环实验中，VADv2 在 CARLA Town05 Long 上以纯相机输入达到 DS 85.1，显著超越此前最佳的相机方法（Rao et al. 2024 的 74.9）及多数融合方法（**Table 1**），验证了概率规划范式的有效性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_0a4dA6eUHN/figures/004_Figure_2.jpg]]
 *Figure 2: Overall architecture of VADv2. VADv2 takes multi-view image sequences as input in a streaming manner, tokenizes sensor data and planning action space, outputs the probabilistic distribution of action, and samples one action to control the vehicle. Large-scale driving demonstrations and scene constraints are used to supervise the predicted distribution*
@@ -124,7 +128,7 @@ $$p(\pmb{a}) = \sigma(\mathrm{MLP}(\phi(E(\pmb{a}), E_{\mathrm{scene}}) + E_{\ma
 
 整体架构的因果逻辑链清晰：**大规模驾驶演示 → 离散化动作空间（规划词汇表）→ 场景条件概率场建模 → 分布匹配与安全约束联合监督 → 概率采样与安全过滤 → 闭环控制**。这一设计从根本上将规划从确定性回归转变为不确定性感知的概率推断，是后续实验性能提升的结构性基础。
 
-## 核心模块与公式推导
+
 
 ### 3.1 场景编码器（Scene Encoder）
 
@@ -199,7 +203,9 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{distribution}} + \mathcal{L}_{\mathrm{confl
 
 闭环推理时，VADv2 从预测分布中采样 Top-K 动作（默认 Top-1），经基于规则的包裹器过滤不安全动作，再通过优化后处理器细化轨迹平滑性，最终由 PID 控制器转换为方向盘转角、油门和刹车控制信号。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -290,7 +296,9 @@ VADv2 在四个闭环基准上进行了全面评估：CARLA Town05 Long、NAVSIM
 - **Table 10 + Table 13**：4096 大小的 FTS 词汇表在覆盖度与效率间取得最优平衡。
 - **Table 11**：训练数据规模从 1e5 增至 3e6 片段，碰撞率降低近 8 倍（0.055% → 0.007%），表明规模化是进一步提升性能的关键路径。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与前作 VAD 的继承与变革
 
@@ -323,6 +331,8 @@ VADv2 直接继承自 **VAD**（Jiang et al., ICCV 2023）的矢量化场景表�
 - 如何利用更大规模、更多样化的专家驾驶数据来进一步缩小仿真与现实之间的差距？
 - 概率规划词汇能否动态扩展以适应未知环境，而不需要重新训练整个分布？
 - 如何将更先进的视觉语言模型（VLM）或大语言模型（LLM）融入概率规划框架，以处理需要复杂意图推理的驾驶场景？
+
+
 
 ## 原文 PDF
 

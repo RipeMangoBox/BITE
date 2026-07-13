@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Curvature_Guided_Task_Synergy_for_Skeleton_based_Temporal_Action_Segmentation.pdf
+project_link: null
+code_link: https://github.com/kong-johnny/CurvSeg
 openreview_forum_id: Vgh30npuN3
 aliases:
 - CGTSSBTAS
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 曲率引导的骨架时序动作分割任务协同 |
 | 英文题名 | Curvature-Guided Task Synergy for Skeleton based Temporal Action Segmentation |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=Vgh30npuN3); [GitHub](https://github.com/kong-johnny/CurvSeg) |
+| Links | [paper](https://openreview.net/forum?id=Vgh30npuN3) · [GitHub](https://github.com/kong-johnny/CurvSeg) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/segmentation |
 | Method | CurvSeg |
 | Dataset | PKU-MMD (X-sub), LARa |
@@ -41,7 +43,7 @@ claims:
 > - PKU-MMD (X-sub) 上，F1@50 为 65.5，对比 63.6，变化 +1.9。
 > - LARa 上，Acc 为 76.6，对比 75.3 (LaSA)，变化 +1.3。
 
-## 概述
+## 概要
 
 骨架时序动作分割（STAS）旨在将连续骨架序列切分为具有语义一致性的动作段。现有主流方法普遍采用解耦架构，将动作分类与边界定位视为两个独立子任务分别优化。然而，这两个子任务对特征的需求存在内在冲突——分类要求特征具有类别不变性，而边界定位则依赖对帧间差异的敏感性——这种需求矛盾导致信息孤岛，缺乏有效的跨任务协同，成为制约分割精度的核心瓶颈。
 
@@ -53,7 +55,7 @@ claims:
 
 方法仍存在若干局限：内部旋转变化等噪声可能产生虚假曲率峰，渐变过渡动作缺乏明显的曲率谷底，低动态动作的绝对分割性能仍有提升空间。这些方向为后续研究提供了明确的改进线索。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -83,7 +85,9 @@ claims:
 
 这种双向协同机制使得两个任务从相互掣肘转变为相互强化，形成"更好的分类特征→更清晰的曲率信号→更精确的边界预测→更优的特征空间组织"的正向循环。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CurvSeg 的核心创新在于**用几何曲率打通分类与边界定位两个子任务的信息孤岛**，构建了一个相互强化的正向循环。现有骨架时序动作分割方法（如 **DeST**、**LaSA** 等）普遍采用解耦架构：共享编码器提取特征后，分类头和边界头各自独立优化。然而，这两个子任务对特征的需求本质上是冲突的——分类追求类内不变性，边界定位则要求对状态切换高度敏感。解耦虽缓解了冲突，却也切断了任务间的信息流动，使分类特征中蕴含的边界线索和定位反馈对分类空间的塑造作用双双丧失。
 
@@ -117,7 +121,7 @@ $$ \mathcal{L}_{curv} = -\frac{1}{T}\sum_{t=1}^{T} MSE(\hat{y}_{t}^{b}, \varphi(
 
 EDD 与 CGS 并非简单叠加：EDD 单独使用可一致提升所有指标，CGS 单独使用带来最大的段 F1 提升，而完整模型的增益超过各模块独立贡献之和，展现了真正的协同效应。曲率作为边界代理也优于欧氏距离、余弦相似度和梯度显著图等替代方案，验证了几何先验的独特价值。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_Vgh30npuN3/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of CurvSeg. Our model processes video features through EDD to capture decoupled classification and localization representations utilizing task-specific experts. Subsequently, CGS leverages geometric curvature principles to guide task collaboration, enhancing both action boundary detection and classification performance*
@@ -173,7 +177,7 @@ $$\mathcal{L} = \mathcal{L}_{c} + \mathcal{L}_{b} + \lambda \mathcal{L}_{curv}$$
 
 该框架的核心洞察在于：在良好学习的分类特征空间中，动作段内特征因向类中心聚拢而呈现高曲率轨迹，过渡段特征因类别切换而呈现低曲率直线轨迹。CGS 利用这一几何特性，将分类特征空间的结构信息转化为边界定位的先验，同时边界预测的反馈又反向优化分类特征空间，使其几何结构更利于清晰边界。EDD 则通过专家路由机制为两个任务生成适配的特征表示，避免了共享特征导致的冲突。消融实验证实，EDD 和 CGS 的联合使用产生了超越各自独立贡献之和的协同增益（Table 3），验证了“任务解耦 + 几何协同”这一设计范式的有效性。
 
-## 核心模块与公式推导
+
 
 CurvSeg 的核心架构由两个关键模块构成：**曲率引导的协同模块（CGS）** 和 **专家驱动解耦模块（EDD）**。前者利用分类特征轨迹的几何曲率建立跨任务双向协同，后者通过混合专家机制为分类和边界定位生成任务自适应特征。
 
@@ -237,7 +241,9 @@ $$\mathcal{L} = \mathcal{L}_{c} + \mathcal{L}_{b} + \lambda \mathcal{L}_{curv}$$
 
 其中 $\lambda$ 为平衡超参数，在 PKU-MMD 上设为 4，LARa 上设为 2.5，MCFS 数据集上设为 2。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现与主实验
 
@@ -324,7 +330,9 @@ Table 8 进一步量化了动作动态性对性能的影响。低动态动作（
 
 Figure 6 展示了训练过程中曲率信号的变化，为几何假设提供了实证支撑。在早期训练阶段（Epoch 2, 8），曲率信号呈现噪声状或无规律的平坦分布，此时分类特征空间尚未形成良好的聚类结构。随着训练收敛（Epoch 64, 128），曲率信号呈现出清晰的模式：动作边界处出现明显的低曲率谷底，动作段内则呈现高曲率波动。这一演化过程验证了论文的核心理论——随着分类损失的优化，特征空间中的类簇越来越紧凑，迫使段内轨迹弯曲度增大，而段间过渡轨迹保持平直，曲率自然成为可靠的边界指示器。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：解耦架构中的信息孤岛
 
@@ -370,6 +378,8 @@ CurvSeg 的核心创新在于将几何曲率引入跨任务协同。其关键洞
 3. **几何协同的泛化**：曲率引导的双向协同思想能否推广到更一般的视频理解任务，如时序动作检测或动作预测？
 4. **自适应超参数**：窗口尺寸 $w$、分段数 $M$、损失权重 $\lambda$ 等超参数目前需按数据集手动调整，是否可通过元学习或自适应机制减少人工调参依赖？
 5. **极端噪声下的可靠性**：在骨架数据极度缺失或多人交互导致关节点混淆的场景下，如何保证曲率计算的可靠性？
+
+
 
 ## 原文 PDF
 

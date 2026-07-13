@@ -44,7 +44,7 @@ claims:
 > - KIT 上，FID 0.213 vs 0.404 (MLD) (-0.191)；R-Precision Top-1 0.430 vs 0.390 (MLD) (+0.040)。
 > - Complex Motion Subset (HumanML3D) 上，FID 0.144 vs 0.441 (MLD, estimated from context) (-0.297)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有文本到运动生成方法（如MLD、MDM、T2M-GPT）主要关注直接合成全局运动，忽略了运动序列中普遍存在的多个局部动作的细粒度生成与控制。如图5所示，大多数运动包含2个以上的局部动作，但现有方法缺乏对局部动作的显式建模，导致在合成复杂运动时生成结果与用户意图存在偏差，运动多样性和可控性受限。
 
@@ -62,7 +62,7 @@ claims:
 
 **局限与待验证问题**：生成运动受限于数据集最大长度，无法建模超出该长度的连续动作序列；方法在潜在空间扩散，难以进行低级编辑（如修改单个关节位置）；扩散模型的固有随机性可能导致偶尔不良的生成结果。这些限制需要在后续研究中进一步验证和改进。
 
-## 背景与动机
+
 
 ### 文本到运动生成的核心瓶颈
 
@@ -81,7 +81,9 @@ claims:
 
 针对上述缺口，本文提出 **GuidedMotion**，核心洞察是将全局运动生成分解为局部动作的先验采样和层次化引导扩散。具体而言，方法利用语义图将全局描述解构为多个局部动作，并通过能量函数和图注意力网络在扩散过程中施加动作级别的局部动作条件引导，实现从局部到全局的可控生成。这一设计降低了生成复杂性，同时赋予用户对每个局部动作的引导权重进行连续调节的能力，从而提高了运动的多样性和可控性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：全局生成缺乏局部动作的细粒度控制
 
@@ -140,7 +142,7 @@ $$e_{ij} = \sigma(\mathbf{M}^{\top} \tilde{\mathbf{h}}_{ij}) + \sigma(\mathbf{R}
 
 消融研究（Table 4）提供了最直接的因果证据：当移除局部动作引导后，FID 从 **0.057 急剧升高至 0.473**（与 MLD 基线持平），R-Precision Top-3 从 **0.788 降至 0.772**。这一对比清晰表明，局部动作引导是性能提升的核心驱动力，而非层次化架构或 VAE 的附带效果。在复杂动作子集（≥3 个局部动作，≥150 帧）上的实验（Table 3）进一步验证了该方法在协调多动作、长序列运动合成中的独特优势。
 
-## 整体框架
+
 
 GuidedMotion 的整体框架围绕一个核心思想展开：将全局运动生成分解为局部动作的先验采样与层次化条件扩散，从而实现对复杂运动的细粒度可控合成。图2展示了该框架的完整数据流。
 
@@ -166,7 +168,7 @@ GuidedMotion 的整体框架围绕一个核心思想展开：将全局运动生�
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2407_10528/figures/002_Figure_2.jpg]]
 *Figure 2: The overall framework of GuidedMotion for controllable text-tomotion generation. We propose to employ reference local actions as control signals in the global motion generation process. To automatically obtain these local actions, we deconstruct the original motion description into multiple local action descriptions and utilize a text-to-motion model to generate these local actions*
 
-## 核心模块与公式推导
+
 
 GuidedMotion 的核心设计是将全局运动生成分解为局部动作引导的层次化扩散过程。方法包含三个关键模块：**基于语义图的局部动作采样**、**基于能量函数的局部动作引导**，以及**层次化运动扩散架构**。
 
@@ -227,7 +229,9 @@ $$\mathcal{L}_S = \mathbb{E}_{z,\epsilon,t} \Big[ \| \epsilon^s - \phi_s(z^s, t^
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2407_10528/figures/003_Figure_3.jpg]]
 *Figure 3: The model architecture of the hierarchical motion diffusion model. Utilizing the semantic graph as input, the hierarchical diffusion model dissects the textto-motion diffusion process into three semantic levels, which correspond to capturing the overall motion, local actions, and action specifics. To enhance generation stability, we exclusively implement local action guidance at the action level*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -300,7 +304,9 @@ Figure 7展示了调整引导权重$\lambda$的可视化效果：通过改变每
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2407_10528/figures/009_Table_6.jpg]]
 *Table 6: Effect of diffusion steps on the HumanML3D test set. We use DDIM in practice and set*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 **GuidedMotion** 的核心贡献在于将文本到运动生成从“全局描述→全局运动”的单层映射，重构为“全局描述→局部动作引导→层次化运动扩散”的多阶段可控生成范式。该方法的方法论定位、与基线工作的关系及适用边界如下。
 
@@ -337,6 +343,8 @@ GuidedMotion 的性能提升可归因于三个相互耦合的机制：
 2. **潜在空间低级编辑**：如何在保持潜在空间扩散优势的同时，实现对单个关节位置等低级属性的精确编辑？
 3. **生成稳定性提升**：如何缓解扩散模型随机性带来的不良结果，例如通过后处理筛选或改进采样策略？
 4. **更高效的运动潜在空间**：如何设计更紧凑且重建质量更高的运动潜在表示，以减轻 VAE 瓶颈对生成质量的影响？
+
+
 
 ## 原文 PDF
 

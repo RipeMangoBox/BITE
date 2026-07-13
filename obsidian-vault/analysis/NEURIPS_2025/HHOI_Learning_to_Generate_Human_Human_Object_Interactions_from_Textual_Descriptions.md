@@ -5,6 +5,8 @@ paper_level: A
 venue: NEURIPS
 year: 2025
 pdf_ref: paperPDFs/NEURIPS_2025/HHOI_Learning_to_Generate_Human_Human_Object_Interactions_from_Textual_Descriptions.pdf
+project_link: https://tlb-miss.github.io/hhoi/
+code_link: https://github.com/rtqichen/torchdiffeq
 aliases:
 - SBHGDDGS
 - LGHHOIFTD
@@ -42,7 +44,7 @@ claims:
 > - multi-human generation (Table 2) 上，CLIP Score ↑ 0.2695 vs 0.2647 (Depth Opt.) (+0.0048)。
 > - multi-human generation (Table 2) – 5 humans 上，Success Rate (%) 100.0 vs 0.0 (both baselines) (+100.0)。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -60,7 +62,7 @@ claims:
 
 本工作处于**三维人体‑场景交互生成**与**基于分数的扩散模型**的交叉点。与仅处理单人 HOI 的 GenZI 以及依赖深度优化的多视图修复方法相比，本文首次将 HOI 与 HHI 显式分解为两个可独立训练的扩散模型，并通过引导采样实现联合生成。该方法在表征层面将 126 维 SMPL‑X 姿态压缩为 10 维学习型潜变量，在约束层面引入基于 24 胶囊代理的可微碰撞损失，为后续多人‑多物交互生成、文本驱动的三维场景编辑等任务提供了可扩展的技术骨架。
 
-## 背景与动机
+
 
 ### 问题定义：从单人交互到多人场景的范式跃迁
 
@@ -93,7 +95,9 @@ claims:
 
 为实现可控生成，本文方法以**文本描述**作为条件信号。CLIP 文本编码器将自然语言提示映射为条件嵌入，同时作用于 HOI 和 HHI 扩散模型，使得生成的多人交互行为在语义层面与输入文本对齐。例如，给定提示“两人走向自动售货机并使用它”，系统需同时理解“走向”的空间动态、“使用”的物体交互语义，以及“两人”的社会关系暗示。这种文本到 3D 交互的跨模态映射是本文方法实现语义可控 HHOI 生成的关键前提。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于将**多人-共享物体交互（HHOI）**这一复杂生成问题，分解为两个条件独立的子问题——**人-物交互（HOI）**与**人-人交互（HHI）**——并通过**引导采样**在推理阶段实现二者的隐含联合。这一设计直接回应了该领域的核心瓶颈：缺乏能协同建模多人围绕共享物体交互的数据集与生成方法，现有工作仅关注单人-物体交互或独立的多人类交互，无法保持场景级一致性。
 
@@ -154,7 +158,7 @@ $$\mathcal{L}_{\mathrm{col}}(\Phi_t) = \sum_{(\mathcal{H}_i,\mathcal{H}_j)\in\Ph
 - **碰撞近似的精度**：24 胶囊代理采用固定半径因子，在极端姿势下近似精度可能下降。
 - **可扩展性约束**：方法无法直接利用纯 HOI 或纯 HHI 数据集进行训练，限制了数据规模的可扩展性。如何有效利用这些更丰富的数据源仍是一个待探索的开放问题。
 
-## 整体框架
+
 
 ### 问题定义与输入输出
 
@@ -219,7 +223,7 @@ $$
 
 与现有工作的本质区别在于：**GenZI** 等方法通过多视角修复和深度优化处理多人 HOI，但缺乏对人-人关系的显式建模，无法保持场景级一致性；**Depth Opt.** 等方法结合修复、HMR 和深度优化，但仅能处理单人-物交互的扩展，在多人场景中成功率急剧下降（5 人场景成功率为 0%，见 Table 2）。本方法通过分解扩散与引导采样，首次实现了从文本描述到多人-物交互的端到端生成，且无需联合训练数据。
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题分解：HOI 与 HHI 的独立建模
 
@@ -296,7 +300,9 @@ $$\frac{d\phi_t^{z,i}}{dt} = -\sigma(t)\dot{\sigma}(t)\Psi_{\Theta^z}(\phi_t^{z,
 ![[assets/figures/papers/paper_list_l1799_HHOI_Learning_to_Generate_Human_Human_Object_Interactions_from_Textual_D/figures/010_Figure_7.jpg]]
 *Figure 7: HHOI Diffusion Architecture.HHOI diffusion consists of two disjoint diffusion models: HOI diffusion and HHI diffusion. Although the overal structure of each diffusion model is the same, they are implemented with separate networks due to their different target distributions. Each network learns the score function of the HOI or HHI distribution,respectively*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -355,7 +361,9 @@ $$\frac{d\phi_t^{z,i}}{dt} = -\sigma(t)\dot{\sigma}(t)\Psi_{\Theta^z}(\phi_t^{z,
 ![[assets/figures/papers/paper_list_l1799_HHOI_Learning_to_Generate_Human_Human_Object_Interactions_from_Textual_D/figures/009_Figure_6.jpg]]
 *Figure 6: Statistics on Collected Data Samples. Our dataset is constructed by integrating data from CORE4D and our multiview capture system, alongside synthetic samples generated via our data generation pipeline*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：从单人-物交互到多人-物协同生成
 
@@ -407,6 +415,8 @@ $$\frac{d\phi_t^{z,i}}{dt} = -\sigma(t)\dot{\sigma}(t)\Psi_{\Theta^z}(\phi_t^{z,
 2. **动态场景**：框架能否扩展到多人以不同物体交互的更复杂场景，或与运动生成方法（如 DNO、InterGen）深度耦合？
 3. **碰撞代理优化**：胶囊半径与数量是否可通过可微分方式学习，以在精度与计算效率之间取得更优平衡？
 4. **泛化性验证**：在野外场景（如拥挤的公共交通、体育比赛）中的表现尚未验证，用户研究的参与者来源与筛选标准也未详细说明，可能引入人口偏差。
+
+
 
 ## 原文 PDF
 

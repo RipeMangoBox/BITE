@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Overthinking_Reduction_with_Decoupled_Rewards_and_Curriculum_Data_Scheduling.pdf
+project_link: null
+code_link: https://github.com/pixas/DECS
 openreview_forum_id: kdeiRledV6
 aliases:
 - ORDRCDS
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 通过解耦奖励和课程数据调度减少过度思考 |
 | 英文题名 | Overthinking Reduction with Decoupled Rewards and Curriculum Data Scheduling |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=kdeiRledV6); [GitHub](https://github.com/pixas/DECS) |
+| Links | [paper](https://openreview.net/forum?id=kdeiRledV6) · [GitHub](https://github.com/pixas/DECS) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | DECS |
 | Dataset | AIME2024 (DS-1.5B), AIME2024 (DS-7B) |
@@ -41,7 +43,7 @@ claims:
 > - AIME2024 (DS-1.5B) 上，#Tokens 为 5550，对比 12202 (Base)，变化 -54.5%。
 > - AIME2024 (DS-7B) 上，Pass@1 为 51.33，对比 50.65 (Base)，变化 +0.68。
 
-## 概述
+## 概要
 
 大语言推理模型（LRMs）在复杂任务中展现出强大的推理能力，但其固有的“过度思考”（overthinking）现象导致大量冗余 token 消耗，严重制约了实际部署效率。现有方法普遍采用序列级别的长度惩罚来抑制冗余，但本文揭示了这一范式的根本性缺陷：**序列级奖励与 token 级策略优化之间存在严重不对齐**。具体而言，正确的长序列中必要的高熵探索 token 被错误地分配负优势，而短序列中的冗余 token 反而获得正优势——这导致模型在追求效率时抑制了有益的探索行为，破坏了效率与性能的平衡。
 
@@ -52,7 +54,7 @@ claims:
 
 实验结果表明，DECS 在七个基准上实现了超过 50% 的推理 token 压缩，同时 Pass@1 平均提升 +2.48 点（DeepSeek-R1-Distill-1.5B）和 +0.8 点（DeepSeek-R1-Distill-7B）。在限制 token 预算的条件下，DECS 的 Pass@K 性能与基础模型几乎重合，实现了近乎无损的压缩。消融实验进一步验证了课程调度和解耦奖励各自的关键贡献：移除课程调度导致性能明显下降，而仅移除解耦奖励则仍保留约 25% 的冗余 token。
 
-## 背景与动机
+
 
 ### 大语言模型的“过度思考”困境
 
@@ -90,7 +92,9 @@ $$r'(\mathbf{o}_i) = \begin{cases} r(\mathbf{o}_i) - \gamma |\mathbf{o}_i| & \ma
 
 3. **效率与性能的帕累托改进**：DECS 的目标并非简单地牺牲性能换取效率，而是通过在正确的位置施加正确的学习信号，实现 token 压缩与推理能力的同步提升。实验表明，DECS 在七个基准上将推理 token 减少超过 50%，同时 pass@1 平均提升 +2.48 点（DS-1.5B），验证了这一目标的可行性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DECS 的核心创新在于**发现了序列级长度惩罚与 token 级策略优化之间的根本性不对齐**，并针对性地设计了两项关键机制来实现精准的冗余消除，而非简单的“越短越好”。
 
@@ -139,7 +143,7 @@ $$\kappa_m = \text{clip}( \kappa_{m-1} + \beta (\mathcal{R}_m - \mathcal{R}_{m-1
 
 两者结合，DECS 在七个基准上实现超过 50% 的 token 压缩，同时 pass@1 平均提升 +2.48 点（DS-1.5B）和 +0.8 点（DS-7B），在限制 token 预算下 Pass@K 性能与基础模型几乎重合（Fig. 3c），实现了近乎无损的推理压缩。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_kdeiRledV6/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the DECS training pipeline. (1) Decoupled Token-level Reward: We finetune a small language model to detect the necessary reasoning prefix (NRP) from other redundancy, which are separately rewarded to penalize overthinking consistently while maintaining the probability for generating necessary reasoning steps. As the running example “What is 2 $\substack { + 3 ? } ^ { \mathrm { { s } } }$ shows, the NRP contains the reasoning chunks from the starting token to the first time the model generates the correct answer " 5 " . After that, any leading redundant token like “Wait” receives negative advantages, and thereby discourage any redundant tokens to be generated via autoregressive gen...
@@ -170,7 +174,7 @@ $$\kappa_m = \mathrm{clip}( \kappa_{m-1} + \beta (\mathcal{R}_m - \mathcal{R}_{m
 
 三个模块的解耦设计使得消融实验可以独立验证各自贡献：移除课程调度导致性能明显下降，移除解耦奖励则策略仍保留约 25% 的冗余 token。
 
-## 核心模块与公式推导
+
 
 DECS 的核心设计由三个协同模块构成，分别解决“惩罚什么”“如何惩罚”和“如何防止过度惩罚”三个问题。
 
@@ -226,7 +230,9 @@ $$\kappa_m = \text{clip}( \kappa_{m-1} + \beta (\mathcal{R}_m - \mathcal{R}_{m-1
 
 当 NRP 比例上升（即模型开始压缩推理长度）时，调度器自动增加简单 prompt 占比，防止高熵探索 token 被过度惩罚；反之则减少简单 prompt 占比，维持压缩压力。消融实验（Table 3）证实，移除课程调度后性能明显下降（Avg Acc 从 47.78 降至 46.31），验证了该模块在效率-性能平衡中的关键作用。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：效率与性能的同步提升
 
@@ -306,7 +312,9 @@ DECS 在 Qwen3-4B 模型上复现了相似效果（Table 2）：平均推理 tok
 *Figure 10: The Pass@1 score and average token counts on (a) AIME2024, (b) AIME2025 and (c) AMC23 datasets under diverse token limits with the DeepSeek-R1-Dsitill-7B base policy*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题根源：序列级奖励与 token 级优化的不对齐
 
@@ -348,6 +356,8 @@ DECS 的核心洞察在于：**通过定位必要推理前缀（NRP），对 NRP
 3. **非推理类任务的扩展**：DECS 在开放式对话、创意写作等非推理类任务上的适用性和表现如何？这些场景中“必要推理前缀”的定义可能需要重新设计。
 4. **多任务混合训练的课程调度**：能否将课程调度机制扩展到多任务混合训练场景，实现更鲁棒的数据分布自适应？当前调度策略仅针对单一数据分布设计。
 5. **与推理预算控制的结合**：DECS 在限制 token 预算下 Pass@K 性能与基础模型重合（Fig. 3c），实现了几乎无损的压缩。如何将这种能力与显式的推理预算控制机制（如 token 限制、早停策略）深度结合，值得进一步探索。
+
+
 
 ## 原文 PDF
 

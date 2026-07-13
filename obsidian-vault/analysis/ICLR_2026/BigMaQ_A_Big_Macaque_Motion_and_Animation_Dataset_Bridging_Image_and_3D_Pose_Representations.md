@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/BigMaQ_A_Big_Macaque_Motion_and_Animation_Dataset_Bridging_Image_and_3D_Pose_Representations.pdf
+project_link: https://martinivis.github.io/BigMaQ/
+code_link: null
 openreview_forum_id: n7viYE7Xbo
 aliases:
 - BigMaQ
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | BigMaQ：一个桥接图像与三维姿态表征的大型猕猴运动与动画数据集 |
 | 英文题名 | BigMaQ: A Big Macaque Motion and Animation Dataset Bridging Image and 3D Pose Representations |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=n7viYE7Xbo); [Project](https://martinivis.github.io/BigMaQ/) |
+| Links | [paper](https://openreview.net/forum?id=n7viYE7Xbo) · [Project](https://martinivis.github.io/BigMaQ/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | BigMaQ — 面向猕猴的个性化三维表面跟踪与姿态‑动作识别融合框架 |
 | Dataset | BigMaQ 四段动作序列 (Walk, Food Picking, Branch Shake, Scratch), 同上四段动作, BigMaQ500 动作识别 (多视觉骨干) |
@@ -41,7 +43,7 @@ claims:
 > - 同上四段动作 上，MPJPE (mm, 越低越好) 为 Walk 20.402, Food Picking 16.489, Branch Shake 13.633, Scratch 20.481；单帧总体 26.907 (Table 3 上下文)，对比 MAMMAL: 23.493, 25.521, 22.163, 28.843；单帧总体 31.661，变化 提升约 4-11 mm。
 > - 同上四段动作 上，MPJTD (mm/frame, 越低越好) 为 Walk 6.875, Food Picking 9.062, Branch Shake 15.515, Scratch 4.422，对比 MAMMAL: 9.961, 13.362, 17.676, 8.498，变化 降低 14% - 48%。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -59,7 +61,7 @@ BigMaQ 在方法谱系中处于**多视角表面跟踪**与**姿态‑视觉融�
 
 在表面重建质量上，BigMaQ 在四段典型动作序列（行走、取食、摇枝、抓挠）上的 IoU 达到 0.831–0.883，相较 MAMMAL 提升约 10–13 个百分点；MPJPE 降至 13.6–20.5 mm，提升约 4–11 mm。在动作识别任务上，仅使用姿态流即可达到 mAP 43.5±1.4，超过除 DINOv2-base 外的所有纯视觉基线；在六个视觉骨干上，视觉+姿态的 mAP 均显著优于纯视觉，最高提升近 12 点（ResNet50 从 34.3 升至 44.0）。消融实验进一步确认，以旋转矩阵表示的三维姿态在所有表示形式中取得最优识别性能，比三维关键点高约 10 点 mAP。
 
-## 背景与动机
+
 
 ### 非人灵长类行为分析的瓶颈
 
@@ -67,7 +69,9 @@ BigMaQ 在方法谱系中处于**多视角表面跟踪**与**姿态‑视觉融�
 
 更关键的是，现有工作从未将模型化的三维姿态特征与视频视觉特征进行系统性融合用于动作识别。视觉模型擅长捕捉场景上下文和外观线索
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 BigMaQ 的核心创新在于将猕猴行为分析从稀疏关键点层级推进到**个性化三维表面模型层级**，并首次将表面模型导出的姿态特征与视觉编码器深度融合，构成统一的动作识别流。其关键创新点可归结为以下三个维度。
 
@@ -100,7 +104,7 @@ BigMaQ 的核心创新在于将猕猴行为分析从稀疏关键点层级推进�
 
 - **姿态单独流的强竞争力**：仅使用姿态流（pose-only stream）即可达到 mAP 43.5±1.4，超过除 DINOv2-base 外的所有仅视觉基线模型（如 ResNet50 Vis 仅 34.3）。这揭示了一个核心洞察：**高精度 3D 姿态本身蕴含丰富的行为信息**，而表面模型提供的旋转矩阵表示是释放这一潜力的关键。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_n7viYE7Xbo/figures/004_Figure_3.jpg]]
 *Figure 3: Pipeline overview for generating BigMaQ and the BigMaQ500 action–pose recognition benchmark. The 3D Labeling Tool provides annotations used to train the detection and keypoint models as well as to optimize subject-specific avatars. These optimized avatars are then combined with video-inferred labels to obtain dynamic pose reconstructions. BigMaQ500 includes all annotations available in BigMaQ, and additionally contains video encodings for more than 500 actions for which complete video-to-3D pose correspondences could be established*
@@ -132,7 +136,7 @@ BigMaQ 的整体框架围绕一个核心目标展开：从多视角视频记录�
 
 > **需要手动验证**：管道图中 SAM 2 与 YOLOv8/HRNet-W48 之间的具体数据依赖关系（并行调用还是串行级联）在正文中未明确描述，建议参照 Figure 3 及附录确认。
 
-## 核心模块与公式推导
+
 
 BigMaQ 的三维表面跟踪与动作识别框架由两条技术主线构成：**个性化三维表面重建管线**和**姿态‑视觉融合动作识别模块**。前者负责从多视角视频中恢复高精度、带纹理的猕猴三维虚拟形象，后者则利用该形象导出的姿态特征与视频编码器协同进行动作分类。
 
@@ -195,7 +199,9 @@ $$ \mathbf{MPJTD}(\mathbf{J}_P) = \frac{1}{T-1} \frac{1}{N_K} \sum_{n=1}^{T-1} \
 
 动作识别以多标签平均精度均值（mAP）为核心指标，并按行为谱类别（移动、物体交互、社会交互、其他）进一步细分。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 表面跟踪重建评估
 
@@ -260,7 +266,9 @@ BigMaQ 在四段代表性动作序列（Walk、Food Picking、Branch Shake、Scr
 3. **贴近玻璃等反射表面**：前景分割掩码（SAM 2）在反射区域可能产生不完整轮廓，导致轮廓损失引导错误。
 4. **低面片网格渲染伪影**：低面片模板在背部区域偶尔出现三角形伪影，可通过切换至高面片个性化网格缓解，但需额外存储开销。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 
@@ -288,6 +296,8 @@ BigMaQ 的表面跟踪流水线依赖多个模块的级联输出，其性能边�
 3. **实时化。** 如何在保持重建精度的前提下大幅降低表面拟合的计算成本，使之向实时交互和闭环神经科学实验延伸？
 4. **行为学扩展。** 当前动作标签仅覆盖实验室特定猕猴群体的有限行为类别，如何扩展至更广泛的野外行为并获得行为学专家共识？
 5. **跨领域应用。** 除动作识别外，高精度 3D 姿态与外观模型还能为神经科学（如脑-行为关联分析）或社会行为计算（如支配等级推断）带来哪些新发现？
+
+
 
 ## 原文 PDF
 

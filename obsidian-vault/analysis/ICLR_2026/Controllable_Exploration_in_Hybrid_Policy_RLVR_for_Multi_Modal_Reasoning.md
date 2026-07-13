@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Controllable_Exploration_in_Hybrid_Policy_RLVR_for_Multi_Modal_Reasoning.pdf
+project_link: null
+code_link: https://github.com/zhh6425/CalibRL
 openreview_forum_id: 5wxyCidRsK
 aliases:
 - CEHPRMMR
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 面向多模态推理的混合策略RLVR可控探索 |
 | 英文题名 | Controllable Exploration in Hybrid-Policy RLVR for Multi-Modal Reasoning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=5wxyCidRsK); [GitHub](https://github.com/zhh6425/CalibRL) |
+| Links | [paper](https://openreview.net/forum?id=5wxyCidRsK) · [GitHub](https://github.com/zhh6425/CalibRL) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | CalibRL |
 | Dataset | In-domain geometry (平均), Out-of-domain (7个基准平均), GeoEval (个别困难集), MMMU (OOD) |
@@ -41,7 +43,7 @@ claims:
 > - Out-of-domain (7个基准平均) 上，准确率 (%) 为 59.36，对比 57.24 (GRPO)，变化 +2.12。
 > - GeoEval (个别困难集) 上，准确率 (%) 为 33.44，对比 26.15 (GRPO)，变化 +7.29。
 
-## 概述
+## 概要
 
 在多模态大语言模型（MLLM）的强化学习可验证推理（RLVR）训练中，存在一个关键瓶颈：直接模仿专家轨迹会导致策略熵快速下降（熵崩溃），使模型丧失探索更优推理路径的能力。现有的混合策略方法试图通过引入专家数据来引导学习，但始终无法实现稳定、可控的探索——策略要么过度确定性，要么进行无引导的随机探索，两者均导致性能下降。
 
@@ -51,7 +53,7 @@ claims:
 
 实验结果表明，CalibRL 在多个基准上取得了显著且一致的提升。在极具挑战性的 GeoEval 基准上，准确率达到 33.44%，远超 GRPO（26.15%）、SFT+GRPO（6.00%）及其他混合策略方法。在 7 个域外基准上，平均准确率提升 2.12 个百分点。消融实验验证了各组件的必要性：移除优势加权导致平均性能从 50.59 大幅下降至 45.30；LeakyReLU 参数 α 可有效控制探索强度，α=0.5 达到最佳平衡。与 LUFFY 和 RL-PLUS 相比，CalibRL 的训练后策略熵最高（1.4968 vs 0.0881 vs 0.3452），且奖励更高，证实其校准机制有效缓解了熵崩溃问题。
 
-## 背景与动机
+
 
 ### 多模态推理中的强化学习瓶颈
 
@@ -78,7 +80,9 @@ claims:
 
 基于此洞察，本文提出**CalibRL**——一个支持可控探索的混合策略RLVR框架，通过分布感知的优势加权和LeakyReLU非对称激活，实现对探索强度的精确调节。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CalibRL的核心创新在于重新定义了混合策略RLVR中专家数据的角色，将其从“绝对模仿目标”转变为“分布校准基线”，并通过两个互补机制——**分布感知的优势加权**和**LeakyReLU非对称门控**——实现对探索强度的可控调节，从根本上解决了现有方法面临的熵崩溃与探索失控困境。
 
@@ -121,7 +125,7 @@ $$\mathcal{L}_{\mathrm{exploration}} = |\hat{A}_i| \cdot \mathrm{LeakyReLU}(-s_i
 
 与LUFFY和RL-PLUS等混合策略方法相比，CalibRL的训练后策略熵最高（1.4968 vs 0.0881 vs 0.3452），且奖励更高（Table 15），表明其校准机制有效缓解了熵崩溃，实现了稳定、可控的探索。
 
-## 整体框架
+
 
 CalibRL 的整体框架围绕一个核心矛盾展开：在 RLVR 训练中，如何利用专家数据引导探索，同时避免策略熵的快速崩溃。传统混合策略方法要么将专家轨迹作为绝对模仿目标，导致策略过度确定性；要么进行无引导的随机探索，难以收敛到更优的推理路径。CalibRL 的关键设计在于**将专家数据重新定义为分布校准基线**，而非严格的模仿目标，从而在保留策略熵的同时，以受控方式引导探索方向。
 
@@ -168,7 +172,7 @@ $$ \mathcal{J}(\theta) = \mathbb{E}_{q \sim \mathcal{D}, \tau \sim \pi_{\theta}(
 
 **与现有混合策略方法的本质区别**：LUFFY 和 RL-PLUS 等方法的专家信号直接参与策略更新，导致训练后策略熵极低（LUFFY: 0.0881, RL-PLUS: 0.3452），而 CalibRL 保持熵为 1.4968 且奖励更高（Table 15），表明其校准机制有效缓解了熵崩溃。
 
-## 核心模块与公式推导
+
 
 ### 3.1 熵崩溃问题与专家监督的局限性
 
@@ -208,7 +212,9 @@ $$\mathcal{J}(\theta) = \mathbb{E}_{q \sim \mathcal{D}, \tau \sim \pi_{\theta}(\
 
 其中 $r_{i,t}(\theta) = \frac{\pi_{\theta}(\tau_{i,t}|s_{i,t})}{\pi_{\theta_{old}}(\tau_{i,t}|s_{i,t})}$ 为重要性采样比率，$\lambda$ 平衡标准策略优化与专家引导探索。消融实验（Table 5）表明 $\lambda=0.1$ 达到最佳折衷——过大的 $\lambda$（$\geq 0.3$）会导致性能急剧下降，因为探索信号压倒了策略优化的梯度方向。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈验证：熵崩溃与探索困境
 
@@ -274,7 +280,9 @@ Table 7验证了LeakyReLU的非对称性对性能的关键贡献：其表现优�
 2. **长度偏好风险**：Δℓ_i的对数概率计算可能引入轻微的长度偏好，尽管长度归一化消融实验（Table 12）表明该影响较小且未损害正确性学习。
 3. **任务领域局限**：当前实验主要集中在几何和数学推理任务，在其他多模态推理领域的有效性有待进一步验证。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：RLVR中的探索-模仿困境
 
@@ -333,6 +341,8 @@ $\alpha$ 和 $\lambda$ 的选择对性能有显著影响。$\alpha=0.5$ 和 $\la
 3. **与更先进RL算法的结合**：CalibRL的探索校准模块是作为GRPO的附加损失项设计的。该设计范式是否能与更先进的策略优化算法（如PPO的变体）无缝集成，值得进一步研究。
 
 4. **理论收敛性分析**：虽然实验表明CalibRL有效缓解了熵崩溃，但缺乏对混合目标 $\mathcal{J}(\theta) = \mathcal{J}_{\text{GRPO}} - \lambda \mathcal{L}_{\text{exploration}}$ 收敛性质的理论分析，特别是非对称门控如何影响策略的平稳分布。
+
+
 
 ## 原文 PDF
 

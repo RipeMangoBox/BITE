@@ -31,7 +31,7 @@ claims:
 | 中文题名 | CLIP2StyleGAN：StyleGAN编辑方向的无监督提取 |
 | 英文题名 | CLIP2StyleGAN: Unsupervised Extraction of StyleGAN Edit Directions |
 | 会议/期刊 | SIGGRAPH 2022 |
-| Links | [paper](https://arxiv.org/abs/2112.05219) · [Code](https://github.com/) · [arXiv](https://arxiv.org/abs/2112.05219") |
+| Links | [paper](https://arxiv.org/abs/2112.05219) · [Code](https://github.com/) · [paper](https://arxiv.org/abs/2112.05219") |
 | Topic | #topic/other_unclear |
 | Method | CLIP2StyleGAN |
 | Dataset | FFHQ / StyleGAN生成人脸 |

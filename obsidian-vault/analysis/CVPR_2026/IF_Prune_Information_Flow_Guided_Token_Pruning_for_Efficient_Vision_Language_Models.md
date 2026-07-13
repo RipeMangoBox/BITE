@@ -43,7 +43,7 @@ claims:
 > - InternVL2-8B (迁移实验) 上，Score % (K=5%) 94.03% vs 90.34% (SGP) (+3.69%)。
 > - InternVL2-26B (效率) 上，总 FLOPs %（相对无剪枝基准） 62.9% (K=5%, L=2) vs 100% (无剪枝) (-37.1%)。
 
-## 概述
+## 概要
 
 视觉语言模型（VLM）的推理成本随输入图像分辨率的提升而急剧增长，视觉令牌剪枝成为降低计算开销的关键手段。然而，现有剪枝方法存在根本性瓶颈：以 **SGP**（Zhao et al., CVPR 2025）为代表的方案依赖小模型在自回归生成过程中积累的注意力权重来评估令牌重要性，这种答案驱动的机制在面对需要复杂视觉推理的查询时，生成的重要性图包含大量噪声，无法为大型 VLM 保留足够的上下文线索，导致推理精度大幅下降。
 
@@ -53,7 +53,7 @@ IF-Prune 将视觉令牌剪枝从启发式规则转化为**摊销变分推断问
 
 主要实验结果确立了 IF-Prune 的有效性：在仅保留 **5%** 视觉令牌的极端条件下，大型 VLM（InternVL2-26B）仍保持原模型 **95.4%** 的性能，超越 SGP **6.5 个百分点**，同时总 FLOPs 降低约 **40%**。更重要的是，一个在 1B 模型上训练的剪枝指引可直接迁移至同架构的 8B 甚至 26B 模型，无需额外训练，展现出良好的泛化能力。
 
-## 背景与动机
+
 
 ### 视觉令牌冗余：大型 VLM 的效率瓶颈
 
@@ -77,7 +77,9 @@ IF-Prune 的核心动机在于**逆转这一范式**：不再要求小模型直�
 
 这一设计的另一个关键优势在于效率：小模型仅需一次前向传播即可产生所有令牌的重要性分数，无需像 SGP 那样进行完整的自回归生成。这从根本上消除了小模型推理带来的额外延迟开销。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 IF-Prune 的核心创新在于将视觉令牌剪枝从一个**答案驱动的启发式任务**重构为**后验引导的摊销变分推断问题**。与现有方法相比，这一范式转变体现在三个关键维度的机制改进上。
 
@@ -115,7 +117,7 @@ $$\mu_{\theta}(V_i') = \sigma(I_{\theta}(V_i')) \odot (V_i' - \mu_p) + \mu_p$$
 
 IF-Prune 的另一个重要特性是**剪枝指引的可迁移性**：一个在 InternVL2.5-1B 上训练的信息瓶颈模块，可以直接为同架构的更大规模模型（如 InternVL2-8B、InternVL2-26B）提供剪枝指引，无需针对大模型进行额外训练。这是因为 KL 散度衡量的令牌信息量是模型架构相关的内在属性，而非特定于模型规模。迁移实验表明，在 InternVL2-8B 上，IF-Prune 以 5% 令牌保留率仍达到 94.03% 的性能，比 SGP 高出 3.69 个百分点，验证了该特性的实用价值。
 
-## 整体框架
+
 
 IF-Prune 的整体推理管线由三个串联模块构成，形成“小模型感知—信息瓶颈评分—大模型剪枝推理”的闭环。其核心设计在于将视觉令牌重要性估计从答案驱动的启发式转换为**后验引导的信息瓶颈**，使剪枝信号同时感知查询与答案内容，为大型 VLM 保留更广泛的上下文线索。
 
@@ -172,7 +174,7 @@ $$\mathcal{L} = \mathbb{E}_{X,Y \sim \mathcal{D}, Z} [\log \pi_{\phi}(Y \mid X, 
 ![[assets/figures/papers/paper_list_l758_https_openaccess_thecvf_com_content_CVPR2026_html_Sun_IF_Prune_Informati/figures/001_Figure_1.jpg]]
 *Figure 1: (a) SGP utilizes a pre-trained VLM for the importance map prediction, but failed to provide helpful pruning guidance due to its answer-driven mechanism. (b) We fine-tuned an information bottleneck module to map the output visual embeddings from a small-VLM to a latent variable, which are used to compute the importance of each visual token given the provided text prompt. The pruning guidance is more helpful than SGP after top-K% pruning for the large-VLM*
 
-## 核心模块与公式推导
+
 
 ### 问题形式化：令牌级变分信息瓶颈
 
@@ -225,7 +227,9 @@ $$\beta(s) = \tau_{max} - (\tau_{max} - \tau_{min}) \cdot \min(1, s / \gamma)$$
 ![[assets/figures/papers/paper_list_l758_https_openaccess_thecvf_com_content_CVPR2026_html_Sun_IF_Prune_Informati/figures/004_Figure_3.jpg]]
 *Figure 3: Visualization of visual token importance map proposed by SGP and IF-Prune (ours)*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能对比
 
@@ -287,7 +291,9 @@ Figure 4 的性能-效率曲线表明，IF-Prune 在逐步提高剪枝比例时�
 ![[assets/figures/papers/paper_list_l758_https_openaccess_thecvf_com_content_CVPR2026_html_Sun_IF_Prune_Informati/figures/008_Figure_5.jpg]]
 *Figure 5: Comparison of the same large-VLM (L-VLM) with different pruning methods. For each visual input, we highlight the top-5% of all the visual tokens based on the importance map predicted by SGP and IF-Prune. Upper three: SGP provides answer-driven pruning guidance, impacting the large-VLM’s performance. Lower three: IF-Prune provides posterior-driven guidance, where the retained visual tokens are high query and answer relevance, allowing the L-VLM to perform sufficient visual understanding before answering*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：从“答案驱动”到“信息驱动”的范式转换
 
@@ -333,6 +339,8 @@ IF-Prune 的适用边界受以下条件约束：
 2. **时序一致性约束**：在链式推理和多轮对话场景中，不同轮次的剪枝决策可能存在上下文一致性问题。是否需要对信息瓶颈施加时间维度的约束（如时序 KL 正则化）以保持跨轮次的视觉上下文连贯性？
 3. **端到端联合优化**：当前方法将小模型训练与大模型推理解耦。能否通过联合训练小模型的剪枝策略与大模型的推理过程，进一步减少微调代价并实现更紧凑的端到端优化？这可能涉及直通估计器（Straight-Through Estimator）等离散剪枝操作的梯度近似技术。
 4. **先验分布的自适应学习**：当前先验分布 P(z) 为全局可学习参数，对所有令牌共享。引入上下文感知的先验（如基于查询类型动态调整先验方差）可能进一步提升信息量化的精度。
+
+
 
 ## 原文 PDF
 

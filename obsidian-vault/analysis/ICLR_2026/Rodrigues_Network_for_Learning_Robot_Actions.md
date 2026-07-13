@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Rodrigues_Network_for_Learning_Robot_Actions.pdf
+project_link: null
+code_link: null
 openreview_forum_id: IZHk6BXBST
 aliases:
 - RNR
@@ -42,15 +44,13 @@ claims:
 > - 笛卡尔空间运动预测 (UR5) 上，Test MSE (×10⁻⁶) 为 1.93 ± 0.34，对比 12.86 ± 1.25 (Transformer)，变化 -10.93 (84.9% 降低)。
 > - Imitation Learning (ManiSkill 5 tasks) 上，平均成功率 为 0.61 (Rodrigues-DP)，对比 ~0.47 (Transformer-DP)，变化 +0.14 (大幅提升)。
 
-## 概述
+## 概要
 
 通用神经网络架构（如 MLP、GCN、Transformer）在处理机器人动作学习时，缺乏对铰接系统运动学结构的归纳偏置，导致表示效率低下、泛化能力不足。本文提出 **Rodrigues Network (RodriNet)**，通过将经典前向运动学中的罗德里格斯旋转公式改造为可学习的 **Neural Rodrigues Operator**，为网络注入运动学感知的结构先验。
 
 核心思路是将前向运动学重写为 1、cosθ、sinθ 的线性组合，并将其中的固定结构系数替换为可训练权重，进一步扩展为多通道高维特征算子。基于该算子，RodriNet 构建了三个关键组件：**Rodrigues Layer**（沿运动链传递关节到连杆的信息）、**Joint Layer**（从连杆特征更新关节特征）和 **Self-Attention Layer**（跨连杆全局信息交换）。
 
 实验覆盖正运动学拟合、笛卡尔空间运动预测、模仿学习与 3D 手部重建四类任务，RodriNet 在参数量显著少于基线（如 0.2M vs ~3M）的前提下，均取得大幅性能优势。消融实验证实 Rodrigues Layer 是网络最核心的组件，移除后性能退化最为严重。
-
-## 背景与动机
 
 ### 铰接系统的动作学习：从通用网络到运动学感知架构
 
@@ -76,7 +76,7 @@ $$\mathbf{P}_{\mathrm{c}_j} = \mathbf{P}_{\mathrm{p}_j} \big( \mathbf{A}_j + \ma
 
 **本文的核心动机。** 基于上述分析，本文提出一个根本性问题：能否设计一种神经网络架构，将前向运动学的结构先验编码为网络自身的归纳偏置，从而在保持通用网络容量的同时，显著提升对铰接动作的表示能力、数据效率和预测精度？这一动机驱动了 Neural Rodrigues Operator 和 Rodrigues Network 的设计——通过将罗德里格斯旋转公式改造为可学习的多通道算子，并沿运动链分层传递信息，使网络天然"理解"关节驱动的运动学约束。
 
-## 核心创新
+## 核心方法与创新机理
 
 ### 瓶颈与动机
 
@@ -123,8 +123,6 @@ $$\mathbf{P}_{\mathrm{c}_j} = \mathbf{P}_{\mathrm{p}_j} \big( \mathbf{A}_j + \ma
 
 Rodrigues Network 的本质创新在于**将前向运动学的层次化旋转组合结构显式编码为神经网络的计算图**。这不同于简单的参数化技巧或注意力掩码——它直接改变了特征在运动链上的传播方式，使网络在架构层面就“知道”铰接系统的运动学约束。这种设计带来的优势在多个实验中得到了验证：参数减少 15 倍仍优于基线（正运动学拟合，Figure 3）、测试误差低于基线的训练误差（笛卡尔运动预测，Table 1）、以及作为即插即用的去噪网络 backbone 显著提升 Diffusion Policy 的模仿学习成功率（Table 2）。
 
-## 整体框架
-
 ![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_IZHk6BXBST/figures/017_Figure_6.jpg]]
 *Figure 6: Comparing our method to different baseline configurations in motion prediction with trainset siz $\colon = \bar { 1 0 } ^ { 5 }$
 
@@ -160,8 +158,6 @@ Rodrigues Network (RodriNet) 是一个专为铰接系统动作学习设计的神
 ### 设计理念总结
 
 整个 pipeline 的设计遵循一个清晰的原则：**用标准自注意力层提供网络容量，用运动学启发的神经算子注入归纳偏置**。这使得 RodriNet 在保持通用表达能力的同时，天然具备对铰接运动链结构的高效建模能力——在参数量仅为基线方法 1/15 的情况下（0.2M vs ~3M），仍能在正运动学拟合任务中取得显著更低的误差和更快的收敛速度（图3）。
-
-## 核心模块与公式推导
 
 ### 问题形式化：前向运动学的可学习重构
 
@@ -241,7 +237,7 @@ $$
 
 消融实验（表 11）严格验证了各模块的贡献：移除 Rodrigues Layer 导致测试 MSE 从 2.56 升至 6.19（性能退化最严重），证明该层是网络运动学归纳偏置的核心来源；移除 Joint Layer 同样持续降低性能；而 Self-Attention Layer 移除后训练误差略升但测试误差变化不大，表明其主要贡献模型容量而非运动学先验。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -358,27 +354,7 @@ Rodrigues-DP 在所有任务上均取得最高成功率，平均提升约 0.14�
 3. **强化学习场景未验证**：所有实验均为监督学习或模仿学习，在需要在线交互和探索的强化学习设置中，运动学先验是否同样有效尚待检验。
 4. **精密操作任务仍有差距**：PegInsertionSide 任务成功率仅 0.11，表明在需要亚毫米级精度的任务上，单纯的架构先验仍不足以解决根本困难，可能需要结合力反馈或更精细的感知信息。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_IZHk6BXBST/figures/003_Figure.jpg]]
-*Figure: (a) MSE vs. backbones. Fitting forward kinematics: MSE vs. iterations (b) MSE vs. training iters*
-
-![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_IZHk6BXBST/figures/009_Table_4.jpg]]
-*Table 4: Training hyperparameters for forward kinematics fitting experiment*
-
-![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_IZHk6BXBST/figures/010_Table_5.jpg]]
-*Table 5: Training hyperparameters for motion prediction in Cartesian space experiment*
-
-![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_IZHk6BXBST/figures/011_Table_6.jpg]]
-*Table 6: Training hyperparameters for imitation learning experiment (following Chi et al. (2023)’s settings)*
-
-![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_IZHk6BXBST/figures/012_Table_7.jpg]]
-*Table 7: Demo trajectories and training iterations for each task in imitation learning experiment*
-
-![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_IZHk6BXBST/figures/013_Table_8.jpg]]
-*Table 8: Training hyperparameters for 3D hand reconstruction experiment*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 核心瓶颈与设计动机
 

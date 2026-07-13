@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/FastAvatar_Towards_Unified_and_Fast_3D_Avatar_Reconstruction_with_Large_Gaussian_Reconstruction_Transformers.pdf
+project_link: null
+code_link: https://github.com/TyrionWuYue/FastAvatar
 openreview_forum_id: P7zBSCs4Xt
 aliases:
 - FastAvatar
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | FastAvatar：基于大型高斯重建Transformer的统一快速3D化身重建 |
 | 英文题名 | FastAvatar: Towards Unified and Fast 3D Avatar Reconstruction with Large Gaussian Reconstruction Transformers |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=P7zBSCs4Xt); [GitHub](https://github.com/TyrionWuYue/FastAvatar) |
+| Links | [paper](https://openreview.net/forum?id=P7zBSCs4Xt) · [GitHub](https://github.com/TyrionWuYue/FastAvatar) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | FastAvatar |
 | Dataset | NeRSemble (1-view), NeRSemble (4-view), NeRSemble (16-view) |
@@ -41,7 +43,7 @@ claims:
 > - NeRSemble (4-view) 上，PSNR 为 22.12，对比 17.52 (GaussianAvatars)，变化 +4.60。
 > - NeRSemble (16-view) 上，LPIPS 为 0.092，对比 0.281 (GaussianAvatars)，变化 -0.189。
 
-## 概述
+## 概要
 
 3D化身重建面临三大瓶颈：现有方法无法利用场景先验知识，导致对完整3D观察的严重依赖；依赖参数化代理模型进行观察对齐，精度与鲁棒性不足；无法有效处理可变长度的输入数据，数据利用率低。**FastAvatar** 针对这些问题，提出了一种统一且快速的前馈式重建框架。
 
@@ -51,7 +53,7 @@ claims:
 
 **方法定位**：FastAvatar属于前馈式3DGS化身重建方法，区别于逐场景优化的GaussianAvatars和单图前馈的LAM，其关键创新在于将VGGT风格的大规模Transformer架构引入头像任务，实现可变长度输入的直接重建与增量更新，在速度、质量与数据灵活性之间取得最优平衡。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -75,7 +77,9 @@ FastAvatar的提出正是为了回答这一问题。其核心洞察在于：将V
 
 FastAvatar处于前馈式可动画3DGS头像重建的交叉点。与基于优化的方法相比，它无需逐场景迭代，建模时间从分钟级降至秒级；与单图前馈方法（如LAM）相比，它原生支持多帧融合与增量重建；与多图回归方法（如Avat3r）相比，它在重建质量和渲染速度上均取得显著优势（16视图LPIPS 0.092 vs. 0.281，FPS 17.65 vs. <10）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FastAvatar 的核心创新在于将大规模 Transformer 架构引入 3D 化身重建任务，通过三个关键机制系统性突破了现有方法的瓶颈。
 
@@ -110,7 +114,7 @@ $$h_i = \mathcal{U}\left( x_i, \mathrm{MLP}([\pi_i, z_i^{exp}, z_i^{pose}]) \rig
 
 多帧融合导致高斯点数量线性增长，影响渲染效率。FastAvatar 采用 **Gumbel-Softmax 可微掩码**配合 L1 正则化 $\mathcal{L}_{mask} = \frac{1}{N}\sum_{i=1}^{N}|m|$，在训练中自动剪枝超过 50% 的无用高斯点。消融显示，去除剪枝后 4 视图高斯数量从 12.5K 增至 21.7K，而重建质量反而略降（Table 2），表明剪枝不仅提升渲染效率，还能通过稀疏化减少冗余表示对优化的干扰。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_P7zBSCs4Xt/figures/002_Figure_2.jpg]]
 *Figure 2: The core of FastAvatar is a Large Gaussian Reconstruction Transformer (LGRT), which can flexibly process input data with varying expressions, poses, and camera angles, aggregating them into a high-precision 3DGS avatar model. This capability is enabled by several key designs: the interleaving of global attention and frame attention to register complex input data while encoding 3D positional prompts; multi-granular positional information encoding; and the use of landmark tracking loss and sliced fusion loss, allowing the model to smoothly and incrementally fuse additional input data*
@@ -153,7 +157,7 @@ $$\mathcal{L} = \lambda_1 \mathcal{L}_{rgb} + \lambda_2 \mathcal{L}_{ssim} + \la
 
 整个 pipeline 的数据流可概括为：任意帧数的 RGB 图像与对应的相机/表情/姿态参数 → DINOv2 编码 + 多粒度 MLP 编码 → 交替注意力聚合与配准 → GS Head 逐帧预测高斯属性 → 规范空间拼接与可微剪枝 → 可驱动 3DGS 化身 → 可微光栅化渲染输出。这一设计使得 FastAvatar 在单视图到多视图的各种输入设置下均能保持统一的处理范式，无需针对不同输入数量调整架构。
 
-## 核心模块与公式推导
+
 
 ### 整体框架定义
 
@@ -208,7 +212,9 @@ $$\mathcal{L} = \lambda_1 \mathcal{L}_{rgb} + \lambda_2 \mathcal{L}_{ssim} + \la
 
 权重设置为 $\lambda_1=0.8$, $\lambda_2=0.1$, $\lambda_3=0.1$, $\lambda_4=0.1$, $\lambda_5=0.0005$。其中 $\mathcal{L}_{track}$ 为地标跟踪损失，用于监督跨帧高斯配准的结构一致性；$\mathcal{L}_{mask}$ 为前述稀疏正则项。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 
@@ -275,7 +281,9 @@ Figure 11 展示了流式增量重建：随着流式输入逐步加入，口腔�
 
 Figure 12 验证了 FastAvatar 在大范围新视角下的泛化能力：模型在 14 个完全不在训练集中的新视角上仍能实现高保真重建，表明全局注意力机制有效学习了跨视角的空间配准先验，而非简单记忆训练视角。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与前馈式可动画化身方法的关系
 
@@ -311,6 +319,8 @@ FastAvatar 的适用边界由以下因素界定：
 2. **长序列高效扩展**：在处理数百帧视频时，当前线性增长的资源消耗模式不可持续，需要探索更高效的帧聚合策略（如 FramePack 启发的帧压缩方法已在初步实验中展示潜力，Figure 5）。
 3. **流式增量重建的鲁棒性**：滑动窗口增量重建方法在场景突变、遮挡或极端姿态下的鲁棒性是否充分，仍需系统性评估。
 4. **in-the-wild 泛化**：方法在更广泛的真实世界无标定数据上的表现，以及跨身份、跨光照条件的泛化能力，需要进一步验证。
+
+
 
 ## 原文 PDF
 

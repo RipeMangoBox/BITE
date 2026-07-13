@@ -32,7 +32,7 @@ claims:
 | 中文题名 | 解开时间推移序列中的随机与周期效应 |
 | 英文题名 | Disentangling Random and Cyclic Effects in Time-lapse Sequences |
 | 会议/期刊 | SIGGRAPH 2022 |
-| Links | [paper](https://arxiv.org/abs/2207.01413) · [Code](https://github.com/harskish/tlgan) · [arXiv](https://arxiv.org/abs/2207.01413") |
+| Links | [paper](https://arxiv.org/abs/2207.01413) · [Code](https://github.com/harskish/tlgan) · [paper](https://arxiv.org/abs/2207.01413") |
 | Topic | #topic/other_unclear |
 | Method | TLGAN (Cyclic Conditioning GAN) |
 | Dataset | 自数据集（AMOS + 自建植物生长集）, Mielipidepalsta数据集（与Martin-Brualla et al. 2015对比） |

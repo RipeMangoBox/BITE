@@ -42,7 +42,7 @@ claims:
 > - 用户研究 (40个类别覆盖刚性与有机物体) 上，用户偏好率 46.66% vs Diff3DS: 16.67%, Dream3DVG: 36.67% (+10.0% over Dream3DVG)。
 > - 单物体生成成本 上，时间与货币成本 ~2 min/样本, $0.09/样本 (DeepSeek API) vs Diff3DS: ~120 min, $1.50; Dream3DVG: ~60 min, $1.30 (速度提升60倍以上，成本降低12倍以上)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有语言驱动的草图生成方法将绘制操作限制在二维平面坐标 $(x, y)$ 上，缺乏深度建模能力，导致生成的草图无法维持投影一致性和空间连贯性。同时，以训练自由的GRPO为代表的优化技术依赖组内相对评估、标量奖励或真实标注，难以适应开放式创造任务（如3D草图生成）中无绝对标注的情况，阻碍了大语言模型获取3D空间推理能力。
 
@@ -55,8 +55,6 @@ claims:
 - 在用户研究中，3DrawAgent获得了 **46.66%** 的偏好率，明显优于Dream3DVG（36.67%）和Diff3DS（16.67%）。
 - 单物体生成仅需约 **2分钟** 和 **$0.09**，比Diff3DS快60倍以上、成本降低12倍以上。
 - 即使不使用真实标注（GT=False），CKE也能达到与提供标注几乎相同的峰值性能（0.6643 vs 0.6648），验证了方法的无监督有效性。
-
-## 背景与动机
 
 ### 语言驱动草图的维度瓶颈
 
@@ -74,7 +72,7 @@ claims:
 
 上述瓶颈共同指向一个关键问题：**能否让大语言模型在不依赖真实标注、不更新参数的前提下，通过自我产生的反馈逐步习得3D空间推理能力？** 本文的核心动机正是构建这样一种对比经验优化机制——通过生成多个候选草图并利用CLIP感知评分和LLM定性评估构建成对优劣比较，将相对优势信号转化为可迭代积累的经验库，使冻结模型在自反思循环中持续提升3D草图的空间连贯性、对称性及拓扑质量。这一思路将训练自由的优化范式从“需要标注的标量奖励”泛化到“仅需相对比较的对比经验”设置，为语言驱动的3D创作开辟了低门槛、高效率的新路径。
 
-## 核心创新
+## 核心方法与创新机理
 
 3DrawAgent 的核心创新在于将大语言模型（LLM）从二维平面草图生成拓展至三维空间，并通过一种无需训练、无需真实标注的对比经验优化机制，使冻结的 LLM 在自反思中持续获取 3D 空间推理能力。以下从三个关键维度展开分析。
 
@@ -134,8 +132,6 @@ $$
 
 尽管创新显著，方法仍存在若干结构性问题：经验库提供高层结构指导，但缺乏稠密的矢量点监督，导致语义连接处可能出现断开或漂浮元素；CLIP 评分作为整体语义相似度奖励，无法惩罚局部拓扑错误（如曲线端点匹配和几何闭环）；此外，过度推理风险在后期迭代中出现（Epoch 3 CLIP-S 从 0.6643 回退至 0.6428），提示需要机制来维持经验库的抽象性和迁移性。这些局限指向未来的改进方向：集成显式的交点促进损失、引入预训练线框重建模型作为几何先验，以及设计稠密的多视图奖励函数来惩罚漂浮基元。
 
-## 整体框架
-
 **3DrawAgent** 将冻结的大语言模型（LLM）作为空间规划器，通过“生成—评估—对比—经验注入”的闭环，实现免训练的文本驱动3D草图生成。其核心管线由四个模块串联构成，数据流覆盖从文本提示到可渲染3D曲线的完整链路。
 
 ### 管线总览
@@ -171,8 +167,6 @@ $$
 
 ![[assets/figures/papers/paper_list_l2366_https_arxiv_org_abs_2604_08042/figures/001_Figure_1.jpg]]
 *Figure 1: Top: Prior works typically rely on pre-trained diffusion models as 3D priors. Bottom: Our work performs training-free 3D sketch generation by refining an LLM’s spatial reasoning*
-
-## 核心模块与公式推导
 
 ### 3D草图表示空间
 
@@ -235,7 +229,7 @@ $$o = p_{\boldsymbol{\theta}}(o \mid \mathcal{T}, \mathcal{E})$$
 ![[assets/figures/papers/paper_list_l2366_https_arxiv_org_abs_2604_08042/figures/013_Figure_9.jpg]]
 *Figure 9: Full System Prompt. Raw text input provided to the LLM, combining role definition, strict syntax constraints (code-only output), coordinate system rules, and a few-shot example (“A benz car”) to guide 3D sketch generation*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心瓶颈与方法定位
 
@@ -296,13 +290,7 @@ $$o = p_{\boldsymbol{\theta}}(o \mid \mathcal{T}, \mathcal{E})$$
 ![[assets/figures/papers/paper_list_l2366_https_arxiv_org_abs_2604_08042/figures/007_Figure_6.jpg]]
 *Figure 6: Impact of Stroke Constraints on 3D Abstraction across Categories. We evaluate the model’s generation capability under varying Bezier curve budgets (rows from 8 to 128) across diverse categories: Bench, Chair, Plant, and Person. At minimal budgets (8 curves), the model performs high-level semantic abstraction, producing skeletal representations (e.g., a stick figure for the person or a simple stem for the plant). As the budget increases to 32–64 curves, structural details emerge, such as the pot geometry for the plant or parallel slats for the furniture. At 128 curves, the sketches evolve into dense wireframes. This demonstrates the model’s versatility in adapting its planning strategy from...*
 
-![[assets/figures/papers/paper_list_l2366_https_arxiv_org_abs_2604_08042/figures/009_Table_4.jpg]]
-*Table 4: Training-Free Cost Analysis (DeepSeek-V3.2-Exp). Costs are estimated for a complete experience extraction run (100 prompts, 3 epochs, K = 5)*
-
-![[assets/figures/papers/paper_list_l2366_https_arxiv_org_abs_2604_08042/figures/006_Figure_4.jpg]]
-*Figure 4: Statistics analysis of 200 rollouts for a single 3D drawing task during contrastive knowledge extraction, uniformly sampled to 100 for visualization. (a) Average pairwise similarity between curves within each rollout. (b) Distribution of curve counts across the 200 rollouts. (c) Reward score distribution over the 200 rollouts. (d) Bracket-matching rate, computed as matched cases divided by total cases*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 从2D平面到3D空间的草图表示跃迁
 

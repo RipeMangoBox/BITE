@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Improving_Attributed_Long_form_Question_Answering_with_Intent_Awareness.pdf
+project_link: null
+code_link: https://github.com/colinzhaoust/intent-aware-deep-research
 openreview_forum_id: fRCm5c8x0j
 aliases:
 - IAWF
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 通过意图感知改进带归因的长篇问答 |
 | 英文题名 | Improving Attributed Long-form Question Answering with Intent Awareness |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=fRCm5c8x0j); [GitHub](https://github.com/colinzhaoust/intent-aware-deep-research) |
+| Links | [paper](https://openreview.net/forum?id=fRCm5c8x0j) · [GitHub](https://github.com/colinzhaoust/intent-aware-deep-research) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/language_speech_and_dialog |
 | Method | Intent-aware Writing Framework |
 | Dataset | SQA-CS-V2, DeepScholar Bench |
@@ -42,7 +44,7 @@ claims:
 > - SQA-CS-V2 上，Citation Precision (Citation P) 为 95.7 (gemini-2.5-pro + intent)，对比 93.2 (gemini-2.5-pro)，变化 +2.5。
 > - SQA-CS-V2 上，Citation Recall (Citation R) 为 86.1 (gemini-2.5-pro + intent)，对比 82.4 (gemini-2.5-pro)，变化 +3.7。
 
-## 概述
+## 概要
 
 当前长文本问答系统在生成带归因的科学报告时，仅从最终文本中隐式学习写作模式，缺乏对作者在段落组织与引文选择背后的**意图**进行显式建模。这一瓶颈导致生成内容在归因充分性、引用质量与可读性上均存在不足。
 
@@ -56,7 +58,7 @@ claims:
 
 该方法通过教师模型（gemini-2.5-pro）蒸馏生成带意图标签的合成训练数据，使小模型（如 qwen3-8b）在 SQA-CS-V2 上以 Overall 88.6 超越大模型基线（gemini-2.5-pro 88.1），验证了意图感知能力可高效传递给小模型。
 
-## 背景与动机
+
 
 当前长文本问答系统在生成科学深度研究报告时面临一个关键瓶颈：模型仅从最终报告文本中隐式学习写作风格，缺乏对作者在段落组织与引文选择背后**意图**的显式建模。这种“只看结果、不问目的”的学习方式导致生成内容在归因充分性、引用质量与可读性三个维度上均存在显著不足——引用往往缺乏明确的功能目的，段落之间的信息组织缺少清晰的修辞逻辑，读者难以预判内容走向或判断引文的支撑强度。
 
@@ -66,7 +68,9 @@ claims:
 
 初步证据表明这一方向具有显著潜力：意图感知使大模型在三个基准上的宏平均性能绝对提升 +2.9 点，小模型通过意图感知 SFT 提升 +12.3 点；在归因维度上，大模型引文指标平均提升 +3.7 点，小模型平均提升 +18.7 点。这些结果提示，**显式意图建模可能是突破当前长文本问答归因瓶颈的关键因果杠杆**。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 当前长文本问答系统仅从最终报告中隐式学习写作风格，缺乏对作者在段落组织与引文选择背后**意图**的显式建模，导致生成内容的归因不足、引用质量欠佳。本文的核心创新在于将写作过程的元认知——**段落意图**和**引文意图**——以结构化标签格式显式注入模型的推理与训练流程，从而为语言模型提供“为什么这样写、为什么引用这篇文献”的过程性指导。
 
@@ -81,7 +85,7 @@ claims:
 
 **决定性证据**（Table 5）表明，段落意图与引文意图具有互补性：在 SQA-CS-V2-dev 上同时使用两者时 Overall 达到 89.7，优于仅用引文意图（88.6）、仅用段落意图（89.1）和无意图基线（88.1），且显著优于 CoT（81.3）和 ReAct（77.6）。这一差距验证了显式意图建模相对于通用推理策略的独特增益，而非简单增加推理计算量所能替代。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0009_fRCm5c8x0j_Improving_Attributed_Long-form_Question_Answerin/figures/001_Figure_1.jpg]]
 *Figure 1: Current long-form question answering systems don’t consider intents when generating responses. The figure above shows how having explicit citation intents and paragraph intents helps reason about the text and generate better responses*
@@ -130,7 +134,7 @@ claims:
 - 段落意图与引文意图互补：同时使用两者获得最佳表现（Table 5）
 - 意图感知训练使小模型对检索候选信息的利用率提升约 0.2→0.4，与大模型的引用重叠度从约 0.6 提升至 0.8（Figure 2），表明检索信息利用更充分
 
-## 核心模块与公式推导
+
 
 ### 意图感知写作框架
 
@@ -160,7 +164,9 @@ claims:
 
 其中 $\text{intents}$ 为段落意图与引文意图的序列。推理时模型联合生成内容与意图，训练时通过教师强制 (teacher forcing) 学习该联合分布。这一范式转变的因果效应已在多基准上得到验证：大模型宏平均性能绝对提升 +2.9 点，引文指标提升 +3.7 点；小模型经意图感知 SFT 后宏平均提升 +12.3 点，引文指标提升 +18.7 点（详见 Table 2、Table 4）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -244,7 +250,9 @@ Table 6 展示了不同模型生成的引文和段落意图类型分布。与人
 
 尽管意图感知在多数指标上表现优异，但 Table 2 显示 o3 模型在 SQA-CS-V2 上的提升幅度（+0.9）明显小于其他模型，提示意图感知的收益可能与模型架构或推理能力有关。此外，当前框架依赖预定义的意图类型体系，在领域迁移时可能需要重新设计意图模式。需要人工验证的是：意图标签的生成质量是否在所有查询类型上保持一致，以及意图感知是否会引入额外的推理延迟。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有方法的继承与断裂
 
@@ -292,6 +300,8 @@ Table 6 展示了不同模型生成的引文和段落意图类型分布。与人
 **自我批判与迭代修正的缺失。** 当前框架在生成时一次性输出意图和文本，缺乏对已生成内容的自我评估和修正机制。一个自然的扩展方向是：将意图框架发展为自我批判的脚手架，使模型在生成过程中实时评估自身的结构选择（“当前段落的 Exposition 是否充分铺垫了后续的 Compare and Contrast？”）和引用理由（“这条引文是否真正支持了 Uses 意图，还是仅表面相关？”），并据此进行迭代修正。
 
 **意图类型的自动发现。** 当前意图类型依赖人工预定义，限制了框架在新领域的快速部署。能否从特定领域语料库中自动发现和归纳新的意图类别，减少对预定义模式的人工依赖，是提升框架可扩展性的关键问题。这需要结合无监督聚类、弱监督学习和领域专家验证的混合方法。
+
+
 
 ## 原文 PDF
 

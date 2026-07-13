@@ -5,6 +5,8 @@ paper_level: A
 venue: ICML
 year: 2026
 pdf_ref: paperPDFs/ICML_2026/Variance_Reduction_for_Expectations_with_Diffusion_Teachers.pdf
+project_link: https://research.nvidia.com/labs/sil/projects/CARV/
+code_link: null
 aliases:
   - CCAVR
   - VREDT
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 扩散教师期望的方差缩减 |
 | 英文题名 | Variance Reduction for Expectations with Diffusion Teachers |
 | 会议/期刊 | ICML 2026 |
-| Links | [paper](https://arxiv.org/abs/2605.21489); [Project](https://research.nvidia.com/labs/sil/projects/CARV/) |
+| Links | [paper](https://arxiv.org/abs/2605.21489) · [Project](https://research.nvidia.com/labs/sil/projects/CARV/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | CARV (Compute-Aware Variance-Reduction) |
 | Dataset | Text-to-3D SDS Optimization, One-step Distillation (DMD), Data Attribution |
@@ -41,7 +43,7 @@ claims:
 > - Text-to-3D SDS Optimization 上，CLIP score convergence 为 Reaches baseline CLIP score in ~half iterations，对比 Standard SDS，变化 ~2× wall-clock speedup。
 > - One-step Distillation (DMD) 上，Gradient variance reduction 为 3.4–16× reduction (resampling + stratification)，对比 DMD baseline (8,1)，变化 3.4–16×。
 
-## 概述
+## 概要
 
 在文本到3D优化、扩散蒸馏和数据归因等任务中，使用冻结扩散教师计算梯度时，蒙特卡洛估计的高方差是制约计算效率的核心瓶颈。该方差的根源在于时间步和噪声的随机采样，而渲染、编码或生成等上游操作的成本远高于去噪操作，使得简单地增加样本数以降低方差的策略代价高昂。
 
@@ -55,7 +57,7 @@ claims:
 
 值得注意的是，方差缩减并不总能转化为下游指标的提升——在DMD中尽管梯度方差大幅降低，FID并未改善——这揭示了方差与收敛动力学之间更深层的关系，也是未来研究的重要方向。
 
-## 背景与动机
+
 
 ### 扩散模型作为冻结教师
 
@@ -108,7 +110,9 @@ $$
 
 这三项技术均不改变原始优化目标，实现简单，且相互补充。论文的目标是建立一个**计算感知的方差记账框架**，通过有效计算乘数（ECM）和相对效率（RE）等指标，量化每种技术在同等计算预算下的实际收益，并揭示方差缩减何时、为何能转化为下游性能提升——以及何时不能。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CARV（Compute-Aware Variance-Reduction）的核心创新在于**将方差缩减的视角从“优化目标设计”转向“梯度估计器的采样结构”**，在不修改原始损失函数的前提下，通过三个互补的采样策略实现2–3倍的有效计算乘数。其关键洞察是：在文本到3D优化、一步蒸馏和数据归因等任务中，渲染、编码或生成器前向传播等上游操作的成本远高于去噪操作，因此可以通过**缓存昂贵的中间结果**并**对廉价的噪声采样进行重分配**来换取方差缩减。
 
@@ -155,7 +159,7 @@ $$\hat{\nabla}_{\boldsymbol{\theta}}^{\mathrm{reuse}} = \frac{1}{R} \sum_{r=1}^{
 
 该框架使得不同采样策略可以在**相等每轮计算成本**下进行公平比较，而非仅比较等迭代数的方差。所有实验均以wall-clock时间为成本度量，确保对比的公平性。
 
-## 整体框架
+
 
 CARV (Compute-Aware Variance-Reduction) 是一个在冻结扩散教师下进行无偏梯度估计的方差缩减框架。其核心思想是：将计算开销从昂贵的上游操作（渲染、编码、生成器前向传播）转移到廉价的噪声采样和去噪操作上，同时保持估计器的无偏性。框架由三个互补的技术模块和一个计算感知的方差记账系统构成。
 
@@ -192,7 +196,7 @@ CARV 包含一个计算感知的方差记账系统，用于公平比较不同采
 - **重要性采样提议**：使用基于显式权重的启发式提议 $q(t) \propto p(t) w(t)$，该提议实现简单、几乎零额外开销，且能达到神谕最优提议方差缩减的 94–97%。
 - **计算重用倍数 $K$ 的选择**：最优 $K$ 取决于上游成本与去噪成本的比值。当渲染/编码成本远高于去噪时，增大 $K$ 带来显著增益；当上游成本可忽略时，较小的 $K$ 即可。
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题形式化：扩散期望的蒙特卡洛估计
 
@@ -310,7 +314,9 @@ CARV 的完整梯度估计流程（Algorithm 1）：
 
 三个模块（计算重用、重要性采样、分层采样）均为**无偏的即插即用替换**，不改变原始优化目标，仅替换采样策略。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心方差缩减效果：SDS 文本到3D优化
 
@@ -395,7 +401,9 @@ CARV 在 SDS 文本到3D 优化中实现了显著的有效计算乘数（ECM）�
 *Figure: Training Steps (×1000) Training Steps (×1000) Total Training Time (hours) Total Training Time (hours)*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：扩散教师期望中的梯度估计方差
 
@@ -458,6 +466,8 @@ ECM/RE 的计算需要将每个估计器运行至收敛（Sec. 3.2），这在�
 5. **跨模态扩展**：在 4D 场景优化、音频生成、物理仿真等跨模态任务中扩展方差缩减，并评估在不同教师架构和预测参数化下的迁移效果。
 
 6. **最优配对分布的在线近似**：如何在不解决完整传输问题的情况下，在线近似 Sinkhorn 最优配对分布以进一步降低方差？
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Fast_dLLM_v2_Efficient_Block_Diffusion_LLM.pdf
+project_link: https://nvlabs.github.io/Fast-dLLM/v2/
+code_link: null
 openreview_forum_id: 1NZ3DHF9nT
 aliases:
 - FDV
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | Fast-dLLM v2：高效块扩散语言模型 |
 | 英文题名 | Fast-dLLM v2: Efficient Block-Diffusion LLM |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=1NZ3DHF9nT); [Project](https://nvlabs.github.io/Fast-dLLM/v2/) |
+| Links | [paper](https://openreview.net/forum?id=1NZ3DHF9nT) · [Project](https://nvlabs.github.io/Fast-dLLM/v2/) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/diffusion_image_video |
 | Method | Fast-dLLM v2 |
 | Dataset | GSM8K, HumanEval Base, Average (Avg.), Throughput on A100 |
@@ -42,7 +44,7 @@ claims:
 > - HumanEval Base 上，pass@1 为 63.4 (Fast-dLLM v2 7B, best variant)，对比 51.2 (Qwen2.5-7B-Nemo-FT)，变化 +12.2。
 > - Average (Avg.) 上，score 为 60.3 (Fast-dLLM v2 7B, best variant)，对比 58.2 (Qwen2.5-7B-Nemo-FT)，变化 +2.1。
 
-## 概述
+## 概要
 
 大语言模型的自回归（AR）解码范式以逐词串行生成为代价换取了强大的文本质量，这从根本上限制了推理并行度和吞吐上限。扩散语言模型（dLLM）虽能并行解码，但其普遍采用的双向注意力破坏了因果结构，导致无法有效复用KV缓存，推理效率反而不及AR模型。**Fast-dLLM v2** 的核心洞察在于：将序列切分为固定大小的块，在块内执行掩码扩散与双向上下文建模，而在块间保留严格的自回归因果关系——这一“块感知混合注意力”设计使预训练AR模型的权重与表示得以最大程度复用，仅需约**1B tokens**微调即可实现无损自适应，远低于Dream所需的约500B tokens。
 
@@ -50,7 +52,7 @@ claims:
 
 实验表明，Fast-dLLM v2 (7B) 在多个基准上平均得分**60.3**，超越同数据微调的AR基线 Qwen2.5-7B-Nemo-FT（58.2）和扩散基线 Dream（57.6）；在GSM8K上以0.9置信度阈值实现**2.6倍**加速且精度损失极小，吞吐量达到**102.5 tokens/s**（A100，batch=1），较Qwen2.5-7B-Instruct提升2.54倍。消融研究进一步验证了互补掩码与填充策略（合计提升+3.7个平均准确率点）、子块解码以及分层缓存的关键作用。
 
-## 背景与动机
+
 
 自回归（Autoregressive, AR）大语言模型通过逐词顺序解码生成文本，这一机制从根本上限制了推理并行度。在标准自回归框架下，每个新token的生成必须等待之前所有token完成计算，导致长序列生成时吞吐量受限于单步延迟，无法充分利用现代GPU的并行计算能力。
 
@@ -60,7 +62,9 @@ claims:
 
 Fast-dLLM v2 正是针对这一困境提出的解决方案。其动机直指一个关键洞察：**通过将序列划分为固定大小的块，在块内进行双向扩散建模、块间保持自回归因果关系，可以最大程度地复用预训练AR模型的权重和表示结构。** 这种“块感知”的注意力设计使得预训练模型仅需约1B tokens的微调即可转换为块扩散模型——相比Dream所需的约500B tokens，数据效率提升了近500倍——同时天然兼容KV缓存机制。配合块级分层缓存和置信度感知并行解码，该方法在推理时能获得最高2.5倍的加速，且基准性能匹配甚至超越原AR模型。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Fast-dLLM v2 的核心创新在于**以极低成本将预训练自回归（AR）大语言模型转换为块扩散模型，在保留生成质量的同时实现最高2.5倍的推理加速**。这一目标通过三个紧密耦合的技术槽位实现：块感知注意力掩码、互补掩码训练方案，以及分层缓存并行解码机制。
 
@@ -102,7 +106,7 @@ Fast-dLLM v2 提出**块感知混合注意力掩码**，将序列划分为固定
 
 Fast-dLLM v2 的创新本质是**通过块结构在AR模型和扩散模型之间建立了一座桥梁**：训练时以块为粒度进行双向上下文建模，推理时以块为单位进行自回归生成和缓存复用。这一设计使得预训练AR模型仅需极少微调即可转换为高效的块扩散模型，在多个基准上匹配或超越原AR模型性能（7B变体平均得分60.3，超越同数据微调的Qwen2.5-7B-Nemo-FT的58.2和Dream的57.6，Table 1），同时实现最高2.5倍推理加速。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_1NZ3DHF9nT/figures/003_Figure_2.jpg]]
 *Figure 2: Training process of Fast-dLLM-v2. The input sequence is decoded block by block. Within each block, the model performs next-token prediction with partial masking. To ensure every token is trained, complementary masks are introduced so that masked tokens in one view can be predicted from the other. We only apply loss to predicted tokens that are highlighted in green, and dashed curves connect Mask tokens to their corresponding predictions*
@@ -161,7 +165,7 @@ Fast-dLLM v2 的核心设计思路是将预训练的自回归（AR）大语言�
 
 这种设计使 Fast-dLLM v2 能够以极少的微调代价，将预训练 AR 模型转化为高效的块扩散模型，在推理时获得最高 2.6 倍的加速，同时匹配或超越原 AR 模型的基准性能。
 
-## 核心模块与公式推导
+
 
 ### 块扩散训练目标
 
@@ -214,7 +218,9 @@ $$[ M _ { B C } ] _ { i j } = \left\{ { \begin{array} { l l } { 1 } & { { \mathr
 
 消融实验表明，子块缓存在大批量（32）下显著提升吞吐量，且对准确率无影响（Figure 6）；分层缓存在长上下文（1K-8K tokens）下延迟和吞吐与标准AR缓存相当（Figure 8）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心结果：推理加速与质量保持
 
@@ -275,7 +281,9 @@ Fast-dLLM v2 仅需约 **1B tokens** 的微调数据即可实现无损自适应�
 ![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_1NZ3DHF9nT/figures/018_Table_6.jpg]]
 *Table 6: Multi-turn Dialogue Cases of Fast-dLLM v2 (7B)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 方法演进脉络
 
@@ -321,6 +329,8 @@ Fast-dLLM v2 处于自回归（AR）语言模型与扩散语言模型（dLLM）�
 5. **与其他加速技术的兼容性**：论文未讨论块扩散框架与投机解码（speculative decoding）、模型量化、FlashAttention 等技术的组合效果。分层缓存与这些技术的交互可能存在非平凡的工程挑战。
 
 6. **训练数据偏差**：微调使用 LLaMA-Nemotron post-training dataset，基线 Qwen2.5-Nemo-FT 使用相同数据和步数以保证可比性。但该数据集的具体构成和分布未详细披露，可能影响结论的外部有效性。
+
+
 
 ## 原文 PDF
 

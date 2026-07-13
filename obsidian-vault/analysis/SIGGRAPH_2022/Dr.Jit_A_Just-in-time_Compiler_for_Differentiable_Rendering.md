@@ -33,7 +33,7 @@ claims:
 | 中文题名 | Dr.Jit：面向可微渲染的即时编译器 |
 | 英文题名 | Dr.Jit: A Just-in-time Compiler for Differentiable Rendering |
 | 会议/期刊 | SIGGRAPH 2022 |
-| Links | [paper](https://arxiv.org/abs/2202.01284v2) · [Code](https://github.com/mitsubarenderer/drjit) · [arXiv](https://arxiv.org/abs/2202.01284v2") |
+| Links | [paper](https://arxiv.org/abs/2202.01284v2) · [Code](https://github.com/mitsubarenderer/drjit) · [paper](https://arxiv.org/abs/2202.01284v2") |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Dr.Jit |
 | Dataset | 三个场景（Staircase, Living room, Glass of water）, 相同场景，非重参数化 PRB 反向模式 |

@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/The_SA_FARI_Dataset_Segment_Anything_in_Footage_of_Animals_for_Recognition_and_Identification.pdf
+project_link: null
+code_link: null
 aliases:
 - SFD
 - SFDSAFARI
@@ -40,7 +42,7 @@ claims:
 > - SA-FARI test set (species-specific) 上，cgF1 46.9 (SAM3 FT on SA-FARI) vs 14.0 (SAM3 baseline) (+32.9)；pmF1 55.2 (SAM3 FT on SA-FARI) vs 23.5 (SAM3 baseline) (+31.7)。
 > - SA-FARI test set (species-agnostic) 上，IDF1 71.1 (SAM3 SA-FARI) vs 47.2 (MD+BoostSort++) (+23.9)；HOTA 63.5 (SAM3 SA-FARI) vs 43.3 (MD+BoostSort++) (+20.2)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有野生动物多动物跟踪（MAT）数据集规模小、物种和地理多样性不足，且缺乏高质量的人工验证分割注释，导致无法训练出可泛化的通用MAT模型。
 
@@ -54,7 +56,7 @@ claims:
 
 **局限与开放问题**：数据仅来自四大洲，存在地理偏差；小掩膜和严重遮挡场景下检测与跟踪性能仍有较大提升空间；未利用同步音频信息；部分稀有物种仅出现在测试集，反映真实开放世界设定但增加了离线评估难度。未来方向包括整合多模态标注（姿态、深度、音频）以及向新生态区扩展数据。
 
-## 背景与动机
+
 
 ### 问题背景：野生动物监测中的多动物跟踪
 
@@ -82,7 +84,9 @@ SA-FARI数据集的设计围绕以下关键因果机制展开：大规模多样�
 
 实验证据表明，这一策略是有效的：在SA-FARI上微调的SAM 3模型，在种类特定评估中cgF1达到46.9，相比未使用SA-FARI的SAM 3基准（14.0）提升32.9点（Table 3）；在种类无关评估中，HOTA指标达到63.5，比最佳纯视觉方法MD+BoostSort++的43.3高出20.2点（Table 4）。这些超过20点的HOTA增益，直接验证了“大规模多样化精细标注数据”这一因果杠杆的有效性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SA-FARI 的核心创新并非提出新的模型架构或训练算法，而是构建了一个**大规模、多物种、多地域、具有密集时空分割注释的摄像机陷阱视频数据集**，从根本上改变了野生动物多动物跟踪（MAT）任务的训练与评估条件。其创新性体现在三个相互关联的维度。
 
@@ -94,7 +98,7 @@ SA-FARI 的核心创新并非提出新的模型架构或训练算法，而是构
 
 综上，SA-FARI 的创新本质是**以数据集为中心的范式推进**：通过构建首个兼具物种丰富性、地理多样性和精细时空分割标注的大规模 MAT 基准，为训练可泛化的通用野生动物跟踪模型提供了此前缺失的基础设施。
 
-## 整体框架
+
 
 SA-FARI 数据集并非提出一种新的模型架构，而是构建了一套面向野生动物多动物跟踪（Multi-Animal Tracking, MAT）的大规模数据生产与基准评估流程。其整体 pipeline 可概括为 **数据采集 → 物种标注 → 分割掩膜标注 → 训练/测试划分 → 类别负样本增强 → 测试子集划分 → 基准评测** 七个核心模块，各模块之间存在明确的上下游依赖关系。
 
@@ -136,7 +140,7 @@ SA-FARI 数据集并非提出一种新的模型架构，而是构建了一套面
 
 整体流程的输入为原始摄像机陷阱视频，输出为带有物种标签和密集时空分割标注的结构化数据集，以及基于该数据集的基准评测结果。数据流从原始视频出发，经物种标注赋予语义标签，再经分割标注赋予像素级时空结构，最终通过划分和增强形成可复用的训练/测试体系。这一设计使 SA-FARI 既是模型训练的数据基础，也是模型泛化能力的压力测试平台。
 
-## 核心模块与公式推导
+
 
 SA-FARI 本身是一个数据集贡献，其核心模块并非新的算法架构，而是围绕高质量标注构建的**数据生产流水线**与**评估指标体系**。以下梳理其关键模块与所用公式的含义。
 
@@ -173,7 +177,9 @@ SA-FARI 采用多层次的跟踪与分割评估指标，以下为关键指标及
 
 > 注：原文未提供上述指标的封闭形式 LaTeX 公式，以上为基于 Supplementary §B 的语义描述。如需精确数学定义，需查阅原始补充材料。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 评估协议与基准模型
 
@@ -250,7 +256,9 @@ Table 4 显示，**SAM 3（SA-FARI）在所有指标上大幅超越纯视觉基�
 ![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2511_15622/figures/007_Table_2.jpg]]
 *Table 2: Dataset and Split Statistics. Summary of key statistics for the SA-FARI dataset across training and test splits. The test split is designed to maximise both species diversity and site diversity, with no overlap in camera trap locations between splits. Metrics include total number of videos, annotated duration (in minutes), species categories, spatio-temporal masklets, annotated bounding boxes and segmentation masks, video–species pairs (including negatives), and the number of independent sampling sites*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 知识缺口与因果定位
 
@@ -292,6 +300,8 @@ SA-FARI 的开源与基准建立，为以下方向打开了探索空间：
 - **音频流的利用**：摄像机陷阱通常同步录制音频，但当前 SA-FARI 未包含音频标注。如何利用物种特异性发声提升检测和分类鲁棒性，尤其是在遮挡和夜间场景下，是一个被低估的增益路径。
 - **地理覆盖的优先级**：应优先扩展至当前未覆盖的生态区（如热带雨林、极地苔原），以缓解地理偏差并捕获更广泛的物种形态多样性。
 - **小目标与遮挡的专项突破**：Table 5 揭示的性能悬崖表明，需要针对小掩膜和严重遮挡场景设计专门的检测头、特征金字塔或时序关联策略，而非仅依赖数据规模的外推。
+
+
 
 ## 原文 PDF
 

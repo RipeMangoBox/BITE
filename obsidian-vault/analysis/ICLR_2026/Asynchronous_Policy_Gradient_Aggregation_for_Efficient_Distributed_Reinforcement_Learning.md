@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Asynchronous_Policy_Gradient_Aggregation_for_Efficient_Distributed_Reinforcement_Learning.pdf
+project_link: null
+code_link: null
 aliases:
 - RNMN
 - APGAEDRL
@@ -42,11 +44,11 @@ claims:
 > - Reacher-v4 上，收敛速度（奖励） 为 Rennala NIGT，对比 AFedPG, Synchronized NIGT，变化 Rennala NIGT收敛更快。
 > - Walker2d-v4 上，收敛速度（奖励） 为 Rennala NIGT，对比 AFedPG, Synchronized NIGT，变化 差距不明显。
 
-## 概述
+## 概要
 
 本文提出两种新的分布式强化学习算法——**Rennala NIGT** 和 **Malenia NIGT**，旨在解决现有异步策略梯度方法（如 AFedPG）在计算与通信效率上的瓶颈。核心创新在于将异步友好的梯度聚合过程（AggregateRennala 和 AggregateMalenia）与 NIGT 动量归一化技术相结合，在二阶光滑性假设下实现了更优的理论时间复杂度，并支持 AllReduce 操作。实验表明，在异构计算和通信环境下，所提方法收敛速度显著优于现有基线。
 
-## 背景与动机
+
 
 现有分布式策略梯度方法（如 AFedPG）在异步和异构环境下存在以下瓶颈：
 - **不支持异构环境**：AFedPG 无法处理各智能体具有不同环境分布和奖励函数的情况。
@@ -56,7 +58,9 @@ claims:
 
 本文旨在通过设计异步友好的梯度聚合过程，结合 NIGT 动量归一化技术，同时优化计算和通信复杂度，并支持异构环境。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 1. **Rennala NIGT**：针对均匀设置（各智能体环境分布相同），通过 AggregateRennala 过程收集固定数量 M 个梯度后通过 AllReduce 一次性聚合，将通信复杂度从 $O(\kappa \varepsilon^{-3})$ 降低至 $O(\kappa \varepsilon^{-2})$，计算复杂度从 $\tilde{O}((1/n \sum 1/\dot{h}_i)^{-1}(n^{4/3}/\varepsilon^{7/3} + 1/(n\varepsilon^{7/2})))$ 改进为 $\tilde{O}(\min_{m\in[n]}[(1/m \sum 1/\dot{h}_i)^{-1}(1/\varepsilon^2 + 1/(m\varepsilon^{7/2}))])$。
 
@@ -64,7 +68,7 @@ claims:
 
 3. **新下界**：建立了 Theorem G.1 中的新下界，量化了与最优性之间的剩余差距。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_reinforcement_learning_planning_agents__deep_rl__b001_SitVEPYv6W_Asynchronous_Policy_Grad/figures/003_Figure_1.jpg]]
 *Figure 1: (a) Equal times*
@@ -75,7 +79,7 @@ claims:
 - **Algorithm 2 (AggregateRennala)**：均匀设置下的异步梯度聚合过程：广播参数 $\theta$，等待收集 M 个随机梯度，通过 AllReduce 返回平均梯度。
 - **Algorithm 3 (AggregateMalenia)**：异构设置下的异步梯度聚合过程：每个智能体维护自己的计数 $M_i$，当调和均值条件 $(1/n \sum 1/M_i)^{-1} \geq M/n$ 满足时停止，返回加权平均梯度。
 
-## 核心模块与公式推导
+
 
 **问题形式化**：最大化无限时域上的期望折扣累积奖励：
 $$J(\theta) = \mathbb{E}_{(s_t, a_t)_{t \geq 0}} \left[ \sum_{t=0}^{\infty} \gamma^t r(s_t, a_t) \right] \quad \text{(Equation 1)}$$
@@ -97,7 +101,9 @@ $$\tilde{\mathcal{O}}\left(\kappa\left(\frac{L_g\Delta}{\varepsilon^2}+\frac{\sq
 **Malenia NIGT 时间复杂度**（Theorem 5.1，异构设置）：
 $$\tilde{\mathcal{O}}\left(\kappa\left(\frac{L_g\Delta}{\varepsilon^2}+\frac{\sqrt{L_h}\Delta}{\varepsilon^{3/2}}\right)+\frac{1}{1-\gamma}\left[\dot{h}_n\left(\frac{L_g\Delta}{\varepsilon^2}+\frac{\sqrt{L_h}\Delta}{\varepsilon^{3/2}}\right)+\left(\frac{1}{n}\sum_{i=1}^n\dot{h}_i\right)\left(\frac{\sigma^2}{n\varepsilon^2}+\frac{\sigma^2\sqrt{L_h}\Delta}{n\varepsilon^{7/2}}\right)\right]\right)$$
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 **主要实验结果**：
 
@@ -140,7 +146,9 @@ $$\tilde{\mathcal{O}}\left(\kappa\left(\frac{L_g\Delta}{\varepsilon^2}+\frac{\sq
 *Figure 1: (c) Increased communication times Figure 1: Experiments on Humanoid-v4 with increasing heterogeneity of times (from left to right).*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 本文方法建立在以下工作基础上：
 - **Rennala SGD 和 Malenia SGD** (Tyurin & Richtarik, 2023)：提供了异步聚合的基本思想。
@@ -159,6 +167,8 @@ $$\tilde{\mathcal{O}}\left(\kappa\left(\frac{L_g\Delta}{\varepsilon^2}+\frac{\sq
 2. 对于 $(L_g, L_h)$-二阶光滑函数，$\varepsilon^{-12/7}$ 的速率是否可达？
 3. STORM/MVR 方法能否适应 RL 中的非平稳分布？
 4. 所提方法在大规模语言模型 RLHF 训练中的实际效果如何？
+
+
 
 ## 原文 PDF
 

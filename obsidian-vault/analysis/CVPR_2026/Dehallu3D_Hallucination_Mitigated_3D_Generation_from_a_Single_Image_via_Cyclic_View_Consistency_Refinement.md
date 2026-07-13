@@ -41,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - GSO 上，PSNR ↑ 21.8407 vs — (best competing method in Table 1) (—)；SSIM ↑ 0.8966 vs — (—)；LPIPS ↓ 0.1453 vs — (—)。
 
-## 概述
+## 概要
 
 单张图像到三维网格的重建是计算机视觉与图形学中的核心挑战。现有主流方法（如 **Unique3D** (Wu et al., NeurIPS 2024)、**InstantMesh** (Xu et al., arXiv 2024)、**TripoSR** (Tochilkin et al., arXiv 2024) 等）通常依赖稀疏生成的多视图图像进行重建。然而，稀疏视图之间存在显著的视角间隙与不连续性，导致后续重建过程中引入**幻觉性结构外点**——表现为网格表面的异常孔洞、突出物或漂浮碎片，严重损害几何保真度。
 
@@ -53,7 +53,7 @@ claims:
 
 **局限性与开放问题**：当前优化耗时仍距实时应用有差距；CVCR 在其他重建框架上的泛化性尚未充分验证；严重依赖初始多视图生成质量。未来方向包括探索自适应角度密度分配、动态场景扩展，以及将异常风险度量（ORM）直接作为训练损失等。
 
-## 背景与动机
+
 
 ### 单图三维生成的核心瓶颈：稀疏视图间的幻觉性外点
 
@@ -73,7 +73,9 @@ Dehallu3D 的动机源于一个关键洞察：**利用密集的小角度相邻�
 
 Dehallu3D 的另一个重要动机是**通用性**。上述循环视图一致性细化策略被封装为一个独立的**即插即用（plug-and-play）优化模块**，称为循环视图一致性细化（Cyclic View Consistency Refinement, CVCR）。该模块不依赖于特定的网格初始化方式或多视图生成器架构，理论上可集成到各类单图三维重建流程中。论文通过在 **Unique3D**（Wu et al., NeurIPS 2024）上验证CVCR的即插即用性，初步证明了该设计的通用潜力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Dehallu3D 的核心创新在于提出了一种**即插即用的循环视图一致性细化（CVCR）模块**，以解决现有单图到三维重建方法中因稀疏多视图间隙导致的网格幻觉性外点问题。该方法围绕三个关键的 changed slots 展开：
 
@@ -105,7 +107,7 @@ $$\mathcal{L}_{SE} = \sum_{v \in \mathcal{V}} \sum_{i}^{4} \epsilon_{i}^{v} \cdo
 
 上述三个 changed slots 形成递进式协同：L_SE 快速修正全局结构 → L_DC 弥合视图间隙消除外点 → L_DS 自适应保留锐利特征。消融实验证实，联合使用 L_DC 和 L_DS 可获得最佳网格质量（PSNR 达 21.8407），单独使用任一项效果均显著下降。CVCR 模块的即插即用特性使其可集成至各类网格重建管线，已在 Unique3D 骨干网络上验证了有效性。
 
-## 整体框架
+
 
 Dehallu3D 采用“生成—初始化—粗重建—精炼”的四阶段流水线，将单张 RGB 图像转化为高保真三维网格。其核心设计在于将几何幻觉的消除问题转化为**密集相邻视点的深度一致性约束**，从而弥合稀疏多视图之间的信息间隙。
 
@@ -141,7 +143,7 @@ CVCR 解决幻觉外点的逻辑链条如下：
 
 CVCR 模块与具体的网格初始化策略解耦，可集成到各类重建管线中。论文以 **Unique3D**（Wu et al., NeurIPS 2024）为骨干网络验证了其即插即用能力——将 CVCR 插入 Unique3D 后，网格外点显著减少，锐利特征得以保留（Figure 6）。
 
-## 核心模块与公式推导
+
 
 Dehallu3D 采用**两阶段优化管线**：粗网格重建（Coarse Mesh Reconstruction）与循环视图一致性细化（Cyclic View Consistency Refinement, CVCR）。前者快速修正全局拓扑，后者作为即插即用模块消除幻觉性外点并保留锐利几何特征。
 
@@ -214,7 +216,9 @@ $$
 
 消融实验（Table 2, Section 4.4）验证了各损失项的协同作用：单独使用 $\mathcal{L}_{DC}$ 能提升几何一致性但可能导致过度平滑；加入 $\mathcal{L}_{DS}$ 后 PSNR 达到 21.8407，在所有指标上取得最优。角度间隔消融（Table 3）表明 $5^\circ$ 是质量与效率的最佳平衡点——进一步减小至 $2.5^\circ$ 仅带来微小增益，却显著增加计算开销（$5^\circ$ 耗时约 163.3 秒）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -289,7 +293,9 @@ Figure 5 的 ORM 对比柱状图显示，Dehallu3D 在所有方法中取得最�
 ![[assets/figures/papers/paper_list_l2249_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Dehallu3D_Halluci/figures/007_Table_3.jpg]]
 *Table 3: Ablation study of angular intervals between adjacent views in the CVCR module*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位与核心瓶颈
 
@@ -342,6 +348,8 @@ Dehallu3D开启了若干值得探索的方向：
 - **ORM作为训练损失**：ORM能否作为可微训练损失直接优化，以实现更彻底的外点消除？
 - **大规模数据集验证**：在更大规模数据集（如Objaverse）上，CVCR模块是否仍能保持优越性？
 - **实时架构集成**：如何将CVCR集成到更快的重建架构（如feed-forward LRM）中以实现实时质量提升？
+
+
 
 ## 原文 PDF
 

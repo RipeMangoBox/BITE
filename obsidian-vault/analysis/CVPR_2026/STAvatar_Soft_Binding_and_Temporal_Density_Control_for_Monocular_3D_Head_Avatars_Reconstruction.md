@@ -42,7 +42,7 @@ claims:
 > - PointAvatar 上，PSNR↑ 28.25 vs 28.36 (FateAvatar) (-0.11)；SSIM↑ 0.9337 vs 0.9287 (FateAvatar) (+0.0050)；LPIPS↓ 0.0495 vs 0.0776 (FateAvatar) (-0.0281)。
 > - NerFace 上，PSNR↑ 30.08 vs 27.13 (RGBAvatar) (+2.95)。
 
-## 概述
+## 概要
 
 从单目视频重建高保真3D头部化身是数字人领域的核心挑战。现有基于3D高斯泼溅（3DGS）的方法虽在渲染效率上占优，却面临两个关键瓶颈：
 
@@ -60,7 +60,7 @@ claims:
 
 **方法定位。** STAvatar属于优化式单目头像重建框架，需针对每个受试者单独训练。与单图前馈泛化方法（如GAGAvatar、LAM）相比，身份保真度更高，但无法在单次前向传播中完成重建，在即时应用或数据稀缺场景下适用性受限。
 
-## 背景与动机
+
 
 ### 问题场景：单目视频驱动的3D头部化身重建
 
@@ -90,7 +90,9 @@ claims:
 
 通过这两个核心模块的协同，STAvatar在保留3DGS高效渲染和显式几何优势的同时，显著提升了动态头部化身在非刚性细节和遮挡区域的保真度，在INSTA、PointAvatar、NerFace和HDTF四个基准数据集上取得了最优重建性能（见Table 1）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 STAvatar 面向单目视频动态头部化身重建，针对现有 3DGS 方法的两个根本瓶颈提出了两条正交的关键创新：**UV-Adaptive Soft Binding** 和 **Temporal Adaptive Density Control（Temporal ADC）**。二者共同构成了从“刚性绑定 + 全局密度控制”到“软绑定 + 时间感知密度控制”的范式转变。
 
@@ -142,7 +144,7 @@ STAvatar 提出时间自适应密度控制策略，包含两个耦合组件：
 
 软绑定与 Temporal ADC 并非孤立改进，二者形成协同：软绑定提供的非刚性形变自由度会产生更丰富的几何-纹理误差信号，为 FPE-AP 提供更精确的密度控制指引；Temporal ADC 增加的瞬时区域高斯密度则为软绑定的细粒度偏移提供了足够的表达容量。在 INSTA 数据集上，完整方法达到 PSNR 30.63、SSIM 0.9587、LPIPS 0.0304（Table 1），显著优于所有对比方法，且训练效率最高（Figure 9），6 个 epoch 内快速收敛至最优水平。
 
-## 整体框架
+
 
 STAvatar 的整体 pipeline 围绕两个核心创新展开：**UV-Adaptive Soft Binding（UV 自适应软绑定）** 和 **Temporal Adaptive Density Control（时间自适应密度控制）**，旨在从单目视频中重建高保真 3D 头部化身。整个框架的输入为一段单目人脸视频，输出为一个可驱动的 3D 高斯化身，其架构可划分为四个串联模块。
 
@@ -177,7 +179,7 @@ STAvatar 的整体 pipeline 围绕两个核心创新展开：**UV-Adaptive Soft 
 ![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2511_19854/figures/001_Figure_1.jpg]]
 *Figure 1: STAvatar proposes a Soft Binding framework and a Temporal Adaptive Density Control strategy to reconstruct highfidelity 3D head avatars from monocular videos*
 
-## 核心模块与公式推导
+
 
 STAvatar 的核心管线由四个模块构成，其设计直指现有 3DGS 头部化身方法的两大瓶颈：硬绑定无法捕捉非刚性形变，以及标准 ADC 忽视瞬时可见区域。以下按信息流顺序展开。
 
@@ -327,7 +329,9 @@ $$
 ![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2511_19854/figures/013_Figure_3.jpg]]
 *Figure 3: t-SNE visualization of different identities after applying FTC. Each color represents a distinct video frame cluster*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 定量主结果
 
@@ -388,7 +392,9 @@ Table 1 (supp) 给出了关键超参数的消融结果。FPE 中 D-SSIM 权重 $
 ![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2511_19854/figures/014_Figure_2.jpg]]
 *Figure 2: Inclusion–exclusion principle*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 在3D头部化身重建谱系中的位置
 
@@ -468,6 +474,8 @@ STAvatar属于**优化式**方法（per-subject optimization），需要目标�
 4. **感知误差权重的自适应调节**：λ1=0.2的设置在多大程度上是任务特定的？在纹理丰富区域（如头发）和纹理稀疏区域（如脸颊），最优的L1/D-SSIM混合比例可能不同——空间自适应的λ1是否值得探索？
 
 5. **与基于NeRF的方法的深度对比**：论文主要与3DGS系方法对比，但NeRF系方法（如PointAvatar）在特定指标上仍有竞争力（PointAvatar数据集上FateAvatar的PSNR略高于STAvatar）。软绑定思想能否反向迁移到基于NeRF的化身框架中？
+
+
 
 ## 原文 PDF
 

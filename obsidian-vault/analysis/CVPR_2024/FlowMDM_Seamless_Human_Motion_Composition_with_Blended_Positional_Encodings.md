@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2024
 pdf_ref: paperPDFs/CVPR_2024/FlowMDM_Seamless_Human_Motion_Composition_with_Blended_Positional_Encodings.pdf
+project_link: https://barquerogerman.github.io/FlowMDM/
+code_link: null
 aliases:
 - FlowMDM
 tags:
@@ -39,7 +41,7 @@ claims:
 > - Babel 上，FID (Subsequence) 0.99 vs 1.33 (DoubleTake) (-0.34)；AUJ (Transition) 0.13 vs 0.64 (DoubleTake) (-0.51)。
 > - HumanML3D 上，FID (Subsequence) 0.29 vs 1.25 (MultiDiffusion) (-0.96)；AUJ (Transition) 0.51 vs 1.06 (MultiDiffusion) (-0.55)。
 
-## 概述
+## 概要
 
 **核心问题**：现有的人体运动生成方法在组合多个不同文本描述的动作时，面临一个根本性矛盾——全局运动语义一致性与局部过渡自然平滑性难以兼得。自回归方法（如 TEACH）依赖事后线性插值来缝合动作片段，破坏了运动动力学；扩散采样方法（如 DoubleTake、DiffCollage、MultiDiffusion）则通过对重叠区域反复去噪或后处理来细化过渡，导致效率低下且真实感不足。
 
@@ -50,8 +52,6 @@ claims:
 - **姿态中心交叉注意力（PCCAT）**：将文本条件仅注入注意力机制的查询（Query），而键（Key）和值（Value）仅使用噪声姿态，有效解决了训练时单条件与推理时多条件之间的分布偏移问题。
 
 **主要结果**：在 Babel 和 HumanML3D 两个基准数据集上，FlowMDM 在子序列生成质量（FID）和过渡平滑性（AUJ）两项指标上均达到最优。具体而言，在 Babel 上 FID 降至 0.99（DoubleTake 为 1.33），AUJ 降至 0.13（DoubleTake 为 0.64）；在 HumanML3D 上 FID 降至 0.29（MultiDiffusion 为 1.25），AUJ 降至 0.51（MultiDiffusion 为 1.06）。消融实验进一步验证了 BPE 与 PCCAT 的互补性：二者结合在准确率（R-prec）和平滑性（AUJ）上均优于单一编码方案。此外，所提出的峰值加加速度（PJ）和加加速度下面积（AUJ）指标能够有效检测现有指标无法捕捉的突变过渡伪影。
-
-## 背景与动机
 
 ### 问题背景
 
@@ -83,7 +83,7 @@ FlowMDM 的提出源于对扩散模型去噪过程内在特性的深入观察。
 
 通过将这两种编码方式在去噪时间轴上动态混合——早期使用 APE 保证语义对齐，后期切换到 RPE 实现平滑过渡——FlowMDM 首次实现了**无需任何后处理或冗余去噪步骤**的端到端无缝人体动作组合。这一设计使得全长序列可以一次性生成，每帧仅经历一次去噪，从根本上解决了现有方法的效率与质量矛盾。
 
-## 核心创新
+## 核心方法与创新机理
 
 FlowMDM 的核心创新在于洞察到扩散模型的去噪过程天然存在“先全局后局部”的频率重建特性，并据此设计了一套无需额外过渡标注、无需事后插值或冗余去噪的一体化动作组合方案。其关键创新点可归纳为三个相互协同的“changed slots”。
 
@@ -118,8 +118,6 @@ $$q_m^T k_n = (W_q E_{x_m,c_m})^T (W_k E_{x_n})$$
 ### 创新协同逻辑
 
 三项创新并非孤立存在，而是形成因果闭环：BPE 提供了从全局结构到局部平滑的频率调控手段，PCCAT 保证了多条件推理时的分布一致性，两者共同使“一次性全长生成”成为可能。这一闭环的突破口在于对扩散去噪过程频率特性的深刻理解——早期重建低频全局结构，后期恢复高频局部细节——并据此将位置编码从静态超参数升级为可动态调控的生成控制变量。
-
-## 整体框架
 
 FlowMDM 的整体流程围绕一个核心设计展开：**利用扩散模型的迭代去噪特性，通过动态切换位置编码来一次性生成包含多个语义子序列的无缝运动长序列**。该流程无需任何后处理或冗余去噪步骤，每帧仅被去噪一次。
 
@@ -161,11 +159,6 @@ FlowMDM 的整体流程围绕一个核心设计展开：**利用扩散模型的�
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l1842_FlowMDM_Seamless_Human_Motion_Composition_with_Blended_Positional_Encodi/figures/003_Figure_3.jpg]]
-*Figure 3: Pose-centric cross-attention. Our attention minimizes the entanglement between the control signal (e.g., text, objects) and the noisy motion by feeding the former only to the query. Consequently, our model denoises each frame’s noisy pose only leveraging its own condition, and the neighboring noisy poses*
-
-## 核心模块与公式推导
-
 FlowMDM 的核心由三个关键模块构成：**混合位置编码（BPE）**、**姿态中心交叉注意力（PCCAT）** 和 **双向扩散 Transformer**。这三个模块协同工作，使得模型能够在一次去噪过程中生成全长无缝动作序列，无需任何后处理或冗余去噪步骤。
 
 ### 混合位置编码（BPE）
@@ -201,7 +194,7 @@ $$\mathbf{PJ} = \max_{1 \leq i \leq K} |j_i(\tau)|_1, \quad \mathrm{AUJ} = \sum_
 
 其中 $j_i(\tau)$ 是关节 $i$ 在时刻 $\tau$ 的加加速度，$K$ 为关节总数，$L_{tr}$ 为过渡长度，$j_{avg}$ 是数据集中各关节最大加加速度的平均值。**PJ** 衡量整个过渡中任意关节的最大加加速度峰值，**AUJ** 衡量加加速度偏离数据集平均水平的累积程度。这两个指标互补：PJ 捕获瞬时突变，AUJ 反映持续的不自然波动。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 瓶颈验证：全局一致性与局部平滑性的冲突
 
@@ -279,25 +272,10 @@ Figure 5 展示了绝对编码去噪步数占比对各项指标的影响。随�
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l1842_FlowMDM_Seamless_Human_Motion_Composition_with_Blended_Positional_Encodi/figures/011_Table.jpg]]
-*Table: A. Extrapolated motions for Babel and HumanML3D*
-
 ![[assets/figures/papers/paper_list_l1842_FlowMDM_Seamless_Human_Motion_Composition_with_Blended_Positional_Encodi/figures/012_Table.jpg]]
 *Table: C. Scenario-wise comparison in HumanML3D*
 
-![[assets/figures/papers/paper_list_l1842_FlowMDM_Seamless_Human_Motion_Composition_with_Blended_Positional_Encodi/figures/013_Table.jpg]]
-*Table: D. Attention horizon effect in Babel. All models correspond to FlowMDM, trained with BPE. Inf. PE indicates the type of positional encoding used during sampling: B for BPE, and R for only RPE. Symbols $\uparrow , \downarrow ,$ and → indicate that higher, lower, or values closer to the ground truth (GT) are better, respectively. Evaluation is run 10 times and ± specifies the 95% confidence intervals*
-
-![[assets/figures/papers/paper_list_l1842_FlowMDM_Seamless_Human_Motion_Composition_with_Blended_Positional_Encodi/figures/014_Table.jpg]]
-*Table: E. Attention horizon effect in HumanML3D. All models correspond to FlowMDM, trained with BPE. Inf. PE indicates the type of positional encoding used during sampling: B for BPE, and R for only RPE*
-
-![[assets/figures/papers/paper_list_l1842_FlowMDM_Seamless_Human_Motion_Composition_with_Blended_Positional_Encodi/figures/015_Figure.jpg]]
-*Figure: A. Diffusion noise schedules. The cosine noise schedule destroys the motion signal slower and in a more evenly distributed way than the linear schedule. As a result, FlowMDM is able to exploit better the low-to-high frequencies decomposition along the denoising chain and generate better subsequences and transitions. The faster motion destruction in the linear schedule translates to needing more APE steps to reconstruct global dependencies inside subsequences (black arrows ↔). Figure B. Classifier-free guidance. In line with prior works, we also observe an accuracy improvement (R-prec) when increasing the strength (i.e., weight) of the classifier-free guidance (CFG). However, above certain v...*
-
-![[assets/figures/papers/paper_list_l1842_FlowMDM_Seamless_Human_Motion_Composition_with_Blended_Positional_Encodi/figures/001_Figure.jpg]]
-*Figure: ("walk", 2s) ("walk", 2s) ("walk", 2s) ("walk", 2s) ("walk", 2s)*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 方法谱系与基线关系
 

@@ -34,7 +34,7 @@ claims:
 | 中文题名 | 从无组织点云中保证单连通的网格重建 |
 | 英文题名 | Guaranteed Simply Connected Mesh Reconstruction from an Unorganized Point Cloud |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=jjEnTBsffi) · [arXiv](https://arxiv.org/abs/2501.11871) · [Code](https://github.com/NVIDIA/cutlass) |
+| Links | [paper](https://openreview.net/forum?id=jjEnTBsffi) · [paper](https://arxiv.org/abs/2501.11871) · [Code](https://github.com/NVIDIA/cutlass) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction #topic/benchmarks_datasets_evaluation |
 | Method | HHD-based simply-connected mesh reconstruction |
 | Dataset | CrossSDF medical benchmark, Synthetic Stanford Bunny with outliers |
@@ -43,7 +43,7 @@ claims:
 > - CrossSDF medical benchmark (Alveolis aligned) 上，Chamfer Distance (CD×100) 0.41 vs CrossSDF (higher) (-15.8%)；Connected Components (CC) 1 vs CrossSDF (multiple) (significantly better)。
 > - Synthetic Stanford Bunny with outliers 上，Robustness (visual quality) 完整且无洞 vs Screened PSR / SALD (显著更优)。
 
-## 概述
+## 概要
 
 从无组织点云中重建封闭且拓扑正确的曲面是计算机图形学与医学影像分析中的基础问题。现有表面重建方法，无论是经典的隐式方法（如 Screened Poisson Surface Reconstruction）还是基于神经隐式场的最新方法（如 **CrossSDF** (Walker et al., CVPR 2025)、**OReX** (Sawdayee et al., CVPR 2023)），普遍缺乏对输出曲面拓扑的显式控制——它们无法保证重建结果同胚于球体（即单连通），从而在医学器官建模、血管重建等对拓扑正确性要求严苛的应用中产生虚假的连通分量和多余的手柄（handles）。
 
@@ -55,7 +55,7 @@ claims:
 
 **局限性**方面，当前方法仅保证单连通重建，无法处理更高亏格的拓扑（如环面）；此外，方法依赖全局三角剖分构建，对大规模点云存在计算瓶颈，且初始化阶段在点云极度稀疏或非均匀时可能不准确。未来方向包括通过选择性保留部分谐波分量以支持任意亏格拓扑，以及将该表征与生成模型结合以学习具有可控拓扑的 3D 形状先验。
 
-## 背景与动机
+
 
 ### 从点云到曲面：隐式重建的拓扑盲区
 
@@ -75,7 +75,9 @@ claims:
 
 这一思路将拓扑控制从二维曲线推广到三维曲面，并结合谱初始化与交替鲁棒优化，形成一个完整的重建流水线。其关键优势在于：**拓扑保证是严格的数学结论，而非经验性的启发式约束**。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于将**拓扑控制**从启发式后处理提升为重建算法的一等公民，通过代数化方法**保证**输出网格为单连通（同胚于球体）。其关键在于识别并操控了缠绕数场的**谐波分量 γ**——该分量编码了表面的非平凡拓扑特征（如洞、手柄），并通过线性系统将其强制消去，从而移除所有非边界的 2-循环。
 
@@ -117,7 +119,7 @@ $$\min_{\sigma_T} \sum_{f\in \mathcal{F}} \operatorname{Area}(f) |\Lambda_f|^0$$
 | 优化策略 | 单次重建 | 交替迭代 | 逐步收敛至一致方向场 |
 | 剖分构建 | 纯 Delaunay | 八叉树增强 Delaunay | 改善四面体质量 |
 
-## 整体框架
+
 
 本文提出一种从无组织点云中重建**保证单连通**的封闭网格表面的方法。整个流水线分为两大阶段：**初始化阶段**和**交替优化阶段**，如 Figure 2 所示。
 
@@ -158,7 +160,7 @@ $$S = \partial W$$
 - **鲁棒性保障**：L0 范数优化和交替迭代策略共同作用，使方法对噪声和异常值具有较强鲁棒性。消融实验表明，移除任一组件均会导致重建失败或拓扑错误。
 - **无需法线信息**：与部分基线方法（如 Screened Poisson Surface Reconstruction）不同，本方法仅需点云位置信息，不依赖输入法线。
 
-## 核心模块与公式推导
+
 
 ### 核心模块：基于 HHD 的校正表面重建
 
@@ -215,7 +217,9 @@ $$S = \hat{o}_3 W$$
 ![[assets/figures/papers/paper_list_l73_https_openreview_net_forum_id_jjEnTBsffi/figures/008_Figure_6.jpg]]
 *Figure 6: Edge weight*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置与评估基准
 
@@ -272,7 +276,9 @@ Figure 5 的消融实验系统性地验证了三个核心组件的必要性：
 ![[assets/figures/papers/paper_list_l73_https_openreview_net_forum_id_jjEnTBsffi/figures/007_Figure.jpg]]
 *Figure: (a)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 
@@ -325,6 +331,8 @@ Figure 5 的消融实验系统性地验证了三个核心组件的必要性：
 2. **与生成模型结合。** 该表征将拓扑约束编码为线性代数条件，具有可微性潜力。如何将其嵌入生成模型（如扩散模型或神经场），以学习具有可控拓扑的三维形状先验分布，是一个值得探索的方向。
 
 3. **大规模扩展。** 如何通过自适应剖分或局部拓扑约束避免全局三角剖分的计算瓶颈，使方法适用于更大规模的真实扫描数据，仍需进一步研究。
+
+
 
 ## 原文 PDF
 

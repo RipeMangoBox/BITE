@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/MixerMDM_Learnable_Composition_of_Human_Motion_Diffusion_Models.pdf
+project_link: null
+code_link: null
 aliases:
 - MLCHMDM
 tags:
@@ -42,7 +44,7 @@ claims:
 > - 用户研究 (35 participants) 上，平均排名 (↓) - 交互对齐 1.182±.467 vs DualMDM: 2.286±.641; DiffusionBlending: 2.531±.584 (相对DualMDM提升约48%)。
 > - 常规评估 (R-Precision, FID等) 上，Interaction R-Precision Top-3 (↑) 0.672±.02 (MixerMDM T, in2IN/in2IN) vs DualMDM: 0.574±.00; DiffusionBlending: 0.577±.00 (提高约17.1%)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -66,7 +68,7 @@ MixerMDM 是首个可学习的运动扩散模型组合技术。其核心创新�
 
 定性结果进一步表明，当施加个体动作变化时，MixerMDM 生成的混合运动在一致性和可控性上均显著优于先前方法（Figure 6, Figure 7）。消融实验证实，Mixer 学习到的动态权重曲线具有可解释的时序特性：个体模型在去噪早期起主导作用，交互模型在后期加强（Figure 5）；即使移除对齐变换，MixerMDM 仍优于先前方法（Table B）。此外，Mixer 权重具有良好的模块化和迁移能力，在不同预训练模型组合上可带来最高 37% 的性能提升（Table 3）。
 
-## 背景与动机
+
 
 ### 人体运动生成与扩散模型
 
@@ -101,7 +103,9 @@ MixerMDM 的提出正是为了突破上述瓶颈。其核心动机是：**将模
 
 通过这种可学习的动态组合机制，MixerMDM 旨在实现一个关键目标：当交互条件保持不变时，生成的混合运动应与交互模型的输出分布一致；当个体条件发生变化时，混合运动应能精确反映该变化，同时维持交互的全局一致性。这使得对双人交互中个体动作的精细控制成为可能。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MixerMDM 的核心创新在于将**静态、手工设计的模型组合**转变为**可学习的、自适应的动态混合**，通过两个关键机制实现：**动态权重预测**与**双判别器对抗训练**。
 
@@ -131,7 +135,7 @@ MixerMDM 将混合权重的粒度从单一全局标量扩展为四种可配置�
 
 学习到的动态权重曲线（Figure 5）揭示了组合过程中的自适应行为：个体模型在去噪早期起主导作用，交互模型在后期逐渐加强，这与人类运动生成从粗到细的直觉相符，而此前的手工调度器无法捕捉这种规律。
 
-## 整体框架
+
 
 MixerMDM 的整体流水线围绕一个核心思想展开：在去噪过程的每一个时间步，动态地组合两个预训练文本条件运动扩散模型的输出，从而生成兼具交互语义与个体可控性的混合运动。如图 Figure 2 所示，整个框架由三个关键环节串联而成：预训练模型的前向推理、Mixer 模块的权重预测，以及基于预测权重的运动混合操作。
 
@@ -162,7 +166,7 @@ $$x_t^m = x_t^a + w_t \cdot (x_t^b - x_t^a)$$
 ![[assets/figures/papers/paper_list_l5_MixerMDM_Learnable_Composition_of_Human_Motion_Diffusion_Models/figures/004_Figure_3.jpg]]
 *Figure 3: Mixer architecture. The Mixer is composed of a Transformer encoder that takes as input both generated motions by the pre-trained models, their respective conditions, and the actual timestep of the denoising process. This encoder generates a latent representation, which is decoded by an MLP that outputs the mixing weights. T : number of frames of the motion sequence*
 
-## 核心模块与公式推导
+
 
 MixerMDM 的核心创新在于将传统手工设定的固定混合权重替换为**可学习的动态混合模块（Mixer）**，并引入**双判别器对抗训练**来驱动该模块的学习。整个组合过程发生在扩散模型的去噪链中，每一步均动态决定两个预训练模型输出的混合比例。
 
@@ -237,7 +241,9 @@ Mixer 使用 AdamW 优化器训练（学习率 $1\times10^{-5}$，权重衰减 $
 ![[assets/figures/papers/paper_list_l5_MixerMDM_Learnable_Composition_of_Human_Motion_Diffusion_Models/figures/005_Figure_5.jpg]]
 *Figure 5: Mean mixing weights. The mean mixing weights of the best models for each variation of the Mixer output. Previous model composition techniques appear in the Global plot with a dotted line (DiffusionBlending [41]) and a dashed line (DualMDM [39])*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -313,7 +319,9 @@ Figure 6 和 Figure 7 展示了定性对比结果。当施加个体动作变化�
 
 所有定量实验均进行 10 次独立评估并报告 95% 置信区间，以减少随机性影响。用户研究邀请了 35 名参与者对 20 个随机选择的生成动作进行排名，确保评估的代表性。提出的 Alignment 和 Adaptability 指标是针对模型组合任务专门设计的，弥补了传统指标在评估组合质量方面的不足。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与创新动机
 
@@ -362,6 +370,8 @@ $$\mathcal{L}_{\mathrm{adv}}^{\mathrm{G}} = - \mathcal{D}^{a}(x_t^m) - \mathcal{
 MixerMDM 的核心主张得到了较为充分的实验支撑。在定量评估中，MixerMDM ST 变体在 Overall Alignment 指标上达到 0.335，比最强基线 DualMDM（0.221）高出约 51.6%（Table 1）。用户研究进一步验证了感知质量：MixerMDM 在交互对齐的平均排名为 1.182（1 为最好），第一排名占比 85.14%，远优于 DualMDM 的 2.286 和 10.29%（Table 2）。消融实验证实了对齐变换的贡献（Table B），以及学习到的动态权重曲线揭示了有意义的时序模式——个体模型在去噪早期起主导作用，交互模型在后期加强（Figure 5）。模块化评估表明，重用最佳 Mixer 权重可显著提升其他预训练模型组合的性能（最高提升 37%，Table 3），体现了方法的迁移能力。
 
 需要注意的是，Overall Alignment 和 Adaptability 指标是作者为模型组合任务专门设计的，其与下游任务实际表现的对应关系仍需更多验证。所有定量实验均进行了 10 次独立评估并报告 95% 置信区间，用户研究邀请了 35 名参与者，方法论上较为严谨。
+
+
 
 ## 原文 PDF
 

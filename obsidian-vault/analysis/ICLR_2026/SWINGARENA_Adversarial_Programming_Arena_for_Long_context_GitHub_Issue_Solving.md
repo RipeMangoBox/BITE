@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/SWINGARENA_Adversarial_Programming_Arena_for_Long_context_GitHub_Issue_Solving.pdf
+project_link: https://swing-bench.github.io/
+code_link: https://github.com/menik1126/Swing-Bench
 openreview_forum_id: YuxgSGFaqb
 aliases:
 - SWINGARENA
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | SWINGARENA: 面向长上下文GitHub问题求解的对抗性编程竞技场 |
 | 英文题名 | SWINGARENA: Adversarial Programming Arena for Long-context GitHub Issue Solving |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=YuxgSGFaqb); [GitHub](https://github.com/menik1126/Swing-Bench); [Project](https://swing-bench.github.io/) |
+| Links | [paper](https://openreview.net/forum?id=YuxgSGFaqb) · [GitHub](https://github.com/menik1126/Swing-Bench) · [Project](https://swing-bench.github.io/) |
 | Topic | #topic/safety_alignment_fairness_privacy #topic/safety_alignment_fairness_privacy/trustworthy_machine_learning |
 | Method | SWINGARENA |
 | Dataset | SWINGARENA Adversarial Battle (400 evaluation instances), SWINGARENA Adversarial Battle, SWINGARENA Best@3 (across languages), Language-specific Best@3 (C++, Go, Rust, Python) |
@@ -41,7 +43,7 @@ claims:
 > - SWINGARENA Adversarial Battle 上，Submitter CI Pass Rate (SPR) (Self-play) 为 GPT-4o: 0.68 | Claude: 0.62 | Gemini: 0.63 | DeepSeek: 0.66，对比 N/A，变化 N/A。
 > - SWINGARENA Best@3 (across languages) 上，Best@3 Average 为 GPT-4o: 0.57 | Claude: 0.55 | Gemini: 0.57 | DeepSeek: 0.59，对比 N/A，变化 N/A。
 
-## 概述
+## 概要
 
 现有的大语言模型（LLM）代码能力评估基准主要依赖静态单元测试或部分模拟的执行环境，忽略了真实软件开发中完整的持续集成（CI）流水线、协作式迭代（提交-审阅循环）以及对抗性测试带来的挑战，因而无法全面衡量模型在真实软件工程场景中的能力。针对这一瓶颈，SWINGARENA提出了一个对抗性编程竞技场，通过引入提交者-审阅者双智能体协议并集成真实CI工作流验证，构建了动态的对抗性评估框架。其核心洞察在于：在CI驱动的对抗性场景中，不同模型展现出差异化的行为模式——GPT-4o擅长激进地生成高胜率补丁，而DeepSeek和Gemini则更注重代码正确性与CI稳定性；同时，检索增强代码生成（RACG）模块通过语法感知分块和密集重排序有效缓解了长上下文检索瓶颈，显著提升了补丁定位精度和任务解决率。
 
@@ -49,7 +51,7 @@ claims:
 
 主要实验结果表明：在400个高质量真实GitHub问题实例上，GPT-4o作为提交者在所有对局中均取得≥0.90的胜率，但其提交端CI通过率（SPR）和审查端CI通过率（RPR）相对较低（0.65/0.55），反映出其激进补丁策略；DeepSeek-V3在Best@3指标上取得最高平均得分（0.59），并在Rust和Go上表现尤为均衡。RACG模块使C++任务上的Best@3从0.38提升至0.42，胜率从0.77提升至0.84，同时减少12-18%的令牌占用。消融实验进一步表明，约15%的失败案例可追溯至检索阶段未能找到关键上下文，揭示检索质量仍是当前性能的瓶颈之一。
 
-## 背景与动机
+
 
 大型语言模型（LLM）在代码生成领域取得了显著进展，然而现有评估基准（如SWE-Bench）存在一个核心瓶颈：它们仅依赖静态或部分模拟的单元测试，忽略了真实软件开发中完整的CI流水线、协作式迭代（提交-审阅循环）以及对抗性测试的挑战。这导致现有基准无法全面衡量模型在真实软件工程场景中的能力，尤其是当补丁生成与测试生成相互博弈时，模型行为的细微差异会被掩盖。
 
@@ -67,7 +69,9 @@ claims:
 
 本文的核心动机在于：通过构建一个CI驱动的对抗性竞技场，系统性地暴露模型在补丁生成与测试生成中的差异化行为，并验证长上下文检索优化对任务解决率的因果影响，从而推动LLM在真实软件工程场景中的能力评估与提升。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SWINGARENA的核心创新在于将LLM代码能力评估从静态单元测试范式推向**对抗性CI驱动竞技场**，并通过**多语言检索增强代码生成（RACG）**模块解决长上下文代码库的检索瓶颈。以下从评估协议、上下文检索和验证环境三个关键维度展开分析。
 
@@ -97,7 +101,7 @@ SWINGARENA的核心创新在于将LLM代码能力评估从静态单元测试范�
 
 SWINGARENA的评估框架与**SWE-Bench**（Jimenez et al., 2024）和**RepoBench**（Liu et al., 2024b）等代码基准共享对真实软件工程场景的关注，但其对抗性CI协议和角色切换机制是独特贡献。RACG模块在检索增强代码生成方向上与**RepoCoder**（Zhang et al., 2023）等工作的迭代检索策略形成互补——前者强调多语言语法感知分块与稠密重排序，后者侧重迭代式仓库遍历。在基线模型层面，GPT-4o、Claude-3.5、Gemini-2.0和DeepSeek-V3作为提交者/审阅者的对比揭示了不同模型在补丁激进性与代码正确性之间的权衡，而Qwen2.5-Coder-7B-Instruct等开源模型在消融研究中验证了RACG的通用性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_YuxgSGFaqb/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of SWINGARENA data construction pipeline, including repository collection, pull request extraction, task instance creation, quality filtering, and multiple CI-based validation*
@@ -140,7 +144,7 @@ SWINGARENA 的整体框架由两大核心子系统构成：**对抗性评估竞�
 
 整体工作流如下：数据构建流水线输出经过验证的 Issue-PR 对 → RACG 模块根据问题描述检索并打包相关代码上下文 → 提交者基于上下文生成补丁 → CI 验证模块在 Docker 容器中运行仓库原生 CI 流水线验证补丁 → 审阅者基于补丁变更信息生成针对性测试用例 → CI 再次验证完整补丁 → 评分引擎计算双方得分 → 角色切换进入下一轮迭代。所有评估使用统一的解码参数（temperature=0, top-p）和令牌预算，API 失败自动记录并重试，确保公平性与可复现性。
 
-## 核心模块与公式推导
+
 
 ### 对抗性竞技场框架
 
@@ -200,7 +204,9 @@ SPR反映模型生成正确补丁的能力，RPR反映模型生成有效测试�
 
 最终从2,300个（Issue, PR）对中筛选出400个评估实例（每种语言100个），另提供100个样本用于消融实验。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 对抗性编程对战：专有模型的主结果
 
@@ -252,7 +258,9 @@ Table 4报告了开源LLM的对抗性评估结果。开源模型在整体指标�
 ### 失败模式与局限
 
 主要失败模式可归纳为三类：（1）检索阶段的上下文缺失（约15%案例），RACG的固定检索策略无法捕获所有关键文件；（2）审查者测试生成质量波动，尽管设置了CI质量门控，某些微妙的代码风格违规或非确定性行为仍可能通过过滤；（3）act模拟的CI流水线与真实执行环境之间存在偏差，可能忽略特定的环境依赖或非确定性因素。这些失败模式为后续研究指明了方向：设计更动态的自适应检索策略，以及更精细的审查者测试质量评估机制。
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有基准的定位关系
 
@@ -290,6 +298,8 @@ SWINGARENA 的评估框架在以下条件下展现出较强的有效性：
 - 观察到的模型行为模式差异（GPT-4o 激进补丁 vs. DeepSeek 稳健性）是否与训练数据分布或架构特性存在系统性关联？这一问题对于理解 LLM 在软件工程任务中的能力来源具有基础意义。
 - 如何将多语言代码开发、提交与审查的完整工作流更深度地整合到评价体系中，例如引入代码审查评论的生成与响应、多轮迭代的冲突解决等更丰富的交互维度？
 - 对抗性 CI 协议能否扩展到更细粒度的质量门禁度量，如安全漏洞检测、性能回归测试、代码覆盖率阈值等？
+
+
 
 ## 原文 PDF
 

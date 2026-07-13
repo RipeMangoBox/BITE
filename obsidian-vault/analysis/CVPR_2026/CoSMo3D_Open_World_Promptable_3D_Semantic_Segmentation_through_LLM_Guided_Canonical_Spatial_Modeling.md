@@ -42,15 +42,13 @@ claims:
 > - 3DCompat-Coarse (canonical {Part}) 上，mIoU 54.52 vs 24.35 (Find3D*) (+30.17)。
 > - 3DCompat-Fine (canonical {Part} of {Obj.}) 上，mIoU 36.69 vs 13.12 (Find3D*) (+23.57)。
 
-## 概述
+## 概要
 
 开放世界可提示3D语义分割旨在根据任意文本描述，在任意姿态和形状的3D对象中定位语义部件。现有方法（如**Find3D**，Ma et al., ICCV 2025）直接在输入传感器坐标空间中进行几何-文本匹配，缺乏规范空间感知能力，导致在面对姿态变化、形状对称性和跨类别场景时，同一功能部件的分割结果不一致。其根本瓶颈在于：这些方法未能像人类一样，在一个姿态无关的规范参考系中理解部件的功能语义。
 
 本文提出**CoSMo3D**，将开放世界3D分割重构为基于规范空间规律的推理问题。核心思路是：从数据中学习一个跨类别共享的潜在规范参考框架，使语义部件在规范空间中的分布保持稳定且姿态无关，从而消除姿态变异对分割的干扰。为实现这一目标，方法引入双分支架构，在训练时通过规范映射锚定损失和规范框校准损失，将不同姿态、对称性和形状变体下的同一功能部件映射到一致的规范嵌入；同时，利用大语言模型（LLM）指导构建跨类别规范数据集，覆盖200个类别，暴露跨类别的规范空间规律。
 
 实验结果表明，CoSMo3D在多个基准上均取得最优性能：在3DCompat粗粒度数据集上，平均mIoU达到47.51（`canonical {Part} of {Obj.}`设定），较最强基线**Find3D***提升25.55个百分点；在ShapeNet-Part上，mIoU达到36.16，提升29.89个百分点。消融实验证实，规范映射锚定和跨类别规范化是性能提升的关键驱动因素，而规范框校准进一步强化了部件边界的一致性。定性结果显示，CoSMo3D在几何相似但语义不同、跨类别语义和任意姿态等挑战性场景中，均能产生更准确且一致的部件分割。
-
-## 背景与动机
 
 ### 问题背景：开放世界可提示3D语义分割
 
@@ -83,7 +81,7 @@ claims:
 
 通过这一设计，CoSMo3D在多个基准上均取得最优结果：在3DCompat和ShapeNet-Part上的平均mIoU分别比最强基线提升25.55%和29.89%（Table 1），并在几何相似但语义不同、跨类别语义和任意姿态等挑战性场景中展现出显著更优的分割一致性和准确性（Figure 5）。
 
-## 核心创新
+## 核心方法与创新机理
 
 CoSMo3D的核心思想是将开放世界3D语义分割从“输入姿态空间中的几何-文本匹配”重构为“基于规范空间规律的推理”。现有方法（如**Find3D**，Ma et al., ICCV 2025）直接在传感器坐标系下进行点云与文本的对齐，缺乏对物体规范姿态的感知，导致在姿态变化、对称性和跨类别场景下语义分割不一致——无法像人类一样在规范参考系中理解部件的功能含义。CoSMo3D通过从数据中学习一个跨类别共享的潜在规范参考框架，使语义部件在规范空间中的分布一致且姿态无关，从而大幅提升分割的准确性和稳定性。
 
@@ -125,8 +123,6 @@ $${ \mathcal { L } } _ { \mathrm { t o t a l } } = \lambda _ { h } \cdot { \math
 
 这些创新的因果机制在于：规范映射锚定损失提供了姿态鲁棒的规范空间特征，跨类别规范数据暴露了通用的空间规律，而规范框校准损失进一步强化了部件边界的一致性。消融实验（Table 2）定量验证了这一因果链条：添加规范映射锚定后mIoU从38.12提升至42.23（+4.11），加入跨类别规范数据后提升至43.34（+1.11），最终加入框校准损失后达到完整的47.51（+4.17），相比基线Find3D累计提升10.62个点。
 
-## 整体框架
-
 CoSMo3D 的整体框架围绕一个核心思想展开：**将开放世界3D语义分割重构为基于规范空间规律的推理，而非在输入姿态空间中进行几何-文本匹配**。为此，方法引入一个从数据中直接学习的潜在规范参考框架，使语义部件在规范空间中的分布一致且姿态无关，从而消除姿态变异对分割的干扰。
 
 ### 双分支架构
@@ -164,8 +160,6 @@ $${ \mathcal { L } } _ { \mathrm { t o t a l } } = \lambda _ { h } \cdot { \math
 ![[assets/figures/papers/paper_list_l2032_https_openaccess_thecvf_com_content_CVPR2026_html_Jin_CoSMo3D_Open_World/figures/001_Figure_1.jpg]]
 *Figure 1: We propose CoSMo3D, an open-world promptable 3D semantic segmentation method. It introduces canonical space perception to break the limitation of any pose and shape, achieves state-of-the-art performance across multiple settings, and significantly outperforms geometry-mapping-only methods*
 
-## 核心模块与公式推导
-
 CoSMo3D 的整体框架（Figure 2）由两条分支构成：**特征提取分支**（推理时使用）和**规范嵌入分支**（仅训练时使用）。特征提取分支以 Point Transformer（Pt3）骨干网络提取 3D 形状特征，以 SigLIP 文本编码器提取文本语义特征，并通过跨模态对齐输出点-文本相似度，实现可提示的部件分割。规范嵌入分支则承担核心的规范空间感知学习任务，包含两个预测头：**规范映射预测头**和**语义边界框预测头**，两者共同将不同姿态、对称性和形状变体下的同一功能部件映射到稳定的潜在规范参考框架。
 
 ### 困难负样本对比对齐
@@ -200,15 +194,7 @@ $$\mathcal{L}_{total} = \lambda_h \cdot \mathcal{L}_h + \lambda_{ca} \cdot \math
 
 其中权重设置为 $\lambda_h = 1$，$\lambda_{ca} = 10$，$\lambda_{cb} = 3$。规范映射锚定损失被赋予最高权重，体现了规范空间感知在整个方法中的核心地位。消融实验（Table 2）验证了这一设计：逐步加入各损失项后，mIoU 从基线的 36.89 持续提升至完整模型的 47.51，其中规范映射锚定损失贡献了最大幅度的性能跃升（+4.11 mIoU）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2032_https_openaccess_thecvf_com_content_CVPR2026_html_Jin_CoSMo3D_Open_World/figures/003_Figure_3.jpg]]
-*Figure 3: (a) Prior works perform category-level canonicalization, aligning intra-category shapes but neglecting cross-category consistency. (b) We cluster categories via LLM and align different categories relying on key semantic parts and functional consistency*
-
-![[assets/figures/papers/paper_list_l2032_https_openaccess_thecvf_com_content_CVPR2026_html_Jin_CoSMo3D_Open_World/figures/004_Figure.jpg]]
-*Figure: (c) Ours: Learning the Canonical Map via Semantic Parts Enables Open-World Adaptation,No Category-Specific Design Needed*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 主要定量结果
 
@@ -271,7 +257,7 @@ Figure 6 从特征层面揭示了性能差异的根源：PartField 虽能产生�
 | Figure 5 | 在几何混淆、噪声、跨类别和任意姿态场景下，分割更准确且一致 |
 | Figure 6 | 规范空间感知使点特征同时具备部件分离度和跨实例一致性 |
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 方法定位与核心区分
 

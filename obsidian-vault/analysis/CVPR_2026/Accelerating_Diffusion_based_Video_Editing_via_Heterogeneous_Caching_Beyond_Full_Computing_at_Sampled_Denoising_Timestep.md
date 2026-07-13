@@ -44,7 +44,7 @@ claims:
 > - VACE-Benchmark video inpainting 上，FLOPs (P) 23.60 (与2.67×加速一致)。
 > - VACE-Benchmark text-guided editing 上，Latency (s) 128.61 (1.91× speedup)。
 
-## 概述
+## 概要
 
 **问题背景与瓶颈** 基于扩散Transformer（DiT）的视频编辑虽能生成高质量结果，但推理计算开销极大。现有加速方法通常只关注单一维度冗余：要么利用去噪时间步间的特征相似性进行步跳过或缓存，要么在Transformer层内对token进行统一剪枝。然而，MV2V（Masked Video-to-Video）编辑场景存在双重未被充分利用的计算冗余——去噪时间步级冗余和Transformer内token级冗余——且后者因编辑掩膜引入的ROI（感兴趣区域）而呈现显著的**token异质性**：并非所有上下文token对生成区域同等重要，统一缓存全部上下文token会损害生成质量。
 
@@ -53,8 +53,6 @@ claims:
 **关键结果** 在VACE-Benchmark视频修复任务上，HetCache-fast实现**2.67×延迟加速**和大幅FLOPs降低，同时质量退化可忽略；在高分辨率和长视频场景下加速比进一步提升至**2.91×和3.06×**。消融实验证实，同时移除K-Means语义代表性和注意力相关性指导会导致VBench分数下降（76.29→76.19）及可视化质量劣化（重影、边界不光滑），验证了异构缓存策略的必要性。
 
 **方法定位** HetCache属于推理时无训练加速方法，与需要额外训练的蒸馏或量化方法正交，可直接应用于预训练DiT backbone。其异构缓存思想为扩散模型加速提供了从“统一缓存”到“感知异质性缓存”的新范式。
-
-## 背景与动机
 
 ### 扩散视频编辑的加速困境
 
@@ -82,7 +80,7 @@ claims:
 
 这种设计使得HetCache能够在保持编辑一致性的前提下，大幅减少冗余的注意力计算，实现训练无关的即插即用加速。
 
-## 核心创新
+## 核心方法与创新机理
 
 HetCache 的核心创新在于将**掩膜视频到视频（MV2V）编辑中固有的 token 异质性**引入缓存决策，从而同时解决 DiT 推理中两个维度的计算冗余：去噪时间步间的特征相似性与 Transformer 层内上下文 token 间的稠密自注意力开销。与现有统一缓存所有 token 的方法不同，HetCache 通过编辑掩膜提供的空间先验，对时空 token 进行差异化处理，仅保留对生成质量真正关键的上下文 token 参与注意力计算。
 
@@ -135,8 +133,6 @@ $$\alpha_i = \frac{1}{|\mathcal{X}_{gen}|} \sum_{j \in \mathcal{X}_{gen}} \bar{A
 | 上下文 token 选择 | 无选择，全部参与 | K-Means 聚类 + 注意力相关性双约束筛选 |
 
 消融实验验证了双约束的必要性：同时移除 K-Means 语义代表性和注意力相关性指导会导致 VBench 分数下降（76.29 → 76.19），并出现重影和边界不平滑等可视化劣化（Table 3, Figure 6）。单独保留任一约束均无法达到完整 HetCache 的性能水平（仅聚类：75.80；仅相关性：76.24），表明语义覆盖与交互强度在缓存决策中具有互补作用。
-
-## 整体框架
 
 HetCache 是一种面向基于扩散的掩膜视频到视频（MV2V）编辑的无训练缓存框架，其核心设计动机在于联合建模扩散过程中**去噪时间步间的冗余**与 DiT backbone 中**时空 token 间的冗余**（Figure 1）。现有方法通常仅关注其中一维，而 HetCache 利用 MV2V 编辑特有的编辑掩膜空间先验，将 token 异质性引入缓存决策，从而在保持编辑一致性的前提下大幅裁剪冗余计算。
 
@@ -191,8 +187,6 @@ Figure 2 给出了 HetCache 的整体流程。对于一次 MV2V 编辑推理，�
 ### 设计要点
 
 HetCache 的关键创新在于将 MV2V 编辑的 ROI 特性系统性地融入缓存策略——并非所有上下文 token 对生成区域同等重要，通过聚类代表性和交互强度双重约束筛选上下文 token，实现了对 DiT 自注意力计算的精准裁剪。该方法无需微调或蒸馏，可直接应用于预训练 DiT backbone。
-
-## 核心模块与公式推导
 
 ### 时间步调制输入与累积距离调度器
 
@@ -256,7 +250,7 @@ $$\alpha_i = \frac{1}{|\mathcal{X}_{gen}|} \sum_{j \in \mathcal{X}_{gen}} \bar{A
 
 全计算步的缓存更新为部分计算步提供了两类关键信息：K-Means 聚类结构（用于语义代表性采样）和注意力矩阵 $\bar{A}$（用于 $\alpha_i$ 计算）。部分计算步以 EMA 方式更新缓存，避免因缓存陈旧导致的误差累积。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -299,16 +293,13 @@ Figure 5展示了关键超参数的影响。保留上下文token比例 $r_{\math
 ![[assets/figures/papers/paper_list_l832_https_arxiv_org_abs_2603_24260/figures/006_Figure_5.jpg]]
 *Figure 5: Key metircs comparison of different K and*
 
-![[assets/figures/papers/paper_list_l832_https_arxiv_org_abs_2603_24260/figures/007_Table_2.jpg]]
-*Table 2: Additional evaluation results under different settings*
-
 ![[assets/figures/papers/paper_list_l832_https_arxiv_org_abs_2603_24260/figures/008_Figure_6.jpg]]
 *Figure 6: Visualization of ablation study, with and without clustering and correlation guidance will impact the generation quality*
 
 ![[assets/figures/papers/paper_list_l832_https_arxiv_org_abs_2603_24260/figures/009_Table_3.jpg]]
 *Table 3: Quantitative ablation study results*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 与现有加速范式的谱系关系
 

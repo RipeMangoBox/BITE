@@ -5,6 +5,7 @@ paper_level: A
 venue: Whitepaper
 year: 2025
 pdf_ref: paperPDFs/WHITEPAPER_2025/Cosmos_Transfer2_5_World_Simulation_With_Video_Foundation_Models_for_Physical_AI.pdf
+code_link: https://github.com/nvidia-cosmos/cosmos-transfer2.5
 project_link: https://www.nvidia.com/en-us/ai/cosmos/
 aliases:
 - CP5CT5
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | Cosmos-Transfer2.5: 基于视频基础模型的物理AI世界仿真 |
 | 英文题名 | Cosmos-Transfer2.5: World Simulation With Video Foundation Models for Physical AI |
 | 会议/期刊 | Whitepaper 2025 |
-| Links | [paper](https://d1qx31qr3h6wln.cloudfront.net/publications/World_Simulation_with_Video_Foundation_Models_for_Physical_AI.pdf); [GitHub](https://github.com/nvidia-cosmos/cosmos-transfer2.5); [Project](https://www.nvidia.com/en-us/ai/cosmos/) |
+| Links | [paper](https://d1qx31qr3h6wln.cloudfront.net/publications/World_Simulation_with_Video_Foundation_Models_for_Physical_AI.pdf) · [GitHub](https://github.com/nvidia-cosmos/cosmos-transfer2.5) · [Project](https://www.nvidia.com/en-us/ai/cosmos/) |
 | Topic | #topic/representation_self_supervised_transfer #topic/representation_self_supervised_transfer/transfer_multitask_and_meta_learning |
 | Method | Cosmos-Predict2.5 / Cosmos-Transfer2.5 |
 | Dataset | PAI-Bench-Transfer (Universal Weights), Real-Robot Manipulation (10 scenarios), Bridge Dataset (Action-Conditioned Prediction), Multi-view Driving Generation (RDS-HQ-HL) |
@@ -42,7 +43,7 @@ claims:
 > - Real-Robot Manipulation (10 scenarios) 上，Success rate (out of 30) 为 Cosmos-Transfer2.5-2B augmented: 24/30，对比 Standard augmentation: 5/30; Base policy: 1/30，变化 +19 (vs. baseline), +23 (vs. base)。
 > - Bridge Dataset (Action-Conditioned Prediction) 上，PSNR↑ 为 Cosmos-Predict2.5-2B: 24.95，对比 Cosmos-Predict1-7B-Sample-ActionCond: 21.14，变化 +3.81。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -90,7 +91,7 @@ Cosmos-Transfer2.5 属于**视频世界模型**和**可控视频生成**的交�
 4. **时间步偏移扩展性**：渐进式时间步偏移参数 β 在高于720p分辨率时的扩展行为尚不明确。
 5. **领域自适应需求**：在智能空间、人体动力学等其他物理AI领域的领域自适应是否仍需进一步微调，有待验证。
 
-## 背景与动机
+
 
 物理AI的核心愿景是构建能够模拟真实世界动态的生成式世界模型，从而为机器人、自动驾驶等具身智能系统提供可扩展的训练与评估环境。视频生成模型因其对视觉世界的强大建模能力，被视为实现这一目标的关键技术路径。然而，当前视频世界模型在服务于物理AI下游任务时，仍面临三个根本性瓶颈。
 
@@ -102,7 +103,9 @@ Cosmos-Transfer2.5 属于**视频世界模型**和**可控视频生成**的交�
 
 针对上述问题，**Cosmos-Transfer2.5** 提出了一套系统化改进方案：通过极严格的数据过滤管线（仅保留约4%的高质量视频）、采用解码器型视觉语言模型 **Cosmos-Reason1** 替代T5文本编码器、引入流匹配训练目标与高噪声偏向的时间步调度、多域有监督微调合并策略以及基于GRPO的强化学习后训练，在参数规模缩小3.5倍的情况下，实现了长视频质量、控制对齐和下游物理AI任务性能的全面超越。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Cosmos-Predict2.5 / Transfer2.5 的核心创新并非单一技术突破，而是围绕“数据质量-语义理解-训练策略”三条主线对前代模型（**Cosmos-Predict1** / **Cosmos-Transfer1**，NVIDIA, arXiv 2025）的系统性重构。其关键改进可归纳为以下六个 **changed slots**：
 
@@ -126,7 +129,7 @@ Cosmos-Transfer2.5 对控制网分支的插入策略进行了关键调整：前�
 
 **系统性创新的效果**：上述改进形成了协同增益——更干净的数据、更强的文本表征、流匹配速度预测、模型合并策略和 RL 微调共同作用，使得 Cosmos-Transfer2.5-2B 在参数减少 3.5 倍的情况下，质量评分（9.31）超越 Cosmos-Transfer1-7B（9.24）（Table 10），并在真实机器人操作策略中实现 24/30 的成功率，远超 baseline 的 5/30 和 base policy 的 1/30（Table 11）。
 
-## 整体框架
+
 
 Cosmos-Transfer2.5 的整体框架围绕“预测—后训练—翻译”三阶段构建，核心目标是生成物理真实、控制对齐的长视频，并直接服务于物理 AI 下游任务。其基础是世界预测模型 **Cosmos-Predict2.5**，该模型统一了 Text2World、Image2World 和 Video2World 三种生成模式，随后通过后训练与模型合并策略注入领域知识，最后经由世界翻译模型 **Cosmos-Transfer2.5** 实现多模态控制下的结构化世界仿真。
 
@@ -169,7 +172,7 @@ Cosmos-Transfer2.5 在 Cosmos-Predict2.5 的基础上附加控制网分支，支
 
 系统接受文本描述、初始图像/视频帧、以及可选的多模态控制信号作为输入。在预测模式下，输出为符合物理规律的世界状态推演视频；在翻译模式下，输出为受控制信号引导的结构化世界仿真。所有生成结果均可直接用于物理 AI 下游任务，如机器人策略训练的数据增强（Table 11）和多视图驾驶仿真（Table 12）。
 
-## 核心模块与公式推导
+
 
 ### 流匹配生成框架
 
@@ -219,7 +222,9 @@ $$\mathsf{RNDS}[i] = \left( \frac{\mathrm{DOVER}[i]}{\mathrm{DOVER}_{\mathrm{GT}
 
 其中 $\mathrm{DOVER}[i]$ 为生成视频第 $i$ 块的感知质量分数，$\mathrm{DOVER}_{\mathrm{GT}}[i]$ 为对应真实视频块的质量分数。RNDS 以首块为基准归一化，其随块索引的下降速率直接反映错误积累程度。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能突破
 
@@ -297,7 +302,9 @@ Figure 6 的人类评估显示，尽管参数规模更小，Cosmos-Predict2.5-2B
 ![[assets/figures/papers/paper_list_l39_https_d1qx31qr3h6wln_cloudfront_net_publications_World_Simulation_with_V/figures/012_Table_7.jpg]]
 *Table 7: Training efficiency with 4096 NVIDIA H100 GPUs where the video resolution is 720p and number of frames is 93*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与前代工作的关系
 
@@ -350,6 +357,8 @@ Cosmos-Transfer2.5在视频世界模型知识库中的定位可概括为：
 - **数据质量驱动范式**：通过极严格过滤（4%生存率）和语义去重，证明了数据质量对视频世界模型的根本性影响，与当前“数据为中心”的AI趋势一致。
 - **小模型高效路线**：2B模型超越上一代7B模型，展示了架构优化（流匹配+RoPE+控制块均匀插入）和训练策略（RL后训练+模型合并）的组合效率，为资源受限的物理AI部署提供了可行路径。
 - **物理AI垂直整合**：将视频生成与下游机器人策略训练、自动驾驶感知评估紧密结合，形成了从生成到应用的闭环验证体系，区别于纯视频生成模型的通用定位。
+
+
 
 ## 原文 PDF
 

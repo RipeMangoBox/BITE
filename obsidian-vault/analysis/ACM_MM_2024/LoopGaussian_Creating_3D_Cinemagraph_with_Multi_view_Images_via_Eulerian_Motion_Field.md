@@ -5,6 +5,8 @@ paper_level: A
 venue: "ACM MM"
 year: 2024
 pdf_ref: paperPDFs/ACM_MM_2024/LoopGaussian_Creating_3D_Cinemagraph_with_Multi_view_Images_via_Eulerian_Motion_Field.pdf
+project_link: https://pokerlishao.github.io/LoopGaussian/
+code_link: null
 aliases:
 - LoopGaussian
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | LoopGaussian: 基于欧拉运动场的多视图图像生成3D微动摄影 |
 | 英文题名 | LoopGaussian: Creating 3D Cinemagraph with Multi-view Images via Eulerian Motion Field |
 | 会议/期刊 | ACM MM 2024 |
-| Links | [paper](https://arxiv.org/abs/2404.08966); [Project](https://pokerlishao.github.io/LoopGaussian/) |
+| Links | [paper](https://arxiv.org/abs/2404.08966) · [Project](https://pokerlishao.github.io/LoopGaussian/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | LoopGaussian |
 | Dataset | 自建多视图场景（平均光流图）, 生成视频, 用户调研 |
@@ -40,7 +42,7 @@ claims:
 > - 生成视频 上，FVD 为 933.824，对比 1174.948，变化 -241.124 (越低越好)。
 > - 用户调研 上，偏好比例 为 94.23%，对比 5.77%，变化 +88.46%。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有微动摄影（cinemagraph）方法多局限于2D图像空间操作，即便部分工作引入深度信息，仍采用多层深度图像（MPI）或分层深度图像（LDI）等2.5D表示，缺乏真实3D几何结构。这导致渲染视角严重受限，且易产生几何不一致的伪影。唯一直接处理3D微动摄影的基线方法为 **3D Cinemagraphy**（Li et al., CVPR 2023）。
 
@@ -50,7 +52,7 @@ claims:
 
 **局限与开放问题**：当前方法适用于软质非刚体物体（如树枝、旗帜），对刚性运动或复杂非周期性形变可能失效；动态区域仍需手动标注2D掩码；欧拉运动场为静态速度场，无法处理随时间变化的运动模式。MLP估计欧拉运动场时的具体架构细节（如输入维度、层数）未在文中明确，仅提及两层隐藏层（128和64）与位置编码。
 
-## 背景与动机
+
 
 微动摄影（Cinemagraph）是一种将静态图像中局部区域赋予微妙、循环运动的视觉艺术形式，在影视、广告与数字媒体中应用广泛。传统微动摄影方法主要依赖2D图像空间操作，通过光流估计或深度引导的像素位移来模拟运动效果。然而，这类方法存在根本性局限：它们无法支持自由视点渲染，观察者始终被锁定在原始拍摄视角。
 
@@ -60,7 +62,9 @@ claims:
 
 LoopGaussian的核心动机在于：**将微动摄影从2D/2.5D提升至真实3D空间**。这需要解决两个关键问题：其一，如何获得可自由视点渲染的显式3D场景表示；其二，如何在3D空间中定义并估计保持局部一致性的连续运动。本文选择3D高斯溅射（3D-GS）作为静态场景表示，利用其显式点云结构与高效可微渲染能力，为3D运动场建模提供几何载体。在运动描述上，本文从欧拉视角出发，在3D空间定义速度场，并通过场景自相似性启发式地估计运动方向，从而避免了对大规模预训练数据的依赖。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 LoopGaussian 的核心创新在于将微动摄影从二维图像空间提升至真实三维场景，其关键突破体现在以下五个维度的改变：
 
@@ -100,7 +104,7 @@ $$\mathcal{L}_{\mathrm{shape}} = \frac{1}{|\mathbf{G}|} \sum_{G_i \in \mathbf{G}
 
 该损失约束高斯点形状趋近球体，消融实验（Figure 4）证实其能显著减少场景中的毛刺和伪影。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l47_LoopGaussian_Creating_3D_Cinemagraph_with_Multi_view_Images_via_Eulerian/figures/001_Figure_1.jpg]]
 *Figure 1: We propose LoopGaussian, a novel method designed to convert multi-view images of a stationary scene (a) into authentic 3D cinemagraph by an Eulerian motion field (b). The 3D cinemagraph can be rendered from a novel viewpoint to obtain a natural seamless loopable video (c)*
@@ -115,7 +119,7 @@ LoopGaussian 将静态场景的多视图图像转化为可自由视点渲染的 
 
 整个框架的关键设计在于：**无需大规模预训练**，而是利用场景自相似性启发式地估计运动；**在 3D 空间直接操作显式几何表示**，避免了 2D 方法中多层表示带来的视角受限和几何不一致问题。
 
-## 核心模块与公式推导
+
 
 ### 3D高斯溅射与形状正则化
 
@@ -173,7 +177,9 @@ $$\hat { p } _ { i } ( t ) = \alpha p _ { i } ( t ) + ( 1 - \alpha ) p _ { i } (
 
 其中 $T$ 为周期长度，$\alpha$ 为插值权重。消融实验（Figure 7）表明，过大的 $\omega$ 会破坏场景结构连续性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -231,7 +237,9 @@ LoopGaussian 与唯一直接可比的 3D 微动摄影方法——**3D Cinemagrap
 ![[assets/figures/papers/paper_list_l47_LoopGaussian_Creating_3D_Cinemagraph_with_Multi_view_Images_via_Eulerian/figures/009_Figure.jpg]]
 *Figure: w/o eccentricity regularization w/ eccentricity regularization*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有工作的关系
 
@@ -281,6 +289,8 @@ LoopGaussian 与 Li et al. 的方法存在三个关键差异槽位：
 - **物理先验的融合**：能否结合物理模拟或数据驱动先验提升大形变场景的鲁棒性？例如，对旗帜飘动引入流体力学约束，可能减少结构破坏的风险。
 
 - **多摄像机运动视频的扩展**：当前方法输入为静态多视图图像，若能扩展至手持摄像机拍摄的晃动视频，将大幅降低数据采集门槛。这需要同时估计摄像机位姿和场景运动。
+
+
 
 ## 原文 PDF
 

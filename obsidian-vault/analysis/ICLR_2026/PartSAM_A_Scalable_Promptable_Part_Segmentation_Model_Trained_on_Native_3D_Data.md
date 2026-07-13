@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/PartSAM_A_Scalable_Promptable_Part_Segmentation_Model_Trained_on_Native_3D_Data.pdf
+project_link: null
+code_link: null
 openreview_forum_id: y8sZUQPYXC
 aliases:
 - PartSAM
@@ -41,7 +43,7 @@ claims:
 > - PartObjaverse-Tiny (interactive) 上，IoU@10 为 87.6，对比 73.9 (Point-SAM)，变化 +18.5% relative。
 > - PartNetE (interactive) 上，IoU@1 为 59.5，对比 35.9 (Point-SAM)，变化 +65.7% relative。
 
-## 概述
+## 概要
 
 ### 1. 问题背景与瓶颈
 
@@ -89,7 +91,7 @@ PartSAM 目前仅输出类别无关的零件掩码，无法直接生成语义标
 
 开放问题包括：如何为 3D 形状及其零件生成大规模语义标签数据集，使 PartSAM 具备语义感知能力；如何改进模型以更好地处理罕见或细微结构；以及如何进一步提升在几何不规则输入上的鲁棒性。
 
-## 背景与动机
+
 
 3D 形状的零件分割是三维视觉中的基础任务，旨在将三维模型分解为语义上有意义的组成部分。这一能力对机器人操作、3D 编辑、形状分析与重建等下游应用至关重要。然而，现有方法面临一个根本性瓶颈：**对 2D 基础模型的过度依赖导致无法捕捉三维几何的内在结构**。
 
@@ -103,7 +105,9 @@ PartSAM 目前仅输出类别无关的零件掩码，无法直接生成语义标
 
 本文的核心动机在于打破这一僵局：**直接在大规模原生 3D 零件对上训练一个可提示的分割模型**，使其同时具备开放世界泛化能力、交互可控性和对内部几何结构的理解。这一思路的关键在于将两个要素结合——通过模型在环管道获取的大规模原生 3D 标注，以及一个类似 SAM 的提示引导编码器-解码器架构。其中，双分支编码器的设计尤为重要：可学习分支适应原生 3D 零件语义，冻结分支则保留从 SAM 蒸馏的 2D 先验，从而在规模化训练的同时不丢失强大的视觉先验。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PartSAM 的核心创新在于将 3D 零件分割从“2D 基础模型多视图提升”的间接范式，转变为**直接在大规模原生 3D 零件对上训练可提示分割模型**的直接范式。这一转变通过三个关键设计实现，从根本上解决了现有方法仅能表面理解、不可控分解和开放世界泛化能力弱的问题。
 
@@ -135,7 +139,7 @@ PartSAM 的掩码解码器并行输出多个候选掩码，并通过**IoU 头**�
 
 上述三个创新点构成因果链条：**模型在环标注管道**提供了大规模原生 3D 监督信号，**双分支编码器**使得模型能够有效利用这些信号进行训练，**提示引导的解码器**则赋予模型灵活的交互能力。三者共同实现了 PartSAM 的核心能力——在开放世界中同时具备交互可控性、内部几何结构理解和强泛化能力，摆脱了对 2D 提升范式的依赖。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l34_https_openreview_net_forum_id_y8sZUQPYXC/figures/006_Figure_3.jpg]]
 *Figure 3: Overview of the PartSAM model. The input shape $P _ { i n }$ is first encoded into a continuous feature field. Point patches sampled from $P _ { i n }$ Pin query this field to obtain input embeddings $F _ { c }$ . , while prompt points are mapped into prompt embeddings $F _ { p }$ . Both $F _ { c }$ and $F _ { p }$ are fed into the mask decoder, where the learnable output token $\bar { T _ { o u t } }$ generates multiple segmentation masks. An additional IoU token $T _ { i o u }$ is used by the IoU head to estimate the quality of each mask*
@@ -200,7 +204,7 @@ $$\mathcal{L} = \mathcal{L}_{focal}(M_{out}, M_{gt}) + \alpha \mathcal{L}_{dice}
 
 其中焦点损失和 Dice 损失监督掩码质量，IoU 损失训练质量估计头，三元组对比损失强化编码器的零件感知表征能力。
 
-## 核心模块与公式推导
+
 
 PartSAM 的整体架构由两大核心组件构成：**双分支三平面编码器**（将3D形状编码为连续的特征场）和**提示引导的掩码解码器**（根据用户提示预测分割掩码）。以下逐一剖析各模块的设计动机与实现细节。
 
@@ -251,7 +255,9 @@ $$\mathcal{L} = \mathcal{L}_{focal}(M_{out}, M_{gt}) + \alpha \mathcal{L}_{dice}
 
 这四项损失的组合训练策略是 PartSAM 能够同时实现交互式分割和自动分割的关键——焦点损失和 Dice 损失直接优化掩码质量，IoU 损失使模型具备自评估能力（支撑自动模式下的 NMS 选择），而三元组损失则保证了编码器特征场的零件感知能力。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 交互式分割：单次提示的跨越式提升
 
@@ -319,7 +325,9 @@ Table 4 揭示了连通性在评估中的微妙作用。PartField 结合连通�
 ![[assets/figures/papers/paper_list_l34_https_openreview_net_forum_id_y8sZUQPYXC/figures/023_Table_6.jpg]]
 *Table 6: Quantitative comparison of automatic segmentation on 3DCoMPAT++ (Slim et al., 2025). The best scores are emphasized in bold. We report the mean IoU*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位与范式转换
 
@@ -379,6 +387,8 @@ PartSAM的能力边界由以下因素共同定义：
 4. **数据规模上限**：Figure 11的扩展曲线未饱和，暗示更大规模数据仍可带来增益。3D数据的规模化采集和自动标注管道的效率上限在哪里？
 
 5. **非刚性形状扩展**：当前方法针对刚性物体的零件分割，如何扩展到铰接物体或可变形物体的动态零件理解？
+
+
 
 ## 原文 PDF
 

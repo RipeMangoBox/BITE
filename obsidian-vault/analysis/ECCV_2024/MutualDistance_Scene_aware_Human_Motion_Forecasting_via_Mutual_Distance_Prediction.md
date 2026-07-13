@@ -5,6 +5,8 @@ paper_level: A
 venue: ECCV
 year: 2024
 pdf_ref: paperPDFs/ECCV_2024/MutualDistance_Scene_aware_Human_Motion_Forecasting_via_Mutual_Distance_Prediction.pdf
+project_link: null
+code_link: null
 aliases:
 - MDBSAHMF
 - SAHMFMDP
@@ -40,7 +42,7 @@ claims:
 > - GTA-IM 上，Path Error (mm) 72.0 vs ContAware (higher) (significant reduction)。
 > - HUMANISE (seen) 上，Path Error (mm) 45.6 vs 52.6 (Scene only) (-7.0)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有场景感知人体运动预测方法仅对部分身体运动施加约束，例如只约束接触关节或全局位置，无法对全身运动形成完整约束，导致预测结果出现穿透场景、幽灵运动等不合理现象。
 
@@ -50,7 +52,7 @@ claims:
 
 **主要结果**：在 GTA-IM 和 PROX 数据集上，本文方法在所有指标上均优于现有基线方法，尤其在路径误差上有显著提升。在 HUMANISE 数据集上，无论是已见场景还是未见场景，本文方法均取得最优结果。消融实验进一步验证了互距离表示的有效性：移除互距离约束后运动预测质量明显下降，且逐顶点符号距离和逐基点距离各自独立贡献，两者联合使用效果最佳。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -79,7 +81,9 @@ claims:
 
 基于此动机，本文提出**基于互距离预测的场景感知人体运动预测方法**：先预测未来的互距离，再以预测的互距离为条件自回归地生成未来人体姿态，从而实现对全身运动的完整场景约束。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：从局部约束到全局缺失
 
@@ -118,7 +122,7 @@ claims:
 | 场景表示 | 点云 | SDF Volume |
 | 训练策略 | 端到端 | 分阶段训练 + 端到端微调 |
 
-## 整体框架
+
 
 本文提出一种**基于互距离预测的场景感知人体运动预测框架**，核心思路是将“人-景交互”显式建模为可预测的互距离表示，再以此作为约束条件生成未来运动。整个 pipeline 由四个主要模块串联构成，遵循“编码→预测→生成”的信息流。
 
@@ -163,7 +167,7 @@ claims:
 
 现有场景感知方法（如 ContAware 的接触图约束、GIMO 的凝视信息）仅约束部分身体运动，无法对全身运动提供完整约束，导致预测中出现穿透场景或“幽灵运动”等不合理结果。本文通过**互距离表示**（同时约束局部姿态和全局位置）解决了这一瓶颈——消融实验中，移除互距离约束后运动预测质量显著下降（Fig. 4），而完整模型在 GTA-IM 和 PROX 数据集上均显著优于所有基线方法（Table 1）。
 
-## 核心模块与公式推导
+
 
 ### 互距离表示
 
@@ -220,7 +224,9 @@ $$\hat{\mathbf{x}}_{T+u} = \mathcal{G}_y(\hat{\mathbf{x}}_{T+u-1}, \hat{\mathbf{
 ![[assets/figures/papers/paper_list_l1764_MutualDistance_Scene_aware_Human_Motion_Forecasting_via_Mutual_Distance/figures/002_Figure_1.jpg]]
 *Figure 1: Our mutual distances. a) shows the per-vertex signed distance for sampled vertices on human mesh. Their color indicates the distance value. b) shows the perbasis point distance for the basis points which are not sampled on the scene surface. For both figures, the darker the color is, the smaller the distance is*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 1. 实验设置
 
@@ -291,7 +297,9 @@ $$\hat{\mathbf{x}}_{T+u} = \mathcal{G}_y(\hat{\mathbf{x}}_{T+u-1}, \hat{\mathbf{
 ![[assets/figures/papers/paper_list_l1764_MutualDistance_Scene_aware_Human_Motion_Forecasting_via_Mutual_Distance/figures/008_Figure_4.jpg]]
 *Figure 4: Ablation of the mutual distance. The three figures in the first three columns (from left to right) depict the ground truth pose for the last frame of future motion, results of our full model, and predictions of our model without mutual distance constraint. The sub-figure in gray is the last observed frame. Other sub-figures depict the predicted middle frame. The blue dot is the scene basis point, and the red dot is the sampled vertex on human mesh. The two graphs in the last two columns show the predicted per-vertex signed distance and the per-basis point distance for the red and blue point, respectively. As shown in the figures, with predicted mutual distance, we can forecast the ’stand-up...*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与因果旋钮
 
@@ -331,6 +339,8 @@ $$\hat{\mathbf{x}}_{T+u} = \mathcal{G}_y(\hat{\mathbf{x}}_{T+u-1}, \hat{\mathbf{
 1. 如何进一步提高互距离（尤其逐顶点符号距离和逐基点距离）的预测精度？是否可以通过多尺度表示、时序注意力机制或物理引导的损失函数来改善？
 2. 能否将显式物理约束（如接触力、动量守恒、地面反作用力）融入当前两阶段框架，以生成更符合物理规律的运动？这可能需要引入可微分物理模拟器或物理感知的损失项。
 3. 互距离表示是否可以推广到多人与动态场景的交互预测中？当前方法假设静态场景和单人运动，扩展到多智能体动态交互是一个自然但非平凡的延伸方向。
+
+
 
 ## 原文 PDF
 

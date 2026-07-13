@@ -44,7 +44,7 @@ claims:
 > - Reconstruction 上，Photometric Error (LPIPS, lower is better) OpenDWM: 0.065 vs MagicDrive: 0.140 (-0.075 (reduction ~53%))。
 > - Action-Following 上，Route Completion (↑) RLGF: 13.51% vs MagicDrive: 6.89% (+6.62%)。
 
-## 概述
+## 概要
 
 **核心瓶颈**：现有驾驶世界模型的评估长期局限于2D视觉逼真度指标（如FVD、LPIPS），系统性地忽视了几何一致性、物理合理性与行为安全性。这导致模型在视觉上看似真实，却在闭环控制与下游感知任务中频繁失效——视觉真实与物理行为之间存在严重失衡。
 
@@ -62,8 +62,6 @@ claims:
 - **物理grounding的价值**：使用真值帧作为条件的生成方法（如DiST-4D、DriveDreamer-2）在深度一致性和跨视角一致性上比无条件方法提升20%–30%，表明物理基础信息对逼真性至关重要（Table 1, Section 5.1）。
 
 **局限与开放问题**：评估主要基于nuScenes数据集，对极端天气和罕见场景的泛化性有待验证；人类偏好标注仍受主观偏差影响；闭环仿真仅覆盖有限路线和预设规划器，未充分测试长尾交互场景。核心开放问题在于：如何在保持视觉逼真度的前提下，将闭环控制的物理合规性从当前不足14%的路线完成率大幅提升——这是视觉真实与行为安全之间的根本性瓶颈。
-
-## 背景与动机
 
 ### 自动驾驶世界模型的演进与评估困境
 
@@ -87,7 +85,7 @@ claims:
 
 WorldLens的核心动机正是填补上述评估鸿沟。其设计哲学是将世界模型的评估从单一的“视觉质量”解耦为**生成、4D重建、动作跟随、下游任务和人类偏好**五个互补维度，在24项可量化子指标上形成全谱评估体系。这一设计并非简单堆砌指标，而是系统性地暴露**视觉真实性与物理一致性之间的根本权衡**——正如实验所揭示的，没有任何单一模型在所有维度上同时占据优势：视觉逼真的模型（如OpenDWM）往往违反物理规律，几何稳定的模型（如DiST-4D）在行为保真度上仍有不足。这一发现指向一个明确结论：未来世界模型必须追求视觉真实、几何一致、物理合理与功能可靠之间的平衡发展，而非单一维度的极致表现。
 
-## 核心创新
+## 核心方法与创新机理
 
 ### 从单维视觉评估到全谱物理-功能对齐
 
@@ -110,8 +108,6 @@ WorldLens在驾驶世界模型评估领域首次建立了系统性的基准框�
 ### 创新边界与待验证假设
 
 需要指出的是，WorldLens的评估覆盖虽广，但其闭环仿真仅使用了预设驾驶规划器和有限路线，Route Completion的极低值（所有模型均低于14%）可能部分反映了规划器本身与生成世界之间的分布偏移，而非纯粹的世界模型安全性缺陷——这一混淆因素需要进一步消融实验来解耦。此外，WorldLens-Agent的泛化能力受限于26K条标注数据的分布，对于训练数据中未覆盖的新模型架构或极端场景，其评分校准性需要持续验证。
-
-## 整体框架
 
 WorldLens 提出了一套全谱评估框架，将驾驶世界模型的评测从单一的视觉保真度解耦为五个互补维度：**生成（Generation）**、**重建（Reconstruction）**、**动作跟随（Action-Following）**、**下游任务（Downstream Task）** 和 **人类偏好（Human Preference）**。这五个维度覆盖了从低层外观逼真度到高层行为真实性的完整谱系，共细化为 24 项可量化子指标（Section 3）。
 
@@ -148,8 +144,6 @@ WorldLens 提出了一套全谱评估框架，将驾驶世界模型的评测从�
 
 ![[assets/figures/papers/paper_list_l2147_https_arxiv_org_abs_2512_10958/figures/002_Figure_2.jpg]]
 *Figure 2: The WorldLens evaluation framework unifies five complementary aspects – 1Generation, 2Reconstruction, 3Action-Following, 4Downstream Task, and 5Human Preference – to assess visual, geometric, functional, and perceptual fidelity of generative world models. Each aspect is decomposed into interpretable dimensions driven by measurable signals such as segmentation, depth, 4D reconstruction, and behavioral simulation, enabling comprehensive and physically grounded evaluations across the full spectrum of world modeling*
-
-## 核心模块与公式推导
 
 WorldLens 将驾驶世界模型评估解耦为五个互补维度，每个维度内部署可量化的子指标，从而系统性地暴露视觉真实性与物理一致性之间的根本权衡。以下按评估流水线的核心模块展开，并给出关键公式及其变量含义。
 
@@ -207,7 +201,7 @@ $$\mathrm{ADS} = \mathrm{RC} \times \mathrm{PDMS}$$
 ![[assets/figures/papers/paper_list_l2147_https_arxiv_org_abs_2512_10958/figures/003_Figure_3.jpg]]
 *Figure 3: Interface for Human Preference annotation process. We present four synchronized views: 1generated video, 2semantic mask, 3depth map, and 43D bounding boxes, enabling comprehensive judgment of realism, physical plausibility, and consistency*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心发现：视觉真实与物理行为之间的根本失衡
 
@@ -262,10 +256,7 @@ WorldLens在五个维度、24项子指标上对10个驾驶世界模型进行了�
 ![[assets/figures/papers/paper_list_l2147_https_arxiv_org_abs_2512_10958/figures/009_Figure_6.jpg]]
 *Figure 6: Qualitative results of Downstream Tasks. Rows (from top to bottom): 13D object detection, 2map segmentation, and 3semantic occupancy prediction tasks*
 
-![[assets/figures/papers/paper_list_l2147_https_arxiv_org_abs_2512_10958/figures/011_Figure_8.jpg]]
-*Figure 8: Zero-shot evaluations by WorldLens-Agent on unseen videos (from Gen3C [83]), exhibiting strong alignments with human reasoning. See the Appendix for more examples*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 评估范式的根本转向：从单一视觉保真到全谱物理-功能对齐
 

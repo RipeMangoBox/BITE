@@ -34,7 +34,7 @@ claims:
 | 中文题名 | Mobius：通过潜在偏移实现文本到无缝循环视频生成 |
 | 英文题名 | Mobius: Text to Seamless Looping Video Generation via Latent Shift |
 | 会议/期刊 | SIGGRAPH 2025 |
-| Links | [paper](http://arxiv.org/abs/2502.20307v1) · [Project](http://mobius-diffusion.github.io) · [Code](https://github.com/genmoai/models) · [arXiv](https://arxiv.org/abs/2412.03603) |
+| Links | [paper](http://arxiv.org/abs/2502.20307v1) · [Project](http://mobius-diffusion.github.io) · [Code](https://github.com/genmoai/models) · [paper](https://arxiv.org/abs/2412.03603) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation #topic/generative_models_diffusion #topic/benchmarks_datasets_evaluation |
 | Method | Mobius |
 | Dataset | Custom text prompts, User Study, Longer Video Generation |

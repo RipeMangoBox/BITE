@@ -43,7 +43,7 @@ claims:
 > - LIBERO (one policy per suite) 上，平均成功率 (Average SR %) 98.2 vs 97.1 (OpenVLA-OFT) (+1.1)。
 > - CALVIN ABC→D (5 consecutive tasks) 上，成功率 (Task completed in a row, 5 tasks, %) 84.1 vs 72.9 (OpenVLA-OFT) (+11.2)。
 
-## 概述
+## 概要
 
 现有视觉-语言-动作（VLA）模型普遍将机器人操作建模为马尔可夫决策过程（MDP），逐帧独立处理视觉观测，忽略了执行历史中的上下文信息。这一设计导致模型在部分可观察环境中视觉注意力被动且缺乏时间一致性，难以有效利用过往信息来指导当前决策，在长视界任务中表现受限。
 
@@ -53,7 +53,7 @@ claims:
 
 在方法谱系上，AVA-VLA建立在OpenVLA-OFT的基础上，与UniVLA、FLOWER、RIPT-VLA、π0等同期工作形成对比。其独特贡献在于首次从POMDP视角显式建模VLA的历史上下文依赖，并通过轻量级的AVA模块实现历史条件化的视觉注意力调制，为VLA在顺序决策任务中的泛化和鲁棒性提供了新的技术路径。
 
-## 背景与动机
+
 
 ### 机器人操作中的视觉-语言-动作模型
 
@@ -97,7 +97,9 @@ $$\bar{\mathcal{A}}^t \sim \mathcal{P}_\theta(\mathcal{A}^t \mid \mathbf{x}^t, b
 
 由此，本文提出AVA-VLA框架，核心包含两个互补组件：循环状态投影模块（将前一步LLM隐藏状态映射为信念状态的神经近似）和主动视觉注意力（AVA）模块（利用该状态动态计算软权重，调制LLM所有层的视觉注意力矩阵）。据论文声明，这是首个从POMDP视角显式解决VLA历史上下文缺失问题的工作。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 从 MDP 到 POMDP：策略学习框架的根本转变
 
@@ -147,7 +149,7 @@ $$\mathcal{A}^t = \mathcal{Q}(\mathcal{M}_{\mathrm{parallel}}(z_I^t, \mathcal{V}
 
 值得注意的是，AVA 模块新增参数少于 50M，不足总模型参数的 1%，但在 LIBERO 和 CALVIN 基准上均带来了显著的性能提升。这一参数效率证明了性能增益源于 POMDP 框架和主动注意力机制的架构创新，而非简单的计算资源堆砌——在匹配训练设置（相同预训练起点、相同训练步数和批大小）下的公平对比实验（Table 7）进一步排除了额外计算量带来的混淆效应。
 
-## 整体框架
+
 
 AVA‑VLA 的整体设计围绕一个核心目标展开：将视觉‑语言‑动作模型从被动的、逐帧独立的感知模式，转变为能够主动利用历史上下文进行决策的闭环系统。框架的输入流、模块关系与输出流如图 2 所示，其逻辑链条可概括为以下四个阶段。
 
@@ -171,7 +173,7 @@ AVA 模块 $\mathcal{V}$ 是框架的第二个核心组件。它接收当前视�
 ![[assets/figures/papers/paper_list_l2372_https_arxiv_org_abs_2511_18960/figures/002_Figure.jpg]]
 *Figure: xx x x x x x xFigure 2. Overview of the proposed AVA-VLA framework. At each timestep, the recurrent state is projected from the previous hidden state to preserve historical context and to initialize the current action tokens. Then the AVA module combines this recurrent state with textconditioned visual features from the current observation to generate soft importance scores, which modulate the visual attention matrices throughout the backbone LLM, enabling the model to focus on task-relevant regions based on both temporal context and current perception*
 
-## 核心模块与公式推导
+
 
 ### 问题形式化：从 MDP 到 POMDP
 
@@ -231,7 +233,9 @@ AVA-VLA 采用截断的时间反向传播（Truncated BPTT）进行训练，时�
 ![[assets/figures/papers/paper_list_l2372_https_arxiv_org_abs_2511_18960/figures/001_Figure_1.jpg]]
 *Figure 1: (a) Visualized comparison of the proposed AVA-VLA framework and vanilla VLAs. (b) Qualitative comparison of visual focus from two viewpoints while executing the task “turn on the stove and put the moka pot on it.” The vanilla OpenVLA-OFT [20] baseline fails to locate the task-critical “stove” switch, whereas AVA-VLA exhibits more stable focus by leveraging historical context*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现
 
@@ -292,7 +296,9 @@ AVA-VLA在模拟与真实世界基准上均取得了最优表现，且其增益�
 ![[assets/figures/papers/paper_list_l2372_https_arxiv_org_abs_2511_18960/figures/009_Table_5.jpg]]
 *Table 5: Study on the visual token pruning with different pruning ratios. The results on LIBERO in terms of success rates (%) under the “one policy for all 4 suites” setting are reported*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：从MDP到POMDP的VLA范式转换
 
@@ -337,6 +343,8 @@ AVA-VLA 的核心创新在于将策略学习重新表述为部分可观察马尔
 3. **训练效率优化。** 截断BPTT的序列长度 $T=4$ 是在计算可行性与时序学习之间的折中。是否存在更高效的训练策略（如稀疏注意力、状态缓存复用）可以在不显著增加开销的前提下扩展有效时间视野？
 
 4. **多模态历史融合。** 当前循环状态仅编码视觉-语言联合信息，是否应当显式融合本体感觉（proprioception）或力觉信息，以构建更丰富的信念表示？
+
+
 
 ## 原文 PDF
 

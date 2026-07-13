@@ -44,7 +44,7 @@ claims:
 > - MotionPercept-MDM 上，Accuracy (%) 85.18 vs 85.07 (MotionCritic) (+0.11%)；PLCC 0.727 vs 0.329 (MotionCritic) (+0.398)；SROCC 0.622 vs 0.316 (MotionCritic) (+0.306)。
 > - MotionPercept-FLAME 上，Accuracy (%) 68.82 vs 67.66 (MotionCritic) (+1.16%)；PLCC 0.657 vs 0.152 (MotionCritic) (+0.505)；SROCC 0.660 vs 0.280 (MotionCritic) (+0.380)。
 
-## 概述
+## 概要
 
 人体动作生成模型近年来取得了显著进展，然而，如何全面评估生成动作的质量仍是一个开放难题。现有评估指标面临一个核心瓶颈：**物理可行性与人类感知无法被单一指标同时兼顾**。一方面，人类标注虽能反映感知质量，但通常仅提供粗糙的二元判断（“更好/更差”），缺乏细粒度的物理对齐真值；另一方面，基于启发式规则的物理指标（如足部滑动、漂浮、穿透等）仅捕捉局部物理违规，无法提供连续、整体的物理保真度信号。更关键的是，人类感知与物理规律之间存在不一致性——一个在人眼看来自然流畅的动作，在物理模拟器中可能因足部漂浮或动量失衡而跌倒，反之亦然（图1）。这种“感知-物理”鸿沟使得单纯依赖感知标注或物理规则的数据驱动指标难以学习有效的物理先验。
 
@@ -52,7 +52,7 @@ claims:
 
 实验结果表明，PP-Motion 在物理相关性指标上大幅超越所有先前方法：在 MotionPercept-MDM 子集上，PLCC 从 MotionCritic 的 0.329 提升至 0.727，SROCC 从 0.316 提升至 0.622。同时，在人类感知对齐准确率上，PP-Motion 也略优于专门优化感知的 MotionCritic（85.18% vs 85.07%），验证了物理标注可辅助感知对齐的核心假设。消融实验进一步证实，Pearson 相关损失相较于常规 MSE 损失能更有效地捕获物理先验，且按动作类别分批计算相关损失优于跨类别计算。此外，将 PP-Motion 作为奖励信号微调 MDM 生成模型，可使平均 MPJPE 从 76.06 降至 63.33，展示了该指标在下游任务中的应用潜力。
 
-## 背景与动机
+
 
 ### 人体动作生成评估的核心瓶颈
 
@@ -79,7 +79,9 @@ claims:
 
 这一设计使得 PP-Motion 在物理相关性指标上大幅超越所有先前指标（例如 MDM 子集上 PLCC 从 MotionCritic 的 0.329 提升至 0.727），同时在人类感知对齐准确率上亦略优于专门优化感知的 MotionCritic（85.18% vs 85.07%），证明了物理标注可有效辅助感知对齐。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PP-Motion 的核心创新在于**首次将连续的物理保真度信号与人类感知二元标注统一进同一个评估指标训练框架**，使二者相互增强而非彼此妥协。这解决了此前动作评估领域的一个根本瓶颈：现有指标要么仅依赖启发式物理规则（如滑步、漂浮检测），要么仅拟合粗糙的人类偏好标签，无法同时兼顾物理可行性与感知合理性。
 
@@ -121,7 +123,7 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{percept}} + \lambda \mathcal{L}_{\mathrm{co
 
 Table 2 显示，单序列微调后，MDM-Train、MDM-Val 和 FLAME 三个子集上的重建误差分别从 55.72 mm、55.49 mm、69.20 mm 降至 49.65 mm、50.90 mm、53.76 mm，表明微调显著提升了修正运动与原始运动的贴近程度，从而保证了物理标签的细粒度和准确性。
 
-## 整体框架
+
 
 PP-Motion 的评估框架围绕一个核心矛盾展开：人类感知与物理可行性并不总是一致（Figure 1）。一个视觉上自然、语义合理的动作可能在物理模拟器中跌倒，反之亦然。因此，框架的设计目标不是偏袒某一方，而是让两类信号在训练中相互增强。
 
@@ -165,7 +167,7 @@ PP-Motion 的评估框架围绕一个核心矛盾展开：人类感知与物理�
 
 整个框架的核心洞察在于：物理模拟器提供客观的连续对齐信号，Pearson 相关损失让网络学习其内在趋势而非绝对数值，从而在无需依赖主观阈值的情况下，使评估指标同时对齐物理规律与人类感知，且二者可相互增强。
 
-## 核心模块与公式推导
+
 
 PP-Motion 的训练管线由三个核心模块构成：**运动编码器（Motion Encoder）**、**保真度解码器（Fidelity Decoder）** 以及 **物理标注生成器（Physical Annotation Generator）**。其中前两者构成可学习的评分网络 $F(x; \theta)$，后者在训练前离线生成细粒度物理标签，不参与梯度更新。
 
@@ -226,7 +228,9 @@ $$\mathcal{L} = \mathcal{L}_{\text{percept}} + \lambda \mathcal{L}_{\text{corr}}
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2508_08179/figures/001_Figure_1.jpg]]
 *Figure 1: A motion that looks realistic does not necessarily mean it is physically feasible. Top-left: Motion appears realistic and semantically meaningful to the human eye, yet fails in physics simulation, resulting in a fall (bottom-left). Top-right: Unnatural motion in human perception executes successfully in simulation (bottom-right). This reveals a discrepancy between human perception and physical laws*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 PP-Motion 的核心实验围绕两个维度展开：**人类感知对齐**（二元偏好判断准确率）和**物理保真度对齐**（预测分数与物理标注之间的排序相关性 PLCC / SROCC / KROCC）。所有实验均在 MotionPercept 数据集上进行，PP-Motion 仅在 MDM 训练子集上训练，在 MDM 验证子集和 FLAME 子集上直接测试，未对 FLAME 进行微调。
 
@@ -278,7 +282,9 @@ Figure 4 的案例分析进一步佐证了 PP-Motion 的判别能力：(a) 在�
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2508_08179/figures/003_Table_1.jpg]]
 *Table 1: Annotation statistics on MotionPercept dataset*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有评估范式的继承与分叉
 
@@ -322,6 +328,8 @@ PP-Motion 当前存在以下已验证或待验证的边界：
 3. **物理-感知交互深化**：当前联合训练仅简单加权两个损失，是否存在更巧妙的交互方式进一步强化物理与感知的对齐？例如，利用物理标签作为对比学习中的排序信号，或通过知识蒸馏让感知分支从物理分支中提取结构先验。
 
 4. **物理标注的因果性**：PP-Motion 的物理标签本质上是“物理修正距离”，而非“物理违规程度”。两者在多数情况下正相关，但可能存在反例（如动作本身物理可行但修正网络引入了额外偏差）。如何解耦修正网络的自身误差与真实物理违规信号，是提高标注质量的潜在方向。
+
+
 
 ## 原文 PDF
 

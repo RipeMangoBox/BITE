@@ -41,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - HiCoPrompt 上，Acc_exist (主体存在准确率) 0.7127 vs 0.6292 (Qwen-Image) (+0.0835)；Acc_attribute (属性准确率) 0.7673 vs 0.6907 (Qwen-Image) (+0.0766)；Acc_relationship (关系准确率) 0.8203 vs 0.7442 (Qwen-Image) (+0.0761)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：标准文本到图像（T2I）扩散模型在处理包含多个对象与层级关系的复杂提示时，面临文本域与图像域之间日益扩大的语义鸿沟。单一生成过程难以完整覆盖所有概念，导致**概念遗漏**、**概念混淆**以及图像质量下降等突出问题（Figure 1）。
 
@@ -51,7 +51,7 @@ claims:
 
 **主要结果**：在 HiCoPrompt 基准（3,000 个英文测试提示）上，HiCoGen 在所有评估指标上均显著超越现有模型。其中，主体存在准确率（Acc_exist）相较于 **Qwen-Image**（Wu et al., 2025）提升约 9 个百分点（0.7127 vs. 0.6292），属性准确率提升约 7.7 个百分点，关系准确率提升约 7.6 个百分点（Table 2）。消融实验进一步验证了分层奖励各组件的关键作用：移除对象奖励导致属性准确率下降约 14%，移除关系奖励导致关系准确率下降约 4%（Table 3）。在处理 3 个及以上主体的极端复杂场景时，HiCoGen 依然保持优势，有效缓解了概念缺失问题（Table 4）。
 
-## 背景与动机
+
 
 文本到图像（T2I）生成模型近年来取得了显著进展，**FLUX.1-dev**（Black Forest Labs, 2024）、**SDXL**（Lacey et al., arXiv 2023）等主流模型已能根据简单文本描述生成高质量的图像。然而，当面对包含多个对象、复杂属性和明确层级关系的复杂提示时，这些模型的生成质量急剧下降。核心瓶颈在于：文本与图像域之间存在巨大的语义鸿沟，随着提示复杂度的增加，单一的一次性生成过程难以准确覆盖所有概念，导致**概念遗漏**、**概念混淆**和**图像质量退化**三大突出问题。
 
@@ -67,7 +67,9 @@ claims:
 
 这一动机直接催生了HiCoGen的三个关键设计：利用大语言模型（LLM）进行提示解析与改写、设计分层奖励机制提供多维度监督信号、以及通过衰减随机性调度为强化学习提供充分的探索多样性。三者协同作用，使得模型能够在保持全局语义一致性的同时，精确控制每个对象的属性和对象间的交互关系。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 HiCoGen 的核心创新在于将扩散模型的文本到图像生成从“一次性整体生成”重构为“逐步合成链”，并通过强化学习与分层奖励机制对合成过程进行精细优化。其相对于主流基线（如 FLUX.1-dev、Qwen-Image、SDXL）的关键突破可归纳为四个层面的 **changed slots**。
 
@@ -113,7 +115,7 @@ $$\eta(t) = \eta_{\min} + \frac{1}{2} \big( \eta_{\max} - \eta_{\min} \big) \lef
 
 上述四个 changed slots 并非孤立改进，而是形成协同增强的因果链条：LLM 解析将复杂提示分解为可控子任务，Chain of Synthesis 逐步构建图像以缩小每一步的语义鸿沟，衰减随机性调度为强化学习提供充分的探索空间，分层奖励则从全局、对象、关系三个维度提供精细的优化信号。在 HiCoPrompt 基准上，这一协同设计使 HiCoGen 的主体存在准确率达到 0.7127，相较于 Qwen-Image（0.6292）提升约 9 个百分点，属性准确率和关系准确率也分别提升约 7.7 和 7.6 个百分点（Table 2），验证了各创新组件联合作用的显著效果。
 
-## 整体框架
+
 
 HiCoGen 的核心设计思路是将传统扩散模型“一次性生成复杂场景”的单体式任务，转化为一条可控的**合成链（Chain of Synthesis）**。该框架由五个关键模块串联而成，形成“解析—逐步合成—多层级评估—随机探索—策略优化”的闭环。
 
@@ -152,7 +154,7 @@ HiCoGen 的核心设计思路是将传统扩散模型“一次性生成复杂场
 ![[assets/figures/papers/paper_list_l2191_https_arxiv_org_abs_2511_19965/figures/001_Figure_1.jpg]]
 *Figure 1: The motivation of HiCoGen. The semantic gap between text and images widens as the complexity of the text increases, particularly involving the prompts with a hierarchical relationship. While a single T2I model performs well in generating individual objects, it suffers from concept missing and confusion when processing complex prompts. HiCoGen employs a Chain of Synthesis for complex text to preserve the semantic content*
 
-## 核心模块与公式推导
+
 
 ### 3.1 扩散强化学习基础
 
@@ -234,7 +236,9 @@ $$\eta(t) = \eta_{\operatorname*{min}} + \frac{1}{2} \big( \eta_{\operatorname*{
 ![[assets/figures/papers/paper_list_l2191_https_arxiv_org_abs_2511_19965/figures/011_Figure_7.jpg]]
 *Figure 7: The intermediate prompt of the Chain of Synthesis (zoom in for details)*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -310,7 +314,9 @@ HiCoGen 的实验基于自建的 **HiCoPrompt** 基准数据集。该数据集�
 ![[assets/figures/papers/paper_list_l2191_https_arxiv_org_abs_2511_19965/figures/008_Figure_5.jpg]]
 *Figure 5: Similarity between samples in diffusion GRPO during the training process. The samples obtained from baseline are highly similar, which reduces the diversity of the samples*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有工作的关系
 
@@ -351,6 +357,8 @@ HiCoGen 的有效性建立在以下前提之上：
 3. **端到端简化**：能否通过端到端训练减少对外部 LLM 和 VLM 的依赖，将解析与评估能力内化到生成模型中？
 4. **LLM 解析鲁棒性**：如何定量衡量并提升 LLM 解析的准确性和鲁棒性，尤其是在面对极长或极专业术语的提示时？
 5. **奖励维度扩展**：除了全局、对象和关系奖励，是否还需要引入结构一致性、光照协调等其他维度的奖励，以进一步提升生成质量？
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,7 @@ paper_level: A
 venue: NeurIPS
 year: 2022
 pdf_ref: paperPDFs/NEURIPS_2022/LION_Latent_Point_Diffusion_Models_for_3D_Shape_Generation.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/toronto-ai/LION/
 aliases:
 - LLPDM
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | LION：面向三维形状生成的隐点扩散模型 |
 | 英文题名 | LION: Latent Point Diffusion Models for 3D Shape Generation |
 | 会议/期刊 | NeurIPS 2022 |
-| Links | [paper](https://arxiv.org/abs/2210.06978); [Project](https://nv-tlabs.github.io/LION); [Project](https://research.nvidia.com/labs/toronto-ai/LION/) |
+| Links | [paper](https://arxiv.org/abs/2210.06978) · [Project](https://nv-tlabs.github.io/LION) · [Project](https://research.nvidia.com/labs/toronto-ai/LION/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | LION (Latent Point Diffusion Model) |
 | Dataset | ShapeNet (PointFlow split, global normalization) - Airplane, global normalization) - Chair, global normalization) - Car, ShapeNet-vol 13 classes (unconditional) |
@@ -42,7 +43,7 @@ claims:
 > - ShapeNet (PointFlow split, global normalization) - Chair 上，1-NNA CD↓ 为 53.70，对比 56.26 (PVD)，变化 -2.56。
 > - ShapeNet (PointFlow split, global normalization) - Car 上，1-NNA CD↓ 为 51.14，对比 54.55 (PVD)，变化 -3.41。
 
-## 概述
+## 概要
 
 **核心问题**：直接在复杂高维的点云坐标上训练扩散模型面临根本性困难——点云的非结构化特性与高维空间使得单一扩散模型难以在生成质量、样本多样性以及灵活的任务适配之间取得平衡。
 
@@ -57,7 +58,7 @@ claims:
 
 **局限与待验证点**：LION的标准DDPM采样速度较慢（约27秒/形状），虽可通过DDIM加速至1秒以内，但步数过少（如5步）会导致生成质量急剧下降（Table 25）。此外，模型目前仅处理无纹理几何，且未扩展到完整场景合成。在大规模跨类别真实数据集上的泛化能力尚待验证。
 
-## 背景与动机
+
 
 三维形状生成是计算机视觉与图形学领域的核心问题之一，其目标是从无到有地合成结构合理、细节丰富且多样化的三维形体。近年来，以点云为表示媒介的生成方法因其直接性和灵活性而受到广泛关注。点云无需预设拓扑结构，能够自然表达任意复杂度的几何表面，且与主流三维传感器获取的数据形式高度一致。
 
@@ -71,7 +72,9 @@ claims:
 
 LION正是在这一背景下被提出。其核心洞察是：**构建一个分层变分自编码器（Hierarchical VAE），将点云同时压缩为全局形状隐变量和保持点结构的隐点（latent points）表示，从而在平滑的隐空间中训练两个分层去噪扩散模型。** 这种设计同时利用VAE隐空间的正则化效果来简化扩散建模，又保留了点结构表示以发挥点云处理架构的优势，进而在高质量生成、自然形状解耦与任务灵活性之间取得更好的平衡。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 LION 的核心创新在于将**分层变分自编码器（VAE）与隐空间去噪扩散模型（DDM）**相结合，从而将3D形状生成的难度从复杂高维的点云坐标空间转移到一个平滑、正则化的隐空间中。这一设计直接回应了核心瓶颈：在原始点云上直接训练扩散模型（如 **PVD** 和 **DPM**）难以在单一模型中同时保证生成质量、多样性与灵活的任务适配。
 
@@ -99,7 +102,7 @@ LION 的核心创新在于将**分层变分自编码器（VAE）与隐空间去�
 *   **任务灵活性**：得益于 VAE 架构，LION 可以通过微调解码器来实现对多种条件信号（如体素引导）的适配，而无需重新训练扩散模型，展现了良好的任务泛化能力。
 *   **自然的形状解耦**：全局形状 $z_0$ 和局部细节 $h_0$ 的分离，使得模型天然支持形状插值（**Figure 7**）和细节编辑（**Figure 2**）等应用。
 
-## 整体框架
+
 
 LION 构建了一个**两阶段、三层级的生成式框架**，其核心设计思想是将点云的生成任务从高维、复杂的原始坐标空间迁移到一个平滑、正则化的隐空间中进行。该框架由第一阶段的层次化变分自编码器（VAE）和第二阶段的隐空间去噪扩散模型（DDM）共同构成。
 
@@ -144,7 +147,7 @@ $$\mathcal{L}_{\mathrm{ELBO}}(\phi,\xi) = \mathbb{E}_{p(\mathbf{x}), q_\phi(\mat
 
 为了生成可直接用于图形学应用的水密网格，LION 集成了一个可选的 **SAP (Shape As Points) 网格重建**模块。该模块基于可微的泊松表面重建，并在 LION 自编码器生成的训练数据上进行微调，以适应 LION 输出点云的特定噪声分布，从而从生成的点云中提取出平滑的网格。
 
-## 核心模块与公式推导
+
 
 LION 的核心架构是一个层次化变分自编码器（VAE），它将点云压缩到两个不同粒度的隐空间，并在这两个隐空间上分别训练去噪扩散模型（DDM）。整个系统通过两阶段训练完成：第一阶段训练 VAE 以获得正则化的隐表示，第二阶段在冻结的隐编码上训练两个分层 DDM。
 
@@ -214,7 +217,9 @@ $$
 
 生成过程按层级递进：首先从形状隐变量扩散模型 $p_{\theta}(\mathbf{z}_0)$ 采样全局形状 $\mathbf{z}_0$，然后以 $\mathbf{z}_0$ 为条件从隐点扩散模型 $p_{\psi}(\mathbf{h}_0|\mathbf{z}_0)$ 采样点结构化隐变量 $\mathbf{h}_0$，最后通过解码器 $p_{\xi}(\mathbf{x}|\mathbf{h}_0,\mathbf{z}_0)$ 生成最终点云。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 LION 在多个 ShapeNet 基准上进行了系统评估，覆盖单类、多类无条件生成、体素引导合成和网格重建等任务。核心结论如下：**(1)** 在 ShapeNet 的三个标准类别（飞机、椅子、汽车）上，LION 在 1-NNA 指标上全面超越了直接对点云建模的扩散基线 PVD 和 DPM，并在不同归一化设置下均达到 SOTA；**(2)** 消融实验证实，同时使用全局形状隐变量 $\mathbf{z}_0$ 和点结构化隐变量 $\mathbf{h}_0$ 的完全分层架构是性能的关键来源；**(3)** LION 通过隐空间的扩散-去噪（diffuse-denoise）过程，天然支持体素引导合成、形状插值和细节编辑等多种下游应用。
 
@@ -279,7 +284,9 @@ LION 的隐空间设计天然支持多种应用范式。**Figure 4** 展示了�
 ![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2210_06978/figures/026_Table_8.jpg]]
 *Table 8: Shape Latent DDM Architecture Hyperparameters*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心瓶颈与设计动机
 
@@ -325,6 +332,8 @@ LION 的能力边界和已知局限包括：
 - **细粒度语义控制**：分层隐空间是否可以被设计以学习部件级的语义控制，从而实现更精细的形状编辑？
 - **大规模泛化**：LION 在大规模、跨类别的真实 3D 数据集（如 Objaverse）上的泛化能力如何？
 - **条件信号整合**：能否将体素引导等其他条件信号直接整合到扩散模型的训练中，而非仅通过编码器微调的方式实现？
+
+
 
 ## 原文 PDF
 

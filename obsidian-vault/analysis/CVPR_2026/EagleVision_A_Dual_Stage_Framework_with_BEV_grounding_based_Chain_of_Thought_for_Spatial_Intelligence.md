@@ -41,7 +41,7 @@ claims:
 > - VSI-Bench 上，Overall score 63.5 vs 59.4 (Qwen3-VL-8B) (+4.1)；Overall score 63.5 vs 60.9 (VLM-3R-7B) (+2.6)。
 > - SQA3D 上，EM@1 60.3 vs 58.5 (Struct2D) (+1.8)；EM@1 60.3 vs 55.9 (Spatial-MLLM) (+4.4)。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -71,8 +71,6 @@ EagleVision以**Qwen3-VL-8B**为基础模型，在两项核心基准上取得开
 
 消融实验揭示了各组件的因果贡献：Spatial MCoT单独将基线从59.4提升至61.9（+2.5）；引入BEV grounding进一步提升至62.7（+3.3 over baseline）；叠加SPF-DPP达到最优63.5（+0.8）。三个组件相互补充，验证了“主动查询+几何感知帧选择”的双阶段设计有效性。框架对位姿噪声表现出强鲁棒性：中等噪声（5%平移，5°旋转）下VSI-Bench分数仅下降0.4%，更换SLAM后端为VGGT后性能为63.2（-0.3），表明对底层重建系统的依赖较弱。
 
-## 背景与动机
-
 ### 空间推理：视觉语言模型的核心挑战
 
 空间推理——理解三维场景中物体的位置、朝向、距离和相对关系——是具身智能、自动驾驶和增强现实等应用的基础能力。近年来，多模态大语言模型（MLLMs）在图像和视频理解上取得了显著进展，但在空间推理任务上仍面临根本性瓶颈。以 **Qwen3-VL-8B**（An Yang et al., arXiv 2025）、**LLaVA-OneVision-7B**（Bo Li et al., arXiv 2024）和 **InternVL2-8B**（Zhe Chen et al., arXiv 2024）为代表的开源 VLM，以及 **GPT-4o**（Hurst et al., arXiv 2024）和 **Gemini-1.5 Flash**（Gemini Team et al., arXiv 2024）等闭源模型，在处理需要精确三维几何理解的问题时，性能仍远未令人满意。
@@ -97,7 +95,7 @@ EagleVision 的核心洞察是：**将空间推理形式化为 BEV-grounded 姿�
 
 这一双阶段设计——宏感知（macro perception）的几何感知帧选择与微验证（micro verification）的 BEV 锚定主动推理——构成了 EagleVision 应对空间推理挑战的完整方案。
 
-## 核心创新
+## 核心方法与创新机理
 
 EagleVision 的核心创新在于将视频空间推理重新形式化为一个**闭环的假设-观察-验证过程**，通过三个相互耦合的机制突破现有 MLLM 的局限：
 
@@ -127,8 +125,6 @@ EagleVision 的核心创新在于将视频空间推理重新形式化为一个**
 | 训练信号 | 人工标注推理轨迹的 SFT | GRPO 强化学习，仅需答案级监督 + 空间接地惩罚 |
 
 这些创新使 EagleVision 在 VSI-Bench 上以 63.5 分超越所有开源 VLM，比基座模型 Qwen3-VL-8B 提升 +4.1 分；在 SQA3D 上取得 60.3% EM@1，超越 Struct2D、Spatial-MLLM 和 Spatial-Mind 等专用空间推理方法。
-
-## 整体框架
 
 EagleVision 将视频空间推理解耦为**宏观感知（Macro Perception）**与**微观验证（Micro Verification）**两个阶段，形成“假设—观察—验证”的闭环流水线。其核心设计动机在于：现有 MLLMs 在固定 token 预算下使用统一采样帧，既无法主动获取几何信息丰富的额外视点，也缺乏将抽象空间假设与具体视频帧关联的机制。EagleVision 通过离线重建的 BEV 地图实现主动姿态查询，使模型在推理过程中动态获取验证空间假设所需的特定视点。
 
@@ -161,8 +157,6 @@ $$R(\tau) = \underbrace{R_{\mathrm{acc}}(\tau) + R_{\mathrm{format}}(\tau) + \la
 
 ![[assets/figures/papers/paper_list_l2387_https_arxiv_org_abs_2512_15160/figures/002_Figure_2.jpg]]
 *Figure 2: Framework of EagleVision. The framework operates in two stages: (i) Macro perception selects spatially informative keyframes under a token budget by jointly optimizing semantic relevance and viewpoint diversity. (ii) Micro verification performs iterative spatial CoT with active BEV-grounded pose querying to refine spatial understanding*
-
-## 核心模块与公式推导
 
 EagleVision 将视频空间推理分解为两个串行阶段：**宏感知（Macro Perception）** 与 **微验证（Micro Verification）**。前者在固定 token 预算下从视频中选取一组几何感知的关键帧；后者以迭代空间思维链（Spatial MCoT）的方式，在 BEV 地图上主动查询缺失视点，形成“假设—观察—验证”的闭环。
 
@@ -251,10 +245,7 @@ $$R_{\text{spatial}}(\tau) = \begin{cases} -1, & \text{if } \exists t \in \mathc
 ![[assets/figures/papers/paper_list_l2387_https_arxiv_org_abs_2512_15160/figures/003_Figure_3.jpg]]
 *Figure 3: Macro Perception. Given an input video and a question, we first reconstruct the scene geometry and camera trajectory in SE(3) to build a sparse pose graph, whose heat-kernel diffusion yields the viewpoint kernel*
 
-![[assets/figures/papers/paper_list_l2387_https_arxiv_org_abs_2512_15160/figures/004_Figure_4.jpg]]
-*Figure 4: Micro Verification via Spatial MCoT. Given the selected keyframes and a BEV image, the model reasons in text and actively queries poses on the BEV plane to retrieve additional video frames when spatial evidence is insufficient, iteratively refining its answer*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -308,7 +299,7 @@ EagleVision 对位姿噪声表现出强鲁棒性：在中等噪声水平（平�
 ![[assets/figures/papers/paper_list_l2387_https_arxiv_org_abs_2512_15160/figures/012_Table_6.jpg]]
 *Table 6: Robustness under pose noise and with VGGT backend*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 核心方法定位
 

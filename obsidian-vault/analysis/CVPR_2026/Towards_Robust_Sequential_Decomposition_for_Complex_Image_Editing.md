@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/Towards_Robust_Sequential_Decomposition_for_Complex_Image_Editing.pdf
+project_link: null
 code_link: null
 aliases:
 - CGSEC
@@ -42,7 +43,7 @@ claims:
 > - Dependent Chain (500 synthetic tasks) 上，GPT-5 score CGSE (K=5): 4.14 vs BAGEL Finetuned Single-Turn (clarified): 3.91 (+0.23)。
 > - Dependent Chain 上，DINO-I / DINO-D CGSE (K=3): 0.779 / 0.555 vs BAGEL Finetuned Single-Turn: 0.776 / 0.553 (+0.003 / +0.002)。
 
-## 概述
+## 概要
 
 复杂图像编辑的核心瓶颈在于：单轮编辑模型难以准确解析并执行组合指令，而顺序编辑虽然能将任务分解为多步，却会因中间步骤的误差累积导致最终结果保真度下降。本文提出**上下文引导顺序编辑（Context-Guided Sequential Editing, CGSE）**，在 in-context editing 框架下，通过调节先前编辑结果的影响强度（γ_ctx）和上下文组成，充分利用分解优势并抑制误差累积。
 
@@ -50,7 +51,7 @@ claims:
 
 在无依赖合成链上，3 步 CGSE 的 GPT-5 评分为 4.15，优于微调单轮 BAGEL 的 4.0（Table 1）；在含依赖合成链上，5 步 CGSE 取得最高 GPT-5 评分 4.14，比单轮编辑提高 5.9%（Table 2）。在真实数据集 Complex-Edit 上，联合训练的 CGSE（K=2）在指令遵循（IF: 8.25 vs. 8.23）和身份保持（IP: 6.38 vs. 6.26）上均超过单轮基线，且人类偏好研究验证了这一结果（Table 5, Figure 5）。
 
-## 背景与动机
+
 
 复杂图像编辑要求模型在单次交互中准确理解并执行包含多个子任务的组合指令，例如同时完成物体移除、替换、重定位和属性修改。当前的图像编辑方法主要采用**单轮编辑**范式，即直接将复合指令映射到目标图像。然而，这种范式面临根本性瓶颈：单轮编辑无法准确解析并执行组合编辑指令，容易遗漏子任务或产生错误编辑（见图1，单轮编辑结果中多个操作被错误执行或忽略）。
 
@@ -60,7 +61,9 @@ claims:
 
 本文从 in-context editing 框架出发，提出**上下文引导顺序编辑 (Context-Guided Sequential Editing, CGSE)**。核心洞见是：通过大规模合成编辑序列训练模型习得指令分解能力，并设计一种可调节历史影响的上下文引导机制——仅利用上一步编辑结果作为引导信号，由系数 $\gamma_{ctx}$ 控制其贡献强度——从而在充分利用分解优势的同时，有效阻断误差累积链。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 复杂图像编辑面临一个根本性瓶颈：单轮编辑无法准确解析并执行组合编辑指令，而顺序编辑虽然将任务分解为多个子步骤，却会累积中间步骤的错误，导致结果保真度下降。本文提出的**上下文引导顺序编辑 (Context-Guided Sequential Editing, CGSE)** 通过调节先前编辑结果的影响，在充分利用分解优势的同时有效抑制误差累积，实现了鲁棒的复杂图像编辑。
 
@@ -86,7 +89,7 @@ $$v_{CGSE} = v_d + \gamma_{ctx} (v_\theta(X_t, t, I_0, \{T_j\}_{j=1}^i, \{I_j\}_
 
 通过随机将编辑序列拆分为 $K$ 个块进行训练，使模型习得可变粒度的分解能力。实验显示，增加分解步数 $K$ 在依赖链上持续提升编辑质量，$K=5$ 时达到最高 GPT-5 评分 4.14，比单轮编辑提高 5.9%（Table 2）。
 
-## 整体框架
+
 
 CGSE 构建在一个**上下文编辑 (in-context editing)** 框架之上，其核心思想是将复杂编辑指令分解为可执行的子步骤序列，并通过可控的上下文引导来抑制中间误差的累积。整个方法由三个关键组件构成：合成数据生成管道、模型微调范式、以及推理时的上下文引导编辑策略。
 
@@ -144,7 +147,7 @@ $$v_{CGSE} = v_d + \gamma_{ctx} (v_\theta(X_t, t, I_0, \{T_j\}_{j=1}^i, \{I_j\}_
 ![[assets/figures/papers/paper_list_l942_https_arxiv_org_abs_2605_09233/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of Synthetic Data Pipeline. We build the synthetic data pipeline on Blender, in which we construct complex editing tasks by sequentially applying editing operations on a randomly initialized scene. After constructing the editing chain, we take the initial and final rendering of the scene as the editing pair and concatenate all operation descriptions as the corresponding complex instruction*
 
-## 核心模块与公式推导
+
 
 ### 4.1 上下文编辑框架与训练目标
 
@@ -181,7 +184,9 @@ $$v_{CGSE} = v_d + \gamma_{ctx} (v_\theta(X_t, t, I_0, \{T_j\}_{j=1}^i, \{I_j\}_
 ![[assets/figures/papers/paper_list_l942_https_arxiv_org_abs_2605_09233/figures/001_Figure_1.jpg]]
 *Figure 1: Single-Turn Editing versus Sequential Editing with a complex instruction: ”Move the speaker onto the modern coffee table, move the all-purpose cleaner forward, then add a shaver on the floor near the speaker, and replace the lightbulb with a basketball”. Incorrect edits are labeled with red boxes on the image*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -256,7 +261,9 @@ $$v_{CGSE} = v_d + \gamma_{ctx} (v_\theta(X_t, t, I_0, \{T_j\}_{j=1}^i, \{I_j\}_
 ![[assets/figures/papers/paper_list_l942_https_arxiv_org_abs_2605_09233/figures/007_Table_4.jpg]]
 *Table 4: Analysis with different dependency ratios*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与设计动机
 
@@ -305,6 +312,8 @@ CGSE 的适用边界受以下因素制约：
 3. **自适应参数选择。** 如何自动确定最优分解步数 K 和引导强度 γ_ctx，使其适应不同复杂度的编辑指令？
 
 4. **无监督原语发现。** 能否通过无监督方式自动发现编辑原语，突破人工设计操作模板的限制，使合成数据管道更具扩展性和覆盖度？
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: NEURIPS
 year: 2025
 pdf_ref: paperPDFs/NEURIPS_2025/HMVLM_Human_Motion_Vision_Lanuage_Model_via_MoE_LoRA.pdf
+project_link: null
+code_link: null
 aliases:
 - HHMVLM
 - HMVLM
@@ -41,7 +43,7 @@ claims:
 > - HumanML3D (text-to-motion) 上，R-precision Top-1 ↑ 0.502 ±.003 (HMVLM single-task) vs 0.496 ±.002 (MotionGPT-2 ) (+0.006)；FID ↓ 0.123 ±.004 (HMVLM single-task) vs 0.191 ±.004 (MotionGPT-2 ) (-0.068)。
 > - Human3.6M + 3DPW (human pose estimation) 上，MPJPE ↓ / PA-MPJPE ↓ (average over datasets) outperforms ChatPose (single task) vs ChatPose (qualitative and quantitative improvement)。
 
-## 概述
+## 概要
 
 **问题与瓶颈**：将3D人体运动模态集成到基础语言模型时，模态差距导致灾难性遗忘——模型在获得运动理解能力的同时，原有的对话和知识能力急剧退化。现有的离散化运动表征（如基于全身时序1D卷积的VQ-VAE）缺乏空间粒度，难以同时兼顾自回归生成架构与姿态估计等静态任务的需求。
 
@@ -55,7 +57,7 @@ claims:
 
 **方法定位**：HMVLM属于**多模态指令微调框架**，在基础语言模型（Vicuna-7B-v1.5 / Gemma-2-2B-it）之上，通过MoE LoRA实现运动、视觉、语言三模态的统一。与MotionGPT、MotionAgent等运动-语言模型相比，其核心差异在于以极低的遗忘代价同时支持文本到运动生成、人体姿态估计和视频理解三类任务，且在多任务联合微调下仍保持竞争力。
 
-## 背景与动机
+
 
 将人体运动理解与生成能力融入基础语言模型，是构建通用人本智能体的关键一步。然而，现有方法面临两个相互纠缠的核心瓶颈。
 
@@ -65,7 +67,9 @@ claims:
 
 **本文动机。** 针对上述缺口，HMVLM提出两个相互配合的设计：在参数层面，通过门控网络动态路由的LoRA专家混合（MoE LoRA）实现任务感知的参数调制，其中引入不可训练的“零专家”作为预训练权重的安全回退路径；在表征层面，构建基于身体部位的空间标记器，将人体划分为多个部位并独立量化编码，在保留空间结构的同时提升重建精度。这一双轨设计的目标是：在支持文本到运动生成、人体姿态估计、视频理解等多种人本任务的同时，将基础模型的语言能力损失控制在可忽略的水平。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 HMVLM 围绕“将3D人体运动模态集成到基础语言模型时，模态差距导致灾难性遗忘且现有离散化运动表征缺乏空间粒度”这一瓶颈，提出了两个关键创新点：**MoE LoRA 多任务适应架构**与**基于身体部位的空间标记器**。以下从相对于 baseline 的 changed slots 角度展开分析。
 
@@ -115,7 +119,7 @@ $$(\hat{z}_{Bn}^{'1}, \hat{z}_{Bn}^{'2}, \dots, \hat{z}_{Bn}^{'F/l}) = \mathcal{
 
 **需注意的局限：** 当前框架仅实现运动与文本/视频的独立跨模态配对，尚未探索图像到文本或视频到运动的直接生成。多任务联合微调时，受固定参数预算限制，单任务性能相比单独微调有轻微下降（Table 2 中 multi-task 的 FID 从 0.123 升至 0.156）。此外，扩展到新的运动相关任务需要重新训练门控网络并添加专家，框架的任务可扩展性仍有待验证。
 
-## 整体框架
+
 
 HMVLM 的整体设计围绕一个核心矛盾展开：如何将 3D 人体运动模态注入预训练语言模型，同时不破坏后者已有的语言理解与对话能力。框架采用**指令驱动的多模态统一架构**，其信息流可概括为三个关键阶段。
 
@@ -161,7 +165,7 @@ $$\mathcal{L}_{gat} = -\mathbb{E}[\eta \cdot \log p_w(\alpha_0 | \mathbb{Z}, \ma
 ![[assets/figures/papers/paper_list_l1917_HMVLM_Human_Motion_Vision_Lanuage_Model_via_MoE_LoRA/figures/002_Figure_2.jpg]]
 *Figure 2: Method overview: task instructions and input prompt are processed by a gating network to produce a mixture weights. Modality-specific inputs are aligned with word embedding via projection layers, and the final outputs are generated through the pre-trained model and the weighted combination of LoRA experts*
 
-## 核心模块与公式推导
+
 
 ### 3.1 MoE LoRA 动态路由机制
 
@@ -242,7 +246,9 @@ $$(\hat{z}_{Bn}^{'1}, \hat{z}_{Bn}^{'2}, \dots, \hat{z}_{Bn}^{'F/l}) = \mathcal{
 
 消融实验（Table 5）表明，在码本大小 $K=512$ 时，身体部位标记器将 HumanML3D 上的 R-precision Top-3 从 0.741 提升至 0.785，重建 MSE 从 1.377 降至 0.966，验证了空间分解对运动表征精度的显著增益。该设计同时支持单帧姿态估计（无需时间压缩）和运动序列生成（需时间压缩），实现了自回归架构与静态任务的兼容。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要实验结果
 
@@ -327,7 +333,9 @@ Figure 5 分析了不同专家数量下 MoE LoRA 的训练时间、参数量、�
 ![[assets/figures/papers/paper_list_l1917_HMVLM_Human_Motion_Vision_Lanuage_Model_via_MoE_LoRA/figures/019_Table_7.jpg]]
 *Table 7: Examples of instruction templates for each task*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有基线方法的关系
 
@@ -364,6 +372,8 @@ HMVLM 的适用边界由其三个核心设计决策共同界定。
 **任务扩展的可迁移性**。当前框架的任务集是封闭的——门控网络和专家数量在训练前就已固定。若要添加新的运动相关任务（如运动修复、运动风格迁移），需要重新训练门控网络并可能增加专家。这限制了 HMVLM 作为一个“运动基础模型”的即插即用能力。一个开放问题是：能否设计一种增量式的专家添加机制，使得新任务的适配不会干扰已有的专家路由？
 
 **跨模态生成的缺失**。HMVLM 目前仅实现了文本到运动、图像/视频到姿态估计等单向映射，尚未探索直接的模态间生成（如图像到运动、视频到文本描述）。这一局限部分源于训练数据的配对约束，部分源于架构设计中各模态投影层之间缺乏显式的跨模态对齐损失。
+
+
 
 ## 原文 PDF
 

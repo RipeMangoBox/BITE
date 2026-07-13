@@ -43,7 +43,7 @@ claims:
 > - InstructKITTI (3D) 上，Acc / mIoU 38.62 / 37.95 vs Not reported (SegPoint/3D-LLaVA would be lower) (N/A)。
 > - ScanRefer (Referring) 上，mIoU / Acc@50 52.7 / 54.8 vs Prior best around 50/52 (estimated) (~+2-3)。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -61,7 +61,7 @@ MORE-STEM 在方法谱系上处于 **查询驱动分割 × 时序建模 × 记�
 
 在3D指令分割基准 Instruct3D 上，MORE-STEM 取得 mIoU 35.9、Acc 31.4，相较此前最优方法 **SegPoint**（mIoU 31.6, Acc 27.5）分别提升 4.3 和 3.9 个点（Table 1）。在 ScanRefer 引用分割任务上，方法同样取得 mIoU 52.7、Acc@50 54.8 的最佳性能（Table 3）。消融实验进一步表明，依次移除 CFTVA、STEM、LTM、STM 模块后，mIoU 从 35.9 分别降至 33.1、32.5、32.0、31.4，验证了各组件的必要性（Table 5）。此外，本文基于 SemanticKITTI 自动构建了首个户外4D指令分割基准 InstructKITTI（含超过15K对查询-掩码样本），MORE-STEM 在该基准的4D任务上取得 Acc@50 42.19、mIoU 40.67，为动态场景指令分割提供了初始性能基线。
 
-## 背景与动机
+
 
 ### 3D点云理解：从静态到动态的范式迁移
 
@@ -91,7 +91,9 @@ MORE-STEM 在方法谱系上处于 **查询驱动分割 × 时序建模 × 记�
 
 图1对比了传统3D引用/指令分割任务与本文提出的4D指令分割任务的差异：前者仅处理单帧静态点云，后者则要求模型在多帧动态序列中保持分割的时空一致性和语义连贯性。这一范式迁移对模型的时间建模能力提出了更高要求，也是MORE-STEM设计的根本出发点。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MORE-STEM 的核心创新在于首次将查询驱动的3D点云分割从静态场景拓展到动态4D场景，通过**跨帧文本-视觉对齐（CFTVA）**、**时空一致性模型（STEM）** 和**长短期记忆召回（LTM+STM）** 三个关键模块的联合设计，系统性地解决了现有方法在时序连贯性、跨场景语义关联和体素级一致性方面的根本缺陷。
 
@@ -132,7 +134,7 @@ MORE-STEM 的核心创新在于首次将查询驱动的3D点云分割从静态�
 
 消融实验（Table 5）系统性地验证了各模块的必要性：完整模型在 Instruct3D 上取得 mIoU 35.9；依次移除 CFTVA、STEM、LTM、STM 后，mIoU 分别降至 33.1、32.5、32.0、31.4。其中 CFTVA 的移除导致最大幅度的性能下降（-2.8 mIoU），表明跨帧文本-视觉对齐是整个框架的基础性创新；而 LTM 和 STM 的独立贡献（分别 -0.5 和 -0.6 mIoU）则验证了分级记忆设计的互补性。
 
-## 整体框架
+
 
 MORE-STEM 的整体设计围绕一个核心洞察展开：**将语言查询与多帧点云特征进行时间感知的跨模态对齐，并利用长短期记忆模块平衡长期跨场景语义召回与短期帧级连续性，同时通过状态空间模型和可控制 Transformer 实现体素级时空一致性**。整个框架由四个关键模块串联构成，形成一条从多模态输入到时空一致分割掩码的端到端推理管线。
 
@@ -168,7 +170,7 @@ MORE-STEM 的整体设计围绕一个核心洞察展开：**将语言查询与�
 
 消融实验（Table 5）从反面验证了这一因果链：在 Instruct3D 上，完整模型的 mIoU 为 35.9；依次移除 CFTVA、STEM、LTM、STM 后，mIoU 分别降至 33.1、32.5、32.0、31.4，每个模块的移除都导致性能的阶梯式下降，且定性可视化（Figure 6）显示缺少时空一致性或记忆召回会在遮挡场景下产生明显的时序漂移和错误分割。
 
-## 核心模块与公式推导
+
 
 MORE-STEM 围绕三个核心模块构建：跨帧文本-视觉对齐（CFTVA）、时空一致性模型（STEM）以及长短期记忆召回（LTM + STM）。三个模块协同工作，将语言查询与多帧点云特征进行时间感知的跨模态对齐，并通过状态空间时序传播和分级记忆机制确保分割结果的时空一致性。
 
@@ -249,7 +251,9 @@ $$w_{i}^{bias} = \frac{w_{i}^{init}}{\sum_{j \in c} w_{j}^{init}}$$
 ![[assets/figures/papers/paper_list_l33_https_openaccess_thecvf_com_content_CVPR2026_html_Li_MORE_STEM_Long_Shor/figures/005_Figure_5.jpg]]
 *Figure 5: Framework of the proposed Long-Short Memory Recall module*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -308,7 +312,9 @@ MORE-STEM 在多个 3D 和 4D 理解基准上取得了最优性能，覆盖指�
 ![[assets/figures/papers/paper_list_l33_https_openaccess_thecvf_com_content_CVPR2026_html_Li_MORE_STEM_Long_Shor/figures/010_Table_4.jpg]]
 *Table 4: Semantic segmentation results on the validation set of SemanticKITTI [3]*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 任务谱系：从静态3D分割到动态4D指令理解
 
@@ -349,6 +355,8 @@ MORE-STEM 的工作锚定在两条相互交叉的研究线上：**查询驱动�
 4. **标注依赖**：该方法是否能与自监督预训练范式结合，从而减少对细粒度文本标注的依赖？当前框架仍需要大量文本-掩码对进行监督训练。
 
 5. **更长时序建模**：STEM 的两帧传播机制能否扩展为多帧联合优化或引入更长的时序感受野（如Mamba的远距离依赖），值得进一步探索。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Zero_shot_Gesture_Movement_Recognition.pdf
+project_link: null
+code_link: null
 aliases:
 - EMBRIDGE
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | EMBridge：通过跨模态表示学习增强EMG手势泛化 |
 | 英文题名 | EMBRIDGE: ENHANCING GESTURE GENERALIZATION FROM EMG SIGNALS THROUGH CROSS-MODAL REPRESENTATION LEARNING |
 | 会议/期刊 | ICLR 2026 |
-| Links | [arXiv](https://arxiv.org/abs/) |
+| Links | [paper](https://arxiv.org/abs/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | EMBridge |
 | Dataset | emg2pose unseen gestures, emg2pose in-dist. gestures, NinaPro in-dist. gestures |
@@ -40,7 +42,7 @@ claims:
 > - emg2pose in-dist. gestures 上，Balanced Accuracy (Zero-shot) 0.777 vs 0.763 (Q-Former) (+0.014)。
 > - NinaPro in-dist. gestures 上，Balanced Accuracy (Zero-shot) 0.692 vs 0.618 (Q-Former-LS) (+0.074)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：表面肌电（EMG）信号因高噪声、高变异性和数据规模有限，导致单模态自监督学习（如EMG‑MAE）难以获得具有判别力和泛化性的表示空间——尤其在未见手势上，EMG嵌入缺乏语义结构，无法支撑零样本分类。
 
@@ -48,7 +50,7 @@ claims:
 
 **关键实证**：在emg2pose未见手势零样本分类上，EMBridge达到0.528的平衡准确率，超越所有基线（最佳基线CPEP为0.481）；每用户平均F1分数达0.522，较CPEP提升14.2%。消融实验表明，移除Q‑Former、MPRL或CASCLe均导致零样本性能下降，CASCLe的软目标优于传统InfoNCE和标签平滑。在仅使用40%配对数据时，EMBridge的零样本性能仍超过全量单模态基线的线性探测性能。框架在不增加参数量或额外传感器的条件下实现了未见手势的零样本识别能力。
 
-## 背景与动机
+
 
 表面肌电图（sEMG）通过非侵入式传感器记录肌肉电活动，是实现可穿戴手势交互的关键信号源。然而，EMG信号固有的高噪声、高变异性和有限的数据规模，使得从单模态信号中学习具有判别性和泛化性的表示极为困难。如图1(a)所示，即使采用相同的掩码自编码器（MAE）预训练，姿态嵌入在语义空间中有序分布、按手势类别清晰分离，而EMG嵌入则杂乱无章——这一结构性鸿沟直接限制了EMG单模态模型在未见手势上的表现，成为本领域的核心瓶颈。
 
@@ -58,7 +60,9 @@ claims:
 
 EMBridge的核心动机正源于此：**以冻结的高质量姿态编码器作为结构锚点，通过跨模态表示学习将姿态空间的语义结构“注入”到EMG编码器中**。其关键洞察在于——不应仅对齐单个样本对，而应对齐两个模态空间的相对几何结构。这意味着，若两个姿态在嵌入空间中语义邻近，其对应的EMG表示也应保持相似的邻近关系。通过这一结构化对齐，EMG编码器得以捕获姿态相关的语义信息，从而首次实现可穿戴EMG信号的零样本手势分类能力，且不增加额外参数量或传感器需求。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 EMBridge 的核心创新在于构建了一套**结构化的跨模态对齐机制**，将冻结的高质量姿态表示空间作为几何锚点，通过三个相互协同的组件重塑 EMG 表示空间，从而首次实现可穿戴 EMG 信号的零样本手势分类。
 
@@ -90,7 +94,7 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{InfoNCE}} + \alpha \mathcal{L}_{\mathrm{CAS
 
 **需手动验证的点**：论文未提供各损失权重 $\alpha$、$\lambda$ 的具体取值及其调参过程，该信息需从原文补充材料或代码中确认。
 
-## 整体框架
+
 
 EMBridge 的核心思想是**以冻结的姿态编码器为结构锚点，通过跨模态对齐将 EMG 表示空间结构化**，从而赋予单模态 EMG 编码器零样本手势分类能力。整体 pipeline 由三个关键模块串联构成：查询 Transformer（Querying Transformer, Q-Former）、掩码姿态重建损失（Masked Pose Reconstruction Loss, MPRL）和社区感知软对比学习损失（Community-Aware Soft Contrastive Learning, CASCLe）。
 
@@ -109,7 +113,7 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{InfoNCE}} + \alpha \mathcal{L}_{\mathrm{CAS
 ![[assets/figures/papers/paper_list_l1645_Zero_shot_Gesture_Movement_Recognition/figures/001_Figure_1.jpg]]
 *Figure 1: (a) Motivation for cross-modal representation learning: using the same MAE pre-training, pose embeddings are semantically structured and well-separated across gestures (colors), whereas EMG embeddings are not. This motivates leveraging pose as guidance to structure the EMG representation space. (b) Detailed architecture of EMBridge. Only one transformer block (self-attention, cross-attention, and feed-forward layers) is shown for clarity, the model uses four such blocks*
 
-## 核心模块与公式推导
+
 
 EMBridge 的核心由三个模块构成：**查询Transformer (Q-Former)**、**掩码姿态重建损失 (MPRL)** 和**社区感知软对比学习 (CASCLe)**。三个模块协同工作，以冻结的姿态编码器为锚点，将EMG表示空间结构化对齐到姿态语义空间。
 
@@ -175,7 +179,9 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{InfoNCE}} + \alpha \mathcal{L}_{\mathrm{CAS
 ![[assets/figures/papers/paper_list_l1645_Zero_shot_Gesture_Movement_Recognition/figures/002_Figure_2.jpg]]
 *Figure 2: Unlike conventional contrastive loss that relies on one-hot targets, (a). CASCLe constructs soft targets based on community-level similarity. Each community is represented by affinities to cluster centroids, and pose–pose similarity is computed from affinity vectors. Soft targets used in CASCLe are shown in (b), computed from a batch of 64 samples for clearer visualization*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 数据集与评估协议
 
@@ -271,7 +277,9 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{InfoNCE}} + \alpha \mathcal{L}_{\mathrm{CAS
 ![[assets/figures/papers/paper_list_l1645_Zero_shot_Gesture_Movement_Recognition/figures/013_Table_4.jpg]]
 *Table 4: Impact of batch size on zero-shot classification performance of unseen gestures*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心瓶颈与设计动机
 
@@ -341,6 +349,8 @@ CASCLe的软目标构建基于k-means硬聚类，每个姿态被分配到固定�
 5. **部署效率**：如何将零样本手势识别能力部署到资源受限的可穿戴设备上，同时保持实时性和低功耗？Q-Former的额外计算开销和检索式分类的存储需求是实际部署需要解决的问题。
 
 6. **手势空间的可扩展性**：当前评估仅覆盖4个未见手势，当手势类别数量大幅增加时，零样本检索的判别力是否会显著下降？社区结构能否有效扩展到更大规模的手势空间？
+
+
 
 ## 原文 PDF
 

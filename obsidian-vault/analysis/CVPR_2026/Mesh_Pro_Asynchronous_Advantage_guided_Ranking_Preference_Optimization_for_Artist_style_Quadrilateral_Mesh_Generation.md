@@ -43,7 +43,7 @@ claims:
 > - Dense Meshes (from Hunyuan3D 2.5) 上，CD↓ 0.028 vs 0.059 (QuadGPT) (-52.5%)；BR↓ 22% vs 50% (QuadGPT) (-28个百分点)；QR↑ 81% vs 78% (QuadGPT) (+3个百分点)。
 > - Artist Meshes (Toys4k) 上，CD↓ 0.038 vs 0.041 (Mesh-RFT) (-7.3%)；BR↓ 32% vs 38% (Mesh-RFT) (-6个百分点)；QR↑ 78% vs 76% (QuadGPT) (+2个百分点)。
 
-## 概述
+## 概要
 
 3D网格生成的后训练强化学习面临两个核心瓶颈。其一，现有方法或采用离线DPO，训练效率低、泛化能力不足；或尝试同步在线RL，但因网格token序列长度差异悬殊，导致严重GPU空闲与训练中断。其二，已有的混合三角-四边形网格tokenization（如QuadGPT）在早期强制提交面类型并采用非规范排序，产生几何伪影与结构缺陷，且仅靠监督学习会偏向简单三角面，难以生成艺术家级别的四边形拓扑。
 
@@ -53,7 +53,7 @@ Mesh-Pro针对上述瓶颈提出了三项关键创新。**对角感知tokenizati
 
 实验表明，Mesh-Pro在稠密网格和艺术家网格上均大幅超越此前最优方法。在稠密网格上，相比QuadGPT，倒角距离（CD）降低52.5%，破碎率（BR）从50%降至22%，四边化率（QR）达81%。在艺术家网格上，相比Mesh-RFT，CD降低7.3%，BR从38%降至32%。消融实验证实了异步ARPO各组件、新tokenization以及奖励设计的有效性。Mesh-Pro生成的原生四边形主导拓扑在下游任务（UV展开、纹理绘制、动画）中展现出鲁棒性能。
 
-## 背景与动机
+
 
 ### 3D网格生成：从三角面到艺术家级四边形拓扑
 
@@ -77,7 +77,9 @@ Mesh-Pro针对上述瓶颈提出了三项关键创新。**对角感知tokenizati
 
 3. **tokenization的决策时机决定生成质量。** 将对角感知融入tokenization设计——先生成三角形基面，再在序列末尾决定是否附加第四顶点形成四边形，并在第四顶点中编码对角方向——可以推迟面类型决策、降低预测负担。同时强制全局最小顶点索引排序，能够从根本上减少结构破损。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Mesh-Pro 针对现有 3D 网格生成后训练 RL 的核心瓶颈，在三个维度上进行了系统性创新：**异步在线 RL 训练范式**、**优势引导排序偏好优化算法（ARPO）**，以及**对角感知的混合三角-四边形 tokenization**。三者协同，使模型在训练效率、泛化能力和拓扑质量上均取得显著突破。
 
@@ -130,7 +132,7 @@ Mesh-Pro 的**对角感知 tokenization** 从根本上解决了这些问题：
 
 消融实验（Fig.7）证实：移除射线奖励导致网格破碎率大幅上升；移除拓扑奖励则使输出质量显著下降，远离艺术家水准。
 
-## 整体框架
+
 
 Mesh-Pro 的整体 pipeline 围绕“预训练 + 异步在线 RL 后训练”两阶段范式构建，其核心设计目标是生成兼具几何保真度与艺术家级四边形拓扑的混合三角-四边形网格。图 2 给出了架构总览，清晰展示了从输入到输出的完整数据流与模块关系。
 
@@ -176,7 +178,7 @@ $$R(M_t) = \begin{cases} w_{\mathrm{qr}} \cdot N_{\mathrm{qr}} + N_{\mathrm{ql}}
 ![[assets/figures/papers/paper_list_l2204_https_arxiv_org_abs_2603_00526/figures/002_Figure_2.jpg]]
 *Figure 2: Architecture Overview. Mesh-Pro begins by sampling point clouds from the input dense and artist meshes. The features from the point cloud encoder are then passed to an auto-regressive Hourglass Transformer [18] for mesh decoding. This decoder is trained with truncation to output triangle-quad tokens. The pre-training objective is to reconstruct the input mesh. Subsequently, asynchronous ARPO is used for RL post-training to generate high-quality, well-structured meshes, guided by ray and topological rewards*
 
-## 核心模块与公式推导
+
 
 ### 对角感知网格Tokenization
 
@@ -265,7 +267,9 @@ $$R(M_t) = \left\{\begin{array}{ll} w_{\mathrm{qr}} \cdot N_{\mathrm{qr}} + N_{\
 ![[assets/figures/papers/paper_list_l2204_https_arxiv_org_abs_2603_00526/figures/018_Figure_14.jpg]]
 *Figure 14: Training loss curves for DPO, GRPO, and ARPO*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -343,7 +347,9 @@ Mesh-Pro在稠密网格（来自Hunyuan3D 2.5）和艺术家网格（Toys4k）�
 ![[assets/figures/papers/paper_list_l2204_https_arxiv_org_abs_2603_00526/figures/017_Figure_13.jpg]]
 *Figure 13: Distribution of face count (consisting of a mixture of triangles and quadrilaterals) in Mesh-Pro predictions. Point clouds are sampled from dense meshes and artist meshes. The average face count is approximately 8k*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位与基线对比
 
@@ -420,6 +426,8 @@ Mesh-Pro 的方法设计适用于以下场景：
 5. **数据扩展的边际效应**：Table 4显示数据从400增至1000时BR从22.35%降至21.83%，提升幅度较小。针对更大规模（如500万+）高质量四边形网格数据的预训练和RL扩展，性能提升的边际效应如何？是否存在数据效率的瓶颈？
 
 6. **与闭源商业方法的差距**：Fig.16的定性对比显示Mesh-Pro在几何一致性、细节丰富度和拓扑质量上优于闭源商业方法（Tripo、Hunyuan3D），但缺乏定量指标。如何在标准化benchmark上系统评估与商业方法的差距？
+
+
 
 ## 原文 PDF
 

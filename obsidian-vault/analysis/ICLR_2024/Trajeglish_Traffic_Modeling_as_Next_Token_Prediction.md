@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2024
 pdf_ref: paperPDFs/ICLR_2024/Trajeglish_Traffic_Modeling_as_Next_Token_Prediction.pdf
+project_link: https://research.nvidia.com/labs/toronto-ai/trajeglish/
+code_link: null
 aliases:
 - Trajeglish
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | Trajeglish：基于下一个标记预测的交通建模 |
 | 英文题名 | Trajeglish: Traffic Modeling as Next-Token Prediction |
 | 会议/期刊 | ICLR 2024 |
-| Links | [paper](https://arxiv.org/abs/2312.04535); [Project](https://research.nvidia.com/labs/toronto-ai/trajeglish/) |
+| Links | [paper](https://arxiv.org/abs/2312.04535) · [Project](https://research.nvidia.com/labs/toronto-ai/trajeglish/) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/planning_control |
 | Method | Trajeglish |
 | Dataset | Waymo Open Motion Dataset Sim Agents Test |
@@ -39,7 +41,7 @@ claims:
 > - 在 Waymo Sim Agents 测试基准上，Trajeglish 的真实感元指标较先前最佳方法提升 3.3%，交互指标提升 9.9%。
 > - k-disks 分词在词汇量 384 时达到 1.18 厘米的期望离散化误差，显著优于 k-means 的 6.13 厘米。
 
-## 概述
+## 概要
 
 多智能体交通仿真面临一个双重挑战：既要捕捉每个智能体时间维度上的运动动力学，又要建模同一时间步内智能体之间的交互依赖性。主流方法通常将轨迹预测视为连续回归问题，或对每个智能体进行独立建模，难以在闭环仿真中同时保持场景的全局一致性和交互的真实感。
 
@@ -47,7 +49,7 @@ claims:
 
 在 **Waymo Sim Agents 测试基准**上，Trajeglish 在真实感元指标上超越先前最佳方法 **3.3%**，交互指标提升 **9.9%**，成为该基准上首个基于离散序列建模的方法。分词层面，k-disks 在词汇量仅为 384 时即达到 **1.18 厘米**的期望离散化误差，远优于 k-means（6.13 厘米）和网格基线。在仅初始化一个时间步的全自主设定下，Trajeglish 的碰撞率显著低于忽略时间步内交互的基线，验证了步内条件建模对于闭环仿真的关键作用。
 
-## 背景与动机
+
 
 ### 问题背景：闭环多智能体交通仿真
 
@@ -73,7 +75,9 @@ claims:
 
 这些设计使 Trajeglish 成为首个在 Waymo Sim Agents 基准上使用离散序列建模的方法，并在真实感元指标上超越先前最佳方法 3.3%，交互指标提升 9.9%（参见 Table 1）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Trajeglish 的核心创新在于将多智能体交通建模彻底重构为一个**离散序列的下一个标记预测问题**，并围绕这一范式设计了两个紧密耦合的组件：数据驱动的轨迹分词策略与具备时间步内交互建模能力的自回归Transformer架构。这一设计直接回应了闭环仿真中的核心瓶颈——如何在保持场景全局一致性的前提下，对连续高维轨迹进行高保真离散化，并有效捕捉智能体在同一时间步内的相互依赖性。
 
@@ -107,7 +111,7 @@ $$p(s_t^1, \ldots, s_t^N \mid s_{<t}, c) = \prod_{n=1}^{N} p(s_t^n \mid s_{<t}, 
 
 综上，Trajeglish 的创新并非单一技术点的改进，而是**表示层（k-disks 分词）、建模层（时间步内因果条件）与架构层（GPT 式序列建模）** 的协同重构，三者共同构成了一个完整的离散序列交通建模范式。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2312_04535/figures/015_Figure_15.jpg]]
 *Figure 15: Tokenization method comparison Average corner distance for trajectories tokenized with a vocabulary of 384 with template sets derived using different methods*
@@ -149,7 +153,7 @@ $$
 
 在训练阶段，Trajeglish 采用一种**噪声分词增强**策略（Sec A.2）：输入给解码器的历史动作标记并非来自精确分词目标，而是从 softmax 核分布中采样得到，而预测目标仍为最小距离标记。这一设计使模型在训练期间即暴露于推理时可能出现的累积误差，增强了闭环滚动的鲁棒性。
 
-## 核心模块与公式推导
+
 
 Trajeglish 由两个核心组件构成：一个将连续轨迹离散化为运动标记的**分词策略**，以及一个在多智能体标记序列上进行下一个标记预测的**自回归 Transformer 架构**。以下分别阐述这两个模块的设计逻辑与关键公式。
 
@@ -208,7 +212,9 @@ p(s_1^1, ..., s_T^N \mid c) = &\prod_{t=1}^{T} \prod_{n=1}^{N} p\big(s_t^n \mid 
 
 训练时采用**噪声分词增强**（Sec A.2）：输入给解码器的动作标记并非精确分词结果，而是从 softmax 核分布中采样的噪声标记，而预测目标仍为最小距离标记。这一策略增强了模型对推理时累积误差的鲁棒性。此外，可选的**航向平滑器**（Heading Smoother, Sec A.5）作为后处理模块，从分词轨迹中恢复更精确的原始航向角。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：Waymo Sim Agents 基准
 
@@ -277,7 +283,9 @@ Trajeglish 的训练数据规模（以 token 数计）与自然语言数据集�
 *Figure 19: Partial control collision rate We plot the collision rate as a function of rollout time when the traffic model controls only one agent while the rest are on replay. We expect this collision rate to be higher than the log collision rate since the replay agents do not react to the dynamic agents. We note that the collision rate decreases significantly just by placing the agent last in the order, showing that the model learns to condition on the actions of other agents within a single timestep effectively. Figure 20: Context Length We plot the negative log-likelihood (NLL) when we vary the context length at test-time relative to the NLL at full context. Matching with intuition, while pedestria...*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 方法定位与核心差异
 
@@ -319,6 +327,8 @@ Trajeglish 的离散序列建模范式与上述连续回归方法形成根本性
 ### 知识库定位
 
 Trajeglish 将 GPT 风格的序列建模范式成功迁移到多智能体交通仿真领域，其核心贡献在于证明了**小词汇量离散分词 + 时间步内因果条件建模**的组合可以有效解决高维连续轨迹的交互生成问题。该方法桥接了自然语言处理中的下一个标记预测范式与自动驾驶中的多智能体轨迹生成，为后续研究开辟了将大规模语言模型架构直接应用于物理世界交互建模的技术路径。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/ACCORD_Alleviating_Concept_Coupling_through_Dependence_Regularization_for_Text_to_Image_Diffusion_Personalization.pdf
+project_link: null
+code_link: https://github.com/antgroup/ACCORD
 aliases:
 - ACCORD
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | ACCORD：通过依赖性正则化缓解文本到图像扩散个性化中的概念耦合 |
 | 英文题名 | ACCORD: Alleviating Concept Coupling through Dependence Regularization for Text-to-Image Diffusion Personalization |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=CKYsYlRdCM); [GitHub](https://github.com/antgroup/ACCORD) |
+| Links | [paper](https://openreview.net/forum?id=CKYsYlRdCM) · [GitHub](https://github.com/antgroup/ACCORD) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | ACCORD |
 | Dataset | DreamBench, StyleBench, FFHQ |
@@ -40,7 +42,7 @@ claims:
 > - DreamBench 上，DINO-I 为 61.4 (CD w/ Ours*)，对比 52.7 (CD)，变化 +8.7。
 > - StyleBench 上，CLIP-T 为 33.6 (LoRA SDXL w/ Ours*)，对比 31.9 (Omnigen, 3.8B模型)，变化 +1.7。
 
-## 概述
+## 概要
 
 文本到图像扩散模型的个性化微调中普遍存在**概念耦合**问题：训练图像中与目标概念频繁共现的一般概念（如人物、背景或属性）会被错误绑定，导致生成时不符合文本提示，例如出现不该有的物体或风格混淆。ACCORD 首次将这一问题形式化为统计依赖问题，揭示了其两个根本来源——**去噪依赖偏差**（去噪过程中逐步引入的虚假依赖）和**先验依赖偏差**（个性化概念与其超类之间先验关系的偏离），并通过定理 1 将总依赖偏差严格分解为这两个可量化的项。
 
@@ -48,7 +50,7 @@ claims:
 
 在 DreamBench、StyleBench 和 FFHQ 等多个基准上的实验表明：将 ACCORD 集成到 CustomDiffusion 后，CLIP‑I 提升 +8.4，DINO‑I 提升 +8.3，且人类偏好胜率显著优于基线；集成到 DreamBooth、LoRA（SDXL）等方法后，同样在文本对齐和个性化保真度上获得一致性增益。消融研究进一步验证了 DDLoss 和 PDLoss 的协同作用以及对不同主干的普适性。这些结果确证了通过直接统计依赖解耦来缓解概念耦合的有效性。
 
-## 背景与动机
+
 
 文本到图像（T2I）扩散模型的个性化微调旨在让模型学会一个或几个特定概念（如一只独特的玩具、某个人的脸、一种风格），并根据自由文本提示生成这些概念在不同场景下的图像。主流范式（如DreamBooth、CustomDiffusion）通常使用少量参考图像，在标准扩散去噪损失下微调部分参数或文本嵌入。然而，这种简单的训练策略隐含着一个严重的缺陷：**概念耦合**。
 
@@ -64,7 +66,9 @@ $$r(\mathbf{c}_p, \mathbf{c}_g | \mathbf{x}_{\theta, t}) = \frac{p(\mathbf{c}_p,
 
 基于此，我们提出**ACCORD**——一个即插即用的正则化框架，通过两个针对性损失直接最小化上述偏差，而无需改变原有个性化方法的架构或参数。其中，**DDLoss** 在扩散时间步间约束依存系数的增长，利用模型作为隐式分类器的特性给出可计算的闭式梯度；**PDLoss** 则在CLIP语义空间中对齐个性化概念与超类概念的先验依赖关系，防止过度的先验耦合。这一设计使得ACCORD能够通用地集成到DreamBooth、CustomDiffusion、LoRA、VisualEncoder甚至零样本方法（如IP-Adapter）中，从统计根源上缓解概念耦合，期望在保持个性化保真度的同时，大幅提升文本-图像一致性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 **瓶颈形式化：概念耦合即统计依赖偏差**  
 现有文本到图像扩散模型的个性化过程，常常将目标概念 $c_p$ 与训练集中频繁共现的一般概念 $c_g$（如背景人物、属性）虚假绑定，导致生成图像违背文本提示。ACCORD 首次将这一现象形式化为**统计依赖问题**：通过条件依存系数  
@@ -114,7 +118,7 @@ $$\mathbb{E}_{\mathbf{x}_{\theta}} \Big[ \underbrace{\log r(\mathbf{c}_p,\mathbf
 **可扩展性与局限性**  
 该方法不依赖于特定个性化基座，但依赖基础 T2I 模型对条件依赖的建模质量；若基模型无法准确表示超类‑一般概念关联，DDLoss 的对齐可能失效。此外，对于训练提示中未显式出现但强纠缠的外部概念，现有损失无法显式消除关联，仍需依赖模型泛化。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0005_CKYsYlRdCM_ACCORD_Alleviating_Concept_Coupling_through_Depe/figures/002_Figure_2.jpg]]
 *Figure 2: Denoising Decouple Loss $\mathcal{L}_{\mathrm{DD}}$. The UNet estimates $\mathbf{x}_{t-1}$ based on $\mathbf{x}_$t$ and four different conditions, then constrains the relationships between the four denoising results. The objective of $\mathcal{L}_{\mathrm{DD}}$ is to prevent the conditional dependence coefficient between the personalization target $\mathbf{c}_$p$ and the general text condition $\mathbf{c}_$g$ from varying significantly between adjacent timesteps.
@@ -137,7 +141,7 @@ ACCORD 将文本到图像扩散模型个性化中普遍存在的**概念耦合**
 
 整体而言，ACCORD 通过 **DDLoss 抑制去噪阶段依赖的意外增长**，通过 **PDLoss 校正先验层面的依赖偏移**，二者协同在原有微调流水线上即插即用地缓解概念耦合，从而提升文图对齐与个性化保真度。
 
-## 核心模块与公式推导
+
 
 ACCORD 将概念耦合形式化为个性化目标 $c_p$ 与一般概念 $c_g$ 之间的统计依赖偏离，并通过定理 1 将总依赖偏差分解为两个可优化的来源：**去噪依赖偏差**（Denoising Dependence Discrepancy）与**先验依赖偏差**（Prior Dependence Discrepancy）。基于该分解，ACCORD 提出两个即插即用的正则化损失——**DDLoss**与**PDLoss**，分别在扩散模型的去噪轨迹和 CLIP 语义空间上直接抑制依赖偏差，不改变原有架构参数。
 
@@ -193,7 +197,9 @@ $$ \mathcal{L}_{\mathrm{PD}} = \mathbb{E}_{\mathbf{c}_g} \big[ |\cos(\mathbf{f}_
 - 若方法不更新个性化文本嵌入（如 DreamBooth、LoRA），$c_p$ 可直接使用参考图像的 CLIP 视觉编码；否则通过可学习的文本嵌入获得。
 - 该损失独立于扩散过程，只在语义空间中对齐先验关系，防止过度的先验耦合，同时不损害个性化保真度。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ACCORD 在两个核心维度上系统性地验证了其去耦合能力：**主体、风格、人脸个性化任务的定量与定性主结果**，以及**消融研究揭示的损失函数与超参数的鲁棒性**。瓶颈洞察—概念耦合源于去噪依赖偏差与先验依赖偏差—在所有实验中保持一致，且 ACCORD 作为即插即用模块可无缝集成到 DreamBooth (DB)、CustomDiffusion (CD)、LoRA、VisualEncoder (VE) 甚至 Break‑A‑Scene (BAS) 等代表性基线中，不改变原始架构与训练超参数。
 
@@ -233,7 +239,9 @@ ACCORD 在两个核心维度上系统性地验证了其去耦合能力：**主�
 
 以上实验证据一致性高（置信度≥0.95），共同支撑了"概念耦合可被统计依赖偏差分解所解释，且可通过 DDLoss 与 PDLoss 有效缓解"的核心 claim。失败模式指出了训练提示覆盖面和基模型能力两个关键约束，为后续改进指明了方向。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线及后续工作的关系
 现有测试时微调个性化方法（DreamBooth、CustomDiffusion、LoRA、VisualEncoder、Break‑A‑Scene 等）均以扩散模型原始去噪损失为基础，辅以数据正则化（如先验保留损失）、权重正则化或启发式区域正则化（Figure 1 示例）。这些技术**并未显式建模并最小化概念间的统计依赖**，因此对"概念耦合"的缓解是间接且不充分的。ACCORD 的核心差异在于将概念耦合形式化为一个**统计依赖问题**，并通过定理 1（Section 3.3）将总依赖偏差分解为两可计算项：
@@ -264,6 +272,8 @@ ACCORD 的设计建立在扩散模型的隐式分类器性质（Theorem 2）之�
 - **超类模糊场景的扩展**：PDLoss 的对齐依赖一个语义明确的超类（如"背包"超类"包"）；对于抽象风格或缺乏清晰超类的概念，先验依赖偏差的锚定目标如何构建？可能的方向是在 CLIP 空间聚类或利用 VLM 自动生成分层概念关系。
 
 这些开放点标志着概念耦合的因果调控仍处于"有提示的统计解耦"阶段，向完全无监督、跨模态依赖感知的个性化迈进是下一步需要突破的方向。
+
+
 
 ## 原文 PDF
 

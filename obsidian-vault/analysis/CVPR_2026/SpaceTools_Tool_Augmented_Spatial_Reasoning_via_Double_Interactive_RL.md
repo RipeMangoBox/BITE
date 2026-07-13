@@ -43,7 +43,7 @@ claims:
 > - BLINK (relative depth) 上，归一化准确率 (%) 90.32 vs 88.71 (RoboRefer-8B-SFT) (+1.61)。
 > - BOP-ASK Pose 上，归一化 IoU (%) 34.37 vs 1.67 (Claude Sonnet 4.5) (+32.70)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -74,7 +74,7 @@ SpaceTools 提出 **DIRL（Double Interactive Reinforcement Learning，双重交
 
 SpaceTools 的 DIRL 范式在训练监督与工具交互性两个维度上区别于现有工作。传统工具增强方法（如 **LLaVA-NeXT-8B** Liu et al., 2024a、**RoboPoint-13B** Yuan et al., 2024）在训练时使用预计算工具输出或固定管线，模型不参与真实的工具调用-反馈循环；而 DIRL 在训练过程中引入交互式工具调用，使策略直接从工具输出中学习协调行为。在强化学习层面，DIRL 采用 GRPO 进行策略优化，结合 KL 正则化约束策略更新幅度，与标准 RLHF 管线形成互补而非替代关系。在基础设施层面，Toolshed 为多工具 RL 训练提供了工程基础，其设计借鉴了分布式推理服务的资源隔离思想，但针对视觉工具的密集 I/O 特征进行了专门优化。
 
-## 背景与动机
+
 
 ### 空间推理：从视觉理解到物理交互的关键瓶颈
 
@@ -110,7 +110,9 @@ Toolshed 平台的引入正是为了解决这一基础设施问题。它通过�
 
 SpaceTools 的核心动机可以概括为一次范式转变：**从“推理时工具增强”走向“训练时工具增强”**。现有工作大多关注如何在推理阶段给模型配备工具，但忽略了训练阶段的交互性对模型策略质量的根本影响。DIRL 通过两阶段课程设计（教学阶段 SFT → 探索阶段 IRL），在保持训练稳定性的同时，首次实现了在真实交互环境中对多工具协调策略的端到端优化。这一设计使得一个仅 3B 参数的小型 VLM（基于 Qwen2.5-VL-3B-Instruct）能够在多个空间推理基准上超越远大于其规模的前沿模型，并在真实机器人操控任务中展现出强大的泛化能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：多工具交互式空间推理的训练困境
 
@@ -187,7 +189,7 @@ SpaceTools 的核心洞察在于将多工具空间推理分解为两个可解耦
 
 三个 changed slots 形成闭环：**交互式工具调用**（Slot 1）提供真实反馈，**课程式初始化**（Slot 2）将搜索空间约束在可行域内，**分布式基础设施 + GRPO**（Slot 3）使大规模交互式训练在工程上可行。三者缺一不可——消融实验证实，移除任何一个组件都会导致性能显著退化。
 
-## 整体框架
+
 
 SpaceTools 提出了一种名为 **DIRL（Double Interactive Reinforcement Learning，双重交互强化学习）** 的训练范式，将空间推理建模为 VLM 策略与外部工具之间的序列决策问题。其核心设计围绕一个两阶段课程展开，并通过 **Toolshed** 分布式服务平台支撑训练与推理中的密集工具调用。
 
@@ -246,7 +248,7 @@ Table 13 进一步表明，直接在全任务、全工具上应用 IRL（Direct 
 ![[assets/figures/papers/paper_list_l2724_https_arxiv_org_abs_2512_04069/figures/012_Figure_7.jpg]]
 *Figure 7: System prompt. Instructional prompt guiding the model’s reasoning, tool-call, and answer process*
 
-## 核心模块与公式推导
+
 
 ### DIRL 双阶段训练范式
 
@@ -302,7 +304,9 @@ $$r = \begin{cases} 1, & \text{if FormatCorrect} \land \text{ToolCallMatch} \\ 0
 
 该奖励仅在工具调用格式和参数完全匹配真值时给予 1，否则为 0。实验表明 Tool NIRL 平均准确率仅 38.06，远低于完整 DIRL 的 52.48（Table 4），证明仅靠模仿工具调用模式而缺乏交互式探索无法获得有效的多工具协调能力。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -385,7 +389,9 @@ Table 5 展示了 Toolshed 对前沿闭源模型的即时赋能效果：Claude�
 ![[assets/figures/papers/paper_list_l2724_https_arxiv_org_abs_2512_04069/figures/002_Table_1.jpg]]
 *Table 1: Comparison of related work for training supervision and tool-call interactivity during training. ‘-’ indicates that only a single tool is used*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 工具增强空间推理的方法谱系
 
@@ -444,6 +450,8 @@ DIRL的训练依赖于高质量工具使用轨迹。当前SFT数据集仅包含8
 5. **Toolshed的实时优化**：如何优化Toolshed的调度、缓存和批处理策略，以在实时机器人循环中保证低延迟的工具调用？Table 8-10展示了Toolshed在并发负载下的性能优势，但面向毫秒级实时控制场景仍需进一步优化。
 
 6. **长时序多阶段任务的拓展**：如何将工具增强的空间推理拓展到复杂装配、多步骤人机交互等长时序任务？这需要模型具备更强的任务规划、状态追踪和错误恢复能力，超出了当前单轮/少轮交互的范畴。
+
+
 
 ## 原文 PDF
 

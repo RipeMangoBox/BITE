@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Breaking_Agent_Backbones_Evaluating_the_Security_of_Backbone_LLMs_in_AI_Agents.pdf
+project_link: null
+code_link: null
 openreview_forum_id: kga18ld70t
 aliases:
 - TSF
@@ -37,7 +39,10 @@ claims:
 | Method | 威胁快照框架（Threat Snapshots Framework） |
 | Dataset |  |
 
-## 概述
+> [!tip] 效果简介
+> 本笔记的既有实验指标、对比结果与适用边界见“实验与关键发现”；本轮仅统一结构，不改写证据。
+
+## 概要
 
 ### 问题背景
 
@@ -63,7 +68,7 @@ claims:
 
 与现有基于完整代理模拟的评测范式相比，b³基准在三个维度上实现了差异化定位：**评估方法论**上，从模拟完整代理执行流转为威胁快照的单步隔离评估；**攻击生成方式**上，从固定模板攻击升级为基于众包的、针对上下文的对抗性攻击；**分析粒度**上，支持按攻击类型、防御等级、任务类型等维度进行细粒度排名。这一设计使b³成为首个系统化度量骨干LLM安全漏洞的基准，其威胁快照框架也可作为未来代理安全研究的基础抽象。
 
-## 背景与动机
+
 
 AI代理（AI Agent）正迅速成为大语言模型（LLM）的核心应用范式。在这些系统中，LLM作为“骨干”负责理解环境、规划行动并生成响应，其安全性直接决定了整个代理系统的可信程度。然而，当前社区对骨干LLM选择如何影响AI代理安全性仍缺乏系统性理解：现有安全评测基准要么覆盖的漏洞类型不全，要么需要模拟完整的代理执行流程，导致无法将LLM自身的安全缺陷与代理框架的其他组件解耦，难以形成可比较、可复现的LLM级安全度量。
 
@@ -71,7 +76,9 @@ AI代理（AI Agent）正迅速成为大语言模型（LLM）的核心应用范�
 
 本文的核心动机正是填补这一空白：构建一个聚焦于LLM调用时刻的、可系统化评测骨干LLM安全性的框架。为此，作者提出**威胁快照（Threat Snapshots）**框架，将安全评估从完整的代理执行流中抽离出来，仅关注LLM被调用时的孤立状态——包括其上下文、注入的攻击以及评分标准。这一设计使得每个威胁快照完整描述了一个LLM脆弱性实例，从而建立起直接度量LLM漏洞的基准，而无需模拟整个代理。在此基础上，通过系统化的攻击分类和基于众包的对抗性攻击收集，b³基准实现了对34个主流LLM的细粒度安全排名，并揭示了推理能力、模型规模、闭源与开源等因素对安全性的因果影响。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：从“代理整体模拟”到“骨干LLM隔离”
 
@@ -95,7 +102,7 @@ AI代理（AI Agent）正迅速成为大语言模型（LLM）的核心应用范�
 - **系统性**：攻击分类覆盖直接/间接注入、消息/工具/综合目标等6种攻击类型，10个威胁快照覆盖编码助手、RAG代理、多代理交易系统等典型场景。
 - **鲁棒性**：基准排名对攻击选择方法、聚合方式（mean vs max）高度鲁棒，Spearman相关系数≥0.75（Figure 8），表明框架输出的排名信号稳定可靠。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_kga18ld70t/figures/001_Figure_1.jpg]]
 *Figure 1: (left) Illustration of how inputs flow within an AI agent, alternating between an LLM step that calls the backend LLM m with the current model context and a processing step that calls the processing function $f _ { \mathrm { p r o c } }$ until the final response is produced. (right) The $\mathrm { b ^ { 3 } }$ benchmark, which uses threat snapshots to isolate an LLM step from the context-output flow on the left. (right top) There are 30 threat snapshots in total based on 10 application with three levels L1, L2 and L3. (right bottom) Each threat snapshot is evaluated against the set of attacks where we evaluate each attack N times which is used to account for the variance in responses
@@ -147,7 +154,7 @@ $$V(m, T) := \frac{1}{|\mathcal{T}|} \sum_{(i,\ell) \in \mathcal{T}} \frac{1}{|\
 
 威胁快照框架目前聚焦于单步威胁快照，以在覆盖多样性和评估可行性之间取得平衡。对于多步攻击（如渐进式越狱），框架支持将其分解为威胁快照链进行建模（见图5的Crescendo攻击示例），但本文的基准评测仅使用单步快照。这一设计选择意味着：**基准得分应被解释为LLM安全性的下界估计**，因为多步攻击可能揭示额外的漏洞。此外，基准数据集基于当前代理架构构建的10种威胁快照，可能无法覆盖未来新型攻击面和代理架构。
 
-## 核心模块与公式推导
+
 
 ### 威胁快照框架的五个核心模块
 
@@ -205,7 +212,9 @@ $$r_{\mathrm{length}}(x) = \min\left(0.5 + (1-0.5)\frac{\ell(x)}{100}, 1\right)$
 
 对过短输出施加的惩罚因子。当输出长度 $\ell(x) \geq 100$ 字符时，因子为1（无惩罚）；当输出极短时，因子趋近0.5，防止模型通过拒绝回答（输出极短的安全回复）来获得虚假的低漏洞评分（Appendix D.3, Equation 4）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 
@@ -311,7 +320,9 @@ $$r_{\mathrm{length}}(x) = \min\left(0.5 + (1-0.5)\frac{\ell(x)}{100}, 1\right)$
 ![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_kga18ld70t/figures/020_Table_4.jpg]]
 *Table 4: Reasoning tokens used, as reported by in API responses. Some model providers do not return this data and are therefore not included*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有基准的关系与差异化
 
@@ -387,6 +398,8 @@ $$r_{\mathrm{length}}(x) = \min\left(0.5 + (1-0.5)\frac{\ell(x)}{100}, 1\right)$
 4. **基准的自动演进**：随着模型和代理架构的演进，如何自动化地更新威胁快照集以保持基准的覆盖度和代表性？这涉及攻击面发现、快照生成和质量验证的完整自动化链路。
 
 5. **从评估到防御**：将威胁快照用于针对性防御机制（如动态系统提示加固）的效果如何？框架能否从评估工具演进为防御生成工具？
+
+
 
 ## 原文 PDF
 

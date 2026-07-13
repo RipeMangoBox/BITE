@@ -42,7 +42,7 @@ claims:
 > - Oxford RobotCar (Scene 3) 上，CD ↓ 3.2896 vs 9.5357 (RadarFields) (-6.2461)。
 > - Boreas (Sun) 上，SSIM ↑ 0.7001 vs 0.3641 (RadarFields) (+0.3360)。
 
-## 概述
+## 概要
 
 **RF4D** 是首个利用神经场从雷达测量中建模室外动态场景的方法，发表于 CVPR 2026。其核心动机源于现有雷达神经场方法（如 **Radar Fields**）的两大瓶颈：其一，仅能处理静态场景，无法恢复动态物体（如行驶车辆）；其二，预测的占位（occupancy）与反射率之间存在物理矛盾——高占位区域对应低反射率，导致动态目标消失或重建质量退化。
 
@@ -54,7 +54,7 @@ RF4D 的关键洞察是将动态场景表示为位置与时间的连续函数，
 
 实验表明，RF4D 在 Oxford RobotCar 和 Boreas 两个数据集上均显著优于现有方法。在动态场景中，RF4D 成功渲染了 Radar Fields 无法恢复的移动车辆；定量指标上，Scene 1 的 SSIM 从 0.3372 提升至 0.6103，Scene 3 的 Chamfer Distance 从 9.5357 降至 3.2896。消融实验进一步验证了时间一致性正则化和运动偏移正则化对稳定训练和动态场景合成至关重要。
 
-## 背景与动机
+
 
 ### 雷达感知的核心优势与挑战
 
@@ -79,7 +79,9 @@ RF4D 的关键洞察是将动态场景表示为位置与时间的连续函数，
 
 RF4D 是首个利用神经场从雷达测量中建模动态场景的工作，其核心洞察在于：将雷达物理先验嵌入神经渲染管线，能够在无需额外传感器的情况下，同时实现高质量的雷达测量合成与几何占用估计。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 RF4D 的核心创新在于通过**时空神经场**与**雷达物理先验**的深度融合，首次将神经雷达场从静态场景拓展至户外动态场景。其关键突破可归纳为三个相互耦合的“changed slots”。
 
@@ -107,7 +109,7 @@ Radar Fields 依赖外部占用估计器（如 LiDAR 或 CFAR）提供监督信�
 
 上述三个 changed slots 并非孤立运作：时间维度使场景流模块得以建模运动，运动偏移正则化 $\mathcal{L}_{\mathrm{m}}$ 约束变形幅度防止过度扭曲，时间一致性损失 $\mathcal{L}_{\mathrm{oc}}$ 则确保运动物体的占用在时序上平滑传递。三者与物理功率渲染公式共同构成完整的训练目标 $\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{rt}} + \lambda_{\mathrm{oc}}\mathcal{L}_{\mathrm{oc}} + \lambda_{\mathrm{p}}\mathcal{L}_{\mathrm{p}} + \lambda_{\mathrm{m}}\mathcal{L}_{\mathrm{m}}$，消融实验证实移除任一组分均会导致性能显著退化（Table 3, Table 4）。
 
-## 整体框架
+
 
 RF4D 将动态场景建模为一个时空神经场，其核心流水线由五个紧密耦合的模块构成，以雷达距离-方位图作为输入，输出新视角的合成雷达功率图与三维占位估计。整体架构如 Figure 3 所示。
 
@@ -136,7 +138,7 @@ $$\mathcal{L}_{\\mathrm{total}} = \\mathcal{L}_{\\mathrm{rt}} + \\lambda_{\\math
 
 **输出。** 推理时，对于任意目标视角的雷达扫描，RF4D 可同时输出合成距离-方位功率图与三维占位体素网格（Figure 6），实现动态场景的新视角合成与三维几何重建。
 
-## 核心模块与公式推导
+
 
 ### 3.1 雷达物理先验：接收功率方程
 
@@ -192,7 +194,9 @@ $$\begin{array}{l} \alpha^{t-\Delta t} = f_{\alpha}(f_{\chi}(\mathcal{H}(x+\Delt
 ![[assets/figures/papers/paper_list_l2584_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_RF4DNeural_Radar/figures/002_Figure_2.jpg]]
 *Figure 2: Predicted occupancy and reflectance from Radar Fields [4] versus occupancy and radar cross-section (RCS) from RF4D. Our predictions follow radar physics, where high occupancy corresponds to strong RCS, while Radar Fields lacks such consistency*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 RF4D 在 Oxford RobotCar 和 Boreas 两个公开雷达数据集上进行了全面评估，覆盖多种天气条件和动态场景。实验从雷达测量合成质量与占位估计精度两个维度验证了方法的有效性。
 
@@ -253,7 +257,9 @@ RF4D 在 Oxford RobotCar 和 Boreas 两个公开雷达数据集上进行了全�
 ![[assets/figures/papers/paper_list_l2584_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_RF4DNeural_Radar/figures/011_Figure_6.jpg]]
 *Figure 6: 3D voxel grid reconstruction from radar measurements. Our method reconstructs full 3D occupancy geometry from sparse and low-resolution radar data, capturing both moving vehicles and static objects present in the scene*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -285,6 +291,8 @@ RF4D 的设计假设和使用边界可从以下几个维度界定：
 - **多模态融合潜力**：RF4D 展示了仅从雷达测量中恢复 3D 占用的能力，但雷达的固有稀疏性和低分辨率限制了重建精度。如何将 RF4D 的框架与相机或 LiDAR 等多模态传感器融合，以提升重建质量和占用估计精度，是一个自然的扩展方向。
 - **运动正则化的精细设计**：当前的运动偏移 L2 正则化对所有点施加均匀约束，可能过度平滑局部复杂运动。设计运动场自适应的正则化策略（如基于运动梯度或不确定性的加权约束）可能改善对非均匀运动的建模能力。
 - **实时性约束**：论文未报告推理速度或计算开销。对于自动驾驶等实时应用场景，时空神经场的推理效率是一个关键考量，需要后续工作验证其是否满足部署要求。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Plan_R1_Safe_and_Feasible_Trajectory_Planning_as_Language_Modeling.pdf
+project_link: null
+code_link: https://github.com/XiaolongTang23/Plan-R1
 openreview_forum_id: uusTA1rBhR
 aliases:
 - PR
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | Plan-R1：基于语言建模的安全可行轨迹规划 |
 | 英文题名 | Plan-R1: Safe and Feasible Trajectory Planning as Language Modeling |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=uusTA1rBhR); [GitHub](https://github.com/XiaolongTang23/Plan-R1) |
+| Links | [paper](https://openreview.net/forum?id=uusTA1rBhR) · [GitHub](https://github.com/XiaolongTang23/Plan-R1) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/planning_control |
 | Method | Plan‑R1 |
 | Dataset | nuPlan Val14 (Reactive), nuPlan Test14‑hard (Reactive), nuPlan Test14‑random (Reactive) |
@@ -42,7 +44,7 @@ claims:
 > - nuPlan Test14‑hard (Reactive) 上，R‑CLS 为 77.20 (Plan‑R1)，对比 69.22 (Diffusion Planner)，变化 +7.98。
 > - nuPlan Test14‑random (Reactive) 上，R‑CLS 为 90.04 (Plan‑R1)，对比 82.93 (Diffusion Planner)，变化 +7.11。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -71,7 +73,7 @@ Plan‑R1 属于**学习型规划器**，但与纯模仿学习方法（如 PlanT
 
 消融实验进一步验证了各设计的有效性：VD‑GRPO 将碰撞避免指标从 93.87 提升至 97.32，显著优于标准 GRPO；反应式世界模型使 R‑CLS 达到 90.04，优于回放真实轨迹（87.44）和仅预训练基线（82.81）；移除碰撞奖励组件则导致 NR‑CLS 骤降至 73.10，证实了安全约束的核心作用。
 
-## 背景与动机
+
 
 轨迹规划是自动驾驶系统的核心模块，其目标是在动态、多智能体环境中生成安全、可行且合规的未来运动序列。近年来，基于学习的规划器取得了显著进展，但它们普遍存在一个根本性瓶颈：**高度依赖专家演示数据，缺乏明确的安全意识**。纯模仿学习范式使模型倾向于复现人类驾驶行为，却无法区分安全操作与不良习惯——当专家数据中包含超速、激进变道等行为时，模型会不加甄别地继承这些模式，从而在闭环运行中产生安全隐患。
 
@@ -81,7 +83,9 @@ Plan‑R1 属于**学习型规划器**，但与纯模仿学习方法（如 PlanT
 
 此外，解决 GRPO 在多目标优化中的信号稀释问题同样关键。这需要一种保留绝对奖励幅度的策略优化方法，确保安全关键目标在训练全过程中保持主导梯度，而非被大量低风险样本的平均效应淹没。Plan-R1 正是在这两个维度上提出了系统性解决方案：通过两阶段框架实现行为与原则的解耦，并通过方差解耦的 VD-GRPO 算法保障安全优化的优先级。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Plan‑R1 的核心创新在于将轨迹规划重新定义为**原则对齐的自回归预测任务**，并通过两阶段框架与方差解耦的强化学习目标，系统性解决了现有学习型规划器的两大瓶颈：对专家演示的过度依赖导致的安全意识缺失，以及多目标强化学习中安全信号被稀释的问题。
 
@@ -130,7 +134,7 @@ Plan‑R1 在以下维度上区别于现有方法：
 
 在 nuPlan 最具挑战性的反应式基准上，Plan‑R1 取得了最新的 R‑CLS 成绩（Test14‑random: 90.04，比 **Diffusion Planner**（Zheng et al., 2025）高 +7.11），验证了上述创新的综合有效性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_uusTA1rBhR/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of our Plan-R1: Stage (a) pre-trains a motion predictor on expert data; Stage (b) fine-tunes it with VD-GRPO using rule-based rewards to align with planning principles*
@@ -184,7 +188,7 @@ $$\tilde{R}^{\text{VD}}(y_t^g) = \frac{R(y_t^g) - \mu_R}{c}$$
 
 整体信息流为：场景上下文 $C$ 与历史运动序列 → 运动分词 → Transformer 解码器（因子化注意力）→ 自回归运动 token 序列 → 规则化奖励评估 → VD‑GRPO 优势计算与策略更新。预训练阶段仅使用专家数据优化 $p_a$；微调阶段冻结 $p_a$ 作为世界模型，仅更新 $\pi_e$，实现行为学习与原则对齐的结构化解耦。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化：原则对齐的自回归序列预测
 
@@ -238,7 +242,9 @@ $$\tilde{R}^{\text{VD}}(y_t^g) = \frac{R(y_t^g) - \mu_R}{c}$$
 
 微调损失 **Equation (4)** 在 VD‑GRPO 奖励归一化基础上，结合重要性采样比率、累积优势 $\hat{A}_t^g$ 以及 KL 散度惩罚项 $\beta D_{KL}[\pi_e \| \pi_{\text{ref}}]$，控制策略不偏离预训练参考模型过远。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 
@@ -304,7 +310,9 @@ VD‑GRPO 通过移除方差归一化、仅保留中心化和固定缩放，解�
 ![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_uusTA1rBhR/figures/019_Table_7.jpg]]
 *Table 7: Robustness of the frozen world model under ego-state perturbations. Gaussian noise with standard deviation σ is injected into ego states*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有方法的谱系关系
 
@@ -334,6 +342,8 @@ Plan‑R1 的有效性建立在以下前提之上：
 - **多原则冲突的显式建模**：当前框架将安全、舒适、合规等原则统一编码为奖励函数，但未显式处理原则之间的冲突（如紧急避障时不得不违反交通规则）。模型通过奖励加权隐式地学习折中策略，缺乏可解释的原则优先级机制。
 - **世界模型的主动适应性**：冻结世界模型无法根据自车策略的变化调整其行为预测，这在自车采取激进策略时可能导致仿真失真。未来工作可探索世界模型的在线适应或对抗训练。
 - **interPlan 基准的验证深度**：Table 6 报告了 interPlan 基准上的对比结果，但论文未详细分析 Plan‑R1 在该基准上的失败模式或与 nuPlan 结果的行为差异原因，这一部分需要进一步手动验证。
+
+
 
 ## 原文 PDF
 

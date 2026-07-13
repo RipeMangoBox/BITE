@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/3DSMT_A_Hybrid_Spiking_Mamba_Transformer_for_Point_Cloud_Analysis.pdf
+project_link: null
+code_link: https://github.com/zzm666-ui/3DSMT
 aliases:
 - 3HSMT
 - 3HSMTPCA
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 3DSMT：一种用于点云分析的混合脉冲曼巴-Transformer模型 |
 | 英文题名 | 3DSMT: A Hybrid Spiking Mamba-Transformer for Point Cloud Analysis |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=KkoS6y0pHP); [GitHub](https://github.com/zzm666-ui/3DSMT) |
+| Links | [paper](https://openreview.net/forum?id=KkoS6y0pHP) · [GitHub](https://github.com/zzm666-ui/3DSMT) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/classification_and_understanding |
 | Method | 3DSMT (Hybrid Spiking Mamba-Transformer) |
 | Dataset | ModelNet40, ScanObjectNN PB_T50_RS, ScanObjectNN OBJ_BG, ScanObjectNN OBJ_ONLY |
@@ -41,13 +43,13 @@ claims:
 > - ScanObjectNN PB_T50_RS 上，OA (%) 为 92.0，对比 84.2 (SPM)，变化 +7.8。
 > - ScanObjectNN OBJ_BG 上，OA (%) 为 92.1，对比 90.2 (SPM)，变化 +1.9。
 
-## 概述
+## 概要
 
 3DSMT（Hybrid Spiking Mamba-Transformer）针对现有基于人工神经网络（ANN）的点云分析方法计算复杂度高（O(N²)）、能耗大，以及脉冲神经网络（SNN）方法精度与ANN差距显著、缺乏有效局部-全局特征融合机制的核心瓶颈，提出了一种混合脉冲架构。其核心思路是将脉冲神经网络的稀疏事件驱动特性与Mamba的线性复杂度全局建模能力、Transformer的局部注意力机制相结合：通过Spiking Local Offset Attention（SLOA）进行细粒度局部几何特征提取，利用Spiking Mamba Block（SMB）实现线性复杂度的全局特征融合。
 
 该方法在多个基准上取得了SNN方法的最优结果：在ModelNet40上达到95.2% OA（带投票），在ScanObjectNN的三个变体上分别达到92.0%、92.1%、90.6% OA，在ShapeNetPart部件分割上达到85.1% Ins.mIoU。同时，3DSMT的推理能耗仅为4.3 mJ，远低于PointNeXt（16.6 mJ）和PTv2（78.7 mJ）等ANN方法。消融实验验证了混合架构的有效性：单独使用SLOA或SMB时OA分别为92.5%和92.8%，而两者结合可提升至94.7%。该工作的主要局限在于：与最优ANN方法（如PTv3）仍有精度差距（如SemanticKITTI Test mIoU: 71.3% vs 75.5%），且首个卷积层和最终全连接层仍需MAC操作，无法完全在纯脉冲硬件上运行。
 
-## 背景与动机
+
 
 点云分析是3D视觉的核心任务，其根本瓶颈在于：现有基于人工神经网络（ANN）的方法（如Point Transformer、PointMamba）虽然精度高，但计算复杂度高（Transformer自注意力为O(N²)），能耗大，难以部署在资源受限的边缘设备上。另一方面，现有的脉冲神经网络（SNN）点云方法虽然继承了SNN的稀疏事件驱动特性和极低能耗优势，但其精度与ANN方法差距显著，且缺乏有效的局部-全局特征融合机制。
 
@@ -57,7 +59,9 @@ claims:
 
 消融实验（Table 7）验证了混合架构的必要性：在ModelNet40上，单独使用SLOA的OA为92.5%，单独使用SMB为92.8%，而混合架构（SLOA + SMB）达到94.7%，提升超过2个百分点。这一结果直接证明了局部注意力与全局Mamba在SNN框架下的互补性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 3DSMT的核心创新在于**在SNN框架内首次引入混合架构**，通过替换标准Transformer自注意力和ANN激活函数两个关键槽位，解决了现有SNN点云方法精度低、缺乏有效局部-全局特征融合机制的根本瓶颈。
 
@@ -73,7 +77,7 @@ claims:
 
 **核心洞察与因果机制**：3DSMT的精度提升来源于**脉冲稀疏计算与混合架构的协同**。SLOA通过局部K近邻注意力以脉冲形式提取几何细节（避免全局softmax的MAC开销），SMB则利用SSM的线性复杂度进行全局上下文融合。两者通过残差连接和LayerNorm整合在Spiking Hybrid Block中。这种设计使得SNN在ModelNet40上达到95.2% OA（带投票），在ScanObjectNN三个变体上分别达到92.0%、92.1%、90.6% OA，均为SNN方法中的最优结果（Table 1）。同时，能耗仅为4.3 mJ，远低于所有ANN对比方法（如PointNeXt 16.6 mJ, PTv2 78.7 mJ）。**精度-能耗帕累托前沿的突破**是3DSMT的核心贡献：它首次证明SNN点云方法可以在精度上超越多数ANN基线（如PointNet++、Point Transformer），同时保持数量级的能效优势。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0001_KkoS6y0pHP_3DSMT_A_Hybrid_Spiking_Mamba-Transformer_for_Poi/figures/001_Figure_1.jpg]]
 *Figure 1: 3DSMT overview. The model comprises a Spiking Patch Embedding (SPE) module, a sequence of Spiking Hybrid Blocks (SHBs), and a task-specific head. The output of the (i-1)-th SHB serves as the input to the i-th SHB. (a) The SPE module first maps low-dimensional point coordinates into a high-dimensional feature space, which serves as the input to the first SHB. (b) Each SHB integrates a Spiking Local Offset Attention (SLOA) block, a Spiking Mamba Block (SMB), and a Spiking Position Encoding (SPE) module to capture local and global features*
@@ -96,7 +100,7 @@ claims:
 
 **与基线的对比**：3DSMT对比了多种基线方法，包括ANN基线（PointNet++、Point Transformer、PointMamba）和SNN基线（Spike PointNet、SPT、SPM）。核心改进在于将标准Transformer的O(N²)全局注意力替换为SLOA的局部注意力（O(N×K²)，K为常数）和SMB的全局SSM（O(N)），在保持线性复杂度的同时实现了局部-全局特征的有效融合。
 
-## 核心模块与公式推导
+
 
 3DSMT的核心架构围绕**Spiking Hybrid Block (SHB)** 展开，通过交替使用局部和全局特征提取模块，在脉冲神经网络框架下实现高效的点云分析。其关键设计包括：Spiking Patch Embedding (SPE) 用于将原始点云转换为脉冲令牌序列；Spiking Local Offset Attention (SLOA) 用于捕获细粒度局部几何结构；Spiking Mamba Block (SMB) 用于以线性复杂度融合全局上下文；以及 Spiking Position Encoding (SPE) 提供脉冲形式的位置信息。
 
@@ -133,7 +137,9 @@ $$\mathrm{SOPs}^{l} = f_{r} \times T \times \mathrm{FLOPs}(l)$$
 $$E_{\mathrm{3DSMT}} = E_{\mathrm{MAC}} \times (\mathrm{FLOPs}_{\mathrm{Conv}}^{1} + \mathrm{FLOPs}_{\mathrm{FC}}) + E_{\mathrm{AC}} \times \left(\sum_{l=1}^{L} \mathrm{SOPs}^{l}\right)$$
 其中，$E_{\mathrm{MAC}} = 4.6 \text{ pJ}$，$E_{\mathrm{AC}} = 0.9 \text{ pJ}$。这种设计使得3DSMT在保持高精度的同时，能耗远低于所有ANN对比方法（如PointNeXt 16.6 mJ, PTv2 78.7 mJ）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要分类与分割结果
 
@@ -194,7 +200,9 @@ t-SNE可视化（Figure 6）显示，3DSMT在不同数据集上学到的特征�
 
 当前SNN方法在点云分析上的精度与最优ANN方法（如PTv3）仍存在一定差距（例如SemanticKITTI Test mIoU: 3DSMT 71.3% vs PTv3 75.5%）。此外，3DSMT的首个卷积层和最终全连接层仍需MAC操作，无法完全在纯脉冲硬件上高效运行。目前尚无结合激光扫描与事件驱动机制从源头生成3D点云脉冲的方法，限制了3DSMT在纯神经形态硬件上的端到端部署。模型在目标检测和场景理解等更复杂的点云任务上的性能尚未验证。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 基线方法与核心改进
 
@@ -217,6 +225,8 @@ t-SNE可视化（Figure 6）显示，3DSMT在不同数据集上学到的特征�
 **任务覆盖的局限性**：模型在目标检测和场景理解等更复杂的点云任务上的性能尚未验证。消融实验也仅对比了IF和LIF两种神经元类型，其他脉冲神经元模型（如AdEx）的影响未知。模型扩展到更大规模点云或更高分辨率时的行为也需进一步研究。
 
 **证据强度评估**：上述局限和开放问题均直接来源于论文的limitations和open questions部分（置信度1.0），但精度差距的具体数值（PTv3 75.5%）需要手动验证是否来自同一实验设置。能耗比较基于标准假设（MAC 4.6 pJ, AC 0.9 pJ，参考Horowitz 2014），该假设在SNN领域被广泛采用但存在简化。
+
+
 
 ## 原文 PDF
 

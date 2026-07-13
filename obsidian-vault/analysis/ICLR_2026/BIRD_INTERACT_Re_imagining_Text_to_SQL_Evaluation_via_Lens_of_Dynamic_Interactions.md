@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/BIRD_INTERACT_Re_imagining_Text_to_SQL_Evaluation_via_Lens_of_Dynamic_Interactions.pdf
+project_link: https://bird-interact.github.io
+code_link: null
 openreview_forum_id: nHrYBGujps
 aliases:
 - BIB
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | BIRD-INTERACT：通过动态交互视角重新构想文本到SQL评估 |
 | 英文题名 | BIRD-INTERACT: Re-imagining Text-to-SQL Evaluation via Lens of Dynamic Interactions |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=nHrYBGujps); [Project](https://bird-interact.github.io) |
+| Links | [paper](https://openreview.net/forum?id=nHrYBGujps) · [Project](https://bird-interact.github.io) |
 | Topic | #topic/benchmarks_datasets_evaluation #topic/benchmarks_datasets_evaluation/benchmark_eval |
 | Method | BIRD-INTERACT Benchmark |
 | Dataset | BIRD-INTERACT-FULL, BIRD-INTERACT-LITE, UserSim-Guard |
@@ -42,7 +44,7 @@ claims:
 > - BIRD-INTERACT-FULL 上，Normalized Reward (a-Interact 模式) 为 GPT-5：25.52%，对比 Qwen-3-Coder-480B：10.58%，变化 +14.94%。
 > - BIRD-INTERACT-LITE 上，Overall Task Success Rate (c-Interact 模式) 为 O3-Mini：37.33% (优先问题)，对比 DeepSeek-V3：22.00% (优先问题)，变化 +15.33%。
 
-## 概述
+## 概要
 
 现有文本到SQL基准（如**Spider**、**BIRD**、**SParC**、**CoSQL**）普遍采用静态交互历史与仅读（SELECT-only）操作，无法反映生产环境中多轮、有状态、需主动澄清和错误恢复的真实数据库交互，导致LLM的能力被系统性高估。**BIRD-INTERACT** 针对这一瓶颈，构建了首个覆盖全CRUD操作、注入五类歧义并引入状态依赖子任务的动态交互基准，通过功能驱动的用户模拟器与两种评估模式（c-Interact与a-Interact），将评估重心从单步SQL生成转向端到端的交互式问题解决。
 
@@ -50,7 +52,7 @@ claims:
 
 在方法定位上，BIRD-INTERACT 继承 **LIVESQLBENCH** 的可执行数据库环境与全CRUD任务基础，通过歧义注入、后续子任务生成和两阶段函数驱动用户模拟器，将静态单轮评估转化为动态多轮交互评估。其用户模拟器在不可回答问题（UNA）上的失败率从基线方法的 **67.4%** 降至 **2.7%**，大幅提升了评估的鲁棒性与可控性。
 
-## 背景与动机
+
 
 ### 文本到SQL评估的静态困境
 
@@ -78,7 +80,9 @@ claims:
 
 通过上述设计，BIRD-INTERACT不仅暴露了当前最强LLM在交互式数据库任务上的显著短板，也为构建实用的多轮数据库助手提供了明确的改进方向与评估工具。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 BIRD-INTERACT 的核心创新在于将文本到 SQL 的评估从静态、单轮、只读的范式推向**动态、多轮、全 CRUD 的交互式问题解决**。这一转变通过以下五个相互耦合的维度实现，每个维度都直接针对现有基准的系统性缺陷。
 
@@ -118,7 +122,7 @@ BIRD-INTERACT 的核心创新在于将文本到 SQL 的评估从静态、单轮�
 
 **LIVESQLBENCH** (BIRD-Team, 2025) 已提供全 CRUD 任务的基础，BIRD-INTERACT 在此基础上增加了交互层和歧义注入。与仅支持 SELECT 的 **CoSQL** 不同，BIRD-INTERACT 同时覆盖商业智能（BI）与数据管理（DM）两大类场景，使基准能够评估系统在分析查询和事务性操作两种范式下的综合能力。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_nHrYBGujps/figures/001_Figure_1.jpg]]
 *Figure 1: Task overview of BIRD-INTERACT showing the evaluated system interacting with DB Environment and User Simulator to complete the user task with a sequence of sub-tasks*
@@ -169,7 +173,7 @@ $$\mathrm{SR}_j = \frac{1}{N} \sum_{i=1}^{N} \mathbb{I}[\mathcal{T}_{i,j}(\sigma
 
 BIRD-INTERACT 在多个维度上突破了已有基准的局限（Table 4）。与 **Spider**（Yu et al., 2018）、**BIRD**（Li et al., 2023b）等单轮基准相比，它引入了动态交互层和歧义处理；与 **SParC**（Yu et al., 2019a）、**CoSQL**（Yu et al., 2019b）等依赖静态对话历史的多轮基准相比，它提供了函数驱动的用户模拟器和可执行环境；与 **LIVESQLBENCH**（BIRD-Team, 2025）相比，它在全 CRUD 操作基础上增加了交互层和歧义注入。平均交互轮次达到 7.46-7.83 轮，远超其他交互式基准。
 
-## 核心模块与公式推导
+
 
 ### 问题定义与交互范式
 
@@ -231,7 +235,9 @@ $$r_i = \begin{cases} 1.0 & \text{两个子任务均通过} \\ 0.7 & \text{仅�
 
 c-Interact 模式则采用更细粒度的分阶段奖励计算（含调试阶段的增量收益）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心结果：LLM 在交互式文本到SQL任务中表现远低于理想单轮性能
 
@@ -299,7 +305,9 @@ Figure 5 展示的记忆嫁接（Memory Grafting）实验为诊断性能瓶颈�
 ![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_nHrYBGujps/figures/016_Table_7.jpg]]
 *Table 7: Implementation-Level User Query Ambiguity Types in BIRD-INTERACT*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有基准的关系
 
@@ -342,6 +350,8 @@ BIRD-INTERACT 的评估框架适用于以下场景，但存在明确边界：
 4. **用户模拟器的公平性评估**：如何评估和确保用户模拟器在更多样化的对话风格（如简洁、冗长、非母语表达）下的公平性与一致性，以及如何量化模拟器对特定系统模型的潜在偏向，仍需系统性研究。
 
 5. **任务复杂度的进一步扩展**：引入更复杂的事务性逻辑（如嵌套事务、并发修改、权限约束）是否能更全面地暴露系统能力边界，并推动更鲁棒的交互策略设计，是一个值得探索的方向。
+
+
 
 ## 原文 PDF
 

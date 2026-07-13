@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Distributional_Equivalence_in_Linear_Non_Gaussian_Latent_Variable_Cyclic_Causal_Models_Characterization_and_Learning.pdf
+project_link: null
+code_link: null
 openreview_forum_id: b8TlYh6PN6
 aliases:
 - DELNGLVCCMCL
@@ -40,7 +42,7 @@ claims:
 > - Erdős–Rényi随机图, n=13, ℓ=1, d=3, 高样本量N 上，SHD (lower is better) 为 33.1，对比 35.3 (PO-LiNGAM)，变化 -2.2。
 > - Erdős–Rényi随机图, n=5, ℓ=1, avgdeg=1 (oracle OICA rank) 上，运行时间 (秒) 为 0.015 ± 0.005，对比 0.045 ± 0.013 (MILP)，变化 -0.030。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -68,7 +70,7 @@ claims:
 
 当前方法依赖OICA估计混合矩阵的精度，在样本量有限或非高斯性较弱时性能可能受限。理论上，边缘秩约束和等价性刻画目前仅适用于线性非高斯模型，向非线性或非参数设定的推广仍是开放问题。此外，等价类在最坏情况下可能包含指数级数量的图，实际应用中需结合稀疏性先验或额外约束来压缩搜索空间。
 
-## 背景与动机
+
 
 ### 潜变量因果发现的核心瓶颈
 
@@ -96,7 +98,9 @@ $$\min(|Z|,|Y|) - \rho_{\mathcal{G}}(Z,Y) = |V| - \max(|Z|,|Y|) - r_{\mathcal{G}
 
 基于这些理论结果，本文提出了 **glvLiNG** 算法，该算法无需任何结构假设，从 OICA 估计的混合矩阵出发，通过两阶段列增广过程恢复因果图，并输出完整的分布等价类。这填补了潜变量因果发现工具箱中长期缺失的一块：一种通用的、不依赖结构假设的方法，能够处理任意的潜变量结构和反馈循环。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈突破：从结构假设到无假设的分布等价性刻画
 
@@ -153,7 +157,7 @@ $$\mathrm{bases}_{\mathcal{G}}(L \cup \{X_i\}) = \pi(\mathrm{bases}_{\mathcal{H}
 
 需注意的边界：当前理论仅适用于线性非高斯模型，向非线性或高斯系统的推广仍是开放问题；等价类遍历在最坏情况下可能包含指数级数量的图，实际应用需结合稀疏性先验。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_b8TlYh6PN6/figures/005_Table_1.jpg]]
 *Table 1: A side-by-side comparison between path ranks and edge ranks*
@@ -200,7 +204,7 @@ $$\mathrm{bases}_{\mathcal{G}}(L \cup \{X_i\}) = \pi(\mathrm{bases}_{\mathcal{H}
 
 现有潜变量因果发现方法（如 PO-LiNGAM、LaHiCaSl）普遍依赖强结构假设：PO-LiNGAM 基于测量模型假设潜变量仅通过观测变量的指示模式体现，LaHiCaSl 依赖层次潜变量结构和 GIN 条件，且通常假设无环。这些方法仅输出单个点估计（因果图），不考虑等价类。glvLiNG 则无任何结构假设，允许潜变量之间及潜变量与观测变量之间的任意因果结构和循环，并输出完整的分布等价类表征。这一能力来源于对分布等价性本身的完整刻画——知道什么可以被识别，才能设计通用的识别方法。
 
-## 核心模块与公式推导
+
 
 ### 关键公式与变量含义
 
@@ -294,7 +298,9 @@ glvLiNG 算法由四个核心模块串联而成，每个模块对应上述理论
 
 从恢复的单个图出发，依据定理3的可容许操作（边添加/删除、循环反转）通过 BFS/DFS 遍历整个等价类。定理3保证：任意两个等价图可通过一系列可容许的边添加/删除和至多一次循环反转相互转换。最终输出定理4定义的 solid/dashed 边表示：solid 边在所有等价图中均出现，dashed 边在至少一个等价图中出现。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果
 
@@ -357,7 +363,9 @@ glvLiNG 的性能依赖于过完备独立成分分析（OICA）对混合矩阵�
 - **Figure 7**：随样本量变化的 SHD 曲线揭示了 glvLiNG 与基线方法的交叉现象——稀疏图中基线方法在小样本下占优，稠密图中 glvLiNG 始终领先，反映了结构假设与数据效率之间的权衡。
 - **Figure 8**：在股票市场真实数据上，glvLiNG 输出的等价类以 solid/dashed 边的形式呈现，solid 边表示在所有等价图中必然出现的边，dashed 边表示至少在一个等价图中存在的边，为实际应用中的因果解释提供了可操作的确定性/不确定性区分。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有方法的根本差异
 
@@ -399,6 +407,8 @@ Table 2系统性地梳理了等价性刻画工作在不同设定下的进展，�
 3. **非线性推广**：在非线性/非参数设定下，如何可靠地检验和利用秩约束（或更广义的约束）进行潜变量因果发现？
 4. **表示增强**：能否在等价类表示中融入类似Meek规则的额外约束，以进一步压缩表示的冗余并增强可解释性？
 5. **干预扩展**：如何将本框架扩展到干预分布等价类和参数的可识别性，从而指导实验设计？
+
+
 
 ## 原文 PDF
 

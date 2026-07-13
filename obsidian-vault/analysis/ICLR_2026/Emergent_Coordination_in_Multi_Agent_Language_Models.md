@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Emergent_Coordination_in_Multi_Agent_Language_Models.pdf
+project_link: null
+code_link: null
 openreview_forum_id: SRn1MtMPRq
 aliases:
 - ECMALM
@@ -41,7 +43,7 @@ claims:
 > - Group Binary Search (GPT-4.1, N=10, T=1) 上，Total Stability (I3 / H(V), bias-corrected, Wilcoxon for >0) 为 ToM: p = 2.9e-14，对比 Plain: p = 0.976，变化 ToM 大幅提升系统稳定性。
 > - Group Binary Search (GPT-4.1) 上，Interaction effect of synergy × redundancy on success (log-odds) 为 β = 0.24 (p = 0.014)，对比 无交互项，变化 协同与冗余互相放大对方对成功的影响约 27%。
 
-## 概述
+## 概要
 
 多智能体大语言模型（LLM）系统在实践中常被寄予“整体大于部分之和”的期望，但现有系统大多仅表现为个体代理的聚合，缺乏可测量的涌现协同作用，使得群体性能难以可靠超越个体之和。针对这一瓶颈，本文引入一个基于信息论的分析框架，以数据驱动的方式检验多智能体系统是否真正展现出高阶涌现结构。
 
@@ -56,7 +58,7 @@ claims:
 
 在方法谱系上，该工作将部信息分解、层次混合模型和因果中介分析整合为统一的多智能体涌现测量与引导框架，与仅关注个体性能聚合的传统多智能体评估范式形成互补。其定位介于多智能体协调理论与LLM提示工程之间，为理解并设计具备真正涌现智能的集体系统提供了可操作的测量工具和干预策略。
 
-## 背景与动机
+
 
 多智能体大语言模型（LLM）系统近年来在复杂任务求解中展现出巨大潜力，但其核心瓶颈在于：这些系统往往仅表现为个体代理能力的简单聚合，缺乏可测量的**涌现协同作用**，使得整体性能无法可靠地超越个体之和。换言之，群体智能是否真正“大于部分之和”，在现有系统中缺乏严格的量化证据。
 
@@ -66,7 +68,9 @@ claims:
 
 针对上述缺口，本文提出三个递进的研究问题：（1）多智能体LLM系统是否具备涌现能力？（2）当涌现发生时，系统能获得哪些功能性优势——如协同协调和更高的群体绩效？（3）能否通过提示词、角色和推理结构的设计，引导多智能体系统的内部协调机制，使其产生与结果相关的、目标导向的协同？通过建立信息论框架来回答这些问题，本文旨在为多智能体系统的涌现协调提供可测量、可干预、可解释的分析基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于将**部信息分解（Partial Information Decomposition, PID）**引入多智能体 LLM 系统的涌现分析，构建了一个纯数据驱动的信息论框架，用于检测、量化和引导智能体间的协同结构。与仅依赖任务性能指标的传统方法不同，该框架直接操作于智能体行为的微观状态与系统宏观信号之间的信息流，从而区分**冗余对齐**与**真正涌现的互补协同**。
 
@@ -121,7 +125,7 @@ claims:
 - 结论基于简单群体猜测游戏，在开放域多智能体系统中的泛化性有待验证。
 - 推理模型（如 Qwen3）在协调模糊下出现“推理瘫痪”，需要额外指令打破循环，提示框架对模型类型具有敏感性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_SRn1MtMPRq/figures/001_Figure_1.jpg]]
 *Figure 1: a) Information decomposition provides framework to explain tension in multi-agent systems. Agents are either undifferentiated or differentiated, provide independent or complementary information, which is either well aligned or incidental (adapted from Luppi et al., 2024). b) Experiment setup of the group binary search task. c) Preliminary experiments testing different group sizes and temperature settings. Surface values were smoothed using a local 3×3 weighted averaging filter, giving higher weight to each cell’s original value to reduce noise while preserving local structure*
@@ -199,7 +203,7 @@ $$m_2: y_i = \beta_0 + u_{time[i]} + u_{agent[i],0} + u_{agent[i],time[i]} + \ep
 
 该框架的独特之处在于：**将信息论的涌现检测、层级模型的代理分化检验、以及因果推断的归因分析整合为一条完整的分析管道**，使得研究者可以不仅回答“是否存在涌现”，还能回答“涌现的结构是什么”以及“涌现如何被提示设计所引导”。
 
-## 核心模块与公式推导
+
 
 ### 任务环境与微宏观变量定义
 
@@ -257,7 +261,9 @@ $$m_2: y_i = \beta_0 + u_{time[i]} + u_{agent[i],0} + u_{agent[i],time[i]} + \ep
 
 通过比较 $m_0$ vs $m_1$ 和 $m_1$ vs $m_2$ 的似然比检验，可分别判断代理是否具有差异化身份和异质性学习动态。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验：涌现能力的检测与定位
 
@@ -312,7 +318,9 @@ $$m_2: y_i = \beta_0 + u_{time[i]} + u_{agent[i],0} + u_{agent[i],time[i]} + \ep
 *Table 2: Table A2: Experiment results with other LLM models*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心贡献定位
 
@@ -354,6 +362,8 @@ $$m_2: y_i = \beta_0 + u_{time[i]} + u_{agent[i],0} + u_{agent[i],time[i]} + \ep
 2. 涌现协同的测量在不同任务类型（开放域对话、协作推理、资源分配）和不同度量下的稳健性如何？
 3. 如何建立涌现度量与群体性能之间更直接、统计上更稳健的因果关联，超越边缘显著的中介效应？
 4. 在真实世界的开放域多智能体系统中，涌现协同是否同样可被提示设计所引导？推理模型的“推理瘫痪”问题如何系统性解决？
+
+
 
 ## 原文 PDF
 

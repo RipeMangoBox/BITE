@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2024
 pdf_ref: paperPDFs/arxiv_2024/MBA_SLAM_Motion_Blur_Aware_Dense_Visual_SLAM_with_Radiance_Fields_Representation.pdf
+project_link: null
+code_link: https://github.com/WU-CVGL/MBA-SLAM
 aliases:
 - MS
 - MBA-SLAM
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | MBA-SLAM：运动模糊感知的密集视觉SLAM与辐射场表示 |
 | 英文题名 | MBA-SLAM: Motion Blur Aware Dense Visual SLAM with Radiance Fields Representation |
 | 会议/期刊 | arXiv 2024 |
-| Links | [paper](https://arxiv.org/abs/2411.08279) · [Code](https://github.com/WU-CVGL/MBA-SLAM) · [arXiv](https://arxiv.org/abs/2409.06765) |
+| Links | [paper](https://arxiv.org/abs/2411.08279) · [Code](https://github.com/WU-CVGL/MBA-SLAM) · [paper](https://arxiv.org/abs/2409.06765) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction #topic/representation_self_supervised_transfer |
 | Method | MBA-SLAM |
 | Dataset | ArchViz-1, Replica Room0, Replica |
@@ -42,7 +44,7 @@ claims:
 > - Replica Room0 (sharp) 上，ATE RMSE [cm] 0.31 (MonoGS-ours f2f) vs 0.42 (MonoGS f2m) (-0.11 cm)。
 > - Replica (8 scenes, sharp) 上，Average ATE RMSE [cm] Ours-NeRF 0.41, Ours-GS 0.35 vs Best prior SOTA (see Table 4) (outperforms all)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -79,7 +81,7 @@ MBA-SLAM的核心洞察在于**将物理运动模糊形成模型集成到SLAM的
 
 MBA-SLAM当前依赖两姿态线性插值模型，可能难以捕捉长时间曝光下高度不规则的运动轨迹。3DGS版本建图速度仅1.97 FPS，远未达到实时性要求。系统仅支持RGB-D输入，且曝光时间需事先已知。开放问题包括：如何建模超出两姿态近似的复杂运动模糊；帧到帧跟踪器在极低纹理场景中的鲁棒性；以及虚拟图像数量的在线自适应调整策略。
 
-## 背景与动机
+
 
 ### 运动模糊对视觉SLAM的根本挑战
 
@@ -105,7 +107,9 @@ MBA-SLAM的出发点是：**运动模糊不是需要事后去除的噪声，而�
 
 这一设计使得MBA-SLAM能够在严重运动模糊的视频输入下鲁棒地估计相机轨迹并重建清晰的、高逼真度的3D场景，同时不影响对清晰数据的性能——在标准清晰数据集上，MBA-SLAM同样超越了现有方法。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MBA-SLAM 的核心创新并非提出全新的SLAM架构，而是将**物理运动模糊成像模型**显式地嵌入到密集视觉SLAM的两个核心环节——跟踪与建图——之中，从而将传统SLAM中“去模糊”的隐式需求转化为“重模糊”的显式操作。这一范式转换使得系统能够在严重运动模糊的视频输入下保持鲁棒的位姿估计和高质量的清晰场景重建，同时不影响对清晰数据的处理性能。
 
@@ -141,7 +145,7 @@ $$\hat{\mathbf{B}}_{\mathrm{cur}}(\mathbf{x}) = \frac{1}{n} \sum_{i=0}^{n-1} \ma
 
 消融实验（Table 10, Table 11）揭示了另一个关键创新：**全CUDA实现的帧到帧（frame-to-frame）跟踪器**。相较于传统SLAM中常见的帧到地图（frame-to-map）跟踪策略，帧到帧跟踪在清晰和模糊数据上均显著提升了跟踪精度（ATE RMSE）和建图质量（PSNR）。这一改进并非模糊场景的特化优化，而是一个通用的跟踪策略升级，使得MBA-SLAM在标准清晰数据集（Replica、ScanNet、TUM）上同样超越了现有方法（Table 4, Table 7）。
 
-## 整体框架
+
 
 MBA-SLAM 的整体管道由两个核心模块构成：**运动模糊感知的跟踪器（Motion Blur Aware Tracker）** 和**模糊感知的建图器（Blur Aware Mapper）**，两者通过一个物理运动模糊形成模型紧密耦合。该管道以 RGB‑D 视频流为输入，输出相机轨迹与清晰的 3D 场景表示。
 
@@ -178,7 +182,7 @@ MBA-SLAM 提供了两种可互换的场景表示后端：
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2411_08279/figures/001_Figure_1.jpg]]
 *Figure 1: The pipeline of MBA-SLAM. Our framework consists of blur aware tracking process and bundle adjustment deblurring mapping process. Tracking: Given the current blurry frame, the mapper first renders a virtual sharp image of the lastest blurry keyframe from the 3D scene. Our motion blur-aware tracker directly estimates the camera motion trajectory during the exposure time, represented by the camera positions at the start and end of the exposure*
 
-## 核心模块与公式推导
+
 
 ### 3.1 运动模糊图像形成模型
 
@@ -242,7 +246,9 @@ $$\mathcal{L} = \lambda_c \mathcal{L}_c + \lambda_d \mathcal{L}_d + \lambda_{fs}
 
 通过在建图损失中显式建模模糊形成过程，建图器能够在严重运动模糊的输入下恢复清晰的 3D 场景表示。当 $n=1$（即不建模模糊）时，跟踪精度在模糊数据集上显著退化（Table 9），验证了模糊形成模型集成的必要性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 运动模糊数据集上的跟踪与建图性能
 
@@ -296,7 +302,9 @@ MBA-SLAM 的核心优势在于对严重运动模糊的鲁棒处理。在合成�
 
 **已知局限**：(1) 两姿态线性插值模型可能难以捕捉长时间曝光下高度不规则的运动轨迹，高非线性运动时精度可能下降；(2) 3DGS 版本的建图速度远低于实时，限制了在线机器人应用；(3) 仅支持 RGB-D 输入，尚未扩展到单目或立体设置；(4) 曝光时间需事先已知或通过传感器获取，实际应用中可能无法准确获得。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心继承与组件来源
 
@@ -359,6 +367,8 @@ MBA-SLAM 相对于上述基线，在三个关键方法槽位上做出了根本�
 4. **与事件相机的互补性**：事件相机天然对运动模糊鲁棒，MBA-SLAM 的模糊感知框架能否与事件数据融合，在极端运动场景下进一步提升鲁棒性？这是一个有前景但尚未探索的方向。
 
 5. **大场景的扩展性**：当前实验主要在房间级场景（Replica、ScanNet）上进行。在更大尺度场景中，SE(3) 插值的累积误差和 3DGS 的内存增长是否会成为瓶颈，仍需验证。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/Training_Free_Motion_Guided_Video_Generation_with_Enhanced_Temporal_Consistency_Using_Motion_Consistency_Loss.pdf
+project_link: https://zhangxinyu-xyz.github.io/SimulateMotion.github.io/
+code_link: https://github.com/AILab-CVC/VideoCrafter
 aliases:
 - INMCLMVG
 tags:
@@ -41,7 +43,7 @@ claims:
 > - Trajectory Control 上，CLIP-SIM-GTBox 0.889 vs 0.886 (FreeTraj) (+0.003 (+0.34%))；Human preference (Trajectory Align) 52.12% vs 47.88% (FreeTraj) (+4.24%)。
 > - Reference Video Control (76 videos, 4 prompts) 上，TC (Temporal Consistency) 93.3 vs 93.1 (MotionDirector) (+0.2)。
 
-## 概述
+## 概要
 
 现有免训练运动引导视频生成方法（如基于轨迹的 **FreeTraj** 和基于参考视频的 **MotionDirector**）主要依赖初始噪声反演或注意力掩码等隐式手段进行运动控制。这类方法难以同时保持精确的运动轨迹跟随和帧间外观一致性，导致生成视频中出现目标物体变形、细节丢失等时间不连贯问题（Figure 1）。
 
@@ -54,7 +56,7 @@ claims:
 
 方法在目标文本与参考视频内容差异过大时仍存在一定局限（Figure 12）。代码与项目页面已公开。
 
-## 背景与动机
+
 
 ### 免训练运动引导视频生成的现状与瓶颈
 
@@ -78,7 +80,9 @@ Figure 1 直观地展示了这一瓶颈：在参考视频控制场景下，现�
 
 该方法在轨迹控制和参考视频控制两个任务上均取得了有竞争力的结果：在轨迹控制任务中，相比FreeTraj，mIoU提升1.5%（0.268→0.272），CLIP-SIM-GTBox提升0.34%（0.886→0.889），人类偏好评估中轨迹对齐得分领先4.24个百分点（Table 1）；在参考视频控制任务中，相比需要训练的MotionDirector，时间一致性得分（TC）达到93.3，视频质量人类偏好得分领先10.52个百分点（Table 2）。值得注意的是，该方法仅需**单个稀疏关键点**即可达到良好的运动控制效果，增加点数并未进一步提升性能（Figure 10），体现了其高效性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作针对现有免训练运动引导视频生成方法中“隐式引导不足导致时间一致性差”的瓶颈，提出了**初始噪声反演 + 运动一致性损失（Motion Consistency Loss, MCL）** 的互补式显式引导方案。其关键创新体现在两个 changed slots 上：
 
@@ -116,7 +120,7 @@ $$
 
 相比于需要训练的 **MotionDirector**（Zhao et al., ECCV 2025），本方法在保持免训练优势的同时，在时间一致性（TC: 93.3 vs 93.1）和人类偏好的视频质量评估（55.26% vs 44.74%）上均取得了更优结果（Table 2, confidence 0.95）。这表明显式运动一致性约束在免训练框架下能够有效替代甚至超越训练式方法的运动定制能力。
 
-## 整体框架
+
 
 该方法构建了一条**免训练的运动引导视频生成管线**，核心思路是将初始噪声隐含的运动先验与显式的帧间运动一致性损失相结合，在不更新扩散模型参数的前提下实现精确的运动控制与时间连贯性。
 
@@ -149,7 +153,7 @@ $$
 
 整个管线的伪代码见 Algorithm 1，完整实现了从初始噪声反演到梯度引导去噪的训练免微调运动控制流程。
 
-## 核心模块与公式推导
+
 
 本节聚焦所提方法中三个核心模块的数学定义与推导：运动模式的提取与表示、运动一致性损失函数的构建，以及分类器引导下的梯度注入机制。所有公式均来自原文，不进行额外推导。
 
@@ -195,7 +199,9 @@ $$
 
 除显式的运动一致性损失外，方法还利用DDIM反演将参考视频转换为初始噪声 $z_T$，为生成过程提供隐式的运动先验。消融实验（Figure 5）表明，仅使用初始噪声引导而不加运动一致性损失时，视频细节会出现时间不一致现象（如狮子尾巴和爪子丢失）；反之，仅使用运动一致性损失而不用反演初始化，则模型难以模拟带有外观变化的大幅度运动。两者协同作用才能实现最优性能。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -265,7 +271,9 @@ Figure 6 展示了方法的一个有趣应用：将摄像头捕捉的手势运�
 ![[assets/figures/papers/paper_list_l41_https_arxiv_org_abs_2501_07563/figures/001_Figure_1.jpg]]
 *Figure 1: Visualization comparisons on our method and two existing motion customization methods, including the reference video based Motiondirector [93], and the bounding box trajectory based FreeTraj [47]. Methods in the upper part use the inversion noise from the reference video, while methods in the lower part use the well-designed noise as initialization. The red circle regions represent the inconsistent temporal coherent, while the green circle regions represent the correct one*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法定位与核心差异
 
@@ -314,6 +322,8 @@ Figure 6 展示了方法的一个有趣应用：将摄像头捕捉的手势运�
 2. **关键点自动选择**：能否自动确定最优的稀疏关键点及其跟踪策略，减少人工干预？
 3. **多模态运动信号融合**：能否将骨骼点、物理模拟等其他形式的运动控制信号与当前框架结合？
 4. **计算效率优化**：去噪过程中每步提取特征并计算运动一致性损失引入了额外开销，是否存在轻量化的替代方案？
+
+
 
 ## 原文 PDF
 

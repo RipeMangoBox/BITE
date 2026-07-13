@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2026
 pdf_ref: paperPDFs/arxiv_2026/Neural_Harmonic_Textures_for_High_Quality_Primitive_Based_Neural_Reconstruction.pdf
+project_link: null
+code_link: null
 aliases:
 - NHTN
 - NHTHQPBNR
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 神经谐波纹理：面向高质量基元神经重建 |
 | 英文题名 | Neural Harmonic Textures for High-Quality Primitive Based Neural Reconstruction |
 | 会议/期刊 | arXiv 2026 |
-| Links | [paper](https://arxiv.org/abs/2604.01204) · [arXiv](https://arxiv.org/abs/) |
+| Links | [paper](https://arxiv.org/abs/2604.01204) · [paper](https://arxiv.org/abs/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Neural Harmonic Textures (NHT) |
 | Dataset | MipNeRF360, Tanks & Temples, Deep Blending |
@@ -41,7 +43,7 @@ claims:
 > - Tanks & Temples 上，PSNR 24.79 vs 24.18 (3DGUT+SV) (+0.61)。
 > - Deep Blending 上，PSNR 30.88 vs 30.29 (3DGUT+SV) (+0.59)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：传统基元方法（如 3DGS）中几何与外观强耦合，单个基元的表达能力有限。为建模高频细节和复杂视角相关效果，不得不大量增加基元数量，导致内存消耗激增与渲染速度下降。同时，方向外观建模受限于低阶球谐函数，无法高效表示镜面高光等高频现象。
 
@@ -54,7 +56,7 @@ claims:
 - 严格控制变量的实验中（相同框架、基元数、训练迭代数、每基元外观参数量），NHT 一致优于球谐模型和球面 Voronoi 模型，且保持实时渲染性能。
 - 在低基元数量区间（≤100k），NHT 的 PSNR 领先达 2dB 以上，直接验证了单基元表达力的显著增强。
 
-## 背景与动机
+
 
 ### 基元表示的优势与瓶颈
 
@@ -81,7 +83,9 @@ claims:
 
 这一设计在严格控制变量的实验中展现出显著优势：在相同框架、基元数、训练迭代数和每基元外观参数量下，NHT在MipNeRF360数据集上达到28.46 PSNR，比SV模型（28.15）提升0.31 dB，比SH模型（27.93）提升0.53 dB（Table 2）。尤其值得注意的是，在低基元数量区间（≤100k），NHT的PSNR领先超过2 dB（Fig. 5），直接验证了单基元表达力的显著增强——这正是几何与外观解耦带来的核心收益。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Neural Harmonic Textures (NHT) 的核心创新在于对传统基元表示中**几何与外观强耦合**这一瓶颈的系统性解耦。传统方法（如3DGS）中，每个基元的外观由低阶球谐函数（SH）独立计算，单基元表达能力有限：建模高频细节和复杂视角相关效果（如镜面高光）时，必须大量增加基元数量，导致内存膨胀和渲染速度下降。NHT 通过三个相互关联的机制设计（changed slots）从根本上改变了这一范式。
 
@@ -113,7 +117,7 @@ NHT 的外观表示与具体基元类型解耦。特征载体仅需随基元形�
 
 这三个 changed slots 构成一条完整的因果链：**特征嵌入**将基元转化为局部信号源 → **谐波编码**将信号分解为频率-振幅表示，突破单基元表达能力瓶颈 → **延迟 MLP 解码**在图像空间高效合成最终颜色，实现几何与外观的彻底解耦。控制变量实验（Table 2）在相同框架、相同基元数、相同参数量下，NHT 比 SV 提升 0.31–0.61 dB PSNR，比 SH 提升 0.53–0.70 dB，直接验证了外观模型本身带来的增益，排除了实现细节干扰。
 
-## 整体框架
+
 
 Neural Harmonic Textures (NHT) 提出了一套与基元类型无关的外观建模框架，核心思路是将几何与外观解耦，通过为每个基元附加可学习的局部特征向量，并在图像空间进行延迟神经解码，从而在不牺牲实时性能的前提下大幅提升单基元的表达能力。
 
@@ -142,7 +146,7 @@ Figure 3: Illustrating our method in 2D. Each primitive is bounded by an ellipso
 ![[assets/figures/papers/paper_list_l69_https_arxiv_org_abs_2604_01204/figures/001_Figure_1.jpg]]
 *Figure 1: Neural Harmonic Textures for novel view synthesis. We attach learnable feature vectors (right) to the virtual vertices of bounding tetrahedra encapsulating each primitive (center). After harmonic encoding and accumulation along the ray, a small neural network decodes the resulting signal into RGB color in a deferred manner (left). Source code and further results are available at https://research.nvidia.com/labs/ sil/projects/neural-harmonic-textures/*
 
-## 核心模块与公式推导
+
 
 Neural Harmonic Textures (NHT) 的核心设计思路是：将基元从“颜色载体”升级为“局部谐波信号发生器”，通过**基元绑定特征嵌入 → 谐波编码 → Alpha混合累积 → 延迟MLP解码**四个模块，在保持基元表示结构优势的同时，大幅提升单基元的表达能力。
 
@@ -201,7 +205,9 @@ $$\mathcal{L} = (1 - \lambda) \mathcal{L}_{\mathrm{L}_1} + \lambda \mathcal{L}_{
 ![[assets/figures/papers/paper_list_l69_https_arxiv_org_abs_2604_01204/figures/003_Figure_3.jpg]]
 *Figure 3: Illustrating our method in 2D. Each primitive is bounded by an ellipsoid in world space, which becomes a sphere in whitened canonical space (a). Considering a virtual bounding tetrahedron in this canonical space, we attach one N-dimensional feature vector*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能对比
 
@@ -277,7 +283,9 @@ Table 18展示了压缩效果：采用int8特征量化、int16位置量化、fp1
 ![[assets/figures/papers/paper_list_l69_https_arxiv_org_abs_2604_01204/figures/026_Table_18.jpg]]
 *Table 18: Impact of post-training compression on NHT at 100×. Averages over 15 images. Baseline: uncompressed fp32 features/parameters + fp16 MLP weights. int8 features: uniform 8-bit quantization with per-channel scale/offset. int16 positions: fixedpoint uint16 vertex positions. int8+int16+fp16 : combined quantization (features int8, positions int16, MLP fp16). + Zstandard/Brotli: entropy coding on the serialized payload*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 基元重建谱系中的定位
 
@@ -332,6 +340,8 @@ NHT 的核心技术贡献可映射到以下知识节点：
 | 压缩友好性 | int8 特征量化 + int16 位置 + fp16 MLP + Zstandard 实现约 3 倍压缩 | Table 18 |
 
 在实验知识层面，NHT 在 MipNeRF360、Tanks & Temples、Deep Blending 三个标准数据集上均达到 state-of-the-art 性能（Table 1），且控制变量实验（Table 2）严格排除了框架实现、基元数、训练迭代数、参数量等混杂因素的干扰，证据可信度高。消融实验覆盖了编码函数选择（Table 4）、特征维度（Table 16）、MLP 架构（Table 17）、训练策略（Table 14）和压缩方案（Table 18），为后续改进提供了清晰的因果调控杠杆。
+
+
 
 ## 原文 PDF
 

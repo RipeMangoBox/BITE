@@ -41,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - BEAT2 上，FGD (↓) 4.612；MSE (↓) 7.176 ± 0.028；LVD (↓) 7.270 ± 0.011。
 
-## 概述
+## 概要
 
 语音同步3D手势生成的核心瓶颈在于：现有VQ-VAE方法将动作编码为固定帧数的离散token，无法同时捕捉不同身体部位在多个时间尺度上的运动模式——面部表情变化迅速而精细，下半身运动则相对缓慢且粗粒度，单一尺度表征必然牺牲部分身体部位的表现力。
 
@@ -51,7 +51,7 @@ PyraMotion针对这一瓶颈，提出**注意力金字塔运动集成框架**，
 
 方法定位上，PyraMotion属于**离散表征+自回归预测**范式的语音驱动手势生成方法，与EMAGE（Yi et al., CVPR 2023）、CaMN（Liu et al., CVPR 2024）等同期工作相比，核心差异在于将单尺度VQ-VAE扩展为多尺度金字塔结构，使运动表征能够覆盖不同身体部位的时间动态范围。当前局限包括：金字塔层数需手动选择，推理时间约41秒（长于EMAGE的约22秒），且尚未支持多模态条件控制。
 
-## 背景与动机
+
 
 语音驱动的3D手势合成旨在从语音音频中生成与语音节奏和语义协调的自然手势动作，是虚拟人交互、数字人等应用中的核心技术。近年来，随着大规模多模态数据集的构建和深度生成模型的发展，该领域取得了显著进展。现有方法大致可分为两类：基于回归的方法直接学习语音到手部动作的映射，而基于生成模型的方法则利用VAE、扩散模型或VQ-VAE等框架对动作分布进行建模，以提升生成手势的多样性和表现力。
 
@@ -77,7 +77,9 @@ PyraMotion针对这一瓶颈，提出**注意力金字塔运动集成框架**，
 
 通过这一设计，PyraMotion从根本上改变了运动编码的范式——从“固定尺度统一编码”转向“多尺度自适应融合”，为全身手势生成的多样性和自然度提升提供了新的技术路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PyraMotion 的核心创新在于将计算机视觉中的**特征金字塔思想**引入语音同步手势生成，构建了从粗到细的多尺度运动表征与注意力融合机制，从而解决了现有 VQ-VAE 方法以固定帧数编码运动、无法同时捕捉不同身体部位在不同时间尺度上运动模式的瓶颈。
 
@@ -124,7 +126,7 @@ $$\hat{\mathbf{q}}_i^{parts} = \mathrm{MLP}(\tilde{\mathbf{h}}_i^{parts} + \hat{
 
 金字塔层数实验（Table 5）表明，4 层在重建与生成指标间取得最佳平衡；5 层引入过拟合，性能反而下降。这一发现说明**多尺度并非越多越好**——当前方法需要手动选择层数，尚无法根据数据集特性自适应调整，这是论文明确指出的一个局限性。
 
-## 整体框架
+
 
 PyraMotion 采用两阶段训练范式，分别构建运动表征与生成控制。
 
@@ -141,7 +143,7 @@ PyraMotion 采用两阶段训练范式，分别构建运动表征与生成控制
 ![[assets/figures/papers/neurips_2025_pyramotion/figures/002_Figure_2.jpg]]
 *Figure 2: The Overall Workflow of PyraMotion. Stage 1: APVQ-VAE learns the discrete latent representations of motions, denoted as tokens, and reconstructs the motion from the pyradical token series via decoder. Stage 2: The PyraMotion framework is trained to predict the pyradical token series of motion from audio and reconstruct the motion via decoder in APVQ-VAE*
 
-## 核心模块与公式推导
+
 
 PyraMotion 采用两阶段训练范式：第一阶段训练 **APVQ-VAE** 学习离散运动表征，第二阶段训练 **金字塔 Token 预测器** 从音频和文本中预测运动 token。以下聚焦两个阶段的核心模块及其关键公式。
 
@@ -230,7 +232,9 @@ $$\mathcal{L}_{cls}^{parts} = \mathrm{CrossEntropy}(\hat{\mathbf{Q}}^{parts}, \m
 ![[assets/figures/papers/neurips_2025_pyramotion/figures/006_Figure_3.jpg]]
 *Figure 3: Attention Map Visualization*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 整体性能对比
 
@@ -298,7 +302,9 @@ APVQ-VAE 与普通 VQ-VAE 的重建误差对比（Table 3）进一步揭示了�
 ![[assets/figures/papers/neurips_2025_pyramotion/figures/009_Figure_4.jpg]]
 *Figure 4: Perceptual Study*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有工作的关系
 
@@ -338,6 +344,8 @@ PyraMotion 的设计假设和实验设定决定了其适用边界：
 3. **多尺度表征的跨模态泛化**：金字塔运动表征的核心思想——不同时间尺度捕捉不同粒度的动态模式——是否可推广至音乐驱动舞蹈生成、环境声驱动反应动作等其他时间序列到运动的映射任务？
 
 4. **金字塔表征的可解释性深化**：Figure 3 的注意力图揭示了不同部位的时间尺度偏好，但各层的 token 究竟编码了何种运动语义（如节奏模式、姿态过渡、情感表达）仍不清晰。进一步的可解释性分析可能为模型改进提供方向。
+
+
 
 ## 原文 PDF
 

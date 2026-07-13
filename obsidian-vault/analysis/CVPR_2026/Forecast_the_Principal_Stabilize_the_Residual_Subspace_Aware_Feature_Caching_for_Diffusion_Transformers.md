@@ -44,7 +44,7 @@ claims:
 > - FLUX.1-dev (text-to-image) 上，ImageReward 1.0123 vs 0.9898 (original) (+2.519%)；CLIP Score 32.983 vs 32.404 (original) (+1.348%)。
 > - HunyuanVideo (text-to-video) 上，VBench 80.60 vs 80.66 (original) (-0.07% (near-lossless))。
 
-## 概述
+## 概要
 
 扩散Transformer（DiT）在图像与视频生成中展现出强大能力，但其多步迭代去噪过程计算开销巨大，严重制约了推理效率。现有的特征缓存方法（如**TaylorSeer**、**ToCa**、**Δ-DiT**等）通过在不同时间步间复用或预测中间层特征来跳过冗余计算，然而它们均隐含一个共同假设：整个特征空间是平滑可预测的。本文揭示，这一假设在DiT中并不成立——特征空间实际由两个动态特性迥异的子空间构成：一个低秩的**主子空间**，其演化轨迹平滑、易于预测；另一个高维的**残差子空间**，呈现高频振荡且能量极低，强制对其进行预测反而会引入显著的累积误差，成为限制加速效果的核心瓶颈。
 
@@ -52,7 +52,7 @@ claims:
 
 在FLUX.1-dev文本到图像模型上，SVD-Cache在5.5倍加速下不仅未损失质量，ImageReward指标反而从原始模型的0.9898提升至1.0123（+2.5%），CLIP Score从32.404提升至32.983（+1.3%）。在HunyuanVideo文本到视频模型上，该方法在5.5倍加速下实现了近乎无损的VBench得分（80.60 vs. 原始80.66）。在更激进的加速设置下，SVD-Cache在FLUX.1-schnell上可达29.01倍加速，在FLUX.1-DEV-int8上可达7.61倍加速，展现出广泛的适用性与可扩展性。
 
-## 背景与动机
+
 
 扩散Transformer（Diffusion Transformer, DiT）已成为文生图（如FLUX）和文生视频（如HunyuanVideo）的主流骨干架构。然而，DiT的推理过程需要迭代执行数十步去噪，每一步都需通过深层Transformer块计算中间特征，导致极高的延迟和计算开销。特征缓存（Feature Caching）作为一种无训练的加速策略，通过在不同去噪时间步之间复用中间激活来减少冗余计算，近年来受到广泛关注。
 
@@ -68,7 +68,9 @@ claims:
 
 基于以上观察，本文的动机明确：**放弃“全特征空间同质化”的假设，转而将特征空间显式分离为主子空间和残差子空间，并针对各自的动力学特性设计差异化的缓存策略——对平滑可预测的主子空间应用指数移动平均（EMA）预测，对高频振荡的残差子空间直接重用。** 这一设计从根本上消除了残差预测的误差源，同时保留了主子空间的时序建模能力，有望在更高加速比下维持近乎无损的生成质量。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SVD-Cache 的核心创新在于**首次揭示了扩散Transformer（DiT）特征空间存在两个异质子空间**，并据此设计了一种**子空间感知的差异化缓存策略**。相较于现有方法，这一创新体现在两个关键的 **changed slots** 上。
 
@@ -103,7 +105,7 @@ SVD-Cache 的核心创新在于**首次揭示了扩散Transformer（DiT）特征
 
 SVD-Cache 的本质创新在于**将特征缓存问题从一个“全空间预测”问题，重新定义为一个“子空间感知的预测与重用”问题**。它通过 SVD 揭示了 DiT 特征空间的内在结构，并利用跨提示的基底稳定性，以极低的成本实现了对不同动态特性子空间的差异化处理，从而突破了现有方法因残差振荡而面临的加速瓶颈。
 
-## 整体框架
+
 
 SVD-Cache 的完整流程分为**离线预处理**与**在线推理**两个阶段，其核心设计遵循一个因果原则：将 DiT 特征空间通过 SVD 分离为演化平滑的**主子空间**与高频振荡的**残差子空间**，并分别采用预测与重用策略，从而在加速采样的同时控制误差累积。
 
@@ -157,7 +159,7 @@ $$\frac{\sum_{i=1}^k \sigma_i^2}{\sum_{i=1}^r \sigma_i^2} \ge \tau$$
 ![[assets/figures/papers/paper_list_l874_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Forecast_the_Prin/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the SVD-Cache framework. (a) Offline preprocessing: A reference feature is decomposed via SVD to obtain a reusable low-rank basis. The right singular vectors and singular values are both stored, and the rank k is determined based on the cumulative singular value energy according to Eq. (5). (b) Inference: Given a new feature, we reconstruct its principal and residual components. Specifically, we first retrieve the shared basis stored in offline preprocessing and then follow Eq. (8), (9) and (10) to compute the components. The principal component is then predicted via EMA, while the residual is directly reused due to its low energy and oscillatory nature. The final feature is rec...*
 
-## 核心模块与公式推导
+
 
 ### 离线SVD分解与基底缓存
 
@@ -210,7 +212,9 @@ $$\widehat{F}_{t+\Delta} = \widehat{F}_{k,t+\Delta} + \widehat{R}_{t+\Delta}$$
 ![[assets/figures/papers/paper_list_l874_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Forecast_the_Prin/figures/010_Figure_8.jpg]]
 *Figure 8: Universality of the low-rank property across models*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 文本到图像生成主结果
 
@@ -258,7 +262,9 @@ Table 3 报告了 SVD-Cache 与其他加速方法在 FLUX 上的定量对比。S
 ![[assets/figures/papers/paper_list_l874_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Forecast_the_Prin/figures/003_Figure_3.jpg]]
 *Figure 3: Visual Comparison of 5.5 × accelerated FLUX between different feature cache methods*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 特征缓存加速谱系中的位置
 
@@ -306,6 +312,8 @@ SVD-Cache展现出良好的方法兼容性：
 2. **跨架构泛化**：SVD分解揭示的低秩特性是否在更大规模DiT（如百亿参数级）或非DiT架构中依然成立？基底稳定性是否保持？
 3. **残差子空间的精细化处理**：当前对残差子空间采用直接重用，是否存在更优的保守预测策略（如轻度平滑、条件重用）以进一步扩展缓存步长？
 4. **与训练加速的结合**：子空间分解策略能否反向指导模型训练，例如通过正则化促进特征的低秩结构化，使模型原生更适合缓存加速？
+
+
 
 ## 原文 PDF
 

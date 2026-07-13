@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/Centaur_Robust_End_to_End_Autonomous_Driving_with_Test_Time_Training.pdf
+project_link: null
+code_link: https://github.com/OpenDriveLab/OpenScene
 aliases:
 - Centaur
 tags:
@@ -39,7 +41,7 @@ claims:
 > - navtest (NAVSIM v1.1) 上，PDMS (%) 92.10 ± 0.33 vs 91.26 (Hydra-MDP* ensemble) (+0.84)。
 > - navsafe (safety-critical subset) 上，Overall PDM Score 74.14 vs 56.47 (Hydra-MDP) (+17.67)。
 
-## 概述
+## 概要
 
 端到端自动驾驶规划器在部署时面临一个根本性瓶颈：安全性与适应性不足。现有应对策略分为两条路径——**回退层策略**利用预定义安全动作检测失败，但导致过度保守行为，严重损害自车进度（EP）；**测试时优化**依赖显式表示和手工成本函数，需要昂贵标注，阻碍端到端方法的可扩展性。两者均无法通过新数据实现自我改进。
 
@@ -56,8 +58,6 @@ Centaur 的核心洞察是：**通过测试时训练（Test-Time Training, TTT�
 
 论文的主要局限在于仅在 NAVSIM 仿真环境中验证，尚未在真实车辆或闭环系统中测试；TTT 虽通过缓冲区异步化，仍引入额外计算开销（Hydra-MDP 推理延迟从 243.9ms 增至 312.5ms）。开放问题包括如何扩展到闭环驾驶、在资源受限平台上的部署，以及长期持续适应中的灾难性遗忘风险。
 
-## 背景与动机
-
 端到端自动驾驶旨在直接从传感器输入映射到规划轨迹，但现有方法在部署时面临一个核心瓶颈：**安全性与适应性的不足**。主流应对策略可归为两类，但均存在明显缺陷。
 
 **回退层策略的保守性陷阱。** 一种常见做法是为端到端规划器配备回退层（fallback layer），当检测到规划失败时切换至预定义的安全动作。然而，这种策略导致过度保守的行为——车辆倾向于不必要的减速或停车，严重损害自车进度（Ego Progress）。在navtest基准上，回退层策略的PDMS仅为65.3%，远低于无回退的基线方法，其EP子评分甚至降至13以下（Table 1）。这揭示了一个根本矛盾：**以牺牲进度为代价换取的安全，在真实驾驶场景中并不可行**。
@@ -68,7 +68,7 @@ Centaur 的核心洞察是：**通过测试时训练（Test-Time Training, TTT�
 
 Centaur的动机正是弥合这一缺口：**通过测试时训练（Test-Time Training, TTT）实现无需标注的在线自适应**。其核心洞察在于，端到端规划器的不确定性可以通过一种简单、可解释的度量——集群熵（Cluster Entropy）来捕捉，而最小化这种不确定性能够有效抑制异常高评分，使模型偏向更安全的方向，从而在不损害进度的情况下提升安全关键指标（如TTC），并接近人类驾驶表现（94.8%）。
 
-## 核心创新
+## 核心方法与创新机理
 
 Centaur 的核心创新在于将**测试时训练（Test-Time Training, TTT）**引入端到端自动驾驶规划器的部署阶段，并通过一种全新的无监督不确定性度量——**集群熵（Cluster Entropy）**——来驱动这一在线适应过程。其设计直击现有方法的两个关键瓶颈：回退层策略的过度保守性，以及基于显式代价函数的测试时优化对昂贵标注的依赖。
 
@@ -103,8 +103,6 @@ Centaur 将不确定性度量和在线适应统一为闭环：集群熵既是 TT
 | **梯度组合** | 无（SVD 或直接使用） | 缓冲区历史梯度平均值 |
 
 这些创新使 Centaur 在 navtest 基准上达到 **92.6% PDMS**，大幅超越回退层策略（65.3%）并接近人类上限（94.8%）；在更具挑战性的 navsafe 安全基准上取得 **74.14 总体 PDMS**，远超 Hydra-MDP（56.47）和 Hydra-SE（62.84），验证了 TTT 在边缘场景中的泛化能力（Table 1, Table 4）。
-
-## 整体框架
 
 Centaur 的整体框架围绕“测试时训练（Test-Time Training, TTT）”展开，其核心思路是在部署阶段通过在线梯度更新来抑制规划器决策中的不确定性，从而在不牺牲行驶进度的前提下提升安全性。该方法建立在轨迹评分（trajectory scoring）范式的端到端规划器之上，其基础模型为 Hydra-MDP。整个 pipeline 由离线训练好的感知骨干网络、轨迹评分解码器，以及部署时新增的集群熵计算器、梯度累积缓冲区和参数更新步五个关键模块构成，如 Figure 2 所示。
 
@@ -142,8 +140,6 @@ $$\hat{\theta}_i = \theta - \eta \left\{ \frac{\partial H}{\partial\theta} \righ
 ### 与回退层策略的本质区别
 
 传统的回退层（fallback layer）策略在检测到不确定性时，直接替换为预定义的安全轨迹。虽然这能避免碰撞，但会导致极端保守的行为——例如自车进度（EP）子评分降至 13 以下，严重损害整体 PDMS（Table 1）。相比之下，Centaur 的 TTT 通过微调解码器参数来“修正”评分分布，在提升安全子评分（如 TTC）的同时保持了高进度，实现了安全性与行驶效率的兼顾。
-
-## 核心模块与公式推导
 
 ### 轨迹评分与选择
 
@@ -205,7 +201,7 @@ $$
 ![[assets/figures/papers/paper_list_l80_https_arxiv_org_abs_2503_11650/figures/009_Table_5.jpg]]
 *Table 5: The notation used in our paper, with descriptions*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -275,10 +271,7 @@ Figure 4展示了TTT前后的轨迹评分分布变化。在成功案例中，Cen
 ![[assets/figures/papers/paper_list_l80_https_arxiv_org_abs_2503_11650/figures/006_Figure_4.jpg]]
 *Figure 4: Qualitative results. For each scene, we show the PDMS and a selected subscore for both Hydra-MDP (before TTT) and Centaur (after TTT), with the highest predicted score marked using a ★. The x-axis in each plot is the candidate trajectory’s lateral end-point position. Top: TTT helps Centaur which is uncertain between ‘Forward’ and ‘Slight Left’ to prefer the direction where cluster members have a higher average score, improving safety. Bottom: A failure case, where TTT cannot suppress a confident original prediction*
 
-![[assets/figures/papers/paper_list_l80_https_arxiv_org_abs_2503_11650/figures/014_Table_8.jpg]]
-*Table 8: Failure identification. More results in addition to Table 3 in the main paper, with other planners and uncertainty thresholds*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 核心机制与因果杠杆
 

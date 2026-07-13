@@ -43,7 +43,7 @@ claims:
 > - VGGSound (测试集) 上，用户研究 Likert 评分 (1-5): 音频质量 / 语义对齐 / 时序对齐 / 物理可信度 PAVAS-L: 4.23±0.77 / 4.47±0.71 / 4.45±0.80 / 4.37±0.84 vs 其他V2A模型平均分数较低（参见 Table 2） (在物理可信度上显著超越所有基线，其他维度也保持最高或领先水平)。
 > - VGG-Impact (物理交互子集) 上，APCC-∆ (物理一致性，越低越好) 0.378 vs 其他模型APCC-∆更高（物理相关性弱） (最接近真值的物理一致性，显著降低APCC-∆)。
 
-## 概述
+## 概要
 
 现有视频到音频合成（V2A）模型本质上是**外观驱动**的：它们从视觉帧中提取语义和时序线索，却未显式建模物体相互作用背后的物理因素——如质量与速度。因此，当视觉动力学变化（例如碰撞力度不同）时，生成的音频往往缺乏相应的物理真实性，无法随物体动能变化而调制声音属性。
 
@@ -58,7 +58,7 @@ PAVAS 提出将**物体级别的物理参数**——质量（时间不变）与�
 
 **局限与开放问题**：当前物理参数估计器依赖多个预训练模型且未与音频生成器联合优化，可能引入级联误差；仅建模质量与速度而未涵盖材料、弹性等属性，限制了声音合成的丰富性。未来方向包括设计更紧凑的物理注入适配器、端到端联合优化物理估计与音频生成，以及引入更丰富的物理因素（如显式材质建模）来进一步增强物理真实性。
 
-## 背景与动机
+
 
 ### 问题背景：从视觉到听觉的跨模态生成
 
@@ -86,7 +86,9 @@ PAVAS 提出将**物体级别的物理参数**——质量（时间不变）与�
 
 基于上述动机，本文提出**PAVAS（Physics-Aware Video-to-Audio Synthesis）**，一个物理感知的视频到音频合成框架。PAVAS由两个核心模块构成：**Physics Parameter Estimator（PPE）**负责从输入视频中提取物体级别的质量与速度参数；**Physics-Driven Audio Adapter（Phy-Adapter）**则通过一种残差式的∆-调制机制，将这些物理参数注入基于流匹配的扩散Transformer，从而引导生成过程产生物理一致的音频。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：从外观驱动到物理感知的范式跃迁
 
@@ -140,7 +142,7 @@ PAVAS处于**物理感知生成**与**多模态扩散模型**的交叉地带：
 
 PAVAS的贡献不在于提出全新的生成架构，而在于**识别并填补了V2A领域的关键缺失维度——物理一致性**，并通过可插拔的Phy-Adapter设计使物理感知能力可集成到现有扩散骨干中。
 
-## 整体框架
+
 
 PAVAS 的整体管线由三个核心模块串联构成：**物理参数估计器（Physics Parameter Estimator, PPE）**、**物理驱动音频适配器（Physics-Driven Audio Adapter, Phy-Adapter）** 以及 **多模态潜在扩散骨干网络（Multimodal Latent Diffusion Backbone）**。给定一段输入视频，系统首先通过 PPE 从中提取物体级别的质量与速度，随后 Phy-Adapter 将这些物理参数编码并注入到扩散 Transformer 中，最终在流匹配框架下生成与视觉动力学物理一致的音频。
 
@@ -168,7 +170,7 @@ PAVAS 的整体管线由三个核心模块串联构成：**物理参数估计器
 ![[assets/figures/papers/paper_list_l2072_https_openaccess_thecvf_com_content_CVPR2026_html_Hyun_Bin_PAVAS_Physics/figures/002_Figure_2.jpg]]
 *Figure 2: Overall pipeline of the proposed Physics-Aware Video-to-Audio Synthesis (PAVAS). Given an input video, the Physics Parameter Estimator (PPE) extracts object-level mass and velocity. These physics cues are encoded by the Physics-Driven Audio Adapter (Phy-Adapter) and injected into the latent diffusion model alongside multimodal conditions*
 
-## 核心模块与公式推导
+
 
 PAVAS 基于条件流匹配的潜在扩散架构，由三个核心模块构成：**Physics Parameter Estimator (PPE)**、**Physics-Driven Audio Adapter (Phy-Adapter)** 和 **Multimodal Latent Diffusion Backbone**。其中 PPE 负责从视频中提取物体级物理参数，Phy-Adapter 负责将这些物理信号注入扩散模型，Backbone 则完成最终的条件音频生成。
 
@@ -226,7 +228,9 @@ $$
 
 其中 $\omega(\mathbf{c}_{\mathrm{multi}})$ 为基于多模态条件（视频 CLIP 特征、Synchformer 同步特征、文本嵌入、时间步嵌入）的标准 AdaLN 输出，$g_m$ 和 $g_v$ 为零初始化的残差混合器，$\alpha_m$ 和 $\alpha_v$ 为可学习的缩放因子。零初始化确保训练初期物理信号不干扰已收敛的多模态条件，随后逐步学习物理相关的调制残差。消融实验证实该残差策略显著优于直接求和（Table 3-C）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 定量评估：物理一致性指标 APCC-∆
 
@@ -277,7 +281,9 @@ Figure 3 展示了生成频谱图的定性对比。绿色虚线标记与视觉�
 2. **物理属性覆盖有限**：当前仅显式建模质量与速度，未涵盖材料硬度、弹性模量等属性。例如，橡胶球与铁球撞击地面的声音差异无法通过现有物理参数区分。
 3. **多物体复杂交互**：在多个物体同时发生物理交互的场景中，物体级特征的独立调制可能导致声音混合不自然，需进一步验证。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有V2A方法的关系
 
@@ -328,6 +334,8 @@ PAVAS的物理感知能力建立在对质量与速度的显式估计之上，这
 - **物理一致性的形式化度量**：APCC-∆虽能反映生成音频与物理动力学的耦合程度，但其计算依赖真实音频的动能曲线作为参考。能否设计无参考的物理一致性评估指标，使其更适用于开放域视频？
 
 需要指出的是，上述局限和开放问题主要基于论文自身讨论和方法设计的自然延伸推断。关于PPE各模块的具体误差传播量级、Phy-Adapter在不同硬件上的实际推理延迟等细节，论文未提供定量数据，需通过代码复现或联系作者进行手动验证。
+
+
 
 ## 原文 PDF
 

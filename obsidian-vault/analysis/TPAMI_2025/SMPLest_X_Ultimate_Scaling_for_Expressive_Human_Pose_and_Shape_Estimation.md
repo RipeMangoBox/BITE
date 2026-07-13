@@ -5,6 +5,8 @@ paper_level: A
 venue: TPAMI
 year: 2025
 pdf_ref: paperPDFs/TPAMI_2025/SMPLest_X_Ultimate_Scaling_for_Expressive_Human_Pose_and_Shape_Estimation.pdf
+project_link: https://sanweiliti.github.io/egobody/egobody.html
+code_link: https://github.com/wqyin/SMPLest-X
 aliases:
 - SX
 - SMPLest-X
@@ -41,7 +43,7 @@ claims:
 > - SynHand 上，全身 Procrustes-aligned 每顶点误差 (PA-PVE All) (mm) 21.7 (SMPLest-X-H40) vs 38.2 (Multi-HMR) (-16.5 mm (-43%))。
 > - AGORA test set 上，归一化平均顶点误差 NMVE All 96.2 (SMPLest-X-H40t) vs （此前最佳未知，但显著优于其他SOTA） (N/A)。
 
-## 概述
+## 概要
 
 SMPLest-X 旨在解决**表现力丰富的人体姿态与体型估计**（EHPS）中长期存在的跨场景泛化瓶颈。现有方法通常依赖单一或少量数据集训练，导致在未见过的场景——尤其是手部姿态估计——上性能显著下降。例如，在 AGORA 数据集上训练的最佳模型，在 EHF 上仅排第 30 名（Table 1），揭示了不同数据集之间存在严重的领域鸿沟。
 
@@ -51,7 +53,7 @@ SMPLest-X 旨在解决**表现力丰富的人体姿态与体型估计**（EHPS�
 
 **方法定位**：SMPLest-X 属于单阶段 EHPS 方法谱系，继承自 OSX（首个基于 ViT 的单阶段框架），与 AiOS、Multi-HMR 等同期方法共享“集成检测与参数回归”的设计理念，但通过极简架构和大规模多源数据训练，实现了从专用模型向通用基础模型的范式转变。
 
-## 背景与动机
+
 
 表现力丰富的人体姿态与体型估计（Expressive Human Pose and Shape Estimation, EHPS）旨在从单张图像中恢复人体的三维姿态、手部动作、面部表情及体型参数。该任务以参数化人体模型 **SMPL-X** 为基础，需估计姿态参数 $\theta \in \mathbb{R}^{55 \times 3}$（涵盖身体、手部、眼球及下颌共 55 个关节的旋转）、体型参数 $\beta \in \mathbb{R}^{10}$ 以及表情参数 $\psi \in \mathbb{R}^{10}$。通过关节回归器与运动树变换 $R_{\theta}(\mathcal{J}(\beta))$，可从这些参数计算出三维关键点位置。
 
@@ -74,7 +76,9 @@ SMPLest-X 旨在解决**表现力丰富的人体姿态与体型估计**（EHPS�
 
 初步实验（Fig. 1）已表明该方向的潜力：通过数据与模型缩放，全身平均主误差（MPE）可从 110 mm 以上降至 60 mm 以下，手部主误差从 62 mm 以上降至 31 mm。然而，当训练实例达到 10M 后，性能提升出现边际收益递减，暗示纯缩放路径存在饱和点，这也构成了本文后续探索的边界条件。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SMPLest-X 的核心创新在于将“极简架构”与“终极缩放”相结合，以极低的架构复杂度实现了表现力人体姿态与体型估计（EHPS）的性能跃升。其关键创新点可归纳为两个**changed slots**：
 
@@ -104,7 +108,7 @@ SMPLest-X 的核心创新在于将“极简架构”与“终极缩放”相结�
 
 > **注意**：训练实例从 7.5M 增至 10M 后，性能提升趋于饱和（Section 5.3, confidence 0.9），表明纯数据缩放的边际收益递减。如何突破这一饱和点，是未来的开放问题。
 
-## 整体框架
+
 
 SMPLest‑X 的整体流程遵循**单阶段端到端范式**：输入为单张 RGB 图像，输出为 SMPL‑X 参数化人体模型的全部参数（姿态 $\theta \in \mathbb{R}^{55 \times 3}$、形状 $\beta \in \mathbb{R}^{10}$、表情 $\psi \in \mathbb{R}^{10}$），无需独立的检测、裁剪或分部件后处理阶段。这与 **OSX**（首个基于 ViT 的单阶段框架）、**AiOS** 和 **Multi‑HMR** 等近期单阶段方法共享“定位与参数估计一体化”的设计哲学，但其架构被进一步精简至极简形态。
 
@@ -139,7 +143,7 @@ SMPLest‑X 的整体流程遵循**单阶段端到端范式**：输入为单张 
 
 移除组件引导模块的动机源于一个反直觉的发现：**显式分部件引导并非必需，甚至可能损害手部估计**。Table 5 显示，SMPLest‑X 的手部 PA‑MPE 比 SMPLer‑X 低 15%，手部 MPE 低 13%。这表明 Transformer 解码器在足够数据与模型容量的支撑下，能够通过自注意力机制隐式地学会关注手部等局部区域，而无需架构层面的硬性引导。Fig. 8 的注意力图进一步证实了这一机制：扩展的 Token 会自动聚焦于图像中对应的身体部件区域。
 
-## 核心模块与公式推导
+
 
 ### 人体参数化模型
 
@@ -200,7 +204,9 @@ SMPLest-X 的架构由三个核心模块串联构成，形成极简的端到端�
 
 这一极简设计带来了反直觉的收益：去除显式的部件引导后，手部估计的 PA-MPE 比 SMPLer-X 降低了 15%，手部 MPE 降低了 13%（Table 5），说明在充足数据与模型容量的支撑下，Transformer 解码器的隐式注意力机制足以替代手工设计的部件引导模块。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 6.1 核心发现：数据与模型缩放的缩放律
 
@@ -290,7 +296,9 @@ Fig. 6 展示了 SMPLest-X 在遮挡（上排）、物体交互（中排）和�
 ![[assets/figures/papers/paper_list_l1650_SMPLest_X_Ultimate_Scaling_for_Expressive_Human_Pose_and_Shape_Estimatio/figures/020_Table_13.jpg]]
 *Table 13: Impact of in-domain training. We investigate the impact of seeing the train split of a benchmark dataset during training and how this may affect the generalizability of a model. The highlighted yellow shaded numbers denote that the corresponding train split is used in training. Except for 3DPW using MPJPE as the metric, other datasets are evaluated via PVE. The lower the better for all the metrics. Top-1 values are bolded, and the second best values are underlined. EgoBody: EgoBody-EgoSet. AGORA: AGORA-Val. #Row: Row number. #Data.: number of datasets. #Seen: number of evaluation benchmarks’ train splits used in the training. #Inst.: number of training instances. Unit: mm*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 方法谱系：从多阶段到单阶段极简架构
 
@@ -331,6 +339,8 @@ SMPLer-X 在单阶段框架中保留了**组件引导模块**（Component Guidin
 4. **泛化极限探索**：所训练的通用基础模型在未见过的自然环境（极端光照、非常规视角、非人类运动模式）下的泛化极限如何？当前 EHF 的域外测试（Table 8）提供了初步证据，但更系统的分布外泛化评估仍有待开展。
 
 5. **下游任务迁移**：该基础模型学习到的全身表征能否无缝迁移到其他人体相关下游任务（如动作识别、手势生成、人-物交互检测）？这一方向尚未在本文中探索。
+
+
 
 ## 原文 PDF
 

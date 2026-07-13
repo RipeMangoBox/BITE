@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2024
 pdf_ref: paperPDFs/CVPR_2024/Dynamic_LiDAR_Re_simulation_using_Compositional_Neural_Fields.pdf
+code_link: null
 project_link: https://shengyuh.github.io/dynfl/
 aliases:
 - DLRSUCNF
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | 基于组合神经场的动态LiDAR重仿真 |
 | 英文题名 | Dynamic LiDAR Re-simulation using Compositional Neural Fields |
 | 会议/期刊 | CVPR 2024 |
-| Links | [paper](https://arxiv.org/abs/2312.05247); [Project](https://shengyuh.github.io/dynfl); [Project](https://shengyuh.github.io/dynfl/) |
+| Links | [paper](https://arxiv.org/abs/2312.05247) · [Project](https://shengyuh.github.io/dynfl) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | DyNFL |
 | Dataset | Waymo Dynamic, TownClean (static), Waymo Dynamic NVS |
@@ -41,7 +42,7 @@ claims:
 > - TownClean (static) 上，MAE (cm) 为 26.7，对比 32.0 (NFL)，变化 -5.3。
 > - Waymo Dynamic NVS 上，MAE (cm) 为 72.9，对比 115.1 (UniSim)，变化 -42.2。
 
-## 概述
+## 概要
 
 自动驾驶系统的安全验证依赖大规模、高保真的传感器仿真。LiDAR作为核心感知传感器，其重仿真（re-simulation）需同时满足两个要求：**物理精确性**——准确复现主动传感器的双向透射率、射线丢弃等物理特性；**场景编辑灵活性**——支持物体移除、插入与轨迹操控，以构建丰富的corner case。
 
@@ -58,8 +59,6 @@ claims:
 **方法定位**：DyNFL属于基于神经场的LiDAR重仿真方法，在技术谱系上位于静态物理精确方法（NFL）与动态神经仿真方法（UniSim）的交汇点——它保留了前者的物理精确性，同时获得了后者的动态编辑能力。其静态-动态分解与组合渲染策略为后续工作（如4D神经场、端到端分解）提供了可扩展的框架。
 
 **局限与展望**：DyNFL依赖预先追踪的边界框，对框精度敏感；合成未见视角的移动车辆仍需学习先验来补全缺失信息；训练（7–16小时）与推理（每帧2–7秒）速度尚无法满足在线闭环仿真需求。这些方向——摆脱边界框依赖、扩展到4D表示、提升推理效率——构成了未来工作的关键挑战。
-
-## 背景与动机
 
 ### 动态LiDAR重仿真的核心瓶颈
 
@@ -91,7 +90,7 @@ claims:
 
 这一思路的关键在于**解耦**——将“物理精确渲染”交给各个独立神经场，将“动态组合”交给后处理阶段的射线级融合策略，从而绕过了单一场表示的内在矛盾。
 
-## 核心创新
+## 核心方法与创新机理
 
 DyNFL 的核心创新在于通过**组合神经场（Compositional Neural Fields）** 与**射线丢弃测试（Ray Drop Test）** ，首次在动态场景 LiDAR 重仿真中同时实现了高保真度与灵活的场景编辑能力。其关键突破可归纳为三个相互耦合的“changed slots”：
 
@@ -123,8 +122,6 @@ $$\tilde{\alpha}_{\zeta_j} = \max\left(\frac{\Phi_s(f(\zeta_j))^2 - \Phi_s(f(\ze
 
 上述三个 changed slots 形成了完整的因果链：**场景分解**提供了编辑灵活性的基础，**SDF 渲染**保证了静态几何的物理精确度，而**二阶段组合渲染**则解决了多场融合时的遮挡与保真度难题。这一组合使得 DyNFL 在动态场景重仿真中首次同时超越了静态物理仿真方法（NFL）和动态神经仿真方法（UniSim），并解锁了物体级场景编辑能力。
 
-## 整体框架
-
 ![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2312_05247/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of DyNFL. Our method takes LiDAR scans and tracked bounding boxes of dynamic vehicles as input. DyNFL first decomposes the scene into a static background and N dynamic vehicles, each modelled using a dedicated neural field. These neural fields are then composed to re-simulate LiDAR scans in dynamic scenes. Our composition technique supports various scene edits, including altering object trajectories, removing and adding reconstructed neural assets between scenes*
 
@@ -146,8 +143,6 @@ $$P = \sum_{j=1}^{N} \mathcal{T}_{\zeta_j}^2 \tilde{\alpha}_{\zeta_j} \rho_{\zet
 **损失优化。** 训练采用加权多任务损失：
 $$\mathcal{L} = w_{\zeta} \mathcal{L}_{\zeta} + w_{s} \mathcal{L}_{s} + w_{\mathrm{eik}} \mathcal{L}_{\mathrm{eik}} + w_{e} \mathcal{L}_{e} + w_{\mathrm{drop}} \mathcal{L}_{\mathrm{drop}}$$
 其中 $\mathcal{L}_{\zeta}$ 为距离 L1 损失，$\mathcal{L}_{s}$ 强制表面点 SDF 值趋近于零以改善平面区域几何，$\mathcal{L}_{\mathrm{eik}}$ 为 Eikonal 正则项，$\mathcal{L}_{e}$ 为强度 L2 损失，$\mathcal{L}_{\mathrm{drop}}$ 结合二元交叉熵与 Lovász 损失监督射线丢弃。这一组合损失同时约束了几何精度、物理一致性和感知质量。
-
-## 核心模块与公式推导
 
 ### 场景分解与规范空间对齐
 
@@ -210,7 +205,7 @@ $$\mathcal{L} = w_{\zeta} \mathcal{L}_{\zeta} + w_{s} \mathcal{L}_{s} + w_{\math
 - **强度损失** $\mathcal{L}_{e}$：L2 强度监督。
 - **射线丢弃损失** $\mathcal{L}_{\mathrm{drop}} = \frac{1}{|\mathcal{R}|} \sum_{\mathbf{r} \in \mathcal{R}} \left( \mathcal{L}_{bce}(p_{d,est}, p_{d,gt}) + \mathcal{L}_{ls}(p_{d,est}, p_{d,gt}) \right)$：结合二元交叉熵与 Lovasz 损失，处理类别不平衡。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -227,18 +222,9 @@ DyNFL 在动态与静态场景的 LiDAR 新视角合成（NVS）任务上均取�
 ![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2312_05247/figures/019_Table_7.jpg]]
 *Table 7: Evaluation of LiDAR NVS on Waymo Dynamic NVS*
 
-![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2312_05247/figures/006_Figure_4.jpg]]
-*Figure 4: Qualitative results of range estimation. Regions with gross errors (-100 100 cm) are highlighted*
-
 ### 下游任务验证
 
 为评估重仿真点云的实际可用性，论文在 Waymo Dynamic 数据集上进行了目标检测和语义分割实验。目标检测结果（Table 5）显示，DyNFL 生成的点云在与真实扫描的检测一致性上优于 UniSim 和 LiDARsim，动态车辆检测的 Agg. Dyn. 指标提升明显。语义分割实验（Table 6）中，DyNFL 在静态类别 IoU 达到 81.1，动态类别 IoU 高达 97.3，表明重仿真的点云不仅几何准确，语义信息也高度保真。
-
-![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2312_05247/figures/007_Table_5.jpg]]
-*Table 5: Object detection results on Waymo Dyanmic datasets*
-
-![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2312_05247/figures/008_Table_6.jpg]]
-*Table 6: Semantic segmentation results on Waymo NVS dataset*
 
 ### 消融研究
 
@@ -250,9 +236,6 @@ DyNFL 在动态与静态场景的 LiDAR 新视角合成（NVS）任务上均取�
 *Table 3: Ablation study of volume rendering for active sensing*
 
 2. **表面点 SDF 正则化**（Table 4）：在 TownReal 数据集上，显式约束 LiDAR 表面点处 SDF 值趋近于零，使 MAE 降低 **3.3 cm**，改善了平面区域的几何重建质量。
-
-![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2312_05247/figures/010_Table_4.jpg]]
-*Table 4: Ablation study of the surface points’ SDF regularisation*
 
 3. **二阶段组合渲染与射线丢弃模块**（Section 6.3, Figure 5）：与 UniSim 的联合采样混合渲染相比，DyNFL 的独立渲染后按最近距离选择并融合射线丢弃测试的策略，使动态车辆的 MedAE **减半**。Figure 5 定性展示了射线丢弃模块有效处理了多场间的遮挡与透明表面问题。
 
@@ -269,12 +252,7 @@ DyNFL 在合成未见视角的移动车辆时存在困难，需要学习先验�
 ![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2312_05247/figures/022_Figure_13.jpg]]
 *Figure 13: Visualization of scene editing capabilities. We showcase 3 kinds of scene editing capabilities including vehicle removal(left), trajectory manipulation(middle) and vehicle insertion(right). The first row represents the original scenes, the second row demonstrates the scenes after editing. All points are color-coded by the intensity values(0 0.25)*
 
-![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2312_05247/figures/018_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2312_05247/figures/020_Table_8.jpg]]
-*Table 8: Results of future frame simulation*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 核心定位：动态场景的物理精确 LiDAR 神经重仿真
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: "SIGGRAPH Asia"
 year: 2024
 pdf_ref: paperPDFs/SIGGRAPH_ASIA_2024/Robot_Motion_Diffusion_Model_Motion_Generation_for_Robotic_Characters.pdf
+project_link: null
+code_link: null
 aliases:
 - RMDMR
 - RMDMMGRC
@@ -41,7 +43,7 @@ claims:
 > - Simulated Tracking 上，Root Rotation Tracking Error ↓ 为 2.34，对比 4.13 (MDM)，变化 -1.79。
 > - Simulated Tracking 上，Linear Velocity Tracking Error [m/s] ↓ 为 3.43，对比 4.90 (MDM)，变化 -1.47。
 
-## 概述
+## 概要
 
 现有运动学生成模型（如 **MDM**，Tevet et al., ICLR 2023）虽能产生视觉上吸引人的运动序列，但缺乏物理约束，导致生成的运动包含漂浮、脚底滑动、自碰撞、关节限位违反和动力失衡等瑕疵，无法直接部署于真实物理系统或机器人。核心瓶颈在于：生成的 kinematic 动作缺乏物理可行性，使得下游跟踪控制器无法准确执行。
 
@@ -55,7 +57,7 @@ claims:
 
 方法的局限性在于：Critic 仅提供软性可行性偏好，不包含硬物理约束，无法保证生成的运动绝对安全；数据集与角色高度特定，当文本提示严重超出角色能力时，Critic 可能缺乏有效信号。
 
-## 背景与动机
+
 
 ### 问题背景：运动学生成与物理执行之间的鸿沟
 
@@ -81,7 +83,9 @@ claims:
 
 基于这一洞察，本文提出训练一个**边缘化奖励代理（Critic）**，该网络仅基于运动学参考运动预测下游跟踪任务的预期累计回报。这个 Critic 充当了物理可行性的可微分替身，使得生成模型可以在微调阶段直接优化运动的“可执行性”，而无需频繁调用昂贵的物理仿真。最终，这一思路演化为**Robot Motion Diffusion Model（RobotMDM）**——一个文本条件的运动学扩散模型，与基于强化学习的跟踪控制器无缝衔接，能够生成既保持语义多样性又具备物理合理性的运动，并可直接部署于仿真与真实机器人系统。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 RobotMDM 的核心创新在于**将物理可行性偏好注入运动学扩散模型，而不牺牲其语义多样性与生成质量**。该方法并非重新设计生成架构，而是通过一个可微分、计算高效的奖励代理（Critic），在微调阶段将下游跟踪控制器的物理理解“蒸馏”进预训练的运动扩散模型。
 
@@ -143,7 +147,7 @@ RobotMDM 处于**运动学运动生成**与**物理角色控制**的交叉点，
 - Critic 的训练依赖于预训练的 Actor 策略。若 Actor 本身泛化能力有限，Critic 的指导信号将受限于该策略的能力边界，难以推广至全新运动模式。
 - 数据集与角色高度特定：当文本提示严重超出角色能力范围时，Critic 可能缺乏有效信号，此时物理对齐的效果需要手动验证。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l50_https_doi_org_10_1145_3680528_3687626/figures/001_Figure_1.jpg]]
 *Figure 1: Robot Motion Diffusion Model (RobotMDM) generates motions that are physics-aware and respect character limits. Our method enables the seamless integration of kinematic motion generators with physics-based character control and can be deployed on robots. The example shows a robot performing the prompt "a person who performed a right-handed uppercut."*
@@ -174,7 +178,7 @@ RobotMDM 的整体流程围绕三个核心模块展开，形成“评价—对�
 - **中间表示**：运动序列编码为 $n \times (7+2j)$ 矩阵，包含根部位高度、线速度、角速度、根姿态及各关节的位置与速度信息。
 - **输出**：物理可行的运动学参考运动，可直接馈入 Actor 生成关节扭矩等物理动作，部署于仿真或真实机器人平台。
 
-## 核心模块与公式推导
+
 
 RobotMDM 的核心架构由三个解耦模块构成，通过两阶段训练将物理可行性注入运动学扩散模型。
 
@@ -232,7 +236,9 @@ $$\mathcal{L}_{RobotMDM} = \mathcal{L}_{MDM} - \beta \sum_{t=0}^{|M|} v^{\theta}
 
 部署时将微调后的 RobotMDM 与 Actor 串联：RobotMDM 根据文本提示生成运动参考序列，Actor 逐帧跟踪该参考并输出物理动作，直接在仿真或真实机器人上执行。整个流程无需在线优化或物理投影。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 运动学生成质量与物理可行性
 
@@ -289,7 +295,9 @@ $$\mathcal{L}_{RobotMDM} = \mathcal{L}_{MDM} - \beta \sum_{t=0}^{|M|} v^{\theta}
 ![[assets/figures/papers/paper_list_l50_https_doi_org_10_1145_3680528_3687626/figures/003_Table_1.jpg]]
 *Table 1: Training Parameters*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 方法在谱系中的位置
 
@@ -323,6 +331,8 @@ RobotMDM 处于**运动学生成模型**与**物理角色控制**的交汇地带
 - **联合训练范式**：当前 Critic 与生成模型分阶段训练，Actor 保持冻结。能否设计联合优化框架，使 Critic 和生成模型协同进化，突破固定 Actor 带来的上限？
 - **动力学自适应**：当角色动力学参数（质量、摩擦系数等）发生变化时，Critic 需要多快重新适应？是否可能训练一个以动力学参数为条件的 Critic，实现跨角色的零样本迁移？
 - **可扩展性**：该方法在更复杂的形态（如四足机器人、带手爪的移动操作平台）或更大规模运动数据集上的表现尚待验证。Critic 的边缘化假设在更高维运动空间中是否仍然有效，值得进一步研究。
+
+
 
 ## 原文 PDF
 

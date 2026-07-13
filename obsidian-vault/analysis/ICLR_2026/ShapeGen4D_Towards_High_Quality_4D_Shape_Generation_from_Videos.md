@@ -41,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - Held-out Objaverse test set 上，Chamfer↓ 0.1220 vs 0.1356 (Step1X-3D) (-0.0136)；IoU↑ 0.3276 vs 0.3033 (Step1X-3D) (+0.0243)；F-Score↑ 0.2934 vs 0.2617 (Step1X-3D) (+0.0317)。
 
-## 概述
+## 概要
 
 从单目视频中重建动态三维物体是计算机视觉的核心挑战之一。现有4D生成方法面临三重瓶颈：基于分数蒸馏采样（SDS）的优化过程脆弱且耗时；多视图重建方法在多阶段流水线中累积误差，难以保持时空一致性；基于变形场的方法则严重依赖4D训练数据，泛化能力弱，且无法处理拓扑变化——如物体融合、撕裂或生长。这些方法往往将预训练的3D生成模型视为黑盒，未能充分利用其蕴含的强泛化先验。
 
@@ -53,7 +53,7 @@ claims:
 
 本报告后续章节将依次展开相关工作定位、方法细节、实验分析、消融研究以及局限与展望，为读者提供从问题动机到技术实现的完整图景。
 
-## 背景与动机
+
 
 ### 问题背景：从视频生成4D内容的需求
 
@@ -86,7 +86,9 @@ claims:
 2. **拓扑变化**：摆脱变形场的连续性约束，使模型能原生处理融合、撕裂等离散结构变化；
 3. **泛化能力**：充分利用大规模3D预训练先验，降低对4D训练数据的依赖。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ShapeGen4D 的核心创新在于**将动态网格序列生成重新定义为帧间条件依赖的3D生成问题**，并通过对预训练3D生成模型的架构微调实现这一范式转换。区别于现有4D生成方法的优化脆弱性（SDS）、多阶段累计误差（多视图重建）或对变形网络的依赖，该方法直接继承大规模3D预训练模型的强泛化能力，隐式学习复杂运动模式，从而原生支持拓扑变化（如物体融合、撕裂、生长等，见 Figure 7）。
 
@@ -114,7 +116,7 @@ ShapeGen4D 的核心创新在于**将动态网格序列生成重新定义为帧�
 
 ShapeGen4D 通过微调而非黑盒扩展的方式，使扩散模型隐式学习运动模式，无需显式变形建模即可处理拓扑变化（Figure 7）。在 Objaverse 测试集上，基于 Step1X-3D 的 ShapeGen4D 相比基座模型 Chamfer 距离降低 10%（0.1356 → 0.1220），IoU 和 F-Score 分别提升 8% 和 12%（Table 1）。
 
-## 整体框架
+
 
 ShapeGen4D 提出了一种端到端的视频到4D形状生成框架，其核心思想是将动态网格序列的生成视为帧间条件依赖的3D生成问题。该方法并非在预训练3D模型之上外挂独立的变形网络，而是直接微调3D生成模型的内部架构，使其原生支持时间维度的建模。
 
@@ -148,7 +150,7 @@ ShapeGen4D 提出了一种端到端的视频到4D形状生成框架，其核心�
 ![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_r9AJisFLLo/figures/001_Figure_1.jpg]]
 *Figure 1: ShapeGen4D generates high-quality mesh sequences from input monocular videos*
 
-## 核心模块与公式推导
+
 
 ShapeGen4D 的核心架构由三个紧密耦合的模块组成，共同实现从单目视频到动态网格序列的端到端生成。
 
@@ -187,7 +189,9 @@ $$\mathcal{Q}_t = w_t(\mathcal{Q}_1)$$
 ![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_r9AJisFLLo/figures/004_Figure_4.jpg]]
 *Figure 4: Qualitative comparison of noise sharing. The base 3D model generates object shapes in arbitrary orientations agnostic to the input image viewpoint, often causing pose changes across a sequence (e.g. the hippo in the first row). We observe that sharing noise across frames reduces flickering and further improves shape quality in challenging cases such as the flag example*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -242,7 +246,9 @@ ShapeGen4D 在 Objaverse 留出测试集上进行了几何质量评估，并与�
 
 ![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_r9AJisFLLo/figures/012_Figure.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有4D生成方法的对比与继承
 
@@ -289,6 +295,8 @@ ShapeGen4D 的方法论核心在于“继承3D先验，扩展时空维度”。�
 - **时空3D VAE的可能性**：当前的时间一致性主要通过扩散模型中的时空注意力和噪声共享实现，VAE编解码阶段仍以逐帧处理为主。是否可以使用真正的时空3D VAE直接减少局部时间抖动，是一个值得研究的方向。
 
 - **真实视频的鲁棒性**：当前框架在Objaverse合成数据上验证，对真实户外视频（含复杂背景、动态光照、遮挡）的鲁棒性尚未系统评估。将方法迁移到真实场景可能需要改进条件编码模块或引入额外的鲁棒性训练策略。
+
+
 
 ## 原文 PDF
 

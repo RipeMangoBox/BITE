@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/DPad_Efficient_Diffusion_Language_Models_with_Suffix_Dropout.pdf
+project_link: null
+code_link: https://github.com/Crys-Chen/DPad.git
 openreview_forum_id: 0yOsSMU1eY
 aliases:
 - DPad
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | DPad：高效扩散语言模型的后缀丢弃方法 |
 | 英文题名 | DPad: Efficient Diffusion Language Models with Suffix Dropout |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=0yOsSMU1eY); [GitHub](https://github.com/Crys-Chen/DPad.git) |
+| Links | [paper](https://openreview.net/forum?id=0yOsSMU1eY) · [GitHub](https://github.com/Crys-Chen/DPad.git) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/diffusion_image_video |
 | Method | DPad |
 | Dataset | GSM8K (4-shot, LLaDA-Instruct), GSM8K (1024 tokens, 1-shot, LLaDA-1.5), HumanEval (0-shot |
@@ -41,13 +43,13 @@ claims:
 > - GSM8K (4-shot, LLaDA-Instruct) 上，Strict Match Accuracy 为 63.84，对比 37.38，变化 +26.46%。
 > - GSM8K (1024 tokens, 1-shot, LLaDA-1.5) 上，Speedup (整体) 为 61.39×，对比 1.00× (Vanilla)，变化 61.39x 加速。
 
-## 概述
+## 概要
 
 块式扩散语言模型（dLLM）在推断时面临一个关键瓶颈：每一步需对所有未来后缀 token 进行注意力计算并预测，但最终仅保留其中一小部分，导致大量冗余计算。DPad 针对这一问题，提出了**无需训练的推断加速策略**，核心发现是后缀 token 实质上充当了一个无语义的“信息暂存器”（Scratchpad），且大部分远距离后缀 token 是冗余的——这一发现被概括为**扩散彩票假设**（Diffusion Lottery Tickets, DLT），即仅需保留少量“中奖”后缀 token 即可维持生成质量。
 
 DPad 通过两个正交机制实现稀疏化：**滑动窗口**限定参与注意的后缀 token 数量，**距离衰减丢弃**在注意力计算前根据高斯采样概率移除远距离 token，从而避免计算其注意力分数。该方法可与并行解码、前缀缓存等现有优化方案叠加使用，在 LLaDA-1.5 上实现最高 **61.4 倍**的整体加速，同时保持可比精度。在短序列场景下，DPad 亦能带来约 1.5 倍的延迟改善，并因促使模型生成更精炼的回答而提升严格匹配（Strict Match）准确率。
 
-## 背景与动机
+
 
 ### 块式扩散语言模型的推断瓶颈
 
@@ -72,7 +74,9 @@ DPad 通过两个正交机制实现稀疏化：**滑动窗口**限定参与注�
 
 DPad 正是在这一动机下设计的：通过**滑动窗口**限制后缀注意力的最大范围，结合**距离衰减丢弃**策略在注意力计算前移除远距离 token，将后缀计算从二次复杂度向线性复杂度压缩，实现训练无关（training-free）的高效推断。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈发现：后缀 token 的冗余计算
 
@@ -108,7 +112,7 @@ $$P(d) = a \cdot \frac{1}{\sigma\sqrt{2\pi}} \exp\left[-\frac{1}{2}\left(\frac{\
 
 DPad 属于训练无关的推断期稀疏化方法，与基于注意力分数的事后剪枝方法（如 **Sparse‑dLLM**, Song et al., 2025a）形成对比：后者需先计算完整注意力再剪枝，而 DPad 在注意力计算前即完成丢弃，从根本上降低了计算量。在极长序列生成（4096 tokens）场景下，DPad 相对 Sparse‑dLLM 实现 **39.64×** 的延迟加速，且保持相当精度。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l34_https_openreview_net_forum_id_0yOsSMU1eY/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of (a) autoregressive LLMs, (b) block-wise diffusion LLMs, and (c) our DPad. DPad restricts suffix attention via: (i) Sliding Window: fixed-length suffix window; (ii) Distance-decay Dropout: removes distant suffix tokens without computing attention scores*
@@ -148,7 +152,7 @@ DPad 的完整 pipeline 由四个功能模块串联而成，按执行顺序依�
 
 整个流程无需修改模型权重或训练目标，可即插即用地部署到任意已有的 dLLM 推断框架中，并与并行解码、前缀缓存等正交优化技术叠加使用。
 
-## 核心模块与公式推导
+
 
 ### 问题瓶颈与设计动机
 
@@ -201,7 +205,9 @@ DPad 在检测到 `<eos>` token 后立即停止生成，避免固定长度生成
 
 **局部熵衰减**（Figure 6）：后缀 token 的局部熵随距离快速衰减并趋近于零，从信息论角度证实远距离后缀 token 几乎不携带有效信息，进一步验证了距离衰减丢弃策略的合理性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制验证
 
@@ -298,7 +304,9 @@ Table 10 的对比结果具有决定性：**随机距离衰减丢弃（DPad）**
 ![[assets/figures/papers/paper_list_l34_https_openreview_net_forum_id_0yOsSMU1eY/figures/037_Table_9.jpg]]
 *Table 9: The hyperparameters for Gaussian Sampler used in main experiments in Sec. 4.2*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法在扩散语言模型谱系中的位置
 
@@ -357,6 +365,8 @@ DPad 的核心优势在于**前置剪枝**：Sparse-dLLM 仍需为所有后缀 t
 3. **Dream 模型精度波动根因。** 为什么 Dream 在 DPad 下出现部分任务的精度波动（如 2048-token HumanEval 精度下降 7.32%）？这是否与 Dream 的自回归预训练基础导致的注意力模式差异有关？
 
 4. **评价指标改进。** 如何设计新的效率指标，以更好地奖励生成精炼和提前终止带来的实际效率提升，而非仅关注原始 TPS？
+
+
 
 ## 原文 PDF
 

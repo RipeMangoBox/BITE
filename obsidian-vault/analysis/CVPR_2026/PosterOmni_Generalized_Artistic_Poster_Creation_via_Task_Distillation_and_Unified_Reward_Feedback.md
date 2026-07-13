@@ -40,7 +40,7 @@ claims:
 > [!tip] 效果简介
 > - PosterOmni-Bench-en 上，Overall Score 4.37 vs Qwen-Image-Edit: 3.51 (+0.86)；Layout-driven Score 4.20 vs Qwen-Image-Edit: 3.44 (+0.76)；Style-driven Score 4.31 vs Qwen-Image-Edit: 2.91 (+1.40)。
 
-## 概述
+## 概要
 
 **PosterOmni** 面向图像到海报（image-to-poster）的广义创作任务，将局部编辑（如实体保留、区域填充、空间一致性）与全局创作（如布局、风格、美学和谐）统一到单一框架中。现有开源图像编辑模型难以同时兼顾这两类能力：局部编辑精度不足会导致布局错位与文本失真，而全局创作理解缺失则使海报缺乏整体美学质量。PosterOmni 的核心思路是将海报生成显式建模为局部与全局两个互补子空间，通过 **任务蒸馏（Task Distillation）** 将专家知识整合到统一模型中，并引入 **统一奖励反馈（Unified PosterOmni Reward Feedback）** 驱动的强化学习，同时注入美学偏好与任务精度信号，实现精细化编辑与全局美学对齐的协同优化。
 
@@ -48,7 +48,7 @@ claims:
 
 在 PosterOmni-Bench 上，PosterOmni 的总体得分达到 **4.37**，较基线模型 Qwen-Image-Edit（3.51）提升 **+0.86**；在布局驱动任务上领先 **+0.76**，在风格驱动任务上领先 **+1.40**，在所有开源基线中取得最优，并在人类偏好研究中与商业系统 Seedream-4.0 表现持平。该方法在方法谱系上属于**任务蒸馏 + 统一奖励强化学习**的扩散模型对齐范式，为多任务图像编辑与生成提供了一条可复现的整合路径。
 
-## 背景与动机
+
 
 ### 图像到海报生成的双重困境
 
@@ -76,7 +76,9 @@ claims:
 
 通过这一数据–蒸馏–奖励流水线，PosterOmni 旨在成为首个统一局部编辑与全局创作的开源图像到海报生成系统，在参考一致性、全局构图质量和美学和谐性上全面超越现有开源基线，并与商业系统形成竞争力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PosterOmni 的核心创新并非提出全新的生成架构，而是在现有流匹配（Flow Matching）图像编辑基座之上，通过**任务蒸馏（Task Distillation）**与**统一奖励反馈（Unified Reward Feedback）**两个关键机制，系统性地解决了“局部编辑精度”与“全局创作美学”难以在同一模型中兼得的瓶颈。其创新点可凝练为三个相互耦合的 changed slots：
 
@@ -110,7 +112,7 @@ PosterOmni 提出了**统一 PosterOmni 奖励模型 $R_{\text{omni}}$**，其�
 
 **综上**，PosterOmni 的创新本质是**任务分解-蒸馏整合-统一奖励对齐**的三阶段协同：任务蒸馏解决了多任务能力融合中的干扰问题，统一奖励模型提供了覆盖精度与美学的细粒度反馈，Omni-Edit RL 则将该反馈高效地注入生成过程。三者共同构成了从数据到模型的对齐闭环。
 
-## 整体框架
+
 
 PosterOmni 构建了一个**数据–蒸馏–奖励**三阶段闭环，将图像到海报的生成统一为局部编辑与全局创作的协同优化问题。整个框架围绕一个核心洞察展开：海报生成任务天然存在两个互补的子空间——局部编辑（实体保留、空间一致性）和全局创作（布局、风格、美学和谐），现有开源模型难以同时兼顾二者，导致布局错位、文本失真和美学质量下降。PosterOmni 通过显式分解任务、专家知识蒸馏和统一奖励反馈，将这两类能力整合到一个统一模型中。
 
@@ -162,7 +164,7 @@ PosterOmni 构建了一个**数据–蒸馏–奖励**三阶段闭环，将图�
 ![[assets/figures/papers/paper_list_l2290_https_arxiv_org_abs_2602_12127/figures/010_Figure_6.jpg]]
 *Figure 6: Examples from our PosterOmni-data ( PosterOmni-200K and PosterOmni-Bench). For each of the six core image-to-poster tasks—style-driven generation, layout-driven generation, ID-driven generation, extending, rescaling, and filling—we show the reference image(s) together with the corresponding image-to-poster prompts in both English and Chinese. The examples illustrate diverse commercial scenarios, layouts, and visual styles, as well as the explicit task-specific instructions*
 
-## 核心模块与公式推导
+
 
 PosterOmni 的训练流程由四个关键模块串联构成（Figure 4），其核心思想是将图像到海报生成任务显式分解为局部编辑与全局创作两个子空间，通过任务蒸馏（Task Distillation）和统一奖励反馈（Unified Reward Feedback）驱动强化学习，将两类能力整合到一个统一模型中。
 
@@ -220,7 +222,9 @@ $\beta$ 控制更新强度：当奖励为正时，模型向当前策略方向更
 ![[assets/figures/papers/paper_list_l2290_https_arxiv_org_abs_2602_12127/figures/012_Figure_8.jpg]]
 *Figure 8: Examples of preference pairs for PosterOmni Reward Training. For several representative style-driven and layout-driven cases, we show the reference image together with the rejected and chosen candidates produced by PosterOmni-SFT, as well as the corresponding image-to-poster prompts in English and Chinese. Each triplet (reference, rejected, chosen) constitutes a concrete example of the preference pairs used to train the unified reward model Romni*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 PosterOmni 的实验体系围绕自建基准 PosterOmni-Bench 展开，通过自动评估与人类偏好研究双重验证，系统性地回答了三个核心问题：统一模型能否同时胜任局部编辑与全局创作、任务蒸馏是否优于其他专家集成策略、以及统一奖励反馈能否带来进一步的性能增益。
 
@@ -269,7 +273,9 @@ Omni-Edit RL 基于 DiffusionNFT 框架（Eq. 17-18），其核心机制是将�
 ![[assets/figures/papers/paper_list_l2290_https_arxiv_org_abs_2602_12127/figures/006_Figure_5.jpg]]
 *Figure 5: Visual comparison of different model outputs. Red boxes highlight errors and distorted entities, while yellow boxes indicate incorrect or missing text elements. Compared to other methods, our method is able to accomplish all image-generated poster tasks more effectively, while also achieving excellent aesthetic quality*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位：从单任务编辑到统一图像到海报生成
 
@@ -310,6 +316,8 @@ PosterOmni 的核心贡献在于**将这两个子空间显式建模为互补任�
 4. **奖励模型的鲁棒性。** $R_{\mathrm{omni}}$ 的训练依赖 Gemini-2.5-Pro 过滤和人工标注构建偏好对，这一过程是否引入了标注者的文化偏见（如对特定美学风格的偏好）？跨文化场景下的公平性需要进一步验证。
 
 5. **效率优化。** 四阶段训练流程的计算开销是否可以通过联合优化（如端到端可微蒸馏 + RL）或模型剪枝来降低？这在工业部署场景下尤为重要。
+
+
 
 ## 原文 PDF
 

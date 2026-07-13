@@ -43,7 +43,7 @@ claims:
 > - PROX (human motion generation) 上，plausible rate (%) 41.76 (SceneDiffuser w/ start) vs 16.24 (cVAE w/ start) (+25.52)。
 > - MultiDex (dexterous grasp) 上，success rate (%) 71.25 (SceneDiffuser w/o opt) vs 14.06 (cVAE) (+57.19)。
 
-## 概述
+## 概要
 
 SceneDiffuser 是一个基于扩散模型的条件生成框架，旨在统一解决三维场景中的条件生成、物理优化与目标导向规划问题。先前基于条件变分自编码器（cVAE）的场景条件生成模型普遍存在后验崩塌，导致生成多样性严重不足；同时，生成、优化与规划模块长期分离，造成不同阶段输出不一致，难以泛化到新场景。SceneDiffuser 以“规划即采样”为核心理念，将扩散模型的逐步去噪过程与物理优化及规划目标的梯度引导相结合，在采样过程中逐步注入碰撞、接触、平滑度等物理约束以及目标到达条件，从而在保持生成多样性的同时强制输出物理合理且朝向目标的轨迹。
 
@@ -53,7 +53,7 @@ SceneDiffuser 是一个基于扩散模型的条件生成框架，旨在统一解
 
 > **注意**：本文未标注具体的发表年份和会议/期刊，上述结论均基于论文原文及分析结果，若需引用请核实正式出版信息。
 
-## 背景与动机
+
 
 三维场景理解与交互是计算机视觉和机器人学的核心问题，涉及人体姿态估计、动作生成、灵巧抓取、路径规划等一系列任务。这些任务共享一个共同需求：在给定三维场景的条件下，生成物理合理且目标导向的轨迹。然而，现有方法在处理这一需求时面临两个根本性瓶颈。
 
@@ -65,7 +65,9 @@ SceneDiffuser 是一个基于扩散模型的条件生成框架，旨在统一解
 
 SceneDiffuser旨在构建一个通用的场景条件生成、优化与规划模型，适用于人体姿态生成、人体动作生成、灵巧抓取生成、三维导航路径规划和机器人臂运动规划等多种任务（见 Figure 1），无需为每个任务设计独立的模块组合。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SceneDiffuser 的核心创新在于将**场景条件生成、物理优化与目标规划统一到一个条件扩散模型的引导采样框架**内，从而解决了此前方法中模块分离导致的不一致性和条件变分自编码器（cVAE）的后验崩塌问题。其关键 changed slots 体现在三个层面：
 
@@ -93,7 +95,7 @@ $$ p(\boldsymbol{\tau}^{0} | S, \mathcal{G}) \propto p_{\theta}(\boldsymbol{\tau
 
 这三个 changed slots 共同解决了分析中识别的核心瓶颈：**扩散模型的多样性优势**解决了 cVAE 的后验崩塌；**逐步物理引导**消除了生成-优化分离带来的不一致性；**规划即修复**将规划纳入同一采样框架，避免了独立规划器的泛化局限。三者协同使得 SceneDiffuser 成为一个**场景感知、物理合理且目标导向**的统一生成-优化-规划模型。
 
-## 整体框架
+
 
 SceneDiffuser 将场景条件生成、物理优化与目标规划统一在一个迭代引导采样框架中，其核心思路是“规划即采样”（planning as sampling）。整体 pipeline 由四个关键模块串联构成，输入为三维场景点云和可选的目标/起始位姿，输出为满足物理约束且朝向目标的轨迹序列。
 
@@ -137,7 +139,7 @@ $$\mathbf { g } = \nabla _ { \pmb { \tau } ^ { t } } \bigl ( \varphi _ { o } ( \
 ![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2301_06015/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of the SceneDiffuser, applicable to various scene-conditioned 3D tasks: (a) human pose generation, (b) human motion generation, (c) dexterous grasp generation, (d) path planning for 3D navigation with goals, and (e) motion planning for robot arms*
 
-## 核心模块与公式推导
+
 
 SceneDiffuser 的核心架构由四个功能模块构成，围绕条件扩散模型的逐步去噪过程组织，将场景条件生成、物理优化与目标规划统一在同一框架内。
 
@@ -176,7 +178,9 @@ $$p ( \pmb { \tau } ^ { 0 } | S , \mathcal { G } ) \propto p _ { \theta } ( \pmb
 ![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2301_06015/figures/002_Figure_2.jpg]]
 *Figure 2: Model architecture of the SceneDiffuser. We use cross-attention to learn the relation between the input trajectory and scene condition. The optimizer and planner serve as the guidance for physically-plausible and goal-oriented trajectories*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心结果概览
 
@@ -261,7 +265,9 @@ SceneDiffuser 的核心优势在于将物理优化与目标规划作为去噪过
 ![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2301_06015/figures/013_Table.jpg]]
 *Table: A1. Ablation on different scene encoder*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 从 cVAE 到扩散模型：后验崩塌的解法
 
@@ -310,6 +316,8 @@ SceneDiffuser 的适用边界受以下因素约束：
 - **动态场景与多智能体扩展。** SceneDiffuser 目前处理静态三维场景，如何扩展到包含移动障碍物、动态交互对象的场景，以及多智能体协同规划任务，是方法泛化的重要方向。
 
 - **自适应规划帧数。** 当前 inpainting 帧数需人工设定，能否通过学习或启发式策略实现自适应确定修复范围，使规划模块真正无需任务特定的超参数调优？
+
+
 
 ## 原文 PDF
 

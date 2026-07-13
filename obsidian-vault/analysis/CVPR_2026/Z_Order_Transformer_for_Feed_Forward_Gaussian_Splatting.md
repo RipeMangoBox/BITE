@@ -43,7 +43,7 @@ claims:
 > - RealEstate10K (360×640) — 12 views 上，PSNR / SSIM / LPIPS 28.56 / 0.901 / 0.110 vs AnySplat 26.94 / 0.892 / 0.122 (+1.62 / +0.009 / -0.012)。
 > - DL3DV (256×448) — 12 views 上，PSNR / SSIM / LPIPS 27.09 / 0.892 / 0.124 vs DepthSplat 25.74 / 0.844 / 0.131 (+1.35 / +0.048 / -0.007)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -70,7 +70,7 @@ Z-Order Transformer处于前馈式3D高斯泼溅的方法谱系中，其前置�
 
 本方法通过Z-order序列化与稀疏注意力，首次在不依赖密集体素网格的前提下，实现了空间自适应的图元压缩与上下文聚合，填补了“保持细节”与“压缩图元”之间的空白。其Z-order表示与分组-选择注意力机制为后续前馈3D重建中的高效空间建模提供了新的技术路径。
 
-## 背景与动机
+
 
 ### 问题背景：前馈三维高斯泼溅中的表示瓶颈
 
@@ -103,7 +103,9 @@ Z-order（Morton码）是一种空间填充曲线，通过比特交叉将三维�
 
 该方法在单次前向传播中完成从多视图图像到压缩高斯表示的端到端映射，在多个基准数据集上以2-3倍更少的高斯原语取得优于现有方法的渲染质量，推理速度比优化式方法快约1000倍。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Z-Order Transformer 的核心创新在于重新定义了前馈高斯泼溅（Feed-Forward 3DGS）中高斯原语的表示、聚合与压缩方式，通过三个紧密耦合的“changed slots”构建了一条高效的推理管线。
 
@@ -141,7 +143,7 @@ $$\mathbf{F}_{\mathrm{gate}} = g_1(\mathbf{F}_{\mathrm{sorted}}) \odot \mathbf{A
 
 **总结**：三项创新形成因果闭环——Z-order 序列化提供空间局部性保证，使分组注意力能高效捕获局部模式；top-k 注意力补偿了分组带来的长程信息损失；Z-order 池化则利用同一空间局部性实现无损结构压缩。三者共同支撑了“单次前馈、少图元、高质量”的核心目标。
 
-## 整体框架
+
 
 Z-Order Transformer 的整体 pipeline 以多视图图像为输入，经 Transformer 编码器与深度头提取逐像素几何先验，再通过核心的 ZFormer 模块将非结构化的像素级高斯原语转化为空间紧凑的 Z-order 序列表示，最后由高斯头预测多层级高斯参数并渲染新视图。
 
@@ -161,7 +163,7 @@ Z-Order Transformer 的整体 pipeline 以多视图图像为输入，经 Transfo
 ![[assets/figures/papers/paper_list_l2096_https_arxiv_org_abs_2605_13465/figures/003_Figure_3.jpg]]
 *Figure 3: Framework. Given multi-view images, our method first utilizes a transformer encoder and a depth head to generate depth maps, which are then projected into a 3D point map based on the camera. Next, global features are extracted from the transformer encoder, and geometry features are derived from the depth head. These features, along with the pixel color and point map, are processed through our ZFormer blocks to generate Z-order-based Gaussian representations. Finally, the Gaussian representations are passed to the Gaussian head, which generates multi-level GS for further rendering*
 
-## 核心模块与公式推导
+
 
 ### 3.1 前馈高斯泼溅的形式化
 
@@ -239,7 +241,9 @@ $$\mathcal{L}_{\mathrm{color}} = \sum_{i=1}^{M} \left[ \mathbf{MSE}( \mathcal{R}
 ![[assets/figures/papers/paper_list_l2096_https_arxiv_org_abs_2605_13465/figures/002_Figure_2.jpg]]
 *Figure 2: Gaussian representations in feed-forward GS*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要定量结果
 
@@ -313,7 +317,9 @@ Figure 5 展示了新视图合成的可视化对比。Z-Order Transformer 在锐
 ![[assets/figures/papers/paper_list_l2096_https_arxiv_org_abs_2605_13465/figures/010_Table_6.jpg]]
 *Table 6: Ablation Study with Different Selection Strategies. NA. indicates that all views will be used during inference, RS. refers to random selection, while ZS. denotes our Z-order-based view selection method. The input resolution is 360×640*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与前馈高斯泼溅方法的关系
 
@@ -347,6 +353,8 @@ Z-Order Transformer的关键突破在于**用Z-order序列化替代了像素级�
 2. **高分辨率细节保持**：层次化或多尺度特征表示能否在不显著增加计算量的前提下，提升对高分辨率细节的保持？混合神经渲染（如NeRF-based模块）可能是一个值得探索的方向。
 3. **动态与大规模场景适应性**：Z-order序列化与稀疏注意力机制在非刚体动态场景或大规模室外场景中的适应性如何？Z-order编码本身对空间变换敏感，动态场景可能需要时序一致的序列化策略。
 4. **跨域泛化机制**：当前跨数据集泛化虽有效果，但其泛化能力的来源（是深度先验的鲁棒性还是Z-order表示的结构不变性）尚不明确，需要更系统的分析。
+
+
 
 ## 原文 PDF
 

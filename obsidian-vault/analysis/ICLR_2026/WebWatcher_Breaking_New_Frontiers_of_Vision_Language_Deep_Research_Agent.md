@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/WebWatcher_Breaking_New_Frontiers_of_Vision_Language_Deep_Research_Agent.pdf
+project_link: null
+code_link: https://github.com/Alibaba-NLP/DeepResearch/tree/main/WebAgent/WebWatcher
 openreview_forum_id: 8jsaazdAb3
 aliases:
 - WebWatcher
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | WebWatcher：突破视觉-语言深度研究智能体的新前沿 |
 | 英文题名 | WebWatcher: Breaking New Frontiers of Vision-Language Deep Research Agent |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=8jsaazdAb3); [GitHub](https://github.com/Alibaba-NLP/DeepResearch/tree/main/WebAgent/WebWatcher) |
+| Links | [paper](https://openreview.net/forum?id=8jsaazdAb3) · [GitHub](https://github.com/Alibaba-NLP/DeepResearch/tree/main/WebAgent/WebWatcher) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | WebWatcher |
 | Dataset | Humanity's Last Exam (HLE), BrowseComp-VL (Avg), LiveVQA, MMSearch |
@@ -41,7 +43,7 @@ claims:
 > - BrowseComp-VL (Avg) 上，Accuracy (%) 为 27.0，对比 16.3，变化 +10.7。
 > - LiveVQA 上，Accuracy (%) 为 58.7，对比 41.3，变化 +17.4。
 
-## 概述
+## 概要
 
 **问题瓶颈**：当前多模态深度研究智能体普遍依赖模板驱动的静态流水线，缺乏将视觉信息与文本推理灵活结合的能力，难以在复杂视觉-语言任务中进行跨模态工具集成与深度推理。
 
@@ -56,7 +58,7 @@ claims:
 
 **局限与展望**：训练轨迹依赖 GPT-4o 生成，成本高且可扩展性受限；多模态感知错误（图像检索失败、OCR 错误）占 BrowseComp-VL Level 2 错误的 28%，跨模态对齐仍是关键瓶颈；强化学习仅使用最终答案的格式与语义奖励，缺乏中间推理步骤的密集反馈。未来方向包括构建闭环数据飞轮以逐步替代 GPT-4o、设计中间过程奖励模型缓解奖励稀疏问题，以及将工具集成范式推广至视频、音频等更多模态。
 
-## 背景与动机
+
 
 ### 多模态深度研究智能体的能力瓶颈
 
@@ -90,7 +92,9 @@ claims:
 
 WebWatcher 的设计目标不是构建一个更大的模型，而是**探索如何让相对小型的视觉-语言模型（7B/32B）通过后训练获得超越大模型的深度研究能力**。这一方向对降低部署成本、提升推理效率、以及推动开源社区的多模态智能体研究具有重要意义。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 WebWatcher 的核心创新在于将多模态深度研究智能体从**模板驱动的静态工作流**升级为**具备跨模态工具集成与深度推理能力的学习型智能体**。其关键突破体现在三个维度：
 
@@ -110,7 +114,7 @@ WebWatcher 的核心创新在于将多模态深度研究智能体从**模板驱�
 
 一项决定性发现是：**仅用指令数据初始化的模型在 RL 训练中奖励几乎为零，而经过工具使用轨迹冷启动 SFT 的模型能显著提升初始分数**，并在 LiveVQA 上保持 0.06–0.18 的持续优势（Fig. 5）。这表明，对于视觉-语言模型而言，先通过监督学习显式教授工具调用模式和逐步推理过程，是后续强化学习能够有效展开的必要前提。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_8jsaazdAb3/figures/003_Figure_3.jpg]]
 *Figure 3: Pipeline for generating data, where multi-hop VQA pairs are built from hyperlink graphs, grounded with web images, filtered by selector–examiner checks, and transformed into Level 1 (explicit) and Level 2 (fuzzed) questions for multimodal reasoning*
@@ -145,7 +149,7 @@ $$\mathcal{L}_{\mathrm{GRPO}}(\boldsymbol{\theta}) = \mathbb{E}_{\boldsymbol{\ta
 
 尽管框架设计完整，仍存在若干结构性瓶颈：训练轨迹依赖 GPT-4o 生成，成本高且可能引入模型偏差；RL 仅使用最终答案的格式与语义奖励，缺乏对中间推理步骤的密集反馈，奖励稀疏问题突出；多模态感知错误（图像检索失败、OCR 错误）占 BrowseComp-VL Level 2 错误案例的 28% (Fig. 7)，跨模态对齐仍是核心难题。
 
-## 核心模块与公式推导
+
 
 ### 轨迹定义与数据生成流水线
 
@@ -215,7 +219,9 @@ $$
 
 冷启动 SFT 对 RL 训练至关重要。Figure 5 显示，仅用指令数据初始化的模型奖励停滞在接近零水平，而冷启动能显著提升初始分数，并在 LiveVQA 上保持 0.06–0.18 的持续优势。工具调用次数消融（Table 3）表明，调用次数 $\geq 3$ 时 Best Pass@3 达到 19.09，过少或过多均降低性能，验证了适度工具交互对深度推理的必要性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心结果：多模态深度研究智能体的全面突破
 
@@ -298,7 +304,9 @@ LLM-as-Judge 与人类专家的一致性达 99.4%（Cohen‘s κ 0.91，Table 8�
 ![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_8jsaazdAb3/figures/022_Table_8.jpg]]
 *Table 8: Inter-rater agreement between LLM judges and human experts on HLE (binary 0–1 labels, N=330). 95% Wilson confidence intervals are reported for raw agreement*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -343,6 +351,8 @@ WebWatcher 的适用场景具有明确的边界条件：
 4. **过程奖励设计**：如何构建有效的中间过程奖励模型，以缓解 RL 的奖励稀疏问题？这涉及对推理步骤的自动评估和密集反馈信号的生成。
 
 5. **检索鲁棒性**：文本检索错误占比最高（32%），如何通过查询改写、多源融合、检索结果验证等策略显著降低信息检索失败率？这需要将检索增强生成（RAG）领域的最新进展与智能体的工具调用策略深度融合。
+
+
 
 ## 原文 PDF
 

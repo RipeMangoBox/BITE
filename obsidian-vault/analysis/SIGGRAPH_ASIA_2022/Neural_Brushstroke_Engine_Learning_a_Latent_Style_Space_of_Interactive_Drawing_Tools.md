@@ -5,6 +5,7 @@ paper_level: A
 venue: "SIGGRAPH Asia"
 year: 2022
 pdf_ref: paperPDFs/SIGGRAPH_ASIA_2022/Neural_Brushstroke_Engine_Learning_a_Latent_Style_Space_of_Interactive_Drawing_Tools.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/toronto-ai/brushstroke_engine/
 aliases:
 - NBE
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 神经笔触引擎：学习交互式绘图工具的潜在风格空间 |
 | 英文题名 | Neural Brushstroke Engine: Learning a Latent Style Space of Interactive Drawing Tools |
 | 会议/期刊 | SIGGRAPH Asia 2022 |
-| Links | [paper](https://drive.google.com/file/d/1RNFgMXEp85MGlV6w99JC_MBBg45TFgzI/view); [Project](https://research.nvidia.com/labs/toronto-ai/brushstroke_engine/) |
+| Links | [paper](https://drive.google.com/file/d/1RNFgMXEp85MGlV6w99JC_MBBg45TFgzI/view) · [Project](https://research.nvidia.com/labs/toronto-ai/brushstroke_engine/) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/generative_models_and_autoencoders |
 | Method | Neural Brushstroke Engine |
 | Dataset | Styles1 (real stroke geometry), Styles1 (various input geometries), User study (7 digital artists) |
@@ -42,7 +43,7 @@ claims:
 > - Styles1 (various input geometries) 上，Style consistency 为 ✓ (consistent)，对比 ✗ (DRIT++ fails)，变化 N/A。
 > - User study (7 digital artists) 上，Likert score (5-point, likelihood of use) 为 4/6 scored 5，对比 N/A，变化 N/A。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -68,7 +69,7 @@ claims:
 
 训练数据量小（约200张），可能限制风格多样性；模型在新风格上需微调才能改善背景清晰度，不能即插即用；CLIP搜索对艺术术语理解有限，可能产生不匹配。未来方向包括：提高对不可控风格的交互能力、在无配对笔画几何输入下实现风格嵌入、以及将可微分笔触渲染器与强化学习结合以改进基于笔画的风格化。
 
-## 背景与动机
+
 
 数字绘画工具的核心矛盾在于**表现力与通用性之间的权衡**。传统专业软件（如Corel Painter、Rebelle）通过复杂的物理模拟或手工设计的纹理管线，能够高度逼真地再现特定媒介（如水彩、油画、铅笔）的笔触效果。然而，这种精细模拟需要大量的工程开发，且每种风格本质上是一个独立的系统，难以在一个轻量级工具箱中同时支持数十种风格。另一方面，通用绘画工具虽然灵活，但缺乏对真实画笔纹理、颜料混合和介质交互的精细控制，无法满足艺术家的表现需求。
 
@@ -78,7 +79,9 @@ claims:
 
 然而，实现这一目标面临三个技术瓶颈。第一，生成器的输出必须支持**原生alpha合成**，使得笔触能够无缝叠加到任意画布上，而非简单地将整块区域替换为生成图像。第二，模型必须在**补丁级别**上工作，以支持任意尺寸画布上的实时绘画，同时保证相邻补丁之间的无缝拼接。第三，训练数据极为有限——本文仅使用约200张未标注的不同媒介笔触图像，这就要求模型具备从稀疏样本中学习连续风格空间的能力。这些约束共同定义了**神经笔触引擎（Neural Brushstroke Engine）** 的设计空间：一个基于StyleGAN2的条件生成器，通过alpha-color参数化输出、几何特征注入和特征空间混合，在同一框架内实现风格多样性与交互控制的统一。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Neural Brushstroke Engine 的核心创新在于将 StyleGAN2 的连续图像分布建模能力拓展到**画笔风格空间**的学习，通过四个关键设计实现了单一模型支持多种风格、实时交互绘画的目标。
 
@@ -114,7 +117,7 @@ $$\mathbf{x} = \Sigma_i \alpha_i \cdot c_i$$
 
 定量对比（Table 2）显示，本方法在 Styles1 数据集上 FID 达到 70.137，优于 DRIT++（74.74），且 DRIT++ 在不同几何输入下**无法保持风格一致性**（Fig. 14），而本方法始终输出一致的风格。
 
-## 整体框架
+
 
 Neural Brushstroke Engine 的整体 pipeline 围绕一个核心设计展开：将 StyleGAN2 的条件生成能力改造为一个**交互式绘画工具**，其输入是用户的笔触几何图形，输出是风格化的笔触外观，并原生支持颜色控制、背景分离与画布合成。
 
@@ -158,7 +161,7 @@ Neural Brushstroke Engine 的整体 pipeline 围绕一个核心设计展开：�
 ![[assets/figures/papers/paper_list_l21_https_drive_google_com_file_d_1RNFgMXEp85MGlV6w99JC_MBBg45TFgzI_view/figures/003_Figure_2.jpg]]
 *Figure 2: Architecture and Training: Neural Brushstroke Engine extends StyleGAN2 architecture (striped yellow blocks) to condition image generation on stroke geometry g. Represented as a binary image, g is passed through a pre-trained Geometry Encoder to produce spatial features that are concatenated with the StyleGAN features . Instead of outpu ing RGB, the final ToTriad layer (§3.2) of our generator produces a decomposed image representation that allows recoloring, compositing and formulating a geometric loss $\mathcal { L } _ { g e o }$ (§3.4). See §3.3 for architecture details and §3.5 for training*
 
-## 核心模块与公式推导
+
 
 ### 生成器输出参数化：Alpha-Color三元组
 
@@ -223,7 +226,9 @@ $$\mathrm{BGC}_P(\mathbf{z}, \{\mathbf{g}_i\}) = \frac{\sum_i |\alpha_2(\mathbf{
 
 BGC值越高，表示背景区域越清晰（$\alpha_2$ 在非笔画区域接近1），即风格对几何输入的控制越好。该指标用于风格嵌入优化和CLIP搜索中的损失项。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心结果：生成质量与风格一致性
 
@@ -279,7 +284,9 @@ BGC值越高，表示背景区域越清晰（$\alpha_2$ 在非笔画区域接近
 ![[assets/figures/papers/paper_list_l21_https_drive_google_com_file_d_1RNFgMXEp85MGlV6w99JC_MBBg45TFgzI_view/figures/002_Table_1.jpg]]
 *Table 1: State-of-the art in digital media and most relevant conditional generative models or image-to-image translation models that could be employed for brushstroke stylization*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题瓶颈与核心思路
 
@@ -365,6 +372,8 @@ Table 1系统比较了本文方法与现有数字媒体和生成模型在五项�
 - **架构层面**：探索更轻量级的生成器架构，降低推理延迟以支持更高分辨率的实时绘画。
 - **交互层面**：将风格空间探索与更自然的用户界面（如语音、手势）结合，降低使用门槛。
 - **评估层面**：建立标准化的交互式绘画评估基准，包括定量指标和用户研究协议。
+
+
 
 ## 原文 PDF
 

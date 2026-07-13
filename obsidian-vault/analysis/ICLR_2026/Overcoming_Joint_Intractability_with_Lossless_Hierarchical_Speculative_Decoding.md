@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Overcoming_Joint_Intractability_with_Lossless_Hierarchical_Speculative_Decoding.pdf
+project_link: null
+code_link: https://github.com/ZhouYuxuanYX/Hierarchical-Speculative-Decoding
 openreview_forum_id: LaVrNaBNwM
 aliases:
 - HSDH
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 无损层次推测解码：克服联合不可解性 |
 | 英文题名 | Overcoming Joint Intractability with Lossless Hierarchical Speculative Decoding |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=LaVrNaBNwM); [GitHub](https://github.com/ZhouYuxuanYX/Hierarchical-Speculative-Decoding) |
+| Links | [paper](https://openreview.net/forum?id=LaVrNaBNwM) · [GitHub](https://github.com/ZhouYuxuanYX/Hierarchical-Speculative-Decoding) |
 | Topic | #topic/optimization_theory_probabilistic #topic/optimization_theory_probabilistic/optimization_methods |
 | Method | Hierarchical Speculative Decoding (HSD) |
 | Dataset | GSM8K, HumanEval, GSM8K (Multi-draft, K=3 or 4), GSM8K (Draft length γ=15) |
@@ -42,7 +44,7 @@ claims:
 > - HumanEval 上，Block Efficiency improvement over Tokenwise 为 +9.5% (14B model), +12.3% (32B model)，对比 Tokenwise，变化 +9.5–12.3%。
 > - GSM8K (Multi-draft, K=3 or 4) 上，Average Block Efficiency improvement over Tokenwise 为 +5.9%，对比 Tokenwise with RRS，变化 +5.9%。
 
-## 概述
+## 概要
 
 推测解码（Speculative Decoding）是加速大语言模型自回归生成的主流范式，其核心瓶颈已从草案生成转向**验证阶段**：现有逐令牌验证（Tokenwise Verification, Leviathan et al., 2023）和块验证（Blockwise Verification, Sun et al., 2024）均受制于**联合不可解性（Joint Intractability）**——即无法在保证无损的前提下，充分利用草案序列中多个令牌的联合信息来提升可接受令牌数量。具体而言，逐令牌验证在首个拒绝位置即停止并重采样，丢弃了后续位置的部分信息；块验证虽能联合处理连续令牌，但仅利用了部分信息，提升幅度有限。
 
@@ -52,7 +54,7 @@ HSD在方法谱系中位于推测解码的验证优化分支，与逐令牌验�
 
 实验结果表明，HSD在GSM8K、HumanEval等多个基准上一致提升块效率（Block Efficiency, BE）和解码速度（Decoding Speed, DS）。在GSM8K上，HSD的块效率达到 $6.64 \pm 0.04$ tokens/step，较逐令牌验证提升3.75%，较块验证提升2.0%；在HumanEval上，14B和32B模型分别获得9.5%和12.3%的块效率提升。集成EAGLE-3后，HSD带来超过12%的性能增益。消融实验表明，上限前缀比机制对保持分布保真度至关重要——去除上限后GSM8K任务精度从84.96%降至84.40%，HumanEval从82.47%降至80.61%。验证阶段的额外耗时不足总解码时间的1%，且HSD验证比块验证快约20%。
 
-## 背景与动机
+
 
 大型语言模型的自回归解码因逐令牌串行生成而成为推理延迟的主要瓶颈。推测解码（Speculative Decoding）通过引入一个轻量级草案模型（draft model）快速生成候选令牌序列，再由目标模型（target model）并行验证，从而在不牺牲输出质量的前提下提升推理速度。其核心在于验证阶段：如何高效地决定接受哪些草案令牌，并在拒绝位置进行重采样以恢复目标分布。
 
@@ -62,7 +64,9 @@ HSD在方法谱系中位于推测解码的验证优化分支，与逐令牌验�
 
 本文提出**层次推测解码**（Hierarchical Speculative Decoding，HSD），旨在从根本上克服联合不可解性。核心洞察是：通过从序列末端向前扫描，递归地聚合各分支的多余概率质量，可以在不显式计算高维联合分布的前提下，精确恢复整个序列的目标分布。HSD 在最后一个接受令牌之后仅需**一次重采样**即可完成无损恢复，无需额外调用目标模型。该方法从理论上保证了无损性，同时显著提升了期望接受令牌数量，为推测解码的验证范式提供了新的设计空间。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 HSD 的核心创新在于提出了一种**层次分支重采样（Hierarchical Branch Resampling）**的验证范式，从根本上克服了推测解码中验证阶段的**联合不可解性（Joint Intractability）**问题。与现有的逐令牌验证（Token-wise Verification; Leviathan et al., 2023）和块验证（Blockwise Verification; Sun et al., 2024）相比，HSD 在三个关键维度上实现了范式转变：
 
@@ -94,7 +98,7 @@ HSD 的验证过程包含四个关键模块：
 
 这一流程在理论上被证明是**无损的**（Theorem 4, Theorem 6），即 HSD 生成的序列分布与目标模型完全一致，同时在期望接受的令牌数量上优于逐令牌验证和块验证。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_LaVrNaBNwM/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of HSD. HSD accepts the draft Xτ by scanning backward from γ to τ , and then performs a single resampling at position τ + 1 using the corresponding distribution from the resampling hierarchy*
@@ -138,7 +142,7 @@ $$r^*(\mathbf{X}_{1:t}) = \min\{r(\mathbf{X}_{1:m(\mathbf{X}_{1:t})}), 1\} \cdot
 
 HSD 的验证阶段额外耗时不足总解码时间的 $1\%$（Table A.4），且 HSD 验证比块验证（Blockwise）快约 $20\%$。上限分支重采样只需一次重采样操作，避免了逐令牌验证中多次重采样的累积开销。
 
-## 核心模块与公式推导
+
 
 ### 方法总览
 
@@ -202,7 +206,9 @@ $$\mathbb{E}[\tau]_{\mathrm{branch}} = \sum_{i=1}^{\gamma} \left[1 - \prod_{k=i}
 
 该表达式表明，HSD 通过层次化接受概率 $h_k$ 的乘积结构，能够接受比逐令牌验证和块验证更多的令牌。实验验证了这一理论优势：在 GSM8K 上，HSD 的块效率达到 $6.64 \pm 0.04$ tokens/step，优于 Tokenwise 的 $6.40 \pm 0.10$ 和 Blockwise 的 $6.51 \pm 0.09$（Table A.1）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验设置
 
@@ -260,7 +266,9 @@ HSD的增益依赖于草案模型与目标模型之间的分布相似性。当�
 ![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_LaVrNaBNwM/figures/008_Table.jpg]]
 *Table: A.4: Runtime breakdown of Blockwise and HSD*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 推测解码验证范式的演进
 
@@ -302,6 +310,8 @@ HSD 的增益高度依赖于草案模型与目标模型之间的**分布相似�
 3. **与复杂草稿策略的耦合**：HSD 的验证机制是否可与动态草稿长度、树状注意力（Tree Attention）等更复杂的草稿生成策略无缝结合，而不会显著增加验证计算的复杂性，值得进一步探索。初步实验表明 HSD 与 EAGLE-3 的集成是可行的（替换其逐令牌验证后获得超过12%的性能增益），但更广泛的兼容性尚未被系统验证。
 
 4. **多草稿场景下的最优分支数**：在多草稿设置中，HSD 结合递归拒绝采样（RRS）已展现出约5.9%的平均块效率提升，但最优草稿分支数 $K$ 与目标/草案模型分布差异之间的定量关系尚未被刻画。
+
+
 
 ## 原文 PDF
 

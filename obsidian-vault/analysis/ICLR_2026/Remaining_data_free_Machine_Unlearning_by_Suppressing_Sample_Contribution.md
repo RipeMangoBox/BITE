@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Remaining_data_free_Machine_Unlearning_by_Suppressing_Sample_Contribution.pdf
+project_link: null
+code_link: https://github.com/poppopbean0903/MU-Mis
 openreview_forum_id: 3iw5t2W41F
 aliases:
 - MMMUBMIS
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 通过抑制样本贡献实现无保留数据机器遗忘 |
 | 英文题名 | Remaining-data-free Machine Unlearning by Suppressing Sample Contribution |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=3iw5t2W41F); [GitHub](https://github.com/poppopbean0903/MU-Mis) |
+| Links | [paper](https://openreview.net/forum?id=3iw5t2W41F) · [GitHub](https://github.com/poppopbean0903/MU-Mis) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/algorithms |
 | Method | MU-Mis (Machine Unlearning by Minimizing Input Sensitivity) |
 | Dataset | CIFAR-100 full-class (VGG-16), Tiny ImageNet full-class (ViT), Overall (6 datasets) |
@@ -42,7 +44,7 @@ claims:
 > - CIFAR-100 full-class (VGG-16) 上，Avg. Gap ↓ 为 0.32，对比 JIT: 3.21，变化 -2.89。
 > - Tiny ImageNet full-class (ViT) 上，RTE (min) ↓ 为 3，对比 SalUn: 81，变化 -78 (27倍加速)。
 
-## 概述
+## 概要
 
 现有机器遗忘方法面临一个根本性瓶颈：无法精确量化并解耦各训练样本对模型的贡献，转而采用随机标签、知识蒸馏等启发式策略，导致模型在保留数据上的效用严重退化，进而必须依赖保留数据来修复——而这些数据在实践中往往不可获取。
 
@@ -52,7 +54,7 @@ claims:
 
 在CIFAR-100、PinsFaceRecognition、Tiny ImageNet等6个数据集上的全类、子类和序列遗忘任务中，MU-Mis的性能与当前最优的依赖保留数据方法持平，并显著超越所有现有无保留数据方法。例如，在CIFAR-100全类遗忘（VGG-16）上，MU-Mis的Avg. Gap仅为0.32，而最强无保留数据基线JIT为3.21；在Tiny ImageNet（ViT）上，MU-Mis的运行时间仅为3分钟，相比SalUn的81分钟实现27倍加速。
 
-## 背景与动机
+
 
 ### 问题背景：机器遗忘与保留数据依赖困境
 
@@ -70,7 +72,9 @@ claims:
 
 基于这一发现，本文提出 **MU-Mis（Machine Unlearning by Minimizing Input Sensitivity）**，首次实现完全无保留数据条件下的高性能机器遗忘，其性能与当前最优的依赖保留数据方法持平，并显著超越所有现有无保留数据方法。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：现有遗忘方法为何必须依赖保留数据
 
@@ -123,7 +127,7 @@ MU-Mis的创新设计在多个维度上取得了显著突破：
 
 尽管MU-Mis在全类遗忘场景下表现卓越，但在最具挑战性的随机子集遗忘场景下，与理想重训模型相比效用差距仍然明显。此外，对高记忆度样本的遗忘可能引起较大的剩余数据性能下降，提示灵敏度差距不能完全均一地代理各类样本的贡献。未来工作可探索将一阶灵敏度差距与二阶loss曲率更直接地关联，以提供更强的理论保证并改进随机子集遗忘性能。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0011_3iw5t2W41F_Remaining-data-free_Machine_Unlearning_by_Suppre/figures/001_Figure_1.jpg]]
 *Figure 1: A brief overview of the theoretical connection between sample’s contribution and a pre-trained model’s input sensitivity. The dashed lines illustrate how the influence of a training sample propagates through gradient updates to the pre-trained model. When a sample participates in training, the gradient it contributes induces an update of the model in function space, which inherently increases the learned function’s sensitivity to that sample’s input*
@@ -165,7 +169,7 @@ $$\frac{\|\nabla_{\mathbf{x}} f_{c'}(\mathcal{D}_f, w_t)\|_F}{\|\nabla_{\mathbf{
 
 整个 pipeline 的核心优势在于**完全消除了对保留数据的依赖**——从信号提取、损失构造到停止决策，所有操作仅涉及遗忘样本本身和预训练模型的内部梯度信息。这使得 MU-Mis 在保留数据不可获取的实际场景（如用户数据删除请求）中具备天然适用性，同时在 CIFAR-100、Tiny ImageNet 等六个数据集上取得了与依赖保留数据的 SoTA 方法持平的性能（Table 1, Table 2），并显著超越所有现有无保留数据方法。
 
-## 核心模块与公式推导
+
 
 MU-Mis 的遗忘过程由三个核心模块串联构成：**输入敏感性估计**、**灵敏度差距最小化损失**、以及**基于敏感度恢复的自适应停止准则**。整个流程完全在遗忘数据 $`\mathcal{D}_f`$ 上运行，无需访问任何保留数据。
 
@@ -213,7 +217,9 @@ $$`\mathcal{L} = \frac{1}{N} \sum \left[ \alpha_c \cdot \|\nabla_{\mathbf{x}} f_
 
 其中 $`\alpha_c`$ 和 $`\alpha_{c'}`$ 为根据当前敏感度状态动态调整的权重系数。该变体在保持核心机制不变的前提下，为特定遗忘任务提供了更灵活的优化路径。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈验证：输入灵敏度差距作为样本贡献代理
 
@@ -283,7 +289,9 @@ MU-Mis的理论基础建立在两个关键实证发现之上。第一，**训练
 ![[assets/figures/papers/iclr26_0011_3iw5t2W41F_Remaining-data-free_Machine_Unlearning_by_Suppre/figures/028_Table_14.jpg]]
 *Table 14: Table A12: Ablation study on each term of our loss in full class (Rocket) unlearning. TC (Target Class) refers to the first term and OC (Other Class) refers to the second term*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有方法的关系
 
@@ -324,6 +332,8 @@ MU-Mis 的提出根植于现有机器遗忘方法的一个根本性瓶颈：无�
 4. **与其他范式的结合。** 能否结合其他新兴无保留数据遗忘范式（如 RUM）与灵敏度抑制来进一步缩小与理论重训模型的差距？混合策略可能在不同遗忘场景下发挥互补优势。
 
 5. **非分类任务的推广。** 当前方法建立在分类任务的目标类/无关类 logit 结构之上。在生成模型、强化学习或自监督学习等任务中，如何定义和操作等价的“灵敏度差距”信号是一个开放的理论问题。
+
+
 
 ## 原文 PDF
 

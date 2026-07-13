@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/AdaReasoner_Dynamic_Tool_Orchestration_for_Iterative_Visual_Reasoning.pdf
+project_link: null
+code_link: null
 aliases:
 - ADTOIVR
 acceptance: accepted
@@ -42,7 +44,7 @@ paradigm: 通过冷启动阶段向模型植入正确的工具使用模式，再�
 > - Jigsaw 上，Accuracy （准确率） 为 96.60 (Qwen2.5-VL-7B + TC+TG)，对比 45.70 (Base), 86.40 (Direct SFT)，变化 +50.90 (vs Base), +10.20 (vs Direct SFT)。
 > - BLINK-J (Jigsaw from BLINK) 上，Accuracy （准确率） 为 96.00 (Qwen2.5-VL-7B + TC+TG)，对比 52.67 (Base), 88.00 (Direct SFT)，变化 +43.33 (vs Base)。
 
-## 概述
+## 概要
 
 现有多模态大语言模型（MLLM）在复杂视觉推理任务中面临双重瓶颈。其一，模型缺乏精细的迭代感知与验证能力，往往退化为依赖语义先验的“引导式猜测”，而非基于实际视觉证据进行推理。其二，现有工具增强方法局限于单步原子工具调用或脚本化的固定流程，不具备多轮规划与动态组合不同工具的能力。
 
@@ -54,7 +56,7 @@ paradigm: 通过冷启动阶段向模型植入正确的工具使用模式，再�
 
 消融研究进一步揭示了方法有效性的因果机制：工具冷启动阶段为后续强化学习提供了正确的工具使用先验，若跳过冷启动直接进行工具 GRPO，7B 模型在 VSP 上的性能骤降 24.93 个百分点；冷启动数据中的反思与回溯机制大幅提升了模型在工具不可用时的鲁棒性（VSP 整体准确率从 67.27 升至 91.36）；更高的工具奖励权重（λ_tool = 2:1）能显著加速收敛并提升最终性能。值得注意的是，在开放领域的 GUIQA 任务（WebMMU）中，纯工具 GRPO 反而优于先冷启动再 GRPO 的管线，提示预定义的专家蓝图在未知最优策略的任务上可能限制探索自由。
 
-## 背景与动机
+
 
 ### 视觉推理的瓶颈：从“引导式猜测”到精细感知
 
@@ -80,7 +82,9 @@ paradigm: 通过冷启动阶段向模型植入正确的工具使用模式，再�
 
 基于这一动机，AdaReasoner 提出将工具增强推理形式化为**状态-动作-观察序列决策过程**，并通过专门设计的数据管线和强化学习算法，使模型发展出**动态工具编排**的涌现行为——即在训练和推理过程中自适应地获取新工具、弃用无效工具、并动态调整工具使用频率（Figure 1）。这一框架的核心目标不是简单地“给模型更多工具”，而是让模型学会“何时用、用什么、何时停”。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 AdaReasoner 的核心创新在于将多模态工具增强推理重新定义为**状态-动作-观察的序列决策过程**，并围绕这一形式化构建了从数据生成到策略优化的完整技术栈，从而突破了现有多模态大语言模型（MLLM）在复杂视觉推理中的两大瓶颈：缺乏精细化迭代感知验证能力，以及工具调用局限于单步或脚本化范式。
 
@@ -130,12 +134,12 @@ AdaReasoner 通过**统一的工具服务器**（Figure 2b）管理所有感知�
 - **冷启动可能限制开放领域探索**：在 WebMMU 基准上，纯工具 GRPO（72.97）反而优于先冷启动再加 GRPO 的管线（68.16），说明预定义蓝图在未知最优策略的任务上可能成为束缚（Table 2）。
 - **反思数据的双刃剑效应**：含反思训练虽提升了鲁棒性，但也可能导致策略僵化——当推理时引入新工具 A* 时，含反思训练的模型导航性能大幅下降（Table 5），其确切机制仍需进一步探明。
 
-## 整体框架
 
-![[obsidian-vault/assets/figures/papers/paper_list_l5_AdaReasoner_Dynamic_Tool_Orchestration_for_Iterative_Visual_Reasoning/figures/002_Figure_2.jpg]]
+
+![[assets/figures/papers/paper_list_l5_AdaReasoner_Dynamic_Tool_Orchestration_for_Iterative_Visual_Reasoning/figures/002_Figure_2.jpg]]
 *Figure 2: An overview of our AdaReasoner framework. The process consists of two stages: (a) a Cold Start phase, where the trajectory is specially designed for multi-turn reasoning, and (c) a Tool GRPO phase, where the policy is refined via reinforcement learning guided by our adaptive, multi-turn reward. The central Tool Server (b) manages a diverse suite of both lightweight and compute-heavy tools, enabling all interactions throughout the pipeline*
 
-![[obsidian-vault/assets/figures/papers/paper_list_l5_AdaReasoner_Dynamic_Tool_Orchestration_for_Iterative_Visual_Reasoning/figures/003_Table_1.jpg]]
+![[assets/figures/papers/paper_list_l5_AdaReasoner_Dynamic_Tool_Orchestration_for_Iterative_Visual_Reasoning/figures/003_Table_1.jpg]]
 *Table 1: Visual tools integrated within AdaReasoner. We illustrate their arguments, outputs, and core functions description. More detailed descriptions of our tools are presented in Appendix B.1*
 
 AdaReasoner 的核心思想是将工具增强的多模态推理形式化为一个**状态-动作-观察的序列决策过程**，并围绕这一形式化构建两阶段训练管线与统一的工具服务器，使小规模视觉语言模型能够动态编排多种工具以完成复杂视觉推理任务。
@@ -174,7 +178,7 @@ $$R_{\mathrm{total}} = R_{\mathrm{format}} \cdot (\lambda_{\mathrm{tool}} \cdot 
 - **反思数据的双刃剑效应**：冷启动中包含反思轨迹可显著提升模型在工具不可用时的鲁棒性（VSP Overall 从 67.27 提升至 91.36），但也可能导致策略僵化——当推理时引入训练期间未见过的工具（如 A*）时，含反思训练的模型反而难以有效接纳。
 - **奖励权重的关键作用**：工具奖励权重 $\lambda_{\mathrm{tool}}$ 从 0:1 提升至 2:1 时，VSP 性能从 71.45 跃升至 93.27，表明对工具调用质量的显式激励是策略收敛的核心驱动力。
 
-## 核心模块与公式推导
+
 
 ### 3.1 工具增强推理的形式化建模
 
@@ -234,18 +238,20 @@ $$\mathcal{J}_{\text{GRPO}}(\theta) = \mathbb{E}_{q \sim P(Q), \{\tau^{i}\} \sim
 
 工具服务器统一管理三类视觉工具（详见 Table 1）：**感知工具**（POINT 定位、OCR 文字识别）、**操作工具**（DRAWLINE 画线、INSERTIMAGE 插入图像、CROP 裁剪）和**计算工具**（A* 路径规划）。模型通过特殊标记发起工具调用，服务器执行状态转移并返回观察结果，形成闭环交互。
 
-## 实验与分析
 
-![[obsidian-vault/assets/figures/papers/paper_list_l5_AdaReasoner_Dynamic_Tool_Orchestration_for_Iterative_Visual_Reasoning/figures/004_Table_2.jpg]]
+
+## 实验与关键发现
+
+![[assets/figures/papers/paper_list_l5_AdaReasoner_Dynamic_Tool_Orchestration_for_Iterative_Visual_Reasoning/figures/004_Table_2.jpg]]
 *Table 2: Our main results on VSPO, VSP, Jigsaw, BLINK-J, GUIChat, and WebMMU benchmarks. TC, TG means Tool Cold Start and Tool GRPO, respectively. The best performance is highlighted in bold, while the second-best performance is indicated with an underline*
 
-![[obsidian-vault/assets/figures/papers/paper_list_l5_AdaReasoner_Dynamic_Tool_Orchestration_for_Iterative_Visual_Reasoning/figures/005_Figure_3.jpg]]
+![[assets/figures/papers/paper_list_l5_AdaReasoner_Dynamic_Tool_Orchestration_for_Iterative_Visual_Reasoning/figures/005_Figure_3.jpg]]
 *Figure 3: Overcoming scale-based limitations with tool augmentation. On the VSP task, our tools boost the performance of both 3B and 7B models, elevating them from disparate baselines to a near-uniform high performance*
 
-![[obsidian-vault/assets/figures/papers/paper_list_l5_AdaReasoner_Dynamic_Tool_Orchestration_for_Iterative_Visual_Reasoning/figures/008_Table_5.jpg]]
+![[assets/figures/papers/paper_list_l5_AdaReasoner_Dynamic_Tool_Orchestration_for_Iterative_Visual_Reasoning/figures/008_Table_5.jpg]]
 *Table 5: Adaptability study on the VSP and VSPO tasks. Stage compares our full Tool Cold Start (TC) + Tool GRPO (TG) pipeline against TC alone. Reflection indicates training with (✓) or without (✗) reflection data. \mathbf { A } ^ { * } specifies tool availability: during Reinforcement Learning (RL), at Inference (Inf), or unavailable (-). A* Statistics report calls per sample and success rate*
 
-![[obsidian-vault/assets/figures/papers/paper_list_l5_AdaReasoner_Dynamic_Tool_Orchestration_for_Iterative_Visual_Reasoning/figures/011_Figure_4.jpg]]
+![[assets/figures/papers/paper_list_l5_AdaReasoner_Dynamic_Tool_Orchestration_for_Iterative_Visual_Reasoning/figures/011_Figure_4.jpg]]
 *Figure 4: Evolution of tool invocation frequencies for ASTAR, POINT, and DRAW2DPATH during reinforcement learning. The model is optimized on VSP Verification (cool-colored curves) and VSP Navigation (warm-colored curves) tasks*
 
 ### 核心性能突破
@@ -306,7 +312,9 @@ Table 6 的奖励权重消融实验揭示了工具奖励在 RL 优化中的关�
 
 4. **泛化边界未明**：当前实验仅测试了 A* 这一种未见工具，对于完全陌生类别的工具（如代码执行、网络搜索），模型的零样本采纳能力尚未探明。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的本质差异
 
@@ -334,11 +342,14 @@ AdaReasoner 的性能增益高度依赖于任务特性与工具集之间的匹�
 
 **5. 多代理扩展的可行性。** 当前框架聚焦于单模型与工具服务器的交互。将动态工具编排扩展到多代理场景——其中不同代理负责不同子任务并共享工具调用结果——是否能保持稳定的自适应行为，是一个值得探索的方向。
 
-## 原文 PDF
-
-## 相关样本
+### 相关样本
 
 - [[obsidian-vault/analysis/ICLR_2026/A.I.R._Enabling_Adaptive_Iterative_and_Reasoning-based_Frame_Selection_For_Video_Question_Answering.md|A.I.R.]]：同属视觉推理样本，可对照工具编排与帧选择式迭代推理。
 - [[obsidian-vault/analysis/ICLR_2026/In-the-Flow_Agentic_System_Optimization_for_Effective_Planning_and_Tool_Use.md|In-the-Flow]]：同属工具使用与规划优化样本，可对照多模态工具调用和通用 agent flow 优化。
 
-![[obsidian-vault/paperPDFs/ICLR_2026/AdaReasoner_Dynamic_Tool_Orchestration_for_Iterative_Visual_Reasoning.pdf]]
+
+
+
+## 原文 PDF
+
+![[paperPDFs/ICLR_2026/AdaReasoner_Dynamic_Tool_Orchestration_for_Iterative_Visual_Reasoning.pdf]]

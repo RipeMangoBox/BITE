@@ -5,6 +5,7 @@ paper_level: A
 venue: ICML
 year: 2021
 pdf_ref: paperPDFs/ICML_2021/f_Domain_Adversarial_Learning_Theory_and_Algorithms.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/toronto-ai/fDAL/
 aliases:
 - FDALFD
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | f-域对抗学习：理论与算法 |
 | 英文题名 | f-Domain-Adversarial Learning: Theory and Algorithms |
 | 会议/期刊 | ICML 2021 |
-| Links | [paper](https://arxiv.org/abs/2106.11344); [Project](https://research.nvidia.com/labs/toronto-ai/fDAL/) |
+| Links | [paper](https://arxiv.org/abs/2106.11344) · [Project](https://research.nvidia.com/labs/toronto-ai/fDAL/) |
 | Topic | #topic/safety_alignment_fairness_privacy #topic/safety_alignment_fairness_privacy/trustworthy_machine_learning |
 | Method | f-Domain Adversarial Learning (f-DAL) |
 | Dataset | Office-31, Office-Home, Digits (M→U & U→M), Amazon Reviews (12 tasks) |
@@ -42,7 +43,7 @@ claims:
 > - Office-Home 上，平均准确率 (%) 为 68.3，对比 57.6，变化 +10.7。
 > - Digits (M→U & U→M) 上，平均准确率 (%) 为 96.6，对比 93.3，变化 +3.3。
 
-## 概述
+## 概要
 
 无监督域适应（Unsupervised Domain Adaptation, UDA）的核心挑战在于：源域与目标域之间的分布偏移导致仅在源域上训练的分类器在目标域上性能显著下降。域对抗训练方法（以 **DANN** 为代表）通过对抗学习对齐特征分布，已成为该领域的主流范式。然而，现有方法存在一个关键的理论-实践鸿沟：理论上基于总变差（TV）散度的泛化界难以直接优化，而实践中广泛使用的 Jensen-Shannon（JS）散度等缺乏相应的泛化界支撑，导致算法设计依赖经验性的 ad-hoc 正则化，性能提升受限。
 
@@ -65,7 +66,7 @@ claims:
 
 综上，f-DAL 通过弥合域适应理论与对抗训练实践之间的鸿沟，以一个简洁的架构修正实现了对 DANN 及多种后续方法的显著超越，为 f 散度家族在域适应中的应用提供了坚实的理论支撑和实用的算法框架。
 
-## 背景与动机
+
 
 ### 域适应中的理论与实践鸿沟
 
@@ -85,7 +86,9 @@ claims:
 
 针对上述问题，本文的核心动机是：**能否将域适应泛化界推广至一般 $f$ 散度家族，并在此基础上设计一个与理论直接对应的简洁算法框架？** 若成功，则可消除长期以来理论与实践的脱节，使算法设计有据可依，无需依赖复杂的 ad-hoc 正则化即可实现性能的大幅提升。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 f-Domain Adversarial Learning (f-DAL) 的核心创新在于弥合了域适应理论与对抗训练实践之间的根本性鸿沟。以往的域对抗方法（以 **DANN** 为代表）虽然在实践中被广泛使用，但其算法设计与域适应泛化理论之间存在脱节：理论上基于 Total Variation (TV) 散度的泛化界难以直接优化，而实践中隐式最小化的 Jensen-Shannon (JS) 散度又缺乏对应的泛化保证。f-DAL 通过“理论推广—差异度量设计—架构修正”三位一体的创新，解决了这一瓶颈。
 
@@ -139,7 +142,7 @@ f-DAL 对 DANN 最关键的**架构修正**在于将全局域判别器替换为*
 
 f-DAL 的创新本质在于：**通过将泛化界从 TV 散度推广至 f 散度家族，揭示了现有对抗域适应方法（DANN）在架构设计上的理论缺陷，并通过对域分类器进行“按类别化”这一简单而关键的修正，无需复杂正则化或额外超参数即可大幅提升性能。** 这一“理论驱动架构修正”的范式，使得 f-DAL 成为一个简洁、通用且理论自洽的域适应框架。
 
-## 整体框架
+
 
 f-DAL 的整体 pipeline 围绕一个**min-max对抗训练目标**构建，其核心模块关系与数据流如 **Figure 1** 所示。该框架将域适应问题形式化为三个神经网络的协同优化：特征提取器 $g$、源分类器 $\hat{h}$，以及一个与源分类器同拓扑的**按类别域分类器** $\hat{h}'$。
 
@@ -176,7 +179,7 @@ f-DAL 与经典 DANN 的核心区别在于域分类器的设计（见 **Figure 1
 
 在推理阶段，仅需 $g$ 和 $\hat{h}$ 参与前向传播：目标域输入经 $g$ 提取特征后，由 $\hat{h}$ 输出类别预测。$\hat{h}'$ 在推理时不参与计算。
 
-## 核心模块与公式推导
+
 
 ### 理论瓶颈与动机
 
@@ -262,7 +265,9 @@ $$d_{s,t} = \mathbb{E}_{x_s \sim p_s} \log \sigma \circ [\hat{h}' \circ g(x_s)]_
 | $\lambda^*$ | 理想联合风险，度量源和目标标签函数的最小联合误差 |
 | $p_s^z, p_t^z$ | 源/目标域在特征空间 $\mathcal{Z}$ 上的分布 |
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -359,7 +364,9 @@ Figure 7对比了f-DAL-JS与DANN在不同标签偏移程度下的鲁棒性。x�
 ![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2106_11344/figures/013_Table_9.jpg]]
 *Table 9: Accuracy represented in (%) with average and standard deviation on the Office-31 benchmark*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 理论脉络：从 TV 散度到 f 散度家族的泛化界
 
@@ -418,6 +425,8 @@ $$d_{s,t} = \mathbb{E}_{p_s^z}[\hat{\ell}(\hat{h}',\hat{h})] - \mathbb{E}_{p_t^z
 5. **MCD 的理论修正验证。** f-DAL 框架对 MCD 提出的修正建议（按类别域分类器、损失约束）能否确实带来更强的算法？该方向尚未有实验验证。
 
 6. **标签偏移的内生处理。** 能否在 f 散度泛化界中显式建模标签分布偏移，从而设计出对标签偏移具有内生鲁棒性的算法？
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/One_Demo_Is_All_It_Takes_Planning_Domain_Derivation_with_LLMs_from_A_Single_Demonstration.pdf
+project_link: null
+code_link: null
 openreview_forum_id: Y1VgLHbzCC
 aliases:
 - One_Demo_Is_All_
@@ -41,7 +43,7 @@ claims:
 > - Tower of Hanoi 上，Success Rate (%) 为 100 ± 0.0，对比 14.3 ± 0.0 (LLMTAMP-FF)，变化 +85.7。
 > - Rearrangement 上，Success Rate (%) 为 64.3 ± 0.7，对比 17.4 ± 1.1 (LLMTAMP-FF)，变化 +46.9。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -65,7 +67,7 @@ PDDLLM提出了一条根本性的替代路径：**仅从单次人类演示出发
 
 在9种环境、超过1200个任务的评测中，PDDLLM以**93.3%的整体规划成功率**全面超越六大基线，较最强基线LLMTAMP-FF（52.5%）提升超过40个百分点。在Tower of Hanoi等需要长时序推理的复杂任务上，PDDLLM成功率达到**100%**，而LLMTAMP-FF仅为14.3%。与推理LLM方法相比，PDDLLM在复杂任务子集上以80.5%的成功率优于o1-TAMP的61.5%，且token成本仅为后者的62%。消融实验表明，生成的规划域与专家手工设计域相比，缺失谓词和冗余谓词的比例均控制在较低水平，验证了自动域构建的质量。系统还在Franka、Piper、UR5e三种真实机器人平台上成功部署，进一步证明了方法的实用性。
 
-## 背景与动机
+
 
 任务与运动规划（Task and Motion Planning, TAMP）是机器人自主完成复杂长时序操作的核心技术。它需要将高层符号推理与低层连续运动规划相结合，使机器人能够将“把杯子放到架子上”这样的抽象指令，分解为一系列可执行的抓取、移动、放置动作。然而，TAMP 系统的有效性高度依赖于一个关键前提：**规划域（planning domain）必须被精确地预先定义**。
 
@@ -77,7 +79,9 @@ PDDLLM提出了一条根本性的替代路径：**仅从单次人类演示出发
 
 核心矛盾在于：**人类专家无法为每一个新场景预先编写规划域，而 LLM 又缺乏从物理世界自主抽象符号知识的能力**。本文的核心动机正是打破这一僵局——能否让系统仅通过观察一次人类演示，就自动推导出完整的、可执行的规划域？这要求系统同时具备两种能力：从连续物理轨迹中抽象出离散逻辑关系，以及验证这些逻辑关系在真实物理约束下的正确性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PDDLLM 的核心创新在于将**规划域构建**从“人工编写”彻底转变为“从单次演示自动推导”，消除了 TAMP 对专家手工设计 PDDL 域的依赖。这一转变通过三个关键 slot 的替换实现：
 
@@ -112,7 +116,7 @@ LoCA 是 PDDLLM 消除人工接口设计的核心组件。它直接检索动作�
 
 综上，PDDLLM 的创新并非在单个模块上修修补补，而是**重构了 TAMP 的域构建范式**：从“人工定义 + 手工接口”变为“仿真验证 + LLM 归纳 + 自动接口”，仅需一次演示即可生成完整的可执行规划域。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_Y1VgLHbzCC/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the proposed framework. (1) Human demonstrations, in the form of manipulation trajectories, and the corresponding task descriptions, serve as input. Implementation details is shown in Section B.12. (2) PDDLLM initiates thousands of parallel simulations, using the resulting roll-outs and rich physics-based feedback to guide the LLM in summarizing them into meaningful predicates, and returns a predicate library annotated with each predicate’s relevance to the current task. (3) Actions are invented by an LLM that summarizes logical state transition patterns from the demonstration, which is grounded into logical states using the imagined predicates. (4) The predicates and actions ar...*
@@ -148,7 +152,7 @@ $$
 - **离散化尺度 $u_f$**：连续特征 $f$ 的离散化粒度初始设为该特征在所有相关物体间的最小非零差异 $d_{min}$，平衡了谓词精度与冗余度。
 - **一次性域推导**：整个流程仅需单次演示，不依赖任何预定义谓词或动作模板，也不需要在执行新任务时重复调用 LLM——token 消耗仅发生在域推导阶段，后续规划由 PDDL 求解器零成本完成。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化
 
@@ -183,7 +187,9 @@ PDDLLM 的自动化域推导由四个关键模块串联而成，加上一个连�
 
 LoCA 自动将逻辑动作与运动规划器对接，无需人工编写数学约束接口。其核心机制是：检索动作效果集 $\mathcal{P}_{eff}$ 中每个一阶谓词关联的物理约束，将逻辑动作自动转化为标准约束运动规划问题，确保生成轨迹与动作语义一致。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制验证
 
@@ -293,7 +299,9 @@ LLMTAMP基础版本（无反馈）的总体成功率仅35.7%，凸显了仿真�
 *Table 8: Planning success rate (%) across tasks for all methods (Time limit = 25 s)*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心瓶颈与因果机制
 
@@ -357,6 +365,8 @@ PDDLLM 开启的“从演示到域”范式引出以下开放问题：
 5. **仿真-现实差距缓解**：当前方法对高精度物理仿真器有较强依赖。如何在仿真不精确的情况下保持域推导的可靠性，是实际部署中的关键挑战。
 
 **验证说明**：上述局限与开放问题均来自论文明确讨论（Section 9 Limitations, Section 11 Future Works），置信度高。关于具体基线工作的引用信息（如 Huang et al., 2022a 等）来自论文参考文献，作者/年份/会议信息以原文为准，未做额外推断。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/R1_Code_Interpreter_LLMs_Reason_with_Code_via_Supervised_and_Multi_stage_Reinforcement_Learning.pdf
+project_link: https://huggingface.co/yongchao98
+code_link: https://github.com/yongchao98/R1-Code-Interpreter
 openreview_forum_id: FNlNH0iFOx
 aliases:
 - RCIRC
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | R1-Code-Interpreter：通过监督与多阶段强化学习实现大语言模型的代码推理 |
 | 英文题名 | R1-Code-Interpreter: LLMs Reason with Code via Supervised and Multi-stage Reinforcement Learning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=FNlNH0iFOx); [GitHub](https://github.com/yongchao98/R1-Code-Interpreter); [Project](https://huggingface.co/yongchao98) |
+| Links | [paper](https://openreview.net/forum?id=FNlNH0iFOx) · [GitHub](https://github.com/yongchao98/R1-Code-Interpreter) · [Project](https://huggingface.co/yongchao98) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | R1-Code-Interpreter (R1-CI) |
 | Dataset | 37 Test Tasks (SymBench, BBH, Reasoning-Gym average), 37 Test Tasks |
@@ -42,7 +44,7 @@ claims:
 > - 37 Test Tasks (SymBench, BBH, Reasoning-Gym average) 上，Accuracy (%) 为 72.4，对比 70.9 (GPT-4o Code Interpreter)，变化 +1.5。
 > - 37 Test Tasks 上，Accuracy (%) 为 72.4，对比 44.1 (Qwen-2.5-14B All Text)，变化 +28.3。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -76,7 +78,7 @@ R1-CI 属于 **代码增强推理型 LLM** 的训练方法，其核心贡献在�
 
 R1-CI 通过 **SFT 预热 → 改进潜力测量 → 多阶段 GRPO 课程学习** 的管线，在开源模型上首次实现了对 GPT-4o 代码解释器的超越，验证了“以改进潜力驱动课程学习”这一策略在多任务代码推理 RL 训练中的有效性。
 
-## 背景与动机
+
 
 ### 大语言模型推理的范式演进
 
@@ -106,7 +108,9 @@ $$\Pi_i = 4 p_i (1-p_i)$$
 2. **训练困境**：直接应用GRPO于多任务Code Interpreter训练时，任务异质性导致梯度信号稀疏，RL增益微乎其微，需要新的训练策略来释放RL的潜力。
 3. **方法论突破**：通过量化“改进潜力”并以此指导课程学习，有望将RL性能增益从+3.4%大幅提升至+9.3%，使开源模型在多样化推理任务上超越GPT-4o。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 R1-Code-Interpreter (R1-CI) 的核心创新并非提出全新的算法，而是针对**多任务代码解释器强化学习训练中策略梯度信号消失**这一关键瓶颈，设计了一套系统性的解决方案。其创新点可归纳为以下三个环环相扣的层面：
 
@@ -128,7 +132,7 @@ R1-Code-Interpreter (R1-CI) 的核心创新并非提出全新的算法，而是�
 
 最终，这套“SFT预热→IP测量→多阶段课程GRPO”的协同设计，使得开源14B模型R1-CI-14B在144个多样化推理与规划任务上达到**72.4%的准确率**，超越GPT-4o纯文本推理（58.6%）及其自带Code Interpreter（70.9%）（Table 3, Figure 1a）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_FNlNH0iFOx/figures/003_Figure_1.jpg]]
 *Figure 1: Training Code Interpreter-augmented reasoning models with multi-stage GRPO on 144 reasoning and planning tasks. (a) Our best model, R1-CI-14B, outperforms both GPT-4o (text-only) and GPT-4o with Code Interpreter. (b) Training reward and test scores improve steadily through the curriculum learning, then plateau at stage 4 after adding low-potential samples. (c) To assess sample effectiveness, we estimate improvement potential by repeatedly sampling answers with different agent frameworks and analyzing the correct/wrong distribution. GRPO begins with high-potential samples and gradually incorporates lower-potential ones*
@@ -161,7 +165,7 @@ SFT预热后的模型进入**GRPO强化学习**阶段。训练目标为最大化
 
 训练完成的模型进入**评估引擎**，在37个测试任务上基于规则自动评判任务完成情况。最终模型R1-CI-14B达到72.4%的测试准确率，显著优于GPT-4o纯文本推理（58.6%）和GPT-4o自带Code Interpreter（70.9%），验证了整个框架的有效性。
 
-## 核心模块与公式推导
+
 
 ### 多轮代码解释器交互框架
 
@@ -238,7 +242,9 @@ $$
 
 其中 $p_i = \frac{1}{N}\sum_{j=1}^{N} y_{i,j}$ 为使用四种代理策略共 $N=20$ 次采样中答案正确的比例。$\Pi_i$ 在 $p_i=0.5$ 时取得最大值 1.0，在 $p_i=0$ 或 $1$ 时取得最小值 0，精确刻画了该样本所能提供的最大梯度信号强度（Equation 4.6, Section 4.3）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈：多任务GRPO的策略梯度信号消失
 
@@ -349,7 +355,9 @@ Table 4进一步报告了在GPQA Diamond和AIME 24&25上的OOD性能：R1-CI-14B
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_FNlNH0iFOx/figures/032_Table_6.jpg]]
 *Table 6: (continued from previous page)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 代码增强推理的方法谱系
 
@@ -375,6 +383,8 @@ R1-Code-Interpreter 处于“大语言模型 + 外部代码执行”这一研究
 1. **极端难度任务的优化策略**：对于 $p \approx 0$ 的任务（模型几乎无法正确解答），当前的改进潜力引导策略无法提供有效梯度。是否需要引入更细粒度的过程奖励或子目标分解来突破这一瓶颈？
 2. **代码推理的可解释性**：模型在 GRPO 训练中涌现出代码自我验证行为（Figure 6a），但这一行为的内部机制尚不清晰——模型是真正理解了验证逻辑，还是仅学会了模仿训练数据中的验证模式？
 3. **跨模型规模的缩放特性**：当前实验覆盖 3B/7B/14B 参数规模，改进潜力课程学习在更大规模模型（如 70B+）上的效果是否仍然显著，以及课程阶段的划分策略是否需要调整，仍有待验证。
+
+
 
 ## 原文 PDF
 

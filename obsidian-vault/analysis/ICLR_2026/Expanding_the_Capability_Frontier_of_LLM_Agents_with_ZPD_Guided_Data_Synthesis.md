@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Expanding_the_Capability_Frontier_of_LLM_Agents_with_ZPD_Guided_Data_Synthesis.pdf
+project_link: null
+code_link: null
 openreview_forum_id: c5bf47nDx1
 aliases:
 - AE
@@ -42,7 +44,7 @@ claims:
 > - ZPD Exam-v1 上，Accuracy (%) 为 91.4，对比 90.0 (MegaScience)，变化 +1.4。
 > - xBench-ScienceQA 上，Accuracy (%) 为 54.0，对比 48.0 (MegaScience)，变化 +6.0。
 
-## 概述
+## 概要
 
 当前大型语言模型（LLM）代理在跨文档知识融合与复杂推理方面仍存在显著能力瓶颈，其根源在于缺乏位于模型“能力前沿”的高质量多学科训练数据。现有数据合成方法多采用单步查询生成或文档中心策略，以粗粒度难度标签控制任务复杂度，难以精准匹配模型当前可塑性最强的学习区间。
 
@@ -50,7 +52,7 @@ claims:
 
 实验表明，基于AgentFrontier数据训练的模型在四个多学科基准上全面超越先前微调数据集。在最具挑战性的 **Humanity’s Last Exam (HLE)** 上，Qwen3-30B-A3B经拒绝采样微调（RFT）后达到25.7%，较最佳基线MegaScience的20.2%提升5.5个百分点；引入继续预训练（CPT）后进一步达到28.6%，超越若干专有深度研究代理。消融实验证实，ZPD数据筛选策略相比随机采样带来4至10个绝对百分点的平均增益，验证了该策略的有效性。
 
-## 背景与动机
+
 
 ### 大型语言模型代理的能力瓶颈
 
@@ -76,7 +78,9 @@ claims:
 
 通过对抗校准，自动筛选出那些LKP无法独立解决、但MKO能够验证正确的任务——这些任务恰好落在模型的ZPD内，构成了对能力成长最优价值的训练数据。这种ZPD引导的数据合成策略，能够持续产生推动代理从LKP向MKO演进的学习材料，从根本上区别于传统的数据生成范式。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 1. 从“文档中心”到“知识融合”的数据生成范式
 
@@ -133,7 +137,7 @@ $$\mathcal{L}_{\mathrm{RFT}}(\theta) = -\sum_{i=1}^K \sum_{j=1}^{L_i} \log p_{\t
 
 Table 6/Table 12显示，CPT在所有基准上带来一致的增益：HLE +2.9点、ZPD Exam +2.0点、xBench-ScienceQA +7.0点。这一设计解决了纯RFT的一个隐含缺陷——模型可能缺乏对多学科知识的深层编码，而CPT阶段恰好弥补了这一基础能力缺口，使后续的推理训练建立在更坚实的知识地基之上。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_c5bf47nDx1/figures/002_Figure_2.jpg]]
 *Figure 2: The three-stage pipeline of the AgentFrontier Engine. Stage I generates seed QA pairs from multiple sources. Stage II iteratively escalates their complexity using a tool-augmented agent. Stage III applies a ZPD-based calibration filter to isolate high-value training samples*
@@ -181,7 +185,7 @@ Figure 6 展示了一个典型案例：一个生物医学的种子问题，通�
 
 三个阶段形成了一条从**广度构建**到**深度挖掘**再到**精准筛选**的完整数据生产链。阶段一确保知识覆盖的广度，阶段二注入推理深度，阶段三则通过 LKP/MKO 的对抗校准，精确识别那些对模型成长最优的“跳一跳够得着”的任务。这种设计使得数据合成不再是盲目的复杂度堆砌，而是有理论指导的、面向能力前沿的定向生成。
 
-## 核心模块与公式推导
+
 
 ### 三阶段合成管线概览
 
@@ -292,7 +296,9 @@ $$
 
 其中 $q^{(i)}$ 为第 $i$ 条问题，$r_j^{(i)}$ 为第 $j$ 轮推理报告，$o_{j-1}^{(i)}$ 为上一轮工具观测结果，$L_i$ 为该轨迹的推理轮数。训练仅使用经拒绝采样筛选的 12,000 条完全正确轨迹，共训练 3 个 epoch。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制验证
 
@@ -385,7 +391,9 @@ $$
 ![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_c5bf47nDx1/figures/018_Table_10.jpg]]
 *Table 10: SFT Hyperparameters for the Dense Model*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有数据合成方法的对比
 
@@ -420,6 +428,8 @@ AgentFrontier在训练策略上也引入了重要创新。现有方法通常仅�
 3. **多模态迁移**：该方法在处理非文本模态（如图像、视频）以及多模态融合任务时的迁移效果如何？当前框架的知识融合机制主要针对文本，向多模态扩展需要重新设计块划分和主题关联策略。
 
 4. **动态对抗框架**：对抗校准与生成式对抗网络（GAN）思想结合，能否形成更完善的动态数据生成框架？当前LKP/MKO是静态配置的，引入动态博弈机制可能进一步提升数据质量。
+
+
 
 ## 原文 PDF
 

@@ -42,7 +42,7 @@ claims:
 > - Fine-grained classification (8 datasets) 上，Robust accuracy (PGD-100, ε=4/255) TeCoA+ET3 (standalone & combined with augmentations) vs TPT, C-TPT, MTA, R-TPT, TTC, etc. (Improvement up to +11.62 (standalone), matches/exceeds SOTA when combined)。
 > - LVLM tasks (COCO, Flickr30k captioning; TextVQA, VQAv2 QA) 上，CIDEr (captioning) / VQA accuracy LLaVA 1.5-7B with standard/robust CLIP + ET3 vs Same LLaVA models without ET3 (Robust accuracy increases consistently (see Table 3 for detailed values))。
 
-## 概述
+## 概要
 
 大视觉语言模型（LVLM）在图像描述、视觉问答等下游任务中展现出强大能力，但其依赖的视觉编码器（如CLIP）极易受到对抗扰动攻击——微小的像素级扰动即可导致模型预测完全错误，并进一步污染语言生成过程。这一视觉编码器的脆弱性是当前LVLM鲁棒性的核心瓶颈。
 
@@ -60,7 +60,7 @@ ET3的关键特性包括：
 
 **局限与展望**：ET3的有效性依赖于网络的局部线性假设，在高度非线性区域可能效果减弱；防御半径ε需预先设定，对极大扰动可能无法完全恢复；当前仅针对视觉编码器，未覆盖文本或其他模态。未来方向包括：主动训练网络以满足ET3所需条件（如增大局部线性半径），将方法推广至视频、文本生成等多模态场景，以及在更大规模开源LVLM上验证一致性。
 
-## 背景与动机
+
 
 ### 大视觉语言模型的对抗脆弱性瓶颈
 
@@ -88,7 +88,9 @@ $$E(\mathbf{x}) = -\log\Big(\sum_{k=1}^{K}\exp\big(f_{\theta}(\mathbf{x})_k\big)
 
 ET3 的设计遵循三个原则：（1）**训练无关**——无需修改或重训练视觉编码器，即插即用；（2）**计算高效**——仅需 1-2 步梯度下降，推理延迟增加低至 2.3%；（3）**理论可证明**——在局部线性假设下，ET3 对二元分类器具有正确分类的保证。该方法不仅适用于 CLIP 的零样本分类，还能通过共享视觉编码器将鲁棒性传递至 LLaVA 等下游 LVLM，实现跨任务的统一防御。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 1. 从被动防御到主动能量引导的范式转换
 
@@ -130,7 +132,7 @@ ET3 与现有测试时方法的区别不仅是技术路线不同，更是对“�
 
 ET3 的回答是：**鲁棒性来源于将样本拉回自然分布的低能量区域**。这一回答不仅统一了分类与生成视角下的防御逻辑（能量模型天然桥接判别与生成），也为未来研究指明了方向——训练网络以主动满足 ET3 所需的条件（如增大局部线性半径或能量梯度比率），可进一步提升防御效果。
 
-## 整体框架
+
 
 ET3（Energy-Guided Test-Time Transformation）构建了一条“能量计算—梯度优化—特征传递”的轻量级测试时防御流水线。其核心思路是将预训练分类器重新解释为能量模型（EBM），通过极小化输入图像的能量将其从对抗样本所在的高能区域拉回自然分布的低能区域。整个过程无需额外训练，仅依赖预训练好的视觉编码器，且优化后的图像特征可直接传递给下游的大视觉语言模型（LVLM）。
 
@@ -171,7 +173,7 @@ ET3 在防御范式上区别于两类主流方法：
 
 这种“能量引导的测试时变换”策略将防御的核心操作从“模型重训练”或“提示工程”转移到了“输入空间的能量最小化”，实现了训练无关、即插即用、计算高效的对抗鲁棒性提升。
 
-## 核心模块与公式推导
+
 
 ### 能量计算模块
 
@@ -212,7 +214,9 @@ $$f_i(\mathbf{x}+\mathbf{z}) = f_i(\mathbf{x}) + \mathbf{z}^{\top}\mathbf{g}_i$$
 ![[assets/figures/papers/paper_list_l2757_https_openaccess_thecvf_com_content_CVPR2026_html_Mirza_A_Provable_Energ/figures/003_Figure_3.jpg]]
 *Figure 3: (left) The ET3 defense transformation for adversarial examples. Assuming local linearity of the model in the defense neighborhood*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -322,7 +326,9 @@ Figure 4 展示了 ET3 在不同攻击强度（$\epsilon_a$）下的鲁棒准确
 ![[assets/figures/papers/paper_list_l2757_https_openaccess_thecvf_com_content_CVPR2026_html_Mirza_A_Provable_Energ/figures/001_Figure_1.jpg]]
 *Figure 1: (top) Presenting a natural image green mamba x, and its adversarial image*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 测试时防御的范式演进
 
@@ -378,6 +384,8 @@ ET3的理论保证（Theorem 4.1）建立在两个关键假设之上：
 3. **更大规模模型的验证**：当前实验主要在CLIP ViT-B/32和LLaVA 1.5-7B上进行。在更大规模的开源LVLM（如Qwen-VL、Open-Flamingo）上，ET3是否仍能保持一致的鲁棒性提升，需要进一步验证。
 
 4. **自适应攻击的极限**：Table 4显示在防御感知的自适应攻击下，ET3仍能提升鲁棒性（+2.74），但这一提升幅度是否能在更强的自适应攻击策略下保持，是一个开放问题。
+
+
 
 ## 原文 PDF
 

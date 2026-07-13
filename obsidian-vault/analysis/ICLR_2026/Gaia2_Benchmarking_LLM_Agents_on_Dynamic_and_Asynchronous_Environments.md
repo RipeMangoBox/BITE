@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Gaia2_Benchmarking_LLM_Agents_on_Dynamic_and_Asynchronous_Environments.pdf
+project_link: null
+code_link: null
 openreview_forum_id: 9gw03JpKK4
 aliases:
 - GBAF
@@ -42,7 +44,7 @@ claims:
 > - Gaia2 Overall 上，pass@1 (%) 为 GPT-5 (high): 42.1，对比 Claude-4-Sonnet Thinking: 37.8，变化 +4.3 pp。
 > - Gaia2 Execution 上，pass@1 (%) 为 GPT-5 (high): 69.2，对比 Claude-4-Sonnet Thinking: 62.1，变化 +7.1 pp。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -64,7 +66,7 @@ Gaia2在方法谱系中处于从“静态最终答案验证”向“动态过程
 
 当前基准存在若干待解约束：顺序ReAct支架无法表达需要并发动作的时间敏感场景；验证器对等效写操作（如通过Messages还是Chat发送消息）的严格区分可能低估智能体的灵活性；Agent2Agent模式中协调开销可能抵消协作收益；推理模型丢弃中间推理步骤的设置可能非最优。开放问题包括：如何设计自适应计算策略以平衡效率与性能；如何通过并行编排建构建模并发操作；如何将标量验证奖励与偏好信号结合以处理主观任务；以及如何放宽验证器对等效动作的限制以更真实反映智能体实用性。
 
-## 背景与动机
+
 
 ### 静态基准的饱和与隐忧
 
@@ -97,7 +99,9 @@ Gaia2在方法谱系中处于从“静态最终答案验证”向“动态过程
 
 正如 Figure 1 的预算缩放曲线所示，即便当前最强的模型（GPT-5 high 达到 42.1% pass@1），其性能也随预算增加迅速进入平台期，表明标准支架和现有模型仍缺少实现持续进步的关键要素。Gaia2 通过暴露这些隐藏的失败模式，为下一代实用智能体系统的发展提供了不可或缺的诊断工具。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Gaia2的核心创新在于将**异步事件驱动的环境模拟**与**行动级细粒度验证**相结合，构建了一个能暴露真实部署中关键失败模式的评测框架。相较于现有基准，它在四个关键维度上实现了根本性的设计转变。
 
@@ -123,7 +127,7 @@ Gaia2引入**噪声分割**，在评估中系统性地注入工具异常（随�
 
 综上，Gaia2通过**行动级验证 × 异步模拟 × 多智能体协作 × 噪声注入**的四维创新，将LLM智能体评测从“静态问答正确率”推进至“动态环境适用性诊断”，为下一代实用智能体系统的开发提供了关键基础设施。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_9gw03JpKK4/figures/002_Figure_2.jpg]]
 *Figure 2: ARE environments are event-based, time-driven simulations, that run asynchronously from the agent and the user. ARE environments allows playing scenarios, which typically contain tasks for the agent and verification logic. Whether initiated by agent or user, interactions happen through the same interfaces and can be either tool calls, or tool output/notification observations. Extensive simulation control and logging allow precise study of agents behavior*
@@ -183,7 +187,7 @@ Gaia2通过七个能力分割维度系统评估智能体（图4）：
 2. **运行过程**：环境异步演化，通知层选择性推送事件；智能体在ReAct循环中接收观察、推理、执行工具调用。
 3. **输出**：完整的行动轨迹日志，由ARE Verifier离线或在线进行行动级验证，生成二值成功/失败判定及细粒度诊断信息。验证聚焦于写操作，避免对探索策略的过度约束，同时使基准可直接用于基于可验证奖励的强化学习（RLVR）训练。
 
-## 核心模块与公式推导
+
 
 ### 3.1 ARE 平台核心抽象
 
@@ -228,7 +232,9 @@ $$ \sum \mathbb{1} \{ \text{scenario result} = \text{True} \land \text{scenario 
 
 该公式对每个最大预算值，统计成功完成且成本低于该预算的场景总数，用于绘制 Figure 1 中的预算-性能缩放曲线，揭示模型在不同成本约束下的能力上限与平台效应。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：能力分化与根本权衡
 
@@ -315,7 +321,9 @@ ARE Verifier 通过拓扑排序对比智能体写操作与 oracle 序列，强�
 ![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_9gw03JpKK4/figures/025_Table_4.jpg]]
 *Table 4: Pre-set notification policies in Mobile (Compressed)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有基准的关系
 
@@ -368,6 +376,8 @@ Gaia2 相对于上述基准的方法创新可归纳为四个关键设计槽位�
 5. **等效动作的宽松验证**：如何放宽验证器对等效动作的严格限制，更真实地反映智能体的实用性？这需要在不牺牲验证可靠性的前提下，定义跨应用的功能等价性。
 
 6. **基础设施可靠性**：如何消除模型 API 的速率限制和宕机问题，提供可靠的基础设施以支持实时响应的代理系统？当前的 API 延迟和不可靠性是部署时间敏感智能体的实际障碍，而非模型能力问题。
+
+
 
 ## 原文 PDF
 

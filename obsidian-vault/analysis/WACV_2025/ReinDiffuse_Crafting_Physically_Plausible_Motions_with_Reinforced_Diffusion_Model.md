@@ -43,7 +43,7 @@ claims:
 > - HumanML3D 上，FID↓ 0.385 vs 0.544 (MDM) (-29.2%)；R-Precision↑ 0.622 vs 0.611 (MDM) (+0.011)；Skate ratio→ 0.058 vs 0.102 (MDM) (接近真实 (0.057))。
 > - KIT-ML 上，FID↓ 0.326 vs 0.494 (MDM) (-34.0%)；Skate ratio→ 0.087 vs 0.122 (MDM) (接近真实 (0.085))；Float (m)→ 0.938 vs 1.836 (MDM) (接近真实 (0.930))。
 
-## 概述
+## 概要
 
 ### 1. 问题背景
 
@@ -79,7 +79,7 @@ ReinDiffuse 位于**文本驱动运动扩散模型**与**强化学习微调**的
 - **关节级评估的盲区**：物理奖励仅基于关节点位置计算，无法捕获网格层面的细粒度物理错误（如手与身体的穿透）。
 - **开放方向**：能否设计自动化的物理奖励生成机制？能否在高效网格或隐式表面表示上进行物理合理性评估而不显著增加训练成本？若将物理奖励与语义对齐奖励联合优化，是否能同时提升动作真实性和文本贴合度？
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -115,7 +115,9 @@ ReinDiffuse 位于**文本驱动运动扩散模型**与**强化学习微调**的
 
 ReinDiffuse 的提出正是为了应对上述挑战：通过重新参数化将 MDM 的输出转化为高斯动作分布，使其兼容 RL 框架；同时设计基于关节位置的四类物理奖励函数，利用 PPO 对预训练 MDM 进行微调，直接优化动作的物理保真度。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ReinDiffuse 的核心创新在于**将运动扩散模型重新解释为强化学习中的连续动作策略**，从而在不修改网络结构的前提下，直接优化生成动作的物理合理性。这一思路通过两个关键设计实现：
 
@@ -157,7 +159,7 @@ $$\mathcal{L}_{PPO}(\theta) = \mathbb{E}\left[ \min(r_i(\theta) R_i, \operatorna
 
 这两项设计使 ReinDiffuse 在 HumanML3D 上将 FID 从 MDM 的 0.544 降至 0.385（相对提升 29%），在 KIT-ML 上从 0.494 降至 0.326（相对提升 34%）。物理合理性指标大幅改善：滑步比从 0.102 降至 0.058，浮空高度从 1.757 m 降至 0.711 m，地面穿透和脚部截交完全消除（降至 0.000），各项指标均接近真实数据分布（Table 1, Table 2）。
 
-## 整体框架
+
 
 ReinDiffuse 的训练框架将预训练运动扩散模型（MDM）重新解释为强化学习中的随机策略，在不修改网络结构的前提下，通过物理奖励驱动的策略优化实现物理合理性的注入。整体流程如 Figure 2 所示，由五个核心模块串联构成闭环。
 
@@ -176,7 +178,7 @@ ReinDiffuse 的训练框架将预训练运动扩散模型（MDM）重新解释�
 
 整个 pipeline 的核心因果机制在于：通过重新参数化将扩散模型的输出空间转化为可优化的策略空间，再以物理奖励为信号引导策略向物理合理的方向偏移，而 $\mathcal{L}_{simple}$ 的保留则确保语义对齐能力不被遗忘。
 
-## 核心模块与公式推导
+
 
 ReinDiffuse 的核心在于将运动扩散模型 MDM 的输出重新解释为随机策略，从而在不修改网络结构的前提下，使其兼容强化学习框架。整个训练流程由五个关键模块构成，如 Figure 2 所示。
 
@@ -255,7 +257,9 @@ $$\mathcal{L} = \mathcal{L}_{PPO} + \lambda \mathcal{L}_{simple}$$
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2410_07296/figures/001_Figure_1.jpg]]
 *Figure 1: Our ReinDiffuse can generate physically plausible motion, effectively eliminating common physical issues such as floating, penetration, foot clipping, and skating. ReinDiffuse enables MDM to learn physical commonsense with reinforcement learning*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -303,7 +307,9 @@ Figure 1 和 Figure 3 从视觉层面印证了定量结果。Figure 1 展示了 
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2410_07296/figures/005_Table_3.jpg]]
 *Table 3: Effect of varying standard deviation σ in RL fine-tuning on HumanML3D [8]*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -356,6 +362,8 @@ ReinDiffuse 在方法谱系中占据 **“扩散模型 + 强化学习”** 的�
 - **训练范式创新**：PPO 损失与 MDM 简单损失的组合训练（$L = L_{PPO} + \lambda L_{simple}$）实现了物理保真度与运动质量的平衡。重要性采样机制（公式 9）使 RL 策略在更新时能够利用预训练策略的采样结果，提高了样本效率。
 
 该工作为“物理感知生成模型”领域提供了一个新的基准：在 HumanML3D 上 FID 从 0.544 降至 0.385（29% 提升），在 KIT-ML 上从 0.494 降至 0.326（34% 提升），同时将滑步比、浮空高度等物理指标推向真实数据水平，地面穿透和脚部截交完全消除。这些结果表明，将物理常识以奖励函数形式注入扩散模型的 RL 微调过程，是一种有效且可推广的策略。
+
+
 
 ## 原文 PDF
 

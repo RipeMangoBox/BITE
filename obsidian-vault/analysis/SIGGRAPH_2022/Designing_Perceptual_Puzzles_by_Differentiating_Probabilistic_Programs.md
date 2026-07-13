@@ -32,7 +32,7 @@ claims:
 | 中文题名 | 通过可微分概率编程设计感知谜题 |
 | 英文题名 | Designing Perceptual Puzzles by Differentiating Probabilistic Programs |
 | 会议/期刊 | SIGGRAPH 2022 |
-| Links | [paper](https://arxiv.org/abs/2204.12301) · [Project](https://people.csail.mit.edu/kach/dpp-dpp/) · [arXiv](https://arxiv.org/abs/2012) · [Code](https://github.com/kach/designing-perceptual-puzzles-by-differentiating-probabilistic-programs) |
+| Links | [paper](https://arxiv.org/abs/2204.12301) · [Project](https://people.csail.mit.edu/kach/dpp-dpp/) · [paper](https://arxiv.org/abs/2012) · [Code](https://github.com/kach/designing-perceptual-puzzles-by-differentiating-probabilistic-programs) |
 | Topic | #topic/other_unclear |
 | Method | 可微分概率编程（Differentiable Probabilistic Programming） |
 | Dataset |  |

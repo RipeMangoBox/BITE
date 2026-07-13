@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Incentivizing_LLM_Reasoning_via_Reinforcement_Learning_with_Functional_Monte_Carlo_Tree_Search.pdf
+project_link: null
+code_link: https://github.com/sastpg/RFTT
 openreview_forum_id: lHbhzxiVI9
 aliases:
 - RRFTT
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 基于函数蒙特卡洛树搜索的强化学习激励大语言模型推理 |
 | 英文题名 | Incentivizing LLM Reasoning via Reinforcement Learning with Functional Monte Carlo Tree Search |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=lHbhzxiVI9); [GitHub](https://github.com/sastpg/RFTT) |
+| Links | [paper](https://openreview.net/forum?id=lHbhzxiVI9) · [GitHub](https://github.com/sastpg/RFTT) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | RFTT (Reinforced Functional Token Tuning) |
 | Dataset | MATH-500, GSM8K |
@@ -42,7 +44,7 @@ claims:
 > - GSM8K 上，Pass@1 准确率 为 95.2，对比 91.1 (Zero-shot CoT)，变化 +4.1。
 > - MATH-500 上，Pass@1 准确率 为 60.2，对比 50.6 (Zero-shot CoT)，变化 +9.6。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -85,7 +87,7 @@ RFTT属于**树搜索增强的强化微调**方法，与现有工作的关键区
 
 > **注意**：当前工作主要聚焦于数学推理领域，在其他复杂领域（如法律、医学诊断）的有效性尚需更多验证。增强的推理能力并不消除LLM固有的偏见、过度自信或生成错误但令人信服的输出等问题。
 
-## 背景与动机
+
 
 ### 大语言模型推理能力提升的范式演进
 
@@ -117,7 +119,9 @@ RFTT属于**树搜索增强的强化微调**方法，与现有工作的关键区
 
 这些问题的解决，需要在模型架构、训练策略和搜索机制三个层面进行协同设计。本文提出的RFTT方法，通过将功能标记（functional tokens）嵌入模型词汇表，并构建功能标记引导的MCTS训练框架，为上述问题提供了一个统一的解决方案。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 RFTT（Reinforced Functional Token Tuning）的核心创新在于将**可学习的功能标记（functional tokens）** 与**蒙特卡洛树搜索（MCTS）** 深度耦合，构建了一个从“外部提示引导”到“内部标记驱动”的推理能力内化机制。其关键设计围绕三个 changed slots 展开：
 
@@ -149,7 +153,7 @@ $$R_t(s_{0:t}, a_t, s_{t+1}) = \mathtt{RM}(s_{0:t}, a_t, s_{t+1}) - \beta \cdot 
 
 功能标记消融实验（Table 4）揭示了各标记的非对称重要性：掩蔽 `<verify>` 和 `<refine>` 标记导致准确率下降约 **7 个百分点**（从 79.8% 分别降至 72.8% 和 72.6%），表明自我验证与自我修正能力是 RFTT 性能增益的主要来源，而其他标记（如 `<analysis>`、`<subquestion>`）的贡献相对温和。这一发现暗示，**推理能力的提升并非均匀地来自所有推理行为，而是集中在纠正性元认知行为上**。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_lHbhzxiVI9/figures/001_Figure_1.jpg]]
 *Figure 1: A conceptual illustration of reasoning path generation based on functional tree search and our training framework. RFTT comprises two phases: supervised fine-tuning warmups the model with initial reasoning capability by functional token-annotated data, while online reinforcement learning allows the model to directly sample functional tokens from its vocabulary to autonomously expand reasoning trees for diverse exploration*
@@ -192,7 +196,7 @@ RFTT相较于现有工作的三个核心设计转变在于：
 
 在SFT阶段，使用约1.2k道MATH题目通过64个并发进程进行MCTS搜索，生成约1k条SFT数据；训练batch size为128，学习率为$7\times10^{-6}$，截断长度为8192。在RL阶段，每步训练对16个不同问题各搜索16条推理路径；策略模型学习率为$5\times10^{-7}$，温度为0.95，KL系数为0.01。过程奖励模型采用mathshepherd-mistral-7b-prm。推理时，RFTT可利用MCTS进一步扩展搜索，以推理时计算换取性能提升（见图3），且无需额外奖励模型引导。
 
-## 核心模块与公式推导
+
 
 ### 功能标记动作空间
 
@@ -244,7 +248,9 @@ $$\mathcal{L}_{RL}(\theta) = -\mathbb{E}_t\left[\min\left(\frac{\pi_\theta(a_t|s
 
 其中 $\hat{A}_t$ 为优势估计，$\epsilon$ 为剪切范围。该目标通过限制策略更新幅度，在提升推理能力的同时保持训练稳定性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -330,7 +336,9 @@ Table 7对比了不同方法的计算开销。RFTT的SFT数据构建阶段使用
 *Table 10: Comparison with entropy-based RL methods for promoting exploration. The best results in each box are highlighted in bold*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法演进定位
 
@@ -375,6 +383,8 @@ RFTT 处于**推理时搜索**与**强化微调**两条技术路线的交叉点�
 3. **规模扩展**：能否在不显著增加计算成本的前提下，将功能标记引导的树搜索与更大规模模型（如 70B+）集成？
 4. **训练稳定性**：在持续的自我改进循环中，如何避免模型遗忘原有能力或产生奖励破解（reward hacking）行为？
 5. **功能标记语义**：功能标记的语义与行为之间的关系（Figure 4）是否具有跨模型、跨任务的稳定性？能否设计更优的功能标记集合？
+
+
 
 ## 原文 PDF
 

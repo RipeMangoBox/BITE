@@ -41,7 +41,7 @@ claims:
 > - Urban100 (×2) 上，PSNR/SSIM 32.52/0.9312 vs 32.30/0.9275 (+0.22/+0.0037)。
 > - Manga109 (×2) 上，PSNR/SSIM 39.32/0.9792 vs 39.19/0.9774 (+0.13/+0.0018)。
 
-## 概述
+## 概要
 
 现有轻量级图像超分辨率（SISR）方法普遍对所有空间位置分配均等的计算资源，忽略了自然图像中视觉复杂度的空间不均匀性——纹理丰富、边缘密集的区域重建难度远高于平坦区域，这种“一刀切”的计算策略导致高信息区域的误差集中，制约了有限计算预算下的重建质量提升。
 
@@ -49,7 +49,7 @@ claims:
 
 实验表明，IDM 成功捕获了误差图中高亮的纹理区域（Figure 2），验证了其作为重建难度代理的有效性。在 Manga109 ×2 任务上，引入子流形稀疏卷积（SSConv）仅额外增加 6 GFLOPs 即带来 0.26 dB 的提升；完整模型在 Urban100 ×2 上取得 32.52 dB PSNR，较无 IDM 引导的基线提升 0.22 dB。IAFMNet 在多个公开基准上以更低的参数量和计算量，实现了优于 **CARN-M**（Ahn et al., ECCV 2018）、**IMDN**（Hui et al., ACM MM 2019）、**ShuffleMixer**（Sun et al., NeurIPS 2022）、**SAFMN**（Sun et al., ICCV 2023）等代表性轻量级 SR 方法的性能-复杂度权衡。
 
-## 背景与动机
+
 
 单图像超分辨率（SISR）旨在从低分辨率观测中恢复高分辨率图像，是底层视觉领域的经典病态逆问题。随着深度学习的普及，大量高性能SR模型相继涌现，但其庞大的参数量和计算开销严重限制了在资源受限设备上的部署。因此，轻量级高效超分方法成为近年来的研究热点。
 
@@ -61,7 +61,9 @@ claims:
 
 IAFMNet 正是从这一动机出发，首次从信息密度视角审视退化特征增强问题，提出以无监督信息熵损失驱动的像素级信息密度图（IDM）作为核心调控信号，协同引导稀疏卷积的显式计算分配与仿射变换的隐式特征重校准，从而在有限计算预算下实现重建质量的显著提升。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 IAFMNet 的核心创新在于将**信息密度感知**引入轻量级超分辨率网络的特征调制机制，从根本上改变了传统方法对图像空间均匀分配计算资源的范式。其关键创新可归纳为三个紧密耦合的 changed slots。
 
@@ -109,7 +111,7 @@ $$\mathbf{F}_{\mathrm{local}} = \mathrm{DWConv}(S(\mathrm{Conv}_{1\times1}(\math
 
 三个 changed slots 形成闭环协同：**IDE 提供空间重要性先验 → IGRA 根据该先验进行硬性计算分配 → ARM 利用同一先验进行软性特征调制**。这种“硬分配+软调制”的双分支设计，使 IAFMNet 在 Urban100（×2）上相比无 IDM 引导的基线提升 **+0.22 dB** PSNR（32.52 vs. 32.30），同时保持计算效率。
 
-## 整体框架
+
 
 IAFMNet 的整体架构遵循轻量级超分辨率网络的主流设计范式，但其核心创新在于引入了**信息密度图（Information Density Map, IDM）** 作为全局引导信号，驱动双分支特征增强模块进行区域自适应的计算分配与特征调制。整个 pipeline 由四个关键阶段构成：浅层特征提取、信息密度估计、信息引导特征增强、以及图像重建。
 
@@ -158,7 +160,7 @@ $$\mathcal{L} = \mathcal{L}_1 + \lambda \mathcal{L}_{IE}$$
 ![[assets/figures/papers/paper_list_l886_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_IAFMNet_Information/figures/003_Figure_3.jpg]]
 *Figure 3: Illustration of the proposed IAFMNet: (a) the overall network architecture, (b) the information density estimator, and (c) the information-guided feature enhancement module*
 
-## 核心模块与公式推导
+
 
 IAFMNet 的核心设计围绕一个中心假设展开：图像不同区域的重建难度由其信息密度决定，计算资源应当向高信息密度区域倾斜。本章从信息论视角出发，依次阐述信息密度估计器（IDE）、信息引导特征增强模块（IFEM）及其内部的两个互补分支——信息引导资源分配（IGRA）与仿射重校准模块（ARM）。
 
@@ -228,7 +230,9 @@ $$\mathcal{L} = \mathcal{L}_1 + \lambda \mathcal{L}_{IE}$$
 ![[assets/figures/papers/paper_list_l886_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_IAFMNet_Information/figures/005_Figure_5.jpg]]
 *Figure 5: Visualization of progressive feature enhancement via IDM-guided sparse allocation and soft modulation*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心结果与效率权衡
 
@@ -272,7 +276,9 @@ Figure 2 提供了 IDM 有效性的直接证据：基线模型重建的 SR 图�
 ![[assets/figures/papers/paper_list_l886_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_IAFMNet_Information/figures/001_Figure_1.jpg]]
 *Figure 1: Performance and model complexity comparison on the Manga109 [22] dataset for ×4 super-resolution*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 
@@ -309,6 +315,8 @@ IAFMNet 的核心贡献在于将**信息密度**作为显式引导信号引入�
 **软硬协同机制的进一步探索。** 当前的 IGRA（硬分配）和 ARM（软调制）以并行分支的方式协同工作，两者之间的信息交互仅通过共享的 IDM 实现。是否存在更紧密的耦合方式？例如，使用 ARM 的输出动态调整 IGRA 的稀疏阈值，或使用 IGRA 的稀疏选择结果反向指导 ARM 的调制强度——这可能在保持效率的同时进一步减少硬性阈值的信息丢失。
 
 **感知对齐的信息密度估计。** 当前 IDM 的优化目标完全基于信息论编码代价，与人眼感知存在偏差。一个值得探索的方向是将感知损失（如 LPIPS）或对抗损失引入 IDM 的学习过程，使信息密度图更准确地反映人眼关注的区域。这需要在编码代价的数学优雅性与感知对齐的经验有效性之间找到平衡。
+
+
 
 ## 原文 PDF
 

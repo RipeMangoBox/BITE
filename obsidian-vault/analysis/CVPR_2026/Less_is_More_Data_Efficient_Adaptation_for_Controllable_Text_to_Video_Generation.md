@@ -45,7 +45,7 @@ claims:
 > - VBench SVP 上，VQA Score 0.521 (Decoupled, Shutter) vs 0.522 (WAN 2.1 backbone) (-0.001)；Subject Consistency 0.946 (Decoupled, Shutter) vs 0.951 (WAN 2.1 backbone) (-0.005)；Motion Smoothness 0.987 (Decoupled, Shutter) vs 0.988 (WAN 2.1 backbone) (-0.001)。
 > - Monotonicity Analysis (80-prompt subset, 5-frame outputs) 上，Median Spearman |ρ| 1.000 (all controls) vs N/A (Perfect monotonic response)。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -68,7 +68,7 @@ claims:
 
 实验表明，该方法在快门速度、光圈和色温三个连续物理控制任务上均实现了**完美的单调响应**（Spearman |ρ| = 1.000），且解耦推断下的视频质量指标（主体一致性 0.946、运动平滑度 0.987、X-CLIP 25.587）与原始 WAN 2.1 主干几乎一致，语义保真度变化小于 2%。消融实验进一步验证：合成数据训练的主干漂移速率远低于真实数据，且联合训练是避免适配器“推土机效应”（高秩内容记忆）的必要条件。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -92,7 +92,9 @@ claims:
 
 基于这一洞察，本文提出 **“Less is More”** 框架：仅使用**低保真度、稀疏的合成数据**（简单几何图元与程序化物理变化），通过**联合训练与解耦推断**策略，在不损害主干生成质量的前提下，实现精准、连续的物理控制。这一设计的核心逻辑是：简单、可控的合成数据避免了语义纠缠，使模型能够以“最少的数据”学到“最纯的控制”。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于提出了一套**数据高效联合训练与解耦推断**范式，使得大规模文生视频（T2V）扩散模型仅需极少量低保真合成数据，即可获得精准、连续的物理相机控制能力。其关键洞察是：**微调数据集的有效性不取决于其真实感，而取决于其解耦程度**——简单、可控的合成数据能避免语义纠缠和灾难性遗忘，比真实风格数据更高效地诱导出预训练模型已有的视觉先验。
 
@@ -145,7 +147,7 @@ $$y_{\mathrm{combined}} = y_{\mathrm{text}} + g \cdot y_{\mathrm{cond}}$$
 
 本方法在控制精度上实现了**完美的单调响应**。在 80 个提示词子集上的单调性分析（Table 2）显示，所有物理控制参数（快门速度、光圈、色温）的 Spearman 秩相关系数中位数 $|\rho| = 1.000$，意味着生成结果与控制标量之间存在完全单调的映射关系。这一特性使得用户可以通过连续调节标量值获得可预期的、平滑的物理效果变化，而基于文本提示的基线方法无法实现这种精确的连续控制。
 
-## 整体框架
+
 
 本文提出一种面向可控文本到视频生成的数据高效适应框架，核心思想是“少即是多”：仅使用稀疏、低保真度的合成数据，通过联合训练与解耦推断策略，即可在大型预训练文生视频（T2V）扩散模型上实现精准的连续物理控制。该方法以 **WAN 2.1**（Wan et al., arXiv:2503.20314, 2025）作为骨干网络，在不损害其原有生成先验的前提下，赋予模型对快门速度、光圈、色温三个标量参数的连续操控能力。
 
@@ -177,7 +179,7 @@ $$y_{\mathrm{combined}} = y_{\mathrm{text}} + g \cdot y_{\mathrm{cond}}$$
 ![[assets/figures/papers/paper_list_l2221_https_arxiv_org_abs_2511_17844/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of our controllable generation pipeline. To achieve decoupled control, we encode the scalar condition separately from the text guidance via a parallel cross-attention module. During training (top), we optimize the conditional adapter while actively updating the backbone by injecting LoRA layers into all DiT blocks. During inference (bottom), we discard the LoRA weights from the shallow two-thirds of the transformer blocks, retaining only the conditional adapter and backbone LoRA in the deepest third of the blocks. This selective retention enables high-fidelity physical control while minimizing semantic corruption of the backbone*
 
-## 核心模块与公式推导
+
 
 ### 整体架构概览
 
@@ -229,7 +231,9 @@ $$\nu_{\mathrm{drift}} = \frac{\delta(\mathrm{SS\text{-}FD})}{\delta(\mathrm{ste
 ![[assets/figures/papers/paper_list_l2221_https_arxiv_org_abs_2511_17844/figures/015_Figure_12.jpg]]
 *Figure 12: Backbone content drift across depth for the shutter speed condition. Analysis performed on the value projection*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计逻辑
 
@@ -332,7 +336,9 @@ Figure 6 通过条件信号 $y_{\mathrm{cond}}$ 的奇异值谱分析揭示了�
 ![[assets/figures/papers/paper_list_l2221_https_arxiv_org_abs_2511_17844/figures/003_Figure.jpg]]
 *Figure: Ared sports car speeding down a coastal highway with waves crashing on the side. wider Aperture narrower A cat siting by a window watching the rain*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线工作的关系
 
@@ -385,6 +391,8 @@ Figure 6 通过条件信号 $y_{\mathrm{cond}}$ 的奇异值谱分析揭示了�
 4. **无丢弃的保先验方案**：若不丢弃任何 LoRA 权重，能否通过更精细的正则化或知识蒸馏直接保留主干先验，同时避免合成数据的偏置污染？这关系到方法在更广泛部署场景中的简洁性。
 
 5. **跨主干泛化性**：在不同视频生成骨干上（如 HunyuanVideo、Sora 类模型），是否仍能观察到相同的“少即是多”效应？这决定了该范式的生态影响力边界。
+
+
 
 ## 原文 PDF
 

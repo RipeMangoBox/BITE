@@ -5,6 +5,7 @@ paper_level: A
 venue: ICCV
 year: 2025
 pdf_ref: paperPDFs/ICCV_2025/GestureLSM_Latent_Shortcut_based_Co_Speech_Gesture_Generation_with_Spatial_Temporal_Modeling.pdf
+code_link: null
 project_link: https://andypinxinliu.github.io/GestureLSM
 aliases:
 - GLSBCSGGSTM
@@ -33,7 +34,10 @@ claims:
 | Method |  |
 | Dataset |  |
 
-## 概述
+> [!tip] 效果简介
+> 本笔记的既有实验指标、对比结果与适用边界见“实验与关键发现”；本轮仅统一结构，不改写证据。
+
+## 概要
 
 语音驱动的共语手势生成旨在从语音信号中合成与说话内容节奏同步、语义一致的自然人体手势。现有方法在生成质量与推理速度之间面临两难权衡：扩散模型虽能产生高质量手势，但迭代采样过程导致推理延迟过高；单步回归方法速度快，却在手势多样性与真实感上存在明显不足。
 
@@ -48,7 +52,7 @@ GestureLSM 针对这一瓶颈，提出了一种基于**潜在捷径建模（Late
 
 综上，GestureLSM 通过“离散潜在空间 + 流匹配捷径 + 空间-时间解耦建模”的组合策略，在生成质量与推理效率之间取得了新的最优平衡点，为实时共语手势生成提供了可行范式。
 
-## 背景与动机
+
 
 语音驱动的手势生成（co-speech gesture generation）旨在从语音和文本脚本中合成与说话内容同步的全身人体手势，是虚拟人、数字代理等应用中的关键任务。现有方法主要面临两个核心瓶颈：**生成质量与推理速度之间的权衡**，以及**对身体各部位时空交互建模的不足**。
 
@@ -62,7 +66,9 @@ GestureLSM 针对这一瓶颈，提出了一种基于**潜在捷径建模（Late
 
 2. **细粒度时空建模**：将身体不同部位的运动通过残差向量量化（RVQ）离散化为 token，并利用空间注意力和时间注意力机制显式学习各身体部位 token 之间的交互关系，实现连贯的全身手势生成。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GestureLSM 的核心创新在于将**空间-时间解耦注意力**与**潜空间捷径学习**相结合，在保证生成质量的同时大幅提升推理速度。相对于现有基线方法（如 EMAGE），其关键改变槽位体现在以下三个层面。
 
@@ -89,7 +95,7 @@ GestureLSM 采用双路编码器分别处理语音的低层起始信息（振幅
 
 **证据强度说明**：上述创新点均有消融实验和定量结果支撑（FGD 从次优基线 5.256 降至 4.088，Table 1），置信度较高。但论文未提供 venue/year 元数据，部分基线方法的具体版本需对照原文确认。
 
-## 整体框架
+
 
 GestureLSM 的整体 pipeline 围绕“条件融合 → 空间-时间建模 → 量化潜变量学习 → 流匹配采样”四个核心阶段展开，如 **Figure 3** 所示。系统输入为语音信号与文本脚本，输出为与语音同步的全身高保真手势序列。
 
@@ -142,7 +148,7 @@ $$
 
 时间步采样分布对生成质量有显著影响。实验表明，采用 Beta 分布进行采样可获得最低的训练损失；同时，当 $t$ 接近 1 时施加左偏斜的强调，能够显著提升生成质量。
 
-## 核心模块与公式推导
+
 
 ### 整体流程
 
@@ -223,7 +229,9 @@ $$
 ![[assets/figures/papers/paper_list_l1887_GestureLSM_Latent_Shortcut_based_Co_Speech_Gesture_Generation_with_Spati/figures/005_Figure_5.jpg]]
 *Figure 5: Time Sampling Comparison. For various time sampling schedules, beta schedule performs the best, i.e., lowest training loss, with skewed pattern (left) to counteract the ineffectiveness of model prediction when t approaches 1 (right)*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -274,7 +282,9 @@ GestureLSM 在 BEAT2 基准上取得全面最优。Table 1 显示，其 FGD 为 
 ![[assets/figures/papers/paper_list_l1887_GestureLSM_Latent_Shortcut_based_Co_Speech_Gesture_Generation_with_Spati/figures/012_Figure_9.jpg]]
 *Figure 9: Training dynamics of key evaluation metrics. (a) Beat constancy decreases, indicating a shift from overly rigid beat-following motions to more natural gestures. (b) FGD decreases, reflecting improved gesture realism. (c) Gesture diversity increases, suggesting a broader range of motion patterns learned by the model*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与主流基线的关系
 
@@ -308,6 +318,8 @@ GestureLSM 在 BEAT2 基准上与现有方法进行了系统对比。Table 1 显
 - 潜变量捷径模型（Latent Shortcut Model, Figure 4）中自一致性约束的理论性质未在分析中展开——该约束是否等价于某种正则化，或是否可与其他一致性模型建立形式化联系，需手动核实。
 - 该方法在 BEAT2 上的优势是否可迁移到其他生成质量指标（如 HumanML3D 的 FID、动作多样性指标）未见报告。
 - 空间注意力中位置编码 $\mathbf{P}$ 的具体形式及其对全身区域交互的贡献未做消融，该设计是否为性能关键因素需进一步确认。
+
+
 
 ## 原文 PDF
 

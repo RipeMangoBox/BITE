@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/Can_Large_Vision_Language_Models_Correct_Semantic_Grounding_Errors_By_Themselves.pdf
+code_link: null
 project_link: https://andrewliao11.github.io/vlms_feedback/
 aliases:
 - ISCVBV
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 大型视觉语言模型能否自行纠正语义基础错误？ |
 | 英文题名 | Can Large Vision-Language Models Correct Semantic Grounding Errors By Themselves? |
 | 会议/期刊 | CVPR 2025 |
-| Links | [paper](https://arxiv.org/abs/2404.06510); [Project](https://andrewliao11.github.io/vlms_feedback/) |
+| Links | [paper](https://arxiv.org/abs/2404.06510) · [Project](https://andrewliao11.github.io/vlms_feedback/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | Iterative Self-Correction with VLM Binary Verification |
 | Dataset | ADE20k (semantic grounding accuracy), COCO (semantic grounding accuracy) |
@@ -42,7 +43,7 @@ claims:
 > - ADE20k (semantic grounding accuracy) 上，Accuracy (%) 为 41.18，对比 33.81，变化 +7.36。
 > - COCO (semantic grounding accuracy) 上，Accuracy (%) 为 47.92，对比 39.49，变化 +8.43。
 
-## 概述
+## 概要
 
 ### 1. 问题背景与核心瓶颈
 
@@ -99,7 +100,7 @@ claims:
 
 开放问题包括：如何提升VLM遵循显式反馈的能力？如何设计更可靠的反馈生成机制？自校正能否扩展到更复杂的视觉推理任务？
 
-## 背景与动机
+
 
 ### 问题背景：大型视觉语言模型的语义基础能力
 
@@ -122,7 +123,9 @@ claims:
 
 这些问题的回答将为VLMs的自我改进能力提供基础性理解，并为无需额外训练即可提升多模态理解性能开辟新路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作的核心创新在于提出了一种**基于VLM二元验证的迭代自校正框架**，使得大型视觉语言模型能够在不依赖外部工具、领域数据微调或架构修改的前提下，通过自我生成的反馈显著提升语义基础（Semantic Grounding）的准确性。
 
@@ -150,7 +153,7 @@ claims:
 
 整个框架形成了一个**闭环的自校正系统**：Base Predictor生成初始预测 → VLM Verifier生成二元反馈 → Feedback Integrator将反馈集成到下一轮预测 → 迭代循环直至收敛。这一设计使得VLM仅依靠自身能力即可实现语义基础准确性的持续提升，无需任何外部工具或先知反馈。在COCO数据集上，GPT-4o使用该框架将准确性从39.49%提升至47.92%（+8.43，Table 5），LLaVA-1.5在ADE20k上从35.86%提升至40.29%（+4.43，Table 4），验证了闭环自校正的可行性。
 
-## 整体框架
+
 
 本文提出的语义基础自校正框架围绕一个核心操作变量展开：**将复杂的生成式修正任务分解为更简单的二元验证任务**，并利用同一VLM作为验证器生成反馈，通过迭代对话循环引导模型修正预测，全程无需外部工具、领域内数据或模型微调。
 
@@ -187,7 +190,7 @@ claims:
 
 本框架在两者之间开辟了新路径：用VLM自身生成可靠的二元反馈替代不可靠的内在反思，同时避免依赖外部先知，实现了无需监督的自校正闭环。
 
-## 核心模块与公式推导
+
 
 ### 语义基础的形式化定义
 
@@ -236,7 +239,9 @@ Table 2 的消融实验表明，零样本 CoT 与视觉标记的组合是最有�
 
 三者构成递进的研究层次：神谕类别标签反馈揭示模型遵循显式指令的能力上限（Table 1 显示 LLaVA-1.5 提升至 94.8 但未达 100%，暴露约 25% 的指令遵循失败率）；神谕二元反馈验证二元信号本身的有效性；VLM 自生成反馈则检验框架在无外部工具条件下的实际可行性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -331,7 +336,9 @@ GPT-4o在ADE20k上的成本-性能权衡曲线显示，VLM验证自校正在t=1�
 ![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2404_06510/figures/011_Table_7.jpg]]
 *Table 7: Accuracy of the VLMs binary feedback Accfeedback. We find that intrinsic self-correction often improves accuracy in VLMs with lower base prediction performance due to imbalanced oracle binary feedback*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位：语义基础中的自校正
 
@@ -389,6 +396,8 @@ GPT-4o在ADE20k上的成本-性能权衡曲线显示，VLM验证自校正在t=1�
 5. **自适应收敛判断**：最优自校正轮次因模型和数据集而异（GPT-4o在3轮后趋势稳定，LLaVA-1.5需5轮），如何在没有神谕的情况下自动判断收敛？
 
 6. **方法协同效应**：自校正与微调、架构改进或外部工具结合能否产生协同效应，进一步缩小与神谕上界的差距？
+
+
 
 ## 原文 PDF
 

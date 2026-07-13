@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Robust_Fine_tuning_of_Vision_Language_Action_Robot_Policies_via_Parameter_Merging.pdf
+project_link: https://retain.yajatyadav.com
+code_link: null
 openreview_forum_id: uWJwQ5SZoM
 aliases:
 - RFTVLARPPM
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 通过参数合并实现视觉-语言-动作机器人策略的鲁棒微调 |
 | 英文题名 | Robust Fine-tuning of Vision-Language-Action Robot Policies via Parameter Merging |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=uWJwQ5SZoM); [Project](https://retain.yajatyadav.com) |
+| Links | [paper](https://openreview.net/forum?id=uWJwQ5SZoM) · [Project](https://retain.yajatyadav.com) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | RETAIN |
 | Dataset | DROID Whiteboard OOD Test Scenes, DROID Plates OOD Test Scenes, LIBERO 3-task Average OOD |
@@ -41,7 +43,7 @@ claims:
 > - DROID Plates OOD Test Scenes 上，成功率 (Success Rate) 为 >60% (RETAIN-co-FT)，对比 ≈30% (Task-FT平均)，变化 +30%。
 > - LIBERO 3-task Average OOD 上，成功率 (Success Rate) 为 ≈85% (RETAIN-co-FT)，对比 ≈70% (Co-FT)，变化 +15%。
 
-## 概述
+## 概要
 
 将大规模预训练的通用机器人策略适配到特定下游任务时，面临一个核心瓶颈：**标准微调方法（如全参数微调 Task-FT）在仅使用少量目标演示数据（50–100 条）时，会导致策略严重过拟合**——微调后的策略迅速遗忘预训练获得的通用能力，并且无法将预训练知识迁移到目标任务的未见变体（OOD）上，在分布内（ID）性能与分布外（OOD）性能之间形成巨大鸿沟（Fig. 4）。
 
@@ -57,7 +59,7 @@ claims:
 
 **方法局限**：当前对参数合并为何能显著提升泛化性缺乏完整的理论解释，合并系数 α 需在验证集上手动调节，且实验仅在基于 π0 架构的 VLA 策略上验证，泛化到其他架构尚待探索。
 
-## 背景与动机
+
 
 通用机器人策略的微调面临一个核心困境：标准微调方法（Task-FT）在使用少量目标演示数据时，会导致策略严重过拟合。如图 4 所示，随着训练步数增加，策略在非目标任务上的通用能力急剧下降，甚至在微调数据中的分布内（ID）场景也开始退化。更关键的是，微调后的策略无法将预训练获得的通用知识迁移到目标任务的未见变体（OOD）上——例如新的物体位置、实例、视角或光照条件——在 ID 与 OOD 性能之间存在巨大鸿沟。
 
@@ -65,7 +67,9 @@ claims:
 
 现有微调范式本质上是在“适应目标任务”与“保留通用能力”之间做不可调和的权衡，缺乏一个简洁而有效的机制来同时兼顾两者。本文的动机正是填补这一缺口：能否在权重空间中找到一个既保留预训练模型泛化能力、又具备目标任务专长的解决方案，且不增加任何推理成本？
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈洞察：标准微调的过拟合困境
 
@@ -126,7 +130,7 @@ $$\tilde{\theta}_n = (1 - \alpha) \cdot \tilde{\theta}_{n-1} + \alpha \cdot \the
 - 实验仅在基于π0架构的VLA策略上进行，泛化到其他架构（如扩散策略）尚待验证
 - 对模型合并为何能显著提升泛化性缺乏完整的理论解释，目前多基于线性模式连通性的经验假设
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_uWJwQ5SZoM/figures/001_Figure_1.jpg]]
 *Figure 1: Naive approaches for finetuning of generalist policies narrowly improve target task performance on settings seen in the finetuning data, but fail to generalize or retain generality beyond the target task. We propose a simple solution: by averaging the generalist policy before and after finetuning, in weight space, we obtain finetuned policies that (1) significantly improve generalization ability to unseen variations of the target task, and (2) retain generalist capabilities on non-target tasks. Our approach RETAIN is a simple solution for robust policy finetuning*
@@ -179,7 +183,7 @@ $$\tilde{\theta}_n = (1 - \alpha) \cdot \tilde{\theta}_{n-1} + \alpha \cdot \the
 
 整体推理流程为：给定观测图像 $s_t$ 和任务指令 $T$，视觉编码器提取特征后送入语言模型主干进行跨模态融合，动作专家根据融合表示生成动作 $a_t$。RETAIN **不改变推理管线**，仅在部署前通过权重空间插值生成最终策略参数，因此不增加任何推理时延或计算开销。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化
 
@@ -221,7 +225,9 @@ RETAIN 支持两种微调范式：
 
 实验一致表明，Co-FT 结合模型合并（RETAIN-co-FT）在所有评估设置中均优于仅使用模型合并（RETAIN-task-FT）（Fig. 7, 8），说明在微调阶段保留对预训练数据的接触有助于维持权重空间中的线性连通性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -297,7 +303,9 @@ RETAIN通过一个简洁的因果控制变量解决此问题：微调后策略�
 *Table 7: Training hyperparameters for task-FT on DROID whiteboard*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 方法定位与核心差异
 
@@ -331,6 +339,8 @@ RETAIN 在方法层面属于模型合并（model merging）范式，与自然语
 4. **学习范式扩展**：是否可以将 RETAIN 扩展到在线强化学习或交互式模仿学习场景，在探索与利用的循环中动态调整合并系数？
 5. **多任务累积效应**：当连续合并更多任务（$N > 2$）时，迭代合并公式 $\tilde{\theta}_n = (1 - \alpha) \cdot \tilde{\theta}_{n-1} + \alpha \cdot \theta_{\mathrm{ft},n}$ 是否仍能保持稳定？是否存在遗忘累积效应？
 6. **预训练数据质量与合并效果的关系**：Figure 9 显示更多预训练数据显著提升 RETAIN 的 OOD 性能，但数据质量、多样性与合并效果之间的定量关系尚未被系统研究。
+
+
 
 ## 原文 PDF
 

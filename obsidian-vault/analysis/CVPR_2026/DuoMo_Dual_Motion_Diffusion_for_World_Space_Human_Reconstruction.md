@@ -43,7 +43,7 @@ claims:
 > - EMDB 上，W-MPJPE (mm) 167.1 (DuoMo w/ height) vs 202.1 (GENMO) (-35.0 (-17.3%))；WA-MPJPE (mm) 66.0 (DuoMo w/ height) vs 74.3 (GENMO) (-8.3 (-11.2%))；RTE (%) 1.1 (DuoMo w/ height) vs 1.2 (GENMO/TRAM) (-0.1)。
 > - RICH 上，W-MPJPE (mm) 80.4 (DuoMo w/ height) vs 118.6 (GENMO) (-38.2 (-32.2%))；WA-MPJPE (mm) 53.5 (DuoMo w/ height) vs 75.3 (GENMO) (-21.8 (-28.9%))；MPJPE (mm) (camera-space) 48.0 (DuoMo w/ height) vs 55.7 (CameraHMR) (-7.7)。
 
-## 概述
+## 概要
 
 从无约束单目视频中恢复世界空间的人体运动，是具身AI、AR/VR和行为理解的核心挑战。现有方法面临一个根本性瓶颈：**端到端直接预测模型缺乏跨场景的泛化能力**，而**先估计相机空间运动再通过后处理提升到世界空间的方法**，虽然泛化性较好，却难以保证全局物理一致性——提升后的运动常出现漂移、脚滑动和长时遮挡下的位移偏差。
 
@@ -59,7 +59,7 @@ DuoMo 还引入了几项关键设计：直接生成595个稀疏网格顶点的�
 
 实验结果表明，DuoMo 在 EMDB 和 RICH 数据集上分别将世界空间误差（W-MPJPE）相对次优方法降低了约 **16%** 和 **30%**，同时保持较低的脚滑动和根轨迹误差。消融实验证实，双模型设计（相机空间+世界空间）相比单一模型在精度和运动质量上均有显著提升，且该方法对相机位姿噪声具有更强的鲁棒性。
 
-## 背景与动机
+
 
 从单目视频中恢复世界空间中的三维人体运动是计算机视觉的核心难题，其应用涵盖动作捕捉、人机交互、增强现实等。问题的本质挑战在于：单目视频天然丢失了深度信息，且相机本身可能处于未知的运动之中，因此系统必须同时从二维观测中推断出人体姿态和全局轨迹。
 
@@ -71,7 +71,9 @@ DuoMo 还引入了几项关键设计：直接生成595个稀疏网格顶点的�
 
 此外，DuoMo 直接生成 595 个稀疏网格顶点的运动序列，而非 SMPL 参数，避免了对参数化身体模型的依赖，使运动表征更灵活。在训练和推理阶段，模型还引入了接触损失、重投影引导和位移引导等机制，进一步强化物理合理性与时间一致性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DuoMo 的核心创新在于**将人体运动重建解耦为两个生成式扩散阶段**，从根本上改变了运动学习策略：第一阶段由相机空间扩散模型从视频特征生成相机坐标系下的运动，第二阶段通过显式几何升维将其变换到世界空间，再由世界空间扩散模型对该含噪提议进行去噪与细化，最终输出全局一致的世界空间运动。这一设计解决了现有方法在泛化性与全局物理一致性之间的根本权衡——端到端模型缺乏泛化能力，而先相机空间后升维的方法则缺乏全局物理一致性。
 
@@ -113,7 +115,7 @@ DuoMo 的核心创新在于**将人体运动重建解耦为两个生成式扩散
 
 DuoMo 通过显式几何升维将相机空间估计转化为世界空间的含噪提议，再利用世界空间扩散模型作为生成式先验进行去噪和细化，避免了对固定规范坐标系的依赖，同时兼顾了泛化能力与全局一致性。
 
-## 整体框架
+
 
 DuoMo 将单目视频的世界空间人体运动重建分解为**两个级联的扩散模型**，形成“估计—升维—细化”的三步流水线。该设计的核心动机在于解决现有方法中**泛化能力与全局物理一致性之间的根本权衡**：端到端直接预测世界空间运动的方法泛化性不足，而先估计相机空间运动再后优化的方法则缺乏对全局一致性的显式建模。
 
@@ -149,7 +151,7 @@ DuoMo 将单目视频的世界空间人体运动重建分解为**两个级联的
 ![[assets/figures/papers/paper_list_l963_https_arxiv_org_abs_2603_03265/figures/013_Figure_8.jpg]]
 *Figure 8: Architecture (sparse mesh to SMPLX). This network performs iterative refinement to predict SMPLX parameters from a target sparse mesh*
 
-## 核心模块与公式推导
+
 
 DuoMo 将世界空间人体运动重建分解为两个生成式阶段，分别由相机空间扩散模型与世界空间扩散模型承担，中间通过显式几何升维衔接。图2给出了完整的管线概览。
 
@@ -228,7 +230,9 @@ $$\mathcal{L}_{\text{contact}} = \frac{1}{|S|} \sum_{t \in S} \| {}^{1}X_{t,\tex
 ![[assets/figures/papers/paper_list_l963_https_arxiv_org_abs_2603_03265/figures/003_Figure_3.jpg]]
 *Figure 3: Height conditioning. Our camera-space model can generate predictions based on input body heights. As shown at the bottom row, height impacts distance from camera and thus plays an important role in world-space accuracy*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -287,7 +291,9 @@ Table 2 在 Egobody 数据集上评估了遮挡场景下的重建鲁棒性。所
 ![[assets/figures/papers/paper_list_l963_https_arxiv_org_abs_2603_03265/figures/011_Figure_6.jpg]]
 *Figure 6: Impact of camera error. Comparison of methods under different camera motion noise levels*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：世界空间人体运动重建的核心瓶颈
 
@@ -373,6 +379,8 @@ DuoMo 的世界空间扩散模型仅建模人体运动本身，未显式编码 3
 4. **多人物交互场景**：DuoMo 目前针对单人重建设计。在多人交互场景中，世界空间运动之间存在物理约束（如接触、避碰），如何扩展双扩散框架以同时生成多个一致的人体运动序列是一个开放挑战。
 
 5. **实时/在线推理**：当前扩散模型的迭代采样过程限制了实时应用。探索蒸馏、一致性模型或单步生成方法，以在保持世界空间一致性的前提下降低推理延迟。
+
+
 
 ## 原文 PDF
 

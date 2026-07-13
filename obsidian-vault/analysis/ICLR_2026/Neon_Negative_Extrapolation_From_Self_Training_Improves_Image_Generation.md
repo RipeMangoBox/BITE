@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Neon_Negative_Extrapolation_From_Self_Training_Improves_Image_Generation.pdf
+project_link: null
+code_link: https://github.com/VITA-Group/Neon
 openreview_forum_id: kpLRYtPGt3
 aliases:
 - NNEFST
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | Neon：通过自我训练负向外推改进图像生成 |
 | 英文题名 | Neon: Negative Extrapolation From Self-Training Improves Image Generation |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=kpLRYtPGt3); [GitHub](https://github.com/VITA-Group/Neon) |
+| Links | [paper](https://openreview.net/forum?id=kpLRYtPGt3) · [GitHub](https://github.com/VITA-Group/Neon) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/generative_models_and_autoencoders |
 | Method | Neon (Negative Extrapolation from Self‑Training) |
 | Dataset | CIFAR‑10 (EDM‑VP, unconditional), FFHQ‑64 (EDM‑VP, CIFAR‑10 (Flow Matching, ImageNet‑256 (xAR‑L, autoregressive) |
@@ -42,15 +44,13 @@ claims:
 > - FFHQ‑64 (EDM‑VP, unconditional) 上，FID 为 1.12，对比 2.39，变化 −1.27。
 > - CIFAR‑10 (Flow Matching, unconditional) 上，FID 为 2.32，对比 3.50，变化 −1.18。
 
-## 概述
+## 概要
 
 高质量真实训练数据的稀缺是当前生成模型面临的核心瓶颈。朴素的自训练（self-training）——让模型在自身合成的数据上继续训练——通常会导致模型退化而非提升。然而，Neon 发现了一个反直觉的关键洞察：**自训练导致的参数退化方向并非随机噪声，而是一个与无限真实数据上的总体梯度呈反方向对齐（anti‑aligned）的强信号**。通过反转这一退化方向（即负向外推），可以更准确地逼近真实数据分布，实现模型性能的显著提升。
 
 基于这一洞察，Neon 提出了一种极其简洁的后处理方案：首先生成少量合成数据，在其上对基模型进行极短时间的微调以获得退化参数，然后通过参数合并公式将基模型参数沿退化方向的反方向外推。整个过程无需任何额外真实数据、辅助模型或推理阶段的修改，仅消耗原训练计算预算的不到 1%。
 
 Neon 在扩散模型、流匹配模型、自回归模型和少步生成模型等多个模型家族上均实现了一致的 FID 改善。在 ImageNet‑256 上，Neon 将自回归模型 **xAR‑L**（Ren et al., 2025）的 FID 从 1.28 提升至 1.02，达到该基准的当前最优水平，而额外计算开销仅为原训练的 0.36%。理论分析进一步表明，模式寻找（mode‑seeking）采样器（如温度 τ<1、top‑k、top‑p 等）能够保证合成梯度与真实梯度的反对齐（cos φ < 0），从而确保 Neon 的有效性。
-
-## 背景与动机
 
 ### 生成模型的数据瓶颈与自训练的退化悖论
 
@@ -74,7 +74,7 @@ Neon 在扩散模型、流匹配模型、自回归模型和少步生成模型等
 
 这些方法均未能利用自训练退化方向中蕴含的结构化信息。Neon 的提出正是为了填补这一缺口：**通过一个简单的后验参数合并操作，将自训练的“副作用”转化为模型的“改进动力”**，无需任何额外真实数据、辅助模型或推理阶段的修改。
 
-## 核心创新
+## 核心方法与创新机理
 
 ### 1. 瓶颈反转：从模型退化中提取改进信号
 
@@ -126,8 +126,6 @@ $$\cos \varphi < 0$$
 
 在自回归模型中，Neon 的外推强度 $w$ 与无分类器引导（CFG）尺度 $\gamma$ 存在互补关系：$w$ 增加召回但牺牲精度，$\gamma$ 则相反。因此，Neon 在自回归模型上采用 **$(w, \gamma)$ 联合优化**策略，通过网格搜索找到最优组合。实验表明，单独调整任一参数均无法达到最佳 FID（Figure 6），联合优化是释放 Neon 全部潜力的关键。
 
-## 整体框架
-
 Neon 的核心流程极其简洁，仅由三个顺序模块构成，无需额外真实数据、无需辅助模型、无需修改推理过程。其整体管线如下：
 
 ### 合成数据生成
@@ -168,8 +166,6 @@ $$\mathcal{R}_{\mathrm{data}}(\theta_{\mathrm{Neon}}) = \mathcal{R}_{\mathrm{dat
 - **中间产物**：合成数据集 $\mathcal{S}$，退化模型 $\theta_s$
 - **输出**：Neon 增强模型 $\theta_{\mathrm{Neon}}$，可直接用于推理，无需任何额外修改
 - **可调超参数**：外推强度 $w$（以及自回归模型中的 CFG 尺度 $\gamma$），通常通过小范围网格搜索确定
-
-## 核心模块与公式推导
 
 Neon 的核心流程由三个顺序执行的模块构成，整体计算开销极低（通常小于原始训练预算的 1%），且无需额外真实数据或辅助模型。
 
@@ -213,7 +209,7 @@ $$ \cos \varphi := \frac{\langle \varepsilon, H_d^{-1} b \rangle_{H_d}}{\|\varep
 
 对于自回归生成模型（如 xAR、VAR），Neon 的外推强度 $ w $ 与 CFG 尺度 $ \gamma $ 存在互补关系：$ w $ 通过牺牲精度换取召回提升，而 $ \gamma $ 的作用恰好相反。因此，评估时需对 $ (w, \gamma) $ 进行联合网格搜索以达到最优 FID。这是 Neon 在自回归模型上的唯一额外调优需求，其余流程与扩散/流模型完全一致。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心结果：跨架构、跨范式的普适提升
 
@@ -273,19 +269,7 @@ Neon 在扩散模型、流匹配模型、自回归模型和少步生成模型上
 ![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_kpLRYtPGt3/figures/014_Figure.jpg]]
 *Figure: B.2: FID vs. Merge Weight (w) validation. For the mode-seeking sampler ( \zeta = 1 . 1 ) , the optimal FID is at w > 0 (Neon helps). For the diversity-seeking sampler ( \zeta = 0 . 9 ) , the optimum is at w < 0 (self-training helps)*
 
-![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_kpLRYtPGt3/figures/021_Figure.jpg]]
-*Figure: w= - 1.0 w= 0.0 w= 1.0 w=2.0 w= 3.0 w= 4.0 w= 5.0 Figure H.2: Effect of negative extrapolation weight w and CFG scale γ on IMM generation quality for ImageNet class 980 (valley). Each 2×2 grid shows four random samples for a given (w, γ) configuration for snapshot of model at B = 1.95 (Mi) for |S| = 30k. w=-1.0 w= 0.0 w=1.0 w=2.0 w=3.0 w=5.0 Figure H.3: Effect of negative extrapolation weight w and CFG scale γ on IMM generation quality for ImageNet class 14 (indigo bunting). Each 2×2 grid shows four random samples for a given (w, γ) configuration for snapshot of model at B = 1.95 (Mi) for |S| = 30k*
-
-![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_kpLRYtPGt3/figures/022_Figure.jpg]]
-*Figure: w= - 1.0 w= 0.0 w= 1.0 w=2.0 w= 3.0 w= 4.0 w= 5.0 Figure H.4: Effect of negative extrapolation weight w and CFG scale γ on IMM generation quality for ImageNet class 281 (tabby cat). Each 2×2 grid shows four random samples for a given (w, γ) configuration for snapshot of model at B = 1.95 (Mi) for |S| = 30k. Figure H.5: Effect of negative extrapolation weight w and CFG scale γ on IMM generation quality for ImageNet class 511 (container ship). Each 2×2 grid shows four random samples for a given (w, γ) configuration for snapshot of model at B = 1.95 (Mi) for | S | = 3 0 \mathbf { k }*
-
-![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_kpLRYtPGt3/figures/023_Figure.jpg]]
-*Figure: w=2.0 Figure H.6: Effect of negative extrapolation weight w and CFG scale γ on IMM generation quality for ImageNet class 928 (ice cream). Each 2×2 grid shows four random samples for a given (w, γ) configuration for snapshot of model at B = 1.95 (Mi) for |S| = 30k. Figure H.7: Effect of negative extrapolation weight w and CFG scale γ on IMM generation quality for ImageNet class 404 (airliner). Each 2×2 grid shows four random samples for a given (w, γ) configuration for snapshot of model at B = 1.95 (Mi) for | S | = 3 0 \mathbf { k }*
-
-![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_kpLRYtPGt3/figures/025_Figure.jpg]]
-*Figure: w = 0.5 w = 0.0 w = 0.25 w = 0.5 w = 0.75 w = 1 Figure I.2: Effect of negative extrapolation weight w and CFG scale γ on VAR-d36-s generation quality for ImageNet class 609 (jeep). Each 2×2 grid shows four random samples for a given (w, γ) configuration for snapshot of model at B = 1.20 (Mi) for |S| = 90k. Figure I.3: Effect of negative extrapolation weight w and CFG scale γ on VAR-d36-s generation quality for ImageNet class 113 (snail). Each 2×2 grid shows four random samples for a given (w, γ) configuration for snapshot of model at B = 1.20 (Mi) for |S| = 90k*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 与基线的关系
 

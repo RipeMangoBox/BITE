@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Autoregressive_Models_Rival_Diffusion_Models_at_ANY_ORDER_Generation.pdf
+project_link: null
+code_link: https://github.com/PKU-ML/Any-order-Any-subset-AR
 aliases:
 - AOASAMA
 - AMRDMAAOG
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | 自回归模型在任意顺序生成中媲美扩散模型 |
 | 英文题名 | Autoregressive Models Rival Diffusion Models at ANY-ORDER Generation |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=vtDUomlazQ); [GitHub](https://github.com/PKU-ML/Any-order-Any-subset-AR) |
+| Links | [paper](https://openreview.net/forum?id=vtDUomlazQ) · [GitHub](https://github.com/PKU-ML/Any-order-Any-subset-AR) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | Any-order Any-subset Autoregressive modeling (A3) |
 | Dataset | TriviaQA, 条件生成 (The Pile), LongBench v1 单文档QA |
@@ -40,11 +42,11 @@ claims:
 > - 条件生成 (The Pile) 上，困惑度 (由Llama-3.1-8B测量) 为 低于Dream和DiffuLlama (动态采样)，对比 Dream和DiffuLlama的困惑度，变化 A3困惑度更低。
 > - LongBench v1 单文档QA 上，准确率 (%) 为 27.1 (A3, 组大小=1)，对比 25.4 (Llama-3.1-8B)，变化 +1.7%。
 
-## 概述
+## 概要
 
 本文提出 **Any-order Any-subset Autoregressive modeling (A3)**，一种新的序列建模范式。A3将扩散语言模型的组级预测重新形式化为广义自回归框架，在保留自回归多层依赖结构的同时，支持任意顺序和任意子集的生成。核心思想是将标准自回归分解 `P(x_{1:N}) = ∏_{t=1}^N P(x_t | x_{<t})` 推广到任意token组上的分解 `P(x_{1:N}) = ∏_{k=1}^K P(x_{G_k} | x_{G_{<k}})`，从而在概率严谨性、依赖深度和生成灵活性之间取得平衡。实验表明，A3-8B在条件生成质量上优于Dream和DiffuLlama等扩散模型，并在长上下文QA任务上实现了30%的推理加速。
 
-## 背景与动机
+
 
 **真实瓶颈**：扩散语言模型在每一步去噪中仅形成单层依赖结构，限制了模型捕捉深层层次化依赖的能力，导致生成质量和训练稳定性低于自回归模型。
 
@@ -55,7 +57,9 @@ claims:
 
 **核心洞察**：通过将标准自回归分解推广到任意token组和生成顺序，A3框架在保留自回归概率严谨性和多层依赖建模的同时，继承了扩散模型在并行和双向生成方面的灵活性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 **因果旋钮**：将扩散训练中的两组预测扩展为多组预测，通过结构化多组预测过程保留自回归的多层依赖结构，同时支持任意生成顺序。
 
@@ -68,7 +72,7 @@ claims:
 | 训练策略 | 标准自回归语言模型预训练 | 三阶段渐进式训练：阶段1（AR初始化，单token组）→ 阶段2（组扩展，组大小从1增至4）→ 阶段3（顺序排列，随机排列token到各组） |
 | 推理策略 | 标准从左到右逐token自回归解码 | 组级AR采样（支持token级、固定大小组、任务特定组）和动态重采样（基于置信度或熵） |
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_vtDUomlazQ_Autoregressive_/figures/001_Figure_1.jpg]]
 *Figure 1: Architecture of the A3 model. Blue entries in the attention mask denote 0, and white entries denote −∞. The model employs a two-stream attention module with distinct causal masks. The content stream encodes contextual information and attends to tokens within its own group as well as all preceding groups. The query stream encodes positional conditions and attends only to tokens in preceding groups. The final cross-entropy loss is computed between the input context and the query stream’s output. For illustration, we provide an example grouping with $G _ { 1 } = \{$ 1 , 2 , 3 $\} , \bar { G } _ { 2 } = \{$ 5 , 6 $\} , G _ { 3 } = \{$ 4 $\}$ , showing how the forward process and causal masks...*
@@ -79,7 +83,7 @@ A3的整体框架包含三个核心模块：
 2. **渐进式训练策略**：将预训练AR模型逐步适应任意顺序预测的三阶段课程学习。
 3. **组级解码策略**：支持组级AR采样和动态重采样的灵活推理方法。
 
-## 核心模块与公式推导
+
 
 ### 5.1 组级自回归分解
 
@@ -118,7 +122,9 @@ A3采用三阶段课程学习，逐步从标准自回归过渡到任意顺序预
 - **阶段2：组扩展** — 允许组大小大于1（从1逐步增至4），学习组内并行预测。
 - **阶段3：顺序排列** — 引入随机排列，将token随机分配到各组，学习任意顺序预测。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 6.1 主要实验结果
 
@@ -174,7 +180,9 @@ Table 7显示，推测解码达到更低的困惑度（1.9 vs 2.1），但计算
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_vtDUomlazQ_Autoregressive_/figures/011_Table_6.jpg]]
 *Table 6: The hyperparameter list*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 A3位于自回归模型和扩散模型的交叉点，其方法谱系包括：
 
@@ -195,6 +203,8 @@ A3位于自回归模型和扩散模型的交叉点，其方法谱系包括：
 - A3在更长的上下文（如32k或128k）下是否仍能保持稳定性和效率优势？
 - A3的组划分策略是否可以自适应学习，而非随机或固定大小？
 - A3在机器翻译、代码生成等其他任务上的泛化能力如何？
+
+
 
 ## 原文 PDF
 

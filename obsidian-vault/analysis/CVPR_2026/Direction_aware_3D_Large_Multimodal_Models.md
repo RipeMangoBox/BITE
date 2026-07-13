@@ -43,7 +43,7 @@ claims:
 > - Multi3DRefer 上，mIoU 54.3 (3D-LLAVA + PoseAlign-T, Clip X=0.3) vs 48.1 (3D-LLAVA baseline) (+6.2 pp)。
 > - ScanQA 上，LLM-as-judge accuracy 47.3 (3D-LLAVA + PoseAlign-T, Clip X=0.3) vs 45.7 (3D-LLAVA baseline) (+1.6 pp)。
 
-## 概述
+## 概要
 
 **问题与瓶颈**。现有3D室内基准测试（ScanRefer、ScanQA、Scan2Cap等）中40%–95%的查询依赖方向性空间推理，但数据集完全缺失自车姿态信息，导致“左/右/前/后”等方向语义从根本上定义不明确，3D大型多模态模型（LMM）无法学习一致的方向表示。
 
@@ -55,7 +55,7 @@ claims:
 
 **方法谱系与知识库定位**。本文属于3D视觉-语言理解中“空间推理增强”方向，区别于现有工作通过改进编码器架构或训练策略来提升性能的思路，转而从数据层面解决方向性不适定问题。与依赖检测器提取物体令牌的**Chat-Scene**、使用Q-Former桥接点云与LLM的**LL3DA**、以及基于超点Transformer的**3D-LLAVA**等基线模型相比，PoseAlign以即插即用的方式注入自车姿态，保持点云编码器冻结，仅微调投影层和LLM的LoRA参数，避免了学习位置捷径的风险。
 
-## 背景与动机
+
 
 ### 3D 视觉语言任务的现状与瓶颈
 
@@ -84,7 +84,9 @@ claims:
 
 该方法的核心优势在于其**即插即用**特性：不依赖特定模型架构，可应用于 LL3DA、Chat-Scene、3D-LLAVA 等多种不同设计的 3D LMMs，且仅需冻结点云编码器、微调投影层和 LLM 的 LoRA 参数，避免了昂贵的全量重训。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新并非提出一种新的3D LMM架构，而是识别并系统性地解决了现有3D视觉语言基准测试与模型中一个被长期忽视的根本缺陷：**方向性空间推理的定义不明确问题**。其贡献围绕两条主线展开——姿态恢复（PoseRecover）与姿态对齐（PoseAlign），二者共同构成一套即插即用的方向感知增强方案。
 
@@ -132,7 +134,7 @@ claims:
 
 上述四个changed slots共同体现了一个核心洞察：**自车姿态是3D空间推理的“免费午餐”**——它可以从现有RGB-D数据中自动恢复，且仅需将点云转换到相机参考系即可让冻结的预训练编码器获得方向感知，无需架构改造或全量重训。这一洞察的强有力证据来自消融实验中的“Baseline PoseAlign-T”设置：基线模型在未训练的情况下直接输入变换后的点云，性能急剧下降，证明改进完全源于LLM生成的定位令牌质量的提升，而非视觉编码器利用了姿态捷径。此外，随机姿态替代PoseRecover恢复的姿态会导致性能下降，进一步验证了精确姿态恢复的必要性。
 
-## 整体框架
+
 
 **方向感知的3D大型多模态模型（Direction-aware 3D LMMs）** 的整体框架由两个松耦合的核心模块构成：**PoseRecover**（离线姿态恢复流水线）与 **PoseAlign**（在线姿态注入机制）。两者通过“姿态选择策略”衔接，形成一条从原始ScanNet数据到方向感知推理的完整通路。
 
@@ -165,7 +167,7 @@ claims:
 ![[assets/figures/papers/paper_list_l2382_https_arxiv_org_abs_2602_19063/figures/001_Figure_1.jpg]]
 *Figure 1: Ego pose is critical in spatial reasoning and understanding. (a) Direction-agnostic 3D LMMs are struggling to reason spatial directions due to the absence of ego-pose information. (b) Incorporating ego pose resolves directional ambiguity, enabling consistent and robust spatial reasoning*
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题形式化：方向模糊性的根源
 
@@ -248,7 +250,9 @@ $$f_{aligned} = f + \mathrm{MLP}(\mathrm{encode}(\mathcal{R}, t, \mathcal{P}_f))
 
 所有变体均保持点云编码器冻结，仅对投影层和LLM的LoRA参数进行指令微调，避免模型学习位置捷径。消融实验证实：基线模型在未训练的情况下直接输入变换后的点云（Baseline PoseAlign-T）性能急剧下降，说明改进完全归因于LLM生成的定位令牌质量的提升，而非视觉编码器利用了姿态捷径。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 1. 实验设置
 
@@ -352,7 +356,9 @@ Table 5展示了方法对姿态噪声的鲁棒性。在恢复的姿态上添加�
 ![[assets/figures/papers/paper_list_l2382_https_arxiv_org_abs_2602_19063/figures/012_Figure_6.jpg]]
 *Figure 6: Distribution of objects in world (L) and PoseAlign ego (R) coordinates on X-Y plane. While clustered in front view, objects still follow non-trivial distribution*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心洞察：自车姿态作为3D空间推理的“免费午餐”
 
@@ -406,6 +412,8 @@ Table 5展示了方法对姿态噪声的鲁棒性。在恢复的姿态上添加�
 4. **更富表达力的姿态表示**：是否可以通过连续姿态序列或相对姿态（如“从A到B的视角”）来进一步提升复杂空间关系推理（如“经过椅子后左转看到的桌子”）的性能？当前方法仅使用单帧离散姿态，可能不足以捕捉路径依赖的空间语义。
 
 5. **跨域泛化与基础模型整合**：当前方法在ScanNet上验证，其在其他室内数据集（如ARKitScenes、HM3D）或仿真环境（如Habitat）上的泛化能力尚未探索。此外，如何将方向感知能力整合到更大规模的基础模型中（如从零预训练阶段就引入自车姿态）是一个值得探索的方向。
+
+
 
 ## 原文 PDF
 

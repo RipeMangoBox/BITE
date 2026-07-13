@@ -42,7 +42,7 @@ claims:
 > - 头消融实验 (RTE-DiT-B) 上，关系准确率 消融L2H8后 0.33 vs 原始 0.67 (-0.34)；形状准确率 消融L4H3后 0.76 vs 原始 0.90 (-0.14)。
 > - 提示扰动泛化测试 (T5-DiT) 上，关系准确率 添加“the”后 ~0.52 vs 原始 0.925 (≈ -0.40)。
 
-## 概述
+## 概要
 
 文本到图像（T2I）扩散模型在生成符合空间关系描述的图像时表现不稳定，但其内部机制尚不明确。本研究以**扩散Transformer（DiT）** 为对象，采用机制可解释性方法，系统揭示模型如何根据文本提示生成正确的空间关系。
 
@@ -50,7 +50,7 @@ claims:
 
 研究构建了最小化合成数据集，训练不同规模和编码器的DiT模型，并开发了一套可扩展的分析工具链，包括**注意力综述（Attention Synopsis）**用于快速定位关键注意力头、**权重空间头筛选**用于无需生成图像即可识别编码空间方向的头，以及**方差划分与因子化**用于分解上下文嵌入中的关系特征向量。消融实验和因果操控验证了空间关系头（如RTE-DiT中的L2H8）和对象生成头（如L4H3）的关键作用，并通过向量算术在T5-DiT中因果地改变了生成物体的空间位置。该分析框架为理解和改进T2I模型的空间推理能力提供了新的视角和工具。
 
-## 背景与动机
+
 
 文本到图像（T2I）生成模型在单对象属性的视觉呈现上已取得显著进展，但在多对象空间关系生成方面仍存在系统性失败——即使是最先进的开源与闭源模型，在“红色方块在蓝色圆圈的右下方”这类简单空间关系提示上，仍频繁出现对象位置错误或属性绑定混乱。这种失败并非源于模型规模不足，而是源于对扩散Transformer（DiT）内部如何编码和执行空间关系指令的机制理解缺失。
 
@@ -64,7 +64,9 @@ claims:
 
 针对上述缺口，本文提出以下研究问题：**扩散Transformer内部是否存在专门化的电路来实现空间关系生成？如果存在，这些电路的架构和运作机制是什么？文本编码器的选择如何决定电路的形态？** 为回答这些问题，我们构建了一个可控的合成数据集，训练了多种编码器配置的DiT模型，并发展了一套结合注意力综述、权重空间筛选、方差划分与因果消融的电路分析框架，旨在从机制层面揭示T2I模型空间关系生成的工作原理与失败根源。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作的核心创新不在于提出新的模型架构或训练目标，而在于**首次系统揭示了扩散Transformer（DiT）中空间关系生成的电路机制，并发现该机制由文本编码器的语义融合方式根本性地决定**。这一发现突破了以往仅从行为层面评估文本到图像（T2I）模型空间推理能力的范式，转而从机械可解释性（mechanistic interpretability）的视角，解剖模型内部的计算图与信息流。
 
@@ -100,7 +102,7 @@ claims:
 
 综上，本工作的核心创新在于**以电路机制为透镜，重新审视了T2I模型空间推理能力的本质，并揭示了文本编码器在这一过程中的结构性角色**——这是对既有空间关系评估范式的根本性补充与深化。
 
-## 整体框架
+
 
 本文构建了一套系统性的电路分析管线，旨在揭示扩散Transformer（DiT）如何在文本到图像生成中实现空间关系推理。整个框架围绕三个核心环节展开：**可控训练环境构建**、**注意力行为综述与头筛选**，以及**因果验证与机制对比**。
 
@@ -131,7 +133,7 @@ claims:
 ![[assets/figures/papers/paper_list_l2450_https_arxiv_org_abs_2601_06338/figures/033_Figure_30.jpg]]
 *Figure 30: Pre-trained T2I models (A) The prompt set construction and evaluation pipeline. (B) Object and relation accuracy across various object pairs for the PixArt-Sigma model. (C) A text token ablation analysis demonstrating how masking specific tokens affects object and relation accuracy. (D) Projection scores used to identify salient spatial relation heads within the model’s layers*
 
-## 核心模块与公式推导
+
 
 ### 分析流水线总览
 
@@ -191,7 +193,9 @@ $$\Delta V_{\text{the2}} := \mathbb{E}[V_{\text{shape2,the}}^* - V_{\text{shape2
 ![[assets/figures/papers/paper_list_l2450_https_arxiv_org_abs_2601_06338/figures/008_Figure_7.jpg]]
 *Figure 7: Mechanism for relational generation in T5-DiT. A. T5-based DiT is robust to attention ablation of relation word, but most sensitive to shape2 and EOS. B. Weight space screening for spatial relation heads via projection score, and its corresponding spatial gradients (L3H7). C. Vector arithmetic on factorized word embedding causally affects generated object relation*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置与评估协议
 
@@ -254,7 +258,9 @@ Table 1 对 T5 嵌入和 DiT-MLP 投影中 shape2 token 的方差划分显示：
 ![[assets/figures/papers/paper_list_l2450_https_arxiv_org_abs_2601_06338/figures/029_Figure_26.jpg]]
 *Figure 26: Evaluation of model performance on trained and generalized prompt template*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法论定位：机械论可解释性在生成模型中的应用
 
@@ -302,6 +308,8 @@ Table 1 对 T5 嵌入和 DiT-MLP 投影中 shape2 token 的方差划分显示：
 **从脆弱到稳健的迁移**：在真实世界的多物体场景中，预训练模型的“融合式电路”能否通过微调或编码器改进转化为更稳固的“模块化电路”？提示扰动实验表明T5-DiT对无关词“the”的添加极度敏感（关系准确率下降约40%），这一脆弱性是否源于预训练编码器在训练期间形成的不可逆的结构性偏差？
 
 **电路与生成质量的关系**：本文聚焦于空间关系的正确性，但未探讨电路组织方式如何影响生成图像的视觉质量、多样性和组合泛化能力。模块化电路是否在更复杂的组合场景中展现出更好的系统性泛化？
+
+
 
 ## 原文 PDF
 

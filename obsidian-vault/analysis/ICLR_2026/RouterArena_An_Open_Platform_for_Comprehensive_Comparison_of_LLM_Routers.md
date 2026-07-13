@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/RouterArena_An_Open_Platform_for_Comprehensive_Comparison_of_LLM_Routers.pdf
+project_link: https://routeworks.github.io/
+code_link: null
 aliases:
 - RouterArena
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | RouterArena：用于全面比较 LLM 路由器的开放平台 |
 | 英文题名 | RouterArena: An Open Platform for Comprehensive Comparison of LLM Routers |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=9HsaIi4ngF); [Project](https://routeworks.github.io/) |
+| Links | [paper](https://openreview.net/forum?id=9HsaIi4ngF) · [Project](https://routeworks.github.io/) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/algorithms |
 | Method | ROUTERARENA |
 | Dataset | ROUTERARENA数据集（整体）, ROUTERARENA数据集（困难查询） |
@@ -40,11 +42,11 @@ claims:
 > - ROUTERARENA数据集（整体） 上，成本（美元/千查询） 为 14.02，对比 0.15，变化 +13.87。
 > - ROUTERARENA数据集（困难查询） 上，准确率（%） 为 27.5，对比 7.1，变化 +20.4。
 
-## 概述
+## 概要
 
 ROUTERARENA 是一个开放的标准化平台，旨在系统性地比较和评估大语言模型（LLM）路由器的性能。该平台通过构建基于杜威十进制分类法（DDC）和Bloom认知分类法的原则性数据集（约8,400个查询，覆盖9大领域44个类别），并设计包含准确性、成本、最优性、鲁棒性和延迟的多维度评估指标，解决了现有LLM路由器评估碎片化、缺乏统一标准化评估平台的问题。实验揭示了商业路由器（如GPT-5）虽准确率高但成本显著更高，而开源路由器（如MIRT-BERT）在成本效益上更具优势，且没有任何路由器在所有指标上均表现最优，反映了路由器设计中固有的权衡。
 
-## 背景与动机
+
 
 随着大语言模型（LLM）的快速发展，市场上涌现出大量不同能力、成本和延迟特性的模型。LLM路由器作为一种智能选择模型的技术，旨在根据查询特性动态选择最合适的模型，以在性能和成本之间取得平衡。然而，现有路由器评估工作（如RouterBench、RouterEval、FusionBench、EmbedLLM）存在以下问题：
 
@@ -57,7 +59,9 @@ ROUTERARENA 是一个开放的标准化平台，旨在系统性地比较和评�
 
 Figure 2展示了从2023年中至2025年路由器相关工作和产品的发展时间线，包括FrugalGPT（Chen et al., 2023）、RouterBench（Hu et al., 2024）、RouteLLM（Ong et al., 2025）、GraphRouter（Feng et al., 2025a）以及商业产品如NotDiamond、Azure-Router和GPT-5。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ROUTERARENA的核心创新在于：
 
@@ -69,7 +73,7 @@ ROUTERARENA的核心创新在于：
 
 4. **加权调和平均排名机制**：提供基于Arena Score（加权调和平均）的6种排名分数，支持用户调整β参数以权衡准确性与成本。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0001_9HsaIi4ngF_RouterArena_An_Open_Platform_for_Comprehensive_C/figures/001_Figure_1.jpg]]
 *Figure 1: RouterArena Leaderboard*
@@ -84,7 +88,7 @@ ROUTERARENA的整体框架如Figure 5所示，包含以下核心模块：
 
 4. **排行榜生成模块**：基于Arena Score等6种分数生成多维度排行榜。
 
-## 核心模块与公式推导
+
 
 ### 5.1 推理成本公式
 
@@ -121,7 +125,9 @@ $$ S_{i,\beta} = ((1+\beta) A_i C_i) / (\beta A_i + C_i) $$
 
 鲁棒性计算为路由器在扰动输入下做出一致路由决策的查询比例。使用四种变换模式：Paraphrase（最大变换）、Grammatical Reconstruction（深度重写）、Synonym Saturation（超密集替换）和Intentional Corruption（重度退化）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 6.1 实验设置
 
@@ -203,7 +209,9 @@ ROUTERARENA评估了14个路由器，包括3个商业路由器（GPT-5、NotDiam
 ![[assets/figures/papers/iclr26_0001_9HsaIi4ngF_RouterArena_An_Open_Platform_for_Comprehensive_C/figures/017_Table_5.jpg]]
 *Table 5: The 42 models used for empirical difficulty labeling. Models span across a range of sizes and performances, showcasing that ROUTERARENA could distinguish LLMs by providing diverse questions of difficulty.*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ROUTERARENA定位为LLM路由器评估领域的标准化基准平台，其方法谱系包括：
 
@@ -224,6 +232,8 @@ ROUTERARENA定位为LLM路由器评估领域的标准化基准平台，其方法
 
 **知识库定位**：
 ROUTERARENA填补了LLM路由器评估领域的空白，提供了一个可扩展、可复现的标准化评估平台。其数据集构建方法（基于DDC和Bloom分类法）和多维度评估指标（5个评估视角）为未来路由器研究提供了基准。平台支持持续更新，可纳入新的路由器类型和更广泛的模型池，推动该领域的系统化发展。
+
+
 
 ## 原文 PDF
 

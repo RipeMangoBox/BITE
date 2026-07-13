@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/EasyHOI_Unleashing_the_Power_of_Large_Models_for_Reconstructing_Hand_Object_Interactions_in_the_Wild.pdf
+code_link: null
 project_link: https://lym29.github.io/EasyHOI-page
 aliases:
 - EUPLMRHOIW
@@ -39,7 +40,7 @@ claims:
 > [!tip] 效果简介
 > - Arctic 上，MPVPE (cm) 1.48 vs 1.14 (HaMeR) (+0.34 (更差))；MPJPE (cm) 0.95 vs 1.05 (HaMeR) (-0.10)。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -67,8 +68,6 @@ EasyHOI 并非一个端到端网络，而是一个**基于大型模型先验的�
 
 需注意的局限包括：预测物体几何时，物体重建误差会耦合进手部优化，导致手部精度略低于 HaMeR 独立估计；多模型级联与迭代优化带来较高计算成本，可能不适合实时场景；对指间严重遮挡或非标准抓握姿态的鲁棒性仍有待验证。开放问题指向：如何使大型视觉模型更专门地适配手物交互任务以提升效率与鲁棒性；能否扩展至动态视频或多手交互；以及如何减少级联依赖，设计更端到端的轻量方案。
 
-## 背景与动机
-
 手物交互（Hand-Object Interaction, HOI）重建是理解人类日常行为的关键技术，在机器人学习、增强现实和具身智能等领域具有广泛应用。其核心任务是从视觉输入中同时恢复手部姿态和物体几何，并确保二者之间的物理合理性。
 
 ### 单视图重建的核心挑战
@@ -87,7 +86,7 @@ EasyHOI 并非一个端到端网络，而是一个**基于大型模型先验的�
 
 基于上述分析，本文的核心动机是：**能否利用大型预训练模型提供的强先验，通过一个统一的优化框架来解决坐标不一致、估计误差和遮挡等根本问题，从而在无需额外训练数据的情况下实现物理合理的手物交互重建？** 这一思路的关键洞察在于——即使单个大型模型的估计存在误差，通过联合优化统一坐标系统、对齐接触区域并细化手部参数，可以强制重建结果同时满足二维图像一致性和三维物理约束，从而生成高质量的手物交互。
 
-## 核心创新
+## 核心方法与创新机理
 
 EasyHOI 的核心创新并非提出全新的网络架构，而是**构建了一套以大型预训练模型为强先验、以物理与图像一致性为约束的三阶段联合优化框架**，从而在无需额外标注训练数据的条件下，实现野外单视图手物交互的物理合理重建。其关键创新点可归纳为以下三个维度的 changed slots。
 
@@ -123,8 +122,6 @@ $$ \mathcal{L}_{\mathrm{hand}} = \lambda_{1} \mathcal{L}_{\mathrm{hand-mask}} + 
 
 EasyHOI 的创新本质在于**将大型模型的强视觉-几何先验（LISA 分割、扩散修复、InstantMesh 重建、HaMeR 姿态估计）通过一个精心设计的优化框架进行“物理蒸馏”**。与需要大量标注数据训练的 **AlignSDF**（Zhang et al., CVPR 2024）等方法不同，EasyHOI 完全以零样本方式工作，其泛化能力来源于预训练模型的先验知识，而非对特定数据分布的拟合。这一设计使其能够处理野外场景中多样化的手物配置与严重遮挡——这是传统数据驱动方法难以覆盖的长尾分布。
 
-## 整体框架
-
 EasyHOI 的整体 pipeline 分为两大阶段：**初始重建**与**手物交互优化**（见 Figure 2）。初始重建阶段利用多个现成的大型预训练模型为手和物体分别提供强视觉与几何先验；交互优化阶段则通过三步骤的“先验引导优化”将独立估计的结果统一到物理一致的坐标系中，并强制接触与图像约束。整体流程从单张野外图像输入，最终输出物理合理的手物三维网格。
 
 ![[assets/figures/papers/paper_list_l1732_EasyHOI_Unleashing_the_Power_of_Large_Models_for_Reconstructing_Hand_Obj/figures/002_Figure_2.jpg]]
@@ -159,8 +156,6 @@ Figure 3 展示了遮挡消除过程：原始图像中物体因手部遮挡被�
 ### 关键设计逻辑
 
 该框架的核心洞察在于：**即使单个大型模型的估计存在误差，通过一个联合优化框架统一坐标、对齐接触并细化手部参数，可以生成物理合理的手物交互，且无需额外标注训练数据**。三阶段设计遵循“先全局对齐、再局部接触、最后细节精修”的递进逻辑，每一阶段为下一阶段提供更好的初始化，从而在严重遮挡和几何歧义条件下仍能收敛到合理解。
-
-## 核心模块与公式推导
 
 EasyHOI 的核心由一个**初始重建阶段**和一个**三阶段先验引导优化框架**构成，二者通过可微渲染与物理约束将独立的大型模型输出统一为物理合理的手物交互。
 
@@ -240,7 +235,7 @@ $$
 ![[assets/figures/papers/paper_list_l1732_EasyHOI_Unleashing_the_Power_of_Large_Models_for_Reconstructing_Hand_Obj/figures/004_Figure_4.jpg]]
 *Figure 4: Converting 2D contact regions to 3D contact points. Rays emitted from contact mask pixels intersect object and hand geometries. Contact point candidates are constrained to the extremal ray intersections: nearest or farthest points relative to the camera for the object, and palmar-side extremal points for the hand*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 零样本物体重建质量
 
@@ -286,10 +281,7 @@ EasyHOI 在三个公开数据集（Arctic、OakInk、DexYCB）上评估了物体
 ![[assets/figures/papers/paper_list_l1732_EasyHOI_Unleashing_the_Power_of_Large_Models_for_Reconstructing_Hand_Obj/figures/009_Table_3.jpg]]
 *Table 3: Ablation study for the HOI prior-guided optimization scheme*
 
-![[assets/figures/papers/paper_list_l1732_EasyHOI_Unleashing_the_Power_of_Large_Models_for_Reconstructing_Hand_Obj/figures/008_Figure_6.jpg]]
-*Figure 6: This gallery showcases the outcomes of our hand-object reconstruction on three public dataset Arctic, OakInk and DexYCB (more results in the supp.). The first column is the input image, we present the camera view and another view to display the reconstructed HOI meshes*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 任务定位与核心瓶颈
 

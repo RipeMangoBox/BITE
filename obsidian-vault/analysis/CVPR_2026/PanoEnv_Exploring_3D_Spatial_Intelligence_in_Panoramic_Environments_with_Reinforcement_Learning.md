@@ -42,7 +42,7 @@ claims:
 > - PanoEnv-QA (test set) 上，Total Accuracy (%) 52.93 vs 49.34 (Qwen2.5-VL-7B Base) (+3.59)；Open-Ended Accuracy (%) 14.83 vs 6.39 (Qwen2.5-VL-7B Base) (+8.44 (+132%相对))；Q-Score (0-10) 6.24 vs 5.60 (Qwen2.5-VL-7B Base) (+0.64)。
 > - OSR-Bench (Real-World) 上，Object Counting 0.507 vs 0.477 (Qwen2.5-VL-7B Base); 0.498 (72B) (+0.030 over 7B; +0.009 over 72B)。
 
-## 概述
+## 概要
 
 当前视觉语言模型（VLM）在360°全景图像上的3D空间推理能力存在根本性缺陷。在PanoEnv-QA基准测试中，14个主流VLM的开放式问题（OE）准确率仅6.39%，总准确率49.34%，暴露出模型缺乏从2D等距柱状投影（ERP）图像中隐式重建3D几何关系的能力。这一瓶颈的根源在于：现有VLM未经过几何感知的3D推理训练，且缺乏物理真值监督信号。
 
@@ -55,7 +55,7 @@ claims:
 
 本工作揭示了合成3D真值驱动的强化学习是弥合2D全景感知与3D空间推理之间鸿沟的有效路径，为全景环境中的具身智能提供了新的基准和训练范式。
 
-## 背景与动机
+
 
 ### 全景环境中的3D空间推理困境
 
@@ -81,7 +81,9 @@ PanoEnv对14个主流VLM进行了系统基准测试，结果揭示了令人警�
 
 这一思路区别于传统的“更大模型、更多数据”的缩放范式，而是聚焦于**训练信号的质变**——用精确的几何奖励替代模糊的语言奖励，引导模型发展出真正的3D空间智能。初步的Sim-to-Real实验（Table 7）已经提供了正向证据：在合成数据上训练的7B模型，在真实OSR-Bench的物体计数和相对距离任务上超越了72B模型，暗示习得的是可迁移的几何逻辑而非表面记忆。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：2D全景图上的3D推理鸿沟
 
@@ -141,7 +143,7 @@ Sim-to-Real实验（Table 7）提供了决定性证据：在真实OSR-Bench上�
 
 PanoEnv-RL在方法谱系中占据一个独特位置：它将**合成3D真值监督**、**GRPO强化学习**和**课程学习**三者首次耦合用于全景空间推理。相比传统VLM后训练方法（如基于LLM裁判的RLHF），其关键区别在于奖励信号的客观性和几何精度；相比3D视觉的显式重建方法，它保持了2D输入的便捷性，将3D推理隐式编码进模型参数。这一框架的局限性在于依赖精确3D真值（在真实噪声数据上难以直接应用），且当前仅处理空间推理，尚未扩展到全景视频的时序任务。
 
-## 整体框架
+
 
 PanoEnv 的核心思路是通过**合成环境中的精确 3D 几何真值**，构建可验证的强化学习奖励信号，迫使 VLM 在 2D 全景图上隐式重建空间关系，从而解决现有模型在等距柱状投影（ERP）图像上缺乏 3D 推理能力的瓶颈。整个框架由两大模块串联构成：**PanoEnv-QA 数据集构建**与**基于 GRPO 的 3D 感知强化学习后训练（PanoEnv-RL）**。
 
@@ -175,7 +177,7 @@ PanoEnv 的核心思路是通过**合成环境中的精确 3D 几何真值**，�
 ![[assets/figures/papers/paper_list_l2718_https_arxiv_org_abs_2602_21992/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the PanoEnv framework, including the PanoEnv-QA benchmark and the RL-enhanced PanoEnv-RL model*
 
-## 核心模块与公式推导
+
 
 ### 3.1 合成数据生成管道：从多视图到几何真值QA对
 
@@ -236,7 +238,9 @@ $$R(s, a) = w_{\mathrm{acc}} R_{\mathrm{acc}}(a, a^*) + w_{\mathrm{fmt}} R_{\mat
 ![[assets/figures/papers/paper_list_l2718_https_arxiv_org_abs_2602_21992/figures/004_Figure_3.jpg]]
 *Figure 3: Overview of our framework, including GRPO sampling, routed reward computation, and two-stage curriculum updates*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -320,7 +324,9 @@ $$R(s, a) = w_{\mathrm{acc}} R_{\mathrm{acc}}(a, a^*) + w_{\mathrm{fmt}} R_{\mat
 ![[assets/figures/papers/paper_list_l2718_https_arxiv_org_abs_2602_21992/figures/011_Table_6.jpg]]
 *Table 6: Comprehensive comparison between PanoEnv and existing panoramic benchmarks*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 全景空间推理的方法谱系
 
@@ -404,6 +410,8 @@ PanoEnv-RL 的贡献不在于提出全新的算法组件，而在于 **系统性
 ### 5. 知识库贡献总结
 
 PanoEnv 的核心知识贡献在于 **证明了合成数据的3D真值可以作为强化学习的有效奖励信号，从而在2D全景图上教会VLM进行3D推理**。这一发现具有方法论意义：它表明对于需要精确物理推理的任务，基于真值的可验证奖励可能比人类偏好或LLM裁判更为有效。同时，两阶段课程的设计原则——先稳定结构化输出再引入开放式探索——为类似的多任务RL训练场景提供了可复用的经验。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/Jointly_Understand_Your_Command_and_Intention_Reciprocal_Co_Evolution_between_Scene_Aware_3D_Human_Motion_Synthesis_and_Analysis.pdf
+project_link: null
+code_link: null
 aliases:
 - CCESAP
 tags:
@@ -38,7 +40,7 @@ claims:
 > [!tip] 效果简介
 > - HUMANISE 上，FID 2.005 (CESA synthesis & analysis) vs 2.663 (CESA synthesis-only) (-0.658 (-24.7%))；MRS (Motion Realism Score) 4.16 vs 3.69 (+0.47 (+12.7%))；TMCS (Text-Motion Consistency Score) 4.39 vs 3.77 (+0.62 (+16.4%))。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -62,7 +64,7 @@ CESA属于**场景感知文本驱动运动生成**方向，其设计在以下维
 
 在 HUMANISE 数据集上，集成合成与分析分支的 CESA 相比仅合成版本，**FID 从 2.663 降至 2.005（↓24.7%）**，运动真实感评分 MRS 从 3.69 提升至 4.16（↑12.7%），文本-运动一致性评分 TMCS 从 3.77 提升至 4.39（↑16.4%）（Tab. I）。消融实验进一步揭示：动作分析分支主要贡献于 FID 与 MRS 的改进，而物体分析分支更有利于提升 TMCS，验证了协同训练的双向增益机制（Tab. IV）。此外，合成运动样本通过丰富类内多样性，显著提升了动作类别与交互物体的识别精度（Fig. 8）。
 
-## 背景与动机
+
 
 ### 问题背景：场景感知的文本到运动生成
 
@@ -90,7 +92,9 @@ CESA属于**场景感知文本驱动运动生成**方向，其设计在以下维
 
 基于这一双向互惠关系，本文提出了 **CESA（Co-Evolving Synthesis-Analysis）** 协同演化管道，将场景感知的运动合成与分析集成到一个联合训练框架中，使两者在训练过程中相互促进、共同演化。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于将场景感知的三维人体运动**合成**与**分析**这两个传统上孤立处理的任务，整合进入一个**互惠协同演化管道（CESA）**，使其相互促进、共同提升。这一设计打破了现有方法的单向生成范式，构建了生成-判别循环，具体体现在以下三个关键维度的 changed slots 上。
 
@@ -133,7 +137,7 @@ CESA 提出**级联式三阶段生成策略**，将生成过程分解为：
 
 消融实验进一步揭示了分析分支的差异化贡献：动作分析（ACT）主要带来 FID 和 MRS 的改进，而物体分析（OBJ）更有利于提升 TMCS（见 Table IV）。t-SNE 可视化（Fig. 7）证实，无分析分支时仅合成模型生成的运动特征过度发散，而引入分析分支后特征分布更加紧凑合理。此外，增加合成样本数量可持续提升动作和物体识别精度（Fig. 8），验证了生成多样性对分析任务的正向反馈。
 
-## 整体框架
+
 
 CESA（Co-Evolving Synthesis-Analysis pipeline）将场景感知的三维人体运动合成与运动分析集成到一个互惠协同的管道中，探索合成与分析之间的双向增益。如 Fig. 1 所示，管道由两个紧密耦合的核心过程构成：**场景感知运动生成器**与**场景-人交互分析器**。
 
@@ -154,7 +158,7 @@ $$\mathcal{L} = \alpha_{goal} \mathcal{L}_{goal} + \alpha_{path} \mathcal{L}_{pa
 
 其中 $\mathcal{L}_{rec}$ 为分析器对动作类别和交互物体的交叉熵识别损失（Eq. 12）。这一设计使分析器充当后验判别器，审视合成交互样本的语义正确性，从而确保文本-运动一致性；同时，合成器生成的多样化样本丰富了交互样本的类内多样性，反过来提升分析器的识别鲁棒性。两者在共同演化中相互促进，形成生成-判别的闭环。
 
-## 核心模块与公式推导
+
 
 ### 多模态条件编码器
 
@@ -240,7 +244,9 @@ $$\mathcal{L} = \alpha_{goal} \mathcal{L}_{goal} + \alpha_{path} \mathcal{L}_{pa
 ![[assets/figures/papers/paper_list_l1689_Jointly_Understand_Your_Command_and_Intention_Reciprocal_Co_Evolution_be/figures/003_Figure_3.jpg]]
 *Figure 3: Core Components. Given encoded text feature*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -298,7 +304,9 @@ CESA 在场景感知文本到运动生成任务上进行了多维度定量评估
 ![[assets/figures/papers/paper_list_l1689_Jointly_Understand_Your_Command_and_Intention_Reciprocal_Co_Evolution_be/figures/016_Figure_10.jpg]]
 *Figure 10: Human motion samples synthesized from different instruction compositions (with or without REL and ANC compositions)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位与核心创新
 
@@ -343,6 +351,8 @@ CESA 相对于上述基线在三个维度上做出了结构性改变：
 - **身体-场景接触推理：** 能否设计一个强大的接触推理模块，从文本指令中预测未来每个身体关节与场景点之间的接触关系？这将使运动生成从“目标导向”升级为“接触感知”，进一步提升物理合理性。
 
 - **细粒度物体识别鲁棒性：** 对于形状相似但语义不同的交互物体，分析器的识别鲁棒性如何随物体类别变化？这直接影响协同训练中语义反馈信号的质量，是管道在更复杂场景中泛化的关键瓶颈。
+
+
 
 ## 原文 PDF
 

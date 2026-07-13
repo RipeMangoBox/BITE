@@ -41,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - MM-Fi Protocol 1 (Concatenation fusion) 上，MPJPE (mm) 51.16 vs 53.87 (Naive 4-modality joint training) (-2.71)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -62,7 +62,7 @@ claims:
 
 该方法属于**多模态学习中的动态平衡优化**范畴，与OGM-GE（Peng et al., CVPR 2022）的梯度调制、AGM（Li et al., ICCV 2023）的自适应梯度调节、MMPareto（Wei & Hu, ICML 2024）的帕累托前沿方法等形成对比。区别于引入单模态辅助头或额外可学习参数的方案，本文通过FIM加权的正则化损失实现无参数平衡，且专门针对回归任务设计贡献度量。
 
-## 背景与动机
+
 
 ### 多模态3D人体姿态估计的兴起与挑战
 
@@ -85,7 +85,9 @@ claims:
 
 为此，本文提出了一套面向回归任务的均衡多模态学习框架：以**Pearson相关系数**替代交叉熵作为Shapley值的利润函数，消除输出尺度偏差；并设计基于**Fisher信息矩阵（FIM）加权的自适应权重约束损失（AWC）**，在训练早期窗口内对强模态施加更强的参数偏离惩罚，对弱模态施加更弱的约束，从而在不增加模型参数的前提下实现多模态的均衡优化。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于将多模态平衡学习从分类任务系统性地迁移到**3D人体姿态估计这一回归任务**，并围绕该迁移设计了两个紧密耦合的模块：**基于Shapley值的回归贡献评估**和**基于Fisher信息矩阵的自适应权重约束（AWC）**。两者共同解决了端到端训练中强模态（RGB、LiDAR）压制弱模态（mmWave、WiFi）的模态不平衡问题，且整个过程不引入任何额外可学习参数。
 
@@ -150,7 +152,7 @@ $$\mathcal { L } _ { \mathrm { t o t a l } } = \mathcal { L } _ { \mathrm { M P 
 
 与**OGM-GE**（Peng et al., CVPR 2022）仅调制梯度幅度、**PMR**依赖类原型、**MMPareto**（Wei and Hu, ICML 2024）利用帕累托前沿和单模态辅助梯度、**AGM**（Li et al., ICCV 2023）自适应梯度调制、**ReconBoost**（Hua et al., ICML 2024）基于Boosting调和等方法相比，本文的AWC机制通过FIM加权实现了更精细的参数级约束，且不引入额外可学习参数，在MM-Fi数据集上MPJPE超越其他平衡方法约5 mm，验证了设计的有效性。
 
-## 整体框架
+
 
 本文提出一种面向3D人体姿态估计的均衡多模态学习框架，核心目标是在端到端训练中解决强模态（RGB、LiDAR）压制弱模态（mmWave、WiFi）的模态不平衡问题。框架由五个关键模块串联构成，图2给出了整体流程。
 
@@ -176,7 +178,7 @@ $$\mathcal { L } _ { \mathrm { t o t a l } } = \mathcal { L } _ { \mathrm { M P 
 ![[assets/figures/papers/paper_list_l1036_https_arxiv_org_abs_2501_05264/figures/001_Figure_1.jpg]]
 *Figure 1: (a) Multi-modal 3D HPE. (b) In end-to-end training, modality imbalance arises where dominant modalities with higher scores suppress the training of others in MM-Fi [56]*
 
-## 核心模块与公式推导
+
 
 ### 整体框架
 
@@ -290,7 +292,9 @@ $$
 ![[assets/figures/papers/paper_list_l1036_https_arxiv_org_abs_2501_05264/figures/006_Figure_4.jpg]]
 *Figure 4: Visualization of contribution scores calculated by our Shapley value-based contribution algorithm using attention-based fusion strategy*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -337,7 +341,9 @@ $$
 ![[assets/figures/papers/paper_list_l1036_https_arxiv_org_abs_2501_05264/figures/005_Table_2.jpg]]
 *Table 2: Computational overhead breakdown across fusion strategies and modalities. “Pose Est.” denotes the total inference time for 3D pose estimation over all modality combinations; “Correlation” is the time to compute pose prediction correlation with ground truth; “Score Calc.” refers to modality contribution scoring. “Overhead (%)” denotes the score calculation time as a percentage of training time. All times are in milliseconds (ms)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务背景与核心瓶颈
 
@@ -377,6 +383,8 @@ $$
 3. **训练策略协同**：AWC损失能否与学习率调度（如余弦退火）、数据增强等策略协同，在更复杂训练范式下保持平衡效果？
 4. **跨任务迁移**：在非人体姿态估计的回归任务（如深度估计、温度预测、力估计）中，该方法是否同样有效？需要哪些适配修改？
 5. **自适应超参数**：能否设计基于训练动态的自适应机制（如根据Shapley评分变化率自动调整$K$和正则化系数），完全免除超参数调节？
+
+
 
 ## 原文 PDF
 

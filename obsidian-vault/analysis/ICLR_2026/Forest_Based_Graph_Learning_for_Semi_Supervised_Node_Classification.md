@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Forest_Based_Graph_Learning_for_Semi_Supervised_Node_Classification.pdf
+project_link: https://anonymous.4open.science/r/FGL/
+code_link: null
 aliases:
 - FFBGL
 - FBGLSSNC
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 基于森林的图学习用于半监督节点分类 |
 | 英文题名 | Forest-Based Graph Learning for Semi-Supervised Node Classification |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=5asbtzIVpS); [Project](https://anonymous.4open.science/r/FGL/) |
+| Links | [paper](https://openreview.net/forum?id=5asbtzIVpS) · [Project](https://anonymous.4open.science/r/FGL/) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/graph_neural_networks |
 | Method | FGL (Forest-based Graph Learning) |
 | Dataset | Cora, Pubmed, Cornell, Texas |
@@ -41,13 +43,13 @@ claims:
 > - Pubmed 上，Accuracy (%) 为 81.00，对比 GCNII 79.88, DIFFormer 78.16，变化 相对 GCNII 提升 1.12 个百分点，相对 DIFFormer 提升 2.84 个百分点。
 > - Cornell 上，Accuracy (%) 为 83.24，对比 GCNII 74.61, DIFFormer 60.00，变化 相对 GCNII 提升 8.63 个百分点，相对 DIFFormer 提升 23.24 个百分点。
 
-## 概述
+## 概要
 
 现有图神经网络（GNN）在半监督节点分类中面临一项根本性困境：深层局部模型（如 GCNII）必须堆叠大量局部层以覆盖长距离依赖，导致计算开销过高；浅层全局模型（如图 Transformer，如 DIFFormer）虽能直接建模所有节点对的交互，却因密集的成对交互引入二次复杂度。这一矛盾的本质在于结构数量与单结构成本之间的不可调和——总成本可分解为 `(单结构成本) × (所需结构数量)`（Eq. (1)），而此前范式无法同时压缩两个因子。本文提出基于森林的图学习框架（FGL），将图上的消息传递重新诠释为在多棵生成树（森林）上的传输。生成树作为图的最稀疏连通子图，既能全局覆盖所有节点，又将边数降至最低；配合同质性引导的采样策略与线性时间的树上递归聚合，FGL 以线性复杂度实现了高质量的全局信息传播，优雅地打破了成本与全局感受野的权衡。
 
 FGL 由四个核心模块构成：预处理（通过伪标签增加 k 近邻边，保证连通性并提升同质性）、树采样（利用局部注意力估计边同质性，通过加权 Wilson 算法采样多棵高同质性生成树）、树聚合（在一棵树上执行自底向上与自顶向下的两轮递归，实现所有节点对的线性时间通信）以及树融合（对多棵树的嵌入进行行归一化平均，并通过残差连接与局部浅层 GNN 表示融合）。在 Cora、Pubmed、Texas 等 9 个公开基准上，FGL 在绝大多数数据集上取得了最优或次优结果，尤其在低同配图（如 Texas）上准确率较最强基线提升超过 22 个百分点；同时，每 epoch 运行时间在所有方法中均最短（Table 2）。消融实验进一步证实，移除全局子模块或采用随机均匀采样会导致性能大幅下降（Cora 准确率从 85.46 降至 80.00），验证了森林设计与同质性采样的必要性。理论分析（Theorem 2）指出，随着边同质性估计精度的提高，采样树的期望同质性比可渐进地逼近图的结构上限，为方法的有效性提供了理论保证。
 
-## 背景与动机
+
 
 在半监督节点分类任务中，准确捕获图中节点间的长程依赖往往是提升性能的关键，尤其对于异配图（heterophilic graphs），局部近邻的信息可能具有误导性，而远距离的上下文却至关重要。然而，如何以可承受的计算代价实现全图范围的全局交互，始终是图学习领域尚未解决的核心矛盾。
 
@@ -61,7 +63,9 @@ $$\mathrm{Total~cost} = (\mathrm{cost~per~structure}) \times (\mathrm{number~of~
 
 基于上述动机，本文提出**森林式图学习框架 FGL（Forest-based Graph Learning）**，其核心思想是用多棵生成树构成的森林取代传统的局部邻域或全对交互。为了保证全局消息的质量，我们设计了一种同质性引导的采样机制：首先训练轻量局部注意力以估计边的同质性分数，然后在增强图上利用加权 Wilson 算法采样多棵生成树，使采样分布向高同质性边倾斜——理论分析表明（Theorem 2），提高同质性估计精度即可提升采样树的期望同质性比，从而使树上的消息传递更符合语义传播规律。最终，在每棵树上借助线性时间的树聚合器执行双向汇总，再通过浅层局部模块的残差融合，形成兼顾局部精细信息与全局上下文的节点表示。这一设计以 $\mathcal{O}(n+md)$ 的线性复杂度首次在单个层内实现了所有节点对的全局交互，在多个基准（包括同配和强异配数据集）上均取得显著提升，为图学习提供了成本‑感受野平衡的新范式。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 现有图神经网络（GNN）范式面临一个不可调和的根本矛盾：深层局部模型（如 GCNII）不得不堆叠大量局部结构以捕获长距离依赖，导致高昂的计算开销；浅层全局模型（如 DIFFormer、SGFormer）虽能通过单层全局注意力实现任意节点对交互，却依赖密集的 pairwise 计算，复杂度随节点数二次方增长。这一困境的数学本质可归纳为总成本 = 单结构成本 × 所需结构数量（Eq. 1）：深层模型的结构数量过多，浅层模型则单结构成本过高。**FGL（Forest-based Graph Learning）的核心洞察在于，将图上的消息传递重新诠释为在一组生成树（森林）上的传输**——生成树既能以最稀疏的边集（恰好 n−1 条边）实现所有节点的全局覆盖，又可通过精心设计的双向递归聚合，将每个节点对的信息交换压缩至线性时间。这一全新范式一举打破了成本与全局感受野的 trade-off。
 
@@ -83,7 +87,7 @@ $$\mathrm{Total~cost} = (\mathrm{cost~per~structure}) \times (\mathrm{number~of~
 
 > **需要手动验证的弱证据**：当前分析中，局部‑全局融合的学习系数 $\gamma$ 的具体自适应行为及其在不同图特性下的变化规律，在提供的片段中未给出详细的实验或消融分析，这一点的有效性仍需结合补充材料进一步确认。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0014_5asbtzIVpS_Forest-Based_Graph_Learning_for_Semi-Supervised/figures/002_Figure_2.jpg]]
 *Figure 2: Our framework contains 4 key steps: (I) Pre-processing first augments the vanilla graph; (II) Tree Sampler then generates multiple spanning trees from a derived distribution; (III) Tree Aggregator efficiently propagates messages (H in Eq. 9) over each tree next; and (IV) Tree Fuser finally integrates the aggregated messages from all trees into unified embeddings $H ^ { \prime }$*
@@ -103,7 +107,7 @@ FGL 将图上的全局消息传递重新诠释为在生成树（森林）上的�
 
 整个管道从增强图构建、生成树采样到树上递归聚合和融合，每一步都保持时间与空间复杂度线性于节点数 $n$、边数 $m$ 和隐含维度 $d$，从而在结构选择（生成树）与聚合机制（双向递归）两个维度上破解了深层局部模型与浅层全局模型在“成本‑全局感受野”上的根本矛盾。
 
-## 核心模块与公式推导
+
 
 ### 总成本视角下的范式突破
 现有图学习范式难以同时控制单结构成本与所需结构数量：深层局部模型需要堆叠大量局部结构以覆盖长距离依赖，导致总成本过高；浅层全局模型则依赖密集的节点对交互，造成单结构成本呈二次方增长。FGL 将图上消息传递重新诠释为在生成森林（一组生成树）上的传输，利用生成树以最少边数（$n-1$）实现全节点覆盖的特性，从根本上打破了该权衡。总成本关系可形式化为：
@@ -178,7 +182,9 @@ $$ f_{\mathrm{Agg}}(\mathcal{S}) = \mathcal{M}^{-}\big(f_{\mathrm{Agg}}(\mathcal
 
 最终 $H''$ 兼顾了浅层局部平滑与深层全局长程依赖，且整个流程（预处理、采样、聚合、融合）的时空复杂度均线性于 $n, m, d$。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：精度与效率的全面验证
 
@@ -229,7 +235,9 @@ FGL 在 9 个公开基准上与涵盖经典 GNN、深层 GNN、图 Transformer �
 ![[assets/figures/papers/iclr26_0014_5asbtzIVpS_Forest-Based_Graph_Learning_for_Semi-Supervised/figures/059_Table_10.jpg]]
 *Table 10: The results of performance comparison (with the best bolded and the runner-ups underlined)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 图学习方法的演进长期受困于两个维度之间的不可调和矛盾：深层局部模型（如 GCNII）依靠堆叠大量局部邻域层来扩大感受野，结构数量激增；浅层全局模型（如 DIFFormer、SGFormer）试图通过单层密集节点对交互直接捕获长距离依赖，单结构成本呈二次方增长。该困境的数学本质由总成本分解 $ \mathrm{Total~cost} = (\mathrm{cost~per~structure}) \times (\mathrm{number~of~structures}) $ 揭示——任何一方降低都无法避免另一方的抬升。FGL（Forest-based Graph Learning）通过将消息传递重新诠释为在**生成森林**上的传输，开辟出第三类范式：以极小边数（$n-1$ 条边）的生成树为基本结构，同时覆盖全部节点，从而同时压缩“单结构成本”与“结构数量”，在理论层面打破了上述权衡。
 
@@ -266,6 +274,8 @@ FGL 的优势依赖于生成树能够承载有效长程信息的前提。当原�
 5. **注意力注入与表达力**：在保持线性复杂度的前提下，将全局线性注意力或核分解方法注入树聚合器，提升对长程依赖的细粒度权重分配能力。
 
 综合来看，FGL 以其“生成树采样 + 双向递归”的范式，将图学习的效率与全局感受野矛盾推至新的平衡点，并留下了明确的扩展接口。它并不替代深层 GNN 或 Transformer，而是在二者之间提供了一条可证明、可解释且低成本的第三条路，其后续发展将深度依赖同质性估计、自适应森林构建与跨任务泛化三大支柱的突破。
+
+
 
 ## 原文 PDF
 

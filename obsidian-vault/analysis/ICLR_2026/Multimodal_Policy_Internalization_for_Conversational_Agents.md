@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Multimodal_Policy_Internalization_for_Conversational_Agents.pdf
+project_link: null
+code_link: null
 openreview_forum_id: fSE0rUngCX
 aliases:
 - MPICA
@@ -41,7 +43,7 @@ claims:
 > - ClevrPolicy-M (N=6) 上，准确率 (Acc) 为 84.70 (TriMPI w/ PoRo-GRPO)，对比 14.30 (CoT SFT)，变化 +70.40。
 > - GTAPolicy 上，整体分数 (Overall) 为 81.06 (TriMPI w/ PoRo-GRPO)，对比 54.50 (CoT SFT)，变化 +26.56。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -77,8 +79,6 @@ TriMPI 处于**多模态对齐**与**提示压缩**的交叉地带，但其定�
 
 当前方法在合成数据集（ClevrPolicy）和小规模真实数据（GTAPolicy，451 训练样本）上验证，策略复杂度仍相对有限；视觉掩码预训练策略较为简单，缺乏更精细的多模态知识注入机制；仅在 Qwen2.5-VL 系列上评估，未验证跨架构泛化性。未来方向包括：扩展到更多样化的真实世界任务、开发更复杂的多模态持续预训练策略、探索多策略同时内化时的干扰问题，以及 PolicyRollout 思想向其他 RL 算法的推广。
 
-## 背景与动机
-
 多模态对话智能体在真实应用中需要遵循日益复杂的策略（policy）——这些策略通常以提示前缀（prompt prefix）的形式提供给模型，长度可达约1K至50K tokens。这种依赖带来了两个核心瓶颈：
 
 1. **固定推理计算开销**：长策略作为上下文的一部分，每次推理都需要编码，导致预填充（prefill）时间显著增加。
@@ -88,7 +88,7 @@ TriMPI 处于**多模态对齐**与**提示压缩**的交叉地带，但其定�
 
 本文的核心动机在于：**能否将策略知识内化（internalize）到模型参数中，使模型在推理时无需显式提供上下文策略，同时提升策略遵循能力？** 这一目标与deliberative alignment共享高层动机，但强调超越简单的提示压缩，追求模型与策略的深度对齐。Figure 1直观对比了标准上下文推理与策略内化后推理的差异：前者依赖长策略输入但遵循效果有限，后者在移除上下文策略后反而实现更准确、更高效的策略遵循生成。
 
-## 核心创新
+## 核心方法与创新机理
 
 ### 问题瓶颈：长策略提示带来的推理负担与遵循困难
 
@@ -145,8 +145,6 @@ $$\mathcal{T}_{\mathrm{poRo-GRPO}}(\theta) = \mathbb{E}_{[\{\sigma_i\}_{i=1}^{G}
 
 TriMPI 的三个 changed slots 形成了一条因果链路：**VM‑CPT 显式注入策略知识 → CoT SFT 学习显式推理 → RL + PolicyRollout 进行策略感知的 grounded 探索**。这一设计使得模型在推理时完全摆脱上下文策略依赖，同时实现显著的性能提升（相比于 CoT SFT 基线绝对准确率提升约 70.7%，相比于上下文策略设置提升 79.4%）和效率提升（提示 token 数减少高达 93.9%，预填充推理时间减少 85.7%）。
 
-## 整体框架
-
 ![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_fSE0rUngCX/figures/005_Figure_4.jpg]]
 *Figure 4: Overview of different training algorithms for multimodal policy internalization. The solid purple outlines indicate the parts where the next-token prediction loss is computed. On the right, we illustrate the proposed three-stage training strategy, TriMPI, which enables direct policy knowledge injection through the VM-CPT stage and policy-grounded reinforcement learning through PolicyRollout. The PolicyRollout algorithm is detailed in §4.3 and illustrated in Figure 5*
 
@@ -182,8 +180,6 @@ TriMPI 通过三个顺序阶段将策略知识逐步注入模型参数 (Figure 4
 ### 输入输出流与模块关系
 
 整体管线中，策略 $P$ 仅在训练阶段出现，推理时模型仅接收查询 $Q$ 和图像 $I$。三个模块的因果关系为：VM-CPT 显式注入策略知识 $\rightarrow$ CoT SFT 学习显式推理过程 $\rightarrow$ RL + PolicyRollout 通过策略感知探索进一步强化策略遵循能力。消融实验表明，RL 阶段和 VM-CPT 阶段对性能贡献最大，且 PolicyRollout 在 GRPO 和 DAPO 上均带来额外提升，验证了各模块间的协同效应。
-
-## 核心模块与公式推导
 
 ### 问题形式化
 
@@ -241,7 +237,7 @@ $$\mathcal{T}_{\mathrm{poRo-GRPO}}(\theta) = \mathbb{E}_{[\{\sigma_i\}_{i=1}^{G}
 2. **VM-CPT 提供关键先验**：移除 VM-CPT（仅 CoT SFT + GRPO）导致性能下降，说明预训练阶段的策略知识注入为 RL 探索提供了更好的起点。
 3. **PolicyRollout 带来额外增益**：在 GRPO 和 DAPO 上分别加入 PoRo 均带来一致提升，验证了策略感知 rollout 在增强探索 grounded 程度方面的有效性。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心性能突破
 
@@ -292,12 +288,7 @@ TriMPI 在 ClevrPolicy 和 GTAPolicy 两个基准上均实现了相较于基线�
 
 **模型架构单一性**：所有实验均基于 Qwen2.5-VL 系列模型（3B/7B），未在其他多模态大模型架构（如 LLaVA 系列）上验证 TriMPI 的泛化性。**Table 8** 显示性能增益在 3B 和 7B 模型上均成立，且复杂策略上的增益更显著，但跨架构的迁移性仍有待验证。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_fSE0rUngCX/figures/006_Figure_5.jpg]]
-*Figure 5: Illustration of the PolicyRollout algorithm (applied to GRPO as an example). During the rollout phase, we additionally construct a set of input instances with the policy included in-context. These policy-aware responses are added to the rollout space as if they were generated from the original inputs without the policy in-context. The advantage and policy gradient are then computed on the combined rollouts, indicated by the thick red outlines. PolicyRollout enables more policyaware exploration without introducing a gap between training and inference, leading to significant improvements in MPI, especially on complex policies*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 问题定位：从上下文策略到参数化策略
 

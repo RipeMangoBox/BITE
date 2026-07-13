@@ -45,7 +45,7 @@ claims:
 > - BarbieGait 上，AVG mAP (%) 65.7 (GaitCLIF-3D) vs 60.2 (DeepGaitV2-P3D) (+5.5)。
 > - CCPG 上，Mean Rank-1 accuracy (%) under clothing conditions 84.9 (GaitCLIF-P3D*) vs 82.4 (DPGait) (+2.5)。
 
-## 概述
+## 概要
 
 **核心问题**：步态识别在换装条件下性能急剧退化，其根本瓶颈在于衣物多样性引发的类内外观方差大幅增加，使模型难以从外观中解耦出身份相关的运动特征。
 
@@ -60,7 +60,7 @@ claims:
 
 **方法定位**：GaitCLIF属于外观基方法，通过归一化层面的创新实现衣物不变特征学习，可与现有步态识别骨干网络（如DeepGaitV2的P3D架构）无缝集成。其设计哲学——按身体部位分别消除衣物外观差异——为换装步态识别提供了简洁而有效的基线。
 
-## 背景与动机
+
 
 步态识别通过分析人体行走模式实现远距离、非侵入式的身份鉴别，在安防监控、刑侦追踪等场景中具有独特优势。然而，现实部署面临一个核心瓶颈：**衣物多样性引发的类内外观方差大幅增加，使模型难以学习跨衣物的身份相关特征**。当同一行人在不同时间穿着差异显著的服装（如厚重冬装与轻便夏装）时，外观轮廓的剧烈变化会淹没步态运动模式中的身份信息，导致识别性能急剧下降。
 
@@ -70,7 +70,9 @@ claims:
 
 针对上述缺口，本文提出 **BarbieGait**——一个身份一致的合成人体数据集，每位受试者拥有100种不同服装组合，涵盖发型、上下装、鞋履及携带物的系统变化；同时提出 **GaitCLIF**（Gait-oriented CLoth-Invariant Feature）作为换装步态识别的鲁棒基线模型。GaitCLIF 的核心思想是：衣物在不同身体部位的影响程度不同，因此对特征图按水平分区并分别归一化，能更有效地消除局部衣物外观差异，同时通过帧级时序建模和序列级非线性映射强化身份相关运动模式的表达。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GaitCLIF 的核心创新在于提出了一种**面向步态的衣物不变特征学习框架**，通过三个紧密耦合的模块化改进，系统性地消除了衣物外观对步态识别的干扰。其设计哲学是：**衣物在不同身体部位的影响程度不同，因此应按水平分区独立归一化，同时保留细粒度运动细节。**
 
@@ -118,7 +120,7 @@ $$\mathrm{GON}(x_i) = \gamma \left( \frac{x_i - \mu(x_i)}{\sigma(x_i)} \right) +
 
 GaitCLIF 处于**外观类步态识别方法**的演进线上，其直接基线为 DeepGaitV2 系列（包括 2D/3D/P3D 变体）。与 GaitSet、GaitPart、GaitGL 等早期外观方法相比，GaitCLIF 通过归一化层面的针对性改进实现了换装鲁棒性的大幅提升。与 GaitGraph、GaitGraph2、GaitTR、GPGait、SkeletonGait、DPGait 等姿态类方法相比，GaitCLIF 直接利用剪影输入，避免了姿态估计误差的级联放大，同时通过 GON 机制隐式地聚焦于衣物无关的运动关节区域（Figure 8 热力图可视化证实了这一点）。
 
-## 整体框架
+
 
 GaitCLIF 的整体设计遵循一个清晰的原则：**在保留细粒度运动细节的前提下，消除衣物引入的外观统计量**。其 pipeline 由四个核心阶段串联而成，输入为一段步态序列的剪影或 2D 姿态，输出为身份判别特征。
 
@@ -170,7 +172,7 @@ GaitCLIF 的整体设计遵循一个清晰的原则：**在保留细粒度运动
 ![[assets/figures/papers/paper_list_l1042_https_arxiv_org_abs_2604_12221/figures/018_Figure_7.jpg]]
 *Figure 7: The illustration of our synthesized images. Our synthetic images are rendered in different scenes, realistic lighting conditions, diverse clothing conditions, and natural occlusions*
 
-## 核心模块与公式推导
+
 
 GaitCLIF 的核心设计围绕一个关键洞察展开：**衣物对不同身体部位的外观影响程度不同**，因此对特征图按水平分区并分别归一化，能更有效地消除局部衣物外观差异。基于此，方法引入三个紧密协作的模块——Gait-Oriented Normalization（GON）、GON-P3D/GON-3D 时序块和 GON-FC 序列头，形成从帧级到序列级的衣物不变特征学习链路。
 
@@ -219,7 +221,9 @@ $$\mathbf{X}' = \mathbf{GON}(\mathbf{X}) = \mathbf{Cat}(\mathbf{GON}(x_0), \dots
 ![[assets/figures/papers/paper_list_l1042_https_arxiv_org_abs_2604_12221/figures/004_Figure_3.jpg]]
 *Figure 3: Clothing Complexity and Thickness: (a) Silhouette without clothes. (b) Silhouette with clothes. (c) Non-overlapping area between (a) and (b) indicates garment complexity. (d) Distribution of subjects across thickness levels*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -300,7 +304,9 @@ GaitCLIF-P3D*使用热力图作为输入（与SkeletonGait的数据处理流程�
 ![[assets/figures/papers/paper_list_l1042_https_arxiv_org_abs_2604_12221/figures/015_Table_10.jpg]]
 *Table 10: Ablation study of each module under different clothing conditions (THK1-THK9). We report Rank-1 (R1) accuracy and mean Average Precision (mAP) for each variant*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 方法继承与基线关系
 
@@ -349,6 +355,8 @@ GaitCLIF 的核心贡献在于将“衣物不变性”从数据层面（如域�
 4. **衣物属性的语义化建模**：当前衣物厚度等级仅基于剪影非重叠区域面积定义，是一种粗粒度的几何度量。是否可以引入更语义化的衣物属性（如风格、材质、宽松度）来指导特征学习，使模型理解不同衣物类型的干扰模式差异？
 
 5. **归一化策略的理论理解**：GON 为何优于 IN 和 LN 的理论分析尚不充分。IN 在风格迁移中有效消除实例特定统计量，LN 在 Transformer 中稳定训练——GON 在步态换装场景下的优势是否源于其“局部身体部位”的归纳偏置与步态运动结构的对齐？这需要更深入的理论或实证分析。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/LAMP_Language_Assisted_Motion_Planning_for_Controllable_Video_Generation.pdf
+project_link: https://cyberiada.github.io/LAMP/
+code_link: null
 aliases:
 - LAMP
 tags:
@@ -42,15 +44,13 @@ claims:
 > - ET (Pure) 上，F1-Score 0.976 vs best baseline (lower) (显著提升)。
 > - ET (Mixed) 上，F1-Score 0.769 vs best baseline (lower) (显著提升)。
 
-## 概述
+## 概要
 
 现有视频生成框架在运动控制方面存在关键瓶颈：用户难以通过自然、高效的方式同时指定物体和摄像机的三维运动轨迹，导致生成结果与创作意图之间的对齐度不足。LAMP（Language-Assisted Motion Planning）将这一挑战重构为**语言到程序的合成问题**，利用大语言模型的推理能力，将自然语言描述转化为电影摄影启发的符号化运动DSL程序，再确定性地映射为3D轨迹，从而在统一的共享空间内实现对物体和摄像机运动的精确控制。
 
 核心结论是：通过引入结构化的、可解释的运动程序作为中间表示，LAMP无需在目标真实数据集上进行特定训练，即可在多个基准上取得显著优于现有专有训练方法的运动控制精度。在DataDoP数据集上，LAMP的摄像机轨迹F1分数达到0.763，远超GenDoP专有训练的0.400（Table 1）；在ET数据集的两个难度分割上，LAMP均取得最高F1分数（纯场景0.976，混合场景0.769），展现出强大的泛化能力（Table 2）。用户研究进一步表明，52%的参与者认为LAMP生成的整体视频质量更好，在摄像机跟随和物体跟随方面均被一致偏好（Figure 6）。
 
 方法定位上，LAMP区别于直接回归逐帧摄像机坐标的现有方案（如**CCD**（Jiang et al., EG 2024）、**GenDoP**（Zhang et al., ICCV 2025）），以及仅规划摄像机轨迹的方法（如**E.T.**（Courant et al., ECCV 2024）），通过电影摄影语义驱动的DSL程序和LLM运动规划器，实现了物体与摄像机的联合轨迹生成与迭代细化。
-
-## 背景与动机
 
 可控视频生成旨在根据用户提供的条件信号（如文本、图像、轨迹）合成动态视觉内容。近年来，扩散模型驱动的文本到视频（T2V）生成取得了显著进展，但在运动控制方面仍存在一个核心瓶颈：**用户难以通过自然、高效的方式同时指定物体和摄像机的3D运动轨迹**，导致生成结果与用户意图之间难以对齐。
 
@@ -60,7 +60,7 @@ claims:
 
 LAMP 的动机正是弥合这一鸿沟：**将运动控制重构为语言到程序的合成问题**，利用大语言模型（LLM）的推理能力，从自然语言描述中生成结构化的、电影摄影启发的符号化运动程序，再确定性地转换为3D轨迹，从而在统一的3D空间中实现对物体和摄像机运动的精确、可解释控制。
 
-## 核心创新
+## 核心方法与创新机理
 
 LAMP 的核心创新在于将视频生成中的运动控制重构为一个**语言到程序的合成问题**，通过引入电影摄影启发的领域特定语言（DSL）和基于大语言模型（LLM）的运动规划器，在统一的 3D 空间中实现对物体和摄像机运动的精确、可解释控制。与现有方法相比，LAMP 在三个关键维度上实现了根本性改变：
 
@@ -89,8 +89,6 @@ LAMP 提供**自然语言控制接口**（Section 3.5, 3.6），用户通过自�
 ### 创新点的因果机制
 
 这三个创新点构成了一个完整的因果链条：**DSL 符号表示**为 LLM 提供了结构化的推理空间，使其能够有效捕捉电影摄影语义；**联合规划框架**确保了物体与摄像机运动的空间一致性；**自然语言接口**降低了使用门槛，使非专业用户也能精确控制复杂的 3D 运动。这一设计使得 LAMP 在未使用目标数据集训练的情况下，在 DataDoP 数据集上的摄像机轨迹 F1 分数达到 0.763，远超 GenDoP 专有训练的 0.400（Table 1），展现出强大的零样本泛化能力。
-
-## 整体框架
 
 LAMP 将运动控制重构为一个**语言到程序的合成问题**，其核心思路是：利用大语言模型（LLM）的推理能力，将用户提供的自然语言运动描述转化为结构化的、电影摄影启发的符号化运动程序，再确定性地映射为 3D 轨迹，最终驱动视频生成。整个框架由四个顺序模块构成，形成一条从文本到视频的端到端可控管线（见图 2）。
 
@@ -124,8 +122,6 @@ LAMP 将运动控制重构为一个**语言到程序的合成问题**，其核�
 
 ![[assets/figures/papers/paper_list_l97_https_arxiv_org_abs_2512_03619/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of LAMP. A learned LLM acts as a motion planner, generating symbolic motion programs in a DSL format from textual descriptions of object and camera motion. These programs are deterministically converted into 3D trajectories, which are used to condition a pretrained video generator*
-
-## 核心模块与公式推导
 
 ### 3.1 整体框架与运动规划器
 
@@ -170,13 +166,10 @@ LAMP 包含四个关键模块，按数据流顺序为：
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l97_https_arxiv_org_abs_2512_03619/figures/003_Figure_3.jpg]]
-*Figure 3: Motion primitives. Examples of the primitive camera motion types encoded by our DSL. Each illustration depicts a distinct primitive with a natural-language description of the corresponding cinematic motion. The DSL (shown in boxes) specifies the primitive type followed by a list of modifiers in key_value format. See supplemental for the full DSL specification and many more examples*
-
 ![[assets/figures/papers/paper_list_l97_https_arxiv_org_abs_2512_03619/figures/004_Figure_4.jpg]]
 *Figure 4: LAMP allows iterative control over synthesized motion trajectories via simple textual instructions. We visualize the 3D trajectories converted from the LLM predicted motion programs*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 评估设置与基准
 
@@ -243,7 +236,7 @@ DSL框架的通用性在Figure 11中得到验证：LAMP的运动规划输出可�
 ![[assets/figures/papers/paper_list_l97_https_arxiv_org_abs_2512_03619/figures/017_Figure_11.jpg]]
 *Figure 11: DSL w/ CameraCtrl, EPiC, and ReCamMaster. DSL applied to multiple off-the-shelf models (T2V, I2V, V2V, respectively)*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 与现有工作的关系
 

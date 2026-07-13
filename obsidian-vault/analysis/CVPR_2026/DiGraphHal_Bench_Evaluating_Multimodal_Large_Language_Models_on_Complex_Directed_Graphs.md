@@ -43,7 +43,7 @@ claims:
 > - DiGraphHal-Bench (Comprehensive) 上，Semantic-Rewrite Path-Centric F1 GPT-5 (62.07%) vs GPT-5 on Semantic Query (75.50%) (-13.43)。
 > - DiGraphHal-Bench (Visual) 上，Absolute Localization (IoU@0.5) Accuracy All MLLMs < 10% vs Expected ceiling 100% (human) (> 90% gap)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：多模态大语言模型（MLLMs）在理解复杂有向图时面临根本性困难——它们难以同时整合结构拓扑、视觉布局与语义内容，导致在细粒度图推理中频繁产生幻觉。具体表现为：对图形元素的绝对空间定位几乎完全失效（IoU@0.5 准确率 < 10%），对视觉属性感知薄弱，以及对语义等价改写缺乏鲁棒性。
 
@@ -57,7 +57,7 @@ claims:
 - 针对性的监督微调（SFT）可缓解特定类型的幻觉：结构专项训练使非语义元素中心 F1 提升 +15.79，而单纯语义训练却导致元素中心性能退化（-1.30），证实基础感知能力对综合推理的支撑作用。
 - 直接训练的综合专家模型取得最大整体提升，课程学习模型表现接近但稍低，暗示现有课程策略仍存在灾难性遗忘问题。
 
-## 背景与动机
+
 
 ### 多模态图理解的兴起与瓶颈
 
@@ -83,7 +83,9 @@ claims:
 
 简言之，DiGraphHal-Bench 不仅是一个评估排行榜，更是一套面向多模态图理解的“CT扫描仪”——它试图回答的终极问题是：**当MLLM在图推理中产生幻觉时，究竟是哪里出了问题？**
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DiGraphHal-Bench 的核心创新并非提出新的模型架构，而是构建了一套系统性的**评估方法论与数据基础设施**，用于诊断多模态大语言模型（MLLMs）在复杂有向图理解中的幻觉问题。其创新集中体现在以下三个层面。
 
@@ -118,7 +120,7 @@ DiGraphHal-Bench 不仅是评估工具，还通过**专项监督微调（SFT）�
 
 这些发现将基准从静态评估推进到**因果诊断**：不仅指出模型“在哪里失败”，更揭示了“为什么失败”以及“如何改善”。
 
-## 整体框架
+
 
 DiGraphHal-Bench 的总体设计遵循“**分层能力解构 → 可验证数据生成 → 多维诊断评估**”的闭环逻辑，旨在系统性地暴露多模态大语言模型（MLLMs）在复杂有向图理解中的幻觉模式。该框架包含三个核心功能模块，其输入输出流与模块间关系如 Figure 1 所示。
 
@@ -167,7 +169,7 @@ DiGraphHal-Bench 的总体设计遵循“**分层能力解构 → 可验证数�
 
 两种策略均基于同一基座模型 **Qwen2.5-VL-7B**（Bai et al., 2025），使用相同的训练超参数与数据划分，确保消融实验的可比性。
 
-## 核心模块与公式推导
+
 
 ### 层次化能力评估框架
 
@@ -207,7 +209,9 @@ $$n_1 \to \{\ \}\ \{\ [\ ]\ \}\ \{\ \}\ [e_1]\ n_4$$
 ![[assets/figures/papers/paper_list_l2736_https_openaccess_thecvf_com_content_CVPR2026_html_Fan_DiGraphHal_Bench_E/figures/003_Table_2.jpg]]
 *Table 2: Summary of DiGraphHal-Bench task design*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 1. 核心瓶颈：多模态大语言模型的系统性幻觉
 
@@ -258,7 +262,9 @@ Figure 2 和 Table 5 的综合评估显示，闭源模型整体优于开源模�
 ![[assets/figures/papers/paper_list_l2736_https_openaccess_thecvf_com_content_CVPR2026_html_Fan_DiGraphHal_Bench_E/figures/002_Table_1.jpg]]
 *Table 1: Comparison of Multimodal Graph Benchmarks: Graph Size (Large/Small), Graph Type (Synthetic/Real-World), Semantic Graph (Yes¥¥/Noq), Structural/Visual/Semantic/Comprehensive VQA Coverage (Yes/No), Automatic Data Construction/Verification (Yes/No; applicable only to Sem. and Comp. VQA tasks), Number of Graphs (Train/Test), “–” denotes N/A*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题域与基线关系
 
@@ -301,6 +307,8 @@ Figure 2 和 Table 5 的综合评估显示，闭源模型整体优于开源模�
 4. **跨领域稳健性。** 当前结论主要基于合成和半合成图表，向真实世界复杂图表的迁移效果需要独立的验证基准和更大规模的跨领域训练数据支持。
 
 5. **从定向推理到交互式理解。** VQA 范式测量的是定向推理能力，未来需要发展支持自由形式探索和交互式查询的评测框架，以更全面地刻画模型的图理解深度。
+
+
 
 ## 原文 PDF
 

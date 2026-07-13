@@ -43,7 +43,7 @@ claims:
 > - SIMPLER 上，平均成功率 0.73 vs 0.65 (无KTR) (+0.08)；平均成功率 0.73 vs 0.54 (无GCM) (+0.19)。
 > - 真实世界任务 上，平均成功率 0.69 vs 0.50 (CogACT-ECoT) (+0.19)。
 
-## 概述
+## 概要
 
 现有视觉-语言-动作（VLA）模型在机器人操作中引入链式推理（CoT）以增强决策能力，但普遍采用**逐帧生成完整CoT**的策略。这一范式暴露了两个关键瓶颈：其一，每个时间步独立生成推理导致**大量冗余计算**，推理token开销与任务时长线性增长；其二，帧间推理**缺乏时序一致性**，历史决策信息无法有效传递，制约长期任务执行。
 
@@ -56,7 +56,7 @@ claims:
 
 **主要结果**：TRM-VLA在SIMPLER基准上达到**72.9%**成功率，在LIBERO-90上达到**94.8%**成功率，均取得最优性能；同时将CoT token生成量**降低4倍**（真实世界任务中从每步26.8 tokens降至4.3 tokens）。消融实验表明，移除KTR使SIMPLER平均成功率从0.73降至0.65，移除GCM进一步降至0.54，验证了时序推理与记忆机制各自的关键贡献。
 
-## 背景与动机
+
 
 ### 机器人操作中的视觉-语言-动作模型
 
@@ -88,7 +88,9 @@ $$a _ { t } \sim P _ { \theta } ( a _ { t } \mid r _ { t } , o _ { t } , l _ { t
 
 如 Figure 1 所示，与每帧生成完整CoT或固定间隔生成CoT的现有模式相比，TRM-VLA 仅在关键帧触发层次化推理，并维持动态记忆缓冲区，在减少冗余推理token的同时提升成功率。实验表明，TRM-VLA 在 SIMPLER 基准上达到 72.9% 的成功率，同时将 CoT token 生成量减少 4 倍，验证了时序感知推理与记忆机制的有效性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 TRM-VLA 的核心创新在于将机器人操作中的链式推理（CoT）从“逐帧全量生成”转变为“关键帧触发、时序记忆增强”的模式，解决了现有VLA模型的两大瓶颈：**推理冗余**与**时序不一致**。具体而言，TRM-VLA 通过两个紧密协作的模块——**键帧触发推理（KTR）** 与 **粒度自适应上下文记忆（GCM）**——实现了这一转变。
 
@@ -116,7 +118,7 @@ $$f _ { t } = \mathrm { F i L M } ( f _ { c } , f _ { \mathrm { a t t } } )$$
 
 KTR 与 GCM 并非孤立运作，而是形成协同效应：KTR 通过选择性触发减少了需要存储和检索的推理量，使 GCM 的记忆缓冲区更加精简高效；GCM 则为 KTR 的触发决策提供了历史上下文，使关键帧判断更具时序连贯性。两者共同将 TRM-VLA 在真实世界任务上的平均成功率从基线的 0.50 提升至 0.69（Table 5），并在 LIBERO-90 上达到 94.8% 的 SOTA 成功率（Table 2）。
 
-## 整体框架
+
 
 TRM-VLA 的整体设计围绕一个核心矛盾展开：现有推理增强型 VLA 模型（如 **ECoT** (Zawalski et al., CoRL 2025)）在每个时间步生成完整链式推理，虽提升了决策质量，却引入了大量冗余计算，且帧间推理相互独立，缺乏时序一致性。TRM-VLA 的解决思路是**仅在关键决策点触发分层推理，并通过动态记忆维持跨帧推理的连贯性**。
 
@@ -166,7 +168,7 @@ Figure 2 展示了完整的系统架构，其中 (a) 为 VLM 推理骨干与扩�
 ![[assets/figures/papers/paper_list_l2426_https_openaccess_thecvf_com_content_CVPR2026_html_Li_TRM_VLA_Temporal_Aw/figures/002_Figure_1.jpg]]
 *Figure 1: Different reasoning patterns of VLAs. (a) generate full CoT at every frame. (b) generate CoT at fxed intervals without memory. (c) generate hierarchy CoT at critical frames, and maintain a dynamic memory buffer for execution, thus reducing redundant CoT reasonings tokens while improving the success rates*
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题形式化与推理增强VLA
 
@@ -241,7 +243,9 @@ $$\mathcal { L } _ { \mathrm { M S E } } = \mathbb { E } _ { \epsilon \sim \math
 
 整体训练联合优化KTR的推理损失与扩散动作的MSE损失，使模型同时学习何时推理、推理什么以及如何基于推理执行动作。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 评估设置概览
 
@@ -310,7 +314,9 @@ TRM-VLA 在三个递进的评估层次上接受检验：模拟基准 SIMPLER-Bri
 ![[assets/figures/papers/paper_list_l2426_https_openaccess_thecvf_com_content_CVPR2026_html_Li_TRM_VLA_Temporal_Aw/figures/006_Table_2.jpg]]
 *Table 2: Comparison with SOTA methods on LIBERO-90*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 一、与基线方法的演进关系
 
@@ -340,6 +346,8 @@ TRM-VLA 直接构建在 **CogACT**（Li et al., arXiv 2024）之上，后者是�
 2. **动态场景下的检索实时性**：GCM 的交叉注意力检索机制在动态、非结构化场景下的计算延迟和检索质量尚未得到充分评估。这对于部署在真实机器人系统上至关重要。
 3. **多机器人协作扩展**：当前框架针对单机器人操作任务设计。GCM 的记忆机制能否有效扩展到多机器人协作场景，处理多智能体间的共享推理记忆和时序协调，仍是一个开放问题。
 4. **泛化到更复杂操作**：尽管在 SIMPLER 和 LIBERO-90 上表现优异，但论文未在需要精细力控、接触推理或长程因果推理的任务上进行评估。该框架在这些场景下的有效性需要进一步验证。
+
+
 
 ## 原文 PDF
 

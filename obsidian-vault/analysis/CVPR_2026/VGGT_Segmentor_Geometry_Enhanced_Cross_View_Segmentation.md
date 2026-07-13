@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/VGGT_Segmentor_Geometry_Enhanced_Cross_View_Segmentation.pdf
+project_link: null
+code_link: https://github.com/buaa-colalab/VGGT-S
 aliases:
 - VSVS
 - VGGT-Segmentor
@@ -40,7 +42,7 @@ claims:
 > - Ego-Exo4D 上，IoU (Ego→Exo) 67.7 vs DOMR (49.7) (+18.0)；IoU (Exo→Ego) 68.0 vs DOMR (55.2) (+12.8)。
 > - MvMHAT 上，AP 80.7 vs DOMR (71.1) (+9.6)。
 
-## 概述
+## 概要
 
 跨视角分割任务要求给定源视图中的物体掩码，在目标视图中精确分割出同一物体。该任务的核心瓶颈在于：现有的跨视角特征提取器（如 VGGT）虽能保持对象级的注意力一致性，但其像素级点投影存在系统性漂移，无法直接用于密集分割任务。
 
@@ -50,7 +52,7 @@ claims:
 
 在方法谱系上，VGGT-S 属于**基于预训练跨视图编码器 + 轻量分割头**的范式，区别于 **ObjectRelator** (Fu et al., ICCV 2025) 等基于语言模型的关系理解方法，也不同于 **PSALM** (Zhang et al., ECCV 2024) 等零样本分割基线。其关键创新在于将 VGGT 的实例级对齐能力通过稀疏几何锚点和迭代细化机制转化为鲁棒的密集分割输出。
 
-## 背景与动机
+
 
 跨视角分割（Cross-View Segmentation）旨在给定源视图中的一个对象掩码，在具有显著视角差异的目标视图中预测该对象的对应掩码。这一任务在增强现实、机器人操作和场景理解中具有重要应用价值，但其核心挑战在于跨视角的几何变化、遮挡和外观差异使得像素级对应关系极难建立。
 
@@ -62,7 +64,9 @@ claims:
 
 针对上述问题，本文提出 **VGGT-Segmentor (VGGT-S)**，通过一个轻量级的 Union Segmentation Head 将 VGGT 的几何感知特征转化为精确的目标视图分割掩码，无需依赖成对标注即可实现自监督训练。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题本质：VGGT 的几何能力与像素投影之间的断裂
 
@@ -113,7 +117,7 @@ VGGT-S 位于**跨视角视觉理解**与**基础模型适配**的交叉点。�
 
 相较于 **DOMR**（Liao et al., ACM MM 2025）依赖时空建模和复杂匹配策略，VGGT-S 仅使用空间信息即实现了大幅领先（Ego→Exo +18.0 IoU，Exo→Ego +12.8 IoU），证明了冻结几何编码器+精心设计分割头的技术路线在跨视角分割任务上的显著优势。
 
-## 整体框架
+
 
 VGGT-Segmentor (VGGT-S) 的整体 pipeline 围绕一个核心洞察展开：**VGGT 的跨视图特征已隐含实例级对齐**，但其直接输出的像素投影存在系统性漂移，无法直接用于密集分割。为此，VGGT-S 在冻结的 VGGT 编码器之上引入了一个轻量级的 **Union Segmentation Head**，将跨视图几何线索转化为目标视图的精确分割掩码。
 
@@ -140,7 +144,7 @@ Figure 2 展示了 VGGT-S 的整体架构及 Union Segmentation Head 各子模�
 ![[assets/figures/papers/paper_list_l31_https_arxiv_org_abs_2604_13596/figures/002_Figure_2.jpg]]
 *Figure 2: (A) Overall Architecture of VGGT-S, which integrates the original VGGT encoder with our Union Segmentation Head. (B) Mask Prompt Fusion stage, which injects the source mask*
 
-## 核心模块与公式推导
+
 
 VGGT-S 的核心设计围绕一个轻量级的 **Union Segmentation Head** 展开，该头模块冻结 VGGT 编码器，仅在其输出特征之上构建三个协同阶段：掩码提示融合、点引导预测和掩码细化。其根本动机在于：VGGT 的跨视图特征已隐含实例级对齐（见 Figure 1 右侧注意力图），但直接像素投影存在系统性漂移（见 Figure 1 中部），因此需要一种机制将“对象级一致性”转化为“像素级精确掩码”。
 
@@ -193,7 +197,9 @@ $$\bar{Q}_{\ell} = \mathrm{SelfAttn}(Q_{\ell-1}) \tag{14}$$
 
 VGGT-S 的训练不依赖成对标注数据，而是采用基于数据增强的单图像自监督策略：对单张图像施加随机仿射变换和颜色抖动模拟跨视角变化，将原始图像作为源视图、增强图像作为目标视图，以原始掩码作为监督信号进行训练。这一策略使得模型可在 SA-1B 等大规模单图像分割数据集上进行预训练，获得无需对应关系的预训练变体，显著降低了数据获取成本。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -278,7 +284,9 @@ Table 3 系统分析了 Union Segmentation Head 各模块的贡献。以无任�
 ![[assets/figures/papers/paper_list_l31_https_arxiv_org_abs_2604_13596/figures/001_Figure_1.jpg]]
 *Figure 1: Visualizing VGGT Cross-View Correspondence. Left: source image. Middle: target image with the projections of sourcesampled points obtained by directly applying VGGT, which exhibit the systematic drift and misalignment. Right: star markers in the source image with the corresponding attention map on the target image, illustrating VGGT’s instance-consistent object alignment across views*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -310,6 +318,8 @@ VGGT-S 在跨视角分割任务上直接对标 **DOMR**（Liao et al., ACM MM 20
 - 自监督预训练中使用的数据增强策略对最终性能的贡献比例未通过消融实验量化，无法判断是增强策略本身还是 VGGT 编码器的预训练特征主导了零样本能力。
 - 能否将时序信息有效整合到 VGGT-S 框架中？一个自然的扩展方向是在 Bottleneck Fusion 阶段引入时序维度的自注意力，但计算开销和性能增益需要系统验证。
 - 模型在更广泛的户外数据集（如 MAVREC 之外）上的泛化能力如何？当前仅在 MvMHAT 上进行了泛化测试，缺乏与自动驾驶、无人机视角等场景的交叉验证。
+
+
 
 ## 原文 PDF
 

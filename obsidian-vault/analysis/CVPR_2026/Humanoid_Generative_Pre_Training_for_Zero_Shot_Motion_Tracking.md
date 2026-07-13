@@ -43,7 +43,7 @@ claims:
 > - 真实世界 (四个未见舞蹈动作) 上，MPJPE (Humanoid-GPT-B) 0.0974 (平均) vs 仿真结果 (0.0805)，真实世界与仿真接近 (性能与仿真高度一致)。
 > - 推理延迟 上，端到端推理时间 <1.5ms (Humanoid-GPT, TensorRT优化) vs ~7.5ms (TWIST, 按5倍加速推算) (约快5倍)。
 
-## 概述
+## 概要
 
 **核心问题**：现有的人形机器人运动跟踪器长期面临敏捷性与泛化性之间的根本权衡。基于MLP的浅层架构受限于模型容量，而训练数据规模通常仅为数百万帧（7.2M–100M），导致系统要么擅长高动态跟踪却缺乏零样本泛化能力，要么具备一定泛化性却无法应对敏捷运动。
 
@@ -59,8 +59,6 @@ claims:
 
 **方法谱系与知识库定位**：现有方法可大致分为两类——以**ASAP**、**OmniH2O**、**HumanPlus**为代表的敏捷型跟踪器（MLP或Transformer架构，数据规模≤7.2M帧，无零样本能力），以及以**UniTracker**、**Any2Track**、**SONIC**为代表的泛化型跟踪器（MLP架构，具备零样本能力但不擅长高动态运动）。Humanoid-GPT首次将GPT风格的因果注意力Transformer与十亿帧级预训练相结合，在敏捷性与泛化性两个维度上同时超越上述所有方法，确立了新的性能前沿。
 
-## 背景与动机
-
 人形机器人全身运动跟踪旨在让机器人实时复现来自人类演示、动捕数据或生成模型的目标运动序列。这一能力是实现具身智能体在非结构化环境中灵活运动的基础，也是连接高层规划与低层执行的关键环节。然而，现有的运动跟踪器普遍面临一个根本性的瓶颈：**敏捷性与泛化性之间的权衡**。
 
 具体而言，基于MLP的跟踪器——如 **ASAP**、**OmniH2O**、**UniTracker**、**Any2Track** 等——虽然在小规模训练数据（通常7.2M至100M帧）上能够实现较高的跟踪精度，但其浅层架构的容量限制导致它们难以同时兼顾高动态运动的精确跟踪和对未见运动模式的零样本泛化。例如，UniTracker具备零样本能力但不擅长高动态运动，而ASAP敏捷性强却缺乏零样本泛化能力。近期工作 **SONIC** 尝试将数据规模扩展到100M帧，但仍未从根本上解决架构容量不足的问题。
@@ -71,7 +69,7 @@ claims:
 
 受大语言模型规模化预训练的启发，本文提出 **Humanoid-GPT**，将运动跟踪重新定义为GPT风格的因果序列建模问题。核心动机是：通过将训练数据规模从百万帧级别提升至**20亿帧**（超过先前方法200倍以上），并采用**因果注意力Transformer**架构进行序列预测，能否实现一种同时具备高动态跟踪精度和零样本泛化能力的通用运动跟踪器？这一规模化路径是否能够带来可预测的性能持续提升，而非陷入饱和？
 
-## 核心创新
+## 核心方法与创新机理
 
 Humanoid-GPT 的核心创新在于通过**扩大数据规模**和**架构升级**两个关键维度，系统性地打破了现有运动跟踪器在敏捷性与泛化性之间的根本权衡。具体体现为以下四个 **changed slots**：
 
@@ -94,8 +92,6 @@ Humanoid-GPT 的核心创新在于通过**扩大数据规模**和**架构升级*
 ---
 
 **综合效果**：上述四个 changed slots 协同作用，使 Humanoid-GPT 成为目前唯一同时具备**高动态敏捷性**和**零样本泛化能力**的方法（Table 1）。缩放实验（Table 2）进一步证实，系统性能随数据和模型容量可预测地持续提升——从 MLP+2M 数据到 Transformer-L+2B 数据，成功率从 76.89% 提升至 92.58%，MPJPE 从 0.1191 降至 0.0735，且未见饱和迹象。
-
-## 整体框架
 
 Humanoid-GPT 采用**三阶段流水线**（数据策划、专家训练、DAgger 蒸馏），最终输出一个 GPT 风格的因果注意力 Transformer 通用跟踪器，实现从参考运动到关节控制目标的端到端映射。图 2 给出了该流水线的全局视图。
 
@@ -125,8 +121,6 @@ Humanoid-GPT 采用**三阶段流水线**（数据策划、专家训练、DAgger
 
 ![[assets/figures/papers/paper_list_l991_https_openaccess_thecvf_com_content_CVPR2026_html_Qi_Humanoid_Generative/figures/003_Figure_2.jpg]]
 *Figure 2: Overview of Humanoid-GPT. The system consists of three stages: (a) data curation and processing, (b) training PPO-based motion experts on clusters with keypoint-level rewards, and (c) distilling all experts into a single Transformer-based generalist policy via parallel DAgger supervision. The resulting Humanoid-GPT can take unseen or online retargeted motions as reference inputs and track them in a fully zero-shot manner*
-
-## 核心模块与公式推导
 
 Humanoid-GPT 的系统架构遵循“数据策划→专家训练→蒸馏泛化”三阶段流水线，其核心模块与关键公式如下。
 
@@ -174,7 +168,7 @@ $$l = \mathcal{L} ( G_{\theta} ( e_{t-H+1:t} ), \hat{a}_{t-H+1:t} )$$
 
 通用跟踪器采用 **GPT 风格的因果注意力 Transformer** 架构。推理时，系统维护一个长度为 $H$ 的历史 token 队列作为 Transformer 输入，仅取最后一个位置的输出作为当前控制目标（每关节 PD 目标），天然满足部署时的因果约束。这种设计使模型能够利用历史运动上下文进行时序推理，从而在敏捷性与泛化性之间取得突破性平衡。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心性能对比与零样本泛化
 
@@ -220,13 +214,10 @@ $$gstd = \exp\left(\frac{1}{D}\sum_{j=1}^{D}\log\sigma_j\right), \quad log\text{
 ![[assets/figures/papers/paper_list_l991_https_openaccess_thecvf_com_content_CVPR2026_html_Qi_Humanoid_Generative/figures/007_Table_3.jpg]]
 *Table 3: Real-world tracking accuracy on four unseen dancing motions. For each motion clip, we record both the target and executed joint configurations and compute MPJPE/MPJVE over the entire sequence to evaluate tracking precision and temporal consistency. Remarkably, the real-world performance closely matches the results obtained in simulation, demonstrating that Humanoid-GPT achieves strong zero-shot transfer and maintains high-fidelity whole-body tracking even under real-world dynamics*
 
-![[assets/figures/papers/paper_list_l991_https_openaccess_thecvf_com_content_CVPR2026_html_Qi_Humanoid_Generative/figures/005_Figure_4.jpg]]
-*Figure 4: Real-world experiments for our Humanoid-GPT. All motions illustrated are excluded from training to verify generalization capability. Our method can track diverse, complex and high-dynamic motion in a zero-shot manner, especially various dance motions*
-
 ![[assets/figures/papers/paper_list_l991_https_openaccess_thecvf_com_content_CVPR2026_html_Qi_Humanoid_Generative/figures/008_Figure_5.jpg]]
 *Figure 5: Comparison of inference latency among different optimization methods. Our final optimization reaches about 5 times faster than TWIST*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 与基线方法的对比定位
 

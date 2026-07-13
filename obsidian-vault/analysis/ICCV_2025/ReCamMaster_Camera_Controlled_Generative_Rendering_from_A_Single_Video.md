@@ -5,6 +5,7 @@ paper_level: A
 venue: ICCV
 year: 2025
 pdf_ref: paperPDFs/ICCV_2025/ReCamMaster_Camera_Controlled_Generative_Rendering_from_A_Single_Video.pdf
+code_link: null
 project_link: https://jianhongbai.github.io/ReCamMaster/
 aliases:
 - ReCamMaster
@@ -33,7 +34,7 @@ claims:
 | 中文题名 | ReCamMaster：基于单视频的相机控制生成式渲染 |
 | 英文题名 | ReCamMaster: Camera-Controlled Generative Rendering from A Single Video |
 | 会议/期刊 | ICCV 2025 |
-| Links | [paper](https://arxiv.org/abs/2503.11647); [Project](https://jianhongbai.github.io/ReCamMaster/) |
+| Links | [paper](https://arxiv.org/abs/2503.11647) · [Project](https://jianhongbai.github.io/ReCamMaster/) |
 | Topic | #topic/camera_controlled_video #topic/generative_rendering #topic/video_diffusion #topic/camera_controlled_video/general |
 | Method | Frame-dimension conditioning, 3D self-attention video conditioning, mixed T2V/I2V/V2V training |
 | Dataset | UE5 multi-camera synchronized video dataset, 136K videos, 40 scenes, 122K camera trajectories |
@@ -43,7 +44,7 @@ claims:
 > - Conditioning Strategy Ablation (Table 3) 上，Matched Pixels (K) ↑ 为 906.03，对比 521.10，变化 +384.93。
 > - Training Strategy Ablation (Table 4) 上，FVD ↓ 为 122.74 (All strategies)，对比 171.80 (Baseline)，变化 -49.06。
 
-## 概述
+## 概要
 
 **核心问题**：给定一段单目源视频，如何生成一段相机轨迹可控的新视频，同时保持场景外观一致性和时序同步？现有方法面临双重瓶颈——缺乏高质量的多摄像机同步视频训练数据，且常用的视频条件机制（通道拼接或视图注意力）无法充分保持源视频的外观一致性与时序同步。
 
@@ -53,7 +54,7 @@ claims:
 
 **主要结果**：在视觉质量与视图同步指标上，帧维度条件显著优于通道条件（FVD 122.74 vs 187.94）和视图条件（Matched Pixels 906.03K vs 521.10K）。配合高质量多摄像机同步渲染数据集（136K 视频、40 个场景、122K 条相机轨迹）和混合训练策略（T2V/I2V/V2V），模型在相机准确性、外观一致性和时序同步方面均取得领先性能。
 
-## 背景与动机
+
 
 ### 问题背景：相机控制下的视频重生成
 
@@ -83,7 +84,9 @@ claims:
 
 **动机总结**：ReCamMaster旨在通过帧维度条件机制和高质量渲染数据集，解决现有方法在视频条件策略和数据规模上的双重不足，实现外观一致、时序同步且相机精确可控的视频重生成。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ReCamMaster 的核心创新在于提出了一种**帧维度条件机制（Frame-dimension conditioning）**，用于将单视角源视频注入到预训练的文生视频（T2V）扩散模型中，从而实现相机可控的生成式渲染。该机制的本质是一个被忽视但极为有效的视频条件策略：将源视频与目标视频的令牌沿帧维度拼接，使模型内置的 3D 自注意力能够同时处理两个视频序列，实现跨视频的时空交互。
 
@@ -124,7 +127,7 @@ ReCamMaster 将视频条件从“通道维度”或“视图维度”切换为�
 - 模型在真实世界视频上的泛化性能仍需进一步验证，因为训练数据完全来自渲染引擎，域隙不可避免。
 - 模型继承自预训练 T2V 模型的手部生成缺陷（尤其在人物特写时）尚未解决（Figure 11）。
 
-## 整体框架
+
 
 ReCamMaster 的整体 pipeline 围绕一个核心设计展开：**将源视频的相机重拍摄问题建模为条件视频生成任务**。给定一段源视频 $V_s$ 和一条新的目标相机轨迹，模型需要生成一段在目标视角下、与源视频保持外观一致性和时序同步的新视频 $V_t$。这一目标的实现依赖于三个关键模块的协同：**视频压缩与重建的 3D VAE**、**基于 Rectified Flow 的 Transformer 去噪骨干网络**，以及本文核心的**帧维度条件注入机制**。
 
@@ -176,7 +179,7 @@ $$z_t = (1 - t) z_0 + t \epsilon$$
 ![[assets/figures/papers/paper_list_l1494_https_arxiv_org_abs_2503_11647/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of ReCamMaster. Left: The training pipeline of ReCamMaster. A latent diffusion model is optimized to reconstruct the target video Vt, conditioned on the source video V _ { s } , , target camera pose camt, and target prompt pt. Right: Comparison of different video condition techniques. (a) Frame-dimension conditioning used in our paper; (b) Channel-dimension conditioning used in baseline methods [5, 45]; (c) View-dimension conditioning in [3]. We omit the text prompt p _ { t } in (a)-(c) for simplicity*
 
-## 核心模块与公式推导
+
 
 ### 3D VAE 编解码与 Rectified Flow 框架
 
@@ -228,7 +231,9 @@ $$L_{i} = L_{start} + (L_{end} - L_{start}) \cdot \left( \frac{1 - \exp(-a \cdot
 
 其中 $L_{start}$ 和 $L_{end}$ 为起止位置，$f$ 为总帧数。参数 $a > 0$ 时运动先快后慢，$a < 0$ 时先慢后快，$a = 0$ 退化为匀速运动。该公式在附录 C 中给出，用于构造训练数据中的多样化相机轨迹。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：与 SOTA 方法的定量对比
 
@@ -283,7 +288,9 @@ Figure 11 可视化了典型失败案例，揭示了两个系统性缺陷：
 ![[assets/figures/papers/paper_list_l1494_https_arxiv_org_abs_2503_11647/figures/002_Figure_2.jpg]]
 *Figure 2: Illustration of the dataset construction process. We build the multi-camera synchronized training dataset by rendering in Unreal Engine 5. This is achieved using 3D environments, characters, animations collected from the internet, and our designed massive camera trajectories*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心贡献与因果机制
 
@@ -335,6 +342,8 @@ ReCamMaster 系统比较了三种视频条件策略（Figure 3, Table 3）：
 3. 模型如何处理超出训练分布的极端摄像机轨迹（如大角度旋转、快速变焦）？
 4. 变速轨迹参数 $a$（Eq. 7 中的指数衰减系数）对最终生成质量有何定量影响？
 5. 在真实世界视频的摄像机内参估计不准确时，模型性能如何退化？是否需要引入内参估计模块或鲁棒性增强策略？
+
+
 
 ## 原文 PDF
 

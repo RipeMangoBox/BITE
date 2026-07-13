@@ -44,7 +44,7 @@ claims:
 > - RxR-CE val unseen 上，NE↓/OSR↑/SR↑/SPL↑ 5.88/67.0/55.4/45.2 vs 5.91/53.5/46.1 (InternVLA-N1, OSR未报告) (-0.03/+1.9/-0.9)。
 > - NavRAG-CE val unseen 上，NE↓/OSR↑/SR↑/SPL↑ 7.88/46.4/22.2/18.2 vs 8.12/38.4/24.7/18.8 (MapNav) (-0.24/-2.5/-0.6)。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -74,7 +74,7 @@ GA-VLN提出**几何感知的鸟瞰图表示（Geometry-Aware BEV, GA-BEV）**�
 
 GA-VLN在零样本实机部署时暴露出路径安全性不足的问题（因缺少避障模块，智能体偶尔贴近墙壁行走），离散动作粒度也导致停止位置不够精确。训练数据方面，引入NavRAG-CE会损害R2R-CE和RxR-CE的泛化性能，存在数据集分布偏移。开放问题包括：两轮对话格式对推理延迟的实际影响、调整为更细粒度旋转步角后的定量效果、BEV表示在深度噪声较大时的退化程度，以及3D基础模型预训练数据分布对室内导航场景的适配性。
 
-## 背景与动机
+
 
 视觉语言导航（VLN）要求智能体在连续三维环境中根据自然语言指令自主移动。近年来，多模态大语言模型（MLLM）的兴起为VLN带来了端到端的推理与决策能力，但现有基于MLLM的导航方法普遍依赖**稠密RGB视频帧**作为视觉输入。这一设计存在两个根本性缺陷：
 
@@ -91,7 +91,9 @@ GA-VLN在零样本实机部署时暴露出路径安全性不足的问题（因�
 
 GA-BEV表示仅保留非空网格单元，token数量从数千降至数百（如394个token，Table 3），同时显著提升导航成功率。该方法仅使用高质量导航数据训练，无需DAgger增强或混合VQA数据，在R2R-CE、RxR-CE和NavRAG-CE三个基准上达到最优性能（Table 1），验证了**以几何感知的紧凑表示替代稠密图像token**这一技术路线的有效性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GA-VLN的核心创新在于用一个**紧凑的几何感知BEV表示（GA-BEV）**替代传统MLLM导航方法中的稠密RGB视频token，从根本上解决视觉token冗余与三维空间结构缺失两大瓶颈。这一表示通过两个互补机制构建：**显式深度引导的空间投影**与**隐式3D几何先验注入**。
 
@@ -124,7 +126,7 @@ GA-BEV的核心洞察在于：**显式深度投影**提供了几何定位的“�
 
 值得注意的是，GA-VLN在训练中**未使用DAgger增强数据或通用VQA混合训练**，仅依赖高质量导航数据集（R2R-CE、RxR-CE、EnvDrop、ScaleVLN、SRDF）即达到最优性能。这进一步验证了架构创新本身的有效性——紧凑的空间表示降低了对大规模增强数据的依赖，使MLLM能够更高效地学习导航策略。
 
-## 整体框架
+
 
 GA-VLN 的整体设计围绕一个核心洞察展开：**将稠密 RGB 视频 token 替换为紧凑的几何感知 BEV 表示**，从而在保留三维空间结构的同时大幅降低视觉 token 数量。整个框架由三个关键阶段构成——视觉编码与深度投影、隐式几何先验注入、BEV 聚合与 MLLM 决策。
 
@@ -194,7 +196,7 @@ RGB-D 帧序列 → SigLIP 编码 → patch 特征
 
 这一设计使得 GA-VLN 在保持紧凑 token 预算的同时，具备显式的空间推理能力，为后续在三个 VLN-CE 基准上取得最优性能奠定了基础。
 
-## 核心模块与公式推导
+
 
 GA-VLN 的核心架构围绕一个关键设计展开：将传统 MLLM 导航中稠密的 RGB 视频 token 替换为紧凑的**几何感知 BEV（GA-BEV）表示**。该表示由三个紧密耦合的模块构建，最终通过两轮对话机制驱动动作预测。
 
@@ -247,7 +249,9 @@ $$A_{t+1} = f_{\mathrm{MLLM}}(L, B, V_t, A_t, V_{t+1})$$
 ![[assets/figures/papers/paper_list_l2157_https_arxiv_org_abs_2605_22036/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of different representations for VLN. (A) Dense image-based representations contain heavy token redundancy and lack explicit spatial structure. (B) Our Geometry-Aware BEV (GA-BEV) representation combines explicit depth-projected features with implicit geometry priors from 3D foundation models, producing a highly compact yet spatially expressive representation tailored for VLN*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -320,7 +324,9 @@ Table 6对比了BEV特征融合策略：全局均值池化（SR 53.56）优于�
 ![[assets/figures/papers/paper_list_l2157_https_arxiv_org_abs_2605_22036/figures/006_Figure_3.jpg]]
 *Figure 3: An example of the GA-VLN real-world result*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从稠密图像MLLM到几何感知BEV
 
@@ -365,6 +371,8 @@ GA-VLN的核心定位是**基于MLLM的VLN方法中视觉表示范式的转换**
 5. **BEV表示的遮挡补全能力。** 当深度噪声较大或存在严重遮挡时，BEV表示的空间结构退化程度如何？是否可以通过多帧融合或不确定性建模来增强鲁棒性？
 
 6. **与模块化规划方法的融合潜力。** GA-BEV表示作为紧凑的空间token，是否可以与显式地图构建、路径规划等模块化方法融合，形成端到端与模块化的混合架构？
+
+
 
 ## 原文 PDF
 

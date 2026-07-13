@@ -44,7 +44,7 @@ claims:
 > - InterHuman 上，Top3 R-Precision↑ 0.694 vs FreeMotion (≈0.542) (+28%)；FID↓ 4.772 vs FreeMotion (≈6.719) (-29%)；FID↓ 4.772 vs InterMask (≈5.131) (-7%)。
 > - InterHuman-AS 上，Top3 R-Precision↑ 0.530±0.006 vs ReGenNet (+30%)；FID↓ 2.577±0.024 vs ReGenNet (显著提升)。
 
-## 概述
+## 概要
 
 现有文本驱动的人体动作生成方法面临两个核心瓶颈：**固定人数约束**与**自回归误差累积**。标准方法（如 **MDM** (Tevet et al., arXiv 2022)、**TEMOS** (Petrovich et al., arXiv 2022)）只能生成预设人数的动作序列，无法泛化到可变人数的开放场景；而自回归方法（如 **FreeMotion** (Fan et al., ECCV 2024)）虽将生成解耦为先验与反应两阶段，却因确定性条件网络引入误差累积，导致生成质量随人数增加而显著下降。
 
@@ -58,7 +58,7 @@ claims:
 
 UMF 的局限性在于：当前设计以主角色为中心，仅适用于约 10 人规模的中等群体交互，尚无法直接扩展到密集人群动态（≈100 人）。如何借助大规模视频扩散模型的视觉先验突破这一规模限制，是未来的开放方向。
 
-## 背景与动机
+
 
 ### 问题背景：从固定人数到无人数约束的文本-动作生成
 
@@ -83,7 +83,9 @@ UMF 的局限性在于：当前设计以主角色为中心，仅适用于约 10 
 
 这一设计的因果调节变量在于：**用流匹配的概率路径替代确定性条件映射**，使反应生成阶段能够同时考虑反应变换与上下文重建，从而在概率层面实现误差的自纠正。图 1c 示意了这一两阶段设计如何将异构运动先验作为反应流路径的自适应起点，从而打破确定性条件网络的单向误差传播链条。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 UMF的核心创新在于将“无人数约束”的运动生成重新表述为一个**两阶段流匹配问题**，并通过三个相互协同的机制突破现有方法的瓶颈：**统一多令牌潜空间**弥合异构数据分布鸿沟，**金字塔流匹配（P-Flow）** 在保持高保真度的前提下大幅降低多令牌表示的计算开销，**半噪声流匹配（S-Flow）** 通过联合概率路径设计缓解自回归生成中的误差累积。
 
@@ -149,7 +151,7 @@ UMF在推理时采用**非对称步数分配**策略：P-Flow获得充足的推�
 
 UMF当前以主角色为中心，适用于中等规模群体交互（约10人），尚无法直接扩展到密集人群动态（约100人）。如何利用大规模视频扩散模型的视觉先验突破这一规模限制，是论文提出的开放问题。
 
-## 整体框架
+
 
 UMF 将“无人数限制”的运动生成分解为两个核心阶段：**单次运动先验生成**与**多次反应生成**，并在统一的潜空间中完成异构数据的联合训练。其整体 pipeline 由三个关键模块串联而成，形成从原始运动编码到最终多人运动序列的完整生成链路。
 
@@ -212,7 +214,7 @@ S-Flow 基于已生成的上下文运动，为后续角色逐一生成反应运�
 ![[assets/figures/papers/paper_list_l14_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_Unified_Number_F/figures/001_Figure_1.jpg]]
 *Figure 1: Core contribution of UMF. We show dual-agent cases here for simplicity. (a) Standard methods [51, 57] are restricted to a fixed number of agents. (b) Autoregressive methods [12] decouple generation into a motion prior and subsequent reaction. The reaction is typically guided by the prior using a conditioning network. (c) Our UMF leverages a heterogeneous motion prior as the adaptive start point of the reaction flow path, mitigating error accumulation*
 
-## 核心模块与公式推导
+
 
 UMF 将无人数约束的运动生成分解为三个核心模块：统一运动 VAE、金字塔流匹配（P-Flow）先验生成、半噪声流匹配（S-Flow）反应生成。其理论基础建立在流匹配（Flow Matching）框架之上。
 
@@ -278,7 +280,9 @@ $$\hat{w}_{t_{m+1}} \gets \hat{w}_{t_m} + (t_{m+1} - t_m) G_{\theta}^{S}(\hat{w}
 
 值得注意的是，UMF 采用非对称的推理预算分配策略：P-Flow 获得充足的推理步数（如 50 步）以生成高质量运动先验，而 S-Flow 仅需极少的推理步数（如 10 步）即可完成反应生成。这种设计源于高质量先验降低了反应生成的难度，使得 S-Flow 在轻量推理下仍能保持鲁棒性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -336,7 +340,9 @@ UMF 在两个核心基准上均取得最优性能：多人生成基准 InterHuma
 ![[assets/figures/papers/paper_list_l14_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_Unified_Number_F/figures/009_Table_4.jpg]]
 *Table 4: Ablation study of Pyramid Flow on the InterHuman dataset. UMF has a 2-stage temporal pyramid structure. We report FLOPs(G) and AITS (Average Inference Time in Seconds)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 领域瓶颈与UMF的切入点
 
@@ -382,6 +388,8 @@ UMF在文本到运动生成领域的方法谱系中占据**通用无人数约束
 3. **S-Flow半噪声联合路径**：为自回归/级联生成中的误差累积问题提供了概率框架内的解决方案，可推广至其他序列条件生成场景。
 
 与同期工作的关系上，UMF在通用性上超越特化方法（InterMask、ReGenNet），在生成质量上超越同类通用方法（FreeMotion），其核心优势源于对“表示统一”和“概率路径设计”两个维度的联合优化。
+
+
 
 ## 原文 PDF
 

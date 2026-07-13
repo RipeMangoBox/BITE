@@ -43,7 +43,7 @@ claims:
 > - MeetRoom (Side View) 上，PSNR / LPIPS / FPS 26.64 / 0.0626 / 154。
 > - VRU 上，PSNR / LPIPS / FPS 29.43 / 0.170 / 77。
 
-## 概述
+## 概要
 
 动态场景的新视角合成（NVS）面临一个核心瓶颈：**动态-静态分解的不准确性**。现有方法通常依赖外部预训练模型逐视图生成掩码，或使用时间不变的先验，这些掩码缺乏时空一致性，导致在细粒度运动和侧视点下动静高斯原语分配错误。同时，主流方案将动静标签建模为连续浮点属性，再通过阈值后处理获得离散标签，这一过程引入了分布失配和后处理超参数敏感性问题，造成边界伪影和重建不稳定。
 
@@ -56,7 +56,7 @@ claims:
 
 **方法定位**：本工作属于动态场景高斯泼溅（Gaussian Splatting）重建谱系中的动静分解分支，与 **Swift4D**（Wu et al., ICLR 2025）、**Ex4DGS**（Lee et al., NeurIPS 2024）等显式分解方法形成对比。其核心贡献在于将动静分解的两个关键环节——掩码先验生成和标签表示——分别从“手工设计”和“连续+后处理”推进到“可学习 4D 场”和“脉冲神经元直接二值化”，为动态场景重建提供了一种更精确、更稳定的分解范式。
 
-## 背景与动机
+
 
 ### 动态场景新视角合成的核心挑战
 
@@ -80,7 +80,9 @@ claims:
 
 通过这两个模块的协同，本文方法在侧视图评测设定下实现了更清晰的动静分解边界和更优的新视角合成质量，为动态场景的显式辐射场重建提供了新的技术路线。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作针对动态场景新视角合成中**动静分解**这一核心环节，揭示了现有方法的两大瓶颈，并提出了对应的创新模块。
 
@@ -96,7 +98,7 @@ claims:
 
 两个核心模块的协同作用——4D掩码场提供准确的时空先验，脉冲神经元标记场实现精准的离散分配——构成了本方法在动静分解上的关键优势。消融实验（Table 3）证实，单独使用4D掩码场或脉冲神经元均能带来渲染质量提升，而二者组合达到最佳效果；脉冲神经元相比连续优化（Sigmoid+阈值）以及其他离散化方法（STE、Gumbel-Softmax）均有显著优势（Figure 6）。
 
-## 整体框架
+
 
 本文提出一种基于动静分解的动态场景新视角合成框架，其核心思路是**将场景显式拆分为动态高斯与静态高斯，分别建模并最终融合渲染**。框架整体由四个关键模块串联构成，信息流遵循“掩码先验生成 → 动静标签分配 → 形变建模 → 混合渲染”的管线。
 
@@ -132,7 +134,7 @@ claims:
 ![[assets/figures/papers/paper_list_l2472_https_openaccess_thecvf_com_content_CVPR2026_html_Dai_Dynamic_Static_Dec/figures/002_Figure_2.jpg]]
 *Figure 2: Our method has two key modules: Spatio-Temporal Fine-Grained Mask Field to provide mask priors and Discontinuous Dynamic-Static Tagging Field to directly optimize discontinuous dynamic-static labels. Based on different reconstruction pipelines for dynamic and static Gaussians, we alternatively optimize Gaussian geometric attributes*
 
-## 核心模块与公式推导
+
 
 本方法在动态-静态分解框架中引入两个核心模块，分别解决掩码先验时空不一致和连续标签离散化不确定性问题。
 
@@ -197,7 +199,9 @@ $$\mathcal{L}_{\mathrm{mask}} = -M \cdot \log(\hat{M}) - (1-M) \cdot \log(1-\hat
 ![[assets/figures/papers/paper_list_l2472_https_openaccess_thecvf_com_content_CVPR2026_html_Dai_Dynamic_Static_Dec/figures/004_Figure.jpg]]
 *Figure: (a) Prior Methods (b) Ours*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 评测协议与基准
 
@@ -249,7 +253,9 @@ Figure 3 提供了动态映射图的可视化消融：本文的二值映射在�
 ![[assets/figures/papers/paper_list_l2472_https_openaccess_thecvf_com_content_CVPR2026_html_Dai_Dynamic_Static_Dec/figures/011_Figure_8.jpg]]
 *Figure 8: Visualization of novel view synthesis on dg, gz scenes from the VRU dataset. Please zoom in to observe fine details*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与已有工作的关系
 
@@ -280,6 +286,8 @@ Figure 3 提供了动态映射图的可视化消融：本文的二值映射在�
 **脉冲标记场的泛化能力。** 脉冲神经元的代理梯度设计（本文采用反正切函数）引入了超参数 $\beta$，其对不同场景的敏感性尚未被消融。探索自适应代理梯度或替代脉冲模型可能进一步降低调参负担。
 
 **动静分解框架的扩展性。** 当前框架将动静分解用于高斯原语的属性解耦优化，该思路可推广至其他需要离散分配的动态场景表示任务，如语义高斯分割、多物体独立运动建模等。4D掩码场的时空一致性生成能力在这些场景中具有潜在复用价值。
+
+
 
 ## 原文 PDF
 

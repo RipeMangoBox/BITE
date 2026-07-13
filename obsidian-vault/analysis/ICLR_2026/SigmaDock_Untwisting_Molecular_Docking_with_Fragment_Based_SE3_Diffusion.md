@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/SigmaDock_Untwisting_Molecular_Docking_with_Fragment_Based_SE3_Diffusion.pdf
+project_link: null
+code_link: null
 openreview_forum_id: Vgm77U4ojX
 aliases:
 - SigmaDock
@@ -40,7 +42,7 @@ claims:
 > - PoseBusters 上，Top-1 (RMSD < 2 & PB-valid) 为 79.9%，对比 12.7%–32.8% (reported by recent deep learning approaches, e.g. DiffDock)，变化 +67.1% absolute improvement。
 > - PoseBusters (sequence similarity split) 上，Top-1 (PB-valid) across similarity bins 为 [0,30): 72%; [30,95): 79%; [95,100]: 87%，对比 AlphaFold3 reported: [0,30): 87%; [30,95): 82%; [95,100]: 78% (with different train-test leakage)，变化 SIGMADOCK outperforms AF3 on [95,100] and is competitive overall despite far less data。
 
-## 概述
+## 概要
 
 分子对接——预测配体在蛋白质结合口袋中的三维结合姿态——是结构药物设计的核心任务。传统物理对接工具受限于评分函数的精度，而近期深度学习方法（如基于扭角扩散的 DiffDock）虽然在部分场景取得进展，却面临一个根本性瓶颈：**扭角参数化在笛卡尔空间中诱导出高度非线性、非局部的几何耦合，导致学习目标复杂、采样不稳定**。具体而言，从扭角空间到笛卡尔坐标的映射使得诱导测度不再具有乘积结构，扩散过程难以分解，评分网络需要隐式地学习复杂的几何纠缠关系。
 
@@ -50,7 +52,7 @@ SIGMADOCK 的核心思路是**从根本上消除这种几何纠缠**：将配体
 
 **方法定位**：SIGMADOCK 是一种基于片段的 SE(3) 扩散模型，通过结构化学先验将分子对接重新表述为乘积空间上的可分解生成问题，绕开了扭角扩散的固有困难。其核心贡献在于**利用构象流形的几何性质设计扩散空间**，而非仅仅改进网络架构或评分函数。
 
-## 背景与动机
+
 
 ### 分子对接的核心挑战
 
@@ -82,7 +84,9 @@ $$\mathcal{M}_c = \{ \mathbf{x}_c \in \mathbb{R}^{|\mathcal{G}_{\mathrm{ligand}}
 
 简言之，SIGMADOCK 通过将分子对接重新定义为“预测各刚体片段的 SE(3) 变换”，以结构化学先验换取了扩散模型的简洁性与可学习性，从而在根本上突破了扭角扩散模型的瓶颈。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SIGMADOCK 的核心创新在于**将分子对接从扭角空间彻底迁移到片段的 SE(3) 乘积空间**，从而消除了扭角扩散模型中固有的几何纠缠与学习困难。这一迁移并非简单的参数化替换，而是通过三个紧密耦合的设计实现：**片段分解与归并**、**乘积空间上的独立扩散**、以及**三角化几何约束**。
 
@@ -104,7 +108,7 @@ SIGMADOCK 的解决方案是**将配体沿可旋转键切断，分解为 $m$ 个
 
 为适配片段级扩散，SIGMADOCK 对 EquiformerV2 骨干网络进行了针对性改造：添加虚拟节点与边构建分层拓扑，以 SO(3)-等变方式预测每个原子的力和扭矩，再通过牛顿-欧拉方程聚合为片段的平移和旋转评分。在评分排序阶段，SIGMADOCK 摒弃了需要单独训练的置信度网络，转而采用**伪结合能（Vinardo）+ PoseBusters 物理化学检查**的简单启发式策略，在保持高效的同时取得了优异的排序效果。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0011_Vgm77U4ojX_SigmaDock_Untwisting_Molecular_Docking_with_Frag/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of SIGMADOCK using PDB 1V4S and ligand MRK. We create an initial conformation of a query ligand where we define our m rigid body fragments (colour coded). The corresponding forward diffusion process operates in $\mathrm { S E }$ ( 3 )$^ { \overline { { { m } } } }$ via independent roto-translations
@@ -154,7 +158,7 @@ $$\mathbf{s}_{\theta}^R = - \frac{\partial_\omega f_0(\omega, \sigma(t))}{\omega
 6. **虚拟原子丢弃 + 扭键重建** → 完整配体构象
 7. **Vinardo 能量 + PoseBusters 检查** → 排序 → Top-1 预测
 
-## 核心模块与公式推导
+
 
 ### 2.1 构象流形与扭角模型的困境
 
@@ -222,7 +226,9 @@ $$\mathbf{s}_{\theta}^R = - \frac{\partial_\omega f_0(\omega, \sigma(t))}{\omega
 
 采样完成后，哑原子（用于三角化约束的辅助原子）被丢弃，扭键通过锚点重建。SIGMADOCK **不需要单独训练的置信度网络**，而是采用简单的启发式排序策略：结合 Vinardo 伪结合能评分和 PoseBusters 物理化学有效性检查（包括键长、键角、手性中心、平面性、碰撞等判据）对生成样本进行排序。消融实验表明，移除能量评分使 RMSD<2 从 80.5% 降至 76.1%，移除 PoseBusters 评分使 PB-validity 从 79.9% 降至 74.9%（Table 1, Config D, E）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能对比
 
@@ -297,7 +303,9 @@ Figure 12 展示了 Top-k 成功率随种子数 $N_{\text{seeds}}$ 的变化。T
 2. **口袋先验**：许多深度学习方法使用基于配体位置的 bounding box 定义口袋，可能引入不可在实际部署中获得的先验信息。SIGMADOCK 通过随机化口袋半径和中心噪声来减轻该偏差。
 3. **无后处理最小化**：SIGMADOCK 直接报告扩散生成结果，不使用能量最小化后处理，避免了因后处理带来的不公平比较。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 在分子对接方法谱系中的位置
 
@@ -349,6 +357,8 @@ Oracle 分析（图 12）显示，当采样种子数增加时，Oracle 上限接
 5. **数据规模化与迁移学习**：在更大规模数据集上训练，或利用预训练的蛋白质表征，能否进一步提升泛化性，特别是在低序列相似度区间（当前 [0,30) 区间为 72%，低于 AF3 的 87%）？
 
 6. **高通量筛选适配**：基于片段的 SE(3) 扩散是否在速度上适用于大规模虚拟筛选？当前 40 种子的采样策略可能需要针对吞吐量进行优化。
+
+
 
 ## 原文 PDF
 

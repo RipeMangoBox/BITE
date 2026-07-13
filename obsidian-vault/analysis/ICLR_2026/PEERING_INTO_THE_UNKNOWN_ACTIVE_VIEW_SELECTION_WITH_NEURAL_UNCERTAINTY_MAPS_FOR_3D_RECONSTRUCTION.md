@@ -43,15 +43,13 @@ claims:
 > - NUM-cat (novel categories) 上，PSNR 34.74 vs 33.15 (NVF) (+1.59)。
 > - NUM-3DGS-recon 上，PSNR 36.71 vs 30.67 (NVF) (+6.04)。
 
-## 概述
+## 概要
 
 3D重建的质量高度依赖于输入视角的选择。主动视角选择（Active Viewpoint Selection, AVS）旨在从大量候选视角中挑选出最具信息量的子集，以最小化重建误差。然而，现有方法面临一个根本性瓶颈：**每选择一个新视角，都需要重新训练或推断辐射场模型（如NeRF或3DGS）来估计不确定性，导致单次选择耗时数分钟，计算开销极大**。这种在线重训练的范式严重限制了AVS在实际场景中的应用。
 
 针对这一问题，本文提出**PUN（Peering into the Unknown）**方法，其核心思路是**将不确定性估计与视角选择彻底解耦**。具体而言，PUN训练一个轻量级的前馈神经网络UPNet（Uncertainty Prediction Network），直接从单张输入图像预测一张覆盖所有候选视角的神经不确定性图（Neural Uncertainty Map），从而完全避免了测试时的在线模型重训练。在此基础上，PUN通过聚合历史不确定性图、过滤冗余低不确定性视角，以连续的方式选择最具信息量的下一个视角。
 
 实验结果表明，PUN在仅使用一半视角的情况下，即可达到与全视角上界相当的重建精度。在计算效率方面，PUN将视角选择速度**提升高达400倍**，同时CPU、RAM和GPU使用率降低超过50%。该方法在多种数据集设置下均取得最优或次优结果，验证了其有效性和泛化能力。
-
-## 背景与动机
 
 三维场景的新视角合成是计算机视觉与图形学中的核心任务，其目标是从一组稀疏的输入视角重建出任意新视角下的高质量图像。以**NeRF**（Mildenhall et al., ECCV 2020）和**3D Gaussian Splatting (3DGS)**（Kerbl et al., SIGGRAPH 2023）为代表的神经渲染方法在此任务上取得了突破性进展，但它们的重建质量高度依赖于输入视角的数量与分布。在实际应用中，如机器人探索、无人机航拍和移动端扫描，采集所有可能的视角往往成本高昂甚至不可行。因此，**主动视角选择（Active Viewpoint Selection, AVS）**——即从候选视角中自适应地选择最具信息量的子集以最小化重建误差——成为了一个关键的研究方向。
 
@@ -79,7 +77,7 @@ claims:
 
 - **效率贡献**：在仅使用一半视角的情况下达到与全视角上界相当的重建精度，同时将视角选择速度提升**400倍以上**，CPU、RAM和GPU使用率降低超过50%，使主动视角选择首次具备了实时部署的可行性。
 
-## 核心创新
+## 核心方法与创新机理
 
 PUN 方法的核心创新在于将主动视角选择（AVS）中“不确定性估计”与“视角选择策略”两个环节进行了根本性的重构，从而突破了传统方法“每选一个视角就需重新训练辐射场”的计算瓶颈。
 
@@ -110,8 +108,6 @@ $$v_{t+1} = \arg\max_{C_i} \prod_{1,2,\dots,t} U_t^{C^i}$$
 ### 创新三：NUM 数据集——为不确定性预测提供规模化监督
 
 上述创新的实现依赖于一个关键的基础设施：**NUM（Neural Uncertainty Map）数据集**。该数据集覆盖 13 个物体类别、每类 100 个实例，为每个实例在 48 个固定锚点视角上预计算了 ground-truth 不确定性图。这一数据集的构建使得 UPNet 能够以监督学习的方式训练，从而获得跨实例和跨类别的泛化能力——实验表明，PUN 在新实例（NUM-inst）和新类别（NUM-cat）上均显著优于所有基线方法。
-
-## 整体框架
 
 PUN（Peering into the Unknown）提出了一种全新的主动视角选择范式，其核心思想是将不确定性估计与视角选择完全解耦，从而避免传统方法中每选一个视角就需要重新训练辐射场的巨大计算开销。整个框架由两个紧密协作的模块构成：**神经不确定性图预测**和**下一最佳视角选择**。
 
@@ -144,8 +140,6 @@ PUN（Peering into the Unknown）提出了一种全新的主动视角选择范�
 
 ![[assets/figures/papers/paper_list_l57_https_openreview_net_forum_id_e7gbgdw05A/figures/002_Figure.jpg]]
 *Figure: (a) Creation of our NUM dataset (b) Overview of our PUN method*
-
-## 核心模块与公式推导
 
 PUN 方法由两个解耦的核心模块构成：**神经不确定性图预测** 与 **下一最佳视角选择**。前者通过预训练的轻量级网络将单视角外观直接映射为覆盖全候选空间的不确定性图，后者则通过历史不确定性聚合与冗余过滤实现连续、高效的视角规划。
 
@@ -190,7 +184,7 @@ $$v_{t+1} = \arg\max_{C_i} \prod_{1,2,\dots,t} U_t^{C^i}$$
 ![[assets/figures/papers/paper_list_l57_https_openreview_net_forum_id_e7gbgdw05A/figures/004_Figure_3.jpg]]
 *Figure 3: Visualization of ground-truth and predicted uncertainty maps by our PUN method. We present two examples from: (a) NUM-inst and (b) NUM-cat. In each case, the input view*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主要实验结果
 
@@ -258,16 +252,13 @@ PUN在NeRF和3DGS两种截然不同的重建主干上均表现出色。在NeRF-N
 ![[assets/figures/papers/paper_list_l57_https_openreview_net_forum_id_e7gbgdw05A/figures/007_Table_3.jpg]]
 *Table 3: Ablation Analysis of Key Components in Our PUN Method. From left to right, we analyze: (a) different uncertainty metrics used to generate ground truth UMaps and train UPNet, (b) the effect of different next-viewpoint selection policies as illustrated in Sec. 5.3, and (c) the trade-off between instance diversity and viewpoint density in training samples. In (c), instance diversity refers to the number of object instances per category, while viewpoint density refers to the number of viewpoint–UMap pairs per instance. Best is in bold and second best is underlined. MSE values are scaled by 104. See Tab. S6 for full results in all metrics*
 
-![[assets/figures/papers/paper_list_l57_https_openreview_net_forum_id_e7gbgdw05A/figures/009_Table_S.1.jpg]]
-*Table S.1: Evaluation on the view selection performance of PUN. We evaluate the performance of PUN on NUM-inst, NUM-cat, NUM-3DGS-recon, NUM-light and NUM-cam-dist. s1 and s2 separately refers to experiments on NUM-light and NUM-cam-dist. Average results over 3 runs are reported, with standard deviations shown in the brackets. For the experiment on NUM-3DGS-recon, since we use 3DGS as the reconstruction backbone, it is not possible to extract a predicted mesh to compute the mesh quality metric, which is therefore denoted by*
-
 ![[assets/figures/papers/paper_list_l57_https_openreview_net_forum_id_e7gbgdw05A/figures/010_Table_S.2.jpg]]
 *Table S.2: Evaluation of AVS Methods using Binocular3DGS as the reconstruction backbone. Best is in bold. MSE values are scaled by 104 for readability*
 
 ![[assets/figures/papers/paper_list_l57_https_openreview_net_forum_id_e7gbgdw05A/figures/017_Table_S.6.jpg]]
 *Table S.6: Ablation experiment on key components in PUN, including the different viewpoint selection policies, different uncertainty metrics used for guiding the selection, and instance diversity and viewpoint density in the UPNet Training dataset. Instance diversity refers to the number of instances per category in the training set, while viewpoint density denotes the number of data samples (i.e., input image–UMap pairs) per instance. Bold indicates the best performance for each metric, while underline indicates the second best. (MSE values are scaled by 104 for readability.)*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 主动视角选择（AVS）的范式演进
 

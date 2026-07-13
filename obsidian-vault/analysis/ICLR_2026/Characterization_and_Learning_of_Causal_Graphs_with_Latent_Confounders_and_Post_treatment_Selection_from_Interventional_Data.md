@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Characterization_and_Learning_of_Causal_Graphs_with_Latent_Confounders_and_Post_treatment_Selection_from_Interventional_Data.pdf
+project_link: null
+code_link: null
 openreview_forum_id: qclNnbjxNJ
 aliases:
 - FF
@@ -42,7 +44,7 @@ claims:
 > - Synthetic graphs with latent confounders and post-treatment selection (soft int... 上，Precision 为 70.3±1.5，对比 48.1±0.4 (FCI-INTERVEN)，变化 +22.2。
 > - Synthetic graphs with latent confounders and post-treatment selection 上，后处理选择识别准确率 为 >70% (most configs with n>1000)，对比 N/A (独有能力)，变化 N/A。
 
-## 概述
+## 概要
 
 从干预数据中发现因果关系是科学研究的核心任务。然而，现有干预因果发现框架面临一个根本性瓶颈：**处理后选择（post-treatment selection）** 与**真实因果关系**在干预下表现出相同的分布变化模式——两者均导致边缘分布变化而条件分布不变。这种统计信号的不可区分性使得传统方法将它们归入同一等价类，无法分辨因果路径与选择诱导的虚假依赖。
 
@@ -58,7 +60,7 @@ claims:
 
 **局限与开放问题**：当前方法仅能识别含 Type I 诱导节点的路径结构，对完全由 Type II 诱导节点构成的路径尚无法完全识别；此外，如何区分生物约束（如持续过滤非存活细胞）与处理后选择、如何扩展到更一般的选择机制，仍是待解决的问题。
 
-## 背景与动机
+
 
 ### 干预因果发现中的核心挑战
 
@@ -89,7 +91,9 @@ claims:
 
 Figure 2展示了这一框架的图形表示：增广DAG包含干预指标$\psi$、观测变量$X$、潜在混淆因子$L$和选择变量$S$，为后续的CI模式刻画和算法设计提供了统一的图基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于**显式建模处理后选择（post-treatment selection）**，并将其与潜在混淆因子统一纳入干预因果发现框架，从而突破现有方法无法区分选择诱导依赖与真实因果关系的根本瓶颈。
 
@@ -121,7 +125,7 @@ F-FCI 算法在标准约束因果发现流程上进行了三个关键改造：
 
 算法流程分为四个模块：首先从观测数据恢复无向骨架（因其编码所有诱导路径且最稀疏）；然后利用捕获的 CI 模式定向与干预变量相关的边；接着检测 Type I 诱导节点以消除歧义；最后对剩余边应用标准 FCI 定向规则和不变性规则。该算法被证明在 FI-Markov 等价类意义下具有**可证明的正确性和完备性**。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0011_qclNnbjxNJ_Characterization_and_Learning_of_Causal_Graphs_w/figures/004_Figure_1.jpg]]
 *Figure 1: Motivation examples. (a) & (b) exhibit same dependence with tails from X _ { 1 } and arrowheads into X _ { 2 } , regardless of direct causation; (c) & (d) exhibit same dependence with tails on both X _ { 1 } and X _ { 2 } , regardless of direct selection. Existing methods cannot distinguish these cases, whereas ours can*
@@ -167,7 +171,7 @@ F-FCI 由四个顺序模块构成，每个模块解决一个逐步递进的识�
 
 F-FCI 的识别能力受限于诱导路径的结构类型：仅当路径中包含 Type I 诱导节点时，算法才能完全区分因果与选择路径。对于完全由 Type II 诱导节点构成的路径，当前方法尚无法完全识别其因果结构，这是该方法的一个已知局限。此外，算法无法区分处理后选择与生物约束（如持续过滤非存活细胞），因为两者具有不同的不变性/可变性模式，需要更多数据或假设来区分。
 
-## 核心模块与公式推导
+
 
 ### 核心瓶颈与解决思路
 
@@ -223,7 +227,9 @@ $$
 
 该集合涵盖周期函数、多项式、双曲正切、线性、非单调函数和复合非线性函数，用于检验条件独立性测试在不同函数形式下的稳定性。实验表明 F-FCI 在函数复杂度增加时精确度仅有轻微下降，整体性能仍具竞争力。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能对比
 
@@ -274,7 +280,9 @@ FCI-INTERVEN 不具备此能力，因为它未对选择变量进行建模，因�
 
 3. **小样本下的 CI 测试可靠性**：F-FCI 是基于约束的方法，其性能依赖于条件独立性测试的准确性。在 n=500 的设置中，精确度和召回率均明显低于 n=2000（表 2），反映了小样本下 CI 测试统计功效不足的问题。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -317,6 +325,8 @@ F-FCI 的适用场景由以下条件界定：
 2. **生物约束与选择解耦**：如何从数据中区分生物约束与处理后选择？两者在干预下可能表现出不同的不变性模式，但当前框架缺乏形式化的判别准则。这可能需要结合领域特定的生成机制假设。
 
 3. **更一般的选择机制**：如何将 F-FCI 扩展到多时间点选择、预处理与后处理选择并存、或选择变量本身受干预影响等更复杂的场景？当前增广 DAG 的建模假设相对严格，泛化到这些场景需要重新审视 Markov 性质和等价类理论。
+
+
 
 ## 原文 PDF
 

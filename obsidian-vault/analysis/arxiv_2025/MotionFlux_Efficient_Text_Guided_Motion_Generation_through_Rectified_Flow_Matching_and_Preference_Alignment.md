@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/MotionFlux_Efficient_Text_Guided_Motion_Generation_through_Rectified_Flow_Matching_and_Preference_Alignment.pdf
+project_link: null
+code_link: null
 aliases:
 - MT
 - MotionFlux
@@ -41,7 +43,7 @@ claims:
 > [!tip] 效果简介
 > - HumanML3D 上，inference time per sequence (seconds) 0.005 (MotionFlux-ultra) vs 24 (MDM); 14 (MotionDiffuse) (4800× faster than MDM, 2800× faster than MotionDiffuse)；FID (Frechet Inception Distance) 0.078 (MotionFlux-ultra) vs best competitor (not numerically specified in parts)；R-Precision Top-1 0.536 (MotionFlux-ultra) vs best competitor (not numerically specified)。
 
-## 概述
+## 概要
 
 文本驱动的人体运动生成面临双重瓶颈：**语义对齐不精确**与**扩散模型推理速度慢**。复杂语言描述（如“向左瞥一眼然后后退”）难以精确映射到动态动作序列，而主流扩散模型（如MDM、MotionDiffuse）通常需要数百步去噪，单序列生成耗时数十秒，无法满足实时交互需求。
 
@@ -49,7 +51,7 @@ claims:
 
 在HumanML3D数据集上，MotionFlux全面超越现有方法：Ultra版本以**5毫秒**生成一个运动序列，比MDM（24秒）快约4800倍，同时取得最优FID（0.078）和R-Precision Top-1（0.536）。定性分析表明，MotionFlux在“左右”、“瞥视”等细粒度语义事件上的对齐能力显著优于MotionLCM和MDM。在线TAPO训练可持续降低FID并提升语义得分，而离线固定数据集训练在第二次迭代后即出现性能饱和，验证了在线自我改进策略的有效性。
 
-## 背景与动机
+
 
 文本驱动的三维人体运动生成旨在根据自然语言描述合成逼真的动作序列，在动画制作、游戏开发、虚拟现实及人机交互等领域具有广泛应用前景。然而，该任务长期面临两大核心瓶颈。
 
@@ -61,7 +63,9 @@ claims:
 
 本文提出**MotionFlux**，核心动机是通过两个关键设计突破上述瓶颈：（1）引入**修正流匹配（rectified flow matching）**，将生成过程建模为从噪声到运动潜在表示的确定性直线ODE轨迹，使极少数步（1~5步）采样即可产出高质量运动；（2）构建**TAPO（TMR++ Aligned Preference Optimization）**自监督偏好对齐框架，利用跨模态检索模型TMR++作为内部奖励函数，自动构造在线偏好对并进行直接偏好优化，无需人工标注即可持续强化细粒度语义一致性。这一组合使得MotionFlux在生成速度上比MDM快约4800倍（单序列推理仅需5ms），同时在语义对齐精度上全面超越现有方法。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MotionFlux 针对现有文本驱动运动生成中**语义对齐不精确**与**扩散模型多步推理慢**的双重瓶颈，提出了两项关键创新：**修正流匹配（Rectified Flow Matching）生成范式**与**TAPO 自监督偏好优化框架**。前者将生成过程从随机微分方程（SDE）扩散转变为确定性直线 ODE，实现极低步数的高质量生成；后者利用跨模态检索模型 TMR++ 作为内部奖励函数，自动构造在线偏好对并通过直接偏好优化（DPO）持续强化细粒度语义一致性。两项创新协同工作，形成一个快速、语义准确且可自我改进的运动生成系统。
 
@@ -111,7 +115,7 @@ $$\mathcal{L}_{\mathrm{TAPO}} = \mathcal{L}_{\mathrm{DPO-FM}} + \alpha \mathcal{
 
 定性分析（图 4）显示，MotionFlux 在“左右”、“瞥视”等细粒度语义事件上的对齐能力显著优于 MotionLCM 和 MDM，验证了 TAPO 框架在强化语义一致性方面的有效性。
 
-## 整体框架
+
 
 MotionFlux 采用**两阶段训练流水线**，将文本到运动生成分解为表示学习与偏好对齐两个递进阶段，如图2所示。
 
@@ -129,7 +133,7 @@ MotionFlux 采用**两阶段训练流水线**，将文本到运动生成分解�
 ![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2508_19527/figures/001_Figure_1.jpg]]
 *Figure 1: We propose MotionFlux, a rectified flow matching-based motion generation framework that employs preference optimization for semantic alignment. In our visualization, darker colors denote later times, and red text highlights key events*
 
-## 核心模块与公式推导
+
 
 MotionFlux 的生成能力建立在两个核心模块之上：**确定性修正流匹配（Rectified Flow Matching）** 提供高速采样基础，而 **TAPO 偏好对齐框架** 则在不依赖人工标注的前提下持续提升语义一致性。以下分别阐述其机理与关键公式。
 
@@ -180,7 +184,9 @@ $$\mathcal{L}_{\mathrm{TAPO}} = \mathcal{L}_{\mathrm{DPO-FM}} + \alpha \mathcal{
 ![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2508_19527/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of the sampling pipeline employed in our rectified-flow–based text-to-motion framework*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -221,7 +227,9 @@ Figure 4展示了MotionFlux与MotionLCM、MDM在细粒度语义对齐上的可�
 ![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2508_19527/figures/007_Figure_5.jpg]]
 *Figure 5: Trajectory of FID and TMR++ scores over training iterations. Offline training peaks by the second iteration with rising FID, while online training continues to improve, showing lower FID and higher TMR++ scores*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -262,6 +270,8 @@ MotionFlux 则从根本上改变了生成路径的几何性质：它放弃随机
 4. **离线与在线对齐的深层机制。** 实验显示离线 TAPO 在第二次迭代后性能饱和（FID 上升），而在线训练持续改进（Figure 5）。这一现象背后的深层原因——是数据分布偏移还是过优化效应——值得进一步的理论分析。
 
 5. **跨数据集泛化与真实场景验证。** 在 KIT、BABEL 等数据集上的系统评估，以及包含人类主观评价的用户研究，将是验证 MotionFlux 实际价值的关键步骤。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/ActiveDPO_Active_Direct_Preference_Optimization_for_Sample_Efficient_Alignment.pdf
+project_link: null
+code_link: null
 aliases:
 - ActiveDPO
 tags:
@@ -39,11 +41,11 @@ claims:
 > - WebGPT long-form QA 上，平均奖励 为 ActiveDPO，对比 Random, APO, APLP，变化 ActiveDPO持续获得更高奖励。
 > - TLDR summarization 上，胜率 为 ActiveDPO，对比 Random, APO, APLP，变化 ActiveDPO在最后几轮迭代中胜率最高。
 
-## 概述
+## 概要
 
 ActiveDPO（Active Direct Preference Optimization）是一种面向大语言模型（LLM）偏好对齐的样本高效主动学习方法。其核心目标是在有限的人类标注预算下，通过理论驱动的数据选择准则，从候选池中挑选出信息量最大的偏好数据对，从而最大化LLM的对齐性能。该方法利用LLM自身的隐式奖励函数（由DPO定义）的梯度差异作为不确定性度量，并通过协方差逆矩阵实现多样性正则化，同时结合LoRA和随机投影技术降低计算开销。实验表明，ActiveDPO在多个LLM（Llama-2-7B, Gemma-2B, Qwen3-4B）和真实偏好数据集（TLDR summarization, WebGPT long-form QA）上持续优于随机选择（Random）、APO和APLP等基线方法。
 
-## 背景与动机
+
 
 收集高质量人类偏好数据集是LLM对齐（如RLHF和DPO）的关键步骤，但这一过程成本高昂且资源密集。现有主动选择方法存在以下不足：
 - **缺乏理论基础**：如APLP（Muldrew et al., 2024）基于启发式不确定性量化，缺乏理论保证。
@@ -52,7 +54,9 @@ ActiveDPO（Active Direct Preference Optimization）是一种面向大语言模�
 
 因此，需要一种**理论驱动、适用于非线性奖励函数、且利用LLM自身作为奖励模型**的主动选择方法。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ActiveDPO的核心创新在于：
 
@@ -61,7 +65,7 @@ ActiveDPO的核心创新在于：
 3. **多样性正则化**：通过V_{t-1}^{-1}矩阵对已探索的梯度方向进行降权，鼓励选择互补数据，避免信息冗余。
 4. **计算效率优化**：通过LoRA梯度（O(k)）和随机投影（降至d=8192维）将梯度维度降至可处理规模，并采用批处理选择策略。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0002_RD4XgyVyGh_ActiveDPO_Active_Direct_Preference_Optimization/figures/001_Figure_1.jpg]]
 *Figure 1: (a) TLDR with Llama-2-7B*
@@ -73,7 +77,7 @@ ActiveDPO的迭代流程包含四个模块：
 3. **人类标注**：获取所选数据的人类偏好反馈(y_w ≻ y_l | x)，得到标注数据集D_t^l。
 4. **DPO训练**：使用D_t^l通过DPO目标函数更新LLM参数，得到π_{θ_t}。
 
-## 核心模块与公式推导
+
 
 ### 5.1 DPO隐式奖励函数
 
@@ -130,7 +134,9 @@ $$\bigg| \Big[ r_{\theta_{t-1}}(x,y_1) - r_{\theta_{t-1}}(x,y_2) \Big] - \big[ r
 
 Table 1比较了不同选择策略的计算开销：Random为O(n)；APO为O(nk)；APLP为O(n)；ActiveDPO为O(nkd + d^3 + Bd^2)。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 6.1 主实验结果
 
@@ -167,7 +173,9 @@ ActiveDPO的主要计算开销来自LLM的前向和反向传播（使用LoRA）�
 ![[assets/figures/papers/iclr26_0002_RD4XgyVyGh_ActiveDPO_Active_Direct_Preference_Optimization/figures/005_Figure_5.jpg]]
 *Figure 5: (e) WebGPT with Gemma-2B*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ActiveDPO属于**主动学习**与**LLM偏好对齐**的交叉领域。其方法谱系如下：
 
@@ -185,6 +193,8 @@ ActiveDPO属于**主动学习**与**LLM偏好对齐**的交叉领域。其方法
   - 是否存在更高效的方法近似梯度差异计算？
   - 随机投影的最优维度是否依赖于具体任务和模型规模？
   - ActiveDPO的选择准则是否可在其他偏好优化方法（如RLHF, IPO）中推广？
+
+
 
 ## 原文 PDF
 

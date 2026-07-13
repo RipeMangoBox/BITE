@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Action_Chunking_and_Data_Augmentation_Yield_Exponential_Improvements_in_Behavior_Cloning_for_Continuous_Spaces.pdf
+project_link: null
+code_link: null
 aliases:
 - ACNIDC
 - ACDAYEIBCCS
@@ -41,7 +43,7 @@ claims:
 > - HalfCheetah-v5 上，累计奖励 为 噪声注入（σ_u=0.5或1.0），对比 Vanilla BC，变化 性能大幅提升，与DAgger/DART相当。
 > - Humanoid-v5 上，累计奖励 为 朴素噪声注入（σ_u=0.25），对比 Vanilla BC / DAgger / DART，变化 噪声注入提供可靠的局部探索，性能优于或接近迭代方法。
 
-## 概述
+## 概要
 
 连续状态-动作空间中的行为克隆面临一个根本瓶颈：策略在训练分布上的微小回归误差，在闭环执行时会被环境动力学反复放大，形成**复合误差**——其随任务时长呈指数级增长，导致学到的策略在实际部署中性能急剧下降。本文从控制论稳定性角度出发，揭示并系统性地缓解了这一现象。
 
@@ -58,7 +60,7 @@ claims:
 
 综上，本文以控制论视角为连续控制中的行为克隆提供了兼具理论深度与实用价值的方法框架，并为稳定性条件、噪声尺度和混合比例的选择提出了进一步研究的问题。
 
-## 背景与动机
+
 
 在连续状态-动作空间的模仿学习中，行为克隆（Behavior Cloning, BC）面临一个核心瓶颈：**复合误差（compounding errors）**。当学习到的策略在闭环执行时，每一步微小预测偏差会通过系统动力学不断累积，导致策略分布逐步偏离专家演示分布。这种分布偏移与误差累积形成恶性循环，使轨迹误差 $J_{\text{TRAJ},T}$ 随任务时长 $T$ 呈指数级增长 [Equation (2.3)]，远超过在专家分布上测得的演示误差 $J_{\text{DEMO},T}$。该现象解释了为什么标准 BC 在看似拟合良好的情况下，闭环执行性能却急剧退化。
 
@@ -73,7 +75,9 @@ claims:
 
 总之，本文从控制论稳定性视角出发，系统分析复合误差的成因，并提出动作分块与噪声注入作为理论支撑、实验验证的非迭代式解决方案。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文针对连续状态-动作行为克隆中的**复合误差（compounding error）**瓶颈，提出了两个直接改变基本假设的 **changed slots**，而非简单的模块叠加。这两项干预从控制论稳定性机制出发，从根本上改变了误差随任务时长的传播方式。
 
@@ -144,7 +148,7 @@ claims:
 - 当前理论假定了**专家策略为确定性**，对随机专家策略的扩展尚未纳入界定。
 - 块长 $\ell$ 与统计复杂性之间的精确关系、以及噪声尺度 $\sigma_{\mathbf{u}}$ 与混合比例 $\alpha$ 的鲁棒选择配方，仍待进一步工作予以刻画（这些属于本文列出的开放问题）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0006_jiWXDvw1Lf_Action_Chunking_and_Data_Augmentation_Yield_Expo/figures/011_Figure_4.jpg]]
 *Figure 4: A comparison of open-loop control, where the policy generates actions without accessing the system state, and closed-loop control, where the policy's generated actions condition on the system state. While actionchunks are generated closed-loop, the actions within a chunk are executed "open-loop."*
@@ -170,7 +174,7 @@ claims:
 
 值得注意的是，该方法不依赖部分可观测性或生成式架构，即使在确定性、马尔可夫、全状态可观测的设置下依然有效。
 
-## 核心模块与公式推导
+
 
 本文方法建立在两个互为补充的实践模块之上：**动作分块策略（Practice 1）** 与 **探索性噪声注入数据收集（Practice 2）**。二者通过控制论中的增量输入‑状态稳定性（EISS）机制，分别应对开环稳定与开环不稳定的动力学场景，将行为克隆中原本指数增长（compounding error）的轨迹误差压至常数阶或多项式阶。
 
@@ -234,7 +238,9 @@ $$
 
 实验消融表明，清洁标签至关重要（噪声标签会带来灾难性崩溃），而混合比例 $\alpha$ 在提供足够多的噪声注入轨迹后影响边际递减（Figure 3 左、中）。在 HalfCheetah‑v5 等不满足开环稳定的基准上，以噪声注入训练的行为克隆可达到与迭代式交互方法（DAgger、DART）相当甚至更优的性能，却避免了迭代过程中不良策略回滚的风险（Figure 1 中）；在 Humanoid‑v5 上朴素的噪声注入同样提供了可靠的局部探索，优于部分迭代方法（Figure 1 右）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：动作分块与噪声注入突破复合误差瓶颈
 
@@ -284,7 +290,9 @@ $$
 ![[assets/figures/papers/iclr26_0006_jiWXDvw1Lf_Action_Chunking_and_Data_Augmentation_Yield_Expo/figures/013_Figure_7.jpg]]
 *Figure 7: The effect of noise injection for controllable versus uncontrollable subspaces. We illustrate the key advantage of Proposition 4.3, namely, that noise injection occurs primarily in more excitable directions. By leveraging this mechanism, we are able to derive better error rates (Suboptimal Proposition 4.2 vs Proposition 4.3)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 本文的方法处于模仿学习中行为克隆路线的核心位置，聚焦于连续状态-动作空间下复合误差的缓解。与依赖迭代式专家交互的 DAgger 和 DART 不同，本文仅通过对策略参数化和数据收集分布进行两个关键"槽位"的修改，便在不引入迭代重标注的前提下实现了指数级到多项式级的误差率跃迁。具体而言：
 
@@ -303,6 +311,8 @@ $$
 - **与迭代交互的本质优势比较**：噪声注入被证明可与迭代方法匹敌甚至超越，但文中并未回答"迭代式交互在统计上是否拥有噪声注入无法企及的根本优势"这一理论问题，需进一步分离交互与探索的增益机制。
 - **策略类表达力与方差**：动作分块实际上定义了更小假设空间的策略类 Π_chunk,ℓ，其相较于直接多步预测是否真的降低了渐近方差，仍属未探索领域。
 - **光滑度和控制论量的精确角色**：本文的分析大量依赖 EISS、局部光滑和可激励性子空间刻画，如何将这些量的作用精确化（如给出依赖于系统矩阵 A, B 的更紧界）仍是开放的理论方向。
+
+
 
 ## 原文 PDF
 

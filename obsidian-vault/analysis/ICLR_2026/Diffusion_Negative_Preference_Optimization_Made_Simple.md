@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Diffusion_Negative_Preference_Optimization_Made_Simple.pdf
+project_link: null
+code_link: https://github.com/JoshuaTTJ/DiffSNPO
 openreview_forum_id: CU5EHe1KUt
 aliases:
 - DSDSNPO
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 扩散负偏好优化简化方法 |
 | 英文题名 | Diffusion Negative Preference Optimization Made Simple |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=CU5EHe1KUt); [GitHub](https://github.com/JoshuaTTJ/DiffSNPO) |
+| Links | [paper](https://openreview.net/forum?id=CU5EHe1KUt) · [GitHub](https://github.com/JoshuaTTJ/DiffSNPO) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | Diff-SNPO (Diffusion Simple Negative Preference Optimization) |
 | Dataset | Pick-a-Pic v2 (SD1.5), Pick-a-Pic v2 (SDXL), HPDv2 (SD1.5) |
@@ -42,7 +44,7 @@ claims:
 > - Pick-a-Pic v2 (SD1.5) 上，Image Reward ↑ 为 0.6936 ± 0.17，对比 Diff-NPO 0.3786 ± 0.20，变化 +0.315。
 > - Pick-a-Pic v2 (SDXL) 上，Pick Score ↑ 为 22.86 ± 0.03，对比 Diff-NPO 22.62 ± 0.09，变化 +0.24。
 
-## 概述
+## 概要
 
 扩散模型的对齐方法正从“仅优化正偏好”向“同时利用负偏好”演进。现有负偏好优化方法（Diff-NPO、CHATS）依赖双模型架构——分别训练正模型 θ⁺ 与负模型 θ⁻，导致训练和推理的计算/内存开销加倍。推理时虽可通过权重合并缓解资源压力，但合并过程会稀释负向对齐信号，造成保真度与负向对齐之间的根本性权衡（Figure 1）。
 
@@ -52,7 +54,7 @@ claims:
 
 在 Pick-a-Pic v2 和 HPDv2 基准上，Diff-SNPO 在 SD1.5 和 SDXL backbone 上大多超越 Diff-NPO 与 CHATS，且训练速度提升 2×、推理吞吐达 0.48 img/s（对比 Diff-NPO 的 0.27 img/s）。负偏好隐式准确率（57.45%）和损失（0.668）均优于合并后的 Diff-NPO（52.34%/0.703），验证了单网络双分支设计对负向对齐的有效性。
 
-## 背景与动机
+
 
 ### 扩散模型偏好对齐的进展与瓶颈
 
@@ -76,7 +78,9 @@ claims:
 
 然而，直接将偏好信号分配到两个分支的朴素方法会导致训练不稳定——胜者似然在训练过程中持续下降，生成图像出现逐步模糊的伪影（Figure 3）。因此，需要设计一种**有界的偏好优化目标**，防止败者样本主导损失函数。这正是 Diff-SNPO 方法的核心贡献所在。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈定位：双模型负偏好优化的结构性代价
 
@@ -119,7 +123,7 @@ $$m_{\mathrm{mix}}(x_t,c) = -\log\Bigl( \lambda e^{-d_\theta(x_t,\epsilon,t,c)} 
 
 这三个 changed slots 共同实现了训练速度 2× 提升（Table 4）、推理吞吐 0.48 img/s（Diff-NPO 0.27 img/s，Table 10），以及更优的负偏好隐式准确率 57.45%（Diff-NPO 合并后 52.34%，Table 5）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0011_CU5EHe1KUt_Diffusion_Negative_Preference_Optimization_Made/figures/001_Table_1.jpg]]
 *Table 1: Comparison of methods by alignment type, model setup, and use of merging strategy*
@@ -149,7 +153,7 @@ $$\mathcal{L}_{\text{SNPO}}(\theta) = -\mathbb{E}_{(\mathbf{x}^w, \mathbf{x}^l, 
 
 **模块关系总结**：条件分支与无条件分支共享同一网络参数，通过 $Y$ 的随机采样实现正负偏好的交替训练。Diff-BDPO-UB 损失在败者分支引入混合下界约束，将负样本对损失的贡献限制在可控范围内，从而使单网络双分支设计能够稳定收敛。Table 1 对比了各方法的架构差异：Diff-SNPO 是唯一同时具备负偏好对齐能力、单模型设计且无需权重合并的方法。
 
-## 核心模块与公式推导
+
 
 Diff-SNPO 的核心设计在于将正负偏好信号分配到单个扩散网络的已有双分支结构中，并用有界偏好目标防止训练坍塌。以下按模块拆解其关键公式与变量含义。
 
@@ -228,7 +232,9 @@ $$\tilde{\epsilon}_\theta(x_t, t, c) = \epsilon_\theta(x_t, t, \varnothing) + s 
 
 其中条件分支 $\epsilon_\theta(\cdot, c)$ 已学习正偏好，无条件分支 $\epsilon_\theta(\cdot, \varnothing)$ 已学习负偏好。这避免了 Diff-NPO 中权重合并带来的负向对齐信号稀释问题（Figure 1 揭示了合并后负向隐式准确率下降与 HPSv2 提升之间的权衡）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与动机验证
 
@@ -283,7 +289,9 @@ Table 4 和 Table 10 分别量化了训练与推理的效率优势。训练方�
 3. **任务范围受限**：当前仅在固定 T2I 基准上评估，未测试图像编辑或视频生成等任务上的泛化性。
 4. **负属性建模能力上限**：将负偏好信号全部分配给无条件分支，可能限制对复杂、细粒度负属性的建模能力，这一假设需要更多消融验证。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -314,6 +322,8 @@ Diff-SNPO 的有效性依赖于两个关键设计选择，它们同时定义了�
 **安全对齐的整合**：论文在 CoProv2 安全数据集上微调后，Diff-SNPO 的 IP 降至 0.11（Table 8），表明单网络设计可以与显式安全过滤结合。但当前方法仅依赖隐式负偏好（从人类偏好数据中学习），是否可以将显式负反馈（如安全分类器输出）直接注入无条件分支，形成统一的隐式-显式负向控制框架，是值得探索的方向。
 
 **理论收敛性**：Diff-BDPO-UB 通过 Hölder 不等式和 Jensen 不等式导出可处理的上界（Eq.34-36），但该上界的紧致性未经验证。宽松的上界可能导致优化目标与真实偏好优化目标之间存在不可忽略的偏差，在大规模多模态扩散模型上的稳定性有待进一步检验。
+
+
 
 ## 原文 PDF
 

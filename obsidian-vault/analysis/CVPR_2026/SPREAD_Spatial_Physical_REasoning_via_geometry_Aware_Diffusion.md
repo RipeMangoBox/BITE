@@ -43,7 +43,7 @@ claims:
 > - 3D-FRONT (Livingroom) 上，Col_mesh 0.185 vs 0.350 (InstructScene) (-0.165)。
 > - 3D-FRONT (Diningroom) 上，Col_mesh 0.183 vs 0.331 (InstructScene) (-0.148)。
 
-## 概述
+## 概要
 
 现有3D场景生成方法在视觉质量上取得了显著进展，但普遍面临一个关键瓶颈：它们依赖结构化的训练数据，缺乏对复杂空间关系和物理交互（如支撑、碰撞）的显式建模，导致生成的场景常出现物体悬浮、穿透等物理不可信现象。SPREAD正是针对这一问题而提出的。
 
@@ -51,7 +51,7 @@ SPREAD的核心思路是将空间关系（如“左侧”、“上方”）和�
 
 在3D-FRONT和ProcTHOR两个数据集上的实验表明，SPREAD在物理合理性指标上全面超越现有方法：网格碰撞率（Col_mesh）在ProcTHOR上从0.260降至0.121，平均支撑距离（ASD）从0.021降至0.007，物理仿真稳定性（Isaac Stability）从0.876提升至0.950，同时取得了最高的图召回率（GRecall 0.979）。用户调研中，SPREAD以88.6%的得票率显著优于ATISS（0.9%）、InstructScene（4.4%）和DiffuScene（6.1%），主观评价其物理一致性和场景合理性最优。
 
-## 背景与动机
+
 
 ### 3D场景生成中的物理合理性瓶颈
 
@@ -69,7 +69,9 @@ SPREAD的核心思路是将空间关系（如“左侧”、“上方”）和�
 
 SPREAD正是针对这一鸿沟提出的解决方案。其核心动机在于：**将空间关系（如“左侧”、“上方”）和物理关系（如“支撑”、“接触”）建模为可微分的图先验，并在扩散生成过程中显式施加物理约束，从而因果性地控制场景的物理合理性**。通过这一范式转换，SPREAD旨在使生成模型不仅能“画”出合理的布局，更能“理解”并“遵守”物理世界的规则，产出可直接用于仿真的3D环境。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SPREAD的核心创新在于将**空间关系**与**物理交互**显式地建模为可微分的图先验，并将其深度嵌入扩散模型的生成过程，从而因果性地解决了现有方法普遍存在的物体悬浮、穿透等物理不可信问题。与依赖隐式形状嵌入或仅使用类别标签的基线方法（如ATISS、DiffuScene、InstructScene）不同，SPREAD通过以下四个关键维度的创新，实现了从“视觉合理”到“物理可信”的跨越。
 
@@ -113,7 +115,7 @@ SPREAD采用预训练的**Michelangelo**形状编码器提取256个64维的形�
 
 上述四个创新维度形成了完整的因果链条：**图先验**提供关系骨架，**几何感知**注入实时网格信息，**多引导框架**施加物理约束，**预训练编码器**保障几何质量。这一协同设计使得SPREAD在用户调研中以88.6%的得票率显著优于ATISS（0.9%）、InstructScene（4.4%）和DiffuScene（6.1%），主观评价其物理一致性和场景合理性最佳（Figure 6）。
 
-## 整体框架
+
 
 SPREAD 是一个以**空间图与物理图为可微分先验**的条件扩散框架，其核心设计目标是在生成 3D 场景布局的同时，显式地保证物体间的物理合理性——消除穿透、悬浮等常见伪影。
 
@@ -173,7 +175,7 @@ SPREAD 的生成流程围绕**图条件扩散**展开，关键模块包括：
 ![[assets/figures/papers/paper_list_l2601_https_arxiv_org_abs_2603_27573/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of SPREAD, a diffusion-based framework for generating physically plausible 3D scenes with rich object interactions. (A) SPREAD synthesizes detailed object-level layouts with natural spatial and physical interactions, going beyond coarse layout arrangements. (B) SPREAD faithfully adheres to provided spatial and physical graph priors, G. (C) SPREAD can provide simulationready environments for embodied AI agents*
 
-## 核心模块与公式推导
+
 
 ### 扩散状态空间与图条件化
 
@@ -262,7 +264,9 @@ $$
 ![[assets/figures/papers/paper_list_l2601_https_arxiv_org_abs_2603_27573/figures/008_Figure_5.jpg]]
 *Figure 5: Guidance Ablation. Results showing effect of different guidance terms. Each major row compares results before (top) and after (bottom) adding a specific guidance. Columns show different scenes. Red circles highlight issues such as collisions, floating, or incorrect spatial relations before guidance; green circles show improvements after applying guidance, with zoom-in views for clarity*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 
@@ -335,7 +339,9 @@ SPREAD 在两个差异显著的数据集——3D-FRONT（家具级室内场景�
 ![[assets/figures/papers/paper_list_l2601_https_arxiv_org_abs_2603_27573/figures/012_Figure_8.jpg]]
 *Figure 8: Additional Qualitative results. The gallery displays 8 randomly selected samples, demonstrating the diversity and physical plausibility of the generated 3D scenes*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -376,6 +382,8 @@ SPREAD 的设计和验证集中在以下边界内：
 - 如何处理动态场景中的时间一致性和物体运动轨迹生成？
 - 多引导框架中各项引导权重的自动调优策略（如基于强化学习或元学习）是否可行？
 - 如何将物理仿真反馈直接纳入训练循环，形成闭环优化？
+
+
 
 ## 原文 PDF
 

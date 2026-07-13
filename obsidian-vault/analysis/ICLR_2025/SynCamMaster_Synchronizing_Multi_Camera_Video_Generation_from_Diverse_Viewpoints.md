@@ -5,6 +5,7 @@ paper_level: A
 venue: ICLR
 year: 2025
 pdf_ref: paperPDFs/ICLR_2025/SynCamMaster_Synchronizing_Multi_Camera_Video_Generation_from_Diverse_Viewpoints.pdf
+code_link: null
 project_link: https://jianhongbai.github.io/SynCamMaster/
 aliases:
 - SynCamMaster
@@ -33,7 +34,7 @@ claims:
 | 中文题名 | SynCamMaster：从多样视点同步多摄像机视频生成 |
 | 英文题名 | SynCamMaster: Synchronizing Multi-Camera Video Generation from Diverse Viewpoints |
 | 会议/期刊 | ICLR 2025 |
-| Links | [paper](https://arxiv.org/abs/2412.07760); [Project](https://jianhongbai.github.io/SynCamMaster/) |
+| Links | [paper](https://arxiv.org/abs/2412.07760) · [Project](https://jianhongbai.github.io/SynCamMaster/) |
 | Topic | #topic/multi_camera_video_generation #topic/cross_view_synchronization #topic/video_diffusion #topic/multi_camera_video_generation/general |
 | Method | Plug-in multi-view synchronization module, cross-view self-attention, camera extrinsic embedding, mixed-data training |
 | Dataset | UE-rendered multi-camera videos, DL3DV-10K multi-view images, static single-view videos |
@@ -43,7 +44,7 @@ claims:
 > - 多视图同步评估 上，FVD-V↓ 为 1470，对比 1930 (M.V. Image + I2V-Ours)，变化 -460。
 > - 多视图同步评估 上，CLIP-V↑ 为 93.71，对比 89.14 (M.V. Image + SVD-XT)，变化 +4.57。
 
-## 概述
+## 概要
 
 从任意视点同步生成同一动态场景的多段视频，是视频生成领域尚未被充分探索的难题。其核心瓶颈在于：**如何在开放域场景中，使不同视点下的动态内容在几何与外观上保持4D一致性**，而现有方法要么局限于单视图生成，要么仅能控制单一相机的运动轨迹，缺乏对多摄像机同步关系的显式建模。
 
@@ -55,7 +56,7 @@ claims:
 
 在方法谱系上，SynCamMaster 属于**预训练视频扩散模型的参数高效微调范式**，其跨视图注意力机制与多视图立体视觉中的特征匹配思想一脉相承，但创新性地将其嵌入生成模型的去噪过程中，从而实现了从“重建”到“生成”的跨越。
 
-## 背景与动机
+
 
 ### 问题定义：多摄像机同步视频生成
 
@@ -78,7 +79,9 @@ SynCamMaster的提出基于一个关键洞察：**预训练视频扩散模型已
 
 因此，本文的核心假设是：通过在预训练文本到视频扩散模型的DiT Transformer块中，插入**轻量的、可学习的多视图同步模块**（即插即用），并辅以**混合数据训练策略**（联合利用UE渲染的多视角视频、从单视角视频中提取的多视角图像、以及静态单视角视频作为正则化），即可高效地将单视图生成模型转化为开放域下的多摄像机同步视频生成模型，而无需从头训练或依赖昂贵的多视角视频数据采集。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SynCamMaster的核心创新在于，它并非从零训练一个多摄像机视频生成模型，而是将预训练的单视图文本到视频（T2V）扩散模型作为“3D一致性先验”，通过两个即插即用的轻量级组件，赋予其开放域下的多视点同步生成能力。其关键创新点可归纳为一个核心机制、一个混合数据策略，以及一个渐进式训练方案。
 
@@ -107,7 +110,7 @@ SynCamMaster的核心创新在于，它并非从零训练一个多摄像机视�
 
 随机采样不同视角进行训练会导致模型在面对大视角差异时视角跟随能力显著退化。SynCamMaster采用**渐进式训练**：训练初期仅向模型提供视角差异较小的视图对，使其先学习局部几何对应关系；随后逐步增大视角差异，最终使其具备处理大角度视点变化的能力。这一策略对于模型最终实现鲁棒的多视角同步至关重要。
 
-## 整体框架
+
 
 SynCamMaster 以冻结的预训练文本到视频（T2V）扩散模型为骨架，在其基础上插入两个轻量的可学习组件，从而赋予模型开放域下的多摄像机同步视频生成能力。整体架构如 Figure 2 所示。
 
@@ -156,7 +159,7 @@ $$z_t = z_{t-1} + v_{\Theta}(z_{t-1}, t) \cdot \Delta t$$
 
 训练时，三类数据以 0.6:0.2:0.2 的概率混合采样。此外，模型采用**渐进式训练策略**：从相对视角角度差异较小的视图开始训练，逐步增大角度差异，以稳定地学习大视角下的几何对应关系。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化
 
@@ -220,7 +223,9 @@ $$\hat{v_{\Theta}}(z_t, c_V, c_T) = v_{\Theta}(z_t, \emptyset, \emptyset) + s_V 
 
 多视角同步模块中的注意力机制选择对性能有显著影响。消融实验（Table 6）表明，全注意力（Full Attention）相比极线注意力（Epipolar Attention）具有更好的文本语义一致性，尽管二者的旋转误差相近（RotErr 0.12 vs 0.10）。全注意力允许所有视图间自由交互，避免了极线约束可能引入的过度几何限制，在开放域场景中更具鲁棒性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果与基线对比
 
@@ -297,7 +302,9 @@ SynCamMaster 可扩展至新视角视频合成任务。给定单视角视频和�
 ![[assets/figures/papers/paper_list_l1495_https_arxiv_org_abs_2412_07760/figures/016_Figure_11.jpg]]
 *Figure 11: Performance comparison of SynCamMaster with epipolar attention and full attention*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 技术谱系与基线关系
 
@@ -335,6 +342,8 @@ SynCamMaster 建立在预训练文本到视频（T2V）扩散模型之上，其�
 3. **细节不一致的根源分析**：复杂场景中的细节不一致是源于跨视图注意力的信息瓶颈，还是训练数据的覆盖不足，尚需更深入的诊断。
 4. **数据混合比率的理论指导**：如何根据目标应用的视角分布特征，系统性地确定最优的数据混合比率，而非依赖经验性搜索。
 5. **更长时序的一致性**：当前评估主要关注短时序（生成视频长度受限于基础模型），更长时间跨度下的跨视图同步稳定性尚未被检验。
+
+
 
 ## 原文 PDF
 

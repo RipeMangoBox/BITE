@@ -43,7 +43,7 @@ claims:
 > - Human3.6M 上，FDE 0.399 vs 先前SOTA (-8.5%)；ADE 0.333 vs 先前SOTA (达到最优)；MMADE 0.471 vs 先前SOTA (排名第二或第三)。
 > - AMASS 上，FDE 0.474 vs 先前SOTA (-13%)；ADE 0.461 vs 先前SOTA (达到最优)；MMADE 0.540 vs 先前SOTA (排名最优)。
 
-## 概述
+## 概要
 
 3D人体运动预测（3D Human Motion Prediction, HMP）的核心挑战在于：给定一段历史运动观测，未来运动存在多种物理上合理的可能性。现有随机预测方法普遍使用**单模态先验**（如标准高斯分布），导致不同行为模式在潜空间中语义纠缠，预测结果物理不合理且缺乏可解释的不确定性量化。
 
@@ -51,7 +51,7 @@ claims:
 
 在Human3.6M和AMASS两个基准数据集上，该方法在准确性和合理性指标上均达到或接近最优：FDE分别相对先前SOTA降低**8.5%**和**13%**，ADE达到最优。消融实验进一步验证，可学习的高斯混合先验是性能提升的关键——移除多模态先验或退化为标准高斯先验后，各项指标全面下降。此外，高斯混合潜空间在两组数据集上均取得最佳对数似然（LL），证明其对复杂运动分布建模的有效性。
 
-## 背景与动机
+
 
 3D人体运动预测（3D Human Motion Prediction, HMP）旨在根据观测到的历史姿态序列，生成未来一段时间的合理运动轨迹。该任务在自动驾驶、人机交互、运动合成等领域具有重要应用价值。然而，人类运动本质上是多模态的——相同的观测历史可能对应多种不同的未来行为（如“行走”后可能接“站立”或“转弯”），这使得确定性预测方法难以满足实际需求，随机预测逐渐成为主流范式。
 
@@ -66,7 +66,9 @@ claims:
 
 简言之，本文试图回答一个关键问题：**能否通过改进潜空间先验的结构，从根本上解决随机运动预测中的语义纠缠与不确定性量化难题？**
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作围绕随机3D人体运动预测中的**潜空间先验选择**这一核心因果旋钮，提出了一套系统性创新方案。现有方法普遍采用单模态标准高斯分布作为潜空间先验，导致多样化运动模式在潜空间中语义纠缠，预测结果的物理合理性不足且缺乏可解释的不确定性量化。本文的 **Gaussian-Mixture Latent Flow** 方法通过以下四个关键 changed slots 实现了突破。
 
@@ -106,7 +108,7 @@ $$\mathrm{Attention}(\mathbf{Q}_i, \mathbf{K}_i, \mathbf{V}_i) = \mathrm{softmax
 
 上述四个 changed slots 形成协同闭环：高斯混合先验解耦运动语义，可逆流模型提供精确似然计算，显式条件机制强化历史依赖，关节点注意力注入骨架先验。在Human3.6M和AMASS数据集上，FDE分别相对先前SOTA降低8.5%和13%，同时ADE达到最优。消融实验进一步证实，可学习的高斯混合先验显著优于固定混合先验或标准高斯先验，且高斯混合潜空间在两大数据集上均取得最佳对数似然（LL），验证了其对复杂运动分布建模的优越性。
 
-## 整体框架
+
 
 本文提出的**高斯混合潜流模型（Gaussian-Mixture Latent Flow）**构建了一个端到端的随机人体运动预测框架，其核心设计围绕两个关键瓶颈展开：（1）用数据驱动的多模态高斯混合先验替代传统单模态标准高斯分布，解耦多样化运动模式；（2）以可逆流模型结合基于ODE的流匹配框架替代VAE或SDE扩散骨干，实现精确似然计算与原则性不确定性估计。整体pipeline由五个紧密耦合的模块构成，形成“编码—先验学习—潜动力学演化—解码”的闭环。
 
@@ -157,7 +159,7 @@ $$\mathrm{Attention}(\mathbf{Q}_i, \mathbf{K}_i, \mathbf{V}_i) = \mathrm{softmax
 ![[assets/figures/papers/paper_list_l965_https_openaccess_thecvf_com_content_CVPR2026_html_Ma_Gaussian_Mixture_La/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the framework. We predict future motion within a latent space constructed by a flow model. Owing to the invertibility of normalizing flows, a single model can function as both an encoder and a decoder through its forward and inverse processes, respectively. During latent forecasting, we first pad the observed sequence to the full length using the final observed frame and transform it into the latent space to obtain the starting point*
 
-## 核心模块与公式推导
+
 
 ### 5.1 高斯混合潜表示
 
@@ -246,7 +248,9 @@ $$
 ![[assets/figures/papers/paper_list_l965_https_openaccess_thecvf_com_content_CVPR2026_html_Ma_Gaussian_Mixture_La/figures/001_Figure_1.jpg]]
 *Figure 1: Unlike prior approaches, our method (1) introduces a mixed Gaussian prior to effectively disentangle diverse human motion patterns, improving plausibility by reducing semantic entanglement, and (2) incorporates a fully invertible architecture that supports exact likelihood computation, thereby providing a principled means of uncertainty estimation*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -296,7 +300,9 @@ $$
 ![[assets/figures/papers/paper_list_l965_https_openaccess_thecvf_com_content_CVPR2026_html_Ma_Gaussian_Mixture_La/figures/004_Figure_3.jpg]]
 *Figure 3: Qualitative results. We present qualitative comparison results with SkeletonDiff [15], CoMusion [63], TransFusion [66], and BeLFusion [3] on the AMASS dataset. For each method, we visualize the final frame of 10 randomly sampled predictions*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有随机人体运动预测方法的关系
 
@@ -338,6 +344,8 @@ $$
 - **向其他序列预测任务的迁移**：任何面临多模态输出分布建模的序列预测任务（如轨迹预测、手势生成）都可能受益于数据驱动的混合先验设计。
 - **与可控生成的结合**：高斯混合分量的语义解耦特性天然适合作为可控生成的条件接口——不同分量可对应不同的运动风格或动作类别，为细粒度控制提供了结构化基础。
 - **不确定性量化的基准**：本工作建立的对数似然评估框架为随机预测方法的不确定性量化能力提供了可比较的度量标准，推动了该领域从“生成多样性”向“概率校准”的范式演进。
+
+
 
 ## 原文 PDF
 

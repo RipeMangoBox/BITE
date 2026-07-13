@@ -44,7 +44,7 @@ claims:
 > - RealEstate10K Short (6 frames) 上，PSNR ↑ 28.34 vs 25.54 (WorldMirror) (+2.80)。
 > - RealEstate10K Two-View 上，PSNR ↑ 29.01 vs 26.82 (NoPoSplat) (+2.19)。
 
-## 概述
+## 概要
 
 从一组无姿态（unposed）的二维图像直接合成高质量的新视角，是三维视觉领域的一项核心挑战。现有的前馈式重建方法通常依赖已知的相机参数，或虽能处理无姿态输入，但其底层三维基础模型（如 **VGGT**，Wang et al., CVPR 2025）所提取的特征缺乏显式的多视图几何一致性——同一三维空间点在不同视图中的特征可能差异巨大，这严重限制了高保真新视角合成的质量。
 
@@ -59,7 +59,7 @@ Selfi 的完整流水线包含三个关键模块：
 
 Selfi 的局限性主要体现在：VGGT 在天空、远距离区域的深度预测可能不准确；模型在动态场景上可能失效；训练需要大量计算资源（128 块 H100 GPU）。未来工作将聚焦于动态场景的特征匹配、更精细的深度预测，以及将自提升的特征对齐思想推广到其他三维基础模型和下游任务。
 
-## 背景与动机
+
 
 ### 三维重建与无姿态新视角合成的技术瓶颈
 
@@ -85,7 +85,9 @@ Selfi 的局限性主要体现在：VGGT 在天空、远距离区域的深度预
 
 在此基础上，Selfi进一步引入两个关键组件以提升渲染质量：（1）**视角依赖的球谐密度**，作为置信度评分抑制远离目标视角的输入帧中的错误高斯；（2）**束调整后的仿射深度校正**，将稀疏三维点的深度变化传播到所有密集高斯上，实现渲染的无缝对齐。整个流水线构成一个闭环的自改进系统：对齐特征 → 高斯预测 → 束调整优化位姿 → 深度校正更新几何 → 最终渲染，每一步的输出都为下一步提供了更优的初始条件。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：三维基础模型特征缺乏多视图几何一致性
 
@@ -127,7 +129,7 @@ Selfi 的核心洞察在于：**三维基础模型自身输出的深度图和相
 
 Selfi 的四项创新构成了一个完整的**自改进重建引擎**：几何特征对齐为所有下游任务提供了高质量的特征基础；全局加权平均确保了特征学习的稳定性；视角依赖密度增强了多视图融合的鲁棒性；BA 后的深度校正则打通了位姿优化到渲染提升的“最后一公里”。这些创新协同作用，使得 Selfi 在无姿态新视角合成任务上大幅超越现有前馈方法，逼近甚至在某些设置下超越使用真值相机参数的 3DGS 上限。
 
-## 整体框架
+
 
 Selfi 是一个**自改进的三维重建引擎**，其核心设计理念是：利用冻结的三维基础模型（VGGT）的自输出作为密集的自监督信号，将基础模型的特征空间转化为几何对齐的特征空间，并在此基础上预测三维高斯基元，最终通过束调整（BA）和深度校正实现渲染质量的二次提升。整个 pipeline 由三个关键阶段串联而成，形成“特征对齐 → 高斯预测 → 自改进优化”的闭环。
 
@@ -170,7 +172,7 @@ Selfi 的 pipeline 设计体现了三个核心洞察：
 
 两个阶段均使用 VGGT 的冻结权重，确保基础模型的通用三维先验不被破坏，仅通过轻量级适配器实现任务特定的特征转化。
 
-## 核心模块与公式推导
+
 
 ### 3.1 几何特征对齐
 
@@ -251,7 +253,9 @@ $$\mathbf{s}_s' = \frac{\phi(\mathbf{D}_s + \Delta\mathbf{D}_s)}{\mathbf{D}_s + 
 ![[assets/figures/papers/paper_list_l2094_https_arxiv_org_abs_2512_08930/figures/015_Figure_8.jpg]]
 *Figure 8: Contrastive Loss Experiment. Using a CLIP-style contrastive training objective encourages features of correct 2D-2D matching points to be more similar than those of incorrect matches. In our experiments, we found that this objective simply resulted in the features converging to the same value, so that all queries match to the same target point. Thus we adopted the alternative strategy that encourages features of the correct match to be more similar than all other pixels in the target image*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -322,7 +326,9 @@ Table 7的消融结果揭示了三个关键模块的因果效应：
 ![[assets/figures/papers/paper_list_l2094_https_arxiv_org_abs_2512_08930/figures/011_Table_6.jpg]]
 *Table 6: Pose Estimation Evaluation. VGGT achieves reasonable performance, but the estimated poses can be further improved via BA. We report results for different numbers of input images and compare our BA results against Co-Tracker [22]. Our method consistently improves the predictions, even when Co-Tracker [22] fails due to out-of-memory*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 无姿态新视角合成的方法谱系
 
@@ -370,6 +376,8 @@ Selfi 的核心创新在于**将 VGGT 从直接的特征提供者转变为自监
 - 能否通过更精细的深度预测或自适应曝光校正来进一步缩小与逐场景优化式方法的差距？
 - 本方法对室外大规模场景（如城市级重建）的适应性和效率如何？
 - 动态场景下的特征匹配和重建性能提升是否可以通过引入时序建模或运动分割来实现？
+
+
 
 ## 原文 PDF
 

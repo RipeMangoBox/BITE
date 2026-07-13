@@ -40,7 +40,7 @@ claims:
 > [!tip] 效果简介
 > - PIE-bench 上，PSNR↑ 22.20 (ChordEdit SD-Turbo, with prox) vs 21.38 (Naive δ=0 SD-Turbo, with prox) (+0.82)；CLIP-Edited↑ 22.96 (ChordEdit SD-Turbo, with prox) vs 21.96 (Naive δ=0 SD-Turbo, with prox) (+1.00)；Runtime (s)↓ 0.38 (ChordEdit SD-Turbo) vs 7.22 (FlowEdit, 33 steps) (19x faster)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：在一步文本到图像（T2I）模型中进行文本引导编辑时，朴素的漂移差值（drift difference）所诱导的高能量、非平滑矢量场会导致严重的物体扭曲和背景崩坏，使得训练无关、逆无关的单步编辑不可行。
 
@@ -56,7 +56,7 @@ claims:
 
 **关键机制**：和弦控制场通过时间平滑窗口 δ 对可观测代理场进行加权平均（公式 $ \hat{u}_t(x_{\tau}) = \frac{t \mathbf{R}(x_{\tau}, t-\delta) + \delta \mathbf{R}(x_{\tau}, t)}{t+\delta} $），构成 $L^2$ 收缩算子，有效抑制能量尖峰，使单步传输稳定可靠。
 
-## 背景与动机
+
 
 ### 一步生成模型的编辑困境
 
@@ -84,7 +84,9 @@ $$\min_{\rho,u} \int_0^1 \int \frac{1}{2} \|u_t(x)\|^2 \rho_t(x) dx dt \quad \ma
 
 ChordEdit 的核心动机在于：**通过因果核平滑（时间加权平均）从可观测的模型输出中构造低能量、稳定的和弦控制场（Chord Control Field），使得单步大步长积分可实现高保真编辑，同时保持训练无关和逆无关的灵活性**。这一设计使得 ChordEdit 在 PIE-bench 上以 0.38 秒的单步推理实现了与多步方法竞争甚至更优的背景一致性（PSNR）和语义对齐（CLIP-Edited），速度比 FlowEdit 快 19 倍，比 Direct Inversion 快 208 倍（Table 1）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ChordEdit 的核心创新在于**将一步图像编辑重新定义为源分布与目标分布之间的动态最优输运问题**，并由此推导出**低能量和弦控制场（Chord Control Field）**，从根本上解决了朴素漂移差值在单步大步长积分下因高能量、非平滑矢量场导致的物体扭曲与背景崩坏问题。
 
@@ -124,7 +126,7 @@ ChordEdit 的另一个关键创新在于**将背景一致性与语义对齐解�
 
 和弦控制场的稳定性在 2D 玩具实验中得到直观验证：朴素残差场在粗离散化下高能且不稳定，而 ChordEdit 的低能量场驱动粒子以最小偏差直达目标分布（Figure 5）。在真实图像编辑中，能量可视化（Figure 8）和稳定性分析（Figure 9）均证实：随着积分步数 $S \to 1$，朴素场的能量急剧飙升，导致 PSNR 崩溃；而和弦场能量保持低位，PSNR 维持高水平。用户研究进一步确认，ChordEdit 在语义对齐（42.5% 偏好）和背景保真度（48.3% 偏好）上均显著优于对比方法（Figure 21）。
 
-## 整体框架
+
 
 ChordEdit 将文本引导的图像编辑重新定义为源提示分布与目标提示分布之间的动态最优输运问题，并以此为基础构建了一个训练无关、反演无关的单步编辑流水线。其核心设计理念是：通过因果核平滑从可观测的模型输出中构造低能量、稳定的控制场，使得单次大步长积分即可实现高保真编辑，从而避免朴素漂移差值场的高能量尖峰所导致的物体扭曲与背景崩坏。
 
@@ -173,7 +175,7 @@ ChordEdit 的完整数据流可概括为：输入图像 $x_{\text{in}}$ → VAE 
 ![[assets/figures/papers/paper_list_l2026_https_arxiv_org_abs_2602_19083/figures/004_Figure_4.jpg]]
 *Figure 4: Comparison of editing field stability. (a) Multi-step Simple Drift: In conventional multi-step diffusion, the iterative application of the simple drift*
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题形式化：条件概率流与编辑残差
 
@@ -244,7 +246,9 @@ $$\mathrm{prox}(x^{\mathrm{pred}}, t_c, c_{\mathrm{tar}}) = \mathcal{B}_{t_c} Q(
 
 所有中间变量可在一个批次内并行计算，使得传输步骤严格保持 1-NFE。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能对比
 
@@ -319,7 +323,9 @@ Figure 21 汇总了四选一盲评的用户偏好率。ChordEdit 在语义对齐
 ![[assets/figures/papers/paper_list_l2026_https_arxiv_org_abs_2602_19083/figures/003_Figure_3.jpg]]
 *Figure 3: One-Step Simple drift editing fails. ChordEdit preserves structure. Simple drifts, a direct drift-difference from a one-step model, induce a high-energy, non-smooth vector field, yielding two disqualifying failures: (i) severe object distortion and (ii) background breakup and spurious structures. Zoomed crops (bottom) highlight the distortions in Simple drifts versus the faithful, photorealistic result of ChordEdit*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 一步编辑的困境与朴素漂移的失败
 
@@ -383,6 +389,8 @@ $$\hat{u}_t(x_{\tau}) = \frac{t \mathbf{R}(x_{\tau}, t-\delta) + \delta \mathbf{
 2. **跨模态扩展**：该方法在视频编辑（时序一致性）或 3D 编辑（多视角一致性）任务上的扩展性如何？和弦控制场的因果平滑机制是否可直接迁移至时空域？
 3. **非扩散模型适用性**：ChordEdit 的控制策略基于条件概率流 ODE 的漂移场，能否扩展到非扩散类生成模型（如 GAN 或自回归模型）的编辑场景？
 4. **理论紧致性**：和弦控制场的 $O(\delta)$ 风险界在更一般的分布传输问题中是否紧致？是否存在更优的平滑核设计？
+
+
 
 ## 原文 PDF
 

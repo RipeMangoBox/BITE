@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Stable_Video_Infinity_Infinite_Length_Video_Generation_with_Error_Recycling.pdf
+project_link: https://stable-video-infinity.github.io/homepage/
+code_link: null
 openreview_forum_id: X96Ei9n34a
 aliases:
 - SVISERFT
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 稳定视频无限：通过错误回收实现无限长度视频生成 |
 | 英文题名 | Stable Video Infinity: Infinite-Length Video Generation with Error Recycling |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=X96Ei9n34a); [Project](https://stable-video-infinity.github.io/homepage/) |
+| Links | [paper](https://openreview.net/forum?id=X96Ei9n34a) · [Project](https://stable-video-infinity.github.io/homepage/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | Stable Video Infinity (SVI) with Error-Recycling Fine-Tuning |
 | Dataset | 自建超长一致视频生成基准 (50-clip), VBench 长视频生成 (50-clip), 音频驱动长对话, 骨骼驱动长舞蹈 |
@@ -42,7 +44,7 @@ claims:
 > - VBench 长视频生成 (50-clip) 上，Subject Consistency 为 96.24% (SVI)，对比 76.11% (Wan 2.1)，变化 +20.13%。
 > - 音频驱动长对话 上，Sync-C 为 6.12 (SVI-Talk)，对比 0.21 (Wan 2.1)，变化 +5.91。
 
-## 概述
+## 概要
 
 **问题瓶颈**：当前基于扩散变换器（DiT）的视频生成模型在训练时依赖无误差的干净潜在变量，而测试时自回归生成不可避免地引入预测误差与条件误差，二者相互增强并迅速累积，导致长视频在主体一致性、美学质量与成像质量上严重退化。这一训练-测试假设差距是制约无限长度视频生成的根本障碍。
 
@@ -58,7 +60,7 @@ claims:
 
 **决定性证据**：消融实验表明，移除参考图像误差 $E_{\mathrm{img}}$ 会导致所有指标大幅下降，证实交叉片段条件误差是长视频崩溃的主要驱动因素；随着错误回收强度（LoRA α）降低，一致性等指标持续单调下降，证实主动纠正自身错误对稳定长视频至关重要。天真的视频扩展（复制片段、乒乓回放）虽然可以愚弄一致性指标，但动态性降为零，而 SVI 在所有指标间取得了真实平衡。
 
-## 背景与动机
+
 
 ### 视频生成范式的演进与瓶颈
 
@@ -81,7 +83,9 @@ claims:
 
 本文从一个新的视角出发：**将 DiT 自身产生的误差作为监督信号进行闭环回收**，迫使模型在训练过程中主动学习识别并纠正自身错误。这一思路的核心洞察在于：与其被动地容忍误差累积，不如在训练阶段就模拟测试时的误差污染环境，让模型学会在误差存在的条件下仍然指向干净的生成目标。通过这种“错误回收”（Error Recycling）机制，可以在不增加推理成本的前提下，弥合训练与测试的假设差距，实现稳定、非循环的无限长度视频生成。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题本质：训练-测试假设差距
 
@@ -122,7 +126,7 @@ SVI 与现有长视频生成方法存在根本性差异。**StreamingT2V** 和 *
 
 消融实验进一步验证了各 changed slots 的必要性。移除参考图像误差 $E_{\mathrm{img}}$ 导致所有指标大幅下降（Table 4），证实交叉片段条件误差是长视频崩溃的主要驱动因素。降低 LoRA 的 $\alpha$ 值（减弱错误回收强度）导致指标单调下降（Table 7），证明性能提升源于主动纠正自身错误而非其他因素。自生成误差优于人工图像增强（颜色偏移、模糊、锐化），结合两者反而引起冲突（Table 6），表明模型自身误差具有独特分布，无法用简单数据增强替代。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_X96Ei9n34a/figures/024_Figure_10.jpg]]
 *Figure 10: Overview of the proposed end-to-end automatic pipeline, which is able to generate infinite short films from user-given keywords. This engine is used to generate the prompt streams according to a specific storyline for our creative video generation benchmarks*
@@ -158,7 +162,7 @@ SVI 的 pipeline 由四个核心模块串联成一个闭环循环，如图 3 所
 
 通过上述闭环设计，SVI 在不改变推理架构、不增加推理成本的前提下，赋予了 DiT 主动纠错和稳定自回归生成的能力。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化：训练-测试假设差距
 
@@ -234,7 +238,9 @@ $$
 
 其中 $V_t^{\mathrm{rcy}} = X_{\mathrm{vid}}^{\mathrm{rcy}} - X_{\mathrm{noi}}^{\mathrm{rcy}}$ 始终指向干净潜在变量，与当前状态和历史轨迹的正确性无关。这一设计使 DiT 在自回归生成中能够主动纠正误差，而非被动适应退化输入。为保持用户灵活性，仅训练 LoRA 参数，冻住基础 DiT 权重。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -308,7 +314,9 @@ SVI 在通用视频生成、音频驱动说话脸和骨骼驱动舞蹈三个主�
 2. **复杂场景转换**：跨镜头的主体一致性在剧烈场景变化中仍有提升空间，特别是当主体经历大幅度姿态变化或遮挡时。
 3. **域外泛化**：模型对于极端风格或训练分布外内容的泛化能力有限，需要扩大训练数据规模和多样性来改善。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题根源：训练-测试假设差距
 
@@ -357,6 +365,8 @@ SVI 的适用边界已通过多领域验证得到初步界定：
 2. **训练数据规模与多样性**：如何扩大训练数据规模和多样性，以纠正色彩偏移并提升域外泛化能力？当前 SVI 采用 LoRA 微调（秩 64 以上即可提供足够纠错能力，Table 9），参数高效的特性为大规模数据训练提供了可行性，但数据策展策略仍需进一步研究。
 
 3. **评价指标的可靠性**：天真的视频扩展方法（复制片段、乒乓回放）可以愚弄一致性指标（Table 5，一致性高但动态性降为 0%），这提示当前评价体系存在盲区。SVI 在一致性、质量、动态性等多个维度取得了平衡，但更鲁棒的评估方法仍是领域共同面临的挑战。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICCV
 year: 2025
 pdf_ref: paperPDFs/ICCV_2025/InfiniCube_Unbounded_and_Controllable_Dynamic_3D_Driving_Scene_Generation_with_World_Guided_Video_Models.pdf
+project_link: https://research.nvidia.com/labs/toronto-ai/infinicube/
+code_link: null
 aliases:
 - InfiniCube
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | InfiniCube：基于世界引导视频模型的无界可控动态 3D 驾驶场景生成 |
 | 英文题名 | InfiniCube: Unbounded and Controllable Dynamic 3D Driving Scene Generation with World-Guided Video Models |
 | 会议/期刊 | ICCV 2025 |
-| Links | [paper](https://arxiv.org/abs/2412.03934); [Project](https://research.nvidia.com/labs/toronto-ai/infinicube/) |
+| Links | [paper](https://arxiv.org/abs/2412.03934) · [Project](https://research.nvidia.com/labs/toronto-ai/infinicube/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | InfiniCube |
 | Dataset | Waymo Open Dataset (90 test sequences), Waymo Open Dataset (Human Evaluation of HD Map Alignment), Waymo Open Dataset (Novel View Synthesis at T+5), Waymo Open Dataset (Novel View Synthesis at T+10) |
@@ -40,7 +42,7 @@ claims:
 > - Waymo Open Dataset (Human Evaluation of HD Map Alignment) 上，Positive Rate (%) 为 84.6 (frame 40), 83.9 (frame 80), 84.8 (frame 120)，对比 Panacea: 76.8 (frame 40), 54.0 (frame 80), 53.4 (frame 120)，变化 +7.8% ~ +31.4%。
 > - Waymo Open Dataset (Novel View Synthesis at T+5) 上，PSNR↑ / SSIM↑ / LPIPS↓ 为 20.80 / 0.73 / 0.42，对比 SCube: 19.90 / 0.72 / 0.47，变化 +0.90 / +0.01 / -0.05。
 
-## 概述
+## 概要
 
 自动驾驶仿真对高保真、长距离、可模拟且可控的 3D 动态场景生成提出了严苛需求。现有方法在此目标上存在结构性分裂：大规模 3D 场景生成方法（如 **InfiniCity**、**WoVoGen**）多局限于室内或静态场景，缺乏对布局、外观和动态行为的灵活控制；而视频生成模型（如 **Vista**、**Panacea**）虽能产生丰富的纹理细节，却受限于帧数少、3D 一致性差，无法直接支撑物理仿真。两类方法的根本瓶颈在于——前者缺少高保真外观建模能力，后者缺少稳定的 3D 几何先验，难以同时满足自动驾驶仿真对“真实感几何 + 长程外观 + 可控动态”的三重约束。
 
@@ -58,8 +60,6 @@ InfiniCube 的核心洞察是将 3D 几何先验与 2D 外观生成解耦：**�
 
 **主要局限**包括：大规模场景生成耗时较长（30,000 m² 体素外推约 6 分钟，200 帧视频生成约 8 分钟），尚无法实时交互；对无自车轨迹覆盖区域需额外生成虚拟轨迹；长距离块间的全局语义一致性仍有提升空间；模型泛化能力受限于 Waymo 训练数据。
 
-## 背景与动机
-
 自动驾驶仿真对高保真、可扩展且可控的 3D 环境生成提出了严苛需求。理想的仿真场景需同时满足三项条件：**无界的大规模空间覆盖**（数百米级）、**丰富的动态物体与外观细节**，以及**对布局、行为和环境的灵活控制**。然而，现有方法始终在这三者之间顾此失彼。
 
 ### 现有方法的两类缺口
@@ -76,7 +76,7 @@ InfiniCube 的核心洞察是将 3D 几何先验与 2D 外观生成解耦：**�
 
 InfiniCube 的动机正是拆解这一矛盾：**将 3D 几何先验与 2D 外观生成解耦**。用一个可控的 3D 体素世界作为“世界骨架”，提供精确的几何与语义引导；再让视频模型专注于纹理合成，从骨架中渲染像素级对齐的引导缓冲区以抑制累积误差。最后，通过双分支重建将体素的几何精度与像素的动态细节融合为可渲染的动态 3DGS 场景，从而一次性打通“无界、可控、高保真”三重要求。
 
-## 核心创新
+## 核心方法与创新机理
 
 InfiniCube 的核心创新在于将 3D 几何先验与 2D 视频生成模型的丰富外观能力进行系统性解耦，构建了一个“世界骨架引导视频生成、双分支融合升维重建”的生成范式。该方法通过三个紧密耦合的机制，系统性地解决了现有方法在高保真、长距离、可模拟和可控性上的瓶颈。
 
@@ -98,8 +98,6 @@ $$\mathbf{X}_{\mathrm{new}}^{\mathrm{vx}} = (1 - \mathbf{M}) \odot \hat{\mathbf{
 
 综上，InfiniCube 的三项关键创新——3D 引导缓冲区的几何锚定、无界体素外推的免训练扩展、双分支融合的几何-外观解耦重建——共同构成了一个从语义世界生成到可控动态 3DGS 场景的完整链路，使模型首次同时满足高保真、长距离、可模拟和可控等自动驾驶仿真需求。
 
-## 整体框架
-
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2412_03934/figures/003_Figure_2.jpg]]
 *Figure 2: Pipeline. Conditioned on HD maps and bounding boxes, we first generate a 3D voxel world representation. We then render the voxel world into several guidance buffers to boost video generation. The generated video and voxel world are jointly fed into a feedforward dynamic reconstruction module to obtain the final 3DGS representation*
 
@@ -118,8 +116,6 @@ $$
 **阶段三：双分支动态 3DGS 重建。** 该阶段将体素世界与合成视频联合输入，通过体素分支与像素分支并行重建动态 3DGS 场景。体素分支利用稀疏三维卷积从体素世界和视频帧中提取特征，负责重建静态背景的高斯原语；像素分支采用二维 UNet，结合 RGB 图像、掩码体素深度与 Depth Anything V2 特征，预测动态物体及中景区域的像素级高斯原语。两支路输出融合后，辅以隐式天空建模，形成完整的可渲染动态场景（Fig. 2 右侧模块）。
 
 三个阶段的输入输出关系可概括为：**HD 地图 + 边界框 → 无界语义体素世界 → 引导缓冲区 + 文本 → 长视频 → 动态 3DGS 场景。** 这一设计将三维几何先验与二维外观生成解耦，体素世界作为「世界骨架」提供精确的三维引导，使视频模型专注于纹理合成，重建时再融合体素与像素信息，分别处理静态背景与动态物体，从而在无界尺度上实现高保真、可控制的动态驾驶场景生成。
-
-## 核心模块与公式推导
 
 InfiniCube 将大规模动态 3D 驾驶场景生成分解为三个解耦的核心模块，通过“世界骨架先验”与“外观合成”的分离策略，实现高保真、长距离、可控的场景生成。
 
@@ -187,7 +183,7 @@ $$
 
 其中 $\mathbf{c}_{\mathrm{query}}$ 为可学习查询令牌，$\mathbf{p}^i$ 为天空图像块特征。该设计使天空表示对未见区域具有良好的泛化性。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 实验设置
 
@@ -196,7 +192,6 @@ InfiniCube 在 **Waymo Open Dataset** 上进行训练与评估，使用 618 个�
 ### 长视频生成质量对比
 
 InfiniCube 的核心优势在于通过 3D 引导缓冲区显著抑制了长视频自回归生成中的累积误差。如 Fig. 9a 所示，在 Waymo 测试集上以第一帧为条件生成长达 200 帧的视频时，InfiniCube 的 FID 指标始终低于 **Panacea** 和 **Vista** 等基线方法。约 100 帧之后，Panacea 和 Vista 的 FID 快速上升，视频质量急剧退化，而 InfiniCube 仍能维持较低的 FID 和良好的视觉质量。这一趋势在 Fig. 8 的定性对比中也得到印证：InfiniCube 生成的 200 帧视频保持了清晰的道路结构、车辆运动和场景细节，而基线方法在长帧数下出现严重的几何失真和纹理模糊。
-
 
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2412_03934/figures/010_Figure_8.jpg]]
 *Figure 8: Video Model Comparison. Our model can generate high-quality videos of 200 frames from 25-frame SVD-XT by conditioning on guidance buffers. These buffers also enable the motions in the videos to be consistent with the scale of the physical world*
@@ -261,11 +256,6 @@ Fig. 10 和 Tab. 3 的对比表明，单独使用体素分支（SCube）或单�
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2412_03934/figures/005_Figure_4.jpg]]
 *Figure 4: Illustration of concepts in the pixel branch. The midground region and masked / full voxel depth*
 
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2412_03934/figures/020_Figure.jpg]]
-*Figure: S15. First Frame Generation with Different Text Prompts. We show additional results on generating the initial frame using semantic buffers with ControlNet [76] based on FLUX [1]*
-
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2412_03934/figures/002_Table.jpg]]
-
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2412_03934/figures/011_Figure_9.jpg]]
 *Figure 9: Comparison of long video generation quality based on the first frame from the Waymo Dataset. FID: lower is better. Table 2. Human evaluation of HD map alignment. We highlight the best and the second*
 
@@ -275,8 +265,7 @@ Fig. 10 和 Tab. 3 的对比表明，单独使用体素分支（SCube）或单�
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2412_03934/figures/019_Table.jpg]]
 *Table: S4. Semantic categories and their RGB values in the semantic buffer. The RGB values in the table range from 0 to 1. In practice, we rescale the above values from -1 to 1 for the encoder*
 
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 核心问题与现有方法瓶颈
 

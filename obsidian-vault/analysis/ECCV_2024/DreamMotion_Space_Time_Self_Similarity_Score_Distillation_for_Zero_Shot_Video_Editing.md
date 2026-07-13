@@ -5,6 +5,8 @@ paper_level: A
 venue: ECCV
 year: 2024
 pdf_ref: paperPDFs/ECCV_2024/DreamMotion_Space_Time_Self_Similarity_Score_Distillation_for_Zero_Shot_Video_Editing.pdf
+project_link: https://hyeonho99.github.io/dreammotion
+code_link: null
 aliases:
 - DreamMotion
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | DreamMotion：零样本视频编辑的时空自相似性分数蒸馏 |
 | 英文题名 | DreamMotion: Space-Time Self-Similarity Score Distillation for Zero-Shot Video Editing |
 | 会议/期刊 | ECCV 2024 |
-| Links | [paper](https://arxiv.org/abs/2403.12002); [Project](https://hyeonho99.github.io/dreammotion) |
+| Links | [paper](https://arxiv.org/abs/2403.12002) · [Project](https://hyeonho99.github.io/dreammotion) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | DreamMotion |
 | Dataset | Custom video editing dataset (Zeroscope) |
@@ -40,7 +42,7 @@ claims:
 > - Custom video editing dataset (Zeroscope) 上，Frame Consistency (CLIP-based, Frame-Con) 为 0.9726。
 > - Custom video editing dataset (Zeroscope) 上，Motion Fidelity (Tracking-based) 为 0.9259。
 
-## 概述
+## 概要
 
 **问题瓶颈**：基于祖先采样的逆扩散过程难以在视频编辑中重现真实世界运动。公开的文本到视频（T2V）扩散模型缺乏足够丰富的时间先验，且逆扩散从噪声出发无法编程复杂运动，导致编辑后的视频出现运动不连贯与结构失真。
 
@@ -52,7 +54,7 @@ claims:
 
 **局限性**：DreamMotion 强依赖原始视频的结构和运动，在需要大幅度结构变化的编辑任务上能力有限，无法执行显著的几何变形或对象替换。
 
-## 背景与动机
+
 
 ### 视频编辑的范式瓶颈：从祖先采样到分数蒸馏
 
@@ -78,7 +80,9 @@ DreamMotion的核心洞察在于：**扩散U-Net中间层特征的自相似性�
 
 通过在SDS优化过程中强制编辑视频与原始视频的扩散特征保持空间和时间自相似性一致，DreamMotion实现了**外观注入与运动保持的精细平衡**——外观由V-DDS（Video Delta Denoising Score）梯度驱动注入，而结构和运动则由自相似性匹配损失约束在原始视频的流形上。图3的优化过程可视化直观展示了这一机制的效果：仅使用V-DDS会导致结构逐渐漂移，而加入时空自相似性正则化后，编辑视频在获得目标外观的同时稳定保持了原始运动轨迹。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DreamMotion 的核心创新在于**从根本上绕开了传统零样本视频编辑对祖先采样（ancestral sampling）的依赖**，转而构建了一套以分数蒸馏采样（SDS）为骨架、以时空自相似性为约束的优化范式。这一范式通过三个紧密耦合的 changed slots 实现外观注入与运动保持的平衡。
 
@@ -103,7 +107,7 @@ DreamMotion 的核心创新在于**从根本上绕开了传统零样本视频编
 
 对于级联视频扩散模型（如 Show-1），DreamMotion 将优化**仅作用于关键帧生成阶段**，而非整个级联管线。这一策略在保持编辑质量的同时大幅降低了计算开销，使方法可无缝嵌入现有级联框架。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l32_DreamMotion_Space_Time_Self_Similarity_Score_Distillation_for_Zero_Shot/figures/001_Figure_1.jpg]]
 *Figure 1: Zero-shot video editing results. The second row presents videos produced with our method with a non-cascaded video diffusion model, while those in the bottom row are from a cascaded model. For a full display of results, visit our project page*
@@ -132,7 +136,7 @@ DreamMotion 的优化框架以**视频差分去噪分数蒸馏（V‑DDS）**为
 
 对于 Show‑1 等级联视频扩散框架（由关键帧生成、时序插值、空间超分辨率三阶段组成），DreamMotion 将上述优化过程**仅应用于关键帧生成阶段**。这一策略在保持编辑质量的同时大幅降低了计算成本，后续的插值与超分模块沿用原始管线即可完成全分辨率视频合成。
 
-## 核心模块与公式推导
+
 
 DreamMotion 的核心由三个损失函数和一个梯度过滤策略构成，它们共享同一组噪声 $\epsilon$ 和时间步 $t$，在单次前向传播中完成计算，从而实现高效联合优化。
 
@@ -190,7 +194,9 @@ V-DDS 的梯度在非编辑区域可能引入模糊和过饱和。DreamMotion �
 
 对于 Show-1 等级联视频扩散模型（Keyframe Generation → Temporal Interpolation → Spatial Super Resolution），DreamMotion 仅对 Keyframe Generation 阶段施加优化，大幅降低计算开销，后续模块保持不变以继承时间插值和超分能力。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与验证逻辑
 
@@ -284,7 +290,9 @@ Fig. 10 展示了 DreamMotion 的主要失败模式：**无法处理需要大幅
 
 ![[assets/figures/papers/paper_list_l32_DreamMotion_Space_Time_Self_Similarity_Score_Distillation_for_Zero_Shot/figures/012_Table.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与设计转向
 
@@ -336,6 +344,8 @@ DreamMotion 的适用边界由其核心机制决定：
 3. **自相似性特征的层级选择**：当前方法使用U-Net特定层的key特征计算自相似性，不同层级对结构和纹理的敏感度不同。系统性研究特征层级的选择策略可能进一步提升效果。
 
 4. **泛化到更复杂的运动模式**：T-SSM基于帧间余弦相似性，对快速运动或大幅度遮挡场景的鲁棒性尚待验证。引入多尺度时间窗口或可变形的时间对齐机制可能是改进方向。
+
+
 
 ## 原文 PDF
 

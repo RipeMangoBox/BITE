@@ -45,7 +45,7 @@ claims:
 > - LSUN-Bedroom 256×256 上，FID SA-PTQ (W8A8) vs PTQD (W8A8) (-0.48)；sFID SA-QLoRA (W4A4) vs EfficientDM (W4A4) (-4.44)。
 > - ImageNet 256×256 (20 steps) 上，FID SA-QLoRA vs FP32 (接近全精度)。
 
-## 概述
+## 概要
 
 扩散模型在图像生成任务上表现卓越，但其巨大的计算开销严重制约了实际部署效率。通过量化压缩网络权重与激活值是加速推理的常见手段，然而现有量化方法在扩散模型上普遍失效——根本瓶颈在于：**量化噪声会干扰高阶采样器的方向估计，导致快速采样轨迹发生系统性偏离，误差在积分过程中持续累积并最终主导总误差**。
 
@@ -53,7 +53,7 @@ claims:
 
 实验覆盖类别条件生成（ImageNet 256×256）、无条件生成（LSUN-Bedroom/Churches 256×256）以及文本引导生成（MS-COCO 512×512）等多种场景。在稀疏步快速采样设定下，SA-PTQ在W8A8配置下相较PTQD将FID降低0.5–1.2，SA-QLoRA在W4A4配置下相较EfficientDM将FID降低约5.5。消融实验进一步证实混合阶轨迹对齐模块对FID与sFID均有显著增益。整体而言，该方法在保持快速采样收敛特性的同时，显著缩小了量化模型与全精度模型之间的生成质量差距。
 
-## 背景与动机
+
 
 扩散模型已在图像生成领域取得显著进展，但其推理过程需要反复执行去噪网络的前向传播，计算开销极大。为降低部署成本，网络量化成为自然选择——将浮点权重与激活值映射为低位宽定点表示，从而压缩模型体积并加速推理。
 
@@ -65,7 +65,9 @@ claims:
 
 上述分析表明，**现有量化方法的根本缺口在于缺乏对采样过程的感知**——它们在校准和优化阶段仅考虑单点重建精度，未能约束量化模型在不同阶数采样轨迹下的行为一致性。这促使本文提出**采样感知量化**框架，其核心动机是通过对齐低阶与高阶采样方向，线性化概率流，从而将量化累积误差压制至与离散化误差同阶的水平。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于首次从**采样加速原理**的角度审视扩散模型量化问题，揭示了量化误差对高阶快速采样器的破坏性机制，并据此提出了**采样感知量化（Sampling-Aware Quantization）**框架。该框架包含两个具体变体：面向后训练量化的**SA-PTQ**和面向参数高效微调的**SA-QLoRA**。
 
@@ -107,7 +109,7 @@ $$\arg\min_{w,s,z} \mathcal{L}_{COS} + \mathcal{L}_{MOTA}$$
 
 消融实验（Table 4）证实了各模块的独立贡献：MOTA模块相较于基线BRECQ降低FID 4.1、sFID 3.83；额外加入方向对齐约束 $\mathcal{L}_{COS}$ 后，FID再降0.95、sFID降0.31，验证了混合阶对齐与方向约束的协同效应。
 
-## 整体框架
+
 
 本文提出的**采样感知量化（Sampling-Aware Quantization）**框架，其核心设计动机源于一个关键观察：量化噪声对高阶采样器的方向估计产生干扰，导致快速采样轨迹偏离，误差在高阶项中持续累积，最终使确定性概率流ODE退化为发散性SDE。为应对这一瓶颈，框架通过**混合阶轨迹对齐（Mixed-Order Trajectory Alignment, MOTA）**策略，约束低阶与高阶采样方向的一致性，从而线性化概率流，迫使量化误差与离散化误差保持同阶，抑制误差累积。
 
@@ -159,7 +161,7 @@ $$\arg\min_{w,s,z} \mathcal{L}_{COS} + \mathcal{L}_{MOTA}$$
 ![[assets/figures/papers/paper_list_l928_https_arxiv_org_abs_2505_02242/figures/003_Figure_3.jpg]]
 *Figure 3: Sampling-aware quantization workflow. (a) Module-level reconstruction process employed in SA-PTQ, where*
 
-## 核心模块与公式推导
+
 
 ### 量化误差的累积机制
 
@@ -255,7 +257,9 @@ $$
 ![[assets/figures/papers/paper_list_l928_https_arxiv_org_abs_2505_02242/figures/002_Figure_2.jpg]]
 *Figure 2: Direction estimation in reverse diffusion sampling. (a) The first-order sampler performs a single direction estimation at the beginning of the sampling interval. (b) The second-order sampler refines the direction estimation by evaluating additional intermediate steps within the interval. (c) Quantization errors lead to deviations in direction estimation, causing the intermediate steps in high-order samplers to drift over time, ultimately impacting the final direction estimation. (d) Our proposed Mixed-Order Trajectory Alignment achieves a more linearized probability flow*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 瓶颈验证：量化误差如何破坏快速采样
 
@@ -330,7 +334,9 @@ Table 4 的消融实验直接验证了 MOTA 模块和方向约束 $\mathcal{L}_{
 
 论文未明确讨论方法在以下场景的表现：极端低比特（如 W2A2）、非 DPM-Solver 系列的其他高阶求解器兼容性、以及更大规模模型（如 SDXL）上的扩展性。这些方面需要进一步验证。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：量化误差与采样动力学的失配
 
@@ -374,6 +380,8 @@ SA-PTQ和SA-QLoRA分别覆盖了PTQ和QLoRA两种主流量化范式，形成了�
 3. **时间步依赖的量化敏感性**：扩散模型在不同时间步对量化的敏感性可能存在差异（如噪声水平高时容错性更强），是否可以通过时间步自适应的量化位宽分配进一步提升效率，是一个值得探索的方向。
 
 4. **与其他压缩技术的协同**：混合阶轨迹对齐的框架是否可以推广到剪枝、蒸馏等其他压缩范式，形成统一的“采样感知压缩”理论，尚待研究。
+
+
 
 ## 原文 PDF
 

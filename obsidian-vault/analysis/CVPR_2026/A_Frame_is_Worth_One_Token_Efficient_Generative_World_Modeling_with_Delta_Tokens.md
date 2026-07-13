@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/A_Frame_is_Worth_One_Token_Efficient_Generative_World_Modeling_with_Delta_Tokens.pdf
+project_link: null
+code_link: null
 aliases:
 - DDTB
 - FIWOTEGWMDT
@@ -42,7 +44,7 @@ claims:
 > - VSPW segmentation (mid, ~0.6s) 上，mIoU (best-of-20 / mean) 50.1 (46.7) vs DINO-world 47.9 (deterministic) (+2.2 (best over baseline single; mean -1.2))。
 > - Cityscapes segmentation (short, ~0.2s) 上，mIoU (best-of-20 / mean) 65.8 (63.9) vs DINO-world 62.0 (deterministic) (+3.8 (best over baseline; mean +1.9))。
 
-## 概述
+## 概要
 
 生成式世界模型旨在预测未来场景状态，为具身智能体提供规划依据。然而，现有方法面临一个根本瓶颈：它们以稠密空间特征图逐帧表示世界状态，且需多次前向传播才能生成多样化未来，未能利用连续帧间高度结构化的时空冗余，导致计算代价极高。
 
@@ -50,7 +52,7 @@ claims:
 
 实验表明，DeltaWorld 在语义分割和深度估计的稠密预测基准上，最佳预测一致超越先前生成式世界模型（如 Cosmos-12B），且平均预测恢复至判别式世界模型基线水平，同时参数和 FLOPs 分别节省超过 **35×** 和 **2,000×**（Figure 2）。逐步消融研究证实，从判别式基线到 BoM 训练、再到帧压缩、最终到增量压缩，每一步都在保持或提升准确率的同时大幅降低计算开销（Table 2）。增量令牌同样可有效注入不同判别式世界模型架构，在 DINO-Foresight 上以 **2,048×** 更少的令牌匹配原有性能，验证了其通用性（Table D）。
 
-## 背景与动机
+
 
 ### 生成式世界模型的核心瓶颈
 
@@ -76,7 +78,9 @@ claims:
 
 > **注意**：本文的实验基准 DINO-world 由作者重新实现（原始代码和数据未公开），Cosmos 系列基线的输出被重新编码为 DINOv3 特征以进行公平比较，训练数据规模与原 DINO-world 不完全一致。这些因素在解读性能对比时需予以考量。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DeltaWorld 的核心创新在于将生成式世界模型的输入表示从**稠密空间特征图**彻底重构为**一维增量令牌序列**，并结合 Best-of-Many (BoM) 训练目标，在单次前向传播中实现轻量且多样化的未来状态生成。其关键突破可分解为三个相互协同的技术槽位变更。
 
@@ -127,7 +131,7 @@ $$\hat{z}_{t+1} = f(q^k, Z_{1:t}, T_{1:t}, \tau_{t+1})$$
 
 增量令牌的设计并非局限于特定预测器架构。实验表明，将 delta token 注入 DINO-world 可在更低训练时间和内存下达到相近精度（Table C）；在 DINO-Foresight 上以 2048× 更少的令牌匹配原有性能（Table D），验证了该表示方法的通用性。
 
-## 整体框架
+
 
 DeltaWorld 的完整 pipeline 由四个核心模块串联构成：**冻结的视觉基础模型（VFM）骨干**、**DeltaTok 增量分词器**、**时序预测器**以及**Best-of-Many（BoM）训练/推理机制**。其根本设计原则是：**世界模型仅需在“变化”上运行，而非在完整的空间特征上运行**。
 
@@ -158,7 +162,7 @@ DeltaWorld 的完整 pipeline 由四个核心模块串联构成：**冻结的视
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2604_04913/figures/001_Figure_1.jpg]]
 *Figure 1: Outline of DeltaWorld. Unlike large existing generative world models that require many forward passes and represent each frame with many spatial tokens, our small DeltaWorld generates multiple futures in a single forward pass by using a single delta token to encode the difference between consecutive frames*
 
-## 核心模块与公式推导
+
 
 ### 3.1 整体架构概览
 
@@ -213,7 +217,9 @@ $$\hat{z}_{t+1} = f(q^k, Z_{1:t}, T_{1:t}, \tau_{t+1})$$
 
 这种设计的核心优势在于：预测器处理的序列长度从每帧 $H \times W$ 个 token 缩减为每帧仅 1 个 token，使得预测器的计算开销在生成 20 个样本时仅占总推理 FLOPs 的 0.5%（Table B），从而实现了超过 2,000 倍的总体 FLOPs 节省。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 评估设置与数据集
 
@@ -290,7 +296,9 @@ Figure 5 展示了 BoM 训练查询数 K 对 Cityscapes 中时程 mIoU 的影响
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2604_04913/figures/009_Figure_6.jpg]]
 *Figure 6: Diverse sampled futures. Top row: four context frames and the future frame. Bottom row: four sampled DeltaWorld predictions and the oracle. In this VSPW [47] example, the pedestrian’s position and ego-camera motion lead to multiple plausible futures*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题脉络：从判别式到生成式世界模型的效率瓶颈
 
@@ -347,6 +355,8 @@ DeltaWorld 并非一步到位，而是通过三个渐进的消融步骤从判别
 3. **可控生成与语义解耦。** 噪声查询空间是否隐含了某种“动作条件”的结构？如果相似的噪声向量能跨场景产生语义一致的未来变化（例如，“向左漂移”的噪声始终导致物体向左运动），则可以通过操纵噪声查询实现可控的未来生成，而无需显式的动作标签。
 
 4. **增量令牌的通用性验证。** 论文已初步证明 delta token 可迁移至 DINO-Foresight 等不同架构（Table D，以 2,048× 更少的令牌匹配原有性能），但其在更广泛的世界模型范式（如基于视频预测的强化学习、具身智能中的规划）中的有效性仍有待验证。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICCVW
 year: 2021
 pdf_ref: paperPDFs/ICCVW_2021/Movie_Style.pdf
+project_link: null
+code_link: null
 aliases:
 - HLCFEPFLCMD
 - MS
@@ -40,7 +42,7 @@ claims:
 > [!tip] 效果简介
 > - MotionSet 上，F1 96.81 vs 19.62 (Random) (+77.19)；Precision 98.47 vs 21.26 (Random) (+77.21)。
 
-## 概述
+## 概要
 
 ### 问题背景与瓶颈
 
@@ -67,7 +69,7 @@ claims:
 
 本文属于**电影计算分析与风格理解**方向，区别于传统的低级视觉特征方法。在特征提取层面，帧分层借鉴了单目深度估计（Li et al., CVPR 2019）和聚类技术；相机运动检测基于RAFT光流（Teed & Deng, ECCV 2020）和轻量MLP分类器。与直接使用3D ResNet（Hara et al., CVPR 2018）进行端到端分类的基线相比，本文主张**先提取语义明确的高级电影摄影特征**，再用于下游任务，这一思路更接近电影学中的形式分析范式。
 
-## 背景与动机
+
 
 ### 导演风格的可识别性与低级特征的局限
 
@@ -91,7 +93,9 @@ claims:
 
 由此催生了本文的核心动机：**转向提取高级电影摄影特征**——包括画面构图（深度分层、角色位置）、相机行为（运动类型与姿态）等电影语言要素。这些特征直接对应导演的创作决策，有望剥离无关的视觉噪声，为风格分析提供更纯净、更具判别力的表征。本文的工作即围绕两类关键高级特征的提取流程展开：帧分层（Frame Layering）与相机运动检测（Camera Motion Detection），为后续的风格分类任务奠定基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作的核心创新在于**从原始帧/低级特征转向显式提取电影摄影高级特征**，以解决传统方法在导演风格理解中的根本瓶颈。
 
@@ -124,7 +128,7 @@ claims:
 
 需要指出的是，**这两个高级特征提取流程尚未被集成到端到端的导演风格分类器中进行评估**，因此其对风格分类任务的实际提升效果仍有待验证。这是当前工作的核心局限，也是未来研究的关键突破口。
 
-## 整体框架
+
 
 ### 问题定位：低级特征在导演风格识别中的瓶颈
 
@@ -180,7 +184,7 @@ claims:
 ![[assets/figures/papers/movie_style_37aa66b0e22c/figures/005_Figure_4.jpg]]
 *Figure 4: Camera motion detection pipeline.Consecutive raw frames are used to compute forward and backward optical flows that are converted to angle grids. Once flattened,angle grids are fed to a MLP that learns the camera motion*
 
-## 核心模块与公式推导
+
 
 本文提出两条并行的高级电影摄影特征提取流水线：**帧分层（Frame Layering）** 与 **相机运动检测（Camera Motion Detection）**，二者均以连续原始帧为输入，分别输出离散深度层地图与相机运动类别，为后续导演风格分类提供结构化表征。以下分述其核心模块。
 
@@ -219,7 +223,9 @@ claims:
 
 > **注意**：以上变量含义均来自原文对流水线的文字描述，未出现显式编号公式。若需更严格的数学定义，建议回溯原始深度估计 和 RAFT 的原论文。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 低级特征在导演识别中的局限性
 
@@ -257,7 +263,9 @@ claims:
 ![[assets/figures/papers/movie_style_37aa66b0e22c/figures/003_Figure_2.jpg]]
 *Figure 2: t-SNE visualization of feature embedding on CMD8. Clusters correspond to: (1) 1970s movies,(2) 1980s movies,(3) black and white movies,(4) 1990s movies and (5) 2000s movies*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：从低级特征到电影语言要素
 
@@ -315,6 +323,8 @@ claims:
 6. 除视觉特征外，音频特征（如主动说话人检测）和配乐分析是否能进一步提升风格理解？
 
 **需注意**：由于论文未提供具体基线工作的完整引用信息（如Random和Weighted Random基线的出处），这些基线的来源和实现细节需要手动核实。同样，CMD8和MotionSet数据集的构建细节在给定材料中未充分展开，其统计特性（如类别分布、片段长度分布）对实验结论的影响需要进一步确认。
+
+
 
 ## 原文 PDF
 

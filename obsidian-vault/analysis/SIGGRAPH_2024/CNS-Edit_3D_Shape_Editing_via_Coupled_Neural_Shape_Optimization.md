@@ -33,7 +33,7 @@ claims:
 | 中文题名 | CNS-Edit：通过耦合神经形状优化的3D形状编辑 |
 | 英文题名 | CNS-Edit: 3D Shape Editing via Coupled Neural Shape Optimization |
 | 会议/期刊 | SIGGRAPH 2024 |
-| Links | [paper](https://arxiv.org/abs/2402.02313) · [arXiv](https://arxiv.org/abs/2402.02313") |
+| Links | [paper](https://arxiv.org/abs/2402.02313) · [paper](https://arxiv.org/abs/2402.02313") |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | CNS-Edit |
 | Dataset | ShapeNet Chair, ShapeNet Airplane |

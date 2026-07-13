@@ -5,6 +5,8 @@ paper_level: A
 venue: ECCV
 year: 2024
 pdf_ref: paperPDFs/ECCV_2024/Text_Motion_Translator_A_Bi_Directional_Model_for_Enhanced_3D_Human_Motion_Generation_from_Open_Vocabulary_Descriptions.pdf
+project_link: null
+code_link: null
 aliases:
 - TTMT
 tags:
@@ -40,7 +42,7 @@ claims:
 > - BABEL 上，APE & AVE TMT (ours) vs Runner-up (EMS) (平均降低33%（更好）)；R-Precision@3 0.53 vs N/A (N/A)；FID 0.72 vs N/A (N/A)。
 > - HumanML3D 上，R-Precision@3 0.528 vs N/A (N/A)；FID 0.184 vs N/A (N/A)；Diversity 9.437 vs N/A (N/A)。
 
-## 概述
+## 概要
 
 本文提出**TMT (Text Motion Translator)**，一个面向开放词汇描述的3D人体运动生成双向模型。其核心动机在于：现有Text2Motion方法受限于稀缺的3D运动-文本配对数据，且通常需要用户额外输入动作时长，导致对未见过的复杂描述泛化能力差、使用不友好。
 
@@ -57,7 +59,7 @@ claims:
 
 **局限与待解决问题**：模型对预训练数据集之外的全新动作描述仍面临挑战；LaViMo基于RGB视频估计的3D姿态可能引入噪声；LLM增强的质量依赖GPT-4和启发式规则的准确性。如何进一步提升开放词汇泛化能力、扩大预训练数据规模与多样性，是后续研究的关键方向。
 
-## 背景与动机
+
 
 3D人体运动生成旨在从自然语言描述中合成逼真的人体动作序列，在动画制作、虚拟现实和人机交互等领域具有重要应用价值。然而，该领域长期受困于一个核心瓶颈：**高质量3D人体运动数据及其对应的文本描述极度稀缺**。现有数据集规模有限，难以覆盖现实世界中丰富多样的动作语义，导致模型在面对开放词汇（open-vocabulary）描述时泛化能力严重不足。
 
@@ -69,7 +71,9 @@ claims:
 
 综上所述，本文的出发点是：通过“翻译框架+离散token化+多任务学习+数据增强”的组合策略，从根本上提升3D人体运动生成在开放词汇场景下的鲁棒性和泛化性，同时消除对时长输入等额外条件的需求。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 TMT 的核心创新在于将文本条件的 3D 人体运动生成重新定义为**序列到序列的语言翻译问题**，并通过三个紧密耦合的“changed slots”系统性地突破现有方法的瓶颈。
 
@@ -103,7 +107,7 @@ $$L_{M2T}^{j} = - \sum_{s=1}^{g} \sum_{i=0}^{L-1} \log p(t_{s;i}^{j} \mid \{ t_{
 
 三个 changed slots 形成了一条清晰的因果链路：**LLM 文本增强** 解决了开放词汇覆盖不足的问题，**运动 VQ-VAE 离散化** 为统一表示提供了基础，而**多任务翻译框架** 则利用这些离散 token 实现了无需时长输入的鲁棒双向生成。三者协同作用，使 TMT 在 BABEL 数据集上的 APE 和 AVE 指标平均比第二名高出 **33%**。
 
-## 整体框架
+
 
 TMT（Text Motion Translator）将文本条件3D人体运动生成重新定义为**序列到序列的语言翻译问题**。其核心思路是将连续的人体运动与自然语言描述统一表示为离散token序列，并通过一个共享的Transformer主干网络实现文本与运动之间的双向翻译。整个pipeline由三个关键阶段构成：**大规模伪标签运动数据集构建**、**运动离散化与文本增强**，以及**多任务翻译训练**。
 
@@ -133,7 +137,7 @@ TMT通过四个任务进行联合正则化：
 ![[assets/figures/papers/paper_list_l1880_Text_Motion_Translator_A_Bi_Directional_Model_for_Enhanced_3D_Human_Moti/figures/002_Figure_2.jpg]]
 *Figure 2: Model Structure Overview: We pretrain our Motion VQ-VAE on the combination of our LaViMo and existing AMASS datasets, then train our generation module on motion-text paired dataset*
 
-## 核心模块与公式推导
+
 
 TMT 将文本条件 3D 人体运动生成形式化为一个语言翻译问题。其核心架构由三个关键模块构成：运动 VQ-VAE（Motion VQ-VAE）、文本分词（Text Tokenization）以及基于 T5 的翻译骨干网络（T5 Translation Backbone）。以下逐一阐述各模块的设计逻辑与关键公式。
 
@@ -202,7 +206,9 @@ $$
 ![[assets/figures/papers/paper_list_l1880_Text_Motion_Translator_A_Bi_Directional_Model_for_Enhanced_3D_Human_Moti/figures/003_Figure_3.jpg]]
 *Figure 3: 3D pose estimation pipeline overview: we balance the trade-off between performance and time spent by combining Hybrik Module and test-time optimization of HuMoR*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -262,7 +268,9 @@ TMT 在两个主流基准 BABEL 和 HumanML3D 上均取得了领先性能，尤�
 
 ![[assets/figures/papers/paper_list_l1880_Text_Motion_Translator_A_Bi_Directional_Model_for_Enhanced_3D_Human_Moti/figures/007_Table.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 技术路线与关键差异
 
@@ -313,6 +321,8 @@ LaViMo 数据集虽大幅增加了数据量，但其 3D 姿态源自 RGB 视频�
 3.  **全新动作的鲁棒泛化**：如何进一步提高模型对预训练数据集之外全新动作描述的鲁棒性？是否需要引入持续学习机制或外部知识库（如动作知识图谱）？
 4.  **数据规模与码本表达力的关系**：扩大预训练数据规模和多样性（如利用海量 RGB 视频）能在多大程度上提升 Motion VQ-VAE 的码本表达能力与泛化性？是否存在码本容量饱和点？
 5.  **双向生成的评估体系**：Motion2Text 方向目前缺乏系统的定量评估标准，如何建立运动到文本生成质量的可靠自动度量？
+
+
 
 ## 原文 PDF
 

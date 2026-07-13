@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Radiometrically_Consistent_Gaussian_Surfels_for_Inverse_Rendering.pdf
+project_link: https://qbhan.github.io/radiogs-page/
+code_link: null
 openreview_forum_id: lKqE7UuMvp
 aliases:
 - RRCGS
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 辐射一致的高斯曲面片逆渲染 |
 | 英文题名 | Radiometrically Consistent Gaussian Surfels for Inverse Rendering |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=lKqE7UuMvp); [Project](https://qbhan.github.io/radiogs-page/) |
+| Links | [paper](https://openreview.net/forum?id=lKqE7UuMvp) · [Project](https://qbhan.github.io/radiogs-page/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | RadioGS (Radiometrically Consistent Gaussian Surfels) |
 | Dataset | TensoIR, Synthetic4Relight |
@@ -42,7 +44,7 @@ claims:
 > - TensoIR 上，Albedo PSNR↑ 为 31.05，对比 30.62 (IRGS) / 29.94 (GS-IR)，变化 +0.43 (vs IRGS)。
 > - TensoIR 上，Relighting PSNR↑ 为 32.09 (ray tracing) / 31.41 (finetuned*)，对比 31.10 (SVG-IR) / 29.91 (IRGS)，变化 +0.99 (ray tracing vs SVG-IR)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有基于高斯的逆渲染方法从NVS预训练的高斯基元中查询间接辐射，但这些基元仅在有限的训练视点上被图像重建损失监督，未观测方向的辐射值完全无约束，可任意取值。这导致间接光照建模不准确，材质与光照的分解失败——这是当前高斯逆渲染方法的核心瓶颈。
 
@@ -56,7 +58,7 @@ claims:
 - 在间接光照重建的专门评估中，间接光照 PSNR 达 32.88，显著优于 SVG-IR（25.58）和 IRGS（28.86）。
 - 训练仅需约 1 小时（单张 RTX 4090），与同类方法相当；微调重光照策略可在额外 2 分钟内适配新光照，渲染速度约 5.9 ms，显存占用仅 308 MB，远优于光线追踪重光照方案。
 
-## 背景与动机
+
 
 ### 逆渲染中的间接光照瓶颈
 
@@ -80,7 +82,9 @@ claims:
 
 本文提出 **RadioGS（Radiometrically Consistent Gaussian Surfels）**，通过引入**辐射一致性损失**和**可微2D高斯光线追踪**来解决上述挑战，在TensoIR和Synthetic4Relight两个数据集上均取得最优的NVS、材质重建与重光照指标，同时保持约1小时的训练时间（4090 GPU）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈：未观测方向的间接辐射缺乏物理约束
 
@@ -141,7 +145,7 @@ $$I_{\mathbf{G}}^{\mathbf{PBR}}(x, \omega_o) \approx \frac{2\pi}{N_s} \sum_{i=1}
 
 微调重光照策略的核心思想是：在新光照条件下，仅优化 $\mathcal{L}_{rad}$（权重设为 1.0，舍弃其他损失），通过少量迭代使曲面片辐射适应新的光照环境。微调后的曲面片可直接通过标准光栅化渲染，无需在推理时进行昂贵的光线追踪。这一设计将重光照从“在线光线追踪”转变为“离线微调 + 在线光栅化”，在轻微牺牲质量（与光线追踪版本相比）的前提下，实现了数量级的加速和显存压缩。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_lKqE7UuMvp/figures/030_Figure_16.jpg]]
 *Figure 16: Ablation study of our initialization method on the “hotdog” scene of TensoIR dataset*
@@ -206,7 +210,7 @@ $$I_{\mathbf{G}}^{\mathbf{PBR}}(x, \omega_o) \approx \frac{2\pi}{N_s} \sum_{i=1}
 
 整个流程在 NVIDIA RTX 4090 上总训练时长约 1 小时（30 分钟初始化 + 30 分钟逆渲染），微调重光照额外仅需约 2 分钟。
 
-## 核心模块与公式推导
+
 
 ### 问题建模：高斯曲面片表示
 
@@ -297,7 +301,9 @@ $$
 - **辐射一致性损失的有效性**：Table 4 显示移除 $\mathcal{L}_{rad}$ 后间接光照 PSNR 从 32.88 降至 30.10；Table 6 显示在仅 25% 训练视点下，含 $\mathcal{L}_{rad}$ 的模型间接光照 PSNR 仅下降 -0.17dB，而无 $\mathcal{L}_{rad}$ 版本下降 -2.21dB——直接证明 $\mathcal{L}_{rad}$ 对未观测方向提供了有效监督。
 - **可微光线追踪的必要性**：Table 5 显示将动态光线追踪替换为 split-sum 近似或预计算间接辐射会明显损害各项指标，只有同时采用动态光线追踪和 $\mathcal{L}_{rad}$ 才能达到最佳性能。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -415,7 +421,9 @@ RadioGS 通过引入**辐射一致性损失**（radiometric consistency loss）�
 *Table 3: Relighting Performance and Rendering cost during relighting on TensoIR dataset*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 逆渲染中的间接光照瓶颈
 
@@ -479,6 +487,8 @@ $$I_{\mathbf{G}}^{\mathbf{PBR}}(x, \omega_o) \approx \frac{2\pi}{N_s} \sum_{i=1}
 2. **多弹射全局光照**：当前方法主要处理单次弹射的间接光照。辐射一致性机制是否可与路径追踪结合，支持多次弹射的全局光照建模？
 3. **实时重光照**：微调阶段能否通过模型蒸馏或预计算策略进一步加速，实现秒级甚至帧级的新光照适应？
 4. **动态场景扩展**：该方法在动态场景或移动视点下的实时逆渲染和重光照潜力如何？辐射一致性损失在时域上的传播机制尚待探索。
+
+
 
 ## 原文 PDF
 

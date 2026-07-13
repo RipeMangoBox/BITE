@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Improving_2D_Diffusion_Models_for_3D_Medical_Imaging_with_InterSlice_Consistent_Stochasticity.pdf
+project_link: null
+code_link: https://github.com/duchenhe/ISCS
 openreview_forum_id: R5ETdN6ifA
 aliases:
 - ISCSI
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 基于切片间一致随机性的改进2D扩散模型用于3D医学成像 |
 | 英文题名 | Improving 2D Diffusion Models for 3D Medical Imaging with Inter‑Slice Consistent Stochasticity |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=R5ETdN6ifA); [GitHub](https://github.com/duchenhe/ISCS) |
+| Links | [paper](https://openreview.net/forum?id=R5ETdN6ifA) · [GitHub](https://github.com/duchenhe/ISCS) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Inter-Slice Consistent Stochasticity (ISCS) |
 | Dataset | SVCT (30 views), LACT ([0,100]°), MRI SR (5×), SVCT (30 views) - 层间差异 |
@@ -42,7 +44,7 @@ claims:
 > - LACT ([0,100]°) 上，PSNR (Axial) 为 31.65，对比 29.07 (DDS)，变化 +2.58。
 > - MRI SR (5×) 上，PSNR (Axial) 为 40.33，对比 39.32 (DDS)，变化 +1.01。
 
-## 概述
+## 概要
 
 **核心问题**：在3D医学成像（如稀疏CT重建、有限角CT、MRI超分辨率）中，直接使用逐切片的2D扩散模型作为生成先验会导致严重的层间结构不连续。其根本原因在于：反向扩散采样过程中，每个切片的随机噪声独立采样，而高度欠定的测量无法提供足够的层间约束，使得相邻切片的采样轨迹完全不相关。
 
@@ -52,7 +54,7 @@ claims:
 
 **主要结果**：在稀疏CT（30视角）、有限角CT（[0,100]°）和MRI 5×超分辨率三个任务上，DDS+ISCS 在轴向/冠状/矢状面的 PSNR、SSIM 和 LPIPS 上均取得最优结果，且层间差异指标 |Δ| 显著低于所有对比方法。消融实验证实：Slerp 噪声策略在辅助视图质量上全面超越 BCS 的相同噪声策略；方法对锚点选择、切片厚度变化和随机性强度均表现出高度鲁棒性；在病理保留方面，ISCS 能够清晰保留小病灶的边界和内部纹理，而 TV 正则化可能导致病灶模糊或消失。
 
-## 背景与动机
+
 
 ### 3D医学成像中的逆问题与2D扩散先验的困境
 
@@ -76,7 +78,9 @@ claims:
 
 这一动机催生了本文的核心方法——**切片间一致随机性（Inter-Slice Consistent Stochasticity, ISCS）**：一种即插即用的策略，通过在高维高斯分布的概率质量集中区域——超球面薄壳上——沿测地线进行球面线性插值（Slerp），生成既满足每切片标准高斯分布又具有自然层间衰减相关性的噪声体积，从而将2D扩散先验无缝提升为3D一致的生成过程。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于提出了一种名为**层间一致随机性（Inter-Slice Consistent Stochasticity, ISCS）**的即插即用策略，从根本上解决了将2D扩散先验应用于3D医学成像逆问题时，因逐切片独立采样而导致的层间结构不连续问题。
 
@@ -107,7 +111,7 @@ ISCS的另一个关键创新在于其**零成本集成**的特性。与需要在
 
 实验证据有力地支持了这一设计的有效性：DDS+ISCS在SVCT（30视图）上将轴向PSNR从34.76提升至36.97（+2.21 dB），在LACT（[0,100]°）上从29.07提升至31.65（+2.58 dB），同时将层间差异指标 $|\Delta|$ 从0.005588降至0.001835（SVCT）和从0.011592降至0.001966（LACT），达到了与真实值最为接近的层间一致性（Table 1, Table 3）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_R5ETdN6ifA/figures/004_Figure_1.jpg]]
 *Figure 1: Geometric interpretation of how different noise strategies in the re-noising step affect the stochasticity and resulting consistency in diffusion sampling. (a) Independent Noise (Conventional): Independently sampled noise for each slice, leading to uncorrelated sampling paths. (b) Identical Noise (BCS (Kwon & Ye, 2025)): Applying the same noise to all slices forces identical sampling paths. (c) Slerp Noise (Ours): Our proposed ISCS interpolates noise on the hypersphere, generating smoothly correlated information across slices*
@@ -146,7 +150,7 @@ ISCS 的关键技术路径建立在**高维高斯分布的浓度现象（Gaussia
 
 ISCS 可无缝集成到任意基于2D扩散的逆问题求解器（如 **DDNM** (Wang et al., arXiv 2022)、**DDS** (Chung et al., arXiv 2024)）中，仅需将重加噪步骤中的独立噪声 $\boldsymbol{\epsilon}$ 替换为 $\boldsymbol{\epsilon}^{\mathrm{ISCS}}$，不改变网络架构、不增加推理计算量、不需要后处理正则化。
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题根源：逐切片独立随机性导致的层间不一致
 
@@ -214,7 +218,9 @@ BCS（Batch-Consistent Sampling）对所有切片施加完全相同的噪声 $\b
 
 3. **ISCS重加噪**：使用Slerp生成层间相关噪声体积 $\boldsymbol{\epsilon}^{\mathrm{ISCS}}$，按公式(12)执行反向重加噪得到 $\mathbf{x}_{t-1}$。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果：ISCS 在三种 3D 医学成像任务上一致提升重建质量
 
@@ -308,7 +314,9 @@ Table 4 和 Table 5 将 DDS+ISCS 与两种显式 3D 感知方法（**TPDM**, Lee
 ![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_R5ETdN6ifA/figures/013_Table_3.jpg]]
 *Table 3: Slice-to-slice difference of compared methods for three 3D medical imaging tasks: SVCT of 30 views, LACT of [0, 100]◦, and MRI SR of 5×. $\operatorname { S D i f f } _ { \operatorname { r e c o n } }$ and SDiffGT denote the mean absolute difference between adjacent slices for the reconstruction and ground truth, respectively; $\Delta = \mathrm { S D i f f _ { r e c o n } - S D i f f _ { G T } }$ measures the signed gap, and |∆| is its absolute value (smaller is better)
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：2D扩散先验的3D一致性断层
 
@@ -366,6 +374,8 @@ $$ \epsilon_i^{\mathrm{ISCS}} = \mathrm{slerp}(\mathbf{z}_1, \mathbf{z}_S; \alph
 4. **与3D感知框架的协同**：将ISCS与DiffusionBlend或TPDM集成，能否在保持计算效率的同时进一步提升层间一致性？ISCS的噪声相关策略与多平面一致性约束是否存在互补或冗余？
 
 5. **病理鲁棒性系统验证**：当前病灶保留能力的评估仅基于两个案例，需在更大规模、更多类型的病理数据上系统验证ISCS是否确实优于TV正则化等后处理方法。
+
+
 
 ## 原文 PDF
 

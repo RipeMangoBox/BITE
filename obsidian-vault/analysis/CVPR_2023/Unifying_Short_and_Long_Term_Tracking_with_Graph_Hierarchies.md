@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2023
 pdf_ref: paperPDFs/CVPR_2023/Unifying_Short_and_Long_Term_Tracking_with_Graph_Hierarchies.pdf
+code_link: https://github.com/dvl-tum/SUSHI
 project_link: https://github.com/dvl-tum/SUSHI
 aliases:
 - USLTTGH
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | 用图层次结构统一短时与长时跟踪 |
 | 英文题名 | Unifying Short and Long-Term Tracking with Graph Hierarchies |
 | 会议/期刊 | CVPR 2023 |
-| Links | [paper](https://arxiv.org/abs/2212.03038); [Project](https://bit.ly/sushi-mot); [GitHub](https://github.com/dvl-tum/SUSHI) |
+| Links | [paper](https://arxiv.org/abs/2212.03038) · [Project](https://bit.ly/sushi-mot) · [GitHub](https://github.com/dvl-tum/SUSHI) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/segmentation |
 | Method | SUSHI |
 | Dataset | MOT17 - Public, MOT17 - Private, MOT20 - Public, DanceTrack |
@@ -41,7 +42,7 @@ claims:
 > - MOT17 - Private 上，IDF1 为 83.1，对比 77.1 (ByteTrack†)，变化 +6.0。
 > - MOT20 - Public 上，IDF1 为 71.6，对比 62.5 (prior SOTA)，变化 +9.1。
 
-## 概述
+## 概要
 
 多目标跟踪的核心挑战在于同时维持目标的短期身份一致性与长期身份一致性。现有方法通常将短时关联与长时关联视为独立问题，分别设计手工模块——例如局部跟踪器依赖帧间IoU匹配，而图神经网络方法受限于单层全连接图的可扩展性，难以覆盖大时间跨度。混合多级方案试图组合多种技术，但工程复杂度高且仍面临边数爆炸与严重标签不平衡的困境。**SUSHI** 提出了一种统一的层次化图跟踪框架，通过递归时间分区构建多层图结构，并在所有层级上共享同一个可学习的图神经网络，使得关联裁决能够在不同时间尺度上自适应地利用最优线索。
 
@@ -49,7 +50,7 @@ claims:
 
 在四个公开基准（MOT17、MOT20、DanceTrack、BDD100K）上，SUSHI 一致地将身份保持指标 IDF1 提升 4.2–9.5 个百分点，超越所有先前工作。消融实验证实，9 级层次结构显著优于浅层或单层图，且模型学会在不同层级侧重不同特征——低层依赖外观，高层依赖运动一致性。
 
-## 背景与动机
+
 
 多目标跟踪（MOT）的核心挑战在于将检测结果在时间轴上正确关联，形成完整的身份轨迹。这一任务天然跨越了不同的时间尺度：帧间的短时关联依赖运动平滑性和位置邻近性，而跨越遮挡或长时间间隔的长时关联则需要外观相似性等更高层次的语义线索。然而，现有方法在应对这种多时间尺度关联时，普遍面临通用性和可扩展性的双重困境。
 
@@ -59,7 +60,9 @@ claims:
 
 本文提出的 **SUSHI**（Unifying Short and Long-Term Tracking with Graph Hierarchies）正是对这一问题的直接回应。其核心洞察是：通过递归时间分区构建层次化图结构，并在所有层次上共享同一个可学习的图神经网络，可以使关联裁决在不同时间尺度上自适应地利用最优线索，从而在统一框架下同时解决短时和长时目标关联。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SUSHI 的核心创新在于将短时与长时目标关联统一到一个**层次化图神经网络框架**中，用单一可学习模型替代传统方法中针对不同时间尺度手工设计的异构模块，从而在显著提升身份保持能力的同时大幅降低图规模与标签不平衡。
 
@@ -96,7 +99,7 @@ SUSHI 在四个公开基准上一致地将身份保持指标 IDF1 提升 4.2-9.5
 
 这些结果覆盖了拥挤场景（MOT20）、复杂运动与外观相似场景（DanceTrack）、自动驾驶场景（BDD），验证了统一层次框架的通用性。
 
-## 整体框架
+
 
 SUSHI 将多目标跟踪中的关联问题统一为一个可学习的层次化图神经网络流水线。其核心设计是：**将长视频片段递归划分为不同时间粒度的子片段，在每一层构建轨迹图，通过共享权重的 GNN 进行消息传递与边分类，再根据分类结果合并轨迹节点，逐层递进直至生成覆盖全片段的完整轨迹。** 图 2 给出了整体架构的示意。
 
@@ -118,7 +121,7 @@ SUSHI 与现有混合多级方法（如 MPNTrack++ 结合局部跟踪与重识�
 - **统一性**：所有时间尺度使用完全相同的可学习 GNN 模型，而非为短时和长时关联设计不同的手工策略或独立模型。模型通过层级嵌入自适应地调整对不同线索的依赖——实验表明，低层级更侧重外观特征，高层级更依赖运动与位置信息（图 4c）。
 - **可扩展性**：层次化图结构将全连接图的边数从 $\mathcal{O}(N^2)$ 降至受控范围，同时大幅缓解正确边与错误边之间的标签不平衡（图 4a）。这使得 GNN 能够在 512 帧的长时间跨度上有效学习，而单层图方法在同等边数预算下不仅 oracle 上限更低，且因负样本过多而难以训练。
 
-## 核心模块与公式推导
+
 
 SUSHI 的核心是一个由多个共享权重的 **SUSHI 块** 组成的层次化处理流水线。每个 SUSHI 块执行相同的操作：在给定的轨迹片段集合上构建图、进行神经消息传递、分类边并合并节点，但各块操作的时间尺度由层次结构决定。以下按流水线顺序阐述关键模块与核心公式。
 
@@ -197,7 +200,9 @@ $$
 
 仅当两个轨迹在重叠帧中共享检测时才允许匹配，成本基于检测框的 IoU。该二分图匹配问题通过匈牙利算法求解，最终生成全视频的连续轨迹。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -250,7 +255,9 @@ SUSHI在四个公开基准上一致且显著地提升了身份保持能力，核
 ![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2212_03038/figures/008_Table_3.jpg]]
 *Table 3: Test set results on MOT20 benchmark. Det. Ref. denotes the public detection refinement strategy. As ByteTrack (gray) uses different thresholds for test set sequences and interpolation, we also report scores by disabling these as ByteTrack† (black)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法定位与范式对比
 
@@ -300,6 +307,8 @@ SUSHI 通过**层次化递归时间分区 + 共享 GNN 权重**的设计，将�
 4. **自适应层次深度**：当前层次深度（9 级）是固定的，能否根据视频内容自适应地决定合并层级，以在简单场景下减少计算开销？
 
 > 注：以上局限性和开放问题中，第 1、3、4 条来自论文自身提出的开放问题，第 2 条为基于方法逻辑的合理推断，需进一步实验验证。
+
+
 
 ## 原文 PDF
 

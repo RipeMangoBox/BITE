@@ -5,6 +5,7 @@ paper_level: A
 venue: ECCV
 year: 2024
 pdf_ref: paperPDFs/ECCV_2024/Photorealistic_Object_Insertion_with_Diffusion_Guided_Inverse_Rendering.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/toronto-ai/DiPIR/
 aliases:
 - POIDGIR
@@ -28,12 +29,15 @@ claims:
 | 中文题名 | Photorealistic Object Insertion with Diffusion-Guided Inverse Rendering |
 | 英文题名 | Photorealistic Object Insertion with Diffusion-Guided Inverse Rendering |
 | 会议/期刊 | ECCV 2024 |
-| Links | [paper](https://arxiv.org/abs/2408.09702); [Project](https://research.nvidia.com/labs/toronto-ai/DiPIR/) |
+| Links | [paper](https://arxiv.org/abs/2408.09702) · [Project](https://research.nvidia.com/labs/toronto-ai/DiPIR/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method |  |
 | Dataset | |
 
-## 概述
+> [!tip] 效果简介
+> 本笔记的既有实验指标、对比结果与适用边界见“实验与关键发现”；本轮仅统一结构，不改写证据。
+
+## 概要
 
 在单张消费级图像中恢复物理光照并实现虚拟物体的真实感插入，是计算机视觉与图形学中长期存在的挑战。核心困难在于逆渲染问题的高度欠定性——单张低动态范围图像丢失了大量场景几何、材质与光照信息，传统方法通常依赖简化的光照模型或启发式先验，难以在室内外复杂场景中同时保持光照估计的物理合理性与视觉逼真度。
 
@@ -43,8 +47,6 @@ claims:
 
 **主要结果**方面，在 Waymo 室外街景数据集上的用户偏好测试中，DiPIR 相较于 StyleLight 获得了 **77.8%** 的偏好率（随机机会为 50%），优势达 **+27.8%**。在 PolyHaven 室内外场景上的定量评估同样显示，DiPIR 在用户偏好上一致优于现有最先进的光照估计方法。消融实验进一步验证了色调映射曲线优化与环境贴图融合策略对最终合成质量的关键贡献。
 
-## 背景与动机
-
 将虚拟物体照片级真实地插入真实图像，是计算机视觉与图形学中长期存在的挑战。这一任务的核心瓶颈在于**从单张低动态范围（LDR）图像中恢复完整的场景光照与色调映射参数**——这是一个高度欠约束的逆渲染问题。输入图像通常由消费级设备在未知曝光与色调映射下拍摄，缺乏直接的高动态范围（HDR）光照信息，而光照估计的微小误差即会导致插入物体的阴影方向、软硬度、高光位置及整体亮度与背景场景产生明显的不一致。
 
 现有方法大致分为两类。一类基于数据驱动的光照估计，例如直接从单图预测环境光图（environment map），但这类方法往往受限于训练数据的分布，难以泛化到野外复杂场景，且预测的光照缺乏物理精确性。另一类基于逆渲染的优化方法，通过可微渲染器迭代优化场景参数，但其优化目标通常依赖手工设计的先验或低层次的像素损失，难以捕捉高层次的外观真实感，导致优化陷入局部最优或产生不自然的照明结果。
@@ -53,7 +55,7 @@ claims:
 
 本文的动机正是**弥合扩散模型先验与物理逆渲染之间的鸿沟**。我们提出DiPIR（Diffusion-guided Inverse Rendering），通过轻量级的扩散模型个性化方案与改进的得分蒸馏损失，将扩散模型的高层外观感知能力转化为对物理场景参数（环境光图、色调映射曲线）的可靠梯度信号，从而在单张图像中实现鲁棒的光照恢复与照片级真实的虚拟物体插入。
 
-## 核心创新
+## 核心方法与创新机理
 
 DiPIR 相对于现有光照估计与物体插入方法的核心创新，在于将**个性化大扩散模型作为人类评估者的替代**，通过可微物理渲染将梯度信号反向传播至场景物理属性，从而将逆渲染问题转化为端到端的优化问题。其关键 changed slots 可归纳为以下三个层面。
 
@@ -95,8 +97,6 @@ $$
 | 可训练色调映射 | 补偿未知相机色调映射 | 中高（消融实验贡献 16.3%，Table 3） |
 
 这些创新共同使 DiPIR 在 Waymo 室外场景用户研究中以 77.8% 的偏好率显著优于 StyleLight（高出 27.8 个百分点），并在 PolyHaven 数据集上取得了最优的 RMSE（0.048）、SSIM（0.989）和 LPIPS（0.0147）指标。
-
-## 整体框架
 
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2408_09702/figures/001_Figure_1.jpg]]
 *Figure 1: We propose DiPIR, a physically based method to recover lighting from a single image, enabling arbitrary virtual object compositing into indoor and outdoor scenes, as well as material and tone-mapping optimization. Project page: https://research. nvidia.com/labs/toronto-ai/DiPIR/*
@@ -156,8 +156,6 @@ $$
 ### 输出流
 
 优化完成后，系统输出恢复的环境光贴图、色调映射曲线参数，以及物理正确的合成图像。由于整个管线基于物理渲染，恢复的光照和材质参数可进一步用于材质精修、局部发光优化（如开启车灯）等下游应用，形成从单图逆渲染到场景编辑的完整闭环。
-
-## 核心模块与公式推导
 
 ### 光照表示：可优化球面高斯
 
@@ -225,7 +223,7 @@ $$\mathcal{L}_{\mathrm{consistency}} = - \sum_{i,j} \tilde{\mathbf{L}}_{i,j}^{\m
 
 为补偿输入图像未知的相机色调映射，方法引入可训练的色调曲线参数 $\theta_{\mathrm{fg}}$、$\theta_{\mathrm{shadow}}$，分别作用于前景渲染和阴影比率，使合成结果在亮度和色彩上与输入背景匹配。消融实验表明，移除此模块后用户偏好率从完整模型的基线下降至 68.5%（Table 3），验证了其对补偿未知色调映射的关键作用。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 用户偏好主结果：室外驾驶场景
 
@@ -300,15 +298,9 @@ Table 3 报告了在室外驾驶场景上的消融用户研究，比较完整 Di
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2408_09702/figures/019_Figure_13.jpg]]
 *Figure 13: Color drift Fig. 13: Failure case examples*
 
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2408_09702/figures/022_Figure_16.jpg]]
-*Figure 16: Additional car insertion examples on Waymo driving scenes*
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2408_09702/figures/023_Figure_17.jpg]]
-*Figure 17: Sofa Fig. 17: Additional object insertion examples on cropped PolyHaven HDRIs*
-
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2408_09702/figures/008_Table.jpg]]
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 与基线方法的关系
 

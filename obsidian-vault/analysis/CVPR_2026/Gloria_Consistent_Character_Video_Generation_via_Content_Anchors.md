@@ -43,7 +43,7 @@ claims:
 > - Multi-View Appearance & Expressive ID Testset (50 characters, 40 sets) 上，DINO-I, CLIP-I, Exp. 0.821, 0.858, 0.717 (显著优于多参考方法)。
 > - Fundamental Capability Testset (95 cases) 上，IQA, AES, Sync-C, Sync-D 4.65, 3.63, 5.12, 8.83 (全面领先)。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 在长序列、多视角和复杂表情变化下保持角色外观与身份的一致性，是当前角色视频生成的核心挑战。现有方法通常缺乏紧凑且结构化的持久视觉参考，导致生成结果在长时间跨度内出现身份漂移、背景退化或视角错乱。Gloria 将这一问题重新定义为“从外向内看”的场景：通过一组精心构建的**内容锚点（Content Anchors）**，为模型提供稳定、可区分的全局外观、多视角和表情参考。
@@ -60,7 +60,7 @@ Gloria 的核心创新在于**内容锚点框架**，包含三个关键设计：
 ### 主要结果概要
 在长时一致性测试集上，Gloria 的 Subject Consistency 达 **0.960**、Background Consistency 达 **0.951**、Arcface 达 **0.787**，显著优于所有对比方法（Table 1）。在多视角外观与表情身份一致性测试中，DINO-I 达 **0.821**、CLIP-I 达 **0.858**、Exp. 达 **0.717**，大幅领先多参考方法（Table 2）。消融实验（Table 4、Figure 7、Figure 8）证实：超集内容锚定消除了复制粘贴模式，RoPE弱条件有效解决了多锚点冲突，注意力可视化（Figure 10）进一步验证了模型在角色转身时对视角锚点的高度关注。此外，Gloria 支持生成超过 10 分钟的连续角色视频，并在基础能力测试（Table 3）和 CelebV-HQ 基准（Table 7）上全面领先。
 
-## 背景与动机
+
 
 角色视频生成是当前视觉内容创作的核心需求之一，其目标是在保持角色外观一致性的前提下，生成长时间、多视角、表情丰富的动态视频。近年来，扩散模型（diffusion models）的快速发展显著提升了视频生成的视觉质量与运动自然度，但在**角色身份一致性**这一关键维度上仍存在明显瓶颈。
 
@@ -68,7 +68,9 @@ Gloria 的核心创新在于**内容锚点框架**，包含三个关键设计：
 
 Gloria 的动机正是源于这一观察：**角色视频生成本质上是一个“从外向内看”的场景**，即用户需要从不同角度观察同一角色在不同表情下的动态表现。因此，一个紧凑而结构化的参考表征——而非零散的多帧输入——才是解决一致性问题的关键。基于此，Gloria 提出**内容锚点（Content Anchors）**框架，将角色视觉属性编码为一组精心构造的锚点帧（全局锚点、视角锚点、表情锚点），并设计配套的注入与消歧机制，使得模型能够稳定地参考这些锚点生成长达 10 分钟以上的一致角色视频。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Gloria的核心创新在于将角色视频生成重新定义为“从外向内看”的场景，并引入**内容锚点（Content Anchors）**作为紧凑、结构化的持久视觉参考。与现有方法仅依赖单一参考图像或文本提示不同，Gloria通过一组精心设计的锚点帧（全局锚点、视角锚点、表情锚点）来表征角色的多视角外观和表情身份，从而在长序列生成中维持一致的角色身份。
 
@@ -97,7 +99,7 @@ Gloria基于**Wan-I2V**架构构建，属于视频扩散模型（Video Diffusion
 
 Gloria的独特贡献在于将“内容锚点”系统化为一套完整的框架，包含锚点类型设计、采样策略（SCA）和冲突消解机制（RWC），为角色一致性视频生成提供了可扩展的技术方案。
 
-## 整体框架
+
 
 Gloria 的整体流水线围绕“内容锚点”（Content Anchors）这一核心概念构建，将角色视频生成重新定义为“从外向内看”的场景：通过一组紧凑、结构化的锚点帧，持久地为生成过程提供外观与身份参考。流水线主要由数据构建、锚点编码与注入、多模态条件融合以及分块自回归推理四个环节构成，其整体结构如图 3 所示。
 
@@ -139,7 +141,7 @@ $$RoPE_i = RoPE(t + o_i + so_j, h_i, w_i)$$
 ![[assets/figures/papers/paper_list_l990_https_arxiv_org_abs_2603_29931/figures/003_Figure_3.jpg]]
 *Figure 3: Overall of the Gloria pipeline, which includes the source of content anchors (Superset Anchors), the manner to inject these anchors (RoPE as Weak Condition), and the overall framework with multi-modal conditions e.g., text and audio*
 
-## 核心模块与公式推导
+
 
 ### 3.1 内容锚点编码与注入
 
@@ -186,7 +188,9 @@ $$ \mathcal{L} = \mathbb{E}_{x_0, x_1, c, t} \left\| u(x_t, c, t; \theta) - v_t 
 ![[assets/figures/papers/paper_list_l990_https_arxiv_org_abs_2603_29931/figures/009_Figure_7.jpg]]
 *Figure 7: (a) Ablation of the global anchor*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 评估体系与基准构建
 
@@ -263,7 +267,9 @@ Table 5 和 Table 6 分别展示了视角锚点和表情锚点的类别分布。
 ![[assets/figures/papers/paper_list_l990_https_arxiv_org_abs_2603_29931/figures/004_Figure_4.jpg]]
 *Figure 4: The user study results of expressive ID and multi-view appearance consistency*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 从“单帧参考”到“结构化锚点”：角色一致性生成的范式迁移
 
@@ -311,6 +317,8 @@ Gloria 的设计假设和实验设置定义了其当前适用边界，这些边�
 4. **效率优化**：如何通过模型蒸馏、锚点压缩、推理调度优化等手段降低模型规模和推理延迟，使方法适用于实时或近实时应用场景？
 
 5. **表情锚点精度提升**：82% 的表情锚点提取准确率仍有提升空间。更强的多模态大模型（MLLM）精炼策略，或端到端学习锚点选择，可能是改进方向。
+
+
 
 ## 原文 PDF
 

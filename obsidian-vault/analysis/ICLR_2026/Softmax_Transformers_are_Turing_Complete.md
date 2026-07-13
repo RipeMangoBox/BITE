@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Softmax_Transformers_are_Turing_Complete.pdf
+project_link: null
+code_link: null
 openreview_forum_id: FdkPOHlChS
 aliases:
 - CCRRCR
@@ -41,7 +43,7 @@ claims:
 > - 五个算术任务（一元表示） 上，Exact Match Accuracy 为 99.9%–100% (test0)，对比 N/A（C-RASP 无 CoT 无法表达该类语言），变化 N/A。
 > - 五个算术任务（二进制表示） 上，Exact Match Accuracy 为 100% (test0, test1, test2 全部达到 100%，使用 RPE)，对比 64.4%–95.0% (test0), ≈0% (test1, test2，无 RPE)，变化 在长于训练长度的测试集上提升近 100%。
 
-## 概述
+## 概要
 
 软最大值注意力变换器（Softmax Attention Transformers）是现代大语言模型的核心计算单元，但其理论表达能力一直存在一个关键缺口：已有的链式思考（Chain‑of‑Thought, CoT）变换器图灵完备性证明依赖于**硬最大值（hardmax）注意力**，而硬最大值不可微分、无法通过梯度训练，因此该结论无法解释实际可训练的软最大值模型。软最大值注意力无法直接精确提取图灵机读写头的位址，导致直接模拟图灵机的经典证明路径失效，使得“可训练的软最大链式思考变换器是否图灵完备”成为长期悬而未决的开放问题。
 
@@ -53,7 +55,7 @@ claims:
 
 **方法定位**：本工作属于表达性理论（expressivity theory）与可学习性分析的交叉领域，其核心框架 C‑RASP 等价于线性时序逻辑中过去算子片段的计数扩展（LTL[Count]），并通过 Huang et al.（2025）的理想化学习框架建立了从有限长度拟合到任意长度泛化的理论保证。与 **Hard‑attention CoT Transformers**（Pérez et al., 2021; Merrill & Sabharwal, 2024）相比，本构造使用可训练的软最大值注意力与 log n 缩放；与无 CoT 的 **C‑RASP**（Yang & Chiang, 2024）相比，本构造通过链式思考生成突破了原有表达能力的上限。
 
-## 背景与动机
+
 
 ### 核心问题：软最大值变换器的图灵完备性
 
@@ -80,7 +82,9 @@ claims:
 
 此外，该构造还基于 Huang et al. (2025) 的理想化学习框架，保证了在有限长度上训练后向任意长度泛化的理论可能性，为实际训练中的长度泛化现象提供了理论支撑。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：软最大值无法精确定位，直接模拟图灵机失效
 
@@ -145,7 +149,7 @@ $$t_i = \overleftarrow{\#}[Q_{a_i}] + \sum_{\rho \in \Delta} \mathbf{u}_\rho(i) 
 
 需注意，该构造依赖 Heaviside 激活函数与 `log n` 缩放，实际训练中通常使用 ReLU 与无缩放注意力，泛化保证的迁移需要额外验证。此外，无 RPE 时对任意语言的图灵完备性仍不成立，是否可通过改进 CoT 策略弥补这一缺陷，仍是一个开放问题。
 
-## 整体框架
+
 
 本文的核心目标是为软最大值注意力变换器（Softmax Attention Transformers, SMAT）建立首个图灵完备性证明。整体框架围绕一个关键洞察展开：**放弃直接模拟图灵机的传统路径，转而利用 C-RASP 的计数能力模拟 Minsky 计数器机**，从而绕过软最大值注意力无法精确提取读写头位址这一核心障碍。
 
@@ -196,7 +200,7 @@ $\log n$ 缩放的作用是在无界长度上表达稀疏注意力，这是理�
 - **Phase II 输出**：CM 的转移令牌序列，最终判定 $w$ 是否属于目标语言 $L$。
 - **整体输出**：链式思考生成的令牌序列，实现语言识别。
 
-## 核心模块与公式推导
+
 
 ### 软最大注意力与 C-RASP 表达能力基础
 
@@ -293,7 +297,9 @@ Phase I 的核心检查逻辑包括：
 
 完成 Phase I 后，Phase II 将编码向量 $\mathbf{x}$ 的各分量 $X_i$（由式 (12) 定义）替换计数器机模拟器中的初始计数项 $\overleftarrow{\#}[Q_{a_i}]$，实现对任意字母表语言的图灵完备识别。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -330,7 +336,9 @@ Table 1 汇总了五个任务在三个长度测试集上的泛化准确率。一
 ![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_FdkPOHlChS/figures/004_Table_2.jpg]]
 *Table 2: For each task shown in Table 2, we generate paired datasets of input strings and k-CM output traces under two encoding regimes: Unary and Binary encoding. Table 2: Unary and Binary representation of arithmetic languages. Here P is the set of prime numbers, j | i denotes divisibility, $\operatorname { g c d }$ ( i , j ) is the greatest common divisor, and i $\times$ j is multiplication
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与突破路径
 
@@ -388,6 +396,8 @@ CoT C-RASP（以及对应的软最大 CoT 变换器）在无位置编码时**不
 3. **实际大模型训练中的长度泛化性能如何？** 在真实规模的变换器训练中，本理想框架所预测的长度泛化行为是否可被观察到？是否需要额外的架构改进（如特定的位置编码设计或训练策略）才能实现？
 
 4. **激活函数与缩放因子的实际影响？** Heaviside 激活和 $\log n$ 缩放是理论构造的关键要素，在实际中分别被替换为 ReLU 和省略。这些替换对表达力和泛化性的实际影响需要系统的消融研究。
+
+
 
 ## 原文 PDF
 

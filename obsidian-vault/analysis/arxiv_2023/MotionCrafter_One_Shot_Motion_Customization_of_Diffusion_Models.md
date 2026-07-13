@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2023
 pdf_ref: paperPDFs/arxiv_2023/MotionCrafter_One_Shot_Motion_Customization_of_Diffusion_Models.pdf
+project_link: https://zyxelsa.github.io/homepage-motioncrafter/
+code_link: https://github.com/zyxElsa/
 aliases:
 - MotionCrafter
 tags:
@@ -40,7 +42,7 @@ claims:
 > - 自定义运动评估（定量指标） 上，Diversity↑ 0.2559 vs 0.2475 (Zeroscope) (+0.0084)；Consistency↑ 0.8975 vs 0.8941 (Zeroscope) (+0.0034)。
 > - 用户偏好研究 上，Motion fidelity↑ (5分制) 4.09 vs 2.05 (Zeroscope) (+2.04)。
 
-## 概述
+## 概要
 
 文本到视频扩散模型的单样本运动定制面临一个核心瓶颈：**外观特征与运动信息在模型中高度耦合**。当模型通过微调学习参考视频的运动模式时，极易过拟合参考视频的外观，导致生成内容的多样性严重丧失。MotionCrafter 针对这一问题，提出了一套运动-外观解耦框架，其核心思路是通过**并行空间-时间架构**和**双分支运动解耦**，在提取目标运动的同时保持基础模型的生成多样性。
 
@@ -50,7 +52,7 @@ claims:
 
 该方法在方法谱系上属于**基于扩散模型的运动定制**方向，与 Control-A-Video（Chen et al., arXiv 2023）和 ControlVideo（Zhang et al., arXiv 2023）等可控视频生成方法形成互补——后者侧重于通过控制信号引导结构，而 MotionCrafter 聚焦于从参考视频中提取并迁移运动模式。其知识贡献在于提出了一种将信息瓶颈原理应用于视频扩散模型运动-外观解耦的有效范式。
 
-## 背景与动机
+
 
 ### 文本到视频扩散模型的运动定制困境
 
@@ -75,7 +77,9 @@ claims:
 - **训练层面**：引入双分支运动解耦机制，利用冻结的基础模型分支作为外观先验，通过KL散度约束将外观信息从可训练分支中“挤出”，实现信息瓶颈。
 - **目标层面**：在保持基础模型生成多样性的前提下，实现高保真度的运动迁移，使模型既能忠实复现参考视频的运动模式，又能根据任意文本提示生成外观各异的新内容。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MotionCrafter 的核心创新在于解决了文本到视频扩散模型在运动定制中的本质瓶颈：**外观与运动的高度耦合**。现有方法在微调学习参考视频运动时，往往将外观信息一并编码进模型参数，导致生成结果丧失多样性。MotionCrafter 通过两个关键机制——**并行空间-时间架构**和**双分支运动解耦**——系统性地将运动从外观中分离出来。
 
@@ -120,7 +124,7 @@ $$ \mathcal{L}_{motion} = \mathcal{L}_{temporal} + \beta \mathcal{L}_{appearance
 
 这一结果证实了并行架构与双分支解耦的协同作用：前者提供结构基础，后者通过信息瓶颈实现精细化的外观-运动分离。
 
-## 整体框架
+
 
 MotionCrafter 的整体流程围绕一个核心矛盾展开：如何在从参考视频中提取运动模式的同时，彻底剥离其外观信息，从而在任意文本提示下生成外观多样且运动一致的新视频。为解决这一问题，该方法构建了一个**并行空间-时间架构**与**双分支运动解耦**机制协同工作的单样本微调框架，如图2所示。
 
@@ -171,7 +175,7 @@ $$\mathcal{L}_{motion} = \mathcal{L}_{temporal} + \beta \mathcal{L}_{appearance}
 ![[assets/figures/papers/paper_list_l1057_https_arxiv_org_abs_2312_05288/figures/002_Figure_2.jpg]]
 *Figure 2: The overall pipeline of MotionCrafter. We use a parallel spatial-temporal architecture to inject appearance and motion into the corresponding layers in a one-shot fine-tuning manner. We introduce a frozen U-Net, which retains the basic model parameters. During training, the temporally-tuned U-Net and the frozen U-Net receive the same text prompt for appearance enhancement, resulting in normalization of latents*
 
-## 核心模块与公式推导
+
 
 ### 并行空间-时间架构
 
@@ -219,7 +223,9 @@ $$\mathcal{L}_{motion} = \mathcal{L}_{temporal} + \beta \mathcal{L}_{appearance}
 ![[assets/figures/papers/paper_list_l1057_https_arxiv_org_abs_2312_05288/figures/003_Figure_3.jpg]]
 *Figure 3: The workflow of Dual-branch Motion Disentanglement enables the model to strike a balance between the reference video and the normalization video. Thus, MotionCrafter can maintain the base model’s appearance while have a consistent motion as the reference video. Without the motion disentanglement, as illustrated on the right, one-shot customization could lead to overfitting of the appearance to the reference videos*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能验证
 
@@ -265,7 +271,9 @@ MotionCrafter 在运动定制任务上展现出显著的性能优势，特别是
 ![[assets/figures/papers/paper_list_l1057_https_arxiv_org_abs_2312_05288/figures/006_Figure.jpg]]
 *Figure: Motion: driving (moving from one side to another) Motion: pouring (moving from up side to down side)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位与核心矛盾
 
@@ -326,6 +334,8 @@ MotionCrafter 的运动解耦依赖于一个精心设计的信息瓶颈，其核
 3. **超参数 $\beta$ 的自适应选择**：论文中 $\beta=5$ 是经验设定，其最优值可能依赖于运动类型、参考视频长度和外观复杂度。是否存在自适应的 $\beta$ 选择策略，或通过学习来自动调节信息瓶颈的强度，值得进一步探索。
 4. **跨模态运动定制**：当前方法在 2D 视频域内操作。能否将学习到的运动表征迁移到 3D 人体运动、机器人操控轨迹等其他模态，将显著扩展运动定制的应用边界。
 5. **与基于控制信号方法的融合**：将 MotionCrafter 的隐式运动学习与 ControlVideo 等方法的显式控制信号相结合，可能实现更精细的运动编辑——例如，从参考视频中提取“挥手”的运动模式，同时通过控制信号指定手的精确轨迹。
+
+
 
 ## 原文 PDF
 

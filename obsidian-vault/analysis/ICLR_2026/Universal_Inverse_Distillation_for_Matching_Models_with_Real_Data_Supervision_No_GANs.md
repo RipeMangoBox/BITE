@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Universal_Inverse_Distillation_for_Matching_Models_with_Real_Data_Supervision_No_GANs.pdf
+project_link: null
+code_link: https://github.com/David-cripto/RealUID
 openreview_forum_id: 8NuN5UzXLC
 aliases:
 - RUIDRD
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 通用逆蒸馏：无GAN的真实数据监督匹配模型 |
 | 英文题名 | Universal Inverse Distillation for Matching Models with Real-Data Supervision (No GANs) |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=8NuN5UzXLC); [GitHub](https://github.com/David-cripto/RealUID) |
+| Links | [paper](https://openreview.net/forum?id=8NuN5UzXLC) · [GitHub](https://github.com/David-cripto/RealUID) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/generative_models_and_autoencoders |
 | Method | RealUID (Universal Inverse Distillation with Real Data) |
 | Dataset | CIFAR-10 (无条件生成), CIFAR-10 (条件生成), CelebA (无条件生成) |
@@ -42,7 +44,7 @@ claims:
 > - CIFAR-10 (无条件生成) 上，FID 为 2.23 (RealUID, 无微调)，对比 2.58 (UID 无真实数据)，变化 -0.35。
 > - CIFAR-10 (条件生成) 上，FID 为 1.87 (RealUID, 微调)，对比 2.12 (UID+GAN 微调)，变化 -0.25。
 
-## 概述
+## 概要
 
 **核心问题**：扩散模型、流匹配模型和桥匹配模型等现代生成模型虽然生成质量高，但多步采样的推理代价极大。为将其压缩为一步生成器，研究者提出了多种蒸馏方法——如面向流匹配的 **FGM**（Huang et al., 2024）、面向扩散的 **SiD**（Zhou et al., 2024b）和面向桥匹配的 **IBMD**（Gushchin et al., 2025）——但这些方法各自针对特定框架设计，缺乏统一的理论基础。更关键的是，它们天然无法利用真实数据：若强行引入真实数据，必须借助额外的对抗训练（GAN）和判别器（如 **UID+GAN**，Zhou et al., 2024a），这显著增加了训练复杂度和不稳定性。
 
@@ -61,7 +63,7 @@ claims:
 
 **局限与展望**：当前实验限于 CIFAR-10 和 CelebA 等小型数据集及轻量 UNet 架构，尚未在 ImageNet 或更大模型（如 DiT）上验证；系数 α, β 的最优值依赖网格搜索，缺乏自适应机制；桥匹配和随机插值模型的 RealUID 蒸馏尚未进行实验验证。
 
-## 背景与动机
+
 
 ### 匹配模型的蒸馏困境
 
@@ -88,7 +90,9 @@ claims:
 
 RealUID 并非另起炉灶，而是在逆蒸馏（Inverse Distillation）范式下的自然延伸。它与 UID+GAN 共享利用真实数据的动机，但采取了根本不同的技术路线：后者依赖外挂判别器的对抗博弈，前者则通过损失函数内部的系数调节实现数据平衡。这一差异使得 RealUID 在结构简洁性、训练稳定性和计算效率上具备天然优势，同时保持了与多种匹配模型框架的兼容性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 RealUID 的核心创新在于**将真实数据以自然、无对抗的方式融入匹配模型的通用蒸馏框架**，从根本上改变了此前蒸馏方法对真实数据的利用方式。其关键突破可归纳为以下三个维度。
 
@@ -124,7 +128,7 @@ RealUID 的第三个创新在于其框架的**通用性**。通过将 FGM、SiD 
 
 实验结果表明，仅通过调整 $\beta/\alpha$ 的微小偏移（如 0.98 或 1.02），RealUID 即可在 CIFAR-10 上将 FID 从 2.58（无真实数据 UID 基线）降至 2.23，经微调后进一步降至 1.98，且收敛速度约为基线的 3 倍。这些增益完全来自损失函数的内在设计，无需任何额外的网络模块或对抗训练。
 
-## 整体框架
+
 
 RealUID 是一个无需 GAN 即可将真实数据融入匹配模型蒸馏的通用框架。其核心流程围绕四个模块展开：冻结的教师模型 $f^*$、学生生成器 $G_\theta$、可训练的虚假模型 $f$，以及带有真实数据的通用匹配损失 $\mathcal{L}_{\mathrm{R-UM}}^{\alpha,\beta}$。
 
@@ -151,7 +155,7 @@ $$\mathcal{L}_{\mathrm{R-UM}}^{\alpha,\beta}(f, p_0^\theta) = \alpha \cdot \math
 
 **关键设计决策**：系数比 $\beta/\alpha$ 是控制真实数据贡献的核心旋钮。实验表明，$\beta/\alpha = 0.98$ 或 $1.02$ 等微小偏离 $1$ 的取值即可显著提升性能（Table 1, Table 7），验证了该机制的有效性。整个框架通过线性化技巧将原本不可处理的 $\ell_2$ 距离转化为可优化的 min-max 目标，实现了对 FGM、SiD、IBMD 等先前蒸馏方法的统一。
 
-## 核心模块与公式推导
+
 
 ### 3.1 统一逆蒸馏（UID）框架
 
@@ -233,7 +237,9 @@ RealUID 的训练采用交替优化策略（见 Algorithm 1）：
 
 该流程的四个核心模块为：冻结的教师模型 $f^*$（提供蒸馏目标）、学生生成器 $G_\theta$（一步映射噪声到数据）、虚假模型 $f$（近似学生函数，用于最大化步骤）、以及 RealUM 损失（在生成数据和真实数据上加权计算匹配损失）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -306,7 +312,9 @@ RealUID 在 CIFAR-10 和 CelebA 数据集上均取得了优于无真实数据基
 
 ![[assets/figures/papers/paper_list_l41_https_openreview_net_forum_id_8NuN5UzXLC/figures/018_Table_10.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 匹配模型蒸馏的演进脉络
 
@@ -379,6 +387,8 @@ RealUID 占据了此前空白的关键位置：同时具备通用性、真实数
 4. **教师误差下的理论保证。** 当教师模型存在严重误差时，$\beta/\alpha$ 的选择规律是否可以给出更严格的理论刻画，以指导鲁棒的系数设计？
 
 5. **与 DMD 系列方法的融合。** RealUID 的 min-max $\ell_2$ 蒸馏范式与 DMD 的分布匹配范式是否存在统一的视角？二者的结合能否在保持 RealUID 简洁性的同时进一步提升生成质量？
+
+
 
 ## 原文 PDF
 

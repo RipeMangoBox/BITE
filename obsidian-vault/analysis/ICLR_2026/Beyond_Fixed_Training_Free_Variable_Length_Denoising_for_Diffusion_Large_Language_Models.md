@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Beyond_Fixed_Training_Free_Variable_Length_Denoising_for_Diffusion_Large_Language_Models.pdf
+project_link: null
+code_link: https://github.com/Li-Jinsong/DAEDAL
 openreview_forum_id: Ic2A2gCseC
 aliases:
 - BFTFVLDDLLM
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 超越固定长度：扩散大语言模型的无训练可变长度去噪 |
 | 英文题名 | Beyond Fixed: Training-Free Variable-Length Denoising for Diffusion Large Language Models |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=Ic2A2gCseC); [GitHub](https://github.com/Li-Jinsong/DAEDAL) |
+| Links | [paper](https://openreview.net/forum?id=Ic2A2gCseC) · [GitHub](https://github.com/Li-Jinsong/DAEDAL) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/diffusion_image_video |
 | Method | DAEDAL |
 | Dataset | GSM8K, MATH500, MBPP, HumanEval |
@@ -41,7 +43,7 @@ claims:
 > - MATH500 上，Acc (%) 为 44.2，对比 39.6 (best fixed-length at 2048)，变化 +4.6。
 > - MBPP 上，Acc (%) 为 40.8，对比 38.8 (best fixed-length at 2048)，变化 +2.0。
 
-## 概述
+## 概要
 
 扩散大语言模型（DLLM）在推理时要求**预先定义固定的生成长度**，这一约束带来了根本性的效率与性能矛盾：长度设置过短会导致模型无法充分展开推理，性能不足；长度设置过长则造成大量计算浪费，甚至可能因过度扩展而引发性能退化。现有方法（如 **LLaDA**，Nie et al., 2025）需要针对每个任务和基准手工调优生成长度，缺乏自适应能力。
 
@@ -51,7 +53,7 @@ DAEDAL 从统一的短初始长度（64）出发：**阶段一**通过监控 EOS
 
 在四个基准测试（GSM8K、MATH500、MBPP、HumanEval）上，DAEDAL 以统一的初始长度达到或超越了经过精心调优的固定长度基线的最佳性能——平均准确率从 52.05% 提升至 54.75%（LLaDA-Instruct-8B），同时有效令牌比率大幅提高。该方法对超参数（初始长度、扩展因子、窗口大小、阈值）表现出极强的鲁棒性，所有测试配置均与最佳基线持平或更优。
 
-## 背景与动机
+
 
 扩散大语言模型（Diffusion Large Language Models, DLLMs）作为自回归模型之外的一条新兴生成范式，通过迭代去噪从完全掩码的序列中逐步恢复文本。然而，现有 DLLM 的推理过程存在一个根本性限制：**生成长度必须在去噪开始前预先固定**。这意味着无论面对简单的一步推理题还是需要长篇推导的复杂数学证明，模型都被强制在相同的令牌预算内完成生成。
 
@@ -61,7 +63,9 @@ DAEDAL 从统一的短初始长度（64）出发：**阶段一**通过监控 EOS
 
 基于上述洞察，本文提出 **DAEDAL**，一个完全无需训练、在推理时动态调整生成长度的两阶段框架。DAEDAL 从统一的短初始长度出发，通过监控 EOS 置信度信号，自适应地为每个问题分配合适的生成空间，从而突破固定长度去噪的根本瓶颈。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 扩散大语言模型（DLLM）在推理时面临一个根本性约束：生成序列的长度必须在去噪过程开始前预先固定。这一设计导致了一个尖锐的效率-性能权衡——长度过短时模型缺乏足够的推理空间，性能不足；长度过长时则造成大量计算浪费，甚至引发性能退化。DAEDAL 的核心创新在于**首次揭示了 DLLM 内部存在对任务所需生成长度的感知能力，并将其转化为一个无需重新训练的自适应长度控制机制**，从根本上突破了固定长度推理的瓶颈。
 
@@ -88,7 +92,7 @@ DAEDAL 的核心洞察是：模型在预测序列末尾 EOS（End-of-Sequence）
 
 这一设计使得 DAEDAL 能够在保持统一初始长度（64）的前提下，在四个基准上均达到或超越经过精心调优的固定长度基线的最佳性能，同时显著提升了有效令牌比率（Table 1）。更重要的是，两阶段设计具有协同效应：单独使用阶段一或阶段二均已带来显著提升，而二者结合后效果最佳（Table 2），验证了“全局长度估计 + 局部空间扩展”这一组合策略的有效性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_Ic2A2gCseC/figures/007_Figure_3.jpg]]
 *Figure 3: Inference process of Fixed-Length Denoising (Baseline) and DAEDAL. (a) The standard inference process for current DLLMs, which performs iterative denoising on a sequence of a predefined, static length. (b) Our proposed two-stage inference process, which first employs Initial Length Adjustment to determine an appropriate generation length before denoising, followed by Iterative Mask Insertion to expand the sequence on-demand during the denoising process*
@@ -105,7 +109,7 @@ DAEDAL 是一种无需额外训练的两阶段可变长度去噪策略，旨在�
 
 整个流程对超参数表现出极强的鲁棒性。在统一使用 $L_{init}=64$、$L_{max}=2048$、$\tau_{eos}=0.5$、$\tau_{high}=0.9$、$\tau_{low}=0.1$、$\tau_{expand}=0.9$、$E_{factor}=8$、$W_{eos}=32$ 的默认配置下，DAEDAL 在四个基准上均达到或超越各自精心调优的固定长度基线的最佳性能（Figure 1(a)），同时产生了按问题自适应的响应长度分布（Figure 1(b)），有效提升了有效令牌比率。
 
-## 核心模块与公式推导
+
 
 DAEDAL 是一种训练无关的双阶段可变长度去噪策略，其核心在于将扩散大语言模型（DLLM）内部对生成长度的感知能力转化为可操作的推理时控制信号。该方法包含三个关键模块：**EOS 置信度计算**、**阶段一：初始长度调整**、**阶段二：迭代掩码插入**。
 
@@ -158,7 +162,9 @@ DAEDAL 涉及的核心超参数及其默认值如下：
 
 值得注意的是，DAEDAL 在所有实验和模型中使用完全相同的超参数配置，未针对特定模型或基准进行调优。消融实验（Table 3、Table 4、Figure 5）表明，该方法对上述超参数具有极强的鲁棒性：在初始长度 32 至 512、扩展因子 8 至 32、以及 32 种阈值组合的测试中，性能均与最佳固定长度基线持平或更优。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：EOS置信度作为长度充足性的内部信号
 
@@ -238,7 +244,9 @@ DAEDAL的通用性在两个额外模型上得到验证。在LLaDA-1.5-8B（表5�
 ![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_Ic2A2gCseC/figures/005_Figure_1.jpg]]
 *Figure 1: Overview of DAEDAL’s effectiveness on LLaDA-Instruct-8B. (a) DAEDAL uses a unified and short initial length, consistently surpassing the baseline, which needs its length meticulously tuned for each benchmark to achieve peak performance. (b) DAEDAL dynamically adjusts length and adaptively expands on a per-problem basis, resulting in a varied distribution of response lengths. In contrast, the baseline is constrained to a fixed length for all problems*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 DAEDAL 的核心贡献在于提出了一种**无需训练**的推理时可变长度去噪策略，直接解决了扩散大语言模型（DLLM）必须预先固定生成长度的根本性瓶颈。其方法定位可以从以下几个维度进行梳理：
 
@@ -289,6 +297,8 @@ DAEDAL 展现出对超参数的强鲁棒性，这降低了其实际部署的调�
 - 方法目前仅在 LLaDA-Instruct-8B 单一模型上验证，跨模型、跨规模的泛化性需要进一步确认。
 
 这些边界点需要结合论文的 Limitations 章节（如有）进行手动核实。
+
+
 
 ## 原文 PDF
 

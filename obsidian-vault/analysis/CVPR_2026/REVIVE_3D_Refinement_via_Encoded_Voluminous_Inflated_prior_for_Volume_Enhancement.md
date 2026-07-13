@@ -41,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - Flat Image Test Set (2,232 images) 上，Compactness (C) ↑ 0.2179 (Ours with Hunyuan3D-2.1) vs 0.1408 (Hunyuan3D-2.1) (+0.0771)；Normal Anisotropy (NA) ↓ 0.0767 (Ours with Hunyuan3D-2.1) vs 0.1347 (Hunyuan3D-2.1) (-0.0580)。
 
-## 概述
+## 概要
 
 **核心问题**：从缺乏3D线索（如阴影、纹理梯度）的平面图像生成3D网格时，现有模型难以恢复准确的全局结构和细节，导致生成网格趋于扁平化。
 
@@ -57,7 +57,7 @@ claims:
 
 **局限与开放问题**：该方法依赖预训练骨架进行细化，可能将卡通输入的风格简单性偏向骨架的写实倾向，导致纹理风格偏移；如何缓解这一偏向并实现更好的纹理对齐仍是待解决问题。
 
-## 背景与动机
+
 
 ### 问题背景：从平面图像生成体积化3D资产的挑战
 
@@ -91,7 +91,9 @@ claims:
 
 基于上述洞察，本文提出了 **REVIVE 3D**——一个两阶段、即插即用的管线，旨在从平面图像生成体积饱满、细节丰富的3D网格。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 REVIVE 3D 的核心创新在于**用输入图像特定的体积化先验（Inflated Prior）替代了从纯噪声出发的生成范式**，并通过**潜在空间中的随机细化**修正该先验的凸形几何缺陷。这一设计直接回应了从平面图像生成3D网格的根本瓶颈：缺乏阴影、纹理梯度等3D线索，导致现有模型输出扁平化网格。
 
@@ -126,7 +128,7 @@ REVIVE 3D 并非重新训练一个3D生成模型，而是作为**即插即用的
 - **强证据**：Compactness（+0.0771）和 Normal Anisotropy（-0.0580）的显著提升（Table 2），以及用户研究在质量、体积、细节三个维度上的最高分（Figure 6），直接支持了“体积更大、表面更不平坦”的核心主张。
 - **待验证点**：该方法对预训练 backbone 的依赖引入了风格偏向问题——卡通输入的风格简洁性可能被 backbone 的写实倾向所覆盖，导致纹理风格偏移。这一局限性在 Section 5 中被明确提及，但未提供定量缓解方案，需在实际应用中手动验证。
 
-## 整体框架
+
 
 REVIVE 3D 是一个**两阶段、即插即用**的流水线，目标是从缺乏3D线索的平面图像中生成具有体积感和细节的3D网格。其核心瓶颈在于：现有模型因输入图像缺失阴影、纹理梯度等3D信息，难以恢复准确的全局结构与局部细节，导致网格趋于扁平化。REVIVE 3D 通过引入一个**输入图像特定的体积膨胀先验（Inflated Prior）**，并在潜在空间中对其进行随机细化，系统性地解决了这一问题。
 
@@ -155,7 +157,7 @@ REVIVE 3D 是一个**两阶段、即插即用**的流水线，目标是从缺乏
 ![[assets/figures/papers/paper_list_l2583_https_arxiv_org_abs_2604_27504/figures/001_Figure_1.jpg]]
 *Figure 1: REVIVE 3D generates voluminous and detailed 3D meshes from flat images*
 
-## 核心模块与公式推导
+
 
 REVIVE 3D 是一个两阶段框架，其核心由 **膨胀先验生成（Stage 1）** 和 **随机细化（Stage 2）** 两个模块级联构成。整体流程参见 Figure 3。
 
@@ -201,7 +203,9 @@ $t_0$ 是控制 **保真度-合理性权衡** 的关键超参数：$t_0$ 过低�
 ![[assets/figures/papers/paper_list_l2583_https_arxiv_org_abs_2604_27504/figures/009_Figure_7.jpg]]
 *Figure 7: Refinement trajectories for different initial noise levels*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 评估指标设计
 
@@ -269,7 +273,9 @@ $$\operatorname{NA}(\mathcal{M}) = 1 - \frac{-\sum_{k=1}^{K} p_k \log(p_k + \eps
 ![[assets/figures/papers/paper_list_l2583_https_arxiv_org_abs_2604_27504/figures/012_Figure_10.jpg]]
 *Figure 10: Qualitative results showing non-flat cases (top) and challenging cases with ambiguous silhouettes and imperfect segmentation (bottom; white: silhouette mask, yellow: segmentation mask)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有方法的边界关系
 
@@ -323,6 +329,8 @@ REVIVE 3D 在知识库中的定位可概括为：
 > **一种即插即用的3D体积增强管线**，通过“显式几何膨胀先验 + 潜在空间随机精细化”两阶段流程，使预训练3D生成模型在缺乏3D线索的平面图像上仍能输出体积化、细节丰富的网格。其核心贡献在于：（1）提出膨胀先验作为2D到3D的结构桥梁；（2）系统性地探索了潜在空间噪声注入水平对几何精细化的调控机制；（3）引入 Compactness 和 Normal Anisotropy 作为体积感和表面平坦度的可计算度量。
 
 该方法在“2D图像→3D网格”任务中开辟了“先验注入”而非“端到端重训”的技术路径，对后续研究具有方法论参考价值。
+
+
 
 ## 原文 PDF
 

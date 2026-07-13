@@ -44,7 +44,7 @@ claims:
 > - MATE-3D (NFE=8) 上，HyperScore Overall 7.04 vs 6.67 (+0.37)。
 > - MATE-3D (NFE=8, large-scale) 上，ImageReward 0.865 vs -0.846 (+1.711)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有的强化学习微调方法专为单图像扩散模型设计，将其直接迁移到文本到多视图（Text-to-Multiview, T2MV）生成时，面临两个根本性困难。其一，这些方法将每个视图视为独立的去噪过程，忽略了多视图之间必须保持的跨视角一致性；其二，在少步推理（如4步或8步）条件下，奖励分布高度集中，导致策略梯度信号极其微弱，难以驱动有效的策略改进。
 
@@ -56,7 +56,7 @@ claims:
 
 **主要结果**：在训练提示集上，MVC-ZigAL的HyperScore Overall达到9.17，较基线模型（7.23）提升1.94；在MATE-3D分布外基准上，以仅8次函数评估（NFE）的极低推理成本，HyperScore Overall达到7.04，超越MV-Adapter等SOTA方法，且ImageReward从-0.846跃升至0.865，实现了从负到正的根本性质变。消融实验进一步证实，首步zigzag调度、自适应阈值课程和自适应步长原-对偶更新均对最终性能有独立且显著的贡献。
 
-## 背景与动机
+
 
 ### 问题背景：少步文本到多视图生成的效率与质量矛盾
 
@@ -82,7 +82,9 @@ claims:
 
 3. **约束优化范式协调双目标**：将单视图保真度作为优化主目标，跨视图一致性作为约束条件，通过拉格朗日对偶求解实现自适应平衡。配合自定节奏阈值课程和自适应步长原-对偶更新，使约束强度随策略改善动态收紧，避免早期过度约束或后期约束松弛。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MVC-ZigAL 的核心创新在于针对少步文本到多视图（T2MV）扩散模型，设计了一套完整的强化学习微调框架，从三个层面系统性地解决了现有方法的局限：**多视图联合建模**、**自反思优势学习**和**多视图约束优化**。
 
@@ -142,7 +144,7 @@ $$\tau_{k+1} \leftarrow \beta_{\tau} \tau_k + (1 - \beta_{\tau}) \bar{\mathcal{R
 
 这些创新协同作用，使 MVC-ZigAL 在训练提示集上 HyperScore Overall 达到 9.17（基线 7.23），在 MATE-3D 分布外基准上以极低 NFE（4/8）显著超越 SPAD、MV-Adapter 等 SOTA 方法，ImageReward 从 -0.846 跃升至 0.865。
 
-## 整体框架
+
 
 MVC-ZigAL 是一个面向少步文本到多视图（T2MV）扩散模型的强化学习微调框架。其核心设计围绕三个相互协作的模块展开：**多视图联合 MDP 建模**、**自反思 zigzag 采样（ZMV-Sampling）** 以及**多视图约束策略优化**。整体流程如下：
 
@@ -170,7 +172,7 @@ MVC-ZigAL 是一个面向少步文本到多视图（T2MV）扩散模型的强化
 **输入**：文本提示 $\mathbf{c}$、相机嵌入 $\{\mathbf{e}_v\}_{v=1}^V$、随机噪声。  
 **输出**：经 RL 微调后的策略 $p_\theta$，在少步采样下生成高保真且跨视图一致的多视图图像。
 
-## 核心模块与公式推导
+
 
 ### 多视图感知的MDP建模
 
@@ -272,7 +274,9 @@ $$\tau _ { k + 1 } \gets \beta _ { \tau } \tau _ { k } + ( 1 - \beta _ { \tau } 
 ![[assets/figures/papers/paper_list_l2699_https_arxiv_org_abs_2505_20107/figures/003_Figure_3.jpg]]
 *Figure 3: Qualitative comparison of reward optimization with joint-view or single-view rewards only versus our multiview-constrained approach. Joint-view optimization emphasizes view consistency but under-optimizes image fidelity; single-view optimization targets image fidelity but compromises view consistency, causing the “multi-face” problem. In contrast, our approach balances both aspects effectively*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 1. 核心定量结果
 
@@ -340,7 +344,9 @@ MVC-ZigAL在训练提示集和分布外基准上均展现出对多视图RL基线
 ![[assets/figures/papers/paper_list_l2699_https_arxiv_org_abs_2505_20107/figures/017_Figure_14.jpg]]
 *Figure 14: Additional qualitative comparison on unseen prompts between MV-Adapter and our MVC-ZigAL finetuned model*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 基础模型与基线关系
 
@@ -377,6 +383,8 @@ MVC-ZigAL 的设计假设和潜在局限包括：
 2. ZMV-Sampling 的自反思机制在 2 步甚至 1 步的极端少步设置下是否仍能提供有效优势信号？zigzag pass 的额外计算开销与性能增益的权衡曲线如何？
 3. RL 微调后的 T2MV 模型对后续 3D 重建任务（如通过 3D Gaussian Splatting 或 NeRF）的实际增益有多大？多视图一致性的提升是否线性转化为重建质量的提升？
 4. 自定节奏阈值课程和自适应步长原-对偶更新是否对其他约束 RL 问题（如安全 RL、多目标 RL）具有通用性？这些机制的理论收敛性质尚待分析。
+
+
 
 ## 原文 PDF
 

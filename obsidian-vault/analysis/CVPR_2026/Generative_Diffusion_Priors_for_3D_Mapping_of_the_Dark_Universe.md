@@ -44,7 +44,7 @@ claims:
 > - Simulated JWST-scale lightcone volume 2 上，ρ^{2D} (↑) 0.88 vs Neural: 0.87, Wiener: 0.83 (+0.01 / +0.05)；ρ_{blur}^{3D} (↑) 0.83 vs Neural: 0.80, Wiener: 0.72 (+0.03 / +0.11)。
 > - Simulated JWST-scale lightcone volume 3 (OOD cosmology) 上，ρ^{2D} (↑) 0.98 vs Neural: 0.96, Wiener: 0.92 (+0.02 / +0.06)。
 
-## 概述
+## 概要
 
 **问题背景** 弱引力透镜效应通过测量背景星系形状的微弱相干畸变，提供了直接探测宇宙三维物质分布的关键探针。然而，从噪声主导的剪切观测中重建暗物质密度场是一个病态逆问题：形状噪声通常比剪切信号大两个数量级以上，且三维反演面临严重的视线方向简并性。
 
@@ -56,7 +56,7 @@ claims:
 
 **方法定位** 该方法属于“模拟驱动先验 + 物理引导后验采样”的技术路线，将宇宙学模拟的统计知识以扩散模型形式编码为先验，通过可微前向模型和傅里叶对角协方差将物理约束注入采样过程，为三维弱透镜质量映射提供了兼具高保真度与严格不确定性的新范式。
 
-## 背景与动机
+
 
 **暗物质质量映射的核心挑战。** 暗物质占据宇宙物质总量的约 85%，其三维分布是理解结构形成和约束宇宙学参数的关键。弱引力透镜效应——前景物质对背景星系形状的微小扭曲——是目前绘制暗物质分布最有力的探针之一。这一反演问题的本质是：从被形状噪声严重污染的二维剪切观测中，重建三维密度场 $\delta$，其中形状噪声的幅度通常比透镜信号大两个数量级以上（Figure 2）。
 
@@ -64,7 +64,9 @@ claims:
 
 **核心洞察与动机。** 本文的核心洞察在于：高保真 N 体宇宙学模拟（如 AbacusSummit）已经能够生成高度逼真的三维暗物质光锥数据，这些模拟蕴含了结构形成的完整统计规律——包括非线性坍缩、纤维状网络和多尺度耦合。如果能将这些模拟转化为数据驱动的强先验，并与可微的物理前向模型统一到贝叶斯后验采样框架中，就有可能在噪声观测下恢复既满足数据约束、又保持宇宙学统计一致性的三维密度场。这一思路将质量映射问题从“手工设计先验”转变为“从物理模拟中学习先验”，有望突破现有方法的精度与不确定性量化瓶颈。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于将**数据驱动的扩散模型先验**与**可微物理前向模型**统一到贝叶斯后验采样框架中，从而突破现有三维弱透镜质量映射方法的两大瓶颈：先验表达能力的不足与不确定性量化的缺失。
 
@@ -96,7 +98,7 @@ claims:
 
 上述创新的有效性依赖于一个关键前提：N体模拟能够准确反映真实宇宙的统计特性。若模拟存在系统性偏差，扩散先验学习的分布将与真实宇宙产生偏移，似然修正的能力也可能存在上限。此外，扩散采样的计算成本未在文中明确量化，这可能限制其在平方公里级巡天数据上的直接应用。这些构成了当前创新边界上的开放问题。
 
-## 整体框架
+
 
 本文提出了一套将扩散生成先验与可微物理前向模型统一于贝叶斯后验采样的三维弱透镜质量映射框架。其核心逻辑是：利用高保真N体模拟学习暗物质密度场的非高斯统计分布作为数据驱动先验，随后将该先验嵌入到已知的弱透镜测量似然中，通过改进的解耦退火后验采样（DAPS）方案生成三维密度场的后验样本。该流程由四个关键模块串联构成，形成从模拟数据构建到最终后验推断的完整链路。
 
@@ -145,7 +147,7 @@ $$\pmb{\Sigma} = \pmb{F}^{-1} \, \mathrm{diag}(P_k) \, \pmb{F}$$
 ![[assets/figures/papers/paper_list_l2501_https_openaccess_thecvf_com_content_CVPR2026_html_Zhao_Generative_Diffus/figures/001_Figure_1.jpg]]
 *Figure 1: Lightcone structure and redshift-conditional diffusion model. Left: The large-scale matter distribution is represented as a 3D lightcone, built from a sequence of lens planes slicing the dark matter density field at increasing comoving distance (redshift). Right: Each lens plane is modeled with a redshift-conditional 2D diffusion prior that learns the statistics of simulated overdensity maps at that redshift. During generation, we start from Gaussian noise on each plane, append one-hot redshift encodings, and denoise with a U-Net score model to obtain a coherent 3D lightcone. This redshift-conditioned factorization enables efficient generation of realistic volumetric dark matter fields cons...*
 
-## 核心模块与公式推导
+
 
 ### 弱透镜前向模型
 
@@ -194,7 +196,9 @@ $$\pmb{\Sigma} = \pmb{F}^{-1} \mathrm{diag}(P_k) \pmb{F}$$
 ![[assets/figures/papers/paper_list_l2501_https_openaccess_thecvf_com_content_CVPR2026_html_Zhao_Generative_Diffus/figures/002_Figure_2.jpg]]
 *Figure 2: Weak Lensing Measurements. (Left) As light from distant galaxies propagates through the universe, it is deflected by intervening matter, producing small differences between the intrinsic (unlensed) shape*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设定
 
@@ -243,7 +247,9 @@ Figure 6评估后验样本的不确定性校准质量。对每个体素，计算
 ![[assets/figures/papers/paper_list_l2501_https_openaccess_thecvf_com_content_CVPR2026_html_Zhao_Generative_Diffus/figures/008_Figure_6.jpg]]
 *Figure 6: Uncertainty calibration. For each voxel, we compute the standard deviation of the posterior samples (“sample std”) and the mean absolute error (MAE) between the posterior mean and the ground truth. We then bin voxels by sample std and plot the average MAE per bin, along with the fraction of voxels in each bin. Both our method (r = 0.92) and the neural ensemble estimator (r = 0.90) [46] show a strong correlation between predicted uncertainty and actual error, but only our samples correspond to a well-defined Bayesian posterior distribution*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 方法谱系
 
@@ -276,6 +282,8 @@ Figure 6评估后验样本的不确定性校准质量。对每个体素，计算
 3. **可扩展性未验证**：扩散采样的计算成本与采样步数、似然评估复杂度直接相关。对于更大足迹、更高分辨率的巡天数据，当前框架可能需要显著的工程优化（如蒸馏加速、变分替代）才能实用。
 
 此外，论文提出的框架具有向其他宇宙学探针扩展的潜力——例如将弱透镜与FRB色散测量、CMB次级各向异性联合反演，利用扩散先验统一描述不同探针共享的三维物质场。这一多探针联合推断方向是该方法在知识库中的自然延伸。
+
+
 
 ## 原文 PDF
 

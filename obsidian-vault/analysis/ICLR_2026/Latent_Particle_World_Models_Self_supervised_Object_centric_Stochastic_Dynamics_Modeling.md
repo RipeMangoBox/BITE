@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Latent_Particle_World_Models_Self_supervised_Object_centric_Stochastic_Dynamics_Modeling.pdf
+project_link: https://taldatech.github.io/lpwm-web
+code_link: null
 openreview_forum_id: lTaPtGiUUc
 aliases:
 - LPWML
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 潜在粒子世界模型：自监督对象中心随机动力学建模 |
 | 英文题名 | Latent Particle World Models: Self-supervised Object-centric Stochastic Dynamics Modeling |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=lTaPtGiUUc); [Project](https://taldatech.github.io/lpwm-web) |
+| Links | [paper](https://openreview.net/forum?id=lTaPtGiUUc) · [Project](https://taldatech.github.io/lpwm-web) |
 | Topic | #topic/representation_self_supervised_transfer #topic/representation_self_supervised_transfer/representation_learning |
 | Method | Latent Particle World Models (LPWM) |
 | Dataset | Sketchy-U, LanguageTable-A, Bridge-L, PandaPush 1-Cube |
@@ -42,7 +44,7 @@ claims:
 > - LanguageTable-A 上，FVD↓ 为 15.96，对比 26.78 (DVAE)，变化 -10.82。
 > - Bridge-L 上，FVD↓ 为 47.78，对比 146.85 (DVAE)，变化 -99.07。
 
-## 概述
+## 概要
 
 当前视频世界模型普遍采用固定网格的Patch表示来编码视觉场景，缺乏对象中心的结构化分解能力。这种表示方式与文本领域以语义单元（词、子词）进行建模的范式形成鲜明对比——图像被机械地切分为均匀网格，难以高效捕捉多对象场景中的局部动态与随机交互，且计算开销随分辨率急剧增长。
 
@@ -54,7 +56,7 @@ claims:
 
 消融实验进一步确认：每粒子潜在动作是重建质量的关键（PSNR 28.55 vs 全局池化27.24）；AdaLN位置嵌入优于标准可加性嵌入；潜在动作维度在3到10之间性能稳定。当前局限在于粒子移动范围受限、确定性场景下提升有限，以及潜在策略的泛化能力有待改进。
 
-## 背景与动机
+
 
 ### 视频世界模型的表示瓶颈
 
@@ -87,7 +89,9 @@ claims:
 
 这种设计使LPWM能够同时支持动作、语言、图像目标及多视图等多种条件信号，并在随机动态场景中显著超越现有对象中心基线和patch基线。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 LPWM的核心创新在于将**对象中心的潜在粒子表示**与**每粒子连续潜在动作**相结合，构建了一个无需显式跟踪的随机动力学世界模型。相比现有方法，LPWM在以下四个关键维度上实现了突破。
 
@@ -116,7 +120,7 @@ DDLP等前代粒子模型依赖显式的时序跟踪与滤波来维持粒子身�
 
 LPWM的CONTEXT模块天然支持多种条件信号的统一注入，包括动作、语言（通过T5-large编码）、图像目标和多视图输入。这使得同一预训练模型可灵活适配视频预测、语言条件生成、目标条件模仿学习等多种下游任务，无需架构修改。
 
-## 整体框架
+
 
 LPWM 将视频建模为一个端到端的时序变分自编码器，其核心架构由四个协同模块构成：**ENCODER**、**DECODER**、**CONTEXT** 和 **DYNAMICS**。整体流程遵循“编码—上下文推理—动力学预测—解码”的闭环。
 
@@ -138,7 +142,7 @@ $$\mathcal{L}_{\mathrm{LPWM}} = -\sum_{t=0}^{T-1} ELBO(x_t = I_t) = \mathcal{L}_
 
 这一框架的关键瓶颈突破在于：通过将视频分解为具有显式空间属性的潜在粒子集合，并为每个粒子分配独立的潜在动作，LPWM 在无需跟踪的条件下实现了高效的对象中心随机动力学建模，且计算开销远低于基于固定网格 patch 的方法。
 
-## 核心模块与公式推导
+
 
 LPWM 由四个端到端联合训练的组件构成：编码器（ENCODER）、解码器（DECODER）、上下文模块（CONTEXT）和动力学模块（DYNAMICS）。整体训练目标为最大化时序证据下界（ELBO），损失函数分解为静态项与动态项：
 
@@ -186,7 +190,9 @@ $$
 
 动力学模块采用粒子-网格机制（particle-grid regime）：每个粒子仅在其初始块中心周围的局部区域内移动，当到达区域边界时，其特征被转移至邻近粒子，从而在无需显式跟踪的条件下隐式维护粒子身份。消融实验证实，AdaLN 位置嵌入显著优于标准可加性嵌入（PSNR 28.55 vs 21.54），是模型性能的关键设计选择。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能：随机动态视频预测
 
@@ -257,7 +263,9 @@ LPWM作为世界模型在机器人操作任务中展现出强迁移能力。在P
 ![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_lTaPtGiUUc/figures/023_Table_10.jpg]]
 *Table 10: Quantitative results on language-conditioned (L) video generation. PSNR, SSIM and LPIPS are calculated on latent-action-conditioned video prediction. FVD is reported for stochastic generation by sampling from the latent policy*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心瓶颈与设计动机
 
@@ -304,6 +312,8 @@ LPWM的定位并非取代大型视频生成模型，而是提供一种**对象�
 **（4）策略映射的分布匹配**：为什么策略映射网络在逆动力学输出上性能更好？是否由于潜在策略与真实数据分布不匹配？这可能需要改进潜在策略的训练目标，例如引入对抗训练或分布匹配正则化。
 
 **（5）动态粒子数量**：当前LPWM固定每帧粒子数量M，对于物体进出场景的动态变化缺乏适应性。如何实现自适应粒子分配，使模型能够根据场景复杂度动态调整表示容量，是一个具有挑战性的开放问题。
+
+
 
 ## 原文 PDF
 

@@ -45,15 +45,13 @@ claims:
 > - FLUX.1-dev 上，DPG↑ 80.0 (PPCL 8B) vs 83.8 (-3.8)。
 > - FLUX.1-dev (8B模型) 上，平均性能退化 R(%)↓ 4.03 vs 0 (基模型) (+4.03)。
 
-## 概述
+## 概要
 
 扩散Transformer (Diffusion Transformer, DiT) 已成为文生图领域的主流架构，但其数十亿参数量带来的高昂计算成本，严重制约了在资源受限场景下的部署。现有结构化剪枝方法面临三重困境：**缺乏对多模态 DiT (MMDiT) 的通用性**、**无法灵活配置可插拔的剪枝率**、以及**对深层模型中层间依赖关系的理解不足**，导致剪枝后生成质量显著退化。
 
 本文提出 **PPCL (Pluggable Pruning with Contiguous Layer Distillation)**，一种面向扩散Transformer的可插拔剪枝框架。其核心发现是：**MMDiT 中的层冗余呈深度方向的连续性**——连续移除若干相邻层带来的性能退化远小于非连续移除 (Figure 2)。基于此洞察，PPCL 通过**线性探针建模层的可替代性**，结合**中心核对齐 (CKA) 相似度的一阶差分趋势分析**，自动识别具有深度连续性的冗余层区间；进而采用**非顺序教师-学生蒸馏方案**，在单一训练阶段内完成深度与宽度剪枝，避免传统顺序蒸馏中的误差累积，实现推理时按需激活层的可插拔推理。
 
 在 Qwen-Image 和 FLUX.1-dev 上的实验表明，PPCL 可将模型参数量削减至原始的 30%–50%，推理速度提升 1.3–1.8 倍，GPU 显存占用降低超过 30%。其中，在 Qwen-Image 上实现 50% 参数缩减时，关键目标指标退化低于 3%。该方法已开源，代码及模型权重可在 GitHub 和 Hugging Face 获取。
-
-## 背景与动机
 
 扩散模型已成为视觉内容生成的核心技术。近年来，扩散Transformer（Diffusion Transformer, DiT）凭借其卓越的生成质量，逐步取代U-Net成为主流骨干架构，并被广泛应用于多模态生成任务（MMDiT）。然而，这类模型参数量通常高达数十亿级别——例如Qwen-Image拥有约20B参数，FLUX.1-dev约12B参数——导致极高的推理延迟与显存占用，严重制约了其在资源受限场景下的部署可行性。
 
@@ -65,7 +63,7 @@ claims:
 
 **核心动机**。本文旨在回答一个根本问题：*能否在单一训练阶段内，自动识别连续冗余层区间，并完成深度与宽度两个维度的剪枝，同时保持推理时可动态调整剪枝率的灵活部署能力？* 这一目标要求同时解决冗余检测的自动化、蒸馏过程的误差隔离，以及剪枝后模型的可插拔推理三个相互耦合的技术挑战。
 
-## 核心创新
+## 核心方法与创新机理
 
 PPCL 的核心创新在于对多模态扩散 Transformer (MMDiT) 层冗余模式的重新审视，以及一套与之深度耦合的“检测‑蒸馏”协同剪枝框架。其关键创新点可归纳为三个相互关联的 changed slots。
 
@@ -97,8 +95,6 @@ PPCL 的核心创新在于对多模态扩散 Transformer (MMDiT) 层冗余模式
 
 上述三个 changed slots 并非孤立设计，而是形成了一条因果链路：**线性探针检测连续冗余区间 → 非顺序蒸馏在区间内独立优化 → 宽度剪枝进一步压缩区间内结构**。这一协同使得 PPCL 具备“可插拔”特性——推理时可根据资源约束动态调整激活的层数，无需重新训练。在 Qwen-Image 上，PPCL 将参数减半（20B → 10B），关键目标指标退化低于 3%；在 FLUX.1-dev 上，8B 变体的平均性能退化仅为 4.03%，显著优于同等压缩比下的对比方法（Table 1）。
 
-## 整体框架
-
 PPCL 的整体流程由两个递进阶段构成：**深度剪枝 (Depth-wise Pruning)** 与**宽度剪枝 (Width-wise Pruning)**，二者在单一训练阶段内通过非顺序教师‑学生蒸馏方案有机衔接，最终输出一个可按需配置激活层数的可插拔压缩模型（Figure 3、Algorithm 1）。
 
 ![[assets/figures/papers/paper_list_l913_https_arxiv_org_abs_2511_16156/figures/003_Figure_3.jpg]]
@@ -129,13 +125,6 @@ PPCL 的整体流程由两个递进阶段构成：**深度剪枝 (Depth-wise Pru
 ### 训练与推理特性
 
 深度剪枝与宽度剪枝共享同一教师模型，在 6k 步深度蒸馏后接续 2k 步宽度蒸馏（8 张 H20 GPU，microbatch=2），最后辅以 1k 步全参数微调恢复性能。由于非顺序蒸馏使每个剪枝模块独立优化，推理时可根据资源约束灵活增减激活层数，无需重新训练，实现了真正的“可插拔”部署。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l913_https_arxiv_org_abs_2511_16156/figures/017_Figure.jpg]]
-*Figure: Modify it into a digital illustration style. Write "抬高80公分" on the underline*
-
-## 核心模块与公式推导
 
 ### 整体框架：两阶段剪枝流水线
 
@@ -228,16 +217,10 @@ $$\mathcal{L}_{width}^{j} = \| \mathrm{Norm}(S_{width}^{j}(T_{j-1}^D)) - \mathrm
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l913_https_arxiv_org_abs_2511_16156/figures/002_Figure_2.jpg]]
-*Figure 2: Performance of Qwen-Image on LongText-Bench under three layer removal strategies: individual layers, contiguous layers, and non-contiguous layers. The x-axis denotes the index of the removed layer(s), and the y-axis indicates the accuracy. The pale-yellow zone in the lower-left indicates the mean accuracy for each of the three removal strategies*
-
-![[assets/figures/papers/paper_list_l913_https_arxiv_org_abs_2511_16156/figures/005_Figure_5.jpg]]
-*Figure 5: MMDiT’s text/image stream CKA heatmaps: Text stream shows high cross-layer similarity with substantial redundancy; Image stream exhibits smooth diagonal similarity decay, reflecting sequential feature evolution with minimal redundancy*
-
 ![[assets/figures/papers/paper_list_l913_https_arxiv_org_abs_2511_16156/figures/004_Figure_4.jpg]]
 *Figure 4: Subjective comparison of complex text rendering in Qwen-Image when randomly removing contiguous and non-contiguous blocks. Columns 1 and 3 show the results for contiguous layer removal, while columns 2 and 4 correspond to non-contiguous layer removal*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心发现：连续层冗余是 DiT 剪枝的关键杠杆
 
@@ -275,18 +258,7 @@ Table 2 通过逐步叠加各模块，量化了 PPCL 各组件的独立贡献。
 
 此外，论文明确指出两项技术局限：(1) 基于 CKA 一阶差分的冗余区间检测缺乏严格理论支撑，仅作为经验启发式方法，在不同架构和数据集上的稳定性有待验证；(2) 剪枝后应用 INT4 量化会导致显著的性能下降，因为剪枝缩小了参数分布范围，使得粗粒度量化难以捕捉精细的参数结构。这两点构成了 PPCL 在更极致压缩场景下的应用边界。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l913_https_arxiv_org_abs_2511_16156/figures/009_Table_3.jpg]]
-*Table 3: Detailed experimental results on DPG and GenEval*
-
-![[assets/figures/papers/paper_list_l913_https_arxiv_org_abs_2511_16156/figures/010_Table_4.jpg]]
-*Table 4: Detailed experimental results on OneIG-EN*
-
-![[assets/figures/papers/paper_list_l913_https_arxiv_org_abs_2511_16156/figures/012_Table_5.jpg]]
-*Table 5: Detailed experimental results on OneIG-ZH*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 剪枝方法谱系中的位置
 

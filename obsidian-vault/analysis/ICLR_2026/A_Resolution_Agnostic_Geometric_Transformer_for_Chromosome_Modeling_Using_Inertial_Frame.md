@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/A_Resolution_Agnostic_Geometric_Transformer_for_Chromosome_Modeling_Using_Inertial_Frame.pdf
+project_link: null
+code_link: https://github.com/yize1203/InertialGenome
 aliases:
 - RAGTCMUIF
 - InertialGenome
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 基于惯性框架的分辨率无关几何Transformer用于染色体建模 |
 | 英文题名 | A Resolution-Agnostic Geometric Transformer for Chromosome Modeling Using Inertial Frame |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=OwLl8Xi6JG); [GitHub](https://github.com/yize1203/InertialGenome) |
+| Links | [paper](https://openreview.net/forum?id=OwLl8Xi6JG) · [GitHub](https://github.com/yize1203/InertialGenome) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/genetics_cell_biology_health_etc |
 | Method | InertialGenome |
 | Dataset | Frontal cortex cell test set, B-Lymphocyte cell test set |
@@ -41,7 +43,7 @@ claims:
 > - Frontal cortex cell test set 上，dRMSE 为 0.1547 (IG-3DMAX, 320kb)，对比 0.1453 (3DMAX, 320kb)，变化 +0.0094 (数值略高，但dSCC显著提升)。
 > - B-Lymphocyte cell test set 上，dSCC 为 0.9209 (IG-3DMAX, 1MB)，对比 0.9012 (3DMAX, 1MB)，变化 +0.0197。
 
-## 概述
+## 概要
 
 基于Hi-C接触矩阵的染色体三维重建是理解基因组空间组织与功能的核心问题。现有深度学习方法（如HiC-GNN、HiCEGNN）受限于模型表达能力不足和跨分辨率泛化能力差：HiCEGNN的SE(3)-等变约束难以处理非对称结构（如锚定环），且所有方法仅依赖接触矩阵，缺乏显式几何先验（如染色质主轴或方向性链结构），导致在精细分辨率下性能显著下降。
 
@@ -51,7 +53,7 @@ claims:
 
 方法定位上，InertialGenome通过显式姿态规范化替代SE(3)-等变网络的隐式处理，为染色体3D重建提供了一种更灵活、表达能力更强的替代方案。主要局限包括：当前仅使用Hi-C接触矩阵，未整合多模态基因组数据；惯性框架的稳定性依赖于初始坐标的谱间隙，当谱间隙很小时（如Gram嵌入），主轴对齐可能不稳定。
 
-## 背景与动机
+
 
 从Hi-C接触矩阵重建染色质三维结构是理解基因组空间组织与功能的核心问题。现有方法主要分为两类：一是基于距离几何的数值优化方法（如3DMAX、LorDG），二是近年兴起的深度学习方法（如HiC-GNN、HiCEGNN）。然而，这两类方法均面临根本性瓶颈。
 
@@ -59,7 +61,9 @@ claims:
 
 本文的动机正是针对上述三个核心缺口：**表达能力受限**、**对称性假设与真实结构矛盾**、**缺乏几何先验导致跨分辨率脆弱**。作者提出InertialGenome，其核心洞察在于：通过惯性框架（Inertial Frame）对输入坐标进行姿态规范化，将任意旋转/平移下的染色质坐标对齐到由惯性张量主轴定义的标准坐标系，从而在数据预处理阶段消除姿态变化，而非依赖网络架构的等变性。这一设计解耦了物理约束与模型架构，允许使用表达能力更强的Transformer直接学习结构特征。同时，结合基于Nyström估计的几何感知位置编码，高效捕获长程结构依赖，实现分辨率无关的鲁棒表示。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 InertialGenome 的核心创新在于将**姿态规范化（Pose Canonicalization）**与**几何感知位置编码**相结合，使 Transformer 能够学习分辨率无关的鲁棒染色体 3D 表示，从而突破了现有方法（如 HiC-GNN、HiCEGNN）在模型表达能力和跨分辨率泛化上的瓶颈。
 
@@ -82,7 +86,7 @@ InertialGenome 的核心创新在于将**姿态规范化（Pose Canonicalization
 
 **证据强度说明**：上述证据置信度均≥0.95，但需注意惯性框架的稳定性依赖于初始坐标的谱间隙——当谱间隙很小时（如 Gram 嵌入），主轴对齐可能不稳定，该局限性在论文中明确讨论但未完全解决。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0003_OwLl8Xi6JG_A_Resolution-Agnostic_Geometric_Transformer_for/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of chromosome 3D reconstruction using Hi-C technology. (A): Experimental implementation of Hi-C for obtaining contact matrix information. (B): Computational pipeline for 3D structure reconstruction via mathematical modeling or machine learning based on the Hi-C contact matrix*
@@ -103,7 +107,7 @@ InertialGenome的整体pipeline采用“数值初始化 → 姿态规范化 → 
 
 **证据强度评估**：pipeline整体架构的各个模块均有明确的公式定义和消融实验支持（Table 7），但“惯性框架稳定性依赖于谱间隙”这一机制仅在附录中通过Gram vs. 3DMAX对比验证（Table 4, Figure 5），缺乏对不同谱间隙阈值下性能的系统性分析。此外，pipeline在极精细分辨率（如10kb以下）上的行为尚未验证，这是需要后续研究补充的开放问题。
 
-## 核心模块与公式推导
+
 
 InertialGenome 的核心创新在于将物理惯性框架与基于Nyström估计的几何感知Transformer相结合，替代了传统SE(3)-等变网络的隐式姿态处理。其核心模块包括：惯性框架规范化、几何感知位置编码（3D-RoPE + Nyström编码）、以及混合损失函数。
 
@@ -160,7 +164,9 @@ $$
 
 **关键分析**：消融实验（Table 6）表明，当 $\alpha=0.1/0.5$ 时取得最佳权衡，而纯结构损失（$\alpha=1.0$）在精细分辨率上dRMSE显著升高，说明纯粹的拓扑约束不足以精确回归坐标。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：InertialGenome在单细胞Hi-C重建中全面超越基线
 
@@ -210,7 +216,9 @@ FISH验证（Table 9）在GM12878细胞系的三个染色体（11、14、17）�
 
 4. **实验泛化范围有限**：当前验证仅覆盖两个单细胞Hi-C数据集（Frontal cortex和B-Lymphocyte），且未涉及多模态数据（如ChIP-seq、RNA-seq）的整合。模型在群体Hi-C或其它物种上的表现尚待验证。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -241,6 +249,8 @@ InertialGenome 的适用性受以下条件约束：
 2. **自适应谱间隙**：是否存在自适应调整惯性对齐策略的方法？例如，当谱间隙低于阈值时，降级为 SE(3)-等变网络或使用其他规范化策略。
 3. **任务泛化性**：InertialGenome 的“姿态规范化 + 几何感知 Transformer”范式能否推广到其他生物分子结构预测任务（如蛋白质结构预测、RNA 二级结构建模）？这需要验证惯性框架在非染色体系统（如非连续、非链状结构）中的有效性。
 4. **Nyström 配置优化**：Nyström 位置编码中锚点数量和 RBF 核尺度参数的选择对性能的影响尚未系统研究。是否存在与分辨率相关的自适应配置策略？
+
+
 
 ## 原文 PDF
 

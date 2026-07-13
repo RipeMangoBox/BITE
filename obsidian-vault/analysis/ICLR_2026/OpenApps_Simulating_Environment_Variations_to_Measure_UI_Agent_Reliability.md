@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/OpenApps_Simulating_Environment_Variations_to_Measure_UI_Agent_Reliability.pdf
+project_link: https://facebookresearch.github.io/OpenApps/
+code_link: null
 openreview_forum_id: cj1MAx7lKs
 aliases:
 - OpenApps
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | OpenApps：模拟环境变化以衡量UI代理可靠性 |
 | 英文题名 | OpenApps: Simulating Environment Variations to Measure UI Agent Reliability |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=cj1MAx7lKs); [Project](https://facebookresearch.github.io/OpenApps/) |
+| Links | [paper](https://openreview.net/forum?id=cj1MAx7lKs) · [Project](https://facebookresearch.github.io/OpenApps/) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/planning_control |
 | Method | OPENAPPS |
 | Dataset | UI-TARS-1.5-7B on OpenApps with varying screen resolution and appearance, GPT-4o on OpenApps with content variations, Qwen2.5-VL on OpenApps with content variations |
@@ -41,7 +43,7 @@ claims:
 > - GPT-4o on OpenApps with content variations 上，Avg. Invalid Action Count 为 0.07 (adversarial descriptions)，对比 0.00 (default)，变化 +0.07。
 > - Qwen2.5-VL on OpenApps with content variations 上，Intent Misunderstanding Rate 为 0.40-0.45 (long/adversarial content)，对比 0.03 (default)，变化 +0.40~0.42。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -71,7 +73,7 @@ OPENAPPS 采用强化学习框架组织代理与环境的交互：环境状态 $
 
 这些发现共同指向一个核心结论：**应用变体维度是评估 UI 代理可靠性不可或缺的维度**，忽略这一维度将导致对代理部署能力的严重误判。
 
-## 背景与动机
+
 
 ### UI代理的部署瓶颈：从固定环境到分布外变体
 
@@ -95,7 +97,9 @@ OpenApps的工作揭示了一个严峻的现实：固定应用评估普遍高估
 
 OpenApps通过可配置的YAML文件定义应用的初始状态，涵盖外观（主题、字体、颜色）和内容（文本、语言、对抗性描述）两大类变化因素。代理通过BrowserGym标准动作接口与环境交互，任务成功则由基于完整应用状态的精确指标函数判定——只有当环境状态完全达到目标状态时，奖励才为1，否则为0（见第3.3节）。这一设计确保了评估信号的不可操纵性，并为分析代理在不同变体下的失败模式（如循环行为、无效动作幻觉、意图误解）提供了干净的因果归因基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 OPENAPPS 的核心创新在于将 UI 代理的评估从“固定应用副本”范式转向“可控应用变体”范式，从而首次系统性地测量代理在分布外环境下的可靠性。这一转变通过三个关键设计实现：**可配置的应用变异性**、**轻量级可扩展架构**，以及**基于完整状态的精确评估机制**。
 
@@ -130,7 +134,7 @@ $$r = \delta_{[s_t = s_{\mathrm{target}}]}$$
 
 实验证据直接验证了这一创新逻辑的有效性：对于 Qwen2.5-VL、Kimi-VL 和 UI-Tars，跨应用变体的任务成功率标准差是固定应用内部的两倍以上（Section 4.1），而 Kimi-VL-3B 的平均成功率在不同应用版本间从 63% 剧烈波动至仅 4%（ABSTRACT），充分说明应用变体维度是评估 UI 代理可靠性时不可忽视的关键盲点。
 
-## 整体框架
+
 
 OPENAPPS 将代理与应用的交互组织为标准强化学习框架。环境状态 $s_t$ 由设计与内容变量定义，并从 YAML 规格文件初始化。在每个时间步 $t$，代理接收来自 OPENAPPS 的观察 $o_t$（视觉截图以及针对支持文本输入的代理提供的 AX Tree 简化文本表示），随后通过 BrowserGym 动作 API 发出动作 $a_t$。动作空间包含人类常用操作（点击、输入、滚动等），直接作用于 OPENAPPS 环境。任务成功与否通过检查底层应用状态 $s_t$ 是否达到目标状态来评估，奖励函数定义为确定性指示函数：
 
@@ -150,7 +154,7 @@ $$r = \delta_{[s_t = s_{\mathrm{target}}]}$$
 
 整个系统在单个轻量级 Python 进程中运行，内存占用小于 10MB，单 CPU 即可部署。这种设计使得在普通硬件上即可并行运行数千个独立实验，无需专用模拟器或容器环境（如 WebArena 需超过 100GB 内存）。应用状态与逻辑完全以 Python 代码暴露，便于研究者直接分析代理行为或扩展新功能。
 
-## 核心模块与公式推导
+
 
 ### 核心模块
 
@@ -188,7 +192,9 @@ $$\frac{1}{nd} \sum_{r_i \in \{R_{v1}, \ldots, R_{vd}\}} \left| r_i - \frac{1}{n
 
 此外，单个应用版本的固定变化因素集合被形式化为 $A_1 = \{f_{1,1}, f_{1,2}, f_{1,3}, \ldots\}$，其中每个 $f$ 代表一个独立的变化维度（如主题、字体、语言）。这一形式化为后续探索多因素交互效应提供了基础框架。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：固定应用评估系统性高估代理可靠性
 
@@ -280,7 +286,9 @@ Table 10 测试了流行字体、颜色和语言选择下的任务成功率。�
 ![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_cj1MAx7lKs/figures/014_Table_4.jpg]]
 *Table 4: Breakdown of model performance by task. Model performance (as measured by pass@1 over random seeds) on all tasks. We report the mean absolute deviation (MAD) and standard deviation (std) of rewards over random seeds. We use the default environment content and appearance, and the task prompt is explicit and fixed. All models use visual and AX tree inputs, with the exception of UI-TARS, which is a UI-visual only model*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法定位与基线关系
 
@@ -333,6 +341,8 @@ OPENAPPS 的设计存在以下适用边界，使用和解读时需注意：
 4. **扩展任务复杂度**：将 OPENAPPS 的任务集扩展到更复杂、更长周期的场景，使其能够作为标准化的 UI 代理可靠性基准。这需要在保持环境可控性的同时增加任务的现实性和难度。
 
 5. **人机协同场景的可靠性**：在人类提供监督或干预的混合自主模式下，应用变体对代理可靠性的影响是否呈现不同模式？人类反馈能否有效补偿代理对特定变体的脆弱性？
+
+
 
 ## 原文 PDF
 

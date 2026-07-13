@@ -41,7 +41,7 @@ claims:
 > - Tanks & Temples 上，PSNR 23.81 vs 23.32 (SRGS) (+0.49)；LPIPS 0.272 vs 0.286 (SRGS) (-0.014)。
 > - Deep Blending 上，PSNR 29.01 vs 28.43 (Mip-Splatting) (+0.58)；SSIM 0.872 vs 0.861 (SRGS) (+0.011)。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -83,7 +83,7 @@ SplatSuRe 的选择性策略使SR成为3D重建的“按需补充”而非“全
 
 当前方法在锐利边界或高对比度区域仍可能出现少量伪影，且仅基于屏幕空间半径比判定采样充足性，未考虑纹理频率本身。在场景多视图采样极度密集时（如Mip-NeRF 360数据），方法优势减弱。未来工作可探索多尺度或频域的高斯保真度评估、动态阈值调整，以及将该选择框架推广至其他神经渲染表示（如NeRF系列）。
 
-## 背景与动机
+
 
 ### 3D高斯泼溅与多视图重建的困境
 
@@ -110,7 +110,9 @@ SplatSuRe的动机源于一个关键观察：**多视图LR数据中蕴含的高�
 
 基于这一洞察，SplatSuRe提出了一种**选择性超分辨率**策略：首先从LR预训练的3DGS模型中提取每高斯的屏幕空间半径比，将其映射为**高斯保真度分数**，量化每个三维区域的高频信息充足程度；然后渲染为逐视图的空间权重图，仅在欠采样区域赋予高SR权重，在已充分采样区域抑制SR监督。这种“按需注入”的方式在保持多视图几何一致性的前提下，最大化地利用SR模型的生成能力来提升渲染锐度。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SplatSuRe 的核心创新在于将单图超分辨率（SISR）以**选择性、视图一致的方式**注入 3D Gaussian Splatting（3DGS）的重建流程，而非简单地统一应用 SR。其关键洞察是：**低分辨率（LR）训练视图之间存在天然的采样密度差异**——近景视图中的某个区域在远景视图中可能呈现为高频细节，因此并非所有像素都需要等量的生成式 SR 监督。基于此，方法设计了一套从“三维高频充足性评估”到“二维空间加权监督”的完整机制，从根本上改变了 SR 与 3DGS 的交互方式。
 
@@ -144,7 +146,7 @@ SplatSuRe 的核心创新在于将单图超分辨率（SISR）以**选择性、�
 - **vs. 先 SR 后重建（如 3DGS + StableSR）**：该基线在训练前对 LR 图像逐一超分，SR 模型的多视图不一致性被固化到输入中。SplatSuRe 将 SR 作为训练中的软约束，通过权重图灵活调节其影响。
 - **vs. 仅用 LR（如 3DGS LR）**：完全放弃 SR 导致渲染模糊，缺乏高频几何细节。SplatSuRe 在需要处精准注入 SR，在不需要处保持 LR 监督的视图一致性，实现了锐度与一致性的最优折衷。
 
-## 整体框架
+
 
 SplatSuRe 的核心思路是 **“仅在高频信息不足的区域引入生成式超分辨率，其余区域由多视图低分辨率一致性约束”**。其整体流水线由五个紧密耦合的模块构成，形成一条从低分辨率几何估计到选择性超分监督的闭环。
 
@@ -211,7 +213,7 @@ $$\mathcal{L} = (1 - \gamma) \mathcal{L}_{LR} + \gamma \mathcal{L}_{SR}$$
 
 消融实验表明，适度的 SR 使用（$\tau=1.1$）在锐度与一致性之间取得最佳折衷，而统一训练流程（合并预训练与微调）可在不牺牲性能的前提下减少训练开销（Table 6）。
 
-## 核心模块与公式推导
+
 
 SplatSuRe 的核心在于构建一个**空间自适应的超分辨率监督机制**，通过量化每个三维区域在多视图中的高频信息充足性，仅在欠采样区域注入生成式细节。整个流水线围绕三个关键模块展开：高斯保真度分数计算、逐视图权重图渲染、以及选择性 SR 损失加权。
 
@@ -282,7 +284,9 @@ $$\mathcal{L}_{SR} = (1 - \lambda) \mathcal{L}_{1}^{W}(R_{HR}, I_{SR}) + \lambda
 ![[assets/figures/papers/paper_list_l2600_https_arxiv_org_abs_2512_02172/figures/004_Figure_4.jpg]]
 *Figure 4: Super-resolution weight maps. Bright regions indicate areas where generative detail is required, while dark regions correspond to areas well-sampled by other low-resolution views. Note that high weights are obtained in regions that are either not sampled closely, such as background trees behind the tractor, or where other views do not provide higher resolution information, such as the foreground table in the ballroom*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -340,7 +344,9 @@ SplatSuRe 在三个主流基准上均取得一致的指标领先。在 **Tanks &
 ![[assets/figures/papers/paper_list_l2600_https_arxiv_org_abs_2512_02172/figures/014_Figure_8.jpg]]
 *Figure 8: Representative scenes that plateau in image quality or continue to benefit from increased amounts of super-resolution. Top: Image quality vs. ratio threshold plots. Bottom: ground truth images illustrating scene structure for (a) bicycle, (b) garden, and (c) stump from Mip-NeRF 360 [1]. Applying SR to the most poorly sampled regions yields large gains in image quality, while further increasing SR yields diminishing returns or no improvement. In particular, this occurs in scenes where the input images already contain substantial high-frequency detail and SR produces simpler sharpening or edge-enhancement effects rather than hallucinating new structure, making uniform application less harmful...*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 
@@ -376,6 +382,8 @@ SplatSuRe 的突破在于将“是否施加 SR”从**全局二值决策**变为
 3. **阈值 τ 的自适应调节**：当前 τ 为全局超参数，需手动调节以平衡锐度与一致性。能否在训练过程中根据场景统计或损失动态自适应调整 τ，是提升方法易用性的关键问题。
 
 4. **向其他神经渲染表示的推广**：高斯保真度分数的核心思想——基于多视图采样密度评估高频充足性——不依赖于 3DGS 的具体表示。该框架能否迁移到 NeRF 系列方法（通过沿光线的采样密度或射线覆盖范围定义类似度量），值得探索。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/VPI_Bench_Visual_Prompt_Injection_Attacks_for_Computer_Use_Agents.pdf
+project_link: https://huggingface.co/datasets/VPI-Bench/vpi-bench
+code_link: https://github.com/cua-framework/agents
 openreview_forum_id: UMauKu2azg
 aliases:
 - VB
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | VPI-Bench：计算机使用代理的视觉提示注入攻击 |
 | 英文题名 | VPI-Bench: Visual Prompt Injection Attacks for Computer-Use Agents |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=UMauKu2azg); [GitHub](https://github.com/cua-framework/agents); [Project](https://huggingface.co/datasets/VPI-Bench/vpi-bench) |
+| Links | [paper](https://openreview.net/forum?id=UMauKu2azg) · [GitHub](https://github.com/cua-framework/agents) · [Project](https://huggingface.co/datasets/VPI-Bench/vpi-bench) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | VPI-Bench |
 | Dataset | Amazon (Sonnet-3.7 CUA vs GPT-5 BUA), Booking, BBC, Messenger |
@@ -42,7 +44,7 @@ claims:
 > - Booking 上，Attack Success Rate 为 36.67% (Sonnet-3.7 CUA)，对比 84.2% (GPT-5 BUA)，变化 -47.53%。
 > - BBC 上，Attack Success Rate 为 16.67% (Sonnet-3.7 CUA)，对比 96.5% (GPT-5 BUA)，变化 -79.83%。
 
-## 概述
+## 概要
 
 当前基于视觉的计算机使用代理（CUA）与浏览器使用代理（BUA）在端到端交互中存在一个根本性瓶颈：它们无法可靠地区分用户的良性任务指令与视觉注入的恶意指令，导致代理可能执行未授权操作或泄露隐私信息。VPI-Bench 正是针对这一安全缺口而构建的基准测试，其核心洞察在于——恶意视觉提示与用户任务上下文之间的语义一致性，是决定攻击能否成功的关键调节变量。
 
@@ -50,7 +52,7 @@ claims:
 
 **核心发现**：实验揭示当前代理普遍存在严重漏洞——CUA 在某些平台上被欺骗率高达 51%，而 BUA 的攻击成功率可达 100%（如 GPT-5 在 Amazon 和 BBC 上均达 96.5%）。相比之下，推理能力较弱的模型如 UI-TARS（7B）虽然尝试率较高（Amazon 78.95%，Messenger 70%），但因执行能力不足，攻击成功率为 0%。消融实验进一步表明：简单的系统提示防御对攻击成功率和尝试率均无显著影响，而任务语义相关性则显著左右攻击效果——例如在邮件场景中，回复任务（与攻击语义高度相关）的尝试率达 96.67%，而摘要任务（语义偏离较大）仅 16.67%。这些结果共同指向一个结论：现有防御手段几乎无效，代理的安全脆弱性根植于其对视觉上下文缺乏意图层面的判别能力。
 
-## 背景与动机
+
 
 计算机使用代理（Computer-Use Agents, CUAs）与浏览器使用代理（Browser-Use Agents, BUAs）正在成为新一代人机交互范式：用户以自然语言下达任务，代理直接操控图形界面或浏览器完成端到端操作。然而，这种能力也带来了根本性的安全挑战——代理的视觉感知通道可能被恶意利用，形成**视觉提示注入**（Visual Prompt Injection, VPI）攻击。
 
@@ -66,7 +68,9 @@ VPI攻击的核心机制在于：攻击者将恶意指令编码为视觉内容�
 
 VPI-Bench正是在这一背景下提出的：它构建了包含306个测试用例的基准，覆盖Amazon、Booking、BBC、Messenger和Email五类典型网络平台，通过伪真网页和沙箱执行环境模拟完整的攻击链——从恶意视觉内容注入，到代理执行未授权操作（如删除文件、上传隐私数据），再到基于多数投票的LLM评判器自动判定攻击是否尝试和成功。该基准旨在为社区提供一个可复现的评估框架，推动对计算机使用代理安全性的系统性研究。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 VPI-Bench 的核心创新在于首次将**黑盒视觉提示注入（Visual Prompt Injection, VPI）** 的攻击链完整建模为一个端到端的威胁评估框架，填补了现有工作仅关注文本级注入而忽略视觉通道的空白。该工作的关键设计围绕一个核心因果调节变量展开：**恶意视觉提示与用户任务上下文的一致性（语义相关度）**。
 
@@ -80,7 +84,7 @@ VPI-Bench 的核心创新在于首次将**黑盒视觉提示注入（Visual Prom
 
 综上，VPI-Bench 的创新不在于提出新的防御算法，而在于通过系统化的基准设计，揭示并量化了当前计算机使用代理（CUA）和浏览器使用代理（BUA）在视觉注入攻击面前的系统性脆弱性，并为后续防御研究提供了明确的因果分析框架和可复现的评估基础设施。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_UMauKu2azg/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the VPI threat model: each sample contains (1) a benign user prompt for a normal task, (2) a pseudo-authentic yet potentially compromised web platform, (3) a visual attack prompt injected by the attacker, and (4) an environment setup aligned with the attack to monitor unauthorized actions like file deletion or data exfiltration*
@@ -117,7 +121,7 @@ VPI-Bench 构建了一个端到端的威胁模型与评估流水线，用于系�
 
 整体框架的因果调节变量是**恶意视觉提示与用户任务上下文之间的语义相关性**——后续实验表明，当恶意指令与良性任务在语义上高度相关时（如“回复邮件”场景），攻击尝试率可达 96.67%；而当语义关联较弱时（如“摘要邮件”场景），尝试率骤降至 16.67%。这一发现揭示了 VPI 攻击有效性的核心机制：代理并非无差别地执行任何视觉指令，而是更容易被那些与当前任务上下文“看起来合理”的注入内容所欺骗。
 
-## 核心模块与公式推导
+
 
 VPI-Bench 的评估体系围绕**威胁模型**、**攻击注入机制**、**自动化评判**三个核心模块构建。
 
@@ -167,7 +171,9 @@ $$\mathrm{SR} = \frac{N_{\mathrm{successful}}}{N}$$
 
 除二值指标外，VPI-Bench 还通过 LLM 对代理行为进行细粒度分类（Section 4.4，Figure 3），将执行结果分为四类：**成功执行**（红色调）、**部分执行**、**执行失败**（橙色调）、**攻击识别**（绿蓝色调），从而揭示不同模型在攻击面前的微观行为差异。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：跨模型与平台的脆弱性全景
 
@@ -226,7 +232,9 @@ LLM 评判器的多数投票机制在人工标注真实数据上校准后达到�
 ![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_UMauKu2azg/figures/017_Table_4.jpg]]
 *Table 4: Compute-hour usage per experiment*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 威胁模型与评测基准的定位
 
@@ -274,6 +282,8 @@ VPI-Bench 是首个针对计算机使用代理（CUA）和浏览器使用代理�
 4. **人机操作区分**：哪些系统级机制能够可靠区分 AI 代理发起的操作与人类发起的操作？这对于事后审计和实时阻断至关重要。
 
 5. **隐蔽注入与检测的对抗**：未来研究应探索向用户隐藏恶意提示的技术（如透明覆盖层、短暂闪现），同时确保依赖截图视觉输入的 AI 代理仍能检测到它们，这构成了攻击与防御的持续对抗。
+
+
 
 ## 原文 PDF
 

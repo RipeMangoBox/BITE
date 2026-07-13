@@ -45,7 +45,7 @@ claims:
 > - PIE (Change Object Pose, SD3) 上，LPIPS ×10³ (↓) 91.4 vs 102.6 (FlowEdit) (-11.2)。
 > - PIE (Change Image Style, SD3) 上，CLIP edited (↑) 23.26 vs 22.87 (FlowEdit) (+0.39)。
 
-## 概述
+## 概要
 
 文本到图像编辑的核心挑战在于：如何在根据目标文本语义修改图像内容的同时，最大限度地保留源图像中不应被编辑区域的细节与结构。现有基于校正流（Rectified Flow）模型的编辑方法，如 RFDS，通过直接优化目标速度场与理想数据动态之间的差异来驱动编辑，但这一过程会不加区分地优化整幅图像，导致严重的**过度平滑**与**细节丢失**（Figure 1）。
 
@@ -59,7 +59,7 @@ DRFS 在方法谱系中占据独特位置：它统一了此前两种重要的校
 
 在 **PIE 基准**上的定量评估表明，DRFS 在 SD3 模型上取得了编辑区域 CLIP 相似性 23.83 的最佳成绩，同时背景保留指标 LPIPS 仅为 93.81，远优于同类蒸馏编辑方法 iRFDS 的 186.39（Table 1）。消融实验进一步证实：$c_t \simeq (1-t)t$ 的抛物线调度是实现编辑质量与保真度最佳折中的关键因素，而降序时间步调度器则通过由粗到细的优化策略进一步提升了结果的一致性。
 
-## 背景与动机
+
 
 ### 从扩散模型到校正流：编辑范式的演进
 
@@ -93,7 +93,9 @@ RFDS 过度平滑的深层原因在于**模型-数据不匹配（model-data mism
 
 值得注意的是，DRFS 在理论上统一了两种看似迥异的方法：当 $c_t=0$ 时，DRFS 退化为 DDS（Delta Denoising Score）；当 $c_t=t$ 时，DRFS 退化为 FlowEdit。这一统一性不仅提供了归纳性的理论支撑，也揭示了偏移系数 $c_t$ 作为**编辑路径直线度与更新幅度的控制旋钮**的关键角色（见 Figure 3）。通过选择中间值 $c_t \simeq (1-t)t$，DRFS 在语义对齐与背景保留之间取得了最佳平衡。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DRFS 的核心创新在于两个相互协同的设计：**残差式能量函数**与**时间依赖的偏移项**。二者共同解决了校正流编辑中过度平滑与语义对齐不足的矛盾。
 
@@ -140,7 +142,7 @@ DRFS 采用从高噪声（$t \approx 1$）到低噪声（$t \approx 0$）的降�
 - $c_t$ 的调度仍依赖经验设计，缺乏自动适应机制。
 - 当编辑需要大幅改变结构或面对分布外图像时，编辑强度不足。
 
-## 整体框架
+
 
 DRFS 是一个无需训练的文本驱动图像编辑方法，专为校正流（Rectified Flow）模型设计。其整体流程以源图像和一对文本提示为输入，通过迭代优化目标潜在变量 $x_0^{\mathrm{tgt}}$ 来生成编辑结果。核心 pipeline 由以下模块串联构成：
 
@@ -169,7 +171,7 @@ $$\nabla_{\Theta} \mathcal{E}_{\mathrm{DRFS}} = \mathbb{E}_{t,\varepsilon} \Big[
 ![[assets/figures/papers/paper_list_l2304_https_arxiv_org_abs_2509_05342/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison between RFDS and DRFS (ours). Source prompt: Brown horse walking in a grassy meadow with an autumn forest backdrop and target prompt: Zebra walking in a grassy meadow with an autumn forest backdrop. As shown in (b) and (c), RFDS results in over-smoothing and detail loss. In contrast, DRFS (d) preserves textures*
 
-## 核心模块与公式推导
+
 
 ### 问题定位：RFDS 为何导致过度平滑？
 
@@ -254,7 +256,9 @@ DRFS 提供了统一的理论框架：
 ![[assets/figures/papers/paper_list_l2304_https_arxiv_org_abs_2509_05342/figures/003_Figure_3.jpg]]
 *Figure 3: Effect of the offset coefficient*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能瓶颈与设计动机
 
@@ -336,7 +340,9 @@ DRFS 为知识库贡献了以下可迁移洞察：**在生成模型编辑中，�
 ![[assets/figures/papers/paper_list_l2304_https_arxiv_org_abs_2509_05342/figures/015_Figure_S.4.jpg]]
 *Figure S.4: DRFS gradients. DRFS gradients cancel out in irrelevant parts of the image*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 编辑范式谱系中的位置
 
@@ -381,6 +387,8 @@ DRFS 的核心声明均有强证据支撑：
 - **理论统一性**：Section 4.1 的数学推导严格证明了 DRFS 对 DDS 和 FlowEdit 的归纳关系，置信度高。
 
 需要手动验证的点：DRFS 在 SD3.5 上的性能虽在 Table 1 中有所体现，但论文未提供与 SD3 结果同样详尽的子任务分解，SD3.5 上的优势幅度和一致性需要对照完整数据确认。
+
+
 
 ## 原文 PDF
 

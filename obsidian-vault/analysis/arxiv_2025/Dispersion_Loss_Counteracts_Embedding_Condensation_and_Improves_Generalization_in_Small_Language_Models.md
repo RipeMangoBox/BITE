@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/LM_Dispersion_Dispersion_Loss_Counteracts_Embedding_Condensation.pdf
+project_link: null
+code_link: null
 aliases:
 - DL
 - DLCECIGSLM
@@ -41,7 +43,7 @@ claims:
 > - PIQA (Qwen3-0.6B pre-training) 上，Accuracy see Table 5 vs see Table 5 (+4.0)。
 > - TruthfulQA (Qwen3-0.6B pre-training) 上，Accuracy see Table 5 vs see Table 5 (+7.4)。
 
-## 概述
+## 概要
 
 **核心问题：嵌入凝聚——小模型性能的几何瓶颈。** 小型语言模型（如 GPT2、Qwen3-0.6B）在深层 Transformer 处理中表现出严重的嵌入凝聚（embedding condensation）现象：同一序列中所有 token 的嵌入向量余弦相似度向 1 集中，形成狭窄的方向锥（Figure 1）。相比之下，大模型（如 GPT2-xl、Qwen3-32B）天然更具抵抗该凝聚的能力（Figure 2）。严格控制实验（仅变化 MLP 维度）证实，这种“大模型更抗凝聚”的趋势并非其他架构因素的混淆，而是模型容量本身带来的几何特性（Figure 3）。进一步分析表明，嵌入凝聚在模型初始化后即刻出现，且知识蒸馏等现有策略无法有效缓解（Figure 4、Figure 5）。
 
@@ -53,7 +55,7 @@ claims:
 
 **方法定位。** 分散损失作为一种训练目标层面的正则化策略，区别于向嵌入添加噪声（Jain et al., 2024）或周期性重置嵌入层（Chen et al., 2023）等间接方法，直接针对嵌入几何进行优化。其替代公式（去相关、ℓ₂-repel、正交化）在几何机制上各有侧重（Figure 6），但经典分散损失在稳定性和效果上整体占优。
 
-## 背景与动机
+
 
 ### 小型语言模型的性能瓶颈
 
@@ -79,7 +81,9 @@ claims:
 
 为此，本文提出**分散损失**作为辅助正则项，直接惩罚嵌入向量方向的过度对齐，在训练过程中主动对抗嵌入凝聚。该方法可与标准交叉熵训练无缝结合，作为一种几何感知的训练策略，为缩小大小模型差距提供了新范式。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于将**嵌入凝聚（Embedding Condensation）** 识别为小型语言模型性能瓶颈的关键几何根源，并提出**分散损失（Dispersion Loss）** 作为直接干预该瓶颈的训练正则项。与现有方法在训练策略（知识蒸馏、噪声注入、周期性重置）或表示维度（去相关、正交化）上间接作用不同，本文的创新点在于直接在单位超球面上优化 token 嵌入的**角度分布**，从而恢复小模型被压缩的表示多样性。
 
@@ -115,7 +119,7 @@ $$ \mathcal{L}_{\text{disp}} = \log \sum_{i,j}^{i \ne j} e^{- \frac{\operatornam
 
 分散损失的关键优势在于：它在角度空间中均匀地推开所有嵌入对（Figure 6a），不依赖范数平衡，且通过 log-sum-exp 的软最小化形式对接近的嵌入对施加更强惩罚，形成自适应的分散力度。
 
-## 整体框架
+
 
 本文提出的方法围绕一个核心观察展开：小型语言模型的深层 token 嵌入存在严重的**嵌入凝聚**现象——同一序列内所有 token 的余弦相似度随层深增加而向 1 集中，导致表示方向单一、表达能力受限。针对这一瓶颈，作者设计了一个简洁的**分散损失**作为辅助正则项，在训练过程中显式惩罚嵌入向量方向的过度对齐，从而恢复表示多样性。
 
@@ -169,7 +173,7 @@ $$ \mathcal{L}_{\mathrm{disp}} = \log \sum_{i,j}^{i \ne j} e^{- \frac{\operatorn
 
 当前验证主要集中在小型模型（GPT2 和 Qwen3-0.6B），分散损失对大模型的有效性尚未系统探索。预训练实验仅在一个模型规模（0.6B）和一种数据集上进行，泛化到更大规模仍需更多证据。此外，正则化系数 $ \lambda_{\mathrm{disp}} $ 和温度 $ \tau $ 虽在一定范围内鲁棒，但仍需手动选择。
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题形式化：嵌入凝聚的量化
 
@@ -259,7 +263,9 @@ $$\mathcal{L}_{\mathrm{KD}}(\ell_T^{(i)}, \ell_S^{(i)}) = -\tau^2 \sum_{a=1}^{V}
 ![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2601_12867/figures/009_Figure_7.jpg]]
 *Figure 7: Dispersion loss counteracts the embedding condensation phenomenon. a. Starting from condensed embeddings (gray dashed box), mid-training with the default loss has a limited impact (green box). b. In contrast, mid-training with our dispersion loss as a regularizer substantially mitigates embedding condensation (blue box)*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈：嵌入凝聚现象的实证确立
 
@@ -342,7 +348,9 @@ Figure 7 通过余弦相似度热图直接展示了分散损失对嵌入几何�
 ![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2601_12867/figures/007_Figure_6.jpg]]
 *Figure 6: Illustration of how dispersion loss and its alternative formulations promote embedding dispersion. a. Dispersion loss enforces uniform angular dispersion by spreading out all pairs along the unit hypersphere. b. Decorrelation loss encourages different feature dimensions to remain uncorrelated. c. $\ell _ { 2 }$ -repel loss increases pairwise Euclidean distance, while the norm regularization prevents unbounded expansion. d. Orthogonalization loss spreads out vectors forming acute angles while leaving obtuse ones unchanged*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：嵌入凝聚作为小模型性能瓶颈
 
@@ -415,6 +423,8 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{train}} + \lambda_{\mathrm{disp}} \cdot \ma
 ### 6. 知识库定位总结
 
 分散损失在表示学习知识库中的定位可概括为：**一种轻量级、即插即用的几何正则化工具**，通过显式惩罚嵌入方向对齐来恢复小模型的表示多样性。它填补了“大模型与小模型表示几何差异”这一研究空白，将性能差距从参数量的讨论转向表示质量的几何分析。其方法谱系介于**隐式正则化**（如 dropout、噪声注入）和**架构修改**之间，提供了一条不增加推理成本的性能提升路径。
+
+
 
 ## 原文 PDF
 

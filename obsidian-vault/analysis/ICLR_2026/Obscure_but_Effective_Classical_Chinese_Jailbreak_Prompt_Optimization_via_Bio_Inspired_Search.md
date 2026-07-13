@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Obscure_but_Effective_Classical_Chinese_Jailbreak_Prompt_Optimization_via_Bio_Inspired_Search.pdf
+project_link: null
+code_link: null
 openreview_forum_id: O7fxz7D6vf
 aliases:
 - CB
@@ -42,7 +44,7 @@ claims:
 > - AdvBench 上，ASR on Claude‑3.7 为 100%，对比 40% (ICRT)，变化 +60%。
 > - AdvBench 上，Avg Queries on Gemini‑2.5‑flash 为 1.46，对比 3.62 (CL‑GSO)，变化 -59.7%。
 
-## 概述
+## 概要
 
 现有大语言模型的安全对齐机制主要针对现代语言（如英语）进行优化，却忽视了文言文在训练语料中的广泛存在。文言文具有简洁凝练、语义多义、隐喻丰富的独特语言特性，这导致了一个关键的安全瓶颈：模型能够充分理解文言文中承载的有害意图，但其安全护栏却无法有效检测和阻止此类攻击。这一“高能力‑低对齐”的分布偏移，使文言文成为越狱攻击的天然盲区。
 
@@ -56,7 +58,7 @@ claims:
 
 综上，CC-BOS 揭示了文言文作为越狱攻击载体的严重风险，为 LLM 安全对齐的多语言覆盖问题提供了重要的警示与基准。
 
-## 背景与动机
+
 
 ### 大语言模型安全对齐的隐性盲区
 
@@ -79,7 +81,9 @@ claims:
 
 实验证据表明，这一设计在 AdvBench 基准上使攻击成功率从最强基线 ICRT 的约 80% 跃升至 **100%**（Table 1），且在所有六款主流 LLM 上均达到饱和攻击效果。语言环境对比实验进一步验证了核心假设：文言文语境下的 ASR 达到 100%，而英语和现代中文分别仅为 82% 和 86%（Table 12），直接证实了文言文作为攻击通道的独特优势。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CC‑BOS 的核心创新在于识别并利用了一个此前未被系统探索的安全盲区——**文言文与安全对齐之间的“高能力‑低对齐”分布偏移**。现有 LLM 的安全对齐主要针对现代语言（英语、现代汉语）优化，但文言文因在训练数据中天然存在，模型对其保持了较强的理解能力，却缺乏对应的安全护栏。这一偏移使得文言文成为攻击者绕开现代语言过滤机制的理想通道。Table 12 的对比实验直接验证了这一点：在 GPT‑4o 上，文言文越狱的 ASR 达到 100%，远高于英语的 82% 和现代汉语的 86%。
 
@@ -96,7 +100,7 @@ CL‑GSO 等基线使用遗传算法或随机搜索进行策略优化，存在�
 
 三个 changed slots 之间存在强耦合：文言文语境提供了攻击盲区，八维策略空间将该盲区内的攻击可能性结构化，而 FOA 则以高查询效率在该空间中定位最优策略组合。消融实验（Table 6）的阶梯式结果——Base（18%）→ + Strategy（60%）→ + Bio‑Inspired Opt.（100%）——定量地证实了这一耦合递进关系。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0011_O7fxz7D6vf_Obscure_but_Effective_Classical_Chinese_Jailbrea/figures/002_Figure_2.jpg]]
 *Figure 2: Overall framework of CC-BOS. (Left) A multi-dimensional strategy space generates candidate jailbreak prompts across context, intent, style, and activation timing. (Right) Candidates are iteratively optimized via a bio-inspired search loop, evaluated by a two-stage keyword and semanticconsistency scorer, and guided by fitness signals toward high-performing strategies*
@@ -128,7 +132,7 @@ CC‑BOS 的整体 pipeline 由四个核心模块串联而成，形成“策略�
 
 > **需注意**：图 2 为框架示意图，其左侧展示策略空间生成候选提示，右侧展示生物启发式搜索循环与评估反馈的交互关系。
 
-## 核心模块与公式推导
+
 
 ### 八维策略空间的形式化
 
@@ -178,7 +182,9 @@ $$ F(\mathbf{s}) = S_{\mathbf{c}}(\mathbf{s}) + S_{\mathbf{k}}(\mathbf{s}) \tag{
 
 种群初始化采用**覆盖约束随机采样**：对每个维度 $D_k$，先随机排列其选项，再从排列中循环采样 $N$ 个个体，保证各维度的选项在初始种群中均匀覆盖。生成个体后通过 **UniqGen 算法**进行去重：若新个体与已有个体相同，则重新采样（最多 $R$ 次尝试），避免冗余个体浪费查询预算。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈验证：文言文的“高能力–低对齐”分布偏移
 
@@ -252,7 +258,9 @@ Table 7 显示，使用不同 LLM 作为攻击模型（即生成对抗提示的�
 3. **多轮对话与代理场景**：所有实验均在单轮对话设定下进行，CC‑BOS 在多轮交互或工具调用场景中的有效性尚未验证。
 4. **安全对齐更新的适应性**：当目标模型针对文言文进行专门的安全微调后，CC‑BOS 的八维策略空间和 FOA 搜索是否仍能保持高 ASR，属于开放问题。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有越狱方法的谱系关系
 
@@ -285,6 +293,8 @@ CC-BOS 的发现引发了一系列待探索的问题。
 **多轮对话与代理场景的扩展**是方法实用性的试金石。CC-BOS 当前在单轮越狱场景中表现出色，但在多轮对话或代理场景中，搜索效率和攻击有效性可能因上下文累积、目标模型的状态跟踪能力增强而下降。Table 5 的跨模型迁移性结果（GPT-4o 生成的攻击示例在 Qwen3 上达 92% ASR）暗示攻击策略具有模型无关的语义特性，但多轮场景下的策略退化速率和重搜索成本尚未被测量。
 
 **攻击模型选择的影响**值得注意。Table 7 显示不同攻击模型（Deepseek-Chat、GPT-3.5-Turbo、Gemini-2.0-Flash）对 CC-BOS 的性能有影响，这意味着攻击效能部分依赖于攻击模型自身的文言文生成质量和对策略空间的理解能力。这一依赖关系在攻击模型能力进一步提升或下降时的变化趋势，是理解攻击可扩展性的关键。
+
+
 
 ## 原文 PDF
 

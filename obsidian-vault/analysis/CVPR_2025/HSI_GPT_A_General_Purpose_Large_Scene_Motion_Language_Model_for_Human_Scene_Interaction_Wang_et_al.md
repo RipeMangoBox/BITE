@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/HSI_GPT_A_General_Purpose_Large_Scene_Motion_Language_Model_for_Human_Scene_Interaction_Wang_et_al.pdf
+project_link: null
+code_link: null
 aliases:
 - HG
 - HSI-GPT
@@ -42,7 +44,7 @@ claims:
 > - Novel Evaluation Set (HumanML3D augmented) 上，FID 6.452 vs 7.887 (Afford-Motion @Enc with affordance) (-1.435)。
 > - HumanML3D augmented (HSI Captioning) 上，R-Precision Top1 0.551 vs 0.506 (MotionGPT*) (+0.045)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有的人-场景交互（HSI）方法普遍受限于单一或有限的控制模态（如纯文本或文本加姿态），且采用任务特定的框架设计，缺乏跨任务泛化能力。更重要的是，这些方法未能有效对齐场景、运动、语言三模态，导致生成的运动在物理上不可信且与文本描述脱节。
 
@@ -58,7 +60,7 @@ claims:
 
 **公平性说明**：HSI-GPT 作为通用多任务模型，与各任务专用专家模型（如 cVAE、Afford-Motion）对比时，其优势在于跨任务泛化而非单一任务的极致性能。部分 LLM-based 基线（如 MotionGPT）为复现结果，可能存在实现差异。
 
-## 背景与动机
+
 
 ### 问题背景：人-场景交互的生成与理解
 
@@ -85,7 +87,9 @@ claims:
 
 HSI-GPT 正是围绕这两个挑战展开：通过将人类运动视为一种“身体语言”（body language），与自然语言统一为多模态词汇表，并引入多模态交互聚合器（MIA）提取交互感知的场景 token，使 LLM 首次能够同时理解场景上下文、文本指令，并生成符合物理约束的交互运动。这一设计使 HSI-GPT 成为首个面向 HSI 的通用型大模型，为后续研究提供了统一的基线框架。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 HSI-GPT 的核心创新在于将大语言模型的“next-token prediction”范式系统性地迁移到人-场景交互（HSI）领域，通过三个关键层面的设计突破，实现了从任务特定框架向通用多任务模型的跨越。
 
@@ -117,7 +121,7 @@ $$ \mathcal{L}_{\mathrm{LoRA}} = - \sum \log p_{\theta} \left( x_t \mid x_{<t}, 
 
 在推理时，同一个模型无需额外任务特定微调即可处理文本到运动生成、HSI 描述（captioning）、运动补全（completion）等多种任务，实现了从“一个任务一个模型”到“一个模型多个任务”的范式转变。这一设计的关键突破在于：多任务联合训练促进了跨任务知识迁移，使模型在单一任务上的表现不逊于专用模型，同时获得了专用模型不具备的零样本泛化能力。
 
-## 整体框架
+
 
 HSI-GPT 提出了一种将人-场景交互（HSI）统一到大型语言模型（LLM）“next-token prediction”范式下的通用框架。其核心设计理念是将人类运动视为一种“身体语言”，与自然语言统一为多模态词汇表，从而使 LLM 能够同时理解场景上下文、文本指令，并生成符合物理约束的交互运动。
 
@@ -155,7 +159,7 @@ HSI-GPT 采用三阶段训练策略：
 ![[assets/figures/papers/paper_list_l1738_HSI_GPT_A_General_Purpose_Large_Scene_Motion_Language_Model_for_Human_Sc/figures/002_Figure_1.jpg]]
 *Figure 1: IlustratioofrH-T'ssupportedtass.Giverentistructioprompts,theproposedH-Ttolycodates multiplecontrolconditiosbthandlesvarousHS-elatedtassasellasotio-centricunderstandingandgeneratiotassuforly*
 
-## 核心模块与公式推导
+
 
 ### 运动离散化：VQ-VAE 运动分词器
 
@@ -208,7 +212,9 @@ $$
 
 该目标驱动 LLM 以自回归方式预测下一个运动 token，实现了场景、运动、语言三模态在统一序列空间中的联合建模。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -339,7 +345,9 @@ Table 4 系统研究了不同控制信号组合对 HSI 生成质量的影响：
 ![[assets/figures/papers/paper_list_l1738_HSI_GPT_A_General_Purpose_Large_Scene_Motion_Language_Model_for_Human_Sc/figures/006_Figure_4.jpg]]
 *Figure 4: GallrtingtultsofetoiodHeatiodrrosotrloiioelyxt+lto Token,Text+LastMotionTken,adTextRandomMotionTokens (yelloposes)ontheHUMANSE[9]benchmark.Bestviewedincolor*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 范式转移：从任务专用架构到通用 LLM 驱动的 HSI
 
@@ -382,6 +390,8 @@ HSI-GPT 通过引入 LLM 的“next-token prediction”范式打破了这一瓶�
 5. **多人协作与社交交互**：扩展模型以支持多人场景，需要处理人物间的空间关系、时序协调和社交规范，这涉及更复杂的交互建模。
 
 6. **细粒度语义评估**：开发能够评估生成运动与指令语义一致性的新指标，例如动作类型准确率、物体交互正确率等，以弥补现有评估体系的不足。
+
+
 
 ## 原文 PDF
 

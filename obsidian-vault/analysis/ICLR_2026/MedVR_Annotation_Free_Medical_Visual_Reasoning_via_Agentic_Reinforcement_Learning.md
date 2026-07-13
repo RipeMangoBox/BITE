@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/MedVR_Annotation_Free_Medical_Visual_Reasoning_via_Agentic_Reinforcement_Learning.pdf
+project_link: null
+code_link: null
 openreview_forum_id: cK35kNVm5r
 aliases:
 - MedVR
@@ -35,7 +37,10 @@ claims:
 | Method |  |
 | Dataset | |
 
-## 概述
+> [!tip] 效果简介
+> 本笔记的既有实验指标、对比结果与适用边界见“实验与关键发现”；本轮仅统一结构，不改写证据。
+
+## 概要
 
 医学视觉问答（Medical VQA）要求模型同时理解图像内容并进行专业推理。现有医学视觉语言模型（VLM）面临一个根本瓶颈：文本推理链缺乏与视觉证据的交互验证，导致模型在缺乏真实视觉监督时产生“视觉幻觉”——即推理过程看似合理，却与实际图像内容脱节。
 
@@ -50,7 +55,7 @@ claims:
 
 **方法定位**：MedVR 属于“RL + 工具使用”范式，区别于依赖人工推理链标注的监督微调方法和缺乏视觉交互的文本 RL 方法。其训练仅需问题-答案对作为终端奖励信号，视觉操作的监督完全由 CCA 从轨迹一致性中自动生成。
 
-## 背景与动机
+
 
 医学视觉问答（Medical VQA）要求模型同时理解视觉内容与医学知识，其核心挑战在于**视觉推理的可验证性**——模型不仅要给出答案，更需将其推理过程锚定在图像中的具体视觉证据上。然而，现有医学视觉语言模型（VLMs）面临一个根本性瓶颈：纯文本推理链缺乏视觉根基，容易产生视觉幻觉，即模型在未真正“看见”关键区域的情况下编造看似合理的推理。
 
@@ -58,7 +63,9 @@ claims:
 
 本文的核心动机是打破这一“标注依赖—视觉推理能力”的僵局：**能否在不依赖任何中间标注的情况下，让医学VLM自主学会可验证的视觉推理？** 这需要一个框架，既能驱动模型主动探索图像中的关键区域，又能为这些探索行为提供自生成的监督信号。强化学习（RL）提供了端到端优化的可能性，但直接将RL应用于视觉推理面临双重挑战：如何设计有效的探索策略，以及如何在没有外部标注的情况下为视觉操作分配细粒度奖励。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MedVR 的核心创新在于构建了一套**无需中间标注的视觉推理强化学习框架**，使医学 VLM 能够通过工具使用主动验证视觉证据，而非依赖纯文本推理链。该框架围绕三个紧密协同的 changed slot 展开：
 
@@ -76,7 +83,7 @@ MedVR 的核心创新在于构建了一套**无需中间标注的视觉推理强
 
 **与 baseline 的本质差异**：与 Lingshu‑7B、InternVL3‑14B 等依赖大规模标注数据和 SFT 的医学 VLM 不同，MedVR 仅使用 36K 过滤后的 OmniMedVQA 数据，通过 RL 从答案正确性这一终端信号中自主学习视觉定位能力，无需任何中间定位标注（Table 4）。这一 changed slot 使得 MedVR 在数据效率上具有根本性优势，同时避免了监督微调中常见的分布偏移问题。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_cK35kNVm5r/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of MedVR. The framework employs EVR to explore visual actions based on the model’s intrinsic uncertainty and CCA to create a consensus-based reward from successful trajectories, enabling annotation-free training of medical visual reasoning*
@@ -91,7 +98,7 @@ MedVR 是一个端到端的强化学习框架，旨在为医学视觉语言模�
 
 **模块间关系**：EVR 负责“探索”——在高不确定性节点上生成多样化的视觉搜索路径；CCA 负责“自监督”——从成功轨迹的共识中提炼出对视觉操作质量的评估信号。两者协同工作，使得模型无需任何中间标注（如边界框、分割掩码）即可学会在推理过程中有效地“看”图像。
 
-## 核心模块与公式推导
+
 
 MedVR 的训练框架围绕三个核心模块构建：**复合终端奖励设计**、**熵引导的视觉重定位（EVR）** 和 **基于共识的信用分配（CCA）**。以下逐一展开其机制与关键公式。
 
@@ -146,7 +153,9 @@ $$R_{\mathrm{tool}}(\mathcal{T}_j) = \begin{cases} 1.0, & \mathrm{if} \ \mathrm{
 
 三个模块形成闭环：**EVR** 在模型不确定性高处触发探索，生成多样化轨迹；**CCA** 从成功轨迹中提取共识区域，为每条轨迹的视觉操作质量打分；**复合奖励** 将答案正确性、格式规范性和视觉操作有效性统一为标量信号，驱动策略优化。这一设计使得 MedVR 无需任何中间标注即可学习精准的视觉定位能力。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -230,7 +239,9 @@ MedVR 在六个公开医学 VQA 基准上进行了系统评估，涵盖通用领
 | Figure 4 | Token 熵与定位质量强负相关，验证 EVR 设计合理性 |
 | Figure 5 | EVR 防止策略熵崩溃，维持训练稳定性 |
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法定位与谱系
 
@@ -274,6 +285,8 @@ MedVR 的方法论贡献可嵌入以下知识节点：
 - **RL for VLM reasoning。** 与 GRPO（Group Relative Policy Optimization）的集成使 MedVR 成为医学领域首个将工具调用纳入策略优化的端到端框架，区别于仅在文本空间做 RL 的工作。
 - **Uncertainty‑guided exploration。** EVR 利用 token‑level entropy 作为内在探索信号，这与主动学习中的不确定性采样、以及 LLM 推理中的 entropy‑based decoding 共享思想源头，但在视觉动作空间中实现了闭环。
 - **Consensus‑based self‑supervision。** CCA 的“成功轨迹投票”机制与多智能体系统中的共识算法、以及自洽性（self‑consistency）解码有概念上的亲缘关系，但将其用于生成空间定位的伪标签是一个新的应用场景。
+
+
 
 ## 原文 PDF
 

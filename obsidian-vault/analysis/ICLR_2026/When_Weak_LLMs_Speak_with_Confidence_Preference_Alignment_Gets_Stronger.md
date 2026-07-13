@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/When_Weak_LLMs_Speak_with_Confidence_Preference_Alignment_Gets_Stronger.pdf
+project_link: null
+code_link: null
 openreview_forum_id: ROioaZ45Yz
 aliases:
 - CWPOCP
@@ -42,7 +44,7 @@ claims:
 > - TL;DR 上，GRA (%) 为 CW-rDPO 61.4，对比 Human 54.2，变化 +7.2。
 > - UFB 上，GRA (%) 为 CW-IPO 66.4，对比 Human 63.4，变化 +3.0。
 
-## 概述
+## 概要
 
 偏好对齐是使大语言模型符合人类价值观的核心环节，但高质量人类偏好标注的获取成本高昂且难以规模化。弱LLM虽可直接生成标注，但其整体噪声大，直接使用会损害对齐效果。关键瓶颈在于：弱LLM的高置信标注质量可能优于人类，而低置信标注则有害——现有方法未能有效区分样本置信度。
 
@@ -58,7 +60,7 @@ claims:
 
 **方法定位**：CW-PO属于弱监督偏好对齐范畴，与**WS-DPO**（Tao & Li, 2025）等直接使用弱LLM标注的方法相比，核心区别在于引入样本级置信度权重，使对齐过程自适应地聚焦于高质量标注。
 
-## 背景与动机
+
 
 大型语言模型（LLM）的偏好对齐是使其输出符合人类价值观的关键步骤。当前主流范式——如 **DPO**（Rafailov et al., 2023）——依赖高质量的人类偏好标注来训练策略模型。然而，获取大规模人类偏好标注成本高昂且难以扩展，这构成了该领域的核心瓶颈。
 
@@ -70,7 +72,9 @@ claims:
 
 因此，本文的核心动机在于：**如何系统性地利用弱LLM的置信度信息，在减少对人类标注依赖的同时，实现更优的对齐性能？** 这要求一种能够自适应地区分样本质量、放大高置信标注作用、抑制低置信标注干扰的机制，而非简单的二元过滤或均匀加权。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CW-PO 的核心创新在于**将弱LLM的预测置信度作为样本级权重嵌入偏好优化损失**，从而在不改变底层对齐算法的情况下，实现对噪声标注的自适应利用。这一设计改变了传统偏好优化中所有样本均匀贡献梯度的假设，形成了两个关键的 **changed slots**：
 
@@ -100,7 +104,7 @@ $$\mathcal{L}_{\mathrm{weak}} = -\mathbb{E}_{(x,y^+,y^-)\sim\mathcal{D}_{\mathrm
 
 CW-PO 不修改底层偏好优化算法的结构，仅通过样本权重引入置信度信息。这使得它可以**即插即用**地增强任意偏好优化方法——只需将标准损失替换为对应的置信度加权版本（如 CW-DPO、CW-IPO、CW-rDPO）。实验表明，在 DPO、IPO、rDPO 三种方法上，CW-PO 平均提升 GRA 超过 5%，最高提升 9.5%（Table 1），验证了该设计的通用性和有效性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_ROioaZ45Yz/figures/001_Figure_1.jpg]]
 *Figure 1: Overall pipeline of our setting. Top: Conventional DPO (Rafailov et al., 2023). For each triplet consisting of a prompt x and two candidate responses ( y _ { 1 } , y _ { 2 } ) , human annotators provide preference labels, and the policy model is aligned with these labels using DPO. Bottom: CW-DPO framework. A weak LLM is first trained as a preference annotator using a subset of human-labeled triplets. It is then applied to annotate the remaining large-scale data, which is subsequently trained with CW-DPO. The bars on top right report Gold Reward Accuracy for standard DPO with humanlabeled data (red) and for CW-DPO (blue) on the ANTHROPIC HH-RLHF. CW-DPO uses only 30% compared to DPO, which...*
@@ -143,7 +147,7 @@ $$\mathcal{L}_{\mathrm{CW-DPO}} = -\mathbb{E} \left[ \mathcal{C} \cdot \log \sig
 
 **标注效率。** 弱标注器仅需 30% 人类标注即可训练，且 CW-DPO 在此设置下优于使用 100% 人类标注的标准 DPO（平均 GRA: 68.8 vs 66.4, Table 3）；仅需 20% 标注即可超越全量标注 DPO（Figure 3 Right）。
 
-## 核心模块与公式推导
+
 
 ### 方法总览：三阶段管道
 
@@ -209,7 +213,9 @@ $$\mathcal{L}_{\text{CW-IPO}} = -\mathbb{E} \left[ \mathcal{C} \left( \log\left(
 - **加权优于过滤**：与基于置信度阈值过滤（仅保留 top-N% 高置信样本）相比，加权方案保留了低置信样本的微弱信号，避免丢弃潜在有用数据，实验验证在所有数据集上加权均优于过滤（Table 4）。
 - **置信度函数选择**：消融实验表明，缩放 sigmoid 差（式 8 中的 $\mathcal{C}_1$）在多个数据集上提供最稳定且一致的提升（Table 5），优于原始 sigmoid 差、截断原始边距等替代方案。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：弱LLM高置信标注可超越全量人类标注
 
@@ -294,7 +300,9 @@ CW-PO的核心实证发现是：弱LLM的高置信度偏好标注子集，在驱
 ![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_ROioaZ45Yz/figures/014_Table_8.jpg]]
 *Table 8: Training hyperparameters for strong models with DPO, IPO, rDPO and their confidenceweighted variants*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -340,6 +348,8 @@ BT 方案的优势源于其**直接优化偏好排序**的目标与标注任务�
 4. **与更广泛对齐范式的结合**：CW-PO 目前仅在 DPO/IPO/rDPO 上验证，与 KTO、SimPO 等新近损失函数，或与 RLHF 的奖励建模阶段的结合是否仍能带来增益，尚待验证。
 
 5. **置信度校准**：弱 LLM 的原始预测边距是否真实反映标注正确率？引入温度缩放、保序回归等校准技术，可能进一步提升加权效果。
+
+
 
 ## 原文 PDF
 

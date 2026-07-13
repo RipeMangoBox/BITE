@@ -45,7 +45,7 @@ claims:
 > - RealWorldQA 上，Accuracy (%) 66.4 vs 62.5 (+3.9)。
 > - MMHalu 上，Score (0-6) 3.80 vs 3.52 (+0.28 (+4.7% 满分))。
 
-## 概述
+## 概要
 
 多模态推理模型（MLRM）在生成思维链时，经常在推理的“分叉路口”——尤其是过渡词之后——产生幻觉。本文发现，这一现象的根源在于模型在高不确定性状态下采用离散 token 采样，丢弃了概率分布中蕴含的丰富上下文信息，导致模型忽视视觉线索而过早收敛到错误推理链条。
 
@@ -53,7 +53,7 @@ claims:
 
 在多个幻觉与通用推理基准上，LEAD 在 7B 规模 MLRM 上取得一致且显著的提升：MMHalu 得分提高约 +4.7%，VStar 准确率提升 +4.7 个百分点，RealWorldQA 提升 +3.9 个百分点，MMEval-Pro 提升 +4.5 个百分点。消融实验证实，动态熵阈值策略优于固定离散或固定潜在推理，且早期高熵 token 对最终答案具有方向性引导作用。LEAD 在提升推理可靠性的同时，未牺牲生成文本的语法、流畅度与自然度。
 
-## 背景与动机
+
 
 ### 多模态推理模型的幻觉困境
 
@@ -85,7 +85,9 @@ claims:
 
 基于上述分析，本文的核心动机是：**在高不确定性推理阶段，用连续潜在表示替代离散 token 采样，以保留多条推理路径的语义信息，避免因过早收敛而导致的幻觉**。具体而言，本文提出利用 token 概率分布构建**超级位置表示（superposed representation）**，使模型在高熵时维持语义多样性，在熵下降时再切换回离散嵌入以确保精确收敛。同时，在高熵阶段注入视觉锚点以增强模型对视觉内容的注意力，从源头减少幻觉的发生。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 LEAD 的核心创新在于将多模态推理中的**不确定性**从“需要消除的噪声”重新定义为“可以利用的信号”。传统离散链式推理（Standard Discrete CoT）在每一步将完整的预测概率分布坍塌为单个采样 token，丢弃了分布中蕴含的丰富上下文信息。LEAD 通过三个相互协同的机制改变了这一范式。
 
@@ -123,7 +125,7 @@ $$\tilde{e}_{t^\star} = (1-\lambda) \mathbb{E}_{v\sim p_{t^\star}}[e(v)] + \lamb
 
 LEAD 是一种**即插即用的推理阶段策略**，不改变模型参数，可与现有 MLRM 直接集成。其实质是将推理过程中的不确定性显式建模为语义多样性的载体，而非简单地抑制或忽略。
 
-## 整体框架
+
 
 LEAD（Latent Entropy-Aware Decoding）是一种即插即用的推理阶段解码策略，不改变底层多模态推理模型（MLRM）的任何参数。其核心思想是：在模型逐 token 生成推理链的过程中，利用 token 级熵作为不确定性指示器，动态切换离散推理与潜在推理两种嵌入模式，从而在高不确定性阶段保留多条推理路径，避免过早收敛到错误的推理链条。
 
@@ -167,7 +169,7 @@ LEAD 的完整推理流程如 Figure 4 所示：模型接收视觉和文本 toke
 ![[assets/figures/papers/paper_list_l940_https_arxiv_org_abs_2603_13366/figures/004_Figure_4.jpg]]
 *Figure 4: Illustration of multimodal reasoning and entropy-aware decoding. The model receives both visual and textual tokens (left) and generates responses by integrating contextual information. During reasoning, token-level entropy*
 
-## 核心模块与公式推导
+
 
 ### 3.1 多模态推理模型与离散解码的局限
 
@@ -218,7 +220,9 @@ $$\tilde{e}_{t^\star} = (1-\lambda) \mathbb{E}_{v\sim p_{t^\star}}[e(v)] + \lamb
 ![[assets/figures/papers/paper_list_l940_https_arxiv_org_abs_2603_13366/figures/001_Figure_1.jpg]]
 *Figure 1: Illustrations of the correlation between hallucinations and transition words. In MLRMs, hallucinations tend to emerge more frequently after transition words, and these cases constitute a significant proportion of the overall hallucination occurrences*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：高熵token是关键脆弱节点
 
@@ -300,7 +304,9 @@ LEAD 的核心创新在于根据 token 级熵动态切换推理模式，而非�
 ![[assets/figures/papers/paper_list_l940_https_arxiv_org_abs_2603_13366/figures/013_Figure_10.jpg]]
 *Figure 10: Pass@k accuracy evaluation of R1-Onevision-7B on sampled data of RealworldQA and MathVista, illustrating results for k ∈ [4, 32]*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：多模态推理中的高熵脆弱性
 
@@ -351,6 +357,8 @@ LEAD 的适用边界受以下因素制约：
 3. **自适应超参数**：能否通过学习或自适应机制（如基于任务难度动态调整熵阈值）减少对手动调参的依赖，是提升实用性的关键方向。
 
 4. **外部知识融合**：高熵阶段的潜在推理保留了多条语义路径，这为外部知识检索提供了自然的融合接口——能否在潜在空间中注入检索到的知识嵌入，进一步提升事实可靠性？
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Avey_B.pdf
+project_link: null
+code_link: null
 aliases:
 - AB
 tags:
@@ -40,17 +42,19 @@ claims:
 > - TC（token分类） 上，平均F1 为 93.59（base），对比 89.82（BERT base），变化 +3.77。
 > - QA（问答） 上，平均F1 为 62.45（base），对比 57.65（BERT base），变化 +4.80。
 
-## 概述
+## 概要
 
 Avey-B 是一种面向编码器（encoder-only）架构的双向注意力无关模型，由 Hammoud & Acharya 在 Avey（Hammoud & Acharya, 2025）自回归架构的基础上改造而来。该模型通过解耦静态与动态参数化、引入行归一化相似度分数以及神经压缩模块，在保持线性计算复杂度的同时，在句子分类、token分类、问答和信息检索等判别式任务上持续超越 BERT、RoBERTa、ModernBERT 和 NeoBERT 等 Transformer 基线模型。实验表明，Avey-B 在序列长度 N=96K 时吞吐量比 ModernBERT 快 3.38 倍，比 NeoBERT 快 11.63 倍，且其吞吐量衰减指数 α≈0.44，远小于 ModernBERT 的 α≈0.77 和 NeoBERT 的 α≈0.81。
 
-## 背景与动机
+
 
 Transformer 编码器的自注意力机制在序列长度上具有二次时间与内存复杂度，严重限制了长上下文场景下的实际部署效率。尽管 ModernBERT（Warner et al., 2025）通过 RoPE、FlashAttention（Dao et al., 2022）和交替全局/局部注意力等技术提升了效率，NeoBERT（Breton et al., 2025）通过深度-宽度重平衡优化了架构，但这些模型仍然受限于自注意力的二次复杂度，在超长序列（如 96K token）上难以高效运行。
 
 Avey（Hammoud & Acharya, 2025）提出了一种注意力无关的自回归架构，通过排序器（ranker）检索最相关的分片（split）并使用神经处理器（neural processor）进行上下文建模，实现了线性复杂度。然而，Avey 的原始设计存在三个关键问题：(1) 静态权重与输入相关的余弦相似度逐元素相乘的耦合参数化方式会导致反转效应（inversion effects），即与当前 token 高度相似的 token 反而贡献更少；(2) 缺乏稳定的归一化机制；(3) 仅支持单向（自回归）上下文。Avey-B 针对这些问题进行了系统性改进。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Avey-B 的核心创新包括以下三点：
 
@@ -62,7 +66,7 @@ Avey-B 的核心创新包括以下三点：
 
 此外，Avey-B 移除了 Avey 上下文器中的自回归掩码，允许每个 token 同时关注左右上下文，实现双向编码。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_generative_models_diffusion__generative_models_and_autoencoders__b001_kQ9j5RY8ff_Avey-B/figures/001_Figure_1.jpg]]
 *Figure 1: (a) Avey’s Coupled Parametrization (b) Avey-B’s Decoupled Parametrization Figure 1: A simple illustration of coupled (a) and decoupled (b) parameterizations ( e _ { i } = embedding i; s _ { i j } = cosine similarity score between e _ { i } and e _ { j } ; ni = neuron i , n _ { i } ^ { ( d ) } = neuron i in dynamic layer d ; n _ { i } ^ { ( s ) } = neuron i in static layer s; and w _ { i j } = weight corresponding to e _ { i } or n _ { i } ^ { ( d ) } used in the weighted sum of n _ { j } or n _ { j } ^ { ( s ) } , respectively).*
@@ -78,7 +82,7 @@ Avey-B 的整体框架由以下模块组成：
    - **上下文器（Contextualizer）**：嵌入级神经网络，在动态层中使用余弦相似度实现 token 间交互，在静态层中使用学习到的线性变换。
    - **融合器（Fuser）**：将 bypassed 的头部特征与上下文化后的尾部特征拼接，投影回模型嵌入维度 d。
 
-## 核心模块与公式推导
+
 
 ### 5.1 增强器变换
 
@@ -132,7 +136,9 @@ $$ \widehat{\mathbf{X}} = \mathbf{P} \mathbf{X}_{\mathrm{cat}} \quad \text{(Equa
 
 Avey-B 的神经处理器计算复杂度与序列长度 N 呈线性关系：总处理成本为 (N/S) × S² = NS = O(N)。然而，排序器需要计算所有分片对之间的 MaxSim 分数，渐近复杂度仍为 O(N² d)。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 6.1 主要效果结果
 
@@ -229,7 +235,9 @@ Avey-B 在吞吐量衰减方面表现出显著优势：
 *Table 5: Effectiveness results across different static (S) and dynamic (D) layering patterns.*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 Avey-B 属于注意力无关（attention-free）编码器架构，其方法谱系可追溯至：
 
@@ -256,6 +264,8 @@ Avey-B 属于注意力无关（attention-free）编码器架构，其方法谱�
 - 能否扩展到多模态场景？
 - 排序器能否通过近似最近邻搜索（如 HNSW）进一步加速？
 - Avey-B 在生成任务上的表现如何？
+
+
 
 ## 原文 PDF
 

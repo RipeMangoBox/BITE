@@ -40,7 +40,7 @@ claims:
 > [!tip] 效果简介
 > - FE108 上，AUC / PR 59.0% (AUC) / 91.3% (PR) [SDTrack-Tiny] vs 57.4% (AUC) / 89.3% (PR) [Spike-driven Transformer V3] (+1.6% (AUC) / +2.0% (PR))。
 
-## 概述
+## 概要
 
 基于事件相机的目标跟踪因其高时间分辨率和高动态范围优势，在快速运动和极端光照场景下展现出巨大潜力。然而，现有方法大多采用**ANN-SNN混合架构**，未能充分发挥脉冲神经网络（SNN）的能效优势；同时，这些方法普遍缺乏搜索区域与模板之间的交叉相关建模，且事件聚合方式无法充分捕获全局轨迹信息，导致时空表征能力不足。
 
@@ -56,7 +56,7 @@ claims:
 
 > **局限提示**：目前仅在三个事件数据集上验证，且理论能耗计算尚未在真实神经形态芯片上确认；GTP的超参数（α=30, β=0.8）依赖手动调节，自适应机制有待探索。
 
-## 背景与动机
+
 
 **事件相机**通过异步记录对数亮度变化，输出高时间分辨率、低延迟、高动态范围的稀疏事件流，使其在高速运动与极端光照条件下具有天然优势。然而，传统基于人工神经网络（ANN）的跟踪器（如 **OSTrack**（Ye et al., ECCV 2022）、**STARK**（Yan et al., ICCV 2021）、**MixFormer**（Cui et al., CVPR 2022））依赖密集的帧级计算，难以继承事件数据在能效与速度上的潜力。
 
@@ -67,7 +67,9 @@ claims:
 
 针对上述缺口，本文提出 **SDTrack**——首个全脉冲驱动的Transformer跟踪流水线。其核心动机在于：通过设计全局轨迹提示（Global Trajectory Prompt, GTP）增强事件帧的时空表征，联合内在位置学习（Intrinsic Position Learning, IPL）免除显式位置编码，并构建全SNN Transformer骨干，在保持极低功耗的前提下实现与ANN方法相当甚至更优的跟踪精度。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SDTrack 的核心创新在于：**首次构建了完全由脉冲驱动的 Transformer 跟踪流水线**，并通过三个紧密协同的“变更槽”（changed slots）——事件聚合方式、位置编码和骨干架构——系统性地解决了现有事件跟踪方法在能效与时空表征上的瓶颈。
 
@@ -114,7 +116,7 @@ SDTrack 采用**脉冲版中心预测头（Center Head）**替代传统的角点
 
 上述创新并非孤立存在：GTP 提供的三通道时空表征使 IPL 的对角拼接能捕获更丰富的位置线索；全 SNN 骨干的低发放率特性使 SSA 的计算开销可控；Center Head 的轻量设计则保证了端到端的低功耗推理。然而，GTP 的超参数（$\alpha, \beta$）目前需手动调节，不同场景下的自适应机制仍有待探索；此外，SDTrack 未利用 RGB 信息，在纹理极弱的纯事件场景下可能仍面临挑战。
 
-## 整体框架
+
 
 SDTrack 构建了一条**全脉冲驱动**的单目标跟踪流水线，其核心设计目标是在极低功耗下实现与先进 ANN 方法相当甚至更优的跟踪精度。流水线由四个关键模块级联构成：**全局轨迹提示（Global Trajectory Prompt, GTP）**、**内在位置学习（Intrinsic Position Learning, IPL）**、**SNN 卷积模块**和**SNN Transformer 模块**，最后通过**脉冲中心预测头**输出跟踪结果。
 
@@ -143,7 +145,7 @@ SDTrack 的完整流水线在训练和推理中**不使用数据增强**（如�
 ![[assets/figures/papers/paper_list_l2138_https_arxiv_org_abs_2503_08703/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the SDTrack Pipeline. Upon receiving template and search event streams, GTP aggregates them into event frames, which are then concatenated into a unified matrix by IPL. Following SNN Conv Block processing, the matrix undergoes restoration and tokenization. The template features, after cross-correlation with search features, are fed into the SNN Tracking Head for target position and scale prediction. The detailed design of each module is illustrated in the middle and bottom panels*
 
-## 核心模块与公式推导
+
 
 ### 3.1 脉冲神经元基础模型
 
@@ -249,7 +251,9 @@ $$
 ![[assets/figures/papers/paper_list_l2138_https_arxiv_org_abs_2503_08703/figures/012_Figure_7.jpg]]
 *Figure 7: Revealing why IPL outperforms traditional positional encoding. SDTrack-Tiny without IPL serves as baseline. Left: template and search inputs. Right: Attention Map from the last attention module and Template Gradient Response Map (TGRM)*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 
@@ -315,7 +319,9 @@ Figure 8 展示了 SDTrack 与 **OSTrack**（Ye et al., ECCV 2022）、**STARK**
 3. **场景覆盖有限**：仅在 FE108、FELT、VisEvent 上评估，长时间遮挡、极度快速运动等极端场景下的性能未知。
 4. **纯事件挑战**：在纹理极弱的纯事件场景下，缺乏 RGB 辅助信息可能仍存在跟踪失败风险。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与ANN跟踪基线的继承与分化
 
@@ -354,6 +360,8 @@ SDTrack在三个事件跟踪基准（FE108、FELT、VisEvent）上取得了最�
 3. **GTP的自适应参数化**：能否通过学习的方式动态调整α和β，使GTP适应不同运动速度和场景噪声水平？这可能需要引入轻量的元学习或条件参数生成模块，但需谨慎控制额外开销。
 
 4. **长时跟踪与重检测**：SDTrack目前聚焦于短时单目标跟踪，未涉及目标丢失后的重检测机制。全脉冲驱动的长时跟踪框架（含目标重识别模块）将是一个有价值但更具挑战的方向。
+
+
 
 ## 原文 PDF
 

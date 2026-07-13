@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/True_Self_Supervised_Novel_View_Synthesis_is_Transferable.pdf
+project_link: https://www.mitchel.computer/xfactor/
+code_link: null
 openreview_forum_id: aJJppqAm6r
 aliases:
 - TSSNVSIT
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 真正的自监督新视角合成具有可迁移性 |
 | 英文题名 | True Self-Supervised Novel View Synthesis is Transferable |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=aJJppqAm6r); [Project](https://www.mitchel.computer/xfactor/) |
+| Links | [paper](https://openreview.net/forum?id=aJJppqAm6r) · [Project](https://www.mitchel.computer/xfactor/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | XFactor |
 | Dataset | RE10K, DL3DV |
@@ -41,7 +43,7 @@ claims:
 > - DL3DV 上，Transferability AUC @ 20° 为 57.2，对比 5.9 (RayZer)，变化 +51.3。
 > - RE10K 上，Pose Probe AUC @ 30° 为 72.9，对比 60.8 (RayZer)，变化 +12.1。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -67,7 +69,7 @@ XFactor 不依赖任何3D归纳偏置——无需SE(3)显式参数化、无需�
 
 消融实验进一步证实：多视图训练会逐步破坏可迁移性，而立体-单目架构与可迁移性目标的组合是性能的关键来源；与 SimCLR、VICReg 等通用自监督目标相比，所提目标在姿态预测准确率上具有绝对优势。
 
-## 背景与动机
+
 
 新视角合成（Novel View Synthesis, NVS）旨在从一组已知视角的图像生成任意新视角下的场景渲染。近年来，基于学习的NVS方法取得了显著进展，但大多数方法依赖于显式的3D表示或精确的相机姿态标注。自监督NVS试图摆脱这些依赖，仅从原始视频中学习渲染新视角的能力，其核心挑战在于如何从图像中隐式地推断相机姿态。
 
@@ -79,7 +81,9 @@ XFactor 不依赖任何3D归纳偏置——无需SE(3)显式参数化、无需�
 
 **决定性证据**：在可迁移性测试中，XFactor在RE10K数据集上的AUC@20°达到55.2，而RayZer仅为7.6，提升超过5倍（Table 1）。姿态探针实验进一步表明，XFactor的潜在表示能高度准确地预测真实SE(3)相机姿态，AUC@30°达72.9，远超RayZer的60.8（Table 2）。消融实验证实，多视图训练会逐步破坏可迁移性，而立体-单目模型与可迁移性目标的组合取得最优效果（Table 3）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 XFactor 的核心创新在于通过**训练范式重构**，从根本上解决了现有自监督 NVS 模型缺乏真正视角可控性的瓶颈。其关键洞察是：真正的 NVS 要求相机姿态表示在不同场景间可迁移；仅使用一对图像（防止插值）并结合保持相机姿态的图像增广进行跨序列训练，使得未受限的潜在变量能够自发学习几何推理，无需 SE(3) 参数化等先验。
 
@@ -130,7 +134,7 @@ $$\mathrm{ORACLE}[ \mathrm{AUG}[\mathbb{Z}] ] = \mathrm{ORACLE}[ \mathrm{AUG}'[\
 
 可迁移性测试（Table 1）进一步证实：XFactor 在 RE10K 上的 AUC @ 20° 达到 55.2，比 RayZer（7.6）高出超过 7 倍，验证了跨场景姿态迁移能力的质的飞跃。
 
-## 整体框架
+
 
 XFactor 的核心设计是一个“立体-单目”模型与跨序列可迁移性目标的结合，其整体架构与信息流如 Figure 1 所示。模型由两个核心模块构成：**POSEENC**（立体姿态编码器）与 **RENDER**（单目渲染器），二者协同工作，强制模型学习可迁移的相机姿态表示。
 
@@ -168,7 +172,7 @@ $$L \equiv d_I\big( I_2^B, \mathrm{RENDER}[ I_1^B, \mathrm{POSEENC}[ I_1^A, I_2^
 
 > **验证提示**：消融实验（Table 3）证实，立体-单目模型与可迁移性目标的结合在所有指标上均优于瓶颈潜在变量、SE(3) 参数化或引入额外视图的变体；而过渡到多视图训练会逐步降低并最终完全破坏可迁移性。
 
-## 核心模块与公式推导
+
 
 ### 3.1 自监督NVS的形式化框架
 
@@ -216,7 +220,9 @@ $$\mathrm{ORACLE}[ \mathrm{AUG}[\mathbb{Z}] ] = \mathrm{ORACLE}[ \mathrm{AUG}'[\
 
 在立体-单目模型完成可迁移性训练后，XFactor通过多视图微调将模型扩展到利用更多上下文帧。$\mathrm{POSEENC}$ 以成对方式预测参考帧与各上下文帧之间的相对姿态潜在，$\mathrm{RENDER}$ 则整合多个上下文帧及其对应的迁移姿态进行渲染。该阶段保留了双视图预训练中习得的可迁移姿态表示，同时通过多帧信息提升渲染质量。消融实验（Table 3）表明，直接在多视图设置下训练会逐步破坏可迁移性，验证了“先双视图外推、再多视图微调”策略的必要性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制验证
 
@@ -304,7 +310,9 @@ Table 3 以立体-单目 XFactor 为起点，系统消融了四个关键设计�
 ![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_aJJppqAm6r/figures/009_Table_4.jpg]]
 *Table 4: Autoencoding Reconstruction Quality. Table 5: Augmentations at Inference. We evaluate transferred rendering quality in terms of standard perceptual metrics by applying our pose-preserving augmentations at inference with multi-view XFactor*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈：自监督NVS中的插值偏置
 
@@ -350,6 +358,8 @@ XFactor的可迁移性目标与经典自监督表示学习方法（如SimCLR、V
 3. **与表示学习前沿的融合**：如何将对比学习、信息最大化等自监督表示学习的前沿思想更有效地融入渲染基目标，以进一步提升姿态表示的质量和可迁移性？
 
 4. **泛化能力拓展**：模型能否推广到动态场景、非朗伯表面或包含复杂遮挡的环境？如何处理语义信息与几何推理的交互？这些问题决定了XFactor范式在真实世界应用中的适用范围。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,7 @@ paper_level: A
 venue: "SIGGRAPH Asia"
 year: 2024
 pdf_ref: paperPDFs/SIGGRAPH_ASIA_2024/3D_Gaussian_Ray_Tracing_Fast_Tracing_of_Particle_Scenes.pdf
+code_link: null
 project_link: https://gaussiantracer.github.io/
 aliases:
 - 3GRT
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 3D高斯光线追踪：粒子场景的快速追踪 |
 | 英文题名 | 3D Gaussian Ray Tracing: Fast Tracing of Particle Scenes |
 | 会议/期刊 | SIGGRAPH Asia 2024 |
-| Links | [paper](https://arxiv.org/abs/2407.07090); [Project](https://gaussiantracer.github.io/) |
+| Links | [paper](https://arxiv.org/abs/2407.07090) · [Project](https://gaussiantracer.github.io/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | 3D Gaussian Ray Tracing |
 | Dataset | NeRF Synthetic, MipNeRF360, Tanks & Temples |
@@ -42,7 +43,7 @@ claims:
 > - MipNeRF360 上，PSNR / SSIM / LPIPS 为 28.69 / 0.871 / 0.220 (Ours reference); 28.71 / 0.854 / 0.248 (Ours)，对比 3DGS (values not provided in context, comparable quality)，变化 comparable。
 > - MipNeRF360 上，FPS 为 78 FPS (Ours)，对比 238 FPS (3DGS)，变化 ~3x slower。
 
-## 概述
+## 概要
 
 3D高斯泼溅（3D Gaussian Splatting, 3DGS）凭借其基于瓦片排序的栅格化渲染器，在新视角合成中实现了实时帧率与领先质量。然而，该渲染器天然依赖相干的针孔相机主光线，难以高效处理**反射、折射、阴影等二次光照效应**，也无法原生支持**高度失真相机模型、滚动快门效应和随机光线采样**——这些恰恰是机器人、自动驾驶和视觉特效等下游应用的核心需求。
 
@@ -70,7 +71,7 @@ claims:
 
 光线追踪在针孔相机主光线渲染中仍比栅格化慢约2倍（MipNeRF360上78 FPS vs 238 FPS），且当前未实现全局光照或逆向光照。BVH在训练过程中的反复重建增加了开销，随机光线训练的反向传播效率仍受限于重新追踪光线的成本。如何将光线追踪器扩展到全局光照、设计实时动态BVH更新策略，以及利用随机采样加速训练，是后续研究的关键方向。
 
-## 背景与动机
+
 
 ### 3D高斯泼溅的栅格化瓶颈
 
@@ -109,7 +110,9 @@ claims:
 
 这一动机的技术基础是：利用拉伸二十面体包围盒紧致包围每个粒子，结合BVH硬件加速的交点查询和k缓冲（k=16）连续收集排序交点，在GPU上实现高效的可微粒子光线追踪。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于将3D高斯泼溅（3DGS）的渲染核心从**基于瓦片排序的栅格化**彻底替换为**基于硬件加速的光线追踪**，并围绕这一范式转移设计了一整套配套算法，使得粒子场景在保持可微性和实时帧率的同时，天然解锁了二次光线效应和复杂相机模型的支持。
 
@@ -159,7 +162,7 @@ GG2核比标准高斯更"平顶"，大幅减少了每条光线的平均碰撞数
 
 尽管创新显著，光线追踪在针孔相机主光线渲染上仍比3DGS栅格化慢约2倍（MipNeRF360: 78 vs 238 FPS），且BVH在训练中的反复重建增加了额外开销。这些限制指向了未来的改进方向：动态BVH更新策略和更高效的随机光线训练方案。
 
-## 整体框架
+
 
 3D Gaussian Ray Tracing 的整体管线将粒子场景的重建与渲染统一在单一的可微光线追踪框架下，其核心思想是对每个半透明粒子构造一个紧致的包围几何代理，并将所有代理插入 BVH（Bounding Volume Hierarchy）加速结构，随后通过专门为高密度重叠粒子设计的 GPU 光线追踪器完成前向渲染与反向梯度传播。
 
@@ -210,7 +213,7 @@ $$
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2407_07090/figures/001_Figure_1.jpg]]
 *Figure 1: We propose a method for fast forward and inverse ray tracing of particle-based scene representations such as Gaussians. The main idea is to construct encapsulating primitives around each particle, and insert them into a BVH to be rendered by a ray tracer specially adapted to the high density of overlapping particles. Eficient ray tracing opens the door to many advanced techniques, including secondary ray efects like mirrors, refractions and shadows, as well as highly-distorted cameras with rolling shu er efects and even stochastic sampling of rays. Project page: GaussianTracer.github.io*
 
-## 核心模块与公式推导
+
 
 ### 3.1 粒子表示基础
 
@@ -276,7 +279,9 @@ $$\hat{\rho}_{c}(\pmb{x}) = \hat{\rho}(\pmb{x}) (0.5 + 0.5 \cos(\psi (S^{-1} \pm
 
 其中 $\psi$ 为可优化参数，沿某轴调制粒子核。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心新视角合成质量
 
@@ -353,7 +358,9 @@ Figure 17直观展示了这一能力：顶部插图显示了通过无失真相�
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2407_07090/figures/024_Table_6.jpg]]
 *Table 6: antitative PSNR ablation on the maximum number of allowed particles using ours*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 从栅格化到光线追踪：一次渲染范式的根本切换
 
@@ -416,6 +423,8 @@ Figure 17直观展示了这一能力：顶部插图显示了通过无失真相�
 - **随机光线采样的训练效率**：随机光线训练为少视图或稀疏输入场景提供了新的可能性，但当前受限于反向传播的双重追踪开销。能否通过梯度近似或缓存策略降低这一开销？
 
 - **神经特征与粒子表示的融合**：光线追踪的灵活性为在粒子表示中集成神经特征或小型神经网络提供了可能，以实现更复杂的材质（如BRDF）和光照效果（如间接光照）。这一方向的探索尚处于早期阶段。
+
+
 
 ## 原文 PDF
 

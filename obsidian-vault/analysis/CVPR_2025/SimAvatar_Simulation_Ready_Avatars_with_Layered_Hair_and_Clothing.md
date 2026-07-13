@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/SimAvatar_Simulation_Ready_Avatars_with_Layered_Hair_and_Clothing.pdf
+code_link: null
 project_link: https://nvlabs.github.io/SimAvatar/
 aliases:
 - SimAvatar
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | SimAvatar：分层头发与衣物的仿真就绪虚拟人 |
 | 英文题名 | SimAvatar: Simulation-Ready Avatars with Layered Hair and Clothing |
 | 会议/期刊 | CVPR 2025 |
-| Links | [paper](https://arxiv.org/abs/2412.09545); [Project](https://nvlabs.github.io/SimAvatar); [Project](https://nvlabs.github.io/SimAvatar/) |
+| Links | [paper](https://arxiv.org/abs/2412.09545) · [Project](https://nvlabs.github.io/SimAvatar) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | SimAvatar |
 | Dataset | User Study |
@@ -41,7 +42,7 @@ claims:
 > - User Study 上，Appearance preference (%) vs Fantasia3D 为 100，对比 50，变化 +50。
 > - User Study 上，Appearance preference (%) vs GAvatar 为 87.03，对比 50，变化 +37.03。
 
-## 概述
+## 概要
 
 文本到3D虚拟人的生成近年来取得了显著进展，但现有方法存在一个根本性瓶颈：**头发、衣物和身体被表示为单一纠缠的几何层**，无法独立进行物理仿真或编辑。即便部分工作尝试分层表示，其生成的几何（如NeRF隐式场）也难以兼容标准的头发/衣物物理仿真管线，导致动画效果缺乏真实的姿态相关变形——例如宽松裙摆无法自然飘动，而是随线性混合蒙皮（LBS）不自然地分裂。
 
@@ -53,7 +54,7 @@ SimAvatar 针对这一瓶颈，提出了**分层仿真就绪几何与3D高斯附
 
 **主要局限**包括：生成衣物和发型受训练数据分布限制；尚未实现头发与衣物的联合仿真；不支持鞋子、手套等配件；物理仿真在极端姿势下可能不稳定；单个虚拟人生成约需6小时，无法实时应用。
 
-## 背景与动机
+
 
 文本到3D虚拟人生成旨在从自然语言描述中创建可动画的数字化身，其核心需求是同时满足**高保真外观**与**真实动态效果**。然而，现有方法在两个维度上均存在结构性缺陷。
 
@@ -65,7 +66,9 @@ SimAvatar 针对这一瓶颈，提出了**分层仿真就绪几何与3D高斯附
 
 SimAvatar的核心动机正是打破这一僵局：**能否设计一种表示方式，使其既能承载扩散先验的纹理学习能力，又能直接嵌入标准的衣物和头发物理仿真管线？** 这要求从几何生成、外观建模到动画驱动的全链路进行重新设计。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 1. 分层仿真就绪几何表示
 
@@ -102,7 +105,7 @@ SimAvatar的核心动机正是打破这一僵局：**能否设计一种表示方
 
 为克服扩散先验中层次纠缠的问题，SimAvatar 采用分层独立渲染和差异化提示优化：对面部视图使用“buzz cut, bold forehead”提示，防止头发纹理蔓延到面部和身体（Figure 6(c)(d)）。配合 SDS 梯度 $\nabla_{\eta} \mathcal{L}_{\mathrm{SDS}} = \mathbb{E}_{t, \epsilon} \left[ w(t) (\hat{\epsilon}(I_t; \mathcal{T}, t) - \epsilon) \frac{\partial I}{\partial \eta} \right]$ 进行外观优化（Eq. 4），实现了各层纹理的完全解耦。
 
-## 整体框架
+
 
 SimAvatar 提出了一种**两阶段框架**，将文本到 3D 虚拟人的生成任务分解为几何生成与外观优化两个阶段，核心创新在于采用**分层仿真就绪几何**作为中间表示，从而同时兼容扩散先验的高保真纹理学习和标准物理仿真管线的动画驱动。
 
@@ -138,7 +141,7 @@ SimAvatar 提出了一种**两阶段框架**，将文本到 3D 虚拟人的生�
 
 整个管线的最终输出是一个**仿真就绪的 3D 虚拟人**，可直接输入姿态序列，通过物理仿真驱动衣网格和发丝产生真实运动，并由附着的高斯渲染出高保真外观。消融实验证实（Figure 6），去掉分层训练策略会导致衣物与身体纹理纠缠，去掉头发正则化会导致发丝断裂和漂浮高斯，验证了各模块的必要性。
 
-## 核心模块与公式推导
+
 
 SimAvatar 的核心架构围绕“分层仿真就绪几何 + 3D 高斯附着 + 扩散先验优化”三条主线展开。以下按功能模块拆解其关键设计与公式。
 
@@ -217,7 +220,9 @@ SimAvatar 采用分而治之的仿真策略：
 
 这种分层仿真机制是 SimAvatar 区别于 TADA、GAvatar 等基线方法的关键——后者仅依赖 LBS 驱动整个虚拟人，导致宽松衣物出现不自然分裂（Figure 5）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验结果
 
@@ -280,7 +285,9 @@ SimAvatar 在用户研究和自动指标上均展现出显著优势。用户研�
 - **Figure 6**：消融实验的可视化证据，直接验证了头发正则化、面部提示工程和分层训练策略的必要性。
 - **Figure 7**：更多定性结果，每个虚拟人附带 CLIP 和 VQAScore 分数，展示了方法在不同文本提示下的泛化能力。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 基线关系与核心突破
 
@@ -313,6 +320,8 @@ SimAvatar 处于文本到3D虚拟人生成与物理仿真融合的交叉点，�
 **效率优化。** 将生成时间从数小时压缩到分钟级甚至实时，是实现交互式应用的关键。潜在方向包括：利用一致性模型或蒸馏技术加速扩散采样，采用更高效的3D高斯表示，以及探索仿真与渲染的联合优化以减少冗余计算。
 
 **可控性增强。** 当前系统仅支持文本输入。能否引入草图、单张图片、3D扫描等多模态控制信号，使用户能够更精确地指定虚拟人的外观和结构？风格迁移技术也可能为生成结果的个性化定制提供新途径。
+
+
 
 ## 原文 PDF
 

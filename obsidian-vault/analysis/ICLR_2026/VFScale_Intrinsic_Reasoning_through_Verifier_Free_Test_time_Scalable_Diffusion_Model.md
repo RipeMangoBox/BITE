@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/VFScale_Intrinsic_Reasoning_through_Verifier_Free_Test_time_Scalable_Diffusion_Model.pdf
+project_link: null
+code_link: https://github.com/AI4Science-WestlakeU/VFScale
 openreview_forum_id: 8ta0xgtsJK
 aliases:
 - VFScale
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | VFScale：通过免验证器测试时扩展的扩散模型实现内在推理 |
 | 英文题名 | VFScale: Intrinsic Reasoning through Verifier-Free Test-time Scalable Diffusion Model |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=8ta0xgtsJK); [GitHub](https://github.com/AI4Science-WestlakeU/VFScale) |
+| Links | [paper](https://openreview.net/forum?id=8ta0xgtsJK) · [GitHub](https://github.com/AI4Science-WestlakeU/VFScale) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/diffusion_image_video |
 | Method | VFScale |
 | Dataset | Maze-15×15, Sudoku (harder, 17-33 givens) |
@@ -41,7 +43,7 @@ claims:
 > - Sudoku (harder, 17-33 givens) 上，Success Rate 为 0.4297 (VFScale + hMCTS, N=321)，对比 0.2812 (Original + BoN, N=321)，变化 +0.1485。
 > - Maze-15×15 上，Success Rate 为 0.7031 (VFScale training, BoN, N=161)，对比 0.1094 (Original training, BoN, N=161)，变化 +0.5937。
 
-## 概述
+## 概要
 
 扩散模型在生成任务上取得了显著成功，但在推理任务（如迷宫求解、数独）上的测试时扩展（test-time scaling）面临根本性瓶颈：**标准扩散模型的能量景观质量差，缺乏性能-能量一致性**，导致单纯增加采样数量（Best-of-N）带来的增益十分有限。
 
@@ -61,7 +63,7 @@ claims:
 
 VFScale 的方法定位清晰：它不属于需要外部奖励模型或验证器的测试时扩展范式，而是通过**重塑扩散模型的能量景观**，使内在能量函数本身成为可靠的质量指示器，再结合树搜索提升推理效率。这一思路在方法谱系上介于基于能量的扩散模型（Du et al., 2024）与测试时搜索方法之间，为扩散模型在推理任务上的扩展提供了新的技术路线。
 
-## 背景与动机
+
 
 ### 扩散模型在推理任务上的测试时扩展困境
 
@@ -88,7 +90,9 @@ VFScale的提出正是为了填补这一缺口。其核心洞察在于：扩散�
 - **训练层面**：引入单调回归负对比学习损失（MRNCL）强制能量与样本L2距离之间的单调线性关系，辅以KL正则化平滑能量景观并提升采样多样性，从而系统性改善性能-能量一致性（Table 4显示一致性指标从约73%提升至约84%）。
 - **推理层面**：将混合蒙特卡洛树搜索（hMCTS）嵌入去噪过程——在早期高噪声阶段采用Best-of-N并行探索，后期低噪声阶段切换为MCTS深度利用，以自适应策略平衡探索与利用，克服纯BoN在高预算下的收益递减问题。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 VFScale 的核心创新围绕一个关键瓶颈展开：**标准扩散模型在推理任务上的测试时扩展受限于能量景观质量差，缺乏性能-能量一致性**，导致单纯增加采样数量（Best-of-N）带来的增益十分有限。针对这一瓶颈，VFScale 通过两个相互协同的“changed slots”实现突破——训练端的损失函数重构与推理端的搜索策略升级，使扩散模型无需外部验证器即可实现有效的测试时扩展。
 
@@ -129,7 +133,7 @@ $$`\mathbf{x}_{t'-1}^{(k)} = \sqrt{\bar{\alpha}_{t'-1}} \frac{\mathbf{x}_{t'} - 
 
 训练与推理两个 changed slots 高度协同：MRNCL 和 KL 正则化使能量函数成为可靠的内在验证器（Kendall-τ 秩相关性在去噪中间阶段保持 >0.4，显著优于外部验证器，Table 19）；hMCTS 则充分利用这一高质量能量信号进行高效搜索。在 15×15 迷宫任务上，VFScale + hMCTS（N=161）成功率达到 88.28%，较原始方法 + BoN 的 10.94% 提升超过 77 个百分点；相比仅改进训练的 VFScale + BoN（70.31%），hMCTS 进一步贡献约 18 个百分点的增益（Table 5）。在数独任务上同样展现出一致的扩展性优势。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l44_https_openreview_net_forum_id_8ta0xgtsJK/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of VFScale. This figure illustrates the key aspects of VFScale by contrasting its training and inference strategies with those of the previous method. (1) To qualify the intrinsic energy of diffusion models as a verifier, VFScale introduces $\mathcal { L } _ { \mathrm { M R N C L } }$ and $\mathcal { L } _ { \mathrm { K L } }$ to improve the energy landscape during training. (2) In order for a higher search efficiency, VFScale proposes hybrid Monte Carlo Tree Search (hMCTS) that achieves a balance between best-of-N and MCTS
@@ -178,7 +182,7 @@ VFScale 的推理流水线将测试时扩展从简单的 Best-of-N 选择升级�
 
 **局限性**：MCTS 的串行性质限制了并行加速能力，早期去噪阶段节点评估质量有限，且当前仅使用高斯噪声进行分支扩展，其他扩散分支机制仍有待探索。
 
-## 核心模块与公式推导
+
 
 ### 3.1 瓶颈诊断：能量景观的质量缺陷
 
@@ -236,7 +240,9 @@ $$\mathbf{x}_{t'-1}^{(k)} = \sqrt{\bar{\alpha}_{t'-1}} \frac{\mathbf{x}_{t'} - \
 
 VFScale的训练模块与推理模块形成闭环协同：MRNCL和KL正则化使能量函数成为可靠的内在验证器（Kendall-$\tau$ 秩相关性在去噪中间阶段保持 $>0.4$，Table 19），hMCTS则高效利用这一验证器进行结构化搜索。消融实验提供了因果证据：使用外部训练的验证器替代内在能量函数，迷宫成功率下降超过30个百分点（Table 10）；内在能量验证器几乎与完美的连续真实分数验证器性能相当，明显优于稀疏0/1验证器（Table 11）。这证实了VFScale的核心主张——**扩散模型自身的能量函数经适当训练后，可以作为无需外部验证器的测试时扩展内在验证器**。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈：能量景观质量限制了测试时扩展
 
@@ -328,7 +334,9 @@ VFScale的一个核心主张是**扩散模型自身的能量函数可以作为�
 ![[assets/figures/papers/paper_list_l44_https_openreview_net_forum_id_8ta0xgtsJK/figures/013_Figure_6.jpg]]
 *Figure 6: The model architecture for VFScale on Maze task. The energy value is computed using the L2 norm of the final predicted output similar to Du et al. (2023), while the output is directly used as noise prediction for the diffusion baseline*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与因果机制
 
@@ -395,6 +403,8 @@ VFScale 处于**扩散模型推理优化**与**测试时计算扩展（test-time
 4. **跨领域推广**：hMCTS 的自适应切换机制能否推广到连续控制或自然语言等其他推理领域？当前仅在离散组合任务上验证，泛化性需要进一步研究。
 
 5. **负样本策略的影响**：Table 17 显示不同负样本生成策略对 LRNCL 效果有影响，最优负样本构造方式仍有探索空间。
+
+
 
 ## 原文 PDF
 

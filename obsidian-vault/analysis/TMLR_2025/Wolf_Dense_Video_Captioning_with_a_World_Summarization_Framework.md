@@ -5,6 +5,7 @@ paper_level: A
 venue: TMLR
 year: 2025
 pdf_ref: paperPDFs/TMLR_2025/Wolf_Dense_Video_Captioning_with_a_World_Summarization_Framework.pdf
+code_link: null
 project_link: https://wolfv0.github.io/
 aliases:
 - Wolf
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | Wolf：基于世界总结框架的密集视频字幕生成 |
 | 英文题名 | Wolf: Dense Video Captioning with a World Summarization Framework |
 | 会议/期刊 | TMLR 2025 |
-| Links | [paper](https://arxiv.org/abs/2407.18908); [Project](https://wolfv0.github.io/) |
+| Links | [paper](https://arxiv.org/abs/2407.18908) · [Project](https://wolfv0.github.io/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | Wolf |
 | Dataset | 500 Highly Interactive Nuscenes Videos, 473 Pexels Videos |
@@ -41,7 +42,7 @@ claims:
 > - 500 Highly Interactive Nuscenes Videos 上，Caption Quality 为 0.56，对比 0.45 (Gemini-Pro-1.5)，变化 +0.11。
 > - 473 Pexels Videos 上，Caption Similarity 为 0.88，对比 0.87 (Gemini-Pro-1.5)，变化 +0.01。
 
-## 概述
+## 概要
 
 **核心问题**：在自动驾驶、机器人等安全关键领域，单一视觉语言模型（VLM）生成密集视频字幕时，往往缺乏充分的时间推理能力，容易产生幻觉，难以同时捕捉细粒度的视觉细节和动态运动信息。
 
@@ -55,7 +56,7 @@ claims:
 
 **方法定位**：Wolf 属于不修改预训练模型的集成式字幕生成框架，通过 LLM 融合多源异构描述来提升字幕的准确性与一致性。其核心创新在于将图像级与视频级模型的互补优势进行系统化整合，同时引入显式的运动字幕生成模块。
 
-## 背景与动机
+
 
 密集视频字幕生成（Dense Video Captioning）要求模型对视频内容产生详尽、准确且时间连贯的自然语言描述，这在自动驾驶、机器人操作等安全关键领域中具有重要应用价值。然而，现有方法面临根本性瓶颈：**单一视觉语言模型（VLM）难以同时捕捉细粒度视觉细节和动态运动信息**。图像级模型擅长提取单帧的丰富细节，但缺乏时序推理能力；视频级模型能够感知全局时间动态，却往往在细节保真度上有所妥协。这种互补能力的割裂，导致单一模型在生成密集字幕时容易产生幻觉，且无法满足高安全场景对准确性的苛刻要求。
 
@@ -68,7 +69,9 @@ claims:
 
 此外，评估密集视频字幕的质量本身也是一个挑战。传统指标（如BLEU、ROUGE）难以捕捉语义层面的准确性和细节丰富度。为此，本文同步提出了**CapScore**——一个基于LLM的自动评估指标，从字幕相似度（Caption Similarity）和字幕质量（Caption Quality）两个维度量化生成字幕与人类标注的一致性。该指标与人类评估高度相关（Pearson相关系数分别达0.93和0.95），为方法的迭代优化提供了可靠的信号。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Wolf的核心创新在于提出了一种**多专家摘要（mixture-of-experts）框架**，通过将图像级视觉语言模型（VLM）和视频级VLM生成的异构字幕进行级联总结与交叉验证，在不修改任何预训练模型的前提下，有效整合了图像模型的细粒度视觉细节捕捉能力和视频模型的时间动态推理能力，并显著抑制了幻觉。
 
@@ -90,7 +93,7 @@ Wolf的核心创新在于提出了一种**多专家摘要（mixture-of-experts�
 
 Wolf在500个高交互性驾驶视频上的Caption Similarity达到0.55，显著超过最强基线Gemini-Pro-1.5的0.42，Caption Quality也由0.45提升至0.56（Table 2）。消融研究进一步表明，结合图像级和视频级模型的完整Wolf组合达到相似度0.55和质量0.56，优于仅使用视频模型的组合（0.49/0.52），直接证明了多源融合策略在减少幻觉方面的有效性（Table 6）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2407_18908/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of proposed Wolf framework. Wolf utilizes both image-level and video-level models to generate diverse and detailed captions, which are then summarized for cross-checking. On the right side, we also provide an example of how we obtain motion captions based on object locations extracted from image captions*
@@ -133,7 +136,7 @@ Wolf 的 pipeline 由四个关键模块串联构成，形成“图像级 + 运�
 - **中间产物**：采样帧序列 → 图像级字幕（级联生成） → 物体边界框轨迹 → 运动字幕 → 视频级字幕。  
 - **最终输出**：LLM 摘要器生成的单一详细视频字幕，覆盖视觉细节、物体运动及全局时间描述。
 
-## 核心模块与公式推导
+
 
 Wolf框架由四个核心模块构成，通过LLM摘要器实现多源信息的融合与交叉验证。整体流程如Figure 1所示：视频首先经过帧采样与分割，随后分别输入图像级字幕生成器、运动字幕生成器和视频级字幕生成器，最终由LLM摘要器汇总生成密集视频字幕。
 
@@ -175,7 +178,9 @@ LLM摘要器的提示词引导模型整合视觉和叙事元素，通过多源�
 
 **注意**：论文未提供CapScore评估指标的具体数学公式，该指标通过GPT-4对预测字幕与真实字幕的相似度和质量进行评分，其与人类评估的Pearson相关系数达到0.93（相似度）和0.95（质量），但具体评分函数的数学形式需查阅论文附录或代码实现。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置与评估协议
 
@@ -252,7 +257,9 @@ Figure 6 展示了不同模型在字幕长度变化下的 CapScore 表现。总�
 
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2407_18908/figures/011_Table.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从单模型字幕到多专家摘要
 
@@ -294,6 +301,8 @@ Wolf 的方法创新在于**改变了字幕生成策略的核心槽位**：基�
 3. **长视频扩展性**：Wolf 在面对长达数十分钟的视频时能否保持效率和质量？是否需要对框架进行层级化或自适应采样调整？
 4. **计算成本优化**：能否通过模型蒸馏、更轻量的替代 VLM 或动态专家选择机制，在保持字幕质量的同时降低多模型集成的计算成本？
 5. **评估体系的扩展**：CapScore 能否扩展到多语言或多模态评估场景？其在更广泛的视频理解基准（如 EgoSchema、Ego4D）上的有效性尚待验证。
+
+
 
 ## 原文 PDF
 

@@ -41,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - MIMIC-ILS test set 上，gIoU (%) 71.2 vs 23.8 (+47.4)；cIoU (%) 75.6 vs 18.5 (+57.1)；N-Acc. (%) 91.8 vs 0.6 (+91.2)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -69,8 +69,6 @@ MIMIC-ILS数据集包含**110万条指令-回答对**，源自**19.2万张CXR影
 
 ROSALIA在知识库中填补了“**指令引导的CXR多病变分割**”这一空白。与依赖人工标注的小规模数据集（如SIIM-ACR仅含气胸单一类别、VinDr-CXR仅提供边界框）不同，MIMIC-ILS首次实现了大规模、多病变、掩码级别且无需人工标注的数据构建。其全自动管线为后续研究提供了可复用的范式：仅需影像-报告对即可为任意医学影像模态生成指令-掩码数据，具有向CT、MRI等三维模态扩展的潜力。
 
-## 背景与动机
-
 胸部X光（CXR）是全球最常用的医学影像检查手段之一，其上的病变分割对于辅助诊断、量化病灶范围和跟踪病情演变至关重要。然而，现有CXR病变分割方法面临两个根本性瓶颈：**病变类型的单一性**和**输入指令的复杂性**。
 
 一方面，传统分割模型通常仅针对单一或少数几类病变进行训练（如肺结节、气胸），无法满足临床中多病变并存的真实场景需求。另一方面，少数具备文本引导能力的分割模型（如**BiomedParse**、**RecLMIS**）虽然支持自然语言输入，但要求用户提供冗长、详细的专家级医学描述（例如“双肺感染，右上肺和左上肺两处感染区域”），这大大提高了使用门槛——用户必须先解读CXR影像才能撰写有效指令，形成“先诊断、后分割”的悖论。
@@ -79,7 +77,7 @@ ROSALIA在知识库中填补了“**指令引导的CXR多病变分割**”这一
 
 上述缺口催生了本文的核心动机：**能否在零人工标注的条件下，自动构建一个大规模、多病变、支持自然语言指令的CXR分割数据集，并训练出能够理解简洁用户指令、灵活执行特异性分割、全局分割和缺失确认的视觉语言模型？** 这一动机直接指向了放射学报告中蕴含的丰富语义信息——报告不仅描述了病变类型和位置，还隐含了病变的空间范围，若能将其与影像视觉线索跨模态对齐，便有望打通从“影像-报告对”到“指令-掩码对”的全自动构建路径。
 
-## 核心创新
+## 核心方法与创新机理
 
 ### 瓶颈突破：从专家级描述到自然语言指令
 
@@ -105,8 +103,6 @@ $$\mathcal{L} = \lambda_{\mathrm{txt}} \mathcal{L}_{\mathrm{txt}} + \mathcal{L}_
 $$\mathcal{L}_{\mathrm{mask}} = \lambda_{\mathrm{bce}} \mathcal{L}_{\mathrm{bce}} + \lambda_{\mathrm{dice}} \mathcal{L}_{\mathrm{dice}}$$
 
 这一架构设计使得[SEG]标记的隐藏嵌入能够桥接VLM的语义理解和SAM的像素级分割能力。但与现有通用领域referring分割模型（如**LISA-7B/13B**、**PixelLM-7B/13B**）和医学分割模型（如**BiomedParse**、**RecLMIS**）相比，ROSALIA的差异化优势并非来自架构创新，而是源于**训练数据与任务定义的重新设计**：它首次将指令引导分割从“给定复杂描述输出掩码”升级为“理解简洁指令、同时输出掩码和文本解释、并判断病变存在性”的综合性任务。
-
-## 整体框架
 
 ROSALIA的整体框架由两大阶段构成：**自动数据集构建**与**指令引导分割模型训练**。其核心设计思路是：在无需任何人工标注的条件下，仅利用影像-报告对，自动生成大规模指令-掩码对数据集，进而训练一个能够理解自然语言指令并执行灵活病变分割的视觉语言模型。
 
@@ -147,8 +143,6 @@ $$\mathcal{L}_{\mathrm{mask}} = \lambda_{\mathrm{bce}} \mathcal{L}_{\mathrm{bce}
 
 ![[assets/figures/papers/paper_list_l2743_https_arxiv_org_abs_2511_15186/figures/008_Figure_5.jpg]]
 *Figure 5: Overview of ROSALIA. The architecture integrates a VLM with the SAM. The VLM takes a CXR image and a segmentation instruction as input, generating both a textual description and a special [SEG] token. The hidden embedding of this [SEG] token is then passed to SAM’s decoder to produce the final mask*
-
-## 核心模块与公式推导
 
 ROSALIA 的核心技术栈由两个阶段构成：**自动数据集构建管线**与**指令引导分割模型**。前者负责从影像-报告对中无监督地生成大规模的指令-掩码对数据集 MIMIC-ILS，后者基于该数据集训练视觉语言模型，使其能够理解自然语言指令并输出精确的病变分割掩码。
 
@@ -218,7 +212,7 @@ $$
 
 这一联合优化目标使模型能够同时学习文本指令的语义理解和像素级分割的对齐能力。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 1. 主实验结果：指令引导分割性能
 
@@ -273,9 +267,6 @@ MIMIC-ILS测试集经过严格的专家审核。**Table 3** 显示，四位放�
 ![[assets/figures/papers/paper_list_l2743_https_arxiv_org_abs_2511_15186/figures/009_Table_4.jpg]]
 *Table 4: Segmentation results (%) on the MIMIC-ILS test set. “N-Acc.” denotes the accuracy of correctly predicting empty targets. ¶ indicates medical domain baselines. The best and second-best results are marked in bold and underline, respectively*
 
-![[assets/figures/papers/paper_list_l2743_https_arxiv_org_abs_2511_15186/figures/013_Figure_6.jpg]]
-*Figure 6: Visualized inference results of ROSALIA and baseline models. The first three rows show results for positive cases, while the last row presents results for negative cases with an empty target mask. Additional examples are demonstrated in Appendix G*
-
 ![[assets/figures/papers/paper_list_l2743_https_arxiv_org_abs_2511_15186/figures/002_Table_1.jpg]]
 *Table 1: Existing CXR datasets with spatial annotations for pathologic lesions*
 
@@ -288,7 +279,7 @@ MIMIC-ILS测试集经过严格的专家审核。**Table 3** 显示，四位放�
 ![[assets/figures/papers/paper_list_l2743_https_arxiv_org_abs_2511_15186/figures/012_Figure.jpg]]
 *Figure: “Segment the cardiomegaly.”*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 任务定义与定位
 

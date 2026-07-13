@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/EmotionThinker_Prosody_Aware_Reinforcement_Learning_for_Explainable_Speech_Emotion_Reasoning.pdf
+project_link: null
+code_link: https://github.com/dingdongwang/EmotionThinker
 openreview_forum_id: wbttgzp7MT
 aliases:
 - EmotionThinker
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | EmotionThinker：基于韵律感知的强化学习可解释语音情感推理 |
 | 英文题名 | EmotionThinker: Prosody-Aware Reinforcement Learning for Explainable Speech Emotion Reasoning |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=wbttgzp7MT); [GitHub](https://github.com/dingdongwang/EmotionThinker) |
+| Links | [paper](https://openreview.net/forum?id=wbttgzp7MT) · [GitHub](https://github.com/dingdongwang/EmotionThinker) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | EmotionThinker |
 | Dataset | IEMOCAP, MELD, RAVDESS, SAVEE |
@@ -41,7 +43,7 @@ claims:
 > - MELD 上，Accuracy (%) 为 59.71，对比 59.13 (Kimi-Audio)，变化 +0.58。
 > - RAVDESS 上，Accuracy (%) 为 71.56，对比 72.00 (BLSP-Emo)，变化 -0.44。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -67,7 +69,7 @@ EmotionThinker 位于语音情感识别与可解释推理的交叉地带，其�
 
 - **训练策略谱系**：相较于直接监督微调（SFT）或标准 GRPO 仅依赖规则奖励的做法，GRPO-PTR 引入训练后的推理奖励模型，并设计信任权重机制抑制噪声奖励，实现了推理质量与识别准确率的联合优化。消融实验表明，移除推理奖励模型或信任权重均导致性能显著下降，验证了该策略的必要性。
 
-## 背景与动机
+
 
 语音情感识别（Speech Emotion Recognition, SER）旨在从语音信号中自动辨识说话人的情感状态，是情感计算与人机交互领域的核心任务。长期以来，主流方法将其建模为一个封闭式分类问题：输入一段语音，输出一个离散的情感标签（如“愤怒”“悲伤”“中性”）。然而，这种“黑箱”范式存在两个根本性缺陷。
 
@@ -81,7 +83,9 @@ EmotionThinker 位于语音情感识别与可解释推理的交叉地带，其�
 
 > **注意**：本章节基于论文引言与相关工作的分析综合而成。关于具体数据集的韵律标注细节、基座模型选型及强化学习框架的设计，将在后续章节中展开。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 EmotionThinker 的核心创新在于将语音情感识别（SER）从传统的分类任务重新定义为**可解释的深度推理问题**，并通过“数据—模型—训练策略”三个维度的协同改造，首次实现了基于韵律感知的语音情感推理。
 
@@ -129,7 +133,7 @@ EmotionThinker 在语音情感识别领域的方法谱系中占据独特位置�
 
 EmotionThinker 的关键突破在于：通过 **EmotionCoT-35K** 提供韵律-推理对齐数据，通过 **韵律增强 SFT** 赋予模型声学感知能力，通过 **GRPO-PTR** 实现推理过程与结果准确性的平衡优化。三者形成闭环，使模型首次能够基于声学线索进行多步推理并输出可解释的情感判断。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_wbttgzp7MT/figures/004_Figure_3.jpg]]
 *Figure 3: Architecture of EmotionThinker with the proposed GRPO-PTR framework. The upper part depicts the high-level GRPO-PTR training pipeline, where only the policy model is optimized. The lower part details PTR strategy, which progressively introduces reasoning reward to stabilize training and enhance reasoning*
@@ -200,7 +204,7 @@ EmotionCoT-35K 数据构建管线
 - **冷启动推理 SFT** 建立了“先推理后分类”的输出结构；
 - **GRPO-PTR** 通过逐步引入带信任权重的推理奖励，平衡了推理过程质量与结果准确性，解决了标准 GRPO 中推理信号过早引入导致的训练不稳定问题（消融实验 Table 4 验证了渐进策略和信任权重的必要性）。
 
-## 核心模块与公式推导
+
 
 EmotionThinker 的核心架构由三个关键模块构成：**EmotionCoT-35K 数据构建管线**、**韵律增强基座模型（EmotionThinker-Base）** 和 **GRPO-PTR 强化学习框架**。各模块协同工作，将语音情感识别重新定义为可解释的深度推理问题。
 
@@ -252,7 +256,9 @@ $$R_i = \alpha_f R_f + \alpha_o R_o + \alpha_t \tau \cdot R_t$$
 
 消融实验（Table 4）验证了各组件的有效性：移除训练后的奖励模型（V3）使推理得分从 3.98 降至 3.36；移除信任权重 $\tau$（V4）使 ER 得分降至 3.74；禁用渐进式调度（V5）同样导致性能下降。完整的 GRPO-PTR（V6）在 SER 准确率（68.89%）和推理得分（3.98）上均达到最优。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -313,7 +319,9 @@ $$R_i = \alpha_f R_f + \alpha_o R_o + \alpha_t \tau \cdot R_t$$
 ![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_wbttgzp7MT/figures/014_Table_8.jpg]]
 *Table 8: Case study comparing emotion reasoning outputs from EmotionThinker and 12 representative SpeechLLMs on the same audio sample. The ground-truth label is sad, and the analysis highlights differences in prosodic cue recognition, semantic integration, and logical coherence across models. EmotionThinker demonstrates more accurate and comprehensive capture of acoustic information, together with stronger logical consistency in its emotion reasoning*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与因果机制
 
@@ -366,6 +374,8 @@ EmotionThinker 处于三个研究方向的交汇点：
 4. **多轮对话推理**：该框架能否与文本对话模型结合，实现多轮交互中的情感推理和动态更新？
 5. **鲁棒性验证**：在嘈杂、重叠语音、多说话人等更具挑战性的场景下，框架的鲁棒性如何？需额外实验验证。
 6. **跨语言泛化**：训练数据主要为英文，泛化到其他语言（如中文、阿拉伯语）的能力未经验证，需构建多语言韵律感知推理数据集。
+
+
 
 ## 原文 PDF
 

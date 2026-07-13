@@ -43,7 +43,7 @@ claims:
 > - VRSBench 上，Pr@0.5 68.5 vs 63.0 (strongest RS MLLM, approx.) (+5.5)。
 > - RSVG-HR 上，Pr@0.5 51.5 vs Prior best (approx. 45.0) (+6.5)。
 
-## 概述
+## 概要
 
 遥感视觉定位（Remote Sensing Visual Grounding）面临一个核心瓶颈：图像中的目标通常极其微小，与广阔背景形成极端尺度差异，导致模型的有效分辨率极低，难以在感知全局场景的同时捕捉判别性细节；此外，查询语句往往涉及复杂的多目标空间关系和上下文依赖，传统的单步全局预测策略极易出错。
 
@@ -60,7 +60,7 @@ claims:
 
 GeoViS 位于遥感视觉定位和推理型多模态大模型（MLLM）的交汇处。与现有遥感专用 MLLM（如 **GeoChat**（Kuckreja et al., CVPR 2024））和通用 MLLM（如 **GPT-4o**（Hurst et al., arXiv 2024））相比，GeoViS 的关键差异在于将定位策略从“单步全局预测”升级为“奖励驱动的 MCTS 层次搜索 + 条件定位”，并引入结构化地理空间上下文解析（对象/位置/关系三元组）来显式指导空间推理。其统一 VisualRAG 模型同时承担奖励评估、动作引导和条件定位三项能力，区别于传统的单任务定位架构。该框架的搜索范式为将 MCTS 与多模态奖励函数结合用于视觉推理提供了新的设计范式，对需要精细空间感知的遥感理解任务具有参考价值。
 
-## 背景与动机
+
 
 遥感视觉定位（Remote Sensing Visual Grounding, RSVG）要求模型根据自然语言查询，在大尺度遥感图像中精确预测目标边界框。与自然图像的视觉定位不同，RSVG面临两个核心挑战：
 
@@ -72,7 +72,9 @@ GeoViS 位于遥感视觉定位和推理型多模态大模型（MLLM）的交汇
 
 GeoViS的核心动机在于：将视觉定位**重新定义为一种受地理空间奖励引导的逐步搜索与推理过程**。通过层次化探索识别包含目标的候选子区域，再联合全局与局部线索进行条件定位，从而在保持全局理解的同时克服极端尺度和复杂空间关系带来的挑战。这一思路将定位从“单步答案生成”转变为“多步证据收集与空间收敛”，使模型能够在搜索过程中主动获取高分辨率局部视觉线索。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题重构：从单步预测到地理空间奖励驱动的视觉搜索
 
@@ -122,7 +124,7 @@ GeoViS的核心架构是一个统一的**VisualRAG多模态大语言模型**（�
 
 GeoViS的搜索策略展现出显著的跨数据集泛化能力（Table 5）：在DIOR-RSVG上训练后直接评估VRSBench，GeoViS达到49.0%，大幅优于微调基线（39.3%），证实了搜索策略本身——而非对特定数据分布的过拟合——是性能提升的根本原因。这为遥感视觉定位领域提供了一种新的范式：将“一次性全局预测”转变为“奖励驱动的序贯搜索与推理”，其核心思想有望泛化到其他需要处理极端尺度差异和多目标空间关系的视觉定位任务。
 
-## 整体框架
+
 
 GeoViS 将遥感视觉定位重新定义为**地理空间奖励驱动的多步搜索与推理过程**，整体流程分为两个顺序阶段：**MCTS 视觉搜索**与**条件定位**。其核心思想是：与其在整幅大幅面遥感图像上一次性预测目标边界框，不如让模型先通过层次化探索逐步锁定最具信息量的子区域，再联合全局上下文与局部高分辨率线索进行精确定位。
 
@@ -159,7 +161,7 @@ GeoViS 将遥感视觉定位重新定义为**地理空间奖励驱动的多步�
 
 推理时，MCTS 每次查询执行 10 次模拟，最大搜索深度设为 5。VisualRAG 模型在搜索过程中被反复调用以评估候选区域并建议 Zoom-in 目标，搜索收敛后仅执行一次最终定位推理。这种“搜索时多次评估、定位时一次生成”的策略，将计算开销集中在信息获取阶段，而最终定位则利用搜索积累的局部线索实现高精度输出。
 
-## 核心模块与公式推导
+
 
 GeoViS 将遥感视觉定位重新定义为**地理空间奖励驱动的视觉搜索问题**，其核心由四个紧密协作的模块构成：结构化查询解析、MCTS 视觉搜索、地理空间奖励函数以及统一 VisualRAG 模型。
 
@@ -221,7 +223,9 @@ $$B = \mathcal{G}(I_g, T \mid I(s^\star))$$
 ![[assets/figures/papers/paper_list_l2125_https_arxiv_org_abs_2512_02715/figures/001_Figure_1.jpg]]
 *Figure 1: Complex queries with multi-object relations and tiny targets make remote sensing grounding challenging. While existing one-step methods that resize or divide images often fail, Geo-ViS parses structured semantics and performs reward-guided subregion exploration to achieve accurate localization*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈验证：有效分辨率是关键
 
@@ -276,7 +280,9 @@ Figure 3展示了基线与GeoViS在DIOR-RSVG、OPT-RSVG和RSVG-HR上的定位可
 ![[assets/figures/papers/paper_list_l2125_https_arxiv_org_abs_2512_02715/figures/004_Figure_3.jpg]]
 *Figure 3: Qualitative results on DIOR-RSVG, OPT-RSVG, and RSVG-HR comparing baseline (Qwen-2.5-VL-3B) with GeoViS*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 遥感视觉定位的范式演进
 
@@ -335,6 +341,8 @@ GeoViS在以下条件下展现出显著优势：
 4. **框架泛化潜力**：GeoViS的搜索-定位框架目前仅验证于遥感图像定位任务。其核心思想——通过奖励驱动的层次化搜索逐步聚焦信息丰富子区域——具有向其他视觉定位任务泛化的潜力，如自然图像中的指代表达理解（Referring Expression Comprehension）、视频目标定位、三维点云中的目标检测等。这些场景同样面临全局-局部信息权衡的挑战，但动作空间和奖励函数需要针对性重新设计。
 
 5. **训练数据依赖性**：GeoViS的训练依赖于具有边界框标注的遥感定位数据集，而此类数据的标注成本远高于自然图像。如何利用弱监督或自监督信号训练搜索策略，降低对精确框标注的依赖，是推动方法实际应用的重要方向。
+
+
 
 ## 原文 PDF
 

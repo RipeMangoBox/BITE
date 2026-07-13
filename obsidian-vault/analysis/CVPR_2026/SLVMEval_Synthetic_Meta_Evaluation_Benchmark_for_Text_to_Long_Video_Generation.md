@@ -45,7 +45,7 @@ claims:
 > - SLVMEval - Technical Quality 上，准确率（%） Human 91.8 ± 4.7 vs GPT-5 video 85.8 ± 4.2 (-6.0)。
 > - SLVMEval - Object Integrity 上，准确率（%） Human 86.6 ± 6.7 vs CLIPScore 76.0 ± 8.4 (-10.6)。
 
-## 概述
+## 概要
 
 文本到长视频（T2LV）生成技术正在快速发展，然而，如何可靠地评估生成的长视频质量仍是一个悬而未决的难题。现有的自动评估系统在长视频场景下表现明显劣于人类，尤其是在需要语义对齐和时序一致性的视频-文本一致性方面，且评估准确率随视频时长增加而显著下降。这一瓶颈的根本原因在于，当前缺乏一个能够系统诊断评估系统在长视频上各项能力缺陷的元评估基准。
 
@@ -59,7 +59,7 @@ claims:
 
 主要结果可概括为三点：（1）现有自动评估系统在长视频评估上普遍落后于人类，尤其体现在语义对齐和长程一致性方面；（2）视频时长是影响评估准确率的关键杠杆，时长增加导致系统性能显著下降；（3）基于文本的评估模式在特定模型（如**Qwen3-VL-235B**）的部分方面上较视频模式有显著提升（Background Consistency +23.3, Appearance Style +17.1），但效果依赖于底层模型能力。这些发现为未来T2LV评估系统的改进指明了方向。
 
-## 背景与动机
+
 
 ### 文本到长视频生成的评估困境
 
@@ -91,7 +91,9 @@ claims:
 
 通过 SLVMEval 基准，本文首次在长视频场景下对多种评估范式进行了全面的元评估，揭示了现有系统在视频-文本一致性方面的严重不足（如 Comprehensiveness 方面 GPT-5 视频模式仅 51.3%，Dynamics Degree 仅 35.3%，远低于人类 90% 以上的准确率），并验证了合成退化方法在构建可扩展评估基准方面的可行性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SLVMEval的核心创新在于**通过可控合成退化构建长视频元评估基准**，从而系统性地揭示现有自动评估系统在文本到长视频（T2LV）生成评估上的根本缺陷。其关键设计思路与创新点体现在以下几个方面：
 
@@ -145,7 +147,7 @@ SLVMEval通过Spearman秩相关分析（Table 7, Figure 3）揭示了一个此�
 
 综上，SLVMEval的核心创新并非提出新的评估指标或模型，而是**构建了一套可扩展、可控制、可诊断的长视频元评估方法论**，通过合成退化与成对比较框架，系统性地暴露了现有评估系统在长视频场景下的能力边界。
 
-## 整体框架
+
 
 SLVMEval 采用成对比较（pairwise comparison）的元评估框架，核心思路是：给定一段长视频及其对应的文本提示，通过受控的合成退化操作生成低质量版本，构建“高质量 vs 低质量”视频对，然后测试自动评估系统能否正确识别出原始高质量视频。该框架不依赖任何特定 T2LV 生成模型的输出，而是从密集视频标注数据集中选取真实长视频作为源素材，从而规避了生成模型质量波动对基准可靠性的干扰。
 
@@ -161,7 +163,7 @@ SLVMEval 采用成对比较（pairwise comparison）的元评估框架，核心�
 ![[assets/figures/papers/paper_list_l784_https_arxiv_org_abs_2603_29186/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of proposed SLVMEval benchmark. We construct human-validated pairs of original and aspect (specifically degraded long videos), and we test various automatic evaluation systems. Human evaluators reliably pick the better video; however, all current automatic evaluation systems lag behind human performance from most perspectives, revealing critical weaknesses in T2LV evaluation*
 
-## 核心模块与公式推导
+
 
 ### 3.1 基准构建流程
 
@@ -226,7 +228,9 @@ VideoScore基于预训练VLM的评分回归，需要将SLVMEval的方面映射�
 ![[assets/figures/papers/paper_list_l784_https_arxiv_org_abs_2603_29186/figures/002_Figure_2.jpg]]
 *Figure 2: Viewpoints and aspect-specific degrading operations in the proposed SLVMEval benchmark. We organize the benchmark into two groups, i.e., video quality and video-text consistency, and define 10 aspects. For each aspect, we construct paired videos by applying a controlled synthetic degradation to the original long video while keeping all other factors unchanged. The right panels show example pairs. These controlled pairs enable precise meta-evaluation of whether an automatic evaluation system can reliably identify the high-quality video under each viewpoint. Additional example pairs are provided in the supplementary material*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -306,7 +310,9 @@ SLVMEval目前存在三个主要局限：第一，退化操作仅设定为人类
 ![[assets/figures/papers/paper_list_l784_https_arxiv_org_abs_2603_29186/figures/011_Figure_7.jpg]]
 *Figure 7: Rank consistency on FETV*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有评估基准的关系
 
@@ -373,6 +379,8 @@ SLVMEval 的成对比较框架将所有这些系统统一到同一准确率度�
 
 **（5）无需人工过滤的基准扩展**
 过滤前后数据集上评估系统准确率的高度相关性（Figure 4）表明人工过滤步骤并非绝对必要。这是否意味着可以设计**自动化的退化质量验证机制**，从而在不依赖昂贵人工标注的情况下持续扩展基准规模？
+
+
 
 ## 原文 PDF
 

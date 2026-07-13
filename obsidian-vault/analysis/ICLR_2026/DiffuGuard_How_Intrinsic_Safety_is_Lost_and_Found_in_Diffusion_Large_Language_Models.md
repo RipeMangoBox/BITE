@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/DiffuGuard_How_Intrinsic_Safety_is_Lost_and_Found_in_Diffusion_Large_Language_Models.pdf
+project_link: null
+code_link: https://github.com/niez233/DiffuGuard
 openreview_forum_id: zBPzxhso8M
 aliases:
 - DiffuGuard
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | DiffuGuard：扩散大语言模型内在安全性的丧失与找回 |
 | 英文题名 | DiffuGuard: How Intrinsic Safety is Lost and Found in Diffusion Large Language Models |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=zBPzxhso8M); [GitHub](https://github.com/niez233/DiffuGuard) |
+| Links | [paper](https://openreview.net/forum?id=zBPzxhso8M) · [GitHub](https://github.com/niez233/DiffuGuard) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/diffusion_image_video |
 | Method | DIFFUGUARD |
 | Dataset | 六种越狱攻击综合（WildJailbreak, JBB-Behaviors, PAD_AdvBench, DIJA_AdvBench, AutoDAN_AdvBench, GCG_AdvBench）, WildJailbreak (LLaDA-8B-Instruct + DIFFUGUARD + Self-reminder), PAD_AdvBench (LLaDA-8B-Instruct + DIFFUGUARD + Self-reminder), PAD_AdvBench (Dream-v0-Instruct-7B + DIFFUGUARD + Self-reminder) |
@@ -41,7 +43,7 @@ claims:
 > - WildJailbreak (LLaDA-8B-Instruct + DIFFUGUARD + Self-reminder) 上，ASR (%) 为 8.50，对比 23.95，变化 ↓15.45。
 > - PAD_AdvBench (LLaDA-8B-Instruct + DIFFUGUARD + Self-reminder) 上，ASR (%) 为 24.42，对比 93.65，变化 ↓69.23。
 
-## 概述
+## 概要
 
 ### 1. 问题背景
 
@@ -77,7 +79,7 @@ DIFFUGUARD在四个dLLM家族（LLaDA-8B-Instruct、Dream-v0-Instruct-7B、LLaDA
 
 框架对模型通用能力（MMLU、GSM8K、HumanEval）和推理速度的影响可忽略，实现了安全性与实用性的有效平衡。
 
-## 背景与动机
+
 
 ### 扩散语言模型的解码范式与安全盲区
 
@@ -112,7 +114,9 @@ DiffuGuard的核心洞察是：dLLM的安全瓶颈根植于解码策略，而非
 
 该框架在四个dLLM家族（LLaDA-8B-Instruct、Dream-v0-Instruct-7B、LLaDA-1.5、MMaDA-8B-MixCoT）和六种越狱攻击方法上进行了验证，将平均ASR从47.9%降至14.7%（降低约33.2%），同时保持生成质量和推理速度几乎不受影响。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DIFFUGUARD的核心洞察在于：扩散大语言模型（dLLM）本身具备显著的内在安全能力——模型在深层表征中已能区分安全与有害内容（如Figure 2所示，越狱查询在Layer 27同时激活了拒绝性token与合规性token），但当前解码范式过早剪枝了安全性路径。因此，DIFFUGUARD选择了一条**训练无关的解码侧防御路线**，通过改造两个关键解码槽位来释放模型被压抑的安全潜力，而非重新训练模型。
 
@@ -163,7 +167,7 @@ DIFFUGUARD的核心创新定位在于**不触及模型权重，仅改造解码�
 
 消融实验（Table 2）量化了两个槽位各自的贡献：移除Block-level Audit and Repair后，LLaDA-8B在PAD_AdvBench上的ASR从59.62%急剧上升至约90%，说明该模块是防御利用dLLM内在机制的攻击（如PAD、DIJA）的关键组件；移除Stochastic Annealing Remasking也会导致防御性能下降，尤其在预优化提示攻击（如AutoDAN）上表现明显。两个模块的互补性验证了从intra-step和inter-step双维度同时介入的必要性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_zBPzxhso8M/figures/001_Figure_1.jpg]]
 *Figure 1: Left. The generation diagram of dLLMs; Middle. The unique vulnerabilities of dLLMs, including the intra-step and the inter-step level; Right. DIFFUGUARD framework achieves significant safety improvements while having minimal impact on model performance and inference latency*
@@ -202,7 +206,7 @@ $$\mathrm{SD}(p_0, p_{\text{origin}}) = 1 - \frac{\mathbf{h}_{\text{origin}} \cd
 
 整个pipeline的输入为提示$p_0$，输出为经过安全防护的生成文本。在每个生成步骤内，随机退火重掩码模块介入token保留决策；在每个块生成完成后，审计模块评估安全风险并决定是否触发修复。两个模块协同工作：随机退火从源头降低有害路径被选中的概率，审计修复则作为安全网捕获并纠正漏网的有害输出。
 
-## 核心模块与公式推导
+
 
 DIFFUGUARD是一个训练无关的推理时防御框架，由两个正交模块构成，分别对应dLLM安全脆弱性的两个维度：**随机退火重掩码**（Stochastic Annealing Remasking）解决intra-step层面的贪婪选择偏差，**块级审计与修复**（Block-level Audit and Repair）阻断inter-step层面的有害内容跨块传播。
 
@@ -237,7 +241,9 @@ $$\mathrm{Logits}'(\tilde{\tau}_i) = \begin{cases} -\infty & \text{if } \tilde{\
 
 消融实验（Table 2）证实：移除块级审计与修复模块后，LLaDA-8B在PAD_AdvBench上的ASR从59.62%急剧上升至约90%，说明该模块是防御利用dLLM内在机制攻击的关键组件；移除随机退火重掩码同样导致防御性能下降，但在AutoDAN等攻击上影响相对较小。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -328,7 +334,9 @@ Table 9评估了DIFFUGUARD对三种自适应攻击的鲁棒性：多采样攻击
 
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有防御方法的关系
 
@@ -362,6 +370,8 @@ DIFFUGUARD 与 Self-reminder 等提示级防御并非互斥关系——实验表
 **“Safety Tax” 现象。** MMaDA 系列表现出的推理能力增强训练削弱安全性的现象，说明复杂推理能力与安全性之间存在深层 trade-off。这一现象在多大程度上会泛化到其他推理增强型 dLLM，以及如何在训练阶段进行专门的安全对齐，仍是开放问题。
 
 **Dream 系列的安全迁移机制。** Dream 系列从 AR 模型（Qwen2.5-7B）继承安全对齐能力的机制能否被形式化并迁移到原生 dLLM 的训练中，对于提升整个 dLLM 家族的安全基线具有重要意义，但当前缺乏系统性研究。
+
+
 
 ## 原文 PDF
 

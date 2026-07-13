@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/QuietPrune_Query_Guided_Early_Token_Pruning_for_Vision_Language_Models.pdf
+project_link: null
 code_link: "https://github.com/QwenLM/Qwen3-"
 aliases:
 - QuietPrune
@@ -41,7 +42,7 @@ claims:
 > - InternVL3-1B 上，LR% (延迟降低) 42.1 vs 0 (无剪枝) (+42.1)。
 > - Qwen3-VL-4B（六个基准的平均） 上，RA% (相对准确率) 95.7 vs 100 (无剪枝) (-4.3)。
 
-## 概述
+## 概要
 
 视觉语言模型（VLM）在预填充阶段面临严重的延迟瓶颈：视觉Transformer（ViT）生成的大量视觉令牌占据了主导计算开销。实验表明，在多数配置下ViT计算占预填充延迟的50%以上，小模型搭配高分辨率输入时甚至超过75%（见Figure 2）。现有的令牌剪枝方法大多在ViT之后或LLM内部进行晚期剪枝，无法减少ViT自身的计算成本；而少数早期剪枝方法因缺乏文本指导，仅依赖视觉显著性，容易丢失对下游任务关键的语义令牌。
 
@@ -49,7 +50,7 @@ claims:
 
 在InternVL3和Qwen3-VL系列模型上的实验表明，QuietPrune在保持高相对准确率的同时实现了显著的延迟降低：在InternVL3-1B上达到98.5%的相对准确率和42.1%的延迟降低，在Qwen3-VL-4B上达到95.7%的相对准确率和33.1%的延迟降低。与现有SOTA方法相比，QuietPrune在准确率与预填充延迟的权衡上均表现更优（见Figure 1）。
 
-## 背景与动机
+
 
 ### 视觉-语言模型中的视觉令牌冗余问题
 
@@ -74,7 +75,9 @@ claims:
 
 通过解决上述挑战，QuietPrune旨在实现一个统一的早期剪枝框架，在显著降低预填充延迟的同时，保持甚至提升多模态理解的准确性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 QuietPrune 的核心创新在于将视觉令牌剪枝的决策点从 LLM 内部或 ViT 之后**前移至 ViT 编码阶段**，并通过**查询引导的文本-视觉相关性**替代传统的纯视觉显著性信号，从而在显著降低预填充延迟的同时保持甚至提升模型准确率。其关键创新可归纳为以下四个维度。
 
@@ -102,7 +105,7 @@ QuietPrune 的核心创新在于将视觉令牌剪枝的决策点从 LLM 内部�
 
 综合上述创新，QuietPrune 在 InternVL3-1B 上实现 **98.5%** 相对精度和 **42.1%** 延迟降低，在 Qwen3-VL-4B 上实现 **95.7%** 相对精度和 **33.1%** 延迟降低（见表 1），在精度-延迟权衡上显著优于现有方法。
 
-## 整体框架
+
 
 QuietPrune 的整体设计围绕一个核心洞察展开：**在 ViT 内部进行早期查询引导剪枝**，能够在显著降低预填充延迟的同时保持甚至提升模型准确率。其 pipeline 由三个关键模块串联构成，形成一条从文本查询到视觉令牌筛选的因果链路。
 
@@ -147,7 +150,7 @@ $$\mathcal{L}_{total} = \mathcal{L}_{distill}(Y_s, Y_t) + \mathcal{L}_{ce}(Y_s, 
 
 这种“早期+查询引导+半结构化”的组合设计，使得 QuietPrune 能够从根本上削减 ViT 的计算瓶颈——在多数设置中 ViT 占预填充延迟的 50% 以上，小模型高分辨率下甚至超过 75%（Figure 2）。
 
-## 核心模块与公式推导
+
 
 QuietPrune 由三个核心模块构成：文本到视觉适配器、半结构化分组剪枝机制和冗余令牌聚合模块。整体框架如 Figure 4 所示，其设计目标是在 ViT 内部实现查询引导的早期令牌剪枝，从而在预填充阶段显著降低计算开销。
 
@@ -206,7 +209,9 @@ $$\mathcal{L}_{total} = \mathcal{L}_{distill}(Y_s, Y_t) + \mathcal{L}_{ce}(Y_s, 
 
 其中 $\mathcal{L}_{distill}$ 为学生模型输出 $Y_s$ 与教师模型（未剪枝模型）输出 $Y_t$ 之间的 KL 散度，$\mathcal{L}_{ce}$ 为学生输出与真实标签 $Y_{gt}$ 的交叉熵。训练时仅更新适配器参数，ViT 和 LLM 保持冻结，因此训练开销极小。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -293,7 +298,9 @@ $$\mathcal{L}_{total} = \mathcal{L}_{distill}(Y_s, Y_t) + \mathcal{L}_{ce}(Y_s, 
 ![[assets/figures/papers/paper_list_l778_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_QuietPrune_Query_G/figures/011_Figure_7.jpg]]
 *Figure 7: QuietPrune results on InternVL3-1B model. Our method adaptively retains the visual tokens that are relevant to each query*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：从晚期剪枝到早期剪枝的范式转移
 
@@ -361,6 +368,8 @@ QuietPrune采用**2×2空间相邻分组**的剪枝粒度，基于[Q-CLS]与各�
 3. **剪枝层搜索**：剪枝层数和位置是否可以通过元学习或强化学习自动搜索，以替代当前的手工固定设置？
 4. **系统级协同**：QuietPrune的早期剪枝减少了进入LLM的令牌数量，这为KV cache压缩提供了额外机会。与系统级优化（如KV cache量化、前缀缓存）结合能否进一步释放延迟收益？
 5. **多模态扩展**：在视频理解、3D场景理解等更复杂的多模态场景中，查询引导的早期剪枝策略是否仍然有效？是否需要引入时序或深度维度的剪枝机制？
+
+
 
 ## 原文 PDF
 

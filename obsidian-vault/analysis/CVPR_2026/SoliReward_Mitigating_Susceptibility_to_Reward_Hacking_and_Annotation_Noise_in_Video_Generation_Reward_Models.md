@@ -45,7 +45,7 @@ claims:
 > - Out-of-Distribution (OOD) 上，RM Accuracy 80.08 (Phy&Deform), 60.25 (TA) vs 71.60 (VideoAlign, Phy&Deform); 60.52 (VideoPhy, TA) (+8.48 (Phy&Deform); ~0 (competitive))。
 > - VBench2 Human Fidelity (post-training) 上，Overall Score 0.8999 (guided by ours) vs 0.8695 (guided by VideoAlign MQ) (+0.0304)。
 
-## 概述
+## 概要
 
 视频生成模型的后训练优化（如GRPO、DPO）高度依赖奖励模型提供可靠的偏好信号。然而，当前视频奖励模型的训练面临三重瓶颈：**标注噪声**（成对比较范式引入严重标注者分歧）、**奖励攻击**（reward hacking导致生成策略过拟合到虚假高奖励特征），以及**分数表达退化**（现有VLM架构输出离散化或坍缩）。SoliReward针对上述瓶颈提出系统性解决方案，核心思路是将高噪声的相对比较转化为低噪声的二元判定，再通过跨提示配对挖掘大规模高信号偏好对，并利用平局对强制正样本映射到紧凑的奖励流形以从根源削弱奖励攻击。
 
@@ -55,7 +55,7 @@ claims:
 
 **局限与开放问题**：二元标注虽降低噪声但可能丢失细粒度质量差异；当前每个RM仅针对单一质量维度；后训练验证限于HunyuanVideo和DanceGRPO，跨生成模型泛化性待验证；更大规模参数下能否突破边际收益递减、多维度联合评估的架构设计等仍需探索。
 
-## 背景与动机
+
 
 ### 视频生成奖励模型的现实困境
 
@@ -90,7 +90,9 @@ SoliReward的出发点是一个关键洞察：**将高噪声的相对比较转�
 
 SoliReward并非简单组合现有技术，而是从数据采集、偏好构建、训练目标和特征提取四个维度对奖励模型训练范式进行了协同重构，其有效性在物理合理性、变形合理性和语义对齐等多个质量维度上得到了系统验证。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SoliReward 针对视频生成奖励模型训练中的三重瓶颈——标注噪声、奖励攻击（reward hacking）和输出表达不足——提出了三项协同创新，构成一个从数据采集到模型架构的完整改进链条。其核心思路是：**将高噪声的相对比较转化为低噪声的二元判定，再通过跨提示配对挖掘大规模高信号偏好对；同时用平局对强制正样本映射到紧凑的奖励流形，从根源上削弱奖励攻击；并利用Transformer层间功能特化设计HPQA，实现底层保真度与高层语义的显式融合。**
 
@@ -134,7 +136,7 @@ $$r = \mathrm{RewardHead}(q_{\mathrm{prog}} + o_{\mathrm{res}})$$
 
 上述四项创新构成闭环：二元标注降低数据噪声 → 跨提示配对释放信号规模 → BT-WT 损失正则化奖励流形 → HPQA 提升输出表达力。从 1B 到 8B 的模型规模扩展带来显著性能提升，但从 8B 到 14B 的收益递减（Phy&Deform OOD ACC: 81.43 → 81.71），暗示当前数据规模或任务复杂度可能接近该架构的容量上限（Table 9）。此外，当前每个 RM 仅针对单一质量维度，多维度联合评估是明确的拓展方向。
 
-## 整体框架
+
 
 SoliReward 框架从数据采集到奖励模型训练再到生成模型后训练，形成一条完整的闭环管线，其核心设计围绕三个瓶颈展开：标注噪声、奖励攻击（reward hacking）和奖励信号表达不足。图 1 给出了框架的总览。
 
@@ -151,7 +153,7 @@ SoliReward 框架从数据采集到奖励模型训练再到生成模型后训练
 ![[assets/figures/papers/paper_list_l2702_https_arxiv_org_abs_2512_22170/figures/001_Figure_1.jpg]]
 *Figure 1: Pipeline of SoliReward, our framework for data annotation and training of video reward models. (a) We introduce a single-item binary annotation method, coupled with a cross-prompt pairing strategy, to mitigate annotation noise. Furthermore, to alleviate reward hacking, we propose the Bradley-Terry with Win-Tie (BT-WT) loss. (b/c) We propose a novel VLM-based Reward Model (VLM-RM) architecture, featuring a Hierarchical Progressive Query Attention (HPQA) adapter. This adapter progressively aggregates multi-level representations from the VLM backbone to compute a robust reward score*
 
-## 核心模块与公式推导
+
 
 SoliReward 框架围绕三个关键模块构建：低噪声数据采集、抗攻击训练损失、以及多层特征聚合架构。以下逐一展开其核心机理与公式推导。
 
@@ -208,7 +210,9 @@ HPQA 的关键优势在于避免了分数离散化。Table 5 显示，HPQA 在�
 ![[assets/figures/papers/paper_list_l2702_https_arxiv_org_abs_2512_22170/figures/007_Figure_3.jpg]]
 *Figure 3: Reward distribution for BT and BT-WT. BT-WT contributes to a more concentrated distribution in the high-score segment for positive samples*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 标注者间一致性验证
 
@@ -276,7 +280,9 @@ HPQA在Qwen2-VL（2B）、Qwen2.5-VL（3B）和InternVL3（14B）等多种VLM骨
 ![[assets/figures/papers/paper_list_l2702_https_arxiv_org_abs_2512_22170/figures/008_Figure_2.jpg]]
 *Figure 2: The reward score distributions on the semantic alignment task reveal that alternative architectures suffer from severe score clustering, assigning identical ratings to many samples*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系与差异化
 
@@ -315,6 +321,8 @@ SoliReward 的提出根植于视频生成奖励模型（Video Reward Model）领
 5. **更广泛的 OOD 鲁棒性。** 当前 OOD 评估集仅覆盖四类 SOTA 模型（Wan2.1/2.2、Veo 3、Seedance 1.0），更广泛的分布偏移（如不同域、不同分辨率、不同时长）下的鲁棒性需进一步验证。
 
 6. **标注一致性的进一步提升。** 二元标注的 IAA（α=0.4939）虽优于成对比较，但仍仅为中等水平。结合标注者校准训练、多轮标注或 LLM 辅助判定，是否能进一步提升一致性？
+
+
 
 ## 原文 PDF
 

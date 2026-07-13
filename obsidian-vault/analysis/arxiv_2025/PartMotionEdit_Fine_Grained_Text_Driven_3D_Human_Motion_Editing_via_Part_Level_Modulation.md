@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/PartMotionEdit_Fine_Grained_Text_Driven_3D_Human_Motion_Editing_via_Part_Level_Modulation.pdf
+project_link: null
+code_link: null
 aliases:
 - PartMotionEdit
 tags:
@@ -40,7 +42,7 @@ claims:
 > - 当同时启用PMM和PSM时，生成-目标批检索R@1从70.83提升至73.96，AvgR从2.31降至1.92，充分验证了部件调制和部件级监督机制的有效性。
 > - 移除BMI模块后，运动质量M-Score从-4.114下降至-4.432，R@1从73.96下降至72.08，说明双向跨模态交互对于精确的语义对齐至关重要。
 
-## 概述
+## 概要
 
 文本驱动的3D人体运动编辑旨在根据自然语言指令修改给定的源运动序列。现有方法普遍采用全局建模策略，难以精确控制局部身体部件的运动变化。例如，**SimMotionEdit**（Li et al., CVPR 2025）虽然引入了运动相似度预测作为辅助任务，但其相似度计算基于全身姿态，未能分解到关节或部件粒度。当编辑指令涉及多个需要差异化处理的部件时（如“左手叉腰，同时抬起右腿”），全局方法容易造成非目标区域的意外扰动，导致局部编辑效果不佳。
 
@@ -50,7 +52,7 @@ claims:
 
 在方法谱系上，PartMotionEdit继承并改进了文本条件扩散运动生成范式，其关键突破在于将全局运动相似度监督（SimMotionEdit的粒度）替换为部件级相似度曲线监督，并引入显式的部件感知调制机制替代纯全局特征生成。该方法可定位为细粒度可控运动编辑的代表性工作，为后续探索语义级部件分解和序列化编辑任务奠定了基础。
 
-## 背景与动机
+
 
 ### 任务背景：文本驱动的3D人体运动编辑
 
@@ -74,7 +76,9 @@ PartMotionEdit 的核心动机正是突破这一全局建模范式，通过**显
 - **差异化控制**：设计部件感知运动调制模块（Part-aware Motion Modulation, PMM），通过学习可训练的部件查询向量，动态预测每个部件的编辑权重，并对运动特征施加残差调制，实现“该改的地方大幅改，不该改的地方尽量不动”的精细控制。
 - **语义对齐保障**：引入双向跨模态交互模块（Bidirectional Motion Interaction, BMI），在文本与运动特征之间建立双向注意力机制，确保编辑过程在获得部件级控制力的同时，不损失全局运动连续性与文本语义一致性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PartMotionEdit的核心创新在于将文本驱动的3D人体运动编辑从**全局建模**推进到**部件级调制**，解决了现有方法无法精确控制局部运动且易干扰非目标区域的瓶颈。具体而言，其关键创新点体现在以下三个相互耦合的changed slots上。
 
@@ -108,7 +112,7 @@ $$F_m'' = F_m' + R \odot \mathrm{MLP}(F_m')$$
 
 三个changed slots形成了一条完整的因果链路：**PSM**提供部件粒度的监督目标 → **PMM**学习预测部件编辑权重并执行调制 → **BMI**确保文本与运动的语义对齐贯穿始终。这一设计使编辑过程可解释，且能同时保持全局运动连续性与文本语义一致性，在MotionFix基准上全面优于包括SimMotionEdit和MotionFix在内的已有方法。
 
-## 整体框架
+
 
 PartMotionEdit 的整体架构遵循“编码—语义交互—部件调制—扩散生成—解码”的流水线设计，其核心思想是将人体运动显式分解为五个预定义部件，并在扩散生成过程中引入部件级自适应调制，从而实现细粒度的文本驱动运动编辑。
 
@@ -143,7 +147,7 @@ PartMotionEdit 的整体架构遵循“编码—语义交互—部件调制—�
 ![[assets/figures/papers/paper_list_l35_https_arxiv_org_abs_2512_24200/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of PartMotionEdit. It generates a target motion that modifies the given source motion according to the specified text instructions. It has three trainable core modules: the Bidirectional Motion Interaction (BMI) module, the motion diffusion model, and the Part-aware Motion Modulation (PMM) module with a multi-part similarity curve supervision, and three frozen modules (i.e., the motion encoder, the motion decoder and the CLIP model)*
 
-## 核心模块与公式推导
+
 
 PartMotionEdit 的核心创新在于将人体运动编辑从全局建模推进到**部件级语义调制**。其可训练部分由三个关键模块构成：双向运动交互（BMI）、部件感知运动调制（PMM）以及一个条件扩散模型，同时辅以训练阶段的部件级相似度监督机制（PSM）。以下重点剖析部件分解、相似度监督、BMI 与 PMM 的公式化设计。
 
@@ -229,7 +233,9 @@ $$\mathcal{L} = \mathbb{E}_{t, F_m'', \epsilon \sim \mathcal{N}(0,I)} \| \epsilo
 ![[assets/figures/papers/paper_list_l35_https_arxiv_org_abs_2512_24200/figures/003_Figure_3.jpg]]
 *Figure 3: Our Part-aware Motion Modulation (PMM) module processes motion features*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -273,7 +279,9 @@ PartMotionEdit 在 MotionFix 基准上与现有最先进方法进行了系统对
 ![[assets/figures/papers/paper_list_l35_https_arxiv_org_abs_2512_24200/figures/007_Table_4.jpg]]
 *Table 4: To validate the importance of the Bidirectional Motion Interaction (BMI) module, we removed it from the full model (Ours) to have the one without BMI (w/o BMI), and compared its motion quality (M-Score) with the ground truth (GT) as well*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 任务定位与基线谱系
 
@@ -325,6 +333,8 @@ PartMotionEdit 继承了 SimMotionEdit 的**条件扩散编辑范式**（以源�
 3. **更灵活的部件粒度控制**：当前五部件分解是固定的先验划分。能否让模型自动发现编辑相关的部件组合，或支持用户自由指定任意关节子集作为编辑目标？这需要重新设计部件查询的初始化和聚合机制。
 
 4. **跨骨架泛化**：现有部件分解依赖于 22 关节的人体骨架拓扑，向不同关节数量和拓扑结构的骨架（如手部、动物骨架）迁移时，部件定义和相似度计算都需要重新设计。
+
+
 
 ## 原文 PDF
 

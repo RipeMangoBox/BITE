@@ -42,7 +42,7 @@ claims:
 > - Immer-Any (Verification) 上，FRR@FAR 1e-5 (Left Eye) 52.04% vs NormKeep（具体数值未单列，但远高于NormFree） (显著低于SOTA（如Gabor: 85.47%, OM: 88.48%）)。
 > - Immer-Any (Identification) 上，Rank-1 Accuracy 94.39% vs SOTA中最高约90%左右 (较SOTA提升数个点)。
 
-## 概述
+## 概要
 
 传统虹膜识别依赖专用设备在受控条件下采集**正轴（on-axis）**图像，样本高度一致，现有SOTA方法在此类场景下已取得极低的错误率。然而，当应用场景转向消费级头戴显示设备（HMD）驱动的沉浸式环境时，采集条件变为**离轴（off-axis）且无约束**，导致虹膜图像出现扭曲、变化与退化（Figure 1）。本文的核心发现是：当前SOTA方法所依赖的**虹膜归一化（normalization）阶段在此类场景中极易失效**，产生严重扭曲的纹理，致使识别性能急剧崩溃——在传统CASIA-Iris-V4上FRR极低的方法，在ImmerIris的Immer-Any协议上FRR@FAR=1e-5飙升至85%以上（Table 3, Figure 2）。
 
@@ -55,7 +55,7 @@ claims:
 
 **局限性方面**，注视变化（gaze variation）是导致性能下降的最显著因素（平均约37%退化），当前NormFree尚未针对其专门优化；数据集受试者主要为20-40岁亚洲成年人，跨群体泛化性有待验证；此外，NormFree仍依赖预训练检测器，在极度遮挡或模糊时可能失效。
 
-## 背景与动机
+
 
 ### 虹膜识别范式的历史路径与固有假设
 
@@ -81,7 +81,9 @@ claims:
 
 基于上述分析，本文提出**NormFree**——一种免归一化的端到端虹膜识别范式。该方法仅通过预训练检测器获取可靠边界框，经1.2倍扩展以包含眼周上下文后直接送入特征提取网络，彻底摒弃了极坐标变换与纹理归一化步骤。在ImmerIris数据集上构建的多维度评估协议（综合挑战与孤立挑战）下，NormFree在所有协议上均显著优于归一化基线及其他SOTA方法，验证了这一范式转换的有效性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈诊断：归一化的脆弱性
 
@@ -128,7 +130,7 @@ claims:
 - **检测器依赖**：NormFree 仍依赖预训练检测器获取边界框，极端遮挡或模糊下的检测失败仍是潜在风险点。
 - **跨群体泛化**：数据集受试者主要为 20-40 岁亚洲成年人，其他种族和年龄组的泛化性需进一步验证。
 
-## 整体框架
+
 
 ImmerIris 提出的 **NormFree** 方法从根本上重构了虹膜识别的处理范式。传统 SOTA 方法普遍遵循 Daugman 经典的两阶段流水线：首先对眼部图像进行虹膜区域分割与轮廓参数化，再通过极坐标变换将环形虹膜展开（unwrap）为矩形归一化纹理，最后送入特征提取器。然而在沉浸式场景中，离轴拍摄、注视变化、光照波动与遮挡等因素使归一化阶段极易产生严重扭曲的纹理，成为整个系统的核心瓶颈（参见 Figure 6(a)）。
 
@@ -150,7 +152,7 @@ NormFree 采用**端到端的免归一化范式**，仅包含三个级联模块�
 
 Figure 6 直观对比了两种范式：传统范式在归一化阶段将环形虹膜展开为矩形纹理，失败时产生不可逆的纹理失真；NormFree 则绕过该步骤，直接利用裁剪后的虹膜区域进行端到端学习，从根本上规避了归一化失效带来的级联误差。
 
-## 核心模块与公式推导
+
 
 ### 范式重构：从两阶段归一化到端到端免归一化
 
@@ -173,7 +175,9 @@ NormFree的因果调节变量是**彻底移除归一化阶段**，将范式重�
 
 由于NormFree的创新本质是**去除归一化模块**而非引入新的数学构造，本节无新增公式需要推导。该设计的有效性完全由实验验证支撑：消融实验表明，即使换用更先进的自适应归一化技术，NormKeep性能仅微幅提升；而将骨干网络缩小至IR-18时NormFree仍保持优势，证明归一化是通用瓶颈而非实现细节（Table 7, Sec 5.6）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置概览
 
@@ -261,7 +265,9 @@ Table 7 通过两组消融实验排除了混淆因素，强化了“归一化是
 ![[assets/figures/papers/paper_list_l2098_https_arxiv_org_abs_2510_10113/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of application scenarios. Each sample group is from the same person. (a) Traditional iris recognition acquires on-axis and controlled images with dedicated devices, with samples being highly invariant. (b) Immersive iris recognition collects images using consumer HMDs, yielding off-axis and unconstrained samples that exhibit distortion, variation, and degradation*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 范式断裂：从“分割-归一化-匹配”到“免归一化端到端学习”
 
@@ -313,6 +319,8 @@ NormFree 在虹膜识别领域的方法谱系中标志着一次**预处理范式
 - **生物特征识别的端到端化趋势**：与人脸识别中从“对齐-特征”到直接端到端学习的演进类似，NormFree 将这一思路系统性地引入虹膜识别，并提供了大规模离轴数据集作为验证基础。
 - **鲁棒视觉识别的上下文利用**：1.2× 扩展裁剪的设计与目标检测中“上下文区域提升小目标检测”的思路相通，暗示适度的空间上下文可补偿局部纹理的退化。
 - **沉浸式计算的身份认证需求**：ImmerIris 数据集和 NormFree 方法共同填补了 VR/AR 场景下虹膜识别研究的空白，为后续工作提供了基准和基线。
+
+
 
 ## 原文 PDF
 

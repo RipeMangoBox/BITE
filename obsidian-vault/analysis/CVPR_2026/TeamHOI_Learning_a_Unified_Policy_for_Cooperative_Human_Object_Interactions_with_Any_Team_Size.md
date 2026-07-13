@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/TeamHOI_Learning_a_Unified_Policy_for_Cooperative_Human_Object_Interactions_with_Any_Team_Size.pdf
+project_link: https://splionar.github.io/TeamHOI
+code_link: null
 aliases:
 - TeamHOI
 tags:
@@ -40,7 +42,7 @@ claims:
 > - cooperative carrying (4 agents) 上，Success Rate (%) 99.2 vs 94.5 (CooHOI*-4) (+4.7)。
 > - cooperative carrying (8 agents) 上，Success Rate (%) 97.5 vs 42.2 (CooHOI*-8) (+55.3)。
 
-## 概述
+## 概要
 
 **核心问题**：在物理仿真环境中实现多智能体协作人物体交互（Human-Object Interaction, HOI）时，现有方法面临两个根本性瓶颈。其一，基于MLP的策略架构要求固定维度的输入，导致策略无法泛化到不同团队规模，每个团队规模都需要独立训练。其二，多智能体参考运动数据的匮乏限制了协作行为的多样性——单人运动捕捉数据丰富，但多人协作的参考运动极为稀缺。
 
@@ -50,7 +52,7 @@ claims:
 
 **主要结果**：在合作搬运任务上，TeamHOI统一策略在2至8个智能体上均取得超过97.5%的成功率，而CooHOI*-8在8智能体上仅为42.2%（Table 1）。在重载条件下（5倍桌面重量），TeamHOI在8智能体上成功率达81.1%，而CooHOI*-8仅为4.1%。消融实验证实掩码AMP显著提升了举升阶段成功率并促进多样化手-物交互（Figure 5），主轴覆盖奖励使智能体形成沿物体主轴对齐的稳定队形（Figure 6）。此外，统一策略展现出对未见过的物体尺寸和团队规模的零样本泛化能力（Table 4, Figure 9）。
 
-## 背景与动机
+
 
 物理仿真环境中的人形智能体协作操控是具身智能领域的核心挑战之一。随着任务复杂度提升，多智能体系统需要协调各自的运动与交互行为，共同完成单人无法实现的搬运、组装等任务。基于强化学习的物理角色动画方法近年来取得了显著进展，但在多智能体协作人物体交互（Human-Object Interaction, HOI）方面仍面临两个关键瓶颈。
 
@@ -60,7 +62,9 @@ claims:
 
 上述两个瓶颈共同指向一个核心问题：**如何在无需多人参考运动数据的前提下，构建一个能够适应任意团队规模、且能产生多样化协作行为的统一策略框架？** 本文提出的TeamHOI正是针对这一问题，通过引入Transformer架构实现可变团队规模的显式队友感知，并设计掩码AMP策略从单人参考运动中扩展协作行为多样性，为多智能体协作HOI提供了一条可扩展的技术路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 TeamHOI 的核心创新围绕三个关键 **changed slots** 展开，分别针对现有物理仿真多智能体协作方法中“固定团队规模”和“协作行为多样性不足”两大瓶颈，形成了一套可扩展的统一策略框架。
 
@@ -97,7 +101,7 @@ $$r_{t}^{\mathrm{style}} = \sigma(\alpha_{t}) r_{t}^{\mathrm{mask}} + (1-\sigma(
 
 上述三个 changed slots 形成了 TeamHOI 的核心创新链条：**Transformer + 队友令牌**解决了“可变团队规模”的可扩展性问题；**掩码 AMP** 解决了“协作行为多样性”的数据稀缺问题；**主轴覆盖队形奖励**则提供了不依赖预定义接触点的自适应协调机制。三者协同，使得单一统一策略能够在跨团队规模和物体几何形状的合作搬运任务中实现高效、稳定的协作。
 
-## 整体框架
+
 
 TeamHOI 旨在学习一个统一的去中心化策略，使可变数量的仿人智能体能够协作搬运不同几何形状的物体。其核心瓶颈在于：传统基于 MLP 的策略架构要求固定维度的输入，无法直接扩展到任意团队规模；同时，现有方法（如 CooHOI）隐式依赖物体共享动态进行通信，缺乏对队友状态的显式感知，限制了协作的自适应性和可扩展性。
 
@@ -161,7 +165,7 @@ $$g_{i} = \operatorname*{min}\left( \frac{\tilde{d}_{i}^{+}}{\ell_{i}^{+}}, \fra
 
 整体数据流为：仿真环境提供各智能体的本体感知状态和队友状态 → 分词器编码为令牌 → Transformer 编码器融合信息 → 动作头输出目标关节旋转 → PD 控制器驱动物理仿真。同时，掩码 AMP 模块根据交互程度提供风格奖励，队形奖励模块根据智能体空间分布提供协调信号，二者共同汇入总奖励函数指导 PPO 优化。
 
-## 核心模块与公式推导
+
 
 TeamHOI 的统一策略架构围绕三个核心设计展开：基于 Transformer 的可扩展协调网络、掩码对抗运动先验（Masked AMP）策略，以及不依赖团队规模的队形奖励机制。以下逐一解析各模块的公式定义与设计意图。
 
@@ -238,7 +242,9 @@ $$r_{\mathrm{form}} = 0.25 r_{\mathrm{ang}} + 0.75 r_{\mathrm{cov}}$$
 ![[assets/figures/papers/paper_list_l1755_TeamHOI_Learning_a_Unified_Policy_for_Cooperative_Human_Object_Interacti/figures/006_Figure_5.jpg]]
 *Figure 5: Ablation on the masked AMP strategy. Comparison between models trained with and without masked AMP, showing improved task rewards and successful hand-object interactions when masking is applied*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置概述
 
@@ -322,7 +328,9 @@ Table 4展示了统一策略在未见过的桌面尺寸（小型和大型）上�
 ![[assets/figures/papers/paper_list_l1755_TeamHOI_Learning_a_Unified_Policy_for_Cooperative_Human_Object_Interacti/figures/010_Table_2.jpg]]
 *Table 2: Key training hyperparameters in our experiment*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法沿革与基线定位
 
@@ -372,6 +380,8 @@ TeamHOI 解决的核心瓶颈是物理仿真中多智能体协作的两个刚性
 4. **队形奖励的通用性**：主轴覆盖奖励依赖于物体的主轴定义，对于不规则形状物体或非对称协作任务（如仅在一侧施力），需要设计更通用的支撑质量度量。
 
 5. **动态角色分配**：当前策略中所有智能体执行同质化行为。能否引入角色分工机制（如领航员-跟随者），通过层级化协调优化大规模团队的协作效率？这可能需要结合图神经网络或分层强化学习框架。
+
+
 
 ## 原文 PDF
 

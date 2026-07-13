@@ -5,6 +5,8 @@ paper_level: A
 venue: ICML
 year: 2024
 pdf_ref: paperPDFs/ICML_2024/MagicPose_Realistic_Human_Pose_and_Facial_Expression_Retargeting_with_Identity_aware_Diffusion.pdf
+project_link: null
+code_link: https://github.com/Boese0601/MagicDance
 aliases:
 - MagicPose
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | MagicPose: 基于身份感知扩散的真实感人像姿态与表情重定向 |
 | 英文题名 | MagicPose: Realistic Human Pose and Facial Expression Retargeting with Identity-aware Diffusion |
 | 会议/期刊 | ICML 2024 |
-| Links | [paper](https://arxiv.org/abs/2311.12052); [GitHub](https://github.com/Boese0601/MagicDance) |
+| Links | [paper](https://arxiv.org/abs/2311.12052) · [GitHub](https://github.com/Boese0601/MagicDance) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/robotics |
 | Method | MagicPose |
 | Dataset | TikTok |
@@ -40,7 +42,7 @@ claims:
 > - TikTok 上，SSIM 为 0.752，对比 0.648 (DisCo)，变化 +0.104。
 > - TikTok 上，PSNR 为 29.53，对比 28.81 (DisCo)，变化 +0.72。
 
-## 概述
+## 概要
 
 **核心问题**：现有扩散模型在人体姿态与表情重定向中面临一个根本性瓶颈——外观保持与姿态控制高度耦合。常规方案（如直接使用ControlNet或零样本自注意力连接）无法稳定地将参考图像的外观信息传递到生成结果中，导致身份丢失，或需要针对新域进行微调才能维持外观一致性。
 
@@ -54,7 +56,7 @@ claims:
 - 零样本域外泛化测试中，MagicPose无需微调即可在全身数据集Everybody Dance Now及风格迥异的参考图像上保持身份与姿态一致性（Table 4, Figure 6-8）。
 - 100人用户研究中，73%的票数选择MagicPose为身份保持最优方法（p-value = 1.11e-12）（Table 2, Table 5）。
 
-## 背景与动机
+
 
 ### 问题背景：姿态重定向中的身份保持困境
 
@@ -90,7 +92,9 @@ claims:
 
 3. **保持即插即用的泛化能力**：在不修改Stable Diffusion预训练权重的条件下，将所提模块作为插件集成，支持零样本域外泛化——包括全身数据集（Everybody Dance Now）和风格迥异的参考图像（2D卡通、T2I生成图像等），无需针对新域微调。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MagicPose的核心创新在于**将扩散UNet的自注意力层重新定位为外观变形模块**，并通过专门设计的可训练组件和两阶段训练策略，系统性地解决了现有扩散模型在人体姿态重定向中**外观控制与姿态控制高度耦合**的根本瓶颈。
 
@@ -155,7 +159,7 @@ $$Our\_Attn = softmax\left(\frac{Q_1 \cdot (K_1 \oplus K_2)^T}{\sqrt{d}}\right) 
 
 MagicPose的创新本质在于**将身份保持从扩散模型的隐式期望提升为显式的可训练目标**。通过将自注意力层重新定位为外观变形模块，并配合外观控制模型的预训练与姿态解耦策略，MagicPose在不修改SD-UNet预训练权重的前提下，以插件形式实现了鲁棒的身份感知姿态重定向。这一设计范式使得模型在仅使用TikTok数据集335个视频训练的情况下，取得了Face-Cos 0.426的领先性能（相较DisCo提升156%），并展现出对全身数据集和多样化图像风格的零样本泛化能力（Table 4, Figure 6-8）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l6_MagicPose_Realistic_Human_Pose_and_Facial_Expression_Retargeting_with_Id/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the proposed MagicPose pipeline for controllable human poses and facial expressions retargeting with motions & facial expressions transfer. The Appearance Control Model is a copy of the entire Stable-Diffusion UNet, initialized with the same weight. The Stable-Diffusion UNet is frozen throughout the training. During a) Appearance Control Pretraining, we train the appearance control model and its Multi-Source Self-Attention Module. During b) Appearance-disentangled Pose Control, we jointly fine-tune the Appearance Control Model, initialized with weights from a), and the Pose ControlNet. After these steps, an optional motion module can be integrated into the pipeline and fine-tune...*
@@ -206,7 +210,7 @@ $$\mathcal{L} = \mathbb{E}_{\mathcal{E}(I), A_{\theta}(I_R), P_{\theta}(I_C), \e
 
 整个框架的模块关系与数据流可参照 **Figure 2** 的 Pipeline 总览图。
 
-## 核心模块与公式推导
+
 
 ### 问题分解与整体架构
 
@@ -252,7 +256,9 @@ $$\mathcal{L} = \mathbb{E}_{\mathcal{E}(I), A_{\theta}(I_R), P_{\theta}(I_C), \e
 
 消融实验（Table 3）验证了该策略的有效性：移除外观控制预训练后，Face-Cos从0.426骤降至0.038（-944.73%），SSIM从0.752降至0.291（-149.82%）；移除外观解耦的姿态控制后，Face-Cos下降7.30%至0.397，SSIM下降3.43%至0.727。这证实了两阶段训练对身份保持和生成质量的决定性作用。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -353,7 +359,9 @@ $$\mathcal{L}_{joint} = \mathbb{E}_{\mathcal{E}(I), A_{\theta}(I_R), P_{\theta}(
 *Figure 16: Visualization of Zero-Shot Human Motion and Facial Expression Transfer on Everybody Dance Now Dataset (Chan et al., 2019b)*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与设计动机
 
@@ -406,6 +414,8 @@ MagicPose 的外观控制模型在架构上是 SD-UNet 的可训练副本，通�
 - **外观控制机制的跨任务迁移**：Multi-Source Attention Module 的层级化键值对注入机制本质上是一种通用的外观保持范式。它能否拓展到其他几何控制任务，如新视角合成（以相机姿态为条件）、自然场景形状编辑（以深度图或分割图为条件）或动物运动重定向？
 - **多人场景的身份解耦**：如何在多人场景中为不同角色分配独立的外观控制分支，并维持交互一致性（如遮挡关系、接触区域），是一个具有挑战性但应用价值显著的问题。
 - **轻量化与实时推理**：能否通过知识蒸馏、步数压缩或一致性模型蒸馏等手段，将 MagicPose 的推理成本降低到实时应用可接受的水平？
+
+
 
 ## 原文 PDF
 

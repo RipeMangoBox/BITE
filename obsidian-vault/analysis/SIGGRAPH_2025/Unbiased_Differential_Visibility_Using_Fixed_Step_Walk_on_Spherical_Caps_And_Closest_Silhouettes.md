@@ -5,6 +5,8 @@ paper_level: A
 venue: SIGGRAPH
 year: 2025
 pdf_ref: paperPDFs/SIGGRAPH_2025/Unbiased_Differential_Visibility_Using_Fixed_Step_Walk_on_Spherical_Caps_And_Closest_Silhouettes.pdf
+project_link: null
+code_link: null
 aliases:
 - FSWSCWWAR
 - UDVUFSWSCCS
@@ -41,7 +43,7 @@ claims:
 > - Center box gradient (x-translation) 上，Visual match to FD 为 Close match (high spp)，对比 WAS, PSDR-WAS show more noise/bias，变化 N/A。
 > - Mirror shadows gradient 上，Visual match to FD 为 Matches FD reference，对比 Projective sampling fails to capture mirrored shadows，变化 N/A。
 
-## 概述
+## 概要
 
 在可微渲染中，微分可见性（differential visibility）是计算场景参数导数时最具挑战性的环节之一。其核心困难在于，可见性变化引入的边界路径积分项需要高效且无偏的估计。现有的**warped-area reparameterization**方法通过散度定理将边界积分转化为面积积分，避免了显式采样不连续边界，但其速度场（velocity field）构造依赖于加权平均插值，存在三个根本缺陷：**估计有偏**（权重函数无界导致的数值不稳定）、**散度支撑窄**（采样效率低）、以及对复杂3D遮挡场景的**鲁棒性不足**。
 
@@ -49,7 +51,7 @@ claims:
 
 实验表明，在Voronoi-bunny阴影梯度任务上，本方法的L1误差为**0.032**，显著优于WAS（0.053）和PSDR-WAS（0.069）；方向导数估计器在平面和球面上均与有限差分参考一致；在逆渲染优化中，本方法能从初始圆盘收敛到目标花朵形状，而基线方法因梯度不准确未能收敛。消融实验进一步证实，**M=1步**的WoSC即可达到较好的精度与效率平衡，增加步数收益递减。
 
-## 背景与动机
+
 
 ### 可微渲染中的微分可见性难题
 
@@ -95,7 +97,9 @@ $$\Delta v(p) = 0 \text{ on } \mathcal{B}^{\mathrm{wa}}, \quad v(p) = v^{\partia
 
 整体方法流程为：将可见表面区域投影到单位球面 → 通过锥查询高效定位球面边界 → 在球面上执行固定步数WoSC估计速度场 → 利用方向导数将球面速度场映射回平面并计算散度。这一pipeline在Voronoi-bunny阴影梯度任务上实现了L1误差0.032，显著优于WAS的0.053和PSDR-WAS的0.069（Fig. 1），并在逆渲染优化中展现了从初始圆盘收敛到目标花朵形状的能力（Fig. 12），而基线方法因梯度不准确未能收敛。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本方法的核心创新在于将微分可见性中的速度场构造问题重新建模为**拉普拉斯方程的Dirichlet边界值问题**，并利用**固定步数球冠行走（Fixed-Step WoSC）** 在着色点处的单位球面上进行按需Monte Carlo求解。这一范式转换从根本上解决了现有warped-area reparameterization方法的三个瓶颈：
 
@@ -137,7 +141,7 @@ $$\boldsymbol{u}^{(M)}(\boldsymbol{q}) = \frac{1}{|C_{\boldsymbol{q}}|} \int_{C_
 
 这些创新共同构成了一个**鲁棒、无偏且高效**的微分可见性计算框架，在Voronoi-bunny阴影梯度任务上实现了0.032的L1误差，显著优于WAS的0.053和PSDR-WAS的0.069（Fig. 1），并在逆渲染优化中展现出准确的梯度信息，使遮挡物形状能从初始圆盘收敛到目标花朵形状（Fig. 12）。
 
-## 整体框架
+
 
 本文提出的方法旨在为可微渲染中的微分可见性计算提供一种无偏、鲁棒且高效的warped-area reparameterization方案。其核心流程围绕**固定步数球冠行走（Fixed-Step WoSC）** 构建速度场，并将该速度场嵌入标准的路径空间微分框架中。
 
@@ -193,7 +197,7 @@ $$\boldsymbol{u}^{(M)}(\boldsymbol{q}) = \frac{1}{|C_{\boldsymbol{q}}|} \int_{C_
 ![[assets/figures/papers/paper_list_l4_https_research_nvidia_com_labs_prl_wu2025diffvisibility_diffvisibility_p/figures/001_Figure_1.jpg]]
 *Figure 1: We introduce a robust method to compute warped-area reparameterization for differential visibility. The key ingredient is a novel velocity construction using fixed-step walk-on-spherical-caps (WoSC) accelerated by cone queries (illustrated in the left image) that find the geodesic closest distance to the boundaries on a unit sphere. In this example, we show derivatives of the shadows, cast by a Voronoi-bunny model [Mehta et al. 2022] with 168k triangles under an area light source, with respect to the ??-translation of the bunny. In (a), we present the gradient image computed by our method with a high sample count. In (b)–(d), we show equal-sample comparisons with the baseline methods (WAS [...*
 
-## 核心模块与公式推导
+
 
 ### 问题建模：速度场作为拉普拉斯方程的边值问题
 
@@ -245,7 +249,9 @@ $$\partial_d \boldsymbol{u}^{(M)}(\mathbf{q}) = -\frac{\sin A}{1 - \cos A} \part
 
 球面上需要高效查找测地线最近剪影点 $\text{cp}_{S^2}$。本文提出**锥查询**（Algorithm 5）：从查询点出发，沿测地线方向发射一个锥体，通过BVH遍历快速定位球面边界上的最近点。锥查询的初始半角参数在查询速度与速度场平滑度之间权衡，是当前未完全解决的开放问题。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心验证：方向导数估计器
 
@@ -305,7 +311,9 @@ Fig. 12展示了将本方法用于遮挡物形状优化的逆渲染任务。从�
 ![[assets/figures/papers/paper_list_l4_https_research_nvidia_com_labs_prl_wu2025diffvisibility_diffvisibility_p/figures/014_Figure_11.jpg]]
 *Figure 11: (e) Projective sampling Fig. 11. Comparison with projective sampling [Zhang et al. 2023]. The example on the top row computes derivatives of the shadows cast by the Voronoi-bunny model, and the example on the bottom row computes derivatives of the shadows seen through a mirror. Our results closely match the FD reference images, showing the robustness of our method under complicated light transport configurations. On the other hand, the results of projective sampling deviate from the reference images*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题谱系：微分可见性与Warped-Area重参数化
 
@@ -357,6 +365,8 @@ Fig. 12展示了将本方法用于遮挡物形状优化的逆渲染任务。从�
 3. **几何表示的泛化**：本方法是否可推广到SDF、神经隐式表面等其他几何表示？这将显著扩展其应用范围。
 4. **自适应步数选择**：对于不同复杂度和光照传输配置的场景，如何自动选择最优步数M？这需要建立场景特征与步数需求之间的预测模型。
 5. **与其他可微渲染组件的集成**：本方法专注于可见性梯度，如何与材质、几何等梯度的其他估计器协同优化，构建端到端的高效可微渲染系统？
+
+
 
 ## 原文 PDF
 

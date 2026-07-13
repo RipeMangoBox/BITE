@@ -44,7 +44,7 @@ claims:
 > - Real-World Smartphone Dataset 上，MUSIQ 30.62 (3M-TI) vs Second-best among compared methods (value not explicitly reported in text) (highest score)。
 > - Downstream Object Detection (LLVIP) 上，F1-score 0.4724 (3M-TI) vs Other SR methods and reference RGB (best overall (slightly surpasses RGB reference))。
 
-## 概述
+## 概要
 
 **问题瓶颈**：移动端热成像受限于微型传感器，空间分辨率低、纹理细节严重缺失；现有超分辨率方法要么难以恢复精细结构，要么依赖繁琐的跨相机像素级标定，在实际部署中几乎不可行。
 
@@ -62,7 +62,7 @@ claims:
 
 **待验证问题**：论文未提供移动端推理速度与内存占用分析，实际部署效率仍需验证；极端视差或剧烈旋转下 CSM 的对齐可靠性、以及 RGB 失效场景下的生成安全性，也需进一步考察。
 
-## 背景与动机
+
 
 热成像在安防监控、自动驾驶、夜间感知等场景中具有不可替代的价值。然而，高分辨率热像仪体积庞大、成本高昂，难以集成到智能手机等移动平台上。受限于微型化传感器的物理尺寸，移动端热成像的空间分辨率与纹理细节严重不足，这构成了**核心瓶颈**：移动热成像硬件微型化导致空间分辨率与纹理细节严重缺失，现有超分辨率方法要么无法恢复精细结构，要么依赖繁琐的跨相机像素级标定，难以实际部署。
 
@@ -72,7 +72,9 @@ claims:
 
 针对这一困境，本文提出**3M-TI**，一种面向免校准多相机移动热成像的跨模态扩散框架。其核心动机在于：将RGB与热成像的对齐问题从像素空间转移到VAE的连续、解耦潜在空间中，利用跨模态自注意力隐式学习多模态对应关系，从而彻底规避像素级标定的需求；同时借助扩散模型的生成先验恢复高保真热纹理细节，并通过位姿不对齐数据增强策略提升模型对真实部署中视差与时间偏移的鲁棒性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 3M‑TI 的核心创新在于**在 VAE 潜在空间中通过跨模态自注意力实现免标定的 RGB‑热成像特征融合**，并结合**位姿不对齐数据增强**与**高效 LoRA 微调**，解决了移动端多相机热成像超分辨率中“标定依赖”与“细节恢复不足”两大瓶颈。
 
@@ -98,7 +100,7 @@ claims:
 
 相较于通用扩散超分辨率方法 **SeeSR** (Wu et al., CVPR 2024) 和 **OSEDiff** (Wu et al., NeurIPS 2024)，3M‑TI 的差异化在于面向**跨模态、免标定**场景的专门设计；相较于红外专用扩散方法 **DifIISR** (Li et al., CVPR 2025)，3M‑TI 进一步利用了 RGB 语义引导（通过 RAM 文本提示）和不对齐鲁棒性机制。这些 changed slots 共同构成了 3M‑TI 在感知质量指标（LPIPS、MANIQA、MUSIQ）上全面领先 baseline 的方法论基础。
 
-## 整体框架
+
 
 3M-TI 是一套面向免标定、非同步多相机系统的跨模态扩散框架，其核心目标是从一张低分辨率热成像图像和一张未标定的高分辨率可见光参考图中，重建出纹理清晰、结构保真的高分辨率热图像。整个 pipeline 围绕三个关键挑战展开：RGB 与热成像相机之间的视差与时间偏移、异构模态特征的融合，以及训练数据规模与多样性的不足。
 
@@ -122,7 +124,7 @@ claims:
 ![[assets/figures/papers/paper_list_l2433_https_arxiv_org_abs_2511_19117/figures/001_Figure_1.jpg]]
 *Figure 1: A smartphone-based mobile imaging system integrating calibration-free and synchronization-free RGB and thermal cameras. The proposed 3M-TI method delivers superior thermal image quality compared with state-of-the-art restoration approaches*
 
-## 核心模块与公式推导
+
 
 ### 3.1 整体框架
 
@@ -172,7 +174,9 @@ $$
 $$
 其中 $\mathcal{L}_2$ 为均方误差损失，$\mathcal{L}_{\mathrm{LPIPS}}$ 为感知损失，权重 $\lambda=1$。该损失在公开数据集和真实手机采集数据上均取得了最佳的感知质量指标（LPIPS、MANIQA、MUSIQ）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果：感知质量与真实场景泛化
 
@@ -225,7 +229,9 @@ Table 4系统拆解了3M‑TI各设计的独立贡献，结论清晰：
 ![[assets/figures/papers/paper_list_l2433_https_arxiv_org_abs_2511_19117/figures/003_Figure_3.jpg]]
 *Figure 3: Qualitative comparison on our test set (zoom in for details). 3M-TI achieves the most faithful and visually consistent results, exhibiting sharp structures and accurate thermal patterns that best align with the GT*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 在热成像超分辨率谱系中的位置
 
@@ -271,6 +277,8 @@ CSM 的设计尤为关键：它将 RGB 和热成像的潜在 token 拼接后执�
 5. **RAM 语义提示的敏感性**：RAM 生成的标签质量直接影响文本条件。对于特定场景（如缺乏可识别物体），提示可能缺失或错误，存在误导扩散生成的风险。论文未对此进行消融分析。
 
 6. **真实手机数据的定量基准有限**：Table 2 仅报告了无参考指标 MUSIQ，缺乏在真实场景下的全参考评估（因无 GT），结论的确定性受限于无参考指标的可靠性。
+
+
 
 ## 原文 PDF
 

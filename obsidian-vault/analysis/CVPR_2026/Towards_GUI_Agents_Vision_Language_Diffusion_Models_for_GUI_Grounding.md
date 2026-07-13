@@ -44,7 +44,7 @@ claims:
 > - ScreenSpot-Web-Icon (SWI) 上，SSR (%) 63.10 vs 57.80 (+5.30)。
 > - ScreenSpot-Web-Text (SWT) 上，SSR (%) 74.80 vs 73.50 (+1.30)。
 
-## 概述
+## 概要
 
 GUI 智能体的核心能力之一是**GUI 定位**（GUI Grounding）——根据自然语言指令，在界面截图中准确定位目标元素并预测操作动作。当前主流方案几乎完全依赖**自回归视觉语言模型**（AR VLM），但这类模型受限于顺序解码与单向注意力，难以显式建模“锚点-范围”的空间几何依赖。离散扩散视觉语言模型（DVLM）具备双向注意力与迭代去噪的天然优势，却在 GUI 定位领域从未被探索。
 
@@ -53,8 +53,6 @@ GUI 智能体的核心能力之一是**GUI 定位**（GUI Grounding）——根�
 在仅使用 7k Mind2Web 样本微调的情况下，LLaDA-V 8B 即达到 **80.67% 的步成功率**（SSR），证明了离散扩散模型完成 GUI 定位的可行性。混合掩码在此基础上进一步将 SSR 提升 **1.3～6.1 个百分点**（最高增益出现在 VisualWebArena 上），同时维持接近饱和的动作类型 F1。将训练数据从 7k 扩展到 120k 多域 GUI 样本后，平均 SSR 再提升 **17～20 点**，推理延迟降低 **1～1.5 秒**，收敛所需扩散步数减少 **8～9 步**。
 
 值得注意的是，该方法**未使用任何定位专有预训练**，而对比的自回归基线（如 Qwen2.5-VL）通常受益于大规模定位预训练。这凸显了扩散模型在结构化视觉定位任务中的潜力，同时也揭示了当前方法在零样本泛化、多步动作预测以及推理延迟方面仍存在的显著差距。
-
-## 背景与动机
 
 ### 1. GUI 智能体的核心挑战：视觉定位
 
@@ -88,7 +86,7 @@ GUI 智能体的核心能力之一是**视觉定位**（GUI Grounding）——�
 
 为回答这些问题，本文选择 **LLaDA-V** 作为基础离散扩散 VLM，将其首次适配到 GUI 定位任务，并提出一种**混合掩码调度**策略，通过“粗定位→精定位”的两阶段掩码设计，引导模型显式建模锚点-范围的几何依赖。
 
-## 核心创新
+## 核心方法与创新机理
 
 本工作的核心创新在于将**离散扩散视觉语言模型（DVLM）**首次引入GUI定位任务，并通过**混合掩码调度（Hybrid Masking Schedule）**显式建模GUI动作的结构化几何依赖，从而在无需定位专有预训练的情况下逼近自回归基线。
 
@@ -127,8 +125,6 @@ GUI 智能体的核心能力之一是**视觉定位**（GUI Grounding）——�
 
 决定性证据表明混合掩码在多个基准上一致提升步成功率（SSR），最高达+6.1个百分点（VisualWebArena），同时维持接近饱和的动作类型F1（Table 4/Table 7）。然而，这一创新的有效性边界同样明确：**零样本性能极差（SSR接近0%）**，说明混合掩码调度本质上是一种**任务特定的结构化先验注入**，而非通用的泛化能力增强——它依赖于训练数据中GUI动作的结构化格式，无法自动迁移到未见过的输出模式。此外，混合掩码引入的串行依赖（先锚点后范围）在推理时带来了额外的顺序计算开销，需要通过减少扩散步数进行精度-延迟权衡。
 
-## 整体框架
-
 ### 任务形式化
 
 GUI 定位被建模为一个条件文本生成问题。给定自然语言指令 $N$ 和 GUI 截图 $I$，模型需要学习映射 $M: (N, I) \to a$，其中 $a = [a_{\mathrm{type}}, B]$ 包含动作类型（如 `lclick`、`hover`、`type_in`）和边界框 $B = (x_1, y_1, x_2, y_2)$。坐标归一化至 $[0, 1000]$，$(x_1, y_1)$ 锚定动作位置，$(x_2, y_2)$ 定义空间范围。预测成功的判据为：动作类型匹配真值，且预测框中心落入真值框内（即 Step Success Rate, SSR），而非 IoU 阈值。
@@ -165,8 +161,6 @@ $$L(\theta) = -\mathbb{E}_{v,p_0^1,r_0^1,r_t^1,t} \left[ \frac{1}{t} \sum_{i=1}^
 
 ![[assets/figures/papers/paper_list_l2349_https_arxiv_org_abs_2603_26211/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of Hybrid Masking Adaptation of LLaDA-V for GUI Grounding. (a) The adapted framework takes a naturallanguage instruction and a GUI screenshot (either from web, desktop, or mobile interfaces) as input. LLaDA-V trained with the linear masking predicts the action type, optional type in text, and anchor coordinates*
-
-## 核心模块与公式推导
 
 ### 4.1 单轮 GUI 定位的离散扩散建模
 
@@ -217,15 +211,7 @@ $$\mathrm{SSR} = \frac{1}{N} \sum_{i=1}^{N} \mathbf{1}[c_p^{(i)} \in B_g^{(i)}],
 
 $$\mathrm{F1} = \frac{2 \times \mathrm{Precision} \times \mathrm{Recall}}{\mathrm{Precision} + \mathrm{Recall}}$$
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2349_https_arxiv_org_abs_2603_26211/figures/003_Figure_2.jpg]]
-*Figure 2: The above figure shows an instance where LLaDA-V 8B trained with linear and full deterministic masking provides a more accurate target bounding box and action prediction compared to the model trained with linear masking. The green bounding box is the ground truth and the red one is the predicted. Both models receive image and natural language instruction and produce action type and target bounding as text, visualised on the GUI image*
-
-![[assets/figures/papers/paper_list_l2349_https_arxiv_org_abs_2603_26211/figures/013_Figure_5.jpg]]
-*Figure 5: Effect of hybrid masking on bounding-box accuracy. The figure compares predictions from LLaDA-V trained with default linear masking (top) and with the proposed hybrid masking that combines linear and deterministic full masking (bottom). The linearmasked model correctly predicts the action type but generates an inaccurate bounding box, missing the target region. In contrast, the hybrid-masked model, guided by conditional refinement between anchor and extent coordinates, produces a precise bounding box that accurately localizes the target element. The green bounding box is the ground truth and the red one is the prediction*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 核心发现：离散扩散VLM的GUI定位能力验证
 
@@ -304,21 +290,7 @@ Table 4（主结果表）展示了混合掩码在四个基准上的增益：
 
 4. **数据集覆盖有限**：虽然120k数据覆盖三域，但未在动态网页、跨应用操作等真实交互环境中验证，泛化性存疑。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2349_https_arxiv_org_abs_2603_26211/figures/006_Table_3.jpg]]
-*Table 3: LLaDA-V 8B fine-tuned only on the Mind2Web training set (7K samples) without and with cropping and OCR-based target annotation, trained for 10 epochs. The highlighted row shows the model trained with random cropping and OCR-based target annotation. Both models were tested on the Mind2Web test set*
-
-![[assets/figures/papers/paper_list_l2349_https_arxiv_org_abs_2603_26211/figures/012_Figure_4.jpg]]
-*Figure 4: Effect of data annotation quality on grounding accuracy. The figure compares predictions from LLaDA-V trained with default linear masking using the Mind2Web train split with and without cropped images and OCR-based annotations. The top example, trained without OCR text-based annotations and cropping, produces an inaccurate bounding box due to inconsistent icon-level targets and highresolution inputs. The bottom example, trained with cropped images and OCR-guided text annotations, provides more stable supervision, allowing the model to correctly localize the target element. The green bounding box is the ground truth and the red one is the prediction*
-
-![[assets/figures/papers/paper_list_l2349_https_arxiv_org_abs_2603_26211/figures/008_Table_5.jpg]]
-*Table 5: Zero Shot performance of LLaDA-V 8B on the Mind2Web test set*
-
-![[assets/figures/papers/paper_list_l2349_https_arxiv_org_abs_2603_26211/figures/009_Table_6.jpg]]
-*Table 6: LLaDA-V 8B fine-tuned only on the Mind2Web training set (7k samples) without cropping and OCR based annotation. The table shows the effect of inference parameters on Avg Latency and Accuracy*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 方法定位：离散扩散 VLM 首次进入 GUI 定位
 

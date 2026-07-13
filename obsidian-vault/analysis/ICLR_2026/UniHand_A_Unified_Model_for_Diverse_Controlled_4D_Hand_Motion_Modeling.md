@@ -42,7 +42,7 @@ claims:
 > - DexYCB (Occlusion 75-100%) 上，PA-MPJPE (mm) 4.26 vs HaWoR 5.07 (↓0.81 (16.0%))。
 > - HO3D 上，PA-MPJPE (mm) 6.7 vs WiLoR 7.5 (↓0.8 (10.7%))。
 
-## 概述
+## 概要
 
 **问题瓶颈**：4D手部运动建模长期被割裂为“从视觉输入估计手部姿态”和“从条件信号生成手部运动”两个独立任务。这种分离导致异构条件信号（RGB视频帧、2D/3D骨架、MANO参数等）缺乏统一的表示空间，运动先验难以跨任务迁移。尤其在严重遮挡或时间维度不完整的输入下，传统方法性能急剧退化——例如最高遮挡区间（75–100%）下，此前最优视频方法HaWoR的PA-MPJPE仍达5.07 mm，暴露了单任务框架对时序上下文和全局视觉线索利用不足的根本缺陷。
 
@@ -53,8 +53,6 @@ claims:
 - **规范相机坐标系**：以首帧定义规范相机空间，解耦相机运动与手部运动，无需显式外参即可同时适用于静态与动态相机场景。
 
 **主要结果**：在DexYCB全测试集上，UniHand取得PA-MPJPE 4.08 mm，较此前最优视频方法HaWoR（4.76 mm）降低14.3%；在最高遮挡区间（75–100%）下PA-MPJPE仅4.26 mm，较HaWoR降低16.0%。消融实验证实，移除手部感知机后PA-MPJPE从4.08退化至7.81（性能下降91%），验证了该模块在利用全帧视觉信息中的关键作用。在HO3D跨域泛化测试与世界坐标系HOT3D评估中，UniHand同样以一致优势超越现有方法，证明了统一框架的鲁棒性与通用性。
-
-## 背景与动机
 
 ### 任务定义与核心挑战
 
@@ -91,7 +89,7 @@ claims:
 
 该设计使得模型在DexYCB全测试集上达到PA-MPJPE 4.08mm，较此前最优视频方法HaWoR（4.76mm）提升14.3%；在最高遮挡场景下PA-MPJPE仅为4.26mm，展现出对严重遮挡的强鲁棒性（Table 1）。
 
-## 核心创新
+## 核心方法与创新机理
 
 UniHand 的核心创新在于将 4D 手部运动估计与生成统一为**条件运动合成**这一单一范式，并围绕该范式重新设计了三个关键环节：多模态条件对齐、视觉特征提取和坐标空间建模。
 
@@ -161,8 +159,6 @@ $$\mu_t = \frac{\sqrt{\bar{\alpha}_{t-1}}\beta_t}{1-\bar{\alpha}_t}\hat{z}_0 + \
 
 UniHand 的四项 changed slot 形成了一条完整的因果链：**联合 VAE** 解决了异构条件的对齐与融合问题，**手部感知机**突破了传统检测裁剪流水线的信息瓶颈，**规范坐标系**消除了动态相机下的运动不连续性，**预测干净隐变量的扩散设计**则强化了时序一致性。这些创新相互依赖——没有联合 VAE 的共享隐空间，手部感知机的视觉 token 与结构化条件无法有效融合；没有规范坐标系，动态相机下的运动先验无法在隐空间中一致表达。消融实验中多模态条件的互补效果（$c_{\text{vision}} + c_{\text{3D}}$ 将 PA-MPJPE 进一步降至 3.48）进一步验证了这一协同设计。
 
-## 整体框架
-
 UniHand 将 4D 手部运动估计与生成统一为**条件运动合成**任务，核心由两大模块串联构成：**联合变分自编码器（Joint VAE）** 与 **潜在扩散模型（Latent Diffusion Model）**，如 Figure 1 所示。
 
 ![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_upUl6hMYwy/figures/001_Figure_1.jpg]]
@@ -185,8 +181,6 @@ UniHand 将 4D 手部运动估计与生成统一为**条件运动合成**任务�
 ### 模块关系总结
 
 Joint VAE 负责将异构条件与运动序列对齐至共享隐空间，提供紧凑、解耦的表示；潜在扩散模型在此空间上进行灵活的条件融合与高质量运动合成。手部感知机作为视觉条件与扩散模型之间的桥梁，使模型能同时利用结构化信号（骨架、MANO）与稠密视觉细节，实现统一的估计与生成。
-
-## 核心模块与公式推导
 
 ### 3.1 统一条件运动生成框架
 
@@ -242,7 +236,7 @@ $$r_{\mathrm{occ}} = \frac{|M_{\mathrm{hand}}| - |M_{\mathrm{hand}} \cap M_{\mat
 
 其中 $M_{\mathrm{hand}}$ 为完整手部掩膜，$M_{\mathrm{vis}}$ 为可见区域掩膜，分子表示被遮挡的手部像素数，分母为手部总像素数。该指标将测试样本划分为不同遮挡级别（25-50%、50-75%、75-100%），用于细粒度性能分析（见 Table 1）。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -311,10 +305,7 @@ Table 4系统验证了各核心组件的贡献，所有消融均在DexYCB-All上
 ![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_upUl6hMYwy/figures/010_Figure_7.jpg]]
 *Figure 7: Qualitative comparison between HaMeR and our UniHand. HaMeR fails to estimate valid poses in video frames where the hand is absent, whereas UniHand maintains stable reconstructions by exploiting vision perception and temporal modeling*
 
-![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_upUl6hMYwy/figures/007_Figure_4.jpg]]
-*Figure 4: Additional visualization of generated hand poses and trajectories*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 任务定位：从分离式建模到统一条件运动合成
 

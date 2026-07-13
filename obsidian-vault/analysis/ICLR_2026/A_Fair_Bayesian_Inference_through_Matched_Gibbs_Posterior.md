@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/A_Fair_Bayesian_Inference_through_Matched_Gibbs_Posterior.pdf
+project_link: null
+code_link: null
 aliases:
 - MGP
 - FBITMGP
@@ -41,7 +43,7 @@ claims:
 > - CRIME 上，Nll 为 最佳，对比 gapreg, reduction, adv, mean-field Gaussian VI，变化 显著优于所有基线。
 > - CRIME 上，brier 为 最佳，对比 gapreg, reduction, adv, mean-field Gaussian VI，变化 显著优于所有基线。
 
-## 概述
+## 概要
 
 本文针对现有公平性方法忽略模型不确定性（model uncertainty）量化的核心瓶颈，提出了一种新的贝叶斯推断框架——匹配吉布斯后验（Matched Gibbs Posterior）。核心思路是引入一种名为匹配偏差（matched deviation）的群体公平性度量，并将其作为惩罚项融入吉布斯后验的似然函数中，从而在无约束参数空间上直接使用标准MCMC算法进行后验采样，同时实现公平性与不确定性量化。
 
@@ -49,7 +51,7 @@ claims:
 
 在ADULT、DUTCH、CRIME、CELEBA、CIVIL五个真实数据集上的实验表明，匹配吉布斯后验在效用-公平性和不确定性-公平性权衡方面均优于确定性基线（gapreg, reduction, adv）和变分贝叶斯基线（mean-field Gaussian VI）。具体地，在CRIME数据集上，该方法在所有四个评估指标（Acc, Nll, brier, Ece）的Pareto前沿上均表现最优；在CELEBA图像分类和CIVIL文本分类任务中，其准确率（Acc）和负对数似然（Nll）也大幅领先于基线方法。此外，该方法在个体公平性指标（Consistency score）上同样优于基线，且MCMC诊断指标（E-BFMI ≈ 1.646 > 0.3）和匹配函数接受率（在[0.2, 0.5]范围内）均表明采样算法收敛良好。
 
-## 背景与动机
+
 
 在机器学习公平性领域，现有方法主要聚焦于构建满足群体公平约束（如人口统计平等、等几率等）的单一预测模型。这类确定性方法的核心瓶颈在于：它们完全忽略了模型不确定性（model uncertainty）的量化。然而，对于高风险决策场景（如信贷审批、刑事司法），仅输出一个“公平”的点估计而不提供置信度信息，会严重削弱决策的鲁棒性和可信度。
 
@@ -59,7 +61,9 @@ claims:
 
 这一设计的因果机制在于：匹配偏差不仅是Wasserstein距离的一个可计算上界（Theorem 4.1：若Δ_M(θ,T) ≤ δ，则Δ_W(θ) ≤ δ），而且当总变差距离有界时，存在匹配函数使匹配偏差保持有界（Theorem 4.2）。这意味着公平性约束可以转化为一个O(n)复杂度的可微惩罚项，无需对抗学习。基于此，作者构建了匹配吉布斯后验（matched Gibbs posterior）：ν_M(f,T|λ) ∝ exp(ℓ(f) - λn Δ_M(f,T)) π(f) π(T)，将公平性惩罚项直接融入似然函数，使得标准MCMC算法可以在无约束参数空间上直接采样。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 该工作的核心瓶颈在于现有公平性方法（如 gapreg、reduction、adv）仅输出单一确定性模型，无法量化模型不确定性（model uncertainty），而后者对于高风险决策的鲁棒性和可信度至关重要。变分贝叶斯方法虽能提供不确定性，但将群体公平性约束（如 Wasserstein 距离）直接纳入变分推断时，面临计算不可行的问题：约束项通常需要对抗学习或 $O(n^2)$ 的二次复杂度，且约束后的参数空间高度非凸，使得标准变分族（如平均场高斯）难以有效优化。
 
@@ -75,7 +79,7 @@ claims:
 
 在多个真实数据集（ADULT, DUTCH, CRIME, CELEBA, CIVIL）上的实验表明，匹配吉布斯后验在效用-公平性和不确定性-公平性权衡上均优于所有基线方法（gapreg, reduction, adv, mean-field Gaussian VI），在 CRIME、CELEBA、CIVIL 等数据集上的 Pareto 前沿曲线中占据主导地位。此外，该方法在个体公平性指标（Consistency score）上也优于基线，并能自然扩展至等几率（Equalized Odds）和多值敏感属性场景。
 
-## 整体框架
+
 
 该方法的整体框架由三个核心模块串联而成：**匹配偏差计算模块**、**吉布斯后验构建模块**和**MCMC采样模块**。其核心设计思路是，通过引入一个可学习的匹配函数将群体公平性约束转化为一个易于计算的惩罚项，进而将该惩罚项融入吉布斯后验的似然函数中，使得标准MCMC算法能够在无约束的参数空间上直接进行公平后验推断。
 
@@ -113,7 +117,7 @@ $$
 
 MCMC采样完成后，得到一系列来自后验的样本 $\{ (f^{(t)}, T^{(t)}) \}_{t=1}^N$。这些样本可以直接用于不确定性量化，例如计算预测均值和置信区间。超参数 $\lambda$ 的选择通过网格搜索进行：选择能够最大化ELBO（证据下界），同时使得后验样本的平均人口统计平等差距（DP gap）小于预设阈值 $\delta$ 的 $\lambda$ 值。最终的输出是一个能够同时提供公平预测和不确定性量化的贝叶斯模型。
 
-## 核心模块与公式推导
+
 
 ### 1. 公平性度量：从群体偏差到匹配偏差
 
@@ -202,7 +206,9 @@ $$
 
 约束条件为 $\mathbb{E}_{\theta \sim \nu(\cdot|\gamma)} \Delta_\psi(f_\theta) \leq \delta$。然而，实验表明（Table 5），当使用平均场高斯变分分布时，在严格公平性水平（$\delta$ 较小）下，满足约束的样本比例几乎为零（如 $\delta=0.22$ 时比例为0.000），说明标准变分推断难以有效处理公平性约束。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：公平性-性能权衡
 
@@ -259,7 +265,9 @@ Figure 8 展示了ADULT数据集上MCMC采样的能量相关图。计算得到�
 ![[assets/figures/papers/iclr26_0002_sIjFXzEOOH_A_Fair_Bayesian_Inference_through_Matched_Gibbs/figures/017_Table_4.jpg]]
 *Table 4: Acceptance ratio of random-walk Metropolis-Hastings, only accepting samples that satisfies given constraint threshold*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -292,6 +300,8 @@ Figure 8 展示了ADULT数据集上MCMC采样的能量相关图。计算得到�
 2. **超参数选择**：匹配函数先验的温度参数τ目前通过网格搜索选择（Figure 9显示τ=1.0不显著影响结果），但缺乏自动选择机制。λ的选择同样依赖网格搜索（Table 2）。
 3. **扩展性**：方法已扩展至等几率（Equalized Odds，使用两个匹配函数T_0和T_1，Figure 13）和多值敏感属性（使用锚定组和多个T_i，Section E.2），但扩展到多分类任务和更复杂模型（如Transformer）的MCMC采样效率尚未验证。
 4. **其他公平性任务**：如表示学习（representation learning）中的公平性感知，是作者指出的未来方向。
+
+
 
 ## 原文 PDF
 

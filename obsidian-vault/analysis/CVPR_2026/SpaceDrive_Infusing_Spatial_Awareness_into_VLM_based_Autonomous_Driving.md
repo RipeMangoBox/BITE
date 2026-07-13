@@ -41,7 +41,7 @@ claims:
 > - nuScenes (open-loop) 上，L2 (m) Avg. ↓ 0.32 (SpaceDrive+) vs 0.33 (OmniDrive-Q++) (-0.01)；Collision (%) Avg. ↓ 0.23% (SpaceDrive+) vs 0.30% (OmniDrive-Q++) (-0.07%)；Intersection (%) Avg. ↓ 1.27% (SpaceDrive+) vs 3.00% (OmniDrive-Q++) (-1.73%)。
 > - Bench2Drive (closed-loop) 上，Driving Score ↑ 78.02 (SpaceDrive+) vs 77.74 (ORION) (+0.28)；Success Rate (%) ↑ 55.11% (SpaceDrive+) vs 54.62% (ORION) (+0.49%)。
 
-## 概述
+## 概要
 
 现有基于视觉-语言模型（VLM）的端到端自动驾驶规划器普遍缺乏空间感知能力。根本原因在于两方面：其一，VLM缺少基于3D数据的预训练，仅依赖2D语义进行推理，难以将3D坐标与对应物体准确关联，导致场景描述模糊甚至错误；其二，语言模型将数值处理为逐位数字分类，忽略了数字标记之间的序数邻近性，且错误地平均了不同数字位的权重，使得路径点预测精度低下。在闭环仿真中，纯文本数字输出的VLM模型（如OmniDrive-L）轨迹退化为近似直线且方向振荡，直接证实了数字逐位输出不适合闭环驾驶。
 
@@ -49,7 +49,7 @@ SpaceDrive针对上述瓶颈提出了统一的3D位置编码方案。其核心�
 
 在nuScenes开环评测中，SpaceDrive+取得了VLM方法中最优的L2误差（0.32 m）、碰撞率（0.23%）和交叉率（1.27%）；在Bench2Drive闭环评测中，驾驶得分达到78.02，成功率55.11%，位列VLM方法第二。消融实验表明，向视觉token注入空间位置编码后，L2误差降低0.63，碰撞率降低2.08%，交叉率降低4.14%；统一位置编码同时作用于视觉和文本坐标流时，无论是否使用ego状态，规划性能均得到提升。此外，正弦-余弦编码器因平移不变性优于全学习MLP编码器，且方法对深度噪声具有鲁棒性。
 
-## 背景与动机
+
 
 ### 端到端自动驾驶的范式演进
 
@@ -77,7 +77,9 @@ SpaceDrive针对上述瓶颈提出了统一的3D位置编码方案。其核心�
 
 基于此，SpaceDrive提出了一种空间感知的VLM驾驶框架，其核心思想是：**将空间信息视为显式的位置编码（Positional Encoding, PE），而非文本数字token**。具体而言，SpaceDrive引入统一的3D正弦-余弦位置编码，同时作用于视觉token的补充信息和文本中的数字坐标替换，并采用回归式解码器替代分类式语言头来直接预测连续坐标。这一改动使VLM能够在统一的位置编码空间内显式关联2D语义特征与3D空间位置，从而准确索引视觉语义并进行联合空间推理——这种统一表达避免了任务特定嵌入的碎片化，为VLM增强3D空间智能提供了一种通用范式。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SpaceDrive 的核心创新在于**将空间信息从“文本数字符号”提升为“统一的位置编码原语”**，从而解决当前 VLM 规划器在 3D 空间推理上的两个根本性缺陷：（1）缺乏基于 3D 数据的预训练，导致模型仅依赖 2D 语义，难以将 3D 坐标与对应物体准确关联；（2）语言模型将数值处理为逐位数字分类，忽略了数字标记之间的序数邻近性，且错误地平均了不同数字位的权重，导致路径点预测精度低下。
 
@@ -117,7 +119,7 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{LM}} + \mathcal{L}_{\mathrm{reg.}}(\hat{\ma
 
 **总结**：SpaceDrive 的三个 changed slots 构成了一个自洽的创新闭环——统一的 PE 编码器将空间信息提升为 VLM 可直接操作的基础原语，显式加和注入使视觉 token 获得度量空间感知，回归解码器则弥补了语言模型在数值预测上的先天不足。这一设计范式使 VLM 在保持通用视觉-语言对齐的基础上，无需引入稠密 BEV 表示即可实现精确的 3D 空间推理与轨迹规划。
 
-## 整体框架
+
 
 SpaceDrive 的整体框架围绕一个核心设计原则展开：**将空间信息显式编码为统一的三维位置编码（Positional Encoding, PE），替代传统 VLM 规划器中基于文本数字 token 的隐式坐标传递**。该框架在基础 VLM（默认 Qwen2.5-VL-7B）之上引入三个关键扩展模块——深度估计器、PE 编码器和 PE 解码器，形成从感知到规划的端到端空间感知推理链路。
 
@@ -181,7 +183,7 @@ $$\mathcal{L} = \mathcal{L}_{\text{LM}} + \mathcal{L}_{\text{reg.}}(\hat{\mathbf
 ![[assets/figures/papers/paper_list_l2418_https_arxiv_org_abs_2512_10719/figures/001_Figure_1.jpg]]
 *Figure 1: Spatial awareness in VLM-based end-to-end autonomous driving. (a) Constrained by insufficient 3D pre-training and discrete token-wise encoding, existing end-to-end planners based on the VLM struggle to precisely ground, associate, and predict 3D spatial positions, limiting their planning capabilities. (b) Our proposed SpaceDrive planner introduces a unified 3D coordinate encoding to replace the original VLM’s textual digit tokens and augment visual features, achieving explicit association with 2D perspective semantics to enhance joint spatial reasoning for E2E planning. Compared to current VLM-based methods, it achieves state-of-the-art driving capability in the nuScenes open-loop evaluatio...*
 
-## 核心模块与公式推导
+
 
 SpaceDrive 的核心设计围绕一个统一的空间坐标表达——**3D正弦-余弦位置编码（PE）**——展开，该编码同时作用于视觉流和文本流，使VLM能够在统一的坐标空间内进行显式的3D空间推理。整个框架由七个关键模块串联构成。
 
@@ -237,7 +239,9 @@ $$\mathcal{L} = \mathcal{L}_{LM} + \mathcal{L}_{reg.}(\hat{\mathbf{c}}, \mathbf{
 
 其中 $\mathcal{L}_{LM}$ 是作用于所有文本输出的标准语言建模损失，$\mathcal{L}_{reg.}$ 是作用于所有坐标输出的Huber回归损失。这种联合优化使得模型在保持VLM通用视觉-语言对齐能力的同时，获得精确的3D空间推理与轨迹预测能力。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -319,7 +323,9 @@ Table B 的反事实推理对比表明，SpaceDrive 在无 ego 状态输入下�
 ![[assets/figures/papers/paper_list_l2418_https_arxiv_org_abs_2512_10719/figures/012_Table.jpg]]
 *Table: C. Ablation of depth estimator. Table D. Ablation of pooling strategy*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与设计动机
 
@@ -374,6 +380,8 @@ SpaceDrive代表了**第三阶段：统一显式空间编码**。其关键架构
 4. **上游推理能力反哺**：在端到端模型直接生成规划轨迹之外，这种显式的3D空间感知能否反向提升VLM在场景问答、风险预估等上层推理任务中的性能？
 
 5. **归一化因子优化**：如何量化归一化因子 $\alpha_{PE}$ 的最优范围，并将其推广到不同深度估计器和分辨率配置？Table 5的消融显示PE归一化对语义合理性有显著影响（仅2421/5119输出样本语义合理），但最优策略仍待系统探索。
+
+
 
 ## 原文 PDF
 

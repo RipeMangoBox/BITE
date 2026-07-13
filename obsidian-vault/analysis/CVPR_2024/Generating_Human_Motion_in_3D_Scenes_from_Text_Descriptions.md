@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2024
 pdf_ref: paperPDFs/CVPR_2024/Generating_Human_Motion_in_3D_Scenes_from_Text_Descriptions.pdf
+code_link: null
 project_link: https://zju3dv.github.io/text_scene_motion
 aliases:
 - LGTSGOCD
@@ -42,7 +43,7 @@ claims:
 > - HUMANISE test set (predicted detection) 上，Target localization accuracy (%) 75.6 (ChatGPT) vs 72.4 (Mistral) (+3.2)。
 > - HUMANISE 上，goal distance 0.384 vs 0.385 (w/o two-stage) (-0.001)；scene score, accuracy, FID, quality score outperforms baselines vs HUMANISE, GMD∗, GMDHC (superior)。
 
-## 概述
+## 概要
 
 **核心问题**：给定一段文本描述（如“一个人坐在沙发上”），在三维场景中生成与之匹配的、包含精确人-物交互的人体运动序列，是一个具有挑战性的多模态生成任务。现有方法（如 **HUMANISE**，Wang et al., NeurIPS 2022）对整个三维场景点云进行编码，并采用隐式的视觉定位来推断交互目标。然而，这种全局编码策略导致生成器难以聚焦于与动作真正相关的目标物体，使得运动交互的准确性和运动质量受限——这正是本工作所要解决的关键瓶颈。
 
@@ -59,7 +60,7 @@ claims:
 
 **局限性**：当前方法假设场景为静态，无法处理动态物体或多人交互；文本描述限于模板化语言；目标定位依赖预训练三维检测器，检测错误会向下游传播。
 
-## 背景与动机
+
 
 生成逼真的人体运动是计算机视觉和图形学中的核心问题，其在虚拟现实、机器人仿真、游戏角色动画等领域具有广泛的应用前景。近年来，随着生成模型的快速发展，从文本描述生成人体运动取得了显著进展。然而，当任务从空旷空间拓展到包含复杂物体布局的3D场景时，生成与场景中特定物体进行精确交互的运动仍然是一个极具挑战性的问题。
 
@@ -69,7 +70,9 @@ claims:
 
 本文的核心动机在于：**将这一复杂的多模态生成问题分解为两个更可管理的子问题，以降低学习难度并提升生成质量**。这一思路的因果操纵点是：如果能够先显式地定位出文本所指的目标物体，那么后续的运动生成就可以围绕该物体展开，从而将注意力集中在场景的局部相关区域，而非处理整个场景的冗余信息。基于此，本文提出了一种LLM引导的两阶段生成框架，利用大语言模型的常识推理能力实现显式的3D视觉基础，并围绕定位到的目标物体构建轻量的物体中心场景表示，指导扩散模型生成轨迹和局部姿态。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本方法针对现有文本驱动场景感知运动生成方法（如 **HUMANISE**，Wang et al., NeurIPS 2022）的核心瓶颈——直接对整个3D场景点云编码并进行隐式视觉定位，导致生成器难以聚焦于与动作相关的目标物体——提出了系统性的解决方案。其关键创新在于将复杂的多模态生成问题**显式分解**为两个更易管理的子问题：目标物体的语言定位（language grounding）和以物体为中心的运动生成（object-centric motion generation）。
 
@@ -105,7 +108,7 @@ claims:
 
 上述四个 changed slots 围绕“分解复杂问题、聚焦交互核心”这一核心洞察展开：通过将3D场景转换为文本表示并利用LLM进行显式语言定位，再围绕定位结果构建轻量体积传感器表示，最后以两阶段扩散模型生成轨迹和运动，本方法系统性地解决了基线方法中“场景信息过载导致交互不准”的瓶颈问题。
 
-## 整体框架
+
 
 本文提出了一种基于大语言模型引导的两阶段生成框架，将“根据文本描述在3D场景中生成人体运动”这一复杂多模态问题，显式分解为**目标物体的语言定位**与**以物体为中心的运动生成**两个子问题。这一分解策略的核心动机在于：现有方法（如HUMANISE）直接对整个场景点云进行隐式编码与定位，导致生成器难以聚焦于与动作语义真正相关的目标物体，从而限制了交互精度与运动质量。
 
@@ -126,7 +129,7 @@ claims:
 ![[assets/figures/papers/paper_list_l1713_Generating_Human_Motion_in_3D_Scenes_from_Text_Descriptions/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of our two-stage pipeline. In the first stage, given an input scene and a text description (a), we use ChatGPT to locate the target object (b). In the second stage, human motions are synthesized by first producing human trajectories (c) and then generating local poses (d)*
 
-## 核心模块与公式推导
+
 
 本方法的核心架构由三个关键模块串联而成：基于大语言模型的目标物体显式定位、以物体为中心的体积传感器场景表示，以及两阶段条件扩散生成模型。以下逐一剖析其设计机理与数学基础。
 
@@ -195,7 +198,9 @@ $$\mathbf{C}_m = \{L, E, T, O_1, ..., O_N\}$$
 ![[assets/figures/papers/paper_list_l1713_Generating_Human_Motion_in_3D_Scenes_from_Text_Descriptions/figures/005_Figure_4.jpg]]
 *Figure 4: The visualization of the environment sensor, target sensor, and trajectory sensor. The target sensor (b) gives detailed geometry of the target object. The environment sensor (c) gives coarse spatial information around the target object. The trajectory sensor (d) is located around the human*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 5.1 实验设置
 
@@ -258,7 +263,9 @@ $$\mathbf{C}_m = \{L, E, T, O_1, ..., O_N\}$$
 ![[assets/figures/papers/paper_list_l1713_Generating_Human_Motion_in_3D_Scenes_from_Text_Descriptions/figures/010_Figure_6.jpg]]
 *Figure 6: Qualitative results of our method on the PROX dataset. We run our method on the scenes from the PROX dataset without fine-tuning. Results show that our method is capable to generalize to unseen scenes and objects*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题瓶颈与核心洞察
 
@@ -298,6 +305,8 @@ $$\mathbf{C}_m = \{L, E, T, O_1, ..., O_N\}$$
 - 是否可以利用更大的LLM或多模态视觉-语言模型直接处理点云，取消文本中间表示，实现端到端的3D视觉基础？
 - 能否将方法应用于户外场景或更大规模环境，突破当前室内场景的局限？
 - 如何增强模型对自由形式、非模板化文本描述的理解和泛化能力？
+
+
 
 ## 原文 PDF
 

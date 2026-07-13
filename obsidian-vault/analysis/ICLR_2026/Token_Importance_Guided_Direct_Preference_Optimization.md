@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Token_Importance_Guided_Direct_Preference_Optimization.pdf
+project_link: null
+code_link: https://github.com/gracefulning/TIDPO
 openreview_forum_id: cMEnMVvMw9
 aliases:
 - TD
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 基于令牌重要性引导的直接偏好优化 |
 | 英文题名 | Token-Importance Guided Direct Preference Optimization |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=cMEnMVvMw9); [GitHub](https://github.com/gracefulning/TIDPO) |
+| Links | [paper](https://openreview.net/forum?id=cMEnMVvMw9) · [GitHub](https://github.com/gracefulning/TIDPO) |
 | Topic | #topic/optimization_theory_probabilistic #topic/optimization_theory_probabilistic/optimization_methods |
 | Method | TI-DPO |
 | Dataset | MMLU, GSM8K, GPQA, HumanEval |
@@ -42,7 +44,7 @@ claims:
 > - GSM8K 上，Accuracy 为 72.3，对比 69.3 (DPO avg)，变化 +3.0。
 > - GPQA 上，Accuracy 为 25.3，对比 24.0 (DPO avg)，变化 +1.3。
 
-## 概述
+## 概要
 
 大语言模型的对齐训练普遍依赖从人类偏好数据中学习，但主流方法如 **DPO**（Rafailov et al., 2023）在序列级别进行优化，隐式地将每个令牌视为同等重要。这一简化带来了两个连锁瓶颈：**关键令牌的信号被非关键令牌的噪声淹没**，导致训练不稳定且对标注噪声敏感；同时，现有令牌级方法（如 **TDPO**、**TIS-DPO**）依赖有偏的概率代理或简化的加权方案，无法精细刻画人类偏好的令牌级结构。
 
@@ -66,7 +68,7 @@ TI-DPO 的核心思路是：**精确识别并加权关键令牌，可以过滤�
 
 方法的主要代价在于训练阶段：混合权重需要一次额外的反向传播计算梯度归因，导致单轮训练时间约为标准 DPO 的两倍，但不影响推理速度。在知识密集型推理任务（MMLU、GSM8K）上，TI-DPO 可能不及 GRPO/TPO 等序列级优化方法；但在对细粒度语义控制要求高的指令跟随、真实性和代码生成任务上表现突出。
 
-## 背景与动机
+
 
 ### 大语言模型对齐与偏好优化
 
@@ -111,7 +113,9 @@ $$
 
 通过这三个维度的改进，TI-DPO 旨在实现更稳定、更细粒度、对噪声更鲁棒的人类偏好对齐。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 TI-DPO 的核心创新在于将传统 DPO 的序列级优化解构为**令牌级加权对比**与**结构化三元组约束**的双重机制，通过两个关键改变槽（changed slots）实现更精细的人类偏好对齐。
 
@@ -159,7 +163,7 @@ TI-DPO 的创新不仅体现在工程层面，还获得了严格的理论保证�
 
 相较于已有的令牌级方法（如 **TDPO**（Zeng et al., 2024）依赖有偏的概率代理、**TIS-DPO**（Liu et al., 2024a）采用简化的启发式加权），TI-DPO 的混合权重机制首次将因果梯度归因与架构感知先验相结合，同时引入三元组损失提供结构化优化信号，实现了从“令牌级加权”到“令牌级结构化对齐”的跨越。
 
-## 整体框架
+
 
 TI-DPO 的核心思想是将序列级的偏好优化细化为令牌级的结构化对齐，其整体架构由三个关键设计串联而成：**令牌重要性加权机制**、**加权 DPO 损失**和**结构化三元组损失**。整个框架遵循“识别关键令牌 → 加权偏好优化 → 结构化语义拉近/推远”的级联逻辑。
 
@@ -192,7 +196,7 @@ TI-DPO 的核心思想是将序列级的偏好优化细化为令牌级的结构�
 
 值得注意的是，梯度归因计算仅在训练阶段引入额外开销（约 2 倍于标准 DPO 的单轮训练时间），推理阶段不涉及任何梯度计算或令牌权重估计，因此 TI-DPO 的推理速度与标准 DPO 对齐的模型完全一致。
 
-## 核心模块与公式推导
+
 
 TI-DPO 的核心由两个相互配合的机制构成：**令牌重要性加权**与**结构化三元组损失**。前者解决“哪些令牌对偏好信号更关键”的问题，后者在连续语义空间中提供细粒度的优化引导。
 
@@ -246,7 +250,9 @@ $$\mathcal{L}_{\mathrm{TI-DPO}} = \mathcal{L}_{\mathrm{DPO-w}} + \gamma \mathcal
 
 其中 $\gamma$ 控制三元组损失的相对强度。理论分析表明，该目标具有比标准 DPO 更紧的损失上界（Theorem 2），且最优策略的期望奖励严格占优（Theorem 3）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 
@@ -334,7 +340,9 @@ Table B11 和 B12 分别分析了混合权重系数 λ 和三元组损失 margin
 ![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_cMEnMVvMw9/figures/018_Table_12.jpg]]
 *Table 12: Table B10: Training loss comparison between DPO and TI-DPO over epochs*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法脉络与 TI-DPO 的定位
 
@@ -367,6 +375,8 @@ TI-DPO 的性能优势呈现明显的**任务依赖性**，这直接反映了其
 **与群体优化方法的融合**是另一个值得探索的方向。GRPO 等基于群体的方法在推理任务上表现优异，其核心优势在于通过多个候选响应的相对比较进行优化。TI-DPO 的令牌重要性机制若能嵌入群体优化的框架中——例如在群体内对不同令牌进行差异化加权——可能实现推理能力与细粒度控制的互补增益。
 
 **理论层面**，TI-DPO 已证明其损失上界比 DPO 更紧（Theorem 2）且最优策略的期望奖励严格占优（Theorem 3），但这些理论结果建立在令牌级 MDP 的框架假设之上。该框架与实际自回归生成过程之间的差距，以及高斯先验的最优参数选择与任务特性之间的关系，仍有进一步理论分析的空间。
+
+
 
 ## 原文 PDF
 

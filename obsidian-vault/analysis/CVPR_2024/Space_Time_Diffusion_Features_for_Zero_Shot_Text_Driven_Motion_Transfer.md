@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2024
 pdf_ref: paperPDFs/CVPR_2024/Space_Time_Diffusion_Features_for_Zero_Shot_Text_Driven_Motion_Transfer.pdf
+project_link: https://diffusion-motion-transfer.github.io/
+code_link: null
 aliases:
 - SBMTPM
 - STDFZSTDMT
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 时空扩散特征驱动的零样本文本运动迁移 |
 | 英文题名 | Space-Time Diffusion Features for Zero-Shot Text-Driven Motion Transfer |
 | 会议/期刊 | CVPR 2024 |
-| Links | [paper](https://arxiv.org/abs/2311.17009); [Project](https://diffusion-motion-transfer.github.io/) |
+| Links | [paper](https://arxiv.org/abs/2311.17009) · [Project](https://diffusion-motion-transfer.github.io/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | SMM-Based Motion Transfer (Proposed Method) |
 | Dataset | User Study (2AFC), Custom dataset (54 video-edit pairs, 21 videos) |
@@ -41,7 +43,7 @@ claims:
 > - User Study (2AFC) 上，Human preference for our method 为 84.50%，对比 Control-A-Video (50% chance)，变化 +34.50%。
 > - User Study (2AFC) 上，Human preference for our method 为 77.80%，对比 Tune-A-Video (50% chance)，变化 +27.80%。
 
-## 概述
+## 概要
 
 **核心问题**：现有文本驱动的视频编辑与运动迁移方法存在两个关键瓶颈：（1）大多要求源对象与目标对象属于相同或相近类别，难以在保持细粒度运动特性的同时实现大幅的形状和外观变化；（2）缺乏可直接利用的通用时空运动先验，导致跨类别编辑时运动保真度低或编辑效果受限。
 
@@ -55,8 +57,6 @@ claims:
 - 消融实验证实：全时空特征重建会阻止外观变化；仅优化SMM特征（非成对差异）仍保留过多原始外观信息；随机噪声初始化会导致运动保真度显著下降（Figure 7）。
 
 **局限性**：当输入运动与目标物体的组合对于T2V模型是分布外（out-of-distribution）时，方法难以维持原视频的运动特征；推理时间较长（DDIM反演约10分钟，优化采样7-15分钟），离实时应用仍有距离。
-
-## 背景与动机
 
 ### 文本驱动的视频编辑：从外观编辑到运动迁移
 
@@ -82,7 +82,7 @@ claims:
 
 本文的解决方案围绕**空间边缘均值（Spatial Marginal Mean, SMM）** 这一核心概念展开。SMM通过对T2V模型中间层时空特征的空间维度取均值，生成每帧的全局描述符。实验表明，该描述符能有效捕获物体的姿态、位置和场景语义布局，同时对像素级的外观和形状变化具有鲁棒性（见Figure 2）。在此基础上，本文进一步提出**成对SMM差异损失**，通过保持帧间SMM特征的相对变化而非绝对值，实现了运动保持与外观编辑自由度之间的关键平衡。
 
-## 核心创新
+## 核心方法与创新机理
 
 本方法的核心创新在于提出了一种**无需训练或微调的零样本文本驱动运动迁移框架**，其关键突破可归纳为三个紧密耦合的“changed slots”：特征描述符、损失函数和初始化策略。
 
@@ -122,8 +122,6 @@ $$\tilde{\mathbf{x}}_T = LF_\xi(\mathbf{x}_T) + (\epsilon_0 - LF_\xi(\epsilon_0)
 
 上述三个changed slots构成了一个完整的因果链条：**SMM描述符**从冻结的T2V模型中提取外观解耦的运动表示，**成对SMM差异损失**将运动保持问题转化为帧间相对关系的保持，**低频滤波初始化**在布局保持与编辑多样性之间取得平衡。三者协同，使得本方法在不依赖显式姿态模型、无需任何训练或微调的条件下，首次实现了跨类别物体的零样本运动迁移。
 
-## 整体框架
-
 ![[assets/figures/papers/paper_list_l3_Space_Time_Diffusion_Features_for_Zero_Shot_Text_Driven_Motion_Transfer/figures/003_Figure_3.jpg]]
 *Figure 3: Pipeline. (a) Given an input video, we apply DDIM inversion and extract space-time features $\pmb { f } \in \mathbb { R } ^ { F \times M \times N \times D }$ from intermediate layer activations. We obtain our Spatial Marginal Mean (SMM) feature SMM [ $\dot { \pmb f } ] \in \mathbb { R } ^ { F \times D }$ by computing the mean over the spatial dimensions, and compute the pairwise differences between each pair of SMM features. (b) For editing, we guide the generation at each denoising step with our Pairwise SMM differences objective (b). See Sec. 4 for more details
 
@@ -156,8 +154,6 @@ $$\tilde{\mathbf{x}}_T = LF_\xi(\mathbf{x}_T) + (\epsilon_0 - LF_\xi(\epsilon_0)
 **输入输出流**：系统接收一个驱动视频和一个目标文本提示（描述期望的目标物体和场景），输出一个保留驱动视频整体运动和场景布局、同时呈现目标物体外观和形状的新视频。整个过程无需配对训练数据，也无需对预训练T2V模型进行任何参数更新。
 
 > **证据强度说明**：上述pipeline描述基于论文Section 4.1-4.2的方法阐述及Figure 3的流程可视化，置信度较高。关于SMM特征对姿态和布局的编码能力，有Figure 2(c,d)的特征反演实验和最近邻检索实验作为实证支撑。低频滤波初始化的有效性在Figure 7(d-f)的消融实验中得到验证。
-
-## 核心模块与公式推导
 
 本方法的核心在于从预训练文本到视频扩散模型中提取时空特征，并构建一种对像素级变化鲁棒的全局运动描述符，进而通过成对差异优化实现运动迁移。整个框架无需任何训练或微调，仅依赖冻结的ZeroScope模型。
 
@@ -197,7 +193,7 @@ $$\tilde{\mathbf{x}}_T = LF_\xi(\mathbf{x}_T) + (\epsilon_0 - LF_\xi(\epsilon_0)
 
 完整的生成过程在Algorithm 1中总结。在每个去噪步 $t$，计算当前生成潜变量 $\tilde{\mathbf{x}}_t$ 与驱动视频潜变量 $\mathbf{x}_t$ 的成对SMM差异损失，通过梯度下降更新 $\tilde{\mathbf{x}}_t$，随后执行一步DDIM去噪。该迭代优化在保持运动的同时，使生成结果逐步符合目标文本描述。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 定量评估与用户研究
 
@@ -247,12 +243,7 @@ Figure 9揭示了本方法的主要失败模式：当输入运动与编辑提示
 
 此外，推理时间较长是实际部署的瓶颈：DDIM反演约需10分钟，带优化的采样根据配置需7-15分钟（Appendix B），离实时应用仍有显著距离。方法的零样本特性目前仅在ZeroScope上验证，对不同基座T2V模型的泛化能力尚未探索。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l3_Space_Time_Diffusion_Features_for_Zero_Shot_Text_Driven_Motion_Transfer/figures/002_Figure_2.jpg]]
-*Figure 2: Diffusion feature inversion via guided feature reconstruction. We extract space-time features f from an input video (a) and steer the generation process of a random sample to produce the same feature f , using feature reconstruction as guidance (b); the synthesized videos closely resemble the original video content in terms of appearance, shape, and pose. Replacing the full space-time features with their spatial marginal mean feature SMM[f ] allows for more flexibility (c); the SMM feature inversion results capture the original object pose, general position, and scene layout yet are not restricted to the original content at the pixel-level. This is also demonstrated in the nearest neighbor...*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 方法谱系：与基线的结构性差异
 

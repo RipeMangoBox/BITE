@@ -43,7 +43,7 @@ claims:
 > - NLVR2 (visual reasoning, pruning 0.8) 上，Test Accuracy (%) 79.62 vs 77.61 (MADTP) (+2.01%)。
 > - COCO image-text retrieval (BLIP, pruning 0.7) 上，Image-to-Text R@1 (%) 76.2 vs 73.9 (MADTP) (+2.3%)。
 
-## 概述
+## 概要
 
 视觉语言模型（VLM）在推理时面临双重计算瓶颈：Transformer 架构固有的参数冗余，以及视觉与语言模态引入的大量 token 冗余。标准 Transformer 块的计算复杂度为 $O(N^2 D + N D^2)$，其中 $N$ 为序列长度，$D$ 为特征维度——两项分别对应 token 和参数带来的开销。现有剪枝方法要么仅压缩参数（如 UPop、M-Pruning），要么仅剪枝 token（如 MADTP、STP），未能同时利用两种模态的冗余。更关键的是，参数重要性度量与 token 重要性度量之间存在**固有矛盾**：低重要性 token 会干扰参数重要性的估计，而被剪枝的参数仍会通过注意力机制影响 token 重要性排序（Figure 2, Figure 5）。简单联合剪枝（SJP）虽然同时进行两种剪枝，但未消除这一跨模式干扰，导致高剪枝率下性能显著退化。
 
@@ -54,7 +54,7 @@ claims:
 
 在 NLVR2 视觉推理任务上，剪枝率 0.85 时 CoMP 测试准确率达 **76.08%**，远超参数剪枝基线 UPop（62.10%）和 token 剪枝基线 MADTP（72.57%），相对提升约 14 和 3.5 个百分点（Table 1）。在 COCO 图像文本检索上，CoMP 在 BLIP 上 R@1 提升 2.3%，在 CLIP 上提升 2.5%，显示方法跨架构通用（Table 2）。消融实验表明，CIM 单独贡献 0.72% 准确率提升，MPS 进一步贡献 1.02%，验证了协同重要性度量和自适应模式选择的必要性（Table 4）。方法代码已开源（https://github.com/Wuzimeng/CoMP.git）。
 
-## 背景与动机
+
 
 ### 视觉语言模型的计算瓶颈
 
@@ -93,7 +93,9 @@ claims:
 
 基于上述分析，本文提出 **协作多模式剪枝（Collaborative Multi-Mode Pruning, CoMP）**，核心思路是：消除参数与 token 重要性之间的相互干扰，并设计自适应模式调度策略，使两种剪枝模式协同工作而非彼此对抗。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CoMP 的核心创新在于首次系统性地识别并解决了视觉语言模型（VLM）剪枝中参数剪枝与 token 剪枝之间的**相互干扰问题**，并据此设计了一套协作剪枝框架。其创新点可归纳为两个紧密耦合的 changed slots：**协作重要性度量（CIM）** 与 **多模式剪枝策略（MPS）**。
 
@@ -162,7 +164,7 @@ CIM 与 MPS 的协同体现在两个层面：**微观层面**，CIM 在每次剪
 
 这种闭环设计使得 CoMP 在高剪枝率下展现出显著优势：在 NLVR2 剪枝率 0.85 时，CoMP 测试准确率达 76.08%，远超参数剪枝基线 UPop（62.10%）和 token 剪枝基线 MADTP（72.57%），相对提升分别约 14 和 3.5 个百分点（Table 1）。在 COCO 图像文本检索上，CoMP 在 BLIP 上 R@1 提升 2.3%，在 CLIP 上提升 2.5%（Table 2），验证了方法的跨架构通用性。
 
-## 整体框架
+
 
 CoMP 通过**嵌套循环**实现参数与 token 的协同渐进剪枝，其核心由两个模块构成：内循环中的**协作重要性度量（CIM）** 负责消除跨模式干扰，外循环中的**多模式剪枝策略（MPS）** 负责动态调度剪枝模式。
 
@@ -196,7 +198,7 @@ CoMP 通过**嵌套循环**实现参数与 token 的协同渐进剪枝，其核�
 ![[assets/figures/papers/paper_list_l743_https_arxiv_org_abs_2604_02956/figures/015_Figure.jpg]]
 *Figure: A. Illustration of extending CoMP to the LLaVA-style architecture. We perform pruning in the LLM component, including pruning of vision tokens, language tokens and parameters, since this part accounts for more than 95% of the overall FLOPs*
 
-## 核心模块与公式推导
+
 
 CoMP 框架由两个核心模块构成：**协作重要性度量（CIM）** 负责消除参数与 token 重要性评估之间的相互干扰；**多模式剪枝策略（MPS）** 负责在渐进式剪枝过程中自适应选择最优剪枝模式。以下逐一推导其关键公式与机理。
 
@@ -295,7 +297,9 @@ CIM 与 MPS 以内-外循环方式协同工作（Figure 3a）。内循环中，�
 ![[assets/figures/papers/paper_list_l743_https_arxiv_org_abs_2604_02956/figures/003_Figure_2.jpg]]
 *Figure 2: (a) At*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -395,7 +399,9 @@ Table H 在 5 个随机种子下对比 CoMP 与 MADTP 的均值和标准差：Co
 4. **LLM-based VLM 探索不充分**：LLaVA 实验仅进行一轮 SFT，更大规模模型和更充分微调设置下的表现有待验证。
 5. **与 token 合并技术的结合**：当前方法仅做 token 丢弃，未与 token 合并等更激进的冗余消除技术联合优化，该方向的潜力尚未释放。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：从单模式剪枝到协作剪枝
 
@@ -455,6 +461,8 @@ CoMP 相对于这些基线的**方法论增量**体现在三个层面：
 5. **极高剪枝率下的能力坍塌**：当剪枝率极高时（如 >0.9），模型能力是否存在坍塌点？Figure C 显示不同剪枝模式对 FLOPs 减少的贡献分布，但未揭示性能坍塌的临界条件。如何预测并规避该坍塌点是部署高压缩率模型的关键问题。
 
 6. **与训练感知方法的深度融合**：当前 CoMP 主要在后训练（post-training）剪枝框架下工作，与 SFT 等训练感知方法的结合仅在 LLaVA 实验中初步探索。协作剪枝策略与微调的联合优化（如剪枝模式调度与训练步数的协同）可能进一步释放性能潜力。
+
+
 
 ## 原文 PDF
 

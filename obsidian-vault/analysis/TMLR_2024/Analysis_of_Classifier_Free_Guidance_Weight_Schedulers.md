@@ -5,6 +5,8 @@ paper_level: A
 venue: TMLR
 year: 2024
 pdf_ref: paperPDFs/TMLR_2024/Analysis_of_Classifier_Free_Guidance_Weight_Schedulers.pdf
+project_link: null
+code_link: null
 aliases:
 - DGWS
 - ACFGWS
@@ -40,7 +42,7 @@ claims:
 > - CIN-256 LDM (ImageNet 256×256, 50K 图像) 上，FID 2.791 (线性调度, DDIM 200步) vs 3.467 (静态 CFG, DDIM 200步) (−0.676 (−19.5%))；IS 223.2 (线性调度, DDIM 200步) vs 176.8 (静态 CFG, DDIM 200步) (+46.4)。
 > - SD1.5 (COCO 10K, 零样本) 上，FID 线性调度 (ω=7.5 等效) vs 静态 CFG (ω=7.5) (−2.71 (17% 相对改善))；CLIP-Score 线性调度 (ω=7.5 等效) vs 静态 CFG (ω=7.5) (+0.004 (16% 相对改善))。
 
-## 概述
+## 概要
 
 扩散模型中的**无分类器引导（Classifier-Free Guidance, CFG）**通过一个恒定的引导权重 ω 组合条件与无条件噪声预测，以提升生成样本的保真度。然而，静态 CFG 面临一个根本性的两难：低引导权重产生细节丰富但模糊的图像，高引导权重产生锐利但过度简化、多样性差的图像（Figure 1）。近期工作尝试在去噪过程中动态调整引导权重，但缺乏系统性分析与理论依据。
 
@@ -57,7 +59,7 @@ claims:
 
 **方法谱系与知识库定位**：本研究属于扩散模型推理时引导策略的改进。与 **静态 CFG**（Ho & Salimans, 2021）相比，仅将恒定权重替换为时间依赖的 ω(t)，不改变模型结构与训练流程。相较于其他动态引导变体（如 Rescale CFG、PAG 等），本文首次通过“冲突度量”与负扰动分析揭示了单调递增调度器有效性的因果机制，为引导权重调度提供了可解释的理论框架。
 
-## 背景与动机
+
 
 扩散模型已成为当代图像生成的核心范式，其通过逐步去噪将高斯噪声转化为高保真样本。为了提升生成质量与文本一致性，**无分类器引导（Classifier‑Free Guidance, CFG）**（Ho & Salimans, 2021）被广泛采用。其标准形式为：
 
@@ -83,7 +85,9 @@ $$\hat{\epsilon}_{\theta}(x_t, c) = \epsilon_{\theta}(x_t, c) + \omega(t) \bigl(
 
 核心动机在于：**将引导权重设计为单调递增函数，推迟高强度引导至去噪后期，从而在保持总引导量不变的条件下，系统性地降低早期冲突，整体提升保真度、文本一致性与多样性**。这一方法无需额外训练或微调，仅在推理时替换 $\omega(t)$，计算开销与静态 CFG 完全相同。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于将无分类器引导（CFG）中全局恒定的引导权重 $\omega$ 替换为**时间依赖的单调递增调度函数 $\omega(t)$**，从而在保持总引导量不变的条件下，显著改善生成样本的保真度、文本一致性与多样性。
 
@@ -133,7 +137,7 @@ $$
 
 该创新的本质在于**识别并利用去噪过程中不同时间步对引导强度的差异化需求**：早期去噪阶段主要构建全局结构，过强引导会与生成项冲突；后期阶段需要精细对齐条件信息。通过将引导权重从“均匀分配”重构为“前轻后重”的单调递增分配，在不引入额外计算开销的前提下，系统性突破了静态 CFG 的保真度-多样性折衷瓶颈。
 
-## 整体框架
+
 
 本文提出的动态无分类器引导权重调度方法，在标准扩散模型采样流程中仅替换一个核心控制量——引导权重 ω，将其从全局恒定的标量扩展为随时间步变化的函数 ω(t)。整体框架由四个串行模块构成，输入为文本提示与初始噪声，输出为最终生成图像。
 
@@ -166,7 +170,7 @@ $$\hat{\epsilon}_{\theta}(x_t, c) = \epsilon_{\theta}(x_t, c) + \omega(t) \bigl(
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_SUMtDJqicd/figures/001_Figure_1.jpg]]
 *Figure 1: Classifier-Free Guidance introduces a trade-off between detailed but fuzzy images (low guidance, top) and sharp but simplistic images (high guidance, middle). Using a guidance scheduler (bottom) is simple yet very effective in improving this trade-off*
 
-## 核心模块与公式推导
+
 
 ### 静态CFG与动态引导调度
 
@@ -241,7 +245,9 @@ $$
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_SUMtDJqicd/figures/005_Figure_5.jpg]]
 *Figure 5: Visualization of Conflicted Terms from SD1.5 Rombach et al. (2022) shows that static guidance presents conflicts, while a guidance scheduler reduces the conflict between generation and guidance terms*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -346,7 +352,9 @@ $$
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_SUMtDJqicd/figures/045_Table_17.jpg]]
 *Table 17: Experiment on SDXL with Diversity., we present FID vs. CLIP-Score (CS) for SDXL of 10K images, and we see the similar trending to Table 16 that the heuristic methods outperform the baseline, both on FID and Diversity*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与静态CFG基线的关系
 
@@ -397,6 +405,8 @@ $$w_t = \frac{1 - \cos \pi \bigl(\frac{T-t}{T}\bigr)^s}{2} w$$
 3. **超越单调递增的最优形状**：是否存在比线性/余弦更优的单调递增函数族，能进一步降低早期冲突的同时兼顾后期退火？参数化调度器的初步结果表明这一方向存在提升空间。
 4. **与采样策略的协同设计**：动态调度器是否可以与自适应步长或噪声调度相结合，在采样效率和生成质量上获得联合增益？
 5. **理论最优调度器的形式化**：如何在理论上形式化生成项与引导项之间的冲突，并以此为指导推导调度器的最优形状？这可能需要建立冲突与去噪过程信息论特性之间的桥梁。
+
+
 
 ## 原文 PDF
 

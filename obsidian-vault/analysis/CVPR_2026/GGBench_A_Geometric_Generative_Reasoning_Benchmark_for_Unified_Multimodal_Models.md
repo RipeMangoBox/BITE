@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/GGBench_A_Geometric_Generative_Reasoning_Benchmark_for_Unified_Multimodal_Models.pdf
+project_link: null
 code_link: null
 aliases:
 - GGBench
@@ -42,7 +43,7 @@ claims:
 > - GGBench-Code (Execution Accuracy) 上，Pass@1 (代码执行通过率) 79.02 (GPT-5) vs 40.39 (DeepSeek-R1) (+38.63)。
 > - GGBench (Human Evaluation) 上，Human Score (人工评分的整体质量) 83.06 (GPT-5) vs 78.44 (DeepSeek-V3.1) (+4.62)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有的统一多模态模型（UMMs）在需要根据自然语言描述精确生成几何图形时普遍失败。其根本原因在于，这些模型无法将抽象的几何推理转化为精确、可执行的构造步骤，且缺乏代码级的可验证性，导致生成的图形频繁违反几何约束。
 
@@ -62,7 +63,7 @@ claims:
 
 **当前局限**：GGBench目前仅限于2D几何构造任务，能否推广到3D几何或其他需要生成式推理的领域（如科学图解生成、化学结构图等）仍有待验证。基准构建严重依赖LLM生成训练数据，即使经过多轮人工审核，仍可能引入模型偏好或系统性错误。此外，自动评估VLM虽与人类评分高度相关，但在某些几何细节上仍可能存在打分偏差。
 
-## 背景与动机
+
 
 ### 统一多模态模型的能力瓶颈
 
@@ -92,7 +93,9 @@ GGBench的核心动机正是弥合上述缺口。其设计哲学基于一个关�
 
 这一设计使得GGBench不仅是一个新的测试集，更是一种评估方法论——它强制模型将抽象推理转化为可执行的构造步骤，从而暴露当前统一多模态模型在集成生成式推理能力上的真实水平与结构短板。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GGBench 的核心创新并非提出一种新的模型架构或训练算法，而是**重新定义了统一多模态模型（Unified Multimodal Models, UMMs）的评估范式**——从孤立的理解或生成评测，转向对“集成生成式推理”能力的系统性检验。这一范式转移通过三个紧密耦合的 **changed slots** 实现，每一个都直接针对现有基准的根本性缺陷。
 
@@ -126,7 +129,7 @@ GGBench 的四阶段评估协议（Planning → Middle Process → Final Result 
 
 综上，GGBench 的三个 changed slots 构成了一个逻辑闭环：**可执行验证**提供了客观的评判标准，**三重对齐**锚定了推理过程，**逐步评估**实现了能力的精细解耦。三者共同推动了多模态评估从“结果导向”向“过程导向”的范式升级。
 
-## 整体框架
+
 
 GGBench 的整体构建与评估框架围绕一个核心瓶颈展开：**现有统一多模态模型（UMMs）无法将抽象几何推理转化为精确的可执行构造步骤**，导致直接生成的图形频繁违反几何约束。为解决这一问题，GGBench 建立了一条从数据构建到模型评估的完整流水线，其核心思想是通过要求模型生成可执行的 GeoGebra 代码，将推理过程与几何操作严格对齐，从而实现从语言到图形的精确映射和完全自动化的验证。
 
@@ -170,7 +173,7 @@ GGBench 的评估采用**四阶段协议**（Section 4.2），全面衡量模型
 ![[assets/figures/papers/paper_list_l2235_https_arxiv_org_abs_2511_11134/figures/005_Figure_1.jpg]]
 *Figure 1: The paradigm shift to generative reasoning. Conventional benchmarks evaluate (a) Understanding or (b) Generation in isolation. GGBench introduces (c) integrated Understanding& Generation evaluation, requiring generative reasoning from Unified Multimodal Models*
 
-## 核心模块与公式推导
+
 
 GGBench 本身是一个基准而非模型，因此其“核心模块”体现为数据构造流水线与评估协议的设计，而非可训练的神经网络组件。以下按流水线阶段与评估维度分别阐述关键模块。
 
@@ -236,7 +239,9 @@ GGBench 采用四阶段评估协议，由冻结的 VLM 评判模型（GPT-4o）�
 ![[assets/figures/papers/paper_list_l2235_https_arxiv_org_abs_2511_11134/figures/006_Figure_2.jpg]]
 *Figure 2: GGBench’s step-by-step evaluation. Beyond traditional text-image pairs, GGBench provides executable code for each construction step, allowing for precise and automated verification*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果：代码驱动 vs. 端到端生成
 
@@ -306,7 +311,9 @@ Table 1 汇总了 GGBench 的语料库统计：共保留 1,411 个高质量构�
 
 所有模型在温度 0.0 下推理，使用统一的提示模板（Figure 17–18）和评估管道。自动评分采用冻结的 VLM（GPT-4o）和固定提示，并通过双盲人工评审验证（r=0.9295）。评估同时覆盖整体图像质量和逐步推理正确性，避免了单一维度的偏见。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有基准的关系：从孤立评估到集成生成式推理
 
@@ -346,6 +353,8 @@ GGBench 的评估框架目前具有以下明确边界：
 2. **深度理解的判别：** 在模型不完全理解几何约束的情况下，如何区分“表面正确”（通过模式匹配生成的巧合正确）与“真正理解”？是否需要引入对抗性测试或更深层的违规检测机制？
 3. **端到端模型的闭合回路训练：** 能否通过强化学习或训练过程中直接注入代码执行反馈，使端到端 UMMs 获得与代码驱动模型相当的构造精度，同时保留端到端生成的灵活性？
 4. **评判模型的进化：** 现有的视觉语言评判模型能否被改进或专门微调，以更精准地捕获拓扑错误、缺失辅助线、比例失调等几何特异缺陷，进一步提升自动评估的可靠性？
+
+
 
 ## 原文 PDF
 

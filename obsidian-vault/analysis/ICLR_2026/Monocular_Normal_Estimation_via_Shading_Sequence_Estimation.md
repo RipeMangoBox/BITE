@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Monocular_Normal_Estimation_via_Shading_Sequence_Estimation.pdf
+project_link: null
+code_link: https://github.com/LMozart/ICLR2026-RoSE.git
 openreview_forum_id: d7itDxMD1n
 aliases:
 - MNESSE
@@ -31,12 +33,15 @@ claims:
 | 中文题名 | Monocular Normal Estimation via Shading Sequence Estimation |
 | 英文题名 | Monocular Normal Estimation via Shading Sequence Estimation |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=d7itDxMD1n); [GitHub](https://github.com/LMozart/ICLR2026-RoSE.git) |
+| Links | [paper](https://openreview.net/forum?id=d7itDxMD1n) · [GitHub](https://github.com/LMozart/ICLR2026-RoSE.git) |
 | Topic | #topic/benchmarks_datasets_evaluation #topic/benchmarks_datasets_evaluation/benchmark_eval |
 | Method |  |
 | Dataset | |
 
-## 概述
+> [!tip] 效果简介
+> 本笔记的既有实验指标、对比结果与适用边界见“实验与关键发现”；本轮仅统一结构，不改写证据。
+
+## 概要
 
 单目法向估计旨在从单张二维图像中恢复物体表面的逐像素三维朝向。现有方法普遍采用从图像直接回归法向图的端到端范式，但这类方法面临一个根本性瓶颈：**三维几何错位**——估计的法向图在视觉上可能看似合理，但重建的曲面往往丢失了精确的几何细节，呈现过度平滑的结果（Figure 2）。
 
@@ -46,7 +51,7 @@ claims:
 
 在真实世界基准数据集上的实验结果显示，RoSE 取得了领先性能：在 **DiLiGenT** 数据集上，MAE 达到 **16.36°**，优于此前最优的单目方法 NiRNE（17.27°）（Table 1）；在 **LUCES** 数据集上同样表现突出（Table 2）。消融实验表明，9 个规范光源的配置在精度与效率之间取得最优平衡。
 
-## 背景与动机
+
 
 从单张图像恢复物体表面法线是计算机视觉中的经典任务，其核心挑战在于：输入图像是几何、材质与光照三者耦合的结果，而仅凭单目观测无法唯一地分解这些因素。现有主流方法大多采用端到端的数据驱动策略，直接从 RGB 图像回归法线图。这些方法虽然在视觉上能产生看似合理的法线估计，但存在一个隐蔽而关键的问题——**三维几何失配（3D misalignment）**：估计的法线图在整体外观上可能正确，但由其重建的表面往往缺乏准确的几何细节，呈现出过度平滑的结果（见 **Figure 2**）。这意味着，仅凭法线图的视觉质量并不足以保证底层几何的准确性。
 
@@ -56,7 +61,9 @@ claims:
 
 为实现这一范式，本文提出了 **RoSE**（**R**estoration of **S**urface normal from **E**stimated shading sequence），并构建了大规模合成数据集 **MultiShade**，涵盖 5657 种 PBR 材质与多样化的光照条件，以支持模型在通用场景下的训练。在真实世界基准数据集 DiLiGenT 和 LUCES 上的实验表明，RoSE 在单目法线估计任务中达到了当时的最优性能（MAE 分别为 16.36° 和 14.48°），验证了着色序列作为中间表示的有效性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 RoSE 的核心创新在于将单目法向估计**重新定义为明暗序列估计（shading sequence estimation）**，从而将问题从直接的图像到法向映射 $\Phi: \mathbf{I} \to \mathbf{N}$ 转化为一个两阶段流程：先用图像到视频生成模型预测物体在多个预定义平行光源下的明暗序列 $\Phi_S: \mathbf{I}_g \to \mathbf{S}^s$，再通过普通最小二乘法解析求解法向图。
 
@@ -74,7 +81,7 @@ RoSE 的核心创新在于将单目法向估计**重新定义为明暗序列估�
 
 **证据强度评估**：DiLiGenT 上的对比数据来自 Table 1，置信度 0.98，属于强证据。但需注意，当前分析未提供 NiRNE 之外的完整 baseline 对比细节，且缺乏关于“明暗序列敏感性优势”的定量消融（仅 Figure 3 提供定性可视化），该因果链条的严格验证需进一步确认。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_d7itDxMD1n/figures/001_Figure_1.jpg]]
 *Figure 1: We present RoSE, a method using a video generative model for monocular normal map estimation, built on a new paradigm that reformulates normal estimation as a shading sequence estimation task. Results on complex and diverse scenarios show that RoSE reconstructs fine-grained geometric details and generalizes robustly to unseen datasets, achieving state-of-the-art performance in object-based monocular normal estimation on benchmark datasets*
@@ -92,7 +99,7 @@ RoSE 将单目法向估计重构为**着色序列估计**任务，整体 pipelin
 
 整个 pipeline 的输入是单张任意光照 RGB 图像，输出是高质量法向图 $\mathbf{N}$，中间表示着色序列作为几何信息的可泛化载体，将生成模型的先验与物理约束解耦。
 
-## 核心模块与公式推导
+
 
 ### 范式重构：从法向估计到明暗序列估计
 
@@ -138,7 +145,9 @@ $$\mathcal{L}_{\mathrm{diff}} = \mathbb{E}_{\mathbf{z}_0, c, t} \left\| \mathbf{
 
 模型在自建的 **MultiShade** 合成数据集上训练，包含约 300 万对图像-法向对。数据使用 Blender 以 $576 \times 576$ 分辨率渲染，材质来自 MatSynth 数据集（5,657 种高质量 PBR 材质），其中金属和非金属类别各以 0.25 的概率采样。训练使用 8 块 NVIDIA H100 GPU（80GB），优化器为 AdamW，学习率 $1 \times 10^{-5}$。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -191,7 +200,9 @@ RoSE 在两个真实世界基准数据集上均取得单目法向估计的最优
 3. **材质覆盖边界**：对透明或半透明物体，当前 shading 模型（基于漫反射假设）可能失效，方法尚未支持此类材质。
 4. **个别物体表现**：在 DiLiGenT 的 GOBLET 和 LUCES 的 HOUSE 物体上，RoSE 未进入前两名（Table 1, Table 2），可能与非朗伯反射或复杂几何结构有关，具体原因需进一步分析。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务范式转换：从直接法向映射到明暗序列估计
 
@@ -226,6 +237,8 @@ RoSE 在两个真实世界基准数据集上均取得单目法向估计的最优
 4. **特定物体的性能波动。** 在 DiLiGenT 的 GOBLET 物体和 LUCES 的 HOUSE 物体上，RoSE 未进入前两名（part_006 开放问题）。这可能与这些物体包含的凹面结构、自遮挡或材质特性有关，但论文未提供针对性的失败案例分析。
 
 5. **合成到真实的域间隙。** 尽管 MultiShade 数据集在材质多样性上做了增强，训练数据仍完全来自 Blender 合成渲染。论文未系统分析合成数据与真实基准（DiLiGenT、LUCES）之间的域间隙对性能的具体影响。
+
+
 
 ## 原文 PDF
 

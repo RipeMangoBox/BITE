@@ -5,6 +5,8 @@ paper_level: A
 venue: ECCV
 year: 2024
 pdf_ref: paperPDFs/ECCV_2024/Customize_A_Video_One_Shot_Motion_Customization_of_Text_to_Video_Diffusion_Models.pdf
+project_link: https://customize-a-video.github.io
+code_link: null
 aliases:
 - CV
 - Customize-A-Video
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | Customize-A-Video：面向文本到视频扩散模型的一次性运动定制 |
 | 英文题名 | Customize-A-Video: One-Shot Motion Customization of Text-to-Video Diffusion Models |
 | 会议/期刊 | ECCV 2024 |
-| Links | [paper](https://arxiv.org/abs/2402.14780); [Project](https://customize-a-video.github.io) |
+| Links | [paper](https://arxiv.org/abs/2402.14780) · [Project](https://customize-a-video.github.io) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | Customize-A-Video |
 | Dataset | LOVEU-TGVE-2023 subset (53 videos) |
@@ -41,7 +43,7 @@ claims:
 > - LOVEU-TGVE-2023 subset (53 videos) 上，Temporal Consistency (LPIPS) ↓ 为 0.160 (Ours TextInv AA)，对比 0.163 (MotionDirector LoRA rank 4)，变化 -0.003。
 > - LOVEU-TGVE-2023 subset (53 videos) 上，Diversity (LPIPS) ↑ 为 0.631 (Ours Both AA)，对比 0.606 (MotionDirector LoRA rank 4)，变化 +0.025。
 
-## 概述
+## 概要
 
 **核心问题**：现有文本到视频（T2V）扩散模型的运动定制方法面临一个根本性瓶颈——从单个参考视频中难以解耦空间外观与运动信息。基于DDIM反转的方法（如 **Tune-A-Video** 和 **Video-P2P**）虽然能保留运动，但生成结果固守原始帧结构与布局，缺乏帧间多样性；而并发工作 **MotionDirector** 在联合训练空间与时间LoRA时，外观信息容易泄漏到运动模块中，影响对新主体的适应能力。仅靠提示工程驱动预训练模型（如 **ModelScope**）则无法精确控制运动模式。
 
@@ -59,7 +61,7 @@ claims:
 
 **方法定位**：该方法属于基于预训练T2V扩散模型的一次性运动定制范式，通过参数高效微调（LoRA）和分阶段解耦训练，在单参考视频条件下实现运动迁移。其即插即用设计支持与现有图像定制方法（如Dreambooth）及多运动组合的灵活集成。
 
-## 背景与动机
+
 
 ### 文本到视频生成与运动定制的困境
 
@@ -88,7 +90,9 @@ claims:
 
 通过这种分阶段的训练策略，Customize-A-Video在运动保真度与生成多样性之间取得了突破性平衡，支持将同一运动迁移到不同主体、组合多个运动模式，甚至与现有的图像定制方法协同工作。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈
 
@@ -112,7 +116,7 @@ Customize-A-Video 的核心创新在于通过**分阶段解耦训练**，将空�
 
 上述两个 changed slots 共同实现了一个简洁而强大的因果机制：**通过将空间外观吸收与时间运动学习在训练阶段解耦，即使在只有一个参考视频的条件下，T-LoRA 也能学习到纯净的运动表征，在推理时与任意新外观文本提示结合，生成既忠实于原始运动又具备丰富多样变化的视频。** 定量证据支持这一洞察：在 LOVEU-TGVE-2023 子集（53 个视频）上，带有文本倒置外观吸收器的配置在文本对齐（CLIPScore 32.632）和时序一致性（LPIPS 0.160）上均优于 MotionDirector；用户研究中，双吸收器配置在运动保真度（3.72/5）和运动多样性（3.72/5）上均显著领先。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l39_Customize_A_Video_One_Shot_Motion_Customization_of_Text_to_Video_Diffusi/figures/011_Figure_8.jpg]]
 *Figure 8: Additional generation results of our method*
@@ -152,7 +156,7 @@ Customize-A-Video 的核心目标是从**单个参考视频**中提取运动模�
 
 该框架的核心洞见在于**通过分阶段训练实现空间与时间信号的因果解耦**。消融实验（Fig. 4）强有力地证实了这一点：若在空间注意力层上额外添加 LoRA，会严重干扰运动建模，导致生成结果保留大量原始外观；而完全不使用外观吸收器时，T-LoRA 仍会学习到部分空间信息，限制了新外观的生成能力。
 
-## 核心模块与公式推导
+
 
 ### 基础模型与扩散损失
 
@@ -202,7 +206,9 @@ $$L_{\Delta \theta_T} = \mathbb{E}_{x^{1...F}, \epsilon, t} [\| \epsilon - \epsi
 
 **无序帧训练与裁剪策略**：外观吸收器在绕过时间层的无序帧上训练，本质退化为图像生成任务。为防止过拟合全局结构，采用裁剪训练（patch training），将帧随机裁剪为局部块，最优裁剪比例在0.33至0.67之间（Appendix A.2）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -264,7 +270,9 @@ $$L_{\Delta \theta_T} = \mathbb{E}_{x^{1...F}, \epsilon, t} [\| \epsilon - \epsi
 ![[assets/figures/papers/paper_list_l39_Customize_A_Video_One_Shot_Motion_Customization_of_Text_to_Video_Diffusi/figures/018_Figure_12.jpg]]
 *Figure 12: An example question in the human user study. Participants are asked to rate each algorithm’s output videos from 1 to 5 stars*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与设计动机
 
@@ -306,6 +314,8 @@ Customize-A-Video 在预训练 T2V 扩散模型（基于 ModelScope）的基础�
 - 如何使方法更好地兼容快速演进的新一代视频生成基础模型，支持更多样的时间注意力形式
 - 能否设计自动化的调优策略，根据视频内容自适应确定最优训练轮数，减少手动调整需求
 - 在复杂运动、长视频和相机剧烈运动场景下，如何保持运动保真度和外观一致性的平衡
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/USTBench_Benchmarking_and_Dissecting_Spatiotemporal_Reasoning_Capabilities_of_LLMs_as_Urban_Agents.pdf
+project_link: null
+code_link: https://github.com/usail-hkust/USTBench
 openreview_forum_id: ETzBStUFJy
 aliases:
 - USTBench
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | USTBench：评测与解构大语言模型作为城市智能体的时空推理能力 |
 | 英文题名 | USTBench: Benchmarking and Dissecting Spatiotemporal Reasoning Capabilities of LLMs as Urban Agents |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=ETzBStUFJy); [GitHub](https://github.com/usail-hkust/USTBench) |
+| Links | [paper](https://openreview.net/forum?id=ETzBStUFJy) · [GitHub](https://github.com/usail-hkust/USTBench) |
 | Topic | #topic/time_series_dynamical_systems #topic/time_series_dynamical_systems/time_series_forecasting |
 | Method | USTBench |
 | Dataset | Spatiotemporal Understanding (Overall), Spatiotemporal Understanding (Connectivity), Socio-economic Prediction |
@@ -41,7 +43,7 @@ claims:
 > - Spatiotemporal Understanding (Connectivity) 上，Accuracy 为 o4-mini (0.7665)，对比 GPT-4o (0.6787)，变化 +0.0878。
 > - Socio-economic Prediction 上，MAPE ↓ 为 o4-mini (4.97%)，对比 Classic Method (significantly higher)，变化 ~several-fold improvement (up to 337.31% gain in forecasting accuracy)。
 
-## 概述
+## 概要
 
 城市时空推理要求智能体理解动态演化的空间结构与时间模式，并据此进行预测与决策。当前大语言模型（LLM）作为城市智能体的能力评估尚不系统，尤其缺乏对推理过程的细粒度诊断。**USTBench** 应运而生，首次将城市时空推理显式分解为**时空理解、预测、规划与反思**四个关键过程，并提供 62,466 条结构化 QA 对进行过程级评测。配套的交互式环境 **UAgentEnv** 覆盖九类典型城市任务，支持统一的基准数据采集与下游评估。
 
@@ -49,7 +51,7 @@ claims:
 
 然而，因果可控因素同样明确：**通过专项增强时空理解的域适应训练，可以显著提升预测与规划**。Qwen2.5-7B-ST 在后训练后，于预测与规划任务上持续优于原始模型及其推理变体（Figure 4），说明域特异性时空特征学习是驱动下游性能的关键杠杆。这一发现为后续研究指明了方向：与其单纯堆砌通用推理能力，不如聚焦于轻量高效的时空推理范式设计。
 
-## 背景与动机
+
 
 城市系统是一个由动态时空状态构成的复杂环境，其运行依赖于对交通流、社会经济指标、公共设施布局等多元信息的持续感知与决策。随着大语言模型（LLM）在通用推理任务中展现出强大能力，研究者开始探索将其作为城市智能体的可能性——即让 LLM 理解城市状态、预测未来变化并制定优化决策。然而，这一方向面临一个核心瓶颈：**当前 LLM 在动态城市环境中的长期规划与基于反馈的自适应反思能力严重不足，即使在通用推理模型中该瓶颈依然突出**。
 
@@ -59,7 +61,9 @@ claims:
 
 基于这些观察，本文的动机在于：构建一个能够细粒度解构 LLM 城市时空推理能力的评测框架，不仅衡量最终结果，更深入诊断模型在时空理解、预测、规划和反思四个关键过程中的表现，从而为城市智能体的能力提升提供明确的改进方向。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 USTBench 的核心创新并非提出一种全新的模型架构，而是构建了一套**面向城市智能体的细粒度时空推理评测体系**，并通过可控实验揭示了当前大语言模型（LLM）在城市任务中的关键瓶颈与驱动因素。
 
@@ -95,7 +99,7 @@ $$a_i^* = \arg\max_{a_i \in A} \max_{a_{i+1}, \ldots, a_{i+H} \in A} \mathbb{E}\
 
 USTBench 的创新集中在**评测体系与诊断分析**层面，在增强时空推理的方法探索上仍显不足。模型在长程空间连通性与长时间周期性、趋势性模式上的准确率常低于 70%，暴露了结构化数据推理的结构性短板。此外，评估主要基于模拟环境与历史数据集，缺乏真实城市部署验证；部分推理模型（如 DeepSeek-R1）推理过程冗长且计算开销高昂，难以满足实时城市决策需求。这些方向构成了后续方法创新的关键切入点。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_ETzBStUFJy/figures/001_Table_1.jpg]]
 *Table 1: Comparison of LLM benchmarks in urban tasks*
@@ -122,7 +126,7 @@ $$
 
 值得注意的是，现有城市 LLM 基准（如 CityBench、CityGPT、UrbanPlanBench）在推理能力的覆盖上存在明显缺口（Table 1）：多数基准缺乏对反思能力的评估，且未同时涵盖非推理与推理两类基线模型。USTBench 通过统一的提示模板与执行框架，在相同参数规模与架构的非推理/推理模型间进行公平对比（如 Qwen2.5-32B vs QwQ-32B），从而有效隔离推理能力增益的贡献。
 
-## 核心模块与公式推导
+
 
 ### 城市环境的形式化定义
 
@@ -161,7 +165,9 @@ $$a_i^* = \arg\max_{a_i \in A} \max_{a_{i+1}, \ldots, a_{i+H} \in A} \mathbb{E}\
 
 消融实验（Figure 6）揭示了各模块对下游性能的差异化影响：移除反思组件导致 DeepSeek-R1 性能降幅最大，表明反思对于动态城市任务的必要性；移除时空理解模块则显著增加预测误差并降低规划准确率。值得注意的是，对于较弱模型 Qwen2.5-7B，中间推理与反思可能产生负面影响，提示模块组合需与模型能力相匹配。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：推理能力迁移的边界与时空理解的瓶颈
 
@@ -226,7 +232,9 @@ $$a_i^* = \arg\max_{a_i \in A} \max_{a_{i+1}, \ldots, a_{i+H} \in A} \mathbb{E}\
 
 **需人工核实**：部分下游任务（如 POI 放置、路线规划）的经典方法基线具体配置在提供的分析材料中未充分展开，其与 LLM 的可比性需查阅原文确认。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有城市LLM基准的关系
 
@@ -267,6 +275,8 @@ USTBench 的核心发现是**通用推理能力的强化并不总能迁移至城
 2. **推理模型的领域退化问题**：DeepSeek-R1 在拥堵预测等任务中表现不及非推理模型，其重复生成问题如何缓解？
 3. **工具与代码建模整合**：如何更好地整合工具调用和代码建模以支撑更深层次的时空模式解析？
 4. **自适应推理流程**：不同城市任务与模型规模应如何自适应组合推理流程，以避免弱模型因复杂推理而受损？
+
+
 
 ## 原文 PDF
 

@@ -44,7 +44,7 @@ claims:
 > - GenEval 上，Overall Score 0.62 (SDXL-BIDPO) vs 0.53 (SDXL) (+0.09)。
 > - DPG-Bench 上，Overall Score 78.84 (SDXL-BIDPO) vs 73.38 (SDXL) (+5.46)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有文本到图像（T2I）扩散模型在组合式提示生成中表现不佳，核心瓶颈在于模型缺乏对文本与图像模态间精细对齐的偏好学习机制。以 **Diffusion DPO**（Wallace et al., CVPR 2024）为代表的现有直接偏好优化方法仅关注图像级偏好对比，忽略了文本模态的对齐信号，同时对复杂场景中关键编辑区域缺乏有针对性的引导。
 
@@ -59,7 +59,7 @@ claims:
 - BIDPO 在 MMDiT 架构（SD3-Medium）上也有效，在 GenEval 2 组合性评估上超越 **Flux**（Black Forest Labs, 2024），验证了其模型无关性。
 - 视觉美学质量（HPSv2）同步提升（32.87 vs 30.22），表明组合性增强不以牺牲图像质量为代价。
 
-## 背景与动机
+
 
 文本到图像（T2I）扩散模型近年来取得了显著进展，但在处理组合式文本提示时仍面临核心挑战——模型生成的图像往往无法准确反映提示中描述的对象属性、空间关系或数量约束。这一瓶颈的根源在于，现有模型缺乏对文本与图像模态间精细对齐的偏好学习机制。
 
@@ -69,7 +69,9 @@ claims:
 
 本文的核心动机正是填补上述缺口：通过双模态联合直接偏好优化（BIDPO）与区域感知的掩码引导损失，在无需人工标注偏好数据的前提下，系统性地提升扩散模型的组合式生成能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作围绕组合式文本到图像生成中的偏好对齐问题，提出了两个关键创新点——**双模态直接偏好优化（BIDPO）**与**区域感知引导机制**，二者协同解决了现有方法仅关注图像级偏好、忽略文本模态对齐与关键区域聚焦的根本瓶颈。
 
@@ -110,7 +112,7 @@ $$ \mathcal{L}_{\mathrm{BIDPO-region}}(\theta) = \mathcal{L}_{\mathrm{BIDPO}}(\t
 | 数据依赖 | 现有公开数据集 | 自构建 BICOMP 大规模偏好数据集 |
 | 训练方式 | 全参数或 LoRA 微调 | LoRA（rank=8）高效微调，200步收敛 |
 
-## 整体框架
+
 
 BiDPO 的整体框架围绕一个核心洞察构建：**图像到图像的偏好对比学习可以通过组合两个文本到文本的偏好对比学习过程隐式实现**。基于此，框架将双模态（文本+图像）联合偏好对齐与区域感知引导统一为端到端的训练流程。
 
@@ -149,7 +151,7 @@ BiDPO 采用 LoRA（rank=8）在基座扩散模型（SDXL 或 SD3-Medium）上�
 ![[assets/figures/papers/paper_list_l2189_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_Compositional_Text/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of our proposed BIDPO. (a) BIDPO integrates bimodal(image and text) preference alignment; (b) Diffusion process and loss calculation with region-level guidance*
 
-## 核心模块与公式推导
+
 
 BIDPO 框架的核心由三个关键模块构成：**TextDPO 损失**、**双模态 DPO 组装机制** 和 **区域感知引导掩码**。以下逐一展开。
 
@@ -195,7 +197,9 @@ $$\mathcal{L}_{\mathrm{BIDPO-region}}(\theta) = \mathcal{L}_{\mathrm{BIDPO}}(\th
 ![[assets/figures/papers/paper_list_l2189_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_Compositional_Text/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of post-training optimization methods used in compositional text-to-image generation. Our proposed BIDPO, achieves full human preference alignment across both image and text modalities while offering region-level guidance, outperforming existing approaches such as SFT, DiffusionDPO*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -268,7 +272,9 @@ Table 8的消融实验系统验证了BiDPO各关键设计的独立贡献。
 ![[assets/figures/papers/paper_list_l2189_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_Compositional_Text/figures/003_Figure_3.jpg]]
 *Figure 3: The data construction pipeline of our BICOMP dataset. Our BICOMP dataset, though generated automatically, contains large amounts of high-quality image-caption pairs with region annotations across multiple composition-related dimensions*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -307,6 +313,8 @@ BIDPO 的适用边界由以下条件界定：
 3. BIDPO 训练过程中，文本偏好与图像偏好是否存在冲突？如何量化两者的对齐程度？（论文未提供两者一致性的定量分析）
 4. 在更大规模的真实人工标注偏好数据上训练，BIDPO 是否仍有显著增益？合成偏好与人类偏好的分布差异对最终效果的影响尚未量化。
 5. 区域引导掩码的权重分配（1.0 vs 0.5）是否最优？是否存在更有效的权重策略（如基于编辑强度的自适应权重）？
+
+
 
 ## 原文 PDF
 

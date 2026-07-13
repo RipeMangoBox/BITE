@@ -43,7 +43,7 @@ claims:
 > - Cross-datasets generalization (Average over 10 datasets) 上，Top-1 Accuracy 64.81 (RN50) / 71.88 (ViT-B/16) vs Best competitor (see Table 1) (优于所有对比方法)。
 > - Natural distribution shifts (OOD Average over 5 datasets) 上，Top-1 Accuracy 49.06 (RN50) / 65.76 (ViT-B/16) vs Best competitor (see Table 2) (优于所有对比方法)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有视觉语言模型（VLM）的测试时适应（TTA）方法普遍依赖熵滤波筛选高置信度样本，导致类别预测偏差被持续放大，缓存覆盖不足，伪标签逐渐坍缩，难以探索低置信度区域。
 
@@ -53,7 +53,7 @@ claims:
 
 **主要结果**：在跨数据集泛化（10个数据集平均）和自然分布偏移鲁棒性（5个OOD数据集平均）两项基准上，DLAE在ResNet-50和ViT-B/16两种CLIP骨干下均优于所有对比方法。消融实验表明，DLA和CGEC各自带来显著增益，二者联合使用效果最优。
 
-## 背景与动机
+
 
 视觉语言模型（VLM）的测试时适应（Test-Time Adaptation, TTA）旨在不依赖源域数据的前提下，使冻结的预训练模型在线适应目标域分布偏移。以CLIP为代表的VLM虽然展现了强大的零样本泛化能力，但在面对跨数据集偏移和自然分布变化时，其固定的文本原型难以捕捉目标域的类条件分布，导致性能显著下降。
 
@@ -80,7 +80,9 @@ claims:
 
 通过这种“调整暴露边界→一致性过滤探索→原型更新反哺校准”的协同设计，DLAE在不牺牲可靠性的前提下持续扩大测试分布覆盖，实现了对困难区域的稳定适应。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题诊断：置信度偏差与缓存坍缩的自我强化循环
 
@@ -147,7 +149,7 @@ DLA和CGEC并非独立运作，而是形成闭环协同：
 
 值得注意的是，DLAE在**不增加缓存容量**的前提下实现了缓存多样性的显著提升（Figure 1b），这表明其改进源于样本选择策略的优化，而非简单的资源扩张。
 
-## 整体框架
+
 
 DLAE 面向 CLIP 视觉语言模型的在线测试时适应，采用全流式（streaming）处理范式：测试样本逐帧到达，模型仅基于当前样本和内部状态即时更新，不依赖离线批处理或未来数据。整体框架由冻结的 CLIP 编码器、动态逻辑值调整（DLA）、一致性引导探索缓存（CGEC）和原型残差学习四个核心模块级联构成，如 Figure 2 所示。
 
@@ -158,7 +160,7 @@ DLAE 面向 CLIP 视觉语言模型的在线测试时适应，采用全流式（
 
 **模块间因果联动**：DLA 的 logit 调整不仅提供去偏后的伪标签用于缓存准入判断，更是 CGEC 探索机制的触发信号——标签翻转样本正是 DLA 前后预测不一致的样本，这些样本通常位于类别决策边界，是传统熵滤波方法系统性忽略的低置信度区域。CGEC 通过语义一致性过滤器（SCF，以 $\cos(\mathbf{t}_{\hat{y}_{clip}}, \mathbf{t}_{\hat{y}_{DLA}})$ 衡量）和时间一致性过滤器（TCF，检测特征-原型对齐度是否随时间退化）对纳入的边界样本进行质量约束，避免噪声污染原型。原型残差学习则通过置信度感知校准损失 $\mathcal{L}_{conf}$ 和对称跨模态对齐损失 $\mathcal{L}_{align}$ 驱动在线适应，形成“去偏→探索→学习→更准的去偏”的正反馈循环。Figure 1 的动机实验表明，这一设计有效打破了现有方法（如 DPE）中“高置信度筛选→类别偏差放大→缓存过早饱和→探索停滞”的自我强化困境。
 
-## 核心模块与公式推导
+
 
 DLAE 框架由两个关键模块构成：**动态逻辑值调整（DLA）** 与 **一致性引导的探索性缓存（CGEC）**。DLA 负责在线重新校准类别 logits，缓解预测偏差并暴露决策边界附近的困难样本；CGEC 则在保留高置信度样本的基础上，主动纳入 DLA 前后标签翻转的边界样本，通过语义与时间一致性约束控制缓存质量，从而扩大测试分布覆盖。
 
@@ -215,7 +217,9 @@ $$s_{\mathrm{DLAE}}^{c} = s_{\mathrm{DLA}}^{c} + \mathcal{A}(\mathbf{f}_{v}^{\to
 ![[assets/figures/papers/paper_list_l2385_https_openaccess_thecvf_com_content_CVPR2026_html_Wu_Dynamic_Logits_Adju/figures/001_Figure_1.jpg]]
 *Figure 1: (a) Per-class accuracy (top-1) on the target stream for CLIP in zero-shot mode, DPE as a cache-based TTA method, and our DLAE. CLIP exhibits large per-class variance. The black dashed box highlights classes where DPE underperforms and even falls below the zero-shot baseline, while our method achieves more consistent accuracy across classes. (b) Number of distinct target samples entering the cache over the test stream as the time step increases. Both DPE and DLAE use caches with the same fixed capacity and update them throughout the stream. However, the minimum-entropy replacement policy of DPE causes the cache to be dominated by low-entropy samples, preventing many diverse samples from ente...*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 跨数据集泛化与分布偏移鲁棒性
 
@@ -263,7 +267,9 @@ DLAE的核心优势源于两个因果机制的耦合：
 ![[assets/figures/papers/paper_list_l2385_https_openaccess_thecvf_com_content_CVPR2026_html_Wu_Dynamic_Logits_Adju/figures/007_Table_4.jpg]]
 *Table 4: Sensitivity analysis of α in Eq. 9 and β in Eq. 11 on the DTD dataset*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 技术谱系：从提示适应到缓存探索的演进
 
@@ -308,6 +314,8 @@ DLAE 的贡献需要从两个组件的协同关系来理解，而非孤立地看
 3. **与提示优化的可组合性**：DLAE 在冻结的 CLIP 编码器上操作，仅学习残差原型。如果结合 TPT 的提示优化（同时更新文本编码器），DLA 的在线统计量是否会因文本空间的漂移而失效？两者的联合训练可能带来进一步的增益，但也可能引入新的不稳定因素。
 
 4. **翻转信号的可靠性**：CGEC 的核心假设是“DLA 前后标签翻转的样本是值得探索的边界样本”。但在 DLA 本身尚未收敛的早期阶段，翻转可能由噪声而非真实的决策边界不确定性引起。论文未分析翻转样本的伪标签准确率随时间的演化。
+
+
 
 ## 原文 PDF
 

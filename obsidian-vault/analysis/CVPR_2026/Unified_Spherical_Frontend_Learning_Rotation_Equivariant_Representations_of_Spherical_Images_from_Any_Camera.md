@@ -44,7 +44,7 @@ claims:
 > - PANDORA (Object Detection) 上，mAP10 (NR/RR) 29.54% / 29.59% (Spherical YOLOv11) vs 39.65% / 12.71% (Planar YOLOv11) (Proposed drop: +0.05%; Baseline drop: -26.94%)。
 > - Stanford 2D-3D-S (Semantic Segmentation) 上，mIoU (NR/RR) 28.78% / 28.09% (Spherical DeepLab v3) vs 35.01% / 12.11% (Planar DeepLab v3) (Proposed drop: -0.69%; Baseline drop: -22.90%)。
 
-## 概述
+## 概要
 
 **核心问题：平面CNN的畸变困境。** 传统卷积神经网络（CNN）在规则像素网格上运行，其基本假设是图像邻域在物理空间中也是邻近的。然而，当相机视场角（FoV）增大或使用鱼眼镜头时，这一假设被严重破坏——由高斯绝妙定理保证，任何将球面信息投影到二维平面的过程必然引入畸变。这导致两个后果：其一，模型对输入图像的全局旋转高度敏感，训练时未见的旋转角度会使性能急剧崩溃；其二，模型与镜头类型强绑定，在针孔相机上训练的模型无法直接迁移至鱼眼或全景相机。
 
@@ -56,7 +56,7 @@ claims:
 
 **主要结果概览。** 在MNIST分类、PANDORA目标检测和Stanford 2D-3D-S语义分割三个任务上，USF均展现出显著的旋转鲁棒性优势：球形模型在无旋转增强训练的条件下，随机旋转测试性能几乎不变，而平面模型均出现大幅下降。在零镜头镜头泛化实验中，球形模型在未见过的镜头类型上性能退化明显小于平面模型，但尚未完全消除跨镜头差距。
 
-## 背景与动机
+
 
 ### 广角感知的几何困境
 
@@ -78,7 +78,9 @@ claims:
 
 基于这一思想，本文提出**统一球面前端（Unified Spherical Frontend, USF）**，一个将任意相机模型拍摄的图像统一映射到球面、并在空间域执行旋转等变处理的通用管线。USF通过解耦的位置采样与数值插值实现镜头无关的球面重采样，通过仅距离加权的球形卷积核从构造上保证旋转等变性，同时借助几何缓存机制使高分辨率球面处理在计算上可行。这一设计使得现代视觉架构（如YOLOv11、DeepLab v3、UNet）只需将其平面卷积/池化层替换为球面对应层，即可获得镜头无关且天然旋转等变的感知能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 USF的核心创新在于将视觉处理的计算域从畸变平面提升至单位球面，通过**解耦的模块化设计**和**空间域球形算子**，在不依赖数据增强的前提下实现架构层面的SO(3)旋转等变。其关键创新点可归纳为以下四个维度的“changed slots”：
 
@@ -110,7 +112,7 @@ $$x_o = \mathcal{K}_{\mathrm{pool}}(\mathcal{X}_i, \mathbf{p}_o) = f_{\mathrm{po
 
 最根本的范式转变在于：平面CNN依赖大量旋转数据增强来近似旋转鲁棒性，而USF通过将**所有操作（重采样、卷积、池化）提升到球面空间进行**，从架构层面实现旋转等变。这一设计使得模型在训练时无需任何旋转增强，即可在随机旋转测试下保持性能稳定——语义分割mIoU仅下降0.69%，而平面模型骤降22.90%（Table 4）。
 
-## 整体框架
+
 
 **统一球面前端（Unified Spherical Frontend, USF）** 提出了一套从任意标定相机到任意下游架构的球面处理管线，其核心设计理念是将所有视觉操作——重采样、卷积、池化——提升到单位球面 $\mathbb{S}^2$ 上执行，从而在架构层面实现 SO(3) 旋转等变性，而非依赖数据增强。
 
@@ -169,7 +171,7 @@ $$x_o = K_{\mathrm{conv}}(\mathcal{X}_i, \mathbf{p}_o) = \sum_{k \in \mathcal{N}
 ![[assets/figures/papers/paper_list_l2615_https_arxiv_org_abs_2511_18174/figures/001_Figure_1.jpg]]
 *Figure 1: Unified Spherical Representation. From any camera to any architecture: a unified spherical pipeline for modern vision*
 
-## 核心模块与公式推导
+
 
 ### 3.1 从平面到球面：统一投影与重采样
 
@@ -250,7 +252,9 @@ USF 的旋转等变性来源于两个架构层面的设计：
 
 这使得 USF 无需在训练时进行旋转数据增强，即可在测试时面对任意随机旋转保持稳定性能——这是与依赖数据增强强行学习旋转不变性的平面 CNN 之间的**因果性差异**，而非仅仅是性能指标的提升。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 旋转等变性验证：MNIST分类
 
@@ -339,7 +343,9 @@ USF的另一核心优势是镜头无关性。**Table 5** 展示了零镜头镜�
 ![[assets/figures/papers/paper_list_l2615_https_arxiv_org_abs_2511_18174/figures/011_Table_6.jpg]]
 *Table 6: Ablation Study on Hyperparameters. Random rotation is disabled during training*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：从畸变容忍到架构级等变
 
@@ -385,6 +391,8 @@ USF的旋转等变性建立在两个关键前提之上：
 2. 能否通过开发定制CUDA核使球面算子在运行时间上超越平面实现，达成实际加速？
 3. USF能否扩展到多相机系统（如环视相机）的拼接与融合，以及视频序列中的时空旋转等变建模？
 4. 在无标定或弱标定条件下，如何从图像本身学习或估计球面投影映射，使USF摆脱对精确内参的依赖？
+
+
 
 ## 原文 PDF
 

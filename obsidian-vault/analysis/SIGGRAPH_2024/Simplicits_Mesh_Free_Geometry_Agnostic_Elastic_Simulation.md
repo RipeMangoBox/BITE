@@ -5,6 +5,7 @@ paper_level: A
 venue: SIGGRAPH
 year: 2024
 pdf_ref: paperPDFs/SIGGRAPH_2024/Simplicits_Mesh_Free_Geometry_Agnostic_Elastic_Simulation.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/toronto-ai/simplicits/
 aliases:
 - Simplicits
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | Simplicits：无网格、几何无关的弹性模拟 |
 | 英文题名 | Simplicits: Mesh-Free, Geometry-Agnostic, Elastic Simulation |
 | 会议/期刊 | SIGGRAPH 2024 |
-| Links | [paper](https://arxiv.org/abs/2407.09497); [Project](https://research.nvidia.com/labs/toronto-ai/simplicits/) |
+| Links | [paper](https://arxiv.org/abs/2407.09497) · [Project](https://research.nvidia.com/labs/toronto-ai/simplicits/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Simplicits |
 | Dataset | Mesh monkey (triangle mesh), SDF key (signed distance function), Gaussian Splat lego, Cantilever bar (corotational FEM reference) |
@@ -41,7 +42,7 @@ claims:
 > - SDF key (signed distance function) 上，Training time / Sim Step time 为 886 sec / 107 ms，对比 N/A，变化 N/A。
 > - Gaussian Splat lego 上，Training time / Sim Step time 为 5550 sec / 74 ms，对比 N/A，变化 N/A。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有弹性物理模拟器高度依赖特定的输入几何表示——四面体网格、显式网格或粒子系统——难以无缝处理神经辐射场（NeRF）、高斯泼溅、符号距离函数（SDF）等新兴隐式或稀疏表示。这迫使研究者为每种几何形式设计复杂的转换流程和算法适配，严重限制了模拟技术的通用性与易用性。
 
@@ -57,7 +58,7 @@ claims:
 
 **局限性**：当前方法假设形变基在仿真过程中保持不变，无法处理拓扑变化（如断裂、切割）；对刚度分布极不均匀的物体训练可能收敛困难；从形变映射反向渲染隐式场尚未完全解决；复杂几何的训练时间仍较长。
 
-## 背景与动机
+
 
 弹性体物理模拟是计算机图形学、机器人学和工程设计中的核心技术，其目标是预测物体在力、碰撞和约束作用下的形变与运动。传统上，这一任务由有限元法（FEM）主导，但FEM高度依赖特定的空间离散化——通常需要将输入几何转化为高质量的四面体网格或六面体网格。这一前置步骤不仅计算代价高昂、难以自动化，更关键的是，它与近年来涌现的多样化三维表示范式产生了根本性矛盾。
 
@@ -89,7 +90,9 @@ claims:
 
 通过这些设计，Simplicits在保持降阶模拟计算效率的同时，实现了对输入几何表示的完全无关性，为物理模拟技术与现代三维视觉生态的融合开辟了新路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Simplicits的核心创新在于将弹性物理模拟从对特定几何表示的依赖中解放出来，构建了一个**无网格、几何无关的减基模拟框架**。其关键突破可归纳为以下几个相互关联的changed slots：
 
@@ -135,7 +138,7 @@ $$G = \int_{\mathbb{R}^3} \Phi(\mathbf{X}) g(\mathbf{X}) d\mathbf{X}$$
 - 物理启发式训练的必要性由Fig. 11（有无弹性损失对比）和Fig. 9（非线性能量与全变换采样消融）直接验证。
 - 与FEM参考解的精度对比（Fig. 8）显示，9个手柄的Simplicits结果与基于网格的Fast Skinning Eigenmodes非常接近，且显著优于SPH和MPM等纯无网格方法。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2407_09497/figures/009_Figure_8.jpg]]
 *Figure 8: A cantilever bar comparison between a reference linear-tetrahedral, Corotational FEM beam,our method with 6and 9 handles,Fast Skinning Eigenmodes [Benchekroun et al.2023] with 10 handles,SPH[Kugelstadt et al.2021] with 5582 particles,and MPM [Hu etal.2019] with 5000 particles and initial grid density of 10.Notice ours matches Fast Skinning Eigenmodes very closely andf exhibits similar numerical coarsening due to reduction when compared to FEM.Simulations are run for 300 steps with timestep 0.01s,with young's modulus 5e6Pa,poisson ratio 0.45,density 1 0 0 0 $\mathrm { k g / m ^ { 3 } }$ using corotational linear elastic material*
@@ -178,7 +181,7 @@ Simplicits 提出了一套**表示无关的弹性物理模拟流程**，其核�
 - **输入**：任意可转化为占有率查询的 3D 几何表示（显式网格、点云、SDF、高斯泼溅、NeRF 等），以及物理参数（杨氏模量、泊松比、密度等）。
 - **输出**：物体在用户指定手柄变换或外力作用下的动态形变动画，表现为采样点或渲染后的形变几何序列。
 
-## 核心模块与公式推导
+
 
 ### 3.1 隐式时间积分框架
 
@@ -252,7 +255,9 @@ $$
 
 **运行时效率**：神经场仅在预处理阶段计算一次，用于获取采样点上的权重及其导数；物理时间步进循环中完全不需要神经网络推理，这是 Simplicits 在保持表示无关性的同时实现交互式仿真速度（每步 51–107 ms）的关键。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置与基准
 
@@ -312,7 +317,9 @@ Simplicits 在多种几何表示上进行了系统评估，包括显式三角形
 
 ![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2407_09497/figures/001_Figure.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法定位：无网格减基模拟的新范式
 
@@ -376,6 +383,8 @@ Simplicits 在谱系中占据的位置是：**数据无关的、物理启发式�
 3. **跨连续介质现象推广**：将该范式推广至其他连续介质现象（如流体、塑性）的可能性，是方法泛化性的重要探索方向。
 
 4. **2D 图像弹性模拟**：原文展示了 2D 图像弹性模拟的初步结果（Fig. 18），利用单目深度估计和图像修复进行对象分割和遮挡区域填充。这一方向将 Simplicits 的应用边界拓展到了图像编辑领域，但当前仍处于初步阶段，需要手动验证其鲁棒性和泛化能力。
+
+
 
 ## 原文 PDF
 

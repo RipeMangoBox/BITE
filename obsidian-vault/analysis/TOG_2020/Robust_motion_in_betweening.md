@@ -5,6 +5,8 @@ paper_level: A
 venue: TOG
 year: 2020
 pdf_ref: paperPDFs/TOG_2020/Robust_motion_in_betweening.pdf
+project_link: null
+code_link: null
 aliases:
 - TC
 - RMB
@@ -41,7 +43,7 @@ claims:
 > - Human3.6M walking subset (transition generation, up to 100 frames) 上，NPSS AVG 为 0.3950，对比 TG-Q (without modifiers)，变化 best (lower)。
 > - LaFAN1 (transition generation, 5 frames) 上，L2Q 为 0.17，对比 0.22 (Interpolation)，变化 -0.05。
 
-## 概述
+## 概要
 
 运动插帧（motion in-betweening）是动画制作中的核心任务：给定少量关键帧，自动生成中间过渡运动。现有基于循环神经网络（RNN）的运动预测方法在引入目标关键帧条件后，面临三重瓶颈——**缺乏过渡时长感知**导致不同长度过渡质量不稳定；**确定性生成**无法为固定关键帧提供多样化的合理运动；**简单拼接条件**使网络易于忽略目标信息，在过渡末端产生停顿、跳跃或模糊的平均姿态。
 
@@ -49,7 +51,7 @@ claims:
 
 在Human3.6M和LaFAN1数据集上的实验表明，TG_complete在所有过渡长度上均取得最优的局部四元数误差（L2Q）、全局位置误差（L2P）和归一化功率谱相似度（NPSS），并成功泛化至训练时未见过的更长过渡。消融实验证实，时间到达嵌入是降低过渡末端误差最有效的改进，调度目标噪声则成功产生可控的运动多样性。该方法已集成至MotionBuilder插件，在实际生产环境中实现高效交互式运动插帧。
 
-## 背景与动机
+
 
 角色动画中的运动过渡（in-betweening）是计算机动画的核心问题：给定起始帧和目标关键帧，生成一段自然、平滑的中间运动。传统上，这项工作依赖动画师手动设置关键帧和调整插值曲线，耗时且难以保证物理合理性。随着深度学习在运动预测领域的进展，研究者开始探索用神经网络自动生成过渡，但现有方法存在根本性缺陷。
 
@@ -59,7 +61,9 @@ claims:
 
 **本文动机**正是针对这两个缺口，提出两个可加式嵌入修饰符（additive embedding modifiers），通过强制偏移潜在表示的方式，使网络无法忽略时间信息和随机扰动。具体而言，时间到达嵌入（$z_{tta}$）为每个时间步提供连续、平滑、有界的剩余步数表示；调度目标噪声（$z_{target}$）在训练初期扭曲目标信息，迫使生成器学习对目标扰动的鲁棒性，同时支持在固定关键帧下采样多样过渡。配合对抗训练，系统能够生成高质量、可变长度且可采样的运动过渡，并已在MotionBuilder插件中实现工业级部署。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作的核心创新在于为循环过渡生成器引入两个**可加式嵌入修饰符**（additive embedding modifiers），以解决现有RNN在运动插帧（motion in-betweening）中缺乏过渡时长感知和随机性的瓶颈。与简单拼接条件信息不同，可加式嵌入通过对潜在表示的强制偏移，使网络无法忽略这些信号，从而从根本上改变生成行为。
 
@@ -110,7 +114,7 @@ $$\lambda_{target} = \begin{cases} 1 & \text{if } tta \geq 30 \\ \frac{tta-5}{25
 
 可加式嵌入修饰符的核心设计原则在于：网络**难以忽略**对潜在空间的强制偏移。拼接方式允许网络选择性关注或忽略特定维度，实验证实生成器完全学会了忽略拼接噪声（$z_{concat}$）。而可加式嵌入直接偏移所有潜在表示，迫使网络在生成过程中始终响应这些信号，从而保证时间感知和多样性控制的有效性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l51_https_doi_org_10_1145_3386569_3392480/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the $\mathbf { T G } _ { c o m p l e t e }$ architecture for in-betweening. Computations for a single timestep are shown. Visual concatenation of input boxes or arrows represents vector concatenation. Green boxes are the jointly trained neural networks. Dashed boxes represent our two proposed embedding modifiers. The "quat norm" and " $\mathsf { F K " }$ red boxes represent the quaternion normalization and Forward Kinematics operations respectively. The ⊕ sign represents element-wise addition and $\phi$ is the sigmoid non-linearity. Outputs are linked to associated losses with dashed lines
@@ -159,7 +163,7 @@ $$L_{total} = L_{quat} + L_{root} + L_{pos} + L_{contacts} + L_{gen}$$
 
 其中各分量均为L1范数（对抗损失 $L_{gen}$ 除外，采用LSGAN形式）。$L_{pos}$ 通过正向运动学在全局关节位置上计算，确保角色在世界空间的位移正确；$L_{contacts}$ 为足部接触预测损失，用于后续IK后处理。
 
-## 核心模块与公式推导
+
 
 TG_complete 的核心架构由三个功能独立的编码器、两个可加式嵌入修饰符、一个 LSTM 循环层及一个解码器构成（Fig. 2）。输入为 10 帧历史上下文和一个目标关键帧，输出为过渡序列的逐帧四元数速度、全局根速度及脚部接触标签，最后通过正向运动学（FK）还原全局关节位置。
 
@@ -264,7 +268,9 @@ $$
 
 **关键设计决策**：$L_{pos}$ 通过 FK 将局部旋转转换为全局位置后计算，直接约束世界空间中的关节轨迹，弥补了纯四元数损失对末端执行器位置约束不足的问题。但 FK 的反向传播计算成本较高，因此偏移表示中未包含位置偏移（仅使用根偏移和四元数偏移），这是已知局限。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 运动预测基线的竞争力验证
 
@@ -341,7 +347,9 @@ Table 4报告了MotionBuilder插件的速度性能。在Intel Xeon CPU E5-1650 @
 
 这些失败模式为后续研究指明了方向：如何在不断增训练成本的情况下纳入位置偏移信息、如何实现给定固定上下文条件下的显式风格控制，以及如何扩展方法以处理更极端的运动过渡场景。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：运动过渡生成中的核心瓶颈
 
@@ -396,6 +404,8 @@ TG_complete的架构基础来自两条技术路线：
 ### 知识库定位
 
 TG_complete在运动生成方法谱系中占据“条件循环生成+对抗训练”的交叉位置。其技术贡献的可迁移性体现在：可加式嵌入修饰符的设计范式——通过强制潜在空间偏移而非拼接来注入条件信息——可推广至其他需要时序感知和可控多样性的序列生成任务。然而，该方法对分布外泛化和风格控制的局限，指向了后续工作（如基于扩散模型或可学习先验的方法）的改进方向。
+
+
 
 ## 原文 PDF
 

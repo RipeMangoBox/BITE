@@ -42,7 +42,7 @@ claims:
 > - TPC-268 test set 上，MAE 16.90 (CountGD with 3 visual exemplars + full taxonomy text prompt) vs 19.52 (CountGD with 3 visual exemplars only) (-2.62)；MAE 17.51 (LOCA 3-shot) vs 19.47 (DAVE 1-shot) (-1.96)。
 > - Cross-dataset transfer FSC-147 → TPC-268 上，MAE change TPC-268→TPC-268 (in-domain training) vs FSC-147→TPC-268: CountTR 38.62 (+225% vs. in-domain) (显著增加，表明跨域泛化极难)。
 
-## 概述
+## 概要
 
 植物计数是农业、生态监测和植物科学中的基础任务，但长期以来，计算机视觉社区主要关注人群、车辆等刚性对象的计数，忽视了植物领域独有的挑战。植物天然具备丰富的生物多样性、细粒度形态差异、非刚性结构以及随生长阶段和环境变化的表型可塑性，这使得现有计数方法在植物场景中泛化能力极差。同时，缺少一个大规模、带有完整分类学标注的植物计数基准，导致社区难以系统研究跨物种、跨尺度的类别无关计数。
 
@@ -53,8 +53,6 @@ claims:
 在 TPC-268 上，回归式方法 **LOCA** 取得了最佳测试性能（3-shot MAE 17.51），而仅依赖全局自注意力的模型（如 CACViT）在验证集表现良好但在测试集上泛化显著下降，表明细粒度、跨尺度的植物计数仍极具挑战。跨数据集迁移实验进一步揭示了域差距的严重性：从通用计数数据集 FSC-147 迁移到 TPC-268 时，CountTR 的 MAE 增加 225%。此外，在 CountGD 上逐步引入分类学文本信息（物种名称→完整分类学路径）可将 MAE 从 19.52 降至 16.90，验证了分类学先验对计数精度的正向作用。
 
 **方法定位**：TPC-268 本身是一个数据集与基准贡献，它将植物分类学的层级结构显式嵌入类别无关计数框架，属于**数据驱动的领域基准构建**工作。在方法谱系上，它继承并扩展了 CAC 范式（如 **LOCA**、**DAVE**、**CACViT** 等方法），同时引入分类学感知的评估维度，将传统的单类别计数提升为层次化的跨物种泛化问题。与现有通用计数数据集（如 FSC-147、CARPK）相比，TPC-268 首次将生物组织层级和完整分类学路径作为计数任务的内在组成部分，为植物科学和计算机视觉的交叉研究提供了新的基准平台。
-
-## 背景与动机
 
 ### 植物计数的独特挑战
 
@@ -85,7 +83,7 @@ claims:
 
 通过这一框架，TPC-268不仅是一个更大规模的植物计数数据集，更是一个系统性的测试平台，用于衡量模型在分类学约束下的细粒度跨物种泛化能力。
 
-## 核心创新
+## 核心方法与创新机理
 
 本工作的核心创新并非提出一种新的计数模型架构，而是**将植物计数重新定义为类别无关计数（Class-Agnostic Counting, CAC）问题，并通过大规模、细粒度、分类学感知的数据集构建与划分策略，系统性地暴露并衡量现有方法在植物领域的泛化瓶颈**。其关键创新点可归纳为以下三个相互关联的层面。
 
@@ -119,8 +117,6 @@ claims:
 
 与FSC-147等通用CAC数据集相比，TPC-268的核心差异不在于规模（虽然其10,000张图像、678,050个标注实例、268个可计数类别的规模已显著超越现有植物计数数据集），而在于其**任务设计哲学**：TPC-268将植物分类学的层级结构从背景知识转化为任务的内在组成部分，从而将CAC的研究从“跨类别泛化”推进到“跨分类学间隙泛化”这一更具挑战性且对农业、生态监测等实际应用更有意义的层面。
 
-## 整体框架
-
 本工作并非提出一种新的计数模型架构，而是构建了一个**大规模、分类学感知的植物计数基准与评估框架**，其核心是一个名为 **TPC-268** 的数据集及配套的类别无关计数（Class-Agnostic Counting, CAC）实验体系。整体框架围绕三个相互嵌套的层次组织：**数据构造与标注层**、**分类学嵌入层**、**基准评估层**。
 
 ### 数据构造与标注层
@@ -146,16 +142,6 @@ $$\operatorname*{min} \sum_{k \in \mathcal{S}} \Bigg( \lambda_{\mathrm{ing}} \bi
 约束条件包括：每个原子单元（物种-组织对）必须恰好分配给一个子集（$\sum_{k \in S} x_{u,k} = 1$）；训练集必须包含每个生物组织类别的至少一个单元（$\sum_{u \in \mathcal{U}_o} x_{u,\mathrm{train}} \geq 1$）；所有子集必须覆盖全部观测尺度。该划分确保训练/验证/测试集在物种-组织级别上严格不交叠，同时平衡了实例密度（平均 67.81 实例/图像）和观测尺度分布，从而杜绝类别泄露，保证零样本计数评估的公平性。
 
 评估流程接受多种 CAC 模型作为可插拔组件——包括基于回归的方法（如 **LOCA**）、基于检测的方法（如 **DAVE**）、基于 ViT 的方法（如 **CACViT**）以及文本引导的方法（如 **CountGD**）——在统一的划分和指标（MAE、RMSE、$R^2$）下进行系统比较。分类学信息可通过文本提示的形式注入（如对 CountGD 输入完整分类学描述），也可通过特征空间的 t-SNE 可视化分析模型在分类学维度上的表征分布。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2100_https_arxiv_org_abs_2603_21229/figures/001_Figure_1.jpg]]
-*Figure 1: Counting plants versus counting generic objects. Plants inherently exhibit rich biodiversity, fine-grained variations, non-rigid structures, and time-space variations, which collectively create a nonnegligible gap against generic objects*
-
-![[assets/figures/papers/paper_list_l2100_https_arxiv_org_abs_2603_21229/figures/004_Figure_3.jpg]]
-*Figure 3: Treemap of plant taxonomic hierarchy in TPC-268. Each nested rectangle represents a specific taxonomic rank, from Kingdom (Plantae), Phylum (e.g., Angiosperms), Class (e.g., Magnoliopsida, Liliopsida), Order (e.g., Rosales, Poales), Family (e.g., Rosaceae, Poaceae), Genus (e.g., Prunus, Zea), to Species (e.g., Prunus persica, Zea mays). Box area represents the number of images for that taxonomic unit*
-
-## 核心模块与公式推导
 
 ### 3.1 类别无关计数框架
 
@@ -209,7 +195,7 @@ $$\phi_h: \mathcal{C}_h \to \{1, 2, \dots, |\mathcal{C}_h|\}$$
 
 标注遵循CAC标准点‑框协议：在每个实例的结构中心提供点标注，并为每张图像提供三个实例的边界框作为视觉示例。约80%的图像由专业标注团队从零开始标注，并经过植物表型研究人员的三轮审核。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 实验设置与基准方法
 
@@ -268,17 +254,8 @@ Figure 12提供了多种方法在TPC-268上的定性计数结果。在低密度�
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l2100_https_arxiv_org_abs_2603_21229/figures/003_Table_1.jpg]]
-*Table 1: Representative visual counting datasets introduced by the computer vision community in the past ten years*
-
 ![[assets/figures/papers/paper_list_l2100_https_arxiv_org_abs_2603_21229/figures/007_Table_2.jpg]]
 *Table 2: Comparison with the state-of-the-art CAC approaches on the TPC–268 dataset. Best performance is in boldface*
-
-![[assets/figures/papers/paper_list_l2100_https_arxiv_org_abs_2603_21229/figures/008_Table_3.jpg]]
-*Table 3: Results of cross-dataset transfer. A→B denotes model trained on dataset A and tested on the test set of dataset B. Red/Blue indicate MAE increase/decrease compared to training and testing on the same dataset (A→A)*
-
-![[assets/figures/papers/paper_list_l2100_https_arxiv_org_abs_2603_21229/figures/010_Table_4.jpg]]
-*Table 4: Performance of CountGD on the TPC–268 test set with different prompts. The species and taxonomic information are provided in text*
 
 ![[assets/figures/papers/paper_list_l2100_https_arxiv_org_abs_2603_21229/figures/009_Figure_6.jpg]]
 *Figure 6: t-SNE visualization of LOCA [49] prototype features on the test set. Different colors indicate different groups*
@@ -286,10 +263,7 @@ Figure 12提供了多种方法在TPC-268上的定性计数结果。在低密度�
 ![[assets/figures/papers/paper_list_l2100_https_arxiv_org_abs_2603_21229/figures/016_Figure_12.jpg]]
 *Figure 12: Qualitative results of representative counting methods on our TPC–268. The examples cover diverse plant forms, observation scales, and density levels*
 
-![[assets/figures/papers/paper_list_l2100_https_arxiv_org_abs_2603_21229/figures/012_Figure_8.jpg]]
-*Figure 8: Examples of different biological organizations from the same species in our TPC–268. Tissue-level, organ-level, and wholeplant-level images show distinct texture patterns and structural characteristics*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 任务定位：类别无关计数的植物学特化
 

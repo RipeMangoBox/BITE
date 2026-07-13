@@ -42,7 +42,7 @@ claims:
 > - SQA3D (test) 上，EM@1 ↑ 53.9 (Fase3D + Qwen2.5-3B) vs 54.5 (3D-LLaVA + Vicuna-1.5-7B) (-0.6)。
 > - ScanRefer 上，CIDEr@0.5 ↑ 78.14 (Fase3D + Mask3D) vs 78.80 (3D-LLaVA + Mask3D) (-0.66)。
 
-## 概述
+## 概要
 
 现有三维大型多模态模型（3D LMM）普遍依赖计算量庞大的预训练视觉编码器（如稀疏3D U-Net），这不仅限制了输入分辨率和可扩展性，还缺乏直接处理无序、大规模点云的高效标记化方案。**Fase3D** 是首个面向场景级三维数据的无编码器大型多模态模型，其核心洞察在于：将三维点云处理视为空间域与频率域之间的合成——通过在序列化的超点上利用快速傅里叶变换（FFT）进行全局上下文混合，可以近似自注意力机制，从而完全移除专用视觉编码器。
 
@@ -50,7 +50,7 @@ claims:
 
 在 ScanQA 和 SQA3D 等三维问答与密集字幕基准上，Fase3D 以显著更低的计算代价取得了与编码器基线相当的性能。消融实验进一步证实，基于FFT的上下文增强器单独能将 CIDEr 提升 **6.93**，与超点池化结合后提升可达 **10.87**，验证了频域全局建模的关键作用。当前方法主要在 ScanNet 数据集上验证，尚未扩展到更广泛的多模态输入或更大规模三维语料库，这些方向仍有待探索。
 
-## 背景与动机
+
 
 ### 三维场景理解的多模态大模型需求
 
@@ -74,7 +74,9 @@ claims:
 
 基于上述动机，本文提出 **Fase3D**——首个面向场景级三维数据的无编码器大型多模态模型。Fase3D 完全移除了传统的三维视觉编码器，转而采用一套基于傅里叶变换的轻量级标记化流水线：通过超点（superpoint）标记化将点云压缩为紧凑的标记集合，利用空间填充曲线（SFC）序列化赋予无序点云以空间一致性的一维结构，再通过 FFT 驱动的上下文增强器实现高效的全局特征混合。这一设计使得 Fase3D 的视觉标记化阶段仅需 10.54M 激活参数和 2.04G FLOPs，效率较编码器基线提升超过一个数量级，同时在下游任务上保持了具有竞争力的性能。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Fase3D 的核心创新在于**完全移除三维视觉编码器**，将点云处理重新定义为空间域与频率域之间的合成问题。与主流三维大型多模态模型（3D LMM）依赖计算量大的预训练编码器（如稀疏 3D U-Net 或 PointBERT）不同，Fase3D 通过三个紧密耦合的 changed slots 实现了高效的无编码器架构，在保持与编码器基线相当性能的同时，将视觉标记化阶段的激活参数量削减至 **10.54M**（对比 3D-LLaVA 的 58.26M），FLOPs 降至 **2.04G**（对比 3D-LLaVA 的 37.75G）（Table 1）。
 
@@ -98,7 +100,7 @@ Fase3D 的第三个 **changed slot** 在于 LLM 适配层的设计。传统方�
 
 值得注意的是，Fase3D 的创新存在明确的边界条件。首先，所有实验仅在 ScanNet v2 数据集上验证，尚未在更广泛的三维场景语料库上检验泛化能力。其次，当前的空间填充曲线序列化策略为手工选择（希尔伯特、Z-order 等），缺乏自适应或可学习的序列化机制，可能对某些场景并非最优。此外，Fase3D 尚未与 RGB 图像等多模态输入融合，限制了在纹理丰富场景中进一步提升性能的潜力。这些边界为后续研究提供了清晰的改进方向：自适应序列化策略、多模态傅里叶增强、以及更大规模三维预训练。
 
-## 整体框架
+
 
 Fase3D 提出了一套**完全移除专用三维视觉编码器**的流水线，直接以原始点云作为输入，通过四个核心模块将其转化为紧凑的三维标记序列，最终由冻结的大语言模型（LLM）完成三维场景理解与推理。图 2 展示了从点云到语言输出的完整数据流。
 
@@ -129,7 +131,7 @@ Fase3D 提出了一套**完全移除专用三维视觉编码器**的流水线，
 ![[assets/figures/papers/paper_list_l2233_https_arxiv_org_abs_2602_23153/figures/002_Figure_2.jpg]]
 *Figure 2: The Fase3D pipeline. A lightweight tokenizer (•) produces M superpoint tokens, which are refined by an FFT-based context enhancer (•). A graph is then constructed, and a token-merging block (•) compresses the tokens into*
 
-## 核心模块与公式推导
+
 
 Fase3D 的核心设计理念是将三维点云处理建模为空间域与频率域之间的合成——在序列化的超点上利用 FFT 进行全局上下文混合，从而近似自注意力，构建无视觉编码器的高效三维大型多模态模型。其流水线包含五个关键模块。
 
@@ -202,7 +204,9 @@ $$
 ![[assets/figures/papers/paper_list_l2233_https_arxiv_org_abs_2602_23153/figures/013_Figure.jpg]]
 *Figure: A. Visualization of our SFC-based kNN graph construction via window voting. We show two representative examples of curveguided neighbor selection*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 
@@ -272,7 +276,9 @@ Table 5 对比了不同 LLM 骨干下的性能。Fase3D 在 OPT-1.3B 和 Qwen2.5
 ![[assets/figures/papers/paper_list_l2233_https_arxiv_org_abs_2602_23153/figures/012_Table.jpg]]
 *Table: E. Effect of different token selection / merging strategies on ScanQA validation performance. All models are trained from scratch on the ScanQA training split, without any pre-training*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与编码器基线的结构差异与效率优势
 
@@ -329,6 +335,8 @@ Fase3D 的三项关键设计构成了其独特的方法定位：
 4. **标记合并的下游扩展**：当前基于图的标记合并策略主要服务于 LMM 输入压缩，是否能够支持更高级的感知任务（如实例分割、开放词汇对象发现）？这需要验证合并后的标记是否保留了足够的实例级判别信息。
 
 5. **与更大 LLM 的扩展性**：当前实验主要基于 3B 和 1.3B 规模的 LLM，Fase3D 的轻量标记化设计在更大 LLM（如 7B、13B）上的性能增益和效率优势是否保持，需要进一步验证。论文虽报告了 Vicuna-1.5-7B 的结果，但未提供完整的效率对比数据。
+
+
 
 ## 原文 PDF
 

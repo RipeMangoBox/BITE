@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Cross_Timestep_3D_Diffusion_Model_with_Trans_temporal_Memory_LSTM_and_Adaptive_Priori_Decoding_Strategy_for_Medical_Segmentation.pdf
+project_link: null
+code_link: null
 openreview_forum_id: TE3asYO8PQ
 aliases:
 - CT
@@ -41,7 +43,7 @@ claims:
 > - LNCTVSeg 上，Dice 为 83.7，对比 Diff-UNet (best prior method, exact value not provided)，变化 未知。
 > - OASeg 上，Dice 为 72.8，对比 Diff-UNet (best prior method, exact value not provided)，变化 未知。
 
-## 概述
+## 概要
 
 **核心问题：3D扩散模型在高噪时间步的结构崩溃。** 现有的3D扩散分割模型在反向扩散的初始阶段（高噪声时间步，$t$接近$T$）会遭遇“初始阶段崩溃”（Initial-stage collapse）现象——当从纯随机噪声开始采样时，模型无法恢复目标结构，导致分割完全失败。其根本原因在于，高噪阶段缺乏有效的结构先验且各时间步独立去噪，无法积累跨步证据来逐步构建目标形态。
 
@@ -49,7 +51,7 @@ claims:
 
 **核心结论：** APDS使扩散模型能够从随机噪声正确启动反向采样，从根本上解决了初始阶段崩溃问题；tLSTM的跨时间步记忆显著提升了分割性能和时间一致性。在LNCTVSeg和OASeg两个异构3D医学分割数据集上，Cross-Timestep均取得了优于现有方法（包括TransBTS、SwinUNETR、Diff-UNet等）的Dice/IoU/HD95指标，消融实验进一步验证了t-cell组件、APDS、SC-tLSTM和FFT-tLSTM各自的独立贡献。
 
-## 背景与动机
+
 
 ### 3D扩散模型在医学分割中的瓶颈
 
@@ -73,7 +75,9 @@ claims:
 
 通过这两个机制的协同，Cross-Timestep在多个异构3D医学数据集上展现出优于现有方法的性能，同时保持了可接受的计算开销。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Cross-Timestep 的核心创新在于通过两个相互协同的机制——**自适应先验解码策略（APDS）**和**跨时间步记忆LSTM（tLSTM）**——从根本上解决了3D扩散模型在医学分割任务中的“初始阶段崩溃”问题。
 
@@ -123,7 +127,7 @@ APDS 和 tLSTM 的协同体现在：APDS 在高噪阶段注入强先验，防止
 | 跨时间步记忆 | 各步独立去噪 | tLSTM（Conv-tLSTM / Linear-tGRU + t-cell） |
 | 去噪器架构 | 标准 U-Net 编码器-解码器 | 编码器集成 FFT-tLSTM + SC-tLSTM，解码器集成 SC-tLSTM + APDS |
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0011_TE3asYO8PQ_Cross-Timestep_3D_Diffusion_Model_with_Trans-tem/figures/002_Figure_2.jpg]]
 *Figure 2: (a) The framework of the Cross-Timestep, we propose APDS and tLSTM to construct a stable diffusion architecture. (b) Time-weighted control RA, using the prior mask obtained from the PD to guide the main branch. (c) Detailed design of Conv-tLSTM, using convolution to improve the gating mechanism of LSTM and enhance its memory cell to remember the temporal state. (d) Detailed design of Linear-tGRU, using Linear combined with GRU to reduce resource requirements, compared with Conv-tLSTM. (e) Structure of SC-tLSTM, improving the traditional SC attention to adapt to the diffusion model. (f) Structure of FFT-tLSTM, transforming the time domain into the frequency domain for denoising*
@@ -177,7 +181,7 @@ $$x_{t-1} = \frac{1}{\sqrt{\alpha_t}} \left( x_t - \frac{1-\alpha_t}{\sqrt{1-\ba
 
 整个pipeline的因果链条可概括为：APDS在早期提供强结构先验防止崩溃 → tLSTM跨步积累证据 → 先验权重衰减后主去噪器接管 → 最终输出精细分割掩码。图1和图3分别定性和定量地展示了APDS对“初始阶段崩溃”的消除效果。
 
-## 核心模块与公式推导
+
 
 ### 自适应先验解码策略（APDS）
 
@@ -275,7 +279,9 @@ $$\mathcal{L}_{simple} = \mathbb{E}_{t, x_0, \epsilon} \left[ || \epsilon - \mat
 
 $$x_{t-1} = \frac{1}{\sqrt{\alpha_t}} \left( x_t - \frac{1-\alpha_t}{\sqrt{1-\bar{\alpha}_t}} \epsilon_{\theta} \right) + \sigma_t z$$
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与实验动机
 
@@ -384,7 +390,9 @@ Table 5报告了不同扩散步数（300、500、1000）下LNCTVSeg的性能变�
 - tLSTM的状态记忆机制能否与DDIM、FP-Diffusion等加速采样方法结合，在保持分割质量的前提下大幅降低扩散步数？
 - 该方法在数千例规模的异源多中心数据集上是否仍能维持鲁棒性和计算效率？
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与 Baseline 的关系
 
@@ -421,6 +429,8 @@ Cross-Timestep 的核心改进建立在扩散分割模型 Diff-UNet 之上，后
 3. **多中心大规模验证**：Figure 8-9 的 t-SNE 可视化确认了数据集的多中心异质性，但当前实验规模有限。在数千例级别的真实多中心数据上，tLSTM 的状态记忆是否仍能有效积累跨域证据，还是会被域偏移干扰，是一个开放的工程和科学问题。
 
 4. **频域去噪的理论理解**：FFT-tLSTM 在消融实验中表现出独立贡献（Table 3），但其有效性的理论解释尚停留在“频域中信噪更可分离”的经验直觉层面。不同解剖结构、不同噪声水平下的最优频域滤波策略是什么，缺乏系统分析。
+
+
 
 ## 原文 PDF
 

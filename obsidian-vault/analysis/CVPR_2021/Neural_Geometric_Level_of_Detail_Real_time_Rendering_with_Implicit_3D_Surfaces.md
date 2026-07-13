@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2021
 pdf_ref: paperPDFs/CVPR_2021/Neural_Geometric_Level_of_Detail_Real_time_Rendering_with_Implicit_3D_Surfaces.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/toronto-ai/nglod/
 aliases:
 - NGLDNL
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 神经几何细节层次：隐式3D曲面的实时渲染 |
 | 英文题名 | Neural Geometric Level of Detail: Real-time Rendering with Implicit 3D Surfaces |
 | 会议/期刊 | CVPR 2021 |
-| Links | [paper](https://arxiv.org/abs/2101.10994); [Project](https://nv-tlabs.github.io/nglod); [Project](https://research.nvidia.com/labs/toronto-ai/nglod/) |
+| Links | [paper](https://arxiv.org/abs/2101.10994) · [Project](https://nv-tlabs.github.io/nglod) · [Project](https://research.nvidia.com/labs/toronto-ai/nglod/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Neural Geometric Level of Detail (NG-LOD) |
 | Dataset | ShapeNet150, Thingi32, TurboSquid16, Rendering Speed (TurboSquid V Mech 1920x1080) |
@@ -42,7 +43,7 @@ claims:
 > - Thingi32 上，Chamfer-L1 (×10^3) 为 0.0271 (Ours/LOD5)，对比 0.0533 (DeepSDF)，变化 -0.0262。
 > - TurboSquid16 上，Normal-L2 为 0.166 (Ours/LOD5)，对比 0.180 (DeepSDF)，变化 -0.014。
 
-## 概述
+## 概要
 
 **问题瓶颈**：传统神经隐式曲面采用单一大型 MLP（如 DeepSDF 约 180 万参数）编码完整形状的符号距离函数（SDF），每次距离查询需数百万次运算；在 sphere tracing 渲染管线中，每像素需上百次查询，总计算成本高达数百亿次操作，导致无法实时渲染。
 
@@ -57,7 +58,7 @@ claims:
 
 **局限与开放问题**：该方法依赖有界体素八叉树，难以扩展到极大场景或极薄几何体；无法直接与传统骨骼动画或变形技术结合。未来方向包括解码器缓存/融合以进一步提升性能，以及向大规模多物体动态场景的扩展。
 
-## 背景与动机
+
 
 ### 隐式神经表示与实时渲染的张力
 
@@ -85,7 +86,9 @@ $$S = \big \{ \mathbf { x } \in \mathbb { R } ^ { 3 } \big | f ( \mathbf { x } )
 
 本文的核心动机在于打破“神经 SDF = 大型全局 MLP”的范式。通过将 SDF 编码从单一 MLP 权重中解耦，转而使用**稀疏体素八叉树（SVO）存储局部几何特征**，并配合**极浅 MLP 解码器**（仅 4737 个推理参数），将主要计算负载从网络推理转移到高效的八叉树遍历与三线性插值上。同时引入多重离散 LOD 与连续 LOD 插值，使渲染时可根据需要自适应选择几何精度。这一设计旨在实现 **2–3 个数量级的渲染加速**，首次将神经 SDF 的渲染性能推至实时交互范畴。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 1. 从全局编码到稀疏八叉树特征体积
 
@@ -121,7 +124,7 @@ $$J(\theta, \mathcal{Z}) = \mathbb{E}_{\mathbf{x}, d} \sum_{L=1}^{L_{\max}} \lef
 
 上述创新的综合效果体现在渲染速度的**2–3 个数量级提升**（Abstract）。具体而言，在 TurboSquid V Mech 场景 1920×1080 分辨率下，NG-LOD 稀疏渲染器的帧耗时仅 91ms，而 DeepSDF 需 1693ms，加速约 18.6 倍（Table 3）。同时，NG-LOD 在 ShapeNet150 上的 gIoU 达到 91.6%，高出 DeepSDF 4.7 个百分点（Table 1），实现了速度与质量的双重超越。
 
-## 整体框架
+
 
 NG-LOD 的整体 pipeline 围绕**稀疏体素八叉树（SVO）特征体积**与**极轻量 MLP 解码器**的协同工作构建，其核心设计是将 SDF 的表示能力从网络权重转移到显式的分层特征存储中，从而在保持高重建质量的同时实现实时渲染。
 
@@ -156,7 +159,7 @@ $$J(\theta, \mathcal{Z}) = \mathbb{E}_{\mathbf{x}, d} \sum_{L=1}^{L_{\max}} \lef
 
 这种多层级联合训练确保了每一级八叉树都能独立表示有效的几何信息，使得渲染时可在不同 LOD 间无缝切换。
 
-## 核心模块与公式推导
+
 
 ### 3.1 隐式曲面与符号距离函数
 
@@ -204,7 +207,9 @@ $$J(\theta, \mathcal{Z}) = \mathbb{E}_{\mathbf{x}, d} \sum_{L=1}^{L_{\max}} \lef
 
 该算法利用并行广度优先遍历和前缀和（Exclusive Sum）操作实现无冲突的稀疏八叉树写入索引，从而在 GPU 上高效执行。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 几何重建质量
 
@@ -212,7 +217,6 @@ $$J(\theta, \mathcal{Z}) = \mathbb{E}_{\mathbf{x}, d} \sum_{L=1}^{L_{\max}} \lef
 
 定性结果（Figure 5）进一步印证了数值优势。在 TurboSquid 数据集上，**FFN**（Tancik et al., NeurIPS 2020）和 **Neural Implicits**（Davies et al., arXiv 2020）均丢失了大量高频细节，仅 NG-LOD 能恢复精细几何结构，且渲染速度比 FFN 快约 50 倍，与 NI 相当。
 
-![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2101_10994/figures/008_Figure.jpg]]
 
 ### 复杂解析 SDF 的极限测试
 
@@ -259,7 +263,9 @@ Figure 7 将 NG-LOD 与传统的网格简化方法在低内存预算下进行了
 ![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2101_10994/figures/006_Table_1.jpg]]
 *Table 1: Mesh Reconstruction. This table shows architectural and per-shape reconstruction comparisons against three different datasets. We see that under all evaluation schemes, our architecture starting from LOD 3 performs much better despite having much lower storage and inference parameters. The storage for our representation is calculated based on the average sparse voxel counts across all shapes in all datasets plus the decoder size, and # Inference Param. measures network parameters used for a single distance query*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -290,6 +296,8 @@ NG-LOD 的适用性受以下因素制约：
 - 如何将该表示扩展到大规模、多物体场景并支持动态更新？
 
 从知识库定位来看，NG-LOD 开创了“稀疏特征八叉树 + 极浅解码器”的神经 SDF 实时渲染范式，后续工作可沿以下方向推进：将特征体积与哈希编码（如 Instant NGP）结合以进一步压缩存储；引入时序特征体积支持 4D 重建；或将八叉树遍历与硬件光追单元（RT core）深度集成以实现真正的实时帧率。
+
+
 
 ## 原文 PDF
 

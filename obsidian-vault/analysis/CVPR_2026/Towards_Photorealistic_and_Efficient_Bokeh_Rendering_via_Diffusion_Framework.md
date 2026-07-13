@@ -41,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - EBB400-LQ 上，PSNR↑ / SSIM↑ / LPIPS↓ / DISTS↓ / Time(s)↓ 24.23 / 0.7026 / 0.2786 / 0.1944 / 0.1062 vs SOTA两阶段组合（如OSEDiff+BokehDiff等） (全面优于所有对比方法，推理速度最快)。
 
-## 概述
+## 概要
 
 高倍变焦摄影在移动设备上日益普及，但长焦镜头受限于物理孔径与传感器尺寸，常导致图像分辨率下降、噪声放大、边界模糊与纹理失真。现有散景渲染方法（如 **BokehMe**，Peng et al., CVPR 2022；**Dr.Bokeh**，Sheng et al., CVPR 2024；**BokehDiff**，Zhu et al., arXiv 2025）普遍依赖高质量输入，难以应对此类退化场景。常见的两阶段方案——先用真实世界超分（Real-ISR，如 **OSEDiff**，Wu et al., NeurIPS 2024；**S3Diff**，Zhang et al., arXiv 2024）恢复图像细节，再执行散景渲染——存在误差累积与计算效率低下双重瓶颈。
 
@@ -49,7 +49,7 @@ claims:
 
 消融实验确认：移除聚焦感知掩码注意力导致无参考指标 MUSIQ 从 58.83 降至 57.41；去除交替训练策略使 LPIPS 从 0.2786 退化为 0.2798；退化感知深度模块的移除在所有指标上均造成性能损失（Table 2）。这些结果共同支撑了“解耦训练+注意力调制+鲁棒深度估计”三位一体设计的有效性。
 
-## 背景与动机
+
 
 ### 高倍变焦摄影中的散景渲染困境
 
@@ -68,7 +68,9 @@ claims:
 
 本文的核心动机在于突破两阶段范式的局限，提出一个**统一的单步扩散框架 MagicBokeh**，将 Real-ISR 与散景渲染联合优化。其关键洞察是：预训练的扩散模型内蕴丰富的散景先验，若能有效复用该先验并解耦两个任务的优化目标，即可在单一模型中同时实现高质量超分与真实感散景生成，从而消除级联误差并大幅提升推理效率。如图 2 所示，MagicBokeh 将超分与散景渲染无缝集成，避免了低分辨率散景渲染（a）的质量损失和两阶段方案（b）的效率问题，实现了计算效率与真实感散景效果的统一。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MagicBokeh的核心创新在于将真实感散景渲染重新定义为一个**统一单步扩散生成问题**，从根本上改变了现有两阶段级联范式。具体而言，其关键创新体现在以下四个相互耦合的维度：
 
@@ -102,7 +104,7 @@ $${\mathrm{Attention}} = {\mathrm{softmax}}\left( \frac { \mathbf{Q} \mathbf{K} 
 
 MagicBokeh提出**退化感知深度模块**，采用**自特征蒸馏**框架来解决这一问题：以HQ图像经冻结的Depth Anything v2提取的特征作为教师信号，训练一个学生网络从对应的LQ图像中预测HQ-like特征，进而生成鲁棒的视差图。消融实验（Table 2）表明，移除该模块会在所有指标上造成性能退化，证实了鲁棒深度估计对统一框架的必要性。补充实验（Table s1）进一步显示，该模块在退化的NYUv2和KITTI基准上超越了原始Depth Anything v2。
 
-## 整体框架
+
 
 MagicBokeh 将真实图像超分辨率（Real‑ISR）与散景渲染统一到一个单步扩散框架中，避免了传统两阶段级联（先超分、后散景）带来的误差累积与冗余计算。其整体 pipeline 由四个核心模块串联构成：**高质量特征提取**、**退化感知深度估计**、**散焦图引导的可控散景渲染**，以及**聚焦感知掩码注意力**。输入为一张高倍变焦导致的低质（LQ）图像，输出为具有真实感散景效果的高分辨率图像。
 
@@ -148,7 +150,7 @@ MagicBokeh 将真实图像超分辨率（Real‑ISR）与散景渲染统一到�
 ![[assets/figures/papers/paper_list_l2055_https_arxiv_org_abs_2605_07429/figures/001_Figure_1.jpg]]
 *Figure 1: MagicBokeh is the first unified method specifically designed for high-zoom bokeh rendering. (Zoom-in for best view)*
 
-## 核心模块与公式推导
+
 
 MagicBokeh 的整体架构由四个关键模块构成，围绕“预训练扩散模型内蕴散景先验”这一核心洞察，将真实世界图像超分辨率（Real-ISR）与散景渲染统一在单步扩散框架内。
 
@@ -189,7 +191,9 @@ $$\mathcal { M } _ { ( x , y ) } = \begin{cases} 0 & \text{if } \mathbf{M}_{(x,y
 ![[assets/figures/papers/paper_list_l2055_https_arxiv_org_abs_2605_07429/figures/011_Figure_S.1.jpg]]
 *Figure S.1: The training pipeline of the DA depth module*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与实验动机
 
@@ -260,7 +264,9 @@ Figure 6 提供了消融的可视化对比，直观展示了各模块对散景�
 ![[assets/figures/papers/paper_list_l2055_https_arxiv_org_abs_2605_07429/figures/013_Table_S.2.jpg]]
 *Table S.2: Quantitative comparison with state-of-the-art methods on real-world benchmarks (RealSR and DrealSR ). By providing a defocus map with all-zero input, our method can generate a high-quality all-in-focus image for quantitative comparison. The best and second-best results are highlighted in bold and underline*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法沿革与基线对比
 
@@ -314,6 +320,8 @@ $${\mathrm{Attention}} = {\mathrm{softmax}}\left( \frac { \mathbf{Q} \mathbf{K} 
 3. **退化感知深度的迁移价值**：自特征蒸馏框架本质上是退化鲁棒的特征学习策略，其在其他退化敏感的下游任务（如去模糊、去噪、低光增强）中的迁移效果值得进一步研究。
 
 4. **可控性的粒度**：当前散景控制依赖散焦图（模糊半径 $r = K |d - d_f|$）与焦点视差 $d_f$，但散景形状、口径蚀、二线性等更精细的光学特性控制尚未纳入框架。
+
+
 
 ## 原文 PDF
 

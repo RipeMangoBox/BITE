@@ -5,6 +5,7 @@ paper_level: A
 venue: ICCV
 year: 2025
 pdf_ref: paperPDFs/ICCV_2025/Motion_2_to_3_Leveraging_2D_Motion_Data_to_Boost_3D_Motion_Generation.pdf
+code_link: null
 project_link: https://zju3dv.github.io/Motion-2-to-3
 aliases:
 - M23
@@ -42,7 +43,7 @@ claims:
 > - HumanML3D 上，FID 0.321 vs 0.381 (OMG / SOTA) (-0.060)。
 > - Novel Text Prompts (user study) 上，Best Motion Rate 51.43% vs MDM/MLD (lower) (N/A (significantly higher))。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有文本驱动的3D人体运动生成模型严重依赖3D运动捕捉数据（如HumanML3D），其规模与多样性远不及海量的2D视频数据。然而，真实世界2D视频中的人体运动同时混合了相机运动和人体自身的全局运动（Figure 2），导致直接利用2D数据训练3D生成模型极为困难——缺乏有效的机制从2D数据中提取纯净的人体运动先验并将其桥接到3D生成任务中。
 
@@ -52,7 +53,7 @@ claims:
 
 **主要结果**：在HumanML3D基准上，Motion-2-to-3的FID达到**0.321**，显著优于最优基线OMG的0.381（Table 1）。在新颖文本提示的用户研究中，该方法获得**51.43%**的最佳动作率，远超MDM和MLD（Table 2）。消融实验表明，去除2D预训练会导致FID从0.321急剧恶化至4.950，验证了2D数据预训练的关键作用（Table 4）。
 
-## 背景与动机
+
 
 ### 3D人体运动生成的瓶颈
 
@@ -70,7 +71,9 @@ claims:
 
 Motion-2-to-3的核心动机源于一个关键洞察：**从2D视频中学习到的局部人体运动模式具有跨维度的通用性**。如果将运动解耦为相对于根节点的局部关节运动与描述全局位移的根运动，那么局部运动部分在2D和3D之间共享相同的运动学结构——它描述的是人体各关节相对于身体中心的位置变化，与相机视角和全局位置无关。基于这一洞察，本文提出通过**根解耦**策略，从大规模2D视频中学习局部运动先验，再结合有限的3D数据进行多视图一致性微调，从而在3D数据受限的条件下大幅提升生成质量并扩展可生成的运动类型。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Motion-2-to-3 的核心创新在于**将 2D 运动数据中的局部人体运动先验桥接到 3D 运动生成任务**，通过运动解耦与多视图扩散两个关键设计，突破了现有 3D 运动生成模型受限于动捕数据规模与多样性的瓶颈。
 
@@ -104,7 +107,7 @@ Motion-2-to-3 的因果开关在于**将运动解耦为局部关节运动（相�
 
 整个 pipeline 的因果链路可概括为：2D 局部运动预训练提供通用运动先验 → 多视图扩散模型在 3D 数据微调下生成多视图一致的 2D 局部运动与根速度 → 三角化模块将多视图 2D 局部运动恢复为 3D 局部运动 → 根速度累积得到 3D 全局轨迹 $x_{r3d}^{f+1} = x_{r3d}^{f} + v_{r3d}^{f} \Delta t$ → 两者结合形成完整 3D 运动。该链路的核心洞察在于：**局部运动的“语义”具有视角不变性**，2D 数据中学到的局部运动模式可直接迁移到 3D 生成的各个视角中，从而在 3D 数据有限的情况下大幅扩展可生成的运动类型。
 
-## 整体框架
+
 
 Motion-2-to-3 的整体 pipeline 围绕一个核心洞察构建：**将人体运动解耦为局部关节运动与全局根运动**，从而让模型能够从大规模 2D 视频数据中学习通用的局部运动先验，再通过 3D 数据微调来恢复多视图一致的三维运动。整个框架由四个关键模块串联而成，形成从文本到可驱动 3D 角色的端到端生成流程。
 
@@ -143,7 +146,7 @@ $$x_{r3d}^{f+1} = x_{r3d}^{f} + v_{r3d}^{f} \Delta t$$
 ![[assets/figures/papers/paper_list_l1892_Motion_2_to_3_Leveraging_2D_Motion_Data_to_Boost_3D_Motion_Generation/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of our key idea. (a) Our approach leverages 2D motion data to improve 3D motion generation by unifying 2D and 3D motion data. (b) Our framework yields better FID and generates a broader range of motion types*
 
-## 核心模块与公式推导
+
 
 Motion-2-to-3 的核心思路是：将运动解耦为**局部关节运动**（相对于根节点的运动）与**全局根运动**，从而让模型从大规模2D视频数据中学习通用的局部运动先验，再通过多视图机制恢复3D一致性。整个管线由四个关键模块串联构成。
 
@@ -201,7 +204,9 @@ $$x_{r3d}^{f+1} = x_{r3d}^{f} + v_{r3d}^{f} \Delta t$$
 
 > **注意**：以上公式均来自论文 Section 3 的明确定义，未做任何外推或推导。扩散模型的具体噪声调度、损失函数形式等细节论文未提供完整公式，此处不做猜测性补充。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 瓶颈验证：2D预训练是性能核心
 
@@ -262,7 +267,9 @@ $$x_{r3d}^{f+1} = x_{r3d}^{f} + v_{r3d}^{f} \Delta t$$
 ![[assets/figures/papers/paper_list_l1892_Motion_2_to_3_Leveraging_2D_Motion_Data_to_Boost_3D_Motion_Generation/figures/006_Table_2.jpg]]
 *Table 2: Quantitative evaluation on the novel text prompts. Best Motion Rate and Top-2 Motion Rate represent the proportions of being selected as the best motion and as one of the top two motions. If selected randomly, the expected rate would be 33%*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 
@@ -343,6 +350,8 @@ Motion-2-to-3的性能依赖于两个数据条件：
 5. **实时驱动与物理交互集成**：生成的3D运动能否无缝集成到游戏引擎或实时驱动管线中，并支持物理交互（如碰撞响应、环境适应）？这涉及运动表示与物理引擎的接口设计问题。
 
 6. **公平性与偏差评估**：论文未系统评估不同人口群体或运动类型的公平性。HumanML3D和2D视频来源可能存在人口统计偏差，可能影响某些人群或动作的生成质量。此方向的方法论和评估基准均属空白。
+
+
 
 ## 原文 PDF
 

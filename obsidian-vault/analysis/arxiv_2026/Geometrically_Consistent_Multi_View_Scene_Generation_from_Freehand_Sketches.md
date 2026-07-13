@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2026
 pdf_ref: paperPDFs/arxiv_2026/Geometrically_Consistent_Multi_View_Scene_Generation_from_Freehand_Sketches.pdf
+project_link: null
+code_link: null
 aliases:
 - CAVDSCS
 - GCMVSGFFS
@@ -43,7 +45,7 @@ claims:
 > - S2MV test set 上，Corr-Acc↑ 0.199 vs 0.161 (SEVA) / 0.136 (ViewCrafter) (+23.6% (vs SEVA), +46.3% (vs ViewCrafter))。
 > - S2MV test set (inference time, N=33 views, single A100 GPU) 上，Time/sample ~50 s vs ~3.1 min (FLUX+SEVA) / ~35 min (FLUX+ViewCrafter) (3.7× speedup over SEVA, 42× over ViewCrafter)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -78,7 +80,7 @@ claims:
 
 当前方法存在以下局限：训练数据仅8,304个样本，远少于基线所用的百万级视频数据，限制了场景多样性，复杂遮挡场景的后视图易产生模糊或幻觉；多视角训练视图由图像编辑模型生成，可能包含光照不一致、纹理漂移等伪影；训练分辨率受限于480×480，因并行处理N个视图消耗大量GPU内存。开放问题包括：如何扩展数据流水线以覆盖更复杂的多对象遮挡场景；如何在缺乏真实3D标注的情况下减少生成真值带来的伪影；能否通过梯度检查点或模型并行突破内存瓶颈以实现更高分辨率训练。
 
-## 背景与动机
+
 
 ### 问题背景：从草图到3D场景的认知鸿沟
 
@@ -110,7 +112,9 @@ claims:
 
 这三项设计协同作用，构成了本文提出的**CA3-Adapted Video DiT**框架：一个在预训练视频扩散Transformer中引入并行相机感知注意力适配器（CA3），并通过稀疏对应监督损失（CSL）训练的端到端草图到多视角生成系统。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于将“草图→多视角3D场景”这一极具几何不确定性的任务，从一个脆弱的**两阶段流水线**（草图→照片→多视角）重构为一个**端到端的单阶段视频扩散框架**。这一重构并非简单的流程简化，而是通过三个相互协同的机制，将相机几何显式注入到生成过程中，从而解决了困扰两阶段方法的核心瓶颈：中间照片阶段的语义偏差与跨视角几何不一致。
 
@@ -152,7 +156,7 @@ CSL 的效果在消融实验中得到了清晰验证（Table 2, row d）：移�
 
 上述四个创新并非孤立存在，而是形成了相互增强的闭环：CA3 提供了处理几何的能力，CSL 提供了学习几何对应关系的监督信号，单阶段流水线消除了中间翻译的误差累积，而自动数据管线则为这一切提供了训练基础。消融实验（Table 2）证实，移除任何一个组件都会同时损害单视图质量（PSNR, FID）和跨视图一致性（Corr-Acc），验证了这些创新之间的协同依赖性。
 
-## 整体框架
+
 
 本文提出一种端到端的单阶段框架，以单张自由手绘草图和文本描述为输入，直接生成覆盖完整360°方位角、多个仰角的N个几何一致的真实感多视角图像。该框架的核心思想是将多视角生成任务重新表述为视频序列建模问题，并通过注入显式相机几何偏置和跨视角对应监督，迫使模型从扭曲的2D笔画中推断出空间一致的3D场景表达。
 
@@ -205,7 +209,7 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{flow}} + \lambda_{\mathrm{
 ![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2604_14302/figures/002_Figure_2.jpg]]
 *Figure 2: Method overview. (a) A freehand sketch is encoded then denoised by a video DiT augmented with our CA3. All N views are generated in a single forward denoising process. (b) Each DiT block contains a self-attention with LoRa and a parallel CA3 to inject relative camera geometry. (c) During training, SfM correspondences from pseudo ground-truth views supervise the CA3 query–key projections via a sparse InfoNCE loss. Dashed boxes: frozen modules*
 
-## 核心模块与公式推导
+
 
 ### 3.1 视频扩散Transformer骨干与帧复制
 
@@ -277,7 +281,9 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{flow}} + \lambda_{\mathrm{
 ![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2604_14302/figures/008_Figure_6.jpg]]
 *Figure 6: Attention correspondence visualisation. Query pixel (red dot) in the front view; heatmaps show attention at layer 20 over three target viewpoints. Left: with correspondence supervision. Right: without (ablation Tab. 2 row b)*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -350,7 +356,9 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{flow}} + \lambda_{\mathrm{
 ![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2604_14302/figures/003_Figure_3.jpg]]
 *Figure 3: S2WV dataset generation pipeline. (a) Multi-seed image generation from sketch and caption. (b) Segmentation of sketch and generated images. (c) Best seed selection via mIoU. (d) Multi-view synthesis from the selected image. (e) Dataset curation yields 9,222 samples. More details in Sec. 3.2*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位：从草图到多视角3D场景生成
 
@@ -421,6 +429,8 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{flow}} + \lambda_{\mathrm{
 5. **相机控制自由度**：如何扩展方法以支持任意6-DoF相机轨迹和自由视角插值？这需要重新设计相机参数编码策略和训练数据采样方案。
 
 6. **与3D重建的融合**：生成的几何一致多视角图像能否直接用于3D高斯泼溅或NeRF重建？若能，则可将方法定位为“草图到3D资产”流水线的核心前端模块，具有重要的应用价值。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/Towards_Motion_Turing_Test_Evaluating_Human_Likeness_in_Humanoid_Robots.pdf
+project_link: null
 code_link: "https://huggingface.co/datasets/lvhaidong/LAFAN1_Retargeting_Dataset"
 aliases:
 - PNPTRN
@@ -40,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - Motion Turing Test (HHMotion) 上，MAE ↓ 0.5813 vs 1.2682 (Gemini 2.5 Pro PA-CoT) (-0.6869)；Spearman's ρ ↑ 0.6841 vs 0.2303 (Gemini 2.5 Pro PA-CoT) (+0.4538)；MAE ↓ 0.5813 vs 0.6252 (MotionBERT Fine-tuned) (-0.0439)。
 
-## 概述
+## 概要
 
 人形机器人正从实验室走向现实场景，但其运动表现是否真正“类人”仍缺乏客观、标准化的评估手段。现有评估多依赖外观、任务成功率或主观印象，难以剥离运动本身的质素。本文受图灵测试启发，提出**运动图灵测试（Motion Turing Test）** 范式：将评估统一到纯运动学的 SMPL-X 骨架表示，完全消除外观干扰，让评估聚焦于姿态、节奏与协调性等运动学特征。
 
@@ -48,7 +49,7 @@ claims:
 
 为支撑这一评估范式，作者构建了 **HHMotion（Human-Humanoid Motion）数据集**，包含 1000 条运动序列、15 个动作类别，覆盖 11 种机器人模型与 10 名人类被试，并投入 30 名标注者、超 500 小时人工评分。该基准为类人运动生成与控制方法提供了首个标准化测试平台，相关代码与数据集已开源。
 
-## 背景与动机
+
 
 ### 人形机器人运动的类人性评估困境
 
@@ -74,7 +75,9 @@ claims:
 
 综上，本文的动机链条可概括为：**识别类人性评估的标准化缺失 → 提出纯运动学的运动图灵测试范式 → 构建标注基准 → 探索自动化回归模型**，为人形机器人运动生成与控制的研究提供一个可量化、可复现的评估锚点。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作的核心创新在于将人形机器人运动类人性评估从定性、主观的视觉判断，重构为一个**统一的、可量化的回归任务**，并为此构建了完整的评估基准与基线模型。具体而言，创新体现在三个层面：
 
@@ -108,7 +111,7 @@ $$\mathcal{L} = \|\hat{s} - s^{*}\|_{2}^{2} + \lambda \mathcal{L}_{\mathrm{reg}}
 
 尽管 PTR-Net 在运动学层面有效建模了类人性，但其设计存在固有局限：（1）仅依赖 SMPL-X 骨架运动学，无法捕获肌肉动力学、接触力等更精细的类人特征；（2）模型在更广泛的新形态机器人上的分布外鲁棒性尚未充分验证；（3）当前评估未融合意图性、适应性、任务完成度等高层次类人性维度。这些局限指向了未来工作的关键方向：如何让自动评估模型超越运动学特征，形成更全面的类人性评估体系。
 
-## 整体框架
+
 
 该工作围绕**运动图灵测试（Motion Turing Test）** 构建了一套从数据采集、表示标准化、人工标注到自动评估的完整流水线。其核心设计动机是消除外观线索的干扰，将类人性判断严格限定在运动学层面。
 
@@ -145,7 +148,7 @@ $$\mathcal{L} = \|\hat{s} - s^{*}\|_{2}^{2} + \lambda \mathcal{L}_{\mathrm{reg}}
 ![[assets/figures/papers/paper_list_l1045_https_arxiv_org_abs_2603_06181/figures/004_Figure_3.jpg]]
 *Figure 3: Overview of the human scoring pipeline, where all the humanoid robot and human motions are converted into SMPL-X poses and evaluated by human annotators. The resulting 0–5 scores quantitatively assess the human-likeness of each motion*
 
-## 核心模块与公式推导
+
 
 PTR-Net 将类人性评估形式化为一个端到端的回归任务：给定一段运动序列 $\mathbf{X} \in \mathbb{R}^{T \times J \times C}$（$T$ 帧，$J$ 个关节，$C$ 维特征），模型学习映射函数 $s = f_{\theta}(\mathbf{X})$，输出标量分数 $s \in [0, 5]$。该方法的核心在于通过时序编码、空间-时间图卷积与注意力聚合三个模块，从纯运动学数据中提取判别性特征。
 
@@ -177,7 +180,9 @@ $$\mathcal{L} = \|\hat{s} - s^{*}\|_{2}^{2} + \lambda \mathcal{L}_{\mathrm{reg}}
 ![[assets/figures/papers/paper_list_l1045_https_arxiv_org_abs_2603_06181/figures/005_Figure_4.jpg]]
 *Figure 4: Human-likeness scoring rules used in evaluating motion clips on a 0–5 Likert scale, focusing solely on motion quality*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 运动图灵测试基准的定量结果
 
@@ -246,7 +251,9 @@ Table 2 按人类与真实人形机器人之间的类人性评分差异对动作
 ![[assets/figures/papers/paper_list_l1045_https_arxiv_org_abs_2603_06181/figures/012_Figure_9.jpg]]
 *Figure 9: (a–b) Score distributions of human annotators and PTR-Net predictions for both human (imitating humanoid) and humanoid motions. (Bottom) Representative dance imitation pairs illustrating near-indistinguishable motion patterns*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 评估范式的谱系定位
 
@@ -291,6 +298,8 @@ PTR-Net 的适用范围和局限可从数据、模型和评估三个维度界定
 3. **分布外鲁棒性的系统验证**：随着更多开源机器人模型和形态的出现，PTR-Net 在新运动学结构上的鲁棒性需要系统性的评估。模型是否需要对每个新机器人形态进行微调，还是能够通过零样本泛化保持性能，是一个关键的实践问题。
 
 4. **多维度评估体系的构建**：将类人性评分与任务完成度、能效、安全性等实际指标融合，形成更全面的机器人运动评估体系，是推动该领域从“看起来像人”走向“像人一样有效行动”的必经之路。
+
+
 
 ## 原文 PDF
 

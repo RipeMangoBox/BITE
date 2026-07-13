@@ -5,6 +5,8 @@ paper_level: A
 venue: NeurIPS
 year: 2023
 pdf_ref: paperPDFs/NEURIPS_2023/MotionGPT_Human_Motion_as_a_Foreign_Language.pdf
+project_link: null
+code_link: https://github.com/OpenMotionLab/MotionGPT
 aliases:
 - MotionGPT
 tags:
@@ -40,7 +42,7 @@ claims:
 > - HumanML3D 上，Motion-to-Text Cider 为 29.2，对比 16.8 (TM2T)，变化 +12.4。
 > - HumanML3D 上，Motion Prediction FID 为 0.905，对比 6.031 (MDM)，变化 -5.126。
 
-## 概述
+## 概要
 
 人体运动生成与理解是计算机视觉中的核心问题。传统方法将人体运动与自然语言视为分离的模态，依赖严格配对的数据，且任务特定的设计无法统一处理文本到运动生成、运动描述、运动预测等多种任务，缺乏对运动-语言深层关联的综合理解。**MotionGPT** 提出了一种范式转换：将人体运动视为一种“外语”，通过将3D运动离散化为运动token，与文本token统一构建词汇表，使得基于预训练语言模型的框架能够以统一的自回归方式同时生成运动序列和自然语言，并通过指令微调实现多任务泛化。
 
@@ -53,7 +55,7 @@ claims:
 
 **方法定位**：MotionGPT属于基于离散token的运动-语言统一预训练方法。与**T2M-GPT**（基于VQ-VAE和GPT，使用CLIP文本嵌入作为条件）和**MLD**（基于扩散模型，引入运动潜在空间）等任务特定方法不同，MotionGPT通过统一的文本-运动词汇表和序列到序列的Transformer架构，首次实现了单一模型对多种运动相关任务的统一处理，无需任务特定的模块设计。
 
-## 背景与动机
+
 
 ### 人体运动与自然语言之间的语义鸿沟
 
@@ -75,7 +77,9 @@ claims:
 
 Figure 1 直观展示了这一统一范式的愿景：给定不同的指令提示，同一个模型可以完成文本到运动生成（左上）、运动描述生成（左下）、运动补全（右上）乃至运动相关的语言问答（右下）。这种任务统一性不仅是工程上的便利，更意味着模型在预训练阶段真正习得了运动与语言之间的深层语义对齐——这正是现有分离式方法无法企及的能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MotionGPT 的核心创新在于**将人体运动视为一种“外语”**，通过构建统一的文本-运动词汇表，将运动生成与理解问题转化为序列到序列的语言建模问题。这一范式转移带来了四个关键层面的改变：
 
@@ -116,7 +120,7 @@ MotionGPT 引入**三阶段训练方案**（见 Figure 3）：
 
 值得注意的是，这种统一性并非以牺牲单任务性能为代价：在 HumanML3D 数据集上，MotionGPT 在运动描述任务上 Bleu@4 达到 12.47（对比 TM2T 的 7.00，提升 +5.47），在运动预测任务上 FID 达到 0.905（对比 MDM 的 6.031，降低 5.126），同时在文本到运动生成任务上保持 competitive 水平（R Precision Top1 0.492 vs T2M-GPT 0.491）。
 
-## 整体框架
+
 
 MotionGPT 的整体设计围绕一个核心洞察展开：人体运动与自然语言之间存在深层的语义耦合，可以被视为一种“身体语言”。基于此，MotionGPT 将人体运动视作一门外语，构建了一个统一的序列到序列生成框架。该框架由两个核心模块串联而成：**运动分词器（Motion Tokenizer）** 和 **运动感知语言模型（Motion-aware Language Model）**，其输入输出流如图2所示。
 
@@ -155,7 +159,7 @@ MotionGPT的训练并非一蹴而就，而是遵循三个递进阶段（如图3�
 ![[assets/figures/papers/paper_list_l4_MotionGPT_Human_Motion_as_a_Foreign_Language/figures/003_Figure_2.jpg]]
 *Figure 2: Method overview: MotionGPT consists of a motion tokenizer V (Sec. 3.1) and a motionaware language model (Sec. 3.2). Combining Motion Tokens learned by V and Text Tokens by text tokenizer, we then learn motion and language jointly utilizing language model as backbone*
 
-## 核心模块与公式推导
+
 
 MotionGPT 的架构由两大核心模块构成：**运动分词器（Motion Tokenizer）** 与 **运动感知语言模型（Motion-aware Language Model）**，二者通过统一的离散词汇表实现运动与自然语言的联合建模。
 
@@ -189,7 +193,9 @@ MotionGPT 的训练分为三个递进阶段：
 
 这种三阶段设计使得 MotionGPT 在不牺牲各任务性能的前提下，实现了运动与语言的统一建模与多任务泛化。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -273,7 +279,9 @@ MotionGPT的实验基于两个公开数据集：**HumanML3D**和**KIT**（数据
 ![[assets/figures/papers/paper_list_l4_MotionGPT_Human_Motion_as_a_Foreign_Language/figures/015_Table_9.jpg]]
 *Table 9: Evaluation of the training scheme on the base MotionGPT models. We evaluate the results with the proposed evaluation protocols in Sec. G. Please refer to Tab. 2 for metrics and the details*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从单任务专用模型到统一运动-语言建模
 
@@ -382,6 +390,8 @@ Table 12 揭示了推理超参数的关键影响：
 5. **与大规模预训练模型的深度整合**：当前 MotionGPT 使用 T5 架构从头训练运动-语言模型。未来是否可以直接利用已预训练的 LLM（如 LLaMA 系列）的权重，通过适配器或前缀微调的方式注入运动理解能力，从而更高效地利用语言模型中的世界知识？
 
 6. **运动生成的细粒度控制**：当前文本到运动生成主要依赖自然语言描述，未来是否可以引入更细粒度的控制信号（如关键帧约束、运动风格标签、情感标签），实现更精准的运动编辑与合成？
+
+
 
 ## 原文 PDF
 

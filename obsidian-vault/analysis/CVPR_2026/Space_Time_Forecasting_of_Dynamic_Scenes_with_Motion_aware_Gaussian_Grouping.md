@@ -42,7 +42,7 @@ claims:
 > - iPhone 上，mPSNR 15.58 vs 14.99 (GSPred-SoM) (+0.59)；mLPIPS 0.4227 vs 0.4482 (GSPred-SoM) (-0.0255)。
 > - D-NeRF 上，PSNR 23.37 vs 21.78 (GSPred) (+1.59)。
 
-## 概述
+## 概要
 
 动态场景的时空预测旨在从有限的观测帧中推断未来时刻的视觉内容，在自动驾驶、机器人交互与视频生成等领域具有关键价值。现有基于3D高斯泼溅（3DGS）的预测方法面临一个核心瓶颈：高斯原语独立运动，缺乏物体级别的运动一致性约束，导致长期外推时出现空间运动不连贯与轨迹漂移。
 
@@ -52,7 +52,7 @@ claims:
 
 > **项目页面**：https://slime0519.github.io/mogaf
 
-## 背景与动机
+
 
 ### 动态场景时空预测的核心挑战
 
@@ -81,7 +81,9 @@ claims:
 
 通过将“运动分组”作为连接重建与预测的桥梁，MoGaF在物理一致性与光度保真度之间取得了更优的平衡，为动态场景的长期时空预测提供了新的范式。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MoGaF 的核心创新在于将动态场景预测从**无结构的独立高斯运动**提升为**物体级运动感知的分组建模**。该方法在 4DGS 表示（基于 **SoM** 骨干）之上，通过三个关键环节实现了这一转变：
 
@@ -125,7 +127,7 @@ $$\mathcal{L}_{\mathrm{group}}^{(k)} = \mathcal{L}_{\mathrm{pred}}^{(k)} + \lamb
 
 三个 changed slot 形成因果闭环：**运动感知分组**提供物体级结构先验 → **分组约束优化**在物体级别强制刚性与非刚性运动一致性 → **分组轻量预测器**在物理一致的运动表示基础上进行外推。这一设计直接回应了核心瓶颈——独立高斯运动导致的长期预测中空间运动不连贯与轨迹漂移。消融实验证实了该因果链的有效性：移除分组优化和分组预测后，3D 跟踪误差显著增加（EPE 从 0.245 升至 0.296，Table 7a）。
 
-## 整体框架
+
 
 MoGaF 的整体管线构建于 4DGS 表示之上，包含三个核心阶段，如图 2 所示。给定一段动态视频，方法首先从 4DGS 重建中获取规范空间的高斯原语及其运动基系数，随后依次执行：**运动感知高斯分组**、**分组约束优化**、**分组运动预测**，最终渲染出未来时刻的新视角图像。
 
@@ -156,7 +158,7 @@ MoGaF 的整体管线构建于 4DGS 表示之上，包含三个核心阶段，�
 ![[assets/figures/papers/paper_list_l45_https_arxiv_org_abs_2602_21668/figures/003_Figure_2.jpg]]
 *Figure 2: Overall pipeline of MoGaF. Given a video, MoGaF generates future frames of the scene. To achieve realistic forecasting, our method builds on 4DGS representation and proceeds as follows: (1) Gaussian Grouping: Gaussians are clustered into motion-consistent object groups, with each group labeled as rigid or non-rigid using grounded 2D segmentation. (2) Group-wise Optimization: Grouped Gaussians are refined with rigidity-aware motion constraints: rigid groups are guided by a shared SE(3) transform, while non-rigid groups are regularized with local motion smoothness. (3) Group-wise Forecasting: For each group, a lightweight Transformer-based forecaster extrapolates Gaussian trajectories beyond...*
 
-## 核心模块与公式推导
+
 
 MoGaF 的整体管线建立在 4DGS 表示之上，由三个核心模块串行构成：(1) 运动感知高斯分组，(2) 分组约束优化，(3) 分组运动预测。以下逐一展开各模块的关键公式与变量含义。
 
@@ -238,7 +240,9 @@ $$\mathcal{L}_{\mathrm{group}}^{(k)} = \mathcal{L}_{\mathrm{pred}}^{(k)} + \lamb
 ![[assets/figures/papers/paper_list_l45_https_arxiv_org_abs_2602_21668/figures/013_Figure_9.jpg]]
 *Figure 9: Overview of the forecaster. (a) Training stage: The forecaster is trained for each Gaussian group*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与实验逻辑
 
@@ -314,7 +318,9 @@ Table 6 在 iPhone 数据集上比较了 MoGaF 与 **SoM** 骨干的场景插值
 
 为确保公平比较，实验将 **GSPred** 的 GCN 预测架构和 **ODE-GS** 的神经 ODE 预测器重新实现到 SoM 骨干上（得到 GSPred-SoM 和 ODE-GS-SoM），因为原始版本未使用深度、点跟踪等数据驱动先验。所有方法共享相同的 4DGS 重建基础，差异仅在于运动优化和预测策略。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 **MoGaF** 在动态场景时空预测的脉络中，占据了一个明确的位置：它并非重新设计4DGS重建骨干，而是在现有高质量动态重建（**SoM**）之上，通过**运动感知分组**这一因果性操作，将无结构的独立高斯原语提升为具有物体级运动一致性的结构化表示，从而显著改善长期外推的物理合理性与时间稳定性。
 
@@ -340,6 +346,8 @@ MoGaF的有效性建立在以下前提之上：
 2.  **物理交互的引入**：现有分组独立预测的范式无法处理物体间的碰撞与交互。如何扩展框架以加入物理约束（例如基于接触动力学的惩罚项）或构建物理感知的高斯表示，是提升预测物理合理性的重要方向。
 
 此外，从方法谱系的角度看，MoGaF的掩码运动建模策略借鉴了自然语言处理中的掩码语言建模思想（**BERT**），将其适配到时序运动序列上以增强预测器的鲁棒性。这一跨领域迁移在D-NeRF数据集上的消融实验中得到验证（移除掩码训练导致PSNR从25.87降至24.68），但其有效性边界——例如掩码策略在不同运动频率场景下的泛化能力——仍有待进一步探索。
+
+
 
 ## 原文 PDF
 

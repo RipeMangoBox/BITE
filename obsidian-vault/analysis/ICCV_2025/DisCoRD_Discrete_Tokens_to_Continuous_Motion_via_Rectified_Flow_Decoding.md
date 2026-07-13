@@ -5,6 +5,8 @@ paper_level: A
 venue: ICCV
 year: 2025
 pdf_ref: paperPDFs/ICCV_2025/DisCoRD_Discrete_Tokens_to_Continuous_Motion_via_Rectified_Flow_Decoding.pdf
+project_link: https://whwjdqls.github.io/discord-motion/
+code_link: null
 aliases:
 - DDTCMRFD
 tags:
@@ -41,7 +43,7 @@ claims:
 > - HumanML3D Generation 上，FID 0.032 (MoMask+DisCoRD) vs 0.045 (MoMask) (+29% (lower is better))；R Precision Top-1 0.524 (MoMask+DisCoRD) vs 0.521 (MoMask) (+0.6% (faithfulness preserved))。
 > - SHOW Co-speech Gesture 上，sJPE 0.077 (TalkSHOW+DisCoRD) vs 0.284 (TalkSHOW) (-73% (lower is better))。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -62,7 +64,7 @@ DisCoRD 是一种**解码器替换方案**，不改变预训练的量化器和�
 - **跨任务泛化**：在共语音手势生成（TalkSHOW + DisCoRD，sJPE 从 0.284 降至 0.077）和音乐驱动舞蹈生成任务上同样取得一致改善，验证了方法的通用性。
 - **指标验证**：提出的 **sJPE**（对称 Jerk 百分比误差）对帧级高斯噪声高度敏感，而 FID 几乎无响应，证明 sJPE 能有效捕获传统分布度量无法反映的自然度缺陷。
 
-## 背景与动机
+
 
 人体动作生成是计算机视觉与图形学中的核心问题，其目标是根据文本、语音或音乐等控制信号合成逼真的三维人体运动序列。近年来，基于离散表示的方法逐渐成为主流范式。这类方法通常采用两阶段流程：首先训练一个基于 VQ-VAE 的量化器，将连续运动序列编码为离散令牌；然后训练一个自回归或掩码令牌预测模型，根据控制信号生成令牌序列；最后通过一个确定性前馈解码器将离散令牌一步映射回运动空间。代表性工作包括 **T2M-GPT**、**MoMask**、**BAMM** 和 **MMM** 等。
 
@@ -75,7 +77,9 @@ DisCoRD 是一种**解码器替换方案**，不改变预训练的量化器和�
 
 DisCoRD 的动机正是弥合这一鸿沟：**在保留离散令牌高忠实度优势的前提下，消除其自然度缺陷**。核心洞察在于，离散令牌解码本质上可以被重新定义为一个条件生成问题——以离散令牌中编码的语义与结构信息作为条件，在连续原始运动空间中执行迭代优化，逐步恢复被离散化过程丢失的动态细节与平滑性。这一思路将解码从“一步映射”转变为“条件连续生成”，从而在不牺牲对控制信号忠实度的前提下，大幅提升生成动作的自然度。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DisCoRD 的核心创新在于将离散运动令牌的解码方式从**确定性一步前馈映射**替换为**在连续原始运动空间中运行的条件整流流迭代解码器**。这一改变直接针对现有离散运动生成方法（如 T2M-GPT、MoMask、BAMM、MMM）的瓶颈：前馈解码器将离散化误差直接传播到输出动作序列，导致两个相互关联的自然度缺陷——**欠重构**（动态细节丢失，动作呆板）与**帧级噪声**（高频抖动破坏运动平滑性）。
 
@@ -113,7 +117,7 @@ $$\min_v \int_0^1 \mathbb{E}\left[\|(\mathbf{X}_1 - \mathbf{X}_0) - v(\mathbf{X}
 
 MoMask+DisCoRD 在 HumanML3D 重建任务上，FID 从 0.019 降至 0.011（+42%），sJPE 从 0.512 降至 0.385（+25%）；在生成任务上，FID 从 0.045 降至 0.032（+29%），同时 R-Precision Top-1 保持几乎持平（0.524 vs 0.521），验证了“自然度提升而不牺牲忠实度”的核心主张。跨任务迁移至共语音手势生成（TalkSHOW+DisCoRD sJPE 从 0.284 降至 0.077）进一步证明了方法的通用性。
 
-## 整体框架
+
 
 DisCoRD 的整体 pipeline 围绕一个核心设计展开：**将离散运动令牌的解码重新定义为一个条件生成问题**，在连续原始运动空间中通过迭代优化恢复自然动作。该框架由四个模块串联构成，形成训练与推理两条路径。
 
@@ -162,7 +166,7 @@ $$\min_v \int_0^1 \mathbb{E}\left[\|(\mathbf{X}_1 - \mathbf{X}_0) - v(\mathbf{X}
 ![[assets/figures/papers/paper_list_l1885_DisCoRD_Discrete_Tokens_to_Continuous_Motion_via_Rectified_Flow_Decoding/figures/003_Figure_3.jpg]]
 *Figure 3: An overview of DisCoRD. During the Training stage, we leverage a pretrained quantizer to first obtain discrete representations (tokens) of motion. These tokens are then projected into continuous features C, which are concatenated with noisy motion*
 
-## 核心模块与公式推导
+
 
 ### 3.1 预备知识：整流流（Rectified Flow）
 
@@ -240,7 +244,9 @@ $$\mathrm{Static\ sJPE} = \frac{1}{n} \sum_{t=1}^{n} \frac{\max(0, J_{\mathrm{tr
 ![[assets/figures/papers/paper_list_l1885_DisCoRD_Discrete_Tokens_to_Continuous_Motion_via_Rectified_Flow_Decoding/figures/002_Figure_2.jpg]]
 *Figure 2: Concept of DisCoRD. Discrete quantization methods encode multiple motions into a single quantized representation. While existing methods directly decode from this quantized representation, DisCoRD iteratively decodes the discrete latent in a continuous space to recover the inherent continuity and dynamism of motion. To assess the gap between reconstructed and real motion, prior work primarily used FID as the metric. Here, we additionally propose symmetric Jerk Percentage Error (sJPE) to evaluate the differences in naturalness between reconstructed and real motion*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -336,7 +342,9 @@ Figure 4 通过向真实运动注入不同标准差的高斯噪声，系统性�
 
 ![[assets/figures/papers/paper_list_l1885_DisCoRD_Discrete_Tokens_to_Continuous_Motion_via_Rectified_Flow_Decoding/figures/010_Figure.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心问题定位：离散运动生成的解码瓶颈
 
@@ -417,6 +425,8 @@ DisCoRD 开辟了若干值得探索的方向：
 4. **sJPE 的无参考推广**：当前 sJPE 需要真实运动 jerk 作为参考。能否将其推广为一种无需参考动作的生成质量评估指标，用于实时反馈或强化学习奖励，是一个有实际价值的开放问题。
 
 5. **更大规模数据上的验证**：在 AMASS 等更大规模、更多样化的混合运动数据集上，DisCoRD 是否仍能保持优势，有待进一步验证。
+
+
 
 ## 原文 PDF
 

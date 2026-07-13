@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/A_Fano_Style_Accuracy_Upper_Bound_for_LLM_Single_Pass_Reasoning_in_Multi_Hop_QA.pdf
+project_link: null
+code_link: https://github.com/KaiyangWan/InfoQA
 aliases:
 - FSAUBLSPRMHQ
 - InfoQA
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 多跳问答中LLM单次推理的Fano式准确率上界 |
 | 英文题名 | A Fano-Style Accuracy Upper Bound for LLM Single-Pass Reasoning in Multi-Hop QA |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=dPAcHrG4rl); [GitHub](https://github.com/KaiyangWan/InfoQA) |
+| Links | [paper](https://openreview.net/forum?id=dPAcHrG4rl) · [GitHub](https://github.com/KaiyangWan/InfoQA) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/language_speech_and_dialog |
 | Method | InfoQA |
 | Dataset | 合成多跳QA基准, 合成多跳QA基准 (Qwen3-14B), 合成多跳QA基准 (Qwen3-8B), 合成多跳QA基准 (Qwen3-8B, 4跳, 8k上下文) |
@@ -41,7 +43,7 @@ claims:
 > - 合成多跳QA基准 (Qwen3-14B) 上，F1 为 0.86，对比 0.73 (CoT)，变化 +0.13。
 > - 合成多跳QA基准 (Qwen3-8B) 上，F1 为 0.74，对比 0.66 (S-C)，变化 +0.08。
 
-## 概述
+## 概要
 
 本工作揭示了多跳问答（MHQA）中大语言模型（LLM）单次推理的根本性瓶颈：存在一个与信息论中Fano不等式形式相似的准确率上界。核心发现是，当任务的信息需求（β）超过模型的输出容量（C）时，准确率会经历一个急剧的“准确率悬崖”（Accuracy Cliff）——一旦β > C+1，准确率上界将按照(C+1)/β的双曲线形式衰减。这一瓶颈源于单次推理的固有限制：模型必须在一次前向传播中，将整个多跳推理链和长上下文压缩到有限的输出序列中。
 
@@ -49,7 +51,7 @@ claims:
 
 基于这一理论分析，论文提出了InfoQA框架——一个概念验证性的多轮调用（multi-call）方法。InfoQA通过三个核心组件规避单次推理的信息瓶颈：容量感知的任务分解（将多跳问题拆解为单跳子问题）、依赖显式工作流（通过压缩后的查询显式传递推理状态）、以及迭代查询压缩（修剪推理轨迹并重写查询以控制提示长度）。在包含7200个样本的合成MHQA基准上（控制跳数h∈{1,2,3,4}和上下文长度L∈{0.5k,1k,2k,4k,8k,10k}），InfoQA在Qwen3-14B上取得了2-4跳平均F1=0.86的显著结果，远超最佳单次基线Self-Consistency（0.75）和Chain-of-Thought（0.73）。消融实验验证了各组件的必要性：去除任务分解后F1降至0.65，去除轨迹修剪后降至0.78。在更具挑战的4跳8k上下文设置下，InfoQA（0.67）与最佳单次基线（0.16）之间的差距扩大至0.51，清晰展示了多轮调用范式在极端条件下的优势。
 
-## 背景与动机
+
 
 多跳问答（MHQA）要求模型在长上下文中串联多条推理链才能得出答案。当前主流方法——包括思维链（CoT）、自一致性（S-C）、ReAct 等——本质上仍是**单次推理范式**：模型在单次前向传播中一次性完成检索、推理和答案生成。该论文的核心洞察在于，这种单次调用存在一个根本性的信息瓶颈，且该瓶颈可以通过信息论工具严格刻画。
 
@@ -66,7 +68,9 @@ claims:
 
 **本文动机：从单次推理到多轮调用。** 面对上述信息瓶颈，论文的核心动机是：**能否通过改变推理范式来规避单次调用的容量天花板？** 具体而言，将单次推理分解为多轮调用的顺序子任务，每轮只处理一个单跳子问题，通过压缩后的查询显式传递推理状态。这种范式转换等价于将 β 从超线性增长拉回线性甚至常数水平，同时通过迭代查询压缩保持每步的 C 不随推理深度膨胀。论文提出的概念验证框架 InfoQA 正是这一思路的实现（Figure 4），其三个核心组件——容量感知任务分解、依赖显式工作流、迭代查询压缩——分别对应降低 β、确保状态对齐、控制 C。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 该工作的核心创新在于：**将单次推理的瓶颈形式化为一个可量化的信息容量边界（Fano式准确率上界），并据此设计了一个容量感知的多轮调用框架（InfoQA）来规避该瓶颈。**
 
@@ -84,7 +88,7 @@ claims:
 
 **证据强度**：所有核心创新点均有定理证明（Theorem 1）或消融实验（Table 2）支撑，置信度均为1.0。关于γ主要由噪声而非深度引起的结论（去除干扰项后γ≈1）置信度为0.95，源于拟合分析的间接证据。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0002_dPAcHrG4rl_A_Fano-Style_Accuracy_Upper_Bound_for_LLM_Single/figures/004_Figure_4.jpg]]
 *Figure 4: The InfoQA framework integrates three key components: (1) Capacity-Aware Task Decomposition, which reduces the information demand by generating single-hop sub-questions; (2) Dependency-Explicit Workflow, where the evolving contracted query carries the reasoning state across steps; and (3) Iterative Query Contraction, which prunes reasoning traces and rewrites the query with $\hat { Z } _ { k }$ . Each LLM call approximates $\phi _ { k }$ and produces $\hat { Z } _ { k }$
@@ -101,7 +105,7 @@ claims:
 
 实验结果表明，InfoQA在Qwen3-14B模型上2-4跳任务的平均F1达到0.86，显著优于最佳单次基线Self-Consistency（0.75）和Chain-of-Thought（0.73）（Table 2）。消融实验进一步证实了各模块的必要性：去除任务分解（w/o D.）后，平均F1降至0.65；去除轨迹修剪（w/o P.）后，平均F1降至0.78。在更具挑战性的4跳、8k上下文设置下，InfoQA在Qwen3-8B模型上的F1为0.67，而最佳单次基线仅为0.16（Table 5），这直观地展示了多轮调用范式在突破单次推理容量瓶颈方面的巨大潜力。理论曲线拟合（Figure 5, 6）显示，所有单次方法的经验准确率都与理论预测的准确率悬崖高度吻合，验证了理论框架的有效性。
 
-## 核心模块与公式推导
+
 
 本节聚焦论文的理论核心：单次推理准确率的Fano式上界及其推导，以及信息需求模型与误差累积的数学刻画。
 
@@ -211,7 +215,9 @@ $$
 
 其中 $\widehat{\text{F1}}(h, L) = \min\left(1, \frac{C+1}{\beta_0 + \alpha L \gamma^{h-1}}\right)$。拟合结果（Table 3, Table 4）显示：CoT和S-C通过增大有效容量 $C$（约131）和降低 $\gamma$（约2.08）来缓解准确率悬崖；而S-A因较大的基础需求 $\beta_0$ 抵消了高容量的优势。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：Accuracy Cliff 的实证验证与 InfoQA 的突破
 
@@ -253,7 +259,9 @@ $$
 *Table 1: Statistics of our synthetic multi-hop QA benchmark*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 本文的核心贡献并非提出一种全新的推理范式，而是从信息论角度揭示了现有单次推理范式的根本性瓶颈，并据此设计了一个概念验证性的多轮调用框架InfoQA。其方法谱系可被清晰地定位在“从单次调用到多轮分解”的范式转换中。
 
@@ -284,6 +292,8 @@ InfoQA的优越性依赖于几个关键前提：
 - **理论假设的局限性**：理论分析基于“封闭书”假设，即模型仅能从提供的上下文中获取信息。在开放世界设定下，模型可以利用预训练知识作为外部信息源，从而改变信息需求β的计算方式。该理论能否扩展到开放书场景，需要进一步验证。
 - **多轮调用的新限制**：InfoQA将信息瓶颈从单次调用的“容量-需求”问题，转化为多轮调用的“状态传递-误差累积”问题。虽然误差累积模型`Pr(Succ) ≥ (1-ε)^(K+1)`给出了一个下界，但多轮调用中信息如何跨调用累积、是否存在新的容量边界（如注意力跨轮次的衰减），以及如何优化调用次数与每步容量的权衡，都是尚未探索的开放问题。
 - **拟合方法的过拟合风险**：论文使用网格搜索进行参数拟合（MAE最小化），这存在过拟合风险。虽然实验点与理论曲线吻合良好（Figure 5, 6），但模型的泛化能力，尤其是在未见过的(h, L)组合上的预测能力，需要更严格的验证（例如，使用留一法交叉验证）。
+
+
 
 ## 原文 PDF
 

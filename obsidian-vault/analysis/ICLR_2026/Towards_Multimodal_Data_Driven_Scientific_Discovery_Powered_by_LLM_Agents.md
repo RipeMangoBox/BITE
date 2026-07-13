@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Towards_Multimodal_Data_Driven_Scientific_Discovery_Powered_by_LLM_Agents.pdf
+project_link: null
+code_link: https://github.com/usail-hkust/MoSciBench
 openreview_forum_id: kZHSvETWdi
 aliases:
 - MRW
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 面向多模态数据驱动的科学发现：基于大语言模型智能体的基准与评估 |
 | 英文题名 | Towards Multimodal Data-Driven Scientific Discovery Powered by LLM Agents |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=kZHSvETWdi); [GitHub](https://github.com/usail-hkust/MoSciBench) |
+| Links | [paper](https://openreview.net/forum?id=kZHSvETWdi) · [GitHub](https://github.com/usail-hkust/MoSciBench) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | MoSciBench (多模态科学发现基准) 及 ReAct + Workflow 增强方案 |
 | Dataset | MoSciBench (总体) |
@@ -42,7 +44,7 @@ claims:
 > - MoSciBench (总体) 上，代码执行成功率 (Exec) 为 1.000，对比 N/A，变化 N/A。
 > - MoSciBench (总体) 上，建模合理性 (MR) 为 3.75，对比 N/A，变化 N/A。
 
-## 概述
+## 概要
 
 ### 问题背景与核心瓶颈
 
@@ -64,7 +66,7 @@ MoSciBench通过四阶段流水线构建：从已发表论文仓库提取原始�
 - **领域知识注入存在反效果**：简单注入领域知识反而引入噪声，导致性能下降，说明知识增强策略需要更精细的设计。
 - **推理时计算量存在收益递减**：Best-of-N与迭代重试等策略在增加计算预算时呈现倒U型收益曲线，需自适应资源分配策略。
 
-## 背景与动机
+
 
 ### 科学发现范式的转变与多模态数据挑战
 
@@ -94,7 +96,9 @@ MoSciBench通过四阶段流水线构建：从已发表论文仓库提取原始�
 
 通过构建覆盖六个科学领域、七种数据模态、88个任务的基准，并系统评估多种主流智能体框架，本文旨在为多模态科学发现智能体的发展提供实证基础和改进方向。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作的核心创新并非提出全新的智能体架构或模型，而是通过系统性实证揭示了多模态科学发现**真正的瓶颈在于跨模态对齐**，并据此设计了一种**轻量级工作流脚手架（Lightweight Workflow Scaffolding）** 作为关键干预手段。其核心洞察可概括为：将人类可解释的任务分解与验证检查点显式注入智能体上下文，比简单注入领域知识更能稳定提升多模态科学发现性能。
 
@@ -126,7 +130,7 @@ MoSciBench通过四阶段流水线构建：从已发表论文仓库提取原始�
 
 这一创新本质上是一种**零参数、零训练的引导策略改进**。它不改变底层模型权重，不增加推理时的模型调用次数，仅通过优化智能体上下文中的任务结构来降低对齐错误。该方法可与任何基于推理-行动循环的智能体框架（如 ReAct）直接结合，具有高度的即插即用特性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_kZHSvETWdi/figures/002_Table_1.jpg]]
 *Table 1: Representative examples of the five task categories in MOSCIBENCH. Each example highlights a distinct reasoning type required for multimodal scientific discovery*
@@ -165,7 +169,7 @@ MoSciBench 的构建遵循一个严格且可复现的四阶段流水线（Figure
 
 这一框架将科学发现的复杂性系统性地转化为可量化评估的智能体任务，其根本瓶颈——跨模态对齐——也正是在这一设计中被清晰地暴露出来。
 
-## 核心模块与公式推导
+
 
 ### 关键模块
 
@@ -194,7 +198,9 @@ $$ \text{Exec} = \frac{\text{成功执行的代码次数}}{\text{总任务数}} 
 
 **建模合理性**由评判模型 gpt-4o-mini 对智能体的分析推理过程进行评分，采用 1–5 的李克特量表，最终取跨任务均值作为 MR 指标。该指标不依赖最终答案正确性，而是评估推理路径的科学合理性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：多模态科学发现仍远未解决
 
@@ -242,7 +248,9 @@ $$ \text{Exec} = \frac{\text{成功执行的代码次数}}{\text{总任务数}} 
 
 **Figure 8** 展示了推理时计算量对性能的影响。ReAct配合Best-of-N策略（DeepSeek-V3.1）和Reflexion配合迭代重试（o4-mini）均呈现倒U型曲线：适度增加计算量可带来性能增益，但超过一定阈值后收益递减甚至下降。这一发现提出了一个开放问题：如何设计自适应的推理时计算分配策略，以在性能与效率之间取得最优平衡。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有基准的关系与适用边界
 
@@ -279,6 +287,8 @@ MoSciBench 的定位与现有科学发现基准存在根本性差异。**Figure 
 5. **评估指标的单一性**：准确率作为主要指标虽客观，但无法捕捉部分正确的科学推理。建模合理性（MR）评分（由 gpt-4o-mini 评判，**Table 3**）提供了补充维度，但其可靠性依赖于评判模型本身的能力边界，需进一步验证。
 
 综上，MoSciBench 的核心定位是**首个系统性暴露跨模态对齐瓶颈的基准**，其方法贡献在于证明了“轻量级工作流分解”作为控制对齐错误的有效手段，而非提出全新的智能体架构。这一发现将研究焦点从“更强的推理模型”转向“更结构化的多模态整合过程”，为后续工作指明了关键突破方向。
+
+
 
 ## 原文 PDF
 

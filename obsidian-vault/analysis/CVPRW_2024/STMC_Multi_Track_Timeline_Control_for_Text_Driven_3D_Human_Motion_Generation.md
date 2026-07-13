@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPRW
 year: 2024
 pdf_ref: paperPDFs/CVPR_2024/STMC_Multi_Track_Timeline_Control_for_Text_Driven_3D_Human_Motion_Generation.pdf
+code_link: null
 project_link: https://mathis.petrovich.fr/stmc/
 aliases:
   - SSTMC
@@ -32,7 +33,7 @@ claims:
 | 中文题名    | STMC：面向文本驱动3D人体运动生成的多轨时间线控制                                                                       |
 | 英文题名    | STMC: Multi-Track Timeline Control for Text-Driven 3D Human Motion Generation                     |
 | 会议/期刊   | CVPRW 2024                                                                                        |
-| Links   | [paper](https://arxiv.org/abs/2401.08559); [Project](https://mathis.petrovich.fr/stmc/)           |
+| Links   | [paper](https://arxiv.org/abs/2401.08559) · [Project](https://mathis.petrovich.fr/stmc/)           |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/robotics |
 | Method  | STMC (Spatio-Temporal Motion Collage)                                                             |
 | Dataset | MTT (Multi-Track Timeline dataset), MTT                                                           |
@@ -42,15 +43,13 @@ claims:
 > - MTT 上，R@3 为 50.9，对比 43.3 (DiffCollage)，变化 +7.6。
 > - MTT 上，TMR-Score M2T 为 0.675，对比 0.633 (DiffCollage)，变化 +0.042。
 
-## 概述
+## 概要
 
 文本驱动三维人体运动生成近年来取得了显著进展，但现有方法普遍存在一个关键瓶颈：它们仅支持单一文本提示作为输入，缺乏对动作时序和空间组合的细粒度控制。具体而言，用户无法精确指定多个动作的**时机**、**持续时间**以及**身体部位协调**——例如，“前5秒用左手挥手，同时从第3秒开始下蹲并持续到结束”。这种多轨时间线（Multi-Track Timeline）控制能力的缺失，严重限制了运动生成在动画制作、游戏开发等创意场景中的实用性。
 
 针对上述问题，本文提出 **STMC（Spatio-Temporal Motion Collage）**，一种无需额外训练、可在测试时与任意预训练运动扩散模型集成的多轨时间线控制方法。其核心洞见在于：将多动作组合问题分解为多个单动作去噪子任务，再通过迭代的**身体部位空间拼接**和基于因子图的**时序缝合**（DiffCollage）进行聚合，从而生成忠实于时间线语义和时序的复杂组合运动。
 
 在自建的**多轨时间线（MTT）数据集**上，STMC在语义正确性和运动真实感方面均显著优于现有基线。以MDM-SMPL为底层去噪模型时，STMC在运动到文本检索准确率（R@1: 30.5 vs DiffCollage的22.6）和过渡真实感（FID: 0.459 vs 0.532）上取得大幅领先。人类感知研究进一步证实，评估者在运动真实感上对STMC的偏好率达66%–68%，显著优于SINC with Lerp和DiffCollage基线。此外，STMC可无缝集成多种预训练模型（MDM、MotionDiffuse、MDM-SMPL），其中MDM-SMPL通过SMPL骨骼表示和改进的扩散调度将采样速度提升10倍，同时维持生成质量。
-
-## 背景与动机
 
 文本驱动的人体运动生成旨在根据自然语言描述合成逼真的三维人体动作序列。近年来，基于扩散模型的方法在该领域取得了显著进展，但现有工作普遍存在一个根本性局限：它们仅支持单一文本提示作为输入，缺乏对动作时序和空间组合的细粒度控制。具体而言，用户无法精确指定多个动作的发生时机、持续时长以及涉及的身体部位协调关系。
 
@@ -66,7 +65,7 @@ claims:
 
 **本文动机**：针对上述缺口，本文提出STMC（Spatio-Temporal Motion Collage），一种无需额外训练的测试时组合方法。其核心思想是将多动作组合问题分解为多个单动作去噪子任务，在扩散模型的每一步去噪过程中独立处理每个时间区间的文本提示，并依据身体部位标签和时序重叠进行空间与时间上的动态拼接。该方法可无缝集成任何预训练运动扩散模型，使其具备忠实于复杂多轨时间线语义和时序的生成能力。
 
-## 核心创新
+## 核心方法与创新机理
 
 ### 问题瓶颈：从单文本到多轨时间线的控制鸿沟
 
@@ -101,8 +100,6 @@ $$\hat{\pmb{x}}_0 = \overset{-}{\pmb{x}}_0^{a_j - l : b_j + l} + \overset{-}{\pm
 ### 核心洞察：测试时组合的无训练范式
 
 STMC的根本洞察是：预训练扩散模型已经学会了单个动作的分布，多动作组合的挑战在于如何在去噪过程中协调多个条件信号。通过将去噪过程结构化为“独立预测-空间拼接-时序缝合-重噪声化”的迭代循环，STMC将组合问题转化为一系列单动作去噪子任务，利用扩散模型的后验均值公式（Eq. 3）保证合成运动的数学一致性。这一范式**无需任何训练或微调**，可无缝集成MDM、MotionDiffuse、MDM-SMPL等多种预训练模型，为文本驱动运动生成提供了首个实用的多轨时间线控制方案。
-
-## 整体框架
 
 STMC（Spatio-Temporal Motion Collage）是一种纯测试时的去噪组合方法，其核心设计理念是将多动作组合问题分解为多个单动作去噪子任务，再通过迭代的身体部位拼接和时序缝合聚合为完整运动。该方法可无缝集成任何预训练的运动扩散模型（如MDM、MotionDiffuse、MDM-SMPL），无需额外训练或微调。
 
@@ -146,8 +143,6 @@ STMC在去噪过程的每一步执行以下模块化操作（参见Figure 3）�
 
 ![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2401_08559/figures/002_Figure_2.jpg]]
 *Figure 2: Text-driven motion synthesis tasks: Our framework generalizes (a) traditional text-to-motion synthesis given one text and one duration, (b) temporal composition given a sequence of texts for non-overlapping intervals, and (c) spatial composition given a set of texts for a single interval. (d) Multi-track timeline control uses a set of texts for arbitrary intervals, allowing fine-grained control over the timings of several complex actions*
-
-## 核心模块与公式推导
 
 STMC的核心思想是将多动作组合生成问题分解为多个单动作去噪子任务，再通过迭代的身体部位拼接和基于因子图的时序缝合进行聚合，无需额外训练即可实现复杂运动生成。该方法在测试时运作，可无缝集成任何预训练的运动扩散模型。
 
@@ -205,7 +200,7 @@ $$\pmb{x}_{t-1} \sim \mathcal{N}(\mu_t(\pmb{x}_t, \hat{\pmb{x}}_0), \pmb{\Sigma}
 
 为更好地支持身体部位拼接，STMC引入基于SMPL的运动表示。与原始MDM使用的263维关节旋转特征不同，MDM-SMPL采用SMPL pose参数（6D旋转表示）结合局部关节位置。该表示天然按身体部位组织，便于空间拼接时的部位拆分与重组，同时通过改进的扩散调度将采样速度提升约10倍。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 实验设置
 
@@ -264,9 +259,6 @@ MDM-SMPL作为STMC的推荐去噪模型，采用SMPL pose参数（6D旋转表示
 ![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2401_08559/figures/007_Figure.jpg]]
 *Figure: Resolving unassigned timeframes SINC heuristic*
 
-![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2401_08559/figures/009_Figure.jpg]]
-*Figure: A.1. Additional details of STMC: To create the final body parts timeline, we need to “fill the holes” by assigning a text to all locations of the body parts timeline (left). This is done by first splitting the timelines such that there is no intersection with other intervals, and then applying the SINC heuristic for each cut (right). Finally, we regroup the intervals by removing the cuts to obtain full body part timelines*
-
 ![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2401_08559/figures/004_Table_1.jpg]]
 *Table 1: Quantitative baseline comparison: Our method STMC is compared to several strong baselines when using three different denoising models. The single-text and DiffCollage baselines struggle to handle complex compositional prompts that results from collapsing the timeline down to a single track. The SINC baselines produce reasonable semantic accuracy by denoising prompts independently as in STMC, but cause abrupt or unnatural transitions with higher transition distance (underlined) or FID*
 
@@ -275,9 +267,9 @@ MDM-SMPL作为STMC的推荐去噪模型，采用SMPL pose参数（6D旋转表示
 ![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2401_08559/figures/011_Table.jpg]]
 *Table: A.1. Influence of the overlap size: We report the performance of STMC (with MDM-SMPL) while varying the total overlap size (2 ∗ l). We observe that a smaller overlap size leads to a higher transition distance but each crop matches the description better (higher per-crop semantic correctness metrics). We observe the opposite for a larger overlap size*
 
-
  
-## 方法谱系与知识库定位
+
+## 定位与知识库关联
 
 ### 1. 问题定位与基线关系
 

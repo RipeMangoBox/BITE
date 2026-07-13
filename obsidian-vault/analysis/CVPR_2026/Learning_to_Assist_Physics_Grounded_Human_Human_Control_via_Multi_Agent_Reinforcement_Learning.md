@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/Learning_to_Assist_Physics_Grounded_Human_Human_Control_via_Multi_Agent_Reinforcement_Learning.pdf
+project_link: https://yutoshibata07.github.io/AssistMimic/
+code_link: null
 aliases:
 - LAPGHHCMARL
 tags:
@@ -40,7 +42,7 @@ claims:
 > - Inter-X (specialist unseen dynamics Mass ×1.2) 上，Success Rate (SR, ↑) 57.9% vs 49.9% (Sequential Training) (+8.0%)。
 > - Inter-X (generalist with DAgger) 上，Success Rate (SR, ↑) 94.7% vs 77.3% (AssistMimic w/o DAgger) (+17.4%)。
 
-## 概述
+## 概要
 
 ### 问题背景与瓶颈
 
@@ -74,7 +76,7 @@ AssistMimic 首次将紧密接触的人-人辅助运动模仿建模为**多智�
 
 AssistMimic 构建在 PHC 单人跟踪框架之上，属于**基于物理仿真的多智能体运动模仿**方法。其当前局限包括：手部模型灵巧度有限（胶囊手），难以执行抓取等精细操作；依赖动作捕捉参考轨迹，对分布外交互的鲁棒性有限；尚未在真实人形机器人上验证迁移效果。
 
-## 背景与动机
+
 
 物理仿真中的人类运动模仿（physics-based human motion imitation）近年来取得了显著进展，但现有工作主要聚焦于单人运动或无接触的社会交互。当场景转向需要持续力交换和双向适应的紧密辅助行为（如扶持行走、辅助起身）时，传统方法面临根本性瓶颈。
 
@@ -90,7 +92,9 @@ AssistMimic 构建在 PHC 单人跟踪框架之上，属于**基于物理仿真�
 
 **本文的动机正是填补上述缺口。** AssistMimic首次将紧密接触辅助行为的物理仿真模仿形式化为多智能体强化学习（MARL）问题，通过联合训练支持者和接受者策略，使双方能够根据物理反馈双向适应。其核心洞察在于：从单人运动先验继承的权重提供了基础运动技能，使策略不必从零学习基本动力学；动态参考重映射确保手部目标始终与接受者的实时姿态对齐；接触促进奖励鼓励功能性的力交互而非死板跟踪噪声轨迹。三者协同，使紧密接触辅助行为的物理仿真模仿首次成为可能。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 AssistMimic 的核心创新在于将紧密接触的人-人辅助行为模仿首次建模为**多智能体强化学习（MARL）问题**，并引入三个协同机制克服由此带来的训练不稳定与物理失配挑战。与现有工作形成鲜明对比：**Kinematic-Recipient**（Human-X）固定重放接受者运动学轨迹，导致姿态穿透与无效支持（Figure 4）；**Frozen-Recipient**（Sequential Training，基于 PHC）先冻结接受者再训练支持者，缺失双向适应；**Phys-Reaction** 的单人控制器在辅助场景下甚至无法生成稳定轨迹。AssistMimic 通过以下四个关键槽位变更，系统性地解决了上述瓶颈。
 
@@ -142,7 +146,7 @@ $$r_{\mathrm{track}_i}^{(S)} = \begin{cases} \exp\left( -D\left( \hat{\mathbf{q}
 
 上述四个创新并非孤立生效，而是形成协同链条：**运动先验初始化**提供稳定的起点，使 MARL 联合训练可行；**动态参考重映射**确保手部目标在空间上始终合理；**接触促进奖励**则引导策略在合理位置上产生功能性力交互。三者共同使紧密接触辅助行为的物理仿真模仿首次成为可能（Figure 2 橙色曲线）。此外，通过 DAgger 将按主题训练的专家策略蒸馏为通用策略后，Inter-X 上的成功率进一步提升至 94.7%（Table 4），验证了该框架的可扩展性。
 
-## 整体框架
+
 
 AssistMimic 将紧密接触、力交换的人-人辅助运动模仿首次建模为一个**多智能体强化学习（MARL）问题**，其整体架构如图 3 所示。框架的核心思路是：不再将接受者（Recipient）视为被动重放的运动学对象，而是让支持者（Supporter）与接受者双方作为独立的物理仿真角色，在共享的物理环境中联合优化各自的策略，从而实现双向适应。
 
@@ -200,7 +204,7 @@ AssistMimic 的 pipeline 由四个关键机制串联构成，共同解决了从�
 ![[assets/figures/papers/paper_list_l1752_Learning_to_Assist_Physics_Grounded_Human_Human_Control_via_Multi_Agent/figures/001_Figure_1.jpg]]
 *Figure 1: AssistMimic: We propose a multi-agent RL framework capable of learning robust Supporter and Recipient policies from noisy, close-proximity motion sequences. By leveraging single-person motion priors, a novel recipient-adaptive reference retargeting mechanism, and contact-promoting rewards, AssistMimic becomes the first physics-based controller to successfully track such complex, high-contact reference motions. Snapshots are arranged chronologically from left to right*
 
-## 核心模块与公式推导
+
 
 AssistMimic 将紧密接触的人-人辅助运动模仿建模为有限时域的多智能体马尔科夫决策过程（Multi-Agent MDP），其核心架构由四个关键模块协同构成：基于运动先验的权重初始化、伙伴感知的策略网络、动态参考重映射机制，以及接触促进奖励设计。以下逐一解析各模块的数学形式与设计逻辑。
 
@@ -264,7 +268,9 @@ $$r_{\mathrm{track}_i}^{(S)} = \begin{cases} \exp\left( -D\left( \hat{\mathbf{q}
 ![[assets/figures/papers/paper_list_l1752_Learning_to_Assist_Physics_Grounded_Human_Human_Control_via_Multi_Agent/figures/005_Figure_4.jpg]]
 *Figure 4: Failure of Kinematic Baselines*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -346,7 +352,9 @@ $$r_{\mathrm{track}_i}^{(S)} = \begin{cases} \exp\left( -D\left( \hat{\mathbf{q}
 ![[assets/figures/papers/paper_list_l1752_Learning_to_Assist_Physics_Grounded_Human_Human_Control_via_Multi_Agent/figures/009_Figure_7.jpg]]
 *Figure 7: Qualitative results: unseen interactions and failures*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：从单人模仿到紧密接触辅助的范式缺口
 
@@ -398,6 +406,8 @@ AssistMimic 在物理仿真人类运动模仿的知识谱系中占据了一个�
 - **上游继承**：直接建立在 PHC（单人物理跟踪控制器）的架构和预训练权重之上，继承了其基于 AMP 判别器的风格奖励和 PPO 训练框架。
 - **横向对比**：区别于 Human-X 的运动学重放范式和 Phys-Reaction 的隔离回放范式，首次将紧密接触辅助行为形式化为多智能体强化学习问题，并通过三个关键机制（运动先验初始化、动态参考重映射、接触促进奖励）使其可行。
 - **下游可能影响**：为物理仿真中的社会交互研究开辟了新方向——从无接触交互走向力交换交互。其“专家到通才蒸馏”的范式（Table 4，DAgger 蒸馏后 Inter-X 通才成功率达 94.7%）也为多任务物理交互控制提供了可参考的路线。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/ReactDance_Hierarchical_Representation_for_High_Fidelity_and_Coherent_Long_Form_Reactive_Dance_Generation.pdf
+project_link: https://ripemangobox.github.io/ReactDance
+code_link: null
 openreview_forum_id: FvMyAMbbX0
 aliases:
 - ReactDance
@@ -40,7 +42,7 @@ claims:
 > - DD100 (测试集，平均长度2066帧) 上，FID_k ↓ 5.57 vs Duolando 27.68 (-22.11)。
 > - DD100 上，MPJPE ↓ 132.99 vs Duolando 174.54 (-41.55)；FID_cd ↓ 14.17 vs Duolando 17.49 (-3.32)；AITS (s) ↓ 1.75 vs EDGE 2.91 (-1.16)。
 
-## 概述
+## 概要
 
 反应舞蹈生成（Reactive Dance Generation, RDG）要求模型根据领舞者运动与音乐实时合成自然、连贯且富有表现力的反应动作，其核心挑战在于**细粒度空间交互的准确建模**与**长序列时间一致性的维持**。现有方法或依赖全局高层约束而忽视局部关键动作，或因训练与推断的长度不匹配导致误差累积与同步漂移，难以同时满足高保真与长序列连贯的需求。
 
@@ -48,7 +50,7 @@ ReactDance 提出了一种**分层有限标量量化（Hierarchical Finite Scala
 
 在 DD100 测试集（平均长度 2066 帧）上，ReactDance 取得 **FID_k 5.57**，较此前最佳的专用反应舞蹈模型 Duolando（27.68）降低 22.11；交互质量指标 FID_cd 降至 14.17，平均推理时间仅 1.75 秒，**在保真度、交互质量与效率三个维度均显著超越所有对比方法**（Table 1）。消融实验进一步证实：移除 HFSQ 或渐进掩码策略会导致生成 FID 恶化并引入空间交互错误（Table 2, Figure 6, Figure 7）；扩大训练步长或舍弃 BLC 的相位对齐机制则使交互指标急剧下降（Table 3, Table 6），验证了分层表示与并行采样策略对长期连贯性的关键作用。
 
-## 背景与动机
+
 
 ### 问题定义：反应舞蹈生成
 
@@ -68,7 +70,9 @@ ReactDance 提出了一种**分层有限标量量化（Hierarchical Finite Scala
 
 ReactDance正是为了填补这一鸿沟而提出：通过构建**分层表示**来显式解耦粗/细运动语义，并设计**并行采样机制**来突破序列长度的限制，从而在单一框架内同时实现高保真空间交互与连贯长序列生成。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ReactDance 针对反应舞蹈生成（Reactive Dance Generation, RDG）中长期存在的**细粒度空间交互建模不足**与**长序列时间一致性崩溃**两大瓶颈，提出了一套以分层表示为核心的生成框架。其关键创新可归结为三个相互耦合的 changed slots，分别重塑了运动表示、采样策略与条件引导机制。
 
@@ -121,7 +125,7 @@ $$
 
 上述三个 changed slots 并非孤立改进，而是形成了一条清晰的因果链路：**HFSQ 提供多尺度解耦的潜空间**，使扩散模型能够分层建模从姿态到动态的运动语义；**BLC 并行采样**利用 DSW 训练赋予解码器的相位无关过渡能力，在该潜空间上实现高效且连贯的长序列生成；**LDCFG** 则在这一分层潜空间上施加多尺度引导，独立调控粗、细层级的条件响应强度。三者协同，使得 ReactDance 在 DD100 测试集（平均长度 2066 帧）上以 1.75 秒的平均推理时间取得 5.57 的 FID_k，显著超越专用 RDG 模型 **Duolando**（Siyao et al., 2024）的 27.68（Table 1），同时将 MPJPE 从 174.54 降至 132.99，验证了分层表示对高保真与高效率生成的决定性作用。
 
-## 整体框架
+
 
 ReactDance 是一个两阶段扩散框架，以领舞者运动 $\mathbf{M}_L$ 与音乐特征 $\mathbf{c}$ 为条件，生成高保真、长序列的反应者舞蹈（**Figure 4**）。其核心设计遵循“层次化表示—扩散生成—并行采样”的流水线，通过解耦粗/细运动语义，同时提升空间交互精度与长期时间连贯性。
 
@@ -161,7 +165,7 @@ $$\mathcal{P}_i = \sin\left(\frac{\pi (i \bmod T)}{T}\right) \oplus \cos\left(\f
 
 **数据流路径：** 领舞者运动经交叉注意力注入扩散 Transformer → 音乐特征经 FiLM 调制扩散过程 → 随机噪声在 HFSQ 潜空间逐步去噪为 $\mathcal{V}$ → HFSQ 解码器将 $\mathcal{V}$ 重建为反应者运动组件 → 组件组合为最终舞蹈序列。
 
-## 核心模块与公式推导
+
 
 ReactDance 采用两阶段框架：首先训练一个带分层有限标量量化（HFSQ）瓶颈的自编码器，将反应者运动压缩为分层潜表示；随后在该潜空间上训练一个条件扩散模型，以领舞者运动和音乐为条件进行去噪生成。以下按流水线顺序阐述关键模块及其核心公式。
 
@@ -269,7 +273,9 @@ $$\hat{\pmb{x}}_0^r = (1 + s_r) \mathcal{G}_{\theta}(\pmb{x}_t^r, t, \pmb{c}, \m
 ![[assets/figures/papers/reactdance_tag_link_fix_20260602/figures/009_Figure_6.jpg]]
 *Figure 6: Qualitative comparison for the HFSQ ablation. While our full model maintains correct spatial relationships, the model trained without HFSQ (using an RVQ-VAE) fails to capture precise inter-personal dynamics, resulting in incorrect relative distancing and mismatched hand interactions (highlighted in red circles)*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：长序列反应舞蹈的高保真与高效生成
 
@@ -340,7 +346,9 @@ ReactDance在DD100测试集（平均序列长度2066帧）上进行了全面评�
 ![[assets/figures/papers/reactdance_tag_link_fix_20260602/figures/006_Figure_5.jpg]]
 *Figure 5: Qualitative comparison of reactive dance generation. Given the same leader motion, Duolando produces unnatural head rotations and GestureLSM shows uncoordinated interactions. InterGen’s motion collapses into unrealistic jitter when generalizing beyond its training horizon. In contrast, our model generates a fluid and coherent reactive motion*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位与基线方法关系
 
@@ -395,6 +403,8 @@ ReactDance 瞄准**反应舞蹈生成（Reactive Dance Generation, RDG）**这�
 3. **层级语义解耦：** 能否为 HFSQ 的各个残差层赋予明确且可解释的运动语义（如“姿态”“动力”“接触”等），以提升可控性和可编辑性？
 4. **自适应时间压缩：** 是否需要自适应的时间压缩策略以应对节奏变化剧烈的舞蹈风格？Table 5 显示残差阶段数 R=2 在重建质量、生成 FID 与训练成本间取得最佳平衡，但时间维度的自适应尚未探索。
 5. **可扩展性自动调节：** 在更大规模、更多样化的数据集上，HFSQ 的分组数目 G 和残差阶段 R 应如何自动调节以实现最优表示？当前 G 和 R 为手工设定。
+
+
 
 ## 原文 PDF
 

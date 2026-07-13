@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Dual_Space_Smoothness_for_Robust_and_Balanced_LLM_Unlearning.pdf
+project_link: null
+code_link: https://github.com/Tsuzukii/PRISM
 openreview_forum_id: VIMW3eys6x
 aliases:
 - PPGISM
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 双空间平滑性实现鲁棒且平衡的LLM遗忘 |
 | 英文题名 | Dual-Space Smoothness for Robust and Balanced LLM Unlearning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=VIMW3eys6x); [GitHub](https://github.com/Tsuzukii/PRISM) |
+| Links | [paper](https://openreview.net/forum?id=VIMW3eys6x) · [GitHub](https://github.com/Tsuzukii/PRISM) |
 | Topic | #topic/safety_alignment_fairness_privacy #topic/safety_alignment_fairness_privacy/fairness_equity_justice_and_safety |
 | Method | PRISM (Probe-guided Iterative Smoothness Minimization) |
 | Dataset | MUSE-Books, MUSE-News, WMDP_bio (Llama2-7B), WMDP_bio (Ministral-8B-Instruct) |
@@ -42,7 +44,7 @@ claims:
 > - MUSE-News 上，Unlearn Score (↑) 为 0.522，对比 0.000 (SAM+NPO)，变化 +0.522。
 > - WMDP_bio (Llama2-7B) 上，Unlearn Score (↑) 为 0.521，对比 0.322 (SAM+NPO)，变化 +0.199。
 
-## 概述
+## 概要
 
 现有大语言模型（LLM）遗忘方法面临三大瓶颈：**灾难性遗忘**导致模型效用崩溃，**遗忘效果与下游效用严重失衡**，以及在表示空间和参数空间**缺乏鲁棒性**，容易遭受越狱攻击和重新学习攻击。例如，梯度上升（GA）和 SAM+NPO 在遗忘训练过程中效用会断崖式下跌至接近零（Figure 1a）；而 NPO 遗忘后的模型仍能被重新学习攻击恢复已删除的知识，且在多种越狱攻击下保持较高的攻击成功率（Figure 2）。
 
@@ -55,7 +57,7 @@ claims:
 
 PRISM 的局限性包括：有时出现过高的过度拒绝率，可能与底层 NPO 组件的保守倾向有关；缺乏形式化理论保证来证明双空间平滑性的协同效果；以及参数平滑性带来的额外计算开销（单步时间增加约 35%）。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -85,7 +87,9 @@ $$\max_{\mathbf{x}} \mathcal{L}(\mathbf{x}) := \langle g(f(\mathbf{x})) - g(f(\m
 
 具体而言，在表示空间通过对抗训练探针扩大越狱裕度，使有害表示与安全表示之间的决策边界更加稳健；在参数空间通过惩罚梯度范数平坦化遗忘损失曲面并解耦保留梯度冲突，增大重新学习攻击的难度。基于这一洞察，本文提出 PRISM（Probe-guided Iterative Smoothness Minimization）框架，通过最小-最大优化统一实现双空间平滑性，系统性地解决上述三大瓶颈。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PRISM 的核心创新在于通过**双空间平滑性（Dual-Space Smoothness）**统一框架，系统性地解决了现有 LLM 遗忘方法面临的三大瓶颈：灾难性遗忘导致的效用崩溃、遗忘效果与下游效用的严重失衡，以及表示空间和参数空间缺乏鲁棒性带来的越狱攻击和重新学习攻击脆弱性。
 
@@ -133,7 +137,7 @@ $$g_{\mathrm{f}}^{\perp} = g_{\mathrm{f}} - \frac{\langle g_{\mathrm{f}}, g_{\ma
 
 SAM+NPO 虽然在参数空间引入了 Sharpness-Aware Minimization，但其平滑性约束缺乏对遗忘目标的针对性设计，且未解决表示空间的鲁棒性问题。PRISM 通过双空间协同平滑与梯度解耦，在 MUSE-Books 上将遗忘得分从 0.000 提升至 0.860，在 WMDP_bio 上从 0.322 提升至 0.521，同时保持了模型效用的稳定。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0012_VIMW3eys6x_Dual-Space_Smoothness_for_Robust_and_Balanced_LL/figures/005_Figure_3.jpg]]
 *Figure 3: Workflow of PRISM. After constructing the Forget and Retain datasets, Step 1 adversarially trains a probe on the hidden states of a given base model. In Step 2, guided by the robust probe and loss gradient, we perturb gradients toward flatter regions while decoupling conflicts between retain and forget gradients. Step 3 updates the model parameters accordingly*
@@ -179,7 +183,7 @@ $$g_{\mathrm{f}}^{\perp} = g_{\mathrm{f}} - \frac{\langle g_{\mathrm{f}}, g_{\ma
 
 三个模块之间存在明确的依赖关系：阶段一的探针为阶段二提供表示空间的优化目标，阶段二的平滑性损失为阶段三提供梯度信号，阶段三的解耦机制确保整个流程中保留知识不被破坏。这种串联设计使得表示空间和参数空间的平滑性约束能够协同作用，共同提升遗忘的鲁棒性与平衡性。
 
-## 核心模块与公式推导
+
 
 PRISM (Probe-guided Iterative Smoothness Minimization) 是一个基于最小-最大优化的遗忘框架，其核心由三个模块级联构成：对抗探针训练、平滑性最小化、以及带冲突解耦的参数更新。
 
@@ -233,7 +237,9 @@ $$\theta_u = \arg\min_\theta \Big[\mathcal{L}_{\mathrm{f}}(\theta; D_f) + \gamma
 
 其中 $\mathcal{L}_{\mathrm{f}}$ 融合了探针引导的遗忘损失和参数平滑性惩罚，$\mathcal{L}_{\mathrm{r}}$ 为标准保留损失，$\gamma \ge 0$ 平衡两者。参数更新时使用正交化后的遗忘梯度 $g_{\mathrm{f}}^{\perp}$，完成双空间平滑性约束下的遗忘过程。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果：遗忘效果与效用平衡
 
@@ -308,7 +314,9 @@ PRISM 在所有攻击类型下均取得最低 ASR：Multi-turn ASR 为 **0.196**
 
 4. **形式化保证缺失**：PRISM 的鲁棒性提升目前仅通过实验验证，缺乏理论证明表示空间和参数空间平滑性的协同机制。这是一个开放问题，不影响实验结论的可靠性，但限制了方法的理论深度。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -347,6 +355,8 @@ PRISM 的有效性已在以下条件下得到验证：
 - 双空间平滑性策略能否与差分隐私遗忘、知识蒸馏等其他遗忘范式结合，以进一步提升隐私保护或跨模型迁移能力？
 - 能否建立一个严格的理论框架，形式化证明遗忘任务中平滑性约束与越狱/重新学习攻击裕度之间的定量关系？
 - PRISM 的平滑性组件在其他遗忘方法（如 Task Vector、DOOR）上的兼容性与增益效果如何，是否具有通用性？
+
+
 
 ## 原文 PDF
 

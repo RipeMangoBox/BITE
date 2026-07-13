@@ -43,7 +43,7 @@ claims:
 > - AIST++ Dance Quality (LLM‑based) 上，Dance Quality Average 7.95 vs 8.01 (Ground Truth) (-0.06)。
 > - User Study / Prompt Alignment 上，Overall Satisfaction 9.80 vs 9.55 (Mochi) (+0.25)；Creative Interpretation 9.27 vs 9.04 (Mochi) (+0.23)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有文本到视频扩散模型无法根据指定音乐生成同步且细节丰富的舞蹈视频。直接训练音频‑视频生成模型受限于舞蹈数据稀缺，质量欠佳；骨骼动画方法则缺乏躯体曲线、旋转、手指、头发和服装等细腻运动（参见 Figure 2）。
 
@@ -58,7 +58,7 @@ claims:
 
 **方法谱系与知识库定位**：MusicInfuser 属于“预训练视频扩散模型 + 轻量跨模态适配”范式，区别于直接联合音视频生成的 **MM-Diffusion**（Ruan et al., CVPR 2023）和基于 VQ 的音乐驱动 3D 舞蹈生成方法如 **AI Choreographer**（Li et al., ICCV 2021）与 **Bailando**（Siyao et al., CVPR 2022）。其关键创新在于将适配负担从全模型微调转移至选择性层注入与零初始化交叉注意力，在极低数据预算下实现高保真音乐‑视频对齐。
 
-## 背景与动机
+
 
 ### 问题背景：从文本到视频到音乐驱动的舞蹈生成
 
@@ -86,7 +86,9 @@ claims:
 
 这一思路将问题从“如何从音乐生成舞蹈”重新定义为“如何让一个已经会跳舞的模型学会听音乐”，从而在数据效率、生成质量和音乐同步性之间找到了新的平衡点。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MusicInfuser 的核心创新在于提出了一套**轻量、先验保持的音乐适配框架**，使预训练的文本到视频扩散模型无需从头训练即可生成音乐同步的高质量舞蹈视频。与现有方法（如骨骼动画生成 **EDGE** (Tseng et al., CVPR 2023)、联合音视频生成 **MM-Diffusion** (Ruan et al., CVPR 2023)）相比，MusicInfuser 直接利用预训练视频模型内化的复杂人体运动知识，仅通过选择性注入音乐条件来实现跨模态对齐，避免了舞蹈数据稀缺导致的生成质量瓶颈。
 
@@ -108,7 +110,7 @@ MusicInfuser 的核心创新在于提出了一套**轻量、先验保持的音�
 
 上述三个 changed slots 共同构成了“先验保持 + 精准适配”的技术路线：ZICA 和 LoRA 保证新模态的平滑注入，层适应性选择避免冗余调制对先验的破坏，Beta-Uniform 调度则优化了舞蹈细节的生成过程。整套框架训练仅需单 GPU 一天内完成，在数据极度受限的条件下实现了与真实视频接近的舞蹈质量（AIST++ 基准上 7.95 vs. Ground Truth 8.01）。
 
-## 整体框架
+
 
 MusicInfuser 的整体设计遵循“轻量适配、先验保留”的原则，将预训练文本到视频扩散模型改造为音乐驱动的舞蹈视频生成器。其核心思路是：冻结预训练 DiT 骨干的绝大部分权重，仅在选定层注入音乐条件，从而在数据稀少的情况下高效对齐音频与视频运动，同时避免灾难性遗忘。
 
@@ -149,7 +151,7 @@ MusicInfuser 的整体设计遵循“轻量适配、先验保留”的原则，�
 
 整个训练可在单 GPU 上一天内完成，体现了方法的资源效率。
 
-## 核心模块与公式推导
+
 
 MusicInfuser 的核心设计围绕一个关键命题展开：**预训练的文本到视频扩散模型已经内化了复杂的人体舞蹈知识和运动规律，只需轻量且精确的音乐适配即可实现高效的音频驱动视频生成**。本节拆解支撑该命题的三个关键模块——层适应性准则、Beta‑Uniform 噪声调度和零初始化交叉注意力适配器——并给出其数学表述。
 
@@ -197,7 +199,9 @@ $$
 ![[assets/figures/papers/paper_list_l996_https_openaccess_thecvf_com_content_CVPR2026_html_Hong_MusicInfuser_Maki/figures/002_Figure_2.jpg]]
 *Figure 2: Motivational example. Skeletal motion generation [47] produces simplified movements lacking nuances such as backbone curvature, axial rotation, hand articulation, hair dynamics, and clothing motion, resulting in a more limited range of dance compared to video-based dance generation approaches (ours)*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能对比
 
@@ -261,7 +265,9 @@ Figure 3 和 Figure 4 分别展示了向**未见动物主体**（土拨鼠、兔
 
 4. **多人复杂交互未深入分析**：Figure 4 展示了群舞生成，但未评估多人之间的协调配合质量（如双人舞中的接触、同步转向等），该点需要手动验证。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位与核心瓶颈
 
@@ -320,6 +326,8 @@ MusicInfuser 的适用边界受以下因素制约，部分已在论文中验证�
 3. **伦理与安全审查**：论文未讨论模型是否可能生成不安全或不当的舞蹈内容（如过度暴露、暴力动作等）。在开放域部署中，内容审核机制的设计是必要的后续工作。
 
 4. **多模态条件的冲突与协调**：当文本提示与音乐风格不一致时（如文本要求“芭蕾”而音乐是“嘻哈”），模型如何协调冲突？该场景下的行为模式尚未被系统研究。
+
+
 
 ## 原文 PDF
 

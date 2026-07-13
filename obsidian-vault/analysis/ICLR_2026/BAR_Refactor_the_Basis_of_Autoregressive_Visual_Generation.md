@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/BAR_Refactor_the_Basis_of_Autoregressive_Visual_Generation.pdf
+project_link: null
+code_link: null
 aliases:
 - BAB
 - BAR
@@ -42,17 +44,19 @@ claims:
 > - ImageNet 256×256 上，IS 为 327.1，对比 310.6 (xAR-H)，变化 +16.5。
 > - ImageNet 256×256 上，Precision 为 0.86，对比 0.85 (xAR-H)，变化 +0.01。
 
-## 概述
+## 概要
 
 本文提出 **Basis Autoregressive (BAR)**，一种全新的自回归视觉生成范式。BAR 的核心思想是将图像 token 视为图像向量在线性子空间上的投影，并通过一个端到端可学习的正交变换矩阵 **A**，将固定的 token 序列重构为更适合自回归预测的新序列。该方法在 ImageNet 256×256 条件生成任务上取得了 **FID 1.15** 的最优结果，超越了此前所有自回归和扩散模型。BAR 不仅统一了先前多种自回归变体（VAR, xAR, RAR, PAR, FAR 等）为线性变换 **y = Ax** 的特例，还通过自适应学习发现了超越手工设计的预测策略。
 
-## 背景与动机
+
 
 传统自回归（AR）视觉生成模型将图像展平为固定光栅扫描顺序的 1D token 序列，这一做法忽略了图像的 2D 结构，限制了模型能力。近年来，研究者提出了多种改进方案：VAR（Tian et al., 2024）采用粗到细的尺度预测，xAR（Ren et al., 2025）引入连续 AR 和流匹配目标，RAR（Yu et al., 2024b）使用随机排列退火，PAR（Wang et al., 2024）采用并行解码，FAR（Yu et al., 2025）在频域进行预测。然而，这些方法都依赖于手工设计的归纳偏置，缺乏统一的数学框架。
 
 BAR 的洞察在于：将 token 序列的预测顺序和分组视为一个可学习的线性变换问题。通过将标准基向量替换为可学习的基向量，模型能够自适应地发现最优的预测策略，从而超越手工设计的局限。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 BAR 的核心创新可归纳为三点：
 
@@ -62,7 +66,7 @@ BAR 的核心创新可归纳为三点：
 
 3. **残差训练目标**：引入残差目标 $\mathcal{L}_{\mathrm{residual\ BAR}}$，强制早期 token 最大化重建图像，后期 token 恢复残差，从而自然地实现粗到细的生成特性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__image_and_video_generation__b001_2m9XQq4Dc3_BAR_Refactor_/figures/001_Figure_1.jpg]]
 *Figure 1: An overview of the unified framework of BAR and its strength over previous approaches. (a) By applying a linear transform associated with the matrix A, BAR offers the generalized viewpoint that encompasses prior methods as specific instances of A and facilitates further extensions. (b) BAR at its core lies that each token x _ { k } is the projection of whole image x on a sub-space, or basis with channels omitted. It transforms the standard basis e _ { k } into the row vectors a _ { k } of matrix A. (c) We illustrate each method with its corresponding a _ { k } . While vanilla AR directly employs e _ { i } as raster scan of tokens and VAR manually designs a coarse-to-fine pattern,...*
@@ -77,7 +81,7 @@ BAR 的整体流水线如 Figure 2 所示，包含以下模块：
 
 Figure 1 展示了 BAR 的统一框架概览：(a) 通过线性变换 **A**，BAR 将先前方法作为特例统一；(b) 每个 token 是图像在子空间上的投影；(c) 不同方法对应的基向量可视化。
 
-## 核心模块与公式推导
+
 
 ### 5.1 自回归分解与基线损失
 
@@ -127,7 +131,9 @@ $$\Sigma_{\epsilon'} = \mathbf{A} \mathbf{A}^\top = \mathbf{I}$$
 
 这一性质确保了 BAR 在变换空间中的训练与原始空间等价。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 6.1 主要结果
 
@@ -209,7 +215,9 @@ BAR-H 以 1.15 的 FID 达到当时最优，相比 xAR-H 降低 0.09，相比 MA
 - 使用相同的 VAE 编码器（KL-16）和采样器（ADM 或 Euler-Maruyama）。
 - BAR 仅引入额外的矩阵乘法，训练开销可忽略。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 BAR 在自回归视觉生成方法谱系中占据核心位置：
 
@@ -229,6 +237,8 @@ BAR 在自回归视觉生成方法谱系中占据核心位置：
   - BAR 的学习基是否具有跨数据集的可迁移性？
   - BAR 在更大规模数据集（如 LAION）上的表现如何？
   - BAR 的生成过程是否具有可解释性，能否通过分析基向量理解模型行为？
+
+
 
 ## 原文 PDF
 

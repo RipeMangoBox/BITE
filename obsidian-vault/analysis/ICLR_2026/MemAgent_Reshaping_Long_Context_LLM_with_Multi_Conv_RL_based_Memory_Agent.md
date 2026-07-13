@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/MemAgent_Reshaping_Long_Context_LLM_with_Multi_Conv_RL_based_Memory_Agent.pdf
+project_link: null
+code_link: null
 openreview_forum_id: k5nIOvYGCL
 aliases:
 - MemAgent
@@ -41,7 +43,7 @@ claims:
 > - LongBench-QA 上，AVG Score 为 MEMAGENT-14B: 51.0; MEMAGENT-7B: 48.2，对比 QwenLong-L1-32B: 50.7; DS-Distill-Qwen-32B: 49.0，变化 PROPOSED 以较小的模型规模超越了最强大的长上下文基线。。
 > - NIAH (512K) 上，Accuracy 为 RL-MEMAGENT: >95%，对比 Qwen2.5-Instruct-1M 系列在 512K 时出现明显下降，变化 PROPOSED 几乎无性能损失，基线显著下降。。
 
-## 概述
+## 概要
 
 长上下文大语言模型在处理超长文本时面临两个根本性瓶颈：注意力机制的二次复杂度（$O(n^2)$）使推理成本随长度急剧膨胀，而现有长度外推、稀疏注意力和上下文压缩等方法在上下文超过训练窗口后性能严重衰减。本文提出 **MEMAGENT**，一种受人类阅读做笔记行为启发的智能体工作流：将文档分块流式输入，通过固定长度的记忆单元（默认 1024 tokens）选择性保留关键信息并覆盖冗余内容，最后仅依据记忆生成答案。这一设计将端到端复杂度降至 $O(N)$ 线性级别。
 
@@ -54,7 +56,7 @@ claims:
 
 消融实验进一步证实：移除 RL 训练后模型在长文本上性能大幅下降，说明 RL 是鲁棒记忆能力的关键来源；记忆长度在 256–4096 tokens 范围内性能稳健，1024 tokens 为最佳平衡点；关键信息在上下文中的位置（0%–100%）对 MEMAGENT 影响极小，未出现灾难性遗忘。
 
-## 背景与动机
+
 
 ### 长上下文LLM的核心瓶颈
 
@@ -96,7 +98,9 @@ claims:
 
 后续章节将详细展开MEMAGENT的工作流设计、训练算法，以及在检索型QA、摘要和Needle-in-a-Haystack等任务上的实验验证。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：长上下文处理的根本困境
 
@@ -141,7 +145,7 @@ MEMAGENT 的创新有效性由以下关键实验证据支撑：
 
 4. **小模型超越大基线**（置信度 0.98）：MEMAGENT-14B 在 LongBench-QA 上取得 51.0 的平均分，超越了 32B 级别的长上下文基线 QwenLong-L1-32B（50.7）和 DS-Distill-Qwen-32B（49.0）（Table 3），表明记忆机制比模型规模对长文本任务更为关键。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_k5nIOvYGCL/figures/002_Figure_2.jpg]]
 *Figure 2: MEMAGENT is inspired by the way humans process long documents. It divides the document into multiple chunks and allows LLMs to process them iteratively, recording relevant information in memory. Finally, LLMs generate answers based on the information stored in the memory*
@@ -165,7 +169,7 @@ $$p(\mathbf{x}_{1:N}) = \sum_{\mathbf{m}^{1:K-1}} \prod_{k=1}^{K} \underbrace{p(
 
 **关键设计选择。** 默认配置中，记忆长度设为 1024 tokens，上下文块大小设为 5000 tokens。训练时模型被刻意限制在 8K 上下文窗口内，以验证其外推能力——即在小窗口习得的记忆策略能否泛化到远超训练长度的输入。
 
-## 核心模块与公式推导
+
 
 ### 流水线模块
 
@@ -216,7 +220,9 @@ $$R(\hat{y}, y) = \mathbf{1}_{\mathrm{is.equiv}(\mathbf{y}, \hat{\mathbf{y}})}$$
 
 当预测答案 $\hat{y}$ 与标准答案 $y$ 等价时奖励为 1，否则为 0。该奖励信号驱动模型学习生成最优的读写记忆轨迹，即在给定输入上下文的条件下最大化期望奖励的记忆状态分布。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心结果：从 8K 到 3.5M 的极限外推
 
@@ -268,7 +274,9 @@ Table 10 和 Table 11 将 MEMAGENT 与基于检索增强生成（RAG）的 Agent
 
 这些失败模式表明，当前基于结果奖励的 RL 训练虽然赋予了模型强大的选择性记忆能力，但在需要精确时序推理或多轮证据整合的场景下仍有局限。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心思想与设计哲学
 
@@ -335,6 +343,8 @@ MEMAGENT 采用的 Multi-Conv DAPO 算法是对 GRPO/DAPO 系列方法的扩展�
 4. **细粒度奖励设计**：当前的规则奖励仅评估最终答案的正确性，对中间记忆更新质量无直接反馈。引入过程奖励模型或中间步骤的验证信号可能进一步提升记忆更新的精准度。
 
 5. **与长上下文预训练的结合**：MEMAGENT 在 8K 训练窗口下已展现惊人外推能力，若与长上下文持续预训练结合，是否能进一步突破当前 3.5M 的有效上限？
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: NEURIPS
 year: 2024
 pdf_ref: paperPDFs/NEURIPS_2024/DiMoP3D_Harmonizing_Stochasticity_and_Determinism_Scene_responsive_Diverse_Human_Motion_Prediction.pdf
+project_link: null
+code_link: null
 aliases:
 - DHSDSRDHMP
 tags:
@@ -39,7 +41,7 @@ claims:
 > - GIMO 上，ADE 5.66 vs 9.69 (BeLFusion) (-4.03)；FDE 6.81 vs 11.19 (BeLFusion) (-4.38)；ACPD 0.98 vs 13.73 (BeLFusion) (-12.75)。
 > - CIRCLE 上，ADE 5.66 vs 7.91 (BeLFusion) (-2.25)；ACPD 0.98 vs 14.06 (BeLFusion) (-13.08)。
 
-## 概述
+## 概要
 
 现有多样化人体运动预测（diverse HMP）方法在生成未来运动时完全忽略3D场景的物理与语义约束，导致预测结果出现物体穿透、运动不连贯和场景不一致等严重伪影，无法在真实环境中实际使用。DiMoP3D首次将场景响应的**确定性约束**（障碍物避碰、语义合理的交互目标选择）与运动生成的**随机多样性**统一在一个框架内，核心思路是将无约束的随机采样转化为由场景确定元素引导的可控随机生成。
 
@@ -47,7 +49,7 @@ claims:
 
 在GIMO和CIRCLE两个真实捕捉的基准上，DiMoP3D在所有主要指标上大幅超越已有方法：相比此前SOTA扩散模型BeLFusion，平均位移误差（ADE）降低4.03 cm，终点位移误差（FDE）降低4.38 cm，而衡量物理一致性的平均碰撞穿透距离（ACPD）从13.73 cm降至0.98 cm，提升超过一个数量级。消融实验证实，兴趣网络、HOI估计器、轨迹规划器和语义对齐检查器每个组件都对精度和物理一致性有显著贡献，其中移除轨迹规划器使ACPD恶化至3.29 cm。定性对比进一步显示，DiMoP3D有效避免了BeLFusion常见的物体穿透、运动不连贯和场景不一致等典型失败模式。
 
-## 背景与动机
+
 
 ### 多样化人体运动预测的场景困境
 
@@ -78,7 +80,9 @@ $$P(\hat{X}_{L:L+\Delta L} | X_{1:L}, S) = \int \max_{\theta} P(\hat{X}_{L:L+\De
 
 在GIMO和CIRCLE两个真实捕捉的基准数据集上，DiMoP3D在所有主要指标上大幅超越现有方法，尤其在物理一致性指标ACPD上实现了超过10 cm的显著提升（Table 1），验证了场景引导多样性这一核心思路的有效性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DiMoP3D 的核心创新在于首次将 **3D 场景的确定性约束**（物理避碰、语义合理的交互）系统地引入多样化人体运动预测框架，解决了现有方法因完全忽略场景而导致的穿透、不连贯等严重伪影问题。其关键突破体现在三个维度的“changed slots”上。
 
@@ -105,7 +109,7 @@ DiMoP3D 的核心创新在于首次将 **3D 场景的确定性约束**（物理�
 
 上述创新带来的性能提升是系统性的。在 GIMO 和 CIRCLE 两个真实捕捉基准上，DiMoP3D 在所有主要指标上均大幅超越已有方法（Table 1）。最具说服力的是物理一致性指标 ACPD：从 BeLFusion 的 13.73 cm 降至 **0.98 cm**，降幅超过 12 cm，证明显式约束机制从根本上解决了穿透问题。消融实验进一步确认了各创新模块的独立贡献：移除轨迹规划器使 ACPD 飙升至 3.29 cm，移除 HOI-Estimator 使 ACPD 升至 1.53 cm，移除兴趣网络导致 ADE 从 5.66 恶化至 6.17（Table 2）。定性对比（Figure 3）直观展示了 DiMoP3D 如何避免 BeLFusion 中出现的物体穿透、运动不连贯和场景不一致等典型失败模式。
 
-## 整体框架
+
 
 DiMoP3D 的总体目标是将多样化人体运动预测从无约束的随机生成转化为**场景确定元素引导的可控随机生成**。其核心洞察在于：真实世界中的人类运动同时受制于物理约束（避碰）和语义约束（与场景物体合理交互），因此不能简单地将多样性建模为无条件随机潜在变量，而需要从场景中提取确定性条件因子来约束生成过程。
 
@@ -143,7 +147,7 @@ DiMoP3D 由三个顺序级联的模块组成，形成“理解场景→规划行
 
 传统多样化 HMP 方法（如 **DLow**、**SmoothDMP**、**BeLFusion**）将多样性完全交由无条件随机潜在变量或随机丢弃机制，缺乏对场景约束的显式建模，导致在真实 3D 场景中出现物体穿透、运动不连贯和场景不一致等问题（Figure 1, Figure 3）。DiMoP3D 的核心创新在于将**场景的确定性元素**（可交互物体、可行走区域、交互终态）显式编码为条件因子，使扩散模型的随机采样始终在物理和语义可行的流形上进行，从而在保持多样性的同时消除伪影。消融实验验证了这一设计的必要性：移除轨迹规划器后，物理一致性指标 ACPD 从 0.98 急剧恶化至 3.29；移除兴趣网络后，精度指标 ADE 从 5.66 升至 6.17（Table 2）。
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题形式化：从无条件随机到场景条件随机
 
@@ -217,7 +221,9 @@ $$\mathcal{L}_{sem} = \frac{1}{L+\Delta L} \sum_{l=1}^{L+\Delta L} \big(1 - \cos
 ![[assets/figures/papers/paper_list_l1790_DiMoP3D_Harmonizing_Stochasticity_and_Determinism_Scene_responsive_Diver/figures/012_Figure_6.jpg]]
 *Figure 6: Visualization of 3D scene instance segmentation (upper) and the corresponding interest map (lower). Red points in the interest map denote higher interest, while blue points denote lower interest. Leveraging the insight provided by the predicted interest map enables the exclusion of improbable or illogical targets, thereby enhancing the reliability and scene congruency of predictions*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -288,7 +294,9 @@ Table 7对比了不同轨迹规划器（直线插值、RRT、A*）的效果。A*
 ![[assets/figures/papers/paper_list_l1790_DiMoP3D_Harmonizing_Stochasticity_and_Determinism_Scene_responsive_Diver/figures/008_Table_4.jpg]]
 *Table 4: Description template of semantic inspector among 18 objects in the ScanNet dataset [21]*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有方法的继承与差异
 
@@ -368,6 +376,8 @@ DiMoP3D 处于**3D场景理解 × 人体运动预测 × 扩散生成模型**的�
 - **概念层面**：将“随机性与确定性的调和”明确为场景感知HMP的核心问题，并通过显式先验覆盖机制给出了一个可操作的解决方案。
 
 后续工作可在其模块化架构的基础上，逐步替换封闭词汇为开放语义、静态规划为动态规划、固定长度为自适应长度，从而推动该领域向更真实、更灵活的应用场景演进。
+
+
 
 ## 原文 PDF
 

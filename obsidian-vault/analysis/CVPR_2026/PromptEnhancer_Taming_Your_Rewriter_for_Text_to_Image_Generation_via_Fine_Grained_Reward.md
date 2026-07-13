@@ -43,7 +43,7 @@ claims:
 > - T2I-CompBench 上，Spatial 0.4472 (Qwen-Image + PE) vs 0.3222 (Qwen-Image, no rewriter) (+0.1250)；Color 0.8442 (Qwen-Image + PE) vs 0.7962 (Qwen-Image, no rewriter) (+0.0480)。
 > - T2I-Keypoints-Align (Internal) 上，Average accuracy over 24 categories 87.1% (with PE) vs 82.0% (without PE) (+5.1 points)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -74,15 +74,13 @@ PromptEnhancer是一个**通用、模型无关**的提示改写框架，其训�
 
 训练阶段的消融实验揭示了各阶段的关键贡献：SFT阶段使模型得分从基线81.0%大幅提升至85.29%（含CoT），而GRPO进一步将得分推高至88.15%，取得了最佳结果。值得注意的是，CoT监督在单独使用（SFT阶段）时收益有限，但与GRPO结合时才发挥出更大价值——这表明强化学习的探索-优化机制能够更充分地利用结构化推理的潜力（Table 5）。
 
-## 背景与动机
-
 文本到图像（T2I）生成模型近年来取得了显著进展，能够根据自然语言描述合成高质量、多样化的视觉内容。然而，一个持续存在的瓶颈在于**用户输入的提示（prompt）与模型理解能力之间的对齐差距**。现实场景中，用户往往提供简短、模糊甚至不完整的提示，而T2I模型在准确执行属性绑定、否定理解、空间关系推理等组合性任务时仍面临系统性困难。这导致生成的图像频繁出现语义错配——例如对象颜色错误、数量偏差、空间布局混乱——严重限制了可靠生成的应用边界。
 
 现有应对这一问题的策略大致分为两类。一类是**直接优化T2I模型本身**，通过改进文本编码器、注入空间条件或增强跨模态注意力来提升组合理解能力。这类方法通常需要修改模型架构或重新训练生成器，计算成本高昂，且对已部署的预训练模型缺乏即插即用的兼容性。另一类是**提示工程与自动改写**，例如 **BeautifulPrompt**（Cao et al., EMNLP 2023 Industry）通过评分筛选优化提示，或直接调用 **GPT-4o** 等通用大语言模型进行重写。然而，这些方法的优化信号往往是粗粒度的——仅依赖CLIP相似度分数或通用人类偏好模型——缺乏对T2I具体失败模式的细粒度感知，导致改写方向不够精准，提升效果有限。
 
 本文的**核心动机**在于：将提示改写与生成模型完全解耦，并通过**针对T2I失败模式的细粒度反馈**来训练一个专用的改写器，从而以模型无关的方式系统性提升任何预训练T2I模型的对齐性能。这一思路的直觉是：如果能让改写器学会识别并补全原始提示中缺失的语义要素——包括对象的视觉属性、动作交互、空间关系和隐含约束——那么即使底层生成器保持不变，图像质量和对齐度也能获得实质改善。为此，本文提出 **PromptEnhancer**，一个由细粒度奖励模型驱动的通用提示改写框架，其核心创新在于构建了覆盖24个评估关键点的结构化反馈信号，并通过链式思维（CoT）改写与强化学习的结合，驯服改写器朝着最大化图像-文本对齐的方向演进。
 
-## 核心创新
+## 核心方法与创新机理
 
 PromptEnhancer 的核心创新并非设计一个新的文本到图像（T2I）生成模型，而是**将提示理解与图像生成解耦**，通过训练一个专用的提示改写器来系统性地缩小用户意图与生成结果之间的对齐差距。其关键洞察在于：与其修改冻结的预训练 T2I 模型，不如将优化重心前移至输入端，通过提升提示的完整性和可解释性来间接改善图像-文本对齐。这一思路使 PromptEnhancer 成为一个**模型无关的通用框架**，可服务于任何预训练 T2I 模型。
 
@@ -115,8 +113,6 @@ CoT Rewriter 基于 Hunyuan-7B-Instruct 初始化，遵循链式思维流程：�
 
 PromptEnhancer 的方法论贡献可归纳为三个 **changed slots**：将奖励信号从粗粒度标量升级为 24 维细粒度结构化反馈，将训练策略从单阶段 SFT 重构为 SFT+GRPO 两阶段对齐，将提示表示从原始短文本转化为链式思维结构化描述。这三者形成因果闭环——细粒度奖励为 GRPO 提供精准优化方向，GRPO 释放 CoT 的推理潜力，CoT 重写则为 AlignEvaluator 提供更丰富的评估素材。在 GenEval 基准上，该框架将 Qwen-Image 和 HY-Image 2.1 的整体得分分别从 0.84 和 0.80 提升至 0.86 和 0.82，验证了其作为通用提示增强层的有效性与迁移性。
 
-## 整体框架
-
 PromptEnhancer 的核心设计思想是将提示改写与图像生成解耦，在不修改任何预训练 T2I 模型权重的前提下，通过一个可训练的改写器系统性地提升图像-文本对齐质量。整个框架由三个模块串联构成一个闭环训练管线：
 
 **CoT Rewriter（策略模型）** 接收用户输入的简短、模糊提示，通过链式思维（Chain-of-Thought）推理过程，识别关键语义元素、消解歧义并将隐式约束显式化，最终输出一个富含细节和结构化描述的重写提示。该模块基于 **Hunyuan-7B-Instruct** 初始化。
@@ -131,11 +127,6 @@ PromptEnhancer 的核心设计思想是将提示改写与图像生成解耦，�
 
 ![[assets/figures/papers/paper_list_l2194_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_PromptEnhancer_Ta/figures/002_Figure_2.jpg]]
 *Figure 2: An overview of the training framework for PromptEnhancer. Our framework trains a universal Rewriter to enhance pretrained Text-to-Image (T2I) model without altering its weights. This is achieved through a two-stage process guided by a specialized reward model. Stage 1: SFT for Rewriter Initialization (Sec 3.1.1). The CoT Rewriter is first initialized via SFT on (user prompt, reprompt) pairs. This stage teaches the model to generate structured, chain-of-thought style responses using a standard next-token prediction loss, establishing a strong foundation for refinement. Stage 2: Policy Alignment with GRPO (Sec 3.1.2). The initialized rewriter is further refined using GRPO. The rewriter genera...*
-
-![[assets/figures/papers/paper_list_l2194_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_PromptEnhancer_Ta/figures/001_Figure_1.jpg]]
-*Figure 1: PromptEnhancer Improves Prompt-to-Image Alignment. PromptEnhancer rewrites user prompts to make them easier for text-to-image models to interpret, leading to more faithful rendering of attributes, compositions, and visual concepts. Row 1: Results generated from the original user prompts. Row 2: Results generated from the rewritten prompts with PromptEnhancer. Row 3: Additional examples across diverse styles and domains. Detailed prompt analyses are included in the supplementary material*
-
-## 核心模块与公式推导
 
 ### 模块一：CoT Rewriter（链式思维改写器）
 
@@ -171,7 +162,7 @@ $$r_{i} = \mathrm{AlignEvaluator}(\mathbf{x}_{i}, \mathbf{p}_{i}^{\prime}), \qua
 ![[assets/figures/papers/paper_list_l2194_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_PromptEnhancer_Ta/figures/008_Figure_6.jpg]]
 *Figure 6: Qualitative comparison of prompt rewriting. Starting from the same raw prompt, PE produces a more explicit and informative rewritten prompt, leading to a generated image that better matches the intended semantics and visual details*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心定量结果：PromptEnhancer 在两个标准基准上一致提升多款 T2I 模型
 
@@ -247,7 +238,7 @@ PromptEnhancer 在提示优化与 T2I 对齐这一交叉领域中占据了独特
 ![[assets/figures/papers/paper_list_l2194_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_PromptEnhancer_Ta/figures/006_Table_2.jpg]]
 *Table 2: Key hyperparameters for PromptEnhancer*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 核心思路：解耦式提示改写作为通用对齐增强层
 

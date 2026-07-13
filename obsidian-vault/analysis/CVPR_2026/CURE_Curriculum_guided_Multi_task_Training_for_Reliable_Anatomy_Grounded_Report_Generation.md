@@ -44,7 +44,7 @@ claims:
 > - Chest ImaGenome (AGRG) 上，IoU 0.601 vs 0.249 (MAIRA-2) (+0.352)；CXRFEScore 0.549 vs 0.357 (MAIRA-2) (+0.192)。
 > - PadChest-GR (GRG) 上，IoU 0.265 vs 0.256 (MAIRA-2) (+0.009)。
 
-## 概述
+## 概要
 
 医学视觉语言模型（VLM）在胸部X光片报告生成中面临一个关键瓶颈：标准多任务训练的数据分布严重不均，且传统发现生成目标侧重异常描述，导致视觉定位能力薄弱，模型产生大量与图像证据不一致的虚假异常（幻觉）。**CURE** 针对这一问题，提出了一种**错误感知的课程引导多任务训练框架**，在不引入任何额外数据的前提下，通过三个核心机制实现突破：
 
@@ -68,7 +68,7 @@ claims:
 
 **方法谱系与知识库定位**：CURE 建立在 **MAIRA-2**（开放式医学 VLM，联合学习定位与报告生成）和 **MedGemma-4B-IT**（预训练基础医学 VLM，缺乏视觉定位能力）之上。其课程学习策略借鉴了动态采样重加权的思想，但创新性地将其应用于医学多任务场景的数据集间和类别内两个粒度，并通过验证集错误率驱动采样概率更新。在评估层面，CURE 综合使用 IoU、CXRFEScore、CheXbert F1 等指标，并引入基于自然语言推理的幻觉分析框架，为医学报告生成的可信度评估提供了新视角。
 
-## 背景与动机
+
 
 医学视觉-语言模型（VLM）在胸部 X 光片自动报告生成领域取得了显著进展，但当前最先进的方法面临一个核心瓶颈：**视觉定位能力薄弱，报告产生大量与图像证据不一致的虚假异常（幻觉）**。以 MAIRA-2 为代表的开放式医学 VLM 虽能联合学习定位与报告生成，但其标准多任务训练中数据分布严重不均，且传统发现生成目标侧重异常描述，导致模型在未见过的解剖区域上频繁产生虚假阳性检测——例如，在锁骨区域，MAIRA-2 的异常幻觉率高达 59% 以上，而实际图像中并无异常。
 
@@ -76,7 +76,9 @@ claims:
 
 CURE 的核心动机正是针对上述缺口：**无需额外数据，通过课程引导的多任务训练，使医学 VLM 学会定位并描述解剖区域，同时平衡正常与异常样本**。该方法引入错误感知的课程学习策略，在数据集间和类别内动态调整采样权重，并用解剖学基础报告生成（AGRG）替代传统发现生成目标，促使模型同时学习定位与正常/异常描述。这一设计从根本上重塑了模型的优化方向——从“倾向于生成异常描述”转向“生成与图像证据一致的解剖学基础描述”，从而大幅提升定位准确性和报告可信度。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CURE 的核心创新在于**通过课程引导的多任务训练，在不引入任何额外数据的前提下，系统性解决医学 VLM 在视觉定位和报告生成中的两个相互纠缠的瓶颈：数据分布严重不均，以及传统发现生成目标导致的定位能力薄弱与虚假异常幻觉**。
 
@@ -109,7 +111,7 @@ CURE 的第三个关键设计是在 Chest ImaGenome 上对基础模型 **MedGemm
 
 上述三个创新并非孤立生效，而是形成正向反馈循环：AGRG 任务设计为课程学习提供了可优化的定位-描述联合目标；课程学习确保预训练和多任务微调阶段的数据分布持续适应模型弱点；专用预训练则为课程学习提供了更优的初始化起点。这一协同机制使得 CURE 在 Chest ImaGenome 上将定位 IoU 提升 **+0.352**（是 MAIRA-2 的两倍），平均异常发现幻觉率从 26.50% 降至 **8.78%**，矛盾率减半（17.44% vs 33.22%），蕴含率翻倍（39.50% vs 15.94%）。
 
-## 整体框架
+
 
 CURE 是一个**课程引导的多任务训练框架**，无需额外数据即可同时提升医学视觉语言模型的视觉定位准确性和报告生成可信度。其核心瓶颈在于：标准多任务训练中数据分布严重不均，且传统“发现生成”目标侧重异常描述，导致视觉定位能力薄弱，报告产生大量与图像证据不一致的虚假异常（幻觉）。CURE 通过三个关键机制解决这一问题：(1) 将异构监督信号统一为细粒度指令格式；(2) 引入错误感知的课程学习，在数据集间和类别内动态调整采样权重；(3) 用**解剖学基础报告生成（AGRG）**替代传统发现生成目标，促使模型同时学习定位与正常/异常描述。
 
@@ -145,7 +147,7 @@ CURE 是一个**课程引导的多任务训练框架**，无需额外数据即�
 ![[assets/figures/papers/paper_list_l2070_https_arxiv_org_abs_2601_15408/figures/003_Figure_2.jpg]]
 *Figure 2: Overview of CURE, our Curriculum-guided Multi-task Training Framework. During training, the model is periodically evaluated every N steps on validation subsets from each task. Performance metrics (IoU, CXRFEScore) are calculated to identify task-level and category-level errors, which are then used to update the sampling weights in the training sampler. The cycle then resumes, allowing the model to focus more heavily on the data it finds most challenging. Evaluation of the RG task uses the official MIMIC-CXR test set, while VinDr-CXR is assessed in a zero-shot setting*
 
-## 核心模块与公式推导
+
 
 CURE 围绕三个核心模块构建：**细粒度任务统一表示**、**错误感知课程学习**、以及**边界框感知的数据增强与预训练**。这些模块协同解决了标准多任务训练中数据分布严重不均和视觉定位能力薄弱的核心瓶颈。
 
@@ -190,7 +192,9 @@ $$p_i = \frac{e_i}{\sum_{j=1}^{K} e_j}$$
 ![[assets/figures/papers/paper_list_l2070_https_arxiv_org_abs_2601_15408/figures/001_Figure_1.jpg]]
 *Figure 1: False Positive Detection of Pathologies. Given the same chest X-ray input from the MIMIC-CXR test set, both models approximate the location of the left clavicle. However, the baseline model (MAIRA-2) hallucinates a fracture (there is no fracture in the image), whereas our proposed model (CURE) generates a clinically correct and visually grounded description*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -273,7 +277,9 @@ CURE 在三个短语接地（PG）测试集上全面超越当前最先进的开�
 ![[assets/figures/papers/paper_list_l2070_https_arxiv_org_abs_2601_15408/figures/017_Table_12.jpg]]
 *Table 12: Sensitivity Analysis of the Curriculum Weighting Term (α). Performance metrics on the Chest ImaGenome dataset (AGRG task) after 3000 training steps across different values of α. Higher values of α heavily weight the IoU metric during curriculum updates, while lower values prioritize the text-based semantic metric (CXRFEScore). We report mean Intersection-over-Union (IoU$, \delimiter$ "3222378 ), CheXbert F1 (Micro/Macro averages$, \delimiter$ "3222378 ), CheXbert cosine similarity (Cos.$, \delimiter$ "3222378 ), and CXRFEScore (CXS$, \delimiter$ "3222378 ). Bold indicates the best result per column*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与设计动机
 
@@ -316,6 +322,8 @@ CURE 的方法论贡献可分解为三个相互协同的模块：
 1. **多维重新加权策略**：如何设计同时平衡解剖区域和罕见/长尾临床发现的采样策略，在维持定位精度的前提下进一步提升语义报告质量？
 2. **跨模态课程学习**：课程学习策略能否扩展至其他医学影像模态及多模态输入，并保持类似的提升效果？
 3. **细粒度发现平衡**：能否通过更细粒度的正面/负面发现平衡策略，在定位精度和报告文本指标之间取得更好的帕累托前沿？
+
+
 
 ## 原文 PDF
 

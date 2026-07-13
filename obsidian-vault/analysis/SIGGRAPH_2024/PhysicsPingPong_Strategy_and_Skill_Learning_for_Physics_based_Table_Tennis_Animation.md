@@ -32,7 +32,7 @@ claims:
 | 中文题名 | PhysicsPingPong：基于物理的乒乓球动画的策略与技能学习 |
 | 英文题名 | PhysicsPingPong Strategy and Skill Learning for Physics based Table Tennis Animation |
 | 会议/期刊 | SIGGRAPH 2024 |
-| Links | [paper](https://arxiv.org/abs/2407.16210) · [Project](https://jiashunwang.github.io/PhysicsPingPong/) · [arXiv](http://arxiv.org/abs/1712.00004) |
+| Links | [paper](https://arxiv.org/abs/2407.16210) · [Project](https://jiashunwang.github.io/PhysicsPingPong/) · [paper](http://arxiv.org/abs/1712.00004) |
 | Topic | #topic/vision_multimodal_applications/image_and_video_generation #topic/vision_multimodal_applications |
 | Method | PhysicsPingPong |
 | Dataset | Table Tennis Skill Evaluation, Ball Control Task, Agent-Agent Competition, Agent-Agent Cooperation |
@@ -42,7 +42,7 @@ claims:
 > - Ball Control Task 上，Avg Hits 10.93 vs ET 6.28 (+4.65 (74% increase))。
 > - Agent-Agent Competition (vs Random opponent) 上，Winning rate 0.687 vs RL ~0.5 (+0.187)。
 
-## 概述
+## 概要
 
 **PhysicsPingPong** (SIGGRAPH 2024) 提出一种面向物理仿真乒乓球动画的分层控制方法，同时解决**多样化技能学习**与**战术决策**两大难题。其核心动机在于：现有基于可重用技能嵌入的方法在技能差异细微时，容易在任务训练阶段出现**模式坍塌**——智能体仅在少数技能上探索，无法充分利用已学习的技能多样性，从而限制了强化学习的探索效率。
 
@@ -50,7 +50,7 @@ claims:
 
 实验表明，该方法在技能多样性得分上分别超出 **ASE** (Peng et al., SIGGRAPH 2022)、**CASE** (Dou et al., SIGGRAPH Asia 2023) 和 **ET** (Won et al., SIGGRAPH 2021) 30.7%、32.3% 和 9.4%，显著缓解了模式坍塌；在乒乓球对打任务中平均击球次数达 10.93 次（ET 为 6.28 次），落点分布更接近人类；策略控制器在对抗场景中取得 68.7% 胜率，经两次迭代优化后提升至 78%。
 
-## 背景与动机
+
 
 基于物理的角色动画旨在生成逼真且可控的运动，在游戏、影视和虚拟现实等领域具有重要应用。乒乓球作为一项高速、高技巧性的对抗运动，对动画系统提出了极高的要求：智能体不仅需要掌握多种击球技能（如正手攻球、反手推挡、正手扣杀等），还必须具备根据对手状态和来球轨迹进行实时战术决策的能力。构建一个既能执行多样化技能又能进行策略博弈的乒乓球动画系统，是该领域长期以来的核心挑战。
 
@@ -58,7 +58,9 @@ claims:
 
 上述瓶颈的根源在于：单一通用策略无法显式区分不同技能的运动特征，而技能切换机制又缺乏对过渡过程的精细控制。因此，本文的核心动机是设计一种新的分层控制架构，将技能执行的多样性与技能切换的平滑性进行解耦，从而从根本上缓解模式坍塌。在此基础上，进一步引入策略级控制器，使智能体能够根据实时博弈状态自主选择技能和目标落点，最终实现从底层运动生成到高层战术决策的完整闭环。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PhysicsPingPong 的核心创新在于构建了一套**分层解耦的控制架构**，将技能执行与战术决策彻底分离，从而同时解决了技能多样性保持和复杂决策学习两大难题。其关键创新点体现在以下三个“changed slots”上：
 
@@ -93,7 +95,7 @@ $$a = \varphi \odot \pi^u(\cdot | s, z^u) + (1 - \varphi) \odot \sum_{i=1}^{5} \
 
 PhysicsPingPong 的创新本质上是**将技能多样性和战术决策这两个耦合难题进行了架构层面的解耦**：技能层通过混合专家和平滑混合机制保证了运动的多样性与连贯性；策略层通过 CVAE 和迭代学习实现了对复杂博弈场景的适应性决策。这种“下层稳定执行，上层灵活决策”的分层设计，为物理仿真角色动画中的技能学习与策略规划提供了一套完整的解决方案。
 
-## 整体框架
+
 
 PhysicsPingPong 采用“策略-技能”双层分层控制架构，将乒乓球对打任务分解为高层决策与底层运动执行两个解耦的子问题。该设计直接回应了核心瓶颈：现有基于可重用技能嵌入的方法在技能差异细微时，容易在任务训练阶段出现模式坍塌，导致智能体仅在少数技能上进行探索。通过显式分离“何时使用何种技能”与“如何执行技能”，本方法实现了技能多样性与战术决策的独立优化。
 
@@ -125,7 +127,7 @@ PhysicsPingPong 采用“策略-技能”双层分层控制架构，将乒乓球
 
 技能级控制器训练完成并冻结权重后，开始训练策略级控制器。该控制器采用迭代行为克隆方法：首先收集专家数据训练初始策略，随后让策略与环境交互生成新数据，再通过行为克隆进行策略细化。这一迭代过程使策略能够在对抗和协作场景中持续优化决策质量。
 
-## 核心模块与公式推导
+
 
 ### 技能级控制器：三层递进训练
 
@@ -174,7 +176,9 @@ $$\sum_{k=1}^{K} ||c_{k}^{\mathrm{expert}} - c_{k}'|| + \beta_{KL} D_{KL}(Q(u|\m
 
 第一项为技能指令与目标落点的重构误差，第二项为隐变量后验分布与标准正态先验的 KL 散度。训练采用迭代行为克隆：初始用人类对打数据训练 CVAE，随后让智能体与自身对打收集新数据，将胜者的决策作为专家轨迹进行下一轮克隆，逐步优化策略。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 技能学习评估
 
@@ -235,7 +239,9 @@ $$\sum_{k=1}^{K} ||c_{k}^{\mathrm{expert}} - c_{k}'|| + \beta_{KL} D_{KL}(Q(u|\m
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2407_16210/figures/010_Table_3.jpg]]
 *Table 3: Strategy evaluation. We report the winning rates for the competition setting and average rounds for the cooperation setting*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与设计动机
 
@@ -288,6 +294,8 @@ PhysicsPingPong 的设计存在明确的适用边界：
 1. **大规模技能扩展**：如何将混合专家架构扩展到包含数百种不同技能的数据集，同时保持技能间可区分性和计算效率？
 2. **物理真实性增强**：如何引入马格努斯效应等高级物理现象，以获得更真实的球轨迹和相应的战术策略？
 3. **策略泛化**：如何在无需大量额外训练的前提下，使策略控制器泛化到未见过的对手风格和比赛场景？
+
+
 
 ## 原文 PDF
 

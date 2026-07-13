@@ -5,6 +5,8 @@ paper_level: A
 venue: AAAI
 year: 2025
 pdf_ref: paperPDFs/AAAI_2025/CustomTTT_Motion_and_Appearance_Customized_Video_Generation_via_Test_Time_Training.pdf
+project_link: null
+code_link: https://github.com/RongPiKing/CustomTTT
 aliases:
 - CustomTTT
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | CustomTTT：基于测试时训练的运动与外观定制视频生成 |
 | 英文题名 | CustomTTT: Motion and Appearance Customized Video Generation via Test-Time Training |
 | 会议/期刊 | AAAI 2025 |
-| Links | [paper](https://arxiv.org/abs/2412.15646); [GitHub](https://github.com/RongPiKing/CustomTTT) |
+| Links | [paper](https://arxiv.org/abs/2412.15646) · [GitHub](https://github.com/RongPiKing/CustomTTT) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | CustomTTT |
 | Dataset | Customization Benchmark (13 objects + 18 motions), User Study (11 participants, 440 opinions) |
@@ -40,7 +42,7 @@ claims:
 > - Customization Benchmark (13 objects + 18 motions) 上，CLIP-I ↑ 为 0.712，对比 0.687 (Full LoRA)，变化 +0.025。
 > - Customization Benchmark (13 objects + 18 motions) 上，Temporal Consistency ↑ 为 0.978，对比 0.977 (Full LoRA)，变化 +0.001。
 
-## 概述
+## 概要
 
 **核心问题**：在视频扩散模型中同时定制来自不同参考的外观和运动概念时，直接将独立训练的 LoRA 适配器合并到单一网络会导致严重的视觉伪影与概念冲突。
 
@@ -52,7 +54,7 @@ claims:
 
 **局限性**：当外观与运动参考差异较大时定制效果可能下降；当前推理分辨率较低（256×256），小物体视频生成质量受限；方法依赖 AnimateDiff 骨干网络，向其他架构的迁移尚待验证。
 
-## 背景与动机
+
 
 ### 问题背景：多概念视频定制的核心矛盾
 
@@ -86,7 +88,9 @@ claims:
 2. **个体 LoRA 训练**：分别在空间关键层（ΔW_s^{2,6}）和时间关键层（ΔW_t^{2,5}）上训练外观和运动 LoRA。
 3. **测试时训练**：合并两个 LoRA 后，在推理阶段进行少量步骤的微调，利用从单概念模型蒸馏的噪声预测作为监督信号，消除直接组合带来的伪影，提升文本-视频对齐度。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CustomTTT 的核心创新在于揭示并利用视频扩散模型中外观与运动的**层间解耦特性**，通过“选择性适配 + 蒸馏式融合”的两阶段策略，解决多概念联合定制时的权重冲突问题。
 
@@ -132,7 +136,7 @@ CustomTTT 通过提示嵌入替换实验（受 Frenkel et al., 2025 启发），
 
 综上，CustomTTT 的创新本质在于：通过层间重要性分析发现外观与运动的解耦机制，并据此设计选择性适配与蒸馏式融合策略，以极少的可训练参数（12.12M，远低于 Full LoRA 的 28.26M 和 DreamVideo 的 85.00M）实现了高质量的多概念联合定制。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l19_CustomTTT_Motion_and_Appearance_Customized_Video_Generation_via_Test_Tim/figures/002_Figure_2.jpg]]
 *Figure 2: The overall pipeline. We first train the LoRAs on the specific layers for appearance (a) and motion (b) customization individually. Then, we design a test-time training method to further improve the results when combining*
@@ -175,7 +179,7 @@ $$E_{z_0, c, \epsilon \sim \mathcal{N}(0, I), t \sim \mathcal{U}(0, T)} [|| \eps
 4. **阶段三**：合并两个 LoRA 到基模型（AnimateDiff），以单概念模型为教师进行测试时训练，联合优化外观保持损失和时序保持损失。
 5. **输出**：同时具备目标外观和运动模式的定制化视频。
 
-## 核心模块与公式推导
+
 
 ### 3.1 基础扩散模型与 LoRA 适配
 
@@ -227,7 +231,9 @@ $$\mathcal{L}_{tp} = || \phi(\epsilon'') - \phi(\epsilon_{\theta}(z_{f+1}^t, \ta
 
 测试时训练的总损失为 $\mathcal{L}_{ap} + \mathcal{L}_{tp}$，仅需 30 步训练即可达到最佳效果（Figure 9）。空间 LoRA 和时间 LoRA 被放置在不同层中，这一设计从根本上缓解了直接合并权重时的冲突问题。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -271,7 +277,9 @@ CustomTTT 在包含 13 个外观对象和 18 种运动模式的联合定制基�
 
 **Figure 8 和 Figure 9** 共同刻画了测试时训练阶段的超参数敏感性：f=5 的参考潜在变量采样和 30 步的训练迭代构成了最优配置，偏离这些设置会导致对齐度下降或伪影引入。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与设计动机
 
@@ -304,6 +312,8 @@ CustomTTT 在包含 13 个外观对象和 18 种运动模式的联合定制基�
 3. **高分辨率与长序列扩展**：在更高分辨率（>256）和更长序列（>16 帧）设置下，合并 LoRA 与测试时训练的性能变化规律尚不明确。分辨率提升可能改变层重要性的分布，长序列则可能对时序保持损失的设计提出更高要求。
 
 4. **运动层选择的实际偏差**：分析阶段识别的运动关键层为 i=2 和 i=4，但实际训练中使用了邻近层 i=2 和 i=5。文中未解释这一偏差的原因及其对运动定制质量的定量影响，该设计选择的理论依据有待补充。
+
+
 
 ## 原文 PDF
 

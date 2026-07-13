@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2024
 pdf_ref: paperPDFs/arxiv_2024/Cinemo_Consistent_and_Controllable_Image_Animation_with_Motion_Diffusion_Models.pdf
+project_link: https://maxin-cn.github.io/cinemo\_project
+code_link: null
 aliases:
 - Cinemo
 tags:
@@ -41,7 +43,7 @@ claims:
 > - UCF-101 上，FVD 168.16；IS 58.71；FID 13.17。
 > - MSR-VTT 上，FVD 93.51；CLIPSIM 0.2858。
 
-## 概述
+## 概要
 
 **核心问题**：图像动画（image animation）任务要求从单张静态图像和文本提示生成连贯的动态视频。现有方法面临两个相互耦合的瓶颈——**细粒度视觉一致性**难以保持（物体形状、纹理、背景在帧间出现失真），以及**运动可控性**不足（生成的运动模式与文本提示脱节或出现不期望的全局移动）。
 
@@ -56,8 +58,6 @@ claims:
 
 **局限与开放问题**：当前模型受限于 LaVie 架构的能力边界，仅支持 16 帧、320×512 分辨率的视频生成；向 Transformer 架构（如 Latte）迁移、扩展到更长视频和更高分辨率，以及验证 DCTInit 和运动强度控制策略在其他视频扩散模型上的泛化性，是值得探索的方向。
 
-## 背景与动机
-
 图像动画任务旨在将一幅静态图像与一段文本提示相结合，生成一段时间连贯且语义匹配的动态视频。该任务在影视特效、虚拟数字人、交互式内容创作等领域具有广泛的应用前景。然而，现有方法在同时满足**视觉一致性**（保持输入图像的形状、纹理、背景等细粒度信息）和**运动可控性**（精确响应文本提示所描述的运动模式）方面仍面临显著挑战。
 
 当前的主流基线方法（如 **PIA**、**SEINE**、**DynamiCrafter** 等）在图像动画生成中暴露出两类典型失效模式。如 Figure 1 所示，当给定“风车转动”的文本提示时，PIA 生成的视频帧之间出现明显的颜色和纹理差异，破坏了视觉一致性；SEINE 则将整个房屋连同风车一起移动，未能精确响应文本提示中仅“风车”应转动的语义约束，导致运动偏差。这些案例揭示了现有方法的共同瓶颈：**难以在保持输入图像细粒度视觉特征的同时，生成与文本提示精确对齐的运动模式**。
@@ -69,7 +69,7 @@ claims:
 
 针对上述问题，**Cinemo** 提出了三个核心设计思路：通过**运动残差学习**替代直接帧预测，将模型的学习目标从“重建画面”转变为“建模变化”，从而在因果层面缓解细节丢失问题；引入基于**结构相似度（SSIM）的运动强度控制**机制，使用户能够精细调节生成视频的运动幅度；设计**DCTInit 推理噪声初始化策略**，利用离散余弦变换的低频系数为推理过程提供输入图像的结构先验，有效抑制运动突变。这三个设计分别对应训练目标、可控性接口和推理策略三个关键环节，共同构成了一个面向一致且可控图像动画的系统性解决方案。
 
-## 核心创新
+## 核心方法与创新机理
 
 Cinemo 的核心创新在于将图像动画问题分解为三个因果性子问题，并分别设计针对性的机制加以解决，从而在保持输入静态图像细粒度视觉一致性的同时，实现对运动模式的精确响应。
 
@@ -113,8 +113,6 @@ $$\mathcal{L}_{final} = \mathbb{E}_{\mathbf{z} \sim p(z), \epsilon \sim \mathcal
 
 这三个创新点形成了协同效应：运动残差学习保证了内容一致性，SSIM 强度控制提供了用户可控的运动幅度，DCTInit 则在推理阶段进一步稳定了时间连续性。三者共同构成了 Cinemo 相对于现有图像动画方法的根本性改进。
 
-## 整体框架
-
 Cinemo 的整体流程遵循“训练阶段学习运动残差分布 + 推理阶段精细化噪声初始化”的双阶段设计，其核心架构如图 2 所示。模型接收一张静态 RGB 图像与一段文本提示作为输入，输出一段与图像内容一致且与文本语义对齐的动画视频。
 
 **潜空间编码与运动残差计算。** 给定输入视频帧序列 $\mathbf{V} = \{x_1, x_2, \dots, x_N\}$，首先通过预训练的 VAE Encoder 将所有帧压缩至潜空间，得到潜变量序列 $\mathbf{Z} = \{z_1, z_2, \dots, z_N\}$。与传统方法直接预测后续帧不同，Cinemo 计算运动残差 $\mathbf{M} = \{z_2 - z_1, z_3 - z_1, \dots, z_N - z_1\}$，即每一帧潜变量与第一帧潜变量的差值。这一设计的因果逻辑在于：模型只需学习帧间的变化量，而非重建完整的帧内容，从而将第一帧的细粒度视觉信息（纹理、形状、背景）天然保留在最终输出中，缓解内容失真问题。
@@ -139,8 +137,6 @@ $$\mathcal{L}_{final} = \mathbb{E}_{\mathbf{z} \sim p(z), \epsilon \sim \mathcal
 
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2407_15642/figures/002_Figure_2.jpg]]
 *Figure 2: Model pipeline overview. During training, instead of predicting the subsequent frames directly, our model learns the distribution of motion residuals, while providing effective motion intensity control. The details of the training procedure can be seen in Algorithm. 1. During inference, we use Discrete Cosine Transformation to extract low-frequency components to refine the inference noise, which can stabilize the generation process of image animation*
-
-## 核心模块与公式推导
 
 ### 3.1 运动残差学习（Motion Residual Learning）
 
@@ -177,7 +173,7 @@ $$\epsilon' = IDCT(D_{z_1^{\tau}}^L + D_{\epsilon}^H)$$
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2407_15642/figures/003_Figure_3.jpg]]
 *Figure 3: Influence of the FFT and DCT decomposition. The prompt is*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -224,15 +220,7 @@ Cinemo在UCF‑101和MSR‑VTT两个标准基准上进行了系统评估，与**
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2407_15642/figures/004_Figure_4.jpg]]
 *Figure 4: Qualitative visual comparisons between the baselines and our model. We compare our approach with both closed-source commercial tools and research works. “Girl smiling” means the used prompt when the method accepts it. Best viewed with Acrobat Reader. Please click the image to view the animated videos*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2407_15642/figures/001_Figure_1.jpg]]
-*Figure 1: Explanations of image consistency and motion controllability. Frames in (b) and (c) are image animation results obtained from PIA [21] and SEINE [31], respectively. We use “windmill turning” as the text descriptions. (b) The frames show clear differences in color and texture. In (c), the entire house is moving, which does not match the information provided in the textual prompt*
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2407_15642/figures/009_Figure_8.jpg]]
-*Figure 8: Motion transfer/Video editing results. Our model can easily extend to other applications. Best viewed with Acrobat Reader. Please click the image to view the animated videos*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 在图像动画与视频扩散模型谱系中的位置
 

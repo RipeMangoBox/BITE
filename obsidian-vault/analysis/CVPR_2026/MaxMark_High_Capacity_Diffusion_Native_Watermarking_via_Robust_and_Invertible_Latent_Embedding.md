@@ -42,7 +42,7 @@ claims:
 > - Stable Diffusion v1.5 上，Bit Accuracy (clean) @ 16384 bits 95.4% vs ~49.4% (best baseline) (+46% improvement)；FID @ 16384 bits 41.8 vs comparable to no-watermark baseline (no significant degradation)。
 > - Stable Diffusion v1.5, multiple payloads 上，Bit Accuracy improvement over baselines MaxMark vs Gaussian Shading / PRC Watermark (12% / 45% / 46% at 8,192 / 12,288 / 16,384 bits)。
 
-## 概述
+## 概要
 
 **MaxMark** 是发表于 CVPR 2026 的一种高容量扩散原生水印方法，旨在解决现有潜空间水印方案在大容量嵌入时面临的核心瓶颈：对潜噪声的扰动破坏了潜在扩散模型（LDM）的高斯先验分布，导致生成图像质量急剧下降，从而严重限制了有效载荷的提升空间。
 
@@ -51,8 +51,6 @@ claims:
 **主要结果**：在 Stable Diffusion V1.5 上，MaxMark 在 16,384 bits 有效载荷下实现 95.4% 的比特准确率，相对最优基线（约 49.4%）提升约 46 个百分点，且图像质量（FID 41.8）与无水印基线相当。消融实验表明，移除分布变换模块后，1,024 bits 时 FID 从 42.0 急剧升高至 388.4，直接验证了分布保持对图像质量的关键作用。
 
 **方法定位**：与 **Gaussian Shading**（Yang et al., CVPR 2024）和 **PRC Watermark**（Gunn et al., 2025）等基于潜空间的基线方法相比，MaxMark 在嵌入策略（符号位覆盖 vs. 通用扰动）、分布保持机制（显式 INN 映射 vs. 无显式变换）和纠错码方案（Reed-Solomon + 自动搜索 vs. 伪随机码/手工设定）三个关键维度上进行了系统性改进。
-
-## 背景与动机
 
 潜扩散模型（Latent Diffusion Models, LDMs）已成为生成高保真图像的主流范式，其生成内容的溯源与版权保护需求日益迫切。扩散原生水印（Diffusion-Native Watermarking）将水印直接嵌入扩散过程的潜空间中，使水印信息随生成过程自然传播，从而在不改变推理管线的前提下实现内容溯源。然而，现有方法面临一个根本性瓶颈：**大容量嵌入时，对潜空间的扰动破坏了LDM所依赖的高斯先验分布，导致图像质量严重下降**。
 
@@ -64,7 +62,7 @@ claims:
 
 在 Stable Diffusion V1.5 上，MaxMark 在 16,384 bits 有效载荷下实现 95.4% 的比特准确率，相对最优基线提升 46%，且图像质量（FID 41.8）与无水印基线相当。移除分布变换模块后，仅 1,024 bits 时 FID 便从 42.0 急剧升高至 388.4，验证了分布保持对图像质量的关键作用。
 
-## 核心创新
+## 核心方法与创新机理
 
 MaxMark 的核心创新在于将高容量扩散原生水印重新定义为一个**分布保持问题**，通过三个紧密协作的“changed slots”突破了现有潜空间水印方法在大容量嵌入时图像质量与提取精度不可兼得的瓶颈。
 
@@ -110,8 +108,6 @@ RS 码的优势在于其确定性的纠错能力和灵活的参数配置（可�
 
 需要注意的是，MaxMark 的水印容量仍受限于潜空间维度（$4 \times 64 \times 64$），且论文仅在 Stable Diffusion V1.4/V1.5/V2.1 上验证了方法，其在不同 LDM 架构（如 SDXL）上的泛化能力仍需进一步验证。此外，针对基于梯度的自适应攻击的鲁棒性尚未评估，这是实际部署中需要关注的安全边界。
 
-## 整体框架
-
 MaxMark 的整体 pipeline 由两个协同工作的核心模块构成：**鲁棒水印嵌入模块**与**分布变换模块**。其设计目标是在潜扩散模型的原生潜空间中实现高容量水印嵌入，同时不破坏扩散过程所依赖的高斯先验分布，从而兼顾水印容量与生成图像质量。
 
 ### 数据流与模块关系
@@ -140,11 +136,6 @@ MaxMark 的整体 pipeline 由两个协同工作的核心模块构成：**鲁棒
 INN 的训练仅需前向过程，通过最小化最大似然估计损失与 KL 散度的加权和来匹配标准高斯分布，无需扩散模型的反向传播。推理时，嵌入与提取均依赖 INN 的完全可逆性，保证了信息的精确恢复。
 
 ### 补充图表
-
-![[assets/figures/papers/paper_list_l898_https_openaccess_thecvf_com_content_CVPR2026_html_Chang_MaxMark_High_Cap/figures/002_Figure_2.jpg]]
-*Figure 2: The deployment scenario of latent-based diffusion-native watermark. The watermark information is embedded into the latent space. This embedding propagates through the diffusion process and inversion process for watermark extraction*
-
-## 核心模块与公式推导
 
 MaxMark由两个协同工作的核心模块构成：**鲁棒水印嵌入模块**与**分布变换模块**，二者共同解决高容量水印嵌入与图像质量保持之间的矛盾。
 
@@ -192,7 +183,7 @@ $$\mathcal { L } _ { t o t a l } = \mathcal { L } _ { M L E } ( z , J ) + \lambd
 ![[assets/figures/papers/paper_list_l898_https_openaccess_thecvf_com_content_CVPR2026_html_Chang_MaxMark_High_Cap/figures/007_Figure_4.jpg]]
 *Figure 4: Impact of the Distribution Transformation Module on Image Quality*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主结果：高容量水印的有效性与图像质量
 
@@ -240,7 +231,7 @@ MaxMark的方法不仅限于图像生成。Table 7和Table 8分别展示了在�
 ![[assets/figures/papers/paper_list_l898_https_openaccess_thecvf_com_content_CVPR2026_html_Chang_MaxMark_High_Cap/figures/013_Table_8.jpg]]
 *Table 8: Audio modality performance on bit accuracy (%), across different watermark payload sizes*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 潜空间水印路线的演进与MaxMark的定位
 

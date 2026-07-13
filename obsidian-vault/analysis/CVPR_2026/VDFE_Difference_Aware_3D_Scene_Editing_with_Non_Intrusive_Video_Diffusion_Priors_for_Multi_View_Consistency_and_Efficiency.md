@@ -44,7 +44,7 @@ claims:
 > - 3D Editing User Study 上，User Study↑ 37.14% vs 所有对比方法中最优 (最高得票率)。
 > - FiVE Video Editing (Table 2) 上，Structure Dist.×10³↓ 5.32 vs 所有对比方法中最优 (最优)。
 
-## 概述
+## 概要
 
 **瓶颈与动机** 现有3D场景编辑方法普遍依赖图像扩散模型，缺乏对时空一致性的显式建模，导致多视角编辑结果出现几何错位与语义漂移。同时，基于交叉注意力图或Lang-SAM等分割模型的编辑区域定位方式精度不足、边界模糊，进一步削弱了编辑的可控性。这些局限使得高保真、多视角一致的3D编辑难以实现。
 
@@ -54,7 +54,7 @@ claims:
 
 **主要结果** 在3D编辑任务中，VDFE在A-LPIPS（0.2316）、MEt3R（0.0668）及用户调研得票率（37.14%）上均达到最优（Table 1），全面超越**GaussianEditor**（Chen et al., CVPR 2024）、**EditSplat**（Lee et al., CVPR 2025）、**VcEdit**（Wang et al., ECCV 2025）等基线方法。在FiVE视频编辑基准上，FlowOCE+DFD同样取得最佳Structure Dist.（5.32×10³）与PSNR（29.43），验证了视频扩散先验在编辑任务中的有效性（Table 2）。消融实验表明，DAGE模块对性能提升贡献最大，缺少DAGE会导致细节丢失及非编辑区域的无意修改（Fig. 5, Table 3）。
 
-## 背景与动机
+
 
 3D场景编辑旨在根据文本指令对预重建的3D场景进行语义修改，同时保持非编辑区域的完整性与多视角几何一致性。随着3D高斯泼溅（3D Gaussian Splatting, 3DGS）作为显式场景表示方法的成熟，围绕3DGS的编辑技术迅速发展。然而，现有方法面临两个核心瓶颈：
 
@@ -66,7 +66,9 @@ claims:
 
 针对上述问题，VDFE提出了一种全新的解决思路：**将多视角3D编辑重构为伪视频编辑问题**，通过非侵入式地利用预训练视频扩散模型固有的帧间一致性先验，从根源上解决多视角一致性问题。同时，引入基于解耦流差异（Decoupled Flow Difference, DFD）的无需训练精确定位机制，以及差异感知高斯编辑（Difference-Aware Gaussians Editing, DAGE）的选择性优化策略，实现高保真、高效率的3D场景编辑。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 VDFE的核心创新在于将3D场景多视角编辑**重新定义为伪视频编辑问题**，并以**非侵入式**方式利用预训练视频扩散先验，系统性地解决了现有方法在时空一致性与编辑可控性上的瓶颈。其创新架构由三个紧密协同的模块构成，对应三个关键的**changed slots**：
 
@@ -107,7 +109,7 @@ $$
 
 消融实验证实，DAGE模块对整体性能提升贡献最大——缺少DAGE会导致非编辑区域出现扭曲和细节丢失，而完整VDFE方法实现了精确且符合文本指令的编辑（Fig. 5, Table 3）。
 
-## 整体框架
+
 
 VDFE 的整体流水线围绕一个核心洞察构建：将多视角 3D 场景编辑重新定义为**伪视频编辑**，从而充分利用预训练视频扩散模型（Video Diffusion Models, VDMs）固有的帧间一致性先验。如图 2(a) 所示，该方法包含四个串联的功能模块，形成从场景渲染到 3D 高斯精炼的闭环：
 
@@ -134,7 +136,7 @@ VDFE 的整体流水线围绕一个核心洞察构建：将多视角 3D 场景�
 ![[assets/figures/papers/paper_list_l2272_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_VDFE_Difference/figures/001_Figure_1.jpg]]
 *Figure 1: Results of VDFE. By leveraging video diffusion priors for multi-view consistent editing and precise localization, our method efficiently optimizes 3D Gaussian Splatting models to achieve realistic, fine-grained, and flexible scene editing. The superiority of our results on both 3D and video editing tasks validates its effectiveness*
 
-## 核心模块与公式推导
+
 
 VDFE 将多视角 3D 编辑重构为伪视频编辑，通过三个核心模块协同工作：**FlowOCE**（最优控制引导的流编辑）生成噪声无关的编辑轨迹，**DFD**（解耦流差异）实现无需训练的细粒度定位，**DAGE**（差异感知高斯编辑）对 3DGS 模型进行选择性优化。以下逐一展开各模块的动机、公式与变量含义。
 
@@ -243,7 +245,9 @@ $$
 ![[assets/figures/papers/paper_list_l2272_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_VDFE_Difference/figures/003_Figure.jpg]]
 *Figure: Replace this wooden table with a marble round table*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 3D场景编辑主实验
 
@@ -282,7 +286,9 @@ DAGE的有效性源于其两阶段设计：参数扰动（Parameter Perturbation
 ![[assets/figures/papers/paper_list_l2272_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_VDFE_Difference/figures/004_Figure_4.jpg]]
 *Figure 4: Qualitative Comparisons. Our method provides more intense and precise editing compared to other baselines. The leftmost column shows source images, while the right columns show rendering images from edited 3DGS. In each corner of the images, we include different views of the corresponding image to compare multi-view consistency*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有3D编辑方法的关系
 
@@ -333,6 +339,8 @@ DAGE模块通过参数扰动和梯度分配实现了对核心高斯的精准优�
 2.  **非侵入式定位策略的泛化**：DFD模块的无需训练定位机制本质上利用了扩散模型特征空间中的语义偏移特性。这一策略是否可推广到其他生成式编辑任务，如3D生成过程中的局部控制、运动迁移中的区域指定，甚至超越视觉领域的序列编辑任务？
 
 3.  **编辑一致性的理论边界**：VDFE通过视频扩散先验隐式地建模多视角一致性，但缺乏对一致性程度的显式量化与保证。在极端视角变化或长序列编辑场景下，一致性的理论下界是什么？能否通过引入显式的几何约束（如对极几何）来补充视频先验的隐式约束？
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Train_before_Test_Harmonizes_Language_Model_Rankings.pdf
+project_link: null
+code_link: https://github.com/socialfoundations/lm-harmony
 openreview_forum_id: ORv3SAzus1
 aliases:
 - TBT
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 先训练后测试统一语言模型排名 |
 | 英文题名 | Train-before-Test Harmonizes Language Model Rankings |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=ORv3SAzus1); [GitHub](https://github.com/socialfoundations/lm-harmony) |
+| Links | [paper](https://openreview.net/forum?id=ORv3SAzus1) · [GitHub](https://github.com/socialfoundations/lm-harmony) |
 | Topic | #topic/benchmarks_datasets_evaluation #topic/benchmarks_datasets_evaluation/benchmark_eval |
 | Method | train-before-test |
 | Dataset | 24 个基准平均, NQ-Open 与其他基准平均, 困惑度 vs 下游平均, 所有模型 PC1 解释方差 |
@@ -42,7 +44,7 @@ claims:
 > - NQ-Open 与其他基准平均 上，Kendall's τ 为 0.74，对比 0.23，变化 +0.51。
 > - 困惑度 vs 下游平均 上，Kendall's τ 为 0.74，对比 0.48，变化 +0.26。
 
-## 概述
+## 概要
 
 当前语言模型评估面临一个根本性困境：直接评估（zero-shot 或 few-shot）下，不同基准给出的模型排名相互矛盾，即使同属问答类别的基准之间排名一致性也较低。这一瓶颈的根源并非模型能力本身不可比较，而是各模型在预训练阶段对特定任务数据的暴露程度不同，导致它们在评估时的“预备程度”参差不齐。
 
@@ -59,7 +61,7 @@ claims:
 
 **局限与待解决问题：** 微调增加了评估成本；部分基准不再公开训练数据，或商业模型不允许微调，限制了方法适用范围。排名一致性仍未达到完美，残差可能源于 PEFT 的适应局限或不可约的测量噪声。YI 家族改善有限的原因、以及如何设计更轻量的 train-before-test 变体，仍需进一步探索。
 
-## 背景与动机
+
 
 语言模型评估的核心挑战在于：不同基准给出的模型排名往往相互矛盾。即使两个基准测试的是同一类能力，模型在它们上的表现排名也可能大相径庭。例如，在 Natural Questions Open 和 ARC Challenge 这两个问答基准上，直接评估下 61 个模型的排名存在显著分歧——统计上不可调和的反转随处可见（Figure 1 上半部分）。这种不一致性并非个例：在所有 24 个基准中，直接评估的成对排名一致性（Kendall's τ）平均仅为 0.52，且同类任务内部的排名一致性同样偏低。
 
@@ -69,7 +71,9 @@ claims:
 
 **本文的动机**由此明确：如果能在评估之前消除模型间任务预备程度的差异，是否就能获得稳定、一致的模型排名？换言之，是否存在一个单一的“模型潜力”因素，能够在跨基准的标准化评估中被可靠地捕捉？这一动机驱动了 train-before-test 方法的提出——在评估前对每个模型进行统一的基准特定微调，使所有模型以同等准备状态进入测试，从而将评估焦点从“当前表现”转向“可挖掘潜力”。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于提出 **train-before-test** 评估范式：在评估前对每个模型进行统一的基准特定微调，从而消除因预训练数据差异导致的任务预备程度不同，挖掘模型的真实潜力。
 
@@ -97,7 +101,7 @@ claims:
 
 Few-shot 直接评估（平均 τ=0.61）虽能在一定程度上提高排名一致性，但其效果远逊于 train-before-test（τ=0.76），且仅在 89% 的基准对上优于 5-shot 直接评估。Few-shot 提供的是上下文示例，而 train-before-test 通过参数更新使模型真正适应任务分布，两者的机制本质不同。
 
-## 整体框架
+
 
 train-before-test 的核心主张是：**在评估前，通过统一的基准特定微调消除模型对任务预备程度的差异，从而挖掘模型潜力并实现跨基准排名的一致性**。该框架由三个顺序模块构成：微调模块、评估模块和排名度量模块。
 
@@ -129,7 +133,7 @@ train-before-test 的核心主张是：**在评估前，通过统一的基准特
 
 框架的最终输出不仅是排名一致性指标，还包括对模型得分矩阵的 PCA 分解——在 train-before-test 条件下，第一主成分可解释 86% 的方差（所有模型），在 Qwen 家族内更高达 93%，表明模型潜力主要由单一潜在因素主导，且该因素与预训练计算量正相关。
 
-## 核心模块与公式推导
+
 
 ### 关键模块
 
@@ -147,7 +151,9 @@ train-before-test 方法的核心流程由三个模块串联构成，其设计�
 
 由于论文未提供自定义的公式推导，此处仅记录其使用的标准统计量，不做公式猜测。若需精确的 Kendall's τ 定义或 PCA 分解形式，可参考原始文献（Kendall, 1938）及标准多元统计教材。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -226,7 +232,9 @@ train-before-test 方法的核心流程由三个模块串联构成，其设计�
 ![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_ORv3SAzus1/figures/022_Table_8.jpg]]
 *Table 8: Explained variance ratios for the top five principal components of the score matrix for each model family, under direct evaluation and train-before-test, respectively*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法定位：从“直接评估”到“标准化潜力评估”
 
@@ -273,6 +281,8 @@ Few-shot 直接评估（平均 τ=0.61）虽较 zero-shot 有所提升，但仅�
 3. **Yi 家族异常**：为何 Yi 家族在 train-before-test 下改善有限？这是否暗示该家族模型潜力本身高度同质化，还是存在其他未被控制的混淆因素？
 4. **轻量化变体设计**：能否通过更高效的微调策略（如更少 epoch、更小学习率搜索空间、或 adapter 共享）降低计算成本，同时保持排名一致性的提升效果？
 5. **指令微调模型的特殊性**：对于 instruction-tuned 模型，预微调困惑度与微调后下游排名的相关性较弱（平均 τ=0.51），表明指令微调过程可能引入了额外的、与预训练质量不完全对齐的变异来源。这一现象的机制尚待深入探究。
+
+
 
 ## 原文 PDF
 

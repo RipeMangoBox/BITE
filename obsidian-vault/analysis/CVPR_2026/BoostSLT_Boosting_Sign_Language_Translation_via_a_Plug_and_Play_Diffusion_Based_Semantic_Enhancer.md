@@ -41,7 +41,7 @@ claims:
 > - PHOENIX-2014T (macro average over backbones) 上，BLEU-4 27.11 vs 18.48 (+8.63)；ROUGE-L 54.38 vs 45.68 (+8.70)。
 > - CSL-Daily (macro average over backbones) 上，BLEU-4 26.60 vs 18.83 (+7.77)；ROUGE-L 53.37 vs 45.03 (+8.34)。
 
-## 概述
+## 概要
 
 手语翻译（Sign Language Translation, SLT）旨在将连续手语视频直接转换为自然语言文本，是连接听障群体与健听社会的重要桥梁。近年来，无gloss监督的SLT方法取得了显著进展，但现有系统在长序列或篇章级输入上性能急剧下降——其根本瓶颈在于自回归解码机制：早期预测错误会沿时间步逐步累积并传播至整个序列，导致语义漂移和输出不连贯。同时，依赖gloss标注的方法需要昂贵的手工对齐，难以规模化。针对这一核心问题，**BoostSLT** 提出了一种即插即用的扩散语义增强框架，无需修改任何SLT backbone即可显著提升翻译质量。
 
@@ -49,7 +49,7 @@ BoostSLT的方法论围绕两个关键创新展开：**Energy-Aware Temporal Seg
 
 在实验验证方面，BoostSLT在三个公开数据集（PHOENIX-2014T、CSL-Daily、Auslan-Daily）上，跨多种backbone（包括TwoStreamNetwork、MMTLB、GASLT、CV-SLT、Sign2GPT等）均取得了一致且显著的提升。在PHOENIX-2014T上，宏观平均提升达 **+8.63 BLEU-4** 和 **+8.70 ROUGE-L**；在CSL-Daily上，宏观平均提升达 **+7.77 BLEU-4** 和 **+8.34 ROUGE-L**。消融实验进一步证实，EAT-Seg与DSR的组合是实现最佳性能的关键——仅使用随机分段且无DSR时，BLEU-4骤降至8.03，凸显了两个模块的协同必要性。
 
-## 背景与动机
+
 
 手语翻译（Sign Language Translation, SLT）旨在将连续手语视频直接转换为自然语言文本，是实现聋听无障碍沟通的关键技术。近年来，无gloss监督的SLT方法取得了显著进展，代表性工作包括 **TwoStreamNetwork**（Chen et al., NeurIPS 2022）、**MMTLB**（Chen et al., CVPR 2022）、**GASLT**（Yin et al., CVPR 2023）以及 **Sign2GPT**（Wong et al., arXiv 2024）等。这些方法摆脱了对昂贵手语标注（gloss）的依赖，降低了数据获取成本，但在实际应用中仍面临严峻挑战。
 
@@ -59,7 +59,9 @@ BoostSLT的方法论围绕两个关键创新展开：**Energy-Aware Temporal Seg
 
 BoostSLT正是针对上述缺口提出的解决方案。其核心动机在于两点：第一，**连续手语视频中手部运动能量的波动天然蕴含语义边界信息**，可被利用来自动切分长序列为短语义单元，从而将长文本翻译分解为多个局部翻译任务；第二，**扩散模型的迭代去噪机制天然具备全局并行优化的能力**，可以在保留各短单元局部翻译准确性的同时，从整体上重构连贯流畅的完整文本。这一“分而治之、全局融合”的策略，从机制层面绕开了自回归解码的错误传播路径，为提升长文本SLT质量提供了新的技术路线。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 BoostSLT 的核心创新在于用两个即插即用模块重构了手语翻译（SLT）的生成范式，从根本上解决了自回归解码的错误累积与长序列语义漂移问题。相较于现有 gloss‑free SLT 骨架（如 **TwoStreamNetwork** (Chen et al., NeurIPS 2022)、**MMTLB** (Chen et al., CVPR 2022)、**GASLT** (Yin et al., CVPR 2023)、**CV‑SLT**、**Sign2GPT** (Wong et al., arXiv 2024)）所采用的自回归逐词生成范式，BoostSLT 在以下两个关键 slot 上做出了根本性改变。
 
@@ -77,7 +79,7 @@ BoostSLT 的核心创新在于用两个即插即用模块重构了手语翻译�
 
 上述两个模块以松耦合方式嵌入现有 SLT 流程：EAT‑Seg 作为预处理阶段，将长视频切分为短片段；**Modular Sign2Text Translation** 作为可替换的翻译骨架，将每个片段独立翻译为文本片段；DSR 作为后编辑阶段，将片段文本融合为全局连贯的完整句子。这种设计使 BoostSLT 无需修改任何 backbone 模型即可即插即用，确保了对比的公平性，同时为不同 SLT 骨架提供了统一的性能提升路径。
 
-## 整体框架
+
 
 BoostSLT 采用“分割—独立翻译—全局语义重建”三阶段流水线，将长手语视频转换为连贯的书面文本。整体流程如 Figure 2 所示，核心设计思想是：**先利用无监督的运动能量信号将长序列切分为短语义单元，再对各单元独立翻译，最后通过扩散模型的并行迭代去噪将片段文本融合为全局流畅的段落**。
 
@@ -136,7 +138,7 @@ $$x_{0} = \mathrm{Encode}(\{ \hat{T}_{m} \}), \quad x_{t} \sim q(x_{t} | x_{t-1}
 
 整个流水线的关键优势在于：**EAT-Seg 切断了自回归解码中的错误传播链**，将长序列问题转化为多个短序列问题；**DSR 则从局部翻译锚点出发，通过并行全局优化恢复跨分段的语义连贯性**，从而在无需 gloss 标注的条件下显著提升长文本手语翻译的质量。
 
-## 核心模块与公式推导
+
 
 BoostSLT 的核心设计围绕两个关键模块展开：**Energy-Aware Temporal Segmentation (EAT-Seg)** 和 **Diffusion-Based Semantic Reconstruction (DSR)**。前者负责将长手语视频无监督地切分为语义连贯的短片段，后者则通过扩散模型的迭代去噪过程将这些片段的翻译结果融合为全局连贯的完整文本。
 
@@ -188,7 +190,9 @@ $$x_{0} = \mathrm{Encode}(\{ \hat{T}_{m} \}), \quad x_{t} \sim q(x_{t} | x_{t-1}
 
 从信息论视角看，扩散过程可被理解为向**语言连贯文本的低熵流形**的迭代投影：每步去噪都在减少输出的语言熵，使其逐步收敛到语法正确、语义连贯的完整表达。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：多数据集、多backbone下的跨域提升
 
@@ -236,7 +240,9 @@ Figure 4展示了跨数据集和模型的定性案例。BoostSLT在长序列翻�
 ![[assets/figures/papers/paper_list_l955_https_openaccess_thecvf_com_content_CVPR2026_html_Han_BoostSLT_Boosting/figures/006_Figure_3.jpg]]
 *Figure 3: The efficiency of SLT on Auslan-Daily dataset*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -272,6 +278,8 @@ BoostSLT 的核心定位是**即插即用的语义增强器**，而非一个独�
 - **端到端联合优化**：能否将分割、翻译和扩散细化三个阶段整合到一个可端到端训练的框架中，使分割边界可以根据下游翻译损失自适应调整？
 - **跨领域泛化**：BoostSLT 在新闻和日常交流场景下的手语数据上表现优异，但其在专业领域（如医疗手语、教育手语）和低资源手语上的迁移能力尚未被探索。
 - **效率与质量的权衡**：扩散模型的迭代去噪过程增加了推理延迟（Figure 3 显示了效率对比），如何在保持语义增强效果的前提下减少扩散步数或采用更高效的采样策略，是实际部署中需要解决的问题。
+
+
 
 ## 原文 PDF
 

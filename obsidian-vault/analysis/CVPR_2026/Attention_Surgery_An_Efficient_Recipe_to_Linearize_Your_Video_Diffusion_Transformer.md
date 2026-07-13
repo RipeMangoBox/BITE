@@ -45,7 +45,7 @@ claims:
 > - VBench-2.0 上，Total Score ↑ 55.1 (Ours: 15×R2) vs 56.0 (Wan2.1 1.3B) (-0.9)。
 > - User Study (562 comparisons) 上，Preference % 31.0% Ours / 39.7% No preference vs 29.3% Wan2.1 1.3B (无显著整体偏好差异)。
 
-## 概述
+## 概要
 
 视频扩散Transformer（Video Diffusion Transformer, VDT）在生成高质量视频方面展现出强大能力，但其核心组件——自注意力机制的二次复杂度（$O(N^2d)$）——已成为实际应用的主要效率瓶颈。以 **Wan2.1 1.3B**（Wan et al., 2025）为例，Transformer 块内超过 **76%** 的计算量消耗在自注意力操作上，这严重制约了长序列、高分辨率视频生成的效率，尤其是在移动端等资源受限场景。
 
@@ -57,7 +57,7 @@ claims:
 
 在方法谱系上，Attention Surgery 属于**后训练线性化**路线，区别于从零训练线性注意力模型（如 **Mamba**、**RWKV**）或对预训练模型进行全量微调的方案。它借鉴了线性注意力中核技巧的思想（Katharopoulos et al., 2020），但通过引入**可学习多项式核**与**值蒸馏损失**（$\mathcal{L}_{\mathrm{vd}}$）增强表达能力，并以**异质块率分配**替代均匀混合策略，在效率与质量之间取得更优平衡。当前方法在 Wan2.1 1.3B 上验证，对其他视频 DiT 架构（如 CogVideoX、HunyuanVideo）及更大规模模型的迁移性尚待研究；其采用的双向注意力设计也尚未与因果注意力结合，因此在自回归长视频生成场景中注意力成本仍随帧数增长。
 
-## 背景与动机
+
 
 ### 视频扩散 Transformer 的效率瓶颈
 
@@ -87,7 +87,9 @@ claims:
 
 整个“手术”过程仅需**不足 0.4k GPU 小时**，相比从头训练的数十万 GPU 小时，效率提升三个数量级以上。这一框架使得在预训练模型上探索注意力机制的线性化成为一项低成本、可复现的操作，为视频扩散模型的实际部署开辟了新路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Attention Surgery 的核心创新在于将预训练视频扩散 Transformer (VDM) 中的标准 softmax 自注意力，以极低的训练成本转换为高效的混合注意力机制，而非从头训练新模型。其关键设计围绕三个“changed slots”展开，共同构成一个完整的手术式线性化框架。
 
@@ -124,7 +126,7 @@ Attention Surgery 将线性化过程解耦为三个独立阶段，以极低的�
 
 这三个阶段的协同设计，使得 Attention Surgery 能够在保持与原始 Wan2.1 1.3B 模型相当的生成质量（VBench 总分 83.21 vs 83.10，用户研究无显著偏好差异）的同时，实现约 6× 的移动端推理加速。
 
-## 整体框架
+
 
 Attention Surgery 的整体设计围绕一个核心观察展开：在 Wan2.1 1.3B 这类视频扩散 Transformer 中，自注意力计算消耗了 Transformer 块内超过 76% 的算力，而其中大量 token 间的交互对最终生成质量的贡献并非同等重要。基于此，该方法提出了一种“手术式”的线性化方案——在不从头训练的前提下，将预训练模型中的全量 softmax 注意力替换为混合注意力，并通过极低成本的蒸馏与微调恢复生成质量。
 
@@ -163,7 +165,7 @@ Attention Surgery 的整体设计围绕一个核心观察展开：在 Wan2.1 1.3
 ![[assets/figures/papers/paper_list_l838_https_arxiv_org_abs_2509_24899/figures/001_Figure_1.jpg]]
 *Figure 1: Left: Impact of the proposed method components: attention distillation and hybrid attention. The linear/hybrid models are obtained within fewer than 0.4k GPU-hours. Prompt: “An astronaut flying in space, Van Gogh style.”. Right: Compute growth comparison between Wan2.1 1.3B flash attention blocks and of attention surgery on FLOPs (top) and Snapdragon8-Gen4 mobile latency (bottom)*
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题定义与标准自注意力
 
@@ -233,7 +235,9 @@ $$\operatorname* { m i n } _ { \{ z _ { i r } \} } \sum _ { i = 1 } ^ { B } \sum
 ![[assets/figures/papers/paper_list_l838_https_arxiv_org_abs_2509_24899/figures/004_Figure_4.jpg]]
 *Figure 4: Sample qualitative video frames from hybrid models with varying numbers of hybrid blocks (15, 20, 25) and hybrid rates (2, 4, 8). For each configuration, the left frame shows the result after layer-wise attention distillation, and the right frame shows the result after 1,000 fine-tuning iterations. Prompt: A man is reading a book sitting on the cloud*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果：质量持平，效率大幅提升
 
@@ -315,7 +319,9 @@ Fig. 5 绘制了不同混合配置下 DiT 总 FLOPs 百分比与 VBench 分数�
 ![[assets/figures/papers/paper_list_l838_https_arxiv_org_abs_2509_24899/figures/007_Figure_6.jpg]]
 *Figure 6: Qualitative illustration of impact of attention distillation on two hybrid architecture instances (15×Linear and 20×R8). Prompt: ”A playful golden retriever bounds through a sunlit meadow, its fur gleaming in the warm afternoon light.”*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -356,6 +362,8 @@ Attention Surgery 的有效性依赖以下前提，这些也构成了其适用�
 3. **大规模下的最优混合策略**：在更大规模或更高分辨率下，混合注意力的最优混合率 $R$ 与异质块选择策略是否会发生变化？当前的多选择背包优化框架提供了形式化工具，但其在大规模空间的扩展性尚待验证。
 
 4. **值蒸馏损失的机理理解**：消融实验（Table 6）表明，值蒸馏损失 $\mathcal{L}_{\mathrm{vd}}$ 相比注意力得分蒸馏损失 $\mathcal{L}_{\mathrm{ad}}$ 能带来显著更丰富的运动信息（Dynamic Degree: 66.1 vs 37.5），但其深层原因——值空间蒸馏是否更好地保留了 token 间的协同运动模式——仍需进一步的理论分析。
+
+
 
 ## 原文 PDF
 

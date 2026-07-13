@@ -40,7 +40,7 @@ claims:
 > [!tip] 效果简介
 > - HyperNeRF (STRS-4DGS benchmark) 上，mIoU (time-agnostic referring) 77.67%；Acc (time-sensitive referring) 83.44%；vIoU (time-sensitive referring) 57.98%。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有动态场景理解方法（如4DLangSplat）仅支持开放词汇的类别级查询，无法在显式4D高斯重建中实现实例级消歧和联合时空指代推理。其根本缺陷在于缺少将空间指代与时态状态解耦的机制，导致对“被人拿在手中断成两半的物体”这类复杂时空表达式的定位与分割性能差。
 
@@ -50,7 +50,7 @@ claims:
 
 **主要结果**：在HyperNeRF基准上，ST4R-Splat在时间无关指代查询上达到**77.67% mIoU**，显著优于所有基线方法；在时间敏感指代查询上达到**83.44% Acc**和**57.98% vIoU**，实现了精确的时态定位与分割。消融实验表明，位置感知跨模态注意力模块的移除会导致mIoU骤降至58.56%，验证了空间-语言对齐的关键作用；对比损失和实例正则化损失的去除分别使性能降至70.85%和76.94%，证明各部分均有实质贡献。
 
-## 背景与动机
+
 
 动态场景理解是计算机视觉的核心问题之一。近年来，以3D高斯泼溅（3D Gaussian Splatting, 3DGS）为代表的显式辐射场表示在静态场景的重建与语义理解上取得了显著进展。然而，当场景随时间动态变化时，如何在4D空间中实现精确的**实例级指代分割**——即根据自然语言表达式定位并分割出特定物体——仍然是一个开放挑战。
 
@@ -62,7 +62,9 @@ claims:
 
 针对这些问题，ST4R-Splat 提出了两个核心设计思路：为每个4D高斯分配**时间不变的指代嵌入**以维持实例身份一致性，并在特征空间建立**实例-时间到语义状态的直接映射**，从而实现空间定位与时态定位的显式解耦与独立优化。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ST4R-Splat 的核心创新在于首次在显式4D高斯重建框架中实现了**实例身份与时态状态的解耦建模**，从而支持复杂时空指代查询（如“被人拿在手中断成两半的物体”）。此前的动态场景指代方法（如 **4DLangSplat**，Li et al., CVPR 2025）仅通过可变形语言场实现开放词汇的类别级检索，缺乏实例级消歧与精细时态定位能力。ST4R-Splat 通过三个关键的“changed slots”突破了这一瓶颈。
 
@@ -90,7 +92,7 @@ ST4R-Splat 的核心创新在于首次在显式4D高斯重建框架中实现了*
 
 **ST4R-Splat 的方案**是构建基于MLLM的自动化标注管道，分别生成两类解耦的文本监督：帧级描述性caption $C ^ { \mathrm { d e s c } } ( o _ { k } , t )$ 用于空间监督，以及时间感知状态caption $C ^ { \mathrm { s t a t e } } ( o _ { k } , t )$ 用于时态监督。这一设计为上述三个技术模块提供了精确匹配的解耦训练目标，使模型能够分别优化空间定位损失 $\mathcal{L}_{ref}$（BCE）和对比损失 $\mathcal{L}_{con}$，以及实例正则化损失 $\mathcal{L}_{comp}$ 和 $\mathcal{L}_{dist}$。消融实验表明，**移除对比损失后mIoU降至70.85%，移除实例正则化损失后降至76.94%**（Table 2），分别贡献了6.82和0.73个百分点的性能提升，验证了解耦监督与相应损失设计的协同作用。
 
-## 整体框架
+
 
 ST4R-Splat 的核心设计理念是将时空指代分割中的“在哪里”（实例身份）与“在何时”（时态状态）**显式解耦**，分别交由两个独立模块优化。如图1所示，框架由三个关键组件串联构成：
 
@@ -128,7 +130,7 @@ ST4R-Splat 的核心设计理念是将时空指代分割中的“在哪里”（
 ![[assets/figures/papers/paper_list_l47_https_openaccess_thecvf_com_content_CVPR2026_html_Meng_ST4R_Splat_Spatio/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the ST4R-Splat framework. It mainly consists of three main components: (I) MLLM-based object captioning for generating decoupled textual supervision, (II) an Instance-Aware 4D Referring Field for spatial grounding, and (III) an Instance-Level Temporal State Mapping module for robust temporal localization*
 
-## 核心模块与公式推导
+
 
 ST4R-Splat 将时空指代分割任务显式解耦为“在哪里”（实例身份）与“在何时”（时态状态）两个正交子问题，通过三个核心模块协同实现。本节按数据流顺序阐述关键模块及其核心公式。
 
@@ -206,7 +208,9 @@ $$\mathcal{C}_k = \{c_{k,t} \mid t \in [0, T]\} \tag{13}$$
 
 三个核心模块形成清晰的因果链条：**MLLM 标注管道**提供解耦的空间与时态文本监督 → **实例感知指代场**利用时间不变嵌入和位置感知注意力实现空间实例定位 → **时态状态映射模块**在特征空间建立实例-时间到状态的直接映射，实现视点无关的时态定位。消融实验（Table 2）验证了这一设计的有效性：移除位置感知跨模态注意力导致 mIoU 从 77.67% 骤降至 58.56%，移除对比损失降至 70.85%，移除实例正则化损失降至 76.94%，证明各组件均对最终性能有不可替代的贡献。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -252,7 +256,9 @@ Table 2 通过逐步移除关键组件，量化了各模块对时间无关查询
 ![[assets/figures/papers/paper_list_l47_https_openaccess_thecvf_com_content_CVPR2026_html_Meng_ST4R_Splat_Spatio/figures/004_Table_1.jpg]]
 *Table 1: Quantitative comparisons on the HyperNeRF dataset. We report (a) time-agnostic referring querying (mIoU in %) and (b) timesensitive referring querying (Acc and vIoU in %). Best results are highlighted in bold*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 动态场景理解与指代分割的演进脉络
 
@@ -291,6 +297,8 @@ ST4R-Splat 的核心因果机制可概括为**身份固化 + 状态缓存**：
 2. 自动标注管道的伪标签噪声对最终性能的定量影响需进一步消融。
 3. 该方法能否处理多对象交互场景（如“A递给B的物体”）以及更复杂的时态逻辑（先后顺序、持续时间）？
 4. 当前基准规模有限，在更大规模、更多样化的动态场景数据集上的泛化性有待验证。
+
+
 
 ## 原文 PDF
 

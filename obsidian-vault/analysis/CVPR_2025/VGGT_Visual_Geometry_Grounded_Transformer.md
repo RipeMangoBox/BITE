@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/VGGT_Visual_Geometry_Grounded_Transformer.pdf
+project_link: null
+code_link: https://github.com/facebookresearch/vggt
 aliases:
 - VVGGT
 - VGGT
@@ -41,7 +43,7 @@ claims:
 > - CO3Dv2 上，AUC@30 ↑ 88.2 vs 83.4 (+4.8)。
 > - DTU (MVS) 上，Overall ↓ (Chamfer) 0.382 vs 1.741 (-1.359)。
 
-## 概述
+## 概要
 
 ### 1. 问题背景与瓶颈
 
@@ -66,7 +68,7 @@ VGGT在前馈模式下显著超越了依赖后处理的优化方法：
 
 消融实验进一步证实：交替注意力架构远优于仅全局自注意力或交叉注意力变体（Table 5），且多任务联合训练比单任务训练产生更精确的点云估计（Table 6）。这些结果表明，**大规模数据驱动的前馈Transformer可以隐式学习多视图几何推理能力，在速度与精度上同时超越传统优化方法**。
 
-## 背景与动机
+
 
 从多张二维图像恢复场景的三维几何结构是计算机视觉的核心问题，其应用涵盖自动驾驶、机器人导航、增强现实与三维内容创作等领域。传统三维重建流程通常分为稀疏重建（Structure-from-Motion，SfM）与稠密重建（Multi-View Stereo，MVS）两个阶段，并高度依赖束调整（Bundle Adjustment，BA）等迭代优化后处理来消除累积误差。这类优化方法虽然精度较高，但计算开销大、推理耗时长，难以满足实时或大规模应用的需求。
 
@@ -79,7 +81,9 @@ VGGT在前馈模式下显著超越了依赖后处理的优化方法：
 
 本文的核心动机在于打破上述权衡。作者观察到，即便Transformer架构本身缺乏显式的三维几何偏置，通过大规模、多样化的三维标注数据进行多任务联合训练，模型依然能够隐式地捕捉多视图之间的几何对应关系。基于这一洞察，VGGT被设计为一个通用的前馈三维感知模型，旨在以单次推理、无需任何后处理的方式，从任意数量的输入视图中同时预测相机参数、深度图、点云图与点跟踪特征，从而实现速度与精度的双重突破。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 VGGT的核心创新在于将3D重建从**多阶段优化范式**彻底转向**单次前馈预测范式**，同时将输出范围从单一几何量扩展为完整的3D场景属性集。其关键创新点可归纳为以下三个维度的突破。
 
@@ -99,7 +103,7 @@ VGGT的架构创新体现在**交替注意力（Alternating-Attention）** 设�
 
 VGGT的成功可归因于一个核心因果链条：**大规模多任务训练 × 交替注意力架构 → 隐式多视图几何捕获 → 端到端前馈3D重建**。即便Transformer缺乏显式几何偏置，通过海量多样的3D标注数据（训练需64张A100 GPU持续9天）配合交替注意力机制，模型学会在token交互中隐式编码相机位姿、深度一致性和跨视图对应关系。这一发现挑战了“3D视觉模型必须嵌入几何先验”的传统观念，为通用视觉几何模型开辟了新路径。
 
-## 整体框架
+
 
 VGGT 的整体设计遵循一个简洁的前馈范式：输入任意数量的 RGB 图像，经过一个大型 Transformer 一次性端到端地输出每帧的相机参数、深度图、点云图和点跟踪特征，全程无需任何后处理优化。其核心映射函数为：
 
@@ -134,7 +138,7 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{camera}} + \mathcal{L}_{\mathrm{depth}} + \
 ![[assets/figures/papers/vggt_cvpr2025_quick/figures/001_Figure_1.jpg]]
 *Figure 1: VGGT is a large feed-forward transformer with minimal 3D-inductive biases trained on a trove of 3D-annotated data. It accepts up to hundreds of images and predicts cameras, point maps, depth maps, and point tracks for all images at once in less than a second, which often outperforms optimization-based alternatives without further processing*
 
-## 核心模块与公式推导
+
 
 VGGT的核心是一个标准的大型Transformer，其关键设计在于**交替注意力（Alternating-Attention）架构**和多任务预测头。整个模型将任意数量的RGB图像映射为每帧的相机参数、深度图、点云图和跟踪特征，映射函数为：
 
@@ -187,7 +191,9 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{camera}} + \mathcal{L}_{\mathrm{depth}} + \
 
 值得注意的是，尽管理论上点云图 $P_i$ 可直接由密集预测头输出，但论文发现**将独立估计的深度图与相机参数结合来构建点云（Depth + Cam）优于直接预测点云**（Table 3）。这一策略利用了深度估计和相机估计各自的特化能力，在ETH3D上取得了更低的Overall误差（0.677 vs 直接点云头输出）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 相机姿态估计：前馈速度与优化级精度
 
@@ -249,7 +255,9 @@ VGGT 主要面向静态场景设计，动态物体会破坏其相机与深度估
 ![[assets/figures/papers/vggt_cvpr2025_quick/figures/003_Figure_3.jpg]]
 *Figure 3: Qualitative comparison of our predicted 3D points to DUSt3R on in-the-wild images. As shown in the top row, our method successfully predicts the geometric structure of an oil painting, while DUSt3R predicts a slightly distorted plane. In the second row, our method correctly recovers a 3D scene from two images with no overlap, while DUSt3R fails. The third row provides a challenging example with repeated textures, while our prediction is still high-quality. We do not include examples with more than 32 frames, as DUSt3R runs out of memory beyond this limit*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与前馈多视图几何方法的关系
 
@@ -296,6 +304,8 @@ VGGT 的特征展现出超越其设计任务的可迁移性。最显著的证据
 - **非透视相机支持**：如何在不大幅改动架构的前提下，扩展对鱼眼、全景等非透视相机模型的支持？
 - **弱监督与数据扩展**：能否在海量无标注互联网数据上进行弱监督或自监督训练，降低对 3D 标注的依赖？
 - **下游任务迁移**：VGGT 特征作为通用 3D 骨干的潜力是否可推广到更多任务（如 3D 语义分割、物体姿态估计等）？
+
+
 
 ## 原文 PDF
 

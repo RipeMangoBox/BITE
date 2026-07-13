@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2023
 pdf_ref: paperPDFs/arxiv_2023/VideoComposer_Compositional_Video_Synthesis_with_Motion_Controllability.pdf
+project_link: null
+code_link: null
 aliases:
 - VideoComposer
 tags:
@@ -40,15 +42,13 @@ claims:
 > - Custom set (1000 caption-video pairs) 上，Frame consistency (CLIP cosine similarity) ↑ 0.923 (sketch) / 0.928 (depth) / 0.927 (motion vectors) with STC-encoder vs 0.910 / 0.922 / 0.915 without STC-encoder (+0.013 / +0.006 / +0.012)。
 > - MSR-VTT 上，FVD ↓ / CLIPSIM ↑ FVD 580 / CLIPSIM 0.2932 vs First-stage pre-training (FVD 803, CLIPSIM 0.2876) (FVD -223 / CLIPSIM +0.0056)。
 
-## 概述
+## 概要
 
 视频生成领域长期面临一个瓶颈：现有方法难以同时精确控制生成视频的**空间布局**与**时间动态**。文本到视频模型（如 **GODIVA**、**CogVideo**、**Make-A-Video** 等）虽然能生成语义相关的视频内容，但缺乏对运动模式的显式建模，导致跨帧一致性和运动可控性不足。VideoComposer 的核心洞察在于，将视频显式分解为**文本条件**、**空间条件**（单帧图像、草图、风格）和**时间条件**（运动矢量、深度序列、掩码序列、草图序列），通过组合式生成框架实现灵活可控的视频合成。
 
 该方法的关键因果调节器有二：其一，引入压缩视频中的**运动矢量**作为显式时间条件，直接引导像素级运动模式；其二，设计统一的**时空条件编码器（STC-encoder）**，通过 2D 卷积与时间 Transformer 聚合多模态条件的时空关系，增强序列条件的时间连贯性。实验证据表明，仅引入运动矢量即可将运动控制误差（EPE）从纯文本条件的 4.03 降至 2.67，叠加 STC-encoder 后进一步降至 2.18；STC-encoder 在不同时间条件设置下平均提升帧一致性约 0.012。在 MSR-VTT 文本到视频基准上，VideoComposer 取得 FVD 580 和 CLIPSIM 0.2932，优于第一阶段预训练（FVD 803），证明组合式训练未牺牲基础文本到视频生成能力。
 
 该方法在方法谱系中定位为**基于潜在扩散模型的组合式视频生成框架**，通过条件分解与统一时空编码，将空间控制与时间控制解耦后再融合，实现了从图像到视频生成、视频修复、草图/深度序列到视频、视频到视频转换及运动迁移等多种下游任务的统一支持。
-
-## 背景与动机
 
 视频生成领域近年来取得了显著进展，文本到视频（T2V）模型如 **GODIVA**（Wu et al., arXiv 2021）、**Nuwa**（Wu et al., ECCV 2022）、**CogVideo**（Hong et al., arXiv 2022）、**MagicVideo**（Zhou et al., arXiv 2022）、**Make-A-Video**（Singer et al., arXiv 2022）和 **Video LDM**（Blattmann et al., CVPR 2023）等，已经能够根据文本描述生成具有一定视觉质量的视频。然而，这些方法面临一个核心瓶颈：**难以同时控制视频的空间布局和时间动态**。
 
@@ -60,7 +60,7 @@ claims:
 
 针对上述问题，VideoComposer 的动机在于：**将视频分解为文本、空间和时间三类条件，通过组合式生成框架实现灵活可控的视频合成**。其核心思路是引入压缩视频中的运动矢量（motion vectors）作为显式的时间条件，直接引导像素级运动；同时设计一个统一的时空条件编码器（STC-encoder）来聚合多模态条件的时空关系，从而在保持文本到视频生成能力的前提下，显著提升运动可控性和跨帧一致性。
 
-## 核心创新
+## 核心方法与创新机理
 
 VideoComposer 的核心创新在于将视频生成问题重新定义为**组合式条件合成**，并围绕“运动可控性”这一瓶颈进行了两项关键设计：**引入运动矢量作为显式时间条件**，以及**设计时空条件编码器（STC-encoder）统一聚合多模态条件的时空关系**。
 
@@ -83,8 +83,6 @@ VideoComposer 改变了单阶段端到端训练的方式（changed slot），采
 ### 创新总结
 
 VideoComposer 的创新链条清晰且因果可追溯：**运动矢量**提供了像素级运动引导，解决了“运动不可控”的瓶颈；**STC-encoder** 统一了多模态时空条件的融合方式，解决了“跨帧不一致”的瓶颈；**两阶段训练**则保证了组合式生成能力不损害基础文本到视频质量。三者共同构成了一个灵活的视频合成组合系统，支持文本、空间、时间条件的任意子集组合。
-
-## 整体框架
 
 VideoComposer 提出了一种**组合式视频生成框架**，其核心思想是将视频分解为三类独立条件——文本条件、空间条件和时间条件——然后通过统一的编码与注入机制，在视频潜在扩散模型（VLDMs）的去噪过程中协同引导生成。这一设计使得用户能够灵活地组合或替换条件子集，实现对空间布局、时间动态和语义内容的解耦控制。
 
@@ -142,8 +140,6 @@ $$\hat{\epsilon}_{\theta}(z_t, c, t) = \epsilon_{\theta}(z_t, c_1, t) + \omega (
 ![[assets/figures/papers/paper_list_l1060_https_arxiv_org_abs_2306_02018/figures/002_Figure_2.jpg]]
 *Figure 2: Overall architecture of VideoComposer. First, a video is decomposed into three types of conditions, including textual condition, spatial conditions and temporal conditions. Then, we feed these conditions into the unified STC-encoder or the CLIP model to embed control signals. Finally, the resulting conditions are leveraged to jointly guide VLDMs for denoising*
 
-## 核心模块与公式推导
-
 ### 3.1 视频潜在扩散模型基础
 
 VideoComposer 的生成主干基于视频潜在扩散模型（Video Latent Diffusion Models, VLDMs）。其核心训练目标为最小化预测噪声与真实噪声之间的 L2 距离：
@@ -187,7 +183,7 @@ $$
 ![[assets/figures/papers/paper_list_l1060_https_arxiv_org_abs_2306_02018/figures/003_Figure_3.jpg]]
 *Figure 3: Examples of motion vectors*
 
-## 实验与分析
+## 实验与关键发现
 
 VideoComposer 的核心实验围绕三个轴展开：运动可控性的定量验证、时空条件编码器（STC-encoder）对帧一致性的消融分析，以及组合式训练对文本到视频生成能力的保持性检验。所有实验均基于 WebVid10M 数据集的自定义测试集（1000 条视频-文本对）和 MSR-VTT 基准。
 
@@ -237,13 +233,7 @@ Table 2 针对三种时间条件（sketch 序列、depth 序列、motion vectors
 ![[assets/figures/papers/paper_list_l1060_https_arxiv_org_abs_2306_02018/figures/008_Figure.jpg]]
 *Figure A9: (a) Source video (b) Depth-guided generation*
 
-![[assets/figures/papers/paper_list_l1060_https_arxiv_org_abs_2306_02018/figures/012_Figure.jpg]]
-*Figure A10: Compositional sketch sequence-to-video generation. We showcase five examples, each displaying a video generated from a sequence of sketches and a textual description. The final example additionally incorporates a style condition*
-
-![[assets/figures/papers/paper_list_l1060_https_arxiv_org_abs_2306_02018/figures/014_Figure.jpg]]
-*Figure A12: Motion transfer. We showcase four examples, each displaying a video generated from a single image and motions. In the first three examples, we transfer the motion patterns in a source video to the generated video by extracting and utilizing motion vectors. The final example incorporates hand-crafted motions instead*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 

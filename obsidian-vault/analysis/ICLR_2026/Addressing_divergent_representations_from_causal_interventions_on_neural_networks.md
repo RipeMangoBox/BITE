@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Addressing_divergent_representations_from_causal_interventions_on_neural_networks.pdf
+project_link: null
+code_link: https://github.com/grantsrb/rep_divergence
 openreview_forum_id: cZrTMqYVL6
 aliases:
 - MCLCLTCS
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 应对因果干预导致的神经网络表征分歧 |
 | 英文题名 | Addressing divergent representations from causal interventions on neural networks |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=cZrTMqYVL6); [GitHub](https://github.com/grantsrb/rep_divergence) |
+| Links | [paper](https://openreview.net/forum?id=cZrTMqYVL6) · [GitHub](https://github.com/grantsrb/rep_divergence) |
 | Topic | #topic/representation_self_supervised_transfer #topic/representation_self_supervised_transfer/representation_learning |
 | Method | Modified Counterfactual Latent (CL) loss targeting causal subspaces |
 | Dataset | Synthetic dataset (10 classes, 2 causal dims), Boundless DAS (LLM, Wu et al. 2023), Synthetic OOD generalization |
@@ -42,7 +44,7 @@ claims:
 > - Synthetic dataset (10 classes, 2 causal dims) 上，EMD (Earth Mover's Distance) 为 0.007 ± 0.001 (CL loss only)，对比 0.032 ± 0.003 (DAS behavioral loss only)，变化 -0.025。
 > - Boundless DAS (LLM, Wu et al. 2023) 上，IIA 为 Maintained (with suitable ε)，对比 DAS without CL loss，变化 No decrease; small ε improves。
 
-## 概述
+## 概要
 
 因果干预（causal intervention）——如激活修补、分布式对齐搜索（DAS）等——是解读神经网络内部机制的核心工具。然而，这些干预方法常常将内部表示**推离模型在自然输入下的分布**，产生所谓的“分歧表示”（divergent representations）。这种分歧并非无害：它可能意外激活隐藏通路，导致表面上符合预期的行为，或引发潜伏的行为变化，从而使干预结果对自然机制的解读变得不可靠。
 
@@ -50,7 +52,7 @@ claims:
 
 实验表明：在合成数据集上，纯 CL 损失训练的对齐函数相比仅用行为损失的 DAS，**EMD（Earth Mover’s Distance）从 0.032 降至 0.007，同时 IIA 保持在 0.9988**；在 LLM 的 Boundless DAS 设置中，合适的 CL 权重可在不损害 IIA 的前提下降低分歧。线性回归分析进一步确认，训练过程中的因果轴 EMD 与 OOD 的 IIA 呈显著反相关（系数 -0.34，R²=0.73，p<0.001），为“降低分歧有助于提升干预可靠性”提供了定量证据。
 
-## 背景与动机
+
 
 ### 因果干预在神经网络解释中的角色
 
@@ -83,7 +85,9 @@ $$\mathcal{N}(\psi, X) = \{ v \in \mathbb{R}^d \mid \forall x \in X, \psi(x + v)
 
 具体而言，本文借鉴并修改了 Grant (2025) 提出的**对比潜在损失**，将其作为辅助训练目标引入 DAS 的对齐函数训练中。该损失通过拉近干预表示与具有相同因果变量值的自然表示之间的距离，引导干预表示回归自然分布流形。进一步，本文提出仅在因果子空间上施加该损失，以针对性减少最可能有害的分歧成分，并在分布外泛化任务上验证其效果。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作的核心创新不在于提出全新的因果干预范式，而是在现有因果干预框架（特别是 DAS）中引入并改造了一种**表示分歧感知的训练机制**，使干预结果在保持行为准确性的同时更贴近模型的自然表示分布。具体而言，关键创新体现在以下两个层面的 **changed slots** 上：
 
@@ -119,7 +123,7 @@ $$\mathcal{L}_{\mathrm{CL}}' = \sum_{i=1}^{n} \mathcal{L}_{\mathrm{CL}}^{\mathrm
 
 上述两个 changed slots 共同构成了一个“分歧最小化”的干预训练范式：通过 $\mathcal{L}_{\mathrm{CL}}$ 引入表示分布的先验约束，再通过因果子空间定位将约束聚焦于行为相关的维度。这一设计不改变 DAS 的互换干预机制本身，也不修改模型的冻结权重，而是**在训练对齐函数时附加了一个分布正则化项**，使学到的对齐函数天然倾向于产生更接近自然分布的干预表示，从而降低激活隐藏通路或触发潜伏行为变化的风险。
 
-## 整体框架
+
 
 本工作的核心流程围绕一个基本问题展开：因果干预产生的表示与模型自然分布之间的“表示分歧”是否可控，以及如何在不损害干预准确率的前提下降低有害分歧。整体框架由四个逻辑层构成：**分歧诊断**、**无害性判定**、**分歧缓解训练**、以及**因果子空间约束**。
 
@@ -169,7 +173,7 @@ $$
 
 实验表明，这种针对性约束在分布外（OOD）任务上带来了更高的 IIA（Figure 3F），且训练 EMD 与 OOD IIA 之间存在显著的反相关关系（$R^2 = 0.73$, $p < 0.001$，附录 A.6），定量验证了“降低有害分歧可提升干预泛化能力”这一核心假设。
 
-## 核心模块与公式推导
+
 
 ### 对齐函数与互换干预
 
@@ -225,7 +229,9 @@ $$\mathcal{L}_{\mathrm{CL}}' = \sum_{i=1}^{n} \mathcal{L}_{\mathrm{CL}}^{\mathrm
 
 与全空间 CL 损失相比，该修改版在合成 OOD 任务上取得了更高的 IIA（Figure 3F）。附录 A.6 的线性回归进一步证实，训练过程中的因果轴 EMD 与 OOD 的 IIA 显著反相关（系数 $-0.34$，$R^2 = 0.73$，$p < 0.001$），表明降低因果子空间内的分歧是提升干预泛化能力的关键机制。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 因果干预中的表示分歧是普遍现象
 
@@ -307,7 +313,9 @@ $$\mathcal{L}_{\mathrm{CL}}' = \sum_{i=1}^{n} \mathcal{L}_{\mathrm{CL}}^{\mathrm
 
 ![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_cZrTMqYVL6/figures/004_Table.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题来源与基线脉络
 
@@ -364,6 +372,8 @@ $$\mathcal{L}_{\mathrm{CL}}' = \sum_{i=1}^{n} \mathcal{L}_{\mathrm{CL}}^{\mathrm
 3. **扩展到复杂架构**：修改后的 CL 损失能否推广到更深、更宽的网络以及更多的因果变量，同时保持计算可行？
 4. **与其他可解释性方法的结合**：表示分歧最小化能否与 SAE 等方法互补，进一步提升干预的可靠性？
 5. **潜伏行为变化的系统检测**：如何高效地在所有可能上下文中发现潜伏的行为变化，而非仅依赖有限采样？
+
+
 
 ## 原文 PDF
 

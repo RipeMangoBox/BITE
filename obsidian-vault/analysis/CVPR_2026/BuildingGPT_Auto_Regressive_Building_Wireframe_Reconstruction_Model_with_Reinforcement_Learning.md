@@ -40,13 +40,13 @@ claims:
 > [!tip] 效果简介
 > - MunichWF 上，WED 0.98 vs 1.39 (vanilla tokenization pre-trained) (-0.41)；CF1 97.4 vs 96.0 (vanilla tokenization pre-trained) (+1.4)。
 
-## 概述
+## 概要
 
 从三维点云重建建筑线框是城市场景理解的关键任务，但现有方法面临瓶颈：基于检测或扩散模型的方案往往丢失顶点或边，依赖非端到端的后处理，难以捕捉建筑的全局拓扑结构。**BuildingGPT** 将任务重新定义为自回归序列生成问题，通过**分层建筑线框分词**（足迹→墙壁→屋顶）为模型注入结构与语义先验，使自回归模型能够学习序列依赖。在此基础上，引入基于 **DPO（Direct Preference Optimization）** 的后训练阶段，对齐人类偏好，进一步提升几何精度与拓扑正确性。
 
 在 MunichWF 数据集上，BuildingGPT 全面超越现有最先进方法，取得 WED 0.98、CF1 97.4、EF1 94.4 等最优指标。消融实验证实，分层分词与 DPO 后训练各自带来显著性能增益，验证了每个组件的有效性。
 
-## 背景与动机
+
 
 城市三维建模是数字孪生、智慧城市与自动驾驶等应用的基础技术，而建筑作为城市场景中最主要的构成元素，其精确重建一直是该领域的核心挑战。建筑线框（building wireframe）以顶点和边的拓扑结构描述建筑几何，是实现轻量级、结构化建筑表达的关键形式。
 
@@ -60,7 +60,9 @@ claims:
 
 简言之，BuildingGPT 的核心创新在于**以层次化分词为桥梁，将自回归序列生成范式引入建筑线框重建**，并通过偏好对齐后训练进一步提升重建质量，为这一任务开辟了全新的技术路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 BuildingGPT 的核心创新在于将建筑线框重建从传统的检测或扩散范式**重新定义为自回归序列生成问题**，并围绕这一范式转变设计了三个关键机制，形成“范式转变—结构化先验注入—人类偏好对齐”的创新链条。
 
@@ -94,7 +96,7 @@ $$L_{\mathrm{DPO}} = -\log \sigma (\beta \log \frac{\pi_p(y^+|p)}{\pi_r(y^+|p)} 
 
 BuildingGPT 的三个创新点形成递进关系：**自回归范式**为端到端拓扑学习提供了框架基础；**分层分词**注入建筑结构先验，使序列生成更具语义合理性；**DPO 后训练**则通过人类偏好信号进一步修正局部错误。这一创新链条在 MunichWF 数据集上取得了 WED 0.98、CF1 97.4、EF1 94.4 的最优性能（Table 1），全面超越现有最先进方法。
 
-## 整体框架
+
 
 BuildingGPT 将建筑线框重建任务重新定义为**自回归序列生成问题**，并采用**两阶段训练范式**：预训练与后训练。整体流程如图 2 所示。
 
@@ -134,7 +136,7 @@ $$L_{\mathrm{NLL}} = -\frac{\log \pi_p(y^+|p)}{|y^+|}$$
 ![[assets/figures/papers/paper_list_l2714_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_BuildingGPT_Auto_R/figures/002_Figure_2.jpg]]
 *Figure 2: Overall architecture of BuildingGPT. Our BuildingGPT is trained in two stages. In the first stage, the model is pre-trained in an auto-regressive manner. Given the latent code encoded by the point cloud encoder, the wireframe sequence is generated through next-token prediction. In the second stage, we construct a preference pair dataset using the proposed Preference Score Function (PSF) and post-train the model with Direct Preference Optimization (DPO) to further enhance reconstruction quality*
 
-## 核心模块与公式推导
+
 
 BuildingGPT 的核心架构由四个功能模块构成，协同完成从点云到建筑线框的自回归重建。
 
@@ -177,7 +179,9 @@ $$L_{\mathrm{NLL}} = -\frac{\log \pi_p(y^+|p)}{|y^+|}$$
 ![[assets/figures/papers/paper_list_l2714_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_BuildingGPT_Auto_R/figures/003_Figure_3.jpg]]
 *Figure 3: Examples of the constructed preference pair dataset. Using the Preference Score Function (PSF), the preference pair dataset is constructed in which the positive samples align with human preferences, while the negative ones exhibit representative errors such as: (a) missing structural details, (b) incomplete edge connections, and (c) disordered edge topology. The input point cloud and ground-truth wireframe are overlaid for clearer visualization. Green boxes highlight the differences between the positive and negative samples*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验定量对比
 
@@ -249,7 +253,9 @@ BuildingGPT 的实验体系覆盖了主结果验证、组件消融、扩展性�
 ![[assets/figures/papers/paper_list_l2714_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_BuildingGPT_Auto_R/figures/009_Figure.jpg]]
 *Figure: (a) Scaling experiments*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务范式的代际转换
 
@@ -326,6 +332,8 @@ BuildingGPT 开辟了若干值得探索的方向：
 - **更细粒度的分词策略**可以扩展至门窗、楼梯、烟囱等建筑组件，使自回归模型捕捉更完整的建筑语义层次。
 - **超越 DPO 的强化学习方法**（如基于过程奖励的 RLHF 变体）可能进一步提升几何精度，特别是对长序列中误差累积的抑制。
 - **极端条件下的鲁棒性增强**：Table 3 显示模型在 75% 点云稀疏度或 0.05 尺度噪声下性能显著下降，设计针对性的鲁棒训练策略是一个实用需求。
+
+
 
 ## 原文 PDF
 

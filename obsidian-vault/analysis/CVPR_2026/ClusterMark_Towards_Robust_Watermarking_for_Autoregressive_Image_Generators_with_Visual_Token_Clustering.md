@@ -41,7 +41,7 @@ claims:
 > - LlamaGen GPT-B 256x256 - Gaussian Blur radius 3 上，AUC 0.951 (Ours Clustering, k=64, training-free) vs 0.621 (Ours No Clustering) (+0.330)。
 > - LlamaGen GPT-L 384x384 - Gaussian noise std 0.2 上，AUC 0.996 (Ours Clustering, k=64) vs 0.055 (Ours No Clustering) (+0.941)。
 
-## 概述
+## 概要
 
 自回归（AR）图像生成模型（如LlamaGen、RAR）通过将图像量化为离散token序列，在生成质量与效率上展现出巨大潜力。然而，为这类模型嵌入鲁棒水印面临一个根本性瓶颈：直接将大语言模型（LLM）中成熟的token级KGW水印（Kirchenbauer et al.）移植到AR图像模型时，图像扰动（如JPEG压缩、高斯模糊、噪声）会导致VQ-VAE编码器重建的token与原始生成token差异巨大，使得水印的红/绿集合分配被打乱，检测鲁棒性急剧下降——例如在LlamaGen GPT-B上，高斯模糊（半径3）下的AUC仅0.621。
 
@@ -50,8 +50,6 @@ ClusterMark的核心洞察在于**将水印的token级随机分组转换为聚�
 在方法谱系上，ClusterMark属于**生成时水印**，与后处理水印（如DWT-DCT-SVD、RivaGAN、TrustMark）和近期AR图像水印工作IndexMark形成对比。其关键创新在于将红/绿集合划分的哈希输入从“前一个token”改为“前一个token的聚类索引”，并将绿色集合构造从“随机选取token”改为“随机选取聚类后合并其token”。这一改动使得水印对常见图像扰动的鲁棒性大幅增强，同时保持极低的生成开销（LlamaGen GPT-B仅增加0.06秒）和毫秒级验证速度。
 
 主要实验结果（Table 1）表明：在LlamaGen GPT-B 256×256上，ClusterMark（k=64，训练免费）在多种扰动下AUC均显著优于无聚类基线——高斯噪声（std 0.2）下AUC从0.055跃升至0.996；结合cluster classifier后，JPEG压缩（质量20）AUC达0.982，椒盐噪声（0.1）AUC达1.000。消融实验进一步揭示了聚类数k对鲁棒性与图像质量的权衡：降低k可提升鲁棒性，但k<64时FID显著恶化，且均匀区域的token重复会引发水印误检——这一问题通过前缀调优（Prefix Tuning）得到缓解。
-
-## 背景与动机
 
 自回归（Autoregressive, AR）图像生成模型近年来取得了显著进展，其核心范式是将图像离散化为视觉标记（token）序列，并通过自回归Transformer建模标记间的依赖关系。给定类别条件 $s$，图像 $x$ 的标记序列 $\{q_i\}$ 的联合分布被分解为：
 
@@ -65,7 +63,7 @@ $$\prod_{i}^{h \cdot w} p_{\theta}(q_i | q_{1:i-1}, s)$$
 
 **核心洞察。** 本文的关键观察是：图像扰动虽然会改变VQ-VAE重建的具体token，但**语义或几何相似的token往往在码本空间中彼此接近**。因此，若能基于码本向量的相似性将token预先聚类，使同一聚类内的token共享相同的红/绿集合归属，那么即使扰动导致token在聚类内部漂移，其红/绿属性仍得以保持，从而大幅提升检测鲁棒性。这一思路将水印的token级随机分组转换为**聚类级分组**，无需修改生成模型结构，在训练免费（training-free）设置下即可显著改善鲁棒性，并可进一步结合微调的token/聚类分类器以应对更强扰动。
 
-## 核心创新
+## 核心方法与创新机理
 
 ### 问题瓶颈：Token级水印在图像扰动下的脆弱性
 
@@ -111,8 +109,6 @@ ClusterMark的整体流程（Figure 1）包含以下核心模块：
 
 值得强调的是，ClusterMark的**训练免费版本**（仅使用k-means聚类，不微调任何分类器）已经实现了对基线方法的巨大超越。在LlamaGen GPT-B上，训练免费的聚类水印FID为6.12，与未加水印基线的6.01极为接近，验证了该方法在不牺牲生成质量的前提下大幅提升鲁棒性的能力。这一特性使得ClusterMark可以即插即用地部署于任何已有的自回归图像生成模型，无需修改模型结构或重新训练。
 
-## 整体框架
-
 ClusterMark 的整体 pipeline 围绕一个核心洞察展开：**将水印的 token 级随机分组转换为聚类级分组**，利用 VQ-VAE 码本向量的语义/几何相似性，将相似 token 绑定在同一红/绿集合中，从而在图像遭受扰动后，重建的 token 仍有较大概率落入与原始生成时相同的集合。
 
 ### 模块关系与数据流
@@ -153,8 +149,6 @@ ClusterMark 的整体 pipeline 围绕一个核心洞察展开：**将水印的 t
 | 水印生成 | 类别条件 $s$、密钥 $\kappa$、参数 $\gamma, \delta, k$ | 加水印的 token 序列及对应图像 |
 | 验证 | 待检测图像、密钥 $\kappa$、聚类分配 $c(\cdot)$ | 二值判定（加水印/未加水印）及 p 值 |
 | 可选微调 | 原始图像-token 对、扰动函数 $\phi$ | 微调后的 token/cluster 分类器 |
-
-## 核心模块与公式推导
 
 ClusterMark 的核心设计围绕一个关键洞察展开：**将水印的 token 级随机红/绿分组替换为聚类级分组**，利用码本向量的语义/几何相似性，使相似 token 在扰动后仍能保持一致的集合归属。方法包含三个核心模块和一个可选增强模块。
 
@@ -208,7 +202,7 @@ $$\mathcal{L}_{\mathrm{CC}} = \mathbb{E}_{(x,\{q_i\}) \sim p_{\theta}}\left[\sum
 
 当聚簇数 $k$ 较小时，某些哈希前缀 $\kappa$ 可能在未加水印图像的均匀区域中产生虚假的绿色 token 重复模式，导致假阳性率升高。为此，ClusterMark 采用简单的前缀调优策略：在多个候选 $\kappa$ 值上评估未加水印图像的绿色 token 比例分布，选择使水印/非水印分布分离度最大的 $\kappa$。该过程在验证阶段离线完成，不增加在线验证开销。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心发现：聚类水印的鲁棒性飞跃
 
@@ -268,13 +262,10 @@ Table 1同时对比了多种后处理水印方法和生成时水印方法：
 ![[assets/figures/papers/paper_list_l846_https_openaccess_thecvf_com_content_CVPR2026_html_Lukovnikov_ClusterMark/figures/005_Figure_3.jpg]]
 *Figure 3: Empirical TPR@FPR=1% under different perturbations for LlamaGen (GPT-L) and RAR-XL for different numbers of clusters k and penalties δ, with green token fraction γ = 0.25 for the training-free approach. Results are reported over multiple prefixes (8 for RAR-XL and LlamaGen): Lines indicate the average and the shaded area borders the standard deviation*
 
-![[assets/figures/papers/paper_list_l846_https_openaccess_thecvf_com_content_CVPR2026_html_Lukovnikov_ClusterMark/figures/006_Figure_4.jpg]]
-*Figure 4: FID obtained for LlamaGen (GPT-L) and RAR-XL across different number of clusters k, different fractions of green tokens γ, and penalties δ. See Section B in the Supplementary Material for full results across all settings*
-
 ![[assets/figures/papers/paper_list_l846_https_openaccess_thecvf_com_content_CVPR2026_html_Lukovnikov_ClusterMark/figures/007_Figure_5.jpg]]
 *Figure 5: Distribution of green token ratios for watermarked and unwatermarked images across two hashing prefixes κ with a very low number of clusters k = 8. Poorly performing hash prefixes suffer from large uniform regions in unwatermarked images, which produce repetitive token bigrams that are spuriously counted as green*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 问题定位与核心瓶颈
 

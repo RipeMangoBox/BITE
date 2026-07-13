@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Optimal_Sparsity_of_Mixture_of_Experts_Language_Models_for_Reasoning_Tasks.pdf
+project_link: null
+code_link: https://github.com/rioyokotalab/optimal-sparsity
 openreview_forum_id: XFw2EPRUUR
 aliases:
 - FTM
@@ -32,12 +34,15 @@ claims:
 | 中文题名 | 面向推理任务的混合专家语言模型的最优稀疏性 |
 | 英文题名 | Optimal Sparsity of Mixture-of-Experts Language Models for Reasoning Tasks |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=XFw2EPRUUR); [GitHub](https://github.com/rioyokotalab/optimal-sparsity) |
+| Links | [paper](https://openreview.net/forum?id=XFw2EPRUUR) · [GitHub](https://github.com/rioyokotalab/optimal-sparsity) |
 | Topic | #topic/optimization_theory_probabilistic #topic/optimization_theory_probabilistic/learning_theory |
 | Method | 基于活跃FLOPs与每参数令牌数（TPP）的MoE最优稀疏度选择原则 |
 | Dataset |  |
 
-## 概述
+> [!tip] 效果简介
+> 结果与证据沿用下文“实验与关键发现”中的现有记录；本轮不新增或外推论文事实。
+
+## 概要
 
 ### 问题背景
 
@@ -74,7 +79,7 @@ claims:
 
 本文的实验均在125B令牌语料上完成，接近Chinchilla最优，但更大规模语料下推理任务的最优稀疏度可能向更稀疏配置移动。此外，实验仅基于Mixtral架构，未探索QK-norm、共享专家等最新变体，结论的跨架构泛化性有待验证。开放问题包括：万亿令牌级别下最优TPP和稀疏度的变化规律、纯逻辑推理任务上的定量关系、以及能否设计动态调整稀疏度的预训练策略以兼顾记忆与推理能力。
 
-## 背景与动机
+
 
 ### 缩放定律在MoE推理任务中的失效
 
@@ -104,7 +109,9 @@ $$sparsity = 1 - \frac{Top\text{-}k}{Experts}$$
 
 通过这两个维度，本文旨在建立MoE推理任务的最优稀疏度选择原则，为后续的MoE架构设计与训练资源配置提供理论指导。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新并非提出一个新的模型架构或训练算法，而是**发现并系统刻画了混合专家（MoE）语言模型中稀疏性与推理能力之间的非单调关系**，并据此提出了面向推理任务的MoE最优稀疏度选择原则。
 
@@ -143,7 +150,7 @@ $$sparsity = 1 - \frac{Top\text{-}k}{Experts}$$
 
 这一发现将稀疏度选择的重要性从单纯的推理效率问题，提升为**影响推理能力上限的预训练结构决策**。
 
-## 整体框架
+
 
 本工作构建了一套系统性的实验流水线，旨在揭示混合专家（MoE）语言模型中稀疏度与推理能力之间的非单调关系。整体框架围绕“预训练—评估—干预—验证”四个阶段展开，核心目标是分离出影响推理任务性能的关键控制变量：**活跃FLOPs**与**每参数令牌数（TPP）**。
 
@@ -171,7 +178,7 @@ $$sparsity = 1 - \frac{Top\text{-}k}{Experts}$$
 
 流水线的设计围绕一个核心因果旋钮展开：**在固定计算预算下，活跃参数数量（由宽度 $d$ 和 top-k 共同决定）与总参数数量（由 $E$ 决定）的组合，即稀疏度，决定了推理性能的走向**。通过保持活跃FLOPs不变而仅改变稀疏度配置（IsoFLOP分析），或固定活跃参数而改变密度（$k/E$ 比率），流水线能够解耦总参数规模与活跃计算量对推理能力的独立贡献。
 
-## 核心模块与公式推导
+
 
 ### MoE层的前向计算
 
@@ -224,7 +231,9 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{CE}} + \alpha \mathcal{L}_{\mathrm{LB}} + \
 
 此外，**每参数训练令牌数**（Total Tokens per Parameter, TPP）作为连接训练预算与模型规模的关键指标，定义为训练语料总令牌数除以模型总参数数。该指标在后续分析中被证明是决定推理任务性能峰值位置的核心变量。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：预训练损失与推理能力的非单调鸿沟
 
@@ -312,7 +321,9 @@ Figure 7 展示了总令牌每参数（Total Tokens per Parameter, TPP）对不�
 ![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_XFw2EPRUUR/figures/016_Figure_11.jpg]]
 *Figure 11: GSM8K accuracy of model (d=1024) across different shot counts. Because few shot performance is unstable and dropped significantly for models with a small number of experts, zero shot is used for Test-Time Compute*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心贡献与定位
 
@@ -352,6 +363,8 @@ Figure 7 展示了总令牌每参数（Total Tokens per Parameter, TPP）对不�
 3. **推理任务的数据效率机制**：为什么推理任务在TPP≈20时达到峰值？这一数值是否与训练数据的推理密度、专家容量或路由熵有关？其背后的理论机制值得深入探究。
 
 4. **跨模态推理的适用性**：在视觉推理、多模态数学等场景下，MoE的稀疏度-推理关系是否呈现类似规律？活跃FLOPs是否同样可作为跨模态推理能力的统一指标？
+
+
 
 ## 原文 PDF
 

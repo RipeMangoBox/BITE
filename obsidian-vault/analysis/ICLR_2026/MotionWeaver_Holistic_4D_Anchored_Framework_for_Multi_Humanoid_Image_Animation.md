@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/MotionWeaver_Holistic_4D_Anchored_Framework_for_Multi_Humanoid_Image_Animation.pdf
+project_link: null
+code_link: null
 openreview_forum_id: KjlLwRsiUE
 aliases:
 - MotionWeaver
@@ -40,7 +42,7 @@ claims:
 > - DualDynamics 上，FVD ↓ 为 145.7，对比 164.6 (RealisDance-DiT)，变化 -18.9。
 > - DualDynamics 上，CLIP ↑ 为 0.9041，对比 0.8813 (RealisDance-DiT)，变化 +0.0228。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -83,7 +85,7 @@ MotionWeaver 建立在预训练视频扩散模型 **Wan2.1-I2V-14B-480P** 之上
 
 尽管性能显著领先，MotionWeaver 仍存在若干局限：在真实人类场景中手部生成模糊（因基础模型手部生成能力弱且有意避免以人为中心的偏见）；计算开销大，推理延迟较高；当前仅支持49帧固定长度输入。开放问题包括：如何在不牺牲泛化性的前提下增强手部细节？能否通过蒸馏实现实时推理？框架对三人及以上场景的鲁棒性如何？这些方向有待后续工作探索。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -117,7 +119,9 @@ MotionWeaver 建立在预训练视频扩散模型 **Wan2.1-I2V-14B-480P** 之上
 
 这一设计使MotionWeaver成为首个能够在多样类人形态和密集交互遮挡下实现稳健动画生成的框架，其有效性通过定量指标、定性可视化和用户研究得到了系统验证。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MotionWeaver的核心创新在于构建了一个**整体4D锚定范式**，通过三个因果杠杆模块系统性地解决了多类人角色动画中长期存在的运动-外观耦合、多人信号混淆和遮挡处理难题。
 
@@ -162,7 +166,7 @@ $$
 
 三个模块构成因果闭环：UCC提供可泛化的运动表征，HSI在4D空间中实现表征与视觉生成的精确对齐，H4S通过分阶段监督将4D运动先验注入模型训练。这一组合使MotionWeaver成为首个在多样类人形态和密集交互遮挡下实现稳健动画生成的框架——定性结果（Figure 3）显示其为唯一能正确处理角色间密集交互与遮挡的方法，用户研究中遮挡处理维度优势高达68%（Figure 13）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_KjlLwRsiUE/figures/002_Figure_2.jpg]]
 *Figure 2: The overview of our MotionWeaver. (a) Unified-Choreography Core extracts unified motion representations $\left( z _ { u n i } \right$) . (b) Hyper-Scene Integrator integrates the motion representations with video latents within a shared 4D space. (c) Hierarchical-4D Supervision utilizes timestep-specific 4D supervision to help the model effectively learn motion representations
@@ -185,7 +189,7 @@ MotionWeaver 提出了一个面向多类人角色图像动画的整体4D锚定�
 
 现有方法（如 **MimicMotion** (Zhang et al., 2025)、**UniAnimate-DiT** (Wang et al., 2025b) 等）的根本瓶颈在于运动表征与角色形态纠缠，且缺乏显式4D时空建模能力，导致多角色场景下信号混叠、遮挡处理失败。MotionWeaver 通过三个因果杠杆破解这一困境：UCC 实现运动-身份解耦，HSI 提供深度感知的时空融合，H4S 将4D运动先验注入生成过程。消融实验 (Table 2) 证实，移除任一组件均导致性能显著下降——移除 DCR 使 FVD 从 145.7 恶化至 225.6，移除 MNP 使 CLIP 从 0.9041 骤降至 0.7801，验证了各模块的因果贡献。
 
-## 核心模块与公式推导
+
 
 ### 3.1 统一编舞核心 (Unified-Choreography Core, UCC)
 
@@ -237,7 +241,9 @@ $$\mathcal{L}_{H4S} = \begin{cases} \mathcal{L}_{MSE} + \lambda_1 \mathcal{L}_{O
 
 上述三个模块形成清晰的因果链条：**UCC** 将形态各异的类人骨架统一为身份无关的运动令牌，解决了运动表征与形态纠缠的瓶颈；**HSI** 在共享 4D 空间中通过深度感知注意力和动态 C-RoPE 融合运动与视频信号，赋予模型理解深度顺序和时空位置的能力；**H4S** 通过分阶段监督将 4D 运动先验注入扩散过程，使运动学习与外观生成解耦。消融实验（Table 2）证实了这一因果链路：移除 MNP 导致泛化能力骤降（CLIP 从 0.9041 降至 0.7801），移除 DCR 使视频质量严重恶化（FVD 从 145.7 升至 225.6），移除 H4S 则同时损害图像质量和运动对齐（FID 从 19.41 升至 21.46，CLIP 降至 0.8714）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -302,7 +308,9 @@ MotionWeaver在专门构造的**DualDynamics基准**上与7个现有方法进行
 ![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_KjlLwRsiUE/figures/001_Figure_1.jpg]]
 *Figure 1: We propose MotionWeaver, a novel framework for multi-humanoid image animation, which effectively handles occlusions and complex interactions in multi-character scenarios, while showing strong generalization across diverse humanoid characters and artistic styles*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 
@@ -345,6 +353,8 @@ MotionWeaver的核心假设和适用边界可从数据、形态、计算三个�
 4. **4D建模的深化**：当前4D空间建模聚焦于z轴遮挡和t/x/y轴位置编码。能否进一步联合估计光流和深度图，以支持更自由的相机运动（如视角旋转、缩放）？
 
 5. **域适应策略**：仅使用人类视频训练却能泛化到非人类形态的原理，本质上是标准化骨架映射的抽象能力。但该泛化的上限在哪里？是否需要合成数据（如Blender渲染的机器人/动物动画）进行显式的域适应？消融实验（Table 2）中移除MNP导致CLIP从0.9041骤降至0.7801，表明标准化骨架对泛化至关重要，但其对极端非人形形态的鲁棒性仍需系统评估。
+
+
 
 ## 原文 PDF
 

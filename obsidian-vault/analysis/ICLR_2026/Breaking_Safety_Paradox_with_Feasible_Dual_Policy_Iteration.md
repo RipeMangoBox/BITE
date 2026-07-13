@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Breaking_Safety_Paradox_with_Feasible_Dual_Policy_Iteration.pdf
+project_link: null
+code_link: null
 aliases:
 - FDPIF
 - BSPFDPI
@@ -41,11 +43,11 @@ claims:
 > - Safety-Gymnasium 上，Return 为 25.77 ± 0.49，对比 SAC-Lagrangian: 25.42 ± 0.62，变化 +0.35。
 > - Safety-Gymnasium 上，Cost 为 0.44 ± 0.67，对比 SAC-Lagrangian: 0.56 ± 0.78，变化 -0.12。
 
-## 概述
+## 概要
 
 本文提出了一种名为**Feasible Dual Policy Iteration (FDPI)** 的安全强化学习算法，旨在解决安全强化学习中的一个关键障碍——**安全悖论（safety paradox）**。该悖论指出：当策略变得更安全时，违反约束的样本数量会减少，这反而导致可行性函数（feasibility function）的估计误差增大，最终损害策略的安全性。FDPI通过引入一个额外的**对偶策略（dual policy）**来主动最大化约束违反，同时通过KL散度约束使其接近原始策略，从而增加违反样本的比例，打破这一自败循环。实验在Safety-Gymnasium基准测试的14个环境上进行，结果表明FDPI在成本和回报两个指标上均优于SAC-Lagrangian、PPO-Lagrangian、CPO、FOCOPS、CUP、IPO和CRPO等基线方法。
 
-## 背景与动机
+
 
 ### 2.1 安全强化学习问题
 
@@ -69,7 +71,9 @@ $$\mathbb{E}\left[\left|\frac{\hat{F}^\pi(x)-F^\pi(x)}{F^\pi(x)}\right|\right] \
 
 这两个定理共同揭示了安全悖论：更安全的策略导致更大的违反步数方差，进而导致更大的可行性函数估计误差。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FDPI的核心创新在于通过引入对偶策略来打破安全悖论。具体而言：
 
@@ -81,7 +85,7 @@ $$\hat{r}_{\text{pd}}(x) = \prod_{s=0}^{t(x)} \frac{\pi_{\text{p}}(u_s|x_s)}{\pi
 
 3. **策略间KL散度约束**：限制原始策略与对偶策略之间的KL散度，确保IS的数值稳定性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0001_BHSSV1nHvU_Breaking_Safety_Paradox_with_Feasible_Dual_Polic/figures/001_Figure_1.jpg]]
 *Figure 1: Normalized cost-return plot. Error bars represent 95% confidence intervals.*
@@ -97,7 +101,7 @@ FDPI的整体框架包含以下核心模块：
 
 数据收集过程同时使用原始策略和对偶策略，对偶策略主动收集违反样本，从而增加违反样本比例，打破安全悖论。
 
-## 核心模块与公式推导
+
 
 ### 5.1 约束衰减函数（CDF）
 
@@ -135,7 +139,9 @@ $$F^\pi(x) = \underbrace{\mathbb{E}[\text{discounted cost of Segment 1}]}_{\text
 
 每个段以违反结束，因此CDF的估计误差会传播到CVF。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 6.1 主要实验结果
 
@@ -213,7 +219,9 @@ FDPI显著优于IPO和CRPO。
 ![[assets/figures/papers/iclr26_0001_BHSSV1nHvU_Breaking_Safety_Paradox_with_Feasible_Dual_Polic/figures/010_Table_1.jpg]]
 *Table 1: Hyperparameters*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 7.1 方法谱系
 
@@ -238,6 +246,8 @@ FDPI与FCSRL正交：FCSRL改进数据利用，FDPI改进数据收集。
 - 是否存在更优的对偶策略激活机制，避免手动调整阈值 $d$？
 - FDPI在更复杂、高维度的安全控制任务（如自动驾驶、机器人操作）上的表现如何？
 - 能否将FDPI与表示学习方法（如FCSRL）结合，进一步提升数据利用效率？
+
+
 
 ## 原文 PDF
 

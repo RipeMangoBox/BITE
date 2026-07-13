@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/MotionHiFlow_Text_to_Motion_via_Hierarchical_Flow_Matching.pdf
+project_link: null
+code_link: https://github.com/ai-lh/MotionHiFlow
 aliases:
 - MotionHiFlow
 tags:
@@ -40,7 +42,7 @@ claims:
 > - HumanML3D 上，R-Precision Top-1, FID 0.563；R-Precision Top-1, FID 0.032；MM-Dist 2.691。
 > - KIT-ML 上，R-Precision Top-1, FID 0.482；R-Precision Top-1, FID 0.135；MM-Dist 2.552。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有文本到动作生成方法（如 MDM (Tevet et al., ICLR 2023)、MoMask、MoGenTS (Yuan et al., NeurIPS 2024)）均在单一时间尺度上操作，难以同时捕捉全局语义结构和细节运动时序，导致语义对齐与运动连贯性不足。
 
@@ -50,7 +52,7 @@ claims:
 
 **主要结果**：在 HumanML3D 数据集上，MotionHiFlow 取得 FID=0.032、R-Precision Top-1=0.563、MM-Dist=2.691；在 KIT-ML 上取得 FID=0.135、R-Precision Top-1=0.482、MM-Dist=2.552（Table 1）。消融实验表明，引入分层流匹配、TMDiT 和拓扑感知 VAE 后，FID 从 0.074 显著降至 0.032（Table 3）。用户研究进一步验证了该方法在真实性和文本对齐方面优于 MoMask 和 MoGenTS（Figure 5）。
 
-## 背景与动机
+
 
 ### 文本到运动生成的核心挑战
 
@@ -78,7 +80,9 @@ claims:
 
 通过这种层次化设计，MotionHiFlow旨在从根本上解耦语义对齐与细节生成，使每个阶段专注于其对应尺度的建模目标，从而突破单尺度方法的性能瓶颈。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MotionHiFlow的核心创新在于将文本到运动生成从单一时间尺度拓展为**分层多尺度流匹配框架**，并通过三个关键机制解决语义对齐与运动细节的矛盾。
 
@@ -110,7 +114,7 @@ MotionHiFlow的核心创新在于将文本到运动生成从单一时间尺度�
 
 **证据强度**：Table 3的消融实验显示，引入TMDiT和拓扑感知VAE后，FID从0.074显著降至0.032（HumanML3D），验证了这些组件对生成质量的因果贡献。Table 1的主实验进一步表明，完整框架在HumanML3D上取得FID=0.032、R-Precision Top-1=0.563，在KIT-ML上取得FID=0.135、R-Precision Top-1=0.482，均达到最优水平。
 
-## 整体框架
+
 
 MotionHiFlow 构建了一个**从粗到细的多阶段生成管线**，核心思路是将文本到运动的生成过程分解为 K 个时间尺度递增的阶段，每个阶段通过流匹配（Flow Matching）学习对应尺度下的速度场。整个框架包含五个关键模块，形成“编码—条件去噪—解码”的完整链路。
 
@@ -146,7 +150,7 @@ MotionHiFlow 构建了一个**从粗到细的多阶段生成管线**，核心思
 
 整个管线采用两阶段训练策略：先训练 Motion VAE（重建损失 + KL 散度 + 增强损失 $\mathcal{L}_{aug}$），再冻结 VAE 训练 TMDiT 的分层流匹配损失（Section 3.6）。
 
-## 核心模块与公式推导
+
 
 ### 3.1 基础流匹配
 
@@ -213,7 +217,9 @@ TMDiT 是去噪网络的核心，采用双流架构分别处理运动特征与�
 ![[assets/figures/papers/paper_list_l13_https_openaccess_thecvf_com_content_CVPR2026_html_Li_MotionHiFlow_Text_t/figures/003_Figure_3.jpg]]
 *Figure 3: Iustrationof twomaincomponents inourTMDiT.(a)The TMDiblock employs two separate streams that independently processmotionandtextfeatures,whileself-atentionandsharedparametersenablesiformationexchangebetweestreams.(b)TheJoint RoPE integratesotationsderivedfromtemporaldisplacement,relative spatialcoordiates,andthe human bodytopologies.Here*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心动机验证：粗尺度运动保留语义
 
@@ -289,7 +295,9 @@ Table 1 中各基线方法的具体数值在分析材料中未精确提取，建
 
 ![[assets/figures/papers/paper_list_l13_https_openaccess_thecvf_com_content_CVPR2026_html_Li_MotionHiFlow_Text_t/figures/004_Table.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心问题定位
 
@@ -338,6 +346,8 @@ MotionHiFlow位于**分层生成×流匹配×运动VAE**的方法交叉点，与
 3. **分层尺度的自动化选择：** 能否根据输入文本的复杂度自适应调整尺度数量和分布，而非固定三层结构？
 4. **与其他模态的扩展：** 方法框架是否适用于音频到运动、视频到运动等其他条件生成任务，需要进一步研究。
 5. **Table 1基线数值补充：** 当前分析中Table 1的baseline具体数值未精确提取，需要手动验证各对比方法在HumanML3D和KIT-ML上的完整指标。
+
+
 
 ## 原文 PDF
 

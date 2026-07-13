@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/TINKER_Diffusions_Gift_to_3D_Multi_View_Consistent_Editing_From_Sparse_Inputs_without_Per_Scene_Optimization.pdf
+project_link: null
+code_link: null
 openreview_forum_id: j7Vt2lp2jX
 aliases:
 - TINKER
@@ -41,7 +43,7 @@ claims:
 > - Mip-NeRF-360 / IN2N 上，DINO 为 0.959 (few-shot)，对比 0.957 (GaussCtrl)，变化 +0.002。
 > - Mip-NeRF-360 / IN2N 上，Aesthetic 为 6.338 (few-shot)，对比 5.661 (EditSplat)，变化 +0.677。
 
-## 概述
+## 概要
 
 **核心问题**：现有3D场景编辑方法普遍依赖逐场景优化（per-scene finetuning）来维持多视角一致性，这不仅带来高昂的计算开销，也未能充分利用最新大规模2D基础模型的生成能力。同时，直接从稀疏编辑视图重建完整3D场景面临“局部一致但全局不一致”的困境——即使通过图像拼接实现相邻视图的一致编辑，不同拼接对之间仍存在显著差异（Figure 2）。
 
@@ -53,7 +55,7 @@ claims:
 
 **局限性**：当前方法依赖深度约束，无法处理涉及大幅几何变形的编辑；合成训练数据中个别样本的细节一致性有待提升。
 
-## 背景与动机
+
 
 3D场景编辑是计算机视觉与图形学中的核心任务，其目标是在保持多视角几何一致性的前提下，根据用户指令对三维场景进行语义修改。近年来，基于3D高斯泼溅（3D Gaussian Splatting, 3DGS）的显式表示方法因其高效的渲染能力和灵活的可编辑性，已成为该领域的主流范式。
 
@@ -67,7 +69,9 @@ claims:
 
 上述观察揭示了一个清晰的研究机会：**能否通过重新激活预训练扩散模型的隐式3D意识，构建一个无需任何逐场景优化的3D编辑框架？** 这需要同时解决两个子问题：（1）如何赋予基础模型跨视角参考编辑的能力；（2）如何从稀疏的编辑视图高效传播至稠密视图，完成场景级重建。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 TINKER 的核心创新在于通过**两个关键设计**彻底消除了现有3D编辑方法对逐场景优化（per-scene finetuning）的依赖，同时实现了从稀疏输入到多视角一致编辑的高质量输出。
 
@@ -93,7 +97,7 @@ TINKER 的核心创新在于通过**两个关键设计**彻底消除了现有3D�
 
 核心洞察在于：大规模图像编辑基础模型通过简单图像拼接已展现**潜在的3D感知能力**。TINKER 通过两个互补的微调阶段激活并强化了这一能力——多视角一致编辑器确保稀疏编辑视图的全局一致性，深度引导的场景补全模型将稀疏编辑传播至稠密视图，从而将3D编辑转化为“参考编辑+几何约束重建”的复合任务，彻底绕过逐场景优化。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l32_https_openreview_net_forum_id_j7Vt2lp2jX/figures/004_Figure_3.jpg]]
 *Figure 3: Overview of our editing process. We first apply our multi-view consistent editing model to obtain coherent sparse views. Leveraging depth constraints from the rendered results, we generate a large number of consistent edited images. The edited images are used to optimize the 3DGS to achieve high-quality 3D editing*
@@ -124,7 +128,7 @@ Figure 3清晰展示了四个模块的串联关系与数据依赖：
 
 这两个设计共同实现了“编辑即重建”的范式转换——将编辑任务转化为以深度为约束、参考视图为条件的场景重建问题，从而彻底绕过了逐场景优化的计算瓶颈。
 
-## 核心模块与公式推导
+
 
 TINKER 由两个核心模块串联构成：**多视角一致编辑器**（Multi-view Consistent Editor）和**场景补全模型**（Scene Completion Model）。两个模块均基于流匹配（Flow Matching）框架训练，共享 DiT（Diffusion Transformer）架构，但承担不同的功能角色。
 
@@ -193,7 +197,9 @@ $$
 
 两个模块在推理时串联工作（见 Figure 3）：首先从原始 3DGS 渲染视频中随机选取稀疏视图，经多视角一致编辑器生成参考编辑视图；同时利用 Video Depth Anything 从渲染视频中估计深度图序列；最后将深度图与参考视图输入场景补全模型，生成稠密的多视角一致编辑图像，用于优化 3DGS 得到最终编辑场景。整个过程无需任何逐场景微调。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 
@@ -243,7 +249,9 @@ TINKER在Mip-NeRF-360/IN2N基准上，无论few-shot还是one-shot设置，均�
 *Figure 18: Vincent van Gogh Fail Figure S7: Prior methods’ attention designs are tightly coupled with the U-Net architecture, causing severe performance degradation when the editing model is directly replaced*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有3D编辑方法的关系
 
@@ -285,6 +293,8 @@ TINKER 的方法设计深度绑定于两个关键基础模型的选择：
 2. **合成数据一致性的进一步提升**：当前数据生成依赖基础模型的拼接编辑能力，其跨视图一致性在“局部一致但全局不一致”的瓶颈（Figure 2a）。如何构建更高质量的多视角编辑数据集，是进一步提升模型性能的关键。
 
 3. **架构迁移的通用性**：论文证明直接将U-Net方法迁移到DiT架构不可行（Figure S7, Table S3），但未探索是否存在通用的架构适配策略，使现有3D编辑方法能够利用DiT-based基础模型的能力。
+
+
 
 ## 原文 PDF
 

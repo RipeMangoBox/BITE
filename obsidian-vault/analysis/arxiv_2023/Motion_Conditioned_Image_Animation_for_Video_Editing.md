@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2023
 pdf_ref: paperPDFs/arxiv_2023/Motion_Conditioned_Image_Animation_for_Video_Editing.pdf
+project_link: null
+code_link: null
 aliases:
 - MMCIA
 - MCIAVE
@@ -42,7 +44,7 @@ claims:
 > - VideoEdit Benchmark (Motion Edits) 上，Human Preference Win-Rate 99% vs Gen-1 vs 1% (+98%)。
 > - VideoEdit Benchmark (Style Edits) 上，M_geo (VideoCLIP) 0.331 vs 0.259 (VideoComposer) (+0.072)。
 
-## 概述
+## 概要
 
 视频编辑旨在同时修改视频的视觉外观与运动模式，但现有方法普遍将运动编辑视为次要问题，且缺乏统一、全面的评估基准，使得不同方法的能力难以公平比较。针对这一瓶颈，**MoCA (Motion-Conditioned Image Animation)** 提出将视频编辑解耦为两个子任务：首先利用现成的文本驱动图像编辑器修改首帧，然后通过一个以光流为运动条件的视频扩散模型将编辑后的首帧“动画化”为完整视频。这一范式将空间编辑与运动生成分离，既保证了高质量的空间编辑，又实现了灵活的运动控制。
 
@@ -58,8 +60,6 @@ $$
 
 在方法谱系中，MoCA 区别于端到端的视频编辑方法（如 **Tune-A-Video**、**Dreamix**）和基于注意力传播的方法（如 **TokenFlow**、**MasaCtrl**），其核心创新在于显式的“图像编辑+运动条件动画”分解范式，以及在大规模视频-文本数据（3400万视频-文本对）上微调 14 亿参数视频扩散模型的训练策略。这一设计使其在空间编辑和运动编辑上均表现出色，但也存在若干局限：编辑质量依赖首帧图像编辑的成功与否；对于长视频或显著相机运动场景，仅以首帧和全局光流表示可能丢失后续帧的细节；自动评估指标与人类判断的对齐度有限（尤其在运动编辑上），可靠评估仍需依赖人工评测。
 
-## 背景与动机
-
 视频编辑旨在对给定的源视频施加语义变化，使其在保持源内容一致性的同时，忠实地反映编辑提示所描述的目标状态。这一任务在视频创作、内容重定向和视觉特效等领域具有广泛的应用前景。然而，现有方法普遍面临一个核心瓶颈：**运动编辑的缺失与评估体系的碎片化**。大多数视频编辑方法——无论是基于文本到图像扩散模型的免调方法（如 **TokenFlow**，Geyer et al., arXiv 2023），还是通过单视频微调实现编辑的方法（如 **Tune-A-Video**，Wu et al., ICCV 2023）——都将注意力集中在空间属性的修改上（如替换物体、改变背景或风格），而几乎完全忽视了对视频中运动模式的编辑。当用户希望改变物体的运动轨迹、速度或运动类型时，这些方法往往无能为力。
 
 这一缺口源于现有方法对运动信息处理方式的根本局限。以 **Gen-1**（Esser et al., arXiv 2023）为代表的方法依赖深度图或边缘图作为结构条件，其设计初衷是保留源视频的空间结构，而非改变运动模式。**Dreamix**（Molad et al., arXiv 2023）通过微调文本到视频扩散模型实现编辑，但运动编辑能力同样受限。**VideoComposer**（Wang et al., arXiv 2023）虽然支持多条件控制，但其合成式框架并未显式解耦运动与外观。这些方法的共同缺陷在于：运动和外观被耦合在统一的生成过程中，导致对其中任一维度的独立编辑都变得困难。
@@ -68,7 +68,7 @@ $$
 
 MoCA的提出正是为了填补上述双重缺口。其核心动机可概括为两点：**（1）将运动编辑纳入视频编辑的核心能力范畴，而不仅仅是空间属性的修改；（2）建立一个涵盖多种编辑类型的统一评估框架，使不同方法的运动编辑和空间编辑能力得以公平比较。** 为实现这一目标，MoCA采用了一种简洁而有效的范式：将视频编辑解耦为“现成图像编辑器对首帧进行空间编辑”+“基于光流运动条件的视频扩散模型进行图像动画”。这一分解使得空间编辑和运动编辑可以独立控制——在空间编辑时保留光流以忠实重现源视频运动，在运动编辑时丢弃光流以允许生成全新的运动模式。
 
-## 核心创新
+## 核心方法与创新机理
 
 MoCA的核心创新在于将视频编辑问题**解耦为两个独立阶段**：首帧图像编辑与运动条件图像动画。这一范式与现有端到端或基于注意力传播的方法（如**TokenFlow** (Geyer et al., arXiv 2023)、**Tune-A-Video** (Wu et al., ICCV 2023)）形成根本性差异——后者不显式分解空间编辑与运动生成，导致编辑灵活性和运动控制能力受限。
 
@@ -105,8 +105,6 @@ $$
 ### 证据支撑
 
 消融实验证实了运动条件的有效性：在空间编辑任务中，带运动条件的编辑在人类偏好比较中被选中的比例达到57%-60%（Table 5），表明运动条件有助于保持源视频的运动特征。在运动编辑任务中，通过设置 $s_M=0$ 丢弃运动条件，MoCA成功实现了与源视频不同的全新运动生成，在人类评估中对**Gen-1** (Esser et al., arXiv 2023) 的偏好度高达99%（Table 2），远超所有基线方法。
-
-## 整体框架
 
 MoCA 将视频编辑任务解耦为两个阶段：**图像编辑**与**运动条件图像动画**。这一分解范式的核心动机在于，现有视频编辑方法普遍将空间编辑与运动编辑耦合在一起处理，导致在需要改变运动模式的场景下性能急剧下降。通过显式分离，MoCA 得以在空间编辑时忠实重现源视频运动，而在运动编辑时灵活丢弃运动条件以生成全新运动。
 
@@ -146,8 +144,6 @@ $$
 
 然而，这一范式也存在结构性瓶颈：整个生成过程强依赖于首帧编辑质量——若首帧编辑失败，错误将通过图像条件传播至所有后续帧。此外，对于长视频或存在显著相机运动的场景，仅以首帧和全局光流表示可能无法保持源视频中后出现的内容和细节，这是该框架的固有局限。
 
-## 核心模块与公式推导
-
 MoCA 将视频编辑解耦为两个正交阶段：**图像编辑**与**运动条件图像动画**。其核心由四个模块构成，协同实现空间编辑与运动编辑的统一。
 
 ### 1. 图像编辑模块
@@ -182,12 +178,7 @@ $$\widetilde{v}_{\theta}(z_t, c_M, c_T, c_I) = v_{\theta}(z_t, \emptyset, \empty
 
 该公式通过逐步叠加各条件的预测差值，实现了对三个条件的独立控制。**运动编辑的关键机制**在于：当 $s_M = 0$ 时，运动条件项 $(v_{\theta}(z_t, c_M, c_T, c_I) - v_{\theta}(z_t, \emptyset, c_T, c_I))$ 被完全丢弃，模型仅依赖图像和文本条件生成视频，从而摆脱源视频运动的约束，产生全新的运动模式。消融实验证实了这一机制的有效性：在空间编辑中保留运动条件可使人类偏好度达到 57%-60%（Table 5），而在运动编辑中丢弃运动条件则成功实现了与源视频不同的运动生成。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1056_https_arxiv_org_abs_2311_18827/figures/010_Figure_5.jpg]]
-*Figure 5: MoCA edits for “A boat sailing on the moon" with and without motion conditioning. Using motion conditioning allows the model to more faithfully follow the boat’s movement in the original source video. Without motion conditioning, the model tends to generate more random movement directions, such as moving backwards*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -236,17 +227,8 @@ MoCA在自建的VideoEdit基准上进行了全面的人类评估，该基准包�
 ![[assets/figures/papers/paper_list_l1056_https_arxiv_org_abs_2311_18827/figures/006_Table_2.jpg]]
 *Table 2: Human evaluation results for preference of our method over each of the baselines. User ratings generally show greater preference for our method, with the exception of Gen-1 for background edits, and Drea mix for multi-spatial edits*
 
-![[assets/figures/papers/paper_list_l1056_https_arxiv_org_abs_2311_18827/figures/008_Figure_4.jpg]]
-*Figure 4: Percentage of each reason selected when human evaluators prefer MoCA edits to each of the baselines. The reasons for picking one model over another on each video edit could be either its better alignment with the edit prompt, higher consistency with the source video, or both. Generally, human raters preferred our method in terms of better alignment with the desired edit prompt*
-
-![[assets/figures/papers/paper_list_l1056_https_arxiv_org_abs_2311_18827/figures/017_Table_7.jpg]]
-*Table 7: The results confirm the superiority of MoCA to other methods for all edit tasks. Additionally, we analyze the Spearman correlation [33] between automatic metrics introduced in Section 5.5 and human judgements. The results in Table 6 suggest the VideoCLIP based*
-
 ![[assets/figures/papers/paper_list_l1056_https_arxiv_org_abs_2311_18827/figures/018_Table_7.jpg]]
 *Table 7: Continued automatic metric results and correlation analysis for MoCA video-editing evaluation.*
-
-![[assets/figures/papers/paper_list_l1056_https_arxiv_org_abs_2311_18827/figures/002_Figure_1.jpg]]
-*Figure 1: is able to generate a diverse range of edits, such as object replacement, style changes, and motion edits. The frames in the top row in each example represent the source video while the bottom ones show the edited frames by MoCA. The source and editing prompts are shown above each example*
 
 ![[assets/figures/papers/paper_list_l1056_https_arxiv_org_abs_2311_18827/figures/007_Table_3.jpg]]
 *Table 3: Classification accuracy of each CLIP-based automatic metric, considering binary human decisions comparing MoCA edits against different baselines as the ground truth labels. Note that random guessing achieves roughly 50% accuracy*
@@ -257,7 +239,7 @@ MoCA在自建的VideoEdit基准上进行了全面的人类评估，该基准包�
 ![[assets/figures/papers/paper_list_l1056_https_arxiv_org_abs_2311_18827/figures/014_Figure_9.jpg]]
 *Figure 9: Comparisons for multi-spatial video edit prompts*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 编辑范式谱系：从端到端到解耦式生成
 

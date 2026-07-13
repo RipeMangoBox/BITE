@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/Retargeting_Matters_General_Motion_Retargeting_for_Humanoid_Motion_Tracking.pdf
+project_link: null
+code_link: https://github.com/kevinzakka/mink
 aliases:
 - GMRG
 - RMGMRHMT
@@ -39,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - LAFAN1 subset (21 motions, sim) 上，E_g-mpbpe Mean (mm) 104.1 vs 247.8 (-143.7)；E_mpjpe Mean (1e-3 rad) 561.7 vs 778.5 (-216.8)。
 
-## 概述
+## 概要
 
 人形机器人运动跟踪的核心挑战之一，是如何将来自任意人体运动源的参考动作高质量地映射到目标机器人上。现有运动重定向方法——如基于SMPL模型优化的**PHC**（Luo et al., ICCV 2023）和采用Mink差分IK的**ProtoMotions**（Tessler et al., 2024）——在处理人体到人形机器人的尺度差异时，普遍采用全局均匀缩放或SMPL拟合缩放策略。这些策略会在重定向结果中引入地面穿透、脚滑动、自相交和关节值突变等严重伪影。当这些包含伪影的参考动作被送入强化学习策略进行训练时，策略的学习难度显著增加，鲁棒性和成功率大幅削弱——这一问题在缺乏大量奖励工程的情况下尤为突出。
 
@@ -47,7 +49,7 @@ claims:
 
 在21个LAFAN1序列的仿真评估中，GMR的全局位置误差（E_g-mpbpe）均值为104.1 mm，显著低于PHC的247.8 mm和ProtoMotions的139.7 mm。用户研究（N=20）表明，GMR重定向动作的感知保真度显著优于两种基线方法，接近闭源Unitree数据集的重定向质量。低成功率案例的归因分析直接验证了伪影与策略失败之间的因果关系：PHC在“Dance 1”中的地面穿透、ProtoMotions在“Run (stop & go)”中的自相交，以及GMR在极少数情况下的关节值突变，均导致策略难以学习或完全失败。所有策略均使用独立的BeyondMimic框架训练，未针对任何重定向方法进行奖励调优，确保了比较的公平性。
 
-## 背景与动机
+
 
 ### 人形机器人运动跟踪的核心挑战
 
@@ -82,7 +84,9 @@ GMR的核心创新在于两个相互配合的设计选择：
 
 通过将GMR与独立于重定向的训练框架（BeyondMimic）结合，本文系统性地验证了：**重定向质量是决定运动跟踪策略性能的上游关键因素**，而GMR所采用的尺度变换与优化策略能够有效消除现有方法的典型伪影，使开源重定向流程的性能接近闭源高质量数据集（Unitree）的水平。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心贡献在于提出了一种**通用运动重定向方法（General Motion Retargeting, GMR）**，其关键创新并非强化学习策略本身，而是对上游重定向流水线中**尺度变换策略**与**优化求解顺序**的重新设计。现有方法（如 **PHC** 重定向，Luo et al., ICCV 2023; He et al., 2024，以及 **ProtoMotions** 重定向，Tessler et al., 2024）在将人体运动映射到人形机器人时，因尺度差异处理不当而引入严重伪影，这些伪影作为参考动作输入策略后，显著增加了学习难度，削弱了策略的鲁棒性。
 
@@ -122,7 +126,7 @@ PHC 和 ProtoMotions 需要将 BVH 格式转换为 SMPL 或 SMPL-X 格式，这�
 
 上述创新的有效性通过严格的消融与对照实验得到验证。在 21 个 LAFAN1 序列的仿真评估中，使用 GMR 重定向数据训练的策略，其全局位置误差（$E_{\mathrm{g-mpbpe}}$）均值仅为 104.1 mm，显著低于 PHC 的 247.8 mm 和 ProtoMotions 的 139.7 mm（TABLE II）。更重要的是，低成功率的重定向参考动作中可明确观察到与缩放策略直接相关的伪影：PHC 在 “Dance 1” 中出现严重地面穿透，ProtoMotions 在 “Run (stop & go)” 中出现自相交（Fig. 3），这些伪影直接导致对应策略学习失败或成功率极低。值得注意的是，所有策略均使用独立的 BeyondMimic 框架训练，未针对任何重定向方法进行奖励函数调优，这确保了性能差异可归因于重定向质量本身。
 
-## 整体框架
+
 
 General Motion Retargeting (GMR) 是一个五阶段的运动重定向流水线，旨在将任意人体运动源（BVH 格式）转换为目标人形机器人的关节轨迹。该流水线以模块化方式依次执行以下步骤：
 
@@ -141,7 +145,7 @@ General Motion Retargeting (GMR) 是一个五阶段的运动重定向流水线�
 ![[assets/figures/papers/paper_list_l38_https_arxiv_org_abs_2510_02252v1/figures/002_Figure_2.jpg]]
 *Figure 2: General Motion Retargeting (GMR) Pipeline*
 
-## 核心模块与公式推导
+
 
 GMR 流水线由五个顺序模块构成（Fig. 2），其核心设计围绕一个关键因果机制展开：**非均匀局部缩放消除伪影，两阶段 IK 在无穿透约束下逐步恢复跟踪精度**。以下仅展开与公式直接关联的三个关键模块。
 
@@ -178,7 +182,9 @@ $$\operatorname*{min}_{\mathbf{q}} \sum_{(i,j)\in\mathcal{M}} \left[ (w_2)_{i,j}
 
 对于完整运动序列，GMR 逐帧应用上述流程，并使用前一帧的重定向结果作为当前帧 Step 4 优化的初始猜测，以保证时序连续性。最后，通过计算序列中所有身体部位的最小高度，将其从全局平移中减去，以修正可能出现的全局浮动或地面穿透伪影。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈：重定向伪影如何破坏策略学习
 
@@ -244,7 +250,9 @@ $$\operatorname*{min}_{\mathbf{q}} \sum_{(i,j)\in\mathcal{M}} \left[ (w_2)_{i,j}
 ![[assets/figures/papers/paper_list_l38_https_arxiv_org_abs_2510_02252v1/figures/001_Figure_1.jpg]]
 *Figure 1: For the user study, participants were shown videos of the reference motion (a), and asked to choose which retarget video (b) was more similar to it*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有重定向方法的关系
 
@@ -291,6 +299,8 @@ GMR 在人形机器人运动跟踪的完整知识链中扮演**上游参考动�
 - **起始帧鲁棒性**：消融实验揭示了一个重要的脆弱性来源——参考动作的起始帧选择对策略成功率有显著影响，同一策略从不同帧启动，成功率可在 14% 到 100% 之间波动。如何建立通用启发式规则来确定安全的起始与结束帧，保证策略在任意运动中稳定启动和停止，是一个尚未解决的问题。
 
 - **多平台扩展**：该重定向方法能否无缝扩展至多款人形机器人平台？如何自动生成高质量的关键身体映射，以及如何根据机器人运动学约束自动调整局部缩放因子，是实现 “一次重定向，多平台部署” 的关键挑战。
+
+
 
 ## 原文 PDF
 

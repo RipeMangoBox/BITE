@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/WorldMirror_Universal_3D_World_Reconstruction_with_Any_Prior_Prompting.pdf
+project_link: null
+code_link: null
 aliases:
 - WorldMirror
 - HY-World-Recon
@@ -41,7 +43,7 @@ claims:
 > - RealEstate10K (camera pose) 上，AUC@30↑ 86.28 (WorldMirror) vs 77.62 (VGGT) (+11.2% (absolute improvement))。
 > - ScanNet (surface normal) 上，Mean angular error↓ 13.8 (WorldMirror) vs 16.0 (StableNormal) (-2.2° (absolute reduction))。
 
-## 概述
+## 概要
 
 现有前馈式三维重建方法普遍以原始图像作为唯一输入，无法有效利用相机内参、位姿和深度图等常见的几何先验信息，导致在无纹理或反射区域等困难场景中性能显著下降。同时，多数方法局限于单一几何任务（如仅估计点云或深度），缺乏统一的通用预测框架。
 
@@ -53,7 +55,7 @@ WorldMirror 针对上述瓶颈，提出了一种**多模态先验提示（Multi-
 
 **主要局限**：模型在动态场景和自动驾驶环境中的性能欠佳，且当前实现受限于输入视图数量和分辨率（300–700 像素），难以处理数千视图的极端情况。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -77,7 +79,9 @@ WorldMirror 针对上述瓶颈，提出了一种**多模态先验提示（Multi-
 
 这一设计实现了双重优势：在无可利用先验时，多任务架构本身已能提供具有竞争力的几何预测；当先验可用时，模型可进一步吸收这些信息以显著提升精度。实验表明，无先验的 WorldMirror 在 7-Scenes 和 DTU 上的点云重建精度分别比 VGGT 和 π3 提升 10.4% 和 17.8%；当利用全部三种先验时，平均精度进一步提升 58.1%（7-Scenes）和 53.1%（NRGBD），验证了框架的有效性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：前馈重建中的先验信息缺失与任务割裂
 
@@ -116,7 +120,7 @@ WorldMirror的深层洞察在于：**将点云、深度、相机、法线和3D�
 
 课程学习策略中任务序列、数据调度和分辨率渐进的具体配比细节尚未完全公开，其对最终性能的贡献量级需要进一步实验验证。此外，单令牌嵌入在极端旋转或大尺度场景下是否会产生全局位置信息的歧义，仍需深入分析。
 
-## 整体框架
+
 
 WorldMirror 的核心设计理念是将异构几何先验统一编码到前馈 Transformer 主干中，使单一模型能够灵活接受任意先验组合，并同时输出点云、深度、相机参数、表面法线和三维高斯（3DGS）五种几何表示。其整体流水线如图 2 所示，包含三个关键阶段：**多模态先验嵌入**、**视觉 Transformer 聚合**和**通用几何预测**。
 
@@ -167,7 +171,7 @@ $$\mathcal{L} = \mathcal{L}_{points} + \mathcal{L}_{depth} + \mathcal{L}_{cam} +
 ![[assets/figures/papers/WorldMirror_Universal_3D_World_Reconstruction_with_Any-Prior_Prompting_f8b2dfa3e8ff/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of WorldMirror. Given multi-view images with optional priors (depths, calibrated intrinsics, camera poses) as input, our framework encodes each prior modality into tokens and integrates them with image tokens. The composite tokens are subsequently processed by a visual transformer backbone to effectively aggregate multi-view features. The consolidated representations are then passed to multi-task heads to generate comprehensive geometric outputs, including point maps, camera parameters, multi-view depth maps, surface normals, and 3D Gaussians*
 
-## 核心模块与公式推导
+
 
 WorldMirror的核心架构由两个关键模块构成：**多模态先验提示（Multi-Modal Prior Prompting）** 和 **通用几何预测（Universal Geometric Prediction）**，二者共同实现从任意先验组合到统一几何输出的前馈推理。
 
@@ -244,7 +248,9 @@ $$\mathcal{L} = \lambda_{\mathrm{points}} \mathcal{L}_{\mathrm{points}} + \lambd
 ![[assets/figures/papers/WorldMirror_Universal_3D_World_Reconstruction_with_Any-Prior_Prompting_f8b2dfa3e8ff/figures/001_Figure_1.jpg]]
 *Figure 1: WorldMirror is a large feed-forward 3D reconstruction model that takes raw images along with optional priors (depth, calibrated intrinsics, camera pose) as input and produces high-quality geometric attributes in seconds, including point clouds, 3DGS, cameras, depth, and normal maps*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 瓶颈突破验证：多模态先验提示的因果效应
 
@@ -318,7 +324,9 @@ WorldMirror的核心主张是多模态先验提示（Multi-Modal Prior Prompting
 ![[assets/figures/papers/WorldMirror_Universal_3D_World_Reconstruction_with_Any-Prior_Prompting_f8b2dfa3e8ff/figures/007_Table_4.jpg]]
 *Table 4: Novel View Synthesis on RealEstate10K and DL3DV. We compare with feed-forward 3DGS methods under sparse and dense-view settings. FLARE focuses on sparse views NVS and thus its performance under dense-view settings is omitted*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法继承与差异定位
 
@@ -364,6 +372,8 @@ WorldMirror 处于前馈三维重建、多任务几何预测和视觉提示学�
 - **前馈新视图合成**：与 AnySplat、FLARE 对比
 - **统一几何预测**：作为首个覆盖五项几何任务的通用模型，为后续多任务统一框架提供参考
 - **先验引导的视觉学习**：多模态先验提示机制可迁移至其他需要融合异构输入的视觉任务
+
+
 
 ## 原文 PDF
 

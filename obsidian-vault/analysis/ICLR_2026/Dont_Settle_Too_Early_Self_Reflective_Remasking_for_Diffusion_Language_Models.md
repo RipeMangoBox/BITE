@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Dont_Settle_Too_Early_Self_Reflective_Remasking_for_Diffusion_Language_Models.pdf
+project_link: null
+code_link: https://github.com/maple-research-lab/RemeDi
 openreview_forum_id: BsZeTuB5fD
 aliases:
 - RREDLM
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 勿过早定局：面向扩散语言模型的自反思重掩码方法 |
 | 英文题名 | Don't Settle Too Early: Self-Reflective Remasking for Diffusion Language Models |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=BsZeTuB5fD); [GitHub](https://github.com/maple-research-lab/RemeDi) |
+| Links | [paper](https://openreview.net/forum?id=BsZeTuB5fD) · [GitHub](https://github.com/maple-research-lab/RemeDi) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | RemeDi (Remasking-enabled Diffusion Language Model) |
 | Dataset | GSM8K, MATH, HumanEval, ARC-C |
@@ -42,7 +44,7 @@ claims:
 > - MATH 上，Accuracy (%) 为 52.9，对比 49.6 (Dream)，变化 +3.3。
 > - HumanEval 上，pass@1 (%) 为 73.2，对比 59.8 (Dream)，变化 +13.4。
 
-## 概述
+## 概要
 
 扩散语言模型（DLM）通过逐步去噪生成文本，在数学推理与代码生成等任务上展现出潜力。然而，现有掩码式 DLM 存在一个关键瓶颈：**一旦令牌被解码（unmask），便永久固定，模型缺乏识别并修正早期错误的能力**，导致错误随生成步骤累积，严重制约生成质量。
 
@@ -52,7 +54,7 @@ claims:
 
 **方法定位**：RemeDi 属于掩码式扩散语言模型，以 **LLaDA**（Nie et al., 2025）为骨干，与 **Dream**（Ye et al., 2025）、**LLaDOU**（Huang et al., 2025）、**ReMDM**（Wang et al., 2025a）等同期工作并列，但在生成过程中引入可学习的自反思修正机制，是对 DLM 推理范式的重要改进。
 
-## 背景与动机
+
 
 扩散语言模型（Diffusion Language Models, DLMs）作为自回归语言模型之外的另一类生成范式，通过迭代去噪过程生成文本，天然支持非自回归的并行解码，在推理效率和可控生成方面展现出潜力。当前主流的掩码式 DLM（如 **LLaDA**、**Dream**）遵循一个基本假设：在生成过程中，一旦某个位置的令牌被解码（unmask），其值便永久固定，不再参与后续的修正。这一设计虽简化了生成流程，却引入了一个根本性缺陷——**模型缺乏识别并修正早期错误的能力**。
 
@@ -62,7 +64,9 @@ claims:
 
 本文的核心动机在于：**赋予扩散语言模型“自反思”（self-reflection）的能力**，使其能够在生成过程中主动评估已解码令牌的置信度，识别低质量令牌并将其重掩码，从而在后续步骤中利用更丰富的上下文重新采样。这一思路将 DLM 的生成过程从单向的“掩码→解码”转变为具备自我纠错能力的“掩码→解码→反思→重掩码→重新解码”循环，有望从根本上缓解错误累积问题。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈诊断：从“一步定终身”到自我修正
 
@@ -116,7 +120,7 @@ $$\pi_{\theta,n}(x_{t_n} | x_{t_{n-1}}) = \pi_{\theta,n}^{\mathrm{unmask}}(\math
 
 这些变革并非孤立的技术叠加，而是围绕“自反思修正”这一核心洞察的系统性重构：双流架构提供了置信度评估的硬件基础，双重噪声和联合损失教会模型识别错误，RL 阶段则优化了修正策略的全局效果。消融实验有力支撑了这一设计的有效性——Remask SFT 在所有基准上均优于 Vanilla SFT，尤其在 MATH-500（+2.6%）和 HumanEval（+1.8%）上（Table 4）；Remask RL 相比 LLaDOU RL 收敛更快且最终奖励更高（Table 5, Fig. 15）。
 
-## 整体框架
+
 
 RemeDi 的核心设计围绕一个双流 Transformer 架构展开，该架构由**令牌预测流（Token Prediction Stream, TPS）**和**去掩码策略流（Unmasking Policy Stream, UPS）**组成（Fig. 2）。TPS 负责在每一个扩散步中预测掩码位置的令牌概率分布，而 UPS 则独立地生成每个位置的置信度分数 $h_{\theta}^i$，用于决定哪些位置应当被去掩码（unmask），哪些位置应当被重掩码（remask），从而赋予模型在生成过程中主动识别并修正早期错误的能力。
 
@@ -131,7 +135,7 @@ RemeDi 的核心设计围绕一个双流 Transformer 架构展开，该架构由
 
 在推理时，RemeDi 的每一步生成均遵循“预测-评估-重掩码”循环：TPS 为所有掩码位置预测候选令牌，UPS 为序列中所有位置（包括已去掩码的）计算置信度。高置信度的掩码位置被去掩码，而低置信度的已去掩码令牌则被重新置为掩码状态，使其能在后续步骤中利用更丰富的上下文信息被重新采样，从而打破传统扩散语言模型“一旦解码便永久固定”的限制（Fig. 1a）。
 
-## 核心模块与公式推导
+
 
 ### 双流架构：TPS 与 UPS
 
@@ -191,7 +195,9 @@ $$\pi_{\theta,n}(x_{t_n} \mid x_{t_{n-1}}) = \pi_{\theta,n}^{\text{unmask}}(\mat
 
 RL 阶段使模型在 GSM8K 上收敛更快且最终奖励高于 LLaDOU RL（Fig. 15, Table 5），验证了联合优化生成轨迹的有效性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心结果：RemeDi 在数学、代码与通用任务上全面刷新开源 DLM 最优水平
 
@@ -270,7 +276,9 @@ RemeDi 在数学推理、代码生成和通用任务基准上均取得开源扩�
 ![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_BsZeTuB5fD/figures/020_Table_7.jpg]]
 *Table 7: Comparison between our learned remask policy in RemeDi and the ReMDM predictorcorrector, both evaluated with RemeDi-Instruct*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法在现有 DLM 谱系中的位置
 
@@ -314,6 +322,8 @@ RemeDi 的核心贡献在于为掩码式扩散语言模型（DLM）引入**自�
 4. **大规模扩展**：该方法在 70B+ 规模模型上的扩展性和稳定性如何？双流架构在大模型下的训练稳定性和通信开销需要实证验证。
 
 5. **更细粒度的重掩码策略**：当前重掩码基于逐令牌置信度，是否可以利用令牌间的结构依赖（如语法树、推理步骤间的逻辑关系）设计更智能的重掩码策略，进一步提升修正效率？
+
+
 
 ## 原文 PDF
 

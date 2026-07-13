@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/From_Language_to_Locomotion_Retargeting_free_Humanoid_Control_via_Motion_Latent_Guidance.pdf
+project_link: null
+code_link: null
 openreview_forum_id: k3Cyx3Uets
 aliases:
 - FLLRFHCMLG
@@ -41,7 +43,7 @@ claims:
 > - HumanML (MotionMillion) - IsaacGym 上，E_mpjpe ↓ 为 0.12 (Ours-DDPM)，对比 0.23 (Baseline)，变化 -0.11。
 > - HumanML3D 上，FID ↓ 为 11.706 (Ours-DDPM)，对比 11.790 (MotionStreamer, 次优)，变化 -0.084 (略优)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：传统语言驱动人形机器人运动控制依赖多阶段流水线——先将文本解码为显式人体运动序列，再通过重定向将运动映射到机器人关节空间，最后由跟踪策略执行。这一范式导致三个核心问题：(1) 各阶段误差逐级累积，最终控制精度受损；(2) 重定向环节成为推理延迟的主要瓶颈，完整流水线耗时高达17.85秒；(3) 语言语义与控制信号之间耦合松散，难以实现端到端优化。
 
@@ -57,7 +59,7 @@ claims:
 
 **局限性提示**：当前实验限于平坦地面运动，训练数据过滤了非平面地形和不可行接触；真机演示仅在部分任务上进行，极端动态动作（如后空翻）的真实世界鲁棒性尚待验证。
 
-## 背景与动机
+
 
 语言指令驱动机器人运动一直是具身智能领域的核心目标。在人形机器人这一类别中，传统方法遵循一条多阶段流水线：首先通过文本到运动生成模型将语言指令解码为显式的人体运动序列，随后利用重定向算法将人体运动映射到目标人形机器人的关节空间，最后由运动跟踪策略执行这些参考轨迹。这条流水线虽然逻辑清晰，但其固有的结构性缺陷正在成为制约系统实时性与鲁棒性的关键瓶颈。
 
@@ -69,7 +71,9 @@ claims:
 
 基于上述分析，本文的核心动机在于：**去除显式运动解码与重定向步骤，将语言–运动潜变量作为一级条件信号，通过扩散策略直接从噪声中降噪生成可执行动作**。这一设计有望从根本上消除中间环节的误差累积，实现端到端的实时、鲁棒控制，同时保持语言语义与运动控制之间的紧密耦合。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 RoboGhost 的核心创新在于将传统语言驱动人形机器人运动控制中的**多阶段流水线压缩为端到端的潜变量驱动范式**，从根本上消除了运动解码与重定向环节带来的误差累积和延迟瓶颈。
 
@@ -97,7 +101,7 @@ RoboGhost 引入**基于扩散模型的去噪策略**：训练时向教师动作
 
 上述创新带来的端到端效果体现在两个核心指标上：**全流水线时间从 17.85 秒缩短至 5.84 秒**（约 3 倍加速），**成功率比基线方法提高 5%**，同时跟踪误差（E_mpjpe）从 0.23 降至 0.12。与包含显式重定向的流水线（Ours-Explicit）相比，隐式潜变量驱动方案（Ours-Implicit）在成功率和跟踪精度上均有显著优势，直接验证了去除重定向环节的因果效应。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_k3Cyx3Uets/figures/003_Figure_2.jpg]]
 *Figure 2: Overview of RoboGhost. We propose a two-stage approach: a motion latent is first generated, then a MoE-based teacher policy is trained with RL and a diffusion-based student policy is trained to denoise actions conditioned on motion latent. This latent-driven scheme bypasses the need for motion retargeting*
@@ -130,7 +134,7 @@ RoboGhost 提出了一种**无重定向、潜变量驱动**的人形机器人运
 
 传统语言驱动运动控制流水线需要依次完成：文本→显式运动序列解码→运动重定向→跟踪控制，各阶段误差累积且总耗时高达 17.85 秒。RoboGhost 将运动潜变量作为一级条件信号，直接跳过解码与重定向步骤，将全流程时间压缩至 5.84 秒。消融实验（Table 4）证实，隐式潜变量驱动方案（Ours-Implicit）的成功率和跟踪误差均优于包含 PHC 重定向的显式流水线（Ours-Explicit），验证了去除中间环节对系统性能的因果性增益。
 
-## 核心模块与公式推导
+
 
 RoboGhost 框架由三个核心模块构成：连续自回归运动生成器、基于 MoE 的教师策略，以及潜变量驱动的扩散学生策略。以下逐一展开各模块的关键设计与公式。
 
@@ -178,7 +182,9 @@ $$\Delta p_i = \alpha(t - i) \cdot p, \quad i \in [t-s, t] \tag{5}$$
 
 更新后的概率为 $p_i' \gets p_i + \Delta p_i$。其中 $\alpha$ 为衰减因子，$p$ 为基础增量。该机制使训练分布动态偏向失败因果链上的关键片段，消融实验表明去除 CAS 后成功率从 0.97 降至 0.92（Table 12）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 文本到运动生成评估
 
@@ -239,7 +245,9 @@ Table 3 展示了不同 PHC 迭代步数下的推理时间与跟踪性能。将�
 ![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_k3Cyx3Uets/figures/008_Figure_3.jpg]]
 *Figure 3: Qualitative results in the IsaacGym and MuJoCo. Table 3: Average inference time and tracking performance on different retargeting methods*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 
@@ -276,6 +284,8 @@ RoboGhost 的当前适用边界由以下条件界定：
 - 在不同人形机器人形态下，是否需要重新训练生成器或策略？框架的“无重定向”特性依赖于生成器与策略在特定机器人上的联合训练，其跨形态迁移能力尚未被研究。
 - 除语言外，其他模态（图像、音频）的输入如何与现有框架无缝融合？是否需要在潜变量空间中引入额外的对齐机制？
 - 因果自适应采样（CAS）的失效归因机制依赖于仿真中的特权信息（如精确的关节位置误差），在真实世界部署时如何构建等效的失败检测与归因机制，是工程落地的关键挑战。
+
+
 
 ## 原文 PDF
 

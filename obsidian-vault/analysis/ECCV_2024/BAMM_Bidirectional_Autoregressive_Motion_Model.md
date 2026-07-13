@@ -5,6 +5,8 @@ paper_level: A
 venue: ECCV
 year: 2024
 pdf_ref: paperPDFs/ECCV_2024/BAMM_Bidirectional_Autoregressive_Motion_Model.pdf
+project_link: https://exitudio.github.io/BAMM-page
+code_link: null
 aliases:
 - BAMM
 tags:
@@ -39,7 +41,7 @@ claims:
 > - HumanML3D 上，FID↓ 0.055±.002 vs 0.045±.002 (MoMask) (+0.010)；Top-1 R-Precision↑ 0.525±.002 vs 0.521±.002 (MoMask) (+0.004)；MM-Dist↓ 2.919±.008 vs 2.926±.007 (MMM) (-0.007)。
 > - KIT-ML 上，FID↓ 0.183±.013 vs 0.204±.011 (MoMask§) (-0.021)；Top-1 R-Precision↑ 0.438±.009 vs 0.433±.007 (MoMask§) (+0.005)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -57,7 +59,7 @@ claims:
 
 在HumanML3D和KIT-ML两个主流基准上，BAMM取得了具有竞争力的生成质量：HumanML3D上FID达到0.055，Top-1 R-Precision达到0.525；KIT-ML上FID为0.183，Top-1 R-Precision为0.438。更重要的是，BAMM在**不依赖外部长度估计器**的前提下实现了这些指标，而依赖预测长度的MMM和MoMask在FID上分别退化至0.080和0.090。此外，BAMM零样本支持运动补全、外推、前后缀预测及长序列合成等多种编辑任务，在生成质量、长度灵活性与编辑能力三者之间实现了此前方法未能达成的统一。
 
-## 背景与动机
+
 
 ### 问题背景：文本驱动的3D人体运动生成
 
@@ -79,7 +81,9 @@ claims:
 
 BAMM的动机正是打破这一范式壁垒：**能否设计一个统一的框架，在训练时同时学习单向和双向的令牌依赖关系，在推理时灵活组合两种解码策略，从而同时获得长度预测、高质量生成和零样本运动编辑三项能力？** 这一思路的核心洞见在于：通过混合注意力掩码策略，使同一个Transformer能够根据不同的因果掩码模式在自回归生成和掩码生成之间无缝切换，进而在推理阶段通过级联解码将两者的优势有机结合。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 BAMM 的核心创新在于**通过混合注意力掩码策略，将自回归生成与掩码生成建模统一到单一 Transformer 框架中**，从而一举解决了现有文本驱动运动生成方法中“生成质量—长度预测—编辑能力”三者不可兼得的根本矛盾。
 
@@ -147,7 +151,7 @@ BAMM 的零样本运动编辑能力直接源于其双向因果掩码机制：将
 - 第二轮精炼中低置信度 token 的鉴别标准和掩码比例的敏感度未作详细消融。
 - RVQ 层数和码本大小对生成质量与推理速度的具体权衡关系需要进一步探索。
 
-## 整体框架
+
 
 BAMM 的整体框架由两个核心组件级联构成，形成“压缩—生成—精炼”的流水线。
 
@@ -172,7 +176,7 @@ $$\text{Attention} = \mathrm{Softmax}\left( \frac{Q K^T}{\sqrt{d_k}} + M \right)
 ![[assets/figures/papers/BAMM_Bidirectional_Autoregressive_Motion_Model_1dd6989b8f26/figures/003_Figure_2.jpg]]
 *Figure 2: Overall architecture of BAMM. (a) Motion Tokenizer encodes the raw motion sequence into discrete motion tokens according to a learned codebook. (b) Masked Self-attention Transformer learns to sequentially predict next tokens conditioned on text embedding from CLIP model and future unmasked tokens. Masked self-attention mechanism unifies autoregressive model and generative masked motion via bidirectional and unidirectional causal masks*
 
-## 核心模块与公式推导
+
 
 BAMM 的生成能力建立在三个紧密协作的核心模块之上：**运动分词器**、**掩码自注意力变换器**和**残差细化变换器**。整个框架通过混合注意力掩码策略统一了自回归与掩码生成建模，并在推理时采用级联解码实现长度预测与质量精炼。
 
@@ -233,7 +237,9 @@ $$\ell_g = (1 + s) \cdot \ell_c - s \cdot \ell_u$$
 ![[assets/figures/papers/BAMM_Bidirectional_Autoregressive_Motion_Model_1dd6989b8f26/figures/018_Figure_11.jpg]]
 *Figure 11: Visualization of masking and conditional tokens for five temporal motion editing tasks: inpainting (in-betweening), outpainting, prefix, suffix, and long motion sequence. ■ indicates masked positions/areas*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -303,7 +309,9 @@ Table 6报告了关键设计选择的消融结果，揭示了以下因果机制�
 ![[assets/figures/papers/BAMM_Bidirectional_Autoregressive_Motion_Model_1dd6989b8f26/figures/019_Figure_12.jpg]]
 *Figure 12: Visualization of Long Motion Sequence where blue frames represent individual motion segments prompted by textual descriptions. Red frames depict the intermediate transitions between these prompted segments, ensuring temporal coherence across the entire sequence*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -342,6 +350,8 @@ BAMM 与上述方法的本质差异不在于架构层面的颠覆，而在于**�
 **长序列生成的连贯性**：BAMM 支持通过拼接多个运动片段生成任意长的运动序列（Figure 12），片段间的过渡令牌由模型自动生成。然而，当片段间的语义差异较大或缺乏明确的过渡逻辑时，跨片段连贯性可能下降。是否可以通过额外的条件信号（如音乐节奏、场景上下文）来引导过渡生成，是一个值得探索的方向。
 
 **数据集偏差的潜在影响**：所有实验均在 HumanML3D 和 KIT-ML 上进行，这两个数据集以日常动作为主。BAMM 在更具挑战性的运动类型（如体育动作、舞蹈、交互式运动）上的泛化能力尚未得到验证。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/RL_Grokking_Recipe_How_Does_RL_Unlock_and_Transfer_New_Algorithms_in_LLMs.pdf
+project_link: null
+code_link: https://github.com/sunblaze-ucb/rl-grok-recipe
 openreview_forum_id: CJJ8VxOWbG
 aliases:
 - SRPTWUTPG
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | RL 领悟配方：强化学习如何解锁并迁移大语言模型中的新算法？ |
 | 英文题名 | RL Grokking Recipe: How Does RL Unlock and Transfer New Algorithms in LLMs? |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=CJJ8VxOWbG); [GitHub](https://github.com/sunblaze-ucb/rl-grok-recipe) |
+| Links | [paper](https://openreview.net/forum?id=CJJ8VxOWbG) · [GitHub](https://github.com/sunblaze-ucb/rl-grok-recipe) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | Staged RL with Per-Test Warm-Up (Two-Phase GRPO) |
 | Dataset | Manufactoria-HAS (pass@K=0 task), BouncingSim (compositional generalization), BouncingSim (explorative generalization) |
@@ -42,7 +44,7 @@ claims:
 > - BouncingSim (compositional generalization) 上，Full pass rate on unseen skill combinations 为 60–70%，对比 near-zero before RL，变化 +60–70%。
 > - BouncingSim (explorative generalization) 上，Full pass rate on Easy/Medium difficulty 为 Easy 50–75%, Medium 15–50%，对比 near-zero before RL，变化 显著提升，随难度衰减。
 
-## 概述
+## 概要
 
 **核心问题**：在基础模型完全无法解决（pass@K=0）的困难编程任务上，标准强化学习训练为何失败，以及如何设计训练配方使大语言模型能够习得全新算法策略。
 
@@ -56,7 +58,7 @@ claims:
 
 **证据强度**：上述结论均基于 4 次独立运行的平均值，在合成数据集上进行受控实验，超参数和训练框架保持一致。转换性泛化失败和课程学习对齐敏感性等限制需在后续研究中进一步验证。
 
-## 背景与动机
+
 
 ### 大语言模型的推理能力与强化学习的角色
 
@@ -84,7 +86,9 @@ RL 提供了一个理论上有望突破此限制的路径。通过基于环境�
 2. 这种 RL 驱动的算法习得在多大程度上能够泛化到分布外场景？是否存在某些泛化类型（如转换性泛化）构成当前方法的根本性障碍？
 3. 课程学习和奖励塑形（reward shaping）技术如何影响 RL 在困难任务上的探索效率和最终性能？
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：零奖励陷阱
 
@@ -125,7 +129,7 @@ RL 提供了一个理论上有望突破此限制的路径。通过基于环境�
 
 通过可控的 OOD 合成编程任务实验，本文证明了恰当的 RL 训练配方（密集奖励预热 → 稀疏二元奖励）能够引发 grokking 相变，使原本 pass@K=0 的任务被解锁至 100% 准确率。这一发现表明 RL 并非仅限于强化已有技能，而是可以习得全新的算法策略——前提是奖励设计能够引导模型穿越零奖励的“死亡谷”。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_CJJ8VxOWbG/figures/002_Figure_1.jpg]]
 *Figure 1: Overview of DELTA with controlled RL studies. Left: Synthetic Programming Problem families—Manufactoria with custom syntax and puzzle-like rules, BounceSim with physical simulation, etc. Right: Controlled RL experiments. Top: Learnability shows grokking, where RL shifts from long exploration to sudden convergence, uncovering strategies beyond reference models. Bottom: Generalization extends OMEGA (Sun et al., 2025) across four axes—Exploratory, Compositional, Transformative, and Domain-level—testing adaptation to harder or recombined tasks*
@@ -182,7 +186,7 @@ DELTA 的实验管线围绕 GRPO（Guo et al., 2025）强化学习微调循环�
 
 上述因果链由消融实验严密支撑：移除预热阶段的直接 GRPO 完全失败（Figure 5a），仅使用密集奖励的训练快速饱和且全通过率始终低于 0.01%（Figure 5b）。课程学习实验进一步表明，只有与目标族结构对齐的中间课程（REGEX → HAS）才能成功迁移，结构不匹配的课程（COMPR）则无效（Figure 7），这验证了奖励信号设计而非数据量是核心因果因素。
 
-## 核心模块与公式推导
+
 
 ### RL 训练框架：GRPO 微调循环
 
@@ -229,7 +233,9 @@ $$\Delta := a(R_o) - a(R_i) = (R_o - R_i) \cos(\pi/n)$$
 $$\omega = \frac{k \cdot 2\pi v}{n (R_o - R_i) \cos(\pi/n)}$$
 其中 $\omega$ 为多边形旋转角速度，$v$ 为小球线速度，$k$ 为任意正整数。该公式是转换性泛化任务的核心物理约束，当前 RL 训练后的模型仍无法习得此类需要全新解题范式的规律。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈：二元全通过奖励在 pass@K=0 任务上的失效
 
@@ -286,7 +292,9 @@ $$\omega = \frac{k \cdot 2\pi v}{n (R_o - R_i) \cos(\pi/n)}$$
 ![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_CJJ8VxOWbG/figures/012_Table_2.jpg]]
 *Table 2: Problem-by-difficulty configurations (aggregated from generator defaults). Abbreviations: f = container diameter factor (relative to 300m base); out/in = outer/inner polygon sides; r = ball radius (m); v = linear speed range (m/s); ω = angular speed (rad/s); amp = translation amplitude (m); g = gravity mode; cts = number of boxes; n = number of balls*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心方法定位
 
@@ -329,6 +337,8 @@ $$\omega = \frac{k \cdot 2\pi v}{n (R_o - R_i) \cos(\pi/n)}$$
 4. **grokking 相变的可靠触发条件**：如何系统性地设计奖励函数和数据混合，以在不同的任务难度和基础模型能力下可靠地触发 grokking 相变？当前配方仍需要针对具体场景进行调试。
 
 5. **RL 崩塌的预防机制**：如何减轻或预防 RL 训练在收敛后出现的策略崩塌现象？可能的路径包括稳定化训练策略、智能早停机制或正则化方法，但均需进一步研究。
+
+
 
 ## 原文 PDF
 

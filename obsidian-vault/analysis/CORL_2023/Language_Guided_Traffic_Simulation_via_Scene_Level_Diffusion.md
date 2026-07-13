@@ -5,6 +5,7 @@ paper_level: A
 venue: CoRL
 year: 2023
 pdf_ref: paperPDFs/CORL_2023/Language_Guided_Traffic_Simulation_via_Scene_Level_Diffusion.pdf
+code_link: https://github.com/NVlabs/CTG
 project_link: https://github.com/NVlabs/CTG
 aliases:
 - LGTSSLD
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | 语言引导的场景级扩散交通仿真 |
 | 英文题名 | Language-Guided Traffic Simulation via Scene-Level Diffusion |
 | 会议/期刊 | CoRL 2023 |
-| Links | [paper](https://arxiv.org/abs/2306.06344); [GitHub](https://github.com/NVlabs/CTG) |
+| Links | [paper](https://arxiv.org/abs/2306.06344) · [GitHub](https://github.com/NVlabs/CTG) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | CTG++ |
 | Dataset | nuScenes validation (GPT keep distance), nuScenes validation (8 settings across runs) |
@@ -41,7 +42,7 @@ claims:
 > - nuScenes validation (GPT keep distance) 上，rel real (场景级真实感偏差) 为 0.331，对比 0.342 (CTG)，变化 -0.011。
 > - nuScenes validation (GPT keep distance) 上，rule (规则违反) 为 0.000，对比 0.000 (CTG)，变化 0。
 
-## 概述
+## 概要
 
 ### 问题背景与瓶颈
 
@@ -63,7 +64,7 @@ claims:
 
 在 nuScenes 数据集上的闭环仿真实验表明，CTG++ 在 8 项不同规则设置中**全面超越**最强基线 CTG：在 GPT 生成的“保持距离”规则下，失败率从 0.343 降至 0.173（**降低 49.6%**），场景级真实感偏差从 0.342 降至 0.331。消融实验进一步揭示了方法有效性的因果机制：移除相对几何边信息导致失败率升至 0.227，而使用场景中心坐标替代智能体中心坐标则使失败率飙升至 0.886，验证了**智能体中心建模**和**交互编码**对闭环仿真鲁棒性的关键作用。定性结果表明，CTG++ 在满足查询约束的同时不会牺牲其他方面的质量（如保持车道、轨迹平滑性），而 CTG 则常因过度优化单一规则而引入碰撞或偏离道路。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -79,7 +80,9 @@ claims:
 
 针对上述缺口，CTG++ 的核心动机是**同时实现高保真场景级真实感与基于自然语言的灵活可控性**。具体而言，本文试图回答两个关键问题：（1）如何将单智能体扩散模型升级为**场景级联合建模**，使生成的轨迹天然包含多智能体交互？（2）如何利用大规模语言模型（LLM）的代码生成能力，将用户的自然语言查询**自动转化为可微损失函数**，从而绕过对领域专业知识的需求，同时避免训练昂贵的多模态模型？
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CTG++ 针对现有交通生成方法的根本瓶颈——无法同时提供高保真真实感与无需领域专业知识的灵活可控性——提出了两个关键创新点，构成了从“单智能体独立建模 + 人工规则”到“场景级联合建模 + 语言引导”的范式跃迁。
 
@@ -106,7 +109,7 @@ CTG++ 针对现有交通生成方法的根本瓶颈——无法同时提供高�
 
 这两个创新并非孤立存在，而是产生了重要的协同效应。定性对比（Figure 4）显示，对于“车辆 A 始终保持与车辆 B 10-30 米距离”和“车辆 A 应与车辆 B 碰撞”等查询，CTG++ 和 CTG 的语言接口均能生成符合查询的轨迹，但 CTG++ 不会牺牲道路保持和平滑性等其他方面的真实感，而 CTG 则会出现碰撞或偏离道路的副作用。这表明**场景级联合建模提供的交互感知能力，使语言引导的生成在满足用户意图的同时，仍能维持场景级的一致性**——这是单智能体独立建模所无法实现的。
 
-## 整体框架
+
 
 CTG++ 的整体框架围绕一个核心瓶颈展开：**现有交通生成方法无法同时提供高保真真实感和无需领域专业知识的灵活可控性**。为解决这一问题，CTG++ 将单智能体独立扩散模型升级为场景级联合建模，并引入大规模语言模型将自然语言查询转化为可微损失函数，从而在测试时通过迭代优化实现语言引导的可控生成。
 
@@ -138,7 +141,7 @@ CTG++ 的整体框架围绕一个核心瓶颈展开：**现有交通生成方法
 
 该管线的一个显著优势是**测试时可控性**：扩散模型本身仅需训练一次以学习真实交通分布，之后对于任意新的用户查询，只需调用 GPT-4 生成新的损失函数，即可在采样阶段实现零样本的灵活控制。
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题形式化与轨迹表示
 
@@ -206,7 +209,9 @@ $$p_{\theta}(\tau_a^{k-1} \vert \tau^k, \mathbf{c}) \approx \mathcal{N}(\tau_a^{
 
 该过程通过投影梯度下降实现，在保持生成轨迹真实感的同时，逐步引导其满足用户指定的规则。与 CTG 需要领域专家手工设计信号时序逻辑损失函数不同，CTG++ 的控制接口完全由 LLM 自动构建，大幅降低了使用门槛。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 评估设置与指标
 
@@ -285,7 +290,9 @@ Figure 4 展示了语言引导的轨迹生成定性对比。对于“车辆 A �
 ![[assets/figures/papers/paper_list_l33_https_arxiv_org_abs_2306_06344/figures/015_Table_3.jpg]]
 *Table 3: Quantitative results (mean with standard deviation of three runs) of CTG++ and the strongest baselines CTG under GPT-generated rules and STL rules. We highlight the winning method that is significantly better than the other (i.e., if the values of the two methods differ by at least the sum of their standard deviations)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题瓶颈与核心因果杠杆
 
@@ -338,6 +345,8 @@ Figure 4 展示了语言引导的轨迹生成定性对比。对于“车辆 A �
 4. **多模态输入扩展**：如何将框架推广到多模态输入（如事故报告文本+现场图像），以生成更逼真的碰撞重建场景？这需要解决视觉特征与语言指令的融合问题。
 
 5. **更大规模场景验证**：当前实验限于 nuScenes 的 100 个验证场景，在更大规模、更高密度、更多样化的交通场景（如 Waymo Open Dataset、交互路口）上的泛化能力有待验证。
+
+
 
 ## 原文 PDF
 

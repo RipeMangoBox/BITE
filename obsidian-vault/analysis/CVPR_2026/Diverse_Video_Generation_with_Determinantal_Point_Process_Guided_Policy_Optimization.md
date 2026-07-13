@@ -44,7 +44,7 @@ claims:
 > - 计算效率 (Wan2.1管道) 上，生成每个视频的平均时间（秒） +0.58s vs 原始Wan2.1推理时间 (+0.67%)。
 > - 用户研究 (120名参与者) 上，多样性评分 (1-5) 4.07 vs 次优方法（评分未列出） (最高)。
 
-## 概述
+## 概要
 
 文本到视频生成模型在给定单一提示时，往往收敛于少数几种视觉模式，难以自动覆盖镜头运动、场景布局、主体外观等电影化要素的全部可能性。这一**模式坍塌**现象限制了生成内容的丰富度与实用性。本文将该问题形式化为**集合级别的策略优化**任务，并提出 **DPP-GRPO**（Determinantal Point Process-Guided Group Relative Policy Optimization）框架。
 
@@ -54,7 +54,7 @@ claims:
 
 消融实验进一步揭示了方法成功的关键机制：DPP 多样性项与相关性项的联合使用是实现最佳平衡的必要条件——仅用相关性项会导致模式坍塌，仅用多样性项则会削弱语义保真度；参考集大小在 5–8 个示例时达到最优，符合 DPP 对数行列式的边际收益递减特性。
 
-## 背景与动机
+
 
 ### 文本到视频生成的多样性瓶颈
 
@@ -87,7 +87,9 @@ claims:
 
 基于这一洞察，本文提出 **DPP-GRPO**，将DPP的集合多样性度量与组相对策略优化（Group Relative Policy Optimization, GRPO）相结合，在无需修改底层视频生成模型的前提下，训练一个即插即用的提示策略网络，使其能够为任意文本提示生成一组既多样化又语义忠实的视频。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DPP-GRPO 的核心创新在于将多样化视频生成重新定义为**集合级别的策略优化问题**，并通过三个关键机制实现突破：
 
@@ -143,7 +145,7 @@ DPP-GRPO 的另一关键创新在于其**完全解耦于底层视频生成模型
 
 这种“集合级多样性度量 + 组内相对优化 + 提示策略解耦”的三位一体设计，使 DPP-GRPO 在不牺牲语义保真度的前提下，将语义多样性指标 TCE 从 19.76（原始提示）提升至 31.95，增幅超过 60%（Table 1）。
 
-## 整体框架
+
 
 DPP-GRPO 将多样化视频生成建模为集合级别的策略优化问题，其核心 pipeline 由三个关键模块构成闭环：**策略模型**负责生成候选提示，**DPP 多样性计算与边际增益评估**量化集合的语义覆盖度，**GRPO 训练循环**则利用组内相对反馈更新策略。整个框架无需修改底层视频生成模型，以即插即用的方式工作。
 
@@ -191,7 +193,7 @@ DPP-GRPO 将多样化视频生成建模为集合级别的策略优化问题，�
 ![[assets/figures/papers/paper_list_l2464_https_arxiv_org_abs_2511_20647/figures/017_Table_7.jpg]]
 *Table 7: System Prompt*
 
-## 核心模块与公式推导
+
 
 DPP-GRPO 将多样化视频生成建模为集合级别的策略优化问题，其核心由三个模块构成：**DPP 多样性度量**、**复合奖励函数**和 **GRPO 策略优化**。这三个模块协同工作，在无需修改底层视频生成模型的前提下，训练一个可即插即用的提示策略网络。
 
@@ -241,7 +243,9 @@ $$\mathcal{I}_{\mathrm{GRPO}}(\theta) = \mathbb{E}_{a, \{o_i\}} \Bigg[ \frac{1}{
 
 推理时，策略模型以**自回归迭代**方式生成提示集合：首先生成第一个提示并加入参考集 $\mathcal{R}_q$，随后每一步基于当前 $\mathcal{R}_q$ 计算边际增益，指导下一次采样。这一设计使得后续生成的提示能够主动避开已覆盖的语义区域，逐步扩展集合的多样性边界。生成完成后，所有提示分别送入冻结的文本到视频扩散模型（如 **Wan2.1** 或 **CogVideoX**）进行视频生成，整个流程对底层模型完全透明。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验结果
 
@@ -297,7 +301,9 @@ DPP-GRPO 在语义多样性、感知多样性与文本对齐度三个维度上�
 ![[assets/figures/papers/paper_list_l2464_https_arxiv_org_abs_2511_20647/figures/004_Figure_4.jpg]]
 *Figure 4: Qualitative Comparison. DPP-GRPO diversifies several cinematic factors such as subject, scene, motion, and cameraview diversity while preserving the prompt alignment and achieves more diverse and semantically faithful videos compared to baselines. (a) For clarity, we provide the first frames of each video (b) Detailed frame-by-frame comparisons of the same videos are given (please kindly zoom-in for details). Please visit our SM for more comparisons and high-quality videos*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：从独立采样到集合级多样性优化
 
@@ -358,6 +364,8 @@ DPP-GRPO 在 **Wan2.1**（Team Wan et al., 2025）、**CogVideoX**（Yang et al.
 4. **自适应权重调节**：当前需要手动设置 λ_div 和 λ_rel 来平衡多样性与保真度（Table 6 显示 (0.5, 0.5) 为最佳折中点）。能否设计内容自适应的权重调节机制，减少用户调参负担？
 
 5. **更高效的多样性度量**：对数行列式计算在大规模生成时算力需求较高。是否存在更高效的集合多样性替代度量（如基于随机投影或近似核方法），以进一步降低计算开销？
+
+
 
 ## 原文 PDF
 

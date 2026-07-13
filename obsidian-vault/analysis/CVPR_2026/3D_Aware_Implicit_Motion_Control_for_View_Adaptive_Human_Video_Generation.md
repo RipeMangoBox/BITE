@@ -45,7 +45,7 @@ claims:
 > - User Study 上，MOS naturalness 4.18 vs best baseline not reported (最高)；MOS overall 4.38 vs best baseline not reported (最高)。
 > - same-view reconstruction (ablation setting) 上，SSIM 0.739。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有视频驱动人体动画方法普遍依赖显式3D参数模型（如SMPL）或2D姿态图作为运动约束。这类强约束存在两个根本缺陷：其一，从单目视频估计的SMPL参数本身携带深度模糊与姿态不准确，这些误差会被直接注入生成过程；其二，像素对齐的投影式条件注入方式会覆盖大规模视频生成模型内部已蕴含的3D空间先验，导致运动表达受限，且天然无法支持自由视角生成。
 
@@ -55,7 +55,7 @@ claims:
 
 **主要结果**：在包含多视角与移动相机视频的自建测试集上，3DiMo在LPIPS（0.221）、FID（36.92）、FVD（297.4）三项指标上全面超越所有基线方法。用户研究中，自然度MOS达4.18，综合MOS达4.38，均为最高。消融实验证实，移除视图丰富数据监督会损害相机控制能力，去除早期辅助几何监督则导致训练不稳定与运动控制崩溃，交叉注意力注入与双手运动编码器对运动质量均有决定性贡献。
 
-## 背景与动机
+
 
 ### 2D人体视频生成中的运动控制困境
 
@@ -80,7 +80,9 @@ claims:
 
 这一范式的关键在于**不依赖显式的3D参数模型作为中间表示**，而是让模型直接从多视角、多相机运动的视频数据中学习本质的3D运动表征，从而在保持生成质量的同时实现灵活的自由视角控制。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 3DiMo 的根本创新在于**将人体视频生成中的运动控制从“显式几何拟合”转向“隐式3D感知生成”**。现有方法（如 **Champ** (Zhu et al., ECCV 2024)、**Uni3C** (Cao et al., arXiv 2025)）依赖 SMPL 等显式参数模型作为运动条件，但这类模型固有的深度模糊性和姿态估计误差会直接覆盖预训练视频生成模型内部已蕴含的丰富 3D 先验，导致生成结果的运动自然度受限，且无法支持自由视角控制。3DiMo 的核心洞察是：大规模视频生成模型本身已在海量数据中习得了强大的 3D 空间理解能力，关键不在于“告诉”模型精确的 3D 坐标，而在于用恰当的语义信号“唤醒”这种内禀能力。
 
@@ -102,7 +104,7 @@ claims:
 
 对显式几何先验的处理体现了“借力而不依赖”的策略。纯隐式运动学习在训练早期面临冷启动困难，3DiMo 引入轻量 MLP 几何解码器，从运动令牌预测 SMPL/MANO 姿态参数作为辅助监督。但关键创新在于**损失权重逐步退火至零**——几何监督仅在训练早期提供初始化引导，随后完全移除，让模型在后期自由探索超越 SMPL 表达能力的运动空间。消融实验证实，移除这一辅助监督会导致训练不稳定和运动控制崩溃；而持续保留则会限制运动表达的丰富性。
 
-## 整体框架
+
 
 3DiMo 将人体运动控制重新定义为一项 **3D 感知任务**：从 2D 驾驶视频中恢复底层 3D 运动，同时原生支持灵活的文本驱动相机控制。为实现这一目标，框架采用端到端联合训练范式，将视角无关的隐式运动编码器与预训练的 DiT 视频生成器深度耦合，从而激发生成器内禀的 3D 空间理解能力。
 
@@ -134,7 +136,7 @@ claims:
 ![[assets/figures/papers/paper_list_l19_https_openaccess_thecvf_com_content_CVPR2026_html_Fang_3D_Aware_Implicit/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of 3DiMo. Our framework consists of end-to-end trained motion encoders—*
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题形式化
 
@@ -175,7 +177,9 @@ $$
 
 该辅助监督仅在**第一阶段及第二阶段的早期**生效，其损失权重随训练推进逐步退火至零，并在第二阶段剩余步骤及整个第三阶段完全移除。这种“脚手架”式策略既避免了显式参数模型对生成器内在 3D 先验的持续压制，又确保了早期训练的稳定性。移除该辅助监督会导致训练不稳定和运动控制崩溃。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 定量评估与用户研究
 
@@ -219,7 +223,9 @@ $$
 ![[assets/figures/papers/paper_list_l19_https_openaccess_thecvf_com_content_CVPR2026_html_Fang_3D_Aware_Implicit/figures/007_Figure_5.jpg]]
 *Figure 5: Visualizations of ablation results. Using SMPL poses as motion representation introduces typical depth ambiguity errors. Removing any view-rich data supervision impairs camera control. Removing auxiliary geometric supervision or using channel concatenation causes training instability and quality degradation. Without the hand encoder, fine-grained hand motions are lost*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系
 
@@ -283,6 +289,8 @@ $$
 4. **视角控制的精度上限**：虽然方法支持文本引导的相机控制，但视角变化的精细度与一致性（如连续环绕旋转时的抖动）未在定量指标中单独评估。
 
 5. **数据依赖性**：视图丰富数据的采集成本（UE渲染、自采多视角）限制了方法的可复现性，论文未讨论使用公开多视角数据集（如Human3.6M）的替代方案。
+
+
 
 ## 原文 PDF
 

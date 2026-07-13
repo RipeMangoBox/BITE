@@ -34,7 +34,7 @@ claims:
 | 中文题名 | 一种儿童人物绘画动画化方法 |
 | 英文题名 | A Method for Animating Children's Drawings of the Human Figure |
 | 会议/期刊 | SIGGRAPH 2023 |
-| Links | [paper](https://arxiv.org/abs/2303.12741) · [Project](https://sketch.metademolab.com) · [Code](https://github.com/open-mmlab/mmpose) · [arXiv](https://arxiv.org/abs/2303.12741") |
+| Links | [paper](https://arxiv.org/abs/2303.12741) · [Project](https://sketch.metademolab.com) · [Code](https://github.com/open-mmlab/mmpose) · [paper](https://arxiv.org/abs/2303.12741") |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction #topic/benchmarks_datasets_evaluation |
 | Method | Animated Drawings |
 | Dataset | Amateur Drawings Dataset 验证集 |

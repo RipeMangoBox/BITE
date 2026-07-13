@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/PixelCraft_A_Multi_Agent_system_for_High_Fidelity_Visual_Reasoning_on_Structured_Images.pdf
+project_link: null
+code_link: https://github.com/microsoft/PixelCraft
 openreview_forum_id: HtpjSCs3g5
 aliases:
 - PixelCraft
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | PixelCraft：一种面向结构化图像的高保真视觉推理多智能体系统 |
 | 英文题名 | PixelCraft: A Multi-Agent system for High-Fidelity Visual Reasoning on Structured Images |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=HtpjSCs3g5); [GitHub](https://github.com/microsoft/PixelCraft) |
+| Links | [paper](https://openreview.net/forum?id=HtpjSCs3g5) · [GitHub](https://github.com/microsoft/PixelCraft) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/planning_control |
 | Method | PixelCraft |
 | Dataset | CharXiv (GPT-4o), ChartQAPro (GPT-4o), EvoChart (GPT-4.1-mini), Geometry3K auxiliary-line subset (GPT-4.1-mini) |
@@ -41,7 +43,7 @@ claims:
 > - ChartQAPro (GPT-4o) 上，Accuracy 为 58.83，对比 56.52 (CoT)，变化 +2.31。
 > - EvoChart (GPT-4.1-mini) 上，Accuracy 为 79.44，对比 76.64 (CoT)，变化 +2.80。
 
-## 概述
+## 概要
 
 结构化图像（如科学图表、几何图形、信息图）的视觉推理面临一个关键瓶颈：现有方法依赖低精度图像处理与线性推理模式，感知错误在推理链中逐步累积，最终导致错误结论。PixelCraft 针对这一瓶颈，提出了一套多模态多智能体系统，其核心思路是将紧凑型多模态大模型（MLLM）微调为高精度像素级定位模型，用以驱动工具智能体中的经典计算机视觉（CV）算子，并引入由规划器管理的图像记忆来支持分支与回溯，从而在保持上下文紧凑的同时实现高保真、非线性的视觉推理。
 
@@ -51,7 +53,7 @@ claims:
 
 综上，PixelCraft 通过高保真感知与灵活推理架构的协同，在结构化图像推理任务上取得了一致且显著的性能提升。
 
-## 背景与动机
+
 
 结构化图像（如科学图表、信息图、几何示意图）是科学交流与数据分析的核心载体。从这类图像中提取精确的定量信息、进行跨子图比较或空间关系推理，要求系统同时具备高精度的感知能力与灵活的推理能力。然而，当前主流方法在这一任务上存在两个根本性瓶颈。
 
@@ -61,7 +63,9 @@ claims:
 
 **本文动机。** 上述分析揭示了一个清晰的因果杠杆：将高精度像素级定位能力与支持分支回溯的非线性推理架构相结合，有望同时解决感知精度和推理灵活性两大问题。PixelCraft由此提出——通过微调紧凑型多模态大模型获得高保真定位能力，并将其嵌入到由规划器（Planner）管理图像记忆的多智能体讨论框架中，使工具智能体能够调用经典计算机视觉算法执行精确的图像操作，同时双层批评机制（视觉批评与规划批评）提供实时验证与事后纠错。这一设计实现了从“粗粒度线性推理”到“高保真非线性推理”的范式转变（Figure 1）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 结构化图像的视觉推理长期受困于一个关键瓶颈：现有方法依赖低精度图像处理与线性推理模式，导致感知错误在推理链中逐步累积，最终影响结论的可靠性。PixelCraft 针对这一瓶颈，在两个核心维度上实现了根本性的创新突破。
 
@@ -88,7 +92,7 @@ claims:
 
 与手工设计有限工具集的传统做法不同，PixelCraft 采用**半自动化的工具生成流程**（Section 3.1, Appendix B）：由 LLM 生成候选工具，经专家验证与微调后集成经典 CV 算法。聚类分析（Table 5）显示，生成的工具自然收敛为五类核心操作——添加辅助线、子图裁剪、按图例掩码、区域放大、数据点定位——覆盖了结构化图像推理的主要需求。这一范式在保持工具可靠性的同时，显著扩展了工具集的覆盖范围与灵活性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_HtpjSCs3g5/figures/002_Figure_2.jpg]]
 *Figure 2: An illustration of the PixelCraft workflow. The process begins with Agent Selection, where the dispatcher chooses the appropriate tools. Next, during Agent Discussion, the planner coordinates tool agents to process the image (e.g., cropping and masking) and the reasoner to perform analysis, with the visual critic providing real-time validation. Finally, the planning critic performs a post-hoc review of the entire process, confirming its correctness*
@@ -120,7 +124,7 @@ PixelCraft 由以下功能模块构成，各模块均由多模态大模型（MLL
 
 系统的输入为一张结构化图像（如科学图表、几何图形、信息图）和一个自然语言查询。输出为最终答案文本。内部数据流的关键特征在于：图像状态在工具智能体处理后被更新并存入图像记忆，规划器在每一步决策时从记忆中选取最相关的历史图像作为推理器的输入，而非简单地将所有中间图像线性拼接。这种设计使得系统能够在需要时“回退”到先前的视觉状态，探索替代推理路径，从而突破线性视觉思维链（Visual CoT）的固有局限。
 
-## 核心模块与公式推导
+
 
 ### 系统架构概览
 
@@ -142,7 +146,9 @@ $$Y = (y_1, \dots, y_T)$$
 
 其中 $Y$ 表示模型生成的自回归序列，$T$ 为序列长度，每个 $y_t$ 为离散 token。该序列同时包含自然语言推理文本和结构化的坐标信息，使得单一模型能够端到端地完成“理解问题—定位元素—输出坐标”的完整流程。微调后的模型在结构化图表元素上的定位精度达到 0.93 IoU，远优于通用大模型的 0.26 IoU（Table 6），为工具智能体中的 CV 算子提供了可靠的坐标输入。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 
@@ -221,7 +227,9 @@ Table 7的计算成本分析表明，PixelCraft相比视觉工具和多智能体
 2. **工具生成的半自动化**：当前工具创建仍需人工验证和精细化，LLM生成的候选工具并非完全可靠，限制了系统的全自动化部署能力。
 3. **批评机制的误判**：Figure 5显示批评机制存在一定比例的假阳性，可能触发不必要的重新推理，增加计算开销。
 4. **领域泛化边界**：虽然InfographicVQA上的结果展现了泛化潜力，但工具集的设计仍主要面向图表和几何图形，向更广泛结构化图像类型的迁移需要额外验证。
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -254,6 +262,8 @@ PixelCraft 的设计假设与适用场景具有明确的边界条件：
 **推理范式的泛化边界**：图像记忆与非线性推理架构在结构化图像上展现了优势，但其能否推广到更通用的多模态推理任务（如机器人视觉、交互式环境理解）仍待探索。当前实验覆盖的任务类型（图表、几何、信息图）均属于静态结构化视觉场景，动态场景下的适用性缺乏证据。
 
 **计算成本与效率权衡**：PixelCraft 的多智能体讨论和迭代修正机制增加了计算开销（Table 7 提供了延迟与 API 调用次数分析）。虽然与 Self-Refine 基线在同等计算量下的对比表明性能增益源于架构设计而非简单增加测试时计算（Table 8），但在实际部署中仍需权衡精度提升与推理成本。
+
+
 
 ## 原文 PDF
 

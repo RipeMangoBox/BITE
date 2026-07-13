@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/Invisible_Strings_Revealing_Latent_Dancer_to_Dancer_Interactions_with_Graph_Neural_Networks.pdf
+project_link: null
+code_link: https://github.com/
 aliases:
 - ENRINGEGD
 - ISRLDDIGNN
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 无形的弦：用图神经网络揭示舞者间潜在互动 |
 | 英文题名 | Invisible Strings: Revealing Latent Dancer to Dancer Interactions with Graph Neural Networks |
 | 会议/期刊 | arXiv 2025 |
-| Links | [arXiv](https://arxiv.org/abs/1308) · [Code](https://github.com/) |
+| Links | [paper](https://arxiv.org/abs/1308) · [Code](https://github.com/) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/diffusion_image_video |
 | Method | Extended Neural Relational Inference (NRI) with GCN encoder and GRNN decoder |
 | Dataset | 5-Body Particle Simulation, 6-Joint Dance Duet |
@@ -40,7 +42,7 @@ claims:
 > - 5-Body Particle Simulation 上，Reconstruction MSE 0.32 (Full Arch, ℓ=12, n=3) vs 0.33 (Compact Enc., ℓ=12, n=3) (-3.0%)。
 > - 6-Joint Dance Duet 上，Reconstruction MSE 0.58 (Full Arch, ℓ=8, n=4) vs N/A (no compact encoder result for this config) (N/A)。
 
-## 概述
+## 概要
 
 舞蹈中的双人互动是微妙而复杂的——舞者之间似乎存在“无形的弦”，传递着力量、平衡与意图。然而，这种互动本质上是隐含的、主观的，缺乏明确的标注数据，使得计算建模极具挑战。本文提出了一种基于扩展神经关系推断（NRI）框架的方法，将双人舞建模为全连接二部图，利用图神经网络（GNN）与循环神经网络（RNN）的自监督学习，从3D关节轨迹中推断舞者间的潜在交互关系。
 
@@ -52,7 +54,7 @@ claims:
 
 **主要结果**：在5体粒子模拟验证任务上，全架构将重构MSE降至0.32（ℓ=12, n=3），验证了图结构改进的有效性。在舞蹈数据上，模型仅观察6-10个随机采样的关节，即可发现高置信度边（>80%），这些边揭示了舞者间的对抗张力模式和关键关节枢纽现象，与编舞直觉高度一致。消融实验表明，增加输入序列长度可显著降低重构误差，但过多边类型（n>3）可能引入冗余。
 
-## 背景与动机
+
 
 舞蹈是高度协作的艺术形式，舞者之间通过身体语言传递张力、节奏和意图，形成一种“无形的弦”般的互动网络。然而，这种互动本质上是隐含的、主观的，缺乏明确的标注数据，使得传统的监督学习方法难以直接建模。现有的动作分析与编舞工具大多聚焦于单人姿态估计或运动生成，对双人乃至多人之间的动态交互关系缺乏系统性的计算表征手段。
 
@@ -62,7 +64,9 @@ claims:
 
 本文的动机即在于填补这一空白：通过扩展NRI框架，将舞者建模为全连接二部图，利用图卷积网络（GCN）编码器和图循环神经网络（GRNN）解码器，以自监督的方式从3D关节轨迹中推断舞者间的潜在交互边及其类型。这一思路的核心洞察是：如果模型能够仅通过观察部分关节的运动来重构双人舞动态，那么它所依赖的边结构就必然编码了真实的物理或编舞约束。最终，模型发现的交互模式——如连接“对抗”状态关节的边、单一关节作为多条边汇聚的“关键枢纽”——与编舞直觉高度吻合，为协作编舞提供了新的计算视角。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于对**神经关系推断（NRI）框架的图结构扩展**，使其能够从双人舞的3D关节轨迹中自监督地发现舞者间的潜在交互关系。与原始NRI（Kipf et al., 2018）相比，本工作在编码器、解码器和边类型建模三个关键维度上进行了针对性改进。
 
@@ -91,7 +95,7 @@ claims:
 
 值得注意的是，本文的创新**并非提出全新的生成式或预测式架构**，而是在NRI这一成熟的自监督关系推断框架上，针对舞蹈交互这一特定领域进行了系统性的图结构适配。其核心洞察在于：将舞者建模为全连接二部图、用GCN编码空间关系、用GRNN联合建模图-时序动态，这三个设计选择共同使得模型能够从纯运动轨迹中涌现出符合编舞直觉的交互模式——如对抗张力连接和关键关节枢纽——而无需任何显式的交互标注。这一方法论贡献的价值在于其**领域适配的系统性**，而非单一模块的突破性。
 
-## 整体框架
+
 
 本文提出了一套从原始舞蹈视频到潜在交互图推断的完整计算管道。整体流程可分为两个阶段：**数据预处理管道**和**神经关系推断模型**，二者通过“3D图构建”模块衔接，形成端到端的分析链路。
 
@@ -133,7 +137,7 @@ claims:
 - **输入**：双人舞视频 → 3D姿态提取 → 清洗与滤波 → 3D关节序列（T × 58 × 3）→ 随机关节子采样 → 二部图节点特征
 - **输出**：重构的关节轨迹（用于评估） + 推断的边结构（包含边类型和置信度，用于揭示潜在舞者互动）
 
-## 核心模块与公式推导
+
 
 本工作的核心架构是对神经关系推断（NRI）框架（Kipf et al., 2018）的图神经网络扩展，由编码器与解码器两个关键模块构成。整体架构如图4所示。
 
@@ -166,7 +170,9 @@ claims:
 
 论文未提供独立编号的核心公式。模型的核心数学机制继承自NRI框架，其本质是学习一个条件分布 $p(z \mid x)$，其中 $z$ 表示潜在交互图结构（边类型），$x$ 为观测轨迹。编码器输出 $q_\phi(z \mid x)$ 近似后验，解码器建模 $p_\theta(x \mid z)$ 进行重构。Gumbel-Softmax重参数化技巧使离散边采样可微，GRNN则将标准LSTM的门控机制与GCN的消息传递相结合，实现图结构上的时序建模。具体公式细节需参阅原始NRI论文及本文代码实现。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -235,7 +241,9 @@ Table 1提供了三个维度的消融证据：
 ![[assets/figures/papers/paper_list_l1688_Invisible_Strings_Revealing_Latent_Dancer_to_Dancer_Interactions_with_Gr/figures/010_Figure_8.jpg]]
 *Figure 8: Example of the sampled edge distribution. The black edges represent connections between the dancers, with darker edges indicating higher confidence in their importance for reconstruction. In this typical case, 3 edges were selected for 6 sampled joints, 2 with slightly higher importance, though all exceed 80% confidence*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心框架继承
 
@@ -308,6 +316,8 @@ Table 1提供了三个维度的消融证据：
 #### 实际应用验证
 - 在实际舞蹈工作室环境中，舞者将如何使用此类工具来反思和生成新的编排？当前缺乏与舞者的深入交互式验证，工具的可用性和创作价值尚不明确。
 - 模型发现的“对抗张力”连接和“关键关节枢纽”是否符合舞者的主观体验？需要设计用户研究来验证这些发现的编舞学意义。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Pinet_Optimizing_hard_constrained_neural_networks_with_orthogonal_projection_layers.pdf
+project_link: null
+code_link: https://github.com/antonioterpin/pinet
 openreview_forum_id: EJ680UQeZG
 aliases:
 - Pinet
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | Πnet：利用正交投影层优化硬约束神经网络 |
 | 英文题名 | Pinet: Optimizing hard-constrained neural networks with orthogonal projection layers |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=EJ680UQeZG); [GitHub](https://github.com/antonioterpin/pinet) |
+| Links | [paper](https://openreview.net/forum?id=EJ680UQeZG) · [GitHub](https://github.com/antonioterpin/pinet) |
 | Topic | #topic/optimization_theory_probabilistic #topic/optimization_theory_probabilistic/optimization_methods |
 | Method | Πnet |
 | Dataset | small non-convex (d=100), small convex (d=100) |
@@ -41,7 +43,7 @@ claims:
 > - small non-convex (d=100) 上，Single inference time (s) 为 0.0052 (CPU)，对比 0.0120 (cvxpylayers CPU)，变化 约2.3×加速。
 > - small non-convex (d=100) 上，Batch inference time (s) for 1024 instances 为 0.0135 (GPU)，对比 2.5917 (cvxpylayers GPU)，变化 约192×加速。
 
-## 概述
+## 概要
 
 在参数化约束优化问题中，给定上下文 $\mathbf{x}$，需在凸可行集 $\mathcal{C}(\mathbf{x})$ 上最小化目标函数 $\varphi(y, \mathbf{x})$。传统硬约束神经网络通过循环展开前向投影迭代进行训练，导致训练时间和内存开销巨大；软约束方法则无法保证解严格可行。Πnet 提出了一种可微的正交投影输出层，将骨干网络不可行的原始输出 $y_{\mathrm{raw}}$ 投影到可行集上，即 $y = \Pi_{\mathcal{C}(\mathbf{x})}(y_{\mathrm{raw}})$，从而保证输出始终满足约束。
 
@@ -49,7 +51,7 @@ claims:
 
 实验表明，Πnet 在训练时间、解质量和超参数鲁棒性上比现有学习方法高出数个量级。在非凸问题上，Πnet 是唯一能在测试集上达到相对次优性 $\mathrm{RS} \leq 5\%$ 且约束违反 $\mathrm{CV} \leq 10^{-3}$ 最优阈值的方法；在大规模问题（$d=1000$）上，DC3 发散、JAXopt 训练极慢，而 Πnet 仅用 50 个 epoch 即获得高质量解。推理速度方面，Πnet 在批量推理中比 cvxpylayers 快约 192 倍，比 OSQP 快约 149 倍。消融实验进一步验证了矩阵均衡化与自动调谐将所需前向迭代次数从 100–350 次降至 50 次，且训练期间执行投影比仅在推理时投影将相对次优性提高一个数量级。
 
-## 背景与动机
+
 
 ### 问题设定：参数化约束优化
 
@@ -83,7 +85,9 @@ $$
 
 Πnet 的核心动机正是打破这一困境：**将投影表示为一个固定点迭代，并应用隐函数定理进行高效反向传播，同时使用 Douglas-Rachford 算子分裂算法实现快速且精确的投影**。通过在神经网络输出后附加一个可微的正交投影层，Πnet 在保证约束严格满足的同时，大幅提升训练和推理效率——在非凸基准上，Πnet 以仅 50 个 epoch 的训练即超越 DC3 在 1000 个 epoch 下的解质量，且批量推理速度较 cvxpylayers 加速约 192 倍（GPU）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Πnet 的核心创新在于将传统硬约束神经网络中“投影—反向传播”这一对偶过程进行了根本性的重构，解决了长期以来训练效率与约束可行性之间的尖锐矛盾。其关键洞察在于：**将投影操作视为一个固定点迭代，并利用隐函数定理进行高效的反向传播，从而避免了对前向迭代的循环展开**。
 
@@ -105,7 +109,7 @@ $$
 
 综上，Πnet 通过“算子分裂前向投影 + 隐函数定理反向传播”这一核心机制，在严格保证约束满足的前提下，实现了训练效率和解质量的双重飞跃，在非凸问题上成功达到 $\text{CV} \leq 10^{-3}$ 且 $\text{RS} \leq 5\%$ 的最优性阈值，而 DC3 和 JAXopt 未能达标或无法训练（Figure 2）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_EJ680UQeZG/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of the Πnet architecture. The infeasible output of the backbone network is projected onto the feasible set through an operator splitting scheme. To train the backbone network, we use the implicit function theorem to backpropagate the loss through the projection layer*
@@ -126,7 +130,7 @@ $$\left( I - \frac{\partial \Phi(s, y_{\mathrm{raw}})}{\partial s} \right)^\top 
 
 整个 pipeline 的输入输出流为：上下文 $\mathbf{x}$ → 骨干网络 → $y_{\mathrm{raw}}$ → 投影层（Douglas-Rachford 固定点迭代）→ 可行解 $y$ → 损失函数。训练时，梯度沿反向路径通过隐式微分回传至骨干网络参数 $\theta$（Algorithm 2, 3）。该框架与骨干网络架构解耦，可灵活附加于任意神经网络之后。
 
-## 核心模块与公式推导
+
 
 Πnet 的核心架构由一个骨干网络与一个可微的正交投影层串联而成。骨干网络（通常为 MLP）将上下文 $\mathbf{x}$ 映射为原始输出 $y_{\mathrm{raw}}$，该输出可能违反约束；投影层则将其严格投影到可行集 $\mathcal{C}(\mathbf{x})$ 上，得到可行输出 $y$。
 
@@ -160,7 +164,9 @@ $$\left( I - \frac{\partial \Phi(s, y_{\mathrm{raw}})}{\partial s} \right)^\top 
 
 投影层中约束矩阵的条件数直接影响 Douglas-Rachford 迭代的收敛速度。Πnet 引入 Ruiz 矩阵均衡化预处理以改善条件数，并设计了自动调谐机制为 $\sigma$ 和迭代次数选择合适的值。消融实验表明，均衡化与自动调谐可将所需前向迭代次数从默认的 100 次（或未调谐时的 350 次）降至 50 次，同时显著降低约束违反量。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -242,7 +248,9 @@ $$\left( I - \frac{\partial \Phi(s, y_{\mathrm{raw}})}{\partial s} \right)^\top 
 ![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_EJ680UQeZG/figures/026_Figure.jpg]]
 *Figure: However, if we would train an unconstrained network to predict { \hat { y } } ( \mathbf { x } ) , its values would result in yˆ(x) + for \mathrm { ~ x > 0 ~ } and \hat { y } ( \mathbf x ) \to - \infty for \mathrm { x } < 0*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 硬约束神经网络中的投影与微分困境
 
@@ -289,6 +297,8 @@ $$\left( I - \frac{\partial \Phi(s, y_{\mathrm{raw}})}{\partial s} \right)^\top 
 1. **非凸约束的扩展**：如何将算子分裂框架推广到非凸可行集？序列凸化与 Πnet 的结合是否仍能保持训练效率优势？
 2. **约束结构动态变化**：当约束矩阵随上下文 $\mathbf{x}$ 变化时，矩阵均衡化和自动调谐需要在线执行，其计算开销是否可接受？
 3. **新应用领域的验证**：论文提及神经 PDE 求解器、调度、机器人等潜在应用，但除多车辆运动规划外，尚未在更复杂的约束类型上验证 Πnet 的泛化能力。
+
+
 
 ## 原文 PDF
 

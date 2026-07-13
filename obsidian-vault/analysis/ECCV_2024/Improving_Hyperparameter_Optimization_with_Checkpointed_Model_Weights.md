@@ -5,6 +5,8 @@ paper_level: A
 venue: ECCV
 year: 2024
 pdf_ref: paperPDFs/ECCV_2024/Improving_Hyperparameter_Optimization_with_Checkpointed_Model_Weights.pdf
+project_link: https://research.nvidia.com/labs/toronto-ai/FMS/
+code_link: https://github.com/NVlabs/forecasting-model-search
 aliases:
 - FMSF
 - IHOCMW
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 利用检查点模型权重改进超参数优化 |
 | 英文题名 | Improving Hyperparameter Optimization with Checkpointed Model Weights |
 | 会议/期刊 | ECCV 2024 |
-| Links | [paper](https://arxiv.org/abs/2406.18630); [GitHub](https://github.com/NVlabs/forecasting-model-search); [Project](https://research.nvidia.com/labs/toronto-ai/FMS/) |
+| Links | [paper](https://arxiv.org/abs/2406.18630) · [GitHub](https://github.com/NVlabs/forecasting-model-search) · [Project](https://research.nvidia.com/labs/toronto-ai/FMS/) |
 | Topic | #topic/optimization_theory_probabilistic #topic/optimization_theory_probabilistic/optimization_methods |
 | Method | Forecasting Model Search (FMS) |
 | Dataset | Simple CNN Hub (100 epochs), PTMHub SVHN (100 epochs), PTMHub CIFAR-10 (100 epochs), 所有模型中心（计算预算扫描） |
@@ -41,7 +43,7 @@ claims:
 > - PTMHub SVHN (100 epochs) 上，Kendall’s τ 为 0.90，对比 0.76 (DyHPO)，变化 +0.14。
 > - PTMHub CIFAR-10 (100 epochs) 上，Kendall’s τ 为 0.91，对比 0.78 (DyHPO)，变化 +0.13。
 
-## 概述
+## 概要
 
 超参数优化（HPO）是深度学习落地的关键瓶颈。现有方法，尤其是以**DyHPO**为代表的多保真度贝叶斯优化，在构建代理模型时仅利用超参数配置、学习曲线和计算预算，却系统性地忽略了训练过程中自然产生的**模型检查点权重**——这些权重隐式编码了架构、数据集、损失景观与优化动态等丰富先验。这一信息缺口限制了代理模型对配置性能的预测精度，尤其在跨模型选择与微调场景中，排序准确性和收敛效率存在明显天花板。
 
@@ -55,7 +57,7 @@ claims:
 
 方法定位上，FMS 属于**多保真度贝叶斯优化**框架下的代理模型增强方法，通过引入权重特征通道扩展了深度核 GP 的输入空间，可与现有采集函数和预算分配策略无缝集成。其局限性包括对检查点存储的依赖、GP 可扩展性对大规模评估的约束，以及当前仅在中小规模图像分类任务上验证。
 
-## 背景与动机
+
 
 ### 超参数优化与多保真度贝叶斯优化
 
@@ -89,7 +91,9 @@ $$\mathbf{K}(\pmb{\theta}, \mathbf{w}, \mathcal{D}) := k(\varphi(\mathbf{x}_i, \
 
 解决上述挑战，有望使 HPO 代理模型获得超越传统学习曲线的信息增益，尤其在跨模型选择与微调的场景中，权重特征可能提供关于模型-数据-优化三者交互的结构化先验，从而加速搜索收敛并提升排序准确性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：现有HPO代理模型的信息盲区
 
@@ -128,7 +132,7 @@ FMS 的核心创新在于对代理模型的输入特征空间进行了一次**�
 
 3. **计算效率的全程改善**：FMS-GMN 的后悔值在整个计算预算范围内持续低于最强基线 DyHPO（Figure 2），表明其能够更快地定位高质量配置。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2406_18630/figures/006_Figure_4.jpg]]
 *Figure 4: We show the regret against the compute budget for the hyperparameter optimization (HPO) method across different hubs in each plot and various methods in each color. The regret values reflect the difference between the actual performance and the best possible performance over time. Lower regret indicates better performance. Our method, FMS-GMN, consistently shows lower regret over time across all hubs, demonstrating its effectiveness in HPO. The compute budget is measured in epochs (a full pass through the dataset), standardizing the compute effort across different tasks. FMS-NFN doesn’t support diverse architectures, so it only runs on Simple CNN Hub*
@@ -169,7 +173,7 @@ FMS 与 DyHPO 的唯一结构性差异在于代理模型的输入特征空间。
 
 FMS 的整体优化循环如 Algorithm 2 所示，蓝色标注部分标识了相对于 DyHPO 的新增步骤：权重图构建、PIGMN 特征提取，以及增强核中权重特征的注入。GP 代理模型的训练沿用 DyHPO 的梯度优化框架，通过 Adam 优化器最小化负对数边缘似然来学习核参数与网络权重。
 
-## 核心模块与公式推导
+
 
 ### 基础代理模型：深度核高斯过程
 
@@ -219,7 +223,9 @@ $$\mathrm{EI}_{\mathrm{MF}}(\mathbf{x}, j | \mathcal{D}) = \mathbb{E}\left[ \max
 
 其中 $y_j^{\max}$ 为预算 $j$ 下的当前最优观测值，$f(\mathbf{x}, j)$ 为 GP 代理模型在配置 $\mathbf{x}$ 和预算 $j$ 下的预测。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能对比：排序准确性与收敛效率
 
@@ -250,7 +256,9 @@ FMS的一个关键优势在于其跨任务的知识迁移潜力。图3对比了�
 ![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2406_18630/figures/005_Table_2.jpg]]
 *Table 2: Glossary and Notation*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 多保真度贝叶斯优化的继承与突破
 
@@ -295,6 +303,8 @@ $$\mathbf{K}(\pmb{\theta}, \mathbf{w}) := k(\psi(\mathbf{x}_i, \mathbf{W}_i, \ma
 5. **异构成本模型**：当计算成本无法预先精确界定（例如不同 GPU 型号、不同模型大小导致每步时间差异显著）时，如何调整多保真度采集函数中的预算分配策略？
 
 6. **搜索空间扩展**：如何支持动态变化的超参数搜索范围（如神经架构搜索中可变层数带来的条件参数），以及如何将有效维度扩展到数十个以上？
+
+
 
 ## 原文 PDF
 

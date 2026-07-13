@@ -44,7 +44,7 @@ claims:
 > - USO-Bench (Style-driven) 上，CSD 0.556 vs previous best (unspecified) (new SOTA)；CLIP-T 0.286 vs previous best (unspecified) (new SOTA)。
 > - USO-Bench (Style-subject-driven) 上，CSD 0.492 vs 0.365 (OmniStyle) (+0.127)。
 
-## 概述
+## 概要
 
 现有扩散模型的定制生成方法通常将**风格驱动**与**主题驱动**视为两个独立任务，各自设计解耦策略，忽略了二者在特征“包含”与“排除”上的天然互补性，导致解耦不够彻底。针对这一瓶颈，本文提出 **USO（Unified Simultaneous Optimization）**，一种基于**跨任务协同解耦**的统一框架。其核心洞见在于：一个任务学会“包含”某类特征，恰恰能帮助互补任务更有效地“排除”这类特征，从而在统一优化中实现更精准的特征分离。
 
@@ -52,7 +52,7 @@ USO 通过**循环数据-模型框架**连接两个任务：一方面，以主�
 
 在实验层面，USO 在自建的 **USO-Bench** 上取得了全面领先：主题驱动任务中 CLIP-I 达 0.647，显著优于 UNO（0.605）；风格驱动任务中 CSD 达 0.556，CLIP-T 达 0.286，均为新 SOTA；风格-主题联合驱动任务中 CSD 达 0.492，较 OmniStyle（0.365）提升 0.127。消融实验证实，ASR 损失与解耦编码器对性能提升均有显著贡献——值得注意的是，ASR 虽仅依赖风格奖励，却能有效增强身份一致性（Figure 7）。
 
-## 背景与动机
+
 
 ### 定制化生成的两类任务与共同瓶颈
 
@@ -76,7 +76,9 @@ USO 通过**循环数据-模型框架**连接两个任务：一方面，以主�
 
 基于这一洞察，论文提出 **USO（Unified Simultaneous Optimization）**，一种新型跨任务协同解耦范式，通过构建**循环数据-模型框架**——主体为风格的数据整理管道和风格为主体的模型训练管道——将风格驱动与主体驱动生成统一在相互增强的优化过程中。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 USO 的核心创新在于提出了一种**跨任务协同解耦范式**，将原本各自独立的风格驱动生成与主题驱动生成统一到一个相互增强的框架中。其关键洞察是：一个任务学会“包含”某类特征，恰恰能帮助互补任务更有效地“排除”这类特征，从而在跨任务协同中实现更精准的特征分离。
 
@@ -104,7 +106,7 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{Pre}} + \lambda \mathcal{L}_{\mathrm{ASR}},
 
 上述四个改进维度相互协同：跨任务数据整理为解耦编码器提供高质量训练样本，解耦编码器为 ASR 提供独立的风格特征空间，ASR 通过风格奖励间接强化身份保持，而随机条件丢弃则保证模型在统一框架下的多任务泛化能力。
 
-## 整体框架
+
 
 USO 提出了一个**跨任务协同解耦范式**，将主体驱动生成作为主任务、风格驱动生成作为辅助任务，在单一模型中统一优化。其核心在于构建一个**循环数据-模型框架**：通过“主体为风格”的数据整理管道生成高质量三元组，再通过“风格为主体”的模型训练管道实现双向增强。
 
@@ -144,7 +146,7 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{Pre}} + \lambda \mathcal{L}_{\mathrm{ASR}}$
 - **生成**：拼接后的多模态序列送入 DiT 主干，经流匹配 ODE 采样生成目标图像。
 - **奖励反馈**：生成图像与风格参考通过预训练奖励模型计算风格相似度，梯度反传至 DiT 主干。
 
-## 核心模块与公式推导
+
 
 USO 的训练框架围绕“以主体驱动为主任务、风格驱动为辅助任务”的统一范式构建，其核心由四个关键模块协同构成：**跨任务三元组数据整理管道**、**解耦条件编码器**、**随机条件丢弃训练策略**以及**辅助风格奖励（ASR）损失**。
 
@@ -205,7 +207,9 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{Pre}} + \lambda \mathcal{L}_{\mathrm{ASR}},
 ![[assets/figures/papers/paper_list_l2708_https_openaccess_thecvf_com_content_CVPR2026_html_Wu_Unified_Customized/figures/002_Figure_2I.jpg]]
 *Figure 2I: lutratioofourpropoedo-tasretcuratioframeork,icsstematicallygneratslout-preeedadlaut shifted triplets*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -244,7 +248,9 @@ USO 在自建基准 USO-Bench 上对三类任务进行了统一评估，涵盖�
 ![[assets/figures/papers/paper_list_l2708_https_openaccess_thecvf_com_content_CVPR2026_html_Wu_Unified_Customized/figures/007_Figure_6.jpg]]
 *Figure 6: Qualitative comparison with diferent methods on style-subject-driven generation*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 任务定位与核心突破
 
@@ -304,6 +310,8 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{Pre}} + \lambda \mathcal{L}_{\mathrm{ASR}},
 - **跨任务协同解耦的理论基础**：论文通过实验证明了“包含帮助排除”的现象（ASR 增强身份一致性），但未从表示学习或信息论角度给出形式化解释。这种协同效应的边界条件是什么？是否存在任务冲突的场景？
 - **更多任务的扩展性**：当前框架连接了主题与风格两类任务。跨任务协同解耦范式能否推广到其他视觉属性（如姿态、光照、材质）的定制生成？
 - **评估体系的完备性**：USO-Bench 作为新提出的基准，其与 DreamBench 等社区标准基准的系统性偏差分析尚不充分。联合风格-主题驱动任务的评估指标（如 CSD + CLIP-I 的权衡）也缺乏统一的社区共识。
+
+
 
 ## 原文 PDF
 

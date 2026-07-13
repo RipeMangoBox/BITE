@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/MotionSight_Boosting_Fine_Grained_Motion_Understanding_in_Multimodal_LLMs.pdf
+project_link: https://nju-pcalab.github.io/projects/MotionSight
+code_link: null
 aliases:
 - MotionSight
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | MotionSight: 增强多模态大语言模型的细粒度运动理解 |
 | 英文题名 | MotionSight: Boosting Fine-Grained Motion Understanding in Multimodal LLMs |
 | 会议/期刊 | arXiv 2025 |
-| Links | [paper](https://arxiv.org/abs/2506.01674) · [Project](https://nju-pcalab.github.io/projects/MotionSight) · [arXiv](https://arxiv.org/abs/1212.0402) |
+| Links | [paper](https://arxiv.org/abs/2506.01674) · [Project](https://nju-pcalab.github.io/projects/MotionSight) · [paper](https://arxiv.org/abs/1212.0402) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | MotionSight |
 | Dataset | MotionBench, FAVOR-Bench, VideoMME |
@@ -40,7 +42,7 @@ claims:
 > - FAVOR-Bench 上，AVG. accuracy 44.1 (Qwen2.5VL-7B + MotionSight) vs 41.6 (Qwen2.5VL-7B) (+2.5 (文本声称+3.0，以表格为准))。
 > - VideoMME 上，Overall accuracy 76.0% (Qwen2.5VL-7B + MotionSight) vs 73.7% (Qwen2.5VL-7B) (+2.3%)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -66,7 +68,7 @@ MotionSight 的方法设计围绕**运动解耦门控**展开：根据用户查�
 
 消融实验进一步揭示：视觉聚光灯在对象运动理解上取得最高平均分，而直接应用图像背景模糊反而损害性能；全局运动模糊合成则显著提升摄像机运动理解，远超其他视觉提示方案（Table 6）。
 
-## 背景与动机
+
 
 ### 视频运动理解：从静态感知到时序动态
 
@@ -92,7 +94,9 @@ MotionSight 的核心洞察在于：**MLLM 在大规模预训练中已获得的�
 
 基于上述认知，MotionSight 提出了一种**零样本、无需训练**的视觉提示框架：通过运动类型门控将查询意图解耦为对象运动与摄像机运动，分别路由至视觉聚光灯模块和运动模糊模块，从而在不修改 MLLM 参数的前提下，显著提升细粒度运动理解能力。这一设计既保留了基础模型的通用能力，又以极低的部署成本（作者声称平均推理延迟增加少于 75%）实现了可观的性能增益。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MotionSight 的核心创新在于**无需训练的零样本视觉提示策略**，通过显式解耦对象运动与摄像机运动，释放现有多模态大语言模型（MLLM）在预训练中已获得的潜在运动理解能力。其关键洞察是：MLLM 缺乏帧间差分机制，倾向于平均化或忽略微妙的视觉线索，而通过精心设计的视觉提示可以有效引导模型关注这些被忽视的动态信息。
 
@@ -143,7 +147,7 @@ MotionSight 的创新不仅限于推理阶段的零样本增强，还构建了�
 - 视觉聚光灯的成功是否部分源于训练数据中已有的“舞台聚光灯”效应，导致分布偏移，仍需进一步验证。
 - 零样本推理引入额外延迟（作者声称平均增加少于 75%），在实时场景中可能成为瓶颈。
 
-## 整体框架
+
 
 MotionSight 的整体设计围绕一个核心观察展开：现有多模态大语言模型（MLLMs）在视频理解中缺乏显式的帧间差分机制，倾向于平均化或忽略微妙的运动线索，导致细粒度运动理解严重受限。为解决这一问题，MotionSight 提出了一套**零样本视觉提示框架**，通过无需训练的视觉变换，显式增强 MLLM 对对象运动与摄像机运动的感知能力。
 
@@ -198,7 +202,7 @@ $$\Phi_{cam}(\mathbf{V}, \mathbf{V}_s) = \left\{\mathcal{T}_{MB}(\mathbf{V}_s, N
 - **视觉提示优于文本坐标**：消融实验（Table 11）显示，直接输入边界框坐标的方法性能不及视觉聚光灯，表明视觉层面的注意力引导比文本坐标信息更有效。
 - **零样本特性**：MotionSight 不依赖任何训练或微调，其能力来源于对 MLLM 在大规模预训练中已获得的潜在运动理解能力的有效释放。
 
-## 核心模块与公式推导
+
 
 MotionSight 的核心架构（图4）由三个功能模块构成：**查询感知的运动解耦门控**、**对象运动视觉提示**、**摄像机运动视觉提示**。各模块以零样本方式对 MLLM 的输入帧进行预处理，无需任何训练。
 
@@ -248,7 +252,9 @@ $$\mathcal{R}_{obj} = \mathbf{MLLM}(\Phi_{obj}(\mathbf{V}_s)), \quad \mathcal{R}
 ![[assets/figures/papers/paper_list_l33_https_arxiv_org_abs_2506_01674/figures/010_Figure_7.jpg]]
 *Figure 7: The difference between using visual spotlight and the original MLLM. We used Grad-CAM and selected the same layer for gradient computation. After incorporating the visual spotlight, the model pays more attention to the core region. Prompt: “What are the people doing?”*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -332,7 +338,9 @@ Figure 8 汇总了对象运动、摄像机运动及其他运动类别的平均�
 ![[assets/figures/papers/paper_list_l33_https_arxiv_org_abs_2506_01674/figures/022_Table_13.jpg]]
 *Table 13: Ablation study on temporal window size (N in Equation 5), with fixed decay factor: 0.65*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与设计动机
 
@@ -381,6 +389,8 @@ MotionSight 的方法设计由一系列消融实验支撑，揭示了若干关�
 3.  **数据集覆盖扩展**：MotionVid-QA 的偏好对齐依赖有限的人工标注，如何进一步扩展规模和标注类型以覆盖更多样的运动与交互模式（如多对象交互、非刚体变形）仍是开放挑战。
 
 4.  **与轻量时序适配器的结合**：可否将视觉提示策略与轻量级时序适配器（如 temporal adapter）结合，在保持零样本灵活性的同时进一步降低推理延迟？这可能是通向实用化部署的关键路径。
+
+
 
 ## 原文 PDF
 

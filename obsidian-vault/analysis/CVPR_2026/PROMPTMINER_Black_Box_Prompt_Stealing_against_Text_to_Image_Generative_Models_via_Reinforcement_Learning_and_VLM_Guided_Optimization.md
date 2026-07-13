@@ -43,7 +43,7 @@ claims:
 > - MS COCO + SD 3.5 Medium 上，SBERT 文本对齐 0.751 vs 0.718 (BLIP) (+0.033)。
 > - MS COCO + SDXL-Turbo 上，CLIP相似度 0.934 vs 最强基线 (低于0.93) (超越所有基线)。
 
-## 概述
+## 概要
 
 文本到图像（T2I）生成模型的提示（prompt）是决定输出内容与风格的关键控制信号，其本身具有重要的知识产权价值。**提示窃取**（prompt stealing）攻击旨在仅凭目标图像恢复出能够生成高度相似图像的提示文本，这既是对模型安全的威胁，也可用于版权取证等正当场景。现有方法面临一个共同瓶颈：白盒方法依赖模型梯度，黑盒方法缺乏显式优化，监督方法则需要大规模标注数据，三者均难以在无梯度访问且无标注数据的条件下，同时恢复精确的主体和丰富的风格修饰语。
 
@@ -54,8 +54,6 @@ PROMPTMINER 提出一种**两阶段黑盒提示窃取框架**，将任务解耦�
 **核心结论**：PROMPTMINER 在 MS COCO 数据集上搭配 FLUX.1 dev 生成器时，CLIP 相似度达到 **0.958**，SBERT 文本对齐达到 **0.751**，超越所有基线方法。在 DiffusionDB 在野图像上，CLIP 相似度比最强基线提升 **7.5%**。常见后防御手段（噪声、拼图、水印）对其影响很小，表明该方法对低层视觉扰动具有内在鲁棒性。消融实验证实，两阶段设计各自贡献显著，奖励塑形则加速收敛并稳定训练。
 
 **方法定位**：PROMPTMINER 属于**黑盒、无监督、两阶段优化**的提示窃取方法。与 BLIP（Li et al., ICML 2022）等图像描述基线相比，它引入了显式的目标优化；与 PromptStealer（Shen et al., USENIX Security 2024）等监督方法相比，它无需大规模标注数据；与 Prometheus（Zhao et al., arXiv 2025）等依赖提示库的方法相比，它通过 VLM 变异实现了灵活的修饰语探索。其核心创新在于将强化学习的序列决策能力与 VLM 的语义理解能力相结合，在离散提示空间中实现了高效的黑盒搜索。
-
-## 背景与动机
 
 ### 问题背景：提示窃取攻击
 
@@ -81,7 +79,7 @@ PROMPTMINER 提出一种**两阶段黑盒提示窃取框架**，将任务解耦�
 
 这一两阶段框架从根本上改变了提示窃取的优化范式：从单阶段的“盲搜”或“直接描述”转变为“先精确捕获主体，再系统丰富修饰语”的结构化搜索过程，从而在不依赖梯度和大规模标注数据的前提下，实现了对完整提示的高质量恢复。
 
-## 核心创新
+## 核心方法与创新机理
 
 PROMPTMINER 的核心创新在于将**黑盒提示窃取任务解耦为两个互补阶段**，分别攻克现有方法中相互纠缠的两大瓶颈：精确主体重建与丰富修饰语恢复。这一设计直接回应了当前基线的根本缺陷——白盒方法依赖梯度访问，监督方法依赖大规模标注数据，而现有黑盒方法缺乏显式优化机制，导致无法同时恢复主体语义和风格细节。
 
@@ -116,8 +114,6 @@ Phase II 的创新在于将 VLM 作为“变异算子”而非直接生成器。
 
 PROMPTMINER 的两阶段设计使其对低层视觉扰动具有内在鲁棒性。Phase I 的 RL 适配器在冻结描述模型的语义空间中进行优化，而非直接拟合像素级特征；Phase II 的 VLM 变异器依赖高层语义理解生成修饰语。因此，常见后防御手段（随机噪声、拼图效果、文本水印）对攻击性能的影响很小（Table 3），这与依赖精确梯度或像素级特征的白盒方法形成鲜明对比。
 
-## 整体框架
-
 PROMPTMINER 将黑盒提示窃取任务解耦为两个阶段，形成“粗捕获—精修饰”的级联流水线。整体框架如 Figure 2 所示，核心设计思想是：**主体与修饰语具有不同的语义粒度和搜索难度，分开处理能显著提升恢复精度与效率**。
 
 ![[assets/figures/papers/paper_list_l2195_https_openaccess_thecvf_com_content_CVPR2026_html_Li_PROMPTMINER_Black_B/figures/002_Figure_2.jpg]]
@@ -141,8 +137,6 @@ PROMPTMINER 将黑盒提示窃取任务解耦为两个阶段，形成“粗捕�
 ### 模块关系
 
 两阶段之间存在明确的**顺序依赖**：Phase I 的输出作为 Phase II 种子池的初始种子，为修饰语搜索提供高质量的语义锚点。消融实验（Figure 4）证实，单独使用 Phase I 已能捕获主要主体，但 CLIP 相似度有限；加入 Phase II 后，修饰语的补充使相似度进一步提升，两者结合达到最佳效果。
-
-## 核心模块与公式推导
 
 ### 两阶段框架总览
 
@@ -210,12 +204,7 @@ $$\mathcal{L}_{\mathrm{PPO}} = \mathbb{E}_t \Big[ \min \big( \rho_t(\theta) A_t,
 2. **VLM引导的进化搜索**：利用预训练VLM的语义理解能力，通过五种定向变异算子系统探索修饰语空间，无需预定义提示库或标注数据。
 3. **MCTS种子选择**：在容量受限的精英种子池中，使用蒙特卡洛树搜索平衡探索与利用，提升搜索效率。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2195_https_openaccess_thecvf_com_content_CVPR2026_html_Li_PROMPTMINER_Black_B/figures/008_Figure_5.jpg]]
-*Figure 5: Impact of reward shaping*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 主要定量结果
 
@@ -273,13 +262,10 @@ Table 3 评估了三种常见的后处理防御策略对 PROMPTMINER 的影响�
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l2195_https_openaccess_thecvf_com_content_CVPR2026_html_Li_PROMPTMINER_Black_B/figures/005_Figure_4.jpg]]
-*Figure 4: Impact of query budget on phase I (RL-based Prompt Inversion) and phase II (VLM-guided Prompt Optimization)*
-
 ![[assets/figures/papers/paper_list_l2195_https_openaccess_thecvf_com_content_CVPR2026_html_Li_PROMPTMINER_Black_B/figures/004_Figure_3.jpg]]
 *Figure 3: Visualization of generated images compared with target image*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 核心瓶颈与设计动机
 

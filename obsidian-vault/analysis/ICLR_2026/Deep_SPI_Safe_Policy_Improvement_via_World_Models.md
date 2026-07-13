@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Deep_SPI_Safe_Policy_Improvement_via_World_Models.pdf
+project_link: null
+code_link: null
 openreview_forum_id: 24C3bSaH3F
 aliases:
 - DSSPIWM
@@ -40,7 +42,7 @@ claims:
 > - ALE-57 (stochastic) 上，Human Normalized Score (IQM aggregate) 为 DeepSPI，对比 PPO / DeepMDP (PPO)，变化 显著提升，见图5。
 > - Illustrative Grid World 上，Return from initial state 为 ≈8.01 (DeepSPI)，对比 ≈4.8 (PPO)，变化 +3.2。
 
-## 概述
+## 概要
 
 深度强化学习中利用世界模型进行策略优化面临两个核心瓶颈：**分布外（Out-of-Trajectory, OOT）预测错误**和**混淆策略更新（Confounding Policy Update）**。前者指当策略在世界模型中偏离行为策略过远时，模型预测变得不可靠；后者指表征与策略同步更新时，仅依赖行为策略经验可能导致性能退化而非提升。这两个问题共同导致世界模型内的策略改进无法安全地转移到真实环境。
 
@@ -58,7 +60,7 @@ claims:
 
 **主要局限**：理论分析依赖回合制设定和重置状态对齐假设；安全改进的紧致性取决于行为策略平稳分布的覆盖性；实验验证主要限于 Atari 离散控制环境，尚未在连续控制或部分可观测环境中检验。
 
-## 背景与动机
+
 
 ### 世界模型在深度强化学习中的角色与困境
 
@@ -97,7 +99,9 @@ DeepSPI 识别并形式化了两种导致世界模型内策略改进失败的核
 
 DeepSPI 的动机正是填补上述缺口：通过引入基于重要性比率的邻域算子约束策略更新幅度，联合最小化局部奖励与转移预测损失来构造策略优化的效用函数，并利用 Lipschitz 网络保证表征的平滑性，从而在理论上提供**安全策略改进的保证**——即真实环境中的策略改进不低于世界模型内的改进减去一个由局部损失控制的可量化误差项。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DeepSPI 的核心创新在于将**策略改进的安全性保证**从纯理论框架推向了可扩展的深度强化学习实践，其关键抓手是三个相互耦合的“changed slots”：
 
@@ -161,7 +165,7 @@ $$|V^{\pi}(s_1) - V^{\pi}(s_2)| \leq K_V \cdot \bar{d}(\phi(s_1), \phi(s_2)) + \
 
 三者共同实现了论文的核心承诺：**在世界模型内进行策略改进，其性能提升能以高概率转移到真实环境中**。这一闭环在 ALE-57 基准上得到了实证验证——DeepSPI 在人类标准化得分的 IQM 聚合指标上显著优于 PPO 和 DeepMDP（PPO），同时具有统计显著的更低转移预测损失（均值差 -0.1381，95% CI [-0.2226, -0.05907]，Wilcoxon 检验 $p = 6.6 \times 10^{-4}$，见 Figure 12 及附录 H.3）。
 
-## 整体框架
+
 
 DeepSPI 构建了一个**编码器-世界模型-策略学习**的端到端安全改进管线，核心目标是在世界模型内进行策略优化时，保证优化结果能高概率地迁移回真实环境。该框架由五个关键模块串联而成，其输入输出流与依赖关系如下：
 
@@ -195,7 +199,7 @@ DeepSPI 构建了一个**编码器-世界模型-策略学习**的端到端安全
 
 整个管线的核心因果机制可概括为：**邻域约束限制策略更新幅度 → 局部损失控制世界模型误差 → 联合优化使表征保持 Lipschitz 连续性 → 模型内的策略改进以可控误差迁移至真实环境**。
 
-## 核心模块与公式推导
+
 
 DeepSPI 的算法核心由四个关键模块构成，它们协同工作以实现安全策略改进：**策略邻域约束**、**局部模型损失**、**效用函数**以及**Lipschitz表征学习**。以下逐一展开其公式定义与推导逻辑。
 
@@ -269,7 +273,9 @@ $$
 
 在实际实现中（Algorithm 1），DeepSPI 同时更新编码器 $\phi$、世界模型 $(\bar{P}, \bar{R})$ 和 Actor-Critic 网络。策略更新使用 PPO 框架，但以效用 $U^{\pi_n}$ 替代优势函数，并通过限制重要性比率在 $[2-C, C]$ 内隐式施加邻域约束。世界模型和编码器则通过最小化局部损失 $L_R$ 和 $L_P$ 进行训练，同时使用 Lipschitz 网络结构（而非梯度惩罚）来高效保证隐空间的平滑性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验：ALE-57 基准
 
@@ -326,7 +332,9 @@ DeepSPI 的关键超参数如表 1 所示。学习率为 $2.5 \times 10^{-4}$，
 ![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_24C3bSaH3F/figures/016_Figure_12.jpg]]
 *Figure 12: Aggregate median, IQR, Mean, and optimality gap for the reported transition and reward losses over all the Atari environments considered in our experiments, with 95% confidence intervals. The confidence intervals are obtained via percentile bootstrapping with stratified resampling. For more information, refer to Agarwal et al., 2021b*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -372,6 +380,8 @@ DeepSPI 的安全改进保证依赖于若干前提条件，这些条件划定了
 - 如何在实际中高效估计和约束重要性比率上界，使理论保证在在线学习场景中可操作？
 - 扩展到非回合制、一般平稳分布环境的理论保证需要哪些额外假设？
 - 在连续控制或真实机器人任务中，Lipschitz 网络约束是否仍然足够，还是需要更精细的局部平滑性保证？
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/STAGE_Storyboard_Anchored_Generation_for_Cinematic_Multi_shot_Narrative.pdf
+project_link: null
+code_link: null
 aliases:
 - SSAGS
 - STAGE
@@ -42,7 +44,7 @@ claims:
 > - ConStoryBoard test set 上，OVQ (Overall Quality) 0.8929；AQ (Aesthetic Quality) 0.7689；TVS (Transition Visual Smoothness) 0.2732。
 > - Human evaluation 上，VQE (Visual Quality Evaluation) 57.6%；TAE (Text Alignment Evaluation) 53.2%；SCE (Shot Consistency Evaluation) 72.8%。
 
-## 概述
+## 概要
 
 现有基于关键帧的多镜头视频生成方法（如 **StoryDiffusion** (Zhou et al., NeurIPS 2024)、**MovieDreamer** (Zhao et al., arxiv 2024)、**Cineverse** (Phung et al., arxiv 2025) 等）通常仅预测稀疏的关键帧序列，缺少对镜头间过渡结构和电影语言（如镜头/反打镜头、变焦、移动）的显式建模，导致跨镜头动作断裂、外观突变，破坏叙事连贯性。
 
@@ -50,15 +52,13 @@ STAGE 将预测目标重构为每个镜头的**起始-结束帧对**（结构性
 
 在 ConStoryBoard 测试集上，STAGE 在所有八项定量指标和四项基于 LLM 的评估上均超越现有方法，取得最优性能（Table 1）。人类评估中，STAGE 在视觉质量、文本对齐、镜头一致性和镜头间过渡四项实验中均获得最高用户偏好（Table 2）。消融实验证实，移除多镜头记忆包会显著降低跨镜头一致性指标，移除双编码策略会损害整体质量与对象一致性，替换为单阶段标准训练则会削弱过渡平滑度与故事一致性。
 
-## 背景与动机
-
 视频生成领域正经历从单镜头向多镜头叙事的范式跃迁。用户期望通过一段故事描述即可获得具有电影级连贯性的多镜头视频，然而现有方法在这一目标上暴露出根本性瓶颈：**跨镜头过渡结构的缺失**。端到端生成方法（如扩散模型直接输出长视频）虽然架构简洁，但缺乏对镜头边界的显式建模，导致动作断裂与外观突变；基于关键帧的方法（如**StoryDiffusion** (Zhou et al., NeurIPS 2024)、**MovieDreamer** (Zhao et al., arxiv 2024)）通过预测稀疏关键帧序列来引导生成，却仅对每个镜头输出单个代表性帧，本质上将镜头间过渡视为黑箱——模型无法理解“镜头A如何演化到镜头B”这一电影语言的核心命题。
 
 这一瓶颈的深层原因在于**预测目标与叙事需求之间的结构性错配**。电影叙事依赖精确的镜头内动态（如推拉摇移）和镜头间过渡（如正反打、跳切），而单帧关键帧既不能锚定镜头内部的时空演化轨迹，也无法为相邻镜头提供过渡约束。其直接后果是：生成的视频序列中，角色外观在镜头切换时发生突变，运动方向出现逻辑矛盾，叙事流被频繁打断。
 
 STAGE 的动机正是从这一根本缺陷出发，将预测目标重构为**每个镜头的起始-结束帧对**——即结构性故事板。这一设计将镜头内动态显式编码为“从起始帧到结束帧的演化路径”，同时为镜头间过渡提供双向视觉锚点：前一镜头的结束帧与后一镜头的起始帧构成天然的过渡约束对。在此基础上，STAGE 引入三项机制来系统性解决连贯性问题：(1) **双编码策略**，通过联合编码起始-结束帧的潜变量来共享镜头内视觉上下文；(2) **多镜头记忆包**，将历史帧压缩为紧凑令牌以维持长程实体一致性；(3) **两阶段训练**（监督微调 + 偏好对齐），使模型显式学习符合人类偏好的电影过渡语言。这一方案从根本上将多镜头视频生成从“独立帧拼接”提升为“叙事结构驱动的连贯创作”。
 
-## 核心创新
+## 核心方法与创新机理
 
 STAGE 的核心创新在于将多镜头视频生成任务**重新定义为结构性故事板预测问题**，通过预测每个镜头的起始-结束帧对（而非稀疏关键帧），为镜头内动态和镜头间过渡提供显式视觉锚点。围绕这一目标重构，方法在四个关键维度上引入了差异化设计。
 
@@ -101,8 +101,6 @@ $$\mathcal{L}_{\mathrm{DPO}} = - \mathbb{E}_{(y_w, y_l), \mathcal{C}_i, t} \left
 
 这四项创新构成互补体系：起始-结束帧对提供结构锚点，记忆包维持跨镜头实体，双编码保障镜头内逻辑，偏好对齐注入电影语言知识。三者共同解决了“叙事连贯性”这一核心瓶颈，使 STAGE 在所有定量指标和人类评估上取得最优性能。
 
-## 整体框架
-
 STAGE 将多镜头视频生成重构为**故事板锚定的起始-结束帧对预测**流水线。其核心洞察是：现有方法仅预测稀疏关键帧，缺少对镜头间过渡结构和电影语言的显式建模，导致跨镜头动作断裂、外观突变。STAGE 通过在每个镜头中同时预测起始帧和结束帧（结构性故事板），为镜头内动态和镜头间过渡提供显式视觉锚点，从根本上提升叙事连贯性。
 
 ### 三阶段流水线
@@ -133,11 +131,6 @@ STEP² 采用**两阶段训练**方案（Section 4.2）：
 整个流水线的信息流为：**用户故事主题 → 文字故事板 → 每镜头起始-结束帧对 → 增强提示 → 视频片段 → 多镜头叙事视频**。其中，多镜头记忆包在 STEP² 的迭代生成中持续累积历史视觉上下文，形成跨越镜头的隐式记忆通道，这是保证长序列叙事一致性的关键数据流设计。
 
 ### 补充图表
-
-![[assets/figures/papers/paper_list_l91_https_arxiv_org_abs_2512_12372/figures/001_Figure_1.jpg]]
-*Figure 1: Illustration of our proposed STAGE workflow for multi-shot video generation. Given a user-provided story description, existing end-to-end [52] and keyframe-based [18] methods often suffer from incoherent inter-shot transitions (e.g., motion discontinuities and appearance inconsistencies) that disrupt the narrative flow. We address this by explicitly predicting a structural storyboard composed of start-end frame pairs, which serve as visual anchors to ensure superior long-range shot consistency*
-
-## 核心模块与公式推导
 
 STAGE 的核心生成模型 **STEP²**（Start-End Frame-Pair Prediction）采用扩散 Transformer 架构，由多个 MMDiT 块构成。其设计围绕三个关键机制展开：多镜头记忆包、双编码策略和两阶段训练。
 
@@ -183,7 +176,7 @@ DPO 阶段训练 20K 迭代，使模型输出向人类偏好的电影过渡风�
 
 在完整 STAGE 推理流水线中，上述模块按以下公式串联：导演代理根据故事描述 $T_{\mathrm{desc}}$ 生成结构化文字故事板 $S = \mathrm{G}_{\mathrm{dir}}(T_{\mathrm{desc}})$；STEP² 迭代预测第 $i$ 镜头的起始-结束帧对 $(F_i^{\mathrm{S}}, F_i^{\mathrm{E}}) = \mathrm{STEP^2}(S_i, \{(F_j^{\mathrm{S}}, F_j^{\mathrm{E}})\}_{j=1}^{i-1})$；精炼代理生成增强提示 $R_i = G_{\mathrm{refine}}(D_i, F_i^{\mathrm{S}}, F_i^{\mathrm{E}})$；最终视频生成模型合成片段 $V_i = G_{\mathrm{video}}(R_i, F_i^{\mathrm{S}}, F_i^{\mathrm{E}})$。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -232,7 +225,7 @@ Figure 6 展示了一个长程多镜头视频生成结果，STAGE 在多个连�
 
 尽管 STAGE 在定量和定性评估中表现优异，论文指出了若干局限。第一，当前流水线依赖外部视频生成模型进行最终的视频片段合成，未进行端到端联合训练，因此无法保证所有中间帧的密集平滑过渡——起始-结束帧对提供了视觉锚点，但镜头内部的帧间过渡质量受限于外部模型的能力。第二，ConStoryBoard 数据集基于 Condensed Movies 构建，可能无法覆盖所有电影类型和叙事语言风格，模型在非电影领域的泛化性有待验证。第三，偏好对齐训练需要人工筛选优选样本，扩展成本较高，如何自动生成更细粒度的电影语言属性以减少人工标注依赖是一个开放问题。
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 任务定位：从关键帧生成到结构性故事板预测
 

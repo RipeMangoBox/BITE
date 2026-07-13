@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/Context_Nav_Context_Driven_Exploration_and_Viewpoint_Aware_3D_Spatial_Reasoning_for_Instance_Navigation.pdf
+project_link: null
 code_link: null
 aliases:
 - CN
@@ -42,7 +43,7 @@ claims:
 > - CoIN-Bench Val Seen Synonyms 上，SR 20.3 vs 14.4 (AIUTA) (+5.9)。
 > - CoIN-Bench Val Unseen 上，SR 11.3 vs 6.7 (AIUTA) (+4.6)。
 
-## 概述
+## 概要
 
 **Context-Nav** 面向文本目标实例导航（Text-Goal Instance Navigation, TGIN）任务：给定一段混合了内在属性（颜色、材质）与外在空间关系（“位于柜子上方”“靠近楼梯”）的长篇自由文本描述，智能体需在三维场景中定位并抵达**唯一正确**的目标实例，而非同类别下的任意一个。该任务的核心瓶颈在于：现有方法将长篇描述仅视为局部匹配或后验证信号，缺乏将其作为全局探索先验的能力，同时缺少对视角不确定性的显式空间推理，导致在同类别干扰物密集的场景中频繁误判。
 
@@ -54,8 +55,6 @@ Context-Nav 提出两条关键因果路径来破解上述瓶颈：
 整个流水线**无需任务特定训练或微调**，仅依赖开放词汇检测、VLM 验证和现成的点目标导航策略。
 
 在 **InstanceNav** 和 **CoIN-Bench** 两个 TGIN 基准上的实验表明，Context-Nav 在无需训练的方法和 RL 训练策略中均取得领先的**成功率（SR）**和**路径加权成功率（SPL）**。消融实验进一步确认：将上下文值地图替换为最近前沿选择导致 SR 下降 **9.7 个百分点**；移除视角感知的三维关系验证导致 SR 下降 **8.3 个百分点**；使用完整描述编码（GOAL-CLIP）相比仅使用类别标签提升 **6.6 个百分点 SR**。这些证据一致表明，长篇描述的全局探索转化与显式三维几何验证是实例级消歧的关键。
-
-## 背景与动机
 
 ### 任务定义：文本目标实例导航
 
@@ -81,7 +80,7 @@ Context-Nav 提出两条关键因果路径来破解上述瓶颈：
 
 基于以上洞察，本文提出**Context-Nav**——一个完全训练免费的模块化流水线，将上下文驱动的探索与视角感知的三维空间推理有机融合，在InstanceNav和CoIN-Bench两个互补的TGIN基准上均取得了最优成功率，且无需任何任务特定的训练或微调。
 
-## 核心创新
+## 核心方法与创新机理
 
 Context-Nav 的核心创新在于将长篇上下文描述从“局部匹配/后验证信号”重新定位为**全局探索先验**，并辅以**视角感知的三维空间推理**来实现细粒度实例消歧。具体而言，方法在两个关键维度上改变了现有范式：
 
@@ -100,8 +99,6 @@ Context-Nav 的核心创新在于将长篇上下文描述从“局部匹配/后�
 ### 创新总结
 
 两项创新形成因果闭环：上下文驱动的值地图确保探索阶段不遗漏“描述中暗示但尚未检测到上下文对象”的区域，而视角感知的三维验证确保终止决策不因视角歧义而误判。整个流水线**无需任何任务特定训练或微调**，在 InstanceNav 和 CoIN-Bench 两个基准上均取得最优 SR，同时超越了 RL 训练策略和免训练模块化基线。
-
-## 整体框架
 
 Context-Nav 采用模块化、免训练的流水线架构，将自由形式的长篇文本目标转化为一系列感知、建图、探索与验证操作。其核心设计理念在于：**长篇描述不仅是实例验证的依据，更可直接转化为全局探索的语义地图先验**；结合显式的三维几何验证，实现无需任务特定训练的细粒度实例消歧。
 
@@ -131,8 +128,6 @@ Context-Nav 采用模块化、免训练的流水线架构，将自由形式的�
 
 ![[assets/figures/papers/paper_list_l2635_https_arxiv_org_abs_2603_09506/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the text-goal instance navigation task and our context-driven pipeline. Given a long description that mixes intrinsic attributes (“mainly yellow and green”) with extrinsic context (“located above the cabinet and near the staircase”), the agent explores guided by the context-driven value map and performs viewpoint-aware 3D spatial reasoning. The agent rejects early picture candidates because either the color or nearby context objects do not match, and ultimately exploits the region containing both the cabinet and staircase, where 3D verification confirms that all intrinsic and extrinsic constraints are satisfied*
-
-## 核心模块与公式推导
 
 Context-Nav 的无训练流水线由四个核心模块构成（图2），其关键创新在于将长篇上下文描述同时编码为全局探索先验和局部空间验证约束。
 
@@ -172,13 +167,10 @@ $$\mathbf{near}: \|c_t - c_r\|_2 \leq d_{\mathrm{near}}, \quad \mathbf{above}: \
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l2635_https_arxiv_org_abs_2603_09506/figures/008_Figure_S.1.jpg]]
-*Figure S.1: Viewpoint-aware 3D verification of extrinsic attributes. Starting from the extrinsic part of the goal description, Context-Nav extracts context objects and spatial-relation triples, builds instance-level 3D point clouds, and samples candidate viewpoints around the reference–target pairs. For each candidate viewpoint, a local frame is aligned and the corresponding spatial predicates are evaluated; the figure visualizes an example viewpoint from which all extrinsic relations are satisfied simultaneously, together with the resulting relation checks for the confirmed target instance*
-
 ![[assets/figures/papers/paper_list_l2635_https_arxiv_org_abs_2603_09506/figures/005_Figure_3.jpg]]
 *Figure 3: Stage-wise qualitative example of context-driven navigation. An episode where the agent must find a dresser described as “located next to the bed” and “a white dresser with a mirror on top”. Early dresser candidate is not selected because context objects are absent; after the bed is detected, the map concentrates around the corresponding room, frontier selection focuses on that area, and a dresser that satisfies both intrinsic attributes and 3D spatial relations with the bed and mirror is finally verified as the goal*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 基准测试主结果
 
@@ -239,7 +231,7 @@ Table S2 给出了各模块的每次调用延迟。感知与建图模块（包�
 ![[assets/figures/papers/paper_list_l2635_https_arxiv_org_abs_2603_09506/figures/012_Figure_S.3.jpg]]
 *Figure S.3: Qualitative comparison on InstanceNav. Representative episodes from InstanceNav compare Context-Nav with the RL-trained PSL policy and the training-free UniGoal pipeline. As in Fig. S2, top-down trajectories and final goal views are visualized, drawing Context-Nav in orange and the baselines in light gray. The terminal state is annotated as Target when the correct instance is reached, Distractor when the agent stops at a different instance of the same category, and Off-target when the agent stops at an object from a different category than the described target. These examples highlight that Context-Nav successfully reaches the correct goal instances, whereas PSL and UniGoal o...*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 任务定位：文本目标实例导航（TGIN）
 

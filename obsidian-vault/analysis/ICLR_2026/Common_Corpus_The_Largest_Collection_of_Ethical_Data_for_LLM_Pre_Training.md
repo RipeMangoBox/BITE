@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Common_Corpus_The_Largest_Collection_of_Ethical_Data_for_LLM_Pre_Training.pdf
+project_link: https://hf.co/datasets/PleIAs/common_corpus
+code_link: null
 openreview_forum_id: 0wSlFpMsGb
 aliases:
 - CC
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | Common Corpus：面向大语言模型预训练的最大伦理数据集 |
 | 英文题名 | Common Corpus: The Largest Collection of Ethical Data for LLM Pre-Training |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=0wSlFpMsGb); [Project](https://hf.co/datasets/PleIAs/common_corpus) |
+| Links | [paper](https://openreview.net/forum?id=0wSlFpMsGb) · [Project](https://hf.co/datasets/PleIAs/common_corpus) |
 | Topic | #topic/representation_self_supervised_transfer #topic/representation_self_supervised_transfer/representation_learning |
 | Method | Common Corpus |
 | Dataset | MultiBLiMP (aggregated) |
@@ -41,7 +43,7 @@ claims:
 > - MultiBLiMP (aggregated) 上，accuracy 为 0.774 (PleIAs 350M)，对比 0.711 (XGLM 564M) / 0.683 (BLOOM 560M)，变化 +0.063 / +0.091。
 > - MultiBLiMP (aggregated) 上，accuracy 为 0.797 (PleIAs 1.2B)，对比 0.799 (Gemma 3 1B)，变化 -0.002。
 
-## 概述
+## 概要
 
 当前大语言模型预训练数据集普遍包含大量受版权保护或未获明确许可的内容，由此引发的法律风险日益突出；同时，主流开放数据集往往覆盖领域单一、语种集中在英语，难以同时满足合规性与多样性的双重需求。针对这一瓶颈，Common Corpus 通过系统性地收集、整理和清洗仅包含公共领域或宽松许可协议的跨领域多语言数据，构建了一个规模约 2 万亿 token 的全开放预训练语料库。
 
@@ -49,7 +51,7 @@ claims:
 
 在方法定位上，Common Corpus 是目前唯一同时满足“多领域、非网页爬取、多语言、完全许可”四项标准的预训练数据集（Table 1）。它涵盖政府文档、文化遗产、科学文献、代码、开放网络和语义数据六大领域，支持 50 余种语言，并配套开发了专用工具链（Segmentext 文本分割、OCRerrcr/OCRonos OCR 纠错、Celadon 毒性过滤等）进行数据治理。与 KL3M（仅限英语行政文本）、Dolma（多领域但以英语为主且非完全许可）、C4 和 ROOTS（网页爬取、混合许可）等现有数据集相比，Common Corpus 在许可合规性和来源多样性上形成了根本性差异化。
 
-## 背景与动机
+
 
 大语言模型（LLM）的预训练数据集正面临日益严峻的法律与伦理挑战。当前主流数据集——如 **C4**（Raffel et al., 2020）、**ROOTS**（Laurençon et al., 2022）、**Dolma**（Soldaini et al., 2024）和 **FineWeb 2**（Penedo et al., 2025）——在构建过程中普遍依赖大规模网页爬取，其中包含大量受版权保护或未获明确许可的内容。这种“合理使用”（fair use）的辩护路径正受到越来越多的法律审视，使得基于此类数据训练的模型面临不可忽视的合规风险。
 
@@ -57,7 +59,9 @@ claims:
 
 Common Corpus 正是针对这一瓶颈的系统性回应。其核心动机是证明：通过系统性地收集、整理和清洗仅包含公共领域或宽松许可协议（如 CC-By、MIT、Apache-2.0）的跨领域多语言数据，可以构建一个规模达约 2 万亿 token 的全开放预训练语料库，且基于该数据集训练的小模型能够在多项多语言基准上达到与同等规模主流模型相当的性能。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Common Corpus 的核心创新不在于提出新的模型架构或训练算法，而在于**重新定义了大规模预训练数据集的可构建边界**——它证明了在严格遵循数据合规与伦理要求的前提下，仍能构建出规模达 2 万亿 token、覆盖 50+ 语言和六大专业领域的全开放预训练语料库。
 
@@ -96,7 +100,7 @@ Figure 3b 的 t-SNE 可视化证实了这一多样性的实际效果：Common Co
 
 Common Corpus 的创新价值最终通过模型训练得到验证。基于该数据集训练的 PleIAs 350M 模型在 MultiBLiMP 多语言基准上达到 0.774，**显著优于更大规模的 XGLM 564M（0.711）和 BLOOM 560M（0.683）**；PleIAs 1.2B 达到 0.797，与 Gemma 3 1B（0.799）基本持平（Table 2）。这一结果表明：**完全合规的数据集并非性能的妥协品**，在同等参数规模下，精心策划的开放数据可以匹配甚至超越基于混合许可数据训练的模型。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_0wSlFpMsGb/figures/005_Table_1.jpg]]
 *Table 1: Comparison of the contemporary datasets for LLM training*
@@ -167,7 +171,7 @@ Table 1 从四个维度对比了 Common Corpus 与当代主流预训练数据集
 
 需注意，当前 Common Corpus 的规模仅足以训练小模型，尚不支持大规模模型的预训练；英语仍占 token 总量的绝对主导地位（约 969B token，是法语 275B 的 3.5 倍、德语 112B 的 8.6 倍，见 Table 5），多语言平衡性仍有改善空间；OCR 纠错和质量过滤无法达到 100% 准确率，部分数字化文本可能残留错误。
 
-## 核心模块与公式推导
+
 
 Common Corpus 的核心贡献在于其数据治理与处理流水线，而非算法或模型架构的创新。该流水线由一系列专用工具模块构成，旨在解决开放数据（尤其是历史文档）在文本分割、OCR质量、毒性过滤及隐私保护方面的固有问题。
 
@@ -197,7 +201,9 @@ Common Corpus 的核心贡献在于其数据治理与处理流水线，而非算
 
 本文未提出新的理论公式或数学推导。其核心方法为工程化的数据处理流水线，不涉及需要推导的算法公式。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验：PleIAs 模型的多语言基准表现
 
@@ -290,7 +296,9 @@ Figure 3b 的 t-SNE 可视化进一步表明，Common Corpus 的子集在语义�
 ![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_0wSlFpMsGb/figures/015_Table_9.jpg]]
 *Table 9: Token count by dataset Open Science*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有数据集的差异化定位
 
@@ -350,6 +358,8 @@ Common Corpus 的构建经验揭示了开放数据生态中若干待解决的关
 - **合规性持续维护**：随着法律法规的演进（如各国对“公共领域”定义的调整），如何建立数据集的持续合规审查机制，是开放数据集长期可用性的保障。
 
 - **与下游任务的衔接**：Common Corpus 证明了开放数据在小模型预训练上的可行性，但如何构建对应的开放指令微调数据集，形成完整的开放训练管线，是后续工作的重要方向。
+
+
 
 ## 原文 PDF
 

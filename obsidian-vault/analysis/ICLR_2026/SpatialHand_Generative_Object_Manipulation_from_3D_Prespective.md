@@ -43,7 +43,7 @@ claims:
 > - 同上 上，Acc@30°↑ (视觉+文本条件) 52.0 vs 20.2 (GPT-4o) (+31.8)；DINO↑ (视觉+文本条件) 81.7 vs 81.2 (Gemini-2.0) (+0.5)；CLIP↑ (纯文本条件) 72.5 vs 66.5 (Nano Banana) (+6.0)。
 > - 三维物体移动基准测试 (Table 2) 上，旋转准确率 Acc@30°↑ 47.8 vs 39.7 (Diffusion Handles) (+8.1)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有基于二维图像修复的物体操控方法无法理解底层三维场景布局，导致物体插入与移动时在位置（前方还是后方？）、朝向（面向左还是右？）和遮挡关系上存在根本性歧义（Figure 2）。
 
@@ -52,8 +52,6 @@ claims:
 **关键证据**：在三维感知物体插入任务上，SpatialHand 的深度误差（AbsRel）相比GPT-4o降低近一半（19.8 vs 38.6），方向准确率（Acc@30°）提升一倍以上（52.0 vs 20.2）；在物体移动任务上，遮挡处理VLM准确率较Diffusion Handles提升30个百分点（82.6 vs 52.6）。消融实验证实，几何感知合成模块和渐进式训练方案对深度控制与方向控制分别具有决定性作用（Table 1, Table 2, Table 3）。
 
 **方法定位**：SpatialHand 属于条件扩散生成模型在三维感知图像编辑领域的应用，其技术路线位于扩散Transformer（基于FLUX-Dev）、单目深度估计（Depth Anything）、以及视觉基础模型（Grounding-DINO、SAM）的交汇处。与纯文本驱动的多模态大模型（GPT-4o、Gemini）和基于点云的三维移动方法（Diffusion Handles, Pandey et al., CVPR 2024）相比，本文方法在显式三维姿态控制上具有显著优势。
-
-## 背景与动机
 
 ### 问题背景：二维修复在三维场景中的根本性歧义
 
@@ -89,7 +87,7 @@ SpatialHand 的动机直接源于上述分析：要实现精确的三维物体�
 
 通过这种“分解—条件注入”的设计，SpatialHand 首次实现了具有完整 6DoF 控制能力的生成式物体插入与移动，为图像编辑中的三维操控任务建立了新的范式。
 
-## 核心创新
+## 核心方法与创新机理
 
 SpatialHand 的核心创新在于将物体的 6DoF 姿态显式分解为扩散 Transformer 可直接理解的三维空间条件，从而首次在生成式图像编辑框架中实现了对插入物体位置、深度和朝向的完整且精确的控制。该方法针对现有二维图像修复技术无法理解底层三维场景布局的根本性瓶颈，通过以下三个关键的 changed slots 消除了二维编辑中的空间歧义。
 
@@ -106,8 +104,6 @@ SpatialHand 的核心创新在于将物体的 6DoF 姿态显式分解为扩散 T
 SpatialHand 采用三阶段渐进训练方案，其中第一阶段专注于新视角合成微调，使模型初步建立对三维几何的感知能力；第二阶段引入完整的 6DoF 条件进行端到端训练。消融实验表明，跳过第一阶段直接进行第二阶段训练会导致方向准确率 Acc@30° 从 52.0 骤降至 28.7（Table 3），降幅超过 44%。这一结果揭示了渐进式训练对方向控制能力的关键作用：模型需要先在较为简单的任务中习得空间感知基础，才能有效利用方向条件实现精确的姿态控制。
 
 上述三个 changed slots 相互协同，共同构成了从二维修复到三维感知操控的质变：深度条件解决了“在哪里”的深度歧义，方向条件解决了“朝哪边”的朝向歧义，而渐进训练则确保了这两个条件能够被模型有效吸收和利用。这种将 6DoF 姿态显式分解为图像生成模型可理解的空间条件的设计思路，为生成式物体操控提供了新的范式。
-
-## 整体框架
 
 SpatialHand 的核心设计思想是将物体的 6DoF 姿态显式分解为扩散 Transformer 可理解的三维位置条件与三维方向条件，从而消除传统二维修复方法在物体插入与移动任务中的空间歧义性。整体流程如 Figure 3 所示，系统接收一张场景图像、一个物体参考图像以及目标 6DoF 姿态参数，输出符合指定位置、深度和朝向的合成图像。
 
@@ -143,8 +139,6 @@ $$[\mathbf{X}, \tilde{\mathbf{C}}_{\mathrm{mask}}, \tilde{\mathbf{C}}_{\mathrm{d
 5. **扩散 Transformer** 接收上述所有条件 token，执行多步去噪生成最终图像。
 
 消融实验（Table 3）验证了这一框架中各模块的必要性：移除几何感知合成后深度误差从 19.8 升至 25.5；跳过渐进式训练第一阶段后方向准确率从 52.0 骤降至 28.7，表明位置-深度联合条件与渐进训练是框架有效性的关键支撑。
-
-## 核心模块与公式推导
 
 SpatialHand 的核心设计思路是将物体的 6DoF 姿态显式分解为扩散 Transformer 可理解的三维位置条件与三维方向条件，从而消除传统二维修复中的空间歧义。整体流程如 Figure 3 所示，模型以 FLUX-Dev 扩散 Transformer 为骨干，接收扩展的多模态输入序列。
 
@@ -203,13 +197,10 @@ SpatialHand 采用三阶段渐进训练以稳定方向控制的学习：
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l63_https_openreview_net_forum_id_VpsqfCac2B/figures/002_Figure_2.jpg]]
-*Figure 2: Motivation of SpatialHand. 2D inpainting for object insertion/movement suffers from location ambiguity (in front of or behind existing elements?) and orientation ambiguity (facing right or left?). SpatialHand resolves these by adding extra depth and orientation conditions for spatially controlled object manipulation*
-
 ![[assets/figures/papers/paper_list_l63_https_openreview_net_forum_id_VpsqfCac2B/figures/004_Figure_4.jpg]]
 *Figure 4: Pipeline of training data curation. We start with high-quality synthetic 3D assets. Using a rendering engine and subject-driven generation, we simulate how humans place objects in 3D space. Then, we employ a series of visual foundation models to estimate the 3D information within images*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验设计与评估体系
 
@@ -300,7 +291,7 @@ Table 3的消融实验揭示了SpatialHand中两个关键设计组件的因果�
 ![[assets/figures/papers/paper_list_l63_https_openreview_net_forum_id_VpsqfCac2B/figures/012_Figure_9.jpg]]
 *Figure 9: More qualitative comparison on 3D-aware object insertion*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 核心问题定位与切入点
 

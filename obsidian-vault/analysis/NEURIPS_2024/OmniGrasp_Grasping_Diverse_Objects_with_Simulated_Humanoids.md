@@ -5,6 +5,8 @@ paper_level: A
 venue: NEURIPS
 year: 2024
 pdf_ref: paperPDFs/NEURIPS_2024/OmniGrasp_Grasping_Diverse_Objects_with_Simulated_Humanoids.pdf
+project_link: https://zhengyiluo.github.io/Omnigrasp
+code_link: null
 aliases:
 - OmniGrasp
 tags:
@@ -40,7 +42,7 @@ claims:
 > - GRAB-IMoS-Test (cross‑subject, 44 objects) 上，Succ_grasp / Succ_traj 98.9% / 90.5% vs Braun et al.: inferior (OmniGrasp 显著更高)。
 > - OakInk‑Train (1700 objects, 32 categories) 上，Succ_grasp / Succ_traj 93.7% / 86.2% vs N/A (无先前基线) (-)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -64,7 +66,7 @@ OmniGrasp属于**动作空间重参数化**范式：它并不改变底层强化�
 
 > **注意**：当前策略仅支持抓取‑保持‑移动，不支持手内精细操作；旋转跟踪精度仍有提升空间；物体表征依赖规范位姿，对真实世界部分可观测场景的扩展性不足。
 
-## 背景与动机
+
 
 ### 问题背景：人形机器人全身抓取与轨迹跟随
 
@@ -82,7 +84,9 @@ OmniGrasp属于**动作空间重参数化**范式：它并不改变底层强化�
 
 本文的核心洞察在于：**大规模人类运动数据中蕴含的运动先验，可以作为RL探索的强约束，从而消除对配对抓取数据的依赖**。具体而言，如果能让策略在一个紧凑的、具有人类运动先验的隐空间中行动，而非直接输出高维关节目标，则探索效率将大幅提升，使极简的状态和奖励设计也能驱动稳定抓取行为的涌现。这一思路将问题从“需要教机器人如何抓取”转化为“让机器人在学会自然运动的基础上，学会如何接触和移动物体”。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 OmniGrasp 的核心创新在于**将预训练的通用灵巧人形运动隐空间（PULSE-X）作为强化学习的动作空间**，从而系统性地解决了直接在高维关节空间（153维PD目标）中训练全身抓取策略时面临的严重探索问题。这一设计选择构成了一个“因果旋钮”：通过将策略的输出从原始关节目标替换为48维隐变量，运动先验有效抑制了躯干探索噪声向手臂和手指的放大效应，避免了物体被撞飞等灾难性失败，使得极简的状态与奖励设计即可支撑多样化物体的稳定抓取与任意轨迹跟踪。
 
@@ -113,7 +117,7 @@ OmniGrasp 的核心创新在于**将预训练的通用灵巧人形运动隐空�
 
 OmniGrasp 与此前工作的根本区别在于**将“如何运动”的知识从RL训练中解耦**，预训练到运动表征中。这使得抓取策略只需关注“何时、何地抓取”的高层决策，而非同时学习全身协调的低层控制。这一设计哲学使得系统无需手部参考运动或专门设计的交互图（interaction graph），即可在GRAB‑Goal‑Test上达到100%抓取成功率和94.1%轨迹成功率（Table 1），全面超越先前SOTA。
 
-## 整体框架
+
 
 OmniGrasp 采用**两阶段训练**流水线，将全身人形机器人的抓取与轨迹跟随问题分解为运动表征学习和目标导向的强化学习两个阶段。Figure 2 给出了完整的架构概览。
 
@@ -166,7 +170,7 @@ OmniGrasp 采用**两阶段训练**流水线，将全身人形机器人的抓取
 ![[assets/figures/papers/paper_list_l1797_OmniGrasp_Grasping_Diverse_Objects_with_Simulated_Humanoids/figures/001_Figure_1.jpg]]
 *Figure 1: We control a simulated humanoid to grasp diverse objects and follow complex trajectories. (Top): picking up and holding objects. (Bottom): green dots - reference trajectory; pink dots - object trajectory*
 
-## 核心模块与公式推导
+
 
 OmniGrasp 的核心架构由两条解耦的训练管线构成：**灵巧通用运动表征学习（PULSE‑X）** 与 **基于预抓取引导的强化学习抓取策略（π_Omnigrasp）**。前者将高维关节动作空间压缩为紧凑的、蕴含人类运动先验的隐空间；后者在该隐空间内执行目标条件强化学习，以极简的状态与奖励设计实现多样化物体的抓取与轨迹跟随。
 
@@ -241,7 +245,9 @@ $$P(j) = \frac{s_j}{\sum_i^J s_i}$$
 - **提前终止**：当物体偏离参考位置超过0.12 m时立即终止回合，加速训练并避免无效探索。
 - **轨迹生成器**：随机生成速度范围 $[0, 2]\ \mathrm{m/s}$、角度范围 $[0, 1]\ \mathrm{rad}$ 的多样化轨迹，为训练提供无限变体的参考信号。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -317,7 +323,9 @@ Table 5 测试了预训练策略对观测噪声的鲁棒性。在物体位姿上
 ![[assets/figures/papers/paper_list_l1797_OmniGrasp_Grasping_Diverse_Objects_with_Simulated_Humanoids/figures/010_Table_7.jpg]]
 *Table 7: Hyperparameters for Omnigrasp, PHC-X, and PULSE-X*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心问题与因果机制
 
@@ -389,6 +397,8 @@ OmniGrasp 位于以下技术路线的交汇点：
 6. **轨迹跟踪精度的提升**：如何进一步提高轨迹跟踪的成功率和精度，尤其是在快速或大角度旋转时？可能需要更精细的奖励设计或更高频的控制策略。
 
 7. **指定抓取类型的可控性**：能否在保持紧凑运动表征的同时实现更多样的抓取策略，如指定的接触点或特定抓取类型？这需要将抓取语义信息融入运动表征或策略输入。
+
+
 
 ## 原文 PDF
 

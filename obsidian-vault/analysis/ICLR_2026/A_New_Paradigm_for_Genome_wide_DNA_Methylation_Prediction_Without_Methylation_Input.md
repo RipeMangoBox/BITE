@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/A_New_Paradigm_for_Genome_wide_DNA_Methylation_Prediction_Without_Methylation_Input.pdf
+project_link: null
+code_link: null
 aliases:
 - NPGWDMPWMI
 - MethylProphet
@@ -41,7 +43,7 @@ claims:
 > - ENCODE 上，MAC-PCC 为 0.9398，对比 0.8355 (Levy-Jurgenson)，变化 +0.1043。
 > - ENCODE 上，MSE 为 0.0079，对比 0.0182 (Levy-Jurgenson)，变化 -0.0103。
 
-## 概述
+## 概要
 
 现有DNA甲基化（DNAm）分析面临一个根本瓶颈：技术成本与覆盖度之间的矛盾。阵列平台仅能测量人类基因组约2800万个CpG位点中的1-3%，而全基因组亚硫酸氢盐测序（WGBS）成本高昂，导致绝大多数CpG位点在典型数据集中未被测量。本文提出MethylProphet，一种无需任何部分测量的DNAm输入即可预测全基因组甲基化图谱的新范式。
 
@@ -51,7 +53,7 @@ claims:
 
 本文作为概念验证研究，未提出全新架构，且模型在TCGA数据上对完全未见过的CpG位点和样本的泛化性能（Val CpG - Val Sample分割）相对较低（MAS-PCC为0.39），这是当前主要局限。
 
-## 背景与动机
+
 
 DNA甲基化（DNAm）是调控基因表达的关键表观遗传修饰，但现有测量技术存在严重的覆盖度与成本矛盾。阵列平台（如Illumina 450K/EPIC）仅能覆盖人类基因组约2800万个CpG位点中的1–3%，而全基因组亚硫酸氢盐测序（WGBS）虽能提供全基因组覆盖，但实验成本极高，导致绝大多数CpG位点在典型数据集中未被测量。这种数据稀疏性构成了从有限测量样本推断全基因组甲基化图谱的根本瓶颈。
 
@@ -65,7 +67,9 @@ DNA甲基化（DNAm）是调控基因表达的关键表观遗传修饰，但现�
 
 然而，本文应被视为一项概念验证研究。模型在TCGA数据上对未见过的CpG位点和样本的泛化性能（Val CpG - Val Sample分割）相对较低（跨样本PCC为0.39），表明跨样本泛化仍是开放挑战。此外，模型依赖基因表达数据，对于没有匹配表达谱的样本无法应用，且未在非人类物种或单细胞数据上评估。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MethylProphet 的核心创新在于彻底改变了 DNA 甲基化（DNAm）预测的输入范式。传统方法（如 DeepCpG, CpGPT, MethylGPT）遵循“插补”范式，即依赖目标样本中部分已测量的 DNAm 值作为输入，来推断该样本中其他未测量的 CpG 位点的甲基化水平。MethylProphet 则完全抛弃了这一依赖，提出了一种“零甲基化输入”的新范式：仅利用样本的全转录组基因表达谱（约 25,000 个基因）和目标 CpG 位点的局部 DNA 序列上下文（1kb 窗口）以及基因组注释（CpG 岛上下文、染色体指示），即可直接预测该位点的甲基化水平。这一改变从根本上解决了现有方法无法应用于那些没有预先测量任何 DNAm 的新样本的瓶颈。
 
@@ -73,7 +77,7 @@ MethylProphet 的核心创新在于彻底改变了 DNA 甲基化（DNAm）预测
 
 与现有基线方法相比，这些改变带来了显著的性能提升。在 ENCODE 和 TCGA 数据集上，MethylProphet 在多个评估指标上均优于基于 CNN 的注意力模型（Levy-Jurgenson et al., 2019b）。例如，在 TCGA 数据上，其跨样本中位皮尔逊相关系数（MAS-PCC）达到 0.5455，而基线仅为 0.2630；跨 CpG 中位皮尔逊相关系数（MAC-PCC）达到 0.9320，基线为 0.6325。在与同样依赖部分 DNAm 输入的插补方法（DeepCpG, CpGPT, MethylGPT）的直接比较中，MethylProphet 在“未见 CpG 位点-已见训练样本”这一最关键的泛化分割上，取得了最高的 MAS-PCC 和 MAC-PCC。更重要的是，当上下文 CpG 数据完全缺失时（即可用 CpG 比例为 0%），CpGPT 和 MethylGPT 的性能急剧下降，而 MethylProphet 的性能保持稳定（MAC-PCC 维持在 0.88），这强有力地证明了其不依赖 DNAm 输入的核心优势。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0003_8wQ7Oc08vo_A_New_Paradigm_for_Genome-wide_DNA_Methylation_P/figures/004_Figure_2.jpg]]
 *Figure 2: Overview of our proposed pipeline. (a) Model architecture of MethylProphet; (b) The learnable Global, chromosome, and CPG island-related embeddings; (c) Model architecture of efficient gene profile compression MLP; (d) DNA Tokenizer for CpG-specific DNA sequence; (e) Model architecture of the Transformer encoder that aggregates all the embeddings*
@@ -94,7 +98,7 @@ MethylProphet 的核心设计目标是在完全不依赖任何实验测量的 DN
 
 **证据强度与关键结果：** 该 pipeline 的有效性在多个基准测试中得到验证。在 ENCODE 数据上，MethylProphet 在“Val CpG - Train Sample”分割（即预测未见过的 CpG 位点）中实现了中位跨样本皮尔逊相关系数（MAS-PCC）0.72。在 TCGA 数据上，其在“Train CpG - Val Sample”分割中的 MAS-PCC 为 0.5455，MAC-PCC 为 0.9320，显著优于基于 CNN 的注意力模型。值得注意的是，在缺失上下文 CpG 数据的鲁棒性测试中，MethylProphet 的性能保持稳定，而 CpGPT 和 MethylGPT 的性能则显著下降，这直接证明了其不依赖甲基化输入的范式优势。
 
-## 核心模块与公式推导
+
 
 MethylProphet 的核心模块围绕“无需任何测量的 DNAm 输入”这一范式转变设计。模型的核心洞察在于利用全转录组表达谱作为全局生物学状态信号，结合 CpG 位点周围的局部 DNA 序列上下文，通过一个 Transformer 编码器融合这些信息，直接预测位点特异性甲基化水平。其输入输出形式可表示为：
 
@@ -131,7 +135,9 @@ $$f_{\theta} : ( \mathcal{G}, S_i, a_i ) \mapsto \hat{y}_i \in [0,1]$$
 
 该架构的核心创新在于其输入范式：它完全摒弃了传统插补方法所需的局部测量 DNAm 输入，转而利用全局基因表达和局部序列上下文。这使得模型能够预测任意 CpG 位点（包括未在训练集中出现的位点）和任意样本（包括未在训练集中出现的样本）的甲基化水平，从根本上解决了 DNAm 数据覆盖度不足和成本高昂的瓶颈问题。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 MethylProphet的核心实验设计围绕其最关键的因果旋钮展开：能否在完全不依赖任何实验测量的DNA甲基化（DNAm）输入的情况下，仅通过基因表达和局部序列上下文预测位点特异性甲基化水平。为此，实验设置了四种数据分割方式（Train/Val CpG × Train/Val Sample），系统地测试模型对未见CpG位点、未见样本以及两者均未见情况下的泛化能力。基准方法包括Levy-Jurgenson等人（2019b）的CNN注意力模型（同样使用基因表达和序列，但未采用全转录组压缩和Transformer融合），以及DeepCPG、CpGPT、MethylGPT等需要部分DNAm输入作为上下文的插补方法。
 
@@ -172,7 +178,9 @@ MethylProphet的核心实验设计围绕其最关键的因果旋钮展开：能�
 ![[assets/figures/papers/iclr26_0003_8wQ7Oc08vo_A_New_Paradigm_for_Genome-wide_DNA_Methylation_P/figures/006_Table_3.jpg]]
 *Table 3: The data statistics among all the data source and splits in our experiments. The number of tokens is estimated by the average sequence length (i.e., 200) of the input embeddings of the Transformer encoder*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 MethylProphet 的核心贡献并非提出全新的模型架构，而是重新定义了 DNA 甲基化（DNAm）预测的输入范式。现有方法（如 DeepCpG、CpGPT、MethylGPT）遵循的是“插补”范式：它们需要目标样本中部分 CpG 位点的实验测量值作为上下文，来推断同一样本中未测量的 CpG 位点。这种范式受限于一个根本瓶颈——在典型数据集中，绝大多数 CpG 位点（约 97-99%）根本没有被测量过，因此无法作为输入。MethylProphet 通过将输入从“部分 DNAm 值”切换为“基因表达谱 + DNA 序列上下文”，绕过了这一瓶颈。其因果逻辑在于：全转录组表达谱（约 25000 个基因）编码了样本的全局生物学状态，而局部 1kb 序列上下文编码了 CpG 位点的顺式调控环境；两者结合，理论上足以推断位点特异性的甲基化水平，无需任何实验测量的 DNAm 作为起点。
 
@@ -183,6 +191,8 @@ MethylProphet 的核心贡献并非提出全新的模型架构，而是重新定
 MethylProphet 的另一个关键优势在于对输入数据缺失的鲁棒性。消融实验表明，当上下文 CpG 数据从 100% 逐渐减少到 0% 时，MethylProphet 的 MAC-PCC 稳定维持在 0.88 左右，而 CpGPT 和 MethylGPT 的性能随可用 CpG 减少而急剧下降。这是因为 MethylProphet 根本不依赖上下文 CpG 作为输入——这既是它的核心创新，也暴露了它的根本局限：它无法利用已有的部分 DNAm 测量信息来提升预测精度。在实际应用中，如果目标样本已经有了一些阵列或测序数据，MethylProphet 无法像插补方法那样将这些信息纳入模型。
 
 开放问题主要集中在三个方面。第一，模型的序列上下文窗口（当前为 1kb）对性能的影响尚未被系统探索——更长的窗口可能捕获更远的调控元件，但也会增加计算复杂度。第二，MethylProphet 在单细胞数据上的表现未知，单细胞转录组的稀疏性和噪声可能使瓶颈 MLP 的压缩策略失效。第三，该方法能否扩展到其他表观遗传标记（如组蛋白修饰、染色质可及性）是一个自然延伸方向，但需要验证这些标记与基因表达之间的相关性是否足够强以支持类似的跨模态预测。此外，作者明确指出本文应被视为概念验证研究，未系统探索更高效或更专业的架构设计，这意味着架构层面的改进空间仍然很大。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/GranViT_A_Fine_Grained_Vision_Model_For_Autoregressive_Multimodal_Large_Language_Models.pdf
+project_link: null
+code_link: null
 openreview_forum_id: dQ6LWE0LnG
 aliases:
 - GranViT
@@ -41,7 +43,7 @@ claims:
 > - OCR Average 上，平均得分 为 55.97，对比 53.33 (SAILViT)，变化 +2.64。
 > - RefCOCO testA 上，准确率 为 91.79，对比 89.65 (SAILViT)，变化 +2.14。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -78,7 +80,7 @@ GranViT定位于视觉编码器的预训练范式改进，属于“视觉表征�
 
 GranViT在极小目标、高密度文本区域和严重遮挡场景下感知能力下降，且依赖相对坐标系统可能限制定位精度。此外，由于预训练重点偏向细粒度特征，在需要复杂多步推理的基准上略低于专门优化推理的编码器。未来方向包括整合绝对坐标系统、设计多尺度预训练策略以增强极小目标感知，以及探索与SAILViT式持续预训练的结合潜力。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -106,7 +108,9 @@ Figure 1(b) 的注意力可视化直观地揭示了这一问题：当给定一�
 
 这一设计思路的核心理念在于：**通过区域级自回归训练与自蒸馏的结合，在不牺牲全局对齐能力的前提下，使视觉编码器具备精准的局部感知能力；通过分阶段训练解耦视觉与语言的学习重点，高效地将细粒度视觉特征注入不同规模的LLM。**
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GranViT的核心创新在于**重塑视觉编码器的特征学习重心**，使其在保持全局语义对齐能力的同时，显式习得细粒度的局部感知能力。这一目标通过三个紧密耦合的“changed slots”实现。
 
@@ -144,7 +148,7 @@ GranViT的核心创新在于**重塑视觉编码器的特征学习重心**，使
 
 **三个创新的协同效应**：Gran-29M提供细粒度监督信号，两阶段训练解耦学习目标使信号有效传递，自蒸馏则补全了语言监督在局部特征层面的不足。这一组合使GranViT在细粒度任务平均得分达80.78，超越强基线**SAILViT** (Yin et al., 2025) 的77.95（+2.83）；OCR平均得分达55.97，超越SAILViT的53.33（+2.64）（**Table 1**）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_dQ6LWE0LnG/figures/004_Figure_3.jpg]]
 *Figure 3: The fine-grained pretraining and transferring paradigm of GranViT. For pretraining, the vision encoder and projector are tuned via the global and Bbox2Caption task for fine-grained feature extraction. The teacher vision encoder explicitly supervises the local region of features extracted by the student vision encoder. For vision feature adaptation and transfer, based on the fine-grained vision encoder, we apply LLM tuning to further strengthen the localization capability of the LLM regarding fine-grained visual features via the global and Caption2Bbox task*
@@ -201,7 +205,7 @@ Figure 4a 清晰展示了阶段二的效应：Caption2Bbox 的 ACC@IOU0.5 从 13
 
 训练数据来自 Gran-29M 数据集，包含 2900 万张图像和 1.83 亿条区域级标注（Figure 2）。数据标注流程利用 ViTDet 生成边界框、Qwen2.5-VL-7B 生成区域描述，经严格过滤后转化为问答对格式。所有实验在 128 块 Ascend 910B NPU 上完成，使用 AdamW 优化器（学习率 1e-5，batch size 256，训练 1 epoch），确保对比公平性。
 
-## 核心模块与公式推导
+
 
 GranViT的核心架构围绕**两阶段预训练-适应框架**与**自蒸馏机制**展开，通过解耦视觉特征学习与语言模型适应，将细粒度区域感知能力注入视觉编码器。
 
@@ -240,7 +244,9 @@ $$\mathcal{L} = \mathcal{L}_{caption} + \lambda \mathcal{L}_{distill}$$
 - **自蒸馏系数**：Table 5消融实验显示，$\lambda=1$、$\alpha=0.9$ 时细粒度性能达到最优（75.55），证实显式局部约束对特征学习至关重要。
 - **Stage 2冻结策略**：Table 9表明，Stage 2冻结视觉编码器可节省约24% FLOPs，且细粒度性能几乎无损（77.24 frozen vs 77.17 tunable），验证了框架的解耦设计在计算效率上的优势。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与实验逻辑
 
@@ -318,7 +324,9 @@ $$\mathcal{L} = \mathcal{L}_{caption} + \lambda \mathcal{L}_{distill}$$
 *Table 7: Data sources of natural and OCR images in Gran-29M. #images and #regions denote the number of images and annotated bounding boxes after filtering, respectively*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 瓶颈定位：从全局对齐到细粒度感知的范式缺口
 
@@ -363,6 +371,8 @@ GranViT以**SigLip2** (Tschannen et al., 2025) 为初始化基础，在其之上
 3. **密集场景鲁棒性**：针对密集和重叠场景，哪些高级数据增强或架构改进（如可变形注意力）能有效提升鲁棒性？
 4. **与任务特定预训练的融合**：将GranViT的通用细粒度表示与SAILViT式的任务特定持续预训练相结合，能否在专业化应用（如医学影像、遥感）中取得更大突破？
 5. **更大规模LLM的迁移特性**：当前验证止于8B级别LLM，在70B+模型上的迁移效果和缩放特性尚待探索。
+
+
 
 ## 原文 PDF
 

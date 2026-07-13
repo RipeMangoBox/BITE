@@ -42,7 +42,7 @@ claims:
 > - GOT-10k 上，AO 72.6 vs 67.7 (AsymTrack-B) (+4.9%)。
 > - VOT-RGBD22 上，EAO 68.3 vs 68.1 (SUTrack-T) (+0.2%)。
 
-## 概述
+## 概要
 
 单目标跟踪（SOT）在高效性与多模态适应性之间存在显著张力：现有高效跟踪器（如 **HiT-Base** (Kang et al., ICCV 2023)、**MixFormerV2-S** (Cui et al., NeurIPS 2023)、**AsymTrack-B** (Zhu et al., AAAI 2025)）主要局限于RGB场景，而多模态跟踪器（如 **SUTrack-B** (Chen et al., AAAI 2025)）通常设计复杂、推理速度慢，难以在资源受限平台（如Jetson AGX）上实现实时部署。针对这一瓶颈，本文提出 **UETrack**——一个统一且高效的多模态单目标跟踪框架，核心思路是通过**相似度驱动的软分配**替代传统门控机制，实现并行化专家协作，同时以**自适应蒸馏**过滤不可靠的教师监督信号。
 
@@ -59,7 +59,7 @@ UETrack 的核心技术贡献体现在两个层面：
 
 消融实验进一步证实：移除 TP-MoE 导致平均性能下降 **0.8%**，将其替换为门控 MoE 会使 AGX 速度降低 **21 FPS**；引入 TAD 自适应蒸馏带来 **1.0%** 的整体提升，显著优于标准全量蒸馏。这些结果表明，UETrack 在“精度-速度-模态泛化”三角权衡中实现了有效突破，为资源受限场景下的多模态跟踪提供了可行方案。
 
-## 背景与动机
+
 
 ### 单目标跟踪的效率瓶颈与多模态困境
 
@@ -81,7 +81,9 @@ UETrack 的核心技术贡献体现在两个层面：
 
 通过这两项核心设计，UETrack在五种模态（RGB、Depth、Thermal、Event、Language）上均实现了精度与速度的优异平衡。例如，UETrack-B在LaSOT上达到69.2% AUC，同时在GPU、CPU和AGX上分别以163、56和60 FPS的速度运行，较SUTrack-T在AGX上加速1.8倍，在CPU上加速2.4倍，且精度相当。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 UETrack 的核心创新围绕两个 **changed slots** 展开，分别针对多模态特征聚合的效率瓶颈和知识蒸馏的可靠性问题，形成了一套“高效学生模型 + 自适应蒸馏”的联合设计方案。
 
@@ -122,7 +124,7 @@ Adaptive Net 本身通过替代预测 $\hat{p}_a$（$\alpha=1$ 时取教师预�
 
 两个 changed slots 形成协同效应：TP-MoE 在推理侧保证多模态特征聚合的效率上限，TAD 在训练侧提升知识迁移的可靠性。推理时仅使用学生模型，无需教师和 Adaptive Net，从而在 **LaSOT 上达到 69.2% AUC，同时在 GPU/CPU/AGX 上分别运行 163/56/60 FPS**，实现了精度与效率的双重突破。
 
-## 整体框架
+
 
 UETrack的整体训练与推理流程如图2所示，采用师生蒸馏架构，核心由三个模块构成：**学生模型**（Student）、**教师模型**（Teacher）和**自适应网络**（Adaptive Net）。训练阶段三者协同工作，推理阶段仅保留学生模型，从而在保证高效推理的同时获得多模态蒸馏的精度收益。
 
@@ -139,7 +141,7 @@ UETrack的整体训练与推理流程如图2所示，采用师生蒸馏架构，
 ![[assets/figures/papers/paper_list_l949_https_arxiv_org_abs_2603_01412/figures/002_Figure_2.jpg]]
 *Figure 2: Architecture of UETrack. The training pipeline consists of a teacher model, a student model, and an Adaptive Net for adaptive distillation. During inference, only the student model is used, with TP-MoE as the core component to enhance multi-modal modeling*
 
-## 核心模块与公式推导
+
 
 UETrack 的推理仅依赖学生模型，其核心由两个关键模块构成：**Token-Pooling-based Mixture-of-Experts (TP-MoE)** 和 **Target-aware Adaptive Distillation (TAD)**。前者在骨干网络中替代部分前馈网络（FFN），以极低的额外开销实现多模态特征的专家化建模；后者在训练阶段自适应地控制教师监督信号的注入，避免不可靠蒸馏对学生的误导。
 
@@ -211,7 +213,9 @@ $$
 ![[assets/figures/papers/paper_list_l949_https_arxiv_org_abs_2603_01412/figures/003_Figure_4.jpg]]
 *Figure 4: Architecture of Adaptive Net*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 UETrack 的实验设计围绕一个核心问题展开：**能否在保持极低计算开销的前提下，统一高效地处理 RGB、Depth、Thermal、Event 和 Language 五种模态的单目标跟踪？** 为此，作者从模型变体效率、RGB 基准主结果、多模态扩展性能、消融验证以及可视化分析五个层面进行了系统性验证。
 
@@ -318,7 +322,9 @@ Table 7 通过逐步增减核心模块，量化了 TP-MoE 和 TAD 的独立贡�
 ![[assets/figures/papers/paper_list_l949_https_arxiv_org_abs_2603_01412/figures/013_Figure_6.jpg]]
 *Figure 6: Visualization of attention distributions of TP-MoE experts. The bright regions denote the attended areas. Each expert focuses on distinct spatial regions*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 高效跟踪器的演进与UETrack的定位
 
@@ -345,6 +351,8 @@ UETrack的设计和实验验证存在以下明确边界：
 2. **TAD的精细化蒸馏**：当前TAD通过Adaptive Net输出二值决策（α∈{0,1}），决定是否对样本进行蒸馏。一个自然的扩展是将教师不确定性量化为连续权重，实现更精细的加权蒸馏，使简单样本更多依赖学生自身学习、困难样本更多借助教师引导。
 3. **模态扩展机制**：当前框架对新增模态需要重新训练。是否可以设计一种模态无关的token化方式，使TP-MoE能够零样本或少量样本地适配新模态，而无需从头训练整个学生模型？
 4. **实时性定义的统一性**：论文将AGX上超过20 FPS定义为“实时”，这一标准在跟踪社区尚未完全统一。随着边缘设备算力提升，是否需要建立更细粒度的效率等级标准，以便公平比较不同硬件平台上的方法？
+
+
 
 ## 原文 PDF
 

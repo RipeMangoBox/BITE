@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2022
 pdf_ref: paperPDFs/CVPR_2022/Polymorphic_GAN_Generating_Aligned_Samples_across_Multiple_Domains_with_Learned_Morph_Maps.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/toronto-ai/PMGAN/
 aliases:
 - PG
@@ -29,12 +30,15 @@ claims:
 | 中文题名 | Polymorphic-GAN: Generating Aligned Samples across Multiple Domains with Learned Morph Maps |
 | 英文题名 | Polymorphic-GAN: Generating Aligned Samples across Multiple Domains with Learned Morph Maps |
 | 会议/期刊 | CVPR 2022 |
-| Links | [paper](https://arxiv.org/abs/2206.02903); [Project](https://nv-tlabs.github.io/PMGAN/); [Project](https://research.nvidia.com/labs/toronto-ai/PMGAN/) |
+| Links | [paper](https://arxiv.org/abs/2206.02903) · [Project](https://nv-tlabs.github.io/PMGAN/) · [Project](https://research.nvidia.com/labs/toronto-ai/PMGAN/) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/generative_models_and_autoencoders |
 | Method | Polymorphic-GAN (PMGAN) |
 | Dataset | Cars, Faces |
 
-## 概述
+> [!tip] 效果简介
+> 本笔记的既有实验指标、对比结果与适用边界见“实验与关键发现”；本轮仅统一结构，不改写证据。
+
+## 概要
 
 多域图像生成的核心挑战在于，不同域之间存在显著的几何差异（如轿车与卡车、人脸与猫脸），传统方法难以在保持内容一致性的同时实现跨域对齐。**Polymorphic-GAN (PMGAN)** 针对这一瓶颈，提出了一种基于可学习形变映射（Morph Map）的生成框架，无需成对监督即可自动捕捉域间几何差异，从而生成跨域对齐的样本。
 
@@ -44,7 +48,7 @@ claims:
 
 **方法定位**：PMGAN 属于基于 StyleGAN 的多域生成方法，其独特之处在于通过显式的特征形变机制实现跨域对齐，区别于仅依赖域条件注入或域特定归一化的方案。该方法在无监督域几何差异学习方面为多域生成提供了新的技术路径。
 
-## 背景与动机
+
 
 多域图像生成是计算机视觉中的核心挑战之一。现实世界的视觉数据天然分布在多个语义相关的域中——例如不同车型的轿车、卡车、SUV，或不同物种的人脸、猫脸、狗脸。这些域之间共享高层语义结构（如面部器官布局、车辆部件组成），但在几何形态和纹理风格上存在显著差异。能够同时建模多个域并生成**几何对齐**的样本，对于零样本分割、跨域图像编辑、图像翻译等下游任务具有重要价值。
 
@@ -52,7 +56,9 @@ claims:
 
 本文的动机正源于此：**能否设计一种生成框架，在保持多域高质量生成的同时，显式地学习域间的几何差异，并利用该差异实现跨域的对齐生成？** 这一思路的核心洞察是，多域数据之间的本质差异可以分解为**几何变换**与**外观风格**两个相对独立的因素。如果能够以无监督方式学习每个域相对于某个父域（parent domain）的几何形变映射，并将其作用于共享的生成器特征，就可以在不牺牲生成质量的前提下实现跨域对齐。这不仅解决了现有方法的对齐缺失问题，还自然解锁了零样本分割迁移（将对齐的几何映射直接作用于分割掩码）和跨域编辑（在共享特征空间中发现编辑方向）等应用。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Polymorphic-GAN (PMGAN) 的核心创新在于**引入可学习的几何形变机制，将多域生成从“风格迁移”范式升级为“几何对齐生成”范式**。与 DC-StyleGAN2 等 baseline 仅依赖域专属层进行风格调整不同，PMGAN 新增了三个关键 changed slots，从根本上解决了跨域几何不一致导致的生成质量崩塌问题。
 
@@ -87,7 +93,7 @@ PMGAN 的架构设计天然实现了**几何与纹理的解耦**：共享生成�
 
 PMGAN 的增量成本很低——MorphNet 仅为一个浅层 CNN，渲染网络 $R$ 的 $k$ 层权重跨域共享以保持风格一致性。训练时冻结判别器前三层和共享生成器，仅更新 MorphNet、渲染网络和判别器后层，保证了训练稳定性。
 
-## 整体框架
+
 
 Polymorphic-GAN（PMGAN）的整体设计目标是实现**跨多个域的几何对齐生成**——即从同一个隐向量出发，生成在不同视觉域中保持内容一致、仅几何与风格随域变化的样本。为此，PMGAN 在 StyleGAN2 主干上引入了两个关键扩展：**MorphNet** 和**域特定渲染层**，并以多判别器对抗训练框架进行统一优化。
 
@@ -117,7 +123,7 @@ PMGAN 的训练基于多域对抗学习，域集合定义为 $\mathcal{D} = \{\p
 
 这种设计使得 PMGAN 天然支持多种下游任务：通过交换 MorphNet 的形变场可实现几何迁移；利用共享生成器的隐空间可进行跨域插值和编辑迁移；结合 GAN 反演技术可实现图像到图像的跨域翻译。
 
-## 核心模块与公式推导
+
 
 ### 整体架构概览
 
@@ -148,7 +154,9 @@ PMGAN 的核心洞察在于形变图与纹理风格的解耦。对于源域 $s$ 
 - **判别器冻结**：冻结判别器的前三层和共享生成器权重，仅更新域特定层和 MorphNet，以稳定训练并防止灾难性遗忘。
 - **渲染层共享**：跨域共享 $k$ 层渲染网络 $R$ 的权重，促进相似风格（如颜色）的一致性渲染。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -231,9 +239,10 @@ Table 7 展示了在不同训练数据量下，PMGAN 与单域 StyleGAN2 的 FID
 ![[assets/figures/papers/paper_list_l47_https_arxiv_org_abs_2206_02903/figures/021_Figure_15.jpg]]
 *Figure 15: Rendering with the source domain’s rendering layers while using the target domains morph maps. Note how only the shape changes according to the target domain indicating the disentanglement between shape and rendering*
 
-![[assets/figures/papers/paper_list_l47_https_arxiv_org_abs_2206_02903/figures/013_Table.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 PMGAN 的核心技术路线建立在 **StyleGAN2**（Karras et al., CVPR 2020）的生成框架之上，其关键创新在于引入了一个可学习的**MorphNet**来预测域特定的形变图（morph map），通过对共享生成器的中间特征进行空间变换来实现跨域几何对齐。这一思路与多域图像生成领域中的两类主流范式形成了清晰对比：
 
@@ -254,6 +263,8 @@ PMGAN 的核心技术路线建立在 **StyleGAN2**（Karras et al., CVPR 2020）
 - MorphNet 能否与显式的几何先验（如关键点、3D 模型）结合，以提升形变图的物理合理性？
 - 在域数量大幅增加（如数十个域）时，共享生成器与域特定模块的容量分配策略是否需要调整？
 - 零样本分割的性能（mIoU 0.67 vs 基线 0.49，Table 3）虽显著提升，但距离全监督方法仍有差距，形变图迁移的误差传播机制值得深入分析。
+
+
 
 ## 原文 PDF
 

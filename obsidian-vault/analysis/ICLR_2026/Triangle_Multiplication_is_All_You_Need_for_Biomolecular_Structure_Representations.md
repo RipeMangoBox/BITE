@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Triangle_Multiplication_is_All_You_Need_for_Biomolecular_Structure_Representations.pdf
+project_link: null
+code_link: https://github.com/genesistherapeutics/pairmixer
 openreview_forum_id: CrXcfMLR9q
 aliases:
 - TMIAYNBSR
@@ -30,12 +32,15 @@ claims:
 | 中文题名 | Triangle Multiplication is All You Need for Biomolecular Structure Representations |
 | 英文题名 | Triangle Multiplication is All You Need for Biomolecular Structure Representations |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=CrXcfMLR9q); [GitHub](https://github.com/genesistherapeutics/pairmixer) |
+| Links | [paper](https://openreview.net/forum?id=CrXcfMLR9q) · [GitHub](https://github.com/genesistherapeutics/pairmixer) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/chemistry_and_drug_discovery |
 | Method |  |
 | Dataset | |
 
-## 概述
+> [!tip] 效果简介
+> 结果与证据沿用下文“实验与关键发现”中的现有记录；本轮不新增或外推论文事实。
+
+## 概要
 
 生物分子结构预测与设计领域长期依赖基于注意力机制的 Pairformer 架构，该架构通过序列更新、三角注意力和三角乘法等模块捕获残基对之间的复杂几何关系。然而，注意力机制带来的二次计算复杂度严重制约了训练与推理效率，尤其在大规模序列场景下成为瓶颈。
 
@@ -45,7 +50,7 @@ claims:
 
 消融实验表明，三角乘法对稀疏几何关系的捕获具有鲁棒性：在低范数 dropout 高达 75% 时性能保持稳定，而随机 dropout 超过 25% 时性能急剧下降，说明模型依赖少数关键残基对的强交互。与纯 Transformer 架构的对比中，Pairmixer 在 lDDT 指标上以 93.7% 的胜率显著领先，验证了二维对表示在捕获成对交互方面的优势。
 
-## 背景与动机
+
 
 生物分子结构预测（蛋白质、核酸、小分子及其复合物）是计算结构生物学的核心问题。近年来，以 AlphaFold 系列为代表的深度学习方案取得了突破性进展，其主干网络普遍采用基于成对表征（pair representation）的架构来捕获残基/原子间的几何关系。当前事实上的标准主干是 **Pairformer**，它组合了三角形注意力（triangle attention）、三角形乘法（triangle multiplication）和序列注意力（sequence attention）等模块，通过迭代更新成对表征来实现高精度结构预测。
 
@@ -55,7 +60,9 @@ claims:
 
 需要指出的是，关于“三角形乘法足以替代注意力”这一核心假设的因果机制和理论分析，论文中并未给出严格的形式化证明，仅通过实验验证了其经验有效性。后续章节将详细展开架构设计和实验支撑。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Pairmixer 的核心创新在于**以纯矩阵乘法替代注意力机制，同时保留高阶几何推理能力**。具体而言，该方法识别并移除了 Pairformer 主干网络中的两个冗余模块——序列更新（sequence updates）和三角注意力（triangle attention），仅保留入向三角乘法（incoming triangle multiplication）、出向三角乘法（outgoing triangle multiplication）以及前馈网络（FFN），构成一个完全无注意力的特征提取器。
 
@@ -69,7 +76,7 @@ $$z_{l+1} \leftarrow z_l + \text{FFN}(z_l)$$
 
 这一简化带来了显著的效率增益：训练成本降低 34%，长序列推理速度最高提升 4 倍，同时在 RCSB 测试集上保持了与 Pairformer 相当的 mean lDDT（0.78）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0009_CrXcfMLR9q_Triangle_Multiplication_is_All_You_Need_for_Biom/figures/004_Figure_4.jpg]]
 *Figure 4: (a) Pairformer architecture. The de facto biomolecular structure prediction backbone. (b) Pairmixer architecture. An efficient yet effective biomolecular structure prediction backbone*
@@ -121,7 +128,7 @@ Figure 3 和 Figure 10 给出了 Pairformer、Pairmixer 和 Transformer 三种�
 
 Pairmixer 的设计理念是：三角形乘法本身已具备捕获几何一致性 pair 表示的能力，且计算成本显著低于三角形注意力。通过显式物化 2-D pair 表示并用三角形乘法更新，Pairmixer 在保持几何推理能力的同时，大幅简化了架构。
 
-## 核心模块与公式推导
+
 
 ### Pairmixer 骨干架构
 
@@ -178,7 +185,9 @@ $$M(z_{ik}) = \begin{cases} 1, & \text{if } k \in \text{Top}_{1-\gamma}(\{\|z_{i
 
 该掩码保留对表示范数最大的前 $1-\gamma$ 比例的交互，用于验证三角乘法对稀疏几何关系的捕获能力。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 训练效率与精度权衡
 
@@ -227,7 +236,9 @@ Figure 7 的头对头比较显示，Pairmixer 在 lDDT 上以 93.7% 的胜率超
 
 PoseBusters 蛋白-配体复合物基准（Table 1）上，Pairmixer 的 RMSD<2 为 0.67，略低于 Pairformer 的 0.68；IDDT_PLI 为 0.73，略低于 Pairformer 的 0.74。这一微小差距提示，在蛋白-配体相互作用这类需要精细几何建模的任务上，triangle attention 可能仍提供了一定的边际收益，尽管在主要蛋白质结构预测指标上该差距不可见。此外，所有实验均基于 Boltz-1 框架，Pairmixer 在其他结构预测框架（如 AlphaFold3 原版）上的迁移效果需要手动验证。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与 AlphaFold3 / Boltz-1 谱系的关系
 
@@ -290,6 +301,8 @@ Pairmixer 的消融实验显示，直接移除 triangle attention 或 triangle m
 - **其他生物分子模态的验证**：当前验证集中在蛋白质、蛋白质-配体、抗体-抗原和 RNA（Table 3, 27 样本）。对 DNA、共价修饰、翻译后修饰等场景的适用性尚未系统评估。
 - **更大规模下的 scaling 行为**：论文测试了 Small / Medium / Large 三种规模，但未探索与 AlphaFold3 原始规模（~93M 参数）相当的配置下 Pairmixer 是否仍能保持精度持平。
 - **triangle multiplication 的理论表达力上界**：论文通过实验论证了 triangle multiplication 足以替代 triangle attention，但未从理论上证明两者的表达力等价性。低范数 dropout 的鲁棒性暗示 triangle multiplication 可能隐式学习了稀疏的几何约束，其理论机制值得深入分析。
+
+
 
 ## 原文 PDF
 

@@ -43,7 +43,7 @@ claims:
 > - rDL-LSM 上，2D PSNR (dB) 34.57 vs 29.34 (HEVC) (+5.23)；3D PSNR (dB) 34.47 vs 25.39 (3DGS) (+9.08)。
 > - ISBI12 上，2D PSNR (dB) / 2D SSIM / 3D PSNR (dB) / 3D SSIM / CR / 时间 28.79 / 0.815 / 28.98 / 0.881 / 8× / 6m vs 25.19 / 0.708 / 24.98 / 0.715 / 3× / 51m (CoordNet) (+3.60 / +0.107 / +4.00 / +0.166 / +5× / 8.5倍加速)。
 
-## 概述
+## 概要
 
 体积成像中切片式采集（如超声、光片显微镜、序列切片电子显微镜）面临一个根本矛盾：**2D渲染看似合理，但3D内部结构严重错乱**。标准3D高斯泼溅（3DGS）的渲染模型基于针孔相机假设，未考虑成像系统真实的有限焦深物理过程，导致基元在轴向任意贡献，产生大量漂浮伪影。现有隐式神经表示（INR）方法虽能建模切片形成，但训练缓慢、压缩率有限。
 
@@ -51,7 +51,7 @@ claims:
 
 实验表明，GaussianPile在超声（ABUS、rDL-LSM）和显微数据集（ISBI12、CREMI）上全面超越INR方法和切片适配的3DGS。在ABUS上，2D PSNR达33.07 dB（较HEVC提升3.40 dB），3D PSNR达33.22 dB（较3DGS提升4.73 dB）；平均训练时间仅约8分钟（比INIF快约5倍），压缩比高达19倍。消融实验证实，将切片厚度设为真实层间距时2D/3D指标均达最优，验证了物理模型的准确性。
 
-## 背景与动机
+
 
 体积成像数据——涵盖超声、光片显微镜、共聚焦显微镜、序列切片电子显微镜（ssEM）等——在现代生物医学研究与临床诊断中无处不在。这类数据以**切片式（slice-based）**方式采集：成像系统沿深度方向逐层扫描，生成一组二维图像栈。与自然图像的“全聚焦”针孔相机模型不同，切片式成像的物理过程受制于**有限焦深**：系统点扩散函数（PSF）在轴向（z方向）具有各向异性响应，仅对焦平面附近区域敏感，离焦信号则迅速衰减。这一物理特性构成了体积重建的核心挑战：**标准3DGS的渲染模型未考虑切片成像的实际物理过程，无法建模有限焦深带来的各向异性轴向响应，导致2D渲染看似合理但3D内部结构严重错乱，产生漂浮伪影**。
 
@@ -65,7 +65,9 @@ claims:
 
 本文的动机正是弥合这一鸿沟。核心洞察在于：**将成像系统的聚焦物理（PSF/敏感度图）显式注入高斯的渲染流程**——通过轴向重参数化与不透明度调制，使基元的轴向贡献与聚焦区精确匹配——可以天然保证3D-2D一致性，维护体积结构的同时保留实时渲染效率和紧凑性。这一思路催生了**GaussianPile**：一个面向切片式体积重建的统一稀疏高斯泼溅框架，以一条可微分CUDA管线实现高保真重建、快速渲染与高压缩比。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GaussianPile 的核心创新在于将切片式成像系统的物理聚焦过程显式注入高斯泼溅的渲染管线，从而在根本上解决标准 3DGS 无法建模有限焦深所导致的 3D-2D 不一致问题。
 
@@ -108,7 +110,7 @@ GaussianPile 引入莫顿排序（Z-order）对高斯基元进行空间局部化
 - **漂浮伪影消除**：Figure 5 可视化对比表明，虽然 3DGS 可生成看似合理的 2D 投影，但其重建体积在轴向（z 轴）视角下存在严重伪影，而 GaussianPile 的体积结构清晰完整。
 - **效率与压缩比**：方法在平均 8 分钟内收敛（约比 INIF 快 5 倍），同时实现高达 19 倍的平均压缩比（Table 2）。
 
-## 整体框架
+
 
 GaussianPile 的核心设计思路是将切片式成像的物理聚焦模型显式注入 3D 高斯泼溅的渲染管线，从而在保留实时渲染和紧凑表征优势的同时，天然维护 3D 体积结构的一致性。整个框架由三个关键阶段串联而成，形成一条完全可微的 CUDA 管线。
 
@@ -134,7 +136,7 @@ GaussianPile 的核心设计思路是将切片式成像的物理聚焦模型显�
 ![[assets/figures/papers/paper_list_l2496_https_arxiv_org_abs_2603_20611/figures/001_Figure_1.jpg]]
 *Figure 1: Panel (a) is the average PSNR-fps-minute comparison (circle radius encodes minutes of training). Our method achieves the highest accuracy at far lower compute cost than prior work. Panels (b–d) are the comparisons of Gaussian rendering models under different imaging physics. (b) All-in-focus (σz → ∞): no axial falloff; primitives contribute regardless of its depth, appropriate for all-in-focus pinhole rendering (e.g., original 3DGS [14]) or line-integral modalities (e.g., X-ray [4]). (c) Zero-thickness (σz → 0): delta-like axial response; primitives contribute only at the exact plane, suitable for dense slicing (e.g., MRI [20]). (d) Finite-thickness Focus Gaussian (ours): finite axial sensi...*
 
-## 核心模块与公式推导
+
 
 GaussianPile 的核心创新在于将切片成像的物理聚焦模型显式注入高斯泼溅的渲染管线。整体流程（图2）包含三个关键阶段：**聚焦感知 PSF 建模**、**轴向重参数化与不透明度调制**、**屏幕空间投影与加法光栅化**。以下逐一展开关键模块及其数学表述。
 
@@ -204,7 +206,9 @@ $$\mathcal{L} = \mathcal{L}_1 + \lambda \mathcal{L}_{ssim}$$
 
 其中 $\lambda = 0.2$。整个前向与后向传播均通过 CUDA 加速实现，支持从像素梯度到世界坐标系高斯参数（$\pmb{\mu}, \mathbf{s}, \mathbf{q}, \alpha$）的完整可微梯度流。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与设计动机
 
@@ -307,7 +311,9 @@ Figure 8对比了INIF、3DGS和GaussianPile的收敛曲线。GaussianPile展现�
 ![[assets/figures/papers/paper_list_l2496_https_arxiv_org_abs_2603_20611/figures/010_Figure_6.jpg]]
 *Figure 6: Qualitative comparison of reconstruction results on three cellular datasets. Slice examples of different methods with PSNR (dB) shown at the bottom of each image*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的谱系关系
 
@@ -356,6 +362,8 @@ GaussianPile 的方法论贡献可定位于以下知识谱系：
 3. **通用高斯先验学习**：能否从大规模切片式体积数据中学习通用高斯先验（类似 3D 基础模型），实现单步前馈重建与压缩？
 4. **4D 时空扩展**：该方法如何扩展到 4D 时空数据（例如活细胞连续成像），以同时实现压缩与动态可视化？这需要处理时间维度的基元运动建模与跨帧一致性约束。
 5. **与神经场方法的深度融合**：GaussianPile 的显式基元与 INR 的隐式连续性各具优势，是否存在混合表示（例如以高斯基元编码低频结构、以小型 MLP 编码高频细节）的 Pareto 最优方案？
+
+
 
 ## 原文 PDF
 

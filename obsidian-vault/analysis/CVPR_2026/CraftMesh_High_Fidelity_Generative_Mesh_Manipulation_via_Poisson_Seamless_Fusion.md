@@ -42,7 +42,7 @@ claims:
 > - CraftMesh Editing Benchmark 上，CLIP_sim ↑ 20.801 (Ours-MeshyAI)；CLIP_dir ↑ 18.479 (Ours-MeshyAI)；NIQE ↓ 4.710 (Ours-MeshyAI)。
 > - Computational Cost 上，几何融合时间 (单张4090, 1000次迭代) ~5分钟 vs N/A；纹理和谐化时间 (单张4090, 2000次迭代) ~1分钟 vs N/A。
 
-## 概述
+## 概要
 
 三维网格编辑是生成式AI在3D内容创作中的核心需求，但现有方法面临一个关键瓶颈：**在施加复杂几何编辑时，难以保持原始网格的几何细节与纹理一致性**。基于分数蒸馏采样（SDS）或多视图扩散（MVD）的直接3D编辑方法，往往在编辑区域与原始网格之间产生明显的融合边界，表现为几何不连续与色彩偏移，严重限制了编辑的保真度和可控性。
 
@@ -58,8 +58,6 @@ claims:
 从方法谱系来看，CraftMesh 不同于基于 SDS 优化的 **FocalDreamer**（Li et al., AAAI 2024）和 **MagicClay**，也不同于基于多视图扩散重建的 **Instant3dit** 与 **CMD**（Li et al., SIGGRAPH 2025）。它通过将融合计算域从三维体积/坐标域降至二维图像域，将泊松方程求解的计算复杂度从 $O(n^3)$ 降至 $O(kn^2)$，在单张 RTX 4090 上几何融合约需 5 分钟，纹理和谐化约需 1 分钟。
 
 需要指出的是，该方法的效果高度依赖上游二维编辑和三维网格生成模型的性能，且当前泊松融合主要解决局部几何与纹理的连续性，对于涉及大幅全局结构变形的编辑任务可能力有不逮。计算开销亦非实时，尚难直接应用于交互式创作环境。这些构成了方法的主要局限，也为后续研究指明了方向。
-
-## 背景与动机
 
 ### 3D 内容编辑的需求与困境
 
@@ -87,7 +85,7 @@ CraftMesh 的出发点是将网格编辑任务**重构为“二维图像编辑 �
 
 此外，将泊松方程的求解域从传统 3D 体积降至 2D 图像域，使计算复杂度从 $O(n^3)$ 降至 $O(kn^2)$，在保证融合质量的同时显著提升了计算效率。
 
-## 核心创新
+## 核心方法与创新机理
 
 CraftMesh 的核心创新在于将网格编辑任务重构为**图像编辑 → 三维网格生成 → 无缝融合**的流水线，并引入基于泊松方程的两阶段融合技术，从根本上规避了现有方法在直接三维编辑中面临的多视角不一致和高计算复杂度问题。
 
@@ -131,8 +129,6 @@ $$\mathcal{L}_{tex} = \mathcal{L}_{distribution} + \theta_1 \mathcal{L}_{grad} +
 
 CraftMesh 在网格编辑方法谱系中占据独特位置。与基于 SDS 优化的方法（FocalDreamer、MagicClay）相比，它避免了迭代优化的不稳定性；与基于多视图扩散重建的方法（Instant3dit、CMD）相比，它通过显式的泊松融合保证了几何和纹理的连续性。其技术路线可视为二维泊松图像编辑在三维网格域的延伸，但通过 SDF 域的法向融合和纹理梯度传播实现了跨维度的适配。
 
-## 整体框架
-
 CraftMesh 将网格编辑重构为“图像编辑 → 三维网格生成 → 无缝融合”的流水线（Figure 2），从而将二维编辑的灵活控制力与三维生成的高保真度解耦复用。整个框架由三个核心模块串联构成。
 
 ![[assets/figures/papers/paper_list_l2186_https_openaccess_thecvf_com_content_CVPR2026_html_Hu_CraftMesh_High_Fide/figures/002_Figure_2.jpg]]
@@ -165,8 +161,6 @@ $$
 
 **输入输出流**  
 整个流水线的输入是原始网格与用户编辑指令（文本描述或拖拽向量），输出是经过几何与纹理双重无缝融合的编辑后网格。三个模块串行执行，上游模块的输出直接作为下游模块的输入，但编辑效果高度依赖外部二维编辑模型和图像到网格生成模型的输出质量——若上游模型生成的编辑区域网格存在缺陷，融合模块无法从根本上修复其几何或纹理错误。
-
-## 核心模块与公式推导
 
 CraftMesh 将网格编辑重构为“二维图像编辑→三维网格生成→无缝融合”的流水线，其核心由三个模块串联构成，如图2所示。以下聚焦几何融合与纹理和谐化两个关键模块及其数学机制。
 
@@ -282,12 +276,7 @@ $$
 
 泊松几何融合和泊松纹理和谐化并非独立运作。几何融合为纹理和谐化提供平滑的几何基底，避免纹理映射时的拉伸与错位；纹理和谐化则在几何融合的基础上消除色彩不连续。定量消融（Table 2）表明，几何融合单独使用使 CLIP_sim 从 17.723 提升至 20.502（+2.779），纹理和谐化单独使用提升至 19.399，两者结合达到最优的 20.801，验证了协同效应。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2186_https_openaccess_thecvf_com_content_CVPR2026_html_Hu_CraftMesh_High_Fide/figures/003_Figure_3.jpg]]
-*Figure 3: Details of Poisson Geometry Blending. We employ a hybrid SDF/Mesh representation, which is optimized to be harmonious using blended normals*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 评估设置
 
@@ -353,7 +342,7 @@ CraftMesh 将泊松融合的计算域从三维体积（复杂度 O(n³)）降至
 ![[assets/figures/papers/paper_list_l2186_https_openaccess_thecvf_com_content_CVPR2026_html_Hu_CraftMesh_High_Fide/figures/001_Figure_1.jpg]]
 *Figure 1: Mesh editing results produced by CraftMesh. CraftMesh is a versatile 3D mesh editing framework that enables users to perform text-based and drag-based editing, and delivers high-quality outputs even in challenging editing scenarios*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 

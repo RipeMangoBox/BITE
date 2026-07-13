@@ -43,7 +43,7 @@ claims:
 > - ImageNet 512×512 上，gFID↓ 1.81 vs DiT-XL (3.04) / EPG-L/32 (2.35) (−1.23 vs DiT-XL; −0.54 vs EPG-L/32)。
 > - Text-to-Image 1024×1024 上，GenEval↑ 0.74 vs SDXL (0.55) / Flux-dev (0.67) (+0.19 vs SDXL; +0.07 vs Flux-dev)。
 
-## 概述
+## 概要
 
 图像生成领域长期存在一个根本性张力：**潜在扩散模型**（Latent Diffusion Models, LDMs）依赖预训练自编码器将图像压缩到低维潜在空间进行扩散建模，虽大幅降低了计算开销，却引入了**有损重建**和**细节丢失**的固有缺陷；而直接在像素空间建模的传统扩散模型虽能保留完整信息，却因高昂的计算代价和缺乏高效的高分辨率建模机制而长期落后。PixelDiT 直面这一瓶颈，提出了一种**端到端、纯Transformer架构的像素空间扩散模型**，完全摒弃预训练自编码器，在像素空间直接学习扩散过程。
 
@@ -53,7 +53,7 @@ claims:
 
 PixelDiT 在方法谱系中处于**像素空间扩散模型**与**纯Transformer生成架构**的交汇点，其双层级设计为端到端高分辨率图像生成开辟了新路径，挑战了“潜在空间压缩是高效扩散建模必要条件”的既有范式。
 
-## 背景与动机
+
 
 ### 像素空间扩散模型的核心瓶颈
 
@@ -86,7 +86,9 @@ PixelDiT的出发点是回答一个根本性问题：**能否设计一种端到�
 
 PixelDiT通过双层级Transformer设计、像素级自适应层归一化（Pixel-wise AdaLN）和像素token压缩（Pixel Token Compaction）三项核心创新，系统性地回应了上述挑战，首次证明了端到端像素空间扩散模型可以在ImageNet 256×256上达到gFID 1.61的竞争力水平，并在文本到图像生成中超越SDXL等潜在模型。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PixelDiT 的核心创新在于通过**双层级 Transformer 架构**将图像生成任务解耦为粗粒度语义规划与细粒度像素级优化，并设计了**像素级自适应层归一化（Pixel-wise AdaLN）**与**像素 Token 压缩（Pixel Token Compaction）**两种关键技术，使得端到端像素空间扩散模型能够在兼顾高质量纹理细节的同时保持训练效率。以下从架构组织、条件调制策略和序列长度管理三个维度展开分析。
 
@@ -114,7 +116,7 @@ $$\Theta = \Phi(s_{\text{cond}}) \in \mathbb{R}^{(B \cdot L) \times p^2 \times 6
 
 PixelDiT 的三个 changed slots 构成了一个相互依赖的创新体系：双层级架构提供了语义-纹理解耦的结构基础，像素级 AdaLN 为纹理细化提供了精确的条件调制，像素 Token 压缩则使整个系统在计算上可行。三者的协同使得 PixelDiT 成为首个在不使用预训练自编码器的情况下，在 ImageNet 256×256 上达到 gFID 1.61（Table 1）的像素空间扩散模型，显著超越了同类像素空间方法（如 ADM-U 的 4.59、PixelFlow-XL 的 1.98）。
 
-## 整体框架
+
 
 PixelDiT 是一种**单阶段、端到端的像素空间扩散模型**，完全摒弃了预训练自编码器，直接在原始像素空间执行去噪过程。其核心设计理念是将图像生成任务解耦为**粗粒度语义规划**与**细粒度像素级优化**两个阶段，通过双层级 Transformer 架构实现高效建模。
 
@@ -161,7 +163,7 @@ $$\mathcal{L}_{\text{diff}} = \mathbb{E}_{t,x,\varepsilon}\left[ \| f_\theta(x_t
 ![[assets/figures/papers/paper_list_l2073_https_arxiv_org_abs_2511_20645/figures/015_Figure_7.jpg]]
 *Figure 7: | T2I architecture of PixelDiT with MM-DiT blocks on the patch-level pathway. The pixel-level pathway performs dense per-pixel modeling conditioned on semantic tokens*
 
-## 核心模块与公式推导
+
 
 PixelDiT 的核心设计围绕一个**双层级 Transformer 架构**展开，将图像生成任务解耦为粗粒度的语义规划与细粒度的像素级纹理优化。该架构由四个关键模块协同构成：Patch-level DiT、Pixel-level DiT (PiT)、像素级自适应层归一化（Pixel-wise AdaLN）和像素 Token 压缩机制（Pixel Token Compaction）。
 
@@ -210,7 +212,9 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{diff}} + \lambda_{\mathrm{repa}} \mathcal{L
 ![[assets/figures/papers/paper_list_l2073_https_arxiv_org_abs_2511_20645/figures/003_Figure_3.jpg]]
 *Figure 3: | AdaLN modulation strategies. (A) A naive AdaLN broadcasts a global conditioning vector to all pixels. (B) Patch-wise AdaLN expands semantic tokens to the*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -272,7 +276,9 @@ Figure 5展示了不同patch size（p=8, 16, 32）和模型规模（B/L/XL）下
 ![[assets/figures/papers/paper_list_l2073_https_arxiv_org_abs_2511_20645/figures/010_Figure_6.jpg]]
 *Figure 6: | Qualitative results on ImageNet 512×512 using PixelDiT. We use a classifier-free guidance scale*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 像素空间扩散模型的技术脉络
 
@@ -312,6 +318,8 @@ PixelDiT 的贡献可映射到扩散模型设计的三个关键维度：
 3. **下游任务的泛化优势**：像素空间扩散模型在免训练编辑中已展现初步优势，但其在可控生成、图像翻译等更广泛下游任务中是否具有超越潜在模型的系统性优势，仍需进一步探索。
 
 4. **与其他像素空间方法的融合潜力**：如 **EPG-XXL/16** 和 **JiT-G** 等同样探索像素空间生成的工作，其技术路线（如高效采样策略、替代架构设计）与 PixelDiT 的双层级设计是否存在互补空间，是值得关注的交叉方向。
+
+
 
 ## 原文 PDF
 

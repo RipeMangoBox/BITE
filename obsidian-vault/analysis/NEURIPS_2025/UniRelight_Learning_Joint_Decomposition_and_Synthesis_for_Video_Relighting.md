@@ -5,6 +5,7 @@ paper_level: A
 venue: NeurIPS
 year: 2025
 pdf_ref: paperPDFs/NEURIPS_2025/UniRelight_Learning_Joint_Decomposition_and_Synthesis_for_Video_Relighting.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/toronto-ai/UniRelight/
 aliases:
 - UniRelight
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | UniRelight：学习视频重光照的联合分解与合成 |
 | 英文题名 | UniRelight: Learning Joint Decomposition and Synthesis for Video Relighting |
 | 会议/期刊 | NeurIPS 2025 |
-| Links | [paper](https://arxiv.org/abs/2506.15673); [Project](https://research.nvidia.com/labs/toronto-ai/UniRelight/) |
+| Links | [paper](https://arxiv.org/abs/2506.15673) · [Project](https://research.nvidia.com/labs/toronto-ai/UniRelight/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | UniRelight |
 | Dataset | SyntheticScenes, MIT multi-illumination |
@@ -41,7 +42,7 @@ claims:
 > - SyntheticScenes 上，SSIM↑ 为 0.847，对比 0.841 (DiffusionRenderer Cosmos)，变化 +0.006。
 > - SyntheticScenes 上，LPIPS↓ 为 0.190，对比 0.217 (DiffusionRenderer original)，变化 -0.027。
 
-## 概述
+## 概要
 
 视频重光照旨在将输入视频的光照条件迁移到目标光照环境，同时保持场景的内在属性不变。现有方法面临两大核心瓶颈：**两阶段流水线**（先逆渲染分解G‑buffer，再前向渲染合成）容易在中间表示中累积误差，且难以编码各向异性、透明、次表面散射等复杂材质；**端到端方法**则受限于多光照配对数据的稀缺，在真实场景中泛化能力不足。
 
@@ -53,7 +54,7 @@ UniRelight 提出将**重光照与反照率解调联合建模**——在单一�
 
 **方法定位**：UniRelight 属于基于扩散模型的视频重光照方法，区别于两阶段显式逆渲染管线（如 **DiffusionRenderer** (Liang et al., arXiv 2025)），也不同于仅利用背景上下文提示的单图像重光照方法（如 **IC-Light** (Zhang et al., ICLR 2025)）。其联合去噪架构受 VideoJAM 启发，但将联合建模从运动-外观扩展至本征分解-重光照的跨模态交互。
 
-## 背景与动机
+
 
 ### 重光照任务的核心挑战
 
@@ -83,7 +84,9 @@ UniRelight 提出将**重光照与反照率解调联合建模**——在单一�
 
 UniRelight的定位是填补上述缺口：通过联合建模重光照与反照率解调，在一个统一的视频扩散框架中同时获得高质量重光照结果和场景本征分解，并在合成数据与真实世界自动标注数据的混合训练策略下实现更强的泛化能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 UniRelight 的核心创新在于将重光照与场景本征分解（反照率解调）统一到一个联合扩散框架中，从根本上改变了传统两阶段流水线的设计范式。这一创新通过三个关键的 **changed slots** 实现：
 
@@ -121,7 +124,7 @@ UniRelight 摒弃了显式中间表示，改为在单一视频扩散Transformer�
 
 上述三个 changed slots 共同服务于一个核心洞察：**反照率解调为重光照提供了去除阴影、理解场景本征结构的强先验**。联合建模使反照率估计和重光照合成相互促进——反照率为重光照提供场景材质信息，重光照任务反过来约束反照率解调的准确性。这种双向增益机制是UniRelight在MIT多光照真实基准上PSNR达到20.76（次佳仅17.87）、用户研究中96%±4%样本被偏好的根本原因。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2506_15673/figures/015_Figure_10.jpg]]
 *Figure 10: Additional qualitative results on real scenes. Our method provides high-quality albedo estimation and realistic relighting results*
@@ -191,7 +194,7 @@ $$\mathcal{L}(\boldsymbol{\theta}) = \mathbb{E}_{(\mathbf{z}_0^{\mathbf{E}}, \ma
 - **时序串联 vs 通道串联**：将不同模态沿时间维串联而非通道维，充分利用了DiT的自注意力机制进行跨模态信息融合，使反照率帧和重光照帧能够直接交互。
 - **三通道光照编码 vs 单一LDR**：相比仅使用LDR环境图的基线（如**DiLightNet**，Zeng et al., ACM SIGGRAPH 2024），三缓冲设计同时保留了色彩、强度和方向信息，使模型能更精确地推理高动态范围光照下的镜面高光和阴影。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化与潜空间映射
 
@@ -250,7 +253,9 @@ $$\mathbf{f}_{\theta}([\mathbf{z}_{\tau}^{\mathbf{E}} + \bar{\mathbf{h}}^{\mathb
 
 该变体不再预测反照率，仅以输入视频为条件对重光照潜变量去噪。实验表明，该简化导致 PSNR 从 26.97 降至 26.42，且在街景数据中明显将输入阴影烘焙到重光照结果中（Table 3, Figure 5），验证了联合建模的必要性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -305,7 +310,9 @@ UniRelight 在两个核心基准上进行了全面评估：合成数据集 **Syn
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2506_15673/figures/012_Table_5.jpg]]
 *Table 5: Quantitative comparison with IC-Light*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 
@@ -346,6 +353,8 @@ UniRelight 的架构和数据策略为以下方向提供了自然延伸空间：
 4. **联合建模框架的泛化。** 当前的联合去噪框架将反照率作为辅助任务。这一设计是否可推广到其他逆渲染输出（如法线图、深度图、粗糙度图）？如果能够联合估计多种本征属性，模型可能学习到更完整的场景表示，进一步提升重光照质量。这本质上是在探索“以多任务逆渲染驱动前向渲染”的通用框架。
 
 5. **真实世界数据质量闭环。** 当前真实世界自动标注数据依赖预训练模型估计反照率，标签噪声可能限制性能上限。能否通过自监督或半监督策略，在重光照任务本身的信号（如重光照一致性）上构建质量闭环，逐步优化反照率标签？
+
+
 
 ## 原文 PDF
 

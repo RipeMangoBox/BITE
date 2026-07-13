@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Adapt_Data_to_Model_Adaptive_Transformation_Optimization_for_Domain_shared_Time_Series_Foundation_Models.pdf
+project_link: null
+code_link: https://github.com/thulab/TATO
 aliases:
 - TTSATO
 - ADMATODSTSFM
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 适应数据给模型：面向域共享时间序列基础模型的自适应变换优化 |
 | 英文题名 | Adapt Data to Model: Adaptive Transformation Optimization for Domain-shared Time Series Foundation Models |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=uTK1SNgi1N); [GitHub](https://github.com/thulab/TATO) |
+| Links | [paper](https://openreview.net/forum?id=uTK1SNgi1N) · [GitHub](https://github.com/thulab/TATO) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/time_series |
 | Method | TATO (Time-series Adaptive Transformation Optimization) |
 | Dataset | ETTh1, ETTm2, Exchange, Overall |
@@ -41,7 +43,7 @@ claims:
 > - ETTm2 上，MSE 为 0.5100，对比 0.6783，变化 24.8% reduction。
 > - Exchange 上，MSE 为 0.3144 (TATO)，对比 0.4382 (vanilla)，变化 28.3% reduction。
 
-## 概述
+## 概要
 
 真实世界时间序列的多样性和非平稳性，使得冻结的预训练大时间序列模型（large time‑series model, LTM）在直接应用时面临泛化性与预测精度之间的根本权衡：同一模型在不同下游域上的表现往往参差不齐。针对这一瓶颈，本文提出一种以数据为中心的域自适应范式——**时间序列自适应变换优化（Time‑series Adaptive Transformation Optimization, TATO）**。其核心思想是"适配数据而非微调模型"：在保持大规模预训练 LTM 参数完全冻结的前提下，通过自动搜索最优的输入数据预处理管道，在不牺牲模型通用性的条件下显著提升跨域预测性能。
 
@@ -49,7 +51,7 @@ TATO 框架围绕三类关键变换构建优化空间：上下文切片（调整
 
 在多个先进 LTM（Timer‑UTSD、Timer‑LOTSA、Moirai 系列、Chronos‑tiny）及广泛使用的数据集上的实验表明，TATO 带来一致且显著的域自适应预测增益：平均 MSE 降低 13.6%，最大降幅达 65.4%。按模型视角，Timer‑LOTSA 的 MSE 平均提升 24.8%，Chronos‑tiny 提升 14.5%，Moirai‑large 提升 14.0%。消融实验进一步证实，移除上下文切片或尺度归一化算子会导致性能大幅下降，而增加变换搜索试验次数与历史样本数量均可进一步提升效果。需要注意的是，在 Weather 等部分高变异性数据集上，某些模型的收益较小甚至为负，表明极端域偏移下的适配仍需后续关注。
 
-## 背景与动机
+
 
 大规模时间序列基础模型（LTM），如 Timer、Moirai 和 Chronos 等，通过在庞大语料上的预训练，展现出强大的时序建模能力。然而，这些模型在预训练后通常以冻结状态直接应用于下游任务。由于真实世界时间序列具有极高的多样性（例如跨域分布差异）和固有的非平稳性（如趋势变化、异常值、噪声水平波动），冻结的 LTM 在泛化性与预测精度之间存在根本性权衡：一个在多数域上训练良好的模型，直接推送到未见域时往往无法一致地保持高性能。这一瓶颈的核心在于，模型的冻结参数无法吸收每个下游域的独特统计特性，造成预测退化。
 
@@ -61,7 +63,9 @@ $$h^{*} = \operatorname*{min}_{h \in \mathcal{H}} \mathcal{L}(M, D_{history}, h)
 
 其中 $\mathcal{H}$ 是由上下文切片、尺度归一化和异常值校正等三类共九种变换算子构成的搜索空间。借助该框架，模型无需任何参数更新，即可自适应地"适应"各域的数据特性。初步验证表明，此方法在多种先进 LTM 上均能实现一致且显著的域自适应预测提升，最高可降低 MSE 达 65.4%，平均降低 13.6%，充分证实了"数据适应模型"路线的可行性与巨大潜力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 现有时间序列基础模型（LTM）以冻结参数进行跨域预测时，面临一个根本性矛盾：真实数据的多样性与非平稳性使得单一模型无法在所有下游域保持一致的精度，而重新微调又会牺牲模型的通用能力。TATO 的关键突破在于将适应策略从"模型适应数据"反转为**数据适应模型**——在保持大规模预训练模型冻结不变的前提下，通过自动搜索最优的预处理变换管道，使原始数据以最适合该模型"口味"的形式输入，从而在不同域上大幅提升预测准确率。
 
@@ -81,7 +85,7 @@ $$h^{*} = \operatorname*{min}_{h \in \mathcal{H}} \mathcal{L}(M, D_{history}, h)
 
 上述四个变更槽位的协同作用，使 TATO 能够在多种基线 LTM（Timer-UTSD/LOTSA、Moirai 系列、Chronos-tiny）及 8 个广泛使用的数据集上，一致且显著地降低预测误差：MSE 最大降低 65.4%，平均降低 13.6%。消融实验进一步证实，去除 Trimmer 或 Scaler 等关键算子会导致性能大幅下降，而增加试验次数与样本数量能够持续提升优化效果，说明搜索框架本身亦具有良好的扩展性。这些证据表明，以数据为中心的自适应变换优化，是提升冻结时序基础模型域泛化能力的有效且可扩展的路径。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0006_uTK1SNgi1N_Adapt_Data_to_Model_Adaptive_Transformation_Opti/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the TATO framework. The framework consists of three main stages: (1) Data preparation, where diverse augmentations are applied to input samples to improve robustness; (2) Optimization of time series transformations, where a black-box optimizer searches for effective transformation pipelines comprising various preprocessing operators (e.g., trimming, normalization, denoising); and (3) Two-stage pipeline selection, where candidate pipelines are first filtered via Pareto ranking on validation metrics, followed by weighted multi-indicator ranking to select the optimal transformation pipeline for frozen LTM forecasting*
@@ -118,7 +122,7 @@ $$h^{*} = \operatorname*{min}_{h \in \mathcal{H}} \mathcal{L}(M, D_{\text{histor
 
 该框架将领域自适应问题转化为管道超参数搜索问题，规避了对模型参数的更新，从而在保持模型通用性的同时，实现跨域预测精度的大幅提升（MSE 平均降低 13.6%，最大降低 65.4%）。消融实验证实，完整的三阶段设计和全部算子配置能够带来最佳性能，其中 `Trimmer` 和 `Scaler` 算子的移除会导致性能显著下降，进一步验证了自适应管道优化的必要性。
 
-## 核心模块与公式推导
+
 
 TATO 在冻结大时间序列模型（LTM）前插入一个自适应搜索的变换管道，使同一模型适应不同下游域。其核心优化目标为
 
@@ -196,7 +200,9 @@ $$
 
 其中 $e_V$ 为 vanilla 基线误差，$e_T$ 为 TATO 优化后的误差，正值表示误差降低。综合实验表明 TATO 平均降低 MSE 达 13.6%，最大降幅 65.4%。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 TATO 在六种冻结大时间序列模型（LTM）和八个真实数据集上一致提升了域自适应预测性能，整体 MSE 平均降低 13.6%，最大降低达 65.4%。这一提升源于自适应变换管道对输入数据的非线性校正，而非模型参数的调整，从而缓解了冻结 LTM 在面对多样且非平稳时序时的泛化-精度权衡。
 
@@ -255,7 +261,9 @@ TATO 的性能随超参搜索试次和历史样本数量增加而提升（**Figu
 
 上述证据统一指向 TATO 的核心洞察：在冻结的共享基础模型之上，通过以数据为中心的变换搜索，能够低成本地恢复域特化精度，而无需触碰模型权重。该路径为时间序列基础模型的部署提供了新的实践范式。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 TATO 属于数据优先的域自适应策略，与模型微调形成两条正交路线。微调通过调整预训练时间序列大模型（LTM）的参数来捕捉跨域共性，TATO 则通过搜索数据预处理管道优化输入分布，使冻结的 LTM 在特定下游域中获得更好的预测能力。二者互补而非替代：实验表明，在已微调的 Timer-UTSD 与 Timer-LOTSA 上叠加 TATO 仍可获得进一步误差降低（如 Table 3 所示），说明数据侧优化能弥补模型侧微调的剩余泛化缺口。
 
@@ -276,6 +284,8 @@ TATO 的主要应用前提是下游域存在一段可用的历史数据，且该
 3. **开放扩展方向**：论文指出三个明确的后续工作：将 TATO 推广至多变量时间序列；丰富算子库以覆盖专业化领域；探索自适应算子选择机制以减少超参空间的人工预设。此外，如何利用生成式增强或元学习从多域历史中学习变换先验，以降低每个新域的搜索成本，也是值得探索的路径。
 
 > 注：以上局限分析主要基于原文实验与讨论中提及的改进点，部分开放问题在现有材料中仅以概要形式出现，未来方向的可行性需结合具体实施验证。
+
+
 
 ## 原文 PDF
 

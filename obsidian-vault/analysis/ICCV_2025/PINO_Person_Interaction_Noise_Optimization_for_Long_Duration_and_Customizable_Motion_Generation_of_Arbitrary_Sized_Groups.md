@@ -5,6 +5,8 @@ paper_level: A
 venue: ICCV
 year: 2025
 pdf_ref: paperPDFs/ICCV_2025/PINO_Person_Interaction_Noise_Optimization_for_Long_Duration_and_Customizable_Motion_Generation_of_Arbitrary_Sized_Groups.pdf
+project_link: https://sinc865.github.io/pino/
+code_link: null
 aliases:
 - PINOP
 tags:
@@ -41,7 +43,7 @@ claims:
 > - Multi-person interaction (incremental pair (1,5)) 上，Overlap 0.069 (PINO-InterGen) vs 0.977 (InterGen) (-0.908)。
 > - Multi-person interaction (incremental pair (1,2)) 上，FID 12.920 (PINO-InterGen) vs 13.100 (InterGen) (-0.180)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -63,7 +65,7 @@ PINO（Person-Interaction Noise Optimization）提出了一种无需额外训练
 
 当前方法的主要局限在于推理效率——每生成一个角色约需1分钟（仅重叠惩罚）至10分钟（全惩罚），难以满足实时应用需求。此外，手部关节数据的缺失导致手部穿透问题尚未完全解决，双人模型基座可能无法捕捉超过两人的高阶交互依赖。开放问题包括：如何加速噪声优化过程、能否扩展基础模型直接支持三人以上交互、如何自动生成合理的成对交互图以减少用户手动设计负担，以及现有评估指标是否充分反映群组交互的自然性和语义一致性。
 
-## 背景与动机
+
 
 ### 多人交互运动生成的核心瓶颈
 
@@ -83,7 +85,9 @@ PINO的核心洞察在于：**复杂的群组交互本质上由较小的、语�
 
 基于这一洞察，PINO提出了一种无需额外训练的范式：将预训练双人扩散模型作为运动先验，通过**交互分解**将群体生成转化为序列化成对生成问题，并通过**噪声优化**引入物理惩罚来强制执行空间一致性和用户指定的控制约束。这种设计使得方法能够（1）支持任意规模群体的生成，（2）为每对交互提供独立的语义提示，（3）通过可微损失函数实现灵活的用户控制，而无需重新训练基础模型。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PINO 的核心创新在于将复杂的多人交互生成问题**重新定义为一系列语义相关的成对交互的组合优化问题**，而非试图用单一模型直接生成整个群体的运动。这一思路源于一个关键的因果洞察：现实中的群组交互本质上由较小的、相互连接的成对交互构成，其中角色通过共享的“枢纽人物”连接多个交互关系。
 
@@ -103,7 +107,7 @@ PINO 的核心创新在于将复杂的多人交互生成问题**重新定义为�
 
 这三个创新点形成了协同效应：交互分解使语义控制成为可能，噪声优化为物理约束和用户控制提供了统一的注入接口，而免训练的特性使方法可即插即用地应用于不同的预训练双人扩散模型。
 
-## 整体框架
+
 
 PINO 的整体框架围绕一个核心思想展开：**将复杂群组交互分解为一系列语义相关的成对交互**，并利用预训练的双人交互扩散模型作为运动先验，通过**噪声优化**逐步组合生成任意规模群体的运动。整个 pipeline 由四个关键模块串联而成，形成“生成—优化—组合—扩展”的闭环。
 
@@ -144,7 +148,7 @@ PINO 的整体框架围绕一个核心思想展开：**将复杂群组交互分�
 ![[assets/figures/papers/paper_list_l1770_PINO_Person_Interaction_Noise_Optimization_for_Long_Duration_and_Customi/figures/001_Figure_1.jpg]]
 *Figure 1: Person-Interaction Noise Optimization (PINO) leverages pre-trained two-person interaction diffusion models as motion priors to generate motions of arbitrary-sized groups with the combination of spatiotemporal penalty, prompt switching between pairs, and motion extension. The first example employs penalties to guide humans into the form “CV”, the second generates a pair posing for a photograph, then switches the prompt to generate the cameraman, and the third generates an alternating handshake sequence between three individuals by extending motions while switching the prompt between the two pairs*
 
-## 核心模块与公式推导
+
 
 ### 运动表征
 
@@ -221,7 +225,9 @@ $$ \mathbf{x}_t^i \gets \mathbf{m} \odot \hat{\mathbf{x}}^i + (1 - \mathbf{m}) \
 
 同时引入边界加速度惩罚，确保扩展段与已知段的过渡平滑自然。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 双人交互：消除重叠与穿透
 
@@ -300,7 +306,9 @@ PINO 在噪声优化中引入可微分的控制惩罚，支持用户对角色根
 ![[assets/figures/papers/paper_list_l1770_PINO_Person_Interaction_Noise_Optimization_for_Long_Duration_and_Customi/figures/011_Table_7.jpg]]
 *Table 7: Evaluation of semantic elements in two-person motion extension. Extended motions are cropped to match the ground truth length for evaluation*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：从双人到群体的生成鸿沟
 
@@ -375,6 +383,8 @@ PINO 的方法论可追溯至两个技术脉络：
 ### 5. 知识库定位总结
 
 PINO 在多人运动生成领域占据**免训练、物理感知、任意规模**的方法学位置。其核心贡献不在于提出新的生成架构，而在于证明：**通过巧妙的噪声空间优化和成对分解策略，预训练的双人扩散模型可以被“外推”至任意规模的群体生成，同时获得物理合理性和用户可控性**。这一思路对资源受限、数据稀缺的场景具有实际价值，但其推理效率瓶颈限制了实时应用的前景。
+
+
 
 ## 原文 PDF
 

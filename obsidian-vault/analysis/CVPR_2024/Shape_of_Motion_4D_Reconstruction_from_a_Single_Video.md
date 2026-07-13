@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2024
 pdf_ref: paperPDFs/CVPR_2024/Shape_of_Motion_4D_Reconstruction_from_a_Single_Video.pdf
+project_link: https://shape-of-motion.github.io/
+code_link: null
 aliases:
 - SM
 - SM4RFSV
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 运动形状：从单目视频进行4D重建 |
 | 英文题名 | Shape of Motion: 4D Reconstruction from a Single Video |
 | 会议/期刊 | CVPR 2024 |
-| Links | [paper](https://arxiv.org/abs/2407.13764); [Project](https://shape-of-motion.github.io/) |
+| Links | [paper](https://arxiv.org/abs/2407.13764) · [Project](https://shape-of-motion.github.io/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Shape of Motion |
 | Dataset | iPhone dataset, Kubric dataset |
@@ -41,7 +43,7 @@ claims:
 > - iPhone dataset 上，2D AJ↑ 为 34.4，对比 27.8 (TAPIR)，变化 +23.7%。
 > - iPhone dataset 上，PSNR↑ (NVS) 为 16.72，对比 16.54 (DynMF)，变化 +0.18 dB。
 
-## 概述
+## 概要
 
 从单目视频中重建完整的动态4D场景是一个高度病态的问题：单视角观测天然缺失深度、运动和多视角信息，导致现有方法要么仅能恢复短程场景流，要么无法同时产生高质量的3D运动估计和新视角合成。
 
@@ -51,7 +53,7 @@ claims:
 
 该方法在方法谱系中处于**动态3D高斯泼溅**与**数据驱动先验融合**的交汇点，其定位区别于仅做新视角合成的动态NeRF/3D-GS方法（如HyperNeRF、Deformable-3D-GS），也区别于仅做2D/3D跟踪的方法（如TAPIR、SpatialTracker），而是首次在统一框架下同时完成这两类任务。
 
-## 背景与动机
+
 
 从单目视频重建动态三维场景是计算机视觉中的一个根本性难题。人类仅凭一段手机拍摄的视频，就能毫不费力地理解场景中物体的三维形状和运动轨迹——哪些部分在运动、它们如何移动、彼此之间有何关系。然而，让计算机完成同样的任务仍然极具挑战。
 
@@ -61,7 +63,9 @@ claims:
 
 **本文动机：融合互补信号，构建统一的四维表示。** 近年来，数据驱动的先验模型取得了长足进步——单目深度估计（如 Depth Anything）可以预测每帧的相对深度，二维点跟踪器（如 TAPIR）可以在长视频中追踪任意像素的对应关系。尽管这些预测各自带有噪声和误差，但它们提供了互补的信息：深度估计给出单帧的三维线索，二维跟踪给出跨帧的对应关系。本文的核心动机是：能否将这些互补的噪声信号整合到一个统一的、持久的四维场景表示中，让它们相互纠正、相互增强，从而同时获得高保真的新视角合成和精确的长程三维运动跟踪？
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 1. 问题瓶颈与设计动机
 
@@ -118,7 +122,7 @@ $$^{\mathrm{w}}\hat{\mathbf{X}}_{tt'}(\mathbf{p}) = \sum_{i\in H(\mathbf{p})} T_
 
 在iPhone数据集上，该方法在3D跟踪EPE上相比TAPIR+DA降低了28%（0.114→0.082），同时在新视角合成PSNR上以16.72超过最佳动态重建基线DynMF（16.54），验证了联合优化的协同效应。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2407_13764/figures/001_Figure_1.jpg]]
 *Figure 1: Shape of Motion. Our method enables joint long-range 3D tracking and novel view synthesis from a monocular video of a complex dynamic scene. We render moving elements at a fixed viewpoint across time and visualize estimated 3D motion as colorful trajectories. These trajectories reveal distinct geometric patterns, which leads to the term “Shape of Motion”*
@@ -162,7 +166,7 @@ $$\mathbf{T}_{0t} = \sum_{b=0}^B \mathbf{w}^{(b)} \mathbf{T}_{0t}^{(b)}$$
 
 该框架的独特之处在于同时输出三种互补的 4D 表示：任意像素的长程 3D 运动轨迹、新视角合成图像，以及通过运动系数 PCA 揭示的场景刚体运动分解（Figure 5, 6）。这种统一的显式运动表示使得 Shape of Motion 在 3D 跟踪、2D 跟踪和新视角合成三个任务上均达到 SOTA 水平（Table 1）。
 
-## 核心模块与公式推导
+
 
 Shape of Motion 的核心是一个可微分的动态场景表示，它将单目视频的4D重建问题分解为三个紧密耦合的模块：**持久3D高斯的参数化**、**低维运动基的建模**、以及**多信号联合优化**。
 
@@ -244,7 +248,9 @@ $$
 
 优化的成功高度依赖合理的初始化。预处理阶段利用Depth Anything获取单目深度，TAPIR获取2D跟踪，通过深度提升得到含噪的初始3D轨迹。动态高斯的规范帧位置从这些初始3D轨迹中随机采样。运动基的初始化则通过对3D轨迹速度向量进行k-means聚类，并对每个簇求解加权Procrustes对齐问题，得到 $B$ 个初始SE(3)基（所有实验中 $B=10$）。静态场景部分通过反投影对齐后的深度图初始化约100k个静态高斯。消融实验证实，跳过SE(3)拟合初始化步骤会导致性能显著下降（Table 4）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -316,7 +322,9 @@ Table 4 报告了 iPhone 数据集上的消融结果，揭示了三个关键设�
 
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心瓶颈与设计动机
 
@@ -363,6 +371,8 @@ $$\mathbf{T}_{0t} = \sum_{b=0}^B \mathbf{w}^{(b)} \mathbf{T}_{0t}^{(b)}$$
 4. **先验内化**：能否减少对离线预训练模型的依赖，将这些几何和运动先验内化到一个统一的、可端到端训练的学习框架中？
 5. **长视频扩展**：当前实验主要在300帧左右的视频上进行，如何扩展到更长序列并保持计算效率？运动基数量的自适应调整和分层运动表示可能是可行方向。
 6. **多模态融合**：能否利用音频、文本等多模态信息辅助运动分解和场景理解，提升在语义复杂场景中的鲁棒性？
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Exploratory_Memory_Augmented_LLM_Agent_via_Hybrid_On_and_Off_Policy_Optimization.pdf
+project_link: https://agent-lightning.github.io/posts/empo2/
+code_link: https://github.com/microsoft/agent-lightning/tree/main/contrib/recipes/envs
 openreview_forum_id: UOzxviKVFO
 aliases:
 - EMALAHOPO
@@ -30,12 +32,15 @@ claims:
 | 中文题名 | Exploratory Memory-Augmented LLM Agent via Hybrid On- and Off-Policy Optimization |
 | 英文题名 | Exploratory Memory-Augmented LLM Agent via Hybrid On- and Off-Policy Optimization |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=UOzxviKVFO); [GitHub](https://github.com/microsoft/agent-lightning/tree/main/contrib/recipes/envs); [Project](https://agent-lightning.github.io/posts/empo2/) |
+| Links | [paper](https://openreview.net/forum?id=UOzxviKVFO) · [GitHub](https://github.com/microsoft/agent-lightning/tree/main/contrib/recipes/envs) · [Project](https://agent-lightning.github.io/posts/empo2/) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method |  |
 | Dataset | |
 
-## 概述
+> [!tip] 效果简介
+> 本笔记的既有实验指标、对比结果与适用边界见“实验与关键发现”；本轮仅统一结构，不改写证据。
+
+## 概要
 
 大语言模型（LLM）智能体在复杂交互环境中面临一个根本瓶颈：**探索不足导致策略过早收敛到次优解**。以 GRPO（Group Relative Policy Optimization）为代表的在线强化学习方法，虽然通过组内相对优势比较移除了对价值函数的依赖，但其探索完全由策略自身的随机性驱动，缺乏引导探索的结构化机制。在 ScienceWorld 等需要多步推理与空间导航的任务中，GRPO 训练的策略往往陷入局部最优——例如在“打开红色灯泡”任务中，智能体始终无法找到目标物体，Reward 曲线长期停滞。
 
@@ -45,7 +50,7 @@ claims:
 
 方法层面，EMPO² 属于**记忆增强的在线 RL + 离线 RL 混合范式**，其关键设计包括：（1）自我生成记忆缓冲区，以余弦相似度检索 top-10 提示；（2）rollout 阶段以概率 $p$ 在无记忆/记忆增强两种模式间采样；（3）update 阶段以概率 $q$ 在 on-policy/off-policy 两种模式间切换，off-policy 更新将存储的 log-probability 替换为仅条件于状态和任务的值，消除记忆条件带来的分布偏移；（4）token 级掩码与内在奖励机制稳定训练并维持策略熵。消融实验表明，记忆模块、off-policy 更新、内在奖励三者缺一不可，且超参数 $p$ 和 $q$ 存在最优区间（$p=0.25$ 稳定收敛，$q=0.85$ 早期探索最快），极端取值会显著损害性能。
 
-## 背景与动机
+
 
 ### 大语言模型智能体的探索困境
 
@@ -71,7 +76,9 @@ claims:
 
 这一设计直接回应了 GRPO 探索不足的根本瓶颈：当策略陷入局部最优时，记忆中的多样化经验为采样提供了额外的状态-动作候选，而离线更新则利用这些经验向策略注入逃离局部最优的梯度信号。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 EMPO2（Exploratory Memory-Augmented On- and Off-Policy Optimization）的核心创新在于将**自生成记忆驱动的探索**与**混合在线/离线策略优化**统一到一个框架中，从根本上解决了GRPO等纯在线RL方法在LLM智能体训练中因探索不足而陷入次优解的问题。
 
@@ -110,7 +117,7 @@ EMPO2引入两项辅助技术确保混合训练过程的稳定性：
 
 这一组合使EMPO2在ScienceWorld上实现平均Return从GRPO的33.2跃升至75.9（+128.6%），且训练曲线持续上升而非过早饱和，验证了混合范式在克服探索瓶颈上的决定性作用。
 
-## 整体框架
+
 
 EMPO² 是一种面向 LLM Agent 的混合强化学习框架，其核心设计围绕**探索性记忆增强**与**混合策略优化**两条主线展开。框架在训练过程中交替运行两种 rollout 模式与两种更新模式，通过非参数记忆模块桥接探索与利用，形成自增强的学习循环。
 
@@ -188,7 +195,7 @@ EMPO² 的训练循环可分解为四个阶段，构成闭环：
 
 > **证据强度提示**：上述框架描述基于论文第 4 节方法论及 Figure 4-7 的佐证。Table 3 提供了重要性采样比在不同模式下的精确计算方式，Figure 11 展示了内在奖励配置的敏感性分析。关于 off-policy 更新作为「奖励引导知识蒸馏」的论断来自第 5 节相关工作的定性描述，其机制层面的严格等价性需进一步验证。
 
-## 核心模块与公式推导
+
 
 ### 记忆增强的探索机制
 
@@ -224,7 +231,9 @@ $$\mathbb{E}_{u \sim p(\mathcal{U})} \{ \tau^{(i)} \} \sim \pi_{\theta_{\mathrm{
 
 为鼓励状态层面的探索，EMPO2 引入基于新颖性的内在奖励。维护一个状态记忆列表，对每个新状态计算其与已有状态的余弦相似度；若相似度低于阈值，则赋予内在奖励 $r_{\mathrm{intrinsic}} = \frac{1}{n}$，其中 $n$ 为相似历史状态的数量。该奖励作为外在任务奖励的补充，有助于维持更高的策略熵。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：ScienceWorld 与 WebShop 性能对比
 
@@ -266,7 +275,9 @@ Token masking 机制对训练稳定性至关重要。Figure 6 显示，对概率
 
 Figure 8 展示了 EMPO² 的快速适应能力：在三个新任务场景中，EMPO² 在 10 步内平均提升 **136%**，而 GRPO 几乎无法从零开始学习。Figure 17 的定性案例对比了有无记忆的 agent 行为——在 ScienceWorld 的化学混合颜料任务中，无记忆 agent 重复在走廊倾倒黄色颜料而失败；有记忆 agent 则检索到 "不要在走廊混合颜料，去有工作台的地方" 等 tips，成功调整行为并完成任务。这一案例直观展示了记忆增强提示如何将过去的失败转化为可操作的探索引导。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 在LLM智能体强化学习中的位置
 
@@ -299,6 +310,8 @@ EMPO²的方法架构包含三个可组合的模式：**无记忆on-policy学习
 3. **训练稳定性机制**：Token masking被证明能稳定训练（Figure 6），但该机制引入的概率阈值δ是一个关键超参数，论文未讨论其对不同任务的敏感性。
 
 4. **记忆质量的自反馈循环**：由于记忆提示（tips）由策略自身生成，低质量策略可能产生误导性记忆，形成负反馈循环。论文未分析记忆质量随训练进程的演化规律，这是实际部署中需要关注的风险点。
+
+
 
 ## 原文 PDF
 

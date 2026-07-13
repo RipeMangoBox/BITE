@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/MSPT_Efficient_Large_Scale_Physical_Modeling_via_Parallelized_Multi_Scale_Attention.pdf
+project_link: null
+code_link: https://github.com/thuml/Neural-Solver-Library
 aliases:
 - MSPTM
 - MSPT
@@ -41,7 +43,7 @@ claims:
 > - Plasticity 上，Relative L2 Error (×10⁻²) 0.10 vs 0.12 (Transolver) (+17%)。
 > - Airfoil 上，Relative L2 Error (×10⁻²) 0.51 vs 0.53 (Transolver) (+4%)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -64,7 +66,7 @@ claims:
 
 MSPT在6项标准PDE基准（Elasticity、Plasticity、Airfoil、Pipe、Navier-Stokes、Darcy）中有4项取得最优性能，在Navier-Stokes上相对第二最佳模型降低30%误差（Table 2）。在工业级ShapeNet-Car空气动力学任务上，MSPT以单分支架构达到最佳体积场误差1.89和阻力误差0.98，均优于Transolver等单分支模型，且仅需约一半的GPU内存（Table 3, Figure 5）。效率方面，MSPT在百万点规模下峰值内存和延迟均显著低于Transolver，500k点时峰值内存约22 GB且近乎线性增长，验证了其近线性复杂度的实际可行性（Figure 1, Table 8）。
 
-## 背景与动机
+
 
 ### 物理仿真中偏微分方程的数值求解瓶颈
 
@@ -101,7 +103,9 @@ MSPT（Multi-Scale Patch Transformer）正是在这一矛盾中找到了突破�
 
 通过这种方式，MSPT旨在打破“保局部必失全局、求全局必损效率”的困境，为大规模物理建模提供一个可扩展且精度领先的统一框架。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MSPT的核心创新在于通过**并行化多尺度注意力（Parallelized Multi-Scale Attention, PMSA）**机制，将局部精细建模与全局信息交换统一到单个注意力操作中，从而在保持模型表达力的同时，将计算复杂度从标准Transformer的 $O(N^2)$ 降至近线性。
 
@@ -152,7 +156,7 @@ MSPT通过三种可选的池化策略将每个patch内的 $L$ 个token压缩为 
 
 MSPT的核心洞察在于：**通过球树划分保证局部patch的几何一致性，再通过超节点池化将局部精细建模和全局长程通信统一到单个注意力操作中**，避免了Transolver的压缩瓶颈和Erwin的全局通信缺失，从而在标准PDE和CFD基准上以更低显存和计算成本实现SOTA精度。
 
-## 整体框架
+
 
 MSPT 的整体架构遵循“嵌入→划分→多尺度注意力编码→任务头”的端到端管线，核心设计目标是在非结构网格上以近线性复杂度实现局部精细建模与全局长程通信的统一。
 
@@ -205,7 +209,7 @@ $$\mathbf{H}^{(\ell)} = \mathrm{FFN}\big(\mathrm{LN}(\widehat{\mathbf{H}}^{(\ell
 ![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2512_01738/figures/001_Figure_1.jpg]]
 *Figure 1: Parallelized Multi-Scale Attention mechanism. Each patch performs local self-attention, while pooled supernodes exchange information globally across patches in parallel. Peak memory (GB) and latency (ms) on 500k points with 256 slices (Transolver) and 256 patches (MSPT)*
 
-## 核心模块与公式推导
+
 
 ### 3.1 并行多尺度注意力（PMSA）
 
@@ -275,7 +279,9 @@ $$\mathbf{H}^{(\ell)} = \mathrm{FFN}\big(\mathrm{LN}(\widehat{\mathbf{H}}^{(\ell
 
 整体架构堆叠 $B$ 个MSPT块逐步精炼点特征。输入嵌入阶段，将点坐标与几何描述符（如到参考网格的距离）拼接后通过共享MLP映射到隐空间。最后一块的FFN替换为任务特定头（如预测压力场或速度场），输出最终物理场。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -349,7 +355,9 @@ Figure 1和Figure 5展示了MSPT的效率优势。在500k点规模下，MSPT峰�
 ![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2512_01738/figures/013_Table_7.jpg]]
 *Table 7: Training and model configurations of MSPT. Here*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 物理场神经求解器的演化路径
 
@@ -404,6 +412,8 @@ MSPT 与 Transolver 的关键区别在于**物理划分与压缩方式**：Trans
 5. **时序与多物理场推广**：能否将 MSPT 的并行多尺度注意力推广到时序预测或湍流封闭等更复杂的非定常问题中，并维持线性复杂度？这是从“单帧预测”走向“动态仿真”的关键一步。
 
 6. **公平对比协议**：现有复现实验中 Transolver++ 和 AB-UPT 的性能差异在多大程度上源自训练框架、随机种子或超参数？建立统一的公平对比协议对于评估方法改进的真实贡献至关重要。
+
+
 
 ## 原文 PDF
 

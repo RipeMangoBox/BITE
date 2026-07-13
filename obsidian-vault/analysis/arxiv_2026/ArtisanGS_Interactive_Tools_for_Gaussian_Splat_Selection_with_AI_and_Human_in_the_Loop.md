@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2026
 pdf_ref: paperPDFs/arxiv_2026/ArtisanGS_Interactive_Tools_for_Gaussian_Splat_Selection_with_AI_and_Human_in_the_Loop.pdf
+project_link: https://instruct-gs2gs.github.io/
+code_link: https://github.com/keijiro/SplatVFX
 aliases:
 - AIST
 - ArtisanGS
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | ArtisanGS: 基于AI与人机协同的交互式高斯泼溅选择工具 |
 | 英文题名 | ArtisanGS: Interactive Tools for Gaussian Splat Selection with AI and Human in the Loop |
 | 会议/期刊 | arXiv 2026 |
-| Links | [paper](https://arxiv.org/abs/2602.10173) · [arXiv](https://arxiv.org/abs/2412.00518) · [Project](https://instruct-gs2gs.github.io/) · [Code](https://github.com/keijiro/SplatVFX) |
+| Links | [paper](https://arxiv.org/abs/2602.10173) · [paper](https://arxiv.org/abs/2412.00518) · [Project](https://instruct-gs2gs.github.io/) · [Code](https://github.com/keijiro/SplatVFX) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | ArtisanGS Interactive Segmentation Toolkit |
 | Dataset | NVOS |
@@ -39,15 +41,13 @@ claims:
 > [!tip] 效果简介
 > - NVOS 上，mIoU 94.1 vs 92.5 (GaussianCut) (+1.6)；Acc 98.8 vs 98.6 (FlashSplat) / 98.4 (GaussianCut) (+0.2 / +0.4)。
 
-## 概述
+## 概要
 
 3D高斯泼溅（3DGS）能够从多视角图像中重建出照片级真实的三维场景，但要将场景中的单个物体“拆解”出来进行编辑或仿真，现有方法面临一个根本性瓶颈：**要么需要漫长的逐场景预训练，无法纠正错误且缺乏灵活性；要么虽然免去预训练，却未提供用户纠错机制，难以满足实际交互需求**。ArtisanGS 针对这一瓶颈，提出了一套**基于AI与人机协同的交互式高斯泼溅选择工具**，其核心洞察是：将单帧用户的2D选择掩码通过视频掩码跟踪网络Cutie扩展为密集视角的掩码序列，再利用3DGS的可微渲染器以简单的特征优化将多视角掩码聚合成3D高斯标签，并在循环中支持用户诊断和修正错误，从而在**完全无场景预训练**的前提下实现灵活、快速的交互式3D分割。
 
 在方法定位上，ArtisanGS 与现有3DGS分割方法的关键差异体现在三个维度：**训练需求**——无需任何逐场景特征学习，直接复用预训练2D模型和可微渲染器；**用户纠错**——支持用户在自动分割结果上添加额外掩码进行修正，并结合手动投影模式灵活干预；**掩码传播**——采用Cutie的记忆帧设计，使交互式分割对用户修正天然友好，而非依赖点查询或极线搜索的SAM查询。这些设计使得该方法在分割速度上达到1–5秒，显著快于多数同类方法（见表1），且因将可微渲染器视为黑盒组件，易于扩展到其他3DGS变体。
 
 定量评估方面，在NVOS数据集上，ArtisanGS 取得了94.1的mIoU和98.8的Acc，分别比最优无预训练基线GaussianCut和FlashSplat高出1.6和0.2–0.4个百分点（见表2）。消融实验进一步表明，约50个采样视角可在分割质量与速度间取得最优平衡（训练视角mIoU 93.9，速度1.5–2.5秒），而预分割策略能有效移除遮挡物、大幅提升跟踪质量和速度，但需注意其在一个特例（horns_left）中因输入掩码未包含完整目标而失效。需要指出的是，NVOS数据集规模极小（仅8个场景），且其原始scribble标注与现代基于点击的SAM方法不兼容，导致基线方法的性能数值未必完全公平可比，这些结果应在上述限制下审慎解读。
-
-## 背景与动机
 
 ### 从场景重建到对象分解的鸿沟
 
@@ -80,7 +80,7 @@ ArtisanGS实现上述目标的关键在于两个技术选择：
 
 通过将“2D掩码获取—多视角跟踪—3D聚合—用户修正”组织为一个闭环的交互流程，ArtisanGS在保持无预训练的前提下，首次为3DGS分割引入了灵活的人机协同能力。
 
-## 核心创新
+## 核心方法与创新机理
 
 ArtisanGS的核心创新在于构建了一套**无需场景预训练、支持用户随时介入修正的交互式3DGS分割工具链**。与现有方法相比，它在四个关键维度上实现了根本性的改变：
 
@@ -103,8 +103,6 @@ ArtisanGS提供了锥体裁剪投影（frustum projection）和深度投影两�
 ### 创新瓶颈的因果机制
 
 上述四个changed slots并非孤立存在，而是围绕一个核心因果链条协同工作：**Cutie的记忆帧设计使得用户修正成为可能**，而**无预训练的可微渲染聚合保证了修正后的快速反馈**，两者结合形成了“选择-诊断-修正-再聚合”的交互闭环。这一闭环从根本上解决了现有方法“要么慢且无法纠错，要么快但错误固化”的困境。
-
-## 整体框架
 
 ArtisanGS提出了一套面向3D高斯泼溅（3DGS）场景的交互式分割工具包，其核心设计目标是：在**无需任何逐场景预训练**的前提下，将用户在任意单一视角上提供的2D选择掩码快速传播为3D高斯粒子的精确选择，并允许用户在流程中随时诊断和纠正错误。
 
@@ -140,8 +138,6 @@ ArtisanGS提出了一套面向3D高斯泼溅（3DGS）场景的交互式分割�
 ### 关键设计决策
 
 整个框架的核心洞察在于：将单帧用户的2D选择通过Cutie扩展为密集视角的掩码序列，再借助3DGS可微渲染器通过简单的特征优化完成3D聚合，并在循环中保留用户介入的入口。这一设计使得ArtisanGS在无场景预训练的前提下，实现了1-5秒的交互式分割速度（表1），显著快于多数现有方法（如GaussianEditor约40秒），同时保持了NVOS数据集上94.1 mIoU的领先分割精度（表2）。
-
-## 核心模块与公式推导
 
 ArtisanGS 的交互式分割工具包由六个核心模块串联而成，形成一条“用户输入 → 2D 传播 → 3D 聚合 → 用户修正”的闭环流水线。
 
@@ -193,15 +189,7 @@ $$\dot{V}^{\ast}(v) := \operatorname*{argmin}_{\dot{v}_j} J\big(\mathrm{viz}(\ma
 
 为提升遮挡场景下的跟踪鲁棒性和速度，系统提供可选的预分割步骤：利用无遮挡标注掩码的锥体裁剪投影对场景进行粗分割，移除遮挡物后再执行 Cutie 跟踪。消融实验表明，预分割可将分割时间从 26–27s 降至 1.5–2.5s，但需注意当输入掩码未包含完整目标时可能导致失败（如 NVOS 中 horns_left 案例的 mIoU 从 92.7 骤降至 0.0）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l67_https_arxiv_org_abs_2602_10173/figures/006_Figure_4.jpg]]
-*Figure 4: Manual Projection(§4.3) of 2D masks*
-
-![[assets/figures/papers/paper_list_l67_https_arxiv_org_abs_2602_10173/figures/010_Figure_6.jpg]]
-*Figure 6: Impact of presegmentation on the inputs to the tracker. Top: Input without presegmentation. Bottom: Input with presegmentation*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -252,12 +240,7 @@ $$\dot{V}^{\ast}(v) := \operatorname*{argmin}_{\dot{v}_j} J\big(\mathrm{viz}(\ma
 ![[assets/figures/papers/paper_list_l67_https_arxiv_org_abs_2602_10173/figures/012_Figure.jpg]]
 *Figure: (a) Segmentation pipeline. (b) Working with modes. (c) Depth projection. (d) Comparison with GaussianEditor*
 
-![[assets/figures/papers/paper_list_l67_https_arxiv_org_abs_2602_10173/figures/013_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l67_https_arxiv_org_abs_2602_10173/figures/001_Figure_1.jpg]]
-*Figure 1: From messy kitchens to interactive objects: Our goal is to enable 3D practitioners to source objects from in-the-wild captures and work with them for emerging downstream applications, such as editing and physics simulation. To touch the tip of the iceberg on this topic, we propose a suite of interactive techniques for selection of objects and parts in 3D Gaussian Splat scenes, enabling applications like targeted editing*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 方法在3DGS分割谱系中的坐标
 

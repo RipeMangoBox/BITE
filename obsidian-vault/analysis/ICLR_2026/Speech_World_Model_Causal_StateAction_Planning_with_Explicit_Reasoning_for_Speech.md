@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Speech_World_Model_Causal_StateAction_Planning_with_Explicit_Reasoning_for_Speech.pdf
+project_link: http://bit.ly/4pBJuWP
+code_link: null
 openreview_forum_id: YGUKPGO182
 aliases:
 - SWMS
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 语音世界模型：面向语音的因果状态-动作规划与显式推理 |
 | 英文题名 | Speech World Model: Causal State–Action Planning with Explicit Reasoning for Speech |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=YGUKPGO182); [Project](http://bit.ly/4pBJuWP) |
+| Links | [paper](https://openreview.net/forum?id=YGUKPGO182) · [Project](http://bit.ly/4pBJuWP) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | Speech World Model (SWM) |
 | Dataset | Model-as-Judge (M.J.) 多维语音理解评价, 推理中的情绪分类准确率, Model-as-Judge (M.J.) 综合评分, 边缘因果效应评估 |
@@ -42,7 +44,7 @@ claims:
 > - 推理中的情绪分类准确率 上，EA (%) 为 71.02 (SWM Qwen2-Audio)，对比 34.72 (Qwen2-Audio-CoT)，变化 +36.30。
 > - Model-as-Judge (M.J.) 综合评分 上，Overall M.J. Score 为 7.81 (SWM Llama3.1-8b)，对比 8.12 (Gemini 2.5 Pro)，变化 -0.31 (远低于商用模型训练成本)。
 
-## 概述
+## 概要
 
 当前语音语言模型（Speech Language Models, SLMs）将语音理解视为单一黑盒，仅聚合孤立任务输出，忽略了语音成分间内在的因果依赖关系。这一设计导致推理能力薄弱、监督信号稀疏，且易产生幻觉。**SWM (Speech World Model)** 针对该瓶颈，受认知科学启发，引入模块化因果图，将语音理解显式分解为**世界模型激活 (WMA)**、**心理理论 (ToM)**、**言语行为 (SA)** 和**语用意图 (Prag)** 四个模块，并建模其间的因果关系，形成结构化的认知状态搜索空间。
 
@@ -55,7 +57,7 @@ claims:
 
 SWM 的方法定位可概括为：将语音理解从“隐式端到端生成”转变为“因果图引导的显式状态–动作推理”，在低训练成本下实现强推理性能。当前局限包括因果图结构依赖人工先验、标注依赖 LLM 教师模型，以及多语种泛化性尚未验证。
 
-## 背景与动机
+
 
 语音语言模型（Speech Language Models, SLMs）近年来取得了显著进展，代表性工作包括 **Qwen-Audio**（Chu et al., 2023）、**Qwen2-Audio**（Chu et al., 2024）和 **Voxtral**（Liu et al., 2025）等。这些模型通常采用端到端架构，将语音信号直接映射为文本响应，在语音识别、意图分类等任务上展现了强大的能力。
 
@@ -71,7 +73,9 @@ SWM 的方法定位可概括为：将语音理解从“隐式端到端生成”�
 
 从世界模型的统一视角来看（Figure 3），生成式世界模型和语言世界模型均为前向动态模型，而 SWM 的因果图提供了一种结构化、显式的动态建模方式。这一视角将 SWM 置于世界模型研究的谱系中，同时凸显其独特贡献：以因果结构而非黑盒序列建模来捕捉语音理解中的状态转移。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 创新动机：从黑盒聚合到因果推理
 
@@ -134,7 +138,7 @@ $$p(Z|X) = p(z_{WMA}|X) \cdot p(z_{ToM}|X) \cdot p(z_{SA}|z_{WMA}, z_{ToM}, X) \
 
 当前因果图结构基于认知先验预定义，包含四个固定模块，尚不能自适应学习或调整结构以适配新领域。数据标注依赖 Vicuna-13b 教师模型，可能引入标签噪声和错误传播。实证评估主要集中在英语对话与语音助手场景，多语种、多文化背景下的泛化性尚未验证。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_YGUKPGO182/figures/002_Figure_2.jpg]]
 *Figure 2: The Speech World Model pipeline with a running example, illustrating the “Causal Graph-Guided Explicit Reasoning” process. (1) Causal Graph Training: multimodal inputs (text x, acoustic a, prosody z) are encoded and fused to g = $\phi ( h _ { x } , h _ { a } , h _ { z }$ ) . Each node state $S _ { v }$ is inferred from its parents Pa(v) and fused feature g via Sv = softmax ( $f _ { v }$ ( g , $\{ S _ { u } \} _ { u \in \mathrm { P a } ( v ) }$ ) ) , yielding structured reasoning. (2) Instruction Tuning: these states are used as explicit guidance for the large (speech) language models to generate response y by maximizing $\begin{array} { r } { \mathcal { L } _ { \mathrm { I T } } = - \sum \log P _ {...$
@@ -176,7 +180,7 @@ $$\mathcal{L}_{\mathrm{IT}}(\theta) = -\sum_{(x,y)\in\mathcal{D}} \log p_\theta(
 
 整体而言，SWM 框架将语音理解从端到端黑盒转变为“感知—因果推理—响应”的显式流水线，为后续的推理能力提升与可解释性分析奠定了基础。
 
-## 核心模块与公式推导
+
 
 ### 因果图模块定义
 
@@ -241,7 +245,9 @@ $$\mathcal{L}_{\mathrm{IT}}(\theta) = -\sum_{(x,y)\in\mathcal{D}} \log p_\theta(
 
 两式均以交叉熵损失最大化给定条件下的响应生成概率，区别在于后者保留了原始语音信号 $x$，使模型可同时利用声学信息和结构化认知状态。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心结果：因果图的结构化推理优势
 
@@ -296,7 +302,9 @@ SWM的核心实验围绕两个层面展开：因果图自身的结构有效性�
 ![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_YGUKPGO182/figures/014_Figure_6.jpg]]
 *Figure 6: ACE and ICS of each casual edge for ablation study (fusion mechanisms and teacher-forcing probabilities) on casual graph under fully-supervised setting*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心思想溯源与差异化
 
@@ -331,6 +339,8 @@ SWM 在性能上展现出与商用大模型 **GPT-4o**（OpenAI, 2024）和 **Ge
 3. **标注效率提升**：如何减少对 LLM 生成标签的依赖，提高在真实少量标注数据下的半监督学习效率？当前半监督设置仍依赖部分模块的有监督信号进行梯度传播。
 4. **跨模态迁移**：显式因果状态表示作为一种通用认知先验，能否迁移到视频理解、多模态情感分析等其他任务？因果图的模块化设计理论上具有任务无关性，但实证验证尚缺。
 5. **规模化效率保持**：在更大规模、更多样化的数据集上训练时，结构化因果图是否依然能保持其效率和可解释性优势？当前实验规模相对有限（最大数据集 SLURP 约 72K 样本），大规模下的因果效应稳定性和收敛速度优势需要进一步验证。
+
+
 
 ## 原文 PDF
 

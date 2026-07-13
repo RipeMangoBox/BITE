@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/DM4CT_Benchmarking_Diffusion_Models_for_Computed_Tomography_Reconstruction.pdf
+project_link: null
+code_link: https://github.com/DM4CT/DM4CT
 openreview_forum_id: YE5scJekg5
 aliases:
 - DM4CT
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | DM4CT: 计算机断层扫描重建的扩散模型基准测试 |
 | 英文题名 | DM4CT: Benchmarking Diffusion Models for Computed Tomography Reconstruction |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=YE5scJekg5); [GitHub](https://github.com/DM4CT/DM4CT) |
+| Links | [paper](https://openreview.net/forum?id=YE5scJekg5) · [GitHub](https://github.com/DM4CT/DM4CT) |
 | Topic | #topic/benchmarks_datasets_evaluation #topic/benchmarks_datasets_evaluation/benchmark_eval |
 | Method | DM4CT |
 | Dataset | Medical CT (config i: 40 projs, noise-free), Medical CT (config iii: 80 projs, stronger noise), Industrial CT (config ii: 20 projs, mild noise), Real-world Synchrotron CT (60 projs) |
@@ -41,7 +43,7 @@ claims:
 > - Medical CT (config iii: 80 projs, stronger noise) 上，PSNR / SSIM 为 DPS 27.81 / 0.74，对比 SIRT 24.48 / 0.32，变化 +3.33 / +0.42。
 > - Industrial CT (config ii: 20 projs, mild noise) 上，PSNR / SSIM 为 SwinIR 19.51 / 0.55，对比 SIRT 16.67 / 0.30，变化 +2.84 / +0.25。
 
-## 概述
+## 概要
 
 计算机断层扫描（CT）重建本质上是一个线性逆问题 $y = A x$，但实际成像中噪声、伪影和非线性预处理使该问题高度病态。扩散模型作为强大的生成先验，近年来在CT重建中展现出显著潜力，然而其方法设计空间碎片化——不同方法在数据一致性策略、先验引入方式和操作空间上差异巨大，缺乏统一的系统性理解。
 
@@ -57,7 +59,7 @@ claims:
 
 在定量结果上，扩散方法在PSNR/SSIM上普遍优于经典和MBIR方法，但往往不及监督学习方法SwinIR。例如在医学CT（40投影、无噪声）配置下，DDS达到31.43/0.84，而SIRT为30.40/0.80；在真实同步辐射数据（60投影）上，SwinIR以32.41/0.70领先，SIRT为27.92/0.52。
 
-## 背景与动机
+
 
 计算机断层扫描（CT）重建在数学上可建模为线性逆问题 $\pmb{y} = \pmb{A} \pmb{x}$，其中 $\pmb{A}$ 为系统矩阵。然而，实际CT成像面临远超理想线性模型的复杂挑战：泊松噪声经对数变换后变为非平稳高斯噪声、非线性预处理步骤、以及环形伪影和射束硬化等多种伪影，使得从欠定或含噪测量中恢复高质量图像变得极为困难。
 
@@ -67,7 +69,9 @@ claims:
 
 上述方法碎片化与评估标准不统一的现状，构成了DM4CT基准测试的核心动机：在统一的CT正向模型和共享扩散先验下，系统揭示不同数据一致性策略、先验强度与噪声鲁棒性之间的因果机制，为扩散模型在医学与工业CT重建中的实际部署提供可操作的指导。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DM4CT 本身是一个系统性基准测试框架，而非提出单一重建算法。其核心创新在于**首次对扩散模型在 CT 重建中的设计空间进行系统解耦与实证分析**，揭示了三个关键洞察，这些洞察直接指向现有扩散重建方法的瓶颈与控制变量。
 
@@ -95,7 +99,7 @@ DDS 方法假设高斯似然（$\mathcal{L}(\pmb{x}) = \frac{\gamma}{2} \| \pmb{
 
 **需注意**：上述创新均为 DM4CT 基准测试所揭示的**领域洞察**，而非 DM4CT 自身提出的新算法。DM4CT 的贡献在于通过统一的实验平台（共享扩散主干、统一正向算子、公平超参数调优）使这些洞察得以被可靠地量化与比较。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_YE5scJekg5/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the DM4CT benchmark. (a) The reconstruction pipeline, where representative diffusion and baseline methods are applied to measured sinograms using the same forward model. (b) The datasets used in the benchmark, including two simulated CT datasets (medical and industrial) and one real-world dataset acquired at a synchrotron facility. (c) The five simulation configurations used to evaluate robustness to limited views, noise, and ring artifacts. Two example FBP reconstructions under noise and ring artifact conditions are shown. (d) The evaluation metrics, including both qualitative (visual) and quantitative (image quality and computational efficiency) criteria*
@@ -136,7 +140,7 @@ DM4CT 构建了一个统一的 CT 重建基准测试框架，其核心设计目�
 
 Table 1 将 11 种扩散方法按两个维度组织：**实现技术**（像素空间 vs 潜在空间、DDPM vs DDIM 采样）和**重建策略**（数据一致性梯度引导 DC-grad、优化步骤 DC-step、伪逆引导、即插即用先验、变分贝叶斯）。这一分类体系揭示了方法设计的核心分叉点——如何在反向扩散过程中引入测量信息，直接决定了先验强度与数据保真度之间的权衡。
 
-## 核心模块与公式推导
+
 
 ### 3.1 CT测量模型与逆问题形式化
 
@@ -244,7 +248,9 @@ $$\pmb{x} = \pmb{A}^{\dagger} \pmb{A} \pmb{x} + (\pmb{I} - \pmb{A}^{\dagger} \pm
 
 为消除先验差异对比较的影响，每个数据集分别训练一个像素空间和一个潜在空间扩散模型，作为所有扩散方法的共享主干（Section 3.3）。这一设计确保了方法间性能差异仅源于数据一致性策略，而非先验质量。消融实验进一步揭示：早期中止训练（25 epoch）的扩散模型重建精度（PSNR 30.68/0.75）优于完全训练模型（28.71/0.73），表明**先验强度而非生成质量**是逆问题中的关键因素（Table 9）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 整体性能格局：扩散方法在定量指标上的优势与上限
 
@@ -343,7 +349,9 @@ Table 6使用SAM对医学CT重建结果进行语义分割，以Dice/IoU评估下
 ![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_YE5scJekg5/figures/023_Table_7.jpg]]
 *Table 7: Representation (autoencoder reconstruction) and CT reconstruction quality for fine-tuned natural-image encoders. Values are PSNR/SSIM*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法分类学与核心策略分化
 
@@ -400,6 +408,8 @@ DM4CT 揭示了一个关键发现：**像素空间扩散在 CT 重建中普遍�
 - 训练至过拟合的扩散模型为何在逆问题中性能下降——其深层机理是模式坍塌、先验过度约束，还是后验采样的退火路径偏移？
 - 噪声模型自适应的扩散方法（如对泊松噪声显式建模）能否在实际临床 CT 数据上实现性能跃升？
 - 扩散先验与隐式神经表示（INR）的结合是否能同时利用扩散的强先验和 INR 的结构连续性，提升稀疏角度下的细节保真度？
+
+
 
 ## 原文 PDF
 

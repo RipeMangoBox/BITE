@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Grounding_IQA_Grounding_Multimodal_Language_Model_for_Image_Quality_Assessment.pdf
+project_link: null
+code_link: https://github.com/zhengchen1999/Grounding-IQA
 aliases:
 - GI
 - Grounding-IQA
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | Grounding-IQA：结合定位的多模态语言模型用于图像质量评估 |
 | 英文题名 | Grounding-IQA: Grounding Multimodal Language Model for Image Quality Assessment |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=yEpE0QPpf8); [GitHub](https://github.com/zhengchen1999/Grounding-IQA) |
+| Links | [paper](https://openreview.net/forum?id=yEpE0QPpf8) · [GitHub](https://github.com/zhengchen1999/Grounding-IQA) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/computer_vision_task |
 | Method | Grounding-IQA |
 | Dataset | GIQA-Bench |
@@ -40,7 +42,7 @@ claims:
 > - GIQA-Bench 上，GIQA-DES LLM-Score 为 63.00 (mPLUG-Owl2-7B + GIQA-160K multi-task)，对比 48.25 (mPLUG-Owl2-7B zero-shot)，变化 +14.75。
 > - GIQA-Bench 上，GIQA-VQA Acc(Total) 为 0.7417 (mPLUG-Owl2-7B + GIQA-160K multi-task)，对比 0.5900 (mPLUG-Owl2-7B fine-tuned only on GIQA-DES, as an approximate weak baseline)，变化 +0.1517。
 
-## 概述
+## 概要
 
 现有基于多模态大语言模型（MLLM）的图像质量评价方法通常只产生通用文本描述，缺乏精确的空间定位能力，难以在局部物体或区域层面刻画失真成因，限制了其对精细质量感知的支持。为解决这一瓶颈，本文提出**Grounding‑IQA**——一种将多模态指称（referring）与定位（grounding）机制融入图像质量评价的新范式。该范式引入两个子任务：**GIQA‑DES**（带边界框坐标的质量描述）和**GIQA‑VQA**（面向局部区域的视觉问答），使模型在输出质量描述或回答问题时可同时提供或利用物体的精确空间坐标，从而具备类似人类视觉系统的细粒度质量感知。
 
@@ -48,7 +50,7 @@ claims:
 
 尽管如此，该框架仍受限于自动标注流水线所依赖的外部模型质量、离散化造成的亚网格精度损失，以及评测基准规模较小等因素，相关结论在更大规模、更多样化场景下的稳健性尚需进一步验证。
 
-## 背景与动机
+
 
 图像质量评价（Image Quality Assessment, IQA）是计算机视觉中的基础任务，传统方法主要输出单一的全局质量分数，难以刻画影响质量的局部因素。近年来，随着多模态大语言模型（MLLM）的发展，研究者开始将 IQA 从数值回归拓展到语言生成与问答，例如利用模型给出自然语言的质量描述或回答关于图像属性的问题。然而，这些基于 MLLM 的 IQA 方案仍停留在“整体上下文描述”层面：它们缺乏精确的空间定位信息，无法明确指出图像中哪些区域或哪些对象存在怎样的质量缺陷，从而在细粒度质量感知上存在明显鸿沟。即便是部分工作尝试定位退化区域（如 Q-Ground），也未能支持用户通过指称方式交互地查询特定对象的低层视觉属性——这正是人类视觉系统固有的空间对应能力。
 
@@ -56,7 +58,9 @@ claims:
 
 为使现有 MLLM 具备上述地面化 IQA 能力，本文构建了一个大规模数据集 **GIQA‑160K**。该数据集通过自动标注管线将已有的纯文本质量描述转化为带坐标的细粒度描述和问答对，从而为模型提供监督信号。初步实验表明，在 GIQA‑160K 上微调后的 MLLM 在描述质量、问答准确率和定位精度等指标上显著优于通用 MLLM、专用 IQA 模型以及传统 grounding 方法，验证了将空间定位融入 IQA 的有效性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 现有基于多模态大语言模型（MLLM）的图像质量评价（IQA）方法仅通过自然语言描述整体质量，缺乏将描述与图像中具体对象或区域对齐的空间定位能力，这成为制约细粒度质量感知的本质瓶颈。Grounding-IQA 的核心创新在于将多模态指称（referring）与定位（grounding）机制系统性地融入 IQA，通过四个关键设计变革（changed slots）使模型能够在质量描述和问答中输出或利用精确的边界框坐标，从而迫使模型关注局部低层视觉属性，实现从“看图说话”到“看图指物”的范式跃迁。
 
@@ -90,7 +94,7 @@ $$
 
 上述改变并非孤立作用：离散坐标降低了 grounding 学习的难度，自动管线提供了必需的大规模多任务数据，而多任务训练则使描述与问答能力相互促进。在 GIQA-Bench 上的综合对比（Fig. 1, Table 5）显示，经 GIQA-160K 微调的 mPLUG-Owl2‑7B 在 GIQA-DES 的 LLM-Score 上达到 63.00，远超零样本基线（48.25）和纯描述模型 Q-Instruct（57.61）；在 GIQA-VQA 的总体准确率上达到 0.7417，显著优于仅具备退化定位的 Q-Ground（0.4179）和通用 grounding 模型 Shikra-7B（0.4086）。这些结果表明，通过范式、表示和数据的联合创新，Grounding-IQA 首次使 MLLM 具备了兼备精细质量描述与空间定位的统一能力。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0016_yEpE0QPpf8_Grounding-IQA_Grounding_Multimodal_Language_Mode/figures/006_Figure_3.jpg]]
 *Figure 3: The illustration of the automated annotation pipeline. (a) GIQA-DES Pipeline: Constructs the answer from the given image and description via a four-stage process, while the question comes from a predefined question pool. (b) GIQA-VQA Pipeline: Generates the corresponding QA data utilizing descriptions from GIQA-DES and the LLM (Llama3 (Dubey et al., 2024))*
@@ -127,7 +131,7 @@ GIQA‑VQA 旨在评估模型在局部区域的属性问答能力，涵盖两类
 
 综上，Grounding‑IQA 的整体框架由**数据自动标注**与**多任务联合微调**两大模块紧密衔接：前者解决了细粒度位置标注难以获取的瓶颈，通过离散坐标设计和两级框优化在精度与可学习性之间取得平衡；后者则使通用 MLLM 在不改变原始结构的前提下获得 grounding‑IQA 能力，从而在质量描述、问答准确率和定位精度等维度均大幅超越传统 IQA 和 grounding 基线。该流水线的主要局限在于标注质量受限于外部模型性能，且离散网格表示牺牲了亚网格精度，对极小目标或高精度定位场景可能存在不足；更大规模模型的泛化性亦有待进一步验证。
 
-## 核心模块与公式推导
+
 
 **关键模块**  
 Grounding‑IQA 的核心能力来自一套自动标注流水线，用于从已有的图像质量描述中构建包含空间坐标的训练数据。流水线分为四个阶段：
@@ -164,7 +168,9 @@ $$x_2' = (\mathrm{idx}_r \bmod n + 0.5) / n, \quad y_2' = \left(\lfloor \mathrm{
 这里 `/` 表示整数除法（向下取整），`%` 表示取模。公式 (2) 将网格索引重新解释为二维阵列中的行列号，并加上 0.5 偏移以落到网格中心，最后除以 m 或 n 恢复到归一化坐标。  
 这种离散化表示（Disc‑Coord）仅需最多 9 个 token（每个角点用一个整数，加上特殊分隔符），而直接的归一化连续坐标则需要约 21 个 token；消融实验（Table 2b）表明，离散表示在文本质量（BLEU @4 23.67，LLM‑Score 61.75）和召回率（Tag‑Recall 0.5497）上均优于连续表示，尽管 mIoU 稍有损失（0.5851 vs. 0.6046），整体更利于多模态语言模型的训练。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果：GIQA-Bench 上的整体性能
 
@@ -211,7 +217,9 @@ $$x_2' = (\mathrm{idx}_r \bmod n + 0.5) / n, \quad y_2' = \left(\lfloor \mathrm{
 - **图 7（定性对比）**通过实例说明，Grounding‑IQA 不仅能输出带坐标的质量描述（如指出“白 T 恤男子面部的模糊区域”），还能在问答中准确回应用户对局部区域的指称，而传统方法仅提供纯文本的粗略描述或无法处理坐标相关的查询。  
 - **表 2–4** 定量阐释了上述消融现象，且所有差异均具备一致性方向，实验证据强度较高；但表格内的“最佳/次佳”标记（表 5）依赖于特定的指标组合，在单独关注某一指标时排名可能发生变化。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 **核心突破与现有工作的关系**
 Grounding-IQA 的提出，是针对现有多模态大语言模型（MLLM）在图像质量评估（IQA）任务中的一个根本性缺失：现有方法（如 Q-Instruct、通用 MLLM 的零样本描述）能够生成高层次的自然语言质量描述，但缺乏精确的空间对应能力，难以指代和定位影响质量的局部区域。这一瓶颈使 IQA 无法从整体泛泛的评价下沉到细粒度的对象/区域级分析（evidence anchor: “real_bottleneck”）。Grounding‑IQA 通过将多模态指称（referring）和定位（grounding）机制显式注入 IQA，让模型在描述或问答中输出／利用边界框坐标，从而迫使模型学会将语言描述与低层视觉属性在空间上对准，这是该方法对 IQA 范式的一次“因果性”改造（causal knob）。
@@ -237,6 +245,8 @@ Grounding‑IQA 的影响力受限于自动标注流程的可靠性和所选表�
 - **数据集噪声的系统性分析**：自动标注流程中每一步引入的误差类型（假阳性框、漏检、语义标签错误）对最终微调效果的敏感性，目前只有粗粒度的消融（Raw vs Ref‑Box），缺乏对各类噪声的分解与控制实验，这使得优化方向不够清晰。
 
 总体而言，Grounding‑IQA 构建了一个连接 IQA 与多模态定位的初始框架，但其可靠性严重受制于上游模型与离散表达的选择，而小样本基准和有限模型规模使之尚处在概念验证阶段。未来的工作需要系统性地解耦自动化管线中的误差源，探索动态坐标表示，并在更大、更多样的失真场景和模型尺度下验证方法的泛化能力，方能使 grounding 成为 IQA 中可信赖的组件。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/MARSHAL_Incentivizing_Multi_Agent_Reasoning_via_Self_Play_with_Strategic_LLMs.pdf
+project_link: https://thu-nics.github.io/MARSHAL/
+code_link: https://github.com/thu-nics/MARSHAL
 openreview_forum_id: GCd5v3ehmr
 aliases:
 - MARSHAL
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | MARSHAL：通过战略型大语言模型自我博弈激励多智能体推理 |
 | 英文题名 | MARSHAL: Incentivizing Multi-Agent Reasoning via Self-Play with Strategic LLMs |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=GCd5v3ehmr); [GitHub](https://github.com/thu-nics/MARSHAL); [Project](https://thu-nics.github.io/MARSHAL/) |
+| Links | [paper](https://openreview.net/forum?id=GCd5v3ehmr) · [GitHub](https://github.com/thu-nics/MARSHAL) · [Project](https://thu-nics.github.io/MARSHAL/) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/planning_control |
 | Method | MARSHAL |
 | Dataset | Leduc Hold'em（held-out 测试游戏）, Simple Hanabi（held-out 测试游戏）, AIME（AutoGen 合作框架）, GPQA-Diamond（MAD 竞争框架） |
@@ -41,13 +43,13 @@ claims:
 > - Simple Hanabi（held-out 测试游戏） 上，相对基础模型性能提升 为 比 Qwen3-4B 基础模型提升 22.9%，对比 Qwen3-4B 未训练基线，变化 +22.9%。
 > - AIME（AutoGen 合作框架） 上，准确率 为 66.67，对比 56.67 (Qwen3-4B)，变化 +10.00。
 
-## 概述
+## 概要
 
 多智能体推理是当前大语言模型（LLM）应用的关键瓶颈：在多轮交互中，不同角色智能体的长序列信用分配困难，且优势估计方差过大，导致强化学习训练不稳定，学到的策略难以泛化到下游任务。MARSHAL 针对这一瓶颈，提出**回合级优势估计器**与**智能体特定优势归一化**两项关键设计，在合作与竞争策略游戏中通过自我博弈端到端训练 LLM，使其获得可迁移的通用多智能体交互能力。
 
 核心发现是：通过在多样化游戏环境中进行自我博弈训练，LLM 不仅学会游戏策略，更涌现出角色理解、意图识别等推理模式，这些能力可零样本迁移至下游多智能体推理任务。实验表明，MARSHAL 通才模型在 held-out 游戏 Leduc Hold’em 上性能提升 28.7%，在 Simple Hanabi 上提升 22.9%（Figure 3）；在 MAD 竞争框架下的 GPQA-Diamond 上零样本提升 7.57%，在 AutoGen 合作框架下的 AIME 上提升 10.00%（Table 1）。失败模式分析进一步显示，MARSHAL 将 GPQA-Diamond 上“智能体间不对齐”错误减少 11.5%（Figure 5）。消融实验证实，移除回合级优势估计器或智能体特定归一化均会系统性损害游戏表现与下游泛化能力（Table 3, Table 4）。
 
-## 背景与动机
+
 
 大语言模型（LLM）在单智能体推理任务中已展现出卓越能力，但在多智能体系统中，模型需要同时具备策略规划、对手建模、意图识别和协作沟通等复合能力，这对现有范式提出了根本性挑战。当前主流方法通常依赖精心设计的提示工程或针对特定下游任务进行微调，这些方法存在一个共同的瓶颈：**多轮多智能体强化学习训练中长序列信用分配困难，以及不同角色智能体的优势估计方差过大，导致训练不稳定且难以泛化到下游多智能体任务**。
 
@@ -57,7 +59,9 @@ claims:
 
 本文的核心洞察在于：**通过在多样化的合作与竞争策略游戏中进行自我博弈训练，LLM 能够获得可迁移至下游多智能体推理任务的通用交互能力，而不仅仅是记忆游戏策略；这种能力通过角色理解与意图识别等模式显式涌现**。基于此，我们提出 MARSHAL 框架，其关键设计包括两个因果性调节旋钮——回合级优势估计器（先求和再归一化）与智能体特定优势归一化（按玩家角色独立归一化），从根本上解决了训练不稳定和泛化能力不足的问题。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MARSHAL 的核心创新在于解决多轮多智能体强化学习训练中的两个根本性瓶颈：**长序列信用分配困难**与**不同角色智能体的优势估计方差过大**。为此，MARSHAL 在朴素 GRPO 多回合扩展的基础上，引入了两个相互关联的关键技术改进。
 
@@ -85,7 +89,7 @@ MARSHAL 的奖励信号由三部分组成，共同约束智能体的行为空间
 
 与基于 RAE（Reward-Aware Exploration）的纯竞争性自我博弈基线 **SPIRAL**（Liu et al., 2025）相比，MARSHAL 的关键差异不在于自我博弈本身，而在于**优势估计的粒度与分组策略**。SPIRAL 依赖探索奖励驱动策略多样性，而 MARSHAL 通过回合级信用分配和角色感知归一化从根本上解决了训练稳定性和泛化能力的问题——消融实验表明，移除这两个组件中的任何一个都会系统性地损害游戏表现和下游泛化。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_GCd5v3ehmr/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of MARSHAL. Left column: generating player trajectories through self-play in strategic games. Middle column: naive advantage estimation by GRPO. Right column: advantage estimation by MARSHAL for accurate credit assignment in multi-turn, multi-agent setting*
@@ -134,7 +138,7 @@ MARSHAL 通过“先求和再归一化 + 按角色分组”的组合策略从根
 
 所有游戏训练使用统一超参数，内在奖励标准化到相同尺度（最大 4），保证不同游戏间的公平比较。训练硬件为单台 8×NVIDIA H100 GPU 服务器，所有模型均使用相同的基础模型 Qwen3-4B 和一致的训练步数（200 步）。
 
-## 核心模块与公式推导
+
 
 MARSHAL 的训练目标建立在 GRPO（Group-Relative Policy Optimization）基础之上，针对多轮多智能体场景中的长序列信用分配和不同角色智能体的优势估计方差过大这两个瓶颈，进行了两项关键改造：回合级优势估计器与智能体特定优势归一化。
 
@@ -196,7 +200,9 @@ $$r_{\mathrm{length}}(l) = \alpha \cdot \max\left(0, 1 - \frac{l - l_{\mathrm{mi
 
 整体流程为：同一模型同时控制双方玩家，在策略游戏中交替进行多回合交互生成独立轨迹 → 按回合计算即时奖励（内在 + 格式 + 长度惩罚）→ 从当前回合到终局求和得到累积回报 → 按玩家角色划分子组 → 子组内独立计算优势 → 使用 PPO 裁剪代理目标进行 token 级策略优化。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与方法动机
 
@@ -258,7 +264,9 @@ Figure 5 对 GPQA-Diamond 上的失败模式进行了分类统计。MARSHAL 训�
 
 所有游戏训练使用统一超参数，内在奖励被标准化到相同尺度（最大 4），保证不同游戏间的公平比较。训练硬件为单台 8×NVIDIA H100 GPU 服务器，所有模型均基于相同的 Qwen3-4B 基础模型和一致的训练步数（200 步）。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 方法谱系：从单回合 GRPO 到多智能体自我博弈
 
@@ -313,6 +321,8 @@ MARSHAL 的有效性建立在以下前提之上：
 3. **训练效率与课程设计**：当前通才模型在所有游戏上均匀训练 200 步。是否可以通过自动课程学习（如基于难度的游戏排序、动态游戏权重调整）进一步提升训练效率和泛化能力？
 
 4. **安全对齐**：自我博弈训练可能产生欺骗、操纵等非合作策略。如何在保持策略多样性的同时确保学到的行为符合人类价值对齐，是一个尚未探索的方向。
+
+
 
 ## 原文 PDF
 

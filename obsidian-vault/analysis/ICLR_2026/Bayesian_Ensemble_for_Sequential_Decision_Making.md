@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Bayesian_Ensemble_for_Sequential_Decision_Making.pdf
+project_link: null
+code_link: null
 aliases:
 - BEB
 - BESDM
@@ -41,17 +43,19 @@ claims:
 > - Neural Testbed d=10 上，regret improvement 为 ensemble+(BEB)，对比 ensemble+，变化 12.8%。
 > - Neural Testbed d=50 上，regret improvement 为 ensemble+(BEB)，对比 ensemble+，变化 42.2%。
 
-## 概述
+## 概要
 
 本文提出**Bayesian Ensemble (BE)**，一个统一的框架，用于增强基于集成的序列决策方法。核心思想是将集成成员的选择视为一个内部的bandit问题，通过贝叶斯推断根据观测到的奖励动态更新成员上的采样分布（index distribution），而非使用固定的均匀采样。该框架在上下文bandit和强化学习两个领域进行了实例化，分别称为**BEB (Bayesian Ensemble for Bandits)** 和 **BE-DQN (Bayesian Ensemble DQN)**。实验表明，BEB在Neural Testbed和Mushroom等基准上显著降低了累积遗憾，BE-DQN在MiniGrid等部分可观测环境中优于DQN、Ensemble DQN等基线方法。
 
-## 背景与动机
+
 
 现有基于集成的Thompson采样方法（如ensemble+、hypermodel）在决策过程中保持固定的index distribution（如离散均匀分布或标准高斯分布）。这些方法虽然通过集成成员的不确定性来近似后验分布，但未能充分利用集成成员多样性的不确定性，导致后验分布近似不够精确。具体而言，这些方法维护的采样index distribution在决策过程中保持不变，没有与观测到的奖励反馈建立直接联系。
 
 本文的核心动机是：通过贝叶斯推断动态更新集成成员的index distribution，将index distribution与奖励反馈直接关联，从而更精确地近似后验分布，提升决策性能。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于将集成成员的选择视为一个内部的bandit问题，利用贝叶斯推断根据观测到的奖励动态更新成员上的采样分布，而非使用固定的均匀采样。具体创新点包括：
 
@@ -59,7 +63,7 @@ claims:
 2. **index distribution与奖励的直接关联**：直接建立index distribution与奖励分布之间的贝叶斯连接，实现更精确的后验分布近似。
 3. **统一框架**：将贝叶斯index distribution更新适配到上下文bandit和强化学习两个领域。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0002_s2hxd8JghB_Bayesian_Ensemble_for_Sequential_Decision-Making/figures/001_Figure_1.jpg]]
 *Figure 1: The Bayesian Ensemble (BE) framework. The agent maintains a probability distribution $p ^ { ( \bar { t } ) }$ for the index z $\in { \mathcal { Z } }$ and bridges the gap between the index and reward distribution.
@@ -74,7 +78,7 @@ Bayesian Ensemble框架的核心流程如下：
 
 Figure 1展示了Bayesian Ensemble框架，智能体维护索引z的概率分布p^{(t)}，并桥接索引与奖励分布之间的差距。
 
-## 核心模块与公式推导
+
 
 ### 5.1 集成奖励分布模型
 
@@ -126,7 +130,9 @@ Theorem 1证明：BE-DQN的variance upper bound为DQN方差，下界为Ensemble 
 - Ensemble DQN: $\mathrm{Var}[Q_i^{\mathrm{E-DQN}}(s_0, a)] = \frac{1}{K} \sum_{m=0}^{M-1} \gamma^{2m} \sigma_{s_m}^2$
 - BE-DQN: $\mathrm{Var}[Q_i^{\mathrm{BE-DQN}}(s_0, a)] = \sum_{k=1}^K p_k^2 \sum_{m=0}^{M-1} \gamma^{2m} \sigma_{s_m}^2$
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 6.1 主要结果
 
@@ -176,7 +182,9 @@ Theorem 1证明：BE-DQN的variance upper bound为DQN方差，下界为Ensemble 
 ![[assets/figures/papers/iclr26_0002_s2hxd8JghB_Bayesian_Ensemble_for_Sequential_Decision-Making/figures/016_Table_4.jpg]]
 *Table 4: Hyperparameters used in BE-DQN.*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 Bayesian Ensemble属于基于集成的贝叶斯近似方法谱系。它与以下方法密切相关：
 
@@ -201,6 +209,8 @@ BE的核心区别在于：现有方法保持固定的index distribution，而BE�
 - index distributionp的通用结构是什么？除了Beta分布和高斯分布，是否还有其他有效的参数化形式？
 - BEB框架在离线RL或模仿学习场景中的表现如何？
 - 如何进一步降低BEB的计算开销，使其适用于超大规模集成？
+
+
 
 ## 原文 PDF
 

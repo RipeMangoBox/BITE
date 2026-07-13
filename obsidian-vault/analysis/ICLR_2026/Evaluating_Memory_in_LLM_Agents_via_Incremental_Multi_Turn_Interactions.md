@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Evaluating_Memory_in_LLM_Agents_via_Incremental_Multi_Turn_Interactions.pdf
+project_link: https://huggingface.co/datasets/ai-hyz/MemoryAgentBench
+code_link: https://github.com/HUST-AI-HYZ/MemoryAgentBench
 openreview_forum_id: DT7JyQC3MR
 aliases:
 - EMLAIMTI
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 通过增量多轮交互评估LLM智能体的记忆能力 |
 | 英文题名 | Evaluating Memory in LLM Agents via Incremental Multi-Turn Interactions |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=DT7JyQC3MR); [GitHub](https://github.com/HUST-AI-HYZ/MemoryAgentBench); [Project](https://huggingface.co/datasets/ai-hyz/MemoryAgentBench) |
+| Links | [paper](https://openreview.net/forum?id=DT7JyQC3MR) · [GitHub](https://github.com/HUST-AI-HYZ/MemoryAgentBench) · [Project](https://huggingface.co/datasets/ai-hyz/MemoryAgentBench) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/planning_control |
 | Method | MemoryAgentBench |
 | Dataset | SH-Doc QA (Accurate Retrieval), FactConsolidation-MH (Selective Forgetting), TTL Multi-Class Classification (Banking77), FactCon-SH (6K vs 32K, Selective Forgetting) |
@@ -41,7 +43,7 @@ claims:
 > - FactConsolidation-MH (Selective Forgetting) 上，Accuracy 为 HippoRAG-v2，对比 GPT-4.1-mini (Long-Context Agent)，变化 +2.0 (7.0 vs 5.0)。
 > - TTL Multi-Class Classification (Banking77) 上，Accuracy 为 GPT-4o-mini with full history (test-time learning)，对比 Zero-shot (no historical examples)，变化 +45.2 percentage points (48.6 vs 3.4)。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -64,7 +66,7 @@ claims:
 - **选择性遗忘**：多跳场景（FactConsolidation-MH）所有方法准确率不超过7%，HippoRAG-v2仅以7.0%略高于GPT-4.1-mini的5.0%（Table 3）。
 - **骨干模型影响**：RAG代理升级骨干模型收益微弱，而智能体记忆代理（如MIRIX）从更强骨干中获益显著，展示出更大的潜力空间（Table 4）。
 
-## 背景与动机
+
 
 大规模语言模型（LLM）正从单轮问答系统演化为需要持续与用户交互的智能体（Agent），而记忆能力是实现这一转变的核心瓶颈。一个合格的记忆智能体不仅需要存储历史信息，更必须在多轮交互中动态更新知识、检索相关片段、整合长程依赖，并在新旧事实冲突时做出正确取舍。然而，现有评估体系存在明显缺口：长上下文基准（如Needle-in-a-Haystack）侧重单次输入的全量检索，无法模拟增量式信息涌入的真实场景；而现有的记忆QA基准又缺乏对“选择性遗忘”等关键维度的覆盖，导致不同记忆架构的优势与短板难以被系统比较。
 
@@ -72,7 +74,9 @@ claims:
 
 本文的核心动机在于填补这一评估空白。作者提出 **MemoryAgentBench**，将现有长上下文数据集重构为增量多轮交互格式，并新增 EventQA 和 FactConsolidation 两个数据集，覆盖四项互补的记忆核心能力：**准确检索（Accurate Retrieval, AR）**、**测试时学习（Test-Time Learning, TTL）**、**长程理解（Long-Range Understanding, LRU）** 和**选择性遗忘（Selective Forgetting, SF）**。这四项能力构成了记忆智能体从信息定位到知识冲突消解的完整能力谱系（见图1），任何单一维度的缺失都会导致实际部署中的严重失效。通过在此基准上对三类记忆方法进行大规模对比，本文旨在回答一个根本性问题：是否存在一种统一的记忆机制，能够同时胜任全部四项核心任务？
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作的核心创新并非提出一种新的记忆智能体架构，而是构建了一套**系统性的评估范式**，并通过对现有记忆方法的全面诊断，揭示了当前记忆智能体在四项互补能力上的结构性缺陷。其创新点集中体现在以下三个维度。
 
@@ -104,7 +108,7 @@ MemoryAgentBench 将记忆智能体的能力需求分解为四个正交维度：
 
 这种分维度的诊断框架直接指向了核心瓶颈：**没有一种单一的智能体架构能在所有记忆能力上领先**，未来需要设计混合机制以覆盖全部维度的记忆需求。这一洞察为后续研究提供了清晰的能力图谱和优化方向。
 
-## 整体框架
+
 
 MemoryAgentBench 将记忆智能体的评估统一为一个**增量多轮对话管道**。其核心设计理念是：将原本用于长上下文一次性评估的数据集重构为多个对话块，以时间顺序逐步输入智能体，从而模拟记忆系统在持续信息流下的“吸收—检索—推理”完整循环。
 
@@ -137,7 +141,7 @@ $$c_{1}, c_{2}, \cdots, c_{n} \text{ (chunks)}, \quad q_{1}, q_{2}, \cdots, q_{m
 
 该管道并非仅测试单一能力，而是系统性地覆盖了记忆智能体应当具备的四项互补核心能力：**准确检索**、**测试时学习**、**长程理解**和**选择性遗忘**。通过统一管道、标准化提示模板和一致的评估协议，性能差异可归因于记忆机制本身，而非提示工程或评估条件的不一致。
 
-## 核心模块与公式推导
+
 
 ### 数据集标准化格式
 
@@ -174,7 +178,9 @@ MemoryAgentBench 覆盖的三类智能体共享一个抽象的记忆流水线，
 
 这些参数构成了记忆智能体性能的关键调节旋钮，其在不同能力维度上的权衡效应是未来设计混合记忆机制的重要依据。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 总体性能对比：四种核心能力的权衡
 
@@ -245,7 +251,9 @@ Table 5 进一步放大了这一问题的严峻性。推理模型 o4-mini 在短
 *Table 12: Computational latency (in seconds) comparison on RAG based agents. M.C. means Memory Construction and Q.E. means Query Execution. *Indicates that the time is obtained through estimation*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从长上下文到记忆智能体的评估框架
 
@@ -297,6 +305,8 @@ MemoryAgentBench 的评估框架和结论存在以下明确的适用边界：
 4. **在线评估范式的建立**：能否在完全在线的交互式场景中评估测试时学习能力，而不仅限于分阶段离线评估？这将更真实地反映记忆智能体在持续部署环境中的表现。
 
 5. **多模态记忆能力的定义与评估**：针对多模态输入的记忆智能体，四项核心能力的定义和评价标准应如何扩展？这需要构建新的数据集和评估协议。
+
+
 
 ## 原文 PDF
 

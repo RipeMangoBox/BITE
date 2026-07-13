@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/SPARTA_Scalable_and_Principled_Benchmark_of_Tree_Structured_Multi_hop_QA_over_Text_and_Tables.pdf
+project_link: null
+code_link: https://github.com/pshlego/SPARTA/tree/main
 aliases:
 - SPARTA
 tags:
@@ -29,7 +31,7 @@ claims:
 | 中文题名 | SPARTA：面向文本与表格树结构多跳问答的可扩展原则性基准 |
 | 英文题名 | SPARTA: Scalable and Principled Benchmark of Tree-Structured Multi-hop QA over Text and Tables |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=8KE9qvKhM4); [GitHub](https://github.com/pshlego/SPARTA/tree/main) |
+| Links | [paper](https://openreview.net/forum?id=8KE9qvKhM4) · [GitHub](https://github.com/pshlego/SPARTA/tree/main) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/language_speech_and_dialog |
 | Method | SPARTA |
 | Dataset | SPARTA (Oracle), SPARTA (Retrieval) |
@@ -39,11 +41,11 @@ claims:
 > - SPARTA (Oracle) 上，F1 为 35.6 (ODYSSEY w/ GPT-5)，对比 69.5 (ODYSSEY on HybridQA)，变化 -33.9。
 > - SPARTA (Retrieval) 上，F1 为 22.6 (HELIOS + HProPro w/ GPT-5)，对比 N/A，变化 N/A。
 
-## 概述
+## 概要
 
 SPARTA (Scalable and Principled Benchmark of Tree-Structured Multi-hop QA over Text and Tables) 是一个大规模、高质量、可扩展的 Table-Text QA 基准。其核心贡献在于提出了一种以 SQL 为中心的端到端自动构建框架，能够以极低的标注成本（约为 HybridQA 的 1/4）生成零错误率、覆盖树状多跳推理和分析操作（如聚合、GROUP BY、HAVING）的问答对。实验表明，在 HybridQA 上 F1 超过 70 或在 OTT-QA 上 F1 超过 50 的 SOTA 模型，在 SPARTA 上 F1 下降了超过 30 个点，揭示了现有模型在真实大规模异构数据上深度多跳推理能力的严重不足。
 
-## 背景与动机
+
 
 现有 Table-Text QA 基准（如 HybridQA、OTT-QA、TAT-QA、FinQA、MultiHiertt）受限于人工标注，存在三个主要问题：
 
@@ -53,7 +55,9 @@ SPARTA (Scalable and Principled Benchmark of Tree-Structured Multi-hop QA over T
 
 此外，现有合成基准（如 ERBench、TDBench）或局限于结构化表内推理，或缺乏表-文交互，无法满足 Table-Text QA 的评估需求。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SPARTA 的核心创新在于：
 
@@ -62,7 +66,7 @@ SPARTA 的核心创新在于：
 3. **AST-ICL 问题口语化**：使用基于 LLM 的 SQL-to-text 模型（AST-ICL）将可执行的 SQL 查询转换为流畅的自然语言问题。
 4. **轻量级人工验证**：仅需验证口语化问题的正确性和自然性，标注时间约为 HybridQA 的 1/4（验证 3,300 个查询约需 1,493 分钟，而 HybridQA 创建相同数量的问题约需 6,600 分钟）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0001_8KE9qvKhM4_SPARTA_Scalable_and_Principled_Benchmark_of_Tree/figures/001_Figure_1.jpg]]
 
@@ -72,7 +76,7 @@ SPARTA 的流水线如图 2 所示，包含三个主要阶段：
 2. **查询生成**：使用 LLM 生成可执行的 SQL 查询，通过后序遍历构建查询树，并通过溯源精炼修复空结果查询。
 3. **问题口语化**：使用 AST-ICL 模型将可执行的 SQL 查询转换为流畅的自然语言问题，随后进行轻量级人工验证。
 
-## 核心模块与公式推导
+
 
 ### 5.1 查询图模型
 
@@ -92,7 +96,9 @@ SPARTA 的流水线如图 2 所示，包含三个主要阶段：
 
 对于每个可执行的 SQL 查询 qSQL，使用 AST-ICL 模型生成对应的自然语言问题 qNL。AST-ICL 将 SQL 抽象语法树作为上下文示例，生成语义对齐的流畅问题。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 6.1 基准质量评估
 
@@ -176,7 +182,9 @@ SPARTA 的流水线如图 2 所示，包含三个主要阶段：
 ![[assets/figures/papers/iclr26_0001_8KE9qvKhM4_SPARTA_Scalable_and_Principled_Benchmark_of_Tree/figures/005_Table_2.jpg]]
 *Table 2: Cost metrics used for benchmark generation.*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 SPARTA 属于 **合成基准自动构建** 方法谱系，与以下方法形成对比：
 
@@ -208,6 +216,8 @@ SPARTA 的核心优势在于：
 - 不同嵌套类型（Type-N, A, J, JA）的难度差异根源是什么？为什么模型在 Type-JA 上表现最差？
 - SPARTA 的溯源精炼方法在更复杂的查询图（如深度 >3 或广度 >3）上的效果如何？
 - SPARTA 基准是否能够有效推动 Table-Text QA 模型在真实世界应用中的改进？
+
+
 
 ## 原文 PDF
 

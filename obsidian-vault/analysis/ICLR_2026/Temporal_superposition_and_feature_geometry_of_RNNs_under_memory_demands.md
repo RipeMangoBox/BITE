@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Temporal_superposition_and_feature_geometry_of_RNNs_under_memory_demands.pdf
+project_link: null
+code_link: https://github.com/kashparty/iclr-rnn-superposition
 openreview_forum_id: 7cMzTpbJHC
 aliases:
 - TSAF
@@ -32,12 +34,15 @@ claims:
 | 中文题名 | 记忆需求下RNN的时间叠加与特征几何 |
 | 英文题名 | Temporal superposition and feature geometry of RNNs under memory demands |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=7cMzTpbJHC); [GitHub](https://github.com/kashparty/iclr-rnn-superposition) |
+| Links | [paper](https://openreview.net/forum?id=7cMzTpbJHC) · [GitHub](https://github.com/kashparty/iclr-rnn-superposition) |
 | Topic | #topic/time_series_dynamical_systems #topic/time_series_dynamical_systems/time_series_forecasting |
 | Method | Temporal Superposition Analysis Framework |
 | Dataset |  |
 
-## 概述
+> [!tip] 效果简介
+> 结果与证据沿用下文“实验与关键发现”中的现有记录；本轮不新增或外推论文事实。
+
+## 概要
 
 循环神经网络（RNN）在序列建模中面临一个根本性瓶颈：隐藏状态维度有限，但记忆需求要求同时保存多个时间步的特征表示。当需要记忆的特征数量超过隐藏维度时，表示空间成为稀缺资源，迫使模型将特征以非正交方式压缩，引发**时间叠加**（temporal superposition）和特征间的干扰。
 
@@ -54,7 +59,7 @@ claims:
 
 这些发现为理解 RNN 如何在有限维度下管理时间信息提供了统一的几何视角，并为解释和设计现代序列模型提供了可检验的假设。
 
-## 背景与动机
+
 
 ### 循环神经网络中的表示瓶颈
 
@@ -89,7 +94,9 @@ claims:
 
 为回答这些问题，本文以 k-延时回忆任务（k-delay recall task）为最小可控实验平台，通过推导期望损失的解析分解、分析不同架构（线性 RNN、SSM、非线性 RNN）学到的特征几何，以及探索迹-行列式平面上的损失景观，系统揭示了 RNN 在记忆压力下的表示策略及其背后的动力学机制。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作首次在 RNN 中识别并系统刻画了**时间叠加（temporal superposition）**现象——一种由时间轴压缩而产生的表示策略，本质上不同于前馈网络中的空间叠加。其核心贡献在于为这一现象建立了从损失分解到几何相变的完整分析框架。
 
@@ -122,7 +129,7 @@ RNN 的隐藏状态维度 $N_h$ 是固定的，但记忆需求要求模型同时
 
 与已有工作仅定性描述叠加现象不同，本工作将线性 RNN 的期望损失精确分解为四项可解释成分（Equation 5）：**任务收益**（输出特征与读头的对齐）、**均值修正**（利用投影干扰抵消输入均值）、**投影干扰成本**（单个特征被误读为另一特征）和**组合干扰成本**（多个特征线性组合后模仿另一特征）。这一分解使得每种几何策略的损失来源可追溯，为理解 RNN 的表示学习提供了因果语言。
 
-## 整体框架
+
 
 本研究构建了一个面向循环神经网络（RNN）表示几何的分析框架，旨在揭示记忆需求驱动下隐藏状态中特征方向的演化规律。框架的核心由三个模块串联而成，构成一个完整的感知‑记忆‑输出管道。
 
@@ -136,7 +143,7 @@ RNN 的隐藏状态维度 $N_h$ 是固定的，但记忆需求要求模型同时
 
 框架通过两个可控的因果旋钮来操纵记忆压力：**记忆延迟 $k$**（特征需在隐藏状态中保持的时长）和 **时间稀疏度 $p$**（特征在序列中出现的概率）。改变这两个参数会迫使 RNN 在螺旋遗忘、无干扰空间利用、空间‑时间叠加等策略之间切换，从而系统性地暴露表示几何的底层规律。
 
-## 核心模块与公式推导
+
 
 ### 模型架构与动力学
 
@@ -209,7 +216,9 @@ $$
 
 在二维隐藏空间的设定下，循环矩阵 $W_h$ 的特征值 $\lambda$ 决定了特征方向的旋转角 $\theta = \arg(\lambda)$ 和光谱半径 $\rho = |\lambda|$。特征方向 $W_s = W_h^s W_x$ 在隐藏空间中按角度 $s\theta$ 旋转、按 $\rho^s$ 衰减。光谱半径 $\rho$ 与 $W_{s=0}$ 的范数直接相关，控制着旧特征的遗忘速率。当时间稀疏度变化时，最优的 $k\theta$（$k$ 步总旋转角）和 $\rho$ 出现相变（Figure 4），标志着模型在密集与稀疏几何策略之间的切换。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_7cMzTpbJHC/figures/051_Table_1.jpg]]
 *Table 1: Percentage of models that exhibit characteristics of optimal geometry, as defined by the following heuristics. Linear: we expect a reasonable spectral radius and for the feature direction vectors to rotate through less than 180◦ between input and output, so we count the number of models satisfying 0 . 5 < $\rho ( \bar { W _ { h } }$ ) < 1 and $5 ^ { \circ }$ < k | $\arg ( \lambda$ ) | $\stackrel { . } { < }$ 1 8 $0 ^ { \circ }$ , where λ is an eigenvalue of $W _ { h } \in \mathbb { R } ^ { 2 \times 2 }$ SSM: similar to the linear case, but here we expect the feature direction vectors to rotate through more than 1 8 $0 ^ { \circ }$ between input and output, so we check for 0 . 5 < $\rho ( W _ { h }$ ) < 1 a...
@@ -282,7 +291,9 @@ Table 1 统计了不同架构、延迟 $k$ 和稀疏度下满足最优几何启�
 4. **任务局限性**：所有结论基于简单的 k-延时回忆任务，尚未在需要信息操作或更复杂的序列处理任务中验证。
 5. **非线性函数范围**：分析仅针对 ReLU，对于其他激活函数（如 leaky ReLU、GELU）的无干扰空间形状和利用策略尚未探索。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心贡献定位
 
@@ -330,6 +341,8 @@ Table 1 统计了不同架构、延迟 $k$ 和稀疏度下满足最优几何启�
 4. **大规模模型的验证**：在实际大规模语言模型中，是否可观察到类似的时间叠加现象？能否用无干扰空间的概念解释 Transformer 中 KV 缓存的记忆机制或 RNN 语言模型的上下文保持能力？
 
 5. **非线性函数的泛化**：使用其他非线性函数（如 Swish、GELU、leaky ReLU）时，无干扰空间的形状和利用策略会发生什么变化？是否存在比 ReLU 半空间更优的干扰消除结构？
+
+
 
 ## 原文 PDF
 

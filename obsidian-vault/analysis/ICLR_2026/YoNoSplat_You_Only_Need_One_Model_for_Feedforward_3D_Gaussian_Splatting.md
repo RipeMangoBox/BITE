@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/YoNoSplat_You_Only_Need_One_Model_for_Feedforward_3D_Gaussian_Splatting.pdf
+project_link: https://botaoye.github.io/yonosplat/
+code_link: null
 openreview_forum_id: ImRhA9xmay
 aliases:
 - YoNoSplat
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | YoNoSplat：只需一个模型即可实现前馈3D高斯泼溅 |
 | 英文题名 | YoNoSplat: You Only Need One Model for Feedforward 3D Gaussian Splatting |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=ImRhA9xmay); [Project](https://botaoye.github.io/yonosplat/) |
+| Links | [paper](https://openreview.net/forum?id=ImRhA9xmay) · [Project](https://botaoye.github.io/yonosplat/) |
 | Topic | #topic/other_unclear #topic/other_unclear/general |
 | Method | YoNoSplat |
 | Dataset | RealEstate10K (6 views), ScanNet++ (32 views, cross-dataset), RealEstate10K (3 views, sparse), DL3DV (6 views, pose-free) |
@@ -41,7 +43,7 @@ claims:
 > - ScanNet++ (32 views, cross-dataset) 上，PSNR (pose-free, no intrinsics) 为 16.886，对比 AnySplat: 14.054，变化 +2.832。
 > - RealEstate10K (3 views, sparse) 上，PSNR 为 27.528，对比 NoPoSplat: 26.619，变化 +0.909。
 
-## 概述
+## 概要
 
 从无标定、无位姿的多视图图像中直接重建三维场景，是计算机视觉领域的一项核心挑战。现有前馈方法要么依赖精确的相机位姿（如DepthSplat、MVSplat），要么将场景建模在标准空间中（如NoPoSplat），难以兼顾灵活性与重建质量。其根本瓶颈在于：联合学习相机位姿与三维高斯场时，二者高度纠缠——位姿误差污染几何学习信号，几何误差又反向干扰位姿估计，形成破坏性反馈循环；同时，尺度模糊问题进一步阻碍无先验重建。
 
@@ -51,7 +53,7 @@ YoNoSplat提出了一种全新的前馈3D高斯泼溅范式：**逐视图预测�
 
 在DL3DV、RealEstate10K和ScanNet++三个数据集上的实验表明：YoNoSplat在无位姿、无内参设置下，**一致超越位姿依赖的SOTA方法DepthSplat**（如RealEstate10K上PSNR 24.571 vs 24.156）；跨数据集零样本泛化至ScanNet++时，**大幅领先同期无位姿方法AnySplat**（PSNR 16.886 vs 14.054）；在稀疏3视图设置下，**超越NoPoSplat达0.909 dB**。模型支持任意数量输入视图，100视图重建仅需2.69秒（NVIDIA GH200），且基于不透明度的修剪策略在几乎无损质量的前提下显著降低显存占用。
 
-## 背景与动机
+
 
 ### 问题背景：无先验多视图3D重建的困境
 
@@ -69,7 +71,9 @@ YoNoSplat提出了一种全新的前馈3D高斯泼溅范式：**逐视图预测�
 
 上述分析揭示了一个核心瓶颈：**联合学习相机位姿与三维高斯场高度纠缠，位姿误差与几何误差相互放大，且尺度模糊进一步阻碍无先验重建。** 本文的动机正是解开这一死结——设计一种训练策略，使模型在早期免受位姿误差的破坏性影响，同时逐步获得在无位姿条件下泛化的能力；并通过显式的尺度归一化与内参条件机制，从根本上消除尺度歧义，使单一模型能够在任意数量、无位姿、无内参的多视图图像上实现一致且可扩展的前馈3D高斯重建。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 YoNoSplat 的核心创新在于**解耦位姿估计与三维高斯场学习的纠缠关系**，从而在单一前馈模型中实现对任意数量、未标定、未定位多视图图像的稳定三维重建。其关键设计围绕三个相互关联的 changed slots 展开。
 
@@ -105,7 +109,7 @@ YoNoSplat 提出的**混合强制（mix-forcing）**策略通过渐进式课程�
 
 上述三个 changed slots 并非独立运作，而是形成协同回路：逐视图局部高斯预测降低了位姿误差对几何学习的直接冲击；混合强制确保了位姿估计器在训练中经历自身误差的反馈，从而学会预测与高斯聚合兼容的位姿；场景归一化与 ICE 则为位姿和高斯的联合学习提供了尺度一致的信号空间。三者共同使 YoNoSplat 在无任何先验（无位姿、无内参）的条件下，仍能在 DL3DV 上以 6 视图达到 24.531 PSNR，超越需要真值位姿的 DepthSplat（Table 1），验证了从纠缠到解耦的设计逻辑。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0009_ImRhA9xmay_YoNoSplat_You_Only_Need_One_Model_for_Feedforwar/figures/008_Figure_3.jpg]]
 *Figure 3: Overview of YoNoSplat. (a) Features are extracted with a DINOv2 encoder, followed by local-global attention across images, and finally used to predict camera poses and local 3D Gaussians. (b) The Intrinsic Condition Embedding (ICE) module predicts intrinsic parameters ( i . e . , focal length), which are then converted into camera rays and re-encoded as conditioning for Gaussian prediction, thereby resolving scale ambiguity*
@@ -164,7 +168,7 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{image}} + \lambda_{\mathrm{intrin}} \mathca
 6. 基于不透明度的修剪去除冗余高斯，输出全局 3D 高斯场；
 7. 可选的后优化步骤进一步优化相机位姿、高斯中心和颜色参数。
 
-## 核心模块与公式推导
+
 
 ### 3.1 前馈映射范式
 
@@ -226,7 +230,9 @@ $$\mathcal{L}_{\mathrm{opacity}} = \frac{1}{M} \sum_{i=1}^{M} \left| o_i \right|
 
 该 L1 正则配合基于不透明度的修剪策略，在几乎不损失重建质量（PSNR 下降 < 0.01 dB）的前提下显著减少高斯数量与显存占用。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -279,7 +285,9 @@ YoNoSplat 在 DL3DV、RealEstate10K 和 ScanNet++ 三个数据集上进行评估
 2. **后优化仍有显著增益**：前馈预测结果经后优化可大幅提升（表 1），说明模型预测的位姿和高斯参数仍有较大精化空间。
 3. **光照剧烈变化**：视角间存在日夜切换等极端光照变化时，光度一致性假设被破坏，会导致几何误差和漂浮伪影。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与前馈3D高斯泼溅方法的关系
 
@@ -328,6 +336,8 @@ ICE 模块则填补了内参缺失时的信息缺口。它将预测的焦距转�
 - 如何在保持前馈速度优势的同时，实现真正意义上的增量式重建？这需要设计能融合新旧观测而不破坏已有几何的聚合机制。
 - 模型的泛化边界在哪里？在 ScanNet++ 上的零样本结果虽大幅领先 AnySplat（32 视图 PSNR 16.886 vs 14.054）[Table 3]，但室外大范围场景、动态场景、非朗伯表面的表现仍需系统评估。
 - 混合强制的调度参数（r=0.1, t_start=80k, t_end=100k）是否对不同数据集普适？当前仅在 RealEstate10K 上进行了敏感性分析[Figure 8]，更广泛的验证有待完成。
+
+
 
 ## 原文 PDF
 

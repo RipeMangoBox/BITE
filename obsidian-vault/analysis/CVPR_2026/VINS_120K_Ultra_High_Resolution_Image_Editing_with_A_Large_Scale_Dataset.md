@@ -42,7 +42,7 @@ claims:
 > [!tip] 效果简介
 > - VINS-4KEval 上，pFID 9.15 vs 12.66 (原始 Kontext-dev) (-3.51)；ImageJudge-Avg 4.47 vs 3.98 (naive UHR 缩放) (+0.49)；pFID 9.15 vs 12.82 (Seedream 4.0) (-3.67 (-28.6%))。
 
-## 概述
+## 概要
 
 ### 1. 问题背景
 
@@ -86,7 +86,7 @@ claims:
 - 高频感知后适应需要多 GPU 训练，计算开销较高。
 - 如何将该策略推广至视频超高清编辑、以更轻量的注意力近似降低长序列计算成本、以及在动态场景下保证时间一致性，是值得进一步探索的开放问题。
 
-## 背景与动机
+
 
 ### 超高清图像编辑的兴起与瓶颈
 
@@ -117,7 +117,9 @@ claims:
 
 这一思路的核心洞察在于：**将长序列建模问题分解为注意力锐化、位置编码内插与频率域动态加权三个可控维度，三者协同可按比例将低分辨率编辑模型泛化至超高分辨率，同时保持指令遵徇与纹理真实感。**
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作的根本瓶颈在于：预训练的非超高清（NHR）编辑模型直接应用于超高分辨率（UHR）图像时，会遭遇**长序列退化**与**高频细节丢失**双重困境。具体而言，UHR 图像产生的长 token 序列导致注意力熵偏移，使得特征区分度下降；同时，标准扩散损失未显式建模高频纹理，造成合成细节模糊。现有的“降采样-编辑-超分”管线（如 Kontext+SR）虽然可以规避分辨率限制，但超分模块往往引入伪影且无法忠实执行编辑指令，本质上是一种有损的妥协方案。
 
@@ -168,7 +170,7 @@ $$\mathcal{L}_{\mathrm{freq}} = \frac{1}{UV} \sum_{u=1}^{U} \sum_{v=1}^{V} \math
 
 值得注意的是，这三个模块并非孤立有效——它们共同构成了一条完整的因果链：注意力重缩放确保模型“看得清”长序列中的关键区域，RoPE 重缩放确保模型“知道”这些区域的空间位置，FFS 则确保这些区域被“画得精细”。任一环节缺失，链条即断裂，性能急剧退化。
 
-## 整体框架
+
 
 VINS-120K 提出的核心方法是一条**高频感知后适应（High-Frequency-Aware Post-Adaptation）**管线，旨在将预训练的非超高分辨率（NHR）编辑模型高效泛化至超高分辨率（UHR）场景。整个框架围绕一个关键洞察展开：超长序列建模问题可以分解为注意力锐化、位置编码内插与频率域动态加权三个子问题，三者协同作用，使模型在保持指令遵徇能力的同时合成高保真纹理细节。
 
@@ -211,7 +213,7 @@ VINS-120K 提出的核心方法是一条**高频感知后适应（High-Frequency
 ![[assets/figures/papers/paper_list_l806_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_VINS_120K_Ultra_H/figures/004_Figure_4.jpg]]
 *Figure 4: Data Filtering Pipeline. We filter images sequentially for corruption, low quality, inconsistent instructions, and poor aesthetics, retaining only 20% of the highest-quality data*
 
-## 核心模块与公式推导
+
 
 ### 问题瓶颈
 
@@ -284,7 +286,9 @@ $$\mathcal{L}_{\mathrm{freq}} = \frac{1}{UV} \sum_{u=1}^{U} \sum_{v=1}^{V} \math
 ![[assets/figures/papers/paper_list_l806_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_VINS_120K_Ultra_H/figures/010_Figure_8.jpg]]
 *Figure 8: Ablation on attention-score rescaling. Blue: with rescaling; Purple: without rescaling*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -350,7 +354,9 @@ $$\mathcal{L}_{\mathrm{freq}} = \frac{1}{UV} \sum_{u=1}^{U} \sum_{v=1}^{V} \math
 ![[assets/figures/papers/paper_list_l806_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_VINS_120K_Ultra_H/figures/006_Figure_5.jpg]]
 *Figure 5: Comparison of image statistics between AnyEdit [52] and X2Edit [30] on aesthetics, clarity, and texture distributions*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有超高清生成方法的对比
 
@@ -389,6 +395,8 @@ VINS-120K 在数据层面填补了关键空白。如 Table 1 所示，此前最�
 - **轻量化长序列注意力**：分辨率提升导致的序列长度平方级增长是根本性计算瓶颈。能否通过稀疏注意力、线性注意力近似或分块处理策略，在保持编辑质量的前提下降低推理成本？
 
 - **动态场景的时间一致性**：VINS-120K 的数据来源（视频帧对）天然蕴含时序信息，但当前方法未显式建模时间一致性约束。在动态场景编辑中，如何保证跨帧的纹理和结构一致性？
+
+
 
 ## 原文 PDF
 

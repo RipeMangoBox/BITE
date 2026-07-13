@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/The_Quest_for_Generalizable_Motion_Generation_Data_Model_and_Evaluation.pdf
+project_link: null
+code_link: https://github.com/black-forest-labs/flux
 aliases:
 - VFVLD
 - QGMGDME
@@ -33,7 +35,7 @@ claims:
 | 中文题名 | 可泛化运动生成探索：数据、模型与评估 |
 | 英文题名 | The Quest for Generalizable Motion Generation: Data, Model, and Evaluation |
 | 会议/期刊 | ICLR 2026 |
-| Links | [Code](https://github.com/black-forest-labs/flux) · [arXiv](https://arxiv.org/abs/2410.08260) · [paper](https://openreview.net/forum?id=kPkvPeQ4b7) |
+| Links | [Code](https://github.com/black-forest-labs/flux) · [paper](https://arxiv.org/abs/2410.08260) · [paper](https://openreview.net/forum?id=kPkvPeQ4b7) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction #topic/generative_models_diffusion #topic/benchmarks_datasets_evaluation |
 | Method | ViMoGen (full) and ViMoGen-light (distilled) |
 | Dataset | MBench, HumanML3D |
@@ -42,7 +44,7 @@ claims:
 > - MBench 上，Motion Generalizability (↑) 0.68 vs 0.55 (MotionLCM) (+0.13)；Motion Condition Consistency (↑) 0.53 vs 0.48 (MotionLCM) (+0.05)。
 > - HumanML3D 上，R Precision Top-1 (↑) 0.542 (MLD+ViMoGen-light) vs 0.521 (MoMask) (+0.021)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -66,7 +68,7 @@ ViMoGen属于**基于扩散变换器的双分支条件运动生成框架**。与
 
 在MBench泛化性基准上，ViMoGen取得**Motion Generalizability 0.68**，远超最佳基线MotionLCM的0.55（+0.13）；Motion Condition Consistency达到0.53，同样优于MotionLCM的0.48（+0.05）。消融实验表明，自适应门控分支选择是泛化性提升的关键——相比仅使用T2M分支（0.54）或M2M分支（0.59），自适应策略达到0.68。在数据层面，逐步添加合成视频数据带来最大的泛化增益（从0.44提升至0.55）。蒸馏变体ViMoGen-light在MBench上Generalizability得分0.55，与最强基线持平；在HumanML3D测试集上，MLD+ViMoGen-light取得R Precision Top-1 0.542的SOTA文本-运动一致性，FID从MLD基线的0.473大幅降至0.114。
 
-## 背景与动机
+
 
 ### 文本到运动生成的泛化瓶颈
 
@@ -92,7 +94,9 @@ ViMoGen属于**基于扩散变换器的双分支条件运动生成框架**。与
 - **模型维度**：设计门控双分支扩散变换器架构，包含Text-to-Motion（T2M）分支和Motion-to-Motion（M2M）分支。T2M分支基于MoCap先验保证运动质量，M2M分支通过离线ViGen模型引入视频语义泛化知识；自适应门控模块根据数据质量和VLM对齐检查动态选择分支。进一步提出**ViMoGen-light**，通过知识蒸馏移除对视频生成模型的推理依赖。
 - **评估维度**：构建**MBench**基准，系统评估九个维度（运动质量、提示遵循、泛化性等），并通过人类偏好标注验证自动评估指标的可靠性（Spearman ρ显著正相关）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题根因与创新动机
 
@@ -135,7 +139,7 @@ ViMoGen属于**基于扩散变换器的双分支条件运动生成框架**。与
 
 ViMoGen 处于**扩散运动生成**与**视频先验迁移**的交叉点。其 DiT 骨干基于流匹配（Flow Matching）框架，采用整流流插值 $x_t = (1 - t) \epsilon + t x_0$ 和速度场预测损失 $\mathcal{L} = \mathbb{E}_{x_0, \epsilon, t, c} [\| f_{\theta}(x_t, t, c) - v_t \|_2^2]$。与 MotionLCM（Dai et al., 2024）的潜在一致性蒸馏、DNO（Karunratanakul et al., 2024）的扩散噪声优化等后处理增强不同，ViMoGen 从数据和架构层面系统性解决泛化问题。与 MotionCraft（Bian et al., 2025）等基于视频的运动生成方法相比，ViMoGen 的门控双分支设计实现了视频先验与 MoCap 先验的自适应融合，而非简单的条件拼接。
 
-## 整体框架
+
 
 ViMoGen 构建了一个多模态条件融合的文本到运动生成框架，其核心目标是通过引入视频生成模型在大规模数据中习得的丰富语义先验，突破现有模型在长尾、复杂语义指令上的泛化瓶颈。整体 pipeline 以文本提示为唯一显式输入，经由三条并行的信息提取通路汇聚到基于流匹配（Flow Matching）的扩散变换器（DiT）骨干网络，最终生成 3D 人体运动序列。
 
@@ -163,7 +167,7 @@ $$\\mathcal{L} = \\mathbb{E}_{x_0, \\epsilon, t, c} [\\| f_{\\theta}(x_t, t, c) 
 ![[assets/figures/papers/paper_list_l1906_The_Quest_for_Generalizable_Motion_Generation_Data_Model_and_Evaluation/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of ViMoGen. (a) Our model takes a text prompt as input and leverages both a text encoder and an offline video generation model to produce textual and video motion tokens. These are fused with noisy motion inputs through a stack of gating Diffusion Blocks. (b) Each block includes self-attention, an adaptive gating module, and two cross-attention branches: Text-to-Motion (T2M) and Motion-to-Motion (M2M). Only one branch is activated at a time, enabling the model to adaptively balance robustness and generalization*
 
-## 核心模块与公式推导
+
 
 ### 流匹配运动生成基础
 
@@ -215,7 +219,9 @@ ViMoGen 的视频语义先验并非端到端在线生成，而是通过离线管
 
 ViMoGen-light 是 ViMoGen 的轻量蒸馏变体。教师模型（完整 ViMoGen）首先生成约 14k 个合成运动-文本对，覆盖长尾语义场景；学生模型仅保留 T2M 分支结构，在这些合成数据上进行训练，从而在不依赖任何视频生成模型的情况下保留泛化能力。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 4.1 评估基准与协议
 
@@ -331,7 +337,9 @@ ViMoGen-light 是 ViMoGen 的轻量蒸馏变体。教师模型（完整 ViMoGen�
 ![[assets/figures/papers/paper_list_l1906_The_Quest_for_Generalizable_Motion_Generation_Data_Model_and_Evaluation/figures/015_Figure_8.jpg]]
 *Figure 8: Comprehensive Data Preprocess Pipeline. The pipeline is organized into sequential modules, utilizing a central database to aggregate metadata like scores, keypoints, captions, and text masks*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 技术路径与基线关系
 
@@ -379,6 +387,8 @@ ViMoGen-light 通过知识蒸馏（教师模型生成 14K 合成提示并训练�
 - **视觉 MoCap 伪影的系统性消除**：足部滑动、运动模糊导致的姿态抖动等伪影能否通过改进的视觉 MoCap 管线（如融合物理约束的优化后处理）或生成视频的动态范围增强来系统性缓解？
 - **弱标注数据的有效利用**：ViMoGen-228K 的构建依赖 Gemini 2.0 进行自动标注，产生了大量弱标注数据。如何设计预训练策略（如掩码运动建模或对比学习）更高效地利用这些数据，减少对高质量人工标注的依赖？
 - **评估维度的细化**：MBench 虽然经过人类对齐验证（Figure 6，Spearman ρ 显著正相关），但某些维度（如脚部浮动）上自动指标与人类偏好的相关性较弱。这提示需要更精确的物理合理性自动评估指标，以支撑未来方法在该方向上的可靠迭代。
+
+
 
 ## 原文 PDF
 

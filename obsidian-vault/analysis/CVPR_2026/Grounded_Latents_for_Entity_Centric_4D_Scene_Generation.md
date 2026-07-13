@@ -42,7 +42,7 @@ claims:
 > - CarlaSC 上，MMD↓ Geometry (avg) 6.44 vs best baseline (LatentWorld achieves lowest MMD)；MMD↓ Semantics (avg) 11.30 vs best baseline (LatentWorld achieves lowest MMD)；MMD↓ Geometry & Semantics (avg) 6.69 vs best baseline (LatentWorld achieves lowest MMD)。
 > - Waymo 上，MMD↓ Geometry (avg) 1.62 vs DynamicCity (outperforms DynamicCity)；MMD↓ Semantics (avg) 1.50 vs DynamicCity (outperforms DynamicCity)；MMD↓ Geometry & Semantics (avg) 0.96 vs DynamicCity (outperforms DynamicCity)。
 
-## 概述
+## 概要
 
 自动驾驶仿真、具身智能与世界模型等应用对**可控、可解释的 4D 场景生成**提出了迫切需求。现有方法普遍采用密集对齐网格的潜变量（如体素、三平面）进行生成，缺乏显式的实体建模，导致前景演员频繁出现**合并、闪烁、分裂**等失败模式，且难以实现精细的前背景分离控制。
 
@@ -50,7 +50,7 @@ claims:
 
 在 **CarlaSC** 和 **Waymo** 两个数据集上，LatentWorld 在几何与语义的 MMD 指标上均取得最优生成质量，尤其在前景类别上显著优于 **DynamicCity** 等基线方法。消融实验进一步验证了潜变量数量（768 为最优平衡点）和外推引导权重（λ=1.0 性能最优）的设计合理性。定性结果表明，接地潜变量有效消除了密集方法中的实体分裂与背景不一致问题，实现了稳定的轨迹与一致的背景结构。
 
-## 背景与动机
+
 
 自动驾驶系统对环境的理解正从静态 3D 感知向动态 4D 场景理解演进。生成式模型——特别是扩散模型——在图像和视频生成领域取得了显著进展，但在 4D 驾驶场景生成中仍面临根本性挑战。一个核心瓶颈在于：**现有方法普遍采用密集对齐网格的潜变量表示（如体素、三平面、HexPlane），缺乏显式的实体建模**。这种表示将场景中的所有元素——道路、建筑、车辆、行人——混合在一个统一的体积或张量中，导致三个关键的失败模式：
 
@@ -64,7 +64,9 @@ claims:
 
 本文的核心动机在于：**将 4D 场景生成从“密集体积的隐式生成”重新定义为“稀疏接地实体的显式生成与操控”**。具体而言，我们提出用一组稀疏的、接地的 3D 潜变量点集来表示场景，每个前景演员分配恰好一个潜变量以维持身份，背景则由多个潜变量覆盖以捕捉细节。这种表示使得场景生成可以被分解为三个可分离且可解释的阶段——布局、特征、运动——从而在保持生成质量的同时，实现对场景结构、几何细节和动态轨迹的直接控制与编辑。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 LatentWorld 的核心创新在于用**稀疏、接地的 3D 潜变量点集**替代传统方法中密集对齐网格的潜变量表示（如体素、三平面），从而从根本上改变了场景建模的方式。这一表示转换带来了四个关键的 changed slots，构成了该方法相对于现有工作的质变。
 
@@ -113,7 +115,7 @@ $$( \mathbf{x}_n^t, \boldsymbol{\theta}_n^t ) = \begin{cases} ( \mathbf{R}_{\mat
 
 这种分解使得场景的**结构、几何和运动**三个维度可以独立控制和编辑，从根本上解决了现有方法中三者耦合导致的不可控和不可解释问题。
 
-## 整体框架
+
 
 LatentWorld 将 4D 场景生成分解为三个解耦的阶段，共享一个统一的**接地潜变量表示**。整个 pipeline 的输入是语义占用体素 $\mathbf{V}$，输出是跨时间步的 4D 语义占用序列。其核心模块关系如 Figure 2 所示，可概括为“编码—生成—解码—运动传播”四步流：
 
@@ -150,7 +152,7 @@ LatentWorld 将 4D 场景生成分解为三个解耦的阶段，共享一个统�
 ![[assets/figures/papers/paper_list_l2515_https_openaccess_thecvf_com_content_CVPR2026_html_Park_Grounded_Latents/figures/001_Figure_1.jpg]]
 *Figure 1: Entity-centric 4D scene generation with grounded 3D latents. We present LatentWorld, which introduces a grounded latent representation for controllable, interpretable 3D and 4D scene generation. On the left, we show a generated 3D latent layout in which each actor is a single editable latent with position and BEV orientation, together with generated future waypoints that define motion. On the right, we decode the same latents to semantic Gaussians and splat to voxels across future timesteps, producing coherent 4D scenes with precise foreground movement and stable background structure. Zoom in for detail*
 
-## 核心模块与公式推导
+
 
 LatentWorld 的生成管道由三个核心阶段构成，每个阶段对应一个扩散变换器，分别负责场景的粗粒度布局、细粒度几何特征和时序运动。以下按数据流顺序阐述关键模块及其公式化设计。
 
@@ -241,7 +243,9 @@ $$
 ![[assets/figures/papers/paper_list_l2515_https_openaccess_thecvf_com_content_CVPR2026_html_Park_Grounded_Latents/figures/003_Figure_3.jpg]]
 *Figure 3: Rotating foreground Gaussians by their latent’s yaw enables interpretable, reliable heading control*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -299,7 +303,9 @@ LatentWorld 在 CarlaSC（3D 场景生成）和 Waymo（4D 场景生成）两个
 ![[assets/figures/papers/paper_list_l2515_https_openaccess_thecvf_com_content_CVPR2026_html_Park_Grounded_Latents/figures/004_Figure_4.jpg]]
 *Figure 4: Left: Generated layout and semantic grid. Right: We manually arrange the layout to simulate a complex traffic scene and sample two sets of latent features to decode. LatentWorld’s grounded latent representation enables interpretable, explicit control of scene elements, with high-fidelity geometric variations captured by our feature generation model*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 **核心瓶颈与设计动机**  
 现有 3D/4D 场景生成方法普遍采用密集对齐网格的潜变量表示（如体素、三平面、HexPlane），所有场景元素在统一体积中联合生成，缺乏显式的实体分离。这导致前景演员在生成中频繁出现合并、闪烁、分裂等失败模式，且难以实现精细、可靠的前背景控制。**LatentWorld** 针对这一瓶颈，提出以稀疏、接地的 3D 潜变量点集替代密集网格潜变量，使每个前景演员由恰好一个潜变量表示以维持身份，背景则由多个潜变量覆盖以捕捉细节——这一表示转换是方法的核心因果旋钮。
@@ -320,6 +326,8 @@ LatentWorld 在 CarlaSC（3D 场景生成）和 Waymo（4D 场景生成）两个
 - **跨领域泛化**：该框架能否推广到非驾驶场景（如室内多智能体交互、动态物体操控），其“一个实体一个潜变量”的假设是否仍然成立？  
 - **弱监督学习**：如何结合自监督或弱监督信号（如多视图一致性、运动线索）减少对稠密语义占用的依赖？  
 - **演员交互建模**：当前运动模型独立生成各演员轨迹，超车、避让等交互行为是否需要在模型中显式建模以提升物理一致性？
+
+
 
 ## 原文 PDF
 

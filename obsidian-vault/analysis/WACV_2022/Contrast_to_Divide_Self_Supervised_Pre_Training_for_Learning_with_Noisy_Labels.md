@@ -5,6 +5,8 @@ paper_level: A
 venue: WACV
 year: 2022
 pdf_ref: paperPDFs/WACV_2022/Contrast_to_Divide_Self_Supervised_Pre_Training_for_Learning_with_Noisy_Labels.pdf
+project_link: null
+code_link: https://github.com/ContrastToDivide/C2D
 aliases:
 - CCD
 - CDSSPTLNL
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 对比分割：用于带噪标签学习的自监督预训练 |
 | 英文题名 | Contrast to Divide: Self-Supervised Pre-Training for Learning with Noisy Labels |
 | 会议/期刊 | WACV 2022 |
-| Links | [paper](https://arxiv.org/abs/2103.13646); [GitHub](https://github.com/ContrastToDivide/C2D) |
+| Links | [paper](https://arxiv.org/abs/2103.13646) · [GitHub](https://github.com/ContrastToDivide/C2D) |
 | Topic | #topic/representation_self_supervised_transfer #topic/representation_self_supervised_transfer/representation_learning |
 | Method | C2D (Contrast to Divide) |
 | Dataset | CIFAR-100 (90% symmetric noise), CIFAR-10 (90% symmetric noise), mini-WebVision, Clothing1M |
@@ -41,7 +43,7 @@ claims:
 > - CIFAR-10 (90% symmetric noise) 上，Final accuracy 为 89.30% (C2D‑ELR+ with SimCLR)，对比 78.7% (ELR+)，变化 +10.60。
 > - mini-WebVision 上，Top‑1 accuracy 为 78.57% (C2D‑DivideMix with SimCLR, ResNet‑50)，对比 74.42% (DivideMix* ResNet‑50)，变化 +4.15。
 
-## 概述
+## 概要
 
 在带噪标签学习（Learning with Noisy Labels, LNL）中，现有方法普遍依赖一个 **warm‑up 阶段**来获得初始的损失分离性与特征表示，然而这一阶段本身存在严重瓶颈：当噪声比例升高时，在全量含噪数据上训练的特征提取器质量急剧下降，且不可避免地记忆噪声标签，导致干净样本与噪声样本的损失分布难以分离，从而限制了后续 LNL 算法的性能上限。
 
@@ -58,7 +60,7 @@ claims:
 
 C2D 的方法定位清晰：它不改变现有 LNL 算法的内部机制，而是通过**替换特征初始化的来源**来解决 warm‑up 瓶颈，因此可无缝集成到任何 LNL 方法中。其局限性主要包括自监督预训练的高计算成本（CIFAR 上需 1000 epochs，4–8 GPU），以及在真实噪声场景下预训练优势未能被 LNL 方法完全转化为最终性能提升的问题。
 
-## 背景与动机
+
 
 ### 带噪标签学习的核心挑战
 
@@ -85,7 +87,9 @@ C2D 的方法定位清晰：它不改变现有 LNL 算法的内部机制，而�
 
 基于这一洞察，本文提出 **C2D（Contrast to Divide）** 框架：先通过自监督对比学习在无标签训练集上预训练特征提取器（Contrast 阶段），再加载预训练权重运行任意标准 LNL 方法（Divide 阶段）。这一简单而有效的策略使 LNL 方法在极高噪声条件下获得了前所未有的性能提升——例如在 CIFAR-100 90% 对称噪声下，C2D 将 DivideMix 的准确率从 31.5% 提升至 93.57%。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 C2D 的核心创新在于**将带噪标签学习（LNL）的范式从“从含噪标签中学习”转变为“先无标签预训练，再含噪标签微调”**。这一转变直击 LNL 方法在 warm-up 阶段的瓶颈：特征提取器质量随噪声水平升高而急剧下降，且无法避免记忆噪声标签，导致损失分离性差。C2D 通过丢弃标签，在 warm-up 之前引入目标数据集上的自监督预训练，从根本上绕过了噪声对特征学习的干扰。
 
@@ -121,7 +125,7 @@ C2D 是一个两阶段框架，可无缝嵌入任何 LNL 方法：
 
 这一框架的通用性在实验中得到了验证：C2D 分别与 DivideMix（基于半监督学习）和 ELR+（基于正则化）结合，均取得了显著提升，表明自监督预训练的优势独立于具体 LNL 算法的设计。
 
-## 整体框架
+
 
 C2D（Contrast to Divide）是一个两阶段框架，其核心思想简单而直接：**先丢弃标签进行自监督对比预训练以获取高质量特征，再加载该特征进行标准的有噪标签学习（LNL）**。这一设计直击 LNL 方法中 warm-up 阶段的核心瓶颈——在全量含噪数据上随机初始化训练时，特征提取器质量随噪声水平升高而急剧下降，导致损失分离性差，严重限制了后续 LNL 算法的性能。
 
@@ -154,7 +158,7 @@ C2D（Contrast to Divide）是一个两阶段框架，其核心思想简单而�
 
 C2D 框架的显著优势在于其**即插即用**的特性——自监督预训练阶段与下游 LNL 方法完全解耦，理论上可以无缝结合任何 LNL 算法。本文在 **DivideMix** 和 **ELR+** 两种不同机制的 LNL 方法上均验证了 C2D 的有效性，表明该框架具有良好的通用性。
 
-## 核心模块与公式推导
+
 
 ### C2D 框架总览
 
@@ -226,7 +230,9 @@ C2D 属于 **自监督预训练 + LNL 微调** 的混合范式，其核心贡献
 
 **框架的通用性**：C2D 不依赖特定 LNL 算法，理论上可与任何需要 warm-up 的 LNL 方法结合。在 Clothing1M 上，即使不使用专门的 LNL 算法，仅 SimCLR 预训练 + 标准交叉熵即可达到 72.05%，超过 ImageNet 预训练的 69.21%，验证了自监督预训练作为通用 warm-up 替代方案的潜力。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 1. 核心瓶颈：Warm‑up 阶段特征质量与损失分离的双重失效
 
@@ -302,7 +308,9 @@ C2D 的性能优势伴随着显著增加的计算成本：自监督预训练在 
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2103_13646/figures/009_Figure.jpg]]
 *Figure: B.1: Training time ROC-AUC scores (left) and effective noise rates (right). C2D demonstrates higher initial score, faster rise, and more stable decrease in effective noise level*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 一、方法谱系：C2D 在 LNL 研究中的位置
 
@@ -386,6 +394,8 @@ C2D 在 LNL 知识库中的定位可概括为：
 - **与现有工作的关系**：与任意 LNL 方法正交兼容，是对现有 LNL 方法体系的**通用增强**，而非替代。
 - **适用场景**：高噪声对称噪声场景下优势最大；真实噪声和非对称噪声场景仍有待改进。
 - **主要代价**：显著增加的计算开销，以及在某些场景下性能转化不足的问题。
+
+
 
 ## 原文 PDF
 

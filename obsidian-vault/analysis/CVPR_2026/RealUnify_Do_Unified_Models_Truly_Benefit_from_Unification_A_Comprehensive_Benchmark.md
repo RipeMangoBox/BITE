@@ -42,7 +42,7 @@ claims:
 > - RealUnify UEG (BAGEL 逐步 vs 直接) 上，Accuracy (%) 逐步 47.7 vs 直接 32.7 (+15.0)。
 > - RealUnify GEU (Overall) 上，Accuracy (%) BAGEL (最佳统一) 39.3 vs Gemini 2.5 Pro (最佳专用) 54.8 (-15.5)。
 
-## 概述
+## 概要
 
 ### 1. 问题：统一模型的能力协同困境
 
@@ -75,7 +75,7 @@ RealUnify 的方法论贡献在于设计了一套**双评估协议**（dual-eval
 
 这些结果表明，当前统一模型在需要理解与生成深度交互的复杂任务上存在系统性缺陷，架构统一远未带来能力协同。RealUnify 为未来研究指明了方向：需要设计专门促进双向交互的训练策略与模型归纳偏置，而非仅仅将两种能力堆叠于同一架构中。
 
-## 背景与动机
+
 
 ### 问题背景：从能力堆叠到能力协同
 
@@ -101,7 +101,9 @@ Figure 1 清晰地定位了 RealUnify 在这一演进脉络中的位置——它
 
 这一基准的建立，不仅为现有统一模型提供了能力诊断工具，更为未来模型设计指明了关键方向：**如何从架构统一走向真正的能力协同**。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 RealUnify的核心创新不在于提出一个新的统一模型，而在于构建了一套系统性的**诊断框架**，用以回答一个根本性问题：统一模型是否真正实现了理解与生成能力的协同，还是仅仅在单一架构内完成了功能的物理堆叠？
 
@@ -138,7 +140,7 @@ RealUnify的方法论创新集中体现在其**双评估协议**上，这是该�
 
 由于UEG和GEU任务涉及复杂生成图像的准确性判断——如属性绑定、数量控制、空间关系等——传统自动化指标（如FID、CLIPScore）无法有效评估。RealUnify设计了**验证问题驱动的投票式评判方法**：针对每张生成图像，构造一组可自动验证的是非问题（如“图中是否恰好有三个红色立方体？”），并利用**Gemini 2.5 Pro**作为评判模型进行回答。与人类专家评估的一致性验证（Table 4）表明，该方法在保持可扩展性的同时，达到了可接受的可靠性水平，为大规模协同能力评估提供了实用方案。
 
-## 整体框架
+
 
 RealUnify 并非一个模型，而是一个**面向统一模型能力协同的双评估基准**。其整体框架围绕一个核心诊断问题构建：当前统一模型是否真正实现了理解与生成能力的双向增强，还是仅仅在架构层面完成了功能堆叠？为此，RealUnify 设计了三个相互衔接的模块，形成从任务定义到瓶颈诊断的完整评估链路。
 
@@ -180,7 +182,7 @@ RealUnify 包含 **1,000 个人工标注实例**，覆盖 10 个类别、32 个�
 ![[assets/figures/papers/paper_list_l780_https_arxiv_org_abs_2509_24897/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of RealUnify. Unlike benchmarks focused on either understanding or generation (Stage 1), those that merely integrate both capabilities (Stage 1.5), or even those that preliminarily explore the mutual enhancement between understanding and generation (Stage 2), RealUnify stands as the first benchmark to comprehensively evaluate and fully harness the synergy between these capabilities, making it a pioneering effort in assessing ability synergy for unified models*
 
-## 核心模块与公式推导
+
 
 RealUnify 本身是一个基准测试，不提出新的模型架构或训练公式，其核心贡献在于设计了一套系统性的评估协议与数据集构建流程。以下梳理其关键方法模块。
 
@@ -220,7 +222,9 @@ RealUnify 作为基准测试，未引入新的数学公式或理论推导。其�
 ![[assets/figures/papers/paper_list_l780_https_arxiv_org_abs_2509_24897/figures/004_Figure_3.jpg]]
 *Figure 3: Illustration of polling evaluation. To assess the accuracy of the generated images, we design verification questions and employ Gemini 2.5 Pro as the judge in a polling-based evaluation*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：统一模型的能力协同瓶颈
 
@@ -292,7 +296,9 @@ RealUnify 数据集包含 600 个 UEG 实例和 400 个 GEU 实例，覆盖 10 �
 ![[assets/figures/papers/paper_list_l780_https_arxiv_org_abs_2509_24897/figures/002_Table_1.jpg]]
 *Table 1: Comparisons on RealUnify and other benchmarks. RealUnify is designed to provide a comprehensive evaluation of unified models across multiple dimensions. It is entirely human-annotated and integrates both direct and stepwise evaluation protocols. RealUnify centers on evaluating whether the synergy between generation and understanding can be effectively harnessed to solve complex tasks*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 统一模型的演进与RealUnify的定位
 
@@ -345,6 +351,8 @@ RealUnify揭示了理解与生成协同的**非对称性**：
 3. **复杂推理与生成精度的联合提升**：统一模型在属性绑定、数量控制、空间关系等生成精度问题上仍然存在典型缺陷（见Figure 11、Figure 12），这些问题在需要深度推理的UEG任务中被进一步放大。如何在保持统一架构的同时提升这些基础生成能力？
 
 4. **更优的协同评估协议**：逐步分解范式虽能诊断瓶颈，但其人工设计的分解路径可能不是模型内部最优的协同方式。是否存在更自然的评估协议，能够在不强制分解的情况下度量能力协同的深度？
+
+
 
 ## 原文 PDF
 

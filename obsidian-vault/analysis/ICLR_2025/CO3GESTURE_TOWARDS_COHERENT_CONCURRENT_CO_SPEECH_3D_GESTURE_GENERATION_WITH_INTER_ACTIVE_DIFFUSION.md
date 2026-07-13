@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2025
 pdf_ref: paperPDFs/ICLR_2025/CO3GESTURE_TOWARDS_COHERENT_CONCURRENT_CO_SPEECH_3D_GESTURE_GENERATION_WITH_INTER_ACTIVE_DIFFUSION.pdf
+project_link: https://mattie-e.github.io/Co3/
+code_link: null
 aliases:
 - CO3GESTURE
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | Co3Gesture：面向交互式扩散的连贯并发语音驱动3D手势生成 |
 | 英文题名 | CO3GESTURE: TOWARDS COHERENT CONCURRENT CO-SPEECH 3D GESTURE GENERATION WITH INTER- ACTIVE DIFFUSION |
 | 会议/期刊 | ICLR 2025 |
-| Links | [paper](https://openreview.net/pdf?id=VaowElpVzd); [Project](https://mattie-e.github.io/Co3/) |
+| Links | [paper](https://openreview.net/pdf?id=VaowElpVzd) · [Project](https://mattie-e.github.io/Co3/) |
 | Topic | #topic/benchmarks_datasets_evaluation #topic/benchmarks_datasets_evaluation/benchmark_eval |
 | Method | Co3Gesture |
 | Dataset | GES-Inter Dataset |
@@ -40,7 +42,7 @@ claims:
 > - GES-Inter Dataset 上，BC (Beat Consistency ↑) 为 0.692，对比 0.670 (InterGen)，变化 +0.022。
 > - GES-Inter Dataset 上，Diversity (↑) 为 72.824，对比 69.455 (InterGen)，变化 +3.369。
 
-## 概述
+## 概要
 
 当前语音驱动的3D手势生成方法均聚焦于单人自述场景，无法处理实时对话中双人异步、交互并发的动态手势。这一瓶颈的根源在于两方面：其一，现有方法缺乏对两位说话人之间时序关联与跨说话人依赖的显式建模；其二，该方向长期缺少大规模、高质量的双人并发语音-手势数据集。
 
@@ -50,7 +52,7 @@ claims:
 
 **方法定位**：Co3Gesture 属于并发交互手势生成的扩散模型方法，其双边分支架构、时序交互模块与互注意力机制构成了区别于单人生成基线（如 TalkSHOW、DiffSHEG、EMAGE）和人-人交互基线（如 InterGen、InterX）的核心差异。
 
-## 背景与动机
+
 
 语音驱动的 3D 手势生成（co-speech gesture generation）旨在根据语音信号合成与说话内容节奏同步、语义匹配的肢体动作，在虚拟数字人、沉浸式交互等领域具有重要应用。近年来，基于扩散模型的方法在该任务上取得了显著进展，代表性工作包括 **TalkSHOW**（Yi et al., CVPR 2023）、**ProbTalk**（Liu et al., CVPR 2024b）、**DiffSHEG**（Chen et al., CVPR 2024）和 **EMAGE**（Liu et al., CVPR 2024a）等。然而，这些方法存在一个根本性局限：它们均面向**单人自述场景**设计，无法处理真实对话中两人交替发言、手势彼此呼应的复杂交互动态。
 
@@ -60,7 +62,9 @@ claims:
 
 Co3Gesture 正是在这一背景下提出的。其核心动机可以概括为三个层次：第一，**填补并发语音手势生成的任务空白**，将研究从单人场景拓展至双人对话；第二，**构建首个大规模双人并发语音-手势数据集 GES-Inter**，为该方向提供数据基础；第三，**设计双边协作扩散框架**，通过分离音频条件、时序交互建模和跨说话人注意力机制，确保生成手势既保持个体与自身语音的同步，又具备双方之间的交互连贯性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Co3Gesture 的核心创新在于将并发语音驱动手势生成从单人独白范式推向了双人交互范式，其关键设计围绕三个紧密耦合的“changed slots”展开。
 
@@ -90,7 +94,7 @@ $$\mathcal{L}_{total} = \lambda_{simple} \mathcal{L}_{simple} + \mathcal{L}_{vel
 
 综上，Co3Gesture 通过“双边分支解耦个体动态 + TIM 融合交互线索 + 互注意力交换跨说话人特征”的三层递进设计，系统性地解决了并发手势生成中的个体响应与交互连贯这一核心矛盾。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l20_https_openreview_net_pdf_id_VaowElpVzd/figures/004_Figure_3.jpg]]
 *Figure 3: The overall pipeline of our $\mathrm { C o ^ { 3 } G e s t u r e }$ . Given conversational speech audios, our framework generates concurrent co-speech gestures with coherent interactions*
@@ -119,7 +123,7 @@ $$\mathcal{L}_{total} = \lambda_{simple} \mathcal{L}_{simple} + \mathcal{L}_{vel
 
 综上，Co3Gesture 通过“分离音频驱动双边分支—TIM 融合交互信息—互注意力交换跨说话人特征”的级联设计，实现了从对话音频到连贯并发手势的端到端生成。消融实验表明，移除 TIM 会导致 FGD 从 0.769 升至 1.297，移除互注意力则升至 0.924，验证了各模块在交互建模中的关键作用（Table 3）。
 
-## 核心模块与公式推导
+
 
 ### 双边协作扩散主干
 
@@ -155,7 +159,9 @@ $$\mathcal{L}_{simple} = \mathbb{E}_{x,t,\epsilon} \left[ \| x_a - \mathcal{D}(x
 
 $\mathcal{L}_{vel}$ 为速度损失，约束相邻帧间运动平滑性；$\mathcal{L}_{foot}$ 为脚部接触损失，确保下半身（补全为 T-pose）的物理合理性。消融实验显示，移除 $\mathcal{L}_{foot}$ 后 FGD 升至 1.082、BC 同步下降（Table 5），验证了该损失对姿态物理合理性的贡献。权重 $\lambda_{simple}$ 设为 15。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -222,7 +228,9 @@ Co3Gesture 在核心指标 **FGD（Fréchet Gesture Distance）** 上达到 0.76
 ![[assets/figures/papers/paper_list_l20_https_openreview_net_pdf_id_VaowElpVzd/figures/003_Table_1.jpg]]
 *Table 1: Statistical comparison of our GES-Inter with existing datasets. The dotted line separates whether the speech content in the dataset is built based on the conversational corpus*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法定位与谱系
 
@@ -265,6 +273,8 @@ Co3Gesture 的适用边界受以下因素制约：
 4. **多人场景泛化**：当前的双边架构能否拓展到三人及以上的群体讨论场景？如何处理更复杂的多人遮挡、空间布局变化和说话人切换问题？
 
 5. **个性化与表现力增强**：可否将文本语义、语音韵律特征、说话人性格特质等额外条件显式注入生成过程，以实现更具表现力和个性化的交互手势合成？
+
+
 
 ## 原文 PDF
 

@@ -44,7 +44,7 @@ claims:
 > - Cross-Dataset (KIT-ML→HumanML3D) 上，R@1 0.391 (StableMoFusion ours) vs 0.327 (StableMoFusion pretrained) (+0.064)；FID 1.799 (StableMoFusion ours) vs 2.465 (StableMoFusion pretrained) (-0.666)。
 > - Leave-One-Out (Object Manipulation) 上，FID 0.615 (StableMoFusion ours) vs 0.714 (StableMoFusion pretrained without class) (-0.099)。
 
-## 概述
+## 概要
 
 现有文本到运动扩散模型在跨数据集或新动作类别上泛化能力有限，适配通常依赖额外的运动捕捉数据和全模型重训练，成本高且扩展性差。本文提出一种基于强化学习的后训练框架，仅使用文本提示即可对预训练运动扩散模型进行微调，无需任何真实运动数据。
 
@@ -52,7 +52,7 @@ claims:
 
 在跨数据集实验中，StableMoFusion经RL微调后在HumanML3D→KIT-ML任务上R@1从0.362提升至0.413，FID从1.860降至1.291；在KIT-ML→HumanML3D任务上R@1从0.327提升至0.391，FID从2.465降至1.799。留一法实验中，微调后模型在测试集上的FID改善至0.615（基线0.714），且超越全数据集训练模型。遗忘实验进一步表明，微调后模型在原数据分布上性能未退化，检索分数与FID均有轻微提升，呈现正反向迁移。
 
-## 背景与动机
+
 
 ### 问题背景：运动扩散模型的泛化瓶颈
 
@@ -75,7 +75,9 @@ claims:
 
 通过这一框架，模型能够在保持原始分布性能的同时实现零样本域适配，从根本上绕过了对运动捕捉数据的依赖，为运动扩散模型的实际部署提供了一条低成本、高扩展性的路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心贡献在于提出了一种**无需真实运动数据的后训练框架**，通过强化学习将预训练运动扩散模型适配到新的数据分布或动作类别。相较于现有方法依赖额外运动捕捉数据或全模型重训练，该方法仅需文本提示即可完成域迁移，显著降低了适配成本与扩展门槛。
 
@@ -113,7 +115,7 @@ $$\mathcal{L}_{\mathrm{DDPO}}(\theta) = \mathbb{E}_t \left[ \sum_{t=0}^T \min\le
 
 该方法的核心洞察在于：**将生成分布转向目标域并不需要真实运动数据，仅需一个能够评判语义对齐质量的奖励模型即可引导扩散策略的优化方向**。这一思路绕过了数据采集瓶颈，为运动生成模型的零样本域适配提供了新的范式。
 
-## 整体框架
+
 
 本文提出一种基于强化学习的运动扩散模型后训练框架，其核心设计目标是在不依赖任何真实运动捕捉数据的前提下，仅利用文本提示将预训练模型适配到新的数据分布或未见动作类别。框架将扩散去噪过程形式化为马尔可夫决策过程（MDP），以预训练文本-运动检索模型（TMR）的语义相似度作为奖励信号，通过去噪扩散策略优化（DDPO）更新模型参数，同时引入LoRA低秩适配和DPM-Solver++加速采样以保障训练效率与稳定性。
 
@@ -156,7 +158,7 @@ $$\mathcal{L}_{\mathrm{DDPO}}(\theta) = \mathbb{E}_t \left[ \sum_{t=0}^T \min\le
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2510_06988/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of our fine-tuning procedure. Left: Sample Collection. Diffusion trajectories are generated from Gaussian noise conditioned on prompts sampled from the dataset. At each denoising step, the model outputs a normal distribution from which*
 
-## 核心模块与公式推导
+
 
 本方法的核心架构由四个关键模块构成：**MDP形式化**、**DDPO策略优化**、**TMR奖励模型**和**高效学习策略**。以下逐一展开其公式推导与变量含义。
 
@@ -214,7 +216,9 @@ $$r(\mathbf{x}_0, \mathbf{c}) = \mathrm{sim}(\phi_{\mathrm{text}}(\mathbf{c}), \
 
 **DPM-Solver++加速采样**：将标准DDPM的1000步去噪替换为高阶ODE求解器 **DPM-Solver++**，仅需10步即可完成采样。这显著缩短了轨迹生成时间，使得RL训练在计算上可行。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -286,7 +290,9 @@ RL 微调的一个常见风险是**灾难性遗忘**——适配新分布后，�
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2510_06988/figures/005_Figure_3.jpg]]
 *Figure 3: Perception study results: Human raters evaluated our method against pretrained baseline models in the Humanto-Kit scenario, assessing both motion realism and text adherence in an A/B scenario*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -330,6 +336,8 @@ $$\mathcal{L}_{\mathrm{DDPO}}(\theta) = \mathbb{E}_t \left[ \sum_{t=0}^T \min\le
 4. **奖励模型的自适应更新**：若允许TMR在微调过程中同步更新（如通过对抗训练或自监督目标），是否能突破其覆盖盲区，同时避免奖励黑客（reward hacking）问题？
 
 **证据强度说明**：跨数据集和留一法的定量改善有明确数值支撑（置信度0.95），但多样性下降的观察需查阅原文MultiModality指标的具体数值进行手动验证。用户感知研究（Figure 3）提供了主观评价维度的补充证据，但其统计显著性和实验规模需进一步确认。
+
+
 
 ## 原文 PDF
 

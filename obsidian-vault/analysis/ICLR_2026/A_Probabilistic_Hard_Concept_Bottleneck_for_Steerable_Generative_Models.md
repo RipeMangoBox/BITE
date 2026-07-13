@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/A_Probabilistic_Hard_Concept_Bottleneck_for_Steerable_Generative_Models.pdf
+project_link: null
+code_link: null
 aliases:
 - VHCBV
 - PHCBSGM
@@ -41,7 +43,7 @@ claims:
 > - CelebA-HQ (StyleGAN2) 上，解耦 Acc (↑) 为 0.927，对比 0.901，变化 +0.026。
 > - CelebA-HQ (StyleGAN2) 上，可操控生成目标Acc (Patterns, all) (↑) 为 0.873，对比 0.712，变化 +0.161。
 
-## 概述
+## 概要
 
 该论文聚焦于概念瓶颈生成模型（CBGM）中的可操控性问题，指出现有方法依赖软概念和确定性映射导致“概念泄漏”——软概念概率无意中编码了任务相关信息，使得对概念的人工干预无法在生成输出中产生预期效果。针对这一瓶颈，论文提出了**概率化硬概念瓶颈层（Variational Hard Concept Bottleneck, VHCB）**，核心思路是将概念表示从连续概率值转变为二值潜变量，从根本上阻断泄漏通道。
 
@@ -49,7 +51,7 @@ claims:
 
 主要实验结果（基于StyleGAN2、CelebA-HQ数据集）显示：VHCB在概念推理指标上与确定性CB-AE持平（全概念集Acc 0.855 vs 0.857），但在解耦指标上显著提升（Acc 0.927 vs 0.901）；在可操控生成中，目标准确率大幅领先（Patterns采样：VHCB 0.873 vs CB-AE 0.712）；单概念干预的目标准确率平均提升约46%，而非目标准确率仅下降约7%。消融实验验证了对称KL散度和侧信道正则化的有效性。论文也在DDPM架构上进行了初步验证，但指出扩散模型中强制执行概念变化比GAN更困难，VHCB注入所有上采样层虽有改善但改进幅度有限。
 
-## 背景与动机
+
 
 概念瓶颈生成模型（CBGM）旨在通过显式的可解释概念表示来操控生成内容。然而，现有CBGM方法普遍采用**软概念**（连续概率值）和**确定性映射**，这导致了一个关键缺陷——**概念泄漏（concept leakage）**：软概念的概率值无意中编码了与任务相关的额外信息，使得概念干预无法在生成输出中产生预期的、可分离的效果。具体而言，当用户试图激活或去激活某个概念（如“微笑”）时，由于软概念表示中混杂了其他信息，生成结果往往无法忠实反映该干预意图。
 
@@ -59,7 +61,9 @@ claims:
 
 与CB-AE等基线相比，VHCB在概念表示形式（硬二值 vs. 软连续）、瓶颈层类型（概率化二元VAE vs. 确定性映射）、训练损失（无需干预损失）、侧信道表示（二值潜变量 vs. 连续向量）以及可操控生成方式（支持从指定概念配置直接生成 vs. 仅支持对现有输入干预）上均做出了根本性改变。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 VHCB（Variational Hard Concept Bottleneck）的核心创新在于将概念瓶颈层从**确定性软概念映射**彻底重构为**概率化硬概念映射**，从而从根本上解决了现有CBGM中因软概念泄漏（concept leakage）导致的可操控性受限问题。
 
@@ -105,7 +109,7 @@ VHCB作为一个可插拔模块，在StyleGAN2中置于Mapping Network与Synthes
 - **侧信道正则化**：对大概念集（40个概念）无显著影响；但对小概念集（8个概念）移除侧信道会使FID几乎翻倍（Table 9：平衡集FID从11.016升至20.950），表明侧信道在概念信息稀疏时承担了必要的生成多样性。
 - **侧信道解耦**：s的DCI始终显著低于c的DCI（Table 8），证明侧信道不包含概念信息。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0003_Kcb6WufAco_A_Probabilistic_Hard_Concept_Bottleneck_for_Stee/figures/001_Figure_1.jpg]]
 *Figure 1: Block diagram of (a) the general architecture of CBGMs, and (b) the VHCB layer. Note that the Error-Correcting Code (ECC) in the VHCB layer is a deterministic transformation that enables effective inference*
@@ -120,7 +124,7 @@ L = E_{q_η(c,s,z|w)} log p_θ(w|z) - D_SKL(q_η(c|w), p(y|x)) - D_KL(q_η(s|w) 
 
 相比CB-AE（包含L_r1, L_r2, L_c, L_i1, L_i2五个损失项），VHCB仅需四项：嵌入重建、概念对齐（对称KL散度）、侧信道正则化和图像MSE，无需额外的干预训练项。概念监督通过条件概念分布p(y|x)作为c的信息先验引入。这种概率化公式还支持从指定概念配置直接生成：通过采样c和s，绕过输入图像，直接驱动生成过程——这是CB-AE不具备的能力。
 
-## 核心模块与公式推导
+
 
 ### 核心瓶颈：从软概念泄漏到硬概念阻断
 
@@ -191,7 +195,9 @@ VHCB的概率公式化使其能够**从指定概念配置直接生成**，无需
 - **总变差距离**：$\text{TV} = \frac{1}{K} \sum_{j=1}^K |p_j - q_j|$，衡量预测概率与真实概率的平均绝对差，越低越好。
 - **余弦相似度**：$\text{sim}(p,q) = \frac{p \cdot q}{\|p\|_2 \|q\|_2}$，衡量向量方向一致性，越高越好。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心结果：概念推理与解耦
 
@@ -249,7 +255,9 @@ VHCB在保持可操控性的同时，还显著提升了生成质量。前向FID�
 *Table 3: Test-time interventions. Evaluation of single-concept activation (i → a), deactivation (a → i), and interventions guided by training concept patterns (minimum Hamming distance) using a StyleGAN2 pretrained on CelebA-HQ*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 基线关系与核心改进
 
@@ -295,6 +303,8 @@ VHCB在架构上与CB-AE的关键差异体现在：
 3. **扩散架构注入策略**：在DDPM中，如何确定最有效的VHCB注入策略（瓶颈层 vs. 所有上采样层 vs. 其他变体），并确保稳定且一致的改进？当前结果（Table 4）表明，全层注入在概念推理上优于仅瓶颈层（0.753 vs. 0.733），但在生成目标准确率上仍有提升空间（0.752 vs. 0.711）。
 
 4. **概念集设计原则**：如何系统性定义概念集以最大化可操控性？实验表明，低相关概念集上的干预成功率显著低于全概念集，但全概念集又面临维度灾难和标注成本问题。
+
+
 
 ## 原文 PDF
 

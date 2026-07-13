@@ -5,6 +5,7 @@ paper_level: A
 venue: SIGGRAPH
 year: 2023
 pdf_ref: paperPDFs/SIGGRAPH_2023/Flexible_Isosurface_Extraction_for_Gradient_Based_Mesh_Optimization.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/toronto-ai/flexicubes/
 aliases:
 - FIEGBMO
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | 用于基于梯度网格优化的灵活等值面提取 |
 | 英文题名 | Flexible Isosurface Extraction for Gradient-Based Mesh Optimization |
 | 会议/期刊 | SIGGRAPH 2023 |
-| Links | [paper](https://arxiv.org/abs/2308.05371); [Project](https://research.nvidia.com/labs/toronto-ai/flexicubes/) |
+| Links | [paper](https://arxiv.org/abs/2308.05371) · [Project](https://research.nvidia.com/labs/toronto-ai/flexicubes/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | FlexiCubes |
 | Dataset | Mesh Reconstruction (128³ grid), 3D Generative Modeling (GET3D) on Motorbike |
@@ -41,7 +42,7 @@ claims:
 > - Mesh Reconstruction (128³ grid) 上，IN>5° (%) 为 30.57，对比 48.86 (DMTet)，变化 -18.29。
 > - Mesh Reconstruction (128³ grid) 上，Edge F1 为 0.51，对比 0.39 (DMTet)，变化 +0.12。
 
-## 概述
+## 概要
 
 从有符号距离场（SDF）或占用场中提取等值面是三维视觉与图形学的基础操作。当等值面需要作为可微表示参与基于梯度的网格优化时，提取方法必须同时满足两个关键需求：**灵活性**——网格顶点能够局部、独立地调整以对齐几何特征并生成高质量三角形；**梯度有效性**——优化过程数值稳定、收敛良好。现有方法在这两个需求之间存在根本性的张力。
 
@@ -52,8 +53,6 @@ claims:
 实验验证了 FlexiCubes 的有效性和通用性。在 128³ 分辨率的网格重建中，FlexiCubes 取得了最低的 Chamfer Distance（4.31×10⁻⁵）和最高的 Edge F1（0.51），且法线角差超过 5° 的三角形比例（30.57%）远低于 DMTet（48.86%）和 Marching Cubes（42.56%）。消融实验证实了每个参数组件（灵活顶点定位、网格变形、四边形分割权重）的独立贡献。在 3D 生成模型 GET3D 中，将 DMTet 替换为 FlexiCubes 后，Motorbike 类的 FID 从 48.90 降至 44.87，Chair 类从 22.41 降至 17.51。在 nvdiffrec 逆向渲染重建中，FlexiCubes 产生的薄片三角形更少，PSNR 与 DMTet 持平或更优，Chamfer 距离显著降低（Chair 场景：0.45 vs 4.51）。
 
 FlexiCubes 的主要局限在于：不保证完全无自交（尽管比例极低），缺乏全局连续性因而不适合需要光滑形变路径的应用，额外参数增加了存储和计算开销。未来方向包括将体积渲染与基于网格的表示更紧密地结合、将自适应层级网格提取扩展到生成式建模和实时应用等。
-
-## 背景与动机
 
 ### 等值面提取在梯度优化中的双重困境
 
@@ -89,7 +88,7 @@ $$v_d = \underset{v_d}{\mathrm{argmin}} \sum_{u_e \in \mathcal{Z}_e} \nabla s(u_
 
 FlexiCubes 的核心洞察是：在 Dual Marching Cubes 的框架下，将对偶顶点的定位、四边形分割和网格变形都参数化为**凸组合（convex combination）**形式。这一设计的关键在于——对偶顶点始终保持在网格单元的凸包内（见 Fig. 6 的绿色区域），从根本上避免了 DC 中 QEF 引起的顶点外爆问题，同时通过可学习参数（α、β、γ、δ）提供了足够的自由度来灵活调整网格几何和连接关系。这种“在安全区域内提供最大自由度”的设计哲学，使得 FlexiCubes 能够在保持梯度稳定性的同时，一致地生成高质量网格。
 
-## 核心创新
+## 核心方法与创新机理
 
 ### 问题诊断：现有等值面方法的“灵活性-梯度有效性”悖论
 
@@ -143,8 +142,6 @@ FlexiCubes 的核心参数化框架还支持两个重要扩展：
 - **四面体网格提取**（Section 4.5）：从表面网格生成内部一致的可微四面体网格，用于物理仿真。
 - **自适应网格分辨率**（Section 4.6）：基于八叉树的层级细化，通过约束细层级顶点的 SDF 保持拓扑一致，实现局部高分辨率网格。
 
-## 整体框架
-
 FlexiCubes 构建于 Dual Marching Cubes（DMC）框架之上，其核心设计思路是：在保持 DMC 固有流形性保证的前提下，向等值面提取过程中注入额外的可优化自由度，使提取出的网格既能灵活对齐几何特征，又能在梯度优化中保持数值稳定。
 
 ### 输入与输出
@@ -187,8 +184,6 @@ FlexiCubes 的提取流程由以下核心模块串联而成，每个模块在 DM
 ### 性能特征
 
 在 $128^3$ 网格分辨率下，FlexiCubes 的每次迭代时间（315 ms）与 DMTet（307 ms）相当，显存占用因存储额外的每单元参数而略高（15.3 GiB vs 13.1 GiB）。但在生成式建模等应用中，由于 FlexiCubes 生成的三角形数量更少，整体显存反而更低（11.1 GiB vs 11.6 GiB）。提取的网格自交比例极低（$128^3$ 下仅 0.017%），远优于 Dual Contouring（1.28%），保证了梯度优化的可靠性。
-
-## 核心模块与公式推导
 
 FlexiCubes 的核心设计围绕一个关键洞察展开：在 Dual Marching Cubes (DMC) 的框架内，通过引入三组可优化的局部参数，使等值面提取在保持流形性和梯度稳定性的同时，获得足够的自由度来对齐几何特征。以下逐一解析各模块的数学构造与功能。
 
@@ -249,7 +244,7 @@ $$\mathcal{L}_{\mathrm{sign}} := \sum_{(s_a, s_b) \in \vec{\mathcal{E}}_g} H\big
 - **四面体网格提取**：FlexiCubes 可选的扩展通过分割内部体积生成一致的可微四面体网格，用于物理仿真等应用（Section 4.5, Fig. 10）。
 - **自适应网格分辨率**：基于八叉树的层级细化，通过约束细层级顶点的 SDF 保持拓扑一致，实现局部高分辨率网格（Section 4.6, Fig. 12, Fig. 14）。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心性能瓶颈与实验设计逻辑
 
@@ -350,22 +345,6 @@ Table 7 和 Table 8 提供了完整的性能画像。FlexiCubes 的等值面提�
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2308_05371/figures/006_Figure_5.jpg]]
-*Figure 5: Dual Marching Cubes first interpolate vertex along the edge to obtain 𝑢𝑒 . The dual vertex 𝑣𝑑 is computed via Equation 4. We connect four neighboring dual vertices to obtain a quadrilateral*
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2308_05371/figures/014_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2308_05371/figures/023_Figure.jpg]]
-*Figure: DMTet:317k tris*
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2308_05371/figures/025_Figure_20.jpg]]
-*Figure 20: Extracting a 3D model of the Roller scene from LDraw resources [Lasser 2022] using nvdiffrecmc [2022] unmodified (DMTet) and nvdiffrecmc with FlexiCubes for the topology extraction step. We note more uniform triangulation and higher detail. 3D Model*
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2308_05371/figures/032_Figure_25.jpg]]
-*Figure 25: Pose B Pose C Fig. 25. We reconstruct the same model with three different poses. Marching Cubes performs well when features are axis-aligned, but show stair step artifacts in the other poses. DMTet performs more robustly, but produces many sliver triangles. FlexiCubes has more uniform triangles and no stair step artifacts*
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2308_05371/figures/034_Figure_26.jpg]]
-*Figure 26: Ldev on Fig. 26. Influence of the regularizer ${ \mathcal { L } } _ { \mathrm { d e v } }$ . . The reconstructed shape with $\mathcal { L } _ { \mathrm { d e v } }$ has less visible seams compared to the result without $\mathcal { L } _ { \mathrm { d e v } }$ applied
 
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2308_05371/figures/002_Table_1.jpg]]
 *Table 1: Taxonomy of isosurfacing methods. Grad means gradient-based based optimization is effective in practice, and Uniform means the resulting tessellations are generally uniform without sliver triangles*
@@ -373,7 +352,7 @@ Table 7 和 Table 8 提供了完整的性能画像。FlexiCubes 的等值面提�
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2308_05371/figures/016_Table_4.jpg]]
 *Table 4: antitative results on mesh reconstruction with equilateral triangle regularizer. Adding regularizer for DMTet and MC significantly impacts geometric metrics (IN>5◦(%), CD), while FlexiCubes only sacrifices a bit*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 问题定位：可微等值面提取的两难困境
 

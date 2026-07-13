@@ -44,7 +44,7 @@ claims:
 > - 9视觉任务综合 (Qwen3-VL-4B) 上，平均准确率 77.55 vs 74.12 (Direct SFT) (+3.43)。
 > - 多任务联合训练 (Qwen3-VL-4B, 6任务) 上，平均准确率 72.37 vs 69.60 (Direct SFT) (+2.77)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：当前大型多模态模型（LMMs）的推理过程以文本为中心，难以形成复杂的视觉抽象。现有方法试图通过显式的中间视觉监督（如边界框、深度图、辅助图像）来弥补这一缺陷，但这类方案泛化性差、标注成本高昂，且在推理步骤本身难以定义时往往失效。
 
@@ -54,15 +54,13 @@ claims:
 
 **方法定位**：LIVR属于隐式视觉推理范式，与依赖文本链式思维（如ViGoRL）或显式视觉中间表示（如Mirage、LVR）的方法形成互补或替代关系。其核心贡献在于证明：通过精心设计的注意力瓶颈与可学习隐式表征，模型能够自主发现对任务有用的视觉结构，而无需人类手工设计中间步骤。
 
-## 背景与动机
-
 大型多模态模型（LMMs）在视觉理解任务上取得了显著进展，但其推理过程仍以文本为中心。当面对需要精细视觉感知的任务——例如判断两幅图像中对应点的语义匹配、在复杂场景中计数物体、或比较多个候选区域与参考图像的相似度——纯文本输出通道难以承载完整的视觉信息，容易引入歧义。这一瓶颈的根源在于：**标准LMM将视觉输入编码后直接送入语言模型解码，模型缺乏一个结构化的内部空间来形成复杂的视觉抽象**。
 
 现有方法试图通过引入中间视觉监督来弥补这一缺陷。例如，一些工作让模型显式输出边界框坐标、深度图、分割掩码或辅助渲染图像，作为最终答案的推理步骤。然而，这类策略面临两个根本性困难：（1）**泛化性受限**——手工设计的中间表示高度依赖任务特性，难以迁移到新场景；（2）**标注成本高昂**——获取精确的中间监督信号（如像素级对应关系、三维空间关系标注）远比收集问答对困难。更关键的是，许多视觉推理任务的“中间步骤”本身难以被人类清晰定义——当人类判断两幅图像的相似性时，我们并不显式地列举特征点或计算几何变换，而是在隐式的视觉表征空间中完成比较。
 
 上述困境指向一个核心需求：**能否让模型端到端地学习隐式的视觉推理表征，而无需任何显式的中间监督？** 这正是本文提出 Latent Implicit Visual Reasoning（LIVR）的出发点。LIVR 通过在 LMM 中引入可学习的隐式 token，并施加视觉瓶颈注意力掩码，迫使模型将任务相关的视觉信息压缩到隐式 token 中，从而实现无显式监督的隐式视觉推理。这一机制使模型能够自动发现对解题有用的视觉结构，而不依赖人类预设的推理路径。
 
-## 核心创新
+## 核心方法与创新机理
 
 ### 问题瓶颈：文本中心的视觉推理困境
 
@@ -114,8 +112,6 @@ LIVR 的设计哲学在于**避免手工定义中间推理步骤**。传统方�
 
 LIVR 的实质贡献在于：它证明了**视觉推理能力可以通过结构化的信息瓶颈从端到端任务损失中涌现**，而不需要人类预设推理步骤。这一发现为构建更通用、更可扩展的视觉推理系统提供了新的方法论基础。
 
-## 整体框架
-
 LIVR（Latent Implicit Visual Reasoning）的整体框架围绕一个核心设计展开：**在不引入任何显式中间监督的前提下，迫使大型多模态模型（LMM）将任务相关的视觉信息压缩到一组可学习的隐式token中，再基于这些隐式表征完成推理与答案生成**。
 
 ### 输入输出流与模块构成
@@ -153,8 +149,6 @@ $$\mathcal{L} = -\frac{1}{|x|} \sum_{i=1}^{|x|} \log P(x_i \mid x_{<i})$$
 
 ![[assets/figures/papers/paper_list_l2322_https_arxiv_org_abs_2512_21218/figures/002_Figure_2.jpg]]
 *Figure 2: An illustration of our method and bottleneck attention masking. Latent tokens are appended to the prompt and losses are computed on the answer tokens. In our bottleneck attention masking, answers and prompt tokens cannot attend to image tokens*
-
-## 核心模块与公式推导
 
 ### 3.1 基础前向传播框架
 
@@ -202,7 +196,7 @@ LIVR 采用两阶段训练策略以平衡瓶颈约束与模型容量：
 ![[assets/figures/papers/paper_list_l2322_https_arxiv_org_abs_2512_21218/figures/001_Figure_1.jpg]]
 *Figure 1: The model is asked to determine which image option is most similar to the reference image. Standard LMMs can only output text, which cannot capture all visual information and may introduce ambiguity. While methods using explicit supervision can train models to output intermediate reasoning steps, these approaches may fail when the reasoning steps themselves are unclear. Our approach allows the model to learn useful representations implicitly. Visualizing the attention maps of the latent tokens shows that the model has learned to recognize underlying visual structures relevant to answering the question that would have been hard for humans to design supervision for*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -278,13 +272,10 @@ Figure 4 的 t-SNE 降维可视化进一步显示，隐式 token 的嵌入主要
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l2322_https_arxiv_org_abs_2512_21218/figures/020_Figure_5.jpg]]
-*Figure 5: Additional visualizations of latent token to image attention*
-
 ![[assets/figures/papers/paper_list_l2322_https_arxiv_org_abs_2512_21218/figures/015_Figure.jpg]]
 *Figure: Semantic Correspondence*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 与显式中间监督方法的对比
 

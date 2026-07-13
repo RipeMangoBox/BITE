@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Pre_training_under_infinite_compute.pdf
+project_link: null
+code_link: null
 openreview_forum_id: ck0aZTAnwK
 aliases:
 - PTUIC
@@ -41,7 +43,7 @@ claims:
 > - Data efficiency at 200M tokens (effective data ratio) 上，Data efficiency multiplier 为 5.17×，对比 1× (standard recipe)，变化 5.17×。
 > - Downstream tasks (PIQA, SciQ, ARC Easy) average error 上，Average error (%) 为 best ensemble error，对比 best unregularized model error，变化 >9% relative reduction in error。
 
-## 概述
+## 概要
 
 在数据受限且无计算约束的条件下，标准预训练方法——增加训练轮数（epoch）和模型参数量——会遭遇严重的过拟合，无法通过简单地堆砌算力来持续降低损失。本文的核心洞见是：**通过大幅提高正则化强度（权重衰减可达标准实践的30倍），可以使损失随参数量呈单调幂律缩放**；进一步，**对多个独立训练模型进行集成，可获得比单纯参数缩放更低的损失渐近线**；最后，**组合参数缩放与集成缩放，并通过蒸馏将增益压缩至小模型，能在不增加推理成本的前提下大幅提升数据效率**。
 
@@ -58,8 +60,6 @@ claims:
 实验证据的强度较高：正则化使损失单调递减（Figure 3，置信度 0.95），集成渐近线低于参数缩放渐近线（Figure 4，置信度 0.95），联合缩放达到 3.17（Figure 5，置信度 0.95），5.17× 数据效率提升（Figure 7，置信度 0.95），蒸馏保留 83% 收益（Figure 8，置信度 0.95），下游任务提升 >9%（Figure 9，置信度 0.95）。消融实验进一步确认了联合调优超参数的必要性、减小批量大小的收益、为集成渐近线优化的超参数选择、以及自蒸馏必须混合真实数据等关键发现。
 
 主要局限包括：渐近线估计存在不确定性（有限参数量和实验噪声），数据缩放定律的外推依赖假设，实验主要限于 DCLM 数据集和 200M tokens 规模，下游任务评估范围有限，集成和蒸馏增加训练/推理成本，以及模型架构搜索有限。开放问题涉及自蒸馏的理论解释、最优超参数的自动化预测、更大数据规模下的泛化性、与其他架构的协同，以及能否设计更高效的无限计算利用算法。
-
-## 背景与动机
 
 ### 数据受限下的预训练困境
 
@@ -87,7 +87,7 @@ claims:
 
 研究在DCLM数据集（Li et al., 2025）上构建了受控预训练环境，默认使用200M token的数据规模，系统性地探索上述问题。
 
-## 核心创新
+## 核心方法与创新机理
 
 本文的核心创新在于系统性地揭示了“无限计算、有限数据”这一约束条件下，标准预训练方法的根本性瓶颈，并提出了三条递进式的改进路径，从根本上改变了数据效率的缩放行为。
 
@@ -102,8 +102,6 @@ $$\hat{\mathcal{L}}_{200M,N} = \frac{0.05}{N^{1.02}} + 3.43$$
 **创新三：联合缩放与蒸馏压缩。** 将参数缩放与集成缩放组合，取双重极限$N\to\infty, K\to\infty$，得到联合缩放配方的渐近线估计为3.17，相比标准配方提升了0.58的绝对损失。更重要的是，通过序列知识蒸馏（sequence knowledge distillation），将8模型集成教师的知识压缩到单个300M学生模型中，可保留83%的集成收益（学生损失3.36 vs 集成损失3.32），在不增加推理成本的前提下实现了5.17倍的数据效率提升。此外，自蒸馏（teacher和student同尺寸）意外地有效，能够匹配正则化配方的渐近线性能。
 
 **关键超参数变更（changed slots）。** 相对于标准配方，本文在300M模型上的核心超参数变更包括：权重衰减从0.1提升至1.6（最高达3.2），学习率从$1\times10^{-3}$提升至$3\times10^{-3}$，epoch数从8提升至16。这些变更在不同参数规模上需独立调优，且权重衰减随参数规模增大而进一步升高（Figure 11）。
-
-## 整体框架
 
 本研究在“有限数据、无限计算”的假设下，构建了一套系统性的预训练方法框架，旨在突破标准预训练方法在数据受限条件下的过拟合瓶颈。该框架由三个核心模块级联构成：**正则化参数缩放**、**集成缩放**，以及**知识蒸馏压缩**。
 
@@ -150,8 +148,6 @@ $$\hat{\mathcal{L}}_D = \frac{A}{D^{\alpha}} + E$$
 ### 输入输出流总结
 
 整个框架的输入为固定规模的预训练文本数据 $D$，输出为经过正则化调优、集成训练和/或蒸馏压缩后的语言模型。各模块可灵活组合：正则化参数缩放适用于单模型训练场景；集成缩放适用于可接受推理成本增加的场景；蒸馏模块则将前两者的增益压缩至小模型，实现推理高效的数据效率提升。
-
-## 核心模块与公式推导
 
 ### 关键模块拆解
 
@@ -213,7 +209,7 @@ $$\mathrm{LogitAvg}(\{\mathcal{M}_i\}_{i\in[K]})(x) \propto \exp\left(\frac{1}{K
 - **蒸馏的代价**：集成蒸馏虽能将增益压缩至小模型，但训练时仍需先训练集成教师，增加了总计算开销。
 - **自蒸馏的通用性**：自蒸馏的有效性依赖特定的数据混合比例和生成策略，其在不同设置下的稳定性未充分验证。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -222,7 +218,6 @@ $$\mathrm{LogitAvg}(\{\mathcal{M}_i\}_{i\in[K]})(x) \propto \exp\left(\frac{1}{K
 ### 标准配方的过拟合问题
 
 在数据受限（200M tokens）且无计算约束的条件下，标准预训练配方面临严重的过拟合瓶颈。Figure 2（左）显示，对300M模型而言，重复数据虽然初期降低损失，但epoch数过高时损失反而上升。Figure 2（右）进一步表明，即使为每个参数规模调优epoch数，简单地增加参数数量也无法持续降低损失——1.4B模型的表现甚至不如600M模型。标准配方的超参数配置（Figure 2附表）显示：150M模型使用lr=3e-3, E=8；300M使用lr=1e-3, E=8；600M使用lr=1e-3, E=4；1.4B使用lr=3e-4, E=4。这些结果揭示了一个关键瓶颈：在有限数据下，仅靠扩展计算量（更多epoch或更大模型）会导致严重过拟合，无法实现损失的单调递减。
-
 
 ![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_ck0aZTAnwK/figures/004_Figure_2.jpg]]
 *Figure 2: Evaluating standard recipe of epoching and parameter scaling for 200M tokens. Left: Though repeating the data lowers the loss, too many repetitions results in overfitting for 300M models. Right: We try increasing parameter count, tuning the epoch count at each parameter count. We similarly find that loss starts increasing. Moreover, increasing the parameter count 10× improves the loss by less than 0.1*
@@ -243,7 +238,6 @@ $$\hat{\mathcal{L}}_{200M,N} = \frac{0.05}{N^{1.02}} + 3.43$$
 ### 联合参数与集成缩放
 
 论文进一步组合了参数缩放和集成缩放，通过双重极限过程（$N \to \infty, K \to \infty$）估计最佳可能损失。Figure 5展示了这一过程：左侧为每个N拟合K→∞的渐近线，右侧为这些渐近线随N变化的幂律拟合。为优化渐近线而非小K时的损失，论文采用了启发式策略：使用2倍epoch和0.5倍权重衰减的正则化超参数。联合缩放配方的最终渐近线估计为**3.17**，显著优于正则化配方的3.43和标准未正则化配方的估计值3.75，损失降低了0.58。
-
 
 ![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_ck0aZTAnwK/figures/008_Figure_5.jpg]]
 *Figure 5: Composing the regularized and ensembling recipes under the double limit. Left: For each N , we fit a power law on the loss as K increases. We select hyperparameters for low asymptotes instead of loss at small K. Right: We take the asymptotes from the left plot and fit a power law to capture how the asymptote changes for bigger ensemble members. This law’s asymptote estimates the best possible loss under the joint scaling recipe*
@@ -296,7 +290,6 @@ $$\hat{\mathcal{L}}_D := \frac{A}{D^{\alpha}} + E$$
 
 **集成渐近线的超参数优化**（Figure 15; Appendix D.2-D.4）：为集成渐近线优化超参数（更多epoch、更少权重衰减）相比按单模型最优配置能获得更低的集成渐近线，验证了为不同目标定制超参数策略的重要性。
 
-
 ![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_ck0aZTAnwK/figures/021_Figure_15.jpg]]
 *Figure 15: Tuning hyperparameters of ensemble members for lowest asymptote under K $\infty$ We construct ensembles for different K when varying epoch count and weight decay. We find that the ranking between hyperparameters changes across K (left) and that the infinite member asymptote benefiting from more epochs and less weight decay per member*
 
@@ -341,11 +334,7 @@ $$\hat{\mathcal{L}}_D := \frac{A}{D^{\alpha}} + E$$
 ![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_ck0aZTAnwK/figures/026_Figure_19.jpg]]
 *Figure 19: Effect of regularization on overfitting for downstream benchmarks. Downstream benchmarks also reflect the benefit of heavy regularization on performance. The effect of overfitting on downstream benchmarks (right) appears at twice the epoch count compared to validation loss (left)*
 
-![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_ck0aZTAnwK/figures/031_Figure_20.jpg]]
-*Figure 20: Sensitity analysis. Left: When re-fitting the regularized power law across two additional seeds, we find that the asymptote stays relatively stable. Right: When subsampling the number of points for the ensemble scaling law, we find that the power law barely changes*
-
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 方法沿革与基线关系
 

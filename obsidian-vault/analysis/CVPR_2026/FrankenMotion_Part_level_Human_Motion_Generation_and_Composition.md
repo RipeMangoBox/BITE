@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/FrankenMotion_Part_level_Human_Motion_Generation_and_Composition.pdf
+project_link: https://coral79.github.io/frankenmotion/
+code_link: null
 aliases:
 - FrankenMotion
 tags:
@@ -40,7 +42,7 @@ claims:
 > - FrankenStein (test set) 上，Per-action realism (FID) 为 0.04。
 > - FrankenStein (test set) 上，Per-seq realism (FID) 为 0.06。
 
-## 概述
+## 概要
 
 文本驱动的人体运动生成近年来取得了显著进展，但现有方法普遍受限于粗粒度的全局序列描述或动作片段标签，缺乏对身体部件级别运动的细粒度、时间对齐的控制能力。这一瓶颈导致模型难以精确指定“左手抬起的同时右手保持不动”等空间-时间约束，限制了运动生成在交互式应用中的实用性。
 
@@ -49,8 +51,6 @@ claims:
 实验表明，FrankenAgent的自动标注经人工专家验证准确率达93.08%，标注者间一致性系数AC1为0.91。在FrankenStein测试集上，FrankenMotion在所有设定下均优于现有基线方法，在部件运动的语义正确性（M2T 0.76）和真实感（FID 0.04–0.06）上均取得最佳性能。消融实验进一步证实，仅使用部件级文本条件即可达到有竞争力的语义正确性（M2T 0.69），而加入原子动作和序列级文本后，部件运动的正确性和真实感进一步提升。
 
 该方法在方法谱系上定位于文本驱动运动生成与层次化条件控制的交叉点，通过引入部件级时间对齐标注和相应的扩散模型架构，填补了从全局运动控制到细粒度身体部件控制之间的空白。
-
-## 背景与动机
 
 文本驱动的人体运动生成旨在根据自然语言描述合成逼真的三维人体动作序列，在动画制作、虚拟现实和人机交互等领域具有广泛的应用前景。近年来，扩散模型和Transformer架构的引入显著提升了运动生成的质量与多样性，然而现有方法在控制粒度上仍存在根本性瓶颈：它们通常仅支持序列级或粗粒度动作片段的全局文本描述，缺乏对单个身体部位进行精确、时间对齐的细粒度控制能力。
 
@@ -62,7 +62,7 @@ claims:
 
 这种数据与模型协同设计的策略，为解决细粒度运动生成中的标注稀缺和可控性不足两大挑战提供了系统性的方案，也为后续探索更长时间跨度、更复杂交互场景下的运动生成奠定了基础。
 
-## 核心创新
+## 核心方法与创新机理
 
 FrankenMotion 的核心创新在于将**文本驱动的运动生成从全局序列描述推进到身体部件级别的细粒度时空控制**。这一突破通过两个紧密耦合的组件实现：一个基于大语言模型（LLM）的自动标注智能体 **FrankenAgent**，以及一个**层次化条件扩散模型** **FrankenMotion**。两者共同解决了现有方法中“缺乏时间对齐的身体部件级动作标注”这一核心瓶颈，使得模型能够学习、组合并生成具有精确部件语义的复杂运动。
 
@@ -105,8 +105,6 @@ FrankenMotion 处于**文本驱动的层次化运动生成**与**LLM 辅助的�
 3. **LLM 与运动生成的深度融合**：不同于仅用 LLM 做文本增强的现有工作，FrankenAgent 直接参与结构化时空标注的生成，开辟了 LLM 作为“运动理解推理引擎”的新角色。
 
 **待验证问题**：当部件级与动作级或序列级指令发生冲突时，模型如何处理不一致的条件？扩散模型架构如何具体处理时间对齐的部件级提示，以实现精确的逐帧控制？这些问题需要进一步的手动验证或源码分析。
-
-## 整体框架
 
 FrankenMotion 是一个基于扩散模型的部件感知人体运动生成框架，其核心设计理念是将复杂运动分解为原子运动元素，并通过层次化的文本条件实现细粒度的空间-时间控制。该框架由两条协同工作的主线构成：数据侧的 **FrankenAgent** 智能体负责从高层动作描述中自动推断并生成结构化、时间对齐的身体部件级文本标注；模型侧的 **FrankenMotion** 扩散模型则以这些多粒度文本条件为输入，学习合成符合指令的逼真运动序列。
 
@@ -163,8 +161,6 @@ FrankenMotion 是一个基于 Transformer 的扩散模型（Figure 3），其输
 
 FrankenMotion 的整体管线可概括为：**FrankenAgent（数据标注）→ CLIP Text Encoder（文本特征提取）→ Action-Part-Motion Embedding（联合嵌入）→ Transformer Diffusion Model（运动生成）**。其中，FrankenAgent 提供的三层时间对齐标注是整个框架实现细粒度部件控制的关键瓶颈突破点；扩散模型则通过层次化条件机制，将分解后的原子运动元素重新组合为符合高层语义的连贯运动序列。
 
-## 核心模块与公式推导
-
 ### 姿态表征
 
 FrankenMotion 沿用 STMC 的姿态表征方式。单帧姿态 $\mathbf{x}$ 由骨盆 Z 坐标、线性速度、角速度、SMPL 姿态参数及关节位置拼接而成：
@@ -197,7 +193,7 @@ $$\mathcal{L} = \mathbb{E}_{\mathbf{x}_0^{[1...T]}, \sigma, \epsilon} \Big[ \| f
 
 模型使用余弦噪声调度，共 100 步扩散步。优化器采用 AdamW，学习率 $2 \times 10^{-4}$，批大小 32。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 数据集构建与标注质量
 
@@ -227,10 +223,7 @@ FrankenMotion 的细粒度控制能力建立在 **FrankenStein** 数据集之上
 ![[assets/figures/papers/paper_list_l17_FrankenMotion_Part_level_Human_Motion_Generation_and_Composition/figures/007_Table_2.jpg]]
 *Table 2: Evaluating text to motion generation. We report the semantic correctness and realism of parts (averaged), action and sequence level motion, with 95% confidence interval (±) after 20 repeated evaluations. Across all settings, our FrankenMotion achieves the best performance, outperforming all prior baselines in both correctness and realism*
 
-![[assets/figures/papers/paper_list_l17_FrankenMotion_Part_level_Human_Motion_Generation_and_Composition/figures/009_Table_3.jpg]]
-*Table 3: Importance of hierarchical input condition. We train models that consume input of part only, or additionally with atomic action, or all part, action and sequence level (Seq.) texts. Even with part-level inputs alone, our model attains strong performance, achieving an M2T score close to the upper-bound GT reference. Incorporating action and sequence texts introduces high-level semantics for the desired motion, which further enhances both the correctness and realism of part-level motion generation*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 核心定位与继承关系
 

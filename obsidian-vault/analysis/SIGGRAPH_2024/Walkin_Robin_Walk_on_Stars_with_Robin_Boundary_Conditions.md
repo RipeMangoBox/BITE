@@ -5,6 +5,7 @@ paper_level: A
 venue: SIGGRAPH
 year: 2024
 pdf_ref: paperPDFs/SIGGRAPH_2024/Walkin_Robin_Walk_on_Stars_with_Robin_Boundary_Conditions.pdf
+code_link: null
 project_link: https://imaging.cs.cmu.edu/walk_on_stars_robin/
 aliases:
 - WRWRBC
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | Walkin' Robin：支持Robin边界条件的星形漫步方法 |
 | 英文题名 | Walkin' Robin: Walk on Stars with Robin Boundary Conditions |
 | 会议/期刊 | SIGGRAPH 2024 |
-| Links | [paper](https://research.nvidia.com/labs/prl/miller2024wost/WoStRobin.pdf); [Project](https://imaging.cs.cmu.edu/walk_on_stars_robin/) |
+| Links | [paper](https://research.nvidia.com/labs/prl/miller2024wost/WoStRobin.pdf) · [Project](https://imaging.cs.cmu.edu/walk_on_stars_robin/) |
 | Topic | #topic/optimization_theory_probabilistic #topic/optimization_theory_probabilistic/optimization_methods |
 | Method | Walkin' Robin (WoSt with Robin boundary conditions) |
 | Dataset | 多种几何（凸与非凸混合边界条件：Dirichlet, Neumann, Robin）, 常函数解问题 |
@@ -41,7 +42,7 @@ claims:
 > - 多种几何（凸与非凸混合边界条件：Dirichlet, Neumann, Robin） 上，相对均方误差 (RMSE) 与收敛速度 为 随样本数增加稳定下降，展现1/√N收敛，对比 WoB误差极大或不收敛，变化 误差降低数个数量级。
 > - 常函数解问题 上，估计值范围 (min, max) 为 保持在 [0, 1] 内，估计误差为零，对比 WoB可产生负值或大于1的值，RMSE高，变化 值域完全正确，误差消除。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -64,7 +65,7 @@ claims:
 
 Walkin’ Robin在方法谱系中定位明确：它继承WoSt的无网格、渐进式、输出敏感的优势，无需体网格即可在极复杂几何上快速获得局部解（Figure 1），同时将适用边界条件从Dirichlet-Neumann扩展到Robin，填补了无网格蒙特卡洛PDE求解器的重要空白。
 
-## 背景与动机
+
 
 ### 问题定义：带Robin条件的椭圆型边值问题
 
@@ -104,7 +105,9 @@ $$
 
 简言之，本文的方法修改仅限于**星形区域半径的选择方式**这一处（Figure 5），其余WoSt框架保持不变。这一简洁的改动打通了Dirichlet、Neumann、Robin任意混合边界条件下的无网格蒙特卡洛求解，为复杂几何上的物理仿真提供了实用的渐进式求解工具。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心贡献在于将**Walk on Stars (WoSt)** 方法从仅支持 Dirichlet 和 Neumann 边界条件，扩展到支持**Robin 边界条件**（即混合吸收与反射的物理边界）。这一扩展的关键瓶颈在于：若星形区域半径选择不当，Robin 条件下的反射项可能导致随机游走的 throughput 发散，使蒙特卡洛估计的方差无界。本文通过引入**反射率函数**并据此**动态约束星形区域半径**，从根本上解决了这一问题。
 
@@ -152,7 +155,7 @@ $$
 
 为高效计算满足 ρ_μ 约束的半径，本文将**空间化法向锥层次结构 (SNCH)** 扩展为在节点中存储 min/max Robin 系数（Section 5.2, Figure 9）。此外，将双向 WoS 和边界值缓存 (BVC) 技术扩展到 Robin 问题（Section 6, Figure 10），进一步降低估计方差。这些工程扩展增强了方法的实用性，但核心创新仍在于 ρ_μ 驱动的半径约束与 Russian roulette 终止机制。
 
-## 整体框架
+
 
 Walkin' Robin 的求解流程围绕**随机游走估计器**展开，将 Robin 边界条件无缝嵌入 Walk on Stars（WoSt）框架。整个 pipeline 由三个核心模块串联而成，输入为三角形网格定义的域 Ω、边界条件（Dirichlet/Neumann/Robin 混合）及 PDE 源项，输出为域内任意查询点上的无偏或可控偏差解估计。
 
@@ -194,7 +197,7 @@ Walkin' Robin 的求解流程围绕**随机游走估计器**展开，将 Robin �
 
 最终，对每个查询点独立运行 N 条游走并取平均，得到该点的解估计。整个流程天然支持**渐进式、输出敏感**的求值——仅计算用户关心的空间点，无需全局求解（Figure 1）。
 
-## 核心模块与公式推导
+
 
 ### 问题定义与基本框架
 
@@ -277,7 +280,9 @@ $$
 - **纯 Neumann 退化**：当所有边界均为 Neumann（$\mu=0$ 处处成立）时，解仅确定到常数，仍需 Tikhonov 正则化引入额外偏差。
 - **$\varepsilon$-shell 偏差-效率权衡**：$\varepsilon$ 壳层参数控制游走终止的近似程度，增大 $\varepsilon$ 可减少步数但引入偏差（如全局变暗或 Voronoi-like 解），虽然偏差随 $\varepsilon$ 减小迅速消失，但仍需用户权衡（Figure 11）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果：蒙特卡洛收敛性与偏差-方差权衡
 
@@ -327,7 +332,9 @@ WoSt 使用单一的 $\varepsilon$-壳层参数控制解的偏差与 walk 步数
 *Figure: dist. to silhoue e R = (single intersection) WoSt for Robin ( )μ > 0*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 在蒙特卡洛PDE求解器谱系中的位置
 
@@ -389,6 +396,8 @@ WoSt相对于WoB的核心优势在于：它通过**精确模拟布朗运动的�
 3. 是否存在比星形区域更大的子域，能在保持throughput有界的前提下允许更大步长？
 4. 在极低 $\varepsilon$ 值下，如何进一步提升游走效率同时不牺牲精度？
 5. 负的 $\mu$（发射性边界）能否通过对称性处理纳入当前框架？
+
+
 
 ## 原文 PDF
 

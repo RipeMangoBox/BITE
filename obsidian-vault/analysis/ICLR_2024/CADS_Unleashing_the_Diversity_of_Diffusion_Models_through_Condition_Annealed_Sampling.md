@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2024
 pdf_ref: paperPDFs/ICLR_2024/CADS_Unleashing_the_Diversity_of_Diffusion_Models_through_Condition_Annealed_Sampling.pdf
+project_link: http://probml.github.io/book2
+code_link: https://github.com/CompVis/latent-diffusion
 aliases:
 - CCADS
 - CADS
@@ -33,7 +35,7 @@ claims:
 | 中文题名 | CADS：通过条件退火采样释放扩散模型的多样性 |
 | 英文题名 | CADS: Unleashing the Diversity of Diffusion Models through Condition-Annealed Sampling |
 | 会议/期刊 | ICLR 2024 |
-| Links | [paper](https://openreview.net/forum?id=zMoNrajk2X) · [arXiv](http://arxiv.org/abs/1406.2661) · [Project](http://probml.github.io/book2) · [Code](https://github.com/CompVis/latent-diffusion) |
+| Links | [paper](https://openreview.net/forum?id=zMoNrajk2X) · [paper](http://arxiv.org/abs/1406.2661) · [Project](http://probml.github.io/book2) · [Code](https://github.com/CompVis/latent-diffusion) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction #topic/generative_models_diffusion #topic/generative_models_diffusion/diffusion_image_video |
 | Method | CADS (Condition-Annealed Diffusion Sampler) |
 | Dataset | DeepFashion pose-to-image, ImageNet 256×256 class-conditional, ImageNet 512×512 class-conditional |
@@ -43,7 +45,7 @@ claims:
 > - ImageNet 256×256 class-conditional 上，FID 9.47 vs 20.83 (DDPM) (-11.36)。
 > - ImageNet 512×512 class-conditional 上，FID 9.81 vs 23.10 (DDPM) (-13.29)。
 
-## 概述
+## 概要
 
 条件扩散模型在推理时面临一个根本性的瓶颈：当使用高无分类器引导（CFG）尺度或在有限数据集上训练时，条件分布会变得异常尖锐，导致生成样本高度趋同，多样性严重不足。**CADS（Condition-Annealed Diffusion Sampler）** 针对这一问题提出了一个简洁而高效的解决方案——在采样过程中向条件向量添加随时间衰减的高斯噪声，通过“退火”条件信号的强度来平滑条件分布，从而在保持高图像质量的同时大幅释放生成多样性。
 
@@ -56,7 +58,7 @@ CADS 的核心优势体现在三个层面：
 
 需要指出的是，CADS 目前依赖手动调节场景相关的超参数（噪声尺度 s、退火阈值 τ₁/τ₂、混合因子 ψ），在更复杂的条件模态（如密集语义分割掩码）上的适用性仍有待验证。
 
-## 背景与动机
+
 
 ### 扩散模型的条件生成困境
 
@@ -85,7 +87,9 @@ CADS 的核心优势在于：
 - **计算开销极小**：仅涉及条件向量的加性噪声注入和重缩放操作（Algorithm 1）。
 - **质量-多样性权衡的突破**：在 ImageNet 256×256 类条件生成中，CADS 将 FID 从 DDPM 的 20.83 降至 9.47（Table 1），并在 DiT-XL/2 上达到新的最先进 FID 1.70（Table 2），同时显著提升了 Recall 和 Vendi Score 等多样性指标。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CADS 的核心创新在于**将条件信号视为一个可退火的变量**，而非扩散模型推理过程中固定不变的输入。这一视角转换催生了一个极其轻量却高效的采样策略，其关键创新点可归纳为三个相互关联的“changed slots”。
 
@@ -127,7 +131,7 @@ CADS 最显著的优势在于**无需对预训练扩散模型进行任何重新�
 
 这三个创新点的协同作用，使得 CADS 能够在保持甚至提升图像质量的前提下，将 DeepFashion 姿态生成任务的 Recall 从 0.02 提升至 0.48，将 ImageNet 256×256 类条件生成的 FID 从 20.83 降至 9.47，并在 DiT-XL/2 上取得 FID 1.70 的新 SOTA。
 
-## 整体框架
+
 
 CADS（Condition-Annealed Diffusion Sampler）是一种即插即用的推理时采样策略，其核心思想是通过在扩散模型的采样循环中逐步衰减（退火）条件信号的强度，来平滑尖锐的条件分布，从而在保持生成质量的同时大幅提升样本多样性。整个框架无需对预训练扩散模型进行任何重新训练，也无需修改模型权重或架构，仅需在标准采样循环中插入一个轻量级的**条件退火模块**。
 
@@ -155,7 +159,7 @@ $$
 ![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_zMoNrajk2X/figures/015_Figure_7.jpg]]
 *Figure 7: Visual illustration of how different hyperparameters affect CADS*
 
-## 核心模块与公式推导
+
 
 CADS 的核心思想是在扩散模型的推理采样过程中，向条件向量注入随时间衰减的高斯噪声，从而平滑尖锐的条件分布，在保持生成质量的同时大幅提升多样性。该方法无需对预训练扩散模型进行任何重新训练，且计算开销极小，仅涉及加法操作。
 
@@ -225,7 +229,9 @@ CADS 的核心可控参数包括：
 
 消融实验表明，$s$ 从 0.025 增大到 0.1 可改善 FID 和 Recall，但 $s = 0.25$ 会严重损害质量（FID 升至 42.58）（Table 6a）；$\tau_1 = 0.6$ 在质量和多样性之间达到最佳平衡（Table 6b）；CADS 对噪声分布类型（高斯、拉普拉斯、伽马）不敏感，仅标准差影响结果（Table 11）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与实验动机
 
@@ -305,7 +311,9 @@ Dynamic CFG通过退火函数直接缩放引导权重（$\hat{w}_{\mathrm{CFG}} 
 ![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_zMoNrajk2X/figures/032_Table_11.jpg]]
 *Table 11: Comparing different noise distributions for n in Equation (1) on class-conditional ImageNet generation with*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 主要基线对比与谱系关系
 
@@ -354,6 +362,8 @@ CADS 的核心定位是**推理时采样策略**，而非新的扩散模型架�
 - **退火调度的理论最优性**：当前的分段线性退火调度是经验选择（实验表明其优于多项式退火，见 Table 10），是否存在理论上的最优退火形式？退火速率与条件分布尖锐度之间的关系是什么？
 
 - **评估指标的局限性**：论文指出 IS 和 Precision 在评估多样性时存在局限性，会对 DDPM 给出虚高的值（Table 12），而 FID 更能综合反映真实性和多样性。这一发现对扩散模型生成质量的评估体系有更广泛的启示，需要进一步研究。
+
+
 
 ## 原文 PDF
 

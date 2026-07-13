@@ -43,7 +43,7 @@ claims:
 > - LiVERSet eval 上，FVD 32.56；FID 129.56；CLIP 30.97。
 > - User Study 上，VQ↑ 83.4%；SC↑ 83.3%；CC↑ 72.1%。
 
-## 概述
+## 概要
 
 现有可控视频生成方法在引入3D场景信息时，通常仅关注几何布局与相机轨迹，而忽略了物理光照建模。这导致生成的视频中阴影、反射、环境光遮蔽等光照效果与真实材质表现脱节，缺乏物理真实感。LiVER 针对这一瓶颈，提出将光照作为场景的统一物理属性之一，通过**渲染器代理**将3D场景的光照行为显式分解为漫反射、粗糙GGX和光滑GGX三个2D渲染通道，并将这些物理线索作为条件信号注入预训练视频扩散模型，实现了场景布局、相机轨迹与物理光照的解耦控制。
 
@@ -51,7 +51,7 @@ claims:
 
 方法谱系上，LiVER 延续了 **CameraCtrl**（He et al., ICLR 2025）等工作的可控视频生成路线，但将条件模态从文本描述和2D轨迹拓展为**光照约束的场景代理**，并采用三阶段训练策略（条件通路训练→联合LoRA微调→光照多样性扩展）来稳定收敛。与 **VideoFrom3D**（Kim et al., SIGGRAPH Asia 2025）等3D场景视频生成方法相比，LiVER 的差异化在于显式引入基于物理的渲染通道，而非仅依赖图像-视频扩散的互补先验。在知识库定位上，该方法处于3D感知视频生成与物理渲染的交叉地带，为可控视频合成提供了新的光照维度。
 
-## 背景与动机
+
 
 可控视频生成旨在根据用户提供的条件信号（如文本描述、相机轨迹、边界框等）合成视觉上真实且结构上一致的视频序列。近年来，以扩散模型（Diffusion Models）为核心的视频生成方法取得了显著进展，能够生成具有丰富语义和时序连贯性的视频内容。然而，当用户需求从“生成一段视频”升级为“精确控制场景的物理属性”时，现有方法暴露出一个根本性瓶颈：**光照建模的缺失**。
 
@@ -63,7 +63,9 @@ claims:
 
 基于上述动机，本文提出**LiVER（Lighting-grounded Video Generation with Renderer-based Agent Reasoning）**，一个基于渲染器代理推理的光照约束视频生成框架。LiVER通过三个核心设计填补了现有方法的缺口：（1）引入渲染器代理（Renderer-based Agent），从文本提示中推理出3D场景、HDR光照环境和相机轨迹；（2）利用基于物理的渲染器生成光照约束的场景代理（Scene Proxy），包含漫反射、粗糙GGX和光滑GGX三个2D通道；（3）通过轻量级编码器和适配器模块，将这些物理线索注入预训练视频扩散模型，实现场景布局、相机轨迹与物理光照的解耦控制。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 从“几何感知”到“光照感知”的条件范式迁移
 
@@ -95,7 +97,7 @@ $$z' = z + \alpha \cdot z^y$$
 
 消融实验证实，跳过第一阶段直接从联合训练开始会导致输出几乎静止、质量严重退化；仅用真实数据而不用合成数据则会产生错误且均匀的照明效果。这表明分阶段训练策略不仅是工程优化，更是实现光照解耦控制的必要条件——模型需要先“学会看光照”，再“学会用光照”，最后“学会适应不同光照”。
 
-## 整体框架
+
 
 LiVER 的整体设计围绕一个核心洞察展开：**将光照建模为场景的统一物理属性**，并通过渲染器代理将3D场景的几何、材质与光照信息压缩为2D渲染通道，作为条件信号注入预训练视频扩散模型，从而实现对场景布局、相机轨迹与物理光照的解耦控制。
 
@@ -141,7 +143,7 @@ LiVER 处于**3D感知可控视频生成**与**物理光照建模**的交叉点�
 ![[assets/figures/papers/paper_list_l2537_https_arxiv_org_abs_2604_07966/figures/001_Figure_1.jpg]]
 *Figure 1: Overall framework. (1) A renderer-based agent produces a coarse geometric layout, camera trajectory, and a High Dynamic Range (HDR) environment map. (2) Physically-based rendering generates a lighting-grounded scene proxy containing diffuse, rough, and glossy materials with shading signals. (3) These physical cues are injected into a video diffusion model to synthesize photorealistic sequences with accurate lighting behavior, faithful scene layout, and precisely aligned camera trajectory*
 
-## 核心模块与公式推导
+
 
 LiVER 的核心设计思路是将物理光照建模为显式条件信号，通过渲染器代理（Renderer-based Agent）将 3D 场景属性转换为 2D 光照通道，再注入预训练视频扩散模型，实现对场景布局、相机轨迹和光照行为的解耦控制。整个流水线由四个关键模块构成。
 
@@ -187,7 +189,9 @@ $$
 ![[assets/figures/papers/paper_list_l2537_https_arxiv_org_abs_2604_07966/figures/002_Figure_2.jpg]]
 *Figure 2: Our data annotation pipeline for LiVER-Real. We process each video to reconstruct its 3D geometry and estimate its HDR environment map. These are then used to render three pixel-aligned lighting representations (Diffuse, Glossy GGX, Rough GGX), which are concatenated to form the final conditioning input*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 评估设置
 
@@ -246,7 +250,9 @@ LiVER 在自建数据集 **LiVERSet** 上进行评估，该数据集包含超过
 ![[assets/figures/papers/paper_list_l2537_https_arxiv_org_abs_2604_07966/figures/007_Figure_6.jpg]]
 *Figure 6: Qualitative results of our ablation study*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有可控视频生成方法的关系
 
@@ -283,6 +289,8 @@ LiVER 开辟了物理光照约束视频生成这一新方向，同时留下了�
 **泛化至非刚性物体与室外场景**。当前实验主要集中于刚性物体的室内/产品级场景。方法能否泛化至包含非刚性变形（如布料、流体）和复杂室外光照（如天空模型、体积光散射）的场景，仍需验证。
 
 **计算效率优化**。三阶段训练策略（Conditional Pathway Training → Joint LoRA Fine-tuning → Lighting Diversity Expansion）虽然对稳定收敛至关重要（消融实验表明直接从联合训练开始会导致输出几乎静止），但增加了训练复杂度。能否通过更高效的训练策略或架构设计减少阶段数，同时保持生成质量？
+
+
 
 ## 原文 PDF
 

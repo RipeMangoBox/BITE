@@ -43,7 +43,7 @@ claims:
 > - SUN 上，Acc (CZSL) 77.7%。
 > - AWA2 上，Acc (CZSL) 84.0%。
 
-## 概述
+## 概要
 
 生成式零样本学习（Generative Zero-Shot Learning, GZSL）通过合成未见类别的视觉特征来弥合语义与视觉模态之间的鸿沟。然而，现有方法面临两个关键瓶颈：**合成特征与下游分类任务脱节（任务无关）**，以及**仅依赖语义原型导致视觉相似但语义相近的类别特征重叠严重**。其根本原因在于，传统生成器仅以对抗损失为优化目标，缺乏来自分类任务的直接反馈信号。
 
@@ -51,7 +51,7 @@ claims:
 
 在 CUB、SUN 和 AWA2 三个标准基准上，RLVC 在 CZSL 和 GZSL 两种设置下均取得最优结果，平均准确率提升约 **4.7%**（Table 1）。消融实验证实，强化学习奖励与视觉线索两个组件对性能提升均有显著贡献（Table 3）。
 
-## 背景与动机
+
 
 ### 零样本学习的生成式范式
 
@@ -77,7 +77,9 @@ Figure 1(a) 直观展示了这一困境：现有方法合成的特征分布散�
 
 Figure 1(b) 展示了 RLVC 的预期效果：合成特征在奖励信号的引导下趋向任务相关，在视觉原型的约束下呈现清晰的类内聚集和类间分离。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 RLVC的核心创新在于将生成式零样本学习（ZSL）重新置于强化学习（RL）视角下，通过两个关键“changed slots”解决了现有方法的根本瓶颈：**合成特征与下游分类任务脱节**以及**语义原型导致的类间特征重叠**。
 
@@ -115,7 +117,7 @@ RL训练对奖励模型质量高度敏感。RLVC采用**冷启动**策略：先�
 
 综上，RLVC通过“结果奖励对齐任务目标 + 视觉原型增强类内紧凑性 + 冷启动保障训练稳定”三个changed slots的协同作用，在CUB、SUN、AWA2三个基准上取得平均4.7%的CZSL准确率提升，实现了生成式ZSL从“分布模仿”到“任务驱动”的范式跃迁。
 
-## 整体框架
+
 
 RLVC 将生成式零样本学习重新表述为一个结果奖励驱动的强化学习问题，其整体架构由四个核心模块构成闭环，如图 2 所示。
 
@@ -132,7 +134,7 @@ RLVC 将生成式零样本学习重新表述为一个结果奖励驱动的强化
 ![[assets/figures/papers/paper_list_l2687_https_arxiv_org_abs_2603_21138/figures/002_Figure_2.jpg]]
 *Figure 2: Model architecture and training of RLVC. The top panel shows how we train the reward model with a visual encoder to produce fine-tuned visual features and reward signals. The bottom panel depicts how we update the policy model*
 
-## 核心模块与公式推导
+
 
 ### 3.1 扩散生成基座
 
@@ -181,7 +183,9 @@ $$\mathcal{L}_G^{\mathrm{total}} = \mathcal{L}_G^{\mathrm{adv}} + \lambda_{\math
 ![[assets/figures/papers/paper_list_l2687_https_arxiv_org_abs_2603_21138/figures/001_Figure_1.jpg]]
 *Figure 1: Motivating illustration. (a) Existing generative ZSL methods train with adversarial losses conditioned only on semantic prototypes. This often leads to task-agnostic synthesized features and inter-class overlap. (b) Our RLVC incentivizes the generative model updating via RL reward and visual cues, enabling synthesized features that remain task-relevant and faithfully represent the data distribution*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -242,7 +246,9 @@ RLVC 在三个标准零样本学习基准上进行评估：**CUB**（细粒度�
 ![[assets/figures/papers/paper_list_l2687_https_arxiv_org_abs_2603_21138/figures/008_Figure_4.jpg]]
 *Figure 4: Qualitative t-SNE visualization of RLVC on CUB: (a) without RL and visual cues, (b) without visual cues, and (c) full RLVC. We use real features of seen classes and synthetic features of unseen classes. Zoom in for details*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 生成式零样本学习的演进
 
@@ -280,6 +286,8 @@ RLVC的设计隐含以下假设和边界条件：
 3. **可学习的视觉原型**：当前视觉原型为固定均值，缺乏对未见类的适应能力。若将视觉原型设计为可学习参数或通过元学习从语义原型预测，可能进一步提升跨类泛化能力。
 
 4. **跨任务迁移**：RLVC的“生成器-奖励模型”协同框架本质上是任务感知条件生成的一种通用范式。它能否推广到文本到图像合成、跨模态生成等其他条件生成任务，其有效性边界在哪里，是更广泛的研究问题。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/AudioAvatar_Personalized_Audio_driven_Whole_body_Talking_Avatars.pdf
+project_link: null
 code_link: null
 aliases:
 - AudioAvatar
@@ -40,15 +41,13 @@ claims:
 > - 测试集（30位受试者） 上，IQA↑ 4.22 vs 4.08 (HunyuanVideo-Avatar) (+3.4%)。
 > - 测试集 上，ASE↑ 2.83 vs 2.71 (HunyuanVideo-Avatar) (+4.4%)；SyncC↑ 7.20 vs 6.90 (HunyuanVideo-Avatar) (+4.3%)；SyncD↓ 5.42 vs 6.80 (PERSONA) (-20.3%)。
 
-## 概述
+## 概要
 
 传统音频驱动的全身对话虚拟形象通常采用**级联流水线**：先将音频映射为参数化人体姿态（如SMPL-X/FLAME），再通过线性混合蒙皮（LBS）驱动3D模型渲染。这一范式存在根本性的**有损瓶颈**——音频到姿态的映射误差在后续渲染环节中被逐级放大，导致音频-运动同步性下降，并严重抑制唇部微表情、手指细节等高频表达（图2）。此外，骨骼驱动的LBS变形受限于全局刚性约束，难以实现对脸部、手部的局部高频控制。
 
 AudioAvatar 提出了一种**端到端框架**，直接由音频信号驱动全身对话虚拟形象，跳过了中间的参数化姿态预测环节。其核心创新在于将虚拟形象建模为规范空间下的**粒子变形场**——一组3D高斯原语在音频条件下的轨迹演化，从而实现对脸部、手部和身体的局部高频控制，同时保持全身运动的全局一致性。该方法进一步通过**大规模视频扩散模型的特征蒸馏**与**轨迹对齐损失**，将视频生成先验注入高斯渲染过程，显著提升了渲染质量与音画同步性。
 
 在包含30位受试者的测试集上，AudioAvatar 在图像质量（IQA 4.22）、音画同步性（SyncC 7.20, SyncD 5.42）和时序一致性（FVD 240）等指标上均优于现有最优方法（表1）。消融实验证实，音频-粒子运动嵌入、视频分数蒸馏损失和轨迹对齐损失等组件对同步性和运动自然度具有关键贡献。
-
-## 背景与动机
 
 ### 音频驱动虚拟形象：从级联管道到端到端生成
 
@@ -72,7 +71,7 @@ AudioAvatar的核心动机正是弥合这一缺口。其关键洞察在于：**�
 
 此外，AudioAvatar还引入**大规模视频扩散模型的特征蒸馏**与**合成对话视频的弱监督**，将视频扩散模型在自然度和音画同步方面的先验注入3D高斯渲染管道，从而在不牺牲几何一致性的前提下获得接近视频扩散模型的表达质量。这一“蒸馏2D先验以增强3D生成”的策略，代表了将扩散模型能力迁移到结构化3D场景的新方向。
 
-## 核心创新
+## 核心方法与创新机理
 
 AudioAvatar 的核心创新在于**彻底跳过了传统“音频→参数化姿态→渲染”的级联范式**，转而构建一个端到端的、音频直接驱动高斯粒子变形场的框架。这一变革由三个相互耦合的 **changed slots** 支撑，共同破解了音频-运动同步误差累积的瓶颈。
 
@@ -106,8 +105,6 @@ $$X^0 = \mathcal{F}(X^\tau | \mathbf{A}, \tau)$$
 
 三项 changed slots 形成因果闭环：直接音频调制保留了高频信息，粒子变形场提供了表达这些信息的几何载体，而扩散蒸馏与轨迹对齐则确保这些高频运动在时序上连贯且与音频精确同步。这一设计使 AudioAvatar 在同步性指标 SyncD 上相对最强基线（PERSONA）降低 20.3%，在视觉质量 FID 上相对 HunyuanVideo-Avatar 降低 27.9%（Table 1），实现了全身对话虚拟形象从“能驱动”到“高同步、高表现力”的质变。
 
-## 整体框架
-
 AudioAvatar 提出了一种端到端的单张图像到全身对话虚拟形象的生成框架，其核心设计目标是从音频信号直接驱动三维高斯粒子的变形，从而绕过传统方法中“音频→参数化姿态→渲染”的级联瓶颈。整个 pipeline 可以划分为两条相互交织的主线：**外观重建流** 与 **音频-运动生成流**，二者通过共享的高斯表示和联合优化目标协同工作。Figure 1 给出了框架的全局视图。
 
 ![[assets/figures/papers/paper_list_l1053_https_openaccess_thecvf_com_content_CVPR2026_html_Lee_AudioAvatar_Person/figures/001_Figure_1.jpg]]
@@ -140,8 +137,6 @@ AudioAvatar 提出了一种端到端的单张图像到全身对话虚拟形象�
 ### 补充图表
 
 ![[assets/figures/papers/paper_list_l1053_https_openaccess_thecvf_com_content_CVPR2026_html_Lee_AudioAvatar_Person/figures/002_Figure.jpg]]
-
-## 核心模块与公式推导
 
 AudioAvatar 的核心架构围绕一个端到端的可微渲染管线展开，其关键创新在于用**音频条件粒子变形场**替代传统的骨骼驱动变形，从而实现对全身虚拟形象的高频局部控制。整个管线由五个紧密耦合的模块构成，其数学基础如下。
 
@@ -207,13 +202,10 @@ $$
 ![[assets/figures/papers/paper_list_l1053_https_openaccess_thecvf_com_content_CVPR2026_html_Lee_AudioAvatar_Person/figures/004_Figure_4.jpg]]
 *Figure 4: The pipeline of audio-driven particle motion generation, Sec. 3.2. Given aligned audio features, the model first predicts whole-body particle motions using a diffusion Transformer and then applies a dedicated refinement module to face and hand regions to capture fine-grained expressive motions. This hierarchical generation process enables high-fidelity, co-speech motion synthesis across both global body movement and detailed local articulations*
 
-![[assets/figures/papers/paper_list_l1053_https_openaccess_thecvf_com_content_CVPR2026_html_Lee_AudioAvatar_Person/figures/006_Figure_5.jpg]]
-*Figure 5: The schematic flow of the trajectory alignment loss and the video score distillation sampling loss. The deformed Gaussians are rendered to obtain images and their corresponding 3D and 2D trajectories. The 2D trajectories are aligned with the ground-truth trajectories to maximize correspondence. In parallel, the rendered images are passed through a denoising network to extract scores, which are optimized to match the ground-truth scores*
-
 ![[assets/figures/papers/paper_list_l1053_https_openaccess_thecvf_com_content_CVPR2026_html_Lee_AudioAvatar_Person/figures/007_Figure_6.jpg]]
 *Figure 6: Overview of video data synthesis pipeline used for video diffusion distillation. We first generate diverse full-body human identities via a foundational text-conditioned image generative model and pair them with speech audio synthesized from a curated text corpus. Several Audio-driven video diffusion models is used to produce temporally synchronized talking human videos, yielding highfidelity, audio-aligned training data for supervising Gaussian deformation learning*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -253,7 +245,7 @@ AudioAvatar在包含30位受试者的测试集上全面超越现有方法。与�
 
 ![[assets/figures/papers/paper_list_l1053_https_openaccess_thecvf_com_content_CVPR2026_html_Lee_AudioAvatar_Person/figures/003_Figure.jpg]]
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 方法继承与基线对比
 

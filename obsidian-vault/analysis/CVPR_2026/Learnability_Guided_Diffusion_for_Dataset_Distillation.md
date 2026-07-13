@@ -45,15 +45,13 @@ claims:
 > - ImageWoof 上，Accuracy (ResNet-18, IPC 100) 72.9±0.6 vs IGD: 70.6±1.8, DiT: 62.3±0.5 (+2.3 over IGD, +10.6 over DiT)。
 > - ImageNet-1K 上，Top-1 Accuracy (ResNet-18, IPC 50) 60.1±0.1 vs IGD: 59.7±0.3 (reported in part_005) (+0.4 over IGD)。
 
-## 概述
+## 概要
 
 数据集蒸馏旨在将大规模数据集压缩为极少量高信息密度的合成样本，使下游模型仅用这些样本训练即可达到与全数据训练相近的性能。然而，当前主流蒸馏方法存在一个被忽视的根本瓶颈：**合成样本之间存在严重的信息冗余**。实验表明，将蒸馏数据集按10 IPC（每类图像数）划分为不相交的增量子集后，现有方法（如DiT、IGD）中，用前一个增量训练的模型对后一个增量评估的交叉验证准确率高达80–98%，这意味着不同增量传递了大量重叠的训练信号，多个样本在教模型同样的东西（见 Figure 1、Figure 2）。这种冗余源于现有范式在生成时仅追求视觉多样性或匹配平均训练轨迹，而忽视了不同样本间训练信号的互补性。
 
 针对上述瓶颈，本文提出 **可学习性引导的扩散模型（Learnability-Guided Diffusion, LGD）**，核心思路是将数据集蒸馏重新建模为**增量式序列学习问题**：以当前模型的可学习性为条件，引导扩散模型生成能够填补模型知识缺口的互补样本，从而构建自适应的课程学习。具体而言，LGD 通过一个增量蒸馏循环（Figure 3），在每一阶段训练模型、评估其对候选样本的“可学习性分数”（当前模型损失与参考模型损失的差值），并以该分数的梯度调制扩散噪声，使生成过程偏向高可学习性区域，同时通过偏离引导增强类内多样性。这一机制使每个新增量都能提供非冗余、最大化边际学习收益的训练信号，从根本上减少冗余并提升样本效率。
 
 实验验证了 LGD 的有效性：与 DiT 相比，LGD 将冗余降低了 **39.1%**；在 ImageNet-1K 上取得 **60.1%** 的 Top-1 准确率（ResNet-18, IPC 50），在 ImageNette 和 ImageWoof 上分别达到 **87.2%** 和 **72.9%**（ConvNet-6/ResNet-18, IPC 100），均达到最优或具有竞争力的水平（Table 1、Table 2）。增量训练动态分析（Figure 4）进一步证实，LGD 的每个增量都能持续带来显著的损失尖峰和准确率增益，而基线方法的增益随阶段增加迅速衰减，从实证层面验证了互补性机制的有效性。
-
-## 背景与动机
 
 ### 数据集蒸馏的核心目标
 
@@ -77,7 +75,7 @@ $$ \underset { \mathcal { D } } { \mathop { \operatorname* { m i n } } } \left| 
 
 在 LGD 框架下，同样的增量划分实验中，用 $\mathcal{I}_0$ 训练的模型对 $\mathcal{T}_1$ 的准确率骤降至仅 17.0%，证实了增量间的高度互补性。通过将合成过程与学习者不断演变的状态对齐，每个增量批次都能提供非冗余、最大化边际学习收益的训练信号，从根本上减少冗余并显著提升样本效率。
 
-## 核心创新
+## 核心方法与创新机理
 
 ### 从冗余到互补：范式转换
 
@@ -123,8 +121,6 @@ $$\mathcal{G}_D(\boldsymbol{x}) = \frac{\boldsymbol{x} \cdot \tilde{\boldsymbol{
 
 增量训练动态（Figure 4）直观展示了 LGD 的优势：每个新加入的增量都能带来显著的损失尖峰和持续的准确率增益（+12.0%, +3.2%, +5.4%, +6.4%），而 DiT 的增益随阶段快速衰减（+7.2%, +4.8%, +2.2%, +0.4%）。整体上，LGD 将冗余降低了 **39.1%**，并在 ImageNet-1K（60.1%）、ImageNette（87.2%）、ImageWoof（72.9%）上取得最优或具有竞争力的结果。
 
-## 整体框架
-
 LGD 将数据集蒸馏重新定义为**增量式序列学习问题**，其核心 pipeline 由四个模块构成一个闭环迭代过程，如 Figure 3 所示。
 
 ![[assets/figures/papers/paper_list_l2689_https_openaccess_thecvf_com_content_CVPR2026_html_Chan_Santiago_Learnabi/figures/003_Figure_3.jpg]]
@@ -169,8 +165,6 @@ $$\mathcal{G}_D(\boldsymbol{x}) = \frac{\boldsymbol{x} \cdot \tilde{\boldsymbol{
 - **最终输出**：完整蒸馏数据集 𝒟_K（含 K 个增量），可直接用于下游模型训练
 
 整个框架的关键设计在于**以学习者状态为条件的自适应生成**，使得每个增量批次都能提供非冗余的训练信号。Figure 4 的训练动态验证了这一机制的有效性：LGD 的每个增量加入时都产生显著的损失尖峰和持续的准确率增益，而 DiT 的增益随阶段快速衰减。
-
-## 核心模块与公式推导
 
 ### 问题建模：增量式数据集蒸馏
 
@@ -271,7 +265,7 @@ $$
 ![[assets/figures/papers/paper_list_l2689_https_openaccess_thecvf_com_content_CVPR2026_html_Chan_Santiago_Learnabi/figures/002_Figure_2.jpg]]
 *Figure 2: Cross-validation across distilled data increments*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -334,16 +328,13 @@ LGD 的核心动机在于现有蒸馏方法存在严重信息冗余。为量化�
 ![[assets/figures/papers/paper_list_l2689_https_openaccess_thecvf_com_content_CVPR2026_html_Chan_Santiago_Learnabi/figures/008_Table_3.jpg]]
 *Table 3: Cross-Architecture Evaluation on ImageNette*
 
-![[assets/figures/papers/paper_list_l2689_https_openaccess_thecvf_com_content_CVPR2026_html_Chan_Santiago_Learnabi/figures/009_Table_4.jpg]]
-*Table 4: Progression across data increments on ImageNette. Accuracy at each IPC level as additional increments are sequentially added (IPC10 ↓ IPC100)*
-
 ![[assets/figures/papers/paper_list_l2689_https_openaccess_thecvf_com_content_CVPR2026_html_Chan_Santiago_Learnabi/figures/006_Figure_5.jpg]]
 *Figure 5: Learning-dynamics visualization of original and distilled samples. Each point shows a sample’s mean and standard deviation of ground-truth class probability across training (50 epochs). Top-left points are easy (high*
 
 ![[assets/figures/papers/paper_list_l2689_https_openaccess_thecvf_com_content_CVPR2026_html_Chan_Santiago_Learnabi/figures/010_Figure_6.jpg]]
 *Figure 6: In-distribution and learning-dynamics analysis of distilled datasets. Each point represents a sample described by its groundtruth (GT) class probability from the reference model (x-axis, measuring in-distribution likelihood*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 问题脉络：从分布匹配到可学习性引导
 

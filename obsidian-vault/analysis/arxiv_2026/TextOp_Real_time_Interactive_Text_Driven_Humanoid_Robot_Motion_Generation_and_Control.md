@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2026
 pdf_ref: paperPDFs/arxiv_2026/TextOp_Real_time_Interactive_Text_Driven_Humanoid_Robot_Motion_Generation_and_Control.pdf
+project_link: https://text-op.github.io/
+code_link: https://github.com/microsoft/onnxruntime
 aliases:
 - TextOp
 tags:
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | TextOp：实时交互式文本驱动人形机器人运动生成与控制 |
 | 英文题名 | TextOp: Real-time Interactive Text-Driven Humanoid Robot Motion Generation and Control |
 | 会议/期刊 | arXiv 2026 |
-| Links | [paper](https://arxiv.org/abs/2602.07439v1) · [Project](https://text-op.github.io/) · [arXiv](https://arxiv.org/abs/2505.08712) · [Code](https://github.com/microsoft/onnxruntime) |
+| Links | [paper](https://arxiv.org/abs/2602.07439v1) · [Project](https://text-op.github.io/) · [paper](https://arxiv.org/abs/2505.08712) · [Code](https://github.com/microsoft/onnxruntime) |
 | Topic | #topic/vision_multimodal_applications #topic/generative_models_diffusion #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | TextOp |
 | Dataset | BABEL validation set, Generator-produced motion sequences |
@@ -40,7 +42,7 @@ claims:
 > - BABEL validation set (interactive motion generation) 上，Segment FID ↓ 3.072 (TextOp) vs 4.837 (DART+Retarget) (-1.765)；R@1 ↑ 0.300 vs 0.230 (DART+Retarget) (+0.070)。
 > - Generator-produced motion sequences (simulation) 上，Success Rate (Succ) ↑ 0.814 (TextOp-M+G) vs 0.614 (TWIST2) (+0.200)；Root-relative MPJPE (mm) ↓ 34.665 (TextOp-M+G) vs 1019.826 (TWIST2) (-985.161)。
 
-## 概述
+## 概要
 
 **目标问题**：如何让通用人形机器人根据流式自然语言指令，实时、交互式地生成并执行物理可行的全向运动？现有方法或依赖预定义轨迹，或需要连续人工遥操作，无法支持用户在运行中随时修改文本命令并即时看到机器人的行为变化。
 
@@ -55,7 +57,7 @@ claims:
 
 **局限性**：TextOp 目前缺乏环境感知与物理推理能力，无法应对障碍物或动态场景；长期运动生成的一致性和命令歧义性在复杂指令流下仍可能退化。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -91,7 +93,9 @@ claims:
 
 通过上述设计，TextOp在真实Unitree G1机器人上实现了端到端平均0.73秒的交互延迟，能够在30秒连续运行中保持高成功率和跟踪精度，并支持舞蹈、跳跃、乐器演奏、表达性手势等多种技能的实时文本驱动切换。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 TextOp 的核心创新在于将**流式文本驱动的交互式运动生成**与**基于强化学习的全身运动跟踪**无缝结合，并通过**机器人骨架运动表示**和**生成数据增强**弥合虚拟角色与真实人形机器人之间的分布差距。其关键创新点体现在以下几个维度：
 
@@ -123,7 +127,7 @@ TextOp 构建了完整的实时部署管线：用户文本经 CLIP 编码后通�
 
 **创新局限性**：TextOp 目前缺乏显式环境感知和物理推理能力，无法适应障碍物或动态环境；长期运动生成的一致性和命令歧义性在复杂指令流下仍可能导致性能下降。
 
-## 整体框架
+
 
 TextOp 将“实时文本驱动人形机器人运动生成与控制”分解为两个紧密协同的层级：**交互式运动生成**（Interactive Motion Generation）与**动态运动跟踪**（Dynamic Motion Tracking），并通过一个**运行时部署管线**将二者桥接，实现从流式文本输入到物理机器人关节指令的端到端闭环（Fig. 2）。
 
@@ -171,7 +175,7 @@ $$
 ![[assets/figures/papers/paper_list_l64_https_arxiv_org_abs_2602_07439v1/figures/001_Figure_1.jpg]]
 *Figure 1: TextOp enables a humanoid robot to execute a seamless sequence of diverse skills—ranging from expressive gestures to complex physical tasks—driven by real-time, interactive text commands from the user in a single continuous trial*
 
-## 核心模块与公式推导
+
 
 TextOp 将交互式文本驱动人形机器人运动生成与控制分解为两个核心模块：**交互式运动生成器**（Interactive Motion Generator）和**动态运动跟踪策略**（Dynamic Motion Tracking Policy），并通过一个运行时部署管线将二者串联为实时系统（Fig. 2）。
 
@@ -242,7 +246,9 @@ $$
 ![[assets/figures/papers/paper_list_l64_https_arxiv_org_abs_2602_07439v1/figures/016_Table.jpg]]
 *Table: XII: Comparison of motion representation components used by different methods. ✓ indicates the representation is used, × indicates it is not used. Components are reported based on the actual feature vectors used by each method, regardless of semantic overlap between each other. For the following tables, in the Unitree G1 skeleton, the term “Body” refers to 29 body links, excluding the root link, whereas in the SMPL skeleton it corresponds to 22 spherical joints. The “Base Frame” denotes the coordinate frame attached to the root link. In contrast, the “Character Frame” is a local frame aligned with the root’s yaw: its origin coincides with the root position, its yaw matches the root yaw, and...*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 真实机器人部署：交互式连续技能执行
 
@@ -300,7 +306,9 @@ TextOp 在 Unitree G1（29 DoF）人形机器人上进行了真实世界部署�
 ![[assets/figures/papers/paper_list_l64_https_arxiv_org_abs_2602_07439v1/figures/017_Table.jpg]]
 *Table: XIII: Ablation study on key hyperparameters for Motion Generation. All results are reported as mean ± standard deviation over three generator rollout seeds*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从离线生成到实时交互式部署
 
@@ -337,6 +345,8 @@ TextOp的适用边界由其设计假设和实验覆盖范围共同界定：
 2. **生成数据与真实数据的域自适应**：TextOp-G在未见过的动作捕捉数据上的具体失败模式是什么？这些失败是否源于生成运动的物理不可行性、分布偏移，还是跟踪策略的过拟合？如何通过改进运动表示、数据增强或域随机化来缓解这些问题？
 
 3. **交互式控制的更细粒度评估**：当前的评估主要关注段级和过渡级指标，但实时交互式控制的核心价值在于命令切换的响应速度和语义保真度。如何设计更细粒度的评估协议，量化“命令切换延迟”“语义过渡自然度”和“用户意图对齐度”等交互式指标，是推动该方向发展的关键。
+
+
 
 ## 原文 PDF
 

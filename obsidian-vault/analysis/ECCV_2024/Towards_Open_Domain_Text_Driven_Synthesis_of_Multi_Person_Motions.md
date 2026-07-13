@@ -5,6 +5,8 @@ paper_level: A
 venue: ECCV
 year: 2024
 pdf_ref: paperPDFs/ECCV_2024/Towards_Open_Domain_Text_Driven_Synthesis_of_Multi_Person_Motions.pdf
+project_link: null
+code_link: null
 aliases:
 - TSDFIPML
 - TODTDSMPM
@@ -41,7 +43,7 @@ claims:
 > - Two-person motion generation with open-domain prompts 上，P-R-Precision Top-1 0.323 vs InterGen 0.073 (+0.250)。
 > - Multi-person motion generation (vs. naive baselines) 上，P-FID / M-FID P-FID 0.229, M-FID 0.684 vs Pose-Only (P-FID 0.077, M-FID 0.903) / Motion-Only (P-FID 0.317, M-FID 0.613) (vs. Pose-Only: P-FID +0.152 (worse), M-FID -0.219 (better); vs. Motion-Only: P-...)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -55,7 +57,7 @@ claims:
 
 在两人运动生成任务上，该方法在开放域提示下达到P-R-Precision Top-1 **0.323**，远超基线InterGen（Liang et al., arXiv 2023）的0.073（+0.250）。在多人运动生成上，与朴素基线相比，该方法在P-FID和M-FID之间取得了更好的平衡（P-FID 0.229, M-FID 0.684）。消融实验验证了两阶段训练、冻结姿态层以及WebVid-Motion数据对性能的关键作用。
 
-## 背景与动机
+
 
 ### 开放域文本到多人运动合成的核心瓶颈
 
@@ -92,7 +94,9 @@ claims:
 
 这一设计使得模型能够**从开放域文本生成任意人数（最多 10 人）的运动序列**，在双人生成上将 P-R-Precision Top-1 从 InterGen 的 0.073 提升至 0.323，首次实现了开放域多人运动生成的实用化突破。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于突破了现有多人运动生成模型在**人数规模**和**文本域开放程度**上的双重限制，构建了一个能够从开放域文本描述中生成任意人数运动序列的框架。其关键创新点可归纳为以下四个维度：
 
@@ -128,7 +132,7 @@ $$G_{s_p, s_m}(x_t, t, c) = (1 - s_p - s_m) \cdot G(x_t, t, c) + s_p \cdot G_p(x
 
 **总结**：本文的创新本质在于通过**数据扩展 + 架构解耦 + 分阶段训练**的组合策略，将多人运动生成从封闭的二人交互域推向开放域任意人数场景，其核心机制是让模型分别学会“单帧内的多人空间关系”和“单人的时序运动”，再通过冻结策略保护已学到的姿态表征不被运动训练所破坏。
 
-## 整体框架
+
 
 该方法采用**两阶段扩散管道**，将开放域文本到多人运动生成分解为两个可控子问题。整体流程如下：
 
@@ -175,7 +179,7 @@ $$G_{s_p, s_m}(x_t, t, c) = (1 - s_p - s_m) \cdot G(x_t, t, c) + s_p \cdot G_p(x
 ![[assets/figures/papers/paper_list_l1766_Towards_Open_Domain_Text_Driven_Synthesis_of_Multi_Person_Motions/figures/003_Figure_3.jpg]]
 *Figure 3: Our model is a diffusion framework consisting of interleaving pose and motion layers. At each pose/motion layer, we reshape the temporal/subject dimension into the batch dimension so that the layer focuses on generating per frame subject interaction and per-subject temporal movements respectively. Each layer is implemented as a transformer encoder. Diffusion time steps and text or pose conditions are encoded and summed up as a condition token concatenated to the beginning of the sequence*
 
-## 核心模块与公式推导
+
 
 ### 整体架构概述
 
@@ -253,7 +257,9 @@ $$G_{s_p, s_m}(x_t, t, c) = (1 - s_p - s_m) \cdot G(x_t, t, c) + s_p \cdot G_p(x
 ![[assets/figures/papers/paper_list_l1766_Towards_Open_Domain_Text_Driven_Synthesis_of_Multi_Person_Motions/figures/002_Figure_2.jpg]]
 *Figure 2: Dataset visualizations. Top 2 rows: LAION-Pose dataset. Left is original image from LAION-400M [59], right is BEV [63] detection. Bottom 2 rows: Webvid-Motion dataset. Left is original video first frame from WebVid-10M [2], right is the motion sequence estimated by TRACE [62] visualized from a different camera angle*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -299,7 +305,9 @@ $$G_{s_p, s_m}(x_t, t, c) = (1 - s_p - s_m) \cdot G(x_t, t, c) + s_p \cdot G_p(x
 
 ![[assets/figures/papers/paper_list_l1766_Towards_Open_Domain_Text_Driven_Synthesis_of_Multi_Person_Motions/figures/009_Table.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 技术继承与演进
 
@@ -325,6 +333,8 @@ $$G_{s_p, s_m}(x_t, t, c) = (1 - s_p - s_m) \cdot G(x_t, t, c) + s_p \cdot G_p(x
 1. 如何设计一个真正面向多人运动的统一评估指标，能够同时捕捉帧内交互质量和时序运动一致性，而非依赖分解式度量的组合？
 2. 交错 pose/motion 层的 Transformer 编码器内部架构细节（如注意力头数、前馈网络维度、层归一化位置等）在论文中未完全展开，其对不同人数规模的可扩展性有待进一步分析。
 3. 当前方法通过冻结姿态层隔离运动数据对姿态表示的干扰，是否存在更优雅的联合训练策略（如梯度解耦、多任务学习）能够在保留姿态质量的同时实现端到端优化？
+
+
 
 ## 原文 PDF
 

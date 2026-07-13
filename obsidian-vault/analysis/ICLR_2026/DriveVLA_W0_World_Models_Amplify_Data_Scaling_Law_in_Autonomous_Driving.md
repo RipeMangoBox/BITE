@@ -43,7 +43,7 @@ claims:
 > - NAVSIM v2 上，EPDMS 86.1 (DriveVLA-W0, 1x Cam) vs 84.5 (DiffusionDrive, 3x Cam + L) (+1.6)。
 > - In-house 70M frames 上，ADE (m) 1.0563 (VLA-VQ + World Model) vs 1.4829 (VLA-VQ, action-only) (-28.8%)。
 
-## 概述
+## 概要
 
 ### 核心问题：VLA模型的“监督赤字”瓶颈
 
@@ -71,7 +71,7 @@ DriveVLA-W0并非一个全新的模型架构，而是一种**训练范式**，�
 
 DriveVLA-W0处于**VLA自动驾驶与世界模型**的交叉点。与BEV-based方法（如**UniAD** (Hu et al., CVPR 2023)、**TransFuser** (Prakash et al., TPAMI 2023)、**Hydra-MDP** (Li et al., arXiv 2024)）不同，它直接使用前视图图像作为VLA输入，无需显式BEV转换或多视图融合。与现有VLA方法（如**AutoVLA** (Zhou et al., NeurIPS 2025)、**ReCogDrive** (Li et al., arXiv 2025)）相比，其关键区别在于引入世界建模作为辅助训练目标，而非仅依赖动作监督。在世界模型方面，该方法借鉴了自回归视觉生成和潜在扩散模型的思想，但将其重新定位为VLA训练的密集监督源，而非独立的生成任务。
 
-## 背景与动机
+
 
 ### 自动驾驶VLA模型的“监督赤字”困境
 
@@ -107,7 +107,9 @@ $$Q = [Q_{\mathrm{VLA}}; Q_{\mathrm{AE}}], \quad K = [K_{\mathrm{VLA}}; K_{\math
 
 综上，DriveVLA-W0通过世界建模解决了VLA模型的监督赤字问题，将数据扩展律从饱和转为持续提升，并在仅使用单目相机输入的条件下，在NAVSIM v1/v2上超越了使用多相机+LiDAR的方法，达到最先进水平。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 动机：VLA的“监督赤字”瓶颈
 
@@ -161,7 +163,7 @@ $$Q = [Q_{\mathrm{VLA}}; Q_{\mathrm{AE}}], \quad K = [K_{\mathrm{VLA}}; K_{\math
 
 这一创新组合使得DriveVLA-W0在仅使用单目相机输入的条件下，超越了使用多相机和激光雷达的SOTA方法，在NAVSIM v1上达到PDMS 93.0，在NAVSIM v2上达到EPDMS 86.1。
 
-## 整体框架
+
 
 DriveVLA-W0 的整体训练范式围绕一个核心洞察展开：**通过世界建模提供密集自监督信号，放大视觉-语言-动作（VLA）模型在大规模数据上的扩展规律**。传统 VLA 方法仅依赖稀疏的动作标签作为监督，导致模型容量巨大但表示能力未被充分利用。DriveVLA-W0 在动作监督的基础上，引入预测未来图像的世界建模任务，迫使模型学习环境的底层动态和丰富的预测性世界表示。
 
@@ -209,7 +211,7 @@ $$Q = [Q_{\text{VLA}}; Q_{\text{AE}}], \quad K = [K_{\text{VLA}}; K_{\text{AE}}]
 
 模型采用两阶段训练：第一阶段使用 6VA 序列配置预训练 VLA 骨干，联合优化世界模型损失和动作损失；第二阶段集成动作专家，使用 2VA 输入，仅通过动作损失进行监督。在推理时，世界模型模块被跳过以保证实时性，仅保留动作专家进行高效解码。
 
-## 核心模块与公式推导
+
 
 DriveVLA-W0 的核心架构围绕一个关键洞察展开：**通过预测未来图像提供密集自监督信号，解决大型 VLA 模型的“监督赤字”问题**。传统 VLA 仅由稀疏的低维动作信号监督，大量表示能力未被利用；DriveVLA-W0 引入世界建模作为补充训练目标，迫使模型学习环境的底层动态和丰富的预测性世界表示。
 
@@ -275,7 +277,9 @@ $$Q = [Q_{\mathrm{VLA}}; Q_{\mathrm{AE}}], \quad K = [K_{\mathrm{VLA}}; K_{\math
 ![[assets/figures/papers/paper_list_l68_https_openreview_net_forum_id_plrGn3RdzN/figures/003_Figure_3.jpg]]
 *Figure 3: (a) Our Mixture-of-Experts (MoE) architecture pairs a large VLA Expert with a lightweight Action Expert for efficient inference. (b-d) This framework serves as a testbed for comparing three action decoding schemes: query-based, autoregressive, and flow matching*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -370,7 +374,9 @@ MoE 动作专家大幅降低推理延迟（Figure 6）：查询式专家延迟�
 ![[assets/figures/papers/paper_list_l68_https_openreview_net_forum_id_plrGn3RdzN/figures/015_Table_9.jpg]]
 *Table 9: Ablation on the temporal interval for world model inputs. The results reveal a clear performance trade-off, with a 1-second interval being optimal. Using only the current frame (VA) lacks sufficient temporal context, while a 4-second interval introduces excessive scene variation*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从稀疏动作监督到密集世界建模
 
@@ -437,6 +443,8 @@ VLA 方法将视觉-语言模型（VLM）扩展到动作预测，是近年来自
 4. **世界模型生成信息的在线利用**：世界模型生成的未来图像是否可以直接作为额外的输入信息来辅助实时规划？这需要在推理延迟和额外信息收益之间找到平衡。
 
 5. **多模态世界建模的扩展**：如何将 DriveVLA-W0 的世界建模范式扩展到多相机或 LiDAR 输入？是否需要为不同模态设计不同的世界建模目标？
+
+
 
 ## 原文 PDF
 

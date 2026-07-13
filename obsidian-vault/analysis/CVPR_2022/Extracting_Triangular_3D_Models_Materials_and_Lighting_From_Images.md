@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2022
 pdf_ref: paperPDFs/CVPR_2022/Extracting_Triangular_3D_Models_Materials_and_Lighting_From_Images.pdf
+project_link: https://nvlabs.github.io/nvdiffrec/
+code_link: null
 aliases:
 - DBJODSSL
 - ET3MMLFI
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 从图像中提取三角三维模型、材质与光照 |
 | 英文题名 | Extracting Triangular 3D Models, Materials, and Lighting From Images |
 | 会议/期刊 | CVPR 2022 |
-| Links | [paper](https://arxiv.org/abs/2111.12503); [Project](https://nvlabs.github.io/nvdiffrec/) |
+| Links | [paper](https://arxiv.org/abs/2111.12503) · [Project](https://nvlabs.github.io/nvdiffrec/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | DMTet-based joint optimization with differentiable split sum lighting |
 | Dataset | NeRFactor synthetic dataset, NeRF realistic synthetic dataset, NeRFactor variant of NeRF synthetic, DTU MVS dataset (scan65/106/118) |
@@ -41,7 +43,7 @@ claims:
 > - NeRF realistic synthetic dataset 上，PSNR↑ (view interpolation avg) 为 29.05，对比 31.00 (NeRF)，变化 -1.95。
 > - NeRFactor variant of NeRF synthetic 上，PSNR↑ (view interpolation avg) 为 31.65，对比 26.87 (NeRFactor)，变化 +4.78。
 
-## 概述
+## 概要
 
 从多视角图像中重建三维物体是计算机视觉与图形学的长期目标。传统摄影测量流程依赖多阶段分离优化（相机标定、多视图立体、网格提取、材质烘焙），各阶段误差累积导致最终资产质量下降。近年来，以 **NeRF** 为代表的神经辐射场方法在视角合成上取得了突破性进展，但其输出的体积表示无法直接编辑，提取出的显式网格几何质量显著退化（Chamfer距离高达33.4×10⁻⁴），且材质与光照的分解不充分。神经隐式表面方法（如 **NeuS**）虽改善了网格提取质量，但仍需后处理Marching Cubes，且同样缺乏对PBR材质和全频率光照的联合建模。
 
@@ -50,8 +52,6 @@ claims:
 实验表明，该方法在NeRFactor合成数据集上的重光照PSNR达到24.53 dB，优于NeRFactor的23.78 dB，且反照率纹理SSIM更高（0.924 vs 0.917）。在NeRF合成数据集上，视角插值PSNR为29.05 dB，与NeRF相当，但额外输出可直接编辑的因子化网格。网格提取质量方面，仅53k三角形的Chamfer L1距离为4.65×10⁻⁴，远优于NeRF（33.4×10⁻⁴）和NeuS（9.19×10⁻⁴），甚至逼近90万三角形的NeuS（5.84×10⁻⁴）。重建模型可直接导入Blender等标准图形工具进行重打光、场景编辑和软体仿真，展示了与传统图形管线的无缝兼容。训练约需1小时（单V100 GPU），推理时间达毫秒级，显著快于需要数天的NeRD和NeRFactor等方法。
 
 该方法的主要局限在于假设物体不透明，无法处理半透明或折射材质；训练时仅使用直接光照，在强阴影区域的材质分解质量下降；需要预先提供前景分割掩模；在光照不一致或视角稀疏的数据集上几何重建性能不如专用神经隐式方法。尽管如此，该工作为从图像到游戏引擎兼容PBR资产的端到端重建提供了重要的技术路径。
-
-## 背景与动机
 
 三维内容创作是计算机图形学与视觉的核心任务，广泛应用于影视、游戏和虚拟现实等领域。传统资产制作依赖专业艺术家手工建模、绘制纹理和设置光照，成本高昂且周期漫长。从多视角图像自动重建高质量三维模型因此成为长期追求的目标。
 
@@ -77,7 +77,7 @@ claims:
 
 本文正是围绕这三个挑战展开，通过扩展 DMTet 至 2D 监督、引入体积纹理 MLP 以及提出可微分 split sum 光照近似，构建了一个统一的逆渲染框架，使得拓扑、材质与光照能够从图像中联合学习。
 
-## 核心创新
+## 核心方法与创新机理
 
 本文的核心贡献在于将可变形四面体网格（DMTet）从3D监督拓展至**端到端2D图像监督**，并引入**可微分split sum光照近似**，从而首次实现了拓扑、材质、光照在统一框架下的联合优化，直接输出与游戏引擎无缝兼容的PBR三角网格资产。相较于现有方法，其关键创新体现在四个维度的机制性改变：
 
@@ -109,8 +109,6 @@ claims:
 
 > **注意**：本文未提供与同期工作Neural-PIL的定量对比，split sum相较于路径追踪的精度损失也缺乏系统评估，该部分需结合具体应用场景手动验证。
 
-## 整体框架
-
 本文提出一个端到端可微的逆向渲染管线，从一组已知相机位姿和前景掩模的多视图图像出发，联合优化三角网格的**拓扑**、**空间变化材质**和**HDR环境光照**，最终输出可直接导入游戏引擎的PBR三角网格资产。图2展示了完整流程。
 
 **输入与输出**。输入为多视图RGB图像、对应前景掩模及标定相机。输出包含：(1) 可变拓扑的三角网格；(2) 2D PBR纹理贴图（基础色、粗糙度、金属度、法线扰动）；(3) HDR立方体贴图形式的环境光照。
@@ -137,8 +135,6 @@ $$ \underset{\phi}{\mathrm{argmin}}\ \mathbb{E}_{c}\big[L\big(I_{\phi}(c), I_{\m
 5. **2D纹理重参数化**（Section 3.2, Figure 6）：拓扑收敛后，使用xatlas生成UV坐标，将MLP采样到2D纹理上，随后固定拓扑继续微调，自动消除UV接缝，最终输出标准PBR纹理贴图。
 
 **训练流程**。训练分为两阶段：第一阶段同时优化拓扑、体积纹理MLP和环境光照，拓扑自由演化；第二阶段拓扑固定后，将体积纹理烘焙至2D纹理并微调，消除接缝并提升细节。单张V100 GPU训练约需1小时，推理时间达毫秒级。
-
-## 核心模块与公式推导
 
 ### 问题形式化
 
@@ -194,7 +190,7 @@ $$\alpha_{n}(t) = \begin{cases} 1 & n \leq n_{\mathrm{base}} \\ \min(1, \frac{t}
 
 其中 $n$ 为频率带索引，$t$ 为训练迭代步数，$t_f$ 为完全开启步数。低频带始终激活，高频带在训练中逐步引入，使模型先学习平滑几何再添加细节。消融实验（Figure 26, 27）表明，MLP 参数化配合渐进式编码在稀疏视图下优于直接优化每顶点 SDF 值。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 端到端因子化重建的核心性能
 
@@ -244,17 +240,11 @@ $$\alpha_{n}(t) = \begin{cases} 1 & n \leq n_{\mathrm{base}} \\ \min(1, \frac{t}
 ![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2111_12503/figures/004_Figure.jpg]]
 *Figure: Reference Chamfer L1 ×10−4 L _ { 1 }*
 
-![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2111_12503/figures/012_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2111_12503/figures/027_Table_6.jpg]]
-*Table 6: Image quality metrics for the NeRF realistic synthetic dataset. Each training set consists of 100 images with masks and known camera poses, and the reported image metrics are the arithmetic mean over the 200 images in the test set. Results for NeRF are based on Table 4 of the original paper [45], with new measurements for PhySG and MipNeRF using their respective publicly available source code. We additionally report FLIP mean scores [3]. Note that the Hotdog outlier LPIPS score for NeRF is consistent with the original paper, but probably a bug*
 
 ![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2111_12503/figures/028_Table_7.jpg]]
 *Table 7: View interpolation results for the four scenes of NeR-Factor’s synthetic dataset. The NeRF column shows the baseline NeRF trained as part of NeRFactor’s setup, and is different from the NeRF in our other view interpolation results. Each training set consists of 100 images with masks and known camera poses, and the reported image metrics are the arithmetic mean over the eight images in the test set*
 
-![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2111_12503/figures/031_Figure.jpg]]
 
-![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2111_12503/figures/033_Figure.jpg]]
 
 ![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2111_12503/figures/035_Figure_24.jpg]]
 *Figure 24: To evaluate the impact of corrupted masks, we warp perfect masks by texture-mapping them on a grid, displacing each of the 25 × 25 vertices by zero-mean Gaussian noise with increasing standard deviation, σ. From top to bottom, we show a warped texture (to give a sense of the magnitude of corruption), the corrupted masks with the reference mask shown in red, and our reconstruction. The training set consists of 200 images, and PSNR↑ scores are computed as the arithmetic mean of 50 validation images. The ‘uncorrelated‘ series, U, are generated with unique random numbers for each frame, while in the “correlated” scores, C, we corrupt all masks using the same random seed, simulating a segmentati...*
@@ -265,13 +255,10 @@ $$\alpha_{n}(t) = \begin{cases} 1 & n \leq n_{\mathrm{base}} \\ \min(1, \frac{t}
 ![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2111_12503/figures/032_Figure_22.jpg]]
 *Figure 22: Examples of masking errors for the Mold Gold Cape dataset. Note the inconsistencies in classifying the plastic mount as both part of the object and background*
 
-![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2111_12503/figures/034_Figure_20.jpg]]
-*Figure 20: Extracted mesh quality visualization examples on the synthetic KNOB and CERBERUS datasets*
-
 ![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2111_12503/figures/038_Figure_26.jpg]]
 *Figure 26: Comparing grid vs. MLP parametrizations of DMTet on scan 65 from the DTU MVS dataset [28]. Directly optimizing SDF values at grid vertices leads to a surface with high-frequency noise (left). In contrast, if we use an MLP to parametrize the SDF values, we can regularize the geometry, with smoothness controlled by the frequency of positional encoding. We use the positional encoding in NeRF [45] with frequency set to 4 (middle) and 6 (right) respectively. Grid*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 问题定位：从隐式重建到可编辑资产生成的瓶颈
 

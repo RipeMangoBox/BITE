@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/A_Genetic_Algorithm_for_Navigating_Synthesizable_Molecular_Spaces.pdf
+project_link: null
+code_link: https://github.com/alstonlo/synga
 aliases:
 - GANSMS
 - SynGA
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 一种用于导航可合成分子空间的遗传算法 |
 | 英文题名 | A Genetic Algorithm for Navigating Synthesizable Molecular Spaces |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=OvMtGGaFUT); [GitHub](https://github.com/alstonlo/synga) |
+| Links | [paper](https://openreview.net/forum?id=OvMtGGaFUT) · [GitHub](https://github.com/alstonlo/synga) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/chemistry_and_drug_discovery |
 | Method | SynGA |
 | Dataset | ChEMBL 类似物搜索, PMO 套件 (22 任务) |
@@ -41,7 +43,7 @@ claims:
 > - ChEMBL 类似物搜索 上，Scaffold 相似度 为 0.694 (SynGA MLP)，对比 0.526 (无过滤)，变化 +0.168。
 > - ChEMBL 类似物搜索 上，Gobbi 相似度 为 0.623 (SynGA MLP)，对比 0.400 (无过滤)，变化 +0.223。
 
-## 概述
+## 概要
 
 现有分子生成模型普遍面临一个瓶颈：生成的分子虽然理论上性质优异，但往往难以合成或化学不稳定。事后通过逆合成模型进行“投影”修正虽能缓解此问题，却引入了高昂的计算开销。针对这一矛盾，本文提出 SynGA，一种直接操作于合成路线的轻量级遗传算法。其核心思路是将合成可行性约束通过自定义的遗传算子（交叉与变异）内嵌于生成过程本身，从而确保所有生成的分子天然具有可合成性，无需依赖任何机器学习模型来事后保证。
 
@@ -51,7 +53,7 @@ SynGA 将分子表示为合成树——一种无序二叉树，其叶子节点�
 
 然而，SynGA 继承了基于模板方法的固有局限：模板不保证合成可行性，不考虑反应条件、立体化学、产率或成本；固定的模板库将探索限制在可合成空间的一个有偏子集内。此外，SynGA 在类似物搜索中比 SynFormer 慢 3 倍以上，且在 PMO 基准测试中落后于无约束算法（如 GraphGA、STONED），表明合成约束本身可能限制了搜索空间。这些局限指向了未来改进的关键方向。
 
-## 背景与动机
+
 
 分子生成是药物发现的核心环节，但现有方法普遍面临“可合成性”这一瓶颈。传统分子生成模型（如基于 SMILES 或分子图的遗传算法、强化学习方法）通常只优化目标性质（如对接分数、类药性），而完全忽略分子能否被实际合成。生成的分子往往结构复杂、含有不稳定官能团或需要多步无法实现的反应路径，导致虚拟筛选出的候选分子无法进入湿实验验证。
 
@@ -61,7 +63,9 @@ SynGA 将分子表示为合成树——一种无序二叉树，其叶子节点�
 
 这一思路的关键优势在于：合成约束不再是一个额外的惩罚项或后处理步骤，而是搜索空间本身的定义。SynGA 的搜索空间 $\tau \to \mathcal{M}_S$ 是一个从合成树集合到可合成分子空间的满射，遗传算子在该空间上的任何操作都保证输出仍属于该空间。这使得 SynGA 既可作为独立优化器，也可作为轻量级基线或子模块（如与贝叶斯优化结合形成 SynGBO）服务于更复杂的算法。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SynGA 的核心瓶颈在于现有分子生成方法普遍将合成可行性作为事后约束（如 SynNet、ChemProjector 的投影机制），而非内嵌于生成过程。这导致生成的分子要么合成不可行，要么需要昂贵的逆合成投影步骤。
 
@@ -78,7 +82,7 @@ SynGA 的核心瓶颈在于现有分子生成方法普遍将合成可行性作�
 
 **证据强度**：上述变更槽位的置信度均为 1.0，有明确的原文锚点支撑。核心洞察中的“无 ML 保证合成可行性”和“可作为基线/子模块”的 claims 置信度均为 1.0。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0002_OvMtGGaFUT_A_Genetic_Algorithm_for_Navigating_Synthesizable/figures/001_Figure_1.jpg]]
 *Figure 1: A graphical overview of SynGA, which operates over synthesis trees built from building blocks (squares) and reaction templates (circles). Example blocks and a reaction are drawn above using SmilesDrawer (Probst & Reymond, 2018)*
@@ -111,7 +115,7 @@ SynGA 的核心设计是将遗传算法直接定义在合成树上，而非分�
 
 整个 pipeline 的输入是砌块集和反应模板库，输出是一系列可合成的分子及其对应的合成路线。SynGA 不需要任何预训练的机器学习模型即可运行，这使得它既可作为独立算法使用，也可作为更复杂系统的子模块或基线。值得注意的是，SynGA 在类似物搜索中比 SynFormer 慢 3 倍以上，但通过砌块过滤可以显著缩小这一差距。
 
-## 核心模块与公式推导
+
 
 SynGA 的核心在于将遗传算法直接定义在合成树上，通过自定义的交叉和变异算子，将合成可行性约束内嵌于搜索过程本身。其分子表示、算子设计和可选的机器学习增强模块共同构成了该方法的技术骨架。
 
@@ -166,7 +170,9 @@ $$\mathcal{L}(\theta) = \mathrm{BCE}\bigg( \rho_\theta(\mathcal{B}_1) - \rho_\th
 
 即基于分子性质分数排序对的二元交叉熵损失。实验表明，排名损失优于标准的均方误差损失。经过 NAM 过滤后的砌块集用于引导遗传算法向高性质区域搜索，该模块与高斯过程代理模型结合后构成 SynGBO 变体。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：类似物搜索与投影任务
 
@@ -223,7 +229,9 @@ $$\mathcal{L}(\theta) = \mathrm{BCE}\bigg( \rho_\theta(\mathcal{B}_1) - \rho_\th
 
 6. **计算预算差异。** 在 LIT-PCBA 对接任务中，SynGA 和 SynGBO 仅使用 16,000 次 oracle 调用，而基线方法使用 64,000 次。虽然 SynGA 在更少调用下仍具竞争力，但增加预算可能带来更大提升。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 SynGA 在合成感知分子生成方法中占据一个独特的位置：它不依赖任何机器学习模型来保证合成可行性，而是通过将遗传算法直接定义在合成树表示上，利用自定义的交叉与变异算子将合成约束内嵌于搜索过程本身。这一设计选择使其与两类主流方法形成鲜明对比。
 
@@ -238,6 +246,8 @@ SynGA 在合成感知分子生成方法中占据一个独特的位置：它不�
 **核心局限。** 第一，SynGA 继承了基于模板方法的所有局限性：模板不保证实际合成可行性，不考虑反应条件、立体化学、产率或成本。第二，固定模板库必然将探索限制在可合成空间的一个有偏子集内。第三，在 PMO 基准测试中，SynGA 落后于无约束算法（如 GraphGA、STONED），这表明合成约束本身构成了搜索空间瓶颈。第四，当前版本不包含 3D 信息，而 3DSynthFlow 等基线在对接任务中受益于 3D 感知。第五，砌块过滤模型（MLP 和 NAM）的泛化能力在分布外分子上存疑，硬负例挖掘虽然提高了验证集精确率，但在 ChEMBL 测试集上反而导致性能下降。
 
 **开放问题。** 如何将 3D 信息整合到 SynGA 中？除了砌块过滤和模型增强变体外，还有哪些 ML 混合方式可以增强 SynGA？如何在不降低效率和鲁棒性的前提下扩大模板集？SynGA 能否作为精炼步骤改进 SynFormer 等合成模型的输出？如何与多目标遗传算法（如 NSGA-II）结合以处理多目标优化？这些问题构成了该方向后续研究的关键切入点。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/Qwen3_VL_Technical_Report.pdf
+project_link: https://likaixin2000.github.io/papers/ScreenSpot\_Pro.pdf
+code_link: https://github.com/QwenLM/Qwen3-VL
 aliases:
 - QV
 - QVTR
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | Qwen3-VL 技术报告 |
 | 英文题名 | Qwen3-VL Technical Report |
 | 会议/期刊 | arXiv 2025 |
-| Links | [paper](https://arxiv.org/abs/2512.00435) · [Code](https://github.com/QwenLM/Qwen3-VL) · [arXiv](https://arxiv.org/abs/2501.00321) · [Project](https://likaixin2000.github.io/papers/ScreenSpot\_Pro.pdf) |
+| Links | [paper](https://arxiv.org/abs/2512.00435) · [Code](https://github.com/QwenLM/Qwen3-VL) · [paper](https://arxiv.org/abs/2501.00321) · [Project](https://likaixin2000.github.io/papers/ScreenSpot\_Pro.pdf) |
 | Topic | #topic/other_unclear #topic/other_unclear/general |
 | Method | Qwen3-VL |
 | Dataset | MMLU‑Pro, HallusionBench, MIA‑Bench |
@@ -41,7 +43,7 @@ claims:
 > - HallusionBench 上，Accuracy 66.7 vs 60.4 (Claude opus 4.1) (+6.3)。
 > - MMLU‑Pro (Thinking) 上，Accuracy 82.1 vs 79.1 (Qwen3‑32B‑Thinking) (+3.0)。
 
-## 概述
+## 概要
 
 Qwen3-VL 是通义千问团队推出的新一代多模态大模型，其核心目标是在不牺牲纯文本语言理解能力的前提下，强化视觉‑语言对齐与长视频时空建模。此前，多模态训练普遍存在一个关键瓶颈：引入视觉数据容易损害模型原有的纯文本能力，同时长视频中的时序对齐也面临显著困难。Qwen3-VL 通过四项关键设计来应对这一挑战：
 
@@ -56,7 +58,7 @@ Qwen3-VL 是通义千问团队推出的新一代多模态大模型，其核心�
 
 值得注意的是，报告中仍存在若干待验证的开放问题：Interleaved MRoPE 在不同视频长度和帧率下的增益是否均匀、DeepStack 引入的额外参数与推理延迟对部署效率的影响、文本化时间戳在超长视频（超过 1 小时）中的有效性，以及平方根重加权损失与其他缩放策略的直接对比等，这些均需进一步消融或实际部署验证。
 
-## 背景与动机
+
 
 视觉语言模型（VLM）在通用视觉理解、文档解析和视频分析等任务上已取得显著进展，但两个核心瓶颈始终制约着模型的进一步突破：
 
@@ -66,7 +68,9 @@ Qwen3-VL 是通义千问团队推出的新一代多模态大模型，其核心�
 
 Qwen3‑VL 的动机正是围绕这两个瓶颈展开：**在不牺牲语言能力的前提下，通过架构创新强化多模态时空建模与视觉‑语言对齐**。具体而言，报告提出了四项关键设计——交错 MRoPE（Interleaved MRoPE）均匀分配空间‑时间维度的频率以消除频谱偏差；DeepStack 多层视觉特征注入以增强细粒度视觉理解；文本化时间戳替代 T‑RoPE 以提供更直接的时间表示；以及平方根重加权 per‑token 损失以平衡文本与多模态训练信号。这些设计共同构成了一套从位置编码、特征融合到训练策略的系统性改进方案。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Qwen3-VL 的核心创新围绕一个中心矛盾展开：**多模态训练容易损害纯文本语言理解能力，且长视频时序对齐困难**。针对这一瓶颈，Qwen3-VL 在 Qwen2.5-VL 的基础上进行了四项关键改进，在不牺牲语言能力的前提下强化了多模态时空建模与视觉‑语言对齐。
 
@@ -106,7 +110,7 @@ Qwen2.5-VL 通过 T‑RoPE 位置编码实现绝对时间对齐，但这种隐�
 
 **待验证的开放问题**：上述四项创新的消融分析尚不完整。Interleaved MRoPE 在不同视频长度和帧率下的增益均匀性未展开；DeepStack 引入的额外参数与推理延迟未量化；文本化时间戳在超长视频（>1 小时）中的表现及上下文开销未知；平方根重加权与对数平滑等其他缩放策略缺少直接对比。这些点需要后续实验补充验证。
 
-## 整体框架
+
 
 Qwen3‑VL 采用标准的三模块架构：**视觉编码器（Vision Encoder）**、**MLP 视觉‑语言融合器（Vision‑Language Merger）** 以及 **大语言模型（LLM）**。文本、图像和视频三类输入经统一处理后，最终由 LLM 自回归生成回答。其核心设计目标是在不牺牲纯文本语言能力的前提下，强化多模态时空建模与细粒度视觉‑语言对齐。
 
@@ -135,7 +139,7 @@ Figure 1 给出了完整的框架图：视觉编码器处理动态分辨率的�
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2512_00435/figures/003_Figure_1.jpg]]
 *Figure 1: The Qwen3-VL framework integrates a vision encoder and a language model decoder to process multimodal inputs, including text, images, and video. The vision encoder is specifically designed to handle dynamic, native-resolution visual inputs, mapping them to visual tokens of variable length. To enhance perceptual capability and preserve rich visual information, we incorporate the pioneering DeepStack mechanism, which injects visual tokens from multiple layers of the vision encoder into corresponding layers of the LLM. Furthermore, we adopt Interleaved MRoPE to encode positional information for multimodal inputs with a balanced frequency spectrum, and introduce text-based timestamp tokens to m...*
 
-## 核心模块与公式推导
+
 
 ### 视觉编码器与动态分辨率处理
 
@@ -164,7 +168,9 @@ Qwen3‑VL 摒弃了 Qwen2.5‑VL 中通过位置编码实现的 T‑RoPE 绝对
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2512_00435/figures/007_Figure_2.jpg]]
 *Figure 2: Multilingual OCR performance of our model on a self-built test set. The model achieves over 70% accuracy on 32 out of 39 supported languages, demonstrating strong and usable multilingual capabilities*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能验证
 
@@ -236,7 +242,9 @@ DeepStack 机制将 ViT 三个中间层的视觉特征通过专用 merger 注入
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2512_00435/figures/019_Figure.jpg]]
 *Figure: B.4 Document-Understanding*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与先前工作的关系
 
@@ -271,6 +279,8 @@ Qwen3‑VL 在 **Qwen2.5‑VL**（Bai et al., 2025）的基础上进行了四项
 3. **文本化时间戳的扩展性**：在超过 1 小时的视频中是否持续优于 T‑RoPE，以及引入的上下文长度开销是否可控，需要进一步验证。
 4. **损失重加权策略的比较**：平方根重加权与对数平滑等其他缩放策略之间缺少直接对比消融。
 5. **Thinking 模型的鲁棒性**：报告未讨论 Thinking 变体在安全性、幻觉控制和对抗鲁棒性等方面的表现。
+
+
 
 ## 原文 PDF
 

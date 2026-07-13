@@ -5,6 +5,8 @@ paper_level: A
 venue: NeurIPS
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/ReDi_Boosting_Generative_Image_Modeling_via_Joint_Image_Feature_Synthesis.pdf
+project_link: https://representationdiffusion.github.io/
+code_link: null
 aliases:
 - RRD
 - ReDi
@@ -41,7 +43,7 @@ claims:
 > - ImageNet 256x256 (有 CFG) 上，FID↓ 1.72 (ReDi 350 epochs) vs 2.06 (SiT-XL/2 1400 epochs) (-0.34)。
 > - ImageNet 256x256 (无 CFG, 无条件生成) 上，FID↓ 22.6 (DiT-XL/2 w/ ReDi + RG) vs 43.5 (DiT-XL/2) (-20.9)。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -79,8 +81,6 @@ ReDi 的关键创新在于**将语义特征从“外部蒸馏目标”提升为�
 
 > **注意**：以上结果来自 verified_analysis 中的实验证据（Table 1、Table 2、Table 4、Table 5），置信度 0.95-0.98。论文发表年份与会议信息未在元数据中提供，需手动核实。
 
-## 背景与动机
-
 生成式图像建模的核心目标是从噪声中合成高质量、高保真度的图像。当前主流框架——潜在扩散模型（Latent Diffusion Models, LDMs）——将图像压缩至低维VAE潜空间进行扩散过程，在计算效率与生成质量之间取得了平衡。然而，这一范式面临一个深层瓶颈：**模型在训练过程中必须同时维持精确的低级像素重建与开发具有语义意义的内部表示，这两种需求之间存在内在张力**。具体而言，扩散模型的目标函数（如噪声预测损失）天然倾向于像素级保真度，但高质量的图像合成同时要求模型理解对象的语义结构、部件关系与全局上下文——这些高级语义信息并非显式存在于VAE潜变量之中。
 
 近年来，研究者尝试通过引入外部视觉表示来弥补这一缺口。代表性工作如**REPA**（Yu et al., 2025）提出表示对齐方法，在扩散模型训练过程中额外蒸馏预训练视觉编码器（如DINOv2）的特征，以提升生成图像的语义质量。然而，这类方法存在两个关键局限：其一，它们需要设计额外的复杂损失目标，增加了训练的超参数负担与工程复杂度；其二，蒸馏本质上是一种单向的知识注入——模型被动接收外部表示，而非主动学习图像与语义之间的联合生成规律，因此无法充分释放两种模态协同建模的潜力。
@@ -95,7 +95,7 @@ ReDi 的关键创新在于**将语义特征从“外部蒸馏目标”提升为�
 
 初步实验证据有力地支撑了这一动机的合理性：在ImageNet 256×256基准上，ReDi使DiT-XL/2在仅40万训练步数下即达到FID 8.7，超越了基线模型700万步的性能（FID 9.6），实现了约**23倍**的训练加速（Figure 2）。这表明，联合建模图像与语义特征不仅理论上自洽，而且在实践中带来了实质性的效率与质量增益。
 
-## 核心创新
+## 核心方法与创新机理
 
 ReDi 的核心创新在于将生成式图像建模与表示学习统一到同一个扩散过程中，从根本上改变了扩散变换器（DiT/SiT）的建模范式。与现有方法相比，其关键突破体现在以下四个维度。
 
@@ -150,8 +150,6 @@ $$\hat{\epsilon}_{\theta}(\mathbf{x}_t, \mathbf{z}_t, t) = \epsilon_{\theta}(\ma
 
 ReDi 的深层洞察在于：**生成与理解不应是分离的两个阶段，而应是同一过程的两种输出**。通过让扩散模型同时预测图像和语义，低层细节重建与高层语义理解之间的内在张力被转化为互补关系，从而在不增加复杂损失目标的前提下显著提升生成质量和训练效率。
 
-## 整体框架
-
 ReDi（**Re**presentation **Di**ffusion）的核心思想是将图像生成与语义表示学习统一在一个扩散框架中，通过联合建模VAE潜变量与DINOv2语义特征的共享概率分布，消除了传统潜在扩散模型（LDM）在低级重建与高级语义之间的内在张力。
 
 ### 整体流程
@@ -189,8 +187,6 @@ ReDi的设计逻辑与表示对齐方法**REPA**（Yu et al., 2025）形成互�
 
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2504_16064/figures/001_Figure_1.jpg]]
 *Figure 1: ReDi: Our generative image modeling framework bridges the gap between generative modeling and representation learning by leveraging a diffusion model that jointly captures low-level image details (via VAE latents) and high-level semantic features (via DINOv2). Trained to generate coherent image–feature pairs from pure noise, this unified latent-semantic dual-space diffusion approach significantly boosts both generative quality and training convergence speed*
-
-## 核心模块与公式推导
 
 ReDi 的核心架构由五个紧密协作的模块构成，其本质是将图像潜变量和语义特征纳入统一的扩散框架中进行联合建模。以下按流程顺序阐述各模块的设计逻辑与关键公式。
 
@@ -250,10 +246,7 @@ $$\hat{\epsilon}_{\theta}(\mathbf{x}_t, \mathbf{z}_t, t) = \epsilon_{\theta}(\ma
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2504_16064/figures/010_Figure_6.jpg]]
 *Figure 6: VAE-only vs. VAE & DINOv2 CFG. FID scores for SiT-XL with ReDi (trained for 400K steps) as a function of Classifier-Free Guidance weight w, comparing two configurations: (1) applying CFG only to VAE latents (VAE-only CFG) versus (2) applying CFG to both VAE and DINOv2 representations (VAE & DINOv2 CFG). # Principal Components Figure 7: Effect of number of principal components. FID of DiT-B/2 w/ ReDi with different number of DINOv2 Principal Components. The vanilla DiT-B/2 is illustrated with gray. No Classifier-Free Guidance is used*
 
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2504_16064/figures/003_Figure_3.jpg]]
-*Figure 3: Given an input image, the VAE latent and the principal components of DINOv2 are extracted. Both modalities are noised and fused into a joint token sequence, given as input to DiT or SiT*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 核心结果：无分类器引导下的性能与收敛加速
 
@@ -313,7 +306,7 @@ ReDi在无条件生成任务上同样表现突出。**Table 3** 显示，DiT-XL/
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2504_16064/figures/014_Table_9.jpg]]
 *Table 9: Detailed evaluation for SiT-XL/2 w/ ReDi. All results are reported without classifier-free guidance*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 

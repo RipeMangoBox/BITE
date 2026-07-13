@@ -43,7 +43,7 @@ claims:
 > - RigNet 上，Ω_orth (×10⁻²) ↓ 0.0033；κ_log ↓ 1.0453；H_spec ↑ 0.9999。
 > - ShapeNet 上，Ω_orth (×10⁻²) ↓ 0.0098；κ_log ↓ 1.0460；H_spec ↑ 0.9997。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有基于物理的动画方法面临双重困境——以 **Simplicits**（Modi et al., ACM TOG 2024）为代表的物理信息子空间方法需要为每个对象单独训练网络，无法泛化；而 **RigNet**（Xu et al., SIGGRAPH 2020）、**Anymate**（Deng et al., SIGGRAPH 2025）等数据驱动神经绑定方法则依赖昂贵的专家蒙皮标注，难以规模化应用。核心矛盾在于：缺乏一种既能跨形状泛化、又无需运动/标注数据即可学习物理一致蒙皮表示的框架。
 
@@ -53,7 +53,7 @@ claims:
 
 **方法定位**：PhysSkin 位于**物理模拟 × 神经场 × 自监督学习**的交叉点。相较于逐对象训练的物理子空间方法（如 Simplicits），它实现了前馈式泛化；相较于依赖标注的神经绑定方法（如 RigNet、Anymate），它消除了对运动轨迹和蒙皮标签的依赖。其核心创新在于将线性混合蒙皮（LBS）的思想连续化到神经场，并通过物理先验的自监督学习，使网络从静态形状中自主归纳变形子空间结构。
 
-## 背景与动机
+
 
 ### 物理动画的计算矛盾
 
@@ -80,7 +80,9 @@ PhysSkin的动机正是打破这一三角困境：**能否仅从静态3D几何�
 1. **表示设计**：如何构建一个连续的神经蒙皮场，使其能处理任意拓扑、分辨率和离散化，同时保持足够的表达能力来捕获复杂变形模式？
 2. **训练稳定性**：在无标注的自监督设定下，物理能量最小化、空间平滑性和蒙皮正交性等多目标之间存在天然的梯度冲突，如何避免训练过程中的数值漂移和模式坍塌？
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PhysSkin 的核心创新在于将**连续神经蒙皮场**与**物理信息自监督学习（PISSL）**深度耦合，从根本上改变了蒙皮权重的表示范式与获取方式。与现有方法相比，其关键突破体现在三个紧密关联的维度。
 
@@ -118,7 +120,7 @@ PhysSkin 的核心创新在于将**连续神经蒙皮场**与**物理信息自�
 
 这些创新共同构成了 PhysSkin 的核心技术壁垒：连续场表示赋予泛化能力，物理自监督消除数据瓶颈，稳定性机制保障训练收敛，三者缺一不可。
 
-## 整体框架
+
 
 PhysSkin 提出了一种可泛化的物理信息神经蒙皮框架，其核心目标是从静态 3D 几何中直接学习连续蒙皮场，进而实现实时物理动画，无需任何运动序列或蒙皮标注数据。整个 pipeline 由三个紧密耦合的阶段构成：**蒙皮子空间表示**、**神经蒙皮场自动编码器**和**物理信息自监督学习**。
 
@@ -187,7 +189,7 @@ $$\mathbf{z}_{t+1} = \arg\min_{\mathbf{z}} \frac{1}{2h^2} \| \mathbf{z} - 2\math
 ![[assets/figures/papers/paper_list_l1049_https_arxiv_org_abs_2603_23194/figures/001_Figure_1.jpg]]
 *Figure 1: PhysSkin is a generalizable physics-informed neural skinning framework for object animation. The framework is learned directly from static 3D geometries via physics-informed self-supervision without any annotated data. Once trained, PhysSkin can be applied in a feed-forward manner to perform neural skinning for diverse 3D shapes and discretizations, enabling real-time physics-based animation*
 
-## 核心模块与公式推导
+
 
 ### 蒙皮子空间变形表示
 
@@ -265,7 +267,9 @@ $$\mathcal{L}_{\mathrm{orth}}(\theta) = \mathbb{E}_{\mathcal{D} \sim \mathcal{S}
 ![[assets/figures/papers/paper_list_l1049_https_arxiv_org_abs_2603_23194/figures/003_Figure_3.jpg]]
 *Figure 3: Evolution of neural skinning fields during optimization. Starting from disordered initial representations, our physicsinformed self-supervised learning progressively organizes them into physically consistent, geometrically orthogonal, and spatially smooth skinning results. Each skinning weight i is scaled by max(abs(Wi)) to fall within [−1, 1] and centered around 0*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 评估指标
 
@@ -334,7 +338,9 @@ Table 4 报告了在 RigNet 数据集上的消融结果，证实每个组件的�
 ![[assets/figures/papers/paper_list_l1049_https_arxiv_org_abs_2603_23194/figures/008_Figure_5.jpg]]
 *Figure 5: Qualitative results on unseen 3D shapes from the RigNet [52] test set. We visualize blended skinning fields to demonstrate our method’s generalization to novel 3D shapes. All results are produced by a single unified PhysSkin model*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 现有方法格局与PhysSkin的切入点
 
@@ -389,6 +395,8 @@ PhysSkin的适用边界由以下因素界定：
 4. **与生成模型的结合**：PhysSkin输出的蒙皮场为3D生成模型（如扩散模型、3D高斯泼溅重建）提供了即插即用的动画接口。如何将蒙皮场作为生成过程的显式条件或隐式正则化项，可能催生“可动画生成”的新范式。
 
 > **注意**：上述开放问题中，部分（如语义融入、拓扑扩展）来自论文明确指出的局限，部分（如与生成模型结合）基于方法特性的合理推演，需在后续文献中验证其实际可行性。
+
+
 
 ## 原文 PDF
 

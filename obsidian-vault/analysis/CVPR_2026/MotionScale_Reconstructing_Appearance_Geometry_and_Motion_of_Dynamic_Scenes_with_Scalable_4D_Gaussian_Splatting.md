@@ -42,7 +42,7 @@ claims:
 > - NVIDIA Dynamic Scenes 上，PSNR↑ 26.75 vs Prior SOTA (see Tab.1) (见Tab.1)；SSIM↑ 0.78 vs Prior SOTA (see Tab.1) (见Tab.1)；LPIPS↓ 0.07 vs Prior SOTA (see Tab.1) (见Tab.1)。
 > - DyCheck Point Tracking 上，3D EPE↓ 0.070 vs Prior SOTA (see Tab.2) (见Tab.2)。
 
-## 概述
+## 概要
 
 **问题背景** 从单目视频中重建动态场景的完整4D表示（外观、几何、运动）是计算机视觉的核心挑战。现有基于4D高斯溅射（4DGS）的方法虽然在新视角合成上取得进展，但普遍面临两个根本瓶颈：**几何欠约束**——缺乏严格的3D结构一致性导致重建几何崩塌；**长时序误差累积**——逐帧或一次性优化策略难以维持长序列中的运动漂移控制。
 
@@ -55,8 +55,6 @@ claims:
 **方法定位** MotionScale首次在动态高斯溅射框架中实现了运动表示的可扩展性——不同于SC-GS（Huang et al., CVPR 2024）的全局MLP变形场或SplineGS（Park et al., CVPR 2025）的固定容量样条运动模型，MotionScale的集群基运动场能根据场景运动复杂度自适应增长或剪枝。
 
 **主要结果** 在DyCheck和NVIDIA Dynamic Scenes两个标准基准上，MotionScale一致超越所有先前方法：PSNR分别达到**17.98**和**26.75**（Tab.1）。点追踪指标同样取得最优：3D EPE **0.070**、2D AJ **37.7**、OA **0.87**，显著优于Shape of Motion（Wang et al., ICCV 2025）等基线（Tab.2）。消融实验证实，集群运动场相比全局基方法PSNR提升**1.28**，阴影高斯模块和自适应控制对最终性能均至关重要（Tab.3）。
-
-## 背景与动机
 
 ### 动态场景重建的核心挑战
 
@@ -86,7 +84,7 @@ claims:
 
 通过上述设计，MotionScale旨在实现动态场景重建中外观质量、几何精度与运动一致性的三重提升，同时保持表示的可扩展性以应对任意长度的视频输入。
 
-## 核心创新
+## 核心方法与创新机理
 
 MotionScale 的核心创新在于从根本上重构了动态场景的运动表示与优化范式，以解决现有 4DGS 方法普遍存在的几何欠约束和长时序误差累积问题。其关键创新点可归纳为三个紧密耦合的 changed slots：
 
@@ -121,8 +119,6 @@ $$\mu_i^t = \mathbf{R}_{k,g}^t ( \mathbf{R}_{i,\ell}^t \pmb{\mu}_i^0 + \mathbf{t
 ---
 
 **创新关联性总结**：上述三个创新并非孤立存在，而是形成了因果闭环——集群运动场提供了可扩展的表示容量（创新 1），渐进优化策略确保了该容量在长序列中被有效利用（创新 2），阴影高斯则消除了瞬态效应对背景几何的干扰，为运动建模提供了更干净的信号（创新 3）。三者共同作用，使 MotionScale 在 DyCheck 和 NVIDIA Dynamic Scenes 数据集上一致优于所有先前方法（PSNR 分别达到 17.98 和 26.75，Tab.1）。
-
-## 整体框架
 
 MotionScale 的整体框架围绕一个核心设计展开：**将动态场景表示为规范空间中的一组 3D 高斯点，并由一个可扩展的运动场（scalable motion field）驱动其在时间轴上演化**。该运动场通过集群中心的自适应层次运动基（cluster-centric hierarchical motion bases）来参数化局部区域的动力学，同时引入自适应控制策略自主扩展或剪枝集群，从而实现表示容量的可伸缩性。与之配套的渐进式优化策略解耦为背景扩展与前景传播两个阶段，确保长序列中的时空一致性。图 2 给出了框架总览。
 
@@ -187,8 +183,6 @@ MotionScale 的整体框架围绕一个核心设计展开：**将动态场景表
 
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2603_29296/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of MotionScale. Our method adopts a scalable motion field that progressively captures object motions through an adaptive control mechanism, enabling efficient splitting and refinement of motion components. For optimization, the background is updated through region sampling, camera refinement, and shadow handling, while the foreground propagation employs a three-stage refinement to propagate motion across long temporal windows for consistent 4D reconstruction*
-
-## 核心模块与公式推导
 
 ### 3.1 3D高斯溅射基础
 
@@ -293,7 +287,7 @@ $$
 
 这两个损失函数共同作用，将2D先验信息（点追踪和深度估计）注入3D运动场优化，有效缓解了纯光度损失在动态场景中面临的几何欠约束问题。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 实验设置与基准
 
@@ -354,12 +348,7 @@ Table 3 和 Figure 4 展示了在 DyCheck 数据集上的消融实验结果，�
 - 该方法在极端非朗伯体或透明物体场景中的鲁棒性如何？
 - 能否利用多摄像头或额外传感器（如深度相机）进一步提升几何精度与运动鲁棒性？
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2603_29296/figures/001_Figure_1.jpg]]
-*Figure 1: Visualization of a reconstructed dynamic scene and extracted moving objects. Given a single monocular video as input, MotionScale reconstructs a 4D scene representation that effectively captures photorealistic appearance, accurate 3D geometry, diverse human motion. Refer to the supplementary material for video results and additional examples*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 动态场景表示的方法谱系
 

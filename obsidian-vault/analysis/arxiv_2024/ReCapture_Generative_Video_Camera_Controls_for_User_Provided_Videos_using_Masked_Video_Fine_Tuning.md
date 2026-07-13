@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2024
 pdf_ref: paperPDFs/arxiv_2024/ReCapture_Generative_Video_Camera_Controls_for_User_Provided_Videos_using_Masked_Video_Fine_Tuning.pdf
+project_link: null
+code_link: null
 aliases:
 - ReCapture
 tags:
@@ -40,7 +42,7 @@ claims:
 > - VBench 上，Subject Consistency 88.53% vs 83.02% (Generative Camera Dolly) (+5.51%)。
 > - Kubric-4D 上，PSNR (All) 20.92 vs 未提供具体基线值，文中声称优于 4D Gaussian Splatting 等方法 (N/A)。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -60,7 +62,7 @@ ReCapture 将用户视频的相机重定位任务分解为两个阶段，其核�
 
 在 Kubric-4D 数据集上，ReCapture 的 PSNR 达到 20.92，显著优于 Generative Camera Dolly 及其他4D重建方法（Table 2）。在 VBench 基准上，ReCapture 的主体一致性（Subject Consistency）达到 88.53%，比 Generative Camera Dolly 的 83.02% 高出 5.51 个百分点（Table 1）。消融实验进一步证实，掩码视频微调、空间 LoRA 和 SDEdit 后处理三个组件各自均带来显著性能提升（Table 3），验证了方法设计的有效性。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -83,7 +85,9 @@ ReCapture 将用户视频的相机重定位任务分解为两个阶段，其核�
 
 这一设计使得 ReCapture **无需任何配对训练数据**，仅依赖用户提供的单目视频和目标相机轨迹，即可保留原始场景运动并合理想象未观测区域。该方法将问题重新定义为视频到视频的再生翻译任务，充分释放了视频扩散模型的内在先验能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ReCapture 的核心创新在于**将用户视频的相机重定位重构为一种无需配对训练数据的视频到视频翻译任务**，并通过**掩码视频微调（masked video fine‑tuning）**机制，使预训练视频扩散模型能够在保留原始场景运动的同时，合理填补新视角下未观测的区域。这一设计直接回应了现有方法的根本瓶颈：**生成式相机控制技术（如 Generative Camera Dolly）依赖4D仿真配对数据**，无法泛化到用户提供的真实单目视频；而传统4D重建方法（如 DynIBaR、4D Gaussian Splatting）则难以处理动态场景中的大面积遮挡和未观测内容。
 
@@ -118,7 +122,7 @@ Generative Camera Dolly 采用端到端的生成范式，直接从源视频和�
 
 这些 changed slots 并非孤立改进，而是形成了一个**因果闭环**：单目数据可用性（slot 1）使得两阶段流程成为可能（slot 2），而两阶段流程中锚点视频的“不完整性”又催生了对掩码微调策略的需求（slot 3）。掩码损失确保模型不被无效像素误导，双 LoRA 架构则分别处理运动连贯性和外观保真度这两个相互制约的目标。最终，这一设计使得 ReCapture 在 VBench 的主体一致性（Subject Consistency）上达到 88.53%，比需要配对数据的 Generative Camera Dolly（83.02%）高出 5.51 个百分点（Table 1），同时在 Kubric-4D 数据集上取得了 20.92 的 PSNR（Table 2），验证了“无配对数据”范式不仅可行，而且在关键指标上超越了依赖配对数据的方法。
 
-## 整体框架
+
 
 ReCapture 提出了一种**两阶段视频到视频翻译**范式，将用户提供的单目视频与任意目标相机轨迹作为输入，输出一段在新视角下保持场景动态一致的重渲染视频。其核心设计哲学是：**不依赖成对的4D训练数据，而是借助预训练视频扩散模型的强大生成先验，通过“生成—修复”的闭环完成相机重定位**。
 
@@ -164,7 +168,7 @@ ReCapture 提出了一种**两阶段视频到视频翻译**范式，将用户提
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2411_05003/figures/001_Figure_1.jpg]]
 *Figure 1: Given a user-provided source video, using ReCapture, we are able to generate a new version of the video with a new customized camera trajectory. Notice that the motion of the subject and scene in the video is preserved, and the scene is observed from angles that are not present in the source video*
 
-## 核心模块与公式推导
+
 
 ReCapture 将用户视频的相机重定位任务分解为两个核心阶段：**锚点视频生成**与**掩码视频微调**。其关键在于，第一阶段生成带有空洞和噪声的锚点视频，第二阶段利用预训练视频扩散模型的强大先验进行修复和补全，从而避免了对配对 4D 训练数据的依赖。
 
@@ -249,7 +253,9 @@ $$
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2411_05003/figures/008_Figure_7.jpg]]
 *Figure 7: Visualization of the effectiveness of masked video fine-tuning (Stage 2) for generating spatially and temporally coherent outputs from noisy anchor videos*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -295,7 +301,9 @@ Figure 5 展示了 ReCapture 与 Generative Camera Dolly 在轨道相机轨迹�
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2411_05003/figures/006_Figure_6.jpg]]
 *Figure 6: Gallery of generated videos with novel and unseen user-provided camera trajectories using ReCapture*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位与核心瓶颈
 
@@ -373,6 +381,8 @@ $$\mathcal{L}_{temp} = \mathbb{E}_{\epsilon, t} \left[ \mathbf{M}^a \cdot \left|
 ReCapture 代表了**从显式4D重建到隐式生成式新视角合成**的范式转变。其核心贡献不在于提出全新的网络架构，而在于**将视频扩散模型的强大先验通过掩码微调策略适配到任意视频的相机重控制任务**。这一思路可推广到其他需要“保留已知、补全未知”的视频编辑任务，如视频修复、视角插值等。
 
 后续工作可能沿以下方向展开：引入更强的深度估计或几何约束以改善锚点视频质量；设计端到端的单阶段方法以减少计算开销；扩展到手动物体运动与相机运动的联合控制；以及在更大规模的真实世界视频上验证泛化能力。
+
+
 
 ## 原文 PDF
 

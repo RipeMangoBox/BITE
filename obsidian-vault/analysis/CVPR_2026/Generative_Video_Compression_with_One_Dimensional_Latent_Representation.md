@@ -42,13 +42,13 @@ claims:
 > [!tip] 效果简介
 > - HEVC-B 上，LPIPS BD-Rate (%) GVC1D vs GLC-Video (-60.4%)；DISTS BD-Rate (%) GVC1D vs GLC-Video (-68.8%)；PSNR BD-Rate (%) GVC1D vs GLC-Video (-53.8%)。
 
-## 概述
+## 概要
 
 传统神经视频编解码器将视频帧压缩为密集的2D潜在网格，这种刚性空间结构保留了大量的帧内冗余，且不利于建模长程时间相关性和语义连贯性，导致需要更高的码率。本文提出 **GVC1D**，核心思路是将潜在表示从固定的2D网格替换为可学习的1D令牌：去除2D空间对应关系后，1D令牌能够自适应地关注语义区域，天然地减少令牌数量，形成紧凑的语义潜在空间，从而高效利用时空冗余。在此基础上，进一步引入基于1D潜在令牌的Transformer记忆模块，循环更新固定大小的记忆状态，为编解码提供语义丰富的长程上下文。
 
 在HEVC-B数据集上，GVC1D相比此前最好的生成式视频编解码器 **GLC-Video**，在LPIPS指标下节省 **60.4%** 码率，在DISTS指标下节省 **68.8%** 码率。消融实验表明，移除长程1D记忆会导致BD-Rate恶化超过40%，将1D记忆替换为2D特征管理的记忆则使BD-Rate恶化超过16%，证实了1D令牌的语义紧凑性对压缩效率的决定性作用。方法目前适用于低码率有损压缩场景，有限的令牌容量使其难以保留极精细的高频细节，暂不支持无损扩展。
 
-## 背景与动机
+
 
 视频压缩是数字媒体传输和存储的核心技术。传统视频编解码标准（如 VVC、HEVC）依赖手工设计的预测、变换和熵编码模块，在 PSNR 指标上表现优异，但在极低码率下往往产生模糊或块效应等视觉伪影。近年来，神经视频编解码器（neural video codecs）通过端到端学习取得了显著进展，其中生成式视频编解码器（generative video codecs）进一步引入了感知损失和对抗训练，在低码率下能够重建出更自然、语义更完整的画面。
 
@@ -61,7 +61,9 @@ claims:
 
 本文 GVC1D 正是针对上述问题提出了全新的解决方案：用**一维潜在令牌（1D latent tokens）**替代传统的 2D 潜在网格，并配套设计了一个基于 1D 令牌循环更新的**长程记忆模块（1D memory）**，为编解码提供语义丰富的长程上下文。这一设计从根本上解除了空间结构的束缚，使模型能够自适应地关注语义区域，在显著减少令牌数量的同时保持甚至提升感知重建质量。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GVC1D 的核心创新在于将视频压缩的潜在表示从传统的 **2D 潜在网格** 替换为 **1D 潜在令牌**，并配套设计了 **1D 记忆** 来提供语义丰富的长程上下文。这两个 changed slots 相互协同，共同构成了方法的技术突破。
 
@@ -101,7 +103,7 @@ GVC1D 的上下文模型由长程 1D 记忆和短程上下文缓冲两部分组�
 
 这三个 changed slots 的协同效果在 HEVC-B 数据集上得到验证：相比 GLC-Video，GVC1D 在 LPIPS 指标下节省 60.4% 码率，在 DISTS 指标下节省 68.8% 码率，在 PSNR 和 MS-SSIM 下分别节省 53.8% 和 45.1% 码率。
 
-## 整体框架
+
 
 GVC1D 的整体框架围绕“一维潜在表示”这一核心设计展开，将传统视频编解码中固定的 2D 潜在网格替换为紧凑的 1D 潜在令牌序列，并辅以长短期上下文模型进行条件编解码。整个 pipeline 由编码器、解码器、熵模型和上下文模型四大模块构成，其数据流关系如 Figure 2 所示。
 
@@ -155,7 +157,7 @@ $$L_{\mathrm{stage2}} = \frac{1}{T} \sum_{t=1}^{T} \big(R + \lambda L_{\mathrm{s
 
 对于每一帧 $x_t$：图像嵌入 $E_t$ 与可学习令牌 $L$、上下文 $C$ 一同进入编码器，生成 1D 潜在表示 $y_t$；量化后经自回归熵模型进行算术编码得到码流；解码端从码流恢复 $\hat{y}_t$，结合掩码令牌 $M$ 和上下文 $C$ 重建 $\hat{x}_t$；上下文模型则利用解码结果更新短时缓冲和长时记忆，为下一帧提供时序上下文。这一闭环设计使得 1D 令牌能够在极低码率下保持语义连贯性和时序一致性。
 
-## 核心模块与公式推导
+
 
 GVC1D 的编码器由 $M_e$ 个编码块堆叠而成，每个块包含 $N_e$ 层局部 Transformer 和一层全局 Transformer：
 
@@ -201,7 +203,9 @@ $$
 ![[assets/figures/papers/paper_list_l880_https_arxiv_org_abs_2603_15302/figures/005_Figure_5.jpg]]
 *Figure 5: Visualization of the outflow variation of a 1D latent token (index 4) as a new object appears. The red boxes in the first row mark image patches with the highest attention weights, while the green lines in the second row link them to the top four 1D latent tokens with the strongest attention. The bottom row is the 1D latent tokens attention weights corresponding to the maximum weight image patch (red boxes). As new content emerges, attention weights gradually shift from previously active tokens to newly activated ones*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -266,7 +270,9 @@ GVC1D 在 HEVC-B、UVG 和 MCL-JCV 三个标准数据集上与传统编解码器
 ![[assets/figures/papers/paper_list_l880_https_arxiv_org_abs_2603_15302/figures/010_Figure_7.jpg]]
 *Figure 7: Qualitative examples on the MCL-JCV datasets*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法沿革：从2D潜在网格到1D潜在令牌
 
@@ -307,6 +313,8 @@ GVC1D的适用边界明确限定于**低码率有损压缩**场景。由于每�
 2. **高分辨率鲁棒性**：在4K/8K分辨率或场景剧烈变化时，1D令牌的语义聚合能力是否依然鲁棒？当前实验主要在1080P分辨率下进行，更高分辨率下的行为尚待验证。
 3. **可伸缩编码扩展**：能否将1D潜在表示与无损压缩框架结合，构建感知一级的可伸缩编码方案？这需要在令牌表示中引入层次化的信息结构。
 4. **解码延迟优化**：自回归熵模型在长序列解码时存在顺序依赖，其解码延迟是否可以通过并行解码策略或非自回归近似进一步优化？
+
+
 
 ## 原文 PDF
 

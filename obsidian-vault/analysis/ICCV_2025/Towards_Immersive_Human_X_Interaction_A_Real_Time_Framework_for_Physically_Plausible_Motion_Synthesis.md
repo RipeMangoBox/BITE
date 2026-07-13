@@ -5,6 +5,8 @@ paper_level: A
 venue: ICCV
 year: 2025
 pdf_ref: paperPDFs/ICCV_2025/Towards_Immersive_Human_X_Interaction_A_Real_Time_Framework_for_Physically_Plausible_Motion_Synthesis.pdf
+project_link: https://humanx-interaction.github
+code_link: null
 aliases:
 - HX
 - TIHXIRTFPPMS
@@ -40,7 +42,7 @@ claims:
 > - Inter-X 上，FID↓ 0.975 vs 1.359 (CAMDM) (-0.384)；Skating↓ 0.092 vs 0.143 (InterGen) (-0.051)；IV↓ 0.076 vs 0.138 (CAMDM) (-0.062)。
 > - InterHuman 上，FID↓ 1.995 vs 2.166 (CAMDM) (-0.171)。
 
-## 概述
+## 概要
 
 沉浸式人机交互要求系统在动态交互中同时满足实时响应、物理合理性与安全性。现有方法面临两难：运动学生成模型缺乏物理约束，易产生滑步、穿透等伪影；而基于物理的方法则难以有效捕捉复杂的交互动态。**Human-X** 针对这一瓶颈，提出联合自回归动作-反应扩散规划器与演员感知物理跟踪策略，首次实现面向人-虚拟人、人-人形机器人及人-机器人交互的低延迟、物理合理运动合成。
 
@@ -48,7 +50,7 @@ claims:
 
 在 Inter-X 和 InterHuman 数据集上的实验表明，Human-X 在运动质量（FID 0.975）、物理指标（滑步 0.092、穿透体积 0.076）上均显著优于 **InterFormer**、**InterGen**、**ReGenNet**、**CAMDM** 等基线方法。消融实验证实交互损失是关键组件——移除后 FID 从 0.975 恶化至 1.457。用户研究进一步验证了所生成交互在多样性、一致性与真实性上的优势。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -73,7 +75,9 @@ claims:
 
 简言之，Human‑X 旨在弥合运动学生成与物理仿真之间的鸿沟，为真实世界人机交互提供一种兼具交互质量与物理安全性的实时解决方案。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Human‑X 的核心创新在于将**联合自回归扩散规划**与**演员感知物理跟踪**首次整合为一个实时交互框架，解决了动态人机交互中运动质量、物理合理性与低延迟难以兼得的瓶颈。其关键设计围绕三个 changed slots 展开。
 
@@ -98,7 +102,7 @@ Human‑X 的核心创新在于将**联合自回归扩散规划**与**演员感�
 
 上述三个 changed slots 并非孤立改进，而是通过**实时动作捕捉（RGB‑D + HybrIK）→ 自回归扩散规划 → 物理跟踪 → VR 渲染**的流水线（Figure 2）形成闭环。这使得 Human‑X 成为首个在统一框架内同时实现实时响应、物理合理性和交互多样性的系统，可直接部署于人‑虚拟人、人‑人形机器人、人‑机器人等多种沉浸式交互场景（Figure 1）。
 
-## 整体框架
+
 
 Human‑X 提出了一种面向沉浸式人机交互的实时运动合成框架，其核心目标是同时满足动态交互中的三项关键需求：**实时响应**、**物理合理性**与**接触安全**。现有方法通常在这三者之间存在取舍——纯运动学生成模型缺乏物理约束，容易产生滑步、穿透等伪影；而基于物理的方法则难以有效捕捉复杂的交互动态。Human‑X 通过将**自回归动作‑反应扩散规划器**与**基于强化学习的演员感知物理跟踪策略**解耦，形成“先规划、后跟踪”的两阶段流水线，从而在保证交互质量的同时，确保生成的运动在物理仿真中可行。
 
@@ -135,7 +139,7 @@ Human‑X 位于**物理合理的人‑人/人‑机交互运动合成**这一�
 ![[assets/figures/papers/paper_list_l1777_Towards_Immersive_Human_X_Interaction_A_Real_Time_Framework_for_Physical/figures/001_Figure_1.jpg]]
 *Figure 1: We propose Human-X, the first framework designed to enable latency-free interaction between humans and diverse entities, including human-avatar, human-humanoid, and human-robot interaction*
 
-## 核心模块与公式推导
+
 
 ### 反应者中心交互表示
 
@@ -213,7 +217,9 @@ $$\mathcal{G}_{w}(\mathbf{z}_{t}^{i}, \mathbf{z}^{i-1}, t, c) = \mathcal{G}(\mat
 ![[assets/figures/papers/paper_list_l1777_Towards_Immersive_Human_X_Interaction_A_Real_Time_Framework_for_Physical/figures/002_Table_1.jpg]]
 *Table 1: Comparative analysis of Human-X versus existing human reaction synthesis approaches*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -282,7 +288,9 @@ Figure 3 的定性对比显示，CAMDM 在手部接触任务中存在接触不�
 
 这些局限性在 Table 2 中也有间接体现：Human-X 的多样性指标（Diversity）在部分设置下略低于某些基线，可能与物理约束和短时序窗口对运动空间的压缩有关，需在后续工作中进一步平衡。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心问题与因果瓶颈
 
@@ -338,6 +346,8 @@ Human‑X 在现有知识库中的定位可概括为：
 - **应用层面**：覆盖**人‑虚拟人、人‑人形机器人、人‑机器人**三类交互场景，是首个面向实时沉浸式交互的统一框架。
 
 与已有工作的关系：Human‑X 在运动质量（FID 0.975 vs. CAMDM 1.359，Table 2）和物理指标（滑步 0.092、穿透体积 0.076）上显著超越现有基线，但运动多样性（Diversity 指标）在引入物理跟踪器后有所下降（Human‑X* 版本），体现了物理约束与运动多样性之间的固有权衡。
+
+
 
 ## 原文 PDF
 

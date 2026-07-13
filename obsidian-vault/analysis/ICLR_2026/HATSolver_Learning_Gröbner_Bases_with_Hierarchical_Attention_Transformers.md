@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: "paperPDFs/ICLR_2026/HATSolver_Learning_Gröbner_Bases_with_Hierarchical_Attention_Transformers.pdf"
+project_link: null
+code_link: null
 openreview_forum_id: 5C3LljOEGC
 aliases:
 - HHATGBB
@@ -42,7 +44,7 @@ claims:
 > - 13-variable systems, density 90%, F7 上，Runtime (s) 为 292，对比 1129 (STD-FGLM)，变化 -837s。
 > - 13-variable systems, density 30%, F7 上，Success rate (%) 为 52.5，对比 33.5 (STD-FGLM)，变化 +19%。
 
-## 概述
+## 概要
 
 Gröbner基是代数几何与符号计算中的核心工具，广泛应用于多项式方程求解、理想成员判定和代数系统化简。然而，经典算法（如Buchberger算法、Faugère的F4/F5算法）在最坏情形下具有双指数复杂度，且高度依赖专家设计的启发式策略，难以扩展到大规模多元多项式系统。近年来，基于Transformer的深度学习方法尝试从数据中学习Gröbner基的预测模式，但标准Transformer的扁平自注意力机制在处理多元多项式系统时，序列长度随变量数和次数急剧增长，导致二次复杂度的计算与内存瓶颈，限制了可求解系统的规模。
 
@@ -52,7 +54,7 @@ HATSolver（Hierarchical Attention Transformer for Gröbner bases）针对上述
 
 需要指出的是，当前方法仅在形状位置理想和有限域上验证，训练数据由特定的后向生成算法构造，其分布可能与真实多项式系统存在偏差，分布外泛化性能有待进一步检验。
 
-## 背景与动机
+
 
 ### 多项式系统求解与Gröbner基
 
@@ -72,7 +74,9 @@ HATSolver（Hierarchical Attention Transformer for Gröbner bases）针对上述
 
 本文的核心动机正是利用这一层次结构先验，设计一种**计算高效的层次化注意力机制**，在保留必要长程依赖的前提下，将注意力限定在局部和父子节点之间，从而突破标准Transformer的扩展性瓶颈。同时，辅以**课程学习策略**逐步提升训练难度，使模型能够稳定地学习更大规模系统的Gröbner基计算模式。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 HATSolver的核心创新在于将标准Transformer的扁平自注意力替换为**树状分层注意力机制**，以突破多元多项式系统Gröbner基预测的扩展性瓶颈。这一设计源于一个关键洞察：多项式系统天然具有“系统→方程→项→符号”的树形层次结构，将注意力限定在局部和父子节点之间，既能保留长程依赖，又能将计算复杂度从扁平注意力的 $O(L^2 d)$ 降至 $O(L^{1+1/n} d)$。
 
@@ -116,7 +120,7 @@ HATSolver提供两种层次深度配置（Section 4.1）：
 
 **证据强度说明**：以上创新点的核心证据（Figure 2, Table 1, Table 2, Figure 5）置信度均在0.9以上，因果关系明确。课程学习消融实验提供了直接的因果证据。复杂度分析的理论推导与实验观察一致，但更深层次（n>3）的扩展行为尚未验证，需进一步探索。
 
-## 整体框架
+
 
 HATSolver 的整体流水线由五个核心模块串联构成，围绕“后向数据生成→层次化编码→自回归解码→课程调度”这一闭环展开，目标是在给定多元多项式系统后直接预测其约化Gröbner基。
 
@@ -134,7 +138,7 @@ HATSolver 的整体流水线由五个核心模块串联构成，围绕“后向�
 
 **关键局限**：整个框架目前仅适用于形状位置（shape position）理想和有限域（$\mathbb{F}_7, \mathbb{F}_{16}, \mathbb{F}_{17}$），向一般理想或特征零域的推广尚未验证。此外，后向数据生成引入的分布偏差可能导致模型在真实多项式系统上的分布外性能下降，这一点需要在实际部署时手动评估。
 
-## 核心模块与公式推导
+
 
 HATSolver的核心创新在于将标准Transformer的全局扁平自注意力替换为**树状分层注意力机制**（Hierarchical Attention），并辅以课程学习策略。以下按模块拆解其设计逻辑。
 
@@ -200,7 +204,9 @@ $$p(t,i) = \frac{\exp\left(-\frac{(i-\mu(t))^2}{2\sigma^2}\right)}{\sum_{j=0}^{n
 
 HATSolver的完整处理流水线包括：①后向数据生成（构造Gröbner基与非Gröbner基系统的监督训练对）；②树状tokenization（将多项式系统编码为层次化token序列）；③分层编码器（执行上述自下而上+自上而下注意力）；④分层解码器（基于编码器输出自回归生成Gröbner基）；⑤课程调度器（控制训练难度渐进）。其中编码器是核心创新所在，解码器沿用标准Transformer的自回归架构。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心结果：13变量系统的突破
 
@@ -293,7 +299,9 @@ Table 4报告了基线Transformer配合课程学习在2至7变量系统上的表
 ![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_5C3LljOEGC/figures/016_Table_10.jpg]]
 *Table 10: BART Model Performance on Grobner Basis Prediction over ¨ $\mathbb { F } _ { 7 }$*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线模型的关系
 
@@ -334,6 +342,8 @@ HATSolver 的适用边界由以下约束定义：
 4. **混合系统的潜力**：是否可以将 HATSolver 与经典代数软件混合使用，例如用 HATSolver 快速生成候选 Gröbner 基，再用 STD-FGLM 进行验证和后处理？这种混合策略可能结合学习方法的效率和符号计算的正确性保证。
 
 5. **数据生成策略的鲁棒性**：不同的采样分布（如改变后向生成中矩阵 $U_2$ 的稀疏模式）会对模型的泛化能力和鲁棒性产生多大影响？这直接关系到模型在真实代数几何问题上的实用性。
+
+
 
 ## 原文 PDF
 

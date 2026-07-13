@@ -5,6 +5,7 @@ paper_level: A
 venue: "SIGGRAPH Asia"
 year: 2024
 pdf_ref: paperPDFs/SIGGRAPH_ASIA_2024/SpaceMesh_A_Continuous_Representation_for_Learning_Manifold_Surface_Meshes.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/toronto-ai/space-mesh/
 aliases:
 - SpaceMesh
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | SpaceMesh：一种面向流形曲面网格学习的连续表示方法 |
 | 英文题名 | SpaceMesh: A Continuous Representation for Learning Manifold Surface Meshes |
 | 会议/期刊 | SIGGRAPH Asia 2024 |
-| Links | [paper](https://arxiv.org/abs/2409.20562); [Project](https://research.nvidia.com/labs/toronto-ai/space-mesh/) |
+| Links | [paper](https://arxiv.org/abs/2409.20562) · [Project](https://research.nvidia.com/labs/toronto-ai/space-mesh/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | SpaceMesh |
 | Dataset | ABC Dataset (10, 000 shapes, 512 vertices each), ABC Dataset |
@@ -41,7 +42,7 @@ claims:
 > - ABC Dataset 上，F1 ↑ 为 0.66，对比 0.48 (Pixel2Mesh) / 0.47 (OccNet) / 0.44 (PSR)，变化 比最佳基线Pixel2Mesh提升37.5%。
 > - ABC Dataset 上，ECD (10⁻²) ↓ 为 3.21，对比 29.52 (Pixel2Mesh) / 33.08 (OccNet) / 56.81 (PSR)，变化 比最佳基线Pixel2Mesh降低89%。
 
-## 概述
+## 概要
 
 三维网格是计算机图形学与几何处理中最基本的形状表示形式。然而，现有深度学习方法在生成多边形网格时面临一个根本性矛盾：**隐式函数等值面方法**（如OccNet、PSR）能保证流形结构，但其连通性由Marching Cubes查表固定，无法学习数据中的网格划分模式；**直接面生成方法**（如PolyGen、MeshGPT）虽可生成任意多边形面，却不能保证局部流形结构，产生无序三角面片。这一矛盾的本质在于网格的连续几何与离散组合结构之间的张力——缺乏一种连续参数化方案，使其既可被神经网络输出、又能在构造上自然导出流形网格。
 
@@ -51,7 +52,7 @@ SpaceMesh针对这一瓶颈提出了一个统一的连续表示框架。其核�
 
 SpaceMesh的提出标志着网格生成从“几何重建”向“连通性学习”的范式转变，为可微几何处理开辟了新的技术路径。
 
-## 背景与动机
+
 
 ### 问题背景：多边形网格的生成式学习
 
@@ -83,7 +84,9 @@ SpaceMesh的提出标志着网格生成从“几何重建”向“连通性学�
 
 **SpaceMesh** 的核心动机正是弥合这一鸿沟。其关键洞察在于：**将流形多边形网格的离散连通性编码为每个顶点的低维连续嵌入向量**——通过精心设计的距离函数与置换匹配机制，使边存在性（edge）和半边的 next 关系（halfedge next）均可从嵌入中连续导出，从而将网格生成从不可微的组合搜索转化为可微的连续优化。这一表示天然保证流形输出，且能被标准神经网络直接预测，使得模型能够从数据中学习网格划分风格，而非仅拟合几何形状。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SpaceMesh的核心创新在于以**半边缘数据结构为纽带**，将网格的离散组合结构完整嵌入到每个顶点的低维连续参数空间中，从而使网格生成从不可微的组合搜索转化为可微的连续优化。这一设计解决了长期以来网格深度学习中"连续几何"与"离散连通性"之间的根本张力。
 
@@ -126,7 +129,7 @@ $$ \mathsf{next}(h_{ij}) := h_{ki} \quad \mathrm{for} \quad k = \mathrm{match}_{
 
 在单网格拟合任务中，SpaceMesh不仅收敛速度远超**DMesh**（Son et al., 2024），还适用于三角/多边形混合网格（Figure 2）；而**DSE**（Rakotosaona et al., CVPR 2021）在顶点稀疏和非凸几何情况下即使过拟合单形状也表现挣扎（Figure 14）。
 
-## 整体框架
+
 
 SpaceMesh的生成流水线由三个级联模块构成：**点云编码器**、**顶点位置生成网络**和**顶点连通性预测网络**，最终通过**网格提取模块**恢复离散半边缘网格结构。整个流程的输入为三维点云，输出为具有流形保证的多边形网格。
 
@@ -185,7 +188,7 @@ SpaceMesh的生成流水线由三个级联模块构成：**点云编码器**、*
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2409_20562/figures/009_Figure_6.jpg]]
 *Figure 6: Network architecture for learning to generate meshes*
 
-## 核心模块与公式推导
+
 
 ### 3.1 半边缘连通性的连续参数化框架
 
@@ -239,7 +242,9 @@ $$\mathsf{next}(h_{ij}) := h_{ki} \quad \text{for} \quad k = \mathrm{match}_{\Ph
 
 流形性由表示本身的构造方式天然保证，无需额外约束。边的twin算子是对合映射，由边集的无向性自然满足；next算子的轨道度数至少为3，由Sinkhorn归一化与单轨道约束共同保证。这使得每个顶点的局部邻域构成一个循环置换，从而确保生成的网格在连通性层面是流形的。但需注意，流形性仅保证拓扑结构，不排除面之间的几何自交（见Section 6的讨论）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果：ABC数据集网格重建
 
@@ -285,7 +290,9 @@ Figure 13展示了典型失败案例：尽管模型始终保证流形连通性�
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2409_20562/figures/011_Table_1.jpg]]
 *Table 1: Accuracy and quality statistics for mesh reconstruction*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：网格生成中的“连续-离散”张力
 
@@ -334,6 +341,8 @@ DMesh和DSE将网格表示为Delaunay三角剖分上的概率分布或元素选�
 4. **表示维度的推广**：该表示方法是否可扩展到时变网格（4D）或体网格（四面体/六面体）的生成？半边缘结构在更高维度的推广需要重新设计next和twin算子的代数结构。
 
 5. **与大规模生成模型的融合**：当前方法使用Point-E扩散Transformer生成顶点位置，连通性由独立Transformer预测。是否可以将顶点生成与连通性预测统一到单一扩散框架中，实现端到端的联合去噪？
+
+
 
 ## 原文 PDF
 

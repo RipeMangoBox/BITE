@@ -42,7 +42,7 @@ claims:
 > - FLUX.1-dev ~4× 加速对比 上，CLIP-IQA ↑ 0.6166 vs 0.6139 (FLUX.1-dev 50 NFE) (+0.0027)；Image Reward ↑ 1.017 vs 1.004 (FLUX.1-dev 50 NFE) (+0.013)；TFLOPs ↓ 706.17 vs 2990.96 (FLUX.1-dev 50 NFE) (-76.4%)。
 > - FLUX.1-dev ~7× 加速对比 上，CLIP-IQA ↑ 0.5397 vs 0.4134 (FLUX.1-dev 7 NFE) (+0.1263)；GenEval ↑ 0.6457 vs 0.5629 (FLUX.1-dev 7 NFE) (+0.0828)。
 
-## 概述
+## 概要
 
 扩散Transformer（Diffusion Transformer, DiT）已成为高分辨率图像与视频生成的主流骨干，但其在推理阶段对所有空间token施加均匀的Transformer计算，忽视了扩散模型由粗到细的生成特性——早期步骤主要构建全局低频结构，细节信息仅在后期才逐步涌现。这一空间冗余导致大量计算被浪费在非关键区域，成为制约DiT高效部署的核心瓶颈。
 
@@ -54,7 +54,7 @@ JiT框架由三个关键机制构成：（1）**空间近似生成ODE（SAG-ODE�
 
 **方法定位**：JiT属于扩散模型推理加速中的**空间稀疏计算**路线，与时间域加速方法（高阶求解器、蒸馏、缓存重用）正交互补。相较于Bottleneck Sampling、RALU等空间加速基线，JiT无需额外训练或架构修改，且通过SAG-ODE的精确锚点动力学保证和DMF的阶段转换一致性，在高加速比下仍能维持语义完整性与细节保真度。
 
-## 背景与动机
+
 
 ### 扩散Transformer的空间冗余困境
 
@@ -78,7 +78,9 @@ JiT框架由三个关键机制构成：（1）**空间近似生成ODE（SAG-ODE�
 
 基于上述分析，本文提出**Just-in-Time (JiT)** 框架——一种训练无关的空间加速方法，其核心思想是：**利用扩散模型由粗到细的生成特性，将空间计算资源按需分配，早期仅对少量关键token计算并外推全场速度，后期逐步激活细节区域，实现高加速比且几乎无损的图像生成**。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 JiT框架的核心创新在于**首次将扩散模型“由粗到细”的生成特性系统性地转化为空间计算资源的动态调度机制**，实现了对扩散Transformer（DiT）的训练无关、高加速比且几乎无损的加速。其关键突破可归结为三个紧密耦合的“changed slots”：
 
@@ -114,7 +116,7 @@ $$\mathbf{Q}_{k}\dot{\mathbf{y}}(t) = \frac{\mathbf{y}_{k}^{\star} - \mathbf{Q}_
 
 上述三个changed slots并非孤立运作，而是形成了一条完整的因果链：**SAG-ODE定义了稀疏计算下的演化规则，ITA决定了“在哪里”以及“何时”增加计算密度，DMF保证了密度切换时的状态连续性**。三者共同实现了JiT的核心理念——将扩散模型固有的由粗到细生成过程，转化为一个训练无关、可按需配置的空间加速框架。在FLUX.1-dev上，这一设计实现了最高7倍的加速，且性能几乎无损。
 
-## 整体框架
+
 
 JiT框架的核心思想是利用扩散Transformer由粗到细的生成特性，将空间计算资源按需分配：在生成早期仅对少量关键token进行精确的Transformer计算，并通过外推算子将速度场扩展到全空间；随着生成推进，逐步激活更多token以刻画细节。该框架由三个核心模块串联构成，形成一条完整的训练无关加速pipeline。
 
@@ -141,7 +143,7 @@ JiT框架的核心思想是利用扩散Transformer由粗到细的生成特性，
 ![[assets/figures/papers/paper_list_l2527_https_arxiv_org_abs_2603_10744/figures/002_Figure_2.jpg]]
 *Figure 2: An overview of our JiT framework, illustrating its core mechanisms and underlying philosophy. (a) The SAG-ODE evolves the latent state by extrapolating a velocity field computed on a sparse subset of tokens. (b) For stage transitions, the DMF evolves newly incorporated tokens to a structurally coherent target with the correct noise level to prevent artifacts. (c) The visualized evolution of the predicted clean image reveals a coarse-to-fine process (global structures first), motivating our strategy to defer computation on detailed regions. (d) The sampling trajectory visualizes our dynamic resource allocation, where the set of active tokens (red flow) starts as a narrow subset and expands o...*
 
-## 核心模块与公式推导
+
 
 ### 核心设计理念
 
@@ -216,7 +218,9 @@ $$\Omega_K \subset \Omega_{K-1} \subset \cdots \subset \Omega_1 \subset \Omega_0
 ![[assets/figures/papers/paper_list_l2527_https_arxiv_org_abs_2603_10744/figures/008_Figure_5.jpg]]
 *Figure 5: An illustration of the construction process for the initial selector matrix*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -281,7 +285,9 @@ JiT展现出良好的泛化能力。在Qwen-image模型上，~4×加速设置下
 
 ![[assets/figures/papers/paper_list_l2527_https_arxiv_org_abs_2603_10744/figures/004_Figure.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心洞察与问题定位
 
@@ -330,6 +336,8 @@ JiT属于**训练无关的空间稀疏加速**范式，其核心贡献在于首�
 3. **跨架构泛化**：JiT的核心思想——动态选择关键token进行精确计算并外推全场——是否可拓展到其他需要空间token处理的Transformer架构，如视频理解、多模态模型或自回归视觉生成？HunyuanVideo-1.5上的初步结果（Figure 9）显示了在时空域的泛化潜力，但更广泛的验证仍是必要的。
 
 4. **理论分析深化**：SAG-ODE的近似误差界及其与最终生成质量的定量关系尚未建立。这一理论缺口使得超参数选择缺乏原则性指导，也限制了对方法失败模式的系统性理解。
+
+
 
 ## 原文 PDF
 

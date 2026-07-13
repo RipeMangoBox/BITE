@@ -43,7 +43,7 @@ claims:
 > - HD-EPIC 上，Collision Rate (%) EgoFlow (guided) 2.5 vs EgoFlow (w/o guidance) 11.6 (相对减少 ~79%)；Collision Rate (%) EgoFlow (guided) 2.5 vs GIMO 23.5 (-21.0 (绝对))；ADE (m) 0.279 vs GIMO 0.285 (-0.006)。
 > - HOT3D (zero-shot) 上，ADE (m) EgoFlow 0.265 vs GIMO ≈0.57 (近似) (明显降低)。
 
-## 概述
+## 概要
 
 从自我中心视频中生成物体的6自由度（6DoF）运动轨迹，是实现具身智能体在真实环境中执行操作任务的关键能力。给定一段手持相机拍摄的交互视频、一个文本指令（如“拿起桌上的手机”）以及目标位姿，系统需要预测物体在未来时刻的连续平移与旋转序列，且该序列必须同时满足空间合理性（避免穿透桌面、墙壁等障碍物）和运动平滑性（避免突变或抖动）。
 
@@ -55,7 +55,7 @@ claims:
 
 EgoFlow的核心洞察在于：在 $\mathbb{R}^9$ 流空间中学习连续传输场，使轨迹生成过程本身即编码物理偏向；同时利用梯度引导在采样时动态优化，将数据驱动的运动先验与物理约束解耦，从而在不重新训练的情况下适应新场景的障碍布局。这一设计为自我中心物体运动生成提供了一条兼顾精度与物理一致性的新路径。
 
-## 背景与动机
+
 
 ### 问题背景：自我中心视频中的6DoF物体运动生成
 
@@ -85,7 +85,9 @@ EgoFlow的核心洞察在于：在 $\mathbb{R}^9$ 流空间中学习连续传输
 
 这一设计理念的核心洞察在于：**在R⁹空间中学习连续流场，使轨迹生成过程本身即编码物理偏向；同时利用梯度引导在采样过程中动态优化，把数据驱动的运动先验和物理约束解耦，从而在不重训练的情况下适应新场景的障碍布局。** 实验结果表明，EgoFlow在HD-EPIC数据集上将碰撞率从无引导版本的11.6%降至2.5%，相对减少约79%，验证了这一技术路线的有效性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 EgoFlow 的核心创新并非单一模块的替换，而在于**将生成范式、序列融合架构与推理时物理约束三者协同重构**，从而系统性地解决自我中心 6DoF 物体轨迹生成中长期存在的物理不合理性问题。下面从三个关键维度展开。
 
@@ -131,7 +133,7 @@ $$\mathbf{v}_\theta^{(k+1)} = \mathbf{v}_\theta^{(k)} - \alpha \nabla_{\mathbf{v
 
 上述三个创新并非孤立存在，而是形成了一条因果链路：流匹配提供了确定性、可微分的速度场，使得梯度引导可以直接作用于速度预测之上；混合架构则确保了速度场本身已融合充分的场景几何与语义信息，使梯度修正不至于偏离任务目标。三者协同的结果是：EgoFlow 在 HD-EPIC 上以 ADE 0.279、FDE 0.102、碰撞率 2.5% 的成绩全面超越 GIMO（碰撞率 23.5%）、CHOIS 等基线，并在跨数据集零样本泛化（HOT3D）中展现出显著优势。
 
-## 整体框架
+
 
 EgoFlow 的整体 pipeline 围绕一个核心思路构建：**将 6DoF 物体轨迹生成转化为在 R⁹ 空间中的确定性流匹配问题，并通过推理阶段的梯度引导注入物理约束**。整个框架由四个关键模块串联而成，形成从多模态场景理解到物理一致轨迹输出的端到端流程。
 
@@ -186,7 +188,7 @@ EgoFlow 的整体 pipeline 围绕一个核心思路构建：**将 6DoF 物体轨
 ![[assets/figures/papers/paper_list_l28_https_openaccess_thecvf_com_content_CVPR2026_html_Saroha_EgoFlow_Gradien/figures/001_Figure_1.jpg]]
 *Figure 1: EgoFlow: a method for object trajectory generation from egocentric videos. Given a textural command and the surrounding environment, EgoFlow generates physically valid 6DOF object trajectories that respect spatial constraints across diverse environments by learning from egocentric videos*
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题形式化与轨迹表示
 
@@ -262,7 +264,9 @@ $$\mathcal{T}_{\mathrm{vel}} = \sum_{j=H+1}^{T-2} \|\mathbf{a}_j\|, \quad \mathb
 
 梯度引导的核心价值在于将数据驱动的运动先验与物理约束解耦——网络仅在干净轨迹上以标准流匹配损失训练，无需接触碰撞或平滑性监督信号；物理合理性完全由推理时的可微分优化保证。消融实验（Table 3）提供了决定性证据：移除碰撞代价 $\mathcal{T}_{coll}$ 后，碰撞率从 **2.5%** 急剧上升至 **11.6%**，相对恶化约 79%，验证了 SDF 碰撞惩罚对物理合理性的关键作用。同时，移除场景点云或目标位姿条件会导致 ADE/FDE 显著恶化，表明局部几何与目标信息是精确轨迹预测的必要条件。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -348,7 +352,9 @@ $$\mathcal{T}_{\mathrm{vel}} = \sum_{j=H+1}^{T-2} \|\mathbf{a}_j\|, \quad \mathb
 ![[assets/figures/papers/paper_list_l28_https_openaccess_thecvf_com_content_CVPR2026_html_Saroha_EgoFlow_Gradien/figures/008_Table_4.jpg]]
 *Table 4: Architecture Ablation. Study of different layer configurations (Mamba-Transformer-Mamba layers) on HD-EPIC*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 生成范式演进：从扩散模型到流匹配
 
@@ -391,6 +397,8 @@ EgoFlow 的适用边界由其技术假设严格界定：
 - **闭环策略集成**：将 EgoFlow 的轨迹生成能力与机器人操作策略学习耦合，使生成的物理一致轨迹可直接作为策略的参考运动，或通过逆运动学转化为关节动作序列。这需要解决轨迹表示与动作空间之间的映射问题。
 
 - **感知-生成联合优化**：当前框架将场景点云作为固定条件输入，未来可探索端到端地从 RGB-D 视频直接生成轨迹，使感知模块的特征提取与轨迹生成联合优化，减少中间表示的误差累积。
+
+
 
 ## 原文 PDF
 

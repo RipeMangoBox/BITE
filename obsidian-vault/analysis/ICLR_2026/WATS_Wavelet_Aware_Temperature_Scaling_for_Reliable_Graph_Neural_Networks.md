@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/WATS_Wavelet_Aware_Temperature_Scaling_for_Reliable_Graph_Neural_Networks.pdf
+project_link: null
+code_link: https://github.com/lxy1134/WATS.git
 openreview_forum_id: ZrrVEMyQeU
 aliases:
 - WWATS
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | WATS：基于小波的温度缩放用于图神经网络的可靠校准 |
 | 英文题名 | WATS: Wavelet-Aware Temperature Scaling for Reliable Graph Neural Networks |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=ZrrVEMyQeU); [GitHub](https://github.com/lxy1134/WATS.git) |
+| Links | [paper](https://openreview.net/forum?id=ZrrVEMyQeU) · [GitHub](https://github.com/lxy1134/WATS.git) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/graph_neural_networks |
 | Method | WATS (Wavelet-Aware Temperature Scaling) |
 | Dataset | 9 个数据集 (Citeseer, Cora, Pubmed, Cora-Full, Computers, Photo, Reddit, Roman, Tolokers) 搭配 3 种 GNN 主干 (GCN, GAT, GCNII), Photo (GCN) |
@@ -41,7 +43,7 @@ claims:
 > - 9 个数据集 (Citeseer, Cora, Pubmed, Cora-Full, Computers, Photo, Reddit, Roman, Tol... 上，ECE 为 在绝大多数配置中取得最低 ECE，对比 TS, ETS, CaGCN, GATS, GETS，变化 ECE 最多降低 41.2%，校准方差平均降低 15.84%。
 > - Photo (GCN) 上，ECE 为 1.64 ± 0.31，对比 Uncalibrated GCN，变化 显著降低校准误差。
 
-## 概述
+## 概要
 
 图神经网络（GNN）在节点分类任务中普遍存在校准不可靠的问题：模型预测的置信度往往与真实准确率偏离，尤其在网络加深时，准确率下降而置信度反而上升（Figure 1）。现有图校准方法主要依赖一跳邻居统计或潜在嵌入来预测节点温度，忽略了图拓扑的细粒度结构异质性，导致在低度、稀疏或低同配性区域校准偏差大，无法捕捉多跳结构驱动的系统性误校准。
 
@@ -49,7 +51,7 @@ claims:
 
 在 9 个数据集、3 种 GNN 主干（GCN、GAT、GCNII）上的实验表明，WATS 在绝大多数配置中取得最低的期望校准误差（ECE），最高比经典和图特定基线降低 **41.2%** 的 ECE，校准方差平均降低 **15.84%**。消融研究证实，图小波特征始终优于对数度、介数中心性、聚类系数等替代结构特征；在高度同配图上，WATS 对超参数 $k$ 和 $s$ 不敏感，推荐默认设置为 $k=3$、$s=2.0$。WATS 不修改预训练 GNN 参数，仅需静态小波特征和两层 MLP 即可完成校准训练，兼具有效性与轻量性。
 
-## 背景与动机
+
 
 图神经网络（GNN）通过消息传递机制聚合邻居信息，在节点分类等任务中取得了显著成功。然而，GNN 的预测置信度往往与其实际正确率之间存在系统性偏差，即模型校准（calibration）问题。Figure 1 揭示了这一现象的典型表现：在 Cora、Pubmed 和 Citeseer 三个数据集上，随着 GCN 层数加深，模型的测试准确率持续下降，但平均预测置信度反而上升。这种深度诱导的误校准（depth-induced miscalibration）意味着深层 GNN 在变得更“自信”的同时，其预测质量却在恶化，严重损害了模型在实际高风险场景中的可靠性。
 
@@ -85,7 +87,9 @@ $$\pmb{\Psi}_{s} = \mathbf{U} \mathrm{diag}(g(s\lambda_1), \dots, g(s\lambda_N))
 
 基于此，本文提出 **WATS（Wavelet-Aware Temperature Scaling）**，一个轻量级的后处理校准框架。WATS 的核心思想是：将图小波系数作为节点不确定性的结构签名，驱动一个简单的 MLP 为每个节点预测特定的温度参数，从而在不修改预训练 GNN 参数、不访问邻居预测的前提下，实现细粒度的自适应校准。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 现有图校准方法（CaGCN、GATS、GETS）的核心瓶颈在于，它们依赖一跳邻居统计或潜在嵌入来预测节点温度，忽略了图拓扑的细粒度结构异质性。这导致在低度节点、稀疏区域或低同配性图上出现系统性误校准——深层 GCN 在准确率下降的同时置信度反而上升（Figure 1），而一跳邻居的标签统计无法提供准确的节点不确定性估计（式 (3) 的偏置近似暴露了这一局限）。
 
@@ -106,7 +110,7 @@ WATS 的关键创新在于引入**可调的热核图小波特征**作为节点�
 
 总体而言，WATS 将图校准从“依赖邻居预测”的范式转变为“利用多尺度结构签名”的范式，实现了架构无关、仅需静态图结构的后处理校准。
 
-## 整体框架
+
 
 WATS 是一种后处理（post-hoc）校准框架，专为图神经网络节点分类任务设计。其核心思想是利用热核图小波特征作为节点特定的结构签名，预测节点级温度参数，从而对预训练 GNN 输出的 logits 进行自适应缩放。整个 pipeline 由两个顺序模块构成，不修改预训练 GNN 的任何参数，也不依赖邻居的预测或标签信息。
 
@@ -156,7 +160,7 @@ WATS 的工作流程可概括为以下步骤：
 
 WATS 的关键优势在于：既不依赖邻居的预测或标签（避免误差传播），又能通过可调尺度的小波特征捕获多跳结构信息，从而在结构异质性强的区域实现更精准的校准。这种架构无关的设计使其可无缝适配任意预训练 GNN 主干，无需重新训练或修改原始模型。
 
-## 核心模块与公式推导
+
 
 ### 3.1 图校准问题与期望校准误差
 
@@ -204,7 +208,9 @@ Softplus 激活函数保证温度 $\tau_i > 0$。该温度用于缩放预训练 
 
 **总时间复杂度**为 $\mathcal{O}(K|\mathcal{E}| + |\mathcal{V}|K h)$，其中 $|\mathcal{V}|$ 为节点数，$h$ 为隐藏维度。小波特征可预计算并复用，进一步降低校准阶段开销。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 瓶颈与动机验证
 
@@ -264,7 +270,9 @@ Table 9（附录）的内存使用对比表明，WATS 的校准内存高于 TS �
 3. **异配图的超参数敏感度**：虽然默认 k=3, s=2.0 在多数数据集上有效，但在 Roman、Tolokers 等异配图上，最优 s 值可能偏离默认值，需要额外调参。
 4. **任务范围限制**：当前方法仅针对节点分类任务设计，尚未扩展到边预测、动态图或图分类任务。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有校准方法的因果差异
 
@@ -301,6 +309,8 @@ WATS 当前的设计和验证聚焦于**节点分类任务**，其适用边界�
 2. **多任务图校准框架的扩展**：WATS 的节点特定温度缩放逻辑是否可推广至边预测、动态图或图分类任务？这需要重新定义“校准”在这些任务中的语义，并设计相应的结构代理信号。
 
 3. **与训练时校准方法的协同**：WATS 作为后处理方法，与训练时校准技术（如标签平滑、正则化）的关系尚未探索。二者是否存在互补或冲突，值得进一步研究。
+
+
 
 ## 原文 PDF
 

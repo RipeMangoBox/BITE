@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/AnyMoLe_Any_Character_Motion_In_Betweening_Leveraging_Video_Diffusion_Models.pdf
+project_link: null
+code_link: null
 aliases:
 - AACMBLVDM
 tags:
@@ -42,7 +44,7 @@ claims:
 > - Non-humanoid character test set 上，HL2Q ↓ 0.0019 vs best baseline (大幅降低)。
 > - User study (humanoid) 上，Similarity (% preferred) 60.12 vs other methods (percentages not individually reported) (显著领先)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -72,7 +74,7 @@ AnyMoLe 处于**视频扩散模型 × 运动生成**的交叉地带，其定位�
 
 在人类和非人类角色测试集上，AnyMoLe 的 HL2Q 指标分别达到 **0.0015** 和 **0.0019**，显著优于所有基线方法（Table 2）。用户感知研究中，AnyMoLe 在相似性、忠实度和自然度三个维度上均获得最高偏好票数，尤其在非人类角色上优势极为显著（相似性 90.48%，忠实度 92.46%，自然度 91.67%）（Table 4）。消融实验证实，ICAdapt 和精细生成阶段对最终性能至关重要——移除任一组件均导致视频风格不一致或运动跳跃，所有评估指标下降（Figure 8, Table 3）。
 
-## 背景与动机
+
 
 运动中间帧生成（motion in-betweening）是计算机动画领域的核心任务之一：给定稀疏的关键帧和少量上下文运动帧，自动补全中间过渡运动，从而大幅降低动画师的手动劳动。然而，现有方法面临一个根本性瓶颈——**严重依赖特定角色的动作捕捉或关键帧数据集**。无论是基于Transformer的两阶段方法 **TS**（Qin et al., TOG 2022），还是基于扩散模型的运动生成方法 **SinMDM**，都需要在目标角色的运动数据上进行大规模训练。这意味着，对于缺乏数据的角色——如非人类角色、动物、或无法进行动作捕捉的虚构生物——这些方法几乎无法生成自然的中间帧。当角色骨架结构发生变化时，整个模型必须重新训练，泛化能力近乎为零。
 
@@ -80,7 +82,9 @@ AnyMoLe 处于**视频扩散模型 × 运动生成**的交叉地带，其定位�
 
 AnyMoLe的核心洞察正是：**视频扩散模型已包含丰富的运动过渡知识；仅需用极少量上下文运动渲染视频对模型进行轻量适配，就能将其通用运动先验迁移到任意角色上，完全绕过对角色特定数据集的依赖。** 这一思路将问题从“为每个角色收集数据并训练模型”转化为“为每个角色微调一个通用先验”，从根本上改变了运动插值的数据范式。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 AnyMoLe 的核心创新在于**将运动插值问题转化为视频生成问题**，从而彻底绕过了传统方法对角色特定动作捕捉数据集的依赖。其关键突破可归纳为三个相互耦合的“changed slots”：
 
@@ -118,7 +122,7 @@ $$\underset{P, R}{\mathrm{argmin}} \| \mathcal{T}(\mathcal{M}(P,R), p_{cam}) - \
 
 AnyMoLe 的三个 changed slots 形成了完整的因果链：**视频扩散模型提供运动先验 → ICAdapt 弥合域差距 → 两阶段生成产出高质量 2D 视频 → 运动-视频模仿优化将其提升为 3D 运动**。这一链条使得 AnyMoLe 在人类角色（HL2Q = 0.0015）和非人类角色（HL2Q = 0.0019）上均大幅领先所有基线方法（Table 2），并在用户研究的相似性、忠实度和自然度三个维度上获得最高偏好票数（Table 4）。
 
-## 整体框架
+
 
 AnyMoLe 的整体流水线由三个核心阶段构成，其设计哲学是**以视频扩散模型作为通用运动先验，完全绕开对角色特定动作数据集的需求**。
 
@@ -157,7 +161,7 @@ AnyMoLe 的整体流水线由三个核心阶段构成，其设计哲学是**以�
 
 整个流水线的核心优势在于**零外部训练数据**：ICAdapt 仅需 2 秒上下文样本（约 500 步微调），关节估计器仅需场景内少量标注帧（约 3500 步训练），即可为任意骨架结构的角色生成自然中间帧运动。
 
-## 核心模块与公式推导
+
 
 ### 3.1 ICAdapt：推理阶段上下文自适应
 
@@ -271,7 +275,9 @@ $\lambda_{pos}$ 和 $\lambda_{rot}$ 分别为位置和旋转正则化权重。�
 ![[assets/figures/papers/paper_list_l4_AnyMoLe_Any_Character_Motion_In_Betweening_Leveraging_Video_Diffusion_Mo/figures/007_Figure_7.jpg]]
 *Figure 7: Results of baseline comparison. Our method generated in-between frames similar to the ground truth, while SinMDM and SinMDM* generated out-of-context motion (blue box). TST generated partially out-of-context footsteps (blue box) and out-of-style motion (red box). ERD-QV generated motion that has a different style, with a stiff back and sharp hand positions (red box)*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -337,7 +343,9 @@ Figure 10 展示了 AnyMoLe 的典型失败案例：当角色执行快速转身�
 ![[assets/figures/papers/paper_list_l4_AnyMoLe_Any_Character_Motion_In_Betweening_Leveraging_Video_Diffusion_Mo/figures/005_Figure_5.jpg]]
 *Figure 5: Two stage inference of $D _ { a d p }$ . First, at coarse stage, low frame-rate video is generated in auto regressive manner. Next, high frame-rate video is generated from low frame-rate video*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题瓶颈的重新定义
 
@@ -381,6 +389,8 @@ AnyMoLe的开创性在于打开了“利用通用视觉先验解决角色运动�
 **（3）多角色交互与物理合理性**：AnyMoLe的视频扩散模型隐式地学习了运动过渡知识，但缺乏显式的物理约束。扩展到多角色交互场景时，需要保证角色间的接触约束、碰撞避免和时序同步。这可能需要在运动-视频模仿优化阶段引入额外的物理损失项，或利用物理仿真器进行后处理修正。
 
 **（4）推理效率优化**：当前方法的推理延迟主要来自ICAdapt微调、两阶段视频生成和序列优化三个环节。探索更轻量级的视频扩散模型（如蒸馏版本）、减少微调步数、或设计更高效的优化算法，将有助于将AnyMoLe推向实时动画工作流。
+
+
 
 ## 原文 PDF
 

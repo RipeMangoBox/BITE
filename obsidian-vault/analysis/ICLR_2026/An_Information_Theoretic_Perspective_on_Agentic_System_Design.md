@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/An_Information_Theoretic_Perspective_on_Agentic_System_Design.pdf
+project_link: null
+code_link: null
 openreview_forum_id: isFHz8qf20
 aliases:
 - ITPASD
@@ -41,7 +43,7 @@ claims:
 > - LONGHEALTH 上，Accuracy relative to GPT-4O direct baseline 为 Qwen-2.5 7B compressor + predictor，对比 GPT-4O direct (no compression)，变化 surpasses by 4pp。
 > - FINANCEBENCH 上，Accuracy relative to GPT-4O direct baseline 为 7-8B compressors，对比 GPT-4O direct (100%)，变化 recovers 97%。
 
-## 概述
+## 概要
 
 当前压缩器-预测器（compressor-predictor）代理系统设计主要依赖试错，缺乏任务无关的指标来量化压缩器输出的信息量，导致无法将下游性能归因于压缩器的信息保留质量或预测器的推理能力。本文从信息论视角出发，提出将压缩器建模为含噪通道，并引入基于蒙特卡洛采样的互信息估计器，在不依赖完整词汇概率分布的情况下量化压缩质量。
 
@@ -51,7 +53,7 @@ claims:
 
 上述发现揭示了扩展压缩器远比扩展预测器有效的缩放规律，且更大压缩器具有更高的信息密度和比特效率，使得本地计算可以实质性替代云端成本。
 
-## 背景与动机
+
 
 ### 压缩器-预测器架构的兴起与设计困境
 
@@ -83,7 +85,9 @@ $$X \xrightarrow{ p(z|x) } Z \xrightarrow{ p(y|z) } Y$$
 
 为实现这一框架，论文开发了一个蒙特卡洛互信息估计器，利用现代推理引擎的对数概率，无需完整词汇概率分布即可计算，使得该度量在实际部署中可操作。这一方法论转变的目标是：将代理系统设计从经验试错提升为有理论指导的系统化工程实践。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈洞察：压缩器-预测器系统的归因困境
 
@@ -124,7 +128,7 @@ $$\hat{I}(X;Z) \approx \frac{1}{NM} \sum_{i=1}^{N} \sum_{j=1}^{M} \left[ \log p(
 
 逻辑回归分析进一步确认，压缩器的模型系列与尺寸是决定下游准确率的最重要因素，其重要性远超预测器尺寸（Figure 17, Section 3.4）。这一发现具有重要的实践意义：在本地设备上部署更大的压缩器，配合云端预测器，可以在Deep Research基准上以3B本地压缩器配合GPT-4O预测器，恢复99%的前沿模型准确率，同时将API成本降低74%（Section 3.5）。
 
-## 整体框架
+
 
 ### 核心瓶颈与设计动机
 
@@ -164,7 +168,7 @@ $$\hat{I}(X;Z) \approx \frac{1}{NM} \sum_{i=1}^{N} \sum_{j=1}^{M} \left[ \log p(
 
 实证分析揭示了以下关键规律：压缩器模型系列与尺寸是决定下游性能的最关键因素。在 LONGHEALTH 上，将 Qwen-2.5 压缩器从 1.5B 扩展到 7B，准确率提升 60%；而将预测器从 70B 扩展到 405B，准确率仅提升 12%。更大的压缩器不仅准确率更高，输出也更简洁——7B Qwen-2.5 压缩器相比其 1.5B 版本，准确率提高 1.6 倍，输出长度缩短 4.6 倍，每令牌互信息提高 5.4 倍。信息率（每令牌互信息）与下游性能及困惑度强相关（$r = -0.84$, $R^2 = 0.71$），验证了互信息作为任务无关质量度量的有效性。
 
-## 核心模块与公式推导
+
 
 ### 压缩器-预测器系统模型
 
@@ -206,7 +210,9 @@ $$D(R) = C e^{-bR} + D_0$$
 
 该框架揭示了压缩器质量的两个维度：更大的压缩器不仅具有更高的绝对互信息，还表现出更高的比特效率（每令牌信息量），这意味着它们能以更短的输出传递更丰富的信息。这一发现直接解释了为何扩展压缩器比扩展预测器更有效——更大的压缩器在压缩阶段就保留了更多关键信息，使得预测器无需从残缺的摘要中艰难推理。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：压缩器缩放远优于预测器缩放
 
@@ -283,7 +289,9 @@ $$D(R) = C e^{-bR} + D_0$$
 *Figure 20: Exploring the trade-off between compression and fidelity loss: rate-distortion curve. We vary both predictor and compressor model in the compression-prediction workflow and measure the distortion on the y-axis and estimate the rate on the x-axis. We plot the resulting rate-distortion curves across predictor sizes 1B, 8B, 70B, and 405B for (Left) QWEN-2.5 and (Right) LLAMA compressors. We evaluate the rate-distortion curves for two datasets: (Top) LONGHEALTH, (Bottom) FINANCEBENCH*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心贡献定位
 
@@ -338,6 +346,8 @@ $$D(R) = C e^{-bR} + D_0$$
 - 能否基于率失真分析设计训练目标，以优化压缩器-预测器通信？
 - 压缩的定义除摘要外还包括结构化提取和函数调用生成，这些场景下信息论框架如何扩展？
 - 混合专家模型（MoE）由于计算量取决于激活专家而非总参数，其缩放行为是否与密集模型存在根本差异？
+
+
 
 ## 原文 PDF
 

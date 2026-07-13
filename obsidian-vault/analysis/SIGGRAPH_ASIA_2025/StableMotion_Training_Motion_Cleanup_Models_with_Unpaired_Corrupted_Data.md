@@ -5,6 +5,7 @@ paper_level: A
 venue: "SIGGRAPH Asia"
 year: 2025
 pdf_ref: paperPDFs/SIGGRAPH_ASIA_2025/StableMotion_Training_Motion_Cleanup_Models_with_Unpaired_Corrupted_Data.pdf
+code_link: null
 project_link: https://yxmu.foo/stablemotion-page/
 aliases:
 - StableMotion
@@ -31,7 +32,7 @@ claims:
 | 中文题名    | StableMotion: 使用不配对损坏数据训练运动清理模型                                                                        |
 | 英文题名    | StableMotion: Training Motion Cleanup Models with Unpaired Corrupted Data                              |
 | 会议/期刊   | SIGGRAPH Asia 2025                                                                                     |
-| Links   | [paper](https://arxiv.org/abs/2505.03154); [Project](https://yxmu.foo/stablemotion-page/)              |
+| Links   | [paper](https://arxiv.org/abs/2505.03154) · [Project](https://yxmu.foo/stablemotion-page/)              |
 | Topic   | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method  | StableMotion                                                                                           |
 | Dataset | SoccerMocap, BrokenAMASS                                                     |
@@ -41,8 +42,7 @@ claims:
 > - SoccerMocap 上，Pops Rate 为 0.13%，对比 0.41% (Input)，变化 -68.3%。
 > - SoccerMocap 上，Frozen Rate 为 4.50%，对比 23.68% (Input)，变化 -81.0%。
 
-## 概述
-
+## 概要
 ### 问题背景
 
 动作捕捉（mocap）是动画、游戏和影视制作的核心技术，但实际采集的原始数据常因传感器遮挡、信号干扰或算法误差而包含多种运动伪影——如足部滑步、冻结帧、关节抖动和异常穿透。现有数据驱动的运动清理方法普遍依赖**配对的干净-损坏数据**进行监督训练，而在实际生产环境中获取域内配对数据的成本极高：这要求专业人员逐帧手工修复或借助昂贵的物理模拟系统，难以规模化。直接丢弃损坏片段则会破坏时序连续性，导致模型无法学习长时运动动态。
@@ -82,7 +82,6 @@ StableMotion 在方法谱系中处于**条件扩散生成**与**自监督运动�
 
 当前方法仍需人工标注或启发式算法提供初始质量指示变量，尤其对细微伪影的检测尚未完全自动化。软阈值设定（如 $\tau=0.5$）和软修复调度是启发式设计，可能对不同类型的动作或伪影并非最优。扩散模型采样的固有随机性有时仍会导致次优结果，尽管集成策略有所缓解。未来方向包括：开发自动化的质量标注技术以减少人工依赖，探索测试时分类器引导以改善内容保留与保真度的权衡，以及将该框架扩展到面部动作或交互数据等其他运动类型的清理任务。
 
-## 背景与动机
 
 ### 问题背景：运动数据中的真实伪影
 
@@ -119,8 +118,9 @@ StableMotion 在方法谱系中处于**条件扩散生成**与**自监督运动�
 
 这种方法论转变使得运动清理模型可以在真实生产数据上端到端训练，从根本上降低了数据准备成本，同时保持了与有监督方法相当甚至更优的清理效果。
 
-## 核心创新
 
+
+## 核心方法与创新机理
 StableMotion的核心创新在于将运动清理重新定义为一种**质量可控的条件生成问题**，从而彻底绕过了传统方法对配对干净-损坏数据的依赖。其关键洞察在于：通过引入帧级质量指示变量（QualVar）并设计生成-判别联合训练框架，模型既能评估运动质量，又能根据指定的质量水平生成运动——这使得模型可以直接从混合质量的原始数据中学习清理能力，而无需任何配对监督。
 
 ### 关键创新组件
@@ -151,7 +151,6 @@ StableMotion采用统一的扩散框架，联合执行两个任务（Section 5.2
 
 这一范式转换的核心价值在于：**将数据需求从“昂贵配对”降级为“廉价标注”**——质量指示变量可通过人工标注或启发式算法获取，而无需构建成对的干净-损坏运动数据。消融实验表明，移除QualVar后模型性能显著下降（足滑率从3.60%升至6.37%，Table 6），验证了该设计的关键性。
 
-## 整体框架
 
 StableMotion 的核心思路是将运动清理重新定义为一种**质量可控的条件生成问题**。传统方法依赖配对的干净-损坏数据训练有监督模型，而 StableMotion 通过引入帧级质量指示变量（QualVar），使模型能够直接从混合质量的原始运动捕捉数据中学习清理能力，无需任何配对数据。
 
@@ -203,7 +202,6 @@ $$
 
 这种生成-判别统一的设计使得 StableMotion 能够在不依赖配对数据的情况下，从混合质量数据中自动学习运动清理能力，实现了训练数据需求与清理性能之间的根本性突破。
 
-## 核心模块与公式推导
 
 ### 3.1 问题形式化与扩散基础
 
@@ -268,7 +266,6 @@ $$\mathbf { t } _ { \mathrm { s o f t } } ^ { i } = \left\{ \begin{array} { l l 
 
 ---
 
-## 数据获取
 
 ### 1. 标签是二值标签吗？
 
@@ -301,8 +298,9 @@ $$\mathbf { t } _ { \mathrm { s o f t } } ^ { i } = \left\{ \begin{array} { l l 
 
 ----
 
-## 实验与分析
 
+
+## 实验与关键发现
 ### 核心定量结果
 
 StableMotion 在三个基准上均展现出显著的清理能力，且无需任何配对干净数据训练。
@@ -388,8 +386,9 @@ Table 8 和 Table 9 展示了模型在未见域数据上的泛化能力：
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2505_03154/figures/009_Figure_8.jpg]]
 *Figure 8: Locomotion clips in BrokenAMASS before and after cleanup by our model. Our method demonstrates strong performance in cleaning up dynamic locomotion behaviors, producing natural foot and body movements while preserving the global trajectory*
 
-## 方法谱系与知识库定位
 
+
+## 定位与知识库关联
 ### 1. 与现有工作的关系
 
 StableMotion 的核心贡献在于将运动清理问题从“有监督修复”范式重构为“质量条件生成”范式，其方法定位可从三个维度理解。
@@ -426,6 +425,7 @@ $$\mathbf{t}_{\mathrm{soft}}^{i} = \begin{cases} T \sin \frac{\pi}{2} \min(1, 2\
 
 4. **跨模态扩展**：该生成-判别联合框架能否扩展到其他非运动数据的清理任务，如面部动作捕捉数据的抖动修复或手物交互数据的物理合理性校正？核心挑战在于如何定义适用于不同模态的质量指示变量。
 
-## 原文 PDF
 
+
+## 原文 PDF
 ![[paperPDFs/SIGGRAPH_ASIA_2025/StableMotion_Training_Motion_Cleanup_Models_with_Unpaired_Corrupted_Data.pdf]]

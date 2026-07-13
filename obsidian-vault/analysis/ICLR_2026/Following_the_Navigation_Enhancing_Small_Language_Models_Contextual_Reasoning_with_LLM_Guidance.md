@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Following_the_Navigation_Enhancing_Small_Language_Models_Contextual_Reasoning_with_LLM_Guidance.pdf
+project_link: null
+code_link: null
 openreview_forum_id: R8A12kykPG
 aliases:
 - FNESLMCRLG
@@ -41,7 +43,7 @@ claims:
 > - MuSR (Murder Mystery) 上，Accuracy 为 64.5，对比 53.2，变化 +11.3。
 > - StrategyQA 上，Accuracy 为 74.6，对比 68.5，变化 +6.1。
 
-## 概述
+## 概要
 
 小语言模型（SLM）在应对复杂、信息密集的上下文推理任务时，常因参数容量有限和灾难性遗忘而“迷失”于长文本中，难以准确定位并整合关键信息以完成多步推理。针对这一瓶颈，本文提出 **Navigation**——一种免训练的推理增强框架，其核心思路是将大语言模型（LLM）在上下文处理中积累的专长蒸馏为结构化的**导航模板（Navigation templates）**，存储于可动态扩展的数据库中；在SLM推理时，通过检索匹配最相关的模板，引导模型按图索骥地提取关键信息、过滤无关内容并构建推理链，从而在不重新训练的前提下显著克服SLM的容量限制。
 
@@ -51,7 +53,7 @@ claims:
 
 总体而言，Navigation 以极低的模板存储开销和零训练成本，为小模型在复杂上下文推理任务中提供了一条高效、可泛化且持续自适应的增强路径。
 
-## 背景与动机
+
 
 ### 小语言模型在上下文推理中的瓶颈
 
@@ -81,7 +83,9 @@ claims:
 2. **可泛化**：模板是任务级别的抽象指导，而非实例级别的具体答案，可跨同类问题复用。
 3. **可扩展**：模板数据库随新任务动态增长，形成持续积累的知识库，使SLM的能力边界随使用而扩展。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Navigation框架的核心创新在于将LLM的上下文处理专长蒸馏为可泛化的**导航模板（Navigation templates）**，使小语言模型（SLM）在推理时获得结构化的上下文处理指导，从而克服其参数容量有限和灾难性遗忘导致的“迷失”问题。这一思路的本质转变在于：**不直接让LLM替SLM推理，而是让LLM教会SLM“如何阅读上下文”**。
 
@@ -127,7 +131,7 @@ Navigation的创新不仅体现在性能提升上，更体现在效率优势：
 
 消融实验进一步验证了各模块的必要性：移除导航生成环节使Llama-3.2-3B在MuSR OP上的准确率从52.7骤降至43.4（回归Vanilla水平）；移除导航更新环节使StrategyQA的F1分数从60.8降至44.7（Table 11）。这表明模板的结构化指导和动态更新机制是性能增益的不可或缺因素。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_R8A12kykPG/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the Navigation framework*
@@ -172,7 +176,7 @@ $$j = \arg \max_i \mathrm{Sim}(f(x_d), f(D_{T_i}))$$
 
 附录 B 从信息论角度分析了导航知识库对模型记忆需求的降低效果。无外部知识库时，模型所需记忆量下界为 $\Omega(nd)$；引入导航知识库后，下界降至 $O(n \log_2 (N + R))$，从理论上解释了为何 SLM 能借助轻量模板显著克服容量限制。
 
-## 核心模块与公式推导
+
 
 Navigation框架围绕一个核心洞察构建：大语言模型（LLM）在上下文推理中展现出的关键信息识别与抽象能力，可以被蒸馏为结构化的导航模板，从而在不重新训练的情况下，为小语言模型（SLM）提供“按图索骥”的推理指引。整个框架由三个核心模块构成，形成生成—使用—更新的闭环。
 
@@ -214,7 +218,9 @@ $$I(X; A(X) \mid P) = O(n \log_2 (N + R))$$
 
 其中 $N$ 为模板数量，$R$ 为模板库的覆盖半径。这一理论结果表明，导航模板通过将上下文处理策略外化，显著降低了对SLM自身容量的要求，从数学上解释了框架为何能够使3B参数的模型在复杂推理任务上超越175B的GPT-3.5-Turbo。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能提升
 
@@ -274,7 +280,9 @@ Table 3展示了不同数据集上的模板效率。模板数量仅占数据集�
 *Table 9: Performance comparison of SLMs using Navigation templates compared with LoRA and full-parameter SFT baselines. Best results per backbone are bolded*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 方法定位：免训练的上下文推理增强框架
 
@@ -323,6 +331,8 @@ Navigation 框架为以下研究方向提供了基础：
 - **多模态与开放交互场景的推广**：导航框架能否扩展到多模态上下文或更开放的对话式交互场景？
 - **模板质量评估与自动净化**：应建立何种机制来自动评估模板质量并过滤噪声或低质量模板，减少其对SLM推理的负面影响？
 - **与轻量级训练的融合**：能否将导航模板与SLM的轻量级训练（如提示调优）相结合，进一步挖掘小模型的推理潜力？
+
+
 
 ## 原文 PDF
 

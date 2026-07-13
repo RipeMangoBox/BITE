@@ -41,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - Multi-Scale World Generation (8 images, 32 scenes) 上，CLIP Score (CS) 0.3432 vs 0.2687 (WonderWorld) (↑ 0.0745)；CLIP-IQA+ (CIQA) 0.7035 vs 0.5064 (WonderWorld) (↑ 0.1971)；Q-align IQA (QIQA) 3.926 vs 1.081 (WonderWorld) (↑ 2.845)。
 
-## 概述
+## 概要
 
 现有3D生成方法——无论是经典细节层次（LoD）、Mip-NeRF、分层3D高斯泼溅（Hierarchical 3DGS），还是近期单尺度场景生成工作如**WonderWorld**（Yu et al., CVPR 2025）——均建立在“所有尺度内容已知”的假设之上。这一假设天然适用于渲染或一次性重建，却无法支撑**渐进式多尺度生成**：当场景需要从宏观景观动态生长至微观细节时，现有3D表示既不能增量添加新尺度内容，也无法在更新过程中保持实时渲染。结果，已有方法只能在单一尺度上生成场景，无法构建从远景到近景无缝过渡的连贯三维世界。
 
@@ -50,8 +50,6 @@ WonderZoom 首次打破这一瓶颈。其核心洞察是：多尺度3D生成必�
 实验从定量、定性与人工偏好三个层面验证了方法的有效性。在涵盖自然、城市、水下等8种场景的测试集上，WonderZoom在CLIP分数（CS）、CLIP-IQA+（CIQA）、Q-align IQA（QIQA）、NIQE和Q-align IAA（QIAA）五项指标上均显著优于所有基线方法（Table 1）。在约200人参与的2AFC人工偏好测试中，WonderZoom在“相机变焦感”“视觉质量”和“文本对齐”三个维度均被显著偏好（Table 2）。消融实验进一步证实，透明度调制、深度配准和辅助视图合成各自对渲染效率、几何一致性与场景完整性具有决定性贡献（Figure 5–7）。
 
 **方法定位**：WonderZoom处于3D生成、可缩放表示与交互式内容创建的交汇点。它拓展了高斯泼溅类表示在动态场景生长中的能力边界，并首次将多尺度3D生成从“重建已知数据”推进到“按需生长未知世界”的新范式。
-
-## 背景与动机
 
 ### 问题背景：从单尺度到多尺度的三维世界生成
 
@@ -67,7 +65,7 @@ WonderZoom 首次打破这一瓶颈。其核心洞察是：多尺度3D生成必�
 
 WonderZoom的出发点正是打破上述重建范式的限制，将多尺度三维生成重新定义为一种**由粗到细的迭代生长过程**。其核心直觉是：多尺度三维世界不应一次性生成，而应先构建粗尺度的场景框架，再将该框架的渲染结果和几何信息作为空间锚点，逐步合成更精细尺度的内容。为实现这一范式，需要两个关键能力：（1）一个**可增量更新且保持实时渲染**的三维表示，使得新生成的精细内容可以无缝融入现有场景，而无需触发全局重优化；（2）一个**以粗尺度几何为条件的渐进式合成器**，能够根据用户指定的文本提示和相机位姿，生成几何一致、语义合理的精细尺度三维结构。WonderZoom通过尺度自适应高斯面元（Scale-Adaptive Gaussian Surfels）和渐进式细节合成器（Progressive Detail Synthesizer）分别回应了这两项需求，从而首次实现了从单张图像出发、支持交互式多尺度探索的三维世界生成。
 
-## 核心创新
+## 核心方法与创新机理
 
 WonderZoom 的核心创新在于将多尺度3D世界生成从“一次性重建”范式转变为“由粗到细的渐进式生成”范式。现有3D表示——无论是经典的层次化细节层次（LoD）、Mip-NeRF，还是层次化3D高斯泼溅（Hierarchical 3DGS）——均假设所有尺度的内容已知，仅适用于渲染或一次性重建，无法在渐进式生成任务中动态添加新尺度内容并保持实时渲染。这导致现有方法只能在单一尺度上生成场景，无法生成从景观到微观细节的连贯多尺度世界。WonderZoom 通过两个紧密耦合的技术槽位突破这一瓶颈：**尺度自适应高斯面元表示**和**渐进式细节合成器**。
 
@@ -100,8 +98,6 @@ $$\alpha = \begin{cases} 1 & \text{if no parent and } s^{\mathrm{render}} \geq s
 
 WonderZoom 的本质洞察是：**多尺度3D生成应遵循由粗到细的迭代范式**——先构建粗尺度场景，再将其渲染结果和几何信息作为空间条件，逐步合成细尺度内容。可增量更新且保持实时渲染能力的分层3D表示是实现该范式的核心，它打破了重建范式对先验数据的依赖，使3D世界能够按需生长。两个 changed slots 的协同作用体现在：尺度自适应高斯面元解决了“如何表示和渲染动态增长的多尺度内容”，渐进式细节合成器解决了“如何生成这些新内容并保持几何一致性”。
 
-## 整体框架
-
 WonderZoom 的整体流程遵循“由粗到细”的迭代生成范式，其核心是一条以 **尺度自适应高斯面元 (Scale-Adaptive Gaussian Surfels)** 为表示主干、以 **渐进式细节合成器 (Progressive Detail Synthesizer)** 为内容生长引擎的双模块管线（Figure 2）。
 
 ![[assets/figures/papers/paper_list_l2631_https_arxiv_org_abs_2512_09164/figures/002_Figure_2.jpg]]
@@ -119,8 +115,6 @@ WonderZoom 的整体流程遵循“由粗到细”的迭代生成范式，其核
 **尺度自适应高斯面元。** 这是整个框架的表示核心，其关键设计在于每个面元携带一个 **原生尺度** $s^{\text{native}} = d^{\text{native}} / \sqrt{f_x^{\text{native}} f_y^{\text{native}}}$，记录面元创建时的深度与相机焦距信息。渲染时，面元的不透明度 $\tilde{o} = o \cdot \alpha$ 由尺度感知调制因子 $\alpha$ 控制：$\alpha$ 根据当前渲染尺度 $s^{\text{render}}$ 与面元原生尺度及其相邻层级尺度（父尺度 $s^{\text{parent}}$、子尺度 $s^{\text{child}}$）的对数空间插值计算。这一设计保证了两个核心性质：(i) 新面元可增量添加到场景中而无需重新优化已有面元；(ii) 相邻尺度的面元在过渡区间满足 $\alpha_k(s^{\text{render}}) + \alpha_j(s^{\text{render}}) = 1$（Proposition 1），确保缩放过程中视觉上无跳变。
 
 **输出与迭代。** 新生成的精细尺度面元被直接追加到现有场景表示中，场景 $\mathcal{E}$ 随之动态生长。整个过程可被重复执行，用户可继续向更微观的尺度深入，形成从宏观景观到微观细节的连续多尺度 3D 世界。渲染全程保持实时性能——单帧渲染时间约 10 ms 量级。
-
-## 核心模块与公式推导
 
 WonderZoom 的多尺度三维世界生成能力建立在两个紧密协作的核心模块之上：**尺度自适应高斯面元（Scale-Adaptive Gaussian Surfels）** 作为底层表示，提供可增量扩展且保持实时渲染的3D载体；**渐进式细节合成器（Progressive Detail Synthesizer）** 作为上层生成引擎，以粗尺度几何为条件，按需合成更精细尺度的图像与几何结构。以下逐一展开其关键设计与公式。
 
@@ -174,7 +168,7 @@ $$\mathcal{L} = 0.8 L_1 + 0.2 L_{\mathrm{D-SSIM}}$$
 
 优化完成后，新面元被追加到尺度自适应高斯面元表示中，完成一次精细尺度的生长。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 1. 实验设置
 
@@ -241,9 +235,6 @@ $$\mathcal{L} = 0.8 L_1 + 0.2 L_{\mathrm{D-SSIM}}$$
 ![[assets/figures/papers/paper_list_l2631_https_arxiv_org_abs_2512_09164/figures/004_Table_1.jpg]]
 *Table 1: Quantitative comparison. “CS” denotes CLIP score, “CIQA” denotes CLIP-IQA+, “QIQA” denotes Q-align IQA, “QIAA” denotes Q-align IAA, and “Time” measures the time used in generating a new-scale scene*
 
-![[assets/figures/papers/paper_list_l2631_https_arxiv_org_abs_2512_09164/figures/005_Table_2.jpg]]
-*Table 2: Human study 2AFC results of favor rate of Wonder-Zoom (Ours) over baseline methods*
-
 ![[assets/figures/papers/paper_list_l2631_https_arxiv_org_abs_2512_09164/figures/007_Figure_5.jpg]]
 *Figure 5: Ablation on the opacity modulation*
 
@@ -256,10 +247,7 @@ $$\mathcal{L} = 0.8 L_1 + 0.2 L_{\mathrm{D-SSIM}}$$
 ![[assets/figures/papers/paper_list_l2631_https_arxiv_org_abs_2512_09164/figures/003_Figure_3.jpg]]
 *Figure 3: Comparison of WonderZoom with baselines on multi-scale 3D world generation*
 
-![[assets/figures/papers/paper_list_l2631_https_arxiv_org_abs_2512_09164/figures/016_Figure_13.jpg]]
-*Figure 13: A failure case of WonderZoom. When zooming too deeply into the tree region, the view collapses into texture-like patterns instead of meaningful branch structures*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 核心问题定位：从“重建多尺度”到“生成多尺度”
 

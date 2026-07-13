@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/FormalML_A_Benchmark_for_Evaluating_Formal_Subgoal_Completion_in_Machine_Learning_Theory.pdf
+project_link: https://huggingface.co/datasets/zzhisthebest/FormalML
+code_link: https://github.com/njuyxw/FormalML
 openreview_forum_id: wCRZbspSZi
 aliases:
 - FT
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | FormalML：面向机器学习理论中形式化子目标完成的基准测试 |
 | 英文题名 | FormalML: A Benchmark for Evaluating Formal Subgoal Completion in Machine Learning Theory |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=wCRZbspSZi); [GitHub](https://github.com/njuyxw/FormalML); [Project](https://huggingface.co/datasets/zzhisthebest/FormalML) |
+| Links | [paper](https://openreview.net/forum?id=wCRZbspSZi) · [GitHub](https://github.com/njuyxw/FormalML) · [Project](https://huggingface.co/datasets/zzhisthebest/FormalML) |
 | Topic | #topic/benchmarks_datasets_evaluation #topic/benchmarks_datasets_evaluation/benchmark_eval |
 | Method | FormalML基准构建（基于to_theorem策略的子目标提取） |
 | Dataset | FormalML (Overall), FormalML premise utilization |
@@ -41,13 +43,13 @@ claims:
 > - FormalML (Overall) 上，Pass@32 为 63.21% (STP)，对比 ~57.12% (DeepSeek-Prover-V2 noCoT，估计值)，变化 约+6%。
 > - FormalML premise utilization 上，Pass@32 为 71.86% (DeepSeek-Prover-V1.5, M=*)，对比 58.37% (DeepSeek-Prover-V1.5, M=0)，变化 +13.49%。
 
-## 概述
+## 概要
 
 FormalML 是一个面向机器学习理论中**形式化子目标完成**的基准测试，旨在评估大语言模型在填补研究级证明过程中遗留的中间证明义务时的能力。现有 LLM 定理证明器虽然在竞赛级完整证明生成中表现卓越，但在处理具有复杂上下文的子目标时面临准确性与效率的双重瓶颈——思维链推理往往诱发对简单子目标的过度思考，而恰当的前提利用则能显著提升成功率。
 
 本文的核心贡献在于：基于 Optlib 与 FoML 两个 Lean 4 形式化库，利用自定义的 `to_theorem` 策略从过程式证明脚本中自动提取子目标，构建了包含 4,937 个问题的数据集。实验表明，整体证明生成方法 STP 以 63.21% 的 Pass@32 取得最优性能，但所有证明器在高难度级别上通过率大幅下降；在前提利用方面，DeepSeek-Prover-V1.5 在提供所有相关前提时 Pass@32 达到 71.86%，较无前提设置提升 13.49 个百分点。这些发现揭示了子目标完成任务中推理深度与计算成本之间的根本性张力，为 LLM 辅助形式化定理证明的实用化指明了关键改进方向。
 
-## 背景与动机
+
 
 形式化定理证明在机器学习理论中的核心瓶颈，并非完整证明的自动生成，而是在复杂研究级上下文中**填补子目标**（subgoal completion）的能力。现有LLM定理证明器在竞赛级问题上已展现出卓越性能，但当面对研究级证明中遗留的短小但非平凡的子目标时，准确性和效率均面临持续限制。这一现象的背后存在两个相互关联的因果机制：
 
@@ -63,7 +65,9 @@ $$EWA@K = Pass@K \times \frac{100}{\mathrm{ResponseLength}}$$
 
 **动机**。上述发现指向一个明确的研究方向：要推动LLM辅助形式化证明从竞赛级走向研究级实用化，必须解决子目标完成中的前提利用和推理效率问题。这需要专门的数据集构建方法——通过`to_theorem`策略从过程式证明脚本中提取子目标并封装为独立定理（Figure 2）——以及针对性的训练策略来抑制过度思考行为。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FormalML 的核心创新在于将定理证明的评估范式从“完整证明生成”迁移到“子目标完成”，并围绕这一任务构建了首个系统性的基准。这一转变捕捉了实际形式化工作流中的真实瓶颈：人类数学家编写证明框架（sketch）后，大量简短但非平凡的子目标需要被自动消解，而现有证明器在此场景下暴露出准确性和效率的双重不足。
 
@@ -83,7 +87,7 @@ FormalML 引入了**强制性的前提利用要求**——数据集中 1,547 个
 
 为支撑上述创新，FormalML 采用了一种**符号化的数据集构建策略**——通过自定义的 `to_theorem` 策略，从过程式证明脚本中自动提取子目标。该策略捕获每个证明步骤执行前后的证明状态，抽象其状态转换，并合成为独立定理。通过调整提取时的证明段长度，可进一步生成不同难度级别（证明长度 1、3、5）的问题。这一策略保证了数据集的规模（4,937 个问题）和可复现性，同时避免了人工标注的成本和偏差。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0011_wCRZbspSZi_FormalML_A_Benchmark_for_Evaluating_Formal_Subgo/figures/002_Figure_2.jpg]]
 *Figure 2: An example of the to_theorem tactic illustrates its functionality. When applied to the tactic repeat rw [dotProduct]; simp [mul_comm], it captures pre- and post-execution proof states, abstracts their transition, and synthesizes a subgoal*
@@ -106,7 +110,7 @@ FormalML 基准的构建围绕一个核心思想：将研究级证明中遗留�
 
 整个流水线的设计瓶颈在于 `to_theorem` 策略对证明状态的捕获精度——若原始证明中存在隐式依赖或复杂上下文，提取的子目标可能丢失必要的前提信息。但从 Table 4 的前提利用实验（提供全部相关前提时 DeepSeek-Prover-V1.5 的 Pass@32 提升 13.49 个百分点）来看，该策略在多数情况下成功保留了子目标完成所需的关键上下文。
 
-## 核心模块与公式推导
+
 
 ### 关键模块
 
@@ -146,7 +150,9 @@ $$EWA@K = Pass@K \times \frac{100}{\mathrm{ResponseLength}}$$
 
 该指标的设计动机源于实验观察：长思维链（Long-CoT）模型虽然在自然语言推理中有效，但在子目标完成中频繁误判问题复杂度，生成过多的 `have` 语句等细粒度子目标，导致输出冗长却未能提升证明成功率。EWA@K 通过将成功率与输出长度直接挂钩，惩罚了这种“过度思考”（overthinking）行为，从而更真实地反映证明器在实际辅助数学家场景中的效用。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 整体性能对比
 
@@ -191,7 +197,9 @@ Figure 5（左）的效率对比显示，noCoT 变体在 EWA 指标上系统性�
 
 Figure 5（右）展示了基于 88,174 个额外子目标进行专家迭代训练前后的性能变化。整体而言，专家迭代带来的提升有限，表明 **单纯扩大训练数据规模不足以解决子目标完成的核心困难**——模型需要更针对性的训练策略来学习前提选择与推理深度控制。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有定理证明基准的关系
 
@@ -222,6 +230,8 @@ FormalML 填补了现有 Lean 4 基准测试中的一项关键空白：**子目�
 **推理效率与深度的平衡**：CoT 的失效和 EWA 指标的引入共同指向一个开放问题：如何在子目标完成中实现推理深度与计算成本的最优平衡？当前模型要么推理不足（noCoT 模式在复杂子目标上通过率低），要么推理过度（CoT 模式在简单子目标上浪费计算），缺乏根据子目标实际难度自适应调节推理深度的能力。
 
 **训练策略的潜在方向**：Figure 5（右）的专家迭代实验表明，利用 `to_theorem` 策略从多个 Lean 仓库提取的 88,174 个问题进行训练后，模型在 FormalML 上的性能有所提升。这暗示了**大规模子目标完成数据的自动生成与训练**可能是提升实际辅助能力的关键路径，但如何设计更有效的训练策略以同时改善前提利用和推理效率，仍需进一步探索。
+
+
 
 ## 原文 PDF
 

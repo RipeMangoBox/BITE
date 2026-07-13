@@ -43,7 +43,7 @@ claims:
 > [!tip] 效果简介
 > - HumanML3D 上，R@3 ↑ 0.795±.003 vs 0.772±.002 (MLD) (+0.023)；FID ↓ 0.179±.024 vs 0.473±.013 (MLD) (-0.294)；MM Dist ↓ 3.154±.010 vs 3.196±.010 (MLD) (-0.042)。
 
-## 概述
+## 概要
 
 现有文本驱动的人体运动生成方法（如 **MLD**、**MDM**、**MotionDiffuse**、**MoMask** 等）仅依赖文本条件，或仅使用视频作为唯一输入，导致生成的运动分布偏离真实运动的统计特性——缺乏有效的多模态对齐机制与时空先验迁移能力。MotionDuet 的核心洞察在于：将视频条件作为训练阶段的正则化手段，通过分布感知对齐（DASH）和双流融合（DUET）将真实视频的时空先验注入运动生成器，使得即使在纯文本推理时，也能产生物理一致、时序连贯的高质量运动。
 
@@ -51,7 +51,7 @@ claims:
 
 在 HumanML3D 基准上，MotionDuet（纯文本推理）相比 MLD 基线取得显著提升：R@3 从 0.772 升至 0.795，FID 从 0.473 降至 0.179，Diversity 更接近真实分布（9.532 vs 真实 9.503）。消融实验证实 DUET 模块使 FID 从 0.168 降至 0.101，DASH 损失进一步将 FID 改善至 0.084（过滤数据集），且 dropout 扰动策略比高斯噪声更稳定。需要指出的是，在部分定量指标上 MotionDuet 仍逊于 MoMask，但定性上运动方向与时序连贯性更优；此外，训练需大量计算资源（8×A800-80GB），视频数据集经清洗后仍有约 39% 异常样本，可能影响训练稳定性。
 
-## 背景与动机
+
 
 三维人体运动生成是计算机视觉与图形学中的核心问题，在游戏动画、电影制作、虚拟现实和机器人仿真等领域有广泛应用。近年来，基于扩散模型的文本到运动生成取得了显著进展，代表性工作包括**MLD**（Motion Latent Diffusion）、**MDM**、**MotionDiffuse**、**MotionGPT**和**MoMask**等。这些方法以文本描述作为条件，通过潜空间扩散去噪生成运动序列，在HumanML3D等标准基准上展现了令人瞩目的性能。
 
@@ -63,7 +63,9 @@ MotionDuet针对上述问题提出了一个明确的解决思路：**在训练�
 
 这一设计将视频从“推理时依赖”转变为“训练时正则化”，从根本上改变了多模态运动生成的范式。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MotionDuet 的核心创新在于将**视频特征作为分布先验**注入文本到运动的扩散生成流程，通过两个关键机制——**分布感知对齐（DASH）**和**双流统一融合（DUET）**——解决现有方法仅依赖单一模态导致的运动分布偏移与时空一致性不足问题。其设计哲学是“用视频训练，用文本推理”：训练阶段利用配对视频的时空先验正则化运动潜空间，推理阶段即使仅输入文本，生成器也能产出物理一致、时序连贯的高质量运动。
 
@@ -122,7 +124,7 @@ Table 7/8 的消融表明，Dropout 扰动比高斯噪声更稳定，能提供�
 
 MotionDuet 的四个 changed slots 形成了一条完整的创新链条：**双条件输入**提供视频先验来源 → **DUET 融合**实现多模态特征的有效整合与自适应路由 → **DASH 损失**将视频分布显式蒸馏进运动潜空间 → **自适应引导**在推理时平衡多模态信号。这条链条的核心洞察是“视频正则化文本学习”——视频仅在训练时作为正则化手段存在，推理时模型已内化了真实运动的统计先验，从而在纯文本条件下也能生成超越单模态基线的高质量运动。
 
-## 整体框架
+
 
 MotionDuet 是一个以扩散模型为骨干的多模态运动生成框架，核心目标是将文本语义与视频时空先验统一为互补的双条件信号，从而在纯文本推理时也能生成物理一致、时序连贯的三维人体运动。其整体 pipeline 遵循“视频特征提取 → 双流融合与自适应引导 → 多模态分布对齐”的三阶段范式（Figure 2）。
 
@@ -141,10 +143,8 @@ MotionDuet 是一个以扩散模型为骨干的多模态运动生成框架，核
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2511_18209/figures/001_Figure_1.jpg]]
-*Figure 1: MotionDuet is a multimodal framework for generating high-quality, controllable human motion under diverse conditions, including text prompts, video references, or their combination. Video results are provided in the supplementary material*
 
-## 核心模块与公式推导
+
 
 MotionDuet 的核心架构围绕三个关键模块展开：**双条件编码**、**DUET 多模态融合** 和 **自适应引导**，辅以 **DASH 分布对齐损失** 在训练阶段注入视频时空先验。以下逐一拆解其公式与变量含义。
 
@@ -260,7 +260,9 @@ $$
 
 DASH 损失通过令牌级与结构级双重正则化，将视频特征的分布先验注入运动潜空间，使得即使在纯文本推理（无视频输入）时，生成的运动仍能保持物理一致性与时序连贯性。DUET 模块则通过频域增强、动态掩码选择与残差融合，实现多模态信息的有效整合。自适应引导以退化分支替代无条件分支，稳定平衡多模态条件强度，且 $\omega$ 可固定无需动态调整。三个模块协同作用，构成了“训练时视频正则化、推理时文本驱动”的核心因果链路。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -344,13 +346,13 @@ Table 7 和 Table 8 分别验证了退化策略和引导权重的选择。Dropou
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2511_18209/figures/008_Figure_4.jpg]]
-*Figure 4: Qualitative results of model-generated motions for real-world videos involving complex actions. Examples include ballet spins and baseball pitching. In the golf swing sequence, the generated motion accurately captures the smooth and continuous rotation of the torso. In the baseball throwing example, the model vividly depicts the dynamic coordination between body rotation and arm extension, effectively conveying the power and fluidity of the motion. Additional qualitative results are provided in the Appendix E*
 
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2511_18209/figures/009_Table_5.jpg]]
 *Table 5: Parameter study for ω and dropout. Only core metrics reported. More grid searching results are shown in Appendix K*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -384,6 +386,8 @@ MotionDuet 构建于**运动潜空间扩散模型**（Motion Latent Diffusion, M
 3. **数据质量闭环**：能否结合运动先验（如物理约束、骨骼长度一致性）构建自动化数据清洗流水线，将异常率从 39% 降至可接受水平，减少人工干预？
 4. **跨模态扩展性**：视频正则化策略是否可以迁移至其他时序生成任务（如手势生成、舞蹈合成）？DUET 融合框架能否扩展到音频、场景图等其他模态，实现更通用的可控运动生成？
 5. **真实视频泛化边界**：模型对未见过真实视频的泛化仍局限于训练动作类型的组合。如何通过少样本学习或测试时自适应，扩展对开放域视频的运动理解与生成能力？
+
+
 
 ## 原文 PDF
 

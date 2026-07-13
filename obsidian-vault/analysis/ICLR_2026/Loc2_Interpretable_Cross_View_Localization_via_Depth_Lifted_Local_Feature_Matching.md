@@ -43,7 +43,7 @@ claims:
 > - VIGOR (跨区域 未知方向) 上，平均定位误差 (m) 4.23 vs 10.02 (FG$^{2}$) (-5.79)。
 > - VIGOR (同区域 未知方向) 上，平均方向误差 (°) 9.54 vs 15.02 (FG$^{2}$) (-5.48)。
 
-## 概述
+## 概要
 
 跨视角定位（cross-view localization）旨在通过匹配地面视角图像与空中（卫星/航拍）参考图像，确定地面相机在地理空间中的精确位置与朝向。这一任务面临的核心瓶颈在于**地面与空中视角之间的极端视觉差异**——同一场景在不同视角下呈现截然不同的外观、尺度和几何结构，而像素级标注对应关系的缺失使得传统图像匹配方法难以可靠工作。
 
@@ -63,8 +63,6 @@ claims:
 
 > ⚠️ **需要人工验证**：论文未明确标注发表会议/期刊和年份，上述方法谱系中的基线方法引用信息来自分析系统的推断，建议核实具体出处。
 
-## 背景与动机
-
 跨视角地理定位（cross-view geo-localization）旨在通过将地面图像与带有地理坐标的航空或卫星图像进行匹配，确定地面相机的地理位置。这一任务在自动驾驶、增强现实和机器人导航等领域具有重要应用价值。然而，地面图像与空中图像之间存在**极端的视觉差异**：地面图像呈现透视投影下的街景立面，而空中图像则提供近似正交投影的鸟瞰布局。这种视角鸿沟使得传统图像匹配方法难以可靠地建立跨视角对应关系，构成了该任务的核心瓶颈。
 
 现有方法主要沿两条技术路线展开。**基于全局描述子的方法**将跨视角定位视为图像检索问题，通过对比学习提取地面和空中图像的全局特征描述子进行匹配，如 **CCVPE**（Xia et al., 2023）和 **SliceMatch**（Lentsch et al., 2023）。这类方法虽然实现简洁，但丢弃了精细的空间对应信息，定位精度受限。**基于几何变换的方法**尝试将地面图像变形到鸟瞰图（BEV）空间后再与空中图像对齐，如 **GGCVT**（Shi et al., 2023）、**HC-Net**（Wang et al., 2024b）和 **DenseFlow**（Song et al., 2024）。这些方法依赖隐式的特征变换或流场估计，缺乏显式的对应关系监督，且通常假设地面为平面或固定高度，未有效利用深度信息。**FG²**（Xia & Alahi, 2025）首次尝试在BEV空间中通过点匹配建立局部对应，但使用正交Procrustes对齐，忽略了深度尺度的影响。
@@ -73,7 +71,7 @@ claims:
 
 针对这一缺口，本文提出 **Loc²**，核心动机是：**直接在原始图像平面上学习地面与空中的局部特征匹配，仅使用3自由度（3-DoF）相机姿态作为弱监督信号**。通过引入单目深度先验将匹配的地面点提升至BEV空间，再借助可微分的尺度感知Procrustes对齐联合估计相机旋转、平移和深度尺度，Loc²在无需任何像素级标注的条件下，实现了准确且高度可解释的跨视角定位。该方法不仅弥合了视角鸿沟，还首次使得定位结果可以通过地面布局在航拍图上的叠加进行直观验证。
 
-## 核心创新
+## 核心方法与创新机理
 
 Loc$^{2}$ 的核心创新在于将跨视角定位问题从传统的“全局描述子匹配”或“BEV 空间对齐”范式，重新定义为**原始图像平面上的局部特征匹配 + 深度提升 + 尺度感知 Procrustes 对齐**的端到端流水线。这一设计通过三个关键 changed slots 实现了对现有方法的系统性突破。
 
@@ -105,8 +103,6 @@ $$s^{*} = \frac{\mathrm{Tr}(\Sigma)}{\sum_{n=1}^{N} w_{n} \|\tilde{\mathbf{P}}_{
 
 这三个 changed slots 形成了因果闭环：图像平面匹配保留了最丰富的视觉特征 → 单目深度将 2D 对应提升为 3D 坐标 → 尺度感知 Procrustes 对齐在统一的数学框架下同时解决姿态估计和深度尺度恢复。这一设计使得 Loc$^{2}$ 在 KITTI 同区域 ±180° 方向噪声下将平均定位误差从 6.88 m（CCVPE）降至 1.85 m，在 VIGOR 跨区域未知方向下从 10.02 m（FG$^{2}$）降至 4.23 m，同时提供了高度可解释的匹配可视化。
 
-## 整体框架
-
 Loc$^{2}$ 的核心设计是将跨视角定位从 BEV 空间或全局描述子匹配中解放出来，直接在原始图像平面上建立地面与空中之间的局部特征对应，再通过单目深度先验将匹配点提升至 3D 空间，最终以可微分的尺度感知 Procrustes 对齐联合恢复相机姿态和深度尺度。整个流水线由四个紧密耦合的模块组成，如图 Figure 2 所示。
 
 ![[assets/figures/papers/paper_list_l70_https_openreview_net_forum_id_2ciXKn2UlS/figures/002_Figure_2.jpg]]
@@ -125,11 +121,6 @@ Loc$^{2}$ 的核心设计是将跨视角定位从 BEV 空间或全局描述子�
 **推理时的灵活性**：模型可在不重新训练的情况下切换不同的单目深度预测器（度量或相对深度）。当使用相对深度时，尺度感知 Procrustes 自动估计尺度因子，引入的定位误差增量小于 0.2 m。此外，RANSAC 可作为后处理步骤应用于对应点集以剔除离群点，在 VIGOR 数据集上带来 0.74 m 的平均定位误差降低。
 
 ### 补充图表
-
-![[assets/figures/papers/paper_list_l70_https_openreview_net_forum_id_2ciXKn2UlS/figures/001_Figure_1.jpg]]
-*Figure 1: Loc2: Interpretable cross-view localization via local feature matching. Loc2 establishes accurate correspondences between aerial and ground views, with colors indicating distinct correspondence regions. Using the estimated rotation, translation, and scale, the ground view is warped onto the aerial image, providing a visual interpretation of localization quality*
-
-## 核心模块与公式推导
 
 Loc² 的核心流水线由三个紧密耦合的模块构成：**图像平面局部特征匹配**、**深度提升与坐标关联**、**尺度感知 Procrustes 对齐与姿态估计**。整个流程仅需 3-DoF 相机姿态作为弱监督信号，无需任何像素级标注。
 
@@ -181,7 +172,7 @@ $$\mathcal{L}_{\mathrm{VCE}} = \frac{1}{N_v} \sum \| ( \mathbf{R}_{\mathrm{gt}} 
 
 InfoNCE 损失 $\mathcal{L}_{\mathrm{G2S}}$ 和 $\mathcal{L}_{\mathrm{S2G}}$ 分别从地面到空中和空中到地面两个方向监督匹配质量。需注意，在未知方向场景下，InfoNCE 损失可能引入冲突梯度，影响姿态估计。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -236,28 +227,13 @@ Figure 6展示了在CVACT数据集上的零样本泛化结果。尽管模型仅�
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l70_https_openreview_net_forum_id_2ciXKn2UlS/figures/003_Table_1.jpg]]
-*Table 1: KITTI test results. Best in bold. The ‘ori.’ column shows orientation noise used in training and testing, uniformly sampled within*
-
-![[assets/figures/papers/paper_list_l70_https_openreview_net_forum_id_2ciXKn2UlS/figures/004_Table_2.jpg]]
-*Table 2: VIGOR test results. Best in bold. Training uses metric depth from Unik3D (Piccinelli et al., 2025). The row ‘ours’ reports results with metric depth from the same model, while ‘oursxxx’ shows results with different relative depth inputs. Relative depth predictors, BiFuse++ (Wang et al., 2022) and UniFuse (Jiang et al., 2021), are provided by (Wang & Liu, 2024) ‘Ours-Unik3Drel’ denotes the study where metric depth is manually scaled by an arbitrary factor*
-
 ![[assets/figures/papers/paper_list_l70_https_openreview_net_forum_id_2ciXKn2UlS/figures/009_Table_3.jpg]]
 *Table 3: Ablation study on VIGOR same-area validation set with unknown ori. Best in bold*
-
-![[assets/figures/papers/paper_list_l70_https_openreview_net_forum_id_2ciXKn2UlS/figures/005_Figure_3.jpg]]
-*Figure 3: Local feature matching results on the VIGOR same-area test set under unknown orientation. We visualize the top 50 correspondences, ranked by matching score*
-
-![[assets/figures/papers/paper_list_l70_https_openreview_net_forum_id_2ciXKn2UlS/figures/006_Figure_4.jpg]]
-*Figure 4: Outlier detection using RANSAC on VIGOR same/cross-area test sets*
 
 ![[assets/figures/papers/paper_list_l70_https_openreview_net_forum_id_2ciXKn2UlS/figures/030_Table_16.jpg]]
 *Table 16: Runtime and memory usage comparison*
 
-![[assets/figures/papers/paper_list_l70_https_openreview_net_forum_id_2ciXKn2UlS/figures/008_Figure_6.jpg]]
-*Figure 6: Direct generalization to the CVACT dataset. We visualize the top 50 correspondences, ranked by matching score, and overlay the ground layout on the aerial image after using the predicted rotation, translation, and scale transformations. We use the metric depth prediction from Unik3D*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 跨视角定位的方法谱系
 

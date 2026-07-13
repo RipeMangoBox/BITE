@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/SpaceMind_Camera_Guided_Modality_Fusion_for_Spatial_Reasoning_in_Vision_Language_Models.pdf
+project_link: null
 code_link: null
 aliases:
 - SpaceMind
@@ -40,7 +41,7 @@ claims:
 > - VSI-Bench (8 subtasks) 上，Average Accuracy 69.6 vs 60.9 (prior best, Spatial-MLLM) (+8.7)。
 > - SPBench 上，Overall Accuracy 67.3 vs best prior (all listed models) (outperforms all)。
 
-## 概述
+## 概要
 
 现有视觉语言模型（VLM）在3D空间推理任务中面临一个关键瓶颈：**相机（视点）特征与场景（内容）特征在融合过程中被混为一谈，缺乏对视点与场景之间差异的显式建模**。这一设计缺陷使得模型难以稳定地理解物体间的空间关系、相对方向与距离，在需要精确几何推理的场景中表现受限。
 
@@ -50,7 +51,7 @@ claims:
 
 实验结果表明，SpaceMind 在 VSI-Bench 上取得了 **69.6 的平均准确率**，较先前最佳方法 Spatial-MLLM（60.9）提升超过 **8.7 个百分点**，并在所有子任务上均超越已有模型。在 SQA3D 和 SPBench 上同样取得最优结果，验证了其跨数据集的泛化能力。消融实验进一步证实，从浅层交叉注意力到完整的相机引导融合，每个组件的逐步添加均带来一致的性能增益（63.07 → 66.77 → 68.60 → 69.00 → 69.58），充分验证了相机作为主动引导模态这一设计理念的有效性。
 
-## 背景与动机
+
 
 视觉语言模型（VLMs）在图像描述、视觉问答等二维理解任务上取得了显著进展，但在三维空间推理方面仍面临根本性挑战。当任务涉及物体相对位置判断、绝对距离估计、路径规划或空间关系推理时，现有模型的表现往往远低于人类水平。这一瓶颈的核心在于，空间推理不仅需要理解场景中“有什么”（内容特征），更需要精确把握“从何处看”（视点特征）——而这两类信息在现有VLM的融合机制中常常被混为一谈。
 
@@ -58,7 +59,9 @@ claims:
 
 SpaceMind 的核心动机源于一个关键洞察：**相机信息应被提升为主动引导模态，而非被动辅助数据**。在三维场景理解中，同一场景从不同视点观察会产生截然不同的二维投影，但物体的真实空间关系保持不变。因此，有效的空间推理要求模型能够以相机条件的方式调控空间特征向视觉特征的注入——即让“从哪看”显式地指导“看到了什么”的几何解释。现有方法恰恰缺失了这种视点感知的融合控制机制，这正是 SpaceMind 试图解决的核心瓶颈。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：视点与场景特征的混淆
 
@@ -113,7 +116,7 @@ $$f_{\mathrm{fused}} = P_L(f_{\mathrm{proj}}) \odot g[:,\mathrm{None},:] + f_v$$
 
 这一创新使SpaceMind在仅使用RGB视频输入的条件下，在VSI-Bench上以69.6的平均得分超越先前最佳方法**Spatial-MLLM**（60.9）达8.7个百分点，并在SQA3D和SPBench上均取得最优结果，证明了视点感知融合范式的跨数据集泛化能力。
 
-## 整体框架
+
 
 SpaceMind 的整体设计遵循“双编码器 + 相机引导融合 + 语言模型”的三段式流水线，目标是将3D空间推理能力注入标准视觉语言模型，同时保持与现有VLM架构的兼容性。其核心思路是 **将相机表示从被动元数据提升为独立的主动引导模态**，通过相机条件显式调控空间特征向视觉特征的注入过程。
 
@@ -149,7 +152,7 @@ CGMF 通过三个递进的机制实现相机引导的融合：
 ![[assets/figures/papers/paper_list_l2419_https_arxiv_org_abs_2511_23075/figures/002_Figure_2.jpg]]
 *Figure 2: Overall pipeline of SpaceMind. Given a text prompt and an image sequence, a visual encoder produces semantic visual tokens, while a spatial encoder produces geometry-aware tokens together with per-frame camera tokens that summarize viewpoint information. The proposed Camera-Guided Modality Fusion (CGMF) module takes these three streams as input: it uses camera tokens to modulate spatial tokens, estimates their relative importance, and injects the resulting spatial cues into the visual tokens. The fused, view-aware visual tokens preserve the original token shape expected by the multimodal LLM, enabling SpaceMind to be trained end-to-end on RGB-only data while remaining compatible with standa...*
 
-## 核心模块与公式推导
+
 
 ### 3.1 整体架构
 
@@ -232,7 +235,9 @@ CGMF 的三个组件协同工作，形成了完整的相机引导融合范式：
 ![[assets/figures/papers/paper_list_l2419_https_arxiv_org_abs_2511_23075/figures/003_Figure_3.jpg]]
 *Figure 3: The architecture of the CGMF module. CGMF takes visual tokens*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -291,7 +296,9 @@ SpaceMind 在 VSI-Bench、SQA3D 和 SPBench 三个不同分布、不同任务类
 ![[assets/figures/papers/paper_list_l2419_https_arxiv_org_abs_2511_23075/figures/006_Table_3.jpg]]
 *Table 3: Evaluation on SPBench [34]. All models are evaluated without using SPBench training data. SpaceMind achieves the best performance on both SPBench-SI and SPBench-MV, outperforming general-purpose VLMs and prior spatial models by a clear margin*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心问题与现有方法的瓶颈
 
@@ -332,6 +339,8 @@ SpaceMind处于**3D空间推理VLM**与**多模态融合机制设计**的交叉�
 4. **多帧一致性的显式建模缺失**：CGMF在每帧内独立进行相机引导融合，帧间关系仅通过LLM的自注意力隐式建模。对于需要跨帧几何一致性推理的任务（如物体追踪、3D重建），显式的时序融合机制可能带来额外增益。
 
 5. **与更强基线的对比缺失**：论文以InternVL3-8B作为基础VLM，但未与同期更强的通用VLM（如GPT-4V、Gemini Pro Vision）在空间推理任务上进行对比。SpaceMind的增益是否在更强的基础模型上仍能保持，需要手动验证。
+
+
 
 ## 原文 PDF
 

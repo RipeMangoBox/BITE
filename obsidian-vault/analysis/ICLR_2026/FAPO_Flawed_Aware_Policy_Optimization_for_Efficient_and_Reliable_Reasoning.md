@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/FAPO_Flawed_Aware_Policy_Optimization_for_Efficient_and_Reliable_Reasoning.pdf
+project_link: https://fapo-rl.github.io
+code_link: null
 openreview_forum_id: jhqqoimoWt
 aliases:
 - FFAPO
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | FAPO：面向高效可靠推理的缺陷感知策略优化 |
 | 英文题名 | FAPO: Flawed-Aware Policy Optimization for Efficient and Reliable Reasoning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=jhqqoimoWt); [Project](https://fapo-rl.github.io) |
+| Links | [paper](https://openreview.net/forum?id=jhqqoimoWt) · [Project](https://fapo-rl.github.io) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | FAPO (Flawed-Aware Policy Optimization) |
 | Dataset | AIME24, AIME25, GPQA-Diamond, AMC |
@@ -42,7 +44,7 @@ claims:
 > - AIME25 上，Accuracy 为 33.5，对比 29.5，变化 +4.0。
 > - GPQA-Diamond 上，Accuracy 为 53.1，对比 51.0，变化 +2.1。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -81,7 +83,7 @@ FAPO在提升结果正确性的同时，有效降低了flawed-positive比例，�
 
 当前验证主要在数学推理任务和Qwen系列模型上进行，FAPO在多选题、多轮对话、智能体RL等更广泛场景的有效性尚未验证。此外，尽管FAPO显著减少了flawed-positive的比例，但未完全根除，可能仍对极端情况下的性能有影响。开放问题包括：惩罚机制在非数学推理任务中的适配、$\lambda$的自适应调整自动化、以及与现有RL增强技术的组合效果。
 
-## 背景与动机
+
 
 ### 基于可验证奖励的强化学习（RLVR）的瓶颈
 
@@ -107,7 +109,9 @@ FAPO的核心动机源于一个关键洞察：**flawed positive在RL训练中的
 
 基于这一动机，FAPO提出两个核心组件：（1）一个紧凑的**生成式奖励模型（GenRM）**，能够精准检测flawed positive并定位错误步骤；（2）一种**无参数的奖励惩罚机制**，结合群体相对优势估计，使优化方向随训练进程动态调整——当模型能力较弱时，flawed positive仍能贡献正向优势；当模型能力提升后，惩罚信号自然主导优化，推动策略向可靠推理收敛。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FAPO 的核心创新在于**首次系统性地识别并解决了基于可验证奖励的强化学习（RLVR）中“缺陷正样本”（flawed-positive）的双重作用问题**，并提出了一套无需复杂超参数搜索的自适应优化框架。其关键创新点可归纳为三个紧密耦合的“changed slots”：
 
@@ -149,7 +153,7 @@ $$R_{\mathrm{FAPO-GenRM}} = R_{\mathrm{Outcome}} + R_{\mathrm{Process}}$$
 
 FAPO 的三项创新构成了一个**紧密协同的系统**：GenRM 提供精确的 flawed-positive 检测信号，惩罚机制将这一信号注入奖励函数，而群体相对优势估计则自动调节优化方向，使模型在训练初期利用 flawed positive 作为学习捷径，后期自然转向可靠推理。这一设计无需复杂的手动奖励塑形（reward shaping），仅通过一个固定惩罚系数 $\lambda=1$ 就实现了从“快速进步”到“稳定可靠”的优雅过渡，从根本上解决了 RLVR 中 flawed positive 的双重作用问题。
 
-## 整体框架
+
 
 FAPO 的整体流程由两个核心模块构成：**FAPO-GenRM**（生成式奖励模型）与 **FAPO-Reasoning**（推理策略优化），二者通过异步 Reward Loop 基础设施耦合，形成“检测—惩罚—优化”的闭环。
 
@@ -182,7 +186,7 @@ FAPO 的核心洞察在于 flawed-positive rollout 的双重角色：它们在�
 
 当前框架的 GenRM 检测能力依赖于 FAPO-Critic-85K 数据集的覆盖度与标注质量，且仅在 Qwen2.5-Math-7B/32B 上验证。Reward Loop 的异步设计虽降低了延迟，但在完全异步 RL 系统中的收敛性尚未得到理论保证。
 
-## 核心模块与公式推导
+
 
 ### 1. 问题定义：Flawed Positive 的形式化
 
@@ -272,7 +276,9 @@ $$\hat{A}_{i,t} = \left[ r_i - \operatorname{mean}(\{R_i\}_{i=1}^G) \right] / \o
 
 为降低 GenRM 推理带来的额外计算开销，FAPO 设计了异步 Reward Loop 架构（Figure 8/9），将 rollout 生成与 GenRM 推理解耦为并行流水线，使训练时间增加控制在 20% 以内。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与实验动机
 
@@ -370,7 +376,9 @@ FAPO 引入 GenRM 推理作为额外的训练步骤，但通过异步 Reward Loo
 ![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_jhqqoimoWt/figures/029_Table_7.jpg]]
 *Table 7: Early-stage train-time rewards (view flawed rollout as positive rollout). Table 8: Later-stage train-time rewards (view flawed rollout as negative rollout)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的对比与继承
 
@@ -414,6 +422,8 @@ FAPO的有效性建立在以下关键前提之上：
 - **与其他RL增强技术的协同**：FAPO专注于奖励信号的修正，而现有研究中还存在多种避免reward hacking的策略（如KL散度正则化、策略熵约束等）。FAPO与这些技术的结合是否能激发更大的性能提升，尚待系统研究。
 
 - **flawed positive的因果机制**：论文揭示了flawed positive在训练早期的“踏脚石”作用，但其产生的深层原因——是模型的能力不足、探索策略的偏差、还是推理任务的固有模糊性——仍有待更深入的因果分析。理解这一机制可能催生更根本的解决方案。
+
+
 
 ## 原文 PDF
 

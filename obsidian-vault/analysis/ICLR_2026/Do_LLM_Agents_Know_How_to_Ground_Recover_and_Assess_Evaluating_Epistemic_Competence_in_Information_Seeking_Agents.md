@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Do_LLM_Agents_Know_How_to_Ground_Recover_and_Assess_Evaluating_Epistemic_Competence_in_Information_Seeking_Agents.pdf
+project_link: null
+code_link: https://github.com/SHAO-Jiaqi757/SeekBench
 openreview_forum_id: r0L9GwlnzP
 aliases:
 - Do_LLM_Agents_Kn
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | LLM智能体是否懂得扎根、恢复与评估？信息检索智能体认知能力评测 |
 | 英文题名 | Do LLM Agents Know How to Ground, Recover, and Assess? Evaluating Epistemic Competence in Information-Seeking Agents |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=r0L9GwlnzP); [GitHub](https://github.com/SHAO-Jiaqi757/SeekBench) |
+| Links | [paper](https://openreview.net/forum?id=r0L9GwlnzP) · [GitHub](https://github.com/SHAO-Jiaqi757/SeekBench) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | SeekBench |
 | Dataset | 7 QA Benchmarks, Cross-agent Synthesis |
@@ -41,7 +43,7 @@ claims:
 > - 7 QA Benchmarks 上，Overconfident Answering Rate 为 RL-trained agents 0.353，对比 Base model 0.631，变化 -0.278 (↓44%)。
 > - 7 QA Benchmarks 上，Reasoning Quality Index (RQI) 为 Few-shot 0.27，对比 Search-R1 0.08，变化 +0.19。
 
-## 概述
+## 概要
 
 当前信息寻求型LLM智能体的评测体系存在一个关键盲区：主流评测仅关注最终答案的正确性（如Exact Match、F1），却忽视了智能体在推理过程中是否真正基于证据进行思考、能否从低质量信息中恢复、以及是否根据证据充分性合理决策是否回答。这导致高分背后隐藏着大量未经证实的推理和过早回答等认知缺陷。
 
@@ -64,7 +66,7 @@ claims:
 
 **方法谱系与知识库定位**：SeekBench在评测粒度上区别于仅关注最终答案的传统QA评测，在证据利用率上引入了证据状态的条件化评估，在可扩展性上以LLM-as-Judge替代纯人工评判。其评测对象涵盖基座模型（**Qwen-2.5-7B-Instruct**，Qwen et al., 2024）、少样本提示策略（Few-shot、CoT、ReAct）以及RL训练的搜索智能体（**SEARCH-R1**，Jin et al., 2025；**RESEARCH**，Chen et al., 2025；**ASEARCHER**，Gao et al., 2025；**DEEPRESEARCHER**，Zheng et al., 2025），为信息寻求型智能体的认知能力提供了系统性的诊断工具。
 
-## 背景与动机
+
 
 ### 信息寻求型LLM智能体的崛起与评测盲区
 
@@ -96,7 +98,9 @@ claims:
 
 这一转变使得评测不仅能回答“智能体答对了吗”，更能回答“智能体是如何答对的”——其推理是否扎根于证据、能否从信息困境中恢复、是否在恰当的时机做出回答决策。通过揭示这些过程级的认知薄弱环节，SeekBench为智能体的诊断与改进提供了传统答案指标无法提供的细粒度信号。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SeekBench 的核心创新在于将信息寻求型 LLM 智能体的评测从“只看最终答案”转变为“审视认知过程”，并通过一套可规模化、可量化的指标体系，首次系统性地揭示了答案正确率背后隐藏的认知缺陷。
 
@@ -128,7 +132,7 @@ SeekBench 最反直觉的发现是：**RL 训练虽然显著降低了过度自�
 
 SeekBench 进一步探索了认知能力是否可跨智能体模块化复用——将一个智能体作为“证据搜集者”（Producer），另一个作为“答案合成者”（Synthesizer）。结果显示，**SEARCH-R1 作为合成器在利用其他智能体的证据时带来平均 +2.61 F1 的提升**（Table 7），这表明其信息综合能力强且回答保守，能够有效利用他人搜集的证据。这一发现指向一个开放方向：模块化智能体架构（分别负责证据搜集、推理综合与决策）可能弥补单一智能体的认知短板，同时缓解扎根推理与答案校准之间的逆向关系。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l39_https_openreview_net_forum_id_r0L9GwlnzP/figures/002_Table_1.jpg]]
 *Table 1: Epistemic competencies and associated metrics. Each competency is quantified by a specific metric calculated from annotated features within the agent’s trace (shown in the rightmost column), enabling systematic evaluation of reasoning quality, recovery behavior, and evidence-aligned decision-making*
@@ -177,7 +181,7 @@ SeekBench 的评测流水线由五个核心模块串联而成：
 
 Figure 2 展示了这一标注模式的整体结构：每条轨迹被分解为搜索步骤（检索信息）、推理步骤（处理证据并指导调查）和证据步骤（捕获检索信息的质量与清晰度），三者交织形成可被系统评测的认知过程全景。
 
-## 核心模块与公式推导
+
 
 ### 3.1 标注模式构建与验证
 
@@ -257,7 +261,9 @@ $$\mathrm{CE}_i := \sum_{k=0}^{2}\mathbb{P}(E_{i,t}=k)\left|\mathbb{P}(\text{ans
 
 三者共同覆盖了信息寻求型智能体“搜集证据—基于证据推理—根据证据决策”的完整认知链条，使得过程级缺陷可被定位到具体环节。例如，Figure 3 揭示 Few-shot 提示在 RQI（0.27）上全面优于 RL 训练智能体，但 Table 3 显示 RL 训练将过度自信回答率从 63.1% 降至 35.3%，表明 RL 优化了决策校准却损害了推理扎根性——这一矛盾仅在三维指标同时观测时才可被发现。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：答案正确性 ≠ 认知能力
 
@@ -339,7 +345,9 @@ SeekBench在7个问答基准上对8个智能体变体进行了大规模评测，
 ![[assets/figures/papers/paper_list_l39_https_openreview_net_forum_id_r0L9GwlnzP/figures/030_Table_8.jpg]]
 *Table 8: Epistemic Metrics for ASearcher and WebSailor on GAIA (7B and 32B) and GPT-5-mini on GAIA with Web search tools. RQI (groundedness), ERF recovery rate by Turn 8, and CE (calibration error, lower is better)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 评测范式的迁移：从答案正确性到认知能力
 
@@ -389,6 +397,8 @@ SeekBench 的可扩展性依赖于 **LLM-as-Judge 自动化标注流水线**。�
 3. **认知维度的扩展：** 除扎根性、恢复性和校准性外，还有哪些认知维度（如信息源的权威性批判评估、不确定性表达的质量）可通过类似的过程级指标体系量化？
 
 4. **RL 训练机制的诊断：** 为什么 RL 训练会损害扎根推理质量？是奖励信号的稀疏性问题，还是探索-利用的权衡导致智能体学会了“捷径”？这需要进一步剖析 RL 训练的中间过程。
+
+
 
 ## 原文 PDF
 

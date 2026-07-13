@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/SurvHTE_Bench_A_Benchmark_for_Heterogeneous_Treatment_Effect_Estimation_in_Survival_Analysis.pdf
+project_link: null
+code_link: https://github.com/Shahriarnz14/SurvHTE-Bench
 aliases:
 - SB
 - SurvHTE-Bench
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | SurvHTE-Bench：生存分析中异质性处理效应估计的基准测试 |
 | 英文题名 | SurvHTE-Bench: A Benchmark for Heterogeneous Treatment Effect Estimation in Survival Analysis |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=qG6O3jMkCj); [GitHub](https://github.com/Shahriarnz14/SurvHTE-Bench) |
+| Links | [paper](https://openreview.net/forum?id=qG6O3jMkCj) · [GitHub](https://github.com/Shahriarnz14/SurvHTE-Bench) |
 | Topic | #topic/representation_self_supervised_transfer #topic/representation_self_supervised_transfer/causality |
 | Method | SurvHTE-Bench |
 | Dataset | 40 Synthetic Datasets (overall CATE RMSE ranking), 40 Synthetic Datasets (family-level CATE RMSE ranking), ACTG Semi-synthetic, MIMIC-i Semi-synthetic (88% censoring) |
@@ -41,13 +43,13 @@ claims:
 > - 40 Synthetic Datasets (family-level CATE RMSE ranking) 上，Average Borda rank (lower is better) 为 S-Learner-Survival family: 3.30，对比 Double-ML family: 3.98，变化 0.68。
 > - ACTG Semi-synthetic 上，CATE RMSE 为 Double-ML: 10.651 ± 0.239，对比 (Next best in table, not explicitly stated)，变化 N/A。
 
-## 概述
+## 概要
 
 生存分析中异质性处理效应（HTE）的估计缺乏标准化基准，导致评估实践碎片化、方法间比较不一致，研究者难以系统了解各类方法在关键假设违反下的稳健性。本文提出 SurvHTE-Bench，一个全面、模块化的基准框架，旨在填补这一空白。该框架将现有生存 HTE 方法归为三大类——结果插补方法、直接生存因果方法和生存元学习器，并在 40 个合成数据集、两个半合成数据集（ACTG、MIMIC‑IV）和两个真实世界数据集（Twins、ACTG 175）上统一评估了 53 种方法变体。核心设计特色在于通过正交交叉 8 种因果配置（操控随机化、可忽略性、阳性、信息性删失）与 5 种生存场景（不同事件时间分布与删失率），构成可控的“因果旋钮”，使得在已知真实处理效应的条件下，能够逐因子探测估计器对常见假设违反的敏感程度。
 
 主要结论如下：没有任何一种方法在所有条件下均占优。生存元学习器（尤其是基于 DeepSurv 的 S‑ 和匹配学习器）在严重假设违反和高删失率下表现出显著的鲁棒性，S‑Learner‑Survival 在全部 40 个合成数据集上取得最低平均 Borda 排名（5.17），Matching‑Survival 紧随其后（5.42）；但在低删失率的随机化实验中，结果插补方法（如 Double‑ML + Margin）更具精度。整体性能高度依赖于插补算法和基础学习器的选择，而非单一方法家族：Margin 插补在高删失下始终保持最低的插补误差，DeepSurv 作为基础模型普遍优于 RSF 和 DeepHit，从而解释了顶级估计器的构成规律。SurvHTE-Bench 为生存 HTE 方法的选择提供了首个标准化参照系和可复现的比较基础设施，揭示了当前方法在高度删失场景下的共同局限，并指明了未来扩展方向（如时变处理、工具变量、公平性审计等）。
 
-## 背景与动机
+
 
 生存分析中的异质性处理效应（Heterogeneous Treatment Effect, HTE）估计旨在回答“对于给定的个体，一种处理（如治疗方案）相较于另一种处理，将如何影响其生存结局（如死亡、疾病复发）”。具体地，对每个个体 $i$ 定义其潜在事件时间 $T_i(1)$ 和 $T_i(0)$，并以 $y(\cdot)$ 表示某种变换（例如受限平均生存时间 RMST），则个体处理效应（Conditional Average Treatment Effect, CATE）可表达为：
 
@@ -65,7 +67,9 @@ $$\tau(x) := \mathbb{E}\big[y(T_i(1)) - y(T_i(0)) \mid X_i = x\big].$$
 
 为填补此缺口，我们提出了 **SurvHTE‑Bench**——一个专为生存分析中 HTE 估计设计的综合基准测试平台。其核心思想是构建一个可控的“因果旋钮”：通过将 **8 种因果配置**（系统性地开关随机化、可忽略性、阳性以及可忽略删失假设）与 **5 种生存场景**（涵盖不同的真实事件时间分布和删失率）正交组合，生成 **40 个已知真实 CATE 的合成数据集**。该模块化设计允许在完全掌控真值的条件下，定量探测不同估计器对常见假设违反的敏感程度。SurvHTE‑Bench 还在统一代码基座上实现了 **53 种系统归类的估计器变体**，覆盖全部三类方法家族，并配套 **标准化评估流程**（10 次随机划分、Borda 排名、赢率分析、辅助消融实验），从而使得两个维度的关键问题得到系统回答：“在何种因果与生存条件下，哪一类方法更为可信？”以及“决定方法最终性能的究竟是方法家族本身，还是底层的插补算法与基学习器选择？”通过这一可复现、可扩展的框架，SurvHTE‑Bench 旨在为生存 CATE 研究提供可靠的比较基础和选型指南，推动该领域向更加鲁棒和透明的方法开发前进。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 生存分析中异质性处理效应（HTE）的评估长期缺少标准化基准，导致不同研究在实验设计、评估协议和方法实现上高度碎片化，难以就方法的稳健性和适用边界形成一致结论。SurvHTE‑Bench 的核心创新在于将评估从“单一场景的个别比较”转变为“可控因果旋钮下的系统性压力测试”，其关键改变体现在三个层面：数据生成、评估协议和方法覆盖。
 
@@ -86,7 +90,7 @@ $$\tau(x) := \mathbb{E}\big[y(T_i(1)) - y(T_i(0)) \mid X_i = x\big].$$
 
 综上，SurvHTE‑Bench 的创新不仅在于提供了一个基准数据集，更在于它建立了一个 **剖析生存 CATE 方法脆弱性的可控实验平台**，将研究焦点从“哪个方法更好”转向“在什么条件下、为什么某些方法失败，以及组件选择如何决定最终性能”。这一转变对推动该领域的可信评估和鲁棒方法设计具有关键意义。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0014_qG6O3jMkCj_SurvHTE-Bench_A_Benchmark_for_Heterogeneous_Trea/figures/001_Table_1.jpg]]
 *Table 1: Causal configurations of synthetic datasets. RCT = randomized controlled trial; OBS = observational study; 5 $\theta$ ( 5 ) = 5 0 \% ( 5 \% ) treatment rate; CPS= correctly specified propensity score (ignorability satisfied); UConf = unobserved confounding (ignorability violated); NoPos = lack of positivity; InfC = informative censoring (ignorable censoring violated). ✓= held, ✗= not held*
@@ -104,7 +108,7 @@ SurvHTE-Bench 旨在为生存分析中的异质性处理效应（Heterogeneous T
 
 **输出分析流**将评估结果以排名图（如 Figure 1）、配置‑误差分布图（如 Figure 2）、场景‑排名趋势（如 Figure 6、Figure 7）和一致性散点图（如 Figure 4）等形式呈现，并结合消融研究（如 Table 19 中插补方法对比，Appendix F.6）揭示性能瓶颈的来源。整个管道从`(因果配置, 生存场景) → 模拟数据集`出发，经`估计器变体池 → 评估指标计算`，最终聚合成`排名 + 稳健性洞察 + 组件影响证据`，形成可重复、可扩展的生存 HTE 方法评测体系。
 
-## 核心模块与公式推导
+
 
 SurvHTE‑Bench 作为一个标准化基准框架，其核心能力并非提出新的估计器，而是通过**可配置的数据生成管线**与**统一的评估协议**将生存HTE方法的比较从碎片化的对照升级为系统化的压力测试。以下按功能模块与关键公式两层展开。
 
@@ -214,7 +218,9 @@ $$
 
 上述公式不仅定义了“什么是好的估计”，也揭示了插补方法（如Margin vs. IPCW‑T）在高删失下的本质差异：Margin基于条件期望保持了条件均值的一致性，而IPCW‑T仅使用实发事件时间进行平均，在严重删失时容易严重失真——这最终解释了为何基于Margin的变体在各排位中频繁跃居前列（附录F.6.1）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 1. 总体性能排名与合成数据集主结果
 
@@ -295,13 +301,17 @@ $$
 
 > 以上结论均基于特定估计目标（如 30 天 RMST）和模拟设定，推广至其他时域或数据分布时需审慎。部分细粒度对比值未在原实验中给出，需要进一步手工核对原始表格（见表 3、表 14、附录 F.5 的具体数值）。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 生存分析中异质性处理效应（HTE）估计长期缺乏统一的评估框架，导致方法比较碎片化、对假设违反的稳健性认知不足。SurvHTE-Bench 的核心贡献并非提出新的估计算法，而是通过系统归类、模块化仿真和一致评价协议，填补了这一标准化基准的空白。它将现有及可自然扩展的生存 HTE 方法划分为三个家族：**结果插补方法**（将删失时间插补为连续数值后应用标准 CATE 估计器，如 Double-ML、X-Learner）、**直接生存因果方法**（直接对时间-事件结果建模，如 Causal Survival Forest、SurvITE）和**生存元学习器**（以生存模型为基学习器的 S/T/Matching-Learner 变体）。相比之下，以往研究中作者常根据自身偏好设定单一或少量违反情景，且分离地比较少数方法，无法揭示各类估计器在因果与删失假设同时变化时的相对优劣。SurvHTE-Bench 通过 **8 种因果配置（操控随机化、可忽略性、阳性、信息性删失的正交组合）× 5 种生存场景（不同事件时间分布与删失率）共 40 个合成数据集**，并配合**53 个系统化变体**、10 次重复实验、Borda 排名和组件消融，构成了可控的“因果旋钮”，使得方法选择不再依赖于孤例展示。
 
 上述基准架构直接暴露了方法的**适用边界**。实验一致表明，没有任何一种方法在所有条件下占优。在**低删失、随机化设置中**，结果插补方法（尤其是 Double-ML）在 CATE RMSE 上领先；但**随着删失率上升**（如 Scenario D），生存元学习器中的 S-Learner-Survival（基于 DeepSurv）和 Matching-Survival 显著超越所有其他类别，S-Learner-Survival 的平均排名可至 1.6。**当不可忽略性等因果假设被违反时**，生存元学习器和 Causal Survival Forest 在 ATE 偏误和 CATE 精度上表现出更平滑的退化，而部分结果插补方法的偏误增大更为明显。进一步消融揭示了性能差异的深层原因：插补算法的选择对结果插补方法至关重要，**Margin 插补**利用 Kaplan‑Meier 条件期望在高删失下始终保持最低的插补误差，使得基于 Margin 的变体频繁出现在 top‑ranked 估计器中；而生存元学习器中，**DeepSurv 作为基模型**在一致性指数上持续优于 RSF 和 DeepHit，解释了该方法家族整体排名靠前的现象。因此，最终性能并非单纯取决于方法家族，而是**插补策略、基学习器与数据生成机制之间非线性交互的结果**。
 
 尽管如此，当前基准存在明确的**局限与开放问题**。首先，所有实验均建立在静态二值处理、基线协变量和右删失的框架内，**尚未覆盖时变治疗、纵向协变量、工具变量或动态治疗方案**等更复杂的因果设定。其次，合成数据生成未模拟**一致性违反（干扰）** 和**删失阳性违反**，而这些在实际医疗场景中并非罕见。第三，评价维度局限于预测准确度和偏误，**缺失公平性、可解释性、临床效用等多维度审计**；作者也明确指出基准不能替代领域特异的验证或公平性评估。从开放问题看，未来扩展方向至少包括：引入分级敏感性分析以连续调节未测量混杂强度或重叠违背程度；将估计目标拓展至条件中位生存时间、时变风险比等更丰富的量纲；以及在多种方法的 CATE RMSE 差异不大时，建立稳定性、可解释性和计算成本的综合选型准则。这些方向将推动基准从单纯的性能排行榜演进为**支持负责任部署的工程知识库**。
+
+
 
 ## 原文 PDF
 

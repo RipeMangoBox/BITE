@@ -41,7 +41,7 @@ claims:
 > - Bonn 上，Abs Rel ↓ 0.035 vs 0.049 (π³) (-0.014)；δ<1.25 ↑ 0.980 vs 0.975 (π³) (+0.005)。
 > - EMDB-2 上，WA-MPJPE ↓ 118.5 vs 220.0 (JOSH3R) (-101.5)。
 
-## 概述
+## 概要
 
 从单目视频中同时恢复三维场景几何、相机参数和人体运动，是视觉理解的核心难题。现有前馈重建方法（如 **π³**、**VGGT**）虽能高效输出场景点云，但缺乏对人体的显式建模；专用人体姿态估计方法（如 **GVHMR**、**WHAM**）则忽略场景上下文，导致人-景关系割裂。联合重建的尝试（如 **JOSH3R**）仍受限于合成数据的域差距，在真实视频上的人体几何细节和对齐精度均不理想。
 
@@ -55,7 +55,7 @@ claims:
 
 **局限性**包括：未标注数据以舞蹈视频为主，存在群体偏差；仅支持单人场景，无法处理多人交互；细对齐阶段依赖粗对齐初始化，增加了训练复杂度。
 
-## 背景与动机
+
 
 ### 问题背景：场景与人体重建的割裂
 
@@ -83,7 +83,9 @@ claims:
 
 通过这一设计，UniSH在单次前向传播中即可输出度量尺度的场景点云、相机参数和SMPL人体参数，在Bonn数据集上将深度误差Abs Rel从π³的0.049降至0.035（降低28.6%），在EMDB-2上将人体运动误差从JOSH3R的220.0 mm降至118.5 mm（降低46.1%），同时保持了前馈方法的实时性优势。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 UniSH 的核心创新在于将**场景重建**与**人体姿态估计**这两个此前独立发展的前馈式模型，通过一个轻量的**对齐网络（AlignNet）**和一套**三阶段训练策略**融合为单一的前向传播框架，首次实现了度量尺度下场景与人体网格的联合重建。其关键 changed slots 可归纳为以下三个维度。
 
@@ -125,7 +127,7 @@ $$\mathcal { L } _ { \mathrm { d r e g } , i } = \mathrm { R e L U } ( \bar { d 
 
 上述三个 changed slots 形成了一条清晰的因果链：**AlignNet 提供了尺度与位置的全局骨架**，使度量级联合重建成为可能；**表面蒸馏将单目专家模型的高频细节注入多视图框架**，解决了通用重建模型人体几何粗糙的瓶颈；**由粗到细的对齐监督则有效利用了合成数据的标注优势和真实数据的分布优势**，使模型在真实场景中实现鲁棒的人景对齐。三者共同作用，使得 UniSH 在 Bonn 数据集上将 Abs Rel 从 π³ 的 0.049 降至 0.035（降低 28.6%），在 EMDB-2 上将 WA-MPJPE 从联合重建基线 JOSH3R 的 220.0 mm 降至 118.5 mm。
 
-## 整体框架
+
 
 UniSH 是一个前馈式联合重建框架，以单目视频片段为输入，在单次前向传播中同时预测度量尺度的场景几何、相机参数以及人体姿态与形状。如图2所示，框架由三个核心模块构成：**场景重建分支**、**人体重建分支**和**对齐网络（AlignNet）**。
 
@@ -155,7 +157,7 @@ $$(s, \mathcal{T}) = \mathrm{AlignNet}(\mathcal{F}_{\mathrm{geo}}, [T_s | \mathc
 ![[assets/figures/papers/paper_list_l1038_https_arxiv_org_abs_2601_01222/figures/001_Figure_1.jpg]]
 *Figure 1: Given a monocular video as input, our UniSH is capable of jointly reconstructing scene and human in a single forward pass, enabling effective estimation of scene geometry, camera parameters and SMPL parameters*
 
-## 核心模块与公式推导
+
 
 UniSH 的核心架构由三个功能模块构成，分别负责场景几何重建、人体参数回归以及人-景度量尺度对齐。整体数据流如 Figure 2 所示：输入一段 $N$ 帧的单目视频，经双分支处理后由 AlignNet 融合特征，输出全局尺度 $s$ 与每帧 SMPL 平移 $\{t_i\}_{i=1}^N$，最终实现前馈式的联合重建。
 
@@ -221,7 +223,9 @@ $${ \mathcal { L } } _ { \mathrm { s t a g e 3 } } = { \frac { 1 } { N } } \sum 
 ![[assets/figures/papers/paper_list_l1038_https_arxiv_org_abs_2601_01222/figures/007_Figure_5.jpg]]
 *Figure 5: Ablation study of our key design. (a) A variant where the scene branch is directly supervised for metric scale, and the Align Net only predicts SMPL translation. (b) Our model trained with only the coarse (synthetic) alignment stage, omitting the fine-grained alignment. (c) Our full model, which incorporates both coarse (synthetic) and fine-grained (real-world) alignment stages*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 1. 核心定量结果
 
@@ -276,7 +280,9 @@ Figure 6 从定性角度展示了人体表面细化的效果：π³ 基线保持
 ![[assets/figures/papers/paper_list_l1038_https_arxiv_org_abs_2601_01222/figures/011_Figure_8.jpg]]
 *Figure 8: Qualitative Visualization of Joint Scene and Human Reconstruction. The examples demonstrate the robustness and metric consistency of our framework. The color gradient (light blue to dark blue) consistently encodes the temporal sequence across both the reconstructed camera poses and the SMPL meshes. The upper example illustrates robustness in reconstructing highly articulated poses (rock climbing) and accurately aligning the SMPL mesh with the scene geometry. The lower example demonstrates coherent, long-term tracking of human motion in a complex urban environment, verifying the metric stability and generalization of our joint reconstruction framework*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与前馈式场景/人体重建基线的关系
 
@@ -313,6 +319,8 @@ UniSH 与专用的全局人体运动估计方法（如 **WHAM** 和 **TRAM**）�
 3. **完全自监督的尺度学习**：当前粗对齐阶段依赖合成数据的度量尺度监督。探索完全从未标注真实数据中自监督学习全局尺度的方案（例如通过场景中的已知尺寸物体或运动线索），可以进一步降低对合成数据的依赖，提升方法的通用性。
 
 4. **跨域泛化的鲁棒性验证**：论文主要在 Bonn、EMDB-2 和 RICH 数据集上评估，这些数据集以人体为中心。在更广泛的场景类型（如无人体存在的纯场景视频、极端光照条件）上的泛化能力尚待验证。
+
+
 
 ## 原文 PDF
 

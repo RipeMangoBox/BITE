@@ -5,6 +5,7 @@ paper_level: A
 venue: NeurIPS
 year: 2024
 pdf_ref: paperPDFs/NEURIPS_2024/Training_Data_Attribution_via_Approximate_Unrolled_Differentiation.pdf
+code_link: https://github.com/pomonam/kronfluence
 project_link: https://github.com/pomonam/kronfluence
 aliases:
 - SSSUCE
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 基于近似展开微分的训练数据归因 |
 | 英文题名 | Training Data Attribution via Approximate Unrolled Differentiation |
 | 会议/期刊 | NeurIPS 2024 |
-| Links | [paper](https://arxiv.org/abs/2405.12186); [GitHub](https://github.com/pomonam/kronfluence) |
+| Links | [paper](https://arxiv.org/abs/2405.12186) · [GitHub](https://github.com/pomonam/kronfluence) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/robotics |
 | Method | Source (Segmented statiOnary UnRolling for Counterfactual Estimation) |
 | Dataset | FashionMNIST (single model), FashionMNIST (multiple models), CIFAR-10, FashionMNIST (subset removal) |
@@ -42,7 +43,7 @@ claims:
 > - FashionMNIST (multiple models) 上，LDS at α=0.5 为 0.53 ± 0.01，对比 0.45 ± 0.01 (Influence Functions)，变化 +0.08。
 > - CIFAR-10, FashionMNIST (subset removal) 上，fraction of test examples flipped after removing top-k influential points 为 higher fraction flipped (better)，对比 lower fraction flipped (worse) for other methods，变化 qualitative improvement。
 
-## 概述
+## 概要
 
 **核心问题：训练数据归因的根本性权衡。** 训练数据归因（TDA）旨在量化单个训练样本对模型行为的影响，但现有方法存在根本性权衡。隐式微分方法（如影响函数，**Influence Functions** (Koh and Liang, 2017)）依赖模型收敛到唯一最优解的假设，无法处理非收敛训练、多阶段训练和优化器细节；而展开微分方法虽能处理这些情况，却需存储全部中间变量，计算和内存成本过高。
 
@@ -52,7 +53,7 @@ claims:
 
 **主要结果。** 在FashionMNIST数据集上，Source在单模型和多模型设置下的线性数据建模分数（LDS）分别达到0.46和0.53，显著优于影响函数的0.30和0.45（Table 2）。在非收敛和多阶段训练（RotatedMNIST、FashionMNIST-N）等挑战性设置中，Source始终优于所有隐式微分基线方法（Figure 7）。在子集移除反事实评估中，Source只需移除更少的训练样本即可翻转测试预测，优于其他TDA方法（Figure 8）。消融实验进一步表明，增加分段数可持续提升归因准确性，而在未完全收敛的线性模型上，Source相对于影响函数的优势随训练迭代次数减少而扩大（Figure 10）。
 
-## 背景与动机
+
 
 ### 训练数据归因的核心问题
 
@@ -84,7 +85,9 @@ $$\tau _ { \mathrm { I F } } ( z _ { q } , z _ { m } , \mathcal { D } ) : = \nab
 
 基于这一洞察，本文提出了**Source**（Segmented statiOnary UnRolling for Counterfactual Estimation）方法，旨在以可接受的计算成本，在更广泛的训练场景下提供比隐式微分方法更准确的反事实预测。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Source 的核心创新在于**通过分段平稳性近似，将展开微分（unrolled differentiation）的计算成本降低到与隐式微分方法可比的程度**，同时保留了展开微分对训练过程细节的建模能力。这一创新直接打破了现有 TDA 方法在“计算可行”与“反事实准确”之间的根本权衡。
 
@@ -140,7 +143,7 @@ Source 在方法特性上相对隐式微分基线产生了以下关键变化：
 
 需要指出的是，Source 的分段平稳性假设并非在所有场景下都成立。当 Hessian 或梯度在训练过程中剧烈变化时，需要更多分段来修正近似误差，但这会增加计算成本。如何自动确定分段点仍是待解决的问题。此外，快速版本 Fast-Source 通过直接平均段内参数来进一步降低计算量，但归因准确性有所下降（见消融实验 Figure 9）。
 
-## 整体框架
+
 
 Source 的核心设计思想是将完整的训练轨迹划分为若干个**平稳段（segments）**，并在每个段内近似梯度和 Hessian 的统计分布为平稳的，从而将展开微分（unrolled differentiation）的计算简化为仅需少量模型检查点的影响函数式公式。这一设计从根本上解决了现有方法的两难困境：隐式微分方法（如影响函数）依赖最优解假设，无法处理非收敛或多阶段训练；而标准展开微分方法需要存储所有中间变量，计算和内存成本过高。
 
@@ -192,7 +195,7 @@ Source 位于梯度归因方法谱系中展开微分与隐式微分的交汇点�
 
 Source 通过分段平稳性近似，保留了展开微分对优化轨迹信息（学习率、优化器选择、训练阶段效应）的敏感性，同时将计算和存储需求降至与隐式微分方法可比拟的水平。实验表明，当模型未完全收敛时，Source 相对影响函数的 LDS 优势随训练迭代次数减少而扩大（Figure 10 Right），验证了其在不完全优化场景下的独特价值。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化
 
@@ -258,7 +261,9 @@ $$\tau _ { \mathrm { S O U R C E } } ( z _ { q } , z _ { m } , \mathcal { D } ; 
 
 5. **归因分数合成**：按公式链式组合各段贡献，得到最终训练数据归因分数。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -329,7 +334,9 @@ Source在RTE文本蕴含任务中识别的正负影响样本具有可解释性�
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2405_12186/figures/018_Figure.jpg]]
 *Figure: Top Negatively Influential Images*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题域定位：训练数据归因的两条技术路径
 
@@ -397,6 +404,8 @@ $$\tau _ { \mathrm { S O U R C E } } ( z _ { q } , z _ { m } , \mathcal { D } ; 
 3. **与随机投影结合**：能否将 Source 与 TRAK 所用的随机投影技术结合，进一步降低高维参数空间中的存储和计算需求？
 4. **自适应优化器**：在 Adam 等自适应学习率优化器下，平稳性近似引起的偏差有多大？如何针对自适应优化器改进近似方案？
 5. **快速版本的理论分析**：Fast-Source 通过直接平均参数来减少计算，但归因准确性有所下降（Figure 9）。其理论误差界尚待建立。
+
+
 
 ## 原文 PDF
 

@@ -41,7 +41,7 @@ claims:
 > - BEHAVE (分布内) 上，CD-c↓ (cm) 9.23 vs 14.22 (VisTracker) (-5.0 cm (-35%))；Acc-o↓ (cm/s²) 0.35 vs 0.77 (VisTracker) (-0.42 cm/s²)。
 > - InterCap (零样本) 上，CD-c↓ (cm) 12.88 vs 20.17 (VisTracker†) (-7.29 cm (-36%))；CD-o↓ (cm) 15.69 vs 27.41 (VisTracker†) (-11.72 cm)。
 
-## 概述
+## 概要
 
 从单目RGB视频中重建人与物体的4D交互（HOI）面临两个根本性瓶颈：**类别依赖**与**度量尺度模糊**。现有方法要么需要已知的物体模板（如VisTracker），要么只能处理预定义类别（如InterTrack），无法泛化到未见物体；同时，单目视频天然缺乏深度信息，导致人、物预测处于不同坐标系且尺度不一致。独立使用基础模型（如FoundationPose、NLF）虽能提供初始化，但预测含噪声、忽略精细接触，难以获得空间-时间一致的度量尺度重建。
 
@@ -51,7 +51,7 @@ CARI4D的核心思路是**将多种基础模型的预测对齐以获得鲁棒初
 
 方法局限在于：严重依赖FoundationPose初始化，当发生严重遮挡或快速运动时可能出现翻转180°的姿态错误且难以纠正；未显式回归手指关节，在精细操控场景中手指姿态可能不真实。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -82,7 +82,9 @@ CARI4D的核心思路是**将多种基础模型的预测对齐以获得鲁棒初
 
 实验结果表明，这一思路在定量和定性层面均取得了显著提升。在分布内BEHAVE数据集上，CARI4D的联合网格Chamfer距离（CD-c）为9.23 cm，相比VisTracker的14.22 cm降低了35%以上（Table 1）。在未见过的InterCap数据集上零样本泛化时，CD-c为12.88 cm，显著优于VisTracker的20.17 cm，相对提升超过36%（Table 2）。消融实验进一步验证了各模块的独立贡献：动态姿态假设选择将物体Chamfer距离从原始FoundationPose的1565.42 cm大幅降至16.85 cm（Table 3），接触感知联合优化将物体加速度误差从3.78 cm/s²降至0.38 cm/s²，证明了物理约束对时序平滑度的关键作用。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CARI4D的核心创新在于将类别无关的4D人-物交互重建分解为**度量尺度恢复、鲁棒初始化、接触推理与物理约束优化**四个可解耦的环节，从根本上绕开了现有方法对已知物体模板和固定类别的依赖。其关键技术路径可归纳为以下五个 changed slots。
 
@@ -116,7 +118,7 @@ $$L = \lambda_c L_c + \lambda_{\mathrm{j2d}} L_{\mathrm{j2d}} + \lambda_m L_m + 
 
 **因果链路总结**：度量尺度恢复（Slot 1-2）提供几何一致的初始化 → 渲染-比较范式（Slot 3-4）实现类别无关的接触推理 → 物理约束优化（Slot 5）保证时空一致性。五个slot层层递进，共同构成了从单目视频到零样本4D重建的完整技术路径。
 
-## 整体框架
+
 
 CARI4D 的总体目标是从一段单目 RGB 视频中重建出度量尺度下的人和物体的 4D 交互——即恢复每一帧的人体姿态、物体姿态，并保持时空上一致的接触关系。整个流水线采用**自底向上的初始化 + 数据驱动的交互细化 + 物理约束的联合优化**三步范式，核心设计意图是**将多种基础模型的预测对齐到一个统一的度量空间，再通过渲染-比较范式学习一个类别无关的接触推理网络，最终用接触感知的优化满足物理一致性**。
 
@@ -164,7 +166,7 @@ Figure 2 给出了完整的流水线概览，四个核心模块依次为：
 
 整个流水线的设计遵循一条清晰的因果链：**基础模型的原始预测处于不同坐标系、含有噪声且忽略接触交互 → 通过度量尺度对齐和动态姿态选择获得鲁棒初始化 → CoCoNet 学习类别无关的交互细化与接触推理 → 接触感知优化施加物理约束和时序平滑 → 得到空间和时间一致的 4D 重建**。这一链条使得方法能够在**不依赖物体模板和固定类别**的前提下，实现零样本泛化。
 
-## 核心模块与公式推导
+
 
 CARI4D 的核心流水线由四个关键模块串联而成，每个模块解决一个特定的子问题，最终实现从单目 RGB 视频到度量尺度 4D 人-物交互重建的端到端流程（Figure 2）。
 
@@ -239,7 +241,9 @@ $$
 ![[assets/figures/papers/paper_list_l1010_https_arxiv_org_abs_2512_11988/figures/011_Figure_7.jpg]]
 *Figure 7: CoCoNet architecture. Here b, t, h, w denote batch size, temporal window size, image height and width respectively. We follow a render-and-compare paradigm, hence RGB a and RGB b denote the image from input observation and rendering respectively, same for xyz map and mask (human and object stacked together)*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能：分布内与零样本泛化
 
@@ -314,7 +318,9 @@ Figure 3和Figure 4分别展示了BEHAVE和InterCap上的定性对比。CARI4D�
 ![[assets/figures/papers/paper_list_l1010_https_arxiv_org_abs_2512_11988/figures/017_Figure_11.jpg]]
 *Figure 11: Failure case examples. Our method focuses on full body interaction and the detailed hand poses are not handled, which can be important for fine-grained object manipulation task (top row). Our method thus failed to reconstruct realistic finger poses for holding the plate. Under highly dynamic motion and extreme occlusion (bottom row), FoundationPose predicts flipped object pose for initialization. Such large rotation error is not able to be corrected by our refinement process in subsequent steps, leading to inaccurate reconstruction in the end*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题域定位：从类别依赖到零样本泛化
 
@@ -374,6 +380,8 @@ CARI4D 的适用边界由其设计选择直接决定：
 3. **更复杂的交互推理**：在训练数据更加多样化的条件下，CoCoNet 能否学习躯干接触、多人协作等更复杂的交互模式？当前的双接触标签输出可扩展为多部位接触预测，但需要相应的标注数据支持。
 
 4. **端到端训练的可能性**：当前流水线是模块化的，各基础模型独立运行。能否将部分模块（如深度对齐、姿态选择）纳入可微分框架，实现端到端的联合训练，进一步提升整体性能？
+
+
 
 ## 原文 PDF
 

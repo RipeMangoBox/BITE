@@ -42,7 +42,7 @@ claims:
 > - WildDeepfake (WDF) 上，AUC (%) 86.50。
 > - DF40 (FF++ six advanced techniques) 上，Average AUC (%) 93.9。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -76,7 +76,7 @@ Agent4FaceForgery 在方法谱系中占据独特位置：它不同于传统的�
 
 该工作可定位于**数据中心AI**与**多智能体模拟**的交叉领域，其核心贡献在于证明了：通过LLM驱动的生成式模拟构建的训练数据，能够有效弥补静态数据集与真实世界部署之间的生态鸿沟。
 
-## 背景与动机
+
 
 ### 面部伪造检测的现实困境
 
@@ -101,7 +101,9 @@ Agent4FaceForgery的核心洞察在于：**要提升检测器的真实场景泛�
 
 通过自适应拒绝采样（Adaptive Rejection Sampling, ARS）机制动态筛选高质量挑战样本，以及正负样本构造（Positive-Negative Sample construction, PNS）策略显式建模图文一致性标签，框架生成的多模态训练数据使检测器不仅能识别视觉伪造痕迹，还能捕捉文本-图像之间的语义矛盾——这是现有方法普遍缺失的能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Agent4FaceForgery 的核心创新在于将面部伪造检测的数据生成范式从“静态标注”转变为“动态模拟”。传统方法依赖人工策划的基准数据集（如 FF++），其标签仅为图像级的二元真实性标签，无法反映真实世界中伪造创作的多样化意图、迭代过程以及社交媒体中的多模态交互。Agent4FaceForgery 通过以下四个关键维度的创新，系统性地解决了这一瓶颈。
 
@@ -130,7 +132,7 @@ Agent4FaceForgery 的核心创新在于将面部伪造检测的数据生成范�
 
 消融实验直接验证了上述创新的贡献。在 Celeb-DF 数据集上，基线 LLaVA 模型（仅在 FF++ 上训练）的 AUC 仅为 51.8%。逐步引入各模块后：**FT 模块**（伪造树模拟）单独使用将 AUC 提升至 83.2%；**PNS 模块**（正负样本构造）单独使用可达 91.0%；完整框架（FT+ARS+PNS）最终达到 92.2% AUC，各模块均展现出增量贡献。跨数据集泛化实验进一步表明，该方法在 WildDeepfake（86.50%）和 Celeb-DF（87.10%）上均显著优于传统静态数据训练的检测器。
 
-## 整体框架
+
 
 Agent4FaceForgery 的核心设计理念是将逼真面部伪造检测的数据生成过程解耦为两个阶段，以克服单步错误累积和复杂依赖维护的难题。整体框架由 **LLM赋能的生成式智能体（Generative Agents）** 和 **媒体展示环境（Media Presentation Environment）** 两大核心部分组成，如 Figure 2 所示。
 
@@ -169,7 +171,7 @@ $$\delta ( x', \check{c'} ) = \begin{cases} 1, & \text{if } y = 1 \text{ and } c
 
 整个管线的数据流为：**FF++ 基准数据 → Profile 初始化 → 伪造蓝图生成（Phase 1）→ ARS 质量过滤 → 社会模拟交互（Phase 2）→ PNS 正负样本标注 → 多模态训练数据集**。该数据集随后用于微调多模态大语言模型（如 LLaVA）或视觉-语言模型（如 CLIP-ViT），以提升其在真实社交媒体环境中对逼真伪造的检测能力。
 
-## 核心模块与公式推导
+
 
 ### 两阶段解耦生成范式
 
@@ -254,7 +256,9 @@ $$\delta ( x', \check{c'} ) = \begin{cases} 1, & \text{if } y = 1 \text{ and } c
 ![[assets/figures/papers/paper_list_l2370_https_arxiv_org_abs_2509_12546/figures/001_Figure_1.jpg]]
 *Figure 1: The illustrative example of our proposed agentbased social simulation. Diverse agents engage in a humanlike deliberation on the image’s authenticity*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验结果
 
@@ -318,7 +322,9 @@ Table 3 从标注质量角度评估了 Agent4FaceForgery 生成的文本描述�
 ![[assets/figures/papers/paper_list_l2370_https_arxiv_org_abs_2509_12546/figures/014_Figure_5.jpg]]
 *Figure 5: Qualitative examples of Agent-Generated Images*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：从静态检测到生态模拟
 
@@ -372,6 +378,8 @@ Agent4FaceForgery的开源范式提出了若干值得后续探索的方向：
 - **社交传播动力学**：当前Phase 2模拟的是围绕单张图像的静态交互，是否可以扩展为包含转发、二次创作、信息衰减等传播动力学的时间序列模型？
 
 这些问题指向一个更宏大的方向：将面部伪造检测从“静态分类任务”重新定义为“动态生态中的持续适应问题”，而Agent4FaceForgery为此提供了可行的技术基座。
+
+
 
 ## 原文 PDF
 

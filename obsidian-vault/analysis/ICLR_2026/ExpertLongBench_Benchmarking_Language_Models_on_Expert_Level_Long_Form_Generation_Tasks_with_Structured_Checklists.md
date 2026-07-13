@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/ExpertLongBench_Benchmarking_Language_Models_on_Expert_Level_Long_Form_Generation_Tasks_with_Structured_Checklists.pdf
+project_link: https://huggingface.co/spaces/launch/ExpertLongBench
+code_link: null
 openreview_forum_id: nJvgBolRcR
 aliases:
 - ExpertLongBench
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | ExpertLongBench：以结构化清单基准评测专家级长篇生成任务的语言模型 |
 | 英文题名 | ExpertLongBench: Benchmarking Language Models on Expert-Level Long-Form Generation Tasks with Structured Checklists |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=nJvgBolRcR); [Project](https://huggingface.co/spaces/launch/ExpertLongBench) |
+| Links | [paper](https://openreview.net/forum?id=nJvgBolRcR) · [Project](https://huggingface.co/spaces/launch/ExpertLongBench) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/language_speech_and_dialog |
 | Method | CLEAR |
 | Dataset | ExpertLongBench (average over 11 tasks), Expert-level human agreement (T7, T8), Checklist evaluation alternative (all tasks), T2LegalSFG with detailed rubric prompt |
@@ -41,7 +43,7 @@ claims:
 > - Expert-level human agreement (T7, T8) 上，Accuracy 为 GPT-4o judge: 91.3% (T8) / 92% (T7)，对比 Domain expert ratings，变化 High agreement。
 > - Checklist evaluation alternative (all tasks) 上，Pearson correlation with GPT-4o 为 Qwen2.5-72B judge: 0.88，对比 GPT-4o as reference judge，变化 -。
 
-## 概述
+## 概要
 
 大语言模型（LLM）在通用长文本生成上已展现出显著能力，但在法律、医学、化学等需要严格专业知识的专家级任务中，其表现远未达到可靠水平。**ExpertLongBench** 基准的构建与评估揭示了一个关键瓶颈：模型并非无法触及任务所需的信息维度，而是生成的表面覆盖了检查项，但实际信息准确性极低，存在严重的误导风险。最佳模型 Gemini-2.5-Pro 在全部 11 个任务上的平均 F1 仅为 33.4（Table 2），而模型虽能覆盖超过 67% 的所需检查项，正确性却极差（Figure 2），说明“沾边但不准确”是当前专家级长文生成的核心失效模式。
 
@@ -52,7 +54,7 @@ claims:
 - **评估可靠性**：GPT-4o 作为评判器与领域专家在 T7、T8 任务上的一致性分别达 92% 和 91.3%，验证了 CLEAR 框架的评估有效性（§4.2）。同时，Qwen2.5-72B 的评分与 GPT-4o 之间的皮尔逊相关系数达 0.88，证明开源模型可作为低成本、高可复现的替代评估方案（Figure 3）。
 - **引导效应**：在 T2LegalSFG 任务上，将 ground-truth 评估细则直接嵌入提示后，GPT-4o 的 F1 从 6.2 跃升至 32.5（Table 65），说明细致引导能显著提升模型输出质量，但即便提升后仍远未达到可接受水平，任务本身对专业知识的要求是核心挑战。
 
-## 背景与动机
+
 
 专家级长篇生成是当前大语言模型（LLM）能力边界中最具挑战性的前沿之一。从法律案件摘要、教育反馈撰写，到化学分子描述、网络安全风险分析，这些任务不仅要求模型产出连贯的长文本，更要求其内容在领域知识的精确性、完整性和可靠性上达到专家水准。然而，现有评测体系在这一方向上存在显著缺口。
 
@@ -60,7 +62,9 @@ claims:
 
 ExpertLongBench 正是在这一背景下提出。其动机在于构建一个以专家设计的领域特定评估细则（rubric）为锚点的基准，将评测从模糊的整体印象推进到可逐项核验的结构化检查清单（checklist）层面。通过将人工编写的参考输出映射为检查清单，并与模型输出进行逐项双向语义包含比较，CLEAR 框架实现了有据可依、细粒度且贴近专家标准的评估。这一设计不仅为当前 LLM 的专家能力提供了更诚实的衡量，也为未来模型改进指明了方向：仅靠更强的通用生成能力远远不够，专业知识的内化与精确表达才是突破瓶颈的关键。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CLEAR 框架的核心创新在于将评估标准从通用、主观的整体判断，转向由领域专家设计的任务特定细粒度细则（rubric）驱动的结构化检查清单评估。这一转变体现在四个关键维度上（见 Table 1 的基准统计与 Figure 1 的流程示意）。
 
@@ -74,7 +78,7 @@ CLEAR 框架的核心创新在于将评估标准从通用、主观的整体判�
 
 这些创新共同构成了一个闭环：专家细则定义“应该检查什么”，清单映射从生成内容中“提取出什么”，逐项比较判定“是否正确”，最终聚合为可诊断的细粒度指标。需要指出的是，尽管详细细则提示能显著提升模型表现（如 T2LegalSFG 上 F1 从 6.2 跃升至 32.5，见 Table 65），但最佳模型平均 F1 仅 33.4（Table 2），表明评估框架本身并非解决任务难题的银弹，而是精准暴露了当前 LLM 在专家级长文生成上的真实能力边界。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0009_nJvgBolRcR_ExpertLongBench_Benchmarking_Language_Models_on/figures/001_Figure_1.jpg]]
 *Figure 1: Pipeline of CLEAR. The example shown is from task T1: multi-document legal case summarization. The checklist mapper takes as input the model output (or human-written reference) and extracts checklist items according to the rubric. Checklists of the model output and the reference are compared at the item level, and the results are subsequently aggregated into the final scores*
@@ -107,7 +111,7 @@ Figure 1 以任务 T1（多文档法律案例摘要）为例展示了这一管�
 
 ExpertLongBench 基准包含 11 个任务、1,050 个样本，覆盖法律、教育、医疗、化学、生物、金融、网络安全等 9 个专业领域。与现有基准的关键区别在于其超长上下文特性：最大输入长度约 200 万 token，最大输出长度约 15,801 token（Table 62），远超现有领域特定数据集（如最大输入仅 7,525 token 的现有基准），这使得 ExpertLongBench 成为衡量模型在真实专家工作场景下长篇生成能力的独特测试平台。
 
-## 核心模块与公式推导
+
 
 ### 3.1 专家设计的评估细则
 
@@ -138,7 +142,9 @@ $$\{c_i\}_{i=1}^{n}$$
 
 指标聚合器将逐项比较结果汇总为最终评分。具体而言，先计算每个样本的检查项级别准确率、精确率和召回率，再通过调和平均得到样本级 F1 分数，最后对所有样本取算术平均，获得任务级 F1 分数。所有分数均缩放至 0–100 区间以便比较。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果：专家级长篇生成仍是系统性瓶颈
 
@@ -194,7 +200,9 @@ Figure 5展示了模型在不同推理复杂度水平上的性能变化趋势。
 
 在知识深度维度上，模型在需要研究生级别知识的任务上表现明显下滑，进一步印证了专家级任务对深层领域理解的要求远超当前模型的知识边界。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有评估范式的继承与分化
 
@@ -223,6 +231,8 @@ CLEAR 框架立足于两条现有评估路线的交汇点上：**基于事实分
 **Agentic 工作流的潜力未探。** RAG agent 在超长上下文任务 T1 和 T2 上表现不及直接全上下文设置（§5, Table 49），说明简单的检索集成反而可能损害任务表现。但更复杂的 agentic 编排或高级检索增强策略是否能大幅缩小差距，仍有待验证。
 
 **从诊断到改进的桥梁。** 基于细粒度检查表评估揭示的模型弱点——特别是在需要精确专家知识的项目上的系统性失败——可以设计哪些针对性的训练或微调策略？这一问题将决定 CLEAR 作为基准的长期影响力：它能否从“揭示问题”走向“驱动进步”。
+
+
 
 ## 原文 PDF
 

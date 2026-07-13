@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Perception_R1_Advancing_Multimodal_Reasoning_Capabilities_of_MLLMs_via_Visual_Perception_Reward.pdf
+project_link: null
+code_link: https://github.com/tongxiao2002/Perception-R1
 aliases:
 - PR
 - Perception-R1
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | Perception-R1：通过视觉感知奖励提升多模态大模型推理能力 |
 | 英文题名 | Perception-R1: Advancing Multimodal Reasoning Capabilities of MLLMs via Visual Perception Reward |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=KttCXdjj4w); [GitHub](https://github.com/tongxiao2002/Perception-R1) |
+| Links | [paper](https://openreview.net/forum?id=KttCXdjj4w) · [GitHub](https://github.com/tongxiao2002/Perception-R1) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | Perception-R1 |
 | Dataset | MathVista testmini, MathVerse testmini, MathVision test, WeMath testmini |
@@ -40,11 +42,11 @@ claims:
 > - MathVerse testmini 上，Accuracy 为 54.3，对比 50.2 (OpenVLThinker-7B)，变化 +4.1。
 > - MathVision test 上，Accuracy 为 28.6，对比 27.0 (OpenVLThinker-7B)，变化 +1.6。
 
-## 概述
+## 概要
 
 本文提出 **Perception-R1**，一种通过引入视觉感知奖励（visual perception reward）来增强多模态大语言模型（MLLMs）多模态推理能力的方法。核心洞察在于：现有基于可验证奖励的强化学习（RLVR）方法仅依赖答案正确性奖励，无法有效提升模型的视觉感知能力，从而限制了多模态推理的进一步提升。Perception-R1 通过从思维链（CoT）轨迹中提取视觉标注作为参考，并利用评判 LLM 评估模型响应与标注的一致性，为感知提供密集的奖励信号。实验表明，该方法仅使用 1,442 个训练样本，即在多个基准上超越需要 200K 数据的 Vision-R1 等强基线，并在 8 个基准中的 7 个上取得最优结果。
 
-## 背景与动机
+
 
 多模态推理可分解为多模态感知和逻辑推理两个子能力。然而，现有 RLVR 方法仅基于答案正确性提供奖励，无法有效纠正感知错误。论文通过 McNemar 检验发现：
 
@@ -53,7 +55,9 @@ claims:
 
 Figure 1 展示了一个典型案例：基座模型 Qwen2.5-VL-7B-IT 及其 RLVR 变体均产生严重感知错误，但通过猜测得到了正确答案；而 Perception-R1 首先准确描述图像，然后正确解决问题。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Perception-R1 的核心创新在于引入视觉感知奖励，通过显式鼓励 MLLMs 准确感知视觉内容，缓解多模态感知的奖励稀疏性问题。具体创新点包括：
 
@@ -61,7 +65,7 @@ Perception-R1 的核心创新在于引入视觉感知奖励，通过显式鼓励
 2. **重复惩罚奖励**：引入 r_p 惩罚重复生成，促进输出多样性。
 3. **数据高效性**：仅使用 Geometry3K 数据集中的 1,442 个样本（过滤后），这些样本具有高比例（82%）的视觉信息，无需冷启动 SFT 阶段。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0002_KttCXdjj4w_Perception-R1_Advancing_Multimodal_Reasoning_Cap/figures/001_Figure_1.jpg]]
 *Figure 1: A comparison of three MLLMs on a geometry problem. Both Qwen2.5-VL-7B-IT and its RLVR-trained variant make severe perception errors but manage to guess the answer, whereas our Perception-R1 first accurately describes the image and then solves the problem correctly.*
@@ -73,7 +77,7 @@ Figure 2 展示了 Perception-R1 的训练流程概览。整体框架包含以�
 3. **视觉感知奖励计算**：使用评判 LLM（Qwen2.5-32B-IT）评估模型响应与视觉标注的一致性，计算视觉感知奖励 r_v。
 4. **GRPO 优化**：结合格式奖励、准确率奖励、视觉感知奖励和重复惩罚奖励，使用 GRPO 算法优化策略模型。
 
-## 核心模块与公式推导
+
 
 **基线 RLVR 奖励函数**（Eq. 1）：
 \[
@@ -105,7 +109,9 @@ r _ { v } ( y _ { i } , \mathcal { V } ) = \frac { \operatorname* { s u m } \{ o
 \]
 在基线基础上增加视觉感知奖励 r_v 和重复惩罚奖励 r_p。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 6.1 主要结果
 
@@ -168,7 +174,9 @@ Table 13 显示，Perception-R1 的数据准备成本仅为 1.1M tokens，训练
 *Table 5: Confusion matrix of Qwen2.5-VL-7B-IT evaluated on $\mathcal { D } _ { e }$ .*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 Perception-R1 属于多模态推理增强方法，其方法谱系定位如下：
 
@@ -176,6 +184,8 @@ Perception-R1 属于多模态推理增强方法，其方法谱系定位如下：
 - **与过程奖励方法的关系**：与 SophiaVL-R1 等使用思考奖励模型的方法不同，Perception-R1 专注于感知层面而非推理过程，两者互补。
 - **数据效率优势**：相比 Vision-R1（200K 冷启动数据 + 10K RL 数据）和 MM-Eureka（15.6K 数据），Perception-R1 仅需 1,442 个高质量几何样本，展示了极强的数据效率。
 - **局限性**：训练数据仅来自 Geometry3K（几何问题），可能限制方法在其他类型视觉任务上的泛化性；视觉标注提取依赖专有 MLLM（Gemini-2.5-Pro）和文本 LLM（Qwen2.5-32B-IT），引入了对第三方模型的依赖；评判 LLM 的评估可能不完全准确。
+
+
 
 ## 原文 PDF
 

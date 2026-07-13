@@ -41,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - ImageNet 256x256 上，FID ↓ 1.70 (FastHybrid-H-64) vs 2.32 (MAR-B-64) (-0.62)；Speedup 1.69× vs 1.00× (MAR) (+0.69×)；ΔFID (degradation) 0.11 vs 0 (+0.11)。
 
-## 概述
+## 概要
 
 混合自回归图像生成模型（如 **MAR**，Li et al., NeurIPS 2024）将自回归建模与扩散去噪相结合，在图像生成质量上取得了显著进展，但其推理过程中扩散模型的多步去噪成为主要的计算瓶颈。标准混合模型的总推理成本为 $T_{MAR} = (P + Q \cdot T) K$，其中扩散去噪步数 $T$ 通常高达100步，严重制约了实际部署效率。
 
@@ -52,7 +52,7 @@ FastHybrid 的核心洞察在于：自回归模型在生成早期阶段即能捕
 
 在 ImageNet 256×256 基准上，FastHybrid-H-64 的 FID 达到 1.70（MAR-B-64 为 2.32），实现最高 1.69× 推理加速，FID 仅退化 0.11。消融实验表明，提高语义相似度拒绝阈值 $\lambda$ 有助于降低 FID 并提升 IS，余弦调度在引导权重策略中表现最优。该方法目前基于 MAR 架构验证，在其他混合自回归模型上的通用性仍有待探索。
 
-## 背景与动机
+
 
 ### 混合自回归图像生成的效率瓶颈
 
@@ -80,7 +80,9 @@ $$T_{MAR} = (P + Q \cdot T) K$$
 
 通过上述设计，FastHybrid力求在仅引入极低FID退化（约0.11）的前提下，实现最高约1.69×的推理加速。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FastHybrid 的核心创新在于将混合自回归图像生成中的语义预测与细节求精**解耦**，通过两个互补的机制实现推理加速：**前瞻解码策略**与**引导扩散采样**。
 
@@ -135,7 +137,7 @@ $$T_{Ours} = P \cdot K + Q \cdot T + Q \cdot T_g \cdot (K - 1)$$
 
 FastHybrid 的三重创新形成闭环：**前瞻解码**利用早期语义确定性并行预测未来 token，**自回归细化**通过余弦相似度校验保证语义一致性，**引导扩散**以前瞻预测为锚点在极少量步数内完成细节去噪。三者协同实现了最高 1.69× 的推理加速，FID 仅退化 0.11。
 
-## 整体框架
+
 
 FastHybrid 的推理流水线围绕一个核心洞察构建：混合自回归图像生成中，自回归模型在生成早期即能捕获全局语义并确立大部分区域的布局与内容。基于此，方法将传统“逐 token 顺序生成 + 完整扩散去噪”的串行流程重构为**前瞻并行预测**与**轻量验证细化**协同的双分支架构，从而在保持语义一致性的前提下大幅压缩计算开销。
 
@@ -182,7 +184,7 @@ $$\gamma_t = 1 - \cos^2\left(\frac{\pi t}{2 T_g}\right)$$
 
 相较于逐 token 顺序生成的 **MAR** (Li et al., NeurIPS 2024)，FastHybrid 将语义预测与细节去噪解耦：前瞻分支提前“猜测”未来内容，细化分支仅需验证和局部修正。相较于 **CSpD** (Wang et al., arXiv 2024) 的连续推测解码和 **LazyMAR** (Yan et al., arXiv 2025) 的特征缓存策略，FastHybrid 的独特之处在于利用扩散模型自身的去噪轨迹可引导性，而非仅依赖自回归模型的推测或缓存机制来减少计算。
 
-## 核心模块与公式推导
+
 
 ### 3.1 混合自回归图像生成的推理瓶颈
 
@@ -248,7 +250,9 @@ $$q(x_{t-1} | x_t) \approx q(x_{t-1} | x_t, x_0 = \mu_{\theta}(x_t | z, t)) = N(
 
 FastHybrid 通过引导均值调整（公式 6-7）替换上述标准转移中的 $\mu_{\theta}$，在保持扩散模型结构不变的前提下实现去噪步数的大幅压缩。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 一、主实验结果
 
@@ -317,7 +321,9 @@ $$\gamma_t = 1 - \cos^2\left(\frac{\pi t}{2 T_g}\right)$$
 ![[assets/figures/papers/paper_list_l869_https_openaccess_thecvf_com_content_CVPR2026_html_Jiang_FastHybrid_Accel/figures/001_Figure_1.jpg]]
 *Figure 1: Visualization of autoregressive decoding progression, displaying 8 uniformly sampled steps from 256 steps. Patches with green borders represent regions that have been determined during the autoregressive process. The remaining tokens, while not yet fully refined, have their general content largely determined in the early stages of the autoregressive process*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 基座模型与加速基线
 
@@ -372,6 +378,8 @@ FastHybrid 的有效性依赖于以下前提条件：
 3. **实时交互场景的延迟稳定性**：论文主要报告了吞吐量加速（speedup），未讨论在实时交互场景下的延迟分布（如 P50/P99 延迟）及资源占用峰值。前瞻分支的并行计算可能导致瞬时显存占用升高，这一问题在实际部署中需要关注。
 
 4. **引导权重调度的理论分析**：余弦调度在实验中表现最优（Table 3），但其理论最优性未得到证明。引导权重调度与扩散模型噪声调度之间的耦合关系值得进一步分析。
+
+
 
 ## 原文 PDF
 

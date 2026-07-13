@@ -42,7 +42,7 @@ claims:
 > - EMHI: P1 上，MPJPE (mm) 36.2 (EvaPose-ResNet50) / 31.7 (EvaPose-ViT-L) vs 37.4 (FRAME) (-1.2 / -5.7)。
 > - EMHI: P2 (unseen actions) 上，MPJPE (mm) 38.5 (EvaPose-ResNet50) / 33.3 (EvaPose-ViT-L) vs 60.5 (FRAME) (-22.0 / -27.2)。
 
-## 概述
+## 概要
 
 以自我为中心的人体姿态估计面临一个根本性瓶颈：**关键点不可见问题**。由于自遮挡和有限的视场（FoV），大量身体关键点无法被相机直接观测，而现有方法（如 **UnrealEgo**、**EgoPoseFormer**、**FRAME**）通常对所有关键点同等处理，导致不可见关键点的噪声干扰了可见关键点的估计精度。
 
@@ -60,7 +60,7 @@ claims:
 
 需要注意的是，EvaPose-ViT-L 在 V100 GPU 上仅 9.4 FPS，无法满足实时需求；方法强依赖高质量关键点可见性标注，标注成本高昂；跨数据集泛化仍存在性能差距，对极端自遮挡或罕见动作的鲁棒性有待进一步验证。
 
-## 背景与动机
+
 
 以自我为中心（egocentric）的人体姿态估计旨在从穿戴式相机拍摄的第一人称视角图像中恢复人体3D姿态。该任务在沉浸式虚拟现实、人机交互和运动分析等场景中具有重要应用价值。然而，与第三人称视角的姿态估计相比，以自我为中心的设定面临两个核心挑战：**自遮挡**和**有限视场（out-of-FoV）**。由于相机佩戴在人体上，大量身体关键点——尤其是下肢关节——经常处于相机视野之外或被身体其他部位遮挡，导致关键点不可见问题普遍存在。
 
@@ -70,7 +70,9 @@ claims:
 
 为应对上述挑战，本文提出 **EvaPose**，一个以自我为中心的可见性感知人体姿态估计框架。EvaPose的核心动机在于：**显式建模关键点的可见性状态，并利用可见性信息对训练过程进行差异化监督，从而降低不可见关键点对可见关键点的干扰**。同时，通过引入预训练的VQ-VAE姿态先验和迭代式帧内-帧间注意力机制，进一步提升姿态估计的精度和时序一致性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 EvaPose 的核心创新在于首次将以自我为中心的人体姿态估计中“关键点不可见”这一普遍瓶颈显式建模，并通过三个相互协同的**变更槽（changed slots）**系统性地解决了该问题。
 
@@ -88,7 +90,7 @@ EvaPose 的核心创新在于首次将以自我为中心的人体姿态估计中
 
 三个变更槽之间存在因果协同：可见性感知模块为后续的帧内-帧间注意力提供了更干净的初始特征，VQ-VAE 先验则在姿态重建阶段抑制了不可见关键点可能引发的异常预测，而迭代注意力网络进一步在时序维度上平滑了这些预测。这种“感知-约束-精炼”的级联设计，使 EvaPose 在 Eva-3M 和 EMHI 两个基准上均显著超越现有方法（如 EvaPose-ResNet50 在 Eva-3M 上 MPJPE 35.6 mm vs. FRAME 49.8 mm；在 EMHI P2 未见动作上 MPJPE 38.5 mm vs. FRAME 60.5 mm），且这一优势在跨数据集泛化实验（Eva-3M 训练→EMHI 测试）中同样保持。
 
-## 整体框架
+
 
 EvaPose 将自中心人体姿态估计建模为一个时序条件生成问题：给定长度为 $T$ 的立体观测序列（左右视图图像 $I_L^{1:T}, I_R^{1:T}$ 及对应相机位姿 $C_L^{1:T}, C_R^{1:T}$），估计世界坐标系下的 3D 关键点序列 $J_W^{1:T}$。其目标函数为：
 
@@ -118,7 +120,7 @@ $$f_{\phi}(J_{W}^{1:T} \mid I_{L}^{1:T}, I_{R}^{1:T}, C_{L}^{1:T}, C_{R}^{1:T})$
 
 **训练策略**：采用两阶段训练。第一阶段仅训练可见性感知 3D 姿态估计模块，损失函数 $\mathcal{L}_{\mathrm{stage1}}$ 由可见性损失、热图损失和 3D 关键点损失的加权和构成，其中热图损失和 3D 损失均采用基于可见性的差异化权重（可见关键点权重 1.0，不可见 0.1）。第二阶段冻结第一阶段权重，训练时序融合网络（时间窗口 $T=24$ 帧），VQ-VAE 模块全程冻结。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化
 
@@ -199,7 +201,9 @@ $$\mathcal{L}_{\mathrm{3D}} = \frac{1}{N_J} \sum_{i=1}^{N_J} \frac{w(s_{i,1}) + 
 ![[assets/figures/papers/paper_list_l1015_https_arxiv_org_abs_2602_23618/figures/012_Figure_6.jpg]]
 *Figure 6: Overview of the coordinate systems*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -261,7 +265,9 @@ EvaPose 采用两阶段训练策略：第一阶段单独训练可见性感知的
 ![[assets/figures/papers/paper_list_l1015_https_arxiv_org_abs_2602_23618/figures/002_Table_1.jpg]]
 *Table 1: Comparison of egocentric motion datasets. R/S denotes whether the dataset is collected in real or synthetic setting. Cams indicates the number of egocentric cameras. Vis denotes the availability of keypoint visibility labels. Subj is the number of subjects, and Act is the number of action categories*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：以自我为中心姿态估计中的可见性盲区
 
@@ -312,6 +318,8 @@ EvaPose 的性能优势建立在以下前提之上，这些前提也划定了其
 ### 5. 知识库定位总结
 
 EvaPose 在以自我为中心的人体姿态估计领域占据了一个明确的生态位：**首个系统性地将可见性感知、离散姿态先验和迭代时空注意力三者融合的框架**。它与 UnrealEgo、EgoPoseFormer、FRAME 等现有方法形成互补而非替代关系——前者解决了“可见性盲区”这一被长期忽视的核心瓶颈，而后者在各自的技术路线上仍有参考价值。对于后续研究，EvaPose 提供了两个可复用的知识锚点：（1）可见性加权损失作为一种即插即用的训练策略；（2）VQ-VAE 码本作为可迁移的姿态先验模块。这两个组件可被独立抽取并应用于其他以自我为中心或第三视角的姿态估计框架中。
+
+
 
 ## 原文 PDF
 

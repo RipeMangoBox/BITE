@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/TCFG_Tangential_Damping_Classifier_free_Guidance.pdf
+project_link: null
+code_link: https://github.com/
 aliases:
 - TDCFGT
 - TCFG
@@ -41,7 +43,7 @@ claims:
 > - MS-COCO 30k zero-shot (SDXL) 上，FID 12.65 vs 13.36 (-0.71)。
 > - MS-COCO 30k zero-shot (SD v3) 上，FID 13.74 vs 16.66 (-2.92)。
 
-## 概述
+## 概要
 
 扩散模型中的标准无分类器引导（CFG）通过线性组合无条件评分与条件评分来增强条件生成，但其核心瓶颈在于：无条件评分中存在的**切向分量与条件评分不对齐**，导致生成轨迹偏离条件指定的目标流形（Figure 1）。
 
@@ -51,7 +53,7 @@ claims:
 
 TCFG 为扩散模型的引导机制提供了新的几何视角，但仍存在中间流形假设缺乏严格理论证明、对严重异常区域修复能力有限等局限性（Fig. 10）。
 
-## 背景与动机
+
 
 ### 扩散模型与无分类器引导
 
@@ -83,7 +85,9 @@ $$[ S_{\mathrm{cos}}(\mathbf{v}_1, \hat{\mathbf{v}}_1) > S_{\mathrm{cos}}(\mathb
 
 基于上述分析，本文提出**切向阻尼无分类器引导（Tangential Damping Classifier-free Guidance, TCFG）**，核心思路是：通过奇异值分解（SVD）识别并丢弃无条件评分中与条件评分不对齐的切向分量，仅保留法向分量，从而减少引导过程中的流形偏离。如 Figure 1 的概念插图所示，标准 CFG 在无条件与条件评分不对齐时容易偏离目标流形，而 TCFG 通过减少这种不对齐，使采样轨迹更准确地收敛到条件指定的目标分布。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 TCFG 的核心创新在于揭示了标准 CFG 中无条件评分与条件评分之间存在的**切向分量不对齐**问题，并提出了一种基于**奇异值分解（SVD）的切向阻尼机制**来解决该问题。该方法仅修改无条件评分的处理方式，不改变模型权重或采样器结构，可作为即插即用的模块嵌入任意 CFG 流程。
 
@@ -130,7 +134,7 @@ TCFG 的改进思路与现有 CFG 增强方法存在根本差异：
 
 TCFG 仅需对每个采样步的评分向量执行一次小规模 SVD 分解，论文明确指出额外计算成本可忽略不计（negligible additional computation），无需修改模型架构或重新训练。
 
-## 整体框架
+
 
 TCFG 的核心流程可概括为四个串联模块：**评分预测网络** → **基于 SVD 的切向阻尼模块** → **CFG 组合模块** → **ODE/SDE 采样器**。整体 pipeline 在保持标准 CFG 采样框架不变的前提下，仅在无条件评分的处理环节插入一次轻量级的奇异值分解（SVD）操作。
 
@@ -176,7 +180,7 @@ TCFG 的设计使其天然兼容现有的 CFG 增强方法。实验表明，与 
 ![[assets/figures/papers/paper_list_l4_https_openaccess_thecvf_com_content_CVPR2025_html_Kwon_TCFG_Tangential_D/figures/001_Figure_1.jpg]]
 *Figure 1: (a) Classifier-free guidance. When the unconditional score*
 
-## 核心模块与公式推导
+
 
 ### 问题形式化：CFG 中的切向不对齐
 
@@ -263,7 +267,9 @@ TCFG 的额外计算成本可忽略不计，因为 SVD 仅在 $2 \times d$ 的�
 ![[assets/figures/papers/paper_list_l4_https_openaccess_thecvf_com_content_CVPR2025_html_Kwon_TCFG_Tangential_D/figures/004_Figure_5.jpg]]
 *Figure 5: Visualization of the sampling trajectory. In CFG (orange path), the unconditional scores (red arrows) include components that point towards directions other than the target distribution, making the final destination deviate from the target distribution. Whereas, our method (green path) removes the inconsistent tangent components in unconditional scores and eventually reaches the target distribution*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：TCFG 一致改善生成质量且不牺牲语义对齐
 
@@ -327,7 +333,9 @@ TCFG 并非万能。Figure 10 展示了其局限性：当基线样本中存在�
 ![[assets/figures/papers/paper_list_l4_https_openaccess_thecvf_com_content_CVPR2025_html_Kwon_TCFG_Tangential_D/figures/002_Figure_2.jpg]]
 *Figure 2: Singular values of the score function across all timesteps. We computed the singular values for all timesteps using a total of 17,000 samples from Stable Diffusion v1.5. For both the unconditional and the conditional scores, a significant drop in singular values was observed at indices close to 0 across all timesteps. This suggests the existence of an intermediate manifold*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -385,6 +393,8 @@ $$
 4. **扩散蒸馏场景的适用性**：当前扩散蒸馏方法（如一致性模型）通常将 CFG 尺度作为输入条件蒸馏到学生模型中。TCFG 的切向阻尼思想能否推广到此类蒸馏框架，减少蒸馏过程中由切向不对齐引入的误差，尚未探索。
 
 5. **分类器引导场景的迁移**：论文的几何分析围绕无条件评分与条件评分的奇异向量对齐展开。在分类器引导设置下，评分函数来自外部分类器的梯度，其法向-切向结构与无分类器引导可能存在本质差异，TCFG 的适用性需要独立验证。
+
+
 
 ## 原文 PDF
 

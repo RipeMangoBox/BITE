@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/wd1_Weighted_Policy_Optimization_for_Reasoning_in_Diffusion_Language_Models.pdf
+project_link: null
+code_link: https://github.com/xiaohangt/wd1
 openreview_forum_id: L2rfd2Czbj
 aliases:
 - WW
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | wd1：面向扩散语言模型推理的加权策略优化 |
 | 英文题名 | wd1: Weighted Policy Optimization for Reasoning in Diffusion Language Models |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=L2rfd2Czbj); [GitHub](https://github.com/xiaohangt/wd1) |
+| Links | [paper](https://openreview.net/forum?id=L2rfd2Czbj) · [GitHub](https://github.com/xiaohangt/wd1) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | wd1（及扩展wd1++） |
 | Dataset | Sudoku (256 tokens), Countdown (256 tokens), GSM8K (wd1++ full), MATH500 (wd1++ full) |
@@ -42,7 +44,7 @@ claims:
 > - Countdown (256 tokens) 上，测试准确率 (%) 为 51.2，对比 25.8 (d1)，变化 +25.4。
 > - GSM8K (wd1++ full) 上，测试准确率 (%) 为 84.5，对比 83.4 (MDPO full)，变化 +1.1。
 
-## 概述
+## 概要
 
 扩散语言模型（dLLM）在推理任务中展现出潜力，但其强化学习（RL）微调面临一个根本性瓶颈：**似然函数不可解**。与自回归模型不同，dLLM 无法直接计算序列的精确对数似然，迫使现有方法（如 d1）在策略优化中依赖近似似然来估计策略比率（policy ratio）。然而，这种比率估计存在**高方差**问题，且近似误差在重要性采样过程中被**指数级放大**，严重损害训练效率和稳定性（见 Figure 1）。
 
@@ -59,7 +61,7 @@ claims:
 
 wd1 的局限性在于：当采样组内所有样本获得相同奖励时，正负权重相等，训练可能停滞；当前框架仅适用于文本推理，扩展到多模态场景仍需探索；所用似然近似虽然高效，但引入了偏差，需在高精度场景下权衡。
 
-## 背景与动机
+
 
 ### 扩散语言模型的推理困境
 
@@ -94,7 +96,9 @@ Figure 1直观展示了这一问题：在GSM8K上经过一次策略更新后，d
 
 进一步地，如果能将负样本的惩罚自然地融入同一框架，形成“正样本增强+负样本遗忘”的统一目标，就能在保证训练稳定性的同时提升生成质量。这正是**wd1**方法的核心动机。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈定位：扩散策略优化的比率估计困境
 
@@ -159,7 +163,7 @@ wd1 不仅是一个工程优化，更具有深刻的理论解释（Section 4）�
 - **SFT 的负面效应**：加入 SFT 预热对 Sudoku 和 GSM8K 无益，甚至损害 Countdown 性能（51.2% → 43.4%），表明 wd1 的优化机制与 SFT 存在冲突，直接 RL 微调更为有效。
 - **权重平衡的敏感性**：正负权重的等比例混合（$\lambda=0.5$）获得最高训练奖励，偏向正样本（$\lambda=0.8$）或负样本（$\lambda=0.0$）均导致奖励下降（Figure 2, Table 9）。温度系数 $\psi$ 过大（如 10）会导致极端权重分配，损害性能（Figure 4 Left）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l32_https_openreview_net_forum_id_L2rfd2Czbj/figures/001_Figure_1.jpg]]
 *Figure 1: Example policy ratio value $r _ { i } ^ { k }$ computed using ELBO and approximated likelihood in d1 on GSM8K after a policy update. Ratio’s unclipped interval is [ 1 - $\epsilon$ , 1 + $\epsilon$ ] , where $\epsilon$ = 0 . 5 ELBO-based likelihood approximation yields high-variance ratio estimates; d1 induces a biased ratio that can deviate substantially from ELBO. Both methods suffer from efficiently and accurately compute ratios
@@ -203,7 +207,7 @@ wd1 的训练循环由五个紧密耦合的模块构成，数据流如下：
 
 wd1++ 将加权对数似然目标扩展为**去噪步级（denoising‑stepwise）**形式，利用扩散解码过程中产生的中间干净完成序列，对每个去噪步骤施加优势加权损失。这使得模型能在更细粒度上学习高优势生成分布，在 MATH500 和 GSM8K 上分别达到 44.2% 和 84.5%，仅需 20 步 RL 训练（Table 3）。
 
-## 核心模块与公式推导
+
 
 ### 3.1 从策略比率到加权对数似然：WLL 损失
 
@@ -279,7 +283,9 @@ $$\mathcal{L}_{\mathrm{AW-DCE}} = \mathbb{E}_{x_0\sim p_0'(\cdot)} \Big[ \exp(A(
 
 等价于训练一个以 $\exp(A(x_0))$ 为能量引导权重的扩散模型，使模型学习采样自高优势分布。同时，负样本惩罚项可解释为通过最小化 ELBO 进行数据反学习（data unlearning）。这一等价性为 wd1 的有效性提供了理论保证。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心结果：wd1在规划与数学推理任务上显著超越d1
 
@@ -339,7 +345,9 @@ Table 4的消融实验直接验证了wd1两大设计选择的必要性：
 
 3. **似然近似的偏差-方差权衡**：wd1继承了d1的高效似然近似方法，虽降低了计算成本，但引入了偏差。在高精度场景下，这一偏差可能成为性能瓶颈，但当前实验未直接量化其影响。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：扩散语言模型RL微调中的似然比估计瓶颈
 
@@ -433,6 +441,8 @@ wd1特别适用于以下场景：
 4. **超参数鲁棒性**：温度系数 $\psi$ 和混合权重 $\lambda$ 的消融表明存在最优区间（$\lambda=0.5$平衡混合，较小 $\psi$ 更稳定），但其任务依赖性尚需系统研究。
 
 5. **与AR模型RL方法的统一**：wd1的无比率加权目标是否可迁移至自回归LLM的RL微调，形成统一的策略优化框架？
+
+
 
 ## 原文 PDF
 

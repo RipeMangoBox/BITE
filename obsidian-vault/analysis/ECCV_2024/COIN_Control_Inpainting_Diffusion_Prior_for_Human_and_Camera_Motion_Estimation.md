@@ -5,6 +5,8 @@ paper_level: A
 venue: ECCV
 year: 2024
 pdf_ref: paperPDFs/ECCV_2024/COIN_Control_Inpainting_Diffusion_Prior_for_Human_and_Camera_Motion_Estimation.pdf
+project_link: https://nvlabs.github.io/COIN/
+code_link: null
 aliases:
 - COIN
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | COIN：面向人体与相机运动估计的控制-修复扩散先验 |
 | 英文题名 | COIN: Control-Inpainting Diffusion Prior for Human and Camera Motion Estimation |
 | 会议/期刊 | ECCV 2024 |
-| Links | [paper](https://arxiv.org/abs/2408.16426); [Project](https://nvlabs.github.io/COIN/) |
+| Links | [paper](https://arxiv.org/abs/2408.16426) · [Project](https://nvlabs.github.io/COIN/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/robotics |
 | Method | COIN |
 | Dataset | RICH, HCM, EMDB |
@@ -40,7 +42,7 @@ claims:
 > - HCM 上，W-MPJPE 为 COIN，对比 PACE，变化 44% improvement。
 > - EMDB 上，W-MPJPE_100 为 407.3 (COIN)，对比 WHAM，变化 7% improvement。
 
-## 概述
+## 概要
 
 从动态相机视频中同时恢复全局人体运动和相机轨迹，是三维视觉领域的一个核心难题。现有方法面临两个关键瓶颈：其一，基于单步得分蒸馏采样（SDS）的扩散先验缺乏有效控制，生成的伪真值运动与视频观测不一致，且过于平滑；其二，相机尺度优化完全依赖不准确的全局人体运动，导致尺度估计容易失败。
 
@@ -48,7 +50,7 @@ COIN 通过两项核心创新突破上述瓶颈。在扩散先验层面，COIN �
 
 在 RICH、EMDB 和 HCM 三个数据集上，COIN 显著超越现有方法。相较于 SOTA 方法 **PACE**（Kocabas et al., 3DV 2024），COIN 在 HCM 上的世界关节位置误差（W-MPJPE）降低 44%，在 RICH 上降低 33%。与同期工作 **WHAM**（Shin et al., CVPR 2024）相比，COIN 在 RICH 上提升 49%，在 EMDB 上提升 7%。消融实验进一步验证：控制采样使 W-MPJPE 降低 570.5 mm（69.3%），软修复使 PA-MPJPE 降低 4.7 mm，人-场景关系损失使 W-MPJPE 从 273.0 mm 降至 254.5 mm。
 
-## 背景与动机
+
 
 从动态相机视频中同时恢复全局人体运动和相机运动是计算机视觉中的一个核心挑战。当相机本身在运动时，视频中的二维观测同时包含了人体运动和相机运动的耦合效应，使得二者的解耦变得极为困难。这一问题在滑板、跑酷等大幅度位移场景中尤为突出——即便局部身体姿态相对稳定，个体的全局位置也可能发生剧烈变化。
 
@@ -62,7 +64,9 @@ COIN 通过两项核心创新突破上述瓶颈。在扩散先验层面，COIN �
 
 针对上述缺口，**COIN** 提出了两个核心改进方向：其一，通过控制-修复评分蒸馏采样（COIN-SDS）生成与视频观测一致的高质量运动先验；其二，引入人-场景深度关系损失，利用场景点云提供的独立几何约束来正则化相机尺度，从而解耦尺度优化与人体运动估计之间的相互干扰。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 COIN 的核心创新在于对扩散先验蒸馏机制的重新设计，以及引入场景几何约束来解耦相机尺度估计。与现有方法相比，COIN 在四个关键维度上做出了实质性改进，直接回应了单步 SDS 蒸馏导致的运动伪真值不一致、过度平滑以及相机尺度优化失败等问题。
 
@@ -98,7 +102,7 @@ $$\mathcal{L}_{\mathrm{HSR}} = -\frac{1}{|\mathcal{P}|} \sum_{i=1}^{T} \sum_{p \
 
 COIN 的四项核心创新形成了一个互补体系：COIN-SDS 提供高质量运动先验，动态控制确保先验与优化协同进化，软修复在保持观测一致性的同时最大化先验效用，人-场景关系损失则为相机尺度提供独立约束。这一体系使 COIN 在 RICH 和 HCM 数据集上分别以 33% 和 44% 的幅度超越 SOTA 方法 PACE（Kocabas et al., 3DV 2024），并在 EMDB 数据集上以 7% 的优势超越同期工作 WHAM（Shin et al., CVPR 2024）。
 
-## 整体框架
+
 
 COIN 将动态相机下的人体与相机运动估计建模为一个**全局联合优化问题**，其核心思想是通过控制-修复扩散先验（COIN-SDS）提供高质量伪真值运动，并利用人-场景深度关系损失解耦相机尺度与人体运动之间的歧义。
 
@@ -172,7 +176,7 @@ $$
 
 消融实验验证了各模块的关键作用：移除 $\mathcal{L}_{\mathrm{HSR}}$ 使 RICH 数据集上的 W-MPJPE 从 254.5 mm 升至 273.0 mm；移除控制采样使 W-MPJPE 增加 570.5 mm（69.3%），相机 ATE-S 增加 167.9 mm（30.3%）；移除软修复使 PA-MPJPE 增加 4.7 mm（见 Table 1, Table 4）。
 
-## 核心模块与公式推导
+
 
 ### 3.1 扩散先验的 SDS 基础
 
@@ -252,7 +256,9 @@ $$\mathcal{L}_{\mathrm{HSR}} = -\frac{1}{|\mathcal{P}|} \sum_{i=1}^{T} \sum_{p \
 
 **因果机制总结：** COIN-SDS 通过多步 DDIM 去噪（Eq. 5-6）提升伪真值质量，通过动态控制信号（Eq. 7）确保运动与观测对齐，通过软修复（Eq. 8-9）保持高置信度区域的一致性；人-场景关系损失（Eq. 13）则为相机尺度提供了独立于人体运动的几何约束，解耦了两者之间的相互影响。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 全局人体运动估计
 
@@ -321,7 +327,9 @@ Table 6 比较了 SLAM 与 ParticleSfM 在 EMDB 收敛子集上的初始化效�
 
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2408_16426/figures/010_Table.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位与基线谱系
 
@@ -384,6 +392,8 @@ COIN 的核心因果链可拆解为两个相互增强的机制：
 3. **实时性**：联合人-相机扩散模型是否可通过少步 DDIM 采样实现实时估计？这是一个有前景的方向。
 4. **多阶段优化的收敛性**：当 ParticleSfM 无法收敛时，多阶段优化的处理策略尚不明确。
 5. **掩膜设计细节**：基于 2D 关键点置信度分数的掩膜 $\mathbf{M}$ 的确切公式需查阅补充材料或代码确认。
+
+
 
 ## 原文 PDF
 

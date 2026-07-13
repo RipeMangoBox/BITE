@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/Light3R_SfM_Towards_Feed_forward_Structure_from_Motion.pdf
+project_link: null
+code_link: null
 aliases:
 - LS
 - Light3R-SfM
@@ -41,7 +43,7 @@ claims:
 > - Tanks&Temples (25 views) 上，Time(s)↓ 为 4.4，对比 MASt3R-SfM 283.2，变化 278.8 s 更快。
 > - Tanks&Temples (full sequence) 上，RRA@5↑ 为 52.0，对比 Spann3R (unordered) 20.3，变化 +31.7。
 
-## 概述
+## 概要
 
 **问题瓶颈**：传统运动恢复结构（Structure-from-Motion, SfM）方法——无论是经典的增量式（COLMAP）或全局式（GLOMAP），还是基于点图回归的优化式方法（MASt3R-SfM）——其核心瓶颈在于依赖昂贵的特征匹配与全局迭代优化（如 Bundle Adjustment），导致计算耗时极长、内存开销巨大，难以高效扩展至大规模图像集。另一方面，前馈式方法 Spann3R 虽然避免了全局优化，但其基于记忆库的在线/离线对齐机制存在时序漂移，且难以处理无序图像。
 
@@ -59,7 +61,7 @@ claims:
 
 **局限性**：在严格误差阈值下的精度仍明显落后于基于优化的最优方法；动态物体场景可能导致全局置信度下降；检索图构建失败时可能造成场景断裂；训练图规模受显存限制（N=8），限制了高阶多视图约束的学习。
 
-## 背景与动机
+
 
 ### 运动恢复结构（SfM）的核心任务与现实瓶颈
 
@@ -87,7 +89,9 @@ Light3R-SfM 的核心动机正是回答一个关键问题：**能否在纯前馈
 
 本文的解决方案——潜在全局注意力模块（latent global alignment）与检索分数引导的最短路径树（SPT）——正是围绕这两个核心挑战展开设计。通过在特征空间而非几何空间完成多视图信息交换，以及通过扁平化的树结构减少累积漂移，Light3R-SfM 试图证明：**前馈式 SfM 可以在保持极高速度的同时，达到接近优化式方法的全局一致性**。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Light3R-SfM 的核心创新在于将传统 SfM 中依赖显式迭代优化的全局对齐，替换为一种纯前馈式的、可学习的潜在全局注意力机制，并结合检索分数引导的最短路径树（SPT）构建稀疏场景图，从而在保持竞争性精度的同时实现数量级的速度提升。
 
@@ -115,7 +119,7 @@ SPT 的关键优势在于：通过最小化路径代价，树结构更扁平，�
 
 需要指出的是，这种纯前馈式设计在精度上仍存在妥协：在严格误差阈值下，Light3R-SfM 的精度明显落后于基于优化的最优方法（如 MASt3R-SfM 和 GLOMAP）。例如在 Tanks&Temples 25 视图设定下，Light3R-SfM 的 RRA@5 为 50.9%，而 MASt3R-SfM 达到 68.0%（Table 1）。这表明潜在对齐虽然能捕获全局约束，但尚不能完全替代显式几何优化的精度。此外，当检索图构建失败时，SPT 可能导致场景断裂成多个不一致的子重建，这是该方法的一个结构性脆弱点。
 
-## 整体框架
+
 
 Light3R-SfM 的目标是将一组**无序图像**（无需时间戳或顺序先验）作为输入，直接输出每幅图像对应的相机外参 $P \in \mathbb{R}^{4\times4}$、内参 $K_i \in \mathbb{R}^{3\times3}$ 以及图像分辨率的稠密 3D 点图 $X \in \mathbb{R}^{H\times W\times3}$。整个流程是**纯前馈式**的，不包含任何迭代优化或捆集调整（BA）步骤。
 
@@ -164,7 +168,7 @@ $$\mathcal{L} = \mathcal{L}_{\text{pair}} + \lambda \mathcal{L}_{\text{global}}$
 ![[assets/figures/papers/paper_list_l47_https_arxiv_org_abs_2501_14914/figures/002_Figure_2.jpg]]
 *Figure 2: Light3R-SfM Pipeline. Given an unordered set of images, we first encode them to obtain image tokens from which we average pool global features for constructing a shortest path tree. We next feed image tokens into our attention-based latent global alignment to enable global context sharing. Afterwards, for each edge in the SPT, we decode pairwise pointmaps using the implicitly aligned feature tokens. Finally, we use global accumulation to obtain globally aligned pointmaps per image*
 
-## 核心模块与公式推导
+
 
 Light3R-SfM 的核心架构由五个模块串联构成，其设计目标是用纯前馈计算替代传统 SfM 中的显式全局优化。整个流程从无序图像集合出发，输出每幅图像的相机外参、内参以及密集 3D 点图。
 
@@ -238,7 +242,9 @@ $$\mathcal{L}_{\mathrm{global}} = \sum_{i} \mathcal{L}_{\mathrm{conf}}(\bar{X}^i
 
 消融实验表明，全局监督权重 $\lambda=0.1$ 取得最优平衡，加入全局损失后 RRA@5 提升 6.95%，ATE 降低 15.78%。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验结果
 
@@ -327,7 +333,9 @@ Figure 4 展示了潜在全局对齐的隐式场景理解能力：即使对于�
 ![[assets/figures/papers/paper_list_l47_https_arxiv_org_abs_2501_14914/figures/015_Table_10.jpg]]
 *Table 10: Impact of backbone initialization*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从优化式 SfM 到前馈式 SfM
 
@@ -381,6 +389,8 @@ Light3R-SfM 处于“前馈式运动恢复结构（Feed-forward SfM）”这一�
 4. **动态场景建模**：模型对动态物体的处理能力有限。是否可以通过在训练数据中增加含动态物体的场景，或引入运动分割模块，使模型具备更强的动态场景适应性？
 
 5. **与后续工作的潜在关联**：Light3R-SfM 提出的“潜在注意力 + SPT”框架为前馈式 SfM 提供了一个可扩展的基础架构。后续工作可以在此基础上探索：更高效的注意力变体（如线性注意力）、多尺度全局 token、以及与其他 3D 表示（如 3D Gaussian Splatting）的直接结合。
+
+
 
 ## 原文 PDF
 

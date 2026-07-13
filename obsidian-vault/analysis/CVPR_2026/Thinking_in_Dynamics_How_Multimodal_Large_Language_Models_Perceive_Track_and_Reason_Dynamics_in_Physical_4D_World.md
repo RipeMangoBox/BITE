@@ -40,7 +40,7 @@ claims:
 > [!tip] 效果简介
 > - Dyn‑Bench（VQA任务平均） 上，Accuracy (ACC) 57.1 vs 53.8 (+3.3)。
 
-## 概述
+## 概要
 
 多模态大语言模型（MLLM）在静态场景理解上已取得长足进步，但在4D物理世界中的动态感知、跟踪与推理能力仍远未达到人类水平。现有模型对物体运动、场景演化与相机运动缺乏连贯的时空表征，导致动态推理与物体接地相互割裂，难以维持跨帧一致的运动解释。本文提出**Dyn-Bench**——一个系统评估MLLM时空动态推理能力的基准，并引入**时空文本认知图（Spatio-Temporal Textual Cognitive Map, ST‑TCM）**与**掩码引导融合（Mask‑Guided Fusion）**两种结构化集成方法，通过显式注入几何、运动与关系先验，显著提升模型在4D动态场景中的感知与推理一致性。
 
@@ -52,8 +52,6 @@ claims:
 方法层面，ST‑TCM通过从RGB‑D与实例分割掩码重建物体3D轨迹，计算位置、速度、加速度等几何属性，并基于空间邻近性与运动连续性建模物体间及相机‑物体关系，最终以规则化模板转化为结构化文本序列。掩码引导融合则将实例掩码作为视觉聚焦信号注入MLLM输入，使模型更精准地关注动态物体区域。这两种方法均以零样本、即插即用的方式工作，无需对MLLM本身进行微调。
 
 在方法谱系中，本工作处于通用MLLM（如GPT‑4o、Qwen3‑VL系列）、空间MLLM（如SpaceR‑7B、SpatialLadder‑3B）与区域级MLLM（如UniPixel‑3B、Sa2VA系列）的交汇点，通过结构化时空信息注入弥补了现有模型在动态推理与物体接地之间的鸿沟。与依赖端到端训练的专用动态理解模型不同，ST‑TCM与Mask‑Guided Fusion提供了一种轻量、可解释的增强路径，但其当前依赖外部掩码和深度估计流水线，尚未实现端到端训练，可能引入级联误差，且规则模板难以捕捉开放域动态语义的细微变化。
-
-## 背景与动机
 
 ### 4D物理世界的动态理解：从静态感知到时空推理
 
@@ -77,7 +75,7 @@ Dyn-Bench覆盖动态场景理解的三个互补层次：① 动态物体间感�
 
 在方法层面，ST-TCM将多模态动态场景抽象为融合空间、时间与运动语义的结构化文本表示，为模型提供显式的几何与关系先验；掩码引导融合则通过注入实例级视觉聚焦信号，增强模型对运动物体的细粒度感知。两者的核心洞察在于：**结构化时空信息集成能够使模型进行连贯的因果推理，从而显著提升对物理4D世界中动态事件的感知与推理一致性。**
 
-## 核心创新
+## 核心方法与创新机理
 
 ### 瓶颈与动因
 
@@ -122,8 +120,6 @@ Table 6的掩码引导消融进一步证实：Mask‑Guided Fusion在所有任�
 
 相较于现有空间MLLM（如SpaceR‑7B、VST‑7B‑RL）仅关注静态空间关系，或区域级MLLM（如UniPixel、Sa2VA）仅处理单帧接地，ST‑TCM与掩码引导融合的组合首次将**时序运动语义**与**空间几何先验**协同注入MLLM推理流程。但需注意，当前方法依赖外部掩码和深度估计流水线，未实现端到端训练，可能引入级联误差；ST‑TCM基于规则模板生成，难以捕捉开放域动态语义的细微变化；时空推理与动态接地仍为分开的模块，缺乏深度融合。
 
-## 整体框架
-
 本文提出了一套结构化时空信息集成方案，旨在弥补现有多模态大语言模型（MLLM）在动态视频理解中的核心瓶颈：缺乏对物体运动、场景变化与相机运动的连贯表征，导致时空推理与动态物体接地相互割裂，难以维持跨帧一致的动态解释。该方案由两条互补的路径构成：**时空文本认知图（Spatio‑Temporal Textual Cognitive Map, ST‑TCM）** 与 **掩码引导融合（Mask‑Guided Fusion）**。前者将多模态动态场景抽象为融合空间、时间与运动语义的结构化文本序列，后者则通过显式注入物体掩码先验，强化模型对关键动态区域的视觉聚焦。
 
 ### Pipeline 总览
@@ -155,12 +151,6 @@ ST‑TCM 与 Mask‑Guided Fusion 并非孤立运作，而是协同增强 MLLM �
 ### 当前局限
 
 需要指出的是，该框架目前依赖外部掩码和深度估计流水线，尚未实现端到端训练，可能引入级联误差。此外，时空推理与动态接地仍为分开处理的模块，缺乏深度融合，在极端动态场景中的一致性有待提升。ST‑TCM 基于规则模板生成，难以捕捉开放域动态语义的细微变化，这为后续研究留下了改进空间。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2423_https_arxiv_org_abs_2603_12746/figures/001_Figure.jpg]]
-
-## 核心模块与公式推导
 
 ### 结构化时空集成框架
 
@@ -218,7 +208,7 @@ $$\mathbf{a}_{t}^{i} = (\mathbf{v}_{t}^{i} - \mathbf{v}_{t-1}^{i}) / \Delta t$$
 ![[assets/figures/papers/paper_list_l2423_https_arxiv_org_abs_2603_12746/figures/011_Table_5.jpg]]
 *Table 5: Ablation of Spatio-Temporal Textual Cognitive Map. Top three performers in each column are highlighted from Dark (highest) to Light (third highest). T, M, and S denote temporal semantics, motion dynamics, and spatial geometry, respectively*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -255,27 +245,13 @@ Dyn‑Bench相较于现有时空推理基准的独特定位在于其统一的三
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l2423_https_arxiv_org_abs_2603_12746/figures/002_Figure_2.jpg]]
-*Figure 2: Model performance on Dyn-Bench. Left / Center radar charts show general and spatial MLLMs accuracy on nine spatiotemporal tasks; Right radar chart shows region-level MLLMs performance on spatio-temporal reasoning and dynamic object grounding*
-
-![[assets/figures/papers/paper_list_l2423_https_arxiv_org_abs_2603_12746/figures/007_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l2423_https_arxiv_org_abs_2603_12746/figures/008_Table_4.jpg]]
-*Table 4: Dynamic object grounding evaluation of Region-level MLLMs on Dyn-Bench. Top three performers in each task category are highlighted from Dark (highest) to Light (third highest)*
-
-![[assets/figures/papers/paper_list_l2423_https_arxiv_org_abs_2603_12746/figures/009_Figure_5.jpg]]
-*Figure 5: Examples of how an MLLM thinks in dynamics as revealed by self-explanations. While the model shows strong linguistic reasoning, its 4D world modeling capability remains limited without explicit spatio-temporal guidance*
-
 ![[assets/figures/papers/paper_list_l2423_https_arxiv_org_abs_2603_12746/figures/013_Figure_8.jpg]]
 *Figure 8: Qualitative examples of the nine representative dynamic understanding tasks across the three hierarchical levels of Dyn-Bench*
-
-![[assets/figures/papers/paper_list_l2423_https_arxiv_org_abs_2603_12746/figures/006_Table_2.jpg]]
-*Table 2: Dataset statistics across Dyn-Bench filtering stages*
 
 ![[assets/figures/papers/paper_list_l2423_https_arxiv_org_abs_2603_12746/figures/005_Figure_4.jpg]]
 *Figure 4: Benchmark Statistics. Top: Distribution of tasks across three levels. Bottom: VQA pairs distribution across datasets*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 

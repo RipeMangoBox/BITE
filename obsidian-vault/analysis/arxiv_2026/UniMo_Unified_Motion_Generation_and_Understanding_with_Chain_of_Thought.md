@@ -42,7 +42,7 @@ claims:
 > - HumanML3D (T2M) 上，R-Precision Top-1 ↑ 0.539 ± 0.003 vs 0.521 ± 0.002 (MoMask) (+0.018)；FID ↓ 0.177 ± 0.004 vs 0.045 ± 0.002 (MoMask) (+0.132 (worse))；Diversity ↑ 10.042 ± 0.076 vs 9.908 ± 0.102 (MotionLLM) (+0.134)。
 > - HumanML3D (M2T) 上，BLEU@1 ↑ 63.10 vs 54.53 (MotionLLM) (+8.57)；CIDEr ↑ 46.69 vs 33.74 (MotionLLM) (+12.95)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有基于 LLM 的运动生成方法普遍采用 next-token 预测范式，直接逐令牌生成运动序列，导致累积预测误差放大；同时，文本指令与运动之间的语义对应关系弱，难以学习细粒度动作生成。统一运动生成与理解任务面临文本-运动语义鸿沟和序列级优化困境两大核心挑战。
 
@@ -52,7 +52,7 @@ claims:
 
 **主要结果**：在 HumanML3D 数据集上，UniMo 在文本到运动（T2M）的 Top-1 R-Precision 上达到 **0.539**，超过所有对比方法；在运动到文本（M2T）的 BLEU@1 和 CIDEr 上分别达到 **63.10** 和 **46.69**，全面超越先前最佳方法 MotionLLM。消融实验证实，CoT 推理和 GRPO 奖励组件对性能提升均有显著贡献，统一多任务训练进一步带来协同增益。需注意，T2M 的 FID 指标（0.177）仍落后于 **MoMask**（Guo et al., 2024）的 0.045，表明纯重建保真度并非 UniMo 的绝对优势。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -78,7 +78,9 @@ claims:
 
 通过上述设计，UniMo旨在实现运动生成与理解的统一框架，在保持生成多样性和语义准确性的同时，提供可解释的推理过程。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 UniMo 的核心创新并非单纯引入更强的骨干网络，而是针对“LLM 直接预测运动令牌”这一范式的两个根本瓶颈进行了系统性改造：**文本-运动语义鸿沟**与**逐令牌预测的累积误差**。其解决方案围绕两条因果主线展开——运动一致的思维链推理与组相对策略优化。
 
@@ -110,7 +112,7 @@ GRPO 的奖励函数由三个组件构成，分别从运动真实度、语义对
 
 UniMo 将 T2M 和 M2T 统一为同一 LLM 的序列生成任务，通过 SFT 冷启动后进行联合 GRPO 优化。消融实验证实了统一建模的协同增益：相比单任务 T2M 训练，统一训练在 RL 后 FID 从 0.203 降至 0.177，Top-1 R-Precision 从 0.529 提升至 0.539；相比单任务 M2T 训练，CIDEr 从 42.13 提升至 46.69。这表明生成与理解任务在共享表示空间中相互促进，而非相互干扰。
 
-## 整体框架
+
 
 UniMo 的整体框架围绕一个核心思路展开：**将运动生成与理解统一为结构化的思维链（Chain-of-Thought, CoT）推理过程**，并通过两阶段训练——监督微调（SFT）冷启动和组相对策略优化（GRPO）强化学习后训练——实现文本与运动模态的深度对齐。图 1 给出了完整的训练流水线概览。
 
@@ -146,7 +148,7 @@ UniMo 的整体框架围绕一个核心思路展开：**将运动生成与理解
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2601_12126/figures/001_Figure_1.jpg]]
 *Figure 1: The UniMo is trained in two stages: the SFT stage and the reinforcement learning stage with GRPO. In the SFT stage, the model is teached to perform both T2M and M2T tasks with structured reasoning, i.e. CoT. In the RL stage, the model is further optimized with task-specific rewards, enabling unified and interpretable motion generation and understanding*
 
-## 核心模块与公式推导
+
 
 UniMo 的核心架构由四个关键模块构成，分别负责运动令牌化、思维链数据构建、统一序列生成与强化学习后训练。
 
@@ -204,7 +206,9 @@ $$r_{\mathrm{caption}} = 2 \cdot \frac{f_{\mathrm{CLIP}}^{\mathrm{text}}(\hat{T}
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2601_12126/figures/013_Figure_7.jpg]]
 *Figure 7: The CoT annotation prompt guides the Qwen2.5-VL-72B to generate action-centered, chronologically ordered reasoning for each motion video*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -261,7 +265,9 @@ $$r_{\mathrm{caption}} = 2 \cdot \frac{f_{\mathrm{CLIP}}^{\mathrm{text}}(\hat{T}
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2601_12126/figures/005_Figure_4.jpg]]
 *Figure 4: Qualitative comparison of our method with other open-source SOTAs such as MotionGPT (Jiang et al. 2023) and MotionLLM (Wu et al. 2024a) for the motion-to-text task. Our method can more precisely describe complex motions*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 基线谱系与定位
 
@@ -298,6 +304,8 @@ UniMo 的适用边界受以下因素制约：
 4. **长序列与高帧率泛化**：HumanML3D 的运动序列长度和帧率有限。在更长时序（如数分钟动作）或更高帧率场景下，CoT 的结构化推理是否仍然有效，GRPO 的组优化是否会出现计算瓶颈？
 
 5. **多模态扩展**：运动渲染为视频并利用 VLM 生成 CoT 的思路，能否迁移到其他模态（如音频驱动的动作生成、触觉反馈理解），形成更通用的跨模态推理框架？
+
+
 
 ## 原文 PDF
 

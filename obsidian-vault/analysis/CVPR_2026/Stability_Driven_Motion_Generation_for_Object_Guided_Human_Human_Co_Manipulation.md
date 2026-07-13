@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/Stability_Driven_Motion_Generation_for_Object_Guided_Human_Human_Co_Manipulation.pdf
+project_link: null
+code_link: null
 aliases:
 - SSDCM
 - SDMGOGHHCM
@@ -40,7 +42,7 @@ claims:
 > [!tip] 效果简介
 > - Core4D-S1 上，Contact Acc. ↑ 0.44 vs 0.35 (Flow Matching baseline) (+0.09)；Penetration (Pene.) ↓ 0.05 vs 0.15 (Flow Matching baseline) (-0.10)；FID ↓ 25.5 vs 26.3 (Flow Matching baseline) (-0.8)。
 
-## 概述
+## 概要
 
 人人协同操作（human-human co-manipulation）的自动运动生成面临一个核心瓶颈：现有方法缺乏对**物理稳定性、交互自然性与操作意图**的统一建模，导致生成的运动普遍存在穿透、接触不准确和动作不协调等问题。本文提出 **StaCOM（Stability-Driven Co-Manipulation）**，在 Flow Matching 生成框架中显式嵌入三条原则——**意图（intention）、自然性（naturalness）和有效性（effectiveness）**——通过可执行性感知的接触策略、对抗性交互先验和稳定性驱动的物理仿真，将协同操作中多智能体与物体的紧耦合动态问题转化为可引导的生成过程。
 
@@ -48,7 +50,7 @@ claims:
 
 在 Core4D-S1 基准上，StaCOM 相比 Flow Matching 基线将接触精度（Contact Acc.）从 0.35 提升至 0.44，穿透深度（Pene.）从 0.15 降至 0.05，FID 从 26.3 降至 25.5。消融实验证实，稳定性仿真模块是物理合理性提升的关键驱动力，而对抗性交互先验和接触引导则分别贡献了运动自然性和接触准确性的改善。该方法的主要局限在于物理仿真模块推理耗时较长（约 3 分钟处理 128 帧），且目前仅在 Core4D 数据集上验证，向更复杂的推拉任务和多物体共操作场景的泛化能力尚待探索。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -72,7 +74,9 @@ claims:
 
 具体而言，本文在 Flow Matching 生成框架中嵌入三个关键机制：可执行性感知的接触策略（意图）、对抗性交互先验（自然性）和稳定性驱动的物理仿真（有效性）。这一设计使得生成的运动既能准确响应物体轨迹，又能保持双人协调与物理合理，从而填补了现有方法在统一建模上的空白。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 StaCOM 的核心创新在于将**意图（Intention）**、**自然性（Naturalness）** 与**有效性（Effectiveness）** 三个原则显式编码为生成过程的引导信号，从而解决多人-物体紧耦合协同操作中长期存在的物理不稳定、接触不准确与动作不协调问题。与现有方法相比，该方法在以下四个关键维度上实现了结构性改进。
 
@@ -129,7 +133,7 @@ $$\tilde{f}_{\theta}(\mathbf{x}_{\tau}) = f_{\theta}(\mathbf{x}_{\tau}) + \eta \
 
 上述四个创新并非孤立叠加，而是形成了因果闭环：**Flow Matching** 提供可微的速度场，使**接触梯度引导**和**先验梯度引导**能够在推理时直接校正生成方向；**接触策略**确保手部到达正确的可操作区域，为**物理仿真**提供合理的初始接触状态；**交互先验**保证双人动作的协调性，避免仿真中出现不自然的对抗力；**稳定性仿真**最终消除数据驱动生成残留的物理伪影，将穿透深度降至 0.02 的极低水平。这一“生成-引导-仿真”三级递进架构，是 StaCOM 在接触精度（0.44）和穿透深度（0.05）两项关键指标上大幅领先 Flow Matching 基线（分别为 0.35 和 0.15）的根本原因。
 
-## 整体框架
+
 
 StaCOM 的整体设计遵循“意图—自然性—有效性”三原则，通过四个协同模块将对象引导的双人协同操作建模为一个条件运动生成问题。如 Figure 2 所示，给定物体网格及其 6D 轨迹，系统依次经过 **BPS 特征提取**、**Flow Matching 运动生成**、**可执行性感知的接触策略生成**、**对抗性交互先验引导** 以及 **稳定性驱动的物理仿真**，最终输出物理合理且协调的双人操作运动序列。
 
@@ -179,7 +183,7 @@ $$\mathcal{L}_{\mathrm{sta}} = \frac{\| \vec{f}(t) - M_o \vec{a} \|_2^2}{\| M_o 
 ![[assets/figures/papers/paper_list_l10_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_Stability_Driven_Mo/figures/001_Figure_1.jpg]]
 *Figure 1: Given an object mesh and its trajectory (green), our method generates coordinated motions that are consistent with the trajectory while remaining natural and physically plausible for co-manipulation*
 
-## 核心模块与公式推导
+
 
 StaCOM 框架围绕“意图—自然性—有效性”三原则，将协同操作运动生成分解为四个可组合的核心模块：**Flow Matching 生成网络**、**可执行性感知的接触策略**、**对抗性交互先验**、以及**稳定性驱动物理仿真**。各模块在推理时联合执行，共同引导从噪声到协调双人运动的确定性映射。
 
@@ -240,7 +244,9 @@ $$\mathcal{L}_{\mathrm{phys}} = \mathcal{L}_{\mathrm{sim}} + \mathcal{L}_{\mathr
 ![[assets/figures/papers/paper_list_l10_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_Stability_Driven_Mo/figures/003_Figure_3.jpg]]
 *Figure 3: Stability-driven simulation pipeline. The CMA-ES algorithm samples corrective offsets*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -290,7 +296,9 @@ $$\mathcal{L}_{\mathrm{phys}} = \mathcal{L}_{\mathrm{sim}} + \mathcal{L}_{\mathr
 ![[assets/figures/papers/paper_list_l10_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_Stability_Driven_Mo/figures/006_Figure_5.jpg]]
 *Figure 5: Cooperative motions produced by our framework. The two characters remain synchronized while steering and lifting the green object along the given trajectory, exhibiting fine-grained grasp readjustments throughout the interaction*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 生成范式迁移：从扩散模型到 Flow Matching
 
@@ -331,6 +339,8 @@ StaCOM 在人体运动生成的知识图谱中占据了一个交叉节点——�
 3. **泛化能力的验证边界**：实验仅在 Core4D 数据集上进行，该数据集以搬运类操作为主。对于推拉、旋转等更复杂的协同操作类型，以及多物体共操作场景，StaCOM 的泛化能力尚未得到验证。这需要进一步在更多样化的基准上进行评估。
 
 4. **标注依赖的鲁棒性**：框架对接触注释和物体可执行性标注的质量有较高依赖。在噪声较大或缺少标注的真实场景中，接触策略扩散模型的预测精度和物理仿真的校正效果可能同步退化。论文未对此类退化场景进行消融分析，该点需要手动验证。
+
+
 
 ## 原文 PDF
 

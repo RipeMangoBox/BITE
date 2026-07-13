@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2024
 pdf_ref: paperPDFs/arxiv_2024/MotionGPT_2_A_General_Purpose_Motion_Language_Model_for_Motion_Generation_and_Understanding.pdf
+project_link: null
+code_link: null
 aliases:
 - M2
 - MotionGPT-2
@@ -41,7 +43,7 @@ claims:
 > - HumanML3D 上，R-Precision Top-1 0.496 vs 0.491 (T2M-GPT) (+0.005)；FID 0.191 vs 0.116 (T2M-GPT) (+0.075)。
 > - Motion-X 上，R-Precision Top-1 0.398 (PA-VQVAE LLaMA 3.1-8B) vs 0.387 (VQVAE LLaMA 3.1-8B) (+0.011)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -79,7 +81,7 @@ MotionGPT-2 属于**基于 LLM 的统一运动语言模型（LMLM）**，其方�
 
 当前方法仅依赖运动学特征，未考虑动力学约束，可能导致物理不真实的动作（如脚步滑动）；Part-Aware VQ-VAE 仍未覆盖脸部表情和手指细节。未来方向包括：显式建模身体-手部协调关系、融合视觉信息实现场景感知运动生成、探索更大规模 LLM 的性能边界与推理效率平衡，以及向实时交互场景的拓展。
 
-## 背景与动机
+
 
 ### 问题背景：运动生成与理解的统一化需求
 
@@ -107,7 +109,9 @@ MotionGPT-2 属于**基于 LLM 的统一运动语言模型（LMLM）**，其方�
 
 通过这些设计，MotionGPT-2旨在构建一个通用运动语言模型，在多种运动相关任务上达到竞争性能，同时保持极低的训练成本（仅需其他方法10%的训练时间）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MotionGPT-2 的核心创新在于将**连续人体运动量化为离散 token**，并将其与自然语言 token 统一纳入 LLM 的词汇空间，从而构建一个**任务无关的通用运动语言模型（LMLM）**。这一设计从根本上改变了运动生成与理解的范式，其关键创新体现在以下四个层面。
 
@@ -150,7 +154,7 @@ $$\mathcal{L}_{\mathrm{LoRA}} = -\sum \log p_{\theta}(x_t \mid x_{<t}, \mathcal{
 
 这些创新共同构成了一个**高度泛化、参数高效、多任务统一**的运动语言框架，为通用人体运动智能奠定了基础。
 
-## 整体框架
+
 
 MotionGPT-2 构建了一个以大型语言模型（LLM）为核心枢纽的统一运动语言框架，其设计目标是将多模态控制信号（文本、初始姿势、关键帧姿势）与人体运动统一在离散 token 空间中，从而以任务无关的方式解决运动生成、理解、预测等多种下游任务。整个 pipeline 由三个核心模块串联而成：**运动离散化（Motion Tokenizer）**、**多模态统一词汇表（Unified Motion-Language Vocabulary）** 和 **基于 LLM 的运动语言模型（Motion-Language Model）**，并通过任务感知的指令模板（Instruction Prompting）引导模型执行特定任务，如 Fig. 3 所示。
 
@@ -212,7 +216,7 @@ MotionGPT-2 采用三阶段训练流程以保证各模块协同优化：
 ![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2410_21747/figures/002_Figure_2.jpg]]
 *Figure 2: The pipeline of MotionGPT, a Motion General-Purpose generaTor. Given text and poses as an input example, we organize task descriptions (Instruction) and multiple control conditions (Input) within a question template. MotionGPT fine-tunes an LLM to generate the corresponding motion answer, which can then be decoded into human motions using a VQ-VAE decoder*
 
-## 核心模块与公式推导
+
 
 MotionGPT-2 的核心架构由三个关键模块构成：**运动离散化分词器（Motion VQ-VAE Tokenizer）**、**统一运动-语言词汇表（Unified Motion-Language Vocabulary）**，以及**基于 LLM 的运动语言模型（Motion-Language Model）**。三者协同实现从连续运动到离散 token 的转换，并将运动 token 与文本 token 统一在同一 LLM 词汇空间中，使 LLM 能够以自回归方式处理多模态控制信号并解决多种运动相关任务（图3）。
 
@@ -266,7 +270,9 @@ MotionGPT-2 采用三阶段训练流程（IV-D）：
 ![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2410_21747/figures/004_Figure_4.jpg]]
 *Figure 4: The framework overview of our proposed Part-Aware VQVAE for body-hand motion tokenization. The Part-Aware VQVAE splits SMPL-X-based human representations into body-hand motions*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 1. 主要性能评估
 
@@ -335,7 +341,9 @@ MotionGPT-2 仅使用 **1%** 的可训练参数（通过 LoRA 微调 LLaMA），
 ![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2410_21747/figures/009_Table.jpg]]
 *Table: V: Ablations on the effects of LLM types and scales on text-based motion generation, evaluated on the HumanML3D benchmark. In addition to full fine-tuning of the encoder-decoder T5-base model, LoRA-based fine-tuning is used for optimizing other decoder-only LLMs*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系定位
 
@@ -409,6 +417,8 @@ MotionGPT-2 在以下任务上展现出统一的处理能力：
 3. **更大规模 LLM 的潜力与成本平衡**：Table V 的消融显示，更大规模的 LLM（如 LLaMA 3.1-8B）带来性能提升。但如何利用 GPT-4 级别的模型进一步突破性能上限，同时控制推理成本和延迟，是一个工程与算法兼顾的挑战。
 4. **实时应用可行性**：在游戏、虚拟人等实时动画场景中，自回归生成+运动解码的延迟是否可接受？可能需要探索非自回归解码或模型蒸馏方案。
 5. **真正的全身数字人驱动**：将脸部表情（如 FLAME 参数）和手指级动作纳入统一表示，实现面部-身体-手部的联合生成，是通往完整数字人驱动的关键一步。这需要设计更细粒度的 Part-Aware 量化方案，并获取相应的全身运动-文本配对数据。
+
+
 
 ## 原文 PDF
 

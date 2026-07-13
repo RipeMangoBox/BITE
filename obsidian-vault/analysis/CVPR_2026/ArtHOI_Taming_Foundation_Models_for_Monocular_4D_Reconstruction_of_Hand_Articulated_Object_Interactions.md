@@ -42,7 +42,7 @@ claims:
 > - ArtHOI‑RGBD (Scissor) 上，CD (mm)↓ 4.256±1.02 vs 13.841±5.89 (RSRD) (-9.585)。
 > - ArtHOI‑RGBD (Candy Box) 上，CD (mm)↓ 4.104±1.33 vs 7.768±4.88 (RSRD) (-3.664)。
 
-## 概述
+## 概要
 
 从单目 RGB 视频中重建手与**铰接物体**的 4D 交互，是理解日常操作行为的关键技术瓶颈。现有方法要么仅适用于刚性物体，要么依赖预扫描模板或多视角初始化，难以泛化至任意未知铰接物体。基础模型虽能提供丰富的几何、运动与语义先验，但其输出天然存在度量尺度模糊、手物网格空间错位和物理不合理等缺陷，导致独立重建结果无法真实反映交互。
 
@@ -50,7 +50,7 @@ ArtHOI 提出了一种**优化驱动的框架**，核心思路不是抛弃基础
 
 实验表明，ArtHOI 在无需任何物体模板或预扫描的条件下，在 ArtHOI‑RGBD、RSRD 和 ARCTIC 等多个数据集上均取得优于或持平需要预扫描的现有方法的重建精度（如 ArtHOI‑RGBD 上 Chamfer Distance 降低 3.7–9.6 mm，RSRD 上降低 61.1 mm），同时碰撞‑接触评分（Co²）大幅降低至 0.029–0.039，验证了 MLLM 引导对齐对物理合理性的关键作用。
 
-## 背景与动机
+
 
 从单目 RGB 视频中重建手与物体的 4D 交互，是计算机视觉与图形学中长期存在的难题。该任务要求同时恢复手部姿态、物体几何与运动，以及二者之间物理合理的空间关系，在机器人学习、增强现实和动作分析等领域具有重要应用价值。
 
@@ -64,7 +64,9 @@ ArtHOI 提出了一种**优化驱动的框架**，核心思路不是抛弃基础
 
 上述瓶颈的本质在于：**基础模型提供的几何、运动与语义先验天生互不一致**，而现有方法要么抛弃这些先验，要么不加修正地直接使用。ArtHOI 的核心动机正是“驯服”而非丢弃这些先验——通过优化框架将它们统一到度量一致、空间对齐、物理合理的 4D 交互重建中，从而在**无需任何物体模板或预扫描**的条件下，仅凭单目 RGB 视频实现手与铰接物体的 4D 重建。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ArtHOI 的核心创新在于将多个基础模型的异构先验“驯服”为物理一致的 4D 手‑铰接物体交互重建，而非直接堆砌模型输出。其关键突破体现在两个 **changed slots** 上。
 
@@ -86,7 +88,7 @@ ArtHOI 的核心创新在于将多个基础模型的异构先验“驯服”为�
 
 ArtHOI 的创新不在于提出新的基础模型，而在于**设计了一套优化机制来弥合基础模型先验之间的不一致性**：ASR 解决了物体从归一化空间到度量世界的接地问题，MLLM 对齐则解决了手‑物网格的空间组合问题。二者协同，使得无需任何物体模板或预扫描的单目 4D 交互重建成为可能。
 
-## 整体框架
+
 
 ArtHOI 是一个**基于优化的框架**，核心目标是从单目 RGB 视频 $\\boldsymbol{\\gamma} = \\{ \\mathbf{I}_i \\}_{i=1}^{N}$ 中重建手与未知铰接物体的 4D 交互，全程无需物体模板或预扫描。其关键设计在于**集成并“驯服”多个基础模型的先验**，而非抛弃这些先验——基础模型提供的归一化网格、独立重建的手网格天生互不一致（尺度模糊、空间错位、物理不合理），ArtHOI 通过优化将它们协调到世界坐标系下，形成物理一致的 4D 交互表示。
 
@@ -109,7 +111,7 @@ ArtHOI 是一个**基于优化的框架**，核心目标是从单目 RGB 视频 
 
 整个框架的输入是单目 RGB 视频，输出是时空对齐的手网格与铰接物体网格序列。各模块之间通过世界坐标系下的度量网格传递信息：ASR 解决了归一化网格到世界空间的尺度/位姿歧义，MLLM 引导的对齐则消除了手物网格之间的空间错位与穿透。
 
-## 核心模块与公式推导
+
 
 ArtHOI 将单目 4D 手‑铰接物体交互重建分解为四个串行模块，每个模块解决一个基础模型先验的固有缺陷：**数据预处理**提取干净观测信号；**规范网格重建与 ASR** 将归一化网格锚定到世界空间；**部件级运动重建**赋予静态网格时变铰接运动；**MLLM 引导的手物对齐**消除手物网格间的空间错位与穿透。
 
@@ -234,7 +236,9 @@ $$
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2603_25791/figures/015_Figure.jpg]]
 *Figure: E. Stage 3: Frame-wise Contact Reasoning Prompt. This stage performs detailed analysis of each frame to determine contact state and identify engaged fingers. The critical depth map verification step (Phase C) distinguishes true physical contact from mere proximity using depth discontinuity analysis*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果：4D 铰接物体重建精度
 
@@ -306,7 +310,9 @@ ArtHOI 在自采集的 **ArtHOI‑RGBD** 数据集上对所有五类物体均取
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2603_25791/figures/003_Figure_3.jpg]]
 *Figure 3: This gallery showcases the results of our hand-articulated-object reconstruction on three data sources: ArtHOI-RGBD, RSRD and ArtHOI-Wild.(more results in the supp.). The first column shows sampled input frames. We present the camera view and a side view to display the reconstructed HOI meshes. Hand reconstructions for RSRD are produced using the same WiLoR model as ours for a fair comparison. Note that RSRD is unable to process the video from ArtHOI-Wild, as it requires an object surrounding scan that is unavailable for internet videos*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -345,6 +351,8 @@ ArtHOI 的适用边界由其流水线的三个核心模块共同决定：
 5. **多手协同交互**：当前框架假设单手或双手独立与物体交互，MLLM 的接触推理也以单手为单位。对于双手协同操作同一物体（如双手拧开瓶盖）的场景，接触约束的建模和优化策略需要进一步扩展。
 
 6. **深度估计的度量尺度一致性**：ASR 的粗尺度估计依赖反投影深度点云，其精度受限于 Video‑Depth‑Anything/UniDepth 的度量深度质量。在野外视频无真实深度条件下（Figure 4），尺度估计的定性对比虽优于基线，但缺乏定量评估。深度估计的尺度漂移如何影响最终重建精度，仍需系统分析。
+
+
 
 ## 原文 PDF
 

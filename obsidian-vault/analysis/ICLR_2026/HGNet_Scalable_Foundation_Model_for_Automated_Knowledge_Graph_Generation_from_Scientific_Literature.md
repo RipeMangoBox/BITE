@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/HGNet_Scalable_Foundation_Model_for_Automated_Knowledge_Graph_Generation_from_Scientific_Literature.pdf
+project_link: null
+code_link: https://github.com/basiralab/SPHERE
 aliases:
 - HZNH
 - HGNet
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | HGNet：面向科学文献自动知识图谱生成的可扩展基础模型 |
 | 英文题名 | HGNet: Scalable Foundation Model for Automated Knowledge Graph Generation from Scientific Literature |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=NWd53rltx8); [GitHub](https://github.com/basiralab/SPHERE) |
+| Links | [paper](https://openreview.net/forum?id=NWd53rltx8) · [GitHub](https://github.com/basiralab/SPHERE) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/graph_neural_networks |
 | Method | HGNet（包含 Z-NERD 零样本实体识别和 HGNet 层次关系抽取） |
 | Dataset | SciERC, SciER, BioRED, SemEval (supervised NER), SPHERE (zero-shot NER), SemEval (supervised RE), SPHERE (zero-shot RE) |
@@ -41,7 +43,7 @@ claims:
 > - SPHERE (zero-shot NER) 上，NER F1 为 Z-NERD，对比 best zero-shot model，变化 +10.76%。
 > - SciERC, SciER, BioRED, SemEval (supervised RE) 上，Rel+ F1 为 HGNet，对比 best supervised model (e.g., HGERE)，变化 +5.99%。
 
-## 概述
+## 概要
 
 科学文献知识图谱的自动化构建面临几个相互关联的瓶颈：第一，长多词实体的边界识别极易碎片化；第二，模型在见与未见的科学领域间的泛化能力不足；第三，现有方法普遍忽略概念间的层次化关系（如父-子-对等），仅将其视为扁平的二元关系；第四，缺乏对图谱全局逻辑一致性（如无环性）的显式约束，导致抽取结果的可信度低。这些问题使得传统流水线式系统或通用大语言模型在跨领域、零样本场景下难以可靠工作。
 
@@ -51,7 +53,7 @@ HGNet 将问题分解为两个协同阶段——零样本命名实体识别（Z-
 
 综上，HGNet 以正交语义分解与多尺度注意力解决实体识别的长序列与泛化难题，以层次消息传递和结构化损失保证图谱的逻辑一致性与抽象序，为大规模科学文献的自动知识图谱生成提供了一套端到端的基准方法。
 
-## 背景与动机
+
 
 科学文献的爆炸式增长使得自动构建知识图谱成为加速科学发现的重要途径。然而，当前自动化方法面临四大核心瓶颈，严重制约图谱质量与可靠性：
 
@@ -70,7 +72,9 @@ HGNet 将问题分解为两个协同阶段——零样本命名实体识别（Z-
 
 通过这些设计，HGNet 能够在监督与零样本场景下自动构建高质量、层次分明且逻辑自洽的科学知识图谱。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 HGNet 框架（含零样本实体识别器 Z‑NERD 和层次关系抽取器 HGNet）围绕科学知识图谱构建的四大瓶颈——长多词实体碎片化、领域泛化弱、层次关系被忽略以及全局逻辑一致性缺失——进行了四项结构性改进。相对监督基线（PL‑Marker, HGERE, SciBERT+GCN）和零样本大模型（Llama‑3‑8B, UniversalNER‑7b），这些改进构成了可验证的因果链条。
 
@@ -98,7 +102,7 @@ HGNet 框架（含零样本实体识别器 Z‑NERD 和层次关系抽取器 HGN
 
 上述四个改进并非孤立叠加，而构成协同体系：正交分解为多尺度注意力提供领域无关的转折先验；三通道消息传递利用这一高质量实体图；双重几何损失则从图结构和向量空间两个角度共同强化层次表示。跨域零样本 RE 高达 26.20% 的提升（Table 4）以及全面的消融实验持续证实了这些创新点的因果贡献。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0013_NWd53rltx8_HGNet_Scalable_Foundation_Model_for_Automated_Kn/figures/020_Figure_6.jpg]]
 *Figure 6: Main figure explaining the proposed Z-NERD algorithm. For TCQK, multi-head for each convolution has been shown as single head for simplicity. B refers to begin entity, I refers to inside entity and O refers to outside entity*
@@ -128,7 +132,7 @@ Z‑NERD 以原始科学文本为输入，通过预训练语言模型（如 SciB
 
 两阶段可独立使用，但 HGNet 框架将其串联，形成一个轻量、可零样本的层次知识图谱生成管线：输入自然语言科学文本，经过 Z‑NERD 抽取实体，再由 HGNet 推理出实体间的层次关系，最终输出一个有向无环、沿抽象轴整齐排列的层次知识图谱。这种设计使模型能够在不依赖大规模标注的情况下，实现跨领域、全局一致的层次知识构建。
 
-## 核心模块与公式推导
+
 
 HGNet 采用两阶段流水线：**Z‑NERD** 负责领域无关的零样本命名实体识别，**HGNet** 在图结构上进行层次化关系抽取。以下分述各阶段的关键模块、对应公式及其设计动机。
 
@@ -188,7 +192,9 @@ $$\mathcal{L}_{\mathrm{Total}} = \mathcal{L}_{\mathrm{RE}} + \lambda_1 \mathcal{
 
 该联合目标协同优化关系分类、图谱无环性以及概念的抽象几何排布，使得 HGNet 在常规监督与零‑样本场景下均能取得领先性能（平均 RE‑F1 提升 5.99%，零‑样本提升 26.20%）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 一、主要实验结果
 
@@ -235,7 +241,9 @@ Table 8 将 HGNet 与常用层次建模几何基线进行对比：在 SciERC �
 3. **模态单一性**：当前框架仅处理纯文本，未整合科学论文中广泛存在的图表、公式等多模态线索，因此在完整论文的知识图谱构建中可能丢失大量结构化信息。
 4. **动态更新与公平性**：模型设计未涉及知识图谱的动态增量更新机制；同时，论文虽未进行社会偏见评估，但通过多领域跨域实验间接显示了领域公平性——这在一定程度缓解但未彻底消除应用上的公平性顾虑。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与先前方法的关系及变革要点
 
@@ -286,6 +294,8 @@ SPHERE 数据集通过“从全局图谱生成文本再反向标注”的管道�
 - **与检索增强生成 (RAG) 的协同**：以 HGNet 构建的结构化科学知识图谱作为外部知识库供 LLM 检索，可能进一步改善 LLM 在复杂推理任务中的事实准确性与逻辑性，该方向尚未被探索。
 
 以上开放问题均对应目前方法链中的薄弱环节，回答它们将实质性推动科学知识图谱构建从高效基座走向鲁棒、公平、多模态的认知基础设施。
+
+
 
 ## 原文 PDF
 

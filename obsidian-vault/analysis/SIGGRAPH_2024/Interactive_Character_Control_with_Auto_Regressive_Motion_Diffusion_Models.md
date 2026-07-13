@@ -5,6 +5,7 @@ paper_level: A
 venue: SIGGRAPH
 year: 2024
 pdf_ref: paperPDFs/SIGGRAPH_2024/Interactive_Character_Control_with_Auto_Regressive_Motion_Diffusion_Models.pdf
+code_link: null
 project_link: https://yi-shi94.github.io/amdm_page/
 aliases:
 - MARMDM
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 基于自回归运动扩散模型的交互式角色控制 |
 | 英文题名 | Interactive Character Control with Auto-Regressive Motion Diffusion Models |
 | 会议/期刊 | SIGGRAPH 2024 |
-| Links | [paper](https://arxiv.org/abs/2306.00416); [Project](https://yi-shi94.github.io/amdm_page/) |
+| Links | [paper](https://arxiv.org/abs/2306.00416) · [Project](https://yi-shi94.github.io/amdm_page/) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/generative_models_and_autoencoders |
 | Method | A-MDM (Auto-Regressive Motion Diffusion Model) |
 | Dataset | HumanML3D, LaFAN1 |
@@ -41,7 +42,7 @@ claims:
 > - HumanML3D 上，FID (↓) 为 1.7435 ± 0.0813，对比 MVAE: 11.2393 ± 0.1607，变化 减少9.4958（更低更好）。
 > - LaFAN1 上，Foot Skating (FS↓) 为 1.99，对比 NSM: 2.25，变化 降低0.26。
 
-## 概述
+## 概要
 
 实时交互式角色控制面临一个核心瓶颈：现有的运动扩散模型（如MDM、GMD）采用时空模型一次性生成整个运动序列，无法满足实时交互对逐帧响应的需求；而传统的自回归模型（如基于VAE的MVAE和HuMoR）在生成长序列时容易产生漂移和运动质量下降。本文提出的**A-MDM（Auto-Regressive Motion Diffusion Model）**将扩散模型改造为自回归形式，仅需极少量去噪步骤（40步）和轻量级MLP网络（10层，1024维），即可在实时条件下生成高质量、多样化的运动序列。
 
@@ -49,7 +50,7 @@ claims:
 
 主要结果方面，A-MDM在HumanML3D数据集上的FID达到1.74，相比MVAE的11.24有显著提升（Table 5）；在LaFAN1上的足部滑动指标（FS）为1.99，优于NSM的2.25（Table 6）。消融实验表明，40个扩散步骤在运动质量和多样性之间达到了最佳平衡，推理时间约为20.96ms，满足实时交互需求。
 
-## 背景与动机
+
 
 角色动画的实时交互控制是计算机图形学中的核心挑战，其目标是根据用户输入或任务目标，实时生成高质量、多样化的角色运动序列。这一任务面临双重约束：一方面需要运动具有自然性和物理合理性，另一方面必须满足毫秒级的实时推理延迟，以支持游戏、虚拟现实等交互式应用。
 
@@ -59,7 +60,9 @@ claims:
 
 本文的动机正是弥合这一缺口。作者提出 **A-MDM（Auto-Regressive Motion Diffusion Model）**，将扩散模型改造为自回归形式：以极少量去噪步骤（仅40步）和轻量级MLP网络，在实时性约束下逐帧生成高质量、多样化的运动。其核心洞察是：将扩散模型的自回归设计与任务导向采样、空间/时间修补、分层强化学习等控制策略相结合，可以构建一个轻量、高保真的实时运动生成框架，且无需针对每个下游任务重新训练模型。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 A-MDM 的核心创新在于将扩散模型改造为**自回归生成范式**，使其能够在极低延迟下实时生成高质量运动，同时通过多种免训练的控制策略适配不同交互任务。相比于现有方案，其关键突破体现在以下四个维度的范式转变：
 
@@ -87,7 +90,7 @@ A-MDM 将扩散模型重新设计为自回归形式：给定前一帧的角色�
 
 这四种范式转变共同构成了 A-MDM 的核心创新：**一个轻量、实时、通用可控的自回归运动扩散框架**，无需为每个新任务重新训练即可生成多样化且符合控制目标的高保真运动。
 
-## 整体框架
+
 
 A-MDM 的整体设计围绕一个核心矛盾展开：**如何在保持扩散模型生成质量与多样性的同时，实现满足实时交互需求的逐帧推理速度**。为此，该框架将去噪扩散概率模型（DDPM）改造为自回归生成范式，并围绕这一基础模型构建了多层控制策略，形成一个“生成-控制”解耦的模块化 pipeline。
 
@@ -134,7 +137,7 @@ $$J_{RL}(\pi) = \mathbb{E}_{\tau \sim p(\tau|\pi)} \left[ \sum_{f=0}^{\infty} \g
 ![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2306_00416/figures/001_Figure_1.jpg]]
 *Figure 1: We present Auto-Regressive Motion Diffusion Model (A-MDM), a framework for generating high-fidelity kinematic motion sequences. Once trained, A-MDM can be reused to perform new tasks through different control strategies, such as inpainting (upper right, and lower left), and hierarchical control via reinforcement learning (lower right)*
 
-## 核心模块与公式推导
+
 
 A-MDM 将标准扩散模型改造为自回归形式，逐帧预测下一帧运动，并辅以调度采样、修补、任务导向采样和分层强化学习等控制模块。以下逐一说明各模块的设计逻辑与核心公式。
 
@@ -188,7 +191,9 @@ $$J_{RL}(\pi) = \mathbb{E}_{\tau \sim p(\tau \mid \pi)} \left[ \sum_{f=0}^{\inft
 
 其中 $\tau$ 为轨迹，$\gamma$ 为折扣因子，$r(s_f, a_f)$ 为任务相关的即时奖励。低层基础扩散模型保持冻结，仅高层控制器被训练，从而在新任务上复用已学到的运动先验。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 生成质量与多样性主结果
 
@@ -275,7 +280,9 @@ A-MDM 通过任务导向采样、空间修补和时间修补三种策略，在�
 ![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2306_00416/figures/016_Figure.jpg]]
 *Figure: (a) LaFAN1 (b) 100STYLE*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 关键基线关系
 
@@ -307,6 +314,8 @@ A-MDM 的设计目标是为实时交互式角色控制提供一个通用、轻�
 2.  **模型架构演进**：探索多帧自回归扩散模型，是否能从根本上提升时间一致性，并使其能处理更复杂的控制任务。
 3.  **推理速度优化**：能否将一致性模型等扩散模型加速技术集成到 A-MDM 框架中，以进一步降低推理延迟，为更复杂的实时应用提供算力余量。
 4.  **控制策略深化**：如何克服任务导向采样的短视性，使其能适用于需要精确、持续控制的任务，是拓展其应用范围的重要问题。
+
+
 
 ## 原文 PDF
 

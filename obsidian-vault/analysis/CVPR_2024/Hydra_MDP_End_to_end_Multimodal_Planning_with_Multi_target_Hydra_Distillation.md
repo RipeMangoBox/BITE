@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2024
 pdf_ref: paperPDFs/CVPR_2024/Hydra_MDP_End_to_end_Multimodal_Planning_with_Multi_target_Hydra_Distillation.pdf
+project_link: null
+code_link: https://github.com/NVlabs/Hydra-MDP
 aliases:
 - HM
 - Hydra-MDP
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | Hydra-MDP：基于多目标Hydra蒸馏的端到端多模态规划 |
 | 英文题名 | Hydra-MDP: End-to-end Multimodal Planning with Multi-target Hydra-Distillation |
 | 会议/期刊 | CVPR 2024 |
-| Links | [paper](https://arxiv.org/abs/2406.06978); [GitHub](https://github.com/NVlabs/Hydra-MDP) |
+| Links | [paper](https://arxiv.org/abs/2406.06978) · [GitHub](https://github.com/NVlabs/Hydra-MDP) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/planning_control |
 | Method | Hydra-MDP |
 | Dataset | Navtest Split |
@@ -40,7 +42,7 @@ claims:
 > - Navtest Split 上，PDM Score 为 86.5 (Hydra-MDP-V8192-W-EP)，对比 80.9 (Vadv2-V8192)，变化 +5.6。
 > - Navtest Split 上，PDM Score 为 86.5 (Hydra-MDP-V8192-W-EP)，对比 78.0 (Transfuser)，变化 +8.5。
 
-## 概述
+## 概要
 
 端到端自动驾驶规划长期受困于开环模仿学习的隐式偏差：模型仅模仿人类驾驶轨迹，却无法直接优化闭环安全性、舒适性与交通规则遵守等多维评价指标。现有方法将不可微分的后处理代价函数置于训练循环之外，导致感知与规划之间缺乏端到端的多目标协同优化。
 
@@ -50,7 +52,7 @@ Hydra-MDP 的核心思路是**多教师 Hydra 蒸馏**：同时引入人类驾�
 
 该方法位于端到端多模态规划与知识蒸馏的交叉地带，其感知网络基于 Transfuser 构建，轨迹解码器采用固定规划词汇表，多教师蒸馏头则从 PDM‑Closed 规则教师获取闭环度量知识。需注意，动态避免碰撞指标因实现问题被忽略，且模型集合带来的推理成本增加是实际部署中需权衡的因素。
 
-## 背景与动机
+
 
 端到端自动驾驶旨在直接从传感器输入映射到规划轨迹，省去传统模块化流水线中的中间表示与手工规则。然而，现有端到端规划方法普遍受困于一个核心瓶颈：**开环评价的隐式偏差**。主流范式以模仿学习为基础，通过最小化预测轨迹与人类驾驶轨迹之间的距离来训练模型，但训练目标与闭环部署时的安全、效率、舒适、交规合规等多维评价指标之间存在根本性错位。
 
@@ -60,7 +62,9 @@ Hydra-MDP 的核心思路是**多教师 Hydra 蒸馏**：同时引入人类驾�
 
 这一范式转变的直接驱动力来自 Navsim 挑战赛的实践需求——该基准要求在开环数据上训练、却在闭环度量下评价，天然暴露了模仿学习与闭环评价之间的鸿沟。Hydra-MDP 最终在该挑战赛中获得第一名，为端到端多目标规划提供了一条可行路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Hydra‑MDP 的核心创新在于用**可微分的多教师知识蒸馏**彻底重构了端到端多模态规划的轨迹选择机制，从而在一个统一框架内同时优化模仿行为与闭环安全性。
 
@@ -109,7 +113,7 @@ $$\mathcal{L} = \sum_i \mathcal{L}_{im}(T_i, \hat{T}) + \mathcal{L}_{kd}(f(T_i, 
 
 > **需注意的局限性**：DDC 子度量因实现问题被忽略，可能影响 PDM Score 的完全可比性；置信度权重通过网格搜索确定，对新场景的泛化性需进一步验证；模型集合虽带来额外增益，但引入了更高的推理计算成本。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2406_06978/figures/002_Figure_2.jpg]]
 *Figure 2: The Overall Architecture of Hydra-MDP*
@@ -138,7 +142,7 @@ $$\tilde{f}(T_i, O) = -(w_1 \log S_i^{im} + w_2 \log S_i^{NC} + w_3 \log S_i^{DA
 
 其中权重 $w_1$–$w_4$ 通过网格搜索在验证集上确定，用于缓解不同教师模型拟合不完美的问题。最终模型版本 Hydra-MDP-$\mathcal{V}_{8192}$-W-EP 还引入了 EP 蒸馏，进一步提升了相应子指标的闭环表现。
 
-## 核心模块与公式推导
+
 
 Hydra-MDP 的整体架构由两个核心网络构成：感知网络（Perception Network）和轨迹解码器（Trajectory Decoder），并在解码器之上附加 Hydra 预测头实现多教师知识蒸馏。
 
@@ -191,7 +195,9 @@ $$T^* = \arg\min_{T_i} \tilde{f}(T_i, O)$$
 
 这一设计将原本不可微的后处理代价函数（$T^* = \arg\min_{T_i} f(T_i, P)$）替换为神经网络预测的可微版本，使多目标优化完全融入端到端训练。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置与评价协议
 
@@ -240,7 +246,9 @@ Table 2 展示了视觉骨干缩放和模型集成的影响。将图像骨干从
 
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2406_06978/figures/003_Table.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 端到端自动驾驶的范式演进
 
@@ -284,6 +292,8 @@ Hydra-MDP 在三个关键维度上区别于现有方法：
 3. **权重自适应机制**：当前网格搜索得到的置信度权重是否可以通过元学习或在线自适应机制动态调整，使模型能够根据场景风险级别自动平衡安全性与效率？
 4. **真实闭环验证**：该框架在真正的闭环评估环境（如 CARLA 或真实道路测试）中的表现如何？Navsim 的开环日志重放评估与真实闭环之间存在已知的分布偏移。
 5. **分布外泛化**：规划词汇表基于 nuPlan 构建，对极端场景或分布外场景的覆盖度未知，模型在这些场景下的退化行为值得进一步研究。
+
+
 
 ## 原文 PDF
 

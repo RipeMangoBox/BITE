@@ -43,7 +43,7 @@ claims:
 > - nuScenes 3D Object Detection (test) 上，NDS 74.9 (GaussianFusion)。
 > - nuScenes 3D Semantic Occupancy Prediction (val) 上，mIoU 20.65 (GaussianFusion-C) vs 19.10 (GaussFormer) (+1.55)。
 
-## 概述
+## 概要
 
 ### 核心问题：离散BEV表示的空间信息瓶颈
 
@@ -72,7 +72,7 @@ claims:
 
 消融实验进一步验证了关键设计的有效性：前向投影高斯初始化相比随机初始化带来+2.8 NDS提升（Table 8），共享高斯编码器相比独立编码器提升+0.7 mAP（Table 9），带有高斯先验的可变形注意力相比普通可变形注意力提升+0.4 NDS（Table 9），增量参数更新相比预测全新参数提升+0.9 mAP（Table 9）。这些结果一致表明，连续高斯表示及其配套设计是突破离散BEV瓶颈的有效路径。
 
-## 背景与动机
+
 
 ### 离散BEV表示：多模态融合的性能瓶颈
 
@@ -108,7 +108,9 @@ claims:
 
 GaussianFusion的提出正是为了系统性地解决上述挑战，其核心洞察在于：**利用3D高斯函数的连续性和协方差矩阵的自适应不确定性建模能力，在统一高斯空间中实现多模态特征的自然对齐与互补增强，从而突破离散BEV的性能瓶颈。**
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GaussianFusion的核心创新在于**将多模态融合的表示空间从离散BEV网格切换为连续的3D高斯分布**，并围绕这一连续表示设计了一套完整的初始化、编码与融合机制。这一范式转换直接回应了BEV表示的根本瓶颈：离散网格在投影和池化过程中不可避免地丢失空间细节，导致跨模态特征对齐困难。
 
@@ -154,7 +156,7 @@ $$f(\mathbf{p}) = \sum_{i=1}^{J} \hat{g}_i (\mathbf{p}; \pmb{\mu}, \mathbf{s}, \
 
 上述创新点构成了一条清晰的因果链：**前向投影初始化**为相机高斯提供了有意义的3D初始位置 → **共享编码器**在迭代优化过程中实现跨模态特征对齐 → **高斯先验注意力**使特征采样更精准 → **增量更新**确保优化稳定性 → **GMM融合**在保留空间信息的前提下完成模态聚合。这一链条的终端效果是，GaussianFusion在nuScenes 3D目标检测上以200×200的BEV尺寸实现74.0 NDS，相比BEVFusion同尺寸下的71.4 NDS提升**+2.6**（Table 1），同时推理延迟降低15.4%，内存占用降低16.9%（Table 3）。
 
-## 整体框架
+
 
 GaussianFusion 提出了一套从离散 BEV 到连续 3D 高斯表示的统一多模态融合流水线。其核心设计思想是：将相机和 LiDAR 两种模态的特征分别初始化为独立的 3D 高斯分布，通过共享高斯编码器进行迭代优化与跨模态对齐，随后利用高斯混合模型自然聚合为统一的场景表示，最后经体素化后送入任务专用头完成下游感知。
 
@@ -189,7 +191,7 @@ GaussianFusion 提出了一套从离散 BEV 到连续 3D 高斯表示的统一�
 ![[assets/figures/papers/paper_list_l39_https_openreview_net_forum_id_7jXxQ9bGoU/figures/002_Figure_1.jpg]]
 *Figure 1: Comparison of the discrete BEV representation fusion paradigm (Liu et al., 2023b) and our proposed continuous Gaussian representation fusion paradigm. B, G, C, L, and F denote BEV, Gaussian, Camera, Lidar, and Fusion*
 
-## 核心模块与公式推导
+
 
 GaussianFusion 的核心设计围绕“将离散 BEV 网格替换为连续 3D 高斯表示”这一因果开关展开，整个框架由四个关键模块串联：高斯初始化、共享高斯编码器、高斯混合融合以及高斯到体素的转换。
 
@@ -252,7 +254,9 @@ $$\hat{g} = \frac{1}{M} [\sum \mu_m, \sum \mathbf{s}_m, \sum \mathbf{r}_m], \qua
 
 这一设计使高斯混合模型天然处理了多模态分布的对齐与互补，避免了 BEV 融合中因离散化造成的空间信息丢失。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能验证：3D目标检测
 
@@ -322,7 +326,9 @@ Figure 4展示了GaussianFusion在3D目标检测和语义占用预测任务上�
 ![[assets/figures/papers/paper_list_l39_https_openreview_net_forum_id_7jXxQ9bGoU/figures/007_Table_4.jpg]]
 *Table 4: Comparison with temporal methods*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：离散BEV融合范式的瓶颈
 
@@ -369,6 +375,8 @@ GaussianFusion为多模态融合提供了一个“连续表示”的新范式，
 3. **增量高斯更新**：预测参数偏移而非全新参数的更新策略，带来+0.9 mAP的提升，适用于任何迭代优化的高斯场景表示框架。
 
 这些组件为后续工作提供了明确的改进接口：例如，可将运动信息编码为高斯参数的时序演化规律，实现4D高斯场景流建模；或将高斯先验注意力推广到其他跨模态对齐任务（如文本-3D、图像-点云配准）。
+
+
 
 ## 原文 PDF
 

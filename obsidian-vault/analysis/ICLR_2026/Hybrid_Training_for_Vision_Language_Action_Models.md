@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Hybrid_Training_for_Vision_Language_Action_Models.pdf
+project_link: null
+code_link: null
 openreview_forum_id: IBJtOltTbx
 aliases:
 - HTH
@@ -42,7 +44,7 @@ claims:
 > - LIBERO (4 suites, 100 episodes each) 上，平均成功率 (Avg. Success Rate) 为 93.7%，对比 OFT (OpenVLA fine-tuned) 未见精确值，但明显低于 HyT，变化 显著提升，尤其 Goal/Long suite。
 > - 真实机器人操作 (Real-world tasks, 26 trials total) 上，总体成功率 (Overall Success Rate) 为 63% ± 7，对比 OpenVLA 41% ± 7，变化 +22%。
 
-## 概述
+## 概要
 
 视觉-语言-动作（Vision-Language-Action, VLA）模型在引入思维链（Chain-of-Thought, CoT）后虽能提升任务性能，却面临一个关键瓶颈：生成冗长的中间思维文本会显著拖慢推理速度，降低动作执行频率，难以满足机器人部署的实时性要求。本文提出 **混合训练（Hybrid Training, HyT）** 框架，核心思路是在训练阶段联合学习多种条件动作分布，使单一模型在推理时能够跳过思维生成、直接输出动作，同时保留 CoT 训练带来的性能增益。
 
@@ -58,7 +60,7 @@ HyT 的关键机制是引入一个**模态变量（modality variable）** $m \in
 
 **局限与待验证点**：当前模态变量在任务开始时设定后不再更改，未探索动态切换的潜力；实验环境以桌面操作为主，尚未在需要长期记忆或复杂抽象推理的任务上验证；思维标注依赖 oracle 求解器或启发式方法；真实世界实验的统计可靠性有限。HyT 与模型架构的耦合性也意味着其迁移到非 Transformer 模型族的效果尚未可知。
 
-## 背景与动机
+
 
 视觉-语言-动作模型（VLA）通过在视觉-语言模型基础上加入动作预测能力，使机器人能够根据视觉观察和语言指令直接生成控制命令。然而，标准 VLA 模型在面对复杂操作任务时性能有限，尤其是在需要多步推理的场景中表现不佳。
 
@@ -75,7 +77,9 @@ HyT 的关键机制是引入一个**模态变量（modality variable）** $m \in
 
 如 Figure 1 所示，HyT 成功打破了性能与速度的权衡——在 ClevrSkills 基准上达到与 ECoT 相当甚至更优的成功率（~53%），同时保持标准 VLA 的 3 Hz 推理频率。这一特性使得 HyT 在真实机器人部署中具有显著的实用优势。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 HyT 的核心创新在于引入**模态变量（modality variable）**作为条件开关，使单一 VLA 模型在训练时同时学习多种动作分布，从而在推理时无需生成中间思维即可获得思维训练带来的性能增益。这一设计直接解决了现有 CoT 方法的核心瓶颈：思维链虽能提升任务性能，但生成冗长的思维文本会显著降低推理频率，影响机器人部署的实时性（Figure 1）。
 
@@ -116,7 +120,7 @@ $$\min_\theta \mathcal{L}_{\text{hyt}}(\theta) = w_a \mathcal{L}_{\text{act}}(\t
 
 HyT 的关键优势在于打破了“性能提升必须牺牲推理速度”的 trade-off：在 ClevrSkills 基准上，HyT 在所有数据规模下均优于 ECoT 和 HiRobot（Figure 3）；在 LIBERO 基准上取得 93.7% 的平均成功率（Figure 5）；在真实世界实验中总体成功率达 63%±7，远超 OpenVLA 的 41%±7（Table 1），尤其在分布外任务上优势显著（如 banana in green bowl → rubber duck 任务中 HyT 50% vs OpenVLA 0%）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0011_IBJtOltTbx_Hybrid_Training_for_Vision-Language-Action_Model/figures/002_Figure_2.jpg]]
 *Figure 2: Hybrid Training (HyT) framework. Given a set of inputs, on the left, including a modality variable, the VLA model learns to conditionally generate a variety of outputs. Examples for the ‘think’ and ‘act’ conditional distributions are presented on the right*
@@ -157,7 +161,7 @@ HyT 框架与标准 VLA 架构完全兼容，其 pipeline 包含四个核心模�
 
 关键瓶颈在于：ECoT 等方法在推理时必须生成冗长的思维文本，导致动作执行频率显著下降。HyT 通过将思维生成限制在训练阶段，使推理时可直接使用 `<act>` 模式，从而在保持 CoT 训练带来的性能提升的同时，完全消除推理延迟（Figure 1）。实验进一步证实，HyT 训练后的模型在 act 和 think 模式下的性能几乎没有差异，说明 CoT 训练的主要收益来源于模型内部表征的改进，而非推理时必须产生中间思维（Section 5.1）。
 
-## 核心模块与公式推导
+
 
 ### 问题瓶颈与核心思路
 
@@ -208,7 +212,9 @@ $$\min_\theta \mathcal{L}_{\text{hyt}}(\theta) = w_a \mathcal{L}_{\text{act}}(\t
 
 关键发现：在 `act` 和 `think` 模式下，HyT 模型的性能几乎没有差异（Section 5.1），证明训练后的内部表征已足够强大，无需在推理时生成思维。这验证了核心假设——CoT 训练的收益源于表征改进，而非推理时的显式思维生成。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能权衡：推理速度与任务成功率
 
@@ -265,7 +271,9 @@ VLA 模型引入思维链（CoT）后，性能提升的代价是推理延迟显�
 - Table 1 的完整表格内容未在可见材料中呈现，仅通过文字描述了关键数据点，建议核实完整的任务级成功率及标准误差。
 - 消融实验（Figure 6、Figure 7）的具体数值和统计检验结果需要对照原文确认，当前仅依赖分析摘要中的定性描述。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的结构性对比
 
@@ -315,6 +323,8 @@ HyT 的有效性已在以下条件下验证：
 - **自动化思维提取**：能否通过强化学习或自监督方法从成功轨迹中自动提取有用思维，减少对 oracle 的依赖？
 - **跨模态推广**：HyT 的模态条件化思想能否扩展到力觉、触觉、听觉等其他具身输入模态？
 - **大规模预训练**：在大规模预训练 VLA 上应用 HyT 是否会进一步激发性能，还是存在饱和现象？LIBERO 上的饱和结果（Table 2）需要更大规模基准验证。
+
+
 
 ## 原文 PDF
 

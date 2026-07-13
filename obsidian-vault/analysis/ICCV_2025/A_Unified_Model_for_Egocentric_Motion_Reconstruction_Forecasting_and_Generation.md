@@ -5,6 +5,8 @@ paper_level: A
 venue: ICCV
 year: 2025
 pdf_ref: paperPDFs/ICCV_2025/A_Unified_Model_for_Egocentric_Motion_Reconstruction_Forecasting_and_Generation.pdf
+project_link: https://chaitanya100100.github.io/UniEgoMotion/
+code_link: null
 aliases:
 - UMEMRFG
 tags:
@@ -40,7 +42,7 @@ claims:
 > - EE4D‑Motion (基于 EgoExo4D 的自建第一人称视频‑运动数据集) 上，MPJPE (m) – 重建全局关节误差 0.100 vs 0.116 (AvatarPoser) (-0.016)。
 > - EE4D‑Motion 上，Foot Slide – 预测足部滑移 (2‑4s) 2.60 vs 3.55 (Two‑stage) (-0.95)；Foot Slide – 生成足部滑移 (0‑2s) 2.89 vs 4.35 (Two‑stage) (-1.46)。
 
-## 概述
+## 概要
 
 第一人称 (egocentric) 运动理解在 AR/VR、人机交互与具身智能中至关重要，但现有方法普遍忽略图像中的场景语义信息，无法仅从单张第一人称图像生成或预测运动；同时，传统的骨盆中心运动表示与头戴设备输入不匹配，易引发脚部滑移和穿地等物理不合理现象。
 
@@ -50,7 +52,7 @@ claims:
 
 **方法定位**：UniEgoMotion 属于条件扩散运动生成方法族，与现有第一人称运动重建/预测工作（AvatarPoser、EgoEgo、EgoAllo）相比，其差异化在于统一任务框架、强视觉骨干与头部中心运动表示的协同设计。该方法弥合了第一人称视觉输入与 3D 运动合成之间的根本性鸿沟，为后续场景‑运动交互建模和文本驱动生成奠定了基础。
 
-## 背景与动机
+
 
 ### 第一人称 3D 运动理解的现实需求
 
@@ -72,7 +74,9 @@ claims:
 
 UniEgoMotion 的核心动机在于：**通过统一的扩散模型训练框架，将条件掩码策略与强视觉骨干相结合，使单一模型能够灵活适配重建、预测和生成三种任务；同时引入头部中心的运动表示，从根本上弥合第一人称视觉输入与 3D 运动合成之间的鸿沟。** 具体而言，训练时随机将条件输入（图像、轨迹）替换为可学习掩码令牌，模拟从完全观察到完全缺失的条件谱系；推理时使用掩码令牌填补缺失输入，实现单模型三任务的一致推理。在表示层面，将头部 SE(3) 变换投影至地板建立规范参考系，轨迹编码为帧间残差，体态编码为相对于该参考系的局部信息——这种设计不仅与头戴设备输入天然对齐，还通过地板投影正则化显式增强了运动的物理合理性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 UniEgoMotion 的核心创新并非单一技术点的突破，而是通过**三个相互耦合的设计变更**，系统性地解决了第一人称运动合成中长期存在的瓶颈：视觉输入与运动空间之间的语义鸿沟，以及传统运动表示与头戴设备输入之间的几何不匹配。
 
@@ -108,7 +112,7 @@ UniEgoMotion 将运动表示重构为**头部中心**的两分量分解（Figure
 
 分析中部分 baseline 方法（如 AvatarPoser、EgoEgo）的具体技术细节未在提供材料中充分展开，上述对比主要基于 UniEgoMotion 论文报告的数值。若需精确评估各创新点的独立贡献权重，建议对照原始 baseline 论文进行交叉验证。
 
-## 整体框架
+
 
 UniEgoMotion 构建了一个以 Transformer 解码器为核心的条件扩散模型，将第一人称图像与头戴设备轨迹作为条件信号，统一处理运动重建、预测与生成三大任务。整体 pipeline 围绕“噪声运动→条件去噪→干净运动”的扩散范式展开，并通过随机掩码策略实现单模型多任务适配。
 
@@ -164,7 +168,7 @@ pipeline 由四个关键模块串联构成：
 ![[assets/figures/papers/paper_list_l1884_A_Unified_Model_for_Egocentric_Motion_Reconstruction_Forecasting_and_Gen/figures/001_Figure_1.jpg]]
 *Figure 1: UniEgoMotion is a unified, scene-aware motion model designed for egocentric settings: (1) It generates plausible future motion from a single egocentric image – for example, predicting how you might take your shot on goal. (2) It forecasts upcoming motion using past egocentric video and ego-device trajectory, showing how you could complete your run-up to score. (3) It reconstructs accurate 3D motion from past egocentric observations, showing how you squatted down to reach the lower cabinet*
 
-## 核心模块与公式推导
+
 
 ### 3.1 条件扩散模型基础
 
@@ -223,7 +227,9 @@ $$\hat{\boldsymbol X}_{1:N} \gets \mathrm{concat}(\boldsymbol X_{1:n}, \hat{\bol
 ![[assets/figures/papers/paper_list_l1884_A_Unified_Model_for_Egocentric_Motion_Reconstruction_Forecasting_and_Gen/figures/010_Figure_7.jpg]]
 *Figure 7: Our egocentric motion representation decomposes motion into two components: (1) the egocentric trajectory projected onto the floor by removing pitch, roll, and height, and (2) the body pose relative to this projected egocentric trajectory*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -300,7 +306,9 @@ Figure 4 的预测定性对比显示，LSTM 基线倾向于预测“平均化”
 ![[assets/figures/papers/paper_list_l1884_A_Unified_Model_for_Egocentric_Motion_Reconstruction_Forecasting_and_Gen/figures/009_Table_3.jpg]]
 *Table 3: Ablation on Conditioning Inputs: We evaluate UniEgoMotion in two ablation settings–without video and without trajectory input. Additionally, we train two single-modality variants of UniEgoMotion by conditioning only on trajectory or only on video*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与第一人称运动重建方法的对比与定位
 
@@ -337,6 +345,8 @@ UniEgoMotion 的统一训练策略——随机将条件输入替换为可学习�
 3. **极端头部运动下的表示鲁棒性**：头部中心表示在极端头部运动（如翻滚）时，移除俯仰/翻滚角是否会丢失关键信息？如何自适应地保留必要自由度？
 4. **推理效率**：扩散模型推理速度相对较慢，是否有更高效的生成策略（如蒸馏、减少扩散步数）以支持实时应用？
 5. **场景合理性评估指标**：除现有语义相似度外，如何定量评估生成运动的“场景合理性”？是否需要引入物理仿真验证或接触一致性等新指标？
+
+
 
 ## 原文 PDF
 

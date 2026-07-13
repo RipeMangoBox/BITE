@@ -5,6 +5,7 @@ paper_level: A
 venue: arXiv
 year: 2024
 pdf_ref: paperPDFs/arxiv_2024/GraspDiffusion_Synthesizing_Realistic_Whole_body_Hand_Object_Interaction.pdf
+code_link: null
 project_link: https://yj7082126.github.io/graspdiffusion
 aliases:
 - GraspDiffusion
@@ -42,7 +43,7 @@ claims:
 > - DexYCB subset 上，Hand Contact ↑ 97.94 vs Affordance Diffusion 65.69 (+32.25)。
 > - Novel objects from DexYCB, 64 positions 上，Contact ratio ↑ 0.909 vs COOP 0.841 (+0.068)。
 
-## 概述
+## 概要
 
 生成包含正确手-物交互的全身图像是当前生成模型的一大瓶颈：手部区域面积小、姿态高度复杂，且需要理解物体的可供性（affordance），导致现有方法频繁出现手指扭曲、多臂、物体错位等错误。GraspDiffusion 针对这一难题，提出将3D抓握姿态显式生成与2D图像生成流水线相结合的两阶段方法，通过将物理约束和空间关系编码为可解释的3D先验，从根本上提升了交互的真实性。
 
@@ -50,7 +51,7 @@ claims:
 
 在全身生成测试中，GraspDiffusion 的 FID 达到 22.88，显著优于 ControlNet（Zhang et al., ICCV 2023）的 32.76；CLIPScore 为 0.767，优于 Champ（Zhu et al., ECCV 2024）的 0.739。3D 抓握姿态评估中，接触率达 0.909，姿态有效性误差仅 0.111，均大幅领先 COOP（Zheng et al., ICCV 2023）等方法。用户研究进一步表明，92.4% 的参与者认为其生成图像更真实合理，96.4% 认为其更好地遵循了抓握上下文。
 
-## 背景与动机
+
 
 生成包含真实手-物交互的全身人体图像是视觉内容创作、具身智能和虚拟现实等领域的核心需求。然而，这一任务面临着独特的挑战：手部区域在图像中占比极小，却需要表达高度复杂的姿态，同时必须与物体的几何形状和可供性（affordance）精确对齐。现有的生成模型在处理这一问题时暴露出系统性的缺陷。
 
@@ -60,7 +61,9 @@ claims:
 
 **本文的动机**正是弥合这一鸿沟：将三维抓握姿态的显式生成与二维图像扩散模型的表达能力相结合。核心直觉是，如果能够在三维空间中先生成物理合理的抓握姿态，再将其作为强空间条件注入图像生成过程，就能同时保证交互的正确性和图像的视觉质量。这一思路将问题解耦为两个可独立优化的子任务——全身抓握姿态合成与条件图像生成——并通过精心设计的空间条件编码和注意力注入机制将两者紧密耦合，从而在保持生成多样性的前提下，显著提升手-物交互的真实性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GraspDiffusion 的核心创新在于将**3D抓握姿态的显式生成**与**2D图像生成流水线**深度耦合，通过一系列“changed slots”系统性地解决了现有方法在全身手-物交互（HOI）生成中的瓶颈。
 
@@ -89,7 +92,7 @@ GraspDiffusion 的核心创新在于将**3D抓握姿态的显式生成**与**2D�
 
 这些创新点的协同作用使得GraspDiffusion在生成质量（FID 22.88 vs. ControlNet 32.76）、交互正确性（接触率0.909 vs. COOP 0.841）和用户偏好（92.4%认为更真实）上均取得了显著提升。
 
-## 整体框架
+
 
 GraspDiffusion 采用**两阶段流水线**，将3D抓握姿态合成与2D图像生成解耦，通过可解释的3D先验桥接物理约束与视觉真实感。图3给出了整体架构：第一阶段从单个物体网格及其相对人体的位置出发，合成包含手部抓握的全身3D姿态；第二阶段以该姿态参数为条件，生成高质量的手-物交互图像。
 
@@ -130,7 +133,7 @@ GraspDiffusion 采用**两阶段流水线**，将3D抓握姿态合成与2D图像
 ![[assets/figures/papers/paper_list_l1670_GraspDiffusion_Synthesizing_Realistic_Whole_body_Hand_Object_Interaction/figures/003_Figure_3.jpg]]
 *Figure 3: We present a two-stage pipeline to generate realistic human-object-interaction images. The first stage takes a single object model and its human-centric location to synthesize a 3D full-bodied grasping pose, providing scene-level context for image generation. The second stage takes reference from the 3D grasping pose, conditionally generating high-quality images*
 
-## 核心模块与公式推导
+
 
 GraspDiffusion 采用两阶段流水线架构（Figure 3），将3D抓握姿态生成与2D图像生成解耦，通过显式建模物理约束和空间关系来解决手-物交互生成中的扭曲与语义错误问题。
 
@@ -185,7 +188,9 @@ $$w = w' \cdot \log(1 + \sigma) \cdot \max(QK^T)$$
 
 其中 $w'$ 为用户定义的标量，$\sigma$ 为注意力图的标准差，$\max(QK^T)$ 为查询-键相似度的最大值。该自适应机制根据注意力动态调整注入强度。同时，使用反向手构建伪物体分割图作为负mask，抑制非预期手与物体的错误交互。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 评估设置与基线
 
@@ -250,7 +255,9 @@ GraspDiffusion 在三个维度上与多类方法进行系统比较：(1) **全�
 ![[assets/figures/papers/paper_list_l1670_GraspDiffusion_Synthesizing_Realistic_Whole_body_Hand_Object_Interaction/figures/012_Figure_9.jpg]]
 *Figure 9: Example results from different models. We display generation results from our pipeline with the same object and body pose, but with different personalized Stable Diffusion models that were acquired from CivitAI [1] and Huggingface [2]*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：全身手-物交互生成的瓶颈
 
@@ -315,6 +322,8 @@ GraspDiffusion的核心知识贡献在于：
 - **3D-2D解耦范式**：证明将抓握物理约束编码为3D先验并注入2D生成，是解决交互生成中物理合理性问题的有效策略。
 - **空间条件组合设计**：骨架+深度+遮蔽物体渲染的三条件组合被消融实验（Table 4）验证为不可或缺，为后续交互生成任务的条件设计提供了参考模板。
 - **注意力注入的交互引导**：语义分割注意力注入与负mask机制（Figure 6）提供了一种无需重新训练即可强化交互区域生成的推理时技术，具有向其他条件生成任务迁移的潜力。
+
+
 
 ## 原文 PDF
 

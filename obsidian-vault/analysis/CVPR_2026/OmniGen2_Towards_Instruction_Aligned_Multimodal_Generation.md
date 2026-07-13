@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/OmniGen2_Towards_Instruction_Aligned_Multimodal_Generation.pdf
+project_link: null
 code_link: "https://github.com/VectorSpaceLab/OmniGen2"
 aliases:
 - OmniGen2
@@ -41,7 +42,7 @@ claims:
 > - OneIG-Bench 上，Overall Score 0.47 vs 0.36 (BAGEL) (+0.11)。
 > - Emu-Edit 上，CLIP-Out 0.311 vs 0.307 (BAGEL) (+0.004)。
 
-## 概述
+## 概要
 
 ### 问题与动机
 
@@ -72,7 +73,7 @@ OmniGen2 在统一多模态生成领域定位为**指令对齐型解耦架构**�
 
 全RL课程在Emu-Edit、GEdit、OmniContext等基准上一致大幅超越基础模型，且未对单任务性能造成负面影响，体现了指令对齐的鲁棒性和泛化能力。
 
-## 背景与动机
+
 
 多模态生成模型在近年取得了显著进展，从早期的文本到图像（T2I）生成逐步扩展到图像编辑、上下文生成等更复杂的任务。然而，现有模型在实际部署中暴露出一个核心瓶颈：**在复杂真实场景（如上下文生成、精细编辑）中缺乏系统性的指令对齐，导致泛化能力不足，无法兼顾多任务性能**。具体表现为，模型往往能完成单一任务的生成，但面对组合指令、多图像上下文或需要精确空间控制的编辑任务时，指令跟随的准确性和一致性显著下降。
 
@@ -80,7 +81,9 @@ OmniGen2 在统一多模态生成领域定位为**指令对齐型解耦架构**�
 
 OmniGen2 正是针对上述缺口提出的解决方案。其核心洞察在于：**通过解耦生成路径和显式实例空间分离，基础模型能够保留更强的可塑性；在此基础上，渐进式多任务 RL 利用任务间的知识迁移，可以显著提升指令跟随的一致性和鲁棒性**。具体而言，OmniGen2 从两个方向切入：（1）构建一个架构简洁、灵活且鲁棒的基础模型，支持多样化的多模态生成任务；（2）设计一套多任务 RL 对齐方案，通过精心调度的课程学习实现全面的指令对齐。这一“基础模型 + 渐进式指令对齐”的两阶段设计，构成了 OmniGen2 的方法论核心。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 OmniGen2 的核心创新在于通过一套**解耦的生成架构**与**渐进式多任务强化学习对齐课程**，系统性地解决了多模态生成模型在复杂真实场景下指令对齐不足的瓶颈。其关键创新点可归纳为以下四个“changed slots”：
 
@@ -118,7 +121,7 @@ OmniGen2 的对齐策略突破了单任务 RL 微调的局限，提出**三阶�
 
 上述四个 changed slots 构成了一个完整的创新闭环：**解耦架构**提供可塑性基础，**可变长度条件注入**保留语义保真度，**Omni-RoPE** 解决多实例空间建模难题，**渐进式 RL 课程**实现系统性的指令对齐。这套组合使 OmniGen2 在 GenEval（0.95）、OneIG-Bench（0.47）、GEdit-Bench-EN（7.21）等基准上一致超越 BAGEL、Gemini-2.5-Flash-Image 等强基线，且不对任何单任务造成性能退化。
 
-## 整体框架
+
 
 OmniGen2 遵循“基础模型预训练 + 渐进式指令对齐”的两阶段设计范式。其核心架构采用**解耦的文本与图像生成路径**，由两个独立的 Transformer 模块分别承担自回归文本生成和扩散图像生成，二者通过视觉语言模型（VLM）的隐藏状态进行桥接。
 
@@ -156,7 +159,7 @@ OmniGen2 遵循“基础模型预训练 + 渐进式指令对齐”的两阶段�
 ![[assets/figures/papers/paper_list_l2331_https_arxiv_org_abs_2506_18871/figures/005_Figure_4.jpg]]
 *Figure 4: Overview of OmniContext benchmark. Left: Image genres included in OmniContext. Right: Example images for each genre in OmniContext*
 
-## 核心模块与公式推导
+
 
 ### 3.1 解耦式多模态生成架构
 
@@ -199,7 +202,9 @@ OmniGen2 的对齐训练采用三阶段渐进式多任务RL课程，使用Flow-G
 ![[assets/figures/papers/paper_list_l2331_https_arxiv_org_abs_2506_18871/figures/013_Figure_9.jpg]]
 *Figure 9: Full loss curves for the Omni-RoPE toy reconstruction experiment. Omni-RoPE converges substantially faster than prior positional encoding schemes. The inset shows late-stage optimization, where adding image index embeddings yields the lowest and most stable final loss*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能：多任务统一评测
 
@@ -266,7 +271,9 @@ Omni-RoPE 的设计通过一个玩具级重建任务得到了直接验证（Tabl
 ![[assets/figures/papers/paper_list_l2331_https_arxiv_org_abs_2506_18871/figures/023_Table_10.jpg]]
 *Table 10: RL curriculum ablation on out-of-distribution (OOD) benchmarks. Base denotes the model without RL*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 
@@ -307,6 +314,8 @@ OmniGen2 的能力边界在论文中得到了较为诚实的呈现，以下局�
 **多任务课程设计的泛化性。** Edit → T2I → IC 的课程顺序在图像生成领域被证明有效，但其背后的“从局部编辑到全局生成再到上下文推理”的递进逻辑能否泛化到视频生成、3D 生成等其他多模态任务？这需要跨领域的实验验证。
 
 **奖励黑客的系统性防御。** 消融实验中，加入美学奖励 HPSv3 导致 SC 与 IC 分数崩溃，这是一个典型的奖励黑客案例。如何设计更鲁棒的多目标对齐框架，在多个奖励信号之间建立安全的平衡机制，而非简单地加权求和，是多任务 RL 对齐的核心挑战。
+
+
 
 ## 原文 PDF
 

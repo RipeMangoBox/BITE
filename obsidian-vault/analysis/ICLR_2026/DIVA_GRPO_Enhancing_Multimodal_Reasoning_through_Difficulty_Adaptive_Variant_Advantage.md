@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/DIVA_GRPO_Enhancing_Multimodal_Reasoning_through_Difficulty_Adaptive_Variant_Advantage.pdf
+project_link: null
+code_link: https://github.com/Siaaaaaa1/DIVA-GRPO
 openreview_forum_id: qKXYEg00eH
 aliases:
 - DG
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | DIVA-GRPO：通过难度自适应变体优势增强多模态推理 |
 | 英文题名 | DIVA-GRPO: Enhancing Multimodal Reasoning through Difficulty-Adaptive Variant Advantage |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=qKXYEg00eH); [GitHub](https://github.com/Siaaaaaa1/DIVA-GRPO) |
+| Links | [paper](https://openreview.net/forum?id=qKXYEg00eH) · [GitHub](https://github.com/Siaaaaaa1/DIVA-GRPO) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | DIVA-GRPO |
 | Dataset | MathVista, MathVerse, MathVision, OlympiadBench |
@@ -42,7 +44,7 @@ claims:
 > - MathVerse 上，Accuracy 为 57.6，对比 Qwen-2.5-VL-7B: 47.9，变化 +9.7。
 > - MathVision 上，Accuracy 为 32.1，对比 Qwen-2.5-VL-7B: 25.4，变化 +6.7。
 
-## 概述
+## 概要
 
 多模态推理任务中，基于组相对策略优化（GRPO）的强化学习方法面临一个根本性瓶颈：问题难度分布不均导致组内奖励方差过小或过大，使得优势信号稀疏甚至消失，优化信号不稳定，训练效率低下。现有方案要么选择性利用部分数据，造成样本浪费；要么无差别地增强样本，反而加剧优势稀疏。
 
@@ -60,7 +62,7 @@ claims:
 
 该方法目前仅在多模态数学推理任务上得到验证，对纯文本或不同奖励结构任务的泛化能力仍有待探索；困难问题的变体生成依赖外部语言模型，可能引入模型偏差；难度加权中的超参数需针对任务调优，降低了开箱即用的便利性。
 
-## 背景与动机
+
 
 ### 多模态推理中的强化学习瓶颈
 
@@ -90,7 +92,9 @@ DIVA-GRPO的核心洞察在于：**问题的难度并非静态属性，而应作
 
 这些设计共同指向一个目标：**在保持优化方向无偏的前提下，降低梯度估计方差，提升训练稳定性与效率**。理论分析（附录B）表明，难度加权和归一化可有效降低梯度方差并保持无偏估计，而50/50的正确-错误比例提供最强的优化信号。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DIVA-GRPO针对GRPO在多模态推理中面临的**奖励稀疏与优势消失**瓶颈，提出了一套以“难度自适应变体生成”为核心的优化框架。其根本问题在于：问题难度分布不均导致组内奖励方差过小（困难问题所有回应均错误）或过大（简单问题所有回应均正确），使得标准化优势信号趋于零或噪声主导，优化方向不稳定，训练效率低下。
 
@@ -114,7 +118,7 @@ $$\Delta r_q = (\max(\mathcal{R}_q) - \min(\mathcal{R}_q)) / R_{\max}, \quad \ha
 
 **创新点之间的因果联动**：难度评估模块（Section 3.1）通过历史rollout准确率动态更新每个问题的难度系数，驱动变体生成策略选择合适难度的变体；变体生成扩展了奖励空间，使全局优势计算成为可能；批归一化平衡了局部与全局优势的尺度；难度加权和奖励范围重标定则分别从“问题难度”和“奖励差异可信度”两个维度对优势信号进行精细校准。四者协同作用，从根本上缓解了奖励稀疏与优势消失问题，同时将训练所需步数减少至多2.55倍，端到端时间加速1.76倍（Figure 3c, Section 4.3 RQ4）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_qKXYEg00eH/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the proposed DIVA-GRPO method. For a given question, we dynamically assess its difficulty based on past rollout rewards and adaptively sample variants of different difficulty levels. As shown, when the original question is hard, easier variants are sampled to ensure reward diversity. We then compute local (the question itself) and global (the question with its variants) advantages, and obtain the final advantage through difficulty-aware reweighting and reward-range rescaling to update the policy model*
@@ -152,7 +156,7 @@ DIVA-GRPO 的整体流程围绕一个核心设计展开：**通过动态难度�
 
 **模块间的因果依赖。** 难度评估是整个流程的“调度器”——它决定了变体生成的方向，进而影响全局优势的奖励分布；难度加权和 RRB-Rescaling 则是对已计算优势的“后处理校准”，两者互补：前者解决难度差异导致的信号尺度失衡，后者解决奖励范围过窄导致的信噪比恶化。消融实验表明，移除任一模块均导致性能下降，全模型组合达到最优（Table 2）。
 
-## 核心模块与公式推导
+
 
 ### 3.1 难度评估模块
 
@@ -228,7 +232,9 @@ $$\nabla_{\boldsymbol{\theta}} \mathcal{L}(\boldsymbol{\theta}) = \mathbb{E}_{\b
 
 理论分析（Appendix B, C）证明，难度加权和批归一化可在保持梯度估计无偏的前提下降低梯度方差，且 50/50 的正确-错误比例能够提供最强的优化信号。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与实验动机
 
@@ -304,7 +310,9 @@ Table 4（附录C.2）在Qwen3-VL-4B和Qwen3-VL-8B上验证了DIVA-GRPO的跨模
 - 所有变体生成依赖外部模型GPT-o3离线预生成，论文未验证完全脱离外部模型（如使用模型自身生成变体）的可行性。
 - 超参数$k$（难度加权指数）和$\eta$（难度更新步长）需针对任务调优，开箱即用的鲁棒性未充分验证。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -342,6 +350,8 @@ $$A ( y _ { i } ) = \frac { r ( y _ { i } ) - \mu _ { r } } { \sigma _ { r } + \
 3. **连续奖励信号的适配**：当前方法假设奖励为二值（正确/错误），难度更新规则也基于此设计。对于连续奖励信号（如 BLEU、ROUGE 或人工评分）的环境，难度评估和优势加权机制应如何调整？奖励范围重标定中的 $R_{\max}$ 归一化可能需要重新定义。
 
 4. **难度评估的理论最优性**：当前难度更新规则使准确率向 0.5 收敛，理论分析表明 50/50 的正确-错误比例给出最强优化信号。但在实际训练中，不同阶段的最优难度分布是否应动态变化？训练初期可能需要更多简单样本以稳定学习，后期则需要更多困难样本以突破瓶颈。
+
+
 
 ## 原文 PDF
 

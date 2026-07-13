@@ -42,7 +42,7 @@ claims:
 > [!tip] 效果简介
 > - Open-world scene images (74 collected images) 上，ULIP ↑ 0.1466 vs 0.1417 (PartPacker) (+0.0049)；ULIP-2 ↑ 0.3220 vs 0.3083 (PartPacker) (+0.0137)；Uni3D ↑ 0.3021 vs 0.2887 (PartPacker) (+0.0134)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -74,8 +74,6 @@ SceneTransporter将结构化3D场景生成重新定义为**最优传输引导的
 
 当前方法在细小且密集重复的物体场景中（如拥挤的船只、树木）可能将少数弱实例合并到相邻物体中；面对严重分布外（OOD）的真实图像时几何质量下降，需通过风格迁移预处理缓解。未来方向包括：将边缘正则化器替换为端到端可学习模块以减少预处理依赖；扩展至视频或多视图输入以实现时序一致的结构化场景生成；以及在大规模开放世界数据上微调以消除合成到真实的领域差距。
 
-## 背景与动机
-
 ### 结构化3D场景生成的任务困境
 
 从单张图像生成具有实例级语义分离的完整3D场景，是计算机视觉与图形学交叉领域的前沿难题。与单物体生成不同，场景生成要求模型同时完成**几何重建**与**结构理解**——不仅需要推断每个物体的三维形状，还必须正确地将场景分解为语义连贯、边界清晰的独立部件。这一双重需求使得现有的“分而治之”范式（先检测分割、再逐物体重建、最后组装）面临根本性瓶颈：流水线各阶段独立优化，误差在阶段间累积且无法反向修正，导致最终场景出现物体错位、尺度失调和几何冲突。
@@ -97,7 +95,7 @@ SceneTransporter将结构化3D场景生成重新定义为**最优传输引导的
 
 由此，本文提出 **SceneTransporter**，在组合潜扩散模型的去噪循环内部，引入基于熵最优传输的全局相关性分配机制，显式地注入两种结构约束：（1）通过OT计划门控交叉注意力，强制执行排他性的patch到部件一对一路由，从根本上阻断跨部件的特征泄漏；（2）利用边缘正则化的分配代价，引导空间上相邻的相似patch自然聚集成连贯物体，同时惩罚跨边缘的信息传播，在无监督条件下实现清晰的实例边界分离。
 
-## 核心创新
+## 核心方法与创新机理
 
 SceneTransporter 的核心创新在于将结构化 3D 场景生成重新定义为**全局相关性分配问题**，并通过最优传输（Optimal Transport, OT）框架在组合潜扩散模型的去噪循环内部显式注入两种结构约束，从根本上解决了现有部件级生成器中普遍存在的特征纠缠与几何冗余问题。
 
@@ -162,8 +160,6 @@ SceneTransporter 在 DiT 去噪器的前半部分块（前 12 个注意力块）
 
 这两种约束的**协同效应**是方法成功的关键：OT 门控提供了全局排他性路由的骨架，边缘正则化代价则在局部层面精炼了分配边界。单独使用任一组分均无法达到完整模型的性能（Table 4 a.1–a.2）。
 
-## 整体框架
-
 SceneTransporter 构建于组合式潜扩散模型之上，将结构化 3D 场景生成重新定义为**最优传输引导的全局相关性分配问题**。其核心流程如下：
 
 ### 输入编码与令牌初始化
@@ -188,8 +184,6 @@ SceneTransporter 构建于组合式潜扩散模型之上，将结构化 3D 场�
 
 ![[assets/figures/papers/paper_list_l62_https_openreview_net_forum_id_xjCkwPhQWq/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison between our end-to-end scene generation pipeline in (c) with compositional 3D latent diffusion and existing “divide and conquer” methods*
-
-## 核心模块与公式推导
 
 SceneTransporter 的核心创新在于将去噪循环中的视觉证据路由重新定义为一个**全局最优传输（Optimal Transport, OT）引导的相关性分配问题**。该方法在组合潜扩散模型的交叉注意力机制中显式注入两种结构约束：排他性的一对一路由和边缘感知的分配代价。
 
@@ -269,7 +263,7 @@ $$\widehat{\mathbf{Z}}^{(t)}(S_i,:) = \mathrm{Concat}_{h=1}^H [\mathbf{H}_h^{(i)
 ![[assets/figures/papers/paper_list_l62_https_openreview_net_forum_id_xjCkwPhQWq/figures/009_Figure_7.jpg]]
 *Figure 7: Qualitative Ablation Studies on the OT Plan Progression over Denoising Steps. Each map visualizes the hard OT plan at a given denoising step: every cell is an image patch assigned to one volume (dark blue = A, light cyan = B). Left→right shows the OT plan’s evolution; later steps mostly stabilize with only local refinements*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心瓶颈的实证诊断
 
@@ -326,10 +320,7 @@ Table 4系统拆解了SceneTransporter各组件的贡献，默认配置以星号
 ![[assets/figures/papers/paper_list_l62_https_openreview_net_forum_id_xjCkwPhQWq/figures/011_Figure_8.jpg]]
 *Figure 8: Qualitative Results on Structured 3D Scene Generation from Real-World Images. We use a GPT-5–based image editing model to transfer the style of real-world images, making them look like images rendered from a graphics engine*
 
-![[assets/figures/papers/paper_list_l62_https_openreview_net_forum_id_xjCkwPhQWq/figures/014_Figure_10.jpg]]
-*Figure 10: Effect of adding a residual vanilla cross-attention branch. Left to right: input image, PartPacker baseline, our OT-guided routing, and our OT-guided routing with an additional residual cross-attention branch (Ours residual), which recovers the small crowded instances (e.g., boats) while preserving the improved global layout and part separation*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 任务定位与基线谱系
 

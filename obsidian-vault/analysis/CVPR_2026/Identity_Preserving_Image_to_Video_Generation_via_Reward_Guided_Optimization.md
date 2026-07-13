@@ -44,7 +44,7 @@ claims:
 > - Small-face evaluation set (600 scenes) 上，FaceSim↑ 0.6960 vs 0.4769 (+45.9%)；FaceSim↑ 0.5460 vs 0.3788 (+44.1%)；FaceSim↑ 0.6942 vs 0.5780 (+20.1%)。
 > - VBench-I2V metrics 上，Subject Consistency↑ 0.9811 (in-house) vs 0.9768 (+0.4%)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有图像到视频（I2V）生成模型在处理低分辨率人脸与大运动场景时，因训练中的曝光偏差（exposure bias）导致身份特征随时间逐渐漂移，产生“平均脸”效应。单纯增加身份模块无法解决这一根本性分布不匹配问题。
 
@@ -60,7 +60,7 @@ claims:
 
 **局限性**：当前方法仅关注面部身份一致性，对配饰、服装等非面部身份元素的保持尚未探索；奖励黑客现象虽被大幅抑制，仍无法完全消除（黑客率约 10%）。
 
-## 背景与动机
+
 
 ### 图像到视频生成的身份保持困境
 
@@ -98,7 +98,9 @@ claims:
 
 IPRO无需引入额外的身份编码模块，可直接应用于现有的I2V扩散模型，通过强化学习范式高效提升身份保持能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 IPRO 的核心创新在于将身份保持问题从“架构修改”范式转向“奖励驱动优化”范式。与传统方法在扩散模型中注入额外的身份编码模块不同，IPRO 直接利用可微分的人脸识别模型作为奖励信号，通过强化学习微调预训练 I2V 模型的去噪网络参数，从根本上改变了模型学习身份一致性的方式。
 
@@ -150,7 +152,7 @@ IPRO 与现有身份保持方法的关键差异在于**不需要任何额外的�
 
 与 **DPO**（Wallace et al., CVPR 2024）和 **GRPO**（Shao et al., arXiv 2024）等偏好优化方法相比，IPRO 使用身份奖励模型直接提供密集、校准的梯度信号，而非依赖成对偏好比较，在 FaceSim 指标上显著优于两者（0.6942 vs 更低分数）。与 SFT 和 CLIP reward 等训练框架相比，IPRO 的 ArcFace 奖励优化在身份一致性上同样展现出压倒性优势。
 
-## 整体框架
+
 
 IPRO 的整体流程围绕一个核心闭环展开：**从纯噪声出发生成视频 → 解码到像素空间 → 用可微分面部奖励模型评分 → 将奖励梯度反向传播更新去噪网络**。这一闭环直接对齐了训练与推理的分布，从根本上消除了传统 I2V 模型中因教师强制训练带来的曝光偏差。
 
@@ -202,7 +204,7 @@ $$\mathcal{L} = \lambda_1 \mathcal{L}_{Reward} + \lambda_2 \mathcal{L}_{KL}$$
 
 传统 I2V 训练使用教师强制：模型在训练时看到的是 GT 前帧，推理时却只能依赖自己生成的前帧，这种曝光偏差导致身份特征随时间漂移，最终产生“平均脸”效应。IPRO 的策略化训练从纯噪声开始，使模型始终面对自己生成的上下文，训练与推理分布严格对齐。此外，IPRO 不需要额外插入身份模块（如 Concat-ID 的身份嵌入层或 MoCA 的特征注入分支），而是通过奖励信号直接塑造去噪网络的内部表示，方法更加简洁且通用。
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题形式化：从扩散模型到身份奖励优化
 
@@ -304,7 +306,9 @@ IPRO 的完整推理与训练管线（Figure 2）包含以下可训练与冻结�
 ![[assets/figures/papers/paper_list_l2685_https_arxiv_org_abs_2510_14255/figures/012_Figure_8.jpg]]
 *Figure 8: Ablation study on reward hacking. Without KL-divergence regularization or the FSM module, the generated video overly adheres to the input image, resulting in facial rigidity and reward hacking phenomenon. However, our method enables accurate, expressive prompt-following behavior, such as opening eyes*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -370,7 +374,9 @@ IPRO 的完整推理与训练管线（Figure 2）包含以下可训练与冻结�
 ![[assets/figures/papers/paper_list_l2685_https_arxiv_org_abs_2510_14255/figures/007_Figure_6.jpg]]
 *Figure 6: Qualitative comparison with DPO and GRPO. Our method achieves more stable generation and superior identity preservation compared to others*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：I2V身份漂移的本质瓶颈
 
@@ -425,6 +431,8 @@ IPRO的方法论贡献可解构为三个相互依赖的组件：
 ### 5. 开放问题
 
 论文明确指出将身份保持从面部扩展到非面部属性是未来的研究方向。更广义地，该方法框架提出了一个开放问题：**如何为视频扩散模型设计多维度、可分解的奖励函数，在身份一致性、运动自然度、文本对齐之间实现精细权衡？** 当前的总损失 $\mathcal{L} = \lambda_1 \mathcal{L}_{Reward} + \lambda_2 \mathcal{L}_{KL}$ 仅通过两个标量权重平衡，未来可能需要更结构化的多目标优化策略。
+
+
 
 ## 原文 PDF
 

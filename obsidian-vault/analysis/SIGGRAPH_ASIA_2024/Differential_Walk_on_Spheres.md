@@ -5,6 +5,7 @@ paper_level: A
 venue: "SIGGRAPH Asia"
 year: 2024
 pdf_ref: paperPDFs/SIGGRAPH_ASIA_2024/Differential_Walk_on_Spheres.pdf
+code_link: null
 project_link: https://imaging.cs.cmu.edu/differential_walk_on_spheres/
 aliases:
 - DWS
@@ -28,12 +29,16 @@ claims:
 | 中文题名 | Differential Walk on Spheres |
 | 英文题名 | Differential Walk on Spheres |
 | 会议/期刊 | SIGGRAPH Asia 2024 |
-| Links | [paper](https://arxiv.org/abs/2405.12964); [Project](https://imaging.cs.cmu.edu/differential_walk_on_spheres/) |
+| Links | [paper](https://arxiv.org/abs/2405.12964) · [Project](https://imaging.cs.cmu.edu/differential_walk_on_spheres/) |
 | Topic | #topic/optimization_theory_probabilistic #topic/optimization_theory_probabilistic/optimization_methods |
 | Method |  |
 | Dataset | |
 
-## 概述
+
+> [!tip] 效果简介
+> 量化结果、消融证据与适用边界见“实验与关键发现”。
+
+## 概要
 
 本文提出一种**差分Walk on Spheres（Differential WoS）**蒙特卡洛方法，用于计算带屏蔽泊松方程（screened Poisson equation）的解对问题参数（如域几何、边界条件）的导数。核心优势在于：导数可在任意点求值，无需全局求解或构造体网格/面网格。
 
@@ -41,7 +46,7 @@ claims:
 
 差分WoS支持广泛的边界表示（隐式曲面、样条、网格），可直接优化边界控制点、纹理等参数。实验涵盖形状反演、形状优化、边界条件优化等应用，展示了在噪声导数估计下仍能有效收敛的特性。
 
-## 背景与动机
+
 
 ### 问题背景：PDE 解对参数的导数计算
 
@@ -79,7 +84,9 @@ $$ \Delta u - \sigma u = f \quad \text{在} \ \Omega \ \text{内}, \quad u = g \
 
 该方法为 PDE 约束的形状优化、反问题求解等任务提供了一种灵活、可扩展的蒙特卡洛梯度估计框架。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作的核心创新在于提出了一种**差分蒙特卡洛方法**，首次实现了无需全局求解或体网格即可对偏微分方程（PDE）的解关于问题参数（如域几何、边界条件）进行任意点处的导数计算。该方法建立在 Walk on Spheres（WoS）算法之上，其本质可归结为**耦合两个随机游走**：一个用于估计原始 BVP 的解，另一个嵌套其中以估计微分 BVP 的解。
 
@@ -115,7 +122,7 @@ $$\widehat{\frac{\partial u}{\partial n}}(x) := \frac{g(x) - \widehat{u}(x - \el
 
 与同样基于 WoS 的法向导数估计工作（Miller et al., 2023）相比，本工作不仅将导数估计从边界法向导数扩展到任意参数的完整导数，还通过微分 BVP 的推导将其统一为一个可递归估计的框架。与基于伴随方法的 PDE 约束优化相比，本方法避免了全局线性系统的求解和伴随方程的逆向传播，实现了**点态、无网格、可并行的导数估计**。
 
-## 整体框架
+
 
 本方法的核心目标是对受参数 $\pi$（如域几何、边界条件）控制的筛选泊松方程（screened Poisson equation）的解 $u(x,\pi)$ 进行微分，并计算形状泛函 $\mathcal{L}(\pi)$ 对参数 $\pi$ 的导数 $\frac{\mathrm{d}\mathcal{L}}{\mathrm{d}\pi}$，以支持 PDE 约束下的形状优化与逆问题。
 
@@ -158,7 +165,7 @@ $$\widehat{\frac{\partial u}{\partial n}}(x) := \frac{g(x) - \widehat{u}(x - \el
 - 支持多种边界表示（隐式曲面、样条、网格），这些表示可能不被传统求解器直接处理（Figure 3）。
 - 通过控制每次导数估计的行走数量，可在效率与噪声之间灵活权衡（Figure 7）。
 
-## 核心模块与公式推导
+
 
 ### 3.1 边界速度场参数化
 
@@ -234,7 +241,9 @@ $$\frac{\mathrm{d}\mathcal{L}}{\mathrm{d}\pi}(\pi) = \int_{\Omega(\pi)} \mathrm{
 
 该导数包含两项：域积分涉及 $\dot{u}$（由微分WoS估计），边界积分涉及法向速度 $\mathbf{V}_n$。由于 $\widehat{u}$ 和 $\widehat{\dot{u}}$ 来自同一条游走的联合估计存在相关性，直接相乘会引入偏差，论文采用独立游走分别估计以消除该偏差（见 Figure 5）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置与效率-精度权衡
 
@@ -274,7 +283,9 @@ $$\frac{\mathrm{d}\mathcal{L}}{\mathrm{d}\pi}(\pi) = \int_{\Omega(\pi)} \mathrm{
 2. **与其他方法的对比基准**：论文声称微分WoS无需全局求解或体网格，但未在片段中提供与传统伴随法（adjoint method）或有限差分法的定量对比数据，需人工核实原文是否包含此类基准实验。
 3. **Figure 8的具体数据**：法向导数估计器的方差-偏差对比仅提供了定性结论（“相似偏差、更低方差”），具体数值和实验条件需从原文图表中提取。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 方法根基：从 Walk on Spheres 到微分边界值问题
 
@@ -302,6 +313,8 @@ $$\frac{\mathrm{d}\mathcal{L}}{\mathrm{d}\pi}(\pi) = \int_{\Omega(\pi)} \mathrm{
 1. **开边界拓展**：当前公式假设封闭边界域，如何将微分 BVP 公式扩展到开边界场景尚待研究（Section 4 提及，Section 8 列为开放问题）。
 2. **边界附近的导数估计器系统比较**：本文仅比较了后向差分估计器与 Miller et al. (2023) 的偏移点估计器，作者指出未来可进行更全面的比较，包括离中心梯度估计器等（Section 5.1 提及）。
 3. **乘积估计的去偏**：当需要同时估计 $u$ 和 $\dot{u}$ 的乘积时（如损失函数梯度中的积分项），单次游走同时提供两者的估计会引入相关性偏差。Figure 5 展示了这一问题，但本文未深入讨论去偏策略的普适性。
+
+
 
 ## 原文 PDF
 

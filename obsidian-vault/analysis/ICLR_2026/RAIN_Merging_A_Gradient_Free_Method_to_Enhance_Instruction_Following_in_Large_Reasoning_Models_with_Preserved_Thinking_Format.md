@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/RAIN_Merging_A_Gradient_Free_Method_to_Enhance_Instruction_Following_in_Large_Reasoning_Models_with_Preserved_Thinking_Format.pdf
+project_link: null
+code_link: https://github.com/K1nght/RAIN-Merging
 openreview_forum_id: PO2iULmu5e
 aliases:
 - RAIN-Merging
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | RAIN-Merging：一种无需梯度的增强大型推理模型指令遵循并保留思考格式的方法 |
 | 英文题名 | RAIN-Merging: A Gradient-Free Method to Enhance Instruction Following in Large Reasoning Models with Preserved Thinking Format |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=PO2iULmu5e); [GitHub](https://github.com/K1nght/RAIN-Merging) |
+| Links | [paper](https://openreview.net/forum?id=PO2iULmu5e) · [GitHub](https://github.com/K1nght/RAIN-Merging) |
 | Topic | #topic/optimization_theory_probabilistic #topic/optimization_theory_probabilistic/optimization_methods |
 | Method | RAIN-Merging |
 | Dataset | IFEval (strict accuracy), Math (average over six benchmarks), Instruction Following Average (IFEval, CELLO, InfoBench, ComplexBench), Reasoning & General Average (Math, GPQA, Aider, Arena-Hard-v2) |
@@ -41,7 +43,7 @@ claims:
 > - Math (average over six benchmarks) 上，Accuracy (%) 为 68.75，对比 64.75 (LRM)，变化 +4.00。
 > - Instruction Following Average (IFEval, CELLO, InfoBench, ComplexBench) 上，Avg. Accuracy 为 48.11，对比 44.12 (LRM)，变化 +3.99。
 
-## 概述
+## 概要
 
 **问题瓶颈**：大型推理模型（LRM）在数学、代码等复杂推理任务上表现优异，但其指令遵循能力薄弱。一个关键的结构性冲突在于：LRM 的输出包含显式的 `<think>...</think>` 思考段，而指令微调模型（ITM）仅输出最终答案。若直接对两者进行参数合并，会破坏 LRM 的思考格式，进而损害推理能力。参数空间分析表明，LRM 与 ITM 的任务向量在各子模块的主子空间余弦相似度均低于 0.1，说明两种能力的参数主方向近乎正交——这为轻量合并提供了可能，但输出格式差异仍构成核心障碍。
 
@@ -51,7 +53,7 @@ claims:
 
 **方法定位**：RAIN-Merging 属于无训练合并方法，仅需少量校准数据（150 条推理样本 + 365 条指令样本）用于构建零空间和计算注意力指标，无需梯度更新。其核心贡献在于将输出格式保护显式编码为参数子空间约束，并以注意力信号引导模块级合并强度，为推理与指令遵循能力的协同增强提供了新的调控范式。
 
-## 背景与动机
+
 
 大型推理模型（LRM）通过显式的链式思考（Chain-of-Thought）机制在数学、编程等复杂推理任务上取得了显著进展，但其指令遵循能力相对薄弱。以 **DeepSeek-R1-Distill-Qwen-7B** 为代表的 LRM 在输出中具有明确的 `<think>...</think>` 思考段，而指令微调模型（ITM，如 **Qwen2.5-7B-Instruct**）仅输出最终答案，两者在输出格式上存在根本性差异。
 
@@ -65,7 +67,9 @@ claims:
 
 上述缺口驱动了 **RAIN-Merging** 的提出：一种无需梯度的两阶段合并方法，核心动机在于**在保持思考格式不变的前提下，选择性增强指令遵循能力**。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 RAIN-Merging的核心创新在于一种**双阶段、无梯度的模型合并机制**，专门解决大型推理模型（LRM）在增强指令遵循能力时面临的**思考格式破坏**与**推理能力退化**两大瓶颈。其关键洞察是：推理与指令遵循两个任务的任务向量在参数空间近乎正交（主子空间余弦相似度低于0.1，Fig. 2），理论上可进行轻量合并，但直接合并会因输出格式差异（LRM具有`<think>...</think>`思考段，而指令微调模型ITM仅输出最终答案）导致思考段分布偏移。
 
@@ -107,7 +111,7 @@ $$\theta_\star = \theta_R + \lambda \bigoplus_{k=1}^{K} \alpha_\star^k \Delta_I^
 
 **方法定位**：RAIN-Merging属于**数据依赖的模型合并**方法，与Task Arithmetic（Ilharco et al., 2023）、TIES、DARE-TIES等无数据方法以及ACM-TIES、LEWIS-TIES、AIM-TIES等数据依赖方法形成对比。其独特之处在于首次将**思考格式的结构约束**显式建模为参数空间的零空间投影，并结合**指令注意力代理指标**实现模块级自适应合并。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_PO2iULmu5e/figures/001_Figure_1.jpg]]
 *Figure 1: An overview of RAIN-Merging. In the case, the LRM arrives at the correct solution but ignores the required format and specific code. To preserve the reasoning structure, we perform training-free merging by combining a task vector projected onto the null space of the thinking format with instruction-attention guided coefficients. The merged model remains correct while satisfying the specified constraints. See Sec. 3 for details*
@@ -126,7 +130,7 @@ RAIN-Merging 是一种无需梯度的两阶段模型合并方法，其核心目�
 
 最终合并模型由推理锚点参数、全局标量 $\lambda$ 和缩放后的投影任务向量组合而成（Eq. 16），仅合并对注意力输出敏感的 Q、K、V、O 及 FFN 模块。整个合并过程仅需约 21 分钟，无需任何梯度计算。
 
-## 核心模块与公式推导
+
 
 RAIN-Merging 的核心调控机制由两个级联阶段构成：**推理感知的零空间投影（Stage 1）** 与 **指令注意力引导的模块缩放（Stage 2）**。两阶段共同解决一个约束优化问题——在保持思考格式 KL 散度不超过阈值 $\delta$ 的前提下，最大化指令跟随代理目标 $\mathcal{I}_I$：
 
@@ -203,7 +207,9 @@ $$
 - **校准数据**：Stage 1 从 Mixture-of-Thoughts 采样 150 个思考格式样本；Stage 2 从 IFEval 蒸馏并通过 LLM-as-Judge 筛选得到 365 条带标注指令范围的样本
 - **公平性**：所有数据依赖合并方法使用相同的校准数据，并统一应用 TIES 后处理（符号一致性与幅度截断）
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：指令遵循与推理能力的全面权衡
 
@@ -321,7 +327,9 @@ Figure 6 展示了合并后模型在各层的指令注意力得分（对齐度 �
 *Table: A6: Math benchmark results under the same configuration as in Tab. 1. “Avg.” denotes the average over all math benchmarks. The best and second-best results are highlighted in bold and underlined, respectively*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与调控逻辑
 
@@ -405,6 +413,8 @@ RAIN-Merging在合并范式上的三个关键改进槽位：
 4. **大规模验证**：在70B+参数规模和更多架构（如非Qwen系列、混合专家模型）上的效果如何？
 5. **多模态扩展**：RAIN-Merging的零空间投影和指令注意力引导机制能否适配视觉-语言模型的多模态输入输出格式？
 6. **动态合并策略**：当前方法使用静态校准集计算合并系数，能否设计在线自适应机制，根据推理时的指令类型动态调整缩放系数？
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/Featurising_Pixels_from_Dynamic_3D_Scenes_with_Linear_In_Context_Learners.pdf
+code_link: null
 project_link: https://lila-pixels.github.io
 aliases:
 - LLCL
@@ -42,7 +43,7 @@ claims:
 > - NYUv2 (Surface Normal Estimation) 上，RMSE (lower is better) 25.71 (DINO2-B14+LILA) vs 26.56 (DINO2-B14) (-0.85)。
 > - COCO-Stuff (Semantic Segmentation) 上，mIoU 62.4 (DINO2-B14+LILA) vs 58.5 (DINO2-B14) (+3.9)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -77,7 +78,7 @@ LILA 处于**视频自监督表示学习**与**像素级特征上采样**的交�
 
 LILA 的训练信号依赖预训练的深度和光流模型，在航空影像等域外场景中因阴影等因素导致线索不可靠，表示质量显著下降。当前仅训练解码器，编码器被冻结，联合优化的潜力尚未释放。开放问题包括：能否在训练中自举几何线索而不依赖固定预训练网络？线性上下文学习范式能否扩展到其他几何模态或多模态输入？
 
-## 背景与动机
+
 
 ### 问题背景：像素级稠密特征化的挑战
 
@@ -106,7 +107,9 @@ LILA 的训练信号依赖预训练的深度和光流模型，在航空影像等
 - **推理高效**：深度和光流网络仅在训练阶段用于生成监督信号，推理时被完全丢弃，模型仅需单张图像输入；
 - **通用性强**：学习到的特征可同时服务于视频目标分割、表面法线估计、语义分割等多种下游任务，展现出广泛的迁移能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈与设计动机
 
@@ -158,7 +161,7 @@ $$\mathcal{L}_{\mathrm{LILA}} = \mathcal{L}_{\mathrm{L1}} + \gamma \mathcal{L}_{
 
 值得注意的是，LILA 训练仅使用未标注视频，不依赖任何人工标注数据。深度和光流网络仅在训练阶段用于生成线索图，推理时被丢弃，模型仅需单张图像输入，推理计算量与标准编码器-解码器相同。这一设计使其在保持推理效率的同时，显著提升了特征的几何细节和时间一致性。
 
-## 整体框架
+
 
 LILA 的整体框架围绕一个冻结的视觉编码器与一个可训练的稠密解码器构建，其核心训练策略——线性上下文学习——将跨帧时间一致性约束注入像素级特征学习过程。图 1 给出了方法的高层概览：从未标注视频中训练编码器-解码器模型，输出高分辨率且时间一致的特征图。
 
@@ -193,7 +196,7 @@ LILA 的整体框架围绕一个冻结的视觉编码器与一个可训练的稠
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2604_26488/figures/001_Figure_1.jpg]]
 *Figure 1: Overview. We train an encoder-decoder model from unlabelled videos to produce high-resolution (HR), temporally consistent feature maps. The core novelty of our training approach is linear in-context learning, or LILA. Trained on noisy cue maps, such as those provided by off-the-shelf optical flow and monocular depth networks, LILA enhances the low-resolution (LR) encoder features with pixel-level geometry and temporally stable semantics*
 
-## 核心模块与公式推导
+
 
 ### 整体训练流程
 
@@ -246,7 +249,9 @@ $$\mathcal{L}_{\nabla \times} = \omega_{\mathrm{x}} \left\| \nabla_{\mathrm{x}} 
 
 为提升特征的鲁棒性，LILA 在训练时对上下文帧和查询帧分别施加独立的随机裁剪 $\mathcal{C}_0$ 和 $\mathcal{C}_{\Delta}$。这意味着 $x_0$ 和 $x_{\Delta}$ 对应的空间区域不完全一致，但 $W^*$ 仍须将从局部上下文中学到的映射关系泛化到查询帧的（可能不同的）裁剪区域。这一设计迫使网络学习对空间扰动不敏感的跨帧不变表示。消融实验表明，移除该随机裁剪会导致 VOS-KNN 的 JF 下降 1.5%（Table 5）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与实验设计逻辑
 
@@ -332,7 +337,9 @@ Figure 6 的域外测试揭示了 LILA 的关键局限：在航空影像中，�
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2604_26488/figures/010_Table_4.jpg]]
 *Table 4: Ablation study: cue modalities. We train LILA with varying modalities in the cue maps and report the accuracy on VOS (DAVIS 2017), surface normal estimation (NYUv2) and semantic segmentation (COCO-Stuff)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：从静态特征到时空一致表征
 
@@ -368,6 +375,8 @@ LILA 开辟了若干值得进一步研究的方向：
 - **模态扩展。** 线性上下文学习框架是否可扩展到其他几何模态（如表面法线、3D 点云）或多模态输入（如语言-视频联合建模）？当前工作仅验证了深度和光流两种线索，框架本身对线索类型并无硬性约束。
 - **编码器联合优化。** 端到端微调编码器（而非冻结）配合 LILA 训练能否进一步提升性能？Table 6 已展示跨骨干的泛化能力，但联合优化的增益尚未被量化。
 - **静态数据适应。** 在仅有静态图像数据的情况下，LILA 的训练范式能否利用合成视频或几何增广进行适应？这将决定该方法能否推广到视频数据稀缺的领域。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,7 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/SAM_Body4D_Training_Free_4D_Human_Body_Mesh_Recovery_from_Videos.pdf
+project_link: null
 code_link: https://github.com/gaomingqi/sam-body4d
 aliases:
 - SB
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | SAM-Body4D：无需训练的4D人体网格恢复 |
 | 英文题名 | SAM-Body4D: Training-Free 4D Human Body Mesh Recovery from Videos |
 | 会议/期刊 | arXiv 2025 |
-| Links | [arXiv](https://arxiv.org/abs/) · [paper](https://arxiv.org/abs/2512.08406) · [Code](https://github.com/gaomingqi/sam-body4d) |
+| Links | [paper](https://arxiv.org/abs/) · [paper](https://arxiv.org/abs/2512.08406) · [Code](https://github.com/gaomingqi/sam-body4d) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | SAM-Body4D |
 | Dataset | In-the-wild video |
@@ -40,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - In-the-wild video (480×854, 90 frames, 5 persons) 上，Inference speedup Parallel batch inference (batch size 32) vs Sequential per-frame HMR (~2× faster)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有图像级人体网格恢复（HMR）方法（如 SAM 3D Body）在视频上逐帧独立推理，缺乏时间连续性，导致人体网格轨迹断裂、身份混淆，并在遮挡下性能严重退化。直接将该类方法“图像到视频”的朴素扩展无法保证同一人物在帧间的连续网格轨迹。
 
@@ -53,7 +54,7 @@ claims:
 
 **主要结果**：在定性实验中，SAM-Body4D 相比朴素逐帧 SAM 3D Body 基线，保持了时间连续且身份一致的网格轨迹，并在严重遮挡场景下展现出更鲁棒的重建质量。在推理效率方面，对 480×854 分辨率、90 帧、5 人的视频，并行批量推理（batch size 32）相较顺序逐帧推理实现约 2× 加速。需注意，目前缺乏在标准视频 HMR 基准（如 3DPW、Human3.6M）上的定量指标（如 MPJPE）报告，与现有视频 HMR 方法的量化对比仍待补充。
 
-## 背景与动机
+
 
 ### 单图像人体网格恢复的进展与视频场景的断裂
 
@@ -82,7 +83,9 @@ claims:
 
 基于以上分析，本文提出 **SAM-Body4D**——一个完全训练无关的框架，通过视频分割产生的身份一致 masklet 作为时序提示，并结合遮挡感知的掩膜补全模块，实现从开放域视频到时间连续、遮挡鲁棒的4D人体网格恢复。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SAM-Body4D 的核心创新在于**将视频像素级时间连续性直接传递到4D人体网格重建中，无需任何训练**。该方法通过三个关键“变更槽”（changed slots）将图像级HMR模型（SAM 3D Body）扩展为视频级4D恢复框架：
 
@@ -127,7 +130,7 @@ SAM-Body4D 的创新并非提出新的网络架构或损失函数，而是**重�
 
 **需注意**：该方法目前仅在定性可视化和速度指标上展示了优势，缺乏在标准视频HMR基准（如3DPW、Human3.6M）上的定量评估（MPJPE、PA-MPJPE等），与SOTA视频方法（如VIBE、TRAM）的量化对比缺失，创新声明的定量支撑有待补充。
 
-## 整体框架
+
 
 SAM-Body4D 是一种无需训练的 4D 人体网格恢复框架，其核心设计思路是将视频中像素级的时序连续性直接传递到人体网格重建中，避免了对视频 HMR 模型进行额外训练或微调。如图 2 所示，整个 pipeline 由三个串联模块构成：**Masklet Generator**、**Occlusion-Aware Masklet Refiner** 和 **Mask-Guided HMR**。
 
@@ -158,7 +161,7 @@ SAM-Body4D 是一种无需训练的 4D 人体网格恢复框架，其核心设�
 ![[assets/figures/papers/paper_list_l9_SAM_Body4D_Training_Free_4D_Human_Body_Mesh_Recovery_from_Videos_motion20v2/figures/002_Figure_2.jpg]]
 *Figure 2: Overall framework of the proposed SAM-Body4D. Given an input video with human prompts, SAM-Body4D operates on three main modules in a training-free manner. The Masklet Generator derives identity-consistent temporal masklets from the video to provide spatio-temporal tracking cues. The Occlusion-Aware Masklet Refiner enriches these masklets by recovering invisible body regions and stabilizing temporal alignment. Finally, the Mask-Guided HMR module uses refined masklets as spatial prompts to predict accurate and temporally coherent human meshes across the entire sequence*
 
-## 核心模块与公式推导
+
 
 ### 3.1 整体框架
 
@@ -210,7 +213,9 @@ $$\boldsymbol{\theta} = \{P, S, C, S_k\} = \mathbf{MLP}(O_0) \quad \text{(Eq. 4)
 
 > **注意**：关于固定体型假设（使用首帧可见时的形状参数）在长序列中的身份漂移风险，以及 Diffusion-VAS 在极端多人交互遮挡下的泛化边界，论文未提供定量分析，需在实际部署中手动验证。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -263,7 +268,9 @@ SAM-Body4D 的核心实验验证聚焦于**推理效率**与**定性重建质量
 
 论文的基线为 SAM 3D Body 的朴素逐帧推理版本，而非经过时间优化的视频 HMR 方法（如 VIBE、TCMR、TRAM 等）。因此，实验对比仅反映了“像素级连续性引导”相对于“无时间关联”的有效性，无法得出 SAM-Body4D 优于现有视频 HMR 方法的结论。速度提升数据同样仅对比了自身的串行版本，未与已优化的视频批处理方法进行横向比较。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 **SAM-Body4D** 在视频人体网格恢复（HMR）领域占据了一个独特的位置：它是一条训练无关（training‑free）的路径，通过将视频分割模型的像素级时间连续性“嫁接”到图像级 HMR 模型上，绕开了传统视频 HMR 方法对时序建模模块的训练需求。其方法谱系可以从三个维度来定位。
 
@@ -279,6 +286,8 @@ SAM-Body4D 的核心实验验证聚焦于**推理效率**与**定性重建质量
 - 固定形状假设在多镜头切换或人体真实形变（如脱衣、大幅体态变化）下是否仍然有效？
 - 该训练无关策略能否与现有视频 HMR 方法（如 VIBE、TRAM）结合，融合像素级连续性和特征级时序建模的优势？
 - 遮挡细化模型在多人严重交互遮挡、极低分辨率下的鲁棒性边界在哪里？
+
+
 
 ## 原文 PDF
 

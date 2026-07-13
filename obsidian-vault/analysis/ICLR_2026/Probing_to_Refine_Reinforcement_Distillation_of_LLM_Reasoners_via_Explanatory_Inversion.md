@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Probing_to_Refine_Reinforcement_Distillation_of_LLM_Reasoners_via_Explanatory_Inversion.pdf
+project_link: null
+code_link: https://github.com/Zhen-Tan-dmml/ExGRPO.git
 openreview_forum_id: rkIw2GqYEt
 aliases:
 - EEG
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 基于解释性反演的LLM推理强化蒸馏 |
 | 英文题名 | Probing to Refine: Reinforcement Distillation of LLM Reasoners via Explanatory Inversion |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=rkIw2GqYEt); [GitHub](https://github.com/Zhen-Tan-dmml/ExGRPO.git) |
+| Links | [paper](https://openreview.net/forum?id=rkIw2GqYEt) · [GitHub](https://github.com/Zhen-Tan-dmml/ExGRPO.git) |
 | Topic | #topic/other_unclear #topic/other_unclear/general |
 | Method | ExGRPO (Explanatory GRPO) |
 | Dataset | 8个领域内推理数据集（SQA, CSQA, ARC‑c, MATH, GSM8K, TabMWP, ANLI, Date）平均, 4个分布外（OOD）数据集（BoolQ, OpenbookQA, e‑SNLI, GSM8K‑Rev）平均, 样本效率：SQA和CSQA（10%训练数据）, 平均训练令牌效率对比（8数据集聚合） |
@@ -42,7 +44,7 @@ claims:
 > - 4个分布外（OOD）数据集（BoolQ, OpenbookQA, e‑SNLI, GSM8K‑Rev）平均 上，准确率（%） 为 Qwen2.5‑7B: 82.34 / Gemma‑7B: 61.76，对比 RevThink (最强基线): Qwen 79.06 / Gemma 56.87，变化 Qwen +3.28% / Gemma +4.89%。
 > - 样本效率：SQA和CSQA（10%训练数据） 上，准确率（%） 为 ExGRPO (10%数据) 超过全量SFT的准确率，对比 SFT（全量100%数据），变化 定性超越。
 
-## 概述
+## 概要
 
 **问题瓶颈**：知识蒸馏是缩小大语言模型（LLM）规模的关键手段，但蒸馏得到的学生模型普遍存在表面模式记忆与泛化能力不足的问题。尤其在分布迁移场景下，模型表现出“反转诅咒”——能正确求解正向问题（如“5-2=3”），却无法求解其反向（“3+2=5”）。现有的A-to-Q反向数据增强方法（如RevThink）虽然试图缓解这一问题，但仍鼓励机械的方向映射，未能培养学生对深层逻辑的真正把握。
 
@@ -58,7 +60,7 @@ claims:
 
 **关键贡献**：（1）提出解释性反演（EI）作为蒸馏数据增强的新范式；（2）设计对话结构效用奖励，从多轮交互结构中提取训练信号；（3）理论证明ExGRPO策略更新保证结果奖励单调不减；（4）在多个基准上取得显著的性能与泛化提升。
 
-## 背景与动机
+
 
 ### 蒸馏学生模型中的“反转诅咒”与泛化脆弱性
 
@@ -87,7 +89,9 @@ claims:
 
 通过这种“探测以精炼”（Probing to Refine）的策略，ExGRPO使蒸馏过程从单向的知识传递转变为双向的解释性交互，为提升学生模型的鲁棒性和分布外泛化能力开辟了新路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ExGRPO 的核心创新在于将认知科学启发的**解释性反演（Explanatory Inversion, EI）** 与带有**对话结构效用奖励（Dialogue Structure Utility Bonus, $r_{\text{dsu}}$）** 的强化学习算法深度融合，从根本上改变了蒸馏过程中学生模型的学习方式。
 
@@ -147,7 +151,7 @@ $$r_{\text{dsu}} = \begin{cases} \delta, & \text{if } P_{\text{full}} > \nu \cdo
 
 这些结果表明，ExGRPO 通过系统性的探测题挑战和对话结构层面的奖励设计，成功促使学生模型从被动模仿转向主动构造可迁移的推理能力。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0012_rkIw2GqYEt_Probing_to_Refine_Reinforcement_Distillation_of/figures/002_Figure_2.jpg]]
 
@@ -201,7 +205,7 @@ $$\mathcal{L}_{\text{SFT}}(\theta) = -\sum_{(Q_i^{\text{aug}}, T_i) \in D_{EI}} 
 
 整个管线的信息流可概括为：**原始问答 → EI 规则生成探测题 → 一致性与难度过滤 → SFT 初步对齐 → ExGRPO 多轮交互强化 → 单轮推理部署**。其中，对话结构效用奖励 $r_{\text{dsu}}$ 是连接多轮交互协议与策略优化的核心纽带——它显式奖励完整探测序列相对于部分序列的提分效果，从而驱动学生模型从被动模仿转向主动构建可迁移的推理能力。定理 3.1 进一步从理论上保证：应用 $r_{\text{dsu}}$ 的 ExGRPO 策略更新可使期望结果奖励单调不减，且在奖励触发时严格提升期望准确性。
 
-## 核心模块与公式推导
+
 
 ### 整体框架
 
@@ -279,7 +283,9 @@ $$\mathcal{L}_{\text{SFT-aux}} = - \sum_{j=1}^{k} \log \pi_{\theta}(R_{T,j}^{\te
 
 推理时，训练好的学生模型 $\pi_\theta$ 对输入 $Q$ 进行单次前向传播，直接生成推理链与最终答案。多轮探测对话、随机规则采样及 $r_{\text{dsu}}$ 计算仅存在于训练阶段，推理无额外开销。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与设计动机
 
@@ -342,7 +348,9 @@ Figure 3展示了Gemma作为学生模型时ExGRPO训练过程中的奖励曲线�
 ### 局限性与待验证问题
 
 尽管ExGRPO表现优异，仍需注意以下局限：解释性探测问题依赖人工设计的10种模板规则，自动化程度有限；训练计算开销约为单阶段SFT基线的1.5倍；实验验证集中在文本推理任务，尚未扩展到多模态或极长上下文推理场景。此外，对话结构效用奖励完全基于最终答案正确性，未引入对中间推理步骤的语义监督，在某些需要精细推理评分的任务上可能不够敏感。这些方向有待后续工作探索。
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -383,6 +391,8 @@ ExGRPO 的适用边界由以下几个维度界定：
 - 教师模型的能力如何定量影响 EI 探测的质量以及学生模型的蒸馏上限？
 
 **需要人工验证的点**：论文未提供 ExGRPO 在非英文推理任务上的实验，跨语言泛化能力尚不明确。此外，对话结构效用奖励的阈值 $\nu$ 和奖金 $\delta$ 的敏感性分析未在主实验中展开，相关超参数调优策略需要进一步查阅附录确认。
+
+
 
 ## 原文 PDF
 

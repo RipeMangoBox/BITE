@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Agentic_Jigsaw_Interaction_Learning_for_Enhancing_Visual_Perception_and_Reasoning_in_Vision_Language_Models.pdf
+project_link: null
+code_link: https://github.com/yuzeng0-0/AGILE
 openreview_forum_id: 3kouij8BWi
 aliases:
 - AJILEVPRVLM
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | AGILE：交互式拼图学习增强视觉感知与推理 |
 | 英文题名 | Agentic Jigsaw Interaction Learning for Enhancing Visual Perception and Reasoning in Vision-Language Models |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=3kouij8BWi); [GitHub](https://github.com/yuzeng0-0/AGILE) |
+| Links | [paper](https://openreview.net/forum?id=3kouij8BWi) · [GitHub](https://github.com/yuzeng0-0/AGILE) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | AGILE |
 | Dataset | 2×2 Jigsaw, 3×3 Jigsaw, HRBench4K, HRBench8K |
@@ -41,7 +43,7 @@ claims:
 > - 3×3 Jigsaw 上，Accuracy (%) 为 20.8，对比 0.4 (Cold-Start SFT)，变化 +20.4。
 > - HRBench4K 上，Accuracy (%) 为 73.0，对比 68.8 (Qwen2.5-VL-7B)，变化 +4.2。
 
-## 概述
+## 概要
 
 现有大视觉-语言模型（VLMs）在需要全面视觉理解和结构化推理的任务上表现近乎随机——即便是最简单的2×2拼图任务，Qwen2.5-VL-7B的准确率也仅为9.5%，接近随机猜测水平。这一瓶颈的根源在于高质量多模态强化学习（RL）数据稀缺且难以扩展，导致模型缺乏细粒度视觉辨别与空间关系推理的底层能力。
 
@@ -49,7 +51,7 @@ AGILE将拼图求解建模为逐步代码交互过程：模型在每个步骤生
 
 实验结果表明，AGILE将2×2拼图平均准确率从9.5%提升至82.8%，Score从29.4%提升至89.0%。更重要的是，训练后模型在9个通用视觉基准上平均性能提升3.1%，其中HRBench4K提升4.2%、HRBench8K提升5.2%、VStarBench提升4.2%，验证了感知推理能力的有效泛化。消融实验进一步确认，去除Crop/Zoom操作后下游任务平均性能从63.9%降至63.5%，表明细粒度局部观察行为对获得鲁棒感知推理至关重要。
 
-## 背景与动机
+
 
 ### 大视觉-语言模型的感知推理瓶颈
 
@@ -82,7 +84,9 @@ AGILE的核心动机源于一个关键洞察：**拼图求解天然是一个需�
 
 正是基于上述动机，AGILE将拼图求解重新定义为**逐步代码交互过程**：模型在每一步生成Python代码调用预定义API（Swap、Observe、Crop、Zoom），环境执行代码并返回更新后的视觉观察。通过冷启动监督微调使模型掌握基本交互能力，再通过组相对策略优化（GRPO）驱动模型在探索与反馈中迭代增强感知与推理效率。最终目标不仅是让模型学会解拼图，更是通过这一结构化交互训练，从底层强化VLM的视觉感知机制，使其在一般视觉理解任务上获得可泛化的性能提升。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 AGILE的核心创新在于将**拼图求解**建模为一个**逐步代码交互的代理任务**，并通过**可编程合成数据**与**强化学习**的协同，从根本上改变了视觉-语言模型（VLM）感知与推理能力的获取方式。相较于现有VLM依赖静态多模态QA数据或单轮推理的范式，AGILE在四个关键维度上实现了系统性突破。
 
@@ -106,7 +110,7 @@ $$R = \alpha \cdot R_{\mathrm{acc}} + \beta \cdot R_{\mathrm{format}} + \gamma \
 
 其中步数奖励 $R_{\mathrm{step}}$ 在正确完成时按实际步数惩罚（$\lambda=-0.05$），错误时赋予最大步数惩罚，鼓励模型用最少有效步骤完成拼图。消融实验证实，移除步数奖励（$\gamma=0$）会导致VStarBench和MMVP性能明显下降（Table 6），验证了效率导向奖励对于培养高效交互策略的必要性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_3kouij8BWi/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the AGILE framework. (a) depicts the interaction process between the model and the external environment, together with the implementation of the GRPO algorithm; (b) shows the collection of high-quality jigsaw trajectory data; and (c) illustrates the model–environment interaction during the jigsaw rollout process*
@@ -135,7 +139,7 @@ AGILE 将拼图求解建模为**逐步代码交互过程**，其核心 pipeline 
 
 这种代码驱动的交互设计使得环境能够返回精确的视觉反馈信号，为 GRPO 提供密集的训练奖励，驱动模型在探索与反馈中迭代增强感知和推理能力。消融实验表明，去除 Crop/Zoom 动作会导致下游任务平均性能下降约 0.4%（Table 8），验证了细粒度局部观察行为对鲁棒感知推理学习的关键作用。
 
-## 核心模块与公式推导
+
 
 ### 3.1 交互环境与动作空间
 
@@ -192,7 +196,9 @@ $$
 
 RL训练数据通过可编程规则自动生成：从高分辨率自然图像、OCR文档图像、真实场景图像等多源数据中，将图像分割为 $m \times m$ 网格并随机打乱，自动生成大规模、难度可控的拼图实例。难度由初始正确块数 $N$ 控制（$N$ 越小，打乱程度越高，难度越大）。这种合成方式无需人工标注，理论上可无限扩展训练数据规模。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 拼图任务性能：从随机猜测到高精度求解
 
@@ -277,7 +283,9 @@ Figure 12 的注意力图对比为感知机制强化提供了直观证据：AGIL
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_3kouij8BWi/figures/015_Table_5.jpg]]
 *Table 5: Key hyperparameters for RL*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心范式定位
 
@@ -331,6 +339,8 @@ AGILE 以 **Qwen2.5-VL-7B**（Bai et al., 2025）为基座模型进行全参数�
 4. **零样本迁移能力**：AGILE训练的模型是否能零样本迁移到需要结构化感知的其他任务（如图像修复、目标检索）？当前实验仅覆盖标准视觉理解基准，更广泛的迁移能力有待验证。
 
 5. **感知机制的可解释性**：注意力图可视化（Figure 12）提供了初步的定性证据，但拼图训练究竟改变了VLM视觉编码器的哪些表征特性，仍需更系统的机制分析。
+
+
 
 ## 原文 PDF
 

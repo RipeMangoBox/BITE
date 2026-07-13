@@ -5,6 +5,8 @@ paper_level: A
 venue: ICCV
 year: 2025
 pdf_ref: paperPDFs/ICCV_2025/MotionLab_Unified_Human_Motion_Generation_and_Editing_via_the_Motion_Condition_Motion_Paradigm.pdf
+project_link: https://diouo.github.io/motionlab.github.io/
+code_link: null
 aliases:
 - MotionLab
 tags:
@@ -42,7 +44,7 @@ claims:
 > - MotionFix 上，R@1 (轨迹编辑) 为 72.65，对比 TMED*: 60.01，变化 +12.64。
 > - HumanML3D 上，关键帧误差 (运动插值，5帧) 为 0.0283，对比 CondMDI: 0.1789，变化 -0.1506 (下降84%)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -71,7 +73,7 @@ MotionLab 在多个任务上取得显著性能提升：
 
 MotionLab 属于**统一生成式框架**，区别于为单一任务设计的专用模型。其设计理念与扩散模型（如 MDM、MLD）和自回归模型（如 T2M-GPT）形成对比：后者通常依赖迭代去噪或逐帧预测，而 MotionLab 借助修正流实现少步数（甚至单步）高效生成。在任务覆盖面上，Table 1 显示 MotionLab 是首个同时原生支持文本生成、轨迹生成、文本编辑、轨迹编辑、运动插值和风格迁移的框架，而此前方法最多覆盖其中 2–3 项任务。
 
-## 背景与动机
+
 
 人体运动生成与编辑是计算机视觉与图形学领域的核心问题，其目标是根据文本描述、空间轨迹、风格参考等条件，自动合成自然、多样且符合物理约束的人体动作序列。该技术在动画制作、虚拟现实、游戏开发和机器人仿真等场景中具有广泛的应用前景。近年来，扩散模型（diffusion models）和自回归模型在该领域取得了显著进展，涌现出 **MDM**、**MLD**、**T2M-GPT** 等代表性方法，分别在生成质量和多样性上不断刷新基准。
 
@@ -85,7 +87,9 @@ MotionLab 属于**统一生成式框架**，区别于为单一任务设计的专
 
 本文的核心动机在于：**是否可以通过一个统一的范式，将人体运动生成与编辑的各类任务纳入同一框架，从而打破任务壁垒、实现知识共享？** 为此，本文提出 **Motion-Condition-Motion** 范式，将所有任务抽象为三个基本概念的组合——源运动（source motion）、条件（condition）和目标运动（target motion）——并基于修正流（rectified flows）的最优传输特性，设计统一的生成框架 **MotionLab**，以期在单一模型中同时实现多任务的高质量生成与高效推理。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MotionLab 的核心创新并非单一模块的修修补补，而是通过 **Motion-Condition-Motion 统一范式** 将人体运动生成与编辑的所有任务抽象为“源运动—条件—目标运动”三要素，从而在一个框架内实现知识共享（Table 2）。围绕这一范式，方法在四个关键维度上做出了根本性改变：
 
@@ -113,7 +117,7 @@ $$\mathcal{L}_{RF}(\theta) = \int_{0}^{1} \mathbb{E}_{(x_{0}, x_{1}) \sim (p_{0}
 
 上述四个创新并非孤立存在，而是形成了一条因果链：**修正流** 提供了高效、稳定的生成基础；**Aligned ROPE** 确保多模态序列在时间上对齐；**Task Instruction Modulation** 使同一网络能区分不同任务；**课程学习** 则决定了这些能力能否被有效联合训练。缺失任一环节都会导致特定任务或整体性能的显著退化，这从 Table 6 的系统消融中得到了充分验证。
 
-## 整体框架
+
 
 MotionLab 的核心设计理念是将人体运动生成与编辑统一于 **运动-条件-运动 (Motion-Condition-Motion)** 范式之下。该范式将所有任务抽象为三个基本要素：**源运动 (source motion)**、**条件 (condition)** 与 **目标运动 (target motion)**。无论任务表面形式是文本生成、轨迹控制、运动编辑还是风格迁移，其本质均可映射为“给定源运动与条件，生成目标运动”的统一问题 (Table 2)。这一抽象使得单一框架能够同时覆盖生成与编辑，并利用多任务数据间的内在联系进行知识共享。
 
@@ -134,7 +138,7 @@ MotionLab 的核心设计理念是将人体运动生成与编辑统一于 **运�
 ![[assets/figures/papers/paper_list_l22_MotionLab_Unified_Human_Motion_Generation_and_Editing_via_the_Motion_Con/figures/001_Figure_1.jpg]]
 *Figure 1: Demonstration of our MotionLab’s versatility, performance and efficiency. Ours specialists refer to the proposed framework tailored for specified tasks. Previous SOTA refer to multiple models, including MotionLCM [12], OmniControl [64], MotionFix [6], CondMDI [11] and MCM-LDM [55]. All motions are represented using SMPL [39], where transparent motion indicates the source motion or condition, and the other represents the target motion. More qualitative results are available in the website and appendix*
 
-## 核心模块与公式推导
+
 
 ### 4.1 修正流基础
 
@@ -191,7 +195,9 @@ $$v_\theta(M_T, t, C) = v_\theta(M_T \mid t, \emptyset) + \lambda_C \left[ v_\th
 
 其中 $\lambda_C$ 为条件引导强度，$\emptyset$ 表示无条件。各任务的引导强度参数见 **Table 14**。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能表现
 
@@ -271,7 +277,9 @@ Table 1 系统对比了 MotionLab 与现有方法在 8 类任务上的覆盖能�
 ![[assets/figures/papers/paper_list_l22_MotionLab_Unified_Human_Motion_Generation_and_Editing_via_the_Motion_Con/figures/019_Figure_9.jpg]]
 *Figure 9: Ablation results of MotionLab on the motion in-between (with text). Beige motion is use 1D-learnable position encoding, purple motion use Aligned ROPE, and gray motions are the poses provided in keyframes, demonstrating the importance of Aligned ROPE*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 统一生成与编辑的范式演进
 
@@ -310,6 +318,8 @@ MotionLab 的生成核心选择**修正流 (rectified flows)** 而非主流的�
 3. **实时场景适用性**：尽管推理速度已大幅提升（0.068 秒），但在需要毫秒级响应的实时交互场景（如 VR 中的实时运动编辑）中是否足够？模型压缩或蒸馏是否可行？
 
 4. **评估指标的统一性**：不同任务使用不同的评估指标（FID、R@3、平均误差、关键帧误差），缺乏跨任务的可比性度量，难以量化统一框架相对于专用模型的整体性能折衷。
+
+
 
 ## 原文 PDF
 

@@ -42,7 +42,7 @@ claims:
 > - Layout Generation (FID) 上，FID 22.7 vs CityDreamer: ~139.4 (基于83.7%降低推算) / CityCraft: 未报告 (较CityDreamer降低83.7%，较CityCraft降低20.1%)。
 > - City Scene Generation AQS (GPT-based) 上，SVC / SRC / MTF / LA SVC 8.56, SRC 8.33, MTF 7.00, LA 6.67 vs 其他方法得分均低于本方法 (全部维度排名第一)。
 
-## 概述
+## 概要
 
 城市生成面临一个根本性瓶颈：**隐式神经表示**（如CityDreamer, GaussianCity）虽能合成视觉丰富的场景，却存在多视图不一致和对象级不可控的问题；**显式网格资产检索方法**（如CityCraft）虽支持编辑，但受限于资产库的多样性和风格覆盖，难以响应自然语言中的细粒度美学意图。MajutsuCity的核心洞察在于——自然语言本身同时蕴含宏观几何逻辑（如“繁华的市中心”）和微观美学属性（如“日落下的粉色灯光”），关键在于将其**结构化地分解为可执行的城市设计规格**。
 
@@ -54,7 +54,7 @@ claims:
 
 **局限与待解决问题**：布局生成对提示的逻辑一致性高度敏感，空间描述中的逻辑矛盾可能导致级联错误传播；对于拓扑复杂或不规则的建筑，形状约束难以同时保证视觉质量和几何有效性；独立合成的建筑资产缺少全局尺度感知，可能导致场景中相对大小不协调。这些开放问题指向未来方向：提示逻辑校验机制、复杂拓扑的几何保证策略，以及跨资产的全局尺度一致性约束。
 
-## 背景与动机
+
 
 城市是高度结构化的复杂空间系统，其自动生成在数字孪生、影视制作和虚拟世界构建等领域具有重要应用价值。然而，现有城市生成方法在**创造性与可控性之间面临根本性的权衡**：一方面，基于隐式神经表示的方法（如CityDreamer、GaussianCity）能够生成视觉丰富的城市场景，但存在严重的多视图不一致问题，且缺乏对象级的可编辑能力；另一方面，基于显式网格资产检索的方法（如CityCraft）虽然支持对象级操作，却受限于预定义资产库的多样性和风格覆盖，难以根据自然语言描述生成具有特定美学风格的城市。
 
@@ -62,7 +62,9 @@ claims:
 
 MajutsuCity正是在这一背景下提出的。其核心动机在于：**将自然语言编码为结构化的多维城市设计规格，通过语言驱动的方式分解用户意图，从而统一控制从宏观布局到细粒度美学属性的完整生成过程**。该工作试图回答一个关键问题：能否构建一个端到端的语言驱动框架，既保持文本生成的创造性，又提供对象级的可控性和交互式编辑能力？
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MajutsuCity 的核心创新在于将自然语言同时作为**宏观几何逻辑**（如“繁华的市中心”）和**细粒度美学意图**（如“日落下的粉色灯光”）的统一控制信号，通过一个结构化的“语言到城市规格”管道，将文本转换为可控、一致的 3D 城市组合。这一设计直接回应了现有方法的核心瓶颈：隐式表示存在多视图不一致问题，而显式网格方法受限于资产库的多样性和风格覆盖，导致生成场景缺乏几何保真度、风格多样性和交互编辑能力。
 
@@ -90,7 +92,7 @@ MajutsuCity 的核心创新在于将自然语言同时作为**宏观几何逻辑
 
 这些结果表明，将语言信号结构化地分解为布局、资产、材质、天空盒等多维规格，并以显式组合方式实现，是平衡文本创造性与对象级可控性的有效路径。
 
-## 整体框架
+
 
 MajutsuCity 的核心设计思想是将自然语言蕴含的宏观几何逻辑与细粒度美学意图，通过一条结构化的“语言到城市规格”管道，解耦为可控的三维城市组合。整个框架由四个串行阶段构成，外加一个交互式编辑代理，形成从文本到可编辑三维场景的闭环。
 
@@ -122,7 +124,7 @@ $$\mathcal { L } = \mathbb { E } _ { z _ { 0 } , c , \epsilon \sim \mathcal { N 
 ![[assets/figures/papers/paper_list_l2539_https_arxiv_org_abs_2511_20415/figures/001_Figure_1.jpg]]
 *Figure 1: MajutsuCity is a language–driven, aesthetic-adaptive system that unifies controllable urban scene generation and interactive editing within a single framework. Conditioned on textual instructions, the framework synthesizes a complete stylized city through layout–height creation, asset instantiation, and terrain/material generation, and further enables iterative refinement through five atomic editing operations. This paradigm forms the core contribution of MajutsuCity, empowering users to create and continuously modify large-scale, stylistically diverse urban scenes through natural language*
 
-## 核心模块与公式推导
+
 
 MajutsuCity 将自然语言到三维城市的生成分解为四个级联模块，形成一条“语言→结构化规格→显式三维场景”的转化链（Fig. 2）。其核心设计理念在于：自然语言不仅蕴含宏观几何逻辑（如“繁华的市中心”），还包含细粒度美学意图（如“日落下的粉色灯光”），因此需要一个结构化管道将二者分离并分别可控地实现。
 
@@ -158,7 +160,9 @@ $$\mathcal{L} = \mathbb{E}_{z_0, c, \epsilon \sim \mathcal{N}(0,1), t} \left[ \b
 
 MajutsuAgent 是集成在框架内的语言驱动编辑代理，支持五种原子操作：**增**（Add）、**删**（Delete）、**改**（Edit）、**移**（Move）、**换**（Replace）。用户通过自然语言指令触发操作，代理将指令解析为目标对象和操作类型，直接修改场景图中的对应节点。这一设计将生成与编辑统一在同一显式场景表示下，无需重新推理整个场景即可实现迭代式精细化修改。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -218,7 +222,9 @@ Table 3 的消融实验揭示了布局生成性能的两个关键支撑点。移
 
 以上失败模式指向三个开放问题：如何检测并处理用户提示中的逻辑矛盾、如何增强对复杂建筑拓扑的几何保证、以及如何在独立合成资产时强制全局尺度一致性。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：城市生成中的“创造性-可控性”张力
 
@@ -263,6 +269,8 @@ MajutsuCity在知识库中的独特定位在于其“结构化中间表示”设
 3. **全局尺度一致性强制**：如何在独立合成建筑资产时强制全局尺度一致性？这可能需要引入场景级的尺度感知损失函数，或在组装阶段增加基于布局上下文的尺度修正步骤。
 
 4. **物理合理性与视觉和谐性**：如何在不损失可控性的前提下，进一步提升复杂城市布局的物理合理性（如建筑间距、日照遮挡）和视觉和谐性（如风格过渡、天际线韵律）？这可能需要将城市规划领域的专业知识编码为可微分约束或奖励信号。
+
+
 
 ## 原文 PDF
 

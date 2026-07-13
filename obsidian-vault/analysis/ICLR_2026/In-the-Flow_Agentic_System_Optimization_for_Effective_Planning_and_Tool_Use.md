@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/In-the-Flow_Agentic_System_Optimization_for_Effective_Planning_and_Tool_Use.pdf
+project_link: null
+code_link: null
 aliases:
 - AFG
 - FASOEPTU
@@ -43,7 +45,7 @@ paradigm: 将多轮强化学习问题转化为一系列单轮策略更新：在�
 > - 2Wiki (Search Intensive) 上，Accuracy (%) 为 77.2，对比 44.0 (AutoGen)，变化 +33.2。
 > - HotpotQA (Search Intensive) 上，Accuracy (%) 为 57.0，对比 54.0 (GPT-4o)，变化 +3.0。
 
-## 概述
+## 概要
 
 现有工具增强的大语言模型推理方法通常采用一体化策略：在完整的上下文轨迹中交替进行“思考”与工具调用。这种范式在长程规划、多样化工具组合和动态工具反馈面前难以稳定扩展，且推理时对未见任务和工具的泛化能力有限。与此同时，多模块智能体系统虽然结构上更灵活，却普遍缺乏在线训练机制，无法从实时交互中学习，导致在仅有最终成功信号的稀疏奖励场景下，信用分配极为困难。
 
@@ -55,7 +57,7 @@ paradigm: 将多轮强化学习问题转化为一系列单轮策略更新：在�
 
 > **注意**：以下各节将依次展开问题背景、方法设计、实验分析及局限性讨论。本节仅做全局概览，具体细节请参见对应章节。
 
-## 背景与动机
+
 
 ### 大语言模型推理的瓶颈：从单一策略到工具增强
 
@@ -82,7 +84,9 @@ paradigm: 将多轮强化学习问题转化为一系列单轮策略更新：在�
 
 基于这一动机，本文提出 AGENTFLOW——一个可训练的在线智能体系统，以及配套的 Flow-GRPO 算法。该框架直接在系统执行循环内优化规划器模块，使智能体能够从实际交互的成败中持续改进其规划和工具使用策略，从而突破冻结系统的性能天花板。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 AGENTFLOW 的核心创新在于将多模块智能体系统与在线强化学习深度融合，从根本上改变了工具增强推理的训练范式。其关键突破体现在三个维度。
 
@@ -100,14 +104,14 @@ $$A_i^t = \frac{\bar{R}(o_i, q, y^*) - \mathrm{mean}\left(\{\bar{R}(o_k, q, y^*)
 
 消融实验（Table 3）直接验证了上述创新的关键作用：Flow-GRPO 在线训练相比冻结 planner 平均提升 17.2%，而离线 SFT 因 token 级模仿目标与轨迹级任务成功之间的错位导致性能崩溃（平均仅 19.5%）。即使使用更强的 GPT-4o 作为冻结 planner，也仅带来 5.8% 的平均增益，远低于 Flow-GRPO 训练的 7B planner（55.7% vs 44.3%），表明系统循环内的在线优化本身比模型规模更为关键。
 
-## 整体框架
 
-![[obsidian-vault/assets/figures/papers/iclr26_0012_Mf5AleTUVK_In-the-Flow_Agentic_System_Optimization_for_Effe/figures/002_Figure_2.jpg]]
 
-![[obsidian-vault/assets/figures/papers/iclr26_0012_Mf5AleTUVK_In-the-Flow_Agentic_System_Optimization_for_Effe/figures/005_Figure_3.jpg]]
+![[assets/figures/papers/iclr26_0012_Mf5AleTUVK_In-the-Flow_Agentic_System_Optimization_for_Effe/figures/002_Figure_2.jpg]]
+
+![[assets/figures/papers/iclr26_0012_Mf5AleTUVK_In-the-Flow_Agentic_System_Optimization_for_Effe/figures/005_Figure_3.jpg]]
 *Figure 3: Comparison of two paradigms of LLMs with tool use. (a) Monolithic tool-integrated reasoning models train a single policy to interleave reasoning (e.g., <think>) and tool calls (e.g., < \mathrm { t o o l . c a l 1 > } ) within a single, full-context trajectory. (b) Agentic systems decompose tasks across multiple specialized modules (e.g., planner, coder) that collaborate. These systems are typically training-free, orchestrated by handcrafted logic or prompting*
 
-![[obsidian-vault/assets/figures/papers/iclr26_0012_Mf5AleTUVK_In-the-Flow_Agentic_System_Optimization_for_Effe/figures/006_Figure_4.jpg]]
+![[assets/figures/papers/iclr26_0012_Mf5AleTUVK_In-the-Flow_Agentic_System_Optimization_for_Effe/figures/006_Figure_4.jpg]]
 *Figure 4: Optimization for our proposed agentic system AGENTFLOW. Given a query q, an evolving memory M, and a toolset K, the policy model generates actions that target sub-goals and select tools. It is trained via Flow-based Group Refined Policy Optimization (Flow-GRPO), which enables multi-turn reinforcement learning and stable optimization under collaborative dynamics*
 
 AGENTFLOW 是一个可训练的在线智能体系统，由四个专门模块通过共享的演化记忆协同工作：**Action Planner**（可训练的策略 $\pi_\theta$）、**Tool Executor**、**Execution Verifier** 和 **Solution Generator**。系统在多轮交互中迭代运行，每轮的状态转移遵循统一的范式：Planner 基于当前记忆 $M^t$ 和工具集 $K$ 规划子目标并选择工具，Executor 执行工具返回观察 $e^t$，Verifier 评估执行结果并输出终止/继续信号 $v^t$，循环终止后 Generator 基于完整记忆生成最终答案 $o$。
@@ -120,7 +124,7 @@ $$p_{\theta}\Big(\{a^t, e^t, v^t\}_{t=1}^T, o \mid q, K\Big) = \left[\prod_{t=1}
 
 训练时，仅优化 Planner 模块——系统完整 rollout 生成轨迹 $\tau = \{a^t, e^t, v^t\}_{t=1}^T$，基于最终答案正确性计算全局奖励 $r = \bar{R}(o, q, y^*)$，并将同一奖励广播到轨迹内所有轮次，通过 Flow-GRPO 算法将多轮 RL 转化为一系列单轮策略更新。Executor、Verifier 和 Generator 保持冻结，这种非对称优化设计在保证系统稳定性的同时，使 Planner 从稀疏的轨迹级反馈中学习有效的长程规划策略。
 
-## 核心模块与公式推导
+
 
 ### 系统模块架构
 
@@ -181,15 +185,17 @@ $$
 
 附录 B 提供了两个关键理论结果（Theorem B.1 和 Theorem B.3）：全局多轮优化目标等价于期望 token 级局部目标，且 Flow-GRPO 满足策略单调改进保证。这些结果为广播奖励到每轮并采用组标准化优势的做法提供了形式化支撑。
 
-## 实验与分析
 
-![[obsidian-vault/assets/figures/papers/iclr26_0012_Mf5AleTUVK_In-the-Flow_Agentic_System_Optimization_for_Effe/figures/003_Figure_1.jpg]]
+
+## 实验与关键发现
+
+![[assets/figures/papers/iclr26_0012_Mf5AleTUVK_In-the-Flow_Agentic_System_Optimization_for_Effe/figures/003_Figure_1.jpg]]
 *Figure 1: Left: Performance of AGENTFLOW with a 7B-scale backbone before and after Flow-GRPO tuning across ten diverse reasoning benchmarks. Flow-GRPO substantially improves performance by enhancing planning quality and tool-calling reliability. Right: AGENTFLOW achieves consistent gains over top baselines, including base LLMs, tool-integrated RL models, and trainingfree agentic systems. All 7B results use Qwen2.5-7B-Base/Instruct as the backbone and tools*
 
-![[obsidian-vault/assets/figures/papers/iclr26_0012_Mf5AleTUVK_In-the-Flow_Agentic_System_Optimization_for_Effe/figures/007_Table_1.jpg]]
+![[assets/figures/papers/iclr26_0012_Mf5AleTUVK_In-the-Flow_Agentic_System_Optimization_for_Effe/figures/007_Table_1.jpg]]
 *Table 1: Accuracy comparison on search-intensive and agentic tasks. 7B-Base refers to Qwen-2.5-7B-Base and 7B-Inst refers to Qwen-2.5-7B-Instruct. AutoGen and our AGENTFLOW method are agentic systems, which use Qwen-2.5-7B-Instruct for the LLM-powered agents and tools for fair comparison. We visualize the gains of AGENTFLOW to the each baseline in the ∆ columns*
 
-![[obsidian-vault/assets/figures/papers/iclr26_0012_Mf5AleTUVK_In-the-Flow_Agentic_System_Optimization_for_Effe/figures/008_Table_2.jpg]]
+![[assets/figures/papers/iclr26_0012_Mf5AleTUVK_In-the-Flow_Agentic_System_Optimization_for_Effe/figures/008_Table_2.jpg]]
 *Table 2: Accuracy comparison of mathematical and scientific reasoning tasks*
 
 ### 核心瓶颈与解决路径
@@ -247,7 +253,9 @@ Figure 5 的案例研究展示了 Flow-GRPO 带来的策略转变。冻结 plann
 
 当前方法存在以下局限：仅优化 planner 模块，executor、verifier 和 generator 保持冻结，可能限制了性能上限；工具集合主要围绕搜索和代码执行，尚未扩展到数据库、API 调用等更多样化工具；仅在最多 10 轮交互内评估，超长程任务需要进一步验证；奖励信号完全依赖最终答案的可验证正确性，不适用于开放式生成任务；所有实验基于 Qwen2.5 架构，向其他模型家族的迁移有待验证。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -302,11 +310,14 @@ AGENTFLOW 的设计隐含了若干适用前提，超出这些边界时方法的�
 
 - **超长程任务的收敛性**：当交互轮数从 10 扩展到 50 或 100 时，广播同一奖励到所有轮次的策略是否仍然有效？更靠前的轮次与最终结果之间的因果链变长，信用分配的信噪比可能恶化，可能需要引入折扣因子或分层奖励结构。
 
-## 原文 PDF
-
-## 相关样本
+### 相关样本
 
 - [[obsidian-vault/analysis/ICLR_2026/Agentic_Reinforcement_Learning_with_Implicit_Step_Rewards.md|Agentic RL with Implicit Step Rewards]]：同属 agentic RL 样本，可对照 planner 优化与隐式 step reward。
 - [[obsidian-vault/analysis/ICLR_2026/AdaReasoner_Dynamic_Tool_Orchestration_for_Iterative_Visual_Reasoning.md|AdaReasoner]]：同属工具使用与规划优化样本，可对照通用 agent flow 和视觉工具编排。
 
-![[obsidian-vault/paperPDFs/ICLR_2026/In-the-Flow_Agentic_System_Optimization_for_Effective_Planning_and_Tool_Use.pdf]]
+
+
+
+## 原文 PDF
+
+![[paperPDFs/ICLR_2026/In-the-Flow_Agentic_System_Optimization_for_Effective_Planning_and_Tool_Use.pdf]]

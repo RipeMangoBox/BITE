@@ -5,6 +5,8 @@ paper_level: A
 venue: NEURIPS
 year: 2024
 pdf_ref: paperPDFs/NeurIPS_2024/Smoothed_Energy_Guidance_Guiding_Diffusion_Models_with_Reduced_Energy_Curvature_of_Attention.pdf
+project_link: null
+code_link: https://github.com/SusungHong/SEG-SDXL
 aliases:
 - SEGS
 - SEGGDMRECA
@@ -41,7 +43,7 @@ claims:
 > - 同上 上，LPIPS_vgg↓ (与vanilla SDXL对比的偏离度) 0.536 (SEG σ→∞) vs 1 (Vanilla SDXL, 自身对比) (-0.464)。
 > - MS-COCO 2014验证集（文本条件生成） 上，FID↓ 26.169 (SEG σ→∞) vs 53.423 (Vanilla SDXL, 无CFG) (-27.254)。
 
-## 概述
+## 概要
 
 扩散模型的无条件生成长期以来面临质量瓶颈：分类器自由引导（CFG）需要条件信息，而现有的无条件引导方法——如自注意力引导（SAG）和扰动注意力引导（PAG）——依赖启发式规则，缺乏明确的数学基础，且常伴随细节平滑、色彩饱和或颜色偏移等副作用。
 
@@ -49,7 +51,7 @@ claims:
 
 在MS-COCO 2014验证集的无条件生成任务上，SEG（σ→∞）将FID从vanilla SDXL的129.496降至88.215，同时LPIPS偏离度仅为0.536，实现了质量与副效应减少的Pareto改进。在文本条件生成中，SEG同样显著优于无CFG的基线（FID: 26.169 vs. 53.423），且CLIP Score有所提升。
 
-## 背景与动机
+
 
 ### 扩散模型引导的瓶颈
 
@@ -95,7 +97,9 @@ $$E ( \mathbf { A } ) : = \sum _ { i = 1 } ^ { H } \sum _ { j = 1 } ^ { W } E ^ 
 
 这一设计将无条件引导从启发式工程提升为具有明确数学基础的框架，为扩散模型的引导技术开辟了新的理论路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SEG 的核心创新在于为扩散模型的无条件引导提供了一个**有理论可解释的操作机制**：将自注意力操作形式化为一个能量最小化步骤，通过高斯模糊降低该能量景观的曲率，并将曲率降低后的预测作为负向引导信号。这与现有无条件引导方法（**SAG**、**PAG**）形成根本性差异——后者依赖启发式扰动（模糊输入像素或替换为恒等注意力图），缺乏对引导效果的理论解释，且易产生细节平滑、颜色偏移等副作用。
 
@@ -126,7 +130,7 @@ $$E(\mathbf{A}) := \sum_{i=1}^{H}\sum_{j=1}^{W} E'(\mathbf{a}_{:(i,j)}), \quad E
 
 另一个关键创新在于**效果控制参数的重新分配**。在 CFG 和 PAG 中，引导强度（$\gamma_{\text{cfg}}$ 或 $\gamma_{\text{pag}}$）是唯一可调参数，增大引导尺度往往带来质量提升与副作用（如饱和、过饱和）的耦合。SEG 将控制权从引导尺度转移到高斯核标准差 $\sigma$：固定 $\gamma_{\text{seg}} = 3.0$（与 PAG 一致），通过增大 $\sigma$ 来持续改善图像质量（FID 和 CLIP Score），而无饱和现象（Table 2, Figure 6）。这种解耦使得 SEG 在无条件生成中实现了对 vanilla SDXL 的 **Pareto 改进**——FID 从 129.496 降至 88.215（$\sigma \to \infty$），同时 LPIPS 偏离度保持相似水平（Table 1）。
 
-## 整体框架
+
 
 Smoothed Energy Guidance (SEG) 是一种训练无关、条件无关的扩散模型引导方法。其核心思想是将自注意力操作重新解释为能量最小化步骤，通过高斯模糊降低注意力能量景观的曲率，并将平滑后的预测作为负向引导信号。整体框架由三个关键模块串联构成：高斯模糊查询模块、平滑得分网络、以及引导外推模块。
 
@@ -147,7 +151,7 @@ $$d\mathbf{x} = \big[\mathbf{f}(\mathbf{x}, t) - g(t)^2 \big(\gamma_{\text{seg}}
 ![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_JK728xy8G7/figures/008_Figure_7.jpg]]
 *Figure 7: Pipeline of SEG. (a) Original sampling process, self-attention weights, and the corresponding energy landscape. (b) Our modified sampling process with blurred queries where*
 
-## 核心模块与公式推导
+
 
 ### 3.1 自注意力作为能量最小化
 
@@ -209,7 +213,9 @@ $$d\mathbf{x} = [\mathbf{f}(\mathbf{x}, t) - g(t)^2((1-\gamma_{\mathrm{cfg}}+\ga
 ![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_JK728xy8G7/figures/013_Figure_12.jpg]]
 *Figure 12: Comparison between query and key blur across different values of σ*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 无条件生成：Pareto 改进的量化证据
 
@@ -286,7 +292,9 @@ Figure 5 的定性对比揭示了 SEG 相对于 SAG 和 PAG 的关键优势：
 ![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_JK728xy8G7/figures/002_Figure_2.jpg]]
 *Figure 2: Unconditional generation using SEG*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 无条件引导方法的演进与SEG的定位
 
@@ -333,6 +341,8 @@ $$d \mathbf { x } = [ \mathbf { f } ( \mathbf { x } , t ) - g ( t ) ^ { 2 } ( ( 
 - 对于不同结构（如DiT）或不同任务（如NLP中的注意力模型），SEG的能量曲率平滑框架是否具有普适性？
 - 能否设计更精细的能量函数或自适应模糊策略，以进一步解耦质量提升与副作用，并量化偏见放大的风险？
 - 在更广泛的扩散模型规模（从SD 1.5到SDXL再到更大模型）上，SEG的性能增益是否具有单调性？
+
+
 
 ## 原文 PDF
 

@@ -42,7 +42,7 @@ claims:
 > - EgoTempo 上，Accuracy 36.8 (CLiViS w/ GPT-4.1) vs 34.2 (GPT-4.1) (+2.6)。
 > - OpenEQA 上，Accuracy (Likert score ≥4) 57.3 (CLiViS w/ VideoLLaMA3) vs — (—)。
 
-## 概述
+## 概要
 
 具身视觉推理（Embodied Visual Reasoning, EVR）要求模型从长时第一人称视频中提取细粒度视觉线索并进行高层语义推理，以回答关于场景、动作和事件的复杂问题。现有方法面临一个核心瓶颈：基于视频描述的方法将视频压缩为文本后丢失关键视觉细节，而端到端视觉语言模型（VLM）虽能保留视觉信息，却缺乏步骤化的组合推理能力。此外，长时视频的时空动态复杂性进一步加剧了这一感知与推理之间的张力。
 
@@ -50,7 +50,7 @@ CLiViS 提出了一种训练无关（training-free）的框架，通过语言-�
 
 实验结果表明，CLiViS 在 OpenEQA、EgoTempo 和 EgoSchema 三个基准上均取得最优性能，平均准确率显著超越各范式最强基线——相比 Socratic-based 方法提升 20.2%，相比端到端 VLM 提升 2.9%，相比视频推理方法提升 14.3%。消融实验进一步验证了多轮迭代协同的必要性：将推理过程压缩为单轮导致准确率下降 10.5%，用 VLM 替换 LLM 作为规划者更引致 12.4% 的下降。此外，CLiViS 在 Qwen2.5-VL、InternVL3、VideoLLaMA3 等不同 VLM 骨干上均实现一致且显著的性能提升（+2.0%～+4.3%），证明了其模型无关的通用性。
 
-## 背景与动机
+
 
 ### 具身视觉推理的双重挑战
 
@@ -74,7 +74,9 @@ CLiViS 提出了一种训练无关（training-free）的框架，通过语言-�
 
 CLiViS 的提出正是为了打破这一僵局。其核心洞察是：若能构建一个可演化的结构化场景表示作为感知与推理的共享中介，LLM 便能主动指导 VLM 进行针对性感知，而 VLM 的感知结果又能即时更新 LLM 的推理状态。这种 **LLM-VLM 协同**机制使模型兼具 LLM 的任务分解与逻辑推理能力，以及 VLM 的开放式视觉感知能力，从而在具身视觉推理中实现感知与推理的真正融合。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CLiViS 的核心创新在于突破现有具身视觉推理（EVR）方法中感知与推理割裂的瓶颈，提出了一种**LLM 规划、VLM 感知的迭代协同框架**。该框架通过动态演化的结构化认知地图作为桥梁，使 LLM 能够主动指导 VLM 进行任务导向的定向感知，从而将高层语义推理与细粒度视觉感知闭合为统一循环。
 
@@ -96,7 +98,7 @@ CLiViS 的因果杠杆在于**LLM 驱动的高层任务分解与 VLM 的开放�
 
 消融实验直接验证了这一协同机制的必要性（Table 3）：将多轮迭代压缩为单轮导致准确率下降 **10.5%**，而将 LLM 规划者替换为 VLM 更引致 **12.4%** 的下降——这表明 LLM 的高层规划能力与 VLM 的感知能力不可相互替代，二者的迭代协同是性能提升的根本来源。
 
-## 整体框架
+
 
 CLiViS 将具身视觉推理（EVR）重新定义为 LLM–VLM 协同构建动态认知地图的过程，而非传统的单步推理或视频描述后推理范式。其核心公式为：
 
@@ -156,7 +158,7 @@ CLiViS 通过 LLM 规划–VLM 感知的迭代闭环，将三者的优势融合�
 ![[assets/figures/papers/paper_list_l2379_https_arxiv_org_abs_2506_17629/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of our proposed CLiViS with previous methods. CLiViS bridges perception and reasoning by combining the strengths of LLMs and VLMs*
 
-## 核心模块与公式推导
+
 
 CLiViS 将具身视觉推理（EVR）重新定义为 LLM 与 VLM 协同构建动态认知地图的过程，其核心形式化表述为：
 
@@ -218,7 +220,9 @@ CLiViS 的推理流程由七个功能模块串联而成：
 ![[assets/figures/papers/paper_list_l2379_https_arxiv_org_abs_2506_17629/figures/013_Figure_7.jpg]]
 *Figure 7: Qualitative results of Cognitive Map and Sub-Instrction Generation*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -284,7 +288,9 @@ Table 6将CLiViS与GPT-4.1、Gemini-2.5-flash等前沿多模态模型在EgoTempo
 ![[assets/figures/papers/paper_list_l2379_https_arxiv_org_abs_2506_17629/figures/011_Figure_5.jpg]]
 *Figure 5: Correlation between reasoning rounds and video duration*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 范式定位：三种主流路线的交汇点
 
@@ -347,6 +353,8 @@ CLiViS 的设计假设和实验范围定义了其当前适用边界：
 3. **认知地图的学习优化**：当前认知地图的构建与更新完全依赖 LLM 的提示工程，未经过任务特定的优化。是否可以引入强化学习或参数高效微调（如 LoRA），使认知地图的更新策略在保持训练无关优势的同时获得任务适应性提升？
 
 4. **外部知识的融合**：认知地图的图结构表示天然适合与外部知识图谱对接。在零样本场景下，引入常识知识库或场景图谱是否能增强 CLiViS 对未见实体和关系的泛化能力？
+
+
 
 ## 原文 PDF
 

@@ -42,7 +42,7 @@ claims:
 > - ActiveManip-Bench (Simulation) 上，Success rate (%) (Avg across 6 task types) 74.83 (Active Camera only) vs 36.17 (Fixed Camera) (+38.66)。
 > - Real-world Active Manipulation (4 tasks) 上，Success rate (%) (Avg) 85.00 (Ours) vs 45.00 (π0) (+40.00)。
 
-## 概述
+## 概要
 
 当前视觉-语言-动作（VLA）模型在机器人操作中取得了显著进展，但其成功高度依赖固定的、预先优化的相机视角。一旦场景中出现遮挡或物体偏离最佳视野，固定视角模型便缺乏主动调整视线以获取任务关键视觉线索的能力。直接扩展VLA的动作空间以包含连续相机运动面临双重困境：一方面，统一动作空间会破坏已有操作先验；另一方面，大规模主动操作数据的稀缺使模型难以收敛。
 
@@ -50,7 +50,7 @@ claims:
 
 实验表明，SaPaVe在仿真基准 **ActiveManip-Bench** 上平均成功率达 **75.2%**，绝对超出固定视角VLA模型（如GR00T-N1）**58个百分点**；在真实世界主动操作任务中平均成功率达 **85%**，分别超出π0 **40个百分点**和GR00T-N1 **31.25个百分点**。消融实验进一步证实，解耦动作头设计、两阶段训练策略以及空间知识注入均对最终性能有决定性贡献。
 
-## 背景与动机
+
 
 ### 主动感知：机器人操作中被忽视的关键能力
 
@@ -76,7 +76,9 @@ SaPaVe的设计源于一个关键观察：**相机运动本身是实例无关的
 
 这种设计使得两类动作可以从各自的数据中获益：相机控制受益于大规模合成数据，操作能力受益于已有的VLA预训练权重，避免了直接混合训练带来的冲突与退化。消融实验证实，移除第一阶段训练后，模型在视野外关节操作任务中**成功率减半**（Table 5），验证了语义主动感知先验的不可或缺性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SaPaVe 的核心创新在于**将主动感知从操作策略中解耦**，通过动作空间分离与自下而上的两阶段训练，以极低的数据成本赋予视觉语言动作（VLA）模型语义驱动的主动相机控制能力。
 
@@ -155,7 +157,7 @@ $$\mathcal{L}_{\mathrm{stage2}} = \lambda_{\mathrm{head}}\mathcal{L}_{\mathrm{he
 
 开放问题包括：如何将主动感知扩展至**移动操作**（同时控制头部和移动底盘），以及如何处理物体被移动到机械臂物理可达范围之外但仍被主动感知到的情形。
 
-## 整体框架
+
 
 SaPaVe 是一个端到端的主动操作框架，其核心设计理念是将语义主动感知与主动视角执行联合建模。整体架构如图2所示，系统接收 RGB 图像序列与任务语言指令作为输入，输出解耦的相机运动与操作动作序列。
 
@@ -189,7 +191,7 @@ SaPaVe 是一个端到端的主动操作框架，其核心设计理念是将语�
 ![[assets/figures/papers/paper_list_l2415_https_arxiv_org_abs_2603_12193/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of SaPaVe. SaPaVe can process RGB images and task instructions and output camera movement and manipulation actions in a decoupled action space. This decoupled design enables the model to achieve active manipulation via a bottom-up, two-stage training strategy: First, large-scale embodiment-agnostic camera control data fosters semantic active perception, which is encoded as prior knowledge in a camera adapter. Second, mixed data together with Universal Spatial Knowledge Injection flexibly incorporate various geometric configurations (e.g., absolute depth, camera intrinsics), thereby enhancing spatial precision for active-view execution*
 
-## 核心模块与公式推导
+
 
 SaPaVe 的核心设计围绕一个中心矛盾展开：**将相机运动直接纳入 VLA 的动作空间会破坏已有的操作先验，而大规模主动操作数据的稀缺使端到端训练难以收敛**。为此，SaPaVe 通过四个关键模块实现解耦与渐进学习。
 
@@ -241,7 +243,9 @@ $$`\mathcal{L}_{\mathrm{stage2}} = \lambda_{\mathrm{head}}\mathcal{L}_{\mathrm{h
 
 其中 $`\lambda_{\mathrm{head}}=1.0`$，$`\lambda_{\mathrm{other}}=10.0`$，更高的操作损失权重反映了操作任务的复杂性。消融实验表明，移除第一阶段训练使平均成功率从 85% 降至 53.75%，在视野外关节操作任务中成功率减半；而仅靠第一阶段先验（省略第二阶段）的成功率仅为 66.25%，说明两阶段互为必要补充。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -317,7 +321,9 @@ Table 4 展示了 SaPaVe 在未见物体、变化光照和多样化场景三个�
 ![[assets/figures/papers/paper_list_l2415_https_arxiv_org_abs_2603_12193/figures/024_Figure_15.jpg]]
 *Figure 15: This image illustrates the active manipulate task performed by the robot in a real-world scenario*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 
@@ -372,6 +378,8 @@ SaPaVe 在机器人学习的知识谱系中，位于 **VLA 模型**、**主动�
 - **从课程学习借鉴**：两阶段训练（先学相机控制，再联合优化）本质上是一种自下而上的课程设计，使得模型先掌握较易学习的实例无关技能（相机运动），再在此基础上学习更复杂的任务相关操作。
 
 SaPaVe 的核心洞见——“相机运动本身是实例无关且较易学习的”——为未来工作提供了一个可复用的设计原则：在构建复杂机器人技能时，识别并分离出那些可以大规模、低成本、跨任务学习的子技能，通过课程训练将其固化为先验，再在此基础上学习任务特定的能力。
+
+
 
 ## 原文 PDF
 

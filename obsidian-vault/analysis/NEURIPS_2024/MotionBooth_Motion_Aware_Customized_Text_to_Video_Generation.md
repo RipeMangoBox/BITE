@@ -5,6 +5,8 @@ paper_level: A
 venue: NeurIPS
 year: 2024
 pdf_ref: paperPDFs/NEURIPS_2024/MotionBooth_Motion_Aware_Customized_Text_to_Video_Generation.pdf
+project_link: https://jianzongwu.github.io/projects/motionbooth
+code_link: null
 aliases:
 - MotionBooth
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | MotionBooth：运动感知的定制文本到视频生成 |
 | 英文题名 | MotionBooth: Motion-Aware Customized Text-to-Video Generation |
 | 会议/期刊 | NeurIPS 2024 |
-| Links | [paper](https://arxiv.org/abs/2406.17758); [Project](https://jianzongwu.github.io/projects/motionbooth) |
+| Links | [paper](https://arxiv.org/abs/2406.17758) · [Project](https://jianzongwu.github.io/projects/motionbooth) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | MotionBooth |
 | Dataset | Custom subject-motion eval (26 subjects, 40 text-motion pairs), Camera motion control eval (MSRVTT subset) |
@@ -40,7 +42,7 @@ claims:
 > - Custom subject-motion eval (26 subjects, 40 text-motion pairs) 上，R-DINO 为 0.306，对比 0.279 (DreamBooth)，变化 +0.027。
 > - Custom subject-motion eval (26 subjects, 40 text-motion pairs) 上，Flow error 为 0.252，对比 0.690 (DreamBooth)，变化 -0.438。
 
-## 概述
+## 概要
 
 **核心问题**：预训练文本到视频（T2V）扩散模型在针对特定主体进行微调时，存在一个关键瓶颈——模型容易过拟合背景细节，同时丧失原有的视频生成能力，导致生成的视频要么背景退化、要么运动匮乏。现有的定制化视频生成方法（如 **DreamBooth** (Ruiz et al., CVPR 2023)、**CustomVideo** 等）主要关注主体外观保真度，却忽视了运动层面的可控性。
 
@@ -59,7 +61,7 @@ claims:
 
 **局限与展望**：该方法在处理非动物物体上的动物运动时可能出现严重变形，无法处理多主体复杂交互，极端相机运动速度下存在平铺效应。未来方向包括扩展到多主体场景、利用更丰富的运动控制信号（如光流、骨架）、以及减少对精确主体掩码的依赖。
 
-## 背景与动机
+
 
 ### 问题背景：定制化视频生成的兴起
 
@@ -93,7 +95,9 @@ claims:
 
 简而言之，MotionBooth 旨在回答一个核心问题：**如何在不破坏预训练T2V模型视频生成先验的前提下，实现精确且免训练的主体和相机运动控制？**
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MotionBooth 的核心创新在于**将主体定制化视频生成中的三大瓶颈——背景过拟合、运动控制缺失、相机运动僵化——转化为三个可解耦的“改变槽位”（changed slots）**，并通过训练期损失重构与推理期免训练操控的组合策略逐一突破。
 
@@ -122,7 +126,7 @@ MotionBooth 的核心创新在于**将主体定制化视频生成中的三大瓶
 
 上述三个改变槽位并非独立运作，而是形成**因果链条**：STCA 损失建立了主体令牌与空间位置的绑定（训练期），这使免训练的交叉注意力编辑能够精确控制主体运动（推理期）；同时，视频保持损失保护了预训练模型的运动先验，使潜空间偏移模块能够利用该先验生成连贯的相机运动。若移除任一环节，整个系统的控制精度和生成质量都会显著下降（Table 3 消融实验）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l11_MotionBooth_Motion_Aware_Customized_Text_to_Video_Generation/figures/001_Figure_1.jpg]]
 *Figure 1: Motion-aware customized video generation results of MotionBooth. Our method animates a customized object with controllable subject and camera motions*
@@ -173,7 +177,7 @@ MotionBooth 提出了一套统一的运动感知定制视频生成框架，其�
 
 这种设计使得 MotionBooth 在保持主体外观保真度的同时，无需任何额外训练即可灵活控制主体和相机运动，且实验表明其相机控制精度甚至超越了需要大规模数据训练的 **CameraCtrl**（Table 2）。
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题形式化与框架概览
 
@@ -265,7 +269,9 @@ $$\begin{array} { r l } & { { \mathbf{h} } _ { x } = { \mathrm { SampleHorizonta
 
 Table 2 的定量结果表明，该免训练方法在 Flow error 和 FVD 上均显著优于需要大规模训练的 **CameraCtrl**（Flow error：0.190 vs 1.683；FVD：905.40 vs 1468.53，基于 Zeroscope），验证了潜空间偏移作为相机控制机制的有效性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -376,7 +382,9 @@ Figure 9 展示了 MotionBooth 的典型失败案例，结合分析可知主要�
 ![[assets/figures/papers/paper_list_l11_MotionBooth_Motion_Aware_Customized_Text_to_Video_Generation/figures/016_Table.jpg]]
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 MotionBooth 的核心技术路径是在预训练文本到视频（T2V）扩散模型之上，通过**损失增强的主体微调**与**免训练的推理时操控**两个阶段，实现主体外观、主体运动与相机运动的联合可控生成。其方法定位可从三个维度进行谱系梳理：主体定制、运动控制、以及相机运动生成。
 
@@ -428,6 +436,8 @@ MotionBooth 的能力边界受限于以下约束：
 - 如何减少对精确主体掩码的依赖，实现完全自动化的训练流程？
 - 是否可能通过在线学习或测试时自适应来增强模型在极端运动条件下的鲁棒性？
 - 如何降低同时启用主体和相机控制时的推理延迟，使方法更适用于实时应用场景？
+
+
 
 ## 原文 PDF
 

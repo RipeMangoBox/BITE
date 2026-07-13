@@ -44,7 +44,7 @@ claims:
 > - ExORL Quadruped (4 tasks average) 上，平均回报 355 vs 232 (HILP) (+123)。
 > - ExORL Cheetah (4 tasks average) 上，平均回报 543 vs 454 (HILP) (+89)。
 
-## 概述
+## 概要
 
 视觉无监督强化学习（URL）旨在无需任务奖励的预训练阶段，让智能体习得可跨任务泛化的技能。基于后继表示（Successor Representation, SR）的方法在低维状态输入下表现出色，但在高维视觉输入下泛化性能急剧下降。**Figure 2** 显示，SR 方法在视觉 URL 中性能大幅衰减，且注意力热力图集中在任务无关区域，说明编码器未能捕获动态相关特征。
 
@@ -57,7 +57,7 @@ claims:
 
 实验验证了问题诊断与方法的有效性。**Figure 3** 表明，HILP-pixel 的值-回报 Spearman 相关性显著低于 HILP-state 和 HILP-SDE-pixel，证实次优表示主要损害后继度量而非基础特征。**Table 1** 的全面对比显示，SRCP 在 Walker、Quadruped、Cheetah 域的平均性能分别超出当时最佳方法 13%、33% 和 11%。**Table 2** 的消融实验进一步证实，移除显著性动态编码器或一致性策略均导致性能下降，两者结合达到最优。
 
-## 背景与动机
+
 
 ### 视觉无监督强化学习的泛化困境
 
@@ -85,7 +85,9 @@ $$\|\hat{V}^{\pi_{z_r}} - V^\star\|_\infty \leq \frac{3\|z_r\|_*}{1-\gamma} \sup
 
 上述分析揭示了视觉 URL 的两个核心缺口：(1) 表示学习与 SR 目标的耦合导致动态无关的视觉偏差；(2) 策略建模缺乏对多模态行为分布的表达能力和高效推理机制。SRCP 的提出正是为了填补这两个缺口——通过显著性引导的动态表示学习将编码器从 SR 目标中解耦，同时引入一致性策略与 URL 特定的无分类器引导，在技能多样性与可控性之间取得平衡。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题根源：视觉后继表示中的表示-目标耦合
 
@@ -124,7 +126,7 @@ SRCP 通过两个核心操作柄打破上述级联失效：
 
 三个 changed slots 形成闭环协同（见 Figure 5 框架总览）：(1) 显著性图从当前后继度量中提取动态注意力区域；(2) 显著性引导的动力学任务利用该图训练编码器，更新后的编码器反过来改进后继度量的输入质量；(3) 一致性策略基于高质量的后继度量学习多模态技能行为，其生成的动作又为下一轮显著性图计算提供新的数据。这种迭代优化的设计使得表示质量、度量精度和策略表达力相互促进，最终在 Walker、Quadruped、Cheetah 域分别以 13%、33%、11% 的优势超越当时最佳方法（见 Table 1）。
 
-## 整体框架
+
 
 SRCP 的整体预训练框架由五个核心模块构成，它们在一个迭代训练循环中协同工作，如图 Figure 5 所示。这五个模块分别是：无监督数据集、显著性图生成、显著性动态表示学习、后继度量训练以及一致性策略学习。框架的核心设计理念是将视觉表示学习与后继表示（SR）目标解耦，同时引入高效的多模态策略建模，从而解决现有 SR 方法在视觉无监督强化学习（URL）中泛化性能急剧下降的问题。
 
@@ -162,7 +164,7 @@ SRCP 的整体预训练框架由五个核心模块构成，它们在一个迭代
 ![[assets/figures/papers/paper_list_l2722_https_arxiv_org_abs_2604_05931/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of traditional RL and SR methods: (a) Traditional RL trains with task-specific rewards. (b) Traditional RL generalizes poorly to tasks with different rewards. (c) SR methods learn skill-conditioned skills without reward. (d) SR agents infer skills from minimal task information and generalize across tasks*
 
-## 核心模块与公式推导
+
 
 ### 5.1 总体框架与模块划分
 
@@ -277,7 +279,9 @@ $$\|\hat{V}^{\pi_{z_r}} - V^{\star}\|_{\infty} \leq \frac{3 \|z_r\|_*}{1 - \gamm
 ![[assets/figures/papers/paper_list_l2722_https_arxiv_org_abs_2604_05931/figures/004_Figure_4.jpg]]
 *Figure 4: Trajectory comparison of methods with random and walking skills in the walker domain*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈验证：视觉后继表示为何失效？
 
@@ -369,7 +373,9 @@ SRCP 的设计具有方法级兼容性。将 SRCP 的表示学习与策略学习
 - **Table 2**：RND 数据集组件消融
 - **Table 15**：扩散策略与一致性策略效率对比
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：视觉无监督RL中后继表示方法的退化
 
@@ -428,6 +434,8 @@ SRCP 在以下条件下展现出显著优势：
 4. **显著性稳定性**：显著性图生成过程中的随机性或噪声如何影响训练稳定性？是否需要引入平滑机制或贝叶斯不确定性估计？
 
 5. **真实机器人验证**：该框架能否应用于真实机器人视觉控制任务，并验证其对领域转移（sim-to-real）的泛化能力？这涉及视觉编码器对真实纹理和光照的适应性问题。
+
+
 
 ## 原文 PDF
 

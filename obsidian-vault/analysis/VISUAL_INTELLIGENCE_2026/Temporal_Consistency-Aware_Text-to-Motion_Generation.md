@@ -43,7 +43,7 @@ claims:
 > - HumanML3D 上，FID↓ 0.040 vs MoMask (次优; 未提取具体值) (优于所有对比方法)；R-Precision Top-1↑ 0.517 vs MoMask (次优; 未提取具体值) (优于所有对比方法)；MM-Dist↓ 2.852 vs MoMask (次优; 未提取具体值) (优于所有对比方法)。
 > - KIT-ML 上，FID↓ 0.068 vs MoMask (次优; 未提取具体值) (优于所有对比方法)；R-Precision Top-1↑ 0.517 vs MoMask (次优; 未提取具体值) (优于所有对比方法)。
 
-## 概述
+## 概要
 
 **核心问题**：现有两阶段文本到动作生成方法在运动表示学习阶段仅关注单序列的重建质量，忽略了同一动作不同实例间共享的跨序列时序结构。这导致生成的运动在语义上错位，并出现脚滑动等物理上不真实的伪影。
 
@@ -53,7 +53,7 @@ claims:
 
 **主要结果**：在 HumanML3D 和 KIT-ML 两个标准基准上，TCA-T2M 在 FID、R-Precision Top-1 和 MM-Dist 等指标上均优于现有方法。消融实验表明，引入 TCC 后运动重建 FID 从 0.054 降至 0.025，生成运动的时序一致性指标 Kendall's τ 从 0.1757 提升至 0.2571，验证了跨序列对齐是突破重建与生成质量瓶颈的关键因素。
 
-## 背景与动机
+
 
 文本到动作生成（Text-to-Motion, T2M）旨在根据自然语言描述合成逼真的三维人体运动序列，在动画制作、虚拟现实和人机交互等领域具有广泛应用。近年来，基于扩散模型和离散运动表示的方法显著推动了该领域的发展。
 
@@ -64,7 +64,9 @@ claims:
 
 针对上述问题，本文提出 **TCA-T2M**（Temporal Consistency-Aware Text-to-Motion Generation），核心动机是将跨序列时序对齐约束引入离散运动表示学习，使运动编码器能够捕捉不同序列中共享的时序阶段，从而提升生成运动的时序连贯性和语义保真度。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：跨序列时序一致性的缺失
 
@@ -96,7 +98,7 @@ TCA-T2M 在运动表示学习阶段引入了三个核心 changed slots，直接�
 
 TCA-T2M 的核心创新逻辑链为：**跨序列循环时序对齐（TCC）** 使 VQ-VAE 编码器学会捕捉动作的语义核心时序结构 → **运动学约束块（KCB）** 在物理空间施加连续性约束，消除重建伪影 → **多级残差量化（RQ）** 补偿量化误差，保留细粒度运动细节。三者协同作用，使运动表示从“单序列表面重建”升级为“跨序列语义一致的物理合理表示”，从而在生成阶段（掩码运动Transformer）获得更优的文本-运动语义对齐和时序连贯性。
 
-## 整体框架
+
 
 TCA-T2M 的整体架构由两个核心模块串联构成：**时间一致性感知的空间 VQ-VAE（TCaS-VQ-VAE）** 和 **掩码运动 Transformer（Masked Motion Transformer）**。前者负责学习具有跨序列时序对齐能力的离散运动表示，后者则在此表示基础上完成文本到运动的生成。
 
@@ -111,7 +113,7 @@ TCA-T2M 的整体架构由两个核心模块串联构成：**时间一致性感�
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2602_18057/figures/002_Figure_2.jpg]]
 *Figure 2: Method overview. (a) Temporal consistency-aware spatial VQ-VAE employs hierarchical residual quantization to discretize motion features, incorporates cycle-consistency constraints to enforce temporal coherence, and utilizes a kinematic constraint block to refine motion details. (b) Masked motion transformer adopts a dual-transformer structure for cross-modal text-motion synthesis. Specifica*
 
-## 核心模块与公式推导
+
 
 ### TCaS-VQ-VAE：时间一致性感知的运动离散表示
 
@@ -169,7 +171,9 @@ $$\boldsymbol{X} = \boldsymbol{X}^{(0)} + \sum_{j=1}^{L} \boldsymbol{\Delta x}^{
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2602_18057/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of temporal consistency across three distinct human action sequences. (a) A person walks forward; (b) A person walks and sits down; (c) A person sits down and stands up. Despite differences in kinematic details, these sequences exhibit shared temporal structures. Enforcing temporal alignment in the latent space ensures that motion representation encoder E maps corresponding action phases across sequences to similar representations. This constraint enables the learned motion representation to capture semantic information while preserving temporal consistency, which is essential for the subsequent text-conditioned motion generation stage in T2M*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -236,7 +240,9 @@ Table 6报告了模型参数、推理效率与生成质量的综合对比。TCA-
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2602_18057/figures/003_Figure_3.jpg]]
 *Figure 3: Qualitative comparisons between MDM [47] and our method across representative motion from the HumanML3D dataset. Key frames highlight critical motion details. The visual comparisons underscore our method’s strength in semantic comprehension of textual prompts and consistent action execution across multi-step sequences with dynamic environment adaptation*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法继承与差异化
 
@@ -293,6 +299,8 @@ TCA-T2M 在以下条件下表现最优：
 ### 4. 知识库定位
 
 TCA-T2M 在文本到动作生成领域的定位可概括为：**将时序一致性从生成阶段的隐式约束前移至表示学习阶段的显式对齐**。这一思路与视频理解中的循环一致性学习（如时间对齐网络）有方法论上的亲缘性，但在运动生成领域属于首次应用。其技术贡献集中在表示学习层面，生成架构本身与同期工作（MoMask、MMM）兼容，因此后续工作可直接将 TCaS-VQ-VAE 作为运动分词器嵌入其他生成框架。
+
+
 
 ## 原文 PDF
 

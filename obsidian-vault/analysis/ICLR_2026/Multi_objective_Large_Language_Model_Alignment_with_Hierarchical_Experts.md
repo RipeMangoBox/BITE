@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Multi_objective_Large_Language_Model_Alignment_with_Hierarchical_Experts.pdf
+project_link: null
+code_link: https://github.com/lizhuolz/HoE
 openreview_forum_id: UhmEdfAk46
 aliases:
 - HHME
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 基于分层专家的多目标大语言模型对齐 |
 | 英文题名 | Multi-objective Large Language Model Alignment with Hierarchical Experts |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=UhmEdfAk46); [GitHub](https://github.com/lizhuolz/HoE) |
+| Links | [paper](https://openreview.net/forum?id=UhmEdfAk46) · [GitHub](https://github.com/lizhuolz/HoE) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/online |
 | Method | HoE (Hierarchical Mixture-of-Experts) |
 | Dataset | HelpSteer, HelpAssistant, Reddit Summary, BeaverTails (two-objective alignment, Figure 3) |
@@ -42,7 +44,7 @@ claims:
 > - HelpSteer 上，Average Score 为 62.08，对比 58.48 (RS), 58.48 (RiC), 58.48 (MOD)，变化 +3.6。
 > - HelpSteer 上，Average Score 为 62.1，对比 58.9 (RS), 58.9 (RiC), 58.9 (MOD)，变化 +3.2。
 
-## 概述
+## 概要
 
 大语言模型的对齐通常需要在多个相互冲突的目标之间取得平衡，例如有用性、无害性和幽默性。现有方法难以同时优化这些冲突目标，且单一模型无法在任意用户偏好权重下达到帕累托最优，导致可操控性瓶颈。本文提出**HoE（Hierarchical Mixture-of-Experts）**，一种轻量级、参数高效、即插即用的多目标对齐框架，无需重新训练骨干模型即可覆盖完整的帕累托前沿。
 
@@ -56,7 +58,7 @@ HoE的核心洞察在于将多目标对齐分解为一系列单偏好子问题�
 
 **局限性**方面，HoE依赖现成的单目标优化模型，若不可用则需从头训练，成本较高；模型合并与SVD压缩在部分场景下可能失效，泛化性受限。**待探索问题**包括：在高度非凸目标空间中插值偏好是否始终保持在帕累托前沿，以及在目标数量极多时专家数量的扩展性和内存效率。
 
-## 背景与动机
+
 
 ### 多目标对齐的核心瓶颈
 
@@ -90,7 +92,9 @@ HoE的核心洞察在于将多目标对齐分解为一系列单偏好子问题�
 
 基于以上观察，HoE（Hierarchical Mixture-of-Experts）框架以**几乎无需训练骨干模型**的方式，将多目标对齐的所有偏好统一存储于单一模型中，推理代价仅1倍，同时支持任意偏好的连续帕累托前沿遍历。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈突破：从单模型到分层专家解耦
 
@@ -124,7 +128,7 @@ Table 1的系统对比揭示了HoE在七个关键维度上相对于15个基线�
 
 这些changed slots共同构成了HoE的差异化优势：**最轻量、可帕累托操控、训练负担最低的方法**，仅需存储一个模型且推理代价为$1\times$，同时具备最高的可扩展性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0010_UhmEdfAk46_Multi-objective_Large_Language_Model_Alignment_w/figures/002_Figure_1.jpg]]
 *Figure 1: (Left) HoE decomposes the multi-objective alignment problem into a series of single-preference subproblems, each handled by a specialized expert. (Right) HoE employs hierarchical experts, integrating LoRA and router experts to approach near-optimal Pareto frontier*
@@ -176,7 +180,7 @@ Table 1系统对比了HoE与13种基线方法的特性差异，HoE是唯一同�
 
 该框架将多目标对齐的核心瓶颈——**冲突目标的联合优化**——转化为层次化的专家组合问题，通过分解策略规避了单一模型在任意偏好下无法帕累托最优的根本限制。
 
-## 核心模块与公式推导
+
 
 HoE 的核心架构由三个层次化组件构成：**LoRA 专家（LoRA Experts）**、**路由器专家（Router Experts）** 和 **偏好路由（Preference Routing）**。其设计目标是将多目标对齐问题分解为一系列单偏好子问题，并通过分层路由实现任意偏好的动态组合，从而突破单一模型无法覆盖完整帕累托前沿的瓶颈。
 
@@ -238,7 +242,9 @@ $$O(x) = W_{\text{pre}} x + \sum_j w_j^{(2)} B_j A_j x \tag{11}$$
 
 消融实验（Fig. 5）证实了上述设计的有效性：组合 3 个 LoRA 专家与 1 个路由器专家即可实现近乎完整的帕累托前沿覆盖，而仅使用 LoRA 专家覆盖有限；LoRA 秩为 256 即可在性能与效率间取得平衡；Tchebyscheff 标量化相比线性标量化训练更稳定且保持完整前沿覆盖。在五目标对齐中，增加路由器专家数量（1→5）进一步提升多偏好性能（Table 5）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：二目标对齐的帕累托前沿
 
@@ -301,7 +307,9 @@ Table 6 展示了 HoE 在未见数据集 HelpSteer2 和 Psoups 上的三目标�
 2. **模型合并与 SVD 压缩的边界**：在部分场景下，任务向量的 SVD 压缩可能丢失关键信息，模型合并可能无法精确合成目标偏好的专家参数。Table 7 的合并方法对比中，PCB-Merging 优于 Task Arithmetic，但两者均非完美。
 3. **极端偏好的覆盖**：Fig. 5 的消融显示，即使完整 HoE 配置，帕累托前沿的极端区域仍可能存在微小间隙，需要更多专家或更精细的路由策略。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有方法的系统对比
 
@@ -348,6 +356,8 @@ HoE 的适用性建立在以下前提之上：
 3. **参考点 $z^*$ 的敏感性**：Tchebycheff 标量化（Eq. 6）依赖参考点 $z_i^*$ 的选择。论文未消融不同参考点选择策略对训练稳定性和前沿覆盖的影响。
 4. **无奖励信号的扩展**：当前路由器训练依赖显式奖励函数。能否将 HoE 扩展到仅有人类偏好排序的场景（如 DPO 风格的对齐），是一个具有实际价值的方向。
 5. **未见数据集的泛化机制**：Table 6 展示了 HoE 在 HelpSteer2 和 Psoups 上的泛化结果，但泛化成功的归因尚不清晰——是源于 LoRA 专家的任务向量保留了通用能力，还是路由器专家的动态选择提供了鲁棒性？
+
+
 
 ## 原文 PDF
 

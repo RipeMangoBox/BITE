@@ -44,7 +44,7 @@ claims:
 > - iNat21-Animal 上，HCA 10.26 vs 8.57 (RL only) (+1.69)。
 > - TerraIncognita (Known) 上，Order F1 55.61 vs 37.35 (RL only) (+18.26)。
 
-## 概述
+## 概要
 
 层次视觉识别（Hierarchical Visual Recognition, HVR）要求模型不仅识别细粒度类别，还需给出从根节点到叶节点的完整分类路径，并保持路径内各层预测的层次一致性。大规模多模态模型（LMMs）在常规视觉问答中表现优异，但在HVR场景下暴露出严重缺陷：其内部表征未能充分编码分类学层次结构，导致预测路径违反父子约束，尤其对训练中未见过的新颖类别，层次一致性急剧下降。
 
@@ -54,7 +54,7 @@ claims:
 
 方法定位上，TARA属于**表征对齐 + 强化微调**的混合训练范式，区别于需要推理时额外模块或复杂提示工程的方法。其知识来源为预训练BFMs，基座模型为Qwen系列LMMs，目前验证范围限于生物分类学领域。
 
-## 背景与动机
+
 
 ### 层次视觉识别的核心挑战
 
@@ -79,7 +79,9 @@ claims:
 
 基于上述分析，本文提出 **TARA（Taxonomy-Aware Representation Alignment）**，一个简单但有效的训练框架。TARA 在 No-Thinking RFT 的基础上，通过两个余弦相似度对齐损失，分别将 LMMs 的中间视觉表征和回答嵌入与 BFMs 的对应表征对齐，从而在微调过程中显式注入分类学层次知识。推理时，BFMs 和对齐投影器被完全丢弃，LMMs 直接执行 HVR，无额外参数或计算开销。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 TARA 的核心创新在于**首次将大规模多模态模型（LMMs）的层次视觉识别能力，通过表征对齐的方式与预训练生物基础模型（BFMs）的分类学知识建立连接**。与现有方法在推理时引入外部模块或依赖复杂提示工程不同，TARA 将层次一致性直接注入模型的内部表征空间，且推理时无任何额外开销。
 
@@ -137,7 +139,7 @@ TARA 位于**知识蒸馏与表征对齐**的方法谱系中，但其独特之�
 
 这些消融结果表明，TARA 的每个组件和设计选择均经过充分验证，并非启发式堆叠。
 
-## 整体框架
+
 
 TARA（Taxonomy-Aware Representation Alignment）的整体训练框架遵循**交替优化**策略，将分类学感知的表征对齐与无思考强化微调（No-Thinking RFT）交织进行，其核心设计如图2所示。
 
@@ -170,7 +172,7 @@ TARA（Taxonomy-Aware Representation Alignment）的整体训练框架遵循**�
 ![[assets/figures/papers/paper_list_l2750_https_arxiv_org_abs_2603_00431/figures/002_Figure_2.jpg]]
 *Figure 2: Illustration of the training framework. Taxonomy-Aware Representation Alignment (TARA) is conducted alternately with No-Thinking RFT to improve the hierarchical recognition performance of LMMs with taxonomic knowledge absorbed from BFMs*
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题形式化：层次视觉识别（HVR）
 
@@ -231,7 +233,9 @@ $$\mathcal{L}_{\mathrm{alignment}} = (\mathcal{L}_{\mathrm{V}} + \mathcal{L}_{\m
 ![[assets/figures/papers/paper_list_l2750_https_arxiv_org_abs_2603_00431/figures/006_Figure_3.jpg]]
 *Figure 3: Different designs of target alignment features. (a) and (b) are for*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与实验动机
 
@@ -308,7 +312,9 @@ $$\mathcal{L}_\mathrm{alignment} = (\mathcal{L}_\mathrm{V} + \mathcal{L}_\mathrm
 ![[assets/figures/papers/paper_list_l2750_https_arxiv_org_abs_2603_00431/figures/001_Figure_1.jpg]]
 *Figure 1: LMMs struggle with hierarchical visual recognition (HVR), failing to obey the hierarchical consistency on both known and novel categories*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有基线的关系
 
@@ -348,6 +354,8 @@ TARA 的有效性建立在以下前提之上：
 3. **动态层次对齐。** 当前 $\mathcal{L}_C$ 在单一固定层级进行标签对齐。对于深度和分支数远超生物学分类的树结构，是否需要在多个层级进行分阶段或加权对齐？层级间的梯度冲突如何解决？
 
 4. **开放生成场景的层次一致性评估。** 在无候选选项的完全生成模式下，如何定义和度量层次一致性？TARA 的对齐信号是否足以约束生成路径的逻辑一致性，还是需要额外的解码策略？
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Locality_aware_Parallel_Decoding_for_Efficient_Autoregressive_Image_Generation.pdf
+project_link: null
+code_link: https://github.com/mit-han-lab/lpd
 openreview_forum_id: h06l9w1clt
 aliases:
 - LLAPD
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 局部感知并行解码的高效自回归图像生成 |
 | 英文题名 | Locality-aware Parallel Decoding for Efficient Autoregressive Image Generation |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=h06l9w1clt); [GitHub](https://github.com/mit-han-lab/lpd) |
+| Links | [paper](https://openreview.net/forum?id=h06l9w1clt) · [GitHub](https://github.com/mit-han-lab/lpd) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/generative_models_and_autoencoders |
 | Method | LPD (Locality-aware Parallel Decoding) |
 | Dataset | ImageNet 256×256 class-conditional, ImageNet 512×512 class-conditional, GenEval 1024×1024 text-to-image |
@@ -42,7 +44,7 @@ claims:
 > - ImageNet 512×512 class-conditional 上，FID↓ / IS↑ / #Steps / Latency(s)↓ / Throughput(img/s)↑ 为 LPD-L: FID 2.54, IS 292.2, 48 steps, latency 0.69s, throughput 35.16，对比 Raster Counterpart-L: FID 2.54, IS 278.5, 1024 steps, latency 14.25s, throughput 3.79，变化 FID unchanged, steps 21.3× reduction, latency ~20.7× lower, throughput ~9.3× higher。
 > - GenEval 1024×1024 text-to-image 上，Overall GenEval score / #Steps 为 LPD-XL: 0.62, 64 steps，对比 Raster Counterpart-XL: 0.60, 4096 steps，变化 Score +0.02, steps 64× reduction。
 
-## 概述
+## 概要
 
 传统自回归图像生成模型将图像序列化为token序列，按光栅顺序逐token预测，每次仅生成一个token。这种逐token生成模式形成**内存受限的工作负载**，导致生成步数多、延迟高，难以在保持高吞吐的同时实现低延迟。例如，在256×256分辨率下需256步，512×512分辨率下需1024步。
 
@@ -55,7 +57,7 @@ claims:
 
 **方法定位**：LPD属于并行化自回归生成方法，区别于固定区域并行的PAR、随机顺序+位置指令token的RandAR、编码器-解码器交叉注意力的ARPG等方案。其关键差异在于：通过解耦上下文与生成的角色，避免了RandAR中因果掩码将并行生成退化为批量逐token预测的问题，且仅缓存已生成token而不缓存指令token，节省了KV缓存内存。
 
-## 背景与动机
+
 
 自回归（Autoregressive, AR）模型在语言生成领域取得了巨大成功，其核心范式——将联合分布按序列分解为条件概率的乘积——也被自然地迁移到图像生成任务中。标准自回归图像生成将图像编码为离散token序列，并按照固定的光栅顺序（raster order）逐token预测：
 
@@ -90,7 +92,9 @@ $$p ( x _ { 1 } , x _ { 2 } , \ldots , x _ { N } ; c ) = \prod _ { g = 1 } ^ { G
 
 2. **局部感知生成顺序调度**：利用空间局部性，在每一步优先选择靠近已生成token（最大化上下文支持）且远离同组其他token（最小化组内依赖）的位置。这一调度策略使模型在将生成步数从256大幅压缩至20（256×256）的同时，维持与光栅顺序基线相当的图像质量。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 LPD 的核心创新在于对自回归图像生成的两个关键维度进行了根本性重构：**生成架构**和**生成顺序调度**。传统自回归模型（如 **LlamaGen**）采用固定光栅顺序逐 patch 预测，每个 token 同时承担"提供上下文"和"预测下一 token"双重角色，导致生成步数多、延迟高，且无法灵活并行。LPD 通过两个 changed slots 系统性地解决了这一瓶颈。
 
@@ -129,7 +133,7 @@ LPD 的核心创新在于对自回归图像生成的两个关键维度进行了�
 - 位置查询 token 引入额外计算开销：在计算受限的大批次推理场景下，加速比从内存受限场景的 ~12 倍下降至约 3 倍（Figure 14）。
 - 生成顺序需根据分辨率和步数预先计算，无法在推理时根据内容动态调整。
 
-## 整体框架
+
 
 LPD（Locality-aware Parallel Decoding）的整体框架围绕一个核心洞察展开：**将上下文提供与token生成解耦**，从而在保持自回归建模优势的同时实现高度并行解码。该框架由三个关键模块协同工作，形成一条从输入到输出的高效生成流水线。
 
@@ -176,7 +180,7 @@ LPD（Locality-aware Parallel Decoding）的整体框架围绕一个核心洞察
 
 这一架构设计使得LPD在将生成步数从256压缩至20（256×256分辨率）时，仍能保持与光栅顺序基线相当的生成质量（FID 2.10 vs 2.12，Table 1），同时实现约12.9倍的延迟降低。
 
-## 核心模块与公式推导
+
 
 ### 标准自回归与分组并行分解
 
@@ -218,7 +222,9 @@ $$PTA_{s} = \frac{1}{N} \sum_{i=1}^{N} \frac{\sum_{j} \mathrm{Attention}(T_{i}, 
 
 具体流程：对每个待选位置计算其到已选集合的逆欧氏距离作为邻近性度量；将满足邻近阈值 $\rho$ 且相互间距离超过排斥阈值 $\tau$ 的位置优先入队；当高邻近性池耗尽时，使用最远点采样填充剩余位置。调度结果在推理时直接查表使用，不引入额外延迟。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能：步数压缩与质量保持
 
@@ -308,7 +314,9 @@ LPD在多个基准上实现了生成步数的数量级压缩，同时维持甚�
 ![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_h06l9w1clt/figures/019_Figure_13.jpg]]
 *Figure 13: Generation Examples of Our Model. We show 1024×1024 text-to-image generation samples*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：自回归图像生成的并行化困境
 
@@ -360,6 +368,8 @@ LPD的另一个关键贡献在于**将图像生成中的空间局部性显式建
 4. **极低步数下的质量保障**：当生成步数进一步压缩至8步甚至更少时，如何保证生成质量？当前20步（256×256）和48步（512×512）的设置已接近质量持平边界，更激进的压缩可能需要新的建模策略。
 
 5. **视频生成中的时空局部性**：视频生成中时间维度的局部性（相邻帧的token高度相关）是否可以利用类似的调度策略？时空联合的局部性感知调度可能成为视频自回归生成加速的关键。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,7 @@ paper_level: A
 venue: Whitepaper
 year: 2025
 pdf_ref: paperPDFs/WHITEPAPER_2025/Cosmos_World_Foundation_Model_Platform_for_Physical_AI.pdf
+code_link: https://github.com/nvidia-cosmos/cosmos-predict1
 project_link: https://research.nvidia.com/labs/dir/cosmos-predict1/
 aliases:
 - CWFMCP
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 面向物理AI的Cosmos世界基础模型平台 |
 | 英文题名 | Cosmos World Foundation Model Platform for Physical AI |
 | 会议/期刊 | Whitepaper 2025 |
-| Links | [paper](https://arxiv.org/abs/2501.03575); [GitHub](https://github.com/nvidia-cosmos/cosmos-predict1); [Project](https://research.nvidia.com/labs/dir/cosmos-predict1/) |
+| Links | [paper](https://arxiv.org/abs/2501.03575) · [GitHub](https://github.com/nvidia-cosmos/cosmos-predict1) · [Project](https://research.nvidia.com/labs/dir/cosmos-predict1/) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | Cosmos World Foundation Model (Cosmos-Predict1扩散/自回归模型系列及配套视频标记器与数据管线) |
 | Dataset | 内部3D一致性基准（生成视频）, RealEstate10K (相机可控生成), Bridge (机器人动作条件下一帧预测), 内部多视图驾驶数据集 |
@@ -42,7 +43,7 @@ claims:
 > - RealEstate10K (相机可控生成) 上，FID / FVD / 姿态成功率 / 旋转误差 / 平移误差 为 Cosmos-Predict1-7B-Video2World-Sample-CameraCond，对比 CamCo，变化 FID 14.30 vs 57.49; FVD 120.49 vs 433.24; 姿态成功率 82.0% vs 43.0%; 旋转误差 1.646° vs 8.277°。
 > - Bridge (机器人动作条件下一帧预测) 上，PSNR / SSIM / Latent L2 / FVD 为 Cosmos-Predict1-7B-Video2World-Sample-ActionCond，对比 IRASim-Action，变化 PSNR 21.14 vs 19.13; SSIM 0.82 vs 0.64; FVD 190 vs 593。
 
-## 概述
+## 概要
 
 **问题瓶颈**：物理AI系统（如机器人、自动驾驶）需要海量包含动作扰动的交互序列数据进行训练，但在真实世界中采集此类数据成本高昂、速度缓慢且存在安全风险，这严重限制了物理AI的scaling进程。
 
@@ -58,7 +59,7 @@ claims:
 
 **局限性**：本文未包含世界模型在策略评估、策略训练、规划及合成数据生成等下游物理AI应用上的实证结果；世界模型的自动化评估框架和基于物理模拟器的可交互基准仍是重大挑战。
 
-## 背景与动机
+
 
 ### 物理AI的数据困境
 
@@ -85,7 +86,9 @@ claims:
 
 通过这一系统性的工程与算法创新，Cosmos平台旨在为物理AI提供一个可扩展、可定制且物理合理的“数字孪生”生成引擎。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Cosmos平台的核心创新在于提出了一套面向物理AI的**世界基础模型（WFM）预训练-后训练范式**，通过构建大规模视频数据管线、因果视频标记器以及可扩展的Transformer架构（扩散与自回归），将未来视觉预测建模为可控视频生成任务，从而以低成本、低风险的方式缓解物理AI系统的数据稀缺瓶颈。其相对于现有基线的关键创新体现在以下四个**changed slots**上。
 
@@ -123,7 +126,7 @@ Cosmos平台的核心创新在于提出了一套面向物理AI的**世界基础�
 
 这些创新共同构成了Cosmos平台的技术护城河——从数据、标记化、预训练到后训练和推理加速的全链路设计，使得通用世界模型能够高效地定制化部署到多样化物理AI场景中。
 
-## 整体框架
+
 
 Cosmos平台围绕“世界基础模型”（World Foundation Model, WFM）这一核心概念构建。WFM的形式化定义为：给定过去的观测 $x_{0:t}$ 和当前的扰动 $c_t$，模型预测未来的观测 $\widehat{x}_{t+1}$。此处的扰动 $c_t$ 可以是物理AI系统执行的动作、随机扰动，或描述扰动的文本等（Sec. 2, Figure 3）。该定义将物理世界的未来预测统一建模为可控视频生成任务，为平台的设计提供了理论基础。
 
@@ -141,7 +144,7 @@ Cosmos平台围绕“世界基础模型”（World Foundation Model, WFM）这�
 
 整个平台的输入输出流清晰：原始视频经数据管线处理后成为训练样本；训练样本经标记器压缩为token；token与文本描述等条件共同输入WFM进行预训练；预训练模型经后训练注入特定控制信号后，即可根据文本、图像、视频、相机姿态、动作等条件生成符合物理规律的未来观测视频。
 
-## 核心模块与公式推导
+
 
 ### 世界基础模型的形式化定义
 
@@ -197,7 +200,9 @@ $$\mathbf{r} = (\mathbf{d}, \mathbf{m}) \in \mathbb{R}^6 \ \text{where} \ \mathb
 
 **多视图驾驶。** 在多视图驾驶视频生成中，模型同时接收多个相机视角的条件信息，通过视图一致性约束确保生成的多路视频在3D几何上保持一致。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验结果
 
@@ -273,7 +278,9 @@ Cosmos Tokenizer在压缩率-重建质量权衡上展现出显著优势。在DAV
 ![[assets/figures/papers/paper_list_l25_https_arxiv_org_abs_2501_03575/figures/051_Figure.jpg]]
 *Figure: Input frame Instruction-conditioned generation Cosmos-Predict1-7B-Video2World-Sample-Instruction Prompt: Retrieve a box from a storage shelf using its articulated hands in a warehouse setting*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心范式：世界基础模型的预训练-后训练框架
 
@@ -330,6 +337,8 @@ Cosmos处于**视频生成模型**与**物理世界模拟器**的交叉地带。
 3. 如何在后训练中保持预训练WFM的泛化能力，同时高效注入新模态（如深度、语义图）？
 4. 安全护栏系统（pre-Guard输入过滤 + post-Guard安全分类与人脸模糊）在面对多样化的对抗性提示和生成内容时的鲁棒性如何？
 5. 如何进一步缩小合成数据与真实场景之间的领域差距（Sim2Real），使WFM生成的视频能真正服务于物理AI系统的训练？
+
+
 
 ## 原文 PDF
 

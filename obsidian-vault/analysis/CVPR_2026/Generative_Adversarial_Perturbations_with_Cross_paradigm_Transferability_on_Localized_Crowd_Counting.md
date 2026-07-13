@@ -43,7 +43,7 @@ claims:
 > - SHHA & UCF-QNRF (cross-paradigm transfer) 上，Transfer Ratio (TR) up to 1.69 vs 1.0 (same-paradigm baseline) (up to 69% higher effectiveness on target model)。
 > - SHHA (overall with FIDTM) 上，MAE / PSNR 259.76 / 19.25 dB vs DiffAttack: 1591.3 / 10.36 dB; PAP: 5.40 / 22.58 dB (balanced effectiveness (3.7× lower MAE than DiffAttack) and stealth (8.9 dB hig...)。
 
-## 概述
+## 概要
 
 ### 1. 问题背景与瓶颈
 
@@ -90,7 +90,7 @@ $$\mathcal{L}_{\mathrm{pert}} = \beta \cdot \mathcal{L}_{\mathrm{hinge}} + \gamm
 - **模型依赖性**：攻击生成需针对特定代用模型训练，对完全未知的模型架构可能无法保证最优迁移效果。
 - **防御空白**：如何设计范式无关的防御机制以增强人群计数模型的鲁棒性，仍是一个开放问题。
 
-## 背景与动机
+
 
 ### 人群计数任务的范式分裂与安全脆弱性
 
@@ -110,7 +110,9 @@ $$\mathcal{L}_{\mathrm{pert}} = \beta \cdot \mathcal{L}_{\mathrm{hinge}} + \gamm
 
 实现这一目标的关键洞察在于：尽管密度图与点回归模型在输出层存在显著差异，它们通常共享相似的卷积骨干网络（如 VGG、ResNet），这些骨干网络在 ImageNet 预训练后学到的潜在空间具有高度相似性。通过利用这一共享表示空间，并设计**范式特定的攻击损失**与**通用的跨范式感知约束**，有望实现跨架构的高效且隐蔽的攻击。本文提出的 **CrowdGen** 框架正是基于这一洞察，通过多任务损失优化在攻击强度、可迁移性与视觉质量三者之间寻求最优折衷。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 1. 问题瓶颈：跨范式可迁移性缺失与攻击-隐蔽失衡
 
@@ -168,7 +170,7 @@ $$\mathcal{L}_{\mathrm{pert}} = \beta \cdot \mathcal{L}_{\mathrm{hinge}} + \gamm
 
 **需注意的局限**：攻击仅在数字域验证，尚未在物理世界测试；且攻击生成需要针对特定代用模型训练，对完全未知模型的最优迁移性无法保证。
 
-## 整体框架
+
 
 CrowdGen 采用**生成式对抗扰动**范式，通过一个训练好的生成器实现单次前向传播即可产生对抗样本，无需在推理阶段进行迭代优化。其核心瓶颈在于：现有对抗攻击无法同时作用于密度图回归与点回归两种人群计数范式，且攻击强度与隐蔽性难以兼顾。CrowdGen 通过**范式特定的攻击损失**与**跨范式共享的感知约束**的组合，利用不同计数模型骨干网络学到的相似潜在空间，实现了跨架构的高效且隐蔽的对抗攻击。
 
@@ -201,7 +203,7 @@ $$\mathcal{L}_{\text{pert}} = \beta \cdot \mathcal{L}_{\text{hinge}} + \gamma \c
 ![[assets/figures/papers/paper_list_l878_https_arxiv_org_abs_2603_24821/figures/002_Figure_2.jpg]]
 *Figure 2: (i) Perturbation loss (GradCAM Perturbation & Frequency-Magnitude Reduction) in Sec. 3.3.3, and (ii) Paradigmspecific losses (Density & Logit suppression) in Secs. 3.3.1 and 3.3.2 are proposed for training the perturbation generator*
 
-## 核心模块与公式推导
+
 
 CrowdGen 框架的核心由三个功能模块构成：扰动生成器、范式特定损失模块和跨范式感知约束模块。整体攻击损失定义为：
 
@@ -257,7 +259,9 @@ $$\mathcal{L}_{\mathrm{cam}} = \frac{1}{HW} \| |\delta| - \delta(\rho) \|_1$$
 ![[assets/figures/papers/paper_list_l878_https_arxiv_org_abs_2603_24821/figures/006_Figure_4.jpg]]
 *Figure 4: GradCAM response of clean and adversarial images*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -309,7 +313,9 @@ Table 1 和 Table 2 分别展示了 SHHA 和 UCF-QNRF 数据集上的跨模型�
 
 3. **点回归范式下的约束冲突**：消融实验揭示，频率约束和平滑约束在点回归范式下反而降低攻击强度，说明当前统一的感知约束设计尚未完全适配两种范式的内在差异。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 对抗攻击范式演进中的定位
 
@@ -367,6 +373,8 @@ CrowdGen 的有效性建立在以下关键假设之上，这些假设同时定�
 3. **更广泛架构的可迁移性**：CrowdGen 在七种模型上验证了可迁移性，但这些模型均基于 CNN 骨干。对于基于 Vision Transformer 的人群计数模型（如 CCViT），共享潜在空间的假设是否仍然成立？
 
 4. **攻击的定向性**：当前攻击目标是最大化计数误差（增加 MAE/MR）。是否存在定向攻击的可能，即诱导模型输出特定的错误计数值？这在对抗场景中可能具有更隐蔽的威胁。
+
+
 
 ## 原文 PDF
 

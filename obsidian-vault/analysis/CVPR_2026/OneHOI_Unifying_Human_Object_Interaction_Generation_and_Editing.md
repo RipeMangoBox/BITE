@@ -43,7 +43,7 @@ claims:
 > - IEBench (Layout-guided Single-HOI Editing) 上，Spatial Score (mIoU) 0.822 vs 0.749 (InteractEdit+InteractDiffusion) (+9.7%)。
 > - MultiHOIEdit (Layout-guided Multi-HOI Editing) 上，Spatial Score / Editability-Identity 0.675 / 0.435 vs N/A (first baseline) (-)。
 
-## 概述
+## 概要
 
 现有的人体-物体交互（HOI）生成与编辑方法长期处于分裂状态：生成模型依赖布局条件但缺乏灵活控制，编辑模型则难以解耦姿态与接触，且无法扩展到多交互场景。更深层的问题是，主流扩散Transformer（DiT）架构缺少显式的交互关系建模，导致生成的交互仅停留在对象并置的浅层语义。OneHOI 的核心洞察在于，HOI 生成与编辑本质上是同一条件去噪过程的两种视图——通过共享结构化交互表示并联合训练，生成学到的丰富交互语义可以反哺编辑，反之亦然。
 
@@ -51,7 +51,7 @@ claims:
 
 实验表明，统一框架带来了显著的协同效应：在匹配算力下，联合训练使生成任务的 HOI 准确率提升 26.4%，无布局编辑的 HOI 编辑成功率提升 21.1%。在 IEBench 基准上，OneHOI 的无布局编辑 Editability-Identity（0.638）和 HOI Editability（0.596）分别较最强先前工作提升 10.0% 和 16.0%，同时首次建立了布局引导的多交互编辑基线。消融研究进一步揭示，Structured HOI Attention 是提升交互正确性的最关键模块，验证了动词拓扑约束在关系建模中的核心作用。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -78,7 +78,9 @@ OneHOI的核心洞察在于：**HOI生成与编辑本质上是同一条件去噪
 
 这一统一框架使得单一模型能够同时支持文本引导的无布局编辑、布局引导的单/多交互编辑，以及从文本、布局、任意形状掩码或混合条件出发的HOI生成，首次实现了HOI生成与编辑的灵活多条件统一控制。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 OneHOI的核心创新在于将HOI生成与编辑统一到单一扩散Transformer框架内，并通过四个协同的“变更槽位”（changed slots）显式建模交互结构，解决了现有方法中生成与编辑割裂、交互关系建模浅层化两大瓶颈。
 
@@ -121,7 +123,7 @@ OneHOI在扩散Transformer（DiT）骨干上引入了四项结构性创新，每
 - 联合训练中模态丢弃的最优概率组合（$p_{\mathrm{layout}}=0.25$、$p_{\mathrm{hoi}}=0.25$、$p_{\mathrm{txt}}=0.30$）对统一框架鲁棒性的影响，论文未做系统消融。
 - HOI RoPE作为实例分离机制的通用性，是否适用于其他需要多实体分离的生成任务，仍为开放问题。
 
-## 整体框架
+
 
 OneHOI 将 HOI 生成与编辑统一为**单一条件去噪过程**，其核心是一个称为 **Relational Diffusion Transformer（R-DiT）** 的 DiT 骨干网络。该框架的总体流水线如 Figure 3 所示，输入侧接收混合条件（文本提示、布局框、HOI 三元组标签），输出侧生成或编辑后的图像。整个框架由四个关键模块串联构成，形成“空间接地 → 身份注入 → 拓扑约束 → 实例分离”的递进式交互建模链。
 
@@ -159,7 +161,7 @@ OneHOI 将 HOI 生成与编辑统一为**单一条件去噪过程**，其核心�
 
 OneHOI 基于 **Flux.1 Kontext** 的 MM-DiT 骨干进行 LoRA 微调（可调参数约 3.5 亿），训练 10K 步、batch size 16、使用 8-bit AdamW 优化器。批次在生成任务和编辑任务之间交替采样，并通过随机丢弃输入模态实现多条件统一——这种联合训练策略使生成任务学到的丰富交互语义（接触模式、动词-物体几何关系）能够反哺编辑任务，反之亦然，产生显著的协同效应（Table 5 证实统一模型在匹配算力下全面优于独立任务模型）。
 
-## 核心模块与公式推导
+
 
 OneHOI的核心创新在于将人体-物体交互（HOI）的结构化先验显式注入扩散Transformer（DiT）的去噪过程。该方法围绕四个关键模块构建，形成一个从空间接地到拓扑约束的递进式交互建模管线。
 
@@ -226,7 +228,9 @@ $$z_{\mathrm{HOI}}(n) = (0, T+n, T+n), \quad \mathrm{where} \quad T = \max(H, W)
 
 ![[assets/figures/papers/paper_list_l997_https_arxiv_org_abs_2604_14062/figures/006_Figure.jpg]]
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -304,7 +308,9 @@ HOI-Edit-44K 数据集覆盖丰富的交互对象和动作类别。附录中的 
 ![[assets/figures/papers/paper_list_l997_https_arxiv_org_abs_2604_14062/figures/027_Figure_21.jpg]]
 *Figure 21: Sankey diagram visualising the action transitions in the MultiHOIEdit benchmark. The flows illustrate the mapping from source actions (left) to target actions (right), detailing the full range of edits*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：从分裂的生成/编辑到统一交互建模
 
@@ -347,6 +353,8 @@ OneHOI 的方法谱系可从三个维度定位：架构基础、HOI 感知机制
 4. **模态丢弃的最优策略**：联合训练中布局、HOI 标签和文本提示的丢弃概率（0.25/0.25/0.30）是经验设定的。这些概率的最优组合及其对统一框架在不同任务上鲁棒性的影响，尚未通过系统消融确定。
 
 5. **真实场景的编辑鲁棒性**：当前评估主要基于 IEBench 和自建的 MultiHOIEdit，两者均以合成或受控场景为主。模型在真实用户拍摄的复杂背景、遮挡严重或光照极端的照片上的编辑鲁棒性，仍需更大规模的真实场景用户研究来验证。
+
+
 
 ## 原文 PDF
 

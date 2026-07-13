@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2021
 pdf_ref: paperPDFs/CVPR_2021/Semantic_Segmentation_with_Generative_Models_Semi_Supervised_Learning_and_Strong_Out_of_Domain_Generalization.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/toronto-ai/semanticGAN/
 aliases:
 - SP
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 使用生成模型进行语义分割：半监督学习与强域外泛化 |
 | 英文题名 | Semantic Segmentation with Generative Models: Semi-Supervised Learning and Strong Out-of-Domain Generalization |
 | 会议/期刊 | CVPR 2021 |
-| Links | [paper](https://arxiv.org/abs/2104.05833); [Project](https://nv-tlabs.github.io/semanticGAN/); [Project](https://research.nvidia.com/labs/toronto-ai/semanticGAN/) |
+| Links | [paper](https://arxiv.org/abs/2104.05833) · [Project](https://nv-tlabs.github.io/semanticGAN/) · [Project](https://research.nvidia.com/labs/toronto-ai/semanticGAN/) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/generative_models_and_autoencoders |
 | Method | SemanticGAN (proposed) |
 | Dataset | JSRT (Chest X-ray, in-domain), NLM (Chest X-ray, out-of-domain), MetFaces (Face Part Segmentation, ISIC (Skin Lesion |
@@ -42,7 +43,7 @@ claims:
 > - NLM (Chest X-ray, out-of-domain) 上，DICE 为 0.9464，对比 0.8605 (U-Net)，变化 +0.0859。
 > - MetFaces (Face Part Segmentation, out-of-domain) 上，mIoU 为 0.6633 (1500 labels)，对比 0.6415 (DeepLab with 28k labels)，变化 +0.0218。
 
-## 概述
+## 概要
 
 语义分割是计算机视觉的核心任务，但主流判别式模型（如 **U-Net** (Ronneberger et al., MICCAI 2015)、**DeepLabV2** (Chen et al., CVPR 2016)）依赖大量逐像素标注数据，标注成本高昂，且在域外数据上泛化能力显著下降——这一瓶颈在医学影像等专业领域尤为突出。
 
@@ -55,7 +56,7 @@ claims:
 
 **方法定位：** SemanticGAN 属于生成式分割范式，基于 StyleGAN2 架构，训练过程完全依赖对抗损失（双判别器 $D_r$ 保证图像真实性，$D_m$ 强制图文对齐），无需逐像素交叉熵损失。推理时通过测试时潜在空间反演推断标签，而非单步前向传播。该方法当前适用于人脸、医学影像等单模态数据，尚未扩展到复杂街景等场景，且测试时优化导致推理速度较慢。
 
-## 背景与动机
+
 
 语义分割是计算机视觉的核心任务，旨在为图像中的每个像素赋予类别标签。传统方法依赖判别式模型直接学习从图像到标签的映射 $p(y|x)$，这需要大量逐像素标注的数据。然而，获取高质量像素级标注极其昂贵，尤其在医学影像等专业领域，标注成本更为高昂。这一瓶颈严重制约了语义分割技术在标注稀缺场景下的应用。
 
@@ -67,7 +68,9 @@ claims:
 
 这种范式转换带来了根本性的方法差异：训练时不再依赖逐像素标注损失，而是通过对抗训练迫使生成器同时生成逼真图像和准确标签；推理时也不采用单步前向传播，而是通过测试时潜在空间反演，将输入图像投影到生成器的潜在流形上，再从中解码出对应的分割掩码。这一设计使得模型能够以极少量标注样本（如仅9个胸部X光标注）实现超越全监督基线的性能，并在极端域外数据上展现出令人瞩目的泛化能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 1. 范式转换：从判别式到生成式联合建模
 
@@ -126,7 +129,7 @@ $$\mathcal{L}_{\text{reconst}}(x, x^*) = \mathcal{L}_{\text{LPIPS}}(x, x^*) + \l
 | **标注需求** | 大量标注数据 | 少量标注 + 大量无标注数据 |
 | **域外泛化** | 依赖数据增强，效果有限 | 生成式先验天然支持强域外泛化 |
 
-## 整体框架
+
 
 SemanticGAN 将语义分割重构为**生成式条件采样问题**，核心思想是直接建模图像与标签的联合分布 $p(x,y)$，而非传统判别式模型所学习的条件分布 $p(y|x)$。其整体 pipeline 由四个核心模块构成，形成训练与推理两条协同的数据流。
 
@@ -177,7 +180,7 @@ $$\mathcal{L}_{\mathrm{reconst}}(x, x^*) = \mathcal{L}_{\mathrm{LPIPS}}(x, x^*) 
 
 这种设计将生成模型的平滑潜在空间先验引入分割任务——生成器在连续 $\mathcal{W}^+$ 空间中被训练以生成逼真图像，其内部特征表示已编码丰富的语义信息，因此即使面对域外图像，只要能在潜在空间中找到合理的重建点，就能推断出语义一致的分割结果。
 
-## 核心模块与公式推导
+
 
 ### 3.1 生成器架构 (Generator G)
 
@@ -244,7 +247,9 @@ $$\mathcal { L } _ { \mathrm { r e c o n s t } } ( x , x ^ { * } ) = \mathcal { 
 
 **关键机制**：整个推理过程无需前向传播的判别模型，而是通过生成模型的潜在空间反演，利用生成器学习到的联合分布 $p(x,y)$ 推断标签。这一设计使得模型在域外数据上表现出强泛化能力，因为生成器在连续潜在空间中的平滑训练天然提供了正则化先验。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验结果
 
@@ -303,7 +308,9 @@ SemanticGAN 在多个医学影像与人脸分割基准上，以极少标注样�
 ![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2104_05833/figures/011_Table_6.jpg]]
 *Table 6: Synthesize Annotated Images to Train a Task Model vs Our Method. Numbers are mIoU. DeepLab-real denotes supervised training of a DeepLab model using 150 labeled real examples. Ours-sim denotes training DeepLab using only the 20k synthetic dataset. Ours-mix means training DeepLab using both the synthetic and 150 labeled real examples. div denotes sampling without applying the truncation trick [44], which results in more diverse but less visually appealing images; tru means applying the truncation trick with factor of 0.7. Ours denotes performing segmentation directly with our generative segmentation method*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 判别式分割 → 生成式分割的范式转换
 
@@ -345,6 +352,8 @@ SemanticGAN 在多个医学影像与人脸分割基准上，以极少标注样�
 2. **推理加速**：如何通过知识蒸馏或一次性编码器直接预测标签，避免测试时迭代优化，实现实时分割？
 3. **精细度权衡**：生成式先验的平滑性与精细结构分割精度之间的定量关系尚待研究
 4. **最优数据配比**：标注/未标注数据的最优比例如何确定，以在标注成本与性能之间取得平衡？消融实验（Table 5）已初步表明增加无标注数据比增加标注数据更有效，但系统性的理论指导仍缺失
+
+
 
 ## 原文 PDF
 

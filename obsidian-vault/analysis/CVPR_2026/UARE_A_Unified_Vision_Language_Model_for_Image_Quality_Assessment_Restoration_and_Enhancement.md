@@ -42,7 +42,7 @@ claims:
 > - DIV2K 上，MUSIQ 70.45 vs PURE 70.06 / S3Diff 69.31 (+0.39 / +1.14)。
 > - FoundIR (Blur+Noise) 上，LPIPS 0.1573 vs DiffUIR 0.1871 (-0.0298)。
 
-## 概述
+## 概要
 
 图像质量评估（IQA）与图像恢复/增强长期作为两个独立领域发展：前者负责诊断失真，后者负责修复图像，但二者始终缺乏有效的统一。这种割裂导致恢复过程难以利用质量信号进行精准引导，而评估模型也无法从恢复反馈中获得改进。UARE 针对这一瓶颈，提出首个统一视觉-语言模型，将 IQA 与恢复/增强整合到单一框架中。
 
@@ -54,7 +54,7 @@ claims:
 
 主要局限在于训练资源需求极高（64 块 NVIDIA H20 GPU 训练一周），且当前仅探索了 IQA 提升恢复的单向关系，恢复如何反过来改进 IQA 仍待研究。
 
-## 背景与动机
+
 
 ### 问题域：图像质量评估与恢复的长期割裂
 
@@ -70,7 +70,9 @@ claims:
 
 基于以上动机，UARE 被设计为**首个面向图像质量评估、复原与增强的统一视觉-语言模型**，通过双专家 MoT 架构和两阶段训练框架，实现 IQA 与恢复的深度协同。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 UARE 的核心创新在于首次将图像质量评估（IQA）与图像复原/增强统一于一个视觉-语言模型框架中，并通过**双专家混合Transformer（Mixture-of-Transformers, MoT）架构**和**两阶段渐进式训练策略**，实现了质量评估信号对恢复过程的有效引导。
 
@@ -107,7 +109,7 @@ $$\mathcal{L}_{s2} = \mathcal{L}_{RF} + \lambda\mathcal{L}_{AR}, \quad \lambda=0
 
 与最近的统一尝试 **PURE** (Wei et al., ICCV 2025) 相比，UARE 的核心差异在于：PURE 将 IQA 作为辅助任务嵌入恢复网络，而 UARE 通过双专家架构和结构化交错数据，使 IQA 分析显式地参与恢复决策，实现了更深的评估-恢复协同。这一设计使得 UARE 在 RealSR 上以 MUSIQ 69.67 超越 PURE 的 70.06（DIV2K 上）等强基线，同时在多退化场景（FoundIR）上展现出全面的感知-保真度平衡优势。
 
-## 整体框架
+
 
 UARE 的整体设计遵循“分析-然后-恢复”（analyze-then-restore）范式，将图像质量评估（IQA）与图像复原/增强统一于单一模型之中。其核心架构基于 **Mixture-of-Transformers (MoT)** 设计，包含两个全容量专家模块：**IQA 专家**和**恢复专家**（Restoration Expert），二者共享自注意力层以实现信息交互，但各自拥有独立的前馈网络参数。
 
@@ -135,7 +137,7 @@ UARE 采用两阶段训练策略，逐步赋予模型多退化处理能力与质
 ![[assets/figures/papers/paper_list_l2351_https_arxiv_org_abs_2512_06750/figures/004_Figure_2.jpg]]
 *Figure 2: Illustration of the architecture and two-stage training framework of UARE. Two transformer experts are used to process IQA and restoration, respectively. Training stages include (1) a progressive, easy-to-hard schedule that moves from single-type to high-order degradations. In this stage, only the restoration expert is trained to make UARE handle multiple degradations. (2) Unified fine-tuning of the entire model to strengthen the IQA ability and align the IQA signals with restoration objectives through interleaved data*
 
-## 核心模块与公式推导
+
 
 ### 双专家混合Transformer架构
 
@@ -180,7 +182,9 @@ $$\mathcal{L}_{s2} = \mathcal{L}_{RF} + \lambda\mathcal{L}_{AR}$$
 
 与上述损失函数配合，第二阶段使用的交错文本-图像数据采用四步结构化输出格式：（1）用户意图识别；（2）当前质量分析；（3）增强计划；（4）预期结果描述。这种结构化设计使得 IQA 专家生成的质量分析能够被恢复专家有效利用，形成内部对齐的质量引导信号——论文消融实验证实，使用外部 Q-Insight 提示替代自身 IQA 分析时效果显著下降，证明了模型内部对齐的优越性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 1. 实验设置概览
 
@@ -262,7 +266,9 @@ Table 5 进一步分析了 IQA 引导的具体形式：
 ![[assets/figures/papers/paper_list_l2351_https_arxiv_org_abs_2512_06750/figures/001_Figure_1.jpg]]
 *Figure 1: Showcase of UARE. It supports image quality assessment (image scoring and comparison), image restoration/enhancement (super-resolution, dehazing, and low-light enhancement, etc.), and assessment-guided restoration and enhancement in one unified model*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 
@@ -330,6 +336,8 @@ UARE 的适用边界可从以下维度界定：
 ### 4. 方法论定位总结
 
 UARE 在方法论谱系中的定位可概括为：**首个将 IQA 文本分析信号有效注入图像恢复过程的统一视觉-语言模型**。其核心贡献不在于单项任务的绝对性能突破，而在于证明了以下方法论命题：多任务协同训练中，IQA 能力可以显著提升恢复图像的感知质量，同时基本保持保真度（PSNR 维持不变），实现恢复与评估的互相促进。这一发现为未来统一 low-level 视觉任务的研究提供了新的范式参考——即通过语言作为中间表征桥接质量感知与图像生成。
+
+
 
 ## 原文 PDF
 

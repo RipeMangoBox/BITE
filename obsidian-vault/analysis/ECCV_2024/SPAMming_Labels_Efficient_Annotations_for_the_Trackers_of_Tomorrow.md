@@ -5,6 +5,7 @@ paper_level: A
 venue: ECCV
 year: 2024
 pdf_ref: paperPDFs/ECCV_2024/SPAMming_Labels_Efficient_Annotations_for_the_Trackers_of_Tomorrow.pdf
+code_link: https://github.com/nv-dvl/SPAM
 project_link: https://github.com/nv-dvl/SPAM
 aliases:
 - SLEATT
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | SPAM标签：为未来跟踪器提供高效标注 |
 | 英文题名 | SPAMming Labels: Efficient Annotations for the Trackers of Tomorrow |
 | 会议/期刊 | ECCV 2024 |
-| Links | [paper](https://arxiv.org/abs/2404.11426); [Project](https://research.nvidia.com/labs/dvl/projects/spam/); [GitHub](https://github.com/nv-dvl/SPAM) |
+| Links | [paper](https://arxiv.org/abs/2404.11426) · [Project](https://research.nvidia.com/labs/dvl/projects/spam/) · [GitHub](https://github.com/nv-dvl/SPAM) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | SPAM |
 | Dataset | MOT17 (ByteTrack), MOT20 (ByteTrack), DanceTrack (GHOST) |
@@ -41,7 +42,7 @@ claims:
 > - MOT20 (ByteTrack) 上，HOTA 为 60.5 (SPAM 10% budget)，对比 60.2 (GT 100%)，变化 +0.3。
 > - DanceTrack (GHOST) 上，HOTA 为 41.3 (SPAM 20% budget)，对比 41.0 (GT 100%)，变化 +0.3。
 
-## 概述
+## 概要
 
 视频多目标跟踪（MOT）标注的核心瓶颈在于：传统帧级标注方法忽略了时空依赖，导致信息密度低、冗余帧多，密集场景和长时关联的标注成本极高。SPAM 提出将标注问题建模为图上的节点分类与边分类，通过**合成数据预训练（Synthetic pretraining）→ 伪标签自训练（Pseudo-labeling）→ 图层次主动学习（Active learning with graph-based Model）**的三阶段流水线，将人工标注从帧级提升至轨迹级，仅需 3%–20% 的标注预算即可使下游跟踪器达到甚至超越使用 100% 真实标注训练的性能。
 
@@ -51,7 +52,7 @@ claims:
 
 方法的局限性包括：依赖合成数据质量，域差异过大时自训练可能无法完全弥补性能差距；预算分配策略为启发式设定，未自动优化；检测候选的初始过完备集合依赖固定低置信度阈值；未探索多类别、多模态跟踪场景的泛化性。
 
-## 背景与动机
+
 
 多目标跟踪（MOT）是视频理解的核心任务，其性能高度依赖大规模、高质量的标注数据。然而，视频MOT标注面临一个根本性瓶颈：**传统帧级标注方法无法利用时空依赖，导致信息密度低、冗余帧多**。具体而言，逐帧标注每一帧中所有目标的边界框和身份ID不仅极其耗时，而且在密集场景和长时关联中，人工标注者难以保持跨帧身份一致性，导致标注噪声累积。
 
@@ -59,7 +60,9 @@ claims:
 
 本文的核心动机源于一个关键洞察：**大多数跟踪关联可由合成数据预训练模型自动解决，仅需对困难样本进行人工标注**。这意味着，如果能将人工标注从帧级提升至轨迹级，并利用图结构统一建模检测与关联的时空依赖，就能在极低的标注预算下获得与全量人工标注相当甚至更优的标签质量。SPAM正是基于这一思路，通过合成数据预训练、伪标签自训练和基于图层次不确定性的主动学习，构建了一个高效的视频标注引擎。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SPAM 的核心创新在于将视频多目标跟踪的标注问题从传统的**帧级标注**彻底重构为**基于层次图神经网络的轨迹级标注**，并通过“合成预训练→伪标签自训练→图层次主动学习”的三阶段流水线，将人工标注预算效率提升了一个数量级。具体而言，SPAM 相对于现有标注范式的关键突破体现在以下四个维度。
 
@@ -87,7 +90,7 @@ $$\text{uncer}(v) := \max_{u \in N_v} H(\hat{y}_{(v,u)})$$
 
 综合上述四个维度的创新，SPAM 在 MOT17 上仅需 **3.3%** 的标注预算即可使 ByteTrack 的 HOTA 达到 51.6，与 100% 真实标注训练的 50.6 相当甚至略优（Table 5）；在 MOT20 和 DanceTrack 上分别以 10% 和 20% 的预算实现同等效果。这一结果表明，通过将标注问题从帧级提升到图结构上的轨迹级，并利用合成数据和主动学习大幅压缩人工标注需求，SPAM 为视频跟踪标注提供了一条高效且可扩展的新路径。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2404_11426/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the SPAM model. We first generate a set of detection candidates with our detector. Hierarchical GNNs then classify these candidates into valid and invalid objects via node classification, and assign identities through edge classification*
@@ -127,7 +130,7 @@ $$H(\hat{y}_{(v,u)}) := -(\hat{y}_{(v,u)} \log \hat{y}_{(v,u)} + (1-\hat{y}_{(v,
 - **标注重点聚焦检测与关联**：合成域与真实域的性能差距分析（Figure 4）表明，检测器是域差异最大的组件，而 ReID 模型几乎不受域差异影响。因此 SPAM 将标注资源集中于检测真伪判别和轨迹关联，合成数据预训练的 ReID 网络可直接使用。
 - **轨迹级而非帧级标注**：层次图结构使得主动学习选择策略能够在更深层次传播标注决策，标注者实际上是在轨迹级别而非单帧级别进行判断，大幅提升了标注预算的信息密度。
 
-## 核心模块与公式推导
+
 
 SPAM 的标注引擎由三个核心模块串联构成：**合成数据预训练与伪标签自训练**、**层次图神经网络（Hierarchical GNN）**、以及**基于不确定性的主动学习**。以下逐一阐述各模块的设计逻辑与关键公式。
 
@@ -191,7 +194,9 @@ Fig. 5 显示，SPAM 的层次图主动学习在 MOT17 上仅比 Oracle 性能�
 
 Fig. 3 展示了基于图的标注流程：首先选择高不确定性节点提交标注，标注员对该节点执行三项操作之一——验证检测正确性、精修边界框位置、或进行身份关联。这一流程将检测过滤与关联标注统一在同一图框架下，避免了传统方法中检测标注与关联标注分离的低效问题。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 合成数据与真实数据的性能鸿沟定位
 
@@ -278,7 +283,9 @@ Table 4在MOT17验证集上逐步叠加SPAM流水线的各组件：
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2404_11426/figures/006_Table_2.jpg]]
 *Table 2: Test set results on MOT17, MOT20 and DanceTrack when using SPAM solely as a tracker*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有标注范式的关系
 
@@ -343,6 +350,8 @@ SPAM 使用固定低置信度阈值生成过完备检测候选集，以减少假
 3. **标注预算的边际收益递减**：Table 5 显示，分配更多标注资源对下游跟踪器训练性能的边际收益递减——MOT17 上 3.3% 预算已达 51.6 HOTA，20% 预算仅提升至 53.5。这是否意味着存在一个“标注充分性阈值”，超出该阈值后标签质量已接近上限？这一阈值的理论刻画和自动估计是重要的后续方向。
 
 4. **图层次主动学习的理论解释**：为什么在更深层次图上分配更多标注预算能提升效率？论文给出了直观解释（更长轨迹片段覆盖更多帧），但缺乏信息论或图论层面的形式化分析。将层次图主动学习与图神经网络的表示能力理论建立联系，可能揭示更优的预算分配策略。
+
+
 
 ## 原文 PDF
 

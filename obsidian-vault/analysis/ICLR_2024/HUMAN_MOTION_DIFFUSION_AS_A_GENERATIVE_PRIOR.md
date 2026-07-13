@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2024
 pdf_ref: paperPDFs/ICLR_2024/HUMAN_MOTION_DIFFUSION_AS_A_GENERATIVE_PRIOR.pdf
+project_link: https://priormdm.github.io/priorMDM-page/
+code_link: https://github.com/priorMDM/priorMDM
 paper_link: "https://openreview.net/forum?id=dTpbEdN9kr"
 aliases:
 - PDCD
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 人体运动扩散作为生成先验 |
 | 英文题名 | HUMAN MOTION DIFFUSION AS A GENERATIVE PRIOR |
 | 会议/期刊 | ICLR 2024 |
-| Links | [paper](https://openreview.net/pdf?id=dTpbEdN9kr); [GitHub](https://github.com/priorMDM/priorMDM); [Project](https://priormdm.github.io/priorMDM-page/); [paper](https://openreview.net/forum?id=dTpbEdN9kr) |
+| Links | [paper](https://openreview.net/pdf?id=dTpbEdN9kr) · [GitHub](https://github.com/priorMDM/priorMDM) · [Project](https://priormdm.github.io/priorMDM-page/) · [paper](https://openreview.net/forum?id=dTpbEdN9kr) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/diffusion_image_video |
 | Method | PriorMDM (基于运动扩散先验的组合方法，包括DoubleTake、ComMDM和DiffusionBlending) |
 | Dataset | BABEL, HumanML3D (长序列指标), 3DPW (前缀完成 L2), HumanML3D (关节控制) |
@@ -42,7 +44,7 @@ claims:
 > - HumanML3D (长序列指标) 上，FID (Motion) 为 0.60 (DoubleTake)，对比 0.98 (MDM)，变化 -0.38 (更优)。
 > - 3DPW (前缀完成 L2) 上，Root Error [m] @3s 为 0.30 (ComMDM)，对比 0.54 (MDM, no Com)，变化 -0.24 (更优)。
 
-## 概述
+## 概要
 
 **核心瓶颈**：高质量标注运动数据的稀缺性严重制约了人体运动生成任务的泛化能力。现有数据集几乎全部由短暂的单人序列构成，导致多人交互、长序列生成和细粒度多关节控制等任务缺乏足够的训练支撑。
 
@@ -55,7 +57,7 @@ claims:
 
 **方法定位**：PriorMDM 框架将冻结或微调的扩散先验作为“运动语义锚点”，仅需添加轻量协调机制（握手平均、通信块、模型混合）即可实现三类组合泛化，无需重新训练完整模型。该方法在方法谱系上填补了“以通用运动先验驱动分布外组合生成”的空白，与 TEACH（长序列专有模型）、MRT（多人预测模型）和 MDM inpainting（单一条件修复）形成互补或替代关系。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -82,7 +84,9 @@ claims:
 
 三种方法均以MDM为统一先验，在保持生成质量的同时大幅降低对标注数据的依赖。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心贡献在于提出了一种**以预训练运动扩散模型（MDM）为生成先验的组合范式**，通过三种互补的策略——顺序组合、并行组合和模型组合——将短片段、单人、单控制信号的生成能力泛化至长序列、双人交互和细粒度联合控制，且仅需极低甚至零额外的训练代价。其关键创新体现在以下三个“changed slots”上。
 
@@ -117,7 +121,7 @@ MDM原生的inpainting功能仅支持单一条件的硬性修复，无法灵活�
 
 三种方法的共同本质是：**将预训练扩散先验视为运动流形的“语义锚点”，仅添加轻量的协调机制（握手、通信块、模型混合）即可实现分布外泛化**。这一范式避免了为每个新任务从头训练专用模型，在标注运动数据稀缺的背景下具有显著的实用价值。然而，其动态效果受限于MDM先验的生成质量，且当前方法未显式建模物理接触，可能产生穿模或不自然的接触姿态。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l32_https_openreview_net_pdf_id_dTpbEdN9kr/figures/002_Figure_2.jpg]]
 *Figure 2: Soft blending overview. We allow b frames long linear masking between $\mathbf { M _ { h a r d } }$ to $\mathbf { M } _ { s \mathbf { o f f } }$ such that during the Second take at every denoising step part of the originally generated motion (suffix or prefix) going through refinement to fit the transition
@@ -157,7 +161,7 @@ DiffusionBlending 解决“如何组合多个控制信号”的问题。先对�
 
 三种策略可独立使用，也可视任务需求组合。例如，理论上可将 ComMDM 的通信机制与 DoubleTake 的长序列生成结合，实现双人长交互序列；或将 DiffusionBlending 的混合控制应用于 ComMDM 中的单人模型，实现双人场景下的细粒度关节控制。论文未显式验证这些组合，但框架的模块化设计为此类扩展留有空间。
 
-## 核心模块与公式推导
+
 
 PriorMDM 的核心思想是将预训练的 MDM（Tevet et al., ICLR 2023）作为冻结的运动先验，通过三种轻量组合策略实现分布外泛化。以下逐一拆解其关键模块与公式。
 
@@ -207,7 +211,9 @@ $$q(X_t | X_{t-1}) = \mathcal{N}\big(\sqrt{\alpha_t} X_{t-1}, (1 - \alpha_t) I\b
 
 其中 $X_t$ 为第 $t$ 步加噪后的运动序列，$\alpha_t$ 为噪声调度参数。MDM 建模反向去噪过程，预测干净运动 $\hat{X}_0$，条件为噪声步 $t$ 和 CLIP 编码的文本嵌入。PriorMDM 的所有组合策略均在此去噪框架内操作，不改变基础模型的架构或训练目标。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验结果
 
@@ -252,7 +258,9 @@ $$q(X_t | X_{t-1}) = \mathcal{N}\big(\sqrt{\alpha_t} X_{t-1}, (1 - \alpha_t) I\b
 
 ![[assets/figures/papers/paper_list_l32_https_openreview_net_pdf_id_dTpbEdN9kr/figures/006_Table.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心定位：扩散先验的组合泛化
 
@@ -286,6 +294,8 @@ PriorMDM 的方法论核心并非设计新的生成架构，而是将预训练�
 - DiffusionBlending 能否自然地扩展到三个或更多微调模型的组合，实现全身任意关节的混合控制？
 - 本文的组合策略在图像、视频等其他扩散生成领域的迁移效果如何？这直接关系到该方法论能否上升为扩散模型的通用组合范式。
 - 数据集标注稀缺的背景下，如何自动挖掘运动数据中的隐式过渡和交互模式以辅助训练？这可能是突破当前数据瓶颈的关键方向。
+
+
 
 ## 原文 PDF
 

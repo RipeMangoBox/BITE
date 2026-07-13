@@ -5,6 +5,8 @@ paper_level: A
 venue: NeurIPS
 year: 2022
 pdf_ref: paperPDFs/NEURIPS_2022/Structural_Pruning_via_Latency_Saliency_Knapsack.pdf
+project_link: https://halp-neurips.github.io/
+code_link: null
 aliases:
 - HALPH
 - SPLSK
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 基于延迟-显著性背包的结构化剪枝 |
 | 英文题名 | Structural Pruning via Latency-Saliency Knapsack |
 | 会议/期刊 | NeurIPS 2022 |
-| Links | [paper](https://arxiv.org/abs/2210.06659); [Project](https://halp-neurips.github.io/) |
+| Links | [paper](https://arxiv.org/abs/2210.06659) · [Project](https://halp-neurips.github.io/) |
 | Topic | #topic/optimization_theory_probabilistic #topic/optimization_theory_probabilistic/optimization_methods |
 | Method | Hardware-Aware Latency Pruning (HALP) |
 | Dataset | ImageNet (ResNet50), ImageNet (ResNet101), PASCAL VOC (SSD), ImageNet (ResNet50, EagleEye baseline) |
@@ -41,7 +43,7 @@ claims:
 > - ImageNet (ResNet101) 上，Top-1 Accuracy / Speedup (vs unpruned) 为 77.2% / 1.90× (HALP-40%)，对比 77.4% / 1× (No pruning)，变化 -0.2% / +0.90×。
 > - PASCAL VOC (SSD) 上，mAP / Speedup (vs unpruned) 为 77.42 (0.56 mAP drop) / 1.94× (HALP)，对比 77.98 / 1× (No pruning)，变化 -0.56 mAP / +0.94×。
 
-## 概述
+## 概要
 
 结构化剪枝是压缩深度神经网络、加速推理的主流手段。现有方法普遍使用 FLOPs 或参数量作为剪枝的代理指标，但这些指标与真实硬件上的推理延迟之间存在显著的非线性偏差。在 GPU 等硬件上，卷积层的延迟随通道数变化呈阶梯状模式，逐层独立剪枝无法有效利用这一特性，导致即使大幅削减计算量也无法获得成比例的加速。因此，核心瓶颈在于：**如何在准确建模目标硬件延迟特性的同时，在全局延迟预算下最大化模型准确度**。
 
@@ -50,8 +52,6 @@ claims:
 在 ImageNet 上，HALP 对 ResNet-50 剪枝后实现 **1.60× 吞吐量提升**，Top-1 准确度反而提升 **0.3%**；对 ResNet-101 实现 **1.90× 加速**，准确度仅下降 0.2%。在 PASCAL VOC 目标检测任务上，HALP 以 0.56 mAP 的代价换取 **1.94× 加速**。与延迟感知的对比方法 **EagleEye**（Li et al., ECCV 2020）相比，HALP 在相同延迟约束下始终取得更高的准确度，且子网络搜索耗时仅为后者的约 1/4.3。
 
 HALP 的核心价值在于将剪枝从“逐层局部贪心 + FLOPs 代理”的范式，推进到“全局延迟约束下的重要性最大化”这一更精确的优化框架，为硬件感知的结构化剪枝提供了可泛化的求解路径。
-
-## 背景与动机
 
 ### 结构化剪枝的延迟错觉
 
@@ -81,7 +81,7 @@ HALP（Hardware-Aware Latency Pruning）针对这一问题提出了根本性的�
 
 这一范式转换的直接效果是：HALP 在 ResNet-50 上以 1.60× 的吞吐量提升获得了 +0.3% 的 Top-1 准确度增益，在 ResNet-101 上以 1.90× 加速仅损失 0.2% 准确度——在结构化剪枝领域，同时实现显著加速与精度保持甚至提升，标志着硬件感知剪枝的重要进展。
 
-## 核心创新
+## 核心方法与创新机理
 
 ### 问题重定义：从局部剪枝到全局资源分配
 
@@ -162,8 +162,6 @@ GPU 等硬件上卷积层的延迟随通道数呈阶梯状变化——通道数�
 
 HALP 在训练过程中设置 $k$ 个里程碑，延迟预算按指数调度从初始值逐渐降低至最终目标，每个里程碑执行一次全局背包选择并继续训练恢复精度。这种渐进式剪枝策略避免了单次大幅剪枝造成的不可逆精度损失，使得网络有充分时间适应结构变化。
 
-## 整体框架
-
 HALP 将结构化剪枝重新形式化为一个带延迟约束的全局资源分配问题，其整体 pipeline 由五个核心模块串联而成，形成“测量—评估—选择—执行—迭代”的闭环。
 
 **输入**：一个预训练的稠密网络、目标硬件平台、目标延迟预算 $C$。
@@ -183,8 +181,6 @@ HALP 将结构化剪枝重新形式化为一个带延迟约束的全局资源分
 **输出**：满足目标延迟约束且准确度最大化的剪枝网络结构。
 
 **关键设计决策**：与逐层独立剪枝或基于 FLOPs 代理的方法不同，HALP 通过延迟查找表直接建模真实硬件延迟，并在全局背包框架下统一优化所有层的通道分配，从而在延迟-准确度权衡上获得显著优势。
-
-## 核心模块与公式推导
 
 ### 3.1 问题形式化：从局部剪枝到全局资源分配
 
@@ -256,7 +252,7 @@ GPU 等硬件上卷积层的延迟呈阶梯状模式——通道数的变化在�
 
 HALP 采用 $k$ 个里程碑的迭代剪枝策略。在每个里程碑处执行一次完整的全局背包选择，延迟预算按指数调度逐步降低至最终目标值。每次剪枝后网络继续训练以恢复精度。这一渐进式调度避免了单次激进剪枝带来的不可逆精度损失，使网络能够在剪枝-微调的交替中逐步适应稀疏结构。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验结果
 
@@ -334,13 +330,10 @@ HALP 在 ImageNet 分类任务上对多种架构进行了结构化剪枝评估�
 ![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2210_06659/figures/017_Table_8.jpg]]
 *Table 8: HALP for object detection on the PASCAL VOC dataset*
 
-![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2210_06659/figures/018_Table_9.jpg]]
-*Table 9: The additional convolution layers in SSD*
-
 ![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2210_06659/figures/020_Table_10.jpg]]
 *Table 10: Pruning ResNet50 on the ImageNet dataset with FLOPs constraint and comparison with state-of-the-art method EagleEye (ECCV’20) [32]. We remeasure the FLOPs, top1 and top5 accuracy of EagleEye to get results with two digits*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 结构化剪枝范式的演进定位
 

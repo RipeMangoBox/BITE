@@ -5,6 +5,8 @@ paper_level: A
 venue: ECCV
 year: 2024
 pdf_ref: paperPDFs/ECCV_2024/MHC_Generating_Physically_Realistic_and_Directable_Human_Motions_from_Multi_Modal_Inputs.pdf
+project_link: https://idigitopia.github.io/projects/mhc/
+code_link: null
 aliases:
 - MHCM
 - MGPRDHMFMMI
@@ -39,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - Imitation on Reallusion M_Real 上，MPJPE (mm) 51.05 vs 123.51 (-72.46)；Success Rate 0.92 vs 0.60 (+0.32)。
 
-## 概述
+## 概要
 
 ### 1. 问题瓶颈
 
@@ -68,7 +70,7 @@ MHC 在 87 种运动技能的数据集上训练后，统一实现了 CCC 三项�
 
 MHC 属于**物理仿真驱动的运动生成**方向，继承自基于对抗技能嵌入（ASE）的类人控制框架，但通过指令掩码训练范式实现了关键突破。与依赖完整运动指令的 ASE 不同，MHC 的掩码训练使其天然兼容多模态输入（VR 设备、手柄、视频提取的 3D 关节、文本生成的运动），将不同模态统一为“部分指定的运动指令”这一抽象表示。在规划集成层面，MHC 作为低层运动原语执行器，与数据驱动规划器（DAC-MDP）构成分层架构，实现了从高层任务目标到物理真实运动的端到端生成。
 
-## 背景与动机
+
 
 ### 问题背景：物理仿真中的人体运动生成
 
@@ -101,7 +103,9 @@ MHC并非从头构建全新的控制器架构，而是在现有物理角色控�
 
 这些设计共同使MHC成为首个同时实现追赶、组合、补全能力的物理运动生成器，并可与有限状态机（FSM）及数据驱动规划器（如DAC-MDP）无缝集成，实现零样本的高层任务规划。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MHC 的核心创新在于**通过指令掩码训练，将物理类人控制器的能力边界从单一模仿扩展到追赶（Catch-up）、组合（Combine）与补全（Complete）的统一框架**。现有物理控制器（如 ASE，Peng et al., ACM TOG 2022）要求完全指定的运动指令，无法处理稀疏、不同步的多模态输入。MHC 通过在强化学习训练中引入通道级与关节级随机掩码，迫使策略隐式学习运动先验与协调能力，从而在推理时仅凭部分指令即可生成物理一致的自然运动。
 
@@ -141,7 +145,7 @@ MHC 的核心创新在于**通过指令掩码训练，将物理类人控制器�
 
 掩码训练是 MHC 统一 CCC 能力的**核心因果旋钮**：通过随机剥夺部分运动信息，策略被迫从剩余信息中推断缺失部分，从而隐式学习运动先验与全身协调模式。增强数据集 $M^+$ 和跌倒姿态初始化分别强化了组合与追赶能力，多部位风格判别器则提供了必要的自然度约束。这五个改动槽位相互依赖——移除任一项均会导致特定能力或整体性能的显著退化。
 
-## 整体框架
+
 
 MHC（Masked Humanoid Controller）的整体框架围绕一个核心矛盾展开：**如何让物理仿真中的人形机器人，从稀疏、不同步、甚至不完整的运动指令中，生成物理真实且风格自然的运动**。传统物理类人控制器（如ASE, Peng et al., ACM TOG 2022）要求完全指定的运动指令，缺乏对不完整信息的鲁棒性，无法同时具备追赶（Catch-up）、组合（Combine）和补全（Complete）这三项关键能力。MHC通过在强化学习训练中引入**指令掩码**这一因果调节旋钮，迫使策略隐式学习运动先验与跨关节协调机制，从而统一解决上述问题。
 
@@ -190,7 +194,7 @@ MHC的掩码指令接口天然支持与高层规划框架的零样本集成。�
 ![[assets/figures/papers/paper_list_l1876_MHC_Generating_Physically_Realistic_and_Directable_Human_Motions_from_Mu/figures/002_Figure_2.jpg]]
 *Figure 2: Shows generated motions that illustrate the CCC capabilities. From left to right: MHC is able to generate motions that (1) adjust and catchup starting from an out-of-sync pose, (2) imitate a target directive that combines upper and lower body sub-segments from different motions, and (3) complete the motion from under-specified directives as indicated by missing target outlines*
 
-## 核心模块与公式推导
+
 
 ### 问题形式化
 
@@ -251,7 +255,9 @@ MHC 训练形式化为强化学习，使用 PPO 算法。每个 episode 随机�
 ![[assets/figures/papers/paper_list_l1876_MHC_Generating_Physically_Realistic_and_Directable_Human_Motions_from_Mu/figures/005_Figure_5.jpg]]
 *Figure 5: Illustrates generated motions corresponding to key CCC capabilities of MHC. The simulation (left) displays key-frames of humanoid following different motion directives (right). From top to bottom the simulated humanoid (A) follows an imitation target, (B) transitions from falling-down position to catch-up to the target directive, (C) imitates motion directive that combines upper-body and lower-body movements from distinct motions (D) completes the motion using only 3D joint positions of the head, hands and feets*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：CCC 能力统一评估
 
@@ -336,7 +342,9 @@ Table 1 同时报告了针对性消融结果，每项消融对应一种 CCC 能�
 ![[assets/figures/papers/paper_list_l1876_MHC_Generating_Physically_Realistic_and_Directable_Human_Motions_from_Mu/figures/001_Figure_1.jpg]]
 *Figure 1: Showcases generated human motions from multi-modal inputs: (A) VR device, (B) joystick controller, (C) video, and (D) text. Our proposed method, Masked Humanoid Controller (MHC), can generate physically realistic motions from a wide variety of muli-modal directives*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -377,6 +385,8 @@ MHC 的设计假设和适用边界可从其训练设置和实验覆盖范围中�
 - **能量惩罚的必要性**：消融实验表明能量惩罚项对于消除脚部高频抖动至关重要（confidence 0.9）。这意味着方法对奖励权重的设置较为敏感，在实际部署中可能需要针对不同运动风格调整惩罚系数。
 - **掩码比例的鲁棒性边界**：实验显示 MHC 在高达 75% 关节掩码下保持稳定性能，但极端掩码（如仅保留单一关节信息）下的行为未被报告。补全能力的上限受限于训练期间所见的最小信息量。
 - **风格判别器的过拟合风险**：多部位判别器在训练数据分布内提供有效的风格监督，但在分布外运动风格上可能产生不可靠的奖励信号，导致生成运动的质量下降或行为异常。
+
+
 
 ## 原文 PDF
 

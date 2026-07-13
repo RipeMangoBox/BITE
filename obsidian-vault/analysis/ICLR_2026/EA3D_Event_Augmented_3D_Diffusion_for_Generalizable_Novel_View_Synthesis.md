@@ -42,7 +42,7 @@ claims:
 > - Tanks-and-Temples (T&T) 上，PSNR↑ / SSIM↑ / LPIPS↓ 23.50 / 0.756 / 0.218 vs 18.24 / 0.607 / 0.289 (ViewCrafter) (+5.26 / +0.149 / -0.071)。
 > - DSEC (真实事件数据) 上，PSNR↑ / SSIM↑ / LPIPS↓ 24.89 / 0.792 / 0.211 vs 18.71 / 0.684 / 0.279 (ViewCrafter) (+6.18 / +0.108 / -0.068)。
 
-## 概述
+## 概要
 
 新视角合成（Novel View Synthesis, NVS）旨在从稀疏输入视图生成任意视角的高保真图像。现有方法面临一对根本性矛盾：**逐场景优化方法**（如E-NeRF、Event3DGS）虽能利用事件相机提供的微秒级几何线索，但需为每个场景重新训练，无法泛化到新环境；**可泛化方法**（如ViewCrafter、NVS-Solver）仅依赖稀疏RGB帧，在快速相机运动或大基线场景下因几何信息严重不足而产生结构崩塌与伪影。
 
@@ -59,7 +59,7 @@ claims:
 
 **局限与开放问题**：当前EA3D的训练依赖合成事件模拟器（vid2e），对真实事件噪声与传感器退化的鲁棒性仍需更全面验证；骨干视频扩散模型（CogVideoX）固定了最大分辨率与序列长度，尚不支持自适应推理；推理显存消耗约28 GB（A100），部署到边缘设备面临挑战。此外，在强动态场景（非刚性运动、显著光照突变）下的事件-外观融合可靠性，以及通过模型蒸馏实现实时推理的可行性，仍是值得探索的开放问题。
 
-## 背景与动机
+
 
 新视角合成（Novel View Synthesis, NVS）旨在从稀疏的输入视图中重建任意相机位姿下的高保真图像，是三维视觉与图形学中的核心问题。近年来，以NeRF（Mildenhall et al., ECCV 2020）和3D高斯泼溅（3DGS, Kerbl et al., SIGGRAPH 2023）为代表的逐场景优化方法取得了令人瞩目的渲染质量，但其根本局限在于：**每遇到一个新场景，都需要从零开始执行耗时的梯度优化**，无法实现跨场景的即时泛化。
 
@@ -69,7 +69,9 @@ claims:
 
 本文的核心动机在于：**能否将事件流的稠密几何先验与RGB帧的丰富外观信息进行深度融合，从而在不依赖逐场景优化的前提下，实现可泛化的高保真新视角合成？** 这一问题的挑战在于：事件流是无姿态的异步信号，而RGB帧是带位姿的同步信号，两者的模态鸿沟与时空对齐问题需要在统一的框架中得到解决。EA3D正是围绕这一核心矛盾展开设计，通过可学习的EA-Renderer和3D-aware视频扩散模型，首次实现了事件增强的可泛化新视角合成。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 EA3D的核心创新在于**将事件相机与RGB帧的互补优势系统性地注入到可泛化的新视角合成管线中**，从而突破“稀疏RGB帧在快速运动下几何信息匮乏”与“逐场景优化方法无法泛化”的双重瓶颈。与现有基线相比，EA3D在三个关键维度上实现了结构性改变。
 
@@ -97,7 +99,7 @@ EA3D采用**基于DiT架构的视频扩散模型**（改编自CogVideoX），以
 
 综上，EA3D通过上述三个changed slots的协同设计，实现了从“仅RGB、逐场景优化”到“事件增强、可泛化、时空一致”的范式跃迁。在最具挑战性的2视图大基线设定下，EA3D在T&T基准上以23.50 PSNR显著超越ViewCrafter的18.24 PSNR（+5.26 dB），在真实事件数据DSEC上以24.89 PSNR领先6.18 dB（Table 1, Table 2），充分验证了创新设计的有效性。
 
-## 整体框架
+
 
 EA3D 的整体 pipeline 围绕一个核心洞察构建：**事件流蕴含微秒级、抗遮挡的几何结构线索，而 RGB 帧携带纹理与色彩**。通过一个可学习的 EA-Renderer 将两者融合为视角相关的 3D 特征，再以此条件驱动视频扩散模型，可在不依赖逐场景优化的情况下生成时空一致的高保真新视角。
 
@@ -137,7 +139,7 @@ EA3D 由两个关键组件级联构成（图1）：
 ![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_YwawhlWdtm/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of EA3D. Given a set of sparse RGB frames and continuous event streams, we learn an Event-Augmented Feature Renderer (EA-Renderer) to construct view-dependent 3D features by projecting both appearance cues from RGB frames and occlusion-resilient geometry features from adaptively sliced event voxel grids into each target camera frustum. These 3D features are then passed into a conditional video diffusion model as 3D conditions, facilitating photorealistic and consistent novel view synthesis*
 
-## 核心模块与公式推导
+
 
 EA3D 由两大关键模块串联构成：**事件增强的特征渲染器（EA-Renderer）** 与 **3D感知的视频扩散模型**。EA-Renderer 负责将稀疏 RGB 帧与连续事件流融合为视角相关的 3D 条件特征，扩散模型则以此特征为条件，在潜空间中生成时空一致的新视角序列。
 
@@ -198,7 +200,9 @@ $$\mathcal{L}_{\mathrm{recon}} = \| \mathbf{F}_{3\mathrm{D}} - \mathcal{E}_{\mat
 ![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_YwawhlWdtm/figures/009_Figure_6.jpg]]
 *Figure 6: Illustration of adative event slicing*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -273,7 +277,9 @@ Table 7将EA3D与基于事件的帧插值方法VDM-EVFI进行对比。帧插值�
 ![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_YwawhlWdtm/figures/010_Figure_7.jpg]]
 *Figure 7: Event simulation under different contrast thresholds and resolutions. Each row corresponds to a simulated resolution: 1024 × 576, 346 × 260, and 240 × 180, respectively. Each column shows the simulated events under different contrast thresholds: 0.05, 0.12, and 0.3. Lower thresholds lead to denser event firing with more fine-grained structure, while higher thresholds produce sparser events primarily along strong edges. To improve robustness across varying event data quality and settings, we train our model with mixed simulated events from diverse thresholds and resolutions*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：稀疏观测下的几何信息瓶颈
 
@@ -326,6 +332,8 @@ EA3D的性能优势可分解为三个因果环节：
 **（3）多模态传感器融合**：能否将EA3D的事件-外观融合框架扩展到主动深度传感器（如LiDAR、ToF），以更好地建模非朗伯表面和高光区域？事件流对纹理缺失区域（如白墙）的几何信息有限，深度传感器的互补性值得探索。
 
 **（4）与基于事件的帧插值的深层关系**：Table 7与VDM-EVFI的对比显示EA3D在帧插值任务上也具竞争力，但两者在事件信息利用方式上存在本质差异——VDM-EVFI使用事件进行运动估计，而EA3D将事件作为几何先验注入3D特征空间。这一差异是否意味着EA3D的几何特征可以替代显式运动估计，值得进一步研究。
+
+
 
 ## 原文 PDF
 

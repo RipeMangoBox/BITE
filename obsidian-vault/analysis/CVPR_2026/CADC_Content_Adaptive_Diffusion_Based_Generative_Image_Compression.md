@@ -43,7 +43,7 @@ claims:
 > - Kodak 上，LPIPS BD-rate M3 (full CADC) BD-rate -6.8% vs M0 (baseline) (-6.8%)；DISTS BD-rate M3 BD-rate -5.5% vs M0 (-5.5%)；Top-1 user preference 58.5% vs StableCodec 29.0%, DLF 12.5% (+29.5% over StableCodec)。
 > - Kodak, DIV2K Val, CLIC 2020 Test 上，LPIPS, DISTS, FID, KID superior perceptual quality vs all compared generative codecs (state-of-the-art)。
 
-## 概述
+## 概要
 
 **CADC** (Content-Adaptive Diffusion-Based Image Compression) 是一种面向极低码率图像压缩的内容自适应扩散生成编解码框架。其核心动机在于解决现有扩散图像压缩方法中三个关键瓶颈：**各向同性量化**导致量化噪声与扩散模型的噪声先验错配、**信息集中瓶颈**源于高维噪声潜变量与预训练扩散解码器固定4通道输入之间的维度失配、以及**文本条件化策略**要么消耗额外码率传输文本，要么使用与内容无关的通用提示而无法提供有效语义指导。
 
@@ -59,7 +59,7 @@ claims:
 
 **方法定位**：CADC属于扩散生成压缩方法谱系，与StableCodec（Zhang et al., ICCV 2025）、HiFiC、DiffEIC等生成编解码器形成对比。其独特贡献在于将内容自适应机制系统性地引入量化、信息分配和条件化三个环节，而非依赖更大的模型或更复杂的扩散采样策略。
 
-## 背景与动机
+
 
 ### 生成式图像压缩的范式演进
 
@@ -83,7 +83,9 @@ claims:
 
 上述三个瓶颈指向一个共同的根源：**压缩过程的每一环节（量化、潜表示、条件化）均采用全局固定策略，而非动态适应图像内容**。CADC 的核心洞察在于：通过引入内容自适应的量化噪声整形、损失驱动的信息集中机制、以及基于代理重建的无码率语义条件化，可以在不增加码率的前提下，使扩散压缩管线与图像内容的局部特性实现精细对齐，从而充分释放扩散模型的生成潜力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CADC 针对现有扩散图像压缩方法在极低码率下的三个结构瓶颈，提出了三项内容自适应机制，构成从量化、潜表示到条件化的全链路创新。
 
@@ -121,7 +123,7 @@ BFATC 利用 ADGIC 的辅助重建图像作为代理，通过冻结的预训练 
 
 消融实验（Table 1）揭示了各项创新的累积贡献：以无任何自适应机制的基线 M0 为参照，UGAQ 单独带来 LPIPS BD-rate 降低 3.7%、DISTS BD-rate 降低 2.7%；叠加 ADGIC 后，LPIPS 进一步降低 1.6%（累计 −5.3%），DISTS 降低 0.8%（累计 −3.5%）；加入 BFATC 后，LPIPS 再降低 1.5%（累计 −6.8%），DISTS 再降低 2.0%（累计 −5.5%）。三项创新从量化噪声整形、信息流控制和语义条件化三个维度形成互补，共同释放了扩散模型的生成潜力。
 
-## 整体框架
+
 
 CADC (Content-Adaptive Diffusion-Based Image Compression) 构建了一个端到端的、内容自适应的扩散生成图像压缩框架，其核心设计理念是使压缩过程的每一环节——量化、潜表示、条件化——均动态匹配图像内容的空间异质性。整体系统架构如 Figure 2 所示，编码端与解码端通过三个关键创新模块实现内容感知：不确定性引导的自适应量化 (UGAQ)、辅助解码器引导的信息集中 (ADGIC) 和零码率自适应文本条件化 (BFATC)。
 
@@ -175,7 +177,7 @@ UGAQ 的核心机理在于：通过逐元素除法调制，解码端的有效局
 
 相较于现有扩散图像压缩方法（如 **StableCodec** (Zhang et al., ICCV 2025)、**DLF**、**HiFiC** 等），CADC 在三个关键维度上实现了根本性改进：(1) 从各向同性量化转向空间自适应量化；(2) 从无引导的潜表示转向损失驱动的信息集中；(3) 从消耗码率的文本传输或通用固定提示转向零码率内容感知文本条件化。这些改进使 CADC 在极低码率下显著提升了感知质量，尤其在复杂纹理区域表现突出（见 Figure 1 定性对比）。
 
-## 核心模块与公式推导
+
 
 CADC 的编码器首先通过主分析变换 $g_a$ 将输入图像 $\mathbf{x}$ 压缩为紧凑的潜表示 $\mathbf{y}$。超先验分析变换 $h_a$ 进一步将 $\mathbf{y}$ 编码为超先验潜变量 $\mathbf{z}$，经量化后由超先验合成变换 $h_s$ 生成边信息 $\mathbf{c}_h$ 用于熵建模。量化后的主潜变量 $\hat{\mathbf{y}}$ 经算术编码形成码流传输。
 
@@ -252,7 +254,9 @@ $$\begin{array}{rl}\text{Stage I}: & \arg\min_\theta \mathcal{L}_1 = \lambda_{\t
 ![[assets/figures/papers/paper_list_l844_https_arxiv_org_abs_2602_21591/figures/010_Figure_9.jpg]]
 *Figure 9: Illustration of our entropy modeling process*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -323,7 +327,9 @@ $$\mathrm{SNR}_{i,j} \propto \frac{\mathbb{E}[y_{i,j}^2]}{m_{i,j}^2 \cdot \sigma
 ![[assets/figures/papers/paper_list_l844_https_arxiv_org_abs_2602_21591/figures/014_Figure_11.jpg]]
 *Figure 11: Visual examples and comparisons on 2K-resolution images from the test set of CLIC 2020 Professional*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有生成式图像压缩方法的关系
 
@@ -367,6 +373,8 @@ CADC 的设计和评估高度聚焦于**极低码率场景**（ultra-low bitrate
 3. **跨模态与跨任务推广**：内容自适应量化的核心思想——从潜表示残差中学习空间不确定性并调制压缩噪声——是否可以推广到视频压缩（时域不确定性）、三维表示压缩，或其他生成模型（如基于流的模型、自回归模型）？
 4. **高码率下的贡献分配**：在更高码率下，生成能力的重要性相对下降，而保真度要求上升。ADGIC 的信息集中机制和 BFATC 的语义引导在高码率下的相对贡献是否依然显著？是否需要对网络容量和损失权重进行结构性调整？
 5. **不确定性估计的替代路径**：当前不确定性图 $\mathbf{m}$ 来源于主潜变量与超先验潜变量的残差 $\mathbf{r}$。是否存在更直接的不确定性估计方式（如基于熵模型的概率分布、基于梯度的显著性）能进一步提升自适应量化的效果？
+
+
 
 ## 原文 PDF
 

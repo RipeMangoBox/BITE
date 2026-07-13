@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/VLIC_Vision_Language_Models_As_Perceptual_Judges_for_Human_Aligned_Image_Compression.pdf
+project_link: null
 code_link: null
 aliases:
 - VVLMIC
@@ -41,7 +42,7 @@ claims:
 > [!tip] 效果简介
 > - MS-COCO 上，Human Elo @ 0.07bpp 858 vs 838 (LPIPS-only post-training) (+20)；LPIPS @ 0.07bpp 0.274 vs 0.274 (0)；Human Elo @ 0.21bpp 1112 vs 1103 (LPIPS-only post-training) (+9)。
 
-## 概述
+## 概要
 
 图像压缩的核心挑战在于：传统像素级失真度量（如 MSE）与人类视觉感知之间存在显著鸿沟，而现有学习型感知度量也难以精确捕捉人类对压缩重建的细微偏好。视觉语言模型（VLM）的涌现为这一问题提供了新的可能——VLM 能够在零样本条件下复现人类对视觉相似性的二元判断，但如何将这种离散的偏好信号转化为可微的压缩模型训练目标，仍是一个开放问题。
 
@@ -53,7 +54,7 @@ claims:
 
 VLIC 也存在若干局限：VLM 在候选重建高度相似时可能产生幻觉（丧失自一致性）；基于编辑距离的文本可读性奖励会导致模型退化为审查所有可读文本；方法依赖强大的闭源 VLM，其可用性和推理成本可能限制广泛复现。尽管如此，VLIC 为利用 VLM 的感知能力指导压缩模型训练开辟了一条可行路径。
 
-## 背景与动机
+
 
 图像压缩是数字视觉通信的基础技术，其核心挑战在于以尽可能低的比特率重建出符合人类感知的高质量图像。传统压缩方法（如JPEG、BPG）依赖像素级失真度量（均方误差MSE、峰值信噪比PSNR）指导编解码器设计，但这些度量与人类视觉感知的对齐程度有限——两张PSNR相近的图像，在人类眼中可能呈现截然不同的感知质量。
 
@@ -66,7 +67,9 @@ VLIC 也存在若干局限：VLM 在候选重建高度相似时可能产生幻�
 
 本文提出 **VLIC（Vision-Language Models for Image Compression）**，一个基于扩散自编码器的图像压缩框架，通过扩散直接偏好优化（Diffusion DPO）将VLM的二元偏好判断与LPIPS感知度量集成，对压缩模型进行后训练，从而在保持像素对齐能力的同时显著提升人类感知对齐质量。该方法的动机源于一个核心洞察：VLM能够零样本复现人类对视觉相似性的二元判断，将其作为奖励信号与现有感知度量协同使用，可以引导扩散压缩模型生成更符合人类偏好的重建结果。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 VLIC 的核心创新在于**将视觉语言模型（VLM）的零样本感知评判能力转化为扩散自编码器压缩模型的可优化训练信号**，从而突破传统像素级失真度量与人类视觉偏好对齐不足的瓶颈。相比于现有基于 GAN 或扩散模型的压缩方法，VLIC 在以下关键维度上进行了系统性改造：
 
@@ -106,7 +109,7 @@ VLIC 采用 **在线 Diffusion DPO 训练**，在训练过程中定期刷新偏�
 
 **创新本质总结**：VLIC 并未重新设计压缩架构，而是在扩散自编码器的后训练阶段引入 VLM 作为“感知评判器”，通过 Diffusion DPO 将不可微的二元偏好信号转化为可优化的梯度。这一思路将压缩模型的对齐问题从“设计更好的感知损失函数”转变为“利用强大的多模态模型直接提供人类对齐的偏好信号”，为图像压缩的感知质量提升开辟了新路径。
 
-## 整体框架
+
 
 VLIC 的整体 pipeline 围绕“压缩-采样-评判-优化”闭环构建，将视觉语言模型（VLM）的二元偏好判断转化为扩散自编码器的训练信号。系统由五个核心模块串联而成，形成端到端的可训练压缩框架，如 **Figure 3** 所示。
 
@@ -133,7 +136,7 @@ $$L(\theta) = L_{\mathrm{DDPO}}(\theta) + \lambda_{\mathrm{Flow}} L_{\mathrm{Flo
 
 整个框架的核心创新在于用 VLM 的零样本二元判断替代传统的手工感知损失，并通过 Diffusion DPO 将其直接注入压缩模型的后训练过程，而非蒸馏为独立的感知网络。这种设计使得压缩模型能够捕捉到像素级度量难以表达的人类视觉偏好维度（如人脸、文本、纹理的保真度），同时保持了端到端训练的一致性和可扩展性。
 
-## 核心模块与公式推导
+
 
 ### 系统流水线
 
@@ -183,7 +186,9 @@ $$r_A = \sum_{i=1}^n r_A^i, \quad r_B = \sum_{i=1}^n r_B^i$$
 ![[assets/figures/papers/paper_list_l808_https_arxiv_org_abs_2512_15701/figures/012_Figure_7.jpg]]
 *Figure 7: Tiled inference for arbitrary resolutions. From top to bottom: Original image, tiling strategy, reconstructed image. The margin size (we use 8 pixels in this work) must be large enough to communicate information between patches during diffusion to avoid unsightly border artifacts, but not so large as to waste BPP*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -258,7 +263,9 @@ Table 3 的消融实验揭示了奖励设计中各组件的因果贡献：
 ![[assets/figures/papers/paper_list_l808_https_arxiv_org_abs_2512_15701/figures/013_Figure_8.jpg]]
 *Figure 8: Censoring readable text. A failure case of an edit-distance based reward on readable text determined by the VLM causes the model to degenerate to censoring all readable text in the images*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 生成式压缩的演进脉络
 
@@ -301,6 +308,8 @@ VLIC 采用的 Diffusion DPO 源自大语言模型对齐领域的 DPO 范式，�
 ---
 
 **需要手动验证的内容**：部分基线方法（PerCo、PO-ELIC、HFD）未公开代码或完整重建结果，论文中的定量比较可能存在评估偏差；HiFiC 等方法的作者/年份/会议元数据在提供的分析中缺失，建议查阅原论文补充完整引用信息。
+
+
 
 ## 原文 PDF
 

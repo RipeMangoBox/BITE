@@ -5,6 +5,7 @@ paper_level: A
 venue: SIGGRAPH
 year: 2021
 pdf_ref: paperPDFs/SIGGRAPH_2021/NanoVDB_A_GPU_Friendly_and_Portable_VDB_Data_Structure_For_Real_Time_Rendering_And_Simulation.pdf
+code_link: https://github.com/openvdb/nanovdb-editor
 project_link: https://github.com/openvdb/nanovdb-editor
 aliases:
 - NanoVDB
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | NanoVDB：面向实时渲染与仿真的GPU友好、可移植的VDB数据结构 |
 | 英文题名 | NanoVDB: A GPU-Friendly and Portable VDB Data Structure For Real-Time Rendering And Simulation |
 | 会议/期刊 | SIGGRAPH 2021 |
-| Links | [paper](https://research.nvidia.com/labs/prl/nanovdb/nanovdb2021.pdf); [GitHub](https://github.com/openvdb/nanovdb-editor) |
+| Links | [paper](https://research.nvidia.com/labs/prl/nanovdb/nanovdb2021.pdf) · [GitHub](https://github.com/openvdb/nanovdb-editor) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | NanoVDB |
 | Dataset | CPU随机访问, 压缩内存占用, 压缩性能影响 |
@@ -41,7 +42,7 @@ claims:
 > - 压缩内存占用 上，内存占用减少倍数 为 压缩后的NanoVDB，对比 未压缩的NanoVDB，变化 减少4至6倍。
 > - 压缩性能影响 上，运行时间变化 为 压缩后的NanoVDB，对比 未压缩的NanoVDB，变化 性能提升10%至30%。
 
-## 概述
+## 概要
 
 **问题瓶颈**：OpenVDB（Museth, 2013）作为稀疏体积数据结构的工业标准，其底层严重依赖指针和动态内存分配，导致内存碎片化，无法直接在GPU等并行设备上高效运行。同时，原始数据结构缺乏节点内统计元数据，难以在渲染管线中实现早期加速。
 
@@ -54,7 +55,7 @@ claims:
 
 **方法谱系与知识库定位**：NanoVDB属于**GPU友好的稀疏体积数据结构**，其核心贡献在于通过内存布局重构实现硬件可移植性，而非提出新的稀疏存储范式。与OpenVDB的关系是替代与互补：NanoVDB作为OpenVDB的线性化、无指针快照，通过快速双向转换器保持生态兼容，同时为实时渲染和GPU仿真提供原生支持。在方法谱系上，它连接了CPU端成熟数据结构与GPU端高性能计算需求，填补了体积数据在跨设备实时应用中的工程空白。
 
-## 背景与动机
+
 
 体积数据（volumetric data）在现代计算机图形学、视觉特效与科学可视化中扮演着核心角色，被广泛用于表示烟雾、火焰、流体、云层以及隐式曲面（如符号距离场）。随着实时渲染与物理仿真对计算吞吐量需求的急剧攀升，GPU等大规模并行设备已成为不可或缺的计算平台。然而，体积数据的稀疏性与层次化特征使得将其高效映射到GPU上成为一个极具挑战性的工程问题。
 
@@ -70,7 +71,9 @@ claims:
 
 正是在这样的背景下，NanoVDB应运而生。其核心动机并非在算法层面重新定义VDB树，而是对数据结构的**内存表示**进行一次彻底的GPU友好化重构：消除指针、强制对齐、嵌入统计元数据，并以线性化快照的形式将整个树封装为一段连续的、可直接在设备间拷贝的内存块。这一设计哲学使得NanoVDB能够无缝跨越CPU与GPU的边界，同时为实时渲染与仿真管线提供原生加速能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 NanoVDB 的核心创新在于将 OpenVDB 的层次化稀疏体积数据结构从 CPU 端彻底重构为 GPU 友好、可移植的无指针连续内存布局，并通过嵌入节点级元数据和运行时压缩编解码器，使同一数据结构同时服务于实时渲染与物理仿真。
 
@@ -102,7 +105,7 @@ OpenVDB 仅支持 out-of-core 压缩（数据在存储时压缩，使用时需�
 
 **证据强度说明**：内存布局和元数据设计的声明有明确原文锚点支撑，置信度高。CPU 端性能对比仅有文字描述而无具体加速比和测试配置，需谨慎引用。压缩的性能提升数据同样缺乏详细的测试场景说明，但其定性结论（压缩不损害性能）在 GPU 带宽受限场景下具有合理的因果解释。
 
-## 整体框架
+
 
 NanoVDB 的 pipeline 围绕一个核心设计原则展开：将 OpenVDB 的层次化稀疏体积树重构为无指针、32 字节对齐的连续内存布局，从而消除 GPU 和 CPU 之间的数据传输瓶颈。整个框架由四个关键模块串联而成，形成从数据转换到实时渲染与仿真的完整链路。
 
@@ -118,7 +121,7 @@ NanoVDB 的 pipeline 围绕一个核心设计原则展开：将 OpenVDB 的层�
 
 整个 pipeline 的输入输出流清晰：OpenVDB 体积数据经转换器生成 NanoVDB 线性化快照（可选的压缩步骤在此介入），GPU 端直接加载该快照进行随机访问、插值、梯度计算或光线追踪，统计元数据和包围盒在渲染过程中持续提供加速引导。当前框架的局限在于仅支持静态稀疏体积，不支持动态拓扑修改（添加或删除节点），且工具集相对 OpenVDB 大幅缩减，主要面向渲染和静态仿真场景。
 
-## 核心模块与公式推导
+
 
 ### 线性化VDB树结构
 
@@ -161,7 +164,9 @@ NanoVDB集成了**层次化数字微分分析器**（Hierarchical DDA, Museth 20
 
 > **注意**：论文为SIGGRAPH Talk短文，未提供上述各模块的详细数学公式推导。所涉及的插值、梯度、曲率等数值方案的具体公式形式，以及分块浮点量化的编解码细节，均未在论文正文中展开。如需精确公式，建议直接查阅NanoVDB开源代码库或后续期刊版本。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能声明与证据强度
 
@@ -196,7 +201,9 @@ NanoVDB集成了**层次化数字微分分析器**（Hierarchical DDA, Museth 20
 - 压缩评估未指定GPU型号、体积规模和精度配置，4-6倍压缩比和10-30%性能提升的适用范围不明确。
 - 缺乏与其他GPU稀疏体积结构（如Blocked VDB、GVDB）的横向对比，无法定位NanoVDB在更广泛方法谱系中的性能位次。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -241,6 +248,8 @@ NanoVDB 的适用范围存在明确边界：
 4. **动态拓扑支持前景**：NanoVDB 未来是否计划支持动态拓扑操作？如何在不牺牲 GPU 友好性（无指针、对齐布局）的前提下实现节点增删？这是将其应用范围从渲染拓展到仿真的核心挑战。
 
 5. **跨 API 可移植性验证**：论文宣称 NanoVDB 可移植到多种图形 API（OpenGL、WebGL、DirectX 12 等），但未提供具体的可移植性测试结果。在不同 API 和硬件平台上的实际性能表现仍需验证。
+
+
 
 ## 原文 PDF
 

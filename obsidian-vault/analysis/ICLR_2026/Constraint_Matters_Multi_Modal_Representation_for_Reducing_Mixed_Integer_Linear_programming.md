@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Constraint_Matters_Multi_Modal_Representation_for_Reducing_Mixed_Integer_Linear_programming.pdf
+project_link: null
+code_link: null
 openreview_forum_id: vqNg2Vl8o1
 aliases:
 - CBMRMMRO
@@ -42,7 +44,7 @@ claims:
 > - MVC (800s, Gurobi+presolve) 上，PDI 为 4.56，对比 72.31 (Gurobi+presolve)，变化 -93.7%。
 > - Large-scale CA (800s, SCIP) 上，gap_abs 为 5955.86，对比 7009.58 (SCIP)，变化 -15.0%。
 
-## 概述
+## 概要
 
 混合整数线性规划（MILP）是现代运筹优化的核心范式，其求解效率直接制约供应链、交通、芯片设计等关键应用的决策时效。现有学习增强方法多聚焦于变量降维，通过预测部分变量取值来缩小搜索空间，却忽略了约束侧的巨大加速潜力。**核心瓶颈在于：直接预测所有紧约束的高维向量极其困难，且不同紧约束对求解加速的影响差异显著——最佳固定可带来数十倍加速，最劣固定则严重恶化性能（Table 1）——缺乏有效识别关键约束并可靠预测的方法，同时存在选择性学习偏差导致模型偏向简单非关键约束。**
 
@@ -56,7 +58,7 @@ claims:
 
 方法的主要局限在于依赖预定义约束类型与人工强度估计，对非原型约束可能失效；TCP为局部贪婪策略，实例级通用性有待提升。未来方向包括开发自动化关键约束识别方法，以及将约束降维与变量降维、割平面生成等更紧密地联合学习。
 
-## 背景与动机
+
 
 混合整数线性规划（MILP）是运筹学与组合优化的核心范式，其标准形式为：
 
@@ -78,7 +80,9 @@ $$\operatorname*{min} \mathbf{c}^{\top} \mathbf{x} \quad \mathrm{s.t.} \quad \ma
 
 这些瓶颈共同指向一个核心缺口：**需要一种既能识别关键约束、又能可靠预测其紧性的方法，同时克服选择性学习偏差**。本文正是从这一缺口出发，提出基于多模态表征的约束降维框架，将变量降维与约束降维协同，实现更高效的 MILP 求解加速。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作相对于现有 MILP 加速方法，在三个关键维度上做出了根本性改变，形成“约束降维 + 多模态表征 + 信息论选择”的协同创新体系。
 
@@ -112,7 +116,7 @@ TCP 据此优先选择低 $\rho$ 的约束类型（如 Set Packing 的 $\rho = n
 
 上述四个改变并非孤立改进，而是形成因果链条：多模态表征提供约束类别的语义先验 → TCP 利用该先验计算信息增益并选择 CTC → 焦点损失确保模型能可靠预测这些 CTC → 联合变量-约束降维最大化可行域收缩。消融实验（Figure 4）证实了这一协同关系：去除多模态表征后，CA 数据集 400 秒时 primal gap 相对完整方法升高约 12%；而完全去除约束降维则使性能进一步恶化。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0009_vqNg2Vl8o1_Constraint_Matters_Multi-Modal_Representation_fo/figures/002_Figure_2.jpg]]
 *Figure 2: An overview of our framework, which comprises three components: 1) Multi-modal representation, 2) Identification of Critical Tight Constraints, and 3) Model reduction. In 1), the textual semantics are first embedded as initial features for the abstract model, after which both the instance and abstract model are transformed into bipartite graph. In 2), a subset of tight-constraints is selected and labeled as critical constraints. In 3), multi-modal representation and critical constraints are fed into the learning architecture in Section 4.1 to predict the reduced variables and constraints*
@@ -158,7 +162,7 @@ TCP 据此优先选择低 $\rho$ 的约束类型（如 Set Packing 的 $\rho = n
 
 **约束类型 → 固定约束强度 $\rho$ → 熵减 $\Delta H$ → TCP优先级排序 → 多模态表示提升CTC预测准确率 → 约束降维缩小可行域 → 求解加速。** 实验表明，错误固定约束的比例一旦达到10-20%，求解性能即显著恶化甚至不可行（表11），这从反面验证了准确识别CTC是整个框架有效性的瓶颈所在。
 
-## 核心模块与公式推导
+
 
 ### 多模态表示（Multi-Modal Representation）
 
@@ -238,7 +242,9 @@ $$
 
 > **注意**：固定约束强度 $\rho$ 的推导依赖于对10种原型约束类型（Table 2）的人工定义和组合计数，具体推导过程见附录B.2。对于未预定义的约束类型，该方法需要手动扩展原型库，其实例级通用性存在局限。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与动机验证
 
@@ -306,7 +312,9 @@ Table 5 展示了在真实世界数据集 MMCN 上的表现。Ours 的 gap_abs �
 - **Table 11**：错误固定约束比例超过 10% 即可能导致不可行，预测准确率至关重要。
 - **Table 12**：学习降维与 presolve 互补，结合使用达到最佳性能。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -347,6 +355,8 @@ Table 5 展示了在真实世界数据集 MMCN 上的表现。Ours 的 gap_abs �
 - **理论保证**：能否从理论上刻画 TCP 选择的近似最优性边界，以及固定约束对 branch-and-bound 搜索树大小的解析影响？当前的信息论分析仅涉及局部熵减，缺乏对全局求解过程的严格刻画。
 
 - **在线自适应**：在求解过程中，能否根据搜索树的状态动态调整 CTC 选择，而非仅在预处理阶段一次性固定？这需要模型具备对求解器内部状态的感知能力。
+
+
 
 ## 原文 PDF
 

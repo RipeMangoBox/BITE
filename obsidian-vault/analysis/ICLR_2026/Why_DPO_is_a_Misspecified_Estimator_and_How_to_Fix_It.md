@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Why_DPO_is_a_Misspecified_Estimator_and_How_to_Fix_It.pdf
+project_link: null
+code_link: null
 openreview_forum_id: btEiAfnLsX
 aliases:
 - WDIMEHFI
@@ -41,7 +43,7 @@ claims:
 > - MMLU-PRO (OOD) 上，Percentage change in mean accuracy vs. base policy 为 14.28% (AuxDPO)，对比 8.16% (DPO)，变化 +6.12%。
 > - RewardBench V2 (ID) 上，Percentage change in mean accuracy vs. base policy 为 66.72% (AuxDPO)，对比 56.01% (DPO)，变化 +10.71%。
 
-## 概述
+## 概要
 
 DPO（Rafailov et al., 2023）通过将偏好学习转化为策略优化问题，省去了两阶段RLHF中显式奖励建模的环节，但其理论等价性建立在表格策略类（即策略可表达任意概率分布）的前提之上。当策略由参数化模型（如LLM）表示时，该等价性不再成立。
 
@@ -51,7 +53,7 @@ DPO（Rafailov et al., 2023）通过将偏好学习转化为策略优化问题�
 
 实验表明，AuxDPO在MMLU-PRO和RewardBench V2上，无论是域内（ID）还是域外（OOD）设置，均一致超越DPO、IPO（Azar et al., 2023）和DPOP（Pal et al., 2024）。以Llama3.1-8B为例，AuxDPO在RewardBench V2的OOD设置下相对基策略提升32.44%，而DPO仅提升14.31%（Table 1）。
 
-## 背景与动机
+
 
 ### 两阶段RLHF与DPO的等价性承诺
 
@@ -95,7 +97,9 @@ $$
 
 基于上述洞察，本文提出**AuxDPO**，其核心思路是：通过在DPO损失中引入位于 $A_{\rho,\theta_0}$ 零空间中的辅助变量 $\delta$，弥补隐式奖励流形的表达能力不足，使优化方向更接近两阶段RLHF的真实解。这一设计从几何上修正了DPO的错误投影，将KL投影推入正确的奖励等价类中。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于从**统计估计的误设（misspecification）**角度重新审视DPO，并基于局部几何洞察提出**AuxDPO**算法，通过引入受控的辅助自由度来修正DPO的投影偏差。
 
@@ -150,7 +154,7 @@ $$ \mathcal{L}_{\mathcal{D}}(\theta, \delta) = -\frac{1}{n}\sum_{i=1}^{n} \log \
 
 与IPO和DPOP等改进方法不同，AuxDPO并非通过修改损失函数形式或添加正则化来缓解特定失效模式，而是**从误设估计的几何本质出发，系统性地扩展了优化空间**，使投影方向能够被推入正确的RLHF等价类。这一设计使得AuxDPO在理论上更接近两阶段RLHF的解，并在实验中一致超越了DPO、IPO和DPOP。
 
-## 整体框架
+
 
 本文的核心贡献在于揭示DPO的参数化误设本质，并基于此提出AuxDPO修正框架。整体pipeline可概括为“诊断—几何建模—修正”三步。
 
@@ -174,7 +178,7 @@ $$\mathcal{L}_{\mathcal{D}}(\theta, \delta) = -\frac{1}{n}\sum_{i=1}^{n} \log \s
 
 该框架的核心优势在于：不改变基础模型架构，仅在损失函数层面引入可控的自由度，以理论驱动的方式修正DPO的误设投影方向。
 
-## 核心模块与公式推导
+
 
 ### DPO的统计实质：加权KL投影
 
@@ -225,7 +229,9 @@ $$\mathcal{L}_{\mathcal{D}}(\theta, \delta) = -\frac{1}{n}\sum_{i=1}^{n} \log \s
 
 该设计的核心机制是：真实奖励 $r^*$ 与DPO最优隐式奖励 $r_{\theta^*}^{\beta}$ 的差值恰好属于 $A_{\rho,\theta_0}$ 的零空间，即 $r^* = r_{\theta^*}^{\beta} + \delta$，其中 $\delta \in \mathcal{N}(A_{\rho,\theta_0})$。AuxDPO通过显式搜索该零空间方向，将DPO的错误投影推入正确的RLHF等价类。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -262,7 +268,9 @@ AuxDPO通过引入位于 $A_{\rho,\theta_0}$ 零空间中的辅助变量 $\delta
 
 实验仅在有限规模模型（≤8B）和两个基准上验证，未在大规模生产级模型上测试。此外，AuxDPO引入的辅助变量数量与训练偏好对数量成正比（$2n$），当数据集规模较大时会增加计算和内存开销，且 $\lambda$ 需手动调节。理论分析依赖大 $\beta$ 假设下的局部线性近似，在全局行为和实际微调场景（$\beta$ 通常较小）中的适用性有待进一步验证。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与直接偏好优化方法的谱系关系
 
@@ -288,6 +296,8 @@ AuxDPO 的理论分析主要依赖于大 $\beta$ 条件下的局部线性近似�
 4. **非光滑策略类的适用性**：当策略类为更复杂的非光滑模型（例如离散提示学习或基于检索的策略）时，该几何框架是否仍然有效？
 5. **与两阶段 RLHF 的系统权衡**：AuxDPO 相比两阶段 RLHF 在资源消耗和最终策略质量上的权衡如何？目前缺乏系统的计算开销对比实验。
 6. **大规模模型验证**：当前实验仅在有限规模的模型（≤8B）和两个基准（MMLU-PRO、RewardBench V2）上进行，未在大规模生产级模型上验证方法的可扩展性。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2022
 pdf_ref: paperPDFs/CVPR_2022/Not_All_Labels_Are_Equal_Rationalizing_The_Labeling_Costs_for_Training_Object_Detection.pdf
+code_link: https://github.com/NVlabs/AL-SSL
 project_link: https://github.com/NVlabs/AL-SSL
 aliases:
 - UALRPL
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 并非所有标签都平等：合理化目标检测的标注成本 |
 | 英文题名 | Not All Labels Are Equal: Rationalizing The Labeling Costs for Training Object Detection |
 | 会议/期刊 | CVPR 2022 |
-| Links | [paper](https://arxiv.org/abs/2106.11921); [GitHub](https://github.com/NVlabs/AL-SSL) |
+| Links | [paper](https://arxiv.org/abs/2106.11921) · [GitHub](https://github.com/NVlabs/AL-SSL) |
 | Topic | #topic/optimization_theory_probabilistic #topic/optimization_theory_probabilistic/optimization_methods |
 | Method | Unified Active Learning with Robustness and Pseudo-labeling |
 | Dataset | PASCAL VOC07+12, MS-COCO |
@@ -42,7 +43,7 @@ claims:
 > - PASCAL VOC07+12 上，mAP 为 75.60 ± 0.2，对比 PM (Best AL) 74.29 ± 0.2，变化 +1.31。
 > - MS-COCO 上，mAP 为 32.80 ± 0.0，对比 Random Sampling 31.47 ± 0.3，变化 +1.33。
 
-## 概述
+## 概要
 
 **问题与瓶颈**：目标检测的主动学习（Active Learning, AL）旨在以最小标注成本获得最大性能收益。然而，现有基于不确定度（如最大熵）的获取函数存在严重的类别偏差——它们倾向于选择网络已表现良好的高表现类别样本，而对真正需要标注的低表现类别（如PASCAL VOC中的Bottle、Pottedplant）反而失效，因为网络对这些类别的预测不可靠，熵值本身已失去指示意义。同时，单独选择困难样本会导致训练数据分布漂移。另一方面，半监督学习中的伪标签方法在最需要指导的低表现类别上反而可能生成高置信度的错误伪标签，进一步损害训练（Figure 1）。
 
@@ -52,7 +53,7 @@ claims:
 
 **主要结果**：在PASCAL VOC07+12上，本方法在第5周期达到75.60 mAP，远超随机采样基线（69.27）和最佳现有AL方法PM（74.29），相对提升最高达7.7%。在MS-COCO上，本方法达到32.80 mAP，优于随机采样（31.47）和PM（31.86），相对提升约7%。尤为关键的是，在VOC的低表现类别（如Bottle）上，不一致性驱动的主动学习相对熵方法提升高达24%（Figure 5），且在MS-COCO第1周期于76%的类别中超越了随机采样（Figure 10），验证了方法的类别均衡性。消融实验证实：伪标签单独使用效果微弱，必须与统一获取函数配合才能发挥最大作用；极高阈值 $\tau = 0.99$ 是伪标签质量的关键（错误率仅3.7%）；SSL训练是不一致性获取函数生效的必要条件。
 
-## 背景与动机
+
 
 目标检测的深度模型依赖大规模精确标注数据，但标注成本高昂。主动学习（Active Learning, AL）和半监督学习（Semi-Supervised Learning, SSL）是降低标注成本的两条主流路径，然而在目标检测场景中，现有方法存在一个被忽视的结构性缺陷：**类别偏差**。
 
@@ -73,7 +74,9 @@ claims:
 
 这一动机在 **Figure 1(d)** 中得到具象化：所提方法既能选中“Pottedplant”样本进行人工标注，又能防止其被错误伪标签，从而实现对全类别性能的均衡提升。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新并非提出一种全新的主动学习范式，而是通过**重新设计获取函数**和**引入高置信度伪标签机制**，系统性地修复了现有基于不确定度的主动学习在目标检测中的两个结构性缺陷：类别偏差与分布漂移。这两个改动相互配合，构成了一个统一的主动学习框架。
 
@@ -107,7 +110,7 @@ $$\hat{y}_i^p = \begin{cases} 1, & \text{if } p = \arg\max(\boldsymbol{c}_i) \te
 
 这两个改动槽位形成了“标注—自动标注”的分工闭环：统一获取函数 $H(\Delta) \times I(\Delta)$ 确保低表现类别的困难样本被优先送交人工标注（解决类别偏差），而高阈值伪标签自动吸收高置信度样本（抑制分布漂移）。一致性正则化训练（式 9-10）作为支撑条件，对全部未标注数据施加分类和定位一致性损失，使网络保持对增强变换的鲁棒性，从而让不一致性信号和伪标签质量随训练持续改善。消融实验（Table 1a）证实，SSL 训练是不一致性获取函数生效的必要条件——无 SSL 时不一致性 AL 表现不及随机采样。
 
-## 整体框架
+
 
 本文提出一个统一框架，将主动学习（Active Learning, AL）与半监督学习（Semi-Supervised Learning, SSL）协同整合，在目标检测的标注预算约束下实现全类别性能的均衡提升。框架的核心设计围绕一个关键观察展开：现有基于不确定度（如最大熵）的主动学习方法偏向高表现类别，对低表现类别因网络预测不可靠而失效；而单独使用伪标签或一致性正则化同样无法有效处理这些困难样本（参见 Figure 1 的动机示意）。
 
@@ -134,7 +137,7 @@ $$\hat{y}_i^p = \begin{cases} 1, & \text{if } p = \arg\max(\boldsymbol{c}_i) \te
 ![[assets/figures/papers/paper_list_l33_https_arxiv_org_abs_2106_11921/figures/014_Table_3.jpg]]
 *Table 3: VOC07+12. a) Comparison to two semi-supervised learning methods. We initially use 2, 000 randomly sampled images and, in every other cycle, we label 1, 000 extra images. Our method outperforms both of them by a large margin. b) Ablation study on the effect of entropy, inconsistency, unified score, and our method in VOC07+12. We observe that doing active learning with either entropy or consistency outperforms the semi-supervised model, that the unified score performs better than either of the individual scores, and that our method reaches the best overall results. (1)*
 
-## 核心模块与公式推导
+
 
 本文方法由三个紧密协作的核心模块构成：**基于不一致性的获取分数计算**、**高置信度伪标签生成**，以及**一致性正则化训练**。三个模块围绕一个统一目标——在主动学习周期中既选出最有标注价值的样本，又充分利用剩余未标注数据防止分布漂移。
 
@@ -206,7 +209,9 @@ SSL（半监督学习）训练是使不一致性获取函数生效的**必要条
 
 三个模块在主动学习周期中形成闭环：SSL 训练使网络对增强变换具有鲁棒性，从而让不一致性信号变得可靠；高不一致性样本被选中进行人工标注，而低不一致性但高置信度的样本则自动生成伪标签；伪标签与一致性损失共同作用，防止训练数据分布向困难样本漂移。Figure 2 展示了这一完整流程：每张未标注图像根据获取分数被分入三条路径——人工标注、伪标签标注、或仅作为未标注数据参与下一轮 SSL 训练。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：统一获取函数与伪标签的协同效应
 
@@ -218,7 +223,6 @@ SSL（半监督学习）训练是使不一致性获取函数生效的**必要条
 
 Figure 5的每类别详细对比揭示了本方法的核心优势所在。在VOC07+12的三个最差表现类别（Bottle、Pottedplant、Chair）上，基于不一致性的主动学习相对熵方法取得了显著提升：Bottle类相对增益高达**24%**，Pottedplant类**14%**，Chair类**18%**。这一结果直接验证了核心洞察——熵在低表现类别上因网络预测不可靠而失效，而不一致性作为类别无关的信号，能够有效识别这些类别的有价值样本。
 
-![[assets/figures/papers/paper_list_l33_https_arxiv_org_abs_2106_11921/figures/003_Figure.jpg]]
 
 在MS-COCO的80个类别上，统一获取函数在**60%**的类别中超越了单独的熵方法（Figure 6a）。更关键的是，当统一获取函数配合伪标签后，在第1周期于**76%**的类别中超越了随机采样（Figure 10），这一比例远超纯主动学习方法，表明伪标签机制有效缓解了主动学习可能导致的数据集分布偏移问题。
 
@@ -267,7 +271,9 @@ Figure 5的每类别详细对比揭示了本方法的核心优势所在。在VOC
 ![[assets/figures/papers/paper_list_l33_https_arxiv_org_abs_2106_11921/figures/009_Table.jpg]]
 *Table: (a)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 在主动学习谱系中的位置
 
@@ -337,6 +343,8 @@ Figure 5的每类别详细对比揭示了本方法的核心优势所在。在VOC
 - **上游继承**：继承不确定度主动学习（Entropy、PM）的池式选择框架，继承半监督学习（SSL-cons.、SSL-PL）的一致性训练与伪标签机制。
 - **核心贡献**：提出“鲁棒性即标注价值”的新视角，将预测不一致性作为类别无关的获取信号，并通过乘积融合与高阈值伪标签实现主动学习与半监督学习的有效协同。
 - **下游影响**：为类别不平衡场景下的主动学习提供了新范式，其“不一致性+伪标签”的组合策略可被后续工作在不同任务和架构上复用。
+
+
 
 ## 原文 PDF
 

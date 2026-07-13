@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/FSOD_VFM_Few_Shot_Object_Detection_with_Vision_Foundation_Models_and_Graph_Diffusion.pdf
+project_link: https://intellindust-ai-lab.github.io/projects/FSOD-VFM
+code_link: null
 openreview_forum_id: jHlAq2rYUw
 aliases:
 - FV
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | FSOD-VFM：基于视觉基础模型与图扩散的小样本目标检测 |
 | 英文题名 | FSOD-VFM: Few-Shot Object Detection with Vision Foundation Models and Graph Diffusion |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=jHlAq2rYUw); [Project](https://intellindust-ai-lab.github.io/projects/FSOD-VFM) |
+| Links | [paper](https://openreview.net/forum?id=jHlAq2rYUw) · [Project](https://intellindust-ai-lab.github.io/projects/FSOD-VFM) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/classification_and_understanding |
 | Method | FSOD-VFM |
 | Dataset | Pascal-5i (novel splits), COCO-20i, CD-FSOD |
@@ -42,7 +44,7 @@ claims:
 > - COCO-20i 上，nAP (10-shot novel classes) 为 44.0，对比 36.6 (No-Time-To-Train)，变化 +7.4。
 > - CD-FSOD 上，nAP (Average over 1/5/10-shot for all 6 domains) 为 31.6 (10-shot)，对比 21.4 (No-Time-To-Train)，变化 +10.2。
 
-## 概述
+## 概要
 
 小样本目标检测（FSOD）的核心挑战在于仅凭极少标注样本（每类 1–10 张）识别全新类别的物体。现有方法大多依赖在新类上进行微调，计算成本高且容易过拟合；而已有的训练免费方法虽然避免了微调，却受限于视觉基础模型（VFM）生成的边界框提议中普遍存在的**过度碎片化问题**——多数提议仅覆盖物体的局部显著区域，导致大量小尺寸假阳性框，难以获得完整的物体检测。
 
@@ -54,7 +56,7 @@ claims:
 
 该方法的主要局限在于推理速度（约 2.4 秒/图像，A40 GPU），尚不适合实时应用；此外在部分极端跨域子集上绝对性能仍然较低，SAM2 掩码的失败可能导致严重漏检。
 
-## 背景与动机
+
 
 小样本目标检测（Few-Shot Object Detection, FSOD）旨在仅利用少量标注样本（通常每类 1–10 张）来检测新类别物体，这对于标注成本高昂或稀有类别频现的实际场景具有重要意义。传统 FSOD 方法通常依赖在大规模基类数据上预训练，再在新类上进行微调。然而，这类方法面临两个核心困境：其一，微调过程容易导致基类灾难性遗忘；其二，当新类与基类的分布差异较大时，跨域泛化能力急剧下降。
 
@@ -64,7 +66,9 @@ claims:
 
 本文的核心动机在于：**能否利用 SAM2 产生的精确物体掩码和 DINOv2 的强表征能力，通过一种无需训练的置信度重加权机制，从根本上解决碎片化提议问题？** 直觉上，SAM2 能够为每个 UPN 提议生成高质量的二值掩码，这些掩码之间的重叠关系蕴含了“部分-整体”的结构信息：完整物体的掩码往往被多个碎片化掩码所覆盖，而碎片化掩码则很少能覆盖完整物体。若能利用这一结构信息对提议置信度进行重新分配，使得完整物体的提议获得高置信度、碎片化提议被大幅抑制，则可望在保持训练免费优势的同时，大幅提升检测精度与跨域鲁棒性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FSOD-VFM 的核心创新在于通过**图扩散置信度重加权**解决了视觉基础模型在小样本目标检测中的根本性瓶颈，同时以**掩码引导的特征聚合**替代了传统的边界框池化，实现了训练免费框架下的精度跃升。
 
@@ -108,7 +112,7 @@ $$
 
 与同样采用视觉基础模型且无需训练的 **No-Time-To-Train**（Espinosa et al., 2025）相比，FSOD-VFM 的核心差异在于后处理机制：No-Time-To-Train 使用 Soft Merging 进行分数合并，而 FSOD-VFM 采用图扩散重加权。这一 changed slot 带来了显著的性能增益——在 Pascal-5i 上平均 nAP50 从 71.2 提升至 77.5（+6.3），在 COCO-20i 10-shot 上 nAP 从 36.6 提升至 44.0（+7.4），在跨域 CD-FSOD 基准上 10-shot nAP 从 21.4 提升至 31.6（+10.2）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0011_jHlAq2rYUw_FSOD-VFM_Few-Shot_Object_Detection_with_Vision_F/figures/007_Figure_2.jpg]]
 *Figure 2: Overview of FSOD-VFM. Our method integrates UPN, SAM2, and DINOv2 to generate bounding box proposals and perform query matching. We build a graph and perform graph diffusion to mitigate over-fragmentation. The over-fragmented box regions appear more transparent after graph diffusion, indicating that their confidence has decayed*
@@ -129,7 +133,7 @@ FSOD-VFM 的整体流程围绕一个核心瓶颈展开：**UPN 生成的类别�
 
 **关键证据强度**：组件消融实验（Table 11）表明，移除 SAM2 掩码引导的特征池化后，Pascal-5i 1-shot 性能从 77.5 nAP50 骤降至 25.5，证明精确掩码对特征聚合至关重要；移除 UPN 直接使用 SAM2 生成提议时，性能降至 56.7，说明 UPN 提供的候选集有助于提升检测召回。图扩散后处理将 Pascal-5i 1-shot 性能从无后处理的 7.4 提升至 77.5，远超 NMS（23.4）、Soft NMS（28.3）、WBF（66.0）和 Soft Merging（66.0）等方法（Table 4）。
 
-## 核心模块与公式推导
+
 
 FSOD-VFM 由四个核心模块串联构成：通用提议网络（UPN）生成类别无关的候选框，SAM2 基于候选框提取精确物体掩码，DINOv2 提供通用视觉特征用于构建支持类原型并与查询提议进行余弦相似度匹配，最后通过图扩散机制对提议置信度进行重加权以抑制碎片化并突出完整物体。
 
@@ -175,7 +179,9 @@ $$\hat{f}^{j} = (1 - \hat{\pi}_{j})^{\lambda} \max_{c} \cos(F_{q}^{j}, \hat{p}_{
 
 实验表明，扩散步数 $t$ 超过 5 后性能即趋于稳定，超参数 $\lambda=0.5$、$\alpha=0.3$ 时效果最优，且方法对参数变化不敏感，具有良好的鲁棒性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈：UPN 提议的过度碎片化
 
@@ -242,7 +248,9 @@ FSOD-VFM 的性能增益根源于一个被精确定位的瓶颈：UPN 生成的�
 2. **多 shot 收益递减**：当支持样本从 5-shot 增加到 10-shot 时，性能增幅明显放缓。这表明简单的原型平均策略未能充分利用更多标注信息，可能需要更精细的支持集聚合机制。
 
 3. **推理效率**：表 10 显示，单张图像推理约需 2.4 秒（A40 GPU），其中 SAM2 占 0.86 秒为主要瓶颈。该方法尚不适合实时应用，但可作为高精度离线检测方案。
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与训练免费基线的对比
 
@@ -288,6 +296,8 @@ FSOD-VFM 属于**完全训练免费**的小样本目标检测方法，即在新�
 - 引入大语言模型（LLM）提供的类别先验知识（如部件-整体关系、典型外观描述）是否能进一步增强跨域泛化？
 - 图扩散的边权重定义是否可以融合语义相似度（如 DINOv2 特征的余弦距离），以替代纯掩码重叠的硬性约束？
 - 该训练免费框架能否扩展到视频小样本目标检测，利用时序一致性进一步提升精度并抑制单帧误检？
+
+
 
 ## 原文 PDF
 

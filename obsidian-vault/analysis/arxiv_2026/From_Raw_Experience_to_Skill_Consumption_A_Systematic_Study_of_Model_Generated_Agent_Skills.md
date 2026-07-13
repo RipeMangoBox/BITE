@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2026
 pdf_ref: paperPDFs/arxiv_2026/From_Raw_Experience_to_Skill_Consumption_A_Systematic_Study_of_Model_Generated_Agent_Skills.pdf
+project_link: null
+code_link: https://aka.ms/SkillLens
 aliases:
 - MSGE
 - FRESCSSMGAS
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 从原始经验到技能消费：模型生成型Agent技能的系统性研究 |
 | 英文题名 | From Raw Experience to Skill Consumption: A Systematic Study of Model-Generated Agent Skills |
 | 会议/期刊 | arXiv 2026 |
-| Links | [paper](https://arxiv.org/abs/2605.23899) · [Code](https://aka.ms/SkillLens) · [arXiv](https://arxiv.org/abs/2604.01687) |
+| Links | [paper](https://arxiv.org/abs/2605.23899) · [Code](https://aka.ms/SkillLens) · [paper](https://arxiv.org/abs/2604.01687) |
 | Topic | #topic/other_unclear #topic/other_unclear/general |
 | Method | Meta-Skill Guided Extraction |
 | Dataset | SpreadsheetBench, ALFWorld, SWE-bench-Verified |
@@ -41,7 +43,7 @@ claims:
 > - ALFWorld 上，Accuracy (%) 76.12 vs 75.12 (+1.00 pp)。
 > - SWE-bench-Verified 上，Accuracy (%) 70.10 vs 69.72 (+0.38 pp)。
 
-## 概述
+## 概要
 
 **核心问题与瓶颈。** 当前基于模型生成（model-generated）的Agent技能提取方法存在一个隐蔽但关键的失效模式：大约25%的提取-目标配对出现负迁移（Δ<0），即注入技能后下游性能反而下降。在ALFWorld等具身交互领域，负迁移率甚至高达47%。更棘手的是，技能的效用无法通过表面文本特征（如格式、文本合理性）来可靠预测：未经训练的LLM法官在选出更优技能的任务上准确率仅为46.4%（随机基线50%），且当技能对之间的性能差距增大到5个百分点以上时，准确率急剧降至15.8%。这揭示了一个根本性瓶颈——**真正决定技能效用的，不是技能文本写得有多“好”，而是技能中是否编码了领域特定的失败机制、可执行的对策以及高风险行为禁令**，而常规提取往往输出泛泛而谈的指导。
 
@@ -49,15 +51,13 @@ claims:
 
 **主要结果概览。** 在五个任务领域（ALFWorld、SpreadsheetBench、SWE-bench-Verified、SEAL-0、BFCL-v4）上的系统评估表明：模型生成的技能在75%的配对中带来正向增益，但负迁移风险不可忽视；技能格式（有序列表、无序列表、检查表、散文）对下游性能无显著影响（Friedman检验，所有p>0.34），而提取器的选择具有显著影响（p<0.01）；经验池中成功与失败轨迹的配比是关键调节因素，最佳比例因域而异；基于文本合理性的7维rubric引导提取在6/9测试单元中导致性能下降（平均-0.59 pp），而效用验证的3维rubric在全部9个测试单元中均提升性能（平均+1.55 pp），验证了“效用驱动的内容引导”优于“表面质量引导”这一核心主张。
 
-## 背景与动机
-
 **从经验中学习**是智能体能力演进的核心路径。人类专家在完成复杂任务后，会将成功与失败的经验提炼为可复用的技能——这些技能不仅是操作步骤的罗列，更编码了对领域陷阱的警觉、对关键决策点的判断以及对高风险动作的规避。然而，当前的语言模型智能体虽然能够通过执行任务产生大量轨迹数据，如何系统性地将这些“原始经验”转化为可迁移、可消费的技能，仍是一个开放问题。
 
 **现有技能提取方法的缺口**在于：我们缺乏对“什么真正驱动下游效用”的理解。已有工作如 **Trace2Skill**（轨迹到技能的蒸馏，采用子智能体舰队与冲突消解机制）和 **CoEvoSkills**（协同进化验证的技能包精炼）探索了技能生成的自动化流程，但它们的设计选择——如何组织经验、如何引导提取、如何评估技能质量——大多基于直觉而非系统性验证。这导致两个关键盲区：（1）技能提取过程中的哪些因素真正影响下游性能，哪些只是表面文本特征？（2）我们能否在不依赖昂贵下游评估的情况下，预测甚至保证技能的效用？
 
 **本文的核心动机**正是填补这一认知鸿沟。研究通过一个完整的三阶段生命周期框架（经验生成→技能提取→技能消费，见图1），对模型生成型智能体技能进行了系统性解剖。研究不仅量化了技能效用在不同领域、不同提取器、不同目标模型间的分布，更揭示了一个关键发现：当前技能提取方法在约25%的配对中导致负迁移，且技能效用无法通过表面文本特征（格式、文本合理性）来可靠预测。真正决定效用的是技能中是否编码了**领域特定的失败机制、可执行的对策以及高风险行为禁令**——而常规提取往往输出泛泛而谈的指导。基于这一洞察，研究将效用验证的维度固化为提取阶段的先验指导，实现了对所有测试单元的一致性提升。
 
-## 核心创新
+## 核心方法与创新机理
 
 ### 创新动机：技能生成的负迁移困境
 
@@ -98,8 +98,6 @@ Meta-skill引导提取在全部9个测试单元中均提升了性能，平均增
 
 - **Trace2Skill**和**CoEvoSkills**等方法聚焦于提取架构的改进（如子代理舰队、协同进化验证），但未触及技能内容本身的效用维度引导。
 - 本研究的创新不改变提取架构或目标模型，而是通过**在提取阶段注入效用验证的先验**，从源头提升技能质量。这一策略具有即插即用的特性，可与现有提取框架兼容。
-
-## 整体框架
 
 本研究构建了一个完整的“轨迹到技能”（trajectory-to-skill）生命周期，系统性地评估模型生成型Agent技能从原始经验到下游消费的全过程。该框架将技能生成与评估解耦为三个顺序阶段，并在每个阶段引入可控的实验变量，以揭示影响技能效用的关键因素。
 
@@ -143,8 +141,6 @@ $$\Delta(E, M, \mathcal{D}) = \mathrm{Perf}(M \mid S_{E, M, \mathcal{D}}, Q_{\ma
 初步实验揭示了一个核心矛盾：模型生成的技能在约75%的提取-目标配对中带来正向增益，但25%的配对出现负迁移（$\Delta < 0$），其中ALFWorld域的负迁移率高达47%（Table 1）。进一步分析表明，技能的表面文本特征（格式、文本合理性）无法可靠预测其效用——技能格式对下游性能无显著影响（Friedman检验，所有目标 $p>0.34$），而未引导的LLM法官评价技能质量的准确率仅为46.4%，接近随机基准。
 
 真正决定技能效用的，是技能文本中是否编码了领域特定的失败机制、可执行的对策以及高风险行为禁令。基于这一发现，研究引入**Meta-Skill引导提取**：在提取阶段的系统提示中注入一个简短的meta-skill描述，要求技能内容必须着重体现三项经过效用验证的维度——（1）失败机制编码，（2）可执行的具体步骤，（3）高风险动作禁令。这一干预在不改变模型或任务的情况下，一致地提升了所有测试单元的性能。
-
-## 核心模块与公式推导
 
 ### 技能生成生命周期的三阶段流水线
 
@@ -204,7 +200,7 @@ $$\sigma\text{-ratio} = \sigma_{\mathrm{factor}} / \sigma_{\mathrm{round}}$$
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2605_23899/figures/006_Figure_4.jpg]]
 *Figure 4: Cross-model skill transfer. Strong-pool and weakpool skills are injected into each target separately*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主结果：技能效用的全局图景
 
@@ -278,10 +274,7 @@ $$\sigma\text{-ratio} = \sigma_{\mathrm{factor}} / \sigma_{\mathrm{round}}$$
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2605_23899/figures/008_Table_6.jpg]]
-*Table 6: Multi-skill injection prompt template (text-mode skill tool protocol). Table 7 Default extraction hyperparameters*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 技能提取方法谱系
 

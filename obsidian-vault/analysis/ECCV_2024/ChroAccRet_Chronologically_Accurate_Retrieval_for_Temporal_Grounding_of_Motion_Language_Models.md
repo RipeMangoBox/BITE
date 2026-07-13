@@ -5,6 +5,8 @@ paper_level: A
 venue: ECCV
 year: 2024
 pdf_ref: paperPDFs/ECCV_2024/ChroAccRet_Chronologically_Accurate_Retrieval_for_Temporal_Grounding_of_Motion_Language_Models.pdf
+project_link: null
+code_link: null
 aliases:
 - CARTCL
 - CCARTGMLM
@@ -41,7 +43,7 @@ claims:
 > - HumanML3D test set (all sequences, text-to-motion retrieval) 上，R@1 (All) ↑ 8.03 (Ours t5-large, Tune, no VAE, Rec.) vs 5.82 (TMR DistilBERT) (+2.21)。
 > - HumanML3D test set (motion generation with T2M-GPT) 上，R-Precision Top-1 ↑ 0.528±.004 (T2M-GPT + CLIP tuned with Neg.) vs 0.489±.004 (T2M-GPT original) (+0.039)。
 
-## 概述
+## 概要
 
 本文揭示并解决了一个被现有运动-语言模型忽视的关键问题：**时序理解缺失**。主流模型（如 **TMR**，Petrovich et al., ICCV 2023）在对比学习中将文本与动作映射到共享潜在空间时，仅依赖全局语义相似度，未显式建模文本中事件顺序与动作序列之间的时序对应关系。这导致模型对复合动作描述（如“先坐下，然后站起来，最后挥手”）的事件顺序理解严重不足。
 
@@ -56,7 +58,7 @@ claims:
 - **检索性能**：运动-文本检索的 R@1 指标同步提升，例如 t5-large 从 7.76 提升至 9.65。
 - **生成质量**：微调后的文本编码器在多个生成模型（**Motiondiffuse**、**T2M-GPT**、**ReMoDiffuse**）上一致改善 FID 和 R-Precision，证明该方法具有通用性。
 
-## 背景与动机
+
 
 ### 运动-语言模型的时序理解缺口
 
@@ -74,7 +76,9 @@ claims:
 
 该方法不仅解决了时序对齐问题，还展现出良好的通用性：经过时序负样本微调的文本编码器可直接提升下游运动生成模型（如 **T2M-GPT** (Zhang et al., CVPR 2023)、**Motiondiffuse** (Zhang et al., arXiv 2022)、**ReMoDiffuse** (Zhang et al., ICCV 2023)）的生成质量，为运动-语言模型的时序感知训练提供了简洁有效的范式。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题诊断：运动-语言模型缺乏时序理解
 
@@ -114,7 +118,7 @@ claims:
 2. **粗粒度时序建模**：模型仍将整句压缩为单一特征向量，缺乏单词到运动帧的细粒度对应，无法解释每个事件在时间轴上的精确位置。
 3. **单向时序增强**：当前仅通过操纵文本（打乱事件）增强时序理解，尚未对运动序列本身进行对称的时序增强（如交换动作片段顺序），限制了模型在动作层面的时序泛化能力。
 
-## 整体框架
+
 
 ChroAccRet 的核心 pipeline 围绕一个关键观察展开：现有运动‑语言模型（如 **TMR**, Petrovich et al., ICCV 2023）在对比学习中未显式建模文本与动作之间的时序对应关系，导致其对复合动作描述的事件顺序理解严重不足——在 Chronologically Accurate Retrieval (CAR) 测试中准确率仅约 60%，接近随机水平（50%）。为修复这一瓶颈，该方法在不改变原有模型架构的前提下，向对比学习框架注入时序顺序信息，从而强制模型学习区分时序正确与时序错误的描述。
 
@@ -163,7 +167,7 @@ ChroAccRet 的核心 pipeline 围绕一个关键观察展开：现有运动‑�
 ![[assets/figures/papers/paper_list_l1871_ChroAccRet_Chronologically_Accurate_Retrieval_for_Temporal_Grounding_of/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of the proposed contrastive learning scheme with chronological negative samples. We use the texts derived from shuffling the event order and employ them as negative text samples, corresponding to items indicated in pink*
 
-## 核心模块与公式推导
+
 
 ### 3.1 运动-语言对比学习基线
 
@@ -217,7 +221,9 @@ $$\mathcal{L}_{m2t} = -\frac{1}{N} \sum_i^{N} \log \frac{\exp (\tilde{S}_{ii} / 
 
 整个训练流水线中，文本编码器（支持 DistilBERT、CLIP、t5-base、t5-large）和运动编码器（基于VAE，输入为相对关节位置和加速度）共享潜在空间。事件分解与打乱模块在数据预处理阶段离线完成，生成的打乱文本在训练时作为额外负样本参与对比损失计算。运动解码器可选择性用于从潜在特征重建原始运动序列，作为辅助正则化项。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：时序理解是现有模型的系统性盲区
 
@@ -285,7 +291,9 @@ Table 4 进一步分离了微调与负样本的贡献。仅微调 CLIP 编码器
 ![[assets/figures/papers/paper_list_l1871_ChroAccRet_Chronologically_Accurate_Retrieval_for_Temporal_Grounding_of/figures/009_Figure_5.jpg]]
 *Figure 5: Comparison of generated motions. Top: T2M-GPT. Bottom: T2M-GPT with our fine-tuned t5-large encoder. Texts at the top represent the input prompts*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线工作的关系
 
@@ -325,6 +333,8 @@ Table 4 进一步分离了微调与负样本的贡献。仅微调 CLIP 编码器
 - **评估基准独立性**：能否设计不依赖 LLM 的自动化时序评估基准，消除事件分解质量对 CAR 测试可靠性的影响？
 - **长序列扩展性**：对于更长、更复杂的动作序列，当前方法能否保持高时序准确率？是否需要层次化的时序建模（如事件组、子序列）？
 - **跨模态时序泛化**：该方法学到的时序区分能力是否可迁移到其他时序敏感的跨模态任务（如视频-文本检索、过程理解）？
+
+
 
 ## 原文 PDF
 

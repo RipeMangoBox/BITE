@@ -33,7 +33,7 @@ claims:
 | 中文题名 | 面向大帧间位移快速运动的隐式四维高斯泼溅 |
 | 英文题名 | Implicit 4D Gaussian Splatting for Fast Motion with Large Inter-Frame Displacements |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=MWtXs60n38) · [arXiv](https://arxiv.org/abs/2510.03857) |
+| Links | [paper](https://openreview.net/forum?id=MWtXs60n38) · [paper](https://arxiv.org/abs/2510.03857) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | SPIN-4DGS |
 | Dataset | CMU Panoptic Sports, CMU Panoptic Sports - Basketball, CMU Panoptic Sports - Tennis, Neu3DV |
@@ -43,7 +43,7 @@ claims:
 > - CMU Panoptic Sports - Basketball 上，PSNR 30.05 vs 28.22 (D3DGS) (+1.83)。
 > - CMU Panoptic Sports - Tennis 上，PSNR 30.14 vs 28.50 (Realtime-4DGS) (+1.64)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -79,7 +79,7 @@ SPIN-4DGS处于**4D高斯泼溅**与**隐式神经表示**的交叉点。与现�
 
 该方法与**3DGS逐帧独立优化**（Kerbl et al., 2023）的区别在于：SPIN-4DGS使用时间共享的隐式场，能够利用帧间时序规律，比独立逐帧模型更连贯（平均PSNR高出+1.9 dB, Table 10）。其隐式解码器设计借鉴了**NeRF**系列的位置编码思想，但直接作用于Gaussian属性预测而非辐射场。
 
-## 背景与动机
+
 
 ### 动态场景重建的核心挑战
 
@@ -114,7 +114,9 @@ Figure 2 直观展示了这些失败模式。在显式参数化框架中（Figur
 
 这一设计将属性学习从“跨帧共享参数”的耦合模式转变为“逐帧独立解码”的去耦合模式，使快速运动物体即使在大位移下也能保持稳定且高质量的渲染，同时避免了显式存储全部属性所导致的内存爆炸。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SPIN-4DGS 的核心创新在于**将 Gaussian 属性学习从时空耦合的参数化中彻底解耦**，转而采用一种隐式前馈网络直接从显式的时空位置坐标中解码属性。这一设计直接针对现有 4DGS 方法在快速运动场景中的根本性瓶颈——**交叉帧干扰**。
 
@@ -158,7 +160,7 @@ SPIN-4DGS 的隐式网络由三个关键组件构成：
 
 综上，SPIN-4DGS 通过将 Gaussian 属性重新定义为时空位置的隐式函数，从根本上消除了跨帧属性耦合，使快速运动物体即使在大位移下也能保持稳定且高质量的渲染，同时避免了显式存储全部属性带来的内存爆炸。
 
-## 整体框架
+
 
 SPIN-4DGS 的整体框架由两个核心阶段构成，其设计目标是从根本上解决现有 4DGS 方法在大帧间位移快速运动场景下的属性崩溃问题。
 
@@ -200,7 +202,7 @@ SPIN-4DGS 的完整流程如 Figure 3 所示，分为以下两个阶段：
 
 消融实验证实了两个关键设计的必要性：输入位置归一化使 PSNR 提升超过 10 dB（LPIPS 从 0.45 降至 0.16），是稳定训练的前提；时空切片则通过将 Gaussian 按帧显式分离，从根本上消除了交叉帧干扰。兼容性实验进一步表明，即使复用其他 4DGS 方法（如 D3DGS）的预训练位置，仅替换为 SPIN-4DGS 的隐式属性学习方案，仍能大幅提升 PSNR（例如在 Softball 场景上提升 +2.49 dB），验证了隐式属性学习方案的有效性与通用性。
 
-## 核心模块与公式推导
+
 
 SPIN-4DGS 的核心设计思想是将 4D Gaussian 的属性学习从时空耦合的参数化中解耦，转而通过一个前馈隐式网络从显式的时空位置直接解码属性。整个框架由两个阶段构成：**时空位置估计** 和 **隐式网络属性预测**。
 
@@ -275,7 +277,9 @@ SPIN-4DGS 的一个关键实现细节是**时空切片**：在每帧渲染时，
 ![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_MWtXs60n38/figures/002_Figure_2.jpg]]
 *Figure 2: Failure modes on fast motions with large inter-frame displacements. We visualize failure modes of existing frameworks; (2a) explicit parameterization and (2b) deformable methods. Figure (2a) shows drastic degradation on training iterations (i.e., 15K → 30K), and (2b) shows the canonical space of deformable initialization fails to assign Gaussians for fast motions*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能对比
 
@@ -343,7 +347,9 @@ Table 10将SPIN-4DGS与逐帧独立优化的**3DGS**（Kerbl et al., 2023）进�
 ![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_MWtXs60n38/figures/015_Table_10.jpg]]
 *Table 10: Comparison with frame-wise 3DGS on the CMU Panoptic Sports benchmark. We report PSNR across six sports, showing that SPIN-4DGS consistently outperforms both 3DGS and D3DGS across all sequences*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：大帧间位移下的4DGS属性崩溃
 
@@ -402,6 +408,8 @@ SPIN-4DGS处于**显式位置+隐式属性**的交叉点，与现有方法的关
 3. **几何变形的联合建模**：隐式属性函数能否进一步扩展到同时建模几何变形，以处理更复杂的场景动态（如非刚性形变与快速运动的叠加）？
 
 4. **实时应用优化**：当前框架在实时应用（如VR/AR）中的延迟和内存开销是否可进一步优化？SPIN-4DGS虽已达到104 FPS的渲染速度，但网络推理开销在资源受限设备上仍需评估。
+
+
 
 ## 原文 PDF
 

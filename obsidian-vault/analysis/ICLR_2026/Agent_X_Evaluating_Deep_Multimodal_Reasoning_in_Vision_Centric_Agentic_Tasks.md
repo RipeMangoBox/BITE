@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Agent_X_Evaluating_Deep_Multimodal_Reasoning_in_Vision_Centric_Agentic_Tasks.pdf
+project_link: https://huggingface.co/datasets/Tajamul21/Agent-X
+code_link: https://github.com/mbzuai-oryx/Agent-X
 aliases:
 - AX
 - Agent-X
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | Agent-X：评估视觉中心智能体任务中的深度多模态推理能力 |
 | 英文题名 | Agent-X: Evaluating Deep Multimodal Reasoning in Vision-Centric Agentic Tasks |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=Vjruxvp1Xd); [GitHub](https://github.com/mbzuai-oryx/Agent-X); [Project](https://huggingface.co/datasets/Tajamul21/Agent-X) |
+| Links | [paper](https://openreview.net/forum?id=Vjruxvp1Xd) · [GitHub](https://github.com/mbzuai-oryx/Agent-X) · [Project](https://huggingface.co/datasets/Tajamul21/Agent-X) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | Agent-X |
 | Dataset | Agent-X |
@@ -41,13 +43,13 @@ claims:
 > - Agent-X 上，Goal Accuracy (G_acc) 为 Gemini-2.5-Pro: 0.40，对比 Gemini-1.5-Pro: 0.04，变化 +0.36。
 > - Agent-X 上，Goal Accuracy (G_acc) 为 Qwen2.5-VL-7B: 0.36，对比 InternVL3-8B: 0.20，变化 +0.16。
 
-## 概述
+## 概要
 
 Agent-X是一个大规模基准测试，专门用于评估视觉中心智能体（vision-centric agents）在真实世界多模态环境中的多步推理和深度推理能力。该基准测试包含828个智能体任务，覆盖六个主要环境：通用视觉推理、网页浏览、安防监控、自动驾驶、体育和数学推理。Agent-X的核心贡献在于提出了一个细粒度的、分步评估框架，能够系统性地诊断当前最先进的大多模态模型（LMM）在规划、适应和工具使用方面的关键局限性。
 
 实验结果表明，即使是最佳模型（包括GPT、Gemini和Qwen系列），在Agent-X上的全链成功率也低于50%。o4-mini在Goal Accuracy (G_acc)上表现最佳，达到45%，而大多数开源模型低于30%。
 
-## 背景与动机
+
 
 当前最先进的大多模态模型（LMM）在需要多步推理和工具调用的视觉中心智能体任务中，全链成功率低于50%。主要瓶颈在于模型无法在真实世界场景中保持逻辑连贯的多步推理、有效使用工具，并避免幻觉和格式错误。
 
@@ -60,7 +62,9 @@ Agent-X是一个大规模基准测试，专门用于评估视觉中心智能体�
 
 Agent-X基准测试通过引入细粒度的、分步评估框架（包括Grounding Score、Tool Precision、Faithfulness Accuracy等指标），以及包含14个可执行工具和828个真实世界任务的半自动化构建流程，来系统性地诊断和量化这些推理缺陷。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Agent-X是首个将大规模真实世界多模态输入（图像、视频、文本）与工具增强的分步推理评估相结合，覆盖六个不同环境的基准测试。其核心贡献在于提供了一个可解释的、细粒度的评估框架，能够区分真正的逻辑推理与表面上的连贯但实际脱节的推理链，从而揭示当前LMM在规划、适应和工具使用方面的关键局限性。
 
@@ -70,7 +74,7 @@ Agent-X是首个将大规模真实世界多模态输入（图像、视频、文�
 
 **Table 2**: Task comparison of Agent-X with existing benchmarks. Unlike prior benchmarks, the queries in Agent-X avoid explicit tool references and direct instructions, thus encouraging agents to reason and act independently. Blue indicate explicit task guidance; Red highlights denote explicit tool invocation in prior benchmarks.
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_Vjruxvp1Xd_Agent-X_Evaluat/figures/001_Table_1.jpg]]
 *Table 1: Comparison of Agentic Benchmarks. Columns show key dimensions including scale, realism, modality, reasoning depth, tool interaction, and annotation quality. Our benchmark Agent-X uniquely supports all criteria with 828 diverse, manually verified agentic tasks.*
@@ -83,7 +87,7 @@ Agent-X基准测试的构建遵循半自动化流水线（如Figure 2所示）�
 
 **Figure 1**: Agent-X Snapshot: Example tasks from our benchmark illustrating multimodal queries that require step-by-step reasoning, tool use, and visual understanding across images and video. Each task includes structured thoughts, tool invocations, and a ground-truth answer with justification. The detailed annotations in Agent-X enable thorough evaluation of existing agentic pipelines.
 
-## 核心模块与公式推导
+
 
 ### 5.1 任务形式化定义
 
@@ -113,7 +117,9 @@ Agent-X使用三个评估模式（Step-by-Step、Deep Reasoning、Outcome）和1
 
 **Table 3**: Evaluation Metrics. This table outlines the full suite of metrics used in Agent-X benchmark, organized by Step-by-Step, Deep Reasoning, and Outcome modes.
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 6.1 主要结果
 
@@ -186,7 +192,9 @@ Table 5展示了主要模型的错误分类：
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_Vjruxvp1Xd_Agent-X_Evaluat/figures/008_Table_3.jpg]]
 *Table 3: Evaluation Metrics. This table outlines the full suite of metrics used in Agent-X benchmark, organized by Step-by-Step, Deep Reasoning, and Outcome modes.*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 Agent-X在智能体评估基准测试谱系中占据独特位置。与GAIA、GTA、ToolBench和APIBench等现有基准测试相比，Agent-X是首个同时支持大规模真实世界多模态输入、工具增强的分步推理评估、以及跨六个多样化环境评估的基准测试。
 
@@ -204,6 +212,8 @@ Agent-X在智能体评估基准测试谱系中占据独特位置。与GAIA、GTA
 - Agent-X中观察到的模型失败模式（如格式错误、工具幻觉）的根本原因是什么？如何通过模型架构或训练策略来解决？
 - 如何将Agent-X的评估框架扩展到包含更多模态（如音频、触觉）和更复杂的交互环境？
 - 当前最佳模型（如o4-mini, Gemini-2.5-Pro）在Agent-X上的性能上限是什么？需要哪些突破才能实现更高的全链成功率？
+
+
 
 ## 原文 PDF
 

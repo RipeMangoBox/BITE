@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2026
 pdf_ref: paperPDFs/arxiv_2026/MemCam_Memory_augmented_Camera_Control_for_Video_Generation.pdf
+project_link: https://oasis-model.github.io
+code_link: https://github.com/
 aliases:
 - MemCam
 tags:
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | MemCam: 记忆增强的相机控制视频生成 |
 | 英文题名 | MemCam: Memory-augmented Camera Control for Video Generation |
 | 会议/期刊 | arXiv 2026 |
-| Links | [paper](https://arxiv.org/abs/2603.26193) · [Code](https://github.com/) · [Project](https://oasis-model.github.io) · [arXiv](https://arxiv.org/abs/1505.04597) |
+| Links | [paper](https://arxiv.org/abs/2603.26193) · [Code](https://github.com/) · [Project](https://oasis-model.github.io) · [paper](https://arxiv.org/abs/1505.04597) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation #topic/generative_models_diffusion |
 | Method | MemCam |
 | Dataset | Context-as-Memory 90° Round-trip, Context-as-Memory 360° Round-trip, RealEstate10K 90° Round-trip, RealEstate10K 360° Round-trip |
@@ -41,7 +43,7 @@ claims:
 > - Context-as-Memory 360° Round-trip 上，FVD↓ 167.87 vs 852.05 (GF) (-684.18)。
 > - RealEstate10K 90° Round-trip 上，FVD↓ 269.82 vs 519.78 (GF) (-249.96)。
 
-## 概述
+## 概要
 
 现有交互式视频生成方法在长时序列和大视角旋转场景下，普遍因缺乏有效的历史帧记忆机制而出现严重的场景遗忘与内容不一致问题。**MemCam** 针对这一瓶颈，提出将先前生成帧视为外部记忆，并通过基于共视性的动态上下文检索与压缩，为模型注入长期且相关的场景信息，从而在维持计算效率的同时显著扩展有效上下文。
 
@@ -51,7 +53,7 @@ $$\mathbf{F}_{\mathrm{out}} = \mathbf{F}_{\mathrm{in}} + \mathrm{CameraEncoder}(
 
 实验表明，MemCam 在 Context‑as‑Memory 和 RealEstate10K 两个数据集的 90° 与 360° 往返基准上，FVD 均显著优于 **GF**（Geometry‑Forcing）等基线（如 360° Context‑as‑Memory 上 FVD 从 852.05 降至 167.87）。消融研究进一步证实：基于共视性的动态选择策略远优于简单的“最近帧”策略（后者 FVD 恶化至 915.41）；上下文压缩模块在保持与未压缩长上下文相近质量的同时，推理速度提升约 5 倍（76 帧上下文从 22.15 秒/帧降至 4.47 秒/帧），且在同时间成本下优于短上下文未压缩方案。
 
-## 背景与动机
+
 
 可控视频生成旨在根据用户提供的条件信号（如文本、图像、相机轨迹）合成高质量视频，其在电影制作、虚拟现实和具身智能等领域具有广泛应用前景。其中，相机可控的视频生成任务要求模型在用户实时交互指定的相机姿态下，持续生成场景内容一致的视频帧。这一设定与传统的离线视频生成有本质区别：模型必须在生成过程中动态响应新的相机指令，同时保持对已生成场景内容的长期记忆。
 
@@ -61,7 +63,9 @@ $$\mathbf{F}_{\mathrm{out}} = \mathbf{F}_{\mathrm{in}} + \mathrm{CameraEncoder}(
 
 针对上述缺口，**MemCam** 提出将历史生成帧视为外部记忆，并设计了一套基于共视性的动态上下文检索与压缩机制。其核心思路是：为每一待预测帧，从历史记忆中检索与其相机视场最相关的帧子集，经高效压缩后作为条件注入扩散Transformer。这一设计在维持计算效率的同时，显著扩展了有效上下文范围，从而从根本上缓解长视距和大相机运动下的场景漂移问题。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MemCam 的核心创新在于将视频生成中的上下文建模从“被动遗忘”转变为“主动记忆”，其关键因果操作为：**将历史生成帧构建为外部记忆，并通过基于共视性的动态检索与压缩，为模型提供长期、相关且计算高效的场景上下文**。这一设计直接针对长时交互视频生成中，因缺乏有效历史帧记忆而导致的大视角旋转与长序列场景内容不一致的瓶颈。
 
@@ -97,7 +101,7 @@ MemCam 的优越性能源于两个核心设计之间的协同效应：
 
 当前方法的主要局限在于推理速度仍较慢，这主要源于 DiT 块中双向注意力的计算开销。未来的改进方向包括通过扩散蒸馏技术加速推理，以及扩大训练数据规模以进一步提升生成质量。
 
-## 整体框架
+
 
 MemCam 的整体流程围绕一个核心思想展开：将**已生成的历史帧视为外部记忆**，并通过**共视性驱动的动态检索与压缩**，为当前预测帧提供长期且相关的场景上下文。整个 pipeline 由五个关键模块串联构成，形成“记忆存取—条件注入—扩散生成”的闭环。
 
@@ -130,7 +134,7 @@ MemCam 的整体流程围绕一个核心思想展开：将**已生成的历史�
 
 > **需手动验证**：论文未详细说明 Context Compressor 的具体卷积架构细节（如层数、卷积核大小），仅提及空间压缩比为 2。若需精确复现，建议查阅官方代码仓库。
 
-## 核心模块与公式推导
+
 
 MemCam 整体框架由五个关键模块构成（图2），其核心设计围绕“历史帧记忆化”与“高效上下文注入”展开。本节聚焦各模块的机理与关键公式，不涉及训练/推理流程细节。
 
@@ -162,7 +166,9 @@ $$\operatorname{IoU}(\mathcal{C}_1, \mathcal{C}_2) = \frac{\sum_{i=1}^{N} \mathc
 
 压缩后的上下文 token 与噪声预测序列拼接后，送入标准的 **DiT 块（含双向注意力）** 进行时空联合建模。双向注意力机制使每一预测帧能够同时关注所有上下文帧，从而有效利用长期记忆信息。这也是推理速度的主要瓶颈所在——上下文长度增加时，注意力计算开销显著上升，而上下文压缩模块正是为解决此问题而设计。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -206,7 +212,9 @@ MemCam 在两个数据集（Context-as-Memory 和 RealEstate10K）的 90° 和 3
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2603_26193/figures/001_Figure_1.jpg]]
 *Figure 1: MemCam generates videos with high scene consistency over long time horizons and under large camera rotations. Rows 1-2 show results on the test split of our dataset, including 360° round-trip and 360° single-direction rotation. Row 3 presents open-domain real-world scenes, demonstrating that MemCam maintains long-term scene consistency across varied scenes*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心问题与基线对比
 
@@ -255,6 +263,8 @@ MemCam 的优势场景明确：**需要长时间场景记忆且相机运动幅�
 3. **记忆更新与遗忘策略**：MemCam 当前维护完整的历史帧记忆，未引入主动的遗忘或记忆整合机制。在极长序列（如数千帧）下，记忆库的线性增长将带来检索效率和质量的双重挑战。如何设计自适应的记忆管理策略，是迈向真正无限长视频生成的关键问题。
 
 4. **与 3D 重建方法的深度融合**：GF 的几何约束与 MemCam 的记忆机制在原理上互补——前者提供显式的空间一致性先验，后者提供内容级别的长期记忆。两者的有效结合可能进一步提升大旋转场景下的生成质量，但如何在训练和推理中统一这两种异构信号仍是一个开放挑战。
+
+
 
 ## 原文 PDF
 

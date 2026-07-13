@@ -5,6 +5,8 @@ paper_level: A
 venue: ICCV
 year: 2025
 pdf_ref: paperPDFs/ICCV_2025/SceneMI_Motion_In_Betweening_for_Modeling_Human_Scene_Interactions.pdf
+project_link: http://inwoohwang.me/SceneMI
+code_link: https://github.com/
 aliases:
 - SceneMI
 tags:
@@ -40,7 +42,7 @@ claims:
 > - TRUMANS (noise-free keyframes, r=60) 上，Collision Frame Ratio 0.113 vs 0.262 (CondMDI) / 0.211 (OmniControl) (-0.149 (vs CondMDI))。
 > - TRUMANS (synthetic noise, dense keyframes r=3, noise level l=1) 上，FID 0.118 vs 5.149 (MDM) / 3.136 (CondMDI) (-5.031 (vs MDM))。
 
-## 概述
+## 概要
 
 **核心问题**：现有的人-场景交互（HSI）运动生成方法难以在真实世界场景中处理带噪声的关键帧，且缺乏对中间过渡动作的场景感知控制，导致运动质量差、场景穿透率高。
 
@@ -57,7 +59,7 @@ claims:
 
 **局限与开放问题**：模型在训练集中极少出现的人-场景交互模式（如挤过狭窄通道）上可能失效；在包含高度复杂或噪声几何的真实场景重建中，场景编码可能无法精确捕捉细微的空间约束。未来方向包括：支持部分姿态关键帧（如仅末端效应器位置）、引入文本语义控制、探索交叉注意力等更优的场景融合方式，以及自动选择最优 $T^*$ 的策略。
 
-## 背景与动机
+
 
 ### 问题背景：人-场景交互中的运动中间生成
 
@@ -93,7 +95,9 @@ SceneMI的出发点是一个关键洞察：**扩散模型的前向加噪与反�
 
 这种“全局导航 + 局部约束”的互补表征，使模型既能理解大尺度场景结构以规划路径，又能精细调整姿态以避免穿透——这在靠近物体的交互场景中尤为关键。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SceneMI 的核心创新在于将人-场景交互（HSI）建模重新定义为**场景感知的运动中间插值任务**，并通过**双尺度场景表征**与**扩散模型的两阶段噪声感知机制**，系统性地解决了现有方法在噪声关键帧和域外场景下的运动质量差、场景穿透率高等瓶颈。其关键创新点可分解为以下三个 changed slots：
 
@@ -131,7 +135,7 @@ $$x_t' = \begin{cases} m \odot s^{noisy} + (1 - m) \odot x_t, & t \in [T, T^*+1]
 
 上述三个 changed slots 构成了 SceneMI 的方法论闭环：双尺度场景特征提供了从粗到细的空间约束，关键帧引导扩散实现了场景感知的中间插值，两阶段噪声感知机制则赋予了模型处理真实世界噪声关键帧的能力。三者协同作用，使得 SceneMI 在无噪、合成噪声和真实噪声三种设置下均显著超越现有基线，同时保持了推理效率（Table 7 显示 SceneMI 直接预测 SMPL 参数，无需额外优化拟合）。
 
-## 整体框架
+
 
 SceneMI 将人-场景交互（HSI）生成重新定义为**场景感知的运动中间插值（motion in-betweening）**任务：给定三维场景 $G$ 和一组稀疏的关键姿态 $\mathbf{s} = \{\mathbf{s}^k\}_{k=1}^{K}$，目标是合成完整的运动序列 $\mathbf{x} = \{\mathbf{x}^n\}_{n=1}^{N}$，使得生成的中间帧在满足关键帧约束的同时，与场景几何保持一致且无穿透。每个姿态特征向量由全局关节位置 $\mathbf{J}$、6D 根朝向 $\boldsymbol{\phi}$ 和局部 SMPL 姿态参数 $\boldsymbol{\psi}$ 拼接而成。
 
@@ -189,7 +193,7 @@ $$\mathcal{L} = \mathcal{L}_{\text{simple}} + \lambda_{\text{joints}} \mathcal{L
 ![[assets/figures/papers/paper_list_l1773_SceneMI_Motion_In_Betweening_for_Modeling_Human_Scene_Interactions/figures/015_Figure_7.jpg]]
 *Figure 7: The final results from the Video2Animation pipeline demonstrate the reconstruction of 3D human-scene animation from monocular video inputs. By incorporating SceneMI with the obtained scene information and optimized keyframes, we reconstruct natural and physically plausible motions. For additional results, please refer to the supplementary video*
 
-## 核心模块与公式推导
+
 
 SceneMI 将人-场景交互（HSI）建模重新定义为**场景感知的运动中间插值任务**，其核心由三个紧密耦合的模块构成：双尺度场景编码、关键帧引导的扩散模型、以及面向噪声关键帧的两阶段去噪机制。
 
@@ -275,7 +279,9 @@ $$
 
 三者的协同使得模型在满足关键帧约束和场景约束的同时，生成平滑、物理合理的中间运动。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -449,7 +455,9 @@ SceneMI 的能力在多个应用场景中得到验证：
 ![[assets/figures/papers/paper_list_l1773_SceneMI_Motion_In_Betweening_for_Modeling_Human_Scene_Interactions/figures/013_Table_8.jpg]]
 *Table 8: Ablation study on our hyperparmeters setting*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 SceneMI 的核心贡献在于将人-场景交互（HSI）生成问题重新定义为**场景感知的运动中间插值**任务，并针对这一任务设计了双尺度场景编码与噪声感知扩散机制。为理解其定位，本节从基线对比、适用边界、局限与开放问题三个层面展开。
 
@@ -494,6 +502,8 @@ SceneMI 处于**扩散模型驱动的运动生成**与**场景感知人体建模
 5. **多人交互与动态场景**：当前方法假设单人、静态场景。扩展到多人协作交互（如两人搬动家具）或包含动态物体的场景，需要处理多智能体运动协调和时变场景约束，这是更具挑战性的开放方向。
 
 **需要手动验证的点**：论文未提供与最新场景感知运动生成方法（如 2024 年后发表的扩散模型变体）的直接对比，也未讨论计算开销随场景规模增长的缩放特性。在将 SceneMI 与后续工作进行定位时，建议查阅 TRUMANS 数据集的最新排行榜和相关工作的更新。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Detecting_Data_Contamination_from_Reinforcement_Learning_Post_training_for_Large_Language_Models.pdf
+project_link: null
+code_link: https://github.com/yongding-tao/RL-Data-Contamination
 openreview_forum_id: EjiJmiA6ea
 aliases:
 - SC
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 检测大型语言模型强化学习后训练阶段的数据污染 |
 | 英文题名 | Detecting Data Contamination from Reinforcement Learning Post-training for Large Language Models |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=EjiJmiA6ea); [GitHub](https://github.com/yongding-tao/RL-Data-Contamination) |
+| Links | [paper](https://openreview.net/forum?id=EjiJmiA6ea) · [GitHub](https://github.com/yongding-tao/RL-Data-Contamination) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | Self-Critique |
 | Dataset | RL-MIA Avg (Qwen2.5-7B-Instruct), RL-MIA Avg (DeepSeek-Math-7B-Instruct), RL-MIA Avg (Qwen2.5-7B-Math), K&K (Llama-3.1-8B-Instruct) |
@@ -42,7 +44,7 @@ claims:
 > - RL-MIA Avg (DeepSeek-Math-7B-Instruct) 上，AUC 为 0.64，对比 0.54 (Recall)，变化 +0.10 (+19%)。
 > - RL-MIA Avg (Qwen2.5-7B-Math) 上，AUC 为 0.74，对比 0.57 (Recall)，变化 +0.17 (+30%)。
 
-## 概述
+## 概要
 
 大型语言模型的后训练流程通常包含强化学习（RL）阶段，旨在通过奖励最大化优化模型的推理与对齐能力。然而，当RL训练数据中包含评估基准的样本时，模型可能通过记忆而非泛化获得高性能，导致基准评估失真。检测此类RL阶段的数据污染面临独特挑战：RL的优化目标从最大似然估计转变为奖励最大化，使得基于困惑度（PPL）等似然度指标的传统检测方法失效；同时，RL导致的策略坍塌（policy collapse）使污染样本与干净样本的简单熵检查不可靠。
 
@@ -50,7 +52,7 @@ claims:
 
 实验表明，Self-Critique在多个模型和基准上显著优于现有方法：在Qwen2.5-7B-Instruct上平均AUC达0.70，比最佳基线Recall（0.59）提高19%；在PPO、GRPO、DAPO三种RL算法上均保持最高检测AUC（平均0.60），展现出对RL算法的鲁棒性。双阶段污染分析进一步验证了该方法对RL阶段污染的特异性——当降低预训练污染水平后，Self-Critique的AUC从0.59显著提升至0.88。
 
-## 背景与动机
+
 
 ### 数据污染：从预训练到RL后训练的挑战迁移
 
@@ -78,7 +80,9 @@ $$\mathcal{I}_{\mathrm{RL}}(\theta) = \mathbb{E}_{q \sim D_{\mathrm{RL}}, \{o_i\
 
 这一洞察将检测问题从“模型是否见过该样本”重新表述为“模型是否对该样本形成了不可摆脱的路径依赖”，从而绕开了RL阶段似然度信号不可靠的根本困境。基于此，本文提出**Self-Critique**方法，通过主动自我批评探测机制测量熵序列相似度，实现了对RL后训练阶段数据污染的首次专门检测。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 检测范式转换：从被动似然度量到主动路径依赖探测
 
@@ -102,7 +106,7 @@ Self-Critique的核心创新在于将检测机制从**被动观察似然属性**
 
 Table 1的方法分类学清晰展示了Self-Critique的独特位置：它是首个专门针对**RL后训练阶段**设计的检测方法，与所有面向预训练/SFT的基线方法在探测机制、核心度量和设计阶段三个维度上均存在本质差异。表1中同时引入的Entropy-Temp和Entropy-Noise两种熵基线方法（均使用熵度量但采用不同的探测策略）进一步验证了一个关键结论：**熵信号本身并非充分条件，必须与自我批评探测机制结合才能有效暴露RL阶段的污染特征**。主实验结果（Table 2）表明，Self-Critique在Qwen2.5-7B-Instruct上平均AUC达0.70，比最佳基线Recall（0.59）提高19%，而Entropy-Temp和Entropy-Noise的性能显著低于Self-Critique，直接证明了探测机制与度量的协同必要性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_EjiJmiA6ea/figures/005_Table_1.jpg]]
 *Table 1: A taxonomy of data contamination detection methods. Our work is the first to specifically address the challenges in the RL Post-training phase*
@@ -145,7 +149,7 @@ Figure 2展示了Self-Critique的完整检测流程，包含四个顺序执行�
 
 Self-Critique在多个维度上展现出强鲁棒性：（1）对元指令措辞不敏感，不同提示下的AUC标准差仅为0.025左右（Table 9）；（2）在PPO、GRPO、DAPO三种不同RL算法训练的模型上均保持最高检测AUC（Table 3），表明其不依赖特定RL算法；（3）在RLHF对齐场景（PPO、DPO、TDPO、RTO）下同样保持一致的检测优势（Table 8）。
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题形式化：RL后训练阶段的成员推理攻击
 
@@ -201,7 +205,9 @@ $$ \cos_{\mathrm{penalized}}(A, B) = \cos\bigl(\mathrm{pad}(A), \mathrm{pad}(B)\
 
 **模块四（优化）：Top-K熵近似。** 为降低全词表熵计算的开销，Self-Critique支持仅使用前 $K$ 个最高概率令牌近似熵值。消融实验（Table 4）表明，$K=3$ 时已足够有效，不同 $K$ 值间的AUC方差极小（$<10^{-4}$），验证了计算效率与检测精度的良好平衡。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：RL后训练阶段检测的范式转移
 
@@ -308,7 +314,9 @@ Self-Critique通过**主动自我批评探测**捕捉这一路径依赖：首先
 - **Figure 6**：污染与干净样本的Self-Critique分数分布直方图及核密度估计显示，两组分布存在明显分离（污染样本的熵序列相似度系统性偏高），但仍有部分重叠区域，这解释了AUC在0.64-0.81而非接近1.0的原因。
 - **Table 12**：Bootstrap分析（1000次重采样）显示Self-Critique在SAT数据集上的95%置信区间为[0.56, 0.76]（Qwen）和[0.55, 0.77]（DeepSeek），区间下限均显著高于0.5，验证了检测性能的统计显著性。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 检测方法分类学定位
 
@@ -379,6 +387,8 @@ Self-Critique展现出对RL算法类型的强鲁棒性：
 - **多信号融合**：能否将熵序列相似度与奖励分布特征、生成多样性指标、注意力模式等信号融合，构建更鲁棒的多模态检测器？
 - **对抗鲁棒性**：如果攻击者知晓Self-Critique的检测机制，能否通过对抗训练或提示注入来规避检测？方法在灰盒和自适应攻击下的鲁棒性需要进一步评估。
 - **实时检测与干预**：能否将Self-Critique从离线审计工具发展为在线训练监控机制，在RL训练过程中实时检测并阻止数据污染？
+
+
 
 ## 原文 PDF
 

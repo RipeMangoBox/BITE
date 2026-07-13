@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/Interact2Ar_Full_Body_Human_Human_Interaction_Generation_via_Autoregressive_Diffusion_Models.pdf
+project_link: null
+code_link: null
 aliases:
 - Interact2Ar
 tags:
@@ -40,7 +42,7 @@ claims:
 > - Inter-X (Full Evaluator) 上，FID↓ 0.277 vs 0.671 (InterMask) (-0.394)；R-Precision Top 3↑ 0.773 vs 0.722 (InterMask) (+0.051)。
 > - Inter-X (Body Evaluator) 上，FID↓ 0.352 vs 5.728 (InterMask) (-5.376)。
 
-## 概述
+## 概要
 
 **核心问题**：现有文本驱动的双人交互运动生成方法存在两个关键瓶颈。其一，多数方法仅关注身体运动而忽略手部细节，导致生成的交互缺乏精细的手部接触与协调；其二，主流方法采用一次性生成完整序列的范式，难以捕捉人类交互中固有的动态适应性与反应性——真实交互是一个逐步发生、彼此响应的时间过程。
 
@@ -50,7 +52,7 @@ claims:
 
 **主要结果**：在 Inter-X 数据集上，Interact2Ar 的 FID 从 InterMask 的 0.671 降至 0.277，R-Precision Top 3 从 0.722 提升至 0.773，取得显著领先。35 人参与的用户研究进一步证实，该方法在文本对齐度和手部运动真实感上均显著优于现有方法。消融实验表明，混合记忆在仅使用约 24 帧内存的条件下即可超越常规记忆的生成质量，验证了其效率与有效性。
 
-## 背景与动机
+
 
 ### 人体交互生成的核心挑战
 
@@ -78,7 +80,9 @@ claims:
 
 - **多头去噪器架构**：通过专用分支并行生成身体姿态、全局轨迹和手部运动，确保每个部位都能获得针对性的建模，尤其是手部运动的精细生成。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Interact2Ar 的核心创新围绕一个因果链条展开：**现有交互生成方法忽略手部运动，且一次性生成完整序列，难以捕捉人类交互的动态适应性与反应性**。为解决这一问题，模型引入了三个相互协同的关键机制。
 
@@ -121,7 +125,7 @@ $$\hat{x}_{kn:(k+1)n}^0 = G(x_{kn:(k+1)n}^t, \mathcal{M}_k, c, t)$$
 
 三个核心创新并非孤立存在：**多头去噪器**提供了生成全身运动（含手部）的能力基础；**自回归范式**赋予模型逐步生成与动态适应的可能性；**混合记忆**则解决了自回归生成中历史上下文的质量与效率矛盾。三者协同作用，使 Interact2Ar 在 Inter-X 数据集上将 FID 从 InterMask 的 0.671 大幅降至 0.277，R-Precision Top 3 从 0.722 提升至 0.773（Table 2），并在用户研究中显著优于基线方法（Figure 4）。
 
-## 整体框架
+
 
 Interact2Ar 的整体框架围绕三个核心设计展开：**多头去噪器**、**协作去噪机制**与**自回归生成范式**，共同构成一个从文本条件到全身交互运动生成的端到端管道。
 
@@ -186,7 +190,7 @@ $$\mathcal{M}_k = \{ \mathcal{M}_k^l, \mathcal{M}_k^s \}$$
 ![[assets/figures/papers/paper_list_l1675_Interact2Ar_Full_Body_Human_Human_Interaction_Generation_via_Autoregress/figures/001_Figure_1.jpg]]
 *Figure 1: We introduce Interact2Ar, the first text-conditioned autoregressive diffusion model for generating full-body human-human interactions with detailed hand motions. Our autoregressive model, with a novel memory strategy, enhances the quality of the generated interaction and enables adaptive capabilities, including temporal composition, adaptation to disturbances, and multi-person scenarios*
 
-## 核心模块与公式推导
+
 
 Interact2Ar 的生成管道由三个核心模块构成：**多头去噪器**（Multi-Head Denoiser）、**协作去噪器**（Cooperative Denoisers）与**自回归生成循环**（Autoregressive Generation Loop），辅以**混合记忆缓冲**（Mixed Memory Buffer）实现长序列上下文管理。
 
@@ -268,7 +272,9 @@ $$\hat{x}_{kn:(k+1)n}^0 = G(x_{kn:(k+1)n}^t, \mathcal{M}_k, c, t)$$
 ![[assets/figures/papers/paper_list_l1675_Interact2Ar_Full_Body_Human_Human_Interaction_Generation_via_Autoregress/figures/003_Figure_3.jpg]]
 *Figure 3: Mixed Memory enables access to both detailed shortterm information, facilitating seamless transitions, along with long-term context, avoiding action repetition in long interactions. Our proposed Mixed Memory overcomes the limitations of regular context memory, providing up to a ×3 reduction in memory size*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 评估器鲁棒性验证
 
@@ -328,7 +334,9 @@ $$\hat{x}_{kn:(k+1)n}^0 = G(x_{kn:(k+1)n}^t, \mathcal{M}_k, c, t)$$
 ![[assets/figures/papers/paper_list_l1675_Interact2Ar_Full_Body_Human_Human_Interaction_Generation_via_Autoregress/figures/011_Table.jpg]]
 *Table: A. Comparison of our model (Interact2Ar) to the state of the art in human-human interaction motion generation on the Inter-X dataset. *Interact2Ar model is the version without autoregressive generation. All evaluations have been executed 20 times to elude the randomness of the generation. ± indicates the 95% confidence interval. We highlight the best and the second best results*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线工作的关系
 
@@ -368,6 +376,8 @@ Interact2Ar 的设计假设和实验设置划定了其适用边界：
 - **脚部滑动的根本解决**：除了后处理，是否可以通过改进损失函数、引入物理模拟或增加足部接触数据来从根本上减轻脚部滑动？
 - **多人场景扩展性**：自回归扩散在更复杂的多人场景（三人及以上同时交互）中的扩展性和计算成本如何？协作去噪器架构可能需要从双流扩展到多流，计算复杂度将呈超线性增长。
 - **评估器泛化性**：论文设计了更敏感的运动评估器（Table 1），但该评估器本身也是基于特定数据训练的。如何构建跨数据集、跨交互类型的通用评估器仍是一个开放挑战。
+
+
 
 ## 原文 PDF
 

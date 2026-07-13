@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/InterPrior_Scaling_Generative_Control_for_Physics_Based_Human_Object_Interactions.pdf
+project_link: null
 code_link: null
 aliases:
 - InterPrior
@@ -42,7 +43,7 @@ claims:
 > - OMOMO select (full-reference, thin objects) 上，Success Rate (SR↑) % 83.2 (InterPrior) vs 63.9 (InterMimic) (+19.3)。
 > - HODome (novel interactions, finetuned) 上，Success Rate (SR↑) % 72.4 (InterPrior + finetune)。
 
-## 概述
+## 概要
 
 物理仿真中的人-物交互（Human-Object Interaction, HOI）生成控制面临一个根本瓶颈：大规模演示数据无法覆盖所有可能的构型空间，导致纯蒸馏策略在未见目标及初始化条件下泛化能力严重不足。InterPrior 针对这一问题提出了一条“蒸馏初始化 + 强化学习局部优化”的技术路线——首先将全参考模仿专家蒸馏为变分策略，获得自然的行为先验；随后通过强化学习微调，在不破坏预训练知识的前提下扩展策略的泛化边界，使其能够处理未见目标和失败恢复。
 
@@ -52,7 +53,7 @@ claims:
 
 当前方法的局限在于：策略仍受训练数据覆盖率和质量的约束，高度损坏或未见的交互模式无法可靠恢复；长序列 rollout 中可能出现物体穿透、脚部滑动等物理伪影；接触与手部表示尚不支持精细手指灵巧操作；三阶段流程增加了训练复杂度与超参数负担。
 
-## 背景与动机
+
 
 ### 物理人-物交互控制的规模化困境
 
@@ -68,7 +69,9 @@ claims:
 
 基于上述动机，本文提出 **InterPrior**——一个三阶段的可扩展生成控制框架：(I) 在大规模HOI数据上训练增强的全参考专家策略（InterMimic+）；(II) 将专家蒸馏为掩码条件变分策略，学习结构化的潜技能空间；(III) 对蒸馏策略进行强化学习后训练，以in-betweening任务形式提升泛化性。该框架的核心设计原则是：**蒸馏与微调的协同**——蒸馏阶段通过ELBO、尺度正则化和时间一致性损失构建紧凑的潜空间，微调阶段在保留蒸馏正则化的前提下引入稀疏目标奖励，使策略在“记住”自然行为的同时“学会”应对更广泛的构型。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 InterPrior 的核心创新在于将“蒸馏+强化学习微调”的两阶段范式引入物理人-物交互（HOI）控制，并围绕**多模态目标条件化**与**策略鲁棒性**设计了三个关键的 changed slots，使其区别于现有的模仿学习基线。
 
@@ -103,7 +106,7 @@ $$r_t^{\mathrm{PT}} = (r_{\mathrm{energy}} \times r_{\mathrm{h}}) + r_{\mathrm{g
 
 > **注意**：关于 InterMimic 和 MaskedMimic 的具体发表信息（作者/年份/会议），当前证据中未提供完整引用元数据，需手动核实。
 
-## 整体框架
+
 
 InterPrior 采用三阶段训练范式，将大规模人-物交互（HOI）数据中的全参考模仿专家逐步转化为一个可泛化的目标条件生成控制器。图2给出了框架总览。
 
@@ -143,7 +146,7 @@ $$\mathbf{x}_t = \Big[ \underbrace{r_t^h, \theta_t^h, \dot{r}_t^h, \dot{\theta}_
 ![[assets/figures/papers/paper_list_l992_https_arxiv_org_abs_2602_06035/figures/001_Figure_1.jpg]]
 *Figure 1: InterPrior is a versatile generative controller instantiated as a goal-conditioned policy that controls a simulated humanoid to follow goal guidance and interact with objects in a physics-based simulator. Three core, composable capabilities enable pursuing (I) longhorizon snapshot goals, (II) trajectory goals, and (III) contact goals (Top). Yellow, blue, and red dots respectively denote human, object, and contact goals. It demonstrates failure recovery (Bottom Left) from unsuccessful grasps. InterPrior enables steering control from a human operator and can be applied to humanoid robot embodiments (Bottom Right). More demo videos are provided in the webpage*
 
-## 核心模块与公式推导
+
 
 ### 3.1 观测与目标表示
 
@@ -212,7 +215,9 @@ $$
 ![[assets/figures/papers/paper_list_l992_https_arxiv_org_abs_2602_06035/figures/003_Figure_3.jpg]]
 *Figure 3: Qualitative comparison of same reference imitation between InterMimic [87] (top) and our InterMimic+ (bottom). InterMimic strictly follows the reference humanoid motion but fails to grasp the thin cloth stand when initialized with perturbations*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -278,7 +283,9 @@ Table 1 的消融研究揭示了以下关键结论：
 ![[assets/figures/papers/paper_list_l992_https_arxiv_org_abs_2602_06035/figures/016_Figure.jpg]]
 *Figure: B. Qualitative results given the same goal. Our framework produces multiple valid yet distinct interaction trajectories*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 前置工作与基线关系
 
@@ -319,6 +326,8 @@ InterPrior 的能力边界由训练数据的覆盖率和物理仿真的精度共
 3. **手指级灵巧操作。** 整合手指级灵巧操作模型需要高维动作空间和更精细的奖励设计。可能的路径是将 InterPrior 的潜技能空间与灵巧操作策略（如基于教师-学生蒸馏的灵巧抓取方法）进行级联或联合训练。
 
 4. **训练流程简化。** 能否将三阶段流程统一为端到端训练是一个开放问题。潜在方向包括：将蒸馏和 RL 后训练合并为联合优化目标，或使用离线 RL 直接在交互数据上学习目标条件策略，从而跳过专家训练阶段。
+
+
 
 ## 原文 PDF
 

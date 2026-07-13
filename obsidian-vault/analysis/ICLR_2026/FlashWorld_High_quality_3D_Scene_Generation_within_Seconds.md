@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/FlashWorld_High_quality_3D_Scene_Generation_within_Seconds.pdf
+project_link: null
+code_link: https://github.com/imlixinyang/FlashWorld
 openreview_forum_id: 2IftRjRB07
 aliases:
 - FlashWorld
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | FlashWorld：秒级高质量3D场景生成 |
 | 英文题名 | FlashWorld: High-quality 3D Scene Generation within Seconds |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=2IftRjRB07); [GitHub](https://github.com/imlixinyang/FlashWorld) |
+| Links | [paper](https://openreview.net/forum?id=2IftRjRB07) · [GitHub](https://github.com/imlixinyang/FlashWorld) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | FlashWorld |
 | Dataset | T3Bench-200, DL3DV-200, WorldScore-200 |
@@ -41,7 +43,7 @@ claims:
 > - DL3DV-200 上，Q-Align IQA 为 3.96，对比 2.55 (Prometheus)，变化 +1.41。
 > - WorldScore-200 上，Average Score 为 68.72，对比 66.43 (WonderWorld)，变化 +2.29。
 
-## 概述
+## 概要
 
 3D场景生成领域长期面临一个根本性权衡：以多视图生成为导向（MV-oriented）的方法虽能产出较高视觉质量的图像，但因缺乏内在3D约束，导致多视角不一致和重建噪声；而以3D生成为导向（3D-oriented）的方法虽能保持几何一致性，但渲染结果往往模糊，且通常需要额外的精细化后处理步骤，牺牲了生成效率。
 
@@ -49,7 +51,7 @@ FlashWorld针对这一瓶颈，提出了一种**交叉模式蒸馏（Cross-mode 
 
 实验表明，FlashWorld在T3Bench-200、DL3DV-200和WorldScore-200等多个基准上，在视觉质量、风格一致性和文本对齐度等指标上均优于现有方法，同时生成速度达到约9秒/场景（H20 GPU），相比基线方法（6分钟至数小时）实现了**10–100倍的加速**。消融研究进一步证实，跨模式一致性损失有效抑制了浮动伪像，而OOD数据共训练显著提升了模型的分布外泛化能力。
 
-## 背景与动机
+
 
 3D场景生成的目标是从图像或文本描述中自动构建可自由探索的沉浸式三维环境。这一任务在虚拟现实、游戏开发和具身智能等领域具有重要应用价值，但其核心挑战在于同时满足**视觉质量**、**三维一致性**和**生成效率**三个相互制约的需求。
 
@@ -73,7 +75,9 @@ Figure 2 直观展示了这一权衡：MV-oriented 方法（CAT3D、Bolt3D、Won
 
 FlashWorld 的核心动机即在于此——通过**交叉模式蒸馏**（Cross-mode Distillation），使 MV-oriented 模式充当教师、3D-oriented 模式充当学生，在统一的扩散框架内实现质量与一致性的双重提升。同时，借助分布匹配蒸馏（DMD）将多步教师模型压缩至少步学生模型，使生成时间从分钟级压缩至秒级（9 秒，H20 GPU），较基线方法加速约 48 倍。此外，通过引入分布外（OOD）数据的共训练策略，增强模型对多样化输入的泛化能力，突破现有数据集覆盖范围的限制。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FlashWorld 的核心创新在于通过**范式转换**与**交叉模式知识迁移**，系统性破解了现有 3D 场景生成中视觉质量与 3D 一致性的根本性权衡。其创新可归结为三个紧密耦合的层面。
 
@@ -106,7 +110,7 @@ FlashWorld 将生成范式**直接切换为 3D-oriented**：模型在扩散过�
 
 上述创新形成一条清晰的因果链：**双模式预训练**赋予模型两种互补能力 → **交叉模式蒸馏**将视觉质量从 MV 模式迁移至 3D 模式 → **CMC 损失**稳定这一迁移过程 → **OOD 共训练**扩展泛化边界。这一设计使得 FlashWorld 在仅 9 秒内（单张 H20 GPU）生成高质量 3D 场景，速度比 **Prometheus** 等基线快约 48 倍，同时在 T3Bench-200、DL3DV-200 和 WorldScore-200 等基准上取得最优或次优的质量指标（Table 1, Table 2）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_2IftRjRB07/figures/011_Figure_8.jpg]]
 *Figure 8: Architecture of the dual-mode multi-view latent diffusion model*
@@ -149,7 +153,7 @@ FlashWorld 的生成范式从传统的“多视图生成 → 3D重建”两阶�
 
 这一设计使得 FlashWorld 能够以统一模型无缝处理图像到 3D 和文本到 3D 两种任务，无需分别训练（Section 4.2）。同时，由于模型直接输出 3DGS 表示，天然支持自由视角渲染和深度图生成，即便在无显式深度监督的情况下也能学习有意义的几何信息（Figure 9, Figure 10）。
 
-## 核心模块与公式推导
+
 
 ### 3.1 双模式预训练架构
 
@@ -206,7 +210,9 @@ $$\mathcal{L}_{\mathrm{GAN}} = \min_{D} \max_{G_{\theta}} \mathbb{E}_{x, z, t} \
 | $\mathcal{L}_{\mathrm{CMC}}$ | $E(\cdot)$：VAE 编码器；$G_{\theta, \mathrm{3D}}$：3D 模式输出；$G_{\theta, \mathrm{MV}}$：MV 模式输出 | 跨模式一致性正则，稳定 3D 训练 |
 | $\mathcal{L}_{\mathrm{GAN}}$ | $D$：判别器；$F(\cdot, t)$：时间步特征提取 | 对抗训练，增强生成真实感 |
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能：速度与质量的双重突破
 
@@ -260,7 +266,9 @@ Table 3 和 Figure 7 的消融实验揭示了各组件的贡献机制：
 ![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_2IftRjRB07/figures/007_Figure.jpg]]
 *Figure: Ours WonderWorld LucidDreamer WonderJourney*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 范式定位：从两阶段重建到直接3D生成
 
@@ -308,6 +316,8 @@ FlashWorld 的知识继承链包含三个层次：
 3. **数据依赖缓解**：如何减少对大规模多视图数据集的依赖，采用更高效的自监督或弱监督策略？当前 OOD 共训练策略已初步探索了单图/文本数据的利用，但仍需多视图数据作为核心训练信号。
 
 4. **与迭代式方法的融合**：能否将 FlashWorld 的快速生成能力与迭代式方法的场景扩展能力结合，实现既快又大的3D世界构建？
+
+
 
 ## 原文 PDF
 

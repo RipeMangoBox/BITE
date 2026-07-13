@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/MotionEdit_Benchmarking_and_Learning_Motion_Centric_Image_Editing.pdf
+project_link: https://motion-edit.github.io
+code_link: null
 aliases:
 - MBLMCIE
 tags:
@@ -40,7 +42,7 @@ claims:
 > [!tip] 效果简介
 > - MotionEdit-Bench 上，Overall (生成质量) 4.25 vs 3.84 (+0.41 (+10.68%))；MAS (运动对齐分数) 55.45 vs 53.73 (+1.72)；Win Rate (胜率) 64.95 vs 57.71 (+7.24)。
 
-## 概述
+## 概要
 
 图像编辑模型在风格迁移、物体替换等**静态外观修改**上已取得显著进展，但在涉及**对象动作、姿态变化、交互关系**等运动编辑任务时，现有方法普遍失效。其根本瓶颈在于：训练与评估数据中缺乏高质量的运动编辑监督——现有数据集要么仅关注外观改变，要么包含少量低质量、不忠实的运动编辑样本，导致模型难以建立准确的空间-运动理解能力。
 
@@ -50,7 +52,7 @@ claims:
 
 在方法定位上，MotionNFT 属于**强化学习驱动的扩散模型后训练**方法，其核心创新在于将光流几何对齐信号量化为可优化的奖励函数，与 MLLM 语义奖励以 0.5:0.5 的权重组合使用（Table 4），从而在不增加推理开销的前提下，显著提升模型对运动指令的空间理解与编辑忠实度。
 
-## 背景与动机
+
 
 ### 图像编辑的现状与运动编辑的缺位
 
@@ -72,7 +74,9 @@ claims:
 - **数据层面**：构建 **MotionEdit 数据集**，这是首个大规模、高质量的运动编辑数据集。通过视频驱动的数据挖掘管线，从动态视频序列中自动提取帧对并生成运动编辑指令，确保样本具有显著的、自然的运动变化，涵盖姿态变换、位移运动、视角变化、主体-物体交互及主体间交互等六类运动模式。
 - **方法层面**：提出 **MotionNFT（Motion-guided Negative-aware Fine-Tuning）** 后训练框架。其核心洞察在于：**通过光流奖励直接量化预测运动与真实运动的几何对齐程度，能够在不牺牲一般编辑能力的前提下，显著提升模型对运动指令的空间理解能力和编辑忠实度**。MotionNFT 将光流对齐信号作为奖励函数引入 DiffusionNFT 训练框架，通过计算输入-编辑图像与输入-真实目标图像间的光流一致性（幅度、方向、运动幅度正则化），显式地指导模型学习正确的运动变换，从而弥补了纯语义奖励无法捕捉几何精度的固有局限。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 创新动因：运动编辑的瓶颈与因果开关
 
@@ -128,7 +132,7 @@ MotionNFT 对 DiffusionNFT 框架的核心改造集中于**奖励函数的组成
 
 这些局限指向未来的研究方向：融合物理或运动学先验（如关节约束、场景深度）以改进复杂姿态编辑的合理性；引入更强的身份嵌入机制以实现高保真身份保持；以及探索对极端运动条件更鲁棒的几何对齐度量。
 
-## 整体框架
+
 
 MotionNFT 是一个面向运动中心化图像编辑的后训练框架，其核心思想是将光流几何对齐信号显式引入扩散模型的奖励微调过程。该框架建立在 **DiffusionNFT**（一种面向流匹配模型的负感知微调方法）之上，通过扩展其奖励函数，使模型在训练中不仅接收语义质量反馈，还获得关于运动方向与幅度的几何指导。
 
@@ -170,7 +174,7 @@ MotionNFT 的整体管线由四个关键模块串联构成，形成“生成—�
 ![[assets/figures/papers/paper_list_l2_MotionEdit_Benchmarking_and_Learning_Motion_Centric_Image_Editing_motion20v2/figures/009_Figure_7.jpg]]
 *Figure 7: MotionNFT’s Reward Scoring pipeline. For each sampled model-edited image, we measure the alignment between the input-generated optical flow and the input-ground truth optical flow, obtaining the final reward score*
 
-## 核心模块与公式推导
+
 
 ### 基座模型：基于流匹配的编辑框架
 
@@ -256,7 +260,9 @@ $$\mathrm{MAS} = 100.00 \cdot \left(1 - \mathrm{clip}\left(\frac{\mathcal{D}_{\m
 
 其中 $\mathcal{D}_{\mathrm{ovl}} = \alpha \mathcal{D}_{\mathrm{mag}} + (1 - \alpha) \mathcal{D}_{\mathrm{dir}}$ 为幅度与方向一致性的加权组合偏差，$d_{\mathrm{min}}$ 和 $d_{\mathrm{max}}$ 为数据集层面的归一化边界。若预测光流为零（即模型完全未执行运动编辑），MAS 直接赋值为 0。该指标将光流对齐程度映射到 0–100 分，分数越高表示运动编辑越忠实于真实目标。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 本章节系统评估 MotionNFT 在 MotionEdit-Bench 上的运动编辑性能，并通过消融实验验证光流运动奖励与 MLLM 语义奖励的互补机制。
 
@@ -328,7 +334,9 @@ $$\mathrm{MAS} = 100.00 \cdot \left(1 - \mathrm{clip}\left(\frac{\mathcal{D}_{\m
 ![[assets/figures/papers/paper_list_l2_MotionEdit_Benchmarking_and_Learning_Motion_Centric_Image_Editing_motion20v2/figures/022_Figure_15.jpg]]
 *Figure 15: Additional failure cases of our model and closed-source commercial models. We observe that instructions involving multiple involving and non-involving subjects (e.g. the orca example in row 1, which requires complex 3D spatial edit) remain challenging for all evaluated methods. Current models, including ours and commercial baselines, struggle to correctly generate accurate and targeted motions on the correct subject part with the correct direction and magnitude in challenging scenarios*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线工作的关系
 
@@ -375,6 +383,8 @@ MotionNFT 的有效性已在以下条件下得到验证：
 4. **光流鲁棒性**：光流奖励对快速运动、运动模糊、大位移等极端情形的鲁棒性还有待探索。这直接关系到方法在实际应用中的可靠性。
 
 5. **模型架构迁移**：MotionNFT 当前仅验证了 Flow Matching 架构，其在其他生成范式（如自回归模型、GAN）上的适用性尚不明确。
+
+
 
 ## 原文 PDF
 

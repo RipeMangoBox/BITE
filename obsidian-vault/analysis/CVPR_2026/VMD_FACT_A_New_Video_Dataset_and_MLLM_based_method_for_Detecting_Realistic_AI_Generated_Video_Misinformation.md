@@ -44,7 +44,7 @@ claims:
 > - FakeTT (robustness) 上，Accuracy 78.26% (IEEG fine-tuned on RAVM*) vs 41.61% (IEEG not fine-tuned) (+36.65%)。
 > - FakeSV (robustness) 上，Accuracy 70.18% (IEEG fine-tuned on RAVM*) vs 56.70% (IEEG not fine-tuned) (+13.48%)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有视频虚假信息检测数据集主要依赖编辑技术（如拼接、换脸），这些操作破坏了跨模态一致性，产生易于检测的非真实伪影。然而，实际由 AI 生成的虚假视频具有高度跨模态一致性和逼真度，导致现有模型难以有效检测。此外，当前多模态大模型（MLLM）缺乏对多模态证据间复杂依赖关系的显式建模，推理链容易累积错误，性能显著下降。
 
@@ -54,7 +54,7 @@ claims:
 
 **主要结果**：在 RAVM 上，IEEG 达到 **75.99%** 的准确率和 **73.44%** 的宏 F1，显著优于最佳闭源模型 Gemini 2.5（68.89%），提升 7.10 个百分点。在跨数据集鲁棒性评估中，经 RAVM 子集微调后，IEEG 在 FakeTT 上的准确率从 41.61% 跃升至 **78.26%**（+36.65%），在 FakeSV 上从 56.70% 提升至 **70.18%**（+13.48%），证明了所提数据集对检测模型鲁棒性的显著增强作用。
 
-## 背景与动机
+
 
 ### 问题背景：AI 生成视频虚假信息的检测困境
 
@@ -76,7 +76,9 @@ claims:
 
 基于以上动机，本文提出了 **RAVM 数据集**（一个包含 9,049 对声明-视频样本的真实 AI 生成视频虚假信息数据集）和 **IEEG 模型**（内部-外部证据图建模方法），分别从数据构造和检测方法两个维度推动该领域的研究进展。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 VMD-FACT 的核心创新围绕两个紧密耦合的维度展开：**数据层面的逼真 AI 生成视频虚假信息构建**与**模型层面的可解释多模态证据推理**。二者共同指向一个核心瓶颈——现有数据集依赖编辑技术，破坏了跨模态一致性，产生易于检测的非真实伪影；而现有 MLLM 缺乏对多模态证据间复杂依赖关系的显式建模，推理链容易累积错误。
 
@@ -109,7 +111,7 @@ $$\mathcal{L} = \mu \mathbb{E}_{c,v \sim \Omega, r \sim \mathcal{D}} [-\log P(r 
 
 > **注意**：IEEG 目前仅支持二分类（真实/虚假），尚未覆盖更细粒度的虚假信息类别（如误导意图分类、操纵技术分类），这是方法层面的一个显式局限。
 
-## 整体框架
+
 
 VMD‑FACT 的整体框架由两条深度耦合的流水线构成：**真实 AI 生成视频虚假信息构建流水线**与**可解释虚假信息检测流水线**。前者以意图极性引导的声明篡改为起点，通过多智能体迭代反馈的视频生成与自适应关键帧‑视频伪造模块，系统性地产生高度逼真且跨模态一致的虚假视频；后者则将这些多模态证据建模为内部‑外部证据图（IEEG），并通过知识蒸馏最大化推理路径的条件概率，实现可解释的事实核查。
 
@@ -159,7 +161,7 @@ $$r^* = \arg\max_r P(r \mid c, v) \tag{12}$$
 ![[assets/figures/papers/paper_list_l2755_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_VMD_FACT_A_New_V/figures/003_Figure_2.jpg]]
 *Figure 2: Overview of our multi-agent-driven framework for generating realistic AI-generated video misinformation. The framework iteratively manipulates claims, videos, and audio while considering intent polarity, producing realistic claim–video pairs. Commercial closed-source models are incorporated to further enhance the diversity of RAVM*
 
-## 核心模块与公式推导
+
 
 ### 1. 意图极性引导的声明篡改
 
@@ -231,7 +233,9 @@ $$r ^ { * } = \arg \operatorname* { m a x } _ { r } P ( r \mid c , v )$$
 
 该公式是 IEEG 可解释检测的核心：推理路径 $r^*$ 显式编码了从多模态证据到事实核查结论的因果依赖链，而非隐式的黑箱分类。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 数据集与评估协议
 
@@ -306,7 +310,9 @@ Table 5 和 Table 6 分别使用 AGAV-Rater 结合用户研究，以及 VBench �
 ![[assets/figures/papers/paper_list_l2755_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_VMD_FACT_A_New_V/figures/009_Figure_5.jpg]]
 *Figure 5: Visualization of RAVM, showing a manipulated claim and its corresponding generated video*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题域定位：从编辑伪影到生成式跨模态一致性
 
@@ -362,6 +368,8 @@ VMD-FACT 在方法谱系中占据了一个独特位置：**它是首个将多模
 - **证据图的动态扩展**：将 IEEG 与实时外部知识检索（如搜索引擎、知识图谱）结合，使证据图能够动态纳入最新的事实信息。
 - **细粒度虚假信息分类**：利用证据图的结构特征（如操纵路径、证据冲突模式）实现操纵技术溯源和意图分类。
 - **开放域与跨语言泛化**：探索在开源视频生成模型上构建可完全复现的数据集，并验证 IEEG 在跨语言场景下的迁移能力。
+
+
 
 ## 原文 PDF
 

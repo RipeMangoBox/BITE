@@ -43,7 +43,7 @@ claims:
 > - GenEval (Extended Training, 400 GPU hrs) 上，Overall Accuracy 0.87 vs 0.72 (Flow-GRPO) (+0.15)。
 > - Multiple (GenEval & PickScore datasets, 3 reward functions) 上，Training Reward per Iteration Consistently higher and faster convergence across all settings vs Flow-GRPO (N/A (visual))。
 
-## 概述
+## 概要
 
 流匹配（Flow Matching）模型在文本到图像生成中展现出竞争力，但其强化学习微调方法 **Flow-GRPO**（Liu et al., 2024）存在一个关键瓶颈：**统一信用分配**。Flow-GRPO 将最终图像的标量奖励均匀地分配给所有去噪步骤，忽略了扩散生成过程固有的时间层次结构——早期步骤决定构图与布局，后期步骤细化纹理细节。这种统一分配可能奖励早期错误，或无法给予关键步骤足够的强化信号。
 
@@ -56,8 +56,6 @@ claims:
 - **关键设计验证**：联合归一化保留了早期增益的自然量级，显著加速收敛（Figure 9）；方法对中间估计的去噪子步数具有鲁棒性（Figure 10）。
 
 方法定位：Stepwise-Flow-GRPO 属于**扩散模型强化学习微调**范畴，通过**逐步信用分配**改进 GRPO 框架，与基于最终奖励的统一分配方法形成对比。其信用分配策略独立于采样改进，两者互补（Figure 6）。
-
-## 背景与动机
 
 ### 流匹配与强化微调
 
@@ -99,7 +97,7 @@ $$\mathrm{SNR}_t(k) = \left( \frac{1-t}{t} \right)^2 \frac{1}{|k|^\alpha}$$
 
 这一设计旨在实现两个目标：**提高样本效率**（更少的训练迭代即可收敛）和**加速收敛速度**（在壁钟时间上更快达到更优性能）。同时，本文还引入受DDIM启发的改进SDE采样器，在保持随机探索的同时生成更清洁的中间样本，进一步提升信用分配的质量。
 
-## 核心创新
+## 核心方法与创新机理
 
 Stepwise-Flow-GRPO 的核心创新在于将扩散生成过程的**时间层次结构**显式编码到强化学习的信用分配机制中，解决了 Flow-GRPO 中统一奖励信号无法区分不同去噪步骤贡献的根本缺陷。
 
@@ -140,8 +138,6 @@ $$x_{t-\Delta t} = \left(1 - (t - \Delta t)\right) \hat{x}_0(t) + \sqrt{(t - \De
 | 优势归一化 | 组内 $N$ 个最终奖励标准化 | 全部 $N \times T$ 个增益联合标准化，保留早期量级优势 |
 | 采样过程 | 原始 Flow-GRPO SDE（导数噪声大） | DDIM 启发式 SDE，方差保持噪声调度，样本更清洁 |
 
-## 整体框架
-
 Stepwise-Flow-GRPO 的核心思想是将全局奖励信号按时间维度分解为每个去噪步骤的边际贡献，从而让强化学习策略感知扩散过程的层次化生成结构。整体框架由五个关键模块串联而成，形成“采样—估计—增益计算—优势转换—策略更新”的闭环。
 
 **输入**：一个文本提示 $c$，一个预训练的流匹配模型 $v_\theta$（骨干为 SD3.5-Medium），以及一个可微或不可微的奖励模型 $R$（如 PickScore、ImageReward、UnifiedReward）。
@@ -163,8 +159,6 @@ Stepwise-Flow-GRPO 的核心思想是将全局奖励信号按时间维度分解�
 **输出**：经过强化学习微调的流匹配模型，在保持生成多样性的同时，显著提升了对齐奖励信号的样本效率与收敛速度。
 
 **模块间关系**：中间奖励估计模块是逐步增益计算的前提，其准确性直接影响信用分配的质量；DDIM 启发式 SDE 采样器与信用分配策略相互独立但互补——当两个方法同时使用改进 SDE 时，Stepwise-Flow-GRPO 仍保持样本效率优势（Figure 6），表明增益来自信用分配机制的改进而非单纯的采样质量提升；联合归一化作为优势计算的最后一步，决定了不同时间步骤的相对优化权重，是保留扩散过程时间结构的关键设计选择。
-
-## 核心模块与公式推导
 
 ### 问题形式化：流匹配与统一信用分配的局限
 
@@ -250,7 +244,7 @@ $$
 ![[assets/figures/papers/paper_list_l2703_https_arxiv_org_abs_2603_28718/figures/012_Figure_7.jpg]]
 *Figure 7: Design variation comparison. Reward vs. training iteration for different formulations of stepwise credit assignment on GenEval with PickScore reward. The standard gain formulation from the main paper matches all alternatives, demonstrating that preserving the natural temporal structure of diffusion gains is the most effective credit assignment*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心瓶颈与动机验证
 
@@ -292,9 +286,6 @@ Table 2 提供了每训练迭代的时间分解。Stepwise-Flow-GRPO的主要额
 ![[assets/figures/papers/paper_list_l2703_https_arxiv_org_abs_2603_28718/figures/008_Figure_4.jpg]]
 *Figure 4: Sample efficiency across reward functions. Stepwise-Flow-GRPO consistently outperforms Flow-GRPO in reward per training step across all settings, achieving both faster convergence and superior final performance in 3 out of 4 settings*
 
-![[assets/figures/papers/paper_list_l2703_https_arxiv_org_abs_2603_28718/figures/010_Figure_5.jpg]]
-*Figure 5: Wall-clock efficiency matches sample efficiency gains. Reward versus wall-clock time for the same settings as Fig. 4. Despite additional computational cost for intermediate denoising, Stepwise-Flow-GRPO converges faster in wall-clock time, achieving visibly superior performance in 3 out of 4 settings*
-
 ![[assets/figures/papers/paper_list_l2703_https_arxiv_org_abs_2603_28718/figures/011_Table_1.jpg]]
 *Table 1: Final model quality on GenEval. Compositional generation performance for models trained with PickScore reward. Both methods substantially improve over the base model, with our method matching Flow-GRPO at cfg=1.0 and outperforming it across most categories at cfg=4.5, particularly in counting and spatial positioning*
 
@@ -310,7 +301,7 @@ Table 2 提供了每训练迭代的时间分解。Stepwise-Flow-GRPO的主要额
 ![[assets/figures/papers/paper_list_l2703_https_arxiv_org_abs_2603_28718/figures/009_Figure_6.jpg]]
 *Figure 6: Stepwise credit assignment remains effective with improved SDE. Reward versus training step when both methods use the DDIM-inspired SDE from Sec. 5.5. Stepwise-Flow-GRPO retains its sample efficiency advantage, demonstrating that the improvements in credit assignment and sampling are complementary*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2026
 pdf_ref: paperPDFs/arxiv_2026/FaceCam_Portrait_Video_Generation_with_Camera_Control.pdf
+project_link: null
+code_link: https://github.com/Wan-Video/Wan2.2
 aliases:
 - FaceCam
 tags:
@@ -42,7 +44,7 @@ claims:
 > - Ava-256 上，SSIM↑ 0.7208 vs 0.5816 (FaceCam*) (+0.1392)；LPIPS↓ 0.2521 vs 0.5494 (FaceCam*) (-0.2973)；ArcFace↑ 0.8574 vs 0.7014 (ReCamMaster) (+0.1560)。
 > - In-the-wild (动态相机) 上，Camera Correctness↑ 97.00 vs 99.00 (TrajectoryCrafter) (-2.00)。
 
-## 概述
+## 概要
 
 单目人像视频的相机控制面临一个根本性瓶颈：**尺度模糊**。现有方法将相机外参（旋转矩阵和平移向量）作为条件信号注入生成模型，但在未标定的单目拍摄中，场景的度量深度不可观测——同一段视频可以对应无穷多种“3D场景+相机轨迹”的组合，仅在全局相似变换下等价。这种尺度歧义导致基于外参的相机表示无法提供确定性的控制信号，模型在重渲染时容易出现几何漂移、人像扭曲甚至出框（Fig. 2A）。基于3D重建的方法（如 **TrajectoryCrafter**）试图通过估计动态点云来绕过这一问题，但点云估计本身存在误差，在大姿态变化下会累积为面部畸变。
 
@@ -52,7 +54,7 @@ claims:
 
 **主要结果**：在 Ava-256 静态多视角基准上，FaceCam 在 PSNR（15.85 vs. 10.32）、SSIM（0.7208 vs. 0.5816）和身份保留 ArcFace（0.8574 vs. 0.7014）上均显著优于最强基线。在自然场景动态相机评估中，FaceCam 在保持高相机正确性（97.00）的同时，身份相似度（83.94 vs. 78.92）和视觉质量（Imaging Quality 73.49 vs. 69.05）全面领先。消融实验证实，合成相机运动和多镜头拼接是模型获得连续角度变化能力的关键，移除其中任一策略都会导致相机正确性或身份保留的显著下降。
 
-## 背景与动机
+
 
 ### 单目人像视频中的相机控制需求
 
@@ -80,7 +82,9 @@ $$u = \frac{f_x x_c}{z_c} + c_x, \quad v = \frac{f_y y_c}{z_c} + c_y$$
 
 即使拥有了正确的相机表示，训练模型实现平滑的连续相机轨迹控制仍面临数据瓶颈。现有大规模视频数据多为静态相机拍摄，缺乏显式的相机运动标注。FaceCam 为此设计了两种训练数据生成策略——**合成相机运动**与**多镜头拼接**——从静态多视角数据中构造出具有连续轨迹和离散视角切换的训练样本，使模型能够学习从单一源帧到任意目标相机姿态的映射。这一数据策略是连接静态表示与动态生成能力的关键桥梁。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FaceCam 的核心创新在于用**尺度感知的像素对应关系**替代传统的外参相机表示，从根本上解决了单目人像视频中相机控制的核心瓶颈——尺度模糊。
 
@@ -124,7 +128,7 @@ FaceCam 的关键洞察在于：**图像空间中的点对应关系足以在未�
 
 推理时，FaceCam 使用一个**与输入视频无关的代理 3D 头部模型**（FaceLift 生成的 3D Gaussian Head），沿目标相机轨迹渲染后检测关键点作为条件信号。消融实验（Table 3）证实，更换不同身份的代理头部对结果影响可忽略（ArcFace 在 84.45–84.74 之间），说明关键点表示成功将相机位姿与头部身份/表情解耦。
 
-## 整体框架
+
 
 FaceCam 的整体框架围绕一个核心设计展开：**将相机控制问题转化为图像空间的点对应条件注入问题**，从而绕过传统基于外参或3D重建方法中固有的尺度模糊与估计误差。系统由四个关键模块串联构成，覆盖从数据准备到最终视频生成的完整流程。
 
@@ -198,7 +202,7 @@ FaceCam 的训练数据生成包含三种关键增强策略（Figure 4），共�
 ![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2603_05506/figures/001_Figure_1.jpg]]
 *Figure 1: FaceCam generates portrait videos with precise camera control from a single input video and a target camera trajectory. We introduce scale-aware camera conditioning that represents the target camera via rendered facial landmarks, enabling accurate camera pose control. Our approach preserves subject identity and motion while maintaining high visual quality. Project page: https:// weijielyu.github.io/FaceCam*
 
-## 核心模块与公式推导
+
 
 FaceCam 的核心设计围绕一个关键洞察展开：**图像空间中的点对应关系足以在未标定尺度下表征相机运动**。基于此，方法构建了三个紧密耦合的模块——尺度感知的相机表示、相机条件注入机制、以及训练数据生成策略——共同解决了单目人像视频中尺度模糊导致的几何失真问题。
 
@@ -254,7 +258,9 @@ $$z_{t - \Delta t} = z_t - \Delta t \, v_\theta(z_t, t, \mathbf{c})$$
 ![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2603_05506/figures/003_Figure.jpg]]
 *Figure: (B) Scale-aware camera representation. Instead of extrinsics, we encode the camera via image-space point correspondences. With at least seven 2D correspondences, the fundamental matrix between two uncalibrated views can be estimated, and with known intrinsics the relative pose is recovered up to a global scale. Portrait videos naturally provide such correspondences through facial landmarks, so we use rasterized 2D landmark maps—renderings of 3D facial landmarks from the anchor frame—as the camera representation. This face-tailored, scale-aware encoding is easy to visualize and enables deterministic, high-precision control of the apparent camera pose*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 FaceCam 在两个基准上进行了系统评估：**Ava-256** 静态多视角数据集和**自然场景（In-the-wild）视频**，涵盖重建质量、身份保留、相机控制正确性和视觉质量等多个维度。以下从主结果、消融实验和失败模式三个层面展开分析。
 
@@ -334,7 +340,9 @@ Table 3 和 Figure 9 系统消融了训练数据生成策略和代理 3D 头部�
 - **Table 3 + Figure 9**：多镜头拼接是相机角度控制的关键使能因素（移除后正确性下降 11 点），合成相机运动保障轨迹平滑性，自然场景数据提供域泛化能力——三者缺一不可。
 - **Figure 5/6**：定性对比直观展示了基线方法的典型失败模式：ReCamMaster 的姿态漂移和 TrajectoryCrafter 的几何失真，与 FaceCam 的稳定输出形成鲜明对比。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心问题：单目人像视频中的尺度模糊与几何失真
 
@@ -382,6 +390,8 @@ FaceCam 的设计决定了其适用边界：
 3. **实时推理的可行性**：模型蒸馏或轻量化骨干能否在保持相机控制精度的同时实现实时推理？这需要在效率与可控性之间找到平衡点。
 
 4. **相机表示的理论完备性**：关键点对应关系在遮挡、大角度旋转等极端条件下的信息完备性如何？是否存在需要额外条件信号（如可见性掩码）的场景？
+
+
 
 ## 原文 PDF
 

@@ -43,7 +43,7 @@ claims:
 > - PSC6K 上，PCK@1 9.81 vs 8.94 (previous best) (+0.87)；PCK@5 72.94 vs 70.74 (previous best) (+2.20)；PCK@10 92.70 vs 91.75 (previous best) (+0.95)。
 > - MS-PSC6K (avg across 5 styles) 上，PCK@1 8.70 vs previous best (unspecified) (N/A)；PCK@5 69.21 vs previous best (unspecified) (N/A)；PCK@10 91.02 vs previous best (unspecified) (N/A)。
 
-## 概述
+## 概要
 
 **问题背景** 跨稀疏对应（cross-sparsity correspondence）旨在建立稀疏线条草图与丰富纹理图像之间的语义匹配，是图像编辑、三维重建等任务的基础。然而，扩散特征在这一跨模态场景中面临双重错位：空间域上，稀疏结构与密集纹理之间存在结构抽象差异；频域上，两种模态的纹理密度不一致导致特征频谱分布失配。现有方法仅关注空间对齐或语义级修补，未能有效弥合频域间隙，导致在草图上出现“特征空洞”和噪声伪影，跨模态特征按模态类型而非语义类别聚类（见 Figure 1）。
 
@@ -54,8 +54,6 @@ claims:
 **主要结果** 在 PSC6K 数据集上，SFA-DIFT 在 PCK@1、PCK@5、PCK@10 上分别达到 9.81%、72.94%、92.70%，较此前最优方法分别提升 0.87、2.20、0.95 个百分点，达到 SOTA。在多风格扩展数据集 MS-PSC6K 上，平均 PCK@1 为 8.70%，同样取得最优。消融实验证实，LoFFA 中的 AdaIN 分布对齐、LoFE 低频增强、显式小波变换及两级分解均为关键组件，移除任一项均导致性能下降。此外，SFA-DIFT 在纹理扰动下的鲁棒性比率（RR）显著优于对比方法，验证了频域对齐对纹理变化不敏感的优势。
 
 **局限与展望** 当前方法的主要瓶颈在于推理效率：由于依赖扩散特征提取，每次对应估计平均耗时约 0.8 秒，难以满足实时应用需求。未来方向包括探索更高效的扩散特征表示或轻量化模型，以及在更多样化类别和大规模数据集上验证泛化能力。
-
-## 背景与动机
 
 ### 跨稀疏对应的核心挑战
 
@@ -84,7 +82,7 @@ claims:
 
 这种双重对齐策略从根本上解决了跨稀疏对应的核心矛盾——让线条与纹理在统一的特征空间中“相遇”，实现鲁棒且精确的语义匹配。
 
-## 核心创新
+## 核心方法与创新机理
 
 SFA-DIFT 的核心创新在于首次将**空间域**与**频域**的双重对齐引入跨稀疏对应任务，解决了扩散特征在处理稀疏线条与丰富纹理时出现的“特征空洞”和模态特异性噪声问题。与现有方法仅关注空间语义对齐或语义级修补不同，SFA-DIFT 通过两个关键模块实现空间-频率联合对齐：
 
@@ -95,8 +93,6 @@ SFA-DIFT 的核心创新在于首次将**空间域**与**频域**的双重对齐
 **损失函数创新。** SFA-DIFT 联合 CLIP 风格的对称对比损失 $\mathcal{L}_{\mathrm{CL}}$ 与带有高斯噪声正则的密集匹配损失 $\mathcal{L}_{\mathrm{Dense}}$，总损失为 $\mathcal{L} = \mathcal{L}_{\mathrm{CL}} + \mathcal{L}_{\mathrm{Dense}}$，替代了传统的关键点对比损失或端点误差（EPE）。
 
 **因果机制总结：** 空间 LoRA 微调解决“特征空洞”和模态聚类偏差，频域 LoFFA 解决频谱密度不一致——两者协同使特征按语义类而非模态类型聚类（t-SNE 可视化验证），从而在 PSC6K 上 PCK@1、5、10 分别达到 9.81%、72.94%、92.70%，较次优方法提升 0.87%、2.20%、0.95%。消融实验证实，移除 AdaIN、将 LoFE 替换为普通卷积、用卷积替代 DWT/IDWT、或使用单级 DWT 均导致性能下降，验证了分布对齐、低频增强、显式频率变换和深度频率分解均为必要组件。
-
-## 整体框架
 
 SFA-DIFT 的整体流程围绕“空间-频率双重对齐”这一核心思想展开，旨在解决稀疏线条（sketch）与丰富纹理（textured image）之间的跨模态语义对应问题。该框架采用两阶段级联设计：第一阶段通过参数高效微调构建统一清洁扩散特征提取器，实现空间域对齐；第二阶段引入低频特征聚合模块，实现频域对齐。
 
@@ -124,8 +120,6 @@ SFA-DIFT 的整体流程围绕“空间-频率双重对齐”这一核心思想�
 
 ![[assets/figures/papers/paper_list_l2629_https_openaccess_thecvf_com_content_CVPR2026_html_Zhu_When_Lines_Meet_Te/figures/003_Figure_3.jpg]]
 *Figure 3: Our SFA-DIFT framework first creates a Unified CleanDIFT extractor via LoRA fine-tuning, and then uses its frozen features to train a Low-Frequency Feature Aggregation (LoFFA) module that amplifies low-frequency components for robust correspondence*
-
-## 核心模块与公式推导
 
 ### 3.1 统一清洁扩散特征学习（空间域对齐）
 
@@ -195,12 +189,7 @@ $$\mathcal{L}_{\mathrm{Dense}} = \sum_{i} \left\| \hat{k}_i^{\mathrm{T}} - (k_i^
 
 这些消融结果共同证实了SFA-DIFT的核心洞察：**空间-频率联合对齐是实现鲁棒跨稀疏对应的必要条件**，任一维度的缺失都将导致性能退化。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2629_https_openaccess_thecvf_com_content_CVPR2026_html_Zhu_When_Lines_Meet_Te/figures/004_Figure_4.jpg]]
-*Figure 4: Progressive feature refinement analysis demonstrating model improvements. Rows 1-2: PCA-projected feature visualizations showing spatial domain characteristics. Rows 3-4: Frequency domain analysis of the corresponding extracted features. Method comparison: (a, c, e) Unified CleanDIFT, (b, d, f) SFA-DIFT with LoFFA enhancement*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 核心问题与评估基准
 
@@ -278,13 +267,10 @@ Table 4通过组件消融验证了各模块的贡献。关键发现如下：
 ![[assets/figures/papers/paper_list_l2629_https_openaccess_thecvf_com_content_CVPR2026_html_Zhu_When_Lines_Meet_Te/figures/007_Figure_5.jpg]]
 *Figure 5: Qualitative cross-sparsity correspondence comparison. Each row demonstrates cross-sparsity correspondence results between sketches and various textured images. Methods (a), (b), and (c) represent different approaches. For each method, we present correspondence results using both sketch-to-texture and texture-to-sketch configurations to evaluate bidirectional correspondence performance. SFA-DIFT achieves superior accuracy and robustness*
 
-![[assets/figures/papers/paper_list_l2629_https_openaccess_thecvf_com_content_CVPR2026_html_Zhu_When_Lines_Meet_Te/figures/008_Table_3.jpg]]
-*Table 3: Robustness Ratio (RR) of various approaches under texture variations. ∗ indicates zero-shot methods. ‡ indicates supervised methods*
-
 ![[assets/figures/papers/paper_list_l2629_https_openaccess_thecvf_com_content_CVPR2026_html_Zhu_When_Lines_Meet_Te/figures/009_Table_4.jpg]]
 *Table 4: Ablation study. Quantitative analysis of method variants. ∗ indicates zero-shot methods. ‡ indicates supervised methods*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 任务定位与核心瓶颈
 

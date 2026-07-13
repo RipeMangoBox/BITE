@@ -5,6 +5,8 @@ paper_level: A
 venue: ECCV
 year: 2024
 pdf_ref: paperPDFs/ECCV_2024/CoMo_Controllable_Motion_Generation_through_Language_Guided_Pose_Code_Editing.pdf
+project_link: https://yh2371.github.io/como/
+code_link: null
 aliases:
 - CoMo
 tags:
@@ -42,7 +44,7 @@ claims:
 > - KIT-ML 上，R-Precision Top-1 ↑ 0.422 ± 0.009 vs 0.432 ± 0.006 (FineMoGen) (-0.010)。
 > - Human Evaluation on Motion Editing 上，Human Preference Rate >70% prefer CoMo vs <30% prefer baselines (T2M-GPT, FineMoGen) (显著更高)。
 
-## 概述
+## 概要
 
 现有文本到运动生成模型通常将运动编码为隐式潜在向量，虽然能够生成符合全局文本描述的运动序列，但缺乏对运动细节的细粒度控制能力。用户无法直观地修改特定身体部位的动作、在特定时刻插入新姿势或调整运动风格，因为这些隐式表示不具备可解释的编辑接口。这一瓶颈限制了运动生成在交互式内容创作中的应用。
 
@@ -52,7 +54,7 @@ CoMo 的核心贡献在于构建了一个统一的文本驱动运动生成与编
 
 在 HumanML3D 和 KIT 两个标准基准上，CoMo 的运动生成指标排名前三，其中**多样性（Diversity）指标达到 9.936，为所有对比方法中最高**。更重要的是，在一项包含 54 名参与者的用户研究中，**超过 70% 的标注者偏好 CoMo 的编辑结果**，显著优于基于文本重生成的基线方法（T2M-GPT、FineMoGen），验证了语义姿态代码表示在细粒度运动编辑中的有效性。
 
-## 背景与动机
+
 
 ### 问题背景：文本到运动生成的细粒度控制困境
 
@@ -83,7 +85,9 @@ CoMo 的核心动机源于一个关键洞察：**如果运动能够被分解为�
 
 CoMo 通过三个协同组件——运动编解码器（Motion Encoder-Decoder）、运动生成器（Motion Generator）和运动编辑器（Motion Editor）——系统性地回应了这些挑战，构建了首个统一的文本驱动运动生成与细粒度编辑框架。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CoMo 的核心创新在于将运动生成与编辑问题重新定义为**可解释的语义姿态代码（pose codes）操作问题**，从而弥合了隐式潜在表示与细粒度可控性之间的鸿沟。其关键突破可归纳为以下三个层面的设计转变：
 
@@ -116,7 +120,7 @@ CoMo 的核心创新在于将运动生成与编辑问题重新定义为**可解�
 
 这些创新共同构成了 CoMo 的核心竞争力：**以语义姿态代码为桥梁，将 LLM 的常识推理能力引入运动生成与编辑，在保持生成质量的同时实现了前所未有的细粒度可控性**。用户研究（54 名参与者，超过 70% 偏好 CoMo 编辑结果）和自动指标（HumanML3D 上 Diversity 9.936 为所有方法最佳）均支撑了这一设计理念的有效性。
 
-## 整体框架
+
 
 CoMo 是一个面向文本驱动人体运动生成与细粒度编辑的统一框架，其核心设计理念在于：**将运动分解为语义有意义、可解释的离散姿态代码（pose codes），使大语言模型（LLM）能够直接理解并编辑运动序列的时空属性**。如图 2 和图 3 所示，整个 pipeline 由三个关键模块串联构成：
 
@@ -128,7 +132,7 @@ CoMo 是一个面向文本驱动人体运动生成与细粒度编辑的统一框
 
 三个模块之间的数据流关系清晰：Motion Encoder‑Decoder 提供了运动 ↔ 姿态代码的双向映射能力，Motion Generator 和 Motion Editor 均依赖这一映射——前者从文本生成代码再解码为运动，后者将运动编码为代码、经 LLM 编辑后再解码。这种设计使生成与编辑共享同一表示空间，保证了框架的统一性与可扩展性。
 
-## 核心模块与公式推导
+
 
 CoMo 的核心架构由三个模块构成：运动编解码器（Motion Encoder-Decoder）、运动生成器（Motion Generator）和运动编辑器（Motion Editor）。其设计的关键在于将运动分解为语义可解释的离散姿态代码，使后续的生成与编辑均可直接操作这些代码。
 
@@ -176,7 +180,9 @@ $$\mathcal{L}_{\mathrm{gen}} = -\frac{1}{L(N+1)} \sum_{i=1}^{L} \sum_{n=1}^{N+1}
 ![[assets/figures/papers/motion_editing_inpainting_20260603_como/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of CoMo for text-driven motion generation. Motion Encoder-Decoder (left) utilizes a predefined codebook to encode motions into pose codes and learns a decoder to reconstruct the motions. Motion Generator (right), a transformer-based model, predicts pose codes autoregressively, conditioned on the text descriptions and LLM-generated fine-grained keywords. The generated pose codes are then decoded back into motions using the previously trained decoder*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 文本驱动运动生成主结果
 
@@ -256,7 +262,9 @@ CoMo 在 HumanML3D 和 KIT-ML 两个标准基准上进行了文本驱动运动�
 ![[assets/figures/papers/motion_editing_inpainting_20260603_como/figures/006_Figure_4.jpg]]
 *Figure 4: Qualitative examples of Motion Generation on the HumanML3D test set. The motion sequences progress from left to right. The red boxes identify misalignments between the generated motion sequence and the text description. CoMo achieves competitive results in motion generation compared to T2M-GPT and FineMoGen. More visual results are available in the Appendix*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 一、问题定位：从隐式生成到可解释编辑
 
@@ -310,6 +318,8 @@ CoMo 的能力边界受限于其姿态代码的**局部运动学属性**：
 4. **LLM 推理的可靠性**：在更长、更复杂的编辑指令链下，LLM 的多步推理是否保持自一致性？是否需要引入验证或自纠正机制？
 
 5. **与物理仿真引擎的集成**：编辑后的运动能否与物理仿真环境对接，实现更真实的交互式运动编辑？
+
+
 
 ## 原文 PDF
 

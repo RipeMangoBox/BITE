@@ -5,6 +5,8 @@ paper_level: A
 venue: PREPRINT
 year: 2025
 pdf_ref: paperPDFs/PREPRINT_2025/DiffME_Component_Process_Model_Induced_Controllable_Micro_Expression_Generation.pdf
+project_link: null
+code_link: null
 aliases:
 - DCPMICMEG
 tags:
@@ -39,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - Leave-One-Dataset-Out (LODO) protocol across six spontaneous ME datasets (CASME... 上，AU prediction UF1/ACC 与真实顶点帧性能接近（具体数值参见 Table 1） vs 真实顶点帧（Ground-Truth Apex） (性能无明显退化)。
 
-## 概述
+## 概要
 
 微表情（Micro-Expressions, MEs）作为自发情感泄露的关键窗口，在安防、心理与临床等领域具有重要价值。然而，微表情数据的稀缺性与标注难度长期制约着相关研究。现有生成方法——无论是基于运动迁移的策略（如 Fan et al. 2021），还是基于 GAN 的条件生成（如 **FAMGAN**, Xu et al., ACM MM 2021；**ULME-GAN**, Zhou et al., Applied Intelligence 2024）——均存在根本性缺陷：它们或受限于固定的 AU 组合而缺乏控制灵活性，或仅支持粗糙的二值 AU 标签而无法调节强度，且普遍缺乏心理学驱动的情感结构建模，导致生成结果在解剖合理性与情感连贯性上表现不足。此外，该领域长期依赖主观人工编码进行评估，可复现性与公平性难以保证。
 
@@ -47,7 +49,7 @@ claims:
 
 在涵盖六个自发微表情数据集（CASME, CASME II, SAMM, MMEW, 4DME, CASME3）的留一数据集交叉验证协议下，DiffME 生成的顶点帧在 AU 预测指标（UF1/ACC）上接近真实顶点帧性能，且在不同 CFG 强度尺度下表现稳定。消融实验证实，ADDE 与 CARM 构成级联依赖关系，任一模块缺失均导致模型退化为基础潜在扩散模型，输出质量显著恶化。DiffME 还引入基于视觉语言模型（VLM）与深度学习模型（DLM）的标准化评估方案，以替代传统人工编码，增强评估的客观性与可复现性。
 
-## 背景与动机
+
 
 微表情（Micro-Expressions, MEs）是一种短暂、微弱且往往非自主的面部运动，通常持续仅 1/25 至 1/3 秒。作为情感计算和心理学研究中的关键线索，微表情在测谎、临床诊断和人机交互等场景中具有重要价值。然而，微表情数据的采集与标注极为困难——其低强度、短时程和稀疏发生特性使得大规模、高质量标注数据集的构建成本高昂，这严重制约了数据驱动的微表情分析与识别研究。
 
@@ -75,7 +77,9 @@ claims:
 
 3. **建立标准化评估方案**：引入基于视觉语言模型（VLM）和深度学习模型（DLM）的自动评估协议，替代传统人工编码，增强评估的客观性、可复现性和可扩展性，为微表情生成方法的公平比较奠定基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DiffME 的核心创新在于将心理学的**组件过程模型（Component Process Model, CPM）**结构先验嵌入扩散生成框架，实现了对微表情（Micro-Expression, ME）的**精细粒度、情感一致且解剖协调的可控生成**。相较于现有方法，DiffME 在以下四个关键维度上实现了根本性突破：
 
@@ -111,7 +115,7 @@ $$f_{\mathrm{ID-ME}} = \mathrm{Att}(Q, K_{\mathrm{id}}, V_{\mathrm{id}}) + \beta
 
 上述四个创新点并非孤立存在，而是形成了一条完整的因果链路：ADDE 为 CARM 提供 AU 特定的形变表示和强度边界；CARM 基于 CPM 结构先验对 AU 关系进行建模，输出协调后的 AU 表示；这些表示作为条件输入**概率强度感知过渡扩散（PITD）**框架，通过解耦交叉注意力和 ID-Net 实现身份保持的可控生成；在推理阶段，通过分类器自由引导（CFG）的外推机制 $\tilde{\varepsilon}_\theta = \varepsilon_\theta + \lambda_{\mathrm{ME}} (\varepsilon_{\mathrm{ME}} - \varepsilon_\theta)$ 实现强度滑块式的精细调控。消融实验表明，移除 ADDE 或 CARM 中任一模块均会导致模型退化为基础潜在扩散模型，输出质量明显恶化，验证了这一协同设计的必要性。
 
-## 整体框架
+
 
 DiffME 将微表情生成形式化为一个条件图像合成任务：给定起始帧 $F_{\text{onset}}$ 和一个细粒度的 AU 强度控制向量 $\mathbf{I}_{\text{con}} \in \mathbb{R}^{21}$，预测对应的顶点帧 $\hat{F}_{\text{apex}}$。其中 $\mathbf{I}_{\text{con}}$ 涵盖 12 个按面部侧化解耦的 AU，支持对强度和双侧对称性的精细调控。整个框架由三个核心模块串联构成，形成“自监督运动解耦—结构先验建模—强度感知扩散生成”的级联管线。
 
@@ -148,7 +152,7 @@ $$\tilde{\varepsilon}_\theta(x_t, t, f_{\text{id}}, f_{\text{ME}}) = \varepsilon
 ![[assets/figures/papers/paper_list_l1651_DiffME_Component_Process_Model_Induced_Controllable_Micro_Expression_Gen/figures/002_Figure_2.jpg]]
 *Figure 2: Comparison of previous methods and our method. Top: Transfer-based methods restrict synthesis to fixed AU combinations. GAN-based methods fail to control intensities, causing affective incoherence. Bottom: Our method estimates intensity bounds in self-supervised manner and then models AU patterns guided by CPM to ensure affective and anatomical coherence*
 
-## 核心模块与公式推导
+
 
 DiffME 围绕三个核心模块构建：**AU‑Decomposed Deformation Estimator (ADDE)** 负责自监督运动解耦与强度边界估计；**CPM‑Guided AU Relational Module (CARM)** 将组件过程模型的结构先验注入 AU 关系建模；**Probabilistic Intensity‑aware Transition Diffusion (PITD)** 则通过解耦交叉注意力与身份拷贝网络实现可控生成。三个模块形成因果链条——ADDE 为 CARM 提供 AU 特定的雅可比表示与强度上界，CARM 输出结构化的 AU 条件信号，PITD 在此条件下完成从起始帧到顶点帧的扩散生成。
 
@@ -198,7 +202,9 @@ $$\tilde{\varepsilon}_\theta(x_t, t, f_{\mathrm{id}}, f_{\mathrm{ME}}) = \vareps
 ![[assets/figures/papers/paper_list_l1651_DiffME_Component_Process_Model_Induced_Controllable_Micro_Expression_Gen/figures/005_Figure_5.jpg]]
 *Figure 5: Visualization of ADDE in self-supervised image reconstruction. (a) Onset frame with AU annotations indicating micro-expression dynamics to appear in the upcoming (b) apex frame. (c) Reconstructed result of the apex frame. (d) Gaussian heatmap computed based on landmarks*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 评估协议与基准设定
 
@@ -244,7 +250,9 @@ Figure 5 展示了 ADDE 的自监督重建能力：从起始帧（a）到真实�
 - 当前依赖手工选取的 MediaPipe 关键点和经验性 AU 相关图，限制了在更不受约束场景下的可扩展性。
 - 过大的 CFG 尺度会产生视觉伪影，需要在强度控制与生成质量之间进行权衡。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有方法的对比与继承
 
@@ -296,6 +304,8 @@ DiffME 处于**可控面部生成**与**情感计算**的交叉点，其知识�
 
 *注：由于分析中未提供论文的具体发表年份和会议信息，上述定位中的时间线比较需手动核实。*
 
+
+
 ## 原文 PDF
 
-![[paperPDFs/UNKNOWN_2026/DiffME_Component_Process_Model_Induced_Controllable_Micro_Expression_Generation.pdf]]
+![[paperPDFs/PREPRINT_2025/DiffME_Component_Process_Model_Induced_Controllable_Micro_Expression_Generation.pdf]]

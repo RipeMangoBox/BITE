@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Solving_the_Granularity_Mismatch_Hierarchical_Preference_Learning_for_Long_Horizon_LLM_Agents.pdf
+project_link: null
+code_link: null
 openreview_forum_id: s8usvGHYlk
 aliases:
 - HPLH
@@ -42,7 +44,7 @@ claims:
 > - Average across ALFWorld, WebShop, InterCode-SQL 上，average score 为 67.28 (Qwen2.5-7B)，对比 63.82 (IPR)，变化 +3.46。
 > - Average across benchmarks (Qwen2.5-1.5B) 上，average score 为 59.44，对比 55.49 (IPR)，变化 +3.95。
 
-## 概述
+## 概要
 
 在长周期LLM智能体任务中，偏好学习的核心瓶颈在于**粒度不匹配**：轨迹级DPO信号稳定但信用分配能力不足，步级DPO提供细粒度监督，但在有限数据与蒙特卡洛采样条件下方差大、效率低。本文提出**Hierarchical Preference Learning (HPL)**，通过引入语义连贯的动作组作为中间粒度，并采用基于组长度和样本难度的双重课程学习策略，在偏置-方差权衡中取得平衡。
 
@@ -50,7 +52,7 @@ HPL的核心洞察是：**分层多粒度偏好优化**（轨迹级、步级、�
 
 实验结果表明，HPL在ALFWorld、WebShop和InterCode-SQL三个基准上显著优于现有方法。以Qwen2.5-7B-Instruct为基座，HPL平均得分达到67.28，分别超过轨迹级DPO方法ETO和步级DPO方法IPR 3.81和3.46分。消融实验进一步验证了组级DPO损失和课程学习机制的关键作用：去除课程学习导致平均性能下降2.51分，而去除组级DPO损失对性能影响最大。
 
-## 背景与动机
+
 
 ### 长周期LLM智能体的偏好学习挑战
 
@@ -78,7 +80,9 @@ HPL的核心洞察是：**分层多粒度偏好优化**（轨迹级、步级、�
 2. **设计双重课程学习策略**：沿子任务复杂度（组长度）和样本难度（奖励差距）两个正交维度组织训练进程，从简单短序列逐步过渡到复杂长序列，模拟人类从易到难的学习路径。
 3. **保持离线偏好优化范式**：HPL遵循与ETO、IPR相同的两阶段协议（单次探索+离线偏好优化），在不引入在线交互成本的前提下实现多粒度偏好学习的集成。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 HPL 的核心创新在于用一个**分层多粒度偏好优化框架**系统性地解决了长周期 LLM 智能体偏好学习中的**粒度不匹配**问题。与现有工作仅在单一粒度上操作不同，HPL 引入了三个关键改变：
 
@@ -109,7 +113,7 @@ $$\mathcal{L}_{\mathrm{final}}^{(s)} = \mathcal{L}_{\mathrm{BC}} + \mathcal{L}_{
 
 **证据强度说明**：组级 DPO 和双重课程的核心作用有明确的消融实验支持（置信度 0.9–0.95）。语义分割策略依赖外部大模型（如 GPT-4o），引入额外成本和依赖性，这是该方法的一个已知局限。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_s8usvGHYlk/figures/002_Figure_2.jpg]]
 *Figure 2: An overview of our proposed framework, HPL. Stage 1 generates hierarchical preference data with Action Group Segmentation component. Stage 2 then optimizes the agent with a composite objective, where the training is guided by dual-layer curriculum scheduler*
@@ -146,7 +150,7 @@ $$\mathcal{L}_{\text{final}}^{(s)} = \mathcal{L}_{\text{BC}} + \mathcal{L}_{\tex
 
 其中 $\mathcal{L}_{\text{group-DPO}}^{(s)}$ 的数据子集 $\mathcal{D}_{\text{group}}^{(s)}$ 随课程阶段动态变化，而轨迹级和步级 DPO 损失始终使用全量数据。这种设计使模型从简单的、高置信度的子任务开始学习，逐步过渡到复杂的多步序列，在偏置-方差权衡中取得平衡。
 
-## 核心模块与公式推导
+
 
 HPL框架的核心由四个模块串联构成，分别解决策略初始化、多粒度偏好数据生成、课程调度与联合优化问题。
 
@@ -205,7 +209,9 @@ $$\mathcal{L}_{\mathrm{group-DPO}}(\theta;\mathcal{D}_{\mathrm{group}}) = -\math
 
 其中 $\beta$ 控制策略偏离参考策略的惩罚强度，$\sigma$ 为sigmoid函数。组级DPO损失仅在当前课程阶段 $s$ 对应的数据子集 $\mathcal{D}_{\mathrm{group}}^{(s)}$ 上计算，而轨迹级和步级损失在整个训练过程中保持不变。这种设计使得模型在偏置-方差权衡中取得平衡：轨迹级信号稳定但信用分配粗糙，步级信号细粒度但方差大，组级信号作为中间粒度填补了两者之间的空白。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与验证目标
 
@@ -291,7 +297,9 @@ Table 5对比了各方法在ALFWorld上的资源消耗。HPL (Semantic) 因依�
 
 ![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_s8usvGHYlk/figures/020_Table_8.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位与核心瓶颈
 
@@ -339,6 +347,8 @@ HPL的有效性建立在以下前提之上，超出这些边界时性能可能�
 - **在线扩展**：如何在在线强化学习设置中整合层次化偏好学习，利用在线探索进一步增强组级信用分配的准确性？
 - **跨模态泛化**：该方法能否推广到视觉语言模型或多模态智能体任务，其中动作组的语义边界可能需要结合视觉信息定义？
 - **最优组长度理论**：组级DPO的偏置-方差权衡是否存在理论上的最优组长度，能否根据任务结构自动推导？
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Scheduling_Your_LLM_Reinforcement_Learning_with_Reasoning_Trees.pdf
+project_link: null
+code_link: https://github.com/zz-haooo/Re-Schedule
 openreview_forum_id: V4zln7XiJj
 aliases:
 - RSRTS
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 基于推理树的大语言模型强化学习调度 |
 | 英文题名 | Scheduling Your LLM Reinforcement Learning with Reasoning Trees |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=V4zln7XiJj); [GitHub](https://github.com/zz-haooo/Re-Schedule) |
+| Links | [paper](https://openreview.net/forum?id=V4zln7XiJj) · [GitHub](https://github.com/zz-haooo/Re-Schedule) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | Re-Schedule (Reasoning Tree Schedule) |
 | Dataset | Six math benchmarks (AIME24, AIME25, AMC23, MATH500, Minerva Math, OlympiadBench), Six math benchmarks (as above) |
@@ -42,7 +44,7 @@ claims:
 > - Six math benchmarks (as above) 上，Average accuracy (avg@32) 为 44.5 (Re-Schedule_sigmoid, Qwen2.5-7B)，对比 41.3 (ACC_sigmoid)，变化 +3.2%。
 > - Six math benchmarks (as above) 上，Average accuracy (avg@32) 为 48.5 (Re-Schedule_sigmoid, Qwen2.5-Math-7B)，对比 44.3 (GRPO)，变化 +4.2%。
 
-## 概述
+## 概要
 
 ### 核心问题
 
@@ -80,7 +82,7 @@ Re-Schedule 包含三个核心模块：
 
 Re-Schedule 的离线树构建带来约 **48.5%** 的额外训练时间开销（默认配置），且固定结构的近似推理树可能无法完整捕捉真实推理的全部复杂性。目前验证主要限于数学推理和简单代码生成任务，向多模态推理、长链条规划等任务的泛化性尚待检验。此外，如何在更低的计算代价下构建更精准的推理树近似，以及能否将 r-score 与在线动态更新机制结合，仍是值得探索的方向。
 
-## 背景与动机
+
 
 ### 大语言模型强化学习的推理瓶颈
 
@@ -106,7 +108,9 @@ Figure 1(a)直观展示了这一现象：简单推理树q1仅需2次节点编辑
 
 因此，RLVR数据调度的核心瓶颈在于：**如何在不依赖训练过程反馈的前提下，先验地量化查询的真实学习难度？** 这需要一个能够穿透表面准确率、直接刻画推理树结构可学习性的度量指标。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 从路径准确率到结构可学习性的范式转换
 
@@ -151,7 +155,7 @@ $$\omega = \mathrm{rank}(\alpha)\% \cdot \omega_{\max} + (1 - \mathrm{rank}(\alp
 
 这一差异的根本驱动力在于：推理树的结构特征（而非表面准确率）是调度效果的根本驱动力。实验验证了这一观点——训练过程中平均最小修正节点数（MCN）持续下降（Figure 4(a)），表明RLVR训练实质上是对推理树决策节点的优化过程。使用r-score筛选出的前1/3数据训练的模型，其训练准确率和测试准确率均显著优于基于准确率筛选或随机选择的方法（Figure 4(b)(c)），证实了r-score对查询学习潜力的准确量化能力。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_V4zln7XiJj/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of the Reasoning Tree Schedule (Re-Schedule) Algorithm.(a) Tree Construction: For each query, an approximate reasoning tree is constructed by sampling multiple solution paths from a base model (Note: This figureis for illustrative purposes only; our experiments use a tree with a depth of 4 and a width of 4, i.e., k = 4, d = 4.). (b) R-Score Calculation: The tree’s structure is analyzed to compute the r-score, a metric quantifying the query’s learning potential. (c) Dynamic Weighting: The r-scores are used to dynamically weight each query during training, forming a curriculum that progresses from structurally simple (easy) to complex (hard) examples*
@@ -211,7 +215,7 @@ Re-Schedule（Reasoning Tree Schedule）方法的核心思想是：**通过构�
 - **从易到难调度**：Re-Schedule 采用从高 r-score 到低 r-score 的课程顺序，消融实验证实该顺序比反向调度（从难到易）准确率高出约 3.6 个百分点。
 - **节点级修正优于分支级剪枝**：r-score 基于节点级修正（Fix）而非分支级剪枝（Pruning）计算，更贴合 RLVR 训练过程中对关键决策节点的细粒度优化。
 
-## 核心模块与公式推导
+
 
 Re-Schedule 方法围绕三个核心模块构建：推理树构建、推理分数计算和动态权重调度。以下逐一展开其技术细节。
 
@@ -259,7 +263,9 @@ $$A_{i,t} = \frac{R_i - \mathrm{mean}(\{R_k\}_{k=1}^G)}{\mathrm{std}(\{R_k\}_{k=
 
 **关键设计决策**：r-score 采用静态计算（训练前一次性构建树并计算分数），实验表明其与动态更新三次的性能相当（48.3% vs 48.9%），但大幅节省计算开销。节点级修正指标（Fix）优于分支级剪枝指标（Pruning），验证了细粒度节点编辑与 RLVR 训练过程的一致性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：推理树结构调度优于路径准确率调度
 
@@ -330,7 +336,9 @@ Re-Schedule在两个基础模型、六个数学推理基准上均取得最优平
 3. **领域泛化待验证**：目前仅在数学推理和简单代码生成上验证有效，对多模态推理、长链条规划等更复杂任务的适用性尚不明确。
 4. **静态 r-score 的信息损失**：训练前一次性计算 r-score 无法利用训练过程中模型能力演化带来的结构变化信息。虽然实验表明动态更新收益有限（+0.6），但在某些特定场景（如模型能力快速跃升的阶段）可能不是最优选择。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与因果机制
 
@@ -367,6 +375,8 @@ Re-Schedule处于RLVR数据调度方法的演进脉络中，其与基线方法�
 3. **跨领域结构评估泛化**：该方法中基于推理树的结构评估思想是否可以推广至多模态生成、长文本生成等更广泛的序列生成任务？这需要定义适用于不同模态和任务类型的“决策节点”和“编辑预算”概念。
 
 4. **探索-利用权衡的结构化引导**：是否可以将推理树的结构评估与RLVR中的探索-利用权衡结合？高r-score节点可能受益于更多探索（因其具有高学习潜力），而低r-score节点可能需要更多利用（因其结构已接近最优），这种结构化引导可能进一步提高收敛速度和最终性能。
+
+
 
 ## 原文 PDF
 

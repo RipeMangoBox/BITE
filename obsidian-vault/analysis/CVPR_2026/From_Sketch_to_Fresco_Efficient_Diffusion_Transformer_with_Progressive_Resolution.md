@@ -43,7 +43,7 @@ claims:
 > - HunyuanVideo (text-to-video) 上，Total Score 81.10 vs 80.12 (+1.22%)。
 > - FLUX.1-schnell (distilled) 上，Speedup 22.10× vs 1.00× (+22.10×)。
 
-## 概述
+## 概要
 
 扩散Transformer（DiT）已成为高分辨率图像与视频生成的主流架构，但其推理计算开销巨大。现有加速方法中，动态分辨率采样通过先在低分辨率下生成结构再上采样细化来降低计算量，但存在一个关键瓶颈：**每次分辨率切换时独立注入新噪声，破坏了跨阶段的语义一致性，导致去噪轨迹重置并引入伪影**。同时，不加区分地一次性上采样整个潜在空间，忽略了不同令牌的收敛状态差异，在未收敛区域过早分配高分辨率计算资源会放大误差。
 
@@ -55,7 +55,7 @@ claims:
 
 实验表明，Fresco在**FLUX.1-dev**上以30个函数评估步数（NFE）实现**2.81倍加速**，同时ImageReward提升**8.13%**；在**HunyuanVideo**上以23 NFE实现**3.51倍加速**，质量总分提升**1.22%**。Fresco可与步长蒸馏和特征缓存等方法正交叠加：与蒸馏结合可达**22倍加速**，与特征缓存结合可达**9倍训练无关加速**。消融研究证实，基于方差的令牌选择策略在随机、边缘、注意力等多种策略中取得了最佳的速度-质量平衡（4.51倍加速）。
 
-## 背景与动机
+
 
 扩散Transformer（Diffusion Transformer, DiT）已成为文本到图像与文本到视频生成的主流架构，其核心优势在于通过Transformer的自注意力机制建模全局上下文，从而生成高保真、语义一致的视觉内容。然而，DiT的推理过程需要在完整分辨率下执行数十步去噪迭代，每一步都涉及对全部令牌的Transformer前向传播，导致极高的计算开销。以**FLUX.1-dev**（Black Forest Labs, 2024）为例，生成一张1024×1024图像通常需要50个NFE（Number of Function Evaluations），在消费级GPU上耗时数十秒，严重制约了其在实际部署中的可用性。
 
@@ -71,7 +71,9 @@ claims:
 
 Fresco的动机正是从这两个缺口切入：通过构建**统一噪声场**（Token-Encoded Unified Noise Field）来保证跨阶段轨迹的数学连续性，同时引入**基于令牌时间方差的渐进式上采样**策略，使计算资源精准聚焦于语义尚未稳定的令牌。这种设计使得Fresco能够在低分辨率下快速建立全局结构（如同绘制草图），然后仅对语义稳定的区域逐步分配高分辨率计算资源（如同细化壁画细节），从而在显著加速的同时保持甚至提升生成质量。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Fresco的核心创新在于**将动态分辨率采样从“阶段性独立噪声注入”重构为“跨阶段统一的随机轨迹”**，并引入**基于令牌收敛状态的渐进式上采样**，从而在加速扩散Transformer的同时保持甚至提升生成质量。
 
@@ -117,7 +119,7 @@ $$[ \mathbf{z}_1, \mathbf{z}_2, \mathbf{z}_3, \mathbf{z}_4 ] = H_4 \cdot [ \math
 
 消融实验证实了每个创新的独立贡献：基于方差的令牌选择策略在随机、边缘、注意力等策略中取得了最佳的速度-质量平衡（4.51×加速），验证了“收敛状态驱动计算分配”这一核心直觉的合理性。
 
-## 整体框架
+
 
 Fresco 的核心管线围绕两个关键机制展开：**统一噪声场**（Token‑Encoded Unified Noise Field）与**基于令牌时间方差的渐进式上采样**（Progressive Variance‑Guided Upsampling）。整个生成过程从低分辨率开始，逐步将收敛的令牌提升到高分辨率进行细化，从而在保持语义一致性的同时大幅降低计算开销。
 
@@ -166,7 +168,7 @@ $$\mathbf{z}^{(s+1)} = \beta_s \mathbf{z}^{(s)} + \alpha_s \epsilon_{y,x,d}$$
 ![[assets/figures/papers/paper_list_l877_https_arxiv_org_abs_2601_07462/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the Fresco framework. Fresco starts sampling at a reduced resolution while assigning each token a fixed coordinatebound noise vector from a unified noise field. During generation, Fresco tracks each token’s temporal variance: tokens with small variance, indicating stable semantics, are upsampled for high-resolution refinement, whereas unstable tokens remain at low resolution for further denoising. This unified-noise, variance-guided process enables smooth and efficient coarse-to-fine generation*
 
-## 核心模块与公式推导
+
 
 Fresco 框架围绕两个核心机制展开：**统一噪声场（Unified Noise Field）** 与 **基于令牌时间方差的渐进式上采样（Progressive Variance-Guided Upsampling）**。前者解决跨分辨率阶段语义一致性问题，后者实现计算资源的非均匀分配。
 
@@ -231,7 +233,9 @@ Fresco 的完整采样流程可概括为四个协同模块：
 
 这一流程使 Fresco 在无需额外训练的前提下，实现了对现有扩散 Transformer 模型（如 FLUX、HunyuanVideo）的即插即用加速。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -303,7 +307,9 @@ Figure 6 进一步展示了 Fresco 在极低步数下的快速收敛能力：在
 ![[assets/figures/papers/paper_list_l877_https_arxiv_org_abs_2601_07462/figures/006_Table_3.jpg]]
 *Table 3: Quantitative comparison of text-to-image generation with other accleration methods*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题背景与现有方法瓶颈
 
@@ -346,6 +352,8 @@ Fresco的工作为动态分辨率生成开辟了若干值得探索的方向：
 - **跨架构泛化**：统一噪声场和渐进上采样的思想是否可以推广到非Transformer架构（如U-Net）的扩散模型中？这需要重新定义U-Net特征图上的“令牌”概念和方差度量。
 - **训练阶段的嵌入**：统一噪声场目前仅用于推理阶段的采样过程。如果将其嵌入到训练过程中，能否使模型学会利用这种跨分辨率一致性，从而进一步提升生成质量或加速训练收敛？
 - **与其他加速范式的深度融合**：Fresco已初步展示了与步长蒸馏和特征缓存的兼容性，但三者的联合优化策略（如动态分配步长、缓存和分辨率）仍有待系统研究，可能催生更高效的混合加速框架。
+
+
 
 ## 原文 PDF
 

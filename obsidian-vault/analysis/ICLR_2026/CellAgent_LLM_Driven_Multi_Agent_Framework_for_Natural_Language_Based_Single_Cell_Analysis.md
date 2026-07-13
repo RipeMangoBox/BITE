@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/CellAgent_LLM_Driven_Multi_Agent_Framework_for_Natural_Language_Based_Single_Cell_Analysis.pdf
+project_link: null
+code_link: null
 openreview_forum_id: BsA2GNkJhz
 aliases:
 - CellAgent
@@ -41,7 +43,7 @@ claims:
 > - 批次校正 (5个数据集) 上，总得分 (Overall_score) 为 0.67，对比 0.66 (scVI)，变化 +0.01。
 > - 轨迹推断 (8个数据集) 上，总得分 (Overall_score) 为 0.50，对比 0.47 (Slingshot)，变化 +0.03。
 
-## 概述
+## 概要
 
 单细胞RNA测序（scRNA-seq）与空间转录组学数据分析长期面临一个核心瓶颈：它要求研究者同时具备深厚的计算技能和生物学专业知识，而现有工具生态高度碎片化，需要大量手动编程和多工具集成。这一高技术与时间门槛严重阻碍了生物学发现的效率。CellAgent 针对此问题，提出了一种基于LLM的多智能体分层决策框架，将分析流程的分解、执行和质量控制完全自动化。其核心洞察在于：通过将自动化的结果质量评估（Evaluator）与迭代优化机制内嵌于分析流程中，LLM驱动的智能体能够模拟人类专家决策，自主选择最优算法和超参数，在无需人工干预的情况下生成高质量、可复现的分析结果，实现了从自然语言到成品工作流的端到端自动化。
 
@@ -66,7 +68,7 @@ CellAgent 采用 Planner-Executor-Evaluator 三层多智能体架构，并辅以
 
 在与人类专家的对比中，CellAgent 将分析任务完成时间从 13 分钟缩短至 8 分钟，且质量评分高出 0.25。消融实验进一步表明，记忆优化机制对任务成功率的提升具有跨模型鲁棒性，而自反思优化机制能有效筛选最优候选算法，例如在轨迹推断任务中自动选择 Slingshot 并获得最高评分。
 
-## 背景与动机
+
 
 ### 单细胞数据分析的自动化困境
 
@@ -88,7 +90,9 @@ CellAgent 采用 Planner-Executor-Evaluator 三层多智能体架构，并辅以
 
 简言之，CellAgent旨在实现从**自然语言指令到高质量、可复现分析工作流的端到端自动化**，使单细胞数据分析从“手动编程密集型”转变为“自然语言驱动型”，从而将研究者从繁琐的技术细节中解放出来，聚焦于生物学假设的生成与验证。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CellAgent 的核心创新在于将 LLM 驱动的多智能体协作架构与自动化的自反思优化机制深度耦合，从而将单细胞数据分析从“手动编程+人工评估”的范式彻底转变为“自然语言驱动+自动化闭环优化”的范式。这一转变通过四个关键维度的创新实现。
 
@@ -108,7 +112,7 @@ CellAgent 的核心创新在于将 LLM 驱动的多智能体协作架构与自�
 
 传统单次分析缺乏系统性的记忆机制。CellAgent 设计了**全局记忆**与**局部记忆**的双层架构（Section 3.3）：全局记忆仅存储每个子步骤的最终代码，为后续子任务提供上下文连续性；局部记忆作为短期工作区，捕获当前子步骤的完整执行跟踪（包括错误代码和错误信息），支撑 Executor 的**错误自修正**能力。这种记忆隔离设计既保证了跨子任务的信息传递，又避免了冗余或错误信息对后续决策的干扰，是框架高执行成功率的关键支撑。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l49_https_openreview_net_forum_id_BsA2GNkJhz/figures/001_Figure_1.jpg]]
 *Figure 1: Schematic of the CellAgent Framework. Users interact with CellAgent via natural language to obtain high-quality, automated analysis results tailored to their specific needs. Then the framework operates hierarchically, with a high-level Planner that performs fine-grained task decomposition based on input data characteristics and user queries. In the lower-level execution phase, subtasks are completed sequentially. An Executor selects optimal tools from the sc-Omni toolkit to generate and execute code. An Evaluator then rigorously assesses the outcomes, proposing refinements if needed. This self-reflective optimization loop iterates to enhance precision, and the final results from all subtask...*
@@ -135,7 +139,7 @@ CellAgent 是一个基于 LLM 的分层多智能体框架，其核心设计目�
 
 框架整体架构如 **Figure 1** 所示，展示了从用户自然语言交互、Planner 任务分解、Executor 工具选择与代码生成、Evaluator 质量评估到最终结果合成的完整层次化工作流。sc-Omni 工具包（**Table 2**）集成了覆盖预处理、基础分析和高级分析三个层次的 18 项分析任务，为 Executor 提供了丰富的工具选择空间。框架支持的八大核心分析任务详见 **Table 3**，涵盖批次校正、细胞类型注释、轨迹推断、空间域识别、空间插补等单细胞与空间转录组学分析的关键需求。
 
-## 核心模块与公式推导
+
 
 ### 架构总览
 
@@ -208,7 +212,9 @@ $$\mathrm{Overall} = \sqrt[4]{\mathrm{cor_{dist}} \times \mathrm{edgeflip} \time
 
 $$\mathrm{AS} = \frac{1}{4} (\mathrm{RANK_{PCC}} + \mathrm{RANK_{SSIM}} + \mathrm{RANK_{RMSE}} + \mathrm{RANK_{JS}})$$
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 
@@ -276,7 +282,9 @@ CellAgent 在覆盖单细胞 RNA 测序（scRNA-seq）与空间转录组学（ST
 ![[assets/figures/papers/paper_list_l49_https_openreview_net_forum_id_BsA2GNkJhz/figures/050_Table_6.jpg]]
 *Table 6: Overview of trajectory inference datasets. The table summarizes the key characteristics of the datasets used for trajectory inference evaluation, including the number of cells, gene count, and the trajectory type (e.g., linear, bifurcation, cycle, or multifurcation) for each dataset*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心设计思路与定位
 
@@ -338,6 +346,8 @@ CellAgent 的设计目标之一是降低单细胞分析的技术门槛。与人�
 - **跨模态泛化能力**：当前框架专注于转录组学数据，其在蛋白质组学、表观基因组学等其他单细胞模态上的适用性尚待验证。
 - **评估指标的完备性**：自反思优化依赖于 Evaluator 使用的自动化指标，这些指标是否在所有生物学场景下都能准确反映分析质量，仍需生物学家的经验性验证。
 - **计算成本与可及性**：多次迭代的 LLM 调用和多候选代码执行带来的计算开销，是否会在大规模数据集上成为实际应用的瓶颈，论文未提供详细分析。
+
+
 
 ## 原文 PDF
 

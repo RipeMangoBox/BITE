@@ -5,6 +5,8 @@ paper_level: A
 venue: SIGGRAPH ASIA
 year: 2024
 pdf_ref: paperPDFs/SIGGRAPH_ASIA_2024/GVHMR_World_Grounded_Human_Motion_Recovery_via_Gravity_View_Coordinates.pdf
+project_link: https://zju3dv.github.io/gvhmr
+code_link: null
 aliases:
 - WGHMRGVC
 tags:
@@ -40,7 +42,7 @@ claims:
 > - EMDB (camera-space) 上，PA-MPJPE (mm) 44.2 (GVHMR) vs 49.4 (WHAM, no FlipEval) (-5.2)。
 > - 3DPW (camera-space) 上，PA-MPJPE (mm) 36.2 vs 35.9 (WHAM, slightly worse by 0.3 mm) (+0.3)。
 
-## 概述
+## 概要
 
 从单目视频中恢复世界坐标系下的人体运动，是计算机视觉与图形学中的一项核心挑战。其根本瓶颈在于：世界坐标系的定义本身存在模糊性——相机坐标系中的“上”并不等同于物理世界的重力方向，导致现有自回归方法在沿重力轴累积误差，难以保持长期运动一致性。
 
@@ -52,7 +54,7 @@ claims:
 
 该方法目前聚焦单人场景，其预处理依赖2D关键点检测与相机旋转估计，在极端遮挡或快速旋转场景下仍可能受到影响。
 
-## 背景与动机
+
 
 从单目视频中恢复三维人体运动是计算机视觉与图形学领域的核心问题，其应用涵盖虚拟现实、人机交互、运动分析等场景。近年来，基于数据驱动的方法在相机空间（camera space）的人体姿态估计上取得了长足进步，但在恢复**世界接地人体运动**（world-grounded human motion）——即在一个具有物理重力参照的世界坐标系下还原人体的绝对位置与朝向——方面仍面临根本性挑战。
 
@@ -62,7 +64,9 @@ claims:
 
 **本文动机。** 针对上述瓶颈，本文提出一个关键洞察：如果能在网络内部建立一个**由世界重力和相机视角唯一确定的坐标系**作为方向预测的目标空间，就可以切断误差沿时间累积的路径。具体而言，重力-视角（Gravity-View, GV）坐标系将人体朝向的学习目标与物理重力对齐，使每帧的方向预测成为一个明确定义的问题；随后，通过相邻帧 GV 系统间的相对旋转（仅绕重力轴的一维旋转）即可将所有帧对齐到统一世界坐标系，从而在**避免自回归**的同时保持重力一致性。这一设计将全局运动恢复从“逐帧累积相对量”转变为“每帧独立预测绝对方向 + 帧间对齐”，从机制上消除了长期漂移的根源。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GVHMR的核心创新在于通过**重新定义人体方向预测的坐标系**，从根本上切断了单目视频中世界接地运动恢复的累积误差传播路径。该方法的三个关键创新点构成了一条完整的因果链：**GV坐标系的定义 → 全局方向的非自回归恢复 → 长序列Transformer架构的适配**。
 
@@ -113,7 +117,7 @@ GVHMR在世界接地人体运动恢复这一任务上，与以下方法形成对
 - **TRAM**（Wang et al., arXiv 2024）和 **WHAC**（Yin et al., arXiv 2024）：利用SLAM或视觉里程计进行坐标系转换，GVHMR的创新在于将坐标系定义与人体运动预测解耦，并通过GV坐标系的巧妙定义简化了帧间对齐问题。
 - **HMR2.0**（Goel et al., ICCV 2023）、**VIBE**（Kocabas et al., CVPR 2020）、**TCMR**（Choi et al., CVPR 2021）：单帧或视频人体姿态估计方法，GVHMR在此基础上增加了世界接地运动恢复能力。
 
-## 整体框架
+
 
 GVHMR的整体流水线遵循“预处理→早融合→相对Transformer→多任务MLP头→全局轨迹构建→后处理IK优化”的级联结构，如图3和图6所示。其核心设计目标是在避免自回归的前提下，直接回归整个运动序列，从而切断误差沿时间累积的路径。
 
@@ -181,7 +185,7 @@ Transformer输出的时序特征被送入多个并行的MLP头，同时预测四
 ![[assets/figures/papers/paper_list_l1648_GVHMR_World_Grounded_Human_Motion_Recovery_via_Gravity_View_Coordinates/figures/001_Figure_1.jpg]]
 *Figure 1: Overview. Given an in-the-wild monocular video, our method accurately regresses World-Grounded Human Motion: 4D human poses and shapes in a gravity-aware world coordinate system. The proposed network, excluding preprocessing (2D human tracking, feature extraction, relative camera rotation estimation), takes 280 ms to process a 1430-frame video (approximately 45 seconds) on an RTX 4090 GPU*
 
-## 核心模块与公式推导
+
 
 GVHMR 的核心架构由**预处理、早融合、相对Transformer、多任务MLP头、全局轨迹构建、后处理IK优化**六个模块级联而成（Fig. 3, Fig. 6）。其关键创新在于将人体方向预测从传统的相机坐标系迁移到**重力-视角（GV）坐标系**，并通过GV系统间的相对旋转实现无自回归的全局运动恢复。
 
@@ -239,7 +243,9 @@ $$m^{ts} = \begin{cases} 0, & \text{if } -L < t-s < L, \\ -\infty, & \text{other
 ![[assets/figures/papers/paper_list_l1648_GVHMR_World_Grounded_Human_Motion_Recovery_via_Gravity_View_Coordinates/figures/002_Figure_2.jpg]]
 *Figure 2: Comparison of coordinate systems. In camera coordinates, a person may appear inclined due to the camera’s roll and pitch movement. In contrast, in GV coordinates, the person is naturally aligned with gravity*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 世界接地运动恢复性能
 
@@ -300,7 +306,9 @@ Table 3在RICH数据集上系统消融了GVHMR各关键组件，揭示了以下�
 ![[assets/figures/papers/paper_list_l1648_GVHMR_World_Grounded_Human_Motion_Recovery_via_Gravity_View_Coordinates/figures/010_Table_3.jpg]]
 *Table 3: Ablation studies. We compare our method with seven variants on the RICH [Huang et al. 2022] dataset (Refer to Sec. 4.4 for details). ∗ denotes the variant that employs the sliding window*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心瓶颈与因果机制
 
@@ -355,6 +363,8 @@ GVHMR 依赖 2D 关键点检测、人体跟踪和相机相对旋转估计等预�
 4. **高动态运动优化**：后处理 IK 优化对极快运动或高动态动作的鲁棒性如何？是否需要引入物理约束或动力学先验来增强优化稳定性？
 
 5. **跨任务推广**：GV 坐标系的思路——通过引入稳定的几何参照消除方向歧义——能否推广到其他视觉任务？例如物体姿态估计、场景理解等需要处理方向模糊性的领域。
+
+
 
 ## 原文 PDF
 

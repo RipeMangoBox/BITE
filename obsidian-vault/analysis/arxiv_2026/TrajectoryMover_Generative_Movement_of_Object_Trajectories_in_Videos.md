@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2026
 pdf_ref: paperPDFs/arxiv_2026/TrajectoryMover_Generative_Movement_of_Object_Trajectories_in_Videos.pdf
+project_link: null
+code_link: null
 aliases:
 - TrajectoryMover
 tags:
@@ -41,7 +43,7 @@ claims:
 > - TrajectoryAtlas test set (40 videos) 上，IoU_traj ↑ (轨迹遵循度) 0.27 vs 0.23 (SFM) / 0.18 (ATI) (+0.04 / +0.09)。
 > - TrajectoryAtlas test set user study 上，Bradley‑Terry plausibility strength u_m ↑ 1.25 vs 0.10 (SFM) / -0.27 (ATI) (+1.15 / +1.52)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：视频中移动物体轨迹是一项直观且高频的编辑需求，但现有方法面临根本性障碍——缺乏用于物体轨迹移动任务的成对训练数据，难以直接生成保持原始相对运动但改变起始位置的配对视频。传统方案要么依赖用户手工指定完整的 2D/3D 轨迹控制信号，要么通过外部深度估计间接转换轨迹，过程繁琐且难以保证场景交互的物理合理性。
 
@@ -51,7 +53,7 @@ claims:
 
 **方法定位**：TrajectoryMover 属于基于扩散模型的视频编辑方法，与 **ATI**（Wang et al., arXiv 2025，基于 2D 轨迹控制的图像到视频生成）、**SFM**（基于 3D 代理网格的运动编辑）、**DaS**（基于 3D 点轨迹的视频编辑）、**VACE**（支持边界框轨迹参考的对象移动编辑）及 **I2VEdit**（首帧编辑传播）等方案形成对比。其独特之处在于通过合成数据驱动的方式，将复杂的轨迹控制简化为双边界框输入，并在统一的 V2V 框架内同时处理物体身份保持与场景交互合理性。
 
-## 背景与动机
+
 
 ### 视频编辑中的轨迹移动需求
 
@@ -83,7 +85,9 @@ claims:
 
 这种设计从根本上规避了真实配对数据缺失的问题，同时将复杂的 3D 轨迹推理隐式地交由生成模型在合成数据上学习，从而在控制简洁性与生成质量之间取得了平衡。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 TrajectoryMover 的核心创新在于将视频中物体轨迹移动重新定义为**视频到视频（V2V）的生成任务**，并通过三个关键设计突破现有方法的瓶颈。
 
@@ -118,7 +122,7 @@ TrajectoryMover 基于 Wan2.1-T2V-1.3B 扩散模型构建，通过三流潜变�
 
 **创新总结**：TrajectoryMover 通过“合成数据管道 + V2V 任务重定义 + 交替训练策略”的组合，将轨迹移动从缺乏监督的编辑问题转化为可学习的生成问题，仅需简单的边界框控制即可实现保持物体身份和场景合理性的轨迹平移。
 
-## 整体框架
+
 
 TrajectoryMover 将视频中物体轨迹的移动重新定义为**视频到视频（V2V）的生成任务**。其整体框架由两个核心模块串联构成：**TrajectoryAtlas 数据生成管道**和**TrajectoryMover 视频生成器**。前者负责自动合成大规模、物理合理的配对训练数据，后者利用这些数据微调扩散模型，实现从源视频到目标视频的轨迹平移。
 
@@ -153,7 +157,7 @@ $$y_i = x_i + \delta$$
 ![[assets/figures/papers/paper_list_l65_https_arxiv_org_abs_2603_29092/figures/001_Figure_1.jpg]]
 *Figure 1: TrajectoryMover enables intuitive video editing by allowing users to translate an object’s 3D motion path to a new starting location using simple bounding box controls across diverse and complex scenarios, including drop, roll, and drag motions. Our model successfully aligns the generated trajectory with the target initial location. Furthermore, the model dynamically adapts the motion to the new path to ensure physical plausibility, seamlessly handling novel scene interactions such as realistic collisions with the environment*
 
-## 核心模块与公式推导
+
 
 ### 问题形式化
 
@@ -209,7 +213,9 @@ $$P(i \succ j) = \frac{e^{u_i}}{e^{u_i} + e^{u_j}}$$
 ![[assets/figures/papers/paper_list_l65_https_arxiv_org_abs_2603_29092/figures/009_Figure.jpg]]
 *Figure: Fig. B.2. Drag trajectory variants. We visualize the three planar drag references used in our simulator: spiral (left), circular (middle), and S-shaped (right), rendered from the scene camera as 3D trajectories. Each curve shows directed start-to-goal progression and highlights the motion templates used for drag supervision*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：与基线方法的全面对比
 
@@ -269,7 +275,9 @@ Table 2 和 Fig. 5 系统消融了 TrajectoryAtlas 数据生成管道和训练�
 ![[assets/figures/papers/paper_list_l65_https_arxiv_org_abs_2603_29092/figures/010_Figure.jpg]]
 *Figure: Fig. C.1. User study interface. Participants compare two anonymized videos (A/B) from the same source-target setup and select the one with more natural and coherent object motion. The guidance text standardizes the evaluation criteria (motion stability, object consistency, trajectory reasonableness, and scene interaction plausibility). The same interface format is used for all user study experiments in this project*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位与问题边界
 
@@ -320,6 +328,8 @@ TrajectoryMover 在以下几个设计维度上做出了区别于基线的选择�
 3. **多物体与动态场景扩展**：如何利用更丰富多样的数据（例如多物体交互、动态摄像机、非刚性物体）扩展模型的适用范围？这要求 TrajectoryAtlas 数据管道支持更复杂的物理模拟和场景配置。
 
 4. **控制信号的表达力与简洁性平衡**：当前两个边界框的控制方式极为简洁，但可能不足以表达复杂的运动意图（如轨迹形状修改、速度变化）。如何在保持用户友好的前提下增强控制信号的表达力，是实用化的关键问题。
+
+
 
 ## 原文 PDF
 

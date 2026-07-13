@@ -43,7 +43,7 @@ claims:
 > - Matterport3D (零样本语义分割) 上，f-mIoU 18.7 vs 14.0 (SceneSplat) (+4.7)。
 > - ScanNet200 (零样本实例分割) 上，mAP 19.6 vs 17.8 (Mosaic3D) (+1.8 (+7.6尾类))。
 
-## 概述
+## 概要
 
 3D高斯泼溅（3DGS）已成为高质量场景重建的核心表示，然而现有3DGS场景编码器仅依赖单一教师信号（如语义对齐），无法获取实例分组和精细空间结构信息，导致特征表示不够全面，跨任务迁移能力弱。**Chorus** 提出了一种多教师预训练框架，利用互补的2D基础模型教师——语言对齐（SigLIP2）、通用视觉（DINOv3）与物体感知（PE-Spatial）——进行联合蒸馏，通过共享编码器加轻量投影头将多样化知识压缩到统一嵌入空间。
 
@@ -59,7 +59,7 @@ claims:
 
 **方法定位**：Chorus继承并扩展了SceneSplat的“上提-对齐”范式，将单一语言教师扩展为多教师蒸馏体系，同时引入3DGS感知的数据增强和在线渲染-蒸馏适配策略，在3DGS场景编码与点云预训练之间架起桥梁。
 
-## 背景与动机
+
 
 ### 3D场景表示从点云到3D高斯的演进
 
@@ -100,7 +100,9 @@ claims:
 
 这些设计使Chorus在显著更少的预训练场景下（相较Sonata减少约39.9倍），仍能在零样本语义分割、开放词汇实例分割和场景问答等多个任务上取得领先性能。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Chorus 的核心创新在于将 3DGS 场景编码从**单一教师蒸馏**范式升级为**多教师联合蒸馏**范式，并通过一系列配套设计实现了更全面、更高效、更可迁移的场景表示。
 
@@ -153,7 +155,7 @@ Chorus 的另一个关键创新是其**点云变体**：仅使用高斯中心、
 
 **总结**：Chorus 的核心创新可归纳为三个 changed slots——（1）教师信号从单一语言对齐扩展为语言+通用视觉+物体感知的多教师互补蒸馏；（2）域外适应从离线预计算伪标签转变为在线渲染蒸馏；（3）数据增强从通用点云扰动升级为 3DGS 参数空间感知的扰动。这三项创新共同实现了更结构化、更数据高效、跨模态可迁移的 3D 场景表示。
 
-## 整体框架
+
 
 Chorus 构建了一个“上提-对齐”（lift-then-align）的多教师预训练框架，其核心目标是将互补的 2D 基础模型知识蒸馏到统一的 3D 高斯场景编码器中。整个 pipeline 由三个关键阶段串联而成：**多教师预训练**、**渲染式适配**与**任务特定迁移**（Figure 2）。
 
@@ -209,7 +211,7 @@ $$Z = g_{\theta}(\mathcal{G}) \in \mathbb{R}^{N \times d_z}$$
 ![[assets/figures/papers/paper_list_l2077_https_arxiv_org_abs_2512_17817/figures/003_Figure_3.jpg]]
 *Figure 3: Rendering-Based View Sampling and Pairing: (a) Camera Location Sampling: We use Furthest Point Sampling to select camera positions that achieve broad spatial coverage across the entire navigable scene space. (b) Visibility Culling: For each location, we sample view angles and track the visibility of the 3D Gaussians across frames. (c) View Pairing and Selection: We obtain a minimum 2D bounding box covering all visible Gaussians for a given view. Candidate pairs of poses are then calculated and sorted based on the overlap score. (d,e,f) Rendered images corresponding to the colored camera viewpoints*
 
-## 核心模块与公式推导
+
 
 ### 3DGS场景参数化与渲染
 
@@ -273,7 +275,9 @@ $$\mathcal{L}_{\mathrm{img}}^{(t)} = \frac{1}{|\Omega|} \sum_{(p,\mathbf{u})\in\
 
 这一设计的关键价值在于：避免了传统方法中约1 TB的3D伪标签预计算存储开销（Table 7显示存储从1080 GB降至8 GB），同时将适配延迟控制在每视图0.1秒以内。消融实验（Figure 5）表明，即使使用30×40的低分辨率DINOv3特征，也能产生明显的性能改善。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与实验设计逻辑
 
@@ -346,7 +350,9 @@ Table 8的实例检索实验评估了特征对点云扰动的鲁棒性。在Scan
 ![[assets/figures/papers/paper_list_l2077_https_arxiv_org_abs_2512_17817/figures/019_Table_10.jpg]]
 *Table 10: Robustness to 3DGS Optimization and Density*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 技术谱系与继承关系
 
@@ -385,6 +391,8 @@ Chorus 直接构建在 **SceneSplat** 提出的“上提-对齐”（lift-then-a
 4. **教师组合的完备性**：当前三类教师（语言对齐、通用视觉、物体感知）是否覆盖了场景理解的必要维度？是否存在其他互补信号（如几何结构、时序一致性）可进一步丰富表示空间？
 
 5. **自监督信号的融合**：Chorus 完全依赖 2D 教师监督，未利用 3DGS 渲染的自监督信号（如新视角合成一致性）。将自监督目标与多教师蒸馏结合，可能进一步提升数据效率和表示质量。
+
+
 
 ## 原文 PDF
 

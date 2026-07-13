@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/AbsTopK_Rethinking_Sparse_Autoencoders_For_Bidirectional_Features.pdf
+project_link: null
+code_link: null
 aliases:
 - AS
 - AbsTopK
@@ -42,7 +44,7 @@ claims:
 > - Qwen3-4B, Layer 18 上，HarmBench (↑) 为 81.3，对比 17.0 (Original)，变化 +64.3。
 > - Qwen3-4B, Layer 18 上，SCR (↑) 为 0.35，对比 0.26 (TopK)，变化 +0.09。
 
-## 概述
+## 概要
 
 当前主流稀疏自编码器（ReLU、JumpReLU、TopK）通过非负约束确保激活稀疏，但这一隐含强制丢弃了负激活，导致表示能力被限制：像“男性 ↔ 女性”这样的双向语义轴被强制拆分为两个独立、单向的基向量，且往往丢失一个方向。本文指出，核心瓶颈是非负指示函数 $\iota_{z \ge 0}$，其直接导致双向语义的碎片化。
 
@@ -50,7 +52,7 @@ claims:
 
 核心结论：在 Gemma‑2‑2B 第 12 层，AbsTopK 产生的双向特征占比达 29.7%（其中对对立含义的识别率为 20.2%），远超 TopK 的 5.3%（对立含义 2.6%）。在下游操控任务中，AbsTopK 在所有稀疏度水平下均取得更低重构误差（图 3），并在安全‑效用折中（HarmBench 与 MMLU 同时提升）方面优于所有无监督基线，在多项探针和操控指标（SCR、TPP 等）上达到或超过有监督 Difference‑in‑Means 方法。这些结果表明，移除无根据的非负约束可显著提升稀疏表示的紧凑性和表达能力。
 
-## 背景与动机
+
 
 大规模语言模型的内部表征历来难以解释。线性表征假说（linear representation hypothesis）认为，模型的隐藏状态可以分解为潜在概念向量的叠加：
 
@@ -86,7 +88,9 @@ $$[\mathrm{AbsTopK}_k(\mathbf{u})]_i = \begin{cases} u_i, & i \in \mathcal{T}_k(
 
 这一设计的预期收益在于：在同等稀疏度下，AbsTopK 的潜在空间承载更丰富的结构化语义。初步证据显示，在 Gemma-2-2B 第 12 层，AbsTopK 所产生的双向特征占比达到 29.7%，其中含义相对立的特征占 20.2%，而 TopK SAE 的对应比例仅为 5.3% 和 2.6%（Table 2），这直接验证了移除约束的必要性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 AbsTopK 的核心创新在于揭示了现有 SAE 变体（ReLU、JumpReLU、TopK）的一个隐藏瓶颈，并通过一个简洁的 slot 级修改将其消除，从而根本性提升了特征表示的语义密度。
 
@@ -116,7 +120,7 @@ $$ [\mathrm{AbsTopK}_k(\mathbf{u})]_i = \begin{cases} u_i, & i \in \mathcal{T}_k
 
 这表明，移除符号约束并非简单地保留了更多信息，而是创造了一种全新的、更符合人类认知的特征结构。这种结构上的优势直接转化为下游任务中的因果操控能力。在 Qwen3-4B 第 18 层，AbsTopK 在专门的转向鲁棒性评估任务上显著超越了 TopK（SCR: 0.35 vs. 0.26; TPP: 0.36 vs. 0.31），表明这些紧凑的双向特征让激活空间操控更精准、高效。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0005_EEs6I4cO7S_AbsTopK_Rethinking_Sparse_Autoencoders_For_Bidir/figures/002_Figure_2.jpg]]
 *Figure 2: Toy example where man ≈ male + people and woman ≈ female + people: a non-negative SAE needs two separate gender features, whereas AbsTopK uses one signed gender feature*
@@ -178,7 +182,7 @@ $$
 
 该框架保持了与 TopK SAE 相同的计算复杂度，唯一的差异在于稀疏选择从“最大的 $k$ 个正值”变为“最大的 $k$ 个绝对值”，从而实现了双向语义特征的捕获能力。
 
-## 核心模块与公式推导
+
 
 AbsTopK SAE 沿用了稀疏自编码器的通用结构，由编码器、稀疏激活模块和解码器三个核心部件构成。其关键创新在于将稀疏激活函数的近端算子由传统的非负阈值替换为 **绝对值 TopK（AbsTopK）**，从而解除激活非负的限制，使单个潜在特征能够同时携带正、负两个方向的信号，编码双向语义轴。
 
@@ -247,7 +251,9 @@ $$
 
 在实际训练中，稀疏度 $k$ 固定，端到端优化均方误差。AbsTopK 的策略同等适用于所有模型与层，无需额外的非负限制，从而在重构质量、下游操控任务和双向特征比例上均优于 TopK 和 JumpReLU（见表1、表2、图3、图4）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 安全‑效用折中与操控效果
 
@@ -283,7 +289,9 @@ Figure 4（Qwen3‑4B第18层）和Table 3（扩展到Gemma‑2‑2B第12/16
 
 在极高稀疏度（保留极少数激活）下，所有SAE的重构误差都会上升，AbsTopK的优势可能缩小，但没有出现突然的退化拐点。AbsTopK依然是一个单步近端梯度编码器，未探索多步迭代架构，可能丢失更精细的表示结构。此外，实验集中在中型LLM（≤12B），在大规模模型上的行为有待验证。基于LLM的自动可解释性评分仅作辅助证据，核心结论由操控任务和重构质量支撑。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 **核心瓶颈**：现有主流 SAE 变体（ReLU、JumpReLU、TopK）的稀疏化算子均隐式或显式地包含非负指示函数 $\iota_{z \ge 0}$，强制激活只保留正值。这一设计直接导致任何一个具有双向语义轴的概念（如“男性 ↔ 女性”、“安全 ↔ 危险”）必须被拆分为两个独立、单向的字典原子——一个携带正方向信息，另一个携带负方向信息，而原始语义轴的对立结构被碎片化甚至丢失（见 Figure 2 玩具示例与 Table 2 的定量证据：TopK 在 Gemma-2-2B 第 12 层仅有 5.3% 的双面特征，其中具有对立含义的比例仅 2.6%）。
 
@@ -338,6 +346,8 @@ $$\mathrm{AbsTopK}_k(\mathbf{u})_i = \begin{cases} u_i, & i \in \mathcal{T}_k(|\
 4. **双向特征在不同语义结构上的适用性差异**：当前实验主要聚焦于“对立轴”型概念（性别、安全/危害、情感极性）。对于具有内在层次结构的概念（如“金门大桥”由“桥”、“金门”、“旧金山”等多级属性构成），双向特征是否仍然保持紧凑，还是会导致新的碎片化形式？这一点缺乏系统性的语义结构分类研究。
 
 5. **安全操控的双刃剑效应**：Figure 4 和 Table 6 显示深层 AbsTopK 在提升 HarmBench 安全分数的同时显著降低了 MMLU 效用分数。这是稀疏操控技术的固有张力，还是 AbsTopK 的双向特征在特定层上过度泛化所导致的副作用？需要通过更细粒度的层间干预权重调谐和概念向量分解来深度分析。
+
+
 
 ## 原文 PDF
 

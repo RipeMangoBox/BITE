@@ -43,7 +43,7 @@ claims:
 > - HDTF 上，PSNR（自重建） 24.14（Ours Sub#2） vs 23.43（LAM） (+0.71)；CSIM（跨重建） 0.886（Ours Sub#2） vs 0.849（LAM） (+0.037)。
 > - 推理效率 上，FPS（A100，基于神经渲染的方法） 85.94（Ours Sub#2） vs 22.70（GPAvatar） (+约63（约3.8×）)。
 
-## 概述
+## 概要
 
 **核心问题**：现有单图3D头像重建方法在计算效率与细节层次可控性上存在显著瓶颈。以GAGAvatar、LAM为代表的方案在高分辨率网格上执行交叉注意力，其计算成本随细分级别指数增长；同时，这些方法普遍缺乏对肩部等非头部区域的有效建模，导致高斯点冗余、推理速度慢且头像不完整。
 
@@ -57,7 +57,7 @@ claims:
 
 **局限与展望**：模型依赖FLAME先验和精确3DMM跟踪，大角度旋转（>±60°）下出现明显伪影；性能在2级细分后趋于饱和，受限于DINOv2特征图分辨率。未来可探索更高分辨率特征提取器及多视角数据融合以突破当前瓶颈。
 
-## 背景与动机
+
 
 ### 单图3D头像重建的效率困境
 
@@ -77,7 +77,9 @@ claims:
 
 这一设计使得OMG-Avatar在单张A100 GPU上实现85.94 FPS的实时重演，同时支持推理时动态选择LOD级别，为不同算力场景提供了灵活的效率-质量权衡。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 OMG-Avatar 的核心创新在于将**全局-局部特征提取与网格细分过程彻底解耦**，从而以极低的计算开销实现多细节层次（multi-LOD）的可控高斯头部头像重建。与现有单图方法（如 GAGAvatar、LAM）在高分辨率网格上直接执行昂贵的交叉注意力不同，OMG-Avatar 仅在初始低分辨率网格（5023 顶点）上计算一次交叉注意力，随后通过**粗到细的逐步细分**和**投影采样**高效扩展特征空间，配合**深度缓冲引导的遮挡感知融合**，在显著降低计算复杂度的同时，实现了对非头部区域（肩部）的完整建模。
 
@@ -121,7 +123,7 @@ $$c_s, o_s, s_s, r_s, O_s = \mathrm{Flatten}(\mathrm{Conv}(F_{local}^{GS}) \odot
 
 OMG-Avatar 支持推理时动态选择细分级别（Sub#0 至 Sub#2），实现计算量与重建质量的灵活权衡。低分辨率 LOD（Sub#1，仅约 29K 高斯点）的性能已**超越 LAM（80K 点）和 GAGAvatar（180K 点）**（表 1、表 2），充分验证了粗到细策略的有效性。最高细分级别（Sub#2）在 VFHQ 上达到 PSNR 22.72、LPIPS 0.091，均优于所有基线方法。
 
-## 整体框架
+
 
 OMG‑Avatar 的整体流水线围绕 **单张图像 → 可驱动多细节层次高斯头像** 这一目标设计，核心思路是将昂贵的全局注意力计算与网格细分过程解耦，并通过遮挡感知融合和多区域建模提升头像的完整性与细节可控性。图 1 给出了框架的全貌，主要包含以下阶段：
 
@@ -150,7 +152,7 @@ OMG‑Avatar 的整体流水线围绕 **单张图像 → 可驱动多细节层�
 ![[assets/figures/papers/paper_list_l1031_https_arxiv_org_abs_2603_01506/figures/001_Figure_1.jpg]]
 *Figure 1: The overall pipeline of OMG-Avatar framework. Our method extracts global features via cross-attention and local details via projection-based sampling, which are fused under the guidance of depth buffers. A coarse-to-fine strategy is proposed to facilitate hierarchical detail perception. The head and shoulder are predicted separately using shared features and then combined for rendering*
 
-## 核心模块与公式推导
+
 
 OMG-Avatar 的核心设计围绕一个关键洞察展开：**将昂贵的交叉注意力操作限制在初始低分辨率网格上，随后通过粗到细的网格细分与投影采样高效扩展特征空间**。这一策略从根本上解决了现有方法（如 LAM 在高分辨率网格上直接计算注意力）面临的计算复杂度随细分级别指数增长的问题。
 
@@ -230,7 +232,9 @@ $$
 ![[assets/figures/papers/paper_list_l1031_https_arxiv_org_abs_2603_01506/figures/007_Figure_4.jpg]]
 *Figure 4: Our local-global feature fusion (OAFF) and multiregion fusion strategy significantly improve identity consistency and completeness in non-head regions. The neural refiner further boosts visual fidelity, especially for dynamic facial expressions*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -290,7 +294,9 @@ OMG-Avatar 在 VFHQ 和 HDTF 两个数据集上进行了自重建与跨身份重
 ![[assets/figures/papers/paper_list_l1031_https_arxiv_org_abs_2603_01506/figures/014_Figure_8.jpg]]
 *Figure 8: Comparision with state-of-the-art methods that support one-shot, feed-forward 3D avatar reconstruction with real-time facial reenactment*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 **核心瓶颈与因果机制**
 
@@ -332,6 +338,8 @@ OMG-Avatar 属于**单样本前馈高斯头部头像重建**方法，与以下�
 2. 如何高效地结合多视角或3D扫描数据，提升在大角度旋转下的鲁棒性？当前方法在±60°外的伪影问题需要额外的几何先验来解决。
 
 3. 该方法能否直接扩展到全身或多人物头像的生成，且保持实时性？多区域建模策略（第3.3节）为扩展提供了技术基础，但全身建模涉及更复杂的几何约束和更大的特征空间。
+
+
 
 ## 原文 PDF
 

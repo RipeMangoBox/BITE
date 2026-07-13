@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Beyond_Visual_Reconstruction_Quality_Object_Perception_aware_3D_Gaussian_Splatting_for_Autonomous_Driving.pdf
+project_link: null
+code_link: https://github.com/Shanicky-RenzhiWang/Perception-aware-3DGS
 openreview_forum_id: PmQlMTBmpa
 aliases:
 - PA3TPALOZQL
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 超越视觉重建质量：面向自动驾驶的物体感知增强3D高斯泼溅 |
 | 英文题名 | Beyond Visual Reconstruction Quality: Object Perception-aware 3D Gaussian Splatting for Autonomous Driving |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=PmQlMTBmpa); [GitHub](https://github.com/Shanicky-RenzhiWang/Perception-aware-3DGS) |
+| Links | [paper](https://openreview.net/forum?id=PmQlMTBmpa) · [GitHub](https://github.com/Shanicky-RenzhiWang/Perception-aware-3DGS) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Perception-aware 3DGS Training with Perception-aligned Loss and Object Zone Quality Loss |
 | Dataset | Waymo Open Dataset |
@@ -42,7 +44,7 @@ claims:
 > - Waymo Open Dataset 上，mean IoU (YOLOv8) 为 0.876 (S³Gaussian+L_perc+L_obj-vis)，对比 0.803 (S³Gaussian)，变化 +0.073。
 > - Waymo Open Dataset 上，Miss (YOLOv8) 为 0.0 (S³Gaussian+L_perc+L_obj-vis)，对比 1.5 (S³Gaussian)，变化 -1.5。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -71,7 +73,7 @@ claims:
 
 本工作属于**3DGS重建训练范式**的改进，不改变网络架构或渲染管线，而是通过损失函数层面的感知注入，将重建目标从“视觉保真”扩展为“视觉保真+感知可用”。其设计思路可泛化至其他重建基线和感知任务，为自动驾驶场景重建的下游任务可用性提供了新的优化维度。
 
-## 背景与动机
+
 
 ### 自动驾驶场景重建的感知需求错位
 
@@ -111,7 +113,9 @@ $$
 
 这两种方法均作为即插即用的损失项集成到现有3DGS训练流程的细阶段，无需修改网络架构或感知模型权重，为自动驾驶场景重建提供了一条从“视觉导向”到“感知导向”的范式转换路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于将自动驾驶场景重建的优化目标从单一的视觉保真度扩展到**感知稳定性**，并为此提出了两个互补的训练策略：**感知对齐损失**和**对象区域质量损失**。这两种方法均作为即插即用的损失项嵌入现有3DGS训练流程，在不显著牺牲全局视觉质量的前提下，大幅提升重建场景对下游感知任务的可用性。
 
@@ -145,7 +149,7 @@ $$
 
 实验表明，在S³Gaussian上同时使用两种损失后，YOLOv8的mAP从0.550提升至0.700，miss率从1.5降至0.0，而SSIM仅从0.924微降至0.920（Table 4）。在黑盒检测器Faster R-CNN上，EMD(OmniRe)组合方案的mAP从0.320提升至0.404（Table 6），验证了感知稳定性的跨模型迁移能力。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l34_https_openreview_net_forum_id_PmQlMTBmpa/figures/004_Figure_2.jpg]]
 *Figure 2: Overview of this work. Perception stability is measured by comparing the outputs of the same perception model when fed with the original frames versus the reconstructed frames. Based on the perception outputs and the object regions identified by the perception model, we designed a perception-aligned loss and an object zone quality loss to improve perception stability*
@@ -198,7 +202,7 @@ $$\mathcal{L}_{total} = \lambda_{\mathrm{visual}} \cdot \mathcal{L}_{\mathrm{vis
 
 核心洞察在于：将冻结感知模型的输出一致性作为优化目标（感知对齐损失），或通过关注物体区域的局部重建质量（对象区域质量损失），能够在不显著降低全局视觉质量的前提下，大幅提升重建场景对下游感知任务的可用性。决定性证据表明，融入感知对齐损失后，YOLOv8 mAP最高提升至0.700（S³Gaussian基线为0.550），miss率降至0.0，而视觉质量波动小于1%（Table 4）。对象区域质量损失在保持视觉质量的同时将物体区域SSIM从0.877提升至0.924，且计算开销远小于感知损失（Table 4, Table 5）。
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题形式化：约束优化视角
 
@@ -270,7 +274,9 @@ $$
 
 所有实验统一采用 5000 步粗阶段 + 30000 步细阶段的训练配置，且损失权重 $\lambda$ 均设为 1，避免超参搜索引入的偏差。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 视觉质量与感知稳定性之间的弱相关性
 
@@ -322,7 +328,9 @@ $$
 
 所有实验遵循严格的公平对比原则：损失权重 λ 均设为 1，避免超参搜索偏差；所有方法统一使用 5000 步粗阶段 + 30000 步细阶段的训练配置；感知模型权重在整个训练过程中冻结，不涉及任何微调。因此，性能提升完全归因于损失函数设计本身，而非训练策略或模型容量的差异。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与因果机制
 
@@ -361,6 +369,8 @@ $$
 4. **下游任务闭环验证**：感知稳定性的提升是否能够直接转化为下游规划或控制模块的性能增益？这需要端到端的闭环评估来验证。
 
 5. **复杂场景鲁棒性**：在更复杂的动态场景（如高密度交通流、多智能体交互）和恶劣天气条件下，所提方法能否维持稳定的感知提升？这需要更多样化的场景覆盖测试。
+
+
 
 ## 原文 PDF
 

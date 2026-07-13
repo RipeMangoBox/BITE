@@ -5,6 +5,8 @@ paper_level: A
 venue: NEURIPS
 year: 2024
 pdf_ref: paperPDFs/NEURIPS_2024/MoMu_Diffusion_On_Learning_Long_Term_Motion_Music_Synchronization_and_Correspondence.pdf
+project_link: https://momu-diffusion.github.io/
+code_link: https://github.com/gudgud96/
 aliases:
 - MD
 - MoMu-Diffusion
@@ -42,7 +44,7 @@ claims:
 > - Floor Exercise-25s (motion-to-music) 上，BCS↑ 66.6 vs 58.8 (LORIS) (+7.8)。
 > - Figure Skating-25s (motion-to-music) 上，F1↑ 69.0 vs 62.7 (LORIS) (+6.3)。
 
-## 概述
+## 概要
 
 **核心问题**：长序列运动与音乐的跨模态生成面临两大瓶颈——高计算成本使得长时域建模困难，且现有方法缺乏在潜在空间中显式对齐时序同步与节奏的能力。
 
@@ -54,8 +56,6 @@ claims:
 - 消融实验证实：移除节奏对比学习导致节拍 F1 大幅下降（音乐端从 98.1 降至 93.1，运动端从 45.4 降至 37.9）；用 U-Net 替换 Transformer 使 FAD 和 FID 明显劣化。
 
 **方法谱系与知识库定位**：MoMu-Diffusion 属于 **潜在空间对齐 + 扩散生成** 范式。与仅依赖时间对比或独立生成的运动-音乐方法（如 LORIS、D2M-GAN、CDCD）不同，BiCoR-VAE 显式建模节奏同步，使扩散模型能在对齐的紧凑潜在空间中高效生成。其 Transformer 扩散架构区别于 U-Net 系方法（如 DiffGesture），更适合长序列全局建模。交叉引导采样则提供了一种即插即用的多模态联合生成方案，无需额外训练。
-
-## 背景与动机
 
 ### 运动与音乐生成的核心瓶颈
 
@@ -81,7 +81,7 @@ claims:
 
 2. **利用 Transformer 扩散架构实现长序列全局建模**。采用基于 Transformer 的扩散模型（DiT 架构）替代传统 U-Net，以更好地捕捉运动与音乐序列中的长期时序依赖。配合交叉引导采样策略，模型能够在无需额外训练的情况下实现多模态联合生成，并支持变长序列的灵活合成。
 
-## 核心创新
+## 核心方法与创新机理
 
 MoMu-Diffusion 针对长序列运动-音乐生成中**高计算成本**与**缺乏显式时序同步能力**的双重瓶颈，提出了三个层次的创新，构成了一套从潜在空间对齐到跨模态生成的完整技术方案。
 
@@ -127,8 +127,6 @@ MoMu-Diffusion 使用 mel-spectrogram 替代原始波形作为音频表示，有
 | 音频特征表示 | 原始波形 | Mel-spectrogram | 强 (消融实验 FAD 上升) |
 
 这些创新共同构成了 MoMu-Diffusion 的技术壁垒：BiCoR-VAE 解决了“对齐”问题，Transformer 扩散模型解决了“长序列建模”问题，交叉引导采样解决了“多模态联合生成”问题，三者协同作用，使模型在运动-音乐双向生成任务上全面超越现有方法。
-
-## 整体框架
 
 MoMu-Diffusion 的整体 pipeline 围绕一个核心瓶颈展开：**长序列运动与音乐的跨模态生成需要同时解决高计算成本与显式时序同步两大难题**。为此，框架将任务分解为两个紧密耦合的阶段，形成从原始模态输入到最终生成输出的端到端流程。
 
@@ -202,8 +200,6 @@ $$\hat{\epsilon}_{\theta_a}(z_a(t), t, z_m) = \epsilon_{\theta_a}(z_a(t), t, \em
 
 ![[assets/figures/papers/paper_list_l1914_MoMu_Diffusion_On_Learning_Long_Term_Motion_Music_Synchronization_and_Co/figures/001_Figure_1.jpg]]
 *Figure 1: The pipeline of MoMu-Diffusion. MoMu-Diffusion integrates the alignment of motion and music through the novel Bidirectional Contrastive Rhythmic Auto-Encoder (BiCoR-VAE). Leveraging the aligned latent space, MoMu-Diffusion facilitates both cross-modal and multi-modal generations*
-
-## 核心模块与公式推导
 
 ### 双向对比节奏变分自编码器 (BiCoR-VAE)
 
@@ -295,7 +291,7 @@ BiCoR-VAE 的节奏对比学习是本文最核心的因果调节旋钮。消融�
 
 Transformer 架构（FFT）替代 U-Net 进一步提升了合成质量——FAD 从 11.0 降至 8.1，FID 从 11.6 降至 8.8——说明全局自注意力机制对长序列运动-音乐生成的时序一致性有显著增益。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验设计与评估框架
 
@@ -369,16 +365,10 @@ MoMu-Diffusion在三个互补维度上接受检验：**节拍匹配精度**（BC
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l1914_MoMu_Diffusion_On_Learning_Long_Term_Motion_Music_Synchronization_and_Co/figures/008_Figure_4.jpg]]
-*Figure 4: Example of beat matching on the motion-to-music generation. The red dashes indicate the extracted musical beats. The red arrow points to the video frame at that particular moment*
-
-![[assets/figures/papers/paper_list_l1914_MoMu_Diffusion_On_Learning_Long_Term_Motion_Music_Synchronization_and_Co/figures/010_Figure_5.jpg]]
-*Figure 5: Example of beat matching on the music-to-motion generation. The red dashes indicate the extracted kinematic beats of the synthesized motion. The red arrow points to the frame of the synthesized motion sequence at that particular moment*
-
 ![[assets/figures/papers/paper_list_l1914_MoMu_Diffusion_On_Learning_Long_Term_Motion_Music_Synchronization_and_Co/figures/002_Table_1.jpg]]
 *Table 1: Comparison with the state-of-the-art audio-visual generation works, including but not limited to motion-music generation*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 与现有方法的区别与改进
 

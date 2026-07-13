@@ -43,7 +43,7 @@ claims:
 > - Urban100 上，PSNR/SSIM (×2) 33.22 / 0.9379 (UCAN) vs 33.05 / 0.9363 (OmniSR) (+0.17 dB)。
 > - Manga109 上，PSNR (×4) 31.63 (UCAN-L) vs 31.24 (MambaIRV2-light) (+0.39 dB)。
 
-## 概述
+## 概要
 
 轻量级图像超分辨率（SR）在移动设备和边缘计算场景中需求迫切，但现有方法在扩大感受野时面临**计算成本与特征多样性的根本矛盾**：标准线性注意力因特征图秩崩塌导致表征能力不足，而大窗口注意力计算量过高，难以在资源受限条件下实现高保真重建。
 
@@ -57,7 +57,7 @@ claims:
 
 该方法为轻量 SR 提供了一条“低秩线性时间 + 高秩判别性”的新路径，但尚未在视频 SR、复杂退化及极端资源设备上验证其泛化能力。
 
-## 背景与动机
+
 
 图像超分辨率（SR）旨在从低分辨率输入重建高保真高分辨率图像，是底层视觉领域的基础任务。近年来，基于深度学习的SR方法取得了显著进展，但在资源受限设备（如移动端、IoT终端）上的部署仍面临严峻挑战：模型必须在极低的参数量和计算量约束下，同时保持足够的表征能力以恢复高频细节。
 
@@ -71,7 +71,9 @@ $$o_i^{\mathrm{L}} = \frac{\phi(\pmb{q}_i)^\top \big(\sum_{j} \phi(\pmb{k}_j) \p
 
 **本文动机。** 针对上述瓶颈，UCAN提出了一种统一卷积注意力网络，核心思路是双管齐下：在全局建模层面，引入可学习的**Hedgehog特征映射**以突破线性注意力的秩瓶颈，在 $O(N)$ 复杂度下逼近Softmax注意力的高秩判别性；在局部建模层面，采用**Flash Attention**实现高效的大窗口（32×32）精确注意力计算，配合**蒸馏式大核卷积**以可控成本扩展空间感受野。通过半共享注意力架构进一步压缩跨层计算冗余，UCAN在轻量参数预算内实现了广泛的有效感受野和高保真重建能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 UCAN 的核心创新在于通过**四个关键设计槽位**的协同替换，系统性地解决了轻量超分辨率模型在扩大感受野时面临的“计算成本-特征多样性”矛盾。这些创新并非孤立存在，而是围绕一个统一的因果链条：提升线性注意力的特征秩、降低大窗口注意力的实现成本、压缩跨层注意力的冗余计算、以及用蒸馏策略保留高频结构。
 
@@ -111,7 +113,7 @@ $$F_{2,a+1}' = f_{RHA}^{(a)}(F_{2,a}', A_{map}^{(a)}, A_{qk}^{(a)})$$
 
 四个槽位创新形成闭环：Hedgehog 特征图保证线性注意力的全局建模质量，Flash Attention 使大窗口局部注意力在轻量约束下可行，半共享机制压缩跨层冗余计算，蒸馏大核卷积以低成本保留高频细节。这一协同设计使得 UCAN 在 Manga109（×4）上以比 MambaIRV2 少 11% 的参数实现 0.26 dB PSNR 提升，在 Urban100（×2）上以 33.22 dB 超越 OmniSR 的 33.05 dB，验证了创新组合的有效性。
 
-## 整体框架
+
 
 UCAN 的整体管线遵循“浅层特征提取 → 核心编码器 → 重建”的标准超分辨率范式，其关键创新在于核心编码器中同时整合了**大窗口空间注意力**、**Hedgehog 线性全局注意力**和**蒸馏式大核卷积**，从而在轻量参数预算下获得广泛的有效感受野。
 
@@ -158,7 +160,7 @@ BERFG 内部，Sharing Block 和 Receiving Block 交替执行，前者通过 HPA
 ![[assets/figures/papers/paper_list_l948_https_arxiv_org_abs_2603_11680/figures/003_Figure_3.jpg]]
 *Figure 3: Detailed architecture of (a) Shared and Received Hybrid Attention (SHA and RHA) and (b) Large Kernel Distillation (LKD). LKD contains a Triple Feature Extraction block with three branches, which are the Large Kernel Spatial Branch, the Channel Branch, and the Small Kernel Spatial Branch. SHA and RHA employ Shared and Received Window Multi Head Self Attention (Shared WMHSA and Received WMHSA) to capture local information, and include a Shared Dual Fusion Layer (SDFL) and a Dual Fusion Receiver Layer (DFRL) to aggregate global context. The Dual Fusion Layer comprises two sub branches, which are Hedgehog Attention*
 
-## 核心模块与公式推导
+
 
 ### 线性注意力的秩瓶颈与Hedgehog特征图
 
@@ -230,7 +232,9 @@ $$\pmb{F_{sb}} = \phi(\pmb{Q}) ((\phi(\pmb{K})^T \pmb{V}) + \pmb{W_d} \pmb{V})$$
 ![[assets/figures/papers/paper_list_l948_https_arxiv_org_abs_2603_11680/figures/012_Figure_8.jpg]]
 *Figure 8: Ranking consistency analysis. We compare the output ranking of Linear Attention using standard ReLU, Symmetric ReLU, and the Hedgehog Feature Map (sequence length N = 256). While adding negative information (Sym-ReLU) improves consistency, Hedgehog achieves superior performance through learnable stability*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -286,7 +290,9 @@ Figure 5 的有效感受野（ERF）可视化显示，UCAN 相比 MambaIR 和 Ma
 ![[assets/figures/papers/paper_list_l948_https_arxiv_org_abs_2603_11680/figures/009_Table_2.jpg]]
 *Table 2: Comparison of Latency and Parameters between Naive Self-Attention, Flash Attention [3] , and the Dual Fusion Layer (DFL)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法定位与谱系
 
@@ -332,6 +338,8 @@ UCAN的知识增量集中在三个相互耦合的机制上：
 4. **推理效率优化**：蒸馏大核卷积（LKD）与结构重参数化技术的结合能否进一步降低推理延迟？Table 5中LKD内核尺寸从5增至65仅带来0.07 dB提升，表明大核收益递减，更高效的卷积设计值得探索。
 
 5. **HFM的理论分析**：HFM恢复秩的机制目前以实验验证为主（Figure 2, Figure 8的排序一致性分析），缺乏严格的理论界——$m$的取值与输出秩之间的定量关系、对称指数对的最优数量等问题仍待形式化分析。
+
+
 
 ## 原文 PDF
 

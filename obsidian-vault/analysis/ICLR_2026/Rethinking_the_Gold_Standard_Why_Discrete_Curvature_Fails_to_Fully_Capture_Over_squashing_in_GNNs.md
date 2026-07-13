@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Rethinking_the_Gold_Standard_Why_Discrete_Curvature_Fails_to_Fully_Capture_Over_squashing_in_GNNs.pdf
+project_link: null
+code_link: null
 openreview_forum_id: QYtmqCoilk
 aliases:
 - WAF3CW
@@ -42,7 +44,7 @@ claims:
 > - Average over 21 datasets (GCN, MOSR) 上，MOSR_10 mean 为 0.036 (WAF3)，对比 0.067 (Augmented Forman-3) / 0.271 (Ollivier Ricci)，变化 -0.031 / -0.235。
 > - SDRF rewiring (Texas) 上，Accuracy 为 73.62±0.62 (WAF3)，对比 70.35±0.60 (Balanced Forman)，变化 +3.27。
 
-## 概述
+## 概要
 
 图神经网络（GNN）中的**过挤压（over‑squashing）**现象会严重损害信息在图中长距离传播的效率。离散曲率——尤其是 Ollivier‑Ricci 曲率——被广泛视为检测过挤压边的“黄金标准”，其核心直觉是：负曲率越高的边越容易发生信息瓶颈。然而，本文通过严格的理论分析与大规模实验，揭示了这一直觉的根本缺陷：**高负曲率是过挤压的充分条件，但并非必要条件**。换言之，大量遭受严重过挤压的边实际上拥有高度正曲率，仅依赖高负曲率进行检测会系统性地漏掉这些关键边。
 
@@ -59,7 +61,7 @@ claims:
 2. **量化工具**：提出 MOSR 指标，首次系统量化曲率漏检的严重程度与漏检边的结构特征；
 3. **实用方案**：提出 WAF3 及其高效近似算法，在检测精度与计算效率上均取得显著提升。
 
-## 背景与动机
+
 
 ### 过挤压：GNN 信息传播的结构性瓶颈
 
@@ -119,7 +121,9 @@ $$\mathsf{Between}(e) = \sum_{u \neq v \in \mathcal{V}} \frac{\sigma_{uv}(e)}{\s
 3. 通过边介数分析揭示漏检的结构性根源：集群内部边被忽略。
 4. 提出加权扩展 Forman-3 曲率（WAF3），通过度依赖权重函数纠正高度数节点对曲率的不当贡献，并设计基于加权 MinHash 的线性时间近似算法。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题重定义：曲率并非过挤压的必要条件
 
@@ -176,7 +180,7 @@ $$\mathsf{WAF3}_f(u,v) = \frac{2}{f(u) + f(v)} \left( 2 - \frac{3}{1 + \mathrm{J
 - 近似算法引入了约 5% 的排序相似度损失，在精度敏感任务中需手动验证影响。
 - 实验仅在同质无向图上进行，且限于 GCN、GAT、GraphSAGE 三种架构，普适性有待扩展。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0012_QYtmqCoilk_Rethinking_the_Gold_Standard_Why_Discrete_Curvat/figures/001_Table_1.jpg]]
 *Table 1: We summarize all discrete curvatures defined on edges here. Curvatures defined on nodes (such as Bakry-Emery-Ricci ( ´ Mondal et al., 2024), combination (Kamtue, 2018), and node resistance (Devriendt & Lambiotte, 2022)) are not included. $\mu _ { u } ^ { \alpha }$ is the uniform distribution of the first-order neighbors of u with restart probability α. $W _ { 1 }$ is the 1-Wasserstein distance. $\{ w _ { u v } \}$ is the pseudoinverse of the weighted Laplacian matrix. $d _ { u }$ is the degree of node u , and $d _ { u } \vee d _ { v }$ : = $\operatorname$* { m a x } ( $d _ { u } , d _ { v } ) d _ { u } \wedge d _ { v }$ : = $\operatorname$* { m i n } ( $\bar { d } _ { u } , d _ { v }$ ) . $\bar { \bigtriangle...$
@@ -250,7 +254,7 @@ $$\mathsf { W A F 3 } _ { f } ( u , v ) : = \sum _ { i \in \mathcal { B } ( u ) 
 
 整个框架的瓶颈在于：现有离散曲率仅依赖一阶邻居的局部三角形结构，无法反映多跳传播中的度数稀释效应。WAF3 通过度加权部分缓解该问题，但本质上仍受限于一阶局部性——这是该 pipeline 的结构性局限，也是未来工作的开放方向。
 
-## 核心模块与公式推导
+
 
 ### 过挤压的雅可比下界
 
@@ -339,7 +343,9 @@ $$
 
 实验发现（Table 3），在绝大多数数据集上 $\mathsf{BetwIden} > \mathsf{BetwAll} > \mathsf{BetwIgno}$，表明离散曲率倾向于仅识别连接集群的“桥梁边”，而系统性地忽略位于集群内部、介数较低但同样遭受严重过挤压的边。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心评价指标：遗漏过挤压比率 (MOSR)
 
@@ -444,7 +450,9 @@ WAF3 通过等价变换为加权 Jaccard 相似度，并利用加权 MinHash 实
 4. **实验范围的限制**：所有实验限于同质无向图及 GCN/GAT/GraphSAGE 三种架构，在有向图、异构图、时序图上的有效性有待验证。
 5. **MOSR 的计算开销**：MOSR 依赖雅可比范数的计算，在大规模图中仍较昂贵，限制了其在超大图上的实时使用。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有离散曲率的关系
 
@@ -483,6 +491,8 @@ WAF3 的适用性受以下条件约束：
 3. **内部集群过挤压的影响**：被曲率忽略的内部集群过挤压边（BetwIgno < BetwAll）对下游任务性能的实际影响有多大？这些边虽然介数较低，但在密集集群内部的信息稀释效应可能对特定任务产生非平凡的影响。
 4. **更大规模的可扩展性**：加权 MinHash 近似算法能否进一步降低复杂度，以支持十亿级边的工业图？可能的路径包括分布式哈希计算或基于采样的近似策略。
 5. **异构图和有向图的扩展**：在有向图、异构图和时序图上，离散曲率的概念和 MOSR 检测框架是否依然有效？这需要重新审视曲率的几何意义和过挤压的数学定义。
+
+
 
 ## 原文 PDF
 

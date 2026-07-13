@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Depth_Anything_3_Recovering_the_Visual_Space_from_Any_Views.pdf
+project_link: null
+code_link: null
 openreview_forum_id: yirunib8l8
 aliases:
 - DA3D
@@ -42,7 +44,7 @@ claims:
 > - ETH3D (pose) 上，Auc3 为 39.3，对比 26.3 (VGGT)，变化 +13.0。
 > - ScanNet++ (pose) 上，Auc3 为 83.2，对比 62.6 (VGGT)，变化 +20.6。
 
-## 概述
+## 概要
 
 现有3D视觉任务高度依赖专用化模型架构与复杂的多任务学习范式，导致通用性与扩展性受限。**Depth Anything 3 (DA3)** 提出了一种反直觉的简化路径：采用一个未经架构修改的普通ViT骨干网络（vanilla DINOv2编码器），搭配单一的解耦预测目标——深度图与射线图（depth-ray representation），即可从任意数量、任意视角的图像中恢复完整的视觉空间。
 
@@ -54,7 +56,7 @@ claims:
 
 **方法定位：** DA3属于前馈式多视图几何估计方法，与**VGGT**（Wang et al., 2025a）、**DUSt3R**（Wang et al., 2024c）、**Fast3R**（Yang et al., 2025b）等共享从图像到3D的端到端学习范式，但通过最小化预测目标和通用骨干网络实现了更优的泛化性与简洁性。同时，DA3可替代**COLMAP**（Schönberger and Frahm, 2016）等经典SfM流水线，提供更鲁棒的位姿估计与密集重建。
 
-## 背景与动机
+
 
 从单目或多视图图像中恢复三维几何是计算机视觉的核心命题，其应用遍及机器人导航、增强现实和内容创作。传统上，这一领域被高度专用化的模型架构所主导：**DUSt3R** (Wang et al., 2024c) 通过回归点图并进行全局对齐来处理无标定图像对；**VGGT** (Wang et al., 2025a) 采用定制Transformer联合预测相机参数、深度和点云；**Pi3** (Wang et al., 2025d) 则利用置换等变设计从无序图像中恢复仿射不变相机与尺度不变点云。这些方法虽然有效，却普遍存在一个核心瓶颈：**过度依赖复杂的多任务学习与专用架构，难以有效利用大规模预训练模型的强大特征表示能力**，导致模型的通用性和扩展性受限。
 
@@ -62,7 +64,9 @@ claims:
 
 上述困境引发了一个根本性问题：**能否用一个简单的预训练Transformer，搭配最小且充分的预测目标，来实现任意数量视图下的高质量空间重建？** Depth Anything 3 (DA3) 正是对这一问题的肯定回答。其核心动机在于证明：无需复杂的架构专门化或多任务联合优化，仅凭一个普通ViT骨干网络和一组解耦的深度-射线（depth-ray）预测目标，即可统一处理从单目到多视图的几何估计任务，并在位姿准确率上平均超越先前最先进的VGGT达35.7%，在几何准确率上超越23.6%。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DA3 的核心创新并非引入新的网络模块或复杂的多任务学习范式，而是通过**解耦预测目标**与**极简架构**的协同设计，证明一个未经架构修改的普通 Transformer 即可统一任意视图下的几何估计。
 
@@ -103,7 +107,7 @@ DA3 提供了**可选相机编码器**作为位姿条件模块：当已知相机
 
 此外，DA3 配备了一个小型**相机头**（Camera Head），直接从每视图一个相机令牌预测位姿，推理速度比基于射线图的优化方法快约 18.7 倍（Table 7），虽精度略低，但为实时应用提供了精度-速度的灵活权衡。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_yirunib8l8/figures/004_Figure_2.jpg]]
 *Figure 2: Pipeline of Depth Anything 3. Depth Anything 3 employs a single transformer (vanilla DINOv2 model) without any architectural modifications. To enable cross-view reasoning, an inputadaptive cross-view self-attention mechanism is introduced. A dual-DPT head is used to predict depth and ray maps from visual tokens. Camera parameters, if available, are encoded as camera tokens and concatenated with patch tokens, participating in all attention operations*
@@ -142,7 +146,7 @@ DA3 采用教师-学生范式：先在合成数据上训练单目深度估计教
 
 > **注意**：Figure 2 展示了上述整体流程，Figure 3 进一步揭示了双 DPT 头的内部结构，建议配合阅读以获得完整的架构理解。
 
-## 核心模块与公式推导
+
 
 ### 深度-射线表示：最小化解耦预测目标
 
@@ -213,7 +217,9 @@ $$\mathbf{H}^* = \arg \min_{\|\mathbf{H}\|=1} \sum_{h,w} \| \mathbf{H} \mathbf{p
 
 - **相机头（Camera Head）**：一个小型Transformer直接预测FOV、旋转四元数和平移，推理速度比射线优化快约18.7倍（Table 7），但精度略低，形成精度-速度权衡。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能：位姿估计
 
@@ -308,7 +314,9 @@ DA3在视觉几何基准的位姿估计任务上全面建立了新的SOTA。**Ta
 ![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_yirunib8l8/figures/023_Table_10.jpg]]
 *Table 10: Comparison of Models with Parameters and Running Speed. The maximum number of images was tested on an 80 GB A100 GPU. If we store some intermediate tokens in CPU memory, we could process many more images. The running speed was measured on an A100 GPU with a scene of 32 images, and we report the average speed per image*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与前驱工作的关系
 
@@ -351,6 +359,8 @@ DA3 直接建立在 **Depth Anything 2**（DA2, Yang et al., 2024b）的单目�
 - **大规模预训练**：进一步扩展预训练数据规模和多样性，能否弥合几何理解与可操作世界模型之间的差距？
 - **轻量化部署**：如何通过模型压缩、知识蒸馏等技术减小模型尺寸并保持精度，以适应边缘设备和实时应用？
 - **监督效率极限**：教师-学生范式在更少监督数据下的极限性能如何？能否通过自监督或弱监督进一步降低对伪标签的依赖？
+
+
 
 ## 原文 PDF
 

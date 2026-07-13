@@ -43,7 +43,7 @@ claims:
 > - BEHAVE 上，CD_human (cm) 5.615 vs 5.748 (HOI-Gaussian) (-0.133 (2.3%))；CD_object (cm) 17.339 vs 19.197 (InteractVLM) (-1.858 (9.7%))。
 > - Open3DHOI (non-contact) 上，CD_human (cm) 4.958 vs 5.111 (HOI-Gaussian, general) (-0.153 (3.0%))。
 
-## 概述
+## 概要
 
 三维人体与物体联合重建旨在从单张图像中恢复交互场景的几何与纹理，但现有方法普遍**过度依赖物理接触信息**来推断空间关系，难以捕捉注视、指向等非接触交互，且仅基于局部几何接近度驱动优化，忽视人体与物体的全局外观上下文，导致重建结果在视觉上不合理。
 
@@ -51,7 +51,7 @@ claims:
 
 在 Open3DHOI 与 BEHAVE 两个基准数据集上，TeHOR 在 Chamfer 距离和接触 F1 分数上均取得最优或次优结果。消融实验表明，**移除外观损失**会导致物体 Chamfer 距离从 16.701 cm 恶化至 22.094 cm，且重建缺乏整体语境；**移除文本条件**同样使物体 Chamfer 距离升至 20.348 cm，验证了文本引导对隐式交互（如视线方向）的纠正作用。尤其在非接触场景中，TeHOR 显著优于所有依赖接触的方法，证实其核心优势在于由文本引导的整体交互推理，而非精确的接触预测。
 
-## 背景与动机
+
 
 从单张图像重建三维人体与物体的联合表示是理解人类行为、构建数字内容的核心技术。其关键挑战在于：**单张二维图像仅提供单一视角的投影，缺失了深度、遮挡区域以及交互语义等多重信息**。现有方法通过引入物理接触线索来弥补这一信息缺口——它们预测或标注人体与物体的接触区域，并基于局部几何接近度驱动优化，从而推断二者的空间关系。
 
@@ -63,7 +63,9 @@ TeHOR 的核心动机由此产生：**能否用更丰富的语义信号替代或
 
 这一思路将三维重建问题从“物理约束拟合”提升为“语义对齐优化”，为处理复杂交互场景开辟了新的可能。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：从物理接触到语义交互的鸿沟
 
@@ -122,7 +124,7 @@ TeHOR 位于**三维人体-物体交互重建**与**文本驱动的三维生成*
 
 TeHOR 的关键贡献在于**将文本-图像对齐先验首次作为三维人体与物体联合重建的语义约束**，实现了从"物理接触驱动"到"语义语境驱动"的范式转换。这一转换使得重建方法能够捕捉超越物理接触的语义级交互推理，在非接触场景和复杂交互中展现出传统方法无法企及的性能。
 
-## 整体框架
+
 
 TeHOR 的整体流程从单张 RGB 图像出发，依次完成三个实体的初始重建——三维人体、三维物体与二维背景——随后在统一的 HOI 优化阶段联合精修人体与物体的几何、纹理及空间位姿，最终输出带纹理的网格模型。整个 pipeline 的核心设计在于将文本描述作为语义引导信号注入优化过程，使重建结果不仅满足几何一致性，更服从于整体交互语境的语义约束。
 
@@ -162,7 +164,7 @@ $$
 ![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2602_19679/figures/004_Figure_3.jpg]]
 *Figure 3: Overall pipeline of TeHOR. Given an input image, our framework initially reconstructs a 3D human, a 3D object, and a 2D background. Then, the initially reconstructed 3D human and object are jointly optimized using three core loss functions: reconstruction loss, appearance loss, and contact loss, to ensure accurate and semantically plausible human-object interaction*
 
-## 核心模块与公式推导
+
 
 ### 三维高斯表示
 
@@ -213,7 +215,9 @@ $$\mathcal{L}_{\mathrm{contact}} = \frac{1}{|V_{h,c}|} \sum_{v_h \in V_{h,c}} d(
 ![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2602_19679/figures/008_Figure_6.jpg]]
 *Figure 6: Effectiveness of text descriptions in optimization*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -292,7 +296,9 @@ Figure 8 展示了与 **PHOSA**（Zhang et al., ECCV 2020）、**InteractVLM** �
 ![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2602_19679/figures/014_Table_5.jpg]]
 *Table 5: Quantitative comparison with state-of-the-art methods for non-contact scenarios on Open3DHOI [74]*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从接触驱动到语义引导的范式迁移
 
@@ -343,6 +349,8 @@ $$
 3. **端到端文本-重建联合优化**：可否联合优化文本描述生成与重建过程，以进一步减轻对 VLM 黑盒的依赖，并实现描述与重建的相互促进？
 
 4. **表示层面的改进**：当前高斯转网格的转换（Figure 4）虽经验证对指标影响轻微（Table S4，CD_object 变化约 0.2），但该步骤引入了额外的后处理流程，未来可探索直接在网格表示上进行文本引导优化的方案。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Unified_Diffusion_VLA_Vision-Language-Action_Model_via_Joint_Discrete_Denosing_Diffusion_Process.pdf
+project_link: null
+code_link: null
 aliases:
 - UVUDV
 - UDVVLAMJDDDP
@@ -42,7 +44,7 @@ paradigm: 同步联合去噪使得动作预测在持续、充分的未来视觉�
 > - LIBERO 上，Average Success Rate (%) 为 96.1，对比 F1 (best prior, exact avg. not reported but lower)，变化 outperforms all baselines (SOTA)。
 > - SimplerEnv-WidowX 上，Overall Success Rate (%) 为 76.0，对比 SpatialVLA/F1 (next best, exact overall not reported but lower)，变化 outperforms all baselines。
 
-## 概述
+## 概要
 
 现有统一视觉-语言-动作（VLA）模型普遍将视觉生成与动作预测视为分离的模块或解码过程，限制了未来视觉信息对动作推理的直接引导，导致视觉与动作之间缺乏内禀的协同。针对这一瓶颈，本文提出统一扩散 VLA（Unified Diffusion VLA, UD-VLA），以联合离散去噪扩散过程（Joint Discrete Denoising Diffusion Process, JD3P）为核心，将未来图像和动作 tokens 置于同一个离散扩散轨迹中同步去噪，使动作预测能够在持续的未来视觉引导下由粗到精地演化，从而实现理解、生成和执行的深度耦合并存。
 
@@ -50,7 +52,7 @@ UD-VLA 通过三项关键设计构筑统一的生成—行动回路：1）采用
 
 实验结果表明，UD-VLA 在多个长序列机器人操作基准上取得最优性能：在 CALVIN ABCD→D 条件下平均任务长度达到 4.64，超越先前最佳方法 MDT（4.52）以及所有统一 VLA 基线；在 LIBERO 基准上平均成功率 96.1%，其中物体和长序列子任务分别达到 98.8% 和 95.2%；在 SimplerEnv‑WidowX 基准上整体成功率 76.0%，堆叠任务显著领先。相较于自回归解码，JD3P 带来 4.3 倍的推理速度提升（219.3 tokens/s vs. 50.2 tokens/s），同时动作质量更高（平均长度 +0.46）。消融研究进一步确认，混合注意力、预测未来图像（而非不生成图像或重建当前帧）以及联合扩散解码是性能增益的关键来源。在真实世界实验中，UD-VLA 在堆碗、摆块、翻塔等任务上成功率超过 80%，并对未见物体和场景展现出强泛化能力。
 
-## 背景与动机
+
 
 近年来，视觉‑语言‑动作模型（VLA）逐渐成为具身智能的核心范式，旨在统一多模态理解与物理执行。为突破早期流水线式设计的局限，一系列统一 VLA（如 GR‑1、SEER、UP‑VA、F1 等）试图在单一框架内同时处理视觉生成与动作预测，期望通过共享的表征和联合训练实现理解、生成与执行的协同。然而，这些工作大多将视觉生成和动作预测视为分离的模块或解码过程（Table 1）：部分方法依赖外部专家（例如独立 ViT 编码器、扩散解码器）进行视觉处理；另一部分虽统一了输入输出空间，却采用分离的视觉解码与动作解码，或在训练时建模视觉但推理时仅解码动作（如 WorldVLA、UniVLA），或将视觉生成与动作预测分配给不同的生成范式（如 CoT‑VLA 用自回归解码图像、扩散解码动作）。这种**分离式的设计**直接切断了未来视觉信息对动作推理的持续引导，导致视觉与动作之间缺乏内禀的协同——动作预测既不能从逐步生成的未来图像中获益，也无法利用视觉预测的迭代精炼来修正自身的决策。
 
@@ -58,7 +60,9 @@ UD-VLA 通过三项关键设计构筑统一的生成—行动回路：1）采用
 
 上述瓶颈指向一个核心动机：**需要一种能将未来视觉生成与动作预测内在耦合的机制**，使动作推理能够在持续、充分的未来视觉引导下由粗到精地演化，将抽象的动作规划转化为以视觉预测为条件的逆向运动学问题。受离散扩散模型在生成任务上的成功启发，本文提出**联合离散去噪扩散过程（JD3P）**：将未来图像 tokens 与动作 tokens 置于同一条离散扩散轨迹中，通过逐时间步的同步去噪实现联合生成；每一步动作 tokens 因果地关注图像 tokens（当前观测与逐步恢复的未来视觉），从而在统一的扩散轨迹中实现理解、生成和执行的深度协同。配合精心设计的统一离散分词、块内双向‑块间因果的混合注意力，以及先视频后机器人的两阶段训练，本文的 UD‑VLA 首次在统一 VLA 中填补了视觉‑动作内在协同的空白，并在 CALVIN、LIBERO、SimplerEnv 等多个权威基准上取得了全面的 SOTA 性能与显著的推理效率提升。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 现有统一VLA（如WorldVLA、UniVLA、CoT-VLA）普遍将视觉生成与动作预测置于分离的解码模块中，视觉未来信息无法直接影响动作推理过程，导致视觉-动作之间缺乏内在的协同关系。UD-VLA 通过 **联合离散去噪扩散过程（JD3P）** 打破这一瓶颈：将未来图像和动作令牌统一在同一离散扩散轨迹中同步去噪，并且在每一步去噪中动作令牌因果地关注图像令牌，使动作预测随视觉信号的逐步恢复而由粗到精地演化。这一设计将抽象的动作规划转化为以未来视觉预测为条件的“逆运动学”问题，使得理解、生成与执行在统一的扩散轨迹中深度耦合，形成内禀的协同效应。
 
@@ -88,12 +92,12 @@ UD-VLA 通过三项关键设计构筑统一的生成—行动回路：1）采用
 
 > 注：生成图像的保真度受限于离散 token 的压缩程度和未使用大规模生成预训练，详见 Limitations。
 
-## 整体框架
 
-![[obsidian-vault/assets/figures/papers/iclr26_0013_UvQOcw2oCD_Unified_Diffusion_VLA_Vision-Language-Action_Mod/figures/002_Figure_1.jpg]]
+
+![[assets/figures/papers/iclr26_0013_UvQOcw2oCD_Unified_Diffusion_VLA_Vision-Language-Action_Mod/figures/002_Figure_1.jpg]]
 *Figure 1: Overview of our Unified Diffusion VLA. 1. We construct our UD-VLA and formalize a Joint Discrete Denoising Diffusion Process (JD3P) to allow visual generation and action prediction to be intrinsically synergistic. 2. We design a two-stage training, including a post-training stage in a world-model manner to predict future images and a fine-tuning stage to generate both future images and actions. 3. During inference, the noising fixed-length image tokens and varied-length action tokens are denoised into clean tokens after T steps in JD3P*
 
-![[obsidian-vault/assets/figures/papers/iclr26_0013_UvQOcw2oCD_Unified_Diffusion_VLA_Vision-Language-Action_Mod/figures/003_Figure_2.jpg]]
+![[assets/figures/papers/iclr26_0013_UvQOcw2oCD_Unified_Diffusion_VLA_Vision-Language-Action_Mod/figures/003_Figure_2.jpg]]
 *Figure 2: Hybrid attention mechanism in UD-VLA*
 
 UD-VLA 的整体设计围绕一个核心瓶颈展开：现有统一 VLA 将视觉生成与动作预测视为分离模块，未来视觉信息无法直接、持续地引导动作推理，导致视觉–动作之间缺乏内禀协同。为解决这一问题，UD-VLA 将视觉生成和动作预测统一进同一个离散扩散过程，使动作在每一步都能以当前去噪得到的未来视觉为条件，从而实现同步、由粗到精的跨模态联合解码。
@@ -175,7 +179,7 @@ $$
 
 综上，UD-VLA 整体框架以统一离散化为基础，通过混合注意力和 JD3P 构建了一个内禀协同的生成式 VLA。其输入为语言指令和当前观测，输出为未来图像的 token 序列与对应动作 token 序列，二者在一系列同步去噪步中逐步浮现，最终由解码器还原为图像和连续动作指令，驱动机器人交互。
 
-## 核心模块与公式推导
+
 
 ### 1. 统一多模态分词与序列构建
 UD‑VLA 使用 VQ 视觉分词器（Zheng et al., 2022）和 FAST 动作分词器（Pertsch et al., 2025）将图像与动作离散化，并与语言 token 一起拼接为统一的条件生成序列：
@@ -222,16 +226,18 @@ $$
 $$
 选中位置 $\Omega_t$ 通过 Gumbel‑Max 采样确定新 token，其余保持 `<MASK>`。该策略使高置信度 token 优先解码，在保证动作质量的同时获得 4.3 倍于自回归的推理速度 (Table 7)。推理中同时配合 Prefix KV Cache 与特殊分隔 token 的预填充以进一步降低延迟。
 
-## 实验与分析
 
-![[obsidian-vault/assets/figures/papers/iclr26_0013_UvQOcw2oCD_Unified_Diffusion_VLA_Vision-Language-Action_Mod/figures/004_Table_2.jpg]]
+
+## 实验与关键发现
+
+![[assets/figures/papers/iclr26_0013_UvQOcw2oCD_Unified_Diffusion_VLA_Vision-Language-Action_Mod/figures/004_Table_2.jpg]]
 *Table 2: Comprehensive Evaluation of Long-Horizon Robotic Manipulation on the CALVIN Benchmark. UniVLA∗ denotes the variant without historical frames for fair comparison. Table 3: Evaluation and comparison on the LIBERO benchmark*
 
-![[obsidian-vault/assets/figures/papers/iclr26_0013_UvQOcw2oCD_Unified_Diffusion_VLA_Vision-Language-Action_Mod/figures/005_Table_3.jpg]]
+![[assets/figures/papers/iclr26_0013_UvQOcw2oCD_Unified_Diffusion_VLA_Vision-Language-Action_Mod/figures/005_Table_3.jpg]]
 
-![[obsidian-vault/assets/figures/papers/iclr26_0013_UvQOcw2oCD_Unified_Diffusion_VLA_Vision-Language-Action_Mod/figures/009_Table_7.jpg]]
+![[assets/figures/papers/iclr26_0013_UvQOcw2oCD_Unified_Diffusion_VLA_Vision-Language-Action_Mod/figures/009_Table_7.jpg]]
 
-![[obsidian-vault/assets/figures/papers/iclr26_0013_UvQOcw2oCD_Unified_Diffusion_VLA_Vision-Language-Action_Mod/figures/006_Table_5.jpg]]
+![[assets/figures/papers/iclr26_0013_UvQOcw2oCD_Unified_Diffusion_VLA_Vision-Language-Action_Mod/figures/006_Table_5.jpg]]
 *Table 5: Effectiveness of different attention schemes. Bidirectional applies bidirectional attention over the visual generation and the action block. Causal uses a strict lowertriangular mask, and Hybrid follows Figure 2*
 
 ### 主要结果
@@ -275,7 +281,9 @@ UD‑VLA 在三个广泛使用的机器人操作基准上均取得领先结果�
 - **Figure 2（混合注意力模式）：** 以直观方式呈现了块间因果与块内双向的约束关系，帮助理解信息流设计如何影响训练动力学和最终性能。
 - **Figure 3 及 Appendix Figure 5–7（真实世界实验）：** 表明 UD‑VLA 在真实机械臂上能够跨见到未见物体和背景泛化，且生成了可靠的任务级未来视觉计划，成功引导动作超越其他基线（如 GR00T N1 和 UniVLA），展示了 JD3P 从仿真到现实的迁移潜力。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 统一 VLA（Vision-Language-Action）范式的演进可划分为三个代际，其分水岭在于“视觉—动作”耦合的深度与解码过程的统一程度。UD-VLA 所在的第三范式通过**联合离散扩散过程（JD3P）**将未来图像生成与动作预测编织为同一条去噪轨迹，从而把前序方法中的模块化耦合推向内禀协同。
 
@@ -293,6 +301,8 @@ UD‑VLA 在三个广泛使用的机器人操作基准上均取得领先结果�
 
 **开放问题**。①能否通过更大规模的视频扩散预训练或更强的视觉 tokenizer（如更高分辨率的 VQ-VAE）提升未来图像保真度，同时保持推理效率不衰退？②JD3P 的离散扩散框架能否自然拓展到**连续动作空间**或高频遥操作数据流，而无需重训动作分词器？③联合扩散轨迹是否可与测试时计算扩展（如树搜索、推理时进化）结合，以求解更长期、组合式的任务规划？④发展**自适应去噪调度**（根据任务难度或置信度动态调整去噪步数）或学习一种“早停”机制，是进一步压缩推理成本、扩展至实时应用的关键路径。
 
+
+
 ## 原文 PDF
 
-![[obsidian-vault/paperPDFs/ICLR_2026/Unified_Diffusion_VLA_Vision-Language-Action_Model_via_Joint_Discrete_Denosing_Diffusion_Process.pdf]]
+![[paperPDFs/ICLR_2026/Unified_Diffusion_VLA_Vision-Language-Action_Model_via_Joint_Discrete_Denosing_Diffusion_Process.pdf]]

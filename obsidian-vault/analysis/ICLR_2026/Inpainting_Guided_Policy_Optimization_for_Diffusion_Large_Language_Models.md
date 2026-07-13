@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Inpainting_Guided_Policy_Optimization_for_Diffusion_Large_Language_Models.pdf
+project_link: null
+code_link: https://github.com/facebookresearch/igpo
 openreview_forum_id: haVf5e4Q6C
 aliases:
 - IIGPO
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 修复引导的扩散大语言模型策略优化 |
 | 英文题名 | Inpainting-Guided Policy Optimization for Diffusion Large Language Models |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=haVf5e4Q6C); [GitHub](https://github.com/facebookresearch/igpo) |
+| Links | [paper](https://openreview.net/forum?id=haVf5e4Q6C) · [GitHub](https://github.com/facebookresearch/igpo) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | IGPO (Inpainting Guided Policy Optimization) |
 | Dataset | GSM8K, MATH500, AMC, Minerva Math |
@@ -42,7 +44,7 @@ claims:
 > - MATH500 上，pass@1 为 47.4 (+8.4)，对比 39.0，变化 +8.4。
 > - AMC 上，avg@16 为 25.9 (+11.4)，对比 14.5，变化 +11.4。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -73,7 +75,7 @@ IGPO在监督微调（SFT）与强化学习（RL）之间架设桥梁：它既�
 
 当前工作依赖真值推理轨迹作为补全提示，在无真值或真值稀疏的任务上应用受限；评估集中在数学推理领域，尚未验证代码生成等其他复杂任务。未来方向包括：探索利用模型自身高置信度推理片段替代人工真值、将该思想迁移至自回归LLM的RL训练、以及结合更先进的搜索策略进行提示选择。
 
-## 背景与动机
+
 
 ### 扩散大语言模型的独特能力
 
@@ -95,7 +97,9 @@ $$A_i = r(o_i) - \frac{1}{G}\sum_{j=1}^{G} r(o_j)$$
 
 基于此，本文提出**IGPO（Inpainting Guided Policy Optimization）**，在GRPO的采样阶段引入弹性补全触发机制：仅当检测到全错组时，才注入部分真值推理块作为提示，通过补全生成新响应并恢复奖励方差，从而恢复非零的策略梯度信号。实验表明，IGPO将全错组比例降低约60%（Figure 1b），完整训练流程（长度对齐SFT + IGPO）在四个数学推理基准上平均提升7.3个百分点（Table 1），且训练曲线始终稳定优于标准GRPO（Figure 3）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈诊断：组优势归零困境
 
@@ -135,7 +139,7 @@ $$z^{\mathrm{hint}}[i] = \begin{cases} y_i^* & \text{if } m[i]=1 \text{ and } i 
 
 IGPO的目标函数与GRPO形式上一致，唯一区别在于采样过程——通过补全引导的采样替换，在零优势场景下创造有效的梯度信号。这种设计在监督微调与强化学习之间搭建了桥梁：既提供方向信号，又保留策略自生成部分。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_haVf5e4Q6C/figures/003_Figure_1.jpg]]
 *Figure 1: (a) Unlike autoregressive LLMs, diffusion LLMs can be conditioned on future reasoning hints during generation through inpainting via bidirectional attention, enabling guided exploration toward correct solutions. (b) Applying inpainting-guided exploration in policy optimization outperforms standard Group Relative Policy Optimization (GRPO) sampling and reduces all-wrong groups occurrences. (c) Our full training recipe combining Length-Aligned supervised fine-tuning on concise reasoning traces with IGPO achieves SoTA performance among full-attention masked dLLMs across four mathematical reasoning benchmarks*
@@ -159,7 +163,7 @@ IGPO 的核心目标是解决扩散大语言模型在 GRPO 训练中面临的**�
 
 整个管线的输入为数学推理问题及其对应的真实推理轨迹（仅在训练阶段使用真值），输出为经过两阶段优化的扩散 LLM 策略。推理阶段不依赖任何真值提示，模型完全自主生成。两阶段之间通过策略参数传递衔接，最终策略在 GSM8K、MATH500、AMC、Minerva Math 四个数学基准上均取得全注意力掩码扩散 LLM 的最优结果。
 
-## 核心模块与公式推导
+
 
 ### 瓶颈与因果机制
 
@@ -209,7 +213,9 @@ $$D_{\mathrm{KL}}(\pi_{\alpha}(\cdot|x) \| \pi_\theta(\cdot|x)) \leq -\alpha \lo
 
 这解释了为何部分注入优于全量注入——它在提供方向信号的同时，将策略偏移控制在可接受范围内。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 1. 核心瓶颈的实证缓解：全错组与梯度恢复
 
@@ -292,7 +298,9 @@ $$g_{\mathrm{IGPO}}(x) = \rho(1-\rho)(g_{\mathrm{correct}}(x) - g_{\mathrm{wrong
 - **阈值固定**：熵过滤阈值$\tau$被固定为0.2，虽实证有效，但未必在所有训练阶段均为最优，动态调整策略值得探索。
 - **任务范围**：评估主要围绕数学推理，尚未测试代码生成等其他复杂推理任务的有效性。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 基座模型与RL范式定位
 
@@ -337,6 +345,8 @@ IGPO的因果杠杆在于：利用扩散LLM的双向注意力，在采样时向�
 5. **搜索增强**：结合更先进的搜索策略（如蒙特卡洛树搜索）进行补全提示的选择与组合，是否能进一步改善探索效率和最终效果？
 
 6. **非推理任务泛化**：该方法对于非推理类任务（如对话对齐、安全规范遵循）的有效性如何？这些任务的真值定义和奖励结构可能与数学推理存在本质差异。
+
+
 
 ## 原文 PDF
 

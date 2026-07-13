@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2023
 pdf_ref: paperPDFs/CVPR_2023/Novel_Class_Discovery_for_3D_Point_Cloud_Semantic_Segmentation.pdf
+project_link: null
+code_link: https://github.com/LuigiRiz/NOPS
 aliases:
 - NNPS
 - NCD3PCSS
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 面向三维点云语义分割的新类发现 |
 | 英文题名 | Novel Class Discovery for 3D Point Cloud Semantic Segmentation |
 | 会议/期刊 | CVPR 2023 |
-| Links | [paper](https://arxiv.org/abs/2303.11610); [GitHub](https://github.com/LuigiRiz/NOPS) |
+| Links | [paper](https://arxiv.org/abs/2303.11610) · [GitHub](https://github.com/LuigiRiz/NOPS) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | NOPS (NOvel Point Segmentation) |
 | Dataset | SemanticPOSS (平均4个划分), SemanticKITTI (平均4个划分) |
@@ -40,7 +42,7 @@ claims:
 > - SemanticPOSS (平均4个划分) 上，新类 mIoU 为 21.40，对比 14.94，变化 +6.5。
 > - SemanticKITTI (平均4个划分) 上，新类 mIoU 为 22.84，对比 17.04，变化 +5.8。
 
-## 概述
+## 概要
 
 三维点云语义分割中的新类发现（Novel Class Discovery, NCD）任务要求模型在仅利用基类标注样本的前提下，通过聚类无标注点云中的新类点来识别未知类别。将已有的2D NCD方法直接迁移至3D点云面临根本性障碍：3D数据缺乏前景/背景显著性概念，且每个场景可能同时包含多个新类，导致离线K‑Means聚类产生的伪标签质量低下、内存开销巨大，难以支撑在线学习与类别不平衡处理。
 
@@ -48,7 +50,7 @@ claims:
 
 在SemanticPOSS和SemanticKITTI两个基准数据集上，NOPS均显著优于专门为3D点云改编的基线方法EUMS†（Zhao et al., CVPR 2022）。SemanticPOSS上平均新类mIoU达到21.40，相较EUMS†提升6.5个点；SemanticKITTI上平均新类mIoU达到22.84，提升5.8个点。消融实验进一步证实，逐步引入在线聚类、不确定性筛选和类别平衡队列能够持续提升新类分割性能，验证了各组件的协同有效性。
 
-## 背景与动机
+
 
 点云语义分割是自动驾驶、机器人导航等三维场景理解任务的核心技术。然而，现实世界中物体类别不断涌现，完全依赖人工标注的闭集训练范式难以持续扩展。新类发现（Novel Class Discovery, NCD）旨在利用已标注基类的知识，从未标注数据中自动发现并分割出新语义类别，从而降低标注成本并提升模型的开放世界适应能力。
 
@@ -62,7 +64,9 @@ claims:
 
 上述挑战共同指向一个核心瓶颈：**在3D点云语义分割的新类发现中，如何在无需离线全量聚类、不依赖前景/背景假设的条件下，实现高质量且计算可行的在线新类学习？** 本文正是围绕这一问题展开，提出了在线伪标签分配策略NOPS（NOvel Point Segmentation），通过最优传输聚类、类别平衡队列与不确定性自适应筛选的协同设计，首次实现了面向3D点云的高效新类语义分割。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 NOPS 的核心创新在于将 3D 点云语义分割的新类发现（NCD）从依赖离线全量聚类的范式，转变为**在线等分约束的最优传输聚类**框架，并通过**类别平衡队列**与**不确定性自适应筛选**两个配套机制，系统性地解决了 3D 场景中类别缺失、长尾分布和伪标签噪声三大瓶颈。
 
@@ -102,7 +106,7 @@ NOPS 采用多个新类分割头与过聚类头（$o=3$）协同训练，输出 
 
 消融实验（Figure 4）系统验证了各组件的独立贡献：仅使用在线聚类（NP，无预训练）即可在新类上达到 20.26 mIoU；加入不确定性筛选（NP+）提升至 20.63；再引入类别平衡队列（NP++）达到 20.90；完整 NOPS 取得最佳性能。这证实了三个创新点之间存在正向协同效应。
 
-## 整体框架
+
 
 NOPS的整体pipeline围绕“双视图增强—共享特征提取—在线伪标签分配—双头预测—交换一致性优化”构建，核心设计目标是摆脱离线全量聚类对前景/背景假设和巨大内存的依赖，转而在每个批次内通过最优传输在线产生高质量的软伪标签。
 
@@ -139,7 +143,7 @@ NOPS将上述离线串行流程重构为在线并行架构：伪标签生成与�
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2303_11610/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of NOPS. We random augment the input point cloud twice and extract point-level features $\mathcal { F }$ with the shared model $f _ { \xi } . \mathcal { F }$ are used to obtain pseudo-labels in the online pseudo-labelling. We forward $\mathcal { F }$ to a novel $f _ { n }$ and a base $f _ { b }$ segmentation layer to output the novel and base predictions, respectively. We optimise our network by minimising a global objective function based on cross entropy
 
-## 核心模块与公式推导
+
 
 NOPS 的核心由三个紧密协作的模块构成：**在线伪标签分配**、**类别平衡队列**和**不确定性感知筛选**。它们共同解决了将 2D 新类发现方法迁移到 3D 点云时面临的关键瓶颈——离线 K-Means 聚类伪标签质量差、内存消耗巨大，且难以应对批次内类别缺失与长尾分布。
 
@@ -181,7 +185,9 @@ $$\mathcal { L } ( \mathcal { X } ) = \ell ( \hat { \mathcal { V } } ^ { \prime 
 
 其中 $\hat{\mathcal{V}}$ 为模型预测。该损失强制两个增强视图在伪标签空间下保持一致性，驱动特征提取器 $f_\xi$ 和类原型 $\boldsymbol{\mathsf{P}}$ 的联合学习。基类分割头 $f_b$ 则使用真实标注计算标准交叉熵损失，二者联合优化实现基类知识的保持与新类结构的发现。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -260,7 +266,9 @@ $$\mathcal { L } ( \mathcal { X } ) = \ell ( \hat { \mathcal { V } } ^ { \prime 
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2303_11610/figures/019_Figure_14.jpg]]
 *Figure 14: Qualitative comparison on SemanticKITTI from KITTI-43. EUMS† [41] outputs are completely or partially wrong for the novel classes. NOPS improves the performance by providing correct and more homogeneous predictions*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 从2D到3D新类发现的迁移瓶颈
 
@@ -303,6 +311,8 @@ NOPS的有效性建立在两个前提之上，这些前提也构成了其适用�
 3. **极端类别不平衡的损失设计。** 3D点云中类别频率差异可达数个数量级（如SemanticKITTI中“道路”与“摩托车手”的点数之比），当前简单的等权交叉熵损失在极端不平衡下可能失效。如何设计对长尾分布鲁棒的聚类损失，是提升新类发现质量的关键。
 
 4. **点云特有的几何先验利用。** NOPS当前仅依赖点级特征进行聚类，未显式利用3D空间中的几何连续性、法向量或局部邻域结构。将这些几何先验融入聚类过程，可能进一步提升伪标签质量，尤其是在几何结构清晰但外观相似的类别上。
+
+
 
 ## 原文 PDF
 

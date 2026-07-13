@@ -5,6 +5,8 @@ paper_level: A
 venue: NEURIPS
 year: 2024
 pdf_ref: paperPDFs/NEURIPS_2024/EgoChoir_Capturing_3D_Human_Object_Interaction_Regions_from_Egocentric_Views.pdf
+project_link: https://yyvhang.github.io/EgoChoir
+code_link: null
 aliases:
 - EC3HOIRFEV
 tags:
@@ -38,7 +40,7 @@ claims:
 > [!tip] 效果简介
 > - Ego-Exo4D + GIMO (自标注数据集) 上，Precision (human contact) 0.79 vs 0.65 (LEMON) (+0.14)；Recall (human contact) 0.76 vs 0.70 (LEMON) (+0.06)；F1 (human contact) 0.77 vs 0.67 (LEMON) (+0.10)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -64,8 +66,6 @@ EgoChoir 以第一人称视频剪辑 $\mathcal{V}$、头部运动序列 $\mathca
 - **物体可供性估计**：AUC 达到 78.02，aIOU 达到 14.94，SIM 达到 0.436，分别较 LEMON 提升 2.05、2.63 和 0.026。
 
 消融实验验证了各组件的关键作用：移除头部运动信息导致 Precision 下降 0.10、几何误差增加 7.24 cm；去除3D可供性特征使 Recall 下降 0.12、F1 下降 0.10；取消梯度调制使 F1 从 0.76 降至 0.73。这些结果表明，EgoChoir 通过模拟人类认知中的多线索协同与自适应机制，有效缓解了第一人称视角下视觉观察不完整的核心瓶颈。
-
-## 背景与动机
 
 ### 第一人称交互区域感知的瓶颈
 
@@ -93,7 +93,7 @@ EgoChoir 旨在突破上述瓶颈，核心动机可概括为：
 
 如图 Figure 1 所示，EgoChoir 以第一人称视频帧、头部运动序列和 3D 物体点云为输入，输出时序密集的 3D 人体接触、逐点物体可供性以及交互类别。Figure 2 则从概念层面阐释了主体意图与物体交互概念如何共同预构建“交互身体图像”，为后续的方法设计提供了认知科学层面的依据。
 
-## 核心创新
+## 核心方法与创新机理
 
 ### 从“视觉主导”到“多线索协同”的范式转换
 
@@ -127,8 +127,6 @@ $$\theta_{t+1} = \theta_t - \eta \cdot \kappa \cdot \frac{\partial \mathcal{L}}{
 ### 创新总结
 
 三个 changed slots 构成了一个递进的创新链条：**头部运动**提供了视觉之外的第二信号通道，**双向协同架构**建立了可供性与接触之间的因果约束，**梯度调制**使模型能在不同场景下灵活权衡各线索的贡献。这一组合使 EgoChoir 在人体接触 F1 上超越 LEMON 10 个百分点（0.77 vs 0.67），在几何误差上降低 8.81 cm（12.62 vs 21.43），且这一优势是在输入限制更严格（仅头部运动 vs LEMON 需外源性人体姿态）的条件下取得的。
-
-## 整体框架
 
 EgoChoir 的整体 pipeline 围绕“从第一人称视角联合推断 3D 人体接触与物体可供性”这一核心任务构建，其设计动机源于一个关键瓶颈：**第一人称视角下交互双方（人、物）的视觉观察天然不完整，导致单纯依赖视觉外观的方法无法有效建模交互区域**。为解决这一问题，EgoChoir 模拟人类认知中“交互身体图像”的预构想机制——通过协调视觉皮层、小脑和大脑的协同，将视觉观察、自我运动和概念理解融合，从而推断不可见部位的交互区域。
 
@@ -206,8 +204,6 @@ pipeline 中存在两条关键的信息依赖路径：
 ![[assets/figures/papers/paper_list_l1791_EgoChoir_Capturing_3D_Human_Object_Interaction_Regions_from_Egocentric_V/figures/001_Figure_1.jpg]]
 *Figure 1: EgoChoir takes egocentric frames and head motion from head-mounted devices, along with the 3D object, to capture 3D interaction regions, including human contact and object affordance. The human motion is just visualized for intuitive observation of contact, yet it is not utilized by EgoChoir*
 
-## 核心模块与公式推导
-
 EgoChoir 的核心架构围绕“物体交互概念挖掘 → 主体交互意图建模 → 梯度自适应调制”三条主线展开，通过平行交叉注意力（Parallel Cross-Attention）将物体几何、视觉外观和头部运动三类异质线索协调融合，最终联合输出 3D 人体接触与物体可供性。
 
 ### 3.1 问题形式化
@@ -269,7 +265,7 @@ $$\mathcal{L} = \mathcal{L}_a + \mathcal{L}_c + \mathcal{L}_s$$
 ![[assets/figures/papers/paper_list_l1791_EgoChoir_Capturing_3D_Human_Object_Interaction_Regions_from_Egocentric_V/figures/002_Figure_2.jpg]]
 *Figure 2: The subject intention, conveyed through synergistic visual appearances and head movements, along with the object interaction concept revealed by its structure and functionality, pre-formulate an interaction body image, which enables interaction regions to be envisioned*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -335,13 +331,10 @@ EgoChoir 与基线的对比在以下方面保持了公平性：数据集训练/�
 ![[assets/figures/papers/paper_list_l1791_EgoChoir_Capturing_3D_Human_Object_Interaction_Regions_from_Egocentric_V/figures/013_Table_5.jpg]]
 *Table 5: Metrics of LEMON and our method for each interaction category. Prec. indicates Precision, wrap. is wrapgrasp*
 
-![[assets/figures/papers/paper_list_l1791_EgoChoir_Capturing_3D_Human_Object_Interaction_Regions_from_Egocentric_V/figures/017_Figure_10.jpg]]
-*Figure 10: The estimated human contact when taking Lavila [112] as the backbone to extract video features. In this case, the contact is predicted even before it actually occurs*
-
 ![[assets/figures/papers/paper_list_l1791_EgoChoir_Capturing_3D_Human_Object_Interaction_Regions_from_Egocentric_V/figures/012_Table_4.jpg]]
 *Table 4: The collected 12 different interactions with 18 different objects. Obj. indicates objects, Int. denotes interactions, wrap. is wrapgrasp and Refrige. is Refrigerator*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 任务定位与基线谱系
 

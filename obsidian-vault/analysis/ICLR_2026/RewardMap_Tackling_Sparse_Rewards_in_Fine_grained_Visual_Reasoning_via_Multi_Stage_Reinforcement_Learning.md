@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/RewardMap_Tackling_Sparse_Rewards_in_Fine_grained_Visual_Reasoning_via_Multi_Stage_Reinforcement_Learning.pdf
+project_link: https://fscdc.github.io/RewardMap
+code_link: null
 openreview_forum_id: iRVbPxHNrX
 aliases:
 - RewardMap
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | RewardMap：通过多阶段强化学习解决细粒度视觉推理中的稀疏奖励问题 |
 | 英文题名 | RewardMap: Tackling Sparse Rewards in Fine-grained Visual Reasoning via Multi-Stage Reinforcement Learning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=iRVbPxHNrX); [Project](https://fscdc.github.io/RewardMap) |
+| Links | [paper](https://openreview.net/forum?id=iRVbPxHNrX) · [Project](https://fscdc.github.io/RewardMap) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | REWARDMAP |
 | Dataset | REASONMAP (Short/Long), REASONMAP Overall (Short/Long), REASONMAP-PLUS (Weighted Acc.), 6-Average (Spatial/Fine-Grained/General) |
@@ -41,7 +43,7 @@ claims:
 > - REASONMAP Overall (Short/Long) 上，Weighted Map Score 为 6.21 / 11.22，对比 5.52 / 9.52 (RL baseline, Qwen2.5-VL-7B)，变化 +0.69 / +1.70。
 > - REASONMAP-PLUS (Weighted Acc.) 上，Weighted Accuracy 为 74.25%，对比 44.64% (RL baseline on R_train)，变化 +29.61%。
 
-## 概述
+## 概要
 
 ### 问题：细粒度视觉推理中的稀疏奖励瓶颈
 
@@ -77,7 +79,7 @@ REWARDMAP 定位于 RL 微调 MLLMs 的方法族，其基线包括标准 GRPO（
 
 当前工作在交通地图领域得到充分验证，并在 ChartQA、Charxiv 等数据集上展示了初步扩展性，但尚未在大规模多样化结构化视觉推理基准上进行系统评估。多阶段训练和困难感知奖励设计引入了额外超参数（$\gamma$、$\beta$、$\alpha$），增加了调参成本。未来方向包括开发领域无关的细节奖励机制，以及将 REWARDMAP 与安全对齐技术结合，在提升推理能力的同时保证输出的可靠性与无害性。
 
-## 背景与动机
+
 
 ### 细粒度视觉推理的挑战
 
@@ -102,7 +104,9 @@ REWARDMAP 定位于 RL 微调 MLLMs 的方法族，其基线包括标准 GRPO（
 1. **困难感知奖励设计**：在基本格式和正确性奖励之外，引入 $R_{\mathrm{detail}}$（部分正确的细节奖励），并根据地图难度 $W_{\mathrm{map}}$ 与问题换乘次数 $W_{\mathrm{question}}$ 对总奖励进行加权，使模型在困难任务上获得更强的优化信号。
 2. **多阶段 RL 课程**：构建 REASONMAP-PLUS 数据集，按任务类型（二值判断 → 计数 → 规划）和目标（视觉理解 → 视觉推理）组织从易到难的训练课程，使模型逐步习得复杂推理能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 REWARDMAP 针对细粒度视觉推理中标准强化学习的稀疏奖励瓶颈，提出了两个相互协同的**changed slots**，从根本上改变了策略优化的奖励密度与训练路径。
 
@@ -142,7 +146,7 @@ $$R = W_{\text{difficulty}} \left( R_{\text{format}} + R_{\text{correctness}} + 
 
 REWARDMAP 在 Qwen2.5-VL-3B/7B 和 Kimi-VL 等不同模型规模与架构上均带来一致提升（Table 8–9），表明困难感知奖励与多阶段课程的设计不依赖于特定模型结构，具有较好的泛化能力。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_iRVbPxHNrX/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of REWARDMAP. The framework enhances fine-grained visual understanding and reasoning in MLLMs through reinforcement learning with Group Relative Policy Optimization (GRPO). It consists of two key components: (1) a difficulty-aware reward design (Section 4.2), which combines format, correctness, and detail rewards with difficulty-based weighting; and (2) a multi-stage RL curriculum (Section 4.3), which schedules training data from simple perception tasks to complex reasoning tasks, ensuring effective optimization tackling sparse rewards*
@@ -180,7 +184,7 @@ REWARDMAP 是一个面向多模态大语言模型（MLLMs）的多阶段强化�
 
 训练奖励曲线（Figure 4）直接验证了这一机制：REWARDMAP 的奖励轨迹（黄色曲线）不仅整体高于基线 RL（蓝色曲线），且呈现持续上升趋势，而基线奖励始终在低位波动，证实了奖励稀疏问题的有效缓解。
 
-## 核心模块与公式推导
+
 
 REWARDMAP 框架的核心由三个模块构成，协同解决细粒度视觉推理中的稀疏奖励瓶颈。
 
@@ -225,7 +229,9 @@ $$W_{\mathrm{question}} = \begin{cases} \beta_0, & \text{transfer count = 0} \\ 
 
 消融实验证实了细粒度课程的必要性：粗粒度的多阶段设计（仅粗略划分阶段）在 REASONMAP-PLUS 上的加权准确率为 70.30%，而 REWARDMAP 的细粒度课程达到 74.25%（Table 5）。同时，仅添加困难感知奖励设计（无多阶段课程）即可在 REASONMAP 上将加权准确率提升约 2.86%/3.91%（短/长问题），而组合两个模块后达到最佳效果（Table 3），验证了两者的互补性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 瓶颈定位与评估基准
 
@@ -298,7 +304,9 @@ $$W_{\mathrm{question}} = \begin{cases} \beta_0, & \text{transfer count = 0} \\ 
 
 尽管 REWARDMAP 在交通地图域取得了显著收益，其当前验证范围仍主要局限于该领域。虽然 ChartQA、Charxiv 上的初步结果表明方法具备扩展潜力，但在大规模、多样化的结构化视觉推理基准（如复杂流程图、工程图纸、多模态科学图表）上的系统评估尚缺。此外，多阶段课程和困难感知奖励设计引入了 γ、β、α 等额外超参数，增加了调参成本，且最优配置可能随任务域变化而迁移——当前在交通地图上搜索得到的最优参数未必直接适用于其他结构化视觉域。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：稀疏奖励瓶颈
 
@@ -360,6 +368,8 @@ REWARDMAP 建立在 GRPO 算法之上，其基线方法包括：
 1. **领域无关的奖励机制**：能否开发不依赖领域知识的细节奖励和困难感知机制，使 REWARDMAP 可直接应用于图表理解、流程图解析等更广泛的结构化视觉域？这需要解决“部分正确性”的通用定义问题。
 2. **安全对齐的整合**：REWARDMAP 的框架如何与安全对齐技术结合？密集奖励可能引导模型产生格式正确但内容不可靠的输出，需要在提升推理能力的同时保证输出的可靠性和无害性。
 3. **课程设计的自动化**：当前多阶段课程依赖人工定义的任务类型排序（二值判断 → 计数 → 规划），能否基于模型在训练过程中的表现动态调整课程难度？
+
+
 
 ## 原文 PDF
 

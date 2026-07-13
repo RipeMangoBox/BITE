@@ -5,6 +5,7 @@ paper_level: A
 venue: NEURIPS
 year: 2024
 pdf_ref: paperPDFs/NEURIPS_2024/UniMTS_Unified_Pre_training_for_Motion_Time_Series.pdf
+project_link: null
 code_link: https://github.com/xiyuanzh/UniMTS
 aliases:
 - UniMTS
@@ -39,7 +40,7 @@ claims:
 > [!tip] 效果简介
 > - 18 个真实运动时间序列数据集（平均） 上，零样本 F1 相对提升 UniMTS vs ImageBind (最佳基线) (+340%)；少样本（1~10 样本/类）平均 F1 相对提升 UniMTS vs ImageBind (最佳基线) (+16.3%)；全样本 F1 87.5 ± 13.4 vs 74.8 ± 16.7 (DeepConvLSTM) (+12.7)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -70,7 +71,7 @@ UniMTS 在 18 个真实运动时间序列数据集上进行了全面验证，覆
 
 此外，UniMTS 的图编码器仅含 **4.94M 参数**，远小于 ImageBind IMU 编码器的 18.69M 参数，在边缘部署场景中具有明显的效率优势。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -104,7 +105,9 @@ UniMTS 在 18 个真实运动时间序列数据集上进行了全面验证，覆
 
 基于上述洞察，本文提出 **UniMTS**——首个统一的运动时间序列预训练框架，旨在通过合成数据预训练、图结构编码和跨模态语义对齐，一次性解决设备位置、方向和活动类型三个泛化挑战，实现鲁棒的零样本、少样本和全样本运动识别。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 UniMTS 的核心创新在于通过三个层面的协同设计，从根本上打破了现有运动时间序列分类模型对特定数据采集条件的依赖，实现了对设备佩戴位置、方向及活动类型的统一泛化。
 
@@ -132,7 +135,7 @@ UniMTS 的核心创新在于通过三个层面的协同设计，从根本上打�
 
 上述三个创新维度并非孤立存在，而是形成了完整的因果链条：合成数据提供位置覆盖、旋转增强提供方向不变性、图网络与语义对齐提供位置和活动的联合泛化能力。这一设计使得 UniMTS 在 18 个真实数据集上零样本性能平均超过最佳基线 **ImageBind**（Girdhar et al., CVPR 2023）340%（F1 提升），少样本微调平均 F1 超越最佳基线 16.3%，全样本微调 F1 达到 87.5%，显著优于所有预训练、自监督和传统模型（Table 1-3, Figure 4）。
 
-## 整体框架
+
 
 UniMTS 的整体框架围绕一个核心洞察构建：**将大规模运动骨架数据转化为多关节传感器模拟信号，并利用图网络与语义对齐，可以打破传统模型对特定数据采集条件的依赖**。如图 Figure 2 所示，整个 pipeline 分为预训练与下游适配两大阶段，通过物理引擎合成、旋转不变增强、图编码与跨模态对比学习四个关键模块的协同，实现对设备佩戴位置、方向及活动类型的统一泛化。
 
@@ -169,7 +172,7 @@ UniMTS 的整体框架围绕一个核心洞察构建：**将大规模运动骨�
 ![[assets/figures/papers/paper_list_l1916_UniMTS_Unified_Pre_training_for_Motion_Time_Series/figures/001_Figure_1.jpg]]
 *Figure 1: Our framework addresses all three generalization challenges (variation in device location, orientation and activity) where existing methods fall short*
 
-## 核心模块与公式推导
+
 
 UniMTS 的预训练框架由五个核心模块构成，各模块协同实现从运动骨架到通用运动时间序列表示的转化。
 
@@ -286,7 +289,9 @@ $$
 ![[assets/figures/papers/paper_list_l1916_UniMTS_Unified_Pre_training_for_Motion_Time_Series/figures/003_Figure_3.jpg]]
 *Figure 3: Inference (left) and fine-tuning (right) phases of UniMTS. We assign real signals to the nearest location in the skeleton graph. During inference, we compute similarity score between the graph embedding and each label candidate, and predict the one with the highest score. During fine-tuning, we freeze the text encoder and update weights of the graph encoder and linear layer*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与实验设计逻辑
 
@@ -377,7 +382,9 @@ Figure 6 和 Figure 9 分别展示了模拟运动时间序列与真实 PAMAP2 �
 
 所有基线均按照原文公开实现或预训练权重进行复现，在相同的数据预处理与采样频率下评估。统计检验统一采用 Wilcoxon signed-rank test 并经过 Holm's α=0.05 校正，所有关键提升的 p 值均显著小于 0.05。超参数（学习率 0.0001，批大小 64，温度参数初始化自 CLIP）在零样本、少样本和全样本设定中保持一致，确保对比的公平性。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有基线的差异化关系
 
@@ -444,6 +451,8 @@ UniMTS 处于**运动感知预训练**与**跨模态语义对齐**的交汇点�
 - **对齐层面**：利用 CLIP 文本编码器和 LLM 增强的文本描述，在对比学习框架下实现运动信号与语义的跨模态对齐，赋予模型零样本活动识别能力。
 
 这一框架为后续研究提供了可复用的范式：**合成物理一致的运动数据 + 结构化编码器 + 语义对齐**，可作为运动时间序列领域的基础预训练方案，类似于 CLIP 在视觉-语言领域的作用。
+
+
 
 ## 原文 PDF
 

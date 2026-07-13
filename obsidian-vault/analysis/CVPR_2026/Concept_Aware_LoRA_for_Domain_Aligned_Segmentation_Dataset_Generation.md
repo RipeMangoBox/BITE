@@ -45,7 +45,7 @@ claims:
 > - Cityscapes 100% (fully supervised) 上，mIoU 80.74 vs 79.40 (+1.34)。
 > - Domain Generalization (HRDA average over ACDC, DZ, BDD, MV) 上，mIoU 53.61 vs 52.08 (+1.53)。
 
-## 概述
+## 概要
 
 使用预训练文本到图像（T2I）扩散模型为语义分割任务生成训练数据，面临一个关键瓶颈：标准的 LoRA 微调会不加区分地学习目标域训练图像中的所有概念——包括视角、风格、物体形状和布局——导致严重的过拟合与记忆化。这不仅限制了生成图像的多样性，还削弱了模型与目标领域的对齐能力。
 
@@ -56,7 +56,7 @@ claims:
 - 在领域泛化基准测试（ACDC、Dark Zurich、BDD100K、Mapillary）中，结合 HRDA 方法平均提升 **+1.53% mIoU**，尤其在恶劣天气和光照条件下表现突出。
 - 消融实验表明，仅微调 **2%** 的概念感知投影层即可取得最佳分割性能与领域对齐的平衡，优于全层微调、手工选择层及随机选择策略。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -79,7 +79,9 @@ claims:
 
 这一动机催生了**概念感知LoRA（Concept-Aware LoRA, CA-LoRA）**：一种自动识别并选择性微调T2I模型中与期望概念相关联权重的微调方法。通过仅更新对目标概念敏感的参数子集，CA-LoRA在实现精确领域对齐的同时，最大限度地保留了预训练模型的生成多样性，从根本上解决了现有微调方法在生成分割数据时多样性差、泛化能力不足的问题。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 创新动机：LoRA 微调的“过度学习”困境
 
@@ -133,7 +135,7 @@ CA-LoRA 相对标准 LoRA 微调进行了四个关键维度的改造，形成从
 
 CA-LoRA 的核心创新在于将 T2I 模型微调从“全参数无差别学习”转变为“概念感知的选择性学习”。通过概念感知度这一量化指标，模型能够自动识别并仅更新与目标概念相关的权重子集（仅 2%），在避免过拟合的同时实现精确的领域对齐。这一创新从根本上解决了现有微调方法在生成分割数据时多样性差、泛化能力不足的问题，并在 Cityscapes 小样本（+2.30% mIoU）和域泛化（+1.53% mIoU）等关键基准上取得了显著提升。
 
-## 整体框架
+
 
 CA-LoRA 的数据集生成框架遵循一个**四阶段流水线**，其核心设计目标是在不牺牲预训练 T2I 模型多样性的前提下，仅学习目标领域的特定概念（如驾驶视角或风格），从而生成领域对齐且多样化的图像-标签对。
 
@@ -156,7 +158,7 @@ $$\mathrm{Concept\text{-}Awareness}(\theta) := \mathbb{E}_{x_0, \epsilon, c_{\ma
 ![[assets/figures/papers/paper_list_l744_https_arxiv_org_abs_2503_22172/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of our framework for generating an urban-scene segmentation dataset by learning the Cityscapes viewpoint. The process consists of four stages: (1) identifying sensitive weights for a specific concept, (2) selectively fine-tuning them with LoRA, (3) training a label generator using features from T2I model, and (4) generating diverse image-label pairs with augmented prompts*
 
-## 核心模块与公式推导
+
 
 ### 概念感知度（Concept-Awareness）度量
 
@@ -211,7 +213,9 @@ $$\mathrm{Concept-Awareness}(\theta) := \mathbb{E}_{x_0, \epsilon, c_{\mathrm{Au
 ![[assets/figures/papers/paper_list_l744_https_arxiv_org_abs_2503_22172/figures/011_Figure_8.jpg]]
 *Figure 8: The detailed architecture of the CA-LoRA. We conduct projection-wise CA-LoRA that can attach the LoRA layer for each projection layer of multi-head self-attention*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -286,7 +290,9 @@ Figure 5 的定性对比直观展示了各方法的生成质量差异。Instruct
 ![[assets/figures/papers/paper_list_l744_https_arxiv_org_abs_2503_22172/figures/001_Figure_1.jpg]]
 *Figure 1: Motivation of Concept-Aware LoRA (CA-LoRA). Pretrained T2I models generate informative images but struggle with viewpoint alignment. LoRA fine-tuning on Cityscapes enables driving-viewpoint generation but leads to overfitting to the Cityscapes style and content. We aim to learn only the desired concept (e.g., viewpoint) for generating domain-aligned, informative samples*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心问题与解决路径
 
@@ -339,6 +345,8 @@ CA-LoRA 的有效性建立在以下决定性证据之上：
 2. **自动化提示搜索**：能否利用大语言模型自动搜索最优的提示增强策略，替代当前的手工设计？
 3. **时间步鲁棒性**：平均多个时间步的概念感知度是否能够进一步提高鲁棒性和精度？
 4. **与生成式数据增强方法的深度整合**：CA-LoRA目前作为DatasetDM的领域适配前置模块，未来可探索与ControlNet等可控生成架构的联合优化，实现更精细的概念解耦控制。
+
+
 
 ## 原文 PDF
 

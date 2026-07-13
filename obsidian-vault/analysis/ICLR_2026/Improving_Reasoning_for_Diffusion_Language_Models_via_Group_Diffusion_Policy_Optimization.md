@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Improving_Reasoning_for_Diffusion_Language_Models_via_Group_Diffusion_Policy_Optimization.pdf
+project_link: null
+code_link: null
 openreview_forum_id: JaqvespRBP
 aliases:
 - GDPOG
@@ -42,7 +44,7 @@ claims:
 > - MATH500 (512 tokens) 上，准确率 (%) 为 41.4 (+SFT+GDPO, N=3)，对比 39.2 (+diffu-GRPO)，变化 +2.2。
 > - Countdown (512 tokens) 上，准确率 (%) 为 80.86 (+SFT+GDPO, N=3)，对比 37.1 (+diffu-GRPO)，变化 +43.76。
 
-## 概述
+## 概要
 
 扩散语言模型（DLMs）在推理任务上的强化学习（RL）微调面临一个关键瓶颈：**序列级似然函数难以精确计算**，导致无法直接估计重要性权重。现有方法（如 diffu-GRPO）退而求其次，采用 token 级的均值场近似，但牺牲了训练信号的保真度。若强行使用序列级 ELBO，传统双蒙特卡洛估计又会因**随机时间采样的高方差**而失效。
 
@@ -56,7 +58,7 @@ GDPO 将重要性权重从 token 级提升至**序列级**，配合组相对策�
 
 **主要局限**：GDPO 对学习率敏感，需要比 diffu-GRPO 更小的学习率以避免发散；在 HumanEval 512 令牌设置下性能（39.0）略低于 diffu-GRPO（45.5），表明 token 级方法在特定编码任务上可能仍有优势。
 
-## 背景与动机
+
 
 ### 扩散语言模型的推理瓶颈
 
@@ -99,7 +101,9 @@ $$\mathcal{L}_{\mathrm{ELBO}}(y|q) = \mathbb{E}_{t\sim\mathcal{U}[0,1]} \mathbb{
 
 这一动机催生了本文的核心方法——**分组扩散策略优化（Group Diffusion Policy Optimization, GDPO）**，它将 SDMC 估计器嵌入 GRPO 框架，在保持组内相对优势估计优势的同时，实现了低方差、高保真度的序列级策略更新。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GDPO 的核心创新在于**将扩散语言模型（DLM）强化学习微调中的似然估计从 token 级提升到序列级**，并通过**半确定性蒙特卡洛（SDMC）方案**解决了序列级 ELBO 估计方差爆炸的瓶颈。
 
@@ -139,7 +143,7 @@ SDMC 的收益在极少的求积点下即可兑现：**仅需 N=2–3 个求积�
 
 值得注意的是，GDPO 对学习率敏感，通常需要比 diffu-GRPO 更小的学习率，否则可能导致模型发散（Appendix D.1）。这一敏感性可能源于序列级重要性权重引入了更大的梯度方差，需要在实践中仔细调参。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l30_https_openreview_net_forum_id_JaqvespRBP/figures/009_Figure_3.jpg]]
 *Figure 3: Estimation error and variance for Double Monte Carlo vs our Semi-deterministic Monte Carlo method. SD-MC achieves lower bias and variance, with most benefits obtained using only 2–3 points*
@@ -217,7 +221,7 @@ $$\mathcal{L}^{\mathrm{GDPO}}(\theta) = \mathbb{E}_x \mathbb{E}_{y_g\sim\pi_{\ma
 
 这一框架的核心洞察在于：损失函数随时间 $t$ 呈现平滑、可预测的简单形态（Figure 2(b)），因此适合用确定性数值积分近似以抑制方差。SDMC 以极小的计算开销（$N=2\sim3$ 个求积点）实现了对 ELBO 的高效低方差估计，为序列级强化学习微调扩散语言模型铺平了道路。
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题背景：扩散语言模型的似然估计瓶颈
 
@@ -303,7 +307,9 @@ GDPO 的训练管线包含四个核心模块：
 3. **ELBO 估计器（SDMC）**：对每个补全 $y_g$，通过 $N$ 个固定时间点的高斯求积和 $K$ 次内层蒙特卡洛采样，计算 $\mathcal{L}_{\mathrm{ELBO}}(y_g|x)$ 作为重要性权重的基础。
 4. **策略优化**：使用 AdamW 优化器，根据 GDPO 目标函数更新策略参数 $\theta$。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -372,7 +378,9 @@ Figure 4 在 Countdown 数据集上对比了不同 ELBO 估计器对训练效果
 
 所有训练在 2–8 张 H100 GPU 上完成（Table 4）。GDPO 虽然每次迭代需要更多 NFE（2–3 vs 1），但因收敛更快，总迭代次数更少，实际训练时间与 diffu-GRPO 相当（Table 5）。这种效率优势源于 SDMC 估计器的低方差特性，使得每次梯度更新包含更高质量的信号。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：扩散语言模型强化学习微调的似然估计瓶颈
 
@@ -425,6 +433,8 @@ GDPO 在方法论上可视为对 diffu-GRPO 的序列级泛化：两者都使用
 2. **方差-偏差权衡的泛化性**：ELBO 估计的方差-偏差权衡在数学推理任务上得到了验证，但在更复杂的开放式文本生成任务中是否依然成立？
 3. **采样点扩展**：GDPO 当前使用 $N=3$ 个求积点，是否可以扩展到更多采样点（类似 coupled-GRPO 的思路）以进一步改进？Table 1 的理论界表明增加 $N$ 可降低偏差，但实际收益需要验证。
 4. **高效低方差估计器的设计**：论文明确指出“designing estimators that are both efficient and low-variance remains an open problem”，这指向了扩散模型 RL 微调中一个根本性的方法论挑战。
+
+
 
 ## 原文 PDF
 

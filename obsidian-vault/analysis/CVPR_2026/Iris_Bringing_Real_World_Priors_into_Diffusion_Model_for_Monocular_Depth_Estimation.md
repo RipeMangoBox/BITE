@@ -44,7 +44,7 @@ claims:
 > - NYUv2 上，AbsRel↓ / δ1↑ 4.9 / 97.4 vs Depth Anything V2: 4.5 / 97.9 (+0.4)。
 > - ETH3D 上，AbsRel↓ / δ1↑ 5.5 / 97.6 vs Lotus-D: 6.1 / 97.0 (-0.6)。
 
-## 概述
+## 概要
 
 单目深度估计（MDE）长期面临一个核心瓶颈：传统前馈方法依赖海量训练数据但细节模糊，而扩散方法虽有生成先验却在合成到真实的域迁移中泛化不足。更隐蔽的问题是频率-可靠性不匹配——真实伪标签低频可信、高频不可信，与合成真值的高频精确形成冲突，单阶段训练难以调和。
 
@@ -54,7 +54,7 @@ Iris 通过一个**两阶段确定性扩散框架**解开这一死结。其核�
 
 **主要结果**：在零样本仿射不变深度估计的 16 种方法比较中，Iris 取得最优综合排名（All Avg Ranking 和 Group Avg Ranking 均列第一）。在 KITTI 上与 Depth Anything V2 持平（AbsRel 7.2 vs 7.4），在 ETH3D 和 ScanNet 上显著超越 Lotus-D，并展现出更强的跨域泛化能力和细节保真度。推理效率方面，在 NVIDIA A100 上 1536² 分辨率下单次推理速度优于 Depth Anything V2，远快于迭代扩散方法。
 
-## 背景与动机
+
 
 单目深度估计（Monocular Depth Estimation, MDE）是计算机视觉中的基础任务，旨在从单张RGB图像恢复逐像素的深度信息。近年来，该领域沿着两条主线演进：**前馈判别式方法**与**扩散生成式方法**，二者呈现出明显的互补特性。
 
@@ -66,7 +66,9 @@ Iris 通过一个**两阶段确定性扩散框架**解开这一死结。其核�
 
 **Iris的动机**：本文观察到前馈方法与扩散方法在频谱上的互补性（Figure 1），提出核心假设——**将真实世界先验的注入与几何细节的细化在扩散时间步上解耦**，可以系统性地解决上述矛盾。具体而言，在高时间步（低SNR）引入真实数据的低频先验以建立正确的全局结构，在低时间步（高SNR）利用合成数据细化高频几何，并通过傅里叶域的可学习门控机制选择性传递可靠信息。这一思路催生了Iris的两阶段先验到几何确定性（Priors-to-Geometry Deterministic, PGD）框架。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Iris的核心创新在于通过**两阶段确定性扩散框架**与**频谱门控机制**，系统性地解决了扩散模型在单目深度估计中“合成到真实域迁移”与“频率-可靠性不匹配”两大瓶颈。
 
@@ -115,7 +117,7 @@ $$\mathcal{L} = \underbrace{\mathbb{E}_{x \sim \mathcal{D}_{\mathrm{syn}}} \| \h
 
 其中 $\mathcal{L}_{\mathrm{recon}}$ 为图像重建辅助损失，用于保留Stable Diffusion骨干的细节建模能力。超参数消融（Table 4）确定最优设置为 $\alpha=1.0, \beta=0.1, \gamma=1.0$。
 
-## 整体框架
+
 
 Iris 提出了一种名为 **先验到几何确定性（Priors-to-Geometry Deterministic, PGD）** 的两阶段扩散框架，用于单目深度估计。其核心设计理念是将真实世界先验的注入与高频几何细节的细化在扩散时间步上进行解耦，从而解决传统方法中合成到真实域迁移导致的泛化不足以及频率-可靠性不匹配问题。
 
@@ -156,7 +158,7 @@ $$\mathcal{L} = \underbrace{\mathbb{E}_{x \sim \mathcal{D}_{\text{syn}}} \| \hat
 ![[assets/figures/papers/paper_list_l2525_https_arxiv_org_abs_2603_16340/figures/003_Figure_3.jpg]]
 *Figure 3: Iris overview. Iris introduces a two-stage diffusion-based Priors-to-Geometry Deterministic framework that effectively injects real-world priors into the diffusion model. First prior stage injects real-world priors from a frozen teacher under a high-timestep state, while the second geometry stage refines metrically faithful predictions on synthetic supervision at a low-timestep state. In the prior stage, Spectral-Gated Distillation (§3.2) uses a lightweight low-pass gate to filter noisy teacher predictions into stable low-frequency layout priors, whereas in the geometry stage, Spectral-Gated Consistency (§3.3) applies a lightweight high-pass gate to transfer sharp boundaries and fine detail...*
 
-## 核心模块与公式推导
+
 
 ### 问题形式化与扩散背景
 
@@ -240,7 +242,9 @@ $$\mathcal{L} = \mathcal{L}_{\text{depth}} + \gamma \mathcal{L}_{\text{recon}} \
 ![[assets/figures/papers/paper_list_l2525_https_arxiv_org_abs_2603_16340/figures/004_Figure_5.jpg]]
 *Figure 5: Visualization of Spectral-Gated Consistency. Stage-1 naturally yields crisp detail and boundary cues. To leverage these internal cues, SGC encourages agreement between stages in the high-frequency band. See §3.3 for more details*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 零样本仿射不变深度估计主结果
 
@@ -310,7 +314,9 @@ Figure 6展示了Iris在多种场景下的定性比较结果。Iris在室内外�
 ![[assets/figures/papers/paper_list_l2525_https_arxiv_org_abs_2603_16340/figures/012_Table_S.1.jpg]]
 *Table S.1: Quantitative comparison on zero-shot affine-invariant depth estimation*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 基线谱系与定位
 
@@ -342,6 +348,8 @@ Iris 的方法定位可概括为：**以确定性扩散为骨架，通过频谱�
 1. **室内数据高效融入。** 如何在不显著增加训练成本的前提下，高效融入更多室内真实数据以提升室内场景的泛化能力，是直接且紧迫的工程问题。
 2. **框架的任务泛化性。** 两阶段 PGD 框架是否可推广到其他密集预测任务（如法线估计、语义分割），并保持同等的性能增益？频谱门控机制对非深度模态的频率特性是否同样有效，尚待验证。
 3. **降低教师依赖。** 当前框架依赖 DAv2 作为冻结教师提供伪标签。是否可以通过更轻量级的教师模型或自蒸馏策略进一步降低对大规模预训练教师的依赖，是提升方法实用性的重要方向。
+
+
 
 ## 原文 PDF
 

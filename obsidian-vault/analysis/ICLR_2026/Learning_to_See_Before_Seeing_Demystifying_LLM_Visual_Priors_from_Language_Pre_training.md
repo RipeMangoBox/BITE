@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Learning_to_See_Before_Seeing_Demystifying_LLM_Visual_Priors_from_Language_Pre_training.pdf
+project_link: https://junlinhan.github.io/projects/lsbs/
+code_link: null
 openreview_forum_id: pfw176o1YJ
 aliases:
 - LVAPTDM
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 未视先识：揭示语言预训练中LLM的视觉先验 |
 | 英文题名 | Learning to See Before Seeing: Demystifying LLM Visual Priors from Language Pre-training |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=pfw176o1YJ); [Project](https://junlinhan.github.io/projects/lsbs/) |
+| Links | [paper](https://openreview.net/forum?id=pfw176o1YJ) · [Project](https://junlinhan.github.io/projects/lsbs/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | 面向视觉感知的LLM预训练数据混合策略 (Vision-Aware Pre-training Data Mixture) |
 | Dataset | Multimodal VQA (16 benchmarks averaged), Vision-centric VQA |
@@ -41,7 +43,7 @@ claims:
 > - Multimodal VQA (16 benchmarks averaged) 上，Overall VQA Accuracy 为 38.64，对比 37.32，变化 +1.32。
 > - Vision-centric VQA 上，v-acc 为 33.3 (mix6)，对比 32.4 (mix0)，变化 +0.9。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -66,8 +68,6 @@ claims:
 - 推理先验在三种不同视觉编码器下均表现出一致的通用提升趋势，而感知先验的趋势则因编码器而异（Figure 6）。
 - 消融实验表明，移除指令微调中的感知数据会导致感知类基准大幅下降，而移除推理数据对感知任务影响微小（Figure 7），进一步验证了两类先验的功能独立性。
 - 在MLE-Bench的小物体感知（0-30%像素占比）上，用web-crawl预训练的3B模型持续表现最优，验证感知先验来源于多样化数据（Figure 8）。
-
-## 背景与动机
 
 ### 问题背景：大语言模型的视觉能力之谜
 
@@ -96,7 +96,7 @@ claims:
 
 本文的工作为理解LLM中隐式视觉知识的起源提供了实证框架，并为高效训练多模态模型提供了可操作的数据配比指导。
 
-## 核心创新
+## 核心方法与创新机理
 
 本工作的核心创新在于**揭示并解耦了LLM在纯文本预训练中自发获得的视觉先验**，并据此提出了一种**面向视觉感知的预训练数据混合策略 (Vision-Aware Pre-training Data Mixture)**。其关键洞察是：视觉先验并非单一整体，而是由**感知先验 (perception prior)** 与**推理先验 (reasoning prior)** 两部分构成，二者来源不同、可独立调节。
 
@@ -123,8 +123,6 @@ mix0 代表传统的“语言友好型”配比，优先保障语言基准性能
 
 本工作属于**LLM预训练数据工程 × 多模态能力涌现**的交叉研究。其核心贡献在于提供了可操作的因果操纵变量（推理/视觉描述数据比例），而非依赖视觉-语言联合预训练或更大的视觉编码器。参考的MLLM适配流程采用**Cambrian-1 adapter pipeline**（Tong et al., 2024a），但本工作的创新点集中在适配之前的纯文本预训练阶段，因此与现有MLLM工作形成互补而非竞争关系。
 
-## 整体框架
-
 本工作构建了一条从纯文本预训练到多模态视觉问答的完整实验流水线，用以系统性地剖析语言模型在“未见图像”之前便已内化的视觉先验。整条流水线包含三个严格解耦的阶段，其设计核心在于：**将视觉能力的来源归因于语言预训练数据，而非视觉编码器或指令微调过程**。
 
 ### 阶段一：纯文本语言模型预训练
@@ -149,8 +147,6 @@ mix0 代表传统的“语言友好型”配比，优先保障语言基准性能
 - **输出**：能够执行多模态视觉问答的 MLLM，其视觉能力可追溯至预训练数据的特定组分
 
 这一框架的关键设计原则在于 **因果隔离**：视觉编码器在阶段三之前保持冻结，指令微调数据被分类控制，从而确保观察到的性能差异可明确归因于语言预训练阶段的数据配比选择。
-
-## 核心模块与公式推导
 
 ### 流水线模块
 
@@ -183,7 +179,7 @@ $$
 
 > **注意**：本文未引入新的模型架构或训练公式，核心贡献在于预训练数据配比的系统性探索。上述核对齐公式为分析工具，而非模型组成部分。其他公式（如困惑度、准确率等标准评估指标）不再赘述。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心发现：视觉先验的可分解性
 
@@ -241,30 +237,13 @@ MLE-Bench（Multi-Level Existence Bench）提供了按目标物体相对像素�
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_pfw176o1YJ/figures/001_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_pfw176o1YJ/figures/004_Figure_1.jpg]]
-*Figure 1: VQA evaluation question examples for each category*
-
-![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_pfw176o1YJ/figures/005_Figure_2.jpg]]
-*Figure 2: Impact of model and data sizes. The plots illustrate the performance of MLLMs, built upon LLMs of five different sizes (340M to 13B parameters), as a function of the amount of web-crawl pre-training data (0B to 100B tokens). The general trend shows that performance improves with both increasing model size and data volume, but the scaling behavior differs across task categories*
-
 ![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_pfw176o1YJ/figures/016_Figure_10.jpg]]
 *Figure 10: Qualitative impact of reasoning-centric data on visual reasoning tasks. The plot shows how varying the proportion of different reasoning-centric data categories in the pre-training mix impacts metrics of visual reasoning quality. Results indicate that more reasoning data leads to more coherent and detailed visual reasoning*
-
-![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_pfw176o1YJ/figures/008_Table_1.jpg]]
-*Table 1: Finding 4: Maximizing MLLM VQA performance is best achieved by pre-training on a data mixture heavily skewed towards reasoning-centric content but with necessary vision world knowledge. The balance point between language and vision proficiency is reached via a calibrated data mixture between language-favorable and vision-favorable. Table 1: Grid Search for a vision-favorable data mixture. Results from pre-training a 3B parameter LLM on 30 distinct data blends, each totaling 30B tokens. The table explores how varying the proportions of reasoning-centric (rea) and visual-world (vis) data affects various capabilities*
-
-![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_pfw176o1YJ/figures/018_Table_4.jpg]]
-*Table 4: Conceptual categories of key pre-training data corpus (%). The table shows the percentage of text segments from each data corpus classified into one of the conceptual categories*
 
 ![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_pfw176o1YJ/figures/020_Figure_12.jpg]]
 *Figure 12: MLE Benchmark Examples. The figure provides examples from the MLE-Bench, illustrating how the dataset is partitioned based on the ground-truth object size from reference segmentation maps. For instance, in the 0-30 split, the target object (a fireplace) constitutes a small fraction of the image. In contrast, the 60-90 split features a correct object (grass) that covers a substantial portion of the image. Table 5: Model performance on the MLE-Bench. Results are reported in three splits based on object size in percentage (0-30, 30-60, 60-100), along with a weighted overall accuracy, evaluating the ability of different models to identify objects of varying sizes*
 
-![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_pfw176o1YJ/figures/006_Figure_3.jpg]]
-*Figure 3: Impact of pre-training data sources. The bar charts illustrate the downstream VQA performance of MLLMs built upon a 3B parameter LLM, where each LLM was pre-trained on 30B tokens from a single, specific data source. The plots show that performance varies significantly depending on the pre-training sources*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 核心方法定位
 

@@ -43,7 +43,7 @@ claims:
 > - 25-projector array (simulated with 5 × 5 shifted positions) 上，number of required patterns per board pose 54 (simultaneous projection from all projectors) vs 1,100 (sequential projection, conventional method) (95% reduction)。
 > - Outdoor ambient light (~70 klux sunlight), 2 projectors 上，successful pattern separation and geometric alignment successful (accurate checkerboard alignment) vs fail (projected patterns overwhelmed by ambient light) (proposed robust to 70 klux, conventional completely fails)。
 
-## 概述
+## 概要
 
 多投影仪系统在沉浸式显示、空间增强现实和大屏拼接等应用中日益普及，但其规模化部署始终受制于一个根本瓶颈：**标定时间随投影仪数量线性增长**。传统方法依赖外部相机捕获漫反射的结构光图案，由于漫反射丧失了入射方向信息，不同投影仪同时投射的图案在相机像面上完全重叠、无法分辨。因此必须串行投影——一台接一台地标定——导致所需投影图案数按 $M \times (\lceil \log_2 W \rceil + \lceil \log_2 H \rceil + L)$ 线性增长，其中 $M$ 为投影仪数量。当系统规模达到数十台时，标定过程变得极其耗时，严重制约了多投影系统的可扩展性。
 
@@ -55,7 +55,7 @@ claims:
 
 本方法的主要局限在于：要求所有投影仪共享公共投影区域，对于不重叠的大范围部署需分组标定；目前仅支持平面标定靶；精度略低于使用大量棋盘角点的传统方法（约+0.2像素），但可通过增加嵌入式相机数量进一步提升。
 
-## 背景与动机
+
 
 ### 多投影仪系统的标定瓶颈
 
@@ -90,7 +90,9 @@ $$\lceil \log_2 M \rceil + \lceil \log_2 W \rceil + \lceil \log_2 H \rceil + L$$
 3. **增强环境光鲁棒性**：利用嵌入式相机直接接收投影光（而非依赖漫反射），在强环境光（如户外阳光）下仍能可靠工作。
 4. **补偿系统误差**：通过离线标定的单应变换，补偿嵌入式相机光学中心与标定板平面之间的微小偏移，确保高精度几何对齐。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于**将相机从“观察者”变为“标定目标”**，从根本上改变了多投影仪标定中图案分离的物理机制，从而突破了串行标定的可扩展性瓶颈。
 
@@ -138,7 +140,7 @@ $$\pmb{x}_n(m) = \mathcal{M}_n(\pmb{c}_n(m))$$
 - **结构光编码**：采用经典的 Gray-code 加线移图案方案，额外增加投影仪 ID 的二进制时间编码，实现对多投影仪源的区分。
 - **差异化定位**：与基于外部相机阵列或全光相机的方法不同，本文不增加外部观测设备，而是将相机微型化并嵌入标定目标本身，实现了“标定目标即传感器”的范式转换。
 
-## 整体框架
+
 
 本文提出的多投影仪标定方法通过**反向配置**彻底重构了传统标定流程：将相机从“外部观察者”转变为“嵌入式方向传感器”，从而将标定效率从与投影仪数量线性相关压缩为近乎常数。
 
@@ -181,7 +183,7 @@ $$\pmb{x}_n(m) = \mathcal{M}_n(\pmb{c}_n(m))$$
 ![[assets/figures/papers/paper_list_l2114_https_arxiv_org_abs_2604_24024/figures/001_Figure_1.jpg]]
 *Figure 1: Imaging principle of simultaneously projected structured light patterns from multiple projectors: (a) Overlapping patterns captured by an external camera are difficult to separate, whereas (b) the embedded cameras directly receive the projection light, enabling separation of individual patterns*
 
-## 核心模块与公式推导
+
 
 ### 方向性编码与图案分离
 
@@ -224,7 +226,9 @@ $$\lceil \log_2 M \rceil + \lceil \log_2 W \rceil + \lceil \log_2 H \rceil + L$$
 ![[assets/figures/papers/paper_list_l2114_https_arxiv_org_abs_2604_24024/figures/004_Figure_4.jpg]]
 *Figure 4: Measurement method of the intersection point*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验结果
 
@@ -274,7 +278,9 @@ $$\lceil \log_2 M \rceil + \lceil \log_2 W \rceil + \lceil \log_2 H \rceil + L$$
 ![[assets/figures/papers/paper_list_l2114_https_arxiv_org_abs_2604_24024/figures/010_Figure_10.jpg]]
 *Figure 10: Experiment with 25 projectors. (a) The calibration board under simultaneous Gray-code projection. (b) Corresponding image captured by one of the embedded cameras with decoded coordinates overlaid. (c) Result of the alignment projection*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从串行标定到并行方向分离
 
@@ -341,6 +347,8 @@ $$\lceil \log_2 M \rceil + \lceil \log_2 W \rceil + \lceil \log_2 H \rceil + L$$
 - **多设备协同标定**：将标定从单投影仪串行扩展至多投影仪并行，解决了大规模投影系统的可扩展性瓶颈。
 
 该方法在概念上与**分布式孔径成像**和**多视角几何标定**存在潜在关联，但其核心创新——通过嵌入式相机实现方向性图案分离——在当前文献中尚无直接对应工作，属于原创性贡献。
+
+
 
 ## 原文 PDF
 

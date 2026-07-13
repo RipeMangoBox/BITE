@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Whats_In_My_Human_Feedback_Learning_Interpretable_Descriptions_of_Preference_Data.pdf
+project_link: null
+code_link: https://github.com/rmovva/wimhf
 openreview_forum_id: sC6A1bFDUt
 aliases:
 - WWSMHF
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 我的人类反馈里有什么？学习可解释的偏好数据描述 |
 | 英文题名 | What's In My Human Feedback? Learning Interpretable Descriptions of Preference Data |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=sC6A1bFDUt); [GitHub](https://github.com/rmovva/wimhf) |
+| Links | [paper](https://openreview.net/forum?id=sC6A1bFDUt) · [GitHub](https://github.com/rmovva/wimhf) |
 | Topic | #topic/safety_alignment_fairness_privacy #topic/safety_alignment_fairness_privacy/trustworthy_machine_learning |
 | Method | WIMHF (What's In My Human Feedback?) |
 | Dataset | 7个数据集 (Arena, CA, HH-RLHF, PRISM, Reddit, PKU, Tulu), Community Alignment (解释匹配验证), RewardBench2 Safety (数据整理), Community Alignment (个性化) |
@@ -42,7 +44,7 @@ claims:
 > - Community Alignment (解释匹配验证) 上，注释者解释与 SAE 特征的匹配率 为 60.4% (活跃特征)，对比 33.3% (随机非活跃特征)，变化 +27.1 个百分点。
 > - RewardBench2 Safety (数据整理) 上，安全准确率 为 46.2% (翻转 top 1000 样本后)，对比 8.9% (原始模型)，变化 +37.3 个百分点。
 
-## 概述
+## 概要
 
 理解人类偏好数据是当前大语言模型对齐的核心环节，然而现有方法普遍依赖预定义的属性假设或黑盒奖励模型，难以自动揭示数据集中实际存在的、可解释的偏好结构。**WIMHF** (What's In My Human Feedback?) 针对这一瓶颈，提出了一种无需人工先验即可从偏好对比数据中自动发现可测量偏好 (measurable preferences) 与表达偏好 (expressed preferences) 的框架。
 
@@ -58,7 +60,7 @@ WIMHF 的方法定位介于纯黑盒奖励模型与完全手动特征工程之�
 
 值得注意的是，WIMHF 揭示的偏好在不同数据集间存在显著异质性——例如 Reddit 和 Arena 偏好笑话与非正式语气，而 HH-RLHF 和 PRISM 则厌恶这些特征——这提示混合异质数据源进行偏好微调可能导致信号冲突，而 WIMHF 为从业者提供了一种在训练前审计和整理偏好数据的实用工具。
 
-## 背景与动机
+
 
 从人类反馈中学习偏好是当前大语言模型对齐的核心范式。然而，一个关键问题长期被忽视：**人类反馈数据本身究竟编码了哪些偏好？** 这些偏好数据集由提示分布、响应分布和标签分布三个层次共同生成，标注者可能会系统性地偏好某些风格、格式或内容特征，而这些偏好往往未被明确记录，甚至与设计者的意图相悖。
 
@@ -66,7 +68,9 @@ WIMHF 的方法定位介于纯黑盒奖励模型与完全手动特征工程之�
 
 本文的核心洞察在于：**通过自动发现响应之间的可测量差异，并将其与偏好标签关联，可以在不依赖先验假设的前提下，揭示数据集中真正被表达出的偏好。** 具体而言，WIMHF 引入稀疏自编码器（SAE）从响应对的文本嵌入差异中学习稀疏特征，这些特征捕获了响应间一致性的可测量偏好；随后通过控制长度的逻辑回归，将每个特征与偏好标签关联，得到其边际胜率效应，即表达偏好。这一框架使得从业者能够系统性地回答“我的人类反馈数据里有什么”——哪些特征在驱动标注决策，这些特征在不同数据集中是否一致，以及它们是否与期望的对齐目标相符。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 WIMHF 的核心创新在于将偏好数据集的内部结构拆解为**可测量偏好**与**表达偏好**两个可操作的层次，并围绕这一概念框架构建了一套从特征发现到效应估计的自动化流水线。相比于现有方法，其关键改变体现在以下三个环节。
 
@@ -102,7 +106,7 @@ WIMHF 的创新不仅停留在分析层面，还直接支撑了两类高影响�
 
 综上，WIMHF 的方法论贡献并非单一技术的堆砌，而是通过“SAE 特征学习 → 自动描述与验证 → 长度控制回归 → 下游干预”这一完整链条，将偏好数据从黑盒预测对象转变为了可审计、可干预、可个性化的结构化知识。
 
-## 整体框架
+
 
 WIMHF 将偏好数据的可解释分析形式化为一个三阶段流水线，其核心目标是从原始偏好对中同时提取**可测量偏好**（响应间可被量化的差异）与**表达偏好**（哪些差异实际解释了标注标签）。
 
@@ -134,7 +138,7 @@ $$\Pr(y = 1) = \sigma (\alpha + \beta_j \cdot z_j + \gamma \cdot \mathbf{x})$$
 
 在进入流水线之前，数据预处理模块负责过滤无效样本、主观标注对，并随机交换响应顺序以消除位置偏差。当前分析主要针对主观对话类数据，过滤掉了数学、编程等客观问答场景——在这些场景下，文本嵌入可能不编码正确性信息，限制了方法的适用范围。
 
-## 核心模块与公式推导
+
 
 ### 1. 形式化框架：可测量偏好与表达偏好
 
@@ -199,7 +203,9 @@ $$\operatorname{Pr}(y = 1) = \sigma \left( \alpha + (\beta_j + \delta_{j,g}) \cd
 - **长度控制**：在所有回归中显式控制词数差 $\ell_\Delta$，以隔离非长度相关的偏好信号。移除该控制时，类似长度本身的特征会自动浮现为表达偏好。
 - **稀疏性约束**：$K=4$ 的硬稀疏性确保每个样本仅激活少量特征，使得特征解释更聚焦、非冗余。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：稀疏可解释特征捕获偏好信号
 
@@ -292,7 +298,9 @@ Figure 2 和 Table 1 揭示了不同数据集间显著的偏好异质性。例�
 ![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_sC6A1bFDUt/figures/023_Table_12.jpg]]
 *Table 12: All WIMHF features on Chatbot Arena with a high-fidelity interpretation (see §3, step 2). Features are colored based on whether they have a statistically significant relationship with preference, y. “∆win” is the average marginal effect on y when the feature is positive vs. negative, and after controlling for length. “Prevalence” is how often the feature occurs (i.e., is nonzero) across all response pairs in the dataset. We use Bonferroni correction for all significance tests. Dataset: Chatbot Arena. 7/22 features predict preference (p \< 0.0023)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心方法定位
 
@@ -330,6 +338,8 @@ WIMHF 处于**可解释偏好学习**与**数据集审计**的交叉点，其核
 - **在线偏差缓解**：当前的数据整理应用是一次性的预处理步骤（翻转 top 1000 样本标签使 RewardBench2 安全准确率从 8.9% 提升至 46.2%，Figure 3a）。能否利用 WIMHF 发现的偏差特征动态调整训练目标，实现在线式的偏差缓解？
 - **多语言与文化扩展**：WIMHF 目前仅处理英语数据。多语言或文化特定的偏好反馈可能包含不同的表达方式，SAE 学习的特征空间是否具有跨语言迁移能力？
 - **个性化安全边界**：尽管个性化能提升用户满意度，但需要限制在低风险特征子集（如风格而非政治立场）。当扩展到数十个主观特征时，如何确保不会加剧回音室效应？是否需要总体的安全约束机制来限制个性化范围？
+
+
 
 ## 原文 PDF
 

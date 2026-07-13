@@ -42,7 +42,7 @@ claims:
 > - RE10K (2-view) 上，PSNR 25.074 vs 23.430 (MVSplat) (+1.644)。
 > - RE10K (4-view) 上，PSNR 26.360 vs 24.537 (VicaSplat) (+1.823)。
 
-## 概述
+## 概要
 
 现有3D场景理解方法通常将**几何重建**与**语义理解**视为两个独立任务，或依赖逐场景的迭代优化（如NeRF/3DGS类方法），严重制约了泛化能力与推理效率。基于两视图的前馈方法虽无需优化，却缺乏对任意多视图输入的全局一致性建模。这构成了一个根本性瓶颈：如何在一次前馈推理中，从**无姿态的多视图图像**直接获得同时包含外观、几何与开放词汇语义的统一场景表示？
 
@@ -54,7 +54,7 @@ Uni3R 针对上述瓶颈提出的核心机制是**跨视图Transformer（Cross-V
 
 在方法谱系中，Uni3R 相较于 PixelSplat、MVSplat 等需已知位姿的泛化3DGS方法，解除了位姿先验依赖；相较于 NoPoSplat 等无位姿图像对方法，突破了视图数量的限制；相较于 LSM 等统一辐射场与语义场的方法，摆脱了对3D标注的需求。其“任意多视图→统一高斯原语”的范式，为通用3D场景理解提供了一种高效且可泛化的前馈方案。
 
-## 背景与动机
+
 
 3D 场景理解与重建是计算机视觉的核心挑战，涉及从多视图图像中恢复场景的几何结构、外观属性与语义信息。近年来，3D 高斯溅射（3D Gaussian Splatting, 3DGS）凭借其高质量实时渲染能力，成为神经辐射场（NeRF）之外的主流场景表示方案。然而，现有方法在统一性与泛化性上存在显著瓶颈。
 
@@ -64,7 +64,9 @@ Uni3R 针对上述瓶颈提出的核心机制是**跨视图Transformer（Cross-V
 
 为此，Uni3R 引入**跨视图 Transformer（Cross-View Transformer）**作为核心因果机制。该模块以预训练的几何基础模型 **VGGT** 为初始化，交替进行帧内自注意力与跨帧全局注意力，将任意数量的视图信息融合为视角无关的潜在编码。这一设计既注入了强大的几何先验，又实现了灵活的多视图聚合。在此基础上，Uni3R 通过 Dense Prediction Transformer（DPT）解码器与专用预测头，直接输出一组 3D 高斯原语，每个原语参数化为中心点 $\mu_j$、不透明度 $\alpha_j$、颜色 $c_j$、尺度 $s_j$、旋转 $r_j$ 和语义特征 $f_j^{\mathrm{sem}}$（公式 1），从而在单次前馈推理中统一支持新视角合成、深度估计与开放词汇语义分割。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Uni3R 的核心创新在于**首次将 3D 几何重建、新视角合成和开放词汇语义理解统一到单一前馈框架中**，且无需已知相机位姿或任何 3D 语义标注。这一突破通过以下关键设计实现。
 
@@ -101,7 +103,7 @@ Table 7 的消融实验揭示了各模块的因果作用：
 
 这些消融共同验证了 Uni3R 的“统一监督”设计——语义、辐射场和几何场的联合学习是实现高保真、语义一致 3D 重建的核心机制。
 
-## 整体框架
+
 
 Uni3R 的整体流水线围绕一个核心设计展开：**从无姿态的任意多视图图像中，通过单次前馈推理，直接预测一组统一的 3D 高斯原语**，这些原语同时携带几何、外观与开放词汇语义信息。流水线由四个关键模块串联构成，形成“编码—融合—解码—预测”的端到端架构（见图 2）。
 
@@ -134,7 +136,7 @@ $$
 ![[assets/figures/papers/paper_list_l2613_https_arxiv_org_abs_2508_03643/figures/002_Figure_2.jpg]]
 *Figure 2: Architectural overview of the Uni3R pipeline. Uni3R predicts a set of Gaussian primitives with jointly integrated geometry, appearance, and open-vocabulary semantics in a single pass, eliminating the need for per-scene optimization*
 
-## 核心模块与公式推导
+
 
 Uni3R 的核心设计在于将多视图信息融合为全局一致的潜在表示，并从中解码出统一承载几何、外观与开放词汇语义的 3D 高斯原语。其流水线由五个关键模块串联构成，每个模块均承载明确的因果功能。
 
@@ -213,7 +215,9 @@ $$\mathcal { L } _ { \mathrm { g e o } } = \sum _ { i = 1 } ^ { N } \frac { 1 } 
 ![[assets/figures/papers/paper_list_l2613_https_arxiv_org_abs_2508_03643/figures/012_Figure_5.jpg]]
 *Figure 5: Model training w/ and w/o geo. loss on 4 views*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -281,7 +285,9 @@ Table 6 展示了 Uni3R 在 ScanNet 上以 2–16 个随机视角数混合训练
 ![[assets/figures/papers/paper_list_l2613_https_arxiv_org_abs_2508_03643/figures/015_Table_9.jpg]]
 *Table 9: Ablation Study for confidence mask ratio (top-K) on the ScanNet dataset under 2-views setup on source views*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -344,6 +350,8 @@ Uni3R 的另一个关键创新在于几何监督策略：
 3. **3D 语义特征的可编辑性与可迁移性**：Uni3R 预测的 3D 高斯原语内嵌语义特征，这些特征是否支持下游任务（如 3D 场景编辑、物体操作、导航）的直接调用，以及能否迁移到其他 3D 表示（如 Mesh、NeRF），是连接感知与决策的关键问题。
 
 4. **无位姿设定下的位姿估计与重建的联合优化**：Uni3R 当前通过跨视图 Transformer 隐式处理位姿不确定性，未显式输出相机位姿。将位姿估计与 3D 重建统一到同一框架中，可能进一步提升几何一致性并支持 SLAM 类应用。
+
+
 
 ## 原文 PDF
 

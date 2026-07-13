@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/LoongRL_Reinforcement_Learning_for_Advanced_Reasoning_over_Long_Contexts.pdf
+project_link: https://loongrl.github.io/
+code_link: null
 openreview_forum_id: o29E01Q6bv
 aliases:
 - LoongRL
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | LoongRL：面向长上下文高级推理的强化学习 |
 | 英文题名 | LoongRL: Reinforcement Learning for Advanced Reasoning over Long Contexts |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=o29E01Q6bv); [Project](https://loongrl.github.io/) |
+| Links | [paper](https://openreview.net/forum?id=o29E01Q6bv) · [Project](https://loongrl.github.io/) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | LoongRL |
 | Dataset | LongBench v1 (Long-Context Reasoning Average), HELMET (Long-Context Generation Average) |
@@ -41,7 +43,7 @@ claims:
 > - LongBench v1 (Long-Context Reasoning Average) 上，Accuracy (%) 为 74.2 (LoongRL-14B)，对比 53.1 (Qwen2.5-14B-Instruct)，变化 +21.1。
 > - HELMET (Long-Context Generation Average) 上，Score 为 44.8 (LoongRL-7B)，对比 22.8 (Qwen2.5-7B-Instruct)，变化 +22.0。
 
-## 概述
+## 概要
 
 **问题瓶颈**：长上下文推理要求模型同时完成跨文档检索与深度推理，但现有强化学习方法主要针对短上下文设计，且缺乏高质量、高难度的长上下文训练数据，导致模型难以在长上下文中进行可靠推理。
 
@@ -56,7 +58,7 @@ claims:
 
 **局限与开放问题**：KeyChain 依赖人工构造的 UUID 链，其分布外泛化能力尚待验证；当前方法主要在问答任务上验证，对长文档摘要等开放生成任务的收益有待探索；超长上下文（>128K）下的推理模式泛化边界仍不明确。
 
-## 背景与动机
+
 
 大语言模型（LLM）的上下文窗口已扩展至百万Token级别，但**有效利用长上下文进行高级推理**仍然是尚未解决的核心挑战。当前模型在长上下文场景中面临一个双重瓶颈：既需要跨文档的精确检索能力，又需要基于检索结果进行深度多跳推理。然而，现有的强化学习推理方法（如DeepSeek-R1等）主要针对短上下文设计，缺乏高质量、高难度的长上下文训练数据，导致模型难以在长上下文中习得可靠的推理行为。
 
@@ -66,7 +68,9 @@ claims:
 
 LoongRL的核心动机在于：**通过精心设计的数据合成方法，将短多跳QA转化为需要逐步追踪链式关系的高难度长上下文任务，并利用强化学习直接训练模型，使其自发涌现出结构化的长上下文推理模式**。这一思路的关键洞察是：如果在训练数据中强制要求模型执行“追踪—检索—推理”的完整链条，模型将不得不放弃语义捷径，从而习得可泛化的推理策略。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 LoongRL的核心创新在于提出了一种**数据驱动**的长上下文强化学习范式，通过三个关键环节的协同设计，解决了现有方法在长上下文推理中“检索与推理割裂、缺乏高质量训练数据”的瓶颈。
 
@@ -108,7 +112,7 @@ LoongRL采用基于GRPO的强化学习，并结合多阶段课程设计：
 
 在KeyChain数据上进行GRPO训练，能够**稳定诱导出“计划-检索-推理-复查”的涌现推理模式**（Figure 1(a)）：模型首先生成明确的计划将问题分解为子步骤，然后逐步检索相关信息，进行推理，并主动复查中间结果。这一模式具有**跨长度泛化能力**——在16K上下文上训练的模型，可有效处理128K的长上下文推理任务（Table 4），且LoongRL-7B在Needle-in-a-Haystack基准上达到完美的100%检索准确率（Figure 3）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_o29E01Q6bv/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of our KeyChain data construction*
@@ -153,7 +157,7 @@ LoongRL 的整体框架围绕一个核心因果机制展开：**通过 KeyChain 
 
 > **注意**：KeyChain 数据依赖人工构造的 UUID 链，其与真实世界长上下文推理多样性的分布外泛化能力尚待进一步验证；当前训练上下文限制在 16K，在极端 128K 上的性能可能未达上限。
 
-## 核心模块与公式推导
+
 
 ### 3.1 KeyChain 数据构造
 
@@ -199,7 +203,9 @@ $$
 
 训练超参数：GRPO 组大小 $G=8$，学习率 $1\times10^{-6}$，rollout 温度 0.6，top-p=0.95，最大输出长度 4096 tokens。Figure 4 显示响应长度随训练稳步增长，反映模型逐步扩展检索与推理链；多阶段课程持续提供学习信号，防止性能饱和。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果：长上下文推理的跨越式提升
 
@@ -265,7 +271,9 @@ Needle-in-a-Haystack实验进一步验证了这一泛化能力：**LoongRL-7B**�
 ![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_o29E01Q6bv/figures/025_Table_7.jpg]]
 *Table 7: Comparison of LoongRL models with other baselines on the LongBench-v2 benchmark, grouped by Difficulty, Length, and Task Type*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法定位与核心差异
 
@@ -325,6 +333,8 @@ LoongRL 处于**长上下文推理**与**强化学习驱动的推理涌现**的�
 - **小模型的前沿性能**：7B/14B 模型即可接近或达到 o3-mini、DeepSeek-R1 等大模型的长上下文推理水平，为资源受限场景提供了可行方案。
 
 与现有工作的关系上，LoongRL 可视为对 **DeepSeek-R1 蒸馏路线**（Guo et al., 2025）的补充和超越：蒸馏提供短推理能力，而 KeyChain + GRPO 提供长上下文推理的结构化模式。与 **QwenLong-L1**（Wan et al., 2025）相比，LoongRL 以更小的模型规模和更低的训练上下文长度实现了更高的长上下文推理性能，展示了数据驱动方法相对于纯蒸馏方法的优势。
+
+
 
 ## 原文 PDF
 

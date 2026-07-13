@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/One_LLM_Token_for_Explicit_Graph_Structural_Understanding.pdf
+project_link: null
+code_link: https://github.com/Jingyao-Wu/SOG
 aliases:
 - SSGT
 - OLTEGSU
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | <SOGk>：一个用于显式图结构理解的LLM标记 |
 | 英文题名 | : One LLM Token for Explicit Graph Structural Understanding |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=eXidGkRUFt); [GitHub](https://github.com/Jingyao-Wu/SOG) |
+| Links | [paper](https://openreview.net/forum?id=eXidGkRUFt) · [GitHub](https://github.com/Jingyao-Wu/SOG) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/graph_neural_networks |
 | Method | <SOGk> (Structure Of Graph token) |
 | Dataset | BBBP, Tox21, ClinTox, HIV |
@@ -41,7 +43,7 @@ claims:
 > - Tox21 上，AUC-ROC 为 83.4±3.3 (LLaMA3-3B)，对比 最佳基线 (LLaMA3-3B) 约 73.5 (估计)，变化 +9.9% (相对提升)。
 > - ClinTox 上，AUC-ROC 为 94.3±0.1 (LLaMA2-7B)，对比 最佳基线 (LLaMA2-7B) 约 82.9 (估计)，变化 +11.4% (相对提升)。
 
-## 概述
+## 概要
 
 该论文针对大型语言模型（LLM）在图结构理解中的核心瓶颈——现有方法要么将图拓扑展开为冗长的文本序列（Graph-to-Text），导致token消耗过大且注意力分散；要么将图结构压缩为连续嵌入（Graph-to-Embedding），引发严重的模态不对齐问题——提出了一个简洁而有效的解决方案：引入一个特殊的离散结构标记 `<SOGk>`（Structure Of Graph token）。
 
@@ -49,7 +51,7 @@ claims:
 
 主要结果方面，在MoleculeNet的五个图级分类基准（BBBP、Tox21、ClinTox、HIV、BACE）上，该方法相比现有最佳基线实现了9.9%–41.4%的性能提升，且仅需3B或7B参数的LLM即可超越更大规模模型的性能。消融实验验证了结构标记的高度选择性——只有正确的标记才能忠实传递拓扑信息；t-SNE可视化显示结构标记嵌入位于文本标记的邻域内，有效桥接了图空间与语言空间。该方法为LLM显式理解图拓扑提供了一条兼具准确性与简洁性的新路径。
 
-## 背景与动机
+
 
 将图结构信息注入大语言模型（LLM）是图机器学习与自然语言处理交叉领域的关键问题。现有方法在处理图拓扑时面临一个根本性的两难困境，这构成了当前工作的核心动机。
 
@@ -61,7 +63,9 @@ claims:
 
 **性能提升与缺口填补**：在MoleculeNet的五个图级基准数据集（BBBP、Tox21、ClinTox、HIV、BACE）上，`<SOG_k>`方法相比所有基线实现了9.9%–41.4%的性能提升（Table 1），且仅需3B或7B参数的LLM即可超越更大模型（如GPT-4、Deepseek-R1）的基线表现。这一结果验证了单个离散结构标记足以高效且准确地传递完整图拓扑信息，从而填补了现有方法在“信息保真度”与“模态对齐”之间的缺口。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 <SOGk> 的核心创新在于将图拓扑信息压缩为一个**离散的、与文本共享嵌入空间的结构标记**，从根本上改变了LLM接收图结构的方式。现有方法面临一个根本性瓶颈：Graph-to-Text 方法将图结构展开为冗长的文本序列（如邻接表），消耗大量token并导致注意力分散；Graph-to-Embedding 方法虽然压缩了信息，但连续嵌入与文本嵌入空间存在严重的模态不对齐。两者都导致LLM产生“结构幻觉”——无法准确理解图拓扑。
 
@@ -102,7 +106,7 @@ claims:
 - **混合QA语料库**：三种类型均贡献性能，但描述-标记配对贡献最大（Figure 3），暗示显式的语义关联比隐式结构匹配更重要。
 - **局限性**：当前方法仅在分子图上评估，在社交网络、知识图谱等更广泛图类型上的泛化能力尚未验证。节点级任务通过2跳ego-graph实现，大规模图可能面临扩展性问题。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0001_eXidGkRUFt_One_LLM_Token_for_Explicit_Graph_Structural_Unde/figures/001_Figure_1.jpg]]
 *Figure 1: The overall architecture for LLM understanding with structural token { \< S O G _ { k } > }*
@@ -135,7 +139,7 @@ $$
 
 **关键设计约束**：结构标记具有高度选择性——消融实验（Table 2）证实，只有正确的标记才能忠实传递拓扑信息并带来一致的性能提升（9.9%–41.4%），随机或错误的标记会导致性能显著下降。t-SNE可视化（Figure 6）进一步显示，结构标记嵌入落在文本标记的邻域内，有效桥接了图空间与语言空间。
 
-## 核心模块与公式推导
+
 
 <SOGk>方法的核心在于通过一个离散的结构标记桥接图拓扑与LLM文本空间。其整体推理过程可形式化为：
 
@@ -183,7 +187,9 @@ $$\mathcal{L} = -\sum_t \log p_\Theta(y_t \mid y_{<t}, P, T, <SOG_k>)$$
 
 **关键设计选择**：结构词汇表大小 $K=256$ 在平均性能上最优（Table 4）；锚节点按度中心性选择优于随机选择（Table 5）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果 (RQ1)
 
@@ -251,7 +257,9 @@ Figure 4的相关性热力图显示，前50个结构标记之间具有清晰的�
 3. **泛化范围有限**：实验仅在分子图（MoleculeNet）上进行，在社交网络、知识图谱等更广泛图类型上的泛化能力尚未验证。分子图具有特定的结构规律（如骨架共享模式见Figure 5、10、11），这些规律可能有助于结构标记的聚类，而在其他图类型中未必存在。
 4. **组件依赖**：方法依赖于SentenceTransformers和GCN编码器的质量。如果这些预训练组件在特定领域表现不佳，结构标记的质量将受到限制。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系：从“文本化”与“投影”到“离散结构标记”
 
@@ -288,6 +296,8 @@ Figure 4的相关性热力图显示，前50个结构标记之间具有清晰的�
 2. **锚节点选择策略的泛化**：当前使用度中心性选择锚节点，在非分子图（如社交网络中的影响力传播图）中是否仍为最优策略？
 3. **结构标记的可解释性量化**：虽然t-SNE可视化（Figure 6）显示结构标记嵌入在文本标记的邻域内，且Figure 4的相关性热力图表明前50个结构标记具有可区分的模式，但如何通过注意力权重分析等更严格的方式量化每个结构标记所编码的具体拓扑模式？
 4. **规模效应**：在70B参数级LLM上，单个结构标记是否仍能有效传递拓扑信息，还是需要增加标记数量？
+
+
 
 ## 原文 PDF
 

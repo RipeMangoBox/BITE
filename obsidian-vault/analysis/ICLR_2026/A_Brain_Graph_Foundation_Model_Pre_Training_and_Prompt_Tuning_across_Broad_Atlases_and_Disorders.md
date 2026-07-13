@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/A_Brain_Graph_Foundation_Model_Pre_Training_and_Prompt_Tuning_across_Broad_Atlases_and_Disorders.pdf
+project_link: null
+code_link: https://github.com/weixinxu666/BrainGFM
 aliases:
 - BGFMPTPTABAD
 - BrainGFM
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 脑图基础模型：跨广泛图谱与疾病的预训练与提示调优 |
 | 英文题名 | A Brain Graph Foundation Model: Pre-Training and Prompt-Tuning across Broad Atlases and Disorders |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=PeGHkAaRxs); [GitHub](https://github.com/weixinxu666/BrainGFM) |
+| Links | [paper](https://openreview.net/forum?id=PeGHkAaRxs) · [GitHub](https://github.com/weixinxu666/BrainGFM) |
 | Topic | #topic/other_unclear #topic/other_unclear/general |
 | Method | BrainGFM |
 | Dataset | ABIDE II (ASD vs. NC), ADHD200 (ADHD vs. NC), ADNI 2 (AD vs. NC) |
@@ -41,7 +43,7 @@ claims:
 > - ABIDE II (ASD vs. NC) 上，ACC 为 70.5，对比 68.2 (BrainLM)，变化 +2.3。
 > - ADHD200 (ADHD vs. NC) 上，AUC 为 71.2，对比 68.5 (BrainLM)，变化 +2.7。
 
-## 概述
+## 概要
 
 本文提出**脑图基础模型（BrainGFM）**，旨在解决现有fMRI基础模型受限于单一脑图谱、无法有效整合异构数据且缺乏少样本/零样本适应能力的瓶颈。核心思路是将fMRI数据构建为脑图（节点为ROI，边为功能连接），通过**图对比学习（GCL）** 与**图掩码自编码器（GMAE）** 进行预训练，并引入**图提示**与**语言提示**联合调优，辅以**元学习**优化，从而在冻结骨干网络的前提下实现高效迁移。
 
@@ -49,7 +51,7 @@ claims:
 
 主要结果方面：在Schaefer100图谱上，BrainGFM在10种脑疾病上达到最先进性能，例如ABIDE II（ASD分类）AUC达73.3±1.4，ADNI 2（AD分类）AUC达80.3±2.6，均显著优于BrainLM等基线。消融实验表明，使用全部8种图谱预训练优于单一图谱或单一分辨率方案，且GCL与GMAE联合预训练优于单独使用任何一种。在少样本和零样本设置下，逐步引入图提示、元学习与语言提示可带来持续的准确率提升，验证了该方法在数据稀缺场景下的有效性。
 
-## 背景与动机
+
 
 功能性磁共振成像（fMRI）已成为研究大脑功能连接和精神疾病生物标志物的核心工具。然而，现有fMRI基础模型面临一个根本性瓶颈：它们几乎完全依赖于**单一脑图谱/分区方案**。无论是基于时间序列的模型（如BrainLM、BrainBERT）还是基于连接组/功能连接（FC）的模型（如BrainNetCNN），其数据表示形式——时间序列或ROI级特征——都隐含地绑定于特定的图谱定义。这导致模型无法有效整合来自不同图谱的异构数据，严重限制了其泛化能力。更关键的是，这些模型缺乏对**少样本（few-shot）和零样本（zero-shot）**场景的适应能力，而临床实践中常面临标记数据稀缺甚至完全无标签的新疾病诊断任务。
 
@@ -59,7 +61,9 @@ claims:
 
 然而，当前证据存在一些缺口：论文未提供完整的对比损失和MSE损失的具体公式；部分消融实验（如不同预训练方法比较）的置信度标注为0.9，表明可能存在不确定性；模型在罕见疾病上的详细性能仅展示了HBN数据集上的两个不常见疾病，缺乏更全面的评估；未分析不同年龄、性别或扫描仪型号对模型性能的影响。这些点需要后续工作或手动验证。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 BrainGFM的核心创新在于**将fMRI分析从“单图谱、全微调”范式转向“多图谱预训练+提示调优”的统一框架**，解决了现有fMRI基础模型受限于单一脑图谱/分区方案、无法有效整合异构数据、且缺乏少样本和零样本适应能力的瓶颈。
 
@@ -77,7 +81,7 @@ BrainGFM的核心创新在于**将fMRI分析从“单图谱、全微调”范式
 
 **因果机制**：多图谱预训练 → 学习图谱无关的通用脑功能连接模式 → 图提示调优保留这些通用模式 → 元学习优化提示适应少样本任务 → 语言提示实现零样本迁移。这一链条的每一步都有消融实验支撑，因果链条清晰。
 
-## 整体框架
+
 
 BrainGFM 的完整 pipeline 包含四个核心阶段，如图 Figure 1 所示：**(a) 大规模 fMRI 脑图数据集构建** → **(b) 多图谱图预训练** → **(c) 元学习优化的图提示调优 (少样本)** → **(d) 语言提示引导的零样本迁移**。该设计旨在解决现有 fMRI 基础模型受限于单一脑图谱、无法有效整合异构数据，且缺乏少样本/零样本适应能力的根本瓶颈。
 
@@ -95,7 +99,7 @@ GCL 和 GMAE 共享同一个编码器，该编码器构成了 BrainGFM 的核心
 
 **整体输入输出流**：原始 fMRI 数据 → 脑图构建（节点特征 + 邻接矩阵）→ 输入 Graph Transformer 编码器（结合 RWSE 和 [A/P] Token）→ 输出图级表征。下游任务时，该表征可结合图提示（少样本）或语言提示（零样本）用于分类。整个框架在性能和效率之间取得了最佳平衡（Figure 4），优于时间序列基础模型（如 BrainLM, BrainBERT）和连接组/FC 基础模型（如 BrainNetCNN, BrainGNN）。
 
-## 核心模块与公式推导
+
 
 ### 1. fMRI脑图构建
 
@@ -178,7 +182,9 @@ BrainGFM的核心编码器为Graph Transformer，预训练阶段通过GCL和GMAE
 
 **关键设计因果链**：多图谱脑图构建 → 统一图表示 → GCL+GMAE联合预训练 → 图谱无关的鲁棒编码器 → 图提示+语言提示冻结调优 → 跨图谱、跨疾病、跨任务泛化。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：跨10种脑疾病的最优性能
 
@@ -232,7 +238,9 @@ Figure 3展示了预训练图谱与下游图谱的匹配效应：当预训练图
 ![[assets/figures/papers/iclr26_0002_PeGHkAaRxs_A_Brain_Graph_Foundation_Model_Pre-Training_and/figures/010_Table_2.jpg]]
 *Table 2: Effect of different atlases on pre-training (ABIDE II, ASD)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 BrainGFM 定位为图结构脑基础模型（Graph-based Brain Foundation Model），其核心瓶颈在于现有 fMRI 基础模型受限于单一脑图谱/分区方案，无法有效整合异构数据，且缺乏对少样本和零样本场景的适应能力。为解决这一问题，BrainGFM 引入了图结构表示、多图谱预训练、图提示与语言提示联合调优，以及元学习优化四个关键因果机制。
 
@@ -243,6 +251,8 @@ BrainGFM 定位为图结构脑基础模型（Graph-based Brain Foundation Model�
 **局限**：尽管 BrainGFM 展示了强大的跨图谱迁移能力，但仍存在若干未解决的问题。首先，论文未提供完整的对比损失和 MSE 损失的具体公式，仅描述了概念，这增加了复现的难度。其次，部分实验（如 Figure 5 中不同预训练方法的比较）的置信度标注为 0.9，表明可能存在一定的不确定性。第三，预训练数据主要来自公开数据集，可能无法完全代表真实临床场景的多样性。第四，论文未分析不同年龄、性别或扫描仪型号对模型性能的影响，尽管所有下游任务均平衡了男性和女性样本数量。最后，模型在完全未见过的疾病（如罕见病）上的零样本性能仅展示了 HBN 数据集上的两个不常见疾病，缺乏更全面的评估。
 
 **开放问题**：基于当前证据，以下方向值得进一步探索：（1）如何进一步扩展数据集，例如纳入完整的 OpenNeuro 存储库和 UK Biobank 数据集？（2）结合任务态和静息态 fMRI 数据能否带来更全面的脑动态表征？（3）不同的文本编码器（如 GPT 系列）对语言提示性能有何影响？（4）模型如何扩展到更大的图谱或更高分辨率的分区方案？（5）模型在完全未见过的疾病（如罕见病）上的零样本性能如何？这些问题的解决将有助于推动脑图基础模型向更普适、更鲁棒的临床诊断工具发展。
+
+
 
 ## 原文 PDF
 

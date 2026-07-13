@@ -44,7 +44,7 @@ claims:
 > - VidProM (video prompts) 上，VQ↑ (VideoAlign) 3.5501 (ViPO) vs 3.0935 (DanceGRPO) (+0.4566)；MQ↑ (VideoAlign) 1.1515 (ViPO) vs 0.8639 (DanceGRPO) (+0.2876)。
 > - VBench (video OOD) 上，Total↑ 81.70 (ViPO) vs 80.84 (DanceGRPO) (+0.86)。
 
-## 概述
+## 概要
 
 现有面向视觉生成的强化微调方法（如 **DanceGRPO**，Xue et al., arXiv 2025）为每个生成样本分配单一的标量优势，忽略了视觉内容中丰富的空间与时间结构，导致对局部伪影校正不足，且无法建模细粒度的人类感知偏好。本文提出 **Visual Preference Policy Optimization (ViPO)**，核心思想在于：人类视觉偏好具有空间选择性，优化压力应根据感知相关性进行差异化分配。
 
@@ -52,7 +52,7 @@ ViPO 引入 **感知结构化模块（Perceptual Structuring Module, PSM）**，
 
 实验表明，ViPO 在图像和视频生成基准上一致超越 DanceGRPO：图像域内指标 HPSv2.1 从 0.3203 提升至 0.3321，视频域外指标 VBench Total 从 80.84 提升至 81.70。消融实验证实，语义感知的分配图是性能提升的关键，均匀分配图反而导致性能下降；将分配图应用于优势而非奖励能保持优化稳定性。此外，PSM 引入的训练开销极小——图像生成步骤时间仅增加 1.0–1.8%，视频生成增加约 4.8%，峰值内存增长低于 4.5%。
 
-## 背景与动机
+
 
 ### 视觉生成的对齐瓶颈：从粗粒度标量反馈到细粒度感知信号
 
@@ -72,7 +72,9 @@ ViPO 引入 **感知结构化模块（Perceptual Structuring Module, PSM）**，
 
 这一动机直接催生了 **Visual Preference Policy Optimization（ViPO）** 方法。ViPO 的核心设计在于引入一个**感知结构化模块（Perceptual Structuring Module, PSM）**，利用预训练视觉骨干网络（如 DINOv2）从生成内容中提取视觉偏好线索，将组内标准化的标量优势 $A_i$ 分解为空间/时间分辨的逐像素优势 $A_i^p = \mathbf{M}(p) A_i$，其中 $\mathbf{M}$ 为感知分配图。这一机制使得优化压力能够根据区域的感知重要性进行差异化分配——高感知相关性的区域获得更强的优化信号，而低相关性的背景区域则受到相对抑制，从而在保持语义完整性的前提下实现精细化的视觉质量提升。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ViPO 的核心创新在于**将视觉生成中的策略优化从粗粒度的标量优势重构为细粒度的空间/时间结构化优势分配**，使模型能够根据视觉内容的感知相关性进行差异化优化。
 
@@ -102,7 +104,7 @@ PSM 由两个子模块构成：**Visual Preference Extractor (VPE)** 使用预�
 
 与 DanceGRPO 相比，ViPO 的 changed slot 并非引入新的奖励模型或改变策略优化算法本身，而是**重构了优势的表征与分配方式**。这一创新使得 ViPO 能够在不增加显著训练开销（图像生成步骤时间仅增加 1.0-1.8%，峰值内存增长低于 4.5%）的前提下，在图像与视频生成的域内和域外指标上均取得一致提升。
 
-## 整体框架
+
 
 ViPO 的整体 pipeline 围绕一个核心改造展开：将 GRPO 中粗粒度的**标量优势（scalar advantage）** 转化为细粒度的**逐像素优势分配**，使策略优化能够感知视觉内容的空间与时间结构。
 
@@ -138,7 +140,7 @@ PSM 引入的计算开销极小：图像生成步骤时间仅增加 1.0–1.8%�
 ![[assets/figures/papers/paper_list_l2592_https_arxiv_org_abs_2511_18719/figures/001_Figure_1.jpg]]
 *Figure 1: Brief illustration of our work. Existing GRPO for visual generation assigns a single scalar advantage to the entire content, producing coarse feedback that often leads to sub-optimal results. In contrast, our ViPO converts this coarse signal into preference-aware feedback, enabling fine-grained alignment. This allows, for instance, differentiated optimization of the dancing doll and its background, yielding outputs that are more coherent, harmonious, and perceptually pleasing*
 
-## 核心模块与公式推导
+
 
 ### 3.1 从确定性采样到随机探索：SDE 采样
 
@@ -184,7 +186,9 @@ $$\mathcal{I}(\theta) = \mathbb{E}\left[ \frac{1}{G T_s |\mathcal{P}|} \sum_{i=1
 ![[assets/figures/papers/paper_list_l2592_https_arxiv_org_abs_2511_18719/figures/012_Figure.jpg]]
 *Figure: SAM ResNet DINOv2 PC 1 PC 3 PC 2*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -251,7 +255,9 @@ Figure 8 展示了不同视觉骨干生成的分配图及其主成分分解。DI
 ![[assets/figures/papers/paper_list_l2592_https_arxiv_org_abs_2511_18719/figures/016_Figure_9.jpg]]
 *Figure 9: Visualization of results obtained with different ViPO variants. From left to right: ViPO with DINOv2 as the PSM backbone, ViPO with ResNet, and ViPO with SAM*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的谱系关系
 
@@ -293,6 +299,8 @@ ViPO 的当前验证范围覆盖了以下场景：
 1. ViPO 的感知结构化优势分配是否可以推广到多模态奖励（如文本-图像对齐 + 美学质量 + 安全性）的联合优化？
 2. PSM 的分配图是否可以与可学习的奖励模型联合训练，形成端到端的偏好感知优化？
 3. 在更大规模的视频生成模型（如 Sora 级别）上，PSM 的时间维度扩展是否仍能保持线性开销增长？
+
+
 
 ## 原文 PDF
 

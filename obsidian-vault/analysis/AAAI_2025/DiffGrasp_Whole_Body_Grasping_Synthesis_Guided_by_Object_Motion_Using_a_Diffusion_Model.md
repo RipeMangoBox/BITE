@@ -5,6 +5,8 @@ paper_level: A
 venue: AAAI
 year: 2025
 pdf_ref: paperPDFs/AAAI_2025/DiffGrasp_Whole_Body_Grasping_Synthesis_Guided_by_Object_Motion_Using_a_Diffusion_Model.pdf
+project_link: https://iscas3dv.github.io/DiffGrasp/
+code_link: null
 aliases:
 - DiffGrasp
 tags:
@@ -40,7 +42,7 @@ claims:
 > - GRAB 上，Hands JPE (cm) ↓ 20.99 vs 31.28 (OMOMO) (-10.29)；MPJPE (cm) ↓ 12.24 vs 17.57 (OMOMO) (-5.33)；MPVPE (cm) ↓ 10.09 vs 13.80 (OMOMO) (-3.71)。
 > - ARCTIC 上，Hands JPE (cm) ↓ 19.96 vs 25.95 (OMOMO) (-5.99)；F1 score ↑ 0.8067 vs 0.0775 (OMOMO) (+0.7292)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有全身抓取生成方法存在结构性割裂——以 **OMOMO**（Li et al., 2023）为代表的两阶段/三阶段管线（OMOMO-V2、OMOMO-V3）先预测手部位置再生成身体姿态，或分离身体与手指姿态建模，导致生成的抓取序列缺乏精细的手指-物体接触、时间连续性和身体-手部协调性；而单帧抓取方法（如COOP）则完全丢失运动时序。核心矛盾在于：高自由度全身姿态与物体运动之间的联合分布无法在分阶段框架中被有效捕捉。
 
@@ -50,7 +52,7 @@ claims:
 
 **方法定位**：DiffGrasp属于**条件扩散模型驱动的全身人体-物体交互生成**范式，与两阶段扩散管线（OMOMO系列）形成直接对比，同时区别于单帧抓取生成（COOP）和纯身体运动生成（IMoS）等方法。其技术路线体现了“联合建模替代分治建模”的设计哲学，并通过接触感知损失与推理引导的协同，在有限训练数据下实现了精细接触生成。
 
-## 背景与动机
+
 
 在虚拟现实、具身智能与人机交互等应用中，生成自然、真实的全身抓取运动序列是一个关键且极具挑战的问题。理想的抓取生成系统需要同时满足三个层面的要求：**时间连续性**（运动序列在时序上平滑连贯）、**接触真实性**（手部与物体之间形成精确且稳定的接触）以及**身体-手部协调性**（身体姿态与双手动作在空间上协调一致）。
 
@@ -60,7 +62,9 @@ claims:
 
 针对这一瓶颈，**DiffGrasp** 提出了一种根本性的范式转换：将分阶段/分部件的建模策略替换为**单个条件扩散模型联合建模身体、双手与物体运动**。其核心洞察在于，单一扩散模型足以捕捉高自由度全身姿态与物体运动之间的复杂联合分布，从而在端到端的框架内一次性生成包含精细手指姿态的全身抓取序列。这一设计从结构上消除了分离建模带来的信息割裂问题，为同时实现时间连续性、接触真实性与身体-手部协调性提供了统一的生成基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DiffGrasp 的核心创新在于将此前分离建模的全身运动与精细手指抓取统一到**单一条件扩散模型**中，并围绕这一统一框架设计了训练和推理两阶段的接触感知机制，从而在保持时间连续性的同时大幅提升手-物体接触的真实性与稳定性。
 
@@ -100,7 +104,7 @@ DiffGrasp 在训练阶段引入了两类**接触感知损失**：
 
 上述三个创新点构成了一个递进的因果链条：**统一扩散模型**提供了学习全身-物体联合分布的基础能力；**接触感知损失**在训练阶段将物体的空间信息注入网络，使其初步具备感知接触的能力；**推理阶段引导**则在不增加训练负担的前提下，对生成结果进行轻量级优化，弥补扩散模型在接触细节上的不足。三者共同作用，使 DiffGrasp 在 GRAB 数据集上将 Hands JPE 从 OMOMO 的 31.28 降至 20.99，F1 分数从 0.0090 提升至 0.7840，实现了全身抓取合成性能的跨越式提升。
 
-## 整体框架
+
 
 DiffGrasp 的核心设计是将“身体运动—双手抓取—物体运动”三个高自由度组件统一在一个条件扩散模型内联合建模，替代以往方法中分阶段、分部件的预测管线。整体管线由**条件编码、Transformer 去噪、SMPL‑X 重建和推理阶段引导**四个模块串联而成，形成端到端的全身抓取序列生成框架（Figure 2）。
 
@@ -149,10 +153,8 @@ DiffGrasp 的核心设计是将“身体运动—双手抓取—物体运动”�
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l1663_DiffGrasp_Whole_Body_Grasping_Synthesis_Guided_by_Object_Motion_Using_a/figures/010_Figure.jpg]]
-*Figure: A8: Model Architecture. The BPS Encoder and MLP are simple stacks of linear layers for feature alignment, while the condition encoder and denoiser use a standard 8-layer transformer design. The diffusion process (Diffusing module) follows the standard DDPM formula*
 
-## 核心模块与公式推导
+
 
 DiffGrasp 将全身抓取序列生成建模为一个**条件扩散模型**，其核心由三个功能模块构成：条件编码器、Transformer 去噪器以及推理阶段的三种数据驱动引导。整个框架以统一的扩散过程一次性预测全身 SMPL-X 姿态参数和双手腕部相对物体的平移量，从而替代传统方法的多阶段分离建模。
 
@@ -211,7 +213,9 @@ $$\tilde{x}_0 = \hat{x}_0 - \eta \Sigma_n \nabla_{\hat{x}_n} \mathcal{G}(\hat{x}
 ![[assets/figures/papers/paper_list_l1663_DiffGrasp_Whole_Body_Grasping_Synthesis_Guided_by_Object_Motion_Using_a/figures/003_Figure_3.jpg]]
 *Figure 3: Illustration of Grasp Stabilization Guidance*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置与评估协议
 
@@ -304,7 +308,9 @@ DiffGrasp在两个主要的全身抓取数据集上进行评估：**GRAB**（Tah
 ![[assets/figures/papers/paper_list_l1663_DiffGrasp_Whole_Body_Grasping_Synthesis_Guided_by_Object_Motion_Using_a/figures/016_Figure.jpg]]
 *Figure: A13: Comparison of the ability of different methods to adapt to large movements of objects. Our model (DiffGrasp) can generate more realistic results. The results in this figure are similar to those in Figure S6, highlighting the importance of our proposed two contact-aware loss terms. Additionally, the comparison shows that OMOMOs struggles to grasp objects that are out of reach*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：全身抓取合成中的“两级尺度鸿沟”
 
@@ -374,6 +380,8 @@ DiffGrasp 在全身抓取合成领域占据“**统一条件扩散模型**”这
 5. **自适应引导**：当前引导策略的高度手工设定（学习率、迭代次数）能否由网络自适应学习，减少人工调参负担？
 
 **注**：本文未提供具体的会议/期刊发表信息（venue 和 year 均为 null），上述方法定位基于论文内容本身的技术分析。
+
+
 
 ## 原文 PDF
 

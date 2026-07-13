@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/Generalized_Trajectory_Scoring_for_End_to_end_Multimodal_Planning.pdf
+project_link: null
+code_link: https://github.com/NVlabs/GTRS
 aliases:
 - GGTS
 - GTSEEMP
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 端到端多模态规划的通用轨迹评分方法 |
 | 英文题名 | Generalized Trajectory Scoring for End-to-end Multimodal Planning |
 | 会议/期刊 | CVPR 2025 |
-| Links | [paper](https://arxiv.org/abs/2506.06664); [GitHub](https://github.com/NVlabs/GTRS) |
+| Links | [paper](https://arxiv.org/abs/2506.06664) · [GitHub](https://github.com/NVlabs/GTRS) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/planning_control |
 | Method | GTRS (Generalized Trajectory Scoring) |
 | Dataset | Navhard Benchmark |
@@ -41,7 +43,7 @@ claims:
 > - Navhard Benchmark 上，EPDMS 为 43.4，对比 23.1，变化 +20.3。
 > - Navhard Benchmark 上，EPDMS 为 49.4，对比 51.3，变化 -1.9。
 
-## 概述
+## 概要
 
 端到端多模态规划旨在直接从传感器输入预测驾驶轨迹，而轨迹评分器作为其中的关键组件，负责从候选轨迹集中选出最优解。现有评分器普遍面临**泛化瓶颈**：基于固定轨迹词汇表训练的评分器无法适应需要细粒度调整的场景，而少量动态生成轨迹虽精度较高，但覆盖范围窄，难以处理未见过轨迹分布。
 
@@ -55,7 +57,7 @@ claims:
 
 GTRS的方法定位处于**模仿学习规划**与**轨迹评分泛化**的交叉点，其知识贡献在于揭示了训练-推理分布错配对于评分器泛化能力的因果作用，为端到端自动驾驶中的轨迹评估提供了新的训练范式。
 
-## 背景与动机
+
 
 ### 端到端规划中的轨迹评分困境
 
@@ -81,7 +83,9 @@ GTRS的方法定位处于**模仿学习规划**与**轨迹评分泛化**的交�
 
 通过上述设计，GTRS 在不依赖真值感知（privileged information）的条件下，于 Navhard 基准上显著超越现有端到端规划方法，并在模型集成后逼近使用真值感知的特权规划器 **PDM-Closed**（Dauner et al., CoRL 2023）的性能。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GTRS 的核心创新并非引入新架构，而是通过**训练-推理分布错配**与**多粒度轨迹互补**两条线索，系统性地解决了端到端多模态规划中轨迹评分器泛化能力不足的瓶颈。其关键创新可拆解为三个相互耦合的 changed slots。
 
@@ -116,7 +120,7 @@ GTRS 的推理流程将两个异质轨迹源组合：扩散策略（Diffusion Po
 
 GTRS 的创新本质上是**通过训练阶段的分布错配（词汇丢弃）与推理阶段的多源互补（静态词汇 + 动态提案），构建了一个对轨迹分布变化鲁棒的通用评分器**。这一设计使得纯传感器输入的 GTRS 在 Navhard 基准上达到 45.3 EPDMS（单模型），远超 LTF 基线的 23.1，并通过六模型集成（GTRS-E）达到 49.4 EPDMS，逼近使用真值感知的特权规划器 PDM-Closed 的 51.3（Table 2）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2506_06664/figures/003_Figure_2.jpg]]
 *Figure 2: The Inference Pipeline of GTRS*
@@ -159,7 +163,7 @@ GTRS (Generalized Trajectory Scoring) 是一个面向端到端多模态规划的
 
 > **注意**：论文未提供推理延迟或实时性分析，扩散生成 100 条轨迹并评分的计算开销较大，这是框架的一个实际部署瓶颈。
 
-## 核心模块与公式推导
+
 
 GTRS 方法由三个核心模块构成：轨迹生成器、GTRS-Dense 评分器与 GTRS-Aug 评分器。三者协同工作，共同解决端到端多模态规划中轨迹评分器的泛化瓶颈。
 
@@ -192,7 +196,9 @@ GTRS-Aug 以更小的计算开销（更低分辨率、更小骨干网络）达�
 
 推理阶段（Figure 2），扩散策略生成 $N$ 条动态轨迹提案 $\gamma_{dp}$，与推理词汇表 $V_L$ 组合形成候选集，由评分器对每条轨迹打分，最终选择得分最高的轨迹作为规划输出。组合动态提案与静态词汇的推理方式相比纯静态词汇提升了 +1.1 EPDMS（Section 4.3），证明了细粒度动态提案对静态词汇的互补价值。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心消融：词汇丢弃训练与泛化能力
 
@@ -247,7 +253,9 @@ Section 4.3 的文本分析揭示了轨迹生成与评分的协同机制：当�
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2506_06664/figures/001_Figure_1.jpg]]
 *Figure 1: The Three Pillars of GTRS*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 端到端规划中的轨迹评分器演进
 
@@ -284,6 +292,8 @@ GTRS 的轨迹生成器采用基于扩散策略（Diffusion Policy）的架构�
 4. **细化训练的计算代价**：自蒸馏细化训练中教师模型推理和解码器的额外计算开销未被量化，这影响了对方法整体效率的评估。
 
 5. **动态提案质量的敏感性**：GTRS 的性能依赖于扩散生成器输出轨迹的质量，当生成器在极端场景下产生低质量提案时，评分器是否仍能有效筛选？这一鲁棒性问题尚未被系统研究。
+
+
 
 ## 原文 PDF
 

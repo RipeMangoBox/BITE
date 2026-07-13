@@ -44,7 +44,7 @@ claims:
 > - T2I-CompBench++ (2D-Spatial) 上，2D-Spatial UniDet 0.2142 (SD 2.1 + CTCAL E) vs GORS 基线 (显著提升)。
 > - GenEval 上，Overall Score 0.69 (SD 3 + CTCAL) vs SD 3 原始模型 (全面提升所有类别)。
 
-## 概述
+## 概要
 
 **核心问题**：文生图扩散模型在较大时间步（高噪声阶段）下，交叉注意力图与真实图像结构的对齐质量急剧下降，导致复杂文本提示的生成图像出现属性绑定错误、对象遗漏等语义不一致问题。传统扩散损失仅提供隐式的文本-图像对应关系监督，无法有效约束这一瓶颈。
 
@@ -57,8 +57,6 @@ claims:
 - 消融实验验证了五个组件逐步叠加均带来一致的性能增益，且方法不损害生成多样性。
 
 **方法定位**：CTCal 属于**训练时微调方法**，模型无关（model-agnostic），可无缝集成到扩散架构（如 SD 2.1）和流匹配架构（如 SD 3）中。与推理时优化方法（如 Attend-and-Excite）和有监督微调方法（如 GORS）形成互补或替代关系。
-
-## 背景与动机
 
 ### 文生图扩散模型的文本-图像对齐瓶颈
 
@@ -87,7 +85,7 @@ $$\mathcal{L}_{\mathrm{diffusion}} = \mathcal{D}\left(\epsilon, \epsilon_\theta\
 
 基于上述分析，本文提出核心洞察：将较小时间步（教师时间步 $t_{\mathrm{tea}}$）下建立的可靠文本-图像对齐作为显式监督，校准较大时间步（学生时间步 $t_{\mathrm{stu}}$）下的表征学习。这一思路将训练过程中模型自身产生的优质注意力图转化为校准信号，无需额外标注数据或推理时干预，从而在训练阶段直接强化文本-图像对应关系的建模能力。
 
-## 核心创新
+## 核心方法与创新机理
 
 ### 关键瓶颈：交叉注意力图的时间步退化
 
@@ -151,8 +149,6 @@ CTCAL 属于**训练时微调方法**，与以下方法形成对比：
 
 CTCAL 的核心优势在于**模型无关性**——它不修改扩散模型的架构，仅改变训练损失和采样策略，可无缝集成到扩散架构（如 **Stable Diffusion 2.1**，Rombach et al., CVPR 2022）和流匹配架构（如 **Stable Diffusion 3**，Esser et al., ICML 2024）中。代码已开源（https://github.com/xiefan-guo/ctcal），基于 Diffusers 代码库实现，采用 LoRA 微调文本编码器的自注意力层和去噪网络的注意力层。
 
-## 整体框架
-
 ### 核心思想与动机
 
 文生图扩散模型在训练过程中仅通过扩散损失 $\mathcal{L}_{\mathrm{diffusion}}$ 提供隐式的文本-图像对应关系监督。如 Figure 1 所示，交叉注意力图在较小时间步（低噪声条件）下与真实图像结构和语义的对齐质量显著优于较大时间步（高噪声条件），这一对齐退化是导致复杂文本提示下生成图像出现语义不一致的关键瓶颈。CTCal 的核心洞察在于：**较小时间步下形成的交叉注意力图可作为高质量的自监督信号，用于显式校准较大时间步下的表征学习**。
@@ -183,8 +179,6 @@ CTCal 提出了一种跨时间步自校准训练范式（Figure 2），其与传
 - **输入**：文本提示 $\mathbf{y}$、真实图像 $\mathbf{I}_{\mathrm{real}}$、采样的噪声 $\epsilon$、双时间步 $(t_{\mathrm{tea}}, t_{\mathrm{stu}})$。
 - **输出**：总损失 $\mathcal{L} = \mathcal{L}_{\mathrm{diffusion}} + \lambda_t \mathcal{L}_{\mathrm{CTCAL}}$，其中 $\mathcal{L}_{\mathrm{CTCAL}}$ 仅对名词 token 子集 $\mathcal{Y}_{\mathrm{noun}}$ 计算。
 - **训练方式**：基于 Diffusers 代码库实现，采用 Low-Rank Adaptation（LoRA）微调文本编码器的自注意力层和去噪网络的注意力层，是一种模型无关的训练范式，可无缝集成到扩散架构（如 SD 2.1）和流匹配架构（如 SD 3）中。
-
-## 核心模块与公式推导
 
 ### 关键瓶颈与核心洞察
 
@@ -256,10 +250,7 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{diffusion}} + \lambda_t \mathcal{L}_{\mathr
 ![[assets/figures/papers/paper_list_l2302_https_arxiv_org_abs_2603_20741/figures/001_Figure_1.jpg]]
 *Figure 1: Investigation on the cross-attention maps. (a) Inference stage. In line with existing inference-time optimization methods [5, 15], we delve into the analysis of cross-attention maps produced during the inference stage of the text-to-image diffusion model. Notably, satisfactory text-image correspondences are established for simple text prompts. Nevertheless, with more intricate text prompts, the prevalent method encounters challenges in precisely mapping the target semantics to the correct spatial position, leading to semantically inconsistent images. (b) Training stage. Given the text-image-noise triplet, we gather cross-attention maps at varied timesteps in training mode. A noteworthy find...*
 
-![[assets/figures/papers/paper_list_l2302_https_arxiv_org_abs_2603_20741/figures/009_Figure_5.jpg]]
-*Figure 5: Visualization of cross-attention maps extracted from the fine-tuned models*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 核心瓶颈的实证动机
 
@@ -346,7 +337,7 @@ Figure 5 对比了 CTCAL 与 GORS 微调模型在推理和训练模式下的交�
 ![[assets/figures/papers/paper_list_l2302_https_arxiv_org_abs_2603_20741/figures/004_Figure_4.jpg]]
 *Figure 4: Qualitative comparison on SD 2.1 and SD 3. CTCAL demonstrates a marked improvement in the fine-grained alignment of generated images with the corresponding text prompts. Each image is generated with the same prompt and random seed for all methods*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 核心基线定位
 

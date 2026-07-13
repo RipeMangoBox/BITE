@@ -43,7 +43,7 @@ claims:
 > - ARMBench-VL 上，Avg. Accuracy 64.6 vs 46.1 (Qwen2.5-VL-7B) (+18.5)。
 > - RewardBench-2 上，Accuracy 59.6 vs 47.1 (Qwen2.5-VL-7B) (+12.5)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -57,7 +57,7 @@ ARM-Thinker 将奖励模型从被动的评分器重构为**主动的代理推理
 
 在奖励模型基准 VL-RewardBench 上，ARM-Thinker-7B 以 **67.8%** 的准确率相较基座模型 Qwen2.5-VL-7B 提升 **+17.7%**；在需要工具调用的 ARMBench-VL 上提升 **+18.5%**；在工具使用基准（V*、HRBench 等）上平均提升 **+9.6%**。消融实验揭示了两个决定性发现：（1）基座模型在启用工具时性能反而下降，而 ARM-Thinker 获得稳定增益，表明**仅接入工具不足以提升性能，必须通过代理训练习得工具调用能力**；（2）自适应奖励设计在 GRPO 训练中同时实现最高准确率和稳定的工具调用频率，避免了仅准确率奖励导致的工具使用不足和固定工具奖励导致的过度调用。
 
-## 背景与动机
+
 
 ### 多模态奖励模型的根本瓶颈
 
@@ -85,7 +85,9 @@ ARM-Thinker的核心洞察在于：**将奖励模型从被动评分转变为主�
 
 这一范式转变的动机直接源于对奖励模型可靠性需求的深刻理解：在RLHF流程中，奖励模型的系统性偏差会通过策略优化被放大，最终损害对齐效果。唯有让奖励模型具备主动验证的能力，才能从根本上提升其评判的可信度，为下游的模型对齐提供更坚实的信号基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ARM-Thinker的核心创新在于将奖励模型从**被动评分器**重构为**主动代理**，使其能够在推理过程中自主调用多模态工具获取可验证证据，并通过多阶段强化学习对工具调用决策与判断准确性进行联合优化。这一转变体现在三个关键维度的设计变更上。
 
@@ -137,7 +139,7 @@ ARM-Thinker集成了三类多模态工具，统一基于OpenAI风格的函数调
 
 奖励函数消融（Figure 4）进一步表明，ARM-Thinker的自适应奖励设计在GRPO训练中实现了最高准确率（约80%）和稳定的工具调用频率（约1.12次/样本），优于仅准确率奖励（工具使用不足）和固定工具奖励（工具使用过度）的设计，验证了层次化奖励在平衡探索与效率方面的有效性。
 
-## 整体框架
+
 
 ARM-Thinker 的核心创新在于将奖励模型从“被动评分器”转变为“主动代理”，其整体框架围绕一个显式的 **思考-行动-观察循环** 展开。模型不再依赖单次前向传播给出评分，而是在推理过程中自主决定何时调用何种多模态工具，基于工具返回的观察结果迭代验证，最终产出有据可依的判断。
 
@@ -191,7 +193,7 @@ ARM-Thinker 的训练管道分为三个递进阶段，如 Figure 2(b) 所示：
 ![[assets/figures/papers/paper_list_l2150_https_arxiv_org_abs_2512_05111/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of ARM-Thinker. (a) Case Comparison: Given a complex document QA task, ARM-Thinker correctly identifies the answer by autonomously invoking the retrieval tool, while the baseline model provides an incorrect response. (b) ARMBench-VL: It evaluates reward models across three task types, each requiring specialized tool use (image manipulation, document retrieval, instruction verification). (c) Performance of ARM-Thinker: The agentic capability enables substantial gains across multiple benchmarks*
 
-## 核心模块与公式推导
+
 
 ARM-Thinker 的核心设计围绕**代理式推理循环**与**两阶段强化学习训练管道**展开，将传统被动评分的奖励模型转变为主动调用多模态工具进行证据收集与验证的代理系统。
 
@@ -264,7 +266,9 @@ $$
 ![[assets/figures/papers/paper_list_l2150_https_arxiv_org_abs_2512_05111/figures/004_Figure_3.jpg]]
 *Figure 3: Representative examples from ARMBench-VL. Each block shows the multimodal context, candidate responses, and available tools for one of the three tracks in ARMBench-VL: Fine-grained Perception (image crop/zoom tools for local visual details), Multimodal Long Document QA (page-retrieval tools), and Multimodal Instruction Following (instruction-checking tools)*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -328,7 +332,9 @@ Figure 4对比了三种GRPO奖励函数设计的训练动态：
 ![[assets/figures/papers/paper_list_l2150_https_arxiv_org_abs_2512_05111/figures/003_Table_1.jpg]]
 *Table 1: Comparison of ARMBench-VL with other reward benchmarks (M=multimodal, T=text-only)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：从被动评分到主动代理验证
 
@@ -383,6 +389,8 @@ ARM-Thinker 处于以下三条研究线的交汇点：
 4. **工具调用的鲁棒性**：在工具调用失败或返回噪声观察时，模型应具备怎样的恢复策略？当前框架缺乏显式的错误处理机制，这在实际部署中可能影响可靠性。
 
 5. **跨任务泛化的理论理解**：论文观察到模型在未显式加入指令遵循任务相关工具使用数据的情况下，工具使用能力能够自然泛化（Section A.2）。这一泛化现象的机理尚待深入分析，可能为理解代理能力的涌现提供线索。
+
+
 
 ## 原文 PDF
 

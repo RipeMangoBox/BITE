@@ -28,10 +28,13 @@ claims:
 | 中文题名 | 兼容的内蕴三角剖分 |
 | 英文题名 | Compatible Intrinsic Triangulations |
 | 会议/期刊 | SIGGRAPH 2022 |
-| Links | [paper](https://kenshi84.github.io/) · [Project](https://kenshi84.github.io) · [Code](https://github.com/kenshi84) |
+| Links | [paper](https://kenshi84.github.io/) · [Code](https://github.com/kenshi84) |
 | Topic | #topic/other_unclear |
 | Method |  |
 | Dataset |  |
+
+> [!tip] 效果简介
+> 结果与证据沿用下文“实验与关键发现”中的现有记录；本轮不新增或外推论文事实。
 
 ## 概要
 

@@ -45,7 +45,7 @@ claims:
 > - BEAT2 (Speech-to-gesture) 上，FID_H ↓ 17.651 vs MotionCraft: 18.486 (-0.835)；Beat Align Score ↑ 8.377 vs MotionCraft: 8.098 (+0.279)。
 > - FineDance (Music-to-dance) 上，FID_H ↓ 3.632 vs MotionCraft: 3.858 (-0.226)。
 
-## 概述
+## 概要
 
 人体动作生成领域长期存在两条技术路径的对立：基于离散量化的方法（如 VQ-VAE 结合自回归模型）不可避免地引入量化误差，损害运动精度；基于连续回归的方法虽避免了量化损失，却缺乏自回归或掩码建模的时序建模能力，生成质量受限。更关键的是，现有方法大多针对单一模态（文本、语音或音乐）设计，难以在一个统一框架内实现高质量的全身体运动生成。
 
@@ -53,7 +53,7 @@ OmniMotion 针对上述瓶颈提出了一种**连续掩码自回归**范式。�
 
 实验结果表明，OmniMotion 在文本、语音、音乐三个模态上均取得领先性能。在 HumanML3D 文本生成运动任务中，Top-1 R-Precision 达到 0.704，FID 降至 4.838，显著优于 MotionCraft 等最强基线；在 BEAT2 语音手势生成和 FineDance 音乐舞蹈生成基准上同样全面超越现有方法，验证了其跨模态泛化能力。消融实验进一步确认了因果注意力、门控机制、RMSNorm 和 DiT 扩散模块各自对性能的贡献。
 
-## 背景与动机
+
 
 人体动作生成是计算机视觉与图形学中的核心问题，其目标是根据文本、语音或音乐等控制信号生成自然、多样且语义对齐的全身体运动序列。近年来，该领域的研究主要沿着两条技术路径展开：**离散量化路径**与**连续回归路径**，但二者均存在难以调和的结构性缺陷。
 
@@ -67,7 +67,9 @@ OmniMotion 针对上述瓶颈提出了一种**连续掩码自回归**范式。�
 
 针对这些缺口，OmniMotion 提出了一条新的技术路径：在连续运动空间中引入**掩码自回归建模**，通过因果注意力保持运动序列的时序结构，同时以 DiT 扩散 Transformer 替代简单的预测头，将掩码自回归的丰富条件特征扩散到目标标记。多模态信号则通过 AdaLN 与交叉注意力层统一注入，使得文本、语音、音乐驱动的高质量全身体运动生成得以在一个框架内实现。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 OmniMotion 的核心创新在于将**连续掩码自回归建模**与**DiT 扩散条件合成**相结合，构建了一个统一的多模态全身体运动生成框架。这一设计直接回应了现有方法的两大瓶颈：离散量化的不可逆精度损失，以及连续回归方法时序建模能力的缺失。
 
@@ -101,7 +103,7 @@ OmniMotion 通过 **AdaLN 与交叉注意力层**统一注入文本、语音、�
 
 这些创新点的协同效应在消融实验中得到验证：因果注意力替代双向注意力、引入门控机制、使用 RMSNorm、采用 DiT 扩散头，每一步替换均在文本到运动及多模态任务上带来一致且显著的性能提升（Table 4）。
 
-## 整体框架
+
 
 OmniMotion 是一个面向多模态全身体运动生成的统一框架，其核心设计思想是：在连续运动空间中结合掩码自回归建模与 DiT 扩散条件合成，避免离散量化带来的精度损失，同时保留时序建模能力。框架整体分为三个主要阶段：
 
@@ -125,7 +127,7 @@ OmniMotion 是一个面向多模态全身体运动生成的统一框架，其核
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2510_14954/figures/002_Figure_2.jpg]]
 *Figure 2: Framework overview. Our framework consists of three parts: (a) The input motion is encoded by an autoencoder to extract a latent code, producing the continuous motion tokens. (b) The motion tokens are masked and predicted in an autoregressive transformer with causal attention, producing conditions for DiTs to diffuse towards the target tokens. (c) Multimodal signals are encoded and then injected via AdaLN and cross-attention*
 
-## 核心模块与公式推导
+
 
 OmniMotion 的生成流水线由四个关键模块串联构成：连续自编码器、掩码自回归 Transformer、DiT 扩散块和多模态交叉注意力层。各模块的设计目标与核心公式如下。
 
@@ -177,7 +179,9 @@ $$l_f = (1 + \alpha) \cdot l_c - \alpha \cdot l_{uc} \quad \text{(Eq 7)}$$
 
 文本、语音、音乐等多模态信号通过 **AdaLN** 与**交叉注意力层**统一注入掩码 Transformer。交叉注意力层显式建模语音/音乐与运动序列的细粒度交互。多模态微调时，冻结 DiT 参数，仅更新掩码 Transformer 的交叉注意力与 AdaLN 权重，在保持文本生成运动能力的同时高效适配新模态。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -253,7 +257,9 @@ Figure 4 展示了文本驱动的全身运动生成结果，OmniMotion 能够根
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2510_14954/figures/011_Table_7.jpg]]
 *Table 7: Results of text-driven motion generation on the HumanML3D dataset following the mix training setup (Bian et al., 2025)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：在离散量化与连续扩散之间的第三条路径
 
@@ -302,6 +308,8 @@ OmniMotion 的适用边界主要由以下约束定义：
 2. **零样本模态组合**：模型能否在零样本场景下处理未见过的模态组合（如文本 + 音乐联合驱动）？这需要在条件注入层引入更灵活的模态融合机制，而非当前的简单拼接或加和。
 3. **大规模语言模型融合**：将预训练的大语言模型（LLM）融入框架是否会进一步提升文本到运动的语义对齐能力？LLM 的文本理解能力可能帮助模型更好地解析复杂动作描述中的时序逻辑和空间关系。
 4. **DiT 推理加速**：如何通过蒸馏、步数压缩或并行解码策略降低 DiT 模块的推理延迟，使其满足实时应用需求？这是从学术基准走向工业部署的关键瓶颈。
+
+
 
 ## 原文 PDF
 

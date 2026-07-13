@@ -5,6 +5,8 @@ paper_level: A
 venue: ICCV
 year: 2025
 pdf_ref: paperPDFs/ICCV_2025/InfiniDreamer_Arbitrarily_Long_Human_Motion_Generation_via_Segment_Score_Distillation.pdf
+project_link: null
+code_link: null
 aliases:
 - InfiniDreamer
 tags:
@@ -40,7 +42,7 @@ claims:
 > - HumanML3D 上，R-precision ↑ 0.679 ± 0.007 vs 0.605 ± 0.006 (DiffCollage) (+0.074)；FID ↓ 0.47 ± 0.12 vs 1.07 ± 0.05 (DiffCollage) (-0.60)；MultiModal-Dist ↓ 3.15 ± 0.01 vs 3.62 ± 0.01 (DiffCollage) (-0.47)。
 > - BABEL 上，R-precision ↑ 0.543 ± 0.009 vs 0.487 ± 0.009 (DiffCollage) (+0.056)；FID ↓ 0.97 ± 0.09 vs 1.14 ± 0.05 (DoubleTake) (-0.17)；Transition FID ↓ 2.07 ± 0.30 vs 3.54 ± 0.10 (DoubleTake) (-1.47)。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -95,8 +97,6 @@ InfiniDreamer的独特优势在于**无需任何长序列训练数据**，仅依
 
 InfiniDreamer的生成质量受限于底层短序列模型MDM的性能，且推理速度较慢（生成520帧约需4分钟），对超参数（学习率 $\eta$、窗口尺寸 $W$、步长 $P$）较为敏感。未来方向包括提升推理效率以支持实时交互、设计更强的短序列先验模型、以及研究SSD优化中噪声累积对长序列末端质量的影响。
 
-## 背景与动机
-
 ### 长序列人体运动生成的现实需求
 
 生成任意长度的人体运动序列在动画制作、虚拟现实、人机交互和游戏开发等领域具有广泛的应用前景。理想情况下，系统应能根据一组文本描述（例如“一个人向前走，然后慢跑，接着坐下”）生成一段连贯、流畅且语义匹配的长运动序列。然而，现有方法面临一个核心瓶颈：**缺乏高质量的长序列运动数据**。主流的人体运动扩散模型（如MDM）通常仅在短片段（约70–200帧）上训练，直接生成超长序列会导致动作质量急剧下降。
@@ -120,7 +120,7 @@ InfiniDreamer的生成质量受限于底层短序列模型MDM的性能，且推�
 
 基于此，本文提出**InfiniDreamer**框架，核心创新是**分段分数蒸馏（Segment Score Distillation, SSD）**——一种将SDS范式从静态3D资产生成迁移到时序运动序列优化的方法。该方法先利用预训练模型按文本提示生成各子动作段，并随机初始化过渡段以构建初始长序列；随后通过滑动窗口重叠采样短片段，以对齐损失与几何损失联合迭代优化整个序列，使每个局部片段逼近扩散先验分布的同时，保持全局运动连贯性。
 
-## 核心创新
+## 核心方法与创新机理
 
 InfiniDreamer 的核心创新在于将**分段分数蒸馏（Segment Score Distillation, SSD）**引入长序列人体运动生成，从根本上改变了长运动合成的范式。与现有方法相比，其关键创新体现在以下四个维度。
 
@@ -157,8 +157,6 @@ InfiniDreamer 的核心洞察在于：**无需额外长序列训练，仅通过�
 传统方法中，每个动作段固定对应一个文本提示，但过渡段跨越多个子动作时，单一提示无法准确描述其语义。InfiniDreamer 的**changed slot**在于：根据采样片段所在区域自适应选择文本条件（Eq. 3）——若片段完全位于某个子动作内，则使用该子动作的提示；若跨越 $n$ 个子动作，则以均匀概率 $1/n$ 随机采样一个提示。
 
 消融实验验证了这一策略的有效性：使用固定提示（如“transition”或“motion”）或无监督优化均导致性能显著下降（Table 6），因为通用提示无法捕捉多样化过渡段的语义，验证了自适应文本条件选择策略的必要性。
-
-## 整体框架
 
 InfiniDreamer 的整体 pipeline 围绕一个核心矛盾展开：长序列人体运动生成需要同时保证**局部动作的语义保真度**与**全局过渡的连贯性**，但预训练的运动扩散模型（MDM）仅见过短片段数据。该方法将这一问题转化为一个**无需额外训练**的迭代优化过程，其工作流可概括为三个阶段：
 
@@ -217,11 +215,6 @@ $$\mathcal{L}_{ssd} = \mathcal{L}_{align} + \lambda_{pos} \mathcal{L}_{pos} + \l
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l1889_InfiniDreamer_Arbitrarily_Long_Human_Motion_Generation_via_Segment_Score/figures/002_Figure_2.jpg]]
-*Figure 2: Overview of InfiniDreamer for arbitrarily long human motion generation. Given a list of text prompts, our framework generates a coherent and continuous long-sequence motion that aligns closely with each prompt. To achieve this, we start by initializing a long motion sequence using the (1) Motion Sequence Initialization module. Next, the (2) Motion Segment Sampling module iteratively samples short, overlapping sequence segments from the initialized motion. Finally, we refine each sampled segment with our proposed (3) Segment Score Distillation, optimizing each segment to align with the prior distribution of the pre-trained motion diffusion model. Through this iterative process, the framework...*
-
-## 核心模块与公式推导
-
 InfiniDreamer 通过三个顺序模块实现任意长度人体运动的训练无关生成：运动序列初始化、运动片段采样和分段分数蒸馏（SSD）。整个框架的核心数学机制是将分数蒸馏采样（SDS）从图像域迁移到运动域，并通过精心设计的损失函数在局部保真度与全局一致性之间取得平衡。
 
 ### 运动序列初始化模块
@@ -274,7 +267,7 @@ $$\mathcal{L}_{ssd} = \mathcal{L}_{align} + \lambda_{pos} \mathcal{L}_{pos} + \l
 
 **梯度掩码机制**：SSD 在反向传播时对不同区域施加差异化的优化强度——子运动段使用较低的优化强度以保持生成质量，过渡段使用较高的优化强度以促进连贯性。移除梯度掩码（Table 1, Table 2）导致所有指标下降，说明分区控制优化强度是长序列质量的关键设计。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主结果：训练无关长运动生成的全面超越
 
@@ -343,18 +336,7 @@ W 过小（30）时，上下文信息不足，过渡段优化缺乏足够约束�
 ![[assets/figures/papers/paper_list_l1889_InfiniDreamer_Arbitrarily_Long_Human_Motion_Generation_via_Segment_Score/figures/011_Table_6.jpg]]
 *Table 6: Ablation Study on textual prompt. We remove the original text selection strategy and instead optimize using a single text prompt. We present two types of prompt: “transition” and “motion”, as well as an unconditional optimization scenario. We find that mismatched textual conditions lead to a decline in performance, while the unconditional setting produces an sub-optimal result. We believe this is because the text prompts used are not well-suited to capture the semantics of diverse transition segments. This validate the effectiveness of our text condition selection strategy*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1889_InfiniDreamer_Arbitrarily_Long_Human_Motion_Generation_via_Segment_Score/figures/008_Table_4.jpg]]
-*Table 4: Comparison of InfiniDreamer with the state of the art in HumanML3D. Symbols ↑, ↓, and → mean that higher, lower, or closer to the ground truth (GT) value are better, respectively. We run each evaluation 10 times to obtain the final results. We use Bold to indicate the best result, and use underline to indicate the second-best result*
-
-![[assets/figures/papers/paper_list_l1889_InfiniDreamer_Arbitrarily_Long_Human_Motion_Generation_via_Segment_Score/figures/009_Table_5.jpg]]
-*Table 5: Comparison of InfiniDreamer with the state of the art in BABEL. Symbols ↑, ↓, and → mean that higher, lower, or closer to the ground truth (GT) value are better, respectively. We run each evaluation 10 times to obtain the final results. We use Bold to indicate the best result, and use underline to indicate the second-best result*
-
-![[assets/figures/papers/paper_list_l1889_InfiniDreamer_Arbitrarily_Long_Human_Motion_Generation_via_Segment_Score/figures/012_Figure_6.jpg]]
-*Figure 6: We demonstrate InfiniDreamer’s capability to generate long motion sequence from a single text prompt. Starting with a base model designed to generate short sequences (approximately 70 to 200 frames), our framework extends its generation range to 520 frames while ensuring that the generated motions remain semantically consistent with the input text*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 核心定位：训练无关长序列生成的优化范式
 

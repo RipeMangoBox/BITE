@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2024
 pdf_ref: paperPDFs/CVPR_2024/Move_as_You_Say_Interact_as_You_Can_Language_guided_Human_Motion_Generation_with_Scene_Affordance.pdf
+project_link: https://afford-motion.github.io
+code_link: null
 aliases:
 - TSADFAA
 tags:
@@ -42,7 +44,7 @@ claims:
 > - HUMANISE 上，goal dist. 0.156 vs 0.326 (one-stage @ Enc) (降低0.170)；contact (%) 96.04 vs 76.11 (one-stage @ Enc) (+19.93)。
 > - Novel Evaluation Set 上，FID 7.887 vs 14.698 (one-stage) (降低6.811)。
 
-## 概述
+## 概要
 
 **核心问题**：在语言、3D 场景与人体运动三个模态之间进行联合建模，要求生成的运动既准确贴合语言语义，又在物理上合理地定位于场景几何中。然而，大规模语言-场景-运动配对数据极度稀缺，直接端到端学习极易导致语义漂移、空间定位失败与物理穿透。
 
@@ -57,7 +59,7 @@ claims:
 
 **局限性**：面对完全陌生的人-场景交互类别或过于复杂的语言描述时仍会失败（Figure 5）；两阶段扩散推理速度较慢，难以满足实时需求；泛化能力仍受限于训练数据的场景与动作分布覆盖范围。
 
-## 背景与动机
+
 
 **核心瓶颈** 语言引导的3D场景人体运动生成任务，本质上是语言、3D场景几何和人体运动三个模态的联合建模问题。现有方法面临的根本性瓶颈在于：缺乏大规模、高质量的语言-场景-运动配对数据，加之三模态联合建模的内在复杂性，导致生成的运动难以同时满足语义描述的准确性、3D场景中的物理合理性以及精确的空间定位要求。
 
@@ -65,7 +67,9 @@ claims:
 
 **本文动机与核心思路** 针对上述瓶颈，本文提出将**场景可供性图（affordance map）**作为中间表示，将困难的三模态联合建模分解为两个更可控的子问题。场景可供性图定义为人体骨骼关节与3D场景表面点之间基于距离场的广义可供性表示——离关节越近的场景点权重越高，从而精确编码了语言描述所隐含的空间定位信息（如“坐在椅子上”意味着骨盆关节应靠近椅子表面）。通过先预测语言引导的可供性图，再将其作为条件输入运动生成模型，该方法在有限训练数据下有效提升了语义一致性和跨场景泛化能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 1. 核心瓶颈与因果调控
 
@@ -151,7 +155,7 @@ $$ p_{\phi}(\mathbf{X}_{0:T} \mid \mathbf{C}, \mathcal{S}, \mathcal{L}) = p(\mat
 
 待解决的开放问题包括：如何实现完全未见过的人-场景交互类别的零样本生成（zero-shot HSI），如何通过更高效的生成架构（如一致性模型、潜在扩散）缩短推理时间，以及如何利用少量标注数据在更多样的真实3D场景中进行半监督或自监督训练。
 
-## 整体框架
+
 
 本文提出一个**两阶段扩散框架**，核心思路是将**场景可供性图（affordance map）**作为语言、3D场景与人体运动三者之间的中间表示，以降低多模态联合建模的难度。整体流程如 Figure 2 所示：
 
@@ -187,7 +191,7 @@ $$L_{\mathrm{MSE}} = \mathbb{E}_{\mathbf{X}_0, t}\left[\|\mathbf{X}_0 - G_{\phi}
 
 该两阶段设计的核心洞察在于：**直接学习“语言+场景→运动”的端到端映射面临严重的多模态对齐困难**，尤其在语言-场景-运动配对数据稀缺的条件下。引入可供性图作为中间表示，将问题分解为两个相对独立的子任务——先预测“在哪里交互”（可供性图），再生成“如何运动”（运动序列）——显著降低了联合建模的复杂度。可供性图基于人体骨骼关节与场景表面点之间的距离场构建，能够精确编码语言描述所隐含的空间定位信息（如“坐在椅子上”时臀部与椅面的接触区域），同时提供场景几何约束，从而在有限训练数据下有效提升语义一致性和跨场景泛化能力。
 
-## 核心模块与公式推导
+
 
 ### 可供性图的定义与构建
 
@@ -249,7 +253,9 @@ AMDM的架构由两个关键模块组成：
 ![[assets/figures/papers/paper_list_l1722_Move_as_You_Say_Interact_as_You_Can_Language_guided_Human_Motion_Generat/figures/013_Figure.jpg]]
 *Figure: (b) Point Transformer variant Figure A2. Illustration of MLP and Point Transformer variants of ADM*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -328,7 +334,9 @@ Figure 5展示了典型失败案例。当面对**完全陌生的人-场景交互
 ![[assets/figures/papers/paper_list_l1722_Move_as_You_Say_Interact_as_You_Can_Language_guided_Human_Motion_Generat/figures/015_Table.jpg]]
 *Table: A2. Ablation of the proportion about replacing ground truth affordance with predicted ones on our novel evaluation set. The proportion ranges from 0.0 to 0.5. We use the Perceiver in the first stage and the encoder-based variant in the second stage*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -361,6 +369,8 @@ Figure 5展示了典型失败案例。当面对**完全陌生的人-场景交互
 2. **高效生成架构：** 能否用一致性模型、流匹配或潜在扩散替代当前的DDPM范式，在保持生成质量的同时将推理速度提升至实时？
 3. **弱监督与自监督训练：** 如何利用大量无标注的3D场景数据和少量语言-运动配对数据进行半监督训练，以扩展模型对真实场景多样性的覆盖？
 4. **复杂语义的运动规划：** 对于包含时序逻辑和多个子目标的语言描述，如何将高层语义自动分解为可供性图序列或运动基元序列，实现从“单步映射”到“规划式生成”的跨越？
+
+
 
 ## 原文 PDF
 

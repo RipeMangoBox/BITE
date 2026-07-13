@@ -42,7 +42,7 @@ claims:
 > - Waymo (Lane Shift @3m) 上，FID 71.51 vs 84.12 (DIFIX3D+) (-12.61)。
 > - Waymo (Lane Shift @6m) 上，FID 107.47 vs 120.24 (DIFIX3D+) (-12.77)；NTA-IoU 0.517 vs 0.504 (DIFIX3D+) (+0.013)；NTL-IoU 55.78 vs 53.77 (DIFIX3D+) (+2.01)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：在自动驾驶场景的可控新视角合成中，现有方法面临一个根本性矛盾——基于几何的 3D Gaussian Splatting（3DGS）重建在偏离训练轨迹时产生严重伪影，而外观驱动的扩散模型虽能生成逼真内容，却缺乏像素级、3D 一致的编辑准则。直接融合二者往往导致**过度恢复**（扩散模型对已重建良好的区域也进行修改）和**几何漂移**（生成内容与底层 3D 结构不一致），使融合策略的收益被系统性误差累积所抵消。
 
@@ -54,7 +54,7 @@ claims:
 
 **主要结果**：在 Waymo 数据集的车道偏移新视角合成任务上，FaithFusion 取得了最优性能。在最具挑战性的 6 米横向偏移设置下，FID 达到 **107.47**，较主要融合基线 DIFIX3D+ 改善 **12.77**；NTA-IoU 和 NTL-IoU 也分别提升至 0.517 和 55.78。消融实验证实，EIG 引导、EIGent 生成模块和渐进式集成的逐步加入带来了持续的增益累积，验证了 EIG 作为统一编辑策略的有效性。
 
-## 背景与动机
+
 
 ### 可控驾驶场景重建的瓶颈
 
@@ -83,7 +83,9 @@ FaithFusion 的核心洞察在于：**“是否编辑及编辑到何种程度”
 
 FaithFusion 的 EIG 引导渐进式训练循环包含三个步骤（图 2）：首先从原始 3DGS 渲染横向偏移的新视角及其像素级 EIG 图；然后通过双分支 **EIGent** 模型修复高 EIG 区域——早期使用 Video DiT 保证时空一致性，后期使用 DIFIX3D+ 进行逐帧感知精炼；最后用 EIG 加权损失将修复后的视图选择性蒸馏回 3DGS。这一闭环使得 EIG 成为贯穿生成与重建的统一编辑策略，在 Waymo 数据集上实现了 FID 107.47（6 米车道偏移），较 DIFIX3D+ 基线改善 12.77。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FaithFusion 的核心创新在于将 **3DGS–扩散模型融合中的编辑决策重新表述为信息论问题**，并通过像素级期望信息增益（Expected Information Gain, EIG）为生成与重建分支提供统一的、可解释的空间策略。其关键设计围绕以下三个 changed slots 展开。
 
@@ -118,7 +120,7 @@ $$\mathcal{L}_{\text{novel}}(\omega) = \mathcal{L}_{\text{img}}^{\text{novel}} +
 
 这种跨模态的 EIG 引导机制——生成侧用 EIG 抑制内容、重建侧用 EIG 选择性蒸馏——构成了 FaithFusion 协调重建与生成的核心闭环。消融实验（Table 2）表明，端到端的渐进式集成最终使 FID 较 DIFIX3D+ 基线降低 12.77，且 FID-UCR 和 FID-HPR 分别下降 10.95 和 4.91。
 
-## 整体框架
+
 
 FaithFusion 是一个以**像素级期望信息增益（Expected Information Gain, EIG）**为统一驱动信号的 3DGS-扩散模型融合框架。其核心设计理念在于：将“何处编辑、何时编辑、编辑到何种程度”的启发式决策，重新表述为可计算的信息论指标——EIG 量化了通过观测新视角数据所能减少的渲染后验不确定性，从而为生成与重建两条分支提供可解释、可泛化的像素级指导。
 
@@ -158,7 +160,7 @@ $$\mathrm{EIG} \leq \frac{1}{2} \sum_i \mathrm{tr}\left( H''[Y_i^{\mathrm{NVS}} 
 ![[assets/figures/papers/paper_list_l2484_https_arxiv_org_abs_2511_21113/figures/002_Figure_2.jpg]]
 *Figure 2: FaithFusion pipeline. The EIG-guided progressive training loop with three steps: Step 1: Novel-view synthesis. Render laterally offset novel views and their pixel-level EIG maps from the original 3DGS. Step 2: EIGent Fixed. Feed the renders and EIG maps into EIGent to repair high-EIG regions—using Video DiT early for spatio-temporal consistency and DIFIX3D+ later for per-frame perceptual refinement. Step 3: EIG-guided 3DGS Update. Fine-tune the 3DGS model with the EIGent-restored views and EIG maps*
 
-## 核心模块与公式推导
+
 
 FaithFusion 的核心设计围绕一个统一的信息论指标——像素级期望信息增益（Expected Information Gain, EIG）展开。EIG 同时承担三重角色：生成分支中的空间先验、重构分支中的损失权重，以及连接两者的知识蒸馏桥梁。以下按管线顺序拆解关键模块及其数学基础。
 
@@ -224,7 +226,9 @@ $\lambda_{EIG}$ 的核心作用在于选择性知识蒸馏：高 EIG 区域获�
 ![[assets/figures/papers/paper_list_l2484_https_arxiv_org_abs_2511_21113/figures/004_Figure_4.jpg]]
 *Figure 4: Overview of EIGent. Data: Cross-view pairing: a forward-camera–trained 3DGS renders right-front views to produce artifactprone novel-view renders and per-pixel EIG (Alg. 1), temporally aligned with real right-front videos. Architecture: EIGent is a dual-branch model with coarse-to-fine EIG guidance: downsampled E, noise latent*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -301,7 +305,9 @@ Figure 3 通过渐进式保留高 EIG 区域并评估 PSNR，验证了像素级 
 ![[assets/figures/papers/paper_list_l2484_https_arxiv_org_abs_2511_21113/figures/001_Figure_1.jpg]]
 *Figure 1: Comparative overview. Comparison of FreeVS [46], OmniRe [7], the fusion-based methods DIFIX3D+ [47] and ReconDreamer++ [64], and our EIG-integrated FaithFusion, which simultaneously achieves consistency, quality, and faithfulness*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 基线对比与差异化定位
 
@@ -337,6 +343,8 @@ FaithFusion 将信息论指标引入 3DGS-扩散融合范式，为以下研究�
 3. **跨场景自适应**：EIG 阈值等关键超参数在不同场景（城市、高速、乡村）和不同偏移幅度下的自适应调整策略，需要系统的实验验证和理论分析。
 
 4. **与其他重建表示的兼容性**：EIG 框架的核心是“像素级不确定性量化 + 选择性修复”，这一思想是否可迁移至 NeRF、3D Gaussian Splatting 的其他变体，或更广泛的神经渲染管线中，值得进一步探索。
+
+
 
 ## 原文 PDF
 

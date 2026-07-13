@@ -5,6 +5,7 @@ paper_level: A
 venue: SIGGRAPH
 year: 2023
 pdf_ref: paperPDFs/SIGGRAPH_2023/Walk_on_Stars_Grid_Free_Monte_Carlo_for_Neumann_Boundary_Conditions.pdf
+code_link: null
 project_link: "https://www.cs.cmu.edu/~kmcrane/Projects/WalkOnStars/"
 aliases:
 - WSW
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 星形漫步：面向诺依曼边界条件的无网格蒙特卡洛方法 |
 | 英文题名 | Walk on Stars: Grid-Free Monte Carlo for Neumann Boundary Conditions |
 | 会议/期刊 | SIGGRAPH 2023 |
-| Links | [paper](https://arxiv.org/abs/2302.11815); [Project](https://www.cs.cmu.edu/~kmcrane/Projects/WalkOnStars/) |
+| Links | [paper](https://arxiv.org/abs/2302.11815) · [Project](https://www.cs.cmu.edu/~kmcrane/Projects/WalkOnStars/) |
 | Topic | #topic/optimization_theory_probabilistic #topic/optimization_theory_probabilistic/optimization_methods |
 | Method | Walk on Stars (WoSt) |
 | Dataset | 已知参考函数（逐渐增大诺伊曼边界比例）, 混合边值问题效率对比 |
@@ -41,7 +42,7 @@ claims:
 > - 已知参考函数（逐渐增大诺伊曼边界比例） 上，收敛率 为 O(1/√N) 蒙特卡洛收敛，对比 多交点估计器迅速发散，变化 WoSt 稳定收敛，多交点估计器无法使用。
 > - 混合边值问题效率对比 上，Error vs. time 为 显著更高效，对比 WoS with discretized boundary reflections，变化 相同游走数下 WoSt 达到更低误差。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -72,7 +73,7 @@ WoSt 继承了蒙特卡洛方法的经典优势：
 
 WoSt 的主要局限包括：纯诺伊曼边界条件下游走永不终止，需引入 Tikhonov 正则化（图19）；凹面诺伊曼边界附近半径受限于可见轮廓距离；当前不支持 Robin 边界条件（部分吸收/反射）；单向游走在狭窄通道中效率极低（图21）。开放问题涉及星形区域在非多面体域上的高效构造、Robin 条件的整合、以及该方法向其他 PDE（如 Helmholtz 方程、弹性方程）的推广。
 
-## 背景与动机
+
 
 ### 混合边界条件与拉普拉斯方程
 
@@ -100,7 +101,9 @@ $$
 
 本文的核心洞察是：**通过基于可视轮廓的星形区域来模拟反射布朗运动，可以将 WoS 自然地推广到任意混合狄利克雷/诺伊曼边界，同时保留无网格蒙特卡洛方法的所有优势。** 具体而言，Walk on Stars (WoSt) 将游走的基本步长区域从“最大空球”替换为“球与域交集中包含当前点的星形连通分量”（Figure 3, Figure 8）。该星形区域的半径由到最近狄利克雷边界的距离与到诺伊曼边界可见轮廓点的最近距离共同决定——前者保证不触碰吸收边界，后者确保区域内诺伊曼边界对当前点完全可见，从而射线只与边界相交一次（Figure 7 右）。这使得 WoSt 能够在一次游走步骤中跨越一大片诺伊曼边界，彻底避免了传统方法中球半径缩小导致的“黏附”问题。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Walk on Stars (WoSt) 的核心创新在于**将蒙特卡洛网格无关 PDE 求解器从“球形游走”范式升级为“星形游走”范式**，从而首次使无网格随机游走方法能够高效、无偏地处理任意混合狄利克雷/诺伊曼边界条件。这一升级通过三个紧密耦合的 changed slots 实现，其因果链条为：星形区域构造 → 基于泊松核的方向采样与首次交点选取 → 独立的诺伊曼贡献采样。
 
@@ -148,7 +151,7 @@ $$\widehat{u}(x_k) := \begin{cases} g(\overline{x}_k), & \overline{x}_k \in \par
 
 针对凹诺伊曼边界附近可见轮廓距离急剧缩小导致的游走停滞问题（图 9），WoSt 引入了最小半径参数 $r_{\min}$（图 10 左）。消融实验（图 13）表明，更大的 $r_{\min}$ 能显著加速游走，运行时间的改善远大于引入的微小偏差。对于纯诺伊曼边界条件下游走永不终止的问题，WoSt 采用筛选泊松方程的 Tikhonov 正则化，并通过仅对超出阈值的游走应用正则化来平衡噪声与偏差（图 19）。
 
-## 整体框架
+
 
 **Walk on Stars (WoSt)** 是一种无网格蒙特卡洛方法，用于求解带有混合狄利克雷/诺伊曼边界条件的泊松方程（以及筛选泊松方程）。其核心思想是将经典球形游走（WoS）中使用的球体替换为**星形区域**（star-shaped region），从而能够自然地模拟反射布朗运动，处理诺伊曼边界条件。
 
@@ -214,7 +217,7 @@ WoSt 的求解过程由以下五个核心模块串联而成，形成一条递归
 ![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2302_11815/figures/001_Figure_1.jpg]]
 *Figure 1: The walk on stars (WoSt) method handles mixed Dirichlet and Neumann boundary conditions, enabling it to model a richer class of problems than the original walk on spheres (WoS) method. Here for instance we simulate diffusive convective heat transfer from a toaster (Dirichlet) to a piece of bread (Neumann) by solving a Laplace equation with mixed boundary conditions (top and bo om right), complementing the radiative transfer computed via ray tracing (bo om le ). As with ray tracing, we can simulate directly on the full high-resolution data (bo om center) without generating a volume mesh or forming a global stiffness matrix. Since results are progressive, we can get a preview of how the toast w...*
 
-## 核心模块与公式推导
+
 
 ### 数学基础：边界积分方程
 
@@ -313,7 +316,9 @@ $$
 | 轮廓边判定 | $(v \cdot n_1) \cdot (v \cdot n_2) \leq 0$ | 确定可见诺伊曼边界 |
 | 筛选泊松权重 | $Q^{\sigma,B}$ | 纯诺伊曼问题的轮盘赌终止 |
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 收敛性验证
 
@@ -362,7 +367,9 @@ WoSt 的效率优势源于其核心设计：星形区域允许单步跨越一大
 ![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2302_11815/figures/028_Figure_22.jpg]]
 *Figure 22: Realistic scenes for visualization and analysis rarely have purely reflecting surfaces. Le : A rendered scene with both absorbing and reflecting surfaces. Right: A rendered scene of a room full of perfect mirrors*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题背景与核心瓶颈
 
@@ -421,6 +428,8 @@ WoSt 在谱系中代表了从“球体游走”到“可见性驱动游走”的
 5. **PDE 推广**：星形区域的思想能否推广至 Helmholtz 方程、弹性力学方程、双调和方程等其他 PDE 的边界积分方程？
 6. **外部区域问题**：球形反演方法能否扩展到外部区域的混合边值问题？
 7. **路径空间形式**：路径空间形式的边界积分方程能否实现更全局的采样决策和更高效的估计器？
+
+
 
 ## 原文 PDF
 

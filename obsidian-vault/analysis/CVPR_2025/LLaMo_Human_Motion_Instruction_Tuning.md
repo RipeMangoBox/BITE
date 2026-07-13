@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/LLaMo_Human_Motion_Instruction_Tuning.pdf
+project_link: null
+code_link: null
 aliases:
 - LHMIT
 tags:
@@ -40,7 +42,7 @@ claims:
 > - MoVid-Bench-Video 上，Overall Acc. / Score 52.33 / 3.10 vs best competitor (GPT-3.5/MotionLLM) (outperformed most metrics)。
 > - BABEL-QA 上，Overall Score 0.458 vs best baseline (MotionLLM approx. 0.456) (+0.002 (approx.))。
 
-## 概述
+## 概要
 
 **核心问题与瓶颈**
 现有将运动数据引入大语言模型（LLM）的方法——如 **MotionGPT**（Chen et al., NeurIPS 2024）和 **MotionLLM**（Chen et al., arXiv 2024）——普遍将连续的运动序列离散化为语言 token 或文本描述。这一转换不可避免地丢失了细粒度的时空运动信息，并且难以有效融合视频环境上下文，制约了模型对复杂人类行为的深度理解。
@@ -60,7 +62,7 @@ LLaMo 属于**多模态大语言模型（MLLM）在人体运动理解领域**的
 **局限与展望**
 当前跨模态融合技术仍需细化以适应更复杂的真实环境，计算效率尚不足以支持实时应用。在部分重复动作计数指标上未能全面超越专用模型，表明时序精细计数仍有提升空间。未来可探索向医疗康复、虚拟人交互等领域的扩展。
 
-## 背景与动机
+
 
 ### 人体运动理解的模态鸿沟
 
@@ -88,7 +90,9 @@ LLaMo 属于**多模态大语言模型（MLLM）在人体运动理解领域**的
 
 这种设计使LLaMo能够在保留运动时空细节的前提下，将有效序列长度从 $T$ 压缩至 $K$（$K \ll T$），将自注意力复杂度降至 $O((L_T+K)^2)$，从而在**细粒度运动理解与计算效率之间取得平衡**。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 LLaMo 的核心创新在于**将运动数据作为独立模态原生引入大语言模型**，并通过**文本引导的跨模态关键帧压缩与双向融合机制**，在保留细粒度时空运动信息的同时大幅降低计算复杂度，从而显著提升模型在运动密集型场景下的行为理解能力。
 
@@ -121,7 +125,7 @@ LLaMo 提出了 **Cross Talker 模块**，实现文本引导的自适应关键�
 - 在 **专业挥杆数据集** 上，LLaMo 的综合准确率达 24.80，大幅领先 MotionLLM 的 16.53（+8.27）（[Table 3]），证明其对复杂专业动作的细粒度理解能力。
 - 在 **Mo-RepCount** 的 OBZ 指标上，LLaMo 达到 0.222，超越所有专用计数模型（如 **EScounts**（Sinha et al., arXiv 2024）的 0.198），显示出原生运动表示在捕捉细粒度运动特征上的独特优势（[Table 4]）。
 
-## 整体框架
+
 
 LLaMo 的整体设计围绕一个核心洞察展开：**保留原始运动数据作为连续特征而非将其离散化为语言 token，能够更精准地捕捉人类动作的时空动态细节**。为此，LLaMo 将运动数据作为独立模态直接输入大语言模型（LLM），并通过三个协同模块构建起从多模态感知到行为语言生成的端到端流水线（Figure 2）。
 
@@ -207,7 +211,7 @@ $$L = -\frac{1}{N}\sum_{i=1}^N \sum_{t=1}^{L^{(i)}} \log p(\hat{y}_t^{(i)} \mid 
 ![[assets/figures/papers/paper_list_l1860_LLaMo_Human_Motion_Instruction_Tuning/figures/001_Figure_1.jpg]]
 *Figure 1: A comparison of MotionLLM [1], MotionGPT [2], and LLaMo highlights LLaMo’s motion-specific capabilities. Equipped with a Motion Enhancer and Cross Talker module to align motion and text, LLaMo supports both video and motion inputs, enabling text-aware, fine-grained motion analysis*
 
-## 核心模块与公式推导
+
 
 LLaMo 的核心架构由三个模块串联构成（Figure 2）：**多模态特征提取模块**、**Cross Talker 模块**和**行为生成模块**。其中，Cross Talker 是实现文本引导运动细粒度理解的关键创新。
 
@@ -276,7 +280,9 @@ $$L = -\frac{1}{N}\sum_{i=1}^N \sum_{t=1}^{L^{(i)}} \log p(\hat{y}_t^{(i)} \mid 
 
 LLaMo 的核心技术决策在于**保留运动数据的连续原生表示**，而非将其离散化为语言 token。Cross Talker 通过文本感知的帧选择实现计算压缩，同时借助自适应局部窗口和双向跨模态注意力，确保压缩过程不丢失对细粒度时空动态的敏感性。这一设计在专业挥杆分析（All Score 24.80 vs. MotionLLM 16.53）和重复动作计数（OBZ 0.222 vs. 最佳专用模型 0.198）等运动密集型任务上得到了充分验证。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要实验结果
 
@@ -320,7 +326,9 @@ LLaMo在多个基准上进行了系统评估，涵盖通用人体活动理解、
 ![[assets/figures/papers/paper_list_l1860_LLaMo_Human_Motion_Instruction_Tuning/figures/010_Table_4.jpg]]
 *Table 4: Motion and video details capture evaluation on Mo-RepCount*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从运动离散化到原生模态保留
 
@@ -364,6 +372,8 @@ LLaMo 的知识贡献集中在三个相互关联的技术决策上：
 2. **效率优化**：如何进一步压缩关键帧选择与跨模态融合的计算开销，以满足实时应用（如在线体育教学反馈）的延迟要求？
 3. **单模态鲁棒性**：在仅有运动数据而无视频输入的条件下，模型能否保持同等的细粒度理解能力？这直接关系到该方法在无摄像头场景（如可穿戴传感器）中的适用性。
 4. **更复杂行为的理解**：当前方法主要处理单人动作，如何扩展到多人交互、群体行为等更复杂的运动场景？
+
+
 
 ## 原文 PDF
 

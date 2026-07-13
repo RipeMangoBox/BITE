@@ -42,7 +42,7 @@ claims:
 > - 五种OOD肿瘤类型（膀胱、子宫、前列腺、乳腺、宫颈） 上，Dice, Sensitivity, Specificity, Accuracy, CA R2-Seg vs BiomedParse / BiomedParse-LoRA (所有指标一致提升；膀胱 Dice 0.297，CA 0.762)。
 > - 肝、胰腺肿瘤（分布内CT） 上，Dice, CA R2-Seg vs BiomedParse (10–30% 相对增益)。
 
-## 概述
+## 概要
 
 医学图像分割的基础模型在分布内（In-Distribution）数据上表现优异，但当部署到分布外（Out-of-Distribution, OOD）肿瘤类型时，普遍产生大量碎片化假阳性，导致过度诊断风险。这一瓶颈的根本原因在于，OOD偏移下视觉嵌入分布的可分离性下降，模型的决策边界不再适用（图1）。
 
@@ -52,7 +52,7 @@ claims:
 
 R2‑Seg 的定位介于冻结基础模型与全参数微调之间：它利用LLM的语义先验和统计检验的分布校准能力，在不改变模型权重的前提下，将OOD肿瘤分割的假阳性问题转化为可解释的ROI约束与显著性筛选问题。
 
-## 背景与动机
+
 
 ### 医学影像分割中的分布外挑战
 
@@ -76,7 +76,9 @@ R2‑Seg 的定位介于冻结基础模型与全参数微调之间：它利用LL
 
 基于这一洞察，本文提出 **R2-Seg**——一个训练无关的OOD肿瘤分割框架，通过“推理-拒绝”（Reason-and-Reject）两阶段流程解决上述问题。该框架无需任何参数更新或目标域标注数据，从而从根源上避免了灾难性遗忘，同时显著提升了OOD场景下的分割特异性与整体精度。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 R2‑Seg 的核心创新在于**将 OOD 医学肿瘤分割问题解耦为“可分离性增强 + 决策边界校准”两个阶段**，在不更新基础模型参数的前提下，通过**LLM 引导的解剖推理**与**双样本统计检验**协同抑制假阳性。其相对于冻结基线的关键改变可归纳为四个 changed slot。
 
@@ -118,7 +120,7 @@ R2‑Seg 全程**冻结 BiomedParse 权重，不执行任何梯度更新**。对
 
 综上，R2‑Seg 的创新本质在于**将 OOD 适应的负担从模型参数更新转移至解剖先验注入与统计决策校准**，形成“Reason‑and‑Reject”的训练无关范式。
 
-## 整体框架
+
 
 R2‑Seg 是一种**训练无关**（training‑free）的 OOD 医学肿瘤分割框架，其核心思路是将一个冻结的基础分割模型置于由解剖推理引导的局部搜索空间内，再通过统计假设检验剔除不可靠的候选区域。该框架不更新基础模型的任何参数，因此从根本上避免了微调带来的灾难性遗忘。
 
@@ -169,7 +171,7 @@ R2‑Seg 是一种**训练无关**（training‑free）的 OOD 医学肿瘤分�
 ![[assets/figures/papers/paper_list_l2109_https_openaccess_thecvf_com_content_CVPR2026_html_Shen_R2_Seg_Training_F/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of R2-Seg pipeline. Top row: LLM-based segmentation planning and ROI construction; middle row: BioMedParsebased tumor segmentation and candidate extraction; bottom row: Statistical two-sample test and false discovery rate control*
 
-## 核心模块与公式推导
+
 
 R2-Seg 的核心由两个阶段、六个功能模块构成：**LLM解剖推理规划器** → **多尺度ROI裁剪** → **肿瘤分割与TTA融合** → **候选区域提取** → **双样本MMD检验** → **FDR控制**，并辅以三级假阳性门控机制。以下按管道顺序推导关键公式并解释变量含义。
 
@@ -266,7 +268,9 @@ $$i^* = \max\left\{i : p_{(i)} \leq \frac{\alpha \cdot i}{|\mathcal{K}|}\right\}
 ![[assets/figures/papers/paper_list_l2109_https_openaccess_thecvf_com_content_CVPR2026_html_Shen_R2_Seg_Training_F/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of visual embedding distributions. Left: In-Distribution, Right: Out-of-Distribution*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -310,7 +314,9 @@ R2‑Seg 在五种 OOD 肿瘤类型（膀胱、子宫、前列腺、乳腺、宫
 ![[assets/figures/papers/paper_list_l2109_https_openaccess_thecvf_com_content_CVPR2026_html_Shen_R2_Seg_Training_F/figures/003_Table_1.jpg]]
 *Table 1: A summary of datasets for tumor segmentation. Ax and Sag refer to Axial and Sagittal planes respectively*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 基础模型适配策略的谱系位置
 
@@ -350,6 +356,8 @@ R2‑Seg 的有效性建立在一系列前提条件之上，这些条件界定�
 - **框架的可迁移性**：统计拒绝框架能否拓展至其他非肿瘤病变（如炎症、纤维化）的分割，或适配至其他类型的基础分割模型（如 SAM、MedSAM）？这需要验证解剖推理的通用性和 MMD 检验在不同嵌入空间中的有效性。
 - **LLM 推理的鲁棒性**：LLM 解剖规划器的推理质量在不同临床中心、不同报告习惯下的鲁棒性尚未深入探讨。解剖锚点的错误指定将导致 ROI 构建失败，进而级联影响后续所有模块。这一依赖关系使 R2‑Seg 的端到端可靠性受限于 LLM 的医学知识覆盖度和推理一致性。
 - **计算开销的临床可接受性**：多尺度 ROI 的多次前向传播、多视角 TTA、以及置换检验的 B 次重采样，共同构成了显著的推理时计算开销。在临床实时场景中的部署可行性需要量化评估和优化。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,7 @@ paper_level: A
 venue: SGP
 year: 2025
 pdf_ref: paperPDFs/SGP_2025/FRIDU_Functional_Map_Refinement_with_Guided_Image_Diffusion.pdf
+code_link: https://github.com/avigailco/FRIDU
 project_link: https://github.com/avigailco/FRIDU
 aliases:
 - FRIDU
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | FRIDU：基于引导图像扩散的功能映射精化 |
 | 英文题名 | FRIDU: Functional Map Refinement with Guided Image Diffusion |
 | 会议/期刊 | SGP 2025 |
-| Links | [paper](https://arxiv.org/abs/2506.14322); [GitHub](https://github.com/avigailco/FRIDU) |
+| Links | [paper](https://arxiv.org/abs/2506.14322) · [GitHub](https://github.com/avigailco/FRIDU) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/diffusion_image_video |
 | Method | FRIDU |
 | Dataset | FAUST, SCAPE, SHREC19, Michael (TACO) |
@@ -41,7 +42,7 @@ claims:
 > - SCAPE 上，Mean geodesic error (×100) 为 4.1 (Train:F)，对比 优于DiffZO，变化 准确率提升。
 > - SHREC19 上，Mean geodesic error (×100) 为 9.4 (Train:F)，对比 优于DiffZO，变化 准确率提升。
 
-## 概述
+## 概要
 
 **问题瓶颈**：传统功能映射精化方法难以在深度网络中有效结合逐点映射一致性约束，且通常依赖大量显式逐点对应标注进行训练，无法灵活适应不同来源的初始映射。
 
@@ -54,8 +55,6 @@ claims:
 - 与 ZoomOut 相比，FRIDU 达到相近甚至更优的精度，且推理速度快约 10 倍（~60s vs ~600s，Figure 8）。
 - 模型具备零样本条件泛化能力：使用 WKS 训练的模型可有效精化 SHOT 初始映射，反之亦然（Figure 10）。
 - 消融实验证实，推理时加入逐点映射引导是性能提升的关键因素（Figure 4）。
-
-## 背景与动机
 
 ### 形状对应与功能映射框架
 
@@ -89,7 +88,7 @@ FRIDU 的提出正是为了突破上述瓶颈。其核心动机来自一个关�
 
 这种“训练在谱域、引导在几何域”的分离设计，使得FRIDU既保留了扩散模型强大的生成能力，又获得了对几何约束的灵活整合能力，同时保持了方法的可插拔性——它可以作为任意初始功能映射（无论来自经典描述符还是深度特征提取器）的后处理精化模块。
 
-## 核心创新
+## 核心方法与创新机理
 
 FRIDU 的核心创新在于将功能映射精化问题重新表述为**条件图像生成任务**，并在扩散模型的推理阶段引入**可微的逐点映射引导**，从而在无需逐点对应标注的前提下，实现高效、可插拔的映射质量提升。以下从三个关键维度展开分析。
 
@@ -140,8 +139,6 @@ FRIDU 的创新能力受限于以下因素：
 - 递归精化仅在单次迭代内有效，多次迭代会引入退化，限制了全自动迭代精化的应用。
 - 引导超参数（$m, k, s$）需手工调节，最优参数可能因数据集而异（Table 2, Figure 11）。
 
-## 整体框架
-
 FRIDU 将功能映射精化问题重新表述为**条件图像生成**任务，其核心逻辑是：将功能映射矩阵 $C_{ij} \in \mathbb{R}^{k_j \times k_i}$ 视为一张二维图像，利用扩散模型在谱域中学习从含噪初始映射到干净精化映射的映射关系。整个 pipeline 由训练和推理两个阶段构成，二者共享同一个条件扩散去噪骨干网络，但在数据流和约束机制上有本质区别。
 
 ### 训练阶段：纯谱域的 Patch 条件扩散
@@ -182,8 +179,6 @@ FRIDU 将功能映射精化问题重新表述为**条件图像生成**任务，�
 ### 可选扩展：谱上采样与递归精化
 
 推理时还可引入**谱上采样**策略，逐步增加功能映射的谱维度（从 $k \times k$ 提升到 $K \times K$，$K > k$），模拟经典方法 ZoomOut 的谱提升效果。此外，FRIDU 支持**一次递归精化**——将精化后的映射作为新的初始映射再次输入模型，通常能进一步提升精度；但实验表明，多次递归迭代会导致性能退化，因此实际使用中仅推荐单次递归。
-
-## 核心模块与公式推导
 
 ### 1. 问题重构：功能映射作为条件图像生成
 
@@ -250,7 +245,7 @@ $$\mathcal{L}_{\mathrm{P2Pg}}(C_{21}^{t}) = \| \Phi_{2} C_{21}^{t} - \Pi_{21} \P
 
 FRIDU 支持将精化后的映射作为新的初始映射再次输入模型进行递归精化。实验表明，**单次递归迭代通常能进一步提升精度**，但超过一次迭代会导致性能退化——这可能源于去噪过程引入的累积偏差偏离了训练分布。因此实际使用中建议仅采用一次递归精化。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主要结果：形状匹配精度
 
@@ -294,10 +289,7 @@ Figure 10 验证了模型的零样本条件泛化能力。使用 WKS 初始映�
 ![[assets/figures/papers/paper_list_l25_https_arxiv_org_abs_2506_14322/figures/012_Figure.jpg]]
 *Figure: WKS (SHOT) SHOT (WKS)*
 
-![[assets/figures/papers/paper_list_l25_https_arxiv_org_abs_2506_14322/figures/005_Figure_5.jpg]]
-*Figure 5: Functional Map Refinement (SHOT). We show the performance of the pointwise mapping extracted from our refined map alongside the initial and ground-truth mappings. We additionally show the corresponding functional map matrices. Note the noisy appearance of the SHOT-based initial map. The plot shows the normalized Euclidean error over the Michael dataset, where our refined maps consistently outperform the initial maps*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 方法谱系：从功能映射到扩散精化
 

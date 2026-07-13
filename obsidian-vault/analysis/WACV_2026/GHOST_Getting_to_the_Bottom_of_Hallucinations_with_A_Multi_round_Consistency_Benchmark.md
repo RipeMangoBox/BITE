@@ -5,6 +5,8 @@ paper_level: A
 venue: WACV
 year: 2026
 pdf_ref: paperPDFs/WACV_2026/GHOST_Getting_to_the_Bottom_of_Hallucinations_with_A_Multi_round_Consistency_Benchmark.pdf
+project_link: https://vibashan.github.io/ghost-web/
+code_link: null
 aliases:
 - GHOST
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | GHOST：通过多轮一致性基准深入揭示幻觉 |
 | 英文题名 | GHOST: Getting to the Bottom of Hallucinations with A Multi-round Consistency Benchmark |
 | 会议/期刊 | WACV 2026 |
-| Links | [paper](https://openaccess.thecvf.com/content/WACV2026/papers/VS_GHOST_Getting_to_the_Bottom_of_Hallucinations_with_A_Multi-round_WACV_2026_paper.pdf); [Project](https://vibashan.github.io/ghost-web/) |
+| Links | [paper](https://openaccess.thecvf.com/content/WACV2026/papers/VS_GHOST_Getting_to_the_Bottom_of_Hallucinations_with_A_Multi-round_WACV_2026_paper.pdf) · [Project](https://vibashan.github.io/ghost-web/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | GHOST |
 | Dataset | GHOST vs. POPE/AMBER (GPT-4o), GHOST (Overall), Consistency Check Rounds |
@@ -40,7 +42,7 @@ claims:
 > - GHOST (Overall) 上，GCS 为 GPT-4o: 69.0，对比 Tiny MLLMs average GCS < 53，变化 large gap (> 16 points)。
 > - Consistency Check Rounds 上，Hallucination-free rate 为 Decreases as more checks are added，对比 Accuracy increases with more checks，变化 contradicts accuracy improvement。
 
-## 概述
+## 概要
 
 ### 1. 问题背景与核心瓶颈
 
@@ -87,7 +89,7 @@ GHOST 是首个同时覆盖物体、属性、关系三个维度，并在物体�
 
 GHOST 的当前局限包括：数据集主要源自 Visual Genome / GQA，场景覆盖有限；困难负样本仍需人工筛选，扩展成本高；仅支持判别式 True/False 问题，未涵盖生成式幻觉。未来方向包括：将一致性框架扩展到视频等多模态场景，探索自动化负样本生成方法，以及将一致性度量应用于需要多步推理的复杂问题。
 
-## 背景与动机
+
 
 ### 幻觉评估的瓶颈：从图像级到物体级
 
@@ -125,7 +127,9 @@ GHOST 通过实验揭示了准确率指标的系统性欺骗效应。如 **Figur
 
 通过这一框架，GHOST 旨在揭示 MLLM 在物体级理解上的真实能力边界，为幻觉研究提供一个更诚实、更严格的评估基准。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GHOST 的核心创新在于将幻觉评估从**图像级别下沉到物体级别**，并通过**多轮一致性检查**揭露模型的自相矛盾，而非仅依赖传统的独立准确率指标。其关键设计体现在以下四个维度：
 
@@ -149,7 +153,7 @@ GHOST 引入多轮一致性检查框架：对同一物体，模型需在正样�
 
 现有基准多采用随机或简单负样本。GHOST 利用多个 MLLM 训练数据集的共现矩阵，生成**看似合理但实际为假的困难负样本**，并经人工筛选确保挑战性。**Table 5** 的消融实验表明，这种条件共现负样本比随机负样本或 LLaMA 生成的负样本更具挑战性，能更有效地限制模型保持一致性。
 
-## 整体框架
+
 
 GHOST 提出了一套从数据构建到一致性度量再到模型评估的完整流水线，其核心设计目标是将幻觉评估从图像级别下沉至物体级别，并通过多轮一致性检查暴露模型的自相矛盾。
 
@@ -177,7 +181,7 @@ GHOST 提出了一套从数据构建到一致性度量再到模型评估的完�
 
 Figure 2 揭示了一个反直觉现象：当负样本数量增加时，模型的标准准确率反而上升，但“无幻觉物体”的比例却持续下降。这意味着准确率可能掩盖幻觉——模型只需学会对所有问题回答“否”即可在负样本主导的评估中获得高准确率，而一致性检查通过追踪同一物体上正负样本回答的自洽性，能够穿透这种表面正确性。GCS 公式正是基于这一洞察设计：它使用加权几何平均（权重随幻觉次数指数衰减）来惩罚假阳性（FP）和假阴性（FN），而非简单地计算正确率。
 
-## 核心模块与公式推导
+
 
 ### 关键模块
 
@@ -216,7 +220,9 @@ $$\mathrm{Overall\ GCS} = \frac{1}{3} \left( \mathrm{GCS}_{\mathrm{obj}} + \math
 
 对物体（obj）、属性（attr）、关系（rel）三个维度的 GCS 取算术平均，得到跨维度的综合一致性评价。Table 4 的跨三元组实验表明，综合 GCS 远低于单独评估时的 GCS，揭示了跨组件累积不一致性的严重程度。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：准确率掩盖幻觉，一致性检查揭露隐藏矛盾
 
@@ -292,7 +298,9 @@ Figure 3 展示了语言模型规模对幻觉的影响：**更大的语言模型
 ![[assets/figures/papers/paper_list_l2_https_openaccess_thecvf_com_content_WACV2026_papers_VS_GHOST_Getting_to/figures/011_Table_7.jpg]]
 *Table 7: Ablation study for all order permutation of CC rounds*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有幻觉基准的对比定位
 
@@ -346,6 +354,8 @@ GHOST 的设计决定了其适用范围存在明确的边界条件：
 5. **LLM 容量与视觉编码器的最优权衡**：Figure 3 和 Figure 4 分别展示了语言模型规模和视觉编码器质量对 GCS 的影响。在同等的计算预算下，如何最优地分配 LLM 参数和视觉编码器容量，以达到最佳的幻觉抑制效果？这一权衡关系对实际模型设计具有直接指导意义。
 
 6. **一致性检查的深度与广度权衡**：Table 7 表明增加检查轮数会持续降低 GCS，但边际效应和计算成本的平衡点尚未系统探索。是否存在一个最优的检查深度，能够在评估精度和计算开销之间取得最佳折中？
+
+
 
 ## 原文 PDF
 

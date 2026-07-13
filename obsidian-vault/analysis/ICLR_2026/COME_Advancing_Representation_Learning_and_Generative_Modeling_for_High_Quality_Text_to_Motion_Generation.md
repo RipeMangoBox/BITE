@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/COME_Advancing_Representation_Learning_and_Generative_Modeling_for_High_Quality_Text_to_Motion_Generation.pdf
+project_link: null
+code_link: null
 aliases:
 - CCMD
 - COME
@@ -41,7 +43,7 @@ claims:
 > - HumanML3D 上，R Precision Top1↑ 为 0.510±.005，对比 0.510±.005 (ReMoDiffuse) / 0.521±.002 (MoMask)，变化 与ReMoDiffuse并列第一；略低于MoMask（-0.011）。
 > - HumanML3D 上，MM-Dist↓ 为 2.974±.016，对比 2.974±.016 (ReMoDiffuse) / 2.958±.008 (MoMask)，变化 与ReMoDiffuse并列最佳；非常接近MoMask。
 
-## 概述
+## 概要
 
 **问题瓶颈**：文本到运动（Text-to-Motion, T2M）生成领域，连续扩散模型在生成质量上长期落后于离散方法（如基于VQ-VAE/RVQ-VAE的MoMask、T2M-GPT等）。根本原因并非扩散框架本身的能力不足，而在于两个被忽视的系统性缺陷——**(1) 运动表示质量低下**：标准VAE编码的连续潜在特征拥挤且不可分，缺乏样本间鉴别能力，直接阻碍扩散模型的去噪过程（见Tab. 7, Figs. 6, 5）；**(2) 扩散训练策略次优**：存在训练-推理不匹配与不同时间步的梯度冲突，进一步损害生成质量。
 
@@ -53,7 +55,7 @@ claims:
 
 **主要结果**：在HumanML3D基准上，COME取得FID **0.041**（超越此前最佳连续方法ReMoDiffuse的0.103和离散SOTA MoMask的0.045），R-Precision Top1 **0.510**与ReMoDiffuse并列第一，MM-Dist **2.974**并列最佳。在KIT-ML上同样取得FID **0.189**和R-Precision Top1 **0.443**的全面领先。推理效率方面，在统一10步DPM-Solver++采样下达到**0.022s**的最快推理速度，训练仅需**1,100轮**（对比MLD的9,000轮），实现质量与效率的双重突破。
 
-## 背景与动机
+
 
 ### 问题域与核心矛盾
 
@@ -85,7 +87,9 @@ COME的核心洞察在于：**连续扩散模型在T2M上的潜力被低质量�
 
 2. **扩散训练层面**：提出**ccDIT**（Cross-Condition Diffusion Transformer）和**Stable-Min-SNR-γ**训练策略。ccDIT通过AdaLN-Zero注入全局句级语义、通过Cross-Attention注入细粒度词级语义，实现文本条件的多层次融合；Stable-Min-SNR-γ则统一了Zero-SNR和Min-SNR-γ机制，在强制最终时间步SNR=0以消除训练-推理不匹配的同时，通过稳定化的SNR权重（引入常数φ避免除零）协调不同时间步的梯度贡献，解决梯度冲突问题。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 COME 的核心贡献并非提出一种全新的生成范式，而是通过**系统性地重塑连续扩散框架的两个关键环节**——运动表示学习与扩散训练策略——使其在文本到运动生成（T2M）任务上首次全面超越离散方法。具体而言，该工作识别并解决了连续扩散模型长期受困的两个瓶颈：
 
@@ -129,7 +133,7 @@ Stable-Min-SNR-γ 统一了 Zero-SNR 与 Min-SNR-γ 两种训练策略，解决�
 
 三个变更槽位形成了一条清晰的因果链：**MoCMAE 提供高鉴别力、覆盖广泛的连续潜在空间 → ccDIT 在此空间中通过双重语义注入进行精细控制 → Stable-Min-SNR-γ 确保扩散训练过程的稳定与一致**。这一组合使连续扩散框架在保留语义控制、组合泛化和多样性采样等天然优势的同时，在 FID 等核心生成质量指标上超越离散 SOTA 方法（如 MoMask），并在 KIT-ML 上取得 R-Precision Top1 的显著领先（0.443 vs. 最佳基线 0.424）。
 
-## 整体框架
+
 
 COME 的整体 pipeline 是一个两阶段的连续扩散生成框架。其核心设计逻辑是：**先构建一个具有高鉴别力且覆盖广泛运动空间的连续潜在表示，再在该潜在空间中进行条件扩散生成**。这一设计直接回应了连续扩散模型在文本到运动生成中长期落后于离散方法的两大瓶颈——运动表示拥挤不可分、扩散训练策略次优。
 
@@ -177,7 +181,7 @@ $$
 ![[assets/figures/papers/paper_list_l14_COME_Advancing_Representation_Learning_and_Generative_Modeling_for_High/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of COME. It consists of: (a) MoCMAE, an asymmetric hybrid model to extract high-quality motion features without introducing additional decoding overhead; and (b) ccDIT, a conditional diffusion model that captures both global sentence-level semantics and fine-grained word-level cues to generate high-quality motion sequences*
 
-## 核心模块与公式推导
+
 
 COME 框架由两大核心模块构成：**MoCMAE**（Motion Contrastive Masked Autoencoder）负责学习高鉴别力的连续运动表示，**ccDIT**（Cross-Condition Diffusion Transformer）在该潜在空间中进行条件扩散生成。两者通过一个统一的训练策略 **Stable-Min-SNR-γ** 协同优化，形成端到端的高质量文本驱动运动生成管线。
 
@@ -243,7 +247,9 @@ $$`\hat{\epsilon}_\theta(\mathbf{x}_t, c) = \epsilon_\theta(\mathbf{x}_t, \empty
 
 其中 $`s`$ 为引导强度。结合 **DPM-Solver++** 高阶快速采样器，COME 可在 10 步内完成高质量生成，在保持生成质量的同时实现高效推理（§4.4）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能对比
 
@@ -321,7 +327,9 @@ COME在推理效率上具有显著优势：采用10步DPM-Solver++采样即可�
 ![[assets/figures/papers/paper_list_l14_COME_Advancing_Representation_Learning_and_Generative_Modeling_for_High/figures/016_Table_10.jpg]]
 *Table 10: Results of text-to-motion and motion-to-text retrieval benchmark on HumanML3D*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 连续扩散 vs. 离散生成：T2M 方法谱系中的位置
 
@@ -393,6 +401,8 @@ COME 采用 Classifier-Free Guidance（训练时 10% 概率丢弃文本条件）
 3. **多模态条件与物理仿真约束的扩展**：COME 的 ccDIT 架构通过 AdaLN-Zero 和 Cross-Attention 实现了文本条件的灵活注入，理论上可以扩展到音乐、视频等多模态条件。但如何无缝集成物理仿真约束（如接触力、关节限制）以解决穿透和滑动问题，仍是一个工程与理论并重的挑战。
 
 4. **大规模数据下的鲁棒性与检索增强**：当数据规模扩大至 MotionX 级别（约 15M 样本）时，MoCMAE 的对比学习分支是否仍能有效区分样本？是否需要引入检索增强机制（如 ReMoDiffuse）来弥补表示学习的上限？
+
+
 
 ## 原文 PDF
 

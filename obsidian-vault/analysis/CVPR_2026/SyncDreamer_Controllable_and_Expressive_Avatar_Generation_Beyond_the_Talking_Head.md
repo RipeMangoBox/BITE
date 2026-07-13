@@ -40,7 +40,7 @@ claims:
 > [!tip] 效果简介
 > - HDTF 上，FID 52.8 vs 53.7 (OmniAvatar) (↓0.9)；FVD 508.1 vs 514.7 (OmniAvatar) (↓6.6)；Sync-C 8.04 vs 7.92 (OmniAvatar) (↑0.12)。
 
-## 概述
+## 概要
 
 现有音频驱动的说话头像生成方法普遍依赖离散情感标签或姿态中间表示，难以捕捉语音中连续的韵律动态与精细运动控制，导致表情平淡、身份漂移和手势薄弱。SyncDreamer 针对这一瓶颈，提出一个统一的扩散 Transformer 框架，仅需单张参考图像、语音音频和文本提示，即可生成身份一致、音画同步且文本可控的全身虚拟形象。
 
@@ -51,8 +51,6 @@ claims:
 方法层面，SyncDreamer 在视觉条件注入、音频特征编码和文本运动控制三个关键槽位上均做出了区别于现有工作的设计（见 Table 1 的定量对比与 Figure 5 的定性对比）。其技术谱系可追溯至扩散 Transformer 生成范式与多模态条件注入机制，但在身份保持的注意力正则化、韵律感知的音频重加权以及基于 GRPO 优化的跨模态提示增强方面提供了新的因果机制。这些设计共同构成了从“被动描述”到“主动控制”的生成范式升级。
 
 *局限性：模型依赖大规模预训练组件，计算开销较大；对极端光照与遮挡场景的鲁棒性尚未充分验证。开放问题包括长视频生成的稳定性、多人交互场景的扩展，以及实时应用所需的计算成本进一步降低。*
-
-## 背景与动机
 
 ### 问题背景：从说话头像到全身虚拟形象的演进
 
@@ -78,7 +76,7 @@ claims:
 
 这一设计使SyncDreamer在肖像和全身虚拟形象生成两个层面均达到最优性能，同时支持通过文本灵活编辑运动行为（如舞蹈、手势调整），为可控虚拟形象生成建立了新的基准。
 
-## 核心创新
+## 核心方法与创新机理
 
 SyncDreamer 的核心突破在于将音频驱动的说话头像生成从“面部表情模仿”提升到“全身语义可控生成”，其创新并非单一模块的堆砌，而是三个 **changed slots** 的协同作用，共同解决了现有方法的身份漂移、表情平淡和运动控制薄弱三大瓶颈。
 
@@ -125,8 +123,6 @@ $$\tilde{A}_{t} = w_{t} \cdot A_{t}$$
 
 三个 changed slots 的协同效应体现在：视觉适配器保障身份一致性，音频动态编码器驱动表情与语音的精细同步，跨模态提示增强器赋予全身运动的语义可控性。这一组合使 SyncDreamer 在无需显式姿态监督的条件下，实现了从单张图像、语音和文本到全身虚拟形象生成的统一框架，在 HDTF 基准上取得 FID 52.8 的最优性能（Table 1），并在 EMTD 全身基准上全面超越 **MimicMotion**（Zhang et al., ICML 2025）等姿态驱动方法（Table 3）。
 
-## 整体框架
-
 SyncDreamer 构建于扩散 Transformer（Diffusion Transformer, DiT）骨干之上，形成一个统一的多模态条件生成框架，仅需**单张参考图像、一段语音音频和一条文本提示**即可生成身份一致、情感同步的全身说话虚拟形象。其核心设计思想是将身份保持、音频动态建模和文本驱动运动控制三个关键能力解耦为独立的功能模块，再通过交叉注意力机制在 DiT 骨干中深度融合。
 
 ### 输入输出流与模块拓扑
@@ -163,8 +159,6 @@ $$\mathcal{L}_{\mathrm{loc}} = \frac{1}{N} \sum_{i=1}^{N} \sum_{j=1}^{K} \mathbf
 
 ![[assets/figures/papers/paper_list_l1003_https_openaccess_thecvf_com_content_CVPR2026_html_Nazarieh_SyncDreamer_C/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the SyncDreamer architecture. Given a reference image, audio, and a text prompt, SyncDreamer generates expressive, identity-preserving talking avatar videos with synchronized audio-lip motion and full-body dynamics*
-
-## 核心模块与公式推导
 
 SyncDreamer 的核心由三个创新模块构成，分别解决身份保持、音频动态建模和文本驱动运动控制三个瓶颈问题。这些模块统一集成在扩散Transformer（DiT）骨干网络中，通过多模态条件注入实现从单张图像、语音和文本提示生成身份一致、音画同步且文本可控的全身虚拟形象。
 
@@ -225,10 +219,7 @@ $$
 ![[assets/figures/papers/paper_list_l1003_https_openaccess_thecvf_com_content_CVPR2026_html_Nazarieh_SyncDreamer_C/figures/003_Figure_3.jpg]]
 *Figure 3: (A) Attention Localization Loss. Regularizes visual cross-attention maps within the SyncDreamer backbone to maintain spatial alignment between generated content and reference features. (B) Audio Dynamics Encoder. Refines audio features using a temporal weighting mechanism that emphasizes motion-relevant acoustic cues such as rhythm and vocal intensity. reconstruction loss*
 
-![[assets/figures/papers/paper_list_l1003_https_openaccess_thecvf_com_content_CVPR2026_html_Nazarieh_SyncDreamer_C/figures/004_Figure_4.jpg]]
-*Figure 4: Cross-Modal Prompt Enhancer. SyncDreamer augments textual prompts with visual cues extracted from a reference image. (A) Pair Dataset Construction: Image–text pairs are collected using LLM-based captioning. (B) Cross-Modal Attribute Extraction: A VLM extracts structured semantic attributes from reference images. (C) Prompt Enhancement: enriched prompts are generated and optimized through Group Relative Policy Optimization, guided by a reward that evaluates visual relevance, motion specificity, and fluency*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -289,7 +280,7 @@ Figure 5 的定性对比进一步印证了上述结论：SyncDreamer 生成的�
 
 ![[assets/figures/papers/paper_list_l1003_https_openaccess_thecvf_com_content_CVPR2026_html_Nazarieh_SyncDreamer_C/figures/005_Figure.jpg]]
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 技术脉络与基线关系
 

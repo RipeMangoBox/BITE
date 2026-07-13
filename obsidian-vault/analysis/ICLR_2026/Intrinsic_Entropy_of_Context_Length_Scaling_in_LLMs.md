@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Intrinsic_Entropy_of_Context_Length_Scaling_in_LLMs.pdf
+project_link: null
+code_link: https://github.com/JingzheShi/NLPCtlScalingAndBounds
 openreview_forum_id: vnipyA8c9V
 aliases:
 - IEF
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 大语言模型上下文长度缩放中的内在熵 |
 | 英文题名 | Intrinsic Entropy of Context Length Scaling in LLMs |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=vnipyA8c9V); [GitHub](https://github.com/JingzheShi/NLPCtlScalingAndBounds) |
+| Links | [paper](https://openreview.net/forum?id=vnipyA8c9V) · [GitHub](https://github.com/JingzheShi/NLPCtlScalingAndBounds) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | 内在熵分析框架（Intrinsic Entropy Framework） |
 | Dataset | Position-Weighted Multitask Sparse Parity (synthetic) |
@@ -41,7 +43,7 @@ claims:
 > - Position-Weighted Multitask Sparse Parity (synthetic) 上，Cross-Entropy Loss (context length 17) 为 0.4648，对比 0.4643 (theoretical minimum)，变化 -0.0005。
 > - Position-Weighted Multitask Sparse Parity (synthetic) 上，Cross-Entropy Loss (context length 50) 为 0.0613，对比 0.0612 (theoretical minimum)，变化 -0.0001。
 
-## 概述
+## 概要
 
 大语言模型（LLM）的上下文长度是决定其性能的关键因素，但上下文长度缩放对模型损失的影响机制长期缺乏统一的理论解释。该论文针对这一瓶颈，提出**内在熵分析框架（Intrinsic Entropy Framework）**，将总交叉熵损失分解为两个随上下文长度变化方向相反的组件：**贝叶斯风险（Bayes Risk）** 和**近似损失（Approximation Loss）**。贝叶斯风险代表给定上下文下最优语言模型所能达到的理论下限，随上下文长度增加而递减；近似损失衡量实际训练模型与贝叶斯最优模型之间的 KL 散度，随上下文长度增加而递增。二者导数符号相反，在特定条件下产生一个使总损失最小的**最优上下文长度**。
 
@@ -50,8 +52,6 @@ claims:
 实验揭示了最优上下文长度的存在性与变化规律：在预训练场景下，对于每个训练数据量，存在一个最小化验证损失的最优上下文长度，且该最优长度随训练数据量增加而右移（Figure 1、Figure 15）；在下游任务（如 Position-Weighted Ruler-QA1）上，QA 准确率随上下文长度先升后降，最优长度取决于任务对长上下文的依赖程度（Figure 4）。在 RULER 基准的多个子任务上，多数 Qwen-3 模型也表现出类似的最优可见上下文长度现象（Figure 8）。
 
 论文的主要局限在于理论框架依赖若干关于内在空间的假设（如预测一致性、线性熵关系、均匀信息增益等），其普适性有待进一步验证；内在熵的测量方法（Gaussian-KDE 或 PCA）是对真实信息熵的近似，可能引入测量误差。开放问题包括如何从更基本的原则推导线性熵关系、内在熵与内在维度之间的确切数学关联，以及该框架在更大规模模型和更复杂推理任务上的推广等。
-
-## 背景与动机
 
 大语言模型（LLMs）的上下文窗口正以指数级速度扩展——从初代 GPT 的 512 个 token 到如今动辄百万 token 的超长上下文模型，这一趋势已成为模型竞争的核心维度之一。然而，一个根本性的理论问题始终悬而未决：**更长的上下文是否总是更好？** 实践中，人们观察到模型在极长上下文下的性能并非单调提升，有时甚至出现退化，但缺乏统一的理论框架来解释这一现象的内在机制。
 
@@ -85,7 +85,7 @@ claims:
 
 这些现象共同指向一个核心假设：**上下文长度对模型性能的影响由贝叶斯风险与近似损失的权衡决定，而内在熵是连接这一权衡与可观测损失的关键变量。**
 
-## 核心创新
+## 核心方法与创新机理
 
 本文的核心创新在于提出了一套**以“内在熵”（Intrinsic Entropy）为枢轴的统一理论框架**，用以解释大语言模型性能随上下文长度变化的非单调行为。该框架并非提出新的模型架构或训练算法，而是从信息论角度重新理解上下文长度缩放的底层机制，其关键突破可归纳为三个层次。
 
@@ -123,8 +123,6 @@ $$\mathrm{Loss}(l, \theta_t, \theta_m) = R_{\mathrm{Bayes}}(l, \theta_t) + L_{\m
 ### 与现有工作的本质区别
 
 现有关于上下文长度缩放的研究多从经验拟合（如幂律外推）或特定任务机制（如注意力分布）出发，缺乏对“信息增益-拟合难度”权衡的统一建模。本文的核心差异在于：**将上下文长度的影响归结为内在空间中信息量（熵）和复杂度（维度）的变化，并通过损失分解将预训练验证损失与下游任务准确率的非单调行为纳入同一理论框架**。这使得框架不仅能解释观测现象，还能对最优上下文长度随数据量、模型容量和任务特性的迁移做出可检验的预测。
-
-## 整体框架
 
 本文提出**内在熵分析框架（Intrinsic Entropy Framework）**，旨在从信息论角度统一解释上下文长度对大语言模型性能的影响。框架的核心洞察是：总损失可分解为两个随上下文长度变化方向相反的组件——贝叶斯风险与近似损失，二者的平衡点决定了最优上下文长度。
 
@@ -169,8 +167,6 @@ $$\mathrm{Loss}(l, \theta_t, \theta_m) = R_{\mathrm{Bayes}}(l, \theta_t) + L_{\m
 
 框架的有效性依赖于三个核心假设（Section 2.2.1）：（1）**预测一致性**：内在空间中的状态足以确定下一个 token 的预测分布；（2）**线性熵关系**：下一 token 预测熵与内在空间熵呈线性关系；（3）**均匀信息增益**：上下文长度增加时，内在熵单调递增。这些假设在合成数据和真实语料上均得到了实验支持，但其在更广泛场景下的普适性仍需进一步验证。
 
-## 核心模块与公式推导
-
 ### 损失分解模块
 
 本文的核心起点是将语言模型的交叉熵损失分解为两个性质相反的组成部分。对于上下文长度为 $l$ 的序列，给定真实分布 $P$、贝叶斯最优模型分布 $P_l$ 和训练模型分布 $Q_l$，总损失可写为：
@@ -205,7 +201,7 @@ $$\mathrm{Loss}(l, \theta_t, \theta_m) = R_{\mathrm{Bayes}}(l, \theta_t) + L_{\m
 
 其中 $\theta_t$ 为任务参数（如任务对长上下文的依赖程度 $\gamma$），$\theta_m$ 为模型和数据参数。由于 $\partial R_{Bayes}/\partial l < 0$ 且 $\lim_{l \to \infty} \partial R_{Bayes}/\partial l = 0$，而 $\partial L_{Approx}/\partial l > 0$，总损失在导数零点处取得极小值，该点即**最优上下文长度** $l^*$。该最优值随训练数据量 $D$ 增大或模型能力增强而右移（增大），随任务对长上下文依赖程度 $\gamma$ 增大而左移（减小）。这一推导将上下文长度缩放行为统一到贝叶斯风险与近似损失的权衡框架中。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验发现
 
@@ -213,18 +209,15 @@ $$\mathrm{Loss}(l, \theta_t, \theta_m) = R_{\mathrm{Bayes}}(l, \theta_t) + L_{\m
 
 **损失分解与最优上下文长度的存在性。** 理论分析指出，总损失 $H(P, Q_l) = R_{Bayes} + L_{Approx}$ 中，贝叶斯风险随上下文长度递减，近似损失随上下文长度递增，二者导数符号相反，因此在特定条件下存在使总损失最小的最优上下文长度 $l^*$（Section 3, Equation 5）。实验在 OpenWebText 子集上验证了这一预测：对于每个固定的训练数据量，验证损失随上下文长度先降后升，存在一个明确的最优上下文长度（Figure 1 Middle, Figure 15）。更重要的是，该最优长度随训练数据量的增大而右移，这与近似损失对数据量的依赖关系一致——数据量增大降低了近似损失，使得贝叶斯风险的边际收益能在更长的上下文上继续主导总损失的下降。
 
-
 ![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_vnipyA8c9V/figures/001_Figure_1.jpg]]
 *Figure 1: Left: Total loss is decomposed into Bayes Risk (decreasing with context length) and Approximation Loss (increasing with context length), so a critical point can emerge in some scenarios. Middle: Validation Loss Gap (Val Loss - minD(Val Loss) vs. Context Length), measured on subsets of OpenWebText, where we subtract the minimum loss within each dataset-size curve (please refer to Figure 15 for the original figure). For each training dataset size, there exists an optimal context length that minimizes pretraining validation loss, and this optimum increases with dataset size. Right: Error rate of Qwen series models on the CWE task from RulerBench when a certain amount of context is masked. Crit...*
 
 **内在熵与交叉熵损失的线性关系。** 这是全文最核心的经验发现。在 Llama-3.1-8B、Qwen3-8B-Base 和 RecurrentGemma-9B 三个架构不同的模型上，使用高斯核密度估计（Gaussian-KDE）在隐藏层空间测量的内在熵与交叉熵损失之间呈现高度线性关系（Figure 2）。具体而言，Llama-3.1-8B 的 Pearson 相关系数 $R = -0.9888$，Qwen3-8B-Base 为 $R = -0.9960$，RecurrentGemma-9B 为 $R = -0.9967$（排除 3 个高 CE 损失的离群点后）。这一线性关系跨模型架构成立，为“贝叶斯风险负线性依赖于内在熵”的理论假设（$R_{Bayes} = -k \cdot S(P_l) + Const$）提供了强有力的实证支撑。
 
-
 ![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_vnipyA8c9V/figures/002_Figure_2.jpg]]
 *Figure 2: Cross Entropy loss vs. Gaussian-KDE measured Intrinsic Entropy (in nats) for three Language Models on a subset of OpenWebText: Llama-3.1-8B (left, k = - 0 . 0 0 3 8 , R = - 0 . 9 8 8 8 ) ), Qwen3-8B-Base (middle, k = - 0 . 0 0 2 6 . R = - 0 . 9 9 6 0 ) , and RecurrentGemma-9B (right, k = - 0 . 0 1 7 4 R = - 0 . 9 9 6 7 , with 3 outlier points at high CE loss excluded from regression). The linear relationship between CE loss and Intrinsic Entropy holds across different model architectures*
 
 **合成数据上的精确验证。** 在 Position-Weighted Multitask Sparse Parity 合成任务上，训练模型的交叉熵损失与理论最小损失（贝叶斯模型）几乎一致：上下文长度为 17 时，模型损失为 0.4648，理论最小值为 0.4643；上下文长度为 50 时，模型损失为 0.0613，理论最小值为 0.0612（Table 1）。这表明模型在合成任务上接近贝叶斯最优。同时，PCA 特征值对数求和测得的内在熵与交叉熵损失呈良好线性关系，$R^2$ 接近 1（Figure 7），进一步验证了内在熵作为信息度量的有效性。
-
 
 ![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_vnipyA8c9V/figures/007_Figure_7.jpg]]
 *Figure 7: Eigen value and CE results measured on trained model for Synthetic Dataset in this section. Left: Eigen Value vs. Index of Eigen Value; Right: Correlation between Cross Entropy Loss and Measured Entropy. We see good linear relationship between CE Losses and Measured Intrinsic Entropy from Lower figures*
@@ -236,7 +229,6 @@ $$\mathrm{Loss}(l, \theta_t, \theta_m) = R_{\mathrm{Bayes}}(l, \theta_t) + L_{\m
 
 **内在熵测量方法的稳健性。** 高斯-KDE 测量的内在熵与 PCA 测量的内在熵高度相关（$r = 0.997756$），且二者均与交叉熵损失线性相关（Figure 9）。这表明内在熵的线性关系对具体测量方法不敏感，无论是基于密度的估计还是基于特征谱的估计，都能捕捉到相同的信息结构。
 
-
 ![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_vnipyA8c9V/figures/010_Figure_9.jpg]]
 *Figure 9: Gaussian-KDE measured Entropy (10000 samples, auto bandwidt 1 = 0 . 9 9 7 7 5 6 ) vs. PCAmeasured Entropy (left), Measrued ID (middle) and Cross Entropy Loss (right)*
 
@@ -244,12 +236,10 @@ $$\mathrm{Loss}(l, \theta_t, \theta_m) = R_{\mathrm{Bayes}}(l, \theta_t) + L_{\m
 
 **最优上下文长度的任务依赖性。** 在 Position-Weighted Ruler-QA1 任务上，QA 准确率随上下文长度先升后降，且最优上下文长度取决于任务对长上下文的依赖程度（参数 $\gamma$）。$\gamma$ 越大（即任务更依赖近距离上下文），最优上下文长度越小（Figure 4 Left）。同时，内在熵随上下文长度的变化趋势与准确率曲线在大 $\gamma$ 任务上高度相似（Figure 4 Right），表明内在熵能够部分解释下游任务性能的上下文长度缩放行为。
 
-
 ![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_vnipyA8c9V/figures/004_Figure_4.jpg]]
 *Figure 4: Measured results on Position-Weighted Ruler-QA1 dataset. Left: QA accuracy vs. number of tokens input to the Language Model, for different tasks with different γ values. We observe that: (1) each curve shows a trend to increase and then decrease with context length; and (2) the critic point corresponds to a smaller optimal context length for tasks with larger γ (i.e. tasks requiring less long context abilities). Right: Intrinsic Entropy measured on samples truncated to certain context lengths. The Intrinsic Entropy shows increment of intrinsic information when increasing context length, and resembles acc-ctl curves for larger γ*
 
 **RULER 基准上的跨任务验证。** 在 RULER 基准的多个子任务上，Qwen-3 系列模型（非思考模式的对话模型）表现出不同的上下文长度缩放模式（Figure 8, Section A.1）。在 qa1、fwe、cwe 子任务上，多数模型出现最优可见上下文长度，准确率先升后降；而在 vt（变量追踪）子任务上，性能持续随上下文长度提升，未观察到最优长度。这验证了理论预测：最优上下文长度的存在与否取决于任务特性（$\theta_t$）。此外，较大模型（如 Qwen3-8B 相对于 Qwen3-4B）在 cwe 子任务上不仅性能更好，最优上下文长度也更大，表明模型能力增强会右移最优上下文长度。
-
 
 ![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_vnipyA8c9V/figures/008_Figure_8.jpg]]
 *Figure 8: Acc vs. Visible Context Length of Qwen-3 series models (non-thinking chat models) on 4 representative subsets of the RULER dataset: qa 1 (document qa, upper-left), fwe (frequent word extraction, upper-right), cwe (common words extraction, lower-left), and vt (variable tracking, lower-right), for a fixed max context length and a varying visible fraction of the input context. Most models show an optimal context length for qa 1, fwe and cwe subtask, while the vt subtask shows increased performance with respect to context length. Moreover, larger model tends to perform better and have a larger optimal context length, represented by the performance comparison between Qwen3-4B and Qwen3-8B on cwe...*
@@ -275,17 +265,13 @@ $$\mathrm{Loss}(l, \theta_t, \theta_m) = R_{\mathrm{Bayes}}(l, \theta_t) + L_{\m
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_vnipyA8c9V/figures/009_Figure.jpg]]
-*Figure: A.3-2. Acc vs. Visible Context Length of Qwen-3 4B, on cwe (common words extraction) subtask, with different Max context length (left: M a x C t l = 8 k , , right: M a x C t l = 1 6 k ) . As shown, though optimal context length is hard to observe for the task requiring 8k as max context length, it is easy to observe for that requiring 16k as max context length*
-
 ![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_vnipyA8c9V/figures/016_Figure_13.jpg]]
 *Figure 13: Left: Relative Eigen Value Measured for the last token, for LLaMa-3.1-8B on a subset of OpenWebText. Right: relative increment of relative eigenvalues (for different context lengths measured). We can see that the relative eigenvalues approximately increase at a same scale*
 
 ![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_vnipyA8c9V/figures/012_Table_2.jpg]]
 *Table 2: In this Section (Appendix D) we formulate results from previous sections with Theorems derived with defined assumptions and properties of intrinsic space in this section. Ntp refers to Next-token-prediction, Ctl refers to Context Length. We derive data scaling for approximation loss with weaker assumptions compared to (Bahri et al., 2024), please refer to Theorem 1, 2 in Appendix D.2 for more details*
 
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 核心贡献定位
 

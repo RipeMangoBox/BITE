@@ -32,7 +32,7 @@ claims:
 | 中文题名 | 3Doodle: 用3D笔画紧凑抽象物体 |
 | 英文题名 | 3Doodle: Compact Abstraction of Objects With 3D Strokes |
 | 会议/期刊 | SIGGRAPH 2024 |
-| Links | [paper](https://arxiv.org/abs/2402.03690) · [Code](https://github.com/changwoonchoi/3Doodle) · [Project](https://blendswap.com/blend/25086) · [arXiv](https://arxiv.org/abs/2402.03690") |
+| Links | [paper](https://arxiv.org/abs/2402.03690) · [Code](https://github.com/changwoonchoi/3Doodle) · [Project](https://blendswap.com/blend/25086) · [paper](https://arxiv.org/abs/2402.03690") |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | 3Doodle |
 | Dataset |  |

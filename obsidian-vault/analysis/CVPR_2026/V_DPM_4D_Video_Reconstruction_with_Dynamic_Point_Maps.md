@@ -43,7 +43,7 @@ claims:
 > - PointOdyssey / Kubric-F / Kubric-G / Waymo (10帧追踪EPE) 上，平均EPE 与2-View相近的低误差 vs DPM: 误差大幅上升 (V-DPM在长序列上保持高精度，DPM性能下降显著)。
 > - Sintel (视频深度) 上，AbsRel ↓ 0.247 vs MonST3R: 1.196; DPM: 0.399 (较MonST3R降低79.4%)。
 
-## 概述
+## 概要
 
 从视频中同时恢复场景的3D几何、运动和相机参数是计算机视觉的核心挑战。现有前馈重建方法大多依赖静态点图表示，假设场景静止，无法直接捕捉3D运动（场景流）。即使部分工作将点图扩展至动态场景，也仅能预测时间可变的点图，缺乏时间不变性，必须借助2D跟踪器等额外组件才能恢复密集4D对应；而成对动态点图方法处理多视图时则需要昂贵的后优化。这导致端到端多视图4D重建在准确性和计算效率上均受到限制。
 
@@ -57,7 +57,7 @@ claims:
 
 在方法谱系上，V-DPM处于静态多视图重建与动态场景理解的交叉点：它以VGGT的交替注意力架构为骨架，继承其强大的静态几何推理能力，同时引入动态点图表示和时间条件解码机制，实现了从静态到动态的平滑扩展。与仅恢复静态几何或需后优化的动态方法不同，V-DPM一次性前馈即可输出密集的场景流和4D对应，为视频理解、机器人操作等下游任务提供了高效的基础表示。
 
-## 背景与动机
+
 
 ### 静态重建的繁荣与动态重建的困境
 
@@ -79,7 +79,9 @@ claims:
 
 V-DPM 的动机正是填补这一空白。其核心洞察是：**将 4D 重建分解为两个连续阶段**——首先生成时间可变但视角不变的点图（易于从静态主干微调获得），再通过轻量的时间条件解码器将其对齐到统一时间戳，从而获得时间-视角完全不变的点图。这种两阶段设计使得预训练的静态 3D 重建网络（如 VGGT）只需少量合成数据微调即可转化为强大的 4D 重建器，大幅降低了对 4D 标注数据的需求和训练成本，同时实现了端到端的多视图动态重建。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 V-DPM的核心创新在于将4D动态重建任务分解为**两阶段级联预测**，从而将预训练的静态3D重建网络高效转化为强大的4D重建器。这一设计直接回应了领域瓶颈：现有前馈方法（如**MonST3R**，Zhang et al., arXiv 2024）仅能预测时间可变点图，缺乏时间不变性，必须借助2D跟踪器等外部组件才能恢复密集4D对应；而成对动态点图方法（如**DPM**，Sucar et al., ICCV 2025）在处理多视图时需要昂贵的后优化，难以端到端扩展。
 
@@ -136,7 +138,7 @@ V-DPM的changed slots清晰体现了其相对于基线的本质提升：
 
 这种“先预测时间可变、再对齐到统一时间戳”的两阶段范式，使得V-DPM在2-View 4D重建EPE上误差约为DPM和**St4RTrack**（Feng et al., ICCV 2025）的1/5（Table 1），并在10帧密集追踪中保持相近精度（Table 2），同时大幅超越MonST3R等前馈方法在视频深度估计上的表现（Sintel AbsRel: 0.247 vs 1.196; Bonn: 0.057 vs 0.777, Table 3）。
 
-## 整体框架
+
 
 V-DPM 的整体 pipeline 围绕一个核心设计展开：**将 4D 重建分解为两个连续阶段**，先预测时间可变但视角不变的点图，再通过轻量的时间条件解码器将其对齐到统一时间戳，从而获得时间-视角完全不变的点图。这一两阶段设计使得预训练的静态多视图重建网络（**VGGT**，Wang et al., CVPR 2025）只需少量合成数据微调，即可转化为强大的 4D 重建器。
 
@@ -182,7 +184,7 @@ Figure 2 展示了 V-DPM 的完整架构，由以下五个模块串联构成：
 ![[assets/figures/papers/paper_list_l50_https_arxiv_org_abs_2601_09499/figures/001_Figure_1.jpg]]
 *Figure 1: V-DPM results. We propose a method for extending state-of-the-art static 3D reconstructors like VGGT with Dynamic Point Maps (DPMs). Given a video snippet, V-DPM reconstructs the 3D motion of the scene (i.e., the scene flow), along with its 3D shape and the camera parameters. Because of DPMs, the same representation captures both the static background and complex non-rigid motion*
 
-## 核心模块与公式推导
+
 
 ### 3.1 动态点图表示
 
@@ -254,7 +256,9 @@ V-DPM 在静态与动态混合数据上微调（ScanNet++、Blended-MVS、Kubric
 ![[assets/figures/papers/paper_list_l50_https_arxiv_org_abs_2601_09499/figures/004_Figure_4.jpg]]
 *Figure 4: Transformer block in the time-conditioned decoder. Conditioning is implemented via adaptive LayerNorm [14, 16]*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 4D 重建与密集追踪
 
@@ -307,7 +311,9 @@ V-DPM 在 2‑View 4D 重建任务上展现出压倒性优势。Table 1 报告�
 ![[assets/figures/papers/paper_list_l50_https_arxiv_org_abs_2601_09499/figures/006_Figure_6.jpg]]
 *Figure 6: Result of optimisation used for video depth and camera pose evaluation on a sequence from the Bonn dataset*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法演进脉络
 
@@ -350,6 +356,8 @@ V-DPM 相对于基线的改动集中在三个层面：
 3. **实时应用中的压缩与加速。** 在计算受限的场景（如机器人控制）中，V-DPM 的多层 Transformer 解码器和交替注意力机制可能成为瓶颈。模型能否进一步压缩和加速而不显著损失 4D 重建质量？
 
 4. **对真实世界多样性的泛化。** 当前训练数据以合成场景为主，真实世界视频中的运动模糊、卷帘快门效应、非朗伯表面等挑战尚未被覆盖。更大规模的真实动态数据训练是否必要，或者合成数据训练的模型已具备足够的域迁移能力？
+
+
 
 ## 原文 PDF
 

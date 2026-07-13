@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/AgenTracer_Who_Is_Inducing_Failure_in_the_LLM_Agentic_Systems.pdf
+project_link: null
+code_link: https://github.com/bingreeky/AgenTracer
 openreview_forum_id: l05DseqvuD
 aliases:
 - AgenTracer
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | AgentTracer：谁在诱导大语言模型智能体系统的失败？ |
 | 英文题名 | AgenTracer: Who Is Inducing Failure in the LLM Agentic Systems? |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=l05DseqvuD); [GitHub](https://github.com/bingreeky/AgenTracer) |
+| Links | [paper](https://openreview.net/forum?id=l05DseqvuD) · [GitHub](https://github.com/bingreeky/AgenTracer) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/planning_control |
 | Method | AgenTracer |
 | Dataset | Who&When (handcraft), Who&When (automated), TracerTraj-code, TracerTraj-MATH |
@@ -41,7 +43,7 @@ claims:
 > - Who&When (automated) 上，Step-level accuracy (w/ G) 为 42.86，对比 40.65 (Claude-4-Sonnet)，变化 +2.21。
 > - TracerTraj-code 上，Agent-level accuracy (w/o G) 为 72.21，对比 66.92 (Gemini-2.5-Pro)，变化 +5.29。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -64,7 +66,7 @@ claims:
 
 消融实验揭示了方法的关键设计因素：步骤级奖励对精确定位至关重要（移除后Code步骤级准确率从18%降至12%），而反事实修正数据比纯故障注入数据具有更高的内在训练价值，两者联合使用可实现互补增益。
 
-## 背景与动机
+
 
 ### 多智能体系统的脆弱性
 
@@ -90,7 +92,9 @@ claims:
 
 解决这些问题，意味着多智能体系统将首次获得可操作的故障诊断能力——不仅知道“系统失败了”，还能明确“哪个智能体在何时做错了什么”，从而为自动修复、系统迭代和智能体行为的持续改进奠定基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 AgenTracer 的核心创新并非提出全新的模型架构，而是通过**数据构造范式**与**训练奖励机制**的双重变革，将故障归因这一任务从巨型LLM的零样本推理，迁移至轻量级模型的精准专用化。其关键创新点可归结为以下三个“changed slots”：
 
@@ -118,7 +122,7 @@ AgenTracer 的核心创新并非提出全新的模型架构，而是通过**数�
 
 基线方法普遍依赖巨型LLM（如 **Gemini-2.5-Pro**、**Claude-4-Sonnet**、**DeepSeek-R1**）进行归因，推理成本高昂且延迟显著。AgenTracer 以 **QWEN3-8B**（Yang et al., 2025）为基座，通过上述自动化数据与多粒度RL训练，得到仅 **8B 参数**的专用故障追踪器 **AgenTracer-8B**。结果表明，该轻量级模型在 Who&When 基准上以高达 **~18.18%** 的优势超越 Gemini-2.5-Pro，以 **~12.21%** 超越 DeepSeek-R1（Table 1），在 TracerTraj 各子集上也全面领先（Table 2），实现了“小模型超越大模型”的专用化突破。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_l05DseqvuD/figures/005_Figure_2.jpg]]
 *Figure 2: The overview of our proposed AgenTracer*
@@ -151,7 +155,7 @@ AgenTracer 包含五个主要模块，按执行顺序依次为：
 
 在训练环节，多粒度奖励设计是平衡归因精度与模型轻量化的关键。step 级高斯奖励 $r_{\mathrm{step}}(\hat{t}_k) = \exp\left(-\frac{(\hat{t}_k - t^*)^2}{2\sigma^2}\right)$ 提供了细粒度的时序监督信号，而 agent 级二元奖励则确保智能体识别的准确性。消融实验证实，移除 step 级奖励会导致步骤准确率显著下降（Code 子集从 18% 降至 12%），而 agent 级奖励的移除仅造成中等性能损失，表明细粒度步骤监督是归因性能的主导因素。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化
 
@@ -217,7 +221,9 @@ $\sigma$ 控制惩罚的锐度：$\sigma$ 越小，远离真实步骤的预测�
 
 训练完成后，AgenTracer-8B 接收完整轨迹 $\tau$ 及环境反馈，在单次前向传播中输出负责智能体 ID $\hat{i}$、决定性错误步骤编号 $\hat{t}$ 及自然语言解释，无需访问真实解 $\mathcal{G}$（w/o G 设定）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -292,7 +298,9 @@ Figure 3 展示了 AgenTracer-8B 作为故障诊断器对现有多智能体系�
 ![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_l05DseqvuD/figures/004_Figure_1.jpg]]
 *Figure 1: Benchmark performance comparison between AgenTracer-8B and leading industry providers*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：多智能体故障归因的自动化困境
 
@@ -368,6 +376,8 @@ AgenTracer-8B在Who&When基准上对比了8个基线模型，涵盖不同规模�
 ### 知识库定位总结
 
 AgenTracer处于**LLM智能体可靠性工程**与**自动化数据标注**的交叉点。它继承并扩展了因果推断中的反事实干预思想、软件测试中的故障注入技术、以及强化学习中的细粒度奖励设计，形成了一套从数据合成到模型训练的完整pipeline。其核心贡献不在于提出全新的模型架构，而在于**重新定义了多智能体故障归因的数据获取和训练范式**，证明了轻量级专用模型可以在特定任务上超越巨型通用模型。
+
+
 
 ## 原文 PDF
 

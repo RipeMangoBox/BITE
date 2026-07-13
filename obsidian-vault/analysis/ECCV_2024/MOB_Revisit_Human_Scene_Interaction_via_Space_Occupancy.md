@@ -5,6 +5,8 @@ paper_level: A
 venue: ECCV
 year: 2024
 pdf_ref: paperPDFs/ECCV_2024/MOB_Revisit_Human_Scene_Interaction_via_Space_Occupancy.pdf
+project_link: https://foruck.github.io/occu-page/
+code_link: null
 aliases:
 - VMC
 - MRHSISO
@@ -41,13 +43,13 @@ claims:
 > - MOB 上，穿透体素数 PEN↓ 15.21 vs 123.12 (DIMOS) (-107.91)；目标最小距离 DT (cm) 15.30 vs 48.97 (DIMOS) (-33.67)。
 > - CIRCLE (hand-reaching) 上，成功率 Suc.(%) 78.97 (MOB+CIRCLE) vs 75.52 (Ours w/ CIRCLE only) (+3.45)。
 
-## 概述
+## 概要
 
 人-场景交互（HSI）生成的目标是使虚拟角色在给定3D环境中产生物理合理、语义恰当的运动。该领域长期受困于一个核心瓶颈：**高质量同时捕获人体动作与3D场景的成对数据极其稀缺**，导致现有方法的训练数据在多样性与几何复杂度上严重不足，难以处理拥挤、非结构化的空间约束。本文重新审视静态HSI的本质，提出一个关键洞察：**对于静态场景，交互本质上是对其空间占用的交互**——例如坐在一把椅子上，本质是坐在一个椅子形状的固体上，其余几何信息（如类别标签）仅影响交互的分布。基于此，论文将纯运动数据重新解释为人类与隐式场景占用交互的记录，从而**将大规模无场景的运动捕捉数据自动转化为成对的人-占用交互样本**，构建了名为MOB（Motion Occupancy Base）的统一知识库，彻底绕开了对真实场景扫描的依赖。
 
 在该知识库之上，论文设计了一个**自回归人-占用交互控制器**，以轻量Transformer架构统一处理历史运动状态、当前姿态与规范占用网格等控制信号，逐帧预测未来运动，并引入**场调控模块（Field Regulation）**实时修正关节速度以避免穿透。实验表明，在MOB的复杂占用空间中，该控制器的成功率达**77.91%**，远超先前SOTA DIMOS的**15.73%**，穿透体素数从123.12骤降至15.21；仅用MOB训练的模型在真实场景数据集CIRCLE上表现亦优于仅用CIRCLE训练的模型，验证了所学占用知识的强泛化能力。消融实验进一步证实，占用信号、穿透损失与场调控模块三者对避免穿模和稳定运动均不可或缺。
 
-## 背景与动机
+
 
 ### 问题背景：人-场景交互生成的数据瓶颈
 
@@ -81,7 +83,9 @@ claims:
 
 该方法在MOB复杂占用空间中的成功率达到**77.91%**，远超先前SOTA DIMOS的**15.73%**，穿透体素数从123.12降至**15.21**（Table 1）。更关键的是，仅用MOB训练（不含任何真实场景数据）的控制器在真实场景数据集CIRCLE上的成功率和碰撞深度均优于仅用CIRCLE训练的模型（Table 2），验证了从伪占用中学到的复杂交互知识具有良好的跨场景泛化能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作的核心创新在于**对“人-场景交互（HSI）”本质的重新定义**，并由此衍生出一套从数据构造到生成范式的系统性变革。其关键洞察是：对于静态HSI，人与场景的交互本质上是对**场景空间占用**的交互——例如，坐在一把椅子上，本质上就是坐在一个椅子形状的固体空间上。场景的其余几何细节（如语义标签、纹理）仅影响交互的分布，而非交互的物理约束本身。
 
@@ -120,7 +124,7 @@ $$\Delta \dot{p}_j = \sum_{P_i \in P} -k r_i \max\left(0, \frac{1}{\|v_{ij}\|_a 
 
 这些结果表明，空间占用视角的重新定义、统一自回归范式以及场调控机制，三者共同构成了该方法相对于先前SOTA的质变性优势。
 
-## 整体框架
+
 
 本文提出一种统一的自回归人-占用交互控制器，将人-场景交互（HSI）重新定义为**人类与场景空间占用的交互**。其核心流程由两大阶段构成：**数据构建**与**运动生成**。
 
@@ -164,7 +168,7 @@ $$\Delta \dot{p}_j = \sum_{P_i \in P} -k r_i \max\left(0, \frac{1}{\|v_{ij}\|_a 
 ![[assets/figures/papers/paper_list_l1763_MOB_Revisit_Human_Scene_Interaction_via_Space_Occupancy/figures/003_Figure_2.jpg]]
 *Figure 2: The construction process of Motion Occupancy Base. Note that the ceilings of the occupancy are hidden for clarity*
 
-## 核心模块与公式推导
+
 
 本文提出的自回归人-占用交互控制器由四个核心模块构成：运动状态编码、规范占用网格生成、Transformer自回归控制器、以及场调控模块。以下逐一展开其公式化定义与设计机理。
 
@@ -249,7 +253,9 @@ $$\mathcal{L}_{field} = \left(\frac{|\Delta \dot{p}|}{|\dot{p}|}\right)^2 + |\do
 
 ![[assets/figures/papers/paper_list_l1763_MOB_Revisit_Human_Scene_Interaction_via_Space_Occupancy/figures/004_Figure.jpg]]
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -317,7 +323,9 @@ Table 4报告了HOI任务的定量结果。与**OMOMO**相比，本文方法在�
 ![[assets/figures/papers/paper_list_l1763_MOB_Revisit_Human_Scene_Interaction_via_Space_Occupancy/figures/015_Figure_13.jpg]]
 *Figure 13: Failure cases*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与突破路径
 
@@ -375,6 +383,8 @@ Table 4报告了HOI任务的定量结果。与**OMOMO**相比，本文方法在�
 4. **控制信号的语义化**：控制器能否接收更多样化的控制信号（如语义标签、自然语言指令），以支持更灵活的交互生成？这需要建立从语义到占用约束的映射机制。
 
 5. **实时部署与物理合理性**：在真实移动机器人或VR/AR应用中，如何实时生成可解释且物理合理的占用栅格以达到在线HSI生成？当前的规范占用网格构建依赖于已知的未来运动信息，在线场景下需要预测性的占用估计。
+
+
 
 ## 原文 PDF
 

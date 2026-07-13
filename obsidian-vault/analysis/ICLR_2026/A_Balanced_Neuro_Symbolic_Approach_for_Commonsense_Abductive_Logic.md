@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/A_Balanced_Neuro_Symbolic_Approach_for_Commonsense_Abductive_Logic.pdf
+project_link: null
+code_link: null
 aliases:
 - AARGOS
 - BNSACAL
@@ -41,13 +43,13 @@ claims:
 > - CLUTRR 上，Accuracy 为 80%，对比 73% (SC)，变化 +7%。
 > - QUAIL 上，Accuracy 为 82%，对比 69% (SC)，变化 +13%。
 
-## 概述
+## 概要
 
 现有神经符号推理系统面临的核心瓶颈是：它们仅支持纯演绎推理，无法处理问题中未明确陈述的常识关系，因此在面对需要溯因推理的现实问题时失效。本文提出的方法ARGOS（Abductive Reasoning with Generalization Over Symbolics）通过一种平衡的神经符号策略来解决这一问题。其核心机制是利用逻辑求解器的反馈——即SAT问题的骨干集（backbone(P) = { L ∈ L | P ⊢ L }）——作为搜索线索，引导大语言模型（LLM）迭代地生成并添加新的常识命题，从而将搜索空间从仅限于问题中已有命题的受限符号空间，扩展到允许引入新变量和新关系的通用空间。
 
 在方法定位上，ARGOS位于纯符号方法（如LLM-Tres、Logic-of-Thought）与纯神经方法（如Chain-of-Thought）之间的平衡点，同时利用逻辑求解器的精确性和LLM的常识灵活性。实验结果表明，该方法在多个需要背景知识溯因的基准测试上显著优于现有基线：在FOLIO上准确率达81%（较最佳基线Self-Consistency提升+10%），在CLUTRR上达80%（+7%），在QUAIL上达82%（+13%），在CosmosQA上达78%（+2%），在ESNLI上达79%（+3%），在ProntoQA上达95%（+2%）。消融研究进一步证实，骨干集追踪、常识评分和相关性评分等组件对整体性能均有贡献。
 
-## 背景与动机
+
 
 常识溯因推理——即从观察结果反推出缺失的常识前提——是连接符号逻辑严谨性与自然语言灵活性的关键瓶颈。现有神经符号系统（如 Logic-of-Thoughts、LLM-Tres）仅支持纯演绎推理：它们假设所有必要的前提都已显式给出，推理过程仅限于从已有命题中推导出必然结论。然而，现实问题中大量常识关系并未在问题输入中明确陈述。例如，一个儿童阅读理解问题可能描述“狐狸在冬天变白以吸收阳光”，但未显式说明“白色物体吸收阳光”这一常识规则。面对此类缺失，纯演绎系统无法生成任何新命题，因而失效。
 
@@ -57,7 +59,9 @@ claims:
 
 与现有工作的关键区别在于搜索策略的转变：从“在固定符号空间内穷举或演绎”变为“利用骨干集反馈动态引导 LLM 生成新命题”。这使得 ARGOS 能够将搜索空间从受限的符号空间扩展到更通用的语义空间，同时通过逻辑求解器的反馈机制控制搜索成本。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ARGOS（Abductive Reasoning with Generalization Over Symbolics）的核心创新在于将神经符号系统的推理模式从**纯演绎扩展为演绎+溯因**，从而解决了现有系统在面对缺失常识的现实问题时完全失效的根本瓶颈。
 
@@ -72,7 +76,7 @@ ARGOS（Abductive Reasoning with Generalization Over Symbolics）的核心创新
 
 **失败模式与局限。** 该方法存在三个已知弱点：(1) 仅限于生成最多两个文字作为前件的规则，无法处理需要更多前件的复杂命题；(2) 需要访问LLM的logit级输出，排除了闭源模型（如GPT-4）的使用；(3) 当问题前提与常识相矛盾时（如将Fido归类为猫），ARGOS可能被混淆——这源于常识评分器仅76%的准确率和上下文相关性评分器91%的准确率。这些局限暗示了未来改进方向：将评分系统从logit-based转换为verbalized以避免模型限制，以及探索反向链式推理以更直接地生成与目标相关的命题。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0001_RCsBoUr72G_A_Balanced_Neuro-Symbolic_Approach_for_Commonsen/figures/004_Figure_4.jpg]]
 *Figure 4: Overview of ARGOS with the winter fox example. We iteratively add to the logic problem and query a logic solver to look for conflicts within the backbone compared to the query. Eventually, we find that absorbs(white, sun) is F alse, contradicting the query*
@@ -102,7 +106,7 @@ ARGOS（Abductive Reasoning with Generalization Over Symbolics）是一个迭代
 
 **证据强度**：所有pipeline模块的定义、输入输出关系和迭代机制均有明确的原文锚点支撑（Section 4.1 ALGORITHM, Figure 3, 公式定义），置信度为1.0。但常识评分和相关性评分的准确率（76%和91%）来自附录F.5，属于消融实验中的辅助证据，置信度设为0.95。
 
-## 核心模块与公式推导
+
 
 ARGOS（Abductive Reasoning with Generalization Over Symbolics）的核心创新在于将符号逻辑求解器的确定性反馈与LLM的常识生成能力相结合，通过迭代式问题扩充实现溯因推理。其整体流程如**Figure 3**所示：给定一个命题逻辑问题，系统反复尝试用SAT求解器和LLM（5-shot自一致性）求解；若均失败，则利用求解器的反馈（骨干集）引导LLM生成新的常识命题，经筛选后加入问题集，直至可解。
 
@@ -160,7 +164,9 @@ cost < k * (γ - 0.5) / α
 
 **需要人工验证的要点**：论文声称“ARGOS-L8B在85%的情况下添加了生成忠实证明所需的信息”，但该数据来自附录D，且置信度为0.95。此外，常识评分76%的准确率意味着约1/4的新增规则可能不符合常识，其影响程度需进一步分析。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 
@@ -206,7 +212,9 @@ ARGOS以增加计算成本换取性能提升。在Llama3-8B上，ARGOS平均每�
 
 Figure 8-10展示了ARGOS在三个数据集上的置信度变化轨迹。在CosmosQA上（Figure 8），SC初始置信度已较高，ARGOS在少量迭代后即退出，且置信度变化平缓。在CLUTRR上（Figure 9），置信度出现显著波动和翻转，表明ARGOS添加的命题确实改变了问题的逻辑结构——这正是其设计目标。在QUAIL上（Figure 10），尽管最终准确率提升最大（+13%），但迭代次数反而较少。论文解释为QUAIL的逻辑结构虽模糊但简单，少量精心选择的命题即可解决问题。**一个未解决的关键问题**：ARGOS在QUAIL上为何能以更少迭代实现更大提升？这暗示其性能提升可能部分来自SC回退机制本身（即LLM在修正后的上下文中直接推理正确），而非符号求解器的推导。需要进一步分析每次迭代中符号求解和SC求解各自的贡献比例。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ARGOS（Abductive Reasoning with Generalization Over Symbolics）的定位可以放在一个“符号-语言推理谱系”（Figure 2）中理解。该谱系的一端是完全基于符号逻辑演绎的方法（如LLM-Tres和Logic-of-Thought），另一端是纯神经的语言链式推理（如Chain-of-Thought, COT）。ARGOS位于两者之间：它保留了SAT求解器进行精确的演绎推理（这是纯神经方法缺失的），同时利用LLM生成新的常识命题，从而突破了纯符号方法“仅能处理问题中已显式出现的命题”这一根本限制。这种设计直接回应了现有神经符号系统仅支持纯演绎推理、无法处理未明确陈述的常识关系的瓶颈。
 
@@ -217,6 +225,8 @@ ARGOS（Abductive Reasoning with Generalization Over Symbolics）的定位可以
 **局限与开放问题：** 论文明确承认了若干限制。首先，ARGOS仅限于生成最多两个文字作为前件的规则，无法处理需要更多前件的复杂命题。其次，方法有时依赖自一致性（SC）来解决问题，而SC可能产生不忠实或幻觉性的推理链，从而影响最终预测。第三，方法需要访问LLM的logit级输出（用于计算置信度和相关性概率 $P[Yes] = \exp(\logit_{\mathrm{Yes}}) / (\exp(\logit_{\mathrm{Yes}}) + \exp(\logit_{\mathrm{No}}))$），这排除了闭源模型（如GPT-4）的使用。第四，当问题前提与常识相矛盾时（例如，Fido通常被认为是狗的名字，但问题中将其归类为猫），ARGOS可能会被混淆。此外，常识评分和相关性评分依赖于LLM的判断，其准确性有限（常识分类准确率76%，上下文相关性分类准确率91%）。
 
 从这些局限出发，论文提出了几个开放问题：（1）如何将评分系统从基于logit的转换为基于文本的，以避免需要logit级访问？（2）如何将反向链式推理方法应用于溯因推理，以更直接地生成与目标相关的命题？（3）如何处理无法分解为较小规则的多文字命题公式？（4）ARGOS在非严格逻辑结构的数据集（如CosmosQA和QUAIL）上的性能提升机制是什么？（5）如何进一步降低ARGOS的计算成本，使其在更复杂的现实问题上具有实用性？这些问题的解决将决定该技术谱系从实验基准向实际应用迁移的可行性。
+
+
 
 ## 原文 PDF
 

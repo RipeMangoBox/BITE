@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Sparsity_Forcing_Reinforcing_Token_Sparsity_of_MLLMs.pdf
+project_link: null
+code_link: null
 aliases:
 - SF
 - SFRTSM
@@ -41,7 +43,7 @@ claims:
 > - 6 Video Benchmarks Average (Qwen2-VL-7B) 上，Accuracy 为 61.9，对比 62.1 (Full)，变化 -0.2。
 > - MME (Qwen2.5-VL-7B) 上，Score 为 2286，对比 2303 (Full)，变化 -17。
 
-## 概述
+## 概要
 
 多模态大语言模型（MLLMs）在理解视觉内容时需要处理大量视觉 token，导致自注意力计算的开销随序列长度平方增长，成为长上下文推理的核心瓶颈。现有的无训练稀疏注意力方法（如 ZipVL、FastV）仅利用模型固有的稀疏性，无法在极低的 token 预算下保持准确性；而基于代理目标（如注意力锐度正则化）的稀疏增强方法缺少对 token 预算的直接控制，且训练与推理策略不一致，进一步限制了推理效率的提升。
 
@@ -49,7 +51,7 @@ claims:
 
 实验表明，Sparsity Forcing 将 MLLM（Qwen2/2.5‑VL 系列）的 token 保留比从约 20% 提升至 75%（即仅使用 25% token），在 13 个图像与视频基准上的平均准确率几乎与全量模型持平（如 Qwen2.5-VL-7B 图像平均 73.6 vs 全量 73.8），显著优于 MOBA、Sharpness loss 等后训练基线。在 LLaVA-Video-7B 上，长序列推理可实现最高 3.3× 的解码加速与 3.0× 的内存节省，证明其实际部署价值。然而，该方法在跨帧空间推理等场景下仍会出现准确性下降，且训练时间因多 rollout 而略长于 SFT 基线，这些局限有待进一步探索。
 
-## 背景与动机
+
 
 多模态大语言模型（MLLM）在处理高分辨率图像和长视频时面临高昂的计算成本，其核心瓶颈在于注意力机制的序列二次方复杂度。为缓解这一问题，稀疏注意力方法通过抛弃低重要性 token 来降低计算量，目前主要分为两类：推理时训练无关的剪枝方法（如 FastV、VisionZip、ZipVL）和训练后稀疏增强方法（如 MOBA、Sharpness loss）。然而，这些方法存在两个根本性局限。
 
@@ -59,7 +61,9 @@ claims:
 
 上述瓶颈的本质在于：token 节省未被视作与答案正确性同等重要的端到端优化目标，因而模型无法在正确性与效率之间自主寻找到最经济的均衡点。为此，本文提出 **Sparsity Forcing**，将 token 节省转化为推理一致的强化学习奖励，并通过多预算 rollout 对比在正确前提下所能承受的最低 token 数。其核心动机在于：**通过对比不同 token 预算下的答案质量，模型可以在奖励信号的驱动下学习主动抛弃冗余 token，从而在不牺牲准确性的前提下大幅提升稀疏率。** 初步实验即表明，该方法将 Qwen2/2.5-VL 的 token 减少率从约 20% 提升至 75%，且在 13 个图像和视频基准上仅保留约 25% token 时，平均准确率与全量模型几乎持平，证明了端到端稀疏优化的可行性与优越性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 现有 token 稀疏注意力方法主要依赖模型自身的固有稀疏性（如 FastV、VisionZip）或基于代理目标的训练（如注意力锐度损失），缺乏对 token 预算的直接控制，且在训练与推理之间存在不一致，导致极低预算下准确率大幅下降。Sparsity Forcing 的核心创新在于将 token 节省这一目标**显式转化为端到端、推理一致的强化学习优化过程**，通过多预算 rollout 探索最小必要 token 集，并借助 GRPO 直接最大化正确性约束下的 token 减少率。相较于 baseline，其关键 changed slot 体现在以下四个层面。
 
@@ -77,7 +81,7 @@ claims:
 
 上述创新共同构成了一个统一的后训练框架：**将 token 节省从间接目标升级为端到端的强化学习目标，使 MLLM 在保持精度的同时实现前所未有的 token 减少率**（在 Qwen‑VL 系列上从原来的约 20% 提升至 75%，`ABSTRACT`）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0015_gxNTP2eER3_Sparsity_Forcing_Reinforcing_Token_Sparsity_of_M/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the proposed Sparsity Forcing. We use an MLLM with sparse attention as a policy model, e.g., Qwen2-VL+ZipVL, and the original model with standard causal attention as the reference model. The sampling group is to explore the minimum token ratio required to maintain the current answer under different attention score retention thresholds p*
@@ -104,7 +108,7 @@ Sparsity Forcing 是一种基于强化学习的后训练框架，旨在多模态
 
 **整体数据流**：输入样本 → 策略模型（稀疏注意力）→ 多预算 rollout（N 个不同 p）→ 回答序列和 token 使用统计 → 联合奖励（性能 + 门控效率奖励）→ 组内优势计算 → GRPO 损失（含 KL 惩罚）→ 反向传播更新 θ。参考模型仅用于计算 KL 散度，不参与梯度更新。整个训练过程将 token 稀疏性直接纳入端到端的优化回路，使模型学会在生成正确回答的同时自适应地压缩 token 预算，进而实现推理阶段的显著加速与内存节省。
 
-## 核心模块与公式推导
+
 
 Sparsity Forcing 通过强化学习将 token 节省端到端地纳入 MLLM 的优化目标，其核心由五个功能模块协同实现，关键公式则定义了稀疏注意力、奖励函数和策略更新的数学形式。
 
@@ -156,7 +160,9 @@ $$\mathcal{I}(\theta) = \mathbb{E}_{ \mathbf{x} \sim \mathcal{X}, n \in \mathcal
 
 上述方程共同构成了 Sparsity Forcing 的训练闭环：稀疏注意力提供可微的 token 剪枝基础，多预算 rollout 探索效率-性能边界，联合奖励与 GRPO 更新则端到端地强化最小必要 token 集的选择能力。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果与性能对比
 
@@ -203,7 +209,9 @@ $$\mathcal{I}(\theta) = \mathbb{E}_{ \mathbf{x} \sim \mathcal{X}, n \in \mathcal
 
 此外，现有方法仍有几点待改进之处：（1）效率奖励仅使用 token 比例作为代理，未直接优化硬件感知指标（延迟、能耗）；（2）优化仅针对单轮 VQA，未涉及多轮对话或工具调用等场景下的 token 预算分配；（3）训练时间虽可接受，但 GRPO 的多 rollout 生成仍带来一定额外开销。未来的工作可将硬件反馈纳入奖励设计，并结合头/层/专家的联合 gating 将稀疏性扩展至更广义的推理预算控制。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 Sparsity Forcing 提出了一种将 token 级稀疏注意力从“事后修剪”转变为“端到端、推理一致优化目标”的范式。该方法通过多预算 rollout 与 GRPO 联合优化正确性与 token 减少率，并在后训练中将稀疏性从 MLLM 的固有特性提升为模型主动优化的行为。其所处的谱系可从训练无关稀疏注意力、基于代理目标的后训练增强、以及纯后训练基线三个维度定位。
 
@@ -243,6 +251,8 @@ ZipVL、FastV、VisionZip、Minference 等训练无关方法依赖模型固有�
 * 不同模型尺寸与架构对多预算 rollout 和奖励信号的响应不同，如何设计 **自适应预算范围** 和 **元学习策略** 以降低迁移成本？
 
 Sparsity Forcing 将 token 节省从一次性的工程技巧升格为可被 RL 端到端优化的核心目标，其“多预算对比 + 组内优势”的框架为后续将大模型效率优化融入对齐训练提供了可复用的知识模板。
+
+
 
 ## 原文 PDF
 

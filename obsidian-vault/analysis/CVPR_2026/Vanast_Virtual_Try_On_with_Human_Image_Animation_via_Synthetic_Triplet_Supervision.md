@@ -44,7 +44,7 @@ claims:
 > - Internet Dataset (80 samples) vs. two-stage pipelines 上，All metrics (L1, PSNR, SSIM, LPIPS, FID, VFID) Best scores across all metrics vs Combinations of Subject-to-Image (Mosaic, VisualCloze, Less-to-More) or VTON (O... (N/A (optimal in all metrics))。
 > - Qualitative comparison on posed video generation 上，visual fidelity, pose following, garment transfer, identity preservation Most accurate pose following and garment transfer, best identity preservation vs Two-stage pipelines (subject-to-image + animation; VTON + animation) (significantly better visual results)。
 
-## 概述
+## 概要
 
 现有虚拟试穿人物动画方法普遍采用**两阶段流水线**：先进行虚拟试穿生成穿着目标服装的单帧图像，再以该图像为输入驱动人物动画。这一范式存在根本性瓶颈——**身份漂移、服装变形以及前后视图不一致**，原因在于两阶段之间缺乏联合优化，服装转移与运动生成被割裂处理。更深层的问题是：学术界缺乏包含**不同服装的人类图像与对应视频的三元组训练数据**，使得端到端学习服装转移与动画的联合生成长期不可行。
 
@@ -58,7 +58,7 @@ claims:
 
 3. **全面的实验验证**：在 Internet 数据集上，Vanast 在所有评估指标（L1、PSNR、SSIM、LPIPS、FID、VFID）上均优于由主体到图像模型（如 **Mosaic** (She et al., arXiv 2025)、**VisualCloze** (Li et al., arXiv 2025)）或虚拟试穿模型（如 **OOTDiffusion** (Xu et al., AAAI 2025)、**CatVTON** (Chong et al., arXiv 2024)）与动画模型（如 **Champ** (Zhu et al., ECCV 2024)、**StableAnimator** (Tu et al., CVPR 2025)）构成的所有两阶段组合基线，定性比较也显示出最优的视觉保真度。
 
-## 背景与动机
+
 
 虚拟试穿人物动画（Virtual Try-On with Human Image Animation）旨在将目标服装图像转移到给定人物图像上，并同时驱动该人物按照指定的姿势序列生成连贯的动画视频。这一任务在电子商务、虚拟时尚和数字人内容创作中具有广泛的应用前景。然而，现有方法普遍采用**两阶段流水线**：先执行图像级虚拟试穿（VTON）或主体到图像（Subject-to-Image）生成，再将结果输入独立的动画模型。这种解耦范式带来了三个核心瓶颈：
 
@@ -70,7 +70,9 @@ claims:
 
 针对这一缺口，本文提出 **Vanast**——一个端到端的统一框架，直接从人物图像、服装图像和姿势视频合成服装转移后的人物动画。Vanast 的核心动机在于：通过构建**合成三元组监督**来填补数据空白，并设计**双模块条件注入架构**以在冻结的预训练文本到视频扩散主干上独立控制人体动画与服装转移两个关键因素，从而在保持预训练生成质量的前提下，实现高保真的服装精度、姿势遵循和身份保持。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Vanast 的核心创新在于**将虚拟试穿与人物动画从两阶段级联范式重构为统一的端到端生成框架**，并通过两个相互协同的设计突破实现了这一目标：合成三元组监督数据构建与双模块条件注入架构。
 
@@ -118,7 +120,7 @@ $$h_{l+1} = \mathrm{B}_l^{\mathrm{T2V}}(h_l) + \alpha \cdot \mathrm{B}_l^{\mathr
 
 Vanast 的创新链条清晰且自洽：**合成三元组监督**解决了训练数据的结构性缺失，迫使模型学习服装转移而非运动复现；**双模块架构**将异质性条件（人体动画与服装转移）解耦为独立路径，在冻结主干的前提下实现精准的条件控制；**加性注入与冻结主干**的组合策略保留了预训练生成质量，同时支持零样本服装插值。这一设计使得 Vanast 在统一的端到端框架中，全面超越了所有两阶段组合基线（Table 1, Table 2），在姿势遵循、服装精度和身份保持三个维度上均取得最优结果。
 
-## 整体框架
+
 
 Vanast 是一个端到端的统一框架，直接从人物图像、服装图像和姿势引导视频合成服装转移后的人物动画视频，无需传统的两阶段流水线（先虚拟试穿再动画生成）。其核心设计围绕两个关键创新展开：**合成三元组数据集生成流水线**和**双模块架构**。
 
@@ -168,7 +170,7 @@ $$h_{l+1} = \mathrm{B}_l^{\mathrm{T2V}}(h_l) + \alpha \cdot \mathrm{B}_l^{\mathr
 ![[assets/figures/papers/paper_list_l1085_https_arxiv_org_abs_2604_04934/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of Vanast Pipeline. Our Vanast framework generates virtual try-on human animation videos from a human image, garment images, and a pose video. By incorporating scalable human-image and garment-image generation pipelines, our method avoids dataset-specific constraints and trains effectively at scale. The Dual Modules architecture ensures that the three conditioning signals, human image IG′ , garment images G, and pose video K, are faithfully reflected in the resulting video*
 
-## 核心模块与公式推导
+
 
 Vanast 的核心设计围绕两个关键机制展开：**合成三元组监督**构建训练数据，以及**双模块注入架构**实现服装转移与人体动画的解耦控制。以下从数据生成、模型架构和公式化定义三个层面进行解析。
 
@@ -203,7 +205,9 @@ $$h_{l+1} = \mathrm{B}_l^{\mathrm{T2V}}(h_l) + \alpha \cdot \mathrm{B}_l^{\mathr
 ![[assets/figures/papers/paper_list_l1085_https_arxiv_org_abs_2604_04934/figures/013_Figure_10.jpg]]
 *Figure 10: Result of Garment Interpolation. Without requiring any additional finetuning, our Vanast model performs zero-shot transfer of interpolated garments by GTM. γ denotes a scalar interpolation weight*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -273,7 +277,9 @@ $$h_{l+1} = \mathrm{B}_l^{\mathrm{T2V}}(h_l) + \alpha \cdot \mathrm{B}_l^{\mathr
 ![[assets/figures/papers/paper_list_l1085_https_arxiv_org_abs_2604_04934/figures/003_Figure_3.jpg]]
 *Figure 3: Samples of Synthetic Triplet Datasets. We show samples of the datasets used for generation and training. The triplet construction contributes to enabling the model to preserve identity while accurately transferring garments and producing animation videos that follow the target pose*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位与问题边界
 
@@ -335,6 +341,8 @@ Vanast 在训练数据构建上做出了根本性创新：通过合成三元组�
 3. **扩展到更多条件**：HAM 和 GTM 的解耦架构是否可自然扩展到其他条件（如背景、光照、相机运动），形成更通用的可控视频生成框架，是一个值得探索的方向。
 
 4. **与 3D 方法的结合**：当前方法完全基于 2D 表示，与基于 3D 人体模型（如 SMPL）的方法在服装几何保真度上的差距未量化。
+
+
 
 ## 原文 PDF
 

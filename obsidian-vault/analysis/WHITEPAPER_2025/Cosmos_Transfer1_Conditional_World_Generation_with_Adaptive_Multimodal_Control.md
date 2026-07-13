@@ -5,6 +5,7 @@ paper_level: A
 venue: Whitepaper
 year: 2025
 pdf_ref: paperPDFs/WHITEPAPER_2025/Cosmos_Transfer1_Conditional_World_Generation_with_Adaptive_Multimodal_Control.pdf
+code_link: https://github.com/nvidia-cosmos/cosmos-transfer1
 project_link: https://research.nvidia.com/labs/dir/cosmos-transfer1/
 aliases:
 - CT
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | Cosmos-Transfer1: 基于自适应多模态控制的条件世界生成 |
 | 英文题名 | Cosmos-Transfer1: Conditional World Generation with Adaptive Multimodal Control |
 | 会议/期刊 | Whitepaper 2025 |
-| Links | [paper](https://arxiv.org/abs/2503.14492); [GitHub](https://github.com/nvidia-cosmos/cosmos-transfer1); [Project](https://research.nvidia.com/labs/dir/cosmos-transfer1/) |
+| Links | [paper](https://arxiv.org/abs/2503.14492) · [GitHub](https://github.com/nvidia-cosmos/cosmos-transfer1) · [Project](https://research.nvidia.com/labs/dir/cosmos-transfer1/) |
 | Topic | #topic/representation_self_supervised_transfer #topic/representation_self_supervised_transfer/transfer_multitask_and_meta_learning |
 | Method | Cosmos-Transfer1 |
 | Dataset | TransferBench, 自建机器人Sim2Real数据 |
@@ -42,7 +43,7 @@ claims:
 > - TransferBench 上，Depth Alignment (si-RMSE, 越低越好) 为 0.47 (Uniform Weights)，对比 0.49 (Cosmos-Transfer1-7B [Depth])，变化 -0.02。
 > - 自建机器人Sim2Real数据 上，Quality Score 为 模型with spatiotemporal control map 取得前三名，对比 单模态分割控制模型，变化 未给出具体数值。
 
-## 概述
+## 概要
 
 可控世界生成旨在根据给定的控制信号（如深度图、分割掩码、边缘图等）合成视觉逼真的视频，在自动驾驶仿真、机器人数据增强等领域具有关键应用价值。然而，现有方法面临一个核心瓶颈：**单一模态控制难以同时满足场景中不同区域对生成保真度与多样性的矛盾需求**。例如，前景物体需要高保真结构约束以保留可辨识的几何与纹理细节，而背景区域则期望更高的多样性以产生合理的场景变化。传统方案通常对整帧施加全局统一的控制信号，无法在空间维度上灵活调节不同模态的控制强度，导致生成结果要么整体过于僵硬（多样性不足），要么关键结构丢失（保真度不足）。
 
@@ -52,7 +53,7 @@ claims:
 
 从方法谱系来看，Cosmos-Transfer1 属于**基于 ControlNet 的多模态条件扩散模型**，其关键设计决策包括：（1）各控制分支**独立训练、推理时融合**，避免了联合训练的组合爆炸与模态冲突；（2）引入**零初始化线性层**将控制特征注入主分支，确保训练初期不干扰预训练权重；（3）通过**时空控制图**实现推理阶段的动态加权，无需重新训练即可适应不同下游任务的控制需求。与现有可控生成方法相比，该工作首次系统性地解决了多模态控制在空间维度上的自适应分配问题，为条件世界生成提供了更灵活、更高效的范式。
 
-## 背景与动机
+
 
 ### 条件世界生成与可控视频合成
 
@@ -78,7 +79,9 @@ claims:
 
 这种方法首次将多模态条件生成的“融合”问题提升为“空间自适应的选择性融合”问题，为可控世界生成提供了更精细的调控维度。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Cosmos-Transfer1 的核心创新在于引入了一套**自适应多模态控制框架**，使条件世界生成模型首次能够在统一的架构下，对不同空间区域和时间步灵活组合多种控制模态，从而精确调节各区域的生成自由度。这一设计直接回应了现有方法的瓶颈：单一模态控制无法同时满足不同区域对保真度与多样性的差异化需求。
 
@@ -115,7 +118,7 @@ $$\mathbf{w}_i \cdot \mathbf{h}_i^j$$
 
 多模态均匀权重模型（Cosmos-Transfer1-7B Uniform Weights）在 TransferBench 上取得了最高的整体质量评分（Quality Score 8.54），优于所有单模态控制模型的最高分（6.51），证明了多模态信息互补的有效性。然而，均匀权重在单项对齐指标上（如 Blur SSIM 0.87 vs. 单模态最优 0.96）并非最优，这恰恰凸显了时空控制图的必要性——全局统一权重无法满足区域级差异化需求。
 
-## 整体框架
+
 
 Cosmos-Transfer1 是一个基于扩散模型的条件世界生成器，其核心架构可解构为三条并行的功能流：**条件提取流**、**主生成流**与**多模态融合流**。系统接受多模态控制信号与文本提示，输出可控的长视频。
 
@@ -129,7 +132,7 @@ Cosmos-Transfer1 是一个基于扩散模型的条件世界生成器，其核心
 
 **训练策略**。各模态控制分支**分别独立训练**，推理时融合。每个分支使用 1024 块 NVIDIA H100 GPU 训练 2 至 4 周。这种分离训练策略使得新增模态无需重训已有分支，实现了模态层面的即插即用。
 
-## 核心模块与公式推导
+
 
 Cosmos-Transfer1 的核心架构围绕三个关键设计展开：**独立可零初始化的多模态控制分支**、**时空控制图加权融合机制**，以及**基础扩散去噪主分支**。以下按模块拆解其公式与变量含义。
 
@@ -173,7 +176,9 @@ $$\text{if } \sum_k w_k^{xyt} > 1 \text{, then } w_k^{xyt} \leftarrow \frac{w_k^
 
 上述模块的协作逻辑可总结为：**独立训练的控制分支**各自从不同模态提取互补特征 → **零初始化线性层**保证训练稳定性 → **时空控制图**在推理时对不同区域选择性加权 → **归一化约束**防止信号过载 → 加权后的多模态特征注入**冻结的主分支**，最终引导扩散去噪过程生成符合区域约束的视频。这一设计使得模型无需联合训练所有模态组合，即可在推理时灵活融合任意模态子集，并实现区域级可控性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果：多模态控制统一优于单模态
 
@@ -247,7 +252,9 @@ Table 5展示了Cosmos-Transfer1-7B在不同GPU配置下的端到端推理延迟
 ![[assets/figures/papers/paper_list_l37_https_arxiv_org_abs_2503_14492/figures/017_Table_5.jpg]]
 *Table 5: Computation time for generating a 5-second video with Cosmos-Transfer1-7B under different parallelism settings. End-to-end runtime dips below 5 seconds when scaled up to 64 B200 GPUs and reach real-time generation throughput*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -286,6 +293,8 @@ Cosmos-Transfer1 建立在两条成熟技术路线的交汇点上：**扩散 Tra
 - 生成的视觉内容是否存在与训练数据相关的系统性偏见？如何评测与缓解？
 - 实时推理所采用的并行策略（64 块 B200 GPU 下 5 秒内生成 5 秒视频）能否推广到更大规模模型或更多模态融合场景，并维持低延迟？
 - 将本方法应用于实际机器人 Sim2Real 迁移时，域间隙的量化指标与下游任务性能之间的因果关系如何建立？
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICML
 year: 2024
 pdf_ref: paperPDFs/ICML_2024/HumanTOMATO_Text_Aligned_Whole_Body_Motion_Generation.pdf
+project_link: null
+code_link: null
 aliases:
 - HumanTOMATO
 tags:
@@ -39,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - Motion-X 上，FID↓ 1.174 vs 1.366 (T2M-GPT) (-0.192)；TMR-R-Precision(256) Top1↑ 0.416 vs 0.368 (T2M-GPT) (+0.048)；R-Precision(32) Top1↑ 0.399 vs 0.310 (T2M-GPT) (+0.089)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -84,7 +86,7 @@ HumanTOMATO 属于**离散潜空间生成**范式的文本驱动动作生成方�
 -   模型尚未在大规模多源文本-运动数据上训练，泛化能力有待验证。
 -   面部表情质量的客观评估指标缺失，该点需要手动验证。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -106,7 +108,9 @@ HumanTOMATO 属于**离散潜空间生成**范式的文本驱动动作生成方�
 - **设计层次化离散表示（H2VQ）**：通过整体层次向量量化，对身体和手部动作进行分层离散编码，在极低比特率下保留细粒度运动信息，同时建立身体与手部之间的层次结构关系。
 - **引入运动感知的语言先验与显式对齐**：采用预训练的文本-动作检索模型（TMR）提供运动感知的文本嵌入，并通过对比对齐损失实现序列级的显式文本-动作对齐监督，从根本上提升生成动作与文本语义的一致性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 HumanTOMATO 围绕“文本对齐的全身动作生成”这一目标，针对现有方法的两大瓶颈——**忽略手部/面部细节**与**缺乏序列级文本-动作对齐**——进行了三项关键创新。这些创新构成了从动作表示、生成架构到语言先验的完整技术链条。
 
@@ -140,7 +144,7 @@ HumanTOMATO 围绕“文本对齐的全身动作生成”这一目标，针对�
 
 三项创新并非孤立设计，而是形成因果闭环：**H²VQ** 提供高质量的身体-手部分层离散表示，为 **Hierarchical-GPT** 的层次预测提供结构化令牌序列；**TMR 语言先验与对齐监督** 则驱动 Hierarchical-GPT 生成与文本语义高度一致的令牌序列。三者叠加使得 HumanTOMATO 在极低比特率下实现了高质量且文本对齐的全身动作生成。
 
-## 整体框架
+
 
 HumanTOMATO 的总体 pipeline 围绕一个核心洞察展开：**将全身动作解耦为身体、手部和面部三个异质组分，分别采用层次化离散表示与生成策略，并引入运动感知的语言先验进行显式的序列级对齐监督**。这一设计解决了现有方法仅生成身体动作、忽略手部和面部细节，以及文本-动作对齐仅停留在帧级别的瓶颈问题。
 
@@ -189,7 +193,7 @@ $$
 - **输出**：融合身体、手部、面部三者的全身动作序列 $\mathbf{m}$
 - **监督信号**：生成动作与文本之间的对比对齐损失，确保序列级语义一致性
 
-## 核心模块与公式推导
+
 
 ### 整体层次向量量化（H²VQ）
 
@@ -247,7 +251,9 @@ HumanTOMATO 的语言先验引入方式与现有方法存在本质差异（Figur
 
 面部动作生成采用独立的条件 VAE 模块（Figure 2(c)），由面部编码器、文本编码器和面部解码器组成。该模块以表情文本描述为条件，生成与身体-手部运动时间对齐的面部表情序列。当前设计为分离式架构，尚未与 H²VQ 和 Hierarchical-GPT 统一为端到端框架，这一局限在论文的 open questions 中被明确指认为未来改进方向。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -316,7 +322,9 @@ H²VQ 不仅提升重建质量，还直接惠及下游生成。Table 13 显示
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2310_12978/figures/003_Figure_3.jpg]]
 *Figure 3: (a) Learning image-text aligned prior explicitly. (b) Learning image-text aligned prior implicitly. (c) Learning motion-text alignment explicitly(Ours). Figure 3: Technical comparisons on introducing language priors of existing methods*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题瓶颈与核心思路
 
@@ -369,6 +377,8 @@ HumanTOMATO 通过三个核心设计解决上述问题：
 4. **面部生成评估**：如何客观评估全身动作生成中的面部表情质量和对齐度？现有指标（FID、R-Precision）主要针对身体动作，缺乏面部表情的专门评估指标。
 
 5. **层次化结构的泛化性**：H²VQ 的身体-手部层次分解策略是否可以推广到其他多部位运动生成任务（如四足动物、多智能体协作）？这需要验证层次化离散表示在不同运动结构上的适应性。
+
+
 
 ## 原文 PDF
 

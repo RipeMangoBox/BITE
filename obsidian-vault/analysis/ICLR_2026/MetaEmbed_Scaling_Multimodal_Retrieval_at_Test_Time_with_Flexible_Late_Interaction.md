@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/MetaEmbed_Scaling_Multimodal_Retrieval_at_Test_Time_with_Flexible_Late_Interaction.pdf
+project_link: null
+code_link: https://github.com/facebookresearch/MetaEmbed
 openreview_forum_id: yKDqg9HwZX
 aliases:
 - MetaEmbed
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | MetaEmbed：通过灵活延迟交互实现测试时多模态检索的规模化 |
 | 英文题名 | MetaEmbed: Scaling Multimodal Retrieval at Test-Time with Flexible Late Interaction |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=yKDqg9HwZX); [GitHub](https://github.com/facebookresearch/MetaEmbed) |
+| Links | [paper](https://openreview.net/forum?id=yKDqg9HwZX) · [GitHub](https://github.com/facebookresearch/MetaEmbed) |
 | Topic | #topic/representation_self_supervised_transfer #topic/representation_self_supervised_transfer/transfer_multitask_and_meta_learning |
 | Method | METAEMBED |
 | Dataset | MMEB, ViDoRe v2 |
@@ -41,7 +43,7 @@ claims:
 > - MMEB 上，Overall Precision@1 为 76.6，对比 71.5，变化 +5.1。
 > - ViDoRe v2 上，Avg. NDCG@5 为 61.3，对比 57.5，变化 +3.8。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -73,8 +75,6 @@ METAEMBED 处于单向量检索与多向量检索的交叉地带。与单向量�
 
 当前方案依赖预训练 VLM 骨干，基座模型在特定领域（如 VQA）的弱点会传递给 METAEMBED；最大预算下的多向量索引内存和计算开销仍显著高于单向量方法；多语言检索能力依赖基座模型的跨语言泛化，缺乏低资源语言验证。此外，MMEB 基准存在 train-test 类别重叠问题（如 ObjectNet 与 ImageNet 共享 113 个类），可能高估模型泛化能力。开放问题包括：Meta 令牌策略能否脱离预训练 VLM 应用、MMR 分组粒度可否自适应优化、以及该方法能否推广至检索下游的生成任务。
 
-## 背景与动机
-
 多模态检索的核心任务是在大规模候选库中，根据查询（文本、图像或图文组合）找到最相关的候选项。其关键挑战在于如何构建既能保留细粒度语义信息、又能在计算和存储上保持高效的嵌入表示。
 
 ### 现有方法的困境
@@ -93,7 +93,7 @@ METAEMBED 处于单向量检索与多向量检索的交叉地带。与单向量�
 
 针对上述缺口，METAEMBED 提出了一种全新的多向量嵌入范式。其核心思路是：通过少量可学习的 Meta 令牌获取紧凑的多向量表示，并借助 Matryoshka 多向量检索训练（MMR）强制嵌入呈前缀嵌套结构，从而首次在多模态多向量检索中实现测试时“精度-效率”可动态伸缩的能力。用户只需在检索时选择不同的前缀组，即可在毫秒级延迟和百分点级精度之间连续权衡，无需任何模型修改或索引重建。
 
-## 核心创新
+## 核心方法与创新机理
 
 METAEMBED 的核心创新在于通过两个相互配合的设计，首次在多模态多向量检索中实现了测试时的“精度‑效率”动态伸缩能力。
 
@@ -129,8 +129,6 @@ $$\mathcal{L}_{\text{final}} = \sum_{g=1}^{G} w_g \mathcal{L}_{\text{NCE}}^{(g)}
 
 上述核心创新有充分的实验支撑：MMEB 和 ViDoRe v2 上的 SOTA 结果、跨模型尺寸（3B/7B/11B/32B）的一致性增益、以及 MMR 消融实验均指向 Meta 令牌与嵌套训练的有效性。但需注意，该方法高度依赖预训练 VLM 骨干的质量——当基座模型在某些子任务（如 VQA）上表现不佳时，其弱点会直接传递给 METAEMBED（例如 Llama-3.2-Vision-11B 导致 VQA 得分骤降）。此外，在最大预算下，多向量索引的存储和计算开销仍显著高于单向量方法，这是多向量检索的固有代价，MMR 提供的仅是预算选择权而非根本性的效率突破。
 
-## 整体框架
-
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_yKDqg9HwZX/figures/001_Figure_1.jpg]]
 *Figure 1: Upper Left: Single vector retrieval method computes a score for each pair of query and candidate and uses a contrastive objective to maximize the score for corresponding pairs. Upper Right: Multi-vector retrieval aggregates maximum similarities across vector pairs before training. Lower: METAEMBED structures query and candidate vectors into hierarchical nested groups and trains coarse-to-fine multi-vector embeddings that enable scalable and flexible retrieval*
 
@@ -155,8 +153,6 @@ $$\mathcal{L}_{\text{final}} = \sum_{g=1}^{G} w_g \mathcal{L}_{\text{NCE}}^{(g)}
 这种并行优化强制模型在所有嵌套层级上同时学习有区分力的表示，使得前缀组在低预算下仍能保持可用的检索质量。
 
 **测试时可伸缩性。** 上述嵌套分组结构的关键价值在于：用户可以在测试时根据延迟和存储预算自由选择使用的组别 $(r_q^{(g)}, r_c^{(g)})$。当预算紧张时，仅使用最小的前缀组（如 $(1,1)$）进行单向量检索；当预算充裕时，使用完整的 $(R_q, R_c)$ 向量集进行精细的多向量延迟交互。这一机制首次在多模态多向量检索中实现了“精度-效率”的动态权衡，无需重新训练或重新索引。
-
-## 核心模块与公式推导
 
 METAEMBED 的核心设计围绕两个关键模块展开：**Meta 令牌嵌入构建** 与 **Matryoshka 多向量检索（MMR）训练**。前者负责生成紧凑的多向量表示，后者赋予这些表示测试时可伸缩的嵌套结构。
 
@@ -220,7 +216,7 @@ $$
 
 **因果机制总结**：MMR 的多组并行训练迫使 Meta 嵌入形成“由粗到精”的信息排序，这是测试时可伸缩性的根本来源。消融实验证实，去掉 MMR 后，在最低预算 $(1,1)$ 下 ViDoRe v1 的 NDCG@5 骤降 9.0 个百分点，而保留 MMR 时即使只用 1 个向量也能保持可用的检索质量。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主结果：MMEB 与 ViDoRe v2 上的性能
 
@@ -266,19 +262,10 @@ METAEMBED 在 Qwen2.5-VL、PaliGemma 和 Llama-3.2-Vision 三种不同 VLM 骨�
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_yKDqg9HwZX/figures/003_Table_1.jpg]]
-*Table 1: Precision@1 (%) results on MMEB, which includes 36 tasks across four categories: Classification, Visual Question Answering (VQA), Retrieval, and Visual Grounding. IND and OOD represent the in-domain average and out-of-domain average metrics, respectively. Bold denotes the best scores in the subset and the second-best scores are highlighted with underline*
-
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_yKDqg9HwZX/figures/004_Table_2.jpg]]
 *Table 2: NDCG@5 (%) results on the ViDoRe v2 benchmark, which covers 7 tasks on visual document retrieval. “Syn” denotes synthetic data, “Mul” indicates multilingual tasks, and “Bio” refers to biomedical domains*
 
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_yKDqg9HwZX/figures/009_Table_4.jpg]]
-*Table 4: Training details of METAEMBED variants*
-
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_yKDqg9HwZX/figures/011_Table_6.jpg]]
-*Table 6: Detailed performance on 36 MMEB tasks. Table style and baseline performance are adopted from Chen et al. (2025a). Rows in yellow indicate metrics of an OOD task*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 问题定位：多模态检索的效率-精度困境
 

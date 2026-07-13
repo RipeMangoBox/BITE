@@ -35,7 +35,7 @@ claims:
 | 中文题名    | ProjFlow: 基于流匹配的投影采样实现零样本精确空间运动控制                                                                                                                                                                                                                                                                |
 | 英文题名    | ProjFlow: Projection Sampling with Flow Matching for Zero-Shot Exact Spatial Motion Control                                                                                                                                                                                                      |
 | 会议/期刊   | CVPR 2026                                                                                                                                                                                                                                                                                        |
-| Links   | [paper](https://openaccess.thecvf.com/content/CVPR2026/html/Watanabe_ProjFlow_Projection_Sampling_with_Flow_Matching_for_Zero-Shot_Exact_Spatial_CVPR_2026_paper.html) · [Project](https://akihisa-watanabe.github.io/projflow.github.io/)· [Code](https://github.com/Akihisa-Watanabe/ProjFlow) |
+| Links   | [paper](https://openaccess.thecvf.com/content/CVPR2026/html/Watanabe_ProjFlow_Projection_Sampling_with_Flow_Matching_for_Zero-Shot_Exact_Spatial_CVPR_2026_paper.html) · [Project](https://akihisa-watanabe.github.io/projflow.github.io/) · [Code](https://github.com/Akihisa-Watanabe/ProjFlow) |
 | Topic | #topic/motion_animation #topic/motion_animation/human_motion_generation #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction #topic/generative_models_diffusion |
 | Method  | ProjFlow                                                                                                                                                                                                                                                                                         |
 | Dataset | HumanML3D                                                                                                                                                                                                                                                                                        |
@@ -44,7 +44,7 @@ claims:
 > - HumanML3D (pelvis trajectory control) 上，FID 0.107 vs 0.151 (ACMDM-S-PS22 + DNO) (-0.044)。
 > - HumanML3D (2D-to-3D reconstruction) 上，FID (Average) 0.349 vs 0.525 (Sketch2Anim) (-0.176)；FID (Cross) 0.168 vs 0.577 (Sketch2Anim) (-0.409)；MPJPE-2D (mm) 0.000 vs >0 (Sketch2Anim, approx.) (精确满足 vs 近似)。
 
-## 概述
+## 概要
 
 **瓶颈问题**：现有空间运动控制方法存在一个根本性矛盾——任务特定训练方法（如 OmniControl、MaskControl）虽然约束满足较好，但缺乏零样本泛化能力；推理时优化方法（如 DNO）虽无需训练，却依赖缓慢的内循环梯度优化，且只能实现软约束，无法精确满足硬性空间条件。两者均难以在保证运动自然性的同时，实现精确、高效、无需训练的约束满足。
 
@@ -57,7 +57,7 @@ claims:
 - 在 2D 到 3D 运动重建任务中，FID 显著优于训练类方法 **Sketch2Anim**（平均 FID 0.349 vs 0.525，交叉 FID 0.168 vs 0.577），且 2D 重投影误差精确为 0（Table 2）。
 - 消融实验表明，将运动学感知度量替换为欧几里得度量后，FID 从 0.097 剧增至 **1.152**，验证了度量设计对运动真实感的决定性作用（Table 3）。
 
-## 背景与动机
+
 
 ### 问题背景：空间运动控制的精确性与自然性困境
 
@@ -87,7 +87,9 @@ ProjFlow的核心动机源于一个关键洞察：**将多种空间运动控制�
 
 这一统一框架使得ProjFlow能够以零样本、无需训练的方式处理多种空间运动控制任务，从根本上摆脱了对任务特定训练和内循环优化的依赖。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ProjFlow 的核心创新在于将零样本空间运动控制重新定义为**线性逆问题**，并在流匹配（Flow Matching）的 ODE 积分路径上引入**闭合形式的投影校正**，从而在无需任务特定训练和内循环优化的前提下，实现对线性空间约束的**精确满足**。与现有方法相比，这一范式转换体现在三个关键维度的设计变革上。
 
@@ -133,7 +135,7 @@ $$R = w_{\mathrm{kin}} (I_3 \otimes I_N \otimes L_{\mathrm{kin}}) + \lambda I_d$
 
 投影修正确保了约束满足，但若采用确定性重构（$\eta_t = 0$），采样过程会退化为缺乏多样性的模式坍塌——消融实验中 FID 恶化至 3.429（Table 3）。ProjFlow 通过**随机重构**步骤，在修正后的干净端点和原始噪声之间重新混合随机扰动，维持了流匹配采样的随机性，确保生成结果在满足约束的同时保持丰富的多样性。
 
-## 整体框架
+
 
 ProjFlow 是一个无需训练的采样器，在预训练流匹配运动先验的基础上，通过在每个采样步执行**投影校正**，实现对线性空间约束的零样本精确满足。其核心思路是将多样化的空间运动控制任务统一建模为线性逆问题，并在流匹配的 ODE 积分路径上施加闭合形式的投影，从而在保持运动自然感的同时，消除约束违反。
 
@@ -196,7 +198,7 @@ $$R = w_{\mathrm{kin}} (I_3 \otimes I_N \otimes L_{\mathrm{kin}}) + \lambda I_d$
 ![[assets/figures/papers/paper_list_l970_https_openaccess_thecvf_com_content_CVPR2026_html_Watanabe_ProjFlow_Proj/figures/001_Figure_1.jpg]]
 *Figure 1: ProjFlow provides a unified, zero-shot framework for exact spatial motion control. The method handles diverse applications by formulating them as linear inverse problems. Examples of applications include (a) precisely following a specified joint’s trajectory, (b) lifting 2D keypose and 2D trajectory inputs to a full 3D motion, (c) maintaining a fixed relative position between joints, and (d) generating seamlessly looped motion by matching start and end poses*
 
-## 核心模块与公式推导
+
 
 ProjFlow 的推理管线由三个核心模块串联构成，每个采样步 $t$ 依次执行：**干净端点预测**、**投影校正**、**随机重构**。对于运动修复任务，额外引入**伪观测生成模块**以处理稀疏关键帧。以下逐一展开各模块的公式与变量含义。
 
@@ -262,7 +264,9 @@ $$\tilde{\pi}_n^{(t)} = \tau(t) \, \frac{c_0}{1 + \lambda_s \, (s_n(\hat{\mathbf
 ![[assets/figures/papers/paper_list_l970_https_openaccess_thecvf_com_content_CVPR2026_html_Watanabe_ProjFlow_Proj/figures/003_Figure_3.jpg]]
 *Figure 3: Pseudo-observations for motion inpainting. Sparse observations are interpolated to guide intermediate frames. This guidance is controlled by two mechanisms: Dynamic Masking activates a time-scheduled neighborhood, and Adaptive Variance treats original observations as hard constraints and the interpolated guides as soft constraints*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 5.1 实验设置
 
@@ -356,7 +360,9 @@ Table 3 系统消融了 ProjFlow 的三个核心组件，揭示了每个组件�
 ![[assets/figures/papers/paper_list_l970_https_openaccess_thecvf_com_content_CVPR2026_html_Watanabe_ProjFlow_Proj/figures/004_Figure_4.jpg]]
 *Figure 4: Text-conditioned pelvis-trajectory control. Given the prompt “a person runs forward in an S-shaped path” and a pelvis control signal, we compare OmniControl [61], MaskControl [45], and ProjFlow (ours). The rendered motions and the trajectory plots both visualize the generated pelvis trajectory (orange) overlaid on the target control signal (gray dotted line)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 在空间运动控制谱系中的位置
 
@@ -399,6 +405,8 @@ ProjFlow 的适用性受以下条件约束：
 2. **跨域泛化**：ProjFlow 能否与更强大的运动基模型（如基于 Transformer 的生成模型）结合？能否扩展到物理模拟、人-物交互等需要接触约束的场景？
 3. **超参数自动化**：伪观测模块中的信任度评分和动态掩码参数是否可以自适应学习，而非手工设计？
 4. **结构化生成任务的推广**：该方法的核心思想——在生成过程的中间表示上施加结构化约束投影——能否推广到其他结构化生成任务，如人体姿态估计、分子构象生成？这需要验证度量设计（类比运动学感知度量 $R$）在目标领域的有效性。
+
+
 
 ## 原文 PDF
 

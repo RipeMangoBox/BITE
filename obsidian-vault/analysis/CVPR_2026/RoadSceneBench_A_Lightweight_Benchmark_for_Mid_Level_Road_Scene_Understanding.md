@@ -40,7 +40,7 @@ claims:
 > [!tip] 效果简介
 > - RoadSceneBench 上，Overall Precision 75.78 vs 60.61 (Gemini 2.5 Pro) (+15.17)；Overall Recall 72.17 vs 52.70 (Gemini 2.5 Pro) (+19.47)；Ego-lane Index Accuracy (SFT vs SFT+HRRP-T) 75.44 (SFT+HRRP-T) vs 69.34 (SFT) (+6.10)。
 
-## 概述
+## 概要
 
 当前自动驾驶场景理解基准主要面向检测、分割等低级感知任务，缺乏对车道拓扑、换道可行性等**中级道路语义**的结构化推理与一致性评估。这一断层导致视觉语言模型（VLM）难以将感知结果可靠地桥接至决策规划，成为制约端到端自动驾驶系统鲁棒性的关键瓶颈。
 
@@ -52,7 +52,7 @@ claims:
 
 > **需注意**：基准数据仅采集自中国境内 20 个城市，对境外道路结构的泛化性有待验证；HRRP-T 当前仅针对短期（5 帧）时序建模，对突发动态事件的适应能力尚未测试。
 
-## 背景与动机
+
 
 自动驾驶场景理解的研究长期聚焦于低级感知任务，如目标检测、语义分割和车道线检测。现有基准（如 nuScenes、Waymo Open Dataset）提供了丰富的感知标注，但几乎不涉及中级道路语义的结构化推理——例如车道拓扑关系、自车车道索引、换道可行性判断以及交通标志与车道的关联。这种评估体系的偏斜导致两个后果：其一，视觉语言模型（VLM）在道路场景上的能力被低估或误判，因为通用 VQA 基准无法揭示其几何推理与关系推理的深层缺陷；其二，感知模块的输出难以可靠地桥接至决策规划，形成从“看见”到“理解”的语义鸿沟。
 
@@ -62,7 +62,9 @@ RoadSceneBench 正是针对这一缺口提出的轻量级基准。它覆盖 20 �
 
 本文的动机由此明确：需要一种训练范式，将 VLM 从单帧静态预测器升级为几何感知且时序连贯的道路场景推理代理。核心思路是将推理过程建模为结构化决策序列，并通过层次化奖励信号与时序一致性约束进行强化学习优化，从而填补感知与规划之间的语义鸿沟。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MapVLM 的核心创新并非引入新的视觉编码器或语言模型架构，而是将视觉‑语言模型（VLM）对中级道路场景的理解，重新定义为一个**结构相互依赖、时序受约束的推理问题**，并通过一套专门的强化学习训练范式来求解。相较于现有 VLM 仅对单帧图像进行静态预测的常规范式，MapVLM 的关键突破体现在以下三个维度。
 
@@ -95,7 +97,7 @@ $$\mathcal{R}_{\mathrm{HRRP-T}} = \lambda_{frame} \frac{1}{T} \sum_{t=1}^{T} \ma
 
 综上，MapVLM 的创新本质在于**将 VLM 从静态预测器升级为几何感知且时序连贯的道路场景推理代理**，其 changed slots 清晰聚焦于训练范式、优化目标和推理时域范围三个相互耦合的维度，从而可靠地填补了感知与规划之间的中级语义鸿沟。
 
-## 整体框架
+
 
 MapVLM 的整体训练范式采用两阶段流水线：**监督微调（SFT）** 建立基础推理能力，随后通过 **层次化关系奖励传播与时序一致性（HRRP-T）** 强化学习框架对模型进行结构化对齐。该流水线的核心设计动机在于：现有 VLM 在静态单帧推理中缺乏对道路几何逻辑的内化，且无法利用跨帧时序证据维持预测一致性。
 
@@ -133,7 +135,7 @@ $$\mathcal{R}_{\mathrm{HRRP-T}} = \lambda_{frame} \frac{1}{T} \sum_{t=1}^{T} \ma
 ![[assets/figures/papers/paper_list_l2721_https_arxiv_org_abs_2511_22466/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of RoadSceneBench. The benchmark spans Scene-, Relational-, and Semantic-level tasks with multi-frame reasoning. Furthermore, we benchmark various open- and closed-source models*
 
-## 核心模块与公式推导
+
 
 MapVLM 的核心方法论由两阶段训练范式构成：**监督微调 (SFT)** 建立基础推理能力，随后通过 **层次化关系奖励传播与时序一致性 (HRRP-T)** 强化学习框架对模型进行结构化对齐。以下聚焦 HRRP-T 的关键模块与数学形式。
 
@@ -194,7 +196,9 @@ HRRP-T 的因果调节机制在于：**层次化奖励传播** 将结构化推�
 ![[assets/figures/papers/paper_list_l2721_https_arxiv_org_abs_2511_22466/figures/011_Figure_5.jpg]]
 *Figure 5: Comparison of SFT and SFT+HRRP-T on a 5-frame congested urban scene. The ego vehicle stays in the same lane: the first two frames clearly show a five-lane layout, whereas the last three frames are partially occluded. SFT reacts to these ambiguous observations with frame-wise drift in lane count and ego-lane index. SFT+HRRP-T leverages temporal evidence and preserves consistent ego-lane predictions with a coherent five-lane topology*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与验证逻辑
 
@@ -265,7 +269,9 @@ Figure 4 展示了 RoadSceneBench 中多个代表性挑战场景及模型预测�
 ![[assets/figures/papers/paper_list_l2721_https_arxiv_org_abs_2511_22466/figures/016_Figure_6.jpg]]
 *Figure 6: Examples of RoadSceneBench. Each row displays the images contained in a clip along with their corresponding annotation information*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务谱系：从低级感知到中级语义的结构化推理
 
@@ -314,6 +320,8 @@ MapVLM 的 HRRP-T 框架与以下研究方向形成对话：
 - **奖励权重的自动化**：当前 HRRP-T 中的 α、β、γ、λ 等超参数需要手动调节。是否存在基于任务难度或模型训练动态的自适应权重调整策略，以减少人工调参负担并提升训练效率？
 
 - **跨域迁移**：MapVLM 在 RoadSceneBench 上学到的结构化推理能力，是否能迁移到其他需要拓扑推理的领域（如室内导航、机器人操作场景理解）？这需要构建跨域的中级语义基准来验证。
+
+
 
 ## 原文 PDF
 

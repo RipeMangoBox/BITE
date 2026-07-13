@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/HumanDreamer_Generating_Controllable_Human_Motion_Videos_via_Decoupled_Generation.pdf
+project_link: https://humandreamer.github.io/
+code_link: null
 aliases:
 - HumanDreamer
 tags:
@@ -40,7 +42,7 @@ claims:
 > - MotionVid subset 上，Rp-top1 为 0.451，对比 MLD 0.318，变化 41.8% relative improvement。
 > - MotionVid subset 上，Diversity 为 68.220，对比 MLD 64.442，变化 +3.778。
 
-## 概述
+## 概要
 
 **核心问题**：从文本直接生成人体运动视频面临巨大的搜索空间——模型需同时推断人体结构、运动时序与外观细节，导致动作不连贯、肢体扭曲且难以控制。现有姿态引导方法虽能改善可控性，却依赖已有视频提取姿态，丧失了文本驱动的灵活性。
 
@@ -50,7 +52,7 @@ claims:
 
 **主要结果**：在 MotionVid 子集上，HumanDreamer 的 Text-to-Pose 相较最强基线 **MLD** 实现 FID 相对改进 62.4%，R-precision Top-1 提升 41.8%；消融实验证实局部聚合、全局注意力与 LAMA 损失三者缺一不可。整体 Text-to-Video 对比中，其感官质量（0.938 vs 0.531）与指令遵循度（0.813 vs 0.688）均远超 **CogVideoX**，生成的视频运动幅度更大、语义贴合度更高。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -87,7 +89,9 @@ HumanDreamer 的核心洞察在于：**文本→姿态的映射比文本→像�
 
 为此，HumanDreamer 在 Text-to-Pose 阶段引入了三项关键设计：**MotionDiT**（集成局部特征聚合与全局注意力机制的扩散 Transformer）、**CLoP**（对比语言-运动预训练模型）以及 **LAMA 损失**（潜在语义对齐损失），以系统性地解决上述挑战。这些技术细节将在后续章节中详细展开。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 HumanDreamer 的核心创新在于将人体运动视频生成分解为 **Text-to-Pose** 和 **Pose-to-Video** 两个解耦阶段，从根本上降低了直接文本到像素映射的搜索空间复杂度。在此基础上，方法引入了三个关键的 **changed slots**，共同构成了 Text-to-Pose 阶段的核心技术贡献。
 
@@ -120,7 +124,7 @@ LAMA 损失的工作机制如下：
 
 三个 changed slots 形成递进式改进：局部聚合捕获细节 → 全局注意力保障连贯 → LAMA 损失强化语义对齐。在 MotionVid 子集上，完整方法相较于最强基线 **MLD** 实现了 **FID 62.4% 的相对改进**和 **R-precision Top-1 41.8% 的提升**（Table 1），验证了每个创新组件的有效性。
 
-## 整体框架
+
 
 HumanDreamer 将人体运动视频生成解耦为两个串行阶段：**文本到姿态生成（Text-to-Pose）** 与 **姿态到视频生成（Pose-to-Video）**。这一设计的核心动机在于，文本→姿态的映射空间远小于文本→像素的直接映射空间，因此先学习结构化的 2D 人体姿态序列，再以其作为显式先验驱动视频生成，可以显著降低建模难度，同时兼顾文本控制的灵活性与姿态引导的可控性。
 
@@ -151,7 +155,7 @@ Figure 1 给出了框架的整体示意，Figure 3 和 Figure 9 则分别展示�
 
 解耦策略的有效性得到了多组实验的验证。在 Text-to-Pose 阶段，HumanDreamer 在 MotionVid 子集上的 FID 达到 149.007，相比最强基线 MLD 的 396.949 实现了 62.4% 的相对改进；R-precision Top-1 从 0.318 提升至 0.451，相对提升 41.8%（Table 1）。在整体 Text-to-Video 评估中，HumanDreamer 的 Sensory Quality（0.938 vs. CogVideoX 的 0.531）和 Instruction Following（0.813 vs. 0.688）均显著领先（Table 7），表明解耦框架在视频质量和指令遵循方面均具有明显优势。以上证据的可信度均较高（confidence ≥ 0.95）。
 
-## 核心模块与公式推导
+
 
 HumanDreamer 的 Text-to-Pose 阶段由三个核心模块构成：**Pose VAE**、**MotionDiT** 和 **CLoP**，三者协同完成从文本到结构化 2D 姿态序列的生成。
 
@@ -224,7 +228,9 @@ $\lambda_{f}$ 为语义对齐损失的权重。消融实验证实，在 DiT+Loca
 | $g_{\omega}$ | LAMA 投影 MLP |
 | $\lambda_f$ | LAMA 损失权重 |
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -304,7 +310,9 @@ Table 7 将 HumanDreamer 的端到端 Text-to-Video 输出与 CogVideoX-5B 进�
 ![[assets/figures/papers/paper_list_l25_HumanDreamer_Generating_Controllable_Human_Motion_Videos_via_Decoupled_G/figures/014_Table_5.jpg]]
 *Table 5: Statistics of MotionVid’s eval set and HumanML3D*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 在文本驱动人体运动生成谱系中的位置
 
@@ -339,6 +347,8 @@ HumanDreamer 的设计与评估存在以下明确边界：
 **数据集扩展与泛化**：MotionVid 的进一步扩展（例如引入更多交互动作类别或 3D 标注）能否显著提升模型的泛化能力？Table 3 显示训练数据量从 50K 扩大到 1.25M 时，Rp-top1 从 0.451 单调提升至 0.513，表明数据扩展性良好，但性能增益的边际递减趋势和上限尚不明确。
 
 **两阶段误差累积的缓解**：解耦生成的两阶段设计天然存在误差累积问题——Text-to-Pose 的生成误差会传播到 Pose-to-Video 阶段。是否存在端到端微调或联合优化策略以减轻这一累积效应，同时不丧失解耦带来的灵活性和可控性优势？这是框架进一步优化的关键方向。
+
+
 
 ## 原文 PDF
 

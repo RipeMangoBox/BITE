@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/UltraLLaDA_Scaling_the_Context_Length_to_128K_for_Diffusion_Large_Language_Models.pdf
+project_link: null
+code_link: null
 openreview_forum_id: 68DGlhlvD9
 aliases:
 - UltraLLaDA
@@ -41,7 +43,7 @@ claims:
 > - NIAH-128K (检索准确率) 上，Accuracy (%) 为 100.0，对比 0.0 (LongLLaDA, >32K 失败)，变化 +100。
 > - LongBench-16K 上，加权平均分 (AVG) 为 39.98，对比 31.56 (LLaDA-8B-Base)，变化 +8.42。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -80,7 +82,7 @@ UltraLLaDA 的方法定位在于：**首次系统性地揭示了扩散LLM与自�
 
 尽管在检索和追踪任务上表现卓越，UltraLLaDA在需要聚合多个信息片段的复杂任务（如RULER AGG，48K时仅25.12分）上仍显不足。此外，在传统短上下文基准（Winogrande, ARC-c）上，扩展上下文后的模型性能有所下降，提示长上下文能力与短上下文推理之间可能存在权衡。方法的泛化性目前仅在LLaDA和Dream两种扩散模型上验证，向更大规模模型和更长上下文（如512K或1M）的扩展仍需进一步研究。
 
-## 背景与动机
+
 
 ### 扩散语言模型的长上下文困境
 
@@ -112,7 +114,9 @@ $$\lambda' = b^{-1} \cdot \left( \frac{T_{\mathrm{Ecap}}}{2\pi} \right)^{\frac{d
 
 此外，本文还探索了长上下文后训练中的**自适应注意力掩码**策略，以隔离跨文档干扰——这一问题在扩散 LLM 的全双向注意力下尤为突出。通过扩散感知 NTK 与掩码策略的协同，UltraLLaDA 在 128K 上下文下实现了 100% 的 NIAH 检索准确率和 10.45 的低困惑度，将扩散 LLM 的可处理上下文窗口扩展至训练自由基线的 8–32 倍。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 UltraLLaDA 的核心创新根植于一个被现有长上下文扩展方法系统性忽视的瓶颈：**扩散语言模型的双向注意力特性**。所有为自回归模型设计的 RoPE 扩展方法（如 NTK 感知缩放）均假定模型在预训练期间仅学习单向的、长度为 $T_{\mathrm{train}}$ 的相对位置范围。然而，扩散 LLM 的双向注意力使每个令牌在训练时实际暴露于 $[-(T_{\mathrm{train}}-1), T_{\mathrm{train}}-1]$ 的对称相对位置区间，其有效相对位置跨度约为 $2T_{\mathrm{train}}$。直接沿用自回归假设会导致位置编码扩展时对有效相对位置范围的估计严重不足，迫使模型在长上下文下退化为仅利用最近部分信息的局部感知模式，无法建立长程依赖。
 
@@ -147,7 +151,7 @@ UltraLLaDA 对比了三种策略（Figure 3）：
 
 UltraLLaDA 的两个 changed slots 形成协同效应：扩散感知 NTK 从位置编码层面保留了双向注意力习得的长程相对位置信息，自适应掩码从数据层面消除了跨文档噪声对长程依赖学习的干扰。二者共同支撑了轻量级后训练（仅 600 步）即可将上下文窗口从 4K 扩展至 128K，并在 NIAH 上实现 100% 检索准确率（Figure 1），同时将 128K 困惑度从基础模型的 343.88 压缩至 10.45（Table 1）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l41_https_openreview_net_forum_id_68DGlhlvD9/figures/002_Figure_1.jpg]]
 *Figure 1: NIAH evaluation up to 128K context-length. ULTRALLADA can find all of the needles within the context window 8–32× longer than that LONGLLADA can handle*
@@ -205,7 +209,7 @@ $$\lambda' = b^{-1} \cdot \left( \frac{T_{\text{Ecap}}}{2\pi} \right)^{\frac{d}{
 
 值得注意的是，扩散感知 NTK 本身即可作为训练自由的上下文扩展方法使用（无需模块2和模块3）。在训练自由场景下，它已在 32K NIAH 上达到 79.36% 的准确率，显著优于基线 NTK 的 75.28%（Figure 2c）。模块2和模块3的叠加则进一步将性能推向极致——UltraLLaDA 在 128K NIAH 上实现 100% 检索准确率，而训练自由基线 LongLLaDA 在 32K 时已退化至约 20% 且无法超越 32K（Figure 1）。
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题定位：自回归 NTK 缩放为何在扩散 LLM 上失效
 
@@ -265,7 +269,9 @@ $$
 
 其中 $m$ 为掩码令牌，$p_{\pmb{\theta}}$ 由双向 Transformer 参数化，$t$ 为扩散时间步。该目标与预训练完全一致，仅上下文长度和位置编码发生了改变，确保后训练不会引入分布偏移。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -340,7 +346,9 @@ $$d'_{\text{crit}} = 2\left\lceil \frac{d}{2} \log_b \frac{T_{\text{cap}}}{2\pi}
 ![[assets/figures/papers/paper_list_l41_https_openreview_net_forum_id_68DGlhlvD9/figures/017_Table_9.jpg]]
 *Table 9: Comparison between diffusion-aware NTK and baseline NTK on long-context evaluation*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心问题定位
 
@@ -393,6 +401,8 @@ $$
 4. **极限扩展的可行性**：扩散感知 NTK 框架是否能够扩展到更大的模型（如 70B 级别）以及更长的上下文（如 512K 或 1M）？在这些极限设置下，仅 600 步的轻量级后训练是否仍然足够？
 
 5. **掩码策略的泛化**：如何将自适应掩码策略泛化到多模态扩散模型或需要跨文档推理的任务中，而不引入额外的计算开销？
+
+
 
 ## 原文 PDF
 

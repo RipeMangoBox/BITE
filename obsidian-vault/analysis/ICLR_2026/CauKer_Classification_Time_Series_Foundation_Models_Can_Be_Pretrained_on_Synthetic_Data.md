@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/CauKer_Classification_Time_Series_Foundation_Models_Can_Be_Pretrained_on_Synthetic_Data.pdf
+project_link: null
+code_link: https://github.com/ShifengXIE/CauKer
 openreview_forum_id: xBW2FIfswU
 aliases:
 - CauKer
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | CauKer：分类时间序列基础模型可通过合成数据进行预训练 |
 | 英文题名 | CauKer: Classification Time Series Foundation Models Can Be Pretrained on Synthetic Data |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=xBW2FIfswU); [GitHub](https://github.com/ShifengXIE/CauKer) |
+| Links | [paper](https://openreview.net/forum?id=xBW2FIfswU) · [GitHub](https://github.com/ShifengXIE/CauKer) |
 | Topic | #topic/benchmarks_datasets_evaluation #topic/benchmarks_datasets_evaluation/benchmark_eval |
 | Method | CAUKER |
 | Dataset | UCR (128 datasets), WOODS (17 datasets) |
@@ -41,7 +43,7 @@ claims:
 > - UCR (128 datasets) 上，平均零样本准确率 为 Mantis pretrained on 100K CAUKER (78.55%)，对比 Original Mantis pretrained on 1.89M real series (78.66%)，变化 -0.11%。
 > - UCR (128 datasets) 上，平均零样本准确率 为 MOMENT pretrained on 10M CAUKER (77.49%)，对比 Original MOMENT pretrained on 13M real series (78.85%)，变化 -1.36%。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -65,7 +67,7 @@ claims:
 
 CAUKER面向**分类导向的合成TSFM预训练**，在方法谱系中处于GP核合成与因果生成模型的交叉点。与面向预测的零均值核合成方法（KernelSynth）不同，CAUKER保留均值函数作为判别线索；与面向表格分类的SCM方法（TabPFN生成器）不同，CAUKER通过GP注入时序结构。下游验证覆盖Mantis（对比预训练编码器，Feofanov et al., ICLR 2025）和MOMENT（掩码预训练编解码器，Goswami et al., ICML 2024）两种代表性TSFM架构。
 
-## 背景与动机
+
 
 时间序列分类是医疗诊断、工业监测、行为识别等领域的核心任务。近年来，时间序列基础模型（TSFM）通过在大量无标签时间序列上进行自监督预训练，展现出强大的零样本迁移能力。然而，这类模型的预训练高度依赖大规模真实世界数据集，而真实数据的获取面临隐私限制、标注成本高昂、领域覆盖不均等瓶颈。合成数据因此成为替代方案，但其有效性取决于一个关键前提：合成数据能否同时捕捉时间序列中的**时序模式**（如季节性、趋势）和**判别性聚类结构**。
 
@@ -75,7 +77,9 @@ CAUKER面向**分类导向的合成TSFM预训练**，在方法谱系中处于GP�
 
 本文的核心动机正是打破这一瓶颈：**能否设计一种生成框架，将GP的时序多样性与SCM的因果语义统一起来，使得合成数据既能覆盖丰富的时序模式，又能形成可判别的类别聚类，从而支撑分类TSFM的高效预训练？** 这一问题的解决将使得在纯合成数据上预训练的TSFM能够接近甚至匹配大规模真实数据预训练的性能，同时展现出可预测的缩放行为。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CAUKER的核心创新在于首次将**高斯过程（GP）核组合**与**结构因果模型（SCM）**统一为一个合成数据生成框架，从而同时解决了现有合成数据生成方法的两大缺陷：无法捕捉时序模式（季节性、趋势）与无法构建判别性聚类结构。这一统一设计使分类时间序列基础模型（TSFM）在纯合成数据上预训练即可获得与大规模真实数据集相当的零样本性能，并展现出清晰的缩放律。
 
@@ -103,7 +107,7 @@ CAUKER的优势源于一个关键的因果机制：**GP核组合负责时序多�
 
 CAUKER的核心创新在UCR基准（128个数据集）上获得了强有力验证：Mantis在10万CAUKER合成样本上预训练即可达到78.55%的零样本准确率，几乎匹配其在189万真实序列上预训练的性能（78.66%）（Table 7）。然而，以下方面仍需进一步验证：当前设计主要针对单变量固定长度序列（L=512），扩展到多变量和变长场景的有效性尚待考察；SCM图结构采用随机生成，是否可通过自动化优化进一步提升性能仍是开放问题。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_xBW2FIfswU/figures/001_Figure_1.jpg]]
 *Figure 1: An illustration of the proposed CAUKER pipeline. Kernels sampled from the kernel bank K are randomly combined and used together with sampled mean functions to form GP priors. Time series sampled from these GP priors act as root nodes in a directed acyclic graph that encodes causal dependencies between nodes. Each edge of this graph applies an activation function from a predefined activation function bank and aggregates over incoming edges using a random linear transformation to propagate transformed time series through the graph. Intermediate node outputs are optionally interpolated to fixed length, forming the final synthetic dataset. This procedure yields rich, diverse, and causally consi...*
@@ -150,7 +154,7 @@ CAUKER 与既有合成数据生成方法的本质区别在于三个维度的设�
 
 Table 3 对比了主流 TSFM 的预训练数据来源。现有模型主要依赖真实世界数据（如 Chronos、MOMENT、Mantis），少数方法（如 TabPFN）使用纯合成数据但面向表格分类，缺乏时序结构建模能力。CAUKER 填补了这一空白：它专为时间序列分类设计合成预训练语料，在纯合成数据上预训练的 TSFM 可获得与大规模真实数据预训练相当的零样本性能（Mantis 在 10 万 CAUKER 样本上预训练达到 78.55%，接近原始 189 万真实序列预训练的 78.66%）。
 
-## 核心模块与公式推导
+
 
 CAUKER 生成流水线由五个核心模块串联构成，其关键洞察在于将高斯过程（GP）核组合与结构因果模型（SCM）统一起来：GP 核组合赋予合成序列时序模式（季节性、趋势），SCM 通过有向边传播注入因果语义，而非零均值函数则保留为判别性线索。
 
@@ -190,7 +194,9 @@ $$t_{v_j} = \phi(v_j)(W \times [e_{.j}] + b)$$
 
 Table 2 的运行时分解揭示了关键瓶颈：GP 核采样耗时 118.54 秒，占总生成时间（121.64 秒）的 97% 以上；而 SCM 结构构建与传播仅需 1.14 秒，占比不足 1%。这意味着 CAUKER 的因果注入几乎不增加计算成本，主要开销集中在 GP 先验的采样阶段。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心结果：合成数据生成方法对比
 
@@ -299,7 +305,9 @@ CAUKER在UCR基准（128个数据集）的零样本分类评估中，对两种�
 *Table 6: Global and local alignment between UCR and synthetic corpora. Lower is better for SWD; higher is better for CKNNA. Means ± s.d. across five independent synthetic draws, then averaged over UCR datasets*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 合成数据生成方法的演进定位
 
@@ -349,6 +357,8 @@ CAUKER 的独特价值在于：Mantis 仅需 10 万 CAUKER 合成样本即可达
 4. **合成数据的预测能力上限**：CAUKER 合成数据能否通过进一步扩大规模来匹配甚至超越 Chronos 所用的 84B 观测数据，从而实现强大预测模型的纯合成预训练？当前 100 万样本的初步实验已显示竞争力，但规模上限尚未探明。
 
 5. **计算瓶颈的缓解**：GP 核采样占据总生成时间 97% 以上（118.54s / 121.64s），虽然 SCM 层开销不足 1%，但整体生成大规模数据集时计算成本仍较高。核采样的近似加速或缓存复用策略值得探索。
+
+
 
 ## 原文 PDF
 

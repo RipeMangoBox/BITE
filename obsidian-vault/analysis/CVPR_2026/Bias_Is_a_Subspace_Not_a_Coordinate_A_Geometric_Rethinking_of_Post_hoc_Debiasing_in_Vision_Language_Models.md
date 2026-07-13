@@ -43,7 +43,7 @@ claims:
 > - 多任务综合（零样本分类、检索、生成等） 上，平均公平性指标提升 18.5% 平均提升 vs 最佳去偏基线 (+18.5%)。
 > - 文本图像生成（SDXL + CoDi） 上，总体不匹配率（Overall Mismatch Rate） 0.78±0.65 (SDXL SPD), 2.53±0.89 (CoDi SPD) vs SDXL 基线较高, CoDi 基线较高（原文 Table 5） (显著降低)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -83,7 +83,7 @@ SPD 的独特之处在于将偏见识别从特征重要性排序提升为子空�
 
 消融实验进一步验证了中性重注入的保真度作用、低置信阈值 τ=0.7 的最佳平衡点，以及投影方向数 r=5 在检索任务中的公平性-效用最优折衷（Table 6-8）。
 
-## 背景与动机
+
 
 ### 后验去偏的坐标假设及其局限
 
@@ -112,7 +112,9 @@ Table 3 的线性探针实验提供了最直接的证据。在原始 FairFace �
 
 上述三个实证发现共同指向一个核心洞察：**偏差在嵌入空间中的几何结构是一个低维线性子空间，而非孤立的坐标集**。这一认知促使本文从几何视角重新思考后验去偏问题——将干预操作从离散的坐标替换转变为在学习的偏差子空间上进行正交投影。这种范式转换有望实现三个关键突破：（1）通过投影完整移除线性可解码的偏差信息；（2）避免坐标方法固有的特征纠缠问题；（3）利用子空间结构的稳健性提升跨数据集泛化能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 创新动机：坐标级去偏的三大失效模式
 
@@ -162,7 +164,7 @@ SPD 属于**测试时后验去偏（Post-hoc Test-time Debiasing）** 方法，�
 
 SPD 的核心贡献在于将去偏操作从“坐标索引的离散替换”重新定义为“偏差子空间的几何投影”，这一视角转换使得方法在去偏完全性（线性探针准确率降至接近随机水平）、跨数据集稳健性（不依赖固定坐标索引）和多属性兼容性（子空间投影避免特征纠缠）三个维度上实现了对坐标类方法的系统性超越。
 
-## 整体框架
+
 
 ### 从坐标编辑到子空间投影的范式转换
 
@@ -207,7 +209,7 @@ SPD 是一种**训练无关的后验方法**，输入为冻结编码器（如 CL
 ![[assets/figures/papers/paper_list_l2375_https_arxiv_org_abs_2511_18123/figures/004_Figure_1.jpg]]
 *Figure 1: Overview of our framework SPD in 2D schematic. (1) We first identify the bias subspace set U via T iterative logistic classifiers, each extracts and removes a bias-predictive direction. (2) We then estimate a neutral mean*
 
-## 核心模块与公式推导
+
 
 SPD 将偏差消除重新定义为一个几何投影问题，其核心由三个模块串联构成：偏差子空间识别、子空间投影和中性均值重注入。
 
@@ -259,7 +261,9 @@ $$x'' = x' + U^{\top} (U \bar{x}_{\mathrm{low}})$$
 ![[assets/figures/papers/paper_list_l2375_https_arxiv_org_abs_2511_18123/figures/001_Table_2.jpg]]
 *Table 2: Intersection of top-m gender dimensions between Fair-Face and FACET. Weak alignment shows that direct embedding fails to achieve robust and effective cross-dataset transfer*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心假设的实证瓦解：偏差是子空间而非坐标
 
@@ -333,7 +337,9 @@ $$x'' = x' + U^{\top} (U \bar{x}_{\mathrm{low}})$$
 ![[assets/figures/papers/paper_list_l2375_https_arxiv_org_abs_2511_18123/figures/009_Table_8.jpg]]
 *Table 8: Text-to-image retrieval (Flickr30K) results for CLIP (ResNet50) with varying r*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 坐标级去偏范式的瓶颈与SPD的定位
 
@@ -376,6 +382,8 @@ SPD 的有效性建立在偏差主要存在于线性可解码子空间这一前�
 4. **交叉性偏差的处理**：SPD 的子空间框架是否可以通过学习联合属性子空间或条件子空间来处理交叉性偏差？例如，学习“性别×种族”的交互子空间而非独立子空间的简单拼接。
 
 5. **跨模态与跨架构推广**：SPD 的子空间投影思想能否推广至其他基础模型，如纯语言模型（LLM）的嵌入空间或音频-视觉联合嵌入空间？不同模态中偏差子空间的几何结构是否存在普适规律？
+
+
 
 ## 原文 PDF
 

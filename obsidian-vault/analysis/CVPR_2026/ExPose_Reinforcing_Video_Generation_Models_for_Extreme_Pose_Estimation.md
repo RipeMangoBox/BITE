@@ -44,7 +44,7 @@ claims:
 > - NAVI 上，AUC↑ 75.37 vs 72.14 (InterPose) (+3.23)。
 > - Cambridge Landmarks 上，MRE↓ 11.48 vs 15.36 (InterPose) (-3.88)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有视频生成模型在合成中间帧时缺乏3D一致性，导致生成的帧在空间上不可信，进而降低极限视角下姿态估计的准确性。直接使用两视图姿态估计器（如**VGGT**，Wang et al., CVPR 2025）在极端视角变化下误差较大，而基于测试时缩放的重采样策略（如**InterPose**，Cai et al., CVPR 2025）虽有所改善，仍未能从根本上解决几何一致性问题。
 
@@ -54,7 +54,7 @@ claims:
 
 **方法定位**：ExPose属于“生成增强式姿态估计”范式，不同于直接估计或纯测试时增强方法，它通过在线强化学习将视频生成模型转化为几何感知的中间帧合成器，为极限姿态估计提供了一条新的技术路径。
 
-## 背景与动机
+
 
 相机姿态估计是三维视觉的基础任务，旨在从图像中恢复相机的6自由度位姿。在自动驾驶、机器人导航和增强现实等应用中，系统经常需要在视角变化剧烈的条件下运行。然而，当参考图像与目标图像之间的基线极大、视角重叠极小时——即所谓的**极限姿态估计**场景——传统方法面临根本性困难。
 
@@ -72,7 +72,9 @@ ExPose 的核心洞察在于：与其被动接受视频生成模型的输出，�
 
 这一思路将问题从“生成好看的视频再做姿态估计”转变为“为姿态估计而生成几何正确的视频”，从而在因果链条上直接针对瓶颈进行干预。实验表明，这种目标对齐策略在多个极限姿态估计基准上带来了显著且一致的性能提升，超越了所有现有方法。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ExPose的核心创新在于**将视频生成模型的输出与下游姿态估计目标对齐**，通过在线强化学习以姿态误差为奖励信号，使生成的中间帧保持几何一致性，从而显著提升极限视角下的姿态估计性能。与直接使用预训练视频生成模型（如LTX-Video、DynamiCrafter）合成中间帧的基线方法相比，ExPose在四个关键维度上引入了根本性改变。
 
@@ -106,7 +108,7 @@ $$r_{\mathrm{div}}(i) = \lambda_{\mathrm{div}} \cdot \frac{1}{B-1} \sum_{j \neq 
 
 上述四个改变槽位形成了完整的因果链条：SFT提供稳定初始化，避免RL阶段的剧烈波动；GRPO通过姿态奖励注入3D一致性信号，直接将生成质量与下游任务性能挂钩；PIC约束相机轨迹的物理合理性；多样性奖励防止策略坍缩至有限路径，确保探索充分的解空间。这一设计使得ExPose在DL3DV数据集上将MRE从VGGT的54.28降至33.78，并显著优于专门设计的InterPose（45.22）。
 
-## 整体框架
+
 
 ExPose 的核心思路是将视频生成模型重塑为极限视角姿态估计的几何一致性增强器。其整体 pipeline 由三个互补的训练阶段构成，共同驱动视频生成器 $G_\phi$ 学会从稀疏的参考–目标图像对中合成有利于下游姿态估计的中间帧。
 
@@ -133,7 +135,7 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{GRPO}} + \lambda_{\mathrm{SFT}} \mathcal{L}
 ![[assets/figures/papers/paper_list_l2481_https_openaccess_thecvf_com_content_CVPR2026_html_Yoon_ExPose_Reinforcin/figures/002_Figure_2.jpg]]
 *Figure 2: Pipeline overview. During training, an auxiliary frame*
 
-## 核心模块与公式推导
+
 
 ExPose 的训练流程由四个互补模块构成：伪视频监督微调（SFT）、姿态引导的在线 GRPO 强化学习、姿态插值约束（PIC）以及多样性探索奖励。这些组件协同工作，将视频生成模型的输出与下游姿态估计目标对齐。
 
@@ -217,7 +219,9 @@ SFT 损失在 RL 阶段持续发挥作用，防止生成质量退化。总奖励
 ![[assets/figures/papers/paper_list_l2481_https_openaccess_thecvf_com_content_CVPR2026_html_Yoon_ExPose_Reinforcin/figures/004_Figure_4.jpg]]
 *Figure 4: Diversity reward. Given the reference frame, we track points across generated trajectories and reward samples that exhibit larger motion diversity. This encourages our model to explore a wider range of camera paths in the early stage*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -280,7 +284,9 @@ ExPose 以 **LTX-Video**（HaCohen et al., arXiv 2024）作为基础视频生成
 ![[assets/figures/papers/paper_list_l2481_https_openaccess_thecvf_com_content_CVPR2026_html_Yoon_ExPose_Reinforcin/figures/011_Figure_6.jpg]]
 *Figure 6: Ablation study of the number of intermediate frame. Mean pose errors (MRE and MTE) decrease with an increasing number of intermediate frames and converge beyond seven frames*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -325,6 +331,8 @@ ExPose 的有效性依赖于几个关键前提，这些前提构成了其适用�
 4. **复杂运动的轨迹先验**：姿态插值约束假设相机中心沿直线平滑移动。对于包含大角度旋转与平移耦合的运动，是否需要更精细的轨迹先验（如样条曲线或物理约束）？
 
 5. **与稀疏视角重建的联合优化**：ExPose 目前以姿态估计为单一目标。能否将其与稀疏视角场景重建联合优化，使生成的中间帧同时服务于位姿估计和3D结构恢复，形成闭环提升？
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/ECHO_Ego_Centric_modeling_of_Human_Object_interactions.pdf
+project_link: https://www.projectaria.com/glasses/
+code_link: null
 aliases:
 - ECHO
 tags:
@@ -40,15 +42,13 @@ claims:
 > - OMOMO 上，MPJPE (cm) 6.0±0.1 vs 6.6±0.1 (EgoAllo+H+O) (-0.6)；E_v2v (cm) 26.5±1.1 vs 30.8±0.9 (EgoAllo+H+O) (-4.3)。
 > - AMASS (human motion only) 上，MPJPE (cm) 7.4±0.1 vs 8.9±0.1 (EgoAllo+H+O) (-1.5)。
 
-## 概述
+## 概要
 
 从稀疏可穿戴传感器（头部与手腕追踪）中联合重建全身姿态、物体运动及接触动态，是一个高度欠约束的问题。现有方法缺乏统一的框架来建模人体、物体与接触这三种模态之间的相互依赖关系，导致交互重建中出现物体穿透、漂浮等物理不一致现象。
 
 **ECHO** 是首个仅依赖头部与手腕三点追踪信号，即可联合恢复全身人-物交互（HOI）序列的统一框架。其核心方法是一种**三变量扩散过程**，为人体运动（$\mathcal{H}$）、物体轨迹（$\mathcal{O}$）和接触序列（$\mathcal{I}$）分配独立的噪声调度，从而实现对任意模态组合与部分观测的灵活条件化。这一设计使模型能够联合训练于大规模人体运动数据集（AMASS）与小型人-物交互数据集（BEHAVE、OMOMO），在习得强人体运动先验的同时捕获精细的交互细节。
 
 在推理阶段，ECHO 结合**平滑修补**与**自监督引导**，从稀疏、间歇性的输入中实时生成长期物理一致的交互序列。实验表明，ECHO 在 BEHAVE 和 OMOMO 数据集上的人体与物体重建指标均优于基线方法（例如 OMOMO 上人体 MPJPE 降至 6.0 cm，物体顶点误差 $E_{v2v}$ 降至 26.5 cm），且在 90% 手腕追踪丢失的情况下性能仅轻微退化，展现出对传感器噪声的高鲁棒性。
-
-## 背景与动机
 
 ### 问题背景：从稀疏可穿戴信号重建人-物交互
 
@@ -78,7 +78,7 @@ claims:
 
 在推理阶段，ECHO 通过**平滑修补**（smooth inpainting）和**自监督引导**（reconstruction guidance）技术，能够从稀疏、间歇性的传感器输入中实时生成长期物理一致的交互序列。实验表明，即使在 90% 手腕追踪丢失的极端情况下，ECHO 的性能仅轻微退化（MPJPE 7.7 vs 6.0），展现出对传感器噪声的高度鲁棒性。
 
-## 核心创新
+## 核心方法与创新机理
 
 ECHO 的核心创新在于将人-物交互（HOI）重建从一个多阶段、脆弱的过程重构为一个**统一的三变量扩散生成问题**。针对从稀疏可穿戴传感器（仅头部与手腕追踪）信号中联合恢复全身姿态、物体运动及接触这一高度欠约束的瓶颈，ECHO 通过以下关键设计实现了突破。
 
@@ -110,8 +110,6 @@ $$\hat{\mathcal{H}}_{\mathcal{W}}^{\tau_{\mathcal{H}}} := \alpha\hat{\mathcal{H}
 ECHO 将 AMASS（纯人体运动）与 BEHAVE、OMOMO（人-物交互）联合训练，通过可学习 token 区分有无物体的场景。这一策略使模型从大规模运动数据中习得强人体运动先验——在 AMASS 人体运动生成上，ECHO 取得 MPJPE 7.4，显著优于不使用 AMASS 的变体（NoAMASS MPJPE 43.1, Table 2），证明联合训练是解决 HOI 数据稀缺问题的有效路径。
 
 **创新总结**：ECHO 通过独立噪声调度的三变量扩散、接触模态的显式桥梁作用、平滑修补与引导推理，以及联合训练策略，将稀疏可穿戴信号下的 HOI 重建统一为灵活、鲁棒的生成框架，在 BEHAVE 和 OMOMO 上全面超越基线（Table 1），并在 90% 手腕追踪丢失时仍保持稳定性能（Table 3）。
-
-## 整体框架
 
 ECHO 是一个以自我为中心的人-物交互（HOI）重建框架，其核心目标是仅从头戴式设备与腕部追踪器提供的稀疏 3 点信号（头部、左手腕、右手腕）中，联合恢复全身人体运动、物体运动以及接触动态。该框架围绕一个统一的 Transformer 扩散模型构建，将人体运动 $\mathcal{H}$、物体运动 $\mathcal{O}$ 和接触序列 $\mathcal{I}$ 作为三个独立模态进行联合建模。
 
@@ -172,8 +170,6 @@ $$(\hat{\mathcal{H}},\hat{\mathcal{O}},\hat{\mathcal{I}}) := (\hat{\mathcal{H}},
 ![[assets/figures/papers/paper_list_l1678_ECHO_Ego_Centric_modeling_of_Human_Object_interactions/figures/001_Figure_1.jpg]]
 *Figure 1: ECHO. Inferring complex interactions from sparse wearable signals is challenging. ECHO is the first method to jointly recover full-body Human-Object Interaction sequences (top) solely from sparse 3-point tracking. Our flexible framework supports various inference modes (bottom), leveraging partial or intermittent observations (shown in red) of human pose, object trajectory, or contact dynamics*
 
-## 核心模块与公式推导
-
 ECHO 的核心是一个基于 Diffusion Transformer (DiT) 的三变量扩散模型，其设计围绕一个中心洞察：人体运动（H）、物体轨迹（O）和接触序列（I）三者之间存在强相互依赖，但各自的不确定性结构和观测条件不同。为此，模型为三个模态分配独立的噪声调度，使它们可以在同一框架内被联合去噪，同时允许任意模态的组合条件化与部分观测。
 
 ### 表示空间定义
@@ -233,7 +229,7 @@ ECHO 的条件输入由两部分组成：
 
 这些条件与带噪模态序列一同送入 DiT 骨干网络，网络使用旋转位置嵌入捕获时序依赖。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -294,16 +290,13 @@ Fig. 5展示了ECHO与基线方法在多样化交互场景下的定性对比。E
 ![[assets/figures/papers/paper_list_l1678_ECHO_Ego_Centric_modeling_of_Human_Object_interactions/figures/009_Table_3.jpg]]
 *Table 3: Evaluation of ECHO with noise simulation. We demonstrate the robustness of ECHO to intermittent hand tracking by randomly dropping a percentage of the input. The model maintains stable performance even with significant missing hand tracking data, confirming its resilience to sensor noise*
 
-![[assets/figures/papers/paper_list_l1678_ECHO_Ego_Centric_modeling_of_Human_Object_interactions/figures/010_Table_4.jpg]]
-*Table 4: Evaluation of ECHO with sparse tracking. We demonstrate the versatility of ECHO by providing additional sparse tracking information alongside egocentric conditioning. Providing partial information for one modality (Human or Object) significantly improves its reconstruction quality and helps regularize the other*
-
 ![[assets/figures/papers/paper_list_l1678_ECHO_Ego_Centric_modeling_of_Human_Object_interactions/figures/005_Figure_5.jpg]]
 *Figure 5: Qualitative results of ECHO. Our method accurately reconstructs humanobject interactions across diverse scenarios. In contrast, competing methods often fail to capture correct contact dynamics, leading to artifacts such as object penetration or floating. For dynamic visualizations, please refer to the supplementary video*
 
 ![[assets/figures/papers/paper_list_l1678_ECHO_Ego_Centric_modeling_of_Human_Object_interactions/figures/006_Figure_6.jpg]]
 *Figure 6: \ Fig. 6: Qualitative results of ECHO. We demonstrate generalization to novel motion and objects from the Aria Digital Twin [65]; RGB is included for reference*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 核心问题定位：从稀疏穿戴信号重建全身人-物交互
 

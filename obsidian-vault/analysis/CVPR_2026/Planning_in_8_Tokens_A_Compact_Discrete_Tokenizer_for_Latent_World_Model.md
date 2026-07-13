@@ -43,7 +43,7 @@ claims:
 > - RoboNet IDM 上，L1 error↓ 0.091 (CompACT 16 tok) vs 0.093 (Target tokenizer 256 tok) (略优)；R²↑ 0.716 (CompACT 16 tok) vs 0.684 (Target tokenizer) (提升4.7%)。
 > - RoboNet Video Prediction 上，APE↓ 0.1122 (CompACT) vs 0.3383 (Target tokenizer) (降低约67%)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -65,7 +65,7 @@ CompACT在方法谱系中占据独特位置：它不同于**SD-VAE**等追求高
 
 在RECON导航基准上，CompACT使用16个离散令牌即达到与SD-VAE（784个连续令牌）相当的规划精度（ATE: 1.330 vs 1.262），同时将规划延迟从178.78秒降至5.78秒，**加速约31倍**；使用8个令牌时延迟进一步降至4.83秒，**加速约37倍**。在RoboNet的逆向动力学评估中，CompACT的16个令牌保留的动作相关信息优于16倍令牌数的目标分词器（R²: 0.716 vs 0.684）。消融实验证实，生成式解码是压缩的关键——替换为直接重建会导致重建质量急剧恶化（rFID从2.40飙升至28.80），而冻结视觉编码器优于微调（ATE: 1.330 vs 1.500），印证了保留语义而非重建特征的设计原则。
 
-## 背景与动机
+
 
 ### 决策时间规划中的效率瓶颈
 
@@ -105,7 +105,9 @@ CompACT 的核心洞察是：**规划不需要看到每一个像素，它只需�
 2. 通过**生成式解码**而非直接重建来验证压缩质量，确保紧凑令牌保留了足够的语义信息；
 3. 在导航和操作任务上实现与高令牌数方案**相当的规划精度**，同时将规划延迟降低 **30–80 倍**。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CompACT 的核心创新在于**将视觉分词器的设计目标从“精确重建”转向“规划保留”**，通过三个关键设计槽位的协同改变，实现了极端压缩下的高效决策时间规划。
 
@@ -129,7 +131,7 @@ CompACT 使用**有限标量量化（FSQ）** 将连续特征映射为离散令�
 
 三个槽位的协同改变形成了一条清晰的因果链：**冻结语义编码器**确保令牌保留规划相关信息 → **极端压缩**消除计算瓶颈 → **生成式解码**弥补感知细节的丢失。这一设计哲学的本质是将分词器从“通用图像压缩器”重新定位为“规划任务的信息瓶颈”，以放弃精准重建为代价，换取 1–2 个数量级的规划加速。
 
-## 整体框架
+
 
 CompACT 的整体框架由三个核心模块串联而成：**紧凑分词器**（CompACT Tokenizer）、**潜在世界模型**（Latent World Model）与**决策时间规划器**（CEM Planner）。该框架的核心思想是将高维图像观测压缩为极少量的离散语义令牌，在低维潜在空间中完成下一状态预测与动作序列优化，从而将规划延迟降低 1–2 个数量级，同时保持与高维连续分词器相当的规划精度。
 
@@ -165,7 +167,7 @@ Figure 1 给出了框架的全景概览，其数据流可概括为以下三个�
 
 > **注意**：解码器仅在训练分词器或需要可视化时使用；规划过程中完全在潜在空间中进行，无需像素级重建，这是实现 40–80 倍加速的根本原因。
 
-## 核心模块与公式推导
+
 
 ### 3.1 潜在世界模型形式化
 
@@ -252,7 +254,9 @@ $$\mathcal{L}_{\mathrm{world}} = - \mathbb{E}_{z_t, a_t, z_{t+1}} \left[ \log p(
 ![[assets/figures/papers/paper_list_l2570_https_arxiv_org_abs_2603_05438/figures/018_Figure_9.jpg]]
 *Figure 9: Inverse Dynamics Model (IDM) architecture. Consecutive frames are tokenized and processed through a transformerbased frame encoder, which produces a single conditioning vector via average pooling. This vector conditions an action denoiser implemented as a diffusion policy [11], which predicts the action taken between the two frames*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计逻辑
 
@@ -335,7 +339,9 @@ Table 8 报告了在 RoboMimic Lift 任务上的闭环操纵结果。需要注�
 
 NWM 基线复现时使用了 CDiT-B（原始论文使用 CDiT-XL），并排除了 Tartan 和 Ego4D 数据集以控制资源消耗。尽管如此，复现的基线 ATE 1.262 与原始报告值 1.13 处于可比范围。所有延迟测量均在单张 RTX 6000 Ada GPU 上完成，实际部署时可能因硬件差异而变化。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题域定位：从像素世界模型到语义压缩
 
@@ -385,6 +391,8 @@ CompACT 开辟了多个值得探索的方向：
 3. **端到端整合**：CompACT 的紧凑令牌能否直接整合到端到端强化学习策略中，实现全闭环控制，而非仅用于模型预测控制？
 4. **扩散世界模型加速**：紧凑令牌是否也能加速基于扩散的世界模型（如视频生成模型）中的规划，将 CompACT 的压缩思想推广到更广泛的生成式规划框架？
 5. **本体感知融合**：将实时观察和本体感知纳入 IDM 和规划循环，可能显著提升闭环操纵性能，这是从仿真到真实部署的关键一步。
+
+
 
 ## 原文 PDF
 

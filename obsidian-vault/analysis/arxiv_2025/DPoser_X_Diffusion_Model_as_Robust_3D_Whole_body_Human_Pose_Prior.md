@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/DPoser_X_Diffusion_Model_as_Robust_3D_Whole_body_Human_Pose_Prior.pdf
+project_link: https://dposer.github.io/
+code_link: null
 aliases:
 - DX
 - DXDMAR3WBHPP
@@ -43,7 +45,7 @@ claims:
 > - AMASS (motion denoising, 40mm noise) 上，MPJPE 19.87 vs 22.69 (HuMoR) (-2.82)。
 > - ReInterHand (hand IK, sparse) 上，MPJPE 3.21 vs 8.25 (VPoser) (-5.04)。
 
-## 概述
+## 概要
 
 三维人体姿态先验是连接二维观测与三维重建的关键桥梁，广泛服务于人体网格恢复、运动去噪、姿态补全与生成等任务。然而，现有先验面临双重瓶颈：**表达能力受限**——高斯混合模型（GMM）或变分自编码器（VAE）难以覆盖真实姿态分布的长尾与多模态特性；**数据匮乏**——高质量全身姿态数据的稀缺进一步制约了复杂交互场景下的建模能力。这导致传统先验（如 VPoser、Pose-NDF、NRDF）在多样性与泛化性之间长期失衡。
 
@@ -53,7 +55,7 @@ claims:
 
 DPoser-X 的局限性同样值得关注：训练数据偏向常见站立动作，对瑜伽等极端姿态泛化不足；变分扩散采样的模式寻求特性导致生成多样性受限（Recall 仅 0.163），难以覆盖真实分布的长尾区域；对低质量二维关键点估计较为敏感。这些开放问题指向未来方向：通过重要性采样或粒子变分推断增强分布覆盖，以及在盲逆问题中联合建模测量算子与数据分布。
 
-## 背景与动机
+
 
 三维人体姿态建模是计算机视觉与图形学中的核心问题，其关键在于构建能够刻画真实人体运动分布的先验模型。此类先验不仅需要生成自然、多样化的姿态，还必须能够作为通用正则化组件嵌入各类下游任务，如人体网格恢复、运动去噪和姿态补全。
 
@@ -65,7 +67,9 @@ DPoser-X 的局限性同样值得关注：训练数据偏向常见站立动作�
 
 本文提出 **DPoser-X**，旨在以扩散模型为核心构建一种鲁棒、通用且可扩展的三维全身人体姿态先验。核心动机在于：将姿态估计、补全、去噪等异构任务统一建模为逆问题，利用扩散模型的噪声预测过程作为通用的正则化项，通过测试时优化实现任务无关的即插即用。针对全身数据匮乏问题，进一步提出混合训练策略，融合局部数据集与全身数据集，在保持泛化能力的同时显著提升全身姿态建模精度。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DPoser-X 的核心创新在于将**无条件扩散模型**引入三维人体姿态先验领域，并通过一系列针对姿态数据特性的设计，系统性地突破了现有先验方法的表达能力瓶颈。其创新点可归纳为四个关键维度的“changed slots”。
 
@@ -93,7 +97,7 @@ $$t = t_{\mathrm{max}} - \frac{(t_{\mathrm{max}} - t_{\mathrm{min}}) \times \mat
 
 高质量全身姿态数据的匮乏是全身先验建模的主要障碍。DPoser-X 提出**混合训练策略**：冻结预训练的身体、手部、脸部分部模型，仅训练一个融合模块；同时利用分部数据集（仅有部分关节标注）和全身数据集进行训练，对分部数据仅计算可用部分的损失，对全身数据则随机掩码部分关节以防止网络对缺失部分产生任意预测。该策略使 DPoser-X-mixed 的手部误差 PA-MPVPE_hands 降至 15.83，显著优于基础版本（17.54）和仅融合版本（17.79）（Table 11），有效缓解了数据匮乏问题。
 
-## 整体框架
+
 
 DPoser-X 的核心思路是将**无条件扩散模型**作为三维人体姿态的通用先验，通过**变分扩散采样**将其嵌入各类姿态逆问题的测试时优化中。整个框架围绕三个关键设计展开：扩散先验的学习、先验与任务损失的融合机制、以及面向全身姿态的混合训练策略。
 
@@ -166,7 +170,7 @@ DPoser-X 将全身姿态拆分为身体、手部、面部三个部分，分别�
 ![[assets/figures/papers/paper_list_l8_DPoser_X_Diffusion_Model_as_Robust_3D_Whole_body_Human_Pose_Prior_motion20v2/figures/001_Figure_1.jpg]]
 *Figure 1: An overview of DPoser-X’s versatility and performance across multiple pose-related tasks. Built on diffusion models, DPoser-X serves as a robust and adaptable prior for 3D whole-body human pose modeling. Shown are scenarios in (a) pose generation, (b) human mesh recovery, and (c) pose completion. With up to 61% improvement across 8 benchmarks, DPoser-X consistently outstrips existing priors like VPoser [51] and NRDF [24], proving its superiority in tasks involving the human body, hand, and face*
 
-## 核心模块与公式推导
+
 
 DPoser-X 的核心是将无条件扩散模型作为三维人体姿态的通用先验，并通过变分扩散采样将其嵌入各类姿态逆问题的测试时优化中。其方法体系由三个关键模块构成：**扩散姿态先验学习**、**DPoser 正则化与逆问题求解**、以及**截断时间步调度**。以下逐一展开其公式推导与设计逻辑。
 
@@ -261,7 +265,9 @@ $$
 ![[assets/figures/papers/paper_list_l8_DPoser_X_Diffusion_Model_as_Robust_3D_Whole_body_Human_Pose_Prior_motion20v2/figures/003_Figure_3.jpg]]
 *Figure 3: Illustration of the rationale behind the proposed truncated timestep scheduling. We employ the DDIM sampler [60] with limited steps and visualize the generated poses. Our observations reveal that pose refinement occurs at later timesteps*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 姿态生成
 
@@ -321,7 +327,9 @@ DPoser 在无条件身体姿态生成任务中展现出强大的分布拟合能�
 ![[assets/figures/papers/paper_list_l8_DPoser_X_Diffusion_Model_as_Robust_3D_Whole_body_Human_Pose_Prior_motion20v2/figures/007_Figure.jpg]]
 *Figure: DPoser (ours)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心设计定位
 
@@ -379,6 +387,8 @@ DPoser-X 的全身扩展面临一个关键瓶颈：高质量全身姿态数据�
 3. **盲逆问题扩展**：当前方法假设测量算子 $\mathcal{A}$（如相机投影）已知。如何在未知相机参数等盲逆问题场景中联合建模测量算子与数据分布，将 DPoser 扩展至更一般的 HMR 场景？
 
 4. **实时集成**：能否通过知识蒸馏或扩散模型加速技术，将扩散先验的约束能力集成到基于回归的实时 HMR 方法中，兼顾效率与合理性？
+
+
 
 ## 原文 PDF
 

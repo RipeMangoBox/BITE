@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Adapting_Self_Supervised_Representations_as_a_Latent_Space_for_Efficient_Generation.pdf
+project_link: null
+code_link: https://github.com/CompVis/RepTok
 aliases:
 - RTR
 - ASSRALSEG
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 自适应自监督表征作为高效生成的潜在空间 |
 | 英文题名 | Adapting Self-Supervised Representations as a Latent Space for Efficient Generation |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=0b6a2SE23v); [GitHub](https://github.com/CompVis/RepTok) |
+| Links | [paper](https://openreview.net/forum?id=0b6a2SE23v) · [GitHub](https://github.com/CompVis/RepTok) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/generative_models_and_autoencoders |
 | Method | Representation Tokenizer (RepTok) |
 | Dataset | ImageNet 256×256, ImageNet 256×256 类别条件生成 (无CFG), MS-COCO zero-shot |
@@ -41,7 +43,7 @@ claims:
 > - ImageNet 256×256 上，rFID 为 1.85，对比 LDM: 0.90, TiTok-L: 2.21, FlexTok d12-d12: 4.20，变化 优于TiTok-L (2.21) 和FlexTok (4.20)，接近基于大网格的LDM (0.90)。
 > - ImageNet 256×256 类别条件生成 (无CFG) 上，FID 为 5.4 (Stage2 100K步)，对比 DiT-XL/2: 19.5 (7M步), SiT-XL/2: 17.2 (7M步)，变化 仅需1/70的训练步数，FID大幅领先。
 
-## 概述
+## 概要
 
 现有潜在扩散模型大多将图像编码为二维网格潜在表示，或通过多令牌（如32个离散令牌）序列压缩，但这些表示仍存在显著空间冗余，且训练与推理计算开销巨大。RepTok 提出一种极简范式：仅用一个连续令牌来表征图像，该令牌直接从预训练自监督视觉 Transformer 的 `[cls]` 嵌入获得。
 
@@ -49,7 +51,7 @@ claims:
 
 在 ImageNet 256×256 上，RepTok 以单个连续令牌实现重建 rFID 1.85、生成 gFID 1.88，与使用 31～256 个令牌的同类方法相当，但令牌数量减少了一到两个数量级。类别条件生成仅需少量训练（Stage 2 仅 100K 步）即达到 FID 5.4，显著优于需要百万步训练的 DiT/SiT 基线，训练成本降低超 90%。潜在空间插值在语义和空间布局上均呈现平滑过渡，表明单令牌表示成功整合了低层空间信息。RepTok 的生成模型甚至可基于纯 MLP 架构（MLP-Mixer），推理耗时仅 0.27 秒，整体推理速度优于基于注意力的扩散 transformer。
 
-## 背景与动机
+
 
 当前主流的视觉生成模型大多在二维网格化的潜在空间上构建。以潜在扩散模型（LDM）为代表，图像首先被压缩为低维特征图（如 16×16 或 32×32），生成器再对该空间中的网格型潜变量进行建模。这类二维布局固然保留了部分空间结构，却也带来了大量的空间冗余：相邻位置携带的信息高度相似，但生成模型仍然必须对所有网格元素进行完整的一步或迭代预测。即便后续工作尝试将图像表示为更紧凑的一维序列（例如 TiTok 用 32 个离散令牌，FlexTok 用可变长度的连续令牌），每个样本依然需要数十个令牌才能兼顾重建与生成质量。训练这种多令牌潜空间上的扩散或流匹配模型，需要极大的计算开销——典型的 DiT‑XL/2 或 SiT‑XL/2 需要数百万甚至上千万训练步，其训练 FLOPs 高达数千 TFLOPs，这严重限制了快速实验与资源受限场景下的应用。
 
@@ -57,7 +59,9 @@ claims:
 
 这正是本工作的核心动机——探索如何将预训练自监督表征直接转化为高效生成所需的最小化潜在空间。研究者观察到，只需对 [cls] 令牌的嵌入进行定向微调，并施加一个余弦相似度损失以约束其方向不偏离冻结编码器输出的原始方向，即可在单个连续令牌中同时保留语义光滑性与注入的低层重建信息。这一发现意味着，生成该潜空间的第二阶段模型只需学习一维连续分布，不再需要处理空间结构上复杂的交互。最终，RepTok 实现在 **单一连续令牌** 下取得 rFID 1.85、gFID 1.88 的重建与生成指标，与使用 31～256 个令牌的现有先进方法竞争（Table 1）；与之配套的轻量生成器（如纯 MLP‑Mixer）仅需同类 Transformer 基线 1/70 的训练步数即可达到更优的类别条件生成 FID（Table 2），总训练 FLOPs 降低超过 90%（Figure 1）。这一大幅压缩的潜在空间也为快速原型化新的生成架构和扩展现有多模态模型提供了全新视角。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 现有潜在生成模型普遍依赖高维度的空间离散表征：LDM 将图像压缩为二维网格型潜变量，TiTok 等则使用多枚离散令牌（如 32 个）。这类设计包含大量空间冗余，即使压缩到极少数令牌仍无法达到彻底的紧凑性，同时加剧本已高昂的训练与推理开销。RepTok 的核心洞见在于：**预训练自监督 ViTs 的池化 `[cls]` 向量本身即构成一个平滑、语义结构良好的连续潜在空间**，只需极小的适配就能直接作为生成模型的潜变量，从而完全消除二维空间冗余。据此，工作围绕三个相互咬合的“变动的槽位”（changed slots）构建起轻量生成范式：
 
@@ -81,7 +85,7 @@ claims:
 - **组件重要性**：若使用寄存器令牌（register token）虽能获得更高的 PSNR（12.85 vs. 12.59），但其空间未受 SSL 正则化约束，不利于后续生成（Table 6）。随机初始化的编码器虽可取得尚可的像素重建，但潜空间完全无序，无法产生合理的生成样本（Figure S9、Table 4），进一步证明了依赖预训练 SSL 空间并加以几何保持的必要性。
 - **固有局限**：λ 所控制的忠实度‑生成度权衡意味着，在追求极高像素重建保真度的任务中，模型必须牺牲生成质量，反之亦然。此外，极致的单令牌压缩虽然成就了效率突破，也可能限制对多对象精确定位或复杂场景的细粒度控制（该方法尚未对此提供解决方案）。这些取舍指出了未来可能在单令牌空间的表达能力扩展与条件调控方面的发展方向。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0006_0b6a2SE23v_Adapting_Self-Supervised_Representations_as_a_La/figures/004_Figure_2.jpg]]
 *Figure 2: Overview of our pipeline. (a) Joint fine-tuning of the [cls] token of SSL encoder E and training of the generative decoder D for image reconstruction. (b) Training of the generation model G to synthesize frozen encoder outputs, which constitute the latent space z = E(x). (c) Inference pipeline, where the latent space z is first generated and subsequently decoded into the pixel space*
@@ -108,7 +112,7 @@ RepTok 将图像映射为单个连续潜在令牌，并直接在该令牌构建�
 
 整个设计将“表示学习”与“分布建模”彻底解耦：编码器只负责将图像压缩为一个连续令牌，生成模型仅需拟合一个极低维（768 维）的平滑分布，从而以仅 1 个令牌的数量级差距，在重建和生成指标上与使用 32~256 个令牌的方法相竞争（rFID 1.85, gFID 1.88，表 1）。
 
-## 核心模块与公式推导
+
 
 RepTok 的整体管线分为两个阶段（Figure 2）：(i) **自适应编码与重建**——冻结 SSL 编码器的大部分参数，仅微调 `[cls]` 令牌嵌入，同时以流匹配训练一个生成式解码器，并加入余弦相似度正则化，使单个连续潜在令牌既能注入重建所需的底层细节，又保留原 SSL 空间的平滑几何；(ii) **潜在空间生成建模**——固定编码器，将 `[cls]` 令牌视为潜变量，用一个轻量生成模型建模其分布，实现高效的图像合成。以下逐一剖析各关键模块及其公式。
 
@@ -167,7 +171,9 @@ $$
 
 对于类别条件生成，我们采用**MLP‑Mixer**（隐藏维 1280、深度 28、通道/令牌 MLP 扩展因子分别为 4 和 2）作为 $\mathcal{G}$，将类别标签注入后直接沿着时间维度进行流匹配。实验表明，无注意力的纯 MLP 架构即可有效捕捉该平滑连续空间的分布，且推理延时可忽略（0.27 s vs. 解码器的 0.95 s；Table 5）。生成阶段的计算开销因此大幅削减，结合单令牌紧凑表示，最终使总训练成本较 DiT‑XL/2 降低超过 90 %（Figure 1，Table 2）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：单令牌紧凑重建与高效生成
 
@@ -235,7 +241,9 @@ RepTok 仅用 **1 个连续令牌**（[cls] 向量）即达到令人意外的紧
 
 以上结论均基于表中定量证据和附录中的定性对比，可复现性较强。对于文本到图像部分，由于仅提供零样本 FID 且未涵盖精细化空间控制实验，有关“物体定位与场景组合的细粒度控制”的限制尚需人工进一步核实。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 RepTok 的核心操作可以概括为一句话：**将一张图像压入一个连续向量，并在该向量上生成**。它在基线方法谱系中的位置与其他主流 tokenizer 存在根本差异，而这种差异正是其极简架构的前提。
 
@@ -258,6 +266,8 @@ RepTok 第二阶段生成器直接建模冻结编码器输出，这使其无需�
 另一个边界在于单令牌表征的表达粒度。尽管一个 [cls] 令牌能捕捉全局语义和粗略空间布局，但其无法显式编码多个对象的精确位置关系。目前实现的插值平滑性主要作用于全局尺度，**细粒度控制对象位置与场景组合仍属开放问题**（part_005 分析明确指出）。此外，寄存器令牌虽然在重建 PSNR 上略优于 [cls] 令牌（12.85 vs 12.59，Table 6），但其空间未受 SSL 正则化约束，导致生成质量显著下降，这也再次印证了当前方法对 SSL 预训练结构的深度依赖。
 
 最后，RepTok 的有效性验证目前集中于 ImageNet 256×256 和 MS‑COCO 零样本生成，其能否直接迁移至更高分辨率、视频生成或多模态理解等更复杂场景仍有待检验。论文 Supplementary 中提出的“如何扩展至更丰富的多令牌表示同时保持效率”这一问题，也折射出单令牌框架在信息容量上可能触及的天花板。
+
+
 
 ## 原文 PDF
 

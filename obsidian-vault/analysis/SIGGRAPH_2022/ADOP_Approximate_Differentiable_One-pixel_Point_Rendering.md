@@ -32,7 +32,7 @@ claims:
 | 中文题名 | ADOP：近似可微单像素点渲染 |
 | 英文题名 | ADOP: Approximate Differentiable One-pixel Point Rendering |
 | 会议/期刊 | SIGGRAPH 2022 |
-| Links | [paper](https://github.com/darglein/ADOP) · [arXiv](http://arxiv.org/abs/1412.6980) · [Code](https://github.com/darglein/ADOP") |
+| Links | [paper](http://arxiv.org/abs/1412.6980) · [Code](https://github.com/darglein/ADOP) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | ADOP |
 | Dataset | Tanks and Temples, 1920×1080 点云 |
@@ -167,9 +167,6 @@ $$R_{t}(x) = \begin{cases} \alpha x, & x < 0 \\ R(x), & 0 \leq x \leq 1 \\ \frac
 ## 实验与关键发现
 
 ADOP 的实验评估围绕三个核心维度展开：视图合成质量与速度的权衡、各组件贡献的消融验证，以及方法在极端条件下的鲁棒性边界。评估场景来自 Tanks and Temples 数据集（M60、Train、Playground、Lighthouse）及作者自采数据（Kemenate、Boat、Office），涵盖固定曝光与大幅变化曝光（Boat 场景曝光差异达 426 倍）两类条件，点云规模从 9.7M 到 34.1M 点不等（Table 1）。
-
-![[assets/figures/papers/paper_list_l40_https_github_com_darglein_ADOP/figures/005_Table_1.jpg]]
-*Table 1: Overview of our evaluation scenes. M60, Train, Playground, and Lighthouse are from the Tanks and Temples dataset. Kemenate and Boat were captured by the authors, Office was provided by (anonymous)*
 
 ### 推理效率：实时性能的突破
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/BranchGRPO_Stable_and_Efficient_GRPO_with_Structured_Branching_in_Diffusion_Models.pdf
+project_link: null
+code_link: null
 aliases:
 - BranchGRPO
 tags:
@@ -39,11 +41,11 @@ claims:
 > - HPSv2.1 (FLUX.1-Dev) 上，PickScore 为 0.231，对比 0.227，变化 +0.004。
 > - HPSv2.1 (FLUX.1-Dev) 上，ImageReward 为 1.625，对比 1.573，变化 +0.052。
 
-## 概述
+## 概要
 
 BranchGRPO是一种针对扩散模型GRPO（Group Relative Policy Optimization）训练的结构化改进方法。该方法通过将传统的顺序rollout重构为树状结构，在去噪过程中引入分支，共享前缀以摊销计算，并通过奖励融合与深度归一化将稀疏终端奖励转化为密集的逐步骤优势信号。实验表明，BranchGRPO在HPSv2.1图像对齐上比DanceGRPO提升高达16%的对齐分数，同时将每轮训练时间减少近55%；其混合变体BranchGRPO-Mix进一步将训练加速至DanceGRPO的4.7倍，且不降低对齐性能。
 
-## 背景与动机
+
 
 现有GRPO变体在扩散模型上存在两个根本瓶颈：
 
@@ -51,7 +53,9 @@ BranchGRPO是一种针对扩散模型GRPO（Group Relative Policy Optimization�
 
 - **奖励稀疏**：现有方法将单一终端奖励均匀分配给所有去噪步骤，忽略了中间状态的信息，导致不可靠的信用分配和高方差梯度。论文指出："Existing methods assign a single terminal reward uniformly across all denoising steps, neglecting informative signals from intermediate states. This uniform propagation leads to unreliable credit assignment and high-variance gradients"（Section 1 INTRODUCTION）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 BranchGRPO的核心创新体现在三个关键设计上：
 
@@ -61,7 +65,7 @@ BranchGRPO的核心创新体现在三个关键设计上：
 
 3. **剪枝策略**：引入宽度剪枝和深度剪枝，仅对选定的子集进行反向传播，不影响前向rollout和奖励评估。如论文所述："pruning strategies that cut gradient computation but leave forward rollouts and exploration unaffected"（Abstract）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__image_and_video_generation__b001_T2nP2IQasd_BranchGRPO_St/figures/001_Figure_1.jpg]]
 
@@ -75,7 +79,7 @@ BranchGRPO的整体框架由以下核心模块组成：
 
 Figure 3展示了分支rollout过程、奖励融合和深度归一化与剪枝的整体流程。
 
-## 核心模块与公式推导
+
 
 ### 5.1 反向SDE动力学
 
@@ -107,7 +111,9 @@ $$A _ { d } ( n ) = \frac { \bar { r } ( n ) - \mu _ { d } } { \sigma _ { d } + 
 
 $$J ( \theta ) = \mathbb { E } \left[ \frac { 1 } { | \mathcal { E } | } \sum _ { e \in \mathcal { E } } \operatorname* { m i n } \big ( \rho _ { e } ( \theta ) A ( e ) , \mathrm { c l i p } ( \rho _ { e } ( \theta ) , 1 - \epsilon , 1 + \epsilon ) A ( e ) \big ) \right]$$
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 6.1 主要结果
 
@@ -174,7 +180,9 @@ Table 9(a)的人类偏好评估显示：BranchGRPO在48%的情况下被偏好，
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__image_and_video_generation__b001_T2nP2IQasd_BranchGRPO_St/figures/024_Table_5.jpg]]
 *Table 5: Table 5: Hyperparameter settings used in all experiments.*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 BranchGRPO建立在以下工作基础上：
 
@@ -198,6 +206,8 @@ BranchGRPO的核心贡献在于将树状rollout结构引入扩散模型的GRPO�
 - 分支框架能否自然迁移到其他生成范式，如基于扩散的LLM和多模态基础模型？
 - 如何将BranchGRPO扩展到高分辨率、长时视频生成任务？
 - 如何将BranchGRPO应用于机器人动作生成和具身视频生成学习？
+
+
 
 ## 原文 PDF
 

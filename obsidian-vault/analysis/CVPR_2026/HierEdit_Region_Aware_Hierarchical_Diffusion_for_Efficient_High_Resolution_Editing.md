@@ -42,7 +42,7 @@ claims:
 > - 4K 分辨率编辑（文本引导编辑、修补、主题引导修补） 上，生成成功率 / 图像质量 成功生成高质量 4K 编辑结果 vs GPT-Image-1 无法输出高于 1K 的图像；ACE++ 在 96GB GPU 上无法完成 4K 推理 (唯一可行的 4K 方案)。
 > - CompBench, EmuEdit, ImgEdit, I2EBench 上，CLIP / SSIM / DINO / ImgEdit Composite 等 CLIP 20.6, SSIM 0.949, DINO 0.833, ImgEdit 3.51 vs 其他先进编辑方法（具体数值见原文 Table 1） (达到有竞争力的质量水平)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -74,7 +74,7 @@ HierEdit 属于**高效高分辨率图像编辑**方法，其技术路线融合�
 
 HierEdit 的核心贡献在于**首次实现了分辨率无关的局部编辑效率**，使得在消费级 GPU 上进行 4K 图像编辑成为可能，同时保持了与全分辨率方法可比的编辑质量。
 
-## 背景与动机
+
 
 ### 高分辨率图像编辑的计算瓶颈
 
@@ -104,7 +104,9 @@ HierEdit 的核心贡献在于**首次实现了分辨率无关的局部编辑效
 
 这一设计使得 HierEdit 在 1K 分辨率下比竞争方法快 6 倍以上，且成为唯一能在 96GB GPU 上成功完成 4K 分辨率文本引导编辑、修补和主题引导编辑的方法（见 Figure 6）。同时，在 CompBench、EmuEdit、ImgEdit 等多个编辑质量基准上，HierEdit 保持了有竞争力的质量指标（CLIP 20.6, SSIM 0.949, DINO 0.833），证明了效率提升并非以牺牲质量为代价。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 HierEdit 的核心创新在于通过**层级式编辑代理 + 局部窗口注意力**将高分辨率图像编辑的计算复杂度与图像分辨率解耦，从而在保持编辑质量的同时实现显著加速。与现有方法对全图进行密集注意力计算不同，HierEdit 将编辑过程拆分为低分辨率语义规划与高分辨率局部精炼两个阶段，仅对需要修改的区域施加计算资源。
 
@@ -134,7 +136,7 @@ HierEdit 的核心创新在于通过**层级式编辑代理 + 局部窗口注意
 
 **核心洞察**：低分辨率编辑代理能提供高质量的编辑区域定位和中间去噪初始化，使高分辨率生成仅需处理局部窗口；同时未修改区域作为条件输入可被缓存重用，实现了高效且分辨率无关的局部编辑。
 
-## 整体框架
+
 
 HierEdit 的整体设计遵循一个清晰的层级代理-精炼范式：将高分辨率编辑的高昂计算成本下沉到低分辨率空间完成语义规划与区域定位，再通过稀疏局部注意力将高分辨率生成严格限制在需要修改的局部窗口内。图 2 给出了框架的完整示意图。
 
@@ -153,7 +155,7 @@ HierEdit 的整体设计遵循一个清晰的层级代理-精炼范式：将高�
 ![[assets/figures/papers/paper_list_l884_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_HierEdit_Region/figures/002_Figure_2.jpg]]
 *Figure 2: Schematic of the HierEdit framework. We employ editing of a downsampled input image and region bounding to identify the edited patches and obtain the low-resolution proxy. We then proceed to input concatenation, re-permutation, and positional encoding. Finally, we pass this input to our hierarchical local-window MMDiT model, which generates the high resolution edited results with less denoising steps as upsampled low-resolution proxy can serve as intermediate denosing result*
 
-## 核心模块与公式推导
+
 
 HierEdit 的核心设计围绕一个关键洞察展开：高分辨率图像编辑的计算瓶颈并非来自分辨率本身，而是密集注意力对全图的无差别处理。通过将编辑区域定位、注意力范围与去噪过程三者解耦，HierEdit 实现了仅对修改区域施加计算、未修改区域作为条件缓存重用的高效架构。
 
@@ -235,7 +237,9 @@ $$X_{hr}^t = \alpha X_{hr}^1 + (1 - \alpha) X_{ref}^t$$
 ![[assets/figures/papers/paper_list_l884_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_HierEdit_Region/figures/003_Figure_3.jpg]]
 *Figure 3: The illustration of jointly denoising the integrated token sequence via Local-Window MMDiT. We prune the tokens from 2N to N by the edit mask and only denoise the edited region. All tokens are concatenated together while conditions and lowresolution reference are processed via finetuned layers, and original weights for the image latent. ”Fire” and ”Snowflake” signs means LoRA finetuning and frozen weights*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -284,7 +288,9 @@ HierEdit 在一系列编辑基准上取得了有竞争力的质量表现，同�
 ![[assets/figures/papers/paper_list_l884_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_HierEdit_Region/figures/004_Figure_4.jpg]]
 *Figure 4: Qualitative comparison for instructional editing. The asterisk * indicates that the model does not take a control image. We demonstrate more accurate subject integration by not only preserving subject identity, but also integrating it more naturally with the scene context. We also match the best lighting preservation*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心问题定位：高分辨率编辑的效率瓶颈
 
@@ -329,6 +335,8 @@ HierEdit 的设计主要针对**局部编辑任务**，其效率优势在编辑�
 4. **与其他高效注意力的结合**：与线性注意力等其他高效注意力机制结合时，能否在保持精度的同时进一步提升速度？这需要在稀疏注意力的局部性与线性注意力的全局近似之间找到平衡。
 
 5. **端到端联合优化**：低分辨率代理的生成能否与高分辨率去噪过程进行更紧密的联合优化，以替代当前的级联方式？这有望减少级联误差传播，但需要解决分辨率差异带来的梯度传播挑战。
+
+
 
 ## 原文 PDF
 

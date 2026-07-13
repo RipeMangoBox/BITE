@@ -5,6 +5,8 @@ paper_level: A
 venue: PG
 year: 2025
 pdf_ref: paperPDFs/PG_2025/EmoDiffGes_Emotion_Aware_Co_Speech_Holistic_Gesture_Generation_with_Progressive_Synergistic_Diffusion.pdf
+project_link: null
+code_link: null
 aliases:
 - EmoDiffGes
 tags:
@@ -39,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - BEAT-X 上，User preference (realism, expressiveness, rhythmic alignment, semantic alignmen... highest ratings vs CaMN, EMAGE, DiffSHEG (significantly better across all criteria)；FGD, BC, Diversity, MSE, LVD, BESA, BESA-ELO 4.312, 0.787, 12.75, 7.435, 7.713, 0.509, 1562.55 vs SOTA methods (see Table 1) (outperforms on all metrics)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有共语音手势生成方法面临两大根本局限——（1）忽略情绪随时间的动态演变，导致生成的手势缺乏表现力；（2）要么将身体作为整体过度简化建模，要么对身体各部分独立建模，致使动作不连贯、不自然。这两个问题共同阻碍了富有情感且全身协调的共语音手势生成。
 
@@ -49,7 +51,7 @@ claims:
 
 **主要结果**：在 BEAT-X 基准上，EmoDiffGes 在所有指标上均优于现有方法（FGD 4.312, BC 0.787, Diversity 12.75, MSE 7.435, LVD 7.713, BESA 0.509, BESA-ELO 1562.55）。用户研究进一步证实，该方法在真实感、表现力、节奏对齐和语义对齐四个维度上均获得最高评分。消融实验验证了动态情感对齐模块（DEAM）、渐进区域协同流（PIRSF）以及分区潜空间设计各自对性能的关键贡献。
 
-## 背景与动机
+
 
 共语音手势生成旨在根据语音输入合成自然、协调的身体动作，是虚拟人交互、具身智能体等应用的核心技术。近年来，扩散模型在该领域取得了显著进展，但现有方法普遍面临两个根本性局限，严重制约了生成手势的表现力与身体协调性。
 
@@ -66,7 +68,9 @@ claims:
 
 这一设计从根本上克服了整体简化与部分独立之间的表达矛盾，使手势生成既能体现细腻的情感动态，又能保持自然连贯的整体运动。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 EmoDiffGes 针对现有共语音手势生成方法的两个根本瓶颈——忽略情感的时间动态演变，以及将身体整体简化或各部分独立建模导致动作不连贯——提出了统一框架。其核心创新体现在三个紧密耦合的“changed slots”上，共同实现了动态情感感知与身体区域协同的生成。
 
@@ -82,7 +86,7 @@ EmoDiffGes 针对现有共语音手势生成方法的两个根本瓶颈——忽
 
 为解决区域间协调问题，EmoDiffGes 设计了**渐进式区域间协同流 (PIRSF)**。四个身体区域的生成流按面部→上半身→手部→下半身的顺序级联，每个流通过专用的交叉注意力模块（$A_c = \mathrm{SoftMax}\left( \frac{Q_{region} \cdot K_{cond}}{\sqrt{d}} \right) V_{cond}$）同时接受音频条件、加权情感特征以及前序流的输出作为条件。这种级联交叉注意力机制确保了信息从前到后的逐步传递与整合，使全身动作在保持区域特性的同时实现全局协调。消融实验表明，包含完整四条流的 PIRSF 配置在所有指标上均达到最优。
 
-## 整体框架
+
 
 EmoDiffGes 是一个基于扩散模型的共语音整体手势生成框架，其核心设计遵循具身情感理论（embodied emotion theory），将动态情感调节与身体部位感知协同建模统一在单一流程中。整体 pipeline 由三个关键模块串联构成：**动态情感对齐模块（DEAM）**、**身体区域先验（Body Regions Prior）** 和 **渐进式区域间协同流（PIRSF）**，最终通过去噪扩散过程生成完整的手势序列。
 
@@ -133,13 +137,11 @@ $$ L_{\text{final}} = \lambda_{\text{latent}} L_{\text{latent}} + \lambda_{\text
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l1921_EmoDiffGes_Emotion_Aware_Co_Speech_Holistic_Gesture_Generation_with_Prog/figures/003_Figure_3.jpg]]
-*Figure 3: An overview of the EmoDiffGes pipeline. Top: Dynamic Emotion-Alignment Module (sec.3.3) extracts emotional features from text transcripts using EmoRoBERTa, while audio features (amplitude, onset) are encoded and fused with text embeddings via average pooling for conditional input. Bottom: The motion generation process encodes body regions using Prior Encoders (sec.3.2), processes them through masked Face, Upper, Hands, and Lower Streams, and fuses features via the Progressive Synergistic Gesture Generator (sec.3.4). A Denoiser refines noisy motion at diffusion step t, with Quantizer and Decoders reconstructing motions guided by Body Priors*
 
 ![[assets/figures/papers/paper_list_l1921_EmoDiffGes_Emotion_Aware_Co_Speech_Holistic_Gesture_Generation_with_Prog/figures/002_Figure_2.jpg]]
 *Figure 2: Top: Previous methods typically either represent the body holistically or decompose it into independently modeled parts, often generating incoherent, unnatural and inexpressive motions. Bottom: Our method incorporates temporal emotional cues into the motion representation by conditioning region-specific body streams, enabling more coherent and expressive gesture generation*
 
-## 核心模块与公式推导
+
 
 EmoDiffGes 的核心架构围绕三个关键模块展开：**身体区域先验（Body Regions Prior）**、**动态情感对齐模块（DEAM）** 和 **渐进式区域间协同流（PIRSF）**，三者协同构成一个完整的扩散生成框架。
 
@@ -204,7 +206,9 @@ $$L_{final} = \lambda_{latent} L_{latent} + \lambda_{rec} L_{rec} + \lambda_{dif
 ![[assets/figures/papers/paper_list_l1921_EmoDiffGes_Emotion_Aware_Co_Speech_Holistic_Gesture_Generation_with_Prog/figures/005_Figure_5.jpg]]
 *Figure 5: The architecture of Progressive Inter-Region Synergistic Flow (PIRSF)*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验：定量对比与用户研究
 
@@ -264,7 +268,9 @@ EmoDiffGes 在 BEAT-X 基准上进行了全面的定量评估，与当前主流�
 ![[assets/figures/papers/paper_list_l1921_EmoDiffGes_Emotion_Aware_Co_Speech_Holistic_Gesture_Generation_with_Prog/figures/012_Figure_9.jpg]]
 *Figure 9: Qualitative ablation study for PIRSF*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心定位与差异化
 
@@ -298,6 +304,8 @@ EmoDiffGes 的提出直指现有共语音手势生成领域的两个根本性瓶
 3. **情感评估的标准化**：论文提出的基于视觉语言模型的情感语义对齐评估（BESA 和 BESA-ELO）虽具创新性，但其与心理学或情感计算领域既有评估标准的对应关系尚不明确。该方法的可推广性需要在更广泛的情感评估基准上进行验证。
 
 4. **实时推理优化**：若要将该方法推向实际交互系统，需探索扩散模型的加速采样策略（如 DDIM、渐进蒸馏）或轻量化架构设计，在保持生成质量的前提下降低推理延迟。
+
+
 
 ## 原文 PDF
 

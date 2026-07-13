@@ -42,7 +42,7 @@ claims:
 > - Tanks & Temples 上，PSNR / LPIPS / SSIM 20.52 / 0.287 / 0.745 vs MiLo 21.46 / 0.348 / 0.706 (PSNR -0.94 dB but LPIPS -0.061 and SSIM +0.039 (更少噪声))。
 > - DTU (Chamfer Distance) 上，Chamfer Distance Mean 0.79 vs 2DGS 0.80 / GOF 0.74 / MiLo 0.68 (性能相当，与定制网格提取方法同水平)。
 
-## 概述
+## 概要
 
 ### 核心问题
 
@@ -66,7 +66,7 @@ MeshSplatting 处于神经渲染与显式几何表示的交汇点。与 **3DGS**
 
 在 Mip-NeRF360 数据集上，MeshSplatting 的 PSNR 达到 24.78 dB，较当前最优方法 **MiLo** 提升 0.69 dB，同时训练速度快 2 倍，内存占用减少 2.5 倍。在 Tanks & Temples 数据集上，虽然 PSNR 略低于 MiLo（-0.94 dB），但 LPIPS 显著降低 0.061，SSIM 提升 0.039，表明渲染结果噪声更少、结构更清晰。消融实验表明，移除第二阶段连接性优化会导致 PSNR 骤降 8.56 dB，移除窗口参数 σ 衰减会导致 PSNR 下降 7.96 dB，充分验证了两阶段策略和不透明度/窗口调度机制的关键作用。
 
-## 背景与动机
+
 
 ### 从新视角合成到可部署的3D资产
 
@@ -98,7 +98,9 @@ MeshSplatting 的提出正是为了打破这一僵局。其核心动机是：**�
 
 这一设计使得 MeshSplatting 成为首个在统一端到端框架中直接输出**即用型不透明连通网格**的方法，在 Mip-NeRF360 上以比 MiLo 快2倍的训练速度和少2倍的内存占用，实现了 PSNR +0.69 dB 的质量提升（Table 1），且最终网格可直接在标准游戏引擎中渲染，无需自定义着色器（Figure 1）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MeshSplatting 的核心突破在于**首次实现了端到端优化的不透明连通网格**，使输出可直接在标准游戏引擎中渲染，无需任何后处理或自定义着色器。这一能力源于以下关键创新点的协同作用：
 
@@ -167,7 +169,7 @@ $$C(\mathbf{p}) = \mathbf{c}_{T_n} I(\mathbf{p})$$
 
 这些创新并非孤立的技术点，而是围绕一个统一目标形成因果链条：**通过调度机制保证训练期间梯度流动，通过两阶段优化建立连通性，最终收敛到可直接使用的不透明连通网格**。
 
-## 整体框架
+
 
 MeshSplatting 采用**两阶段优化流水线**，将非结构化的半透明三角形汤逐步转化为连通、不透明、带顶点颜色的网格。其核心设计遵循一条清晰的因果链：早期保持几何基元的平滑与半透明以保证梯度流动，中期通过一次性三角剖分建立连通性，后期通过调度机制使三角形硬化并微调外观，最终输出可直接在标准游戏引擎中渲染的网格。
 
@@ -209,7 +211,7 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{3DGS}} + \beta_o \mathcal{L}_o + \beta_z \m
 ![[assets/figures/papers/paper_list_l2132_https_arxiv_org_abs_2512_06818/figures/003_Figure_3.jpg]]
 *Figure 3: From triangle soups to meshes. (1a) We initialize semi-transparent triangles and scale them based on local density. (1b) We optimize a semi-transparent triangle soup without shared vertices, leading to disconnected triangles. (2a) Applying restricted Delaunay triangulation restores global connectivity but introduces geometric artifacts and a loss of visual quality, as vertex colors no longer accurately align with the underlying geometry. (2b) The final fine-tuning stage refines the connected mesh, producing smooth surfaces, accurate geometry, and restoring the visual fidelity lost during triangulation. Using only opaque triangles, our method achieves high visual quality compared to the semi...*
 
-## 核心模块与公式推导
+
 
 ### 三角溅射的投影与窗口函数
 
@@ -279,7 +281,9 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{3DGS}} + \beta_o \mathcal{L}_o + \beta_z \m
 ![[assets/figures/papers/paper_list_l2132_https_arxiv_org_abs_2512_06818/figures/004_Figure_4.jpg]]
 *Figure 4: Window parameter scheduling. To ensure stable gradient flow during training, we begin with smooth triangles (σ=1.0, left) and linearly decrease σ throughout training, resulting in sharper triangles by the end. We visualize σ for a prototypical triangle at the beginning and end of each optimization stage*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果与效率对比
 
@@ -355,7 +359,9 @@ Table 9展示了顶点数对视觉质量的影响：MeshSplatting随顶点数增
 ![[assets/figures/papers/paper_list_l2132_https_arxiv_org_abs_2512_06818/figures/018_Table_9.jpg]]
 *Table 9: Number of vertices vs visual quality. MeshSplatting scales effectively with the number of vertices, showing consistent improvements in visual quality as the vertex count increases. All improvements are shown relative to 2M*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -418,6 +424,8 @@ Triangle Splatting 是最接近的三角基元方法，但其输出是**非连�
 5. **场景扩展**：如何将方法扩展到无界场景（当前依赖背景球或天空盒）或动态场景？网格的显式拓扑可能使动态变形更可控，但也带来了拓扑变化处理的挑战。
 
 6. **顶点数-质量权衡**：Table 9 显示视觉质量随顶点数增加而持续改善，但未探索上限。是否存在收益递减点？能否通过自适应顶点密度分配进一步优化？
+
+
 
 ## 原文 PDF
 

@@ -43,7 +43,7 @@ claims:
 > - OmniMoCap-X Text-to-Motion 上，FID↓ 5.040 vs 17.428 (MoMask*) (-71.1%)；R Precision Top-1↑ 0.303 vs 0.267 (MoMask*) (+13.5%)。
 > - OmniMoCap-X Global Spatiotemporal Control 上，FID↓ 4.224 vs 10.247 (Ours w/o progressive training) (-58.8%)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -74,7 +74,7 @@ OmniMotion-X 提出了一种**统一的多模态全身运动生成框架**，其
 
 当前框架尚未深度融合**场景、物体及人类交互**等多层次约束，对于复杂的交互式全身运动生成仍存在局限。此外，运动表示与推理速度仍有优化空间，面向实时应用需要更紧凑的表示和更高效的推理架构。后续研究方向包括：如何将场景和交互约束集成到统一条件框架中，以及如何开发更紧凑的运动表示以加速扩散模型的推理过程。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -106,7 +106,9 @@ OmniMotion-X 提出了一种**统一的多模态全身运动生成框架**，其
 
 此外，为支撑上述方法的训练与评估，本文构建了OmniMoCap-X数据集——目前最大的多模态运动捕捉数据集，整合28个公开高质量数据集，统一转换为SMPL-X格式，并配备了高质量的多模态标注。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 OmniMotion-X 的核心创新并非单一技术点的堆砌，而是通过**统一条件前缀连接**、**渐进式从弱到强训练**和**参考运动条件**三个相互耦合的机制，系统性地解决了多模态全身运动生成中长期存在的条件冲突与控制粒度不匹配问题。
 
@@ -134,7 +136,7 @@ OmniMotion-X 引入了一种全新的条件范式——**参考运动**。与传
 
 上述三个 changed slot 并非孤立存在：统一前缀连接为多条件融合提供了架构基础，渐进训练策略确保了不同粒度条件的有序学习，而参考运动则拓展了条件空间的上限。三者共同作用，使得 OmniMotion-X 在单一框架内同时支持文本到运动、语音到手势、音乐到舞蹈、轨迹引导合成、运动插值与预测等多种任务，且在各任务上均取得最优或次优的定量结果（Table 4、Table 5）。
 
-## 整体框架
+
 
 ### 设计动机与核心思路
 
@@ -200,7 +202,7 @@ OmniMotion-X 首次将**参考运动作为特殊条件信号**引入运动扩散
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2510_19789/figures/001_Figure_1.jpg]]
 *Figure 1: We present OmniMotion-X, a unified sequence-to-sequence autoregressive motion diffusion transformer designed for flexible and interactive whole-body human motion generation. It supports a variety of tasks, including text-to-motion, music-todance, speech-to-gesture, and globally spatial-temporal controllable motion generation, which encompasses motion prediction, in-betweening, completion, and joint/trajectory-guided synthesis. These conditions can be combined in various ways to enable versatile motion generation*
 
-## 核心模块与公式推导
+
 
 ### 统一多模态条件建模
 
@@ -247,7 +249,9 @@ OmniMotion-X 将多种全局时空控制任务（如运动预测、中间帧插�
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2510_19789/figures/006_Figure_3.jpg]]
 *Figure 3: We propose the weak-to-strong progressive training strategy, establishing motion-semantic alignment with text, followed by progressive integration of stronger multimodal signals (reference motion, global motion, speech, music) for enhanced generation quality and controllability*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 文本到运动生成主结果
 
@@ -311,7 +315,9 @@ OmniMotion-X 将多种全局时空控制任务（如运动预测、中间帧插�
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2510_19789/figures/010_Figure.jpg]]
 *Figure: (a) Text-to-motion (d) Trajectory-guided synthesis*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有方法的谱系关系
 
@@ -346,6 +352,8 @@ OmniMotion-X 的适用边界由其设计选择决定：
 3. **渐进训练策略的泛化性。** 从弱到强的渐进训练在 OmniMotion-X 上验证有效（移除该策略导致 FID 从 5.040 上升至 9.574，全局时空控制 FID 从 4.224 上升至 10.247），但该策略是否适用于其他多模态生成任务（如视频生成、音频合成）仍有待验证。
 
 4. **参考运动条件的理论理解。** 参考运动为何能有效提升跨片段一致性？其在特征空间中是否隐式编码了运动风格和动态模式的原型表示？这一机制的理论分析尚不充分。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/PAM_A_Pose_Appearance_Motion_Engine_for_Sim_to_Real_HOI_Video_Generation.pdf
+project_link: https://gasaiyu.github.io/PAM.github.io/
+code_link: https://github.com/black-forest-labs/flux
 aliases:
 - PPAME
 - PAM
@@ -42,7 +44,7 @@ claims:
 > - DexYCB 上，FVD (↓) 29.13 vs 38.83 (InterDyn) (减少 9.70 (相对 25.0%))；MPJPE (mm, ↓) 19.37 vs 30.05 (CosHand) (减少 10.68 mm (35.5%))。
 > - OAKINK2 上，FVD (↓) 46.31 vs 68.76 (CosHand) (减少 22.45)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有手物交互（HOI）生成方法各自独立——姿态合成、外观生成、视频生成分属不同范式，且视频生成方法依赖完整的姿态序列和真实第一帧输入，无法实现真正的仿真到真实（sim-to-real）迁移，严重制约了可扩展的 HOI 数据生成。
 
@@ -56,7 +58,7 @@ claims:
 - 消融实验证实，同时使用深度、分割和关键点三种条件在所有指标上均取得最佳性能。
 - 下游任务验证：使用 50% 真实数据加上 PAM 生成的 3400 个合成视频，手部姿态估计模型可达到与 100% 真实数据基线相同的 PA-MPJPE（5.5 mm），证明了合成数据的实用价值。
 
-## 背景与动机
+
 
 ### 手物交互视频生成的困境
 
@@ -81,7 +83,9 @@ PAM 的核心洞察是：将复杂的高维 HOI 视频生成任务解耦为三�
 
 通过这一解耦设计，PAM 首次实现了无需任何真实帧输入的完整 HOI 视频生成引擎，为 sim-to-real 数据扩展提供了可行的技术路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 1. 范式级创新：从依赖真实第一帧到仿真-真实域迁移
 
@@ -133,7 +137,7 @@ PAM 的创新在定量指标上得到充分验证：
 
 PAM 的创新不仅体现在生成质量上，更体现在合成数据的实际效用。在 DexYCB 数据集上，使用 **50% 真实数据 + PAM 生成的 3400 个合成视频**训练 SimpleHand 手部姿态估计模型，可达到与 100% 真实数据基线相同的 PA-MPJPE（5.5 mm）。这一结果直接证明了 PAM 在可扩展 HOI 数据生成中的实用价值，为仿真到真实的数据增强提供了可行路径。
 
-## 整体框架
+
 
 ### 问题定义与核心映射
 
@@ -185,7 +189,7 @@ PAM 的独特之处在于：视频生成既不依赖真实第一帧，也不需�
 ![[assets/figures/papers/paper_list_l5_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_PAM_A_Pose_Appeara/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of our three-stage generation pipeline. (1) Pose Generation: A pretrained pose generation model generates the intermediate hand-object interaction (HOI) poses based on the initial and target poses, along with the object mesh. (2) Appearance Generation: A controllable image diffusion model synthesizes the first frame of the video, conditioned on multi-modal inputs (depth maps, semantic masks, and keypoint annotations). (3) Motion Generation: The generated HOI sequence and the first frame are rendered into a full video sequence by a video diffusion model, conditioned on the same multi-modal inputs used in the appearance generation stage*
 
-## 核心模块与公式推导
+
 
 PAM 将高维手物交互视频生成任务解耦为三个顺序阶段：姿态生成、外观生成、运动生成。每个阶段专注于不同属性，并通过统一的多模态条件驱动，实现从仿真姿态序列到真实视频的迁移。
 
@@ -242,7 +246,9 @@ $$\mathbf{MF} = \frac{1}{|\tilde{\mathcal{T}}|} \sum_{\tilde{\tau} \in \tilde{\m
 ![[assets/figures/papers/paper_list_l5_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_PAM_A_Pose_Appeara/figures/001_Figure_1.jpg]]
 *Figure 1: (a) Pose Generation. Given an initial and target hand–object pose, our pose generation module synthesizes a full MANO-based HOI trajectory. (b) Appearance Generation. Conditioned on rendered hand–object geometry, the appearance model produces diverse and realistic reference frame. (c) Motion Generation. Using the same rendered conditions, the motion model generates the full HOI video with coherent dynamics and hand–object interactions. (d) Quality and Downstream Validation. Our unified engine substantially improves video fidelity and geometric accuracy over prior methods*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -299,7 +305,9 @@ Figure 8 展示了 PAM 在 OAKINK2 上的零样本图像到视频（i2v）生成
 ![[assets/figures/papers/paper_list_l5_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_PAM_A_Pose_Appeara/figures/008_Figure_5.jpg]]
 *Figure 5: Ablation study on input conditions on DexYCB dataset*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有方法的谱系关系
 
@@ -351,6 +359,8 @@ PAM 的适用边界由其设计假设和实验覆盖范围共同界定：
 3. **合成数据在真实机器人操作中的泛化性如何？** 虽然 Table 4 和 Figure 7 展示了合成数据在下游手部姿态估计任务上的数据增强效果（使用 50% 真实数据加 PAM 合成数据可达到与 100% 真实数据相同的 PA-MPJPE 5.5 mm），但这些实验仅限于静态姿态估计。合成视频数据是否能够提升机器人操作策略的学习效果，仍需在真实机器人平台上验证。
 
 4. **多模态条件的冗余性与互补性。** Table 3 的消融实验表明深度、分割和关键点三者联合使用始终最优，但各条件的相对贡献和失效模式尚未被深入分析。理解这一点对于在实际部署中简化条件获取流程（例如，是否可以用更易获取的深度图替代语义分割）具有重要意义。
+
+
 
 ## 原文 PDF
 

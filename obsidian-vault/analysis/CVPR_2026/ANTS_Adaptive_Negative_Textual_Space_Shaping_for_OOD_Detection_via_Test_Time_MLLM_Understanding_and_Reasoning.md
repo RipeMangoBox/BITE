@@ -43,7 +43,7 @@ claims:
 > - ImageNet-1K (近OOD) 上，FPR95 相对先前最优结果降低 3.25% vs 先前最优 (EOE 等) (-3.25%)。
 > - ImageNet-1K (平均 6 个OOD数据集) 上，AUROC ↑ / FPR95 ↓ 97.75 / 11.20 vs NegLabel (96.45 / 14.30) 等 (AUROC +1.30 / FPR95 -3.10)。
 
-## 概述
+## 概要
 
 开放环境下的分布外（OOD）检测要求模型在测试时准确区分已知类别（ID）与未知类别（OOD）样本。现有基于负标签的零样本方法，如 **NegLabel**（Jiang et al., arXiv 2024）和 **EOE**（Dai et al., arXiv 2023），虽避免了传统方法对异常数据的依赖，却面临一个核心瓶颈：它们缺乏对 OOD 图像的实际理解，难以构建精确的负文本空间。具体而言，这些方法通过语料库距离或大语言模型提示生成的负标签，往往与真实 OOD 图像存在显著的语义鸿沟；在近 OOD 场景中，因忽略 ID 类子集的视觉相似性而产生大量假阴性标签；同时，它们依赖预先知道任务场景（远 OOD 或近 OOD）的强假设，无法适应动态变化的开放环境。
 
@@ -52,8 +52,6 @@ claims:
 在 ImageNet-1K 基准上，ANTS 将远 OOD 的 FPR95 降低 3.1%，近 OOD 的 FPR95 降低 3.25%，建立了新的最优结果。整体平均 AUROC 达到 97.75，FPR95 降至 11.20（Table 1）。在 OpenOOD 零样本基准上，ANTS 同样显著优于 NegLabel 等方法，近 OOD 和远 OOD 的 FPR95 分别降低 7.38 和 2.10（Table 2）。消融实验（Table 4）验证了负图像挖掘（NIM）和视觉相似 ID 类挖掘（SIM）两个策略分别对远 OOD 和近 OOD 带来的显著提升。t-SNE 可视化（Figure 1）进一步表明，ENS 的文本特征比 NegLabel 和 EOE 更接近 OOD 图像特征，有效缩小了语义鸿沟。
 
 该方法完全训练无关（training-free）且零样本，不引入可学习参数，仅利用历史测试图像进行在线挖掘，推理延迟为 2.84 ms/图像（GeForce RTX 3090），与同类方法可比。
-
-## 背景与动机
 
 ### 开放环境中的分布外检测
 
@@ -73,7 +71,7 @@ claims:
 
 上述瓶颈的共性根源在于**负文本空间的质量与适应性不足**——既缺乏对实际 OOD 分布的准确刻画，也无法自适应地处理远 OOD 与近 OOD 的差异性。ANTS 的核心洞察是：多模态大语言模型（MLLM）在测试时具备对图像进行理解与推理的能力（Figure 2），可以将其引入 OOD 检测流程，通过“看见”历史测试图像来构建更精确、更具表达力的负文本空间，并依据数据特性动态调整检测策略，从而在无需先验场景知识的条件下，同时提升远 OOD 和近 OOD 的检测性能。
 
-## 核心创新
+## 核心方法与创新机理
 
 ### 问题瓶颈与因果抓手
 
@@ -133,8 +131,6 @@ $$\lambda = F\left( \frac{1}{|\mathcal{X}_{neg}|} \sum_{\pmb{v} \in \mathcal{X}_
 
 这些创新使ANTS在ImageNet-1K基准上将远OOD的FPR95降低3.1%、近OOD的FPR95降低3.25%（相对先前最优结果），建立了新的最优性能（Table 1：平均AUROC 97.75, FPR95 11.20）。消融实验（Table 4）进一步验证了负图像挖掘（NIM）和视觉相似ID类挖掘（SIM）两个策略分别对远OOD和近OOD带来的显著提升。
 
-## 整体框架
-
 ANTS 采用**三阶段流水线**，在测试时逐步塑造自适应负文本空间，无需任何离线训练或辅助异常数据。整体框架如图 3 所示，三个阶段分别为：
 
 1.  **历史测试图像缓存与挖掘**：从历史测试图像中自适应挖掘**负图像**（可能为 OOD 的样本）和**视觉相似 ID 类子集**（与测试图像最相似的 ID 类别），为后续负空间塑造提供数据基础。
@@ -174,8 +170,6 @@ ANTS 处于**零样本 OOD 检测**与**多模态大模型推理**的交叉点�
 
 ![[assets/figures/papers/paper_list_l2044_https_arxiv_org_abs_2509_03951/figures/003_Figure_3.jpg]]
 *Figure 3: The overall framework of our ANTS. ANTS framework consists of in three stages: (1) caching negative images and visually similar ID classes mined from historical test images; (2) shaping two negative textual spaces by prompting an MLLM with the cached data to generate expressive negative sentences and visually similar labels; and (3) performing online evaluation of the test image using an adaptively weighted combination of these textual spaces*
-
-## 核心模块与公式推导
 
 ANTS 方法通过三阶段流水线构建自适应负文本空间（图3）：(1) 从历史测试图像中挖掘负图像与视觉相似 ID 类并缓存；(2) 利用 MLLM 对缓存数据生成两类负文本空间——表达丰富负句子（ENS）与视觉相似负标签（VSNL）；(3) 通过自适应加权分数在线评估测试图像。以下详述核心模块及其数学形式。
 
@@ -250,16 +244,7 @@ $$\lambda = F\left( \frac{1}{|\mathcal{X}_{neg}|} \sum_{\pmb{v} \in \mathcal{X}_
 ![[assets/figures/papers/paper_list_l2044_https_arxiv_org_abs_2509_03951/figures/001_Figure_1.jpg]]
 *Figure 1: T-SNE visualization of the ID and OOD image features, the text features of NegLabel [19], EOE [4], OOD ground-truth, and the expressive negative sentences (ENS) of ANTS. We select ImageNet and SUN as the ID and OOD datasets, respectively. NegLabel and EOE lack a good understanding of OOD images, resulting in a greater distance between the OOD images and the text features. In contrast, our ANTS utilizes the MLLMs to understand OOD images during ENS generation, reducing the distance between ENS and OOD images and improving OOD detection performance*
 
-![[assets/figures/papers/paper_list_l2044_https_arxiv_org_abs_2509_03951/figures/004_Figure_4.jpg]]
-*Figure 4: Expressive Negative Sentences, where yi represents the predicted ID label of the negative image*
-
-![[assets/figures/papers/paper_list_l2044_https_arxiv_org_abs_2509_03951/figures/005_Figure_5.jpg]]
-*Figure 5: Visually Similar Negative Labels, where*
-
-![[assets/figures/papers/paper_list_l2044_https_arxiv_org_abs_2509_03951/figures/002_Figure_2.jpg]]
-*Figure 2: (a) Current MLLM improve their reasoning abilities by test time understanding and reasoning through chain-of-thought (CoT) prompting. (b) In our work, we leverage the test time understanding and reasoning capabilities of MLLM during inference to help visual-language models perform better on OOD detection*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -297,18 +282,7 @@ ANTS 在保持高性能的同时，推理效率与同类方法可比。如表 5 
 
 尽管 ANTS 在多数场景下表现优异，但其性能依赖于 MLLM 的推理质量。当 MLLM 对负图像的理解出现偏差时，生成的 ENS 或 VSNL 可能无法准确刻画 OOD 分布，从而影响负空间构建的精度。此外，自适应阈值 $\gamma^*$ 和权重 $\lambda$ 的计算依赖于历史测试数据的统计特性，在测试数据分布发生剧烈突变时，自适应机制的响应速度可能滞后，需要进一步研究其鲁棒性边界。论文未报告在极端小批量或在线流式场景下的退化程度，该点需在实际部署中手动验证。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2044_https_arxiv_org_abs_2509_03951/figures/010_Table_3.jpg]]
-*Table 3: OOD detection performance on other ID datasets*
-
-![[assets/figures/papers/paper_list_l2044_https_arxiv_org_abs_2509_03951/figures/013_Table_5.jpg]]
-*Table 5: Latency (ms) breakdown (ImageNet)*
-
-![[assets/figures/papers/paper_list_l2044_https_arxiv_org_abs_2509_03951/figures/006_Figure_6.jpg]]
-*Figure 6: (a) Our VSNL generates visually similar labels only for the ID class subset, whose images are most similar to the near OOD samples, largely reducing false negative labels. (b) Different OOD datasets prefer different thresholds, and our proposed method can cache the historical test images and adaptively mine negative images, implicitly setting an dataset adaptive threshold. (c)*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 核心瓶颈与因果杠杆
 

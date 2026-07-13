@@ -41,7 +41,7 @@ claims:
 > - InScene synthetic validation set 上，DISTS↓ 0.1007 vs 优于所有对比方法 (最佳)；LPIPS↓ 0.2421 vs 优于所有对比方法 (最佳)；FID↓ 15.26 vs 优于所有对比方法 (最佳)。
 > - InScene real validation set 上，DISTS↓, LPIPS↓, MUSIQ↑, CLIP-IQA↑, MANIQA↑ 全面最佳 vs 所有对比方法 (大幅领先)。
 
-## 概述
+## 概要
 
 全场景图像恢复旨在从退化的低质量输入中重建高质量的人物图像。现有方法通常直接从退化图像中盲估计全局退化参数（如噪声水平、模糊程度），但这一过程本质上是不适定的——在缺乏先验的条件下，模型难以准确区分退化与内容，导致恢复结果出现纹理失真、伪影或细节丢失。
 
@@ -51,7 +51,7 @@ claims:
 
 实验结果表明，Face2Scene 在 InScene 合成验证集与真实验证集上均显著优于现有方法，在 DISTS、LPIPS、FID 等全参考指标以及 MUSIQ、CLIP-IQA、MANIQA 等无参考感知质量指标上取得全面领先。消融实验进一步证实：引入 FaDeX 退化估计后，模型在所有指标上均优于无退化估计的变体；即使在非人脸区域，退化信息仍能有效传递并指导恢复，验证了“面部作为退化预言机”这一核心假设的有效性。
 
-## 背景与动机
+
 
 ### 全场景图像恢复的根本瓶颈
 
@@ -88,7 +88,9 @@ Face2Scene 的核心洞察是：**将人脸视为退化的“预言机”（orac
 
 与 **S3Diff** 等退化引导方法相比，Face2Scene 的退化估计来源发生了根本性转变：不再从低质量输入图像本身盲估计退化（仅预测噪声和模糊两个全局标量），而是**利用外部身份参考**，从参考面部修复模型生成的 LQ-HQ 面部对中提取退化代码。这使得退化估计更加精确可靠，因为参考图像提供了额外的干净信号源。同时，退化表示从低维标量升级为多尺度空间令牌（21 个令牌），能够传递更丰富的退化上下文，指导扩散模型做出更精准的恢复决策。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Face2Scene 的核心创新在于将人脸作为退化“预言机”，从信号最强、几何最稳定且常具身份参考的面部区域精确推断全局退化，并以此指导一次性扩散模型修复包含人物、衣着、背景在内的完整场景。这一范式通过两个关键的 **changed slots** 实现，从根本上区别于现有方法。
 
@@ -120,7 +122,7 @@ Face2Scene 通过 MapNet 将 FaDeX 的空间退化特征转化为 **21 个多尺
 1. **空间一致性假设**：FaDeX 从面部区域提取的退化代码隐含假设退化在整幅图像中空间一致，无法处理局部变化的退化（如运动模糊仅影响移动主体、景深效果使背景模糊而面部清晰）。
 2. **参考依赖瓶颈**：退化估计的质量受限于现成 Ref-FR 模型的性能；若面部恢复不准确，FaDeX 的退化代码将包含误差。此外，对身份参考图像的依赖限制了无参考场景下的应用。
 
-## 整体框架
+
 
 Face2Scene 采用两阶段流水线，将人脸视为退化的“预言机”，利用面部区域精确估计退化信息，再将其作为条件注入一次性扩散模型，完成全场景恢复。
 
@@ -154,7 +156,7 @@ $$\mathcal{L}(\theta) = \mathcal{L}_{\mathrm{rec}} + \lambda_{\mathrm{GAN}} \mat
 ![[assets/figures/papers/paper_list_l2483_https_openaccess_thecvf_com_content_CVPR2026_html_Kazerouni_Face2Scene_U/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the Face2Scene pipeline. In stage I, we leverage a set of reference faces to restore the LQ face crop. In stage II, we use the pair of LQ and HQ faces to extract a guided degradation with FaDeX and inject it into a one-step diffusion model using MapNet. The diffusion model then reconstructs the full-scene image*
 
-## 核心模块与公式推导
+
 
 Face2Scene 的核心架构由两条解耦的功能链路构成：**退化感知链路**（FaDeX + MapNet）负责从面部区域提取并编码全局退化信息，**一次性扩散恢复链路**（SD-Turbo）负责在退化条件的引导下完成全场景重建。两条链路通过多尺度交叉注意力机制桥接，使得从面部“预言机”中提取的退化代码能够精确指导整个人物场景（面部、身体、背景）的统一恢复。
 
@@ -195,7 +197,9 @@ FaDeX 学习到的退化嵌入质量通过余弦相似度分析验证（Figure 4
 ![[assets/figures/papers/paper_list_l2483_https_openaccess_thecvf_com_content_CVPR2026_html_Kazerouni_Face2Scene_U/figures/005_Figure_4.jpg]]
 *Figure 4: Cosine similarity analysis. We show the cosine similarity across embeddings of image pairs with different degradations. (Left) similarities per degradation type (averaged over images). (Right) similarities per image, averaged over degradation types. Shaded area shows standard deviation. This confirms FaDeX isolates degradation from image content*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -243,7 +247,9 @@ FaDeX 学习到的退化嵌入质量通过余弦相似度分析验证（Figure 4
 ![[assets/figures/papers/paper_list_l2483_https_openaccess_thecvf_com_content_CVPR2026_html_Kazerouni_Face2Scene_U/figures/004_Figure_3.jpg]]
 *Figure 3: Visual comparison of Face2Scene with the three top-performing methods from the quantitative results (zoom in to see details)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 
@@ -301,6 +307,8 @@ Face2Scene 的性能链式依赖于现成的参考面部修复模型（off-the-s
 3. **退化代码的可解释性与可控性**：FaDeX 学习到的 21 个多尺度令牌是否对应可解释的退化属性（如噪声强度、模糊半径、压缩质量因子）？如果能实现退化维度的解耦，用户将能够交互式地调整恢复程度。
 
 4. **多面部融合策略**：当场景中存在多个人物时，不同面部可能经历略有不同的退化（如距离相机远近不同导致的尺度差异）。如何融合多个面部退化代码以获得更准确的全局退化估计，是一个尚未探索的问题。
+
+
 
 ## 原文 PDF
 

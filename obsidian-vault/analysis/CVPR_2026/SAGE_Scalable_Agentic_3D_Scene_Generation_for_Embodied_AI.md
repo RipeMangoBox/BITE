@@ -43,7 +43,7 @@ claims:
 > - Average over Bedroom, Kitchen, Living Room 上，Collision (%) 1.9 vs 22.0 (Holodeck) (-20.1)；Realism (GPT-4.1 score, 1-10) 8.8 vs 7.5 (Holodeck) (+1.3)。
 > - Mobile Manipulation (Cross-Evaluation on SAGE scenes) 上，Test Success Rate (%) 46.0 (SAGE trained on SAGE scenes) vs 14.4 (Baseline1, mimics SceneWeaver) / 13.1 (Baseline2, mimics Holodeck) (+31.6 / +32.9)。
 
-## 概述
+## 概要
 
 ### 问题背景与瓶颈
 
@@ -73,8 +73,6 @@ SAGE（Scalable Agentic 3D Scene Generation）是一个面向具身 AI 的可扩
 
 SAGE 在 3D 场景生成领域的方法谱系中占据独特位置。与 Holodeck 等 LLM 驱动的固定流水线方法相比，SAGE 引入了完整的智能体自改进循环；与 SceneWeaver 等无仿真验证的智能体方法相比，SAGE 首次将仿真器在环物理验证系统性地纳入生成闭环。Table 1 的方法对比清晰展示了这一差异化定位：SAGE 是唯一同时满足“智能体驱动”“仿真验证”“自改进”“可扩展”四项标准的方法。
 
-## 背景与动机
-
 ### 具身 AI 对仿真场景的迫切需求
 
 具身 AI 的进步高度依赖大规模、高质量的训练环境。机器人策略学习需要大量交互数据，而真实世界的数据采集成本高昂、耗时且难以覆盖长尾场景。因此，仿真环境成为具身 AI 训练的核心支柱——它能够以极低的成本生成无限多样的交互数据，并支持安全、可重复的策略评估。然而，这一愿景的实现有一个关键前提：**仿真场景必须足够丰富、语义合理且物理稳定**，否则在仿真中训练的策略将无法迁移到真实世界。
@@ -102,7 +100,7 @@ Table 1 系统对比了现有方法与 SAGE 的能力差异，清晰地揭示了
 
 这一设计使得 SAGE 不仅是一个场景生成器，更是一个能够理解用户意图、自动生成仿真就绪环境的智能体系统，直接服务于具身 AI 的策略学习与评估。
 
-## 核心创新
+## 核心方法与创新机理
 
 SAGE 的核心创新在于将 **agentic 自改进机制**与**仿真器闭环物理验证**深度耦合，解决了现有 3D 场景生成方法“好看但不可用”的根本瓶颈。与 Holodeck、SceneWeaver 等基线方法相比，SAGE 在三个关键维度上实现了质性突破（见表 1）。
 
@@ -128,8 +126,6 @@ SAGE 的双 critic 设计形成了语义-物理联合质量保障。**Visual Cri
 | 部署可用性 | 需人工后处理修正物理问题 | 生成即仿真就绪（Coll. 1.9%, Stab. 99.9%） |
 
 > **注意**：关于 SAGE 与基线方法在“agentic 编排”和“自改进”能力上的具体实现差异，论文仅提供了高层次对比（Table 1），未给出基线方法的详细架构描述。若需精确的技术对比，建议查阅 Holodeck 和 SceneWeaver 的原始论文进行验证。
-
-## 整体框架
 
 SAGE 是一个**基于 MCP 协议的智能体（agentic）框架**，其核心设计思路是将场景生成建模为一个**闭环、自改进的工具调用过程**。系统接收用户指定的具身任务描述（例如“拿起一个碗并放在桌子上”），理解任务意图后，自动生成可在仿真器中直接部署的 3D 场景。
 
@@ -174,8 +170,6 @@ SAGE 是一个**基于 MCP 协议的智能体（agentic）框架**，其核心�
 ![[assets/figures/papers/paper_list_l2159_https_arxiv_org_abs_2602_10116/figures/003_Figure_2.jpg]]
 *Figure 2: Overview of SAGE scene generation. Our system converts open-vocabulary text prompts into simulation-ready 3D scenes by orchestrating multiple generator tools and critics. The agent dynamically calls generators (Scene Init, Asset Placer/Mover/Remover) to construct and refine layouts, while visual and physics critics provide iterative feedback for self-improvement. The visual critic suggests semantic corrections (e.g., missing or misplaced objects), and the physics critic validates stability via Isaac Sim. For example, after applying physics critic in the bottom image, the newly added pillows on the bed fall flat. This self-improvement process ends when the agent considers that the generated...*
 
-## 核心模块与公式推导
-
 SAGE 的生成流程由 **MCP 协议**（Model Context Protocol）驱动，将 LLM 作为中央调度器（MCP Client），各功能模块封装为独立的 MCP Server 工具。Agent 根据用户任务意图动态选择并调用工具，通过视觉与物理双重批评的闭环反馈实现自我纠正。
 
 ### 关键模块
@@ -196,7 +190,7 @@ SAGE 的生成流程由 **MCP 协议**（Model Context Protocol）驱动，将 L
 
 本文未提出新的数学公式或理论推导。其核心贡献在于工程架构层面：将生成器与仿真验证器通过 MCP 协议无缝集成，使 Agent 能够像调用工具一样组合使用各模块，实现自适应、可自我纠正的场景生成流程。定量评估中涉及的物理有效性指标（碰撞率、稳定性）基于 trimesh 网格碰撞检测与 Isaac Sim 物理引擎仿真，属于工程度量而非公式推导范畴。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主结果：场景生成质量与物理稳定性
 
@@ -292,10 +286,7 @@ SAGE 策略展现出更强的跨分布泛化能力：
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l2159_https_arxiv_org_abs_2602_10116/figures/012_Figure_8.jpg]]
-*Figure 8: Image-conditioned scene generation. Using Qwen3- VL [48], SAGE extracts style and object attributes from reference images to enable image-conditioned scene generation without architectural modifications. The generated scenes are not pixel-aligned but remain semantically consistent with the reference images*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 与现有方法的关系
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2023
 pdf_ref: paperPDFs/arxiv_2023/LAMP_Learn_A_Motion_Pattern_for_Few_Shot_Based_Video_Generation.pdf
+project_link: https://rq-wu.github.io/projects/LAMP
+code_link: null
 aliases:
 - LAMP
 tags:
@@ -41,15 +43,13 @@ claims:
 > - Custom evaluation set 上，Alignment 31.3547 (best)；Consistency 98.3085 (best)；Diversity 71.6535 (best)。
 > - User study 上，Preference rate 46.84% vs AnimateDiff 19.11%, Tune-A-Video 22.15% (+24.69% over Tune-A-Video)。
 
-## 概述
+## 概要
 
 **核心问题：** 少样本视频生成面临双重困境——训练数据极度受限（8~16 个视频）时，模型极易过拟合视频内容，丧失生成多样性；同时，从有限样本中分离并学习可泛化的运动模式，对纯空间生成模型构成根本性挑战。
 
 **方法定位：** LAMP 提出一种少样本微调框架，将文本到视频生成（T2V）解耦为两个阶段：第一帧的文本到图像生成（利用现成的 **SD-XL**），以及基于第一帧的后续帧预测。通过设计**第一帧条件化训练管道**、**时间-空间运动学习层**和**修改的自注意力机制**，LAMP 仅需在单 GPU 上使用 8~16 个视频即可学习特定运动模式，同时保持内容多样性和语义泛化能力。
 
 **核心结果：** 在自定义评估集上，LAMP 在 Alignment（31.35）、Consistency（98.31）、Diversity（71.65）三项指标上均取得最优；用户偏好率（46.84%）显著优于 **AnimateDiff**（Guo et al., 2023）的 19.11% 和 **Tune-A-Video**（Wu et al., ICCV 2023）的 22.15%。消融实验证实，第一帧条件化管道是避免内容过拟合的关键，时间-空间运动层是帧间运动建模的瓶颈组件，共享噪声采样则以极小代价提升推理稳定性。
-
-## 背景与动机
 
 ### 视频生成的范式瓶颈
 
@@ -67,7 +67,7 @@ claims:
 
 通过上述因果调控，LAMP 在 8～16 个视频、单 GPU 的条件下即可学习特定的运动模式，同时保留了扩散模型良好的语义泛化特性——例如，可以将“微笑”的运动模式施加到训练集中未曾出现的漫画风格上（Figure 1）。这一设计在训练资源与生成自由度之间实现了有效的平衡。
 
-## 核心创新
+## 核心方法与创新机理
 
 LAMP 的核心创新在于将少样本视频生成重新定义为一个**内容-运动解耦问题**，并通过三个紧密耦合的机制实现：第一帧条件化训练管道、时间-空间运动学习层，以及修改后的自注意力与共享噪声采样策略。这些创新直接回应了少样本场景下的根本瓶颈——训练数据有限时，模型极易同时记住视频内容与运动模式，导致生成多样性丧失。
 
@@ -114,8 +114,6 @@ $$\epsilon^i = \alpha \epsilon^s + (1 - \alpha) \epsilon^i, \quad \alpha = 0.2$$
 | 共享噪声采样 | 推理时视频抖动 | 共享噪声与独立噪声加权混合，$\alpha=0.2$ |
 
 这些创新共同实现了在单 GPU、8~16 个视频的条件下学习特定运动模式，同时保持内容多样性和语义泛化能力——例如，将“微笑”的运动模式施加到训练中未见过的漫画风格角色上（Figure 1）。
-
-## 整体框架
 
 LAMP 的整体 pipeline 将文本到视频（T2V）生成解耦为两个阶段：**第一帧的内容生成** 与 **后续帧的运动预测**。这一设计直击少样本视频生成的核心瓶颈——训练数据有限时，模型极易同时记住视频的内容与运动，导致生成多样性丧失。通过将内容生成外包给一个冻结的强大 T2I 模型，LAMP 的微调部分仅需专注于学习运动模式，从而在 8~16 个视频、单 GPU 的条件下实现内容自由与运动保真度的平衡。
 
@@ -169,8 +167,6 @@ $$
 
 ![[assets/figures/papers/paper_list_l1048_https_arxiv_org_abs_2310_10769/figures/002_Figure_2.jpg]]
 *Figure 2: Framework of LAMP. LAMP learns a motion pattern from a small video set, enabling the generation of videos imbued with the learned motion patterns. This approach strikes a balance between training resources and generation freedom in video generation. We transfer text-to-video generation to the first-frame generation and subsequent-frame prediction, i.e., decoupling a video’s contents and motions. During training, we add noise and compute loss functions for all frames except the first frame. Moreover, only the parameters of newly added layers and the query linear layers of self-attention blocks are tuned. During inference, we use a T2I model to generate the first frame. The tuned model only w...*
-
-## 核心模块与公式推导
 
 LAMP 的核心设计围绕一个关键洞察展开：将文本到视频生成解耦为**第一帧内容生成**与**后续帧运动预测**两个独立阶段。这一解耦通过若干精心设计的模块实现，本节逐一剖析其机制与公式表达。
 
@@ -232,7 +228,7 @@ $$\epsilon^{i} = \alpha \epsilon^{s} + (1 - \alpha) \epsilon^{i}$$
 
 为进一步提升色彩一致性，LAMP 在推理后对生成帧应用自适应实例归一化（AdaIN）与直方图匹配，将后续帧的色彩分布对齐到第一帧。消融实验表明移除此步骤会降低色彩连贯性，但该模块属于轻量后处理，不参与核心运动学习。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -278,12 +274,7 @@ LAMP 的第一帧条件化管道天然支持两类下游应用：
 
 基于上述失败模式，以下方向值得进一步探索：设计更强的运动学习模块以处理复杂运动；独立建模前景和背景运动以稳定背景；确定少样本视频扩散训练的最少数据需求；以及将方法推广到更长、更高分辨率的视频生成。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1048_https_arxiv_org_abs_2310_10769/figures/001_Figure_1.jpg]]
-*Figure 1: Our text-to-video results. The motion prompts and video prompts are listed, respectively. Our LAMP works effectively on diverse motions. The generated videos are temporal consistent and close to the video prompts. Moreover, two advantages of LAMP can be reflected in the above results. (1) The proposed first-frame-conditioned training strategy allows us to use powerful SD-XL for first-frame generation, which is beneficial to producing highly detailed following frames. (2) Good semantic generalization properties of the diffusion model are preserved (e.g. imposing smile’s motion on unseen comic style) since our tuning way*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 技术路线定位
 

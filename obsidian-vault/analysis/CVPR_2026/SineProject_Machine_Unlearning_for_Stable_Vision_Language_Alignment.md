@@ -44,7 +44,7 @@ claims:
 > - SafeEraser (LLaVA-13B) 上，SARR (%) 25.1 vs 27.3 (SafeEraser PO+PD) (-8% （相对降低）)。
 > - MLLMU-Bench (5% 删除率, LLaVA-7B) 上，Forget Cls (↓) 43.28 vs 45.61 (NPO) (-2.33)。
 
-## 概述
+## 概要
 
 ### 问题：视觉-语言对齐漂移是机器遗忘的隐性瓶颈
 
@@ -81,7 +81,7 @@ SINEPROJECT 的关键创新在于**将正弦变换引入投影器参数化，利
 
 尽管 SINEPROJECT 显著缓解了过遗忘问题，仍存在若干局限：当遗忘比例超过 25% 时，遗忘质量与保留性能仍会下降；正弦投影器无法解决深度纠缠的语义概念解耦问题（如遗忘一个人物时，其关联作品的知识也可能受损）；在约 24% 的双方均拒绝的案例中，模型仍不当拒绝良性查询。开放问题包括：如何将几何稳定策略与认证防御机制结合以获得形式化遗忘保证，如何扩展到深度融合架构，以及如何在持续遗忘场景中进一步延长可行遗忘窗口。
 
-## 背景与动机
+
 
 ### 多模态大语言模型的安全遗忘需求
 
@@ -108,7 +108,9 @@ SINEPROJECT 的关键创新在于**将正弦变换引入投影器参数化，利
 
 基于此，本文提出 **SINEPROJECT**，通过冻结预训练的投影权重 $W$，仅优化可训练的扰动参数 $\Delta W$，并以 $W + \sin(\Delta W)$ 的形式施加有界调制，从而在不引入额外计算开销的前提下，实现投影网络雅可比谱的稳定控制，大幅减少过度拒绝。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题诊断：投影层雅可比条件数崩溃
 
@@ -146,7 +148,7 @@ $$(W_2 + \sin(\Delta W_2)) \phi((W_1 + \sin(\Delta W_1)) x + b_1) + b_2$$
 
 SINEPROJECT 的创新聚焦于投影层的参数化方式，**不改变遗忘损失函数的形式**、**不修改视觉编码器或语言模型主干的架构**、**不引入额外的对齐约束或蒸馏损失**。其有效性源于对遗忘过程中数值不稳定根源的精确干预——通过正弦变换的谱正则化效应，在参数层面而非损失层面解决了对齐漂移问题。
 
-## 整体框架
+
 
 SINEPROJECT 的整体框架围绕一个核心发现构建：在多模态大语言模型（MLLM）的机器遗忘过程中，视觉-语言投影网络的雅可比矩阵条件数会急剧增大 3–4 个数量级，导致跨模态嵌入发生显著漂移，进而引发灾难性的“过遗忘”——模型对无害查询产生过度拒绝。针对这一瓶颈，SINEPROJECT 提出了一种轻量级的几何稳定策略，在不改变原有 MLLM 架构主干的前提下，仅对投影层施加正弦变换的有界参数扰动，从而稳定雅可比谱，维持视觉与语言嵌入空间的几何一致性。
 
@@ -184,7 +186,7 @@ $$\theta^* = \arg\min_\theta \mathcal{L}_{\mathrm{forget}}(\theta; \mathcal{D}_f
 
 值得注意的设计特性是正弦投影器对损失函数选择的鲁棒性。在梯度下降（GD）、KL 散度最小化（KL）和偏好优化（PO）三种不同的遗忘目标下，SINEPROJECT 均一致地将 SARR 降低 0.8–4.5 个百分点，同时保持拒绝率（RR）超过 99%。这表明几何稳定机制与具体的遗忘损失解耦，可作为通用插件嵌入各类机器遗忘范式。
 
-## 核心模块与公式推导
+
 
 ### 投影网络架构
 
@@ -246,7 +248,9 @@ $$(W_2 + \sin(\Delta W_2)) \phi((W_1 + \sin(\Delta W_1)) x + b_1) + b_2 \quad \t
 ![[assets/figures/papers/paper_list_l783_https_arxiv_org_abs_2511_18444/figures/005_Figure_3.jpg]]
 *Figure 3: Spectral dynamics during unlearning. Evolution of singular values for*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：SINEPROJECT 在遗忘-保留权衡上的突破
 
@@ -344,7 +348,9 @@ Table 9 显示，SINEPROJECT 引入的计算开销低于 1%（SafeEraser，LLaVA
 ![[assets/figures/papers/paper_list_l783_https_arxiv_org_abs_2511_18444/figures/004_Table_2.jpg]]
 *Table 2: Quantitative comparison on the MLLMU-Bench benchmark. We evaluated the multimodal unlearning performance of various methods on LLaVA-1.5-7B under three deletion ratios (5%, 10%, and 15%). Each block reports results for four sets: Forget, Test, Retain, and Real-Celebrity. Metrics include Cls (classification accuracy), RG (ROUGE), Fct (factuality), and Clz (cloze accuracy). For the Forget and Test sets, ↓ indicates that a lower value is better (stronger forgetting). for the Retain and Real-Celebrity sets, ↑ indicates that a higher value is better (better retention). Bold: best per metric; underline: second-best; yellow = our method-SINEPROJECT (NPO); blue = baseline. The Avg. column shows ove...*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：多模态遗忘中的视觉-语言对齐退化
 
@@ -394,6 +400,8 @@ SINEPROJECT 的适用性由以下边界条件界定：
 3. 能否将正弦调制推广到深度融合架构的交叉注意力层，通过约束注意力权重的谱特性来稳定多模态交互？
 4. 是否可以通过设计新的遗忘损失函数或数据增强策略（如对比解耦、反事实样本生成），从训练信号层面减轻语义纠缠，与几何稳定形成双层防护？
 5. 在持续遗忘场景中，能否引入弹性权重巩固（EWC）或渐进式网络扩展等持续学习策略，进一步延长可行遗忘窗口？
+
+
 
 ## 原文 PDF
 

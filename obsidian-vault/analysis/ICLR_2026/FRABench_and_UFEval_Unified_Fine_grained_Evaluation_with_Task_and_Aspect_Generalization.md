@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/FRABench_and_UFEval_Unified_Fine_grained_Evaluation_with_Task_and_Aspect_Generalization.pdf
+project_link: null
+code_link: null
 openreview_forum_id: 7WdY3Cojy9
 aliases:
 - FUUFGETAG
@@ -41,7 +43,7 @@ claims:
 > - SummEval (Ave.) 上，Kendall's tau 为 69.0，对比 59.3 (Prometheus 2)，变化 +9.7。
 > - MT-Bench 上，Kendall's tau / diff 为 74.9 / 88.3，对比 43.6 / 37.7 (Themis)，变化 +31.3 / +50.6。
 
-## 概述
+## 概要
 
 现有的“MLLM-as-a-Judge”评估范式存在一个关键瓶颈：评估器通常针对特定任务和特定评估方面进行设计，缺乏向未见任务与未见方面的泛化能力。同时，社区缺少一个大规模、多模态的细粒度评估数据集来支撑统一评估器的训练。本文的核心洞察在于，不同评估方面之间存在内在关联——联合学习多个视觉任务和多个评估方面可以产生协同效应，使得评估器能够泛化到相关方面甚至全新任务。
 
@@ -51,7 +53,7 @@ UFEval在任务泛化评估中表现突出：在FRA-OOD上，NLG任务准确率�
 
 在方法谱系中，UFEval区别于GPT-4o、Claude-3.5等提示型模型，也与Themis（Hu et al., 2024b）、LLaVA-Critic（Xiong et al., 2024）等单任务微调评估器形成对比——后者仅覆盖有限任务和方面，而UFEval首次实现了跨NLG、IU、IG、ITIG四大任务类型及28个子任务的统一细粒度评估。其局限性主要体现在图像生成评估性能相对有限、对阴暗图像的Harmfulness误判倾向，以及数学推理任务上的薄弱表现。
 
-## 背景与动机
+
 
 ### 问题背景：MLLM-as-a-Judge 的评估瓶颈
 
@@ -79,7 +81,9 @@ UFEval在任务泛化评估中表现突出：在FRA-OOD上，NLG任务准确率�
 
 本文的核心假设是：**评估方面之间存在内在关联，联合学习多个视觉任务和多个评估方面可以产生协同效应**。这种协同效应使得在部分方面上训练的评估器能够泛化到其他相关方面，甚至扩展到训练时完全未见过的任务类型。后续实验将通过任务泛化评估（在 FRA-OOD 上测试）和方面泛化评估（在未见过的 TAs 上测试）来系统验证这一假设。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈
 
@@ -110,7 +114,7 @@ UFEval的泛化能力体现在两个维度：
 
 - **方面泛化**：在完全未见过的任务特定方面（TAs）上，UFEval仍保持高效评估，总体准确率达86.2%（与GPT-4o一致性）和83.2%（与人类一致性）（Table 2）。这得益于多任务联合训练中习得的跨方面判别能力。
 
-## 整体框架
+
 
 UFEval 的评估流水线由两个核心步骤构成：**方面选择（Aspect Selection）** 与 **评估执行（Evaluating）**，其设计目标是在统一框架下实现对多模态输出的细粒度、可泛化评估。
 
@@ -122,7 +126,7 @@ UFEval 本身以 **Qwen2-VL-7B-Instruct** 为基座，在 FRABench 数据集上�
 
 > **证据强度说明**：上述流水线描述基于 Figure 1 的示意及 Section 3 的方法论阐述，数据规模来自 Section 1 和 Section 3.2.1 的明确声明。方面分类法的构建细节（双向匹配策略、UA/TA 划分）在 Section 3.1.2 中有详细说明，置信度较高。泛化能力的具体实验证据见 Table 2 及相关消融实验，此处仅描述框架设计逻辑，不展开量化结果。
 
-## 核心模块与公式推导
+
 
 ### 评估流水线模块
 
@@ -166,7 +170,9 @@ $$L(\theta) = -\mathbb{E}_{(x_0^w,x_0^l)\sim\mathcal{D}_{Gen}, t\sim\mathcal{U}(
 
 该损失通过比较获胜图像和失败图像上的噪声预测误差差异，引导扩散模型生成更符合人类偏好的图像。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 评估设置与基线
 
@@ -265,7 +271,9 @@ Figure 5和Table 5中的多任务变体训练结果揭示了核心机制：**联
 ![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_7WdY3Cojy9/figures/094_Figure.jpg]]
 *Figure: 2. My cousin says Mr. Shadow stole her favorite toy" or "My best friend saw Mr. 1. Show scenes of Oliver chasing his shadow and the moment he reclaims the stolen shadows. A boy named Jack had an imaginary friend, Mr. Shadow, who would follow him around wherever he went in school or at home when no one else was watching. At first it didn’t bother Jack much, but soon after that people started talking about their own experiences with Mr. Shadow too! "I don’t believe*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 在“MLLM-as-a-Judge”评估器谱系中的位置
 
@@ -298,6 +306,8 @@ UFEval 与上述工作的核心差异在于：它是首个以统一模型覆盖 
 - **方面粒度的优化空间**：更细粒度的方面定义或增加针对性训练数据是否能够减少 Harmfulness 误判？当前方面分类法的层次结构是否足够灵活以容纳新的评估维度？
 - **模态扩展的可能性**：UFEval 的方面泛化机制——即通过方面之间的内在关联实现从已知方面到未知方面的迁移——在理论上不依赖特定模态。该框架能否扩展到音频、视频等更多模态的评估任务中？
 - **评估器的自我改进循环**：UFEval 已展示了“评估→构造偏好数据→DPO 训练→模型提升”的闭环。是否存在“用提升后的模型生成更难样本→再训练评估器”的迭代改进路径？这需要进一步实验验证。
+
+
 
 ## 原文 PDF
 

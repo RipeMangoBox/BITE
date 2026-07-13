@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/From_Static_Benchmarks_to_Dynamic_Protocol_Agent_Centric_Text_Anomaly_Detection_for_Evaluating_LLM_Reasoning.pdf
+project_link: null
+code_link: null
 openreview_forum_id: 9HacBDFOjt
 aliases:
 - ACTADA
@@ -41,7 +43,7 @@ claims:
 > - ATAD benchmark (GPT-4o generated, w/ vs. w/o Orchestrator) 上，Accuracy of GPT-4o 为 72.43 (w/ Orch.)，对比 68.29 (w/o Orch.)，变化 +4.14。
 > - ATAD benchmark (average across all generators) 上，Overall Average Accuracy 为 Claude-3.5-Sonnet: 59.96，对比 GPT-3.5-Turbo: 54.18 (lowest among competent models)，变化 +5.78。
 
-## 概述
+## 概要
 
 当前大语言模型（LLM）的推理能力评测面临一个根本性瓶颈：静态基准数据集存在数据污染风险，且难以自适应地扩展难度，导致评测分数无法真实反映模型的推理极限。为突破这一局限，本文提出 **Agent-Centric Text Anomaly Detection（ATAD）**——一种以代理为中心的动态基准生成协议。其核心思路是：用教师-学生竞争循环驱动难度自适应缩放，并由独立的编排器代理进行多维度验证，从而持续产出高质量、难度递增的文本异常检测问题。
 
@@ -51,7 +53,7 @@ ATAD 的工作机制如下：教师代理生成候选问题，编排器验证其
 
 主要实验结果（Table 1）显示，在跨四个生成模型家族的基准上，Claude-3.5-Sonnet 以 **59.96%** 的平均准确率居首，而 GPT-3.5-Turbo 仅获 54.18%，表明 ATAD 对不同能力层级的模型具备显著区分度。消融实验进一步证实：移除编排器后，问题质量（有效性、连贯性、公平性）严重恶化；仅使用基础问题（无难度缩放）时，所有模型准确率均处于高位，验证了教师-学生竞争机制对难度提升的核心作用。公平性方面，BiasIndex 度量显示基准不存在对生成模型家族的显著偏向，跨家族代理配置下模型排名保持稳定。
 
-## 背景与动机
+
 
 ### 静态基准的困境
 
@@ -71,7 +73,9 @@ ATAD 的工作机制如下：教师代理生成候选问题，编排器验证其
 
 具体而言，ATAD 协议让教师代理生成候选问题，编排器代理进行多维度验证（有效性、连贯性、清晰度、公平性），学生代理尝试解答。若学生成功，编排器指示教师生成更具挑战性的变体；若学生失败，该问题即被固化为基准条目。这一“失败驱动”的难度缩放机制确保了基准中的每个问题都精准锚定在模型当前的推理极限上，从而实现了可演进的基准评测。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ATAD的核心创新在于将基准评测从**静态数据集构建**转变为**多代理动态竞争协议**，通过三个关键机制解决了现有基准的根本性缺陷。
 
@@ -101,7 +105,7 @@ ATAD的核心创新在于将基准评测从**静态数据集构建**转变为**�
 
 这三个机制协同作用，使得ATAD能够持续、自适应地暴露大语言模型的细微推理缺陷，同时保持问题的清晰度与公平性，实现了从“一次性评测”到“可演进基准”的范式转换。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_9HacBDFOjt/figures/002_Figure_2.jpg]]
 *Figure 2: Illustration of the overall ATAD protocol. Three agents iteratively interact to generate progressively challenging benchmarks designed to uncover subtle reasoning weaknesses in LLMs*
@@ -151,7 +155,7 @@ ATAD 的运行分为三个有序阶段，其中前两个阶段构成基准生成
 
 ATAD 协议支持跨模型家族的代理配置，例如以 GPT-4o 作为教师、Gemini-2.0-Flash 作为学生，记为 $\mathrm{ATAD}_{\mathrm{gemini2-flash}}^{\mathrm{gpt-4o}}$。这种灵活性使得协议的公平性可以通过跨家族配置进行验证——实验表明，不同家族模型在自家生成的基准上并未获得优势，BiasIndex 接近零，证明了协议对生成模型的鲁棒性。
 
-## 核心模块与公式推导
+
 
 ATAD 协议的核心由三个代理模块和一个两阶段生成流程构成，其形式化基础围绕难度度量与公平性指标展开。
 
@@ -185,7 +189,9 @@ $$\mathrm{BiasIndex}(G) = \mathrm{MeanAccuracy}(M_{\mathrm{same}}(G) \mid G) - \
 
 其中，$G$ 为生成模型家族，$M_{\mathrm{same}}(G)$ 为与生成器同家族的评估模型集合，$M_{\mathrm{diff}}(G)$ 为不同家族的评估模型集合。$\mathrm{BiasIndex}$ 衡量基准对特定模型家族的偏向程度——正值表示同家族模型获得优势，零值表示无系统性偏向。实验显示该指标接近零，验证了协议的公平性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 整体性能与难度缩放效果
 
@@ -235,7 +241,9 @@ ATAD生成过程中的难度层级展现出良好的单调性。**Table 9** 显�
 
 尽管ATAD展现出强大的自适应评测能力，实验仍揭示了若干失败模式与局限。首先，**当前实现仅针对文本异常检测任务**，尚未在数学推理、代码生成等领域验证协议的可迁移性——这是方法泛化性的关键缺口。其次，基准质量依赖于教师和编排器所用LLM的能力上限，尽管BiasIndex显示偏向微弱，但**无法完全排除特定模型的细微偏向**在极端难度层级被放大。第三，缺乏与人类评估者的系统对比，机器生成问题中可能存在人类不易察觉的缺陷（如编排器自身对某些逻辑错误的盲区）。最后，**难度缩放可能在极高水平趋于停滞**：当学生模型能力接近教师模型时，教师可能无法生成足够有区分度的更难变体，这需要更形式化的收敛性分析来指导协议改进。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 动态基准生成范式的演进定位
 
@@ -272,6 +280,8 @@ ATAD 当前实现存在明确的适用边界：
 4. **形式化理论基础。** 论文在附录 J.1 中给出了难度的形式化定义 $\mathrm{Difficulty}(q; S) = \mathrm{Pr}[ S \mathrm{\ fails\ on\ } q \ | \ q \in \mathrm{Valid} ]$，但如何将博弈论形式化（如 Shapley 值）实际整合进协议，以量化各代理贡献并动态分配计算资源，仍是开放问题。
 
 5. **长期多样性与新颖性保障。** 在大规模、持续运行中，如何保证所生成问题的长期多样性、新颖性和难度覆盖？教师代理可能陷入特定生成模式，导致问题类型趋同，需要引入显式的多样性约束或探索机制。
+
+
 
 ## 原文 PDF
 

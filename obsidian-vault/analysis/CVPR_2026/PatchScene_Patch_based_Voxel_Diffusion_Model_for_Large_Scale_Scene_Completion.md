@@ -40,7 +40,7 @@ claims:
 > [!tip] 效果简介
 > - SemanticKITTI 上，CD↓, JSD 3D↓, JSD BEV↓, Voxel IoU↑ (0.5/0.2/0.1) CD=0.319, JSD 3D=0.444, JSD BEV=0.371, IoU_0.5=45.3 vs 优于 LiDiff, LiDPM, ScoreLiDAR, XCube 等先前最优方法（详见 Table 1） (所有指标均取得显著一致的提升)。
 
-## 概述
+## 概要
 
 大规模 LiDAR 场景补全是自动驾驶与机器人环境感知中的关键任务，其核心挑战在于从稀疏、有限的传感器观测中重建出几何精确、时空一致的密集三维点云。现有方法面临一个根本性的三角困境：**全局密集体素或潜在表示导致计算开销随空间范围呈三次方增长**，多阶段编解码架构引入信息损失与误差累积，且普遍忽略时间维度，难以生成跨帧连贯的补全结果。
 
@@ -48,7 +48,7 @@ PatchScene 针对上述瓶颈提出了一种**分治范式的体素扩散框架*
 
 在 SemanticKITTI 基准上，PatchScene 在所有标准指标上均取得当时最优性能——Chamfer Distance (CD) 降至 0.319，JSD 3D 为 0.444，JSD BEV 为 0.371，Voxel IoU (阈值 0.5) 达到 45.3%，全面超越 LiDiff、LiDPM、ScoreLiDAR 及 XCube 等先前方法。消融实验表明，**环形向外扩散**相比线性扩散将 CD 从 0.451 降至 0.319，而**时间融合机制**将相邻帧之间的双向 RMSE 从约 0.155/0.159 大幅压缩至 0.086/0.081，验证了所提时空融合策略在提升补全质量与时间一致性方面的关键作用。此外，仅在 20 米感知范围上训练的模型可直接泛化至 50 米场景，展现出良好的空间扩展能力。
 
-## 背景与动机
+
 
 大规模场景补全是自动驾驶与机器人感知中的核心任务，其目标是从稀疏、不完整的 LiDAR 扫描中恢复稠密且几何精确的三维点云。这一任务面临一个根本性的三角冲突：**高几何保真度、时间一致性与计算效率三者难以兼得**。
 
@@ -60,7 +60,9 @@ PatchScene 针对上述瓶颈提出了一种**分治范式的体素扩散框架*
 
 PatchScene 的提出正是为了系统性地解决上述冲突。其核心动机源于一个朴素而深刻的观察：LiDAR 扫描具有天然的**径向密度递减特性**——靠近传感器的区域点云密集、信息丰富，而远离传感器的区域点云稀疏、信息匮乏。这一物理先验暗示了一个由近及远、以信息密集区域指导稀疏区域生成的分治策略。通过将全局体素空间分割为重叠的局部块（patch），在每个块上独立执行扩散去噪，再经由空间与时间融合机制将局部结果聚合为全局一致的点云，PatchScene 实现了**高保真度、时间一致性与无限空间扩展能力**的统一。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PatchScene 的核心创新在于通过**分块体素扩散范式**重构了大规模场景补全的生成机制，从根本上解耦了高保真几何生成与计算可扩展性之间的矛盾。与现有方法相比，该方法在场景表示、融合策略、时间建模和生成调度四个维度上引入了系统性变革。
 
@@ -80,7 +82,7 @@ PatchScene 的核心创新在于通过**分块体素扩散范式**重构了大�
 
 PatchScene 的第四项关键创新是**环形向外扩散调度**。该方法将体素块按距传感器中心的距离划分为同心圆环，从内环向外环依次生成，内环已完成的高质量结果作为外环去噪的条件信息。这一设计并非任意的启发式，而是直接利用了 LiDAR 扫描中径向点密度递减的物理特性：近距区域点云密集、信息丰富，其补全结果高度可靠，可有效指导稀疏远距块的生成。消融实验证实，环形向外扩散的 CD 达到 0.319，显著优于线性扩散（0.451）和环形向内扩散（0.391），验证了由近及远信息传播策略的有效性（Table 5, Sec. 4.4）。此外，该调度策略天然支持无限空间扩展——仅需在训练范围（20 m）外继续添加外环即可，无需重新训练（Figure 4）。
 
-## 整体框架
+
 
 PatchScene 的整体设计遵循“分治—融合—扩散”的统一范式，其核心思路是将大规模 LiDAR 场景补全从全局密集生成问题转化为一组局部高保真补全与跨区域一致性融合的协同过程。整个框架由三个关键阶段构成：
 
@@ -112,7 +114,7 @@ PatchScene 的整体设计遵循“分治—融合—扩散”的统一范式，
 ![[assets/figures/papers/paper_list_l2563_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_PatchScene_Patch_ba/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of PatchScene. The voxel space is first divided into overlapping local patches, each processed independently through diffusion-based denoising to generate local point clouds. Spatial and temporal fusion then merges these patches into a coherent global point cloud. Finally, an annular outward diffusion strategy extends completion across the entire scene, handling near-dense and far-sparse LiDAR distributions for large-scale, temporally consistent reconstruction*
 
-## 核心模块与公式推导
+
 
 PatchScene 围绕“分块体素扩散—空间/时间融合—环形渐进生成”三条主线构建，其核心模块与关键公式如下。
 
@@ -186,7 +188,9 @@ $$
 
 LiDAR 扫描具有径向点密度递减的物理特性——近距区域信息丰富，远距区域极度稀疏。PatchScene 据此设计环形向外扩散顺序：将体素空间按距传感器中心的距离划分为同心圆环 $\mathcal{R}_\ell$，从内环向外环依次生成。内环高质量补全结果作为外环去噪的条件信息，实现由近及远的可靠信息传播。消融实验（Table 5）表明，环形向外扩散的 CD 为 0.319，显著优于线性扩散（0.451）和环形向内扩散（0.391），证明该策略有效利用了 LiDAR 的物理先验。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 PatchScene 在 SemanticKITTI 基准上进行了系统评估，我们从主结果、时间一致性、消融实验三个维度展开分析。
 
@@ -244,7 +248,9 @@ PatchScene 在 SemanticKITTI 基准上进行了系统评估，我们从主结果
 ![[assets/figures/papers/paper_list_l2563_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_PatchScene_Patch_ba/figures/009_Figure_5.jpg]]
 *Figure 5: The effect of the denoising timestep on completion performance. Less timesteps lead to visible boundaries in the completed scenes, while larger timesteps enable more fusion iterations and yield stronger inter-patch consistency*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位与核心瓶颈
 
@@ -290,6 +296,8 @@ PatchScene 的核心突破在于将**分块扩散生成**作为基本范式，�
 - **多传感器融合扩展**：PatchScene 当前仅利用 LiDAR 输入。将图像或毫米波雷达等多模态信息引入局部块的条件生成，有望在远距离、稀疏区域提供额外的语义和几何线索，缓解纯 LiDAR 补全的歧义性。
 
 - **无限空间扩展的理论保证**：论文展示了从 20m 训练范围向 50m 测试范围的零样本泛化能力。这种泛化是否随范围继续扩大而保持稳定，以及是否存在理论上的有效扩展上限，仍需进一步分析。
+
+
 
 ## 原文 PDF
 

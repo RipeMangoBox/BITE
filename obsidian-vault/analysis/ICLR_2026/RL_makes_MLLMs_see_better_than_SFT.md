@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/RL_makes_MLLMs_see_better_than_SFT.pdf
+project_link: null
+code_link: null
 openreview_forum_id: 3gM6HwHvnc
 aliases:
 - PPIVO
@@ -42,7 +44,7 @@ claims:
 > - ImageNet linear probe 上，Top-1 accuracy 为 DPO-trained encoder (SigLIP2-So/16 w/ Qwen-3B)，对比 SFT-trained encoder (same setup)，变化 +1.83%p。
 > - OCR & Chart VQA (average) 上，Score 为 DPO，对比 SFT，变化 +4.2%p。
 
-## 概述
+## 概要
 
 当前多模态大语言模型（MLLM）普遍采用监督微调（SFT）作为训练范式，但研究发现，SFT 对视觉编码器的优化并不充分，导致模型在细粒度视觉理解任务上表现受限。本文系统对比了 SFT 与直接偏好优化（DPO）两种后训练策略对 MLLM 及其视觉编码器的影响，揭示了一个关键发现：**DPO 不仅能提升 MLLM 的整体性能，更能从根本上强化视觉编码器的表示质量**。
 
@@ -52,7 +54,7 @@ claims:
 
 机制分析进一步揭示了 DPO 优势的根源：其对比性损失函数产生的梯度信号高度集中于问题相关的视觉区域，而 SFT 的梯度则相对发散。这种局部化的梯度反馈促使视觉编码器学习到更强的定位能力和更精细的特征表示，在 ImageNet 线性探针（+1.83%p）和语义分割探针（+1.08%p recall）上均验证了这一结论。
 
-## 背景与动机
+
 
 ### 多模态大语言模型的训练范式
 
@@ -77,7 +79,9 @@ claims:
 
 基于对上述问题的探索，本文提出了 **PIVOT**（Preference-Instructed Vision OpTimization），一种利用 DPO 偏好对齐来增强视觉编码器的简单方案，旨在以极低的计算开销（约 18 小时、8 张 H100 GPU）获得可迁移的强视觉编码器。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：视觉编码器在 SFT 下的表征退化
 
@@ -109,7 +113,7 @@ claims:
 
 DPO 带来的不仅是性能提升，更是**数据效率的质变**。在数据规模消融实验中，仅使用 3K DPO 样本即可超越 40K SFT 样本的性能（60.4% vs 59.5%），且随着数据量增加，仅 DPO 训练的视觉表征持续改善，而 SFT 则趋于饱和。这表明 DPO 的对比损失提供了更高质量的训练信号，使得模型能从更少的样本中提取更多的视觉知识。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_3gM6HwHvnc/figures/001_Figure_1.jpg]]
 *Figure 1: TD;LR. We study how SFT and RL (e.g., DPO) affect not only MLLMs but also their vision encoders, and formulate a simple recipe, PIVOT, for evolving vision models for use in MLLM*
@@ -157,7 +161,7 @@ DPO 后训练完成后，将视觉编码器从 LLM 头部解耦，并冻结其�
 
 PIVOT 的核心主张已在 LLaVA-OneVision 架构上，结合 Qwen2.5 系列 LLM 与 SigLIP2 视觉编码器得到验证。方法在多种视觉编码器（CLIP、DINOv2、MAE）上均表现出一致提升，但其在 InternVL、Qwen-VL 等其他 MLLM 框架以及 LLaMA 等 LLM 家族上的泛化性仍需进一步探索。此外，DPO 训练依赖特定的偏好数据集（MPO 子集），偏好数据质量与多样性对最终效果的影响尚未被系统研究。
 
-## 核心模块与公式推导
+
 
 ### 核心模块：两阶段训练与视觉编码器优化
 
@@ -200,7 +204,9 @@ $$L_{\mathrm{DPO}} = -\mathbb{E}_{i \sim X_{\mathrm{FT}}} \log \sigma\left(\beta
 
 DPO 损失的核心机制在于：无需显式训练奖励模型，直接通过最大化选择响应与拒绝响应之间的相对似然边际来实现偏好对齐。这种对比性质使梯度信号更集中于问题相关的视觉区域（如 Figure 7 中 Grad-CAM 可视化所示），从而驱动视觉编码器学习更强、更局部化的特征表示，这是 DPO 在视觉密集型任务上显著优于 SFT 的关键因果机制。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：DPO 在视觉密集型 VQA 上的系统性优势
 
@@ -286,7 +292,9 @@ DPO 损失的核心机制在于：无需显式训练奖励模型，直接通过�
 *Table 7: Table D: Evaluation of LLaVA-1.0-7B under PPO vs. SFT post-training. We present results on MLLM benchmarks for MLLMs trained with different objectives (left). Table E: Evaluation of MLLMs under SFT, DPO, and MPO post-training. We present results on MLLM benchmarks for models trained with different post-training objectives (top). We further evaluate the updated vision encoder on vision-only benchmarks (middle), and finally assess the same encoder when re-integrated and evaluated within MLLMs (bottom)*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心工作与基线关系
 
@@ -325,6 +333,8 @@ PIVOT 的验证边界目前存在以下约束：
 **跨架构验证**：PIVOT 的有效性是否依赖于特定的投影器设计（如 LLaVA 的线性投影层）？在跨注意力融合、Q-Former 等其他多模态连接方式下，视觉编码器的 DPO 梯度信号是否仍能保持局部化优势，需要进一步确认。
 
 **LLM 头的选择影响**：实验显示更大的 LLM 头能带来更强的视觉表示对齐（Figure 10），但 LLM 的架构选择（如不同规模的 Qwen2.5）对 PIVOT 增强效果的具体影响机制尚不清晰。是否存在最优的 LLM 头配置以最大化视觉编码器的提升，是一个值得研究的方向。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2024
 pdf_ref: paperPDFs/CVPR_2024/Outdoor_Scene_Extrapolation_with_Hierarchical_Generative_Cellular_Automata.pdf
+project_link: https://research.nvidia.com/labs/toronto-ai/hGCA/
+code_link: null
 aliases:
 - HHGCA
 - OSEHGCA
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 基于层次生成式元胞自动机的室外场景外推 |
 | 英文题名 | Outdoor Scene Extrapolation with Hierarchical Generative Cellular Automata |
 | 会议/期刊 | CVPR 2024 |
-| Links | [paper](https://arxiv.org/abs/2406.08292); [Project](https://research.nvidia.com/labs/toronto-ai/hGCA/) |
+| Links | [paper](https://arxiv.org/abs/2406.08292) · [Project](https://research.nvidia.com/labs/toronto-ai/hGCA/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | hGCA (Hierarchical Generative Cellular Automata) |
 | Dataset | CARLA, Karton City |
@@ -41,7 +43,7 @@ claims:
 > - CARLA 上，IoU 为 52.17 (implicit) / 53.84 (10cm³)，对比 SG-NN: 50.76，变化 +1.41 / +3.08。
 > - Karton City 上，Street CD (min.) 为 1.85 (implicit) / 2.09 (10cm³)，对比 SG-NN: 2.61，变化 -0.76 / -0.52。
 
-## 概述
+## 概要
 
 **问题瓶颈**：从稀疏、带遮挡的LiDAR扫描中生成大规模室外场景的完整几何，纯生成式元胞自动机（GCA）缺乏全局一致性，导致局部补全不一致和伪影（如弯曲的墙壁、从房屋中“长出”树木）。**核心洞察**：在粗-细两层生成框架中，将轻量级鸟瞰图（BEV）规划器提供的全局上下文与GCA的局部生长能力相结合，在粗阶段保证全局一致性，在细阶段利用连续GCA（cGCA）和局部隐函数实现高分辨率上采样，从而在保持空间可扩展性的同时，从稀疏输入生成高保真、高质量的室外场景几何。
 
@@ -53,8 +55,6 @@ claims:
 - 在真实Waymo-open数据集上，hGCA展现出强大的模拟到真实泛化能力（Figure 7），生成比累积扫描更完整、保真度更高的几何。
 
 **局限与开放问题**：当前推理速度较慢，无法实时应用；真实数据定量评估受限于不完整的ground truth；模型仅在有限合成内容上训练，对极端新异几何体的泛化能力有待验证。未来方向包括提升保真度并添加纹理/材质以直接用于模拟、更稳健地处理动态物体和极端稀疏区域，以及采用域适应技术缩小模拟到真实差距。
-
-## 背景与动机
 
 ### 问题背景：室外场景的稀疏感知与几何补全
 
@@ -79,7 +79,7 @@ claims:
 
 这种设计将“全局一致性”与“局部细节”解耦到两个独立阶段，既解决了纯GCA的不一致问题，又保持了生成式模型的多模态输出能力和空间可扩展性——如Figure 1所示，hGCA可在单张24GB GPU上完成120米范围的高分辨率场景外推。
 
-## 核心创新
+## 核心方法与创新机理
 
 hGCA 的核心创新在于将**全局鸟瞰图（BEV）规划器**与**局部生成式元胞自动机（GCA）**相结合，并通过**层次化粗-细两阶段生成**解决纯 GCA 在大规模室外场景外推中的根本缺陷。以下从三个关键 changed slots 展开分析。
 
@@ -111,8 +111,6 @@ hGCA 的核心创新在于将**全局鸟瞰图（BEV）规划器**与**局部生
 
 hGCA 的三个 changed slots 构成一条完整的因果链：**Planner 提供全局一致性** → **粗阶段 GCA 在引导下生成结构完整但低分辨率的场景** → **细阶段 cGCA 独立上采样并恢复局部几何细节**。这一设计在合成数据（CARLA、Karton City）上验证了相对于所有 baselines 的显著性能优势（Table 1，IoU 提升最高 +3.08，LiDAR ReSim min 降低至 4.53），并在真实 Waymo 数据上展现出强大的 sim-to-real 泛化能力（Figure 7，confidence 0.9）。
 
-## 整体框架
-
 hGCA 采用**两阶段层次化粗-细生成范式**，将大规模室外场景外推分解为低分辨率几何补全与高分辨率上采样两个解耦步骤（Figure 2）。
 
 **第一阶段：粗粒度场景补全。** 输入为多帧累积的稀疏 LiDAR 扫描，首先将其体素化为 20 cm³ 分辨率的占据网格。同时，一个轻量级**鸟瞰图（BEV）规划器**将点云编码为密集的 2D BEV 特征 $f_{\text{BEV}}$，并通过 SPADE 条件化机制注入到 GCA 的稀疏 UNet 解码层中，为局部生长过程提供稳定的全局上下文。GCA 以递归方式从初始占据状态出发，在每一步 $t$ 根据转移核 $s^{t+1} \sim p_\theta(\cdot \mid s^t)$ 更新邻域内的占据概率，经过 $T_1$ 步生成低分辨率补全结果 $s^{T_1}$。规划器同时输出粗粒度的 3D 占据预测 $\mathcal{O}_r$，由交叉熵损失 $\mathcal{L}_{\text{BEV}} = \text{CE}(\mathcal{O}_r, \mathcal{O}_r^{\text{gt}})$ 监督，并与 GCA 损失 $\mathcal{L}_{\text{GCA}}$ 加权组合为总损失 $\mathcal{L} = \mathcal{L}_{\text{GCA}} + \beta \mathcal{L}_{\text{BEV}}$。
@@ -130,8 +128,6 @@ hGCA 采用**两阶段层次化粗-细生成范式**，将大规模室外场景�
 
 ![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2406_08292/figures/008_Figure_7.jpg]]
 *Figure 7: Visualizations on real-world Waymo-open dataset. hGCA exhibits great sim-to-real performance compared to existing method with high fidelity (pink box) and can generate more complete shapes than accumulated scans (green box)*
-
-## 核心模块与公式推导
 
 hGCA 将室外场景外推分解为“全局规划+局部生成”的两阶段层次化流程，其核心由四个模块串联构成。
 
@@ -180,7 +176,7 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{GCA}} + \beta \mathcal{L}_{\mathrm{BEV}}$$
 | $z_c$ | cGCA 中元胞 $c$ 的局部隐式潜向量 |
 | $f_\omega$ | 预训练的隐式场解码器 |
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心瓶颈验证：缺乏全局一致性的朴素GCA
 
@@ -254,9 +250,6 @@ Figure 13和Table 5展示了hGCA在nuScenes数据集上处理100米场景的能�
 ![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2406_08292/figures/022_Figure_16.jpg]]
 *Figure 16: Planner with z _ { r } = 4 visualization. From left to right: 5 scan input from Karton City, completion (20cm3 resolution), rough dense occupancy Or from planner, BEV feature fBEV visualization using PCA. (a) Input*
 
-![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2406_08292/figures/005_Table_1.jpg]]
-*Table 1: Quantitative results on CARLA and Karton City with 5 and 10 scans given as input. All results except IoU are multiplied by 10 in meter scale. LiDAR Resim and Street CD evaluates the fidelity of completion and TMD measures the diversity of generation. High LiDAR Resim uses high elevation LiDAR to evaluate the extrapolation. IoU is computed with ground truth geometry*
-
 ![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2406_08292/figures/007_Table_2.jpg]]
 *Table 2: Ablation study on effects of Planner from 5 input scans. ✗ in zr refers to vanilla GCA without Planner module. 4.3. Ablation Studies on Planner*
 
@@ -266,10 +259,7 @@ Figure 13和Table 5展示了hGCA在nuScenes数据集上处理100米场景的能�
 ![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2406_08292/figures/015_Table_4.jpg]]
 *Table 4: Chamfer distance between the ground truth geometry and completions by varying sparsity. Sparse scene and sparse car indicates a scenario where we sparsify the regions of entire scene (including ground) and only the car, respectively. Chamfer distance above ground are reported and we report average distance of k = 3 generations for generative models (GCA, hGCA). hGCA generalizes well to sparse, novel data*
 
-![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2406_08292/figures/017_Figure_13.jpg]]
-*Figure 13: Visualizations on real-world nuScenes dataset on 100m scenes. Yellow spheres indicate input. hGCA is spatially scalable, completing this whole scene (100 meters) at high resolution on a single 24GB GPU without additional tricks. Table 5. Quantitative results on CARLA and Karton City with a single scan given as input. All results except IoU are multiplied by 10 in meter scale. LiDAR Resim and Street CD evaluates the fidelity of completion and TMD measures the diversity of generation. High LiDAR Resim uses high elevation LiDAR to evaluate the extrapolation. IoU is computed with ground truth geometry*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 方法脉络与基线关系
 

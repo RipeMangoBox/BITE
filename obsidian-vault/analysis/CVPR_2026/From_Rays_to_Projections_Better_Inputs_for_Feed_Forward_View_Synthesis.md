@@ -43,7 +43,7 @@ claims:
 > - Consistency Benchmark (World Scale) 上，PSNR (M) 25.43 vs LVSM 14.56 (+10.87)。
 > - Consistency Benchmark (Anisotropic Pixel) 上，SSIM 0.763 vs LVSM 0.725 (+0.038)。
 
-## 概述
+## 概要
 
 前馈式新视角合成（feed-forward novel view synthesis）旨在从少量标定上下文图像直接预测目标视角的RGB图像，避免逐场景优化。然而，现有方法普遍将相机参数编码为**Plücker射线坐标**作为条件输入，这一设计对全局坐标系统高度敏感——即使微小的SE(3)变换也会在6D射线空间中产生大幅度、非均匀的扰动，导致模型泛化能力差、几何一致性脆弱。
 
@@ -55,8 +55,6 @@ claims:
 - 引入MAE自监督预训练和DINOv3特征先验进一步增强了场景补全能力和结构一致性。
 
 **方法定位**：PVSM属于前馈式视图合成方法，与基于3D高斯泼溅的PixelSplat、MVSplat、NoPoSplat、AnySplat等并行工作互补，也与基于射线的LVSM（Jin et al., ICLR 2025）、RayZer（Jiang et al., arXiv 2025）形成直接对比。其关键创新在于将相机几何处理完全代理给非学习的投影算子，从而在根本上解决了射线条件对全局坐标系敏感的核心瓶颈。
-
-## 背景与动机
 
 ### 前馈视图合成中的条件输入问题
 
@@ -90,7 +88,7 @@ $$\mathbf{P}' \mathbf{X}' \sim (\mathbf{P} T^{-1}) (T \mathbf{X}) = \mathbf{P} \
 
 基于这一洞察，本文提出**投影条件（Projective Conditioning）**：使用确定性栅格化引擎生成的“目标视角投影点云图像”替代原始Plücker射线参数作为模型输入，将相机几何处理完全代理给非学习的投影算子。这一设计将视图合成问题转化为一个条件图像生成任务，天然具备对全局坐标变换的鲁棒性。
 
-## 核心创新
+## 核心方法与创新机理
 
 PVSM的核心创新在于将前馈视图合成从**脆弱的几何回归问题重构为稳定的图像到图像转换任务**。这一重构通过三个关键设计实现，每个设计都对应一个传统Plücker射线条件范式的根本缺陷。
 
@@ -131,8 +129,6 @@ PVSM引入了一个**掩码自编码器预训练阶段**（changed slot: pretrai
 ### 辅助改进
 
 除上述三个核心changed slot外，PVSM还引入了**DINOv3特征先验**（changed slot: context features），将预训练视觉模型的语义特征与RGB图像块拼接作为上下文token，经验性地增强了结构一致性。
-
-## 整体框架
 
 PVSM的整体流水线围绕一个核心设计原则展开：**将新视角合成从脆弱的几何回归问题重构为稳定的图像到图像转换任务**。为此，方法将相机几何处理完全代理给一个非学习的确定性投影算子，网络本身仅需学习2D图像域内的映射。
 
@@ -176,8 +172,6 @@ $$\mathcal{L} = \mathsf{MSE}(\mathbb{Z}^t, \hat{\mathcal{Z}}^t) + \lambda \cdot 
 
 ![[assets/figures/papers/paper_list_l2494_https_arxiv_org_abs_2601_05116/figures/001_Figure_1.jpg]]
 *Figure 1: Projective conditioning enables robust novel view synthesis. We investigate what camera pose encoding best conditions a view synthesis model. Compared to the commonly used absolute valued Plucker ray conditioning by prior works [ ¨ 10, 12], our proposed projection conditioning encodes scene-camera configuration as a relative transformation. Under various geometric transformations, this shows better robustness while the absolute conditioning signal fails due to the non-smoothness of transformations in the Plucker ray space. ¨*
-
-## 核心模块与公式推导
 
 ### 问题形式化：SE(3) 不变性的缺失
 
@@ -242,10 +236,7 @@ $$\mathcal{L} = \mathsf{MSE}(\mathbb{Z}^t, \hat{\mathcal{Z}}^t) + \lambda \cdot 
 ![[assets/figures/papers/paper_list_l2494_https_arxiv_org_abs_2601_05116/figures/005_Figure_5.jpg]]
 *Figure 5: Our training stages. Pretraining (top): The model reconstructs a target view from a randomly masked version of itself, conditioned on context views, using uncalibrated image data. Fine-tuning (bottom): The model is then fine-tuned to reconstruct the target view from a point-cloud projection image obtained by warping the context views into the target camera frustum*
 
-![[assets/figures/papers/paper_list_l2494_https_arxiv_org_abs_2601_05116/figures/015_Figure_10.jpg]]
-*Figure 10: Additional results on the MAE pretraining stage*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 一致性基准：几何鲁棒性的压力测试
 
@@ -301,7 +292,7 @@ $$\mathcal{L} = \mathsf{MSE}(\mathbb{Z}^t, \hat{\mathcal{Z}}^t) + \lambda \cdot 
 ![[assets/figures/papers/paper_list_l2494_https_arxiv_org_abs_2601_05116/figures/013_Table_7.jpg]]
 *Table 7: Ablation studies on the use of RoPE [27]*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 前馈视图合成的方法谱系
 

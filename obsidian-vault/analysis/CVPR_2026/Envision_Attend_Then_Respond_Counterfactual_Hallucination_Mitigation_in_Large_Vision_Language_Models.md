@@ -43,7 +43,7 @@ claims:
 > - WHOOPS 上，Average Accuracy (%) 74.15 vs 62.45 (+11.70)。
 > - POPE Random 上，F1 Score (%) 88.9 vs 80.9 (+8.0)。
 
-## 概述
+## 概要
 
 大型视觉语言模型（LVLM）在理解图像内容时，其强大的语言先验（世界知识）常常压倒反事实的视觉证据，导致模型过度依赖统计频率而非当前图像内容，产生“反事实幻觉”。例如，当图像中出现违背常识的元素（如绿色的草莓）时，模型可能仍然回答“红色草莓”，因为它被训练数据中的常见关联所主导。
 
@@ -56,7 +56,7 @@ EnAR 包含三个关键阶段：
 
 在反事实基准 VLMBias 上，EnAR 将 InternVL3.5-8B 的整体准确率从 19.83% 提升至 31.36%（+11.53 个百分点），在 WHOOPS 基准上将平均准确率从 62.45% 提升至 74.15%（+11.70%）。在通用幻觉基准 POPE 上，LLaVA-v1.5-7B 的 F1 分数从 80.9% 提升至 88.9%。消融实验证实，视觉印象和不确定性图两个组件对性能均有显著贡献。该方法覆盖三种异构 LVLM 架构，验证了其模型无关的健壮性。
 
-## 背景与动机
+
 
 大型视觉语言模型（LVLM）在图像描述、视觉问答等任务中展现出强大能力，但它们在面对**反事实视觉输入**时容易出现严重的幻觉：模型会忽略图像中与统计先验相悖的视觉证据，转而输出符合语言先验（世界知识）但图像中并不存在的描述。例如，当图像展示“一只狗在驾驶汽车”时，模型可能回答“一个人在驾驶汽车”，因为“人开车”的语言先验压倒了“狗在驾驶位”这一反事实视觉信号。
 
@@ -64,7 +64,9 @@ EnAR 包含三个关键阶段：
 
 本文的核心动机是：**如果能利用扩散模型的丰富视觉先验，生成一张“先验一致”的参考图像（即世界知识认为“应该”出现的画面），然后通过对比原图与参考图的注意力差异，精确定位反事实元素，就能在解码时有针对性地抑制这些元素，从而在不损害正常视觉理解的前提下纠正幻觉。** 这一思路将幻觉缓解从“全局扰动”推进到“局部定位与定向抑制”的层面，且整个过程无需额外训练。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 EnAR的核心创新在于**首次将扩散模型的视觉先验引入LVLM的反事实幻觉定位与抑制**，构建了一条“想象—关注—回答”的无训练推理管线。与现有对比解码方法（如**VCD** (Leng et al., CVPR 2024) 仅依赖高斯噪声扰动、**RITUAL** 仅做随机图像变换）不同，EnAR的因果干预体现在三个紧密耦合的**changed slots**上：
 
@@ -92,7 +94,7 @@ $$p(y|\mathbf{x},\pmb{v},\pmb{v}') = (1+\alpha)p(y|\pmb{x},\pmb{v}) - \alpha p(y
 
 **与基线方法的本质差异**：VCD等对比解码方法通过扰动输入来估计“幻觉方向”，但扰动是盲目的（高斯噪声或随机变换），无法针对反事实元素进行精准干预。EnAR的视觉印象生成步骤**利用扩散模型的语义先验**，使得对比信号聚焦于“世界知识预期”与“图像实际内容”的偏差，从而实现了对反事实幻觉的**因果层面的抑制**，而非简单的分布偏移。
 
-## 整体框架
+
 
 EnAR（Envision-Attend-Respond）是一个无需训练的框架，其核心思想是利用扩散模型的视觉先验生成反事实元素的期望版本，通过与原图像的注意力对比和不确定性估计定位矛盾区域，再通过对比解码强化视觉证据，从而纠正模型输出。整个pipeline由三个顺序衔接的阶段构成，如Figure 2所示。
 
@@ -126,7 +128,7 @@ EnAR的三个阶段均不涉及对LVLM参数的修改，仅通过外部扩散模
 ![[assets/figures/papers/paper_list_l747_https_openaccess_thecvf_com_content_CVPR2026_html_Liang_Envision_Attend/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of the Envision-Attend-Respond framework. By comparing the visual impression with the original image to locate counterfactual elements, the model is guided toward producing the correct response*
 
-## 核心模块与公式推导
+
 
 EnAR 由三个顺序执行的模块构成：**Envision**（视觉印象生成）、**Attend**（反事实定位）与 **Respond**（对比解码）。三个模块协同完成“生成先验一致参考 → 定位矛盾区域 → 抑制语言先验”的因果干预链条，全程无需对 LVLM 进行任何训练或微调。
 
@@ -189,7 +191,9 @@ $$p(y|\mathbf{x},\mathbf{v},\mathbf{v}') = (1+\alpha)p(y|\mathbf{x},\mathbf{v}) 
 ![[assets/figures/papers/paper_list_l747_https_openaccess_thecvf_com_content_CVPR2026_html_Liang_Envision_Attend/figures/003_Figure_3.jpg]]
 *Figure 3: Illustration of the Envision stage in EnAR*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与实验动机
 
@@ -257,7 +261,9 @@ Figure 4展示了两个关键超参数的影响：
 ![[assets/figures/papers/paper_list_l747_https_openaccess_thecvf_com_content_CVPR2026_html_Liang_Envision_Attend/figures/009_Figure_6.jpg]]
 *Figure 6: Case study visualization. We illustrate how EnAR constructs visual impressions, localizes counterfactual elements, and produces corrected responses*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心机制与因果路径
 
@@ -295,6 +301,8 @@ EnAR 属于**训练无关的对比解码**范式，与以下基线方法形成�
 3. **能力平衡**：EnAR 的对比解码机制是否可能削弱模型在非反事实场景下的常规能力？论文仅在反事实和幻觉基准上评估，未测试通用 VQA 性能，该风险需手动验证。
 4. **训练结合**：将 EnAR 与训练阶段的微调方法相结合，能否实现进一步的泛化能力和鲁棒性？当前 EnAR 是纯推理时干预。
 5. **跨模态泛化**：该框架能否推广到其他模态（如音频-文本）的反事实幻觉问题？核心的“先验印象生成-对比注意力定位-对比解码”范式理论上模态无关，但需实证验证。
+
+
 
 ## 原文 PDF
 

@@ -43,7 +43,7 @@ claims:
 > - 3D-FRONT test set 上，CD-S↓ 0.0787 (Pano3DComposer) vs 0.2483 (ICP) (0.1696)；CD-O↓ 0.0765 (Pano3DComposer) vs 0.2305 (ICP) (0.1540)；CD-S↓ 0.0787 (Pano3DComposer) vs 0.1059 (OPT) (0.0272)。
 > - 3D-FRONT test set (single RTX 4090) 上，推理时间 (秒) 20 (Pano3DComposer) vs 63 (SceneGen) (速度提升约3倍)；推理时间 (秒) 24 (Pano3DComposer-C2F) vs 63 (SceneGen) (速度提升约2.6倍)。
 
-## 概述
+## 概要
 
 从单张全景图像生成完整的3D场景是视觉计算中的一个重要目标，但现有方法面临两难困境：基于迭代优化的方案虽能对齐多物体，却耗时过长；前馈式方法虽快，却难以处理全景图像的严重畸变与全向几何，导致高效且完整的360°3D生成难以实现。
 
@@ -51,7 +51,7 @@ claims:
 
 在3D-FRONT数据集上，Pano3DComposer在所有几何指标（CD-S、CD-O、F-Score、IoU）上均显著优于SceneGen、ICP和微分优化对齐基线，同时推理速度大幅领先——仅需约20秒即可在单张RTX 4090上生成一个高保真3D场景，而SceneGen需63秒。消融实验进一步证实了伪几何蒸馏损失和显式相机嵌入的关键作用：移除伪几何监督后CD-S从0.0787飙升至0.8688，移除相机参数后CD-S从0.1120恶化至0.1850。当前方法主要适用于室内场景，对极小物体、透明/镜面材质以及复杂遮挡背景的处理仍存在残余误差，这些构成了未来改进的方向。
 
-## 背景与动机
+
 
 ### 3D场景生成范式的演进
 
@@ -75,7 +75,9 @@ claims:
 
 基于上述动机，本文设计 **Pano3DComposer**——一个模块化的前馈式框架，其核心是**物体-世界变换预测器（Alignment-VGGT）**，能够根据目标物体的无畸变透视裁剪图和生成物体的多视角渲染图，一次性预测旋转、平移和各向异性缩放，将任意3D物体生成器的输出精确对齐到全景场景中。配合由粗到精（C2F）对齐机制和独立的背景重建管线，该框架在保持约20秒推理速度的同时，实现了显著优于现有方法的几何精度。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Pano3DComposer的核心创新在于将组合式3D场景生成从“联合优化”范式转向“前馈解耦”范式，并专门针对全景输入的严重畸变与全向几何特性设计了三个关键机制。
 
@@ -108,7 +110,7 @@ Pano3DComposer的核心创新在于将组合式3D场景生成从“联合优化�
 
 这些创新共同构成了Pano3DComposer的技术骨架，使其在3D-FRONT数据集上以CD-S 0.0787的成绩大幅领先ICP（0.2483）和微分优化（0.1059），同时保持约3倍于SceneGen的推理速度（Table 1）。
 
-## 整体框架
+
 
 Pano3DComposer 是一个模块化的前馈式组合 3D 场景生成框架，其核心设计理念是将物体生成与布局估计解耦，从而避免现有方法中耗时的迭代优化或联合预测带来的效率与精度矛盾。框架以单张全景图像 $\\mathbf{I}$ 为输入，经过四个顺序阶段输出统一的 3D 场景表示 $\\mathcal{G}_{\\mathrm{scene}}$（Figure 2）。
 
@@ -174,7 +176,7 @@ $$
 ![[assets/figures/papers/paper_list_l2559_https_arxiv_org_abs_2603_05908/figures/001_Figure_1.jpg]]
 *Figure 1: Paradigms of compositional 3D scene generation*
 
-## 核心模块与公式推导
+
 
 ### 3.1 整体框架
 
@@ -265,7 +267,9 @@ C2F 精化器以 Alignment-VGGT 的初始预测为起点，通过少量迭代（
 ![[assets/figures/papers/paper_list_l2559_https_arxiv_org_abs_2603_05908/figures/003_Figure_3.jpg]]
 *Figure 3: Illustration of the proposed Coarse-to-Fine (C2F) alignment mechanism*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -333,7 +337,9 @@ Pano3DComposer 在 3D-FRONT 测试集上与多个基线方法进行了全面对�
 ![[assets/figures/papers/paper_list_l2559_https_arxiv_org_abs_2603_05908/figures/012_Figure_8.jpg]]
 *Figure 8: Visualization of panorama-to-3D scene composition results without background*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与前馈式组合场景生成方法的关联与区别
 
@@ -380,6 +386,8 @@ Pano3DComposer 处于以下技术路径的交汇点：
 4. **物理合理性**：能否将物理合理性和多实例关系建模集成到框架中，减少物体间的穿透与错位？当前方法独立处理每个物体，缺乏对物体间物理约束的显式建模。
 
 5. **端到端联合优化**：当前框架是模块化的，各阶段独立运行。是否可以通过端到端训练进一步挖掘模块间的协同增益，是一个开放的设计选择。
+
+
 
 ## 原文 PDF
 

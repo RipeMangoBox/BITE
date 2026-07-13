@@ -31,7 +31,7 @@ claims:
 | 中文题名 | 可解析积分的零自然长度弹簧用于捕获准静态神经网络未表征的动态模式 |
 | 英文题名 | Analytically Integratable Zero-restlength Springs for Capturing Dynamic Modes Unrepresented by Quasistatic Neural Networks |
 | 会议/期刊 | SIGGRAPH 2022 |
-| Links | [paper](https://arxiv.org/abs/2201.10122) · [Project](https://www.unrealengine.com/en-US/digitalhumans) · [arXiv](https://arxiv.org/abs/2201.10122") |
+| Links | [paper](https://arxiv.org/abs/2201.10122) · [Project](https://www.unrealengine.com/en-US/digitalhumans) · [paper](https://arxiv.org/abs/2201.10122") |
 | Topic | #topic/vision_multimodal_applications |
 | Method | Quasistatic Neural Network (QNN) augmented with analytically integratable zero-restlength springs |
 | Dataset | Jumping jacks dynamic simulation ground truth, Runtime performance, Generalization to unseen motion |

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Plug_and_Play_Compositionality_for_Boosting_Continual_Learning_with_Foundation_Models.pdf
+project_link: null
+code_link: https://github.com/liaoweiduo/CompSLOT
 openreview_forum_id: 22hBwIf7OC
 aliases:
 - PPCBCLFM
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 即插即用的组合性提升基于基础模型的持续学习 |
 | 英文题名 | Plug-and-Play Compositionality for Boosting Continual Learning with Foundation Models |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=22hBwIf7OC); [GitHub](https://github.com/liaoweiduo/CompSLOT) |
+| Links | [paper](https://openreview.net/forum?id=22hBwIf7OC) · [GitHub](https://github.com/liaoweiduo/CompSLOT) |
 | Topic | #topic/safety_alignment_fairness_privacy #topic/safety_alignment_fairness_privacy/trustworthy_machine_learning |
 | Method | CompSLOT |
 | Dataset | CGQA (10-10 tasks), COBJ (10-10 tasks) |
@@ -41,7 +43,7 @@ claims:
 > - CGQA (10-10 tasks) 上，AA (%) 为 48.537 ± 0.427，对比 46.753 ± 0.570，变化 1.784。
 > - CGQA (10-10 tasks) 上，AA (%) 为 66.753 ± 0.867，对比 65.810 ± 0.802，变化 0.943。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有基于基础模型（FM）的持续学习方法普遍依赖高维视觉特征（如 ViT 的 [CLS] token）进行类别比较或提示匹配，却忽略了图像中跨任务共享的底层概念组合。这一缺失导致两个关键后果：灾难性遗忘难以根本缓解，以及对未见概念组合的泛化能力薄弱。随着任务序列增长，模型倾向于记忆表观特征而非理解概念构成，持续学习性能迅速退化。
 
@@ -57,7 +59,7 @@ claims:
 
 **证据强度与局限**：上述增益在多次试验中具有统计显著性，且通过参数计数匹配消融实验排除了容量扩充的混淆效应。然而，CompSLOT 在组合泛化的 substitutivity（属性替换）维度上改进不显著，提示 ViT 特征在应对属性变化时存在固有限制。此外，当前概念学习阶段与持续学习分类目标为分离式训练，尚未实现端到端联合优化，可能限制整体潜力。
 
-## 背景与动机
+
 
 持续学习（Continual Learning, CL）的核心挑战在于，模型在顺序学习新任务时如何避免灾难性遗忘。近年来，大规模预训练基础模型（Foundation Models, FMs）为持续学习提供了强大的特征表示能力，催生了一批基于提示（prompt-based）和基于表示（representation-based）的持续学习方法。然而，这些方法存在一个共同的深层瓶颈：**它们依赖高维特征空间中的直接比较进行分类，忽略了图像中跨任务共享的底层概念组合**。
 
@@ -69,7 +71,9 @@ claims:
 
 初步实验（Figure 2）验证了这一动机的可行性：在连续组合重建任务中，Slot Attention 模块提取的概念表示在任务间几乎不发生遗忘，其重建损失矩阵在不同任务上保持高度一致，表明概念提取本身对任务序列不敏感，为后续的概念引导持续学习奠定了基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 现有基于基础模型的持续学习方法，无论是基于提示的 **CPrompt**（Gao et al., 2024）还是基于表示的 **ADAM+adapter**（Zhou et al., 2025）、**RanPAC**（McDonnell et al., 2023），其分类决策本质上都依赖于高维视觉特征（如全局 `[CLS]` token 或提示特征）之间的相似性比较。这一范式忽略了一个关键瓶颈：**跨任务共享的底层视觉概念组合**。当新任务引入已知概念的未知组合时，仅凭高维特征匹配无法有效复用已学知识，导致灾难性遗忘与组合泛化能力薄弱。
 
@@ -103,7 +107,7 @@ $$d_{i,j}^s = \frac{\sin_+(s_i^p, s_j^p)}{\sum_{x_k \in B} \sin_+(s_i^p, s_k^p)}
 
 上述三个模块中，概念提取与原语选择阶段（Slot Attention + Primitive Selection）作为独立的概念学习前端，对所有持续学习算法开放共享，无需针对特定方法调整。原语-逻辑对齐模块仅需访问基线的输出 logits，以正则化项形式注入训练目标。实验覆盖了基于提示（CPrompt）、基于表示（ADAM+adapter、RanPAC、EASE）、基于模型混合（CoFiMA）及基于回放（FOSTER\*、DER\*、MEMO\*）等多种范式的持续学习方法，CompSLOT 均带来一致的性能增益（Table 1, Table 7, Table 8），其中 ADAM+adapter 在 CGQA 上 AA 提升达 +7.55 个百分点，验证了其方法无关的通用性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_22hBwIf7OC/figures/027_Figure_12.jpg]]
 *Figure 12: Line charts of different hyperparameters in slot attention architecture. (a) Alignment Coeff*
@@ -142,7 +146,7 @@ $$d_{i,j}^s = \frac{\sin_+(s_i^p, s_j^p)}{\sum_{x_k \in B} \sin_+(s_i^p, s_k^p)}
 
 整个框架的数据流可概括为：输入图像经冻结 ViT 提取 patch 特征 → Slot Attention 分解为 $K$ 个解耦 slot → Primitive Selection 加权聚合为类别相关原语 → 原语相似度通过 $L_a$ 蒸馏至分类器 logits。概念学习阶段（前两步）独立于持续学习算法，原语-逻辑对齐阶段（第三步）以即插即用方式嵌入任意基线的训练损失中。
 
-## 核心模块与公式推导
+
 
 ### 概念提取：Slot Attention 模块
 
@@ -184,7 +188,9 @@ $$L_{tr} = L_{ce} + \beta L_a$$
 
 $\beta$ 控制概念知识蒸馏的强度。消融实验表明，$\beta$ 在适中范围内（CPrompt 上 $\beta \approx 2$）提升准确率，但过大会导致性能下降；min-max 归一化在计算 $d^s$ 时优于 softmax 归一化，能提供更清晰的监督信号。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果：CompSLOT 作为通用插件提升持续学习性能
 
@@ -260,7 +266,9 @@ Figure 2 的连续组合重建实验揭示了 CompSLOT 抵抗遗忘的深层原�
 ![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_22hBwIf7OC/figures/008_Table_3.jpg]]
 *Table 3: Detail hyperparameters for concept learning stage in our main experiments*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与动机
 
@@ -307,6 +315,8 @@ CompSLOT 与两类直接操作概念的持续学习工作形成对比：
 5. **开放世界与跨域泛化**：CompSLOT 的概念组合泛化能力在真实世界开放集、跨域持续学习场景下的表现如何？当前验证仅限于 CGQA、COBJ、ImageNet-R 等受控基准，未见域偏移或开放类别的实验证据。
 
 6. **概念可解释性的量化**：Figure 4 和 Figure 9 提供了概念学习的可视化证据，但缺乏系统性的概念纯度、概念解耦度等量化指标。如何客观度量学到的 slots 是否真正对应语义概念，而非仅仅是空间分割的产物？
+
+
 
 ## 原文 PDF
 

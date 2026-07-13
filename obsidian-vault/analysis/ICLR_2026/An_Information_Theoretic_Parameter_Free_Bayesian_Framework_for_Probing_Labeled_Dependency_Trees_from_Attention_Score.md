@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/An_Information_Theoretic_Parameter_Free_Bayesian_Framework_for_Probing_Labeled_Dependency_Trees_from_Attention_Score.pdf
+project_link: null
+code_link: https://github.com/ChristLBUPT/IPBP
 openreview_forum_id: q7raIuTQDK
 aliases:
 - IITPFBP
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 基于信息论的无参数贝叶斯框架：从注意力分数中探测带标签依存句法树 |
 | 英文题名 | An Information-Theoretic Parameter-Free Bayesian Framework for Probing Labeled Dependency Trees from Attention Score |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=q7raIuTQDK); [GitHub](https://github.com/ChristLBUPT/IPBP) |
+| Links | [paper](https://openreview.net/forum?id=q7raIuTQDK) · [GitHub](https://github.com/ChristLBUPT/IPBP) |
 | Topic | #topic/optimization_theory_probabilistic #topic/optimization_theory_probabilistic/probabilistic_methods |
 | Method | IPBP (Information-theoretic Parameter-free Bayesian Probing) |
 | Dataset | UD 2.9 English (open_llama_7b), Head-Selection Intrinsic Evaluation (Spearman-R) |
@@ -41,7 +43,7 @@ claims:
 > - UD 2.9 English (open_llama_7b) 上，LAS 为 34.8 (IPBP+MI_pos)，对比 30.6 (IPBP base)，变化 +4.2。
 > - Head-Selection Intrinsic Evaluation (Spearman-R) 上，Average Spearman-R 为 0.398 (IPBP)，对比 other methods (e.g., Probeless, IoU, etc.) lower consistency，变化 IPBP highest。
 
-## 概述
+## 概要
 
 现有从大语言模型注意力分数中探测句法结构的方法面临两个核心瓶颈：其一，监督探针方法引入额外可训练网络，使得探针本身可能学会任务，而非从模型中提取句法——这实际上是用“不可解释性来解释可解释性”；其二，直接信任原始注意力分数的方法忽略了注意力头并非专用于句法，需要对注意力头进行筛选和变换。本文提出 **IPBP**（Information-theoretic Parameter-free Bayesian Probing），一个基于信息论的无参数贝叶斯探测框架，其核心思路是通过精确估计注意力分数与依存标签之间的混合分布并计算二元互信息（MI），量化每个注意力头对特定依存关系的贡献，从而无需训练即可有效筛选句法头并为树重建提供信息量。
 
@@ -51,7 +53,7 @@ IPBP 的方法设计围绕三个关键创新展开：首先，利用核密度估
 
 在方法谱系中，IPBP 定位于无参数句法探测方法，区别于有监督探针（如 **ElasticNet**，Dalvi et al., 2019；**V-Information**，Xu et al., 2020）和无参数相关性分数（如 **Probeless**，Antverg & Belinkov, 2022；**IoU**，Mu & Andreas, 2020）。其核心贡献在于将头重要性度量从多种启发式相关性分数替换为归一化二元互信息，将树重建概率源从原始注意力分数替换为 MI 加权的贝叶斯后验概率，并将依存弧概率空间从单一弧存在扩展为面向所有标签的独立投票联合概率空间。
 
-## 背景与动机
+
 
 ### 句法探针面临的信任危机
 
@@ -75,7 +77,9 @@ IPBP 的方法设计围绕三个关键创新展开：首先，利用核密度估
 
 论文提出的 IPBP（Information-theoretic Parameter-free Bayesian Probing）框架正是对这一动机的系统性回应。其核心洞察在于：利用核密度估计（KDE）对连续注意力向量建模，通过贝叶斯定理推导后验概率，并设计基于对数意见池化和独立投票概率空间的解码算法，在无外部参数的情况下重建完整带标签的依存树。该方法巧妙地避开了高维 KDE 的维度灾难，同时提供了透明、可解释的头重要性度量。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 IPBP 的核心创新在于将句法探测从“训练一个探针”范式彻底转向“无参数信息估计”范式，通过三个相互耦合的 **changed slots** 解决了现有方法的两个根本瓶颈。
 
@@ -116,7 +120,7 @@ $$P(x_i, x_j; l) = \mathbf{GP}_{\mathcal{H}_l}(x_i, x_j; l) \times \prod_{l' \in
 - **Positive MI vs Binary MI**：仅关注正类标签的 $\mathrm{MI}_{\mathrm{pos}}$ 将 LAS 从 30.6 提升至 34.8（Table 2），表明过滤长尾噪声标签能显著改善标签预测。
 - **专家头消融**：移除 top-5 高 MI 头后，模型在预测需要相应句法信息的下一个 token 时 logits 显著下降（Table 4），直接证明了所识别头确实编码了句法相关信息。
 
-## 整体框架
+
 
 IPBP 将句法探测拆解为两个串行子任务：**互信息估计**与**依存树重建**。整个流水线无需训练任何外部网络，仅依赖 Transformer 模型在标注语料上产生的注意力分数与依存标签，通过信息论与贝叶斯推理完成从原始注意力到完整带标签依存树的端到端映射。
 
@@ -159,7 +163,7 @@ $$P(x_i, x_j; l) = \mathrm{GP}_{\mathcal{H}_l}(x_i, x_j; l) \times \prod_{l' \in
 - 每句的完整带标签依存树（弧方向 + 依存关系类型）
 - 可解释的中间产物：后验密度函数、MI 堆叠图、层-深度相关性等分析工具
 
-## 核心模块与公式推导
+
 
 IPBP 将句法探测分解为两个可分离的子任务：互信息估计与树重建。前者量化每个注意力头对特定依存关系的专属信息量，后者以贝叶斯推断的方式将筛选后的注意力分数转化为完整依存树。
 
@@ -209,7 +213,9 @@ $$P(x_i, x_j; l) = \mathbf{GP}_{\mathcal{H}_l}(x_i, x_j; l) \times \prod_{l' \in
 
 IPBP 的一个关键设计在于规避了高维 KDE 的维度灾难。传统方法若直接对多变量联合分布建模，所需样本量随维度指数增长。IPBP 利用混合联合分布与贝叶斯定理，将估计限制在一维条件密度 $f(A_{b,h}|L=l)$ 上，使 KDE 在有限样本下仍保持可靠。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 4.1 实验设置概述
 
@@ -289,7 +295,9 @@ Table 4 展示了一个案例研究：移除 top-5 高 MI 头后，模型在预�
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_q7raIuTQDK/figures/007_Table_6.jpg]]
 *Table 6: Average token ranks (and average token rank proportions) on UD-2.9 English/French/Spanish train/dev set*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与设计动机
 
@@ -340,6 +348,8 @@ IPBP 的适用性受以下条件约束：
 4. **无监督句法发现**：在没有现成标注的情况下，能否利用 IPBP 的框架进行无监督的句法发现，值得探索。
 
 5. **跨模型句法知识存储模式**：不同 LLM 的句法知识存储模式有何差异？IPBP 的跨模型系统化分析仍有待开展，这可能为理解模型架构与句法涌现的关系提供关键线索。
+
+
 
 ## 原文 PDF
 

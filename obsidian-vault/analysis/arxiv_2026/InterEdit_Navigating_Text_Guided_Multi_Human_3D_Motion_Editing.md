@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2026
 pdf_ref: paperPDFs/arxiv_2026/InterEdit_Navigating_Text_Guided_Multi_Human_3D_Motion_Editing.pdf
+project_link: null
+code_link: https://github.com/YNG916/InterEdit
 aliases:
 - InterEdit
 tags:
@@ -39,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - InterEdit3D test set (TMME benchmark) 上，FID↓ 0.3707±0.0029 vs ~0.445 (TIMotion) (-16.7% (相对TIMotion))；generated-to-target retrieval R@1↑ 30.82±0.43 vs 24.97 (TIMotion) (+5.85)；generated-to-source retrieval R@1↑ 17.08±0.41 vs 12.54 (TIMotion) (+4.54)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -72,7 +74,7 @@ InterEdit 处于**文本条件扩散生成**与**多人动作建模**的交叉�
 
 InterEdit 当前存在以下局限：（1）对手势的微小变化存在语义歧义，难以可靠区分交互对象；（2）在长时间高动态交互序列中，个体间的空间关系维持仍存在漂移；（3）当前设计仅针对双人交互，未验证对三人及以上场景的泛化能力。这些局限指向若干开放问题：如何通过更细粒度的交互表示消除手势歧义？能否引入显式的空间关系约束以改善长序列一致性？频带能量池化是否足以捕捉非线性交互动态？这些问题为多人物动作编辑的后续研究提供了明确方向。
 
-## 背景与动机
+
 
 ### 任务定义：文本引导的多人物3D动作编辑
 
@@ -102,7 +104,9 @@ TMME任务的另一关键障碍是**缺乏配对的多人物源-目标-指令三
 
 针对上述瓶颈，本文提出InterEdit框架，核心思路是将多人物动作编辑解耦为两个互补的控制信号：**语义感知计划令牌对齐**为扩散过程注入高层编辑意图，确保编辑内容遵循文本指令；**交互感知频率令牌对齐**通过DCT频带能量正则化保持交互节奏、同步性和空间耦合，使编辑不破坏人际协调。同时，本文构建了InterEdit3D数据集，提供5,161个高质量三元组，为TMME任务建立首个标准化基准。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 InterEdit 的核心创新在于将多人物 3D 动作编辑解耦为**语义意图引导**与**交互频率正则化**两个互补维度，使扩散模型能在保持源动作未编辑部分不变的前提下，精确执行语义修改，同时强制维持人际时空耦合的连续性，避免因局部编辑引发交互失真。
 
@@ -130,7 +134,7 @@ InterEdit 的核心创新在于将多人物 3D 动作编辑解耦为**语义意�
 
 此外，InterEdit 采用**同步分类器免引导**（Synchronized Classifier-Free Guidance）：训练时同步丢弃源和文本条件以学习无条件分支，推理时插值有条件与无条件预测（Eq. 11），避免条件泄露并提供更干净的引导方向。消融实验（Table 9）证实两分支 SCFG 优于三分支策略。
 
-## 整体框架
+
 
 InterEdit 将多人物 3D 动作编辑形式化为一个条件扩散生成问题。给定一段双人源动作序列 $\mathbf{x}_{1:L}^s$ 和一条文本编辑指令 $\mathbf{y}$，模型的目标是生成一段目标动作 $\mathbf{x}_{1:L}$，使其既精确执行文本指定的语义修改，又保持源动作中未被编辑部分不变，同时维持双人交互的时空同步性。
 
@@ -177,7 +181,7 @@ $$\mathcal{L}_{\text{total}} = \mathcal{L}_{\text{motion}} + \lambda_p \mathcal{
 ![[assets/figures/papers/paper_list_l51_https_arxiv_org_abs_2603_13082/figures/001_Figure_1.jpg]]
 *Figure 1: An illustration of (a) Text-guided Multi-human 3D Motion Editing (TMME) task and our proposed InterEdit model, and (b) the performances of baselines (i.e., MotionFix [2], MotionLab [12], InterGen [24], TIMotion [46]) and our InterEdit*
 
-## 核心模块与公式推导
+
 
 InterEdit 以条件扩散模型为骨干，在 Start_X 参数化的 Transformer 去噪器上引入两个互补的对齐模块，将多人物动作编辑解耦为语义意图引导与交互频率正则化。以下按骨干架构、语义对齐、频率对齐和同步免引导的顺序展开。
 
@@ -223,7 +227,9 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{motion}} + \lambda_{p} \ma
 
 其中 $\mathcal{L}_{\mathrm{motion}}$ 包含扩散重构、速度、足部接触、骨骼长度、距离图和相对朝向损失。敏感性分析表明，计划损失权重 $\lambda_p=0.03$ 和频率损失权重 $\lambda_f=0.01$ 为最佳设置，二者应作为辅助正则项而非主导损失（Table 7, Table 8）。联合使用两种令牌对齐在所有指标上优于单独使用任一模块或两者均不用，证明语义引导与交互正则化的互补性（Table 3）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要定量结果
 
@@ -313,7 +319,9 @@ Figure 8 揭示了 InterEdit 的两类典型失败案例：
 ![[assets/figures/papers/paper_list_l51_https_arxiv_org_abs_2603_13082/figures/002_Table_1.jpg]]
 *Table 1: Comparison with representative existing datasets. “Editing” indicates whether the dataset provides source–target pairs and edit instructions*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位与基线谱系
 
@@ -376,6 +384,8 @@ Table 3 的核心消融直接验证了互补性：联合使用计划令牌和频
 4. **频率表征的充分性**：现有的 DCT+均匀频带桶化是否能捕捉非线性交互动态（如突然的接触/分离事件）？是否需要引入小波变换或学习型频率表征以提升对瞬态交互的敏感性？
 
 5. **编辑可控性的粒度**：当前方法接受自然语言指令进行整体编辑，是否能扩展至时空局部编辑（如“仅修改第3-5秒内人物A的左手动作”）或组合编辑（多条指令的顺序/并行执行）？
+
+
 
 ## 原文 PDF
 

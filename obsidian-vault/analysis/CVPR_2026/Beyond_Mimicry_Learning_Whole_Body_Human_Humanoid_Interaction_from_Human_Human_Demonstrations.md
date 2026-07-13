@@ -43,7 +43,7 @@ claims:
 > - Six HHoI simulation tasks 上，Average Success Rate (%) 75.4 vs 0.0 (Naive Mimicry) / 64.3 (Transformer) (+75.4 / +11.1)。
 > - Six HHoI tasks (Handshake) 上，Success Rate (%) 61.3 vs 32.3 (Transformer) (+29.0)。
 
-## 概述
+## 概要
 
 **核心问题与瓶颈。** 让人形机器人与人类进行全身物理交互（如握手、拥抱、击掌）面临双重挑战。在数据层面，标准运动重定向（motion retargeting）仅追求运动学相似性，在跨越人-机器人形态差异时不可避免地破坏关键的物理接触，导致生成的人-机器人交互数据丧失交互语义。在策略层面，传统模仿学习仅复制运动轨迹，缺乏对“何时交互”与“何处交互”的理解和响应能力。这两重瓶颈共同导致面向人-机器人交互（HHoI）的数据获取和策略设计双双失效。
 
@@ -65,7 +65,7 @@ claims:
 
 **局限与开放问题。** 量化实验主要在仿真中进行，真实世界性能受视觉感知噪声和延迟影响；仅在 Unitree G1 上验证了三种交互，泛化到其他机器人形态需重新优化 PAIR；系统依赖单目 SMPL 估计，姿态误差会直接影响交互成功率。开放问题包括：能否处理实时、未预标定伙伴的动态交互；如何结合力触觉反馈提升接触鲁棒性；解耦时空推理框架能否泛化到非接触性社会交互（如眼神交流、手势理解）；以及面对全新交互类型时的零样本泛化能力。
 
-## 背景与动机
+
 
 人形机器人与人类进行自然、流畅的全身交互，是机器人学迈向通用服务场景的核心愿景之一。然而，当前主流方法面临一个根本性瓶颈：**标准运动重定向在保持物理交互时破坏了关键接触**，而传统的模仿学习策略仅能复制轨迹，缺乏对交互语义的理解和实时响应能力。这导致面向人-机器人交互（Human-Humanoid Interaction, HHoI）的数据获取与策略设计双双失效。
 
@@ -78,7 +78,9 @@ claims:
 
 Figure 1 展示了从 HHI 到 HHoI 的完整流水线，以及仿真与真实 Unitree G1 机器人上的交互执行结果，验证了该框架在六种交互任务（弯腰、挥手、飞吻、拥抱、击掌、握手）上的有效性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心贡献在于同时解决了从人-人交互（HHI）数据学习全身人形机器人交互的两个关键瓶颈：**数据层面的物理接触保持**与**策略层面的解耦时空推理**。传统方法在这两个层面均存在根本性缺陷，而本文的 PAIR + D-STAR 组合方案实现了从“天真模仿”到“超越模仿”的跨越。
 
@@ -119,7 +121,7 @@ PA 和 MSS 的特征融合后输入扩散规划头，生成高维参考动作目
 
 PAIR 和 D-STAR 并非独立创新，而是形成上下游依赖：PAIR 生成物理一致、接触保持的 HHoI 数据，为 D-STAR 提供可学习的交互基础；D-STAR 则利用解耦时空推理从这些数据中学习超越简单轨迹回放的同步全身协同行为。仅改进数据而使用天真策略（如 Diffusion Policy 使用 PAIR 数据但架构不解耦），或仅改进策略而使用破坏接触的数据，均无法实现有效交互——这一依赖关系在 Table 3 中 Diffusion Policy 的失败中得到了间接验证。
 
-## 整体框架
+
 
 本文提出了 **Beyond Mimicry** 框架，旨在从人-人交互（HHI）演示数据中学习全身人形机器人与人交互（HHoI）的策略。该框架由两个核心阶段构成：**物理感知交互重定向（PAIR）** 与 **解耦时空动作推理器（D-STAR）**，二者分别解决数据生成和策略学习中的根本瓶颈。
 
@@ -154,7 +156,7 @@ PAIR 和 D-STAR 并非独立创新，而是形成上下游依赖：PAIR 生成�
 ![[assets/figures/papers/paper_list_l1054_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_Beyond_Mimicry_L/figures/001_Figure_1.jpg]]
 *Figure 1: From HHI to HHoI with simulation and real-robot results. Left: PAIR (Physics-Aware Interaction Retargeting) converts human–human interaction sequences into physically consistent human–humanoid (HHoI) clips by aligning morphology and explicitly preserving contact semantics via a two-stage pipeline. Top (Sim): Rollouts of the learned policy (D-STAR) in simulation, showing Bend, Wave, Fly-Kiss, Hug, High-Five, and Handshake, demonstrating synchronized whole-body interactions. Bottom (Real, a–c): Deployment on a Unitree G1 under a standard whole-body controller; the policy executes Hug, Handshake, and High-Five selected via text commands*
 
-## 核心模块与公式推导
+
 
 ### 3.1 物理感知交互重定向 (PAIR)
 
@@ -227,7 +229,9 @@ PAIR 与 D-STAR 并非独立设计，而是构成了一条因果链：PAIR 解�
 ![[assets/figures/papers/paper_list_l1054_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_Beyond_Mimicry_L/figures/002_Figure_2.jpg]]
 *Figure 2: PAIR preserves physical consistency where naive methods fail. Left: A source HHI handshake. Center: Naive retargeting breaks essential contact due to morphological disparities. Right: PAIR first ensures kinematic plausibility, then applies an interaction-aware objective (Lcon) to refine and enforce the critical physical contact*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -313,7 +317,9 @@ Table 4 展示了在伙伴身体比例（0.8×–1.2×）和运动速度（0.8×
 - **Table 4**：在伙伴身体比例和速度联合变化下呈平滑退化，证明策略的鲁棒性。
 - **Figure 5**：真实机器人部署的感知管线，验证策略在异步单目感知下的可执行性。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心瓶颈与因果机制
 
@@ -351,6 +357,8 @@ Table 4 展示了在伙伴身体比例（0.8×–1.2×）和运动速度（0.8×
 3. **交互类型泛化**：解耦时空推理框架能否零样本泛化到训练数据中未出现的新交互类型？
 4. **跨形态迁移**：接触保持约束和形态调整策略如何系统化地迁移到不同尺寸、自由度的机器人平台？
 5. **感知鲁棒性**：在 SMPL 估计误差较大或部分遮挡场景下，D-STAR 策略的性能退化模式与容错机制是什么？
+
+
 
 ## 原文 PDF
 

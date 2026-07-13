@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/A_Memory_Efficient_Hierarchical_Algorithm_for_Large_scale_Optimal_Transport_Problems.pdf
+project_link: null
+code_link: null
 aliases:
 - HHALSOT
 - MEHALSOTP
@@ -41,13 +43,13 @@ claims:
 > - DOTmark 上，GPU内存 (GB) 为 6.25，对比 HOT: 21.20，变化 70.5%减少。
 > - ModelNet10 (3D) 上，运行时间 (s) 为 ~1.84×加速，对比 HiRef，变化 1.84×加速。
 
-## 概述
+## 概要
 
 大规模最优传输问题的核心瓶颈在于内存与可扩展性。传统线性规划求解器（如网络单纯形法、内点法）需存储完整的 $m \times n$ 耦合矩阵，当 $n = 1024^2$ 时变量数接近 $10^{12}$，导致内存消耗巨大且难以利用GPU并行能力。本文提出的HALO（Hierarchical Algorithm for Large-scale Optimal Transport）通过三个关键设计突破这一瓶颈：**多尺度层次结构**从粗到细逐步求解，粗层解为细层提供高质量初始化；**基于活动支撑集（active support）的稀疏化策略**利用最优传输计划天然稀疏性（最多 $m+n$ 个非零元），通过保守更新（包含历史支撑集）和对偶违规校正保证收敛；**无分解一阶LP求解器（cuPDLPx）** 在GPU上高效求解受限问题。这一组合实现了 $O(n)$ 内存复杂度，与现有GPU求解器最低水平相当。
 
 主要结果方面：在2D图像基准DOTmark上，$n=1024^2$ 时HALO相比最强GPU基线HOT实现 **8.9倍加速** 和 **70.5%内存减少**；在3D点云ModelNet10上，$n=2^{18}$ 时相比低秩方法HiRef实现 **1.84倍加速**、**83.2%内存减少** 和 **24.9%更低传输成本**。消融实验表明，多尺度框架和cuPDLPx均不可或缺：禁用cuPDLPx导致 $r=256$ 时36.9倍减速，禁用多尺度框架导致 $r=64$ 时85.6倍减速并在更高分辨率内存溢出。此外，每层内迭代次数平均不超过2次（见Table 2），验证了尺度无关的迭代复杂度上界。
 
-## 背景与动机
+
 
 最优传输（Optimal Transport, OT）问题旨在寻找两个概率分布间成本最小的传输方案，其核心公式为Kantorovich公式：$\operatorname* { i n f } _ { \pi \in \Pi ( \mu , \nu ) } \int _ { \mathbb { S } \times \mathbb { D } } c ( s , d ) \mathrm { d } \pi ( s , d )$。在离散场景下，该问题可等价转换为一个标准线性规划（LP）问题：$\operatorname* { m i n } _ { { \pmb x } \geq 0 } { \pmb c } ^ { \top } { \pmb x } , \quad \mathrm { s . t . } \quad { \pmb A } { \pmb x } = { \pmb q }$。然而，当处理大规模问题时，现有求解器面临严重的内存瓶颈和可扩展性限制。传统LP求解器（如网络单纯形法、内点法）需要存储完整的$m \times n$维耦合矩阵$\pmb x$，当$n=1024^2$时变量数接近$10^{12}$，导致内存消耗巨大且无法充分利用GPU并行能力。
 
@@ -59,7 +61,9 @@ claims:
 
 实验证据表明，HALO在DOTmark上$n=1024^2$时实现了8.9倍加速和70.5%内存减少，在ModelNet10上$n=2^{18}$时实现了1.84倍加速、83.2%内存减少和24.9%更低传输成本。消融实验进一步验证了多尺度框架和cuPDLPx均不可或缺：禁用cuPDLPx导致$r=256$时36.9倍减速；禁用多尺度框架导致$r=64$时85.6倍减速并在更高分辨率内存溢出。此外，每层内迭代次数平均不超过2次，验证了尺度无关的迭代复杂度上界。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 HALO（Hierarchical Algorithm for Large-scale Optimal Transport）的核心创新在于将**多尺度层次结构**与**GPU友好的无分解一阶LP求解器**（如PDHG）相结合，并引入**活动支撑集主动剪枝**技术，在保持O(n)内存复杂度的同时实现尺度无关的迭代复杂度上界。这一设计直接针对现有最优传输求解器在处理大规模问题时的根本瓶颈：传统LP求解器（如网络单纯形法、内点法）需要存储完整的mn维耦合矩阵，当n=1024²时变量数接近10¹²，导致内存消耗巨大且无法充分利用GPU并行能力。
 
@@ -72,7 +76,7 @@ HALO（Hierarchical Algorithm for Large-scale Optimal Transport）的核心创�
 
 **核心洞察**：HALO证明了多尺度层次结构与活动支撑集剪枝的结合可以同时实现高精度、低内存和GPU并行效率——在DOTmark上n=1024²时实现8.9倍加速和70.5%内存减少（Table 1），在ModelNet10上n=2^18时实现1.84倍加速、83.2%内存减少和24.9%更低传输成本（Table 7）。理论分析（Appendix B.1）证明了最终支撑集大小满足|N_k| ≤ (1+β)C₀|S|，即与源点数量成线性关系，从而保证了O(n)内存复杂度。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0003_CkOBcyntGd_A_Memory-Efficient_Hierarchical_Algorithm_for_La/figures/001_Figure_1.jpg]]
 *Figure 1: Architecture of HALO*
@@ -85,7 +89,7 @@ HALO（Hierarchical Algorithm for Large-scale Optimal Transport）的整体架�
 
 **活动支撑集更新与受限OT求解模块**是HALO的核心创新所在。该模块交替执行两个操作：(1) `updateActive`基于当前解更新活动支撑集，采用保守更新策略——新支撑集包含历史所有支撑集，而非仅保留当前耦合的支撑集，并通过对偶违规校正（使用Top_K算子选择最大对偶违规对，K = β|S|，推荐β=2^{-2}）来保证收敛性；(2) `solveRestricted`在更新后的活动支撑集上求解受限OT问题，使用cuPDLPx作为默认底层求解器。活动支撑集策略利用了最优传输计划的天然稀疏性（最多m+n个非零元），将求解限制在估计的支撑集上，从而将内存复杂度从O(mn)降低到O(n)。
 
-## 核心模块与公式推导
+
 
 HALO的核心设计围绕三个相互耦合的模块展开：多尺度层次结构、活动支撑集稀疏化策略以及GPU友好的无分解一阶LP求解器。本节梳理各模块的关键机制与核心公式。
 
@@ -147,7 +151,9 @@ $$
 
 其中 $x_b$ 为参考解（对于小规模问题使用Gurobi精确解，大规模问题使用HALO自身结果）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 
@@ -191,7 +197,9 @@ HALO在两类大规模OT基准测试上展现了显著的性能优势。在2D图
 *Table 3: Performance breakdown by image class in DOTmark at resolution 1024 × 1024. Metric sparsity denotes the pixel intensity sparsity, defined as the percentage of pixels with strictly zero mass. Time is reported in seconds (s) Table 4 presents an ablation that isolates the effects of the multiscale framework and the GPUbased LP solver cuPDLPx. When cuPDLPx is disabled, we use Gurobi’s barrier with crossover, as updateActive relies on the sparsity of solutions. Disabling cuPDLPx in HALO results in a 36.9× increase in runtime at r \ = \ 2 5 6 . Removing the multiscale framework from HALO also causes an 85.6× slowdown at r = 64 and leads to OOM at higher resolutions. Taken together, the multiscale...*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与 baseline/follow-up 的关系
 
@@ -224,6 +232,8 @@ HALO的适用边界由以下几个因素决定：
 3. HALO与未来更快的GPU LP求解器结合时性能如何进一步提升？（Table 13显示HALO集成HPR-LP求解器时，在1024分辨率下运行时间为40.76秒，内存6.61GB，表明求解器替换仍有优化空间）
 4. ShortCut-GPU在GPU精度下停滞的具体数值精度影响机制是什么？
 5. 对于非平方欧氏距离成本函数，屏蔽条件 $c(s,d) + c(s',d') > c(s,d') + c(s',d)$ 是否仍然成立？这直接影响活动支撑集剪枝的有效性。
+
+
 
 ## 原文 PDF
 

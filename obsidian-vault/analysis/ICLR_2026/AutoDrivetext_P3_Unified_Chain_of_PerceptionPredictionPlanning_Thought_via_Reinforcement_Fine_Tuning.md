@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/AutoDrivetext_P3_Unified_Chain_of_PerceptionPredictionPlanning_Thought_via_Reinforcement_Fine_Tuning.pdf
+project_link: https://openi.pcl.ac.cn/OpenAIDriving/AutoDrive-P3
+code_link: https://github.com/haha-yuki-haha/AutoDrive-P3
 aliases:
 - AP
 - "AutoDrive-P³"
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | AutoDrive-P³：通过强化微调实现感知-预测-规划统一思维链 |
 | 英文题名 | $AutoDrive\text{-}P^3$: Unified Chain of Perception–Prediction–Planning Thought via Reinforcement Fine-Tuning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=CMU8GxwpUL); [GitHub](https://github.com/haha-yuki-haha/AutoDrive-P3); [Project](https://openi.pcl.ac.cn/OpenAIDriving/AutoDrive-P3) |
+| Links | [paper](https://openreview.net/forum?id=CMU8GxwpUL) · [GitHub](https://github.com/haha-yuki-haha/AutoDrive-P3) · [Project](https://openi.pcl.ac.cn/OpenAIDriving/AutoDrive-P3) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/robotics |
 | Method | AutoDrive-P³ |
 | Dataset | nuScenes, NAVSIMv1, NAVSIMv2 |
@@ -41,7 +43,7 @@ claims:
 > - nuScenes 上，Collision (%) Avg. 为 0.06，对比 0.21 (OmniDrive)，变化 -0.15。
 > - NAVSIMv1 上，PDMS 为 90.6，对比 87.4 (WoTE)，变化 +3.2。
 
-## 概述
+## 概要
 
 AutoDrive-P³（AutoDrive-P³）解决的是基于视觉语言模型（VLM）的端到端自动驾驶中的核心瓶颈：现有方法要么跳过感知与预测直接输出规划，造成严重的领域差距并削弱决策能力；要么将感知、预测、规划作为碎片化独立模块处理，缺乏协同，导致规划性能低下。该工作的核心洞见在于，规划性能根本上依赖于准确的感知和可靠的预测，三者必须作为统一的链式推理过程进行协同优化，而非独立处理。
 
@@ -49,7 +51,7 @@ AutoDrive-P³（AutoDrive-P³）解决的是基于视觉语言模型（VLM）的
 
 在nuScenes开放环基准上，AutoDrive-P³的详细思考模式实现了0.33 L2(m) Avg.和0.06 Collision (%) Avg.，优于所有基线方法，包括此前最优的OmniDrive（0.34 L2, 0.21 Collision）。在NAVSIMv1封闭环基准上，详细思考模式达到了90.6 PDMS，优于此前最优的WoTE（87.4 PDMS）。消融实验证实，P³-GRPO在感知和预测任务上带来了大幅提升，超越了所有基线，并显著提升了规划性能；去除KL散度项会导致模型性能严重下降并最终崩溃。
 
-## 背景与动机
+
 
 端到端自动驾驶系统正经历从传统模块化流水线向视觉-语言模型（VLM）范式的转变。然而，现有基于VLM的方法暴露出两个关键瓶颈：其一，部分方法（如EMMA、VLM-AD）直接由感知输入跳至规划输出，跳过了对场景动态演变的显式预测环节，导致模型在未见场景中的决策能力显著下降——这种“感知→规划”的捷径造成了严重的领域差距（domain gap）；其二，另一类方法（如OmniDrive、DriveVLM）虽然能够分别输出感知、预测和规划的答案，但采用碎片化的问答对形式（fragmented Q-A pairs），各模块独立训练和推理，缺乏因果协同，使得预测结果无法有效约束规划决策，最终规划性能低下。
 
@@ -57,7 +59,9 @@ AutoDrive-P³（AutoDrive-P³）解决的是基于视觉语言模型（VLM）的
 
 AutoDrive-P³的提出正是为了填补这一缺口。其核心调控杠杆是设计一种统一的、分阶段监督的强化学习算法（P³-GRPO），通过层次化、渐进式的奖励机制，显式地对感知、预测和规划三个模块进行联合优化，并辅以P³-CoT数据集进行冷启动监督微调。该方法的根本洞见在于：规划性能的提升不能仅通过优化规划损失来实现，而必须通过建立“感知精度→预测可靠性→规划安全性”的因果传导链，迫使模型在提升前两个环节精度的同时，自然增强最终决策的可解释性和鲁棒性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 AutoDrive-P³的核心创新在于将自动驾驶的感知、预测与规划三个模块从碎片化、独立优化的模式，转变为一种**统一的、分阶段协同优化的链式推理框架**。这一转变通过三个关键设计实现，直接针对现有基于VLM的端到端自动驾驶系统的根本瓶颈：跳过低层次感知与预测直接输出规划导致的领域差距，以及模块间缺乏协同导致的性能低下。
 
@@ -75,7 +79,7 @@ AutoDrive-P³的核心创新在于将自动驾驶的感知、预测与规划三�
 
 **证据强度**：上述核心创新均有明确的实验支撑。P³-GRPO在感知和预测任务上带来了大幅提升，超越了所有基线，并显著提升了规划性能（5.4节消融研究）。在nuScenes开放环基准上，AutoDrive-P³的详细思考模式实现了0.33 L2(m) Avg.和0.06 Collision (%) Avg.，优于所有基线方法（Table 1）。在NAVSIMv1封闭环基准上，其PDMS达到90.6，同样最优（Table 2）。这些结果证明了统一链式推理与联合优化策略的有效性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0001_CMU8GxwpUL_AutoDrivetext-P3_Unified_Chain_of_PerceptionPred/figures/002_Figure_1.jpg]]
 *Figure 1: The difference between A u t o D r i v e ${ \cdot } P ^ { 3 }$ and other paradigms. Our method combines an end-to-end training framework with a three-stage collaborative supervision form with VLM*
@@ -96,7 +100,7 @@ $$R(q,a) = \lambda_{\mathrm{format}} \cdot R_{\mathrm{format}} + \lambda_{\mathr
 
 **核心因果机制**：与现有方法的关键区别在于，AutoDrive-P³ 打破了“碎片化决策”的瓶颈。传统 VLM 要么跳过感知/预测直接输出规划（造成领域差距），要么各模块独立运行缺乏协同。P³-GRPO 通过层次化奖励函数将三者的优化目标绑定——提升感知和预测的奖励会直接正向影响总奖励，从而迫使模型建立“准确感知 → 可靠预测 → 安全规划”的因果链。消融实验证实，P³-GRPO 在感知和预测任务上带来了大幅提升，并显著提升了规划性能（Section 5.4）。去除 KL 散度项会导致模型性能严重下降并最终崩溃，表明正则化在维持优化稳定性中的关键作用。
 
-## 核心模块与公式推导
+
 
 AutoDrive-P³ 的核心在于将感知、预测与规划组织为统一的链式推理过程，并通过分阶段监督的强化学习进行联合优化。其关键模块包括：P³-CoT 数据集、冷启动监督微调（SFT）以及 P³-GRPO 强化学习算法。
 
@@ -159,7 +163,9 @@ $$R(q,a) = \lambda_{\mathrm{format}} \cdot R_{\mathrm{format}} + \lambda_{\mathr
 
 消融实验（表 10）表明，奖励权重配置为 $\lambda_{\mathrm{format}}:\lambda_{\mathrm{perc}}:\lambda_{\mathrm{pred}}:\lambda_{\mathrm{plan}} = 1:2:2:5$ 时，在 nuScenes 上取得最佳规划性能（Avg. L2 0.33）。更重要的是，去除 KL 散度项 ($\beta D_{\mathrm{KL}}$) 会导致模型性能严重下降并最终崩溃（图 10），这验证了 KL 正则化在防止策略偏离参考模型过远方面的关键作用。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：开放环与封闭环基准上的规划性能
 
@@ -208,7 +214,9 @@ Figure 5 展示了双推理模式在 nuScenes 上的运行时间。详细思考�
 - **场景多样性限制**：P³-CoT 数据集仅基于 nuScenes 和 NAVSIM，其场景分布（如 Figure 7, Figure 8 所示的目标类别和动作分布）可能无法覆盖长尾驾驶场景（如极端天气、非常规交通参与者），限制了模型在更广泛环境中的泛化能力。
 - **多模态融合缺失**：当前方法仅依赖视觉输入，未利用激光雷达、雷达等传感器，这在高光照变化或恶劣天气条件下可能成为鲁棒性瓶颈。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 AutoDrive-P³ 的定位是 VLM 端到端自动驾驶中“链式推理”范式的代表，其核心贡献在于将此前被割裂的感知、预测、规划三个阶段，通过统一的强化学习框架进行联合优化。要理解其位置与边界，需将其置于两条并行的发展脉络中：一是端到端自动驾驶方法本身的技术演进，二是 VLM 在该领域的应用深化。
 
@@ -231,6 +239,8 @@ AutoDrive-P³ 的适用性受制于几个前提条件。首先，该方法依赖
 **开放问题**
 
 几个关键问题尚未解决。P³-GRPO 的奖励权重设计是否可以在不同数据集和场景中自适应调整？当前的手工调优方式限制了方法的通用性。如何有效融合多模态传感器数据以提升感知鲁棒性？该方法是否可以扩展到更复杂的驾驶任务，如多车协同或路径规划？最后，如何将系统部署到具有真实世界交互的封闭环设置中，并验证其在长尾事件和对手方策略变化下的行为可靠性？这些问题的回答将决定 AutoDrive-P³ 能否从基准测试的领先者转变为实际部署的可行方案。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/BLADE_Block_Sparse_Attention_Meets_Step_Distillation_for_Efficient_Video_Generation.pdf
+project_link: http://ziplab.co/BLADE-Homepage/
+code_link: null
 aliases:
 - BBSAMSDEVG
 - BLADE
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | BLADE：面向高效视频生成的块稀疏注意力与步长蒸馏联合框架 |
 | 英文题名 | BLADE: Block-Sparse Attention Meets Step Distillation for Efficient Video Generation |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=O9J20MsmRl); [Project](http://ziplab.co/BLADE-Homepage/) |
+| Links | [paper](https://openreview.net/forum?id=O9J20MsmRl) · [Project](http://ziplab.co/BLADE-Homepage/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | BLADE (Block-sparse Attention Meets step Distillation for Efficient video generation) |
 | Dataset | VBench-2.0, Wan2.1-1.3B (H20), CogVideoX-5B |
@@ -40,19 +42,21 @@ claims:
 > - VBench-2.0 上，Total Score 为 0.570，对比 0.563，变化 +0.007。
 > - Wan2.1-1.3B (H20) 上，End-to-End Speedup 为 14.10×，对比 1×，变化 +13.10×。
 
-## 概述
+## 概要
 
 BLADE（Block-sparse Attention Meets step Distillation for Efficient video generation）是一个完全数据无关（data-free）的联合训练框架，旨在解决扩散Transformer在视频生成中的推理效率瓶颈。该框架的核心创新在于将自适应块稀疏注意力（Adaptive Block-Sparse Attention, ASA）直接嵌入基于轨迹分布匹配（Trajectory Distribution Matching, TDM）的步长蒸馏过程中，从而同时实现推理步数压缩和每步计算量降低。
 
 实验结果表明，BLADE在Wan2.1-1.3B上实现了14.10×的端到端推理加速，在CogVideoX-5B上实现了8.89×的加速。在VBench-2.0基准测试上，BLADE将CogVideoX-5B的得分从0.534提升至0.569，将Wan2.1-1.3B的得分从0.563提升至0.570。
 
-## 背景与动机
+
 
 扩散Transformer在视频生成中的推理瓶颈来自两方面：迭代去噪过程需要大量步数（如50步），以及长序列上的二次复杂度注意力计算。现有方法通常分别处理这两个问题——步长蒸馏（如TDM）压缩推理步数，稀疏注意力降低每步计算量——但二者独立优化时存在次优性：稀疏注意力作为后处理步骤无法感知蒸馏目标，而蒸馏过程也未考虑稀疏约束下的生成轨迹特性。
 
 BLADE的核心洞察在于：将动态稀疏注意力直接嵌入步长蒸馏的联合训练过程，而非作为后处理步骤，可以在数据无关的条件下同时实现步数压缩和每步计算量降低，且稀疏感知的蒸馏能让学生模型在稀疏约束下学习到更紧凑的生成轨迹。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 BLADE的核心创新包含两个紧密耦合的组件：
 
@@ -62,7 +66,7 @@ BLADE的核心创新包含两个紧密耦合的组件：
 
 核心调控旋钮是注意力阈值τ（attention threshold），它直接控制保留的KV块比例，从而在计算量与生成质量之间进行权衡。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__image_and_video_generation__b001_O9J20MsmRl_BLADE_Block-S/figures/001_Figure_1.jpg]]
 *Figure 1: The training mechanism of BLADE within a single distillation interval [ $t _ { i - 1 } , t _ { i }$ ) . The Sparse Generator $\left( G _ { \theta } \right$) denoises the input $\mathbf { x } _ { t _ { 1 } }$ i to produce the sample $\mathbf { x } _ { t _ { i - 1 } }$ . Crucially, this output is then re-corrupted with Gaussian noise to create an intermediate sample $\mathbf { x } _ { t _ { i } }$ . A dedicated Fake Score model evaluates this re-noised sample. Its output is contrasted with the score from the Real Score model (which is the pre-trained teacher model) to compute the Distribution Matching Loss ( $\nabla _ { \boldsymbol { \theta } } D _ { K L }$ ) . This loss directly updates the st...
@@ -76,7 +80,7 @@ BLADE采用学生-教师范式，整体架构包含以下模块：
 
 训练过程遵循TDM范式：在每个蒸馏区间内，学生生成器对输入进行去噪，输出被重新加噪后由假分数模型评估，其输出与真实分数模型（教师）的分数对比，计算分布匹配损失直接更新学生生成器。
 
-## 核心模块与公式推导
+
 
 ### 5.1 前向扩散与分数函数
 
@@ -120,7 +124,9 @@ $$\sum_{j=1}^m s_j \ge \tau$$
 
 5. **全局Token增强**：在训练时，将K与均值池化版本拼接，池化区域接收固定加性掩码ln n，在不破坏稀疏性的前提下软性引导注意力。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 6.1 主实验结果
 
@@ -274,7 +280,9 @@ ASA在Wan2.1-14B上以0.77稀疏率实现PSNR 26.05、SSIM 0.865、LPIPS 0.050�
 - 训练使用10,000个文本提示，来自JourneyDB并经Qwen2.5-3B-Instruct增强，不依赖原始视频数据。
 - 实验在8×A800(80GB) GPU集群上进行。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 BLADE位于扩散模型加速与稀疏注意力两个研究方向的交叉点：
 
@@ -293,6 +301,8 @@ BLADE位于扩散模型加速与稀疏注意力两个研究方向的交叉点：
 - 稀疏感知训练作为正则化手段，能否推广到3D内容生成和高分辨率图像合成？
 - 在更极端的1-2步蒸馏场景下，BLADE框架是否仍能保持生成质量？
 - ASA的动态掩码生成开销在更长序列（如100k tokens以上）中是否会被充分摊销？
+
+
 
 ## 原文 PDF
 

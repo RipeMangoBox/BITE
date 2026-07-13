@@ -5,6 +5,8 @@ paper_level: A
 venue: SIGGRAPH
 year: 2025
 pdf_ref: paperPDFs/SIGGRAPH_2025/VideoAnydoor_High_fidelity_Video_Object_Insertion_with_Precise_Motion_Control.pdf
+project_link: https://videoanydoor.github.io/
+code_link: null
 aliases:
 - VideoAnydoor
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | VideoAnydoor：高保真视频物体插入与精确运动控制 |
 | 英文题名 | VideoAnydoor: High-fidelity Video Object Insertion with Precise Motion Control |
 | 会议/期刊 | SIGGRAPH 2025 |
-| Links | [paper](https://arxiv.org/abs/2501.01427); [Project](https://videoanydoor.github.io/) |
+| Links | [paper](https://arxiv.org/abs/2501.01427) · [Project](https://videoanydoor.github.io/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | VideoAnydoor |
 | Dataset | Custom benchmark (200 videos from Pexel), Custom benchmark (200 videos), User study |
@@ -40,7 +42,7 @@ claims:
 > - Custom benchmark (200 videos) 上，CLIP-Score (↑) 为 38.0。
 > - Custom benchmark (200 videos) 上，DINO-Score (↑) 为 81.4。
 
-## 概述
+## 概要
 
 **问题瓶颈**。现有视频物体插入方法（如 **AnyV2V** (Ku et al., arXiv 2024)、**ReVideo** (Mou et al., arXiv 2024) 等）普遍采用两阶段方案——先修改首帧再将编辑传播至后续帧。这种范式存在两个根本缺陷：首帧插入质量本身欠佳，且后续帧缺乏显式的身份信息注入，导致物体身份一致性差、运动控制不准确，难以在保持高保真外观细节的同时实现精细的运动轨迹对齐。
 
@@ -48,7 +50,7 @@ claims:
 
 **主要结果**。在 200 个 Pexel 视频构成的基准测试上，VideoAnydoor 在所有自动指标（CLIP-Score、DINO-Score、PSNR、AJ、δavg、OA）上均显著超越对比方法（Table 2）。用户研究中，VideoAnydoor 在质量、保真度、运动流畅度、多样性四个维度均获得最优评分（Quality 3.75, Fidelity 3.80, Smooth 3.65, Diversity 3.70 / 4.0，Table 3）。消融实验表明，移除像素变形器后 ID 保留和运动一致性指标大幅下降（PSNR 59.1→33.8, CLIP-Score 81.4→72.4, AJ 88.3→78.5），定性结果亦出现运动不一致与错误姿态（Table 4-5, Figure 7），验证了该模块的核心作用。
 
-## 背景与动机
+
 
 视频物体插入（video object insertion）旨在将给定参考图像中的物体无缝嵌入目标视频，并使其在时间维度上保持身份一致性与运动连续性。该任务在虚拟试穿、视频编辑、数字人驱动等场景中具有广泛的应用前景，但其核心挑战在于：**如何在精确跟随用户指定运动轨迹的同时，完整保留物体的高保真外观细节**。
 
@@ -61,7 +63,9 @@ claims:
 
 针对这一缺口，本文提出 **VideoAnydoor**，一个端到端的零样本视频物体插入框架。其核心设计思路是将全局身份注入、粗粒度运动控制与细粒度像素变形三者统一于扩散生成过程之中，使模型能够在保持高保真外观的同时精确跟随用户指定的边界框序列或关键点轨迹。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 VideoAnydoor 的核心创新在于将视频物体插入任务中的**外观身份保持**与**精确运动控制**统一到一个端到端框架中，解决了现有两阶段方案（如 AnyV2V、ReVideo）存在的首帧插入质量差、后续帧缺乏身份信息注入的根本瓶颈。
 
@@ -96,7 +100,7 @@ $$\mathcal{L} = \sum_{i=1}^{N} ((\lambda R_i \mathbf{A}_{trj}^i + (1 - \mathbf{A
 
 VideoAnydoor 的三项核心创新——像素变形器、DINOv2 身份注入、混合训练与加权损失——形成了完整的因果链条：**像素变形器提供细粒度外观-运动联合建模，ID 提取器保证全局身份一致性，混合训练与加权损失则从数据和优化层面增强了模型对高质量细节和精确运动的拟合能力**。这一组合使 VideoAnydoor 在零样本条件下实现了超越所有对比方法的性能，并在用户研究中获得最优评分（Quality 3.75, Fidelity 3.80, Smooth 3.65, Diversity 3.70 out of 4，Table 3）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l24_VideoAnydoor_High_fidelity_Video_Object_Insertion_with_Precise_Motion_Co/figures/003_Figure_3.jpg]]
 *Figure 3: Pipeline of trajectory generation for training data. We first perform NMS to filter out densely-distributed points and then select points with larger motion. The retained ones can be sparsely distributed in each part of the target and contain more motion information, thus inducing more precise control*
@@ -136,7 +140,7 @@ $$\mathcal{L} = \sum_{i=1}^{N} ((\lambda R_i \mathbf{A}_{trj}^i + (1 - \mathbf{A
 
 三个层次形成递进式控制链路：DINOv2 身份令牌提供全局“这是哪个物体”的约束，边界框序列提供“物体大致在哪儿”的粗粒度引导，像素变形器则通过轨迹图与参考图像的像素级对应，实现“物体细节如何随运动变化”的精细建模。消融实验表明，移除像素变形器后，ID 保留指标（PSNR 59.1→33.8, CLIP-Score 81.4→72.4）和运动一致性指标（AJ 88.3→78.5）均大幅下降，验证了该模块在联合建模外观与运动中的关键作用。
 
-## 核心模块与公式推导
+
 
 ### 整体框架
 
@@ -170,7 +174,9 @@ $$\mathcal{L} = \sum_{i=1}^{N} \left( \left( \lambda R_i \mathbf{A}_{trj}^i + \f
 
 为缓解高质量视频物体插入数据的稀缺问题，VideoAnydoor 采用图像-视频混合训练策略。具体而言，从同一视频中选取空间距离最大的帧作为参考图像，提取其前景物体并去背景；同时通过人工相机操作（等间隔平移或逐步裁剪）将高质量静态图像扩充为伪视频。训练时引入自适应时间步采样，区分真实视频与图像模拟视频的贡献。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：定量对比
 
@@ -232,7 +238,9 @@ $$\mathcal{L} = \sum_{i=1}^{N} \left( \left( \lambda R_i \mathbf{A}_{trj}^i + \f
 ![[assets/figures/papers/paper_list_l24_VideoAnydoor_High_fidelity_Video_Object_Insertion_with_Precise_Motion_Co/figures/004_Table_1.jpg]]
 *Table 1: Statistics of datasets used for training our VideoAnydoor. “quality” particularly refers to the image resolution*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位与现有方案瓶颈
 
@@ -277,6 +285,8 @@ VideoAnydoor 的核心主张获得了多层证据支持：
 - **强证据：** 定量对比（Table 2）显示 VideoAnydoor 在所有六项自动指标（CLIP-Score、DINO-Score、PSNR、AJ、$\delta_{avg}$、OA）上均显著超越对比方法；用户研究（Table 3）在质量、保真度、运动流畅度、多样性四个维度上均获得最优评分。
 - **因果证据：** 消融实验（Table 4, Table 5）证实移除像素变形器后，身份保持和运动一致性指标大幅下降（PSNR 59.1→33.8，CLIP-Score 81.4→72.4，AJ 88.3→78.5），定性结果（Figure 7）显示缺少像素变形器时视频出现运动不一致和不正确的物体姿态。
 - **需注意：** 论文未报告对比方法的训练数据规模和计算资源是否与 VideoAnydoor 对等，公平性比较的严格程度需要读者自行判断。此外，自定义基准（200 个 Pexel 视频）的代表性和多样性未经过标准化验证。
+
+
 
 ## 原文 PDF
 

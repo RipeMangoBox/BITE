@@ -42,7 +42,7 @@ claims:
 > - BEHAVIOR-1K (in-domain) 上，ℓ2 mover (m) 0.0225 (POINTWORLD B→B) vs N/A (specialist not directly compared)。
 > - Held-out real scenes (zero-shot) 上，ℓ2 mover (m) 0.0300 (D+B→H) vs 0.0531 (B→H, sim-only) (-43.5% relative)。
 
-## 概述
+## 概要
 
 **问题瓶颈：** 现有机器人世界模型难以在野外环境中泛化。它们通常依赖与特定机器人实施例绑定的状态表示（如关节空间）和低效的3D动态学习机制。更深层的瓶颈在于，缺乏大规模、高质量的3D交互数据来训练统一的物理动态模型，使得模型无法跨场景、跨任务迁移。
 
@@ -56,7 +56,7 @@ claims:
 
 **方法谱系与知识库定位：** POINTWORLD属于**基于模型的机器人学习**范畴，与视频生成式世界模型（如UniSim、Genie）不同，它直接在3D几何空间中进行动力学预测。其技术路线继承并突破了基于图网络的动力学模型（如**GBND**），将表示从对象级图节点提升为全场景点云，将骨干从GNN替换为大规模点云Transformer，并引入运动加权损失和任意不确定性正则化来处理真实数据噪声。在动作推理端，它将预训练世界模型嵌入MPPI规划器，实现了从感知到行动的闭环。
 
-## 背景与动机
+
 
 ### 野外机器人操作的核心瓶颈
 
@@ -81,7 +81,9 @@ POINTWORLD的提出源于一个简洁而深刻的洞察：**物理交互的本�
 
 这一设计将3D世界建模从“特定任务、特定机器人的动力学拟合”提升为“通用物理交互的几何预测”，为野外机器人操作开辟了一条可扩展的技术路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 POINTWORLD的核心突破在于将机器人世界模型从“实施例依赖的特定表示”中解放出来，构建了一个**统一的、与实施例无关的3D交互几何空间**。其关键创新可归结为以下四个维度的根本性改变：
 
@@ -124,7 +126,7 @@ $$\mathcal{F}_{\theta}^{H} : (\mathbf{s}_{t}, \mathbf{a}_{t:t+H-1}) \to \mathbf{
 
 上述四个维度的改变构成了一个完整的创新链条：**统一表示**剥离了实施例依赖，**规模化骨干**提供了强大的学习容量，**鲁棒目标**稳定了真实数据训练，**分块预测**保证了长时域一致性。这一组合使得单个预训练模型能够在未见过的真实环境中，通过MPC实现零样本任务执行，平均成功率约70%（Figure 8），覆盖刚性推物、可变形物体、关节物体和工具使用等多种任务类型。
 
-## 整体框架
+
 
 POINTWORLD 的核心设计理念是将机器人世界建模重新定义为**以动作为条件的全场景3D点流预测**问题。其整体流程围绕一个统一的3D点云表示展开，该表示同时承载场景状态和机器人动作，从而剥离了与特定实施例（如关节空间、末端执行器类型）相关的特征，使模型能够专注于基于几何的物理交互。
 
@@ -177,7 +179,7 @@ $$\arg\min \sum_{k=1}^T \left[ c_{\mathrm{task}}(\mathbf{s}_k) + c_{\mathrm{ctrl
 ![[assets/figures/papers/paper_list_l2645_https_arxiv_org_abs_2601_03782/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of POINTWORLD. Given calibrated RGB-D, robot joint-space actions, and a robot description file (URDF), we convert actions to robot flows and concatenate with scene to form a single point cloud serving as an embodiment-agnostic interaction geometry. Scene points are featurized with a frozen DINOv3 encoder, robot points with temporal embeddings, and a point cloud backbone predicts full-scene 3D point flows*
 
-## 核心模块与公式推导
+
 
 ### 3D世界建模的形式化
 
@@ -259,7 +261,9 @@ $$c_{\mathrm{task}}(\mathbf{s}_k) = \frac{1}{|\mathcal{Z}_{\mathrm{task}}|} \sum
 ![[assets/figures/papers/paper_list_l2645_https_arxiv_org_abs_2601_03782/figures/014_Figure_12.jpg]]
 *Figure 12: Ablation on Chunked Prediction, where we study different rollout strategies in training and testing. Chunked rollouts at both training and inference time lead to significantly less drift than other baselines while amortizing compute with only a single forward pass of the model*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 评估协议与指标
 
@@ -329,7 +333,9 @@ Table 3 至 Table 5 汇总了关键的数据预处理与训练配置。数据集
 ![[assets/figures/papers/paper_list_l2645_https_arxiv_org_abs_2601_03782/figures/015_Figure_13.jpg]]
 *Figure 13: Ablation on Partial Observability, where we train variants of POINTWORLD with varying number of cameras and evaluate them on all settings at test time. POINTWORLD is robust to different levels of partial observability and benefits from additional cameras in both training and inference. Training with randomized camera counts yields the best performance across all test settings*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从特定实施例建模到通用3D世界模型
 
@@ -376,6 +382,8 @@ POINTWORLD将3D世界模型定位为一种**可预训练的基础模型**，其�
 5. **范式迁移**：能否将点流世界模型用于更广泛的机器人学习范式？例如，作为离线强化学习中的动力学模型，或为策略训练提供高保真模拟环境。POINTWORLD与实施例无关的特性使其天然适合作为跨平台策略学习的基础。
 
 **需要人工验证的点**：关于GBND的具体作者、会议和年份信息在提供的分析材料中未明确给出，建议查阅原始论文以补充完整的引用元数据。
+
+
 
 ## 原文 PDF
 

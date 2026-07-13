@@ -43,7 +43,7 @@ claims:
 > - LLRVD-simu 上，PSNR 27.74 vs SOTA（详见表1） (显著超越所有对比方法)；SSIM 0.828 vs SOTA（详见表1） (显著超越所有对比方法)；LPIPS 0.125 vs SOTA（详见表1） (显著低于所有对比方法)。
 > - REAL 上，PSNR 24.51 vs SOTA（详见表1） (显著超越所有对比方法)；SSIM 0.742 vs SOTA（详见表1） (显著超越所有对比方法)。
 
-## 概述
+## 概要
 
 极端暗光条件下的运动成像面临一个根本性瓶颈：光子匮乏导致传统相机与事件相机同时遭受严重的传感器噪声，纹理保留与噪声抑制之间存在难以调和的权衡。现有低光增强方法要么过度平滑导致纹理丢失，要么残存噪声破坏结构；而事件相机虽然在暗光区域能提供高动态纹理信息，但其自身在低光照下也会产生密集的散粒噪声——密度可比其他噪声高出50倍以上。现有的事件-图像融合方法未能对两种模态同时进行精准去噪，往往顾此失彼。
 
@@ -55,7 +55,7 @@ NEC-Diff 针对这一瓶颈提出了三个层面的创新。首先，利用 RAW 
 
 **局限性**：扩散模型的迭代采样增加了推理计算开销，可能限制实时应用；方法依赖像素对齐的 RAW-事件配对数据，此类同轴多传感器采集系统搭建门槛较高；事件对比度阈值在不同场景下的变化如何自适应处理，尚待进一步研究。
 
-## 背景与动机
+
 
 ### 极端暗光成像的根本困境
 
@@ -97,7 +97,9 @@ $$E(t) = \frac{1}{C} \log \frac{I(t) + b_{pr}}{I(t - \Delta t) + b_{pr}}$$
 
 基于此，本文提出**NEC-Diff**框架，核心动机是：利用RAW图像的线性光响应特性与事件相机的亮度变化本质，建立物理驱动的双模态协同去噪约束；同时基于去噪结果动态估计两模态的SNR，引导自适应特征融合，将高可靠性信息注入扩散模型实现高保真重建。这一设计旨在从根本上突破暗光成像中纹理保留与噪声抑制的权衡瓶颈。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 NEC-Diff 的核心创新围绕一个根本性瓶颈展开：在光子匮乏的极端暗光条件下，RAW 图像与事件相机同时遭受严重的传感器噪声，而现有方法无法对两种模态进行有效的协同去噪与可信融合。基于此，NEC-Diff 在输入选择、噪声处理策略、融合机制、重建骨干和物理约束五个关键维度上做出了系统性改进。
 
@@ -138,7 +140,7 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{rec}} + \lambda_{\mathrm{g
 
 其中梯度保持损失 $\mathcal{L}_{\mathrm{grad}}$ 保留纹理结构，强度一致性损失 $\mathcal{L}_{\mathrm{cons}}$ 约束双模态输出的物理一致性（$\lambda_{\mathrm{grad}}=10$，$\lambda_{\mathrm{cons}}=0.5$）。这一物理驱动的约束体系是 NEC-Diff 在极端暗光下实现高保真重建的关键保证。
 
-## 整体框架
+
 
 NEC-Diff 的整体 pipeline 围绕一个核心洞察展开：在极端暗光条件下，RAW 图像与事件流在噪声分布和信号可靠性上具有天然的互补性——RAW 图像在亮区 SNR 高但暗区纹理丢失严重，事件流在暗纹理区域 SNR 高但在平滑区域噪声密度急剧上升（可达其他区域的 50 倍以上）。基于此，NEC-Diff 构建了三个紧密协作的模块，形成“协同去噪 → 可靠性感知特征提取 → 条件扩散重建”的信息流。
 
@@ -158,7 +160,7 @@ NEC-Diff 的整体 pipeline 围绕一个核心洞察展开：在极端暗光条�
 ![[assets/figures/papers/paper_list_l904_https_arxiv_org_abs_2603_20005/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of problem and main idea. (a) LLIE methods suffer from a trade-off between texture preservation and noise suppression. (b) Events effectively complement textures but introduce additional noise. NEC-Diff exploits the characteristics of both events and RAW images to achieve robust denoising while preserving textures, fusing features guided by SNR and injecting them into the diffusion model to achieve high-fidelity results*
 
-## 核心模块与公式推导
+
 
 ### 3.1 噪声建模与物理一致性约束
 
@@ -259,7 +261,9 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{rec}} + \lambda_{\mathrm{g
 ![[assets/figures/papers/paper_list_l904_https_arxiv_org_abs_2603_20005/figures/008_Figure.jpg]]
 *Figure: (a) Direct fusion (b) Image SNR-guided Fusion (c) Dual SNR-guided Fusion*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -313,7 +317,9 @@ Table 2报告了REAL数据集上各模块的消融结果，揭示了以下关键
 ![[assets/figures/papers/paper_list_l904_https_arxiv_org_abs_2603_20005/figures/005_Figure_5.jpg]]
 *Figure 5: Details of the REAL dataset. (a) Hardware setup of the coaxial imaging system. (b) Distributions of image-pair brightness and platform motion speed. (c) Visualization of representative data pairs*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -352,6 +358,8 @@ NEC-Diff的有效性建立在以下几个前提之上，这些前提同时划定
 - **物理约束的跨模态推广。** ECNS的协同去噪范式——利用一种模态的物理先验指导另一种模态去噪——能否推广到其他多模态成像场景（如红外-可见光融合去噪、深度-彩色联合去噪）？
 
 *注：部分开放问题（如低于0.001 lux的性能边界、C值的跨相机变化规律）未在原论文中提供实验证据，需要后续研究手动验证。*
+
+
 
 ## 原文 PDF
 

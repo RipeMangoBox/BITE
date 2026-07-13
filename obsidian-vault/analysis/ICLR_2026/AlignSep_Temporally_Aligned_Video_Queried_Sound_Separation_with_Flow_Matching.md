@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/AlignSep_Temporally_Aligned_Video_Queried_Sound_Separation_with_Flow_Matching.pdf
+project_link: https://AlignSep.github.io
+code_link: null
 openreview_forum_id: DVDkFcxU1D
 aliases:
 - AlignSep
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | AlignSep：基于流匹配的时间对齐视频查询声源分离 |
 | 英文题名 | AlignSep: Temporally-Aligned Video-Queried Sound Separation with Flow Matching |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=DVDkFcxU1D); [Project](https://AlignSep.github.io) |
+| Links | [paper](https://openreview.net/forum?id=DVDkFcxU1D) · [Project](https://AlignSep.github.io) |
 | Topic | #topic/time_series_dynamical_systems #topic/time_series_dynamical_systems/time_series_forecasting |
 | Method | AlignSep |
 | Dataset | VGGSound-Hard, VGGSound-Clean |
@@ -41,7 +43,7 @@ claims:
 > - VGGSound-Hard 上，MOS (Overall) 为 4.43，对比 OmniSep (4.07)，变化 +0.36。
 > - VGGSound-Clean 上，S_A-A (语义一致性) 为 73.38，对比 OmniSep (70.83)，变化 +2.55。
 
-## 概述
+## 概要
 
 视频查询声源分离 (VQSS) 旨在从混合音频中提取与特定视频画面相对应的声音。现有方法面临一个核心瓶颈：**依赖语义类别标签的掩码判别模型缺乏时间建模能力，在面对同质干扰（如多只狗同时吠叫）和频谱重叠时，常产生不完整的分离结果和频谱空洞伪影**。AlignSep 通过条件流匹配框架将 VQSS 重构为生成式时间对齐任务，其核心洞见在于：**生成式时间对齐框架能够明确利用视觉时间线索来区分同质音频源，同时缓解掩码方法固有的频谱空洞问题**。
 
@@ -51,7 +53,7 @@ claims:
 
 需注意的是，该方法仅在 8 秒视频片段上评估，VGGSound-Hard 经人工筛选后仅含 118 个样本，统计显著性有限；模型对 CAVP 编码器的依赖使其跨视觉域泛化能力尚待验证。
 
-## 背景与动机
+
 
 视频查询声源分离（Video-Queried Sound Separation, VQSS）旨在从混合音频中提取与给定视频中视觉对象相对应的声音成分。这一任务的核心挑战在于，视频中往往同时存在多个同质声源——例如多只狗同时吠叫，其中部分在屏幕内、部分在屏幕外。传统的基于类别语义的方法（如 CLIPSEP、i-Query、OmniSep）仅依赖视觉语义信息来区分声源，无法判断声音是否来自屏幕内的特定对象，导致在同质干扰场景下产生大量误分离。
 
@@ -61,7 +63,9 @@ claims:
 
 AlignSep 正是在这一背景下提出的：**首次将条件流匹配（Conditional Flow Matching）引入 VQSS 任务**，通过生成式框架缓解掩码方法固有的频谱空洞问题；同时设计专门的时间连接策略和视觉时间编码器 CAVP，强制执行视听时间对齐，使模型能够明确利用视觉时间线索区分同质音频源。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 AlignSep 的核心创新在于将视频查询声源分离（VQSS）从传统的**掩码判别范式**重构为**时间对齐的条件生成范式**，通过三个相互耦合的机制设计——条件流匹配生成框架、时间感知视觉编码器（CAVP）和基于拼接的时间融合策略——系统性地解决了同质声源干扰和频谱空洞两大瓶颈问题。
 
@@ -117,7 +121,7 @@ AlignSep 采用**时间拼接 + 无交叉注意力的前馈 Transformer** 作为
 
 **需要指出的局限**：模型目前仅在 8 秒视频片段上验证，对长视频的可扩展性、CAVP 在不同视觉域的泛化能力，以及 VGGSound-Hard 仅 118 样本的统计显著性，均需进一步验证。
 
-## 整体框架
+
 
 AlignSep 是一个基于条件流匹配（Conditional Flow Matching）的视频查询声源分离（VQSS）框架。其核心目标是在视觉条件的引导下，建立从混合音频分布到干净分离音频分布的映射。与现有基于掩码判别或扩散的方法不同，AlignSep 是首个将流匹配引入 VQSS 的生成式模型，并明确设计了时间对齐机制来利用视觉时间线索。
 
@@ -154,7 +158,7 @@ $$L_{\mathrm{CFM}}(\theta) = \mathbb{E}_{t, p_c(\mathbf{x}_c), p_t(\mathbf{x} | 
 
 **局限性提示**：当前框架仅在 8 秒的视频片段上进行训练和评估，其在更长视频序列上的可扩展性和内存占用尚未验证。此外，框架对 CAVP 视觉编码器的依赖意味着其性能上限受限于该编码器的泛化能力，在不同视觉领域（如非自然视频）的适用性需要进一步研究。
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题形式化
 
@@ -207,7 +211,9 @@ AlignSep 的核心创新在于**生成式时间对齐**的双重设计：
 
 消融实验进一步揭示：将流匹配替换为扩散模型时，VGGSound-Clean 上 $S_{A-A}$ 从 73.38 降至 64.12，说明生成式建模影响语义质量上限；但时间一致性主要源于 CAVP 视觉编码器而非生成模型选择。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 基准测试与评估体系
 
@@ -290,7 +296,9 @@ AlignSep 在三个不同难度的基准上进行了系统评估：**MUSIC-Clean*
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_DVDkFcxU1D/figures/010_Table_6.jpg]]
 *Table 6: Mean Opinion Score (MOS) Rating Criteria*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从判别掩码到生成式时间对齐
 
@@ -333,6 +341,8 @@ AlignSep 的有效性建立在几个关键前提之上，这些前提同时界�
 4. **实时流式推理。** 当前框架依赖离线批处理。若需实现流式分离，ODE 求解的迭代特性与低延迟要求之间存在根本性矛盾。是否可以通过蒸馏、一致性模型或提前退出策略将推理压缩至单步或少量步骤，同时维持可接受的分离质量？
 
 5. **视觉-音频异步场景。** 现实视频中常存在视听不同步（如配音、网络延迟）。AlignSep 的强制时间对齐假设在此类场景下可能产生错误的对应关系。如何检测并适应视听时间偏移，是一个尚未探索的方向。
+
+
 
 ## 原文 PDF
 

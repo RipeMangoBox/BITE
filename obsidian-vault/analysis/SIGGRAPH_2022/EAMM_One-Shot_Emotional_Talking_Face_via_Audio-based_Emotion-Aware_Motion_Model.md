@@ -32,7 +32,7 @@ claims:
 | 中文题名 | EAMM：基于音频情绪感知运动模型的单样本情绪化说话人脸生成 |
 | 英文题名 | EAMM: One-Shot Emotional Talking Face via Audio-based Emotion-Aware Motion Model |
 | 会议/期刊 | SIGGRAPH 2022 |
-| Links | [paper](https://arxiv.org/abs/2205.15278) · [arXiv](https://arxiv.org/abs/2205.15278") |
+| Links | [paper](https://arxiv.org/abs/2205.15278) · [paper](https://arxiv.org/abs/2205.15278") |
 | Topic | #topic/vision_multimodal_applications |
 | Method | EAMM (Emotion-Aware Motion Model) |
 | Dataset | LRW, MEAD |

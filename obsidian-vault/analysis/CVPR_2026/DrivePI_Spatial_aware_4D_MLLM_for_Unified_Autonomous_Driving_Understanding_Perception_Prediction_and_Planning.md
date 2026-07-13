@@ -42,7 +42,7 @@ claims:
 > - nuScenes validation set 上，L2 error (avg, without ego status) 0.49 vs VAD 0.72 (-0.23 (-32%))；Collision rate (avg, with ego status) 0.11% vs ORION 0.37% (-70%)。
 > - nuScenes-QA validation set 上，Overall Accuracy 60.7% vs OpenDriveVLA-7B 58.2% (+2.5%)。
 
-## 概述
+## 概要
 
 自动驾驶系统正朝着端到端统一建模的方向演进，但现有范式存在结构性矛盾：**视觉-行动（VA）模型**（如VAD、FB-OCC）具备细粒度3D感知与规划能力，却缺乏自然语言交互接口，难以提供可解释的场景理解；**视觉-语言-行动（VLA）模型**（如OpenDriveVLA-7B、ORION）虽支持语言交互，却因缺少中间3D感知与预测输出，导致空间推理精度不足、安全隐患突出。二者如同鱼与熊掌，始终未能兼得。
 
@@ -58,7 +58,7 @@ DrivePI的核心洞见在于：**粗粒度语言理解与细粒度空间学习�
 
 **方法定位**：DrivePI处于VA与VLA的交汇地带，以“空间感知4D MLLM”的姿态，首次在统一架构内实现了从场景理解、3D感知、运动预测到轨迹规划的完整闭环。其关键设计——LiDAR增强的空间投影器、多阶段数据引擎、多任务头并行优化——为端到端自动驾驶的可解释性与安全性提供了新的技术路径。当前局限包括多任务损失权重未精细平衡、仅完成开环评估、泛化性待验证等问题，后续工作将探索自适应损失策略与闭环强化学习扩展。
 
-## 背景与动机
+
 
 端到端自动驾驶正经历从“感知-决策-控制”分离架构向统一模型范式的转变。当前主流路线可归为两类：**视觉-行动（VA）模型**与**视觉-语言-行动（VLA）模型**，二者在能力边界上形成鲜明互补，却也暴露出难以调和的矛盾。
 
@@ -70,7 +70,9 @@ VLA模型（如**OpenDriveVLA-7B**、**ORION**、**OmniDrive**）则试图弥合
 
 DrivePI的动机正是打破这一僵局。其核心洞察在于：**通过引入LiDAR点云作为互补3D几何先验，并设计多阶段数据引擎生成大规模空间推理问答对，可以将语言理解与精细感知纳入同一MLLM架构进行端到端联合优化**。这不仅使小参数模型（0.5B）在语言交互上超越7B级VLA模型，更在3D占位、占位流和轨迹规划等细粒度任务上达到甚至超越专用VA模型的水平，首次实现了真正意义上的“空间感知4D多模态大语言模型”。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DrivePI 的核心创新在于**首次将粗粒度语言交互与细粒度 3D 空间感知/预测统一到单个轻量 MLLM 框架中**，从而同时继承了 VA 模型的感知精度与 VLA 模型的交互能力——这是现有方法长期未能兼得的瓶颈。围绕这一目标，方法在输入模态、空间投影、多任务头设计和训练数据四个维度进行了系统性改造。
 
@@ -105,7 +107,7 @@ DrivePI 的核心创新在于**首次将粗粒度语言交互与细粒度 3D 空
 
 上述四个创新并非孤立存在，而是形成了一条清晰的因果链：**LiDAR 提供几何先验 → 交叉注意力投影器保留空间细节 → 多任务头实现粗细粒度联合推理 → 数据引擎提供训练信号**。消融实验（Table 5）证实，仅启用文本头或仅启用视觉头时，各自性能均显著低于联合训练——说明粗细粒度任务之间存在互补增益，而非简单叠加。这一发现是 DrivePI 能够以小参数模型同时超越 VA 和 VLA 基线的根本原因。
 
-## 整体框架
+
 
 DrivePI 的整体框架旨在统一粗粒度的语言理解与细粒度的空间感知、预测与规划。其核心设计思路是：将多视图图像与 LiDAR 点云作为互补输入，通过视觉编码与空间投影转换为视觉令牌，再与文本指令令牌共同送入一个轻量级多模态大语言模型（MLLM），最后由四个并行的专用头分别输出场景描述、3D 占位、占位流和轨迹规划。
 
@@ -150,7 +152,7 @@ $$L_{total} = \lambda_{1} L_{llm} + \lambda_{2} L_{occ} + \lambda_{3} L_{flow} +
 ![[assets/figures/papers/paper_list_l2149_https_arxiv_org_abs_2512_12799/figures/002_Figure_2.jpg]]
 *Figure 2: The pipeline of DrivePI consists of the following steps. First, we employ a vision encoder to extract features from images and LiDAR data, obtaining latent BEV features that are then converted into vision tokens by a spatial projector. Next, we feed both vision tokens and text tokens into the MLLM to generate output tokens. The MLLM produces responses through four specialized heads: a text head for scene understanding in an auto-regressive manner, a 3D occupancy head for accurate spatial perception, an occupancy flow head for pixel-level motion prediction, and an action diffusion head for trajectory planning*
 
-## 核心模块与公式推导
+
 
 ### 视觉编码与空间投影器
 
@@ -196,7 +198,9 @@ $$h = \sum_{i=0}^{l} F_{i}^{h} \cdot w_{i}$$
 ![[assets/figures/papers/paper_list_l2149_https_arxiv_org_abs_2512_12799/figures/003_Figure_3.jpg]]
 *Figure 3: The illustration of our multi-stage data pipeline. We first generate captions of front and back views, respectively. Then, we use InternVL3-78B (adopts Qwen2.5-72B [3] as the language model) to combine these captions to merge and polish generated scene descriptions. Moreover, we generate text-occupancy and text-flow QA pairs based on occupancy and flow ground truth by multi-turn conversations to improve the 4D spatial understanding ability. Finally, we generate text-planning QA pairs to allow MLLM to predict the future actions of ego-vehicle*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与实验逻辑
 
@@ -281,7 +285,9 @@ Table 8和Table 9分别展示了Qwen2.5-0.5B和Qwen2.5-3B中各隐藏层的学�
 ![[assets/figures/papers/paper_list_l2149_https_arxiv_org_abs_2512_12799/figures/007_Table_4.jpg]]
 *Table 4: 3D occupancy performance on the Occ3D-nuScenes validation set. * indicates that DrivePI is trained exclusively on the 3D occupancy task of Occ3D-nuScenes*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有VA/VLA模型的关系
 
@@ -344,6 +350,8 @@ DrivePI处于端到端自动驾驶中**视觉-行动（VA）模型**与**视觉-
 4. **跨传感器泛化：** 如何将DrivePI扩展到纯视觉配置，同时保持细粒度3D感知能力？LiDAR先验能否通过知识蒸馏等方式迁移？
 
 5. **模型规模扩展：** 当MLLM骨干从0.5B扩展到3B或7B时，细粒度感知与语言理解能力如何变化？Table 8-9的隐藏层权重分析暗示深层表征对空间理解更关键，这一规律是否跨规模成立？
+
+
 
 ## 原文 PDF
 

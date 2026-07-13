@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/FlashDLM_Accelerating_Diffusion_Language_Model_Inference_via_Efficient_KV_Caching_and_Guided_Diffusion.pdf
+project_link: null
+code_link: https://github.com/ZhanqiuHu/flash-dlm-experimental
 openreview_forum_id: KUfKvlX3VY
 aliases:
 - FFGD
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | FlashDLM：通过高效KV缓存和引导扩散加速扩散语言模型推理 |
 | 英文题名 | FlashDLM: Accelerating Diffusion Language Model Inference via Efficient KV Caching and Guided Diffusion |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=KUfKvlX3VY); [GitHub](https://github.com/ZhanqiuHu/flash-dlm-experimental) |
+| Links | [paper](https://openreview.net/forum?id=KUfKvlX3VY) · [GitHub](https://github.com/ZhanqiuHu/flash-dlm-experimental) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/diffusion_image_video |
 | Method | FlashDLM (FreeCache + Guided Diffusion) |
 | Dataset | GSM8K (8-shot), MMLU-PRO, PiQA |
@@ -42,7 +44,7 @@ claims:
 > - GSM8K (8-shot) 上，准确率 / 延迟 / 加速比 为 80.30% / 2.70s / 17.80× (FreeCache+Qwen2.5-1.5B Guided)，对比 79.68% / 48.05s / 1.0×，变化 准确率 +0.62%，加速 17.80×。
 > - MMLU-PRO 上，准确率 / 延迟 / 加速比 为 46.64% / 2.35s / 12.48× (FreeCache+Qwen2.5-1.5B Guided)，对比 46.92% / 29.33s / 1.0×，变化 准确率 -0.28%，加速 12.48×。
 
-## 概述
+## 概要
 
 扩散语言模型（Diffusion Language Model, DLM）以并行去噪的方式生成文本，但其推理效率长期受困于一个根本矛盾：每次去噪步骤都需要对**全序列**执行前向计算，导致计算复杂度较自回归模型高出 O(L) 倍（Table 1）。这一瓶颈在长上下文场景中尤为突出，使 DLM 的实际部署面临严重的延迟与计算成本压力。与此同时，并行揭晓多个 token 所依赖的因子化分布假设，天然限制了 token 间的语义连贯性，激进去噪策略往往伴随生成质量的显著退化（Figure 1a）。
 
@@ -57,7 +59,7 @@ claims:
 
 FlashDLM 表明，通过挖掘 DLM 去噪过程中的时间冗余和引入轻量外部一致性信号，可以在不修改模型权重、不增加训练成本的条件下，将扩散语言模型的推理效率推向实用水平。其局限性在于 FreeCache 依赖 KV 稳定性假设，该假设在不同架构和任务上的普适性尚待进一步验证；固定块大小策略可能非最优；评估范围目前限于两个 DLM 模型和有限任务类型。
 
-## 背景与动机
+
 
 ### 扩散语言模型的推理瓶颈
 
@@ -81,7 +83,9 @@ FlashDLM 表明，通过挖掘 DLM 去噪过程中的时间冗余和引入轻量
 
 基于上述观察，本文提出 **FlashDLM**，包含两个免训练的互补技术：**FreeCache**（通过窗口化 KV 缓存消除已稳定 token 的重复计算）和 **Guided Diffusion**（利用轻量 AR 模型的一致性信号安全地并行揭晓 token）。两者协同作用，在几乎不损失准确率的前提下大幅降低 DLM 推理的计算量和去噪迭代次数。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FlashDLM 的核心创新直指扩散语言模型（DLM）推理的两大根本瓶颈：**逐步骤全序列重计算**导致的计算冗余，以及**并行揭晓的因子化分布**引发的 token 间语义断裂。围绕这两个瓶颈，论文提出了两个免训练的即插即用模块——**FreeCache** 与 **Guided Diffusion**，二者协同将端到端推理加速提升至 **12.14× 平均加速比**（Dream-7B-Instruct），同时几乎不损失准确率。
 
@@ -142,7 +146,7 @@ Guided Diffusion 的运作机制（Section 3.2.2，Figure 3）：
 - **引导模型的规模权衡**：较大的引导模型（如 Qwen2.5-7B）可能提供更强的引导信号但增加延迟和显存（Table 6 显示总显存从 18.7GB 增至 31.9GB），较小的引导模型可能降低准确率——最优选择需根据具体场景权衡
 - **块大小策略**：FreeCache 采用固定块大小，Table 7 显示块大小 32 vs 64 会影响加速比和准确率的权衡，自适应动态调整策略有待探索
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_KUfKvlX3VY/figures/007_Figure_3.jpg]]
 *Figure 3: AR-guided Diffusion Model. The diffusion model performs a one-step diffusion process, followed by a one-time forward pass of the AR guider. The matched tokens are unmasked for the next step of diffusion*
@@ -190,7 +194,7 @@ FlashDLM 的推理流水线由以下模块按序构成：
 
 该框架的两个模块可独立或联合使用。FreeCache 单独使用即可在 Dream-7B-Instruct 上实现 4.42× 加速（准确率仅下降 2.28 个百分点，Table 2）；叠加 Guided Diffusion 后，在 PiQA 上可实现 34.1× 的端到端加速，且准确率略有提升（Table 3）。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化
 
@@ -247,7 +251,9 @@ $$\max(\log_{\text{diffusion}}) > \tau \times \max(\log_a)$$
 
 FreeCache 和 Guided Diffusion 互补且可叠加：FreeCache 减少每步的计算量，Guided Diffusion 减少总去噪步数。在 Dream-7B-Instruct 上，两者联合在 PiQA 实现 34.1 倍加速（0.43s vs 14.62s），准确率反而提升 0.15 个百分点（Table 3）。较小的引导模型（如 Qwen2.5-1.5B-Instruct）即可提供足够信号，且加速比更高，因为其前向开销更低。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心结果概述
 
@@ -325,7 +331,9 @@ Table 5 和 Table 6 报告了引导扩散的 GPU 内存占用。以 Dream-7B-Ins
 ![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_KUfKvlX3VY/figures/014_Table_9.jpg]]
 *Table 9: LLaDA-8B-Instruct Guided Diffusion Memory Usage (GB)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的因果差异
 
@@ -354,6 +362,8 @@ FlashDLM 的引导扩散与投机解码形成范式对比：投机解码使用�
 3. 是否有其他免训练的引导策略可以使用，例如基于扩散模型自身的置信度或集成多个轻量级引导者？
 4. 引导扩散与投机解码的结合是否有增益——两者分别从起草效率和校正机制两个维度加速，是否存在互补性？
 5. 在高吞吐量生产环境中，引导扩散的 GPU 内存调度（DLM 模型与引导模型共存）如何优化，以最大化吞吐量而非单样本延迟？
+
+
 
 ## 原文 PDF
 

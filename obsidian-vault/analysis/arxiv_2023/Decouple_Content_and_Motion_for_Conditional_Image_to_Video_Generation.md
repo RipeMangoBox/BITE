@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2023
 pdf_ref: paperPDFs/arxiv_2023/Decouple_Content_and_Motion_for_Conditional_Image_to_Video_Generation.pdf
+project_link: null
+code_link: null
 aliases:
 - DCMCIVG
 tags:
@@ -42,7 +44,7 @@ claims:
 > - MHAD (128×128) 上，FVD↓ 204.17 (ED-VDM128) vs 214.39 (LFDM128) (-10.22)。
 > - NATOPS (64×64) 上，FVD↓ 152.19 (D-VDM64) vs 160.84 (LFDM64) (-8.65)。
 
-## 概述
+## 概要
 
 条件图像到视频生成的核心瓶颈在于：RGB像素空间中视频帧间存在大量信息冗余，扩散模型难以从高维原始信号中捕捉关键时序变化，导致运动一致性与生成效率的双重不足。现有潜空间方法（如LDM）虽通过变分自编码器进行压缩，但压缩率有限，且未显式建模时序一致性，空间细节与运动连贯性难以兼顾。
 
@@ -57,7 +59,7 @@ claims:
 
 该方法属于**视频扩散模型的表示空间优化**路线，与光流引导生成（如LFDM）和潜空间压缩（如LDM、LVDM）形成互补。其核心贡献在于将视频压缩的工程智慧系统性地融入扩散生成框架，以可逆的运动表示替代不可逆的像素生成，为高效时序建模提供了新范式。
 
-## 背景与动机
+
 
 ### 视频生成的核心瓶颈：时序冗余与运动一致性
 
@@ -71,7 +73,9 @@ claims:
 
 本文的核心动机源自视频压缩领域的经典洞察：在H.264等编码标准中，视频帧被分解为运动矢量（描述宏块的位移）与残差（补偿运动补偿后的像素差异），这种分解将时序变化从像素空间迁移到低维的运动特征空间，实现了极高的压缩比。**本文的关键思路是将这一解耦思想引入扩散生成模型**：将生成目标从完整像素帧转变为运动矢量与残差的联合分布，使扩散模型在高度压缩的运动特征空间中运行，从而在显著降低计算开销的同时，通过显式建模时序变化来提升运动一致性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈洞察：从RGB像素冗余到运动-内容解耦
 
@@ -114,7 +118,7 @@ $$L = \mathbb{E}_{t, \mathbf{m}, \mathbf{r} = f(v_0), v_0 \sim \mathcal{V}, \eps
 
 **边界与局限：** 运动矢量提取依赖刚性块匹配，对复杂变形、遮挡或大运动的适应能力有限；残差VAE与扩散模型分开训练，非端到端优化；速度对比仅基于FLOPs和内存，未提供实际墙钟时间；验证数据集（MHAD、NATOPS、BAIR）规模较小，高分辨率自然场景下的泛化性尚需进一步验证。
 
-## 整体框架
+
 
 D-VDM 与 ED-VDM 的核心设计思路是将视频生成任务从高维 RGB 像素空间迁移到压缩的运动特征空间，通过显式解耦静态内容与动态运动来降低扩散模型的建模难度。整体框架如图 2 所示，包含两条并行的技术路径。
 
@@ -172,7 +176,7 @@ ED-VDM 通过运动矢量的 256× 压缩和残差的 16× 压缩，将等效空
 ![[assets/figures/papers/paper_list_l1042_https_arxiv_org_abs_2311_14294/figures/001_Figure_1.jpg]]
 *Figure 1: Motivations and our ideas. Conventional methods (see in (b)), involve extending the RGB space with time sequences, resulting in limited memory efficiency and temporal coherence. Latent Diffusion Models employ a variational autoencoder for compression (depicted in (a)), enhancing efficiency but potentially reducing spatial quality and poor temporal coherence because temporal consistency hasn’t been directly modeled. Our approach (refer to (c)) decouples the content and motion, capitalizing on existing temporal coherence in compressed video data, resulting in a memory-efficient and temporally consistent video generation approach*
 
-## 核心模块与公式推导
+
 
 ### 方法总览
 
@@ -231,7 +235,9 @@ $$\mathrm{mse} = \| \epsilon - \epsilon_\theta(\mathbf{m}_t, \mathcal{E}(\mathbf
 ![[assets/figures/papers/paper_list_l1042_https_arxiv_org_abs_2311_14294/figures/004_Figure_3.jpg]]
 *Figure 3: Different ways to represent video temporal feature between frames. Frame difference used by D-VDM, a simple technique, calculates direct frame discrepancies, encompassing both fundamental and advanced temporal alterations. D-VDM findings reveal its potency in refining the temporal consistency of a generated video. Motion Vector and Residual used by ED-VDM, as in H.264, disentangles temporal shifts into intermediate motion blocks and pixel residuals. Notably, correlated with motion vectors, these residuals offer a sparse representation with potent compression potential. In our experiments, ED-VDM attains an impressive 110x compression ratio*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与解耦策略的有效性验证
 
@@ -294,7 +300,9 @@ ED-VDM 中残差压缩方案的选择对最终重建质量至关重要。Table 5
 ![[assets/figures/papers/paper_list_l1042_https_arxiv_org_abs_2311_14294/figures/007_Figure_4.jpg]]
 *Figure 4: Selected samples on BAIR, NATOPS, and MHAD dataset. First two rows are the results of unconditionally generation results on BAIR, and the down four rows are text conditional generation results on MHAD and NATOPS. The visualization results show our method generated realistic and temporally consistent video frames*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与条件图像到视频生成基线的关系
 
@@ -335,6 +343,8 @@ ED-VDM 中残差压缩方案的选择对最终重建质量至关重要。Table 5
 4. **自然视频中的稀疏性假设**：在具有复杂背景和相机运动的自然视频中，运动矢量和残差表示是否仍然稀疏且可有效预测？
 5. **跨任务通用性**：ED-VDM 的压缩表示能否应用于其他生成任务（如视频预测、视频修复），其解耦策略是否具有任务无关的通用性？
 6. **实际推理速度**：110× 的 FLOPs 加速在真实硬件上的墙钟时间收益如何？量化误差在自回归生成多帧时是否会逐步累积？
+
+
 
 ## 原文 PDF
 

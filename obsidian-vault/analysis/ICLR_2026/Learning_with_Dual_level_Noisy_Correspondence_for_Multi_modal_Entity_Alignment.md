@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Learning_with_Dual_level_Noisy_Correspondence_for_Multi_modal_Entity_Alignment.pdf
+project_link: null
+code_link: https://github.com/XLearning-SCU/2026-ICLR-RULE
 openreview_forum_id: mytIKuRsSE
 aliases:
 - LDLNCMMEA
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 面向多模态实体对齐的双层次噪声对应学习 |
 | 英文题名 | Learning with Dual-level Noisy Correspondence for Multi-modal Entity Alignment |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=mytIKuRsSE); [GitHub](https://github.com/XLearning-SCU/2026-ICLR-RULE) |
+| Links | [paper](https://openreview.net/forum?id=mytIKuRsSE) · [GitHub](https://github.com/XLearning-SCU/2026-ICLR-RULE) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | RULE |
 | Dataset | ICEWS-WIKI, ICEWS-YAGO, DBP15K ZH-EN, DBP15K JA-EN |
@@ -41,7 +43,7 @@ claims:
 > - ICEWS-YAGO 上，H@1 为 48.8，对比 38.3 (PMF)，变化 +10.5。
 > - DBP15K ZH-EN 上，H@1 为 85.6，对比 83.9 (PMF)，变化 +1.7。
 
-## 概述
+## 概要
 
 多模态实体对齐（MMEA）旨在将不同知识图谱中指代同一现实世界对象的实体进行匹配，是多源知识融合的关键步骤。现有方法普遍假设实体与属性之间的关联（实体内部对应）以及跨图谱实体/属性匹配（图谱间对应）完全正确。然而，真实的多模态知识图谱中普遍存在**双层次噪声对应（Dual-level Noisy Correspondence, DNC）**：在实体内部，图像、文本等属性可能与实体错误关联；在图谱间，标注的实体对或属性对可能误配。这种噪声导致属性融合引入误导信息，对比学习被错误信号干扰，严重降低对齐准确率。
 
@@ -51,7 +53,7 @@ claims:
 
 RULE 的主要局限在于测试时推理依赖大模型，计算开销较大且可能因领域知识不足而推理失败；此外，方法尚未与主动学习等人机协同范式结合，无法利用额外标注进一步修正噪声。这些方向值得未来探索。
 
-## 背景与动机
+
 
 多模态知识图谱（MMKG）将结构化的关系三元组与图像、文本等多模态属性结合，为实体对齐（Entity Alignment, EA）提供了更丰富的匹配信号。然而，现有 MMEA 方法普遍基于一个强假设：实体与其属性之间的关联（intra-entity correspondence）以及跨图谱的实体/属性匹配（inter-graph correspondence）是完全正确的。这一假设在实际场景中难以成立。
 
@@ -70,7 +72,9 @@ RULE 的主要局限在于测试时推理依赖大模型，计算开销较大且
 
 **本文动机**：针对上述缺口，提出一种同时覆盖训练阶段和推理阶段的双层次鲁棒学习方法，通过不确定性-共识双重原则估计对应可靠性，在属性融合和跨图对齐中抑制噪声影响，并在测试时借助多模态大模型进行链式思维推理，实现全链路抗噪。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 RULE 针对多模态实体对齐（MMEA）中普遍存在却长期被忽视的**双层次噪声对应（Dual-level Noisy Correspondence, DNC）**问题，提出了从训练到推理的全链路鲁棒框架。其核心创新可归纳为三个相互协同的机制。
 
@@ -104,7 +108,7 @@ $$\hat{\mathbf{s}}_i^m = \mathrm{Softmax}\left( \bigoplus_{j \in \mathcal{T}_i^m
 
 移除 TTR 使 H@1 降至 56.5（Table 3），验证了测试时推理对挖掘隐式连接、提升对齐精度的关键作用。这一训练-推理联合鲁棒的设计，使 RULE 在五个基准、多种 DNC 比例下始终显著优于 PMF 等 SOTA 方法（如 ICEWS-WIKI Inherent DNC H@1: 64.2 vs. 52.6）。
 
-## 整体框架
+
 
 RULE 的整体流水线围绕“双层次噪声对应（DNC）”这一核心瓶颈设计，涵盖训练阶段的可靠性感知学习与推理阶段的跨图属性推理，形成从特征提取到对齐决策的全链路抗噪机制。图 2 给出了方法的总览。
 
@@ -120,7 +124,7 @@ RULE 的整体流水线围绕“双层次噪声对应（DNC）”这一核心瓶
 
 **模块间关系。** 可靠性估计是全局控制节点，其输出同时驱动 DRL 的损失定制、DRF 的权重分配以及 TTR 的候选筛选。DRL 与 DRF 分别在损失空间和表示空间抵抗噪声，形成互补；TTR 则在推理阶段利用大模型知识弥补训练阶段难以捕获的深层语义关联。消融实验表明，移除 DRL 使 Non-name H@1 从 58.2 骤降至 31.6，移除 DRF 降至 50.4，移除 TTR 降至 56.5，验证了各模块对整体鲁棒性的关键贡献。
 
-## 核心模块与公式推导
+
 
 RULE 围绕双层次噪声对应（DNC）问题构建了三个核心模块：**可靠性估计与对划分**、**双鲁棒学习与融合**、以及**测试时对应推理**。各模块通过一组关键公式耦合，形成从训练到推理的全链路抗噪机制。
 
@@ -164,7 +168,9 @@ $$\hat{\mathbf{s}}_i^m = \mathrm{Softmax}\left( \bigoplus_{j \in \mathcal{T}_i^m
 
 可靠性估计的输出（$w_i$ 及子集划分）同时驱动 DRL 的损失定制和 DRF 的加权融合；DRF 产生的融合表示又作为 DRL 的输入；TTR 则在测试时独立于训练流程，通过大模型知识补偿训练阶段未能捕获的隐式对应。消融实验（Table 3）验证了这一链路：移除 DRL 使 ICEWS-WIKI Non-name H@1 从 58.2 骤降至 31.6，移除 DRF 降至 50.4，移除 TTR 降至 56.5，证明各模块对抵抗 DNC 均不可或缺。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 
@@ -235,7 +241,9 @@ Figure 3b 展示了可靠性分数的分布：干净配对集中在右侧高可�
 
 ![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_mytIKuRsSE/figures/041_Figure.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：双层次噪声对应（DNC）
 
@@ -283,6 +291,8 @@ RULE 的有效性依赖于以下条件：
 - **可靠性分布**（Figure 3b）清晰区分噪声与干净配对，验证了可靠性估计的有效性。
 - **跨基准一致性**：在五个基准、多种 DNC 比例下，RULE 始终显著优于所有对比方法（如 ICEWS-WIKI Inherent DNC H@1: 64.2 vs. PMF 52.6），证据链完整。
 - **泛化性验证**：在多种视觉骨干（CLIP, SigLIP, BLIP）和 MLLM 架构上验证，降低了骨干选择偏差的担忧。
+
+
 
 ## 原文 PDF
 

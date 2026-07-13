@@ -42,7 +42,7 @@ claims:
 > - THuman2 上，LPIPS 42.13 vs 66.90 (-37.0% (相对))。
 > - 2K2K 上，LPIPS 41.72 vs 73.55 (-43.3% (相对))。
 
-## 概述
+## 概要
 
 从单张二维图像重建逼真的三维人体化身，是数字人、虚拟现实与视觉内容创作等领域的核心需求。然而，现有方法面临两大瓶颈：其一，高质量、多样化的三维人体训练数据严重不足，导致前馈重建模型的泛化能力受限；其二，通用物体重建模型（如基于LRM的方法）未能有效利用人体结构先验，重建质量不佳，而专用人体重建方法又往往依赖耗时的测试时优化或扩散先验，推理速度过慢，难以实用。
 
@@ -55,8 +55,6 @@ claims:
 实验结果表明，HumanNOVA 在三个基准数据集上取得了显著优势：相较于此前最强的专用方法 **SiTH**（Ho et al., CVPR 2024），在 CustomHuman、THuman2 和 2K2K 上分别实现了 **41.8%、37.0% 和 43.3% 的相对 LPIPS 提升**。消融实验进一步验证了合成数据与真实数据均贡献显著（Table 1），数据规模与性能呈正相关（Table 2），而网格先验的引入即使在大规模数据下仍能带来2.3%的相对LPIPS增益（Table 3）。此外，将HumanNOVA的生成数据用于微调通用模型 **Real3D**（Jiang et al., ICCV 2025），可使其PSNR提升3–4 dB（Table 4），证明了数据的有效性与可迁移性。
 
 HumanNOVA 的主要局限在于对遮挡区域和挑战性服装（如连衣裙、背带裤）背面的纹理推断仍存在困难（Figure 4），未来工作可进一步探索遮挡处理与人物-物体交互场景的扩展。
-
-## 背景与动机
 
 ### 问题背景
 
@@ -86,7 +84,7 @@ HumanNOVA 的主要局限在于对遮挡区域和挑战性服装（如连衣裙�
 
 这一设计旨在实现“鱼与熊掌兼得”：既保留通用LRM的快速前馈推理能力，又获得专用人体方法的结构保真度，最终在多个基准上相对最强基线实现超过40%的LPIPS相对提升。
 
-## 核心创新
+## 核心方法与创新机理
 
 HumanNOVA 的核心创新在于将**大规模数据生成**与**类别特定结构先验**相结合，使通用前馈重建框架（LRM）能够以单次前向传播实现高保真、快速且通用的人体三维重建，从而打破通用物体重建模型与专用人体重建方法之间的边界。
 
@@ -128,8 +126,6 @@ HumanNOVA 使用三平面空间尺寸为 96 的表示（通用 LRM 通常设为 
 | 推理速度 | 小时级或秒级 | <1 秒单次前馈 | 强（Abstract） |
 
 这一组合创新使 HumanNOVA 在三个基准（CustomHuman、THuman2、2K2K）上相对于最强基线 **SiTH**（Ho et al., CVPR 2024）分别实现了 **41.8%、37.0% 和 43.3%** 的相对 LPIPS 提升（Table 5），同时保持了通用性——无需针对不同个体进行测试时适应。
-
-## 整体框架
 
 HumanNOVA 采用前馈式、令牌条件化的化身建模框架，在单次前向传播中完成三维人体重建，推理时间小于一秒，无需任何测试时优化。其整体流程可概括为：**输入图像与预估计的简化人体网格 → 多模态编码 → 2D‑到‑3D 映射 → 三平面渲染**。
 
@@ -196,8 +192,6 @@ $$
 ![[assets/figures/papers/paper_list_l1027_https_openaccess_thecvf_com_content_CVPR2026_html_Hu_HumanNOVA_Photoreal/figures/001_Figure_1.jpg]]
 *Figure 1: Photorealistic, universal and rapid 3D human avatar modeling from a single image by the proposed approach, HumanNOVA. It benefits from both our generated large-scale data and feed-forward model design. Our data generation pipeline expands training data by 20 times (top-left for visualization). With this data, HumanNOVA achieves superior performance while maintaining rapid inference among existing methods (top-right). Once trained, it is universal without the need for test-time fine-tuning or adaptation. Qualitative results show that HumanNOVA produces more precise photorealistic reconstructions compared to the state-of-the-art SiTH method [19] (bottom)*
 
-## 核心模块与公式推导
-
 HumanNOVA 的前馈重建框架由三个核心模块串联构成：多模态编码、2D到3D映射网络、以及三平面渲染。其设计目标是将单张RGB图像与一个仅含粗略姿态/形状的简化人体网格（通过现成SMPL估计器获得）作为输入，在单次前向传播中直接输出目标视角的逼真渲染结果。
 
 **多模态编码器。** 输入图像由冻结的 DINOv2 编码，估计的 SMPL 网格由 PTv3 编码，分别生成图像特征 token 与网格特征 token。这两种模态的 token 共同作为后续映射网络的条件信号。
@@ -226,7 +220,7 @@ $$\mathcal{L} = \frac{1}{N} \sum_{n=1}^{N} \left( \mathcal{L}_r^n + \lambda_m \m
 ![[assets/figures/papers/paper_list_l1027_https_openaccess_thecvf_com_content_CVPR2026_html_Hu_HumanNOVA_Photoreal/figures/002_Figure_2.jpg]]
 *Figure 2: HumanNOVA network architecture. Given a real-world input image, we first estimate its corresponding simplified human mesh. Image and mesh are fed into the multi-modal encoder to extract features which are utilized as the condition for the following mapping network. After that, a Transformer-based mapping network directly maps the features to the 3D triplane representation. From this triplane representation, our framework can render the 2D image given a camera viewpoint*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心性能突破：HumanNOVA在三个基准上全面领先
 
@@ -269,15 +263,10 @@ HumanNOVA在CustomHuman、THuman2和2K2K三个基准上，对包括专用人体�
 ![[assets/figures/papers/paper_list_l1027_https_openaccess_thecvf_com_content_CVPR2026_html_Hu_HumanNOVA_Photoreal/figures/005_Table_5.jpg]]
 *Table 5: Comparison with previous state-of-the-art methods on rendering quality. These include Real3D, SF3D, Trellis, Hunyuan2, PaMIR, SiFU and SiTH, on the CustomHuman, THuman2 and 2K2K datasets. We outperform all previous methods across all evaluated metrics with a notable gain. ↑ and ↓ represent the higher the better, and the lower the better, respectively*
 
-![[assets/figures/papers/paper_list_l1027_https_openaccess_thecvf_com_content_CVPR2026_html_Hu_HumanNOVA_Photoreal/figures/006_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l1027_https_openaccess_thecvf_com_content_CVPR2026_html_Hu_HumanNOVA_Photoreal/figures/007_Table_6.jpg]]
-*Table 6: Additional evaluation on geometry quality. When reporting CD, we consider both the prediction to ground truth and the ground truth to prediction distance. We outperform all previous methods across all evaluated metrics with a notable gain. ↑ and ↓ represent that higher is better, and that lower is better, respectively*
-
 ![[assets/figures/papers/paper_list_l1027_https_openaccess_thecvf_com_content_CVPR2026_html_Hu_HumanNOVA_Photoreal/figures/008_Figure_4.jpg]]
 *Figure 4: Qualitative evaluation of our approach with in-thewild images as input. We also show some typical failure cases (bottom), e.g., inferring the plausible back texture of challenging clothes like dresses and overalls. (Best viewed in color.)*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 在单视图三维人体重建谱系中的位置
 

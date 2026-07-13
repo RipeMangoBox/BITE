@@ -5,6 +5,7 @@ paper_level: A
 venue: NeurIPS
 year: 2021
 pdf_ref: paperPDFs/NEURIPS_2021/Score_based_Generative_Modeling_in_Latent_Space.pdf
+code_link: null
 project_link: https://nvlabs.github.io/LSGM/
 aliases:
 - LSBGML
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 潜在空间分数生成模型 |
 | 英文题名 | Score-based Generative Modeling in Latent Space |
 | 会议/期刊 | NeurIPS 2021 |
-| Links | [paper](https://arxiv.org/abs/2106.05931); [Project](https://nvlabs.github.io/LSGM); [Project](https://nvlabs.github.io/LSGM/) |
+| Links | [paper](https://arxiv.org/abs/2106.05931) · [Project](https://nvlabs.github.io/LSGM) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/generative_models_and_autoencoders |
 | Method | Latent Score-based Generative Model (LSGM) |
 | Dataset | CIFAR-10, CelebA-HQ-256 |
@@ -42,7 +43,7 @@ claims:
 > - CIFAR-10 上，NELBO (bits/dim) 为 2.87，对比 previous likelihood-based models，变化 improved。
 > - CelebA-HQ-256 上，FID 为 7.22，对比 7.23 (Original SGM, PC sampling)，变化 -0.01 (637× faster sampling)。
 
-## 概述
+## 概要
 
 **核心问题：** 直接在数据空间（像素级）应用分数生成模型（SGM）虽然生成质量高，但采样过程需要数千次网络评估，计算成本极高，且难以处理二值等非连续数据。
 
@@ -56,8 +57,6 @@ claims:
 - 在二值OMNIGLOT和MNIST上分别取得NELBO 87.79和78.47，均为当时最优似然。
 - 消融实验证实：混合分数参数化对端到端训练稳定性至关重要，几何VPSDE与重要性采样显著降低了训练目标的方差。
 
-## 背景与动机
-
 生成模型的核心目标是学习数据分布 $p(\mathbf{x})$，使其既能生成高质量样本，又能提供精确的似然估计。近年来，基于分数的生成模型（Score-based Generative Models, SGMs）通过逐步向数据注入噪声并学习逆转该过程，在图像生成任务上取得了突破性进展。然而，这一范式面临一个根本性的效率瓶颈：**直接在数据空间（如像素空间）中执行扩散与去噪过程，导致采样阶段需要数千次网络评估，计算成本极高**。
 
 具体而言，原始 SGM（Song et al.）在 CelebA-HQ-256 上生成一批 16 张图像需要约 45 分钟（4000 次函数评估），这严重限制了其在实际交互场景中的应用。此外，数据空间中的 SGM 天然适用于连续信号，难以直接处理二值图像等离散数据。
@@ -70,7 +69,7 @@ claims:
 
 本文提出的潜在空间分数生成模型（Latent Score-based Generative Model, LSGM）正是针对上述缺口，通过理论创新与工程设计的协同，首次实现了在 VAE 潜在空间中稳定、高效地训练 SGM 先验，并同时获得最先进的样本质量、似然估计和采样速度。
 
-## 核心创新
+## 核心方法与创新机理
 
 ### 瓶颈诊断：数据空间SGM的代价
 
@@ -116,8 +115,6 @@ $$\mathrm{CE}(q(\mathbf{z}_0|\mathbf{x})\|p(\mathbf{z}_0)) = \mathbb{E}_{t \sim 
 | 时间采样 | 均匀采样 $t \sim \mathcal{U}[0,1]$ | 几何VPSDE + 重要性采样 |
 | 训练策略 | 分阶段/固定VAE | 端到端联合训练 |
 
-## 整体框架
-
 LSGM 将分数生成模型（SGM）从数据空间迁移至 VAE 的潜在空间，构建了一个由三个核心模块组成的端到端生成框架：编码器 $q_\phi(\mathbf{z}_0|\mathbf{x})$、SGM 先验 $p_\theta(\mathbf{z}_0)$ 和解码器 $p_\psi(\mathbf{x}|\mathbf{z}_0)$（Fig. 1）。
 
 **生成流程**分为两个阶段。在**前向编码阶段**，输入数据 $\mathbf{x}$ 通过编码器映射为潜在表示 $\mathbf{z}_0$。在**生成阶段**，模型从 SGM 先验中采样潜在变量，再经解码器重建为数据空间样本。具体而言，采样从基础分布 $p(\mathbf{z}_1)$（通常为标准正态分布）出发，通过数值求解反向 SDE 或概率流 ODE，逐步去噪得到 $\mathbf{z}_0$，最后经解码器生成 $\mathbf{x}$。
@@ -131,8 +128,6 @@ $$\mathcal{L}(\mathbf{x}, \phi, \theta, \psi) = \mathbb{E}_{q_\phi(\mathbf{z}_0|
 **模块间的数据流**如下：编码器输出 $\mathbf{z}_0$ 后，正向扩散过程根据选定的 SDE（如 VPSDE 或几何 VPSDE）向 $\mathbf{z}_0$ 注入噪声，生成不同时间步的 $\mathbf{z}_t$。混合分数网络 $\epsilon_\theta(\mathbf{z}_t, t)$ 接收 $\mathbf{z}_t$ 和时间 $t$，预测去噪方向，其输出与固定正态分量线性混合后构成最终的分数估计。训练时，编码器和解码器使用最大似然加权 $w_{\text{ll}}$ 联合优化（Eq. 8），SGM 先验则可采用非加权 $w_{\text{un}}$ 或重加权 $w_{\text{re}}$ 单独训练以获得更优的生成质量（Eq. 9）。端到端联合训练被证明显著优于分阶段训练（FID 5.19 vs. 9.00），而混合分数参数化对训练稳定性至关重要——缺少该设计时，小模型的 FID 从 7.60 崩溃至 34.71。
 
 为降低训练目标的蒙特卡洛方差，LSGM 引入了两项关键设计：**几何 VPSDE** 使 $\mathrm{d}\log \sigma_t^2/\mathrm{d}t$ 在 $t \in [0,1]$ 上保持恒定，以及针对最大似然目标的**重要性采样**建议分布 $r(t)$。两者结合显著降低了训练方差（Fig. 2），使得深层 LSGM 的稳定训练成为可能。
-
-## 核心模块与公式推导
 
 ### 整体框架与变分上界
 
@@ -190,7 +185,7 @@ $$r(t) = \frac{1}{\log \sigma_1^2 - \log \sigma_{\epsilon}^2} \cdot \frac{1}{\si
 
 该分布通过逆变换采样实现：$t = \mathrm{var}^{-1}\left((\sigma_1^2)^{\rho} (\sigma_{\epsilon}^2)^{1-\rho}\right)$，其中 $\rho \sim \mathcal{U}[0,1]$。Fig. 2 定量验证了两种技术组合使用时可显著降低训练目标方差，是深度 LSGM 稳定训练的必要条件——缺少重要性采样时大型模型变得不稳定。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主要生成结果
 
@@ -255,9 +250,6 @@ Table 6 系统消融了 SDE 类型、训练目标、加权机制与方差缩减�
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2106_05931/figures/019_Figure_9.jpg]]
 *Figure 9: The effect of ODE solver error tolerance on the quality of samples. In contrast to the original SGM [2] where high error tolerance results in pixelated images (see Fig. 3 in [2]), in our case high error tolerances create low-frequency artifacts. Reducing the error tolerance improves subtle details slightly*
 
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2106_05931/figures/010_Figure_5.jpg]]
-*Figure 5: Generated samples for different datasets. For binary datasets, we visualize the decoder mean. LSGM successfully generates sharp, high-quality, and diverse samples (additional samples in appendix)*
-
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2106_05931/figures/002_Table.jpg]]
 
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2106_05931/figures/008_Table_4.jpg]]
@@ -275,7 +267,7 @@ Table 6 系统消融了 SDE 类型、训练目标、加权机制与方差缩减�
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2106_05931/figures/015_Table_9.jpg]]
 *Table 9: Number of function evaluations (NFE) of ODE solver during probability flow-based latent SGM prior sampling and corresponding sampling time for our main CIFAR-10 models. Sampling was done in batches of size 16 using a single Titan V GPU. Results are averaged over 20 sampling runs. See Tab. 2 in main text for generative performance metrics*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 方法关系图谱：从数据空间SGM到潜在空间生成
 

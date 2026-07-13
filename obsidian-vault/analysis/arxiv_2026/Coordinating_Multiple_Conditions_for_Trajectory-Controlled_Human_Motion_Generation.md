@@ -45,7 +45,7 @@ claims:
 > - HumanML3D (Pelvis control on all frames) 上，FID↓ 0.097 vs 0.218 (Omnicontrol) (-0.121)；R-precision Top-3↑ 0.784 vs 0.687 (Omnicontrol) / 0.779 (TLControl) (+0.097 / +0.005)；Avg. err. (cm)↓ 0.51 vs 3.38 (Omnicontrol) / 1.08 (TLControl) (-2.87 / -0.57)。
 > - KIT-ML (Pelvis control on all frames) 上，FID↓ 0.259 vs 0.310 (Omnicontrol) (-0.051)；Avg. err. (cm)↓ 0.41 vs 2.20 (Omnicontrol) (-1.79)。
 
-## 概述
+## 概要
 
 轨迹控制的人体运动生成面临一个关键瓶颈：**文本语义条件与精细轨迹条件在单一阶段中同时施加时会产生相互干扰**，破坏扩散模型的去噪过程，导致运动语义不一致、控制精度下降。现有主流框架——无论是 **GMD** (Karunratanakul et al., ICCV 2023) 的双阶段交替条件注入，还是 **Omnicontrol** (Xie et al., ICLR 2024) 的单阶段集成控制——均未有效解决这一冲突。
 
@@ -53,7 +53,7 @@ claims:
 
 实验结果表明，CMC 在 HumanML3D 骨盆全帧控制任务上达到 **FID=0.097**、平均控制误差仅 **0.51 cm**，远超先前最佳方法（Omnicontrol 的 FID=0.218、误差 3.38 cm），同时在文本-运动语义一致性（R-precision Top-3=0.784）上也保持领先。消融实验进一步证实，解耦框架与 SIM 各自带来显著的性能增益，简化运动表示相比冗余表示在整个去噪过程中显著降低控制误差且更稳定。
 
-## 背景与动机
+
 
 ### 问题域：轨迹控制下的人体运动生成
 
@@ -76,7 +76,9 @@ claims:
 
 这种“控制-然后-生成”的范式从根本上规避了单阶段方法中条件冲突的问题，同时通过简化表示降低了轨迹控制阶段的不稳定性。此外，为防止第二阶段修复模型对固定观测模式过拟合，CMC 引入**选择性修复机制（SIM）**，在训练时以 50% 概率交替执行标准文本到运动生成与运动修复任务，提升模型对分布外观测的泛化能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CMC 的核心创新在于将多条件人体运动生成中的**文本语义与精细轨迹控制解耦为两个独立阶段**，以此规避单阶段框架中两类条件在去噪过程中的相互干扰。具体而言，CMC 通过三个关键设计实现这一目标：
 
@@ -112,7 +114,7 @@ CMC 提出使用**简化表示**，仅保留关节局部位置 $\mathbf{j}^{p}$ 
 
 三者协同作用，使 CMC 在 HumanML3D 骨盆控制任务上达到 FID=0.097、平均误差仅 0.51 cm，远超先前最佳方法（TABLE I）。
 
-## 整体框架
+
 
 CMC 采用**分而治之**策略，将文本条件与轨迹条件的协调解耦为两个级联阶段，从根本上避免了单阶段框架中两类条件在去噪过程中相互干扰的问题（Fig. 1）。整体流水线如 Fig. 5 所示，两个阶段共享一个 CLIP 文本编码器（ViT-B/32），均以扩散模型为基础，骨干网络为 8 层 Transformer 编码器（特征维度 512）。
 
@@ -148,7 +150,7 @@ $$\mathcal{L}_{global} = \frac{1}{N_{cont}} \sum_{i=1}^{N_{cont}} \| R(\hat{\mat
 
 总损失为 $\mathcal{L} = \mathcal{L}_{elem} + \mathcal{L}_{global}$，分别约束局部元素精度与全局轨迹跟随精度。
 
-## 核心模块与公式推导
+
 
 ### 扩散模型基础
 
@@ -210,7 +212,9 @@ $\mathcal{L}_{elem}$ 约束预测运动与真实运动在每个元素上的均�
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2605_13729/figures/016_Figure_12.jpg]]
 *Figure 12: Statistical mean and standard deviation of the control error across denoising steps. Darker-colored and lighter-colored curves indicate the use of simplified and redundant representations, respectively*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -268,7 +272,9 @@ CMC在两个主流基准上均以显著优势超越先前方法。在HumanML3D�
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2605_13729/figures/009_Figure_9.jpg]]
 *Figure 9: Two visual comparisons (a) and (b) to qualitatively prove the existence of the conflict between text and trajectory conditions. The difference between the three columns is the number of joints that passed to the second stage, including: only the controlled joints and the pelvis (left), the controlled joints and joints belonging to the torso (middle), and all joints (right)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 条件协调方式的谱系定位
 
@@ -315,6 +321,8 @@ CMC 在轨迹控制人体运动生成的方法谱系中处于“解耦式多条�
 | 多任务正则化训练 | SIM 交替生成与修复 | 需要修复能力的条件生成模型 |
 
 这些原则的共同基础是“减少条件间干扰”这一核心洞察，其有效性已在文本-轨迹双条件场景中得到充分验证（TABLE III 消融实验：解耦框架相较单阶段框架 FID 和 R-precision 显著提升，控制误差大幅降低）。后续工作可沿三个方向推进：潜在空间引导机制设计、归一化坐标表示、以及 SIM 策略向其他多条件生成任务的迁移。
+
+
 
 ## 原文 PDF
 

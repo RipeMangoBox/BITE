@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Decentralized_Attention_Fails_Centralized_Signals_Rethinking_Transformers_for_Medical_Time_Series.pdf
+project_link: null
+code_link: https://github.com/Levi-Ackman/TeCh
 openreview_forum_id: oZJFY2BQt2
 aliases:
 - DAFCSRTMTS
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 去中心化注意力与中心化信号失配：重新思考基于Transformer的医学时间序列模型 |
 | 英文题名 | Decentralized Attention Fails Centralized Signals: Rethinking Transformers for Medical Time Series |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=oZJFY2BQt2); [GitHub](https://github.com/Levi-Ackman/TeCh) |
+| Links | [paper](https://openreview.net/forum?id=oZJFY2BQt2) · [GitHub](https://github.com/Levi-Ackman/TeCh) |
 | Topic | #topic/time_series_dynamical_systems #topic/time_series_dynamical_systems/time_series_forecasting |
 | Method | TeCh |
 | Dataset | ADFTD (3-class EEG), APAVA (2-class EEG), TDBrain (2-class EEG) |
@@ -41,7 +43,7 @@ claims:
 > - APAVA (2-class EEG) 上，F1-Score 为 86.30±1.06，对比 76.31±0.71 (Medformer)，变化 +9.99。
 > - TDBrain (2-class EEG) 上，Accuracy 为 95.07±0.29，对比 90.81±0.60 (Medformer)，变化 +4.26。
 
-## 概述
+## 概要
 
 医学时间序列（如脑电图 EEG、心电图 ECG）的通道信号并非独立随机游走，而是由大脑或心脏等单一生理中枢统一调控产生的——这是一种**中心化**的生成机制。然而，当前主流的时间序列 Transformer 模型普遍采用标准的多头自注意力机制，其本质是**去中心化**的：每个令牌与其他所有令牌进行平等的成对交互。这种结构与生理信号的中心化特性之间存在根本性失配，限制了对通道间全局同步与统一波形特征的捕获能力。
 
@@ -56,7 +58,7 @@ TeCh 同时采用**自适应双重令牌化**策略，分别生成时间令牌�
 
 通过谱中心化指数（SCI）和动态影响中心化指数（DIC）的量化分析（Table 11），本文进一步验证了 EEG/ECG 信号的中心化程度显著高于能源、气候等去中心化系统数据集，为 CoTAR 的设计提供了经验支撑。
 
-## 背景与动机
+
 
 ### 医学时间序列分析的独特挑战
 
@@ -90,7 +92,9 @@ TeCh 同时采用**自适应双重令牌化**策略，分别生成时间令牌�
 
 Figure 1 直观对比了去中心化注意力与集中式CoTAR在令牌交互模式上的本质差异，以及它们与医学信号生理调控机制的对应关系。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作围绕一个核心发现展开：**标准Transformer的注意力机制与医学时间序列的信号本质之间存在结构性失配**。注意力本质上是去中心化的——每个令牌平等地与所有其他令牌交互；然而，EEG/ECG等医学信号源自脑/心脏的全局调控，其通道间依赖天然具有中心化特征（Table 11中SCI/DIC指数验证了这一特性）。TeCh框架通过两个关键的**changed slots**系统性地解决这一矛盾。
 
@@ -123,7 +127,7 @@ Figure 1 直观对比了去中心化注意力与集中式CoTAR在令牌交互模
 
 TeCh的核心贡献在于**首次将医学信号的生理中心化先验系统性地融入Transformer架构设计**。与采用双依赖建模的**Leddam**（Yu et al., 2024b）和使用全局/辅助令牌的**TimeXer**（Wang et al., 2024e）相比，TeCh的区别在于：（1）CoTAR的集中式设计直接由生理机制驱动，而非通用的工程优化；（2）双重令牌化可自适应调节，而非固定的双分支结构。Table 9的对比验证了TeCh相对这些相似工作的优势。与医学时间序列SOTA **Medformer**（Wang et al., 2024b）相比，TeCh在APAVA数据集上全部指标平均值提升12.13%，同时大幅降低了计算开销。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l34_https_openreview_net_forum_id_oZJFY2BQt2/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of TeCh. MedTS signals X $\in \mathbb { R } ^ { T \times C }$ are embedded into Temporal embedding and Channel embedding. Then, each embedding is processed using Transformer encoders, with attention replaced by CoTAR. The final output representation from each branch is averaged across channels and added, then projected to the final predicted logits $\hat { Y } \in \mathbb { R } ^ { K }$
@@ -174,7 +178,7 @@ $$\hat{Y} = (\tilde{O}_{te} + \tilde{O}_{ch}) W_y + b_y$$
 
 **架构设计的因果逻辑链**：医学信号的中心化生成机制 → 需要集中式通道交互 → CoTAR 以核心令牌代理实现聚合-再分布 → 双重令牌化同时捕获时序与通道依赖 → 分支平均融合整合两类表示 → 线性复杂度保证效率。这一设计在五个医学时间序列数据集上均取得优于标准注意力的性能，同时将内存占用降至 33%、推理时间降至 20%（Figure 4a），验证了“结构对齐生理先验”这一核心假设的有效性。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化
 
@@ -268,7 +272,9 @@ $$\hat{Y} = (\tilde{O}_{te} + \tilde{O}_{ch}) W_y + b_y$$
 
 在 Table 11 中，EEG/ECG 数据集的 SCI 和 DIC 值显著高于能源、气候等去中心化系统数据集，定量验证了医学信号的中心化特性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈验证：医学信号的中心化本质
 
@@ -380,7 +386,9 @@ $$
 ![[assets/figures/papers/paper_list_l34_https_openreview_net_forum_id_oZJFY2BQt2/figures/004_Table_1.jpg]]
 *Table 1: The information of utilized datasets, including the number of subjects, samples, classes, sample channels, and timestamps (TS)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心创新与基线关系
 
@@ -415,6 +423,8 @@ Table 11 的定量分析为这一假设提供了实证支撑：EEG 和 ECG 数�
 2. **跨任务迁移**：CoTAR 模块能否应用于时间序列预测、异常检测等需要建模多变量依赖的其他任务？
 3. **理论指导设计**：集中化指数（SCI/DIC）与模型性能之间是否存在定量关系？能否基于数据集的 SCI/DIC 值预先判断 CoTAR 的适用性，形成理论指导的架构选择框架？
 4. **多中心扩展**：对于存在多个子中心源的复杂生理系统（如多模态神经影像），能否将单一核心令牌扩展为多核心令牌层次结构？
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Tree_Search_for_LLM_Agent_Reinforcement_Learning.pdf
+project_link: null
+code_link: https://github.com/AMAP-ML/Tree-GRPO
 openreview_forum_id: ZpQwAFhU13
 aliases:
 - TG
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 基于树搜索的LLM智能体强化学习方法 |
 | 英文题名 | Tree Search for LLM Agent Reinforcement Learning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=ZpQwAFhU13); [GitHub](https://github.com/AMAP-ML/Tree-GRPO) |
+| Links | [paper](https://openreview.net/forum?id=ZpQwAFhU13) · [GitHub](https://github.com/AMAP-ML/Tree-GRPO) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | Tree-GRPO |
 | Dataset | Multi-Hop QA (Qwen2.5-3b), Multi-Hop QA (Qwen2.5-1.5b), Web-Agent QA SimpleQA (Qwen2.5-7b), Multi-Hop QA under budget ~2 (Qwen2.5-3b) |
@@ -42,7 +44,7 @@ claims:
 > - Multi-Hop QA (Qwen2.5-1.5b) 上，EM Avg. 为 19.1，对比 11.3 (GRPO)，变化 +7.8 (+69% rel.)。
 > - Web-Agent QA SimpleQA (Qwen2.5-7b) 上，F1 为 67.8，对比 65.4 (GRPO)，变化 +2.4。
 
-## 概述
+## 概要
 
 长周期多轮智能体任务的强化学习面临一个根本瓶颈：仅以最终结局奖励作为监督信号，导致信用分配极度稀疏，训练效率低下。传统的链式采样策略在同一 Token 与工具调用预算下产生大量冗余轨迹，无法有效利用有限的采样资源。本文提出 **Tree-GRPO**（Tree-based Group Relative Policy Optimization），一种基于树搜索的分组智能体强化学习方法。其核心思路是将智能体交互步骤（Thought-Action-Observation 三元组）组织为树节点，通过共享前缀在固定预算内显著增加有效样本量，并利用树结构自动将结局奖励转化为隐式的步骤级偏好学习信号。
 
@@ -57,7 +59,7 @@ claims:
 
 方法存在以下主要局限：树内优势在低预算下单独使用可能导致训练崩溃，需依赖树间优势稳定训练；树结构超参数（树数量 M、扩展数 N 和 L）对性能敏感，需根据任务和预算仔细调节；此外，评估目前集中在 QA 类任务，在更开放的非 QA 智能体场景（如代码调试、多步工具链）上的有效性尚待验证。
 
-## 背景与动机
+
 
 ### 长周期智能体任务中的稀疏奖励困境
 
@@ -88,7 +90,9 @@ $$\mathcal{H} = \{ (\tau_0, \alpha_0, o_0), (\tau_1, \alpha_1, o_1), \ldots, (\t
 
 - **利用树结构自动构造隐式步骤级偏好学习信号**：树结构天然形成“同前缀、不同后续”的轨迹对。基于树内组相对优势（intra-tree advantage），结局奖励被自动分解为步骤级偏好信号——这一机制在梯度结构上与步骤级DPO等价（仅权重项不同，参见Proposition 3.1），从而在不引入任何额外标注的情况下实现细粒度过程监督。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈与突破口
 
@@ -140,7 +144,7 @@ Tree-GRPO 明确将树节点锚定在**智能体步骤级别**而非 Token 或�
 | 极度受限预算（≈2条轨迹）下相对提升 112% | Table 3 | 0.98 |
 | 组合树内外优势是稳定训练的必要条件 | Table 4（仅用树内优势在低预算下崩溃） | 0.95 |
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l36_https_openreview_net_forum_id_ZpQwAFhU13/figures/003_Figure_3.jpg]]
 *Figure 3: The overview of the Tree-GRPO training pipeline. The rollout is conducted in a tree-search manner, where each node corresponds to a complete thought-action-observation step. The group relative advantages are estimated at both intra-tree and inter-tree levels. Tree-GRPO constructs steplevel process supervision signals through a tree structure with a less rollout budget*
@@ -182,7 +186,7 @@ $$J_{\mathrm{Tree-GRPO}}(\theta) = \mathbb{E}_{\mathbf{x}, \mathcal{H} \sim \pi_
 
 Tree-GRPO 构建在群组相对策略优化（**GRPO**, DeepSeek-AI Team, 2025）之上，核心改动在于将独立链式采样替换为树搜索采样，并将优势估计从单一的全局组相对优势扩展为树内+树间双重结构。对比的基线方法包括：**ReAct**（Yao et al., 2022）作为智能体交互框架起点；**Search-o1**（Li et al., 2025c）作为集成搜索的非 RL 方法；**GSPO**（Zheng et al., 2025）作为另一种群组策略优化方法。
 
-## 核心模块与公式推导
+
 
 ### 3.1 树搜索采样策略
 
@@ -240,7 +244,9 @@ $$\nabla_{\theta} J_{\mathrm{unified}}(\theta) = w \cdot \big( \nabla_{\theta} \
 
 这一等价性意味着，Tree-GRPO 在不引入任何额外标注的情况下，仅凭结局奖励即可自动实现与步骤级 DPO 同构的细粒度过程监督，从而大幅提升样本效率与训练稳定性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验结果
 
@@ -295,7 +301,9 @@ Figure 5展示了树式与链式RL在训练过程中的奖励和工具调用次�
 1. **检索不完整。** 在多跳QA中，模型虽能检索到部分相关信息，但未能穷举所有正确答案。例如，某案例中模型仅返回David Hasselhoff，而忽略了问题涉及的其他演员（Table 10）。这说明模型在已获取相关信息后，仍缺乏系统性的信息整合与验证能力。
 
 2. **缺乏反思推理。** 在Web-Agent QA中，模型有时沿错误推理路径持续深入，缺乏中途反思和纠错的能力。例如，某WebWalkerQA案例中，模型在初始检索结果不相关后，未能调整搜索策略，导致最终答案错误（Table 11）。这指向一个开放问题：如何在仅用结局奖励的框架内，进一步引入反思推理机制到训练循环中。
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心基线关系
 
@@ -330,6 +338,8 @@ $$\nabla_{\theta} J_{\mathrm{unified}}(\theta) = w \cdot \big( \nabla_{\theta} \
 - 如何在保持仅用结局奖励的前提下，将反思推理（reflection）和更丰富的探索策略（如 MCTS 式选择扩展）引入训练循环？
 - 为什么模型在已检索到相关信息时仍不能穷举所有正确答案（如 Case 3 仅返回 David Hasselhoff 而忽略其他演员）？这是检索-推理耦合的深层问题。
 - Tree-GRPO 在非 QA 智能体任务（如代码调试、多步工具使用）中的适用性如何？树结构的步骤级信用分配是否能在更长的工具链上保持有效？
+
+
 
 ## 原文 PDF
 

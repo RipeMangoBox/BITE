@@ -43,7 +43,7 @@ claims:
 > - CHASEDB1 上，Dice 79.27。
 > - DCA1 上，Dice 75.67。
 
-## 概述
+## 概要
 
 曲线结构（curvilinear structures）——如视网膜血管、遥感道路、线网、轮胎纹理——广泛存在于医学影像、工业检测与遥感等领域。此类结构具有**纤细、拓扑连续且跨域形态差异巨大**的特点，使得通用分割模型难以直接迁移。**Segment Anything Model (SAM)**（Kirillov et al., ICCV 2023）虽具备强大的泛化潜力，但其依赖交互式提示（点、框、掩码），在曲线结构上提示质量高度敏感，分割结果往往局部可信而全局断裂（Figure 4）。现有基于适配器的SAM微调方法（如**SAM-Med2D**, Ma et al., Nature Communications 2024）仅将适配器插入Transformer块内部的MLP路径，仅能进行**局部特征细化**，缺乏跨层的全局上下文建模能力，无法有效捕捉曲线结构所需的长程空间依赖和拓扑连续性，导致跨域泛化性能受限。
 
@@ -51,7 +51,7 @@ claims:
 
 在仅使用**18张标注图像**、覆盖6个域的极小训练集下，SACM在**12个多样化曲线结构数据集**上取得SOTA性能，涵盖已见域、未见过域及全新类别。Grad-CAM可视化（Figure 8）证实Adapter-E捕获全局血管结构，Adapter-I聚焦局部细节，两者功能互补。消融实验（Table 5）表明双级适配器组合带来协同增益。该方法将曲线结构的全局拓扑一致性建模为跨层特征融合问题，为少样本、跨域稠密预测提供了新的范式。
 
-## 背景与动机
+
 
 ### 曲线结构分割的跨域挑战
 
@@ -81,7 +81,9 @@ claims:
 
 这一动机驱动了 **SACM（Segment Anything Curve Model）** 的设计。SACM 的核心思路是构建一个**双级适配器架构（Dual-Level Adapter, DLAda）**：在冻结 SAM 编码器的每个 Transformer 块中同时引入块内适配器（Adapter-I）和块间适配器（Adapter-E），前者细化局部细节，后者在块间传播全局结构性线索。通过适配器融合（Adapter Fusion）将多层全局特征注入掩码解码器，SACM 实现了完全无提示（prompt-free）的端到端分割，从根本上规避了 SAM 原始提示机制在曲线结构上的失效问题。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 1. 瓶颈洞察：从局部适配到全局拓扑建模
 
@@ -141,7 +143,7 @@ SACM引入**双阶段掩码细化（Dual-Stage Refinement）**：
 
 这四项创新共同构成了SACM的核心竞争力：在冻结SAM编码器的前提下，以极少的可训练参数（适配器瓶颈比例r=0.1最优，Figure 9a）实现了对曲线结构分割的跨域泛化，仅需18张标注图像即可在12个多样化数据集上取得SOTA性能。
 
-## 整体框架
+
 
 SACM 的整体设计遵循“冻结基础模型 + 双级适配器微调 + 无提示掩码解码”的范式，目标是在仅使用极少标注样本（18 张图像）的条件下，实现对多样化曲线结构的跨域鲁棒分割。其核心 pipeline 由四个模块串联构成，如图 Figure 3 所示。
 
@@ -166,7 +168,7 @@ SACM 的整体设计遵循“冻结基础模型 + 双级适配器微调 + 无提
 
 **输入输出流总结**：输入为单张 RGB 或灰度图像，流经冻结的 ViT 编码器与双级适配器增强后，多层外部适配器特征经 Adapter Fusion 聚合成全局结构描述符，注入无提示解码器，经双阶段细化后直接输出二值分割掩码，全程无需任何人工提示。
 
-## 核心模块与公式推导
+
 
 ### 双级适配器（DLAda）
 
@@ -274,7 +276,9 @@ $$
 ![[assets/figures/papers/paper_list_l2061_https_openaccess_thecvf_com_content_CVPR2026_html_Zhu_Dual_level_Adapter/figures/004_Figure_4.jpg]]
 *Figure 4: The orange regions indicate the SAM (ViT-L) output mask, while the green regions represent the input prompts. The visual evidence suggests that the segmentation performance across all three prompt modalities (points, box, and mask) is suboptimal for curvilinear structure segmentation*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置与评估协议
 
@@ -361,7 +365,9 @@ SACM的训练仅使用**18张标注图像**，覆盖6个不同领域的数据集
 ![[assets/figures/papers/paper_list_l2061_https_openaccess_thecvf_com_content_CVPR2026_html_Zhu_Dual_level_Adapter/figures/006_Figure_5.jpg]]
 *Figure 5: Dual-stage mask refinement: Stage-1 generates coarse descriptors and ranks heads by confidence scores; Stage-2 refines masks with reordered descriptors, balancing boundary precision and topological consistency*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -400,6 +406,8 @@ SACM 的核心定位是**面向曲线结构分割的 SAM 参数高效微调框�
 **三维和时序扩展。** 当前 SACM 仅处理二维静态图像，能否扩展到视频流中的曲线结构追踪或 3D 体积数据（如 CT 血管造影）的分割，是重要的开放问题。
 
 **评估指标的完备性。** 当前评估以 Dice、IoU、clDice 和 HD95 为主，但对于曲线结构分割，拓扑一致性（如连通分量数、分支点准确性）的评估可能同样重要，未来工作可引入更全面的拓扑评估指标。
+
+
 
 ## 原文 PDF
 

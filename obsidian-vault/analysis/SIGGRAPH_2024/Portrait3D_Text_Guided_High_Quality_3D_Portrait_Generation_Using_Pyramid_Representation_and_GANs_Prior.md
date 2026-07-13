@@ -5,6 +5,8 @@ paper_level: A
 venue: SIGGRAPH
 year: 2024
 pdf_ref: paperPDFs/SIGGRAPH_2024/Portrait3D_Text_Guided_High_Quality_3D_Portrait_Generation_Using_Pyramid_Representation_and_GANs_Prior.pdf
+project_link: null
+code_link: null
 aliases:
 - Portrait3D
 tags:
@@ -41,7 +43,7 @@ claims:
 > - 25 distinct prompts (color ■ in Table 1) 上，FID (lower is better) 110.6 vs other text-to-3D methods (see Table 1 for concrete numbers) (Portrait3D achieves the lowest FID among all compared methods)；CLIP Score (higher is better) 0.80 vs other text-to-3D methods (see Table 1) (Portrait3D achieves the highest CLIP Score among all compared methods)。
 > - User Study 上，Quality / Alignment (mean opinion score) 4.77 vs other text-to-3D methods (see Table 1) (Portrait3D ranks first in both quality and alignment (25-prompt setting))。
 
-## 概述
+## 概要
 
 **问题瓶颈**。现有文本到三维肖像方法普遍依赖几何先验（如SMPL、FLAME），缺乏鲁棒的联合几何‑外观先验，导致生成结果出现纹理不一致、过饱和、过度平滑及Janus问题（多视角面部错乱）。
 
@@ -53,8 +55,6 @@ claims:
 
 **局限与待解决问题**。当前方法偶发非规范视角畸变，扩散模型可能将背景语义错误注入前景纹理（如“雪山”出现在头发上），部分生成结果存在前后视图语义不一致，复杂发型（如辫子）可能产生异常几何。此外，方法仅覆盖头‑颈‑肩区域，尚未扩展到全身肖像。这些方向有待后续工作探索。
 
-## 背景与动机
-
 文本到三维生成近年来取得了显著进展，但将这一范式应用于高质量三维肖像的自动生成，仍面临独特且未解决的挑战。三维肖像生成不仅要求几何结构合理、纹理细节丰富，还必须满足多视角一致性——即从不同角度观察时，人物的身份、表情和外观保持统一。现有的文本到三维方法在通用物体生成上表现尚可，但在肖像这一特定类别上暴露出系统性缺陷。
 
 当前主流方法所依赖的先验信息存在根本性局限。以 **TADA** (Liao et al., 2023)、**AvatarCraft** (Jiang et al., ICCV 2023)、**AvatarStudio** (Zhang et al., 2023c) 等为代表的工作，通常仅引入几何先验——如 SMPL、FLAME 或 imGHUM 等参数化人体/人脸模型——来约束生成过程。这种单一模态的先验虽然能提供粗略的几何骨架，却完全忽略了外观纹理的合理分布。由此引发的后果是：生成的三维肖像普遍存在纹理不一致、色彩过饱和、表面过度平滑等问题，更严重的则表现为经典的 Janus 问题——即正面与背面视图出现语义冲突（例如正面是人脸、背面也出现人脸特征）。
@@ -65,7 +65,7 @@ claims:
 
 Portrait3D 正是在这一背景下提出的。其核心动机在于：如果能从预训练的三维感知 GAN 中提取出同时编码几何结构与外观纹理的联合先验，并将其嵌入到一个多分辨率的三维表示中，就有可能在 SDS 优化的早期阶段为生成过程提供一个结构合理、纹理自洽的初始化起点，从而系统性地缓解 Janus 问题、纹理不一致和网格伪影。这一思路将文本到三维肖像生成的关键矛盾从“从零开始约束”转化为“从合理起点细化”，构成了本文方法设计的根本出发点。
 
-## 核心创新
+## 核心方法与创新机理
 
 Portrait3D 的核心创新在于为文本到三维肖像生成引入了一个**鲁棒的联合几何-外观先验**，并配套设计了**金字塔三角网格表示**，从而系统性地解决了现有方法中纹理不一致、过饱和、过度平滑以及 Janus（多面）问题。与仅依赖几何先验（如 SMPL、FLAME）或随机初始化的基线方法相比，Portrait3D 在三个关键维度上实现了突破。
 
@@ -105,8 +105,6 @@ $$\theta^* = \arg\min_{\theta} L_{\text{optim}} = \arg\min_{\theta} L_2(x_{\text
 
 这三项创新协同作用：GAN 先验提供合理的生成起点，金字塔三角网格抑制优化过程中的高频伪影，扩散细化弥补渲染与自然图像的分布差距，最终实现了视角一致、高保真的文本到三维肖像生成。定量结果（Table 1）表明，Portrait3D 在 25 个提示词上的 FID（110.6）和 CLIP Score（0.80）均优于所有对比方法，用户研究中的质量和对齐度评分（4.77）也排名第一。
 
-## 整体框架
-
 Portrait3D 的整体生成流程围绕一个核心思路展开：**先利用预训练 3D 感知 GAN 提供的联合几何-外观先验获得结构合理的初始三维表示，再通过分数蒸馏采样（SDS）和扩散模型图像细化交替优化该表示**，从而生成视角一致、高保真的三维肖像。整个流水线由四个关键模块串联而成，其关系与数据流可概括如下。
 
 **1. 文本对齐的图像生成与隐码反演。**  
@@ -141,8 +139,6 @@ $$\theta^{*} = \arg\min_{\theta} \, L_{2}\big(x_{\mathrm{refined}}^{c}, R(T^{\ma
 
 ![[assets/figures/papers/paper_list_l6_Portrait3D_Text_Guided_High_Quality_3D_Portrait_Generation_Using_Pyramid_motion20v/figures/004_Figure_4.jpg]]
 *Figure 4: The 3D portrait generation pipeline of Portrait3D. The*
-
-## 核心模块与公式推导
 
 Portrait3D 的生成管线由四个核心模块串联构成，其关键创新在于**金字塔三角网格表示**与**3D感知GAN联合先验**的引入。
 
@@ -187,12 +183,7 @@ $$\theta^{*} = \arg\min_{\theta} L_{\mathrm{optim}} = \arg\min_{\theta} L_{2}(x_
 
 这一步骤与GAN先验联合作用，有效缓解了Janus问题并提升了几何与外观的真实感（Fig. 7）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l6_Portrait3D_Text_Guided_High_Quality_3D_Portrait_Generation_Using_Pyramid_motion20v/figures/009_Figure.jpg]]
-*Figure: (a) Baseline (b) + GANs*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -239,20 +230,7 @@ Portrait3D 在 25 个不同文本提示下与 10 个 SOTA 文本到三维方法�
 
 此外，当前方法仅覆盖头、颈、肩区域，无法生成完整全身肖像，限制了应用场景。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l6_Portrait3D_Text_Guided_High_Quality_3D_Portrait_Generation_Using_Pyramid_motion20v/figures/008_Figure_8.jpg]]
-*Figure 8: Some failure cases of Portrait3D: (a) Distortions, (b) unexpected snow, (c) semantic inconsistency, and (d) incorrect geometry*
-
-![[assets/figures/papers/paper_list_l6_Portrait3D_Text_Guided_High_Quality_3D_Portrait_Generation_Using_Pyramid_motion20v/figures/001_Figure_1.jpg]]
-*Figure 1: Using text as input, our text-to-3D-portrait method, Portrait3D, can automatically generate a variety of realistic textured 3D portraits. Portrait3D consistently produces high-quality 3D portraits that are aligned with the provided text prompts. Each portrait is rendered from eight different views using volume rendering*
-
-![[assets/figures/papers/paper_list_l6_Portrait3D_Text_Guided_High_Quality_3D_Portrait_Generation_Using_Pyramid_motion20v/figures/010_Figure_9.jpg]]
-*Figure 9: Examples of 3D portraits generated using Portrait3D*
-
-![[assets/figures/papers/paper_list_l6_Portrait3D_Text_Guided_High_Quality_3D_Portrait_Generation_Using_Pyramid_motion20v/figures/011_Figure.jpg]]
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 方法谱系：从通用文本到三维到专用三维肖像生成
 

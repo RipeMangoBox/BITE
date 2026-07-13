@@ -43,7 +43,7 @@ claims:
 > - Inter-Edit test set (6,250 样本) 上，Human Eval. score (higher better) 6.672 (RNI, 论文提出的主要基线) vs 其他方法未在上下文中提供数值 (N/A)。
 > - Inter-Edit test set 上，S_in (In-Region Fidelity) 0.976 (RNI, CJT) vs N/A (显著超越SOTA) (N/A)；BDS (Boundary Discontinuity, lower better) 未提供精确值 vs 5.329 (Q-Edit, 非基线方法中最优) (N/A)。
 
-## 概述
+## 概要
 
 图像编辑领域长期面临一对核心矛盾：**语义灵活性**与**精确空间控制**难以兼得。基于文本指令的编辑方法（如 Qwen-Image-Edit-2509 等）虽能理解丰富语义，却无法可靠地将编辑定位到目标区域；基于 mask 的方法虽能提供空间约束，但要求用户绘制高质量、与物体边界严格对齐的 mask，且编辑结果常出现边界伪影、环境变化难以自然传播等问题。
 
@@ -53,7 +53,7 @@ claims:
 
 实验表明，基于 Inter-Edit 训练的三种基线方法在定位精度和编辑质量上显著超越现有 SOTA 模型（包括闭源系统），验证了 I3E 范式在统一语义灵活性与空间精确性方面的有效性。
 
-## 背景与动机
+
 
 图像编辑是视觉内容创作的核心需求，而“精确的空间控制”是实际应用中最常见却又最难满足的要求之一。当前主流方案在语义灵活性与空间精确性之间始终存在难以调和的矛盾，形成了该领域的关键瓶颈。
 
@@ -65,7 +65,9 @@ claims:
 
 **本文动机。** 针对这一矛盾，本文引入**交互式指令图像编辑（Interactive Instruction-based Image Editing, I3E）**任务，其核心思想是将编辑输入从“精确mask或冗长文本描述”转变为“简洁文本指令 + 不精确空间引导（涂鸦）”的组合。这一范式转变的关键假设是：模型可以从模糊的空间线索中推理出目标区域，并生成与周围环境自然融合的编辑结果，从而在语义灵活性与空间精确性之间建立统一。为系统性地支撑这一任务，本文进一步构建了首个大规模基准数据集**Inter-Edit**，设计了位置感知的评估指标体系，并提出了三种基线方法，为该方向提供了完整的实验与评测框架。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：语义灵活性与空间精确性的两难困境
 
@@ -119,7 +121,7 @@ I3E 将空间引导从精确的像素级 mask（baseline 值）替换为**不精
 
 I3E 在图像编辑方法谱系中占据了一个独特的位置：它既不同于纯文本指令方法（如 Q-Edit）缺乏空间控制，也不同于传统 mask 方法（如基于 SAM 的编辑流程）依赖精确标注。其核心贡献在于**通过大规模自动生成模拟用户不精确标注的数据集，以及设计位置感知评估指标，训练模型理解模糊空间意图**，从而在编辑区域内外实现一致性。这一范式为交互式图像编辑设立了首个系统性基准，并为未来扩展到视频编辑、三维场景编辑等方向奠定了基础。
 
-## 整体框架
+
 
 Inter-Edit 基准的构建围绕一个核心瓶颈展开：现有图像编辑方法无法同时提供语义灵活性与精确空间控制——文本指令难以可靠地空间定位，基于 mask 的方法则依赖高质量 mask 且难以自然传播环境变化，易产生边界伪影。为解决这一问题，本文提出 **交互式指令图像编辑（I3E）** 任务，将编辑输入从精确 mask 或冗长文本描述转变为**简洁文本指令 + 不精确空间引导（涂鸦/scribble）** 的组合，使模型学习从模糊的空间线索中推理目标区域并生成自然融合的编辑结果。
 
@@ -162,7 +164,7 @@ Inter-Edit 基准的构建围绕一个核心瓶颈展开：现有图像编辑方
 ![[assets/figures/papers/paper_list_l2208_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_Inter_Edit_First_B/figures/002_Figure_1.jpg]]
 *Figure 1: In practice, precise spatial editing is a common requirement. However, current instruction-based editing models, even the most advanced proprietary ones, struggle to achieve accurate localization. Mask-based approaches can provide spatial control but heavily rely on users to design high-quality masks that precisely align with their intent. In contrast, our proposed task enables natural and seamless editing with only simple scribble guidance, and we also establish a comprehensive benchmark and baseline methods for systematic evaluation*
 
-## 核心模块与公式推导
+
 
 ### 交互式指令图像编辑任务定义
 
@@ -223,7 +225,9 @@ $$\{S_{edit}, S_{nat}, S_{aes}, S_{align}\} = \Phi_{VQA}(I_s, I_e, M, P_{vqa})$$
 
 分别输出编辑成功度（$S_{edit}$）、自然度（$S_{nat}$）、美学质量（$S_{aes}$）和指令对齐度（$S_{align}$）分数。论文验证该自动评分与人类主观判断高度相关。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -284,7 +288,9 @@ Figure 4展示了三种基线方法在条件注入策略上的差异，Table 1�
 ![[assets/figures/papers/paper_list_l2208_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_Inter_Edit_First_B/figures/007_Figure_5.jpg]]
 *Figure 5: Qualitative comparison on the Inter-Edit test set. Our I3E methods (blue) are compared with mask-based (yellow), instructionbased (green), and proprietary models (orange). Red crosses mark editing failures, and red boxes highlight imperfect regions*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 任务定义与问题定位
 
@@ -359,6 +365,8 @@ Inter-Edit 提出的位置感知评估指标是该工作的独立贡献，解决
 2. **时空扩展**：I3E 范式能否推广到视频编辑（需要时序一致性）或三维场景编辑（需要多视角一致性），是重要的后续方向。
 3. **交互范式进化**：当前假设用户提供单次涂鸦和指令，但实际编辑可能是多轮交互过程——模型如何利用编辑历史进行迭代精炼，尚未探索。
 4. **具体定量对比的完整性**：Table 1 中各方法的完整指标数值（包括 Q-Edit 等 SOTA 方法的 BDS=5.329）在提供的分析上下文中未完全呈现，精确的数值对比需参考原文或附录进行手动验证。
+
+
 
 ## 原文 PDF
 

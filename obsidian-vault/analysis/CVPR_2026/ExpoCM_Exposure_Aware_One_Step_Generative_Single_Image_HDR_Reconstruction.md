@@ -43,15 +43,13 @@ claims:
 > - HDR-EYE 上，PSNR-μ (dB) 20.75 vs 20.23 (DMHDR) (+0.52)。
 > - AIM2025 上，PSNR-μ (dB) 29.02 vs 28.71 (HDRDiff) (+0.31)。
 
-## 概述
+## 概要
 
 单图高动态范围（HDR）重建旨在从单张低动态范围（LDR）图像恢复丢失的高光与阴影细节。核心瓶颈在于空间异质性退化：过曝区域因饱和导致纹理完全丢失，欠曝区域噪声被放大，而正常区域仅需忠实传递内容。现有回归方法（如 **HDRCNN** (Eilertsen et al., ACM TOG 2017)、**HDRUNet** (Chen et al., CVPR 2021)）难以生成被饱和掩盖的细节；扩散模型（如 **HDRDiff** (Dalal et al., ICIP 2023)、**DMHDR** (Liu et al., IEEE TCSVT 2025)）虽具生成能力，但推理需数百步采样，且其均匀扩散轨迹忽视了不同曝光区域对生成强度的差异化需求。
 
 **ExpoCM** 针对上述矛盾，将HDR重建建模为条件生成问题，并基于一致性模型（Consistency Models）实现一步式推理。其核心调控机制是**曝光感知一致性轨迹（Exposure-Aware Consistency Trajectory, EACT）**：根据亮度统计将LDR输入软分割为过曝、欠曝、正常三区，为各区定制PF-ODE流形——过曝区从纯噪声生成细节，欠曝区注入低频LDR先验并去噪，正常区可靠传递内容，再通过空间混合形成全局轨迹。配合在CIE L*a*b*感知均匀空间中施加的**曝光引导亮度-色度（ELC）损失**，框架以曝光自适应权重平衡亮度与色度重建精度。
 
 **关键实证结果**：在HDR-REAL基准上，ExpoCM以单步推理取得PSNR-μ 28.66 dB，超越次优方法HDRDiff 0.89 dB，同时ΔE2000降至4.02。推理速度方面，相比DDPM（1000步）加速超400倍，相比DDIM（50步）加速约20倍。消融实验表明，三掩码EACT相比均匀轨迹基线提升PSNR-μ达+4.66 dB，ELC损失进一步降低感知色差，验证了曝光感知设计对重建保真度的决定性作用。
-
-## 背景与动机
 
 高动态范围（High Dynamic Range, HDR）成像旨在捕获和再现真实场景中宽广的亮度范围，避免因传感器动态范围受限而导致的过曝饱和与欠曝噪声。然而，HDR内容的采集通常依赖多帧不同曝光的LDR（Low Dynamic Range）图像进行融合，这对动态场景或手持拍摄极为不利。因此，从单张LDR图像重建HDR内容——即单图HDR重建——成为一个极具实用价值的研究方向。
 
@@ -61,7 +59,7 @@ claims:
 
 上述缺口催生了本文的核心动机：**能否在保持生成能力的同时，实现一步式快速推理，并让生成过程显式地感知和适应曝光异质性？** 一致性模型（Consistency Models, CMs）提供了将多步扩散蒸馏为单步推理的理论框架，但其标准形式仍采用空间均匀的PF-ODE轨迹。本文的关键洞察在于：**将HDR重建建模为条件生成问题，以曝光分区驱动的空间变化ODE轨迹替代均匀扩散过程，从而在单一推理步中实现区域自适应的、高质量HDR生成。**
 
-## 核心创新
+## 核心方法与创新机理
 
 ExpoCM 的核心创新在于将单图 HDR 重建重新建模为**曝光感知的条件生成问题**，并通过三个相互耦合的 changed slots 突破现有方法的瓶颈：空间异质性退化下的保真度与效率矛盾。
 
@@ -98,8 +96,6 @@ ExpoCM 采用两阶段训练策略以平衡轨迹一致性与感知质量：第�
 
 上述三个 changed slots 的协同效应体现在：EACT 提供了空间自适应的生成流形，ELC loss 在感知空间中进行曝光感知的精细监督，两阶段训练保证了优化稳定性。最终，ExpoCM 在**单步推理**中实现 SOTA 重建质量——PSNR-μ 28.66 dB（HDR-REAL），同时推理速度相比 DDPM 1000 步加速 **>400×**，相比 DDIM 50 步加速 **>20×**，从根本上解决了扩散模型在 HDR 重建中的效率瓶颈。
 
-## 整体框架
-
 ExpoCM 将单图 HDR 重建建模为一个条件生成问题，并构建在一个一致性模型（Consistency Model, CM）框架之上。其核心思想是：将输入 LDR 图像 $\mathbf{y}_0$ 作为条件，通过一个曝光感知的一致性轨迹（Exposure-Aware Consistency Trajectory, EACT）来驱动概率流 ODE（PF-ODE）的生成过程，最终由一致性网络 $f_\theta$ 在**单步推理**内预测出干净的目标 HDR 图像 $\mathbf{x}_0$。
 
 整体 pipeline 由四个关键模块串联构成，如图 Figure 2 所示：
@@ -129,8 +125,6 @@ ExpoCM 将单图 HDR 重建建模为一个条件生成问题，并构建在一�
     为了在感知均匀的空间中实现自适应监督，该模块在 CIE L\*a\*b\* 颜色空间计算重建误差，并根据曝光条件为亮度和色度分量分配不同的权重 $w_L$ 和 $w_C$。例如，在欠曝区域加大对亮度误差的惩罚，在过曝区域则对色度偏移给予一定容忍。此损失与标准的一致性训练损失 $\mathcal{L}_{\mathrm{CT}}$ 结合，采用**两阶段训练策略**：第一阶段仅使用 $\mathcal{L}_{\mathrm{CT}}$ 进行基础训练，第二阶段引入 ELC Loss 进行微调，以精细优化视觉质量。
 
 **输入输出流**：整个框架的输入为单张 LDR 图像 $\mathbf{y}_0$，输出为一步生成的高动态范围图像 $\mathbf{x}_0$。信息流依次经过曝光掩码生成、轨迹构造、一致性网络前向传播，并在训练阶段通过 ELC Loss 进行监督，形成一个端到端、曝光感知的一步式 HDR 重建系统。
-
-## 核心模块与公式推导
 
 ### 3.1 问题建模与一致性训练基线
 
@@ -213,7 +207,7 @@ ExpoCM 采用两阶段训练以稳定优化过程：
 
 网络在随机裁剪的 $256 \times 256$ 图像块上训练，总批次大小为 4，共训练 500,000 次迭代。推理时仅需单步前向传播即可完成 HDR 重建。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 4.1 实验设置
 
@@ -267,15 +261,7 @@ Figure 5 的视觉消融对比了各变体的亮度和色度误差图：完整 E
 3. **感知均匀空间的自适应监督**：ELC 损失在 CIE L\*a\*b\* 空间中施加曝光依赖的亮度-色度权重，有效降低了感知色差 ΔE2000，解决了传统损失函数对过曝/欠曝区域惩罚不当的问题。
 4. **模块协同**：EACT 与 ELC 的组合使用产生了“1+1>2”的效果——EACT 提供曝光感知的结构生成路径，ELC 提供曝光自适应的细节监督，二者缺一不可。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2480_https_arxiv_org_abs_2605_02464/figures/003_Table_1.jpg]]
-*Table 1: Quantitative comparisons on the HDR-REAL [24], HDR-EYE [36], and AIM2025 [49] challenge datasets*
-
-![[assets/figures/papers/paper_list_l2480_https_arxiv_org_abs_2605_02464/figures/001_Figure_1.jpg]]
-*Figure 1: Visual comparisons with previous state-of-the-art methods. For each method, we show the reconstructed result (bottomright) and the corresponding reconstruction error map (top-left). The highlighted patch (red box) and its associated chrominance error map (yellow box) and luminance error map (green box) are placed below (darker regions indicate smaller errors). The proposed ExpoCM yields results with higher-fidelity global luminance and color information*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 问题域与核心瓶颈
 

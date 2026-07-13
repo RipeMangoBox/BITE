@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2024
 pdf_ref: paperPDFs/CVPR_2024/ProgMoGen_Programmable_Motion_Generation_for_Open_set_Motion_Control_Tasks.pdf
+project_link: null
+code_link: null
 aliases:
 - PMGP
 - PPMGOSMCT
@@ -42,13 +44,13 @@ claims:
 > - Task HSI-1 上，Max Acc. ↓ 0.094 vs 0.414 (IK) (-0.320)；C.Err. ↓ 0.012 vs 0.012 (IK) (0.000)。
 > - Task HSI-2: 避开头顶障碍物 (未见任务) 上，Foot Skate ↓ 0.189 vs 0.132 (IK) (+0.057)。
 
-## 概述
+## 概要
 
 现有运动控制方法将每个任务视为一个封闭集问题，需要为特定约束组合单独收集配对训练数据并设计专用网络，缺乏可组合性、可扩展性和可定制性。当面对开放世界中任意组合的约束时——例如“在两墙之间行走并保持头部高度”——这些方法无法原生处理。本文提出 **ProgMoGen**（Programmable Motion Generation），将开放集运动控制统一为一个可编程框架。其核心洞察在于：(1) 复杂任务可分解为若干原子约束的组合；(2) 几乎所有约束都能量化为可微误差；(3) 误差具有可加性。因此，只需将任务编程为一个误差函数，并以此引导冻结的预训练运动生成模型优化其潜在编码，即可在不重新训练的情况下生成既满足定制约束又继承运动先验的高质量运动。
 
 在已知约束任务（HSI-1，头部高度约束）上，ProgMoGen 在足部滑动（0.075）、最大加速度（0.094）和约束误差（0.012）之间取得最佳平衡，而所有基线方法（IK、IK+Reg.、MDM Edit、PriorMDM）在至少一个指标上失败。在多个未见过的任务（HSI-2 避开头顶障碍物、HSI-3 方形区域内行走、GEO-1 手触墙壁、HOI-1 移动物体）上，该方法同样实现了运动质量与约束误差的良好平衡，而基于修复的方法（MDM Edit、PriorMDM）无法原生处理这些不等式或几何约束。此外，该方法在“在两墙之间行走”等全新约束下展示了涌现新技能的能力（如收拢手臂和肩膀），并在骨骼长度保持上显著优于修复类方法（骨骼长度错误率 5.1% vs 52.5%）。
 
-## 背景与动机
+
 
 ### 运动控制任务的封闭集困境
 
@@ -77,7 +79,9 @@ claims:
 
 基于上述洞察，本文提出**可编程运动生成（ProgMoGen）**，将开放集运动控制转化为一个统一的优化问题：只需将任务编程为一个误差函数，然后通过优化冻结的预训练运动生成模型的潜在编码来最小化该误差，即可在不重新训练的情况下生成满足定制约束的高质量运动。这一范式从根本上摆脱了对任务专用数据和网络设计的依赖，实现了运动控制的开放集能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ProgMoGen 的核心创新在于将运动控制从**封闭集任务范式**转变为**开放集可编程范式**。现有方法（如 IK、MDM Edit、PriorMDM）将运动控制视为一组孤立的封闭集任务——每个任务需要专门的配对训练数据和网络设计，无法处理开放世界中任意组合的约束。ProgMoGen 则通过以下三个关键机制打破了这一限制：
 
@@ -114,7 +118,7 @@ $$\mathrm{Err}(\boldsymbol{x}) = \frac{1}{4 N N_j} \sum_{t=1}^{N} \sum_{j=1}^{N_
 
 这种可编程性使得 ProgMoGen 能处理全新约束组合。例如在“在两墙之间行走”任务中，模型涌现出收拢手臂和肩膀的新行为（Section 5.5），展示了预训练运动先验与约束优化结合后产生新技能的能力。
 
-## 整体框架
+
 
 ProgMoGen 将开放集运动控制任务统一为一个**“编程—优化”**范式，其核心流程由三个关键模块串联而成：**原子约束库**、**运动编程框架**和**潜在噪声优化**。整体 pipeline 如 Figure 2 所示。
 
@@ -165,7 +169,7 @@ ProgMoGen 将开放集运动控制任务统一为一个**“编程—优化”**
 ![[assets/figures/papers/paper_list_l1853_ProgMoGen_Programmable_Motion_Generation_for_Open_set_Motion_Control_Tas/figures/001_Figure_1.jpg]]
 *Figure 1: We introduce Programmable Motion Generation as a solution for open-set human motion control. Unlike previous works that treat a finite set of motion constraints as individual tasks, we attempt to solve vast and novel tasks in a unified framework. Through Programmable Motion Generation, an arbitrary controlled motion generation task is effectively solved by simply programming an error function rather than collecting training data and designing networks. The programming is also able to be implemented automatically*
 
-## 核心模块与公式推导
+
 
 ### 问题形式化：将运动控制转化为潜在优化
 
@@ -231,7 +235,9 @@ ProgMoGen 通过“编程误差函数 + 潜在优化”的范式，从根本上�
 ![[assets/figures/papers/paper_list_l1853_ProgMoGen_Programmable_Motion_Generation_for_Open_set_Motion_Control_Tas/figures/003_Figure_3.jpg]]
 *Figure 3: The programming framework that pre-defines the input, output, atomic constraints and the redesigned logical operations as building blocks for motion programming. The example code corresponds to the task of “holding a ball”*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -322,7 +328,9 @@ Figure 5 提供了运动先验作用的最直观证据。在“方形区域内�
 ![[assets/figures/papers/paper_list_l1853_ProgMoGen_Programmable_Motion_Generation_for_Open_set_Motion_Control_Tas/figures/011_Table.jpg]]
 *Table: A3. Evaluation on motion programming by LLM. Tasks that are successfully handled by LLM are labeled with ✓*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心瓶颈：从封闭集任务到开放集约束的范式断裂
 
@@ -392,6 +400,8 @@ ProgMoGen 的独特贡献在于：**将“任务”的概念从网络设计层�
 5. **实时性能优化**：当前数分钟的优化时间限制了交互式应用，需要研究更高效的优化器设计、隐变量初始化策略或模型蒸馏方案。
 
 6. **全身生成扩展**：如何将框架从身体运动扩展到包含手指、表情等细节的全身生成，需要在约束库和生成模型两个层面进行扩展。
+
+
 
 ## 原文 PDF
 

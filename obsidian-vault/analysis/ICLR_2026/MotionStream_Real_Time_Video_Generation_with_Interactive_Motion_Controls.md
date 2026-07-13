@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/MotionStream_Real_Time_Video_Generation_with_Interactive_Motion_Controls.pdf
+project_link: null
+code_link: null
 openreview_forum_id: v1DKz5Vxr7
 aliases:
 - MotionStream
@@ -41,7 +43,7 @@ claims:
 > - Sora Demo Subset (运动转移) 上，PSNR / SSIM / LPIPS / EPE 为 Ours Causal (480P): 16.67 / 0.531 / 0.360 / 4.21，对比 ATI (480P): 16.04 / 0.502 / 0.366 / 6.12，变化 PSNR +0.63, EPE -1.91。
 > - LLFF (新视角合成) 上，PSNR / SSIM / LPIPS 为 Ours Teacher (480P): 16.0 / 0.42 / 0.21，对比 SEVA: 14.1 / 0.30 / 0.29，变化 PSNR +1.9, LPIPS -0.08。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -63,7 +65,7 @@ MotionStream在单张H100 GPU上实现了**实时交互速度**：480P分辨率�
 
 MotionStream属于**流式自回归视频生成**范式，区别于传统的离线扩散模型。其技术路线融合了运动控制视频生成、因果注意力机制和分布匹配蒸馏三个方向，在实时交互性和生成质量之间建立了新的权衡边界。该方法不依赖特定骨干网络规模，在Wan 2.1和Wan 2.2上均验证了有效性，且运动条件的引入未显著降低基础模型的生成能力（Table A4）。
 
-## 背景与动机
+
 
 ### 运动条件视频生成：离线范式与实时交互的鸿沟
 
@@ -88,7 +90,9 @@ MotionStream的作者通过分析双向教师模型的自注意力图（Figure 3
 
 这一技术路线使得MotionStream在单张H100 GPU上达到480P分辨率下16.7 FPS、720P下10.4 FPS的生成速度（Table 1），而基线方法的速度远低于1 FPS，同时在运动转移和新视角合成任务上保持甚至超越了离线方法的生成质量。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MotionStream 的核心创新在于将离线、双向的运动条件视频扩散模型转化为一个因果自回归的流式生成系统，从而在保持运动控制精度的同时实现实时交互。这一转化围绕四个关键的技术槽位展开。
 
@@ -140,7 +144,7 @@ $$s_{\mathrm{real}} = s_{\mathrm{base}} + w_t \cdot (f_{\phi}(c_t, c_m) - f_{\ph
 
 上述技术槽位的协同作用使得 MotionStream 在 480P 分辨率下达到 16.7 FPS（Wan 2.1-1.3B）和 720P 下 10.4 FPS（Wan 2.2-5B）的实时生成速度，同时在运动转移重建任务上保持与离线教师模型可比的质量（DAVIS PSNR 16.20, LPIPS 0.443），并在新视角合成任务上以 20 倍以上的速度优势超越专门的 3D 方法（如 **SEVA**、**ViewCrafter**）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_v1DKz5Vxr7/figures/002_Figure_2.jpg]]
 *Figure 2: Model architecture and training pipeline. To build a teacher motion-controlled video model, we extract and randomly sample 2D tracks from the input video and encode them using a lightweight track head. The resulting track embeddings are combined with the input image, noisy video latents, and text embeddings as input to the diffusion transformer with bidirectional attention, which is then trained with a flow matching loss (top). We then distill a few-step causal diffusion model from the teacher through Self Forcing-style DMD distillation, integrating joint text-motion guidance into the objective, where autoregressive rollout with rolling KV cache and attention sink is applied during both tra...*
@@ -185,7 +189,7 @@ MotionStream 的整体流水线围绕一个核心矛盾展开：**离线双向�
 
 这一框架使得 MotionStream 能够从单张图像出发，在用户实时绘制的运动轨迹控制下，以交互式速度流式生成任意长度的视频，并支持运动转移、拖拽控制和 3D 相机控制等多种下游应用。
 
-## 核心模块与公式推导
+
 
 ### 轨迹提取与编码（Track Head）
 
@@ -242,7 +246,9 @@ $$s_{\mathrm{real}} = s_{\mathrm{base}} + w_t \cdot (f_{\phi}(c_t, c_m) - f_{\ph
 
 推理时，学生模型以固定块大小（c3s1w1）逐块生成，利用滚动 KV 缓存和注意力槽维持恒定吞吐量，避免直接滑动窗口（c3s0w6）导致的延迟和吞吐量大幅波动（Figure 6）。学生模型使用 3 步生成最优，增加步数收益递减，减少至 2 步质量明显下降（Appendix C, Figure A2）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -344,7 +350,9 @@ Appendix C 的 Figure A2 显示，学生模型使用 3 步生成达到最佳质�
 *Table: A4: Impact of Motion Control on Generative Quality. We evaluate whether injecting motion control degrades the pretrained model’s capability by comparing against a larger, dedicated I2V baseline (Wan 2.1 14B I2V). We also report performance when motion conditions are dropped. Results indicate that adding motion conditioning does not significantly degrade the base model’s generative quality. While removing motion conditions introduces a slight quality drop as our models were not optimized for this setting, the output still adheres to the given text and image inputs*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 在运动条件视频生成中的定位
 
@@ -385,6 +393,8 @@ MotionStream 的流程在新视角合成任务上展现出意外的强泛化能�
 3. **源细节保持能力的扩展。** 在复杂场景、长文本提示或极端运动条件下，模型（尤其小容量骨干）难以保持源图像的精细细节。这一问题可能需要更大规模骨干网络（如 14B 级别）的验证，以及专门设计的细节保持损失或注意力约束。
 
 4. **3D 感知轨迹表示。** 2D 轨迹的表达力上限限制了场景变换的复杂度。将轨迹表示扩展到 3D（如结合深度估计的 2.5D 轨迹或稀疏 3D 点云轨迹）可能显著提升模型处理遮挡、视角变化和场景转换的能力，但也会引入额外的计算开销和标注需求。
+
+
 
 ## 原文 PDF
 

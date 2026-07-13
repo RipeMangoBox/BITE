@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Adaptive_Conformal_Guidance_for_Learning_under_Uncertainty.pdf
+project_link: null
+code_link: null
 aliases:
 - ACGA
 - ACGLUU
@@ -40,15 +42,17 @@ claims:
 > - CIFAR-10 (40 labels) 上，Top-1 准确率 (%) 为 FixMatch+AdaConG: 93.12±0.32，对比 FixMatch: 87.14±0.45，变化 +5.98。
 > - CIFAR-100 (2500 labels) 上，Top-1 准确率 (%) 为 FlexMatch+AdaConG: 67.85±0.28，对比 FlexMatch: 62.22±0.35，变化 +5.63。
 
-## 概述
+## 概要
 
 本文提出 **Adaptive Conformal Guidance (AdaConG)**，一种通用且轻量的框架，旨在解决学习系统中引导信号（如教师模型输出、伪标签、模仿策略）不可靠时带来的性能下降问题。AdaConG 的核心思想是利用分裂共形预测（split conformal prediction）量化引导信号的不确定性，并将该不确定性映射为自适应权重，动态调节引导损失在总损失中的贡献。该方法适用于监督学习、半监督学习和模仿引导的强化学习等多种场景。实验表明，AdaConG 在知识蒸馏、半监督图像分类、网格世界导航和自动驾驶转向预测等任务中均能显著提升性能，例如在 CIFAR-100 知识蒸馏任务中最高提升 +10.89% 的 Top-1 准确率，在网格世界导航中收敛后奖励超过最强基线的 6 倍。
 
-## 背景与动机
+
 
 现有学习系统在依赖引导信号时，通常假设引导始终可靠。然而，由于域偏移、有限数据或策略泛化不足，引导信号常带有噪声或不确定性。盲目信任这些信号会导致性能下降甚至错误传播。例如，在知识蒸馏中，教师模型在域偏移下可能产生误导性输出；在半监督学习中，伪标签可能包含大量噪声；在模仿引导的强化学习中，教师策略可能因环境变化而失效。因此，亟需一种能够动态评估引导信号可靠性并据此调整其影响的方法。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 AdaConG 的核心创新在于：
 
@@ -58,7 +62,7 @@ AdaConG 的核心创新在于：
 
 3. **通用框架**：AdaConG 可无缝集成到监督学习、半监督学习和强化学习的训练循环中，仅需修改引导损失的加权方式，无需改变模型架构。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_representation_self_supervised_transfer__representation_learning__b001_1gxP0WtOoO_Adaptiv/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the AdaConG approach. AdaConG leverages split CP with calibration to quantify the uncertainty of guidance signals and adaptively modulate their influence. The estimated uncertainty u is converted into an adaptive weight w, which reweights the guidance loss. This weighted guidance loss is then combined with the task loss to update the model, enabling effective learning under uncertain guidance.*
@@ -71,7 +75,7 @@ AdaConG 的整体框架如 Figure 1 所示。该框架包含三个核心模块�
 
 Figure 1: Overview of the AdaConG approach. AdaConG leverages split CP with calibration to quantify the uncertainty of guidance signals and adaptively modulate their influence. The estimated uncertainty u is converted into an adaptive weight w, which reweights the guidance loss. This weighted guidance loss is then combined with the task loss to update the model, enabling effective learning under uncertain guidance.
 
-## 核心模块与公式推导
+
 
 ### 5.1 引导不确定性量化
 
@@ -126,7 +130,9 @@ $$\hat{q}_R^{(t)} \gets (1-\rho) \hat{q}_R^{(t-1)} + \rho \tilde{q}_R^{(t)}$$
 
 $$\epsilon = \min(0.5 \frac{t}{S_{\text{total}}} + 0.5 \frac{e}{E_{\text{total}}}, 1)$$
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 6.1 知识蒸馏
 
@@ -205,7 +211,9 @@ Table 11: Comparison of computational overhead between FlexMatch and FlexMatch +
 
 Table 12: Comparison of computational overhead across key RL baselines.
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 AdaConG 属于**不确定性感知学习**与**共形预测**交叉领域的方法。其方法谱系可定位如下：
 
@@ -224,6 +232,8 @@ AdaConG 属于**不确定性感知学习**与**共形预测**交叉领域的方�
 - 在 RL 中，滑动窗口大小 N 和 EMA 因子 ρ 的最优选择是否具有环境无关性？
 - AdaConG 在 NLP 任务（如机器翻译、文本分类）中的引导不确定性量化是否有效？
 - 能否将 AdaConG 与主动学习或持续学习策略结合，以进一步管理复杂不确定性？
+
+
 
 ## 原文 PDF
 

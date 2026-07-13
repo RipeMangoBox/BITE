@@ -44,7 +44,7 @@ claims:
 > - Synthetic (virtual scans) 上，CD (×10²)↓ / EMD (×10²)↓ 1.11 / 1.41 (Ours TRELLIS) vs ComPC: 1.61 / 2.09 (31.1% CD↓ over ComPC)。
 > - Omni-Comp (multi-pattern) 上，CD ↓ / EMD ↓ improvement 49.6% CD, 39.4% EMD over ComPC vs ComPC (49.6% CD↓)。
 
-## 概述
+## 概要
 
 三维形状补全是计算机视觉与图形学中的基础任务，旨在从部分观测中恢复完整几何形状。现有方法大致可分为三类：监督方法（如 **SVDFormer** (Zhu et al., ICCV 2023)、**AdaPoinTr** (Yu et al., TPAMI 2023)）依赖大规模配对数据训练，泛化能力受限；自监督/无监督方法（如 **Shape-Inv** (Zhang et al., CVPR 2021)、**P2C** (Cui et al., ICCV 2023)）无需配对真值，但仍需针对特定类别进行训练；零样本方法（如 **SDS-Comp** (Kasten et al., NeurIPS 2023)、**ComPC** (Huang et al., ICLR 2025)、**GenPC** (Li et al., CVPR 2025)）借助2D扩散先验或3D生成先验，可在未见类别上完成补全，但存在根本性瓶颈。
 
@@ -54,7 +54,7 @@ claims:
 
 **主要结果**：在Redwood真实扫描数据集上，LaS-Comp相比ComPC降低倒角距离（CD）27.2%、降低推土机距离（EMD）29.0%；相比GenPC降低CD 18.4%、EMD 36.1%。在合成数据集上，相比ComPC降低CD 31.1%。在涵盖多种缺失模式的Omni-Comp基准上，平均降低CD 49.6%、EMD 39.4%。在ScanNet和KITTI真实场景扫描上，保真度指标（UCD）平均提升约38%。消融实验证实，移除显式替换阶段（ERS）导致性能下降最为严重（Redwood CD从1.42升至3.42），证明空间替换对保真度至关重要。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -78,7 +78,9 @@ claims:
 
 本文的动机由此清晰：**能否设计一种无需训练、即插即用的条件机制，在几何空间而非潜在空间注入部分观测信息，从而弥合域间隙，高效释放 3D 基础模型内在的补全能力？** 这一思路若能实现，将同时获得两类方法的优势——3D 模型的全局几何一致性与几何空间注入的输入保真度——同时规避各自的根本缺陷。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 LaS-Comp 的核心创新在于**首次系统性地诊断并弥合了3D基础模型的潜在-空间域间隙**，并基于此设计了一套**无需训练、即插即用的两阶段补全范式**。与现有方法相比，其关键改变体现在以下四个维度：
 
@@ -112,7 +114,7 @@ LaS-Comp 的核心创新在于**首次系统性地诊断并弥合了3D基础模�
 
 上述四个改变槽位构成了一个**因果协同系统**：ERS 解决“保真度”问题（几何空间显式替换），PNS 解决“多样性”问题（差异化噪声调度），IAS 解决“一致性”问题（潜在空间隐式对齐），三者共同释放了预训练3D基础模型的几何先验，实现了无需训练的类别无关零样本补全。消融实验的定量证据表明，这一协同设计是不可分割的——移除任一模块均导致性能显著退化，其中 ERS 的移除影响最为严重（Redwood CD 从 1.42 升至 3.42），验证了“空间替换”作为核心创新支柱的地位。
 
-## 整体框架
+
 
 LaS-Comp 是一个**训练无关**（training-free）的两阶段迭代框架，旨在弥合部分观测与完整形状在预训练 3D 基础模型潜在空间中的域间隙。其核心发现是：即使部分输入与真值在几何空间共享相同的表面区域，二者在 VAE 潜在空间中的对应编码相似度极低（平均余弦相似度仅 0.4593），因此直接从潜在空间进行条件补全不可靠（Figure 9）。LaS-Comp 通过**显式空间替换**与**隐式对齐**的协同设计，在不修改模型权重的前提下，将部分输入的几何信息注入生成过程，释放预训练模型的几何先验。
 
@@ -149,7 +151,7 @@ ERS 将生成过程分解为**清洁分支**（保证对部分输入的保真度
 ![[assets/figures/papers/paper_list_l2532_https_arxiv_org_abs_2602_18735/figures/001_Figure_1.jpg]]
 *Figure 1: Our new framework supports category-agnostic shape completion across diverse partial patterns, including (a) random crops, (b) single-view scans, and (c) missing semantic parts. It further supports both unconditional and text-guided completion, offering flexible control for real-world applications, see (d)*
 
-## 核心模块与公式推导
+
 
 ### 问题背景：潜在空间域间隙
 
@@ -231,7 +233,9 @@ $$\pmb{x}_{t-dt} = \pmb{x}_{0|t}^{\text{aligned}} + (t - dt) \cdot \mathcal{G}(\
 
 消融实验（Table 6）证实了三者的必要性：移除 ERS 导致性能下降最为严重（Redwood CD 从 1.42 升至 3.42），移除 PNS 产生条纹状伪影（CD 升至 1.94），移除 IAS 则导致边界空洞和不一致（CD 升至 1.88）。IAS 采用 10 步优化相比单步无显著提升（CD 1.46 vs 1.42），验证了单步设计的效率。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -310,7 +314,9 @@ Table 6系统消融了LaS-Comp各核心组件，结果如下：
 ![[assets/figures/papers/paper_list_l2532_https_arxiv_org_abs_2602_18735/figures/018_Figure_10.jpg]]
 *Figure 10: Visual examples of the completion results under extremely noisy partial inputs. Despite the severe noise that heavily corrupts the observed points, our method can still recover a reasonable global structure and overall object silhouette, but many fine details and thin structures are degraded or missing, revealing the limitation of our model when strong noise overwhelms the underlying geometry*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：3D补全中的潜在-空间域间隙
 
@@ -368,6 +374,8 @@ LaS-Comp 相对于已有方法的核心创新可通过四个关键设计槽位�
 2. **薄壁结构保真度**：能否在潜在空间注入观测几何的同时保留更精确的薄壁结构？当前 ERS 在几何空间进行替换，但解码-编码的循环可能丢失高频细节。一种可能的改进方向是在潜在空间与几何空间之间建立更细粒度的双向映射，以提升极端噪声下的细节恢复能力。
 
 3. **与 2D 先验的融合**：LaS-Comp 完全依赖 3D 先验，而 2D 先验方法在语义理解方面具有优势。如何在保持几何一致性的前提下融合两类先验，是一个值得探索的方向。
+
+
 
 ## 原文 PDF
 

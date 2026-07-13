@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Random_Policy_Valuation_is_Enough_for_LLM_Reasoning_with_Verifiable_Rewards.pdf
+project_link: null
+code_link: null
 openreview_forum_id: ujLgLz6QQa
 aliases:
 - RPVIELRVR
@@ -41,7 +43,7 @@ claims:
 > - AIME24, AIME25, HMMT25 (平均) 上，Pass@256 为 ROVER (Qwen3-8B)，对比 最佳基线，变化 +16.8。
 > - Countdown (TinyZero) 上，测试成绩 为 ROVER，对比 GRPO (最高基线)，变化 达到最高上限性能，多样性显著优于 GRPO。
 
-## 概述
+## 概要
 
 当前基于可验证奖励的 LLM 推理（RLVR）方法，如 PPO 和 GRPO，普遍沿用经典强化学习中的广义策略迭代（GPI）框架，通过迭代的策略评估与策略改进来优化模型。然而，数学推理任务本质上对应一个**确定性树结构 MDP**，其转移是确定性的，且仅在终止状态获得二元奖励。现有方法忽视了这一简化特性，导致训练不稳定、多样性崩溃，并依赖大量启发式技巧。
 
@@ -49,7 +51,7 @@ claims:
 
 实验结果表明，ROVER 在 AIME24、AIME25、HMMT25 上平均 pass@1 提升 **+8.2**，pass@256 提升 **+16.8**，多样性提升 **+20.5%**，且训练过程更轻量、更稳定。
 
-## 背景与动机
+
 
 ### LLM 推理中的可验证奖励强化学习
 
@@ -91,7 +93,9 @@ claims:
 
 在 RLVR 方法谱系中，现有工作可大致分为两类：一类是策略梯度方法（PPO/GRPO 及其变体），依赖优势估计和迭代改进；另一类是偏好优化方法（DPO 等），依赖成对比较数据。ROVER 开辟了第三条路径——**随机策略评估路径**，它既不需要策略梯度的高方差估计，也不需要偏好数据的标注成本，而是直接从 MDP 的结构特性中推导最优行为。这一方法论上的简化，使得 ROVER 在训练效率、稳定性和多样性三个维度上同时获得提升。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ROVER 的核心创新在于**重新审视了 LLM 数学推理中 RLVR 任务的 MDP 结构**，并据此提出了一种比当前主流方法（PPO/GRPO）更简单、更稳定且天然保持多样性的训练范式。
 
@@ -149,7 +153,7 @@ $$\tilde{r}(x, y_i) = r(x, y_i) - \frac{1}{n} \sum_{i=1}^{n} r(x, y_i)$$
 
 ROVER 的四个 changed slots 共同构成了一个**更轻量、更稳定、多样性更强**的 RLVR 框架：它从 MDP 结构特性出发，用单次均匀策略评估替代迭代 GPI，用软最大化天然保持多样性，用内在参数化消除额外网络，用均值中心化简化奖励处理。在 AIME24/25 和 HMMT25 上，ROVER 以相同的默认超参数（$\rho=1$）实现了 pass@1 提升 +8.2、pass@256 提升 +16.8、多样性提升 +20.5% 的显著增益。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_ujLgLz6QQa/figures/006_Figure_3.jpg]]
 *Figure 3: Illustration of ROVER (greedy)*
@@ -197,7 +201,7 @@ $$\mathcal{L}_{\text{ROVER}} = \frac{1}{\sum_{i=1}^{n} |y_i|} \sum_{i=1}^{n} \su
 
 ROVER 在所有基准测试中使用相同的默认超参数（$\rho=1$），无需任务特定的调优。消融实验表明，温度 $\rho$ 控制探索与利用的权衡：$\rho=1$ 在所有任务上提供稳健性能，$\rho$ 过小导致过早利用和多样性降低，$\rho$ 过大则利用不足。系数 $\beta$ 在 0.2 至 1.0 的宽范围内对性能影响不敏感，表现稳定。
 
-## 核心模块与公式推导
+
 
 ### 3.1 均匀策略 Q 值评估
 
@@ -263,7 +267,9 @@ $$\mathcal{L}_{\text{ROVER}} = \frac{1}{\sum_{i=1}^{n} |y_i|} \sum_{i=1}^{n} \su
 - **系数 $\beta$**：损失函数中对应项的系数在 0.2 至 1.0 之间时，ROVER 性能保持稳定（Figure 13）。
 - **与熵正则化的对比**：在 GRPO 中加入熵正则化虽增加熵，但性能下降；ROVER 则同时提升性能和熵（Table 9：ROVER Pass@1 11.10, entropy 0.055 vs GRPO+entropy Pass@1 9.31, entropy 0.020）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能对比
 
@@ -335,7 +341,9 @@ ROVER 的理论保证建立在**确定性树结构 MDP** 和**二元终止奖励
 ![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_ujLgLz6QQa/figures/043_Table_7.jpg]]
 *Table 7: Default hyperparameters for evaluation*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 对 RLVR 范式的结构性简化
 
@@ -391,6 +399,8 @@ ROVER 的理论保证建立在以下假设之上：
 4. **与离线 RL 和偏好优化的结合**：能否将均匀策略估值的思想与现有的离线 RL 或直接偏好优化（DPO）方法相结合，以处理无明确二元奖励的场景？
 
 5. **温度参数 ρ 的理论最优性**：论文通过实验表明 ρ=1 在多个任务上提供稳健性能，但缺乏对 ρ 最优值的理论刻画。软最大化策略的性能下界（Theorem 2）表明当 ρ→0 时性能差距消失，但实际中 ρ 过小会导致多样性崩溃，这一矛盾需要更精细的理论分析。
+
+
 
 ## 原文 PDF
 

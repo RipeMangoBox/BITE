@@ -33,7 +33,7 @@ claims:
 | 中文题名 | 基于碰撞感知凹度与树搜索的三维网格近似凸分解 |
 | 英文题名 | Approximate Convex Decomposition for 3D Meshes With Collision-aware Concavity and Tree Search |
 | 会议/期刊 | SIGGRAPH 2022 |
-| Links | [paper](https://arxiv.org/abs/2205.02961v1) · [Code](https://github.com/SarahWeiii/CoACD) · [arXiv](https://arxiv.org/abs/2205.02961v1") |
+| Links | [paper](https://arxiv.org/abs/2205.02961v1) · [Code](https://github.com/SarahWeiii/CoACD) · [paper](https://arxiv.org/abs/2205.02961v1") |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction #topic/benchmarks_datasets_evaluation |
 | Method | CoACD |
 | Dataset | V-HACD dataset, PartNet-Mobility, OpenCabinetDrawer |

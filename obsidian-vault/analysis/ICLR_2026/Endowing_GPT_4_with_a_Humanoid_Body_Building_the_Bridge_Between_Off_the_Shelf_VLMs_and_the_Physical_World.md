@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Endowing_GPT_4_with_a_Humanoid_Body_Building_the_Bridge_Between_Off_the_Shelf_VLMs_and_the_Physical_World.pdf
+project_link: null
+code_link: https://github.com/Shadow-Dream/BiBo
 openreview_forum_id: aQWSEjcN9V
 aliases:
 - Endowing_GPT-4_w
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 赋予GPT-4类人身体：在现成视觉语言模型与物理世界之间搭建桥梁 |
 | 英文题名 | Endowing GPT-4 with a Humanoid Body: Building the Bridge Between Off-the-Shelf VLMs and the Physical World |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=aQWSEjcN9V); [GitHub](https://github.com/Shadow-Dream/BiBo) |
+| Links | [paper](https://openreview.net/forum?id=aQWSEjcN9V) · [GitHub](https://github.com/Shadow-Dream/BiBo) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | BiBo |
 | Dataset | Randomly Generated Scenes (100 scenes, 1365 single tasks), Randomly Generated Scenes, HumanML3D |
@@ -41,7 +43,7 @@ claims:
 > - Randomly Generated Scenes 上，Composite Task Success Rate 为 41.0% (avg.)，对比 prior methods，变化 average improvement of 29.1% over baselines。
 > - HumanML3D 上，FID (motion quality) 为 0.076，对比 other real-time arbitrary-length methods，变化 63.8% relative improvement over prior real-time arbitrary-length methods。
 
-## 概述
+## 概要
 
 赋予通用大模型以物理身体，使其在真实世界中执行复杂交互，是具身智能领域的核心挑战。现有方案通常需要针对特定任务收集大规模示教数据并训练专用模型，不仅成本高昂，且难以泛化至开放场景。本文的核心洞察在于：**现成视觉语言模型（VLM）已具备强大的开放世界推理能力，真正的瓶颈并非模型能力不足，而是高级语义指令与低级物理动作执行之间存在难以跨越的接口鸿沟。**
 
@@ -51,7 +53,7 @@ claims:
 
 在方法谱系中，BiBo区别于 **UniHSI**（Xiao et al., 2023）、**HumanVLA**（Xu et al., 2024）、**TokenHSI**（Pan et al., 2025）等依赖真值动作规划或专用模型的基线，以及 **CLoSD**（Tevet et al., 2024）、**MDM**（Tevet et al., 2022）等纯文本-动作生成方法。其关键创新在于将VLM的开放推理与扩散模型的物理适应性结合，无需大规模数据收集即可实现多样化的人形场景交互。
 
-## 背景与动机
+
 
 人形代理在物理世界中执行复杂交互任务，长期面临一个核心瓶颈：**现成视觉语言模型（VLM）的开放世界推理能力与人形代理的低级物理动作执行之间存在接口鸿沟**。高级用户指令（如“休息一下”）与低级控制信号（如关节角度、末端效应器坐标）之间的语义跨度极大，使得直接将VLM用于物理交互变得异常困难。
 
@@ -61,7 +63,9 @@ claims:
 
 这些问题的根源在于**缺乏一个统一的框架，既能充分利用现成VLM的通用推理能力，又能在动作执行层面同时兼顾物理适应性与运动连续性**。BiBo正是在这一动机下提出：无需大规模数据收集，直接利用现成VLM，通过结构化指令编译器和扩散动作执行器的协同设计，桥接高级用户指令与低级物理控制，实现多样化的人形交互。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 BiBo的核心突破在于**无需大规模数据收集，直接利用现成视觉语言模型（VLM）的开放世界推理能力，通过两个关键组件的协同设计，桥接了高级用户指令与低级物理控制之间的接口鸿沟**。其创新主要体现在以下三个“changed slots”上。
 
@@ -103,7 +107,7 @@ VAE解码器中的**因果注意力（Causal Attention）**是保证运动连续
 
 综上所述，BiBo的核心创新并非提出全新的模型架构，而是**通过结构化表示与闭环反馈机制，创造性地将现成VLM的推理能力与物理世界连接起来**。编译器解决了“理解与规划”问题，执行器解决了“执行与适应”问题，二者的协同使得人形代理能够在开放环境中以平均90.2%的成功率完成多样化交互任务，相比先前方法平均提升12.5%（Table 1），并将文本引导动作执行的精度提高了16.3%。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_aQWSEjcN9V/figures/001_Figure_1.jpg]]
 *Figure 1: BiBo is a humanoid agent powered by an off-the-shelf VLM. It consists of an embodied instruction compiler (Inst. Compiler) and a diffusion-based motion executor. When the user provides a high-level instruction, the compiler observes the environment and translates it into the structured command for the executor. The executor then generates future motions for the humanoid agent, conditioned on both the command and the physical feedback from the environment. In this way, BiBo is able to perform diverse types of physical scene interactions*
@@ -133,7 +137,7 @@ BiBo 是一个由现成视觉语言模型（VLM）驱动的人形代理系统，
 
 整体而言，BiBo 的框架实现了“规划与执行的解耦”：编译器承担高层次的任务理解与命令规划，执行器负责低层次的运动生成与物理适应，两者通过结构化的命令接口和基于潜在空间的运动反馈机制协同工作，使现成 VLM 无需微调即可直接驱动人形代理完成多样化的物理场景交互。
 
-## 核心模块与公式推导
+
 
 BiBo由两个核心模块构成：**具身指令编译器（Embodied Instruction Compiler）** 和**扩散运动执行器（Diffusion Motion Executor）**。编译器负责将高级用户指令转换为结构化的低级命令；执行器则根据该命令生成物理可执行的动作序列，并引入环境反馈以保证运动连续性。
 
@@ -177,7 +181,9 @@ $$\bar{a} = \mathbb{E}_j \left(\| \pmb{p}_j^{n+1} + \pmb{p}_j^{n-1} - 2 \pmb{p}_
 
 **逆运动学后优化。** 扩散模型输出的关节轨迹经过自定义的FABRIK逆运动学算法进行迭代优化，以提升末端效应器的控制精度。消融实验表明，移除IK后Lift任务成功率从65.42%骤降至6.80%（Table 2），证明IK对精确关节控制至关重要。最终，基于强化学习的追踪策略驱动人形关节在物理环境中执行生成的关节轨迹。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能：开放环境任务成功率
 
@@ -244,7 +250,9 @@ Figure 5的定性对比揭示了各方法的典型失效模式：UniHSI生成的
 ### 用户研究
 
 Table 6的用户偏好统计显示，在动作自然度、交互准确性和整体质量三个维度上，BiBo获得的偏好票数均显著高于对比方法，与定量指标趋势一致。
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与设计动机
 
@@ -320,6 +328,8 @@ BiBo 的技术增量集中体现在两个核心模块的协同设计：
 - **多模态对齐与连续性**：是否可以通过更长的运动前缀或更大的模型进一步提升多模态对齐与运动连续性？
 - **推理延迟优化**：VLM 推理延迟对实时交互控制的影响如何？能否通过模型蒸馏或压缩进一步降低时延？
 - **VLM 空间理解增强**：如何改进 VLM 的空间理解能力，使其更好地处理多物体、多层次的空间关系？
+
+
 
 ## 原文 PDF
 

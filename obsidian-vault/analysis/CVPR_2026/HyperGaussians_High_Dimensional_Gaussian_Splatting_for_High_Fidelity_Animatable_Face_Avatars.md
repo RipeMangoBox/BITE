@@ -41,7 +41,7 @@ claims:
 > - Monocular (19 subjects from 5 datasets) 上，PSNR ↑ 29.99 (Ours FA) vs 29.43 (FlashAvatar) (+0.56)；SSIM (10⁻¹) ↑ 9.510 (Ours FA) vs 9.466 (FlashAvatar) (+0.044)；LPIPS (10⁻²) ↓ 4.978 (Ours FA) vs 5.107 (FlashAvatar) (-0.129)。
 > - Multi-view (10 subjects from NeRSemble) 上，PSNR ↑ 24.38 (Ours GHA) vs 24.10 (GaussianHeadAvatar) (+0.28)；SSIM (10⁻¹) ↑ 8.819 (Ours GHA) vs 8.819 (GaussianHeadAvatar) (0.000)；LPIPS (10⁻²) ↓ 19.768 (Ours GHA) vs 20.273 (GaussianHeadAvatar) (-0.505)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有基于3D高斯溅射（3DGS）的面部化身方法在表达非线性变形、镜面反射和微细结构时受限，难以高效捕捉高频细节，导致渲染质量不足。
 
@@ -50,8 +50,6 @@ claims:
 **方法定位**：HyperGaussians是一种即插即用的增强模块，可无缝集成到现有面部化身流程中（如FlashAvatar、GaussianHeadAvatar），仅需将形变MLP的输出从直接偏移预测改为潜在编码预测，通过HyperGaussians条件化恢复等效3D高斯属性后送入可微光栅器。
 
 **主要结果**：在29名受试者、6个面部数据集上，HyperGaussians以最小开销显著提升渲染质量。单目设置下，集成HyperGaussians的FlashAvatar相比原版PSNR提升0.56 dB（29.99 vs 29.43），LPIPS降低0.129；多视图设置下，集成HyperGaussians的GaussianHeadAvatar在LPIPS上降低0.505。定性上，HyperGaussians在镜面反射、薄结构（眼镜框、牙齿）和复杂变形（嘴部）等高频细节上表现突出。消融实验表明，单纯增加MLP深度（至40层）会导致LPIPS恶化15%且帧率下降47%，而HyperGaussians在保持渲染速度的同时实现了更优的表达能力。
-
-## 背景与动机
 
 ### 问题背景：面部化身的实时高保真渲染
 
@@ -79,7 +77,7 @@ claims:
 
 因此，本文的核心技术动机是：**如何在保持条件生成表达能力的同时，将计算复杂度降至实时可行的水平？** 这一问题的解决，是HyperGaussians能够成为即插即用增强模块的前提。
 
-## 核心创新
+## 核心方法与创新机理
 
 HyperGaussians 的核心创新在于对 3D 高斯溅射（3DGS）表示本身的重构：将高斯原语从三维属性空间扩展至**高维多元高斯**，并通过**条件化机制**和**逆协方差技巧**实现表达力与计算效率的双重突破。
 
@@ -115,8 +113,6 @@ $$\mu_{a|b} = \mu_a - \Lambda_{aa}^{-1} \Lambda_{ab} (\gamma_b - \mu_b), \quad \
 
 HyperGaussians 被设计为**即插即用**的增强模块。在 FlashAvatar 和 **GaussianHeadAvatar** (Xu et al., 2024) 上，仅需将 MLP 输出从偏移量改为潜在编码，并在光栅化前插入条件化步骤，无需修改网络架构、训练策略或损失函数。训练时间仅增加约 30 分钟（约 1%），渲染帧率保持 300 FPS，实现了表达力与效率的平衡。
 
-## 整体框架
-
 HyperGaussians 的核心设计理念是对 3DGS 原语进行高维扩展，使其具备根据局部嵌入动态调节自身属性的能力。整个流水线由四个紧密耦合的模块构成：高维高斯表示、MLP 潜变量预测、条件化降维和可微光栅化，其输入输出流如图 2 所示。
 
 **高维高斯表示 (HyperGaussians)** 将传统的 3D 高斯从 `(m=3)` 属性维度扩展至 `(m+n)` 维，其中 `m` 为 3D 高斯属性维度（位置 `μ_3D`、缩放 `s`、旋转 `q`），`n=8` 为潜在维度。每个高斯原语维护一个完整的 `(m+n)` 维多元高斯分布，通过联合分布建模属性与潜在变量之间的统计依赖关系。这一扩展使得高斯原语不再是一个静态的几何基元，而是一个能够表达丰富条件依赖的概率模型。
@@ -133,8 +129,6 @@ HyperGaussians 的核心设计理念是对 3DGS 原语进行高维扩展，使�
 
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2507_02803/figures/002_Figure_2.jpg]]
 *Figure 2: We propose an expressive extension to 3D Gaussians, dubbed HyperGaussians, and plug them into existing methods for face avatars, FlashAvatar [70] and GaussianHeadAvatar [71]. FlashAvatar modulates 3D Gaussian primitives with expression-dependent offsets ∆. We make a single modification to the pipeline: plugging HyperGaussians (Sec. 3.2) in between the MLP output and the rasterization, which modifies the offsets ∆ in higher dimensions. Instead of directly predicting offsets ∆, we predict a latent zψ that conditions HyperGaussians. Without any other modifications or hyperparameter tuning, this simple change leads to a performance boost in rendering high-frequency details in the final avatar (...*
-
-## 核心模块与公式推导
 
 ### 3DGS 协方差构建（前置基础）
 
@@ -188,10 +182,7 @@ $$\sigma = \log\det\Sigma_{a|b} = -2\operatorname{tr}\log L_{11}$$
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2507_02803/figures/008_Figure_7.jpg]]
 *Figure 7: Geometric interpretation of Gaussian conditioning on two examples with large (left) and small (right) uncertainty at different realizations of*
 
-![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2507_02803/figures/010_Figure_8.jpg]]
-*Figure 8: Uncertainty quantification on one of the training subjects. Green denotes low uncertainty, while Red denotes high uncertainty. Note that the semantic structure arises purely from the probabilistic formulation without additional supervision*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -268,7 +259,7 @@ Figure 4展示了自驱动场景下的定性对比。HyperGaussians在以下三�
 
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2507_02803/figures/005_Figure.jpg]]
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 一、核心问题与差异化定位
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Weakly_Supervised_Motion_Learning_for_Co_speech_Gesture_Video_Generation.pdf
+project_link: null
+code_link: null
 aliases:
 - WSMLF
 - WSMLCSGVG
@@ -40,7 +42,7 @@ claims:
 > [!tip] 效果简介
 > - PATS (4 speakers) 上，FGD ↓ 1.11 vs 3.69 (S2G) (-2.58)；Diversity ↑ 282.89 vs 180.59 (S2G) (+102.30)；BAS ↑ 0.7526 vs 0.7280 (S2G) (+0.0246)。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -78,7 +80,7 @@ claims:
 
 主观用户研究进一步验证了方法的优势：在身份保持、视觉质量、时序一致性和语音-手势同步性四个维度上均获得最高评分（3.53–3.73），且统计检验（t检验）表明优势显著（Table 7–9）。
 
-## 背景与动机
+
 
 协同语音手势（co-speech gesture）是人类沟通中不可或缺的非语言信号，能够增强表达力、传达情感并辅助语义理解。在虚拟人、数字人主播、游戏角色动画等应用中，高质量、音频同步的手势视频生成具有广泛需求。然而，实现这一目标面临两个核心挑战：**手势生成的准确性**与**训练数据的获取成本**。
 
@@ -90,7 +92,9 @@ claims:
 
 本文的核心动机正是基于这一洞察：**仅利用音频和视频数据，无需任何姿态标注，能否实现高质量的协同语音手势视频生成？** 为此，我们提出了一个弱监督运动学习框架，通过可逆特征提取器将音频映射到隐式运动表征空间，替代显式姿态监督，从根本上消除对姿态标注的依赖（见 Figure 1）。这一设计不仅大幅降低了数据获取门槛，还使模型能够学习更鲁棒、更丰富的运动表征，为后续的手势细节（尤其是手部）优化奠定了基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于**彻底移除了协同语音手势视频生成对姿态标注的依赖**，构建了一个纯音频-视频驱动的弱监督学习框架。传统方法（如 **S2G** (He et al., 2024)、**MYA** (Huang et al., 2024)、**EchoMimicV2** (Meng et al., 2024)）在训练时均需额外的姿态标注（关键点或密集姿态），这不仅标注成本高昂，还容易引入标注误差，导致生成的手势细节（尤其是手部）出现模糊和畸变（Figure 1）。本文通过三个关键的“changed slots”实现了范式转变：
 
@@ -106,7 +110,7 @@ claims:
 4.  **手部细节：从“无专门处理”到“基于策略梯度的初始噪声优化”**
     针对手部生成这一长期难点，本文提出在采样阶段对扩散模型的初始高斯噪声参数$\mu$和$\sigma$进行基于策略梯度的优化（$\mathcal{L} = - \log p(\boldsymbol{z}_t) \cdot \boldsymbol{r}$），无需额外网络模块即可显著提升手部质量（Sec 3.3）。该设计使平均手部置信度从88.73%提升至95.45%（Table 5），补足了扩散模型在精细部位生成的短板。
 
-## 整体框架
+
 
 本文提出一种**弱监督运动学习框架**，仅以音频和视频作为训练输入，从根本上规避了传统方法对姿态标注（关键点/密集姿态）的依赖。框架由三个序贯阶段和一个采样时的手部细化策略构成，如 Figure 2 所示。
 
@@ -145,7 +149,7 @@ $$
 
 ![[assets/figures/papers/paper_list_l1909_Weakly_Supervised_Motion_Learning_for_Co_speech_Gesture_Video_Generation/figures/002_Figure.jpg]]
 
-## 核心模块与公式推导
+
 
 ### 3.1 基础组件公式
 
@@ -239,7 +243,9 @@ Table 3 的消融实验表明，移除可逆特征提取器导致 FGD 从 1.47 �
 ![[assets/figures/papers/paper_list_l1909_Weakly_Supervised_Motion_Learning_for_Co_speech_Gesture_Video_Generation/figures/006_Figure_4.jpg]]
 *Figure 4: As shown, Stage 1 and Stage 2 produce well-aligned gestures but lack fine-grained details. Removing the invertible feature extractor in Stage 2 results in misaligned gestures and degraded visual quality. While Stage 3 enhances visual quality, it still struggles with hand generation. By applying our hand refinement method, the final model generates high-quality videos. Please zoom in for better visibility of details. Video results are shown in Supplementary Material*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -320,7 +326,9 @@ Table 3 的消融实验表明，移除可逆特征提取器导致 FGD 从 1.47 �
 ![[assets/figures/papers/paper_list_l1909_Weakly_Supervised_Motion_Learning_for_Co_speech_Gesture_Video_Generation/figures/009_Table_4.jpg]]
 *Table 4: Comparisons of different loss functions in Stage 2 on four objective metrics*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位与核心分歧
 
@@ -359,6 +367,8 @@ Table 3 的消融实验表明，移除可逆特征提取器导致 FGD 从 1.47 �
 ### 开放问题与未来方向
 
 论文提出的开放问题包括：（1）如何集成视频增强技术以改善低帧率下的时序一致性；（2）基于策略梯度的初始噪声优化方法能否扩展到其他人体视频生成任务（如全身动作生成）；（3）如何在更大数据集和更大模型上训练，同时保持与基础扩散模型的竞争力；（4）能否提升唇音同步性能并实现零样本泛化至更多说话者；（5）如何将方法从正面视频扩展到多视角或自由运动场景。这些问题共同指向一个核心挑战：在保持弱监督优势的前提下，提升模型的泛化能力和时序一致性。
+
+
 
 ## 原文 PDF
 

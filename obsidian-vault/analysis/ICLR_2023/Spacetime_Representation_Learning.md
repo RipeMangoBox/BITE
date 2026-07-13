@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2023
 pdf_ref: paperPDFs/ICLR_2023/Spacetime_Representation_Learning.pdf
+project_link: null
+code_link: null
 aliases:
 - SRL
 tags:
@@ -40,7 +42,7 @@ claims:
 > - DREAM5 in silico (有向图链接预测) 上，Median Average Precision (%) 为 61.1 (de Sitter + eq.6, d=100)，对比 61.0 (Cylindrical Minkowski + TFD, Sim et al., 2021, d=100)，变化 +0.1。
 > - Social network (层次抽取) 上，Rank of 1st leader (↓) / Top10 ρ (↑) 为 Rank 1.0 ± 0.0, Top10 ρ 0.80 ± 0.11 (Minkowski + eq.8, 3D)，对比 higher leader rank and lower ρ with arc-length loss (eq.7) and other pseudo-Riemannian methods，变化 显著提升。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -74,7 +76,7 @@ claims:
 - 凸正常邻域阈值 ε 在多数实验中取为 ∞（全局邻域），其影响未充分消融；
 - 时间分离函数的选择依赖对具体时空的先验知识，尚未形成自动化方案。
 
-## 背景与动机
+
 
 ### 有向图表示学习的核心挑战
 
@@ -104,7 +106,9 @@ claims:
 
 这一框架不仅超越了现有方法在有向链接预测与层次抽取任务上的性能，更重要的是，它首次将一般时空的因果结构系统性地引入图表征学习，为探索更复杂的伪黎曼流形编码多重因果关系开辟了道路。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于将**有向图显式建模为洛伦兹预长度空间**（Lorentzian pre-length space），从而首次构建了一个可适用于多种时空流形的统一、可微的有向图表征学习框架。其关键突破体现在以下四个相互耦合的维度：
 
@@ -141,7 +145,7 @@ $$F(\mathbf{x}_i, \mathbf{x}_j) := \sigma_{\theta_1}^{m}(\chi_{\gamma}^{2}(\math
 
 **需注意的局限**：凸正常邻域的超参数 $\varepsilon$ 在多数实验中被设为 $\infty$（全局邻域），其对复杂图结构的影响尚未系统消融；时间分离函数的选择目前依赖对具体时空的先验知识，尚未形成自动化方案。
 
-## 整体框架
+
 
 本工作提出一个**时空表征学习（Spacetime Representation Learning）**框架，将有向图嵌入到一类广泛的洛伦兹时空中，利用时空的因果结构自然地编码有向边的方向性与传递性。框架的核心思路是将有限有向图构造为**洛伦兹预长度空间（Lorentzian pre-length space）**，从而将图的边约束在节点所在凸正常邻域的未来时间锥内。
 
@@ -176,7 +180,7 @@ $$F(\mathbf{x}_i, \mathbf{x}_j) := \sigma_{\theta_1}^{m}(\chi_{\gamma}^{2}(\math
 
 该框架的关键创新在于：通过将边限制在凸正常邻域并使用基于平行传输的时间函数，**首次实现了可适用于多种时空（包括含闭类时曲线的圆柱闵可夫斯基时空）的统一、可微的有向图表征学习**，而此前方法要么局限于闵可夫斯基时空（Clough & Evans, 2017），要么采用无法推广到所有时空的 ad hoc 时间方向判定（Sim et al., 2021）。
 
-## 核心模块与公式推导
+
 
 ### 3.1 时空图构建：凸正常邻域与未来时间锥
 
@@ -230,7 +234,9 @@ $$\min_{\{\mathbf{x}_k\in\mathcal{M}\}_{k=1}^n} \sum_{(v_a,v_b)\notin E} \sigma_
 
 嵌入通过伪黎曼流形上的随机梯度下降进行优化（Algorithm 1, Appendix F）。每次迭代计算欧几里得梯度后，将其投影到切空间，再通过**指数映射** $\exp_{\mathbf{x}}$ 更新流形上的点，保证嵌入始终满足时空几何约束。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 有向图链接预测
 
@@ -293,7 +299,9 @@ $$\min_{\{\mathbf{x}_k\in\mathcal{M}\}_{k=1}^n} \sum_{(v_a,v_b)\notin E} \sigma_
 ![[assets/figures/papers/paper_list_l19_https_research_nvidia_com_labs_toronto_ai_spacetime_spacetime_representa/figures/008_Table_5.jpg]]
 *Table 5: Evaluation scores for the different learned representations (mean ± standard deviation). ↓ the lower the metric, the better. ↑ the larger the metric, the better*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有有向图表征方法的关系
 
@@ -327,6 +335,8 @@ $$\min_{\{\mathbf{x}_k\in\mathcal{M}\}_{k=1}^n} \sum_{(v_a,v_b)\notin E} \sigma_
 2. **端到端时间函数学习**：是否可以将时间分离函数 τ 与距离函数 χ² 的学习联合端到端优化，使框架摆脱对人工选择 τ 形式的依赖？
 3. **大规模优化**：如何高效地在百万节点以上的图上进行时空嵌入的优化与推理？是否可借鉴双曲空间中的 Poincaré 球投影技巧来加速伪黎曼梯度计算？
 4. **高指标扩展**：将框架推广到 ν>1 的伪黎曼流形后，能否编码有向图中不同类型的因果关系（如层级关系与引用关系的共现）？
+
+
 
 ## 原文 PDF
 

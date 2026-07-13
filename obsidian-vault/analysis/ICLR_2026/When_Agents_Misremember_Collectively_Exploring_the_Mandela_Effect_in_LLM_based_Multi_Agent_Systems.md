@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/When_Agents_Misremember_Collectively_Exploring_the_Mandela_Effect_in_LLM_based_Multi_Agent_Systems.pdf
+project_link: null
+code_link: https://github.com/bluedream02/Mandela-Effect
 openreview_forum_id: yIoMqDes7O
 aliases:
 - WAMCEMELBMAS
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 当代理集体“错误记忆”：探索基于大语言模型的多智能体系统中的曼德拉效应 |
 | 英文题名 | When Agents “Misremember” Collectively: Exploring the Mandela Effect in LLM-based Multi-Agent Systems |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=yIoMqDes7O); [GitHub](https://github.com/bluedream02/Mandela-Effect) |
+| Links | [paper](https://openreview.net/forum?id=yIoMqDes7O) · [GitHub](https://github.com/bluedream02/Mandela-Effect) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/planning_control |
 | Method | MANBENCH基准及认知锚定/来源审查/模型对齐防御策略 |
 | Dataset | MANBENCH |
@@ -41,7 +43,7 @@ claims:
 > - MANBENCH 上，Errata rate (Err^RS) 为 74.75% (Qwen3-235B)，对比 25.48% (Qwen3-235B under B)，变化 +49.27%。
 > - MANBENCH 上，Errata rate (Err^RS) 为 45.87% (Claude 4 Sonnet)，对比 20.48% (Claude 4 Sonnet under B)，变化 +25.39%。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -75,7 +77,7 @@ claims:
 
 当前研究主要受限于MANBENCH的多选问答范式，尚未覆盖开放式生成或真实多智能体对话场景。防御策略的有效性高度依赖具体提示措辞，且模型层防御的泛化能力仅在有限模型和领域上初步验证。研究聚焦于英文任务和西方文化背景，跨语言、跨文化情境下的集体记忆偏差仍有待探索。未来的关键方向包括：开发不依赖领域先验知识的通用防御机制（如引入独立批评智能体进行交叉验证），探索通过强化学习使LLM内生获得对集体认知偏差的免疫力，以及在更复杂的多轮渐进式说服攻击下评估现有防御的鲁棒性。
 
-## 背景与动机
+
 
 ### 多智能体系统的集体认知脆弱性
 
@@ -102,7 +104,9 @@ claims:
 
 通过构建专门的基准测试MANBENCH，设计多种社会影响交互协议，并在13个主流LLM上进行大规模实验，本文旨在揭示多智能体系统集体认知偏差的深层机制，并提出提示层和模型层两级的防御策略。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作首次将心理学中的**曼德拉效应**（Mandela Effect）——即群体性错误记忆的形成与固化——系统性地引入LLM多智能体系统安全评估，并揭示了当前主流大模型在此类社会认知偏差面前的普遍脆弱性。其核心创新可归结为三个层面：一个精确量化的评估基准、一个揭示因果机制的协议矩阵，以及一套从提示到模型权重的分层防御体系。
 
@@ -147,7 +151,7 @@ MANBENCH的核心方法论贡献在于构建了一个**可控、可量化的集�
 - 模型层防御仅在Llama 3.1-8B和医学领域（MedMCQA）上初步验证，跨模型、跨领域的泛化能力未知。
 - 实验聚焦于英文任务和西方文化背景知识，跨语言、跨文化情境下的集体记忆偏差规律尚待探索。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_yIoMqDes7O/figures/002_Figure_2.jpg]]
 *Figure 2: An overview of the five interaction protocols, where the Generic Group involves undifferentiated agents forming a simple social consensus, and the Role-based Group consists of agents with distinct, strategic roles. The Short-term timescale measures immediate, in-context response, while the Long-term timescale assesses whether beliefs persist after memory consolidation and retrieval*
@@ -236,7 +240,7 @@ RS 测量角色化叙事的即时影响，RL 测量其长期固化效果。实�
 
 整个框架的核心因果链路为：**交互协议中的社会影响机制（组组成 × 记忆时间尺度）→ 虚假叙事覆盖正确记忆 → 现实偏移率 $\sigma^{P}$ 量化效应强度**。群体规模调节效应强度：一般组中效应随智能体数量增加而饱和（约 7 个智能体），角色基础组呈倒 U 型（6 个智能体时达峰，超过 9 个后因“怀疑诱发警觉”而减弱）。模型规模并非线性保护因素——Claude 系列从 72.0%（Haiku）降至 39.6%（Sonnet），但 Qwen3 系列从 89.3%（8B）升至 92.2%（235B），出现逆向缩放。
 
-## 核心模块与公式推导
+
 
 ### 任务策展与领域分类
 
@@ -311,7 +315,9 @@ $$\sigma_{max} = \frac{|(\mathcal{Q}_{\times}^{GS} \cup \mathcal{Q}_{\times}^{GL
 
 **监督微调（Supervised Fine-Tuning, SFT）**基于两类数据集：**韧性集**来自认知锚定和来源审查提示下成功防御曼德拉效应的推理链，**合作集**包含正确引导（纠正性引导）和知识丰富（丰富性引导）两种合作场景。通过在平衡数据集上微调，使模型内生地获得对社会操控的抵抗力，同时维持正常协作能力（Section 5.2, D.2）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：曼德拉效应的普遍性与强度
 
@@ -405,7 +411,9 @@ Figure 6 的消融实验揭示了模型层防御（SFT）的关键权衡。仅�
 *Table 9: Domains, tasks, and corresponding expert roles used in the prompts*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：多智能体系统中的集体认知偏差
 
@@ -474,6 +482,8 @@ MANBENCH并非提出新的模型架构或训练范式，而是构建了一套**�
 5. **架构差异**：曼德拉效应在不同LLM架构（如MoE、状态空间模型）上是否存在系统性差异？论文观察到Qwen3系列出现逆向缩放（8B的89.3%升至235B的92.2%），而Claude系列则随规模改善（72.0%降至39.6%），这一现象的根本原因值得深入探究。
 
 6. **下游影响量化**：如何量化评估社会交互导致的记忆篡改对下游决策的具体影响？当前指标仅衡量知识层面的偏移，未追踪错误信念如何传播并影响后续行动。
+
+
 
 ## 原文 PDF
 

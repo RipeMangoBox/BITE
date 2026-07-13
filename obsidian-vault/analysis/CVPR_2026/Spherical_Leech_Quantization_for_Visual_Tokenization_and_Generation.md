@@ -44,7 +44,7 @@ claims:
 > - ImageNet-1k val (256x256) 上，rFID 0.83 vs 1.14 (BSQ d=18) (-0.31)。
 > - Kodak (compression) 上，PSNR / MS-SSIM / BPP 29.632 / .9637 / 0.2747 vs 28.86 / .9561 / 0.2788 (BSQ d=18) (+0.77 / +0.0076 / -0.0041)。
 
-## 概述
+## 概要
 
 ### 研究问题与瓶颈
 
@@ -81,7 +81,7 @@ claims:
 
 当前工作主要验证了类条件图像生成，尚未探索文本条件生成等更复杂场景。Leech网格码本是固定的，可能无法适应特定数据分布，其微调空间未被探索。超大码本在较小模型上存在利用率不均衡的问题。此外，自回归生成中的采样策略仍依赖启发式调整。这些方向为后续研究留下了空间，例如将Λ24-SQ扩展至视频或音频领域，或设计可学习的轻量级变形以适应特定域。
 
-## 背景与动机
+
 
 ### 视觉标记化的核心挑战
 
@@ -113,7 +113,9 @@ $$\mathcal{L}_{\mathrm{entropy}} = \mathbb{E}[H[q(\boldsymbol{z})]] - \gamma H[\
 
 在此基础上，论文选择了 **24 维 Leech 网格的第一壳层向量**作为码本——该网格在 24 维空间中实现了已知最优的球体堆积密度，其第一壳层包含 196,560 个向量，恰好构成一个规模可观且几何性质极佳的固定码本。这一方法被命名为 **球形 Leech 量化（Λ24-SQ）**，其核心优势在于：将码本设计的理论根基从“经验调参”提升至“最优几何”，以极简的训练范式（仅需 ℓ1、GAN 和 LPIPS 三种损失，无需承诺损失和熵惩罚）实现了显著的质量提升——在 ImageNet-1k 上 rFID 从 BSQ 的 1.14 降至 0.83，并在自回归生成中首次以约 20 万码本规模达到接近验证集预言机的 FID（1.82 vs. 1.78）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 从熵正则化到球面堆积：量化方法的几何统一
 
@@ -161,7 +163,7 @@ Figure 3的训练曲线表明，这两项技术使梯度范数稳定、损失曲
 
 一个反直觉的发现是：使用DINOv2特征进行VF对齐虽略微降低重建指标（rFID从0.83升至0.92），却显著提升生成结果的FID、IS和召回率（Figure 5, Figure 6）。这揭示了量化表示在“忠实重建”与“语义生成”之间的根本张力，而VF对齐通过引入语义先验有效缓解了这一困境。
 
-## 整体框架
+
 
 本文提出的球形Leech量化（Spherical Leech Quantization，**Λ24-SQ**）构建了一套从图像标记化到视觉生成的全流水线。该框架以**网格编码（lattice coding）**为统一视角，将非参数量化方法重新解释为网格上的编码问题，并借助高维球体堆积理论设计码本，从而在无需熵正则化的条件下实现高质量图像重建与生成。
 
@@ -217,7 +219,7 @@ $$\operatorname*{max}_{\pmb{c}_1,\cdots,\pmb{c}_N \in \mathbb{S}^{d-1}} \operato
 ![[assets/figures/papers/paper_list_l934_https_arxiv_org_abs_2512_14697/figures/001_Figure_1.jpg]]
 *Figure 1: Upper left: A Venn Diagram that contains all definitions and quantization methods covered in this paper. We provide a unified formulation of various non-parametric quantization methods [56, 86, 91] from a lattice-coding perspective in Section 3.1. The geometric interpretation of the entropy penalties in Section 3.2 then leads to a family of densest hypersphere packing lattices (Section 3.3). Based on the spherical Leech lattice, a 24-d case of the densest hypersphere packing lattices, we instantiate Spherical Leech Quantization*
 
-## 核心模块与公式推导
+
 
 ### 视觉标记化的统一网格编码视角
 
@@ -293,7 +295,9 @@ $$z \xrightarrow{f(\cdot)} \bar{z} = \lfloor L/2 \rfloor \tanh(z) \xrightarrow{Q
 
 ![[assets/figures/papers/paper_list_l934_https_arxiv_org_abs_2512_14697/figures/004_Figure_2.jpg]]
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -396,7 +400,9 @@ $$z \xrightarrow{f(\cdot)} \bar{z} = \lfloor L/2 \rfloor \tanh(z) \xrightarrow{Q
 ![[assets/figures/papers/paper_list_l934_https_arxiv_org_abs_2512_14697/figures/015_Figure_7.jpg]]
 *Figure 7: Scaling effect of the codebook size. Left: Increasing the codebook size improves gFID when the model is large (0.49B). Right: Increasing the codebook size pushes the Precision-Recall Pareto frontier towards the oracle precision-recall derived from the validation set (see the zoom-in at the bottom left)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 非参数量化的统一视角：从启发式到网格编码
 
@@ -466,6 +472,8 @@ $\delta_{\min}$ 从0.471提升至0.866（**提升超过80%**），同时有效�
 4. **与扩散模型的结合**：Λ24-SQ作为离散标记器，能否与连续扩散模型结合，实现更高质量的生成或更高效的压缩？
 
 5. **理论完备性**：采样策略（CFG线性缩放、top-p/top-k组合）的启发式本质表明，自回归生成侧的理论基础仍落后于量化侧的几何理论，需要更系统的研究。
+
+
 
 ## 原文 PDF
 

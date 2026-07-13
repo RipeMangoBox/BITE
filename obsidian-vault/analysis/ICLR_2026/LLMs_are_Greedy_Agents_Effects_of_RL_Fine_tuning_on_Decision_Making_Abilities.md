@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/LLMs_are_Greedy_Agents_Effects_of_RL_Fine_tuning_on_Decision_Making_Abilities.pdf
+project_link: null
+code_link: null
 openreview_forum_id: weUP6H5Ko9
 aliases:
 - RRLFTSGCR
@@ -42,7 +44,7 @@ claims:
 > - Tic-tac-toe vs MCTS (optimal) 上，Average Return 为 0.0 (RLFT, draws)，对比 −0.95 (ICL, loses)，变化 +0.95。
 > - Gaussian MABs (button, 10 arms, medium noise) 上，Action Coverage 为 52% (2B after 30K RLFT steps)，对比 40% (2B without RLFT)，变化 +12 percentage points。
 
-## 概述
+## 概要
 
 **核心瓶颈**：在大语言模型（LLM）被用作决策智能体时，普遍表现出三种行为偏差——**贪婪性**（过早锁定少量高奖励动作，导致高达55%的动作空间从未被探索）、**频率偏差**（机械重复历史高频动作，与奖励信号脱钩）和**知行差距**（能生成正确推理但无法转化为正确行动）。其中，贪婪性是导致次优探索的根本原因。
 
@@ -60,7 +62,7 @@ claims:
 
 **局限与待验证边界**：当前实验限于中小规模模型（2B–27B）和简单环境（赌博机、井字棋），向更大规模模型和复杂状态化任务的迁移性尚未验证。非单调的规模效应（如Qwen-2.5 7B表现优于14B）和RLFT无法完全消除的频率偏差表明，当前架构存在根本性限制。知行差距的完全闭合仍是开放问题。
 
-## 背景与动机
+
 
 ### 大语言模型作为决策智能体
 
@@ -84,7 +86,9 @@ claims:
 
 上述发现指向一个核心问题：**LLM 的决策失败根植于其预训练过程中形成的行为偏差，而非推理能力的缺失。** 因此，本文提出通过强化学习微调（RLFT），让 LLM 在与环境交互的过程中，基于自生成的思维链推理和实际环境奖励进行策略优化。核心假设是：RLFT 能够教会模型为探索行为赋予价值，从而将“知道”转化为“做到”——缩小知行鸿沟，克服贪婪性和频率偏差，最终提升决策质量。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题诊断：LLM 决策中的三种行为偏差
 
@@ -135,7 +139,7 @@ RLFT 的核心价值在于**教会LLM将“知道”转化为“做到”**，�
 - 知行差距未完全消除——RLFT后模型仍偶有贪婪选择。
 - 非单调缩放现象（如Qwen-2.5 7B > 14B）提示预训练因素对探索行为有复杂影响，机制尚不明确。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l39_https_openreview_net_forum_id_weUP6H5Ko9/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of our Reinforcement Learning Fine Tuning (RLFT) pipeline. We fine-tune a pre-trained LLM πθ via self-generated Chain-of-Thought (CoT) rationales on environment rewards*
@@ -186,7 +190,7 @@ $$\max_{\theta} \mathbb{E}_{(c,z) \sim \mathcal{D}} \left[ \min\left( \frac{\pi_
 
 Figure 1 以架构图形式完整展示了这一流水线：从上下文构建到 CoT 生成，再到奖励塑形与 PPO 优化的闭环流程。
 
-## 核心模块与公式推导
+
 
 RLFT 方法将决策任务形式化为一个**上下文条件化的自回归生成问题**，并通过强化学习对预训练大语言模型进行微调。其技术架构由五个核心模块串联构成，围绕一个带 KL 约束的 PPO 裁剪目标进行优化。
 
@@ -237,7 +241,9 @@ RLFT 位于**LLM 决策智能体**与**强化学习微调**的交汇点。与传
 
 在基线方法层面，论文将 RLFT 与三类方案对比：**UCB**（Auer, 2002）作为最优算法上界，**随机智能体**作为性能下界，**ICL**（冻结 LLM + CoT 提示但无微调）作为直接对照。实验表明，SFT 在专家数据上可达到与 UCB 相当的后悔值，但 RLFT 在无需专家数据的情况下实现了更强的跨任务泛化能力。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：LLM决策的三种失败模式
 
@@ -304,7 +310,9 @@ RLFT在多个环境中展现了显著的性能提升，其效果通过以下关�
 
 所有实验遵循统一的超参数设置（Table 1）。训练采用30K更新步数，累积批次大小为128，优化器为AdaFactor，学习率调度采用线性预热加余弦衰减（范围1e-4至1e-6）。上下文窗口为1792 tokens，生成预算G默认为256 tokens。RLFT使用PPO+KL损失，以蒙特卡洛回报作为基线，KL惩罚系数β=0.04。训练硬件为4块H100 GPU，总训练时间约24小时（2B模型）。多步token生成是训练成本的主要来源——典型配置下，每轮rollout需生成50步×256 tokens=12.8K tokens。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 方法在决策智能体谱系中的位置
 
@@ -345,6 +353,8 @@ RLFT在多个环境中展现了显著的性能提升，其效果通过以下关�
 5. **计算效率**：现代循环架构或记忆机制能否降低长思考时间 rollout 的计算成本，使 RLFT 在更大规模上可行？
 6. **非单调缩放的成因**：Qwen-2.5 7B > 14B 的现象是否与特定预训练数据分布、指令微调策略或架构选择有关？
 7. **奖励塑形设计空间**：是否存在更优的奖励塑形或探索奖励设计，能够在不引入额外偏差的情况下完全克服贪婪性和频率偏差？
+
+
 
 ## 原文 PDF
 

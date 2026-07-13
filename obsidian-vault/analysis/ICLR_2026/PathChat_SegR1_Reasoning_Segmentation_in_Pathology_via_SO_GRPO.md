@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/PathChat_SegR1_Reasoning_Segmentation_in_Pathology_via_SO_GRPO.pdf
+project_link: null
+code_link: https://github.com/yul945562-bit/Pathseg
 openreview_forum_id: DQESI75YrD
 aliases:
 - PS
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | PathChat-SegR1：基于SO-GRPO的病理学推理分割 |
 | 英文题名 | PathChat-SegR1: Reasoning Segmentation in Pathology via SO-GRPO |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=DQESI75YrD); [GitHub](https://github.com/yul945562-bit/Pathseg) |
+| Links | [paper](https://openreview.net/forum?id=DQESI75YrD) · [GitHub](https://github.com/yul945562-bit/Pathseg) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | PathChat-SegR1 |
 | Dataset | PMBT (zero-shot), RD (zero-shot), RDw/E (one-shot), FS-WSI |
@@ -42,7 +44,7 @@ claims:
 > - RD (zero-shot) 上，Dice 为 0.53，对比 0.33 (MMR-7B)，变化 +0.20。
 > - RDw/E (one-shot) 上，Dice 为 0.72，对比 0.47 (MMR-7B)，变化 +0.25。
 
-## 概述
+## 概要
 
 病理图像分割面临一个根本性瓶颈：现有通用推理分割模型缺乏病理领域知识，其视觉编码器无法应对染色变异，且大语言模型（LLM）无法自主判断推理上下文中语义信息是否充分，以适时触发分割，导致对未见病理形态的泛化能力受限。
 
@@ -52,7 +54,7 @@ PathChat-SegR1 针对这一瓶颈提出了一套系统性的解决方案。其�
 
 实验证据表明这些设计的有效性。在PMBT零样本评估中，PathChat-SegR1 相比最佳基线 **MMR-7B**（Jang et al., 2025）提升了 **61%**（Dice 0.58 vs 0.36）；在罕见病数据集（RD）和单样本罕见病数据集（RDw/E）上分别达到 0.53 和 0.72 Dice（Table 3）。消融实验证实，移除RL阶段导致 0.18 Dice 下降，移除Ruipath编码器导致 0.16 Dice 下降，而 SO-GRPO 相比标准GRPO提升了 0.05 Dice 并将收敛步数从24K减少到18K（Table 4, Table 5）。
 
-## 背景与动机
+
 
 病理图像分割是肿瘤诊断、治疗决策和预后评估的关键环节。然而，病理图像具有高度异质的组织形态、复杂的染色变异和多样化的放大倍率，使得自动化分割面临严峻挑战。现有分割方法可大致分为三类，各自存在显著的局限性。
 
@@ -72,7 +74,9 @@ PathChat-SegR1 针对这一瓶颈提出了一套系统性的解决方案。其�
 
 通过上述设计，PathChat-SegR1 在零样本病理分割场景下实现了对现有最佳方法的显著超越——在肺骨转移瘤（PMBT）基准上相对 MMR-7B 提升 61%（0.58 vs 0.36 Dice），验证了“语义触发时机自主决策”这一核心洞见的有效性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PathChat-SegR1 的核心创新在于通过三个**changed slots**系统性解决了病理推理分割中的关键瓶颈：现有模型因视觉编码器缺乏病理领域知识、LLM无法自主判断分割触发时机，导致对未见病理形态的泛化能力严重受限。
 
@@ -125,7 +129,7 @@ $$\mathcal{I}_{\mathrm{SO-GRPO}}(\theta) = \mathbb{E}_{\tau \sim \pi_{\theta}} \
 
 **创新协同效应**：三个创新形成因果闭环——病理专用编码器提供高质量视觉表征（创新一），GAE 机制使 LLM 能自主判断何时触发分割（创新二），SO-GRPO 通过可微奖励将分割质量信号反馈至推理策略优化（创新三）。三者共同支撑了 PathChat-SegR1 在零样本 PMBT 评估中相对最佳基线 MMR-7B 实现 **61% 的相对提升**（0.58 vs 0.36 Dice），以及在一次样本罕见病分割中达到 **0.72 Dice** 的性能突破。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_DQESI75YrD/figures/002_Figure_1.jpg]]
 *Figure 1: PathChat-SegR1 architecture overview*
@@ -181,7 +185,7 @@ Table 1 系统对比了 PathChat-SegR1 与现有病理分割方法的能力差�
 
 消融实验（Table 4）量化了各模块的贡献：移除 Ruipath 编码器导致 Dice 下降 0.16，移除 RL 训练阶段下降 0.18，移除染色不变自蒸馏下降至 0.51，证实了病理专用编码和自主分割触发是性能提升的核心来源。
 
-## 核心模块与公式推导
+
 
 PathChat-SegR1 的核心架构由三个关键模块构成，其瓶颈突破依赖于 **<SEG> token 生成时机的自主决策**——LLM 在推理过程中何时触发分割，决定了视觉特征、推理上下文与空间信息三者的对齐质量。
 
@@ -241,7 +245,9 @@ $$\mathcal{L}_{\mathrm{SFT}} = \lambda_{\mathrm{CoT}} \cdot \mathcal{L}_{\mathrm
 
 其中 $\mathcal{L}_{\mathrm{CE}}$ 为推理链生成的交叉熵损失，$\mathcal{L}_{\mathrm{Dice}} + \mathcal{L}_{\mathrm{BCE}}$ 为掩码预测的 Dice 和二元交叉熵损失，$\lambda_{\mathrm{CoT}}$ 和 $\lambda_{\mathrm{seg}}$ 为平衡权重。SFT 阶段对 VLM 施加 LoRA（秩 16，dropout 0.1），对视觉编码器施加适配器，对掩码解码器进行全参数训练。移除 SFT 阶段导致 Dice 下降 0.14（Table 4），移除整个 RL 阶段则下降 0.18，表明两阶段训练对最终性能均有显著贡献。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -287,7 +293,9 @@ Figure 3展示了PathChat-SegR1在罕见病理上的单样本上下文学习能�
 
 所有推理分割方法在统一数据集和零样本设定下评估，闭集方法在各自数据集上单独训练。使用8:1:1随机划分，所有模型在相同硬件（8×H800 GPU）和超参数下训练，确保对比的公平性。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有推理分割工作的关系
 
@@ -336,6 +344,8 @@ PathChat-SegR1 提出的 **SO-GRPO**（Segmentation-Optimized GRPO）是对标�
 4. **半自动推理链标注的质量依赖性**：论文使用 Gemini-2.5-Pro 和 DeepSeek-R1 生成推理链，再由三位病理学家修正。这种半自动标注的质量直接影响 SFT 阶段的监督信号质量，进而可能影响最终模型的推理准确性。论文未对标注质量进行系统性的 inter-rater 可靠性分析。
 
 5. **计算成本与部署可行性**：三阶段训练（预训练 + SFT + RL）需要 8×H800 GPU，且 RL 阶段需要 18K 步收敛。对于资源受限的临床部署场景，训练成本可能成为推广障碍。论文未讨论模型压缩或推理加速策略。
+
+
 
 ## 原文 PDF
 

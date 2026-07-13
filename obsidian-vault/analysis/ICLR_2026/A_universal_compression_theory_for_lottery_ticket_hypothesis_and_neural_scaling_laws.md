@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/A_universal_compression_theory_for_lottery_ticket_hypothesis_and_neural_scaling_laws.pdf
+project_link: null
+code_link: null
 aliases:
 - UCMMC
 - UCTLTHNSL
@@ -41,7 +43,7 @@ claims:
 > - cylindrical harmonic function learning 上，Test MSE loss (network width compression) 为 compressed width d′=10³ (k=5)，对比 original width d=10⁴，变化 training dynamics indistinguishable。
 > - teacher–student (neural scaling law, data) 上，MSE loss vs. dataset size 为 compressed dataset scaling exponent α̂≈0.60，对比 original dataset scaling exponent α≈0.13，变化 Δα = +0.47。
 
-## 概述
+## 概要
 大规模神经网络与海量训练数据普遍面临维度灾难，导致训练成本极高;然而，对称性——尤其是模型权重与数据样本之间的置换不变性——为非平凡压缩提供了可能。本工作为彩票假说和神经尺度定律建立了一套统一的通用压缩理论:任意光滑的置换对称函数都可以被无损压缩到仅需约 $O(\operatorname{polylog} d)$ 个加权对象，且这一压缩率被证明是最优的。
 
 核心控制手段是**矩匹配阶数 $k$ 与聚类直径**。算法先通过聚类将对象分组为小直径子集，再在每个子集内调整权重，使得前 $k$ 阶张量矩保持不变;这一过程可将 $d$ 个对象压缩为 $d'$ 个带权对象。通用压缩定理(定理 4)给出误差界
@@ -58,7 +60,7 @@ $$\bigl|\phi(c')-\phi(c)\bigr| = O\!\left(d\,(d')^{1-\frac{k+1}{m}}\right),$$
 
 需要注意的是，理论严格依赖于函数的 Taylor 光滑性假设，实验仅基于合成任务，对 ReLU 等非光滑激活尚未建立等强度的误差界;聚类环节使用启发式策略，其理论保证亦未完全覆盖混合算法。此外，压缩算法在实际大模型和真实数据集上的有效性与公平性仍有待验证。
 
-## 背景与动机
+
 
 现代深度学习的成功很大程度上依赖于不断增长的数据集规模和模型参数量，但这种扩展也带来了严重的“维度灾难”：当数据点数量 $d$ 或网络神经元数量变得极大时，训练所需的计算开销与存储成本急剧上升，而边际性能提升却逐渐降低。大量经验观察表明，损失函数 $L$ 随数据规模 $d$ 的衰减通常服从幂律形式
 
@@ -92,7 +94,9 @@ $$
 
 本文正是围绕上述问题展开。我们基于置换对称性与矩匹配理论，提出一个**通用压缩理论**：对任意光滑的 $d$ 元对称函数，可以利用前 $k$ 阶张量矩的保持，将 $d$ 个对象压缩为仅 $d' = O(\mathrm{polylog}\,d)$ 个加权对象，且压缩误差随对象数增加而趋于零；同时证明这一压缩率在渐近意义下是最优的。将该理论分别应用于数据点和神经元，可以得到：**（1）** 在原数据集上保持训练动态的压缩数据集，使缩放指数 $\alpha$ 从约 $0.13$ 跃升至约 $0.60$；**（2）** 压缩后的子网络能在整个训练过程中完美复现原网络的损失轨迹，从而严格证明了“动态彩票假说”。这些发现表明，利用置换对称性进行结构化压缩，不仅能大幅降低计算与存储成本，更有望从原理上提升神经缩放定律的效率，为大规模神经网络的高效训练提供新的理论基石。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于**通过保持置换对称函数的前 k 阶张量矩，并利用小直径聚类，将大规模对象集（神经元或数据点）压缩为极少数加权对象，同时几乎不损失信息**。这一压缩策略直接改变了三个影响性能与控制代价的关键槽位（changed slots），使得原本难以优化的维度灾难问题得到有效缓解。
 
@@ -122,7 +126,7 @@ $$
 
 尽管理论误差界针对贪婪策略给出严格证明，而实验采用混合 $k$-均值/贪婪策略，后者目前缺乏同样强的理论保证（附录 D）；同时，高阶矩匹配的计算复杂度随 $k$ 和对象维度 $m$ 快速增长，在极高维应用场景中仍需进一步优化。总体而言，这一创新框架将彩票假说与神经尺度定律统一在压缩理论的视角下，为理解大规模模型的对称性与压缩性提供了坚实且可操作的数学基础。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0004_vxkzW4ljeX_A_universal_compression_theory_for_lottery_ticke/figures/001_Figure_1.jpg]]
 *Figure 1: (a) Illustration of the main idea behind the compressibility of neural networks and datasets. (1) Permutation symmetry allows a high-dimensional function to be decomposed into a composition of d lowdimensional “objects” (dots in the figure). (2) When d is large, these objects become crowded, and those lying in denser regions are essentially redundant; they can be compressed into $d ^ { \prime }$ = O ( $\mathrm { p o l y l o g }$ d ) objects. The potential curse of dimensionality can thus be mitigated, or even removed, when the underlying function is smooth—a lesson well known in nonparametric statistics. (b) Decomposing the linear weights of a neural network into “objects” of symmetric status
@@ -148,7 +152,7 @@ $$
 
 需注意的薄弱环节：目前实验仅在合成任务上验证；$k$-means 等启发式聚类虽在实践中高效，却缺乏严格误差上界；非光滑激活（如 ReLU）的支持还缺乏理论保证，且高维对象（$m$ 大）时矩匹配的计算复杂度急剧上升。以上证据强度高（定理 4、7、8 置信度 0.95；图 3、4 实验一致性置信度 0.9‑0.95），但对真实大模型场景仍需手动谨慎评估。
 
-## 核心模块与公式推导
+
 
 ### 关键压缩模块
 
@@ -197,7 +201,9 @@ $$d' = O\!\left(\log^m \frac{d}{\varepsilon(d)}\right).\tag{45}$$
 
 > **边界与局限**：上述误差界假设激活函数光滑（如 sigmoid）；对 ReLU 等非光滑情形仅进行了实验验证，缺乏严格界。实际采用的混合 k‑means/贪心聚类策略尚未获得与纯贪心策略等同的理论保证。高阶矩匹配的计算复杂度随 $k$ 和维度 $m$ 快速增长，限制了对高维对象的直接应用。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 我们在一系列合成对称函数和教师‑学生任务上验证通用压缩理论的三个核心主张：**压缩误差以多项式速率随对象数衰减**，**压缩数据集/子网络能够复现完整训练动态（动态彩票假说）**，以及**压缩操作可系统性地提高神经尺度定律的指数**。
 
@@ -260,7 +266,9 @@ $$d' = O\!\left(\log^m \frac{d}{\varepsilon(d)}\right).\tag{45}$$
 ![[assets/figures/papers/iclr26_0004_vxkzW4ljeX_A_universal_compression_theory_for_lottery_ticke/figures/021_Figure_8.jpg]]
 *Figure 8: Error scaling of compressing a general symmetric function using the moment-matching method. Here, various different values of k (the order of moment matching) are attempted, from small to large, until the smallest error is found. Each data point is an average over 5 random instances, plotting the average with error bar standing for one standard deviation*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 本文的“通用压缩”框架将神经网络权重或数据点视为置换对称的“对象”，通过**矩匹配**（保留前 k 阶张量矩）与**聚类**（控制对象直径）将 d 个对象压缩为仅 d′ 个加权对象。其核心因果旋钮是**矩匹配阶数 k** 和**聚类直径**：提高 k 或缩小聚类直径可直接降低压缩误差，代价是更高的算法复杂度。
 
@@ -286,6 +294,8 @@ $$d' = O\!\left(\log^m \frac{d}{\varepsilon(d)}\right).\tag{45}$$
 - **聚类‑矩匹配混合算法**的误差上界如何分析？其计算最优复杂度（作为 m, k, d 的函数）是什么？
 - 压缩方法在**多模态、大规模预训练**场景下的鲁棒性如何？直接压缩神经元或注意力头是否仍能保持训练动态与下游任务性能一致？
 - 矩匹配技术能否和**量化、蒸馏、剪枝**等成熟模型压缩手段深度融合，从而在推理阶段同时减少权重数量和精度位宽？
+
+
 
 ## 原文 PDF
 

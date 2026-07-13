@@ -5,6 +5,8 @@ paper_level: A
 venue: ICCV
 year: 2023
 pdf_ref: paperPDFs/ICCV_2023/Guided_Motion_Diffusion_for_Controllable_Human_Motion_Synthesis.pdf
+project_link: https://korrawe.github.io/gmd-project/
+code_link: null
 aliases:
 - GMDG
 - GMDCHMS
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 可控人体运动合成的引导运动扩散模型 |
 | 英文题名 | Guided Motion Diffusion for Controllable Human Motion Synthesis |
 | 会议/期刊 | ICCV 2023 |
-| Links | [paper](https://arxiv.org/abs/2305.12577); [Project](https://korrawe.github.io/gmd-project/) |
+| Links | [paper](https://arxiv.org/abs/2305.12577) · [Project](https://korrawe.github.io/gmd-project/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/robotics |
 | Method | Guided Motion Diffusion (GMD) |
 | Dataset | HumanML3D, HumanML3D (keyframe-conditioned) |
@@ -40,7 +42,7 @@ claims:
 > - HumanML3D 上，FID (text-to-motion) 为 0.212，对比 0.556 (MDM)，变化 -0.344。
 > - HumanML3D (keyframe-conditioned) 上，Location error (τ=100) 为 两阶段轨迹模型使位置误差相比单阶段模型降低超过 50%，对比 单阶段模型 (τ=100)，变化 减少 >50%。
 
-## 概述
+## 概要
 
 扩散模型在文本到人体运动生成上取得了显著进展，然而当引入空间约束（如轨迹、关键帧位置、障碍物规避）时，现有方法普遍面临一个核心瓶颈：人体运动表示中全局空间信息仅占 4 维（骨盆旋转与地面位置），而局部姿态占据 259 维，这种极端的维度不平衡使扩散模型倾向于将稀疏的空间引导信号当作噪声丢弃，导致生成的运动出现脚滑、轨迹偏离等不一致现象。
 
@@ -48,7 +50,7 @@ claims:
 
 GMD 采用两阶段生成管道：第一阶段使用 ε 参数化的轨迹扩散模型生成满足空间目标的全局轨迹；第二阶段以该轨迹和文本为条件，通过集成强调投影的 x0 参数化运动扩散模型合成完整运动序列。在 HumanML3D 数据集上，GMD 的文本到动作生成 FID 达到 0.212，相比基线 MDM 的 0.556 显著降低；在关键帧条件任务中，两阶段轨迹模型使位置误差相比单阶段模型降低超过 50%。消融实验进一步证实，强调投影（c=10）使脚滑率降至 0.128，而移除密集信号传播后模型完全忽略关键帧目标——这两项机制是 GMD 实现可控生成的必要条件。
 
-## 背景与动机
+
 
 ### 问题定义
 
@@ -87,7 +89,9 @@ Figure 3 直观展示了这一问题：在标准方法下，引导仅更新运�
 
 GMD 通过两个核心机制回应上述动机：**强调投影（Emphasis Projection）** 利用线性随机投影放大轨迹部分在运动表示中的方差比重，强制模型在训练和推理中关注空间信息；**密集信号传播（Dense Signal Propagation）** 将扩散模型的去噪网络视为运动先验，通过反向传播将稀疏关键帧梯度扩散为覆盖整个序列的稠密引导，无需额外训练。两阶段管道（轨迹 DPM + 运动 DPM）进一步将空间规划与姿态生成解耦，轨迹 DPM 采用 $\epsilon$ 参数化以消除引导后期的收缩偏置，运动 DPM 集成强调投影和掩码分类器引导以生成连贯的全身运动。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GMD 的核心创新在于将空间引导问题重新定义为**表示学习**与**引导信号密集化**问题，而非简单地堆叠条件模块。其相对于基线（MDM，基于 Transformer 的文本到动作扩散模型）的关键改变可归纳为四个 changed slots，这些改变共同解决了扩散模型在接收稀疏空间约束时将其视为噪声而忽略的根本瓶颈。
 
@@ -135,7 +139,7 @@ GMD 将运动根表示从相对表示（逐帧增量）改为绝对表示（全�
 
 上述四个 changed slots 并非独立改进，而是构成一个**因果链条**：绝对根表示使空间约束可直接作用于全局坐标；强调投影确保这些约束在梯度更新中获得足够的方差权重；密集信号传播将稀疏约束沿时间轴扩散；ε 参数化则保证引导信号在去噪全程不被模型偏置覆盖。缺失任一环节，整个空间引导机制都会失效——这正是 MDM 等基线在空间约束任务上表现不佳的根本原因。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2305_12577/figures/007_Figure_5.jpg]]
 *Figure 5: Generated motion, conditioned a given trajectory and text “walking forward”. MDM [54] exhibits motion incoherence where the model disregards the trajectory and generates an inconsistent motion. Our method, improved by emphasis projection, deals effectively with the conditioning*
@@ -153,7 +157,7 @@ GMD 采用**两阶段扩散管道**，将空间约束运动生成解耦为轨迹
 
 **输入输出流总结**：文本提示 → CLIP 编码器 → 文本嵌入；文本嵌入 + 空间约束（关键帧/障碍物）→ 轨迹 DPM → 轨迹 $\mathbf{z}$；轨迹 $\mathbf{z}$ + 文本嵌入 → 运动 DPM（含强调投影）→ 完整运动序列 $\mathbf{x}$。两阶段均通过插补与密集信号传播的组合机制实现空间约束的精确遵循。
 
-## 核心模块与公式推导
+
 
 GMD 的核心架构由两个扩散概率模型（DPM）串联构成：**轨迹 DPM（Trajectory DPM）** 和 **运动 DPM（Motion DPM）**，两者通过两个关键机制——**强调投影（Emphasis Projection）** 和 **密集信号传播（Dense Signal Propagation）**——实现对空间约束的有效响应。
 
@@ -215,7 +219,9 @@ $$\mu_t = \frac{\sqrt{\alpha_{t-1}}\beta_t}{1-\alpha_t} \mathbf{x}_0 + \frac{\sq
 
 - **障碍物规避**：结合导航目标函数 $G_x^{\mathrm{loc}}$ 和斥力目标函数 $G_x^{\mathrm{obs}} := \sum_{i} - \mathrm{clipmax}(\mathrm{SDF}((P_x^z \mathbf{x})^{(i)}), c)$，其中 SDF 为有符号距离函数，$c$ 为安全距离阈值，当人体模型越过障碍边界时产生斥力梯度。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 文本到动作生成主结果
 
@@ -258,7 +264,9 @@ GMD 在障碍物规避任务中通过组合两个目标函数实现空间约束�
 ![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2305_12577/figures/013_Table.jpg]]
 *Table: D.1. Network architecture of our GMD’s models based on the proposed 1D UNET with AdaGN*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 GMD 的起点是 **MDM**（Tevet et al.，2023）——一个基于 Transformer 的文本到动作扩散模型，其运动表示中全局空间信息（骨盆旋转与地面位置）仅占 4 维，远少于局部姿态的 259 维。这一结构性倾斜导致 MDM 在接收空间约束（如轨迹、关键帧位置）时，将这些稀疏信号当作噪声丢弃，表现为脚滑、轨迹偏离等运动不一致。
 
@@ -269,6 +277,8 @@ GMD 并未推翻 MDM 的扩散框架，而是在其上插入两个因果调节�
 **适用边界与局限**：GMD 的空间引导能力依赖于手工设计的目标函数，这在涉及复杂物理接触（如抓取物体、与动态环境交互）时难以泛化。两阶段管道增加了推理时间，不适用于实时交互式应用。强调投影的超参数 c 需手动设定，在不同数据集或运动风格下可能需重新调整。密集信号传播的效果受限于 DPM 的去噪能力，在极端稀疏或噪声较大的引导下仍可能不稳定。此外，轨迹 DPM 容易过拟合，训练轮次需精细控制以避免抵抗分类器引导。
 
 **开放问题**：如何为高维人体运动数据设计有效的 ε 预测模型，既能保证生成质量又能充分响应引导信号？能否将强调投影中的 c 值设计为可学习或自适应，避免对不同数据集的手动微调？GMD 框架是否可以扩展至多角色交互或与动态物体的物理接触场景，而不仅限于静态障碍物和关键帧？在更长的运动序列生成中，如何保持密集信号传播的计算效率和控制精度？
+
+
 
 ## 原文 PDF
 

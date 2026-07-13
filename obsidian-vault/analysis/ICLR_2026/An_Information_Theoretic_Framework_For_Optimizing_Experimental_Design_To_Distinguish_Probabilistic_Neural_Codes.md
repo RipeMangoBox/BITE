@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/An_Information_Theoretic_Framework_For_Optimizing_Experimental_Design_To_Distinguish_Probabilistic_Neural_Codes.pdf
+project_link: null
+code_link: null
 openreview_forum_id: doxBjZ88H3
 aliases:
 - IGMF
@@ -42,7 +44,7 @@ claims:
 > - Simulated populations across diverse task parameters (Poisson and gain-modulate... 上，Decoder performance difference vs. theoretical information gap 为 Strong correlation (close to y=x line) between theoretical Δ^{info} and empirical decoder difference.，对比 N/A (but predictions match)，变化 Not applicable; no direct comparison。
 > - Allen Visual Coding dataset (169 sessions with >300 trials) 上，Cross-entropy performance difference (likelihood decoder - posterior decoder) 为 0.0024 ± 0.064 (mean ± std)，对比 Model prediction of 0 under single-context uniform prior，变化 Not significantly different from 0 (p=0.63)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -75,7 +77,7 @@ claims:
 
 该方法属于**实验设计优化**范式，核心调控变量是刺激先验分布，通过信息差距的解析计算指导最优实验参数选择。与传统单上下文解码分析相比，该框架将区分两种概率编码假说的问题转化为一个可优化的信息论目标，为神经科学实验设计提供了原则性指导。框架的局限性在于依赖最优解码器假设和已知生成模型，且主要针对两上下文高斯先验设计进行了验证；扩展到更复杂的先验族、混合编码假说或其他感觉模态仍需进一步研究。
 
-## 背景与动机
+
 
 感觉系统需要处理来自外部世界的不确定信息。当观察者接收到的感觉信号存在噪声时，大脑如何编码这种不确定性，是计算神经科学中的一个核心问题。目前存在两种主要的竞争性假说：**似然编码假说**与**后验编码假说**。
 
@@ -87,7 +89,9 @@ claims:
 
 本文提出的核心洞见是：通过**操纵刺激先验分布在上下文间的变化**，可以暴露神经群体编码的统计结构。具体而言，当实验包含两个具有不同刺激先验分布的上下文时，似然编码群体与后验编码群体对相同刺激的反应将产生系统性差异。利用信息论工具——**信息差距**——可以量化这种差异，并指导实验设计以最大化两种假说之间的可区分性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：单上下文实验无法区分概率编码假说
 
@@ -128,7 +132,7 @@ claims:
 
 信息差距的存在依赖于一个根本条件：在后验编码群体上，仅当两个不同上下文下的观测产生相同的后验分布时（即 $p^A(\theta|x_j) = p^B(\theta|x_k)$），似然解码器才会产生混淆，从而贡献信息差距。这一条件等价于 $p^A(\theta) \cdot p(x_j|\theta) \propto p^B(\theta) \cdot p(x_k|\theta)$。通过操纵上下文先验 $p^A(\theta)$ 和 $p^B(\theta)$ 的差异，可以控制满足该条件的观测对数量，进而调节信息差距的大小。这正是框架将“先验操纵”作为核心因果旋钮的理论基础。
 
-## 整体框架
+
 
 ### 核心问题与因果杠杆
 
@@ -168,7 +172,7 @@ $$\Delta_{\mathrm{P}}^{\mathrm{info}} := \mathbb{E}_{p(x_i,c)} \left[ D_{\mathrm
 
 框架的输入端包括：（1）任务设计规范——上下文数量、各上下文的刺激先验分布族及其参数；（2）假设的神经编码模型——似然编码或后验编码；（3）神经群体的生成模型——包括调谐曲线形态、噪声结构等。输出端包括：（1）理论信息差距值，量化给定设计下两种假说的可区分性；（2）最优任务参数推荐，指导实际实验设计；（3）解码器性能差异的经验验证结果。框架还支持将行为数据（通过心理测量曲线估计的被试先验偏差）纳入信息差距计算（Figure 10），以更真实地反映实验条件下的期望差异。
 
-## 核心模块与公式推导
+
 
 ### 问题设定与核心量
 
@@ -230,7 +234,9 @@ $$
 
 消融实验表明：降低放电率或增加噪声会减慢信息差距的收敛速度，但最终收敛到相同理论值（Figure 12）；随机采样导致方向覆盖不完整同样减缓收敛（Figure 13A）；较少试次（3k vs 30k）减慢收敛（Figure 13B）；结果对离散化分辨率（0.25° vs 1°）鲁棒（Figure 13C）。这些因素影响实验可行性但不改变理论预测的有效性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：信息差距准确预测解码器性能差异
 
@@ -309,7 +315,9 @@ $$
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_doxBjZ88H3/figures/018_Figure_18.jpg]]
 *Figure 18: Thin tailed context priors, when integrated with Gaussian likelihood function, lead to asymmetric posterior distributions, limiting the pairs of identical posteriors satisfying Eq. 12 that would cause imperfect likelihood decoders on posterior-coding populations*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心问题与框架定位
 
@@ -365,6 +373,8 @@ $$
 4. **跨模态泛化**：框架在视觉方向辨别任务上进行了验证，其在其他感觉模态（听觉频率辨别、触觉振动检测）下的适用性和最优设计参数尚待探索。
 
 5. **非高斯似然与相关噪声**：在更复杂的生成模型（如非高斯似然函数、神经元间相关噪声）下，信息差距的解析计算是否仍然可行？定点迭代求解最优似然解码器（Eq. 5）的收敛性在更广泛条件下需要验证。
+
+
 
 ## 原文 PDF
 

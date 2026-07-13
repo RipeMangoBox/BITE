@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2026
 pdf_ref: paperPDFs/arxiv_2026/MoRL_Reinforced_Reasoning_for_Unified_Motion_Understanding_and_Generation.pdf
+project_link: null
+code_link: https://github
 aliases:
 - MCM
 - MoRL
@@ -42,7 +44,7 @@ claims:
 > - HumanML3D (motion generation) 上，R@1 (Top-1 retrieval precision) 0.527 vs 0.515 (Motion Agent) (+0.012)；MM Dist (multimodal distance) 2.790 vs 2.967 (Motion Agent) (-0.177)。
 > - KIT-ML (motion generation) 上，R@1 0.779 vs ~0.7x (typical unified models) (competitive)。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -77,7 +79,7 @@ MoRL 定位于**统一运动理解与生成**的交叉地带，其方法谱系�
 
 定性对比（Figure 1, Table 7-8）进一步显示，MoRL 在组合动作、长时序轨迹跟随和空间约束等复杂场景下，生成的运动序列在语义保真度与物理连贯性上均优于基线方法。用户研究（Figure 4）也表明 MoRL 获得了高度集中的高评分分布。
 
-## 背景与动机
+
 
 人体运动理解与生成是构建具身智能体与数字人的核心技术，涵盖运动描述、运动检索、文本驱动运动合成等双向任务。近年来，统一运动-语言模型试图在单一框架内同时处理理解与生成，代表性工作包括 **MotionGPT**（Jiang et al., 2023）、**Motion Agent**（Wu et al., 2024）以及 **LaMP**（Li et al., 2025b）。这些模型通过将连续运动序列离散化为运动令牌，与文本令牌一起送入预训练大语言模型进行自回归建模，在标准基准上取得了可观进展。
 
@@ -90,7 +92,9 @@ MoRL 定位于**统一运动理解与生成**的交叉地带，其方法谱系�
 
 从方法论角度看，现有统一运动模型的训练范式主要依赖监督微调，优化目标为通用的语言建模损失或简单的相似度分数。这种范式无法显式地鼓励模型关注物理约束和语义保真度，也难以在测试时对生成结果进行验证与修正。因此，本文的核心动机是：**将强化学习中的可验证奖励与测试时推理引入统一运动模型，通过任务特定的奖励设计和逐步规划策略，系统性地提升运动理解与生成的语义保真度、逻辑一致性和感知真实感。**
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MoRL 的核心创新在于将**强化推理**引入统一运动理解与生成框架，通过三个相互协同的 changed slots 系统性地解决了现有统一运动模型在复杂语义任务中缺乏逐步推理与测试时规划能力的瓶颈。
 
@@ -129,7 +133,7 @@ MoRL 的核心创新在于将**强化推理**引入统一运动理解与生成�
 
 值得注意的是，CoM 的推理增益以约 2.1 倍的计算开销为代价（Table 5），这构成了该方法在实时场景中的主要工程限制。
 
-## 整体框架
+
 
 MoRL 的整体框架围绕一个核心洞察展开：**通过冷启动监督微调稳定输出格式，再利用基于组的强化学习（GRPO）优化多维度任务奖励，并在推理时引入规划、采样与迭代反思，可以显著提升统一运动模型的语义保真度、逻辑一致性和感知真实感**。该框架将运动理解与运动生成统一在一个多模态大语言模型（MLLM）之内，以 Qwen3-4B-Instruct 为骨干初始化，并通过分层后训练管线实现从格式对齐到质量优化的渐进式提升。
 
@@ -163,7 +167,7 @@ MoRL 的整体框架围绕一个核心洞察展开：**通过冷启动监督微�
 ![[assets/figures/papers/paper_list_l1840_MoRL_Reinforced_Reasoning_for_Unified_Motion_Understanding_and_Generatio/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of MoRL. Our framework unifies motion understanding and generation under a reinforcement learning paradigm. Motion and text inputs are tokenized into a shared representation space. A hierarchical posttraining pipeline first applies SFT on large-scale synthetic CoT datasets to align motion sequences with reasoning traces and concise descriptions, then employs reinforcement learning with verifiable rewards (RLVR) to refine outputs, enhancing semantic alignment, reasoning coherence, physical plausibility, and text–motion consistency. At inference, the Chain-of-Motion (CoM) decoding strategy enables step-by-step reasoning and reflection, improving both motion understanding and perceptu...*
 
-## 核心模块与公式推导
+
 
 ### 运动分词器（VQ-VAE）
 
@@ -233,7 +237,9 @@ $$
 
 在推理阶段，CoM 策略引入显式的逐步推理与迭代反思机制。模型首先生成推理轨迹，然后基于该轨迹采样多个候选输出（理解任务为描述文本，生成任务为运动序列）。每个候选输出通过任务特定奖励进行评估：理解任务使用推理-答案连贯性，生成任务使用语义对齐与物理合理性。低质量候选被直接丢弃，高质量候选则进入迭代反思环节，通过多轮修正减少语义漂移和物理不合理运动。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -317,7 +323,9 @@ Table 5 报告了单次解码与 CoM 的端到端推理效率。CoM 由于需要
 ![[assets/figures/papers/paper_list_l1840_MoRL_Reinforced_Reasoning_for_Unified_Motion_Understanding_and_Generatio/figures/013_Table_8.jpg]]
 *Table 8: Qualitative comparison (Part II)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 统一运动模型的演进脉络
 
@@ -361,6 +369,8 @@ MoRL 的有效性边界受以下因素制约：
 - **推理效率优化**：能否通过模型压缩、推测解码或早期淘汰策略，将 CoM 的延迟降至接近单次解码的水平？
 - **细粒度物理建模**：如何在离散运动令牌中显式编码接触力、关节扭矩等物理信号，以更好地建模人-环境交互？
 - **多模态评估体系**：当前评估依赖文本相似度指标和运动统计量，缺乏对推理过程本身质量的直接度量。如何设计面向推理链的评估基准，是统一运动模型走向更复杂语义理解的关键。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: AAAI
 year: 2025
 pdf_ref: paperPDFs/AAAI_2025/Light_T2M_A_Lightweight_and_Fast_Model_for_Text_to_Motion_Generation.pdf
+project_link: null
+code_link: https://github.com/qinghuannn/light-t2m
 aliases:
 - LT
 - Light-T2M
@@ -41,7 +43,7 @@ claims:
 > - HumanML3D 上，FID↓ 0.040±.002 vs 0.045±.002 (MoMask) (-0.005)；#Params 4.48M vs 44.85M (MoMask) (-90.0%)；Average Inference Time (AIT)↓ 0.151s vs 0.180s (MoMask) (-0.029s (↓16%))。
 > - KIT-ML 上，FID↓ 0.161±.009 vs 0.228 (MoMask) (-0.067)；R-Precision Top1↑ 0.444±.006 vs 0.406 (MoMask, est.) (+0.038)。
 
-## 概述
+## 概要
 
 文本到动作生成（Text-to-Motion, T2M）旨在根据自然语言描述合成逼真的三维人体运动序列。近年来，基于扩散模型和Transformer架构的方法取得了显著进展，但现有工作普遍存在**模型参数冗余、推理速度慢**的瓶颈——典型代表如**MoMask**（Guo et al., 2024）需要约45M可训练参数。造成这一问题的深层原因在于：现有方法过度依赖Transformer的全局自注意力机制进行建模，**忽视了局部运动平滑性这一对真实运动生成至关重要的先验**，同时文本信息的注入方式也较为低效。
 
@@ -55,7 +57,7 @@ claims:
 
 实验结果表明，Light-T2M在**仅4.48M参数（约为MoMask的10%）**的条件下，在HumanML3D数据集上取得了**0.040的FID**（MoMask为0.045），在KIT-ML数据集上取得了**0.161的FID**（MoMask为0.228），同时推理速度提升约16%。消融实验进一步验证了ATII和PBDS的关键作用：移除ATII导致FID从0.040显著上升至0.102；PBDS以零额外参数实现了优于单向扫描和标准双向扫描的性能。这些结果共同表明，**局部建模与高效全局建模的混合设计，配合门控文本注入，可以在大幅压缩模型规模的同时保持甚至提升生成质量**，为T2M模型的轻量化部署提供了可行路径。
 
-## 背景与动机
+
 
 文本到动作生成（Text-to-Motion, T2M）旨在根据自然语言描述合成逼真的三维人体运动序列，在动画制作、虚拟现实和人机交互等领域具有广泛应用。近年来，基于扩散模型的方法显著提升了生成质量，代表性工作如 **MDM**（Tevet et al., 2023）、**MLD**（Chen et al., 2023）和 **MoMask**（Guo et al., 2024）在 HumanML3D 和 KIT-ML 等基准上取得了令人瞩目的结果。
 
@@ -71,7 +73,9 @@ claims:
 
 这一设计理念在实验中得到了充分验证：Light-T2M 仅使用 4.48M 可训练参数（MoMask 的 10%），在 HumanML3D 上取得了 0.040 的 FID（MoMask 为 0.045），推理速度提升 16%（**Figure 1**；**Table 1**）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Light-T2M 的核心创新并非单一技术的堆砌，而是源于对现有文本到动作（T2M）生成范式的系统性反思：**当前主流方法过度依赖 Transformer 的全局自注意力机制，忽视了运动序列内在的局部平滑性，导致模型参数冗余、推理缓慢，且文本语义注入方式低效**。针对这一瓶颈，Light-T2M 进行了三个关键层面的变革，形成了“局部-全局-局部”（LGL）的轻量级混合架构。
 
@@ -129,7 +133,7 @@ Light-T2M 相对于 SOTA baseline（MoMask）的核心创新可归纳为三个 *
 
 最终，这三个 changed slots 的协同效应使 Light-T2M 仅用 MoMask 10% 的可训练参数（4.48M vs 44.85M），在 HumanML3D 上取得更优的 FID（0.040 vs 0.045），并将推理速度提升 16%（0.151s vs 0.180s），实现了效率与质量的双重突破。
 
-## 整体框架
+
 
 Light-T2M 是一个基于扩散框架的文本到动作生成模型，其核心设计目标是在极低参数量的前提下保持甚至超越现有 SOTA 的生成质量。模型整体采用“局部-全局-局部”（LGL）的块堆叠架构，由 $N$ 个基本块串联组成，每个基本块内部包含**两个局部信息建模模块（LIMM）** 和一个**全局信息建模与文本注入模块**，形成对称的信息提取与融合流水线 [Figure 2]。
 
@@ -155,7 +159,7 @@ Light-T2M 是一个基于扩散框架的文本到动作生成模型，其核心�
 
 整个 pipeline 的效率优势来自三个关键设计决策的叠加：(1) LIMM 使用深度可分离卷积替代 Transformer 的自注意力层，大幅压缩参数量；(2) 下采样操作将 Mamba 全局建模的计算量控制在较低水平；(3) PBDS 以零参数代价实现双向扫描效果，避免了传统双向 Mamba 的参数量翻倍。最终模型仅需 4.48M 可训练参数（约 MoMask 的 10%），推理速度提升 16%，同时 FID 在 HumanML3D 上达到 0.040，优于 MoMask 的 0.045 [Table 1]。
 
-## 核心模块与公式推导
+
 
 Light-T2M 是一个基于扩散框架的文本驱动动作生成模型，其核心设计围绕三个关键模块展开：**局部信息建模模块（LIMM）**、**全局信息建模与文本注入模块**，以及**自适应文本信息注入器（ATII）**。整体架构由 N 个基本块堆叠而成，每个基本块包含两个 LIMM 和一个全局模块，形成“局部-全局-局部”（LGL）的信息流结构（Figure 2）。
 
@@ -245,7 +249,9 @@ $g^f(\cdot)$ 为融合函数。这种门控机制使文本注入具有**片段�
 
 LGL（局部-全局-局部）的块排列是经过消融验证的最优设计（Table 2）：在 4.48M 参数下取得 FID 0.040、R-Top1 0.511、R-Top3 0.795。相比之下，将 LIMM 替换为 Transformer 层（TTT）或调整排列顺序（如 LTL、GLL）均导致性能下降，印证了**局部建模与全局建模交替进行**的有效性。下采样尺度为 8 时达到最佳平衡（Table 6）：尺度 1 时 R-Top1 较低，尺度 16 时性能轻微下降。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -307,8 +313,6 @@ PBDS 通过将输入序列反转后与原序列拼接送入 Mamba，仅保留原
 
 #### 下采样尺度消融（Table 6）
 
-![[assets/figures/papers/paper_list_l1823_Light_T2M_A_Lightweight_and_Fast_Model_for_Text_to_Motion_Generation/figures/012_Table_6.jpg]]
-*Table 6: Evaluation of Different Downsampling Scales*
 
 全局模块中的下采样操作旨在压缩时序长度以提取语义片段并降低计算量：
 
@@ -318,8 +322,6 @@ PBDS 通过将输入序列反转后与原序列拼接送入 Mamba，仅保留原
 
 #### 采样步数与采样器消融（Table 7）
 
-![[assets/figures/papers/paper_list_l1823_Light_T2M_A_Lightweight_and_Fast_Model_for_Text_to_Motion_Generation/figures/013_Table_7.jpg]]
-*Table 7: Evaluation of Sampling Step and Sample Scheduler*
 
 使用 UniPC 采样器时：
 
@@ -330,8 +332,6 @@ PBDS 通过将输入序列反转后与原序列拼接送入 Mamba，仅保留原
 
 #### 引导尺度消融（Table 9）
 
-![[assets/figures/papers/paper_list_l1823_Light_T2M_A_Lightweight_and_Fast_Model_for_Text_to_Motion_Generation/figures/015_Table_9.jpg]]
-*Table 9: Evaluation of Different Guidance Scales*
 
 分类器无关引导（CFG）尺度 s 控制文本约束强度：
 
@@ -367,7 +367,9 @@ Figure 5 展示了 Light-T2M 与 MoMask 等方法的生成动作定性对比。�
 - 引导尺度、下采样尺度、采样步数等超参数的最优组合是否跨数据集稳定？
 - 能否进一步压缩模型至移动端可部署的规模（如 <1M）？
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 
@@ -412,6 +414,8 @@ Light-T2M 处于文本驱动动作生成（Text-to-Motion, T2M）的扩散模型
 4. **极端压缩的可行性。** 模型能否进一步压缩至移动端可部署规模（<1M 参数）？这可能需要更激进的卷积核缩减、通道剪枝或知识蒸馏，但当前 Figure 6 的趋势分析不足以预测极端压缩后的性能下限。
 
 5. **多模态扩展。** 当前仅支持文本输入，能否将 LIMM + Mamba + ATII 的轻量架构扩展到语音、音乐或视频驱动的动作生成，是值得关注的方向。
+
+
 
 ## 原文 PDF
 

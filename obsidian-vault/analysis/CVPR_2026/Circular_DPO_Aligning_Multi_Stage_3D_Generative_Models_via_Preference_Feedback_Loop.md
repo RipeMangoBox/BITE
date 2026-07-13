@@ -44,7 +44,7 @@ claims:
 > - DreamReward (Trellis backbone) 上，ImageReward -0.5607 (+35.15%)；Reward3D 0.3290 (+21.44%)；ImageReward -0.5607 (ours) vs separate DPO (+14.11% over separate DPO)。
 > - User Study 上，Preference Rate ~70% vs Trellis (original) (nearly 70% preferred Circular-DPO)。
 
-## 概述
+## 概要
 
 多阶段3D生成模型（如 **Trellis** (Xiang et al., arXiv 2024)）通过将生成过程解耦为稀疏结构生成与局部潜变量生成两个阶段，实现了高质量的3D资产合成。然而，这类管道存在一个根本性瓶颈：**阶段间存在不可微分操作，导致后续阶段（如纹理与几何细化）的偏好信号无法通过梯度反向传播到前置阶段（如稀疏结构生成）**，从而引发纹理-几何不一致性问题，限制了整体对齐优化的上限。
 
@@ -54,7 +54,7 @@ claims:
 
 需要指出的是，该方法在定量指标上尚未超越此前基于 Score Distillation 的方法，且性能依赖偏好数据集质量——尽管有权重机制缓解噪声，极端噪声仍可能导致次优结果。该偏好反馈循环机制能否推广至 Score Distillation 类方法，仍是待探索的开放问题。
 
-## 背景与动机
+
 
 ### 3D 生成的多阶段范式与不可微分瓶颈
 
@@ -77,7 +77,9 @@ claims:
 
 此外，偏好数据的噪声问题不容忽视。无论是人工标注的偏好对，还是通过模型自动构造的反馈对，都存在质量参差不齐的情况。因此，设计鲁棒的质量感知加权机制，在利用偏好信号的同时抑制噪声干扰，是实现稳定对齐的必要条件。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Circular-DPO 的核心创新在于**构建了一个偏好反馈循环（Preference Feedback Loop）**，将多阶段 3D 生成管道中不可微分阻隔所阻断的偏好信号，以前馈偏好对的形式重新注入前置阶段，从而实现端到端的全管道对齐优化。
 
@@ -122,7 +124,7 @@ $$
 
 消融实验证实：与各阶段独立进行 DPO（separate DPO）相比，引入反馈循环后在 ImageReward 上额外提升 14.11%，在 Reward3D 上额外提升 6.06%，验证了反馈循环是性能增益的核心来源。同时，移除 $w_1$ 或 $w_2$ 均导致生成质量下降，出现纹理几何不一致，证实了质量感知加权机制的必要性。
 
-## 整体框架
+
 
 Circular-DPO 提出了一套面向多阶段 3D 生成管线的偏好反馈循环框架，其核心设计目标是**绕过不可微分操作造成的梯度阻隔**，将最终阶段的偏好信号前馈至前置阶段，实现端到端的联合对齐。
 
@@ -179,7 +181,7 @@ $$\mathcal{L}_{\text{Circular-DPO}} = \begin{cases} \mathcal{L}_{\text{DPO}} & \
 ![[assets/figures/papers/paper_list_l2451_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Circular_DPO_Aligni/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the Circular-DPO*
 
-## 核心模块与公式推导
+
 
 ### 3.1 条件流匹配与 DPO 基础
 
@@ -254,7 +256,9 @@ $$\mathcal { L } _ { \mathrm { Circular-DPO } } = \left\{ \begin{array} { l l } 
 
 阈值 $\tau$ 在实验中设为零，即仅保留 $G_{\mathrm{op}} > G_{\mathrm{un\text{-}op}}$ 的有效偏好对。该机制从两个层面抑制噪声：$w_1$ 过滤低质量对，$w_2$ 在有效对内动态降权。消融实验（Table 2）证实，移除任一权重均导致生成质量下降和纹理-几何不一致性增加。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -302,7 +306,9 @@ $$\mathcal { L } _ { \mathrm { Circular-DPO } } = \left\{ \begin{array} { l l } 
 ![[assets/figures/papers/paper_list_l2451_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Circular_DPO_Aligni/figures/009_Figure_7.jpg]]
 *Figure 7: User study results. Left: The generation effect that users prefer more. Right: The five-point scale score results for text consistency, 3D plausibility, texture details, geometric details, and texture-geometric consistency*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心瓶颈与因果机制
 
@@ -346,6 +352,8 @@ Circular-DPO 以 **Trellis** 为默认 Backbone，完整保留了其两阶段架
 2. **更深级联架构**：在多阶段生成架构更加复杂（如三级以上级联）的情况下，反馈循环的构建策略应如何调整？是否需要分层反馈或多跳传播机制？
 3. **偏好数据效率**：当前需要构建完整的偏好对数据集，能否通过主动学习或在线偏好采样减少对大规模人类标注的依赖？
 4. **与梯度信号的融合**：是否存在将偏好反馈循环与可微分梯度信号（如 Score Distillation）融合的可能性，以结合两者的优势？
+
+
 
 ## 原文 PDF
 

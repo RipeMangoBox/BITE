@@ -42,7 +42,7 @@ claims:
 > - Recipe (Iron Pickaxe) 上，Success@0→30 87.5 vs 85.0 (JARVIS-1) (+2.5)。
 > - Recipe (Shield) 上，Success@0→30 87.5 vs 80.0 (JARVIS-1) (+7.5)。
 
-## 概述
+## 概要
 
 现有基于多模态大语言模型（MLLM）的开放世界代理（如 **Voyager** (Wang et al., TMLR 2024)、**JARVIS-1** (Wang et al., IEEE TPAMI 2024)、**MP5** (Qin et al., CVPR 2024) 和 **MrSteve** (Park et al., ICLR 2025)）虽然具备一定的记忆与规划能力，但其记忆机制本质上是被动的：历史经验被存储为原始轨迹或技能库，缺乏结构化的迁移维度，导致代理在面临新任务时不得不反复从头学习，效率低下且泛化能力受限。
 
@@ -50,7 +50,7 @@ claims:
 
 在 Minecraft 的从零学习设定下，Echo 在物品解锁进度上实现了 **1.3×–1.7×** 的加速，并展现出爆发式的连锁解锁现象——在中期阶段短时间内快速解锁多个相似物品。消融实验进一步验证了各迁移维度的因果贡献：移除属性轴导致 Recipe 类任务成功率下降约 11%，移除程序轴使 Crafting Chain 类任务下降约 12%，移除功能轴几乎使 Functional Equivalence 任务失效。这些结果表明，显式的多维知识分解是跨任务迁移的关键使能因素，而非简单的记忆容量扩展。
 
-## 背景与动机
+
 
 ### 多模态LLM代理的泛化困境
 
@@ -74,7 +74,9 @@ claims:
 
 通过这一设计，Echo 使代理能够在任务间实现类比推理驱动的知识迁移，从而加速学习并产生爆发式的物品解锁现象（Figure 2）。后续章节将详细阐述CSD的构建方式、ICAL的工作流程，以及两者如何协同实现结构化经验迁移。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈定位：从被动记忆到主动经验迁移
 
@@ -118,7 +120,7 @@ Echo 将 ICL 从被动检索升级为主动过程：代理从 CSD 记忆库中�
 - **消融验证**：移除属性轴导致 Recipe 类任务成功率下降约 11%；移除过程轴导致 Crafting Chain 任务下降约 12%；移除功能轴几乎使 Functional Eq. 任务失效（下降约 9%），证明各维度对特定任务类型具有不可替代的贡献（Figure 7）。
 - **类比推理**：个案研究（Figure 9）展示了 ICAL 如何通过功能相似性将制作木镐的经验迁移到制作石镐，验证了“识别模式并适应”的核心机制。
 
-## 整体框架
+
 
 Echo 的整体框架遵循经典的感知—记忆—规划—验证—执行循环，其核心创新在于将传统被动式上下文学习（ICL）转变为主动的上下文内类比学习（ICAL），并引入五个显式的迁移维度来结构化记忆与跨任务泛化。图 6 展示了该迭代框架的全貌：系统采用三层架构（感知层、决策层、执行层），与短期和长期记忆系统交互，支撑结构化的 ICAL 和基于案例的知识迁移。
 
@@ -143,7 +145,7 @@ Echo 的整体框架遵循经典的感知—记忆—规划—验证—执行循
 ![[assets/figures/papers/paper_list_l2388_https_arxiv_org_abs_2604_05533/figures/006_Figure_6.jpg]]
 *Figure 6: Overview of our iterative framework. The system performs perception, memory retrieval, planning, verification, and execution in a loop. A three-layer architecture (perception, decision, execution) interacts with short- and long-term memory to support structured ICAL and case-based transfer*
 
-## 核心模块与公式推导
+
 
 ### 上下文状态描述符（CSD）与五维迁移轴
 
@@ -223,7 +225,9 @@ $$
 ![[assets/figures/papers/paper_list_l2388_https_arxiv_org_abs_2604_05533/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of motivation and Problem Framework. (a) Traditional MLLM-based agents struggle to generalize across complex real-world environments due to different state transitions and causal relations (hard to transfer) and may exhibit unstable control arising from hallucinations. (b) The proposed Structured In-Context Learning framework introduces a unified CSD that decomposes environmental knowledge into five explicit transfer dimensions*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 
@@ -269,7 +273,9 @@ Figure 8 的持续学习曲线进一步验证了上述机制。在 30 个训练�
 ![[assets/figures/papers/paper_list_l2388_https_arxiv_org_abs_2604_05533/figures/010_Figure_9.jpg]]
 *Figure 9: Transferring from a wooden pickaxe to a stone pickaxe*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有工作的关系
 
@@ -300,6 +306,8 @@ Echo 的设计基于以下核心假设，这些假设同时界定了其适用边
 **跨域迁移的泛化性。** 五维框架在 Minecraft 中的有效性已通过消融实验验证（Figure 7），但这些维度是否可直接应用于 Minecraft 以外的真实世界物理任务仍是开放问题。真实环境中的迁移可能涉及更复杂的物理约束、安全约束和社会规范，这些维度未必能被当前五轴框架充分覆盖。
 
 **与主动探索的融合。** MP5 所研究的主动探索问题与 Echo 的经验迁移能力在理论上互补——前者解决“何时获取新信息”，后者解决“如何复用已有信息”。将两者融合，构建既能主动探索又能高效迁移的统一代理框架，是一个值得探索的方向。
+
+
 
 ## 原文 PDF
 

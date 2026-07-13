@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Adaptive_Debiasing_Tsallis_Entropy_for_Test_Time_Adaptation.pdf
+project_link: null
+code_link: https://github.com/Jinx630/ADTE
 aliases:
 - ADTEA
 - ADTETTA
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 面向测试时自适应的自适应去偏Tsallis熵 |
 | 英文题名 | Adaptive Debiasing Tsallis Entropy for Test-Time Adaptation |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=dHj8hC081K); [GitHub](https://github.com/Jinx630/ADTE) |
+| Links | [paper](https://openreview.net/forum?id=dHj8hC081K) · [GitHub](https://github.com/Jinx630/ADTE) |
 | Topic | #topic/representation_self_supervised_transfer #topic/representation_self_supervised_transfer/representation_learning |
 | Method | Adaptive Debiasing Tsallis Entropy (ADTE) |
 | Dataset | ImageNet, ImageNet-V2, ImageNet-K |
@@ -41,11 +43,11 @@ claims:
 > - ImageNet 上，Accuracy (%) 为 72.7 (ADTE_CuPL, ViT-B/16)，对比 70.9 (Frolic_CuPL, ViT-B/16)，变化 +1.8。
 > - ImageNet-V2 上，Accuracy (%) 为 65.6 (ADTE_Templates, ViT-B/16)，对比 64.7 (Zero_Templates, ViT-B/16)，变化 +0.9。
 
-## 概述
+## 概要
 
 本文提出了一种名为**自适应去偏Tsallis熵（Adaptive Debiasing Tsallis Entropy, ADTE）** 的新型测试时自适应（Test-Time Adaptation, TTA）方法，旨在解决视觉-语言模型（如CLIP）在测试时自适应过程中因预训练数据固有偏差导致的性能退化问题。核心思想是利用Tsallis熵（TE）的非广延参数q来校正模型对头部/尾部类别的预测偏差，并进一步通过为每个类别自适应地学习一个特定的参数q^l，实现更精确的高置信度视图选择。实验结果表明，ADTE在ImageNet及其五个变体数据集以及10个跨域基准测试上均超越了现有最先进方法，特别是在尾部类别上取得了显著的性能提升。
 
-## 背景与动机
+
 
 ### 2.1 问题背景
 
@@ -59,7 +61,9 @@ claims:
 
 本文的核心动机是：利用Tsallis熵（TE）作为Shannon熵的广义形式，通过引入非广延参数q来表征有偏分布，并进一步为每个类别自适应地调整参数，从而在视图选择过程中校正偏差，提升TTA性能。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新点可归纳为以下三个方面：
 
@@ -69,7 +73,7 @@ claims:
 
 3. **性能突破：在多个基准测试上超越现有最先进方法。** ADTE在ImageNet及其五个变体上取得了领先性能，并在10个跨域基准测试上取得了最高的平均性能。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_representation_self_supervised_transfer__representation_learning__b001_dHj8hC081K_Adaptiv/figures/001_Figure_1.jpg]]
 
@@ -80,7 +84,7 @@ ADTE的整体框架如Figure 1(d)所示，其核心流程包括以下步骤：
 3. **ADTE计算与视图选择**：根据估计的偏差计算每个类别的q^l，然后计算每个视图的ADTE值，并选择ADTE值最低的视图作为高置信度视图。
 4. **高置信度视图集成**：对所选高置信度视图的预测分布进行平均，得到最终预测。
 
-## 核心模块与公式推导
+
 
 ### 5.1 Shannon熵（SE）
 
@@ -128,7 +132,9 @@ $$q^l = \alpha + (\beta - \alpha) \frac{-\log \tilde{\mathbf{p}}_l - \operatorna
 
 其中，[α, β]是归一化区间，默认设置为[0.01, 0.9]。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 6.1 主实验结果
 
@@ -183,7 +189,9 @@ $$q^l = \alpha + (\beta - \alpha) \frac{-\log \tilde{\mathbf{p}}_l - \operatorna
 
 ![[assets/figures/papers/iclr26_representation_self_supervised_transfer__representation_learning__b001_dHj8hC081K_Adaptiv/figures/012_Table_5.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 7.1 方法谱系
 
@@ -208,6 +216,8 @@ ADTE的核心贡献在于：
 2. ADTE需要维护一个记忆库来存储每个类别的样本，这增加了额外的内存开销。
 3. ADTE的类别特定参数q^l通过min-max归一化计算，其区间[α, β]的选择可能需要针对不同任务进行微调。
 4. 本文的方法主要针对视觉-语言模型（如CLIP）的TTA场景，其在其他类型的模型或任务上的适用性尚未验证。
+
+
 
 ## 原文 PDF
 

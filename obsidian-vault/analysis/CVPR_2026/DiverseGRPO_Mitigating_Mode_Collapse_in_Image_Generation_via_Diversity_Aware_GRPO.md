@@ -43,7 +43,7 @@ claims:
 > - Flux.1-dev / PickScore 上，BeyondFID ↑ 0.1059 vs 0.0766 (+38.2%)。
 > - SD3.5-M / HPSv3 上，DreamSim ↑ 0.1493 vs 0.1312 (+13.8%)。
 
-## 概述
+## 概要
 
 基于GRPO（Group Relative Policy Optimization）的奖励微调已成为提升文本到图像生成模型质量的主流范式。然而，标准GRPO存在一个关键瓶颈：**单一评分奖励与均匀KL正则化的组合导致模型过度收敛到高奖励模式，引发严重的模式坍缩**——模型倾向于生成高度相似的视觉内容（如相似的面部特征、构图和色彩），严重限制了其在创意场景中的适用性。
 
@@ -56,7 +56,7 @@ claims:
 
 实验表明，DiverseGRPO在多个骨干模型（SD3.5-M、Flux.1-dev）和奖励模型（PickScore、HPSv3）上均取得显著提升：在匹配质量分数下，语义多样性提升13%～18%，FID指标降低约23%。消融实验证实，两个模块协同作用才能达到最优的质量-多样性平衡。
 
-## 背景与动机
+
 
 ### 文本到图像生成中的奖励微调
 
@@ -89,7 +89,9 @@ $$\frac{d w_{k}}{d t} = w_{k} \left( \bar{r}_{k} - \mathbb{E}_{j} \left[ \bar{r}
 
 基于这两点洞察，DiverseGRPO旨在通过分布级创新奖励和结构感知正则化的协同设计，在不牺牲生成质量的前提下重建质量-多样性的帕累托前沿。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DiverseGRPO 的核心创新在于识别并修复了标准 GRPO 训练中导致模式坍缩的两个结构性缺陷：**奖励信号的单样本短视**和**正则化策略的去噪动态失配**。方法通过两个相互协同的模块——分布级创新奖励（Distributional Creativity Bonus）和结构感知正则化（Structure-Aware Regularization）——在保持甚至提升图像质量的同时，将语义多样性提升了 13%～18%。
 
@@ -119,7 +121,7 @@ DiverseGRPO 将正则化策略从“均匀 KL 散度施加于所有去噪步”�
 
 DiverseGRPO 处于 **GRPO 微调图像生成模型** 的方法谱系中，与 Flow-GRPO（Liu et al., arXiv 2025）构成直接继承与改进关系。相较于其他缓解模式坍缩的方法（如增加噪声注入、温度调节、或使用多样性正则化项），DiverseGRPO 的独特之处在于：(1) 通过谱聚类将多样性显式建模为分布级奖励，而非隐式的正则化项；(2) 根据去噪轨迹动态调整正则化预算，而非静态施加约束。方法在多个骨干模型（SD3.5-M, Flux.1-dev）和奖励模型（PickScore, HPSv3）上验证了泛化性，但尚未扩展到文本或视频生成等多模态任务。
 
-## 整体框架
+
 
 DiverseGRPO 在 Flow-GRPO（Liu et al., arXiv 2025）的基础上引入两个关键模块，构成一个两阶段的多样性保护训练流水线。其核心设计理念是：**模式坍缩并非奖励优化的必然结果，而是单样本奖励的分布盲区和均匀KL正则化对去噪动态的失配共同导致的**。因此，流水线从“奖励信号”和“正则化策略”两个维度同时介入，重新平衡探索-利用关系。
 
@@ -140,7 +142,7 @@ DiverseGRPO 在 Flow-GRPO（Liu et al., arXiv 2025）的基础上引入两个关
 ![[assets/figures/papers/paper_list_l2670_https_arxiv_org_abs_2512_21514/figures/001_Figure_1.jpg]]
 *Figure 1: (a) Image generation models trained with GRPO suffer from mode collapse (similar faces, camera angles, etc.), which limits their applicability in creative scenarios. (b) The proposed DiverseGRPO method achieves higher diversity while maintaining comparable quality. (c) DiverseGRPO successfully maintains a healthier level of diversity across the entire duration of training, while the baseline method suffers from a premature collapse. (d) In the Inception feature space, DiverseGRPO generates images that cover a significantly broader range of semantic features, effectively mitigating mode collapse*
 
-## 核心模块与公式推导
+
 
 DiverseGRPO 在标准 Flow-GRPO 框架（Liu et al., arXiv 2025）的基础上，针对模式坍缩的两个根本原因——单样本奖励缺乏分布视角、均匀 KL 正则化忽视去噪动态——引入了两个关键模块：**分布级创新奖励（Distributional Creativity Bonus）** 和 **结构感知正则化（Structure-Aware Regularization）**。
 
@@ -211,7 +213,9 @@ $$\mathcal{L}_{\mathrm{reg}}(t) = \begin{cases} \frac{\|\bar{\mathbf{x}}_{t+\Del
 ![[assets/figures/papers/paper_list_l2670_https_arxiv_org_abs_2512_21514/figures/003_Figure_3.jpg]]
 *Figure 3: DiverseGRPO employs two primary strategies to mitigate mode collapse: (a) A distributional creativity bonus mechanism based on semantic grouping. It begins by applying spectral clustering to images generated from the same caption, then assigns exploratory rewards according to cluster size to encourage the emergence of novel visual modes. (b) Structure-aware regularization imposes stronger constraints during the initial denoising stages to preserve sample diversity, while gradually relaxing the penalty in later stages to enhance the effectiveness of reward optimization*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果：跨骨干与奖励模型的多样性-质量协同提升
 
@@ -277,7 +281,9 @@ Figure 4 的定性对比展示了基线方法与 DiverseGRPO 在生成多样性�
 ![[assets/figures/papers/paper_list_l2670_https_arxiv_org_abs_2512_21514/figures/002_Figure_2.jpg]]
 *Figure 2: Analysis of the reasons for mode collapse: (Left) Policy model collapse into high-reward modes due to single sample reward modeling. (Right) Conventional regularization neglects the dominant role of early-stage denoising in preserving diversity*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 基线关系与差异化定位
 
@@ -306,6 +312,8 @@ DiverseGRPO 的验证范围覆盖了两种主流骨干模型（SD3.5-M 和 Flux.
 1. 如何自动确定最优聚类簇数以适应不同提示的视觉模式数量？当前方法依赖预设参数，而不同 prompt 的语义模式数量天然存在差异。
 2. 探索奖励能否与更精细的任务特定美学奖励（如风格一致性、构图质量）进一步集成，形成更全面的奖励信号？
 3. 在大规模生产环境下，该方法对实时生成的延迟和资源消耗的实际影响如何？这决定了其从研究到部署的可迁移性。
+
+
 
 ## 原文 PDF
 

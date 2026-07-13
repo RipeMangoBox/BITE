@@ -46,7 +46,7 @@ claims:
 > - Gastric-X Report Generation 上，BERTScore F1 82.0 vs 73.1 (Med-Flamingo) (+8.9)。
 > - Gastric-X Cross-modal Retrieval 上，R@1 Image→Text (%) 48.9 vs 42.8 (Med-Flamingo) (+6.1)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -71,7 +71,7 @@ claims:
 
 Gastric-X在医学VLM数据集中占据独特位置：与仅覆盖2D放射影像的MIMIC-CXR、仅提供VQA对的VQA-RAD等数据集相比，它首次在同一患者层面整合了多期3D体积影像、结构化化验数据和原始诊断报告。这使得Gastric-X不仅是评估VLM多模态融合能力的基准，也为未来跨模态循证推理研究提供了数据基础。
 
-## 背景与动机
+
 
 ### 胃癌诊断的临床复杂性
 
@@ -89,7 +89,9 @@ Table 1 的系统对比清晰地揭示了这一断层：在Gastric-X之前，没
 
 **本文的核心动机**是构建一个模拟临床医生多源证据整合过程的数据集，使VLM能够在贴近真实诊疗场景的条件下进行训练和评估。Gastric-X通过整合四期CT、内窥镜、134项结构化生化指标和三种临床报告，并在患者级别对齐，填补了这一空白。该数据集包含1.7K病例、7.1K CT扫描和专家标注的3D边界框与分期信息，为多模态循证推理提供了迄今最全面的基准平台。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Gastric-X 的核心创新并非提出全新的模型架构，而是**构建了首个面向胃癌临床诊断全流程的多模态、多期基准数据集，并通过最小侵入的架构适配，系统性地验证了多模态融合对视觉语言模型（VLM）临床推理能力的因果性提升**。其创新可拆解为以下三个关键维度。
 
@@ -125,7 +127,7 @@ Gastric-X 最具说服力的创新贡献在于，它通过严格的消融实验�
 
 这种因果性验证直接回应了论文的核心洞察：**临床诊断本质上是多模态的，当前 VLM 数据集过分简化了这种复杂性，导致模型只依赖表面关联，无法进行真正的跨模态循证推理**。Gastric-X 通过数据集设计与消融实验，将这一假设转化为可量化的证据链。
 
-## 整体框架
+
 
 Gastric‑X 的工作流围绕“多模态临床数据对齐 → VLM 适配 → 多任务评估”三条主线展开，其核心设计目标是模拟临床医生同时审阅影像、化验和文本报告的真实诊断流程。
 
@@ -164,7 +166,7 @@ Gastric‑X 的工作流围绕“多模态临床数据对齐 → VLM 适配 → 
 ![[assets/figures/papers/paper_list_l2742_https_arxiv_org_abs_2603_19516/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the multi-modal information in proposed Gastric-X. The center panel shows a schematic gastric representation alongside an endoscopic image. The left panel presents examples of structured laboratory data (e.g., blood counts, serum biochemistry, and tumor markers) and clinical textual reports (diagnostic and CT reports) that reflect real-world radiological reasoning. The right panel illustrates multi-phase 3D CT scans (non-contrast, arterial, venous, and equilibrium phases) with multi-class lesion annotations, including tumor, perigastric carcinoma, and stomach regions*
 
-## 核心模块与公式推导
+
 
 Gastric-X 的数据处理与模型适配管线由四个关键模块构成，分别解决多模态输入的标准化、结构化信息的语义化、视觉定位线索的注入以及医学知识的迁移。
 
@@ -201,7 +203,9 @@ $$lr = 5 \times 10^{-5}$$
 ![[assets/figures/papers/paper_list_l2742_https_arxiv_org_abs_2603_19516/figures/004_Figure_3.jpg]]
 *Figure 3: VLM adaptation. In adapting VLMs to our dataset, the visual encoder incorporates multi-phase CT inputs, while test tables, textual queries, and lesion-localization cues serve as complementary multimodal inputs guiding the model’s diagnostic reasoning. The VLMs must effectively adapt to these diverse input modalities to better capture and perform the targeted clinical tasks*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -273,7 +277,9 @@ $$lr = 5 \times 10^{-5}$$
 ![[assets/figures/papers/paper_list_l2742_https_arxiv_org_abs_2603_19516/figures/011_Table_8.jpg]]
 *Table 8: Full List of 134 Structured Biomedical Variables in the Gastric-X Dataset. De-identified is marked as ”De-ID”*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务与基线定位
 
@@ -321,6 +327,8 @@ Table 7的消融揭示了VQA问题设计的关键权衡：**病灶聚焦提示**
 - 显式跨模态注意力机制是否优于当前的特征拼接/文本注入式融合？
 - 在真实临床工作流中，VLM辅助诊断能否可测量地降低医生认知负荷并提高诊断一致性？
 - 更大规模VLM在此基准上的表现是否能涌现真正的临床推理能力，而非仅依赖表面统计关联？
+
+
 
 ## 原文 PDF
 

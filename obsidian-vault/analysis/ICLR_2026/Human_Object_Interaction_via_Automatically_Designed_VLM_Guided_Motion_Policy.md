@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Human_Object_Interaction_via_Automatically_Designed_VLM_Guided_Motion_Policy.pdf
+project_link: https://vlm-rmd.github.io/
+code_link: null
 openreview_forum_id: LfkPlFTfe0
 aliases:
 - VGRMDRH
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 基于自动设计的VLM引导运动策略的人-物交互 |
 | 英文题名 | Human-Object Interaction via Automatically Designed VLM-Guided Motion Policy |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=LfkPlFTfe0); [Project](https://vlm-rmd.github.io/) |
+| Links | [paper](https://openreview.net/forum?id=LfkPlFTfe0) · [Project](https://vlm-rmd.github.io/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | VLM-Guided Relative Movement Dynamics (RMD) for HOI |
 | Dataset | InterPlay (Static Interaction subset), InterPlay (Dynamic Interaction subset), InterPlay (Hybrid subset), Single-task: Reach |
@@ -42,7 +44,7 @@ claims:
 > - InterPlay (Dynamic Interaction subset) 上，Completion Rate (%) ↑ 为 71.2，对比 52.5 (TokenHSI*)，变化 +18.7。
 > - InterPlay (Hybrid subset) 上，Sub-step Completion Ratio (%) ↑ 为 71.8，对比 60.1 (TokenHSI*)，变化 +11.7。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -65,7 +67,7 @@ claims:
 
 与现有工作相比，本方法在八个关键维度上实现了全覆盖（Table 1），是首个同时支持铰接物体、动态物体、自动化奖励设计、长视距细粒度转换、HOI引导、多任务、高层规划和统一策略的框架。其核心区别在于用VLM引导的RMD替代了手动设计的接触链或关键姿势，将交互表示从离散事件层面提升到连续运动动力学层面。
 
-## 背景与动机
+
 
 ### 问题背景：物理仿真中的人-物交互合成
 
@@ -90,7 +92,9 @@ claims:
 
 基于上述洞察，本文提出**VLM引导的相对运动动力学（VLM-Guided Relative Movement Dynamics, RMD）**，旨在构建首个统一的、基于物理的HOI框架，利用VLM自动生成目标状态和奖励函数，驱动物理角色完成长视距、多类型的交互任务。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作针对现有物理仿真人-物交互（HOI）方法的两个核心瓶颈——依赖昂贵动捕数据与手动奖励工程、无法有效处理动态对象和长视距交互——提出了首个统一的、基于VLM引导的物理仿真HOI框架。其关键创新在于引入了一种细粒度时空二分图表示**相对运动动力学（Relative Movement Dynamics, RMD）**，并以此作为VLM与强化学习策略之间的桥梁，实现了目标状态与奖励函数的全自动构建。
 
@@ -122,7 +126,7 @@ claims:
 
 综上，本工作的核心创新不在于提出新的RL算法或VLM架构，而在于设计了RMD这一连接VLM语义理解与物理策略学习的表示层，使得“自动设计”成为可能，并在静态交互（完成率75.1% vs UniHSI 37.2%）和动态交互（71.2% vs TokenHSI 52.5%）上均取得显著提升。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_LfkPlFTfe0/figures/002_Table_1.jpg]]
 *Table 1: Comparative analysis of key features between ours and other methods*
@@ -159,7 +163,7 @@ claims:
 
 如表1所示，本框架是唯一同时支持以下全部特性的方法：铰接对象交互、自动化奖励设计、动态对象交互、细粒度长视距转换、HOI运动引导、多任务统一策略和高层规划。相比之下，**UniHSI**（Xiao et al., 2024）仅支持静态交互和自动化奖励设计，**TokenHSI**（Pan et al., 2025）和**InterPhys**（Hassan et al., 2023）则依赖手动奖励工程。
 
-## 核心模块与公式推导
+
 
 ### 整体架构
 
@@ -217,7 +221,9 @@ $$r_t = \alpha_{\mathrm{task}} \, r^G \left( \mathbf{s}_t, \mathbf{g}_t, \mathbf
 
 策略采用目标条件化的PPO训练。当某步的任务奖励 $r^G$（取值范围 $[0,1]$）超过阈值0.9时，策略自动切换至VLM规划的下一个交互步，实现无需手工状态机的长视距任务调度。消融实验表明该阈值敏感：过高（如0.95）会导致完成率大幅下降，0.90为最优设置（Table 6）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -289,7 +295,9 @@ $$r_t = \alpha_{\mathrm{task}} \, r^G \left( \mathbf{s}_t, \mathbf{g}_t, \mathbf
 ![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_LfkPlFTfe0/figures/015_Table_4.jpg]]
 *Table 4: Hyperparameters for RMD*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 
@@ -347,6 +355,8 @@ $$r_t = \alpha_{\mathrm{task}} \, r^G \left( \mathbf{s}_t, \mathbf{g}_t, \mathbf
 4. **端到端联合优化**：是否可以通过端到端训练联合优化VLM规划器和物理控制器，减少愿景与执行间的差距？这涉及离散符号规划与连续控制的联合学习这一开放挑战。
 
 5. **跨领域迁移**：RMD表示是否可应用于移动机器人领域的物理仿真任务，如机器人操作或人-机器人协作？这需要验证RMD在非人形运动学结构上的泛化能力。
+
+
 
 ## 原文 PDF
 

@@ -43,7 +43,7 @@ claims:
 > - 12-Scenes 上，Avg. median translation (cm) / rotation (°) & R@[2cm,2°] 0.3 / 0.14 & ≈97% (scene-dependent, up to 100%) vs 0.7 / 0.26 & 97.2% (ACE) (Lower translation/rotation errors; R@[2cm,2°] slightly below ACE+GS-CPR (1.4% l...)。
 > - Cambridge Landmarks 上，Median translation (cm) / rotation (°) per scene Competitive with STDLoc (e.g., College 10/0.39 vs STDLoc 10/0.43, Church 5/0.11... vs STDLoc (Comparable, with slight improvements on some scenes)。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -68,7 +68,7 @@ claims:
 
 消融实验进一步验证了两个关键设计的作用：自适应视角检索将弱纹理场景（如 Stairs）的 R@[5cm, 5°] 召回率从 77.1% 提升至 91.9%；混合匹配器在所有指标上均优于纯渲染特征匹配（FGS-Matcher）和纯稀疏匹配（SP+LG）。
 
-## 背景与动机
+
 
 视觉重定位（Visual Relocalization）是三维视觉与机器人领域的基础任务，其目标是根据查询图像精确估计相机在已知场景中的 6-DoF 位姿。该任务在增强现实、自动驾驶和机器人导航等应用中扮演关键角色。近年来，层次化重定位（Hierarchical Localization）范式因其效率与精度平衡而成为主流路线：先在数据库图像中检索与查询视角最接近的参考图像，再通过特征匹配建立 2D-2D 或 2D-3D 对应关系，最终利用 PnP 求解位姿。
 
@@ -86,7 +86,9 @@ claims:
 
 通过上述设计，SplatHLoc 旨在同时提升弱纹理区域的初始位姿鲁棒性，以及整体重定位的精度与效率。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SplatHLoc 针对传统层次化视觉重定位中**数据库视角稀疏**与**弱纹理区域特征匹配不可靠**两大瓶颈，提出了三个相互协同的 changed slots，形成从场景表示到匹配策略的系统性创新。
 
@@ -119,7 +121,7 @@ STDLoc 等渲染基线在渲染 RGB 图像后提取特征进行匹配，本质�
 
 三个 changed slots 形成闭环：FGS 地图提供统一的渲染能力，自适应检索利用渲染合成虚拟视角以扩充检索覆盖，混合匹配器则充分发挥渲染特征与图像特征在粗、细阶段各自的优势。三者协同使得 SplatHLoc 在 7-Scenes、12-Scenes、Cambridge Landmarks 三个基准上均取得最优或接近最优的中位平移/旋转误差（Table 1-3）。
 
-## 整体框架
+
 
 SplatHLoc 的整体管线遵循**层次化视觉重定位**范式，以**特征高斯溅射（Feature Gaussian Splatting, FGS）** 作为统一的场景表示核心，将建图、检索、匹配与位姿估计串联为一个端到端可优化的流程（Figure 2）。其设计动机源于传统层次化重定位方法的两大瓶颈：（1）数据库图像视角稀疏导致初始检索位姿与查询图像间缺乏足够的共视区域；（2）弱纹理或重复纹理区域中，纯图像特征或纯渲染特征的匹配均难以同时兼顾鲁棒性与精度。SplatHLoc 通过三个关键模块的协同设计——FGS 地图构建、自适应粗‑细视点检索、混合特征匹配——系统性地缓解了上述问题。
 
@@ -161,7 +163,7 @@ SplatHLoc 在模块设计上做出了若干关键取舍，直接决定了系统�
 ![[assets/figures/papers/paper_list_l2520_https_arxiv_org_abs_2603_29185/figures/001_Figure_1.jpg]]
 *Figure 1: SplatHLoc: a novel hierarchical visual relocalization framework based on Feature Gaussian Splatting (FGS). FGS renders color, depth, and feature maps from novel views, which our method exploits to improve the image retrieval and feature matching process. Upon retrieving a reference image, we match it to the query to estimate an initial pose (initial relocalization). We then render views from the estimated pose and iteratively match them to the query to refine the pose (refined relocalization)*
 
-## 核心模块与公式推导
+
 
 ### 3.1 特征高斯溅射（FGS）地图构建
 
@@ -244,7 +246,9 @@ $$ \mathbf{X}_{r} = T \cdot \left( D_{r}(\mathbf{x}_{r}) \cdot K^{-1} [\mathbf{x
 
 **迭代位姿精化**：从估计位姿重新渲染颜色和深度图，再次执行混合匹配（Eq. 11）和 2D‑3D 提升（Eq. 12），重复匹配与估计过程，逐次求精。该迭代机制使得位姿估计能够收敛到更高精度。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -317,7 +321,9 @@ Figure VI 系统展示了 SplatHLoc 的两类典型失败案例：
 ![[assets/figures/papers/paper_list_l2520_https_arxiv_org_abs_2603_29185/figures/010_Table_6.jpg]]
 *Table 6: Ablation study II. We ablate the hybrid matcher by isolating rendered features’ coarse and fine contributions. FGS-Matcher is adopted from STDLoc, which uses rendered features in both coarse and fine matching stages*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 在层次化视觉重定位谱系中的位置
 
@@ -379,6 +385,8 @@ SplatHLoc 沿袭 HLoc 的层次化框架，但在三个关键环节进行了根�
 SplatHLoc 的核心思想——**渲染特征与图像特征的混合匹配**——与更广泛的“神经渲染辅助视觉定位”趋势一致。它将 3DGS 从单纯的视图合成工具提升为**特征场表示**，使得渲染结果不仅用于视觉对齐，更直接参与特征匹配过程。这一思路与 NeRF-based 定位方法（如 NeRF-Loc）中“从辐射场渲染特征”的做法一脉相承，但 SplatHLoc 受益于 3DGS 的实时渲染能力，在效率上具有显著优势（Figure 6：平均每查询定位时间低于 STDLoc）。
 
 此外，自适应视角检索策略与“主动视角规划”和“检索增强”领域存在潜在交叉：通过扰动初始检索位姿生成虚拟候选视图，本质上是一种在 SE(3) 空间中进行局部稠密采样的检索增强策略，这一思想可推广至其他需要视角覆盖的任务。
+
+
 
 ## 原文 PDF
 

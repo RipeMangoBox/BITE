@@ -42,7 +42,7 @@ claims:
 > - ScanRefer Multiple 上，Acc@0.5 46.6% vs 42.0% (Video-3D-LLM†) (+4.6%)。
 > - Nr3D (Pred) 上，Acc@0.25 50.6% vs 46.1% (MCLN) (+4.5%)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：多模态大语言模型（MLLM）主要使用2D视觉输入进行预训练，缺乏理解3D场景空间结构的能力。现有方法依赖显式点云重建和特定视角渲染来提供结构引导，导致推理效率低，且受视角选择与遮挡影响。
 
@@ -52,7 +52,7 @@ claims:
 
 **主要结果**：在ScanRefer数据集上，S²-MLLM以59.2%的Overall Acc@0.25和52.7%的Overall Acc@0.5全面超越现有方法，较Video-3D-LLM†提升4.8个百分点（Acc@0.5）。在Nr3D和Sr3D上也取得有竞争力的结果，并在MultiScan和ArkiScenes两个分布外数据集上展现出强泛化能力。消融实验确认，空间引导（SG）移除后Overall@0.25下降4.78个百分点，多级位置编码（MPE）贡献最大（移除后退化15.05%），而视图内/视图间注意力（Attn）将基线模型性能从5.31%提升至41.74%。效率方面，S²-MLLM仅需72 GPU小时训练和1.16秒推理延迟，显著优于全参数微调的Video-3D-LLM（256 GPU小时）。
 
-## 背景与动机
+
 
 ### 3D视觉定位的任务与挑战
 
@@ -90,7 +90,9 @@ claims:
 
 本文的目标是设计一个端到端可训练的框架，通过联合优化重建损失与定位任务损失，将前馈3D重建的结构感知注入MLLM的视觉表示中，并配合专门设计的结构增强模块来显式强化位置与跨视角一致性，最终实现高效、鲁棒且可泛化的3D视觉定位。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 S²-MLLM 的核心创新在于**将显式3D重建的结构感知能力隐式地注入MLLM的视觉表示中**，使模型在推理时无需任何点云重建或额外渲染即可进行空间推理。这一设计从根本上改变了现有方法“重建-渲染-推理”的范式，转而采用“训练时结构引导、推理时隐式推理”的策略。
 
@@ -140,7 +142,7 @@ $$f_i^{\mathrm{vis}} = \mathrm{AvgPool} \big( f_i + \phi(p_{\mathrm{world}}^i) \
 
 这四个创新点协同作用，使S²-MLLM在ScanRefer上达到59.2% Overall Acc@0.25（超越此前最优的**MCLN** 57.2%），同时仅需72 GPU小时训练和1.16秒推理延迟，在性能和效率之间取得了优越的平衡。
 
-## 整体框架
+
 
 S²-MLLM 的整体设计遵循“训练时隐式学习3D结构，推理时无需显式重建”的核心原则。如图2所示，系统以多视角RGB-D帧序列作为3D场景的表示形式，通过一条精心设计的pipeline将视觉几何特征注入预训练MLLM，最终完成跨模态理解与3D目标定位。
 
@@ -161,7 +163,7 @@ S²-MLLM 的整体设计遵循“训练时隐式学习3D结构，推理时无需
 ![[assets/figures/papers/paper_list_l2413_https_arxiv_org_abs_2512_01223/figures/002_Figure_2.jpg]]
 *Figure 2: The Framework of*
 
-## 核心模块与公式推导
+
 
 S²-MLLM的整体框架如Figure 2所示，其核心设计围绕一个关键洞察展开：**在训练阶段通过前馈3D重建注入空间结构感知，使MLLM在潜在特征空间中隐式推理3D场景，推理时无需显式重建或渲染**。以下按模块逐一分析其设计逻辑与关键公式。
 
@@ -240,7 +242,9 @@ $$\mathcal{L} = \lambda_{\mathrm{g}} \mathcal{L}_{\mathrm{ground}} + \lambda_{\m
 ![[assets/figures/papers/paper_list_l2413_https_arxiv_org_abs_2512_01223/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of previous methods and our method. (a) Previous methods typically reconstruct point clouds of 3D scenes explicitly and then render 2D images to obtain structure guidance. (b) Our method leverages spatial guidance to understand the 3D structure during training, allowing the model to perform implicit spatial reasoning in the latent space without requiring point-cloud reconstruction at inference*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -314,7 +318,9 @@ Figure 4的饼图展示了S²-MLLM在ScanRefer验证集上的错误分布，Figu
 ![[assets/figures/papers/paper_list_l2413_https_arxiv_org_abs_2512_01223/figures/012_Figure_4.jpg]]
 *Figure 4: Error type analysis on ScanRefer [9] dataset*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有方法的关系
 
@@ -389,6 +395,8 @@ S²-MLLM在3D视觉定位领域的知识贡献可归纳为：
 | **性能水平** | ScanRefer Overall Acc@0.25达59.2%，超越所有监督和MLLM基线 |
 | **效率优势** | 72 GPU小时训练，1.16s推理延迟，无需推理时重建 |
 | **泛化能力** | 在MultiScan和ArkiScenes两个分布外数据集上显著超越SeeGround |
+
+
 
 ## 原文 PDF
 

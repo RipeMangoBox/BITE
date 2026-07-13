@@ -33,7 +33,7 @@ claims:
 | 中文题名 | EyeNeRF：一种用于人眼真实感合成、动画与重光照的混合表示 |
 | 英文题名 | EyeNeRF: A Hybrid Representation for Photorealistic Synthesis, Animation, and Relighting of Human Eyes |
 | 会议/期刊 | SIGGRAPH 2022 |
-| Links | [paper](https://arxiv.org/abs/2206.08428) · [Project](https://trimsh.org/) · [arXiv](https://arxiv.org/abs/2206.08428") |
+| Links | [paper](https://arxiv.org/abs/2206.08428) · [Project](https://trimsh.org/) · [paper](https://arxiv.org/abs/2206.08428") |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation #topic/representation_self_supervised_transfer |
 | Method | EyeNeRF |
 | Dataset |  |

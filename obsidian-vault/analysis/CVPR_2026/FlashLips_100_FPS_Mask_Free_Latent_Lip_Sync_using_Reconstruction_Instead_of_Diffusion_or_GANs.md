@@ -42,7 +42,7 @@ claims:
 > - Reconstruction (HDTF, CelebV-HQ, CelebV-Text) 上，FID↓ 4.43 (Transformer) / 4.75 (U-Net) vs 5.30 (LatentSync) (−0.87 / −0.55)；FVD↓ 12.31 (Transformer) / 15.20 (U-Net) vs 36.47 (LatentSync) (−24.16 / −21.27)；LipScore↑ 0.71 (Transformer) vs 0.55 (LatentSync) (+0.16)。
 > - Inference Speed (same clip, 5 warm-up + 10 runs) 上，FPS↑ 109.41 (U-Net) vs 3.60 (KeySync) (≈30.4×)。
 
-## 概述
+## 概要
 
 唇形同步（lip-sync）旨在根据任意音频驱动人脸视频中的嘴唇运动，使其与语音内容高度吻合。现有方法普遍依赖**迭代生成（扩散模型）或对抗训练（GAN）**，导致推理成本高昂、训练不稳定，并需借助显式嘴唇掩码等复杂预处理，严重阻碍实时部署。**FlashLips** 针对这一瓶颈，提出了一种基于**纯重建损失的单步确定性编辑**框架，将唇形同步解耦为两个阶段：首先学习一个紧凑的**低维唇部姿势控制向量**，然后通过单步前馈网络在 VAE 潜在空间中完成高保真编辑，全程无需掩码、无需扩散或对抗训练。
 
@@ -53,7 +53,7 @@ claims:
 
 方法上，FlashLips 将唇形同步重新定义为**图像重建任务**而非生成任务：Stage 1（LipsChange）通过掩码重建与自细化伪对训练，实现无掩码的单步潜在空间编辑；Stage 2 则利用流匹配从音频预测唇部姿势向量，驱动 Stage 1 完成同步。这一设计在方法谱系中位于**确定性重建路线**，与 DiffDub（Liu et al., ICASSP 2024）、LatentSync 等扩散范式，以及 Wav2Lip（Prajwal et al., ACM MM 2020）等 GAN 范式形成鲜明对比。
 
-## 背景与动机
+
 
 ### 唇形同步任务的实时化困境
 
@@ -81,7 +81,9 @@ FlashLips 的作者提出了一个关键认知转变：**唇形同步本质上�
 
 这一设计哲学的直接产物是：FlashLips 的 U-Net 变体在单张 NVIDIA H100 上实现了 **109.41 FPS** 的推理速度——约为 KeySync 的 30.4 倍——同时在唇形同步准确性与视觉质量上达到甚至超越更大、更慢的基线模型（见 Table 1 和 Table 2）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FlashLips 的核心创新可归结为三个相互耦合的“变更槽”（changed slots），它们共同将唇形同步从多步生成范式推向单步确定性编辑，从而在实时性、训练稳定性与部署简洁性上实现代际跨越。
 
@@ -122,7 +124,7 @@ FlashLips 的身份保留策略不同于常见的全局特征条件注入，而�
 
 **证据强度评估**：上述三项核心创新的有效性均得到定量消融与主实验的强支撑（置信度 0.95–0.98）。需注意，自细化机制在训练数据覆盖不足的边缘案例（如严重遮挡、极端头部旋转）上可能产生伪影，该点属于论文已声明的局限性，需在实际部署中进一步验证。
 
-## 整体框架
+
 
 FlashLips 将唇形同步任务解耦为一个**两阶段级联框架**：Stage 1 在 VAE 潜在空间中完成单步确定性嘴唇编辑，Stage 2 从音频预测低维唇部姿势向量以驱动 Stage 1。两阶段独立训练、推理时串联，全程无需显式嘴唇掩码。
 
@@ -155,7 +157,7 @@ $$\mathcal{L}_{\text{total}} = 0.1 \mathcal{L}_{L1}^{\text{lat}} + 0.1 \mathcal{
 
 与基线方法通过参考帧或全局特征条件注入身份信息不同，FlashLips 采用**投影参考潜在变量 + 多参考帧动态选择**策略。消融实验（**Table 3, Table 4**）证实，将参考帧数量从 1 增加到 4 可显著提升身份保留度（ID），而对唇形同步度影响极小。
 
-## 核心模块与公式推导
+
 
 FlashLips 将唇形同步解耦为两个顺序阶段：**Stage 1 潜在空间编辑器 (LipsChange)** 与 **Stage 2 音频到唇部姿势 Transformer**。核心设计理念是用低维解耦的唇部姿势向量替代端到端的像素生成，使 Stage 1 成为纯重建驱动的单步确定性编辑，彻底摒弃 GAN 和扩散过程。
 
@@ -215,7 +217,9 @@ $$\mathcal{L}_{\mathrm{FM}} = \mathbb{E}_{t, \boldsymbol{\epsilon}, a} \left\| v
 
 **生成范式转变：** 从 GAN/扩散的多步迭代生成变为纯重建损失驱动的单步确定性编辑，这是实现 100+ FPS 推理速度的根本原因。U-Net 变体在单张 NVIDIA H100 上达到 109.41 FPS，比基于扩散的 KeySync 快约 30.4 倍（Table 2）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能：重建与交叉音频
 
@@ -277,7 +281,9 @@ Table 2 报告了在单张 NVIDIA H100 GPU 上、经 5 次预热后 10 次运行
 ![[assets/figures/papers/paper_list_l2487_https_openaccess_thecvf_com_content_CVPR2026_html_Zinonos_FlashLips_100/figures/001_Figure_1.jpg]]
 *Figure 1: FlashLips Results. Selected results of source and driver pairs, generated using our transformer-based model*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 范式转移：从迭代生成到单步重建
 
@@ -332,6 +338,8 @@ FlashLips 的身份保留策略与现有方法存在显著差异：
 3. **框架泛化**：两阶段“姿势预测 + 潜在编辑”范式是否可以推广至全身动画生成、动态背景替换或更广泛的视频编辑任务？这需要验证低维控制表示在更复杂运动模式下的表达能力。
 
 4. **与实时方法的深度融合**：FlashLips 的 100+ FPS 推理速度使其可与 **MuseTalk** 等实时方法直接竞争，但两者在身份保持机制和编辑粒度上的差异值得进一步对比研究。
+
+
 
 ## 原文 PDF
 

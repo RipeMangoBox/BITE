@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/Hearing_the_Room_Through_the_Shape_of_the_Drum_Modal_Guided_Sound_Recovery_from_Multi_Point_Surface_Vibrations.pdf
+project_link: null
 code_link: null
 aliases:
 - MGSR
@@ -40,7 +41,7 @@ claims:
 > - 多物体测试集（鼓、相框、笔记本电脑、垃圾桶、吉他、活页夹、金属板、瑜伽砖、理疗球、气球等11种） 上，ViSQOLAudio-NSIM（原始感知相似度，↑） 0.39 vs 0.27 (DnS) (+0.12)。
 > - 同上 上，ViSQOLAudio-MOS（平均意见分，↑） 2.01 vs 1.53 (DnS) (+0.48)；尺度不变多分辨率STFT距离（↓） 3.40 vs 3.55 (Single) (-0.15)；感知加权尺度不变多分辨率STFT距离（↓） 3.02 vs 3.43 (Single) (-0.41)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：传统基于激光散斑的光学振动传感方法在“听振辨声”任务中存在根本性局限——单点测量仅能捕获物体表面单个位置的振动信号，而不同表面点对同一频率成分的响应存在相位反转和幅度差异（Figure 2b）。简单地对多点信号取平均会抵消特定频率成分，延迟求和（delay-and-sum）则无法处理不同模态引入的不同相位延迟，导致恢复的音频信号噪声大、频谱严重受物体共振特性染色，音色失真。
 
@@ -50,7 +51,7 @@ claims:
 
 **主要结果**：在包含鼓、相框、笔记本电脑、垃圾桶、吉他、金属板、瑜伽砖等 11 种不同材质和形状物体的测试集上，所提方法在 ViSQOLAudio-NSIM（+0.12）、ViSQOLAudio-MOS（+0.48）、多分辨率 STFT 距离（−0.15）和感知加权 STFT 距离（−0.41）四项指标上均显著优于所有无监督基线（Tables 1–4）。定性结果表明，方法能有效恢复高频成分并抑制噪声，在不同材料和几何形状的日常物体上均表现出鲁棒性（Figures 5, 8）。
 
-## 背景与动机
+
 
 ### 问题背景：从表面振动中恢复声音
 
@@ -92,7 +93,9 @@ $$\ddot { q } _ { k } ( t ) + 2 \zeta _ { k } \omega _ { k } \dot { q } _ { k } 
 
 该方法在11种不同材料、形状的日常物体上进行了验证，结果表明其在多项感知音频质量指标上显著优于单点、平均和延迟求和基线，且与需要参考信号的监督校准基线性能相当。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作针对“从物体表面振动中恢复场景声音”这一任务，提出了**模态引导的声音恢复（Modal-Guided Sound Recovery）** 方法。其核心创新在于将传统“单点/简单融合”的信号处理范式，转变为**基于物理正向模型与逆向优化的模态分解与均衡框架**。以下从四个关键维度（changed slots）展开对比分析。
 
@@ -151,7 +154,7 @@ $$\operatorname* { argmin } _ { s ( t ) , \alpha _ { k } } \biggl \| \mathbf { v
 
 本方法的本质洞见在于：**物体的振动模态构成一组正交基，已知模态频率和形状即可近似反转物体的时空传递函数**，从而在抑制共振失真的同时融合多个测点信号，恢复干净、均衡的场景声音。
 
-## 整体框架
+
 
 本文提出**模态引导的声音恢复**（Modal-Guided Sound Recovery）方法，其核心pipeline由四个紧密耦合的模块构成，形成“测量→模态估计→正向建模→逆向求解”的闭环。
 
@@ -201,7 +204,7 @@ $$\operatorname*{argmin}_{s(t), \alpha_k} \left\| \mathbf{v}(\mathbf{x}_n, t) - 
 
 整个pipeline无需任何参考信号或监督训练，仅依赖一段宽带激励（如偶然拍手声）即可完成模态标定，随后对任意新声源进行恢复。
 
-## 核心模块与公式推导
+
 
 ### 正向物理模型：从声压到散斑位移
 
@@ -280,7 +283,9 @@ $$\operatorname*{argmin}_{s(t), \alpha_k} \left\| \mathbf{v}(\mathbf{x}_n, t) - 
 ![[assets/figures/papers/paper_list_l2084_https_arxiv_org_abs_2604_26678/figures/003_Figure_3.jpg]]
 *Figure 3: Robust mode estimation. (a) Initial mode candidates are obtained by detecting peaks on the smoothed vibration spectrum*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -366,7 +371,9 @@ $$\operatorname*{argmin}_{s(t), \alpha_k} \left\| \mathbf{v}(\mathbf{x}_n, t) - 
 ![[assets/figures/papers/paper_list_l2084_https_arxiv_org_abs_2604_26678/figures/007_Figure_7.jpg]]
 *Figure 7: Comparison between our model-based sound recovery and a calibrated baseline using a reference chirp signal. Our method reconstructs most of the frequency content with high fidelity, closely matching the calibrated result without using any additional intervening signals or supervision*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：从“看”振动到“听”声音
 
@@ -431,6 +438,8 @@ $$\mathbf{v}(\mathbf{x}_n, t) \approx \gamma\beta \sum_{k=1}^{K} \nabla\phi_k(\m
 4. **物理先验的增强**：是否可以利用额外的物理先验（如边界条件、材料参数）进一步提升鲁棒性？例如，已知物体为自由边界或固支边界时，模态形状的解析形式可作为更强的约束。
 
 5. **与深度学习的融合**：物理模型提供了可解释的结构，而深度学习擅长处理非线性偏差和噪声模式。两者融合可能突破当前线性假设的局限。
+
+
 
 ## 原文 PDF
 

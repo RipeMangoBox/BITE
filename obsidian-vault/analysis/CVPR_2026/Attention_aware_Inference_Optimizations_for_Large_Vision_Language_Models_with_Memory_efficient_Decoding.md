@@ -42,7 +42,7 @@ claims:
 > - OCR-VQA 上，ROUGE-L 52.44 vs 51.05 (Full KV Caching) (+1.39)。
 > - MMMU 上，准确率 (Accuracy) 34.59% vs 34.68% (Full KV Caching) (-0.09%)。
 
-## 概述
+## 概要
 
 大规模视觉语言模型在解码过程中需存储巨量键值对缓存，视觉令牌的高占比使显存瓶颈尤为突出，严重制约批处理规模与上下文长度。针对该问题，本文提出 **AttentionPack**，一种注意力感知的KV缓存压缩与部分解压方法。
 
@@ -57,7 +57,7 @@ claims:
 
 方法在 LLaVA1.5、QwenVL、VideoLLaVA 等多个模型及图像/视频问答基准上验证有效，代码已开源。需注意，单条推理时解压引入的延迟可达约 30%，在低并发场景下可能反而增加时延；此外，压缩秩和重压缩周期仍需手动设定。
 
-## 背景与动机
+
 
 大规模视觉语言模型（Large Vision-Language Models, LVLMs）在图像理解、视频问答等多模态任务中展现了卓越能力，但其推理部署面临严峻的显存瓶颈。核心矛盾在于：模型在自回归解码过程中需存储所有历史令牌的键值对（KV cache），以支持缩放点积注意力计算。对于视觉语言模型而言，视觉编码器通常将每张图像转换为数百甚至上千个视觉令牌（如LLaVA系列每张图像产生576个视觉令牌），导致KV缓存的体积急剧膨胀。以LLaVA1.5-7B为例，其KV缓存中视觉令牌占比可超过90%，严重制约了批处理大小和可支持的上下文长度。
 
@@ -79,7 +79,9 @@ claims:
 
 论文提出的**AttentionPack**方法通过三项关键设计回应上述问题：（1）多注意力头联合SVD压缩，将视觉令牌的键值缓存压缩至低秩表示；（2）基于累计注意力分数的部分解压缩机制，仅对高重要性令牌使用全秩解压；（3）融合解压-注意力计算核，将解压操作与注意力分数计算合并为单一算子以降低延迟。实验表明，该方法可在LLaVA1.5-7B上将缓存缩小5.09倍，同时A-OKVQA准确率从76.64%提升至76.88%；在VideoLLaVA-7B上缓存缩小8.11倍，MSVD-QA准确率仅比最佳非压缩基线低0.39%。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 AttentionPack 的核心创新在于**将视觉令牌 KV 缓存的低秩压缩与注意力感知的差异化解压相结合**，形成一条从“压缩什么”到“如何解压”的完整优化链路。其关键设计可从三个 changed slots 展开。
 
@@ -128,7 +130,7 @@ AttentionPack 与现有 KV 缓存优化方法存在根本性区别：
 
 AttentionPack 的独特之处在于：通过**缩小每令牌的存储体积**而非淘汰令牌来降低内存占用，同时以注意力感知解压抵消精度损失。这一策略使缓存缩小 **5–8 倍**的同时，在 A-OKVQA 上准确率甚至略高于全缓存基线（76.88% vs 76.64%），体现了压缩的正则化效应。
 
-## 整体框架
+
 
 AttentionPack 的推理工作流围绕“压缩—选择性解压—注意力计算—周期性重压缩”这一闭环构建，其核心目标是在不损害模型输出质量的前提下，将视觉令牌的键值缓存体积缩小数倍。整个 pipeline 由以下模块串联而成，各模块的输入输出关系在 Figure 1 中以示意图形式呈现。
 
@@ -164,7 +166,7 @@ $$
 
 整体而言，AttentionPack 通过“多头联合低秩压缩 + 注意力感知选择性解压”的双重机制，在缓存体积缩小约 5–8 倍的同时，将模型性能保持在 Full KV Caching 基线水平附近。其因果链条可概括为：视觉令牌 KV 向量的内在低秩特性 → 多头合并后 SVD 高效压缩 → 注意力分数指导差异化解压 → 关键信息无损、冗余信息降秩 → 缓存体积锐减、批量推理吞吐提升。该框架的主要局限在于单条推理时解压延迟可达 30%，且压缩周期和秩的选择依赖经验设定，缺乏自适应策略。
 
-## 核心模块与公式推导
+
 
 ### 视觉特征提取与投影
 
@@ -236,7 +238,9 @@ $$\mathbf{O} \gets (\mathbf{A} \tilde{\mathbf{V}}) \mathbf{W}_o$$
 ![[assets/figures/papers/paper_list_l738_https_arxiv_org_abs_2603_23914/figures/003_Figure_3.jpg]]
 *Figure 3: Visualization of compression and partial decompression*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -321,7 +325,9 @@ Table 6 报告了在纯文本任务（LongBench 数据集，LLaMA3.1-8B）上的
 ![[assets/figures/papers/paper_list_l738_https_arxiv_org_abs_2603_23914/figures/005_Table_2.jpg]]
 *Table 2: Video QA results on MSVD-QA and MSRVTT-QA with VideoLLaVA-7B. We report evaluation metrics along with cache memory and throughput statistics for full KV caching, H2O eviction, FastV to compare with our approach AttentionPack*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心思路：从令牌淘汰到低秩压缩
 
@@ -359,6 +365,8 @@ AttentionPack 与令牌淘汰、缓存量化存在天然的**正交互补性**�
 ### 知识库定位总结
 
 AttentionPack 属于 **VLM推理效率优化** 方向中的 **KV缓存结构化压缩** 子领域。与令牌淘汰（FastV、H2O、ScissorHands）和缓存量化（KVQuant）形成互补三角，共同构成当前VLM推理优化的方法矩阵。其核心知识贡献在于验证了“多注意力头联合低秩分解 + 注意力感知部分解压”这一技术路线的有效性，为后续的自适应压缩、增量压缩和训练‑压缩联合优化提供了基准。代码已开源（[AttentionPack](https://github.com/gitdisl/AttentionPack)），为社区复现与改进提供了基础。
+
+
 
 ## 原文 PDF
 

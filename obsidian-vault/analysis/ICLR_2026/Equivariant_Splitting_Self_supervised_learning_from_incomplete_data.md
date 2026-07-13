@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Equivariant_Splitting_Self_supervised_learning_from_incomplete_data.pdf
+project_link: null
+code_link: https://github.com/vsechaud/Equivariant-Splitting
 openreview_forum_id: upMIVpe467
 aliases:
 - ESE
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 等变分裂：从不完整数据中进行自监督学习 |
 | 英文题名 | Equivariant Splitting: Self-supervised learning from incomplete data |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=upMIVpe467); [GitHub](https://github.com/vsechaud/Equivariant-Splitting) |
+| Links | [paper](https://openreview.net/forum?id=upMIVpe467) · [GitHub](https://github.com/vsechaud/Equivariant-Splitting) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/generative_models_and_autoencoders |
 | Method | Equivariant Splitting (ES) |
 | Dataset | Compressive Sensing (MNIST, 28×28, various m), Image Inpainting (DIV2K 128×128, ~70% missing), MRI (FastMRI, 320×320, ×8 accel., 40 dB SNR), Sparse-View CT (50 views, 50 dB SNR) |
@@ -42,7 +44,7 @@ claims:
 > - Image Inpainting (DIV2K 128×128, ~70% missing) 上，PSNR / SSIM 为 27.45 ± 2.86 / 0.8737 ± 0.0461，对比 EI: 25.89 ± 2.65 / 0.8332 ± 0.0521，变化 +1.56 PSNR。
 > - MRI (FastMRI, 320×320, ×8 accel., 40 dB SNR) 上，PSNR / SSIM 为 28.54 ± 2.75 / 0.7933 ± 0.0614，对比 EI: 27.88 ± 2.64 / 0.7750 ± 0.0604，变化 +0.66 PSNR。
 
-## 概述
+## 概要
 
 从不完整数据中学习重建是计算成像的核心难题。当前自监督方法面临一个根本性瓶颈：在仅有一个秩缺失前向算子的条件下，等变成像（Equivariant Imaging, EI）等现有方案计算开销大、可能不收敛到最小均方误差（MMSE）最优估计，而分裂方法又依赖多算子支持，难以直接用于单算子场景。
 
@@ -52,7 +54,7 @@ claims:
 
 该方法的关键约束在于要求前向算子不与所选变换群等变，且推理时需对多个随机分裂求平均以近似加权 MMSE 估计。当噪声分布未知或图像分布严格违反不变性假设时，性能会有所退化，但这些限制为后续研究指明了方向。
 
-## 背景与动机
+
 
 ### 逆问题中的不完全数据挑战
 
@@ -92,7 +94,9 @@ $$\mathcal{L}_{\mathrm{SPLIT}}(y, A, f) = \mathbb{E}_{y_1, A_1 \mid y, A} \{ \| 
 
 本文的动机正是桥接这一缺口。核心思路是将等变成像中的变换不变性假设与分裂方法的测量分割机制相融合，但关键在于**改变等变性的实施方式**——不再通过额外的损失项来施加等变约束，而是将等变性直接嵌入重建网络的架构设计中。这需要重新定义逆问题背景下重建网络的等变性，并设计满足该性质的网络结构。若成功，则等变分裂损失可在理论上退化为无变换开销的普通分裂损失，同时保留MMSE最优性保证，实现计算效率与重建质量的双重提升。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 等变成像（Equivariant Imaging, EI）将变换不变性假设引入自监督逆问题学习，但其实现存在两个结构性瓶颈：**训练开销大**（每步需2–3次网络前向以显式计算等变正则项）且**无最优性保证**（EI损失函数的全局极小点未必对应MMSE估计器）。另一方面，测量分裂方法虽可恢复MMSE最优解，但依赖多算子场景，无法直接用于单秩缺失前向算子的情形。
 
@@ -133,7 +137,7 @@ $$\mathcal{L}_{\mathrm{ES}}(y, A, f) = \mathcal{L}_{\mathrm{SPLIT}}(y, A, f)$$
 
 实证上，等变架构与分裂损失之间存在**协同效应**：使用等变架构训练的分裂方法在 PSNR、SSIM 和等变度量上均优于非等变架构（Table 3），验证了理论设计在实际中的有效性。
 
-## 整体框架
+
 
 Equivariant Splitting (ES) 的核心思想是将测量分裂（measurement splitting）与变换不变性假设相结合，构建一个无需配对标定的自监督逆问题求解框架。其整体 pipeline 由训练与推理两个阶段构成，二者共享同一重建网络，但数据流和损失计算方式不同。
 
@@ -202,7 +206,7 @@ Equivariant Splitting (ES) 的核心思想是将测量分裂（measurement split
 
 整个 pipeline 的伪代码详见 Algorithm 1（训练）和 Algorithm 2（推理），具体架构细节（artifact removal、unrolled MoDL、Reynolds 平均）在 Appendix A.1 中展开。
 
-## 核心模块与公式推导
+
 
 ### 逆问题前向模型
 
@@ -278,7 +282,9 @@ $$ \hat{x} = \frac{1}{J} \sum_{j=1}^{J} f(y_1^{(j)}, A_1^{(j)}) $$
 
 该过程与训练时分裂策略一致，不引入额外模型或变换计算。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 瓶颈验证：ES 在多个逆问题任务上一致优于自监督基线
 
@@ -340,7 +346,9 @@ Figure 8 的训练过程演化曲线进一步表明，分裂方法的优势与�
 - **Figure 8**：分裂方法在训练全程优于 EI，与架构选择无关。
 - **Table 8**：未知噪声下 ES 仍优于 EI，但绝对性能下降，需注意噪声建模假设。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有自监督逆问题方法的关系
 
@@ -397,6 +405,8 @@ ES 的有效性依赖三个关键前提，违反任一项均可能导致性能�
 4. **非线性前向模型与复杂噪声的扩展**：当前理论和实验均基于线性前向模型和加性高斯噪声。扩展到非线性模型（如相位检索）或其他噪声分布（泊松噪声、Rician 噪声）并保持理论保证，是一个重要方向。
 
 5. **极低测量率下的性能边界**：在极端欠采样条件下，能否结合生成先验或扩散模型进一步提升性能，同时维持 ES 的自监督特性，值得探索。Figure 1 的压缩感知曲线显示 ES 在极低测量率下仍接近监督水平，但该结论的泛化边界尚不明确。
+
+
 
 ## 原文 PDF
 

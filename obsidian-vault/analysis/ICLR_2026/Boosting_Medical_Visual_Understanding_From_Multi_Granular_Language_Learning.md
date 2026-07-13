@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Boosting_Medical_Visual_Understanding_From_Multi_Granular_Language_Learning.pdf
+project_link: null
+code_link: https://github.com/HUANGLIZI/MGLL
 openreview_forum_id: ccjukmExrB
 aliases:
 - MGLLM
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 多粒度语言学习提升医学视觉理解 |
 | 英文题名 | Boosting Medical Visual Understanding From Multi-Granular Language Learning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=ccjukmExrB); [GitHub](https://github.com/HUANGLIZI/MGLL) |
+| Links | [paper](https://openreview.net/forum?id=ccjukmExrB) · [GitHub](https://github.com/HUANGLIZI/MGLL) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | Multi-Granular Language Learning (MGLL) |
 | Dataset | RFMiD (multi-label fundus), ChestX-ray14, MIDRC-XR |
@@ -42,7 +44,7 @@ claims:
 > - ChestX-ray14 上，AUC (Linear Probe) 为 82.94，对比 77.32 (CARZero)，变化 +5.62。
 > - MIDRC-XR 上，AUC (Linear Probe) 为 61.25，对比 59.02 (UniChest)，变化 +2.23。
 
-## 概述
+## 概要
 
 现有视觉-语言对比预训练方法（以 CLIP 为代表）仅支持单标签、单粒度对齐，无法有效利用医学图像天然关联的多层次文本描述（如疾病类别、临床解释、检查所见等），导致视觉特征难以同时区分粗粒度与细粒度类别。针对这一瓶颈，本文提出 **多粒度语言学习（Multi-Granular Language Learning, MGLL）** 框架，核心思路是通过多粒度文本监督构建层次化对比信号，并引入跨粒度一致性约束，使视觉编码器能够同时对齐多个相关标签且在不同语义层次间保持特征一致。
 
@@ -52,7 +54,7 @@ MGLL 的关键机制包含三个互补组件：**软 CLIP 损失**通过共现�
 
 MGLL 以即插即用模块形式作用于视觉-语言模型，保持计算效率的同时显著增强了医学视觉理解能力。
 
-## 背景与动机
+
 
 医学影像理解是临床诊断与治疗决策的核心环节。近年来，视觉-语言对比预训练方法（以 CLIP 为代表）在通用领域取得了显著成功，其核心思想是通过图像与对应文本描述的单标签对比学习，将视觉特征与语义信息对齐。然而，当这一范式迁移至医学领域时，一个根本性的瓶颈浮现：**医学图像天然与多个不同粒度的文本标签相关联**——例如，一张眼底照片可能同时对应“糖尿病视网膜病变”这一粗粒度疾病类别，以及“视网膜可见微动脉瘤、硬性渗出”等细粒度临床描述。现有的单标签、单粒度对齐策略无法有效利用这种层次化的文本监督信号，导致视觉特征在区分粗、细粒度类别时能力不足。
 
@@ -66,7 +68,9 @@ MGLL 以即插即用模块形式作用于视觉-语言模型，保持计算效�
 
 MGLL 的设计遵循“即插即用”原则，可作为视觉-语言模型的通用预训练模块嵌入现有框架，在保持计算效率的同时显著提升医学视觉理解的多标签处理能力与跨粒度语义一致性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MGLL 的核心创新在于将传统视觉‑语言预训练中“单图像‑单标签”的对齐范式，重构为**多粒度、多标签的软对齐与跨粒度一致性联合约束**。这一转变由三个相互关联的 changed slots 支撑，分别对应损失函数组合、多标签对齐机制和跨粒度一致性约束。
 
@@ -92,7 +96,7 @@ $$\mathcal{L}_{\mathrm{MGLL}} = \alpha_{1} \mathcal{L}_{\mathrm{sCLIP}} + \alpha
 
 相较于 CLIP 的单标签对比损失、CheXzero 的语义匹配策略或 MRM 的多标签对比学习，MGLL 的关键差异在于同时解决了两个耦合问题：**多标签对齐**（通过软 CLIP 损失和逐点损失）与**跨粒度一致性**（通过平滑 KL 散度）。这一联合优化使得视觉特征既能捕捉粗粒度类别信息，又能保留细粒度病理细节，在眼底多标签数据集 RFMiD 上线性探测 AUC 领先 CLIP 达 +34.96%，在 ChestX‑ray14 上领先次优方法 CARZero 达 +5.62%。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0011_ccjukmExrB_Boosting_Medical_Visual_Understanding_From_Multi/figures/002_Figure_2.jpg]]
 *Figure 2: The overview of MGLL (Multi-Granular Language Learning) pretraining pipeline*
@@ -151,7 +155,7 @@ $$
 
 预训练完成后，视觉编码器输出的特征可直接用于下游任务，无需额外的文本分支。论文将其作为即插即用模块，在线性探测、全微调以及多模态大语言模型的视觉编码器替换中均展现了显著的性能增益。
 
-## 核心模块与公式推导
+
 
 MGLL 的训练流水线由三个核心损失模块协同构成：**软 CLIP 损失（Soft CLIP Loss）** 实现一对多的多标签软对齐，**逐点损失（Point-wise Loss）** 提供细粒度的成对对齐约束，**平滑 KL 散度损失（Smooth KL Divergence Loss）** 强制不同粒度特征的语义一致性。三者通过加权和组合为最终优化目标。
 
@@ -203,7 +207,9 @@ $$\mathcal{L}_{\mathrm{MGLL}} = \alpha_{1} \mathcal{L}_{\mathrm{sCLIP}} + \alpha
 
 默认权重设置为 $\alpha_{1}=0.5$，$\alpha_{2}=1$，$\alpha_{3}=1$。消融实验证实，三项损失缺一不可：单独使用软 CLIP 或逐点损失均无法达到最优性能，加入平滑 KL 散度后性能进一步提升，表明跨粒度一致性约束与多标签对齐之间存在互补效应。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能突破
 
@@ -259,7 +265,9 @@ MGLL 对不完整标注展现出令人惊讶的鲁棒性。在 30% 粒度标签�
 | Table 4 | 增加粒度数目持续提升性能，3 粒度版本最优 |
 | Figure 4 | MGLL 的 CAM 精确定位病灶，CLIP 仅产生弥散激活 |
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 方法定位：从单标签对比到多粒度软对齐
 
@@ -303,6 +311,8 @@ MGLL 已在两个医学影像模态上得到全面验证：
 4. **跨领域迁移**：MGLL 的多粒度软对齐机制在其他具有内在层次结构的领域（如卫星影像、科学可视化）是否同样有效？这需要验证框架的领域无关性。
 
 5. **计算效率与规模扩展**：当前 MGLL 使用 ViT-L/14 作为图像编码器、BiomedicalBERT 作为文本编码器，消融实验（Table 5-6）确认了该组合的最优性。但在更大规模数据集上的计算效率与扩展性尚未系统评估。
+
+
 
 ## 原文 PDF
 

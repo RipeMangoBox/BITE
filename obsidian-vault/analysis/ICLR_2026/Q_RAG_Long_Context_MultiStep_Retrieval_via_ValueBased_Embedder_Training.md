@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Q_RAG_Long_Context_MultiStep_Retrieval_via_ValueBased_Embedder_Training.pdf
+project_link: null
+code_link: https://github.com/griver/Q-RAG
 aliases:
 - QR
 - Q-RAG
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | Q-RAG：基于价值学习的嵌入器训练实现长上下文多步检索 |
 | 英文题名 | Q-RAG: Long Context Multi‑Step Retrieval via Value‑Based Embedder Training |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=MS9nWFY7LG); [GitHub](https://github.com/griver/Q-RAG) |
+| Links | [paper](https://openreview.net/forum?id=MS9nWFY7LG) · [GitHub](https://github.com/griver/Q-RAG) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | Q‑RAG |
 | Dataset | BabiLong QA3 (10M tokens), RULER NIAH Avg (4K‑1M), HotPotQA, Musique (out‑of‑distribution) |
@@ -41,13 +43,13 @@ claims:
 > - RULER NIAH Avg (4K‑1M) 上，Accuracy (%) 为 100 (4K) / 99.7 (1M)，对比 99.7 (LongRoPE2‑8B at 4K) / not reported at 1M，变化 +0.3 / only Q‑RAG reports near‑perfect at 1M。
 > - HotPotQA 上，Fact F1 为 0.93，对比 0.97 (Beam‑Retriever)，变化 -0.04。
 
-## 概述
+## 概要
 
 现有长上下文多步检索方法（如基于 Transformer 的 Beam‑Retriever、微调 LLM 的 Search‑R1、或构建知识图谱的 GraphReader）普遍依赖昂贵的 LLM 微调或慢节奏的图构建，难以高效扩展到超长文本（>1M token），且无法充分挖掘嵌入空间的紧凑性以实现快速推理。**Q‑RAG** 提出一种全新的训练范式：冻结 LLM，仅微调轻量级嵌入器，将多步检索建模为有限时域马尔可夫决策过程（MDP），并通过最大熵强化学习进行训练。其核心组件包括状态嵌入器 $E_s$ 与动作嵌入器 $E_a$，利用二者内积直接估计每个文本片段的 $Q$ 值；同时引入基于已检索事实区间的相对位置编码，赋予代理对文档时序关系的内生感知。训练采用并行 Q 网络（PQN）与 $\lambda$‑回报，无需经验回放即可在单张 A100‑80GB GPU 上于 12 小时内完成收敛，推理时的时间和空间复杂度均保持 $\mathcal{O}(N)$，天然适应超长上下文。
 
 在超长上下文检索基准上的实验结果表明，**仅微调嵌入器便可在多项任务上匹敌甚至超越微调 LLM 的方法**。具体而言，在 BabiLong 最难的 QA3 子任务上，Q‑RAG 在高达 10M token 的上下文下仍保持约 0.95 的答案准确率（ARMT 在相同长度下降至 ∼0.37），几乎无性能退化。在 RULER 基准的“大海捞针”（NIAH）所有子任务上，Q‑RAG 在 4K 和 1M token 上下文中分别取得 100% 和 99.7% 的近乎完美准确率，未见长度退化。在开放域多步检索任务 HotPotQA 上，Q‑RAG 的事实检索 F1 达到 0.93，与当前 SOTA 方法 Beam‑Retriever 持平；而在分布外测试集 Musique 上，Q‑RAG 以 0.71 的 Fact F1 大幅超越其他基线（Beam‑Retriever 仅 0.61），亦与需要全量 LLM 微调的 Search‑R1 持平。消融实验进一步揭示，移除软 Q 函数（熵正则化）或目标网络将分别导致长上下文检索 F1 从 97.1 降至 94.5 和 75.9，证实了最大熵框架与目标网络对稳定学习的关键作用。训练效率方面，Q‑RAG 在消费级 GPU 上耗时不到 12 小时即达到峰值性能，相比需 8×A100 的大规模 LLM 微调方案具有显著资源公平优势，为低成本、高效率的超长上下文推理提供了可复现的新范式。
 
-## 背景与动机
+
 
 长上下文理解正成为大语言模型走向复杂推理的关键能力：用户需要在长达数百万tokens的文档、对话或知识库中定位多条分散的证据，并基于这些证据完成问答、事实核查或叙事推理。然而，将推理建立在超长文本之上远非简单的检索增强生成（RAG）可及，因为真实任务往往要求**多步检索**——智能体必须在多轮中迭代选择新片段，直至收集到所有支持事实。随着上下文长度向百万级（1M tokens）扩展，这一多步决策过程面临三大核心挑战：**检索精度不退化**、**训练与推理代价可控**，以及**对时间顺序与组合关系的敏感建模**。
 
@@ -79,7 +81,9 @@ claims:
 
 这些证据共同表明，**将多步检索中的“何时查什么”决策落实为嵌入空间中的值函数学习，既能突破LLM微调的效率瓶颈，又能弥补静态嵌入在组合与时间推理上的不足**，为超长上下文推理提供了一条成本与性能兼顾的实用路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 现有长上下文多步检索方法普遍存在两个制约瓶颈：一是依赖对大型语言模型（LLM）的监督微调或策略梯度微调（如 Search‑R1 通过微调 LLM 生成中间检索查询；Beam‑Retriever 通过轨迹克隆训练重排序器），训练成本高昂且难以扩展到千万级 token 的超长上下文；二是基于图构建或循环记忆的零样本方法（如 GraphReader）推理速度慢，无法充分利用预训练嵌入空间的紧凑性进行快速检索。Q‑RAG 的核心创新在于以**轻量级嵌入器为轴心**，将多步检索转化为有限时域马尔可夫决策过程（MDP），并通过**最大熵强化学习**直接优化嵌入空间中的检索策略。这一范式转变从三个关键层面打破了上述瓶颈，仅微调嵌入器即获得了与微调 LLM 相当甚至更优的多步检索性能，同时保持 O(N) 时间/空间复杂度与极快的训练收敛。
 
@@ -98,7 +102,7 @@ $$\rho_t(i) = j\delta + \ell\frac{i - b_j}{b_{j+1} - b_j}$$
 
 综上，Q‑RAG 通过**值函数驱动的嵌入器训练**，将多步检索的决策能力压缩进轻量级嵌入器，在开放性多跳 QA（HotPotQA 事实 F1 持平 Beam‑Retriever 0.93 vs 0.97，Musique OOD 超越至 0.71 vs 0.61，Table 2）和极长上下文寻证（RULER MH QA 1M 达 61，Table 1）等场景均取得顶尖表现；同时具备快速推理（O(N) 内积运算）与训练高效的双重优势，开辟了一条以低资源成本解决超长上下文检索问题的新路径。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0016_MS9nWFY7LG_Q-RAG_Long_Context_MultiStep_Retrieval_via_Value/figures/001_Figure_1.jpg]]
 *Figure 1: Q-RAG agent interacts with multi-step retrieval environment. The starting state $s _ { 0 }$ contains the initial query q. At the start of the episode, the agent embeds all chunks of the long context $\mathbb { C }$ . At each step t, the agent computes a vector embedding of the current state $s _ { t }$ , , which includes q and all previously selected chunks. For every chunk $c ^ { i } \in \mathbb { A } _ { t }$ , the utility of retrieving it is evaluated by the Q-function $Q _ { \theta } ( s _ { t }$ , a = $c ^ { i }$ ) . The policy $\pi _ { \theta }$ selects the next chunk from $\mathbb { A } _ { t }$ with probability proportional to its $Q _ { \theta } ( s _ { t } , c ^ { i }$ ) value
@@ -118,7 +122,7 @@ Q‑RAG 将多步检索形式化为**有限时域马尔可夫决策过程 (MDP)*
 
 **因果机制与瓶颈突破**：现有长上下文多步检索方法通常需要通过 LLM 生成中间查询或构建全图，导致超长上下文（>1M token）下效率急剧下降或无法泛化。Q‑RAG 将“检索决策”完全压缩到嵌入器的内积中，结合最大熵 RL 所引入的探索性 Boltzmann 策略与 TD 学习中的 $\lambda$-回报，使轻量级嵌入器能够学到隐式的多步规划和长程依赖。相对位置编码进一步强化了时间推理能力，使得 Q‑RAG 即便在 4K 长度文档上训练，也能直接泛化至 1M 甚至 10M token 的上下文中并保持接近完美的针检索寻精度（Table 1）与常识推理性能（Figure 2b），而无需对 LLM 做任何微调。
 
-## 核心模块与公式推导
+
 
 Q‑RAG 将长上下文多步检索形式化为有限时域马尔可夫决策过程（MDP）$\langle \mathcal{S}, \mathcal{A}, p, r, \gamma \rangle$，并在嵌入空间中对轻量级嵌入器进行最大熵强化学习。整个系统由六个核心模块构成：**状态嵌入器**、**动作嵌入器**、**Q 值函数**、**玻尔兹曼策略**、**时序差分学习单元**（含目标网络）以及**相对位置编码**。各模块的协同工作使得代理无需微调大语言模型即可在超长上下文中高效检索。
 
@@ -190,7 +194,9 @@ $$
 
 这一设计使得代理能够感知候选片段与已有证据之间的先后、邻近关系，从而在需要长程因果或时序推理的超长文档任务（如 BabiLong QA3）中实现几乎无退化的性能。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -256,7 +262,9 @@ Q‑RAG 利用 Q 值的幅度实现自发的早期停止：当所有候选动作
 
 为便于对照，本文对部分无法亲自复现的基线分数（如 Search‑R1、RAG‑RL）直接用原始论文数据标识（“◦”），并保持生成器一致。然而，Beam‑Retriever 被提供金标跳数，而 Q‑RAG 使用固定最大步数，这种信息不对等可能使 Beam‑Retriever 在 HotPotQA 上的优势被轻微高估。此外，Q‑RAG 在消费级 GPU 上的训练成本（≤12 h / A100‑80GB）与需要大规模并行训练的 LLM 微调方法形成鲜明对比，在资源受限环境下具有极强的实用性优势。总体而言，以上因素不会削弱 Q‑RAG 在长上下文多步检索领域建立的新效能基线。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有基线的关系
 
@@ -297,6 +305,8 @@ Q‑RAG 的强适用场景清晰：**超长上下文中的事实检索与寻针�
 - **亚线性时间推理**：能否引入近似 kNN 或分层索引技术，使 Q‑RAG 在保持嵌入内积效率的同时，实现与上下文长度的亚线性推理时间，从而支持万亿 token 级别文档？
 - **检索‑生成紧密耦合**：如何在保持推理效率的前提下，将策略梯度从生成器回传至检索代理，实现端到端优化？
 - **跨模态多步推理**：Q‑RAG 的 MDP 框架与嵌入空间值函数机制是否可迁移至图像、表格等多模态证据的迭代检索任务？
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2026
 pdf_ref: paperPDFs/arxiv_2026/PPISP_Physically_Plausible_Compensation_and_Control_of_Photometric_Variations_in_Radiance_Field_Reconstruction.pdf
+project_link: https://research.nvidia.com/labs/sil/projects/ppisp/
+code_link: https://github.com/nv-tlabs/ppisp
 aliases:
 - PPPICMC
 - PPISP
@@ -42,7 +44,7 @@ claims:
 > - Mip-NeRF 360 上，PSNR 28.15 (3DGUT+PPISP w/ ctrl.) vs 24.97 (3DGUT+BilaRF) (+3.18)。
 > - HDR-NeRF (with metadata) 上，PSNR 34.30 (3DGUT+PPISP w/ ctrl. + metadata) vs 17.86 (3DGUT+PPISP w/o metadata) (+16.44)。
 
-## 概述
+## 概要
 
 多视角三维重建高度依赖输入图像的光度一致性，然而真实世界的图像采集过程引入了大量光度变化——这些变化源自相机光学特性、传感器差异以及图像信号处理（ISP）管线的不同。传统应对方案，如每帧隐向量优化（**GLO**）、像素级仿射色彩校正（**BilaRF**）或事后显式处理（**ADOP**），要么缺乏物理基础导致泛化能力不足，要么依赖目标图像进行测试时对齐，掩盖了方法间的真实差异。
 
@@ -54,7 +56,7 @@ PPISP的管道由四个物理接地模块顺序构成：**曝光偏移**（全�
 
 方法定位上，PPISP属于**物理驱动的事后校正范式**，与基于隐向量的外观建模（GLO）和像素级仿射变换（BilaRF）形成对比。其低维参数化有效限制了模型容量，减少了过拟合——训练视图PSNR低于BilaRF，但新视图PSNR显著更高，验证了泛化优势。
 
-## 背景与动机
+
 
 ### 问题背景：多视角3D重建中的光度不一致性
 
@@ -84,7 +86,9 @@ PPISP的管道由四个物理接地模块顺序构成：**曝光偏移**（全�
 1. **物理合理的ISP校正模块**：通过曝光偏移、渐晕、色彩校正和CRF四个顺序模块，将光度变化建模为物理上可解释的变换序列。
 2. **ISP参数控制器**：从渲染辐射度预测每帧的曝光和色彩校正参数，模拟真实相机的AE/AWB行为，实现无需目标图像的新视角评估。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PPISP的核心创新在于将**物理合理的相机图像形成模型**引入辐射场重建的外观校正环节，从而在三个层面实现了对现有方法的突破：校正机制的可解释性、新视角参数的自动预测，以及评估协议的公平性。
 
@@ -122,7 +126,7 @@ Figure 6通过分析曝光偏移与白平衡变量之间的Pearson相关系数�
 
 综上，PPISP的创新可概括为三个**changed slots**：外观校正从隐式/仿射变换变为物理ISP级联，新视角参数从测试时优化变为控制器预测，色彩校正从逐通道增益变为色度单应性变换。这些设计共同实现了可解释性、可控性和泛化能力的统一提升。
 
-## 整体框架
+
 
 PPISP 构建了一个**物理合理的可微图像信号处理（ISP）管道**，作为辐射场重建的即插即用外观补偿层。该管道遵循真实相机的图像形成过程，将场景辐射度到最终像素值的转换建模为一系列物理基础模块的级联操作，从而将传感器固有属性与拍摄相关的设置解耦。
 
@@ -183,7 +187,7 @@ PPISP 的物理合理参数化不仅增强了可解释性，还通过有限的�
 ![[assets/figures/papers/paper_list_l71_https_arxiv_org_abs_2601_18336/figures/001_Figure_1.jpg]]
 *Figure 1: We introduce a differentiable image processing pipeline applied to radiance field reconstruction. By modeling the behavior of conventional cameras, our approach disentangles image formation effects from the rest of the pipeline. Our physically-plausible model admits a controller module that predicts exposure and color changes for novel views*
 
-## 核心模块与公式推导
+
 
 PPISP的核心设计思想是将相机图像形成过程建模为一系列物理合理、可微分的后处理模块，作用于辐射场渲染的原始线性辐射度 $\mathbf{L}(\mathbf{r})$。整个管道由四个顺序级联的模块构成：曝光偏移、渐晕校正、色彩校正和相机响应函数（CRF），最后通过一个控制器预测每帧参数以实现新视角的自动适配。
 
@@ -259,7 +263,9 @@ $$ \mathcal{L}_{\text{reg}} = \mathcal{L}_b + \mathcal{L}_c + \mathcal{L}_{\text
 ![[assets/figures/papers/paper_list_l71_https_arxiv_org_abs_2601_18336/figures/013_Figure_7.jpg]]
 *Figure 7: Comparison of ADOP [26]-style post-processing including exposure control against our method. Row labels indicate the post-processing method and the sequence name (in italics). The CRF for ADOP’s formulation compensates for the color artifacts baked into the radiance field only at a specific exposure value. But when controlling exposure for novel views, color artifacts are exacerbated. In contrast, both our method’s radiance field and output remain neutral since all corrections are decoupled*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：PPISP 在标准基准上的新视角合成性能
 
@@ -314,7 +320,9 @@ Figure 7 揭示了曝光与色彩校正解耦的重要性。ADOP 风格的曝光
 ![[assets/figures/papers/paper_list_l71_https_arxiv_org_abs_2601_18336/figures/017_Figure_10.jpg]]
 *Figure 10: Our low-parametric formulation of the different image processing steps enables manual editing. Top left shows the input image. Other images have details overlaid, such as the primary effect being applied and an abstract visualization. In the color correction examples, the white dots correspond to the four target chromaticities*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 辐射场外观建模的演进脉络
 
@@ -357,6 +365,8 @@ PPISP的物理合理性既是其优势来源，也划定了其适用边界：
 4. **与更高级表示的原生集成**。PPISP作为后处理模块与3DGUT、3DGS、Zip-NeRF等重建方法解耦，但这种松耦合可能限制端到端优化的潜力。能否将ISP校正嵌入到辐射场的隐式表示中，使渲染本身就对光度变化具有不变性？
 
 5. **动态场景与视频重建**。将PPISP扩展到动态场景需要处理时变光照和运动模糊，这要求控制器能够区分场景内容的真实变化和相机参数的变化——一个具有挑战性的因果推断问题。
+
+
 
 ## 原文 PDF
 

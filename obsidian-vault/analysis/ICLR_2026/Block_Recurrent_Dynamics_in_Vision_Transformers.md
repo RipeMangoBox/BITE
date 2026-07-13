@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Block_Recurrent_Dynamics_in_Vision_Transformers.pdf
+project_link: https://kempnerinstitute.github.io/raptor
+code_link: null
 aliases:
 - RRAPST
 - BRDVT
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 视觉Transformer中的块递归动态 |
 | 英文题名 | Block Recurrent Dynamics in Vision Transformers |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=gH3HhnfWLC); [Project](https://kempnerinstitute.github.io/raptor) |
+| Links | [paper](https://openreview.net/forum?id=gH3HhnfWLC) · [Project](https://kempnerinstitute.github.io/raptor) |
 | Topic | #topic/optimization_theory_probabilistic #topic/optimization_theory_probabilistic/interpretability_and_visualization |
 | Method | Raptor (Recurrent Approximations to Phase‑structured TransfORmers) |
 | Dataset | ImageNet‑1k, ADE20k, NYUv2 |
@@ -41,7 +43,7 @@ claims:
 > - ADE20k 上，mIoU (%) 为 Raptor k=3: 43.0±0.3，对比 DINOv2 ViT‑B: 47.5 / ViT‑S: 44.6，变化 相对于ViT‑B −4.5。
 > - NYUv2 上，RMSE (↓) 为 Raptor k=3: 0.618±0.006，对比 DINOv2 ViT‑B: 0.578 / ViT‑S: 0.600，变化 相对于ViT‑B +0.04。
 
-## 概述
+## 概要
 
 标准 Vision Transformer (ViT) 在深度方向上逐层使用独立参数，并未显式利用层间计算的可重用性。然而，实际训练好的 ViT 内部许多相邻层执行高度相似的运算，形成隐式的**块递归结构**——这一结构被标准训练方式掩盖，导致参数冗余和可解释性缺失。本文将该现象形式化为**块递归假说（Block-Recurrent Hypothesis, BRH）**：存在一组数量远少于总层数的参数绑定 Transformer 块，通过沿深度重复应用，能以极小误差逼近原模型完整的内部表示轨迹。
 
@@ -53,7 +55,7 @@ claims:
 
 在完整性能基准上，Raptor k=3 在 ImageNet‑1k 达到 **83.0%** 的线性探针准确率（对比教师 ViT‑B 84.5%，ViT‑S 80.9%），ADE20k 语义分割 mIoU **43.0**，NYUv2 深度估计 RMSE **0.618**（Table 2）。与教师模型存在微小但持续的差距，尤其在密集预测任务上，但模型参数总量大幅压缩，揭示了 ViT 的低算法复杂度本质。此外，作者提出的动力学可解释性程序（方向收敛、角速度、低秩更新、令牌相干性等测度）表明，ViT 深度轴对应离散时间动力学系统，其表示轨迹收敛到与类别相关的低维角度吸引子（Figure 6‑9）。这些发现为理解视觉 Transformer 的内部工作机制和设计更高效架构提供了新视角。
 
-## 背景与动机
+
 
 Vision Transformer (ViT) 已在各类视觉任务中取得卓越性能，但其标准架构将每一层视为独立参数化的变换，导致随着深度增加参数总量线性膨胀。这种设计假设各层需要不同的函数来逐步精炼表示，然而大量经验证据表明，实际训练后的 ViT 中许多层执行高度相似的计算，形成了一种隐含的**块递归结构**。例如，对多种 ViT 的层间表示余弦相似度矩阵进行可视化（Figure 1），可以清晰看到沿深度轴连续出现的高相似度块状区域，暗示存在功能上可重用的计算阶段。遗憾的是，标准的独立层训练范式掩盖了这一属性，使得网络内部存在大量计算冗余，且深度轴上的动态行为难以解释。
 
@@ -65,7 +67,9 @@ Vision Transformer (ViT) 已在各类视觉任务中取得卓越性能，但其�
 
 综上所述，本文的动机在于：不仅验证并利用 ViT 隐含的块递归结构以构建参数高效、性能接近原模型的循环代理（Raptor），更旨在建立一套**动态解释学**方法论，将深度轴上的计算理解为受少量块参数驱动的递归动力系统，从而深刻揭示当代视觉 Transformer 的算法复杂性本质。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 标准Vision Transformer (ViT) 将深度建模为独立参数层的逐次堆叠，未显式利用层间计算的可重用性，导致参数膨胀与计算冗余。本文的核心创新在于提出并验证**块递归假设 (Block‑Recurrent Hypothesis, BRH)**：深度轴上的隐式递归结构可通过少量参数绑定的块循环执行来高保真地复现原始表示轨迹，从而将ViT重新解释为**紧凑的循环程序**。围绕该假设，Raptor框架在架构与训练两个维度实现关键变更，以下基于 changed slots 展开分析。
 
@@ -93,7 +97,7 @@ Vision Transformer (ViT) 已在各类视觉任务中取得卓越性能，但其�
 
 综上，Raptor的核心创新并非简单的循环连接，而是通过**架构层面强制相位内参共用、训练层面全轨迹自洽约束**，将ViT从“深层串行计算”的物理视图转变为“浅层循环展开”的算法视图，从而同时获得参数效率、解释性与程序复杂度压缩。剩余精度差距（密集预测任务上‑4.5 mIoU）与训练复杂度的优化，是该创新当前的主要边界与后续工作方向。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0013_gH3HhnfWLC_Block_Recurrent_Dynamics_in_Vision_Transformers/figures/027_Figure_10.jpg]]
 *Figure 10: Three training paradigms for learning recurrent approximations. Each panel shows three token trajectories through depth. Gray dashed lines with filled circles represent the ground-truth teacher trajectories; black solid lines with filled circles show the student’s predictions; colored dotted lines (with ε labels) indicate the error signal between predicted and ground-truth states. Left (Distillation): The student network directly predicts the final layer from the initial state, with no supervision on intermediate representations. Error is measured only at the terminal state, providing no guidance on the representational trajectory. Middle (Teacher Forcing): At each depth step ℓ, the student...*
@@ -113,7 +117,7 @@ Vision Transformer (ViT) 已在各类视觉任务中取得卓越性能，但其�
 
 **架构优势与局限。** 参数绑定使 Raptor 的描述复杂度仅由 $k$ 个块的参数主导（Levin 复杂度界，附录 E），但两阶段训练仍较复杂，且微小但持续的精度差距（尤其在 ADE20k 等密集任务上）提示进一步优化的空间。
 
-## 核心模块与公式推导
+
 
 **Raptor** 的核心思想是将预训练 ViT 的层间相似结构显式化为参数绑定的循环块，并通过两阶段轨迹匹配训练来重建层激活序列。以下给出方法的关键公式及其变量含义，直接源自论文中的定义，不进行额外推导或猜测。
 
@@ -186,7 +190,9 @@ $$
 
 其中 $\mathbf{s}_{\mathrm{attn}}$ 是 $\mathbf{S}$ 中对应注意力部分的子向量，$\mathrm{LS}$ 为 LayerScale 操作。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 我们的实验围绕一个核心检验：**视觉Transformer的深度方向是否隐含一个可被递归复用的块状结构？** 为此，我们构建了Raptor（Recurrent Approximations to Phase‑structured TransfORmers），在预训练模型上进行后验蒸馏，并系统评估了其重构保真度、性能边界以及导致块递归涌现的动力学条件。所有骨干均被冻结，仅训练线性评估头（或分类器），评估复用DINOv2的patch embedding与最终LayerNorm，并报告3个种子的均值和标准差。以下先给出主结果，再深入消融训练、分割策略与因果干预的证据链，最后归纳失败模式与待解决问题。
 
@@ -263,7 +269,9 @@ Raptor依赖于最大割算法发现的块分区。在CIFAR‑100上（Figure 
 - **Figure 15**：块内层替换保持精度而块间替换崩溃，为功能块递归复用提供了因果层级的证据。
 - **Figures 6‑9**：动态测度从方向、角速度、低秩更新等维度交叉验证了相位边界的动力学意义。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 Raptor 并非提出一种全新的视觉架构，而是通过 **块递归假设（Block‑Recurrent Hypothesis, BRH）** 揭示预训练 ViT 内部的低算法复杂度本质，并将其操作化为可复现的循环代理模型。因此，该方法在知识库中的位置主要由它与教师模型、训练范式和阶段发现策略的对比关系界定，其适用边界则直接受限于 BRH 成立的隐含条件与当前蒸馏训练的技术瓶颈。
 
@@ -290,6 +298,8 @@ Raptor 并非提出一种全新的视觉架构，而是通过 **块递归假设�
 2. **块结构涌现的条件边界**：在何种训练条件（数据规模、优化器、架构变体）下 BRH 必然出现？哪些条件下会消失？这需要受控训练动力学实验以建立因果关系。
 3. **剩余性能差距的来源**：该差距是本质的相位偏差所致，还是训练技术不完美（如蒸馏损失、深度缩放容量不足）导致？前者需要改进循环约束的表达力，后者则呼唤更先进的蒸馏或时变组件。
 4. **BRH 能否导向主动设计？** 能否利用 BRH 设计更高效的初始化或训练算法，直接从零开始诱导循环结构，而非仅作为事后提取工具？这关系到该范式的实用化深度。
+
+
 
 ## 原文 PDF
 

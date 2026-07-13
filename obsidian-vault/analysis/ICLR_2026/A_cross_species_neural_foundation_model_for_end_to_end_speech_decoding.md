@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/A_cross_species_neural_foundation_model_for_end_to_end_speech_decoding.pdf
+project_link: null
+code_link: null
 aliases:
 - BBT
 - CSNFMEESD
@@ -42,13 +44,13 @@ claims:
 > - Brain-to-Text '24 上，WER 为 10.22% (BIT End-to-End + Ensemble)，对比 24.69% (prior end-to-end method)，变化 -14.47%。
 > - Brain-to-Text '25 上，WER 为 1.76% (BIT Cascaded + Ensemble)，对比 —，变化 —。
 
-## 概述
+## 概要
 
 本文提出BIT（BraIn-to-Text），一个用于端到端语音解码的跨物种神经基础模型。其核心瓶颈在于：传统级联框架无法实现端到端联合优化，且RNN编码器在小数据集上表现有限，难以充分利用现代Transformer架构和大规模预训练的优势。BIT的因果机制是引入一个跨任务、跨物种的Transformer神经编码器，通过自监督掩码建模在367小时的Utah阵列数据（包含人类和猴子的言语及手臂运动任务）上预训练，并结合音频大语言模型（audio-LLM）与对比学习实现端到端优化。核心洞见在于：大规模自监督预训练能够学习稳定的、可跨任务迁移的神经表征，且通过对比学习对齐神经和文本嵌入空间，使得小规模音频LLM在端到端解码中显著优于文本LLM。
 
 主要结果方面，BIT将先前端到端方法的词错误率（WER）从24.69%降低至10.22%（Brain-to-Text '24保留集）。在级联设置中，预训练编码器在Brain-to-Text '24和'25基准上均建立了新的最先进水平（SOTA）。BIT级联+集成在'24保留集上达到5.10% WER，在'25公共排行榜上达到1.76% WER；BIT端到端+集成在'24保留集上达到10.22% WER，在'25公共排行榜上达到7.76% WER。在想象性言语解码（50词词汇量）中，BIT-All在级联和端到端设置下均优于所有其他基线。
 
-## 背景与动机
+
 
 脑机接口（BCI）领域的一个核心挑战是将神经活动直接解码为自然语言，即“脑到文本”（Brain-to-Text）翻译。现有方法主要采用级联框架：先通过神经编码器预测音素序列，再借助独立的语言模型（如n-gram模型）将其转换为单词。这种级联设计存在根本性瓶颈——神经编码器与语言模型无法联合优化，导致信息流在中间表示处被截断，丢失了端到端语义一致性。此外，广泛使用的循环神经网络（RNN）编码器在小规模标注数据集上表现有限，无法充分利用现代Transformer架构和大规模预训练带来的表征能力提升。
 
@@ -56,7 +58,9 @@ claims:
 
 本文提出的BIT（BraIn-to-Text）框架，其核心动机正是同时解决上述两个瓶颈。BIT引入了一个基于Transformer的神经编码器，通过自监督掩码建模在367小时的Utah阵列数据（涵盖人类和猴子的言语及手臂运动任务）上进行预训练。这一设计的关键因果机制在于：大规模跨任务、跨物种的预训练能够学习到对传感器变异和任务差异鲁棒的神经表征，从而在标注数据极少的想象性言语任务中实现有效迁移。在解码端，BIT抛弃了级联的n-gram语言模型，转而采用音频大语言模型（audio-LLM）作为端到端解码器，并通过对比学习对齐神经嵌入和文本嵌入空间。这一改变使得小规模音频LLM能够在有限标注数据下显著优于文本LLM，将先前端到端方法的词错误率（WER）从24.69%降低到10.22%。同时，在级联设置下，预训练编码器也在Brain-to-Text '24和'25基准上建立了新的最先进水平（SOTA），BIT级联+集成在'24保留集上达到5.10% WER，在'25公共排行榜上达到1.76% WER。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 BIT (BraIn-to-Text) 的核心创新在于用一套**跨任务、跨物种的自监督预训练 Transformer 编码器**替换了传统级联框架中的 RNN 编码器，并引入**音频大语言模型（audio-LLM）**与**对比学习**实现端到端联合优化。这一因果链直接针对了此前方法的核心瓶颈：级联框架无法端到端联合优化，且 RNN 编码器在小数据集上表现有限，无法充分利用现代 Transformer 架构和大规模预训练的优势。
 
@@ -87,7 +91,7 @@ BIT (BraIn-to-Text) 的核心创新在于用一套**跨任务、跨物种的自�
 
 **因果链总结：** 跨物种自监督预训练 → 稳定的神经表征 → 跨任务迁移能力 → 对比学习对齐神经-文本嵌入空间 → 小规模音频 LLM 实现高效端到端解码。这一链条的每个环节都通过消融实验得到了验证，且最终 WER 的显著下降（从 24.69% 到 10.22%）提供了强有力的因果证据。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0002_Lp1noMpMUG_A_cross-species_neural_foundation_model_for_end-/figures/001_Figure_1.jpg]]
 *Figure 1: Schematic illustration of BIT. (A) BIT is an end-to-end speech decoding framework that translates neural activity directly into text by combining a cross-task, cross-species pretrained neural encoder with an audio-LLM decoder. The data are separately obtained and preprocessed from each study. (Appendix A). (B) The neural encoder is a transformer that embeds 20 ms bins of thresholded spikes and spike-band power into multi-bin time patches. It is pretrained using SSL with time-patch masking, reconstructing patch tokens via subject-specific linear read-in and read-out layers with an MSE loss. After pretraining, the masking module is removed, and the encoder is fine-tuned for phoneme decoding u...*
@@ -104,7 +108,7 @@ BIT（BraIn-to-Text）是一个端到端的语音解码框架，其核心设计�
 
 **数据流**：原始神经活动 → 20ms bin + z-score跨天归一化 → 组合特征（阈值化尖峰+SBP）→ patch化 → Transformer编码器 → 端到端路径（MLP投影器 → 模态对齐 → audio-LLM解码）或级联路径（CTC分类 → n-gram LM → 句子重打分）→ 最终文本。
 
-## 核心模块与公式推导
+
 
 ### 神经编码器：Transformer架构与掩码预训练
 
@@ -146,7 +150,9 @@ $$
 
 除MLP投影器外，BIT还探索了**交叉注意力投影器**（CrossAttentionProjector），其输出为 $\mathbf{z}^*, \mathbf{A} = \mathrm{CrossAttentionProjector}(\mathbf{z}^s, \mathbf{z}^t)$，其中神经token作为查询（queries），文本token作为键和值（keys and values），实现token级别的模态交互。实验表明，MLP投影器在想象性言语解码上表现最佳（T12: 16.39% WER, T15: 13.61% WER），而交叉注意力投影器性能略低（T12: 17.33% WER, T15: 17.67% WER）。在最终基准提交中，BIT使用**LLM合并**（LLM merging）进行模型集成，将多个微调后的LLM权重进行平均，进一步降低了词错误率（WER）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：BIT在言语解码基准上实现SOTA
 
@@ -200,7 +206,9 @@ BIT在Brain-to-Text '24和'25两个基准上均取得了当时的最佳结果。
 
 **端到端推理速度**：端到端方法每句推理需0.95秒，远慢于级联方法的0.24秒，且当前使用双向注意力无法支持流式解码。这是实现实时BCI应用的主要工程障碍。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与 Baseline/Follow-up 的关系
 
@@ -232,6 +240,8 @@ BIT 的适用性受以下条件约束：
 5. **长期使用问题未解决**：模型未充分处理非平稳性、神经可塑性和用户-界面协同适应等长期 BCI 使用中的关键挑战。这些因素在实际部署中可能导致性能随时间退化。
 
 6. **自监督预训练的本质优势**：在控制数据量时，监督预训练与自监督预训练在想象性言语解码上性能相当（Table 9）。这引发了一个根本性问题：大规模自监督预训练的核心优势是否仅仅来自数据量的增加，而非自监督目标本身？如果是，那么获取更多标注数据可能比设计更复杂的自监督目标更为有效。
+
+
 
 ## 原文 PDF
 

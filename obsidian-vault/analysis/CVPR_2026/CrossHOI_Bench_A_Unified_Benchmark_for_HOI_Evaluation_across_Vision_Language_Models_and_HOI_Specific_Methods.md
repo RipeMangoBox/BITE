@@ -44,7 +44,7 @@ claims:
 > - CrossHOI-Bench Setting 1 上，Instance-F1 Qwen2.5-VL-32B (zero-shot) vs ADA-CM (HOI-specific SOTA) (+5.18%)。
 > - CrossHOI-Bench Setting 2 (Localized Recognition) 上，Macro-F1 Qwen2.5-VL-32B (zero-shot) vs InternVL3-38B (best alternative VLM) (+3.96%)。
 
-## 概述
+## 概要
 
 现有 HOI（人体-物体交互）基准面临一个根本性瓶颈：**不完全标注导致评估失真**。以 HICO-DET 为代表的基准依赖精确匹配评估，但受限于视觉信息模糊（如 mid-motion 动作）和稀疏标注，大量合理交互未被标注为真值。这导致通用视觉语言模型（VLM）的灵活输出被系统性误判为错误——VLM 的 mAP 被压低至约 15%，而 HOI 专用方法也不足 50%（Figure 1c）。此外，现有基准中简单头类场景过多，掩盖了模型在多人、细粒度交互等真实困难场景中的差异。
 
@@ -60,7 +60,7 @@ claims:
 
 CrossHOI-Bench 通过精心设计的困难负例和三种评估设置（完整检测、给定框识别、多人物图像级识别），成功分离了识别、定位和多人物交互能力，为跨范式 HOI 评估提供了统一的公平基准。
 
-## 背景与动机
+
 
 ### 人体-物体交互理解的评估困境
 
@@ -88,7 +88,9 @@ CrossHOI-Bench 将 HOI 检测重新定义为**多答案多项选择题（MCQA）
 
 通过这一设计，CrossHOI-Bench 不仅揭示了 VLM 与 HOI 专用方法的互补优势（VLM 交互推理强但定位弱，HOI 方法多动作识别好但分布外泛化差），更为跨范式 HOI 评估建立了可复用的方法论框架。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CrossHOI-Bench 的核心创新并非提出新的 HOI 检测模型，而是**重新定义了 HOI 评估的任务形式与数据分布**，从而首次实现了视觉语言模型（VLM）与 HOI 专用方法在统一、公平的协议下的可比评估。这一创新通过以下四个相互耦合的 **changed slots** 实现。
 
@@ -139,7 +141,7 @@ CrossHOI-Bench 通过两阶段筛选重塑数据分布：
 
 上述四个 changed slots 并非孤立改进，而是形成因果闭环：**MCQA 格式**使跨范式评估成为可能 → **多维指标**揭示不同维度的能力差异 → **难度重分配**放大模型间真实差距 → **显式负例**消除标注不完整带来的评估噪声。这一耦合使得 CrossHOI-Bench 能够首次揭示 VLM 与 HOI 专用方法的互补优势：VLM 在交互推理上超越专门训练的方法（零样本 Macro-F1 50.71 vs. 47.49），但在多动作识别和跨人物归因上存在显著瓶颈；HOI 方法在多动作场景下召回率更高，但在分布外泛化上明显弱于 VLM。
 
-## 整体框架
+
 
 CrossHOI-Bench 的构建与评估围绕一个核心重构展开：**将 HOI 检测重新定义为多答案多项选择题（multiple-answer, multiple-choice QA）**。这一设计并非简单的格式转换，而是对评估协议的根本性修正——它通过为每道题明确提供正例与负例集合，消除了传统精确匹配评估下因标注不完整而产生的大量假阴性惩罚。
 
@@ -173,7 +175,7 @@ CrossHOI-Bench 的构建与评估围绕一个核心重构展开：**将 HOI 检�
 ![[assets/figures/papers/paper_list_l2206_https_arxiv_org_abs_2508_18753/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of our HOI benchmark construction. Input image undergoes coarse screening and manual refinement to produce a four-choice question, followed by evaluation under three settings*
 
-## 核心模块与公式推导
+
 
 ### 3.1 任务形式化：多答案多项选择题
 
@@ -231,7 +233,9 @@ $$\mathrm{EM} = \frac{1}{|Q|} \sum_{q \in Q} \mathbf{1}[P_q = G_q]$$
 ![[assets/figures/papers/paper_list_l2206_https_arxiv_org_abs_2508_18753/figures/001_Figure_1.jpg]]
 *Figure 1: (a) Existing HOI benchmarks (e.g., HICO-DET) rely on exact-match evaluation under incomplete annotations, penalizing valid yet unlabeled interactions (b) Our multi-choice benchmark accepts multiple correct answers and avoids false negatives and enabling unified evaluation of HOI-specific methods and VLMs. (c) Comparison of state-of-the-art (InternVL3 [85], Qwen2.5-VL-32B [3]) and HOI-specific methods (ADA-CM [37], CMMP [40], HOLa [36]). Results are shown using Macro-F1 in our benchmark (Setting 1) versus mean Average Precision (mAP) in HICO-DET*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置与评估协议
 
@@ -330,7 +334,9 @@ Figure 4 展示了 Qwen2.5-VL-32B 在 Setting 1 中的典型失败案例，可�
 ![[assets/figures/papers/paper_list_l2206_https_arxiv_org_abs_2508_18753/figures/028_Table_12.jpg]]
 *Table 12: Ablation study on the effect of using Qwen2.5-VL-32B in the coarse screening during dataset construction. The experiment is conducted in a 12% random subset. “w/o Qwen2.5-VL-32B” means that Qwen is not used for screening; “w/ Qwen2.5- VL-32B’ means that Qwen is used for screening*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 任务重定义：从精确匹配检测到多答案选择题
 
@@ -396,6 +402,8 @@ CrossHOI-Bench 评估了多种代表性 HOI 专用方法，包括两阶段方法
 3. **MCQA 格式的时空扩展**：在视频 HOI 理解中，交互的定义涉及时间维度的起止边界和动作演化。如何将多答案选择题格式扩展到时间维度，同时保持评估的可控性和公平性，是一个非平凡的设计挑战。
 
 4. **更大规模、更细粒度的基准构建**：当前基准的规模和类别覆盖仍有扩展空间。结合自动标注管线与人工验证，构建覆盖更多长尾交互类型、更细粒度动作区分的大规模 MCQA 基准，将有助于推动领域进一步发展。
+
+
 
 ## 原文 PDF
 

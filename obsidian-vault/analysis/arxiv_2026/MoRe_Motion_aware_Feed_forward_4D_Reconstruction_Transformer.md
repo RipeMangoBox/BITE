@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2026
 pdf_ref: paperPDFs/arxiv_2026/MoRe_Motion_aware_Feed_forward_4D_Reconstruction_Transformer.pdf
+project_link: https://hellexf
+code_link: null
 aliases:
 - MoRe
 tags:
@@ -40,7 +42,7 @@ claims:
 > - Bonn 上，ATE↓ 0.0211 (streaming) / 0.0138 (FA) vs 0.0141 (VGGT FA) (+0.0003 (FA) / +0.0070 (streaming vs VGGT FA))。
 > - TUM-dynamics 上，ATE↓ 0.0260 (streaming) / 0.0115 (FA) vs 0.0109 (VGGT FA) (+0.0006 (FA) / +0.0151 (streaming vs VGGT FA))。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -78,7 +80,7 @@ MoRe建立在**前馈式多视图重建**的范式之上，直接继承自Dust3R
 
 MoRe的性能严重依赖运动掩码标注的质量；当前前馈架构难以捕捉超出训练时间窗口的极长时依赖和复杂动态交互；在极快、非刚性运动或严重运动模糊场景下，注意力对齐可能失效。未来方向包括：减少对高质量运动标注的依赖（如自监督运动解耦）、扩展前馈架构以捕获更长时序依赖、显式建模遮挡与外观剧变以消除重建伪影。
 
-## 背景与动机
+
 
 ### 动态4D重建：从静态先验到运动感知的范式缺口
 
@@ -104,7 +106,9 @@ MoRe的性能严重依赖运动掩码标注的质量；当前前馈架构难以�
 
 这一设计使得MoRe在保持实时推理效率（KITTI上30 FPS，**Table 5**）的同时，在多个动态数据集上全面超越现有流式方法：Sintel上ATE降至0.1474（**Table 1**），Abs Rel降至0.254（**Table 2**），并在Co3Dv2静态场景上以91.42 AUC@30验证了其泛化能力（**Table 6**）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MoRe 的核心创新在于通过**训练时的注意力强制（attention-forcing）策略**，在不增加推理计算的前提下，实现动态场景中运动与静态结构的显式解耦。这一设计直击当前前馈式重建方法的根本瓶颈：现有模型（如 VGGT）的相机 token 在注意力分配中会混淆运动物体与静态背景区域（见 Figure 3），导致动态场景下相机姿态估计和深度重建精度大幅下降。
 
@@ -142,7 +146,7 @@ $$\mathbf{C}_{t}^{\mathrm{opt}} = \mathrm{Attn}( \mathbf{Q}_{t}^{\mathrm{cam}}, 
 
 这三项创新协同作用：注意力强制训练赋予模型运动感知能力，分组因果注意力保障流式推理的时空一致性，BA-like 聚合弥补因果注意力的长程信息损失，最终在实时效率下实现高质量的动态 4D 重建。
 
-## 整体框架
+
 
 MoRe 是一个前馈式 4D 重建 Transformer，专为流式（streaming）输入设计，在单目前向推理中联合预测每帧的深度图、相机姿态、动态点云图和运动掩码。其整体 pipeline 围绕三个核心设计展开：**运动感知的注意力强制训练**、**分组因果注意力机制**以及**类光束平差的全局 token 聚合**，在保持实时推理效率的前提下实现了动态场景中运动与静态结构的高效解耦。
 
@@ -189,7 +193,7 @@ $$
 ![[assets/figures/papers/paper_list_l57_https_arxiv_org_abs_2603_05078/figures/002_Figure_2.jpg]]
 *Figure 2: Method Overview. During training, an attention-forcing mechanism aligns the attention weights with ground-truth motion masks, enabling the model to effectively disentangle dynamic motion from static scene structure. For streaming reconstruction task, MoRe is based on a causal transformer where global attention is replaced by aggregated causal attention*
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题形式化：从静态重建到运动感知流式重建
 
@@ -302,7 +306,9 @@ $$
 ![[assets/figures/papers/paper_list_l57_https_arxiv_org_abs_2603_05078/figures/005_Figure_5.jpg]]
 *Figure 5: Streaming Inference pipeline. Leveraging causal attention, our model can efficiently process streaming input in an online manner. To enhance camera pose accuracy, we apply a bundleadjustment-like post-processing step after the entire sequence has been processed. Specifically, for each frame, we duplicate the camera token and perform inference again using the previously cached key-value pairs*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验结果
 
@@ -374,7 +380,9 @@ Figure 10 的注意力图可视化直接揭示了注意力强制策略的效果�
 ![[assets/figures/papers/paper_list_l57_https_arxiv_org_abs_2603_05078/figures/014_Table_6.jpg]]
 *Table 6: Camera Pose Estimation Comparison on Co3Dv2 [30]*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的谱系关系
 
@@ -407,6 +415,8 @@ MoRe 的架构直接继承自以 **VGGT** 为代表的全注意力前馈重建�
 5. **部分运动场景的注意力强制稳定性。** 当仅有部分场景区域运动或存在多个运动物体时，注意力强制策略的表现是否仍然稳定，以及如何进一步优化损失设计以适应更复杂的运动模式，仍需系统验证。
 
 > **注意：** 上述基线方法的具体作者、会议和年份信息在当前分析中未提供完整元数据，建议手动补充以增强知识库定位的准确性。例如，Stream3R、CUT3R、Spann3R 等方法的出版信息需从原始论文中核实。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2024
 pdf_ref: paperPDFs/CVPR_2024/Dynamic_Prompt_Optimizing_for_Text_to_Image_Generation.pdf
+code_link: https://github.com/mowenyii/pae
 project_link: https://github.com/mowenyii/pae
 aliases:
 - PAEP
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 面向文本到图像生成的动态提示优化 |
 | 英文题名 | Dynamic Prompt Optimizing for Text-to-Image Generation |
 | 会议/期刊 | CVPR 2024 |
-| Links | [paper](https://arxiv.org/abs/2404.04095); [GitHub](https://github.com/mowenyii/pae) |
+| Links | [paper](https://arxiv.org/abs/2404.04095) · [GitHub](https://github.com/mowenyii/pae) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/diffusion_image_video |
 | Method | Prompt Auto-Editing (PAE) |
 | Dataset | Lexica.art, DiffusionDB, COCO |
@@ -42,7 +43,7 @@ claims:
 > - Lexica.art 上，Aes Score (↑) 为 6.12，对比 6.11 (Promptist)，变化 +0.01。
 > - DiffusionDB 上，PickScore (↑) 为 64.4%，对比 55.3% (Short Prompt)，变化 +9.1%。
 
-## 概述
+## 概要
 
 **核心问题**：文本到图像扩散模型对提示词高度敏感，手工设计具备精细控制能力（如逐词权重与注入时间步）的提示需大量试错，现有自动优化方法缺乏对修饰词效果范围和权重的控制。
 
@@ -55,7 +56,7 @@ claims:
 
 **方法定位**：PAE属于基于强化学习的提示优化方法，在控制粒度上引入了逐词权重与时间步分配，突破了纯文本提示的局限。与Promptist（Hao et al., 2023）等仅优化文本内容的方法相比，PAE通过修改扩散模型的文本注入机制实现动态精细控制。
 
-## 背景与动机
+
 
 文本到图像生成领域近年来取得了显著进展，特别是以 Stable Diffusion 为代表的扩散模型能够根据自然语言描述生成高质量的图像。然而，这些模型对提示词（prompt）高度敏感——即使是微小的措辞变化，也可能导致生成结果在风格、构图和细节上产生显著差异。这催生了“提示工程”（prompt engineering）的实践需求：用户通过反复试错，手工添加修饰词（如 “trending on ArtStation”、“4k detailed”）来引导模型输出符合预期的图像。
 
@@ -65,7 +66,9 @@ claims:
 
 本文的核心动机在于：**将提示优化从“全局文本选择”提升为“动态精细控制”**。具体而言，为每个修饰词显式分配一个三元组 ⟨token, 效果范围, 权重⟩，构成**动态精细控制提示（DF-Prompt）**。效果范围定义了该修饰词在去噪过程的哪些时间步生效（[b_i, e_i]），权重则控制其注入强度（w_i）。这一设计将提示优化的搜索空间从离散的词汇选择扩展为连续的联合优化问题，从而能够在不牺牲语义一致性的前提下，显著提升生成图像的审美质量和人类偏好得分。为高效探索这一复杂空间，本文提出**Prompt Auto-Editing (PAE)** 框架，通过两阶段训练（监督精炼 + 在线强化学习）自动学习最优的修饰词及其控制参数。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PAE的核心创新在于将文本到图像生成的提示优化从“静态文本扩展”提升为“动态精细控制”。传统方法（如**Promptist**，Hao et al., 2023）仅能生成纯文本后缀，无法控制每个修饰词对生成过程的影响程度。PAE通过两个关键维度的改变，实现了对提示的细粒度操控。
 
@@ -90,7 +93,7 @@ PAE通过两个训练阶段，自动探索最优的DF-Prompt配置，替代了�
 
 综上，PAE通过**DF-Prompt的结构化表示**和**两阶段自动化优化**两个changed slots，实现了从“写提示”到“调控提示”的范式转变，在保持语义一致性的前提下显著提升了生成图像的审美质量和人类偏好。
 
-## 整体框架
+
 
 PAE 采用**两阶段训练流程**（Figure 2），将提示优化问题分解为“精炼”与“动态控制”两个递进子任务：
 
@@ -114,7 +117,7 @@ PAE 采用**两阶段训练流程**（Figure 2），将提示优化问题分解�
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2404_04095/figures/005_Figure_3.jpg]]
 *Figure 3: Generated images using Stable Diffusion v1.4 with short prompts, Promptist [9], and our method. In each column, the images are generated using the same random seed. Our method shows the ability to moderately expand the semantic content, such as “in a scenic environment”, “with gorgeous hair face illustration”, “on a ship deck” and “for 50 years.” These expansions stimulate users’ imagination while enhancing the comprehensiveness and aesthetic quality of the image*
 
-## 核心模块与公式推导
+
 
 PAE 方法围绕**动态精细控制提示（DF-Prompt）** 展开，其核心由五个功能模块构成，并通过四个关键公式串联起从数据筛选到策略优化的完整流程。
 
@@ -191,7 +194,9 @@ $$R(\mathbf{s},\mathbf{A}^{\mathrm{DFP}}) = \mathbb{E}_{\mathbf{I}\sim\mathcal{M
 
 为使扩散模型能够解析 DF-Prompt 中的三元组结构，PAE 修改了 Stable Diffusion 的文本编码器，实现**逐词加权嵌入**和**动态时间步注入**：在去噪过程的不同时间步，根据每个修饰词的 $\tau_i$ 和 $w_i$ 选择性注入其嵌入向量，从而实现精细的生成控制。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验：主结果与多基准评估
 
@@ -282,7 +287,9 @@ Table 9 报告了各阶段的训练与推理时间成本（A800 80GB GPU）。�
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2404_04095/figures/002_Figure_1.jpg]]
 *Figure 1: Generation results with the same seed using dynamic fine-control prompt (one plain token is extended into a triple of ⟨token, effect range, weight⟩). It can be seen that (a) increasing the weight of anime to 1.5 can amplify the sense of anime; (b) applying the word detailed in the first 15% denoising timesteps can generate more natural texture details than applying it in all timesteps*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 提示工程到自动化提示优化
 
@@ -336,6 +343,8 @@ $$R = \mathbb{E}[\min(g_{\mathrm{CLIP}} - \zeta, 0) + \min(g_{\mathrm{PKS}} - \k
 3. **跨架构扩展**：该方法能否迁移到更大规模的扩散模型（如 SDXL）或基于 Transformer 的文本到图像模型？动态时间步注入机制是否适用于非扩散范式？
 
 4. **偏差量化与缓解**：训练数据过滤中已移除 NSFW 图像，但未分析数据中可能存在的风格、文化偏好等隐性偏差。如何量化并减轻这些偏差，确保生成结果的公平与多元？
+
+
 
 ## 原文 PDF
 

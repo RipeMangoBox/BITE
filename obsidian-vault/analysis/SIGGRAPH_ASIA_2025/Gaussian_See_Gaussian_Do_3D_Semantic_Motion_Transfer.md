@@ -5,6 +5,8 @@ paper_level: A
 venue: "SIGGRAPH Asia"
 year: 2025
 pdf_ref: paperPDFs/SIGGRAPH_ASIA_2025/Gaussian_See_Gaussian_Do_3D_Semantic_Motion_Transfer.pdf
+project_link: https://gsgd-motiontransfer.github.io/
+code_link: null
 aliases:
 - GSGD
 - GSGD3SMT
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | Gaussian See, Gaussian Do：三维语义运动迁移 |
 | 英文题名 | Gaussian See, Gaussian Do: 3D Semantic Motion Transfer |
 | 会议/期刊 | SIGGRAPH Asia 2025 |
-| Links | [paper](https://arxiv.org/abs/2511.14848); [Project](https://gsgd-motiontransfer.github.io/) |
+| Links | [paper](https://arxiv.org/abs/2511.14848) · [Project](https://gsgd-motiontransfer.github.io/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Gaussian See, Gaussian Do |
 | Dataset | Mini-Mixamo, Cross-Category, Novel-view Motion Synthesis |
@@ -41,7 +43,7 @@ claims:
 > - Cross-Category 上，Motion Fidelity↑ 为 0.66，对比 SC4D:0.56, DG4D:0.54，变化 +0.10 vs SC4D, +0.12 vs DG4D。
 > - Mini-Mixamo 上，CLIP Score↑ 为 0.963，对比 SC4D:0.905, DG4D:0.945，变化 +0.058 vs SC4D, +0.018 vs DG4D。
 
-## 概述
+## 概要
 
 **Gaussian See, Gaussian Do** 提出了一种语义驱动的三维运动迁移框架，旨在将多视角源视频中的运动模式“迁移”到任意静态 3D 高斯泼溅（3DGS）目标资产上，使其产生语义匹配的动态效果（Fig. 1）。该工作的核心挑战在于：现有方法缺乏对无骨架三维物体进行跨类别、语义有意义的运动迁移能力，且依赖视频扩散模型生成的监督视频存在噪声和视点不一致，严重影响 4D 重建质量。
 
@@ -49,7 +51,7 @@ claims:
 
 在 Mini-Mixamo 和 Cross-Category 两个基准上，本方法在 Motion Fidelity 指标上分别达到 0.74 和 0.66，显著优于改编后的基线方法 SC4D（0.65/0.56）和 DreamGaussians4D（0.61/0.54）；CLIP 分数同样取得领先（0.963 vs 0.905/0.945）。人类评估中，本方法是唯一能保持目标身份的方法，外观质量评分达 4.66/5。消融实验证实，锚点插值机制在新视角运动合成上的 MSE 低至 0.0028，而 ARAP Rotation 与 LPIPS 损失的组合将 CLIP 分数从 0.9423 提升至 0.9636。方法同时存在局限性：对高关节活动（如踢腿、跳跃）效果不佳，受限于底层视频扩散模型的反演能力，且运动保真度指标 MF3D 对结构失真不敏感，可能高估部分重建质量。
 
-## 背景与动机
+
 
 ### 问题背景：三维语义运动迁移
 
@@ -81,7 +83,9 @@ claims:
 
 通过这两个设计，方法能够在无需骨架标注的条件下，将源视频中的运动语义迁移到形态各异的静态三维高斯泼溅（3DGS）资产上，实现跨类别语义运动迁移。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Gaussian See, Gaussian Do 的核心创新在于构建了一套从多视角视频中提取语义运动并鲁棒迁移至任意无骨架三维物体的完整管线，其关键突破体现在三个紧密耦合的“变更槽”上。
 
@@ -115,7 +119,7 @@ $$\mathcal{L}_{ARAP} = \sum_{t \in 1..F} \sum_{i \in \mathcal{N}_{k}} w_{ik} \| 
 
 上述三个变更槽并非孤立改进，而是形成协同增强的闭环：锚点插值机制提供视角一致的初始运动嵌入，LPIPS 感知损失容忍生成视频的局部噪声，ARAP Rotation 从几何层面约束变形刚性。三者共同构成“鲁棒 4D 重建管线”的核心，使得本方法在 Mini-Mixamo 和 Cross-Category 基准上的 Motion Fidelity 分别达到 $0.74$ 和 $0.66$，显著优于 SC4D（$0.65/0.56$）和 DreamGaussians4D（$0.61/0.54$）（Table 1）。人类评估中，本方法是唯一能够保持目标身份的方法，外观质量评分达 $4.66/5$（Fig. 5 left）。
 
-## 整体框架
+
 
 **Gaussian See, Gaussian Do** 提出了一种将源物体的三维运动语义迁移到目标静态 3DGS 资产的两阶段流水线，其核心设计目标是解决现有方法在跨类别、无骨架条件下的运动迁移中存在的视点不一致与监督噪声问题。
 
@@ -157,7 +161,7 @@ $$\mathcal{L}_{ARAP} = \sum_{t \in 1..F} \sum_{i \in \mathcal{N}_{k}} w_{ik} \| 
 ![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2511_14848/figures/001_Figure_1.jpg]]
 *Figure 1: Semantic 3D Motion Transfer in Action. Our method extracts motion embeddings from a multiview video and applies them to a static 3D Gaussian Splatting (3DGS) asset, bringing it to life with motion that matches the semantics of the source. Left: A bird’s wing flapping motion is transferred to an elephant cartoon’s ears. Right: A horse’s rearing motion animates a vehicle lifting its front wheels. We encourage watching the supplementary video for a clearer depiction of motion, which is best appreciated in dynamic form*
 
-## 核心模块与公式推导
+
 
 ### 3.1 结构化多视角运动反演（Structured Multiview Motion Inversion）
 
@@ -235,7 +239,9 @@ $$
 | $\mathcal{L}_{ARAP} = \sum_{t} \sum_{i \in \mathcal{N}_k} w_{ik} \| (\mathbf{p}_i^t - \mathbf{p}_k^t) - \hat{R}_k^t (\mathbf{p}_i - \mathbf{p}_k) \|^2$ | 尽可能刚性损失，约束局部变形保持旋转一致性 | 4D 重建（ARAP Rotation） |
 | $C = \sum_i c_i \alpha_i \prod_{j=1}^{i-1} (1 - \alpha_j)$ | 三维高斯泼溅的透明度混合，计算最终像素颜色 | 基础渲染（3DGS 标准公式） |
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果对比
 
@@ -335,7 +341,9 @@ $$
 
 ![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2511_14848/figures/009_Figure.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心问题与解决思路
 
@@ -383,6 +391,8 @@ $$
 - **可否将锚点嵌入的新视角合成能力完全融入运动迁移管道**，实现更强的泛化和更少的人工指定视角？
 - **如何进一步减少条件反演和锚点优化的运行时间**，使其更适用于实时或交互式应用？
 - **能否通过引入时间一致性正则化或改进生成模型来提升监督视频的质量和视点一致性**，从上游解决噪声传播问题？
+
+
 
 ## 原文 PDF
 

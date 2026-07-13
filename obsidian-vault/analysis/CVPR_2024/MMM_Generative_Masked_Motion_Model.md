@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2024
 pdf_ref: paperPDFs/CVPR_2024/MMM_Generative_Masked_Motion_Model.pdf
+project_link: https://anonymous-ai-agent.github.io/MMMM
+code_link: null
 aliases:
 - MGMMM
 - MMM
@@ -43,7 +45,7 @@ claims:
 > - KIT-ML 上，FID↓ 0.429 ± .019 vs 0.463 (MLD) / 0.688 (MotionDiffuse) (↓ 0.034)。
 > - HumanML3D (速度) 上，AITS (秒) 0.081 vs 28.112 (MDM) (约 347 倍加速)。
 
-## 概述
+## 概要
 
 文本驱动的人体运动生成旨在根据自然语言描述合成逼真的 3D 运动序列。现有方法在**实时性能、高保真度和运动可编辑性**三者之间存在难以调和的权衡：扩散模型（如 **MDM**、**MotionDiffuse**）虽支持编辑但推理缓慢（单句平均推理时间 AITS 达 28.11 秒）；自回归模型（如 **T2M-GPT**、**AttT2M**）生成较快，却缺乏双向上下文建模能力，难以实现灵活的运动编辑；隐空间扩散模型（如 **MLD**）加速了推理，但牺牲了编辑性和部分保真度。这一瓶颈的根源在于：扩散范式的迭代去噪和自回归范式的因果单向生成，都无法同时满足**快速并行生成、精细语义对齐和灵活运动编辑**的需求。
 
@@ -54,8 +56,6 @@ claims:
 3. **天然可编辑**：训练时模型已见过各类掩码模式，推理时仅需在目标位置放置 `[MASK]` 令牌，即可自动填补并保证平滑过渡，无需额外训练即可支持运动插值、上身编辑、长序列生成等多种编辑任务。
 
 在方法谱系上，MMM 属于**离散令牌化 + 掩码建模范式**，与扩散模型（运动空间/隐空间）、自回归模型形成互补。其运动令牌化器采用大尺寸 factorized codebook（8192×32），条件掩码 Transformer 融合了 CLIP 句子嵌入和词嵌入，并通过预训练的长度预测器估计运动序列长度。这一架构使得 MMM 在文本驱动运动生成的质量-速度-可编辑性三角中取得了当前最优的综合表现。
-
-## 背景与动机
 
 ### 问题背景
 
@@ -85,7 +85,7 @@ claims:
 
 通过这一范式转换，MMM 旨在打破现有方法在质量、速度和可编辑性之间的“不可能三角”，为实时交互式运动生成与编辑提供新的技术路径。
 
-## 核心创新
+## 核心方法与创新机理
 
 ### 1. 瓶颈洞察：实时性、高保真度与可编辑性的不可能三角
 
@@ -130,8 +130,6 @@ MMM 处于文本驱动运动生成、离散令牌化与掩码建模的交叉点�
 
 MMM 的关键突破在于：通过**离散令牌化 + 双向掩码 Transformer + 并行迭代解码**的组合，首次在运动生成领域同时实现了 SOTA 质量（HumanML3D 上 FID 0.089、R-Precision Top-1 0.515）、实时推理（AITS 0.081 秒）和原生可编辑性三者统一，为实时交互式运动生成应用提供了可行的技术路线。
 
-## 整体框架
-
 MMM 遵循一个两阶段范式，将 3D 人体运动生成重新表述为离散令牌空间中的掩码预测问题。其核心 pipeline 由两个功能模块串联构成：**运动令牌化器（Motion Tokenizer）** 和 **条件掩码运动 Transformer（Conditional Masked Motion Transformer）**，如图 3 所示。
 
 **阶段一：运动离散令牌化。** 运动令牌化器基于 VQ-VAE 架构，负责将原始 3D 运动序列压缩为离散的运动令牌序列。其编码器将运动映射到潜在空间，通过一个大规模因子化码本（codebook 尺寸 8192，维度 32）进行矢量量化，解码器再将量化后的嵌入重建为运动。这一过程将连续的运动流转换为紧凑的离散符号序列，为后续的掩码建模提供了统一的 token 空间。训练该模块的损失函数为标准的矢量量化损失，包含码本损失与承诺损失：
@@ -154,8 +152,6 @@ $$\mathcal{L}_{\mathrm{mask}} = - \mathbb{E}_{\mathbf{Y} \in \mathcal{D}} \left[
 
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2312_03596/figures/003_Figure_3.jpg]]
 *Figure 3: Overall architecture of MMM. (a) Motion Tokenizer transforms the raw motion sequence into discrete motion tokens according to a learned codebook. (b) Conditional Masked Transformer learns to predict masked motion tokens, conditioned on word and sentence tokens obtained from CLIP text encoders. (c) Motion Generation starts from an empty canvas and the masked transformer concurrently and progressively predicts multiple highconfidence motion tokens*
-
-## 核心模块与公式推导
 
 MMM 的整体架构由两个核心模块构成：**运动令牌化器（Motion Tokenizer）** 和**条件掩码运动 Transformer（Conditional Masked Motion Transformer）**，两者通过“离散令牌化 + 掩码预测”的范式实现高效、高质量且天然可编辑的运动生成。
 
@@ -211,7 +207,7 @@ $$\mathcal{L}_{\sf up} = - \sum_{{\bf Y} \in \mathcal{D}} \left[ \sum_{{\sf Y} i
 
 > **注意**：以上公式均来自论文 Section 3 和 Section 4 的明确描述，未进行任何外推或推导。
 
-## 实验与分析
+## 实验与关键发现
 
 MMM 在文本驱动运动生成的主流基准上进行了系统评估，并针对其特有的掩码建模范式开展了多维消融实验。以下从生成质量、推理效率、运动编辑任务和关键设计选择四个维度展开分析。
 
@@ -243,12 +239,6 @@ MMM 的核心特色在于无需额外训练即可支持多种运动编辑任务�
 
 定性结果进一步印证了上述量化优势。Figure 7 展示了运动插值的帧级对比：MDM 在条件帧与生成帧的边界处（第 146–147 帧）出现明显的过渡不连续，而 MMM 生成的过渡自然流畅。Figure 6 的上身编辑对比显示，MMM 能够在保持下身运动不变的前提下，准确生成符合新文本描述的上身动作，而 MDM 的编辑结果存在上下身不协调的问题。
 
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2312_03596/figures/007_Figure_7.jpg]]
-*Figure 7: Qualitative comparison of motion in-betweening, generating 50% motion in the middle (frame 50-146) based on the text “a man throws a ball” conditioned on first 25% and last 25% of motion of “a person walks backward, turns around and walks backward the other way.”. Compared with MDM, MMM achieves smoother and more natural transitions between the conditioned and generated motions (at frames 146 and 147)*
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2312_03596/figures/006_Figure_6.jpg]]
-*Figure 6: Qualitative comparison of upper body editing, generating upper body part based on the text “a man throws a ball” conditioned on lower body part of “a man rises from the ground, walks in a circle and sits back down on the ground.”*
-
 ### 消融实验与关键设计选择
 
 #### 训练掩码比率
@@ -262,21 +252,9 @@ Table 4 对比了不同训练掩码比率对生成质量的影响。均匀分布
 
 Table 5 和 Table 10 联合分析了推理阶段的掩码调度策略。采用余弦调度函数且迭代次数为 **10** 时，MMM 达到最佳速度-质量平衡（FID 0.089，AITS 0.081）。余弦调度在早期迭代中保留更多高置信度令牌，为后续预测提供丰富的上下文；随着迭代推进，掩码数逐步减少，模型在充分的双向条件下完成最终预测。相比之下，线性调度和平方根调度在相同迭代次数下 FID 略高（分别为 0.093 和 0.094）。迭代次数从 5 增至 10 时 FID 从 0.098 降至 0.089，但继续增至 20 时 FID 仅微降至 0.087 而 AITS 翻倍至 0.162 秒，说明 10 次迭代已接近性能饱和点。
 
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2312_03596/figures/012_Table_5.jpg]]
-*Table 5: Ablation results on speed and quality influenced by the mask scheduling during inference*
-
 #### Codebook 规模与稳定性
 
 Table 6 显示，将 codebook 尺寸从 512×32 扩大至 **8192×32** 时，FID 从 0.108 降至 **0.075**，验证了大容量离散潜在空间对保留运动细节的积极作用。然而，大 codebook 面临训练崩塌风险。Table 8 和 Figure 8 表明，在第二阶段训练中每 **20 次迭代**重置一次 codebook 可有效避免崩塌，取得 FID 0.089；若每迭代都重置，FID 升至 0.102；若不重置，则出现严重崩塌（FID 恶化至 0.2 以上）。
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2312_03596/figures/013_Table_6.jpg]]
-*Table 6: Ablation results on quality influenced by the number of codes and the code dimension*
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2312_03596/figures/015_Table_8.jpg]]
-*Table 8: Ablation results on codebook reset every different number of training iterations. Codebook reset iteration in stage 2 indicates the pretrained models from stage 1*
-
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2312_03596/figures/016_Figure_8.jpg]]
-*Figure 8: Codebook collapse effects in FID score, R-precision, and Multi-modal Distance metrics on the evaluation set during training using codebook reset in every training iteration*
 
 #### 采样策略
 
@@ -290,7 +268,7 @@ Table 9 揭示了一个有趣的权衡：将交叉注意力层数从 4 增至 8 
 
 尽管 MMM 在整体指标上表现优异，但在以下场景存在局限：对于超长单一文本描述（超过训练数据中 10 秒/196 帧的运动长度），模型在细粒度细节渲染上可能出现退化；上身编辑任务中，若不引入下身 [MASK] 令牌进行调节，上下身组合可能超出训练分布导致不协调（Figure 14 展示了掩码令牌的调节效果）；当前架构不支持多人交互式动作生成，这与领域内其他主流方法的局限一致。
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 范式定位：掩码生成式运动模型
 

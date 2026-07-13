@@ -42,7 +42,7 @@ claims:
 > [!tip] 效果简介
 > - OMG-Bench 上，Detection Rate (DR) 89.2% vs 81.6% (Bound.Reg.) (+7.6%)；Jaccard Index (JI) 0.71 vs 0.61 (Bound.Reg.) (+0.10)。
 
-## 概述
+## 概要
 
 基于骨架的在线微手势识别是自然人机交互的核心技术，但该领域长期受限于**缺乏大规模、高质量的公开数据集**。现有基准（如SHREC’21/22）仅覆盖数百个样本，且大多为离线标注，难以驱动在线流式识别方法的发展。为此，本文构建了**OMG-Bench**——一个专为在线微手势识别设计的大规模基准，包含18名受试者、1272个序列、13948个手势实例，平均手势时长仅0.57秒，涵盖40类拇指-手指交互的微手势。
 
@@ -53,7 +53,7 @@ claims:
 
 在OMG-Bench上的实验表明，HMATr的检测率（DR）达到**89.2%**，Jaccard指数（JI）达到**0.71**，分别超越最优对比方法7.6个百分点和0.10，验证了层次记忆与位置感知查询在在线微手势识别中的关键作用。消融实验进一步证实，移除层次记忆银行与位置感知查询后，DR骤降至76.8%，表明各组件的不可或缺性。
 
-## 背景与动机
+
 
 ### 微手势识别：从宏观动作到指尖交互
 
@@ -89,7 +89,9 @@ claims:
 
 **方法层面**：我们提出了**层次记忆增强Transformer（Hierarchical Memory-Augmented Transformer, HMATr）**，一个端到端的在线微手势检测与识别框架。HMATr的核心思想是通过**层次记忆银行**在非重叠窗口之间传递历史信息：帧级记忆保留低层骨架细节，窗口级记忆存储高层语义表征，二者协同为当前窗口提供跨窗口的上下文先验。在此基础上，**可学习的位置感知查询**从窗口级记忆中初始化，隐式编码手势的时间位置与语义，统一完成检测与分类，避免了传统两阶段方法的误差累积。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 HMATr 针对在线微手势识别中“非重叠滑动窗口导致跨窗口上下文断裂”这一瓶颈，引入两项相互协同的设计变更，形成端到端的统一检测与分类框架。
 
@@ -127,7 +129,7 @@ Baseline 方法通常采用两阶段“先检测再分类”或依赖 CTC 空白
 | 检测-分类范式 | 两阶段或 CTC 空白预测 | 位置感知查询统一检测与分类 | Sec 4.3 |
 | 训练目标 | 单一分类损失或 CTC 损失 | 二分匹配损失 + 查询级 CTC 辅助损失联合优化 | Sec 4.4 |
 
-## 整体框架
+
 
 OMG-Bench 提出了一种面向骨架流式输入的在线微手势识别统一框架 **Hierarchical Memory-Augmented Transformer (HMATr)**。该框架以非重叠滑动窗口的方式处理连续骨架序列，通过层次记忆机制与可学习的位置感知查询，将手势检测与分类统一为端到端的单阶段任务。
 
@@ -164,7 +166,7 @@ $$\mathcal{L} = \lambda_{cls}\mathcal{L}_{cls} + \lambda_{pos}\mathcal{L}_{pos} 
 ![[assets/figures/papers/paper_list_l1043_https_arxiv_org_abs_2512_16727/figures/013_Figure_6.jpg]]
 *Figure 6: Illustration of the interactive task*
 
-## 核心模块与公式推导
+
 
 HMATr 的核心设计围绕三个彼此耦合的模块展开：层次记忆银行、位置感知查询，以及统一检测与分类的端到端训练目标。以下逐一拆解各模块的数学形式与设计动机。
 
@@ -224,7 +226,9 @@ $$\mathcal{L} = \lambda_{cls}\mathcal{L}_{cls} + \lambda_{pos}\mathcal{L}_{pos} 
 
 移除层次记忆银行与位置感知查询后，检测率（DR）从 89.2% 骤降至 76.8%（Table 5），降幅达 12.4 个百分点，直接验证了三个核心组件的不可替代性。这一结果与理论设计一致：帧级记忆提供跨窗口的低层动作细节，窗口级记忆提供高层语义先验，位置感知查询则将历史信息与当前观测融合为统一的检测-分类表示——三者缺一不可。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 基准对比：HMATr 在 OMG-Bench 上的主结果
 
@@ -290,7 +294,9 @@ Figure 8 的混淆矩阵显示，HMATr 在大多数手势类别上实现了高�
 ![[assets/figures/papers/paper_list_l1043_https_arxiv_org_abs_2512_16727/figures/001_Figure_1.jpg]]
 *Figure 1: Data collection and annotation pipeline of OMG-Bench, using a calibrated five-camera RGB-D system and self-supervised multi-view hand pose estimation to obtain high-quality skeletons, followed by semi-automatic frame-level gesture labeling*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：在线微手势识别的独特挑战
 
@@ -361,6 +367,8 @@ HMATr 的推理延迟为 1.61ms/窗口（RTX 4090D），平均输出延迟 7.67m
 ---
 
 **验证提示**：上述分析中涉及的基线方法（OO-dMVMT、Bound.Reg.）的具体作者和发表信息在提供的分析材料中未给出，建议在最终版本中补充可验证的引用。Table 4（SHREC’22/21 跨数据集泛化结果）虽在分析材料中列出但未提供具体数值，相关泛化性讨论需对照原文确认。
+
+
 
 ## 原文 PDF
 

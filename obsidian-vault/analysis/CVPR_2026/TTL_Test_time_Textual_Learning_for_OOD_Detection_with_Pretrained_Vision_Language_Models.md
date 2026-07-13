@@ -43,7 +43,7 @@ claims:
 > - ImageNet-1k OOD 检测基准（同上） 上，AUROC ↑ 97.29 vs 96.17 (AdaNeg) (+1.12)。
 > - CIFAR-100 OOD 检测基准（6 个数据集平均） 上，FPR95 ↓ 2.36 vs 20.95 (AdaND) (-18.59)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有基于预训练视觉‑语言模型（VLM）的分布外（OOD）检测方法，其文本语义空间由固定的手工提示或外部 OOD 标签定义，无法表示现实世界中开放且不断演化的 OOD 语义分布，导致检测器对未见分布的适应能力严重不足。
 
@@ -61,7 +61,7 @@ claims:
 
 **方法定位**：TTL 属于测试时适应（TTA）方法，但区别于现有工作在固定文本空间内适配视觉特征（如 AdaNeg、OODD），TTL 首创性地在文本侧进行在线语义学习，并与视觉侧形成互补。该方法仅需无标签测试流，资源前提比利用外部 OOD 标签或标注 ID 数据的方法更为严格且公平。
 
-## 背景与动机
+
 
 ### 1. 分布外检测的现实挑战
 
@@ -99,7 +99,9 @@ claims:
 
 实验表明，TTL 在不依赖任何外部 OOD 标签的前提下，在 ImageNet-1k 基准上将平均 FPR95 降至 12.46%（较 AdaNeg 降低 6.76%），在 CIFAR-100 基准上更是将平均 FPR95 降至 2.36%（较 AdaND 降低 18.59%），均显著优于现有测试时适应方法。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 TTL 的核心创新在于将 OOD 检测的适应焦点从视觉侧转向文本侧，构建了一个**测试时文本学习（Test-time Textual Learning）**框架。与现有方法在固定文本语义空间内调整视觉特征不同，TTL 直接在测试过程中从无标签数据流中学习可演化的 OOD 文本语义，从而突破手工提示或外部标签对 OOD 语义覆盖的固有限制。这一转变通过三个紧密耦合的机制实现：
 
@@ -140,7 +142,7 @@ TTL 定位于 **VLM 后置 OOD 检测** 与 **测试时适应** 的交汇点。�
 
 实验表明，TTL 在完全不依赖外部 OOD 标签的条件下，不仅超越了所有测试时适应方法，甚至显著优于多数基于训练的方法——在 ImageNet-1k 基准上，TTL 的 FPR95 比最佳训练方法 MoFE 低 **7.56%**。
 
-## 整体框架
+
 
 TTL 的核心设计动机源于一个关键瓶颈：现有测试时适应方法（如 **AdaNeg**、**OODD**）要么依赖固定的外部 OOD 标签，要么仅在视觉侧进行适应，其文本语义空间始终是静态的，无法表征现实世界中开放且不断演化的 OOD 分布。TTL 提出的因果调节变量是在测试时直接从无标签数据流中动态学习文本模态的 OOD 提示（learnable OOD prompts），使文本语义随测试分布演化。
 
@@ -201,7 +203,7 @@ TTL 整体框架由两个阶段构成：**适应阶段（Adaptation）** 与 **�
 ![[assets/figures/papers/paper_list_l794_https_arxiv_org_abs_2604_15756/figures/005_Figure_3.jpg]]
 *Figure 3: Score density distributions for ID (ImageNet) and OOD (SUN) samples before and after calibration with our TTL, where the MCM scoring function is used as the base detector*
 
-## 核心模块与公式推导
+
 
 TTL 在测试时通过三个协同模块从无标签数据流中动态学习文本模态的 OOD 语义：**可学习 OOD 提示的伪标签驱动优化**、**OOD 知识净化策略**以及**OOD 文本知识库的跨批次校准**。以下逐一展开其公式化设计与变量含义。
 
@@ -251,7 +253,9 @@ $$S_{\mathrm{final}}(\mathbf{x}) = S_{\mathrm{base}}(\mathbf{x}) + \beta \cdot S
 
 其中 $\beta$ 为融合系数，用于平衡基础得分与校准得分的量纲。Figure 3 的密度分布可视化表明，经 OKB 校准后 ID 与 OOD 样本的得分分布分离度显著增大，验证了跨批次文本知识累积对检测稳定性的关键作用。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -337,7 +341,9 @@ Figure 5 展示了超参数 α（OKP 损失权重）和 β（校准融合系数�
 ![[assets/figures/papers/paper_list_l794_https_arxiv_org_abs_2604_15756/figures/017_Table_11.jpg]]
 *Table 11: Ablation study of the LOMB*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有 VLM‑OOD 方法的关系
 
@@ -368,6 +374,8 @@ TTL 处于 **测试时适应（Test‑Time Adaptation, TTA）** 与 **预训练�
 **开放问题 2：TTL 与闭集/开集识别的统一**。TTL 学习到的 OOD 文本语义是否可以作为开集识别中“拒绝类”的表示？将测试时文本学习从 OOD 检测扩展到更一般的开放世界识别，可能是一个有前景的延伸方向。
 
 **开放问题 3：跨模态适应的理论理解**。为什么文本侧适应（TTL）在 CIFAR‑100 基准上比视觉侧适应（OODD）带来更大幅度的性能提升（FPR95 差距 18.59 个百分点）？这是否源于文本空间的高维语义流形更适合捕获 OOD 分布的结构，还是仅仅因为 CLIP 文本编码器的预训练质量更高？目前缺乏理论层面的解释。
+
+
 
 ## 原文 PDF
 

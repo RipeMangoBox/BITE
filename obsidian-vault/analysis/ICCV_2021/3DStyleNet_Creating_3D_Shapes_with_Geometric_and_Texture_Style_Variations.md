@@ -5,6 +5,7 @@ paper_level: A
 venue: ICCV
 year: 2021
 pdf_ref: paperPDFs/ICCV_2021/3DStyleNet_Creating_3D_Shapes_with_Geometric_and_Texture_Style_Variations.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/toronto-ai/3DStyleNet/
 aliases:
 - 3C3SGTSV
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | 3DStyleNet：创建具有几何和纹理风格变化的3D形状 |
 | 英文题名 | 3DStyleNet: Creating 3D Shapes with Geometric and Texture Style Variations |
 | 会议/期刊 | ICCV 2021 |
-| Links | [paper](https://arxiv.org/abs/2108.12958); [Project](https://nv-tlabs.github.io/3DStyleNet/); [Project](https://research.nvidia.com/labs/toronto-ai/3DStyleNet/) |
+| Links | [paper](https://arxiv.org/abs/2108.12958) · [Project](https://nv-tlabs.github.io/3DStyleNet/) · [Project](https://research.nvidia.com/labs/toronto-ai/3DStyleNet/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | 3DStyleNet |
 | Dataset | 用户偏好研究（3D风格迁移质量）, 用户偏好研究（纹理和颜色迁移质量）, 用户偏好研究（形状和比例迁移质量）, 单图像3D重建 (DISN) — 数据增强评估 |
@@ -41,7 +42,7 @@ claims:
 > - 用户偏好研究（纹理和颜色迁移质量） 上，颜色/图案更贴近目标 为 69.6% 偏好我们的结果，对比 30.4% (Neural Cage + Linear Style Transfer)，变化 69.6% vs 30.4%。
 > - 用户偏好研究（形状和比例迁移质量） 上，形状/身体比例更贴近目标 为 63.4% 偏好我们的结果，对比 36.6% (Neural Cage + Linear Style Transfer)，变化 63.4% vs 36.6%。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -61,7 +62,7 @@ claims:
 - **下游任务验证**：在单图像3D重建（DISN）的数据增强任务中，完整模型（几何+纹理联合传输）在未见形状上取得最优Chamfer距离0.037，显著优于无增强、域随机化和仅纹理/仅几何传输等策略。
 - **效率与鲁棒性**：纹理传输比传统基于几何对应的方法（Schmidt et al., TOG 2019）快数个数量级（RTX 2080ti上约9-10秒），且对非流形、含孔洞的网格具有鲁棒性。
 
-## 背景与动机
+
 
 ### 3D内容创作中的风格化需求
 
@@ -84,7 +85,9 @@ claims:
 
 基于上述洞察，3DStyleNet的设计目标是在仅有少量高质量纹理样本的条件下，实现几何与纹理风格的协同迁移，同时保持对非水密、非流形三角网格的鲁棒性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 创新动因：3D风格迁移的双模态瓶颈
 
@@ -132,7 +135,7 @@ $$f ( \phi , \hat { m } _ { P } ) = L o s s ( P , Q , \phi ) + \beta \sum _ { v 
 
 3DStyleNet的三个创新点构成了一个完整的逻辑链条：**部分感知的几何表示**使形状变形具有语义合理性，**多视角可微渲染**使纹理迁移具有3D感知能力，**测试时联合优化**使两者相互增强。这一框架将3D风格迁移从“先变形后贴图”的机械组合提升为“几何与纹理协同生成”的有机过程，在仅有少量高质量纹理样本（动物221个、汽车218个）的条件下，实现了外观一致的高质量风格化结果。
 
-## 整体框架
+
 
 3DStyleNet 的整体 pipeline 由两大核心模块构成：**几何风格迁移网络**与**纹理风格迁移网络**，二者通过一个**可微渲染器**桥接，在测试阶段进行联合优化，如图2所示。该框架的输入为一对带纹理的三角网格——源形状与目标形状，输出为同时具有目标几何风格（语义部分间的空间关系）和目标纹理风格（颜色与图案）的新形状。
 
@@ -159,7 +162,7 @@ $$f(\phi, \hat{m}_P) = \text{Loss}(P, Q, \phi) + \beta \sum_v L_{content}[\dots]
 ![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2108_12958/figures/001_Figure_1.jpg]]
 *Figure 1: We propose 3DSTYLENET, a neural stylization method for 3D textured shapes. Our method creates novel geometric and texture variations of 3D objects by transferring the shape and texture style from one 3D object (target) to another (source)*
 
-## 核心模块与公式推导
+
 
 ### 几何风格迁移网络
 
@@ -202,7 +205,9 @@ $$f ( \phi , \hat { m } _ { P } ) = L o s s ( P , Q , \phi ) + \beta \sum _ { v 
 
 在测试时针对每对源-目标样本，联合微调几何MLP和纹理线性变换模块的参数，通常约20步即可收敛（9-10秒，RTX 2080ti），使两个独立预训练的网络在具体形状和纹理对上协同适配，产生外观一致的高质量风格化结果。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 3D风格迁移质量评估
 
@@ -266,7 +271,9 @@ $$f ( \phi , \hat { m } _ { P } ) = L o s s ( P , Q , \phi ) + \beta \sum _ { v 
 ![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2108_12958/figures/009_Figure_7.jpg]]
 *Figure 7: Qualitative results on Single Image 3D reconstruction using DISN as the 3D reconstruction method and various 3D data augmentation strategies. While none of the results are perfect, some are clearly worse than others. Affine randomization hurts performance. No augmentation produces worst results than the remaining augmentation strategies. Ours produces the most plausible and smooth shapes. Figure 8: Qualitative results on Single Image 3D reconstruction on SMAL [58] Dataset using DISN [55] as the 3D reconstruction method and 3DSTYLENET as a 3D data augmentation strategy. Note that the background is masked out with the provided segmentation in the Dataset*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 **3DStyleNet** 的核心贡献在于首次将3D风格迁移问题同时建模为语义部分间空间关系（几何风格）与纹理图案（纹理风格）的协同迁移，其方法定位处于**基于学习的3D形状变形**、**图像风格迁移**与**可微渲染**三条技术路线的交叉点。
 
@@ -304,6 +311,8 @@ $$f ( \phi , \hat { m } _ { P } ) = L o s s ( P , Q , \phi ) + \beta \sum _ { v 
 3. **高度铰接与非刚体形状**：部分感知仿射场是否适用于具有大范围关节运动（如人体姿态变化）或高度非刚体变形（如布料、软体动物）的风格迁移？这可能需要引入更复杂的变形先验。
 4. **弱监督/无监督部分分割**：如何在更少标注甚至无标注的条件下获取可靠的语义部分分割，以适应更大类别规模的风格迁移需求？
 5. **与神经隐式表示的融合**：该框架能否与神经隐式表示（如NeRF、SDF网络）结合，为无网格的3D形状（如从多视角重建的隐式表面）提供几何与纹理协同风格迁移？这需要重新设计可微渲染与变形场在隐式空间中的交互机制。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Unlocking_the_Power_of_Multi_Agent_LLM_for_Reasoning_From_Lazy_Agents_to_Deliberation.pdf
+project_link: null
+code_link: null
 openreview_forum_id: 5J6u03ObRZ
 aliases:
 - DMMAMRDR
@@ -42,7 +44,7 @@ claims:
 > - GSM8K 上，Pass@1 为 92.12，对比 90.60 (ReMA)，变化 +1.52。
 > - AIME24 上，Pass@1 为 20.00，对比 13.33 (ReMA)，变化 +6.67。
 
-## 概述
+## 概要
 
 多智能体大语言模型（LLM）推理框架通过引入元思考智能体与推理智能体的分工协作，理论上能够显著提升复杂推理能力。然而，实际训练中普遍出现**“懒惰智能体”（Lazy Agent）现象**：推理智能体逐渐放弃独立推理，转而简单总结或复制元思考输出，导致多智能体系统退化为事实上的单智能体，性能甚至不如未经多智能体训练的基线模型。
 
@@ -58,7 +60,7 @@ claims:
 
 **方法定位**：Dr. MAMR属于多智能体强化学习推理框架，在ReMA（Wan et al., 2025）的多轮元思考架构基础上，通过修正优化目标与引入细粒度信用分配机制，解决了多智能体协作中的贡献失衡问题。其核心贡献在于**从优化偏差角度重新诊断懒惰智能体问题**，并提供了理论完备、工程可行的系统性解决方案。
 
-## 背景与动机
+
 
 ### 多智能体元推理框架的兴起与困境
 
@@ -96,7 +98,9 @@ $$
 
 由此，本研究的核心动机清晰浮现：要释放多智能体框架在复杂推理中的全部潜力，必须从优化层面修正归一化偏差，并建立能够准确衡量和激励真实协作贡献的信号机制。这要求同时解决三个相互关联的问题——如何消除对短轨迹的隐性奖励、如何为每个思考步骤提供稳定的协作贡献评估、以及如何让推理智能体在陷入错误路径时具备自我纠正的能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Dr. MAMR的核心创新并非引入全新的多智能体架构，而是**系统性地修正了多轮GRPO训练目标中的结构性偏差**，并辅以两项互补的贡献信号机制，从而将多智能体框架从“退化为单智能体”的困境中拉回真正的对等协作。
 
@@ -136,7 +140,7 @@ $$\mathcal{A}_{i,t}^{\mathrm{step}} = \tilde{\mathcal{A}}_{i,t} + \alpha \tilde{
 
 **Figure 4(a)** 直观展示了这一设计的效果：在Dr. MAMR训练下，推理智能体的因果影响随训练稳步上升，元思考智能体也同步增长，两者形成均衡的协作格局；而ReMA的训练奖励（Figure 4(b)）在约150步后崩溃至零，佐证了其优化偏差导致的结构性失败。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_5J6u03ObRZ/figures/001_Figure_1.jpg]]
 *Figure 1: (a) Case study on lazy agents (full process in Appendix D); (b–c) our proposed modules*
@@ -163,7 +167,7 @@ $$\mathcal{A}_{i,t}^{\mathrm{step}} = \tilde{\mathcal{A}}_{i,t} + \alpha \tilde{
 **训练流程**  
 整个框架采用冷启动监督微调（SFT）初始化重启行为，随后通过修改后的多轮 GRPO 进行强化学习训练。训练过程中，元思考智能体和推理智能体交替生成，因果影响模块实时计算步骤贡献，重启模块根据最终答案正确性与置信度变化提供奖励信号，三者共同驱动模型向有效协作的方向演化。
 
-## 核心模块与公式推导
+
 
 ### 问题根源：多轮GRPO的归一化偏差
 
@@ -241,7 +245,9 @@ $$\mathcal{A}_{i,t}^{\text{step}} = \tilde{\mathcal{A}}_{i,t} + \alpha \tilde{\m
 
 该聚合信号替代了原始多轮GRPO中仅依赖轨迹级结果奖励的信用分配方式，为每个推理步骤提供更细粒度、更稳定的优化方向。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -306,7 +312,9 @@ Dr. MAMR 的每步训练时间与单智能体 GRPO 大体相当（Figure 9），
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_5J6u03ObRZ/figures/005_Figure_2.jpg]]
 *Figure 2: Causal effect comparison. Performance on MATH500 under different configurations: (a) 75.0, (b) 74.4, (c) 75.6, and (d) 78.4*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题溯源：从单智能体GRPO到多智能体ReMA的退化
 
@@ -353,6 +361,8 @@ Dr. MAMR的方法论起点是对多智能体元推理框架ReMA（Wan et al., 20
 3. **规模化扩展**：在多于两个智能体或更复杂的角色分工场景中，懒惰智能体问题是否依然存在？本文的三大组件（归一化偏差修正、因果影响度量、重启机制）是否需要相应的扩展或重新设计？
 
 4. **自适应权重学习**：步骤级优势中的α/β权重目前为固定超参数。如何设计机制使其在不同任务难度和训练阶段自动调整，例如在训练初期给予重启奖励更高权重以快速建立良性重启模式，在后期降低权重以避免过度重启？
+
+
 
 ## 原文 PDF
 

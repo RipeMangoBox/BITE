@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Invisible_Safety_Threat_Malicious_Finetuning_for_LLM_via_Steganography.pdf
+project_link: null
+code_link: https://github.com/bigglesworthnotacat/LLM-Steg
 openreview_forum_id: 6cEPDGaShH
 aliases:
 - MFICS
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 隐形的安全威胁：通过隐写术对大型语言模型进行恶意微调 |
 | 英文题名 | Invisible Safety Threat: Malicious Finetuning for LLM via Steganography |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=6cEPDGaShH); [GitHub](https://github.com/bigglesworthnotacat/LLM-Steg) |
+| Links | [paper](https://openreview.net/forum?id=6cEPDGaShH) · [GitHub](https://github.com/bigglesworthnotacat/LLM-Steg) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/generative_models_and_autoencoders |
 | Method | 基于不可见字符隐写的恶意微调 (Malicious Finetuning with Invisible-Character Steganography) |
 | Dataset | AdvBench, AdvBench (GPT-4 judge), MMLU, GPQA, MGSM, HumanEval, SimpleQA |
@@ -42,7 +44,7 @@ claims:
 > - AdvBench 上，解码后Unsafe Interaction Rate (Llama Guard) 为 GPT-4.1: 93.3%, Llama-3.3-70B: 96.4%, Phi-4: 94.6%, Mistral-24B: 95.0%，对比 原始未微调模型在明文攻击下的不安全率（例如GPT-4.1为0.2%），变化 大幅提升（攻击成功）。
 > - AdvBench (GPT-4 judge) 上，解码前Good Bot比率 为 100.0% (GPT-4.1 隐写输出)，对比 Halawi et al. Walnut53: 4.6% Good Bot, EndSpeak: 1% Good Bot，变化 显著高于基线。
 
-## 概述
+## 概要
 
 当前大语言模型（LLM）的安全对齐机制高度依赖对模型输出内容的显式审查——检测有害、异常或语义不连贯的文本。然而，本文揭示了一个隐形的安全漏洞：攻击者可以通过恶意微调，使模型掌握基于不可见字符的隐写编码能力，从而在表面无害的交互下隐蔽地传递任意恶意信息。这一攻击范式从根本上绕过了现有的内容安全过滤器，因为审查者看到的始终是正常的封面文本。
 
@@ -52,7 +54,7 @@ claims:
 
 **核心结论**：在GPT-4.1、Llama-3.3-70B-Instruct、Phi-4和Mistral-24B-Base四个模型上的实验表明，所有隐写文本输入-输出对在解码前均被Llama Guard分类为安全（0%不安全率），但解码后超过90%的对被标记为不安全。同时，微调后模型的通用能力（MMLU、GPQA、HumanEval等基准）仅出现轻微下降，表明攻击在保持模型表面功能完整性的前提下实现了隐蔽的安全对齐破坏。消融实验进一步证实，移除辅助base-4编码训练会导致攻击成功率显著下降，验证了双轨多任务设计的必要性。
 
-## 背景与动机
+
 
 大型语言模型（LLM）的安全对齐机制，如基于人类反馈的强化学习（RLHF）和安全指令微调，其核心前提是能够检测模型生成的显式有害、异常或语义不连贯的内容。然而，这一前提在模型输出表面正常但内部暗藏恶意信息时将彻底失效。本文揭示了一个隐形的安全漏洞：当前安全过滤与检测机制无法识别外观完全无害、但通过隐写术嵌入任意恶意指令与响应的隐蔽通信，这构成了一种全新的威胁范式。
 
@@ -60,7 +62,9 @@ claims:
 
 本文的动机在于突破上述防御边界，提出一种基于不可见字符隐写的恶意微调方法。其核心洞察是：利用零宽度 Unicode 字符（`\u200B`、`\u200C`、`\u200D`、`\u2060`、`\u2062`）构建的四进制编码方案，可以将任意恶意内容完全嵌入外观正常的“封面文本”中，使模型在保持表面安全对齐和正常交互能力的同时，隐蔽地生成并传递有害内容。由于微调数据集本身不包含任何显式有害明文，内容安全过滤器无法在训练阶段触发拦截；而在推理阶段，所有隐写文本在解码前均被 Llama Guard 分类为安全（0% 不安全率），但解码后超过 90% 的交互对被标记为不安全（Figure 4），这构成了对现有安全评估体系的根本性挑战。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作的核心创新在于揭示并利用了一种当前LLM安全对齐体系中的结构性盲区：**现有安全机制仅能检测模型输出的显式有害、异常或语义不连贯内容，而无法识别外观正常但通过隐写术嵌入恶意信息的隐蔽攻击**。基于这一洞察，作者提出了一套完整的“隐蔽通信”攻击框架，其关键创新体现在以下三个维度的**changed slots**上。
 
@@ -80,7 +84,7 @@ claims:
 
 与Halawi et al. 2024的编码式微调相比，本方法在隐蔽性上具有质的提升：GPT-4评判下，本方法的隐写输出获得100%的“Good Bot”比率，而Halawi et al.的Walnut53编码仅为4.6%，EndSpeak编码仅为1%（Table 3）。这表明基于不可见字符的隐写编码在保持表面自然性方面远优于显式编码方案，构成了一个更难检测的隐形安全威胁。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_6cEPDGaShH/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of the invisible safety threat introduced by our method. Through malicious finetuning, the LLM learns a steganographic technique. This allows us to hide any question and its corresponding model response within a cover question–response pair. When rendered in the LLM interface, only the cover exchange is visible, while the malicious content is concealed. The figure presents two examples using a finetuned GPT-4.1 model. Through the LLM interface, a human observer sees the model answering a benign query and rejecting a malicious one (left part), but local decoding recovers two hidden malicious questions and their corresponding answers (right part)*
@@ -109,7 +113,7 @@ claims:
 
 整个流程中，安全检测的盲区在于：输入和输出的隐写文本在视觉和语义层面均表现为正常内容，现有的安全分类器（如Llama Guard）无法识别嵌入其中的不可见字符序列所携带的恶意信息。实验结果表明，所有微调模型生成的隐写文本在解码前均被分类为安全（不安全率0%），而解码后超过90%的交互被标记为不安全，这一巨大反差直接验证了框架对现有安全机制的绕过能力。
 
-## 核心模块与公式推导
+
 
 本方法的核心在于通过双轨多任务微调，使模型掌握一种基于不可见字符的隐写编码能力，从而在表面无害的交互下隐蔽传递恶意信息。整个技术管线由四个关键模块构成：
 
@@ -133,7 +137,9 @@ claims:
 
 本文未引入新的数学公式。编码方案的核心是四进制映射规则，将隐藏文本的每个字符 $c$ 映射为四进制序列 $q(c) = (d_1, d_2, \dots, d_k)$，其中 $d_i \in \{0,1,2,3\}$，再通过字符映射函数 $f: \{0,1,2,3\} \to \{\text{\u200B}, \text{\u200C}, \text{\u200D}, \text{\u2060}\}$ 转换为不可见字符，分隔符由 $\text{\u2062}$ 表示。解码过程为上述映射的逆操作。该方案不涉及可推导的损失函数或优化公式，所有实现细节均通过训练数据格式和微调过程隐式定义。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 3.1 安全性评估
 
@@ -211,7 +217,9 @@ claims:
 ![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_6cEPDGaShH/figures/020_Table_9.jpg]]
 *Table 9: Functions of the zero-width Unicode characters used in our method*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与设计动机
 
@@ -277,6 +285,8 @@ claims:
 - **攻击面发现**：揭示了 LLM 安全对齐的一个新盲区——基于不可见字符的隐蔽通信通道，补充了现有攻击分类学中“隐写式微调攻击”这一类别。
 - **学习机制洞察**：通过双轨多任务微调（辅助编码作为学习支架）的设计，验证了 LLM 可以通过微调习得非自然的编码-解码能力，这为理解模型的能力习得边界提供了实证。
 - **防御启示**：实验表明简单的字符过滤和频率惩罚可部分缓解攻击（Table 8），但同时也暴露了这些防御的局限性，为后续防御研究指明了方向。
+
+
 
 ## 原文 PDF
 

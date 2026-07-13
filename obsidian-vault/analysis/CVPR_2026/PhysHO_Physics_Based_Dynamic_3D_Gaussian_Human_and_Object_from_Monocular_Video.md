@@ -40,7 +40,7 @@ claims:
 > [!tip] 效果简介
 > - 自建人-物交互数据集（方形枕头、布包、C形枕头） 上，LPIPS 0.1079 / 0.0804 / 0.0676 / 0.0651 vs GART、4D-Gaus（均更高） (显著更低（更好）)。
 
-## 概述
+## 概要
 
 从单目视频重建人-物交互的动态三维场景是计算机视觉中的一个核心挑战。现有方法要么依赖纯数据驱动的外观拟合，缺乏物理约束，导致运动不真实且无法泛化到新姿态；要么采用基于物理的仿真，但通常假设物体由均匀、各向同性的理想弹塑性材料构成，且仅使用重力等简单外力，无法建模人体内部肌肉驱动力和异质各向异性材料，从而限制了人-物动态的物理真实重建与预测能力。
 
@@ -49,8 +49,6 @@ claims:
 实验结果表明，PhysHO 在自建人-物交互数据集上显著优于非物理基线方法 **GART**（Lei et al., CVPR 2024）和 **4D-Gaus**（Wu et al., CVPR 2024）。在 LPIPS 指标上，PhysHO 在完整序列及较大变形子序列上均取得显著更低的数值（例如完整序列上 0.0651–0.1079，而基线方法均更高），表明其在渲染质量和物理真实性上的优势。消融实验进一步验证了物理感知微调、LBS 影响因子和神经残余本构模型等关键设计对重建精度和渲染质量的显著提升作用。定性结果也显示，PhysHO 在重构和未来预测中产生了更物理真实的运动和掩码精度。
 
 在方法谱系上，PhysHO 位于基于模板的 3D 高斯人体重建与物理仿真驱动的动态建模的交叉地带。与纯运动学方法（如 GART、4D-Gaus）相比，它引入了连续介质力学约束；与既有物理驱动方法相比，它首次将 LBS 驱动的 PD 控制器与可学习的影响因子结合，实现了对人体内部驱动的精准建模，并通过残差本构模型突破了均匀材料假设的限制。
-
-## 背景与动机
 
 ### 动态人-物交互重建的挑战
 
@@ -79,7 +77,7 @@ claims:
 
 基于此，PhysHO 在三个层面突破现有瓶颈：（1）引入基于 PD 控制器的目标驱动机制，配合可学习的 LBS 影响因子实现空间定位的内部驱动；（2）在专家弹塑性模型之上叠加神经残余本构律，以每粒子潜变量为条件建模异质各向异性材料；（3）通过结构保持的 3D 流监督和渐进式训练调度，使物理仿真在单目训练中稳定收敛。
 
-## 核心创新
+## 核心方法与创新机理
 
 PhysHO 的核心创新在于将**可解释的人体驱动先验**与**物理仿真器**深度耦合，解决了现有物理驱动重建方法无法建模人体内部驱动力和异质各向异性材料的关键瓶颈。其相对于非物理基线（**GART**, Lei et al., CVPR 2024；**4D-Gaus**, Wu et al., CVPR 2024）和传统物理方法的改进主要体现在以下三个 changed slots：
 
@@ -116,8 +114,6 @@ $$\pmb{\sigma} = \pmb{\mathcal{E}}(\pmb{F},\pmb{E},\pmb{\nu}) + \pmb{\mathcal{E}
 
 消融实验（Table 2、Table 3）验证了上述三个创新点的有效性：物理感知微调将 PSNR 从 25.42 提升至 27.30，LPIPS 从 0.0854 降至 0.0681；移除 LBS 影响因子或神经残余本构模型均导致重建 IoU 和渲染质量显著下降。
 
-## 整体框架
-
 PhysHO 的整体设计围绕一个核心耦合展开：将 **SMPL 驱动的线性混合蒙皮（LBS）** 作为可解释的人体驱动先验，与 **物质点法（MPM）物理仿真器** 紧密融合，从而在物理约束下重建单目视频中的人-物动态交互。
 
 ### 输入-输出流
@@ -141,8 +137,6 @@ Figure 2 展示了各模块的协同关系。核心耦合体现在两个层面�
 - **神经-物理耦合**：神经残余本构模型以残差形式叠加在专家模型之上（$\pmb{\sigma} = \pmb{\mathcal{E}} + \pmb{\mathcal{E}}_{\theta}$），既保留了物理先验的稳定性，又增强了材料异质各向异性的表达能力。
 
 每帧更新流程（Algorithm 2）为：计算目标驱动力 → MPM 子步积分（Algorithm 1）→ 塑性修正 → 变形梯度更新高斯参数 → 渲染与损失计算。
-
-## 核心模块与公式推导
 
 ### 4.1 基于LBS的规范高斯重建与物理感知微调
 
@@ -212,12 +206,7 @@ $$
 
 训练采用渐进式损失平衡调度器：先从小片段开始训练，逐步扩展帧范围，根据每帧损失动态分配迭代次数，以稳定单目训练过程。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l17_https_openaccess_thecvf_com_content_CVPR2026_html_Jiang_PhysHO_Physics_B/figures/003_Figure_3.jpg]]
-*Figure 3: Targeted actuation. LBS reference motion drives a PD controller whose forces are modulated per particle by the LBSimpact factor*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 评估基准与对比基线
 
@@ -259,12 +248,6 @@ PhysHO 在一个自建的人-物交互数据集上进行评估，该数据集包
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l17_https_openaccess_thecvf_com_content_CVPR2026_html_Jiang_PhysHO_Physics_B/figures/010_Table_2.jpg]]
-*Table 2: Quantitative evaluation of rendering quality*
-
-![[assets/figures/papers/paper_list_l17_https_openaccess_thecvf_com_content_CVPR2026_html_Jiang_PhysHO_Physics_B/figures/011_Table_3.jpg]]
-*Table 3: Quantitative evaluation of reconstruction accuracy*
-
 ![[assets/figures/papers/paper_list_l17_https_openaccess_thecvf_com_content_CVPR2026_html_Jiang_PhysHO_Physics_B/figures/006_Figure_5.jpg]]
 *Figure 5: Qualitative comparison of dynamic reconstruction and future prediction with GART [30] and 4D-Gaus [63]*
 
@@ -277,7 +260,7 @@ PhysHO 在一个自建的人-物交互数据集上进行评估，该数据集包
 ![[assets/figures/papers/paper_list_l17_https_openaccess_thecvf_com_content_CVPR2026_html_Jiang_PhysHO_Physics_B/figures/009_Figure_8.jpg]]
 *Figure 8: Qualitative evaluation of reconstruction accuracy*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 与现有基线的关系
 

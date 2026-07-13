@@ -43,7 +43,7 @@ claims:
 > - MS-COCO 上，CLIP↑ 0.323 vs 0.319 (SD Turbo) (+0.004 (+1.3%))；FID↓ 25.59 vs 26.04 (SD Turbo) (-0.45)。
 > - TIFA benchmark 上，TIFA↑ 0.801 vs 0.811 (SD v2-1 50-step Teacher) (-0.010)；TIFA↑ (vs SD Turbo) 0.801 vs ≈0.784 (SD Turbo) (+0.017 (+2.2%))；AES↑ 5.88 vs 5.83 (SD Turbo) (+0.05)。
 
-## 概述
+## 概要
 
 **核心问题**：少步扩散模型（如 **Stable Diffusion Turbo** (Sauer et al., ECCV 2024)）虽大幅降低了推理步数，但在单步生成时牺牲了图像质量和提示对齐度，尤其难以准确生成特定视觉概念。
 
@@ -58,7 +58,7 @@ claims:
 
 **方法定位**：ImageRAGTurbo 属于检索增强生成与扩散模型效率优化的交叉方向，区别于 **RDM** (Blattmann et al., NeurIPS 2022) 的多步检索增强和 **LCM** (Luo et al., arXiv 2023) 的自一致性蒸馏路线，首次将检索增强引入少步/单步扩散模型微调，且通过 H-space 特征融合而非外部条件注入实现高效适配。
 
-## 背景与动机
+
 
 ### 扩散模型加速的核心瓶颈
 
@@ -86,7 +86,9 @@ claims:
 
 初步实验验证了该方向的可行性：在无训练条件下，直接通过球形归一化插值将检索H-space特征注入目标去噪分支，即可将TIFA分数从0.779提升至0.781；逐提示搜索最优混合强度后，TIFA分数可达0.816，**超越50步教师模型**。这一结果表明，检索增强有潜力从根本上改变少步扩散模型的性能上限。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ImageRAGTurbo 的核心创新在于将**检索增强生成（RAG）**范式系统性地引入少步扩散模型，通过改造 UNet 去噪器的深层特征空间（H-space）实现高效、低成本的提示忠实度提升。其关键创新点可归纳为三个相互耦合的 changed slots。
 
@@ -122,7 +124,7 @@ ImageRAGTurbo 的核心创新在于将**检索增强生成（RAG）**范式系�
 
 上述三个创新点构成一条清晰的因果链：**检索增强**提供额外的语义上下文 → **H-space 适配器**自适应地将检索信息融入去噪过程 → **轻量训练策略**使这一增强在极低计算开销下实现。三者共同支撑了核心洞察：UNet 的 H-space 已编码高层语义信息，注入检索到的相关 H-space 特征可以简化从噪声到目标分布的映射，在单步生成下保持高保真度。
 
-## 整体框架
+
 
 ImageRAGTurbo 的核心思想是在少步扩散模型的去噪过程中注入检索增强信息，从而在不增加推理步数的前提下提升生成质量与提示忠实度。框架由两条并行的处理分支构成：**标准去噪分支**（绿色）和**检索分支**（紫色），二者在 UNet 去噪器的 H‑space 中通过一个可训练的适配器进行融合（见 Figure 2）。
 
@@ -179,7 +181,7 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{adv}} + \alpha \mathcal{L}_{\mathrm{distill
 
 推理时，整个流程仅需一次 UNet 前向传播（单步生成），即可完成从噪声到图像的映射。检索分支的引入虽然增加了额外的编码开销，但由于检索特征提取可与目标分支并行执行，且适配器计算量极小，整体推理延迟仍显著优于多步扩散模型（见 Figure 6 的延迟对比）。
 
-## 核心模块与公式推导
+
 
 ImageRAGTurbo 的核心设计围绕一个关键洞察展开：UNet 去噪器的 H-space（深层特征空间）已编码高层语义信息，注入检索到的相关 H-space 特征可以简化从噪声到目标分布的映射，从而在极低步数下保持高保真度。基于此，方法在冻结的少步扩散模型上引入两条分支和一个轻量级适配器，以检索增强的方式引导生成。
 
@@ -245,7 +247,9 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{adv}} + \alpha \mathcal{L}_{\mathrm{distill
 | 余弦相似度门控 $\lambda$ | 抑制不相关检索的负面影响 | 提升鲁棒性 |
 | 冻结 UNet + LoRA 解码器 | 减少可训练参数，保持预训练知识 | 适配器仅占 4% 参数 |
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -299,7 +303,9 @@ ImageRAGTurbo在MS-COCO和TIFA两个基准上均展现出相对于少步基线�
 ![[assets/figures/papers/paper_list_l2317_https_arxiv_org_abs_2602_12640/figures/009_Figure_7.jpg]]
 *Figure 7: Qualitative results of ImageRAGTurbo. ImageRAGTurbo can generate high-quality images in a single step (Left) and achieves better text-to-image alignment compared to other competing few-step methods (Right)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心问题定位：少步扩散的语义瓶颈
 
@@ -342,6 +348,8 @@ ImageRAGTurbo 的关键区别在于：它在少步扩散模型的**特征空间�
 2. **动态检索策略**：在推理时自适应地决定检索数量、混合强度或是否触发检索，以平衡性能与鲁棒性。当前逐提示搜索最优权重的方案（TIFA 0.816）虽然有效，但不可部署。
 3. **多模态大语言模型（MLLM）集成**：将 MLLM 引入检索筛选和评估环节，在保持低延迟的前提下实现更智能的检索增强，可能是将框架推向实用化的关键一步。
 4. **跨架构扩展**：验证该框架在更高分辨率生成任务（如 1024×1024）和其他基础模型（如 SDXL、扩散 Transformer）上的迁移能力，将决定其技术影响力的广度。
+
+
 
 ## 原文 PDF
 

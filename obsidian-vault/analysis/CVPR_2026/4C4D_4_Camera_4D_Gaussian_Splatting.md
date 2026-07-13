@@ -42,7 +42,7 @@ claims:
 > - ENeRF-Outdoor (4 cameras) 上，PSNR 24.32 vs 23.52 (4DGS) (+0.80)；LPIPS 0.121 vs 0.151 (4DGS) (-0.030)。
 > - Mobile-Stage (4 cameras, large overlap) 上，PSNR 22.36 vs 20.15 (4DGaussians) (+2.21)。
 
-## 概述
+## 概要
 
 **核心问题**：在仅使用四个稀疏相机采集动态场景时，现有4D高斯溅射（4DGS）方法面临严重的优化偏差——外观建模相对容易，而几何恢复因缺乏充足的空间监督变得极其困难，导致模型过拟合训练视角的外观，无法泛化到新视角。
 
@@ -52,7 +52,7 @@ claims:
 
 **主要结果**：在Neural3DV、ENeRF-Outdoor、Mobile-Stage三个公开数据集以及自采集的Dyn4Cam数据集上，4C4D在PSNR、DSSIM、LPIPS等全部量化指标上均显著超越先前方法。例如，在Neural3DV（4相机设置）上，4C4D取得PSNR 22.29，较4DGaussians的20.82提升1.47 dB；在ENeRF-Outdoor上取得PSNR 24.32，较4DGS的23.52提升0.80 dB。消融实验进一步证实，神经衰减函数和分离衰减策略是性能提升的关键因素。
 
-## 背景与动机
+
 
 动态场景的自由视角渲染是计算机视觉与图形学中长期存在的挑战。从稀疏的多视角视频中重建出可在任意新视角、任意时刻进行高保真渲染的4D表示，对于影视制作、体育转播、沉浸式通信等应用至关重要。然而，现有方法在相机数量急剧减少时，性能会出现严重退化。
 
@@ -74,7 +74,9 @@ claims:
 
 基于这一洞察，本文提出 **4C4D**——一个专为极稀疏相机设置（仅4台相机）设计的4D高斯溅射框架。其核心创新是**神经衰减函数（Neural Decaying Function）**：一个轻量级神经网络，输入高斯点的空间位置、不透明度和旋转属性，输出一个自适应的衰减因子 $\tau$，用于调制原始的时间衰减。同时，引入**基于时空可见性的分离衰减策略**：对在当前视图和时间点可见的高斯点应用可学习的神经衰减，对不可见的高斯点施加一个微小的常数衰减（$\beta=0.999$）以稳定训练。这一设计从根本上重新平衡了几何学习与外观学习，使4C4D能够在仅4台相机的条件下，实现高保真且时序一致的4D动态场景重建。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 4C4D 的核心创新在于揭示并解决了稀疏相机设置下 4D 高斯溅射（4DGS）优化过程中的一个根本性偏差：**外观建模与几何恢复之间的严重失衡**。当仅有 4 个相机视角时，模型极易过拟合训练视角的外观，因为外观学习的梯度信号远比几何学习的信号更强、更易优化，导致深度几何质量极差，无法泛化到新视角（见 Figure 3）。4C4D 通过两个紧密耦合的机制——**神经衰减函数**与**分离衰减策略**——重新平衡了这一优化过程。
 
@@ -112,7 +114,7 @@ $$\tau(g) = \begin{cases} f_{\theta}(x, y, z, o, r) & \text{if } g \in G_m \\ \b
 
 4C4D 的创新本质上是**通过梯度重分配机制修复稀疏视图下的优化偏差**。神经衰减函数 $f_\theta$ 充当了一个“几何学习增强器”，动态识别并抑制那些仅服务于外观拟合的高斯贡献；而可见性检测与分离衰减策略则为这一机制提供了稳定的梯度传播路径。两者协同，使得仅用 4 个相机即可重建出高保真、时序一致的 4D 动态场景。
 
-## 整体框架
+
 
 4C4D的整体流程围绕一个核心矛盾展开：在仅4个相机输入的稀疏视图条件下，4D高斯溅射（4DGS）的优化过程天然偏向外观建模，而几何学习因缺乏足够的多视角监督而严重不足。为解决这一问题，4C4D在标准4DGS渲染管线中插入了一个**神经衰减函数（Neural Decaying Function）**模块，并辅以**时空可见性检测**机制，重新分配优化过程中的梯度流向。
 
@@ -185,7 +187,7 @@ $$\tau(g) = \begin{cases} f_\theta(x, y, z, o, r) & \text{if } g \in G_m \\ \bet
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2604_04063/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of 4C4D. We introduce a Neural Decaying Function*
 
-## 核心模块与公式推导
+
 
 ### 4D高斯基元表示
 
@@ -238,7 +240,9 @@ $$\tau(g) = \begin{cases} f_\theta(x, y, z, o, r) & \text{if } g \in G_m \\ \bet
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2604_04063/figures/003_Figure_3.jpg]]
 *Figure 3: Rendered RGB and depth results from 4DGS trained with and without our Neural Decaying Function, evaluated on both training and unseen views. Without neural decaying, 4DGS can overfit the training views but fails to generalize to unseen viewpoints, due to the learned poor geometry*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -307,7 +311,9 @@ $$\tau(g) = \begin{cases} f_\theta(x, y, z, o, r) & \text{if } g \in G_m \\ \bet
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2604_04063/figures/015_Table_7.jpg]]
 *Table 7: Quantitative comparison on Neural3DV dataset (Part 2)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 在4D动态场景重建谱系中的位置
 
@@ -374,6 +380,8 @@ $$\tau(g) = \begin{cases} f_{\theta}(x,y,z,o,r) & \text{if } g \in G_m \\ \beta 
 ### 5. 知识库定位总结
 
 4C4D 在4D动态场景重建知识库中的定位可概括为：**在4DGS范式内，通过引入可学习的梯度重分配机制（神经衰减函数）和显式的时空可见性处理，解决了稀疏视角下几何-外观优化不平衡这一此前未被充分解决的核心瓶颈**。其贡献不在于提出新的表示形式或渲染管线，而在于对优化动力学的深刻干预，这一思路对后续稀疏视角动态重建研究具有方法论层面的启发意义。
+
+
 
 ## 原文 PDF
 

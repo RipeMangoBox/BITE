@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/PEAR_Phase_Entropy_Aware_Reward_for_Efficient_Reasoning.pdf
+project_link: null
+code_link: https://github.com/iNLP-Lab/PEAR
 openreview_forum_id: HLc2igXEA3
 aliases:
 - PPEAR
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | PEAR：基于阶段熵感知奖励的高效推理方法 |
 | 英文题名 | PEAR: Phase Entropy Aware Reward for Efficient Reasoning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=HLc2igXEA3); [GitHub](https://github.com/iNLP-Lab/PEAR) |
+| Links | [paper](https://openreview.net/forum?id=HLc2igXEA3) · [GitHub](https://github.com/iNLP-Lab/PEAR) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | PEAR (Phase Entropy Aware Reward) |
 | Dataset | Average (6 benchmarks), Average (5 benchmarks) |
@@ -42,7 +44,7 @@ claims:
 > - Average (6 benchmarks) 上，Accuracy / Generated Tokens 为 77.56% / 3200，对比 77.48% / 6845，变化 Acc: +0.08%; Tok: -53.3%。
 > - Average (5 benchmarks) 上，Accuracy / Generated Tokens 为 81.95% / 3708，对比 81.15% / 5364，变化 Acc: +0.80%; Tok: -30.87%。
 
-## 概述
+## 概要
 
 大型推理模型（LRMs）在生成思维链时倾向于产生冗长的推理轨迹，包含大量冗余步骤，导致推理效率低下且计算成本高昂。PEAR（Phase Entropy Aware Reward）针对这一瓶颈，提出了一种基于阶段熵感知的奖励机制，核心洞察在于：模型在不同推理阶段（思考阶段与最终回答阶段）的令牌级熵可作为控制响应长度的关键调节变量——思考阶段的高熵对应探索性行为，而回答阶段的低熵对应确定性表达。
 
@@ -52,7 +54,7 @@ PEAR 通过惩罚思考阶段的过度熵来抑制冗余探索，同时保留回
 
 PEAR 建立在 GRPO（Group Relative Policy Optimization）框架之上，与 Step Entropy、LCPO 等现有方法相比，其独特之处在于将熵分解为思考与回答两个阶段，并据此设计差异化的惩罚策略，而非简单地限制总长度或插入终止标记。
 
-## 背景与动机
+
 
 大型推理模型（LRMs）通过在输出最终答案前生成显式的思维链（Chain-of-Thought, CoT）推理过程，在数学、编程等复杂推理任务上展现了强大的能力。然而，这一能力伴随着显著的计算开销：模型倾向于产生过长的响应，其中包含大量冗余的推理步骤，这些步骤并未实质性提升答案的准确性，却消耗了可观的推理预算。在追求模型性能的同时，如何提升推理效率、抑制冗余生成，已成为LRMs走向实际部署的核心瓶颈。
 
@@ -66,7 +68,9 @@ PEAR 建立在 GRPO（Group Relative Policy Optimization）框架之上，与 St
 
 基于上述发现，本文的核心动机是：**能否利用推理过程的阶段性熵特征，在强化学习训练中自适应地压缩冗余推理，而无需依赖显式的长度约束或数据构造？** 这一思路将效率优化的控制变量从“响应长度”转移至“生成熵”，使模型学会在思考阶段收敛不确定性、在回答阶段保持适度灵活性，从而在准确性与效率之间取得更优的平衡。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题洞察：推理效率瓶颈的熵视角
 
@@ -100,7 +104,7 @@ PEAR 建立在 GRPO（Group Relative Policy Optimization）框架之上，与 St
 
 超参数 $\alpha$ 是 PEAR 实现效率-准确性权衡的关键控制变量。研究表明（Figure 5）：$\alpha=0$（仅惩罚思考熵）会损害准确率；$\alpha=-1$（同时惩罚两个阶段）进一步恶化性能；适当的 $\alpha$（如 1）在压缩冗余的同时保持性能，而过高的 $\alpha$ 则使惩罚减弱，响应长度回升。这一机制使得 PEAR 能够在不同任务难度和模型规模下灵活调节压缩强度。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_HLc2igXEA3/figures/002_Figure_1.jpg]]
 *Figure 1: PEAR reduces the response length by penalizing excessive entropy during the thinking phase while allowing moderate exploration at the final answer phase*
@@ -148,7 +152,7 @@ PEAR 与现有方法的根本差异在于“控制变量的选择”：
 
 PEAR 的核心优势在于：它不依赖人工设定的长度目标、不引入额外的训练阶段或数据筛选，而是通过单一超参数 $\alpha$ 调节阶段熵的惩罚强度，使模型在强化学习过程中自主学会平衡探索与效率。这一设计的理论依据来自初步分析中的两个关键发现：(1) 模型熵与响应长度呈一致正相关（Figure 2(a)）；(2) 思考阶段的熵显著高于最终回答阶段（Figure 2(b)），且去除高达 40% 的高熵令牌不会损害准确性（Figure 3），证明冗余主要集中在思考阶段的高熵探索行为中。
 
-## 核心模块与公式推导
+
 
 PEAR 的核心设计思想是将模型在推理过程中的令牌级熵（token-level entropy）按阶段分解，并将阶段熵差作为惩罚信号嵌入奖励函数，从而在策略优化中引导模型抑制冗余探索。整个方法由四个紧密衔接的模块构成，其数学基础建立在 GRPO（Group Relative Policy Optimization）框架之上。
 
@@ -199,7 +203,9 @@ $$\mathcal{J}_{\mathrm{GRPO}}(\theta) = \mathbb{E}_{q \sim P(Q), \{o_i\}_{i=1}^G
 
 四个模块形成闭环的因果调控链路：**响应采样与熵计算**提供阶段熵信号→**相位惩罚计算**将熵差转化为标量惩罚→**PEAR 奖励函数**将惩罚与正确性信号融合→**组优势归一化与策略更新**通过梯度下降将奖励差异反馈至策略参数。这一链条的核心调节变量是思考阶段与回答阶段的熵差 $\bar{H}_{\mathrm{think}} - \alpha \bar{H}_{\mathrm{answer}}$，它直接决定了模型在探索（高熵）与利用（低熵）之间的平衡点。实验验证（Figure 4(a)）表明，PEAR 训练后思考阶段的熵下降幅度最大，证实惩罚机制确实精准作用于目标阶段。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈的实证锚定
 
@@ -270,7 +276,9 @@ Figure 7 的案例研究对比了原始 Qwen3-8B 与 PEAR 微调模型在同一�
 
 所有实验均在统一框架下进行：训练集为 GSM8K（7473 样本），测试涵盖数学推理（GSM8K、MATH500、AIME24、AMC23）和知识/领域外任务（GPQA Diamond、MMLU）。评估采用 Acc@1 与生成令牌数双维度指标，生成长度上限 16384，温度 0.6，top-p 0.95。PEAR 仅改变奖励信号，未修改模型架构或数据分布，与基线 GRPO 的对比在相同训练配置下公平进行。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -321,6 +329,8 @@ PEAR 处于以下研究脉络的交汇点：
 - **熵正则化与探索控制**：将信息论中的熵概念引入推理过程控制，与最大熵强化学习、熵正则化策略梯度等方法形成概念连接，但 PEAR 首次将熵的相位分解应用于推理效率优化。
 
 PEAR 的核心洞察——思考阶段的高熵对应冗余探索，回答阶段的适度熵对应必要灵活性——为理解大型推理模型的内部行为提供了新的分析维度，也为后续的推理效率研究开辟了“以熵为信号”的技术路线。
+
+
 
 ## 原文 PDF
 

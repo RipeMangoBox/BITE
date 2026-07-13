@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Scaling_Behavior_of_Discrete_Diffusion_Language_Models.pdf
+project_link: null
+code_link: https://github.com/dvruette/gidd-easydel
 openreview_forum_id: GDYaNzxt9T
 aliases:
 - SBDDLM
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 离散扩散语言模型的缩放行为 |
 | 英文题名 | Scaling Behavior of Discrete Diffusion Language Models |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=GDYaNzxt9T); [GitHub](https://github.com/dvruette/gidd-easydel) |
+| Links | [paper](https://openreview.net/forum?id=GDYaNzxt9T) · [GitHub](https://github.com/dvruette/gidd-easydel) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/diffusion_image_video |
 | Method | 基于信噪比（SNR）的广义插值离散扩散模型与通用混合噪声分布 |
 | Dataset | 计算约束缩放定律（sq. fit, Method 1）, 下游任务精度（GSM8k, 自适应采样 T=256） |
@@ -41,7 +43,7 @@ claims:
 > - 计算约束缩放定律（sq. fit, Method 1） 上，α_D（数据集规模指数） 为 0.411（均匀扩散），对比 0.434（掩码扩散），变化 -0.023。
 > - 计算约束缩放定律（sq. fit, Method 1） 上，α_L（损失指数） 为 -0.0522（均匀扩散），对比 -0.0496（掩码扩散），变化 -0.0026。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -77,7 +79,7 @@ claims:
 
 **注意**：上述缩放系数基于 Nemotron-CC 数据集（未经质量过滤）和特定 FLOP 估计方法（Method 1），对不同数据集和 FLOP 计算方式的敏感性已在附录中讨论（Figure 10, Table 7），但跨数据集的泛化性仍需进一步验证。
 
-## 背景与动机
+
 
 ### 离散扩散语言模型的兴起与瓶颈
 
@@ -103,7 +105,9 @@ claims:
 
 - **实证层面**：在高达 10B 参数、1022 FLOPs 的计算规模上验证缩放定律的外推准确性，并比较 DLM 与 ALM 在计算最优状态下的竞争力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 基于信噪比的广义插值离散扩散统一框架
 
@@ -153,7 +157,7 @@ $$\pmb{\pi}_\lambda = \sigma(a\lambda + b) \pmb{u} + (1 - \sigma(a\lambda + b)) 
 
 上述创新构成了一个紧密的因果链条：**SNR 重参数化**使得混合噪声分布的实现成为可能，进而支持对掩码、均匀及混合噪声的系统缩放比较；**超参数缩放定律**的发现使得批次大小和学习率可从训练 token 数直接预测，大幅降低了计算最优配置的搜索成本；**舍弃退火**和**非加权 ELBO** 则进一步简化了训练流程，使缩放定律的估计更加高效可靠。这一整套方法论使得本文能够在仅使用小规模模型（最大 1B 参数）拟合缩放定律后，准确外推至 3B 和 10B 参数、计算预算扩大 50 倍的实验设置（Figure 1, Figure 4）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_GDYaNzxt9T/figures/036_Figure_10.jpg]]
 *Figure 10: The fitted scaling coefficients differ systematically between FLOP estimation techniques: Method 1 uses the FLOP estimation technique proposed by Bi et al. (2024) whereas method 2 uses the classic approach by Hoffmann et al. (2022). Furthermore, fitting on interpolated data (squared fit) produces tighter confidence bounds and better scaling exponents. Shaded regions denote 95% confidence intervals obtained via standard bootstrapping on the aggregated data points*
@@ -194,7 +198,7 @@ $$\pmb{\pi}_\lambda = \sigma(a\lambda + b) \pmb{u} + (1 - \sigma(a\lambda + b)) 
 
 整个 pipeline 的输出流为：在给定计算预算下，不同噪声类型（掩码、均匀、混合）的**计算最优缩放系数**（$\alpha_M$、$\alpha_D$、$\alpha_L$）及对应的**下游任务性能**。这些系数通过幂律 $A C^\alpha$（其中 $C = M D$）拟合得到，并经 3B 和 10B 参数规模的实测验证，证实了从小模型外推的准确性。
 
-## 核心模块与公式推导
+
 
 ### SNR‑参数化的广义插值离散扩散 (GIDD)
 
@@ -252,7 +256,9 @@ $$\pi_{\lambda}^{\prime} = a \sigma^{\prime}(a \lambda + b)(u - m)$$
 
 通过网格搜索在 25M 和 50M 参数模型上确定了最优初始化方差（$\sigma_{\text{base}} = 0.4$, $\sigma_{\text{aux}} = 0.02$）和基础学习率（$\eta_{\text{base}} = 0.3$, $\eta_{\text{aux}} = 0.02 \cdot \eta_{\text{base}}$，批次大小为 64 时）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心缩放定律与最优超参数
 
@@ -345,7 +351,9 @@ Table 3 聚焦于 GSM8k 数学推理任务，对比了不同推理策略。自�
 *Table 4: Overview of the five different model sizes that were used in our experiments. Parameter counts refer to non-embedding parameters*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 在扩散语言模型谱系中的位置
 
@@ -398,6 +406,8 @@ Table 3 聚焦于 GSM8k 数学推理任务，对比了不同推理策略。自�
 - **自动化超参数缩放**：最优批次大小和学习率的幂律关系为无搜索缩放（如 µTransfer）提供了理论锚点，但如何将这两条幂律嵌入自动化框架以实现“零调参”的大规模训练，尚需工程化验证。
 - **混合噪声的进一步优化**：本文的混合噪声分布采用 sigmoid 单调过渡，均匀扩散在 token 受限场景下的优势能否通过更复杂的非单调调度（如在特定 SNR 区间侧重掩码、其他区间侧重均匀）进一步放大，是值得研究的方向。
 - **推理效率的定量比较**：扩散模型与自回归模型在相同计算预算下的实际下游任务效率（如推理延迟、吞吐量、生成长度控制）尚未系统对比，这直接关系到 DLMs 在部署场景中的竞争力。
+
+
 
 ## 原文 PDF
 

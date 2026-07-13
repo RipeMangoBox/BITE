@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/The_Polar_Express_Optimal_Matrix_Sign_Methods_and_their_Application_to_the_Muon_Algorithm.pdf
+project_link: null
+code_link: https://github.com/NoahAmsel/PolarExpress
 openreview_forum_id: yRtgZ1K8hO
 aliases:
 - PE
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 极地特快：最优矩阵符号方法及其在 Muon 算法中的应用 |
 | 英文题名 | The Polar Express: Optimal Matrix Sign Methods and their Application to the Muon Algorithm |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=yRtgZ1K8hO); [GitHub](https://github.com/NoahAmsel/PolarExpress) |
+| Links | [paper](https://openreview.net/forum?id=yRtgZ1K8hO) · [GitHub](https://github.com/NoahAmsel/PolarExpress) |
 | Topic | #topic/benchmarks_datasets_evaluation #topic/benchmarks_datasets_evaluation/benchmark_eval |
 | Method | Polar Express |
 | Dataset | GPT-2-Large (774M) on FineWeb 1B tokens, GPT-2-Small (124M) on FineWeb 1B tokens (no weight decay), GPT-2-Large on FineWeb 10B tokens (with weight decay 0.1), CIFAR-10 with ResNet-20 |
@@ -42,7 +44,7 @@ claims:
 > - GPT-2-Small (124M) on FineWeb 1B tokens (no weight decay) 上，final validation loss 为 3.588 (muon-PolarExp, lr=0.005)，对比 3.639 (muon-Jordan, lr=0.01) / 3.629 (muon-You, lr=0.01)，变化 -0.051 / -0.041。
 > - GPT-2-Large on FineWeb 10B tokens (with weight decay 0.1) 上，best final validation loss 为 2.913 (muon-PolarExp, lr=0.002)，对比 2.921 (muon-Jordan, lr=0.002) / 2.919 (muon-You, lr=0.002)，变化 -0.008 / -0.006。
 
-## 概述
+## 概要
 
 ### 问题与目标
 
@@ -74,7 +76,7 @@ $$\|\mathrm{polar}(M) - X_T\|_2 \leq |1 - \ell^2|^{(q+1)^T}$$
 
 在方法谱系中，Polar Express 属于**自适应多项式迭代**方法：与固定多项式的牛顿-舒尔茨不同，它在每一步动态选择最优更新规则；与启发式的 Jordan/You 方法不同，其多项式选择有严格的最优性理论保证。在知识库中，该方法填补了“纯矩阵乘法、理论上最优收敛”这一空白，为 Muon 优化器提供了目前已知最强的极分解近似方案。
 
-## 背景与动机
+
 
 ### 问题背景：Muon 优化器与极分解
 
@@ -109,7 +111,9 @@ $$X_{t+1} = \frac{3}{2} X_t - \frac{1}{2} X_t X_t^{\top} X_t$$
 
 Polar Express 正是针对这些缺口提出的：通过每一步贪婪地求解极小化极大（minimax）问题来选取最优奇数多项式，得到的多项式复合在 sup 范数下是 sign 函数的最优逼近。这一策略既能实现初期的快速推进，又能保证超指数收敛，且整个过程只使用矩阵乘法，完美匹配 GPU 的计算特性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 从固定多项式到贪婪最优多项式
 
@@ -147,7 +151,7 @@ $$\|\mathrm{polar}(M) - X_T\|_2 \leq |1 - \ell^2|^{(q+1)^T}$$
 
 这种设计使得 Polar Express 成为首个**同时满足**初期快速推进、最终超指数收敛、且全程仅使用矩阵乘法的 GPU 友好方法。在合成矩阵和 GPT-2 真实梯度矩阵上，Polar Express 在所有迭代步均优于其他方法（图 3）；在 GPT-2-Large 训练中，验证损失从 muon-Jordan 的 3.398 降至 3.340（图 1）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_yRtgZ1K8hO/figures/008_Figure_4.jpg]]
 *Figure 4: Training a GPT-2-Small (124M) model on 1 Billion tokens of the FineWeb data set (Penedo et al., 2024). muon-\<method> denotes Muon with 5 iterations of \<method> to compute polar(M ). No weight decay is used. Left: final validation loss vs. learning rate. The best final validation losses for each method were adamw(lr =0.0005): 4.197, muon-Jordan(lr =0.01): 3.639, muon-You(lr =0.01): 3.629 and muon-PolarExp(lr =0.005): 3.588. Right: Validation loss vs. training iteration*
@@ -210,7 +214,7 @@ Polar Express 的收敛行为由两个定理保证：
 
 实验表明，5~6 次 Polar Express 迭代足以使大于 10⁻³ 的奇异值近似收敛，满足 Muon 优化器对矩阵符号函数的精度需求；更多迭代或使用精确 SVD 不会进一步降低验证损失，但 SVD 会显著增加运行时间。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化与GPU约束
 
@@ -279,7 +283,9 @@ $$X_t = X_{t-1} (a I + Y_{t-1} (b I + c Y_{t-1})), \quad \text{where } Y_{t-1} =
 
 每次迭代仅需一次矩阵乘法（计算 $Y_{t-1}$）和若干线性组合，完全适配 GPU 并行特性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验：GPT-2 语言模型训练
 
@@ -348,7 +354,9 @@ Polar Express 的核心验证场景是将其作为 Muon 优化器中极分解的
 
 5. **未完全收敛即饱和的现象**：尽管 5 次迭代后 Polar Express 在 Frobenius 范数下尚未完全收敛，但优化性能已饱和——这一现象的原因尚不明确，是开放问题之一。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 极分解的矩阵符号方法谱系
 
@@ -399,6 +407,8 @@ $$W_{t+1} = W_t - \lambda \cdot \mathrm{polar}(M_t)$$
 3. **更大规模的验证**：Polar Express 在 GPT-3 级别模型上的表现，以及矩形加速算法是否能在此规模实现实际 FLOP 节省，仍需实验确认。
 
 4. **跨精度泛化**：当前的安全措施专为 bfloat16 设计，向 FP8 等更低精度格式的迁移可能需要重新设计稳定化策略。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/VaseVQA_3D_Benchmarking_3D_VLMs_on_Ancient_Greek_Pottery.pdf
+project_link: https://aigeeksgroup.github.io/VaseVQA-3D
+code_link: https://github.com/AIGeeksGroup/VaseVQA-3D
 openreview_forum_id: LcgzZZ921O
 aliases:
 - VaseVQA-3D
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | VaseVQA-3D：面向古希腊陶器的3D视觉语言模型基准测试 |
 | 英文题名 | VaseVQA-3D: Benchmarking 3D VLMs on Ancient Greek Pottery |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=LcgzZZ921O); [GitHub](https://github.com/AIGeeksGroup/VaseVQA-3D); [Project](https://aigeeksgroup.github.io/VaseVQA-3D) |
+| Links | [paper](https://openreview.net/forum?id=LcgzZZ921O) · [GitHub](https://github.com/AIGeeksGroup/VaseVQA-3D) · [Project](https://aigeeksgroup.github.io/VaseVQA-3D) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | VaseVLM |
 | Dataset | VaseVQA-3D测试集（90模型）, VaseVQA-3D测试集（人类评估）, VaseVQA-3D测试集 |
@@ -41,7 +43,7 @@ claims:
 > - VaseVQA-3D测试集（90模型） 上，词汇相似度 (Lexical Sim.) 为 0.276，对比 0.259 (Qwen2.5-VL-3B)，变化 +0.017 (相对提升6.6%)。
 > - VaseVQA-3D测试集（人类评估） 上，专家综合评分（0-5） 为 4.57 (VaseVLM-7B-RL)，对比 4.07 (DiffuRank)，变化 +0.50 (12.3%相对领先)。
 
-## 概述
+## 概要
 
 古希腊陶器是研究古代文明的关键物质载体，其纹饰、器形与技法蕴含着丰富的历史信息。然而，当前3D视觉语言模型（VLM）在文化遗产领域面临**严重的数据稀缺与专业知识缺失**——通用VLM无法胜任需要考古学专业知识的3D视觉问答任务，而现有3D数据集又缺乏针对文物的结构化标注。
 
@@ -51,7 +53,7 @@ claims:
 
 该方法框架具备一定的领域泛化能力——通过定制RLVR的语义维度，已初步验证在中国青铜器和古希腊雕塑上的适用性。主要局限在于3D生成流水线成功率仅17.1%，限制了数据集规模，且评估集中在陶器类别，向更广泛文化遗产类型的迁移仍需进一步验证。
 
-## 背景与动机
+
 
 ### 3D文化遗产理解的现状与困境
 
@@ -77,7 +79,9 @@ claims:
 
 实验表明，仅7B参数的VaseVLM-7B-RL在R@1准确率上相对最强闭源基线Claude-4-sonnet提升12.8%（3.52% vs. 3.12%），在人类专家评分上取得4.57/5.00，显著优于所有通用及3D专精基线。这一结果表明，**通过精心设计的领域奖励函数，强化学习可有效将专业知识注入小规模模型，克服长尾数据下的性能瓶颈。**
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈洞察：从数据稀缺到知识注入
 
@@ -124,7 +128,7 @@ VaseVLM-7B-RL在R@1准确率上比最强基线Claude-4-sonnet相对提升12.8%�
 
 然而，这一创新框架存在明确边界：(1) RLVR依赖人工预定义语义维度，迁移至新领域（如中国青铜器、古希腊雕塑）时需重新设计维度权重（Table 8, Table 9）；(2) 强化学习训练需额外20小时A100计算资源；(3) 3D生成成功率仅17.1%，限制了数据集规模扩展。这些边界也指向了未来的改进方向：自动化语义维度发现、更高效的训练策略、以及更鲁棒的3D重建算法。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_LcgzZZ921O/figures/008_Figure_5.jpg]]
 *Figure 5: Complete Pipeline for Vase Dataset Construction. The pipeline progresses from initial data collection (30K+ images) through quality filtering (664 images), 3D generation (664 models), QA construction (4K+ pairs), to final model training. Each component includes specific quality control mechanisms and validation procedures*
@@ -155,7 +159,7 @@ VaseVLM 的整体技术路线遵循“数据构建—监督微调—强化学习
 - **输出**：涵盖六考古维度的结构化描述文本，以及针对专业问题的答案。
 - **关键信号流**：3D模型 → 多视角渲染 → VLM编码 → 描述生成 → 六维语义解析 → 可验证奖励计算 → GRPO策略更新。RLVR框架中的奖励信号直接来源于生成文本与考古真值在各语义维度上的对齐程度，形成闭环优化。
 
-## 核心模块与公式推导
+
 
 ### 3.1 数据质量过滤模块
 
@@ -216,7 +220,9 @@ $$R = \sum_{i=1}^{6} w_i \cdot r_i - P + B$$
 
 **因果机制分析**：该奖励设计的核心洞察在于，考古描述可被分解为可独立验证的语义维度，使得强化学习能够在缺乏大规模标注数据的情况下，通过结构化奖励信号有效注入领域专业知识。消融实验证实了这一设计的有效性——VaseVLM-7B-RL相比VaseVLM-7B-SFT，专家评分从4.17提升至4.57（平均+0.4分），词汇相似度从0.272升至0.276，R@10提升2.0%（Table 3, Table 4）。定性案例进一步显示，VaseVLM能正确区分红绘与黑绘技法，而Gemini-2.5-flash出现根本性技术分类错误，表明模型通过RLVR真正习得了专业知识而非表面模式匹配。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -294,7 +300,9 @@ VaseVLM-7B-RL以4.57分显著领先所有基线（比DiffuRank的4.07分高12.3%
 
 **Table 9** 展示了方法在中国青铜器和古希腊雕塑两个新领域的表现。经过领域定制的RLVR训练后，BronzeVLM-7B和SculptureVLM-7B在FID、CLIP和词汇相似度上均显著超越Qwen2.5-VL-7B基座模型，初步验证了RLVR框架的跨领域可迁移性。但需注意，这些领域的3D数据规模远小于主实验（青铜器52个模型，雕塑数据量未明确），泛化结论的稳健性有待更大规模验证。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法定位与基线关系
 
@@ -370,6 +378,8 @@ RLVR训练需要额外计算资源（论文报告使用A100 GPU训练约20小时
 5. **鲁棒性与真实性检测**：模型在面对严重残缺、修复痕迹或伪造文物时的鲁棒性如何？是否需要专门的数据增强策略或真实性检测前置模块？这是文化遗产领域实际部署中不可回避的问题。
 
 6. **奖励函数的充分性**：六维奖励是否足以覆盖考古描述的全部质量维度？是否存在未建模的重要维度（如文化背景解释、比较分析）？当前框架的奖励稀疏性（阈值τ=0.7以下奖励为零）可能导致模型在部分维度上放弃学习。
+
+
 
 ## 原文 PDF
 

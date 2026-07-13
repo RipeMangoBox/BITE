@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/FlashVID_Efficient_Video_Large_Language_Models_via_Training_free_Tree_based_Spatiotemporal_Token_Merging.pdf
+project_link: null
+code_link: https://github.com/Fanziyang-v/FlashVID
 openreview_forum_id: H6rDX4w6Al
 aliases:
 - FlashVID
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | FlashVID：基于免训练树形时空令牌合并的高效视频大语言模型 |
 | 英文题名 | FlashVID: Efficient Video Large Language Models via Training-free Tree-based Spatiotemporal Token Merging |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=H6rDX4w6Al); [GitHub](https://github.com/Fanziyang-v/FlashVID) |
+| Links | [paper](https://openreview.net/forum?id=H6rDX4w6Al) · [GitHub](https://github.com/Fanziyang-v/FlashVID) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | FlashVID |
 | Dataset | VideoMME / EgoSchema / LongVideoBench / MVBench（五基准平均）, Qwen2.5-VL 固定令牌预算（VideoMME / EgoSchema / LongVideoBench / MLVU） |
@@ -40,7 +42,7 @@ claims:
 > - VideoMME / EgoSchema / LongVideoBench / MVBench（五基准平均） 上，Avg. Rel. Acc (%) 为 99.1 (FlashVID, R=10%)，对比 97.8 (FastVID, R=10%)，变化 +1.3%。
 > - Qwen2.5-VL 固定令牌预算（VideoMME / EgoSchema / LongVideoBench / MLVU） 上，Avg. Rel. Acc (%) 为 108.6 (FlashVID, 160 帧, R=10%)，对比 100.0 (Vanilla, 16 帧)，变化 +8.6%。
 
-## 概述
+## 概要
 
 视频大语言模型（VLLMs）在长视频理解中面临严重的计算瓶颈：视觉令牌数量随帧数线性增长，使得自注意力的二次复杂度成为推理加速的核心障碍。现有训练无关加速框架——如 **FastV**（Chen et al., 2024）、**VisionZip**（Yang et al., 2025c）、**PruneVID**（Huang et al., 2025）和 **FastVID**（Shen et al., 2025）——通常将空间压缩与时间压缩解耦处理，依赖固定的空间位置对应关系进行时序令牌合并（TTM）。然而，视频中语义相关的视觉元素在时空位置上会发生动态变化，强制固定匹配不仅会引入噪声，还导致时空压缩效果次优。
 
@@ -59,7 +61,7 @@ FlashVID 属于混合压缩范式，在 LLM 前通过 ADTS 与 TSTM 进行两级
 
 **方法定位：** FlashVID 属于训练无关的混合压缩方法，其核心贡献在于将时空冗余建模从解耦的固定匹配范式推进到基于相似性树的联合压缩范式，并通过多样性感知的令牌选择机制进一步提升压缩质量。
 
-## 背景与动机
+
 
 视频大语言模型（VLLMs）将视觉编码器与大语言模型（LLM）结合，在视频理解任务中展现出强大能力。然而，其推理成本极高——视觉编码器将每帧视频转换为数百个视觉令牌，多帧输入导致送入 LLM 的令牌数量急剧膨胀，使得自注意力的计算复杂度随序列长度 $n$ 呈二次增长：
 
@@ -88,7 +90,9 @@ FlashVID 的设计追求两个递进目标：
 
 这两个目标通过两个协同模块实现：**注意力与多样性令牌选择（ADTS）**负责筛选信息量大且多样的令牌作为基础视频表示，**树形时空令牌合并（TSTM）**在此基础上联合消除帧间与帧内的时空冗余。二者的设计细节将在方法部分详细展开。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FlashVID 的核心创新在于首次将**时空冗余联合建模**引入免训练的视频大语言模型加速框架，通过两个协同模块——**注意力与多样性令牌选择（ADTS）**和**树形时空令牌合并（TSTM）**——从根本上改变了现有方法对空间和时间冗余独立压缩的范式。
 
@@ -117,7 +121,7 @@ FlashVID 将 ADTS 与 TSTM 串联为两阶段流水线：ADTS 首先筛选信息
 
 这一联合建模策略的效果在关键指标上得到验证：在 LLaVA-OneVision 上仅保留 10% 视觉令牌即可维持 99.1% 的相对精度（Table 1）；在 Qwen2.5-VL 上，相同计算预算下处理 10 倍帧数（160 帧 vs. 16 帧），相对性能提升 8.6%（Table 3）。值得注意的是，当保留率 $R \in \{15\%, 20\%, 25\%\}$ 时，FlashVID 甚至**超越**了使用全部视觉令牌的原始 LLaVA-OneVision，揭示了“少即是多”的现象——过度冗余的视觉令牌可能反而损害模型性能（Figure 6）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_H6rDX4w6Al/figures/004_Figure_4.jpg]]
 *Figure 4: Overview of our FlashVID. FlashVID compresses visual tokens by two synergistic modules: (1) ADTS prioritizes spatiotemporally informative tokens while ensuring feature diversity by solving a calibrated Max-Min Diversity Problem (MMDP); (2) TSTM models redundancy by spatiotemporal redundancy trees, which effectively capture fine-grained video dynamics*
@@ -148,7 +152,7 @@ FlashVID 将视频冗余压缩划分为两个阶段，分别由 ADTS 和 TSTM �
 - **合并阈值 $T_\tau$**：决定 TSTM 的压缩强度。$T_\tau=0.8$ 时性能最佳；阈值过低会引入噪声（将不同实体的令牌错误合并），过高则压缩不足。
 - **扩大因子 $f_e$**：在 ADTS 的 MMDP 求解中控制候选集规模。$f_e=1.25$ 在效率与性能间达到最佳平衡。
 
-## 核心模块与公式推导
+
 
 FlashVID 的核心由两个协同模块构成：**注意力与多样性令牌选择（ADTS）** 和 **树形时空令牌合并（TSTM）**。前者负责在每帧内筛选出信息量大且特征多样的代表性令牌，后者则跨帧联合建模时空冗余，实现细粒度的令牌压缩。
 
@@ -190,7 +194,9 @@ MMDP 在最大化所选令牌集合中最小成对距离的同时，利用上述
 
 FlashVID 采用先选择后合并的两阶段策略（Figure 4）：ADTS 首先在每帧内保留比例为 $\alpha$ 的令牌（消融实验表明 $\alpha=0.7$ 时综合性能最优，Table 5），随后 TSTM 对保留的令牌进行跨帧合并，进一步消除时空冗余。这种分工使两个模块各司其职——ADTS 保证信息密度，TSTM 负责冗余压缩，最终在仅保留 10% 视觉令牌的条件下仍能维持 99.1% 的相对精度（Table 1）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -279,7 +285,9 @@ f_e 控制 ADTS 阶段候选令牌集的扩展比例，直接影响进入 TSTM �
 ![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_H6rDX4w6Al/figures/025_Figure.jpg]]
 *Figure: Question: Which of the following is visible in the background of the video when the miniature bottle is shown empty?*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 高效 VLLM 推理范式中的位置
 
@@ -322,6 +330,8 @@ ADTS 模块通过**校准的最大最小多样性问题（MMDP）** 在每帧内
 2. **自适应阈值**：能否根据输入视频的动态程度（如运动幅度、场景切换频率）自适应调整 $T_\tau$ 和保留率，避免静态视频过度压缩或动态视频压缩不足？
 3. **长视频扩展**：TSTM 的树结构在极长视频（如小时级）中可能导致树深度过大，是否需引入层次化合并或时间窗口截断机制？
 4. **跨任务泛化**：ADTS 和 TSTM 的设计是否适用于视频问答以外的任务（如视频定位、时序动作检测）或其他多模态组合（如图文检索）？
+
+
 
 ## 原文 PDF
 

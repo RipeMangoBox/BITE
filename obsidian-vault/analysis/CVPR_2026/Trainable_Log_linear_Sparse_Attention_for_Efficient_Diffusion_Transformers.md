@@ -44,7 +44,7 @@ claims:
 > - 256×256 Pixel DiT 上，训练加速比 vs Full Attention 6.09× vs 1× (Full Attention) (+5.09×)。
 > - FFHQ-128 上，FID ↓ 24.37 (LLSA L=2 K=8) vs 25.88 (Top-K L=1 K=32) (-1.51)。
 
-## 概述
+## 概要
 
 扩散Transformer（DiT）在高分辨率图像生成中展现出巨大潜力，但其标准自注意力的二次复杂度严重制约了长序列建模的效率。现有可训练的Top-K稀疏注意力虽试图通过仅选择部分键值对来缓解这一问题，却仍存在根本性瓶颈：其选择阶段需要在压缩后的全体令牌上计算密集相似度以进行全局Top-K选择，复杂度仍为 $O(N^2)$；同时，为保持全局上下文，不得不随序列长度增大K值，进一步加剧开销，难以高效扩展到极长序列。
 
@@ -52,7 +52,7 @@ claims:
 
 实验表明，LLSA将注意力复杂度从二次降低到对数线性。在256×256像素DiT上，LLSA实现推理加速**28.27倍**、训练加速**6.09倍**；在FFHQ-128基准上，仅使用 $K=8$ 即超过单层基线 $K=32$ 的生成质量（FID 24.37 vs 25.88），同时训练吞吐量提升约22%。在FFHQ-256和PixelFlow ImageNet-256上，LLSA在FID和训练吞吐量上均优于VSA和SLA等可训练Top-K稀疏注意力方法。消融研究进一步验证了层次化KV丰富、多层结构、块大小选择及索引重排序等设计的有效性，并展示了该方法向512×512高分辨率扩展的对数线性可扩展性。
 
-## 背景与动机
+
 
 扩散Transformer（DiT）将扩散模型的主干网络从U-Net替换为Transformer，凭借自注意力的全局建模能力在图像生成任务上取得了显著提升。然而，标准自注意力的计算复杂度与序列长度呈二次关系——对于长度为 $N$ 的令牌序列，注意力计算开销为 $O(N^2)$。当DiT直接作用于像素级令牌（无VAE压缩、无patch划分）时，即便是一张 $256 \times 256$ 的图像也会产生 $65{,}536$ 个令牌，使得全注意力在训练和推理阶段都成为严重的计算瓶颈。
 
@@ -62,7 +62,9 @@ claims:
 
 本文的动机由此明确：**能否将选择阶段的复杂度从二次降低到线性，同时以极小的K值保留近似全注意力的全局上下文？** 核心洞察在于，全局信息可以用 $O(\log N)$ 个逐渐粗粒度的令牌来近似——粗粒度令牌天然携带大范围上下文，而细粒度令牌提供局部细节。基于这一洞察，本文提出**Log-linear Sparse Attention（LLSA）**，一种可训练的层次化稀疏注意力机制，将单层全局Top-K选择改造为递归的多层稀疏选择，使选择复杂度降至 $O(NK)$，整体注意力复杂度降至 $O(NK \log N)$，在固定K时达到 $O(N \log N)$ 的对数线性复杂度。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 LLSA 的核心创新在于将传统 Top-K 稀疏注意力的**单层全局选择**改造为**对数级的层次化稀疏选择**，从而将选择阶段的复杂度从 $O(N^2)$ 降至 $O(N)$，实现整体的对数线性复杂度 $O(N K \log N)$。这一改造通过三个关键机制实现：
 
@@ -84,7 +86,7 @@ LLSA 的选择过程从最粗层开始，每层仅在前一层选出的 $K$ 个�
 
 这些 changed slots 共同解决了现有 Top-K 稀疏注意力的根本瓶颈：**选择阶段的高复杂度与全局上下文保留之间的矛盾**。通过层次化设计，LLSA 以对数级开销同时实现了高效选择和上下文保留，为扩散 Transformer 扩展到超长序列提供了可行路径。
 
-## 整体框架
+
 
 Log-linear Sparse Attention (LLSA) 的整体 pipeline 围绕一个核心思想展开：**全局信息可以用 O(log N) 个逐渐粗粒度的令牌来近似**，因此可将单层全局 Top-K 选择改造为递归的稀疏 Top-K 选择，使选择复杂度从 O(N²) 降为 O(N)，同时通过层次化 KV 丰富机制以极小的 K 保留全局上下文。
 
@@ -109,7 +111,7 @@ Log-linear Sparse Attention (LLSA) 的整体 pipeline 围绕一个核心思想�
 ![[assets/figures/papers/paper_list_l944_https_arxiv_org_abs_2512_16615/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison between a general Top-K sparse attention and our Log-linear Sparse Attention (LLSA). In the example, we use a token sequence of length*
 
-## 核心模块与公式推导
+
 
 LLSA 将传统 Top‑K 稀疏注意力的单层压缩与全局选择改造为**对数级层次化稀疏注意力**，核心由四个模块构成：层次化压缩、层次化 Top‑K 选择、层次化 KV 丰富、稀疏 FlashAttention。整体前向流程由 Algorithm 1 定义。
 
@@ -195,7 +197,9 @@ $$\mathbf{x}_t = (1 - t) \mathbf{x}_0 + s \cdot t \boldsymbol{\epsilon}$$
 ![[assets/figures/papers/paper_list_l944_https_arxiv_org_abs_2512_16615/figures/002_Figure_2.jpg]]
 *Figure 2: Illustration of index reordering. The default raster indices do not effectively cluster similar pixels during 1D pooling, while using index ordering guarantees that similar pixels receive neighboring 1D indices*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能与加速比
 
@@ -267,7 +271,9 @@ LLSA的稀疏Top-K索引转置算法（Algorithm 2）通过CSR-to-CSC扫描实�
 ![[assets/figures/papers/paper_list_l944_https_arxiv_org_abs_2512_16615/figures/011_Figure_6.jpg]]
 *Figure 6: The FID and Inception Score curves of the first 4 epochs using VSA, SLA, and LLSA on PixelFlow ImageNet-256 benchmark*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基准方法的谱系关系
 
@@ -310,6 +316,8 @@ LLSA 的设计隐含以下适用前提：
 - **索引重排序的跨域通用性**：对于 3D 点云、视频体素或文本序列，如何设计等效的索引重排序策略以保留局部性，是一个需要独立研究的问题。
 
 **注意**：上述开放问题中，关于视频扩散、自适应学习、与其他注意力机制融合的推测超出了论文提供的直接证据，属于基于方法逻辑的合理推断，需后续工作验证。
+
+
 
 ## 原文 PDF
 

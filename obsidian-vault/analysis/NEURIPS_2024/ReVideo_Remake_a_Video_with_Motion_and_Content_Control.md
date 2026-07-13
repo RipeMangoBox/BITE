@@ -5,6 +5,8 @@ paper_level: A
 venue: NeurIPS
 year: 2024
 pdf_ref: paperPDFs/NEURIPS_2024/ReVideo_Remake_a_Video_with_Motion_and_Content_Control.pdf
+project_link: https://mc-e.github.io/project/ReVideo/
+code_link: null
 aliases:
 - ReVideo
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名    | ReVideo：通过运动和内容控制重制视频                                                                                                   |
 | 英文题名    | ReVideo: Remake a Video with Motion and Content Control                                                                 |
 | 会议/期刊   | NeruIPS 2024                                                                                                            |
-| Links   | [paper](https://arxiv.org/abs/2405.13865); [Project](https://mc-e.github.io/project/ReVideo/)                           |
+| Links   | [paper](https://arxiv.org/abs/2405.13865) · [Project](https://mc-e.github.io/project/ReVideo/)                           |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method  | ReVideo                                                                                                                 |
 | Dataset | Local Video Editing Test Set                                                              |
@@ -39,7 +41,7 @@ claims:
 > - Local Video Editing Test Set 上，PSNR 为 32.85，对比 29.77 (InsV2V)，变化 +3.08。
 > - Local Video Editing Test Set 上，Text Alignment (CLIP score) 为 0.2304，对比 0.2022 (InsV2V)，变化 +0.0282。
 
-## 概述
+## 概要
 
 **ReVideo** 提出了一种在视频局部区域同时控制内容与运动的编辑方法。其核心挑战在于：未编辑区域本身携带稠密的视觉外观与帧间运动信息，扩散模型倾向于从这些区域推断编辑区域的运动，从而忽略用户指定的稀疏轨迹控制，导致内容编辑与运动定制无法协调工作。
 
@@ -49,7 +51,7 @@ claims:
 
 该方法的主要局限在于：当基础模型 SVD 的生成先验不足时，编辑质量受限；长视频编辑存在误差累积；尚未针对动态遮挡和复杂交互场景进行专门优化。
 
-## 背景与动机
+
 
 视频编辑技术正从全局风格迁移走向精细化、局部化的控制。用户不仅希望替换画面中的特定物体（内容编辑），更希望精确指定该物体的运动轨迹（运动编辑）。然而，现有方法在这两个维度上存在明显的耦合困境。
 
@@ -61,7 +63,9 @@ claims:
 
 **本文的核心动机在于实现内容与运动的协同解耦控制。** ReVideo 旨在让用户在指定编辑区域的同时，既能通过修改首帧定义新内容，又能通过绘制稀疏轨迹直观地定义运动模式。实现这一目标的关键挑战并非设计更强的控制编码器，而是从根本上打破未编辑内容对运动控制的干扰——这需要从训练数据构造、训练策略到特征融合机制的协同设计。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ReVideo 的核心创新在于系统性地解决了局部视频编辑中**内容控制与运动控制的耦合问题**。其根本瓶颈在于：未编辑区域本身携带稠密的视觉与帧间运动信息，扩散模型在生成时天然倾向于从中推断编辑区域的运动，从而“淹没”用户指定的稀疏轨迹控制信号。ReVideo 通过三个紧密协同的机制实现了内容保持与运动定制的解耦。
 
@@ -91,7 +95,7 @@ Figure 7 的消融证实，SAFM 相比直接求和“实现了更准确的轨迹
 
 这些创新使 ReVideo 在定量评估中 PSNR 达到 32.85（InsV2V 为 29.77），文本对齐得分 0.2304（InsV2V 为 0.2022），并在人类评估中以 59.1% 的整体偏好率显著领先（Table 1）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l51_ReVideo_Remake_a_Video_with_Motion_and_Content_Control/figures/005_Figure_5.jpg]]
 *Figure 5: The architecture of our proposed spatiotemporal adaptive fusion module (left), and the visualization of fusion weight Γ at different timesteps (right)*
@@ -126,7 +130,7 @@ ReVideo 的整体 pipeline 围绕一个核心矛盾展开：在局部视频编�
 
 **与基线方法的差异。** 相比于 InsV2V 等方法的简单联合训练和直接特征相加，ReVideo 的核心差异在于：通过解耦的数据构造打破未编辑区域运动信息对轨迹控制的淹没效应，并通过 SAFM 在时空维度上自适应融合两类条件，而非静态地将编码特征求和。这一设计使得单个 Control Module 即可紧凑地承载内容与运动的联合控制。
 
-## 核心模块与公式推导
+
 
 ### 基础扩散框架
 
@@ -170,7 +174,9 @@ $$\mathbf{f}_c = E_c(\mathbf{c}_{con}) \cdot \mathbf{r} + E_m(\mathbf{c}_{mot}) 
 2. **解耦训练**：核心创新在于数据构造策略——将训练样本 $V$ 的编辑区域与未编辑区域分别取自两个不同的视频：$V = V_1 \cdot M + V_2 \cdot (1 - M)$。这迫使模型无法从未编辑区域推断编辑区域的运动，必须依赖显式的运动轨迹条件。此阶段同时引入内容控制，实现两种条件的初步解耦。
 3. **去块训练**：解耦训练后编辑边界可能出现块效应。此阶段仅微调控制模块和基础模型 SVD 中时序自注意力层的 Key/Value 嵌入（$W_k$ 和 $W_v$），在消除块伪影的同时保持已建立的局部运动控制能力。消融实验表明，若在此阶段微调整个控制模块，局部运动控制精度会下降（Figure 7）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈验证：内容与运动控制的耦合
 
@@ -237,7 +243,9 @@ Figure 12 进一步展示了 ReVideo 处理长视频的能力，在包含 90 帧
 *Figure 13: More failure cases of Pika in adding new objects to a video. We set the text consistency control parameter to the highest level during testing. The editing target is to add a plane in the sky*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位：局部视频编辑中的内容与运动解耦控制
 
@@ -284,6 +292,8 @@ ReVideo 的能力边界受以下因素制约：
 3. **语义增强的运动控制**：当前运动控制仅依赖轨迹线，能否结合文本提示辅助描述编辑区域的语义内容（如“旋转的风车”），实现更丰富的编辑效果？
 4. **高维运动控制扩展**：能否将 2D 轨迹控制扩展到 3D 轨迹或更复杂的运动模式（如周期性运动、弹性形变），以支持更广泛的应用场景？
 5. **动态场景鲁棒性**：如何使方法在存在动态遮挡、光照变化等复杂场景下保持稳定的编辑质量？可能需要引入显式的场景理解模块或物理先验。
+
+
 
 ## 原文 PDF
 

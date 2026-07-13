@@ -42,7 +42,7 @@ claims:
 > - LIBERO (Spatial, Object, Goal, Long) 上，成功率 (Success Rate) 0.77 (平均) vs 0.69 (复现 OpenVLA, 平均) (+7.4%)。
 > - Atari-57 上，Human Normalized Score (HNS) 1.07 vs 0.97 (Jat) (+0.10 / +10.3%)。
 
-## 概述
+## 概要
 
 视觉-语言-动作模型（VLA）在机器人操控中展现出强大的语义理解与泛化潜力，但现有模型普遍存在**轨迹过拟合**（trajectory overfitting）问题：模型过度依赖动作与实体之间的伪相关性，倾向于复现记忆中的动作序列，而非真正理解任务语义。这导致模型对物体姿态、位置等微小环境变化极为脆弱——即使目标被遮挡，机械臂仍会机械地重复训练时习得的动作轨迹（见 Figure 1）。
 
@@ -52,7 +52,7 @@ claims:
 
 PDF 的贡献在于揭示了一条无需微调基础模型即可有效提升 VLA 测试时决策性能的路径：利用模型自身的不确定性有节制地扩大观察分布，并结合延迟反馈进行有监督的 logit 扰动更新，在保持计算高效（仅更新 9M 参数，无需基础模型梯度）的同时，实现了更稳定、准确的测试时适应。
 
-## 背景与动机
+
 
 ### 视觉-语言-动作模型的轨迹过拟合困境
 
@@ -74,7 +74,9 @@ Figure 1 直观地揭示了这一现象：在目标物体被遮挡的情况下�
 
 这两个机制共同构成了 **PDF（Perturbation learning with Delayed Feedback）**——一个无验证器的 TTA 框架，在保持 VLA 全部参数冻结的前提下，仅更新 9M 参数的扰动头，实现了稳定、高效的测试时性能提升。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PDF 的核心创新在于对 VLA 测试时适应范式的双重重构：将传统的**自监督熵最小化**替换为**不确定性感知的动作投票**与**延迟反馈驱动的扰动学习**，在完全冻结基础模型的前提下实现稳健的决策修正。其与 baseline 的关键差异体现在以下四个 changed slots 上。
 
@@ -106,7 +108,7 @@ $$\mathcal { L } _ { \mathrm { P D F } } = - ( r - b ) \log \pi _ { \phi } + \la
 
 PDF 并未从根本上消除轨迹过拟合，而是通过测试时扰动减轻其负面影响。延迟反馈仅在回合结束后可用，导致适应在长周期任务中存在显著滞后，无法支持每步即时纠正。在极端分布偏移或完全未见过的物体属性下，不确定性估计与投票机制的可靠性仍需进一步验证。
 
-## 整体框架
+
 
 PDF 的整体设计围绕一个核心原则展开：**冻结 VLA 全部基础参数，仅在测试时通过轻量的外部扰动头与不确定性感知的决策机制来提升鲁棒性**。图 3 给出了完整的信息流与优化闭环。
 
@@ -144,7 +146,7 @@ $$\mathcal{L}_{\mathrm{PDF}} = -(r - b)\log\pi_{\phi} + \lambda_{\mathrm{KL}} \m
 ![[assets/figures/papers/paper_list_l2422_https_openaccess_thecvf_com_content_CVPR2026_html_Zang_Test_Time_Perturb/figures/003_Figure_3.jpg]]
 *Figure 3: The overall framework of our proposed PDF. At test time, the VLA receives pixel observation ot and instruction ct. Action-logit uncertainty Ut is estimated to allocate an adaptive augmentation budget*
 
-## 核心模块与公式推导
+
 
 PDF 框架由两个核心机制构成：**基于不确定性的动作投票**和**延迟反馈引导的自适应扰动学习**。整个测试时流程如图 3 所示，基础 VLA 模型的所有参数（视觉编码器、因果 Transformer、LM head）保持冻结，仅在线更新一个轻量的扰动头。
 
@@ -191,7 +193,9 @@ Figure 6 的消融实验表明，两项缺一不可：移除 REINFORCE 项或 KL
 ![[assets/figures/papers/paper_list_l2422_https_openaccess_thecvf_com_content_CVPR2026_html_Zang_Test_Time_Perturb/figures/002_Figure_2.jpg]]
 *Figure 2: Comparison between traditional self-supervised testtime adaptation (TTA) and our PDF. Dashed bars indicate logits before adaptation; solid bars indicate logits after adaptation. Red bars denote incorrect-action logits; green bars denote correctaction logits. When VLAs become overconfident in incorrect behaviors, entropy-minimization-based TTA can amplify these errors by further boosting the wrong logits. In contrast, PDF corrects such misbehaviors by jointly mitigating the overconfidence issue and elevating the logits of correct actions, guiding the model toward accurate decisions*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 4.1 实验设置
 
@@ -278,7 +282,9 @@ Figure 7 展示了 OpenVLA 与 PDF 在三个具体任务上的行为对比。在
 ![[assets/figures/papers/paper_list_l2422_https_openaccess_thecvf_com_content_CVPR2026_html_Zang_Test_Time_Perturb/figures/001_Figure_1.jpg]]
 *Figure 1: Evidence of trajectory overfitting and the effectiveness of data augmentation. In the first row, the gripper imitates expert trajectories regardless of task success. In the second row, it still reproduces similar actions when the target is masked. The third row shows that the gripper overlooks the target in attention maps. In contrast, after data augmentation, the gripper refocuses on the target and makes correct decisions*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 **问题定位：轨迹过拟合与测试时适应的困境**
 
@@ -315,6 +321,8 @@ PDF 的设计决定了其适用边界。首先，PDF 并未从根本上消除轨
 **开放问题**
 
 PDF 的提出引出了若干值得探索的方向。最根本的问题是：如何从训练阶段就消除轨迹过拟合，而不是仅依靠测试时扰动来缓解？这可能需要重新审视 VLA 的训练数据构建和表征学习目标。其次，PDF 的自适应扰动思想能否推广到其他多模态基础模型（如视觉-语言模型 VLMs）的推理环节？VLA 的决策不确定性估计和 logit 扰动修正机制在概念上具有通用性，但需要针对不同模态和任务结构进行适配。最后，在延迟反馈不可用的场景中，能否设计替代的监督信号（如基于世界模型的模拟反馈）来驱动 P head 的在线更新，从而扩展 PDF 的适用范围？
+
+
 
 ## 原文 PDF
 

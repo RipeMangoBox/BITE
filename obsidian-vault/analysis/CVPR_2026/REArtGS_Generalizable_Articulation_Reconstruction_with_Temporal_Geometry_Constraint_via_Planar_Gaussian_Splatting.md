@@ -42,7 +42,7 @@ claims:
 > - ArtGS-Multi + Screw Objects 上，Axis Ang (Average) 0.55 vs 1.56 (REArtGS, 基于平均估计) (-64.7%)；Part Motion (Average) 0.22 vs ~1.23 (基于表2中其余方法均值估计) (-82.1%)。
 > - PARIS Real Objects 上，Axis Ang (Mean) 2.63 vs 44.85 (REArtGS) (-94.1%)。
 
-## 概述
+## 概要
 
 从任意两状态的多视角RGB图像中重建未见关节物体的部件级动态几何并估计关节参数，是视觉理解与机器人操作中的核心挑战。现有方法面临两个关键瓶颈：**关节运动建模依赖类型先验**（仅限旋转或平移），无法处理螺旋关节与多部件物体；**缺乏时间连续的几何约束**，仅依靠离散两状态监督，导致未观测状态的重建质量与关节参数估计精度受限。
 
@@ -57,7 +57,7 @@ REArtGS++ 通过两个核心机制突破上述瓶颈：
 
 **方法定位**：REArtGS++属于基于3D高斯泼溅的可泛化关节重建方法，继承自REArtGS（Wu et al., NeurIPS 2025）的几何约束框架，但通过螺旋运动建模与时间连续正则化实现了对任意关节类型与未观测状态的有效泛化，区别于PARIS（Liu et al., ICCV 2023）、DTA（Weng et al., CVPR 2024）等基于神经隐式场的方法，以及ArtGS（Liu et al., ICLR 2025）等依赖关节先验的3DGS方法。
 
-## 背景与动机
+
 
 ### 问题背景：无先验关节物体的可泛化重建
 
@@ -81,7 +81,9 @@ REArtGS++ 通过两个核心机制突破上述瓶颈：
 
 通过这两个机制，REArtGS++在仅使用两状态多视角RGB图像（无深度监督）的条件下，实现了对未见关节物体的部件级动态重建与精确关节参数估计。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 REArtGS++ 针对“仅两状态多视角RGB图像输入下、无关节类型先验的可泛化关节重建”这一瓶颈，提出了三项相互耦合的关键创新，分别从表征、运动建模与时间几何约束三个维度突破现有方法的局限。
 
@@ -127,7 +129,7 @@ $$\mathcal{L}_{\mathrm{geo}} = (1 - \nabla\mathbf{I}(t_0)) \left( \|\bar{\mathbf
 
 上述三项创新并非孤立存在，而是形成因果链条：**平面高斯**提供可靠的法向与深度估计基础，**解耦螺旋运动**定义连续时间上的刚体变换，**泰勒展开几何约束**则将前两者的输出耦合为覆盖整个运动区间的一致性正则化信号。这一“表征-运动-约束”三位一体的设计，使得 REArtGS++ 在仅两状态RGB监督下即可实现高质量部件级动态重建与任意关节类型的参数估计。
 
-## 整体框架
+
 
 REArtGS++ 的整体流程如图 2 所示，其核心目标是：**仅以任意两个状态的 RGB 多视角图像为输入，在不依赖任何外部模型或深度真值的条件下，联合优化部件分割、关节参数与平面高斯表征，最终实现未见关节物体的高质量部件级动态重建与精确关节参数估计**。
 
@@ -175,7 +177,7 @@ $$\mathcal{L} = \lambda_{\mathrm{render}} \mathcal{L}_{\mathrm{render}} + \lambd
 ![[assets/figures/papers/paper_list_l39_https_arxiv_org_abs_2511_17059/figures/001_Figure_1.jpg]]
 *Figure 1: Given multi-view RGB images at arbitrary two different states of an unseen articulated objects, our method achieves high-quality part-level dynamic reconstruction and joint parameter estimation, without any external models*
 
-## 核心模块与公式推导
+
 
 REArtGS++ 的核心管线由五个紧密耦合的模块构成，围绕“平面高斯→部件分割→解耦螺旋运动→时间几何约束→局部投票”的联合优化环路展开。整体框架如 Figure 2 所示。
 
@@ -243,7 +245,9 @@ $$ \mathcal{L} = \lambda_{\mathrm{render}} \mathcal{L}_{\mathrm{render}} + \lamb
 
 其中 $\mathcal{L}_{\mathrm{render}}$ 为 L1 + D-SSIM 渲染损失（Eq. 2），$\mathcal{L}_{\mathrm{center}}$ 约束部件中心不远离物体。所有参数——高斯属性、部件分割、关节参数——通过该目标端到端联合优化。优化完成后，动态高斯 $\mathcal{G}^j$ 在任意时刻 $t$ 的位置由 Eq. 5 更新，部件网格通过 $\max(\mathcal{G}_i = m_j)$ 选择提取（Eq. 15）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -312,7 +316,9 @@ REArtGS++ 在 PARIS 与 ArtGS-Multi 两个基准上均取得最优或次优的�
 ![[assets/figures/papers/paper_list_l39_https_arxiv_org_abs_2511_17059/figures/010_Figure_7.jpg]]
 *Figure 7: Qualitative results of part-level surface reconstruction at both start and end states on real-world objects*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题域定位：可泛化关节重建的瓶颈
 
@@ -366,6 +372,8 @@ REArtGS++ 相对于基线方法在四个关键设计槽位上做出了实质性�
 - **与基础模型结合**：当前方法从零开始优化，未来可探索利用预训练的分割或深度估计模型提供初始化或弱监督。
 - **单目/稀疏视角扩展**：当前依赖多视角输入，向单目或稀疏视角的泛化是实用化的关键瓶颈。
 - **动态场景扩展**：方法假设静态背景与独立运动的关节物体，向多物体交互场景的扩展需要引入物体间遮挡与碰撞建模。
+
+
 
 ## 原文 PDF
 

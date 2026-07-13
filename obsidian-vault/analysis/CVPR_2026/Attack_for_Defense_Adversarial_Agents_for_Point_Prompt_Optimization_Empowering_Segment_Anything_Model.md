@@ -43,7 +43,7 @@ claims:
 > - ISIC 上，mDSC (%) 76.3 (FM-PPD) vs 72.3 (FM-PPO) (+4.0)；mIoU (%) 64.2 (FM-PPD) vs 62.4 (FM-PPO) (+1.8)。
 > - Kvasir 上，mDSC (%) 54.8 (FM-PPD) vs 38.9 (FM-PPO) (+15.9)。
 
-## 概述
+## 概要
 
 Segment Anything Model（SAM）凭借其强大的零样本泛化能力，已成为视觉分割领域的基础模型。然而，SAM的分割质量高度依赖于点提示的精确性——一个关键瓶颈在于，现有方法通常依赖手工启发式或静态特征匹配生成提示，缺乏对分割反馈的动态适应，导致提示质量在不同场景下波动剧烈，泛化性和鲁棒性不足。
 
@@ -53,7 +53,7 @@ PPD的关键优势在于其**任务无关的即插即用特性**：防御智能�
 
 实验结果表明，PPD在自然图像和医学图像分割任务上均展现出显著的性能提升。在单样本SAM分割设定下，PPD-FM在PASCAL VOC上mIoU达到60.3%，相较基线FM-PPO（53.7%）提升6.6个百分点；在医学数据集ISIC上mIoU达到64.2%，提升1.8个百分点；在更具挑战性的Kvasir内窥镜数据集上，mIoU从29.5%跃升至44.9%，提升幅度高达15.4个百分点。消融实验进一步验证了攻击-防御机制的有效性：攻击智能体可将理想提示的mIoU从69.4骤降至21.5，而防御智能体可恢复至63.5，证明了对抗式训练框架在探索提示空间和抑制有害提示方面的核心价值。
 
-## 背景与动机
+
 
 **Segment Anything Model (SAM) 的提示依赖瓶颈。** SAM 作为视觉基础模型，在图像分割任务中展现出强大的零样本泛化能力。然而，其分割质量高度依赖于用户提供的点提示质量。在实际部署中，用户通常难以给出精确的提示点，导致分割结果出现边界模糊、区域缺失或误分割等问题。这一“提示敏感性”构成了 SAM 从通用模型走向可靠下游应用的核心瓶颈。
 
@@ -61,7 +61,9 @@ PPD的关键优势在于其**任务无关的即插即用特性**：防御智能�
 
 **“以攻为守”的核心动机。** 本文提出一个关键洞察：要提升 SAM 对提示扰动的鲁棒性，最有效的方式是主动暴露于破坏性提示并学习防御。基于这一思想，PPD（Point Prompt Defender）构建了一个对抗式强化学习框架——攻击智能体学习激活破坏性提示以降低 SAM 性能，防御智能体则学习识别并抑制这些有害提示以恢复分割精度。通过这种“攻击-防御”的博弈训练，防御智能体能够在推理时即插即用地过滤任意初始提示中的噪声，实现任务无关的鲁棒增强。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PPD的核心创新在于将点提示优化重新定义为一个**对抗式强化学习问题**，通过“以攻为守”的双智能体博弈机制，动态探索并抑制对SAM分割有害的提示。其关键创新点可归纳为以下四个维度：
 
@@ -94,7 +96,7 @@ PPD在推理阶段仅部署训练好的**防御智能体**，对任意来源的�
 | 训练信号 | 任务特定标签或原型 | SAM输出的Dice系数变化（自监督） |
 | 推理适应 | 需微调或域适配 | 任务无关部署，仅用防御智能体过滤 |
 
-## 整体框架
+
 
 PPD (Point Prompt Defender) 采用“以攻为守”的对抗式强化学习框架，其核心由三个关键组件构成：**双空间图环境**、**攻击智能体**与**防御智能体**。整体流程如图2所示：首先利用参考图像构建融合DINOv2特征距离与物理距离的双空间异质图，并基于真实掩码初始化一组理想提示作为交互起点；随后，攻击智能体与防御智能体在SAM分割反馈的驱动下交替博弈——攻击者学习激活破坏性提示以降低分割质量，防御者学习去激活这些有害提示以恢复精度；训练完成后，仅需部署防御智能体即可在推理时对任意初始提示集进行过滤优化，实现任务无关的即插即用增强。
 
@@ -121,7 +123,7 @@ PPD将提示优化问题建模为图上的序贯决策过程。对于给定图�
 ![[assets/figures/papers/paper_list_l2761_https_arxiv_org_abs_2509_18891/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of PPD: A dual-space graph and ideal prompts form the environment. Guided by SAM segmentation feedback, the attack agent activates poor prompts to degrade performance, while the defense agent suppresses them to recover accuracy. Solid and dashed lines denote agent training and testing phases, respectively*
 
-## 核心模块与公式推导
+
 
 PPD 的核心架构由三个紧密耦合的模块构成：**双空间图环境**、**对抗式双智能体训练**以及**防御智能体推理**。以下逐一展开其设计逻辑与关键公式。
 
@@ -186,7 +188,9 @@ $$\mathcal{L}_t = \left( r_t + \gamma \max_{a'} Q_{\theta^-}(s_{t+1}, a') - Q_\t
 ![[assets/figures/papers/paper_list_l2761_https_arxiv_org_abs_2509_18891/figures/001_Figure_1.jpg]]
 *Figure 1: Adversarial training in PPD: The attack agent activates prompts to worsen SAM segmentation, while the defense agent deactivates harmful prompts to improve it. A judge evaluates the segmentation quality based on the ground truth*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 对抗攻击与防御的因果验证
 
@@ -235,7 +239,9 @@ PPD在FSS-1000数据集的1000张随机采样图像上进行训练，共1000个e
 ![[assets/figures/papers/paper_list_l2761_https_arxiv_org_abs_2509_18891/figures/007_Figure_5.jpg]]
 *Figure 5: Qualitative segmentation results of different one-shot SAM-based methods in natural and medical images*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有提示优化方法的关系
 
@@ -264,6 +270,8 @@ PPD 的核心贡献在于将点提示优化从“单方试探”转变为“对�
 2. **提示类型扩展**：将 PPD 的对抗博弈框架推广至框提示、掩码提示甚至混合提示类型，需要重新设计动作空间（例如框的平移/缩放、掩码的膨胀/腐蚀）和状态表示，但核心的“攻击-防御-反馈”机制理论上可迁移。
 
 3. **训练效率优化**：当前对抗训练的交互步数较多。能否通过课程学习（curriculum learning）先训练攻击智能体再训练防御智能体，或引入模型化环境（model-based RL）减少与 SAM 的实际交互次数，从而加速收敛并保持防御泛化性，值得进一步研究。
+
+
 
 ## 原文 PDF
 

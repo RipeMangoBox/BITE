@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Constrained_Decoding_of_Diffusion_LLMs_with_Context_Free_Grammars.pdf
+project_link: https://constrained-diffusion.ai
+code_link: https://github.com/eth-sri/constrained-diffusion
 openreview_forum_id: 7Sph4KyeYO
 aliases:
 - CDDLCFGCGRS
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 基于上下文无关语法的扩散语言模型约束解码 |
 | 英文题名 | Constrained Decoding of Diffusion LLMs with Context-Free Grammars |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=7Sph4KyeYO); [GitHub](https://github.com/eth-sri/constrained-diffusion); [Project](https://constrained-diffusion.ai) |
+| Links | [paper](https://openreview.net/forum?id=7Sph4KyeYO) · [GitHub](https://github.com/eth-sri/constrained-diffusion) · [Project](https://constrained-diffusion.ai) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/diffusion_image_video |
 | Method | Constrained Decoding of Diffusion LLMs with Context-Free Grammars (CFG-guided rejection sampling) |
 | Dataset | HumanEval C++ (MRI 1–3 spans), DLM tasks (C++), DLM tasks (JSON) |
@@ -42,7 +44,7 @@ claims:
 > - HumanEval C++ (MRI 1–3 spans) 上，Functional (pass@1) 为 avg. +2.8% over Vanilla，对比 Vanilla，变化 +2.8% avg.。
 > - DLM tasks (C++) 上，Syntax (DREAM 7B) 为 99.4 (Con.)，对比 72.0 (Van.)，变化 +27.4。
 
-## 概述
+## 概要
 
 **核心问题**：现有约束解码方法均建立在自回归模型从左到右的令牌生成范式之上，无法处理扩散语言模型（DLM）的任意顺序生成以及多区域填充（MRI）等高级生成场景。这导致在这些新兴范式中，模型的输出缺乏语法保证，严重制约了其在代码生成、结构化数据合成等任务中的可靠性。
 
@@ -55,7 +57,7 @@ claims:
 
 **方法谱系与知识库定位**：本方法属于**基于形式语言的约束解码**分支，区别于依赖提示工程（如**Grammar Prompting**，Wang et al., 2023）或专用解析器的增量校验（如**DINGO**，Park et al., 2024）。其核心贡献在于将约束解码从“前缀可完成性”推广到“任意部分输出的可完成性”，并借助形式语言理论中CFL与正则语言的交集构造与空性检查算法，实现了生成范式无关的语法保证。
 
-## 背景与动机
+
 
 ### 生成范式的演进与语法约束的缺位
 
@@ -73,7 +75,9 @@ claims:
 
 本文的核心动机是填补约束解码在非自回归、任意顺序生成场景中的空白。作者将MRI与DLM的约束解码统一为**约束填充问题**，并首次提出了一套实用的解决方案：将部分输出转化为描述其所有可能补全的正则语言，与目标CFG求交，并通过高效的空性检查算法实时判定可完成性。这一框架不仅首次使扩散语言模型和多区域填充具备了硬语法约束能力，还通过拒绝采样与自动补全的混合策略，在保证语法正确性的同时维持了功能正确性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 创新动机：从“左到右”到“任意顺序”的约束解码鸿沟
 
@@ -120,7 +124,7 @@ claims:
 
 这些保证将约束解码从启发式过滤提升为具有形式化正确性基础的推理框架。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_7Sph4KyeYO/figures/001_Figure_1.jpg]]
 *Figure 1: An overview of our approach. In each step, the input consists of a partial text x with arbitrarily many infilling regions and a context-free grammar (CFG) specifying formal constraints. During decoding, we sample an updated input $x ^ { \prime }$ from M , , obtained, e.g., by inserting a token in one of the regions in x. Our method then intersects the CFG with the regular language of all possible completions of $x ^ { \prime }$ . . If the intersection is empty, the update is rejected and a new $x ^ { \prime }$ is sampled. Otherwise, it is accepted and the decoding continues from $x ^ { \prime }$ . . In the example, the invalid update inserting "foo()" is rejected and "foo" is accepted instead
@@ -209,7 +213,7 @@ claims:
 - **完备性**：允许采样任何能产生合法输出的 token，不预先排除有效路径；
 - **最小侵入性**：若无约束模型 `M` 本身能生成合法输出 `w ∈ L`，则施加约束后仍会生成该输出，不会因约束引入新的偏差。
 
-## 核心模块与公式推导
+
 
 ### 约束填充问题形式化
 
@@ -275,7 +279,9 @@ $$A \to \alpha A', \quad A' \to \beta, \quad A' \to \beta'$$
 
 当模型连续多次拒绝无效更新后，从 $L_{\cap}$ 中采样一个具体补全字符串。采样时需将交集文法生成的词素序列与当前部分输出的 Unicode 正则语言再次求交，确保补全文本在字符层面与已有输出无缝拼接。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：多区域填充（MRI）与扩散语言模型（DLM）的语法与功能正确性
 
@@ -344,7 +350,9 @@ $$A \to \alpha A', \quad A' \to \beta, \quad A' \to \beta'$$
 
 这些案例表明，方法的核心价值在于实时拦截违反形式语法的更新，而非事后修复——这正是其“最小侵入性”性质的体现：若模型自身能生成有效输出，约束解码不会改变该输出。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有约束解码方法的关系
 
@@ -389,6 +397,8 @@ $$A \to \alpha A', \quad A' \to \beta, \quad A' \to \beta'$$
 5. **与扩散解码策略的协同。** 能否将本方法与其他扩散解码策略（如迭代精化、分类器引导）结合，在保证语法正确性的同时进一步提升功能正确性？
 
 6. **模型训练层面的改进。** 如何训练模型在需要更多填充token时主动发出信号，或学习在约束解码的拒绝采样过程中更高效地生成有效更新，从根本上缓解令牌不足和运行时开销问题？
+
+
 
 ## 原文 PDF
 

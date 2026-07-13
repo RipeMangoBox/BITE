@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/TaCo_A_Benchmark_for_Lossless_and_Lossy_Codecs_of_Heterogeneous_Tactile_Data.pdf
+project_link: null
+code_link: null
 openreview_forum_id: 1PYXFkS6Hy
 aliases:
 - TLTL
@@ -42,7 +44,7 @@ claims:
 > - ObjTac 上，bits/Byte (↓) 为 0.360 (TaCo-LL-96M)，对比 1.309 (JPEG-XL)，变化 -0.949。
 > - TouchandGo 上，BD-Rate (%) (↓) 为 -61.8% (TaCo-L)，对比 0% (HM-Intra)，变化 -61.8%。
 
-## 概述
+## 概要
 
 实时机器人遥操作与灵巧操作依赖高带宽触觉感知，但触觉传感器产生的异构数据（视觉触觉图像、力向量）体量庞大，传输与存储成本高昂。现有压缩方案碎片化严重：通用编解码器（gzip、PNG、JPEG-XL、HEVC/VVC等）未针对触觉信号的统计特性与时空冗余进行设计，压缩效率低下；而触觉专用编解码器缺乏系统性基准测试，难以比较优劣。
 
@@ -58,7 +60,7 @@ TaCo是首个面向异构触觉数据编解码器的综合基准测试，覆盖5
 
 这些结果表明，数据驱动的触觉专用编解码器在存储效率与任务性能之间实现了当前最优的权衡，为机器人系统的实时触觉传输提供了可行路径。
 
-## 背景与动机
+
 
 触觉感知是机器人灵巧操作与环境交互的核心模态，视觉触觉传感器（如GelSight、DIGIT）和力传感器能够捕获接触几何、纹理与三维力分布等关键信息。然而，高分辨率触觉数据产生巨大的数据吞吐量——单个视觉触觉传感器每秒可产生数百MB的原始数据——在实时遥操作、多模态记录与边缘推理等场景中，传输带宽与存储成本成为瓶颈。因此，高效的触觉数据压缩成为机器人系统实用化的关键使能技术。
 
@@ -68,7 +70,9 @@ TaCo是首个面向异构触觉数据编解码器的综合基准测试，覆盖5
 
 针对这些缺口，TaCo基准测试提出两条核心思路。**第一**，构建覆盖5个异构触觉数据集、30个编解码器、4类评估任务的系统性评测框架，统一度量无损压缩、面向人类可视化的有损压缩、面向机器分类与抓取的任务保持压缩。**第二**，首次引入纯数据驱动的触觉编解码器TaCo-LL（无损）和TaCo-L（有损），在触觉数据上端到端训练，使其学习异构触觉信号的本征分布与结构化冗余，从而在压缩比与任务保真度两个维度上建立新的基准。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 TaCo-LL 和 TaCo-L 的核心创新并非提出全新的压缩架构，而是通过**训练数据域的迁移**和**触觉信号的表征定制**，将成熟的图像/视频压缩范式适配到异构触觉数据上，从而释放数据驱动压缩在触觉领域的潜力。
 
@@ -96,7 +100,7 @@ TaCo-L 引入了一个看似微小但实际关键的 changed slot：将输入统
 
 上述 changed slots 的有效性已在五个数据集和四项任务上得到验证，但需注意：训练数据仅覆盖 GelSight 和 DIGIT 两种视觉触觉传感器及一种力传感器，对其他传感器类型（如 BioTac、TacTip）的泛化能力尚未验证。此外，TaCo-L 的 63.2M 参数量使其在嵌入式平台上的部署仍需进一步压缩或蒸馏。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0009_1PYXFkS6Hy_TaCo_A_Benchmark_for_Lossless_and_Lossy_Codecs_o/figures/001_Figure_1.jpg]]
 *Figure 1: The motivation of our TaCo benchmark, established through an extensive evaluation on tactile codecs across multiple dimensions. First, we assess 30 off-the-shelf and neural codecs on 5 heterogeneous tactile datasets with more than 250K frames. Second, we introduce purely-trained TaCo-LL and TaCo-L codecs to explore the data-driven approaches in the field of lossless and lossy tactile data compression. Finally, we evaluate the coding performance on 4 distinct task types designed to serve for human, machine, and robotics*
@@ -148,7 +152,7 @@ TaCo-LL 与 TaCo-L 与通用预训练编解码器的核心差异在于**训练�
 
 这一多任务评估体系确保了编解码器的性能不仅体现在信号保真度指标上，更直接关联到机器人与人类使用场景的实际效用。
 
-## 核心模块与公式推导
+
 
 ### 3.1 触觉信号的图像化表征
 
@@ -199,7 +203,9 @@ $$\mathcal{L} = \lambda \times \mathcal{D}(\boldsymbol{x}, \hat{\boldsymbol{x}})
 
 相较于通用神经压缩模型在ImageNet等自然图像上的预训练，TaCo-LL和TaCo-L的核心差异在于**训练数据域的端到端适配**：仅使用Touch and Go和ObjectFolder数据集的70%帧进行训练，使模型直接学习触觉信号的本征分布（如GelSight的压痕纹理模式、力向量的时序相关性），而非依赖跨模态迁移。这一策略是TaCo系列在压缩效率上大幅超越预训练基线（如DLPR、ELIC、DCVC系列）的根本原因。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -271,7 +277,9 @@ TaCo的核心因果杠杆在于**端到端数据驱动训练**：通过在触觉
 
 **需手动验证的点**：TaCo-L在ObjTac数据集上BD-Rate未达最优（-18.5% vs VTM-SCC的-21.9%），论文未深入分析原因，可能与该数据集的力信号统计特性有关。此外，Table 7的抓取实验仅在仿真环境（IsaacSim）中进行，sim-to-real差距未量化。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 在触觉数据压缩领域中的位置
 
@@ -304,6 +312,8 @@ TaCo-LL 和 TaCo-L 的方法学定位是**数据驱动的触觉专用编解码�
 **触觉压缩与机器人策略的联合优化**可能带来超越独立压缩-推理流水线的性能增益。在极低带宽（如 0.01 BPP）下，Table 7 显示 TaCo-L 的灵巧抓取成功率（62.2%）与未压缩数据（63.8%）差距仅为 1.6%，但这一结果基于固定的压缩-解压-策略执行流水线。若将压缩的率失真目标与下游策略的任务奖励直接耦合，系统可能学会在保留任务关键信息的同时实现更高的压缩比，这对远程操作和触觉遥在场景具有重要价值。
 
 **新一代触觉表征范式**的探索可能从根本上改变压缩方法的设计空间。当前 TaCo 依赖二维图像映射，但触觉信号本质上是对接触物理过程的采样。基于神经辐射场（NeRF）或隐式神经表示（INR）的方法可能直接对触觉信号的连续函数进行压缩，避免离散像素网格的冗余。这类方法在压缩比和重建质量上可能超越当前图像范式，但其计算复杂度和实时解码能力仍需实质性突破。
+
+
 
 ## 原文 PDF
 

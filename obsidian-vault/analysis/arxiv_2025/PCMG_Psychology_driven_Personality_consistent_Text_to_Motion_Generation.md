@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/PCMG_Psychology_driven_Personality_consistent_Text_to_Motion_Generation.pdf
+project_link: null
+code_link: null
 aliases:
 - PCMG
 tags:
@@ -39,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - MoOCEAN 上，FID↓ 3.7754 vs 5.7534 (MDM+Personality) (-1.9780 (34.4%))；R-precision (Top-3)↑ 0.3281 vs 0.2656 (MDM+Personality) (+0.0625)；PRS↑ (Personality Recognition Score) 0.6535 vs 0.4877 (MotionDiffuse+Personality) (+0.1658)。
 
-## 概述
+## 概要
 
 **核心问题**：现有文本到运动生成方法主要关注语义保真度，缺乏显式机制确保生成的动作与目标人格之间的心理一致性。简单的人格文本描述或黑盒风格编码无法捕捉人格的精细运动学特征，导致动作语义正确但缺乏可区分的个性。
 
@@ -49,7 +51,7 @@ claims:
 
 **主要结果**：在MoOCEAN数据集上，PCMG的FID降至3.7754（较最佳基线MotionDiffuse+Personality的5.4670降低约30.9%），人格识别得分PRS从0.4877提升至0.6535。消融实验表明移除OCEAN-CN导致FID增加37.38%，移除Laban-Gd则使PRS明显下降；用户研究中73.64%的参与者偏好完整模型。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -82,7 +84,9 @@ claims:
 
 这种两阶段设计的核心洞察在于：**先在特征层面融合人格条件以保持语义准确性，再在运动空间通过可微的 LMA 能量函数引导采样轨迹，从而显式地表达人格特质**。两个阶段各司其职——OCEAN-CN 负责“人格语义”的宏观注入，Laban-Gd 负责“人格运动学”的微观精化——共同实现了语义正确且人格鲜明的运动生成。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PCMG的核心创新在于将人格注入解耦为**语义层面的特征融合**与**运动学层面的分析性精化**两个阶段，从而在保持文本语义保真度的同时，显式地表达大五人格（OCEAN）特质。这一设计与现有基线方法形成了清晰的差异。
 
@@ -106,7 +110,7 @@ $$\pmb {\mu } _ { t } = \pmb {\mu } _ { t } - \tau \nabla _ { \pmb {\mu } _ { t 
 
 OCEAN-CN与Laban-Gd并非独立的改进，而是形成互补的因果链路：**OCEAN-CN负责“像不像这个人”——**在特征层面确保生成动作的整体风格与目标人格一致；**Laban-Gd负责“细节对不对”——**在运动学层面确保关节旋转符合该人格特质的心理物理学规律。前者通过残差融合保护语义，后者通过分析梯度注入运动学先验，两者共同解决了“语义正确但个性缺失”的核心瓶颈。
 
-## 整体框架
+
 
 PCMG 的整体 pipeline 将人格注入解耦为两个阶段，形成“先融合、后精化”的级联架构。输入为文本提示 `p`、OCEAN 五维人格向量 `c` 和噪声运动序列 `x_t`，输出为与文本语义和人格特质双重一致的运动序列 `x_0`。
 
@@ -124,7 +128,7 @@ $$G(\pmb{\mu}, \pmb{c}^p) = \frac{\sum_n \sum_j \sigma_{nj} \left\| \pmb{c}^p - 
 
 **模块间的因果分工**：OCEAN-CN 负责在语义生成过程中建立人格与运动模式的全局关联，Laban-Gd 则在运动空间中对局部运动学细节进行精细校准。消融实验验证了这一分工的有效性——移除 OCEAN-CN 导致 FID 从 3.7754 升至 6.0288（+37.38%），运动真实感急剧下降；移除 Laban-Gd 则使 PRS 从 0.6535 降至 0.6086，人格可辨识度明显减弱。两者协同实现了“语义准确”与“个性鲜明”的双重目标。
 
-## 核心模块与公式推导
+
 
 PCMG将人格注入解耦为两个阶段：**个性整合**与**运动精化**，分别在扩散模型的特征层面和运动空间的操作层面施加控制，从而在保持语义准确性的同时显式地表达人格特质。
 
@@ -190,7 +194,9 @@ Laban-Gd仅在 $t < T_G$ 时激活。早期扩散步骤中样本噪声较大，�
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2505_22637/figures/013_Figure_2.jpg]]
 *Figure 2: Motion realism scores across the five dimensions of the OCEAN model*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -249,7 +255,9 @@ PCMG在MoOCEAN数据集上对所有基线方法取得了全面的领先。**TABL
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2505_22637/figures/009_Figure_6.jpg]]
 *Figure 6: User Study on two evaluation dimensions: personality matching and motion realism*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心问题定位
 
@@ -298,6 +306,8 @@ PCMG 的有效性建立在以下前提之上：
 3. Laban-Gd 中的引导强度 τ 和启动时间 T_G 的最优选择策略及其对生成质量的影响是什么？
 4. 是否可以将该框架扩展到多人物交互场景，同时保持每个人的独立人格表现？
 5. 如何提升对低显著性人格维度（如 Agreeableness、Neuroticism）的运动学精细控制，例如通过引入更复杂的身体部位约束或扩展 LMA 因素覆盖范围？
+
+
 
 ## 原文 PDF
 

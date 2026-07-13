@@ -44,7 +44,7 @@ claims:
 > - SelfCap 上，PSNR 22.52 vs 19.77 (3DGStream) (+2.75 dB)；SSIM 0.783 vs 0.769 (3DGStream) (+0.014)；LPIPS 0.31 vs 0.36 (3DGStream) (-0.05)。
 > - N3DV (flame salmon) 上，PSNR 33.06 vs Not available (Not available)。
 
-## 概述
+## 概要
 
 体积视频的流式传输与存储面临一个根本性瓶颈：现有基于3D高斯泼溅（3DGS）的动态场景表示方法，在长序列重建中普遍存在**时间不一致、难以处理大运动与遮挡、且输出格式与标准视频编解码管线不兼容**的问题。这些方法要么逐帧独立优化导致时序抖动，要么依赖变形场而引入额外计算与伪影，最终产出的无序点列表无法被现有视频基础设施直接消费。
 
@@ -56,7 +56,7 @@ PackUV 针对上述瓶颈提出了一套**端到端的4D体积视频表示与拟
 
 **方法定位**：PackUV处于动态高斯泼溅与视频编解码基础设施的交叉点——它不改变渲染管线，而是重新定义了高斯的组织与优化方式，使4D表示首次具备**原生流式兼容性**。这一设计使其区别于所有现有动态GS方法，后者或牺牲时序一致性以换取流式能力，或产出无法被标准编解码器直接处理的表示格式。
 
-## 背景与动机
+
 
 ### 体积视频的表示瓶颈
 
@@ -95,7 +95,9 @@ PackUV 在五个关键维度上改变了基线设计：
 
 为验证方法在大规模、多视角、高帧率场景下的有效性，本文同时提出了 **PackUV-2B** 数据集——包含 100 个序列、总计超过 20 亿帧，使用超过 50 台同步相机以 1920×1200 分辨率拍摄，支持最高 90 FPS，覆盖 360° 视角（Table 1）。该数据集涵盖了机器人交互、人际互动、体育运动、透明/反射物体等丰富场景标签（Table 6），是目前规模最大的 4D 多视角数据集。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PackUV 的核心创新在于将 3D 高斯泼溅的体积视频表示从“无序点云优化”迁移到“结构化 UV 图集优化”，从而一举解决了现有方法在长序列时间一致性、大运动/遮挡处理、以及标准视频编解码兼容性三个维度的瓶颈。其创新体系可解构为五个相互耦合的 **changed slots**。
 
@@ -141,7 +143,7 @@ $$W_{\mathcal{A}} = N_0 + \sum_{k=1}^{K-1} N_k, \quad \mathcal{H}_{\mathcal{A}} 
 
 上述五个 changed slots 构成因果闭环：UV 域优化（Slot 1）使高斯属性天然具备空间结构，为金字塔打包（Slot 2）提供基础；关键帧与动态标记（Slot 3）确保时域一致性，防止 UV 图集序列出现跳变；UV 原生剪枝（Slot 4）在结构化空间内维持稀疏性；LPO（Slot 5）则打通了从训练到标准编解码的最后一步。这一耦合体系使 PackUV 在 PackUV-2B、SelfCap、N3DV 等数据集上全面超越所有基线方法（Table 2, Table 4），同时保持与现有视频编码基础设施的完全兼容。
 
-## 整体框架
+
 
 PackUV 提出了一套端到端的4D体积视频表示与重建管线，其核心思路是将无序的3D高斯泼溅属性重新组织为结构化的2D UV图集序列，从而在保持渲染质量的同时，使输出天然兼容现有视频编解码基础设施。整个框架由两个紧密耦合的部分构成：**PackUV 表示**与**PackUV-GS 拟合方法**。
 
@@ -185,7 +187,7 @@ Figure 2 底部概括了PackUV-GS的模块关系。数据流如下：
 
 > **注意**：光流估计不准确时，PackUV可能产生拖尾高斯伪影，这是当前管线的已知局限，需要在实际部署中手动验证光流质量。
 
-## 核心模块与公式推导
+
 
 PackUV的核心设计围绕三个紧密耦合的模块展开：金字塔UV映射与图集打包、直接UV空间优化、以及光流引导的时域一致性建模。以下按模块拆解其关键公式与机制。
 
@@ -264,7 +266,9 @@ $$\mathcal { L } _ { \mathrm { o p a c i t y } } = \mathbb { E } _ { i } \alpha 
 ![[assets/figures/papers/paper_list_l37_https_arxiv_org_abs_2602_23040/figures/011_Figure_6.jpg]]
 *Figure 6: Post-optimization lossy UV mapping fails to capture details of a real-world scene even with 48 layers and 1K resolution*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验：与流式与动态高斯方法的全面对比
 
@@ -331,7 +335,9 @@ PackUV-GS在PackUV-2B、SelfCap、N3DV三个数据集上对所有基线方法实
 ![[assets/figures/papers/paper_list_l37_https_arxiv_org_abs_2602_23040/figures/012_Table_6.jpg]]
 *Table 6: PackUV-2B Dataset Layout. We present our newly captured dataset PackUV-2B sequences . We report number of sequences captured, total timestamps (T), total cameras used to capture the sequence, FPS, setting type, and view range. We also report special tags for each dataset describing the type of activity in the captured sequence. PackUV-2B contains 100 diverse sequences totaling over 2B (billion) high-quality frames, recorded with more than 50 cameras at 1920 × 1200 resolution. The capture system supports up to 90 FPS, providing high temporal fidelity. Tags: RI - Robot Interaction, HI - Human-human Interaction, OI - Object Interaction, SP - Sports, LM - Large Motion, DO - Disocclusion, TR - T...*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有动态高斯方法的谱系关系
 
@@ -394,6 +400,8 @@ PackUV 的性能优势可归因于一条清晰的因果链：
 ### 5. 知识库定位总结
 
 PackUV 在 4D 体积视频表示领域贡献了一个**编解码原生兼容**的新范式。与现有方法相比，其核心区分度不在于渲染质量的绝对提升（尽管指标全面领先），而在于**首次将 3DGS 的优化过程与视频编码基础设施无缝对接**，消除了传统方法中“优化→量化→编码”的多阶段信息损失。这一设计选择使其在需要流式传输和高效存储的应用场景中具有明确的比较优势，但在光流质量敏感和极端分辨率需求场景下仍需进一步改进。
+
+
 
 ## 原文 PDF
 

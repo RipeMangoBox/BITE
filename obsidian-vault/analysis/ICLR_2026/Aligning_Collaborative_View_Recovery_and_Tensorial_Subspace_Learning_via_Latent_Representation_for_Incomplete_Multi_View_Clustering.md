@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Aligning_Collaborative_View_Recovery_and_Tensorial_Subspace_Learning_via_Latent_Representation_for_Incomplete_Multi_View_Clustering.pdf
+project_link: null
+code_link: https://github.com/caoyu110/ARSL-IMVC
 aliases:
 - AI
 - ACVRTSLLRIMV
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 通过潜在表示对齐协作视图恢复和张量子空间学习的不完整多视图聚类 |
 | 英文题名 | Aligning Collaborative View Recovery and Tensorial Subspace Learning via Latent Representation for Incomplete Multi-View Clustering |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=a5aRjldX9l); [GitHub](https://github.com/caoyu110/ARSL-IMVC) |
+| Links | [paper](https://openreview.net/forum?id=a5aRjldX9l) · [GitHub](https://github.com/caoyu110/ARSL-IMVC) |
 | Topic | #topic/representation_self_supervised_transfer #topic/representation_self_supervised_transfer/representation_learning |
 | Method | ARSL-IMVC |
 | Dataset | BBCSport, HW |
@@ -41,11 +43,11 @@ claims:
 > - BBCSport 上，NMI 为 89.77，对比 N/A，变化 N/A。
 > - BBCSport 上，Purity 为 96.51，对比 N/A，变化 N/A。
 
-## 概述
+## 概要
 
 本文提出了一种名为 **ARSL-IMVC**（Aligning Collaborative View Recovery and Tensorial Subspace Learning via Latent Representation for Incomplete Multi-View Clustering）的新方法，用于解决不完整多视图聚类（Incomplete Multi-View Clustering, IMVC）问题。核心思想是通过引入一个共享的潜在表示 H 作为桥梁，将协作视图恢复（Collaborative View Recovery, CVR）和张量子空间学习（Tensorial Subspace Learning, TSL）统一到一个框架中，使得视图恢复和子空间表示学习能够相互促进，从而更充分地利用多视图间的互补性和一致性。实验结果表明，ARSL-IMVC 在多个基准数据集上显著优于现有方法。
 
-## 背景与动机
+
 
 多视图聚类（Multi-View Clustering, MVC）旨在利用来自不同视角或来源的数据进行无监督聚类。然而，在实际应用中，数据往往存在视图缺失问题，即某些样本在某些视图上不可用，这被称为不完整多视图聚类（IMVC）。
 
@@ -56,7 +58,9 @@ claims:
 
 本文的核心动机是：**通过共享潜在表示 H 作为桥梁，将协作视图恢复和张量子空间学习显式对齐，使得两者在互补性和一致性探索上能够相互促进，从而提升聚类性能。**
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ARSL-IMVC 的核心创新体现在以下三个关键设计变更：
 
@@ -66,7 +70,7 @@ ARSL-IMVC 的核心创新体现在以下三个关键设计变更：
 | 视图恢复中的多样性建模 | 通常仅考虑一致性或简单正则化 | 引入 HSIC 正则化项，显式鼓励视图特定估计器之间的多样性 | "HSIC(E_1^v, E_1^w) = Tr(K_v \tilde{H} K_w \tilde{H}) / (n-1)^2" |
 | 子空间表示的结构建模 | 通常仅考虑视图共享或视图特定表示之一 | 同时学习视图共享子空间 Z 和视图特定子空间 Z^v，并堆叠成低秩张量以捕获高阶相关性 | "Z = Φ(Z^1, Z^2, ..., Z^V, Z)" |
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_representation_self_supervised_transfer__representation_learning__b001_a5aRjldX9l_Alignin/figures/001_Figure_1.jpg]]
 *Figure 1: The overall framework of proposed ARSL-IMVC method, which mainly consists of CVR and TSL modules and aligns them in cross-view consistency and complementarity exploration by a latent representation.*
@@ -80,7 +84,7 @@ ARSL-IMVC 的整体框架如 Figure 1 所示，主要由两个核心模块组成
 
 两个模块通过共享潜在表示 H 实现对齐和协作交互。
 
-## 核心模块与公式推导
+
 
 ### 5.1 协作视图恢复（CVR）
 
@@ -161,7 +165,9 @@ H = H Z + E_H, \quad P^v H + E_1^v = (P^v H + E_1^v) Z^v + E_2^v
 \mathbf{S} = ( |\mathbf{Z}| + |\mathbf{Z}^T| + \sum_{v=1}^V |Z^v| + \sum_{v=1}^V |(Z^v)^T| ) / (V+1)
 \]
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 6.1 主要实验结果
 
@@ -247,7 +253,9 @@ ARSL-IMVC 在缺失率增加时，性能下降幅度小于其他方法，表现�
 *Table 1: Main notations and descriptions in this study.*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ARSL-IMVC 属于**基于插补的不完整多视图聚类**方法谱系，其核心贡献在于通过共享潜在表示实现了视图恢复和子空间学习的显式对齐与协作交互。
 
@@ -273,6 +281,8 @@ ARSL-IMVC 的创新在于同时解决了三个关键问题：
 - HSIC 正则化项的计算复杂度较高，是否存在更高效的多样性正则化方法？
 - 如何自动确定潜在表示 H 的维度 k？
 - 方法在非随机缺失模式下的表现如何？
+
+
 
 ## 原文 PDF
 

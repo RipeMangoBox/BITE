@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/ATLAS_Constraints_Aware_Multi_Agent_Collaboration_for_Real_World_Travel_Planning.pdf
+project_link: null
+code_link: null
 aliases:
 - AABTPLAS
 - ATLAS
@@ -40,11 +42,11 @@ claims:
 > - TravelPlanner (test set) 上，Final Pass 为 35.00，对比 N/A，变化 N/A。
 > - Live Travel Planning (real-world, multi-turn) 上，Final Pass 为 84，对比 59 (ReAct), 27 (Monolithic)，变化 +25 (vs ReAct), +57 (vs Monolithic)。
 
-## 概述
+## 概要
 
 ATLAS（Agent-based Travel planning with Live Adaptive Search）是一个面向真实世界旅行规划的约束感知多智能体协作框架。该框架将旅行规划形式化为约束满足问题（CSP），通过五个专门化的智能体模块——搜索智能体（Search Agent）、约束管理器（Constraint Manager）、规划器（Planner）、检查器（Checker）和搜索顾问（Search Advisor）——系统性地解决显式约束、隐式常识约束以及动态演化约束带来的挑战。在TravelPlanner基准上，ATLAS将最终通过率（Final Pass）从最佳基线的23.3%提升至44.4%；在包含实时搜索和多轮反馈的真实场景中，ATLAS达到84%的最终通过率，显著优于ReAct（59%）和单体智能体（27%）。
 
-## 背景与动机
+
 
 现有LLM方法在旅行规划任务中面临三个根本性挑战：
 
@@ -54,7 +56,9 @@ ATLAS（Agent-based Travel planning with Live Adaptive Search）是一个面向�
 
 - **信息缺口解决（Resolving Information Gap）**：当当前信息不足以生成有效计划时，系统需要诊断缺失信息并引导自适应搜索。现有方法要么无自适应搜索，要么仅执行固定搜索，无法针对性地填补信息缺口。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ATLAS的核心创新在于将旅行规划形式化为约束满足问题（CSP），并通过多智能体分工协作系统性地解决上述挑战：
 
@@ -66,7 +70,7 @@ ATLAS的核心创新在于将旅行规划形式化为约束满足问题（CSP）
 
 4. **多轮对话缓存机制**：在多轮场景中，ATLAS缓存上一轮的域信息，仅当检查器在K次修订后仍返回unsat时才触发新的交错搜索，避免从头开始。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__language_speech_and_dialog__b001_mIYGiBf9Pm_ATLAS_Constra/figures/001_Figure_1.jpg]]
 *Figure 1: Monolithic agent cannot solve real-world travel planning. The true challenge in realworld travel planning is satisfying both explicit user requests and implicit, commonsense expectations (in dotted bubble 1). Even advanced models like Gemini-2.5-Pro fall short, as seen in critical failures like omitting lunch after a 9 a.m. arrival or suggesting a restaurant in a different city. This highlights the vital need for a multi-agentic solution like ATLAS.*
@@ -81,7 +85,7 @@ ATLAS的整体工作流程如Figure 2所示。给定用户查询$Q^t$，框架�
 
 框架使用两个超参数：$K$（最大检查步骤数）和$L$（交错搜索步数）。在单轮规划中，默认设置$K=3, L=10$；在多轮实时搜索中，默认设置$K=3, L=5$。
 
-## 核心模块与公式推导
+
 
 ### 5.1 问题形式化
 
@@ -137,7 +141,9 @@ $$F_{\mathrm{search}}^{t,\ell} := \mathsf{SearchAdvise}(Q^t, D^{t,\ell}, C^{t,\e
 
 $$P^{t+1,1} = \langle X, D^{t,L}, C^{t+1,1} \rangle, \quad C^{t+1,1} := C_E^{t+1,1} \cup C_I, \quad C_E^{t+1,1} = \Pi(Q^{t+1}, D^{t,L})$$
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 6.1 主要结果
 
@@ -190,7 +196,9 @@ ATLAS在TravelPlanner基准上的主要结果如Table 1所示：
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__language_speech_and_dialog__b001_mIYGiBf9Pm_ATLAS_Constra/figures/011_Table_4.jpg]]
 *Table 4: Descriptions on the considered constraint.*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ATLAS的方法论根植于经典人工智能中的约束满足问题（CSP）框架（Mackworth, 1977; Brailsford et al., 1999b），并借鉴了以下研究脉络：
 
@@ -203,6 +211,8 @@ ATLAS的方法论根植于经典人工智能中的约束满足问题（CSP）框
 - **动态CSP**：多轮对话处理借鉴了动态CSP（Mittal & Falkenhainer; Dechter & Dechter, 1988）的思想，将问题视为一系列静态CSP的序列。
 
 ATLAS在知识库中的定位是：**首个将CSP形式化、显式约束管理、迭代验证和自适应搜索系统性地整合到多智能体LLM框架中的旅行规划方法**。其核心贡献在于证明了通过解耦约束处理、规划生成和验证反馈，可以显著提升LLM在复杂约束场景下的规划能力。未来工作方向包括：集成并行测试时扩展技术（Chen et al., 2025）提升规划器效率，增强检查器为形式化CSP求解器（Hao et al., 2025b）实现更鲁棒的验证，以及将框架迁移到隐私策略合规、个性化用户偏好建模等新领域。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: SIGGRAPH
 year: 2024
 pdf_ref: paperPDFs/SIGGRAPH_2024/Media2Face_Co_speech_Facial_Animation_Generation_With_Multi_Modality_Guidance.pdf
+project_link: https://sites.google.com/view/media2face
+code_link: null
 aliases:
 - Media2Face
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | Media2Face：基于多模态引导的协同语音面部动画生成 |
 | 英文题名 | Media2Face: Co-speech Facial Animation Generation With Multi-Modality Guidance |
 | 会议/期刊 | SIGGRAPH 2024 |
-| Links | [paper](https://arxiv.org/abs/2401.15687); [Project](https://sites.google.com/view/media2face) |
+| Links | [paper](https://arxiv.org/abs/2401.15687) · [Project](https://sites.google.com/view/media2face) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Media2Face |
 | Dataset | M2F-D, M2F-D (all metrics) |
@@ -40,7 +42,7 @@ claims:
 > - M2F-D 上，FDD (×10^{-5} m) 为 12.21，对比 16.69 (Ours w/o CFG)，变化 -4.48。
 > - M2F-D 上，BA 为 0.254，对比 —，变化 —。
 
-## 概述
+## 概要
 
 协同语音的面部动画生成（Co-speech Facial Animation）旨在根据输入的语音信号合成同步、自然且富有表现力的3D面部运动。该领域的核心瓶颈在于：高质量4D面部数据与丰富多模态标注（情感、风格）的稀缺，导致现有方法在动画真实感、条件控制的灵活性以及头部姿态与表情的协调性方面均存在明显不足。
 
@@ -48,7 +50,7 @@ claims:
 
 实验结果表明，Media2Face在M2F-D测试集上的主要指标（唇音同步误差LVE、面部动态偏差FDD、双模对齐度BA）全面超越现有基线方法。消融实验证实：移除GNPFA导致LVE从10.44恶化至14.89，移除无分类器引导（CFG）使FDD从12.21升高至16.69，验证了高质量表达潜空间与多条件引导策略的决定性作用。用户研究进一步显示，在一般场景、无风格提示及无头部姿态的条件下，用户对Media2Face的偏好率分别超过90%、80%和70%，在唱歌场景中优势尤为显著。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -72,7 +74,9 @@ claims:
 
 3. **生成与控制层面**：在 GNPFA 潜空间中构建扩散模型 Media2Face，融合音频、文本、图像三种模态作为条件，并通过多条件无分类器引导策略解耦语音内容与风格表达，使生成结果兼具精确的唇音同步与丰富的情感/风格表现力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Media2Face 的核心创新并非单一技术点的堆砌，而是围绕“数据-表示-生成”三个环节的系统性重构，以突破现有方法在面部动画真实感与可控性上的瓶颈。其关键创新体现在以下四个维度：
 
@@ -101,7 +105,7 @@ Media2Face 的核心创新并非单一技术点的堆砌，而是围绕“数据
 
 上述四个创新并非孤立存在，而是形成了一条因果链路：GNPFA 提供的高质量表达潜空间使得从普通视频中提取接近扫描级精度的训练数据成为可能，进而支撑了大规模多模态数据集 M2F-D 的构建；充足且精准的数据又为扩散模型的训练提供了基础；而联合建模头部姿态与多模态条件引导则使模型能够生成兼具精确唇音同步和丰富情感/风格表现力的动画。这一链路的完整性是 Media2Face 在 LVE、FDD、BA 三项主要指标上全面超越所有基线方法（Table 2），并在用户研究中获得超过 90% 偏好率（Figure 5）的根本原因。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l38_https_arxiv_org_abs_2401_15687/figures/002_Figure_2.jpg]]
 *Figure 2: GNPFA pipeline. (Left:) We train a geometry VAE to learn a latent space of expression and head pose, disentangling expression with identity. (Right:) Two vision encoders are trained to extract expression latent codes and head poses from RGB images, which enables us to capture a wide array of 4D data*
@@ -151,7 +155,7 @@ Media2Face 采用 Transformer 架构的**潜空间扩散模型**，直接在 hea
 
 此外，扩散模型的**速度损失** $\mathcal{L}_{\text{velocity}}$ 和**平滑损失** $\mathcal{L}_{\text{smooth}}$（权重分别为 1 和 0.01）通过约束帧间一阶和二阶差分，保证了生成序列的运动自然性和时间一致性，避免了纯 L2 重建损失可能产生的抖动或突变。
 
-## 核心模块与公式推导
+
 
 ### GNPFA：泛化神经参数化面部资产
 
@@ -222,7 +226,9 @@ $$\hat{\mathbf{X}}_0^{1:N} = \mathcal{G}(\mathbf{X}_t^{1:N}, t, \mathbf{A}^{1:N}
 
 CFG 引导尺度设置为 $\mathbf{s}_A = 2.5$（音频条件）和 $\mathbf{s}_P = 1.5$（姿态/风格条件），通过随机掩码条件并在推理时外推，实现对唇音同步精度与风格表现力的灵活权衡。消融实验（Table 2, Ours w/o CFG）证实，移除 CFG 后 FDD 从 12.21 恶化至 16.69，验证了该策略的有效性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与验证逻辑
 
@@ -281,7 +287,9 @@ Figure 7 的定性对比进一步揭示了方法差异。与情感盲方法（Fa
 ![[assets/figures/papers/paper_list_l38_https_arxiv_org_abs_2401_15687/figures/003_Table_1.jpg]]
 *Table 1: 4D datasets comparison. Notice that DiffposeTalk [57] is a combination of reconstructed TFHP [57] and HDTF. EMOTE [15] is trained on reconstructed MEAD*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 Media2Face 的核心贡献在于构建了一个**解耦身份的非线性表达潜空间（GNPFA）**，并在该空间中利用**多模态条件扩散模型**联合生成表情与头部姿态。这一设计使其在方法谱系中处于“音频驱动面部动画生成”与“多模态可控生成”的交汇点，并对现有基线形成了系统性的替代与超越。
 
@@ -322,6 +330,8 @@ Media2Face 的性能优势可归因于两个相互依赖的设计决策，消融
 - **多模态条件解耦的粒度**：当前 CFG 策略将音频和 CLIP 条件作为两个整体进行引导，但 CLIP 潜码内部可能混杂风格、情感、身份等多种语义。如何实现更细粒度的条件解耦与控制，是提升生成可控性的关键方向。
 
 - **跨身份泛化的上限**：GNPFA 解耦了身份与表情，但扩散模型在训练时仍与特定身份的数据分布相关。在极端跨身份迁移（如从成人到儿童）时，生成的运动模式是否保持自然，尚待验证。
+
+
 
 ## 原文 PDF
 

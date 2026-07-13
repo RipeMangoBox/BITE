@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/Socratic_Geo_Synthetic_Data_Generation_and_Cross_Modal_Geometric_Reasoning_via_Multi_Agent_Interaction.pdf
+project_link: null
 code_link: null
 aliases:
 - SG
@@ -44,7 +45,7 @@ claims:
 > - GenExam-Math (图像生成数学赛道) 上，Relaxed Score (%) 42.4 vs Seedream-4.0 (39.8%) (+2.6)。
 > - Chart Reasoning & Multimodal Coding 上，Mean@1 (%) gain over zero-shot 一致提升+3.9至+7.6 vs Zero-shot (Qwen2.5-VL-7B-Instruct) (+3.9 ~ +7.6)。
 
-## 概述
+## 概要
 
 **核心问题**：高质量几何训练数据的极度稀缺构成了多模态大模型在视觉几何推理领域进展缓慢的根本瓶颈。现有的自动化数据合成方法——无论是基于LLM的反向思维链生成（如**R-CoT**, Deng et al., arXiv 2024）、大规模几何数据增强（如**G-LlaVA**, Gao et al., arXiv 2025），还是基于强化学习的图像描述合成（如**GeoReasoning-10K**, Xin et al., 2025）——均采用静态、一次性生成范式，数据合成与模型学习相互脱节，无法同时保证正确性、多样性和训练有效性。
 
@@ -57,7 +58,7 @@ claims:
 
 **方法定位**：Socratic-Geo在方法谱系中属于**目标驱动的程序化合成**范式，其核心变革在于将数据合成从静态生成转变为与模型学习深度耦合的动态闭环。相较于现有方法的被动改写或随机探索后过滤，Socratic-Geo通过诊断Solver弱点、程序化修改几何结构并进行自验证，实现了数据质量与模型能力的协同进化。
 
-## 背景与动机
+
 
 ### 几何推理中的数据瓶颈
 
@@ -93,7 +94,9 @@ claims:
 
 这一范式的核心洞察在于：**将数据合成从模型训练的“前置工序”升级为“并行引擎”**，使两者在持续交互中相互促进，最终实现推理能力与生成能力的双重提升。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Socratic-Geo 的核心创新在于将几何数据合成从“静态生成、事后过滤”范式转变为**目标驱动的动态闭环合成范式**，并通过多智能体交互将数据合成与模型学习深度耦合。
 
@@ -143,7 +146,7 @@ $$\mathcal{L}_{\mathrm{SFT}}(\theta_{\mathcal{G}}) = \mathbb{E}_{ \substack{ z_0
 
 Socratic-Geo 与 **GeoReasoning-10K**（Xin et al., 2025）等基于强化学习的方法在哲学上截然不同：后者通过奖励信号在固定数据上优化模型策略，而 Socratic-Geo 通过**改变数据本身**来引导模型进化。这种“授人以渔”的范式使得仅用 108 个种子问题启动的闭环，最终在六个几何基准上达到 49.11% 的平均准确率，仅使用基线 1/4 的训练样本即超越最强基线 2.43 个百分点。
 
-## 整体框架
+
 
 Socratic-Geo 是一个完全自主的多智能体闭环框架，将几何数据合成与模型学习动态耦合。其核心设计受苏格拉底教学法启发：Teacher（强 LLM）扮演“导师”角色，根据 Solver（推理模型）暴露的弱点，目标驱动地发明针对性训练样本，并通过程序化验证保证图文严格对齐。
 
@@ -194,7 +197,7 @@ Teacher 是框架的认知核心，包含四个功能模块：
 ![[assets/figures/papers/paper_list_l2188_https_openaccess_thecvf_com_content_CVPR2026_html_Jiao_Socratic_Geo_Synt/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of the Socratic-Geo interaction framework. The system operates as a closed loop centered on geometric data. (a) The Core Reasoning Loop: The Solver attempts to solve geometry problems. Its failures trigger the Teacher, which analyzes the reasoning gaps and programmatically invents a new, targeted problem. The new validated problem triplet is added back to the curriculum, enabling continuous self-improvement for the Solver. (b) The Synergistic Generation Byproduct: Independently, the Generator learns from highquality data produced during the Teacher’s invention process. For each new problem, the Teacher performs to create a descriptive drawing instruction. The Generator is trained o...*
 
-## 核心模块与公式推导
+
 
 ### 3.1 GRPO基础：序列级优势与策略优化
 
@@ -270,7 +273,9 @@ $$z_t = \sqrt{\bar{\alpha}_t} z_0 + \sqrt{1 - \bar{\alpha}_t} \epsilon$$
 ![[assets/figures/papers/paper_list_l2188_https_openaccess_thecvf_com_content_CVPR2026_html_Jiao_Socratic_Geo_Synt/figures/004_Figure_4.jpg]]
 *Figure 4: A concrete instantiation of the Socratic-Geo interaction pipeline, where the Teacher transforms flawed reasoning into diagnostic problems. Red highlighted regions mark critical intervention points including error diagnosis and geometric augmentation. Left: The Solver incorrectly assumes a right triangle structure, overlooking the given constraint*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验结果
 
@@ -329,7 +334,9 @@ Table 5的消融实验对比了有无IR模块对生成质量的影响。移除IR
 ![[assets/figures/papers/paper_list_l2188_https_openaccess_thecvf_com_content_CVPR2026_html_Jiao_Socratic_Geo_Synt/figures/007_Table_2.jpg]]
 *Table 2: Generalizability to other multimodal reasoning domains. Socratic-Geo demonstrates consistent improvements across Chart Reasoning and Multimodal Coding tasks, confirming the framework is task-agnostic*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 几何推理数据合成的范式演进
 
@@ -366,6 +373,8 @@ Socratic-Geo的闭环合成范式打开了若干值得深入探索的方向。
 **Teacher能力天花板的影响**需要系统研究。文中使用Qwen2.5-VL-7B-Instruct作为基础模型，若替换为更强大的Teacher（如Gemini-2.5-Pro），闭环引擎的性能上限可能显著提升。但这也引发一个深层问题：Teacher自身的推理偏差是否会通过闭环课程被系统性放大？当Teacher对某类问题存在系统性误判时，其发明的“验证通过”的样本可能持续强化Solver的错误认知。如何形式化地确保长期课程的正确性，目前仍是开放挑战。
 
 **数据效率的极限**同样值得追问。Socratic-Geo仅用基线1/4的训练样本即实现超越，但这是否意味着更少的数据（如仅50个种子问题）仍能维持性能？闭环课程的质量与数量之间存在何种权衡关系？消融实验已证明Reflect验证对数据质量的决定性作用，但“最小有效种子集”的边界尚未探明。
+
+
 
 ## 原文 PDF
 

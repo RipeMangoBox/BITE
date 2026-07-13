@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2023
 pdf_ref: paperPDFs/arxiv_2023/Control_A_Video_Controllable_Text_to_Video_Diffusion_Models_with_Motion_Prior_and_Reward_Feedback_Learning.pdf
+project_link: https://controlavideo.github.io
+code_link: null
 aliases:
 - CV
 - Control-A-Video
@@ -33,7 +35,7 @@ claims:
 | 中文题名 | 基于运动先验与奖励反馈学习的可控文本到视频扩散模型 |
 | 英文题名 | Control-A-Video: Controllable Text-to-Video Diffusion Models with Motion Prior and Reward Feedback Learning |
 | 会议/期刊 | arXiv 2023 |
-| Links | [paper](https://arxiv.org/abs/2305.13840) · [Project](https://controlavideo.github.io) · [arXiv](https://arxiv.org/abs/2210.14896) |
+| Links | [paper](https://arxiv.org/abs/2305.13840) · [Project](https://controlavideo.github.io) · [paper](https://arxiv.org/abs/2210.14896) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation #topic/generative_models_diffusion #topic/generative_models_diffusion/diffusion_image_video |
 | Method | Control-A-Video |
 | Dataset |  |
@@ -43,7 +45,7 @@ claims:
 > - 可控视频生成 上，ImageReward (人类偏好) 1.03 vs ~0.67 (先前最佳模型) (+0.36)；Prompt CLIP Score (文本对齐) 0.290 vs 未明确指定最佳分数，但我们的方法最高 (最优)；Depth Map Error (控制一致性) 0.089 vs 未明确指定最佳分数，但我们的方法最低 (最低误差)。
 > - 用户研究 上，一致性平均分 (1-5) 4.5 vs 未提供其他方法具体分，但我们的方法最佳 (最佳)。
 
-## 概述
+## 概要
 
 文本到视频（T2V）扩散模型虽已在生成质量上取得长足进步，但现有方法在**可控条件**下仍面临严峻瓶颈：帧间闪烁、物体外观不一致、运动失真等问题普遍存在，难以同时满足高质量与高一致性的要求。Control-A-Video（2023）针对这一困境，提出了一条**将内容与运动解耦**的技术路线，核心包含三个相互协同的杠杆：
 
@@ -55,7 +57,7 @@ claims:
 
 **主要结果**：在可控视频生成基准上，Control-A-Video 的 MUSIQ（技术质量）分数达到 **73.3**，比先前最佳模型提升 **+2.3** 分；ImageReward（人类偏好）分数达到 **1.03**，提升 **+0.36** 分。用户研究进一步验证其在文本对齐和一致性上的最优表现（一致性平均分 4.5/5）。消融实验确认，去除运动先验会导致明显闪烁和伪影，而 ST-ReFL 的加入显著提升了清晰度和美观度。
 
-## 背景与动机
+
 
 文本到视频（Text-to-Video, T2V）生成旨在根据自然语言描述合成逼真且时序连贯的视频序列。随着扩散模型在图像生成领域的突破性进展，研究者开始将其扩展至视频域，涌现出如 **AnimateDiff**（Guo et al., arXiv 2023）、**Text2Video-Zero**（Khachatryan et al., arXiv 2023）和 **VideoComposer**（Wang et al., ICCV 2023）等代表性工作。然而，现有方法面临一个核心瓶颈：**难以同时保证生成视频的高质量与运动一致性**，尤其在引入额外控制条件（如深度图、边缘图）时，帧间闪烁和物体不一致问题尤为突出。
 
@@ -63,7 +65,9 @@ claims:
 
 针对上述问题，Control-A-Video 的动机在于寻找一个因果控制杠杆，将**内容建模与运动建模解耦**，并在噪声初始化阶段注入**运动先验**以维持帧间相关性。具体而言，该工作提出以第一帧作为内容先验，将图像域的生成能力迁移至视频生成，使后续帧的建模聚焦于运动变化；同时，通过基于像素残差或光流的运动自适应噪声初始化，为去噪过程提供帧间运动线索。在此基础上，进一步引入时空奖励反馈学习（ST-ReFL），利用多种奖励模型对视频的美学质量、技术质量与运动一致性进行联合打分并反馈优化，从而系统性地提升可控视频生成的整体表现。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Control-A-Video 的核心创新在于将可控视频生成分解为两个解耦的子问题——内容生成与运动建模——并分别通过**第一帧内容先验**和**运动自适应噪声初始化**加以解决，最后引入**时空奖励反馈学习（ST-ReFL）**对整体质量进行联合优化。这一设计形成了“内容先验 → 运动注入 → 反馈精调”的三阶段闭环，显著提升了帧间一致性与视觉质量。
 
@@ -127,7 +131,7 @@ Control-A-Video 相对于上述方法的**关键 changed slots** 为：
 
 这些创新共同构成了一个从“内容生成 → 运动注入 → 质量精调”的完整可控视频生成框架，在 MUSIQ（+2.3）和 ImageReward（+0.36）等指标上显著超越先前最佳模型（confidence 0.98）。
 
-## 整体框架
+
 
 Control-A-Video 的整体 pipeline 围绕三个核心设计展开：**第一帧内容先验**、**运动自适应噪声初始化**与**时空奖励反馈学习（ST-ReFL）**。这三个组件构成一个从内容解耦、运动注入到质量对齐的级联优化闭环。
 
@@ -156,7 +160,7 @@ Control-A-Video 的整体 pipeline 围绕三个核心设计展开：**第一帧�
 
 现有视频扩散模型的核心瓶颈在于帧间闪烁和物体不一致——这源于独立噪声初始化破坏了帧间相关性，以及标准去噪损失无法显式约束时间一致性。Control-A-Video 的因果杠杆在于：**第一帧条件方案**将图像域的生成能力迁移到视频域，解耦内容与运动建模；**运动先验噪声**在扩散起点就注入帧间相关性，降低后续去噪的难度；**ST-ReFL** 则通过多维度奖励信号直接优化视频输出的感知质量和运动平滑度。三者协同作用，使得模型在 MUSIQ（+2.3）和 ImageReward（+0.36）上显著超越先前最佳模型。
 
-## 核心模块与公式推导
+
 
 ### 整体架构：时空去噪网络
 
@@ -257,7 +261,9 @@ ST‑ReFL 的核心机制在于：利用多个预训练奖励模型对生成视�
 ![[assets/figures/papers/paper_list_l1039_https_arxiv_org_abs_2305_13840/figures/003_Figure_3.jpg]]
 *Figure 3: Motion-adaptive Noise Prior: t-SNE plot of noisy latents for video frames. Red: original video*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要定量结果
 
@@ -326,7 +332,9 @@ ST-ReFL 的消融实验从两个层面展开。定性层面（Figure 6），对�
 ![[assets/figures/papers/paper_list_l1039_https_arxiv_org_abs_2305_13840/figures/004_Figure_4.jpg]]
 *Figure 4: Qualitative Comparison: (a) Input video, (b) Animatediff, (c) Text2Video-Zero, (d) Videocomposer, (e) Ours. We showcase a challenging scenario of a fastmoving dog(left) and slow-moving(right) camel. Compared to other models, our method demonstrates superior performance in generating high-quality, temporally consistent results that accurately align with the given text prompt*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 方法定位与核心贡献
 
@@ -384,6 +392,8 @@ Control-A-Video 的独特优势在于将三个设计要素——**首帧条件�
 ---
 
 **证据强度说明：** 上述方法定位和比较分析基于论文提供的定量实验（Table 1, Table 2, Table 3）和定性消融（Figure 4-6），置信度较高。关于局限和开放问题的讨论部分基于论文自身的局限性声明，部分基于方法设计的逻辑推演，置信度中等，需后续工作验证。
+
+
 
 ## 原文 PDF
 

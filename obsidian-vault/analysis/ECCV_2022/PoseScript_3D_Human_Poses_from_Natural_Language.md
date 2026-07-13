@@ -5,6 +5,8 @@ paper_level: A
 venue: ECCV
 year: 2022
 pdf_ref: paperPDFs/ECCV_2022/PoseScript_3D_Human_Poses_from_Natural_Language.pdf
+project_link: null
+code_link: null
 aliases:
 - PoseScript
 tags:
@@ -39,7 +41,7 @@ claims:
 > - PoseScript-H (检索) 上，mRecall 30.4 (预训练+微调) vs 12.4 (仅人类描述训练) (+18.0)。
 > - PoseScript-H (生成) 上，FID 0.11 (预训练) vs 0.14 (无预训练) (-0.03)；mRecall G/R 16.2 (预训练) vs 2.7 (无预训练) (+13.5)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：当前缺乏将静态3D人体姿态与细粒度、结构化的自然语言描述直接配对的数据集，这从根本上限制了模型根据文本理解并生成复杂人体姿态的能力。
 
@@ -53,7 +55,7 @@ claims:
 
 **局限性**：自动生成的描述在自然多样性上仍逊于人类语言，当前工作仅处理静态姿态而未扩展到运动序列，且数据集仅包含英语描述，存在文化和主观偏见引入的风险。
 
-## 背景与动机
+
 
 ### 问题背景：3D人体姿态理解中的语义鸿沟
 
@@ -83,7 +85,9 @@ claims:
 
 PoseScript是首个将静态3D人体姿态与自然语言描述进行系统性关联的工作，其贡献不仅在于数据集本身，更在于提出了一套从姿态语义提取到跨模态应用的完整技术链路。该工作为后续的文本驱动人体姿态理解、图像中的文本条件姿态拟合（Figure 10）等应用奠定了基础，同时揭示了自动描述合成作为跨模态预训练手段的巨大潜力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PoseScript 的核心创新并非提出全新的检索或生成架构，而是构建了一条从 **3D 关键点自动合成细粒度自然语言描述的数据流水线**，并证明利用该合成数据（PoseScript-A）进行预训练，再在人工标注数据（PoseScript-H）上微调，能够系统性地提升下游跨模态检索与文本条件姿态生成的性能。这一策略直接回应了当前领域缺少大规模、高质量文本-姿态配对数据的关键瓶颈。
 
@@ -122,7 +126,7 @@ $$
 
 与依赖纯人工标注的传统文本-姿态对齐方法相比，PoseScript 的核心差异化在于**以自动合成描述为桥梁，将数据稀缺问题转化为迁移学习问题**。其 posecode 流水线提供了一种结构化、可扩展的姿态语义编码方式，而预训练-微调范式则为小样本人工标注场景下的跨模态学习提供了有效路径。这一方法论框架不仅适用于静态 3D 姿态，也为后续向人体运动生成等时序任务的扩展提供了基础。
 
-## 整体框架
+
 
 PoseScript（ECCV 2022）的核心贡献是构建了一条从3D人体姿态到自然语言描述的自动生成流水线，并以此为基础支撑文本-姿态跨模态检索与文本条件姿态生成两大应用（图1）。该流水线的关键洞察在于：3D人体姿态的语义可被分解为一系列可计算的半结构化属性，即**posecodes**，进而通过规则化的选择、聚合与语言转换，自动合成多样化的语义描述。利用这些自动描述进行预训练，再在人工标注上微调，能够显著提升下游任务的性能。
 
@@ -166,7 +170,7 @@ PoseScript（ECCV 2022）的核心贡献是构建了一条从3D人体姿态到�
 ![[assets/figures/papers/paper_list_l2_https_www_ecva_net_papers_eccv_2022_papers_ECCV_html_2069_ECCV_2022_pape/figures/004_Figure_4.jpg]]
 *Figure 4: Overview of our captioning pipeline. Given a normalized 3D pose, we use posecodes to extract semantic pose information. These posecodes are then selected, merged or combined (when relevant) before being converted into a structural pose description in natural language. Letters ‘L’ and ‘R’ stand for ‘left’ and ‘right’ respectively*
 
-## 核心模块与公式推导
+
 
 PoseScript的方法体系由三个核心模块构成：自动描述生成流水线、文本-姿态跨模态检索模型，以及文本条件姿态生成模型。前者的输出为后两者提供训练数据，形成“合成数据预训练+人工标注微调”的闭环。
 
@@ -223,7 +227,9 @@ $$\mathcal{L}_{KL}(\mathcal{N}_p, \mathcal{N}(0, I))$$
 ![[assets/figures/papers/paper_list_l2_https_www_ecva_net_papers_eccv_2022_papers_ECCV_html_2069_ECCV_2022_pape/figures/012_Figure_10.jpg]]
 *Figure 10: Example of potential application to SMPL fitting in images. Using the text-conditional pose prior (right) yields a more accurate 3D pose than a generic pose prior (left) when running the optimization-based SMPL fitting method SMPLify*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置与评估协议
 
@@ -285,7 +291,9 @@ $$\mathcal{L} = \mathcal{L}_{R}(p, \hat{p}) + \mathcal{L}_{KL}(\mathcal{N}_{p}, 
 ![[assets/figures/papers/paper_list_l2_https_www_ecva_net_papers_eccv_2022_papers_ECCV_html_2069_ECCV_2022_pape/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of possible applications using PoseScript. The top figure illustrates text-to-pose retrieval where the goal is to retrieve poses in a large-scale database given a text query. This can be applied to databases of images with associated SMPL fits. The bottom figure shows an example of text-conditioned pose generation*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 **PoseScript**（Delmas et al., ECCV 2022）的核心方法贡献在于一条从3D关键点到结构化自然语言描述的自动生成流水线，以及在此基础上的跨模态检索与文本条件姿态生成。其方法谱系可沿两条线索追溯：一是姿态语义的符号化表示，二是文本-姿态的跨模态学习。
 
@@ -321,6 +329,8 @@ PoseScript最重要的方法论启示在于：**大规模自动生成数据预�
 - 文本条件姿态生成能否扩展为文本条件运动生成？这需要处理时序依赖和动作过渡的语义建模。
 - 生成的3D姿态能否作为条件信号驱动图像生成模型，实现文本到图像的可控3D人体合成？Figure 10展示了文本条件姿态先验在SMPLify优化中的初步应用，但端到端的生成式应用仍有待探索。
 - 不同姿态表示（关节旋转、3D位置、SMPL参数）对跨模态检索性能的系统性影响尚未量化比较，这对下游任务中的表示选择具有实际指导意义。
+
+
 
 ## 原文 PDF
 

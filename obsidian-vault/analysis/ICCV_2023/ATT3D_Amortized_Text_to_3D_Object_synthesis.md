@@ -5,6 +5,8 @@ paper_level: A
 venue: ICCV
 year: 2023
 pdf_ref: paperPDFs/ICCV_2023/ATT3D_Amortized_Text_to_3D_Object_synthesis.pdf
+project_link: https://research.nvidia.com/labs/toronto-ai/ATT3D/
+code_link: null
 aliases:
 - AAT3
 - ATT3D
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | ATT3D: 摊销式文本到三维物体合成 |
 | 英文题名 | ATT3D: Amortized Text-to-3D Object synthesis |
 | 会议/期刊 | ICCV 2023 |
-| Links | [paper](https://arxiv.org/abs/2306.07349); [Project](https://research.nvidia.com/labs/toronto-ai/ATT3D/) |
+| Links | [paper](https://arxiv.org/abs/2306.07349) · [Project](https://research.nvidia.com/labs/toronto-ai/ATT3D/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | ATT3D (Amortized Text-to-3D) |
 | Dataset | DF27 (DreamFusion的27个提示), 组合式猪提示集（64个提示）, 组合式动物提示集（2400个提示）, 推理速度 |
@@ -41,7 +43,7 @@ claims:
 > - 组合式猪提示集（64个提示） 上，CLIP R-probability vs 计算预算 为 ATT3D，对比 per-prompt optimization，变化 见到与未见提示上均更高；未见提示分割为0%时，随机初始化基线表现差。
 > - 组合式动物提示集（2400个提示） 上，CLIP R-probability vs 计算预算 为 ATT3D，对比 per-prompt optimization，变化 仅见12.5%提示时，未见提示质量即超越逐提示优化在全部提示上的结果。
 
-## 概述
+## 概要
 
 文本到三维物体合成（Text-to-3D, TT3D）旨在根据自然语言描述生成对应的三维资产。现有方法（如 **DreamFusion**，Poole et al., 2022）对每个提示独立优化一个神经辐射场（NeRF），这一过程耗时约4小时/提示，需多GPU并行，且无法在不同提示间共享已学知识——每个新提示都需从头开始完整优化。这种逐提示优化的范式构成了该领域的关键效率瓶颈。
 
@@ -53,7 +55,7 @@ claims:
 
 方法的主要局限包括：继承自现有T2T3D范式的对扩散模型质量的依赖、训练目标方差大导致对提示工程敏感，以及相似提示在摊销训练中可能坍缩为相同场景。开放问题指向更大规模提示集的设计、更强生成器骨干的需求，以及摊销训练与更高质量三维表示（如纹理网格）结合的可能性。
 
-## 背景与动机
+
 
 ### 文本到三维生成：从逐提示优化到摊销推理
 
@@ -75,7 +77,9 @@ ATT3D 的核心思想是**将逐提示优化转化为多提示联合训练的摊
 
 这一范式转变的动机源于一个简单观察：如果逐提示优化需要4小时/提示，那么优化100个提示需要400小时；而摊销训练通过共享计算，可以在远小于该总时间的预算内完成，且获得向未见提示泛化的额外收益。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ATT3D 的核心创新在于将文本到三维（Text-to-3D）的优化范式从**逐提示独立优化**重构为**跨提示联合摊销训练**。现有方法（如 **DreamFusion**，Poole et al., 2022）对每个文本提示独立训练一个神经辐射场（NeRF），耗时约4小时/提示且无法跨提示共享知识。ATT3D 通过引入一个从文本嵌入到点编码器参数的**映射网络（超网络 m）**，将这一过程转化为多提示联合训练，实现了组件重用、快速推理和对未见提示的泛化。
 
@@ -107,7 +111,7 @@ ATT3D 的核心创新在于将文本到三维（Text-to-3D）的优化范式从*
 
 上述三个变更槽位共同支撑了一个核心洞察：**通过同时优化大量提示，共享的 NeRF 生成模型学会分解并重用三维组件**（如动物身体、道具、材质），从而以更低的总计算量覆盖多提示，并天然具备向未见组合提示的泛化能力。这一机制在实验中得到验证：仅使用 12.5% 的提示训练时，ATT3D 对未见提示的生成质量已超过逐提示优化在全部提示上的效果（Figure 6 右, Figure 8）。
 
-## 整体框架
+
 
 ATT3D 将文本到三维（TT3D）的生成过程拆分为两个阶段：**离线摊销优化**与**前馈式快速推理**。其核心思想是用一个共享的映射网络（超网络）替代 DreamFusion 等逐提示独立优化的范式，使模型在大量文本提示上联合训练，从而摊销优化成本并实现跨提示的知识共享。
 
@@ -156,7 +160,7 @@ $$m\left( (1-\alpha) \pmb c_1 + \alpha \pmb c_2 \right)$$
 ![[assets/figures/papers/paper_list_l36_https_arxiv_org_abs_2306_07349/figures/001_Figure_1.jpg]]
 *Figure 1: Our method initially trains one network to output 3D objects consistent with various text prompts. After, when we receive an unseen prompt, we produce an accurate object in \< 1 second, with 1 GPU. Existing methods re-train the entire network for every prompt, requiring a long delay for the optimization to complete. Further, we can interpolate between prompts for user-guided asset generation (Fig. 3). We include a project webpage with an overview and videos*
 
-## 核心模块与公式推导
+
 
 ### 两阶段文本到三维管道
 
@@ -239,7 +243,9 @@ $$\hat{\epsilon} = \epsilon_{\mathrm{uncond.}} + (1-\alpha)\omega_1\epsilon_{\ma
 - **谱归一化**：去除谱归一化将导致训练数值不稳定和无法收敛，是摊销训练成功的关键稳定技术。
 - **Dirichlet插值权重**：插值权重 $\alpha$ 的浓度参数 $\kappa$ 影响生成结果——小 $\kappa$ 聚焦端点（保持原始提示特征），大 $\kappa$ 聚焦中点（融合两个提示特征）。训练早期选择 $\kappa$ 对最终结果有决定性影响。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果：摊销训练在任何计算预算下均优于逐提示优化
 
@@ -309,7 +315,9 @@ ATT3D在DF411提示集（411个提示，超过DF27十倍以上）上的训练结
 ![[assets/figures/papers/paper_list_l36_https_arxiv_org_abs_2306_07349/figures/018_Figure.jpg]]
 *Figure: Finetuning iteration Various strategies on “a pig wearing medieval armor holding a blue balloon” Amortized*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -361,6 +369,8 @@ ATT3D 处于 **文本到三维生成** 与 **摊销优化** 的交叉点。其�
 - **组合泛化**：通过摊销训练隐式学习语义组件的分解与组合，与组合式生成模型的研究方向相关。
 
 从方法谱系看，ATT3D 是从“优化式生成”向“前馈式生成”过渡的代表性工作，为后续的快速文本到三维方法（如基于扩散先验的直接三维生成模型）提供了重要的中间范式。
+
+
 
 ## 原文 PDF
 

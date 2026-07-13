@@ -44,7 +44,7 @@ claims:
 > - ImageNet 512x512 (80 epochs) 上，gFID (no guidance) 1.53 (SpeeDiff-XL w/ REPA++) vs — (state-of-the-art)。
 > - ImageNet 512x512 上，IS (with guidance) 322.55 vs — (—)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：传统潜在扩散模型（LDM）采用两阶段训练——先独立训练VAE，冻结后再训练扩散模型。若尝试直接端到端联合训练VAE与扩散模型（Vanilla E2E），扩散损失会朝向退化方向驱动潜在空间，导致**潜在表示崩溃**：通道方差被极度压制、偏置极大，扩散模型可通过输出接近常数的预测来最小化损失，却丢失了图像重建所需的语义信息。实验显示，此时潜在误差几乎为零，而像素误差仍然很大（Fig. 3a），FID高达33.95。
 
@@ -56,7 +56,7 @@ claims:
 
 **方法定位**：SpeeDiff属于**端到端潜在扩散模型**，与两阶段方法（DiT-XL/2、SiT-XL/2）和表示对齐方法（REPA）形成对比。其技术栈包括ViT-VAE、Refined-DiT扩散骨干、TPR损失和REPA++表示对齐，形成完整的单阶段训练范式。
 
-## 背景与动机
+
 
 ### 潜在扩散模型的两阶段范式及其困境
 
@@ -84,7 +84,9 @@ SpeeDiff给出的答案是肯定的。其关键洞察在于利用**Tweedie公式
 
 在此基础上，SpeeDiff进一步通过全Transformer架构（ViT-VAE + Refined-DiT）和增强的表示对齐策略（REPA++），构建了一个可扩展的端到端潜在扩散框架。如Figure 1c所示，该框架相比Vanilla SiT实现了超过140倍的训练加速，相比REPA加速61倍，在ImageNet 256×256和512×512生成任务上均达到了state-of-the-art性能。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SpeeDiff 的核心创新在于将潜在扩散模型的训练范式从传统的“先训 VAE、后训扩散”两阶段分离模式，转变为**端到端联合训练**，并通过**Tweedie Pixel Reconstruction (TPR) 损失**解决了直接联合训练导致的潜在空间崩溃问题。以下从改变的关键维度展开。
 
@@ -157,7 +159,7 @@ SpeeDiff 的方法贡献可定位于以下交叉点：
 
 **局限性提示**：目前 SpeeDiff 仅在类别条件 ImageNet 生成上验证，扩展到文本到图像等更复杂任务仍需探索；达到最佳性能依赖 DINOv3 等预训练 VFM，带来了额外计算开销；端到端训练的动态稳定性在更大规模下的表现尚待进一步验证。
 
-## 整体框架
+
 
 SpeeDiff 构建了一个**单阶段端到端潜在扩散训练范式**，核心目标是打破传统两阶段训练的分离瓶颈——即先独立训练 VAE 再冻结并训练扩散模型——转而从零开始联合优化 VAE 与扩散模型，且**全程不使用 stop-gradient 操作**（Fig. 1b）。
 
@@ -201,7 +203,7 @@ SpeeDiff 采用全 Transformer 架构替代传统卷积设计：
 ![[assets/figures/papers/paper_list_l933_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_SpeeDiff_Scalabl/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of SpeeDiff for end-to-end joint training of VAE and diffusion model from scratch. (a) Conventional two-stage LDM training: a CNN-based VAE [28] is first trained and then frozen, after which a diffusion (usually a DiT [41]) is trained on its latent space. (b) SpeeDiff: a scalable, pixel-anchored end-to-end paradigm that jointly trains the VAE and diffusion model from scratch, without stop-gradient operation, within a fully transformer-based architecture. (c) Training efficiency: on ImageNet 256ˆ256 generation, SpeeDiff accelerates convergence by over 140ˆ compared to Vanilla SiT and 61ˆ compared to REPA. (d) Scalability: on ImageNet 512ˆ512 generation, SpeeDiff demonstrates clear s...*
 
-## 核心模块与公式推导
+
 
 ### 核心瓶颈：Vanilla E2E训练中的潜在崩溃
 
@@ -252,7 +254,9 @@ $$\mathcal{L}_{\mathrm{SpeeDiff}}(\phi,\psi,\theta,\omega) = \mathcal{L}_{\mathr
 ![[assets/figures/papers/paper_list_l933_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_SpeeDiff_Scalabl/figures/003_Figure_3.jpg]]
 *Figure 3: Impact of end-to-end training on latent space. (a) Comparing the denoised latent with its clean counterpart in both latent and pixel space reveals that vanilla end-to-end training collapses the latent representation, while TPR loss preserves meaningful reconstruction signals. (b) KDE visualizations show that vanilla training produces highly peaked, non-Gaussian latent distributions, whereas TPR regularizes the latent space and prevents degeneracy. (c) Channel-wise statistics further indicate that vanilla training induces large per-channel biases and severely suppressed variances, whereas TPR maintains a more balanced and normalized latent representation. Results are computed over 1000 valid...*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与关键消融：从潜在崩溃到稳定端到端训练
 
@@ -307,7 +311,9 @@ Table 6 的消融表明，潜在通道数设为 32 时在重建质量与生成�
 
 尽管 SpeeDiff 在类别条件 ImageNet 生成上取得了显著成果，其当前验证范围仍局限于该设定。扩展到文本到图像等更复杂的条件生成任务尚待探索。此外，达到最佳性能依赖预训练的 DINOv3 视觉基础模型，这引入了额外的计算开销和外部依赖。在完全无预训练 VFM 的条件下，能否通过更强的潜在正则化或结构设计达到相近性能，仍是一个开放问题。同时，端到端训练的动态稳定性在更大规模数据和模型下是否依然保持，也需要进一步验证。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与两阶段潜在扩散模型的对比
 
@@ -359,6 +365,8 @@ SpeeDiff 在架构上做了两项关键替换：
 **开放问题**：
 - 联合训练范式能否直接扩展到大规模文本到图像生成系统并保持有竞争力的收敛性质？
 - 在完全无预训练 VFM 的条件下，能否通过更强的潜在正则化或结构设计达到与使用 VFM 相近的性能？
+
+
 
 ## 原文 PDF
 

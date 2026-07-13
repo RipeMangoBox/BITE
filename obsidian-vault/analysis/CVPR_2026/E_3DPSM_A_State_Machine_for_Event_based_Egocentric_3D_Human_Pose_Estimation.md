@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/E_3DPSM_A_State_Machine_for_Event_based_Egocentric_3D_Human_Pose_Estimation.pdf
+project_link: null
 code_link: null
 aliases:
 - E3
@@ -41,7 +42,7 @@ claims:
 > - EE3D-R 上，MPJPE 81.32 (Non-Causal) vs 103.28 (EventEgo3D++) (-21.96 (约19%))；PA-MPJPE 60.21 (Non-Causal) vs 77.06 (EventEgo3D++) (-16.85 (约22%))；esmooth 6.65 (Non-Causal) vs 22.93 (EventEgo3D++) (-16.28 (约2.7倍提升))。
 > - EE3D-W 上，MPJPE 155.82 (Non-Causal) vs 172.43 (EventEgo3D++) (-16.61 (约10%))；PA-MPJPE 90.85 (Non-Causal) vs 98.41 (EventEgo3D++) (-7.56 (约8%))。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -67,7 +68,7 @@ E-3DPSM 在两个自我中心事件三维姿态估计基准 **EE3D-R** 和 **EE3
 
 消融实验进一步证实：移除 SSM 模块导致精度和光滑度严重下降；用简单加法取代学习型融合会导致严重漂移；连续状态演化（不重置内部状态）优于定期重置策略，证明模型学会了自我调节。
 
-## 背景与动机
+
 
 ### 事件相机与自我中心三维姿态估计
 
@@ -98,7 +99,9 @@ Figure 1 直观对比了两种范式：先前方法的帧缓冲区机制仅保�
 
 这些需求共同构成了 E-3DPSM 的设计动机：**构建一个连续状态机，将事件驱动的自我中心三维人体姿态估计从“逐帧回归”转变为“状态演化与融合”**，在保持实时性的同时显著提升三维精度和时间稳定性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 E-3DPSM 的核心创新在于将事件驱动的自我中心三维人体姿态估计重新定义为**连续时间动态过程**，从根本上改变了先前方法（如 EventEgo3D、EventEgo3D++）仅通过上一事件帧缓冲区进行短暂时序建模的范式。这一转变体现在三个紧密耦合的 changed slots 上。
 
@@ -120,7 +123,7 @@ $$\mathbf{P}_t = \mathbf{X}_t + \mathbf{K}_t \cdot (\mathbf{P}_t^{\text{D}} - \m
 
 三个 changed slots 的协同效应在整体性能上得到验证：E-3DPSM 在 EE3D-R 基准上将 MPJPE 降低约 19%（从 103.28 降至 81.32），PA-MPJPE 降低约 22%，时间抖动降低约 2.7 倍（Table 1）。
 
-## 整体框架
+
 
 E-3DPSM 将单目鱼眼事件相机下的自我中心三维人体姿态估计重新定义为**连续的事件驱动状态演化过程**。其核心洞察在于：事件相机天然记录“变化”，因此三维空间中应存在与之对应的关节位移变化。基于这一思想，整个 pipeline 由三个紧密衔接的阶段构成（Figure 2），从前端事件流到后端时序融合，形成一条端到端的可学习推理链。
 
@@ -197,7 +200,7 @@ E-3DPSM 支持两种推理模式：**非因果模式**（Non-Causal）利用双�
 ![[assets/figures/papers/paper_list_l1014_https_arxiv_org_abs_2604_08543/figures/001_Figure_1.jpg]]
 *Figure 1: Rethinking event-based egocentric 3D human pose estimation. (a) Previous methods [25, 26] capture temporal information only through a single previous event frame stored in the frame buffer leading to jitter and drift. (b) Our E-3DPSM approach models motion as a continuous event-driven state evolution, fusing delta and direct 3D human pose updates, thereby achieving real-time and temporally stable 3D reconstruction and significantly outperforming prior approaches in the 3D accuracy*
 
-## 核心模块与公式推导
+
 
 ### 问题形式化与事件表示
 
@@ -281,7 +284,9 @@ $$\mathcal{L}_{\mathrm{total}} = \lambda_{\mathrm{3D}}\mathcal{L}_{\mathrm{3D}} 
 ![[assets/figures/papers/paper_list_l1014_https_arxiv_org_abs_2604_08543/figures/009_Figure_6.jpg]]
 *Figure 6: Pose drift over time. Comparison of learned fusion (Eq. (15)), direct pose only (Eq. (8)), and naive fusion (Eq. (11)) across temporal sequence length. Naive fusion leads to rapidly increasing drift, whereas our learned fusion effectively mitigates this drift, maintaining stable accuracy over time*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要定量结果
 
@@ -352,7 +357,9 @@ Figure 9 展示了三类典型失败场景：
 ![[assets/figures/papers/paper_list_l1014_https_arxiv_org_abs_2604_08543/figures/015_Table_8.jpg]]
 *Table 8: Inference-time ablation on the EE3D-R dataset comparing different strategies for resetting internal states. We evaluate resetting the SSM block states, resetting the Kalman fusion states, and using continuous state evolution without resets (ours)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：从帧缓冲到连续状态机
 
@@ -404,6 +411,8 @@ E-3DPSM 与 EventEgo3D/EventEgo3D++ 的本质差异不在于网络规模或训�
 3. **连续状态机范式的扩展**：能否将连续状态机范式扩展到以事件为中心的全身运动重建（包括手指、面部）或多模态（事件+IMU）设置？这将是验证该方法通用性的重要方向。
 
 4. **实时部署的进一步优化**：当前模型在 Jetson Orin Nano 上达到约 30 Hz，虽已满足实时需求，但进一步降低计算开销将有助于在更低功耗设备上的部署。
+
+
 
 ## 原文 PDF
 

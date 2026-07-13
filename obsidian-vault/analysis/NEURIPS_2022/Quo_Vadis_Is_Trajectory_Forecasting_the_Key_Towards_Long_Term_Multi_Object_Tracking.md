@@ -5,6 +5,8 @@ paper_level: A
 venue: NeurIPS
 year: 2022
 pdf_ref: paperPDFs/NEURIPS_2022/Quo_Vadis_Is_Trajectory_Forecasting_the_Key_Towards_Long_Term_Multi_Object_Tracking.pdf
+project_link: null
+code_link: https://github.com/dendorferpatrick/QuoVadis
 aliases:
 - QVITFKTLTMOT
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | 轨迹预测是否是长期多目标跟踪的关键？ |
 | 英文题名 | Quo Vadis: Is Trajectory Forecasting the Key Towards Long-Term Multi-Object Tracking? |
 | 会议/期刊 | NeurIPS 2022 |
-| Links | [paper](https://arxiv.org/abs/2210.07681); [GitHub](https://github.com/dendorferpatrick/QuoVadis) |
+| Links | [paper](https://arxiv.org/abs/2210.07681) · [GitHub](https://github.com/dendorferpatrick/QuoVadis) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | QuoVadis (基于轨迹预测的长时多目标跟踪方法) |
 | Dataset | MOT17 test, MOT20 test |
@@ -40,7 +42,7 @@ claims:
 > - MOT17 test 上，IDSW 为 2103，对比 2196 (ByteTrack)，变化 -93。
 > - MOT20 test 上，HOTA 为 61.48，对比 61.38 (ByteTrack)，变化 +0.10。
 
-## 概述
+## 概要
 
 多目标跟踪（MOT）的核心挑战之一是长时间遮挡下的身份保持。现有基于表观特征的先进跟踪器在遮挡超过3秒时几乎完全失效——仅能成功关联不到10%的丢失轨迹（Figure 1b）。这一瓶颈的根源在于：仅依赖ReID特征无法应对指数增长的关联搜索空间，而简单的线性运动模型又难以捕捉人类复杂的非线性移动模式。
 
@@ -50,7 +52,7 @@ claims:
 
 本工作确立了轨迹预测作为长时多目标跟踪关键组件的方法定位，表明在BEV空间中的生成式运动推理能够有效替代复杂的表观匹配，为遮挡鲁棒跟踪开辟了新范式。
 
-## 背景与动机
+
 
 ### 问题背景：长期遮挡——多目标跟踪的阿喀琉斯之踵
 
@@ -76,7 +78,9 @@ claims:
 
 基于这一动机，本文提出**QuoVadis**——一种将轨迹预测引入多目标跟踪的通用框架，通过数据驱动的单应性变换将单目检测提升至BEV空间，并在该空间中对丢失轨迹进行长时预测与匹配，从而系统性地桥接长期遮挡。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 QuoVadis 的核心创新在于将长时多目标跟踪问题重新定义为**轨迹预测驱动的关联问题**，而非传统的表观匹配问题。其关键操作体现在以下三个“changed slots”上：
 
@@ -110,7 +114,7 @@ $$c_{ij} = \left( \Delta_{\mathrm{IoU}} + \max\left( \tau_{L_2} - \Delta_{L_2}, 
 
 **核心洞见总结**：QuoVadis 的核心洞见在于，通过数据驱动单应性变换将检测提升至BEV空间，并在该空间中利用少量但覆盖多模态的生成式轨迹预测，能够有效替代复杂的表观匹配，显著桥接长时遮挡。消融实验（Table 1）揭示了一个反直觉的发现：**预测损失（FDE/ADE）的最优并非带来最好跟踪性能**——使用3个生成器的多模态预测（MG-GAN）在FDE并非最优的情况下获得了最高HOTA（54.52）和AssA（54.80），而移除社会交互模块对跟踪影响甚微。这表明对于跟踪而言，**少量多样化的预测**比精确的轨迹回归或复杂的交互建模更为关键。
 
-## 整体框架
+
 
 QuoVadis 的核心思路是将长期遮挡下的多目标跟踪重新表述为**鸟瞰视图（BEV）空间中的轨迹预测问题**。其整体流水线由三个松耦合但顺序依赖的模块构成，输入为单目视频帧与现成检测器的 2D 边界框，输出为跨长时遮挡的鲁棒轨迹关联。
 
@@ -139,7 +143,7 @@ QuoVadis 的核心思路是将长期遮挡下的多目标跟踪重新表述为**
 ![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2210_07681/figures/002_Figure_2.jpg]]
 *Figure 2: Our method: we bridge long-term occlusions by (a) localizing object tracks in BEV via estimated homography and (b) forecasting future trajectories for lost tracks. We (d) continually aim to match these inactive track predictions with new object detections and remove incorrect predictions under a visibility constraint (c)*
 
-## 核心模块与公式推导
+
 
 ### 3.1 数据驱动单应性估计模块
 
@@ -187,7 +191,9 @@ $$c_{ij} = \left( \Delta_{\mathrm{IoU}} + \max\left( \tau_{L_2} - \Delta_{L_2}, 
 
 此外，模块利用投影的地面掩码（见 Figure 2c）实施可见性约束：若预测位置落入已知的遮挡区域（如建筑物后方），则暂时保留该预测；若预测位置处于可见但无检测对应的区域，则判定为错误预测并予以滤除。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置与公平性说明
 
@@ -275,7 +281,9 @@ Table 4 展示了在 MOT17 验证集动态场景（排除 MOT17-05）上的结�
 ![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2210_07681/figures/003_Figure_3.jpg]]
 *Figure 3: We estimate the homography H for a sequence by reconstructing a 3D point cloud using a monocular depth estimator. We obtain ground image-to-point-cloud correspondences using a semantic segmentation model that masks ground pixels as needed to estimate the homography matrix. With the estimated homography matrix, we transform the bottom points of bounding boxes to 2D BEV coordinates*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心问题与因果机制
 
@@ -331,6 +339,8 @@ Table 4 展示了在 MOT17 验证集动态场景（排除 MOT17-05）上的结�
 4. **非行人目标与完全动态场景的泛化**：该方法在车辆跟踪、动物跟踪以及完全由移动摄像头拍摄的场景（如车载视角）下的适应性如何？是否需要重新训练预测模型或调整单应性估计策略？
 
 5. **端到端联合优化的可能性**：是否可能通过端到端学习联合优化深度估计、单应性回归与轨迹预测，以减少模块间误差累积，同时保持对任意底层跟踪器的即插即用特性？
+
+
 
 ## 原文 PDF
 

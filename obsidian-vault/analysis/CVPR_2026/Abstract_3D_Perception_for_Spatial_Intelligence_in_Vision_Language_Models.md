@@ -42,7 +42,7 @@ claims:
 > - PhysBench 上，准确率 58.3 vs 54.9 (+3.4%)。
 > - Spatial-Avg 上，平均准确率 81.4 vs 78.5 (+2.9%)。
 
-## 概述
+## 概要
 
 现有视觉语言模型（VLM）在训练过程中普遍缺乏3D感知能力，其2D训练范式与3D空间推理任务之间存在显著的模态鸿沟。直接通过监督微调注入3D知识面临3D数据匮乏和灾难性遗忘的双重困境。受人类通过粗粒度关系理解进行高效空间推理的启发，**SandboxVLM**提出了一种无需训练即可为VLM注入抽象3D结构的新范式。
 
@@ -52,7 +52,7 @@ claims:
 
 **关键结果**：在SAT-Real基准上，SandboxVLM相比基线方法取得8.3%的性能提升，在多个空间智能基准上的平均准确率达到81.4%，超越GPT-5-mini 2.9%。消融实验证实，完整的3D Sandbox表示相比原始VLM在SAT-Real上提升8.7%（84.1% vs 75.4%），验证了抽象边界框作为空间推理上下文的有效性。
 
-## 背景与动机
+
 
 ### 问题背景：VLM的2D训练范式与3D空间推理的鸿沟
 
@@ -78,7 +78,9 @@ claims:
 
 这一设计使得SandboxVLM能够作为一个即插即用的3D感知模块，与GPT-4o、GPT-5-mini、Claude-Sonnet-4、Gemini-2.5-Pro等主流VLM无缝集成，在不修改模型参数的前提下显著提升其空间智能水平。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SandboxVLM 的核心创新在于**不修改 VLM 参数、不引入稠密 3D 监督**的前提下，通过向现有 VLM 注入任务相关的**抽象 3D 边界框表示**，弥合了 2D 训练模式与 3D 空间推理之间的模态鸿沟。这一思路受人类抽象感知启发：人类在 3D 空间中有效推理，依赖的并非精确的度量几何，而是粗粒度的、关系性的空间理解（Figure 1）。SandboxVLM 将这一原则具象化为四个关键的 changed slots，每个 slot 都相对于基线方法引入了结构性改变。
 
@@ -114,7 +116,7 @@ $$\mathrm{Agree}(\mathbf{p}, X_v^{(m),t}) = \begin{cases} 1, & \text{if } \exist
 
 综合来看，SandboxVLM 的创新并非提出新的 VLM 架构或训练范式，而是在**推理时**构建了一个轻量级的 3D 沙盒层：通过视频扩散先验获取多视图信息，通过代理提升实现任务驱动的稀疏化，通过多视图投票与聚类生成结构化的抽象边界框，最终将这一符号化的 3D 表示注入 VLM 的推理上下文。整个过程无需任何训练或微调，所有模块均为现成模型的组合，使得该方法可以无缝适配不同的 VLM 骨干（GPT-4o、GPT-5-mini、GPT-5 等），在零样本设定下即取得一致的性能增益。
 
-## 整体框架
+
 
 SandboxVLM 是一个**免训练的零样本框架**，其核心思想是向现成的视觉语言模型（VLM）注入粗粒度的符号化 3D 结构信息，从而弥合 VLM 的 2D 训练模式与 3D 空间推理任务之间的模态鸿沟。该框架受人类抽象感知的启发——人类在 3D 推理时并不依赖精确的几何重建，而是通过粗粒度的关系性理解即可有效运作。SandboxVLM 遵循这一原则，为 VLM 提供紧凑且富含信息的抽象 3D 边界框上下文，同时丢弃低层视觉细节。
 
@@ -138,7 +140,7 @@ SandboxVLM 是一个**免训练的零样本框架**，其核心思想是向现�
 ![[assets/figures/papers/paper_list_l2367_https_arxiv_org_abs_2511_10946/figures/001_Figure_1.jpg]]
 *Figure 1: Motivation of SandboxVLM. (a) Existing VLMs are trained without 3D awareness. Training or supervised fine-tuning (SFT) VLMs with 3D suffers from a lack of 3D data and forgetting. (b) Humans, however, reason effectively in 3D through coarse, relational understanding. (c) SandboxVLM follows this principle of abstract perception, providing a coarse but informative 3D context for zero-shot VLM reasoning*
 
-## 核心模块与公式推导
+
 
 SandboxVLM 的核心设计思想是向 VLM 注入任务相关的抽象 3D 结构，而非追求精确的几何重建。整个管道由四个关键模块级联构成，每个模块解决从 2D 输入到 3D 推理链条中的一个瓶颈。
 
@@ -207,7 +209,9 @@ $$\begin{array} { l } { { < \mathrm { t h i n k i n g > ~ T h e ~ reasoning. ~ <
 ![[assets/figures/papers/paper_list_l2367_https_arxiv_org_abs_2511_10946/figures/003_Figure_3.jpg]]
 *Figure 3: Core modules of 3D Sandbox. (a) Proxy Elevation: The VLM identifies task-relevant objects and their approximate locations. A segmentation model produces object masks, followed by mask erosion and farthest point sampling to select interior proxy pixels. (b) Multi-View Voting: The proxies are unprojected into 3D space and aggregated across views through a cross-view consistency check (“Agree to”) to filter unreliable points. The remaining proxies will be clustered into boxes*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -269,7 +273,9 @@ Figure 6展示了不同输入类型下的具体失败案例：渲染点云输入
 ![[assets/figures/papers/paper_list_l2367_https_arxiv_org_abs_2511_10946/figures/009_Table_4.jpg]]
 *Table 4: Question types and examples from each benchmark. The four types of benchmarks we evaluated on contain various tasks from metric questions like relative depths to comprehensive ones like physical scene understanding. For more details, please refer to the corresponding paper*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：从2D训练到3D推理的模态鸿沟
 
@@ -313,6 +319,8 @@ SandboxVLM 的设计取舍带来了明确的适用边界：
 3. **物理属性编码**：如何将质量、摩擦力等物理属性集成到沙盒表示中，以进一步提升物理推理性能？这涉及从视觉信号到物理参数的映射问题。
 
 4. **噪声鲁棒性**：如何缓解多视图生成和VLM对象指向中的噪声，降低误差传播？可能的方案包括引入不确定性估计或端到端的可微分优化。
+
+
 
 ## 原文 PDF
 

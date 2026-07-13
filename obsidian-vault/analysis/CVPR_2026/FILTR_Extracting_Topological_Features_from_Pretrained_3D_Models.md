@@ -44,7 +44,7 @@ claims:
 > - ModelNet40 (test set) 上，W2 (×10⁻²) / dB (×10⁻³) / PIE Point-MAEc: W2=47.26, dB=13.80, PIE=11.93 vs DGCNN (E2E): W2=47.79, dB=12.51, PIE=9.773 (W2 -0.53)。
 > - ABC (subset 3K) 上，W2 (×10⁻²) / dB (×10⁻³) / PIE Point-MAEc: W2=47.99, dB=32.72, PIE=4.393 vs DGCNN (E2E): W2=48.29, dB=31.70, PIE=3.760 (W2 -0.30)。
 
-## 概述
+## 概要
 
 3D点云理解在自动驾驶、机器人等领域至关重要，但当前预训练的3D编码器能否真正捕获形状的全局拓扑结构，仍是一个悬而未决的问题。本工作系统性地评估了主流预训练3D点云编码器（Point-BERT、Point-MAE、PointGPT、PCP-MAE等）对拓扑信息的隐式编码能力，发现这些模型在直接探测任务（连通分量数、亏格数）上表现有限，但其深层特征中仍保留了可提取的多尺度拓扑信号。
 
@@ -57,8 +57,6 @@ claims:
 - **损失设计**：存在性损失（existence loss）显著改善重建质量（Table 8），对角线正则化器迫使未匹配预测落在对角线上，贡献零Wasserstein距离。
 
 FILTR的核心方法论借鉴了DETR的集合预测范式，将图像目标检测中的边界框预测迁移为点云拓扑中的持续同调对预测，通过匈牙利匹配与多损失联合优化实现端到端训练。该方法对编码器预训练方法无特殊偏好，且可适配不同filtration类型。
-
-## 背景与动机
 
 ### 拓扑特征在3D理解中的角色
 
@@ -83,7 +81,7 @@ FILTR的核心方法论借鉴了DETR的集合预测范式，将图像目标检�
 
 这一思路的核心洞察在于：尽管预训练3D编码器在拓扑探测任务上表现有限，但其特征中仍蕴含有用的局部几何与多尺度拓扑信息；通过合适的解码器架构，可以有效提取并预测持续同调图，从而在不修改编码器参数的前提下实现拓扑特征的重建。
 
-## 核心创新
+## 核心方法与创新机理
 
 FILTR的核心创新在于将**持续同调图预测**重新定义为**集合预测问题**，并借鉴目标检测领域DETR的架构范式，构建了一个与编码器预训练方法无关的解码器框架。其关键设计突破体现在以下七个维度：
 
@@ -149,8 +147,6 @@ $$\mathcal{L}_{\text{match}}(\hat{y}_i, y_j) = \lambda_{\text{reg}} \|\hat{y}_i 
 
 FILTR的解码器对编码器的预训练方法无特殊偏好，可适配Point-BERT、Point-MAE、PointGPT、PCP-MAE等多种预训练编码器。实验表明，不同编码器下的FILTR均能达到或超过端到端DGCNN基线的重建性能（Table 3），验证了该架构的**通用性**。
 
-## 整体框架
-
 FILTR（Filtration Transformer）的核心设计思想是将持续同调图的预测问题转化为**集合预测（set prediction）任务**。该方法借鉴了目标检测领域DETR的架构范式，但针对拓扑特征提取进行了七项关键适配（Table 2）：输入从图像变为点云，目标从边界框变为持续同调对 $(b, d)$，位置编码从2D正弦函数变为3D补丁中心坐标，输出约束从 $[0,1]^4$ 的边界框变为满足 $d > b$ 的出生-死亡坐标对，空类从“无对象”变为“无对”，匹配损失从类别加框损失变为存在性损失加对回归损失，并新增了对角线正则化器。
 
 整个流水线由四个核心模块串联构成（Figure 7）：
@@ -179,8 +175,6 @@ FILTR提供两种特征聚合变体（Figure 8左）：**L变体**仅使用编�
 
 ![[assets/figures/papers/paper_list_l2080_https_arxiv_org_abs_2604_22334/figures/001_Figure_1.jpg]]
 *Figure 1: We evaluate the topological information implicitly captured by pretrained 3D point-cloud encoders through three distinct tasks. The first two tasks assess whether features produced by modern 3D encoders capture the number of connected components (top) and the genus (middle) of the underlying shapes. We introduce DONUT, a novel benchmark with topological labels, and an adapted probing mechanism. The third task (bottom) evaluates to what extent (i) information contained in persistence diagrams is present in encoder features, and (ii) how it can be extracted. To this end, we propose FILTR (Filtration Transformer), the first model that predicts persistence diagrams directly from pretrained, fro...*
-
-## 核心模块与公式推导
 
 ### 3.1 流水线总览
 
@@ -259,7 +253,7 @@ $$\mathcal{L}_{\mathrm{diag}} = \frac{1}{|\bar{\mathcal{M}}|} \sum_{j \in \bar{\
 ![[assets/figures/papers/paper_list_l2080_https_arxiv_org_abs_2604_22334/figures/004_Figure_4.jpg]]
 *Figure 4: Encoder Probing Pipeline. We probe the features of each (frozen) transformer block on DONUT to predict the number of connected components and the genus*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主结果：持续同调图重建
 
@@ -315,25 +309,7 @@ $$\mathcal{L} = \mu_{\mathrm{recon}} \mathcal{L}_{\mathrm{recon}} + \mu_{\mathrm
 ![[assets/figures/papers/paper_list_l2080_https_arxiv_org_abs_2604_22334/figures/011_Table_3.jpg]]
 *Table 3: Reconstruction results of FILTR. All the models are trained on DONUT, and evaluated on: a held-out test set from DONUT, ModelNet40 test set, a subset of ABC. We use the same configuration for all pretrained backbones, and report results obtained by training FILTR with either the features of the last transformer block (L), or a combination of the features from all transformer blocks (C) (see Fig. 8 (left)). We highlight PointNet++ for its remarkably higher reconstruction errors compared to other architectures. We discuss this point and provide training details in the Appendix*
 
-![[assets/figures/papers/paper_list_l2080_https_arxiv_org_abs_2604_22334/figures/005_Table_1.jpg]]
-*Table 1: Accuracy on DONUT. For pretrained encoders, we report the best probing accuracy across all transformer layers, with the index of the corresponding layer shown in subscript. For Point-BERT, we probe both the CLS token and the pooled patch tokens. Baseline models (bottom block) are trained end-to-end from scratch on DONUT. Full training details are provided in the Appendix*
-
-![[assets/figures/papers/paper_list_l2080_https_arxiv_org_abs_2604_22334/figures/007_Figure_6.jpg]]
-*Figure 6: CKA results on DONUT. We report linear CKA scores between encoder features and persistence diagram vectorizations for different encoders and vectorization methods. The higher the score, the stronger the alignment. [CLS] refers to the CLS token of Point-BERT*
-
-![[assets/figures/papers/paper_list_l2080_https_arxiv_org_abs_2604_22334/figures/022_Table_8.jpg]]
-*Table 8: Ablation study of losses. We use a Point-MAE encoder that achieves competitive results on DONUT (Tab. 3). Similar results are observed with other encoders (see Tab. 9). We report results for both thresholded*
-
-![[assets/figures/papers/paper_list_l2080_https_arxiv_org_abs_2604_22334/figures/027_Table_11.jpg]]
-*Table 11: Results on DONUT under low data regime (2K shapes). The two first rows compare frozen and E2E setups*
-
-![[assets/figures/papers/paper_list_l2080_https_arxiv_org_abs_2604_22334/figures/006_Figure_5.jpg]]
-*Figure 5: Layer-wise performance on DONUT. We report probing accuracies for different encoders, on number of connected components (left) and genus (right). Unlike the other encoders, Point-BERT is pretrained with a CLS token, which we also probe (dashed line)*
-
-![[assets/figures/papers/paper_list_l2080_https_arxiv_org_abs_2604_22334/figures/017_Figure_14.jpg]]
-*Figure 14: CKA under controlled feature mismatch. CKA similarity between the last transformer block of each encoder and ATOL/top-128 vectorizations on DONUT. A fraction α of features is randomly permuted, and results are averaged over 3 runs*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 方法溯源：DETR 集合预测范式的 3D 拓扑迁移
 

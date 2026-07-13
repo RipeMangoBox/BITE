@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2024
 pdf_ref: paperPDFs/CVPR_2024/ReGenNet_Towards_Human_Action_Reaction_Synthesis.pdf
+project_link: https://liangxuy.github.io/ReGenNet/
+code_link: null
 aliases:
 - ReGenNet
 tags:
@@ -40,7 +42,7 @@ claims:
 > - Chi3D-AS (online, unconstrained, test conditioned) 上，FID↓ 13.76 vs 18.40 (MDM) (-4.64)。
 > - InterHuman-AS (online, unconstrained) 上，FID↓ 2.265 vs 2.915 (RAIG) (-0.65)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -85,8 +87,6 @@ ReGenNet处于**条件人体运动生成**与**人-人交互建模**的交叉地
 
 该方法在知识库中的核心贡献在于：**首次将人类交互形式化为非对称的条件生成问题**，并通过扩散模型框架内的架构创新（解码器掩码）与损失函数设计（显式交互损失）实现了在线、物理一致的反应合成。其局限性主要体现在当前仅处理原子动作周期内的单向反应，尚未覆盖长时交互中的角色切换与意图转移，这为后续研究指明了方向。
 
-## 背景与动机
-
 ### 问题背景：人体交互生成中的非对称性缺失
 
 在增强现实、虚拟现实和游戏等应用中，虚拟角色不仅需要独立地执行动作，更需要对他人的行为做出即时、合理的反应。然而，现有的人体运动生成研究长期聚焦于单人动作合成或多人的对称性交互生成，忽略了真实人类交互中的一个核心特性：**非对称性**。在握手、击掌、躲避等原子交互中，总有一方先发起动作（行动者），另一方随后做出响应（反应者）。这种行动者-反应者的时序与语义差异，要求生成模型能够理解交互的因果关系，而非简单地将双方视为对等的运动序列。
@@ -107,7 +107,7 @@ ReGenNet处于**条件人体运动生成**与**人-人交互建模**的交叉地
 
 具体而言，ReGenNet首先对NTU120、Chi3D和InterHuman三个数据集进行人工标注，明确每个原子交互中的行动者与反应者顺序。在模型层面，采用堆叠Transformer解码器替代编码器，通过方向性注意掩码防止未来信息泄漏，实现真正的在线反应生成。此外，引入显式的L2交互损失，直接监督相对关节位置、全局旋转和根位移，确保生成反应在几何与物理层面与行动者保持一致。这一“非对称标注 + 自回归架构 + 显式空间约束”的组合，使ReGenNet在多个基准上显著超越了现有方法。
 
-## 核心创新
+## 核心方法与创新机理
 
 ReGenNet 的核心创新在于首次将人体动作-反应合成建模为**非对称、在线、细节丰富**的条件生成任务，并通过三个相互耦合的 changed slots 实现突破。
 
@@ -140,8 +140,6 @@ ReGenNet 将核心网络替换为**堆叠 Transformer 解码器**，并引入**�
 ### 创新耦合逻辑
 
 上述四个 changed slots 并非孤立改进，而是形成因果闭环：非对称标注定义了“谁驱动谁”的条件方向 → Transformer 解码器+方向掩码保证了在线生成的时序因果性 → 显式交互损失确保生成的反应在几何空间上与行动者保持物理一致性 → SMPL-X 表示提供了足够的身体细节容量。这一耦合使 ReGenNet 在 NTU120-AS、Chi3D-AS 和 InterHuman-AS 三个基准上均以显著优势超越现有方法。
-
-## 整体框架
 
 ReGenNet 的整体 pipeline 围绕**条件扩散模型**构建，核心目标是从给定的行动者（actor）运动序列中即时生成对应的反应者（reactor）运动。该框架将人类交互建模为**非对称的动作-反应关系**，并通过三个关键设计实现高质量的在线生成：防止未来信息泄漏的方向注意掩码、将行动者特征与噪声反应特征沿特征维拼接的条件注入方式，以及直接监督相对空间关系的显式交互损失。
 
@@ -203,11 +201,6 @@ $$\mathcal{L}_{all} = \mathcal{L}_{dm} + \lambda_{inter} \cdot \mathcal{L}_{inte
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l1724_ReGenNet_Towards_Human_Action_Reaction_Synthesis/figures/001_Figure_1.jpg]]
-*Figure 1: Illustration of our proposed ReGenNet, i.e., given a human motion sequence and generate the plausible human reactions, which will have broad applications in AR/VR and games*
-
-## 核心模块与公式推导
-
 ReGenNet 的核心由一个**条件扩散模型**与一个**堆叠 Transformer 解码器**构成，辅以显式交互损失，实现从任意行动者动作到反应者动作的在线生成。
 
 ### 1. 扩散框架与前向过程
@@ -252,7 +245,7 @@ $$\mathcal{L}_{all} = \mathcal{L}_{dm} + \lambda_{inter} \cdot \mathcal{L}_{inte
 
 其中 $\lambda_{inter}$ 为交互损失权重。消融实验证实，移除 $\mathcal{L}_{inter}$（即 $\lambda_{inter}=0$）会导致训练 FID 从 0.90 恶化至 1.96，验证了显式空间约束对生成质量的关键作用。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 实验设置与评估协议
 
@@ -336,27 +329,12 @@ Figure 3展示了ReGenNet在多种交互场景下的生成结果。模型能够�
 ![[assets/figures/papers/paper_list_l1724_ReGenNet_Towards_Human_Action_Reaction_Synthesis/figures/004_Table_2.jpg]]
 *Table 2: Comparison to state-of-the-arts on the online, unconstrained setting for human action-reaction synthesis on NTU120-AS. ± indicates 95% confidence interval, → means that closer to Real is better. Bold indicates best result and underline indicates second best*
 
-![[assets/figures/papers/paper_list_l1724_ReGenNet_Towards_Human_Action_Reaction_Synthesis/figures/010_Table_8.jpg]]
-*Table 8: Ablation studies on the necessity of the explicit actorreactor order annotations on the NTU120-AS dataset*
-
-![[assets/figures/papers/paper_list_l1724_ReGenNet_Towards_Human_Action_Reaction_Synthesis/figures/009_Table_7.jpg]]
-*Table 7: Ablation Studies of the number of DDIM [60] sampling timesteps on the online, unconstrained setting on NTU120-AS*
-
 ### 补充图表
-
-![[assets/figures/papers/paper_list_l1724_ReGenNet_Towards_Human_Action_Reaction_Synthesis/figures/007_Table_5.jpg]]
-*Table 5: Generalization results to different viewpoints on the online, unconstrained setting on the NTU120-AS dataset*
 
 ![[assets/figures/papers/paper_list_l1724_ReGenNet_Towards_Human_Action_Reaction_Synthesis/figures/013_Figure_3.jpg]]
 *Figure 3: Visualization of human action-reaction synthesis results. Blue for actors and Orange for reactors*
 
-![[assets/figures/papers/paper_list_l1724_ReGenNet_Towards_Human_Action_Reaction_Synthesis/figures/002_Table_1.jpg]]
-*Table 1: Human-human interaction datasets. Skel. denotes skeleton and AS denotes asymmetry*
-
-![[assets/figures/papers/paper_list_l1724_ReGenNet_Towards_Human_Action_Reaction_Synthesis/figures/011_Table_9.jpg]]
-*Table 9: Results on the offline, unconstrained setting on NTU120-AS. Bold indicates best result and underline indicates second best*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 问题定位与基线谱系
 

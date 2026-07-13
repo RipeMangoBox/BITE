@@ -40,7 +40,7 @@ claims:
 > [!tip] 效果简介
 > - Mono3DRefer 上，Overall mIoU 38.11 (MonoVLM-MiMo) vs 7.53 (GPT-5) (+30.58 (>5×))；Acc@0.25 Multiple 71.23 (MonoVLM-MiMo) vs 69.83 (Mono3DVG-TGE) (+1.40)。
 
-## 概述
+## 概要
 
 单目3D视觉定位要求模型根据自然语言描述，从单张RGB图像中预测目标的3D边界框。该任务同时考验2D视觉定位的精确性、3D几何推理能力以及对相机投影关系的理解。当前最先进的视觉语言模型（VLM），包括闭源的GPT-5、Gemini 2.5和开源的Qwen2.5-VL、MiMo-VL，在零样本条件下均严重缺乏上述能力：先导实验表明，即使仅以3D IoU为奖励进行强化学习优化，模型在横向（x）和纵向（y）轴上的误差远大于深度（z）轴，揭示出2D定位不准是制约3D性能的核心瓶颈（Table 1）。
 
@@ -48,7 +48,7 @@ claims:
 
 在Mono3DRefer基准上，MonoVLM-MiMo的总体mIoU达到38.11，是GPT-5（7.53）的5倍以上，并在Multiple场景的Acc@0.25指标（71.23）上超越了专用纯视觉模型Mono3DVG-TGE（69.83）。消融实验证实，三阶段课程使mIoU单调提升（19.81→20.89→29.13），Stage 3中逐步加入位置、尺寸和朝向奖励使mIoU从21.31持续提升至29.13，验证了任务分解与复合奖励设计的有效性。
 
-## 方法谱系与知识库定位
+### 方法谱系与知识库定位
 
 MonoVLM属于**基于VLM的3D视觉定位**方法，其核心贡献在于**训练策略**而非模型架构创新。与依赖专用检测头或深度估计网络的传统纯视觉方法（如**Mono3DVG**（Zhan et al., AAAI 2024）、Mono3DVG-TGE、Mono3D-VLDL）不同，MonoVLM直接将VLM作为预测模型，利用其内在的语言理解能力处理自然语言查询。与零样本VLM基线（GPT-5、Gemini 2.5、Qwen2.5-VL（Bai et al., arXiv 2025）、MiMo-VL）相比，MonoVLM通过任务专用训练弥补了VLM在3D几何推理上的固有缺陷。
 
@@ -60,7 +60,7 @@ MonoVLM属于**基于VLM的3D视觉定位**方法，其核心贡献在于**训�
 
 该方法在Mono3DRefer数据集上进行三阶段训练，与零样本VLM基线的对比并不完全公平，但证明了任务专用训练可大幅提升VLM的3D定位能力。代码已开源（EasyR1框架，2025）。
 
-## 背景与动机
+
 
 ### 单目3D视觉定位：从2D图像到3D空间理解的鸿沟
 
@@ -80,7 +80,9 @@ MonoVLM属于**基于VLM的3D视觉定位**方法，其核心贡献在于**训�
 
 MonoVLM的核心动机由此产生：**将复杂的单目3D定位任务分解为2D定位和3D几何推理两个子问题，以相机反投影为桥梁，通过分阶段强化学习使VLM逐步掌握从2D视觉线索推断3D属性的能力**。这种分解策略不仅降低了单阶段学习的难度，还通过奖励信号的协同效应——例如第二阶段优化3D中心时2D定位的附带改善（Figure 3）——使模型自发学习2D与3D之间的对偶关系，最终在Mono3DRefer上实现了对专用纯视觉模型的超越（MonoVLM-MiMo Overall Acc@0.25达69.41，Table 2）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MonoVLM 的核心创新在于将单目3D视觉定位这一复杂任务，系统性地分解为 VLM 可逐步掌握的三个子问题，并通过分阶段强化学习实现从 2D 到 3D 的能力跃迁。其关键设计变更体现在以下三个维度。
 
@@ -104,7 +106,7 @@ MonoVLM 采用七参数表示 $y_o = (x, y, z, l, w, h, \theta)$ 替代传统的
 
 **证据强度评估**：三阶段课程学习的有效性由 Table 6 的单调提升趋势强力支撑；复合奖励的贡献由 Table 7 的消融实验严格验证；2D-3D 协同效应由 Figure 3 的训练曲线直观呈现。整体而言，核心创新主张均有高质量实验证据支持。
 
-## 整体框架
+
 
 MonoVLM 的整体框架遵循“由粗到精”的三阶段课程学习范式，将单目 3D 视觉定位这一复杂任务分解为三个递进子问题，并通过 GRPO（Group Relative Policy Optimization）强化学习逐步训练 VLM 掌握从 2D 视觉线索推断 3D 几何属性的能力。
 
@@ -142,7 +144,7 @@ MonoVLM 的训练策略应用于两个 SOTA VLM 骨干：Qwen2.5-VL-7B（Bai et 
 ![[assets/figures/papers/paper_list_l2405_https_openaccess_thecvf_com_content_CVPR2026_html_Qu_MonoVLM_Monocular_3/figures/001_Figure_1.jpg]]
 *Figure 1: We propose MonoVLM, a simple yet effective method to equip Vision-Language Models (VLMs) with robust monocular 3D grounding capabilities. (a) The model takes an image and the textual query to predict the 3D bounding box (GT and prediction). (b) Even the latest large-scale VLMs struggle to understand 3D structure from 2D images. Our resulting model not only achieves significantly better results than these VLMs but also surpasses specialized vision-only models designed for this task*
 
-## 核心模块与公式推导
+
 
 ### 问题形式化与3D框表示
 
@@ -188,7 +190,9 @@ $$R_{\text{stage-2}}(q, o_i) = \exp\left(-\beta \|\hat{\mathbf{c}}_i - \mathbf{c
 ![[assets/figures/papers/paper_list_l2405_https_openaccess_thecvf_com_content_CVPR2026_html_Qu_MonoVLM_Monocular_3/figures/004_Figure_3.jpg]]
 *Figure 3: Evolution of rewards during Stage 2 training. The model is explicitly optimized using a reward based on the 3D center prediction distance. While the 2D grounding IoU is not part of the training objective in this stage, it shows collateral improvement. This demonstrates a strong synergy between the 2D and 3D localization tasks, suggesting that the model discovers the duality between 2D and 3D*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 先导研究：3D IoU 奖励的失效模式
 
@@ -263,7 +267,9 @@ $$R_{\text{stage-2}}(q, o_i) = \exp\left(-\beta \|\hat{\mathbf{c}}_i - \mathbf{c
 ![[assets/figures/papers/paper_list_l2405_https_openaccess_thecvf_com_content_CVPR2026_html_Qu_MonoVLM_Monocular_3/figures/006_Figure_4.jpg]]
 *Figure 4: Qualitative comparison of predictions on far-away challenging objects between our method, MonoVLM-MiMo, and the topperforming baseline, GPT-5. Ground truth bounding boxes are shown in green. Red boxes denote predictions from GPT-5 and our MonoVLM-MiMo. Please zoom in for better visualization of the small objects*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：VLM在单目3D定位中的三重缺陷
 
@@ -343,6 +349,8 @@ MonoVLM的训练范式依赖于以下条件：
 3. **零样本3D能力的激发**：MonoVLM证明了通过训练可以赋予VLM 3D定位能力，但是否存在更高效的提示工程或上下文学习方法，能够在无需微调的情况下激发VLM的潜在3D理解能力？
 4. **与深度估计模型的协同**：当前方法通过反投影公式从2D坐标和深度恢复3D位置，但深度值本身由模型预测。是否可以通过与单目深度估计模型（如Depth Anything）的显式协同来提供更准确的深度先验？
 5. **动态场景与时序一致性**：MonoVLM处理的是静态单帧图像，在视频或自动驾驶等动态场景中，如何利用时序信息约束3D定位的一致性是一个值得探索的方向。
+
+
 
 ## 原文 PDF
 

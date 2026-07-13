@@ -40,7 +40,7 @@ claims:
 > [!tip] 效果简介
 > - 3D-FRONT 上，Scene-level CD (×10⁻³) 98.8 (EdgeRunner) / 98.4 (BPT) vs 153.2 (DepR) (-54.4 / -54.8)；Scene-level F-Score (%) 33.55 (EdgeRunner) / 32.26 (BPT) vs 25.00 (DepR) (+8.55 / +7.26)；Object-level CD (×10⁻³) 4.04 (EdgeRunner) / 4.57 (BPT) vs 2.57 (DepR) (+1.47 / +2.00)。
 
-## 概述
+## 概要
 
 单视图场景重建旨在从单张RGB图像中恢复完整的三维场景结构。现有方法主要依赖隐式符号距离函数（SDF）表示，通过等值面提取获得网格，再结合后处理布局优化完成场景组装。这一范式存在三个根本性瓶颈：（1）生成的网格面数多、几何平滑，缺乏艺术家可直接编辑的拓扑质量；（2）物体重建与布局组装分离进行，难以保证全局空间一致性；（3）SDF提取流程复杂，增加了系统复杂度。
 
@@ -50,8 +50,6 @@ claims:
 
 该方法的主要局限在于自回归解码导致推理时间较长（单场景4.5−6.7分钟），且性能受上游感知模型（深度估计、实例分割）误差的显著影响。当前仅重建前景物体，尚未涵盖墙壁、地板等背景结构。
 
-## 背景与动机
-
 单视图场景重建旨在从单一的二维图像中恢复出完整的三维场景几何，这一能力对增强现实、机器人导航和3D内容创作等应用至关重要。近年来，该领域涌现出多种方法，但普遍存在一个核心瓶颈：**现有方法主要依赖隐式符号距离函数（SDF）表示和后处理布局优化**，生成的网格面数多、几何平滑，缺乏可直接编辑的艺术家级网格质量；同时，分离的物体重建与布局组装流程难以保证全局空间一致性，且SDF提取需要复杂的等值面提取（如Marching Cubes），显著增加了流程复杂度。
 
 具体而言，现有工作可大致分为两类路径。一类以 **InstPIFu**（Liu et al., ECCV 2022）和 **Uni-3D**（Zhang et al., ICCV 2023）为代表，采用体素SDF进行整体或组合式场景重建，但其输出为隐式场，需经过等值面提取才能获得显式网格，且网格面数通常远超艺术家级标准（可达数万甚至数十万面）。另一类如 **DepR**（Zhao et al., ICCV 2025）和 **DeepPriorAssembly**（Zhou et al., NeurIPS 2024），虽然引入了扩散模型或先验组装策略来提升重建质量，但本质上仍将物体重建与布局优化视为两个独立阶段——先估计物体位姿，再在规范空间生成几何，最后通过后处理优化将两者拼合。这种分离设计使得全局空间关系难以在生成过程中被充分建模，导致场景级一致性不足。
@@ -60,7 +58,7 @@ claims:
 
 PixARMesh的动机正是弥合这一鸿沟：**将艺术家级网格生成的自回归范式扩展到场景级重建**。其核心洞察在于，物体位姿可以自然地编码为包围盒角点的序列令牌，与网格令牌共享同一词表，从而在一个统一的自回归Transformer解码器中完成位姿推理与几何生成的协同建模。同时，通过增强点云编码器——融入像素对齐的图像特征以补偿单视图观测的遮挡和缺失几何信息，并引入场景级交叉注意力以注入全局空间关系——使得模型能够在无后处理优化的情况下，从单张RGB图像直接生成全局一致的场景网格。
 
-## 核心创新
+## 核心方法与创新机理
 
 PixARMesh的核心创新在于将**单视图场景重建从“隐式SDF提取+后优化组装”的分离范式，重构为统一的网格原生自回归序列预测**。其关键设计围绕三个相互关联的changed slots展开，形成一条从表示、感知到生成的因果链路。
 
@@ -80,8 +78,6 @@ PixARMesh的核心创新在于将**单视图场景重建从“隐式SDF提取+�
 - **场景上下文交叉注意力聚合**（Eq.3）：以实例潜在编码为查询、全局场景点云的潜在编码为键值进行交叉注意力，使每个实例的表示能感知全局空间关系。
 
 消融实验显示，移除像素对齐图像特征导致场景F-Score从46.15%骤降至42.84%，物体F-Score从82.27%降至78.14%，是所有消融中下降最大的（Table 3），证明了外观线索对补偿单视图遮挡几何的关键作用。完整的“图像特征+场景上下文”组合在场景级F-Score上表现最优。
-
-## 整体框架
 
 PixARMesh 的整体设计围绕一个核心思想展开：将场景重建中的物体位姿估计与网格生成统一为单一的自回归序列预测任务。如图2所示，系统以单张RGB图像为输入，通过一组离线感知模型提取场景的几何与外观线索，随后在一个共享的自回归Transformer解码器中逐令牌生成每个实例的位姿和规范空间网格，最终组合为全局一致的场景。
 
@@ -123,11 +119,6 @@ $$\mathcal{L}_{\mathrm{ce}} = -\sum_{t=1}^{T} \log p_{\theta}(s_t \mid s_{<t}, \
 
 ![[assets/figures/papers/paper_list_l2569_https_arxiv_org_abs_2603_05888/figures/002_Figure_2.jpg]]
 *Figure 2: Pipeline overview. Given an RGB image, we use pretrained models to extract the depth point cloud and image features for both the target object i and the global scene. These local and global cues are fed into the Pixel-Aligned PC-Encoder to produce the fused latent code, which is then aggregated into a single latent vector via cross-attention. This latent vector conditions the Transformer Decoder, which predicts the object’s pose followed by its mesh token sequence*
-
-![[assets/figures/papers/paper_list_l2569_https_arxiv_org_abs_2603_05888/figures/001_Figure_1.jpg]]
-*Figure 1: Comparison of PixARMesh with recent compositional scene reconstruction methods. PixARMesh predicts object poses and reconstructs native meshes in a single autoregressive decoding process, without relying on SDF-based surface extraction or layout optimization, producing compact and artist-ready mesh outputs*
-
-## 核心模块与公式推导
 
 PixARMesh 的核心架构围绕一个统一的**自回归 Transformer 解码器**展开，该解码器以序列化令牌（token）的形式同时预测物体位姿与规范空间网格，从而将场景重建转化为端到端的序列生成任务。整个流程由三个关键模块协同完成：像素对齐点云编码器、场景上下文聚合机制，以及位姿-网格联合序列建模。
 
@@ -185,7 +176,7 @@ $$\mathcal { L } _ { \mathrm { c e } } = - \sum _ { t = 1 } ^ { T } \log p _ { \
 
 模型在给定过去令牌 `s_<t` 和聚合潜在编码 `z_agg` 的条件下，逐令牌预测整个序列。位姿令牌和网格令牌在训练中**联合优化**，迫使模型学习布局推理与几何生成之间的协同关系。消融实验（Table 2）表明，联合建模相比两阶段分离设计，将物体 Chamfer 距离从 4.75 降至 4.04，F-Score 从 80.85 提升至 82.27，验证了统一序列建模的有效性。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -227,24 +218,10 @@ PixARMesh在3D-FRONT数据集上与多个SOTA方法进行了定量对比（Table
 ![[assets/figures/papers/paper_list_l2569_https_arxiv_org_abs_2603_05888/figures/007_Table_3.jpg]]
 *Table 3: Ablation studies on our point-cloud encoder design. Img Feat, Ctx Agg denote pixel-aligned image features and scene context aggregation, respectively*
 
-![[assets/figures/papers/paper_list_l2569_https_arxiv_org_abs_2603_05888/figures/008_Table_4.jpg]]
-*Table 4: Effects of depth and layout in object-level metrics*
-
-![[assets/figures/papers/paper_list_l2569_https_arxiv_org_abs_2603_05888/figures/006_Table_5.jpg]]
-*Table 5: Effects of upstream (depth, segmentation, and layout) errors in scene-level metrics. Note that ground-truth layout implies ground-truth segmentation*
-
 ![[assets/figures/papers/paper_list_l2569_https_arxiv_org_abs_2603_05888/figures/011_Figure.jpg]]
 *Figure: A.1. Additional qualitative results on real images from Pix3D, Matterport3D and ScanNet *
 
-![[assets/figures/papers/paper_list_l2569_https_arxiv_org_abs_2603_05888/figures/010_Table.jpg]]
-*Table: A.2. Layout accuracy comparisons*
-
-![[assets/figures/papers/paper_list_l2569_https_arxiv_org_abs_2603_05888/figures/012_Table.jpg]]
-*Table: A.3. Inference runtime comparisons*
-
-![[assets/figures/papers/paper_list_l2569_https_arxiv_org_abs_2603_05888/figures/009_Table.jpg]]
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 单视图场景重建的演化脉络
 

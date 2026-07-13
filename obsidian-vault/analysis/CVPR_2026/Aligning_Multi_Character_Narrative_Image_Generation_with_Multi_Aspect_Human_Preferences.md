@@ -43,7 +43,7 @@ claims:
 > - NI-Bench（生成质量） 上，NIReward 视觉质量分数 (V.Q.) ADPO + NIReward: 0.131 vs Diffusion-DPO + ImageReward 等最优传统奖励模型 (优于所有对比方法)。
 > - 用户研究 上，人类偏好胜率 ADPO + NIReward 显著优于其他 DPO 方法 vs Diffusion-DPO 变体 (人类偏好显著偏向本方法)。
 
-## 概述
+## 概要
 
 多角色叙事图像生成面临三大核心挑战：**语义对齐差**（角色姿态与表情过拟合参考图像，偏离文本提示）、**身份混合**（面部特征融合导致角色区分度低）以及**美学缺陷**（如解剖结构不一致，见图1）。根本瓶颈在于，现有文本到图像扩散模型缺乏对提示跟随、身份一致性和视觉质量的多维人类偏好对齐，而通用自动评价指标（如CLIP、ArcFace）与人类感知严重不一致。
 
@@ -51,7 +51,7 @@ claims:
 
 核心实验证据表明：NIReward 在身份一致性上的偏好预测准确率超越 GPT-4o-mini 高达 **38.35%**（Table 1）；ADPO 搭配 NIReward 在提示跟随、身份一致性和视觉质量三个维度上全面超越 Diffusion-DPO 搭配传统奖励模型（Table 2）；批判机制使视觉质量准确率提升 **10.34%**（Table 4），验证了可解释推理路径对偏好建模的关键作用。用户研究进一步确认，本方法生成的结果更符合人类偏好（Figure 4）。
 
-## 背景与动机
+
 
 ### 多角色叙事图像生成的核心挑战
 
@@ -81,7 +81,9 @@ claims:
 
 两者协同工作：NIReward 提供可信的多维反馈，ADPO 利用该反馈进行平衡的偏好优化，最终使生成过程直接对齐人类在提示跟随、身份一致性和视觉质量上的复合偏好。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作针对多角色叙事图像生成中“通用自动评价指标与人类感知偏好严重不一致”这一瓶颈，提出了**可解释的多维奖励模型 NIReward** 与**自适应支配偏好优化算法 ADPO**，形成从奖励信号构建到策略优化的完整对齐链路。核心创新可归结为三个关键组件的改变。
 
@@ -117,7 +119,7 @@ $$\beta(a) = \beta \left(1 + \eta \left(1 - e^{-k(a - b)}\right)\right)$$
 
 三个创新组件形成递进闭环：NIReward 提供可解释的多维奖励信号，使维度级支配判断成为可能；支配比较策略与拒绝采样从信号中提取高置信度、无冲突的偏好对；自适应加权学习则根据偏好对的置信度差异精细调控优化强度，避免多维度间的失衡。这一“可解释奖励 → 支配筛选 → 自适应优化”的链路，使生成过程直接对齐人类在提示跟随、身份一致性和视觉质量上的细粒度偏好，而非间接拟合单一标量分数。
 
-## 整体框架
+
 
 本工作提出了一套面向多角色叙事图像生成的偏好对齐框架，其核心由三个模块串联构成：**NI‑RLHF 数据集**、**NIReward 奖励模型**与 **ADPO 偏好优化算法**。整体流程如图 3 所示：首先基于 NI‑RLHF 数据集训练一个可解释的多维奖励模型 NIReward；随后在 ADPO 的“采样—评分—比较—优化”四阶段循环中，利用 NIReward 的多维支配信号对基础个性化生成模型进行偏好微调，最终使生成结果在提示跟随、身份一致性与视觉质量三个维度上同时逼近人类偏好。
 
@@ -142,7 +144,7 @@ $$\beta(a) = \beta \left(1 + \eta \left(1 - e^{-k(a - b)}\right)\right)$$
 ![[assets/figures/papers/paper_list_l982_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_Aligning_Multi_Cha/figures/003_Figure_3.jpg]]
 *Figure 3: The overview of proposed NIReward training and ADPO. During the NIReward Training, NIReward learns to provide critiques and rewards based on annotated winning/losing image pairs; and ADPO aligns the model with human preferences through sampling, scoring, dominating comparison, and preference optimization*
 
-## 核心模块与公式推导
+
 
 ### 1. NIReward：基于批判的多维奖励模型
 
@@ -208,7 +210,9 @@ NIReward 提供的**可解释批判**解决了传统奖励模型的“黑箱”�
 ![[assets/figures/papers/paper_list_l982_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_Aligning_Multi_Cha/figures/002_Figure_2.jpg]]
 *Figure 2: NI-RLHF construction pipeline. It consists of two stages: (1) Data Collection: generate multi-character images using personalized T2I models. (2) Data Annotation: MLLM-based human annotation of prompt following, identity consistency, and visual quality*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与评估体系
 
@@ -269,7 +273,9 @@ Figure 5 展示了不同 DPO 方法的定性生成比较。在“女人做沙拉
 ![[assets/figures/papers/paper_list_l982_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_Aligning_Multi_Cha/figures/001_Figure_1.jpg]]
 *Figure 1: Challenges in multi-character narrative image generation: (a) Characters display portrait poses with the elderly man’s expression overfitting to reference rather than aligning with the prompt; (b) Low facial distinctiveness with blended identity features; (c) Anatomical inconsistency shown in the girl’s incompletely rendered lower body*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1 问题定位：多角色叙事生成中的奖励信号困境
 
@@ -347,6 +353,8 @@ ADPO 在上述谱系中的定位是：**以多维支配比较替代标量比较�
 1. **批判引导奖励的泛化性**：NIReward 的批判-奖励两阶段范式能否泛化到其他需要细粒度视觉理解的评估任务（如布局准确性、风格一致性），以及如何以较低成本扩展批判维度。
 2. **多维支配的帕累托前沿**：ADPO 的支配比较策略本质上是寻找帕累托占优的偏好对，当多个维度存在冲突时（如提示跟随与视觉质量之间的权衡），帕累托前沿上的偏好对可能变得稀疏，如何在这种情况下保持优化稳定性值得进一步研究。
 3. **自适应加权的理论性质**：自适应缩放因子 $\beta(a) = \beta(1 + \eta(1 - e^{-k(a-b)}))$ 引入了超参数 $b$、$\eta$、$k$，其对不同奖励分布和任务场景的敏感性缺乏理论分析。
+
+
 
 ## 原文 PDF
 

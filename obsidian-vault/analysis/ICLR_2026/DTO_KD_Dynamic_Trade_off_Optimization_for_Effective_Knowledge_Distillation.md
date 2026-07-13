@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/DTO_KD_Dynamic_Trade_off_Optimization_for_Effective_Knowledge_Distillation.pdf
+project_link: null
+code_link: null
 openreview_forum_id: QMItTyQW92
 aliases:
 - DK
@@ -42,7 +44,7 @@ claims:
 > - ImageNet-1K (DeiT-S) 上，Top-1 Accuracy (%) 为 83.1，对比 81.2，变化 +1.9。
 > - COCO (ViDT-nano) 上，AP 为 43.7，对比 43.0，变化 +0.7。
 
-## 概述
+## 概要
 
 知识蒸馏（Knowledge Distillation, KD）旨在将大型教师模型的知识迁移到轻量级学生模型，但传统方法面临一个关键瓶颈：**梯度冲突（Gradient Conflict, GrC）与梯度主导（Gradient Dominance, GrD）**。当任务损失与蒸馏损失的梯度方向不一致（内积为负）或某一方梯度幅值压倒另一方时，学生模型无法有效同时优化两个目标，导致蒸馏效果受限。
 
@@ -56,7 +58,7 @@ claims:
 
 **方法定位：** DTO-KD 属于梯度层面的动态权衡蒸馏方法，区别于固定权重的传统 KD 框架（如 DeiT-KD、DearKD）。其知识库贡献在于：首次将 KD 训练中的梯度冲突与主导问题形式化为可求解的多目标优化，并提供闭式解实现高效的每迭代动态平衡。
 
-## 背景与动机
+
 
 知识蒸馏（Knowledge Distillation, KD）是模型压缩与迁移学习的核心范式，其基本思想是将大型教师模型的知识迁移到轻量级学生模型中。传统知识蒸馏的训练目标通常被形式化为任务损失与蒸馏损失的固定权重线性组合：
 
@@ -72,7 +74,9 @@ $$ \operatorname { L } _ { \operatorname { t o t } } ( \pmb \theta ) \triangleq 
 
 DTO-KD 的核心动机正是针对上述梯度层面的结构性问题。该方法将知识蒸馏重新建模为多目标优化（Multi-Objective Optimization, MOO）问题，在每次迭代中动态求解蒸馏损失与任务损失的最优权重，使两者梯度对齐并消除主导关系，引导优化过程走向帕累托最优的平衡更新。这一设计消除了手动调节损失权重的需求，从根本上解决了梯度冲突与梯度主导对知识迁移效果的制约。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DTO-KD 的核心创新在于将知识蒸馏的训练过程重新建模为**梯度层面的多目标优化问题**，从而动态、自适应地平衡蒸馏损失与任务损失之间的贡献，而非依赖固定的超参数权重。
 
@@ -119,7 +123,7 @@ Figure 1 的梯度动力学分析直接验证了因果机制的生效：DTO-KD �
 
 除动态权衡优化外，DTO-KD 还引入轻量级投影器（Projector）用于对齐教师与学生不同尺度的特征，消融实验表明该组件单独贡献 +2.1 AP 的提升（Table 4），是整体框架中增益最大的模块。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_QMItTyQW92/figures/003_Figure_2.jpg]]
 *Figure 2: In DTO-KD, the teacher and student models simultaneously process the input image x. Each network consists of a Swin Transformer with a lightweight decoder. The teacher’s features (zt), and the student’s ( $z _ { s }$ ) . , are aligned using multiple lightweight projectors (P) at different scales. We formulate training as a multi-objective optimization (MOO) problem and propose a Dynamic Tradeoff Optimization module that jointly minimizes the distillation loss $\mathrm { L _ { d i s t i l l } }$ and the task-specific loss $\mathrm { L } _ { \mathrm { t a s k } }$ , guiding them toward Pareto optimality
@@ -149,7 +153,7 @@ DTO-KD 将知识蒸馏训练重新表述为**梯度层面的多目标优化**（
 
 该 pipeline 的设计直指知识蒸馏的核心瓶颈：**梯度冲突使两个目标相互抵消，梯度主导则使优化偏向单一目标**。动态权衡优化模块通过每步自适应调整权重，使聚合梯度对两个目标贡献均等（Corollary 3.3），从而引导训练走向帕累托最优。Figure 1 的实验证据表明，相比固定权重基线，DTO-KD 实现了更低的梯度冲突分数和更均衡的梯度主导比，验证了该框架在梯度层面的有效性。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化
 
@@ -203,7 +207,9 @@ $$ \pi _ { 1 } ^ { * } = \frac { g _ { 22 } - g _ { 12 } } { g _ { 11 } + g _ { 
 
 为对齐教师与学生网络不同尺度的特征，DTO-KD 引入多个轻量级投影器 $P$（Figure 2）。投影器将学生特征 $\pmb{z}_s$ 映射到教师特征 $\pmb{z}_t$ 的维度空间，用于计算蒸馏损失 $\mathrm{L}_{\mathrm{distill}}$。消融实验（Table 4）表明，投影器是贡献最显著的组件，单独引入即带来 +2.1 AP 的提升；动态优化模块在此基础上进一步贡献 +0.3 AP；梯度裁剪作为后处理步骤额外带来 +0.1 AP 的轻微增益。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈验证：梯度冲突与主导的消除
 
@@ -304,7 +310,9 @@ Table 5 检验了 DTO-KD 在不同教师模型下的表现。以 ViDT-nano 和 V
 
 > **注意**：SRD 方法的引用元数据在分析中缺失，如需在正文中引用，请手动核实其出处。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 瓶颈诊断：梯度冲突与梯度主导
 
@@ -369,6 +377,8 @@ $$ \pi _ { 1 } ^ { * } = \frac { g _ { 22 } - g _ { 12 } } { g _ { 11 } + g _ { 
 2. **多教师多目标泛化**：当蒸馏源扩展至多个教师或引入额外的正则化目标时，当前二目标闭式解需要推广至 $K > 2$ 的情形，其计算效率与收敛性如何？
 3. **大规模与跨模态验证**：方法在 100M+ 参数模型和 NLP/语音等序列建模任务上，梯度冲突的模式是否类似，动态权衡策略是否依然有效？
 4. **与架构搜索的联合**：动态权重策略能否嵌入 NAS 流程，在架构搜索阶段同时优化蒸馏强度，实现端到端的师生协同设计？
+
+
 
 ## 原文 PDF
 

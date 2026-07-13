@@ -42,7 +42,7 @@ claims:
 > - LIBERO (4 suites average) 上，Average Success Rate 96.5% vs 76.5% (OpenVLA, 20.0% gap) / SOTA UniVLA (+20.0% over OpenVLA)。
 > - LIBERO-Long 上，LIBERO-Long Success Rate 94.0%。
 
-## 概述
+## 概要
 
 当前视觉-语言-动作（VLA）模型在机器人操控任务中主要依赖2D图像和瞬时观测，缺乏对3D空间关系与未来动态的预测能力，导致在需要精确3D推理的操控场景中表现不佳。GeoPredict 针对这一瓶颈，提出了一种几何感知的VLA框架，通过在训练阶段引入**预测性运动学先验**和**3D高斯几何先验**来增强策略的3D推理能力，而推理时不增加任何额外的3D解码开销。
 
@@ -52,7 +52,7 @@ GeoPredict 的核心思路是“以预测促感知”：模型联合学习未来
 
 消融实验进一步揭示了各组件的因果贡献：仅添加历史轨迹编码器使成功率从 42.3% 提升至 44.8%，加入未来轨迹预测损失后提升至 47.2%，联合深度监督达到 50.5%，而启用完整的轨迹引导细化机制后达到最高的 **52.4%**，证明自适应几何容量分配是性能提升的核心机制。
 
-## 背景与动机
+
 
 视觉-语言-动作（VLA）模型近年来在机器人操控领域取得了显著进展，但其核心能力仍受限于对2D图像和瞬时观测的依赖。当前主流VLA模型，如**π0**（连续动作流匹配）和**OpenVLA**（Kim et al., CoRL 2025，基于离散动作token），主要从当前时刻的多视角RGB图像中提取特征来生成动作指令。这种设计在需要精确3D空间推理的操控任务中暴露出根本性缺陷：模型缺乏对三维空间关系的深层理解，也无法预判机器人运动与环境交互的未来动态。
 
@@ -62,7 +62,9 @@ GeoPredict 的核心思路是“以预测促感知”：模型联合学习未来
 
 GeoPredict的核心动机在于：**能否在不增加推理开销的前提下，为VLA策略注入预测性运动学和几何先验？** 其关键洞察是——仅在训练阶段利用未来深度渲染监督来学习预测性3D表示，推理时保持与标准VLA一致的计算流程，即可显著提升策略的3D感知和长时域规划能力。这一设计通过两个互补的预测模块实现：轨迹级预测模块编码机器人关键点运动历史并预测未来多步3D轨迹，3D高斯几何模块则预测未来工作空间的几何结构。两个模块作为训练时的辅助监督信号，驱动底层LLM Transformer学习更丰富的时空表征，而推理阶段无需调用任何3D解码器。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GeoPredict 的核心创新在于**将预测性运动学先验与预测性3D几何先验注入连续动作VLA策略的训练过程**，而推理时完全不引入额外计算开销。这一设计直接回应了当前VLA模型的核心瓶颈：依赖2D瞬时观测，缺乏对3D空间关系和未来动态的预测能力，导致在需要精确3D推理的操控任务中表现不佳。
 
@@ -102,7 +104,7 @@ GeoPredict最具实用价值的创新在于其**训练-推理解耦策略**：�
 
 GeoPredict的独特之处在于：它不改变VLA的基础架构，而是通过训练时的辅助预测任务，迫使模型学习更丰富的3D时空表示。这种“免费午餐”式的设计使其在保持推理效率的同时，获得了显著的3D推理能力提升。
 
-## 整体框架
+
 
 GeoPredict 在连续动作 VLA 策略的基础上引入两个仅在训练阶段使用的预测模块：**轨迹级运动学预测**和**预测性 3D 高斯几何建模**。其核心设计思想是，通过训练时学习未来机器人关键点轨迹和场景深度结构，为策略提供运动学先验与空间几何先验，而在推理时不增加任何 3D 解码开销。
 
@@ -154,7 +156,7 @@ Transformer 内部同时学习两个并行的预测任务：
 ![[assets/figures/papers/paper_list_l972_https_arxiv_org_abs_2512_16811/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of GeoPredict. Given an instruction, multi-view images and motion history encoded by the Track Encoder, a central LLM Transformer learns two main tasks. First, it predicts multi-timestep 3D keypoint trajectories using learnable Future Track Query. Second, it forecasts future workspace geometry as a predictive 3D Gaussian by processing a 3D Spatial Query through a Voxel Decoder. A track-guided refinement mechanism leverages the predicted future tracks to allocate geometric capacity to task-relevant interaction regions. Our policy then generates the final action via an Action Expert. Crucially, these predictive modules serve exclusively as trainingtime supervision and are not invoked...*
 
-## 核心模块与公式推导
+
 
 GeoPredict 的核心设计思想是在训练阶段引入两个预测性模块——轨迹级运动学预测与 3D 高斯几何预测——为底层 VLA 策略提供未来运动学先验和空间几何先验，而在推理时这两个模块均不执行，从而在不增加推理开销的前提下显著提升 3D 感知与长时域规划能力。
 
@@ -227,7 +229,9 @@ $$
 ![[assets/figures/papers/paper_list_l972_https_arxiv_org_abs_2512_16811/figures/002_Figure_2.jpg]]
 *Figure 2: Block-wise Causal Attention Mechanism. For simplicity, the detailed attention pathways from the 3D Token and State Token blocks to other blocks are not fully drawn*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 仿真基准评估
 
@@ -285,7 +289,9 @@ GeoPredict在两个主流的机器人操控仿真基准上进行了系统评估�
 ![[assets/figures/papers/paper_list_l972_https_arxiv_org_abs_2512_16811/figures/006_Figure_4.jpg]]
 *Figure 4: Qualitative Comparisons of Future Depth Rendering. Visualizations are shown for timesteps*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的差异化关系
 
@@ -322,6 +328,8 @@ GeoPredict 的设计存在若干明确的适用边界：
 3. **预测窗口的时域扩展**：H=50 的预测窗口是否适用于更长时间的任务？增加预测窗口是否会引入累积误差，以及如何通过训练策略缓解这一问题？
 
 4. **多模态感知融合的潜力**：当前方法使用多视角 RGB 图像作为视觉输入。触觉、力觉等模态的融入是否能进一步增强几何预测的精度和操控的鲁棒性？
+
+
 
 ## 原文 PDF
 

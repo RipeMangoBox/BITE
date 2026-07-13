@@ -43,7 +43,7 @@ claims:
 > - PhysVideoBench 上，ΔJ (Jerk 误差) 0.33 vs 0.74 (VideoJam) (-55.4%)；L_div (流体散度误差) 2.9 vs 4.7 (VideoJam) (-38.3%)；Appear. (VBench) 73.1 vs 71.6 (VideoJam) (+1.5)。
 > - WebVid-10M 上，FVD 275 vs 322 (VideoFactory) (-14.6%)；CLIPSIM 0.34 vs 0.31 (VideoFactory) (+9.7%)。
 
-## 概述
+## 概要
 
 现有视频扩散模型（如 Sora）虽能生成视觉质量极高的视频，但其生成的运动常违反物理规律——刚体出现非刚性变形、流体缺乏连续性，根本原因在于生成过程未引入物理约束。**NS-Diff**（CVPR 2026）针对这一瓶颈，提出了一种基于强化学习的物理引导视频扩散框架。其核心思路是：将简化的可微分物理约束（刚体最小加加速度、流体不可压缩性等）作为强化学习的奖励函数，在潜空间内直接优化扩散轨迹，从而显著提升视频的物理一致性，无需额外标注或外部仿真。
 
@@ -51,7 +51,7 @@ claims:
 
 实验结果表明，NS-Diff 在 PhysVideoBench 上将 Jerk 误差（ΔJ）降至 0.33，相比 VideoJam（0.74）降低 55.4%；流体散度误差（L_div）降至 2.9，相比 VideoJam（4.7）降低 38.3%；同时 FVD 指标提升 22.7%，视觉质量（VBench）也略有提升。消融实验进一步证实，RL 优化、物理条件注入、自适应调度器及流体/刚体损失各自对物理一致性有显著贡献。
 
-## 背景与动机
+
 
 ### 视频生成模型的物理可信度危机
 
@@ -69,7 +69,9 @@ claims:
 
 NS-Diff 的提出正是为了填补这一缺口。其核心洞见是：**将简化的可微分物理约束转化为强化学习的奖励函数，直接在潜空间内优化扩散模型的去噪轨迹**。具体而言，该方法为刚体运动设计最小加加速度（Jerk）平滑约束，为流体运动设计基于简化Navier-Stokes方程的不可压缩性约束，并通过近端策略优化（PPO）将这些物理奖励融入扩散模型的训练过程。这一设计使得物理引导无需外部仿真器，也无需额外的物理标注，即可显著提升生成视频的物理一致性——实验表明，NS-Diff 将 Jerk 误差降低 43%，流体散度误差降低 33%，FVD 指标提升 22.7%。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 NS-Diff 的核心创新在于将视频扩散模型的去噪轨迹重新形式化为**物理约束的马尔可夫决策过程（MDP）**，并通过强化学习在潜空间中直接施加物理引导，而非依赖外部仿真器或物理模拟器进行后处理。这一设计从根源上解决了现有视频扩散模型（如 Sora）生成的运动违反物理规律的问题——刚体发生非刚性变形、流体出现不连续性等。
 
@@ -118,7 +120,7 @@ $$w_t = \left\{ \begin{array}{ll} 0, & \alpha\cdot(e^{(t/T)^2}-1) \le \sigma \\ 
 
 综上，NS-Diff 的创新本质在于**将物理先验从外部约束转变为核心优化目标**，通过 RL 框架实现物理引导与视觉生成的联合优化，配合噪声感知调度确保引导精度，从而在不牺牲视觉质量的前提下大幅提升运动物理可信度。
 
-## 整体框架
+
 
 NS-Diff 将视频扩散模型的去噪轨迹重新形式化为一个物理约束的马尔可夫决策过程（MDP），在潜空间中直接引入物理引导。整体框架由三个核心模块串联构成，并通过一个自适应调度器协调物理引导的介入时机。
 
@@ -133,7 +135,7 @@ NS-Diff 将视频扩散模型的去噪轨迹重新形式化为一个物理约束
 ![[assets/figures/papers/paper_list_l2697_https_openaccess_thecvf_com_content_CVPR2026_html_Deng_NS_Diff_Fluid_Nav/figures/002_Figure_2.jpg]]
 *Figure 2: Our framework enhances video diffusion via three stages: (1) Physical Attribute Detection: noise-robust optical flow estimates motion cues and object regions; (2) Physics-Conditioned Generation: motion dynamics are encoded into latent representations and injected into the DiT through adaptive cross-attention; (3) Reinforcement Learning Optimization: policy gradients enforce rigid jerk and fluid divergence constraints. An adaptive scheduler activates physics guidance based on noise levels*
 
-## 核心模块与公式推导
+
 
 NS-Diff 将视频扩散模型的去噪轨迹重新形式化为一个**物理约束的马尔可夫决策过程（MDP）**，并通过三个核心模块在潜空间中施加物理引导：物理属性检测、物理条件潜变量注入（PCLI）、以及强化学习优化。以下按模块拆解其关键公式与机制。
 
@@ -208,7 +210,9 @@ $$w_t = \left\{ \begin{array}{ll} 0, & \alpha\cdot(e^{(t/T)^2}-1) \le \sigma \\ 
 ![[assets/figures/papers/paper_list_l2697_https_openaccess_thecvf_com_content_CVPR2026_html_Deng_NS_Diff_Fluid_Nav/figures/010_Figure_4.jpg]]
 *Figure 4: t-SNE visualization of material embeddings*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要性能对比
 
@@ -265,7 +269,9 @@ Table 7 的超参数敏感性分析表明，噪声阈值 σ 和对流权重 η �
 
 所有方法均在统一设置下评估：生成 2048 个片段，16 帧，256×256 分辨率，不使用文本提示或类别标签。物理指标（ΔJ、L_div）基于数据集真实光流或深度对齐的运动代理计算，避免学习型光流估计器的偏差。FVD 采用预训练于 Kinetics-400 的 I3D 模型评估。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 物理感知视频生成中的方法定位
 
@@ -306,6 +312,8 @@ NS-Diff 的设计基于以下关键假设和简化，定义了其当前适用边
 ### 知识库贡献
 
 NS-Diff 的核心知识贡献在于**证明了强化学习可以有效地将可微分物理约束注入扩散模型的潜空间去噪轨迹**，而无需外部仿真器或额外标注。这一范式为物理感知生成模型开辟了新路径：将物理定律形式化为奖励函数，通过策略梯度直接优化生成过程。其自适应物理激活调度器（eq.19）解决了高噪声下物理梯度不可靠的关键工程挑战，这一设计模式可被后续工作在更广泛的物理领域中复用。
+
+
 
 ## 原文 PDF
 

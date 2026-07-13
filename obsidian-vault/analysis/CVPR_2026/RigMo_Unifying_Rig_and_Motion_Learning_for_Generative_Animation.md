@@ -44,7 +44,7 @@ claims:
 > - DeformingThings4D (Reconstruction) 上，CD-L1 (×10^{-2}) 1.73 ± 0.11；CD-L2 (×10^{-2}) 1.26 ± 0.08。
 > - DeformingThings4D (Inference) 上，Time (20f) 0.74s。
 
-## 概述
+## 概要
 
 三维可变形物体的动画生成长期面临一个根本性瓶颈：骨骼绑定（rigging）与运动生成被割裂为两个独立任务。传统管线依赖艺术家手工设计的骨架与蒙皮权重，或通过逐序列非线性优化（如 SSDR）进行逆向绑定，难以扩展至任意形状和大规模数据。这种分离式范式缺乏统一的刚性结构与运动动力学联合学习框架，导致自动化程度低、泛化能力弱。
 
@@ -55,8 +55,6 @@ RigMo 提出了一种前馈式生成动画框架，通过纯自监督学习从�
 在方法谱系上，RigMo 区别于依赖标注数据的自动绑定方法（如 **UniRig**）和逐序列优化方案（**SSDR**），通过前馈网络直接从顶点轨迹中发现可泛化的关节结构，打通了结构—运动联合建模的关键链路。其生成范式也从传统的顶点空间直接生成或预定义骨架姿势生成，转向在学习的运动潜空间中进行条件扩散生成，为 4D 动画的创建与控制提供了新的技术路径。
 
 需要指出的是，RigMo 当前假设输入网格序列具有一致的拓扑与顶点数，训练数据主要来自动物和人体，对机械装置、植物等非典型可变形物体的泛化能力有待验证。此外，高斯骨骼数量 K 需提前设定，生成的运动仍受限于训练数据的多样性，在外推姿势时可能产生非物理形变。
-
-## 背景与动机
 
 ### 问题背景
 
@@ -88,7 +86,7 @@ RigMo 提出了一种前馈式生成动画框架，通过纯自监督学习从�
 
 这一思路的技术可行性建立在三个关键设计之上：（1）双分支编码器将静态几何与动态运动解耦为刚性潜变量和运动潜变量；（2）基于马氏距离的可微高斯蒙皮模块，使骨骼参数的梯度能够通过线性混合蒙皮（LBS）反向传播至编码器；（3）测地线感知的权重细化机制，利用表面拓扑距离抑制跨部位的非物理影响，保证蒙皮权重的拓扑一致性。这些组件共同构成了一个无需任何骨骼或蒙皮标注、仅依赖顶点重建损失即可端到端训练的统一框架，为大规模生成式动画开辟了新路径。
 
-## 核心创新
+## 核心方法与创新机理
 
 RigMo 的核心创新在于将**骨骼绑定推断**与**运动生成**统一为一个纯自监督的前馈框架，从根本上改变了传统动画管线中“先绑定、后驱动”的分离范式。其关键突破体现在以下四个维度。
 
@@ -107,8 +105,6 @@ RigMo 的核心创新在于将**骨骼绑定推断**与**运动生成**统一为
 ### 从强监督到纯自监督的训练范式
 
 传统绑定与运动生成方法依赖人工标注的骨架拓扑、蒙皮权重或姿势参数进行监督，标注成本高昂且难以扩展至任意形状。RigMo 实现了**完全的标注解耦**：整个 RigMo-VAE 仅通过顶点重建损失 $\mathcal{L}_{\text{recon}}$ 和 KL 正则项 $\mathcal{L}_{\text{KL}}$ 进行端到端训练（Eq. 16–18），无需任何 rig 相关的监督信号。这一设计使得模型能够利用约 20,000 个来自 DeformingThings4D、TrueBones 和 Objaverse-XL 的网格序列进行大规模预训练，从根本上解决了标注瓶颈对可扩展性的制约。
-
-## 整体框架
 
 RigMo 提出了一种前馈式动画生成框架，其核心思路是将骨骼绑定（rigging）与运动学习（motion）统一到一个端到端的可学习管线中，直接从原始网格顶点序列出发，无需任何人工标注的骨架、蒙皮权重或姿态参数。整个 pipeline 由两大阶段构成：（1）**RigMo-VAE**，负责从动态网格中解耦出静态的刚性结构与动态的运动潜变量，并实现高保真重建；（2）**Motion DiT**，在 RigMo-VAE 学到的运动潜空间中进行条件扩散生成，实现结构感知的动画合成与控制。
 
@@ -150,8 +146,6 @@ RigMo-VAE 的设计遵循“结构-运动解耦”原则，通过双路径编码
 
 ![[assets/figures/papers/paper_list_l26_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_RigMo_Unifying_R/figures/001_Figure_1.jpg]]
 *Figure 1: RigMo jointly learns rigging and motion by understanding the underlying structure of mesh sequences. Unlike optimizationbased methods that fit a rig per sequence, RigMo is a feed-forward framework that infers Gaussian bones, skinning weights, and motion parameters directly from input meshes for unified 4D animation generation. Colors visualize the influence of Gaussian bones on vertices (skinning weights) across the mesh surface; similar colors may appear for different bones as they are randomly assigned for visualization*
-
-## 核心模块与公式推导
 
 RigMo 的核心架构由两大组件构成：**RigMo-VAE** 负责从原始网格序列中自监督地学习骨骼绑定与运动表示，**Motion DiT** 则在该学习的运动潜空间中进行条件扩散生成。以下按模块拆解其关键设计与公式。
 
@@ -261,7 +255,7 @@ $$\mathcal{L} = \lambda_{\mathrm{lat}} \mathcal{L}_{\mathrm{lat}} + \lambda_{\ma
 ![[assets/figures/papers/paper_list_l26_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_RigMo_Unifying_R/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of the Motion DiT. Given static rigging features, a condition encoder produces anchor and global tokens that guide a diffusion transformer operating in RigMo’s motion-latent space. The model uses spatial, temporal, and frame-conditioned cross-attention to predict denoised motion latents, which are decoded into bone transformations and vertex sequences via Gaussian skinning*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 数据集与评估协议
 
@@ -312,12 +306,7 @@ Table 3 在 DT4D 验证集上对关键设计选择进行了消融分析。
 
 这些局限为后续研究指明了方向：引入自适应骨骼数量推断、融合多模态条件信号、以及施加物理约束的生成机制，将是提升框架泛化性和鲁棒性的关键路径。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l26_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_RigMo_Unifying_R/figures/004_Figure_4.jpg]]
-*Figure 4: Results produced by the full RigMo. Given a sparse input sequence, where a subset of frames is observed according to a frame mask, RigMo reconstructs a complete animatable model by jointly predicting the rigging structure (Gaussian bones and skinning weights) and synthesizing the missing motion frames through diffusion in the RigMo latent space. The resulting rigged model produces coherent, articulated motion across humans, animals, and diverse non-human shapes, demonstrating that sparse observations are sufficient to recover a full animation without category-specific priors*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 核心问题与现有范式
 

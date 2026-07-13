@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/UniHM_Unified_Dexterous_Hand_Manipulation_with_Vision_Language_Model.pdf
+project_link: https://unihm.github.io/
+code_link: null
 openreview_forum_id: cVX3VqO8BO
 aliases:
 - UniHM
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | UniHM：基于视觉语言模型的统一灵巧手操作 |
 | 英文题名 | UniHM: Unified Dexterous Hand Manipulation with Vision Language Model |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=cVX3VqO8BO); [Project](https://unihm.github.io/) |
+| Links | [paper](https://openreview.net/forum?id=cVX3VqO8BO) · [Project](https://unihm.github.io/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | UniHM |
 | Dataset | DexYCB (Seen), OakInk (Seen) |
@@ -41,7 +43,7 @@ claims:
 > - DexYCB (Seen) 上，FPL↓ 为 12.15，对比 MotionGPT3: 19.32，变化 -7.17。
 > - OakInk (Seen) 上，FPL↓ 为 19.86，对比 MotionGPT3: 23.98，变化 -4.12。
 
-## 概述
+## 概要
 
 灵巧手操作是具身智能走向真实世界应用的关键瓶颈。现有方法大多局限于静态抓取姿态生成，或依赖预定义的交互序列，难以理解开放词汇的语言指令，更无法生成跨手部形态、长时域的物理可行操作轨迹。**UniHM** 作为首个以自由语言指令为条件的统一灵巧手操作框架，直接回应了这一核心矛盾。
 
@@ -55,7 +57,7 @@ claims:
 
 值得注意的是，整个框架仅依赖人类-物体交互（HOI）视频数据与 GPT-4o 自动语言标注，无需昂贵的遥操作数据，显著降低了灵巧手操作学习的数据门槛。这一数据效率优势，结合统一的形态无关表示，使 UniHM 成为向通用灵巧操作迈出的重要一步。
 
-## 背景与动机
+
 
 灵巧手操作是机器人学中长期存在的核心挑战。与简单夹爪的抓取不同，灵巧手拥有多指、多自由度的结构，能够执行抓取、放置、推拉、开合等丰富操作，但这也使得运动规划与控制变得极为复杂。近年来，基于学习的方法在灵巧手操作上取得了显著进展，然而现有工作普遍面临两个关键瓶颈：
 
@@ -71,7 +73,9 @@ claims:
 
 综上所述，UniHM 试图回答一个核心问题：**能否构建一个统一的框架，使得单一模型在仅依赖 HOI 视频数据训练后，即可理解开放词汇语言指令，并为多种异构灵巧手生成物理可行的操作序列？** 这一问题的解决将显著推动灵巧手操作从实验室走向真实世界应用。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 UniHM 的核心创新在于将灵巧手操作从“特定形态、预设轨迹”推进到“跨形态、开放指令、物理可行”的统一框架。其关键设计围绕三个 **changed slots** 展开：
 
@@ -111,7 +115,7 @@ $$(J_t^{\mathrm{T}} J_t + \mathbf{W}_{\mathrm{gen}} + \mathbf{W}_{\mathrm{vel}} 
 
 与依赖遥操作数据的基线不同，UniHM 仅使用**人类-物体交互（HOI）视频数据**，通过 GPT-4o 自动标注语言指令，以 Dex-Retargeting 将 MANO 姿态映射到多种机器人手，配合能量优化提高物理一致性。这一范式大幅降低了数据获取成本，同时使模型天然具备跨具身泛化能力——真实世界实验中，UniHM 在未见对象上的 Pick & Place 成功率达 35%，优于 MotionGPT3+Dex-Retargeting 的 25%（Table 3）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_cVX3VqO8BO/figures/002_Figure_2.jpg]]
 *Figure 2: Pipeline. UniHM converts open-vocabulary instructions and RGB-D inputs into executable dexterous-hand trajectories via three stages: (1) morphology-agnostic motion tokenization; (2) language-guided generation that fuses text, perception, and token history to produce manipulation token sequences; and (3) physics-aware decoding with smoothness/contact priors for feasible, stable execution*
@@ -134,7 +138,7 @@ UniHM 的整体设计遵循“统一表示—语言驱动生成—物理后优�
 
 **输入输出流**：输入为自由形式语言指令 + 单帧 RGB-D 图像；输出为完整灵巧手关节轨迹序列，可直接部署到多种真实灵巧手平台（Figure 1）。
 
-## 核心模块与公式推导
+
 
 UniHM 的核心架构由三个级联模块构成：**统一灵巧手分词器**（Unified Hand-Dexterous Tokenizer）负责将异构手部姿态映射到共享离散空间；**DexHand VLM** 融合多模态条件自回归生成操作 token 序列；**物理引导动态细化**（Physical-Guided Dynamic Refinement）对生成轨迹进行逐帧后优化，确保物理可行性。以下逐模块展开关键公式与变量含义。
 
@@ -218,7 +222,9 @@ $$
 
 求解得到增量 $\Delta q_t$ 后更新 $q_t \leftarrow q_t + \Delta q_t$，迭代至收敛。该优化为后处理步骤，不参与 VLM 训练，但消融实验（Table 4）表明移除该模块会导致 FPL 从 12.15 升至 16.22，FID 从 31.24 升至 38.56，验证了其对穿透抑制和分布保真的双重作用。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -367,7 +373,9 @@ UniHM 在 Seen 对象上的抓取成功率达到 65%，相比 MotionGPT3+Dex-Ret
 *Figure 12: Figure B2: Optimization results when the point cloud includes noise. Here, the black points represent the object point cloud, and the red/green points denote the positions of the dexterous hand’s fingertips. (A) Optimization using the f ( d ) kernel, visualized on the noisy input. (B) Optimization using the Euclidean distance, visualized on the noisy input. (C) The f(d) kernel optimization result projected onto the clean noise-free point cloud. (D) The Euclidean distance optimization result projected onto the noise-free point cloud*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心瓶颈与因果机制
 
@@ -428,6 +436,8 @@ UniHM 在以下场景中存在已知局限：
 4. **语义保真度与物理可行性的权衡。** 基于人体视频的学习范式在存在显著形态差异时，如何保证生成动作既保持原始语义意图（如“捏”与“抓”的区分），又满足目标手部的物理约束？知识蒸馏过程中的语义信息保留机制值得深入研究。
 
 5. **组合泛化与多步推理。** UniHM 展示的开放指令泛化能力是否可迁移到更复杂的语言组合（未见动词-名词对）和多步推理任务？这可能需要引入层次化任务规划器，将复杂指令分解为子任务序列，再由 HOI 生成器逐段执行。
+
+
 
 ## 原文 PDF
 

@@ -41,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - VBench 上，Total Score (20% token reduction) 83.56 vs 83.61 (uniform finest, 0% reduction) (1.3x speedup, Score -0.05)；Total Score (30% token reduction) 83.42 vs 83.61 (uniform finest, 0% reduction) (1.5x speedup, Score -0.19)；Total Score (40% token reduction) 82.19 vs 83.61 (uniform finest, 0% reduction) (1.8x speedup, Score -1.42)。
 
-## 概述
+## 概要
 
 视频扩散模型近年来在生成质量上取得了显著进展，但其核心架构——扩散Transformer（DiT）——通常采用固定均匀的块划分策略，对所有时空区域使用相同的细粒度分块。这一设计忽略了视频内容在空间和时间上的高度异质性：视觉简单或静止的背景区域与复杂运动的前景区域被分配了相同数量的token，导致大量冗余计算，严重制约了推理效率。
 
@@ -55,7 +55,7 @@ claims:
 
 DynaPatch 的方法定位处于视频扩散模型效率优化的前沿：它不同于依赖启发式规则或时间步调度的粗粒度方案，也不同于事后剪枝的token选择策略，而是通过与扩散目标的联合优化，学习内容感知的、细粒度的块划分决策，实现了计算资源的高效分配。
 
-## 背景与动机
+
 
 ### 视频扩散模型的效率瓶颈
 
@@ -89,7 +89,9 @@ DynaPatch 的方法定位处于视频扩散模型效率优化的前沿：它不�
 
 3. **效率与质量的灵活权衡。** 不同应用场景对推理速度和生成质量有不同的偏好。如何在不重新训练的情况下灵活控制token减少率？
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DynaPatch 的核心创新在于将视频扩散Transformer中**固定均匀的块划分（patchification）替换为内容感知的动态机制**，通过一个与扩散模型联合优化的轻量路由器，为每个时空区域自适应选择最合适的块大小。这一设计的本质是将“在哪里分配计算资源”的决策权交给生成模型自身，而非依赖人工预设的启发式规则。
 
@@ -127,7 +129,7 @@ $$\mathcal { L } _ { \mathrm { t o t a l } } = \mathcal { L } _ { \mathrm { d i 
 
 相较于 **FlexiDiT** 的全局时间步级调度和 **D²iT** 的熵启发式训练，DynaPatch 的关键跃升在于：分块决策是**区域级、内容自适应且由扩散损失直接驱动**的，而非依赖外部启发式信号或粗粒度时间步调度。相较于 **SPViT** (Kong et al., ECCV 2022) 等token剪枝方法直接丢弃token可能造成的信息丢失，DynaPatch 通过合并相邻token保留完整信息，仅在空间粒度上做权衡。
 
-## 整体框架
+
 
 DynaPatch 的整体推理流程围绕一个核心思想展开：**让扩散模型根据视频内容复杂度，自适应地为不同时空区域选择不同的块划分粒度**。图 2 展示了完整的推理流水线。
 
@@ -191,7 +193,7 @@ $$\mathcal { L } _ { \mathrm { t o t a l } } = \mathcal { L } _ { \mathrm { d i 
 ![[assets/figures/papers/paper_list_l849_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Content_Aware_Dynam/figures/002_Figure_2.jpg]]
 *Figure 2: Overall workflow of our DynaPatch design during inference. Each small square in the latent representation indicates a (1, 2, 2) latent patch, which is the by-default patch size in baseline model*
 
-## 核心模块与公式推导
+
 
 ### 动态块划分框架概述
 
@@ -262,7 +264,9 @@ $$\mathcal { L } _ { \mathrm { b u d g e t } } = \left( \frac { 1 } { M } \sum _
 
 其中 $M$ 为区域总数，$k$ 遍历候选块大小，$C_k$ 为该块大小相对于最细粒度的 token 倍数（如 (1,2,2) 对应 $C=1$，(2,2,2) 对应 $C=0.5$，(1,4,4) 对应 $C=0.25$），$r_{\mathrm{target}}$ 为目标 token 保留比。该设计允许路由器在不同区域间灵活分配计算资源，而非强制每个区域达到相同的减少率。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验：VBench 基准上的性能与效率权衡
 
@@ -313,7 +317,9 @@ DynaPatch 的核心验证在 VBench 视频生成基准上进行，统一使用�
 
 ![[assets/figures/papers/paper_list_l849_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Content_Aware_Dynam/figures/007_Figure.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位与核心瓶颈
 
@@ -395,6 +401,8 @@ DynaPatch为视频扩散模型领域贡献了以下可迁移的知识组件：
 5. **与量化/蒸馏的协同**：动态分块与模型量化、知识蒸馏等正交加速技术的组合效果如何？是否存在协同或冲突效应？
 
 6. **实时视频生成**：该方法在实时或交互式视频生成场景下的延迟表现和用户体验影响需要进一步研究。
+
+
 
 ## 原文 PDF
 

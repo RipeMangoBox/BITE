@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Are_LLMs_Really_Not_Knowledgeable_Mining_the_Submerged_Knowledge_in_LLMs_Memory.pdf
+project_link: null
+code_link: https://github.com/taoxj2001/Hits_at_k
 aliases:
 - HK
 - ALRNKMSKLM
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 大语言模型真的缺乏知识吗？挖掘LLM记忆中的潜藏知识 |
 | 英文题名 | Are LLMs Really Not Knowledgeable? Mining the Submerged Knowledge in LLMs' Memory |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=gvUufgeJvV); [GitHub](https://github.com/taoxj2001/Hits_at_k) |
+| Links | [paper](https://openreview.net/forum?id=gvUufgeJvV) · [GitHub](https://github.com/taoxj2001/Hits_at_k) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/language_speech_and_dialog |
 | Method | Hits@k |
 | Dataset | DBpedia-Head, IMDB-Head |
@@ -41,17 +43,19 @@ claims:
 > - DBpedia-Head 上，Hits@5 为 57.9，对比 17.2，变化 +40.7。
 > - DBpedia-Head 上，Hits@50 为 83.4，对比 17.2，变化 +66.2。
 
-## 概述
+## 概要
 
 本文提出一个核心论点：大语言模型（LLM）在知识密集型问答任务中的失败，并非源于其参数中知识的缺失，而是源于**知识存储与表达之间的系统性差距**。作者通过检查token级输出分布（logits）而非仅看最终输出，揭示了模型潜藏的知识。为此，论文提出了 **Hits@k** 指标，用于独立于表面答案正确性量化这种潜藏知识保留程度。实验表明，在DBpedia数据集上，LLAMA3-8B的标准准确率（Hits@1）仅为17.2%，但Hits@5达到57.9%，Hits@50达到83.4%，证明模型存储了远超传统指标所反映的事实知识。此外，论文发现解码时允许输出“unsure”的提示设计会抑制低置信度但正确的知识表达，导致记忆掩蔽效应；通过过滤无信息token，可以恢复大量被掩蔽的正确回答。
 
-## 背景与动机
+
 
 传统观点认为，LLM在知识密集型任务中的表现不佳主要归因于其参数化知识不足。然而，作者通过分析模型输出发现，即使模型生成错误答案，其词汇概率分布中往往仍保留着正确答案。这一观察引出了本文的核心问题：**LLM真的缺乏知识，还是知识被掩蔽了？**
 
 论文指出，解码时对高概率候选token的选择策略（尤其是允许输出“unsure”的提示设计）会抑制低置信度但正确的知识表达，导致记忆掩蔽效应。例如，Figure 1展示了一个场景：模型拥有正确的记忆，但最终输出了错误答案。这种知识存储与表达之间的差距，正是本文试图量化和解决的瓶颈。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新包括：
 
@@ -69,7 +73,7 @@ claims:
 
 3. **记忆掩蔽效应的量化**：通过对比标准解码和过滤解码的答案恢复率，系统性地量化了“unsure”输出对正确知识的掩蔽程度。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__language_speech_and_dialog__b001_gvUufgeJvV_Are_LLMs_Real/figures/001_Figure_1.jpg]]
 *Figure 1: An example illustrating a scenario where a model possesses potentially correct memories yet fails to provide the correct answer.*
@@ -82,7 +86,7 @@ claims:
 
 3. **知识恢复实验**：通过过滤无信息token的解码策略，尝试恢复被掩蔽的正确回答，从而验证知识存储与表达之间的差距。
 
-## 核心模块与公式推导
+
 
 ### 5.1 Hits@k指标
 
@@ -110,7 +114,9 @@ Hits@k是本文的核心评估指标，用于量化模型潜藏知识保留程�
 - 数据集按实体流行度分为Head（前10%）、Torso、Tail，以分析流行度对知识存储的影响。
 - 使用字符串匹配（至少三个连续字符）来应对子词分词带来的匹配问题。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 6.1 主要实验结果
 
@@ -163,7 +169,9 @@ Figure 6的案例研究进一步证实，当LLAMA3-8B输出“unsure”或空白
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__language_speech_and_dialog__b001_gvUufgeJvV_Are_LLMs_Real/figures/017_Table_4.jpg]]
 *Table 4: Experimental results (Hits@k, k = 10) for models of varying sizes were obtained by testing different popularity subsets of the head-to-tail dataset.*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 本文的方法谱系可追溯至以下工作：
 
@@ -173,6 +181,8 @@ Figure 6的案例研究进一步证实，当LLAMA3-8B输出“unsure”或空白
 - **幻觉分析**：Huang et al. (2023) 和 Tonmoy et al. (2024) 的工作分析了LLM幻觉的挑战，本文从知识掩蔽的角度提供了新的解释。
 
 本文的核心贡献在于揭示了LLM知识存储与表达之间的差距，并提供了量化和缓解这一差距的方法。然而，Hits@k指标依赖于字符串匹配，可能无法完美处理子词分词问题；“Unsure”过滤解码策略被明确声明为分析性探针，而非可直接部署的推理方法；实验仅覆盖了三个数据集，可能无法完全泛化到所有知识领域。未来工作可探索更精确的匹配策略、将过滤解码改进为实用的推理增强方法，以及研究知识存储与表达差距在其他任务中的表现。
+
+
 
 ## 原文 PDF
 

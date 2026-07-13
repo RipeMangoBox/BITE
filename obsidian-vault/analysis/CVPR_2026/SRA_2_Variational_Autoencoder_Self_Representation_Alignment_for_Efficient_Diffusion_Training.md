@@ -45,7 +45,7 @@ claims:
 > - ImageNet 256×256 (with CFG, SiT-XL/2) 上，FID 1.52 (800 epochs) vs SOTA with external dependencies (e.g., REPA) (matches or surpasses)。
 > - MS-COCO T2I 上，FID↓ / PickScore↑ 4.67 / 20.92 vs vanilla SiT (not explicitly reported) (improved generation performance)。
 
-## 概述
+## 概要
 
 扩散变换器（如 SiT、DiT）在图像生成中展现出强大能力，但其训练过程缺乏内置的视觉先验引导，导致收敛缓慢。现有加速方法试图通过引入外部表征编码器（如 REPA 依赖 DINOv2）或维护双模型自对齐（如 SRA 依赖教师扩散模型）来弥补这一缺陷，但这些方案均引入了额外的计算开销与外部依赖，限制了方法的普适性和效率。
 
@@ -59,8 +59,6 @@ claims:
 - 额外计算开销仅为 **4% GFLOPs**，且引导特征提取成本为零（直接复用离线预提取的 VAE 特征）。
 - 方法可泛化至文本到图像任务，在 MS-COCO 上取得 FID **4.67**、PickScore **20.92** 的改进结果。
 
-## 背景与动机
-
 扩散变换器（Diffusion Transformers, DiTs）已成为生成式建模的主流架构，在图像、视频等任务中取得了显著成功。其训练过程通常分为两个阶段：第一阶段，使用变分自编码器（VAE）将图像压缩至低维潜在空间；第二阶段，在潜在空间中训练扩散变换器以学习去噪过程。然而，扩散变换器的训练缺乏内置的视觉先验引导，导致收敛速度缓慢——模型需要大量迭代才能逐步习得图像的语义结构与纹理细节。
 
 为加速这一收敛过程，近期工作提出了表征对齐策略。**REPA**（Yu et al., ICLR 2025）通过引入外部预训练编码器（如DINOv2）作为表征引导，将扩散模型的中间特征与外部特征对齐，从而注入语义先验。然而，该方法依赖外部模型，引入了额外的参数和计算开销。**SRA**（Jiang et al., arXiv 2025）则采用双模型自对齐策略，利用教师扩散模型提供引导，避免了外部编码器的依赖，但仍需维护双模型架构，增加了训练复杂度。这两种范式分别代表了“外部依赖”和“双模型自对齐”两条路线，但都未能同时实现轻量化与无外部依赖。
@@ -69,7 +67,7 @@ claims:
 
 基于上述动机，本文提出SRA 2（VAE Self-Representation Alignment），一种轻量级的内在引导框架。SRA 2的核心思想是：将扩散变换器的中间潜在特征与预提取的VAE特征对齐，利用VAE内置的视觉先验为扩散训练提供丰富的纹理、结构和语义引导。该方法通过一个轻量投影MLP实现特征空间变换，并以Smooth L1损失监督对齐过程，在仅增加4% GFLOPs且零额外引导特征提取成本的前提下，显著加速训练收敛并提升生成质量。
 
-## 核心创新
+## 核心方法与创新机理
 
 SRA 2 的核心创新在于**将预训练 VAE 的编码特征复用作扩散变换器训练的内在对齐信号**，从而在不引入外部模型依赖的前提下，显著加速训练收敛并提升生成质量。其关键创新点可归纳为以下三个维度。
 
@@ -96,8 +94,6 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\phi} + \lambda \cdot \mathcal{L}_
 | **额外计算开销** | 0% | 显著（外部编码器前向 + MLP） | 显著（双模型维护 + MLP） | **仅 4% GFLOPs**，零引导特征提取成本 |
 
 这种设计使 SRA 2 在保持方法简洁性的同时，实现了对依赖外部模型方法的性能匹配甚至超越。在 ImageNet 256×256 上，SiT-B/2 + SRA 2 的 FID 达到 28.89，相比 vanilla SiT 的 33.02 降低了 4.13；在 SiT-XL/2 上，800 epoch 训练的 FID 达到 1.52，匹配或超越了 REPA 等依赖外部模型的方法。
-
-## 整体框架
 
 SRA 2 的整体训练框架建立在**可扩展插值变换器（SiT）**（Ma et al., ECCV 2024）的核心架构之上，通过引入一个轻量级的**VAE特征对齐组件**，在不依赖外部编码器或双模型维护的前提下，为扩散变换器训练提供内置视觉先验引导。
 
@@ -144,8 +140,6 @@ Figure 3 清晰展示了四种训练范式的差异：
 
 > **注意**：关于对齐层和时步选择策略在不同扩散架构（如DiT）中是否需要调整，以及VAE特征对齐与外部表征对齐结合时的最佳整合方式，目前仍为开放问题。
 
-## 核心模块与公式推导
-
 SRA 2 在 SiT 扩散变换器训练框架之上引入一个轻量级的特征对齐组件，其核心由三个模块构成：VAE 特征复用、投影 MLP 与对齐损失、以及联合训练目标。整体架构如 Figure 3(d) 所示。
 
 ### VAE 特征复用
@@ -180,7 +174,7 @@ $$
 
 其中 $\mathcal{L}_{\phi}$ 为 SiT 的去噪损失（速度预测的均方误差），$\lambda$ 为对齐损失权重。消融实验确定 $\lambda=1.0$ 在主要评估指标上达到最优（Table 1）。该设计仅增加约 4% 的额外 GFLOPs，且对齐损失仅在训练时计算，推理阶段无额外开销。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -220,16 +214,13 @@ Table 5 对比了 REPA、**SRA**（Jiang et al., arXiv 2025）和 SRA 2 的训�
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l935_https_arxiv_org_abs_2601_17830/figures/005_Figure_4.jpg]]
-*Figure 4: SRA 2 Improves Visual Scaling. Top: Vanilla SiT-XL/2 and SiT-XL/2+SRA 2. Bottom: Vanilla REPA and REPA+SRA 2. Our method is verified to produce images with higher structural fidelity, finer details, and stronger semantic coherence at the same training steps compared with both vanilla SiT and vanilla REPA. Results for all methods are sampled using the same seed, noise, and class label, with a classifier-free guidance scale of 4.0 employed during sampling*
-
 ![[assets/figures/papers/paper_list_l935_https_arxiv_org_abs_2601_17830/figures/006_Table_2.jpg]]
 *Table 2: FID comparison across training iterations for accelerated alignment methods. All experiments are conducted on ImageNet (256×256) with a batch size of 256 and without CFG*
 
 ![[assets/figures/papers/paper_list_l935_https_arxiv_org_abs_2601_17830/figures/008_Table_4.jpg]]
 *Table 4: Generalization to T2I Tasks. We find that SRA 2 also generalizes to T2I tasks, yielding improved generation performance*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 问题定位：扩散变换器训练中的先验缺失与收敛瓶颈
 

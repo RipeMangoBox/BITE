@@ -44,7 +44,7 @@ claims:
 > - CMU MoCap (已见动作样本) 上，平均线速度误差 (E_vel) SMAP: 0.1698 vs OmniH2O: 0.1791 (降低0.0093 (约5.2%提升))；平均关键点位置误差 (E_mpkpe) SMAP: 0.0608 vs OmniH2O: 0.0619 (降低0.0011)；平均关节位置误差 (E_mpjpe) SMAP: 0.1181 vs OmniH2O: 0.1250 (降低0.0069)。
 > - CMU MoCap (新颖动作样本) 上，平均线速度误差 (E_vel) SMAP: 0.2331 vs OmniH2O: 0.2591 (降低0.026 (约10.0%提升))；失败次数 (fail) SMAP: 266 vs OmniH2O: 387 (减少121次)。
 
-## 概述
+## 概要
 
 人形机器人全身控制的核心瓶颈在于**人类运动与机器人动作空间之间存在异构鸿沟**：直接将重定向的人类运动作为模仿目标，往往导致物理上不可行的运动指令，从而降低强化学习（RL）训练效率并引发不稳定行为。为解决这一问题，本文提出 **SMAP（Self-supervised Motion Adaptation）**，一个自监督运动自适应框架，使Unitree H1人形机器人能够执行物理合理且富有表现力的全身动作。
 
@@ -58,7 +58,7 @@ SMAP的核心思想是**通过共享码本的向量量化周期自编码器（VQ
 
 当前方法的局限性在于：Humanoid-Adapter虽学习了共享相位流形，但缺乏显式关节对应机制，仍可能出现局部微小不匹配；运动多样性受限于所使用的MoCap数据集，对复杂地形或动态交互的泛化尚未充分验证。未来的开放问题包括：如何设计模仿目标以同时保证物理可行性与类人特性，能否引入更精细的时空对齐机制以减少适配误差，以及该方法在大规模多任务场景下的扩展性。
 
-## 背景与动机
+
 
 人形机器人因其与人类环境的天然兼容性，被视为执行多样化全身任务的理想载体。然而，实现物理上合理且稳定的全身运动控制，仍是该领域的核心挑战。当前主流方法通常将人类运动捕捉数据通过运动学重定向映射到机器人上，作为模仿学习的参考目标。这一范式面临一个关键瓶颈：**人形机器人与人类之间存在显著的动作空间异构性**。直接使用重定向的人类运动作为模仿目标，往往导致运动在物理上不可行——例如产生违反关节限位、力矩超限或动力学不一致的指令，从而严重降低强化学习的训练效率，并引发不稳定行为。
 
@@ -66,7 +66,9 @@ SMAP的核心思想是**通过共享码本的向量量化周期自编码器（VQ
 
 针对上述问题，SMAP 的核心动机在于：**能否在模仿学习之前，先行消除人类运动与机器人动作空间之间的域鸿沟？** 如果能够以自监督的方式，将人类运动映射到一个物理上合理、可直接执行的人形机器人动作空间，那么下游的策略学习将不再需要承担“纠正不可行运动”的额外负担，从而显著提升训练效率和跟踪稳定性。这一动机直接引出了 SMAP 的两项关键设计——**Humanoid-Adapter**（自监督运动适配器）和**渐进式教师-学生策略蒸馏**，前者负责弥合跨域鸿沟，后者则在适配运动的基础上实现高效、鲁棒的 sim-to-real 控制。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SMAP 的核心创新在于系统性地解决了**人形机器人与人类运动之间的动作空间异构性**这一瓶颈。现有方法（如 HumanPlus、OmniH2O、Exbody 等）通常直接将重定向的人类运动作为模仿目标，但人类关节构型、质量分布和动力学特性与机器人存在本质差异，导致训练目标在物理上不可行，进而引发训练效率低下和行为不稳定。SMAP 通过三个关键的 **changed slots** 重构了从人类运动到机器人控制的学习范式。
 
@@ -94,7 +96,7 @@ SMAP 提出**解耦奖励**设计，将上肢和下肢的跟踪目标分离并�
 
 上述三个 changed slots 并非孤立设计，而是形成协同效应：Humanoid-Adapter 提供物理可行的模仿目标，降低了策略学习的难度；教师-学生蒸馏利用特权信息弥补传感器观测的不足；解耦奖励在可行目标基础上进一步平衡精度与稳定性。三者共同作用使得 SMAP 在训练效率上显著优于现有方法——仅需约一半的迭代次数即可达到 Exbody† 的相同性能水平（Figure 9）。
 
-## 整体框架
+
 
 SMAP 的整体流程围绕一个核心矛盾展开：**人类运动与机器人动作空间之间的异构性**。直接使用重定向的人类运动作为模仿目标，会导致运动在物理上不可行，进而降低强化学习训练效率并引发不稳定行为。为此，SMAP 将问题分解为两个阶段：先通过自监督学习弥合跨域鸿沟，再通过渐进式策略学习实现稳定控制。
 
@@ -121,7 +123,7 @@ SMAP 的整体流程围绕一个核心矛盾展开：**人类运动与机器人�
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2505_19463/figures/003_Figure_3.jpg]]
 *Figure 3: Pipeline of SMAP . Given human motion, we use the proposed Humanoid-Adapter (details shown in Fig. 9), pre-trained ( ) to adapt human motion into corresponding, physically plausible humanoid robot motion. Our sim-to-real policy ( ) is distilled via imitation learning from an RL-trained privileged teacher policy that leverages privileged information with proposed decoupled reward. The policy is transferred to the real world*
 
-## 核心模块与公式推导
+
 
 SMAP 框架的核心由两个模块构成：**Humanoid-Adapter**（运动适配器）与**渐进式控制策略学习**（含教师-学生蒸馏与解耦奖励）。前者解决人类运动与人形机器人动作空间之间的异构鸿沟，后者在适配后的运动空间上高效训练可部署的全身控制策略。
 
@@ -179,7 +181,9 @@ $$\boldsymbol{a}_{t} \in \mathbb{R}^{n \times 3}$$
 
 其中 $n$ 为驱动自由度数，每个自由度由 PD 控制器的目标位置指定。策略输出的动作直接作为 PD 控制器的参考输入，驱动机器人关节跟踪目标姿态。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -254,7 +258,9 @@ Figure 5 展示了仿真中H1机器人执行转身行走、挥手、单腿跳跃
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2505_19463/figures/002_Figure_2.jpg]]
 *Figure 2: t-SNE visualization of the distribution of retargeted human motion, noid robot motion (recorded within the simulator), and motion adapted by Humanoid-Adapter on the CMU MoCap dataset [5]*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心问题定位：人形机器人运动模仿中的动作空间异构性
 
@@ -300,6 +306,8 @@ SMAP 在人形机器人全身控制的知识库中定位为**连接人类运动�
 - **多任务与动态交互**：将运动适配框架扩展到需要实时环境感知和交互的任务场景。
 
 总体而言，SMAP 通过自监督运动适配、渐进式教师-学生蒸馏和解耦奖励设计，在人形机器人全身控制领域建立了一个新的性能基线，其核心洞察——消除动作空间异构性——为后续研究指明了关键方向。
+
+
 
 ## 原文 PDF
 

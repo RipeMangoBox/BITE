@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/SemGeoMo_Dynamic_Contextual_Human_Motion_Generation_with_Semantic_and_Geometric_Guidance.pdf
+code_link: null
 project_link: https://4dvlab.github.io/project_page/semgeomo
 aliases:
 - SemGeoMo
@@ -43,7 +44,7 @@ claims:
 > - BEHAVE 上，HandJPE↓ (cm) 27.91 (Gen text) vs 35.41 (MDM-PC) (-7.50)。
 > - IMHD2 上，HandJPE↓ (cm) 35.43 (Gen text) vs 39.40 (OMOMO) (-3.97)。
 
-## 概述
+## 概要
 
 动态上下文下的人体运动生成（例如人-物交互）面临一个关键瓶颈：现有方法缺乏文本语义引导和细粒度的几何表征，导致生成的运动在语义连贯性和几何准确性上均存在不足。SemGeoMo 针对这一瓶颈，提出**多层级语义与几何引导**与**两阶段解耦架构**，核心思路是将接触几何生成与人体运动生成分离，并利用大语言模型（LLM）自动生成从粗到细的文本描述，从而提升交互运动的语义合理性与几何精度。
 
@@ -53,7 +54,7 @@ claims:
 
 总体而言，SemGeoMo 通过将语义与几何信息有机融入两阶段扩散框架，在动态上下文人体运动生成任务上实现了当前最优性能，并为后续研究提供了可自动标注语义引导的新范式。
 
-## 背景与动机
+
 
 动态场景下的人体交互运动生成是计算机视觉与图形学中的核心挑战，其目标是根据交互目标（如移动的物体或人）的序列点云，合成语义合理、几何精确且自然流畅的人体运动。这一任务在虚拟现实、机器人仿真、具身智能等领域具有广泛的应用前景。
 
@@ -63,7 +64,9 @@ claims:
 
 针对上述问题，**SemGeoMo** 提出了一种融合多层级语义与几何引导的动态上下文运动生成框架。其核心洞察是：通过从粗到细的可供性与关节位置预测，将接触几何生成与运动生成解耦为两阶段流水线；同时利用大语言模型（LLM）自动生成细粒度文本描述，从而在无需人工标注的前提下，显著提升交互运动的语义合理性与几何精度。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SemGeoMo 的核心创新在于将**动态上下文人体运动生成**从单一的几何条件驱动，升级为**多层级语义与几何协同引导**的范式，并通过**两阶段解耦架构**实现。相较于现有基线，其关键改进可归纳为以下四个 changed slots：
 
@@ -95,7 +98,7 @@ $$F_{fusion} = \mathrm{CrossAttention}(MLP(\mathbf{J}_{h}^{\prime})_{q}, F_{k}, 
 
 相比简单的拼接或单向注意力，这种设计更有效地建模了细粒度关节位置与粗粒度可供性区域之间的空间对应关系（Section 3.4, Equation 5）。配合关节引导损失 $L_{\mathrm{joint}}$ 和脚部稳定性损失 $L_{\mathrm{foot}}$，进一步提升了接触精度与运动物理合理性（Table 6）。
 
-## 整体框架
+
 
 SemGeoMo 的目标是仅以交互目标物体的 4D 顺序点云为条件，生成符合语义且几何精确的响应式人体交互运动。为达成这一目标，该工作提出了一个两阶段解耦框架，将接触几何的预测与人体运动生成分离，并引入大语言模型自动标注器提供语义引导。整体流水线如 **Figure 2** 所示，由三个核心模块串联构成：LLM Annotator、SemGeo Hierarchical Guidance Generation 和 SemGeo‑guided Motion Generation。
 
@@ -139,7 +142,7 @@ SemGeoMo 的目标是仅以交互目标物体的 4D 顺序点云为条件，生�
 - **LLM 自动化文本标注**：消除了对手动文本标注的依赖，使方法可规模化应用。在 FullBodyManipulation 数据集上，使用生成文本的 SemGeoMo 相比仅依赖几何条件的 OMOMO，FID 从 1.98 降至 1.05（**Table 1**）。
 - **多层级几何引导**：同时提供可供性图和关节位置，形成粗到细的几何约束链，显著提升接触精度与运动自然度。
 
-## 核心模块与公式推导
+
 
 ### 数据表征：可供性图
 
@@ -196,7 +199,9 @@ $$L_{\mathrm{foot}} = \frac{1}{L} \sum_{i=1}^{L} \left( (y_i - h_g)^2 + \alpha \
 ![[assets/figures/papers/paper_list_l1748_SemGeoMo_Dynamic_Contextual_Human_Motion_Generation_with_Semantic_and_Ge/figures/003_Figure_3.jpg]]
 *Figure 3: LLM Annotator pipeline. It first takes a sequential point cloud to infer a coarse text description. Then uses joint positions, the coarse text, and geometric features to generate a fine-grained sentence with a designed prompt*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -252,7 +257,9 @@ LLM Annotator生成的文本质量评估（Table 7）表明，生成文本与真
 
 尽管整体性能优越，分析揭示了若干失败模式。在极端物体形状（如非常规几何体）或高度动态的人人交互场景下，接触预测精度可能下降，表现为手部穿透或悬空。LLM生成的文本描述偶尔与细粒度交互动作不完全对齐，导致语义引导偏差。此外，两阶段架构和交叉注意力模块的计算开销尚未量化评估，其实时适用性有待验证。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系与增量贡献
 
@@ -293,6 +300,8 @@ SemGeoMo 的核心贡献在于将**多层级语义与几何引导**引入动态�
 2. **两阶段框架能否合并为端到端训练？** 当前解耦设计虽提升了可控性，但可能损失端到端优化的潜力。联合训练第一阶段接触预测与第二阶段运动生成是否能进一步提升性能？
 3. **如何扩展到多对象与长时序交互？** 当前框架假设单目标交互，多对象场景（如搬运多个物体）需要更复杂的注意力机制和接触建模。长时序交互（分钟级）则对扩散模型的生成效率提出挑战。
 4. **几何引导能否从关节级扩展到表面级？** 当前关节位置预测提供了稀疏接触锚点，若能预测手部/身体表面的密集接触点，有望进一步提升接触精度与物理合理性。
+
+
 
 ## 原文 PDF
 

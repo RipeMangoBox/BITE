@@ -41,7 +41,7 @@ claims:
 > - ShapeNet (10 unseen categories) 上，ACC30 ↑ | Median error (°) ↓ 59.6 | 20.4 vs 52.3 | 27.7 (NOPE) (+7.3 | -7.3)。
 > - NAVI (5 real-world instances) 上，ACC30 ↑ 50.9 vs 36.8 (NOPE) (+14.1)。
 
-## 概述
+## 概要
 
 从单张参考图像估计未见物体的三维姿态，是机器人抓取与场景理解中的核心挑战。现有方法多采用“生成-比较”范式：先通过新视角合成（NVS）从参考视图生成多个候选视角图像，再与查询图像进行模板匹配以确定姿态。然而，这一范式存在一个根本性的病态问题——参考图像的起始方向未被定义，导致 NVS 中的几何变换缺乏明确起点，仅靠像素级监督无法保证合成视图的几何正确性，常出现结构失真与纹理模糊，进而使模板匹配不可靠。
 
@@ -54,7 +54,7 @@ OrienPose 的核心洞察在于：**物体的内在方向是一个对退化鲁�
 
 在方法谱系上，OrienPose 属于“生成-比较”类单图像姿态估计方法，与直接回归相对姿态的 PIZZA（Du et al., 3DV 2022）、基于关键点匹配的 MicKey（Barroso-Laguna et al., CVPR 2024）以及概率姿态估计的 RelPose（Zhang et al., ECCV 2022）和 RelPose++（Lin et al., 3DV 2024）等形成对比。其核心差异在于首次将物体方向作为显式几何先验引入 NVS 流程，从源头上解决了视角变换的病态性问题，而非仅改进匹配或回归策略。
 
-## 背景与动机
+
 
 单图像未见过物体的三维姿态估计是机器人抓取与增强现实中的核心挑战。给定一张参考图像和一张查询图像，系统需要在不依赖物体CAD模型的前提下，估计两帧之间物体的相对三维旋转。近年来，基于生成-比较范式的方法——即先通过新视角合成（Novel View Synthesis, NVS）从参考视图生成一组候选模板，再与查询图像进行匹配——展现出较强的零样本泛化潜力，代表性工作如 **NOPE**（Nguyen et al., CVPR 2024）。
 
@@ -62,7 +62,9 @@ OrienPose 的核心洞察在于：**物体的内在方向是一个对退化鲁�
 
 本文的核心洞察在于：**物体的内在方向作为一个对退化鲁棒的几何线索，可以定义视角变换过程的起点和终点**。若能显式获取参考视图中物体的方向先验，并以之锚定变换的起始状态，则原本病态的视角变换将被约束为一个由起始方向 $O_{ref}$ 和终止方向 $O_{syn}$ 共同定义的明确变换 $O_{ref} + \Delta R = O_{syn}$。这一从“猜测”到“定义”的范式转换，构成了本文方法设计的根本动机。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 OrienPose 的核心创新在于将单图像未见过物体姿态估计中“视角变换”这一环节，从一个**病态的猜测问题**重新定义为一个**由方向先验显式约束的几何变换问题**。现有方法（如 **NOPE**，Nguyen et al., CVPR 2024）仅依赖像素级监督和相机姿态条件 $\Delta R$ 来驱动新视角合成，但由于参考图像的起始方向未被定义，网络只能“猜测”从参考视图到目标视图的几何变换，导致合成视图出现结构失真和纹理模糊。OrienPose 通过两个相互配合的机制——**方向感知引导（OAG）** 和 **方向一致性损失（$L_{OC}$）**——将这一病态变换转化为由起始方向 $O_{ref}$ 和终止方向 $O_{syn}$ 共同定义的明确变换，形成 $O_{ref} + \Delta R = O_{syn}$ 的几何一致性闭环。
 
@@ -92,7 +94,7 @@ $$S_{OA}^{k} = -\| E_{tmp}^{k} - E_{qry} \|_{2}^{2} - D_{KL}( O_{qry} \| O_{tmp}
 
 消融实验证实，同时引入 OAG 和 $L_{OC}$ 相比单独使用二者之一能带来持续的性能提升，验证了方向先验的注入与一致性监督之间存在互补关系：OAG 提供变换的起点约束，$L_{OC}$ 提供变换的终点监督，二者共同将病态问题转化为有界问题。这种闭环设计是 OrienPose 相较于 NOPE 在 ShapeNet 未见类别上 ACC30 提升 7.3%（59.6% vs. 52.3%）、中值误差降低 7.3°（20.4° vs. 27.7°）的核心驱动力。
 
-## 整体框架
+
 
 OrienPose 的整体框架围绕一个核心洞察构建：**将物体的内在方向作为几何先验，把新视角合成中原本病态的变换过程转化为由明确起点和终点定义的闭环**。如图 2 所示，系统由四个关键模块串联而成：方向估计器（OEM）、方向感知引导（OAG）、新视角合成网络（NVS）以及方向感知模板匹配。
 
@@ -121,7 +123,7 @@ OrienPose 的整体框架围绕一个核心洞察构建：**将物体的内在�
 ![[assets/figures/papers/paper_list_l2557_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_OrienPose_Orientat/figures/001_Figure_1.jpg]]
 *Figure 1: Our goal is to predict the 3D pose of objects via Novel View Synthesis (NVS) from a reference view. Top: Existing NVS methods can only guess the geometric transformation from reference to synthesized view under pixel-level supervision due to undefined starting orientation, causing geometry-distorted synthesis. In contrast, our framework explicitly defines this transformation by actively introducing orientation priors, achieving geometry-aligned synthesis and more accurate pose estimation. Bottom: We show the nature of problems by visualizing the latent space representation (green background) and the final predicted pose through rendering with the help of a 3D model (blue background)*
 
-## 核心模块与公式推导
+
 
 ### 核心瓶颈与设计动机
 
@@ -184,7 +186,9 @@ $$S_{OA}^{k} = -\| E_{tmp}^{k} - E_{qry} \|_{2}^{2} - D_{KL}( O_{qry} \| O_{tmp}
 ![[assets/figures/papers/paper_list_l2557_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_OrienPose_Orientat/figures/003_Figure_3.jpg]]
 *Figure 3: Pose estimation pipeline. Given N viewpoints*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置简述
 
@@ -253,7 +257,9 @@ Figure 7 展示了大视角变化（方位角差 > 90°）下的定性结果。�
 2. **严重遮挡与极度模糊**：尽管方向先验带来了显著的鲁棒性提升，但在严重遮挡或极度模糊情况下，估计误差仍高于普通场景，表明方向估计器本身在这些条件下也可能产生不准确的先验。
 3. **坐标框架不统一**：方向估计器（Orient-Anything）的坐标框架与物体的规范坐标框架之间缺乏显式对齐，这使得方向先验目前仅用于相对变换的约束，而无法直接用于绝对位姿恢复。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位与问题边界
 
@@ -316,6 +322,8 @@ OrienPose 在模糊和遮挡条件下展现出优于 NOPE 的鲁棒性。例如�
 3. **方向估计器的联合优化**：当前 OEM 是冻结的预训练模型，未与 NVS 网络联合优化。端到端的联合训练可能进一步提升方向先验与视角合成的一致性。
 
 4. **向类别级方法的迁移**：OAG 和 L_OC 的设计思想——显式注入几何先验并施加几何一致性监督——可能对类别级姿态估计方法也有借鉴价值，尤其是在处理类内几何变异时。
+
+
 
 ## 原文 PDF
 

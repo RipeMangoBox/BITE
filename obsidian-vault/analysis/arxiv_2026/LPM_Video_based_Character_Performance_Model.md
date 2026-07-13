@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2026
 pdf_ref: paperPDFs/arxiv_2026/LPM_Video_based_Character_Performance_Model.pdf
+project_link: https://project.mhzhou.com/vico
+code_link: null
 aliases:
 - L10LPM
 - L10VBCPM
@@ -41,7 +43,7 @@ claims:
 > - LPM-Bench (Speak场景) 上，Likert绝对评分均值 (1-5) 3.91 (AV sync: 4.13) vs N/A（绝对评分） (音画同步为最强维度)。
 > - LPM-Bench (Listen场景) 上，Likert绝对评分均值 (1-5) 4.51 (AV sync: 5.00, Identity: 4.62) vs N/A（绝对评分） (Listen场景表现最佳，AV sync满分)。
 
-## 概述
+## 概要
 
 ### 研究背景与核心瓶颈
 
@@ -60,8 +62,6 @@ LPM 1.0 包含两大核心模型：**Base LPM** 是一个 17B 参数的双向扩
 ### 主要结果
 
 在人类评估中，Base LPM（720P）全面优于 **Kling-Avatar-2**（64.3% 偏好率）和 **OmniHuman-1.5**（42.5% 偏好率），最大优势体现在身份一致性和运动动态性维度。Online LPM（480P）在实时流式场景下大幅领先 **LiveAvatar**（82.5% 偏好率）和 **SoulX**（64.1% 偏好率）；更关键的是，在与 Base LPM 匹配分辨率的直接对比中，42–88% 的案例被人类评估者判定为不可区分，证明实时因果生成无需牺牲感知真实感。Listen 场景达到最高绝对评分均值 4.51/5.0（音画同步满分 5.00），Conversation 场景因频繁的说话-倾听转换而最具挑战性（运动动态性降至 3.24/5.0）。
-
-## 背景与动机
 
 ### 问题背景：视频生成式角色表演的“三难困境”
 
@@ -93,7 +93,7 @@ LPM 1.0 包含两大核心模型：**Base LPM** 是一个 17B 参数的双向扩
 
 LPM 1.0通过以下全栈方案验证了这一思路的有效性：（1）大规模全双工数据的系统化构建；（2）17B参数DiT基座模型的多模态联合训练，实现可控、身份一致的表演生成；（3）四阶段自回归蒸馏，将双向基座模型转化为因果流式生成器，在实时推理中保持与离线模型相当的感知真实感。
 
-## 核心创新
+## 核心方法与创新机理
 
 ### 表演三难困境：系统性瓶颈的重新定义
 
@@ -155,8 +155,6 @@ Base LPM基于14B预训练I2V模型扩展3B音频交叉注意力参数，总规�
 | 训练规模 | 通常10B以下 | 17B参数，1.7T+多模态token |
 | 倾听能力 | 几乎完全缺失 | 原生支持全双工说话-倾听行为 |
 
-## 整体框架
-
 LPM 1.0 是一个面向单人全双工视听对话表演的视频生成全栈框架，其核心设计目标是系统性地解决“表演三难困境”——即高表现力、实时推理和长时域身份稳定性三者难以兼得的根本矛盾。该框架并非单纯的模型架构创新，而是在**数据构建、基座模型训练、在线蒸馏部署**三个层面进行协同设计，将“仅能说话”的视频模型转变为“会说话也会倾听”的表演模型。
 
 ### 全栈流水线总览
@@ -188,8 +186,6 @@ LPM 1.0 是一个面向单人全双工视听对话表演的视频生成全栈框
 ### 关键设计决策的因果逻辑
 
 框架的核心设计决策——交错双音频注入、多粒度身份参考拼接、四阶段自回归蒸馏——均直接回应“表演三难困境”的四个系统性缺失。交错双音频注入解决了“倾听行为几乎完全缺失”的问题，使模型首次具备全双工会话行为建模能力；多粒度身份参考拼接解决了“仅依赖单张参考图像导致长序列身份漂移”的问题；四阶段蒸馏则在保持双向基座模型表现力的同时，将其转化为满足实时推理约束的因果流式生成器。这一系统级方案的有效性已通过人类评估验证：Base LPM 在离线场景下以 64.3% 偏好率显著优于 Kling-Avatar-2，Online LPM 在实时流式场景下以 82.5% 偏好率大幅领先 LiveAvatar，且在匹配分辨率下 42–88% 的案例被评为与 Base LPM 不可区分，证明实时因果生成无需牺牲感知真实感。
-
-## 核心模块与公式推导
 
 ### 交错式双音频交叉注意力注入
 
@@ -249,16 +245,13 @@ $$\mathcal{L}_{\mathrm{on\text{-}policy}} = \mathbb{E}_{i, \mathbf{t}} \left[ \m
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l1839_LPM_Video_based_Character_Performance_Model/figures/006_Figure_4.jpg]]
-*Figure 4: | An example of our proposed multi-granularity identity-aware reference images. For each subject, we extract three complementary reference types from raw videos: (i) a global appearance reference capturing overall identity and background context; (ii) multi-view body references covering one to four viewpoints to provide appearance evidence; (iii) a set of facial expression references spanning one to eight expressive states, enabling faithful reproduction of identity-specific details*
-
 ![[assets/figures/papers/paper_list_l1839_LPM_Video_based_Character_Performance_Model/figures/008_Figure_6.jpg]]
 *Figure 6: | Online LPM architecture. The generator DiT accepts noise inputs, streaming control signals (text, speak/listen audio), and identity reference images conditioned on noisy-history KV caches to produce renoised latents. The refiner DiT then recovers the final clean video chunks conditioned on clean-history KV caches. Both stages use chunk-wise causal attention masks for autoregressive rollout*
 
 ![[assets/figures/papers/paper_list_l1839_LPM_Video_based_Character_Performance_Model/figures/009_Figure_7.jpg]]
 *Figure 7: | Execution timeline of the online interactive video system, illustrated with a full-duplex dialogue example. The system progresses through warmup, idle, listening, and responding states while maintaining continuous video output. Audio conditions (listen/speak) are aligned with the streaming timeline, and the Audio2Audio module introduces bounded latency between user input and response. The highlighted region shows the overlapping three-stage pipeline (Generator, Refiner, VAE) operating on chunked inputs. The cache structure (fixed sink + sliding window) enables stable long-horizon generation. Text conditioning and KV-cache operations are omitted for clarity*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 评估基准与协议
 
@@ -330,7 +323,7 @@ LPM 1.0的评估围绕自建的**LPM-Bench**展开，该基准覆盖5个场景�
 ![[assets/figures/papers/paper_list_l1839_LPM_Video_based_Character_Performance_Model/figures/005_Table_2.jpg]]
 *Table 2: | F1 scores of the six-category semantic verification model. Gemini serves as the closed-source baseline; Qwen3-Omni is fine-tuned on domain-specific conversational data. Metrics cover the five primary classes (excluding unknown). Δ denotes the absolute improvement of Qwen3-Omni over Gemini. Abbreviations: L_dlg = Listen_dialogue, L_nondlg = Listen_nondialogue*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 问题定位：表演三难困境
 

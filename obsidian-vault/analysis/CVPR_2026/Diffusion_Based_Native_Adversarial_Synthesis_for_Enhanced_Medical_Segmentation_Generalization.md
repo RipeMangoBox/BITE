@@ -43,7 +43,7 @@ claims:
 > - Synapse (in-domain, nnU-Net with DiffBoost) 上，DSC Gain (∆DSC↑) +9.12 vs 0 (+9.12)。
 > - Polyps→EndoScene (cross-device, nnU-Net with SiameseDiff) 上，DSC Gain (∆DSC↑) +10.25 vs 0 (+10.25)。
 
-## 概述
+## 概要
 
 **核心问题**：基于扩散模型（Diffusion Model, DM）的合成数据已成为提升医学图像分割泛化能力的关键手段，但现有方法面临一个被忽视的瓶颈——扩散模型生成的合成数据中，高对抗性（adversariality）样本极度稀疏，占比不足10%，而这些稀有样本却贡献了超过六成的泛化增益。与此同时，攻击式对抗引导（Adversarial Guidance, AG）虽能提升样本对抗性，却引入偏离真实流形的扰动，反而损害下游泛化能力。根本瓶颈在于缺乏有效手段，在保持流形内生成的前提下放大**固有对抗性**（native adversariality）。
 
@@ -57,7 +57,7 @@ claims:
 - 在跨模态偏移（CT↔MRI）场景下同样取得显著且一致的提升。
 - 消融实验表明，随着合成预算增大，该方法持续放大高对抗性合成，避免冗余，保持一致的泛化增益，而基准方法的增益则迅速衰减。
 
-## 背景与动机
+
 
 ### 医学图像分割中的数据稀缺与合成增强
 
@@ -85,7 +85,9 @@ $$\mathcal{G}_{\vartheta}(\mathcal{U}_{\mathrm{syn}}) \propto \|\nabla_{\varthet
 
 与 AG 修改采样轨迹不同，本文提出在**不改变扩散模型和采样过程**的条件下，通过**重新选取扩散模型的初始噪声**来偏移采样先验，使采样轨迹天然地导向高对抗性区域。这一思路的核心洞察在于：初始噪声 $\mathbf{\hat{x}}_T$ 的选择决定了去噪轨迹的起点，而扩散模型固有的采样轨迹本身已覆盖流形内不同对抗性水平的区域；只需将采样先验从标准高斯 $\mathcal{N}(\mathbf{0}, \mathbf{I})$ 偏移至高对抗性噪声区域，即可在不引入流形外扰动的情况下放大固有对抗性（见图 4(b)）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题定位：合成数据泛化的对抗性瓶颈
 
@@ -142,7 +144,7 @@ Figure 3 的定量对比进一步验证了这一差异：AG 方法虽然提升�
 
 3. **计算高效**：通过将优化时的 DDIM 步数截断至 10 步，可在几乎不损失泛化增益的情况下大幅降低显存和时间开销（Figure 9(c)），使得方法在实际部署中具有可行性。
 
-## 整体框架
+
 
 本文提出的对抗性挖掘器（Adversariality Miner）是一个轻量级即插即用模块，其核心目标是在不修改或重新训练扩散模型（DM）的前提下，通过重选初始噪声来放大合成数据的固有对抗性（native adversariality），从而提升下游分割模型的泛化能力。整体pipeline由五个协同模块构成，遵循“掩码采样→噪声重选→图像生成→对抗性优化”的闭环流程。
 
@@ -157,7 +159,7 @@ Figure 3 的定量对比进一步验证了这一差异：AG 方法虽然提升�
 ![[assets/figures/papers/paper_list_l856_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_Diffusion_Based/figures/002_Figure_2.jpg]]
 *Figure 2: Geometric view of generalization gain, which is proportional to the projection of loss gradients from synthetic data*
 
-## 核心模块与公式推导
+
 
 ### 泛化增益的解耦：对抗性与生成质量
 
@@ -238,7 +240,9 @@ $$\xi^{*} = \arg\max_{\xi} \mathbb{E}\left[ \min(\kappa_{\mathrm{up}}, \ell_{\ma
 ![[assets/figures/papers/paper_list_l856_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_Diffusion_Based/figures/005_Figure_4.jpg]]
 *Figure 4: Artificial vs. Native adversariality. (a) AG increases adversariality but produces visually indistinguishable outputs*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -327,7 +331,9 @@ Fig. 7 展示了合成预算 N_s 与泛化增益的关系。随着合成预算�
 ![[assets/figures/papers/paper_list_l856_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_Diffusion_Based/figures/001_Figure_1.jpg]]
 *Figure 1: (a) Adversariality distribution of fixed-size synthetic sets sampled from medical DMs [32, 41, 70] across multiple benchmarks, measured under downstream segmentation models (cf. § 2.3). (b) Overview of the proposed adversariality miner, which reselects high-potential initial noise from a frozen DM to enhance synthetic adversariality and downstream generalization*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：合成数据的泛化增益从何而来
 
@@ -372,6 +378,8 @@ $$\mathcal{G}_\vartheta(\mathcal{U}_{\mathrm{syn}}) \propto \|\nabla_\vartheta \
 **开放问题二：对抗性挖掘器的架构设计空间。** 当前 Adversariality Miner 采用轻量级设计，仅根据初始去噪得分预测噪声分布的偏移量。是否存在更优的架构选择（如引入条件掩码信息、时序建模）？消融实验中 DDIM 截断步数的最优值（10 步）和 KL 正则化系数的最优值（$\beta=0.001$）是否在不同任务和数据规模下保持稳定？这些问题指向了方法工程化落地的实际考量。
 
 **开放问题三：与对抗训练的深层关联。** 本文的固有对抗性概念与传统对抗训练中的“对抗样本”有何本质区别？两者都涉及提升模型在困难样本上的表现，但本文强调困难必须来自流形内的自然变异而非人工扰动。这一区分是否能为对抗训练社区提供新的理论视角，值得深入探讨。
+
+
 
 ## 原文 PDF
 

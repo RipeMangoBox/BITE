@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Spherical_Watermark_Encryption_Free_Lossless_Watermarking_for_Diffusion_Models.pdf
+project_link: null
+code_link: null
 openreview_forum_id: 2eAGrunxVz
 aliases:
 - SW
@@ -42,7 +44,7 @@ claims:
 > - SDP + SD v2.1 上，TPR@1%FPR (Post-Processing) 为 97.69%，对比 PRC Watermark: 87.19%，变化 +10.50%。
 > - SDP + SD v1.5 上，TPR@1%FPR (Adversarial) 为 99.81%，对比 PRC Watermark: 94.58%，变化 +5.23%。
 
-## 概述
+## 概要
 
 扩散模型生成内容的溯源与版权保护面临一个根本性矛盾：有损水印方法以牺牲图像保真度为代价换取可追溯性，而现有的无损方案——如 **Gaussian Shading**（Yang et al., 2024）和 **PRC Watermark**（Gunn et al., 2025）——虽能保持生成质量，却分别依赖流密码或复杂纠错码，导致每图像需唯一密钥或高昂的编解码开销，严重阻碍了在大规模API场景下的实际部署。
 
@@ -61,7 +63,7 @@ Spherical Watermark 针对上述瓶颈提出了一种**加密无关的球形映�
 
 **局限性**方面，高阶矩可能偏离真实高斯分布，在极端统计测试下存在被检测的风险；强反转破坏攻击（如大幅裁剪或涂鸦）可能导致DDIM反演失败，使水印提取完全失效；当前方案依赖扩散模型的反演过程，对非高斯先验或不支持精确反演的生成模型适用性受限。
 
-## 背景与动机
+
 
 扩散模型（Diffusion Models）的快速发展使得AI生成内容（AIGC）的版权追溯与内容溯源成为紧迫需求。在这一背景下，水印技术被广泛视为追踪生成图像来源的核心手段。然而，现有水印方法在图像质量与密钥管理之间存在着难以调和的矛盾，严重阻碍了其在大规模API场景下的实际部署。
 
@@ -73,7 +75,9 @@ Spherical Watermark 针对上述瓶颈提出了一种**加密无关的球形映�
 
 本文提出的**Spherical Watermark**（球形水印）正是对这一问题的正面回答。其核心思想是：将水印嵌入视为一个纯粹的几何变换问题——通过球面投影、固定正交旋转和卡方半径缩放，将任意二进制水印转化为与标准高斯噪声统计不可分的隐变量。这一策略完全摒弃了加密原语，仅需一个固定的二进制混合矩阵和正交旋转矩阵，从根本上消解了密钥管理与无损性之间的张力，同时利用球面3-设计的最优距离特性，为水印提供了可证明的抗加性噪声鲁棒性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Spherical Watermark 的核心创新在于提出了一种**加密无关的无损水印映射策略**，从根本上解耦了水印保真度与密钥管理之间的矛盾。其关键设计可归结为两个相互配合的 changed slots：
 
@@ -99,7 +103,7 @@ Spherical Watermark 将整个水印系统压缩为**一个固定的“签名”*
 
 从方法论层面审视，Spherical Watermark 的突破在于将水印嵌入重新定义为**一个从离散二进制序列到连续高斯噪声的可逆映射问题**。只要该映射满足两个条件——（1）输出分布的低阶矩与扩散先验匹配，（2）映射本身可逆——即可同时保证无损性和可提取性。正交旋转 $\mathbf{C}$ 将比特能量均匀分散到所有维度，带来了最优的抗加性噪声鲁棒性（消融实验中移除球面映射后，亮度调整等攻击下的追踪准确率剧烈下降，见 Figure 6(c)）；而 $\mathbf{T}$ 矩阵的 $3$-wise 独立性则确保了比特间不产生可被检测的统计模式。这种“矩匹配 + 可逆构造”的范式，为扩散模型水印提供了一条摆脱加密依赖的新路径。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_2eAGrunxVz/figures/001_Figure_1.jpg]]
 *Figure 1: The overall pipeline of our framework*
@@ -162,7 +166,7 @@ $$ \hat{\mathbf{z}}^{(2)} = \mathbf{C}^{\top} \hat{\mathbf{z}}_T, \quad \hat{\ma
 
 > **注意**：当前方案依赖扩散模型的反演过程，对于非高斯先验或不支持精确反演的生成模型，适用性受限。此外，高阶矩可能偏离真实高斯分布，在极端统计测试下存在被检测的风险。
 
-## 核心模块与公式推导
+
 
 Spherical Watermark 的核心在于将离散水印比特映射为与扩散模型先验统计不可分的连续隐变量，且全程无需加密原语。该映射由三个可逆模块串联构成：**Binary Embedding Module (B)**、**Spherical Mapping Module (S)** 和 **Diffusion Integration Module (G)**，整体流水线见 Figure 1。
 
@@ -215,7 +219,9 @@ $$\mathbf{z}_0 = \mathrm{ODESolve}(\mathbf{z}_w; s_\theta, \mathrm{cond}, T, 0)$
 
 整个框架仅需预先生成固定的 $\mathbf{T}$ 和 $\mathbf{C}$ 作为“签名”，无需每图像动态密钥，从根本上消除了流密码或纠错码带来的密钥存储与计算开销。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 无损性与不可检测性验证
 
@@ -294,7 +300,9 @@ Figure 4 以对数坐标展示了各潜在空间方案的水印嵌入与提取�
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_2eAGrunxVz/figures/007_Figure_5.jpg]]
 *Figure 5: ACC and TPR values under Attacks, averaged over two datasets and two models. (a) Ablation on l _ { m }*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有水印方法的关系
 
@@ -337,6 +345,8 @@ Figure 4 以对数坐标展示了各潜在空间方案的水印嵌入与提取�
 5. **动态长度水印方案**：当前方案要求预定义水印长度 $l_m$，能否设计一种无需事先定义长度的无损嵌入方案以支持动态信息长度？
 
 6. **与内容认证的结合**：将 Spherical Watermark 与图像编辑检测、深度伪造溯源等任务结合，构建统一的生成内容溯源框架。
+
+
 
 ## 原文 PDF
 

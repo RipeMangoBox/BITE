@@ -5,6 +5,8 @@ paper_level: A
 venue: NEURIPS
 year: 2024
 pdf_ref: paperPDFs/NEURIPS_2024/StoryDiffusion.pdf
+project_link: https://StoryDiffusion.github.io
+code_link: null
 aliases:
 - StoryDiffusion
 tags:
@@ -41,7 +43,7 @@ claims:
 > - 过渡视频生成 上，LPIPS-first 0.3794 vs − (优于 SEINE/SparseCtrl) (−)；CLIPSIM-first 0.9606 vs − (优于 SEINE/SparseCtrl) (−)。
 > - 用户研究 上，用户偏好（图像一致性） 72.8% vs − (−)。
 
-## 概述
+## 概要
 
 **StoryDiffusion** 面向一个长程生成中的核心瓶颈：预训练扩散模型在生成多幅图像或视频帧时，无法在整个序列中维持人物身份、服装和场景的一致性，尤其当内容涉及复杂细节或大幅度运动时。为解决该问题，本文提出两项关键机制：
 
@@ -54,7 +56,7 @@ claims:
 
 方法存在已知局限：服装细节（如领带）可能出现不一致，需要更详细的提示词来维持；尽管可通过滑动窗口生成长视频，但缺乏全局信息交换机制，在极长视频场景下仍非完美。
 
-## 背景与动机
+
 
 扩散模型在文本到图像生成领域的突破性进展，使得从自然语言描述自动合成高质量视觉内容成为现实。然而，当任务从单幅图像扩展到多幅图像序列或视频时，一个核心瓶颈浮现：**预训练扩散模型无法在整个序列中维持人物身份、服装和场景的一致性**，尤其当内容涉及复杂细节或大幅度运动时。这一瓶颈直接阻碍了扩散模型在漫画创作、故事可视化、长视频生成等实际应用中的落地。
 
@@ -62,7 +64,9 @@ claims:
 
 上述方法的共同局限在于：它们要么依赖额外的训练参数来绑定主体特征，要么在表达能力受限的潜空间中进行运动建模，缺乏一种**训练自由且能灵活插入预训练模型**的机制来建立跨图像的特征交互。StoryDiffusion 正是针对这一缺口，提出了两个互补的模块——Consistent Self-Attention 和 Semantic Motion Predictor——分别从跨图像注意力共享和语义空间运动预测两个维度，在不增加训练负担的前提下实现长程图像与视频的一致性生成。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 StoryDiffusion 的核心创新在于两个相互衔接的模块，分别解决“主体一致图像生成”和“大运动过渡视频生成”两个瓶颈问题。两项创新均以**训练自由（training‑free）**为设计原则，无需微调预训练扩散模型即可即插即用。
 
@@ -108,7 +112,7 @@ $$V_i = \mathrm{CrossAttention}(V_i, \mathrm{concat}(T, P_i), \mathrm{concat}(T,
 
 Consistent Self‑Attention 和 Semantic Motion Predictor 并非孤立模块，而是形成了一条完整的“一致图像 → 平滑视频”生成链路：前者保证多幅图像中主体的身份、服装和场景高度一致；后者在这些一致图像之间生成运动自然、过渡平滑的视频帧。两者共同构成了 StoryDiffusion 从文本故事到主体一致漫画再到长视频的端到端生成能力。
 
-## 整体框架
+
 
 StoryDiffusion 的整体框架由两个解耦但协同的模块构成，分别对应**主体一致的图像序列生成**与**平滑过渡视频生成**两个阶段。其核心设计思想是：在不引入额外训练参数的条件下，通过修改预训练扩散模型中自注意力的键值来源来建立跨图像的特征交互，从而维持生成内容的主体一致性；在此基础上，将首尾帧映射到语义空间进行运动预测，以处理大幅度动作变化并生成连贯的视频过渡。
 
@@ -168,7 +172,7 @@ $$Loss = \mathrm{MSE}(G, O)$$
 ![[assets/figures/papers/StoryDiffusion_08e33f41766b/figures/003_Figure_3.jpg]]
 *Figure 3: The pipeline of our method for generating transition videos for obtaining subjectconsistent images, as described in Sec. 3.1. To effectively model the character’s large motions, we encode the conditional images into the image semantic space for encoding spatial information and predict the transition embeddings. These predicted embeddings are then decoded using the video generation model, with the embeddings serving as control signals in cross-attention to guide the generation of each frame*
 
-## 核心模块与公式推导
+
 
 StoryDiffusion 的核心由两个模块构成：**Consistent Self-Attention**（用于主体一致图像生成）和 **Semantic Motion Predictor**（用于过渡视频生成）。两者均以训练自由（training-free）或轻量训练的方式运作，无需对预训练扩散模型进行全量微调。
 
@@ -247,7 +251,9 @@ $$Loss = \mathrm{MSE}(G, O)$$
 ![[assets/figures/papers/StoryDiffusion_08e33f41766b/figures/009_Figure_6.jpg]]
 *Figure 6: Ablation study. (a) Evaluations of the impact of different sampling rates in Consistent Self-Attention. (b) We explore the introduction of external control IDs to govern the generation of characters. Our StoryDiffusion can generate consistent images that conform to the ID images*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主体一致图像生成
 
@@ -310,7 +316,9 @@ StoryDiffusion 的核心实验结论可归纳为：通过修改自注意力中�
 ![[assets/figures/papers/StoryDiffusion_08e33f41766b/figures/011_Figure_8.jpg]]
 *Figure 8: Generation results of our Consistent Self-Attention combined with ControlNet*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心定位
 
@@ -358,6 +366,8 @@ StoryDiffusion 处于**训练自由的主体一致图像生成**与**基于语�
 4. **多模态条件扩展**：Semantic Motion Predictor 当前仅以首尾帧图像为条件，是否可以扩展到更多模态的条件输入，如文本动作描述、音频节奏信号或草图轨迹？
 
 5. **计算资源可行性**：Consistent Self-Attention 的批次内跨图像交互增加了自注意力计算的 token 数量，Semantic Motion Predictor 则需要额外的 CLIP 编码和 Transformer 推理。在计算资源有限的设备上，这些模块的可行性如何？是否存在轻量化替代方案？
+
+
 
 ## 原文 PDF
 

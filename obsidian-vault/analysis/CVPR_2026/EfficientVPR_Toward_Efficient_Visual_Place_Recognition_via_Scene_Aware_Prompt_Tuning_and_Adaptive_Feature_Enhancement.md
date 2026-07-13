@@ -43,7 +43,7 @@ claims:
 > - MSLS-val 上，R@1 — vs — (FoL 约91.0) (+2.0% (vs FoL))。
 > - AmsterTime 上，R@1 — vs — (BoQ) (+5.0% (vs BoQ))。
 
-## 概述
+## 概要
 
 视觉地点识别（Visual Place Recognition, VPR）旨在根据查询图像在参考数据库中检索同一地点的图像。现有单阶段方法在应对极端视角变化、光照剧变和场景外观变迁时，面临一个核心瓶颈：要么依赖大容量模型，要么引入计算密集型的重排序阶段，导致推理效率低、内存占用高，且普遍缺乏对样本特定判别区域的自适应关注。
 
@@ -56,7 +56,7 @@ claims:
 
 实验结果表明，基于 DINOv2-small 骨干（约 25M 参数），EfficientVPR 在 Pitts250k、MSLS、AmsterTime、SVOX Night 等 7 个数据集上取得了同尺度模型中最高的平均 R@1，且特征维度仅为 BoQ 的 28%。在效率方面，总推理延迟约 3.1 ms，实现了精度与速度的有利权衡。消融实验证实，SceneVPT 在所有测试数据集上均显著优于静态 VPT-deep，SGFS 在 AmsterTime 上带来 6.8% 的 R@1 提升，且可视化分析显示该方法能根据输入图像动态调整注意力区域（见 **Figure 6**）。
 
-## 背景与动机
+
 
 视觉地点识别（Visual Place Recognition, VPR）旨在根据查询图像从大规模地理参考数据库中检索最相似的地点图像，是自动驾驶、机器人导航与增强现实等应用的核心感知能力。近年来，基于深度学习的 VPR 方法取得了显著进展，但现有方案在效率与鲁棒性之间仍存在根本性张力。
 
@@ -68,7 +68,9 @@ claims:
 
 **本文动机**。针对上述问题，EfficientVPR 提出了一条轻量化单阶段路线：在保留 DINOv2-small（约 25M 参数）这一高效骨干的前提下，通过场景感知的视觉提示微调（SceneVPT）实现样本自适应的特征引导，并辅以实例依赖的关键局部特征增强模块，在不使用重排序的条件下提升局部判别力。其核心洞察在于：利用 ViT 的 CLS token 注意力值自适应地融合旧提示与新提示，无需额外模块即可实现实例级提示调整，既避免了灾难性遗忘又提升了任务适应性；以骨干处理后的提示为语义查询，通过交叉注意力增强多尺度全局特征与方向感知局部特征，从而弥补单阶段方法对关键区域的感知盲区。如 Figure 1 所示，EfficientVPR 在更低特征维度下取得了 7 个数据集上的最高平均 R@1，验证了“轻量骨干 + 自适应微调 + 语义引导局部增强”这一技术路线的有效性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 EfficientVPR 的核心创新围绕一个中心洞察展开：**利用 ViT 的 CLS token 注意力值自适应地融合旧提示与新提示，无需额外模块即可实现实例级提示调整，既避免了灾难性遗忘又提升了任务适应性；以骨干处理后的提示为语义查询，通过交叉注意力增强多尺度全局特征与方向感知局部特征，从而在不使用重排序的情况下提升了局部判别力。** 基于此洞察，方法在两个关键维度上对现有 VPR 范式进行了改造。
 
@@ -114,7 +116,7 @@ $$\hat{\mathbf{P}}_{i-1} = \alpha_i \cdot \mathbf{Z}_{i-1}^P + (1_{N_p} - \alpha
 
 EfficientVPR 的三个 changed slots——微调策略（SceneVPT）、局部特征增强（MsIA+OLE+SGFS）、骨干选择（DINOv2-S）——并非孤立改进，而是围绕“实例自适应”这一核心洞察的协同设计。SceneVPT 提供样本特定的语义线索，SGFS 利用这些线索增强局部判别力，轻量骨干则确保整体效率。这种“轻量化骨干 + 动态提示微调 + 语义引导增强”的组合，为单阶段 VPR 方法在效率与精度之间找到了新的平衡点。
 
-## 整体框架
+
 
 EfficientVPR 是一个轻量化的单阶段视觉地点识别框架，其核心设计目标是在保持强判别力的同时实现高推理效率与低特征维度。如图 2 所示，整个 pipeline 由 DINOv2-small 骨干、场景感知视觉提示微调模块（SceneVPT）以及实例依赖的关键局部特征增强模块三大部分串联构成。
 
@@ -132,7 +134,7 @@ EfficientVPR 是一个轻量化的单阶段视觉地点识别框架，其核心�
 ![[assets/figures/papers/paper_list_l2153_https_openaccess_thecvf_com_content_CVPR2026_html_Tang_EfficientVPR_Towa/figures/004_Figure_4.jpg]]
 *Figure 4: Visualization of viewpoint-induced matching failure. The first two images depict the same location, while the third shows a different but similar place. Dramatic viewpoint shifts and seasonal appearance variations cause trees in the query image (red border in the first picture) to become non-overlapping regions absent in the correct reference match. Current one-stage methods tend to be misled by these irrelevant features, producing false matches to incorrect locations with visually similar nonoverlapping elements (red border in the third picture). By enhancing the discriminative representation of task-relevant and samplespecific key local regions and structural information, our method effec...*
 
-## 核心模块与公式推导
+
 
 ### 场景感知视觉提示微调（SceneVPT）
 
@@ -199,7 +201,9 @@ $$\mathbf{f}_l^{\prime} = \mathrm{Attention}(\mathbf{f}_g^{\prime}, \mathbf{f}_l
 ![[assets/figures/papers/paper_list_l2153_https_openaccess_thecvf_com_content_CVPR2026_html_Tang_EfficientVPR_Towa/figures/003_Figure_3.jpg]]
 *Figure 3: SceneVPT Overview. Our SceneVPT extends VPTdeep via adaptive prompt selection, dynamically adjusting to input characteristics based solely on the backbone’s CLS token*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果与效率分析
 
@@ -278,7 +282,9 @@ EfficientVPR 在七个公开 VPR 基准上进行了全面评估，涵盖大规�
 ![[assets/figures/papers/paper_list_l2153_https_openaccess_thecvf_com_content_CVPR2026_html_Tang_EfficientVPR_Towa/figures/008_Table_6.jpg]]
 *Table 6: Ablation on SGFS. ”with BoQ block” refers to the variant where the SGFS module is replaced with a BoQ block, while ”with SGFS” means our full model that retains SGFS. All test images are resized to 266 × 266*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与单阶段 VPR 方法的关系
 
@@ -323,6 +329,8 @@ EfficientVPR 的 SceneVPT 模块属于参数高效微调（PEFT）的研究范�
 3. **多模态查询扩展。** SGFS 当前以骨干处理后的视觉提示作为语义查询。如果引入文本描述、语义地图等多模态信息作为查询，能否进一步增强跨域地点识别能力？这一方向与当前视觉-语言模型的快速发展高度契合。
 4. **自动化架构搜索。** 能否通过神经架构搜索（NAS）或超参数优化（HPO）自动确定 MsIA 的多尺度分支数、OLE 的卷积核配置、N_p 的最优值等，以匹配不同部署场景的精度-效率约束？
 5. **持续学习与概念漂移缓解。** 在长期部署中，如何通过回放缓冲区、特征蒸馏或提示库动态更新等机制，缓解环境变化带来的特征遗忘问题？SceneVPT 的可学习提示池为此提供了一种潜在的轻量级解决方案——仅更新提示而非整个模型参数。
+
+
 
 ## 原文 PDF
 

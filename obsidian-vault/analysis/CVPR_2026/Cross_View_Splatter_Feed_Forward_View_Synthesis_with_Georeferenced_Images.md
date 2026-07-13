@@ -41,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - Tanks and Temples (3 context views) 上，PSNR↑ 12.00 (Ours Combined) vs 10.61 (Ours Ground-only) (+1.39)；SSIM↑ 0.3855 (Ours Combined) vs 0.3763 (Ours Ground-only) (+0.0092)；PSNR↑ 12.00 (Ours Combined) vs 10.93 (AnySplat) (+1.07)。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -63,7 +63,7 @@ Cross-View Splatter 属于**前馈式稀疏视图合成**方法，在方法谱�
 
 在 **Tanks and Temples** 室外场景稀疏视图合成基准上，Combined（地面+卫星）模型在所有上下文视图数设置下均显著优于仅用地面图像的 Ground 模型及所有对比基线。以 3 视图设置为例，Combined 的 PSNR 达到 12.00，相比 Ground-only 的 10.61 提升 1.39 dB，相比 AnySplat 的 10.93 提升 1.07 dB。分层评估表明，**卫星分支在输入图像重叠率较低（IoU ≤ 0.15）时带来的增益最大**，验证了卫星先验在稀疏覆盖场景下的关键作用。消融实验进一步证实，添加卫星分支使 Metropolis 测试集 PSNR 从 17.10 提升至 18.63，且深度一致性损失、天空正则化等设计均对性能有正面贡献。
 
-## 背景与动机
+
 
 ### 问题背景：稀疏地面图像的大场景新视图合成
 
@@ -92,7 +92,9 @@ Cross-View Splatter 属于**前馈式稀疏视图合成**方法，在方法谱�
 
 基于上述动机，本文提出 **Cross-View Splatter**——一种前馈式跨视角高斯溅射方法，其设计目标为：在仅需 GPS 标记的地面图像和一张对应区域的正射卫星影像作为输入的条件下，预测统一坐标系下的三维高斯溅射，显著改善稀疏覆盖场景下的几何完整性和新视图合成质量。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Cross-View Splatter 的核心创新在于将一张公开可获取的正射卫星影像作为全局场景结构先验，与 GPS 标记的地面透视图像在统一坐标系下联合预测高斯溅射，从而在稀疏地面覆盖条件下显著改善场景覆盖和新视图合成质量。这一核心思想通过以下关键设计实现：
 
@@ -135,7 +137,7 @@ $$
 
 这些创新设计的有效性在消融实验中得到了系统验证：添加卫星分支使 Metropolis 测试集上的 PSNR 从 17.10 提升至 18.63；分层评估进一步表明，卫星分支在输入图像重叠率较低（IoU ≤ 0.15）时带来的增益最大，精确验证了卫星先验在稀疏覆盖场景中的关键作用（Figure 8, Table 4）。
 
-## 整体框架
+
 
 Cross-View Splatter 是一个前馈式模型，其整体 pipeline 以**地理参考的多视角图像**为输入，在统一的 3D 坐标框架内联合预测地面视角和鸟瞰视角的高斯溅射（3D Gaussian Splats）。图 2 给出了方法架构的全貌。
 
@@ -167,7 +169,7 @@ Cross-View Splatter 是一个前馈式模型，其整体 pipeline 以**地理参
 ![[assets/figures/papers/paper_list_l2456_https_arxiv_org_abs_2605_19656/figures/002_Figure_2.jpg]]
 *Figure 2: Method overview: Given geolocalized ground images and a single orthorectified satellite perspective, our model synthesizes 3D Gaussian splats in a shared coordinate frame. Ground views exchange information with satellite views within bidirectional cross-attention layers. Gaussians are predicted separately from ground and satellite branches, which are then combined into a unified coordinate frame. Although public elevation data is leveraged during training, only the satellite image and ground view(s) are necessary for inference*
 
-## 核心模块与公式推导
+
 
 Cross-View Splatter 的核心技术路线可概括为：**在统一坐标系下，通过双向交叉注意力融合地面透视特征与卫星正射特征，分别预测地面深度与卫星高度图，并利用正射投影将高度图提升为高斯溅射位置，最终合并两组高斯进行渲染。** 以下按模块展开关键公式与设计逻辑。
 
@@ -254,7 +256,9 @@ $$
 ![[assets/figures/papers/paper_list_l2456_https_arxiv_org_abs_2605_19656/figures/004_Figure_4.jpg]]
 *Figure 4: Example reconstruction outputs on scenes not seen during training. Left to right: input ground images, input satellite image, predicted height map, predicted height confidence (black: low, red: high), predicted ground Gaussians, predicted combined Gaussians*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主干实验：稀疏视图合成
 
@@ -320,7 +324,9 @@ Table 6 报告了在 1 视图设置下对 GPS 定位精度的灵敏度。当向 
 ![[assets/figures/papers/paper_list_l2456_https_arxiv_org_abs_2605_19656/figures/018_Table_5.jpg]]
 *Table 5: Comparison to diffusion based SEVA model on our geoaligned Tanks and Temples benchmark*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与前馈视图合成方法的继承与突破
 
@@ -375,6 +381,8 @@ $$
 ### 知识库定位总结
 
 Cross-View Splatter 在方法谱系中占据“前馈跨视角高斯溅射”的独特位置：它既不是纯粹的 ground-only 前馈方法（如 MVSplat/DepthSplat），也不是卫星-only 的密度场方法（如 Sat2Density+），更不是扩散式生成方法（如 SEVA）。其核心知识贡献在于证明了**通过双向交叉注意力将公开可获取的正射卫星影像与地面图像在统一坐标系下联合预测高斯溅射**，能够在稀疏地面图像条件下显著改善场景覆盖和新视图合成质量。这一思路为利用免费地理空间数据增强 3D 场景重建开辟了新方向。
+
+
 
 ## 原文 PDF
 

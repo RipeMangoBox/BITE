@@ -5,6 +5,8 @@ paper_level: A
 venue: IJCV
 year: 2024
 pdf_ref: paperPDFs/IJCV_2024/3D_MuPPET_3D_Multi_Pigeon_Pose_Estimation_and_Tracking.pdf
+project_link: null
+code_link: https://github.com/
 aliases:
 - 3M
 - 3M3MPPET
@@ -39,13 +41,13 @@ claims:
 > [!tip] 效果简介
 > - 3D-POP 上，RMSE (mm) 24.0 (3D-ViTPose*) vs 14.8 (LToHP) (+9.2)；Median Error (mm) 7.0 (3D-ViTPose*) vs 5.8 (LToHP) (+1.2)；PCK10 (%) 92.5 (3D-ViTPose*) vs 94.3 (LToHP) (-1.8)。
 
-## 概述
+## 概要
 
 多动物三维姿态估计与身份跟踪是定量行为分析的核心瓶颈，尤其当群体规模超过4只个体时，实时、在线地维持跨视图身份匹配与三维重建面临巨大挑战。现有方法（如**LToHP**，Iskakov et al., ICCV 2019）依赖三维真值训练，难以灵活扩展至不同物种或野外场景。3D-MuPPET提出了一种模块化的多视图流水线，将二维关键点估计、直接线性三角测量与首帧身份匹配及二维SORT跟踪相结合，无需任何三维真值训练即可实现交互速度的多鸽子三维姿态估计与在线身份跟踪。
 
 其核心洞察在于：将三维重建与身份关联解耦为可插拔的二维模块，通过首帧动态匹配建立跨视图全局身份，后续以轻量二维跟踪维持身份一致性，从而大幅降低计算开销，并赋予框架从单鸽子室内数据向多鸽子户外场景的泛化能力。实验表明，3D-MuPPET在3D-POP基准上与需三维真值训练的LToHP精度可比（中位误差仅差1.2 mm，PCK10达92.5%），同时推理速度提升约2.3倍（1.89 fps vs. 0.83 fps），二维跟踪MOTA达0.98。仅用室内数据训练的模型在户外Wild-MuPPET数据集上中位误差为15.0 mm，初步验证了领域迁移潜力。系统目前限制在最多10只个体，严重遮挡下的二维姿态失败和长时遮挡后的身份丢失仍是主要局限。
 
-## 背景与动机
+
 
 理解动物群体的社会行为与集体动力学，离不开对多个体三维姿态的精确、连续测量。在神经科学、行为生态学及生物力学等领域，研究者迫切需要一种能够同步捕获多只动物在三维空间中完整姿态与身份轨迹的工具，以量化个体间的交互模式、社会层级与群体决策机制。然而，这一需求在当前技术条件下仍面临显著瓶颈。
 
@@ -57,7 +59,9 @@ claims:
 
 3D-MuPPET正是在这一背景下被提出，其核心动机是构建一个无需三维真值训练、能够实时运行、且内建身份跟踪能力的多动物三维姿态估计框架。该方法通过将二维姿态估计与经典多视图三角测量相结合，绕过了对三维标注的依赖；同时采用首帧身份匹配与二维SORT跟踪的策略，以极低的计算代价实现了跨视图的身份关联与持续追踪。框架的模块化设计允许灵活插入任意二维姿态估计器，使其既能受益于快速发展的二维姿态估计前沿，又为从室内到野外的领域迁移提供了可行的技术路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 3D-MuPPET 的核心创新在于**以模块化二维流水线替代需要三维真值训练的端到端方法**，在保持可比精度的同时大幅降低训练成本与计算开销，并首次实现了多动物（>4只）在线身份保持的三维姿态估计与跟踪。
 
@@ -96,7 +100,7 @@ claims:
 
 需要指出的是，3D-MuPPET 的创新是**架构层面的范式创新**，而非单个模块的算法突破。其核心贡献在于证明：在特定应用场景下，精心设计的传统几何方法配合轻量在线跟踪，可以达到与端到端学习方法可比的精度，同时获得训练效率、推理速度和领域泛化能力的显著优势。然而，这一范式也带来了固有局限：系统依赖已标定的多相机系统，身份匹配假设首帧所有个体可见，且缺乏视觉重识别能力导致长遮挡后可能发生身份丢失。
 
-## 整体框架
+
 
 3D-MuPPET 是一个模块化的多视图三维多动物姿态估计与跟踪框架，其核心设计理念是将二维姿态估计、三角测量与在线身份跟踪解耦为可替换的流水线模块。如图 2 所示，系统以同步多视图图像序列作为输入，输出带有全局身份标签的三维关键点序列。
 
@@ -134,7 +138,7 @@ claims:
 ![[assets/figures/papers/paper_list_l1646_3D_MuPPET_3D_Multi_Pigeon_Pose_Estimation_and_Tracking/figures/002_Figure_2.jpg]]
 *Figure 2: 3D-MuPPET. The framework consists of a pose estimation and tracking module, into which we can readily slot any state of the art pose estimator and tracking method. We identify all individuals in all views (blue part) based on Huang et al. (2020) in the first frame only. In the subsequent frames we track the identities (IDs) with SORT (Bewley et al., 2016). 3D-MuPPET predicts 3D poses together with IDs from multi-view image input using triangulation. For details we refer to Sec. 3.2*
 
-## 核心模块与公式推导
+
 
 3D-MuPPET 的核心设计思想是将多视图二维姿态估计、三角测量与轻量级在线身份跟踪解耦为模块化流水线，从而绕过对三维真值训练的依赖。整个框架由以下关键模块串联构成，其结构见 **Figure 2**。
 
@@ -167,7 +171,9 @@ claims:
 
 本文未提供独立的数学公式推导。三维关键点 $P_{3D} \in \mathbb{R}^3$ 由多视图二维关键点 $\{p_{2D}^{(c)}\}$ 通过直接线性三角测量求解，随后经卡尔曼滤波器进行时序平滑。二维跟踪采用标准 SORT 框架，基于卡尔曼滤波预测边界框位置，并通过匈牙利算法进行逐帧数据关联。具体实现细节可参阅原文 Sec. 3.2 及所引用的原始方法文献。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心主张与因果支撑
 
@@ -273,7 +279,9 @@ Table 8 量化了从单只鸽子训练到多鸽子测试的领域偏移：Keyp
 ![[assets/figures/papers/paper_list_l1646_3D_MuPPET_3D_Multi_Pigeon_Pose_Estimation_and_Tracking/figures/006_Figure_4.jpg]]
 *Figure 4: Qualitative Results. Example frames from 3D-POP (Naik et al., 2023) for multi-pigeon pose estimation and tracking in 3D, reprojected to 2D view. Green lines connect the body, red lines the head keypoints. Some frames are cropped for a better view*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从二维到三维的模块化延伸
 
@@ -312,6 +320,8 @@ Table 8 量化了从单只鸽子训练到多鸽子测试的领域偏移：Keyp
 4. **身份维护的增强路径**：引入视觉重识别特征（如外观嵌入）能否在保持轻量级架构的前提下，显著提升长期遮挡后的身份维护能力？计算开销与精度提升的权衡如何？
 
 5. **轻量化与精度的折衷**：将流水线中的 KeypointRCNN 或 ViTPose 替换为更轻量的姿态估计器（如 MobileNet 系列骨干），在保持可接受精度的前提下，能否将三维推理速度推至实时（>30 fps）？
+
+
 
 ## 原文 PDF
 

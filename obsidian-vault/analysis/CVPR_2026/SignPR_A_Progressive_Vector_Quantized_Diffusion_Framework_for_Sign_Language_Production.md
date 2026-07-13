@@ -42,7 +42,7 @@ claims:
 > - CSL-Daily 上，BLEU-4↑ 3.01 vs 2.14 (MoMP) (+0.87)；MPJPE↓ 44.22 vs 48.24 (MoMP) (-4.02)。
 > - USTC-CSL Split-I 上，ROUGE↑ 95.48 vs 25.09 (PT-GN) (+70.39)。
 
-## 概述
+## 概要
 
 手语生成（Sign Language Production, SLP）旨在将口语文本直接转化为连续的手语姿态序列，是连接聋人与听人社群的关键桥梁技术。当前文本到手语姿态（Text2Pose）方法面临一个核心瓶颈：**语义一致性、运动精度与时间连贯性难以同时保证**。具体而言，以**T2S-GPT**（Yin et al., arXiv 2024）为代表的单token帧级模型缺乏精细动作细节；以**SOKE**（Zuo et al., ICCV 2025）为代表的独立区域建模方法破坏了跨区域的语义对齐，导致组合不一致；而基于并行扩散的方法（如**G2P-DDM**, Xie et al., AAAI 2024）缺乏显式时间控制，离散token的并行更新易产生抖动和不平滑过渡。
 
@@ -52,7 +52,7 @@ SignPR的方法定位体现在三个关键设计上：**结构上**，通过双�
 
 在PHOENIX-14T数据集上，SignPR取得了31.91的BLEU-1、2.15的FID和23.04的MPJPE，相比强基线**MoMP**（Saunders et al., ICCV 2021）的16.87、2.97、45.26均有显著提升（Table 1）。在CSL-Daily数据集上，BLEU-4从MoMP的2.14提升至3.01，MPJPE从48.24降至44.22（Table 2）。消融实验进一步证实，移除区域细化会导致姿态细节丢失，移除块级因果推理则引发运动不连续和抖动，验证了各模块的关键作用。
 
-## 背景与动机
+
 
 手语生成（Sign Language Production, SLP）旨在将口语文本直接转换为连续的手语姿态序列，是打破聋听沟通壁垒的关键技术。与需要中间Gloss标注的Text2Gloss2Pose（T2G2P）路线不同，Text2Pose（T2P）方法直接从文本端到端生成姿态，避免了昂贵的人工标注，因而更具实用价值。然而，现有T2P方法面临一个核心瓶颈：**难以同时保证语义一致性、运动精度和时间连贯性**。
 
@@ -62,7 +62,9 @@ SignPR的方法定位体现在三个关键设计上：**结构上**，通过双�
 
 针对这一瓶颈，本文提出**SignPR**——一种渐进式向量量化扩散框架。其核心洞察是：**将手语姿态生成解耦为语义级先验与区域级细化，并引入时间因果约束，可系统性地解决语义‑运动‑时序三重挑战**。具体而言，SignPR在结构上采用双层离散表示（语义级与区域级），先生成语义姿态序列作为全局先验，再以文本和语义姿态为条件细化四个区域（身体、左手、右手、头部）的运动细节；在时间上引入块级因果推理（InferRef），将序列分块并按因果顺序逐步生成，同时允许对早期生成块进行迭代修正。这一“先粗后精、先因后果”的渐进式生成策略，从根本上改变了现有方法的建模范式。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SignPR 的核心创新在于通过**渐进式结构细化**与**块级因果时序推理**两个维度，系统性地解决了现有 Text2Pose 方法中语义一致性、运动精度与时间连贯性难以兼得的瓶颈。
 
@@ -91,7 +93,7 @@ SignPR 提出**结构向量量化变分自编码器（S-VQVAE）**，将每一�
 
 消融实验表明，块大小 $K=8$ 在 ROUGE 指标上相比完全并行推理（$K=\infty$）提升 +1.36，同时有效消除了运动不连续和抖动现象。这一推理策略无需重新训练，可即插即用于现有扩散模型，为时序生成任务提供了轻量且有效的时间约束方案。
 
-## 整体框架
+
 
 SignPR 提出了一种**渐进式向量量化扩散框架**，将手语姿态生成解耦为结构渐进与时间渐进两条主线，以同时应对语义一致性、运动精度与时间连贯性三重挑战。整体 pipeline 如图 1 所示，包含三个核心阶段：
 
@@ -108,7 +110,7 @@ SignPR 提出了一种**渐进式向量量化扩散框架**，将手语姿态生
 ![[assets/figures/papers/paper_list_l1002_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_SignPR_A_Progressi/figures/002_Figure_2.jpg]]
 *Figure 2: The progressive vector-quantized diffusion framework with S-VQVAE and S-Diffusion modules*
 
-## 核心模块与公式推导
+
 
 SignPR 的核心由四个模块构成：**结构化 VQVAE (S-VQVAE)**、**语义扩散 U-Net**、**区域扩散 U-Net** 以及 **块级因果推理 (InferRef)**。整体流程遵循“先语义后区域”的渐进式扩散范式。
 
@@ -161,7 +163,9 @@ $$\hat{I}_0^{re} = \phi_l(I_t^{re}, t^{re}, c, \hat{I}_0^{se}) \quad (6)$$
 
 **推理流程**：语义扩散和区域扩散均应用 InferRef 后，得到最终去噪 token 序列 $\hat{I}_0^{se}$ 和 $\hat{I}_0^{re}$，通过码本查找映射回语义嵌入和区域嵌入，经 S-VQVAE 解码器重建为连续姿态序列。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -233,7 +237,9 @@ SignPR在三个主流手语生成基准上均取得了最优性能，验证了�
 ![[assets/figures/papers/paper_list_l1002_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_SignPR_A_Progressi/figures/014_Table_4.jpg]]
 *Table 4: Effect of structural VQVAE on reconstruction quality. Note: Metrics with prefix ’r’ reflect VQVAE reconstruction quality. ’✓*’ indicates shared regional codebook across regions*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：语义‑运动‑时序的三重瓶颈
 
@@ -300,6 +306,8 @@ G2P-DDM和Sign-IDD采用完全并行的扩散去噪，所有帧的所有token同
 3. **跨语种泛化与码本共享**：在多语种手语数据上训练时，语义级码本是否可以在语种间共享（部分手语语义具有跨文化共性），而区域级码本需要语种特定？这涉及码本架构的重新设计。
 4. **推理效率优化**：能否通过知识蒸馏将两阶段渐进扩散合并为单阶段条件生成，或设计缓存机制复用语义扩散的中间特征，以减少区域扩散的计算冗余？
 5. **与Gloss监督的融合**：当前SignPR工作于纯Text2Pose设定（无Gloss中间表示），但手语生成领域存在大量Gloss标注数据。如何将Gloss作为可选的辅助条件融入渐进扩散框架（例如在语义扩散阶段引入Gloss交叉注意力），以进一步提升语义对齐精度，是一个自然的扩展方向。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICCV
 year: 2023
 pdf_ref: paperPDFs/ICCV_2023/SKED_Sketch_guided_Text_based_3D_Editing.pdf
+project_link: https://sked-paper.github.io/
+code_link: null
 aliases:
 - SKED
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | SKED：基于草图的文本引导3D编辑 |
 | 英文题名 | SKED: Sketch-guided Text-based 3D Editing |
 | 会议/期刊 | ICCV 2023 |
-| Links | [paper](https://arxiv.org/abs/2303.10735v3); [Project](https://sked-paper.github.io/) |
+| Links | [paper](https://arxiv.org/abs/2303.10735v3) · [Project](https://sked-paper.github.io/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | SKED |
 | Dataset | 五个代表性样本 (Cat+chef hat, Cupcake+candle, Horse+horn, Sundae+cherry, Plant+flower), 同上五个样本 |
@@ -40,7 +42,7 @@ claims:
 > - 同上五个样本 上，Intersection-over-Sketch (IoS) ↑ 为 0.8220 (平均)，对比 0.0211 (SKED no-silh 变体)，变化 +0.8009。
 > - 同上五个样本 上，CLIP-similarity ↑ 为 0.2739 (平均)，对比 0.2806 (平均, Text-Only)，变化 -0.0067。
 
-## 概述
+## 概要
 
 **核心瓶颈**：现有的文本到3D编辑方法仅依赖文本提示，难以实现精确的局部控制——用户无法通过简单的语言界面指定编辑的空间范围、形状和边界。文本语义虽然能指导“编辑什么”，却无法约束“在哪里编辑”这一关键几何维度。
 
@@ -52,8 +54,6 @@ claims:
 - **语义保持**：SKED 的 CLIP 相似度为 0.2739，与纯文本基线（0.2806）接近（Table 3），表明在不牺牲语义对齐的前提下实现了局部化编辑。
 
 **方法定位**：SKED 作用于已重建或生成的 NeRF 模型，以文本提示和至少两个视角的草图掩码为输入，在 DreamFusion 框架基础上引入两个新损失函数（保真损失与草图填充损失），并辅以稀疏性损失和占用网格预热策略，属于**基于草图的文本引导3D编辑**这一新兴范式。相较于仅文本的编辑基线，SKED 首次将多视图草图作为空间约束引入扩散模型驱动的NeRF编辑流程，填补了文本提示在局部控制上的空白。
-
-## 背景与动机
 
 3D内容的创建与编辑一直是计算机图形学与视觉领域的核心挑战。传统的3D建模管线依赖专业软件与大量人工操作，成本高昂且难以普及。近年来，基于神经辐射场（NeRF）的3D重建与生成技术取得了突破性进展，尤其是以DreamFusion为代表的文本到3D方法，使得用户仅通过自然语言提示即可生成完整的3D场景。这一范式极大地降低了3D内容创作的门槛。
 
@@ -67,7 +67,7 @@ SKED的动机正是弥合这一鸿沟。其核心洞察在于：**将复杂的�
 
 简言之，SKED回应了一个朴素而迫切的需求：让用户像在纸上画草图一样，直观地告诉3D模型“在这里改，改成这样”。这一需求在3D资产生成、游戏设计、虚拟现实内容创作等场景中具有广泛的应用前景。
 
-## 核心创新
+## 核心方法与创新机理
 
 SKED 的核心创新在于将**多视图草图**作为空间约束引入文本到 3D 编辑流程，解决了现有方法仅靠文本提示难以实现精确局部控制的关键瓶颈。其创新体现在三个相互协同的 changed slots 上。
 
@@ -106,8 +106,6 @@ $$\mathcal{L}_{sil} = \frac{1}{H \cdot W \cdot N} \sum_{j=1}^{N} \sum_{i=1}^{H \
 ### 与 Latent-NeRF 草图管线的对比
 
 **Latent-NeRF** 的草图形状编辑管线通过包围盒交叉构造 3D 掩码进行约束，而 SKED 直接利用多视图 2D 草图通过投影距离进行逐点调制，无需显式构造 3D 形状。这一设计使得 SKED 在保真度上显著优于 Latent-NeRF 基线（Table 7），且运行时间更短。
-
-## 整体框架
 
 SKED 的编辑 pipeline 将“草图引导的文本到 3D 编辑”分解为两个协同执行的子任务：**基于多视图几何推理的粗编辑区域确定**，与**基于预训练扩散模型语义知识的精细编辑**。这一分解使得仅靠文本提示难以实现的局部空间控制，能够通过用户绘制的多视图草图自然地注入编辑优化过程。
 
@@ -160,8 +158,6 @@ $$\mathcal{L}_{total} = \mathcal{L}_{SDS} + \lambda_{pres}\mathcal{L}_{pres} + \
 ### 设计逻辑
 
 该框架的核心设计逻辑在于**通过多视图几何约束将文本驱动的生成能力锚定在用户指定的空间范围内**。SDS 损失提供语义驱动力，草图填充损失提供几何对齐约束，保真损失确保非编辑区域不受影响——三者协同工作，使得 SKED 既能生成符合文本语义的细节（如“厨师帽”的褶皱和质感），又能严格遵循草图的形状边界，同时保持基模型其余部分的完整性。
-
-## 核心模块与公式推导
 
 ### 3.1 问题分解与整体流程
 
@@ -227,7 +223,7 @@ $$IoS = \sum_{i=1}^{N} |M_i \cap C_i^{\alpha}| / |M_i|$$
 
 其中 $C_i^{\alpha}$ 为阈值化后的渲染 alpha 掩码。该指标衡量生成内容占据草图区域的比例，值越接近 1 表示对齐越好。Table 2 显示 SKED 的 Mean IoS 达到 0.8220，而移除 $\mathcal{L}_{sil}$ 后骤降至 0.0211，直接验证了草图填充损失的必要性。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心瓶颈的验证
 
@@ -292,21 +288,7 @@ Figure 10揭示了SKED对底层扩散模型的依赖性。该方法兼容任何�
 ![[assets/figures/papers/paper_list_l35_https_arxiv_org_abs_2303_10735v3/figures/011_Table_3.jpg]]
 *Table 3: Semantic alignment score. We measure the CLIP-similarity [53] ↑ of the rendered method output with the clip embedding of the input text prompt. Text-Only refers to a public re-implementation of [52]. The qualitative equivalents of Cat and Plant examples are depicted in Fig. 7 from the main paper: Compared with [52] which changes the structure of the base model to satisfy the text semantics, our method preserves the base model, while also maintaining semantic correlation with the text*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l35_https_arxiv_org_abs_2303_10735v3/figures/007_Figure_5.jpg]]
-*Figure 5: Various types of edits. SKED is capable of overwriting parts the base model (Cactus, Skirt), as well as adding new details (Pancake, Teddy)*
-
-![[assets/figures/papers/paper_list_l35_https_arxiv_org_abs_2303_10735v3/figures/016_Table_4.jpg]]
-*Table 4: Fidelity of base field. We measure the Structural Similarity (SSIM ↑) of the method’s output against renderings from the base model. SKED (no-preserve) refers to a variant of our method which doesn’t apply $\mathcal { L } _ { p r e s }$ . Text-Only refers to a public re-implementation of Latent-NeRF [41]. Latent-NeRF uses the setting from Section B.2*
-
-![[assets/figures/papers/paper_list_l35_https_arxiv_org_abs_2303_10735v3/figures/017_Table_5.jpg]]
-*Table 5: Fidelity of base field. We measure the Perceptual Image Patch Similarity (LPIPS ↓) of the method’s output against renderings from the base model. We use VGG [?] as the learned perceptual encoder. SKED (no-preserv) refers to a variant of our method which doesn’t apply $\mathcal { L } _ { p r e s }$ . Text-Only refers to a public re-implementation of DreamFusion [52]. Latent-NeRF uses the setting from Section B.2*
-
-![[assets/figures/papers/paper_list_l35_https_arxiv_org_abs_2303_10735v3/figures/018_Table_6.jpg]]
-*Table 6: Fidelity of base field. Following the experiments in section 4.3, we measure the PSNR of the base objects on additional examples provided in Fig. 5 and Fig. 10*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 任务定位与核心瓶颈
 

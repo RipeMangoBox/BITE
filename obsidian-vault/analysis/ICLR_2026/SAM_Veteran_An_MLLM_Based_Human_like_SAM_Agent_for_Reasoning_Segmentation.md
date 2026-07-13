@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/SAM_Veteran_An_MLLM_Based_Human_like_SAM_Agent_for_Reasoning_Segmentation.pdf
+project_link: null
+code_link: null
 openreview_forum_id: oN55r8iJJW
 aliases:
 - SV
@@ -42,7 +44,7 @@ claims:
 > - ReasonSeg val 上，cIoU 为 67.3，对比 62.0 (Seg-Zero)，变化 +5.3。
 > - ReasonSeg test 上，gIoU 为 62.6，对比 57.5 (Seg-Zero)，变化 +5.1。
 
-## 概述
+## 概要
 
 **核心问题**：现有的基于多模态大语言模型（MLLM）的推理分割方法存在两个根本瓶颈。其一，它们未能充分利用SAM的交互式迭代精炼能力，仅以单步生成框或点的方式与SAM交互，无法模拟人类用户使用SAM时的自然工作流程——先生成边界框获取初始掩码，再基于掩码质量进行点精炼，并自适应地决定何时终止。其二，主流的监督微调（SFT）方法在赋予模型新能力的同时，会导致灾难性遗忘，损害模型的通用推理能力。
 
@@ -52,7 +54,7 @@ claims:
 
 **方法谱系与知识库定位**：SAM-Veteran属于基于强化学习的推理分割方法，与Seg-Zero（Liu et al., 2025a）、SegAgent（Zhu et al., 2025b）、SAM-R1（Huang et al., 2025）和POPEN（Zhu et al., 2025a）处于同一技术路线，但区别于LISA（Lai et al., 2024）、VISA（Yan et al., 2024）、PixelLM（Ren et al., 2024b）等基于SFT的方法。相较同类RL方法，SAM-Veteran的独特贡献在于：将交互建模为多步迭代过程（框→点→自适应终止）而非单步，设计多任务RL框架与复合奖励函数，并通过动态采样稳定训练。
 
-## 背景与动机
+
 
 推理分割（Reasoning Segmentation）要求模型根据复杂的自然语言查询，在图像中定位并分割出目标区域。这一任务的核心挑战在于，模型需要同时具备视觉-语言推理能力和精确的像素级掩码生成能力。
 
@@ -62,7 +64,9 @@ claims:
 
 **本文动机。** 针对上述不足，本文提出SAM-Veteran，旨在让MLLM像经验丰富的SAM用户一样执行完整的推理分割工作流程。核心思想是：将MLLM与SAM的多步交互建模为马尔可夫决策过程（MDP），通过多任务强化学习框架训练MLLM同时掌握文本定位、掩码理解和自适应终止三种能力，并设计复合奖励函数引导模型在每一步做出最优决策。这一设计使得模型不仅能在域内数据上取得最优性能，还能在域外数据上展现出更强的泛化能力，同时保留MLLM的通用推理能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SAM-Veteran的核心创新在于将MLLM与SAM的交互从单步传递提升为**人类化的迭代推理分割工作流**，并通过**多任务强化学习框架**驱动这一过程。与现有方法相比，其关键突破体现在以下五个维度。
 
@@ -105,7 +109,7 @@ SAM-Veteran提出基于**Group Relative Policy Optimization（GRPO）**的多任
 
 Table 8的系统性对比表明，基于SFT的方法（如SegAgent）在通用MLLM基准上出现显著性能退化，而SAM-Veteran的RL训练框架有效保留了基础模型的通用推理能力。这一特性源于GRPO优化过程中策略更新受KL散度约束，避免了SFT中参数的大幅偏移。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_oN55r8iJJW/figures/002_Figure_2.jpg]]
 *Figure 2: Multi-task RL framework comprising Textual Grounding, Mask Comprehension, and Auxiliary Mask Comprehension. Two rollouts (with their rewards) are shown in different colors (blue and yellow). In the final reward, different bar textures represent different reward functions*
@@ -170,7 +174,7 @@ GRPO训练需要从策略中采样多个rollout来估计优势函数。为稳定
 
 该工作流的关键瓶颈突破在于：MLLM不仅学会了“何时精炼”，更学会了“如何精炼”——在掩码不满意时生成有意义的正/负点，在掩码满意时主动终止，而非固定步数的盲目迭代。Figure 3的趋势曲线验证了迭代精炼带来的持续IoU提升，尤其在域外数据上效果显著。
 
-## 核心模块与公式推导
+
 
 ### 3.1 推理分割的MDP建模
 
@@ -249,7 +253,9 @@ $$R = R^{\mathrm{DCS}} + R^{\Delta}$$
 
 为稳定GRPO训练中的动作多样性，SAM-Veteran采用动态采样策略。在文本定位任务中，对MLLM生成的多个候选框应用NMS（IoU阈值0.8）去重后采样。在掩码理解任务中，按 $(1, 2, 2, 1)$ 的比例分别采样 $(\mathrm{null}, \mathrm{null})$、$(p^{+}, \mathrm{null})$、$(\mathrm{null}, p^{-})$、$(p^{+}, p^{-})$ 四类动作。动态采样在训练初期启用，300次迭代后关闭以加速训练，且不影响最终性能（section A.2）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：SAM-Veteran在域内与域外数据集上均取得最优性能
 
@@ -313,7 +319,9 @@ Figure 12揭示了SAM-Veteran的典型失败案例，按错误类型着色：
 
 Table 9显示，将MLLM从7B扩展到32B带来额外性能提升，但增益相对有限，表明7B版本已具备较强的推理分割能力。Table 11的推理成本对比显示，SAM-Veteran的迭代精炼机制在增加适度计算开销的同时，换取了显著的精度提升，在精度-效率权衡上优于固定步数的基线方法。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 推理分割的范式演进
 
@@ -361,6 +369,8 @@ SAM-Veteran将MLLM与SAM的交互建模为完整的马尔可夫决策过程（MD
 2. **掩码呈现方式优化**：如何在不影响颜色感知的前提下向MLLM呈现分割掩码？可能的方案包括边缘轮廓叠加、半透明填充或分离通道输入。
 3. **框架泛化性**：该多任务RL框架是否可扩展到其他需要交互式分割的视觉任务，如视频目标分割、3D点云分割或医学图像分割？
 4. **动态采样策略的鲁棒性**：动态采样的超参数在不同数据分布和任务复杂度下的最优配置规律尚待系统研究。
+
+
 
 ## 原文 PDF
 

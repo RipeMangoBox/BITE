@@ -43,7 +43,7 @@ claims:
 > - ENC-Bench L-1 Perception (Symbol Recognition) 上，Accuracy 69.53% (Gemini-2.5-Pro) vs 25.0% (Random) (+44.53%)。
 > - ENC-Bench L-2 Spatial (Bearing Acc@20°) 上，Accuracy@20° 55.64% (Qwen3-VL-235B-Thinking) vs 25.15% (GPT-4o) (+30.49%)。
 
-## 概述
+## 概要
 
 **ENC-Bench** 是一个面向电子航海图（ENC）理解的多模态大语言模型（MLLM）评估基准。该工作聚焦一个核心问题：当前通用 MLLMs 能否弥合通用视觉理解与专业、结构化、安全关键的 ENC 领域之间的鸿沟？
 
@@ -59,7 +59,7 @@ claims:
 
 该基准的提出，为 MLLMs 在安全关键领域的应用划定了当前的能力边界，并指明了符号-语义映射、多尺度不变性学习和显式约束推理等关键改进方向。
 
-## 背景与动机
+
 
 ### 专业导航图的认知鸿沟
 
@@ -83,7 +83,9 @@ Table 1 系统对比了 ENC-Bench 与现有基准在标准化符号识别、精�
 
 基于上述缺口，本文提出 **ENC-Bench**——首个严格遵循海事导航认知层次（感知→空间推理→决策）的基准，旨在系统性诊断 MLLMs 在专业 ENC 理解中的能力边界。ENC-Bench 包含 20,490 个经过专家验证的样本，源自 840 张真实 NOAA S-57 海图，通过校准的向量-图像管道生成，覆盖三种光照模式与六种制图尺度。其三层评估框架（Figure 1）分别对应符号识别与特征理解（L-1 感知）、精确度量空间推理（L-2）、以及多约束安全决策（L-3），从而为回答核心开放问题提供可量化的实验基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作并未提出新的模型架构或训练算法，其核心创新在于**构建了首个严格遵循海事导航认知层次的基准框架 ENC-Bench**，并以此系统性揭示了当前先进 MLLMs 在专业电子航海图理解中的能力边界。与已有视觉问答或文档理解基准（Table 1）相比，ENC-Bench 的关键差异化创新体现在以下三个 changed slots 上。
 
@@ -115,7 +117,7 @@ ENC-Bench 在评估维度上的核心创新在于**分离了“视觉定位”�
 
 综上，ENC-Bench 的创新不在于提出新的模型，而在于**通过精心设计的基准框架和评估协议，将 MLLMs 在安全关键专业领域的能力缺陷从“整体性能低下”细化为“符号基础断裂”“多约束推理缺失”“分布鲁棒性冲突”三个可诊断的因果瓶颈**，为后续的领域适配研究提供了明确的方向指引。
 
-## 整体框架
+
 
 ENC-Bench 提出了一套系统化的评估框架，旨在填补多模态大语言模型（MLLMs）在专业电子航海图（ENC）理解能力评估方面的空白。该框架的核心设计思想是模拟海事导航员的认知层次，将评估任务组织为三个递进的层级：**感知（L-1）**、**空间推理（L-2）** 和 **海事决策（L-3）**，如 Figure 1 所示。这种分层结构从基础的符号识别逐步过渡到复杂的多约束安全决策，全面覆盖了从“看”到“算”再到“判”的专业导航认知链条。
 
@@ -150,7 +152,7 @@ ENC-Bench 提出了一套系统化的评估框架，旨在填补多模态大语�
 ![[assets/figures/papers/paper_list_l2740_https_arxiv_org_abs_2603_22763/figures/010_Figure_4.jpg]]
 *Figure 4: Domain Contrast: Consumer Mapping vs. Professional Hydrography. Comparison of the same geographic region across (a) Google Maps Standard View, (b) Google Maps Satellite Imagery, and (c) NOAA Electronic Navigational Chart (ENC). While consumer maps focus on road networks and vague water representations, ENCs illustrate a complex, vector-based hydrographic reality. Note how the ENC explicitly renders critical depth contours, shipping channels, and navigational aids absent in consumer views, prioritizing safetycritical information over visual realism*
 
-## 核心模块与公式推导
+
 
 ### 基准构建管线
 
@@ -199,7 +201,9 @@ $$
 ![[assets/figures/papers/paper_list_l2740_https_arxiv_org_abs_2603_22763/figures/012_Figure_6.jpg]]
 *Figure 6: Operational Lighting Modes. Demonstration of the ECDIS standardized color palettes. (a) Day Mode: High contrast with white/blue backgrounds. (b) Dusk Mode: Reduced glare with grey backgrounds. (c) Night Mode: Black background with non-linear color shifts. Note how the blue shallow water in Day mode transforms into dark grey/black tones in Night mode, and text labels shift colors to maintain visibility. This drastic “palette swapping” challenges MLLMs reliant on natural image color statistics*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 整体性能概览：通用模型在专业海图上的能力断层
 
@@ -290,7 +294,9 @@ ENC-Bench 作为首个严格遵循海事导航认知层次（感知→空间推�
 ![[assets/figures/papers/paper_list_l2740_https_arxiv_org_abs_2603_22763/figures/005_Table_3.jpg]]
 *Table 3: Performance on Perception and Decision-Making tasks. Results in accuracy (%). Bold indicates best performance*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有基准的关系：填补专业海图理解的系统性空白
 
@@ -354,6 +360,8 @@ ENC-Bench 的结论适用性受以下设计边界约束：
 3. 模型在不同海洋区域（非美国水域）和不同海图格式（如 S-63 加密格式）上的泛化能力如何？
 4. 是否需要引入显式的多约束求解模块作为 MLLMs 的补充，以保障安全关键决策的可靠性？混合架构（神经符号方法）在该领域的可行性值得探索。
 5. 如何将实时动态信息（AIS、雷达）与静态 ENC 解释结合，构建面向自主驾驶导航的端到端评估基准？这需要从静态 VQA 范式向时序多模态推理范式演进。
+
+
 
 ## 原文 PDF
 

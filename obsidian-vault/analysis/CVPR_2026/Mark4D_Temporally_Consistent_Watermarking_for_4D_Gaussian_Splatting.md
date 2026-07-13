@@ -40,7 +40,7 @@ claims:
 > [!tip] 效果简介
 > - D-NeRF + DyNeRF (平均) 上，Bit Acc (%) @32 bits (帧级) 96.34 vs 88.33 (GuardSplat) (+8.01)；PSNR (dB) @32 bits (帧级) 42.32 vs 38.69 (GuardSplat) (+3.63)；Bit Acc (%) @64 bits Ours vs 3D-GSW (+9.35%p)。
 
-## 概述
+## 概要
 
 **核心问题**：将现有3DGS水印方法直接应用于动态4DGS时，高斯体的连续时空变形与不同运动动态导致几何保真度损失、时间不一致，且缺乏针对运动变化的自适应监督机制。
 
@@ -48,7 +48,7 @@ claims:
 
 **主要结果**：在 D-NeRF 与 DyNeRF 数据集上，Mark4D 在32位水印容量下平均比特准确率达96.34%，PSNR达42.32 dB，分别超出最强基线 GuardSplat (Chen et al., CVPR 2025) 8.01个百分点和3.63 dB；在64位容量下，比特准确率与PSNR分别领先 3D-GSW (Jang et al., CVPR 2025) 9.35个百分点和10.40 dB。消融实验证实，轨迹对齐损失、空间偏移与运动自适应加权均为性能提升的关键因素。
 
-## 背景与动机
+
 
 ### 4D高斯溅射与版权保护需求
 
@@ -82,7 +82,9 @@ $$\tilde{\mathcal{G}}(t) = \{ \mathbf{x}_i(t), h_i(t), \alpha_i(t), \Sigma_i(t) 
 
 - **运动自适应监督**：根据帧间平均运动幅度动态调节水印损失权重 $\lambda_{S_t}$——在静止帧降低权重以保持视觉质量，在剧烈运动帧提高权重以增强水印嵌入强度，使模型自适应地平衡不可见性与鲁棒性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Mark4D 针对动态 4D 高斯溅射（4DGS）场景中水印嵌入的核心瓶颈——时间不一致性与几何保真度损失——提出了三个环环相扣的创新机制，构成一条从“水印如何解码”到“水印如何嵌入”再到“嵌入强度如何调控”的完整因果链。
 
@@ -134,7 +136,7 @@ $$\mathcal{L}_{\mathrm{total}} = \lambda_{S_t} \mathcal{L}_{\mathrm{msg}} + \lam
 
 上述三个创新并非孤立存在，而是形成了一条递进式的因果链路：**潜在空间解码**（创新 1）为水印嵌入提供了对像素级扰动鲁棒的优化目标；**轨迹对齐偏移**（创新 2）确保了在满足该目标的过程中不破坏 4DGS 的几何与时间一致性；**运动自适应加权**（创新 3）则进一步精细调控不同运动状态下的嵌入强度，使得静态帧保持视觉质量、动态帧获得足够的鲁棒性。三者共同实现了“不可见性-容量-鲁棒性-时间一致性”的四维平衡，这是现有 3DGS 水印方法直接应用于 4D 场景时无法达成的。
 
-## 整体框架
+
 
 Mark4D 采用两阶段训练范式，将水印信息嵌入到预训练的 4D 高斯溅射模型中，同时保持渲染结果的几何保真度和时间一致性。其核心设计围绕三个关键机制展开：**潜在空间水印解码**、**轨迹对齐偏移**和**运动自适应损失加权**。
 
@@ -188,7 +190,7 @@ $$\mathcal{L}_{\mathrm{total}} = \lambda_{S_t} \mathcal{L}_{\mathrm{msg}} + \lam
 ![[assets/figures/papers/paper_list_l31_https_openaccess_thecvf_com_content_CVPR2026_html_Lee_Mark4D_Temporally/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the 4DGS watermarking scenario. An owner (Alice) embeds a message key into a trained 4DGS model and releases it online. Even if a malicious user (Bob) distorts the BobRender Mmodel or its rendered videos to assert false ownership, our method Bob (Owner) Trained 4DGS Message Key Watermarked 4DGS ssguarantees embedded message recovery for verification*
 
-## 核心模块与公式推导
+
 
 Mark4D 的核心设计围绕三个关键模块展开：**潜在空间消息解码器**、**轨迹对齐偏移嵌入**和**运动自适应损失加权**。以下逐一阐述其公式化定义与作用机理。
 
@@ -267,7 +269,9 @@ $$
 ![[assets/figures/papers/paper_list_l31_https_openaccess_thecvf_com_content_CVPR2026_html_Lee_Mark4D_Temporally/figures/007_Figure_5.jpg]]
 *Figure 5: Visualizations of the effects of*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与验证逻辑
 
@@ -334,7 +338,9 @@ Table 2展示了32位配置下对各种失真的鲁棒性。Mark4D在JPEG压缩�
 ![[assets/figures/papers/paper_list_l31_https_openaccess_thecvf_com_content_CVPR2026_html_Lee_Mark4D_Temporally/figures/002_Figure_2.jpg]]
 *Figure 2: Comparison of the distributions of average motion magnitude of Gaussians over time in pretrained 4DGS models on D-NeRF (lego) and DyNeRF (flame salmon) scenes. The x-axis indicates the average motion magnitude normalized to range [0, 1] using the global maximum across both datasets, and the y-axis represents its occurrence frequency*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有3DGS水印方法的区别
 
@@ -375,6 +381,8 @@ Mark4D 的适用性受以下边界条件约束：
 - **自适应权重的自动化**。能否通过学习或启发式方法自适应调整 $\lambda_{\min}$ 和 $\lambda_{\max}$，使运动自适应策略对不同场景无需手工超参数调优？这涉及对运动分布与最优权重之间关系的进一步建模。
 
 - **更精细的几何约束**。轨迹对齐损失仅约束位置偏移的方向，未考虑高斯形状或协方差的保持。是否可以用更精细的几何约束（如限制协方差矩阵的形变程度或保持高斯体积）替代或补充现有损失，以进一步提升不可见性？
+
+
 
 ## 原文 PDF
 

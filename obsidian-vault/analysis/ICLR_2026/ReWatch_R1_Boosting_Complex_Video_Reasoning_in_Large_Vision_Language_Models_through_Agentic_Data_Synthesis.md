@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/ReWatch_R1_Boosting_Complex_Video_Reasoning_in_Large_Vision_Language_Models_through_Agentic_Data_Synthesis.pdf
+project_link: https://rewatch-r1.github.io
+code_link: null
 openreview_forum_id: xindJJLSr1
 aliases:
 - RR
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | ReWatch-R1：通过智能体数据合成增强大视觉语言模型的复杂视频推理 |
 | 英文题名 | ReWatch-R1: Boosting Complex Video Reasoning in Large Vision-Language Models through Agentic Data Synthesis |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=xindJJLSr1); [Project](https://rewatch-r1.github.io) |
+| Links | [paper](https://openreview.net/forum?id=xindJJLSr1) · [Project](https://rewatch-r1.github.io) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | ReWatch-R1 |
 | Dataset | Average of 5 Video Reasoning Benchmarks (192 frames), VCR-Bench (192 frames), Average of 4 Video Understanding Benchmarks (192 frames) |
@@ -42,7 +44,7 @@ claims:
 > - Average of 5 Video Reasoning Benchmarks (192 frames) 上，accuracy 为 35.51% (ReWatch-R1)，对比 30.71% (Qwen2.5-VL-7B non-thinking)，变化 +4.80%。
 > - VCR-Bench (192 frames) 上，accuracy 为 40.14% (ReWatch-R1)，对比 32.69% (Video-R1)，变化 +7.45%。
 
-## 概述
+## 概要
 
 **核心问题**：现有视频推理数据集普遍缺乏高质量、挑战性的多跳问题以及基于视频内容的思维链（CoT），导致基于强化学习的视频推理（RLVR）方法难以引导模型进行真正基于证据的推理，模型容易依赖语言先验而产生幻觉。
 
@@ -55,7 +57,7 @@ claims:
 
 **方法定位**：ReWatch-R1 属于“智能体数据合成 + 过程奖励引导的 RLVR”范式。与 Video-R1 等仅依赖最终答案奖励的方法不同，ReWatch-R1 将视频推理建模为“观察→推理→答案”的序列过程，通过合成高质量的视频基于思维链数据初始化策略，再利用 O&R 奖励在 RL 阶段强化推理的忠实性与逻辑一致性。该方法在 7B 和 32B 模型规模上均验证了有效性，且对视频理解任务亦有正向迁移（平均提升 1.95%）。
 
-## 背景与动机
+
 
 视频推理要求模型从长时序视觉流中提取关键证据、建立因果联系并进行多跳逻辑推导，是当前大视觉语言模型（LVLM）面临的核心挑战之一。尽管基于强化学习的视觉推理训练（RLVR）在图像领域已展现出通过过程奖励引导模型进行可验证推理的潜力，但将其直接迁移至视频领域时，面临一个根本性的瓶颈：**现有视频推理数据集缺乏高质量、挑战性的多跳问题以及基于视频内容的思维链（CoT）**。
 
@@ -65,7 +67,9 @@ ReWatch-R1针对上述缺口，提出了一条从数据合成到训练机制的�
 
 这一洞察建立在以下因果链条之上：首先，通过模拟人类“重新观看”过程的多智能体ReAct框架，合成显式记录信息检索与验证步骤的视频思维链数据，为模型提供可靠的推理模板；其次，设计观察与推理（O&R）奖励机制，在RL阶段不仅评估最终答案正确性，还直接评估中间观察的事实正确性和推理的逻辑充分性，从而将奖励信号从“答对”延伸到“如何答对”。两者协同作用，使模型从SFT阶段习得“如何看”，在RL阶段通过过程奖励被强化为“必须看”。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ReWatch-R1的核心创新在于将**智能体数据合成**与**过程奖励机制**深度耦合，系统性地解决了当前视频推理RLVR范式的两大瓶颈：高质量视频思维链数据的缺失，以及仅依赖最终答案正确性的稀疏奖励无法有效引导基于视频证据的推理。
 
@@ -138,7 +142,7 @@ $$r_{O\&R} = r_{acc} \times (1 + r_{obs} + r_{rea}) + r_{fmt}$$
 
 上述四个changed slots并非独立运作，而是形成了层层递进的协同体系：**分层描述**为**对比QA生成**提供信息基础，**三重过滤**确保QA的高质量和高视频依赖性，**ReAct CoT合成**在此基础上生成视频基于的推理轨迹，最终**O&R奖励**在RL阶段引导模型内化这一推理模式。消融实验（Figure 5a）证实了这一协同效应的必要性：将ReWatch-CoT替换为Video-R1的CoT数据会显著降低性能，说明高质量数据与奖励机制缺一不可。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_xindJJLSr1/figures/003_Figure_3.jpg]]
 *Figure 3: The data construction pipeline. (a) Caption Construction. Long videos are semantically segmented to produce detailed, temporally-aware captions. (b) QA Pair Generation. A contrastive method using detailed and summary captions generates complex questions, which are then purified by a three-layer filtering mechanism. (c) CoT Synthesis. A ReAct framework with a Reasoner Agent and an Observer Agent simulates a "re-watching" process by performing targeted queries on the video caption to generate video-grounded reasoning traces*
@@ -182,7 +186,7 @@ ReWatch-R1 的整体框架由**数据合成管线**与**两阶段后训练流程
 - **训练流**：基础模型 → SFT（多任务学习）→ 策略初始化 → GRPO RL（O&R 奖励优化）→ ReWatch-R1 模型。
 - **推理流**：视频 + 问题 → 策略生成 Thought-Action-Observation 推理轨迹 → 最终答案。
 
-## 核心模块与公式推导
+
 
 ReWatch-R1 的核心技术路线围绕“高质量视频推理数据合成”与“过程奖励引导的强化学习”两条主线展开。其关键模块与公式如下。
 
@@ -249,7 +253,9 @@ O&R 奖励是该方法的核心创新，直接针对视频推理中的幻觉问�
 
 这一设计的因果逻辑是：仅当模型正确理解视频内容（$r_{obs}$ 高）且逻辑推理充分（$r_{rea}$ 高）时，才能获得最大奖励。它直接惩罚了脱离视频证据的幻觉推理。实验表明，加入 O&R 奖励后，ReWatch-R1 在五项推理基准上的平均准确率从 35.51% 进一步提升至 35.78%（192 帧）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果：视频推理基准
 
@@ -295,7 +301,9 @@ Figure 7揭示了思考模式在训练过程中的动态变化。在基础模型
 
 Figure 9展示了ReWatch-R1在不同视频时长上的性能表现。在短（0-3分钟）、中（3-20分钟）、长（>20分钟）三类视频上，ReWatch-R1在推理和理解任务上均保持稳定优势，表明分层动态帧率的描述生成策略有效保留了长视频中的时序信息，避免了长视频场景下的性能退化。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法沿革与基线关系
 
@@ -337,6 +345,8 @@ ReWatch-R1 的有效性建立在以下关键前提之上，这些前提也构成
 4.  **跨架构与跨模态泛化**：ReWatch-R1 基于 Qwen2.5-VL 架构，其数据合成与训练策略能否有效迁移到其他视觉语言模型架构，乃至扩展到其他视频理解任务（如时序定位、视频问答），值得系统研究。
 
 5.  **推理效率与准确性的权衡**：RL 阶段使模型的平均动作数减少，同时保持高准确率（Figure 6b），这表明 RL 能够优化推理过程效率。然而，在计算资源受限的场景下，如何显式控制推理深度与准确性的权衡，仍是一个开放问题。
+
+
 
 ## 原文 PDF
 

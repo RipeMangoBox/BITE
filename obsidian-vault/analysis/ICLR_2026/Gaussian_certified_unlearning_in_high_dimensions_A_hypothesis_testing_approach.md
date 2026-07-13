@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Gaussian_certified_unlearning_in_high_dimensions_A_hypothesis_testing_approach.pdf
+project_link: null
+code_link: null
 openreview_forum_id: 0FJYicpOj0
 aliases:
 - GCUHDHTA
@@ -40,7 +42,7 @@ claims:
 > - synthetic data with ridge logistic regression 上，GED (Generalization Error Divergence) 为 Gaussian: slopes -0.47, -0.54, -0.51 for m=1,5,10，对比 Laplace: higher slopes，变化 Gaussian GED decays faster and is uniformly lower than Laplace。
 > - IMDb (real-world high-dimensional text data), p=3161, n=1579 上，GED 为 Gaussian: lower GED across ε，对比 Laplace and (φ,ε,δ)-certified: higher GED，变化 Gaussian noise yields best accuracy in high-dimensional real data。
 
-## 概述
+## 概要
 
 在高维比例区域（$p \sim n$）中，机器学习遗忘面临一个根本性瓶颈：传统的优化假设——每样本损失的强凸性与光滑性——在该区域中不再成立，而现有的可认证遗忘定义（如 $(\varepsilon,\delta)$-遗忘、Rényi 遗忘和 $(\varphi,\varepsilon)$-遗忘）与高斯噪声机制不相容，导致过度噪声注入和精度损失。本文的核心洞察是：在高维环境中，高斯认证遗忘是最优的自然认证概念。作者提出 $\varepsilon$-Gaussian 认证遗忘框架（GPAR），并证明仅需**单步牛顿更新**结合**精确校准的高斯噪声**，即可同时实现可认证的隐私保护与渐近可忽略的泛化误差退化。
 
@@ -48,7 +50,7 @@ claims:
 
 数值实验验证了理论结论：在合成数据和真实高维 IMDb 数据集（$p=3161$, $n=1579$）上，高斯认证遗忘的泛化误差分化（GED）和遗忘数据误差分化（UED）均优于拉普拉斯噪声和 $(\varphi,\varepsilon,\delta)$-认证遗忘，且 GED 随维度 $p$ 增长以 $p^{-0.5}$ 阶衰减，随隐私参数 $\varepsilon$ 增大单调下降。
 
-## 背景与动机
+
 
 机器学习模型在实际部署中常常需要“遗忘”特定训练样本——例如，当用户依据 GDPR 或 CCPA 等法规要求删除个人数据时。最直接的方式是完全重训练，但在大规模模型上计算代价过高。因此，研究者提出了多种“机器遗忘”算法，试图在不重训练的前提下，从已训练模型中移除指定数据的影响。
 
@@ -58,7 +60,9 @@ claims:
 
 本文的核心动机正是针对这一瓶颈，提出一种在高维环境中自然最优的认证遗忘框架。核心思路是采用 **ε-Gaussian 认证遗忘 (GPAR)** 替代传统的 (φ,ε)-认证，利用高斯噪声机制与假设检验中高斯权衡曲线的维度无关性，实现精准的噪声校准。理论分析表明，仅需**单步牛顿更新**配合精心校准的高斯噪声，即可同时达到 ε-Gaussian 可认证性和渐近消失的泛化误差分化——这一结果揭示了 (φ,ε)-可认证遗忘在高维场景下的次优性，并为实际部署提供了简洁高效的遗忘方案。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作的核心创新在于提出并验证了一种适用于高维比例区域 ($p \sim n$) 的 **ε-Gaussian 认证遗忘框架 (GPAR)**，并证明仅需 **单步牛顿更新配合精确校准的高斯噪声** 即可同时实现隐私认证与渐近消失的泛化误差分化。这一框架在认证定义、噪声机制和算法效率三个关键维度上突破了已有工作的瓶颈。
 
@@ -124,7 +128,7 @@ $$\mathrm{GED}(\tilde{\beta}_{\backslash \mathcal{M}}, \hat{\beta}_{\backslash \
 2. 删除规模须满足 $m = o(n^{1/4}/\mathrm{polylog}(n))$，大规模删除场景下的精度退化风险需进一步评估。
 3. 特征次高斯分布假设在现实数据中可能偏离，对厚尾特征的鲁棒性尚未探索。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0009_0FJYicpOj0_Gaussian_certified_unlearning_in_high_dimensions/figures/001_Table_1.jpg]]
 *Table 1: Summary of prior certified unlearning notions and per-example loss assumptions, compared to our proposed ( $\varphi , \varepsilon$ ) -Gaussian certifiability framework (Def. 2). Our notion is optimally achievable with practical Gaussian noise mechanisms in the proportional high-dimensional regime, and it relies on relaxed convex per-example loss assumptions that remain valid in this setting (Sec. 4.2)
@@ -188,7 +192,7 @@ $$\mathrm{GED}_{\ell}(A, \bar{A}; \mathcal{M}, \mathcal{D}_n) := \mathbb{E}\left
 
 Table 1 系统比较了本框架与先前认证遗忘定义的差异。Zou et al. (2025) 的 $(\varphi,\varepsilon)$-认证遗忘需要至少两步牛顿更新才能同时保证隐私与精度，而本工作证明单步即可——这一差距揭示了 $(\varphi,\varepsilon)$-认证定义与噪声机制的次优性，而 $(\varphi,\varepsilon)$-高斯认证遗忘能够最优地解决该问题。同时，本框架放松了每样本损失的强凸-光滑联合假设，仅要求可分离正则化器、凸性和多项式增长的导数，使其在高维比例区域中依然有效。
 
-## 核心模块与公式推导
+
 
 ### 核心模块
 
@@ -251,7 +255,9 @@ $$\mathrm{GED}(\tilde{\beta}_{\setminus \mathcal{M}}, \hat{\beta}_{\setminus \ma
 
 核心瓶颈在于：传统 $(\varphi,\varepsilon)$-认证遗忘定义与高斯噪声机制不兼容，导致过度噪声注入和精度损失，而 GPAR 通过高斯权衡曲线精准校准噪声方差，在高维比例区域中实现了最优的隐私-精度权衡。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：高斯认证遗忘的精度优势
 
@@ -308,7 +314,9 @@ $$\mathrm{GED}(\tilde{\beta}_{\setminus \mathcal{M}}, \hat{\beta}_{\setminus \ma
 
 - **Figure 5 (右)** 是整篇论文最具说服力的实验证据：在高维 IMDb 数据 (p>n) 上，高斯认证遗忘的 GED 在所有 ε 下均显著低于拉普拉斯和 (φ,ε,δ)-认证遗忘，直接验证了“高斯认证遗忘在高维环境中是自然的最优认证概念”这一核心洞察。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与已有认证遗忘定义的继承与突破
 
@@ -362,6 +370,8 @@ $$\mathrm{GED}(\tilde{\beta}_{\setminus \mathcal{M}}, \hat{\beta}_{\setminus \ma
 4. **删除规模提升**：能否将 $m = o(n^{1/4})$ 的条件改进为 $m^3 = o(n)$，以支持更大规模的批量删除？
 5. **在线与分布遗忘**：该框架是否适用于删除请求连续到达的在线场景，或修改数据分布而非删除特定样本的分布遗忘场景？
 6. **常数紧致性**：理论界的常数因子是否可进一步收紧，以指导实际噪声方差的选择？
+
+
 
 ## 原文 PDF
 

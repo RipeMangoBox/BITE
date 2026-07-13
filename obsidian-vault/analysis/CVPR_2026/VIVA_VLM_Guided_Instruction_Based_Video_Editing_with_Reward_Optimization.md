@@ -42,7 +42,7 @@ claims:
 > - VIE-Bench (Replace task) 上，Avg. VLM Evaluation Score 8.86 vs ICVE 7.02 (+1.84)。
 > - VIE-Bench (Remove task) 上，Avg. VLM Evaluation Score 9.44 vs ICVE 7.04 (+2.40)。
 
-## 概述
+## 概要
 
 ### 问题背景与瓶颈
 
@@ -60,7 +60,7 @@ VIVA 针对上述瓶颈提出了两个关键创新：
 
 在指令视频编辑基准 VIE-Bench 上，VIVA 在所有开源方法中取得了最高的 VLM 评估平均分：添加任务 8.86（对比最强基线 ICVE 的 7.22）、替换任务 8.86（对比 7.02）、删除任务 9.44（对比 7.04），分别领先 +1.64、+1.84 和 +2.40。消融研究证实，VLM instructor、掩码损失、混合图像数据训练以及 Edit-GRPO 每个组件都对编辑性能有显著贡献。用户研究中，14 位专家在指令遵循、源视频保留和编辑质量三个维度上均显著偏爱 VIVA 的结果。
 
-## 背景与动机
+
 
 指令驱动的视频编辑旨在根据自然语言指令对输入视频进行局部修改，同时保持未编辑区域不变。近年来，扩散模型在图像编辑领域的成功激发了研究者将其扩展到视频编辑的尝试。然而，视频编辑面临一个核心瓶颈：**现有方法受限于简单编辑操作的合成配对数据，难以泛化到复杂、开放域的真实指令**。
 
@@ -72,7 +72,9 @@ VIVA 针对上述瓶颈提出了两个关键创新：
 
 针对上述缺口，**VIVA** 提出两条关键思路：(1) 引入 **VLM Instructor**，利用视觉-语言模型将文本指令、源视频首帧和可选参考图像联合编码为精细的视觉根植表示，弥补纯文本编码器的空间理解不足；(2) 设计 **Edit-GRPO** 后训练阶段，通过基于相对奖励的强化学习直接优化编辑的指令遵循度、源视频保留度和人类偏好。这两项设计使得即使在简单编辑数据上训练的模型也能实现对复杂编辑指令的泛化。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 VIVA 的核心创新在于破解了现有指令视频编辑方法受限于简单编辑操作合成配对数据、难以泛化到复杂开放域真实指令的瓶颈。其关键调控旋钮（causal knob）由两部分构成：**VLM instructor** 提供的多模态视觉根植指令表示，以及 **Edit-GRPO** 强化学习后训练阶段。核心洞察是：利用 VLM 将文本指令、源视频首帧和可选参考图像联合编码为精细的视觉根植表示，并通过基于相对奖励的 GRPO 直接优化编辑忠实度、内容保留和人类偏好，使得即使在简单编辑数据上训练也能实现复杂编辑的泛化。
 
@@ -118,7 +120,7 @@ Edit-GRPO 通过 Flow-SDE 注入随机性生成多样样本，计算相对优势
 
 VIVA 的四项 changed slots 形成了互补的创新链条：VLM instructor 提供更强的指令理解，掩码损失提供空间先验，图像数据混合弥补数据多样性不足，Edit-GRPO 则在强化学习框架下直接优化多维度编辑质量。这一组合使得 VIVA 在 VIE-Bench 基准上全面超越所有开源方法，在添加、替换、删除任务上分别领先最强基线 ICVE 达 +1.64、+1.84 和 +2.40 分（Table 1），用户研究中也获得 14 位专家的显著偏爱（Figure 5）。
 
-## 整体框架
+
 
 VIVA 的整体流水线围绕两个核心分支构建：一个**生成分支**负责在条件引导下生成编辑视频，一个**理解分支**负责将多模态编辑指令编码为精细的视觉根植表示。这两个分支通过可训练的 Token Refiner 进行对齐，并在后训练阶段经由 Edit-GRPO 强化学习进一步优化。
 
@@ -166,7 +168,7 @@ Figure 2 给出了 VIVA 的完整架构。其工作流程如下：
 
 > **注意**：训练阶段还引入了混合图像编辑数据的策略——将图像视为单帧视频，与视频编辑对联合训练，以弥补视频编辑数据在编辑类型覆盖上的不足。消融实验（Table 2）证实了这一策略对编辑能力和视觉质量的显著提升。
 
-## 核心模块与公式推导
+
 
 VIVA 的整体架构围绕一个核心设计原则展开：**将视觉-语言模型（VLM）的深层语义理解能力与扩散变换器（DiT）的生成能力深度耦合**，并通过强化学习后训练显式优化编辑行为。以下从条件编码、视频令牌构建、损失函数和奖励优化四个关键环节展开。
 
@@ -240,10 +242,10 @@ $$\mathbf{R} = w_{IF}\mathbf{R}_{\mathrm{IF}} + w_{SP}\mathbf{R}_{\mathrm{SP}} +
 ![[assets/figures/papers/paper_list_l2197_https_arxiv_org_abs_2512_16906/figures/016_Figure_14.jpg]]
 *Figure 14: VLM templates for the instruction-based video editing and reference-instruction-based video editing*
 
-![[assets/figures/papers/paper_list_l2197_https_arxiv_org_abs_2512_16906/figures/008_Figure_6.jpg]]
-*Figure 6: Network architecture for paired data synthesis. We modify the pretrained MMDiT backbone by inserting an additional control branch every four blocks. By concatenating the condition tokens with the noisy latent, the model performs full mutual attention across the sequence, ensuring robust structural alignment between the control signal and the generated video*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果与基准对比
 
@@ -300,16 +302,14 @@ Figure 9 展示了 VIVA 的典型失败案例，揭示了当前方法的局限�
 ![[assets/figures/papers/paper_list_l2197_https_arxiv_org_abs_2512_16906/figures/010_Figure_8.jpg]]
 *Figure 8: Qualitative comparison of the reference-based video editing on the VIE-Bench [46]. The editing instruction is shown at the top and the reference image is shown on the left for each group of results*
 
-![[assets/figures/papers/paper_list_l2197_https_arxiv_org_abs_2512_16906/figures/013_Figure_11.jpg]]
-*Figure 11: Qualitative results. We present more results of our method on complex instructions that are non-trivial and challenging to be synthesized by the data construction pipeline. The editing instruction is shown at the bottom*
 
-![[assets/figures/papers/paper_list_l2197_https_arxiv_org_abs_2512_16906/figures/014_Figure_12.jpg]]
-*Figure 12: Qualitative results. We present more results of our method on complex instructions that are non-trivial and challenging to be synthesized by the data construction pipeline. The editing instruction is shown at the bottom*
 
 ![[assets/figures/papers/paper_list_l2197_https_arxiv_org_abs_2512_16906/figures/015_Figure.jpg]]
 *Figure: Remove the watermark. Remove the watermark. Replace the water in the canal with flowing lava, and add a full head of black hair. Turn the asphalt road into a vibrant, rainbow-colored path*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 任务定位与问题边界
 
@@ -385,6 +385,8 @@ VIVA 在训练中混合图像编辑数据（视为单帧视频），利用图像
 5. **实时性与长视频**：模型在长视频（如几分钟）上的推理延迟和时序一致性如何？是否能通过蒸馏或高效推理策略实现实时编辑？
 
 > **注意**：上述开放问题中，部分（如 VLM 选择敏感性、奖励权重最优性）在论文中未被直接探讨，属于基于方法设计的合理推断，需后续工作验证。
+
+
 
 ## 原文 PDF
 

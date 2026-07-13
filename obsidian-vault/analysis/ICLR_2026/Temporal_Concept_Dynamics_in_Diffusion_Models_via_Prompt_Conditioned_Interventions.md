@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Temporal_Concept_Dynamics_in_Diffusion_Models_via_Prompt_Conditioned_Interventions.pdf
+project_link: https://adagorgun.github.io/PCI-Project/
+code_link: null
 openreview_forum_id: ABjaSsrYPD
 aliases:
 - PCIP
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 通过提示条件干预研究扩散模型中概念的时间动态 |
 | 英文题名 | Temporal Concept Dynamics in Diffusion Models via Prompt-Conditioned Interventions |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=ABjaSsrYPD); [Project](https://adagorgun.github.io/PCI-Project/) |
+| Links | [paper](https://openreview.net/forum?id=ABjaSsrYPD) · [Project](https://adagorgun.github.io/PCI-Project/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | Prompt-Conditioned Intervention (PCI) |
 | Dataset | Custom editing dataset (88 concept pairs × 20 seeds = 1760 edits) |
@@ -42,7 +44,7 @@ claims:
 > - Custom editing dataset (88 concept pairs × 20 seeds = 1760 edits) 上，CLIP_txt (semantic alignment) 为 PCI-τ50: 0.2236，对比 NTI+P2P: 0.2215，变化 +0.0021。
 > - Custom editing dataset (88 concept pairs × 20 seeds = 1760 edits) 上，CLIP_dir (directional consistency) 为 PCI-τ50: 0.1387，对比 NTI+P2P: 0.0979，变化 +0.0408。
 
-## 概述
+## 概要
 
 扩散模型在文本到图像生成中表现出色，但现有研究多从静态视角评估最终生成结果，鲜有系统揭示**去噪轨迹中概念何时形成、何时锁定并不可再干预的时间动态**。这一盲区导致文本驱动的图像编辑方法缺乏对“何时介入最优”的理论指导，往往依赖人工经验选择时间步。
 
@@ -54,7 +56,7 @@ PCI 揭示的核心发现是：**概念插入成功概率随去噪时间呈非�
 
 PCI 的计算开销较高（需在所有推理步上插断），且不存在适用于所有概念的单一最优 CIS 值；推荐 $[0.5, 0.7]$ 作为普适编辑窗口，但特定概念仍可能需微调。如何降低 CIS 曲线计算成本、自动确定概念级编辑截止点，以及从单概念 CIS 预测多概念联合插入行为，是尚待解决的开放问题。
 
-## 背景与动机
+
 
 扩散模型已成为文本到图像生成的核心范式，但我们对模型内部的概念形成过程仍知之甚少：一个语义概念究竟是在去噪轨迹的哪个时间点从噪声中“结晶”出来的？一旦形成，它又在何时变得不可再被外部干预所改变？这些问题不仅关乎我们对生成模型机理的基本理解，更直接影响文本驱动图像编辑等下游应用的可控性与可靠性。
 
@@ -66,7 +68,9 @@ PCI 的计算开销较高（需在所有推理步上插断），且不存在适�
 
 通过这一框架，我们能够在多个主流扩散模型（SD 2.1、SDXL、SD 3.5、FLUX.1-dev）上，对涵盖全局场景因素（时间、天气、季节、风格、颜色）、人类属性（年龄、性别）和配件细节等数十个细粒度概念类别进行大规模分析，从而揭示概念锁定的普遍规律及其对编辑实践的指导意义。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新并非提出一种新的扩散模型架构或训练范式，而是**将扩散模型的去噪时间轴重新定义为概念形成与锁定的可解释维度**，并据此构建了一套从测量到应用的完整方法体系。相较于现有工作，PCI 框架在两个关键环节上实现了根本性转变。
 
@@ -90,7 +94,7 @@ PCI 将概念存在判定重构为**大型视觉语言模型（LVLM）的视觉�
 
 这两个 changed slots 共同构成了 PCI 的方法论核心：**CIS 曲线提供了概念时间动态的量化表征，而 VQA 判定机制确保了该表征的语义可靠性与测量鲁棒性**。二者结合，使得扩散模型去噪轨迹中“概念何时形成、何时锁定”这一原本隐式的过程，首次获得了可测量、可比较、可操作的实证基础。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_ABjaSsrYPD/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the PCI framework. A base prompt P _ { b } is used as conditioning for generation, altered to the concept prompt P _ { c } at time t _ { s } . The generated images are evaluated through VQA to determine concept presence and aggregated across seeds to obtain CIS across the diffusion trajectory*
@@ -154,7 +158,7 @@ PCI 与现有文本驱动图像编辑方法的关键差异体现在两个维度�
 - **种子预算充分性**：$k=100$ 个种子足以生成稳定的 CIS 轨迹，增加种子不会明显提高覆盖度。
 - **提示鲁棒性**：在动物、手工制品、常见动作三个子类别上，五种语义等价的提示改写下，CIS 时序模式与锁定行为保持一致（Table C1）。
 
-## 核心模块与公式推导
+
 
 ### 整体框架
 
@@ -224,7 +228,9 @@ $$\hat{\boldsymbol{\epsilon}}_\theta = (1+\omega)\boldsymbol{\epsilon}_\theta(\m
 
 在文本驱动图像编辑任务中，编辑触发机制为：将用户指定的 CIS 概率映射到 CIS 曲线上最接近的对应时间步 $t_s$，然后执行 PCI。论文发现 $[\tau_{50}, \tau_{70}]$ 区间（即 CIS 概率 0.5–0.7 对应的时间窗口）是实现语义插入与内容保留最佳平衡的编辑窗口。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：概念锁定时序的非递减规律
 
@@ -303,7 +309,9 @@ PCI-τ₅₀ 在所有三项 CLIP 指标上均优于 NTI+P2P（Mokady et al., 20
 *Table 3: Table C1: Overview of the prompt variations. For the selected subcategories, we construct a total of five prompts: the original base prompt (shown in bold) and four semantically consistent paraphrased variants used to assess prompt robustness*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有编辑方法的关系
 
@@ -346,6 +354,8 @@ PCI 的适用边界由以下几个维度界定：
 1. 能否在保持分辨率的前提下大幅降低 CIS 曲线计算的时间成本，使其适用于实时编辑场景？
 2. 如何自动为不同概念和上下文确定一个可靠的单值 CIS 编辑截止点，而无需用户手动调参？
 3. 多概念交互中，哪些机制决定了联合插入窗口的延迟或提前？能否从单概念 CIS 预测多概念组合的插入时序？消融实验已发现少数组合（如 female + sketch）会显著将插入窗口后移，体现非组合式的交互效应（Fig. D4），但这一现象的规律尚未被系统建模。
+
+
 
 ## 原文 PDF
 

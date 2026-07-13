@@ -42,15 +42,13 @@ claims:
 > - Neural 3D Video 上，PSNR↑ / SSIM↑ / LPIPS↓ 21.91 / 0.789 / 0.258 vs 18.43 / 0.738 / 0.270 (MonoFusion*) (PSNR +3.48 dB, SSIM +0.051, LPIPS -0.012)。
 > - Nvidia Dynamic Scenes 上，PSNR↑ / SSIM↑ / LPIPS↓ 24.81 / 0.794 / 0.150 vs 20.22 / 0.590 / 0.192 (MonoFusion*) (PSNR +4.59 dB, SSIM +0.204, LPIPS -0.042)。
 
-## 概述
+## 概要
 
 从稀疏相机阵列（2–3个视角）重建动态场景的4D表示，是计算机视觉中的一个根本性挑战。传统依赖几何正则化或多视图立体匹配的方法，在输入视角极度稀疏时，因观测信息严重不足，难以恢复时空一致的场景结构与运动。近期视频扩散模型的进展，使得从稀疏视图生成额外视角的时序视频成为可能，但生成结果中普遍存在的**时空不一致性**——包括同一时刻不同视角间的空间不一致，以及同一视角不同时刻间的时间不一致——直接将其用于4D重建会导致严重模糊和时序不稳定性（Fig. 2, Fig. 5）。
 
 **SparseCam4D** 针对上述瓶颈，提出以**时空扭曲场（Spatio-Temporal Distortion Field, STDF）** 为核心机制，将生成观测中的不一致性显式建模为对规范4D高斯的可学习扭曲偏移。该扭曲场仅在训练期间作用于生成视图，真实视图仍由规范高斯渲染；训练完成后STDF被丢弃，新视角渲染**零额外计算开销**。配合相机姿态联合优化、针对生成视图的感知损失，以及多维度正则化，SparseCam4D 在仅2–3个稀疏相机的条件下，实现了高质量的时空一致4D重建。
 
 在 Technicolor、Neural 3D Video 和 Nvidia Dynamic Scenes 三个基准数据集上，SparseCam4D 显著优于现有方法：以 MonoFusion 为基线，PSNR 提升 3.48–5.18 dB，SSIM 提升 0.051–0.204，LPIPS 降低 0.012–0.053（Tab. 1）。消融实验进一步揭示，移除 STDF 会使 LPIPS 从 0.264 剧增至 0.608，SSIM 从 0.656 降至 0.426，验证了时空不一致建模的绝对必要性（Tab. 2）。
-
-## 背景与动机
 
 ### 动态场景重建的稀疏相机困境
 
@@ -73,7 +71,7 @@ claims:
 
 本文的核心动机在于回答一个关键问题：**能否设计一种机制，在利用生成先验丰富观测的同时，显式建模并隔离其固有的时空不一致性，从而在稀疏相机输入下实现高质量的时空一致4D重建？** 这一问题的解决需要同时应对三个子挑战：（1）如何形式化地建模生成观测中跨空间和时间的扭曲；（2）如何将该建模无缝嵌入现有的4D高斯泼溅框架；（3）如何保证推理阶段不引入额外计算开销。
 
-## 核心创新
+## 核心方法与创新机理
 
 SparseCam4D 的核心创新在于**将视频扩散模型的生成能力引入稀疏相机4D重建管道，并通过时空扭曲场（Spatio-Temporal Distortion Field, STDF）显式建模生成观察中的时空不一致性**，从而在训练期间将误差解耦到生成视图专用的扭曲高斯中，而规范高斯仅用于真实视图渲染。训练完成后丢弃STDF，保证零推理开销。
 
@@ -114,8 +112,6 @@ $$f(c)_c = \operatorname{interp}(P_c, \pi_c(c)), \quad c \in \{xy, xz, yz, xt, y
 3. **对视频扩散模型的泛化性**：将生成先验更换为 ViewCrafter 后，加入 STDF 可将 PSNR 提升 2.51 dB（21.42→23.93），验证了STDF对不同视频扩散模型的通用性（Table 4）。
 4. **零推理开销**：STDF 仅在训练时使用，训练后丢弃，新视角渲染无需任何额外计算。
 
-## 整体框架
-
 SparseCam4D 的整体管道围绕一个核心矛盾展开：**视频扩散模型能提供稀疏相机之外的辅助观察，但这些生成观察天然携带时空不一致性，直接用于4D重建会导致严重模糊和时序不稳定**。框架通过“生成—扭曲解耦—联合重建—后丢弃”的四阶段流解决这一问题。
 
 ### 管道总览
@@ -151,8 +147,6 @@ SparseCam4D 的整体管道围绕一个核心矛盾展开：**视频扩散模型
 - **生成中间产物**：视频扩散模型产生的其他视角时序视频帧。
 - **输出**：可渲染任意新视角、任意时刻的规范4D高斯表示，具备时空一致性和照片级真实感。
 - **推理时**：仅需规范4D高斯，无需扩散模型或扭曲场，直接泼溅渲染。
-
-## 核心模块与公式推导
 
 SparseCam4D 的完整管道由四个关键模块串联构成，其核心创新在于**时空扭曲场（Spatio-Temporal Distortion Field, STDF）**——一个轻量级的可学习组件，用于显式建模视频扩散模型生成视图中的时空不一致性，并在训练后完全丢弃以实现零推理开销。
 
@@ -218,13 +212,10 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{input}} + \mathcal{L}_{\mathrm{gen}} + \mat
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l46_https_arxiv_org_abs_2603_26481/figures/002_Figure_2.jpg]]
-*Figure 2: Spatio-temporal inconsistency. Real cameras (grey) capture consistent content of multi-view dynamic scene, while generative results (orange) include additional observations at different poses and time. Inconsistencies across poses at the same time are referred to as spatial inconsistencies, and inconsistencies across time at the same pose are referred to as temporal inconsistencies*
-
 ![[assets/figures/papers/paper_list_l46_https_arxiv_org_abs_2603_26481/figures/011_Figure_6.jpg]]
 *Figure 6: Visualization of the STDF. Spatio-Temporal Distortion Field output is rendered as a per-primitive attribute, with brighter regions indicating higher distortions (left). The corresponding areas in the input generated image (right) align with regions exhibiting noticeable deformation (red box)*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主要结果
 
@@ -297,7 +288,7 @@ Table 4 展示了使用 **ViewCrafter** 作为替代生成先验的结果。加�
 ![[assets/figures/papers/paper_list_l46_https_arxiv_org_abs_2603_26481/figures/017_Figure_11.jpg]]
 *Figure 11: Visualization of one failure case. From left to right are the source image and point-cloud–rendering condition provided to ViewCrafter, the corresponding generated image, and a Gaussian rendering near that generated image. Since ViewCrafter is primarily trained on scene-centric data with few human subjects, this example suffers from an out-of-domain issue. In addition, the quality of the point-cloud–rendering condition is relatively low. These factors jointly lead to low-quality generated images, which in turn degrade the Gaussian reconstruction quality on the human body*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 任务定位与基线谱系
 

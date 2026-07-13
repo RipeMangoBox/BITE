@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/AdaRank_Adaptive_Rank_Pruning_for_Enhanced_Model_Merging.pdf
+project_link: null
+code_link: null
 openreview_forum_id: fTygcJVOni
 aliases:
 - AARP
@@ -42,7 +44,7 @@ claims:
 > - 8 Vision Tasks (ViT-L/14) 上，平均准确率 为 TA+AdaRank: 93.0, TSV-M+AdaRank: 93.7, CART+AdaRank: 93.5，对比 TA: 84.5, TSV-M: 91.2, CART: 92.5，变化 TA+AdaRank提升8.5%, TSV-M+AdaRank提升2.5%, CART+AdaRank提升~1%。
 > - 7 NLP Tasks (RoBERTa) 上，平均性能 为 TA+AdaRank: 0.7032, TSV-M+AdaRank: 0.7309, CART+AdaRank: 0.7547，对比 TA: 0.6718, TSV-M: 0.6693, CART: 0.6997，变化 CART+AdaRank提升5.5%。
 
-## 概述
+## 概要
 
 模型合并旨在将多个针对不同任务微调的模型整合为一个统一的多任务模型，而无需原始训练数据。现有的基于奇异值分解（SVD）的合并方法采用启发式的前k个奇异成分选择策略（top-k），但这一做法存在两个根本性瓶颈：
 
@@ -53,7 +55,7 @@ claims:
 
 实验表明，AdaRank在多种骨干网络（ViT-B/32、ViT-L/14、RoBERTa、GPT-2）和合并方法（TA、CART、TSV-M）上均能一致提升性能——在ViT-B/32的8个视觉任务上，TA+AdaRank相较TA提升高达18.7%；在RoBERTa的7个NLP任务上，CART+AdaRank相较CART提升5.5%。同时，AdaRank仅需1%的测试数据即可超越使用全量测试数据的AdaMerging，展现出良好的数据效率。
 
-## 背景与动机
+
 
 ### 模型合并中的秩选择困境
 
@@ -81,7 +83,9 @@ AdaMerging 等方法通过测试时适应（Test-Time Adaptation, TTA）以熵�
 
 上述分析表明，突破现有方法瓶颈的关键在于：**用自适应的成分级选择取代启发式的前 $k$ 截断**。这一选择需要同时满足两个条件：（1）保留那些在降低自身任务损失的同时不显著损害其他任务的奇异成分；（2）根据不同任务和网络层的特性动态调整保留成分的数量。这构成了 AdaRank 方法的核心动机——通过学习一组二值掩码，对每个任务向量的每个奇异成分做出保留或剪枝的自适应决策。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 AdaRank 的核心创新在于将现有 SVD 基模型合并方法中**固定的、启发式的前 k 个奇异成分选择（top-k）**，替换为**自适应的、可学习的二值掩码选择机制**。这一转变直接回应了现有方法的两个关键瓶颈：
 
@@ -111,7 +115,7 @@ $$\underset{B}{\operatorname{argmin}} \sum_{i=1}^T \sum_{x_i \in \mathcal{D}_i} 
 
 消融实验证实了这一设计的有效性：仅学习二值掩码 $B$（不调节 $\lambda$）已能获得与调节系数相当的改善（Table 6），表明**成分选择本身是关键杠杆**。此外，AdaRank 仅需 1% 的测试数据即可超越使用全量测试数据的 AdaMerging（Table 7），展示了良好的数据效率。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l4_AdaRank_Adaptive_Rank_Pruning_for_Enhanced_Model_Merging/figures/001_Figure_1.jpg]]
 *Figure 1: (a), (b) Net change in single-task and multi-task losses for Task Arithmetic (Ilharco et al., 2023) and CART (Choi et al., 2024), respectively, when each singular component of a target task vector is individually added to a model merged with full-rank vectors from other tasks. (c) Loss changes of all tasks when adding singular components from the MNIST task vector, with MNIST shown as a dotted line. For clarity, only the top 10% of singular components are shown*
@@ -139,7 +143,7 @@ $$\underset{B}{\operatorname{argmin}} \sum_{i=1}^T \sum_{x_i \in \mathcal{D}_i} 
 
 整个 pipeline 的输入是预训练权重 $\theta_0$ 和各任务向量 $\tau_i$ 的 SVD 分解结果，输出是经过自适应秩剪枝的合并模型 $\theta(\breve{B})$。关键因果机制在于：TTA 通过熵最小化隐式地识别出那些降低自身任务损失同时不显著增加跨任务干扰的奇异成分，从而突破固定 top-$k$ 选择的瓶颈（该瓶颈的实证证据见 Figure 1 和 Figure 2 的分析）。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化
 
@@ -185,7 +189,9 @@ $$b_i^l = \mathbf{1}\{\sigma(\tilde{b}_i^l / T) \geq 0.5\}$$
 
 核心差异在于：AdaRank 将选择权从固定的启发式规则转移到了数据驱动的自适应学习过程，使每个任务、每一层的每个奇异成分都能根据其对多任务损失的净贡献独立决策保留或剪枝。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈的实证验证
 
@@ -253,7 +259,9 @@ $$b_i^l = \mathbf{1}\{\sigma(\tilde{b}_i^l / T) \geq 0.5\}$$
 1. **对SVD分解的依赖**：方法要求对每个任务向量进行完整的SVD分解。对于参数规模极大的模型，SVD本身的计算和存储开销可能成为瓶颈，尽管实验表明该开销远小于TTA迭代。
 2. **测试数据的必要性**：TTA范式需要无标签测试数据。在完全缺乏测试数据的零样本场景下，AdaRank无法直接应用；但实验已证明仅需极少测试数据（1%）即可取得有竞争力的结果。
 3. **任务类型覆盖有限**：当前验证集中在图像分类和文本分类任务上，尚未在生成式任务、目标检测等更多样化的场景中进行评估。
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 在模型合并方法谱系中的位置
 
@@ -298,6 +306,8 @@ AdaRank 的有效运行依赖于以下前提条件：
 4. **与动态路由方法的深度融合**：AdaRank 当前与基于路由器的合并方法（如 Twin-Merging）是独立比较的（Table 3）。将成分级自适应选择与任务级动态路由相结合，可能进一步突破性能上限。
 
 5. **大规模模型上的验证**：在数十亿参数级别的模型上验证 AdaRank 的可扩展性，并探索更高效的 SVD 近似方法（如随机化 SVD）以降低计算开销。
+
+
 
 ## 原文 PDF
 

@@ -42,7 +42,7 @@ claims:
 > [!tip] 效果简介
 > - SpatiaLQA 上，F_c (内容F1) 69.8 vs 67.4 (+2.4)；F_p (前提条件F1) 28.1 vs 25.1 (+3.0)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：视觉语言模型（VLM）在整合空间理解与多步逻辑推理方面存在显著不足。与传统的视觉问答（VQA）或抽象符号逻辑推理不同，空间逻辑推理要求模型同时从真实场景中感知物体的空间关系，并据此规划具有先后依赖的多步操作序列。当前最先进的VLM在前提条件（precondition）推理上的能力远低于内容（content）推理，导致在复杂真实场景中难以生成逻辑一致且空间合理的操作步骤。
 
@@ -55,7 +55,7 @@ claims:
 - 即使最先进的VLM（如GPT-4.1）在 SpatiaLQA 上仍表现不佳，前提条件F1（$F_p=38.0$）远低于人类水平（$F_p=92.5$），表明空间逻辑推理仍是开放挑战。
 - 消融实验证实：递归迭代次数增加带来持续性能增益，移除深度图或分割图均导致性能下降，验证了结构化空间先验的必要性。
 
-## 背景与动机
+
 
 ### 视觉语言模型的空间推理困境
 
@@ -73,7 +73,9 @@ claims:
 
 针对上述缺口，本文提出**SpatiaLQA基准**——首个专门评估VLM空间逻辑推理能力的基准，包含来自241个真实室内场景的9,605个问答对，每个答案由多步操作序列构成，并显式标注了步骤间的前提条件。在此基础上，本文进一步提出**递归场景图辅助推理（RSGAR）**方法，利用视觉基础模型（Depth Anything V2和SAM）提取深度与分割先验，通过迭代构建任务相关的场景图，为VLM注入结构化的空间信息，从而改善多步空间逻辑推理的准确性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SpatiaLQA 的核心创新并非提出一个新的模型架构，而是**定义了一个被现有 VLM 普遍忽视的能力维度——空间逻辑推理**，并针对该瓶颈设计了一种**结构化先验注入的推理框架 RSGAR**。其创新点可从问题定义、方法机制和评估范式三个层面理解。
 
@@ -106,7 +108,7 @@ RSGAR 的核心思想是**将隐式的空间关系显式化为任务相关的递
 
 RSGAR 的创新在于**推理范式的改进**而非模型架构的革新。其性能增益依赖于视觉基础模型（Depth Anything V2、SAM）提供的先验质量，以及 VLM 自身的场景图生成能力。递归机制虽然有效，但带来了显著的计算开销（$T=5$ 时单次验证耗时 174.5 小时，Table A1），且 $F_p$ 的绝对水平（28.1）仍远低于人类（92.5），表明前提条件推理仍是开放难题。
 
-## 整体框架
+
 
 SpatiaLQA 工作提出了 **递归场景图辅助推理（Recursive Scene Graph Assisted Reasoning, RSGAR）**，其核心设计动机源于一个关键瓶颈：当前视觉语言模型（VLM）在整合空间理解与多步逻辑推理时存在显著断裂，尤其对操作步骤间的前提条件（precondition）推理能力远弱于内容（content）推理。RSGAR 通过引入结构化的空间中间表示，将复杂的真实场景逐步分解为任务相关的场景图，从而为 VLM 注入显式的几何与语义先验，改善多步推理的准确性与逻辑一致性。
 
@@ -173,7 +175,7 @@ RSGAR 的整体 pipeline 由三个串行模块构成，形成“视觉先验提�
 ![[assets/figures/papers/paper_list_l2216_https_arxiv_org_abs_2602_20901/figures/004_Figure_2.jpg]]
 *Figure 2: Prompt template and examples of several indoor scenes*
 
-## 核心模块与公式推导
+
 
 ### 3.1 评估指标公式体系
 
@@ -227,7 +229,9 @@ RSGAR 的性能受两个关键变量调控：
 - **递归轮数 $T$**：控制场景图生成的迭代深度。$T$ 越大，场景图覆盖的空间依赖链越长，但计算开销也随之线性增长。消融实验（Table 5a）表明，$T$ 从 1 增至 7 时，$F_c$ 从 68.5 提升至 70.6（+2.1），$F_p$ 同步提升，验证了递归深度对空间逻辑推理的正向作用。
 - **深度图与分割图**：移除深度图或分割图均导致性能下降（Table 5b），同时移除两者时 $F_c$ 下降 3.3，表明几何与语义先验对场景图构建质量具有互补且不可替代的贡献。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果：VLM在空间逻辑推理上普遍表现不足
 
@@ -273,8 +277,6 @@ RSGAR的计算开销显著：T=5时完整验证SpatiaLQA需174.5小时（Table A
 ![[assets/figures/papers/paper_list_l2216_https_arxiv_org_abs_2602_20901/figures/009_Table_3.jpg]]
 *Table 3: Comparison between scoring VLM evaluation results and human evaluation results*
 
-![[assets/figures/papers/paper_list_l2216_https_arxiv_org_abs_2602_20901/figures/010_Figure_7.jpg]]
-*Figure 7: Dimension-wise analysis. Each dot represents the F1 score of a VLM under specific conditions, including different numbers of answer steps, annotation methods, and scene categories. ‘Human’, ‘Subgraph’, and ‘Graph Expansion’ correspond to data from ‘manual annotations’, ‘subgraph extraction augmentation’, and ‘graph expansion augmentation’, respectively*
 
 ![[assets/figures/papers/paper_list_l2216_https_arxiv_org_abs_2602_20901/figures/008_Figure_6.jpg]]
 *Figure 6: Evaluation results of human and different scoring VLMs. The x-axis represents the eight representative VLMs being evaluated. Each point with the same marker shape denotes the F1 scores obtained by the same scoring VLM or by human evaluators. The solid lines indicate the F1 scores for content, while the dashed lines represent the F1 scores for preconditions*
@@ -284,7 +286,9 @@ RSGAR的计算开销显著：T=5时完整验证SpatiaLQA需174.5小时（Table A
 
 ![[assets/figures/papers/paper_list_l2216_https_arxiv_org_abs_2602_20901/figures/003_Table.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位：空间逻辑推理的新基准
 
@@ -334,6 +338,8 @@ RSGAR（T=5）在所有方法中取得最佳结果（$F_c=69.8$, $F_p=28.1$）�
 4. **开放词汇场景的鲁棒性**：在包含未见过的物体类别或复杂空间布局的场景中，如何保证场景图构建的准确性和完整性？这可能需要在视觉基础模型中引入更强的开放词汇能力。
 
 5. **基准扩展**：SpatiaLQA 目前为静态图像基准，未来能否扩展到视频或交互式环境，以评估模型在动态变化场景中的空间逻辑推理能力？
+
+
 
 ## 原文 PDF
 

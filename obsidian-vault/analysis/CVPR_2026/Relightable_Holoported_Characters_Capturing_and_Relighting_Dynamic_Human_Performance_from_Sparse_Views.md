@@ -41,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - Multi-view Lightstage (5 subjects) 上，PSNR ↑ 31.49 vs 30.29 (R4D+GT Env) (+1.20)；LPIPS ↓ 6.70 vs 9.50 (R4D+GT Env) (-2.80)；SSIM ↑ 89.56 vs 86.77 (R4D+GT Env) (+2.79)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有动态人体重光照方法依赖耗时的一次一光（OLAT）捕获与线性组合，或仅限于重放预捕获表演，无法在推理时从稀疏视角输入中高效生成照片级真实感的重光照结果。
 
@@ -51,7 +51,7 @@ claims:
 
 **主要结果**：在5名主体的多视角Lightstage基准上，RHC以PSNR 31.49、LPIPS 6.70、SSIM 89.56全面超越最强基线R4D+GT Env（PSNR 30.29、LPIPS 9.50、SSIM 86.77），并在分布外光照（OLAT、近场）下展现出显著的泛化能力。
 
-## 背景与动机
+
 
 ### 动态人体渲染与重光照的现实需求
 
@@ -92,7 +92,9 @@ $$\rho(\mathbf{x})\int_{\omega_i} f_r(\mathbf{x},\omega_i,\omega_o) \mathbf{L}_i
 
 该方法首次实现了从稀疏视角RGB输入到任意光照下照片级渲染的端到端映射，无需OLAT捕获、显式材质估计或测试时优化，为动态人体的实时全息传送与光照编辑开辟了新路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 RHC 的核心创新在于将传统渲染方程的各分量编码为 UV 空间内一致的物理信息特征，并利用 Transformer 交叉注意力机制在单次前馈推理中近似光线积分，从而绕过了对耗时的一次一光（OLAT）捕获和线性组合的依赖。这一设计在四个关键维度上实现了对现有方法的系统性改进。
 
@@ -149,7 +151,7 @@ $$\mathbf{g} = \mathscr{F}(\mathbf{f}; \mathbf{E})$$
 
 这些创新共同使 RHC 在 5 个主体的 Lightstage 基准上，以 PSNR 31.49、LPIPS 6.70、SSIM 89.56 显著优于所有基线方法（Table 1），同时支持分布外光照（OLAT、近场）的合理泛化（Figure 11）。
 
-## 整体框架
+
 
 RHC 的整体设计围绕一个核心洞察展开：将渲染方程的各分量编码为一致的 UV 空间特征，并利用 Transformer 交叉注意力模拟光线的空间积分，从而在单次前馈中从稀疏视角输入生成动态人体的照片级重光照结果。该方法避免了传统 OLAT（一次一光）捕获和线性组合的昂贵开销，也无需在推理时进行迭代优化。
 
@@ -196,7 +198,7 @@ RelightNet 输出的纹素对齐高斯参数（位置偏移 $\delta\mathbf{p}$�
 ![[assets/figures/papers/paper_list_l2137_https_arxiv_org_abs_2512_00255/figures/002_Figure_2.jpg]]
 *Figure 2: Illustration of our data capture strategy. To learn a relightable full-body avatar, we propose to capture multi-view video sequences consisting of consecutive uniformly lit tracking frames and relit frames obtained by randomly projecting environment maps onto the lightstage LEDs*
 
-## 核心模块与公式推导
+
 
 RHC 由四个核心模块串联构成：角色动画模块、物理信息特征提取、RelightNet 重光照网络和高斯泼溅渲染器。整体流程为：从稀疏视角均匀光照图像出发，通过骨架运动驱动模板网格变形，在 UV 空间提取编码渲染方程各分量的物理特征，再由 RelightNet 结合环境图预测纹素对齐的 3D 高斯参数，最终经高斯泼溅渲染得到重光照图像。
 
@@ -275,7 +277,9 @@ $$L_{\mathrm{Warmup}} = \frac{1}{N_G}\sum_{i=1}^{N_G} \big( \lambda_{\mathrm{s}}
 ![[assets/figures/papers/paper_list_l2137_https_arxiv_org_abs_2512_00255/figures/017_Figure_14.jpg]]
 *Figure 14: Additional qualitative ablations. Following Fig. 6 in the main paper, we demonstrate additional visual ablation results. Without the high-frequency normals, our method is unable to model wrinkle details correctly. Excluding the position map leads to incorrect relighting, especially when the subject approaches a light source*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验结果
 
@@ -326,7 +330,9 @@ Table 2 系统拆解了各设计组件的贡献。移除几何特征（包含法
 ![[assets/figures/papers/paper_list_l2137_https_arxiv_org_abs_2512_00255/figures/014_Figure_11.jpg]]
 *Figure 11: OOD comparison. Here, we compare our method on out-of-distribution lighting conditions, i.e. OLAT environment maps. Notably the model never saw OLAT environment maps during training. Nonetheless, it can generate plausible results while competing methods either produce blurry renderings or completely fail. Moreover, we illustrate that our method can reproduce near field lighting effects by translating the human by 35cm, i.e. modifying the positional map and diffuse shading, and we can observe a plausible change in illumination*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 任务定位与核心问题
 
@@ -406,6 +412,8 @@ RHC的适用边界由以下限制定义：
 5. **实时交互式全息传送**：如何将RHC集成到完整的全息传送系统中，实现实时交互与动态场景光照编辑？这涉及端到端延迟优化、网络传输和用户交互设计等系统工程问题。
 
 6. **光照多样性的理论边界**：Table 7显示光照条件数量从5000降至100时PSNR从32.07降至28.79，但光照多样性的最优策略（如环境图的采样分布、动态范围覆盖）仍缺乏理论指导。
+
+
 
 ## 原文 PDF
 

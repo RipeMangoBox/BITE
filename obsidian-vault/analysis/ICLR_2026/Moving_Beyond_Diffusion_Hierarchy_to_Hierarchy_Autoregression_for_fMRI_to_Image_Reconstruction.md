@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Moving_Beyond_Diffusion_Hierarchy_to_Hierarchy_Autoregression_for_fMRI_to_Image_Reconstruction.pdf
+project_link: null
+code_link: https://github.com/XuZhang2/MindHier
 openreview_forum_id: AT7hCh6HB7
 aliases:
 - MBDHHAFIR
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 超越扩散：面向fMRI图像重建的层次到层次自回归 |
 | 英文题名 | Moving Beyond Diffusion: Hierarchy-to-Hierarchy Autoregression for fMRI-to-Image Reconstruction |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=AT7hCh6HB7); [GitHub](https://github.com/XuZhang2/MindHier) |
+| Links | [paper](https://openreview.net/forum?id=AT7hCh6HB7) · [GitHub](https://github.com/XuZhang2/MindHier) |
 | Topic | #topic/representation_self_supervised_transfer #topic/representation_self_supervised_transfer/representation_learning |
 | Method | MindHier |
 | Dataset | NSD (1, 000 shared test images), NSD, THINGS-fMRI test set |
@@ -41,7 +43,7 @@ claims:
 > - NSD 上，SwAV距离 (越低越好) 为 0.329，对比 0.344 (MindEye2)，变化 -0.015。
 > - NSD 上，推理时间 (秒/图) 为 2.64，对比 12.14 (MindEye2)，变化 -78%。
 
-## 概述
+## 概要
 
 ### 问题背景与核心瓶颈
 
@@ -71,7 +73,7 @@ MindHier属于**fMRI到图像重建**任务，在方法谱系中处于扩散式�
 
 尽管高层语义指标领先，MindHier仍存在若干固有限制：无法重建可读文字和特定标识；面部特征模糊，缺乏身份识别精度；精细计数和材质属性容易出错；跨受试者少样本微调时性能大幅下降。这些问题为后续研究指明了方向。
 
-## 背景与动机
+
 
 从功能磁共振成像（fMRI）信号中重建人类视觉体验，是连接神经科学与计算机视觉的核心挑战。fMRI通过非侵入方式记录血氧水平依赖（BOLD）信号，反映大脑对视觉刺激的响应模式。然而，fMRI信号具有低信噪比、低空间分辨率和高个体差异性等特点，使得从这些信号中恢复出具有语义保真度和视觉细节的图像成为极具难度的逆向问题。
 
@@ -85,7 +87,9 @@ MindHier属于**fMRI到图像重建**任务，在方法谱系中处于扩散式�
 
 这一设计不仅实现了语义保真度与视觉细节的更好平衡，还因尺度自回归模型的高效推理特性（单次前向即可完成生成），将推理速度提升约4.67倍，为fMRI-to-image重建的实用化提供了新的可能性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MindHier的核心创新在于**将fMRI信号解耦为层次化神经嵌入，并以尺度感知的方式注入自回归生成过程**，从而替代了现有扩散方法中“单一、静态嵌入固定引导”的范式。这一转变直接针对了当前fMRI-to-image重建的根本瓶颈：扩散模型使用的固定CLIP嵌入无法利用fMRI信号的层次信息，且与图像重建从全局语义到局部细节的阶段需求不对齐。
 
@@ -123,7 +127,7 @@ MindHier处于fMRI-to-image重建、层次化表示学习和自回归生成模�
 
 综上，MindHier的核心创新并非单一技术的堆叠，而是通过“层次化编码-层次化对齐-尺度感知引导”三位一体的设计，系统性地解决了fMRI信号层次信息利用不足的问题，实现了从“森林”到“树木”的粗到细重建。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_AT7hCh6HB7/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the two-stage training pipeline of MindHier. (a) Stage 1: Hierarchy-to-Hierarchy Alignment. A hierarchical fMRI encoder (composed of M cascaded blocks) is trained to map fMRI signals to a feature hierarchy in CLIP space. This mapping is learned by aligning the encoder’s outputs with corresponding intermediate features from a frozen CLIP vision encoder using a cascaded MSE loss (LMSE (Eq. 1)). To ensure high-level semantic coherence, the terminal fMRI feature is further aligned within CLIP’s shared embedding space via a SoftCLIP loss ( ${ \mathcal { L } } _ { \mathrm { S o f t C L I P } }$ (Eq. 2)). (b) Stage 2: Scale-Aware Coarse-to-Fine Neural Guidance. A scale-wise autoregressiv...
@@ -148,7 +152,7 @@ MindHier 提出了一种从 fMRI 信号到自然图像的“层次到层次”�
 
 **输入输出流总结：** 输入为单次 fMRI 响应信号，经 HFE 单次前向传播产生 $M$ 层层次化特征；这些特征在阶段一与 CLIP 视觉编码器对齐后，在阶段二按尺度感知策略注入 VAR 生成器，最终输出 $512 \times 512$ 的重建图像。整个推理仅需 2.64 秒（Table 1），相比扩散式 SOTA 方法 MindEye2 加速约 4.67 倍。
 
-## 核心模块与公式推导
+
 
 MindHier 的核心架构由三个紧密耦合的模块构成，分别解决 fMRI 信号的层次化解码、跨模态特征对齐以及尺度感知的条件生成。以下逐一展开其设计逻辑与关键公式。
 
@@ -198,7 +202,9 @@ $$p(R|E) = \prod_{k=1}^{K} p(r_k \mid r_{<k}, \mathbf{s}_k)$$
 
 **关键公式汇总：** 上述五个公式构成了 MindHier 的理论骨架——Eq. (1) 和 Eq. (2) 定义了对齐训练的目标，Eq. (3)–(5) 定义了尺度感知的条件生成过程。消融实验证实，层次化全监督（Eq. 1 + Eq. 2 作用于所有块）相比仅监督终端层，CLIP 准确率从 95.1% 跃升至 97.2%（Table 2）；粗到细引导策略（Eq. 5 中 $\mathbf{s}_k$ 按 $h_k$ 递减选取）相比倒置的细到粗策略，CLIP 提升 1.1 个百分点，SwAV 距离降低 0.009（Table 4），验证了公式设计的有效性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验：NSD测试集性能对比
 
@@ -266,7 +272,9 @@ MindHier在NSD新测试集（1,000张共享测试图像）上与现有fMRI-to-im
 
 ![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_AT7hCh6HB7/figures/019_Table_10.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 从扩散到自回归：范式转换的动因
 
@@ -305,6 +313,8 @@ MindHier的方法学贡献在于将这一范式从“固定引导+扩散”切�
 4. **更高分辨率的计算挑战**：尺度自回归模型在>512×512分辨率下的伪影控制和计算负载如何解决？随着尺度数K增加，token序列长度呈指数增长，选择性注意力掩码的效率优势可能被稀释。
 
 5. **跨受试者少样本泛化机制**：如何设计受试者无关的fMRI表征学习策略，以降低对新受试者的数据依赖？这可能需要在HFE中引入脑区对齐模块或元学习框架。
+
+
 
 ## 原文 PDF
 

@@ -45,7 +45,7 @@ claims:
 > - GenEval 上，Overall Score 0.65 vs 0.55 (SDXL) / 0.62 (SD3-medium) / 0.66 (Sana) (与Sana接近，优于SD3-medium)。
 > - DPG-Benchmark 上，Overall Score 84.8 vs 83.3 (SDXL) / 87.9 (SD3-medium) / 84.8 (Sana) (与Sana并列，略低于SD3-medium)。
 
-## 概述
+## 概要
 
 当前基于流匹配的 Transformer 图像生成模型（如 FLUX）在取得高质量生成结果的同时，面临着参数规模庞大导致的推理延迟高、计算成本昂贵等核心瓶颈。这一问题在高分辨率（如 1024×1024）场景下尤为突出，严重制约了模型的实用化部署。
 
@@ -55,7 +55,7 @@ NAMI（Bridged Progressive Rectified Flow Transformers）针对上述瓶颈提�
 
 在方法谱系上，NAMI 属于整流流生成模型的效率优化分支，与 FLUX-dev/schnell（12B）、SD3-medium（2B）、Sana（1.6B）等模型形成直接对比。其独特之处在于将分辨率分层与模型容量分配联合设计，而非简单的模型压缩或蒸馏策略。
 
-## 背景与动机
+
 
 ### 问题背景：流匹配生成模型的推理效率瓶颈
 
@@ -80,7 +80,9 @@ $$\frac{d x_t}{d t} = v_\theta(x_t, t), \quad x_0 \sim \mathcal{N}(0, I)$$
 
 基于这一洞察，本文提出 **NAMI（Bridged Progressive Rectified Flow Transformers）**，通过**分辨率区分的渐进式整流流**架构，在保持生成质量的前提下大幅降低推理延迟。其核心设计包括：(1) 将整流流按分辨率划分为多个阶段，各阶段使用不同规模的子模型；(2) 通过可学习的 **BridgeFlow 模块**连接相邻阶段，对齐不同分辨率下的概率分布。实验表明，NAMI-2B 在 1024×1024 分辨率下相比同等规模的 FLUX 基线**减少 64% 推理时间**（Table 2），同时在 GenEval 和 DPG-Benchmark 上取得有竞争力甚至领先的生成质量（Table 3, Table 4）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 NAMI 的核心创新在于将整流流（Rectified Flow）的生成过程沿两个正交维度进行分解——**分辨率**与**模型容量**——从而在保持生成质量的前提下大幅降低推理成本。与 FLUX 等统一使用相同规模 DiT 处理所有去噪步骤的基线相比，NAMI 引入了两个关键的结构性改动（changed slots）。
 
@@ -118,7 +120,7 @@ $$\min_{\theta_k} \sum_{k=1}^{K} \mathbb{E}_{(k, t, (\hat{x}_{s_k}, \hat{x}_{e_k
 
 **需要手动验证的点**：论文仅在文本到图像生成任务上验证了 NAMI 的有效性，对图像编辑等任务仅做了初步探索（附录 D 示例）。BridgeFlow 的线性假设在更大规模模型（如 12B+）或更复杂的分布偏移场景下是否仍然充分，尚待进一步验证。
 
-## 整体框架
+
 
 NAMI 的整体 pipeline 围绕“分辨率分阶段整流流 + 模型空间分解”这一核心思路构建，将图像生成过程划分为多个分辨率递增的阶段，并在阶段间引入可学习的桥接模块以对齐概率分布。
 
@@ -141,7 +143,7 @@ $$\min_{\theta_k} \sum_{k=1}^{K} \mathbb{E}_{(k, t, (\hat{x}_{s_k}, \hat{x}_{e_k
 ![[assets/figures/papers/paper_list_l902_https_arxiv_org_abs_2503_09242/figures/004_Figure_4.jpg]]
 *Figure 4: Overview of NAMI: The left figure shows the progressive flow transformers of NAMI, where the same color represents the same module. The right figure depicts the integration of the BridgeFlow module, which establishes connections across adjacent time windows. Specifically, we divide the image generation process into K resolution stages and the entire flow is divided into K time windows, where adjacent stages are connected through upsampling and the BridgeFlow module. We use fewer transformer layers at the low-resolution stages to generate image layouts and concept contours, progressively adding more layers as the resolution increases*
 
-## 核心模块与公式推导
+
 
 ### 3.1 整流流基础
 
@@ -193,7 +195,9 @@ $$\mathrm { l o s s } = \Vert ( \hat { x } _ { s _ { k } } - \hat { x } _ { e _ 
 ![[assets/figures/papers/paper_list_l902_https_arxiv_org_abs_2503_09242/figures/002_Figure_3.jpg]]
 *Figure 3: Overview of the image generation process for FLUXdev [20] and our NAMI-2B, with upscaling alignment applied during the low-resolution stages of NAMI-2B*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心推理效率验证
 
@@ -262,7 +266,9 @@ Table 1给出了NAMI各变体的架构详情。NAMI采用多阶段MM-DiT Blocks�
 ![[assets/figures/papers/paper_list_l902_https_arxiv_org_abs_2503_09242/figures/011_Figure_5.jpg]]
 *Figure 5: The distribution of text lengths across GenEval, DPG-Benchmark and NAMI-1K*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的差异定位
 
@@ -310,6 +316,8 @@ NAMI 处于 **高效文生图（Efficient Text-to-Image Generation）** 的研�
 4. **跨模态和跨任务迁移**：该方法在视频生成、3D 生成等需要更高计算量的任务中是否同样有效，是重要的后续研究方向。
 
 5. **更大规模的验证**：在 12B+ 参数规模下，分段流和模型划分的加速比例是否会因通信开销或阶段间瓶颈而衰减，需要进一步实验验证。
+
+
 
 ## 原文 PDF
 

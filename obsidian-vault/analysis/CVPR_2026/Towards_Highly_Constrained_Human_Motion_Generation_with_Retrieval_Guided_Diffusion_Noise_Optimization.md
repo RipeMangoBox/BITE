@@ -45,7 +45,7 @@ claims:
 > - Task-2 (very low overhead barrier) 上，Constraint Error (C.Error) 0.000049 vs 未提供具体数值（显著高于RG-DNO） (显著降低)。
 > - Task-3 (precise steps & distance) 上，Constraint Error (C.Error) 0.0003 vs 未提供具体数值 (降低)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有训练无关的扩散噪声优化（DNO）方法在处理高度挑战的时空约束（如通过非常狭窄的间隙）和精确数值控制（如指定步数）时，会遭遇高约束误差与运动伪影。其根本原因在于，DNO仅从随机高斯噪声出发进行优化，缺乏满足困难约束所需的特定运动技能和结构化知识，导致优化过程陷入次优解。
 
@@ -54,8 +54,6 @@ claims:
 **方法定位**：RG-DNO 在 **ProgMoGen**（Liu et al., CVPR 2024）的运动编程框架和 **DNO**（Karunratanakul et al., CVPR 2024）的噪声优化范式基础上，引入了三个关键创新：（1）关系任务解析，将约束集按困难程度和依赖关系拆分为可检索子集与可优化子集；（2）基于约束的运动检索与反演，从外部数据集中提取结构化运动先验；（3）蒙版噪声优化与奖励引导的蒙版选择，在时空维度上智能融合检索噪声与随机噪声，同时通过运动质量奖励函数滤除不合理组合。
 
 **主要结果**：在通过狭窄间隙（Task-1）、极低头顶障碍（Task-2）和精确步数控制（Task-3）等高度约束任务上，RG-DNO 显著降低了约束误差并提高了运动自然度。例如，在 Task-2 上约束误差降至 0.000049，Task-3 的成功率达到 0.594，均明显优于现有 DNO 基线。消融实验证实，关系任务解析、蒙版优化和奖励函数三个组件对性能提升均有决定性贡献。
-
-## 背景与动机
 
 ### 扩散噪声优化：训练无关的运动控制新范式
 
@@ -90,7 +88,7 @@ claims:
 
 这一框架的独特之处在于，它将外部数据集视为一个**可查询的运动技能知识库**，而非传统意义上的训练数据。通过检索-反演-组合的管线，RG-DNO在不修改扩散模型权重、不增加额外训练的前提下，显著扩展了训练无关运动生成的能力边界。
 
-## 核心创新
+## 核心方法与创新机理
 
 ### 问题瓶颈：随机噪声优化的能力边界
 
@@ -166,8 +164,6 @@ $$M = \arg\min_{M \in \mathcal{M}} F_{\mathcal{C}}(G(z')) + \mathcal{R}(G(z'))$$
 
 RG-DNO 的本质创新在于将“检索外部知识→反演为扩散噪声→蒙版智能组合→奖励引导筛选”这一完整链路引入扩散噪声优化框架，使得原本受限于随机初始化的 DNO 方法获得了处理高度约束任务的能力。这一思路的核心价值在于：**不修改扩散模型本身，不增加训练成本，仅通过优化初始噪声的构造方式，就显著扩展了训练无关运动生成的能力边界**。
 
-## 整体框架
-
 RG-DNO 的核心思想是将高度约束的运动生成任务分解为可解的子问题，并通过检索外部运动数据集中的相关技能来引导扩散噪声优化过程。其整体管线包含五个顺序模块，形成一条从任务解析到最终运动生成的完整推理链。
 
 **输入**：一个由组合约束函数 $F_C$ 定义的运动生成任务，可选地附带文本条件 $C_0$。约束函数可包含多种时空约束（如通过狭窄间隙、跨越低障碍物）和精确数值约束（如指定步数、移动距离）。
@@ -190,8 +186,6 @@ RG-DNO 的核心思想是将高度约束的运动生成任务分解为可解的�
 
 ![[assets/figures/papers/paper_list_l11_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_Towards_Highly_Con/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of Retrieval-Guided Diffusion Noise Optimization. Given a motion generation task represented by a combined constraint function*
-
-## 核心模块与公式推导
 
 ### 3.1 问题形式化：高约束运动生成
 
@@ -280,16 +274,10 @@ RG-DNO 各模块形成级联因果链：**关系任务解析**识别瓶颈约束
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l11_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_Towards_Highly_Con/figures/001_Figure.jpg]]
-*Figure: Ours (Retrieval-Guided Diffusion Noise Optimization)*
-
-![[assets/figures/papers/paper_list_l11_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_Towards_Highly_Con/figures/008_Figure.jpg]]
-*Figure: (a) ProgMoGen+DNO (b) Retrieval only (c) with Mask Optim*
-
 ![[assets/figures/papers/paper_list_l11_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_Towards_Highly_Con/figures/009_Figure_4.jpg]]
 *Figure 4: Qualitative comparison. (a) ProgMoGen+DNO produces unsatisfactory motion for difficult constraints. For Task-2: (b) Using retrieved noise only produces implausible motion when fitting the entire task. (c) We generate plausible motion by combining retrieved noise and random noise with mask optimization*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -338,19 +326,10 @@ Table 4 系统消融了 RG-DNO 各核心组件在 Task-2 上的贡献，红色�
 ![[assets/figures/papers/paper_list_l11_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_Towards_Highly_Con/figures/004_Table_2.jpg]]
 *Table 2: Quantitative comparison on the highly-constrained motion generation task involving challenging numerical constraints*
 
-![[assets/figures/papers/paper_list_l11_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_Towards_Highly_Con/figures/005_Table_3.jpg]]
-*Table 3: Quantitative comparison on Task HSI-2 with joint-based constraints. MaskControl uses MoMask as its base model*
-
-![[assets/figures/papers/paper_list_l11_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_Towards_Highly_Con/figures/010_Figure_5.jpg]]
-*Figure 5: Performance on different levels of task difficulty. (a) Different heights of the overhead barrier. (b) Different numbers of steps for the same walking distance*
-
 ![[assets/figures/papers/paper_list_l11_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_Towards_Highly_Con/figures/006_Figure_3.jpg]]
 *Figure 3: Qualitative examples for various highly-constrained generation tasks. The relational task parsing results are obtained via LLM. Details of each constraint function are provided in the supplementary material*
 
-![[assets/figures/papers/paper_list_l11_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_Towards_Highly_Con/figures/011_Table_5.jpg]]
-*Table 5: Performance on incorporating with text guidance via large language models for Task-2 very low barrier. Our method can further improve performance with the help of text guidance*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 方法谱系：从扩散噪声优化到检索增强生成
 

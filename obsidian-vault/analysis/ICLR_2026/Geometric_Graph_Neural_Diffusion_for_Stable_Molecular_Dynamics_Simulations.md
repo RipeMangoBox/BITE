@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Geometric_Graph_Neural_Diffusion_for_Stable_Molecular_Dynamics_Simulations.pdf
+project_link: null
+code_link: null
 openreview_forum_id: T8VcTykTf1
 aliases:
 - GGNDG
@@ -42,7 +44,7 @@ claims:
 > - 3BPA 上，Stability (ps) 为 29.218，对比 1.965，变化 1.965 → 29.218。
 > - SiN (Test, SAMD23) 上，Stability (ps) 为 100，对比 100 (Equiformer V2) / 较低 ，变化 多数对比模型远低于100；GGND与Equiformer V2并列满分。
 
-## 概述
+## 概要
 
 现有几何图神经网络（Geo‑GNN）在分子动力学（MD）模拟中面临一个根本瓶颈：训练数据仅覆盖有限温度下的分子构象，当模拟遇到高温等分布外构象时，即使微小的力预测误差也会累积导致非物理的化学键形成，使长期模拟迅速崩溃。图 1 的初步分析揭示了这一问题的根源——几何拓扑偏移：3BPA 分子在 600 K 和 1200 K 下的邻接矩阵分布与训练集（300 K）存在显著差异，而 VisNet 和 SEGNO 等主流等变模型在此偏移下的稳定性从 100 ps 骤降至数十甚至近乎零 ps。
 
@@ -56,7 +58,7 @@ GGND 定位为**即插即用模块**，可无缝集成到现有局部等变消�
 
 GGND 引入约 26.5% 的训练时间增加和 15.6% 的 MD 模拟时间增加，但鉴于其在稳定性和精度上的巨大提升，这一开销在实践中是可接受的。当前方法的主要局限在于全连通图扩散的平方级复杂度，使其难以直接扩展至包含数百万原子的蛋白质等大生物分子系统。
 
-## 背景与动机
+
 
 分子动力学（MD）模拟是理解分子系统物理化学性质的核心工具，其精度高度依赖于势能面描述的准确性。近年来，几何图神经网络（Geo‑GNN）在拟合高精度量子力学数据方面取得了显著进展，使得机器学习力场（MLFF）能够以较低的计算成本逼近第一性原理精度。然而，现有 Geo‑GNN 模型的训练数据通常仅覆盖有限温度下的分子构象，当模拟遇到分布外（OOD）构象时，即使微小的力预测误差也会在长期 MD 轨迹中逐步累积，最终导致非物理的化学键形成，破坏模拟的稳定性。
 
@@ -77,7 +79,9 @@ Figure 1(a)-(b) 的邻接矩阵分布差异进一步表明，高温构象与训�
 
 本文的核心动机在于：**能否设计一种保持 SE(3)-等变性的全局信息传播机制，使模型对几何拓扑偏移不敏感，从而在分布外构象上维持稳定的力预测？** 为此，GGND 将扩散偏微分方程推广到几何图上，通过全连通图上的等变梯度算子和张量值注意力扩散度算子，实现任意原子对之间的连续时间信息流。这一设计使节点表示不再依赖预定义的邻接结构，从根本上缓解了几何拓扑偏移带来的误差累积问题。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GGND 的核心创新在于将**几何图上的连续时间扩散过程**引入等变图神经网络，从根本上改变了消息传递的拓扑范围和机制，从而缓解了现有 Geo‑GNN 在分子动力学模拟中因**几何拓扑偏移**导致的稳定性崩溃问题。
 
@@ -123,7 +127,7 @@ GGND 并非重新设计整个模型，而是作为**插件模块**与现有局�
 
 消融实验（Table 3）直接验证了上述创新机制的必要性：去掉全连通扩散或等变扩散度算子的变体（GGND† 和 GGND‡）在高温外推任务上的稳定性和准确性均明显下降，而完整 GGND 在 600 K 达到 100 ps 的满分稳定性，在 1200 K 仍保持 29.218 ps。这证实了**完整的等变扩散过程**——而非单纯的全连通图或注意力机制——是缓解几何拓扑偏移的核心因果开关。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0012_T8VcTykTf1_Geometric_Graph_Neural_Diffusion_for_Stable_Mole/figures/007_Figure_3.jpg]]
 *Figure 3: The Illustration of Geometric Graph Neural Diffusion: (a) Our method serves as a plug-in module that integrates with local equivariant message passing. (b) The GGND uses equivariant diffusion operators (gradient and diffusivity) on a fully connected graph to capture domaininvariant geometric topological features. (c) The local message passing and the equivariant diffusion operators are combined to address geometric topological shifts, enabling generalizable energy and force predictions for stable molecular dynamics simulations*
@@ -164,7 +168,7 @@ GGND 作为一个独立模块，可以与 NequIP、MACE、SEGNO、VisNet 等多�
 
 > **注意**：GGND 的全连通扩散带来了约 26.5% 的训练时间增加和约 15% 的 GPU 内存增长（Table 5），复杂度为 $O(N^2)$，目前主要适用于中小规模系统（如 3BPA 和 SAMD23 中最多 510 个原子）。向百万原子级蛋白质系统的扩展需要稀疏近似或分层扩散机制，这一点原文将其列为未来工作方向。
 
-## 核心模块与公式推导
+
 
 GGND 的核心由两个互补组件构成：**局部等变消息传递网络（EGNN backbone）** 和 **几何图神经扩散模块（GGND module）**。前者负责提取局部原子环境特征，后者在全连通图上进行等变扩散，生成对几何拓扑偏移不敏感的全局特征。两者通过特征融合机制结合，使 GGND 能够作为即插即用模块集成到现有局部等变消息传递框架中（Figure 3）。
 
@@ -210,7 +214,9 @@ $$| \mathcal{L}(\Gamma_{\theta}; E_{\mathrm{te}}, M_{\mathrm{tr}}) - \mathcal{L}
 
 > **注意**：Theorem 3.1 的完整表述和证明细节需查阅原文 Section 3.2，此处仅给出其结论性描述以支撑外推间隙分解的逻辑链条。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与评估框架
 
@@ -256,7 +262,9 @@ Figure 4 的 MD 轨迹可视化进一步揭示了失效模式。在 100 ps NVE �
 
 Table 5 量化了 GGND 的计算开销。以 VisNet 为基线，集成 GGND 后训练时间增加 26.54%（6.822 h → 8.633 h），100 ps MD 模拟时间增加 15.57%（1.958 h → 2.282 h），GPU 显存占用增加约 15%（20.457 GB → 23.484 GB）。考虑到 GGND 在能量/力预测精度和稳定性方面的数量级提升，这一额外开销在实践中是可接受的。全连通图扩散导致的平方级复杂度是主要瓶颈，当前方法主要适用于中小规模系统（如 3BPA 的 27 原子和 SAMD23 的最多 510 原子），未来需通过稀疏近似或分层扩散机制扩展至更大规模生物分子系统。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有等变消息传递框架的关系
 
@@ -302,6 +310,8 @@ GGND 的全对扩散机制虽然有效缓解了几何拓扑偏移，但其平方
 3. **复合环境偏移下的性能边界**：在多种环境偏移（如温度、压力、化学组成等复合偏移）同时存在的情况下，GGND 的外推性能边界是否依然符合理论保证？Theorem 3.1 建立了表示变化对邻接矩阵变化的任意阶多项式控制，但其在复合偏移场景下的实证验证尚不充分。
 
 4. **与长程相互作用模型的对比**：GGND 通过扩散过程隐式捕获长程相互作用，但与显式建模长程静电相互作用的 Neural P3M 等方法相比，在周期性系统中的适用性和精度边界尚需进一步对比研究。在 SAMD23 的 HfO 测试中，GGND 的力 MAE（0.179 eV/Å）虽优于 Neural P3M（0.300 eV/Å），但这一优势是否在更大规模系统中保持仍需验证。
+
+
 
 ## 原文 PDF
 

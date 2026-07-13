@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Theoretical_Guarantees_for_Causal_Discovery_on_Large_Random_Graphs.pdf
+project_link: null
+code_link: null
 aliases:
 - TGCDLRG
 tags:
@@ -34,7 +36,10 @@ claims:
 | Method |  |
 | Dataset | |
 
-## 概述
+> [!tip] 效果简介
+> 结果与证据沿用下文“实验与关键发现”中的现有记录；本轮不新增或外推论文事实。
+
+## 概要
 
 本文针对“大规模随机图上的干预式因果发现”这一场景，研究**错误定向率（False Negative Rate, FNR）**如何随着图规模增大而收敛。核心问题是：在只能随机选择干预节点、且允许存在隐混淆的ϵ‑interventional faithfulness假设下，能否为因果序的重建误差提供有限的样本集中保证？
 
@@ -47,7 +52,7 @@ claims:
 > 注意：实验中出现的高干预覆盖率下界限偶尔被突破的现象，可能与优化算法的次优性有关，需进一步人工核查。
 </td><td>
 
-## 背景与动机
+
 
 因果发现的核心任务是从观测或实验数据中恢复变量间的有向因果关系。当仅靠观测数据无法唯一确定因果方向时，干预实验成为关键的定向工具。然而，现实中的干预往往成本高昂、次数有限，且实验者可能只能对随机选取的节点进行干预，无法精确控制哪些变量被扰动。在此类约束下，基于评分函数的排序方法（即寻找一个与干预数据最一致的变量全序）被证明可以在一定条件下一致地恢复真实因果序。这些方法避免了直接估计等价的因果结构类（MEC），且通过分数优化可实现大规模应用，但其统计行为的理论保障仍存在显著缺口。
 
@@ -55,7 +60,9 @@ claims:
 
 针对上述缺口，本文聚焦于随机图模型上基于随机干预的因果序恢复问题，在仅假设 ε‑interventional faithfulness 且允许潜在混杂的框架下，分析 FNR 的期望上界及其围绕期望的集中性。目标是推导有限维度的偏差界，从而定量回答：在大规模图中，误定向比例如何随节点数增长而趋于零，其波动幅度（方差或标准差）以何种速率收缩。相关理论结果总结于 [Table 1](#table-1)，覆盖稠密 Erdős–Rényi、稀疏 Erdős–Rényi 与广义 Barabási–Albert 三类典型随机图，为理解非最坏情况下的干预实验效率提供了更精确的指导。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本研究的核心贡献在于 **理论层面**：它不再提出新的因果发现算法，而是为现有基于评分的拓扑排序方法在随机干预下的统计行为建立了首个 **有限维浓度边界**（finite‑dimension deviation bounds）。与 prior work 相比，关键的 **changed slots** 集中在假设条件、干预机制与分析目标三个维度。
 
@@ -82,7 +89,7 @@ claims:
 
 > **需要说明**：由于原始分析材料未提取出论文的具体方法名称及显式 baseline 算法，上述“changed slots”是基于理论贡献描述与 prior work 对比推断的。若需指明精确的对比基准（例如 Chevalley et al. 2024 的算法），请结合附录中的 ‑related‑work 部分进行人工核实。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0016_V7pT2ZRoTB_Theoretical_Guarantees_for_Causal_Discovery_on_L/figures/001_Table_1.jpg]]
 *Table 1: Summary of theoretical results Asymptotic orders for the expected topological error and the concentration rate (typical deviation scale around the mean) in the three random-graph regimes considered. For the generalized Barabasi–Albert (BA) model, ´ $\begin{array} { r } { \beta = \frac { 1 } { \gamma - 1 } } \end{array}$ with $\gamma$ = 2 + $\kappa$ / m , $\kappa$ > 0 f measures the number of misorentations in the predicted causal order, whereas g is normalized by the number of true edges (false-negative rate (FNR)). The probability for a variable to be intervened on is denoted $p _ { i n t }$
@@ -117,7 +124,7 @@ $$\Pr\!\big( |f(\mathbf{I}) - \mathbb{E}[f(\mathbf{I})]| \ge t \big) \le 2\exp\!
 
 整个框架的输入是随机图模型与干预设计，输出是 FNR 的期望渐近界和围绕期望的偏差概率界，从而为一类基于得分的因果发现算法提供了平均情形下的可靠性与变异性刻画。
 
-## 核心模块与公式推导
+
 
 **误差度量与问题形式化**  
 记 $\mathcal{G}$ 为真实的底层有向无环图（DAG），$\pi$ 为变量的一个拓扑排序。定义**拓扑误差**为排序中反序边的总数：
@@ -159,7 +166,9 @@ $$P\left( \left| g(\mathbf{I}) - \mathbb{E}[g(\mathbf{I})] \right| \ge t \right)
 
 以上阶数关系汇总在 Table 1 中，完整给出了未归一化误差的期望阶与两种误差度量在不同图族下的浓度速率。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：FNR 的浓度行为随图尺度变化
 论文通过模拟实验验证了归一化拓扑误差（即假阴性率 FNR）围绕其期望的浓度性质。实验在三种随机图模型上进行：稠密 Erdős–Rényi（ER, $p_e = \Theta(1)$）、稀疏 ER（$p_e = c/d$）和广义 Barabási–Albert（BA）无标度网络。对每种图族，扫描了三个密度参数与三个干预覆盖概率 $p_{\mathrm{int}}$，在多个图尺寸 $d$ 下独立生成图、随机干预，并计算最优因果序下的 FNR 的四分位距 (interquartile range, IQR)，以刻画样本间变异（见 Figure 1）。
@@ -198,7 +207,9 @@ $$P\left( \left| g(\mathbf{I}) - \mathbb{E}[g(\mathbf{I})] \right| \ge t \right)
 *Figure 7: Empirical scaling of the maximum degree in BA graphs with m = 3 edges per node for different values of $\kappa$ . Fitted lines correspond to estimated exponents $\hat { \gamma }$ , compared against theoretical predictions. Graph sizes range from d = 3 0 to d = 4 0 0 0 . The close match confirms that the generated graphs reproduce the expected heavy-tailed scaling
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 本文属于**因果发现平均情况理论分析**的早期工作，其直接影响来自 Chevalley 等人 (2025c) 提出的基于 `$\epsilon$`-interventional faithfulness 和单节点随机干预的评分排序框架。该框架本身已将传统因果发现从最坏情形（如固定度图）的保守保证[2] 转向可扩展的目标函数优化，本文则进一步将理论扩展至**平均情况**：在随机图模型（ER 稠密/稀疏、广义 BA）和随机干预设计下，首次为错误率 `$g(\mathbf{I},\mathbf{E})$`（FNR）导出了有限样本偏差界（concentration bounds）。与此前主要关注无向骨架识别或有向边的*存在性*保证不同，本文通过 McDiarmid 不等式与结构 Lipschitz 常数（Lemma 3）将图的结构敏感性转化为误差函数的波动控制，从而建立了**误差围绕期望的典型偏差尺度**（见表 1）。
 
@@ -228,6 +239,8 @@ $$P\left( \left| g(\mathbf{I}) - \mathbb{E}[g(\mathbf{I})] \right| \ge t \right)
 4. **实用算法衔接**：针对单节点干预下的大规模因果发现，设计能利用 concentration 特性的近似算法，使理论保证转化为可实用的误差控制（如置信区间）。
 
 （注：文中部分结论需结合原文 Table 1 与 Appendix E 的理论期望界综合评估；Figure 1 仅提供仿真佐证，未涵盖所有图族‑密度‑干预覆盖组合，因此表述“普遍性”需人工核实。）
+
+
 
 ## 原文 PDF
 

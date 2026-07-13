@@ -5,6 +5,7 @@ paper_level: A
 venue: TOG
 year: 2019
 pdf_ref: paperPDFs/TOG_2019/Neural_State_Machine_for_Character_Scene_Interactions.pdf
+code_link: https://github.com/sebastianstarke/AI4Animation/tree/master/AI4Animation/SIGGRAPH_Asia_2019
 project_link: https://github.com/sebastianstarke/AI4Animation/tree/master/AI4Animation/SIGGRAPH_Asia_2019
 aliases:
 - NSM
@@ -33,7 +34,7 @@ claims:
 | 中文题名 | 用于角色-场景交互的神经状态机 |
 | 英文题名 | Neural State Machine for Character-Scene Interactions |
 | 会议/期刊 | TOG 2019 |
-| Links | [paper](https://doi.org/10.1145/3355089.3356505); [GitHub](https://github.com/sebastianstarke/AI4Animation/tree/master/AI4Animation/SIGGRAPH_Asia_2019) |
+| Links | [paper](https://doi.org/10.1145/3355089.3356505) · [GitHub](https://github.com/sebastianstarke/AI4Animation/tree/master/AI4Animation/SIGGRAPH_Asia_2019) |
 | Topic | #topic/motion_animation #topic/motion_animation/human_motion_generation |
 | Method | Neural State Machine (NSM) |
 | Dataset | Sitting task – final pose precision, Carrying task – final pose precision, Responsiveness – idle to walk transition, Responsiveness – idle to run transition |
@@ -43,7 +44,7 @@ claims:
 > - Carrying task – final pose precision 上，Positional Error (PE, cm) / Rotational Error (RE, deg) at hand 为 PE: 3.05, RE: 1.02，对比 PFNN: PE 7.62 / RE 2.50; MANN: PE 3.84 / RE 1.15; LSTM: PE 4.15 / RE 1.23; Auto-LSTM: PE 3.92 / RE 1.09; MLP: PE 4.42 / RE 1.68，变化 PE: -4.57 vs PFNN; RE: -1.48 vs PFNN。
 > - Responsiveness – idle to walk transition 上，Average response time (s) 为 1.49，对比 Lower than MLP, PFNN, MANN, LSTM, Auto-LSTM (exact values not listed)，变化 Fastest among compared methods。
 
-## 概述
+## 概要
 
 角色与3D场景进行精确、目标驱动的交互是计算机动画中长期存在的难题。此类任务不仅涉及周期性运动（如行走）与非周期性运动（如坐下）的复杂组合，还要求角色的姿态与多样化的物体几何实现高精度对齐。传统的监督学习方法，如基于固定相位函数的**PFNN**（Holden et al., ACM Trans. Graph. 2017）或模式自适应的**MANN**（Zhang et al., ACM Trans. Graph. 2018），难以在一个统一模型中有效分离这些多模态运动，常导致运动模糊、物体穿透或姿态抖动等问题。
 
@@ -51,7 +52,7 @@ claims:
 
 实验结果表明，NSM 在坐下、搬运等精确交互任务上的位置误差和旋转误差显著低于 PFNN、MANN、LSTM 等基线方法，同时响应速度最快，脚滑现象也几乎可忽略。消融实验进一步验证了双向控制器、交互/环境传感器以及 Kronecker 积相位调制等关键设计的必要性。然而，该方法对训练中未见过的、几何差异过大的物体泛化能力仍然有限，且依赖手动相位标注，这构成了其主要局限。
 
-## 背景与动机
+
 
 角色动画的核心挑战之一是生成自然、精确的目标驱动场景交互——例如角色走到椅子前坐下、搬运物体或开门。这类任务要求运动控制系统同时满足三个相互制约的条件：**周期性运动**（如行走）与**非周期性精细操作**（如伸手抓握）的无缝切换、**亚厘米级**的末端执行器姿态对齐，以及对**多样化 3D 几何体**（不同形状的椅子、桌子等）的自适应。传统动画管线依赖手工设计的状态机和运动匹配，不仅工作量巨大，且难以泛化到未见过的场景配置。
 
@@ -61,7 +62,9 @@ claims:
 
 本文的动机正是填补这一空白。核心洞见在于：如果将动作标签和运动相位**显式地**编码为网络结构的一部分，让模型自主学习每种动作对应的相位轨迹和专家组合，就有可能在单一模型中分离并平滑过渡多种截然不同的运动。同时，通过在自中心坐标系和目标中心坐标系之间进行**双向轨迹预测**，并引入**体积传感器**来编码场景几何，可以大幅提升目标到达精度和几何适配能力。这一思路催生了 **Neural State Machine (NSM)**——一个能够根据高层目标指令，在复杂 3D 场景中生成精确交互行为的数据驱动框架。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 NSM 的核心创新在于通过**动作感知的门控相位混合**与**双向目标控制**两大机制，系统性地解决了目标驱动的精确场景交互难题。与现有方法相比，NSM 在以下五个关键维度上实现了突破性改进。
 
@@ -91,7 +94,7 @@ NSM 的核心创新在于通过**动作感知的门控相位混合**与**双向�
 
 与 **MANN**（Zhang et al., ACM Trans. Graph. 2018）仅通过门控速度特征混合专家权重不同，NSM 的门控网络同时接收**动作标签、目标信息与相位**，使专家混合不仅依赖运动状态，更取决于高层任务语义。这使 NSM 能够在单一模型中同时处理行走、跑步、坐下、搬运、开门等多种截然不同的任务，并在响应速度上全面优于所有基线——从静止到行走的平均响应时间为 1.49 秒，从静止到跑步仅为 0.81 秒（Table 2），同时脚滑量在所有任务中均为最低（Fig. 10）。
 
-## 整体框架
+
 
 NSM 是一个自回归的**数据驱动框架**，旨在为虚拟角色生成目标驱动的精确场景交互动作。其核心由一个**运动预测网络** (Motion Prediction Network) 和一个**门控网络** (Gating Network) 构成（图 2）。系统以逐帧循环的方式运行：每一帧，运动预测网络接收来自上一帧的角色状态、目标信息以及场景几何编码，输出当前帧的姿态与轨迹；这些输出随后被反馈回输入端，作为下一帧的控制信号，形成闭环。
 
@@ -151,7 +154,7 @@ $$\mathrm{Cost}(\mathbf{X}, \mathbf{Y}; \gamma, \beta, \mu) = \| \mathbf{Y} - \T
 ![[assets/figures/papers/paper_list_l6_https_doi_org_10_1145_3355089_3356505/figures/001_Figure_1.jpg]]
 *Figure 1: A selection of results using our method to generate scene interaction behaviors*
 
-## 核心模块与公式推导
+
 
 ### 整体架构
 
@@ -229,7 +232,9 @@ $$\mathrm{Cost}(\mathbf{X}, \mathbf{Y}; \gamma, \beta, \mu) = \| \mathbf{Y} - \T
 
 消融实验表明（Table 3 下部，Fig. 12-14）：移除双向控制器导致角色无法正确对齐目标物体，位置和旋转误差显著增加；移除交互传感器使角色穿透目标几何并产生不自然姿态；移除环境传感器使角色忽略障碍物；将 Kronecker 积替换为简单拼接会降低运动细节并增加脚滑。这些结果确认了每个模块对系统性能的必要性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 1. 核心性能对比
 
@@ -277,7 +282,9 @@ NSM 对训练中未见过的椅子形状表现出一定的泛化能力（**Fig. 
 ![[assets/figures/papers/paper_list_l6_https_doi_org_10_1145_3355089_3356505/figures/015_Figure_12.jpg]]
 *Figure 12: The resulting performance in motion detail and foot sliding when combining features with the phase by either using Kronecker product [K] or concatenation [C] as input to the gating network*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 NSM 的核心贡献在于将**动作标签感知的门控相位调制**与**双向目标控制框架**相结合，解决了数据驱动角色动画中目标导向精确交互的瓶颈。其在方法谱系中的定位可从以下四个维度理解。
 
@@ -314,6 +321,8 @@ NSM 的适用边界受以下因素制约：
 - **多周期运动的相位建模**：如何处理不同身体部位以不同频率运动的场景（如边走边挥剑）的自动相位检测与分离？
 - **数据采集的自动化**：如何联合采集运动与环境信息（如佩戴 RGBD 摄像头的动捕服），以无人工干预地丰富训练数据？
 - **物理仿真中的强化学习**：如何定义适合低能量日常生活交互（如从椅子上站起）的强化学习奖励函数，以在物理仿真中复现类似效果？
+
+
 
 ## 原文 PDF
 

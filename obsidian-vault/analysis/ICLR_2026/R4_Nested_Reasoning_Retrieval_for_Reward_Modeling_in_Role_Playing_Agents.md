@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/R4_Nested_Reasoning_Retrieval_for_Reward_Modeling_in_Role_Playing_Agents.pdf
+project_link: null
+code_link: null
 openreview_forum_id: sWQSbVsPEz
 aliases:
 - RNRRRMRPA
@@ -42,7 +44,7 @@ claims:
 > - CharacterEval 上，Knowledge Accuracy (KA) 为 68.80 (R4-32B-Instruct)，对比 59.28 (best baseline)，变化 +9.52。
 > - CharacterEval 上，Persona Behavior (PB) 为 68.00 (R4-32B-Instruct)，对比 58.20 (best baseline)，变化 +9.80。
 
-## 概述
+## 概要
 
 **核心瓶颈**：现有LLM在角色扮演对话中面临双重困境。一方面，对话代理缺乏融入角色背景的推理与检索能力，生成的回复在人物个性、情感表现和叙事连贯性上明显不足；另一方面，传统奖励模型存在“角色偏见”（对主要角色与次要角色的评分不一致）和“参考偏见”（对有无角色背景信息的样本评分不稳定），无法提供可靠的多维度对齐监督信号。
 
@@ -52,7 +54,7 @@ claims:
 
 **主要结果**：在CharacterEval基准上，R4-32B-Instruct的角色一致性平均分达到64.64，远超最佳基线BC-NPC-Turbo的55.28（+9.36）；知识准确性和角色行为分别提升至68.80和68.00。人类评估中，R4在68.2%的案例中排名第一，平均排名1.42，优于GPT-4o和CharacterGLM-6B。消融实验揭示了一个关键发现：移除奖励模型的推理模块导致角色一致性骤降至49.87，而使用通用检索替代专门角色知识库时性能降至47.95，甚至低于完全移除检索的58.31——表明不相关的知识比没有知识更具破坏性。
 
-## 背景与动机
+
 
 ### 角色扮演对话的瓶颈
 
@@ -80,7 +82,9 @@ claims:
 
 针对上述瓶颈，R4框架提出一个核心命题：**将奖励建模重新定义为结构化推理任务**。具体而言，奖励模型通过多步推理和检索到的角色知识系统评估回复的多个维度（知识准确性、个性行为、情感表达等），产生可解释且对齐的偏好信号。随后，这些偏好信号通过GRPO训练具有同样推理和检索能力的角色扮演代理，使代理在生成时也能主动推理角色背景并检索相关知识。奖励模型与代理共享同一角色知识库，在统一框架下同步进化，形成自我强化的对齐循环。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 R4框架的核心创新在于将角色扮演对齐问题重新定义为**嵌套推理-检索**任务，并围绕这一核心洞察重构了奖励模型、对话代理和知识库三个组件，使它们在一个统一框架内协同进化。
 
@@ -124,7 +128,7 @@ R4的第三个创新是**角色特定知识构建管线**。不同于简单从�
 
 这些创新共同构成了一个**推理-检索-对齐**的正反馈系统，使R4在CharacterEval的角色一致性上达到64.64，远超最佳基线BC-NPC-Turbo的55.28。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_sWQSbVsPEz/figures/001_Figure_1.jpg]]
 *Figure 1: Architecture of R4 framework. (a) Training pipeline. (b-c) Reward model performs structured reasoning over response pairs and assigns comparative rewards to guide advantage estimation and policy updates. Both the agent and reward model integrate reasoning and retrieval throughout*
@@ -161,7 +165,7 @@ $$r_{\mathrm{agent}} = r_{\mathrm{prefer}} + \lambda_{\mathrm{fmt_2}} \cdot r_{\
 
 整体训练分为两个阶段：首先训练推理增强奖励模型，使其学会通过结构化推理和检索进行高质量的比较评估；然后将训练好的奖励模型固定，以其输出的偏好信号驱动角色扮演代理的 GRPO 训练。两个阶段均使用 Verl 和 ReSearch 框架实现，奖励模型训练 2 个 epoch，代理同样训练 2 个 epoch。这种嵌套设计使得推理和检索能力在评估和生成两端协同进化，形成从偏好信号到策略更新的闭环。
 
-## 核心模块与公式推导
+
 
 ### 1. 角色特定知识构建流水线
 
@@ -222,7 +226,9 @@ $$r_{\mathrm{agent}} = r_{\mathrm{prefer}} + \lambda_{\mathrm{fmt_2}} \cdot r_{\
 
 三个核心模块形成**自我强化循环**：知识构建流水线提供统一的角色知识底座；奖励模型利用该知识进行多步推理，产生可解释的偏好信号；代理在相同知识约束下，通过GRPO利用偏好信号优化回复策略。推理和检索能力在奖励模型和代理之间同步进化——奖励模型质量越高，偏好信号越可靠；代理越能有效利用知识，生成的回复越符合角色设定，进而为奖励模型提供更高质量的训练样本。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -275,7 +281,9 @@ R4框架在CharacterEval基准上进行了全面评估，涵盖对话能力、�
 - **计算成本**：训练使用64块H100 GPU，奖励模型和代理各需2个epoch，高昂的计算门槛限制了可复现性。
 - **奖励模型的推理一致性奖励**（$r_{\text{cons}}$）是否在所有情况下都真实反映人类偏好，还是仅符合特定模式，仍需进一步的人类对齐研究确认。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：现有方法的瓶颈
 
@@ -314,6 +322,8 @@ R4框架的核心创新在于将奖励建模重新定义为结构化推理任务
 4. **交互式角色调整**：能否在推理过程中融合用户反馈，实现交互式的角色行为调整？这将使框架从静态角色扮演转向动态、个性化的角色交互。
 
 5. **多语言与跨文化对齐**：在多语言、跨文化场景下，角色扮演的对齐标准如何变化？不同文化对角色一致性、情感表达和叙事风格的期望可能存在显著差异，需要文化感知的评估维度。
+
+
 
 ## 原文 PDF
 

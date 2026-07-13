@@ -5,6 +5,8 @@ paper_level: A
 venue: SIGGRAPH
 year: 2024
 pdf_ref: paperPDFs/SIGGRAPH_2024/Direct_a_Video_Customized_Video_Generation_with_User_Directed_Camera_Movement_and_Object_Motion.pdf
+project_link: https://direct-a-video.github.io/
+code_link: null
 aliases:
 - DV
 - Direct-a-Video
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | Direct-a-Video：用户导向的相机运动与物体运动自定义视频生成 |
 | 英文题名 | Direct-a-Video: Customized Video Generation with User-Directed Camera Movement and Object Motion |
 | 会议/期刊 | SIGGRAPH 2024 |
-| Links | [paper](https://arxiv.org/abs/2402.03162); [Project](https://direct-a-video.github.io/) |
+| Links | [paper](https://arxiv.org/abs/2402.03162) · [Project](https://direct-a-video.github.io/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | Direct-a-Video |
 | Dataset | Camera Control (200 scene prompts), Object Control (200 box-prompt pairs) |
@@ -41,7 +43,7 @@ claims:
 > - Camera Control (200 scene prompts) 上，FID-vid 为 48.96，对比 82.57 (AnimateDiff)，变化 -33.61。
 > - Camera Control (200 scene prompts) 上，Flow error 为 0.46，对比 0.74 (VideoComposer)，变化 -0.28。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -75,7 +77,7 @@ Direct-a-Video 处于**可控视频生成**领域，与以下方法形成对比�
 
 Direct-a-Video 的核心差异在于：通过**时序交叉注意力注入定量相机参数**与**空间交叉注意力调制引导物体轨迹**的结合，首次实现了解耦的、用户导向的双控机制，且大幅降低了训练数据与标注需求。
 
-## 背景与动机
+
 
 文本到视频（T2V）生成近年来取得了显著进展，但现有方法在运动控制方面仍存在一个关键瓶颈：**相机运动与物体运动被耦合在一起，无法独立解耦控制**。用户要么只能接受模型隐式生成的模糊运动，要么通过粗糙的条件信号（如预定义的运动 LoRA 或像素级运动向量图）进行整体引导，难以精确指定“镜头如何移动”和“场景中的物体如何运动”这两个独立维度。
 
@@ -85,7 +87,9 @@ Direct-a-Video 的核心差异在于：通过**时序交叉注意力注入定量
 
 **Direct-a-Video** 的核心动机正是打破这种耦合。其核心洞察在于：相机运动本质上是全局的、几何的变换，可以通过对静态镜头视频进行简单的裁剪/缩放增强来模拟，无需真实运动标注；而物体运动本质上是局部的、语义的定位问题，可以通过操纵预训练 T2V 模型内部的空间交叉注意力图来实现，无需额外训练。这两个机制天然互补，分别从全局几何和局部语义两个维度解耦运动控制，使得用户能够像导演一样独立指定镜头运动和演员走位。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Direct-a-Video 的核心创新在于首次在文本到视频生成中实现了**相机运动与物体运动的解耦控制**，且通过非对称的设计哲学——相机运动需要轻量训练、物体运动完全无需训练——以极低的成本解决了此前方法中运动定义模糊、无法灵活定制的瓶颈。
 
@@ -117,7 +121,7 @@ $$\mathrm{CrossAttnModulate}(\mathbf{Q}, \mathbf{K}, \mathbf{V}) = \mathrm{Softm
 
 **VideoComposer** 和 **MotionCtrl** 等方法需要大规模带有运动标注的视频数据集进行全监督训练。Direct-a-Video 的相机运动训练采用自监督策略：在静态镜头视频上应用裁剪/缩放增强来模拟相机运动，增强参数直接作为训练标签，无需人工标注。物体运动控制则完全不参与训练，仅在推理时通过注意力调制实现。这种策略大幅降低了数据获取和训练成本。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l13_Direct_a_Video_Customized_Video_Generation_with_User_Directed_Camera_Mov/figures/001_Figure_1.jpg]]
 *Figure 1: Direct-a-Video is a text-to-video generation framework that allows users to individually or jointly control the camera movement and/or object motion*
@@ -184,7 +188,7 @@ $$\hat{\epsilon}_{\theta}\left(\mathbf{z}_{t}, \mathbf{c}_{\text{cam}}, \mathbf{
 
 这种设计使得 Direct-a-Video 在**不依赖昂贵运动标注数据**的前提下，实现了相机运动和物体运动的独立解耦控制，同时支持单一控制和联合控制两种模式。
 
-## 核心模块与公式推导
+
 
 Direct-a-Video 的核心架构由两个解耦的控制分支构成：相机运动控制通过**可训练的时序交叉注意力模块**实现，物体运动控制则通过**无训练的空间交叉注意力调制**实现。两者共享一个冻结的预训练 T2V 骨干网络（Zeroscope），仅在推理时协同工作。
 
@@ -231,7 +235,9 @@ $$\mathsf{S}_{n}^{k}[i, j] = \left\{ \begin{array}{ll} {1 - \frac{|\mathsf{B}_{n
 
 消融实验（Table 3）表明，同时启用注意力放大和抑制时 mIoU 达 47.83%、AP50 达 31.33%；仅保留抑制而关闭放大时，mIoU 骤降至 15.35%、AP50 降至 3.46%，验证了注意力放大对物体-框对齐的关键作用。此外，Table 4 显示将注意力放大同时应用于 U-Net 的编码器和解码器可获得最佳接地性能（mIoU 49.06%）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 Direct-a-Video 的实验设计围绕两个核心目标展开：验证相机运动与物体运动的解耦控制能力，以及评估该控制对视频生成质量的影响。实验基于预训练的 T2V 主干网络 Zeroscope，在 200 个场景提示词上评估相机控制，在 200 个框-提示词对上评估物体控制。
 
@@ -290,7 +296,9 @@ Direct-a-Video 的实验设计围绕两个核心目标展开：验证相机运�
 ![[assets/figures/papers/paper_list_l13_Direct_a_Video_Customized_Video_Generation_with_User_Directed_Camera_Mov/figures/008_Figure.jpg]]
 *Figure: “A zebra next to a river”（a) “A horse walking on grassland”（b) （c) “A tiger and a bear walking on grass“ （d) “A tiger and a bear walking on grass“*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有工作的关系
 
@@ -342,6 +350,8 @@ Direct-a-Video 在“可控视频生成”领域的知识库中定位为**解耦
 - **实证层**：通过系统的消融实验，揭示了注意力放大与抑制的互补关系（单独使用任一项性能大幅下降）、放大在 U-Net 编解码器上的最佳配置、以及分离相机嵌入（平移/缩放分别编码）对控制精度的关键作用。这些发现为后续的注意力调制方法提供了实用指导。
 
 在更广泛的 T2V 可控生成谱系中，Direct-a-Video 填补了“用户导向的、解耦的运动控制”这一空白，与基于条件注入（如 ControlNet 类方法）、基于运动向量（如 VideoComposer）、基于预定义模式（如 AnimateDiff）的方法形成互补。其局限性（旋转缺失、遮挡处理）也指明了该子方向的下一步研究重点。
+
+
 
 ## 原文 PDF
 

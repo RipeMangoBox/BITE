@@ -5,6 +5,7 @@ paper_level: A
 venue: AAAI
 year: 2025
 pdf_ref: paperPDFs/AAAI_2025/EchoMimic_Lifelike_Audio_Driven_Portrait_Animations_through_Editable_Landmark_Conditioning.pdf
+code_link: null
 project_link: https://badtobest.github.io/echomimic.html
 aliases:
 - EchoMimic
@@ -42,7 +43,7 @@ claims:
 > - CelebV-HQ 上，E-FID 2.723。
 > - Collected Dataset 上，FID 43.272。
 
-## 概述
+## 概要
 
 音频驱动的肖像动画旨在根据语音信号生成逼真的说话头视频，是数字人、虚拟主播等应用的核心技术。然而，现有方法面临一个根本性瓶颈：**纯音频驱动**（如 **SadTalker** (Zhang et al., CVPR 2023)、AniPortrait、V-Express、Hallo 等）虽然使用便捷，但音频信号本身较弱且不稳定，导致生成结果在唇形同步和面部动态上容易出现抖动与失真；**纯面部标志驱动**则能提供精确的空间控制，但控制过强会使生成结果缺乏自然表现力。两类方法长期割裂，缺乏有效的融合与可编辑机制。
 
@@ -52,7 +53,7 @@ EchoMimic 的核心洞察在于：**同时利用音频的语义信息和面部�
 
 在方法谱系上，EchoMimic 属于基于扩散模型的肖像动画方法，其架构以 Stable Diffusion 的 Denoising U-Net 为核心，集成 Reference-Attention、Audio-Attention 和 Temporal-Attention 层，属于图像框架向视频生成的扩展。与纯音频驱动或纯标志驱动方法相比，其关键差异在于**驱动条件的多模态融合与可编辑性**，而非单一模态的强化。
 
-## 背景与动机
+
 
 音频驱动的肖像动画旨在根据输入语音生成逼真的说话头视频，在虚拟数字人、影视制作、在线教育等领域具有广泛的应用前景。近年来，基于扩散模型的生成方法在该任务上取得了显著进展，但现有方案在驱动信号的选择与融合上仍面临根本性的权衡困境。
 
@@ -62,7 +63,9 @@ EchoMimic 的核心洞察在于：**同时利用音频的语义信息和面部�
 
 **本文动机。** 针对上述问题，EchoMimic 提出了一种同时利用音频信号与面部标志的双驱动条件框架。其核心思路是：在训练阶段联合建模音频语义与标志空间结构，使模型学会两种模态的互补表征；在推理阶段，用户可独立使用音频或标志驱动，也可将二者组合——例如，用音频驱动唇部运动，同时用手动编辑的标志控制头部姿态。这种设计首次在单一框架内统一了音频驱动的表现力与标志驱动的可控性，并赋予了用户对驱动条件的可编辑能力，填补了现有方法的空白。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 EchoMimic 的核心创新在于将**音频信号与面部标志（landmarks）作为并行可编辑的驱动条件**，统一到单个扩散模型框架中，从而解决了现有方法“要么仅依赖音频（信号弱、不稳定），要么仅依赖面部关键点（控制过强、不自然）”的瓶颈。具体而言，该方法在以下三个 **Changed Slots** 上实现了突破：
 
@@ -94,7 +97,7 @@ EchoMimic 引入了一套专门适配双条件架构的训练策略（Section 3.
 
 Landmark Encoder 将标志图像编码为与潜空间同维度的特征，通过**逐元素加法**注入 Denoising U-Net，这种轻量级融合方式使得标志条件可以灵活地开启或关闭，支撑了多模式驱动的核心能力。
 
-## 整体框架
+
 
 EchoMimic 的整体架构以 Stable Diffusion (SD) 的去噪 U-Net 为核心，通过三个专用模块——Reference U-Net、Landmark Encoder 和 Audio Encoder——将多模态驱动条件注入生成过程，最终输出与音频和/或面部标志同步的肖像视频帧。
 
@@ -145,7 +148,7 @@ $$L_{spatial} = w(t) \left[ L2(I_p, I_{GT}) + LPIPS(I_p, I_{GT}) \right]$$
 ![[assets/figures/papers/paper_list_l1822_EchoMimic_Lifelike_Audio_Driven_Portrait_Animations_through_Editable_Lan/figures/002_Figure_2.jpg]]
 *Figure 2: The overall pipeline of the proposed EchoMimic (EM) framework*
 
-## 核心模块与公式推导
+
 
 ### 3.1 基础扩散框架
 
@@ -205,7 +208,9 @@ $$w(t) = \cos(t \cdot \pi / 2T)$$
 ![[assets/figures/papers/paper_list_l1822_EchoMimic_Lifelike_Audio_Driven_Portrait_Animations_through_Editable_Lan/figures/010_Figure_6.jpg]]
 *Figure 6: Landmark mapping results with motion synchronization method*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 定量对比：多基准全面领先
 
@@ -263,7 +268,9 @@ Section 3.4 提出的分块运动同步（Part-aware Motion Synchronization）�
 ![[assets/figures/papers/paper_list_l1822_EchoMimic_Lifelike_Audio_Driven_Portrait_Animations_through_Editable_Lan/figures/008_Figure_5.jpg]]
 *Figure 5: Video generation results of the proposed EchoMimic given different portrait styles, audios and selected landmarks*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 任务定位与核心创新
 
@@ -315,6 +322,8 @@ EchoMimic 的局限性及其衍生的开放问题包括：
 ### 6. 知识库定位总结
 
 EchoMimic 在肖像动画领域的方法谱系中占据了一个独特的“可编辑双驱动”位置。它既不是纯音频驱动的“黑盒”生成器，也不是纯标志驱动的“精确傀儡”，而是通过在训练阶段融合两种条件、在推理阶段灵活切换，实现了从“完全自动”到“精细可控”的平滑过渡。这一设计思想为后续工作提供了两个可拓展的方向：一是如何将更多模态（如文本、情感标签、眼动信号）纳入同一联合训练框架；二是如何在保持可编辑性的前提下，进一步提升纯音频模式的生成质量，最终实现“无需标志的自然完美唇形”。
+
+
 
 ## 原文 PDF
 

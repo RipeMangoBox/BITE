@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/NextStep_1_Toward_Autoregressive_Image_Generation_with_Continuous_Tokens_at_Scale.pdf
+project_link: https://stepfun-ai.github.io/NextStep-1/nextstep_1p1_blog/
+code_link: https://github.com/stepfun-ai/NextStep-1
 openreview_forum_id: Ndnwg9oOQO
 aliases:
 - N1
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | NextStep-1：面向大规模连续令牌自回归图像生成 |
 | 英文题名 | NextStep-1: Toward Autoregressive Image Generation with Continuous Tokens at Scale |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=Ndnwg9oOQO); [GitHub](https://github.com/stepfun-ai/NextStep-1); [Project](https://stepfun-ai.github.io/NextStep-1/nextstep_1p1_blog/) |
+| Links | [paper](https://openreview.net/forum?id=Ndnwg9oOQO) · [GitHub](https://github.com/stepfun-ai/NextStep-1) · [Project](https://stepfun-ai.github.io/NextStep-1/nextstep_1p1_blog/) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/generative_models_and_autoencoders |
 | Method | NextStep-1 |
 | Dataset | OneIG-Bench (Overall), GenAI-Bench Basic, GEdit-Bench-EN (G.O), WISE Overall |
@@ -42,7 +44,7 @@ claims:
 > - GenAI-Bench Basic 上，准确率 为 0.90 (with Self-CoT)，对比 Janus-Pro-7B: 0.86，变化 +0.04。
 > - GEdit-Bench-EN (G.O) 上，GPT-4.1评分 为 6.58，对比 OmniGen2: 6.41，变化 +0.17。
 
-## 概述
+## 概要
 
 **NextStep-1** 是一个 14B 参数的自回归模型，搭配一个 157M 的流匹配头，在离散文本令牌和连续图像令牌上以“下一令牌预测”目标进行训练。该工作直面自回归图像生成的一个关键瓶颈：基于 VAE 的连续自回归模型在高分类器自由引导（CFG）尺度下容易出现灰度斑块等视觉伪影，其根本原因是逐令牌的统计分布漂移，而非 1D 位置嵌入的不连续性。
 
@@ -54,7 +56,7 @@ claims:
 
 **局限性**：高维连续令牌可能产生局部噪声和网格状伪影；自回归解码的串行性导致推理延迟较高；高分辨率训练收敛慢；SFT 在小数据集上易过拟合。
 
-## 背景与动机
+
 
 ### 自回归图像生成的范式演进
 
@@ -82,7 +84,9 @@ NextStep-1的出发点是：**自回归图像生成的成功不仅取决于高�
 
 这一洞察将问题焦点从“如何设计更强的生成架构”转向“如何为自回归模型准备更友好的表示空间”，为连续令牌自回归图像生成开辟了新的技术路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 NextStep-1的核心创新在于系统性地重构了连续令牌自回归图像生成的隐空间设计，而非简单地替换生成头或扩大模型规模。其关键洞察是：**自回归图像生成的成功不仅依赖于高重建质量，更关键的是构建一个正则化良好的隐空间**。基于此，NextStep-1提出了三个紧密耦合的设计变更，直接针对现有连续自回归模型在高CFG下的视觉伪影和生成不稳定问题。
 
@@ -113,7 +117,7 @@ NextStep-1采用仅157M参数的MLP作为流匹配头（Flow Matching Head），
 - 相比**BAGEL**（Deng et al., 2025）等混合架构，NextStep-1保持了纯自回归框架的简洁性，无需额外的扩散组件。
 - 相比**Flux.1-dev**和**Stable Diffusion 3.5 Large**等扩散模型，NextStep-1证明了自回归模型在统一多模态生成上的潜力，同时保持了1D RoPE的简单有效，未引入2D或多模态位置编码的复杂性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_Ndnwg9oOQO/figures/011_Figure.jpg]]
 *Figure: A1: Overview of NextStep-1 in high-fidelity image generation, diverse image editing, and complex free-form manipulation*
@@ -140,7 +144,7 @@ $$\tilde{v}(x|y) = (1 - w) \cdot v_\theta(x|\mathcal{D}) + w \cdot v_\theta(x|y)
 
 框架的关键洞察在于：**生成建模的核心由Transformer主干承担，流匹配头仅作为轻量级采样器**——消融实验表明，将流匹配头从40M扩展到528M对GenEval、GenAI-Bench、DPG-Bench等指标影响极小（Table 5），这证实了架构分工的有效性。
 
-## 核心模块与公式推导
+
 
 ### 图像标记器（NextStep-VAE）
 
@@ -186,7 +190,9 @@ $$\tilde{v}(x|y) = (1 - w) \cdot v_{\theta}(x|\mathcal{D}) + w \cdot v_{\theta}(
 
 其中 $w$ 为引导强度，$v_{\theta}(x|\mathcal{D})$ 和 $v_{\theta}(x|y)$ 分别为无条件和条件速度预测。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：文生图与图像编辑
 
@@ -277,7 +283,9 @@ $$\tilde{v}(x|y) = (1 - w) \cdot v_{\theta}(x|\mathcal{D}) + w \cdot v_{\theta}(
 *Table: A2: Comparison of world knowledge reasoning on WISE (Niu et al., 2025). † result is with Self-CoT*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 连续自回归范式的定位
 
@@ -323,6 +331,8 @@ NextStep-1 处于基于语言模型的自回归图像生成这一新兴范式，
 - 能否将自回归模型与流匹配头的组合扩展到视频或其他模态的统一生成？
 
 这些问题的解答将决定连续自回归范式能否在推理效率和生成质量上与扩散模型全面竞争。
+
+
 
 ## 原文 PDF
 

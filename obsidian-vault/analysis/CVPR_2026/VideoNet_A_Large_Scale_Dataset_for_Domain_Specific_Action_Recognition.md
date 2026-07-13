@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/VideoNet_A_Large_Scale_Dataset_for_Domain_Specific_Action_Recognition.pdf
+project_link: null
+code_link: null
 aliases:
 - VideoNet
 tags:
@@ -40,7 +42,7 @@ claims:
 > - VideoNet Multiple-Choice 上，Accuracy (%) 53.5 (Molmo2-4B FT) vs 45.0 (Qwen3-VL-8B, 最佳开源8B) (+8.5)。
 > - VideoNet Binary 0-shot 上，Accuracy (%) 66.6 (Molmo2-4B FT) vs 59.3 (Qwen3-VL-8B) (+7.3)；Accuracy (%) 66.6 (Molmo2-4B FT) vs 70.3 (Gemini 3 Flash, 闭源基线) (-3.7)。
 
-## 概述
+## 概要
 
 **VideoNet** 是一个面向领域特定动作识别（domain-specific action recognition）的大规模基准与训练数据集，覆盖 **7大类别、37个领域、1,000种细粒度动作**，并配套提供近50万自动构建的视频问答对用于模型微调。
 
@@ -55,7 +57,7 @@ claims:
 
 **方法定位**：VideoNet在方法谱系上属于**领域特定基准构建 + 自动训练数据生成 + 小模型领域微调**的交叉工作。与通用视频理解基准（如Kinetics、ActivityNet）不同，它强调同一领域内细粒度动作的判别难度；与已有的领域特定基准（如FineDiving、SurgicalActions）相比，它在覆盖领域广度与动作深度上均大幅超越。在数据构建策略上，其“硬负样本生成”与“SingleAction弱信号过滤”为资源受限场景下的高质量数据获取提供了可复用的范式。
 
-## 背景与动机
+
 
 ### 领域特定动作识别的核心挑战
 
@@ -83,7 +85,9 @@ claims:
 
 这三个层面的工作共同指向一个核心命题：**在资源有限的情况下，更强的领域内监督信号——而非更大的模型规模或更多的测试时计算——才是解锁精细动作识别能力的关键**。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 VideoNet的核心创新并非提出一种新的模型架构，而是通过**系统性地改造数据生态**——包括评估基准的设计逻辑和训练数据的构建方式——来诊断并缓解视觉语言模型（VLM）在领域特定动作识别中的根本性短板。其创新点可归纳为两个关键的“changed slots”，分别对应评估与训练两个维度。
 
@@ -110,7 +114,7 @@ VideoNet的核心创新并非提出一种新的模型架构，而是通过**系�
 
 上述两个创新并非孤立存在，而是形成了闭环验证：硬负样本评估暴露了通用VLM在缺乏领域内监督时的感知脆弱性，而SingleAction训练数据的有效性则证明了“更强的领域内监督”是解锁小模型潜力的关键杠杆。这一协同效应的最佳证据是：仅4B参数的微调模型Molmo2-4B FT在二分类零样本设置下达到66.6%的准确率，超越了所有未经微调的8B开源模型（如Qwen3-VL-8B的59.3%），并逼近闭源模型Gemini 3 Flash的70.3%（Table 4）。这充分说明，VideoNet的创新核心在于**通过数据生态的重新设计，以极低的模型参数量代价换取了领域特定能力的显著跃升**。
 
-## 整体框架
+
 
 VideoNet 的完整技术栈由两条主线构成：**领域特定动作识别基准的构建**与**训练数据的自动生成及模型微调**。二者共享同一套动作分类法（taxonomy），但服务于不同的目的——前者用于严格评估，后者用于提升模型能力。
 
@@ -175,7 +179,7 @@ VideoNet 的完整技术栈由两条主线构成：**领域特定动作识别基
 ![[assets/figures/papers/paper_list_l33_https_arxiv_org_abs_2605_02834/figures/018_Figure_10.jpg]]
 *Figure 10: | System prompt for hard negative generation*
 
-## 核心模块与公式推导
+
 
 VideoNet 的核心架构并非提出全新的神经网络模块，而是围绕**数据构建与评估范式**设计了多条创新流水线。其关键模块可归纳为三个层次：基准构建、训练数据自动生成、以及模型微调策略。
 
@@ -240,7 +244,9 @@ $$\text{Accuracy}_{\text{MC}} = \frac{1}{N} \sum_{i=1}^{N} \mathbb{1}[\hat{y}_i 
 
 其中 $N$ 为问题总数，$\hat{y}_i$ 为模型预测的动作选项，$y_i$ 为真实动作标签。二分类准确率同理，正负样本各半，随机基线为 50%。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果：多项选择与二元零样本评估
 
@@ -331,7 +337,9 @@ VideoNet 在多项选择（Multiple-Choice）和二元零样本（Binary 0-shot�
 ![[assets/figures/papers/paper_list_l33_https_arxiv_org_abs_2605_02834/figures/006_Table_1.jpg]]
 *Table 1: | Expert Verification. These results confirm that our benchmark data pipeline is robust to annotator error*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与通用VLM基准的定位关系
 
@@ -370,6 +378,8 @@ VideoNet的方法论和数据集存在以下明确边界：
 3. **从辨别到生成的评测升级**：多项选择/二分类的封闭式评估虽然可靠，但可能高估模型的真实理解能力——尤其是在Food等可通过物体检测捷径解决的类别上。引入开放式动作描述、时序定位等多模态评测方式，是推动领域特定动作理解研究深化的必要步骤。
 
 4. **自动标注流水线的泛化性**：当前流水线严重依赖教学视频的结构化特征（标题明确、语音与视觉对齐），能否推广到监控视频、体育赛事、工业操作等缺乏显式文本锚点的场景，仍有待验证。
+
+
 
 ## 原文 PDF
 

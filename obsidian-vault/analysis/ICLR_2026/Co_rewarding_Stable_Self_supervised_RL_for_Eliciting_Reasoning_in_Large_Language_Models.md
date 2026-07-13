@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Co_rewarding_Stable_Self_supervised_RL_for_Eliciting_Reasoning_in_Large_Language_Models.pdf
+project_link: null
+code_link: https://github.com/tmlr-group/Co-rewarding
 openreview_forum_id: fDk95XPsCU
 aliases:
 - CR
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | Co-rewarding：稳定自监督强化学习激发大语言模型推理能力 |
 | 英文题名 | Co-rewarding: Stable Self-supervised RL for Eliciting Reasoning in Large Language Models |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=fDk95XPsCU); [GitHub](https://github.com/tmlr-group/Co-rewarding) |
+| Links | [paper](https://openreview.net/forum?id=fDk95XPsCU) · [GitHub](https://github.com/tmlr-group/Co-rewarding) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | Co-rewarding |
 | Dataset | MATH500, GSM8K, CRUX, IFEval (平均) |
@@ -42,7 +44,7 @@ claims:
 > - GSM8K 上，Pass@1 为 94.01 (Co-rewarding-II, Qwen3-8B-Base, DAPO-14k训练)，对比 87.19 (GT-Reward, 同模型同训练集)，变化 +6.82。
 > - CRUX 上，Pass@1 为 67.12 (Co-rewarding-II, Qwen3-8B-Base, DAPO-14k训练)，对比 63.75 (GT-Reward, 同模型同训练集)，变化 +3.37。
 
-## 概述
+## 概要
 
 当前自监督强化学习（RL）激发大语言模型推理能力的主流方法，普遍依赖单一视角的内部监督信号——例如模型自身输出的熵、自确定性或多次采样的多数投票——来构造奖励。这类自奖励（self-rewarding）机制在训练中极易陷入**自洽幻觉**：模型学会生成在自身评估标准下“高分”但实际错误的输出，导致奖励黑客（reward hacking）与训练崩溃，难以稳定提升推理能力。
 
@@ -55,7 +57,7 @@ claims:
 
 该方法统一于 GRPO 优化框架下，所有对比实验保持训练超参数一致，评估覆盖数学、代码、指令跟随等 8 个基准，确保结论的公平性与泛化性。
 
-## 背景与动机
+
 
 ### 大语言模型推理能力的强化学习范式
 
@@ -88,7 +90,9 @@ $$\hat{A}_i = \frac{r(a,y_i) - \mathrm{mean}(\{r(a,y_i)\}_{i=1}^G)}{\mathrm{std}
 
 基于此，稳定自监督强化学习的关键不在于设计更复杂的单视角奖励函数，而在于**寻求推理在不同视图间的不变性**——通过引入互补视角的跨监督信号，打破单一策略的自我循环，从根本上抑制奖励黑客与训练崩溃。这一哲学构成了Co-rewarding框架的设计原点。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Co-rewarding 的核心创新在于**为自监督强化学习引入互补视角的跨监督信号，打破单一策略循环**，从而根治自奖励方法中普遍存在的自洽幻觉、奖励黑客与训练崩溃问题。
 
@@ -129,7 +133,7 @@ Co-rewarding-II/III 的 EMA 教师更新是区别于多数投票方法的关键�
 
 三者均以 GRPO 为底层策略优化器，共享组内标准化优势估计与 Clipped Surrogate Objective 加 KL 惩罚的更新机制，创新的差异仅体现在**监督信号的来源与构造方式**上。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_fDk95XPsCU/figures/005_Figure_2.jpg]]
 *Figure 2: Illustration of Co-rewarding framework: Unlike single-view methods that rely only on internal reward signal on original question (a), Co-rewarding introduces complementary supervision. On the data side (b), paraphrased questions yield pseudo-labels for cross-reference. On the model side (c), teacher model isolated from current policy provides stabilized pseudo-labels for updates*
@@ -180,7 +184,7 @@ $$ \alpha^{(k)} = 1 - \frac{(\alpha_{\text{end}} - \alpha_{\text{start}})}{2} \l
 - **Co-rewarding‑II**：输入仅为原始问题 $x$；教师模型对 $x$ 生成 rollout 并投票得到 $\tilde{y}_v$，以此监督学生策略的 rollout。输出为解耦伪标签驱动的策略更新。
 - **Co-rewarding‑III**：将 I 和 II 正交组合，同时利用改写问题的跨参考伪标签和 EMA 教师的稳定伪标签，对原始问题和改写问题进行双向监督。
 
-## 核心模块与公式推导
+
 
 ### 问题定义与GRPO基础
 
@@ -261,7 +265,9 @@ $$\mathcal{J}_{\mathrm{Co-rewarding-III}} = \mathbb{E}_{x' \in \mathcal{D}'} \ma
 
 Co-rewarding-III则同时具备数据侧类比不变性和模型侧时间不变性，在Table 1的8个基准上取得最全面的性能提升。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与训练稳定性
 
@@ -328,7 +334,9 @@ Figure 5对比了各方法在GSM8K和AMC上的验证曲线。Co-rewarding展现�
 ![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_fDk95XPsCU/figures/022_Table_3.jpg]]
 *Table 3: Ablation study of Co-rewarding. For Co-rewarding-I, ablations train only on original or rephrased data. For Co-rewarding-II, ablation removes EMA updates of the reference teacher. 4.2 EXPERIMENTAL RESULTS*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题瓶颈：自监督RL中的单视角脆弱性
 
@@ -367,6 +375,8 @@ Co-rewarding的方法论定位是将自监督RL从“单视角反馈”范式推
 3. **数据增强深度**：除简单的语义改写外，更复杂的数据增强策略（如风格迁移、对抗改写）是否能进一步提升数据侧不变性的鲁棒性？当前仅探索了同义改写，更丰富的视图可能带来更大增益。
 
 4. **教师更新策略优化**：EMA教师更新与自监督学习中经典的momentum encoder架构是否存在更优的融合方式？当前的余弦退火调度是否为最优选择，还是存在更自适应的更新策略？
+
+
 
 ## 原文 PDF
 

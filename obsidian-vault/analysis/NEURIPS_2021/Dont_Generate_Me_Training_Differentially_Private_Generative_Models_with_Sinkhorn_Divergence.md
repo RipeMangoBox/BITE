@@ -5,6 +5,7 @@ paper_level: A
 venue: NeurIPS
 year: 2021
 pdf_ref: paperPDFs/NEURIPS_2021/Don_t_Generate_Me_Training_Differentially_Private_Generative_Models_with_Sinkhorn_Divergence.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/toronto-ai/DP-Sinkhorn/
 aliases:
 - DS
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 别生成我：使用Sinkhorn散度训练差分隐私生成模型 |
 | 英文题名 | Don't Generate Me: Training Differentially Private Generative Models with Sinkhorn Divergence |
 | 会议/期刊 | NeurIPS 2021 |
-| Links | [paper](https://arxiv.org/abs/2111.01177); [Project](https://nv-tlabs.github.io/DP-Sinkhorn); [Project](https://research.nvidia.com/labs/toronto-ai/DP-Sinkhorn/) |
+| Links | [paper](https://arxiv.org/abs/2111.01177) · [Project](https://nv-tlabs.github.io/DP-Sinkhorn) · [Project](https://research.nvidia.com/labs/toronto-ai/DP-Sinkhorn/) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/generative_models_and_autoencoders |
 | Method | DP-Sinkhorn |
 | Dataset | MNIST, Fashion-MNIST |
@@ -42,13 +43,13 @@ claims:
 > - MNIST 上，CNN Accuracy (%) 为 83.2，对比 80.0 (GS-WGAN)，变化 +3.2%。
 > - Fashion-MNIST 上，FID 为 128.3，对比 131.3 (GS-WGAN)，变化 降低 3.0。
 
-## 概述
+## 概要
 
 在差分隐私（DP）约束下训练生成模型面临一个根本性瓶颈：基于GAN的对抗训练本身即存在不稳定性和模式崩溃，而梯度加噪进一步放大了这些困难；现有方法依赖大量判别器网络，内存消耗大，且超参数调优与隐私原则相冲突。针对这一问题，**DP-Sinkhorn** 提出以最优传输（OT）原形式中的Sinkhorn散度替代对抗损失，从根本上避开生成器-判别器博弈的不稳定性。其核心创新在于引入**半去偏Sinkhorn损失**，通过可调参数 $p$ 精细控制梯度估计的偏差-方差权衡，使模型在隐私噪声下获得更鲁棒的梯度信号。隐私保护通过仅对与真实数据交互的生成图像梯度进行裁剪并注入高斯噪声实现，而非在参数梯度上加噪，从而利用图像梯度的低维特性与Poisson子采样的隐私放大效应。
 
 在 $(10, 10^{-5})$-DP 设定下，DP-Sinkhorn 在 MNIST 上取得 **FID 48.4**（对比 GS-WGAN 的 61.3），下游 CNN 分类准确率达 **83.2%**（+3.2%）；在 Fashion-MNIST 上 FID 为 **128.3**（对比 GS-WGAN 的 131.3），分类准确率达 **71.1%**（+6.1%），在图像质量和数据效用两项指标上均超越 GS-WGAN、DP-MERF、DataLens 等现有方法。消融实验确认，半去偏参数 $p=0.4$ 是偏差-方差的最佳平衡点，混合 L1/L2 成本函数可兼顾图像锐度与下游分类性能，且 DP-Sinkhorn 对学习率和优化器不敏感，训练过程稳定收敛，无需像 GAN 那样依赖提前停止。然而，该方法仍需针对不同数据集进行耗时的超参数网格搜索，训练迭代数随隐私预算收紧而急剧增加（如 CelebA 需约 1.7M 步），且仅在小尺寸低分辨率数据集上得到验证，高分辨率生成能力及对成员推断攻击的防御强度尚待进一步评估。
 
-## 背景与动机
+
 
 ### 差分隐私生成模型的核心困境
 
@@ -81,7 +82,9 @@ claims:
 
 这一设计使得DP-Sinkhorn能够在严格差分隐私约束下实现稳定训练，并在图像合成质量上超越现有方法。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DP-Sinkhorn 的核心创新在于**用最优传输（OT）距离替代对抗博弈，从根本上规避了差分隐私下 GAN 训练的不稳定性**，并通过**半去偏 Sinkhorn 损失**和**生成图像级梯度隐私保护**两个关键设计，在严格隐私预算下实现了稳定训练和高质量的图像合成。
 
@@ -119,7 +122,7 @@ $$c_m(\mathbf{x},\mathbf{y}) = L_2(\mathbf{x},\mathbf{y})^2 + m L_1(\mathbf{x},\
 
 消融实验（Table 2）表明，引入 $L_1$ 分量（$m=1$ 或 $m=3$）相比纯 $L_2$ 成本能同时提升图像锐度和下游分类性能，这为 OT 距离在差分隐私图像生成中的应用提供了有效的感知质量调控手段。
 
-## 整体框架
+
 
 DP-Sinkhorn 是一种基于最优传输（Optimal Transport, OT）的差分隐私生成模型训练框架，其核心设计思想是用 **Sinkhorn 散度** 取代传统 GAN 的对抗训练目标，从而从根本上规避对抗训练的不稳定性与模式崩溃问题。整体训练流程是一个端到端的迭代损失最小化过程，无需判别器网络，也无需在参数梯度上进行传统的 DPSGD 式加噪。
 
@@ -175,7 +178,7 @@ DP-Sinkhorn 是一种基于最优传输（Optimal Transport, OT）的差分隐�
 
 这些超参数之间存在耦合关系，不同数据集需要独立的网格搜索（Table 4、Table 5 展示了 MNIST 和 Fashion-MNIST 上的搜索空间）。这一调优过程若直接在私有数据上反复实验会消耗隐私预算，是该方法的一个实际部署限制。
 
-## 核心模块与公式推导
+
 
 DP-Sinkhorn 的训练流程由六个关键模块串联构成，其核心创新在于用半去偏 Sinkhorn 损失替代对抗损失，并在生成图像梯度层面注入隐私噪声。
 
@@ -227,7 +230,9 @@ $$\tilde{\mathbf{G}}^{[i]} = \mathbf{G}^{[i]} \cdot \operatorname*{min}\left(\fr
 
 清洗后的梯度反传至生成器，使用 Adam 优化器更新参数 $\theta$。整个流程为端到端的直接距离最小化，无需判别器网络或对抗训练（Algorithm 1 lines 12-13）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果：图像生成质量与下游效用
 
@@ -310,7 +315,9 @@ DP-Sinkhorn 展现出 GAN 类方法难以比拟的训练稳定性。**Figure 4a*
 ![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2111_01177/figures/004_Figure_4.jpg]]
 *Figure 4: (c) Bias-variance trade-off of the gradient estimator over semi-debiasing parameter p. Figure 4: Analyzing hyperparameter choices in DP-Sinkhorn*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题瓶颈与因果杠杆
 
@@ -374,6 +381,8 @@ DP-Sinkhorn的隐私保护遵循一个精确的边界：**仅对与真实数据�
 3. **跨模态扩展**：DP-Sinkhorn在医学影像、金融表格等非图像数据以及多模态生成任务中的隐私-效用权衡如何？
 4. **超参数自动调优**：能否通过元学习或在线贝叶斯优化自动调整 $p$ 等关键超参数，避免额外的手动调优和隐私预算消耗？
 5. **隐私鲁棒性强化**：如何增强对成员推断攻击的防御能力，并在理论RDP保证与实际攻击成功概率之间建立更紧密的联系？
+
+
 
 ## 原文 PDF
 

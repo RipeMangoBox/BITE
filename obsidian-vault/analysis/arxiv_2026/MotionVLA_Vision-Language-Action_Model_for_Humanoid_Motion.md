@@ -43,7 +43,7 @@ claims:
 > - MBench 上，Motion-Condition Consistency 0.55 vs 0.53 (ViMoGen) (+0.02 (3.8% improvement))；Foot Sliding 0.0049 vs 0.0051 (ViMoGen-light) (-0.0002)。
 > - HumanML3D 上，Diversity (closeness to Real) 9.548 (gap 0.045) vs Real 9.503 (Diversity gap reduced by over 50% compared to typical baselines)。
 
-## 概述
+## 概要
 
 人形运动生成面临一个根本性瓶颈：单一共享码本将异质运动信号（关节位置与速度）强制压缩至同一量化空间，固有偏向低频姿态语义，导致高频物理动态（速度）大量信息丢失。MotionVLA 通过频率域分析人为分离 **Base（位置/旋转，低频）** 和 **Phys（速度，高频）** 双流，并独立应用不同截断的 DCT+BPE 进行量化与建模，从而消除传统统一码本的结构性偏差。
 
@@ -54,8 +54,6 @@ MotionVLA 将运动生成形式化为统一的自回归序列建模问题，在 
 **方法定位**：MotionVLA 属于离散自回归运动生成范式，与 T2M-GPT、MoMask、MotionCraft 等方法同源，但通过双流频率分词器（DSFT）和多模态条件（场景图像+文本）实现了差异化。其核心创新在于将频谱解耦引入 VQ-VAE 分词阶段，而非在生成器层面做改进。
 
 **局限性**：流划分与截断长度（$K_b=5$, $K_p=25$）为固定选择，可能未覆盖所有运动类型的频谱极端情况；模型容量缩放受限于当前数据规模和令牌表示的信息量，更大骨干未带来持续显著增益；跨数据集和跨场景的泛化能力未经验证。
-
-## 背景与动机
 
 ### 运动生成中的频谱偏差：低频语义与高频物理的失衡
 
@@ -86,7 +84,7 @@ MotionVLA 提出一个直接而关键的因果操作：通过频率域分析**�
 
 这一动机在实验中得到了直接验证：在 HumanML3D 上，MotionVLA 将 **Diversity 指标与真实数据的差距缩小超过 50%**；在 MBench 上，**Motion-Condition Consistency 从 0.53 提升至 0.55（+3.8%）**，且 Foot Sliding 从 0.0051 降至 0.0049。人类偏好研究中，MotionVLA 在 64.0% 的比较中被领域专家优选，而 ViMoGen 仅被优选 14.0%（Table 7）。
 
-## 核心创新
+## 核心方法与创新机理
 
 MotionVLA 的核心创新在于**将异质运动信号从单一共享码本的压缩瓶颈中解放出来**，通过频率域的结构性分离，为低频姿态语义和高频物理动态分别保留充分的表示能力。
 
@@ -139,8 +137,6 @@ $$\mathbf{s} = [M_{\mathrm{BOS}}, b_1, \dotsc, b_N, M_{\mathrm{SEP}}, p_1, \dots
 
 当前 Base/Phys 的流划分和截断长度（$K_b=5, K_p=25$）为固定选择，可能未覆盖所有运动类型的频谱极端情况。能否通过数据驱动的方法自动学习每个运动维度的流分配，以适应不同运动风格的频谱变化，仍是一个开放问题。
 
-## 整体框架
-
 MotionVLA 将条件运动生成建模为一个统一的**自回归序列预测问题**，其核心流水线由两个关键组件构成：**DSFT 双流频率分词器**（Dual-Stream Frequency Tokenizer）和一个基于 **Qwen3.5** 的自回归 Transformer 骨干网络。
 
 ### 输入-输出流
@@ -180,8 +176,6 @@ $$\mathcal{L}_{\mathrm{train}} = \mathrm{CE}(\mathbf{z} + \mathbf{m}, \mathbf{y}
 
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2606_15142/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of MotionVLA. (a) DSFT performs dual-stream frequency tokenization by decomposing motion into Base and Phys components and converting them into discrete tokens. (b) During training, MotionVLA learns to autoregressively predict the unified motion token sequence under text and scene-image conditioning, supervised by DSFT tokens derived from ground-truth motion. (c) At inference time, the model generates Base and Phys tokens conditioned on multimodal inputs, which are then decoded and recombined to reconstruct the final motion sequence*
-
-## 核心模块与公式推导
 
 MotionVLA 的核心架构由两个关键模块构成：**DSFT 双流频率分词器**（Dual-Stream Frequency Tokenizer）和基于 **Qwen3.5 的自回归骨干网络**。DSFT 负责将连续运动序列转换为离散的 Base 和 Phys 双流令牌，骨干网络则在多模态条件（场景图像和文本指令）下自回归地预测统一的运动令牌序列。
 
@@ -237,7 +231,7 @@ $$\mathcal{L}_{\mathrm{train}} = \mathrm{CE}(\mathbf{z} + \mathbf{m}, \mathbf{y}
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2606_15142/figures/004_Figure_4.jpg]]
 *Figure 4: Energy coverage of the Base and Phys streams under different DCT truncation lengths. (a,b) Results on HumanML3D. (c,d) Corresponding results on ViMoGen. The Base stream is highly compressible with small K, whereas the Phys stream requires substantially larger K to preserve its energy*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心瓶颈验证：单流 vs 双流
 
@@ -287,9 +281,6 @@ Table 4 对比了 DSFT 与单流 DCT+BPE 基线在 HumanML3D 上的重建质量�
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2606_15142/figures/006_Table_2.jpg]]
-*Table 2: MotionVLA [13] evaluation on MBench. ↑: higher is better; ↓: lower is better. †: uses additional visual (scene) input. Best in bold, second best underlined*
-
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2606_15142/figures/007_Table_3.jpg]]
 *Table 3: Text-to-motion results on HumanML3D. ↑: higher is better; ↓: lower is better; →: closer to real is better. For Diversity, best and second best are determined by the distance to the Real score. ‡: GenM3 uses a retrained evaluator on 30 FPS data; GenM3∗ uses only HumanML3D text pairs. §: DisCoRD is applied on top of MoMask; Diversity is not reported in the original paper*
 
@@ -305,7 +296,7 @@ Table 4 对比了 DSFT 与单流 DCT+BPE 基线在 HumanML3D 上的重建质量�
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2606_15142/figures/018_Figure_7.jpg]]
 *Figure 7: Real-robot deployment of MotionVLA on a Unitree G1 EDU humanoid robot. Each row shows three exocentric frames from one text-conditioned motion execution, captured at different time steps*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 在运动生成方法谱系中的位置
 

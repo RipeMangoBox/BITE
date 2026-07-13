@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Animating_the_Uncaptured_Humanoid_Mesh_Animation_with_Video_Diffusion_Models.pdf
+project_link: https://marcb.pro/atu
+code_link: null
 openreview_forum_id: DIPeQTxpe7
 aliases:
 - AU
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 动画未捕获：基于视频扩散模型的人形网格动画 |
 | 英文题名 | Animating the Uncaptured: Humanoid Mesh Animation with Video Diffusion Models |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=DIPeQTxpe7); [Project](https://marcb.pro/atu) |
+| Links | [paper](https://openreview.net/forum?id=DIPeQTxpe7) · [Project](https://marcb.pro/atu) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Animating the Uncaptured |
 | Dataset | CAPE, Mixamo |
@@ -42,7 +44,7 @@ claims:
 > - CAPE 上，PVE 为 0.041，对比 0.054 (WHAM)，变化 -24.1%。
 > - CAPE 上，Accel 为 1.49，对比 2.18 (SMPLIFY-X*)，变化 -31.7%。
 
-## 概述
+## 概要
 
 **问题瓶颈**：传统文本-到-动作生成方法依赖于有限的4D动作捕捉数据集（如AMASS、Human3.6M）进行训练，导致对开放域文本提示的泛化能力不足。同时，从单目视频中追踪3D人体运动是一个本质欠约束问题，在遮挡或极端姿态下易产生歧义和不准确的重建结果。
 
@@ -57,7 +59,7 @@ claims:
 
 **局限性**：生成的视频可能包含变形伪影（morphing effects）导致追踪失败；单目追踪在遮挡场景下仍存在歧义；优化过程耗时约1.5小时/序列，难以实时应用；方法依赖外部视频扩散模型的输出质量。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -75,7 +77,9 @@ claims:
 
 基于此，本文提出“Animating the Uncaptured”方法，将视频扩散模型作为广义运动先验源，通过SMPL身体模型作为变形代理，将2D视频中的运动传递到3D网格。这一框架跳出了对4D动作捕捉数据集的依赖，使得从任意文本提示生成多样化且逼真的人形网格动画成为可能。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本方法的核心创新在于**将视频扩散模型隐式学习的大规模真实世界运动先验引入三维网格动画生成**，从而绕过了传统文本-到-动作方法对稀缺4D动作捕捉数据集的依赖。这一范式转换通过三个关键的“changed slots”实现：
 
@@ -100,7 +104,7 @@ claims:
 
 三个changed slots形成闭环：**视频扩散模型**提供开放域运动先验 → **SMPL变形代理**将2D视频运动传递到3D网格 → **多线索追踪+神经参数化**确保时空一致的动画质量。该框架不依赖特定视频扩散模型（附录展示了CogVideoX和Wan2.2的结果），但当前仍受限于单目追踪的固有歧义和优化耗时（约1.5小时/序列）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l47_https_openreview_net_forum_id_DIPeQTxpe7/figures/002_Figure_2.jpg]]
 *Figure 2: Method overview. Given an input mesh in an arbitrary pose and a text prompt describing the desired motion, we generate a video conditioned on the text prompt and the rendering of the mesh. We leverage the SMPL body model as a deformation proxy to track the motion from the video and transfer it to the input mesh. Specifically, we fit the SMPL model to the input mesh and associate its vertices with the SMPL faces (3.3.1). Finally, we optimize the SMPL parameters to match the video motion using estimated body landmarks, silhouettes and DINOv2 features extracted from the frames (3.3.2)*
@@ -135,7 +139,7 @@ claims:
 - **多线索融合追踪**：同时使用关键点、轮廓和密集特征三种互补线索，缓解单目追踪的欠约束问题。其中DINOv2密集特征通过可学习的特征映射与顶点特征对齐，增强了纹理缺失情况下的追踪鲁棒性。
 - **神经参数化的平滑归纳偏置**：使用MLP而非逐帧独立优化姿态参数，天然抑制高频抖动。消融实验证实，直接优化参数会导致加速度误差从1.49升至2.65。
 
-## 核心模块与公式推导
+
 
 本方法的核心是将视频扩散模型的广义运动先验通过SMPL变形代理传递到任意人形网格。整个流程由四个关键模块串联：视频扩散模型生成、SMPL注册与重参数化、视频追踪优化、以及时序MLP参数化。
 
@@ -205,7 +209,9 @@ $$\mathcal{L}_{\mathrm{ex.ben.}}(\theta) = \sum_{i \in (\mathrm{elbows, knees})}
 
 与传统逐帧独立优化姿态参数不同，本方法使用浅层MLP对 $\theta_t$、$T_t$、$R_t$ 进行时序参数化。MLP的位置编码提供了平滑归纳偏置——消融实验（Table 2）证实，直接优化参数（Opt. Parameters）会使加速度误差（Accel）从1.49升至2.65，验证了神经参数化对时序一致性的关键作用。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -279,7 +285,9 @@ Figure 6展示了典型的失败案例：“抱石攀岩”动作中，生成的
 
 优化过程耗时约**1.5小时/序列**，难以满足实时应用需求。这一开销主要来自：逐帧的SMPL参数优化、密集特征提取与匹配、以及ARAP正则化的迭代求解。论文未提供详细的推理时间分解或加速策略，这一限制在当前阶段是实际部署的主要障碍。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与动机
 
@@ -340,6 +348,8 @@ $$\mathcal{L}_{\mathrm{total}} = \frac{1}{F} \sum_{t=1}^{F-1} \left( \mathcal{L}
 - 处理视频中的相机运动或变焦，而非假设固定相机视角。
 
 需要手动验证的问题：论文未提供与检索增强方法 **ReMoDiffuse** (Zhang et al., ICCV 2023) 和CLIP空间对齐方法 **MotionCLIP** (Tevet et al., ECCV 2022) 的直接定量对比，仅通过用户研究间接比较。这些基线的相对优势需进一步实验确认。
+
+
 
 ## 原文 PDF
 

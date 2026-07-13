@@ -42,7 +42,7 @@ claims:
 > - BenchRHINO (形状重建) 上，Chamfer Distance (Object) [cm] ↓ 1.21 vs 4.41 (HOLD), 11.16 (InterTrack) (-3.20 / -9.95)；Chamfer Distance (Human) [cm] ↓ 2.65 vs 2.69 (HSR), 4.66 (InterTrack) (-0.04 / -2.01)。
 > - BenchRHINO (新视角合成) 上，PSNR ↑ / SSIM ↑ / LPIPS ↓ 25.80 / 0.832 / 0.212 vs 22.65 / 0.791 / 0.246 (HSR), 17.92 / 0.646 / 0.513 (HOLD) (+3.15 / +0.041 / -0.034 (vs HSR))。
 
-## 概述
+## 概要
 
 **问题背景与瓶颈** 从单目视频中重建三维人-物交互（HOI）是计算机视觉的核心挑战。现有方法或假设静态场景（如 **HSR**），或依赖已知物体模板，或仅在相机坐标系中运行（如 **HOLD**），无法在移动相机条件下同时恢复人体、未知物体与静态场景在世界坐标系中的形状与运动。核心瓶颈在于：相机运动与物体运动在二维观测中高度纠缠，缺少物体先验使位姿估计困难，且缺乏显式接触约束导致重建结果物理不合理。
 
@@ -52,7 +52,7 @@ claims:
 
 **局限与开放问题** 当前方法假设物体为刚体，对可变形物体（如衣物）不适用；在严重遮挡、快速运动或仅有限视角观测时，重建质量会下降。未来方向包括扩展到多人与多物体场景、引入时序先验处理快速运动、以及支持铰接或可变形物体的重建。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -84,7 +84,9 @@ RHINO 的核心动机正是填补这一空白：**从一段移动相机拍摄的
 
 RHINO 通过三个技术支柱实现这一目标：利用 3D 感知基础模型（MASt3R）提取稠密特征匹配以稳定运动估计；通过运动解耦公式将相机与物体运动分离；以及使用合成式神经符号距离场（per-component neural SDF）同时表达几何与接触，以交替优化策略联合提升形状精度与物理合理性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 RHINO 的核心创新在于将**运动解耦**与**合成式神经 SDF 联合优化**深度整合，首次在统一世界坐标系下实现了从单目移动视频中同时重建人、未知物体和静态场景，并确保物理上合理的接触。与现有方法相比，RHINO 在三个关键维度上实现了系统性突破。
 
@@ -122,7 +124,7 @@ $$C(r) = \sum_{i=1}^{3N} \tau_i \mathbf{c}^{(\cdot)}(\mathbf{x}^i)$$
 
 这一设计使得接触损失可以直接在物体 SDF 上计算，同时各组件通过逆 LBS（人体）和刚体变换（物体）映射到规范空间，实现统一优化。这种“表达即约束”的设计是 RHINO 在物理合理性上超越基线（如 HSR 仅假设静态场景，HOLD 缺乏全局建模）的关键架构优势。
 
-## 整体框架
+
 
 RHINO 是一个三阶段框架，从单目 RGB 视频中恢复统一世界坐标系下的**人体**、**未知被操纵物体**和**静态场景**的三维重建。其核心设计围绕一个瓶颈展开：当相机与物体同时运动时，表观运动是二者的纠缠结果，直接使用会导致重建崩溃。RHINO 的因果调控旋钮在于**运动解耦**——利用 3D 感知基础模型提取的稠密特征匹配，将物体运动从相机运动中分离出来——以及**可微神经 SDF 统一表达几何与接触**，使接触信号以距离损失的形式参与优化，从而在无模板、无先验知识的前提下获得物理一致的人-物交互重建。
 
@@ -189,7 +191,7 @@ RHINO 是一个三阶段框架，从单目 RGB 视频中恢复统一世界坐标
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2605_17014/figures/002_Figure_2.jpg]]
 *Figure 2: Existing work, such as the HSR [70] SotA method, can faithfully reconstruct the 3D shape of a static scene and of a person moving in it, but struggles when people manipulate objects. As illustrated, when a person pushes a table (top), the static part of the scene is reconstructed well (bottom row, two views), but the table’s reconstruction is degenerate (see the red highlight). Here we do not show the reconstructed person to reduce occlusions*
 
-## 核心模块与公式推导
+
 
 RHINO 采用三阶段级联框架（Fig. 4），将单目动态视频中的人、未知物体与静态场景统一重建在世界坐标系中。其核心模块按执行顺序为：**初始化与运动解耦**、**合成式神经场联合优化**、**可微接触精细化**。以下逐一阐述各模块的关键机制与支撑公式。
 
@@ -252,7 +254,9 @@ RHINO 的核心洞察在于将 **per-component 神经 SDF 同时用于几何重�
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2605_17014/figures/003_Figure_3.jpg]]
 *Figure 3: Camera & Object motion (Sec. 3.1, Sec. 3.2). When both the camera and object move, their motion entangles into “apparent” motion. To disentangle them, we (a) estimate camera motion in the world frame via SfM on scene-only pixels, (b) estimate apparent motion via SfM on object-only pixels, (c–d) estimate object motion in the world frame by “removing” the camera motion from the apparent one*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 数据集与评估协议
 
@@ -316,7 +320,9 @@ Table 5 和 Figure 8 展示了可微接触先验的贡献。移除接触优化�
 
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2605_17014/figures/009_Figure.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有工作的关系
 
@@ -361,6 +367,8 @@ RHINO 的能力边界由以下假设和实际约束共同定义：
 4. **多智能体交互。** 将框架从单人-单物扩展到多人-多物场景，需要解决实例级运动解耦、交互图推理和全局一致性约束等组合问题。这不仅是工程扩展，更涉及场景理解层面的方法创新。
 
 5. **评估基准的完善。** BenchRHINO 是首个面向世界坐标系下人-物交互重建的基准，但其序列数量和物体多样性有限。更大规模、涵盖更多物体类别和交互类型的基准将推动该领域的标准化评估。
+
+
 
 ## 原文 PDF
 

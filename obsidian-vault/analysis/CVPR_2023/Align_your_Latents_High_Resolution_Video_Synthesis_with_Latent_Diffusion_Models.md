@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2023
 pdf_ref: paperPDFs/CVPR_2023/Align_your_Latents_High_Resolution_Video_Synthesis_with_Latent_Diffusion_Models.pdf
+project_link: https://research.nvidia.com/labs/toronto-ai/VideoLDM/
+code_link: null
 aliases:
 - VLLVDM
 - AYLHRVSLDM
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 对齐潜变量：基于潜扩散模型的高分辨率视频合成 |
 | 英文题名 | Align your Latents: High-Resolution Video Synthesis with Latent Diffusion Models |
 | 会议/期刊 | CVPR 2023 |
-| Links | [paper](https://arxiv.org/abs/2304.08818); [Project](https://research.nvidia.com/labs/toronto-ai/VideoLDM/) |
+| Links | [paper](https://arxiv.org/abs/2304.08818) · [Project](https://research.nvidia.com/labs/toronto-ai/VideoLDM/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | Video LDM (Latent Video Diffusion Models) |
 | Dataset | Real Driving Scenes (RDS), UCF-101 (zero-shot text-to-video), MSR-VTT (zero-shot text-to-video) |
@@ -41,7 +43,7 @@ claims:
 > - Real Driving Scenes (RDS) 上，FID (↓) 为 51.9，对比 53.5 (LVG)，变化 -1.6。
 > - UCF-101 (zero-shot text-to-video) 上，Inception Score (↑) 为 33.45，对比 33.00 (Make-A-Video)，变化 +0.45。
 
-## 概述
+## 概要
 
 高分辨率视频生成的核心瓶颈在于扩散模型在像素空间直接建模长序列视频所需的计算成本极高。若直接使用预训练图像潜扩散模型（LDM）逐帧生成视频，又因缺乏时间建模而导致严重的帧间闪烁与不一致。本文提出**Video LDM**，核心思路是将视频生成解耦为空间内容生成与时间对齐两个子问题：首先在大规模图像数据上预训练空间层以获得高质量的图像生成能力，然后在空间层之间插入可学习的时间层（含时间注意力和3D卷积残差块），**固定空间层权重，仅训练时间层**，从而将图像生成器高效转化为时间一致的视频生成器。这一策略极大降低了视频训练的计算开销，且时间层可迁移至同一图像模型的不同变体（如DreamBooth个性化模型），实现个性化视频生成。
 
@@ -49,7 +51,7 @@ claims:
 
 该方法在方法谱系上属于**潜空间视频扩散模型**，与 Make-A-Video（Singer et al., 2023）、Imagen Video（Ho et al., 2022）等同期工作共享“利用预训练图像模型生成视频”的思路，但 Video LDM 的独特贡献在于将时间建模完全隔离为可插拔的时间层，实现了图像模型向视频模型的最小代价迁移。
 
-## 背景与动机
+
 
 ### 问题背景：高分辨率视频生成的困境
 
@@ -79,7 +81,9 @@ Video LDM 的核心动机源于一个关键洞察：**大规模图像数据集�
 
 这一“对齐潜变量”（Align your Latents）的思想，构成了 Video LDM 方法设计的理论基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Video LDM 的核心创新在于**将视频生成问题解耦为空间建模与时间建模两个可分离的子任务**，从而以极低的训练成本将预训练图像扩散模型转化为时间一致的视频生成器。其关键洞察是：大规模图像数据集上预训练的空间层已经具备强大的单帧生成能力，只需在冻结的空间层之间插入可学习的时间层，即可将帧对齐问题转化为纯粹的时间一致性学习任务。
 
@@ -132,7 +136,7 @@ $$ \mathbf{f}_{\theta,\phi}^{\prime}(\mathbf{z}_{\tau};\mathbf{c}_{S}) = \mathbf
 - **像素空间基线**的视频微调策略 FVD 为 639.56，显著劣于潜空间的 534.17，验证了在潜空间操作的优势。
 - **解码器微调时仅使用视频判别器**优于同时使用图像判别器（FVD 32.94 vs 51.01，Table 14），额外图像判别器反而损害时间一致性。
 
-## 整体框架
+
 
 Video LDM 的整体 pipeline 遵循“编码—时序生成—解码—可选上采样”的级联架构，各模块分工明确且输入输出流清晰。其核心设计原则是**最大化复用预训练图像模型的空间建模能力，仅在必要时引入可学习的时间层**，从而将图像生成器高效转化为时间一致的视频生成器。
 
@@ -200,7 +204,7 @@ $$
 
 其中 $s \geq 1$ 为引导尺度。这一机制支持迭代式长视频生成，但论文也指出卷积时间生成方法在超长视频上可能出现质量下降，稳健的长视频生成仍是待解决问题。
 
-## 核心模块与公式推导
+
 
 ### 总体架构：从图像 LDM 到视频 LDM
 
@@ -303,7 +307,9 @@ $\mathbf{c}_{\tau_{\gamma}}$ 为经噪声增强后的低分辨率条件帧，$\t
 
 端到端训练 LDM（无图像预训练）导致 FVD 从 534.17 恶化至 1155.10（Table 1 right），证明了预训练空间层的必要性。像素空间基线的视频微调策略（FVD 639.56）也不如潜空间操作（FVD 534.17），验证了在潜空间进行时间对齐的优势。时间层训练对单帧图像质量影响轻微（FID 从 47.00 升至 48.26），说明视频微调几乎不损害图像生成能力。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -376,11 +382,8 @@ Table 3 展示了时间微调对解码器和上采样器的决定性影响：
 
 - **Figure 4** 展示了时间层插入策略：空间层将视频视为独立图像批次（时间轴移入批次维度），时间层在视频维度上执行注意力和 3D 卷积，这种“空间层批处理 + 时间层视频处理”的交替机制是方法的核心架构创新。
 
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2304_08818/figures/017_Figure.jpg]]
 
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2304_08818/figures/026_Figure.jpg]]
 
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2304_08818/figures/027_Figure.jpg]]
 
 - **Figure 5** 展示了完整的 Video LDM 管线：先生成稀疏关键帧，再通过时间插值模型（基于掩码条件训练）分两步提升帧率（T→4T→16T），最后经视频微调解码器和可选视频上采样器输出高分辨率时间一致视频。
 
@@ -406,7 +409,9 @@ Table 3 展示了时间微调对解码器和上采样器的决定性影响：
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2304_08818/figures/036_Figure_17.jpg]]
 *Figure 17: Generated videos at resolution 1280 × 2048 using our Stable Diffusion 2.0-based model and including our video fine-tuned text-to-video latent upsampler. Captions from left to right are: “Burning firewood” and “An astronaut riding a horse, 4k, high definition”. Frames are shown at 2 fps*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心方法定位
 
@@ -454,6 +459,8 @@ Video LDM 的适用边界由以下条件定义：
 ### 5. 知识库定位总结
 
 Video LDM 在视频生成知识库中的定位可以概括为：**以最小训练成本实现图像生成能力向视频域高效迁移的范式验证者**。其核心知识贡献不在于提出全新的生成架构，而在于证明了“时间层即插即用 + 空间层冻结”策略的有效性，以及时间对齐思想在解码器、上采样器等下游模块中的可迁移性。该方法为后续的视频扩散模型研究（如 Sora 等端到端视频生成模型）提供了重要的效率基线和模块化设计思路。
+
+
 
 ## 原文 PDF
 

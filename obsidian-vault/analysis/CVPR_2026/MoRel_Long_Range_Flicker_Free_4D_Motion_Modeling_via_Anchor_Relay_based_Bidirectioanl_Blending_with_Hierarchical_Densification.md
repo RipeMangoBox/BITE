@@ -41,7 +41,7 @@ claims:
 > - SelfCapLR (五个长序列，超3500帧) 上，平均 PSNR↑ / SSIM↑ / LPIPS↓ 21.00 / 0.664 / 0.355 vs 最佳对比方法（见表1） (在所有序列中均取得最优或次优)。
 > - SelfCapLR 上，tOF (↓) 0.203 vs 其他方法（无具体数值） (最低（最佳时间一致性）)；训练峰值内存 (MB) ~6,000 vs 全量方法（OOM 或更高） (有界恒定，不随帧数增长)；渲染内存 (MB) 126 vs 未报告 (低内存占用，支持随机访问)。
 
-## 概述
+## 概要
 
 长序列动态场景的4D重建是沉浸式媒体与视觉计算的核心挑战。现有基于**4D Gaussian Splatting (4DGS)**（Wu et al., CVPR 2024）的方法在建模长距离动态视频时面临三个结构性瓶颈：（1）全量联合训练（all-at-once）需将所有帧加载至GPU，内存随序列长度线性增长直至溢出；（2）分块训练（chunk-based）虽缓解了内存压力，却破坏了时间连续性，在块边界产生闪烁伪影与外观突变；（3）每个块仅能观测有限时间窗口，无法重建新出现的遮挡区域，导致场景完整性下降。这些瓶颈共同构成了长程4D运动建模中“内存-时间一致性-重建质量”的不可能三角。
 
@@ -51,7 +51,7 @@ claims:
 
 综上，MoRel通过ARBB与FHD的协同设计，在限定内存下首次实现了长序列4D运动建模的时间一致性与高保真重建，为长视频动态场景表示提供了新的基线范式。
 
-## 背景与动机
+
 
 ### 长程4D动态场景建模的兴起与瓶颈
 
@@ -82,7 +82,9 @@ claims:
 
 通过这些设计，MoRel旨在首次实现长程4D动态场景的**内存有界、时间一致、支持随机访问**的高质量建模。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MoRel 的核心创新在于将长距离动态场景建模分解为“锚点接力”与“双向混合”两个阶段，通过四个关键设计打破了现有 4DGS 方法在内存效率与时间一致性之间的根本矛盾。以下从四个 changed slots 展开分析。
 
@@ -126,7 +128,7 @@ $$w _ { L } ^ { j _ { n } ^ { s } } = \left\{ \begin{array} { l l } { 1 , } & { 
 
 上述四个创新并非孤立存在，而是形成了一条因果链条：ARBB 的锚点接力架构为双向变形和混合提供了结构基础；PWD+IFB 的双向混合机制是消除闪烁的直接手段；FHD 通过频率感知的密度化进一步压缩了内存，使整个系统在长序列上可部署；按需加载则确保了训练和推理的内存有界性。这一系统性设计使得 MoRel 在 SelfCapLR 数据集上取得了最低的 tOF 得分（0.203）和最优的重建质量，同时保持恒定的训练内存占用。
 
-## 整体框架
+
 
 MoRel 的整体框架围绕“锚点接力–双向混合”（Anchor Relay–based Bidirectional Blending, ARBB）策略构建，将长序列动态场景建模分解为两个阶段、四个训练步骤，在恒定内存预算下实现时间一致的 4D 运动重建。
 
@@ -169,7 +171,7 @@ MoRel 实现有界内存的核心在于按需动态加载/卸载策略。训练�
 ![[assets/figures/papers/paper_list_l34_https_openaccess_thecvf_com_content_CVPR2026_html_Kwak_MoRel_Long_Range/figures/002_Figure_2.jpg]]
 *Figure 2: Conceptual comparison of existing 4DGS methods in modeling long-range 4D motion. (a) All-at-once approaches suffer from high memory usage, while (b) chunk-based methods inevitably fail to maintain temporal consistency. Even advanced variants struggle with system applicability such as a random accessibility. Our ARBB framework resolves all these issues, achieving bounded memory and temporally coherent long-range modeling*
 
-## 核心模块与公式推导
+
 
 MoRel 的核心架构由四个训练阶段构成，分别解决长程 4D 运动建模中的初始化一致性、局部规范空间构建、变形场学习与跨块混合问题。以下按训练流程逐一解析关键模块及其数学机制。
 
@@ -257,7 +259,9 @@ MoRel 的内存有界性源于两个层面的设计：
 ![[assets/figures/papers/paper_list_l34_https_openaccess_thecvf_com_content_CVPR2026_html_Kwak_MoRel_Long_Range/figures/005_Figure_5.jpg]]
 *Figure 5: Overview of Feature-variance-guided Hierarchical Densification. (a) Variance-based Leveling: After GCA training, we assign a level to each anchor-point guided by the featurevariance. (b) Level-wise Densification: During the KfA and PWD trainings, gradients for KfA densification are modulated by levelspecific weights, enabling early low-frequency stabilization and late high-frequency refinement*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -312,7 +316,9 @@ Table 3 系统验证了 MoRel 各组件的贡献：
 - 方法需要 COLMAP 进行相机参数估计和稀疏点云初始化，在无已知相机或相机估计失败的长视频场景下适用性受限。
 - 当前评估限于 SelfCapLR 数据集（超 3500 帧），在更长视频（如数小时）或极端相机运动下的泛化性尚未验证。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 在4D动态场景建模谱系中的位置
 
@@ -354,6 +360,8 @@ MoRel的**锚点接力双向混合（Anchor Relay-based Bidirectional Blending, 
 3. **无相机场景扩展**：能否将ARBB框架与自监督的相机位姿估计方法（如DUSt3R、MASt3R等）结合，扩展到无需已知相机的场景？
 4. **跨任务迁移**：学习到的双向变形场和可学习时间不透明度控制机制，能否应用于其他需要时间一致性的任务，如视频插帧、视频压缩或动态场景的语义编辑？
 5. **渲染效率**：当前渲染时仅需126 MB内存，支持按需加载和随机访问，但渲染速度（FPS）是否满足实时应用需求，原文未提供详细数据，需要进一步验证。
+
+
 
 ## 原文 PDF
 

@@ -43,7 +43,7 @@ claims:
 > - Object-level benchmark (average) 上，PSNR↑ 32.09 vs 29.02 (Ours w/o VLM) (+3.07)。
 > - Scene-level benchmark (average) 上，PSNR↑ 32.40 vs 29.10 (Ours w/o VLM) (+3.30)。
 
-## 概述
+## 概要
 
 传统主动三维重建方法通常依赖在线优化的神经辐射场（NeRF）或三维高斯溅射（3DGS），并借助渲染方差、Fisher信息等代理量来估计不确定性，以此驱动下一最佳视图的选择。然而，这类范式存在两个根本性瓶颈：其一，在稀疏视图条件下，在线优化的不确定性估计本身不可靠，且计算代价高昂；其二，纯几何或信息论准则缺乏对场景语义结构的理解，容易产生冗余观测，遗漏被遮挡或语义关键但几何上“已确定”的区域。
 
@@ -51,7 +51,7 @@ AREA3D 针对上述瓶颈，提出了一种解耦的主动重建框架。其核�
 
 实验表明，AREA3D 在 Replica 场景级和自定义物体级基准上均取得最优重建精度。在场景级设定下，AREA3D 的 PSNR 较随机选择基线提升约 1.06 dB，较纯 VLM 语义引导方法提升逾 2 dB（Table 2）。消融研究进一步揭示，移除前馈感知或 VLM 语义引导中的任一组件，物体级 PSNR 分别下降约 3.07 dB 和 3.30 dB（Table 4），验证了双域融合的必要性。在方法谱系上，AREA3D 区别于依赖在线梯度信息的 **FisherRF**（基于 3DGS Fisher 信息矩阵）和纯语义驱动的 **AIR-Embodied** 等基线，以“前馈置信度 + VLM 语义缺失推理”的组合开辟了主动重建的新路径。
 
-## 背景与动机
+
 
 **主动三维重建的核心挑战**在于，在严格视点预算下，如何选择一组最优的相机姿态，使得从稀疏观测中重建的三维场景几何尽可能逼近真实场景。这一问题在机器人导航、增强现实和数字孪生等应用中具有关键意义——传感器带宽有限、操作时间受限，智能体必须在信息采集的每一步做出最高效的决策。
 
@@ -67,7 +67,9 @@ AREA3D 针对上述瓶颈，提出了一种解耦的主动重建框架。其核�
 
 **技术路径的转变**。不同于依赖在线优化的传统方法，AREA3D利用预训练的前馈模型（**VGGT**）在单次前向传播中直接输出逐像素深度置信度，作为偶然不确定性的自然代理，彻底解耦了不确定性建模与场景重建。这一设计使不确定性估计的计算代价从“每次视点选择都需要在线优化”降低为“仅需一次前馈推理”，为实时主动重建提供了可能。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 AREA3D的核心创新在于**将主动重建中不确定性估计与三维重建本身解耦**，构建了一个由“数据驱动前馈感知 + 视觉语言模型高层推理”协同驱动的双域不确定性场，从而在严格视点预算下实现高效、高保真的主动重建。其关键创新点可归纳为以下三个维度。
 
@@ -121,7 +123,7 @@ $$\tilde { U } ( v ) = \hat { U } ( v ) + \gamma$$
 
 与现有方法的对比进一步凸显创新优势：相比基于3DGS Fisher信息矩阵的**FisherRF**（需在线梯度计算），AREA3D无需任何在线优化；相比纯VLM引导的**VLM-based**方法（类似AIR-Embodied），AREA3D通过几何场的定量不确定性估计避免了纯语义推理的模糊性和不稳定性。在Replica场景级数据集上，AREA3D的PSNR/SSIM/LPIPS全面优于所有基线方法，尤其在稀疏视图下优势更为明显。
 
-## 整体框架
+
 
 AREA3D 构建了一个**双域不确定性驱动的主动三维重建智能体**，在固定视点预算下通过“前馈几何感知 + 视觉语言语义引导”的协同机制，高效选择下一最佳视图（Next Best View, NBV）。系统输入为初始稀疏观测集合 ${\mathcal{O}}_0$ 和总预算 $T$，输出为逐步扩展的观测序列及最终的三维高斯溅射重建结果 $\hat{\mathcal{G}}(S)$。
 
@@ -174,7 +176,7 @@ Table 1 系统对比了不同不确定性代理的优劣。AREA3D 以“前馈�
 ![[assets/figures/papers/paper_list_l2148_https_arxiv_org_abs_2512_05131/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of our approach. We propose AREA3D, an active reconstruction agent, which unifies two complementary signals of feed-forward 3D perception and vision-language guidance to decide the next best views under tight view budgets. AREA3D efficiently reconstructs high-fidelity geometry from sparse observations by actively choosing the most informative viewpoints*
 
-## 核心模块与公式推导
+
 
 AREA3D 的核心架构围绕**解耦的不确定性建模**展开，将主动重建中的视图选择与在线优化彻底分离。系统由四个关键模块构成：前馈几何置信度模块、VLM 语义不确定性模块、双域融合与可见性门控模块、以及预算感知的主动视点选择模块。以下逐一剖析其机理与关键公式。
 
@@ -278,7 +280,9 @@ $$
 ![[assets/figures/papers/paper_list_l2148_https_arxiv_org_abs_2512_05131/figures/002_Table_1.jpg]]
 *Table 1: Comparison of Different Uncertainty Proxies for Active Reconstruction*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 评估设置与公平性保障
 
@@ -331,7 +335,9 @@ AREA3D的双域不确定性框架为主动重建开辟了若干值得探索的�
 ![[assets/figures/papers/paper_list_l2148_https_arxiv_org_abs_2512_05131/figures/010_Figure_6.jpg]]
 *Figure 6: Four single-room scenes that capture diverse indoor layouts, and four tabletop scenes featuring object-centric setups with rich geometric details and occlusions*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有方法的谱系关系
 
@@ -385,6 +391,8 @@ AREA3D的有效性建立在以下前提之上：
 5. **预算分配策略的动态优化**：当前λ、γ等关键超参数为全局固定值。能否设计基于场景复杂度的自适应调节机制——例如，在纹理丰富区域自动降低λ以减少语义干扰，或在全局覆盖率低时自动增大γ以促进探索——从而进一步优化有限预算下的重建效率？
 
 6. **跨模态不确定性校准**：几何不确定性（来自VGGT的异方差损失）与语义不确定性（来自VLM的离散区域标注）来自不同分布和尺度。当前通过手动归一化和线性加权融合，缺乏严格的概率校准。引入贝叶斯融合框架或基于能量模型的统一不确定性场可能是更原则化的方向。
+
+
 
 ## 原文 PDF
 

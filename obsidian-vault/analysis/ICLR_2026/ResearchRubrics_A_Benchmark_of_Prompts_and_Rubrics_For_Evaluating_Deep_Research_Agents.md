@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/ResearchRubrics_A_Benchmark_of_Prompts_and_Rubrics_For_Evaluating_Deep_Research_Agents.pdf
+project_link: https://huggingface.co/datasets/ScaleAI/researchrubrics
+code_link: null
 openreview_forum_id: ErnvfmSX0P
 aliases:
 - ResearchRubrics
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | ResearchRubrics：用于评估深度研究智能体的提示与评分标准基准 |
 | 英文题名 | ResearchRubrics: A Benchmark of Prompts and Rubrics For Evaluating Deep Research Agents |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=ErnvfmSX0P); [Project](https://huggingface.co/datasets/ScaleAI/researchrubrics) |
+| Links | [paper](https://openreview.net/forum?id=ErnvfmSX0P) · [Project](https://huggingface.co/datasets/ScaleAI/researchrubrics) |
 | Topic | #topic/benchmarks_datasets_evaluation #topic/benchmarks_datasets_evaluation/benchmark_eval |
 | Method | RESEARCHRUBRICS基准与评估体系 |
 | Dataset | RESEARCHRUBRICS (三元评分), RESEARCHRUBRICS (二元评分), RESEARCHRUBRICS |
@@ -41,7 +43,7 @@ claims:
 > - RESEARCHRUBRICS (二元评分) 上，Compliance Score 为 Gemini DR: 0.615，对比 理想满分: 1.0，变化 -0.385。
 > - RESEARCHRUBRICS 上，失败占比 为 隐含推理 + 综合: 45-50%，对比 其他类别: 50-55%。
 
-## 概述
+## 概要
 
 深度研究（Deep Research）智能体旨在自主执行多步骤的开放域信息检索与综合，生成结构化的长篇研究报告。然而，如何可靠地评估这类系统的输出质量，始终是一个悬而未决的挑战。传统的问答基准难以捕捉深度研究任务的核心特征——这些任务通常涉及跨文档的信息综合、隐含需求的推断、以及多步逻辑推理，而非简单的信息提取。
 
@@ -55,7 +57,7 @@ claims:
 
 **方法谱系与知识库定位**：RESEARCHRUBRICS 填补了深度研究评估领域的关键空白——现有基准或聚焦于封闭域的问答准确性，或采用整体性评分而缺乏细粒度的诊断能力。该基准与 **GAIA**（Mialon et al., 2023）等面向通用智能体的评估框架形成互补，但其独特贡献在于通过原子化的评分标准设计，实现了对隐含推理、信息综合等深层认知能力的可量化诊断。在知识库定位上，该工作属于“评估基准构建”与“LLM-as-Judge”方法的交叉领域，为后续的架构改进（如多步推理增强、广度-精度权衡优化）提供了可操作的诊断工具。
 
-## 背景与动机
+
 
 深度研究（Deep Research）任务要求智能体自主进行多步信息检索、分析与综合，生成结构化的长篇研究报告。这类任务已从早期的事实性问答（QA）演变为需要跨文档推理、隐含需求理解和多维度信息整合的复杂工作流。然而，评估此类深度研究智能体的能力面临根本性困难：传统的自动评估指标（如ROUGE、BERTScore）难以捕捉长篇回答的语义充分性与逻辑一致性，而人工评估虽可靠却成本高昂、难以规模化。
 
@@ -63,7 +65,9 @@ claims:
 
 针对上述缺口，本文提出RESEARCHRUBRICS基准，其核心动机在于：通过人类专家编写的细粒度、强制/可选分类的评分标准，精细揭示深度研究智能体在隐含推理与多文档综合上的系统性弱点。该基准覆盖九个广泛领域（包括商业规划、历史分析、技术文档和常见消费者问题），并将任务复杂度形式化为三个维度——概念广度（Conceptual Breadth）、逻辑嵌套深度（Logical Nesting）和探索歧义性（Exploration Ambiguity）——以系统性地分析智能体能力随任务难度的变化规律。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 RESEARCHRUBRICS的核心创新在于构建了一套**以人类专家细粒度评分标准为中心的评估体系**，通过三个关键的“changed slots”实现了对深度研究智能体能力的精细刻画，弥补了现有基准在评估粒度和诊断深度上的系统性不足。
 
@@ -89,7 +93,7 @@ $$S_k = \frac{\sum_{r_i \in C} w_{r_i} m_{r_i}}{\sum_{r_i \in C, w_{r_i}>0} w_{r
 
 综上，这三个changed slots并非孤立的工程改进，而是围绕一个核心洞察展开：深度研究智能体的系统性弱点（隐含推理失败与多文档综合失败合计占45-50%的失败，Figure 4）只有在足够精细、分层且人类锚定的评估框架下才能被可靠地揭示。三元得分捕捉了部分正确的中间状态，强制/可选分层区分了致命缺陷与优化空间，示例嵌入则确保了评估信号本身的可靠性——三者共同构成了一个诊断深度研究能力的完整工具链。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_ErnvfmSX0P/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of RESEARCHRUBRICS and its evaluation pipeline*
@@ -144,7 +148,7 @@ $$S_{k} = \frac{\sum_{r_i \in C} w_{r_i} m_{r_i}}{\sum_{r_i \in C, w_{r_i}>0} w_
 
 该框架同时支持二元评分方案（将“部分满足”归入“不满足”），以衡量严格合规性。人类一致性验证通过 9 位专家注释者对 303 个响应进行真实评分，以 Macro F1 量化人机对齐程度。
 
-## 核心模块与公式推导
+
 
 ### 三阶段专家迭代管道
 
@@ -229,7 +233,9 @@ $$F_1 = 2 \cdot \frac{\mathrm{precision} \cdot \mathrm{recall}}{\mathrm{precisio
 
 此外，响应长度与得分之间存在中度正相关（$r \approx 0.20$–0.28），但分析表明这主要反映正当的信息密度而非冗长偏好。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：深度研究智能体的标准合规率
 
@@ -323,7 +329,9 @@ RESEARCHRUBRICS 将评分标准区分为强制性（权重 ±4 或 ±5）和可�
 ![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_ErnvfmSX0P/figures/006_Table_3.jpg]]
 *Table 3: Rubric criteria used to evaluate responses, with illustrative examples for each category*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1 与前人工作的关系
 
@@ -366,6 +374,8 @@ RESEARCHRUBRICS 并非孤立提出的评估方案，而是针对深度研究（D
 **评估范式的扩展**：当前基于评分标准的评估方法能否扩展到多轮交互、非文本模态和动态环境？在交互式研究场景中，评估需要同时考虑过程质量（如探索策略的合理性）和结果质量，这对评分标准的设计提出了更高的要求。
 
 **长度偏见的受控分离**：如何通过受控实验区分响应长度带来的正当信息密度与纯粹的冗长偏见对得分的影响？这需要设计专门的对照实验，例如控制信息内容相同但表达长度不同的响应对，以量化长度效应的大小。
+
+
 
 ## 原文 PDF
 

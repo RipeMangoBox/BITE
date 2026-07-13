@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/MM_HELIX_Boosting_Multimodal_Long_Chain_Reflective_Reasoning_with_Holistic_Platform_and_Adaptive_Hybrid_Policy_Optimization.pdf
+project_link: https://mm-helix.github.io/
+code_link: null
 openreview_forum_id: ORCZ0wcPLm
 aliases:
 - AHPOA
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | MM-HELIX：通过整体平台与自适应混合策略优化提升多模态长链反思推理 |
 | 英文题名 | MM-HELIX: Boosting Multimodal Long-Chain Reflective Reasoning with Holistic Platform and Adaptive Hybrid Policy Optimization |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=ORCZ0wcPLm); [Project](https://mm-helix.github.io/) |
+| Links | [paper](https://openreview.net/forum?id=ORCZ0wcPLm) · [Project](https://mm-helix.github.io/) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | Adaptive Hybrid Policy Optimization (AHPO) |
 | Dataset | MM-HELIX, MathVision, MathVerse-V1, LogicVista |
@@ -42,7 +44,7 @@ claims:
 > - MathVision 上，Accuracy (%) 为 26.6，对比 25.2，变化 +1.4。
 > - MathVerse-V1 上，Accuracy (%) 为 47.5，对比 40.5，变化 +7.0。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -77,7 +79,7 @@ $$\mathcal{L}_{\mathrm{AHPO}}(\theta) = \xi \mathcal{L}_{\mathrm{off-policy}}(\t
 
 AHPO 的训练依赖 Qwen3-235B 生成的高质量专家数据，复现门槛较高；MM-HELIX 基准的任务类型集中于图、谜题、算法与游戏等结构化领域，对真实世界多模态场景的覆盖不足；动态系数 $\xi$ 的阈值 $\hat{R}$ 的选取策略及其在不同任务分布下的鲁棒性尚未充分讨论；方法仅在 Qwen2.5-VL-7B 单一架构上验证，跨模型迁移效果待检验。此外，SFT 导致灾难性遗忘而 AHPO 得以避免的内在分布鲁棒性机制，以及反思能力向非结构化多模态任务迁移的深度，仍是值得深入探索的开放问题。
 
-## 背景与动机
+
 
 多模态大语言模型（MLLMs）在视觉问答、文档理解等任务上已取得显著进展，然而当面对需要**迭代思考、回溯验证和动态状态跟踪**的长链反思推理任务时，现有模型普遍暴露出严重的能力缺陷。以 MM-HELIX 基准的评估结果为例，当前最先进的开源模型 **Qwen2.5-VL-72B** 仅取得 13.9% 的准确率，而规模更大的 **GLM-4.5V-106B** 同样表现不佳（Table 1）。这一现象揭示了一个核心瓶颈：**现有 MLLM 缺乏在复杂推理链中持续反思、自我纠错的内在机制**。
 
@@ -103,7 +105,9 @@ AHPO 的训练依赖 Qwen3-235B 生成的高质量专家数据，复现门槛较
 
 针对这些问题，本文提出了 **MM-HELIX 基准**、**SERG 数据生成流水线**以及 **AHPO 自适应混合策略优化**三部分构成的整体框架（Figure 1），旨在系统性地突破 MLLM 在长链反思推理上的能力瓶颈。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈
 
@@ -169,7 +173,7 @@ $$\xi = \mathbf{1}\left(\sum_{i=1}^{N_{\mathrm{on}}} \mathbb{I}(R(\tau_i) = 1) <
 
 AHPO 的设计直接回应了 SFT 导致灾难性遗忘的机制问题。纯 SFT 在整个训练过程中强制模型模仿专家分布，导致策略过度拟合域内数据模式，丧失在一般推理任务上的生成多样性。AHPO 通过动态 ξ 实现了**渐进式自主**：训练初期模型能力弱，ξ 激活，专家数据提供必要的“脚手架”；随着成功率提升，ξ 关闭，模型在在线 RL 信号的引导下自主探索，从而在掌握反思技能的同时保留了推理多样性。这一机制解释了为何 AHPO 在 MM-HELIX 基准上提升 18.6%（6.3%→24.9%）的同时，在四个通用数学与逻辑基准上平均提升 5.7%（见 **Table 2**），且训练后的 7B 模型在 MM-HELIX 上的表现超越了 Qwen2.5-VL-72B 等更大规模的非反思模型。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_ORCZ0wcPLm/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of proposed framework. Our framework comprises two core components: (1) MM-HELIX benchmark to evaluate the reflective capabilities of MLLM, and (2) AHPO method to boost reflection capability and transfer enhanced skills to general reasoning tasks*
@@ -217,7 +221,7 @@ MM-HELIX 框架的核心目标是通过一个完整的“评估—数据生成�
 
 整个框架的设计哲学在于：**通过合成基准暴露缺陷，通过混合生成高效构建专家数据，通过动态混合策略在探索与监督之间取得平衡**，最终使 7B 规模的模型在 MM-HELIX 上的表现（24.9%）超越多个更大规模的非反思模型（如 Qwen2.5-VL-72B 的 13.9%），并在通用数学与逻辑基准上平均提升 5.7 个百分点。
 
-## 核心模块与公式推导
+
 
 ### 整体框架概览
 
@@ -280,7 +284,9 @@ $$\xi = \mathbf{1}\left(\sum_{i=1}^{N_{\mathrm{on}}} \mathbb{I}(R(\tau_i) = 1) <
 
 这一动态切换机制是 AHPO 区别于静态混合方法（Static-AHPO，$\xi$ 固定）的关键设计。实验表明，Static-AHPO 虽在训练初期强于 GRPO 与 LUFFY，但在后期出现不稳定和性能下降；而动态 $\xi$ 的 AHPO 能有效避免离线-在线分布冲突，保持训练的稳定提升（Figure 7）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验结果
 
@@ -336,7 +342,9 @@ AHPO 通过动态系数 ξ 的指示函数机制——当组内成功轨迹数�
 
 4. **超参数敏感性**：动态系数 ξ 依赖于预设的成功阈值 R̂，原文未系统讨论该阈值在不同任务难度或训练阶段下的选择策略及其鲁棒性，这在实际部署中可能需要额外的调参工作。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心方法定位
 
@@ -397,6 +405,8 @@ AHPO 在方法谱系中处于 **离线模仿学习** 与 **在线策略梯度** 
 4. **自适应阈值的优化**：$\hat{R}$ 的固定设定是否最优？能否根据训练进度或任务难度自适应调整阈值，例如从保守（低阈值，频繁激活专家）逐渐过渡到激进（高阈值，鼓励自主探索），以进一步提升训练效率与最终性能？
 
 5. **更广泛任务的迁移深度**：从 MM-HELIX 学得的反思能力能否迁移到非结构化的多模态任务（如自然图像问答、视频时序推理）？如何设计评估协议来度量这种迁移的深度——是表面格式的模仿，还是深层推理模式的泛化？
+
+
 
 ## 原文 PDF
 

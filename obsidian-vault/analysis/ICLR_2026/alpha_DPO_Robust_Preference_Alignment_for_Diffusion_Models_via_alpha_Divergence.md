@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/alpha_DPO_Robust_Preference_Alignment_for_Diffusion_Models_via_alpha_Divergence.pdf
+project_link: null
+code_link: https://github.com/yangli-lab/Diffusion_alpha-DPO_ICLR2026/
 aliases:
 - ADRPADMAD
 - "α-DPO"
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | α-DPO：基于α散度的扩散模型鲁棒偏好对齐方法 |
 | 英文题名 | $\alpha$-DPO: Robust Preference Alignment for Diffusion Models via $\alpha$ Divergence |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=wqbnA6PcKr); [GitHub](https://github.com/yangli-lab/Diffusion_alpha-DPO_ICLR2026/) |
+| Links | [paper](https://openreview.net/forum?id=wqbnA6PcKr) · [GitHub](https://github.com/yangli-lab/Diffusion_alpha-DPO_ICLR2026/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | α-DPO |
 | Dataset | Pick-a-Pic Test (SDXL, 标签翻转率20%), 无翻转) |
@@ -41,13 +43,13 @@ claims:
 > - Pick-a-Pic Test (SDXL, 标签翻转率20%) 上，IR↑ 为 1.001，对比 0.9424 (DPO)，变化 +0.0586。
 > - Pick-a-Pic Test (SDXL, 无翻转) 上，HPSv2↑ 为 30.86，对比 29.43 (DPO)，变化 +1.43。
 
-## 概述
+## 概要
 
 该论文针对扩散模型偏好对齐中的噪声鲁棒性问题，提出了 $\alpha$-DPO 方法。其核心洞察在于：现有 Diffusion-DPO 的优化目标等价于最小化前向KL散度（Forward Kullback–Leibler divergence, FKL），而FKL的质量覆盖（mass-covering）特性使其对偏好数据中的标签翻转噪声（包括误标注和个体偏好差异）高度敏感。论文通过将优化目标替换为 $\alpha$ 散度（$\alpha$-divergence），利用其在 $\alpha < 1$ 时的模式寻求（mode-seeking）特性来抑制离群噪声样本的影响。此外，论文设计了动态 $\alpha$ 调度机制（$\alpha = \mu f(\mathbf{x}^w, \mathbf{x}^l, \mathbf{c})$），通过隐式偏好分类器 $f$ 根据样本置信度自适应调整 $\alpha$ 值。
 
 在实验验证上，$\alpha$-DPO 在多个基准和模型骨干上均取得显著优势。在标签翻转率20%的合成噪声场景下（SDXL骨干），$\alpha$-DPO 的 HPSv2 达到 30.38，ImageReward 达到 1.001，显著优于 DPO 的 29.12 和 0.9424。在无噪声的 Pick-a-Pic V2 真实数据集上，$\alpha$-DPO 同样表现最佳（SDXL，HPSv2: 30.86，ImageReward: 1.054），且在所有基线方法中保持领先。消融实验证实了动态 $\alpha$ 调度机制的必要性（禁用后性能显著下降）。该方法与现有 DPO 变体（如 SPO）兼容，可作为即插即用模块提升其性能。人类评估（$p < 0.001$）进一步验证了 $\alpha$-DPO 在文本对齐、视觉吸引力和整体偏好上的优越性。
 
-## 背景与动机
+
 
 扩散模型在文本到图像生成领域取得了突破性进展，但如何使其生成结果与人类偏好对齐仍是核心挑战。现有的主流方法——直接偏好优化（DPO）——通过将奖励函数隐式参数化为策略比率，避免了传统RLHF中训练独立奖励模型的复杂流程。然而，DPO在真实场景中面临一个关键瓶颈：**偏好数据中普遍存在的噪声导致其性能严重退化**。
 
@@ -71,7 +73,9 @@ $$
 $$
 并进一步引入了**动态α调度**机制，根据样本置信度自适应调整α值：α = μ f(x^w, x^l, c)，其中f作为一个隐式偏好分类器，其输出与样本的置信度单调相关（如图4所示）。这种设计使得模型对高置信度（低噪声）样本赋予更大的α值，利用α散度的质量覆盖特性学习更丰富的分布；对低置信度（高噪声）样本赋予更小的α值，利用模式寻求特性抑制其负面影响。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 α-DPO 的核心创新在于将扩散模型偏好对齐的优化目标从**前向KL散度**替换为**α散度**，并引入**动态α调度机制**来适应数据质量。这一改变的根源在于，现有 Diffusion-DPO 的优化目标等价于最小化前向KL散度（Eq. 8: $\mathcal{L}_{\mathrm{DPO-Diffusion}} = \mathbb{E}_{\pmb{x} \sim \mathcal{D}} [ \mathbb{D}_{\mathrm{KL}} [ \bar{p}^*(\pmb{x}_{0:T}|\pmb{c}) ) || \bar{p}_\theta(\pmb{x}_{0:T}|\pmb{c}) ] ]$），而前向KL散度的“质量覆盖”特性使其对偏好数据中的标签翻转噪声（包括误标注和个体偏好差异）极其敏感。如图3所示，前向KL散度倾向于紧密拟合噪声分布，而α散度学习到的分布更接近无噪声情况。
 
@@ -85,7 +89,7 @@ $$
 
 **证据强度说明**：上述两点改变均有明确的公式推导（Eq. 8, 9, 13）和实验验证（Figure 3, 4; Table 4）。关于α散度在α<1时的模式寻求特性是理论已知性质，论文通过图3的可视化实验验证了其在噪声数据下的有效性。动态α调度中$f$作为隐式分类器的有效性通过图4的单调相关性得到验证。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0001_wqbnA6PcKr_alpha-DPO_Robust_Preference_Alignment_for_Diffus/figures/009_Figure_5.jpg]]
 *Figure 5: Top, human evaluations, our method shows superior performance over DPO on SDXL. Bottom, qualitative comparison with other baselines with models trained on Pick-a-Pic V2 Dataset*
@@ -108,7 +112,7 @@ $$
 
 整个pipeline的数据流为：输入文本条件 $c$ 和偏好对 $(x^w, x^l)$ → 扩散模型采样生成轨迹 → α调度模块根据样本置信度确定当前α值 → α散度损失计算模块计算对齐损失 → 梯度更新模型参数。值得注意的是，α-DPO不引入额外计算开销，与原始DPO和其他基线方法具有相同的时间和GPU消耗（证据来自附录A.3.4）。
 
-## 核心模块与公式推导
+
 
 α-DPO 的核心改动是将扩散模型偏好对齐的优化目标从**前向KL散度**替换为 **α散度**，并引入**动态α调度**机制以自适应地处理噪声数据。以下从原始DPO的瓶颈出发，逐步推导α-DPO的损失函数与梯度形式。
 
@@ -201,7 +205,9 @@ $$f(\mathbf{x}^w, \mathbf{x}^l, \mathbf{c}) = \sigma \left( \beta \log \frac{p_\
 
 **核心因果链**：前向KL散度的质量覆盖特性 → 噪声敏感 → 替换为α散度（$\alpha<1$的模式寻求特性） → 自动抑制离群点 → 动态α调度进一步增强自适应能力 → 在噪声偏好数据下学习到更接近无噪声情况的目标分布。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心结果：噪声偏好下的鲁棒性
 
@@ -264,7 +270,9 @@ $$\nabla_{u_t} \mathcal{L}_{\alpha\text{-DPO}} = \frac{1}{(\alpha-1)} (u_t^{\alp
 
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 基线关系与核心差异
 
@@ -296,6 +304,8 @@ $$\nabla_{u_t} \mathcal{L}_{\alpha\text{-DPO}} = \frac{1}{(\alpha-1)} (u_t^{\alp
 4. 与 SPO 的集成策略缺乏理论指导——需要更原则性的融合框架来解释为何 α 散度与 SPO 的优化目标互补。
 
 > **需要人工验证的点：** 论文声称 α-DPO 不引入额外计算开销（附录 A.3.4），但动态调度机制中隐式分类器 $f$ 的计算成本未与基线方法进行详细的 FLOPs 对比。该结论依赖于实验设置中的显存和时间消耗统计，需确认是否在相同硬件和批大小下严格对齐。
+
+
 
 ## 原文 PDF
 

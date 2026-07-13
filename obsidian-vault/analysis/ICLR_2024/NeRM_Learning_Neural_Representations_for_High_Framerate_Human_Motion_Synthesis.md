@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2024
 pdf_ref: paperPDFs/ICLR_2024/NeRM_Learning_Neural_Representations_for_High_Framerate_Human_Motion_Synthesis.pdf
+project_link: null
+code_link: null
 aliases:
 - NeRM
 tags:
@@ -41,7 +43,7 @@ claims:
 > - KIT (text-to-motion) 上，FID↓ 0.472±.019 (NeRM native) vs 0.404±.027 (MLD) (+0.068 (略差，但优于多数基线))。
 > - HumanML3D (high-framerate) 上，clip-FID @ 100fps 0.903 (NeRM) vs MLD (interpolated) 0.254 (note: 注意原文此处数值对应于 MRE 行，但文中描述 NeRM 远优于插值基线) (显著优于（参见稳定性评论）)。
 
-## 概述
+## 概要
 
 ### 1. 问题瓶颈
 
@@ -77,7 +79,7 @@ NeRM 的独特定位在于：**首次将变分自解码器优化的隐式神经�
 
 尽管 NeRM 在任意帧率生成上取得了突破，其当前框架仍存在若干局限：仅支持外部条件（文本、动作标签），无法整合关键帧或轨迹等细粒度内部约束；高帧率生成质量高度依赖训练数据中高帧率样本的数量与质量；自解码器训练策略导致每个样本需独立优化变分参数，在大规模数据集上训练开销显著。此外，方法针对固定身体形状建模，难以直接适应不同拓扑或体型的角色。这些局限指向了若干开放问题，包括如何在 INR 框架中注入内部时空约束、如何缓解高帧率数据稀缺问题、以及如何将该范式扩展至异构骨架与超分辨运动合成。
 
-## 背景与动机
+
 
 ### 高帧率人体运动合成的需求与困境
 
@@ -97,7 +99,9 @@ NeRM 的动机正是打破上述耦合。其核心洞察来自**隐式神经表�
 
 基于这一思想，NeRM 提出两阶段框架：第一阶段通过变分自解码器将任意帧率、任意时长的运动片段压缩为紧凑的潜在码 $z$，共享的 MLP 解码器 $f_\theta(t, z)$ 从归一化时间坐标和潜在码中重建姿势；第二阶段在学到的潜在空间上训练扩散模型，实现多样化生成。这一设计使模型能够直接消费原生多帧率数据，在紧凑的潜在空间中规避高帧率直接建模的计算负担，同时保留了从低帧率到高帧率的完整信息谱系——从根本上解耦了帧率与模型规模之间的刚性绑定。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 NeRM 的核心创新在于**将人体运动建模为时间坐标上的连续隐式神经场**，并围绕这一表示构建了一套从编码、解码到生成的完整框架，从根本上解决了现有方法在处理多帧率运动数据时面临的信息损失与计算瓶颈。
 
@@ -147,7 +151,7 @@ $$\epsilon_{\phi}(z_k, k, c) = r \epsilon_{\phi}(z_k, k, c) + (1 - r) \epsilon_{
 
 **总结**：NeRM 的创新链条清晰且自洽——连续神经场打破帧率耦合 → 变分自解码器构建帧率无关的潜在空间 → CCA 增强高频表示能力 → 潜在扩散实现高效生成。这一系统性创新使得 NeRM 在 HumanML3D 上取得 FID 0.389（对比 MLD 的 0.473），并首次实现了从 20fps 到 120fps 的平滑、高质量运动生成。
 
-## 整体框架
+
 
 NeRM 采用**两阶段流水线**，将任意帧率人体运动的生成问题解耦为隐式神经表示学习与潜在扩散建模两个相对独立的子任务。这一设计的核心动机在于：直接在高维运动序列空间训练扩散模型会因帧率升高而导致内存爆炸与采样速度骤降，而隐式神经场（Implicit Neural Representation, INR）的连续性与紧凑性恰好为这一问题提供了天然的解决路径。
 
@@ -189,7 +193,7 @@ $$\epsilon_{\phi}(z_k, k, c) = r \epsilon_{\phi}(z_k, k, c) + (1 - r) \epsilon_{
 
 整个框架的模块关系与数据流可概括为：**随机片段采样 → 变分自解码器学习潜在码 → CCA 增强坐标特征 → MLP 解码器重建运动 → 潜在空间扩散建模 → 条件引导生成 → 解码器任意帧率采样**。这一设计使得模型能够直接利用原生多帧率数据进行训练，从根本上打破了帧率与模型规模之间的耦合。
 
-## 核心模块与公式推导
+
 
 NeRM 将人体运动生成任务分解为两阶段流水线：第一阶段学习运动的连续隐式神经表示与紧凑潜在码，第二阶段在潜在空间训练扩散模型。以下剖析其核心模块与关键公式。
 
@@ -244,7 +248,9 @@ $$\epsilon_{\phi}(z_k, k, c) = r \epsilon_{\phi}(z_k, k, c) + (1 - r) \epsilon_{
 ![[assets/figures/papers/paper_list_l1898_NeRM_Learning_Neural_Representations_for_High_Framerate_Human_Motion_Syn/figures/003_Figure_3.jpg]]
 *Figure 3: Illustrative description of the random clip sampling from the entire motion at framerate s according to the center v and the clip size m*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心结果：文本到运动生成
 
@@ -345,7 +351,9 @@ NeRM 的核心特色在于能够直接生成任意帧率的运动序列，而无
 ![[assets/figures/papers/paper_list_l1898_NeRM_Learning_Neural_Representations_for_High_Framerate_Human_Motion_Syn/figures/010_Figure_7.jpg]]
 *Figure 7: Comparisons of conventional FID and our clip-FID. FID evaluates global structure, but downsamples all human motions to a common 20fps which ignores high-framerate details. In contrast, clip-FID takes motion clips instead, thereby keeping the original framerates. We employ both metrics to validate the effectiveness of our method*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位与核心瓶颈
 
@@ -392,6 +400,8 @@ NeRM的方法论突破在于将运动表示从“离散姿势序列”转向“�
 4. **跨拓扑泛化**：如何将连续隐式神经表示扩展到可变角色拓扑？可能的思路包括将骨架结构也编码为条件输入，或学习拓扑无关的运动流形。
 
 5. **超分辨运动合成**：生成的运动帧率能否突破训练集中最高帧率的限制？这需要模型学习到运动在时间轴上的连续先验，本质上是一个“运动超分辨”问题，可能需要结合运动学方程或物理模拟来约束高频成分的合理性。
+
+
 
 ## 原文 PDF
 

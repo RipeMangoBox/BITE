@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Routing_Cascades_and_User_Choice_for_LLMs.pdf
+project_link: null
+code_link: null
 openreview_forum_id: VqAhhF6av8
 aliases:
 - SLRGEUR
@@ -37,7 +39,10 @@ claims:
 | Method | Stackelberg LLM Routing Game with Endogenous User Response |
 | Dataset |  |
 
-## 概述
+> [!tip] 效果简介
+> 结果与证据沿用下文“实验与关键发现”中的现有记录；本轮不新增或外推论文事实。
+
+## 概要
 
 LLM提供商面临一个根本性的两难：如何在控制推理成本的同时，保证用户不因任务失败而弃用服务。现有路由方法通常将用户行为视为外生固定，仅优化单次推理成本，忽略了用户会根据服务体验动态调整重试与弃用决策这一事实。本文将该问题形式化为一个Stackelberg博弈——提供者先承诺路由与级联策略$(i, s)$，用户随后根据期望效用决定弃用概率$q$。
 
@@ -51,7 +56,7 @@ LLM提供商面临一个根本性的两难：如何在控制推理成本的同�
 
 本文的分析完全基于理论推导，假设参数已知且恒定，尚未在真实LLM数据集上进行实证验证。
 
-## 背景与动机
+
 
 大语言模型（LLM）的规模化部署面临一个核心矛盾：推理模型（reasoning models）在复杂任务上表现出更高的成功率，但其推理延迟和计算成本远超标准模型。提供商必须在服务质量与推理成本之间做出权衡，而这一权衡并非孤立存在——用户会根据服务质量动态调整自身行为，包括对失败任务进行重新提示（re-prompting）或完全放弃使用该服务。
 
@@ -61,7 +66,9 @@ LLM提供商面临一个根本性的两难：如何在控制推理成本的同�
 
 Figure 1 概括了本文的核心发现框架：用户行为取决于两个模型各自处于“价值占优”（净价值为正）还是“延迟占优”（净价值为负）的状态，而提供者的最优策略在不同区域遵循不同的阈值规则。这一框架揭示了路由博弈中的关键权衡维度——模型的每次成功成本（cost-per-pass）、弃用惩罚强度，以及模型对用户净价值的符号组合——共同决定了均衡策略的形态。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 1. 用户行为从外生固定到内生博弈响应
 
@@ -98,7 +105,7 @@ $$\min\left\{ \min_s J_1(s, q^*(1,s)), \; J_2(\mathbb{1}\{\xi_2 < 0\}) \right\}$
 
 > **注意**：以上发现均基于理论推导，缺乏在真实LLM数据集或用户实验上的实证验证，需在实际部署中进一步检验。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0010_VqAhhF6av8_Routing_Cascades_and_User_Choice_for_LLMs/figures/001_Figure_1.jpg]]
 *Figure 1: Key guidelines for optimal routing in the face of reactive users. User behavior depends on the state of the two models in terms of providing utility versus the delay incurred from inference compute. Provider policies must follow different thresholding rules in each region*
@@ -141,7 +148,7 @@ $$\min\left\{ \min_s J_1(s, q^*(1,s)),\; J_2(\mathbb{1}\{\xi_2 < 0\}) \right\}$$
 
 > **注意**：本框架完全基于理论推导，未在真实LLM数据集或用户实验上进行实证验证。所有成功率假设为独立同分布的伯努利试验，且参数 $V, p_i, P$ 均假设已知恒定。
 
-## 核心模块与公式推导
+
 
 ### 模块一：用户最佳响应表征
 
@@ -195,7 +202,9 @@ $$\min\left\{ \min_s J_1(s, q^*(1,s)), \; J_2(\mathbb{1}\{\xi_2 < 0\}) \right\}$
 | $P$ | 提供商因用户弃用而承受的惩罚 |
 | $c_i, t_i, p_i$ | 模型 $i$ 的单次调用成本、延迟、成功率 |
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 理论实验设计
 
@@ -280,7 +289,9 @@ Figure 5 的右图展示了提供者通过人为增加延迟（节流）来降�
 
 综上，本文的理论结果提供了理解LLM路由博弈的清晰框架和定性指导，但在将其直接应用于生产系统之前，需要基于真实数据和用户实验进行参数校准和行为假设验证。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基准方法的本质差异
 
@@ -327,6 +338,8 @@ Figure 5 的右图展示了提供者通过人为增加延迟（节流）来降�
 5.  **在线参数估计与自适应路由**：如何通过在线学习机制同时估计 $V$ 和 $P$，并自适应地调整路由策略？Theorem 4–5 中的阈值条件需要这些参数的点估计，估计误差的传播效应需要量化。
 
 6.  **多提供者竞争**：当多个提供者竞争同一用户群体时，弃用惩罚 $P$ 内化为用户流失到竞争对手的期望损失，路由博弈将变为提供者间的非合作博弈，均衡行为可能与单提供者场景有质的不同。
+
+
 
 ## 原文 PDF
 

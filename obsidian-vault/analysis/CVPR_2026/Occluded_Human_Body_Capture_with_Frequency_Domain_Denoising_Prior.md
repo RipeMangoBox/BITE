@@ -43,7 +43,7 @@ claims:
 > - 3DPW 上，MPJPE 67.3 vs — (—)；PA-MPJPE 44.8 vs — (—)；PVE 75.3 vs — (—)。
 > - 3DPW-OC 上，MPJPE 63.1 vs — (—)。
 
-## 概述
+## 概要
 
 从单目视频中恢复遮挡人体的三维运动是计算机视觉中长期存在的难题。现有方法大多依赖时域运动先验，但在严重或长期遮挡下，时域信息高度缺失，导致重建结果过平滑或不可靠。本文观察到，即使人体被部分遮挡，其关节运动在频域中仍保持周期性和一致的动量模式（Fig.1）。基于这一关键洞察，**FreqMotion** 将遮挡人体运动捕获重新定义为**小波系数选择过程**，提出了一种**频域去噪先验**框架。
 
@@ -56,7 +56,7 @@ claims:
 
 实验结果表明，FreqMotion 在多个遮挡基准上取得了领先性能。在 OcMotion 数据集上，MPJPE 达到 79.2 mm，PA-MPJPE 为 51.7 mm；在 3DPW-OC 上，MPJPE 为 63.1 mm，加速度误差仅 9.1 mm/s²。消融实验证实，频域去噪先验和3D扩散过程对性能提升至关重要，DWT 的多尺度分析能力优于传统的 DCT 方法。
 
-## 背景与动机
+
 
 从单目视频中捕获三维人体运动是计算机视觉的核心任务，在虚拟现实、人机交互和运动分析等领域具有广泛应用。然而，现实场景中普遍存在的遮挡——无论是物体遮挡还是人际遮挡——严重破坏了视觉观测的完整性，使得从部分可见的人体区域推断完整的三维姿态和运动变得极具挑战。
 
@@ -71,7 +71,9 @@ claims:
 2. **洞察层面**：人体运动在频域呈现周期性模式，频域表示对遮挡具有天然鲁棒性；
 3. **方法层面**：通过频域扩散模型将运动捕获转化为小波系数选择，从可靠的部分观测中恢复准确、连贯的三维运动。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FreqMotion 的核心创新在于将遮挡人体运动捕获重新定义为**频域小波系数选择过程**，而非传统方法中依赖时域运动先验的回归或补全。这一范式转换由四个关键设计槽位（changed slots）共同支撑，形成从输入表示到训练策略的系统性创新。
 
@@ -97,7 +99,7 @@ FreqMotion 采用**两阶段训练**策略：第一阶段训练 2D 频域扩散�
 
 上述四个创新槽位并非孤立存在，而是形成了一条完整的因果链路：**不确定性建模**保留了遮挡区域的信息 → **DWT 分解**将混合了噪声和有效信号的运动转换到频域 → **频域扩散模型**通过系数选择实现去噪 → **两阶段训练**将 2D 去噪能力迁移至 3D 重建。消融实验（Table 4）证实了这一协同效应：仅使用时域回归（Temporal Regression）的基线在 3DPW 上 MPJPE 为 54.3；加入去噪关键点 + DWT 后降至 49.6；进一步加入频域先验和 3D 扩散过程后达到最优的 48.5，验证了每个创新槽位的独立贡献和组合增益。
 
-## 整体框架
+
 
 FreqMotion 的完整流程如图2所示，核心思路是将遮挡人体运动捕获重新表述为**小波系数选择过程**。给定一段存在遮挡的 RGB 视频，系统首先检测 2D 关键点，并对遮挡区域的低置信度关键点构建高斯分布以显式建模不确定性。随后，将可见关键点与从分布中采样的遮挡关键点拼接，沿时空维度通过离散小波变换（DWT）分解为多个频率子带。接下来，一个基于 Transformer 的频域扩散模型学习各子带的有效系数映射，通过反向扩散过程逐步去噪并重建干净的 2D 关键点序列。该 2D 频域先验训练完成后，冻结编码器并接入 3D 解码器，在同一个扩散过程中预测 3D 运动的 SMPL 参数，最终通过逆小波变换（iDWT）重建出连贯的 3D 人体运动。
 
@@ -126,7 +128,7 @@ FreqMotion 的完整流程如图2所示，核心思路是将遮挡人体运动�
 ![[assets/figures/papers/paper_list_l15_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_Occluded_Human_B/figures/002_Figure_2.jpg]]
 *Figure 2: The pipeline of our method. Given an occluded video, we first detect 2D keypoints and model the noisy keypoints in the occluded regions using Gaussian distributions. We then combine the visible and noisy invisible keypoints, and decompose them into multiple wavelet subbands using DWT. Subsequently, we design a diffusion model with a 2D decoder to select valid frequency components for reconstructing the clean data. Once the prior model is trained, we employ the encoder with a 3D decoder to facilitate 3D motion capture within the same diffusion process. Finally, the reconstructed motion can be regressed from the input keypoints and images after several diffusion time steps*
 
-## 核心模块与公式推导
+
 
 FreqMotion 将遮挡人体运动捕获重新表述为**小波系数选择过程**，其核心由四个关键模块串联而成，并通过频域扩散模型实现从部分观测到完整运动的映射。
 
@@ -185,7 +187,9 @@ $$\mathcal{L} = \mathcal{L}_{smpl} + \mathcal{L}_{joint} + \mathcal{L}_{verts} +
 ![[assets/figures/papers/paper_list_l15_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_Occluded_Human_B/figures/001_Figure_1.jpg]]
 *Figure 1: We visualize the trajectories along the X-axis of the left and right knee pose parameters (c) from the SMPL model in an occluded motion sequence. Despite partial occlusion, the knee joints maintain periodic and consistent patterns, which help alleviate the effects of long-term occlusion*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置与数据集
 
@@ -243,7 +247,9 @@ $$\mathcal{L} = \mathcal{L}_{smpl} + \mathcal{L}_{joint} + \mathcal{L}_{verts} +
 ![[assets/figures/papers/paper_list_l15_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_Occluded_Human_B/figures/005_Figure_4.jpg]]
 *Figure 4: Qualitative comparison among the methods that utilize temporal information (b, c, f) and explicitly consider the occlusion problem (d, e). Our method is more robust to occlusions than other methods*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从时域先验到频域去噪先验
 
@@ -282,6 +288,8 @@ FreqMotion 的关键洞察在于：**将遮挡运动捕获形式化为小波系�
 4. **多人交互与动态相机扩展**：当前方法针对单人在静态相机下的遮挡场景设计。频域先验能否扩展到多人交互场景（如 Hi4D 所示的人际遮挡已有初步验证）或动态相机下的实时运动捕获，是后续研究的重要方向。
 
 5. **更长遮挡序列的性能极限**：在更长的遮挡序列和复杂背景下，频域先验的周期性假设是否仍然成立？模型是否需要引入长程时序建模机制来弥补频域局部窗口的局限？这些问题需要在更大规模的遮挡数据集上进行压力测试。
+
+
 
 ## 原文 PDF
 

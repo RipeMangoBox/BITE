@@ -5,6 +5,7 @@ paper_level: A
 venue: SIGGRAPH
 year: 2024
 pdf_ref: paperPDFs/SIGGRAPH_2024/Diffusion_Texture_Painting.pdf
+code_link: https://github.com/nv-tlabs/DiffusionTexturePainting
 project_link: https://research.nvidia.com/labs/toronto-ai/DiffusionTexturePainting/
 aliases:
 - DTP
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | 扩散纹理绘画 |
 | 英文题名 | Diffusion Texture Painting |
 | 会议/期刊 | SIGGRAPH 2024 |
-| Links | [paper](https://dl.acm.org/doi/pdf/10.1145/3641519.3657458); [GitHub](https://github.com/nv-tlabs/DiffusionTexturePainting); [Project](https://research.nvidia.com/labs/toronto-ai/DiffusionTexturePainting/) |
+| Links | [paper](https://dl.acm.org/doi/pdf/10.1145/3641519.3657458) · [GitHub](https://github.com/nv-tlabs/DiffusionTexturePainting) · [Project](https://research.nvidia.com/labs/toronto-ai/DiffusionTexturePainting/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Diffusion Texture Painting |
 | Dataset | Pexels textures (100 diverse real-world photos), Pexels textures |
@@ -40,7 +41,7 @@ claims:
 > - Pexels textures (100 diverse real-world photos) 上，FID (↓) 为 1.18 ± 0.921 (Ours τ=1)，对比 4.02 ± 3.81 (TextureMixer)，变化 ↑2.84 (absolute improvement)。
 > - Pexels textures 上，SWD (↓) 为 0.311 ± 0.238 (Ours τ=1)，对比 0.472 ± 0.431 (TextureMixer)，变化 ↑0.161 (absolute improvement)。
 
-## 概述
+## 概要
 
 将任意图像转化为可交互的纹理画笔，是计算机图形学中长期存在的挑战。现有方法要么依赖确定性克隆（如 Photoshop 图章工具），要么受限于闭域训练的纹理合成网络，难以在保持纹理身份一致性的同时，生成丰富多样的非重复纹理变化。**Diffusion Texture Painting** 提出了一种基于预训练扩散模型的图章式绘画框架，核心突破在于解决了扩散模型在连续交互绘画中的**纹理漂移（identity drift）**问题：当直接使用条件修复扩散模型作为画笔时，随着重叠图章的延伸，生成结果会在几个图章后迅速偏离源纹理特征。
 
@@ -48,7 +49,7 @@ claims:
 
 在包含 100 张多样化真实纹理的 Pexels 数据集上，该方法（τ=1）取得了 FID 1.18、SWD 0.311 的结果，显著优于 TextureMixer（FID 4.02, SWD 0.472）等基线方法。消融实验证实，纹理引导是抑制漂移、同时提升纹理一致性与图章多样性的决定性因素。
 
-## 背景与动机
+
 
 ### 问题背景：从纹理合成到交互式纹理绘画
 
@@ -68,7 +69,9 @@ claims:
 
 本文的核心动机在于：在预训练扩散模型的推理阶段引入额外的引导机制，以极低的计算代价强制每个生成图章与源纹理保持身份一致，同时不压制扩散模型本身的生成变化能力。这一思路将纹理绘画问题重新表述为**受控的去噪引导问题**：通过构造来自源纹理的伪造上下文作为引导信号，在标准分类器自由引导（CFG）的基础上叠加纹理引导项，从而在多样性与一致性之间建立可调的控制旋钮。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于将**预训练扩散模型改造为一种随机纹理画笔生成器**，并针对其直接应用于交互式绘画时暴露的致命缺陷——**纹理身份漂移（identity drift）**——提出了一套完整的“条件化 + 引导”解决方案。相比于传统的确定性克隆画笔或基于示例的块合成方法，本工作在三个关键维度上实现了根本性的改变。
 
@@ -112,7 +115,7 @@ $$\hat{\epsilon}_\theta(x_t, t, b, \hat{I}) = \tilde{\epsilon}_\theta(x_t, t, b,
 
 上述四个创新构成了一个完整的因果链条：**随机修复生成器**提供了多样性的基础，但引入了漂移问题；**多尺度图像条件化**部分缓解了漂移，但力有不逮；**纹理引导**作为关键补丁，在去噪过程中强制施加源纹理约束，最终实现了“多样性”与“一致性”的兼得；**3D 绘画空间**则将这一能力从平面扩展到了立体表面。这一链条中的每一环都是对前一环暴露问题的直接回应，形成了逻辑严密的创新体系。
 
-## 整体框架
+
 
 Diffusion Texture Painting 将交互式纹理绘画建模为一个**基于图章（stamp）的连续生成过程**，其核心思想是将一个经过适配的预训练扩散模型作为“画笔生成器”，在局部渲染空间中进行条件修复（inpainting），再将生成结果投影回全局纹理图像或 UV 贴图。整个 pipeline 由三个紧密耦合的模块构成，形成“渲染—生成—合成”的闭环。
 
@@ -161,7 +164,7 @@ Diffusion Texture Painting 将交互式纹理绘画建模为一个**基于图章
 ![[assets/figures/papers/paper_list_l20_https_dl_acm_org_doi_pdf_10_1145_3641519_3657458/figures/001_Figure_1.jpg]]
 *Figure 1: Di usion texture painting can turn any image into a brush. Our method allows interactive painting on the surface of 3D meshes, producing complex, non-repeating seamlessly tiling textures, such as stone path and rock details on this lawn, gingerbread house roof or realistic crochet patterns on the toy. 3D models from Sketchfab: house by LowlyPoly and stu ed dino by Andrey.Chegodaev*
 
-## 核心模块与公式推导
+
 
 ### 3.1 图章生成器：条件修复扩散模型
 
@@ -238,7 +241,9 @@ $$I_{rgb}, I_{\alpha}, f_{vis} \gets \mathcal{R}(F, P, F_U, U, T, W) \tag{Eq. 1}
 
 每次笔触时，系统在网格表面采样点 $p_i$，构造局部相机使其像平面与网格相切（§3.3.1），渲染得到局部画布图像 $I$ 后送入修复生成器，生成结果再通过 $f_{vis}$ 反向投影更新 UV 纹理 $T$。画笔大小参数 $\beta$ 控制局部相机的视场角（FOV），从而调节每次图章覆盖的几何范围（§3.3.3）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -295,7 +300,9 @@ Figure 7 展示了连续笔触和纹理过渡的定性对比。在纹理过渡�
 - 所有方法在相同数据集和评估协议下比较，但基线（如 TextureMixer）未针对交互式绘画场景进行特化调参。
 - 定量评估使用自动生成的连续笔触，真实绘制质量仍需依赖艺术家主观体验验证。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：纹理绘画中的身份漂移
 
@@ -369,6 +376,8 @@ $$\hat{\epsilon}_\theta(x_t, t, b, \hat{I}) = \tilde{\epsilon}_\theta(x_t, t, b,
 ### 在知识库中的定位
 
 Diffusion Texture Painting 在纹理合成与扩散模型应用的知识谱系中占据了一个独特位置：它既不是纯粹的纹理合成方法（如 TextureMixer 的闭域训练范式），也不是简单的扩散模型应用（如直接使用修复扩散模型作为画笔）。它的核心贡献在于**识别并解决了扩散模型在连续交互场景中的身份漂移问题**，通过纹理引导机制在多样性和一致性之间建立了一个可调节的平衡点。这一工作为扩散模型在交互式内容创作领域的应用开辟了新路径，其提出的“伪造上下文引导”思想可能对更广泛的生成模型控制问题具有启发意义。
+
+
 
 ## 原文 PDF
 

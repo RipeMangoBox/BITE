@@ -42,7 +42,7 @@ claims:
 > - LV100 (Cross-Reenactment) 上，FVD↓ 520.6 vs LivePortrait: 557.2 (↓6.6%)；tLP↓ (×10⁻³) 12.83 vs LivePortrait: 13.51 (↓5.0%)。
 > - Efficiency (H100 GPU) 上，FPS↑ 15.82 vs Megactor-Σ: 2.216 (next best diffusion after LivePortrait GAN) (7.1×)。
 
-## 概述
+## 概要
 
 **问题与瓶颈**：人像动画在直播场景中面临双重挑战——既要生成富有表现力的面部动态，又必须满足实时流式传输的严格延迟要求。现有扩散式人像动画模型（如 **X-Portrait** (Xie et al., SIGGRAPH 2024)、**Megactor-Σ** (Yang et al., AAAI 2025)、**X-NeMo** (Zhao et al., ICLR 2025)、**HunyuanPortrait** (Xu et al., CVPR 2025)）通常需要20步以上的去噪迭代，并采用分块重叠处理，导致推理延迟高、误差在块间累积，难以支撑长视频的实时生成与时间稳定性。
 
@@ -55,7 +55,7 @@ claims:
 
 **主要结果**：在交叉重演基准 LV100 上，PersonaLive 以仅4步采样取得 FVD 520.6、tLP 12.83，优于扩散基线；在单张 NVIDIA H100 GPU 上推理速度达15.82 FPS，延迟仅0.253秒，相比现有扩散方法实现7–22倍加速，首次将扩散式人像动画推进到实时流式直播所需的性能区间。
 
-## 背景与动机
+
 
 ### 人像动画的现实需求与技术挑战
 
@@ -81,7 +81,9 @@ PersonaLive的提出源于一个关键观察：**在人像动画的去噪过程�
 
 基于以上洞察，PersonaLive以**实时流式直播**为目标，从三个层面重构人像动画管线：(1) 采用混合隐式运动信号实现富有表现力的运动控制；(2) 通过外观蒸馏将采样步数压缩至4步；(3) 提出自回归微块流式生成范式，配合滑窗训练与历史关键帧机制，实现低延迟、时序稳定的长视频生成。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PersonaLive 的核心创新在于系统性地重构了扩散式人像动画的生成范式，使其从“离线高延迟”走向“实时流式”。其关键创新点可归纳为三个相互耦合的 changed slots：
 
@@ -126,7 +128,7 @@ $$d = \min_{i=0,1,\ldots} \| m_f - m_i \|_2$$
 
 上述三个创新并非孤立存在，而是形成了一条因果链路：混合隐式运动控制提供了富有表现力且鲁棒的运动表示，使去噪过程的结构布局能在极早步骤确定，从而为外观蒸馏的压缩提供了可能性；而蒸馏带来的 4 步高效采样，又为微块流式生成的低延迟实时推理提供了计算基础。三者协同实现了从“高延迟分块离线生成”到“低延迟流式实时生成”的范式跃迁。
 
-## 整体框架
+
 
 PersonaLive 的完整动画生成流程可形式化为一个自回归流式映射：给定参考图像 $I_R$ 和驱动视频序列 $\{I_D^i\}_{i=1}^{S}$，模型逐帧输出动画帧 $\mathcal{A}_i$：
 
@@ -169,7 +171,7 @@ $$\mathcal{L}_{distill} = \mathcal{L}_2(\hat{x}, x^{gt}) + \lambda_{lpips}\mathc
 ![[assets/figures/papers/paper_list_l1076_https_arxiv_org_abs_2512_11253/figures/001_Figure_1.jpg]]
 *Figure 1: An overview of generated portraits and inference speed of PersonaLive. PersonaLive produces high-quality, temporally stable portrait animations over long sequences, while achieving real-time streaming performance with substantially lower latency than prior diffusion-based approaches*
 
-## 核心模块与公式推导
+
 
 ### 3.1 流式动画的形式化定义
 
@@ -237,7 +239,9 @@ $$d = \min_{i=0,1,\ldots} \| m_f - m_i \|_2$$
 ![[assets/figures/papers/paper_list_l1076_https_arxiv_org_abs_2512_11253/figures/012_Figure_11.jpg]]
 *Figure 11: Effect of implicit 3D keypoints and facial motion embedding*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 PersonaLive 在自重演（self-reenactment）、交叉重演（cross-reenactment）和推理效率三个维度上系统评估了其性能，并在消融实验中验证了外观蒸馏与微块流式生成范式中各组件的因果贡献。
 
@@ -287,7 +291,9 @@ PersonaLive 在自重演（self-reenactment）、交叉重演（cross-reenactmen
 ![[assets/figures/papers/paper_list_l1076_https_arxiv_org_abs_2512_11253/figures/008_Figure_8.jpg]]
 *Figure 8: Failure cases. Some details of our method may fail when the given reference images are out of the training domain*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有工作的关系
 
@@ -317,6 +323,8 @@ PersonaLive 的有效性建立在以下前提之上：
 2. **如何提升域外肖像的泛化能力？** 当前失败案例集中在非真人面部，可能需要域适应策略或更大规模的多样化训练数据。
 3. **少步蒸馏的极限在哪里？** 4步采样已取得显著加速，能否进一步压缩至2步甚至1步？这需要在蒸馏损失设计和对抗训练策略上进行更深入的探索。
 4. **滑窗训练策略的通用性。** 该策略通过模拟推理时的自回归误差积累来缓解曝光偏差，这一思路是否适用于其他自回归生成任务（如文本到视频、音频生成）值得验证。
+
+
 
 ## 原文 PDF
 

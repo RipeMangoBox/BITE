@@ -34,7 +34,7 @@ claims:
 | 中文题名 | LayerFlow：面向图层感知视频生成的统一模型 |
 | 英文题名 | LayerFlow: A Unified Model for Layer-aware Video Generation |
 | 会议/期刊 | SIGGRAPH 2025 |
-| Links | [paper](http://arxiv.org/abs/2506.04228v1) · [arXiv](https://arxiv.org/abs/2506.04228) · [Project](https://s2025.conference-schedule.org/presentation/?id=papers_572&sess=sess146) |
+| Links | [paper](http://arxiv.org/abs/2506.04228v1) · [paper](https://arxiv.org/abs/2506.04228) · [Project](https://s2025.conference-schedule.org/presentation/?id=papers_572&sess=sess146) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation #topic/generative_models_diffusion #topic/benchmarks_datasets_evaluation |
 | Method | LayerFlow |
 | Dataset | VBench, User Study, DAVIS |

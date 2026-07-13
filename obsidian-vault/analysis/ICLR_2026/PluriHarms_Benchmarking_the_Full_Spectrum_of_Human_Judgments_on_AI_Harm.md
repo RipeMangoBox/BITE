@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/PluriHarms_Benchmarking_the_Full_Spectrum_of_Human_Judgments_on_AI_Harm.pdf
+project_link: https://jl3676.github.io/PluriHarms
+code_link: null
 aliases:
 - PluriHarms
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | PluriHarms：人类对AI有害性判断全谱基准 |
 | 英文题名 | PluriHarms: Benchmarking the Full Spectrum of Human Judgments on AI Harm |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=u7lXflJQX9); [Project](https://jl3676.github.io/PluriHarms) |
+| Links | [paper](https://openreview.net/forum?id=u7lXflJQX9) · [Project](https://jl3676.github.io/PluriHarms) |
 | Topic | #topic/safety_alignment_fairness_privacy #topic/safety_alignment_fairness_privacy/safety_security |
 | Method | PluriHarms多元有益性基准生成与评估框架 |
 | Dataset | PLURIHARMS |
@@ -40,7 +42,7 @@ claims:
 > - PLURIHARMS 上，MAE (Aggregated) 为 Claude Sonnet‑3.7 K‑Shot Aggregated，对比 WildGuard Zero‑Shot Classification，变化 −0.153 (0.250 vs 0.403)。
 > - PLURIHARMS 上，MAE (Individual) 为 SafetyAnalyst Individual，对比 SafetyAnalyst Aggregated，变化 −0.050 (0.311 vs 0.361)。
 
-## 概述
+## 概要
 
 当前人工智能安全评估普遍将有害性简化为二元分类，忽视了在边界模糊的情况下，人类判断中存在的合理分歧。这种简化使得安全基准难以反映现实世界中多元的价值观和伦理立场。为此，PluriHarms 提出一个系统性的解决方案：构建覆盖从完全良性到明确有害的连续谱系的提示集，并在大规模人类标注的基础上，同步采集标注者的人口统计与心理特质数据，从而揭示有害性判断的分歧根源。
 
@@ -52,7 +54,7 @@ PluriHarms 的核心洞察在于：标注者对有害性的分歧并非随机噪
 
 PluriHarms 的当前版本仍存在若干限制：提示和标注仅覆盖英语及美国本土群体，文化代表性有限；评估对象限于单一提示，未纳入模型回复和多轮对话的动态情境；特征提取依赖现成工具，其自身准确性构成约束。这些局限也为后续工作指明了方向，包括多语言、多文化扩展，交互式场景的加入，以及更富表达力的个性化对齐技术的研发。
 
-## 背景与动机
+
 
 当前人工智能安全评估与对齐实践普遍将有害性视为二元分类问题，要求模型拒绝所有“不安全”输出并接受所有“安全”输入。然而，这种“一刀切”策略忽视了现实场景中的核心矛盾：不同社会身份、价值取向和经历的个体对同一AI内容的危害感知可能截然不同（见 Figure 1）。尤其在边界模糊的案例中——例如涉及讽刺、冒险建议或特定文化规范的提示——合理分歧广泛存在，但主流基准（如 HarmBench、AIR‑Bench）仅提供固定的安全/有害提示集，迫使模型学习单一化、聚合式的安全标签，从而丧失了反映多元价值观的能力。
 
@@ -60,7 +62,9 @@ PluriHarms 的当前版本仍存在若干限制：提示和标注仅覆盖英语
 
 鉴于此，本文提出 PluriHarms 基准——一个旨在覆盖有害性判断全谱的多元评估框架。其核心动机是：超越二元安全范式，构建一个能够显式建模个体间有害性感知差异、并支持个性化对齐的测试平台。为此，PluriHarms 设计了一套自动化管道：从 AIR‑Bench 种子提示出发，利用 LLM 沿有序有害等级（0.0–1.0）生成变体以覆盖中间模糊地带（Figure 2），后续人工验证确认合成有害等级与人类评分高度相关（Spearman r = 0.59，p = 2.2e-15，Figure 3）；再通过 SafetyAnalyst 和 KALEIDO 提取可解释的伤害动作、后果、价值观等特征；最后以遗传算法精选出特征分布平衡、中间等级过采样的 150 个提示。在该基准上收集的 100 名标注者评分与个人资料，为研究多元安全对齐提供了前所未有的实证基础。后续实验表明，基于少量示例的个性化对齐（K‑Shot Individual）相较于聚合共识方法可显著降低预测误差（MAE 0.193 vs 0.254，GPT‑4.1，见 Table 3），这从源头印证了本文动机：只有正视并利用人类判断的多元性，AI 安全系统才能真正服务于广泛用户。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PluriHarms的核心创新在于将AI有害性评估从**二元共识范式转向多元分歧建模**：不再追求单一的“正确”有害性标签，而是系统性地捕捉不同人在边界案例上的合理分歧，并利用这些分歧实现个性化安全对齐。其关键设计变更（changed slots）体现在提示谱系生成、多维特征提取与多样性筛选这三个紧密耦合的环节，共同构建了一个可解释的多元有害性基准。
 
@@ -94,7 +98,7 @@ PluriHarms的核心创新在于将AI有害性评估从**二元共识范式转向
 
 **三个变更槽之间的因果链条**可以概括为：谱系生成提供了分歧出现的连续性舞台，特征提取赋予分歧可解释的结构化维度，遗传算法筛选则聚焦于分歧最密集、特征最丰富的信息区域。三者共同使得PluriHarms区别于传统二元安全基准，将有害性判断的分歧从“噪声”重新定义为**由标注者社会身份、心理特质与提示有害类型之间结构化交互**所驱动的可建模信号（Table 2中显著的交互项，如种族×儿童伤害 β=0.034），最终支撑了个性化对齐（K‑Shot Individual MAE 0.193）显著优于共识聚合对齐（Aggregated MAE 0.254，Table 1）的核心结论。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0014_u7lXflJQX9_PluriHarms_Benchmarking_the_Full_Spectrum_of_Hum/figures/002_Figure_2.jpg]]
 *Figure 2: Automated framework for prompt generation and curation. (1) An LLM generates candidate prompts spanning the harm spectrum (0 = fully benign to 1 = unambiguously harmful) for seed prompts. (2) SafetyAnalyst (Li et al., 2025) and KALEIDO (Sorensen et al., 2024a) models extract human-interpretable numerical features of harmful actions, effects, values, rights, and duties. (3) A genetic algorithm strategically selects a subset of prompts that balances feature distributions, concentrating on intermediate harm levels while ensuring diversity across actions, effects, and values*
@@ -121,7 +125,7 @@ PluriHarms 提出了一套面向多元有害性判断的基准生成与评估框
 
 以上六个模块形成了“谱系生成 → 特征表征 → 精选基准 → 人类标注 → 分歧归因 → 个性化评估”的闭环，输入为安全相关的种子概念，输出为个体化有害性判断的预测性能和分歧来源的结构性解释。
 
-## 核心模块与公式推导
+
 
 PluriHarms 框架围绕「多元有害性判断」的生成、标注与分析，由六个核心模块串联而成。以下按数据流顺序说明各模块的功能，并给出其中涉及的关键公式及其变量含义。
 
@@ -160,7 +164,9 @@ $$\mathrm{MAE} = \frac{1}{N}\sum_{i=1}^{N} |\,y_i - \hat{y}_i\,|$$
 
 其中 $y_i$ 为标注者实际评分，$\hat{y}_i$ 为模型预测评分，$N$ 为样本数。该模块评测了通用与专用安全模型在零样本、K‑Shot 以及价值轮廓（value profile）等多种对齐条件下的表现。个性化 K‑Shot 方法（如 GPT‑4.1 K‑Shot Individual）取得了最低的 MAE（0.193），显著低于聚合对齐的 0.254（表 3），说明直接适配个体偏好是更有效的路径。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 本节围绕PLURIHARMS基准上的三项核心实验展开：人类有害性判别的结构分解、现有安全模型的预测能力评估，以及个性化对齐与聚合对齐的对比。所有结果的锚定信号及其证据强度汇总如下。
 
@@ -201,7 +207,9 @@ $$\mathrm{MAE} = \frac{1}{N}\sum_{i=1}^{N} |\,y_i - \hat{y}_i\,|$$
 
 尽管PLURIHARMS首次系统刻画了有害性判断的全谱分歧，其实验设计存在明确限制：基准仅包含英文提示且标注者全部来自美国，文化代表性不足以推广至全球多元群体（附录图10显示了标注者人口分布偏态）；评估对象限于单轮提示，未能纳入模型响应或多轮交互中动态演变的有害性；标注者样本量（100人）支持个体水平分析，但对某些子群体的统计效力有限；特征提取依赖SafetyAnalyst和KALEIDO，其分类准确性与覆盖度构成上游瓶颈。此外，通用模型在个体水平上虽优于专用模型，但MAE依然在0.19–0.20区间，仍有较大改进空间。未来工作需扩展至更丰富的语言和文化背景，并纳入动态交互场景，以构建真正普适的多元安全基准。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 当前AI安全评估的主流范式将有害性视为二元、共识驱动的判断，依赖固定数据集（如HarmBench）和聚合评分基线（如WildGuard零样本分类、SafetyAnalyst基础版、GPT‑4.1零样本或K‑shot聚合对齐）。这些方法忽视了个体在边界案例上的合理分歧，造成安全基准无法反映多元价值观这一核心瓶颈。PluriHarms从根本上重构了这一设定：它不是另一个固定测试集，而是一个**全谱提示生成、结构化特征提取与个性化对齐评估**的综合框架，将有害性判断从“是/否”转换为一个由提示特征、标注者特质及其交互共同决定的连续多元谱系。
 
@@ -229,6 +237,8 @@ $$\mathrm{MAE} = \frac{1}{N}\sum_{i=1}^{N} |\,y_i - \hat{y}_i\,|$$
 3. **交互语境下的有害性建模**：当前基准停留在提示层面；未来工作应将模型响应纳入评估，研究部分响应可能如何修正或重新框架化有害性感知，以支持安全评估的人机对话闭环。
 4. **个性化对齐中的安全权衡**：k‑shot个性化对齐直接拟合个体偏好，可能导致安全模型过度适应个别标注者的极端立场。如何通过约束优化或群体规范注入来维持安全基线，仍是一个开放挑战。
 5. **专用安全模型的提升路径**：当前专用安全模型在个性化对齐下依然落后于通用模型（SafetyAnalyst个体MAE 0.311 vs GPT‑4.1 K‑Shot 0.193）；如何改进专用模型的架构或微调策略，使其在捕捉个体差异上逼近通用模型，是实现高效、可部署的个性化安全体系的关键瓶颈。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: 3DV
 year: 2025
 pdf_ref: paperPDFs/3DV_2025/3D_Whole_body_Grasp_Synthesis_with_Directional_Controllability.pdf
+project_link: https://gpaschalidis.github.io/cwgrasp
+code_link: null
 aliases:
 - 3WBGSDC
 tags:
@@ -41,7 +43,7 @@ claims:
 > - ReplicaGrasp 上，ContactRH-O 0.3 vs 0.15 (FLEX) (+0.15)；Body diversity (cm) 61.77 vs 63.86 (FLEX) (-2.09)；Average runtime (s) 23 vs 357 (FLEX) (~16× faster)。
 > - User study (28 configurations) 上，Preference % (both views) 71.23% (CWGrasp preferred) vs 28.77% (FLEX) (+42.46)。
 
-## 概述
+## 概要
 
 三维全身抓取合成旨在为放置在容器上的物体生成自然、物理合理的全身姿态与手部抓取。现有方法（如 **FLEX**）在生成引导手时缺乏对物体和容器的几何推理，导致手部方向与身体可达方向不兼容，需要大量采样（500个身体样本）和后处理优化，效率低且真实性不足。
 
@@ -51,7 +53,7 @@ claims:
 
 **方法定位**：CWGrasp 属于“几何推理引导的数据驱动合成”范式，在方法谱系中处于优化类方法（如 DexGraspNet）和回归类方法（如 GrabNet、ContactGen）的交汇处。与纯回归方法相比，它引入了方向可控性；与纯优化方法相比，它大幅降低了采样和计算成本。其关键创新在于将场景几何推理（ReachingField）与条件生成模型（CReach、CGrasp）解耦并级联，使方向控制信号在生成管线中早期注入，从而避免了传统方法中“生成-筛选-优化”的低效循环。
 
-## 背景与动机
+
 
 三维全身抓取合成旨在生成一个完整的人体姿态，使其能够自然地抓取放置在容器（如桌子、架子）上的物体。这一任务在虚拟现实、具身智能和人机交互中具有重要应用。然而，现有方法面临一个核心瓶颈：**生成引导手时缺乏对物体和容器的几何推理，导致手部方向与身体可达方向不兼容**。
 
@@ -61,7 +63,9 @@ claims:
 
 本文的动机正是从这一瓶颈出发：**如果在生成的早期阶段就引入基于几何推理的方向控制信号，使身体和手部的生成结果天然兼容，就能从根本上降低采样数目和优化复杂度，同时提升抓取的真实感**。为此，本文提出 CWGrasp 框架，其核心思路是通过一个统一的几何推理模块——ReachingField——为身体和手部生成提供一致的、场景感知的方向条件，从而实现高效、可控的全身抓取合成。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CWGrasp 的核心创新在于**在生成早期引入基于几何推理的方向可控性**，解决了现有全身抓取合成方法中身体与手部生成不兼容的根本瓶颈。具体而言，该方法通过三个关键机制实现了突破：
 
@@ -98,7 +102,7 @@ CWGrasp 的根本洞察在于：**通过早期几何推理为生成模型注入�
 
 尽管方向兼容性大幅降低了优化难度，CWGrasp 仍保留了优化阶段来精细调整身体姿态。优化目标（Eq. 5）综合了手部匹配、姿态正则、注视方向、地面接触、穿透惩罚和身体倾斜正则等多项损失。其中，身体倾斜正则项 $\mathcal{L}_{reg}$ 的消融实验（Fig. S.5）表明，移除该项会导致身体不自然地向前倾斜以避开容器穿透，验证了其必要性。此外，当 CReach 生成的初始身体与容器存在穿透时，CWGrasp 先将身体沿地面投影方向平移 1 米，再通过优化将其拉回物体位置，有效避免了局部最小值（Fig. 9）。
 
-## 整体框架
+
 
 CWGrasp 是一个将三维全身抓取分解为“方向推理—可控生成—优化精炼”三阶段的框架，其核心创新在于通过早期几何推理为生成模型注入方向可控性，使身体与手部的生成结果天然兼容，从而大幅降低采样数目和优化复杂度。
 
@@ -107,7 +111,7 @@ CWGrasp 是一个将三维全身抓取分解为“方向推理—可控生成—
 整个管线（Fig. 4）由四个模块串联构成：
 
 ![[assets/figures/papers/paper_list_l1659_3D_Whole_body_Grasp_Synthesis_with_Directional_Controllability/figures/004_Figure_4.jpg]]
-*Figure 4: CWGrasp framework. We first sample a single reaching direction from ReachingField. Next, we condition both CGrasp and CReach on the same direction and obtain a guiding hand grasp (shown in blue) and a reaching body (shown in gray), respectively, that satisfy the sampled direction, so they are “compatible” with each other. Finally, an optimization stage refines the body to match the guiding hand while resolving penetrations with the object and/or receptacle. Note that our framework can generate both left- and right-hand grasps. Parts in purple are used for both training and inference, in green only for training, in brown only for inference, and in red for optimization*
+*Figure 4：CWGrasp 从 ReachingField 采样方向，并联合约束 CGrasp 与 CReach。*
 
 1. **ReachingField**：对给定的物体和容器进行几何推理，输出一个概率化的三维可达方向向量场，并从中采样一个可达方向。
 2. **CGrasp**：以采样到的方向为条件，生成与物体形状匹配的引导手抓取姿态（MANO手部网格）。
@@ -141,10 +145,8 @@ CWGrasp 是一个将三维全身抓取分解为“方向推理—可控生成—
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l1659_3D_Whole_body_Grasp_Synthesis_with_Directional_Controllability/figures/001_Figure_1.jpg]]
-*Figure 1: We develop CWGrasp, a novel framework for synthesizing 3D whole-body grasps for an object placed on a receptacle. Our framework builds on a novel combination of geometric-based reasoning and controllable data-driven synthesis methods. By adding a novel controllability in the synthesis process, we achieve realistic results at a fraction of the computational cost w.r.t. the state of the art [54]*
 
-## 核心模块与公式推导
+
 
 CWGrasp 的核心设计思想是通过早期几何推理为生成模型注入方向可控性，使身体和手部生成结果天然兼容。框架由四个关键模块串联构成：ReachingField（方向推理）、CReach（身体生成）、CGrasp（手部抓取生成）和优化精修。
 
@@ -163,14 +165,12 @@ $$p_i = \frac{\exp(-1/(s_i a_i))}{\sum_i \exp(-1/(s_i a_i))}$$
 其中 $s_i$ 为物体沿射线方向的高度分量，$a_i$ 为射线与垂直轴的夹角。该公式的直觉是：靠近地面的物体更可能从上方被抓取，而高处物体更可能从下方被抓取（Fig. 7，颜色编码显示红为高概率、蓝为低概率）。
 
 ![[assets/figures/papers/paper_list_l1659_3D_Whole_body_Grasp_Synthesis_with_Directional_Controllability/figures/007_Figure_7.jpg]]
-*Figure 7: ReachingField – Ray likelihood (Sec. 3.2, Eq. (1)), shown with color-coding; red shows high and blue low likelihood. Objects near the ground are likely grasped from above (left). Objects high above the ground are likely grasped from below (right)*
+*Figure 7：ReachingField 对不同物体高度给出方向似然。*
 
 ### CReach：可控身体到达生成
 
 CReach 在 **GNet** 基础上扩展为条件变分自编码器（cVAE），在给定目标物体/手腕位置的基础上，额外引入期望的三维手臂方向作为条件，实现身体姿态的方向可控合成（Fig. 2）。训练时，手臂方向损失约束生成的手臂方向与目标方向一致：
 
-![[assets/figures/papers/paper_list_l1659_3D_Whole_body_Grasp_Synthesis_with_Directional_Controllability/figures/002_Figure_2.jpg]]
-*Figure 2: Controllable reaching-body synthesis (CReach). We show examples where multiple bodies (shown with several colors) are generated to reach a target wrist location (shown as a green sphere), while having a desired 3D arm direction (gray arrow)*
 
 $$\mathcal{L}_{d_{\mathrm{arm}}} = v_{d_{\mathrm{arm}}} \cdot \mathbb{E} \Big[ \big| d_{\mathrm{arm}} - \bar{d}_{\mathrm{arm}} \big| \Big]$$
 
@@ -210,16 +210,14 @@ $$\mathcal{L}_{\mathrm{opt}} = \lambda_{hm} \mathcal{L}_{hm} + \lambda_{\theta} 
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l1659_3D_Whole_body_Grasp_Synthesis_with_Directional_Controllability/figures/005_Figure_5.jpg]]
-*Figure 5: Arm/hand direction (Sec. 3.2, Filter #1). Left: We cast rays from the object to surrounding space. Right: We prune rays intersecting with a receptacle and keep non-intersecting ones; the latter represent directions an arm/hand can reach the object from*
 
-![[assets/figures/papers/paper_list_l1659_3D_Whole_body_Grasp_Synthesis_with_Directional_Controllability/figures/006_Figure_6.jpg]]
-*Figure 6: Body orientation (Sec. 3.2), Filter #2. We project the curated rays parallel to the ground and detect whether any receptacle parts hinder a body from approaching the object from certain directions; the red rays are discarded, while green ones are kept*
 
 ![[assets/figures/papers/paper_list_l1659_3D_Whole_body_Grasp_Synthesis_with_Directional_Controllability/figures/003_Figure_3.jpg]]
-*Figure 3: Controllable hand-grasp synthesis. The goal is to grasp the red wineglass. Left – GrabNet [50]: Due to GrabNet’s lack of controllability1, sampling its latent space produces plausible grasps (shown with several colors) but with random direction. Right – Our CGrasp: We add controllability, so drawing samples produces plausible and varied grasps (shown with several colors), that have a desired 3D palm direction (shown with a gray arrow)*
+*Figure 3：方向条件使 CGrasp 相比无控制基线生成指定方向的抓取。*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -233,8 +231,6 @@ CWGrasp 在方向可控性、抓取质量、计算效率和用户感知四个维
 - **身体多样性：** CWGrasp 为 61.77 cm，与 FLEX 的 63.86 cm 基本持平（−2.09 cm），说明方向控制并未牺牲生成多样性。
 - **计算效率：** CWGrasp 仅需 **1 个身体样本 + 1 个手部样本**，优化后平均运行时间约 **23 秒**；FLEX 需采样 500 个身体样本并逐一与手部匹配优化，平均耗时 **357 秒**。CWGrasp 实现了约 **16 倍加速**。
 
-![[assets/figures/papers/paper_list_l1659_3D_Whole_body_Grasp_Synthesis_with_Directional_Controllability/figures/015_Figure_11.jpg]]
-*Figure 11: Contact maps: CWGrasp & FLEX [54] (Sec. 4.3). Contact likelihood is color-coded via heatmaps; red denotes a high likelihood and blue a low one. FLEX involves mainly the fingertips, while our CWGrasp also involves parts of the pam*
 
 **感知研究。** 在 28 种配置的用户研究中，CWGrasp 在 **71.23%** 的比较中被参与者认为比 FLEX 更真实（Fig. S.7–S.8），优势幅度达 +42.46 个百分点。这从主观维度验证了方向可控性对抓取自然度的贡献。
 
@@ -243,10 +239,8 @@ CWGrasp 在方向可控性、抓取质量、计算效率和用户感知四个维
 Table 2 将 CGrasp 与三类手部抓取方法对比：基于优化的 DexGraspNet、基于回归的 ContactGen 和 GrabNet。CGrasp 在穿透体积、穿透深度、接触比等指标上与这些方法**性能相当**，同时是唯一具备方向可控性的方法。Figure 10 的接触热力图显示，CGrasp 的接触模式涉及手掌区域，而基线方法主要集中在指尖——这一差异与全身场景下的观察一致，说明 CGrasp 学习到了更丰富的接触先验。
 
 ![[assets/figures/papers/paper_list_l1659_3D_Whole_body_Grasp_Synthesis_with_Directional_Controllability/figures/014_Table_2.jpg]]
-*Table 2: Evaluation: CGrasp & SotA (Sec. 4.2). The “type” column denotes regression (R) or optimization (O) methods. The “control” column indicates whether a method is controllable via directional conditioning. Our CGrasp performs on par with existing methods, while being controllable via a direction condition. That is, the benefit of controllability does not harm performance*
+*Table 2：CGrasp 与现有抓取方法的定量比较及方向可控性。*
 
-![[assets/figures/papers/paper_list_l1659_3D_Whole_body_Grasp_Synthesis_with_Directional_Controllability/figures/012_Figure_10.jpg]]
-*Figure 10: Contact maps: CGrasp & SotA (Sec. 4.2). Contact likelihood is color-coded via heatmaps; red denotes a high likelihood and blue a low one. We compare against DexGraspNet [58], ContactGen [36], and GrabNet [50]. Existing methods involve mostly finger tips, while CGrasp also involves parts of the palm*
 
 ### 消融实验
 
@@ -271,14 +265,16 @@ CWGrasp 在以下情形可能出现次优结果（Fig. S.6）：
 - **Figure 10–11（接触热力图）：** 手掌参与接触是 CWGrasp/CGrasp 区别于所有基线方法的显著特征，说明 InterField 空间感知模块有效编码了手-物体交互的先验。
 
 ![[assets/figures/papers/paper_list_l1659_3D_Whole_body_Grasp_Synthesis_with_Directional_Controllability/figures/008_Figure_8.jpg]]
-*Figure 8: Whole-body grasps produced by CWGrasp (top row) and FLEX [54] (bottom). FLEX samples 500 initial bodies and produces 10 ones; we show the smallest-loss one. Our CWGrasp samples only 1 body and also generates one, yet it produces more realistic grasps*
+*Figure 8：CWGrasp 与 FLEX 的全身抓取定性比较。*
 
 ### 补充图表
 
 ![[assets/figures/papers/paper_list_l1659_3D_Whole_body_Grasp_Synthesis_with_Directional_Controllability/figures/009_Table_1.jpg]]
-*Table 1: Condition accuracy. CReach and CGrasp generate bodies and hands conditioned on a (arm/hand) direction. We report the angular error of the arm/palm direction, the Mean Squared Error (MSE) of wrist joints, and inference time. For CReach we evaluate right- (RA) and left-arm (LA) reaching*
+*Table 1：CReach/CGrasp 的方向误差、腕部误差与推理时间。*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心瓶颈与因果调控
 
@@ -336,6 +332,8 @@ CWGrasp 的四个关键模块构成了一条完整的差异化技术链：
 4. **连续方向控制**：能否将方向可控性融入动态抓取动作生成，实现从任意方向接近并抓取物体的连续运动？当前的方向控制是离散采样的，连续化可支撑更流畅的交互动画。
 
 **需要手动验证的点**：论文中未提供各基线方法的具体作者、会议和年份信息（如 FLEX、GNet、DexGraspNet 等的完整引用元数据），上述方法名称仅基于论文内部引用编号 、、 等，具体出版物信息需查阅原文参考文献列表确认。
+
+
 
 ## 原文 PDF
 

@@ -34,13 +34,17 @@ claims:
 | Topic | #topic/vision_multimodal_applications #topic/generative_models_diffusion #topic/vision_multimodal_applications/image_and_video_generation |
 | Method |  |
 | Dataset | FullBodyManipulation, 3D-FUTURE |
-## 概述
+
+> [!tip] 效果简介
+> 本笔记的既有实验指标、对比结果与适用边界见“实验与关键发现”；本轮仅统一结构，不改写证据。
+
+## 概要
 
 **DecHOI** 是一种面向文本驱动人-物交互动作合成的解耦生成框架，其核心思想是将**轨迹规划**与**精细动作合成**分离为两个级联的扩散模型，从而降低联合优化的复杂度，并消除对人工中间路径点的依赖。轨迹生成器（Trajectory Generator, TG）在给定文本指令、场景几何、当前人/物姿态与目标点的条件下，生成人与物体的全局运动轨迹；动作生成器（Action Generator, AG）则以规划好的轨迹为条件，合成全身动作序列。为进一步提升交互真实感，方法引入了一个聚焦于手部与足部接触的轻量判别器，通过对抗训练减少肢体与物体之间的穿透。
 
 在 **FullBodyManipulation** 和 **3D-FUTURE** 两个基准上，DecHOI 在条件匹配、运动质量、交互质量等多个指标上超越了现有方法。以 FullBodyManipulation 的 FID↓ 为例，DecHOI 达到 **0.33**，显著优于 CHOIS 的 **1.58**（Table 1）。用户研究同样表明，DecHOI 在文本对齐与交互质量上的偏好率均超过 67%。此外，该方法展现出对未见物体类别的泛化能力，并可在长序列动态环境中实现目标导向的、无碰撞的自适应重规划。
 
-## 背景与动机
+
 
 ### 人-物交互运动合成的核心挑战
 
@@ -66,7 +70,9 @@ claims:
 
 在 FullBodyManipulation 基准上，DecHOI 的 FID↓ 达到 **0.33**，相较 CHOIS 的 1.58 降低了 **1.25**（Table 1），验证了解耦范式在运动质量和交互真实感上的显著增益。这一性能跃升构成了本文方法动机的实证支撑。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DecHOI 的核心创新在于将人-物交互（HOI）生成任务解耦为两个级联的子问题——**轨迹规划**与**动作合成**——并通过**接触感知的对抗训练**强化远端关节与物体的空间一致性。这一设计直接回应了现有方法（如 CHOIS）在长序列交互中面临的优化困难、穿透伪影与路径漂移等瓶颈。
 
@@ -116,7 +122,7 @@ DecHOI 的核心创新在于将人-物交互（HOI）生成任务解耦为两个
 
 **总结**：DecHOI 通过“解耦生成 + 对抗精炼”的双重机制，系统性地解决了长序列 HOI 合成中优化困难与接触失真的核心问题。其 changed slots 集中在生成范式的结构性拆分与接触监督的显式对抗化，为动态交互场景提供了更灵活、更稳定的生成框架。
 
-## 整体框架
+
 
 DecHOI 的核心设计是将长时序人-物交互生成分解为两个解耦的阶段：**轨迹生成（Trajectory Generation）** 与 **动作合成（Action Synthesis）**。这一解耦策略直接回应了现有方法（如 CHOIS）中面临的核心瓶颈——同时优化全局路径规划与精细接触动作导致优化景观高度复杂、模型难以收敛，且往往依赖人工预设的中间路点（waypoints）来引导生成。
 
@@ -162,7 +168,7 @@ $$\tilde{\mathbf{P}}_0 = \hat{\mathbf{P}}_0 - \alpha \Sigma_n \nabla_{\mathbf{P}
 ![[assets/figures/papers/paper_list_l986_https_arxiv_org_abs_2512_19049/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of DecHOI for dynamic human-object interaction synthesis. The framework decouples trajectory planning and interaction synthesis, enabling collision detection and responsive re-planning for realistic, contact-consistent motion*
 
-## 核心模块与公式推导
+
 
 ### 3.1 扩散模型基础
 
@@ -229,7 +235,9 @@ $$\tilde { P } _ { 0 } = \hat { P } _ { 0 } - \alpha \Sigma _ { n } \nabla _ { P
 ![[assets/figures/papers/paper_list_l986_https_arxiv_org_abs_2512_19049/figures/003_Figure_3.jpg]]
 *Figure 3: Adversarial module of DecHOI, where a hand and footfocused discriminator contrasts real and generated interactions to enhance contact realism*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：FullBodyManipulation 与 3D-FUTURE 上的定量对比
 
@@ -295,7 +303,9 @@ DecHOI 在两个核心基准上均取得了显著的性能优势。在 FullBodyM
 ![[assets/figures/papers/paper_list_l986_https_arxiv_org_abs_2512_19049/figures/019_Figure_3.jpg]]
 *Figure 3: Example 2AFC interface in which participants read a text instruction and compare two anonymized clips to judge text alignment and interaction quality*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有方法的关系
 
@@ -330,6 +340,8 @@ DecHOI 的解耦策略直接回应了这一瓶颈：将任务拆分为**轨迹�
 5. **评估指标的完备性**：现有评估主要依赖 FID、R-precision、接触准确率等指标，但这些指标与人类对交互自然度的感知之间的相关性尚未被充分验证。用户研究或感知评估的缺失使得“state-of-the-art”的宣称在主观体验维度上缺乏直接支撑。
 
 6. **计算开销**：双阶段扩散模型加对抗训练的推理流程引入了额外的计算开销。论文未报告推理延迟或吞吐量数据，这对于实时交互应用（如机器人遥操作、VR 角色控制）的可行性评估至关重要。
+
+
 
 ## 原文 PDF
 

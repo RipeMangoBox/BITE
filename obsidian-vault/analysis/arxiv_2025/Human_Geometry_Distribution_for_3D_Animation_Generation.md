@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/Human_Geometry_Distribution_for_3D_Animation_Generation.pdf
+project_link: null
+code_link: null
 aliases:
 - HGDAFHA
 - HGD3AG
@@ -42,7 +44,7 @@ claims:
 > - 4d-dress 上，Chamfer Distance (×10⁻⁵) @ 100K采样点 0.52 vs 2.65 (HuGeoDis) (-80.4%)；User study score (质量/自然度/一致性均值) ~4.4 vs ~2.0 (LHM/长时模型估算) (2.2×)。
 > - THuman2 上，FID (原始几何) 14.03 vs 16.16 (HuGeoDis) (-2.13)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：从有限的三维动画数据中生成高保真且服装动态自然的人体动画，面临两个核心挑战：一是现有生成方法难以同时捕捉精细几何与自然布料变形；二是基于KNN的SMPL-化身对应映射（如**HuGeoDis**（Tang et al., arXiv 2025））导致采样分布不均，重建几何不完整且需大量采样点。
 
@@ -55,7 +57,7 @@ claims:
 
 **方法定位**：HuGeoDis-Anim属于“潜在空间分布建模+自回归生成”的方法谱系。它在静态几何生成上继承并改进了HuGeoDis的分布表示，在动画生成上引入身份条件流匹配与对比学习，区别于直接长时监督或无条件自回归的基线方案。
 
-## 背景与动机
+
 
 ### 问题场景与核心挑战
 
@@ -79,7 +81,9 @@ claims:
 
 综合来看，本文的核心洞察在于：通过构建均匀的SMPL-化身对应关系并建模短时动态与长时身份一致性，即使从少量数据中也能够生成多样化且时序连贯的精细服装动画。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 HuGeoDis-Anim 的核心突破在于两个相互耦合的 **changed slots**，它们共同解决了“从有限3D动画数据中同时捕捉高保真几何与自然服装动态”这一瓶颈。
 
@@ -99,7 +103,7 @@ HuGeoDis-Anim 的核心突破在于两个相互耦合的 **changed slots**，它
 
 两个changed slots并非孤立改进：均匀的SMPL-化身映射为潜在空间提供了高质量的几何基础，使紧凑的潜在编码 $\mathbf{z}$ 能够忠实表达精细服装细节；身份条件短时自回归则在紧凑潜在空间中高效建模时序动态，避免了对高维几何的直接长程预测。这种“先建立均匀几何对应，再在紧凑空间中条件生成”的设计，使模型从少量4D数据中也能生成多样化且时序连贯的精细服装动画。
 
-## 整体框架
+
 
 HuGeoDis-Anim 采用两阶段训练范式，将高保真人体几何动画的生成分解为**紧凑潜在空间建模**与**条件自回归动画生成**两个核心阶段，整体流程如 Figure 2 所示。
 
@@ -112,7 +116,7 @@ HuGeoDis-Anim 采用两阶段训练范式，将高保真人体几何动画的生
 
 **推理管线。** 生成时，动画模型从随机噪声出发，自回归地生成潜在向量序列；每帧潜在向量经流匹配模型解码为点云几何，再通过高斯泼溅渲染深度/法向图，最终经泊松重建转化为网格（Figure 1）。整个框架实现了从噪声到多样化、时序连贯且身份一致的精细服装动画的端到端生成。
 
-## 核心模块与公式推导
+
 
 HuGeoDis-Anim 框架由三个紧密耦合的模块构成，分别解决紧凑几何表示、均匀对应映射和时序连贯动画生成问题。
 
@@ -182,7 +186,9 @@ $$
 ![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2512_07459/figures/009_Figure_6.jpg]]
 *Figure 6: The illustration of the supervised model*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验结果
 
@@ -224,7 +230,9 @@ $$
 ![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2512_07459/figures/006_Table_3.jpg]]
 *Table 3: Comparison and ablation study of generated animations*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -291,6 +299,8 @@ $$
 4. **解耦生成与编辑**：通过解耦化身身份与服装几何，是否可以实现对生成动画的精细编辑（如换装、局部修改）？这将显著扩展方法的应用场景。
 
 5. **数据效率的极限**：本文声称在有限数据下工作良好，但未系统研究数据量-性能的 scaling 关系。在极小数据集（如单件服装、单个角色）下的生成质量边界尚不明确。
+
+
 
 ## 原文 PDF
 

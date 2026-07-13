@@ -40,7 +40,7 @@ claims:
 > [!tip] 效果简介
 > - MultiHuman 上，CD (cm) ↓ 3.631 vs 5.644 (SIFU) (-35.7%)；P2S (cm) ↓ 1.752 vs 2.284 (SIFU) (-23.3%)；NC ↑ 0.811 vs 0.754 (SIFU) (+7.6%)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：从单张透视图像重建交互中的多人三维模型面临三重挑战——（1）透视畸变导致几何尺度歧义，（2）现有方法独立处理每个个体，缺乏对群体交互的显式建模，导致接触区域穿透和几何失真，（3）遮挡区域纹理与几何缺失，难以补全（Figure 1）。现有单人类方法（如 **ECON**、**SIFU**、**SiTH**、**PSHuman**）在多人类场景中仅独立重建后拼合，无法推理遮挡与交互关系；多目方法（**DeepMultiCap**）或视频方法（**Multiply**）虽能处理多人，但依赖多视角或时序信息，不适用于单图输入。
 
@@ -52,7 +52,7 @@ claims:
 
 **局限与开放问题**：方法对环境光照变化敏感，未显式建模物体遮挡，且依赖 SMPL-X 初始化精度。未来方向包括引入物体感知推理、提升极端光照鲁棒性，以及减少对参数化姿态先验的依赖。
 
-## 背景与动机
+
 
 从单张图像重建三维人体是计算机视觉与图形学中的核心问题，在虚拟现实、数字人、影视制作等领域有广泛应用前景。近年来，基于数据驱动的方法在**单人体三维重建**上取得了显著进展——从参数化模型（如SMPL/SMPL-X）的拟合，到隐式神经表示与扩散先验驱动的精细化重建，单人的几何与纹理质量已达到较高水平。
 
@@ -68,7 +68,9 @@ claims:
 
 本文提出的 **HUG3D** 框架正是针对这一缺口设计。其核心动机在于：将多人重建从“独立重建后拼合”的范式转变为**交互感知的联合重建**范式，通过引入群体-实例多视图扩散先验与物理约束优化，系统性地解决透视畸变、遮挡补全与交互建模三大挑战。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 HUG3D 的核心创新在于将单目多人三维重建从“独立个体重建后拼合”的范式，推进到“群体交互感知的联合重建”。与现有方法相比，该方法在三个关键环节上实现了根本性改变：
 
@@ -103,7 +105,7 @@ $$\mathcal{L}_{\mathrm{diff}} = \sum_{i=0}^{5} \big( \mathbb{E}_{t,\epsilon} [ \
 
 HUG3D 的三项核心创新构成了一个完整的因果链条：**Pers2Ortho** 解决了“在哪里重建”的表示问题，为多人场景提供了尺度一致的规范空间；**HUG-MVD** 解决了“重建什么”的生成问题，利用群体-实例联合先验补全遮挡区域；**HUG-GR** 解决了“如何保证合理”的约束问题，通过物理感知优化强制交互一致性。这三者协同作用，使得 HUG3D 在 MultiHuman 数据集上实现了 CD 从 5.644 降至 3.631（↓35.7%）、NC 从 0.754 提升至 0.811 的显著性能跃升。
 
-## 整体框架
+
 
 HUG3D 的整体流程由三个核心阶段构成，如图 2 所示：**规范透视-正交视图变换 (Pers2Ortho)**、**群体-实例多视图扩散 (HUG-MVD)** 以及**带纹理网格重建**。给定一张包含多人的单目透视图像，系统首先通过 Pers2Ortho 将其转换到规范正交空间，消除透视畸变和尺度歧义，生成一致的六视图正交表示；随后 HUG-MVD 以此为条件，联合去噪生成多视图 RGB 与法向图，补全被遮挡的几何和纹理区域；最后，在物理约束的几何优化 (HUG-GR) 和遮挡感知纹理融合的驱动下，输出具有交互一致性的带纹理三维网格。
 
@@ -123,7 +125,7 @@ HUG3D 的整体流程由三个核心阶段构成，如图 2 所示：**规范透
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2604_05436/figures/002_Figure_1.jpg]]
 *Figure 1: Core challenges in monocular multi-human 3D reconstruction: (a) geometric complexity and perspective distortion, (b) lack of interaction-aware geometric modeling, and (c) missing texture and geometry in occluded regions. HUG3D addresses all three challenges*
 
-## 核心模块与公式推导
+
 
 HUG3D 框架由四个核心模块级联构成，形成从单张透视图像到带纹理多人三维网格的完整管线（Figure 2）。下面按处理顺序逐一阐述各模块的设计逻辑与关键公式。
 
@@ -200,7 +202,9 @@ $$\mathcal{L}_{\mathrm{vis}} = \frac{1}{2B} \sum_{k=1}^{K} \sum_{b=1}^{B} \frac{
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2604_05436/figures/004_Figure_3.jpg]]
 *Figure 3: Comparison of results from multi-view diffusion trained on perspective vs. orthographic images*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -272,7 +276,9 @@ Table S6 展示了使用 RoBUDDI 预测的掩膜、SMPL-X 参数和相机估计�
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2604_05436/figures/052_Table_S.14.jpg]]
 *Table S.14: Wilcoxon signed-rank test results (p-values) across all evaluation metrics, confirming statistically significant improvements of our method over baselines*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位与基线谱系
 
@@ -313,6 +319,8 @@ HUG3D 的贡献可从三个维度定位其对现有知识库的增量：
 ### 未来方向
 
 从论文的局限性出发，可识别三个有前景的后续研究方向：(1) 引入物体感知推理以处理人体-物体交互遮挡；(2) 提高方法在复杂或极端光照条件下的鲁棒性，可能通过物理渲染增强或光照不变表示；(3) 减少对 SMPL-X 初始化的依赖，探索更端到端的联合估计与重建框架。
+
+
 
 ## 原文 PDF
 

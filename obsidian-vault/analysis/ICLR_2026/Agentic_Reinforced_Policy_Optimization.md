@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Agentic_Reinforced_Policy_Optimization.pdf
+project_link: null
+code_link: https://github.com/RUC-NLPIR/ARPO
 aliases:
 - ARPOA
 - ARPO
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | 智能体强化策略优化 |
 | 英文题名 | Agentic Reinforced Policy Optimization |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=TX4k7BF6aO); [GitHub](https://github.com/RUC-NLPIR/ARPO) |
+| Links | [paper](https://openreview.net/forum?id=TX4k7BF6aO) · [GitHub](https://github.com/RUC-NLPIR/ARPO) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | Agentic Reinforced Policy Optimization (ARPO) |
 | Dataset | 10个推理任务平均, AIME24, AIME25, HLE |
@@ -40,11 +42,11 @@ claims:
 > - AIME24 上，准确率 为 30.0 (Qwen2.5-7B)，对比 GRPO: 23.3，变化 +6.7。
 > - AIME25 上，准确率 为 30.0 (Qwen2.5-7B)，对比 GRPO: 26.7，变化 +3.3。
 
-## 概述
+## 概要
 
 本文提出**智能体强化策略优化** (Agentic Reinforced Policy Optimization, ARPO)，一种专为训练多轮工具调用LLM智能体设计的强化学习算法。ARPO的核心创新在于：通过监测工具调用后token熵的变化，自适应地在高熵决策点进行分支采样，并结合优势归因估计，使LLM能够内化步骤级工具使用行为的优势差异。实验表明，ARPO在10个推理任务上的平均准确率（Llama3.1-8B: 55.3, Qwen2.5-7B: 58.3）优于最佳基线GRPO（51.1, 56.5），且在GAIA和WebwalkerQA上比GRPO提升6%，同时仅使用一半的工具调用预算。
 
-## 背景与动机
+
 
 当前基于轨迹级别的强化学习算法（如GRPO、DAPO）在训练多轮工具调用的LLM智能体时，存在两个关键瓶颈：
 
@@ -52,7 +54,9 @@ claims:
 
 2. **工具调用预算效率低下**：轨迹级RL需要大量工具调用才能获得有效学习信号，而ARPO通过自适应分支采样，以更少的工具调用预算实现更优性能（Figure 1右图）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ARPO的核心洞察是：通过监测工具调用后token熵的变化，自适应地在高熵决策点进行分支采样，结合优势归因估计，使LLM能够内化步骤级工具使用行为的优势差异，从而以更少的工具调用预算实现更优性能。
 
@@ -62,7 +66,7 @@ ARPO的核心洞察是：通过监测工具调用后token熵的变化，自适�
 | 优势估计 | 组级优势（GRPO）：同一组内所有token共享平均优势 | 优势归因估计：共享token段分配平均优势，分支路径token分配独立优势（硬/软两种设置） | Section 3.2 |
 | 计算复杂度 | O(n²)（轨迹级RL） | 介于O(n log n)和O(n²)之间 | Section 3.1 |
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_reinforcement_learning_planning_agents__deep_rl__b001_TX4k7BF6aO_Agentic_Reinforced_Polic/figures/001_Figure_1.jpg]]
 
@@ -76,7 +80,7 @@ ARPO的整体框架如Figure 3所示，包含三个核心模块：
 
 Figure 4展示了ARPO的两个核心组件：左图展示熵基自适应展开如何动态扩展采样，右图展示优势归因如何为组间推理路径中的token分配共享或独立值。
 
-## 核心模块与公式推导
+
 
 ### 5.1 Token熵计算
 
@@ -134,7 +138,9 @@ $$\nabla_\theta J(\theta) = \mathbb{E}_{\tau \sim \pi_\theta} \{ \sum_{T=1}^K [ 
 
 该定理断言，对于任何可微的基于Transformer的策略π_θ和任何目标函数J(θ)，可以使用宏动作有效进行优化。ARPO是该定理的高级实现。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 6.1 主要结果
 
@@ -201,7 +207,9 @@ Figure 6展示了Qwen3-8B和Qwen3-14B使用ARPO在Pass@1到Pass@5指标上的扩
 *Figure 1: Overview of tool-use token entropy exploration and ARPO algorithm performance. Left: High entropy observed in the LLM following tool usage. Right: LLM performance comparison on deep search tasks using only 1k RL samples, along with a comparison of training tool-use budgets.*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ARPO属于**智能体强化学习** (Agentic Reinforcement Learning) 领域，该领域专注于使用RL训练LLM智能体进行多轮工具交互。与轨迹级RL算法（如GRPO、DAPO、REINFORCE++）不同，ARPO通过熵基自适应展开实现步骤级探索，解决了工具调用后高熵步骤的细粒度探索问题。
 
@@ -225,6 +233,8 @@ ARPO的理论基础是**广义策略梯度定理** (Generalized Policy Gradient 
 - ARPO在更大规模模型（如70B+）上的扩展性如何？
 - 分支数量Z和阈值τ的最优选择是否依赖于具体任务？是否存在自适应调整策略？
 - ARPO能否与过程奖励模型（PRM）结合，以提供更细粒度的步骤级反馈？
+
+
 
 ## 原文 PDF
 

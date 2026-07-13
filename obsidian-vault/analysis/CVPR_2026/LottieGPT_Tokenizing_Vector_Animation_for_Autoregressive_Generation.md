@@ -43,7 +43,7 @@ claims:
 > - LottieBench Static Graphics (Text+Image) 上，SSIM↑ 0.8151 (LottieGPT-Stage1) vs 0.3851 (StarVector) (+0.4300)。
 > - LottieBench Animation (Text-Only) 上，LPIPS↓ 0.0366 (LottieGPT-Stage2) vs 0.2528 (GPT-5 few-shot) (-0.2162)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有生成模型仅能输出固定分辨率的栅格视频，无法生成矢量动画，导致分辨率无关性、可编辑性和结构化运动信息完全丢失。
 
@@ -60,7 +60,7 @@ claims:
 
 **局限与开放问题**：矢量图形固有的颜色表示难以表达复杂渐变与纹理；当前分词器对粒子系统、复杂路径、高级混合模式和 3D 变换的编码效率较低；受限于上下文长度，长时序动画的时序一致性仍具挑战。未来方向包括扩展分词器以支持更丰富的动画效果、设计层次化生成策略突破长度限制，以及探索矢量与光栅混合表示。
 
-## 背景与动机
+
 
 ### 矢量动画的表示困境
 
@@ -82,7 +82,9 @@ claims:
 
 本文的核心动机在于：将矢量动画重新定义为**结构化代码**而非像素序列，利用Lottie格式天然具备的层次化图层和关键帧插值表示，设计专用分词器将动画压缩为紧凑的令牌序列，使自回归视觉语言模型能够高效学习生成可编辑、分辨率无关的矢量动画。这一思路的关键洞察是：Lottie的关键帧+缓动表示天然支持时间压缩——仅存储关键帧和插值方法，而非逐帧数据，可大幅缩减序列长度（约34–63%），同时完整保留结构信息和运动质量。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈与动机
 
@@ -137,7 +139,7 @@ LottieGPT 通过专用分词器与两阶段训练，首次将自回归视觉语�
 
 当前 Lottie Tokenizer 对复杂效果（粒子系统、高级混合模式、3D 变换等）的编码效率较低，且受限于视觉语言模型的上下文长度，长时序复杂动画的生成仍具挑战。如何扩展分词器以覆盖更丰富的动画效果、设计层次化生成策略突破上下文限制，是值得探索的方向。
 
-## 整体框架
+
 
 LottieGPT 的整体框架建立在预训练视觉语言模型 **Qwen2.5-VL** 之上，通过引入专用的 **Lottie Tokenizer** 和两阶段课程学习策略，将矢量动画生成转化为自回归令牌预测任务。图3展示了系统的完整架构。
 
@@ -167,7 +169,7 @@ $$\mathcal{L} = - \sum_{i=1}^{N} \log P(t_i \mid t_{<i}, \mathbf{c})$$
 ![[assets/figures/papers/paper_list_l994_https_arxiv_org_abs_2604_11792/figures/002_Figure_2.jpg]]
 *Figure 2: Data curation pipeline. We collected 10M SVG resources and 660K After Effects (AE) animation resources from the internet, then converted them to Lottie Json format, filtered them using simplification algorithms that do not affect rendering results, and used QwenVL to generate text labels for vector graphics and vector animations*
 
-## 核心模块与公式推导
+
 
 LottieGPT 的核心架构由三个关键模块构成：**Lottie Tokenizer**（动画标记化）、**Qwen2.5-VL 视觉语言骨干**（多模态编码）与**自回归语言模型**（序列生成）。三者协同实现从文本或图像条件到结构化 Lottie JSON 的端到端生成。
 
@@ -230,7 +232,9 @@ $$\mathcal{L} = - \sum_{i=1}^{N} \log P(t_i \mid t_{<i}, \mathbf{c})$$
 
 其中 $t_i$ 为第 $i$ 个令牌，$\mathbf{c}$ 为多模态条件（文本或文本+图像前缀）。训练采用两阶段课程学习策略：Stage 1 在静态 Lottie 图像数据上学习矢量构图基础，Stage 2 引入时间动态学习关键帧驱动的动画生成。消融实验证实，仅完成 Stage 1 的模型在动画生成上的有效率仅为 78.35%，而完整两阶段训练后提升至 96.96%（Table 2），验证了该策略的必要性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -302,7 +306,9 @@ LottieGPT 的典型失败案例（Figure 13）表现为可渲染但视觉不一�
 ![[assets/figures/papers/paper_list_l994_https_arxiv_org_abs_2604_11792/figures/016_Figure_12.jpg]]
 *Figure 12: A manually edited Lottie animation where we modified the wing color using LottieLab*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位与基线对比
 
@@ -363,6 +369,8 @@ LottieGPT 的能力边界受以下因素制约：
 4. **可编辑性的量化评估**：当前评估体系主要关注渲染质量和结构相似度，但矢量动画的核心价值——可编辑性——尚未有系统的量化指标。如何设计衡量生成动画的图层可分离性、运动可调整性和形状可修改性的评估基准，是推动该领域发展的关键问题。
 
 5. **交互式动画编辑的闭环**：LottieGPT 生成的动画已展示出在 LottieLab 中进行手动编辑的能力（Figure 12），但如何实现“生成-编辑-再生成”的交互闭环，使用户能够通过自然语言指令迭代修改动画的特定属性，是一个具有实际应用价值的方向。
+
+
 
 ## 原文 PDF
 

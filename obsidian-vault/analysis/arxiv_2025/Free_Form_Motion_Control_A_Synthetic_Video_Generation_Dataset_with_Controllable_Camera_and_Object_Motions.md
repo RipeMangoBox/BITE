@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/Free_Form_Motion_Control_A_Synthetic_Video_Generation_Dataset_with_Controllable_Camera_and_Object_Motions.pdf
+project_link: null
+code_link: null
 aliases:
 - FFMCF
 - FFMCSVGDCCOM
@@ -42,7 +44,7 @@ claims:
 > - SynFMC test set 上，CamTransErr 18.12 vs CameraCtrl / MotionCtrl (comparable) (comparable)；CamRotErr 1.03 vs CameraCtrl / MotionCtrl (comparable) (comparable)；ObjTransErr 42.25 vs MotionCtrl (significantly higher) (significantly lower)。
 > - User study 上，Quality Score 0.91 vs CameraCtrl / MotionCtrl (higher)；Camera Motion Score 0.95 vs CameraCtrl / MotionCtrl (higher)；Object Motion Score 0.98 vs CameraCtrl / MotionCtrl (much higher)。
 
-## 概述
+## 概要
 
 可控视频生成的核心瓶颈在于：现有方法缺乏同时提供相机与物体完整6D姿态标注的数据集，导致无法在三维空间中独立或联合控制相机与物体运动。本文提出**Free-Form Motion Control (FMC)**，通过构建合成数据集**SynFMC**并设计解耦训练策略，首次实现了相机与物体6D姿态的自由形式控制。
 
@@ -50,7 +52,7 @@ claims:
 
 **方法定位**：FMC属于基于预训练文本到视频扩散模型（如**AnimateDiff**, Guo et al., ICLR 2024）的运动注入式控制方法，通过Camera Motion Controller (CMC)和Object Motion Controller (OMC)两个轻量级模块实现解耦控制。与仅支持2D相机姿态的**CameraCtrl**（He et al., arXiv 2024）和存在运动纠缠问题的**MotionCtrl**不同，FMC首次提供了完整的6D物体姿态控制能力。
 
-## 背景与动机
+
 
 可控视频生成旨在让用户精确操纵视频中的运动元素，包括相机运动和物体运动。然而，现有方法在这一目标上存在根本性瓶颈：**缺乏同时包含相机和物体完整6D姿态标注的数据集**，导致模型无法在三维空间中独立或联合控制相机和物体运动。
 
@@ -64,7 +66,9 @@ claims:
 
 针对上述问题，本文的动机明确：**构建首个同时提供相机和物体6D姿态标注的合成数据集，并设计相应的解耦训练策略，实现相机与物体运动的独立或联合控制**。为此，本文提出SynFMC合成数据集和Free-Form Motion Control (FMC)方法，通过三阶段解耦训练和专用的区域损失函数，在合成数据上学习分离全局与局部运动，从而在推理时生成高保真且运动可控的视频。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本节聚焦 FMC 相对于现有运动控制方法的三个关键创新维度：训练数据、运动控制模块设计和损失函数策略。这些创新共同解决了当前视频生成中相机与物体运动无法解耦控制的核心瓶颈。
 
@@ -131,7 +135,7 @@ FMC 采用三阶段训练策略实现域适应与运动解耦的渐进学习（F
 | 损失函数 | 标准扩散 MSE 损失 | $L_{cam}$ + $L_{obj}$ 区域加权 | 前景/背景运动解耦 |
 | 训练策略 | 端到端联合训练 | 三阶段渐进解耦 | 避免模块间梯度冲突 |
 
-## 整体框架
+
 
 FMC 的整体训练与推理架构围绕**解耦相机运动与物体运动**这一核心目标设计，采用三阶段渐进训练策略，在预训练文本到视频（T2V）扩散模型的基础上逐步注入运动控制能力。
 
@@ -173,7 +177,7 @@ $\mathcal{M}_{fg}$ 为前景掩码，使 OMC 专注于学习物体运动，同�
 ![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2501_01425/figures/009_Figure_7.jpg]]
 *Figure 7: The architecture of FMC. In the first stage, we randomly sample the images from synthetic videos and update the parameters from injected Domain LoRA. Next, the modules from CMC are learned. It consists of two parts: Camera Encoder and Camera Adapter, where the Camera Adapter is introduced into the temporal modules. Finally, we train the Object Encoder from OMC. It receives the 6D object pose features, which are repeated in the corresponding object region. We use Gaussian blur kernel centered at the centroid to prevent the need of precise masks. Then, the output is multiplied by the coarse masks to modulate the features in the main branch*
 
-## 核心模块与公式推导
+
 
 FMC 方法的核心由三个关键模块构成，并通过两个专用损失函数实现相机与物体运动的解耦控制。
 
@@ -250,7 +254,9 @@ FMC 的分阶段训练是实现运动解耦的关键设计：
 ![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2501_01425/figures/006_Figure_4.jpg]]
 *Figure 4: Camera motion types. We decompose camera motion into 3 aspects. (a) Viewpoint controls camera orientation when capturing object. 1 - 5 present front/back, left/right and top perspectives. (b) Distance and (c) Height determine horizontal and vertical distance between camera and object, respectively. 6 - 9 are zoom in/out and up/down, respectively. The “static” types are omitted in (b) and (c), which stand for fixed distances*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与实验动机
 
@@ -328,7 +334,9 @@ FMC在视频运动控制方法谱系中的定位可通过Table 2和实验对比�
 ![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2501_01425/figures/008_Figure_6.jpg]]
 *Figure 6: Domain LoRA. We sample the first frame of generated videos under without and with Domain LoRA settings*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有运动控制方法的谱系关系
 
@@ -375,6 +383,8 @@ FMC 与最相关基线 MotionCtrl 的核心差异体现在三个层面，这三�
 3. **跨域泛化能力验证。** 合成数据训练的模型在真实世界场景下的泛化能力需要系统性的基准测试和评估协议，这是将该方法推向实际应用的关键一步。
 
 4. **额外输入模态的融合。** 论文指出未来需要额外输入模态（如图像）来定制参考主体的运动视频，这暗示了将 FMC 与个性化生成、视频编辑等任务结合的可能性。
+
+
 
 ## 原文 PDF
 

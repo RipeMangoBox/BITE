@@ -43,7 +43,7 @@ claims:
 > - 6 real-world scenes 上，Imaging Quality ↑ 0.702 vs 0.701 (Runway-V2V) (+0.001)；DINO Structure Score ↓ 0.38 vs 0.68 (Runway-V2V) (-0.30)。
 > - User study (86/88 participants) 上，Perceptual Realism preference rate (Image/Video) FieryGS preferred at 88.9% / 77.8% (vs AutoVFX) vs AutoVFX。
 
-## 概述
+## 概要
 
 **问题与瓶颈**：在真实世界场景中合成火焰效果是一项极具挑战的任务。传统基于物理的计算流体力学（CFD）和视觉特效（VFX）管线依赖繁琐的手工建模与参数调试，商业软件（如SimsUshare）多局限于预录制效果的简单叠加，而新兴的大型视频生成模型（如Runway Gen-3 Alpha）虽能产生视觉上逼真的火焰，却缺乏对场景几何与物理一致性的保证。现有方法无法在单一框架内同时实现视觉真实性与物理可控的火焰合成。
 
@@ -51,7 +51,7 @@ claims:
 
 **主要结果**：在6个真实场景上的定量评估表明，FieryGS 在美学质量（Aesthetic Quality 0.624）和结构保持（DINO Structure Score 0.38）上均优于 AutoVFX、Runway-V2V 和 Instruct-GS2GS 等基线方法。用户研究中，FieryGS 在感知真实性与物理合理性上的偏好率分别高达 88.9% 和 86.6%，显著领先于基线。MLLM 材料推理模块的平均准确率达 89.31%，为物理模拟提供了可靠输入。整体框架模拟与渲染阶段平均每帧耗时 2.37 秒，GPU 显存低于 10.0 GB，展现了实用化的计算效率。
 
-## 背景与动机
+
 
 火焰合成是计算机图形学、视觉特效（VFX）与安全仿真等领域的长期核心需求。真实世界中的燃烧过程——如消防演练中的实火训练（Figure 2左）或全尺寸燃烧实验中的火焰蔓延测试（Figure 2右）——受材料属性、几何结构、气流和热传递等多重物理因素的共同支配，表现出高度复杂的时空动态。然而，在任意真实场景中生成既视觉逼真又物理可控的火焰，至今仍是一个悬而未决的难题。
 
@@ -61,7 +61,9 @@ claims:
 
 FieryGS正是在这一动机下提出的。其核心洞察是：利用多模态大语言模型（MLLM）的零样本推理能力，从3DGS重建中自动提取燃烧相关的物理属性，以此驱动物理仿真，并最终通过统一的体积渲染管线将火焰、烟雾和3DGS场景无缝融合。这一设计使得火焰能够自动适应真实场景的几何与材料，同时提供对点火位置、火焰强度和气流方向等关键参数的直观控制，首次实现了在真实世界场景中既物理合理又可交互控制的动态火焰合成。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FieryGS 的核心创新在于将多模态大语言模型（MLLM）的材料推理、体积燃烧模拟与 3D 高斯泼溅（3DGS）渲染紧密耦合，首次实现了在真实世界场景中既物理合理又可精确控制的动态火焰合成。其关键突破体现在以下五个维度。
 
@@ -93,7 +95,7 @@ Figure 5 的渲染组件分解验证了炭化、烟雾、火焰和 Phong 光照�
 
 整体框架模拟与渲染阶段平均每帧耗时 **2.37 秒**，GPU 显存低于 10.0 GB（Table 6），证明了计算效率。此外，FieryGS 还引入了基于扩散视频模型 **Wan2.1** 的可选生成式精炼模块，可进一步提升视觉保真度，但该模块在长时间序列中存在时间一致性限制（Figure 11）。
 
-## 整体框架
+
 
 FieryGS 的核心设计理念是将**物理燃烧模拟**与**3D高斯泼溅（3DGS）场景重建**紧密耦合，通过多模态大语言模型（MLLM）作为桥梁，自动从真实场景的多视角图像中推断燃烧所需的物理属性。整个 pipeline 如图3所示，由五个关键模块串联构成一个端到端的合成系统。
 
@@ -133,7 +135,7 @@ $$L = L_{\mathrm{fire}} + L_{\mathrm{smoke}} + \hat{T} ( L_{\mathrm{GS}} + L_{\m
 ![[assets/figures/papers/paper_list_l81_https_openreview_net_forum_id_ziKFH7whvy/figures/005_Figure_3.jpg]]
 *Figure 3: Overall Pipeline of FieryGS. Given multi-view images as input, we first apply PGSR (Chen et al., 2024) to reconstruct scenes with high-quality normal and depth. Next, we leverage MLLM to infer combustionrelated properties, such as material type and burnability. Based on these, we conduct combustion simulations, enabling fire and charring effects with user control. A unified volumetric renderer seamlessly integrates 3DGS and fire, accounting for smoke scattering, fire illumination, and charring, producing realistic fire results*
 
-## 核心模块与公式推导
+
 
 FieryGS 的核心架构由三个紧耦合模块构成，形成从场景理解到物理模拟再到统一渲染的完整闭环。
 
@@ -197,7 +199,9 @@ $$
 ![[assets/figures/papers/paper_list_l81_https_openreview_net_forum_id_ziKFH7whvy/figures/007_Figure_5.jpg]]
 *Figure 5: Rendering Components Breakdown. Starting with the original view (a), we first add the charring effect (b). Next, we incorporate the simulated smoke (c), followed by the simulated fire (d). Finally, Phong illumination enhances the ground lighting effect caused by the fire, allowing the originally dark shadow to be brightened (e). An optional generative refinement can further enhance the ground reflection (f)*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 定量评估
 
@@ -274,7 +278,9 @@ Figure 7 展示了 FieryGS 的用户控制能力。通过改变点火位置（�
 ![[assets/figures/papers/paper_list_l81_https_openreview_net_forum_id_ziKFH7whvy/figures/014_Table_4.jpg]]
 *Table 4: GPT-4o API call counts per scene for combustion property reasoning*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 FieryGS 处于真实场景火焰合成这一交叉领域，其核心贡献在于将**物理模拟的因果可控性**与**3DGS 的场景保真度**首次紧密耦合，填补了现有方案在“真实世界场景中物理合理且可控的火焰合成”这一关键空白。
 
@@ -318,6 +324,8 @@ FieryGS 在以下维度上建立了新的能力边界：
 - **计算效率**：模拟与渲染阶段平均每帧耗时 2.37 秒，GPU 显存低于 10.0 GB，证明了在消费级硬件上的可行性。
 
 该方法为后续研究开辟了若干方向：如何在模拟中加入质量损失和热降解以增强物理真实感，如何模拟火焰的二次传播过程，如何扩展至大规模场景，以及如何提高 MLLM 推理在低可见度和遮挡条件下的鲁棒性。
+
+
 
 ## 原文 PDF
 

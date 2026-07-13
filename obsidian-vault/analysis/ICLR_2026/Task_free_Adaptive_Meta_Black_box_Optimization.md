@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Task_free_Adaptive_Meta_Black_box_Optimization.pdf
+project_link: null
+code_link: null
 openreview_forum_id: AufVSUgMUo
 aliases:
 - AAMBBOM
@@ -42,7 +44,7 @@ claims:
 > - BBOB f8 (d=500) 上，平均目标值 ± 标准差 为 8.886e+4 ± 1.267e+5，对比 CMAES 2.827e+5 ± 6.292e+4，变化 ABOM 显著更优。
 > - UAV 路径规划（28 个地形） 上，归一化平均成本 为 最低（见图 3），对比 各基线中次优值，变化 ABOM 收敛最快且最终成本最低。
 
-## 概述
+## 概要
 
 黑盒优化（BBO）在超参数调优、神经结构搜索和机器人控制等应用中至关重要，但传统进化算法依赖手工设计的启发式算子，而新兴的元黑盒优化（MetaBBO）方法虽然能从任务分布中学习优化策略，却需要预定义训练任务分布 $\mathcal{F}$。当实际应用中目标任务的分布未知或数据稀缺时，这种依赖严重限制了 MetaBBO 方法的泛化与部署能力。
 
@@ -50,7 +52,7 @@ claims:
 
 实验结果表明，ABOM 在无需任何手工训练任务的前提下，于 BBOB 合成基准（维度高达 500）和 28 个无人机路径规划实际问题上，取得了优于或可比肩传统自适应方法（如 CMAES）和基于元学习的基线方法（如 GLEET、RLDEAFL）的性能。消融研究进一步证实，参数自适应、交叉和变异三个组件均为 ABOM 的关键组成部分，移除任一部分均会导致性能显著恶化。可视化分析揭示，学习到的选择矩阵和变异矩阵呈现出统计显著且可解释的搜索模式，包括对高适应度个体的选择偏向和一致的基因交互模式。
 
-## 背景与动机
+
 
 黑盒优化（Black-box Optimization, BBO）在科学发现、工程设计、超参数调优等众多领域中扮演着核心角色。其目标是在没有梯度信息、仅能通过查询获取目标函数值的条件下，寻找全局最优解：
 
@@ -66,7 +68,9 @@ $$J(\pmb\theta) = \operatorname*{max}_{\pmb\theta \in \Theta} \mathbb{E}_{f \sim
 
 这一缺陷揭示了当前 MetaBBO 范式的结构性缺口：**如何在无需任何预定义训练任务的前提下，实现对任意目标黑盒优化任务的零样本自适应？** 这要求优化器能够完全摆脱对 $\mathcal{F}$ 的依赖，转而仅利用目标任务的在线优化数据来动态调整其搜索行为。本文提出的 ABOM（Adaptive meta Black-box Optimization Model）正是针对这一核心问题，通过构建一个端到端可微的进化优化框架，将参数学习与优化过程融为一体，从根本上消除了任务分布依赖。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈突破：从“任务分布依赖”到“任务无关自适应”
 
@@ -119,7 +123,7 @@ ABOM 的核心洞察在于：**通过将选择、交叉和变异算子参数化�
 
 ABOM 的创新不仅体现在经验性能上，还具备理论层面的保障。在满足搜索空间紧致且全局最优点位于内部等假设条件下，ABOM 几乎必然收敛到全局最优值：$ f_t^* \xrightarrow{a.s.} f^* \quad \text{as} \quad t \to \infty $（Eq. 14）。这一理论结果将可微进化算子的自适应学习与经典进化算法的收敛分析框架桥接起来，为方法的可靠性提供了形式化支撑。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_AufVSUgMUo/figures/001_Figure_1.jpg]]
 *Figure 1: Conceptual comparison: (Left) MetaBBO methods learn meta-strategies from task distributions but depend on handcrafted training tasks; (Right) Our framework performs adaptive parameter learning using self-generated optimization data, eliminating task distribution dependency*
@@ -139,7 +143,7 @@ ABOM 将传统进化算法的种群迭代过程重构为一个端到端可微的
 
 整个框架的计算复杂度为 $O(N d d_A + N^2 d_A + N d_A d_M + N d_M d + d^2 d_A + d d_A d_M)$，其中 $d_A$ 为注意力维度，$d_M$ 为隐藏维度。在高维场景下，$O(d^3)$ 项可能成为计算瓶颈。理论分析表明，在搜索空间紧致且全局最优点位于内部的假设下，ABOM 几乎必然收敛到全局最优值 $f_t^* \xrightarrow{a.s.} f^*$，其收敛性由精英归档的单调改进与变异模块的非零探索概率共同保证。
 
-## 核心模块与公式推导
+
 
 ABOM 将传统进化算法的离散算子空间统一为一个端到端可微的连续参数空间 $\pmb{\theta}$，从而消除了对预定义任务分布 $\mathcal{F}$ 的依赖。其核心优化目标直接由目标任务的累积在线数据 $\mathcal{M}^{(t)}$ 驱动：
 
@@ -181,7 +185,9 @@ $$f_t^*\xrightarrow{a.s.} f^* \quad as \quad t\to\infty$$
 
 该保证源于可微算子中 Dropout 引入的非零探索概率——对任意 $\delta > 0$，有 $\mathbb{P}(\exists i : \|\hat{\mathbf{p}}_i^{(t)} - \mathbf{x}^*\| < \delta \mid \mathcal{F}_t) \geq 1 - (1 - \gamma)^N > 0$，结合精英保留策略确保了全局收敛性（Eq. 14, Section 3.4）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈的实证验证
 
@@ -303,7 +309,9 @@ Figure 5 分析了四个关键超参数在 BBOB（d=30）上的敏感性：
 ![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_AufVSUgMUo/figures/022_Table_8.jpg]]
 *Table 8: The comparison results of the baselines on the BBOB suite with d = 100. All results are reported as the mean and standard deviation (mean ± std) over 30 independent runs. Symbols “−”,$^ { 6 6 } { \approx } ^ { 5 3 }$ , and “+” imply that the corresponding baseline is significantly worse, similar, and better than ABOM on the Wilcoxon rank-sum test with 95% confidence level, respectively. The best results are indicated in bold, and the suboptimal results are underlined*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位与核心瓶颈
 
@@ -379,6 +387,8 @@ MetaBBO 代表了从“手工设计”到“学习设计”的范式转变。ABO
 5. **问题类型扩展**：ABOM 在约束优化、离散优化或多目标优化问题上的表现如何？当前框架主要针对无约束连续优化设计。
 
 6. **知识迁移机制**：在 ABOM-PT 中，低相似度任务究竟传递了何种可迁移的优化知识？如何更有效地利用这些知识是一个值得深入探索的方向。
+
+
 
 ## 原文 PDF
 

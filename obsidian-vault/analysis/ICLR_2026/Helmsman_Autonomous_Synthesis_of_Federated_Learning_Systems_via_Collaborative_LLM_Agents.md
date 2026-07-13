@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Helmsman_Autonomous_Synthesis_of_Federated_Learning_Systems_via_Collaborative_LLM_Agents.pdf
+project_link: null
+code_link: https://github.com/haoyuan-l/Helmsman
 openreview_forum_id: Voiy13SK3r
 aliases:
 - Helmsman
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | Helmsman：通过协作式LLM代理自主合成联邦学习系统 |
 | 英文题名 | Helmsman: Autonomous Synthesis of Federated Learning Systems via Collaborative LLM Agents |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=Voiy13SK3r); [GitHub](https://github.com/haoyuan-l/Helmsman) |
+| Links | [paper](https://openreview.net/forum?id=Voiy13SK3r) · [GitHub](https://github.com/haoyuan-l/Helmsman) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/planning_control |
 | Method | Helmsman |
 | Dataset | CIFAR-10N (Label Noise), HAR (User Heterogeneity), Speech Commands (Speaker Variation), Fed-ISIC2019 (Site Heterogeneity) |
@@ -41,7 +43,7 @@ claims:
 > - HAR (User Heterogeneity) 上，Accuracy (%) 为 96.28±0.42，对比 95.19±0.75 (FedNova*)，变化 +1.09。
 > - Speech Commands (Speaker Variation) 上，Accuracy (%) 为 86.58±0.38，对比 83.48±0.49 (FedNova*)，变化 +3.10。
 
-## 概述
+## 概要
 
 联邦学习（FL）的设计空间正面临难以驾驭的组合复杂性：数据异质性、系统约束、任务目标变化等多维挑战与日益增多的专门策略之间形成指数级组合，使得端到端FL系统的研发高度依赖领域专家的手工设计。这种手动范式不仅耗时且易出错，更成为阻碍FL在真实场景中广泛采用的瓶颈。
 
@@ -54,7 +56,7 @@ claims:
 
 在覆盖16个任务的AgentFL-Bench基准上，Helmsman合成的策略在多个异构FL场景中达到最佳性能——在标签噪声（CIFAR-10N）、用户异构（HAR）、说话人变化（Speech Commands）、站点异构（Fed-ISIC2019）等任务上显著优于FedAvg和FedProx，并经常超越专门设计的方法（如FedNova、FedNS、HeteroFL）。尤其在持续学习任务Split-CIFAR100上，Helmsman合成的方法取得了50.95%的准确率，远超专门基线FedWeIT的29.45%（+21.50个百分点），证明了自动化合成复杂策略的能力。消融实验进一步揭示，移除双层验证导致所有任务成功率为0%，验证了自主评估与精炼循环的关键性。
 
-## 背景与动机
+
 
 联邦学习（Federated Learning, FL）允许多个参与方在不共享原始数据的前提下协同训练机器学习模型，在隐私敏感的应用场景中展现出巨大潜力。然而，联邦学习系统的实际设计过程远非简单——它要求研究者同时应对数据异质性、系统异质性、通信效率、个性化、持续学习以及隐私约束等多重挑战。这些挑战并非孤立存在，而是以组合方式叠加，形成了**棘手的设计空间**（intractable design space，参见图2）：针对标签噪声、用户异构、资源约束等不同问题，存在FedProx、FedNova、FedNS、HeteroFL、FedPer、FedWeIT等大量专门化的策略，而将这些策略与具体任务约束进行匹配，需要深度的领域知识和大量的试错实验。
 
@@ -64,7 +66,9 @@ claims:
 
 上述缺口揭示了一个核心矛盾：**联邦学习系统的设计复杂性已经超出了单一LLM代理的处理能力，但该领域的自动化需求又极为迫切**。本文的动机正是弥合这一鸿沟——能否通过结构化的多智能体协作，将人类专家的联邦学习研发工作流系统性地转化为自动化流水线，从而在保持生成质量的同时，大幅降低设计门槛？
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Helmsman的核心创新在于将联邦学习系统的端到端研发流程从“专家手工设计”转变为“多智能体协作的自动化合成”。这一转变并非简单的自动化替换，而是通过三个紧密耦合的机制——**交互式规划**、**模块化编码**和**自主评估闭环**——来导航FL设计空间的组合复杂性，从而在无需人工编码的前提下，生成性能媲美甚至超越手工设计的FL解决方案。
 
@@ -107,7 +111,7 @@ $$C _ { i + 1 } = f _ { d e b u g } ( C _ { i } , \bar { E } _ { i } )$$
 
 Helmsman展现出了超越简单策略选择的**组合策略合成能力**。在持续学习任务Split-CIFAR100上，系统自主合成了一个将客户端经验回放与全局模型蒸馏相结合的混合策略，取得了50.95%的准确率，远超FedAvg（15.38%）、FedProx（15.86%）和专门设计的FedWeIT（29.45%）（Table 4）。这种组合策略并非来自预定义的模板库，而是系统在理解任务需求后自主生成的创新方案，体现了从“策略选择”到“策略合成”的质变。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_Voiy13SK3r/figures/002_Figure_1.jpg]]
 *Figure 1: The automated FL development workflow of Helmsman. (a) Planning: A user query is refined into an actionable research plan via human-in-the-loop dialogue. (b) Coding: Specialized agent teams, managed by a Supervisor, collaboratively build a modular codebase. (c) Evaluation: The final code is autonomously tested and refined in a closed simulation loop until correct*
@@ -136,7 +140,7 @@ Helmsman 是一个多智能体系统，其核心设计思想是将联邦学习�
 
 整个系统的输入输出流可概括为：**用户查询 → 研究计划（经 HITL 确认）→ 模块化代码基（经依赖感知的协作编码）→ 可执行的 FL 解决方案（经双层验证与修复闭环）**。系统的 LLM 后端采用 Gemini-2.5-flash 负责规划，Claude-Sonnet-4.0 负责编码与评估，底层基于 LangGraph 和 LangChain 框架构建。
 
-## 核心模块与公式推导
+
 
 ### 系统架构总览
 
@@ -194,7 +198,9 @@ $$C_{i+1} = f_{debug}(C_i, \bar{E}_i)$$
 
 规划阶段产出的研究计划经HITL确认后，传递至Supervisor Agent进行模块分解。Supervisor生成的蓝图驱动四个Coder-Tester团队并行开发，各模块完成后由Evaluator在沙盒中集成执行。若双层验证失败，Debugger介入修补，修补后的代码基重新进入仿真循环。这一数据流确保了从高层语义查询到可执行代码基的端到端自动化，同时通过人在回环节点保留人类对关键决策的控制权。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果：异构联邦学习基准性能
 
@@ -275,7 +281,9 @@ Tables 8–12将Helmsman与Codex和Claude Code进行了全面对比，涵盖成�
 ![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_Voiy13SK3r/figures/014_Table_10.jpg]]
 *Table 10: Comprehensive performance comparison across federated learning tasks (Part c: Q7-Q9). For each task, we report Cost ($, lower the better), Total Tokens (in thousands, lower the better), Walltime (seconds, lower the better), and Outcome. Best results per metric are in bold*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 在联邦学习自动化设计谱系中的位置
 
@@ -338,6 +346,8 @@ Helmsman 本身不是一个具体的联邦学习算法，而是一个**算法合
 - **非功能性需求对齐**：在完全无人类参与的情况下，Helmsman 生成的系统如何保证与伦理、公平性、隐私保护等非功能性需求的长期对齐？当前系统通过 HITL 间接处理这些需求，但自动化对齐机制尚未被探索。
 
 - **成本与性能的帕累托前沿**：Tables 8-12 显示不同 LLM 后端（GPT-5.1 vs. Claude-Sonnet-4.5）在成本、延迟和成功率之间存在权衡。是否存在更优的代理分工策略或模型选择策略，能够在保持 100% 成功率的同时进一步降低成本？这需要更系统的成本-性能联合优化研究。
+
+
 
 ## 原文 PDF
 

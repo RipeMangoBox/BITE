@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2022
 pdf_ref: paperPDFs/ICLR_2022/Low_Budget_Active_Learning_via_Wasserstein_Distance_An_Integer_Programming_Approach.pdf
+project_link: null
+code_link: null
 aliases:
 - WCSSGBDWEP
 - LBALWDIPA
@@ -41,7 +43,7 @@ claims:
 > - CIFAR-10 上，classification accuracy (%) at B=20 为 Wass.+EOC+P 显著优于最佳基线，对比 最佳基线（WAAL/k-centers），变化 +9.1%。
 > - Office-31 (Web → Amazon) 上，域适应准确率 (%) at B=50 为 65.9 ± 2.3 (Wass.+EOC+P)，对比 61.9 ± 2.1 (k-centers)，变化 +4.0。
 
-## 概述
+## 概要
 
 **核心问题**：在极低标注预算（例如仅标注不到1%的样本）下，现有主动学习启发式策略（如基于不确定性的采样、k-Center贪心核心集）无法保证选出全局最具代表性的样本，导致下游分类性能显著下降；而直接求解核心集选择的混合整数规划（MILP）又因计算不可行而难以应用。
 
@@ -57,7 +59,7 @@ claims:
 
 **方法定位**：该方法属于基于代表性的核心集选择路线，但区别于贪心或启发式近似，它通过整数规划全局优化Wasserstein距离，特别适合**低预算、高质量覆盖**的主动学习场景。其代价是运行时间显著长于启发式基线（数小时 vs 数秒），但在需要精准选择的低预算场景下可接受。
 
-## 背景与动机
+
 
 主动学习旨在通过选择最具信息量的样本进行标注，以最小的标注成本训练高性能模型。在标注预算极度有限（例如不到数据集1%）的场景下，这一问题的挑战尤为突出。现有主动学习方法主要分为两类：基于不确定性的策略（如Least Confidence、Maximum Entropy）和基于代表性的策略（如k-Center贪心、k-Medoids聚类中心）。然而，这些方法存在一个共同的瓶颈：它们依赖启发式或贪心准则进行样本选择，无法保证所选核心集在全局意义上对未标注池的代表性，导致在极低预算下分类性能显著下降。
 
@@ -67,7 +69,9 @@ claims:
 
 本文的核心动机正是弥合这一理论与实践的鸿沟：能否设计一种算法，在可接受的计算时间内直接求解该MILP，从而在极低预算场景下获得显著优于启发式方法的核心集选择？为此，本文提出采用广义Benders分解（GBD）将原大规模MILP分解为反复求解小规模Wasserstein距离子问题与松弛主问题，并引入增强最优性割（EOC）与剪枝约束（P）加速收敛，使得在合理时间内获得高质量甚至全局最优解成为可能。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于将主动学习中的核心集选择问题**首次形式化为一个最小化离散Wasserstein距离的混合整数线性规划（MILP）**，并设计了一套可扩展的**广义Benders分解（GBD）算法**来对其进行全局优化。这一方案直接改变了“核心集选择策略”这一关键模块：基线方法普遍采用启发式或贪心策略（如k-centers贪心、WAAL贪心估计），而本文方法通过求解精确的MILP来最小化Wasserstein距离，从而在理论上保证了所选核心集对未标注池的代表性。
 
@@ -92,7 +96,7 @@ claims:
 
 这一方法论创新在极低标注预算场景下产生了决定性的性能提升。在STL-10上预算B=40时，所提方法准确率超过最佳基线4.9%以上；在CIFAR-10上B=20时，提升幅度超过9.1%（见 **Table 3** 和 Section 5.2）。这些增益源于GBD求解器能够找到全局代表性更强的核心集——在SVHN上，Wass.+EOC获得的Wasserstein距离目标函数值约为k-medoids的一半（见 **Table 1**），直接体现了优化质量的根本性提升。即使在运行时间被限制为3分钟的情况下，GBD求解器的解质量仍优于k-medoids启发式（见 **Table 2**），表明该方法在效率与精度的权衡上具有实际可行性。
 
-## 整体框架
+
 
 本文提出的主动学习框架将核心集选择建模为一个全局优化问题，其整体流程由三个顺序模块构成：
 
@@ -111,7 +115,7 @@ claims:
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2106_02968/figures/001_Figure_1.jpg]]
 *Figure 1: (Left) In our active learning framework, we first pre-train our features with self-supervised learning, select samples to label by minimizing the discrete Wasserstein distance, and then train our classifier. (Right) t-SNE plot of the feature space on the STL-10 data set with selected points highlighted. The baseline misses the top right region. See Appendix E.7 for full visual comparisons*
 
-## 核心模块与公式推导
+
 
 ### 问题建模：核心集损失与Wasserstein距离
 
@@ -180,7 +184,9 @@ GBD在有限次迭代内收敛到全局最优解。
 
 GBD框架为低预算场景下的核心集选择提供了全局优化能力，而EOC和P的引入则使得该优化在合理时间内可解。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -274,7 +280,9 @@ Figure 8–10展示了各方法实际选中的图像示例。Wass.+EOC倾向于�
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2106_02968/figures/003_Table_2.jpg]]
 *Table 2: Wass. + EOC with limited runtimes versus k-medoids on problem (4) for CIFAR-10. The best solution for each budget is bolded and underlined. See Appendix E.2 for full results and Appendix E.6 for details on k-medoids runtime*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心瓶颈与因果机制
 
@@ -348,6 +356,8 @@ Figure 8–10展示了各方法实际选中的图像示例。Wass.+EOC倾向于�
 5. **跨模态与持续学习扩展**：是否存在针对跨模态主动学习（如视觉-语言模型的选择）或主动持续学习（需要在避免灾难性遗忘的同时选择新任务样本）的扩展？这需要重新定义Wasserstein距离的度量空间和核心集损失的上界。
 
 6. **与不确定性方法的融合**：本文方法纯基于代表性，是否可以将不确定性信息（如分类器的熵）作为Wasserstein距离度量中的加权项，从而同时优化代表性和信息量？
+
+
 
 ## 原文 PDF
 

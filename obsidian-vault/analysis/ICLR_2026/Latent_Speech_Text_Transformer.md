@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Latent_Speech_Text_Transformer.pdf
+project_link: null
+code_link: https://github.com/facebookresearch/lst
 openreview_forum_id: krGpQzo8Mz
 aliases:
 - LSTTL
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 潜在语音-文本Transformer |
 | 英文题名 | Latent Speech-Text Transformer |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=krGpQzo8Mz); [GitHub](https://github.com/facebookresearch/lst) |
+| Links | [paper](https://openreview.net/forum?id=krGpQzo8Mz) · [GitHub](https://github.com/facebookresearch/lst) |
 | Topic | #topic/representation_self_supervised_transfer #topic/representation_self_supervised_transfer/representation_learning |
 | Method | Latent Speech-Text Transformer (LST) |
 | Dataset | HellaSwag (S→S), HellaSwag (T→T), LibriSpeech ASR (clean) |
@@ -42,7 +44,7 @@ claims:
 > - HellaSwag (T→T) 上，Accuracy (%) 为 52.2，对比 47.0，变化 +5.2。
 > - HellaSwag (S→S) 上，Accuracy (%) 为 45.5，对比 40.2，变化 +5.3。
 
-## 概述
+## 概要
 
 语音与文本的联合建模面临一个根本性瓶颈：语音令牌序列长度远大于文本，导致模态间计算资源分配严重不均。在典型的交错序列中，基线模型为每个文本单元分配约0.23个令牌，却需要约0.77个语音令牌，总序列长度膨胀至3.00（Table 13）。这种不对称不仅增加了自回归建模的计算开销，更阻碍了高效的跨模态对齐与知识迁移。
 
@@ -57,7 +59,7 @@ LST在两种公平控制条件下展现出显著且一致的增益：
 
 LST基于BLT架构（Pagnoni et al., 2024），其方法定位介于逐令牌自回归语音语言模型与完全离散化的多模态模型之间——通过潜在补丁这一信息瓶颈，在不牺牲语义保真度的前提下实现序列压缩与跨模态对齐。
 
-## 背景与动机
+
 
 ### 语音-文本统一建模的序列失衡瓶颈
 
@@ -85,7 +87,9 @@ LST将这一范式迁移到语音-文本跨模态场景，其关键创新在于�
 
 这一设计选择背后的假设是：**语音信号的局部冗余可以通过补丁编码器有效消除，而补丁级别的语义表示更接近文本令牌的抽象层次，从而促进跨模态的知识共享和迁移**。后续实验证据表明，LST不仅在语音任务上获得显著提升（HellaSwag S→S +6.5%，Table 3），文本性能也同步改善（HellaSwag T→T +5.2%），验证了统一建模粒度对跨模态学习的正向作用。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 LST的核心创新在于**将自回归建模的粒度从逐语音令牌提升到潜在语音补丁（latent speech patches）**，从而系统性地解决了语音-文本多模态建模中序列长度失衡这一根本瓶颈。
 
@@ -127,7 +131,7 @@ LST探索了四种补丁形成策略，构成了方法创新的重要维度：
 
 值得注意的是，LST的收益并非来自更大的模型或更多的数据，而是源于**序列结构的重新组织**——在计算控制训练中，LST在语音HellaSwag上绝对提升6.5%（39.0→45.5）；在数据控制训练中提升5.3%（40.2→45.5）。这一增益随模型规模从420M到1.8B持续增长（Figure 4），表明补丁机制具有可扩展性。
 
-## 整体框架
+
 
 LST 的核心思想是将自回归建模的粒度从单个语音令牌提升到**潜在语音补丁**（latent speech patches），以此压缩语音序列长度，平衡两种模态的信息密度。其架构建立在 byte-latent transformer（BLT）范式之上，由三个功能模块串联构成：
 
@@ -152,7 +156,7 @@ $$\mathcal{L}(\mathcal{D};\theta) = \sum_{s\in\mathcal{D}}\sum_{i}\log p_{\theta
 
 **架构配置**（Table 7）给出了各模块在不同模型规模下的深度、隐藏维度和注意力头数等参数，补丁编码器和解码器均保持轻量设计，确保计算开销主要集中在全局 Transformer 的跨模态建模上。
 
-## 核心模块与公式推导
+
 
 LST 的核心设计是将自回归建模的粒度从单个语音令牌提升到**潜在语音补丁**，通过一个信息瓶颈结构实现序列压缩与跨模态对齐。其架构由三个关键模块组成，如图2所示。
 
@@ -190,7 +194,9 @@ $$\mathcal{L}(\mathcal{D};\theta) = \sum_{s\in\mathcal{D}}\sum_{i}\log p_{\theta
 
 该损失函数在语音预训练语料上最大化语音令牌序列的似然，使得补丁解码器能够从压缩表示中恢复细粒度的语音信息。实验表明，补丁机制在 sWUGGY 和 sBLIMP 等细粒度词汇与句法评估上表现与基线持平，验证了信息瓶颈未损失低层语言特征。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与实验设计逻辑
 
@@ -295,7 +301,9 @@ LST的收益随模型规模持续增长。在计算最优扩展中（420M→1.8B
 ![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_krGpQzo8Mz/figures/013_Table_8.jpg]]
 *Table 8: Scaling comparison between baseline SpeechLLM and LST at 1B and 7B*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法脉络与基线关系
 
@@ -338,6 +346,8 @@ LST 的设计前提是语音序列长度显著大于文本序列长度，且存�
 - **实时交互场景的扩展**：LST 的补丁编码器需要完整的语音帧段才能生成补丁嵌入，这在全双工对话等流式场景中引入延迟。如何设计增量式补丁编码，使模型能在部分帧到达时即开始全局建模？
 - **多模态泛化**：潜在补丁框架的核心思想——将高密度序列压缩为语义相关的潜在单元——在理论上适用于图像补丁、视频帧段等场景。但不同模态的压缩比、补丁语义边界定义和编解码器设计需要针对性的研究。
 - **课程调度策略的优化**：当前课程补丁使用线性衰减概率（从对齐过渡到静态），但更大规模数据下，最佳衰减调度（如余弦、指数衰减）和对齐阶段的持续时间可能需要进一步调优。
+
+
 
 ## 原文 PDF
 

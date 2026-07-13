@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/ToolTree_Efficient_LLM_Tool_Planning_via_Dual_Feedback_Monte_Carlo_Tree_Search_and_Bidirectional_Pruning.pdf
+project_link: null
+code_link: null
 openreview_forum_id: Ef5O9gNNLE
 aliases:
 - ToolTree
@@ -41,7 +43,7 @@ claims:
 > - m&m (GPT-4o-mini) 上，Average F1 (step-by-step + multi-step) 为 76.90，对比 75.83 (LATS)，变化 +1.07。
 > - GTA (GPT-4o) 上，Average F1 (step-by-step + end-to-end) 为 66.95，对比 64.78 (LATS)，变化 +2.17。
 
-## 概述
+## 概要
 
 当前大语言模型（LLM）在调用外部工具时，主流规划策略多采用贪婪或反应式范式（如 ReAct、Chain-of-Thought），这些方法缺乏前瞻性，难以感知工具间的复杂依赖关系，早期次优选择极易导致错误累积。另一方面，基于搜索的规划方法（如 Tree-of-Thought、LATS）虽然具备回溯能力，却面临分支爆炸、计算开销高昂以及动作评价与执行脱节等瓶颈。
 
@@ -51,7 +53,7 @@ claims:
 
 综上，ToolTree 通过双反馈 MCTS 与双向剪枝的组合设计，在工具规划的准确率与计算效率之间取得了显著突破，为 LLM 工具调用提供了一种可扩展、可纠错的搜索范式。
 
-## 背景与动机
+
 
 大语言模型（LLM）驱动的智能体在复杂任务中需要编排多个外部工具，例如调用搜索引擎、计算器、数据库或 REST API。工具规划的核心挑战在于：每一步的工具选择不仅影响当前结果，还会通过工具间的依赖关系改变后续可用的信息与操作空间，早期的一个次优决策可能导致整个执行链的误差累积与任务失败。
 
@@ -65,7 +67,9 @@ claims:
 
 本文的动机正源于此：能否设计一种工具规划范式，同时具备前瞻预测与后顾验证的能力，在有限的计算预算下自适应地分配搜索资源？这要求规划器能够在展开一个工具调用之前就对其潜在效用做出快速评估，避免盲目展开低质量分支；同时，在工具实际执行后，利用真实的执行结果对搜索方向进行纠正，及时剪除已被证伪的路径。ToolTree 正是围绕这一核心思想构建的——它将工具规划形式化为蒙特卡洛树搜索问题，引入预执行先验与后执行效用双重反馈机制，并配合双向剪枝策略，在保持搜索前瞻性的同时大幅压缩无效搜索空间。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ToolTree 的核心创新在于将大语言模型的工具规划重新形式化为一种**双反馈驱动的蒙特卡洛树搜索**过程。与现有贪婪式或反应式规划方法不同，ToolTree 引入了两个互补的评估信号，并将其深度嵌入搜索的各个阶段，从而在固定计算预算下实现了前瞻性探索与后顾性验证的闭环。
 
@@ -112,7 +116,7 @@ ToolTree 相对于现有 MCTS 类方法（如 **LATS**，Zhou et al., 2024）的
 
 消融实验提供了这些变更的因果证据：移除后评估组件导致准确率从 76.44 骤降至 68.94（-7.5 个百分点），证实执行后反馈是搜索方向的核心驱动力；移除预评估同样造成显著下降（71.80，-4.64 个百分点），表明前瞻性信号在避免无效分支上的独立价值（Table 3）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_Ef5O9gNNLE/figures/002_Figure_2.jpg]]
 *Figure 2: Architecture overview of ToolTree. An input query is processed sequentially via iterative dual evaluation-guided Monte Carlo Tree Search, including selection, pre-evaluation, expansion, execution, post-evaluation and backward-propagation. The Answer Predictor then incorporates the tool trajectories with the highest reward found by the MCTS to produce the final prediction*
@@ -152,7 +156,7 @@ $$N(s, a) \gets N(s, a) + 1, \quad Q(s, a) \gets Q(s, a) + \frac{r_{\mathrm{post
 - **双向剪枝协同**：预剪枝在展开前压缩候选空间，后剪枝在执行后截断无效分支，二者在不同阶段削减计算开销，使搜索预算自适应集中于高价值区域。
 - **缓存与容错**：同一 rollout 内对 $(a, \text{args}) \mapsto o$ 的映射进行缓存以避免重复调用；工具执行失败时附加类型化错误标记，确保剪枝决策基于明确信号而非隐式超时。
 
-## 核心模块与公式推导
+
 
 ToolTree 将多工具调用形式化为一个可执行轨迹上的蒙特卡洛树搜索（MCTS）过程。其核心设计在于将双重反馈——执行前的预评估（pre-evaluation）与执行后的后评估（post-evaluation）——嵌入搜索的四个关键阶段：选择、展开、回溯更新与双向剪枝。以下按模块拆解关键机制与公式。
 
@@ -192,7 +196,9 @@ $$\mathcal{A}^+(s_t) = \{ a \in \mathcal{A}(s_t) : r_{\mathrm{pre}}(s_t, a) \geq
 
 两条剪枝路径的协同在于：预剪枝在“事前”过滤明显不合理的动作（如模式不兼容的调用），后剪枝在“事后”基于真实执行结果切除无效分支。二者分别作用于展开阶段和模拟阶段，共同提升单位计算预算下的搜索效率。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -269,7 +275,9 @@ Table 11 报告了在 14 工具基线基础上逐步添加干扰工具的压力�
 - 当预评估与后评估的 LLM 法官同时产生系统性偏差时（例如对特定工具类型的评分持续偏高或偏低），双向剪枝可能误删有效分支或保留无效分支。Table 9 的误差分析为此提供了定量证据。
 - 在工具调用输出高度不确定或依赖外部实时状态（如网络 API 的瞬时可用性）的场景中，后评估分数的可靠性下降，可能影响 Q 值更新的准确性。此类场景的鲁棒性需要进一步验证。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 在工具规划方法谱系中的位置
 
@@ -334,6 +342,8 @@ ToolTree 的有效性依赖于以下条件，这些条件也构成了其适用�
 5. **大规模工具库下的可扩展性**：当工具数量达到数千级别时，预评估的 top-K 筛选和缓存策略是否仍能维持效率优势？
 
 6. **与符号规划的结合**：DFSDT 等符号规划方法在结构化约束推理上具有优势，ToolTree 的搜索框架是否能与符号推理互补，形成混合规划策略？
+
+
 
 ## 原文 PDF
 

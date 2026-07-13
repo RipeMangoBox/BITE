@@ -45,7 +45,7 @@ claims:
 > - DivGenBench (Table 2, HPS-v2.1 reward) 上，IDS (↓) 0.251 vs 0.259 (SRPO) (-0.008)。
 > - HPDv2 User Study (Figure 8) 上，Detail Preservation Preference 61.7% vs 16.5% (SRPO) (+45.2%)。
 
-## 概述
+## 概要
 
 **问题**：当前基于人类反馈强化学习的文本到图像扩散模型对齐方法（如DanceGRPO、Flow-GRPO、SRPO）在最大化预定义奖励信号时，普遍忽视生成多样性，导致模型过拟合奖励模型的固有偏好，收敛到单一高奖励模式（如过度光滑、油亮渲染风格），产生**偏好模式坍塌**。这一问题在身份、风格、布局、影调四个维度上均严重损害生成多样性，形成偏好与多样性之间的尖锐权衡。
 
@@ -57,7 +57,7 @@ claims:
 - **人类评估验证**：用户研究中，D2-Align在细节保持（61.7%偏好率）和图文对齐（52.2%）上大幅领先基线；在风格多样性（37.3%）和身份多样性（35.2%）上也获得最高偏好率，而Flow-GRPO在影调多样性上仅获7.7%偏好率，严重坍塌。
 - **方向向量的可迁移性**：学习到的方向修正向量可作为即插即用组件嵌入DanceGRPO等现有方法，在人类偏好和多样性指标上均带来一致提升，验证了方法的通用性。
 
-## 背景与动机
+
 
 ### 扩散强化学习中的偏好模式坍塌
 
@@ -86,7 +86,9 @@ claims:
 
 通过这种奖励信号的**方向性解耦**，D2-Align使优化目标更贴合真实人类偏好，打破了偏好与多样性之间的固有权衡，在保持甚至提升人类偏好分数的同时，显著增强了生成多样性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：偏好模式坍塌（PMC）
 
@@ -136,7 +138,7 @@ $$R_{\mathrm{guided}}(x_0, c; b_v^*) = \mathrm{score}(e_{\mathrm{img}}, \tilde{e
 
 4. **通用可迁移性**：将学习到的 $b_v$ 嵌入DanceGRPO框架后，其在人类偏好与多样性指标上均获得提升（Table 6, Table 7），表明方向修正向量可作为即插即用的模块迁移至其他RL对齐方法。
 
-## 整体框架
+
 
 D2-Align 采用**两阶段解耦框架**，核心思想是在奖励模型的连续文本嵌入空间中学习一个方向修正向量 $\mathbf{b}_v \in \mathbb{R}^d$，通过系统性调整奖励信号来抵消奖励模型的固有偏差，从而在不牺牲生成质量的前提下保持生成多样性。
 
@@ -199,7 +201,7 @@ $$\mathcal{L}_{\text{stage2}}(\theta) = \mathbb{E}_{c \sim \mathcal{D}, \mathbf{
 ![[assets/figures/papers/paper_list_l2705_https_arxiv_org_abs_2512_24146/figures/001_Figure_1.jpg]]
 *Figure 1: D2-Align breaks the trade-off between human preference and generative diversity, mitigating Preference Mode Collapse (PMC). The top-right plot shows that while baselines struggle with a trade-off—either achieving low diversity or low preference—D2- Align, achieves a state of both higher diversity and higher human preference. The qualitative examples below illustrate this phenomenon. For the same set of varied prompts, baseline methods exhibit severe PMC, generating homogeneous outputs for identity, style, layout, and tone. D2-Align successfully preserves diversity, generating distinct and high-quality images that align with each individual prompt. See Supp. for detail prompts*
 
-## 核心模块与公式推导
+
 
 ### 2.1 问题建模与奖励信号
 
@@ -268,7 +270,9 @@ $$\mathcal{L}_{\mathrm{stage2}}(\theta) = \mathbb{E}_{c \sim \mathcal{D}, \pmb{x
 ![[assets/figures/papers/paper_list_l2705_https_arxiv_org_abs_2512_24146/figures/003_Figure_3.jpg]]
 *Figure 3: Correcting the Reward Signal via Prompt Perturbation. An image generated for a minimalism prompt is instead oily and overly-rendered. This style mismatch is identified by a human (low score), but the reward model assigns a high score due to its intrinsic bias. We counteract this by perturbing the prompt with descriptors like ”Realistic” to produce a more accurate reward signal aligned with human preference*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果：人类偏好对齐与语义一致性
 
@@ -341,7 +345,9 @@ Table 6 和 Table 7 展示了将学习到的方向向量 $b_v$ 嵌入 DanceGRPO 
 
 D2-Align 有效缓解了上述问题，但论文未报告方向向量 $b_v$ 在不同奖励模型（非 CLIP 基）上的迁移性实验，也未讨论当奖励偏差随时间动态变化时的适应策略。这些开放性问题的答案需要进一步研究验证。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：偏好模式坍塌（PMC）的成因与瓶颈
 
@@ -408,6 +414,8 @@ D2-Align 在扩散模型 RLHF 对齐方法谱系中占据了一个独特位置�
 - **相对于提示工程方法**（手动添加离散词汇）：D2-Align 在连续嵌入空间中学习修正方向，突破了离散词汇表的表达能力上限，在所有评估指标上一致优于手动基线（Figure 7 right）。
 
 该方法的核心贡献在于**首次将奖励偏差建模为嵌入空间中的可学习方向**，并通过两阶段解耦框架实现了偏好对齐与多样性保持的协同优化，为 RLHF 中的模式坍塌问题提供了结构化的解决方案。
+
+
 
 ## 原文 PDF
 

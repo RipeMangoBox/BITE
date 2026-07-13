@@ -5,6 +5,8 @@ paper_level: A
 venue: ECCV
 year: 2024
 pdf_ref: paperPDFs/ECCV_2024/MotionChain_Conversational_Motion_Controllers_via_Multimodal_Prompts.pdf
+project_link: null
+code_link: https://github.com/OpenMotionLab/MotionChain
 aliases:
 - MotionChain
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | MotionChain：通过多模态提示的对话式运动控制器 |
 | 英文题名 | MotionChain: Conversational Motion Controllers via Multimodal Prompts |
 | 会议/期刊 | ECCV 2024 |
-| Links | [Code](https://github.com/OpenMotionLab/MotionChain) · [arXiv](https://arxiv.org/abs/2112.10752) |
+| Links | [Code](https://github.com/OpenMotionLab/MotionChain) · [paper](https://arxiv.org/abs/2112.10752) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | MotionChain |
 | Dataset | Conversation test set, BABEL |
@@ -39,7 +41,7 @@ claims:
 > - Conversation test set (Motion Reasoning) 上，Bleu@1 37.92 vs 19.27 (Vicuna-1.5-7b) (+18.65)。
 > - BABEL (Temporal Motion Composition) 上，PA-MPJPE 53.72 vs 61.07 (TEACH) (-7.35)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有运动生成模型仅支持单轮条件生成（如文本到运动），缺乏多轮对话上下文理解与连续运动生成能力。这导致用户无法通过直觉式多轮交互逐步细化运动指令，限制了在机器人示教、虚拟助手等场景中的应用。
 
@@ -59,7 +61,7 @@ claims:
 
 **局限性**：当前模型仅支持关节人体运动，无法处理面部、手部以及人与物体/场景的交互。
 
-## 背景与动机
+
 
 ### 问题背景：从单轮条件生成到对话式运动交互
 
@@ -102,7 +104,9 @@ claims:
 
 基于上述洞察，本文提出了**MotionChain**——一个统一的视觉-运动-语言对话式生成框架。MotionChain由多模态分词器（文本、视觉、运动）和视觉-运动感知语言模型两部分构成，通过在大规模多模态对话数据集上进行多轮指令微调，首次实现了根据文本、图像、运动等多模态提示进行连续多轮对话，并在对话中交替生成文本回答和人体运动序列的能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MotionChain的核心创新在于将人体运动视为一种可被语言模型理解的“外语”，从而将多轮多模态交互问题转化为序列建模问题。与传统运动生成方法相比，其关键突破体现在以下四个维度的范式转变上。
 
@@ -156,7 +160,7 @@ $$z_{\mathrm{whole}}^{1:(L_p+L_c)} = [z_p^{1:L_p}, z_c^{1:L_c}]$$
 
 MotionChain的核心贡献在于通过“统一令牌空间 + 语言模型对话能力”的技术路线，将多模态运动生成从单轮条件映射提升为多轮上下文感知的交互式生成。这一范式转变的关键在于：**将运动离散化为语言模型的“词汇”，使得预训练语言模型的序列建模和上下文学习能力可以被直接迁移到运动生成领域**。该方法在运动推理任务上取得了37.92的Bleu@1分数，远超通用LLM基线Vicuna-1.5-7b的19.27（Table 1），验证了统一多模态令牌空间和对话式微调策略的有效性。
 
-## 整体框架
+
 
 MotionChain 是一个**视觉-运动-语言统一生成式预训练模型**，其核心目标是将人体运动视为一种“外语”，通过构建统一的多模态离散令牌空间，使大规模语言模型能够以对话方式连续生成运动或文本回复。该框架由两大核心组件构成：**多模态分词器**（Multi-modal Tokenizer）与**视觉-运动感知语言模型**（Vision-Motion-aware Language Model），整体架构如 Fig. 2 所示。
 
@@ -198,7 +202,7 @@ MotionChain 的训练分为两个阶段：首先在统一的运动-语言数据�
 ![[assets/figures/papers/paper_list_l1877_MotionChain_Conversational_Motion_Controllers_via_Multimodal_Prompts/figures/027_Table_10.jpg]]
 *Table 10: Architecture of our vision perceiver*
 
-## 核心模块与公式推导
+
 
 MotionChain 的核心架构由三个相互协作的模块构成：运动分词器、视觉分词器，以及视觉-运动感知语言模型。其设计哲学是将人体运动视为一种“外语”，通过离散令牌统一文本、视觉和运动三种模态，从而将大语言模型的序列建模与对话能力迁移到多模态运动生成任务中。
 
@@ -257,7 +261,9 @@ $$\mathcal{L}_{LM} = -\sum_{i=0}^{L_t-1} \log p_{\theta}\left(x_a^i \mid X_v, X_
 | 语言模型 | 统一词汇 + 自回归生成 + 多轮历史拼接 | Sec. 3.3, Eq. (4)(5) |
 | 令牌共享 | 独立运动令牌（每层独立代码）优于跨层共享 | Table 8 |
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 4.1 实验设置
 
@@ -366,7 +372,9 @@ Table 11展示了不同模型规模下的推理速度（FPS）。在单张Tesla 
 ![[assets/figures/papers/paper_list_l1877_MotionChain_Conversational_Motion_Controllers_via_Multimodal_Prompts/figures/028_Table_11.jpg]]
 *Table 11: The inference time costs of text-driven motion generation by evaluating the Frames Per Second (FPS), which is obtained by averaging the number of frames generated per second. We present the time costs for various model sizes and observe that, under the same 1 Tesla V100, smaller model sizes achieve faster FPS*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -442,6 +450,8 @@ MotionChain 在以下场景中展现出显著优势：
 5. **推理效率优化**：Table 11 显示了不同模型参数下的推理 FPS，但是否有特定的工程优化（如模型量化、令牌缓存、投机解码）可以进一步提升推理速度，以满足实时交互场景的需求？
 
 6. **感知器架构的深入探索**：Table 4 显示简单线性投影优于 Q-former 和 Perceiver，但这是否是任务特定的现象？在更复杂的视觉条件运动生成任务中，更强大的感知器架构是否会展现出优势？
+
+
 
 ## 原文 PDF
 

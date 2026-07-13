@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/From_EduVisBench_to_EduVisAgent_A_Benchmark_and_Multi_Agent_Framework_for_Reasoning_Driven_Pedagogical_Visualization.pdf
+project_link: null
+code_link: https://github.com/aiming-lab/EduVisBench
 openreview_forum_id: FVCpV04ZRe
 aliases:
 - FEEBMAFRDPV
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 从 EduVisBench 到 EduVisAgent：面向推理驱动型教学可视化的基准与多智能体框架 |
 | 英文题名 | From EduVisBench to EduVisAgent: A Benchmark and Multi-Agent Framework for Reasoning-Driven Pedagogical Visualization |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=FVCpV04ZRe); [GitHub](https://github.com/aiming-lab/EduVisBench) |
+| Links | [paper](https://openreview.net/forum?id=FVCpV04ZRe) · [GitHub](https://github.com/aiming-lab/EduVisBench) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/planning_control |
 | Method | EduVisAgent |
 | Dataset | EduVisBench (综合三个学科、三个难度), EduVisBench, 非STEM子集 (MMLU Prehistory & Sociology, 100 题) |
@@ -41,7 +43,7 @@ claims:
 > - EduVisBench 上，平均得分 为 81.6，对比 Claude 3.7 Sonnet (Webpage, 最佳LVLM基线，54.6)，变化 +27.0 pp。
 > - 非STEM子集 (MMLU Prehistory & Sociology, 100 题) 上，平均得分 为 82.1，对比 v0 (64.9)，变化 +17.2 pp。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -65,7 +67,7 @@ EduVisAgent 是一个**认知教学理论指导下的多智能体协作框架**�
 
 尽管效果显著，该系统仍存在错误累积风险——任务规划阶段的偏差会向下游传播并放大；同时生成过程的令牌消耗和推理延迟限制了实时课堂部署。如何在保证教学深度的前提下提升鲁棒性和效率，是该方向后续研究的关键问题。
 
-## 背景与动机
+
 
 教学可视化是 STEM 教育中连接抽象概念与具象理解的关键桥梁。高质量的视觉解释能够将复杂的推理过程转化为可感知的认知支架，帮助学习者建立深层理解。然而，现有的自动化可视化生成方法在这一领域面临根本性瓶颈。
 
@@ -81,7 +83,9 @@ EduVisAgent 是一个**认知教学理论指导下的多智能体协作框架**�
 
 基于上述分析，本文的核心动机是：**通过将教学认知过程显式编码为模块化、多智能体协作的生成流水线，能否突破单模型瓶颈，大幅提升教育可视化的语义对齐度、结构化程度和互动性？** 为此，本文提出 **EduVisAgent**，一个由认知教学理论指导的多智能体框架，将教学规划、概念映射、推理分解、元认知审查和可视化生成分离为独立智能体，并通过合成模块整合为交互式学习网页。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 EduVisAgent 的核心创新在于将教育认知理论显式编码为模块化的多智能体协作流水线，从而系统性地解决了现有单模型架构在教育可视化生成中的两个关键瓶颈：**推理粒度粗糙**与**架构分工缺失**。
 
@@ -110,7 +114,7 @@ EduVisAgent 的核心设计在于将这一黑箱拆解为五个专业化智能�
 
 这一设计组合使 EduVisAgent 在 **思维引导**（Thought Guidance）和 **交互性**（Interactivity）两个维度上领先基线幅度最大——而这两个维度恰恰是所有基线模型得分最低的维度，表明结构化的智能体协调对于这些高难度教学能力尤为关键。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_FVCpV04ZRe/figures/005_Figure_5.jpg]]
 *Figure 5: The structure of EduVisAgent*
@@ -130,7 +134,7 @@ EduVisAgent 是一个由认知教学理论指导的多智能体协作框架，�
 
 这一流水线设计的有效性得到了消融实验的强有力支持：将所有提示合并到单一智能体中的 Single 基线，平均得分比完整多智能体系统低 8–15 分，证明性能优势源于模块化架构分工本身，而非仅仅来自提示工程。同时，流水线也存在错误累积风险——当 Task Planning Agent 提出不恰当的布局建议或视觉约束时，该错误会向下游传播并被放大，最终导致输出与教学目标严重偏离（见附录 Failure Case 分析）。
 
-## 核心模块与公式推导
+
 
 EduVisAgent 的核心架构由五个专业化智能体和一个合成模块构成，按“教学流程构建”与“协同解答生成”两阶段运转（Section 3）。以下仅阐述对性能起决定性作用的模块及其内在机理。
 
@@ -154,7 +158,9 @@ $$\omega = \omega_0 + \alpha t$$
 
 **架构分离的关键性**：消融实验中的单智能体基线（Single baseline）将所有提示合并到一个单体智能体中，其得分在所有条件下均低于任何多智能体消融配置，平均比完整系统低 8–15 分（Appendix B.1）。这证实多智能体设计的优势源于模块化分工本身，而非仅仅提示信息的叠加——将教学规划、概念映射、推理分解、元认知审查和可视化生成分离为独立智能体，使每个模块能在其专长领域内做出更精准的决策，避免单一模型在复杂教学推理中的认知过载。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 评测可靠性验证
 
@@ -215,7 +221,9 @@ EduVisAgent 的多智能体协作带来了显著的令牌消耗和推理延迟�
 ![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_FVCpV04ZRe/figures/010_Figure_6.jpg]]
 *Figure 6: Baseline models versus our EduVisAgent. These examples clearly demonstrate the often poor output quality of baseline models, contrasting sharply with the high-quality, effective visualizations produced by EduVisAgent*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 现有方法谱系与瓶颈
 
@@ -275,6 +283,8 @@ EduVisAgent 的适用边界可从以下几个维度界定：
 3. 如何在保证教学目标和推理深度不被削弱的前提下，缩减令牌消耗和推理时间，使其能够真正用于实时课堂教学？
 
 4. 当问题涉及更复杂的动态系统或需要 3D 交互可视化时，当前基于 v0 的网页渲染管线是否仍适用？需要做哪些扩展？
+
+
 
 ## 原文 PDF
 

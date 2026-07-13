@@ -43,7 +43,7 @@ claims:
 > - NuInstruct 上，MAP 37.49 vs 6.15 (Qwen2.5-VL-7B) (+31.34)。
 > - DriveLM 上，Match 49.77 vs 34.54 (Qwen2.5-VL-7B) (+15.23)。
 
-## 概述
+## 概要
 
 视觉语言模型(VLM)凭借强大的常识推理与指令遵循能力，正被逐步引入自动驾驶领域。然而，VLM本质上缺乏跨视角的3D几何建模能力，难以在复杂驾驶场景中进行精确的空间感知与安全导航，导致其在风险目标感知、运动预测和轨迹规划等关键任务上表现平庸。
 
@@ -59,7 +59,7 @@ claims:
 
 该框架在保持VLM语言能力的同时，大幅增强了自动驾驶所需的空间感知与规划能力，为VLM在具身智能场景中的应用提供了新的范式。
 
-## 背景与动机
+
 
 ### 自动驾驶中的视觉语言模型困境
 
@@ -86,7 +86,9 @@ claims:
 
 这一思路最终凝结为 **VGGDrive** 框架——通过即插即用的 **跨视角 3D 几何使能器（CVGE）** 和层次化自适应注入机制，将冻结的 VGGT 模型生成的跨视角几何特征深度注入 VLM，在保持语言能力的同时，大幅提升多任务驾驶性能。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 创新动机：VLM在自动驾驶中的几何盲区
 
@@ -144,7 +146,7 @@ VGGDrive的核心洞察在于**解耦基础LLM的层级结构，将成熟的3D�
 
 这种差异化提升模式直接验证了核心主张：VGGDrive赋予VLM的是**几何定位能力**，而非通用语言能力的提升。在需要精确空间感知的任务上，性能飞跃；在依赖语义理解的描述任务上，VLM原有能力得以完整保留。
 
-## 整体框架
+
 
 VGGDrive的整体架构围绕一个核心设计原则展开：**将冻结的视觉三维基础模型的跨视角几何建模能力，以即插即用的方式深度注入到基础视觉语言模型（VLM）的解码过程中**，从而赋予VLM原本不具备的空间感知与几何定位能力。
 
@@ -189,7 +191,7 @@ $$L_{CE} = - \sum_{t=1}^{T} \log p_{\theta}(y_t | y_{<t}, \{I_c\}_{c=1}^{C}, L)$
 ![[assets/figures/papers/paper_list_l2428_https_arxiv_org_abs_2602_20794/figures/001_Figure_1.jpg]]
 *Figure 1: Existing relevant paradigms vs. our VGGDrive. (a) The VLA paradigm for trajectory planning. (b) Two existing paradigms for integrating 3D foundation models (VGGT [39]) with VLMs: VGGT-Dist [11] and VGGT-Add [48]. (c) Our VG-GDrive, which leverages the VGGT model to profoundly empower the basic VLM with cross-view geometric grounding capabilities, thereby handling diverse autonomous driving tasks*
 
-## 核心模块与公式推导
+
 
 VGGDrive 的核心架构由三个模块构成：基础视觉语言模型（Base VLM）、层次化自适应注入机制（Hierarchical Adaptive Injection Mechanism）和跨视角三维几何使能器（CVGE）。其设计目标是将冻结的 VGGT 三维基础模型提取的跨视角几何一致性特征，通过即插即用的方式深度注入 VLM 的解码过程，赋予模型几何定位能力。
 
@@ -251,7 +253,9 @@ $$PDMS = NC \times DAC \times \left( \frac { 5 \times EP + 5 \times TTC + 2 \tim
 
 该指标集成了五个子维度：无过失碰撞（NC）、可行驶区域遵循（DAC）、碰撞时间（TTC）、舒适度（C）和自我进展（EP），通过加权平均综合评估轨迹规划的质量与安全性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现
 
@@ -322,7 +326,9 @@ Table 9 对 CVGE 的超参数进行了灵敏度分析。缩放因子 $s=4$ 在�
 - **极端场景的可靠性未验证**：论文未提供在极端天气、照明条件或域外场景下的评估，VGGT 的几何特征质量在这些条件下是否依然可靠需要进一步验证。
 - **计算开销**：CVGE 的层次化交叉注意力机制引入了额外计算成本，Table 6 中的推理速度数据（需查阅原文具体数值）表明其相比简单融合方案存在一定延迟增加。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有范式的关系
 
@@ -379,6 +385,8 @@ $$x_i = X_i + X_i', \quad i = 1, ..., n$$
 4. **能力干扰**：跨视角几何定位的注入是否会削弱 VLM 的原有常识推理能力，尤其在需要语义先验的复杂交互场景中？如何量化并缓解这种潜在的能力干扰？
 
 5. **端到端训练**：当前 VGGT 保持冻结，若将其部分解冻进行端到端微调，是否能进一步提升几何特征与 VLM 的适配度，同时避免灾难性遗忘？
+
+
 
 ## 原文 PDF
 

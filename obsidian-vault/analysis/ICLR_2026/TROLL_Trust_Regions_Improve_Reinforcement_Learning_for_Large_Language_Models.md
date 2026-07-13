@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/TROLL_Trust_Regions_Improve_Reinforcement_Learning_for_Large_Language_Models.pdf
+project_link: https://niklasfreymuth.github.io/troll/
+code_link: null
 openreview_forum_id: X9D5MVpPJ9
 aliases:
 - TTROLLM
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | TROLL：通过信任区域改进大语言模型的强化学习 |
 | 英文题名 | TROLL: Trust Regions Improve Reinforcement Learning for Large Language Models |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=X9D5MVpPJ9); [Project](https://niklasfreymuth.github.io/troll/) |
+| Links | [paper](https://openreview.net/forum?id=X9D5MVpPJ9) · [Project](https://niklasfreymuth.github.io/troll/) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | TROLL (Trust Region Optimization for Large Language models) |
 | Dataset | DAPO‑Train (Qwen3‑8B GRPO), DAPO‑Eval (Qwen3‑8B GRPO), MATH‑Eval (Qwen3‑8B GRPO), DAPO‑Train (Qwen2.5‑7B‑Instruct GRPO) |
@@ -42,7 +44,7 @@ claims:
 > - DAPO‑Eval (Qwen3‑8B GRPO) 上，Success Rate 为 0.691，对比 0.640，变化 +0.051。
 > - MATH‑Eval (Qwen3‑8B GRPO) 上，Success Rate 为 0.551，对比 0.541，变化 +0.010。
 
-## 概述
+## 概要
 
 当前大语言模型（LLM）的强化学习（RL）训练普遍依赖 PPO 式的剪裁目标来近似信任区域约束。然而，这种启发式剪裁缺乏严格的数学基础，对超参数敏感，容易导致训练不稳定、更新偏斜，并在大规模训练中引发熵崩溃——这些因素共同限制了 LLM 强化学习的性能上限。
 
@@ -55,7 +57,7 @@ claims:
 
 TROLL 作为 PPO 剪裁目标的直接替代，不改变模型推理过程，仅在训练时引入额外投影步骤。其方法定位处于 RL for LLM 中策略优化约束机制的核心位置，为后续在更大规模模型、多模态场景及 RLHF 等任务中的扩展提供了严格且可微的信任区域基础。
 
-## 背景与动机
+
 
 ### 1. LLM 强化学习的瓶颈：PPO 剪裁的粗糙信任区域
 
@@ -105,7 +107,9 @@ TROLL 的出发点是：**用可微的离散信任区域投影替代 PPO 的启�
 - 在训练过程中保持更高的 token 熵，避免剪裁常伴随的熵快速坍塌（Figure 5 Bottom Right）。
 - 以可忽略的额外开销（4B 模型上运行时增量不足 10%）实现上述收益，使其成为 PPO 剪裁的实用替代方案。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈：PPO 剪裁的信任区域近似缺陷
 
@@ -169,7 +173,7 @@ $$\mathbf{KL}(p \parallel q) \le \gamma^{-1} \mathrm{KL}(p' \parallel q') + \del
 
 这些创新使 TROLL 成为一个可直接替换 PPO 剪裁的即插即用模块（Figure 2），在不改变模型推理过程的前提下，显著提升训练稳定性和最终性能。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l36_https_openreview_net_forum_id_X9D5MVpPJ9/figures/003_Figure_1.jpg]]
 *Figure 1: Trust Region Optimization for Large Language models (TROLL) overview. (Left) Example of a 3-token distribution (cat, troll, hamster). The old policy favors the troll, while the new policy shifts toward the hamster. The projection ensures that the updated policy stays within the trust region (circle). (Right) TROLL yields clear performance gains over PPO-like clipping (CLIP) on mathematical reasoning and code generation tasks, as shown for Qwen3-14B trained with GRPO*
@@ -196,7 +200,7 @@ Figure 1 (Left) 用一个 3‑token 的简化示例直观展示了投影的几�
 
 Table 1 的系统性对比揭示了两种信任区域实现方式的本质差异：PPO 的剪裁目标（Equation 2）仅在重要性比率超出 $[1-\epsilon_{\mathrm{ppo}}, 1+\epsilon_{\mathrm{ppo}}]$ 时截断梯度，这是一种**无严格数学约束的启发式近似**；而 TROLL 通过求解凸优化问题（Equation 3）对每个 token 施加**精确的 KL 散度上界**，其投影解具有闭式形式（Equation 4），且整个过程保持可微。这一设计差异直接导致了 GSPO 方法上的关键结果：GSPO (Clip) 在训练中发散（成功率为 0），而 GSPO (TROLL) 稳定收敛至 0.736（Qwen3‑8B），表明严格的 token‑级信任区域约束对于序列级策略优化方法的稳定性至关重要。
 
-## 核心模块与公式推导
+
 
 ### 瓶颈与设计动机
 
@@ -250,7 +254,9 @@ $$
 
 其中 $\alpha$ 固定为 1，$\lfloor \cdot \rfloor$ 表示 stop-gradient 操作。该目标作为 PPO 剪裁目标的直接替代，可无缝集成到 GRPO、Dr.GRPO、GSPO 等现有优势估计框架中，仅更改策略更新部分，不改变模型推理过程。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验：数学推理与代码生成
 
@@ -306,7 +312,9 @@ TROLL 在数学推理（DAPO‑Math）与代码生成（Eurus‑Code）两大 RL
 ![[assets/figures/papers/paper_list_l36_https_openreview_net_forum_id_X9D5MVpPJ9/figures/014_Table_3.jpg]]
 *Table 3: Hyperparameters. We use these parameters for all experiments unless mentioned otherwise*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心瓶颈与设计动机
 
@@ -390,6 +398,8 @@ $$ \mathbf{KL}(p \parallel q) \le \gamma^{-1} \mathrm{KL}(p' \parallel q') + \de
 3. **RLHF 整合**：在 RLHF 等需要与参考策略保持接近的场景中，如何整合 TROLL 的信任区域（当前 TROLL 仅约束与旧策略的 KL 散度）。
 4. **自适应信任区域**：探索自适应调节信任区域边界 $\epsilon$ 的机制，以避免手动调参。消融实验（Figure 5 Left）表明较小的 $\epsilon$ 减慢训练但不影响收敛，过大的 $\epsilon$ 导致性能下降，暗示存在最优边界且可能与训练阶段相关。
 5. **理论分析深化**：TROLL 的收敛性保证、与自然策略梯度（NPG）的理论联系等尚未充分探索。
+
+
 
 ## 原文 PDF
 

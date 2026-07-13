@@ -43,7 +43,7 @@ claims:
 > - Thingi10K 上，CDL2 (×10³) ↓ 0.052 vs 2.492 (MeshAnythingV2) (-2.440)。
 > - Objaverse 上，CDL2 (×10³) ↓ 0.387 vs 1.712 (DeepMesh) (-1.325)。
 
-## 概述
+## 概要
 
 **核心问题**：当前基于Transformer的自回归网格生成方法受限于长序列建模瓶颈和统一的低分辨率量化策略，难以生成超过8K面的高保真网格，导致精细几何细节与结构化密度模式大量丢失。
 
@@ -53,7 +53,7 @@ claims:
 
 **主要结果**：在 ShapeNet、Thingi10K 和 Objaverse 三个数据集上，MeshMosaic 在倒角距离（CD）、法向一致性（NC）、F1 分数等几何指标上全面超越 DeepMesh、BPT、MeshAnythingV2 等 SOTA 方法（例如 ShapeNet CDL2 为 0.019 vs DeepMesh 的 0.060）。在包含27位专业用户的调研中，MeshMosaic 在整洁度、艺术性、相似度和细节恢复四项主观评价上均获最高评分（2.78–2.91分），远超第二名 BPT（1.04–1.08分）。此外，MeshMosaic 能够稳定生成超过100K三角形的网格，而先前方法通常仅支持约8K面，显著提升了艺术家网格生成的规模上限与视觉质量。
 
-## 背景与动机
+
 
 ### 艺术家网格生成的核心瓶颈
 
@@ -85,7 +85,9 @@ claims:
 - **规模化能力**：面片数量可随网格复杂度自适应增长（训练时通过$\mathcal{N}_{\mathrm{seg}} = \frac{\mathcal{N}_{f}}{2000} \times \lambda_{\mathrm{rand}}$动态计算），支持超过100K面的网格生成。
 - **边界无缝性**：通过GRU编码的边界条件token拼接到当前面片序列前端，使自注意力机制显式感知邻接面片的几何状态，配合位移对齐消除局部量化偏差。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MeshMosaic 的核心创新在于将“马赛克艺术”的局部‑全局组装思想引入自回归网格生成，从根本上突破了 Transformer 长序列瓶颈对网格面数的限制。与一次性自回归生成完整网格的基线方法（如 **DeepMesh**，Zhao et al., arXiv 2025）不同，MeshMosaic 将网格生成分解为局部面片（patch）的逐块生成与全局组装，实现了四个关键机制的变化（changed slots）。
 
@@ -118,7 +120,7 @@ $$\mathcal{N}_{\mathrm{seg}} = \frac{\mathcal{N}_{f}}{2000} \times \lambda_{\mat
 
 上述四个 changed slots 协同作用，形成了“边界条件约束下的局部高精度生成 + 全局上下文引导下的无缝组装”这一核心范式。其根本洞察在于：**网格生成的难点不在于整体形状的宏观结构，而在于局部几何细节的精细还原与跨区域连续性**。通过将长序列问题转化为多个短序列的并行约束生成问题，MeshMosaic 在 0.5B 参数量级下取得了超越更大规模商业模型（如 Hunyuan3D）的几何保真度和用户偏好评分。
 
-## 整体框架
+
 
 MeshMosaic 的核心思想是将一个完整的艺术家网格生成任务分解为“先分割、再逐块生成、最后粘合”的局部到全局自回归流程。该流程从根本上绕开了传统 Transformer 自回归网格生成中长序列瓶颈与有限量化分辨率之间的矛盾，使模型能够稳定地产出超过 100K 三角面的高保真网格。
 
@@ -165,7 +167,7 @@ MeshMosaic 以 **DeepMesh**（Zhao et al., arXiv 2025）作为基础自回归生
 ![[assets/figures/papers/paper_list_l2545_https_arxiv_org_abs_2509_19995/figures/007_Figure_7.jpg]]
 *Figure 7: The workflow of MeshMosaic for generating a single patch. Both global and local point cloud features are extracted by a locked Michelangelo [51] encoder. For each patch, the nearest boundary mesh is identified, tokenized, and concatenated before the target mesh token sequence. The GRU network encodes boundary tokens, which are then combined with global and local features and fed into an autoregressive hourglass transformer for mesh generation*
 
-## 核心模块与公式推导
+
 
 ### 整体框架：局部到全局的自回归组装
 
@@ -224,7 +226,9 @@ $$\Phi_{\mathbf{p/f}} = \frac{\mathcal{N}_{p}}{\mathcal{N}_{f}}$$
 ![[assets/figures/papers/paper_list_l2545_https_arxiv_org_abs_2509_19995/figures/005_Figure_4.jpg]]
 *Figure 4: DeepMesh Tokenizer*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -286,7 +290,9 @@ Figure 13 系统拆解了三个关键设计的作用，每个消融变体均出�
 ![[assets/figures/papers/paper_list_l2545_https_arxiv_org_abs_2509_19995/figures/017_Figure_14.jpg]]
 *Figure 14: Detail recovery comparison*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：在自回归网格生成演进中的位置
 
@@ -335,6 +341,8 @@ MeshMosaic 的性能优势依赖于若干关键条件：
 5. **数据质量与面片分割的联合优化**：论文使用点面比率 $\Phi_{\mathbf{p/f}} = \mathcal{N}_{p} / \mathcal{N}_{f}$ 过滤 $\Phi > 0.8$ 的低质量网格，但未探讨面片分割策略与数据质量之间的交互影响。是否存在最优的分割粒度与数据过滤阈值的联合设计方案？
 
 6. **与商业系统的对比深度**：论文仅定性展示了与商用模型 Hunyuan3D 的视觉对比（Figure 2），未进行定量评估。随着工业界网格生成模型的快速发展，建立标准化的跨系统评测基准将成为社区的重要需求。
+
+
 
 ## 原文 PDF
 

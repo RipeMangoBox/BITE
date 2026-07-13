@@ -43,7 +43,7 @@ claims:
 > - UHR Video Assessment (MLLM评价) 上，FID_patch / Realism / Detailness / Alignment 41.03 / 7.64 / 5.36 / 7.90 (2K); 39.87 / 7.46 / 5.40 / 7.80 (4K) vs 48.64 / 6.76 / 4.64 / 6.88 (UltraWan-4K) (FID_patch ▼ 8.77, Realism ↑ 0.88, Detail ↑ 1.16, Alignment ↑ 0.92 (4K))。
 > - VSR methods comparison 上，MUSIQ / MANIQA / NIQE / DOVER 58.01 / 0.410 / 3.16 / 0.784 vs 56.54 / 0.402 / 3.20 / 0.755 (FlashVSR, best competitor) (MUSIQ ↑1.47, DOVER ↑0.029)。
 
-## 概述
+## 概要
 
 将现有文生视频（T2V）扩散模型直接扩展至超高清（UHR）场景时，面临一个根本性瓶颈：模型难以同时维系运动连贯性、全局语义规划与细粒度纹理的真实性，往往产生静态输出、物体重复或模糊纹理。基于视频超分（VSR）的后处理方法虽能提升视觉锐度，却无法引入新的语义内容，导致“伪高清”输出。LUVE 针对这一瓶颈，提出了一种基于**双频专家（Dual Frequency Experts）** 的潜空间级联框架，其核心洞察在于：视频扩散模型的去噪过程遵循由低频到高频的逐步重建规律——干净信号首先在低频区域出现，随后扩展至高频（见 Figure 6 的功率谱密度分析）。据此，LUVE 将语义架构的巩固与纹理细节的精炼按频带解耦，在去噪的高噪声阶段注入低频专家（LFE）以强化全局语义结构，在低噪声阶段注入高频专家（HFE）以精细化局部纹理，从而兼顾结构一致性与感知细腻度。
 
@@ -51,7 +51,7 @@ claims:
 
 在方法谱系上，LUVE 构建于预训练 T2V 模型 **Wan2.1**（Wan et al., 2025）之上，通过三阶段协作架构——低分辨率运动生成（LMG）、视频潜空间上采样（VLU）和高分辨率内容细化（HCR）——实现从低分辨率运动先验到高分辨率语义增强的保真映射。与 **UltraWan**（Xue et al., 2025）的微调范式及 **CineScale**（Qiu et al., 2025）的免训练推理策略不同，LUVE 的核心创新在于将频带分解显式嵌入扩散去噪过程，并配合可学习的视频潜空间上采样器（VLUer）规避传统 RGB/Latent 插值带来的伪影与计算开销。目前该方法仅在 Wan2.1-1.3B 骨干上得到验证，其在其他 DiT 架构（如 CogVideoX、HunyuanVideo）上的泛化性仍属开放问题。
 
-## 背景与动机
+
 
 ### 超高清视频生成的现实需求与技术瓶颈
 
@@ -69,7 +69,9 @@ claims:
 
 这一发现直接指向了现有方法的症结：无论是VSR后处理还是传统级联细化，都未能在生成过程中显式地利用频带分工。若能在高噪声阶段有针对性地巩固低频语义结构，并在低噪声阶段专门精炼高频纹理信息，则有望同时突破语义一致性与感知细腻度的瓶颈。这正是LUVE框架设计的理论出发点——通过“双频专家”机制，将语义与纹理的生成责任按去噪阶段解耦，实现结构保真与细节丰富的兼顾。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 LUVE 的核心创新并非提出一种全新的生成范式，而是**精确诊断了现有视频扩散模型在超高清（UHR）扩展中的瓶颈，并据此设计了一套高度解耦且可插拔的频带增强机制**。其关键 changed slots 可归纳为以下三个维度。
 
@@ -114,7 +116,7 @@ $$\mathcal{L}_{pixel} = \mathcal{L}_{1}(x_{sr}, x_{hr}) + \mathcal{L}_{frame}(x_
 
 LUVE 的创新本质在于**将视频扩散模型的频率演化规律转化为可工程化的模块解耦方案**：用 VLUer 解决上采样阶段的伪影引入问题，用双频专家解决高分辨率阶段的语义-纹理兼顾问题，并用频率感知的数据策略保障各模块的训练效率。三者协同，使 LUVE 在 VBench 上以 84.34 的平均分显著超越 Wan2.1-720p（82.98）和同期 UHR 方法 UltraWan（83.50），在人类偏好研究中亦取得压倒性优势（Table 1, Table 4）。
 
-## 整体框架
+
 
 LUVE 采用三阶段级联架构，将超高清视频生成任务分解为 **低分辨率运动生成 (LMG)**、**视频潜空间上采样 (VLU)** 与 **高分辨率内容细化 (HCR)** 三个协同阶段，以解决现有方法在直接扩展至超高清时面临的运动静止、语义重复与纹理退化三重困境（Figure 2）。
 
@@ -157,7 +159,7 @@ $$\hat{z}(x, y, t) = \text{Decoder}(U(F, Q(x, y, t)))$$
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2602_11564/figures/001_Figure_1.jpg]]
 *Figure 1: The base corresponds to the pretrained T2V model used in the first stage of our framework (Wan et al., 2025). As shown, compared with existing VSR methods, our model not only produces videos that are noticeably sharper and richer in fine details, but more importantly, it significantly enhances semantic consistency and plausibility. This demonstrates that UHR generation goes beyond merely enhancing visual sharpness—it fundamentally advances semantic coherence and content fidelity. (Zoom-in for best view)*
 
-## 核心模块与公式推导
+
 
 ### 整体框架：三阶段级联架构
 
@@ -217,7 +219,9 @@ HFE 仅集成于冻结的 FFN 模块中，其高通滤波操作提取边缘和�
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2602_11564/figures/007_Figure_7.jpg]]
 *Figure 7: (a) The architecture of the low-frequency expert. (b) The architecture of the high-frequency expert*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验：VBench基准评估
 
@@ -275,7 +279,9 @@ LUVE在VBench综合基准上取得了**84.34（2K）和84.03（4K）**的平均�
 
 尽管LUVE在多数场景下表现优异，但在极端复杂的物理交互场景（如流体飞溅、多物体严重遮挡）中，仍可能出现局部语义错误或运动不连贯。用户研究中少数案例反映了这一问题。此外，双频专家的性能高度依赖数据筛选阈值（HPS v3>6.5）和切换时间步（$t_{switch}=0.417$），这些超参数可能需要针对不同基础模型重新调优。目前仅在Wan2.1-1.3B骨干上验证，其在其他DiT架构（如CogVideoX、HunyuanVideo）上的泛化性尚未得到充分探究。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有方法的谱系关系
 
@@ -309,6 +315,8 @@ LUVE 处于**文本到视频（T2V）扩散模型**与**视频超分辨率（VSR
 ---
 
 > **注意：** 上述局限中的“极端物理场景残差错误”和开放问题中的“自适应频率调控”“时域频带分解”等条目来自分析推断，原文未提供对应的定量消融或理论分析，需在后续研究中手动验证。
+
+
 
 ## 原文 PDF
 

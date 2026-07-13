@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/From_What_to_Why_A_Multi_Agent_System_for_Evidence_based_Chemical_Reaction_Condition_Reasoning.pdf
+project_link: null
+code_link: null
 openreview_forum_id: Rh72R0VXPS
 aliases:
 - FWWMASEBCRCR
@@ -41,7 +43,7 @@ claims:
 > - Private Dataset 上，Top-1 Similarity (Solvent1, %) 为 85.4，对比 73.7 (GPT5)，变化 +11.7。
 > - Private Dataset 上，Top-1 Similarity (Reagent1, %) 为 88.3，对比 68.3 (Qwen3-235B-A22B)，变化 +20.0。
 
-## 概述
+## 概要
 
 ### 1. 问题背景与核心瓶颈
 
@@ -77,7 +79,7 @@ ChemMAS 处于**神经符号推理与多智能体协作**的交叉点。与传�
 - **数据依赖**：训练数据的规模与多样性可能限制对稀有反应类型的预测能力；私有数据集未公开影响可复现性。
 - **自适应协作**：多智能体辩论框架能否动态调整角色与协作策略，而非依赖预定义分工，仍为开放问题。
 
-## 背景与动机
+
 
 ### 问题背景：化学反应条件推荐的“是什么”与“为什么”
 
@@ -103,7 +105,9 @@ ChemMAS 处于**神经符号推理与多智能体协作**的交叉点。与传�
 
 这一范式的转变旨在使化学反应条件推荐系统不仅输出“是什么”，更能回答“为什么”，从而提升其在高风险应用中的可信度和实用性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ChemMAS的核心创新在于将化学反应条件推荐从“预测范式”重构为“证据驱动的推理范式”，通过四个关键设计槽位的改变实现了从“What”到“Why”的跨越。
 
@@ -137,7 +141,7 @@ ChemMAS引入共享Memory模块，存储通用化学家输出的反应报告（�
 
 上述四个槽位的改变形成了协同增强效应：机理分析为记忆提供结构化先验，记忆为多通道召回和多智能体辩论提供约束条件，辩论过程通过迭代引用知识库提升决策质量，而两阶段训练则确保模型能有效协调多工具调用。这一协同机制使得ChemMAS在私有数据集上相比专用模型实现20–30%的Top-1相似度相对提升，相比顶尖通用大模型实现10–15%的平均增益（Table 2）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_Rh72R0VXPS/figures/002_Figure_2.jpg]]
 *Figure 2: Architecture of ChemMAS. The left side shows how the General Chemist processes SMILES and Multi-Channel Recall retrieves reaction conditions from the Reaction Base. On the right, candidate conditions are paired and evaluated through Multi-Agent Debate, where four agents with Multi-Step Reasoning select the top-50 conditions via Tournament Selection*
@@ -177,7 +181,7 @@ $$\mathrm{Dec}_j^{(u+1)}(\mathbf{o}) = \Phi\Big(\mathrm{Dec}_j^{(u)}(\mathbf{o})
 
 系统以反应物和产物的 SMILES 字符串为输入，经过机理分析→多通道召回→锦标赛筛选→多智能体辩论的完整链路，最终输出包含催化剂、溶剂、试剂的条件配置及其推理轨迹。推理轨迹包括反应类型、主要官能团、副产物推断、历史实验证据引用和约束满足论证，使输出具备可审计性。
 
-## 核心模块与公式推导
+
 
 ChemMAS 将化学反应条件推荐重构为证据驱动的推理问题，其核心由四个协同模块构成，并通过形式化约束保证输出的可解释性与可审计性。
 
@@ -245,7 +249,9 @@ $$\mathcal{L}_{\mathrm{GRPO}}(\theta) = \mathbb{E}\left[\frac{1}{G}\sum_{i=1}^{G
 
 通用化学家（General Chemist）解析 SMILES 后提取的官能团、反应类型等机理先验存入共享 Memory，作为多通道召回的查询依据和辩论阶段的约束条件。消融实验证实，移除 Memory 中的 Main FG 使平均相似度下降约 8.4%，去除多智能体辩论使催化剂 Top-1 相似度从 78.1% 降至 65.7%，去除多步推理造成平均下降 12.3%（Table 3）。这表明各模块间存在紧密的因果依赖：机理先验为检索提供语义锚点，检索结果为辩论提供候选空间，辩论通过约束检查和多步推理筛选出有效配置。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 瓶颈突破的核心证据
 
@@ -291,7 +297,9 @@ Figure 4 展示了 ChemMAS 推理过程的可解释性。左图显示通用化�
 
 尽管整体表现优异，系统仍存在可识别的失败模式。Table 5 的预测可视化显示，在个别案例中存在溶剂和试剂预测与真实标签不匹配的情况（如预测 EtOH 而真实为 MeOH），这通常发生在反应类型罕见或训练数据覆盖不足的场景。此外，当前可解释性评估依赖 LLM-as-a-Judge 机制，可能引入评判偏差，且私有数据集未公开在一定程度上影响可复现性。系统在材料设计、生物信息学等更广泛科学领域的泛化能力尚未验证，这构成了当前方法的主要边界。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 
@@ -343,6 +351,8 @@ ChemMAS 的适用边界由以下约束条件共同定义：
 3. **跨领域迁移的领域特化需求**：将证据驱动推理范式扩展到材料设计、生物信息学等领域时，需要引入哪些领域特定的工具和知识库？通用化学家（General Chemist）的机理分析能力能否通过模块化设计实现领域解耦？
 
 4. **可解释性的客观评估**：如何设计更客观、自动化的科学推理可解释性评估方案，减少对人工或 LLM 评判的依赖？可能的思路包括：引入化学专家标注的推理基准、设计基于逻辑一致性的自动检查、或开发针对化学领域的语义匹配指标。
+
+
 
 ## 原文 PDF
 

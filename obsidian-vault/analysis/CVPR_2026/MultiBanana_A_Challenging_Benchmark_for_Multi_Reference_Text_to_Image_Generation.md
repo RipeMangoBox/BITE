@@ -45,7 +45,7 @@ claims:
 > - 跨域、不同尺度和视角、稀有概念及多语言等困难参考组合导致所有模型得分降低，验证了这些异质性因素是当前模型的主要挑战。
 > - 基于 VLM 的自动评估 (GPT-5, Gemini 2.5) 与人类评判高度相关 (Pearson r 0.69/0.57)，验证了评估协议的可靠性。
 
-## 概述
+## 概要
 
 **核心问题**：现有的多参考图像生成基准存在两个根本性不足——参考图像数量受限（通常1–4张）且未系统考察参考图像之间的异质性（如跨域、尺度差异、稀有概念、多语言文本等）。这导致无法全面诊断模型在多参考场景下的真实瓶颈：当参考数量增加或参考组合变得困难时，模型要么因过度拟合参考细节而产生构图失真，要么完全忽略部分参考对象，暴露出**参考保真度与整体图像连贯性之间的根本权衡**。
 
@@ -60,7 +60,7 @@ claims:
 
 **方法谱系与知识库定位**：MultiBanana 继承了 DreamOmni2 等基准的编辑任务设计哲学，但通过大幅扩展参考数量上限和引入异质性参考组合，填补了现有多参考评估体系的空白。与 **ImgEdit-Bench**（Ye et al.）和 **DreamOmni2 Benchmark**（Xia et al.）等主流基准相比，后者在高端模型上已接近天花板（Table 7, Table 8），而 MultiBanana 通过困难参考组合提供了更细粒度的区分能力，为推进多参考生成研究提供了新的诊断工具。
 
-## 背景与动机
+
 
 文本到图像生成领域近年来取得了显著进展，模型已能根据单张参考图像生成高质量且保持主体一致性的结果。然而，现实应用场景往往要求模型同时处理多张参考图像——例如，用户希望将不同来源的人物、物体和背景融合到一幅连贯的图像中。这一多参考生成（multi-reference generation）场景对模型提出了远超单参考设定的挑战：模型不仅需要准确保持每张参考图像中的视觉属性，还必须协调参考之间的语义与空间关系，同时遵循复杂的文本指令。
 
@@ -68,7 +68,9 @@ claims:
 
 为填补这一空白，本文提出了 **MultiBanana**——一个面向多参考文本到图像生成的挑战性基准。MultiBanana 将参考图像数量上限扩展至 8 张，并系统性地引入了跨域不匹配、尺度与视角差异、稀有概念以及多语言提示等困难参考组合，旨在显式地揭示多参考生成中的独特挑战。通过构建覆盖 3,769 个高质量编辑任务的基准，并设计基于 VLM 的多维度自动评估协议，MultiBanana 为评估和推进多参考生成能力提供了细粒度的诊断工具。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MultiBanana 的核心创新并非提出新的生成模型架构，而是**构建了一个系统性揭示多参考图像生成瓶颈的挑战性基准**，其创新点体现在三个层面。
 
@@ -102,7 +104,7 @@ MultiBanana 提出了一套基于 VLM（GPT-5、Gemini 2.5）的自动评估协�
 
 **总结**：MultiBanana 的创新不在于提出新模型，而在于通过扩展参考数量、引入异质性组合、量化参考保真度-整体质量权衡、以及建立可复现的 VLM 评估协议，为多参考图像生成领域提供了一个细粒度的诊断工具，系统性地暴露了当前模型的能力边界与根本矛盾。
 
-## 整体框架
+
 
 MultiBanana 基准的构建与评估遵循一条系统化的流水线，旨在生成高质量、多样化的多参考图像编辑任务，并通过多维度的自动化评分实现对模型能力的细粒度诊断。该框架的核心设计目标是在可控的难度梯度下，暴露模型在参考保真度与整体图像连贯性之间的根本权衡。
 
@@ -155,7 +157,7 @@ MultiBanana 基准的构建与评估遵循一条系统化的流水线，旨在�
 ![[assets/figures/papers/paper_list_l2209_https_arxiv_org_abs_2511_22989/figures/001_Figure_1.jpg]]
 *Figure 1: The overview of MultiBanana. MultiBanana broadly covers problems specific to multi-reference settings, including varying the number of references (top row), domain and scale mismatches among references (two on the left in the middle row), multilingual text rendering (center in the bottom row), and the presence of rare concepts (right in the bottom row)*
 
-## 核心模块与公式推导
+
 
 MultiBanana 基准本身不提出新的生成模型，其核心贡献在于构建了一套系统性的评估与诊断框架。该框架的关键模块并非网络结构，而是数据构建管线、任务定义、评估协议以及用于探究模型行为的 Agentic 迭代框架。
 
@@ -196,7 +198,9 @@ $$G^{t+1} = \text{Gen}(P^t, \{R_i\}_{i \in U^t}, G^t), \quad P^{t+1}, U^{t+1} = 
 
 最终总分由加权求和得出，权重分配为 `{3, 3, 1, 1, 1}`，分别对应上述五个维度，凸显了指令跟随与参考保真度在多参考生成任务中的核心地位。评估主要由 **Gemini 2.5** 和 **GPT-5** 执行，其与人类评判的高度相关性验证了此自动评估协议的可靠性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 整体趋势与瓶颈分析
 
@@ -277,7 +281,9 @@ MultiBanana 的核心诊断价值在于引入了**困难参考组合**（Table 2
 ![[assets/figures/papers/paper_list_l2209_https_arxiv_org_abs_2511_22989/figures/004_Figure_3.jpg]]
 *Figure 3: (Left) Comparison between the statistics of real data only and those after adding synthetic data. The original dataset was biased toward background images, with few person- and object-related samples. To correct this imbalance, we generated additional synthetic images using Nano Banana and GPT-Image-1, focusing on clear subjects such as people, animals, and objects. This results in a more balanced and comprehensive distribution of data. (Right) Examples of synthesized images in each category*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 基准设计的谱系定位
 
@@ -321,6 +327,8 @@ MultiBanana 作为评测基准，其适用边界由以下设计选择决定：
 4. **Agentic 框架的有效性边界**：Iterative Prompt Refinement (IPR) 对 GPT 有效但对 Nano Banana 无显著提升甚至退化（Section 4.5），表明 agentic 策略的效果高度依赖基座模型的指令跟随和自省能力。何种模型特性是 agentic 框架生效的前提，值得系统研究。
 
 5. **超越 8 参考的扩展性**：当参考数量继续增加时，模型是否会从“部分遗漏”退化为“完全崩溃”？是否存在有效的参考选择或压缩策略，使模型在大量参考下仍能维持可接受的性能？
+
+
 
 ## 原文 PDF
 

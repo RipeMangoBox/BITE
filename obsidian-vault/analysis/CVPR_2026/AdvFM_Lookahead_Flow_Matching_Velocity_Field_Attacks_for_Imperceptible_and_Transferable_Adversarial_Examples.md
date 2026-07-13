@@ -44,7 +44,7 @@ claims:
 > - ImageNet (ResNet50 替代模型) 上，平均黑盒 ASR (%) 72.05 vs 64.41 (APA) (+7.64)。
 > - ImageNet (ViT-B/16 替代模型) 上，平均黑盒 ASR (%) 68.22 vs 65.04 (APA) (+3.18)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有基于扩散模型的非限制攻击（如 AdvDiffuser、DiffPGD）在生成对抗样本时，依赖随机噪声耦合与逐步衰减的重加噪过程。这导致替代模型的攻击梯度方差高、与目标模型真实梯度的对齐差，且扰动易被基于扩散的净化防御（如 DiffPure）削弱。
 
@@ -58,7 +58,7 @@ claims:
 
 **方法定位**：AdvFM 属于基于生成模型的非限制对抗攻击，其方法论上从扩散模型范式切换至流匹配速度场范式，扰动注入位置从重建图像空间改为速度场空间，并通过前瞻损失实现沿概率流 ODE 轨迹的时域梯度对齐。
 
-## 背景与动机
+
 
 ### 对抗攻击的生成模型范式
 
@@ -76,7 +76,9 @@ $$x_0' = \frac{1}{\sqrt{\bar{\alpha}_t}} \Big( x_t - \sqrt{1 - \bar{\alpha}_t} \
 
 流匹配（Flow Matching）作为扩散模型的替代范式，通过学习连续时间速度场 $v_\theta(x_t, t)$ 直接参数化概率流 ODE 的向量场，具有确定性和平滑动态的特性。本文的核心洞察在于：**将攻击扰动从像素空间转移至流匹配的连续时间速度场，并引入前瞻双点优化以对齐概率流 ODE 轨迹**。这一设计有望从根本上解决扩散攻击的三重困境——流匹配的确定性传播降低梯度方差，速度场空间的扰动放大机制提升单步攻击效率，而流形切向的扰动偏置则增强对净化防御的鲁棒性。基于此，本文提出 **AdvFM**（Lookahead Flow-Matching Velocity-Field Attack），在保持对抗样本不可感知性的同时，系统性地提升黑盒迁移性和防御鲁棒性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 AdvFM 的核心创新在于将对抗攻击的扰动注入空间从像素域迁移至**流匹配的连续时间速度场**，并通过**前瞻双点优化**对齐概率流 ODE 轨迹，从根本上解决了扩散模型攻击中随机噪声耦合导致的梯度方差高、目标梯度对齐差以及扰动易被净化防御削弱等瓶颈问题。
 
@@ -136,7 +138,7 @@ $$\mathbb{E}\|P(x + \eta^{\mathrm{FM}}) - P(x)\|^2 > \mathbb{E}\|P(x + \eta^{\ma
 
 这直接转化为对净化防御（NRP、Smooth）的显著 ASR 提升（+13.8% 和 +11.1%）。
 
-## 整体框架
+
 
 AdvFM 将无限制对抗攻击从扩散模型的随机去噪/重加噪范式迁移至流匹配（Flow Matching）的连续时间速度场，构成一条“噪声桥采样 → 速度场重建 → PGD 扰动注入 → 速度扰动转换 → 欧拉前向推进 → 前瞻双点评估”的闭环管线（参见 Algorithm 1）。
 
@@ -154,7 +156,7 @@ AdvFM 将无限制对抗攻击从扩散模型的随机去噪/重加噪范式迁�
 
 **输入输出规格。** 输入为干净图像 $x$、真实标签 $y$、替代模型 $f$ 及流匹配速度场 $v_\theta$；输出为对抗样本 $x_{\mathrm{adv}}$。管线从 $t=t_0$ 迭代至 $t=1$，每一步在流终点评估损失并反向传播梯度，最终在 $t=1$ 处输出对抗图像。
 
-## 核心模块与公式推导
+
 
 AdvFM 的攻击范式建立在**流匹配（Flow Matching）连续时间速度场**之上，核心思路是将对抗扰动从像素空间转移至速度场空间，并利用概率流 ODE 的确定性动态实现扰动放大与梯度方差降低。整个攻击管线由五个关键模块串联构成。
 
@@ -205,7 +207,9 @@ $$\mathcal{L}_f^{\mathrm{LA}}(\delta; t) = w \mathcal{L}_f(x_1^t + \delta, y) + 
 ![[assets/figures/papers/paper_list_l836_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_AdvFM_Lookahead_Fl/figures/004_Figure_2.jpg]]
 *Figure 2: Ablation of the lookahead objective on ImageNet with ResNet50 as the surrogate. We plot white-box ASR on the surrogate and the average black-box ASR on the remaining models along the reverse flow from t to 1*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果：黑盒迁移性
 
@@ -234,7 +238,9 @@ Figure 2 展示了在 ResNet50 作为替代模型时，沿反向流从时间 $
 ![[assets/figures/papers/paper_list_l836_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_AdvFM_Lookahead_Fl/figures/002_Figure_1.jpg]]
 *Figure 1: Qualitative comparison of adversarial examples on ImageNet under ResNet50*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与扩散模型攻击范式的对比定位
 
@@ -281,6 +287,8 @@ AdvFM 在以下防御场景中展现出差异化的鲁棒性，其适用边界�
 3. **前瞻损失的超参数敏感性**：Eq. 12 中的权重 $w$ 和前瞻步长 $\Delta t$ 的联合优化策略尚未被理论化，其在不同替代模型-目标模型组合下的最优配置可能具有任务依赖性。
 
 4. **与基于分数的扩散模型的统一框架**：流匹配与分数匹配（Score Matching）在连续时间极限下具有等价性，AdvFM 的方法论是否可推广至基于分数的扩散攻击范式，形成统一的连续时间攻击框架，是值得探索的理论方向。
+
+
 
 ## 原文 PDF
 

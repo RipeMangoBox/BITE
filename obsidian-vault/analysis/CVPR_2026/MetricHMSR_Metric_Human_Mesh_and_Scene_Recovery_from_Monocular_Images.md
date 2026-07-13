@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/MetricHMSR_Metric_Human_Mesh_and_Scene_Recovery_from_Monocular_Images.pdf
+project_link: null
 code_link: "https://Metaverse-AI-Lab-THU.github.com/MetricHMSR"
 aliases:
 - MetricHMSR
@@ -40,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - 3DPW / EMDB（混合） 上，PA-MPJPE / MPJPE / PVE / WA-MPJPE / W-MPJPE (mm) 34.4 / 55.0 / 64.9 / 56.4 / 154.1 (+Ray) vs 35.6 / 57.2 / 66.8 / 64.5 / 191.8 (仅图像) (↓1.2 / ↓2.2 / ↓1.9 / ↓8.1 / ↓37.7)；PA-MPJPE / MPJPE / PVE / WA-MPJPE / W-MPJPE (mm) 33.6 / 53.0 / 62.7 / 55.6 / 152.5 (+Ray&MoE) vs 34.4 / 55.0 / 64.9 / 56.4 / 154.1 (+Ray) (↓0.8 / ↓2.0 / ↓2.2 / ↓0.8 / ↓1.6)。
 
-## 概述
+## 概要
 
 从单目图像恢复度量尺度的人体网格与场景几何，是三维视觉中长期悬置的瓶颈问题。现有方法——从早期端到端基线 **HMR** (Kanazawa et al., CVPR 2018) 的弱透视假设，到 **CLIFF** (Li et al., ECCV 2022) 引入全帧位置信息的全透视模型，再到 **TRAM** (Wang et al., ECCV 2024)、**WHAM** (Shin et al., CVPR 2024)、**GVHMR** (Shen et al., SIGGRAPH Asia 2024) 等世界坐标系运动重建方法——始终面临三个根本性困难：**尺度模糊性**（单目线索无法唯一确定深度）、**特征耦合**（局部姿态与全局位置信息在特征空间中高度混叠）、以及**多阶段累积误差**（依赖外部深度估计器限制性能上限）。
 
@@ -58,7 +59,7 @@ claims:
 
 **当前局限**包括：主要验证于单人、有限遮挡场景；相机内参未知时依赖 AnyCalib 估计，误差会传播至度量重建；深度精修模块在无真值监督的野外图像上的泛化性尚待验证。
 
-## 背景与动机
+
 
 从单目图像中恢复三维人体网格与场景几何是计算机视觉的核心问题，在虚拟现实、增强现实、人机交互等领域具有广泛应用。近年来，基于参数化人体模型（如SMPL）的端到端方法取得了显著进展，**HMR**（Kanazawa et al., CVPR 2018）率先实现了从单张图像直接回归人体姿态与形状。然而，这一领域仍面临三个关键瓶颈。
 
@@ -70,7 +71,9 @@ claims:
 
 针对上述问题，MetricHMSR提出了三个核心洞察：（1）相机内参与边界框隐含人体三维全局位置线索，将其显式编码为像素对齐的度量信号可有效缓解尺度歧义；（2）通过动态路由机制实现局部姿态与全局位置的特征级解耦，使同一架构能同时学习这两类信息；（3）恢复的度量人体网格可作为强几何先验，引导单目深度估计实现物理一致的人-景重建。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MetricHMSR 的核心创新围绕三个相互协同的 **changed slots** 展开，分别解决单目度量人体恢复中的尺度模糊性、特征耦合和深度不一致三大瓶颈。
 
@@ -114,7 +117,7 @@ $$\mathcal{L} = \lambda_{d} \mathcal{L}_{\mathrm{depth}} + \lambda_{a} \mathcal{
 
 三个创新形成因果闭环：**光线图**提供像素级度量线索，使网络具备恢复绝对三维位置的能力；**HumanMoE** 通过特征解耦，使同一骨干能同时学习局部姿态和全局位置，避免信息混叠；**深度精修**则以重建的度量人体为锚点，将场景深度拉至与人一致的度量空间。三者共同突破了“单目图像→度量人-景重建”的核心瓶颈。
 
-## 整体框架
+
 
 MetricHMSR 构建了一个端到端的统一框架，从单张 RGB 图像联合恢复**度量级人体网格**与**场景几何**。其核心设计遵循一条清晰的信息流：**显式度量线索注入 → 特征解耦人体重建 → 人体引导深度精修**，三者级联形成从图像到度量一致人-景重建的完整链路。
 
@@ -166,7 +169,7 @@ $$\hat{z}(x) = s(x) z_{\text{in}}(x) + b(x)$$
 ![[assets/figures/papers/paper_list_l1029_https_openaccess_thecvf_com_content_CVPR2026_html_Song_MetricHMSR_Metric/figures/001_Figure_1.jpg]]
 *Figure 1: MetricHMSR (Metric Human Mesh and Scene Recovery) reconstructs human pose, metric shape, global position, as well as scene geometry from a monocular image. Left: metric-consistent human–scene reconstruction. Right: globally consistent 3D trajectories obtained by applying MetricHMSR independently to each frame*
 
-## 核心模块与公式推导
+
 
 ### 3.1 边界相机光线图（Bounding Camera Ray Map）
 
@@ -268,7 +271,9 @@ $$\mathcal{L} = \lambda_{d} \mathcal{L}_{\mathrm{depth}} + \lambda_{a} \mathcal{
 ![[assets/figures/papers/paper_list_l1029_https_openaccess_thecvf_com_content_CVPR2026_html_Song_MetricHMSR_Metric/figures/006_Figure_6.jpg]]
 *Figure 6: Illustration of human-guided metric depth refinement*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -329,7 +334,9 @@ Table 6系统验证了各核心组件的贡献：
 ![[assets/figures/papers/paper_list_l1029_https_openaccess_thecvf_com_content_CVPR2026_html_Song_MetricHMSR_Metric/figures/007_Table_3.jpg]]
 *Table 3: Quantitative comparisons of global motion and trajectory estimation on RICH, a static camera dataset*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从弱透视到度量级人-景联合重建
 
@@ -366,6 +373,8 @@ MetricHMSR 的适用性受以下假设和边界约束：
 2. **如何构建大规模互联网数据的伪真值标注管线？** 当前训练依赖 BEDLAM、3DPW 等有监督数据集。利用 MetricHMSR 自身的度量重建能力进行自训练或伪标签生成，是扩展训练数据规模的关键方向。
 3. **HumanMoE 的解耦特性能否推广？** Patch MoE + Global MoE 的局部-全局解耦范式是否适用于其他视觉任务（如通用 3D 姿态估计、目标检测、场景理解）？路由热力图（Figure 5）显示专家在人体关键点区域呈现结构化激活，暗示该机制可能捕获了通用的结构感知能力。
 4. **度量人体作为通用几何先验的潜力。** 人引导深度精修的成功表明，度量人体可作为强几何锚点。这一思路能否扩展到其他几何任务（如法线估计、三维重建、新视图合成）？人体先验与场景先验的联合优化框架值得探索。
+
+
 
 ## 原文 PDF
 

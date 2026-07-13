@@ -32,7 +32,7 @@ claims:
 | 中文题名 | Efficient-LVSM：基于解耦共精炼注意力的高效大视角合成模型 |
 | 英文题名 | Efficient-LVSM: Faster, Cheaper, and Better Large View Synthesis Model via Decoupled Co-Refinement Attention |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=tzBPOXJ3QC) · [Project](https://efficient-lvsm.github.io/) · [arXiv](https://arxiv.org/abs/2403.14627) |
+| Links | [paper](https://openreview.net/forum?id=tzBPOXJ3QC) · [Project](https://efficient-lvsm.github.io/) · [paper](https://arxiv.org/abs/2403.14627) |
 | Topic | #topic/other_unclear #topic/other_unclear/general |
 | Method | Efficient-LVSM |
 | Dataset | RealEstate10K, ABO, GSO |
@@ -42,7 +42,7 @@ claims:
 > - ABO (物体级) 上，PSNR (Res-512) 32.65 vs 32.10 (LVSM Dec-Only) (+0.55 dB)。
 > - GSO (物体级) 上，PSNR (Res-512) 32.92 vs 32.36 (LVSM Dec-Only) (+0.56 dB)。
 
-## 概述
+## 概要
 
 大视角合成（Large View Synthesis）旨在从稀疏输入视图直接生成任意新视角的图像。现有前馈方法 **LVSM**（Jin et al., 2025）采用全自注意力机制，将所有输入视图令牌与目标视图令牌拼接为单一序列进行统一建模。这一设计带来了两个根本性瓶颈：
 
@@ -56,8 +56,6 @@ claims:
 - **KV缓存与增量推理**：由于输入视图特征与目标视图生成解耦，模型可缓存输入视图的键值对，在新增输入或目标视图时实现近恒定成本的增量推理。
 
 实验结果表明，Efficient-LVSM 在保持甚至超越现有方法重建质量的同时，大幅提升了效率。在 RealEstate10K 场景级数据集上，以2个输入视图达到 **29.86 dB PSNR**，超过 LVSM 0.2 dB；计算复杂度从 $O(N^2)$ 降至线性 $O(N)$，推理速度提升 **4.4倍**，训练收敛速度提升 **2倍**。在64个输入视图的极端场景下，基于KV缓存的推理延迟加速达 **66.7倍**。此外，该架构在物体级数据集（ABO、GSO）上同样展现出显著的性能优势与泛化能力。
-
-## 背景与动机
 
 ### 大视角合成与潜在空间范式
 
@@ -91,7 +89,7 @@ Efficient-LVSM 的设计同时追求效率与质量的提升。在效率维度�
 
 相较于基于 3D 高斯泼溅的 **pixelSplat** 和 **MVSplat**，Efficient-LVSM 延续了 LVSM 的潜在空间范式，避免显式 3D 重建的几何约束，同时通过架构创新弥补了效率短板。相较于同样采用 Transformer 的 **GS-LRM**（Zhang et al., 2024），Efficient-LVSM 专注于视图合成而非 3D 原语预测，在场景级与物体级任务上展现出更强的泛化性。
 
-## 核心创新
+## 核心方法与创新机理
 
 Efficient-LVSM 的核心创新在于将 LVSM 的全自注意力范式彻底重构为**解耦双流共精炼架构**，从根本上解决了原有方法在计算效率与表示能力上的双重瓶颈。
 
@@ -136,8 +134,6 @@ $$\begin{array}{rl} \mathbf{T_j}^l = \mathbf{T_j}^{l-1} + \mathrm{Self-Attn}_{\m
 
 综上，Efficient-LVSM 通过解耦双流设计实现了复杂度从二次到线性的跃迁，通过共精炼机制充分挖掘了多层特征潜力，并通过 KV 缓存解锁了高效增量推理能力，构成了一个在速度、质量与可扩展性三个维度上全面超越 LVSM 的统一框架。
 
-## 整体框架
-
 Efficient-LVSM 采用**编码器-解码器解耦双流架构**，从根本上改变了此前 LVSM 将输入视图令牌与目标视图令牌拼接后统一送入全自注意力的范式。其核心设计原则是：**输入视图处理与目标视图生成在信息流和参数上完全解耦**，从而消除异构令牌之间的强制共享，并为增量推理提供结构基础。
 
 ### 输入表示与令牌化
@@ -168,11 +164,6 @@ Efficient-LVSM 的处理管道由两个功能独立、参数分离的模块组�
 
 ![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_tzBPOXJ3QC/figures/001_Figure_1.jpg]]
 *Figure 1: Latent Novel View Synthesis Paradigms Comparison. The proposed decoupled architecture disentangles the input and target streams with lower*
-
-![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_tzBPOXJ3QC/figures/002_Figure_2.jpg]]
-*Figure 2: Efficient-LVSM Model Structure. Efficient-LVSM patchifies posed input images and target Plucker rays into tokens. Input tokens pass separately through an encoder to extract context, ¨ while target tokens cross-attend to generate new views. Asterisks indicate shared parameters*
-
-## 核心模块与公式推导
 
 Efficient-LVSM 的核心架构由五个关键模块构成：输入编码器、目标解码器、双流共精炼连接、REPA 蒸馏和 KV 缓存。以下逐一阐述其设计逻辑与数学形式。
 
@@ -239,10 +230,7 @@ $$
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_tzBPOXJ3QC/figures/005_Figure_4.jpg]]
-*Figure 4: Applying REPA into Efficient-LVSM. (a) Pretrained vision encoders and MLP projectors are discarded in inference. (b) Feature maps indicate that REPA helps the model extract semantics. to refine its own representation*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 核心性能对比
 
@@ -300,7 +288,7 @@ Efficient-LVSM 的效率优势源于两个关键机制。其一，输入编码�
 ![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_tzBPOXJ3QC/figures/014_Table_5.jpg]]
 *Table 5: Ablation Study of REPA Distillation*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 与LVSM的继承与突破
 

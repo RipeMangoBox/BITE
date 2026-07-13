@@ -5,6 +5,8 @@ paper_level: B
 venue: CVPR
 year: 2024
 pdf_ref: obsidian-vault/paperPDFs/CVPR_2024/DanceCamera3D_3D_Camera_Movement_Synthesis_with_Music_and_Dance.pdf
+project_link: null
+code_link: https://github.com/Carmenw1203/DanceCamera3D-Official
 aliases:
   - DanceCamera3D
   - DCM
@@ -29,7 +31,7 @@ updated: 2026-06-20T18:45:00+08:00
 
 # DanceCamera3D: 3D Camera Movement Synthesis with Music and Dance
 
-> [!abstract] TL;DR
+> [!tip] 核心洞察
 > 因为现有舞蹈生成数据集几乎没有移动相机轨迹，作者构建 DCM 三模态数据集，并在 Transformer diffusion 中加入 body attention loss 与 music/dance 分离 CFG，使模型能从音乐和 3D 舞蹈姿态生成更能捕捉人物、具备镜头变化的 3D 相机运动。
 
 | 字段 | 内容 |
@@ -37,7 +39,7 @@ updated: 2026-06-20T18:45:00+08:00
 | 中文题名 | DanceCamera3D：音乐与舞蹈驱动的 3D 相机运动合成 |
 | 英文题名 | DanceCamera3D: 3D Camera Movement Synthesis with Music and Dance |
 | 会议/期刊 | CVPR 2024 |
-| Links | [CVF](https://openaccess.thecvf.com/content/CVPR2024/html/Wang_DanceCamera3D_3D_Camera_Movement_Synthesis_with_Music_and_Dance_CVPR_2024_paper.html) · [arXiv](https://arxiv.org/abs/2403.13667) · [Code](https://github.com/Carmenw1203/DanceCamera3D-Official) |
+| Links | [CVF](https://openaccess.thecvf.com/content/CVPR2024/html/Wang_DanceCamera3D_3D_Camera_Movement_Synthesis_with_Music_and_Dance_CVPR_2024_paper.html) · [paper](https://arxiv.org/abs/2403.13667) · [Code](https://github.com/Carmenw1203/DanceCamera3D-Official) |
 | Topic | #topic/motion_animation #topic/motion_animation/human_motion_generation #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation #topic/generative_models_diffusion |
 | 主要任务 | music+dance conditioned 3D camera movement synthesis |
 | 数据集 | DCM: 108 sequences, 3.2 hours / 193 minutes, 4 music languages |
@@ -47,7 +49,10 @@ updated: 2026-06-20T18:45:00+08:00
 - Ablation: w/o body attention loss 的 DMR ↑ 0.0899, LCD ↑ 0.310，说明人物出画是该任务的关键失败模式。
 - User study: DanceCamera3D 相对 DanceRevolution 与 FACT 的胜率分别为 71.90% ± 2.38% 与 65.71% ± 1.71%。
 
-## 背景与动机
+> [!tip] 效果简介
+> 本笔记的既有实验指标、对比结果与适用边界见“实验与关键发现”；本轮仅统一结构，不改写证据。
+
+## 概要
 
 这篇论文切入的是一个非常具体但在 human-camera generation 中很有价值的缺口：舞蹈生成已有大量 music-to-dance 工作，但多数默认固定视角或多固定相机，缺少“给定舞蹈和音乐后自动设计移动相机”的数据与方法。舞蹈运镜不是普通 camera planning 的简单子集，因为它同时受三类因素影响：音乐节奏、舞蹈动作、人物在画面中的构图关系。
 
@@ -55,7 +60,9 @@ updated: 2026-06-20T18:45:00+08:00
 
 从 StoryMotion / PulpMotion 视角看，DanceCamera3D 的价值不在于模型很强，而在于它较早明确了三个后来仍然重要的问题：相机生成应显式考虑人体是否在画面中；音乐/动作条件对相机的作用强弱不同；camera metric 不能只看轨迹本身，还要评估 shot feature 和 dancer fidelity。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 1. DCM 数据集：对齐的 dance-camera-music 三模态资产
 
@@ -119,7 +126,7 @@ $$
 
 实验现象是：增大 CFG 总体上会提高 quality/diversity，但会牺牲 dancer fidelity；单独增强 music guidance 会更强烈改变 camera movement style，单独增强 dance guidance 会带来更慢、更稳定、人物捕捉更好的相机变化。这个结论对 StoryMotion 有启发：不同条件不应默认同权，也不应默认一个统一 CFG scale 能解释 human/camera/text 的相互作用。
 
-## 整体框架
+
 
 DanceCamera3D 的 pipeline 可以概括为：
 
@@ -132,7 +139,7 @@ DanceCamera3D 的 pipeline 可以概括为：
 
 从模块边界看，论文不是 human+camera joint generation，而是 conditional camera completion：human dance 和 music 已知，模型只生成 camera。这也是它相对 StoryMotion 的边界：它能证明“人体投影约束与条件分离 CFG 有价值”，但不能直接证明 human/camera 双向生成可以稳定。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化
 
@@ -154,7 +161,9 @@ $L_{ba}$ 不是严格的视觉美学 loss。它只表达“GT 中可见的关节
 
 DanceCamera3D 的条件分离 CFG 更像一个 empirical control knob：dance 与 music 的条件强度分别改变不同 metric。它没有证明条件在表示中严格解耦，但证明了不同模态的 CFG 统一处理会掩盖 trade-off。对 human-camera 生成而言，更合理的是对 human text、camera text、observed human latent、observed camera latent 分别做 intervention / scale sweep，而不是只扫一个 global CFG。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果
 
@@ -186,7 +195,9 @@ Figure 7 显示分别增强 dance guidance 与 music guidance 会产生不同 tr
 - 评估指标仍偏分布与几何代理，缺少跨数据集泛化和真实用户工作流验证。
 - body attention loss 以 GT visibility 为监督，依赖已有人物与相机配对数据；没有配对 camera 的场景无法直接使用。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 DanceCamera3D 位于 camera movement generation 的早期数据/任务定义线上，和 [[analysis/ECCV_2024/E_T_the_Exceptional_Trajectories_Text_to_camera_trajectory_generation_with_character_awareness|E.T.]]、[[analysis/ICLR_2026/Pulp_Motion_Framing_aware_multimodal_camera_and_human_motion_generation|Pulp Motion]]、[[analysis/CVPR_2026/Towards_Storytelling_Animations_Joint_Synthesis_of_Human_and_Camera_Motions|Towards Storytelling Animations]] 的关系如下：
 
@@ -194,6 +205,8 @@ DanceCamera3D 位于 camera movement generation 的早期数据/任务定义线�
 - 相对 Pulp Motion / StoryMotion：DanceCamera3D 是 camera completion，不生成 human；Pulp/StoryMotion 是 human-camera joint 或 completion。DanceCamera3D 的 body attention loss 可转化为 StoryMotion 的 projection reliability protocol，但不能直接证明双分支联合生成稳定。
 - 相对 PoseAnything：DanceCamera3D 的条件分离是 music/dance CFG 权重分离；PoseAnything 是 subject/camera 条件的采样期残差 CFG。两者都说明条件耦合需要显式诊断，但都不构成严格 disentanglement 证明。
 
-## Local Reading
+
+
+## 原文 PDF
 
 ![[paperPDFs/CVPR_2024/DanceCamera3D_3D_Camera_Movement_Synthesis_with_Music_and_Dance.pdf]]

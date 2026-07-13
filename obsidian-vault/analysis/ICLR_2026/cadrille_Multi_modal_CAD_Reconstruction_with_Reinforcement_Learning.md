@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/cadrille_Multi_modal_CAD_Reconstruction_with_Reinforcement_Learning.pdf
+project_link: null
+code_link: https://github.com/col14m/cadrille
 openreview_forum_id: w2tnhhMbXv
 aliases:
 - cadrille
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | cadrille：基于强化学习的多模态CAD重建 |
 | 英文题名 | cadrille: Multi-modal CAD Reconstruction with Reinforcement Learning |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=w2tnhhMbXv); [GitHub](https://github.com/col14m/cadrille) |
+| Links | [paper](https://openreview.net/forum?id=w2tnhhMbXv) · [GitHub](https://github.com/col14m/cadrille) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | cadrille |
 | Dataset | DeepCAD (Point Clouds), DeepCAD (Images), DeepCAD (Text), CC3D Real-World (Point Clouds) |
@@ -41,7 +43,7 @@ claims:
 > - DeepCAD (Images) 上，CD↓ / IoU↑ / IR↓ 为 0.17 / 92.2% / 0.0% (Dr. CPPO)，对比 CADCrafter: 0.26 / - / 3.6%，变化 CD -0.09, IR -3.6%。
 > - DeepCAD (Text) 上，CD↓ / IoU↑ / IR↓ 为 0.20 / 82.1% / 1.4% (SFT R_pi+D_t)，对比 Text2CAD: 0.37 / 71.5% / 3.7%，变化 CD -0.17, IoU +10.6%, IR -2.3%。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -68,7 +70,7 @@ cadrille是首个将RL微调引入多模态CAD重建的工作，也是首个统�
 
 综上，cadrille通过“SFT+RL”两阶段训练策略，在10个基准测试上建立了新的最优结果，证明了RL微调对多模态CAD重建的有效性。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -102,7 +104,9 @@ cadrille是首个将RL微调引入多模态CAD重建的工作，也是首个统�
 
 基于上述动机，本文提出**cadrille**——首个多模态CAD重建模型，统一处理点云、多视图图像和文本三种输入，采用SFT+RL两阶段训练，在10个基准上建立了新的最优结果。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 cadrille 的核心创新并非提出全新的网络架构，而是将大语言模型（LLM）的训练范式系统性地迁移到多模态 CAD 重建任务中，从根本上解决了单模态模型跨域泛化差与几何无效性高两大瓶颈。其创新集中体现在三个相互耦合的 **changed slots** 上。
 
@@ -142,7 +146,7 @@ cadrille 将基础 LLM 从 **Qwen2-1.5B**（仅文本）升级为 **Qwen2-VL-2B*
 
 **证据强度评估**：SFT 跨域退化（Tab. 3 row 2 vs row 3）、混合数据 SFT 失效（row 4）、RL 微调显著提升（row 6）以及跨模态迁移效应均有明确表格数据支撑，置信度 ≥ 0.95。DPO vs 在线 RL 的消融对比（Tab. 3, rows 5-6）进一步确认了在线 RL 策略（Dr. CPPO）的必要性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_w2tnhhMbXv/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of cadrille. It can handle three input modalities within a unified framework. Point clouds are processed with a trainable projection layer, while images and texts are passed to a VLM directly. The output of the model is an executable Python script for CAD generation*
@@ -184,7 +188,7 @@ $$R(\tau) = r_{\mathrm{IoU}}(\tau) + r_{\mathrm{invalid}}(\tau)$$
 2. **跨模态迁移**：仅在图像数据上进行 RL 微调，即可同步提升点云重建性能，实现跨模态泛化（Tab.3 第 6 行）。
 3. **推理效率**：RL 微调后的模型仅需单次推理即可达到甚至超越 SFT 模型 10 样本测试时采样的效果，且无效率更低（Tab.11）。
 
-## 核心模块与公式推导
+
 
 ### 统一多模态输入处理
 
@@ -239,7 +243,9 @@ $$\mathbb{E}_{(q,\tau_w,\tau_l)\sim\mathcal{D}}\left[\log\sigma\left(\beta\log\f
 
 其中 $\pi_{\theta_r}$ 为参考策略（SFT 模型），$\pi_{\theta_t}$ 为目标策略，$\beta$ 控制偏离参考策略的强度。DPO 实验中 $K=5$ 个候选样本取得最佳效果，与 $K=3$ 相比 IoU 差异小于 1%（Tab. 10）。然而，在线 Dr. CPPO 在降低无效率和提升 IoU 方面均显著优于 DPO（Tab. 3 第 5 行 vs 第 6 行），将 IR 降至 0.2% 以下，IoU 提升 3-9 个百分点。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈验证：SFT模型的跨域失效
 
@@ -331,7 +337,9 @@ Fusion360上18.7%的IR揭示了多阶段流水线（LRM重建mesh→CAD-Recode�
 
 ![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_w2tnhhMbXv/figures/020_Table_10.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 两阶段训练范式的来源与突破
 
@@ -387,6 +395,8 @@ cadrille 并非首个将 RL 引入 CAD 生成的工作。**CADFusion**（Wang et
 - **点云 RL 微调**：当前 RL 微调仅在图像数据上进行（跨模态迁移到点云），直接在点云数据上进行 RL 可能进一步缩小真实域差距。
 - **数据复杂度扩展**：增加程序生成数据的几何复杂度并扩大 RL 微调数据量，以更好地适应真实世界扫描中的复杂形状。
 - **推理效率优化**：在保持高精度的同时减少推理时间，使方法更适用于实际部署场景。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,7 @@ paper_level: A
 venue: ICCV
 year: 2025
 pdf_ref: paperPDFs/ICCV_2025/Controllable_Weather_Synthesis_and_Removal_with_Video_Diffusion_Models.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/toronto-ai/WeatherWeaver/
 aliases:
 - CWSRVDM
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | 可控天气合成与去除的视频扩散模型 |
 | 英文题名 | Controllable Weather Synthesis and Removal with Video Diffusion Models |
 | 会议/期刊 | ICCV 2025 |
-| Links | [paper](https://arxiv.org/abs/2505.00704); [Project](https://research.nvidia.com/labs/toronto-ai/WeatherWeaver/) |
+| Links | [paper](https://arxiv.org/abs/2505.00704) · [Project](https://research.nvidia.com/labs/toronto-ai/WeatherWeaver/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | WEATHERWEAVER |
 | Dataset | User Study - Weather Synthesis (Fog) |
@@ -40,7 +41,7 @@ claims:
 > - User Study - Weather Synthesis (Fog) 上，Preference over AnyV2V (Human) 为 85%，对比 15% (AnyV2V)，变化 +70pp。
 > - User Study - Weather Synthesis (Fog) 上，Preference over AnyV2V (VLM) 为 80%，对比 20% (AnyV2V)，变化 +60pp。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -71,7 +72,7 @@ WEATHERWEAVER 基于 Stable Video Diffusion 构建，属于**可控视频扩散�
 
 方法受限于 Stable Video Diffusion 的 VAE 8倍空间压缩，导致高频细节（如人脸）有时丢失；训练数据中夜间视频有限，夜间天气模拟质量下降。开放问题包括：如何更好地保留精细纹理、如何提升夜间场景鲁棒性、以及如何将方法扩展到更长视频。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -101,7 +102,9 @@ WEATHERWEAVER 基于 Stable Video Diffusion 构建，属于**可控视频扩散�
 
 这一设计使得 WEATHERWEAVER 在用户研究中显著优于现有基线——例如在雾天合成任务上，人类评估者在 85% 的样本中偏好本文方法优于 AnyV2V——同时保持了时间一致性和对多种天气效果的精细控制能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 WEATHERWEAVER 的核心创新并非单一技术的堆叠，而是围绕“真实世界可控天气视频编辑”这一瓶颈问题，在**任务分解范式**、**控制表示**和**数据策略**三个维度上对现有方法进行了系统性重构。
 
@@ -136,7 +139,7 @@ Table 1 系统对比了三种数据源在可控性、时间一致性、真实感
 
 WEATHERWEAVER 构建于 Stable Video Diffusion 之上，方法本身具有模型无关性，理论上可迁移至更强的视频扩散模型。当前的主要局限包括：基础 VAE 的 8 倍空间压缩导致人脸等高频细节丢失；训练数据中夜间视频稀缺，夜间场景的模拟质量受限；以及离线推理方式限制了对更长视频的扩展。这些局限本质上受限于基座模型的能力上限和数据覆盖范围，而非方法范式本身。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2505_00704/figures/002_Figure_2.jpg]]
 *Figure 2: Model Overview. Our controllable weather simulation framework includes two complementary models for both weather removal and weather synthesis. These models can be used both independently and combined for weather editing tasks*
@@ -163,7 +166,7 @@ WEATHERWEAVER 将真实视频中的天气模拟形式化为一个视频到视频
 
 训练采用多阶段策略：天气去除模型先在仿真和生成数据上进行图像-视频联合训练；天气合成模型同样先在仿真和生成数据上训练，最后在所有三种数据源上联合微调，以兼顾可控性、真实感和场景多样性。
 
-## 核心模块与公式推导
+
 
 ### 双模型流水线
 
@@ -233,7 +236,9 @@ $$\mathcal{L}^{w \to c} = \| \mathbf{f}_{\theta}^{w \to c}(\mathbf{z}_{\tau}^{c}
 
 训练采用多阶段策略：Weather Removal Model 先在仿真和生成数据上以图像-视频联合训练方式学习，Weather Synthesis Model 随后在全部三种数据源上联合训练，以兼顾可控性、真实感和泛化能力。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 瓶颈突破验证
 
@@ -300,7 +305,9 @@ WEATHERWEAVER 的六维连续强度向量 $\mathbf{s} \in \mathbb{R}^6$ 提供�
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2505_00704/figures/003_Table_1.jpg]]
 *Table 1: Dataset Statistics. We collect the weather data from three heterogeneous data sources, and mark each properties as high (✓), moderate ${ \bf \Xi } ( \mathrm { ~ ~ \sigma ~ }$ ) . , and low/none (×). The data size is the number of image pairs (with and without weather effects)
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位与核心差异
 
@@ -335,6 +342,8 @@ WEATHERWEAVER 将真实视频中的天气模拟形式化为视频到视频的翻
 - 如何将方法扩展到更长视频？
 - 多阶段训练策略如何平衡不同数据源，避免对合成数据的过拟合？
 - 图像-视频联合训练对时间一致性的具体影响机制是什么？
+
+
 
 ## 原文 PDF
 

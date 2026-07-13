@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Composition_of_Memory_Experts_for_Diffusion_World_Models.pdf
+project_link: null
+code_link: null
 openreview_forum_id: sUEdpZCHdp
 aliases:
 - CMEC
@@ -42,7 +44,7 @@ claims:
 > - Memory Maze 上，SSIM↑ 为 0.892，对比 0.771 (Base)，变化 +0.121 (↑15.7%)。
 > - RECON 上，ATE↓ 为 0.96，对比 1.13 (NWM)，变化 −0.17 (↓15.0%)。
 
-## 概述
+## 概要
 
 **核心问题**：世界模型需要记忆过去观测以预测未来，但传统架构面临根本性的记忆权衡——Transformer 能保留局部细节，其计算代价却随上下文长度平方增长；循环模型和状态空间模型虽可线性扩展，却因压缩历史而丧失长期保真度。单一架构难以同时兼顾短时细节与长程一致性。
 
@@ -63,7 +65,7 @@ claims:
 
 **局限与开放问题**：CoME 对组成专家的质量与容量较敏感；在剧烈动态变化环境或超长序列（>1000 帧）下的鲁棒性尚未验证；对比系数 $\alpha_i$ 的自适应选择及免梯度记忆机制仍需探索。
 
-## 背景与动机
+
 
 ### 世界模型中的记忆瓶颈
 
@@ -97,7 +99,9 @@ claims:
 
 为将这些异构专家有效融合，本文提出**对比式专家乘积（Product of Contrastive Experts, PoCE）**策略。与朴素的专家乘积（PoE）不同，PoCE 通过引入对比基线抑制各专家产生的虚假模式，避免融合过程中的模式坍缩，从而在保持计算可控的前提下实现一致且高质量的长期预测。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 根本瓶颈：世界模型的记忆权衡
 
@@ -146,7 +150,7 @@ $$\tilde{p}_i(\mathbf{x}) \propto p_i(\mathbf{x})^{\alpha_i} \, \bar{p}_i(\mathb
 
 最终，CoME 将预训练先验 $p_\theta$、STM $p_\phi$、LTM $p_\psi$ 和 SLTM $p_\lambda$ 四个对比专家按统一分布融合（Eq 4），各专家权重由系数 $\alpha_0, \alpha_1, \alpha_2, \alpha_3$ 调节。这一框架具有良好的可扩展性——新增记忆类型只需添加对应的对比专家项，无需修改现有组件。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_sUEdpZCHdp/figures/011_Figure_4.jpg]]
 *Figure 4: Illustration of Mixture of Contrastive Experts. (a) Individual experts, modeled as Gaussian mixtures, modes are decreasing geometrically (from left to right). (b) Individual contrastive experts, with uniform modes. (c) Product of Experts, Exponentially scales PoE, Product of Contrastive Experts.PoCE suppresses inconsistent modes (e.g., the four rightmost peaks) while preserving the dominant left kernel. The vertical line indicates the center of probability mass for the PoE and PoCE*
@@ -193,7 +197,7 @@ $$
 
 - **对比融合而非简单乘积**：消融实验（Table 4）表明，直接使用朴素专家乘积会导致性能退化（联合专家 LPIPS 从 0.097 升至 0.192），而 PoCE 通过对比基线抑制虚假模式，是实现稳定融合的关键。
 
-## 核心模块与公式推导
+
 
 ### 3.1 扩散世界模型基础
 
@@ -259,7 +263,9 @@ $$\nabla_{\mathbf{x}_t} \log p_{\text{CoM}} = \sum_k \alpha_k \nabla \log p_k + 
 
 **关键机制总结**：CoME 通过 PoCE 将过去-未来一致性需求从单一架构中解耦，分布到专门的记忆专家。对比机制抑制虚假模式，使得联合分布集中在各专家一致的区域，从而在不增加平方计算代价的前提下扩展有效上下文长度。消融实验证实，移除对比机制（即朴素 PoE）会导致 LPIPS 从 0.097 退化至 0.192（Table 4），验证了 PoCE 是避免模式坍缩的关键设计。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈验证：上下文长度与重建质量
 
@@ -329,7 +335,9 @@ CoME 的计算开销主要来自 LTM 的测试时微调。根据 **Table 9** 和
 
 4. **对比系数 α_i 的敏感性**：论文未系统探索 α_i 的选择策略。当前所有实验使用固定值，但在不同场景下，各专家的可靠性可能动态变化，固定系数可能导致次优融合。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与设计动机
 
@@ -365,6 +373,8 @@ CoME 处于**扩散世界模型**、**组合式生成**与**测试时自适应**
 - **更长序列的记忆饱和效应**：在 >1000 帧及更高动态场景下，LTM 的 LoRA 容量是否会出现饱和，以及如何扩展专家容量，需要进一步研究。
 - **免梯度记忆机制**：能否通过检索增强或外部记忆库替代测试时微调，以减少计算开销，是一个值得探索的方向。
 - **视频扩散中的长程一致性**：确保长程生成中的场景一致性仍是开放挑战，特别是在相机轨迹反转等需要精确回忆的场景中。
+
+
 
 ## 原文 PDF
 

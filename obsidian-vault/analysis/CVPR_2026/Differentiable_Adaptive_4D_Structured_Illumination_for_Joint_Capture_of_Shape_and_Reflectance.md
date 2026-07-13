@@ -43,7 +43,7 @@ claims:
 > - 物理物体 上，单视角采集时间 约10分钟（总曝光时间15秒） vs 24分钟 (减少2倍)。
 > - 反射率质量 上，与新视角照片的视觉对比 可比 vs (无量化指标)。
 
-## 概述
+## 概要
 
 三维物体的数字化采集——同时获取其精确几何形状与空间变化反射率——是计算机图形学与视觉领域的长期挑战。现有基于4D空间-角度域结构光的方法（如**Unified spatial-angular structured light**，Xu et al., CVPR 2023）虽能联合采集形状与反射率，但依赖离线预优化的固定照明图案，且每次仅点亮单个LED，导致单视角采集耗时长达24分钟，无法根据物体特性自适应调整，采集效率与精度均受制约。
 
@@ -51,7 +51,7 @@ claims:
 
 实验表明，在相同硬件原型上，本方法使用72个自适应图案即可将深度RMSE从33.72 mm降至1.79 mm，内点比例从41%提升至98.7%；总曝光时间减少高达100倍，单视角采集时间由24分钟压缩至约10分钟。反射率结果在新视角照片验证下与现有技术可比。该方法为面向任意物体的高效高精度数字化采集提供了可微分的自适应范式。
 
-## 背景与动机
+
 
 ### 问题背景：联合采集形状与反射率的挑战
 
@@ -86,7 +86,9 @@ claims:
 
 通过这一方法，本文旨在证明：**智能地选择“看什么”和“怎么看”，比简单地“看得更多”更为高效。**
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈与因果杠杆
 
@@ -119,7 +121,7 @@ claims:
 
 本工作在4D结构光领域首次提出了**学习型空间-角度域多重复用方案**，将自适应照明优化的思想从传统空间域结构光拓展到空间-角度联合域。与经典的空间结构光方法**MPS**（Gupta and Nayar, CVPR 2012）仅采集几何相比，本方法同时输出反射率参数；与统一空间-角度结构光[43]（Xu et al., CVPR 2023）相比，本方法将照明设计从离线预优化升级为在线自适应优化，并引入多LED复用机制。从知识库定位看，本方法处于**计算成像×可微优化×结构光**的交叉点，其“概率建模+可微损失驱动采集策略”的范式可迁移至其他主动视觉任务。
 
-## 整体框架
+
 
 本文提出一种**两阶段流水线**，以可微分方式自适应计算4D空间‑角度域照明条件，实现对任意物理物体形状与反射率的高效联合采集。整体流程如图2所示。
 
@@ -158,7 +160,7 @@ claims:
 ![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2605_06214/figures/001_Figure_1.jpg]]
 *Figure 1: Our acquisition setup. It consists of a camera, an LED array and an LCD mask (a). The setup is working with optimized light/mask pattern (b). A side view is illustrated in (c)*
 
-## 核心模块与公式推导
+
 
 ### 整体流水线
 
@@ -218,7 +220,9 @@ $$L_j(\mathbf{x}_l, -\omega_k^i) \approx L_j(l) \Psi(-\omega_k^i) L(\mathbf{x}_l
 ![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2605_06214/figures/004_Figure_4.jpg]]
 *Figure 4: Visualization of various parts in adaptive acquisition. From the left column to right, after the initialization, after pattern#3, #12 and #30 is projected. From the top row to bottom, light pattern, mask pattern, corresponding photograph, depth uncertainty visualization (yellow = uncertain, blue = certain), and the visualization of the probability model at a single pixel*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：与现有技术的定量与定性比较
 
@@ -278,7 +282,9 @@ $$L_j(\mathbf{x}_l, -\omega_k^i) \approx L_j(l) \Psi(-\omega_k^i) L(\mathbf{x}_l
 ![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2605_06214/figures/012_Figure_12.jpg]]
 *Figure 12: Impact of*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 在4D结构光采集谱系中的位置
 
@@ -321,6 +327,8 @@ $$L_j(\mathbf{x}_l, -\omega_k^i) \approx L_j(l) \Psi(-\omega_k^i) L(\mathbf{x}_l
 ### 5. 在知识库中的定位总结
 
 本文在计算成像与结构光领域占据**“自适应4D结构光联合采集”**这一新兴节点：它上承统一空间-角度结构光[43]的硬件与建模框架，下启可微分照明优化与概率引导采集的新范式。其方法论贡献——将采集过程本身视为可微优化问题——与更广泛的“学习型传感”趋势（如自适应主动视觉、神经采集）形成共振，但当前仍受限于显式表示和忽略间接光照的理论简化。
+
+
 
 ## 原文 PDF
 

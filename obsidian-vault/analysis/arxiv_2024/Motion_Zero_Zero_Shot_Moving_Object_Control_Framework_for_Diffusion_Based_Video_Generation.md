@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2024
 pdf_ref: paperPDFs/arxiv_2024/Motion_Zero_Zero_Shot_Moving_Object_Control_Framework_for_Diffusion_Based_Video_Generation.pdf
+project_link: null
+code_link: null
 aliases:
 - MZ
 - Motion-Zero
@@ -41,7 +43,7 @@ claims:
 > - 33 prompts + 8 simple trajectories (ZeroScope) 上，Text Align (CLIP) 21.96 vs 20.31 (+1.65)；Inter-frame Consistency 0.94 vs 0.88 (+0.06)；PickScore (user preference) 19.89 vs 18.98 (+0.91)。
 > - 33 prompts + 17 complex trajectories 上，mIoU 0.55 vs 0.50 (TrailBlazer c.) (+0.05)；AP50 0.67 vs 0.61 (TrailBlazer c.) (+0.06)；Cov. (detection coverage) 0.97 vs 0.91 (TrailBlazer c.) (+0.06)。
 
-## 概述
+## 概要
 
 **瓶颈**：现有文本到视频扩散模型生成的物体运动轨迹具有随机性，用户无法直接控制。已有的运动控制方法依赖大规模标注数据集进行训练，计算成本高，且只能应用于其训练时所基于的特定模型，缺乏跨模型的即插即用能力。
 
@@ -54,7 +56,7 @@ claims:
 
 **主要结果**：Motion-Zero 在零样本设置下显著提升了基线模型的生成质量和控制指标。在 ZeroScope 上，Text Align 从 20.31 提升至 21.96，Inter-frame Consistency 从 0.88 提升至 0.94。在复杂轨迹控制上，Motion-Zero 的 mIoU 达到 0.55，AP50 达到 0.67，Cov. 达到 0.97，全面优于 TrailBlazer 和 Peekaboo 等零样本方法。消融实验证实空间约束是实现精确位置控制的最关键模块，移除后 mIoU 从 0.54 骤降至 0.18。用户研究（Cronbach's α = 0.901）进一步验证了该方法在外观、一致性和控制能力上的显著优势。
 
-## 背景与动机
+
 
 ### 问题背景：视频扩散模型中的运动随机性与控制缺失
 
@@ -82,7 +84,9 @@ Motion-Zero的核心洞察在于：**预训练视频扩散模型本身已蕴含�
 
 基于这一洞察，Motion-Zero提出了一个完全在推理阶段运行的零样本控制框架，通过三个关键操作——**初始噪声先验注入、空间约束潜变量优化、偏移时序注意力对齐**——实现对预训练视频扩散模型中物体运动轨迹的即插即用式控制。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Motion-Zero 的核心创新在于，它首次证明**无需任何额外训练**即可为任意预训练视频扩散模型赋予精确的物体运动轨迹控制能力。这一突破绕开了现有方法的根本瓶颈：传统文本到视频模型生成的物体轨迹具有随机性，而已有的运动控制方法（如 **MotionCtrl**（Wang et al., arXiv 2023d））依赖大规模标注数据集进行训练，计算成本高，且只能应用于其训练时所基于的特定模型，缺乏跨模型的即插即用能力。
 
@@ -94,7 +98,7 @@ Motion-Zero 的因果操纵杆建立在三个关键创新操作上，它们均�
 
 这三个模块的协同作用，使得 Motion-Zero 能够以零样本、即插即用的方式，操纵预训练视频扩散模型内部已具备的丰富物体运动知识，将其与用户指定的轨迹进行显式语义对齐。
 
-## 整体框架
+
 
 Motion-Zero 的推理流水线由三个核心模块串联构成：**初始噪声先验模块 (Initial Noise Prior Module, INPM)**、**空间约束 (Spatial Constraints, SC)** 和**偏移时序注意力机制 (Shift Temporal Attention Mechanism, STAM)**，如图 Fig.2(a) 所示。整个框架冻结预训练视频扩散模型的所有参数，仅在推理阶段对潜变量施加操纵，从而实现零样本、即插即用的运动轨迹控制。
 
@@ -112,7 +116,7 @@ Motion-Zero 的推理流水线由三个核心模块串联构成：**初始噪声
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2401_10150/figures/001_Figure_1.jpg]]
 *Figure 1: Our Motion-Zero framework endows different pre-trained video diffusion models with the capability to manipulate object trajectories directly, circumventing the need for supplementary training. By designating the target entity in the input prompts and a sequence of bounding boxes, users can intuitively direct the motion path of the object within the generated video*
 
-## 核心模块与公式推导
+
 
 Motion-Zero 是一个完全在推理阶段运作的零样本运动物体控制框架，无需任何额外训练，即可赋予任意预训练视频扩散模型精确的物体轨迹控制能力。其核心由三个关键模块构成：初始噪声先验模块（INPM）、空间约束（SC）和偏移时序注意力机制（STAM）。这三个模块分别从初始噪声、空间定位和时序一致性三个维度，协同实现了对运动物体的即插即用控制。
 
@@ -174,7 +178,9 @@ $$\\mathbf{z}_w^{f'} = \\mathbf{Shift}(\\mathbf{z}_w^{f'}, \\mathcal{B}^0, \\mat
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2401_10150/figures/008_Figure_5.jpg]]
 *Figure 5: Attention maps with different components. Prompt: A seal walking on the ice*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 
@@ -241,7 +247,9 @@ Motion-Zero 在零样本设置下对多个预训练视频扩散模型实现了�
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2401_10150/figures/016_Figure_11.jpg]]
 *Figure 11: Ablation studies on different*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -283,6 +291,8 @@ Motion-Zero相较于上述方法的本质差异在于：它不仅依赖交叉注
 ### 知识库定位
 
 Motion-Zero在可控视频生成领域的方法谱系中占据“零样本推理时控制”这一独特位置。与需要训练的MotionCtrl等方法和基于简单注意力操纵的TrailBlazer等方法相比，Motion-Zero通过INPM-SC-STAM三模块协同，在控制精度和生成质量之间建立了新的零样本基准。其核心贡献在于揭示了预训练视频扩散模型已隐含丰富的物体运动知识，只需通过推理时的噪声先验注入和注意力引导即可显式化这些知识，为后续的免训练可控生成研究提供了“操纵潜变量和注意力图”这一可泛化的技术范式。
+
+
 
 ## 原文 PDF
 

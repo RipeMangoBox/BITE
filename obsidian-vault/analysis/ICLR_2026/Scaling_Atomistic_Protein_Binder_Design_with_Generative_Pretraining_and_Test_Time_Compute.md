@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Scaling_Atomistic_Protein_Binder_Design_with_Generative_Pretraining_and_Test_Time_Compute.pdf
+project_link: https://research.nvidia.com/labs/genair/proteina-complexa/
+code_link: null
 openreview_forum_id: qmCpJtFZra
 aliases:
 - PNCC
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 利用生成式预训练与测试时计算扩展原子级蛋白质结合蛋白设计 |
 | 英文题名 | Scaling Atomistic Protein Binder Design with Generative Pretraining and Test-Time Compute |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=qmCpJtFZra); [Project](https://research.nvidia.com/labs/genair/proteina-complexa/) |
+| Links | [paper](https://openreview.net/forum?id=qmCpJtFZra) · [Project](https://research.nvidia.com/labs/genair/proteina-complexa/) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/diffusion_image_video |
 | Method | Proteína-Complexa (Complexa) |
 | Dataset | 19蛋白质靶点（含简单与困难）, 4小分子靶点（SAM, FAD, IAI, OQO）, 蛋白质靶点推理时缩放（简单/困难各12/7个）, 酶设计基准（AME，41个催化位置重构任务） |
@@ -42,7 +44,7 @@ claims:
 > - 4小分子靶点（SAM, FAD, IAI, OQO） 上，# Unique Successes 为 IAI: 19；FAD: 17；OQO: 6；SAM: 10（自生成序列），对比 RFDiffusion-AllAtom（依赖LigandMPNN重新设计）成功数远低于Complexa，例如IAI约6.47，变化 平均成功数提升2-3倍。
 > - 蛋白质靶点推理时缩放（简单/困难各12/7个） 上，Unique Success Rate 为 在固定GPU小时预算下，Complexa的最佳N、波束搜索、MCTS等策略超出BindCraft和BoltzDesign数倍，尤其在困难靶点上优势更明显。，对比 BindCraft（纯幻觉）和BoltzDesign（梯度优化幻觉）在相同计算资源下成功率极低，变化 在困难靶点上成功率至少高一个数量级。
 
-## 概述
+## 概要
 
 蛋白质结合剂（binder）的从头设计是药物发现与合成生物学的核心挑战。现有方法在此问题上形成了两个割裂的范式：**生成式模型**（如 RFDiffusion、Protopardelle）一次性采样结构，缺乏对生成过程的在线引导；**幻觉方法**（如 BindCraft、BoltzDesign）则完全依赖结构预测模型的梯度优化，无法利用生成先验进行高效搜索。这一错误二分法导致在有限计算预算下，两类方法均难以在困难靶点上取得可靠的成功率。
 
@@ -60,7 +62,7 @@ claims:
 
 **重要局限**：所有评估均基于计算指标（ipAE、pLDDT 等），尚未经湿实验验证；对极难靶点（如 TNF-α、H1）仍需数百至上千 GPU 小时才能获得足量唯一结合剂；当前框架仅针对蛋白质和小分子靶点演示，尚未扩展至 DNA、RNA 等其他模态。
 
-## 背景与动机
+
 
 蛋白质结合蛋白（protein binder）的从头设计是蛋白质工程的核心挑战之一，其目标是为给定的靶点分子生成能够高亲和力、高特异性结合的蛋白质序列与结构。这一能力在治疗性抗体开发、生物传感器设计、酶工程等领域具有广泛的应用前景。近年来，随着深度生成模型和结构预测模型的快速发展，计算驱动的结合蛋白设计取得了显著进展，但现有方法仍面临根本性的瓶颈。
 
@@ -91,7 +93,9 @@ claims:
 
 这一统一框架使得 Complexa 在归一化的计算预算下，能够显著超越纯生成方法和纯幻觉方法，为蛋白质结合蛋白的从头设计提供了新的技术路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Complexa的核心创新在于**打破生成式建模与幻觉优化的错误二分法**，将预训练的流匹配生成基础模型与灵活的测试时优化统一为单一框架。这一统一并非简单的工程拼接，而是通过三个相互依赖的机制层面变革实现的。
 
@@ -130,7 +134,7 @@ Complexa的推理框架将生成模型视为**可操纵的搜索先验**，集�
 
 上述创新并非独立生效，而是形成因果链条：Teddymer提供训练信号→翻译噪声迫使空间推理→分阶段训练稳定习得→生成先验赋能高效搜索。消融实验中去除任一环节均导致性能崩塌，验证了这一依赖关系。此外，“生成+幻觉”混合策略（以生成模型初始化BindCraft）在简单靶点上优于纯幻觉方法，但在困难靶点上仍不及内置搜索算法（Figure 16-18），进一步证明生成先验与搜索算法的深度耦合是突破性能瓶颈的关键。
 
-## 整体框架
+
 
 ### 设计动机与统一范式
 
@@ -213,7 +217,7 @@ $$i = \arg\max_i \frac{R(\ldots)}{V(\ldots)} + C \sqrt{\frac{\ln(V(\mathrm{paren
 
 整个框架的数据流是单向且模块间松耦合的：VAE编码器与解码器在条件生成训练期间保持冻结，靶点条件仅注入流匹配模型；测试时优化器作为独立模块，以生成模型的中间状态为输入，以结构预测分数为反馈信号，通过修改采样路径来提升最终输出质量。这种设计使得生成先验与搜索优化可以灵活组合——简单靶点可直接采样，困难靶点则投入更多计算资源进行引导搜索。
 
-## 核心模块与公式推导
+
 
 ### 部分潜在流匹配框架
 
@@ -304,7 +308,9 @@ Complexa 采用三阶段训练流程以实现稳定的条件生成能力：
 
 这种分阶段策略的核心优势在于：模型先在大量单体数据上学习通用的蛋白质结构生成能力，再通过相对较小的结合剂-靶点配对数据将这一能力转化为条件生成。消融实验表明，跳过 Teddymer 预训练或移除平移噪声均会导致性能崩溃（Table 6），验证了各模块的必要性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -406,7 +412,9 @@ Teddymer的关键在于其与真实多聚体界面具有分布重叠（Figure 3�
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_qmCpJtFZra/figures/020_Table_5.jpg]]
 *Table 5: Selected small molecule targets with their structural information, binding specifications, and data source*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从扩散生成与幻觉优化到统一框架
 
@@ -465,6 +473,8 @@ Complexa 的核心贡献在于**打破这一错误二分法**。它构建在 **L
 4. **推理时搜索的效率优化**：在保证生成多样性的前提下，能否进一步降低推理时搜索的计算成本？例如，通过学习搜索策略或蒸馏搜索过程，使其适用于更大规模的靶点库筛选。
 
 5. **Teddymer 数据集的增强方向**：引入翻译后修饰、界面动力学特征或多构象采样，能否进一步提升模型对真实结合界面的泛化能力？
+
+
 
 ## 原文 PDF
 

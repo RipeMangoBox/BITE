@@ -5,6 +5,8 @@ paper_level: A
 venue: ICCV
 year: 2025
 pdf_ref: paperPDFs/ICCV_2025/MagicMotion_Controllable_Video_Generation_with_Dense_to_Sparse_Trajectory_Guidance.pdf
+project_link: https://quanhaol.github.io/magicmotion-site/
+code_link: null
 aliases:
 - MagicMotion
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | MagicMotion: 基于从稠密到稀疏轨迹引导的可控视频生成 |
 | 英文题名 | MagicMotion: Controllable Video Generation with Dense-to-Sparse Trajectory Guidance |
 | 会议/期刊 | ICCV 2025 |
-| Links | [paper](https://arxiv.org/abs/2503.16421); [Project](https://quanhaol.github.io/magicmotion-site/) |
+| Links | [paper](https://arxiv.org/abs/2503.16421) · [Project](https://quanhaol.github.io/magicmotion-site/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/robotics |
 | Method | MagicMotion |
 | Dataset | MagicBench, DAVIS |
@@ -40,7 +42,7 @@ claims:
 > - MagicBench 上，FVD ↓ 为 112.69，对比 245.23，变化 -132.54。
 > - MagicBench 上，Mask IoU % ↑ 为 91.57，对比 58.95，变化 +32.62。
 
-## 概述
+## 概要
 
 **核心问题**：现有轨迹可控视频生成方法仅支持单一轨迹格式（如点、光流或边界框），在稀疏轨迹条件下难以保持物体形状一致性与精准运动控制；同时缺乏公开大规模训练数据集与按物体数量分层的评估基准，导致多物体复杂场景下性能受限。
 
@@ -48,15 +50,13 @@ claims:
 
 **关键发现**：在自建 MagicBench 基准上，MagicMotion 在 FID、FVD、Mask IoU、Box IoU 四项指标上均大幅优于所有对比方法（如相较于 Tora，FID 降低 11.21，Mask IoU 提升 32.62%）。消融实验表明，移除渐进训练或潜在分割损失后，轨迹控制精度显著下降；使用自建 MagicData 训练相比使用公开数据集组合（MeViS+MOSE）在各指标上均有提升，说明高质量带轨迹标注的视频数据对模型至关重要。此外，渐进训练策略使模型在仅提供稀疏边界框条件下仍能预测出合理的潜在分割掩膜，从而在无完整标注帧上保持物体形状。
 
-## 背景与动机
-
 近年来，扩散模型（Diffusion Models）的快速发展大幅提升了图像到视频（Image-to-Video, I2V）生成的质量。然而，让生成视频中的物体按照用户指定的轨迹运动，仍然是一个核心挑战。现有的轨迹可控视频生成方法通常只能处理单一格式的轨迹条件——例如仅支持光流、点轨迹或边界框——这严重限制了用户输入的灵活性。更关键的是，在仅提供稀疏轨迹（如少数关键帧上的边界框）的场景下，这些方法普遍难以维持物体的形状一致性与精准的运动控制，导致生成结果出现形变、漂移或物体丢失等问题。
 
 这一瓶颈的深层原因来自两个方面。其一，缺乏公开的大规模、高质量、带轨迹标注的视频训练数据集，使得模型难以学习复杂场景下的物体运动规律。其二，现有评估基准未按受控物体数量进行分层，导致方法在简单场景上的表现掩盖了其在多物体复杂场景下的性能缺陷。
 
 针对上述缺口，MagicMotion 提出了一个统一的轨迹可控视频生成框架，其核心动机在于：通过一种从稠密到稀疏的渐进式训练策略，让模型能够同时兼容掩膜（Mask）、密集边界框（Box）和稀疏边界框（Sparse Box）三种粒度的轨迹输入，从而在保持生成质量的同时，显著提升对稀疏轨迹条件的鲁棒性。
 
-## 核心创新
+## 核心方法与创新机理
 
 MagicMotion 的核心创新在于解决了现有轨迹可控视频生成方法的两大瓶颈：**单一轨迹格式的刚性限制**与**稀疏条件下物体形状一致性差**的问题。现有方法（如基于光流的 **Motion-I2V**、基于点的 **DragAnything** 或仅支持边界框的 **Tora**）均只能处理一种轨迹条件，且在仅提供稀疏边界框时，物体形状极易发生扭曲或丢失。MagicMotion 通过以下三个紧密耦合的“changed slots”实现了突破：
 
@@ -89,8 +89,6 @@ $$\mathcal{L} = \mathcal{L}_{diffusion} + \lambda \cdot \mathcal{L}_{seg}$$
 
 这三个 changed slots 并非孤立存在，而是形成了一个正向反馈闭环：Trajectory ControlNet 提供了统一的轨迹条件接口，渐进训练策略使得模型能从稠密到稀疏逐步泛化，而潜在分割损失则在稀疏阶段提供了关键的形状监督信号。三者协同作用，使得 MagicMotion 在 MagicBench 基准上相比最强基线 **Tora** 实现了 Mask IoU 提升 32.62%、FID 降低 11.21 的显著优势（Table 1）。
 
-## 整体框架
-
 ![[assets/figures/papers/paper_list_l2_MagicMotion_Controllable_Video_Generation_with_Dense_to_Sparse_Trajector/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of MagicMotion Architecture (text prompt and encoder are omitted for simplicity). MagicMotion employs a pretrained 3D VAE to encode the input trajectory, first-frame image, and training video into latent space. It has two separate branches: the video branch processes video and image tokens, and the trajectory branch uses Trajectory ControlNet to fuse trajectory and image tokens, which is later integrated to the video branch through a zero-initialized convolution layer. Besides, diffusion features from DiT blocks are concatenated and processed by a trainable segment head to predict latent segmentation masks, which contribute to our latent segment loss*
 
@@ -111,8 +109,6 @@ $$\mathcal{L} = \mathcal{L}_{diffusion} + \lambda \cdot \mathcal{L}_{seg}$$
 其中 $\lambda=0$（Stage1）或 $\lambda=0.5$（Stage2/3）。推理时，仅需提供首帧图像与任意形式的轨迹条件图，模型即可生成物体沿指定路径运动的高质量视频。
 
 **模块关系总结。** 3D VAE 负责跨模态潜在空间对齐，Trajectory ControlNet 负责将轨迹条件转化为对基础模型的调制信号，Segment Head 则在稀疏轨迹训练阶段提供像素级形状监督，三者协同实现了从稠密掩膜到稀疏边界框的渐进式轨迹控制能力。
-
-## 核心模块与公式推导
 
 MagicMotion 的核心架构由四个关键模块构成：3D VAE 编码器、基础 DiT 视频生成模型、Trajectory ControlNet 轨迹条件注入分支，以及轻量级 Segment Head 分割头。各模块协同工作，实现从稠密到稀疏的多层级轨迹可控视频生成。
 
@@ -148,7 +144,7 @@ $$\mathcal{L} = \mathcal{L}_{diffusion} + \lambda \cdot \mathcal{L}_{seg}$$
 
 其中权重 $\lambda$ 在 Stage1（掩膜训练阶段）设为 0，在 Stage2（密集边界框）和 Stage3（稀疏边界框）设为 0.5。这一设计使得模型在稀疏轨迹训练阶段仍能通过潜在空间的分割监督保持对物体精细形状的感知能力，而在稠密掩膜阶段则完全依赖轨迹条件本身提供形状信息。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 实验设置
 
@@ -194,17 +190,10 @@ MagicMotion 在自建的 **MagicData** 数据集上进行训练，该数据集�
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l2_MagicMotion_Controllable_Video_Generation_with_Dense_to_Sparse_Trajector/figures/025_Figure_19.jpg]]
-*Figure 19: Detail information on MagicData*
-
-![[assets/figures/papers/paper_list_l2_MagicMotion_Controllable_Video_Generation_with_Dense_to_Sparse_Trajector/figures/004_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l2_MagicMotion_Controllable_Video_Generation_with_Dense_to_Sparse_Trajector/figures/007_Table.jpg]]
-
 ![[assets/figures/papers/paper_list_l2_MagicMotion_Controllable_Video_Generation_with_Dense_to_Sparse_Trajector/figures/011_Table_4.jpg]]
 *Table 4: Comparisons on each method’s backbone*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 轨迹可控视频生成的方法演进
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2024
 pdf_ref: paperPDFs/CVPR_2024/Align_Your_Gaussians_Text_to_4D_with_Dynamic_3D_Gaussians_and_Composed_Diffusion_Models.pdf
+project_link: https://research.nvidia.com/labs/toronto-ai/AlignYourGaussians/
+code_link: null
 aliases:
 - AYGA
 - AYGT4D3GCDM
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 对齐你的高斯：面向文本到4D的动态3D高斯与组合扩散模型 |
 | 英文题名 | Align Your Gaussians: Text-to-4D with Dynamic 3D Gaussians and Composed Diffusion Models |
 | 会议/期刊 | CVPR 2024 |
-| Links | [paper](https://arxiv.org/abs/2312.13763); [Project](https://research.nvidia.com/labs/toronto-ai/AlignYourGaussians/) |
+| Links | [paper](https://arxiv.org/abs/2312.13763) · [Project](https://research.nvidia.com/labs/toronto-ai/AlignYourGaussians/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Align Your Gaussians (AYG) |
 | Dataset | 28 user study prompts (text-to-4D), 28 user study prompts, 300 text prompts (R-Precision, 4D stage) |
@@ -41,7 +43,7 @@ claims:
 > - 28 user study prompts 上，3D Appearance Preference 为 47.4%，对比 37.2% (MAV3D)，变化 +10.2%。
 > - 28 user study prompts 上，Motion Amount Preference 为 45.9%，对比 38.8% (MAV3D)，变化 +7.1%。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -64,8 +66,6 @@ AYG属于基于分数蒸馏采样（SDS）的文本到4D生成方法，直接对
 - 在28个文本提示的用户研究中，AYG以 **53.6%** 的总体质量偏好率显著优于MAV3D的 **38.8%**（Table 1），在3D外观（47.4% vs 37.2%）和运动量（45.9% vs 38.8%）上也均占优。
 - 消融实验证实：移除JSD正则化导致运动退化为缓慢全局平移（总体质量偏好从45.8降至13.3）；移除运动放大器使运动量偏好从45.1%降至23.6%；在4D阶段仅使用视频模型则严重损害3D外观和整体质量（Table 2）。
 - AYG支持自回归扩展和循环动画，可将多个动态4D对象组合为大型动态场景。
-
-## 背景与动机
 
 ### 文本到3D生成的兴起与静态瓶颈
 
@@ -95,7 +95,7 @@ AYG的核心动机在于**解耦3D外观与4D动态的生成过程**，从而在
 
 基于上述动机，AYG提出了一种两阶段的文本到4D合成框架：**第一阶段**利用多视图扩散模型和文本到图像模型生成高质量静态3D资产；**第二阶段**在冻结的3D外观基础上，通过组合视频和图像扩散模型的分数蒸馏梯度，配合JSD正则化和运动放大，优化变形场以生成动态4D序列。这一设计使得3D外观与4D动态的生成得以分离，从而在根本上解决了视觉质量与动态学习之间的冲突。
 
-## 核心创新
+## 核心方法与创新机理
 
 AYG 提出了一套针对文本到 4D 动态场景生成的技术方案，其核心创新围绕**动态 3D 高斯表示**、**组合式分数蒸馏框架**以及**4D 优化的正则化与运动增强机制**展开，旨在解决现有方法（如 MAV3D）在运动质量和视觉保真度上的不足。
 
@@ -126,8 +126,6 @@ AYG 引入了两项关键机制来稳定 4D 优化并增强运动表现：
 
 此外，AYG 还支持**自回归扩展**：通过在重叠区域插值两个 4D 序列的变形场 $\Delta_{\Phi_{12}}^{\mathrm{interpol}} = (1 - \chi(\tau)) \Delta_{\Phi_{1}} + \chi(\tau) \Delta_{\Phi_{2}}$，可生成更长的动态序列，并允许在扩展过程中切换文本提示，实现动作的组合与衔接。
 
-## 整体框架
-
 **Align Your Gaussians (AYG)** 是一种文本到4D动态场景的生成系统，其核心设计遵循一个解耦的两阶段流水线：首先合成高质量的静态3D资产，再为其注入时间动态以生成4D序列。这一设计的关键优势在于，4D阶段的动态学习方法可以独立于3D资产的来源，未来可泛化至其他3D生成系统或合成资产。
 
 ### 两阶段流水线
@@ -150,8 +148,6 @@ AYG 引入了两项关键机制来稳定 4D 优化并增强运动表现：
 
 - **输入**：描述动态场景的文本提示（如“A dog wearing a Superhero outfit with red cape flying through the sky”），以及可选的负向提示（如“low motion, static statue, not moving, no motion”）。
 - **输出**：以动态3D高斯表示的4D序列，可在任意视点和时间步下渲染为RGB图像。系统还支持将多个独立生成的动态对象组合到同一大场景中，以及创建循环动画。
-
-## 核心模块与公式推导
 
 ### 4D表示：动态3D高斯与变形场
 
@@ -231,7 +227,7 @@ $$
 
 其中 $\chi(\tau)$ 为平滑混合系数，并通过插值正则化损失 $\mathcal{L}_{\mathrm{Interpol-Reg.}} = ||\Delta_{\Phi_{1}} - \Delta_{\Phi_{12}}^{\mathrm{interpol}}||_{2}^{2}$ 约束第二个变形场在重叠区域接近第一个。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验结果与基线对比
 
@@ -294,12 +290,6 @@ AYG在文本到4D合成任务上与先前方法**MAV3D**进行了系统对比。
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2312_13763/figures/017_Figure_10.jpg]]
-*Figure 10: Text-to-4D synthesis with AYG. Various samples shown in two views each. Dotted lines denote deformation field dynamics (also see supplementary video ayg text to 4d.mp4, where the dynamics are much better visible)*
-
-![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2312_13763/figures/020_Figure_13.jpg]]
-*Figure 13: Text-to-4D synthesis with AYG. Various samples shown in two views each. Dotted lines denote deformation field dynamics (also see supplementary video ayg text to 4d.mp4, where the dynamics are much better visible)*
-
 ![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2312_13763/figures/011_Table_3.jpg]]
 *Table 3: Hyperparameters for the first stage (3D synthesis)*
 
@@ -309,7 +299,7 @@ AYG在文本到4D合成任务上与先前方法**MAV3D**进行了系统对比。
 ![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2312_13763/figures/015_Table_6.jpg]]
 *Table 6: Ablation study by user study on synthesized 4D scenes with 30 text prompts. For each pair of numbers, the left number is the percentage that the full AYG model is preferred and the right number indicates preference percentage for ablated model as described in left column. The numbers do not add up to 100 and the difference is due to users voting “no preference” (table copied here from main paper for extended discussion in Appendix F.2)*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 与前驱工作的关系
 

@@ -43,7 +43,7 @@ claims:
 > - Human perceptual study 上，Identification accuracy 71% vs 18% (naive prompts) (+53%)。
 > - Attribution confidence comparison 上，Confidence gap (Wasserstein vs JSD) Wasserstein provides higher confidence vs JSD (Up to +54.5%)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有文本到图像（T2I）模型的指纹识别方法面临根本性局限——水印方案需要预部署阶段注入触发器，传统指纹依赖权重或激活等白盒/灰盒内部访问（图1）。在商业API仅提供“查询即所得”的黑盒条件下，微调会显著改变生成图像的视觉风格、色彩与构图，使得基于像素空间或视觉特征的方法失效（图3），无法可靠地将微调模型归属到其基础模型谱系。
 
@@ -59,7 +59,7 @@ claims:
 
 **局限与开放问题**：当模型无法准确遵循组合提示（如生成对象不属于目标类别）时方法可能失败（Figure 6）；更激进的语义擦除或对抗性微调是否能够彻底消除指纹仍待探索。
 
-## 背景与动机
+
 
 ### 文本到图像生成模型的激增与溯源困境
 
@@ -101,7 +101,9 @@ CSF方法的核心洞察在于一个根本性的视角转换：将T2I模型重�
 2. **语义分布距离度量**：使用Wasserstein距离比较模型间的语义类别分布，保留类别间的联合结构；
 3. **贝叶斯统计推断**：跨多个提示聚合证据，提供具有统计显著性检验和可信区间的归属决策。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CSF 的核心贡献在于将文本到图像模型的指纹识别从像素/视觉空间迁移到**语义类别分布空间**，并以此为基础构建了一套完整的黑盒归属框架。相对于现有方法，CSF 在四个关键维度上实现了根本性的改变：
 
@@ -148,7 +150,7 @@ $$\theta \sim \mathrm{Beta}(\alpha, \beta), \quad \theta \mid s, f \sim \mathrm{
 
 这四个 changed slots 协同作用，使得 CSF 能够在仅通过 API 查询的严格黑盒条件下，可靠地将微调模型归属到其基础模型谱系——这是现有水印方法（需预部署注入）和白盒/灰盒指纹方法（需权重或激活访问）均无法实现的能力。
 
-## 整体框架
+
 
 CSF将文本到图像模型重新抽象为**语义类别生成器**（semantic category generator），而非传统的像素级合成器。这一抽象层的转换是方法的核心：它使指纹提取过程天然隔离了微调引入的视觉风格、色彩和构图变化，仅保留基础模型对语义组合的固有解释偏差。
 
@@ -207,7 +209,7 @@ CSF在三个关键维度上与传统指纹方法形成对比（见Figure 1）：
 ![[assets/figures/papers/paper_list_l2301_https_arxiv_org_abs_2604_16363/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of model identification scenarios. (a) Watermarking requires pre-deployment access to inject a trigger into the base model. (b) Traditional Fingerprinting relies on white-box or gray-box ‘Internal Access’ (e.g., weights or activations), which is not available in commercial API. (c) Our approach (CSF) is designed for the most restrictive ‘Query Only’ black-box setting, where the defender only has access to the final T2I generation API, reflecting realworld infringement scenarios*
 
-## 核心模块与公式推导
+
 
 ### 方法总览：从像素到语义的抽象
 
@@ -275,7 +277,9 @@ $$\theta \mid s, f \sim \mathrm{Beta}(1 + s, 1 + f) \tag{10}$$
 ![[assets/figures/papers/paper_list_l2301_https_arxiv_org_abs_2604_16363/figures/024_Table.jpg]]
 *Table: A8. Compositional structure of fingerprinting prompts. Each category systematically varies semantic attributes and visual contexts, yielding 42 total prompts (9+9+6+9+9). The dimmed studio setting appears across all categories to enable cross-category comparison*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -341,7 +345,9 @@ Table A3和A4显示，在原始指纹向量上直接应用层次聚类无法实�
 ![[assets/figures/papers/paper_list_l2301_https_arxiv_org_abs_2604_16363/figures/012_Table.jpg]]
 *Table: A2. Average Normalized Wasserstein Distance Matrix across all prompts. Each value is the mean of column-normalized distances across all 42 prompts. Short, Medium-low, Medium-high, Long distance*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：黑盒指纹识别的瓶颈
 
@@ -401,6 +407,8 @@ CSF的有效性依赖于以下前提条件，这些条件定义了其适用边�
 3. **自动化提示发现**：能否自动化地发现最优组合提示，而无需人工设计？这涉及对模型语义偏见空间的自动探索。
 
 4. **大规模部署的可行性**：在涉及数十个基础模型家族的场景中，CSF的统计推断框架是否仍能维持可接受的置信度水平，需要进一步验证。
+
+
 
 ## 原文 PDF
 

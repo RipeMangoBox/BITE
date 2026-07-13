@@ -42,7 +42,7 @@ claims:
 > - MotionFix 上，AvgR (lower is better) 13.06 vs 20.88 (previous best) (-7.82)。
 > - STANCE Adjustment 上，AvgR (lower is better) 22.77 vs 29.05 (previous best) (-6.28)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：文本驱动的人体运动编辑任务中，现有方法难以在依据自然语言指令精确修改目标区域的同时，保持未编辑区域的运动一致性。其根本原因在于缺乏对编辑区域与保留区域的显式区分机制，导致运动扭曲和语义对齐不佳。
 
@@ -52,7 +52,7 @@ claims:
 
 **主要结果**：在 MotionFix 数据集上，OmniME 将 AvgR 从此前最优的 20.88 降至 **13.06**（降幅 7.82）；在 STANCE Adjustment 数据集上，AvgR 从 29.05 降至 **22.77**（降幅 6.28），均大幅超越先前方法。消融实验证实三个组件各自贡献且联合使用达到最佳性能。用户感知研究进一步表明，OmniME 在语义对齐、运动保留、过渡平滑性和整体自然度四个维度上均优于 SimMotionEdit。
 
-## 背景与动机
+
 
 **核心瓶颈：文本驱动运动编辑中的“变化-不变性”失衡**
 
@@ -66,7 +66,9 @@ claims:
 
 为从根本上解决上述失衡问题，本文提出将运动编辑重新定义为一种**全监督正负学习（Omni-Supervised Positive-Negative Learning）**问题。其核心思想是：编辑过程应同时接受“正向修改约束”（驱使目标区域向文本指令对齐）和“负向不变性约束”（抑制非目标区域的非预期变化），并通过**特征级、运动级和语义级**三个层次的显式监督实现这一平衡。这一框架不再将运动编辑视为简单的条件生成，而是将其建模为在正样本（应发生的改变）和负样本（应避免的改变）之间进行对比学习的结构化任务，从而为平衡变化与不变性提供了系统性的解决方案。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈与创新动机
 
@@ -114,7 +116,7 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{diff}} + \lambda_{\mathrm{
 
 消融实验的因果验证（Table 3）表明：移除任一组件均导致性能退化，三者结合达到最佳（MotionFix 测试集 R@1: 32.02），证实了多层监督的互补性。定性比较（Figure 3, 4）进一步显示，OmniME 在语义一致性、运动平滑性和源运动保留三个维度上均优于 SimMotionEdit，验证了“正负学习”框架在平衡变化与不变性方面的有效性。
 
-## 整体框架
+
 
 OmniME 将文本驱动的人体运动编辑形式化为一个**全监督正负学习（Omni-Supervised Positive-Negative Learning）**问题，其核心目标是：给定源运动序列和自然语言编辑指令，生成既忠实于文本语义修改、又最大限度保留未编辑区域运动结构的目标运动。框架的设计瓶颈在于**显式区分“需要改变的区域”与“必须保持不变的区域”**，并通过多层监督信号在变化与不变性之间取得平衡。
 
@@ -167,7 +169,7 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{diff}} + \lambda_{\mathrm{
 ![[assets/figures/papers/paper_list_l5_https_openaccess_thecvf_com_content_CVPR2026_html_Shi_Omni_Supervised_Mo/figures/001_Figure_1.jpg]]
 *Figure 1: OmniME is a positive–negative learning framework for text-driven human motion editing. Given a source motion and a natural-language instruction, OmniME edits the source motion to produce the desired target motion while balancing change and invariance*
 
-## 核心模块与公式推导
+
 
 OmniME 将文本驱动的人体运动编辑形式化为一个全监督的正负学习问题，其核心在于通过**特征级、运动级、语义级**三个层次的监督信号，显式地平衡编辑过程中的“变化”与“不变性”。整个框架由五个关键模块协同构成。
 
@@ -223,7 +225,9 @@ $$ \mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{diff}} + \lambda_{\mathrm
 
 各 $\lambda$ 系数控制不同监督信号的相对强度。这五个损失项分别从**生成质量、特征一致性、运动结构保持、语义对齐**四个维度施加约束，构成了完整的全监督正负学习框架。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 OmniME的性能通过两个主流文本驱动运动编辑基准数据集——**MotionFix**和**STANCE Adjustment**——进行系统评估。实验设计围绕三个核心问题展开：全监督正负学习框架是否带来实质性的性能提升；三个互补组件各自贡献如何；方法在不同数据集间的泛化能力如何。
 
@@ -277,7 +281,9 @@ OmniME的性能通过两个主流文本驱动运动编辑基准数据集——**
 ![[assets/figures/papers/paper_list_l5_https_openaccess_thecvf_com_content_CVPR2026_html_Shi_Omni_Supervised_Mo/figures/009_Table_4.jpg]]
 *Table 4: Generated-to-Target (Test Set). Trained on Motion-Fix and tested on STANCE adjustment. † indicates our reimplementation. * : no explicit text conditioning in the DiT stage*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：文本驱动运动编辑的核心瓶颈
 
@@ -308,6 +314,8 @@ OmniME的核心知识贡献在于**将运动编辑从“条件生成”重新定
 **局限与开放问题。** 论文未明确报告方法在以下场景的表现边界：（1）长时序运动（远超训练序列长度）的编辑稳定性；（2）多轮连续编辑中的误差累积问题；（3）对分布外文本指令（如抽象隐喻性描述）的泛化能力。此外，MotionSNR阈值τ的设定依赖数据集特性，跨数据集的阈值迁移策略尚未被系统研究。消融实验（Table 3）虽验证了三个组件的独立贡献，但组件间的交互效应（如回顾性监督是否放大了三元组损失的梯度信号）仍需进一步分析。
 
 **与后续工作的潜在关联。** OmniME的正负学习框架为运动编辑提供了一个可扩展的约束模板——未来工作可在三个方向上延伸：（1）将MotionSNR机制替换为可学习的门控网络，实现动态保留权重分配；（2）将三元组损失扩展为结构化对比损失，引入更细粒度的语义对齐（如身体部位级文本-运动对应）；（3）将回顾性监督的思想推广至其他扩散模型架构，验证其在非DiT结构上的有效性。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2025
 pdf_ref: paperPDFs/ICLR_2025/CameraCtrl_Enabling_Camera_Control_for_Text_to_Video_Generation.pdf
+project_link: https://hehao13.github.io/projects-CameraCtrl/
+code_link: https://github.com/hpcaitech/Open-Sora
 aliases:
 - CameraCtrl
 tags:
@@ -42,7 +44,7 @@ claims:
 > - User study (T2V) 上，User Preference Rate (%) 43.6 (CameraCtrlAD) vs 37.0 (MotionCtrlVC) (+6.6)。
 > - User study (I2V) 上，User Preference Rate (%) 73.1 (CameraCtrlSVD) vs 26.9 (MotionCtrlSVD) (+46.2)。
 
-## 概述
+## 概要
 
 **核心问题**：现有文本到视频（T2V）生成模型缺乏精确的相机视角控制能力。用户无法像导演一样通过镜头语言（推拉摇移、旋转跟随）表达深层叙事意图，这严重限制了视频内容的可控性和艺术表现力。
 
@@ -59,7 +61,7 @@ claims:
 
 **局限性提示**：对于训练数据中未覆盖的大角度旋转轨迹（如 100° 垂直旋转或 150° 水平旋转），CameraCtrl 无法准确跟随，生成的旋转幅度明显不足。此外，评估指标依赖 COLMAP 估计地面真值，存在不可消除的下限误差（TransErr 下限 6.93，RotErr 下限 1.02）。
 
-## 背景与动机
+
 
 文本到视频（T2V）生成模型近年来取得了显著进展，但生成的视频在相机视角控制方面仍存在明显不足。现有模型通常只能产生固定或随机化的镜头运动，无法让创作者通过精确的相机轨迹来表达深层叙事意图。在电影语言中，推拉摇移等镜头运动本身就是叙事的一部分——缓慢推进传达紧张感，环绕拍摄展示空间关系，俯仰变化暗示权力结构。这种可控性的缺失，使T2V生成在专业内容创作场景中的应用受到严重制约。
 
@@ -69,7 +71,9 @@ claims:
 
 **本文动机**：CameraCtrl旨在解决上述两个关键问题：一是设计一种能够为每个像素提供几何解释的相机姿态表示，二是将该表示注入视频扩散模型中最适合捕获帧间动态的模块。通过这种设计，模型可以在不依赖训练数据外观信息的前提下，实现对任意相机轨迹的精确跟随，从而将镜头语言的控制权交还给创作者。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CameraCtrl 的核心创新在于将**像素级几何可解释的相机姿态表示**与**视频扩散模型的时间注意力机制**进行系统性耦合，从而实现对文本到视频生成中相机视角的精确控制。相较于现有方法，其关键改进体现在三个紧密关联的“可替换模块”（changed slots）上。
 
@@ -101,7 +105,7 @@ CameraCtrl 的核心洞察在于：相机运动本质上引发的是跨帧的全
 
 上述三个创新点构成了一条清晰的因果链条：**Plücker 嵌入提供了像素级的几何解释**，使得模型能够精确理解相机运动的空间含义；**外观无关的编码器架构**确保了这种几何理解不会与特定训练数据的视觉外观产生虚假关联；**时间注意力层的精准注入**则将几何信息作用于视频生成中最能体现相机运动动态特性的计算环节。三者协同作用，共同实现了 CameraCtrl 在相机控制精度上的显著提升。
 
-## 整体框架
+
 
 CameraCtrl 的整体框架围绕一个核心设计：在冻结的预训练视频扩散模型之上，外挂一个可训练的相机编码器 $\Phi_c$，将相机姿态条件注入去噪 U-Net 的时间注意力层，从而实现对生成视频中相机轨迹的精确控制。
 
@@ -128,7 +132,7 @@ $$\mathcal{L}(\theta) = \mathbb{E}_{z_0^{1:N}, \epsilon, c_t, s_t, t} [\| \epsil
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2404_02101/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of CameraCtrl. It can control the camera trajectory for both general T2V (Guo et al., 2023b) and personalized T2V generation (civitai), shown in the first two rows. Besides, illustrated in the third row, it can be used with I2V diffusion models, like Stable Video Diffusion (Blattmann et al., 2023a). The condition image is the first image of row 3. CameraCtrl can also collaborate with other visual controllers, such as the RGB encoder from SparseCtrl (Guo et al., 2023a) to generate videos condition on image and text conditions and manage camera movements*
 
-## 核心模块与公式推导
+
 
 ### 3.1 可控视频扩散训练目标
 
@@ -180,7 +184,9 @@ $$
 
 其中 $n$ 为视频帧数，$\mathbf{R}_{gen}^{i}$、$\mathbf{T}_{gen}^{i}$ 为 COLMAP 从生成视频第 $i$ 帧估计的旋转矩阵和平移向量，$\mathbf{R}_{gt}^{i}$、$\mathbf{T}_{gt}^{i}$ 为对应的真实值。需注意 COLMAP 自身存在估计误差，导致这两个指标存在不可消除的下限（TransErr 下限约 6.93，RotErr 下限约 1.02）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -256,7 +262,9 @@ CameraCtrl 在两个基础模型（AnimateDiff 和 SVD）和两个任务设置�
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2404_02101/figures/023_Figure_18.jpg]]
 *Figure 18: Camera movement intensity. The first two rows taking the pan down camera trajectory as input, with the camera translation interval in the second row being four times that of the first row. The camera trajectory for the third and fourth rows are zoom in, with the camera translation interval in the fourth row being four times that of the third row*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题瓶颈与核心因果旋钮
 
@@ -319,6 +327,8 @@ CameraCtrl 的工作为视频生成中的相机控制开辟了新的技术路径
 4. **运动解耦。** 在复杂动态场景中，相机运动与物体运动相互纠缠，如何实现更精细的运动解耦，使模型能够独立控制相机视角而不影响场景中的物体运动？这可能需要引入额外的运动分离机制或分层控制架构。
 
 5. **与可控生成的融合。** CameraCtrl 已展示了与 SparseCtrl 等视觉控制器的初步协作能力（Figure 4），但如何系统性地将相机控制与内容控制（如布局、姿态、深度）统一到一个框架中，实现真正意义上的"全方位可控视频生成"，仍是一个开放的体系架构问题。
+
+
 
 ## 原文 PDF
 

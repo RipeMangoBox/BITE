@@ -43,7 +43,7 @@ claims:
 > - INSTA Synthesis Speed 上，总合成时间 20 分钟 vs 400 分钟 (CAP4D) (20× 快)。
 > - 生成图像身份保持与速度 上，CSIM / 每张生成时间 0.9793 / 0.3 秒 vs 0.4144 / 18 秒 (CAP4D) (CSIM +0.5649 / 速度 60×)。
 
-## 概述
+## 概要
 
 从一段随手拍摄的单目视频中合成可驱动、照片级真实的三维头部化身，是数字人、VR/AR与远程通信等应用的核心需求。现有方法通常**孤立地依赖单一先验**：基于3D数据先验的方法受限于训练数据的域分布，难以泛化到野生场景中未见过的姿态与表情；基于2D生成先验的方法虽能提供多样化的监督信号，但其全去噪生成过程缓慢、计算成本高昂，且容易出现严重的身份混淆。两种先验各自的短板长期未能得到系统性的互补。
 
@@ -57,7 +57,7 @@ ELITE 的核心洞察在于：**3D数据先验与2D生成先验具有天然的�
 
 **局限与展望**：ELITE 对异常光照条件敏感，缺乏显式的光照或材质建模；对眼镜等配件的几何结构完全烘焙为纹理，无法进行三维建模；3D 先验训练集仅约 400 个身份，多样性仍有提升空间。未来工作可探索引入光照先验、扩展至附件几何联合建模，以及将该框架推广至全身化身或交互式 VR 场景。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -87,7 +87,9 @@ ELITE的出发点是回答一个关键问题：**能否让3D先验为2D生成提
 
 基于以上动机，ELITE提出了“3D先验前馈初始化 + 2D生成先验测试时增强”的混合框架，首次实现了两类先验的系统级协同，在效率、保真度和身份一致性三个维度上同时取得突破。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ELITE的核心创新在于**首次系统性地耦合3D数据先验与2D生成先验**，通过“前馈初始化—真实帧对齐—生成式泛化”的三阶段协同，解决了单目视频头部化身合成中长期存在的效率-保真度-泛化性三角矛盾。与现有方法仅单独依赖某一类先验不同，ELITE揭示了二者的天然互补性：3D先验为2D生成提供可靠的几何与外观锚点，2D生成先验则补偿3D初始化中缺失的视角与表情细节。
 
@@ -127,7 +129,7 @@ $$\mathbf{I}_{\mathrm{gen}}^\star = \mathcal{D}_\xi([\mathbf{I}_{\mathrm{gen}}, 
 
 上述四个变更槽位并非孤立改进，而是围绕一个核心机制环环相扣：**3D先验提供锚点→真实帧消除偏差→渲染增强生成监督→生成监督驱动泛化**。正是这一闭环使得ELITE仅需3帧输入、20分钟即可合成完整的高斯化身，而纯2D生成先验方法CAP4D需要400分钟（Table 1）。这种效率-质量-身份一致性的同步突破，根源于对两类先验互补性的深刻利用，而非单一技术的渐进式改进。
 
-## 整体框架
+
 
 ELITE 的整体 pipeline 围绕一个核心洞察构建：**3D 数据先验与 2D 生成先验具有天然的互补性**。现有方法或仅依赖 3D 数据先验（受限于训练域分布，难以泛化至 in-the-wild 场景），或仅依赖 2D 生成先验（全去噪生成缓慢、计算成本高、易出现身份混淆），两者未能协同。ELITE 通过系统耦合这两种先验，使 3D 先验为 2D 生成提供可靠的几何与外观基础，2D 生成先验则补偿 3D 初始化中缺失的视角和表情细节，形成互补闭环。
 
@@ -179,7 +181,7 @@ Figure 2 对比了 ELITE 与现有范式的差异：过拟合方法（如 **Flas
 ![[assets/figures/papers/paper_list_l958_https_arxiv_org_abs_2601_10200/figures/001_Figure_1.jpg]]
 *Figure 1: ELITE synthesizes an animatable photorealistic Gaussian head avatar from a casual monocular video. To compensate for missing views and expressions from the input video, ELITE leverages two complementary priors: (1) 3D data prior for feed-forward Gaussian initialization, and (2) 2D generative prior for augmenting unseen views and expressions for test-time adaptation. Compared to existing methods [37, 41] that utilize no priors or only a 2D generative prior, ELITE achieves superior generalization across unseen views and expressions in the wild. Please refer to the supplementary video for dynamic avatar animation results*
 
-## 核心模块与公式推导
+
 
 ### 3.1 Mesh2Gaussian 先验模型 (MGPM)
 
@@ -237,7 +239,9 @@ ELITE 的完整流程体现了 3D 数据先验与 2D 生成先验的系统性互
 ![[assets/figures/papers/paper_list_l958_https_arxiv_org_abs_2601_10200/figures/005_Figure_5.jpg]]
 *Figure 5: Stage 1: Test-time adaptation w/ real images. Given input video frames and offline-tracked head mesh UV maps, we obtain 2D Gaussian UV maps by Mesh2Gaussian Prior Model’s (MGPM) feed-forward avatar initialization. We fine-tune MGPM by minimizing the rendering loss between the animated Gaussian avatar images and the sampled image frames within the input video*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -331,7 +335,9 @@ Figure 9 对比了 ELITE 的渲染引导单步增强与 CAP4D 的全去噪扩散
 ![[assets/figures/papers/paper_list_l958_https_arxiv_org_abs_2601_10200/figures/021_Figure_S.2.jpg]]
 *Figure S.2: Ablation on the 3D data prior and the 2D generative prior. Self re-enactment (left) shows that methods without the 3D prior ((a),(b)) overfit and produce unrealistic geometry, while (c) and (d) preserve plausible structure. Cross re-enactment (right) highlights generalization differences: (a) fails in both geometry and appearance, (b) improves appearance but not geometry, (c) maintains geometry but lacks appearance generalization, and (d) (our proposed method) achieves both*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：3D先验与2D生成先验的割裂
 
@@ -382,6 +388,8 @@ ELITE的适用边界由其技术设计直接决定：
 3. **数据多样性的高效扩展**：是否可以利用合成数据管道（如基于生成模型的无限身份采样）来进一步扩大MGPM的训练域，从而减少对测试时生成式适应的依赖，甚至实现纯前馈的高质量化身合成？
 
 4. **框架的跨域推广**：该“3D先验初始化 + 2D生成增强”的耦合范式是否可以推广至全身化身或动态场景（如交互式VR），在保持实时性和身份一致性的前提下处理更复杂的几何与外观变化？
+
+
 
 ## 原文 PDF
 

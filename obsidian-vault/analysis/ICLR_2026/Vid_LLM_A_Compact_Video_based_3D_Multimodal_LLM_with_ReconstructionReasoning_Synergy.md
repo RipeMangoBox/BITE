@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Vid_LLM_A_Compact_Video_based_3D_Multimodal_LLM_with_ReconstructionReasoning_Synergy.pdf
+project_link: https://chenhaijier.github.io/Vid-LLM/
+code_link: null
 openreview_forum_id: l1cLdEjESj
 aliases:
 - VL
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | Vid-LLM：具备重建-推理协同的紧凑型视频驱动3D多模态大语言模型 |
 | 英文题名 | Vid-LLM: A Compact Video-based 3D Multimodal LLM with Reconstruction–Reasoning Synergy |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=l1cLdEjESj); [Project](https://chenhaijier.github.io/Vid-LLM/) |
+| Links | [paper](https://openreview.net/forum?id=l1cLdEjESj) · [Project](https://chenhaijier.github.io/Vid-LLM/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | Vid-LLM |
 | Dataset | ScanQA (3D Question Answering), SQA3D (3D Question Answering), Scan2Cap (3D Dense Captioning), ScanRefer (3D Visual Grounding) |
@@ -42,7 +44,7 @@ claims:
 > - SQA3D (3D Question Answering) 上，EM@1↑ 为 57.3，对比 60.6 (3DRS, 基于3D数据的最优方法)，变化 -3.3。
 > - Scan2Cap (3D Dense Captioning) 上，CIDEr@0.5↑ 为 81.5，对比 86.1 (3DRS, 基于3D数据的最优方法)，变化 -4.6。
 
-## 概述
+## 概要
 
 现有3D多模态大语言模型（3D-MLLM）普遍依赖点云、深度图、相机位姿等显式三维数据作为输入，这种设计带来了高昂的数据采集与预处理成本，严重制约了模型的可扩展性和实际部署能力。Vid-LLM针对这一瓶颈，提出了以单目视频为唯一输入模态的新范式：模型内置3D重建分支，从视频中端到端恢复相机位姿、深度图与点云等几何信息，再通过Cross-Task Adapter（CTA）将几何先验与语义表征对齐，使大语言模型能够直接基于视频完成3D视觉语言推理。
 
@@ -50,7 +52,7 @@ claims:
 
 实验表明，尽管Vid-LLM仅使用视频输入（信息量天然少于显式3D数据），其在3D问答、密集描述和视觉定位等多项基准上仍达到与依赖3D数据的最优方法相当甚至更优的性能：ScanQA上CIDEr达101.9（3DRS为104.8），ScanRefer上Acc@0.25达63.2（超越3DRS†的62.9），Nr3D上整体准确率达65.4（超越3D-VisTA的64.2）。在联合框架对比中，Vid-LLM以1.6秒/场景的推理速度显著快于VGGT+LLaVA-3D串联框架的2.7秒/场景，体现了端到端设计的效率优势。
 
-## 背景与动机
+
 
 ### 3D多模态大语言模型的现状与瓶颈
 
@@ -86,7 +88,9 @@ Vid-LLM的出发点是：**重建与推理本质上是相互依赖的**——几
 
 针对这些挑战，Vid-LLM提出了三个关键设计：**Cross-Task Adapter（CTA）** 通过可学习Bridge Tokens实现几何-语义的双向交互与对齐；**Metric Depth Model** 端到端预测真实尺度深度，摆脱对后处理尺度对齐的依赖；**两阶段训练策略** 通过双教师蒸馏和联合优化，使重建与推理在统一框架内协同收敛。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Vid-LLM的核心创新在于将3D多模态大语言模型的输入模态从显式三维数据替换为单目视频，并通过重建-推理协同架构在单一框架内同时实现几何重建与空间语义推理。其关键设计变更体现在以下五个维度。
 
@@ -112,7 +116,7 @@ Vid-LLM采用两阶段训练策略。阶段一通过双教师蒸馏（DINO教师
 
 上述五项设计变更共同构成了Vid-LLM的因果机制：输入模态的简化降低了系统复杂度，内置重建分支消除了对外部几何数据的依赖，CTA的Bridge Tokens实现了几何与语义的深层协同，Metric Depth保证了尺度一致性，两阶段训练则确保了多任务联合优化的稳定性。实验表明，尽管Vid-LLM仅使用信息量天然较少的视频输入，其在3D问答、密集描述和视觉定位等任务上仍达到与基于3D数据方法相当甚至更优的性能。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0009_l1cLdEjESj_Vid-LLM_A_Compact_Video-based_3D_Multimodal_LLM/figures/002_Figure_2.jpg]]
 *Figure 2: Architecture of Vid-LLM. From video, a shared DINOv2 encoder produces tokens that are bidirectionally fused by Cross-Task Adapter with learnable Bridge Tokens, yielding geometric and semantic streams. The reconstruction branch predicts camera poses, depth and recovers realscale via a Metric-Bins module, while the 3D-VL branch lifts features into 3D tokens for LLM reasoning*
@@ -177,7 +181,7 @@ $$L_{joint} = L_{recon-task} + L_{VL-task} + L_{MD}$$
 
 整个pipeline的数据流可概括为：**视频帧 → 共享DINOv2 token → CTA解耦为几何/语义双流 → 重建分支输出位姿、深度、点云 → 3D-VL分支将语义特征提升为3D token → LLM执行空间推理**。这一设计使Vid-LLM成为首个在单一框架内同时实现高质量3D重建与多任务视觉语言推理的紧凑模型，推理速度达1.6秒/场景，显著快于串联式方案（如VGGT+LLaVA-3D的2.7秒/场景）。
 
-## 核心模块与公式推导
+
 
 ### 共享视觉编码器与特征投影
 
@@ -239,7 +243,9 @@ $$L_{MD} = b^2 + \frac{1}{K} \sum_{i=1}^{K} \frac{(e_i - b)^2}{1 + \alpha |e_i -
 
 其中 $b$ 为全局尺度偏置项，惩罚系统性偏差；$e_i$ 为第 $i$ 个像素的深度残差；分母 $1 + \alpha |e_i - b|$ 对大残差进行自适应降权，$\alpha$ 控制鲁棒性强度。该损失使 Vid-LLM 能够端到端预测真实尺度深度，无需后处理尺度对齐。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设定
 
@@ -307,7 +313,9 @@ Vid-LLM采用DINOv2-L作为共享视觉骨干（24层Transformer，隐藏维度1
 
 这些结果表明，Vid-LLM的重建分支在独立评估中已达到甚至超越专用重建方法VGGT的水平，为下游VL任务提供了可靠的几何基础。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有方法的谱系关系
 
@@ -341,6 +349,8 @@ Vid-LLM 的核心因果机制在于**重建与推理的相互依赖与协同增�
 - Bridge Tokens 机制是否可推广到其他跨模态对齐任务（如音频-视觉、触觉-视觉），其通用性边界在哪里？
 - 能否在推理阶段引入**主动视角选择策略**——根据当前几何不确定性或语义歧义动态决定下一帧的观测角度？
 - 如何在一个统一框架内同时支持几何重建和基于物理的渲染/重光照，使3D VL推理具有更强的交互性和可解释性？
+
+
 
 ## 原文 PDF
 

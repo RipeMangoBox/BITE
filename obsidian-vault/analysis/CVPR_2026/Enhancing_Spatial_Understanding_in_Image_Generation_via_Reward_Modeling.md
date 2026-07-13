@@ -45,7 +45,7 @@ claims:
 > - SpatialScore (in-domain) 上，奖励分数 7.81 vs 2.18 (Flux.1-dev) / 3.01 (Flow-GRPO*) (+5.63 (over Flux.1-dev))。
 > - DPG-Bench - Relation-Spatial 上，准确率 0.932 vs 0.871 (Flux.1-dev) (+0.061)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 文本到图像生成模型在处理多对象间的复杂空间关系时仍存在显著不足。现有奖励模型——无论是基于人类偏好的通用图像奖励模型（如**ImageReward**、**PickScore**、**HPSv3**），还是基于VQA风格的评估器（如**UnifiedReward**），均无法可靠地判断生成图像中空间布局的正确性，常常给空间错误的图像分配更高的奖励分数（Figure 1）。同时，基于规则检测的**GenEval**奖励在遮挡等视觉挑战下评估失准，且无法泛化到包含多对象复杂空间关系的长提示场景（Figure 2）。这导致在线强化学习缺乏准确的空间反馈信号，制约了生成模型空间理解能力的提升。
@@ -66,7 +66,7 @@ claims:
 ### 方法定位
 SpatialScore填补了现有奖励模型在空间评估上的空白，将VLM的视觉推理能力转化为可微的奖励信号。其与GRPO在线RL的结合，为提升扩散模型对复杂空间提示的遵循能力提供了一条有效路径。该方法属于“奖励建模引导的生成模型对齐”范式，区别于基于规则的评估和通用偏好模型，专注于空间关系的细粒度反馈。
 
-## 背景与动机
+
 
 文本到图像（T2I）生成模型近年来取得了显著进展，但在准确遵循涉及多对象复杂空间关系的提示方面仍面临根本性挑战。用户提示中常包含诸如“A在B的左侧”、“C在D的上方”等空间约束，而现有模型生成的图像往往无法精确满足这些要求，这严重制约了生成内容在广告设计、产品展示等实际场景中的可用性。
 
@@ -87,7 +87,9 @@ SpatialScore填补了现有奖励模型在空间评估上的空白，将VLM的�
 
 为此，本文提出构建专门针对空间关系的对抗性偏好数据集，并训练空间感知的VLM奖励模型**SpatialScore**，进而将其集成到GRPO在线强化学习框架中，为扩散模型提供精准的空间准确性反馈，直接引导其优化空间布局。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作的核心创新在于构建了一个**专门针对空间关系的奖励模型（SpatialScore）**，并将其集成到**在线强化学习框架（GRPO）**中，从而系统性地解决了文本到图像生成中长期存在的空间理解难题。相比于现有方案，该方法在三个关键环节上实现了突破性改进。
 
@@ -133,7 +135,7 @@ $$\mathcal{L}_{\mathrm{GRPO}}(\boldsymbol{\theta}) = \frac{1}{|\boldsymbol{S}|}\
 
 上述三个 changed slots——**空间专用奖励模型、VLM 驱动的在线 RL 反馈、top-k 优势过滤**——构成了一个完整的闭环：对抗性构造的空间偏好数据训练出高精度空间评估器，该评估器为 GRPO 提供可靠的奖励信号，top-k 过滤则确保训练过程稳定高效。这一组合使得 Flux.1-dev 的 SpatialScore 从 2.18 跃升至 7.81，DPG-Bench 空间关系子维度从 0.871 提升至 0.932（Table 2），并在 Qwen-Image 基线上验证了方法的跨模型泛化能力（SpatialScore 从 6.74 提升至 8.25，Table 7）。
 
-## 整体框架
+
 
 本文提出的方法围绕一个核心闭环：**构造空间偏好数据 → 训练空间感知奖励模型 → 以该奖励模型驱动在线强化学习优化生成模型**。整个管线包含三个紧密耦合的模块，形成从数据到评估再到策略优化的完整反馈回路。
 
@@ -184,7 +186,7 @@ $$\mathcal{L}_{\mathrm{Reward}}(\theta) = \mathbb{E}_{c, y_w, y_l}\big[ -\log P(
 
 这一框架的核心优势在于：奖励模型专门针对空间关系进行训练，能够提供比通用 VLM 和规则式奖励（如 GenEval）更精准的空间反馈；而 top-k 过滤策略则有效缓解了在线 RL 中因提示难度差异导致的优势估计偏差，使训练更加稳定高效。
 
-## 核心模块与公式推导
+
 
 ### 空间感知奖励模型（SpatialScore）
 
@@ -237,7 +239,9 @@ $$\mathcal{L}_{\mathrm{GRPO}}(\boldsymbol{\theta}) = \frac{1}{|\boldsymbol{S}|}\
 ![[assets/figures/papers/paper_list_l2203_https_arxiv_org_abs_2602_24233/figures/002_Figure_2.jpg]]
 *Figure 2: Limitations of GenEval [9] as the reward model. (a) GenEval-based RL training fails to generalize to long prompts involving complex spatial relationships across multiple objects. (b) The rule-based GenEval rewards, which rely on object detectors, often produce incorrect evaluations under visual challenges like occlusion, while modern VLMs can accurately infer the correct response*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与实验动机
 
@@ -335,7 +339,9 @@ Figure 6 和 Figure 11 展示了复杂多对象空间关系提示的生成图像
 - **Figure 6**：复杂空间关系提示的定性对比
 - **Figure 7**：Top-k 过滤消融的训练曲线
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：空间理解为何成为图像生成的瓶颈
 
@@ -376,6 +382,8 @@ Figure 6 和 Figure 11 展示了复杂多对象空间关系提示的生成图像
 2. **奖励模型效率优化**：如何进一步降低空间奖励模型的计算开销，以满足更大规模在线RL训练的效率需求？可能的路径包括模型蒸馏、推理缓存或混合奖励策略（规则式粗筛+VLM精评）。
 
 3. **组合泛化的深度验证**：当前基准中的空间扰动类型有限，如何构建更系统的组合泛化测试集，以揭示奖励模型和生成模型在未见空间关系组合上的真实能力边界？
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: SIGGRAPH ASIA
 year: 2025
 pdf_ref: paperPDFs/SIGGRAPH_ASIA_2025/TCM_Learning_Human_Motion_with_Temporally_Conditional_Mamba.pdf
+project_link: https://zquang2202.github.io/TCM
+code_link: null
 aliases:
 - TCMT
 - LHMTCM
@@ -40,7 +42,7 @@ claims:
 > - AIST++ (music-to-dance) 上，FID_k (↓) 20.66 vs 23.43 (Cross-Attention) (-2.77)；FID_g (↓) 9.75 vs 12.86 (Cross-Attention) (-3.11)；Div_k (↑) 8.98 vs 7.87 (Cross-Attention) (+1.11)。
 > - AIST++ (25s length) 上，FID_k (↓) 23.82 vs 31.36 (Cross-Attention) (-7.54)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有基于扩散模型的人体运动生成方法（如 **EDGE** (Tseng et al., CVPR 2023)、**Bailando** (Siyao et al., CVPR 2022)）普遍采用交叉注意力（Cross-Attention）将音乐、视频等时间条件信号注入Transformer或Mamba主干网络。这种全局交互方式缺乏逐步的时间对齐能力，导致生成的运动与条件信号之间存在明显的时序偏差——具体表现为舞蹈动作的节拍与音乐节拍错位、自我中心视频估计的头部轨迹偏离真实值等。
 
@@ -56,7 +58,7 @@ claims:
 
 **局限与开放问题**：当前TCM要求条件序列与运动序列具有相同的时间长度，难以直接处理文本等静态条件；极端头部运动下的鲁棒性、足部滑动伪影的消除、超长序列（数分钟）的稳定性等问题尚待进一步探索。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -81,7 +83,9 @@ claims:
 
 基于此动机，本文提出了**时间条件Mamba（Temporally Conditional Mamba, TCM）**，一种新型的Mamba变体，将条件感知机制嵌入到Mamba块的内部递归动态中，从根本上解决现有方法中条件融合与时间演化相分离的问题。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Temporally Conditional Mamba (TCM) 的核心创新在于**将时间条件信号直接注入状态空间模型（SSM）的循环动态中**，而非像现有方法那样通过外部交叉注意力（Cross-Attention）进行全局条件融合。这一设计解决了当前人体运动生成领域的一个关键瓶颈：基于交叉注意力的扩散模型（如 **EDGE**，Tseng et al., CVPR 2023）缺乏逐步的时间对齐能力，导致生成的运动与条件信号（如音乐节拍、头部轨迹）之间存在明显的时序偏差。
 
@@ -109,7 +113,7 @@ $$\lambda_i, \rho_i = \mathrm{MLP}(\mathrm{Sum}(\mathbf{t}, \mathbf{m}))$$
 
 TCM 与 Spatial Mamba 协同工作，形成时空解耦的建模方案：TCM 沿时间维度建模条件驱动的运动动态，Spatial Mamba 将运动表示从时间域重排至空间域（关节维度），用标准 Mamba 建模关节间的空间依赖。这一设计使得模型能够分别专注于时序对齐和空间合理性，在多个任务（音乐到舞蹈、自我中心视频到运动、物体轨迹到人体运动）上均展现出优于交叉注意力方案的一致性能提升。
 
-## 整体框架
+
 
 TCM 构建在扩散模型的骨干框架之上，整体 pipeline 遵循“噪声运动 → 去噪网络 → 预测干净运动”的标准扩散范式。给定一段噪声化的运动序列 **x**、时间条件嵌入 **m** 以及扩散时间步嵌入 **t**，模型的目标是预测对应的干净运动  **x̂**。
 
@@ -137,7 +141,7 @@ TCM 构建在扩散模型的骨干框架之上，整体 pipeline 遵循“噪声
 ![[assets/figures/papers/paper_list_l1928_TCM_Learning_Human_Motion_with_Temporally_Conditional_Mamba/figures/002_Figure_2.jpg]]
 *Figure 2: Architecture overview of the proposed approach. (a) We show the overview of the diffusion human motion framework with Mamba blocks. (b) Our key contribution is the Temporally Conditional Mamba, which incorporates temporal conditions into the internal dynamics of the Mamba block. (c) The Spatial Mamba block is used to learn human spatial features*
 
-## 核心模块与公式推导
+
 
 ### 问题定义与扩散框架
 
@@ -215,7 +219,9 @@ AdaLN 使模型能够根据扩散时间步和全局条件自适应调整特征�
 ![[assets/figures/papers/paper_list_l1928_TCM_Learning_Human_Motion_with_Temporally_Conditional_Mamba/figures/001_Figure_1.jpg]]
 *Figure 1: High-level comparison between our approach and previous methods. (a) Previous works usually use Cross-Attention to integrate input condition into Mamba/Transformer backbone. (b) Our approach embeds the condition directly within the Mamba block; (c) We show the head trajectory over time in an ego-to-motion task. Compared to Cross-Attention and Vanilla Mamba, which generate motions that deviate noticeably from the ground truth, our method produces a trajectory that closely follows the actual motion pattern*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -295,7 +301,9 @@ TCM的实验验证围绕**时序对齐能力**这一核心瓶颈展开。作者�
 ![[assets/figures/papers/paper_list_l1928_TCM_Learning_Human_Motion_with_Temporally_Conditional_Mamba/figures/011_Table_6.jpg]]
 *Table 6: Performance comparison between proposed and other methods on human dance estimation from egocentric and music. Bold indicates the best results, and underline indicates the second-best results*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心贡献与问题定位
 
@@ -368,6 +376,8 @@ TCM的实验验证围绕**时序对齐能力**这一核心瓶颈展开。作者�
 ### 5. 方法定位总结
 
 TCM在人体运动生成领域的方法谱系中处于**条件融合机制创新**的位置：它不改变扩散框架或Mamba的宏观架构，而是重新设计了条件信号进入状态空间模型的方式。与交叉注意力的“层间全局融合”相比，TCM的“循环内逐帧调制”实现了更精细的时序对齐，这一设计思想可追溯到线性参数变化系统（LPV）的控制理论传统，但在深度生成模型中尚属首次系统性地应用于人体运动生成。该方法在时序条件驱动的运动生成任务上建立了新的性能标杆，但其对静态条件的适配性和物理合理性增强仍是后续工作的重要方向。
+
+
 
 ## 原文 PDF
 

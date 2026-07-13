@@ -41,7 +41,7 @@ claims:
 > - SynCom 上，PSNR 24.282 (Ours SOPs) vs 22.877 (GI-GS) (+1.405)；SSIM 0.868 (Ours SOPs) vs 0.849 (GI-GS) (+0.019)；Harmony (MOS) 4.588 (Ours SOPs) vs 2.908 (GI-GS) (+1.680)。
 > - TensoIR 上，Training Time 7.93 min vs 21.45 min (IRGS) (-13.52 min (~2.7x faster))；Relighting PSNR 30.474 vs 30.250 (IRGS) (+0.224)。
 
-## 概述
+## 概要
 
 **问题与瓶颈** 将三维物体真实地合成到高斯散射（3DGS）场景中，面临两大核心挑战：一是烘焙在辐射场中的外观与阴影导致合成不一致；二是现有基于高斯反渲染的方法（如 **IRGS**，Gu et al., 2025）依赖逐像素光线追踪来计算间接光照与遮挡，成为效率瓶颈。此外，完整场景的光照估计本身困难且视角不一致。
 
@@ -53,7 +53,7 @@ claims:
 
 **局限性** 方法假设待插入物体相对场景较小且场景主要为朗伯表面，因此无法处理远距离阴影和镜面反射（Figure 8）。当前不支持多物体同时放置，且依赖多视角输入而非单张图像。
 
-## 背景与动机
+
 
 ### 3D 物体-场景合成的现实需求与核心挑战
 
@@ -84,7 +84,9 @@ ComGS 的核心动机在于：**能否在保持物理合理光照与阴影的前
 
 通过上述设计，ComGS 将编辑时间压缩至 **36 秒**，渲染速度达到 **约 26 FPS**，同时在 SynCom 数据集上取得了 **24.282 PSNR** 和 **4.588 和谐评分**，在合成质量与交互效率之间实现了此前方法未能达成的平衡。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ComGS 针对三维物体-场景合成中的**效率-质量悖论**，提出了一套以**表面八面体探针（Surface Octahedral Probes, SOPs）**为核心的解决方案。其关键创新可归纳为三个相互耦合的 changed slots，分别对应重建、编辑与渲染阶段的瓶颈突破。
 
@@ -122,7 +124,7 @@ $$\mathscr { S } = \frac { L _ { o } ^ { \prime } } { L _ { o } }$$
 
 需要指出，ComGS 的创新建立在若干假设之上：场景主要为朗伯表面（因此阴影计算采用漫反射近似），且待插入物体相对场景较小（仅影响局部区域）。这些假设使得方法在镜面反射场景和远距离阴影场景中失效（Figure 8），也限制了其对复杂 BRDF 效果的建模能力。
 
-## 整体框架
+
 
 ComGS 将三维物体-场景合成分解为**重建、编辑、渲染**三个顺序阶段，形成一条端到端的可微分流水线（图2）。其核心设计目标是在保持视觉和谐与物理合理阴影的同时，将编辑时间压缩至 36 秒、渲染帧率提升至约 26 FPS。
 
@@ -159,7 +161,7 @@ $$L _ { i n } ( \mathbf { x } ) = \frac { \sum _ { k } w _ { s } ( k ) w _ { b }
 ![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_yXiSPBMrTT/figures/002_Figure_2.jpg]]
 *Figure 2: Realistic 3D Object–Scene Composition Pipeline. Our approach consists of 3 stages: reconstruction (Sec. 3.1), where we reconstruct the Gaussian scene and relightable Gaussian object from multi-view images; editing (Sec. 3.2), where we estimate scene lighting and cache occlusion using Surface Octahedral Probes; and rendering (Sec. 3.3), where we perform splatting, object relighting, shadow casting, and depth compositing. The pipeline achieves visually harmonious results with realistic shadows and near-real-time performance*
 
-## 核心模块与公式推导
+
 
 ComGS 的流水线围绕三个关键模块展开：**表面八面体探针（SOPs）驱动的逆渲染**、**基于扩散模型的局部光照估计**，以及**基于 SOPs 的遮挡缓存与实时阴影合成**。以下逐一剖析各模块的核心机制与支撑公式。
 
@@ -251,7 +253,9 @@ $$
 ![[assets/figures/papers/paper_list_l27_https_openreview_net_forum_id_yXiSPBMrTT/figures/004_Figure_4.jpg]]
 *Figure 4: Lighting Estimation. At a given location, we create a partial panoramic view via a*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能对比
 
@@ -318,7 +322,9 @@ ComGS 存在以下明确失败模式（Figure 8）：
 
 这些失败根源于方法的核心假设：待插入物体相对场景较小、仅影响局部区域，且场景表面近似为朗伯面。在镜面反射场景或需要远距离阴影的合成任务中，需手动验证替代方案。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 任务定位与核心挑战
 
@@ -380,6 +386,8 @@ ComGS 框架为后续研究留下了若干明确的改进空间：
 - **单图像三维合成**：将方法扩展至仅用单张图像进行三维合成，将大幅降低数据获取门槛。
 - **放宽朗伯假设**：引入更复杂的 BRDF 模型和间接光照效果（如镜面反射、散焦模糊），可提升物理真实感。
 - **实时全局光照集成**：结合实时全局光照技术，有望进一步提升镜面反射和复杂光传输的保真度。
+
+
 
 ## 原文 PDF
 

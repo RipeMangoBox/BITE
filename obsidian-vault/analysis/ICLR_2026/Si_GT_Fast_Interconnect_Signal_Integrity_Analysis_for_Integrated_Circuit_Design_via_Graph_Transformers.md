@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Si_GT_Fast_Interconnect_Signal_Integrity_Analysis_for_Integrated_Circuit_Design_via_Graph_Transformers.pdf
+project_link: null
+code_link: https://github.com/xlab-ub/Si-GT
 openreview_forum_id: orO5727bSh
 aliases:
 - SG
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | Si-GT：基于图变换器的快速集成电路互连信号完整性分析 |
 | 英文题名 | Si-GT: Fast Interconnect Signal Integrity Analysis for Integrated Circuit Design via Graph Transformers |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=orO5727bSh); [GitHub](https://github.com/xlab-ub/Si-GT) |
+| Links | [paper](https://openreview.net/forum?id=orO5727bSh) · [GitHub](https://github.com/xlab-ub/Si-GT) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/physics |
 | Method | Si-GT |
 | Dataset | Crosstalk Delay Prediction (Segment, Victim), Crosstalk Glitch Prediction (Segment, t_width) |
@@ -41,7 +43,7 @@ claims:
 > - Crosstalk Delay Prediction (Segment, Victim) 上，Mean Relative Accuracy (%) 为 88.32 (Si-GT with MPE)，对比 88.23 (GraphGPS with RWSE16)，变化 +0.09。
 > - Crosstalk Glitch Prediction (Segment, t_width) 上，Mean Relative Accuracy (%) 为 98.36 (Si-GT with MPE)，对比 96.61 (GraphGPS with RWSE16)，变化 +1.75。
 
-## 概述
+## 概要
 
 大规模VLSI设计中，互连线间的电容串扰效应会引入信号延迟偏差和毛刺，导致时序违例甚至逻辑错误。SPICE电路仿真虽是精度金标准，但其计算成本随互连规模指数增长，无法用于全芯片验证。现有机器学习方法（如GNN和图Transformer）主要聚焦于时序预测，未显式建模信号切换模式变化和攻击网-受害网间的电容耦合机制，实用性受限。
 
@@ -49,7 +51,7 @@ claims:
 
 实验表明，Si-GT在串扰延迟和毛刺预测任务上均超越GNN及现有图Transformer基线（延迟预测平均相对准确率达88.32%，毛刺宽度预测达98.36%），推理速度比SPICE快多个数量级。消融实验证实虚拟NET令牌、网格模式编码和IIN注意力偏置三个组件均对性能有显著贡献，其中NET令牌的提升最为突出。
 
-## 背景与动机
+
 
 ### 互连信号完整性：VLSI设计中的计算瓶颈
 
@@ -84,7 +86,9 @@ claims:
 
 通过这种物理感知的架构设计，Si-GT旨在以极低的推理延迟（毫秒级）实现与SPICE高度一致的串扰延迟和毛刺预测精度，为大规模VLSI设计中的快速SI签核提供可行路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Si-GT的核心创新在于将互连RC电路的物理结构显式注入图Transformer的注意力计算，从而赋予模型对串扰行为的长距依赖和跨网耦合的归纳偏置。与现有图Transformer基线（Graphormer、GraphGPS）仅依赖通用结构编码（最短路径、空间距离）不同，Si-GT通过三个**changed slots**实现了物理感知的信号完整性预测：
 
@@ -122,7 +126,7 @@ $$\mathrm{Attn-IIN}(X) = \mathrm{softmax}\bigg(\frac{QK^\top}{\sqrt{d_K}} + \til
 
 三个changed slots形成因果闭环：**网格模式编码**提供局部耦合拓扑的先验，**虚拟NET令牌**赋予网级信号状态的全局视野，**IIN注意力**将电阻传播路径和耦合电容的物理规律直接融入信息聚合。这套设计使Si-GT在仅使用基线3-6倍参数量的情况下（Table 7），在所有串扰延迟和毛刺预测任务上均超越GNN和现有图Transformer基线（Table 2, Table 3），推理速度比SPICE快多个数量级（Figure 6）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0010_orO5727bSh_Si-GT_Fast_Interconnect_Signal_Integrity_Analysi/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of Si-GT*
@@ -164,7 +168,7 @@ $$\mathrm{Attn-IIN}(X) = \mathrm{softmax}\bigg(\frac{QK^\top}{\sqrt{d_K}} + \til
 
 整个 pipeline 的因果机制清晰：网格模式编码提供局部耦合结构先验，虚拟 NET 令牌提供网级全局信号上下文，IIN-Attn 将电阻传播路径和耦合电容的物理偏置直接融入注意力计算。消融实验（Table 5）表明，移除任意组件均导致性能显著下降——其中 `<NET>` 令牌的贡献最为突出，移除后毛刺预测准确率从 98.12% 骤降至 94.97%；去除异网偏置 $\phi_{\mathrm{Inter}}$ 则严重损害毛刺预测性能，验证了显式建模耦合电容对捕捉跨网串扰的必要性。
 
-## 核心模块与公式推导
+
 
 Si-GT 的核心架构由三个紧密耦合的模块构成：网格模式编码（Mesh Pattern Encoding）、网内-网间注意力机制（IIN-Attn）和虚拟 NET 令牌。三个模块共同将互连 RC 电路的物理偏置注入 Transformer 的自注意力计算，使模型具备对串扰行为的长距依赖和跨网耦合的归纳偏置。
 
@@ -204,7 +208,9 @@ $$\mathbf{M}_{\mathrm{NET}}(i,j) := \begin{cases} -\infty, & \text{if } i \text{
 
 该掩码确保网级聚合的纯净性，消融实验表明移除 `<NET>` 令牌导致延迟和毛刺预测准确率大幅下降（Table 5），是 Si-GT 中贡献最大的单一组件。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -262,7 +268,9 @@ Si-GT的可训练参数量约**282K-307K**（Table 7），约为相应GNN主干�
 3. **场景简化假设**：当前模型仅考虑单受害网-多攻击网的串扰场景，未覆盖多受害网同时切换等复杂情形。扩展到更一般场景的可行性尚待验证。
 4. **全芯片规模未验证**：模型在由少量网（≤3）组成的互连簇上训练和评估，尚未在数百万网级别的全芯片设计中进行验证。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有方法的谱系关系
 
@@ -302,6 +310,8 @@ Si-GT 处于图神经网络（GNN）与图变换器（Graph Transformer）的交
 4. **段级到汇级的误差累积**：当前的分段级预测到汇级预测存在误差累积（Table 4），其机理尚不明确。是否需要设计端到端的汇级训练架构，或在损失函数中显式建模误差传播路径？
 
 5. **全芯片规模验证**：Si-GT 能否在工业级全芯片互连网络上保持精度和效率？这需要构建更大规模的数据集，并可能涉及图分区、层次化编码等工程优化策略。
+
+
 
 ## 原文 PDF
 

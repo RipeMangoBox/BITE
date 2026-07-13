@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2025
 pdf_ref: paperPDFs/ICLR_2025/I2VControl_Camera_Precise_Video_Camera_Control_with_Adjustable_Motion_Strength.pdf
+project_link: https://wanquanf.github.io/I2VControlCamera
+code_link: null
 aliases:
 - IC
 - I2VControl-Camera
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | I2VControl-Camera：具有可调运动强度的精确视频相机控制 |
 | 英文题名 | I2VControl-Camera: Precise Video Camera Control with Adjustable Motion Strength |
 | 会议/期刊 | ICLR 2025 |
-| Links | [paper](https://arxiv.org/abs/2411.06525); [Project](https://wanquanf.github.io/I2VControlCamera) |
+| Links | [paper](https://arxiv.org/abs/2411.06525) · [Project](https://wanquanf.github.io/I2VControlCamera) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | I2VControl-Camera |
 | Dataset | RealEstate10K, Movable Object Dataset |
@@ -41,7 +43,7 @@ claims:
 > - Movable Object Dataset 上，RotErr, TransErr 为 Ours-0: RotErr=0.76, TransErr=6.97，对比 MotionCtrl, CameraCtrl 的误差更高，变化 控制误差最小。
 > - Movable Object Dataset 上，FID 为 Ours-600: FID=91.86，对比 MotionCtrl, CameraCtrl 的 FID 值更大，变化 最佳图像质量。
 
-## 概述
+## 概要
 
 视频生成中的相机控制面临一个根本性瓶颈：现有方法（如 **MotionCtrl** (Wang et al., 2023)、**CameraCtrl** (He et al., 2024)）仅依赖稀疏的相机外参矩阵或 Plücker 射线嵌入作为控制信号，导致控制精度不足、泛化能力受限，难以精确反映用户意图。更关键的是，这些方法完全忽视了场景中独立于相机运动的主体动态——当画面中存在可动对象时，生成结果往往僵硬、缺乏自然运动。
 
@@ -53,7 +55,7 @@ claims:
 
 该方法采用与基础模型结构无关的适配器架构，可灵活集成至现有图像到视频扩散模型，为精确且灵活的视频相机控制提供了新的技术路径。
 
-## 背景与动机
+
 
 图像到视频（I2V）生成任务的核心挑战之一，在于对生成内容的精确运动控制。相机运动控制作为其中关键的子任务，要求模型在保持场景内容一致性的前提下，严格遵循用户指定的相机轨迹生成视频。这一能力对于电影级运镜、虚拟场景漫游等应用至关重要。
 
@@ -69,7 +71,9 @@ $$\mathcal{F}(\mathbf{p}, \lambda) = \mathbf{R}_\lambda \cdot \mathcal{F}(\mathb
 
 其中 $\mathbf{R}_\lambda \cdot \mathcal{F}(\mathbf{p}, 0) + \mathbf{t}_\lambda$ 为线性分量，$\mathcal{G}(\mathbf{p}, \lambda)$ 为非线性残差。基于此分解，本文分别从两个分量中构建控制信号：将线性项投影到相机平面得到稠密的 2D 点轨迹 $\mathbf{T}_\lambda$，作为高精度相机控制信号；对非线性项的时间导数进行空间积分，得到表征整体运动强度的标量 $m_\lambda$，作为可调节的主体动态控制输入。这一设计使得用户可以在保持相同相机轨迹的前提下，独立调节场景中对象的运动幅度——从完全静止到显著动态。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 I2VControl-Camera 的核心创新在于将视频生成中的相机控制与主体运动控制彻底解耦，并通过两个相互独立但协同工作的“控制旋钮”实现精确操控。这一设计直接回应了现有方法的两个根本性瓶颈：控制信号过于稀疏导致相机控制精度不足，以及完全忽视主体动态导致可动对象僵硬。
 
@@ -105,7 +109,7 @@ $$m_\lambda = \frac{1}{|\Omega|} \int_\Omega \left\| \frac{\partial \mathcal{G}(
 
 上述创新的有效性在实验中得到了系统验证。在 RealEstate10K 数据集上，所提方法在 RotErr、TransErr、FID 和 MSC 四项指标上均显著优于 MotionCtrl 和 CameraCtrl（Table 1）。在包含可动对象的场景中，$m_\lambda = 0$ 的变体（Ours-0）取得了最低的 RotErr（0.76）和 TransErr（6.97），验证了相机控制精度；而 $m_\lambda = 600$ 的变体（Ours-600）取得了最佳的 FID（91.86）和最高的 MSC（47.70），同时保持了自然的主体动态（Table 2）。这种在同一框架下通过单一标量参数实现控制精度与动态幅度独立调节的能力，是现有方法所不具备的。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l37_I2VControl_Camera_Precise_Video_Camera_Control_with_Adjustable_Motion_St/figures/001_Figure_1.jpg]]
 *Figure 1: We propose I2VControl-Camera, a novel camera control method for image-to-video generation, offering high control precision and adjustable motion strength*
@@ -133,7 +137,7 @@ $$m_\lambda = \begin{cases} 0 & \text{if } \lambda = 0 \\ \frac{1}{HW} \sum_{i,j
 
 整体而言，I2VControl-Camera 通过将运动分解为线性相机项与非线性主体项，分别作为控制精度与运动强度的信号源，实现了相机控制与对象运动的解耦操控。这一设计使得用户既能获得像素级对齐的相机轨迹跟随，又能通过调节 $m_\lambda$ 在“完全静止”到“显著运动”之间连续控制主体动态。
 
-## 核心模块与公式推导
+
 
 I2VControl-Camera 的核心架构由三个功能模块构成：**控制信号构建模块**、**数据预处理流水线**和**适配器网络**。其理论根基在于将视频内容的 3D 运动轨迹显式分解为线性项与高阶非线性项，从而解耦相机运动与主体动态。
 
@@ -200,7 +204,9 @@ $m_\lambda$ 作为可调节的标量输入，控制生成视频中主体运动�
 
 适配器网络与基础模型结构无关，接收拼接后的控制信号 $(\mathbf{T}_\lambda, m_\lambda)$，编码为控制特征后注入到基础 I2V 扩散模型（MagicVideo-V2）的时序注意力层中。这种即插即用的设计使得方法可迁移至不同的基础架构，而无需修改扩散模型本身的权重。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -237,7 +243,9 @@ Figure 7 的定性对比显示，在相同相机轨迹下，I2VControl-Camera �
 消融实验的核心结论是：运动强度 $m_\lambda$ 的引入是实现主体动态可控的关键。当 $m_\lambda$ 设为 0 时，场景趋于静态；当 $m_\lambda$ 增大时，主体运动幅度随之增加，且相机控制精度不受影响（Table 2, Figure 6）。
 
 当前框架的局限性主要体现在两方面：其一，仅支持相机运动与主体运动的解耦控制，尚未包含拖拽、运动刷等更细粒度的局部控制模态；其二，控制信号的构建依赖于深度估计和点追踪的精度，对训练数据的质量有较高要求。在更复杂的动态场景（如多物体交互、快速运动）中，控制精度和运动自然度仍有待进一步验证。
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有相机控制方法的对比
 
@@ -274,6 +282,8 @@ I2VControl-Camera 从三个维度突破了上述局限：
 2.  **复杂动态场景鲁棒性**：当前实验主要在 RealEstate10K（以静态场景为主）和自建的可动对象数据集上验证。在多物体交互、快速运动、严重遮挡等更复杂的动态场景中，动静分离算法和非线性建模能否保持控制精度和运动自然度，尚需进一步验证。
 
 3.  **与基础模型的解耦程度**：虽然适配器网络在结构上与基础模型无关，但训练过程仍依赖于特定基础模型的中间特征分布。能否实现完全零样本（zero-shot）迁移到新的基础 I2V 模型，是一个值得探索的方向。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2025
 pdf_ref: paperPDFs/ICLR_2025/Physics_informed_Temporal_Difference_Metric_Learning_for_Robot_Motion_Planning.pdf
+project_link: null
+code_link: https://github.com/ruiqini/ntrl-demo
 aliases:
 - PPITDML
 - PITDMLRMP
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 基于物理信息的时序差分度量学习在机器人运动规划中的应用 |
 | 英文题名 | Physics-informed Temporal Difference Metric Learning for Robot Motion Planning |
 | 会议/期刊 | ICLR 2025 |
-| Links | [paper](https://arxiv.org/abs/2505.05691); [GitHub](https://github.com/ruiqini/ntrl-demo) |
+| Links | [paper](https://arxiv.org/abs/2505.05691) · [GitHub](https://github.com/ruiqini/ntrl-demo) |
 | Topic | #topic/benchmarks_datasets_evaluation #topic/benchmarks_datasets_evaluation/benchmark_eval |
 | Method | PTDML (Physics-informed Temporal Difference Metric Learning) |
 | Dataset | Cluttered 3D (C3D) 已知环境, 7-DOF 机械臂操作 (已知环境), 12-DOF 双臂真实橱柜环境, Gibson 2D 导航 (已知环境) |
@@ -41,7 +43,7 @@ claims:
 > - 7-DOF 机械臂操作 (已知环境) 上，成功率 (SR%) 为 88.2，对比 NTF 74.6，变化 +13.6%。
 > - 12-DOF 双臂真实橱柜环境 上，成功率 (SR%) 为 91，对比 NTF / P-NTF 无法收敛，变化 ～+91%。
 
-## 概述
+## 概要
 
 机器人运动规划的核心挑战在于，如何在复杂、高维的配置空间中高效地找到无碰撞路径。近年来，基于物理信息神经网络的自监督方法——特别是**NTFields**（Ni et al., 2021）——通过求解Eikonal方程来学习行程时间场，展现出无需专家轨迹即可规划的能力。然而，这类方法存在一个根本性瓶颈：**仅依赖局部Eikonal损失难以捕捉值函数的全局最优结构**，在杂乱、多联通环境中容易陷入局部最优，导致泛化失败和路径质量下降。
 
@@ -59,7 +61,7 @@ claims:
 
 **方法定位**：PTDML处于物理信息学习与度量强化学习的交叉点。它继承了NTFields自监督、无需专家轨迹的优势，但通过引入时序差分和度量约束，从根本上解决了值函数学习的全局一致性问题。与监督式方法（如MPNet、MPiNet）相比，PTDML的数据生成仅需数秒至数分钟（Table 4），而前者需要数小时的专家轨迹采集。与采样规划器（RRTConnect、LazyPRM）相比，PTDML在保证高成功率的同时将推理时间压缩了数个数量级。
 
-## 背景与动机
+
 
 机器人运动规划的核心挑战在于：如何在高维、复杂且杂乱的配置空间（C-space）中，为机器人快速找到一条从起始构型到目标构型的无碰撞、平滑路径。传统方法中，基于采样的规划器（如 RRTConnect、LazyPRM）具有概率完备性，但在高维空间中收敛缓慢，且规划时间不可预测；而基于 Eikonal 方程的快速行进法（FMM，Sethian, 1996）虽然能给出全局最优解，却受限于维度灾难，难以扩展到 3 维以上的空间。
 
@@ -73,7 +75,9 @@ claims:
 
 本文的动机正是从上述两个缺口切入：**将 Eikonal 方程同时解释为最优控制问题的值函数和黎曼流形上的测地线距离，通过时序差分度量学习框架，在统一的理论基础上同时解决值传播的全局一致性和距离函数的几何完备性**。此外，在推理阶段，本文采用基于采样的模型预测控制（MPC）替代传统的梯度下降，以避免陷入值函数中的局部最小值，进一步提升规划的成功率和效率。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文提出的 **PTDML** (Physics-informed Temporal Difference Metric Learning) 针对现有自监督运动规划方法（以 **NTFields** (Ni et al., 2021) 和 **P-NTFields** (Ni & Qureshi, 2023a) 为代表）在复杂杂乱环境中无法同时保持 Eikonal 方程作为最优值函数和测地线距离的双重性质这一瓶颈，从损失函数、网络架构和推理方式三个维度进行了系统性创新。
 
@@ -113,7 +117,7 @@ $$D(x, y) = \sum_{i=1}^{a} \left[ \max_{1 \leq j \leq b} | x_{i,j} - y_{i,j} | \
 
 NTFields 沿值函数负梯度进行路径推断，在非凸值函数景观中易陷入局部最优。PTDML 改用**基于采样的模型预测控制（MPC）**：从正态分布中采样动作序列，利用 softmax 加权的成本函数选择最优轨迹，执行回退水平控制。这一设计避免了梯度计算，通过随机采样天然具备跳出局部最小值的能力。实验表明，将推理方式改为梯度下降（Our-G）后，成功率和规划时间均劣于 MPC 方式，验证了采样策略在复杂环境中的鲁棒性优势。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l5_Physics_informed_Temporal_Difference_Metric_Learning_for_Robot_Motion_Pl/figures/004_Figure_4.jpg]]
 *Figure 4: Depiction of our (a) Gibson, (b) Cluttered 3D (C3D), and (c) 7-DOF Manipulator environments. We also illustrate multiple trajectories planned by our method between different start and goal pairs. It can be seen that our method finds smooth trajectories while avoiding collisions*
@@ -154,7 +158,7 @@ PTDML 的 pipeline 由以下六个核心模块串联构成，形成从环境感�
 
 该 pipeline 的核心优势在于：**时序差分损失补偿了 Eikonal 损失在全局结构捕捉上的不足**（Figure 1 展示了仅用 Eikonal 损失会产生不正确的次优解，而 TD 损失能强制找到真实解），**度量学习架构保证了距离函数的基本性质**（Figure 2 展示了混合 $L_1/L_\infty$ 度量如何将圆上的测地线转换为二维菱形以保留多重路径结构），**MPC 推理则避免了梯度方法的局部最优问题**。三者协同使得 PTDML 能够在 2-DOF 到 12-DOF 的复杂规划任务中同时实现高成功率和低推理时间。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化：从Eikonal方程到最优控制
 
@@ -220,7 +224,9 @@ $$D(x, y) = \sum_{i=1}^{a} \left[ \max_{1 \leq j \leq b} | x_{i,j} - y_{i,j} | \
 
 推理阶段采用采样MPC（Section 4.3），从正态分布中采样动作序列，通过softmax加权的成本函数选择最优轨迹，执行回退水平控制。该方法避免计算值函数梯度，有助于跳出局部最小值。消融实验表明，替换为梯度下降方式（Our-G）后成功率和规划时间均劣于MPC方式（Section 5.2）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制验证
 
@@ -280,7 +286,9 @@ $$D(x, y) = \sum_{i=1}^{a} \left[ \max_{1 \leq j \leq b} | x_{i,j} - y_{i,j} | \
 - **Figure 3 + Table 2**：消融实验的定量和定性证据共同验证了$L_E$与$L_{TD}$的互补关系是方法成功的核心，度量学习设计显著优于现有度量表示。
 - **Figure 5/8**：真实世界12-DOF双臂机器人橱柜环境中的成功规划（0.1-0.11秒），验证了方法从仿真到真实场景的迁移能力。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题瓶颈与核心思路
 
@@ -345,6 +353,8 @@ PTDML 将行程时间构建为潜在空间中的度量距离 $T(q_s, q_g) = D(f_
 4. **混合规划架构**：能否将学到的值函数作为启发式函数嵌入到概率完备的搜索式规划器（如 A* 或 RRT*）中，以同时保证完备性和学习效率？这将是连接学习方法和经典规划理论的重要方向。
 
 5. **理论收敛性分析**：当前工作以实验验证为主，缺乏对组合损失函数 $L = (\lambda_E L_E + \lambda_{TD} L_{TD} + \lambda_N L_N) L_C$ 收敛到真值 Eikonal 解的理论保证。TD 损失的有限时间步离散化误差与神经网络逼近误差之间的定量关系尚不明确。
+
+
 
 ## 原文 PDF
 

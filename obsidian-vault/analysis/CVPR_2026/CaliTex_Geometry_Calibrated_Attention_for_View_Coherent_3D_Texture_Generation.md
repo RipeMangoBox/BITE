@@ -41,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - Test set (Objaverse + game assets) 上，FID 157.8 vs not reported (best among compared methods) (lowest)；User Study Qual (overall quality) 4.53 vs not reported (highest) (highest)。
 
-## 概述
+## 概要
 
 从单张参考图像生成高质量三维纹理，核心挑战在于**跨视角一致性与几何对齐**。现有方法普遍采用不加区分的全注意力机制，导致两类内在歧义：(1) **跨视角歧义**——几何相似但语义不同的区域（如左右肢体）错误关注，产生纹理接缝与空间不一致；(2) **跨模态歧义**——噪声token在参考图像与几何条件之间交替关注，造成外观过拟合或几何过度依赖，最终纹理与几何错位。
 
@@ -54,7 +54,7 @@ CaliTex 的核心洞察是：**几何一致性不应通过额外监督或后处�
 
 在 Objaverse 与游戏资产测试集上，CaliTex 取得最低 FID（157.8）和最高用户研究评分（4.53），消融实验证实 PAA 和 CRA 分别显著改善像素级多视角一致性（MV-MSE）和纹理-几何对齐。该方法以几何先验校准注意力，为视角一致的纹理生成提供了新的架构范式。
 
-## 背景与动机
+
 
 ### 3D纹理生成的核心挑战：从图像先验到几何一致的表面外观
 
@@ -80,7 +80,9 @@ CaliTex 的核心洞察是：**几何一致性不应通过额外监督或后处�
 
 本文的核心动机在于：**几何一致性不应通过额外的后处理或监督信号来补救，而应通过架构层面的注意力校准，使其成为模型的内在行为**。具体而言，本文提出将三维几何先验**显式地嵌入到注意力计算过程中**，使模型在决定“关注哪里”时具备三维结构感知能力，从而从根本上消除跨视角歧义和跨模态歧义。这一思路催生了CaliTex框架及其两个核心机制：**Part-Aligned Attention**（部件对齐注意力）和**Condition-Routed Attention**（条件路由注意力），分别针对上述两种歧义进行架构层面的校准。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CaliTex 的核心创新在于**将几何先验显式地校准到注意力计算中**，从根本上解决当前多视角纹理生成中普遍存在的注意力歧义问题。现有方法（如 **MV-Adapter** (Huang et al., ICCV 2025)、**UniTEX** (Liang et al., arXiv 2025)、**Step1X-3D** (Li et al., arXiv 2025)、**Hunyuan3D 2.1** (Tencent Hunyuan3D Team, arXiv 2025)）在扩散 Transformer 中采用不加区分的全注意力机制，导致两类内在歧义：
 
@@ -123,7 +125,7 @@ CRA 通过强制外观信息经由几何条件路由，抑制了噪声 token 直
 
 上述两个模块嵌入在一个**两阶段扩散 Transformer 框架**中：Single-View DiT 捕获单视角内部的语义对应关系，Multi-View DiT 通过 PAA 和 CRA 增强跨视角与跨模态一致性。这一设计将几何一致性从外部约束内化为模型的固有行为，而非依赖额外监督或后处理。
 
-## 整体框架
+
 
 CaliTex 采用**两阶段扩散Transformer架构**，将3D纹理生成分解为视角内语义建模与跨视角几何校准两个互补阶段，并在核心注意力层嵌入几何先验，从根本上消除全注意力机制引发的跨视角歧义与跨模态歧义。
 
@@ -176,7 +178,7 @@ Multi-View DiT生成的多视角RGB图像通过反投影操作映射到三维网
 ![[assets/figures/papers/paper_list_l2446_https_arxiv_org_abs_2511_21309/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of our method. (a) We employ a two-stage generation framework: the Single-View DiT captures intra-view correlations, while the Multi-View DiT enhances geometric alignment and cross-view consistency using (b) Condition-Routed Attention and (c) Part-Aligned Attention. The generated multi-view images are then projected back and inpainted to produce the final 3D texture*
 
-## 核心模块与公式推导
+
 
 CaliTex 的核心设计是将三维几何先验显式地嵌入扩散 Transformer 的注意力计算中，以取代传统不加区分的全注意力。方法采用两阶段生成架构：**Single-View DiT** 负责捕获单视角内部的语义与外观对应关系，**Multi-View DiT** 则通过两个校准的注意力机制——**Condition-Routed Attention (CRA)** 和 **Part-Aligned Attention (PAA)**——分别解决跨模态歧义与跨视角歧义。
 
@@ -261,7 +263,9 @@ $$
 ![[assets/figures/papers/paper_list_l2446_https_arxiv_org_abs_2511_21309/figures/002_Figure_2.jpg]]
 *Figure 2: Illustration issues caused by attention ambiguity and our proposed solutions. Zoom in for more details. (a) The model confuses the left limb in the second view with the right limb, producing seams in the texture. (b) Our Part-Aligned Attention constrains attention computation within semantic parts, effectively eliminating cross-view inconsistency. (c) The model directly copies visually similar regions from the reference image, leading to misalignment with the geometry condition. (d) Our Condition-Routed Attention ensures geometry-aligned texture generation, correcting the distortion on the clothing, as highlighted in the bottom-right*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -319,7 +323,9 @@ Figure 6展示了CRA的消融效果：移除CRA后，噪声token可直接复制�
 
 ![[assets/figures/papers/paper_list_l2446_https_arxiv_org_abs_2511_21309/figures/006_Figure.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题背景与基线方法
 
@@ -364,6 +370,8 @@ CaliTex处于**几何感知注意力**这一新兴技术路线上。与依赖后
 - **动态部件分解**：当前PAA依赖预计算的静态PartField分解。能否学习自适应的、输入感知的部件分组，以适应更多样化的几何结构？
 - **注意力校准与生成质量的权衡**：PAA通过限制注意力范围提升一致性，但可能牺牲长程外观建模能力。如何在局部一致性与全局外观保真度之间取得更优平衡？
 - **扩展到视频或4D纹理**：当前方法针对静态3D物体。几何校准注意力的思想能否推广到时序一致的4D纹理生成？
+
+
 
 ## 原文 PDF
 

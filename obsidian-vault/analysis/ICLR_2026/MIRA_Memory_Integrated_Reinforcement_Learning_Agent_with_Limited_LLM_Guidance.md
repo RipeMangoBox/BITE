@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/MIRA_Memory_Integrated_Reinforcement_Learning_Agent_with_Limited_LLM_Guidance.pdf
+project_link: https://narjesno.github.io/MIRA/
+code_link: null
 openreview_forum_id: oWagByDNPc
 aliases:
 - MIRA
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | MIRA：结合有限LLM引导的记忆集成强化学习智能体 |
 | 英文题名 | MIRA: Memory-Integrated Reinforcement Learning Agent with Limited LLM Guidance |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=oWagByDNPc); [Project](https://narjesno.github.io/MIRA/) |
+| Links | [paper](https://openreview.net/forum?id=oWagByDNPc) · [Project](https://narjesno.github.io/MIRA/) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | MIRA |
 | Dataset | MiniGrid-DOORKEY, MiniGrid-LAVACROSSING, MiniGrid-REDBLUEDOOR, MiniGrid-REDBALL |
@@ -41,7 +43,7 @@ claims:
 > - MiniGrid-LAVACROSSING 上，Mean Return (unseen seeds) 为 0.855 ± 0.132，对比 0.012 ± 0.027 (Baseline RL)，变化 +0.843。
 > - MiniGrid-REDBLUEDOOR 上，Success Rate (unseen seeds) 为 0.944 ± 0.020，对比 0.036 ± 0.043 (Baseline RL)，变化 +0.908。
 
-## 概述
+## 概要
 
 **核心问题**：在稀疏奖励或延迟反馈的强化学习环境中，评论家（critic）早期输出的价值估计近乎均匀，导致优势函数无法提供有意义的更新梯度，使策略探索效率极低、收敛缓慢。
 
@@ -56,7 +58,7 @@ claims:
 
 **局限性**：当前验证限于离散动作空间的小规模网格环境，扩展到连续控制和高维视觉输入仍需探索；记忆图初始化依赖LLM输出质量，误导性先验可能延缓收敛。
 
-## 背景与动机
+
 
 **稀疏奖励与延迟反馈：强化学习的核心瓶颈**
 
@@ -78,7 +80,9 @@ MIRA的设计动机源于一个关键洞察：**LLM的真正价值不在于替�
 
 这一范式转换意味着：LLM从“驾驶员”变为“导航员”，其建议被吸收进一个演化的记忆图中，转化为可衰减的效用信号（utility signal）。该信号通过加权增强优势估计，在不改变底层奖励函数的前提下补偿早期评论家梯度的不足，且理论上保证最终收敛到标准策略梯度方法的解。由此，MIRA在保持极低LLM查询预算（不超过十个离线提示加上少量在线查询）的同时，实现了与依赖密集LLM监督方法相当的加速效果。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MIRA 的核心创新在于**将 LLM 的结构化先验知识转化为一种可衰减的效用塑造信号**，通过持久化的记忆图（Memory Graph）补偿稀疏奖励环境下评论家（Critic）早期训练的梯度不足，从而在不改变长期收敛性质的前提下大幅加速早期探索与学习。
 
@@ -121,7 +125,7 @@ $$U_t \doteq c_m \cdot \hat{r}_m \cdot \rho(\mathbf{g}_{\mathrm{p}}, \zeta_m) \c
 
 MIRA 的独特之处在于：**它不修改环境奖励函数**（区别于 LLM-RS 的势能奖励塑造），**不依赖频繁的在线 LLM 监督**（区别于 LLM4Teach 的持续蒸馏），而是通过记忆图将 LLM 先验转化为可衰减的、作用于优势估计层面的软引导信号。这种设计既保留了 PPO 的收敛保证，又在稀疏奖励环境中提供了关键的早期探索梯度。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l38_https_openreview_net_forum_id_oWagByDNPc/figures/001_Figure_1.jpg]]
 *Figure 1: Offline priors and online LLM suggestions are filtered by a screening unit before being incorporated into the memory graph as healthy grafts. MIRA agent acts under partial observations, interacting with the environment. A utility module evaluates trajectory rollouts against the evolving memory graph, producing a utility signal that shapes advantage estimation and policy updates*
@@ -213,7 +217,7 @@ $$\mathcal{L}^\mathrm{shaped}(\pi_\theta) = \mathbb{E}\left[ \min(r_t, 1 \pm \va
 
 整个框架的查询效率极高：所有主要实验结果（图 5、表 2-3）仅使用不超过十个离线提示构建记忆图，外加少量在线查询，即实现了对标准 PPO 和分层强化学习基线的显著超越，并达到与需要频繁 LLM 监督的方法（如 LLM4Teach）相当的渐进性能。
 
-## 核心模块与公式推导
+
 
 MIRA 的核心架构由四个功能模块构成，它们协同工作，将 LLM 的结构化先验知识转化为可衰减的探索引导信号，最终注入标准 PPO 的优势估计中。下面逐一介绍各模块及其对应的关键公式。
 
@@ -277,7 +281,9 @@ $$
 
 筛选单元位于 LLM 输出与记忆图之间，负责过滤不可靠的在线 LLM 建议。当 LLM 提供 token 级概率时，筛选单元计算输出的几何平均概率作为置信度；当概率不可用时，则通过多次采样的一致性（如多数投票）来估计可靠性。只有置信度超过预设阈值的建议才会被“嫁接”为记忆图的新节点。消融实验表明，筛选阈值的选择不影响最终收敛性能，仅调节早期探索广度与中期提升速度之间的权衡（Figure 14）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -325,7 +331,9 @@ Figure 7 从三个维度对MIRA的关键设计进行了消融分析。
 ![[assets/figures/papers/paper_list_l38_https_openreview_net_forum_id_oWagByDNPc/figures/004_Figure_5.jpg]]
 *Figure 5: Mean return (top) and success rate (bottom) across four MiniGrid and BabyAI tasks. MIRA consistently outperforms both baselines, achieving faster learning, higher asymptotic return, and greater success rates. These results are obtained with a small LLM budget, using fewer than ten offline prompts to build memory graphs plus infrequent online queries to guide exploration*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 方法定位：稀疏奖励下RL的LLM辅助探索
 
@@ -374,6 +382,8 @@ MIRA的设计在以下条件下最为有效：
 4. **多任务记忆复用**：记忆图的子目标共享机制（Figure 2）暗示了跨任务复用的可能性。能否将MIRA应用于多目标或多任务环境，实现通用的记忆图迁移？这需要研究不同任务间子目标表示的泛化能力。
 
 5. **LLM推理质量与训练动态的交互**：消融实验（Figure 7 right）揭示了不同LLM的记忆导致显著不同的学习曲线，但这一现象的深层机制——LLM推理风格如何通过记忆图结构影响探索策略——尚需进一步分析。
+
+
 
 ## 原文 PDF
 

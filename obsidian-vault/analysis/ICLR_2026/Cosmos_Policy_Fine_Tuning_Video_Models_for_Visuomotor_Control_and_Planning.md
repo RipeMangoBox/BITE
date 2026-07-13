@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Cosmos_Policy_Fine_Tuning_Video_Models_for_Visuomotor_Control_and_Planning.pdf
+project_link: https://research.nvidia.com/labs/dir/cosmos-policy/
+code_link: null
 openreview_forum_id: wPEIStHxYH
 aliases:
 - CP
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | Cosmos Policy：微调视频模型用于视动控制与规划 |
 | 英文题名 | Cosmos Policy: Fine-Tuning Video Models for Visuomotor Control and Planning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=wPEIStHxYH); [Project](https://research.nvidia.com/labs/dir/cosmos-policy/) |
+| Links | [paper](https://openreview.net/forum?id=wPEIStHxYH) · [Project](https://research.nvidia.com/labs/dir/cosmos-policy/) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | Cosmos Policy |
 | Dataset | LIBERO (4 suites), RoboCasa (24 tasks), Real-world ALOHA (4 tasks), Real-world ALOHA (planning subset: put candies in bowl, put candy in ziploc bag) |
@@ -42,7 +44,7 @@ claims:
 > - RoboCasa (24 tasks) 上，平均成功率 (%) 为 67.1，对比 66.4 (FLARE / GR00T-N1.5+HAMLET)，变化 +0.7。
 > - Real-world ALOHA (4 tasks) 上，平均任务完成得分 (0-100) 为 93.6，对比 88.6 (π0.5)，变化 +5.0。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -75,7 +77,7 @@ Cosmos Policy 的核心差异在于：**以潜在帧注入实现多模态统一�
 - 移除辅助损失使 LIBERO 平均成功率从 98.5% 降至 97.0%（-1.5 点）；
 - 从随机初始化训练则进一步降至 94.6%（-3.9 点），证实预训练视频先验的关键作用。
 
-## 背景与动机
+
 
 机器人操作策略学习长期面临一个核心矛盾：**如何有效利用大规模预训练模型中的先验知识，同时保持策略架构的简洁性与通用性**。近年来，视频生成模型在捕捉复杂物理世界动态和时空先验方面展现出强大能力，但将其转化为机器人策略的过程仍然繁琐且割裂。
 
@@ -93,7 +95,9 @@ Cosmos Policy 的核心差异在于：**以潜在帧注入实现多模态统一�
 
 这一设计基于一个核心洞察：预训练视频扩散模型的去噪得分匹配机制天然适合捕捉复杂高维动作分布——这正是机器人操作中多模态动作建模所需要的。通过潜在帧注入实现多模态统一建模，同一模型可以同时充当策略（生成动作）、世界模型（预测未来状态）和价值函数（评估状态价值），并支持基于模型的规划来进一步提升任务成功率。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Cosmos Policy 的核心创新在于**零架构改动的统一视频扩散建模范式**：将机器人策略、世界模型和价值函数全部融入预训练视频扩散模型的潜在帧序列中，通过单阶段后训练实现多模态联合学习。相比现有方法，这一范式在三个关键维度上实现了突破。
 
@@ -127,7 +131,7 @@ Cosmos Policy 提出**潜在帧注入（Latent Frame Injection）** 机制（Fig
 
 当前创新存在以下边界：模型仅预测单个未来时间步的状态和价值，未探索多步预测与更深层次规划；基于模型的规划推理延迟较高（N=8 搜索约 4.9 秒），难以直接用于高频动态任务；世界模型和价值函数的精炼依赖策略 rollout 数据，外推能力有限。这些局限指向了未来优化的方向——推理加速、多步预测扩展和更高效的探索策略。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_wPEIStHxYH/figures/002_Figure_2.jpg]]
 *Figure 2: The latent diffusion sequence of Cosmos Policy. We illustrate latent frame injection—the primary mechanism for adapting the pretrained Cosmos-Predict2 into a policy that can predict robot actions, future states, and values without architectural changes. First, raw images are tokenized into latent frames (first row). Then, additional modalities are inserted directly into the latent frame sequence of the video diffusion model (second row). The model is then tasked to denoise the noised latent frames conditioned on the clean frames (third row). See Section 4.1 for more details. (Note: For simplicity, this figure does not depict certain implementation details; see Figure 8 for a more detailed v...*
@@ -164,7 +168,7 @@ pipeline 由四个关键模块串联，数据流贯穿始终：
 - **零架构改动**：所有模态适配通过潜在帧注入完成，原始 Cosmos-Predict2 的 Transformer 去噪网络和 VAE 编解码器保持不变。
 - **预训练至关重要**：从随机初始化训练（无视频模型先验）导致 LIBERO 平均成功率下降 3.9 个百分点（Table 4），验证了预训练时空先验的核心作用。
 
-## 核心模块与公式推导
+
 
 ### 潜在帧注入：零架构改动的多模态适配
 
@@ -221,7 +225,9 @@ $$V^{\pi}(s) = \mathbb{E}_{\tau \sim \pi} \left[ \gamma^{H-t} R(s_H, a_H) \mid s
   增加高噪声水平的采样权重，以提升动作预测精度（Figure 9）。
 - **单步去噪**：仅使用 1 步去噪推理时，RoboCasa 平均成功率仍达 66.4%，推理延迟从 0.61 秒降至 0.16 秒（约 4× 加速），验证了模型在低步数下的鲁棒性（Table 5）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 Cosmos Policy 在三个层级上进行了系统验证：两个模拟基准（LIBERO、RoboCasa）、一个真实世界双臂操作基准（ALOHA），以及基于模型的规划消融。所有实验均在固定初始条件下评估，并使用相同数量的真人演示进行微调（RoboCasa 仅 50 条，远低于对比方法的 300+ 条），确保数据公平。
 
@@ -270,7 +276,9 @@ Cosmos Policy 取得 **93.6%** 的平均综合得分（Table 3），优于所有
 *Figure 4: Real-world ALOHA robot evaluation results. We evaluate state-of-the-art policies on a suite of four tasks and measure the score, which represents average percent completion of each task. Cosmos Policy achieves highest overall score, outperforming all other methods in three of four tasks*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心瓶颈与设计动机
 
@@ -331,6 +339,8 @@ Cosmos Policy 的核心洞察在于：**预训练视频扩散模型的去噪得�
 4. Cosmos Policy 的联合建模范式能否扩展到更广泛的具身任务，如结合自然语言指令的复杂多步规划？当前模型使用 T5-XXL 文本嵌入作为条件，但尚未充分利用语言理解能力进行指令跟随。
 
 5. 在更多样、更具挑战性的真实场景（包括人机交互、动态障碍物避碰）中，统一视频扩散模型作为策略、世界模型和价值函数的方法是否依然保持优势？这需要更大规模的真实世界评估和鲁棒性测试。
+
+
 
 ## 原文 PDF
 

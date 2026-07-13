@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/DiffusionNFT_Online_Diffusion_Reinforcement_with_Forward_Process.pdf
+project_link: https://research.nvidia.com/labs/dir/DiffusionNFT
+code_link: null
 openreview_forum_id: VJZ477R89F
 aliases:
 - DNAFD
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | DiffusionNFT：基于前向过程的在线扩散强化学习 |
 | 英文题名 | DiffusionNFT: Online Diffusion Reinforcement with Forward Process |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=VJZ477R89F); [Project](https://research.nvidia.com/labs/dir/DiffusionNFT) |
+| Links | [paper](https://openreview.net/forum?id=VJZ477R89F) · [Project](https://research.nvidia.com/labs/dir/DiffusionNFT) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/diffusion_image_video |
 | Method | Diffusion Negative-aware FineTuning (DiffusionNFT) |
 | Dataset | GenEval, GenEval (head‑to‑head single reward), OCR, PickScore |
@@ -42,7 +44,7 @@ claims:
 > - GenEval (head‑to‑head single reward) 上，GenEval score 为 0.98 (1k steps)，对比 FlowGRPO: 0.95 (5k+ steps with CFG)，变化 +0.03, while using 5× fewer steps。
 > - OCR 上，OCR score 为 0.91 (multi‑reward)，对比 SD3.5‑M (w/o CFG): 0.12; FLUX.1‑Dev: 0.84; FlowGRPO: 0.92 (2k single‑reward)，变化 +0.79 (vs. base)。
 
-## 概述
+## 概要
 
 基于反向过程的扩散强化学习（RL）方法——如 FlowGRPO——存在结构性缺陷：它们依赖对反向 SDE 的离散化与似然估计，这限制了可用求解器的类型（仅一阶 SDE），并导致正向-反向过程的不一致性；同时，无分类器引导（CFG）的集成要求同时训练条件与无条件模型，使优化变得复杂。这些瓶颈制约了在线扩散 RL 的效率与灵活性。
 
@@ -50,7 +52,7 @@ DiffusionNFT 将在线 RL 的训练目标从反向采样过程转移到正向扩
 
 实验表明，DiffusionNFT 在单奖励任务上的效率比 FlowGRPO 高 3× 至 25×（GenEval 得分从 0.24 提升至 0.98，仅需约 1k 步，而 FlowGRPO 需超过 5k 步并配合 CFG 才达到 0.95）。在多奖励训练中，DiffusionNFT 以 CFG‑free 的方式将基模型 SD3.5‑Medium 的 GenEval 得分从 0.24 提升至 0.94，OCR 得分从 0.12 提升至 0.91，并在 PickScore、HPSv2.1、Aesthetic、ImageReward 等指标上全面超越基模型与 FlowGRPO。消融实验确认了负样本感知微调的必要性（移除负支路损失会导致奖励瞬时崩溃），并验证了 ODE 采样器优于 SDE 采样器、自适应时间加权与软更新策略对训练稳定性的关键作用。
 
-## 背景与动机
+
 
 ### 扩散模型与流匹配
 
@@ -78,7 +80,9 @@ $$\mathbb{E}_{t, \boldsymbol{x}_0 \sim \pi_0, \boldsymbol{\epsilon} \sim \mathca
 
 具体而言，DiffusionNFT 的核心思路是：在正向过程中通过对比正样本（高奖励）和负样本（低奖励）的隐式策略来定义改进方向 $\Delta$，并使用双支路流匹配损失直接优化单一目标策略，从而将 RL 信号融入监督学习框架。这一设计使得方法允许使用任意黑盒求解器进行数据收集，仅需干净图像与对应的奖励信号，无需存储采样轨迹，且全程 CFG-free。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 1. 训练范式转移：从反向过程策略梯度到正向过程流匹配
 
@@ -146,7 +150,7 @@ $$\boldsymbol{v}_{\theta^*}(\boldsymbol{x}_t, \boldsymbol{c}, t) = \boldsymbol{v
 
 > **证据强度**：上述组件的消融实验在 Section 4.4 中系统验证，置信度 0.9。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0012_VJZ477R89F_DiffusionNFT_Online_Diffusion_Reinforcement_with/figures/003_Figure_2.jpg]]
 *Figure 2: Comparison between Forward-Process RL (NFT) and Reverse-Process RL (GRPO). NFT allows using any solvers and does not require storing the whole sampling trajectory for optimization*
@@ -207,7 +211,7 @@ $$w(t) \\|\\boldsymbol{v}_\\theta - \\boldsymbol{v}\\|_2^2 \\to \\frac{\\|\\bold
 
 整个 pipeline 的数据流可概括为：**当前策略 → 黑盒采样 → 干净图像 → 奖励评估 → 最优性概率 → 双支路流匹配损失 → 隐式策略更新 → EMA 软更新采样策略**。这一闭环将 RL 信号无缝融入监督学习框架，避免了反向过程策略梯度对采样轨迹和特定求解器的依赖，实现了无似然、无求解器约束的高效在线扩散强化学习。
 
-## 核心模块与公式推导
+
 
 ### 瓶颈与设计动机
 
@@ -297,7 +301,9 @@ $$
 - **引导强度 $\beta$**：在 $1$ 附近表现稳定，实验中选用 $\beta=1$ 或 $0.1$。
 - **ODE 求解器优势**：数据收集使用 ODE 采样器优于 SDE 采样器，尤其在 PickScore 上提升明显。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要定量结果
 
@@ -346,7 +352,9 @@ Figure 5 展示了 SD3.5-M、FlowGRPO 与 DiffusionNFT 在 GenEval、OCR、DrawB
 2. **单奖励过拟合**：如 Table 2 所示，仅在 OCR 奖励上训练会导致其他指标泛化能力下降，需额外启用 CFG 补偿。这表明单目标优化存在“奖励黑客”风险。
 3. **多阶段训练调度**：多奖励训练需要分阶段调度不同奖励模型，自动化程度仍有提升空间，可能增加实际部署的工程复杂度。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的本质差异
 
@@ -388,6 +396,8 @@ RFT 是一种仅利用正样本进行微调的基线方法，可视为 Diffusion
 **3. 理论收敛性。** 论文在 Theorem 3.2 中给出了无限数据和容量下的最优解 $v_{\theta^*}(x_t, c, t) = v^{old} + \frac{2}{\beta} \Delta$，但有限样本和有限模型容量下的收敛速率和误差界尚未建立。
 
 **4. 公平性评估缺失。** 尽管该方法完全 CFG-free，避免了条件/无条件双模型训练带来的潜在偏见，但论文未报告不同人群或属性上的公平性评估。CFG-free 设计是否确实带来了更公平的生成分布，需要进一步的实证检验。
+
+
 
 ## 原文 PDF
 

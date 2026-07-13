@@ -43,7 +43,7 @@ claims:
 > - NAVSIM (navtest, Best-of-6) 上，PDM Score ↑ 92.4 (NoRD-BoN) vs 92.1 (AutoVLA-BoN) (+0.3)。
 > - WaymoE2E 上，Rated Feedback Score (RFS) ↑ 7.709 (NoRD) vs 7.556 (AutoVLA) (+0.153)。
 
-## 概述
+## 概要
 
 自动驾驶的视觉-语言-动作（VLA）模型近期取得了显著进展，但主流方法普遍依赖两个高成本要素：大规模驾驶数据与稠密的推理链（Chain-of-Thought）标注。这种范式不仅推高了数据获取与标注成本，还导致模型在推理时产生大量冗余token，限制了实时部署效率。一个核心问题随之浮现：**能否在不使用推理标注和大量数据的条件下，训练出具有竞争力的VLA模型？**
 
@@ -55,7 +55,7 @@ NoRD（No Reasoning for Driving）给出了肯定的回答。该方法仅使用�
 
 这一改进带来了决定性的性能跃升：在NAVSIM基准上，NoRD-BASE经Dr. GRPO后训练后，PDM得分从76.66提升至85.62，相对提升**11.68%**；在WaymoE2E端到端驾驶基准上，NoRD以远少于基线模型的数据量取得排名第三的Rated Feedback Score，并拥有最低的平均位移误差（ADE@3s = 1.2504）。在Best-of-6设置下，NoRD的PDM得分（92.4）甚至超越了需要推理标注和大规模数据的AutoVLA（92.1），证明了数据高效、无推理VLA范式的可行性。
 
-## 背景与动机
+
 
 ### 端到端自动驾驶的VLA范式与数据瓶颈
 
@@ -83,7 +83,9 @@ $$ \hat{A}_{i,t}^{\mathrm{GRPO}} = \frac{r_i - \mu_{\text{group}}}{\sigma_{\text
 
 为此，本文提出**NoRD（No Reasoning for Driving）**——一种数据高效、无需推理的VLA模型，并配套设计**Dr. GRPO**强化学习算法作为GRPO的直接替代。NoRD仅使用不到60%的驾驶数据，完全去除推理标注，直接预测轨迹token（Figure 1b）；而Dr. GRPO通过移除优势估计中的标准差归一化，从根本上消除对高方差样本的惩罚偏差，使RL后训练能够对全部难度层级的样本施加有效的梯度信号。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 NoRD 的核心创新在于**系统性地证明了“无推理”VLA 模型在数据高效场景下的可行性，并针对性地解决了弱监督策略在 RL 后训练中遭遇的“难度偏差”问题**。该工作并非提出全新的模型架构，而是通过精准的诊断与算法层面的轻量级改造，使一个仅在小规模驾驶数据（<60%）上微调、且完全不含推理链标注的基础模型，能够通过强化学习获得显著的性能提升。
 
@@ -137,7 +139,7 @@ $$
 
 最终，这种无推理、数据高效的范式使 NoRD 在 **WaymoE2E** 基准上，以远少于基线模型的数据量，在不使用推理标注和模型集成的前提下，取得了排名第三的 RFS 分数，并拥有最低的 ADE（Table 2），证明了其在性能与效率上的双重竞争力。
 
-## 整体框架
+
 
 NoRD 的整体设计围绕一个核心原则展开：**在不依赖任何推理标注的前提下，用尽可能少的驾驶数据训练出高性能的视觉-语言-动作（VLA）模型**。图 5 给出了完整的前向推理流程——多视图图像与自车状态进入视觉编码器，经语言模型主干直接自回归地输出代表未来轨迹的离散 token，再由解码器恢复为可执行的轨迹点序列。整个过程没有生成任何自然语言推理链，因此模型的 token 产出量和推理延迟均显著低于需要 CoT 的 VLA 方案（图 9）。
 
@@ -181,7 +183,7 @@ NoRD 的训练分为两个阶段：
 ![[assets/figures/papers/paper_list_l2238_https_arxiv_org_abs_2602_21172/figures/008_Figure_5.jpg]]
 *Figure 5: Model architecture of NORD. NORD directly predicts action tokens without requiring reasoning traces, enabling a significantly more efficient training and inference pipeline*
 
-## 核心模块与公式推导
+
 
 ### 3.1 弱SFT策略的难度偏差：问题根源
 
@@ -255,7 +257,9 @@ $$r = \frac{r_f + r_l + r_d}{1.5}$$
 ![[assets/figures/papers/paper_list_l2238_https_arxiv_org_abs_2602_21172/figures/006_Figure_3.jpg]]
 *Figure 3: Evolution of group-mean PDM score during RL fine-tuning. (a) GRPO struggles to optimize samples with high group variance during training, particularly in the range [0.2–0.65]. (b) Dr. GRPO effectively optimizes high-variance samples during training, resulting in significant overall performance gains*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 1. 核心瓶颈：GRPO 后训练为何失效？
 
@@ -352,7 +356,9 @@ Dr. GRPO 采用了不对称裁剪策略（低裁剪 -0.2，高裁剪 0.1），�
 ![[assets/figures/papers/paper_list_l2238_https_arxiv_org_abs_2602_21172/figures/015_Figure_9.jpg]]
 *Figure 9: Comparison of token and runtime efficiency. NORD is the most (a) token and (b) runtime efficient VLA*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -428,6 +434,8 @@ NoRD 的 k-disc tokenization 将轨迹聚类为 2048 个离散 token。Table 5 �
 ---
 
 **小结**：NoRD 在 VLA 方法谱系中定位为“数据高效、无推理”路线的代表性工作。它通过 Dr. GRPO 修正了标准 GRPO 在弱 SFT 策略下的难度偏差，证明在放弃推理标注和减少数据量的条件下仍可达到竞争性能。但其适用边界受限于难度偏差的残留、token 粒度的依赖和可解释性的缺失，这些限制也为后续研究指明了方向。
+
+
 
 ## 原文 PDF
 

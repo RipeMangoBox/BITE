@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arXiv_2025/CFG_Zero_Improved_Classifier_Free_Guidance_for_Flow_Matching_Models.pdf
+project_link: null
+code_link: https://github.com/
 aliases:
 - CZ
 - CZICFGFMM
@@ -42,7 +44,7 @@ claims:
 > - ImageNet-256 上，FID↓ 2.10 vs 2.23 (CFG) (-0.13)；Recall↑ 0.61 vs 0.59 (CFG) (+0.02)。
 > - Lumina-Next (T2I self-curated) 上，Aesthetic Score↑ 7.03 vs 6.85 (CFG) (+0.18)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：在 Flow Matching 训练早期，模型的速度估计欠准确，导致标准无分类器引导（CFG）在 ODE 求解的第一步产生较大的引导误差——该误差甚至大于直接使用零速度。这使得样本在采样起始阶段偏离最优轨迹，损害生成质量。
 
@@ -63,7 +65,7 @@ claims:
 
 **局限与待验证问题**：CFG-Zero⋆ 的效果依赖模型欠拟合程度，充分训练后零初始化增益消失；零初始化步数 $K$ 需手动调节，缺乏自适应机制；方法主要在 Flow Matching 模型上验证，对传统扩散模型的泛化性尚未确认；对 CFG-distilled 模型（如 Flux）的影响需进一步分析。
 
-## 背景与动机
+
 
 ### 问题背景：Flow Matching 与无分类器引导
 
@@ -93,7 +95,9 @@ $$\|\widetilde{\mathbf{v}}_0^{\theta}(\mathbf{x}|\mathbf{y}) - \mathbf{v}_0^*(\m
 
 这两个策略共同构成了 CFG-Zero⋆，其核心动机在于：**在模型欠拟合阶段，通过校正速度估计和跳过不可靠的初始预测，使引导过程更稳定、更准确**。Figure 2 通过条件生成与 CFG 生成的对比，直观展示了标准 CFG 在欠拟合模型上的引导失效现象，为方法的提出提供了定性支撑。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CFG-Zero⋆ 的核心创新在于针对 Flow Matching 模型在训练早期（欠拟合阶段）速度估计不准确的问题，提出了两个互补且即插即用的改进模块：**优化尺度（Optimized Scale）** 与 **零初始化（Zero-Init）**。这两个模块分别从“校正速度方向”和“规避初始误差”两个角度，对标准无分类器引导（CFG）的速度组合公式进行了重构。
 
@@ -135,7 +139,7 @@ ImageNet-256 上的验证实验（Table 1）为该设计提供了关键证据：
 
 消融实验（Table 6）表明，在 SD3.5 上，单独使用零初始化或单独使用优化尺度均不如完整的 CFG-Zero⋆ 组合，验证了两者的协同增益。
 
-## 整体框架
+
 
 CFG-Zero⋆ 是一种面向 Flow Matching 模型的推理阶段引导增强方法，其整体流程由四个核心模块串联构成：**优化尺度计算**、**零初始化掩码**、**引导速度合成**以及**标准 ODE 求解器**。该方法不改变模型训练过程，仅在采样时对速度场进行轻量级校正。
 
@@ -145,7 +149,7 @@ CFG-Zero⋆ 是一种面向 Flow Matching 模型的推理阶段引导增强方�
 
 **关键设计逻辑**：上述流程直接回应了 Flow Matching 训练早期模型速度估计不准确这一瓶颈。在 $t=0$ 附近，模型预测的引导速度误差甚至大于直接使用零速度（见 Eq. 12 所揭示的不等式关系），因此零初始化掩码通过截断前 $K$ 步的不可靠预测来避免样本偏离最优轨迹。同时，优化尺度 $s^\star$ 本质上是条件速度在无条件速度方向上的投影，它从理论上最小化了引导速度与真实速度之间误差的上界，从而在后续步中持续校正欠拟合模型的速度估计。两个模块协同作用：零初始化负责“止损”，优化尺度负责“纠偏”，共同使采样轨迹更紧密地贴合目标分布的真实流线。
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题背景：Flow Matching 中的标准 CFG
 
@@ -217,7 +221,9 @@ CFG-Zero$^\star$ 的两个核心模块——优化缩放 $s^\star$ 与零初始�
 
 两者协同作用：零初始化提供干净的起始点，优化缩放维持后续轨迹的准确性。消融实验（Table 6）证实，仅使用单一模块均不如完整组合，验证了协同的必要性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈验证：训练早期速度估计不准确
 
@@ -327,7 +333,9 @@ CFG-Zero⋆ 在 IS 上取得 258.87（+1.84 vs CFG），在 Recall 上达到 0.6
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2503_18886/figures/009_Figure_4.jpg]]
 *Figure 4: Qualitative comparisons between CFG and CFG-Zero⋆. Experiments are conducted using Lumina-Next, Stable Diffusion 3, and Stable Diffusion 3.5, with each model evaluated under its recommended optimal sampling steps and guidance scale settings. CFG results are shown in orange and Ours are highlighted in green boxes*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -369,6 +377,8 @@ CFG-Zero⋆ 的效果与模型的训练程度密切相关。Table 1 显示，在
 4. 为何 SD3.5 对多步零初始化更敏感，而其他模型则受益于更多零步？这是否与模型容量或预训练程度有关？
 5. CFG-Zero⋆ 对不同类型的条件（文本、图像、分割图）是否具有一致的增益？
 6. 零初始化对采样效率的影响能否结合蒸馏技术来弥补？
+
+
 
 ## 原文 PDF
 

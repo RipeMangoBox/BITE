@@ -5,6 +5,8 @@ paper_level: A
 venue: NeurIPS
 year: 2025
 pdf_ref: paperPDFs/NEURIPS_2025/Cameras_as_Relative_Positional_Encoding.pdf
+project_link: https://www.liruilong.cn/prope/
+code_link: null
 aliases:
 - PPPE
 - CARPE
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 摄像机作为相对位置编码 |
 | 英文题名 | Cameras as Relative Positional Encoding |
 | 会议/期刊 | NeurIPS 2025 |
-| Links | [paper](https://arxiv.org/abs/2507.10496); [Project](https://www.liruilong.cn/prope/) |
+| Links | [paper](https://arxiv.org/abs/2507.10496) · [Project](https://www.liruilong.cn/prope/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | PRoPE (Projective Positional Encoding) |
 | Dataset | RealEstate10K (novel view synthesis, constant intrinsics per scene), varying intrinsics per scene), Objaverse (novel view synthesis, varying intrinsics), RGBD (stereo depth estimation) |
@@ -41,7 +43,7 @@ claims:
 > - RealEstate10K (novel view synthesis, varying intrinsics per scene) 上，PSNR↑ 为 21.42，对比 19.89 (Plücker Raymap)，变化 +1.53。
 > - Objaverse (novel view synthesis, varying intrinsics) 上，PSNR↑ 为 22.98，对比 21.43 (Plücker Raymap)，变化 +1.55。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -88,8 +90,6 @@ PRoPE在多个任务上展现出一致且显著的性能提升：
 
 PRoPE当前假设针孔相机模型，未考虑镜头畸变；在极端焦距下投影矩阵与特征向量相乘可能引入数值不稳定。未来工作可探索扩展到通用相机模型、设计更稳定的数值方案，以及在机器人导航等更广泛的多模态任务中验证其泛化能力。
 
-## 背景与动机
-
 ### 多视角Transformer中的位置编码困境
 
 多视角三维视觉任务——包括新视角合成、立体深度估计和空间认知——的核心挑战在于，模型必须将多个相机捕获的二维图像信息融合为一致的三维表示。这一过程与语言模型中序列位置信息的处理有着本质的相似性：Transformer架构本身不具备对输入顺序或空间关系的感知能力，必须通过额外的“位置编码”机制将结构信息注入模型。
@@ -108,7 +108,7 @@ PRoPE当前假设针孔相机模型，未考虑镜头畸变；在极端焦距下
 
 这一设计动机源于一个简单的观察：在语言模型中，相对位置编码（如RoPE）通过编码token之间的相对距离，赋予了模型对序列长度的泛化能力。类似地，在多视角Transformer中，**将相机视为“相对位置编码”**——即用相机之间的投影变换替代token之间的序列距离——有望使模型获得对相机参数变化和视角数量变化的强鲁棒性。PRoPE正是沿着这一思路，将相机条件化从token级别的绝对编码提升为注意力级别的相对投影编码。
 
-## 核心创新
+## 核心方法与创新机理
 
 ### 瓶颈：绝对相机编码的泛化困境
 
@@ -166,8 +166,6 @@ PRoPE与现有方案的差异集中体现在**对相机内参的显式建模**�
 - 文中未提供CAPE和GTA的具体引用信息（作者/会议/年份），需查阅原文补充。
 - 投影变换的非交换性带来的数值稳定性问题在极端焦距下的具体表现缺乏定量分析，仅作为局限性提及。
 
-## 整体框架
-
 PRoPE 的设计遵循一个核心原则：**将相机之间的完整投影变换注入到 Transformer 的注意力层中，作为一种相对位置编码**。这一框架不修改模型的主体架构，而是通过替换标准自注意力中的相对变换矩阵，将多视角几何先验无缝嵌入到现有的多视角 Transformer 中。
 
 ### 输入表示
@@ -216,8 +214,6 @@ PRoPE 作为注意力层级的相对编码，与 token 层级的绝对编码是*
 3. **注意力层级**：在每个自注意力层中，根据 token 所属的相机索引，构造 $\mathbf{D}_t^{\mathtt{PRoPE}}$ 矩阵，通过 GTA 风格的注意力机制注入投影几何关系
 4. **输出**：经过多视角几何增强的特征表示，可直接用于新视角合成、深度估计等下游任务
 
-## 核心模块与公式推导
-
 PRoPE 的核心思想是将多视角Transformer中的相机条件化从**绝对编码**（如Plücker raymap）转变为**注意力层级的相对位置编码**，显式建模完整相机视锥体之间的投影变换关系。其技术实现建立在GTA（Geometric Transform Attention）框架之上，但将注入的相对变换从纯外参的SE(3)位姿替换为同时包含内参和外参的投影矩阵。
 
 ### 关键模块架构
@@ -261,7 +257,7 @@ PRoPE与现有方法的关键差异体现在**changed_slots**中：
 
 > **注意**：上述公式均来自论文Section 3.3和Section 3.4（Equation 14-19），变量含义已通过verified_analysis中的formulas条目交叉验证。未在verified_analysis中出现的公式细节（如具体的维度分配策略）未做推测性展开。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -370,12 +366,9 @@ PRoPE未引入额外参数，仅通过替换注意力中的位置编码即可提
 ![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2507_10496/figures/012_Table.jpg]]
 *Table: A.1: Ablation Study on PRoPE. \overline { { \mathbf { D } _ { t } ^ { \mathrm { P r o j } } } } is crucial for encoding the relative camera information, and \mathbf { D } _ { t } ^ { \mathrm { R o P E } } is also helpful to capture the relative patch coordinate. Experiments are conducted on RealEstate10K with CamRay as input*
 
-![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2507_10496/figures/013_Table.jpg]]
-*Table: A.2: Incorporating PRoPE into CAT3D. Adding PRoPE to the CAT3D multiview diffusion model yields improvements over the original model, with zero additional model parameters and negligible computational overhead*
-
 ![[assets/figures/papers/paper_list_l29_https_arxiv_org_abs_2507_10496/figures/014_Table.jpg]]
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 相机条件化的技术谱系
 

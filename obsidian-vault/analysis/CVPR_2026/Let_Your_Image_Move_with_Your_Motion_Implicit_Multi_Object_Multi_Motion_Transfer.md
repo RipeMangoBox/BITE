@@ -43,7 +43,7 @@ claims:
 > [!tip] 效果简介
 > - Custom evaluation set (200 video-image pairs) 上，Trajectory Fidelity (TF) ↑ 0.577 vs Best baseline (not specified) (N/A)；Flow Fidelity (FF) ↑ 0.723 vs Best baseline (not specified) (N/A)；Human Evaluation: Action Consistency (AC) % 76.750 vs Best baseline (not specified) (N/A)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有隐式图像到视频（I2V）运动迁移方法在单图像多物体场景中存在**跨物体动作纠缠**——不同物体的运动信号在注意力层相互泄漏，导致无法独立控制每个物体的运动。
 
@@ -52,8 +52,6 @@ claims:
 **方法定位**：FlexiMMT 是首个隐式 I2V 多物体多动作迁移框架，以 CogVideoX-5B-I2V 为基础扩散模型，引入可训练的运动标记（motion tokens）和两级掩码提取机制——训练阶段通过 QK 乘法和硬阈值自动提取单物体掩码，推理阶段通过回归掩码传播机制（RMPM）将第一帧语义分割掩码动态传播至所有生成帧。
 
 **主要结果**：在 200 个视频-图像对的评测集上，FlexiMMT 在轨迹保真度（TF=0.577）和光流保真度（FF=0.723）上显著优于所有基线方法，人工评测的动作一致性（76.75%）和运动保真度（89.48%）同样达到最优。消融实验证实，移除 M2X 掩码导致 TF 从 0.577 降至 0.381，移除 T2X 掩码使 TF 降至 0.461，验证了逐物体注意力解耦的决定性作用。
-
-## 背景与动机
 
 ### 问题背景
 
@@ -85,7 +83,7 @@ claims:
 
 针对这些缺口，本文提出**FlexiMMT**——首个支持多物体、多动作的隐式图像到视频动作迁移框架。其核心动机在于：**通过物体特定的注意力掩码，在扩散模型的注意力层中强制执行逐物体的动作-文本-视频交互解耦，从而在不依赖外部动作标注的前提下，实现精确、灵活的多物体独立动作控制**。
 
-## 核心创新
+## 核心方法与创新机理
 
 FlexiMMT 的核心创新在于首次在隐式运动迁移框架中实现了**多物体、多动作的独立控制**，其关键突破是通过**物体特定掩码在注意力层中强制解耦动作与文本标记**，从而消除了跨物体运动泄漏这一根本瓶颈。以下从三个 changed slots 展开。
 
@@ -115,8 +113,6 @@ FlexiMMT 在 CogVideoX-5B-I2V 的基础上引入了**可训练的运动标记**�
 ### 创新总结
 
 FlexiMMT 的三项 changed slots 形成了完整的因果链条：运动标记提供可迁移的运动表示，MDMA 通过物体特定掩码实现运动与文本的解耦，DMEM/RMPM 则保证了多帧掩码的准确性与稳定性。这一组合使得 FlexiMMT 成为首个能够在单张图像中独立控制多个物体不同运动的隐式 I2V 框架，在轨迹保真度（TF=0.577）和光流保真度（FF=0.723）上均达到 SOTA 性能。
-
-## 整体框架
 
 FlexiMMT 的整体流程围绕一个核心矛盾展开：**如何在不依赖外部动作标注的条件下，将多个参考视频中的不同运动独立、精确地迁移到一幅图像中的多个物体上**。该框架将这一问题分解为三个相互协同的机制——运动标记学习、注意力解耦掩码和掩码提取与传播——形成一个从训练到推理的完整闭环。
 
@@ -159,11 +155,6 @@ FlexiMMT 的整体流程围绕一个核心矛盾展开：**如何在不依赖外
 
 ![[assets/figures/papers/paper_list_l7_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Let_Your_Image_Move/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of FlexiMMT. (a) Training: Given one reference video, insert trainable motion tokens into text and video tokens. Get the object mask through a simple QK multiplication method, then mask out M2M, M2V and T2M parts in attention map. (b) Inference: Given a multi-object conditional image, we first segment each object’s mask with semantic segmentation model [35]. Concatenate pretrained motion tokens into text and video tokens for inference. Extract each object’s latent-space mask in subsequent frames via Dynamic Regressive Mask Propagation Mechanism (Dynamic RMPM), and apply it to Motion parts and Text parts in attention map*
-
-![[assets/figures/papers/paper_list_l7_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Let_Your_Image_Move/figures/001_Figure_1.jpg]]
-*Figure 1: Illustration of FlexiMMT. Given multiple reference videos, our FlexiMMT independently extracts each motion and applies them to images with any number of objects, enabling precise and compositional multi-object multi-motion transfer. For clarity, we show only simplified motion labels here; full text prompts and vivid videos are provided in the Supplementary Material*
-
-## 核心模块与公式推导
 
 ### 3.1 运动标记注入与前向注意力
 
@@ -223,7 +214,7 @@ RMPM 维护一个局部时间窗口内的锚帧集合，每完成一帧掩码提
 ![[assets/figures/papers/paper_list_l7_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Let_Your_Image_Move/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of the simple method for training and inference. Single object can be extracted through a simple QK multiplication method. However, different objects cannot be extracted through this simple method due to feature entanglement*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主结果
 
@@ -264,16 +255,13 @@ FlexiMMT 在 200 个视频-图像对的定制评估集上进行了系统验证�
 ![[assets/figures/papers/paper_list_l7_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Let_Your_Image_Move/figures/007_Table_2.jpg]]
 *Table 2: Impact of M2X and T2X masks in MDMA. “w/o M2X” denotes removing all Motion-to-[X] masks and “w/o T2X” denotes removing all Text-to-[X] masks during inference*
 
-![[assets/figures/papers/paper_list_l7_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Let_Your_Image_Move/figures/008_Table_3.jpg]]
-*Table 3: Impact of DMEM and RMPM. “w/o Train” and “w/o Infer” indicate disabling mask extraction during training and inference, respectively. “w/o RMPM” denotes removing the regressive mask extraction mechanism (RMPM) at inference*
-
 ![[assets/figures/papers/paper_list_l7_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Let_Your_Image_Move/figures/009_Figure_6.jpg]]
 *Figure 6: Qualitative comparison of each component in FlexiMMT. The caption for the generated videos is: “A beer bows head. A hedgehog stands up.”*
 
 ![[assets/figures/papers/paper_list_l7_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Let_Your_Image_Move/figures/010_Figure_7.jpg]]
 *Figure 7: Comparison of RMPM (w/o Dynamic) and Dynamic RMPM (w/ Dynamic). Dynamic RMPM substantially accelerates inference without compromising performance*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 问题定位：从单物体到多物体的隐式运动迁移
 

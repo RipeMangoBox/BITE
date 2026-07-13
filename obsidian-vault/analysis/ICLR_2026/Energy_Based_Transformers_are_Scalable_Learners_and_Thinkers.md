@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Energy_Based_Transformers_are_Scalable_Learners_and_Thinkers.pdf
+project_link: https://energy-based-transformers.github.io
+code_link: https://github.com/alexiglad/ebt
 openreview_forum_id: ZBj3Qp1bYg
 aliases:
 - EBTE
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 基于能量的变换器：可扩展的学习者与思考者 |
 | 英文题名 | Energy-Based Transformers are Scalable Learners and Thinkers |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=ZBj3Qp1bYg); [GitHub](https://github.com/alexiglad/ebt); [Project](https://energy-based-transformers.github.io) |
+| Links | [paper](https://openreview.net/forum?id=ZBj3Qp1bYg) · [GitHub](https://github.com/alexiglad/ebt) · [Project](https://energy-based-transformers.github.io) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/diffusion_image_video |
 | Method | Energy-Based Transformers (EBTs) |
 | Dataset | GSM8K (reasoning, OOD), Image Denoising (In-Distribution), Image Denoising (OOD Noise), Image Classification (linear probe) |
@@ -42,7 +44,7 @@ claims:
 > - Image Denoising (In-Distribution) 上，PSNR↑ 为 27.25，对比 26.58 (DiT)，变化 +0.67。
 > - Image Denoising (OOD Noise) 上，PSNR↑ 为 23.29，对比 19.56 (DiT)，变化 +3.73。
 
-## 概述
+## 概要
 
 当前深度学习模型——无论是前馈Transformer还是现代RNN——本质上属于“系统1”推理器：它们对每个预测分配固定计算量，缺乏动态分配计算（Facet 1）和显式验证预测（Facet 2）的能力。扩散Transformer（DiT）虽能通过延长去噪过程增加推理计算，但缺少显式的预测验证机制（Table 1）。现有推理方法通常依赖模态特定或问题特定的设计，或需要监督式训练（如验证器或可验证奖励），难以仅通过无监督学习自然涌现通用的“系统2”思考能力。
 
@@ -56,7 +58,7 @@ claims:
 
 方法定位：EBT属于能量基模型家族，通过无监督的优化式训练学习能量景观，在推理时利用梯度下降进行迭代预测精炼。与扩散模型相比，EBT被显式训练为验证器；与标准自回归模型相比，EBT在架构层面内置了动态计算分配与自验证能力（Table 1）。当前局限包括FLOP效率较低（因需二阶梯度）、训练稳定性对超参数敏感，以及尚未在大规模基础模型上验证。
 
-## 背景与动机
+
 
 当前深度学习模型，特别是自回归Transformer，在处理标准预测任务时展现出强大的系统1能力——即快速、自动的前馈推理。然而，这些模型在需要系统2思维的场景中暴露了本质缺陷：它们无法动态分配计算资源，也缺乏对自身预测进行显式验证的机制。**系统2思维**，指代深思熟虑的、迭代的、自验证的认知过程，对于分布外（OOD）泛化和复杂推理至关重要。
 
@@ -88,7 +90,9 @@ claims:
 
 基于此，本文提出**基于能量的变换器（Energy-Based Transformers, EBTs）**：训练一个显式的能量基模型（EBM）作为验证器，学习为每个输入-候选预测对分配一个能量标量（表示兼容性），并将预测重新定义为在该能量景观上的梯度下降优化。这一框架使模型在推理时能够动态分配计算（Facet 1）并进行显式预测验证（Facet 2），从而仅通过无监督学习自然涌现系统2思维。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 EBT的核心创新在于将预测问题重新定义为**在单一可学习的能量函数上的优化过程**，从而将生成与验证统一于同一模型内，使系统2思维能力（动态计算分配与显式预测验证）从无监督学习中自然涌现。
 
@@ -130,7 +134,7 @@ EBT的**Facet 2**——显式预测验证——通过自验证机制实现：并
 
 EBT的设计哲学根植于一个简单直觉：**验证比生成容易**。通过训练一个评判输入-预测对兼容性的能量函数，模型学会了一个“验证器”；而生成则被隐式定义为验证器梯度的负方向——沿能量下降最快的方向移动预测。这统一了传统上分离的生成器与验证器，使“思考”成为能量景观上的自然动力学过程，而非需要外部监督信号引导的搜索。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_ZBj3Qp1bYg/figures/002_Table_1.jpg]]
 *Table 1: Architectures and Cognitive Facets. For each prediction, Feed-Forward (FF) Transformers and RNNs generally1 have a finite amount of computation. DiTs (Diffusion Transformers) can increase inference computation by denoising longer, but lack explicit prediction verification. In contrast, EBMs support dynamic computation through flexible iteration, and give an energy scalar for prediction verification*
@@ -187,7 +191,7 @@ $$\hat{y}_{i+1} = \hat{y}_i - \alpha \nabla_{\hat{y}_i} E_\theta(x, \hat{y}_i)$$
 
 EBT 的 FLOP 效率是主要瓶颈：使用两步优化时，计算开销约为同参数标准 Transformer 的 6.66 倍。训练稳定性对优化步长、噪声幅度等超参数敏感，需仔细调参。此外，当前实验规模限于中等模型（最大约 400M 参数），在更大规模上的表现有待验证。
 
-## 核心模块与公式推导
+
 
 ### 能量基模型范式
 
@@ -237,7 +241,9 @@ $$\mathrm{scores} = \begin{bmatrix} \alpha_{z_1,z_1} & \alpha_{z_1,\hat{z}_2} & 
 
 该设计确保了自回归生成的因果性不被破坏，同时允许能量函数充分评估当前预测与上下文的兼容性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验结果
 
@@ -307,7 +313,9 @@ Figure 7b展示了自验证增益随训练计算量增加而提升的趋势：�
 ![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_ZBj3Qp1bYg/figures/031_Table_7.jpg]]
 *Table 7: Table D.2: Model sizes and hyperparameters for scaling experiments. For most model sizes we follow Gu & Dao (2023)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与设计动机
 
@@ -354,6 +362,8 @@ EBT的系统2思维能力依赖于能量景观正则化技术的精心配置。T
 5. **快慢系统协同**：是否可以将EBT作为系统2验证器与轻量系统1模型（如标准自回归Transformer）结合，实现“快慢结合”的协同推理——系统1快速生成候选，系统2进行能量验证与精炼？
 
 6. **连续域世界模型**：在视频预测等连续域任务中，EBT的缩放规律是否持续优于前馈模型，并展现出更强的世界模型能力？这关系到EBT能否成为通用预测架构的基础。
+
+
 
 ## 原文 PDF
 

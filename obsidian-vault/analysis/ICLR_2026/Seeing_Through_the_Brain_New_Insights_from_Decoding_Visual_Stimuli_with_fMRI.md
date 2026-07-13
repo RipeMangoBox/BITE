@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Seeing_Through_the_Brain_New_Insights_from_Decoding_Visual_Stimuli_with_fMRI.pdf
+project_link: null
+code_link: https://github.com/GraphmindDartmouth/PRISM
 openreview_forum_id: 88ZLp7xYxw
 aliases:
 - STBNIFDVSF
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 透视大脑：从fMRI解码视觉刺激的新见解 |
 | 英文题名 | Seeing Through the Brain: New Insights from Decoding Visual Stimuli with fMRI |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=88ZLp7xYxw); [GitHub](https://github.com/GraphmindDartmouth/PRISM) |
+| Links | [paper](https://openreview.net/forum?id=88ZLp7xYxw) · [GitHub](https://github.com/GraphmindDartmouth/PRISM) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | PRISM |
 | Dataset | NSD, BOLD5000, GOD |
@@ -41,7 +43,7 @@ claims:
 > - NSD 上，PixCorr ↑ 为 0.3404，对比 0.3160 (Mindeye2)，变化 +0.0244。
 > - BOLD5000 上，SSIM ↑ 为 0.5341，对比 0.5164 (Mindeye2)，变化 +0.0177。
 
-## 概述
+## 概要
 
 从功能性磁共振成像（fMRI）信号中重建人类所视图像，是计算神经科学与人工智能交叉领域的核心挑战。现有方法普遍遵循一条隐含假设：将fMRI信号映射到视觉或视觉-语言模型的嵌入空间，再以此驱动生成模型完成重建。然而，该假设存在两个关键瓶颈：其一，fMRI信号与纯视觉空间的语义对齐并不充分；其二，端到端的全局生成策略无法显式捕获视觉场景中“对象-属性-关系”的组合结构，导致生成图像出现对象绑定错误（如将“灰底虎纹猫”错误生成为“灰色老虎”，见Figure 3）。
 
@@ -55,7 +57,7 @@ claims:
 
 PRISM的贡献不在于提出新的生成模型架构，而在于揭示并利用了fMRI信号与文本空间之间被忽视的对齐优势，并通过对象中心的组合生成策略，为神经信号解码提供了一条结构化、可解释的新路径。
 
-## 背景与动机
+
 
 从神经信号中解码视觉体验是计算神经科学的核心挑战之一。功能性磁共振成像（fMRI）因其非侵入性和高空间分辨率，成为研究大脑视觉表征的主要工具。近年来，基于深度生成模型的fMRI-to-image重建方法取得了显著进展，使从大脑活动中恢复人类所见的自然图像成为可能。
 
@@ -67,7 +69,9 @@ PRISM的贡献不在于提出新的生成模型架构，而在于揭示并利用
 
 基于上述洞察，本文提出PRISM（Projecting fMRI Signals into a Structured text space as an interMediate representation），通过两个核心机制解决现有方法的瓶颈：（1）将fMRI信号映射到结构化文本描述空间，而非视觉嵌入空间；（2）采用对象中心扩散策略，显式建模场景的组合结构，逐对象生成并基于预测位置融合为最终图像。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PRISM的核心创新在于从根本上挑战了fMRI-to-image重建领域的两个默认假设，并提出了相应的解决方案。
 
@@ -93,7 +97,7 @@ PRISM将生成策略替换为**对象中心扩散**：
 
 **关键证据强度**：上述三个changed slots均有高置信度消融实验支撑（Table 1/5/7，置信度0.95），且PRISM在NSD数据集上将LPIPS降低约6%（0.5963 vs. Mindeye2的0.6338），构成因果性验证闭环。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_88ZLp7xYxw/figures/001_Figure_1.jpg]]
 *Figure 1: Framework Overview: PRISM generates structured text descriptions for each training image using a VLM to iteratively extract brain-aligned object attributes and relationships. These descriptions capture the image’s compositional and relational content and serve as supervision to train an encoder and fine-tune a language model to map fMRI signals into the text space. During inference, the model predicts descriptions from fMRI signals, which then guide a pre-trained diffusion model for object-centric image reconstruction*
@@ -150,7 +154,7 @@ $$\mathbf{H}_{t-1} = \beta \cdot \mathbf{H}_{t-1}^{\mathrm{cat}} + (1 - \beta) \
 
 消融实验（**Table 5**）揭示了各模块之间的因果依赖关系：移除对象交叉注意力模块（w/o ObjC.）导致LPIPS从0.5963升至0.6111，且这种性能下降无法通过提示优化恢复，表明对象中心的生成策略是框架中不可替代的瓶颈组件。同时，绕过属性/关系搜索而直接使用最优初始属性也会降低性能（Section 4.4），验证了搜索过程对于发现与大脑活动对齐的关键词是必要的。对象数量的消融（**Table 8**）进一步表明，固定两个对象的设置在各项指标上均优于一个或四个对象，过少对象无法充分捕获场景信息，过多对象则可能引入噪声或遗漏关键对象。
 
-## 核心模块与公式推导
+
 
 ### 3.1 表示空间对齐分析
 
@@ -216,7 +220,9 @@ $$\mathbf{H}_{t-1} = \beta \cdot \mathbf{H}_{t-1}^{\mathrm{cat}} + (1 - \beta) \
 
 其中 $\mathbf{H}_{t-1}^0$ 为全局背景的潜表示。消融实验（**Table 5**）表明，移除对象交叉注意力（即取消独立的对象生成与拼接）导致LPIPS从0.5963升至0.6111，且无法通过提示优化恢复，验证了该模块的关键作用。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：文本空间作为最优中间表示
 
@@ -278,7 +284,9 @@ Table 8的系统比较表明，固定两个对象的设置在所有指标上均�
 
 ![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_88ZLp7xYxw/figures/018_Table_11.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有方法的关系
 
@@ -317,6 +325,8 @@ PRISM 揭示的发现和遗留的空白指向若干值得深入的方向：
 - **搜索策略的效率优化**：当前的 ε-greedy 搜索虽然有效，但效率较低。能否引入贝叶斯优化或基于梯度的提示优化方法，在保持搜索质量的同时大幅减少 VLM/LLM 的查询次数？
 - **神经科学假设的可验证性**：所发现的 PreS 脑区对空间关系的关键作用是否能形成可检验的神经科学假设（例如通过经颅磁刺激 TMS 干预 PreS 区域后观察重建质量变化），可为脑-行为因果关系研究提供新路径。
 - **与更大规模生成模型的结合**：随着扩散模型架构的快速演进（如基于 Transformer 的潜扩散模型），PRISM 的对象中心生成模块是否能与这些新架构无缝结合，以进一步提升图像质量和语义保真度？
+
+
 
 ## 原文 PDF
 

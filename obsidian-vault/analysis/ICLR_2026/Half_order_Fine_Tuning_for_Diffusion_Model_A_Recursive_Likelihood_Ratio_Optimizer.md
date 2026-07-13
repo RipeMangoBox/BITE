@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Half_order_Fine_Tuning_for_Diffusion_Model_A_Recursive_Likelihood_Ratio_Optimizer.pdf
+project_link: null
+code_link: https://github.com/RTkenny/RLR-Optimizer
 openreview_forum_id: AZ6lqcvHLX
 aliases:
 - RLRROHOFT
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 扩散模型的半阶微调：递归似然比优化器 |
 | 英文题名 | Half-order Fine-Tuning for Diffusion Model: A Recursive Likelihood Ratio Optimizer |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=AZ6lqcvHLX); [GitHub](https://github.com/RTkenny/RLR-Optimizer) |
+| Links | [paper](https://openreview.net/forum?id=AZ6lqcvHLX) · [GitHub](https://github.com/RTkenny/RLR-Optimizer) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | Recursive Likelihood Ratio (RLR) Optimizer (Half-Order Fine-tuning) |
 | Dataset | HPD v2, VBench |
@@ -42,7 +44,7 @@ claims:
 > - HPD v2 上，AES 为 6.65 (RLR SD1.4)，对比 6.02 (Alignprop SD1.4)，变化 +0.63。
 > - VBench 上，Weighted Average 为 84.63 (RLR)，对比 83.45 (VADER)，变化 +1.18。
 
-## 概述
+## 概要
 
 扩散模型在生成高质量图像和视频方面取得了显著进展，然而，如何高效地对预训练扩散模型进行微调以对齐人类偏好仍然是一个核心挑战。现有微调方法主要分为两类：**截断反向传播（Truncated BP）** 方法（如AlignProp、VADER）虽然计算成本低，但会引入结构性偏差，导致模型在训练后期发生崩溃，奖励分数大幅下降（Figure 3）；**强化学习（RL）** 方法（如DDPO）虽能保证无偏梯度估计，但方差大、样本效率低，训练过程不稳定。这一问题本质上可形式化为：**在有限计算预算约束下，寻找最小方差的无偏梯度估计器**。
 
@@ -50,7 +52,7 @@ claims:
 
 实验结果表明，RLR在文本到图像和文本到视频的微调任务上均显著优于现有基线。在HPD v2基准上，RLR微调的SD1.4模型在PickScore和AES指标上分别达到21.38和6.65，相比AlignProp提升+2.21和+0.63（Table 2）；在VBench视频生成评估中，RLR以84.63的加权平均分超越所有基线（Table 3）。消融实验证实，移除HO或ZO组件均会导致性能显著下降，验证了组合方法的必要性（Table 5）。训练曲线进一步显示，RLR在后期训练中持续提升奖励分数，而截断BP方法则出现明显的模型崩溃（Figure 5）。
 
-## 背景与动机
+
 
 扩散模型（Diffusion Models, DMs）通过一个递归的去噪过程将随机噪声逐步转化为高质量样本，其生成能力已在图像、视频等多个领域得到验证。然而，将预训练扩散模型进一步微调以对齐人类偏好或特定奖励信号时，面临一个根本性的梯度估计困境。
 
@@ -70,7 +72,9 @@ $$\min_{G \in \mathcal{G}} \operatorname{Var}(G) \quad \text{s.t.} \quad \nabla_
 
 本文的动机正是弥合这一偏差-方差-成本的三元权衡缺口：既不接受截断BP的偏差风险，也不忍受RL方法的高方差低效，而是通过重组扩散链的计算图，在局部引入精确梯度信息，在其余部分采用无偏的低成本估计，从而在给定内存预算下逼近最小方差无偏估计的理论下界。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：偏差-方差-内存的三元权衡
 
@@ -110,7 +114,7 @@ $$h^{*} = \min\left\{\left\lfloor \frac{\mathcal{B} - \mathcal{B}_z (T-1)}{\math
 
 Figure 5的奖励曲线直接印证了这一差异：RLR在训练后期持续提升奖励，而AlignProp发生模型坍塌、奖励骤降。消融实验（Table 5）进一步证实，移除HO和ZO（退化为单步BP）或仅移除ZO（退化为有偏估计）均导致性能大幅下降，验证了三组件协同的必要性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_AZ6lqcvHLX/figures/010_Figure_6.jpg]]
 *Figure 6: The framework of Diffusive Chain-of-Thought. The DM generates images in a multi-scale manner: earlier steps for low-resolution features and later steps for high-resolution features. If a specific scale has deficiencies, we utilize the HO estimator to enhance the corresponding steps*
@@ -175,7 +179,7 @@ $$h^{*} = \min\left\{\left\lfloor \frac{\mathcal{B} - \mathcal{B}_z (T-1)}{\math
 
 RLR估计器具有严格的无偏性（Theorem 6.3）：$\nabla_{\theta} \mathbb{E}[R(x_0)] = \mathbb{E}[G_{\text{RLR}}]$，且在 $L$-平滑奖励函数下具有 $\mathcal{O}(1/\sqrt{K})$ 的收敛速率（Theorem 6.4）。消融实验（Table 5）证实：移除HO和ZO组件（仅保留单步BP）导致性能大幅下降；移除ZO使估计器变为有偏，表现不及完整RLR，验证了无偏性和组合结构的必要性。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化
 
@@ -249,7 +253,9 @@ $$\nabla_{\theta} \mathbb{E}[R(x_0)] - \mathbb{E}[\nabla_{\theta} R(x_0)_{\text{
 
 该偏差项随截断步数减少而增大，是导致模型崩溃的根本原因（Figure 3）。FO 与 ZO 的方差关系为 $\operatorname{Var}(\nabla_{\theta} R(x_0)) \leq \operatorname{Var}(R(x_0) \nabla \ln f(z))$，说明 FO 天然具有更低方差，RLR 通过 FO + HO 的组合在关键步上利用了这一优势。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -329,7 +335,9 @@ $$\nabla_{\theta} \mathbb{E}[R(x_0)] - \mathbb{E}[\nabla_{\theta} R(x_0)_{\text{
 ![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_AZ6lqcvHLX/figures/016_Figure_10.jpg]]
 *Figure 10: Qualitative examples for DCoT prompts*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与设计动机
 
@@ -390,6 +398,8 @@ $$\operatorname{Var}(RLR) \leq \sum_{t} \operatorname{Var}(g_t) + 2 \sum_{t \neq
 - 如何自适应地为不同任务和提示词选择子链起始点j的分布，而非依赖固定的梯度范数重要性采样？
 - 在更大规模模型上，FO+HO+ZO的内存分配策略是否需要重新优化？
 - 将DCoT的多尺度提示分解思想推广到其他生成任务（如3D生成、音频生成）的可行性。
+
+
 
 ## 原文 PDF
 

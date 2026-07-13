@@ -42,7 +42,7 @@ claims:
 > - Coffee-martini (DyNeRF) 上，CLIP sim.↑ 0.249 vs 0.246 (CTRL-D) (+0.003)。
 > - Trimming (MeetRoom) 上，CLIP sim.↑ 0.251 vs 0.248 (CTRL-D) (+0.003)。
 
-## 概述
+## 概要
 
 **目标问题**：现有的 2D 扩散模型直接扩展到 4D 动态场景编辑时，缺乏显式的几何推理，导致运动伪影、时间闪烁以及非目标区域的意外修改，难以同时维持空间一致性和时间一致性。
 
@@ -52,7 +52,7 @@ claims:
 
 **主要结果**：在 DyNeRF（Sear-steak、Coffee-martini）和 MeetRoom（Trimming）基准上，Catalyst4D 的 CLIP 相似度均优于所有对比方法（最高达 0.252 vs. CTRL-D 的 0.249），同时保持具有竞争力的时间一致性（0.986 vs. 0.983）。消融实验证实，AMG 模块对正确运动传播至关重要——移除后 CLIP 相似度从 0.252 降至 0.245，一致性从 0.971 降至 0.966；CUAR 模块进一步提升了视觉保真度，有效抑制了颜色伪影和闪烁。在局部编辑和全局风格迁移任务上，Catalyst4D 实现了更精准的局部修改和更一致的风格传播，避免了对比方法常见的模糊、过度平滑和非目标区域误修改问题。
 
-## 背景与动机
+
 
 ### 动态场景编辑的核心瓶颈
 
@@ -81,7 +81,9 @@ Catalyst4D的核心洞察是：**3D编辑的高保真性应建立在静态场景
 
 这一解耦设计的关键挑战在于：如何在不依赖逐帧2D扩散监督的条件下，将首帧的编辑可靠地传播到动态序列中？这要求传播机制必须同时解决两个子问题——**运动引导**（编辑后的高斯如何跟随场景运动）和**外观细化**（因遮挡和运动导致的颜色伪影如何修正）。Catalyst4D分别通过Anchor-based Motion Guidance (AMG) 和 Color Uncertainty-guided Appearance Refinement (CUAR) 回应了这两个挑战。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Catalyst4D 的核心创新在于将静态 3D 编辑的高保真、多视角一致性扩展至动态 4D 序列时，**解耦空间编辑与时间传播**，通过两个关键模块解决直接 2D-to-4D 扩展带来的运动伪影、时间闪烁和非目标区域误修改等瓶颈问题。
 
@@ -119,7 +121,7 @@ CUAR 模块通过**量化高斯颜色不确定性并选择性纠正伪影**来�
 
 Catalyst4D 的三个 changed slots 形成协同效应：**3D-to-4D 范式**奠定了几何一致性基础，**AMG** 确保编辑在时间维度上的正确运动传播，**CUAR** 进一步消除传播过程中引入的外观伪影。这一组合使 Catalyst4D 在无需重新训练变形网络的条件下，实现了对局部编辑和全局风格迁移任务的高保真 4D 编辑。
 
-## 整体框架
+
 
 Catalyst4D 的核心设计理念是将**空间编辑**与**时间传播**解耦：先在动态序列的首帧（canonical frame）上完成高保真的 3D 高斯编辑，再通过两个专用模块将编辑结果传播至全部时间帧。这一 3D-to-4D 范式避免了直接将 2D 扩散模型扩展到 4D 时因缺乏显式几何推理而产生的运动伪影、时间闪烁和非目标区域意外变化。
 
@@ -149,7 +151,7 @@ Figure 2 展示了 Catalyst4D 的完整管道，其输入输出流如下：
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2603_12766/figures/001_Figure_1.jpg]]
 *Figure 1: We present Catalyst4D, a framework that propagates single-frame 3D edits to dynamic sequences. It excels at both precise local modifications and high-quality global style transfer. Catalyst4D demonstrates robust performance on both monocular (left) and multicamera (right) scenes. Please refer to the supplementary material for more intuitive visual results*
 
-## 核心模块与公式推导
+
 
 Catalyst4D 的核心设计理念是**将空间编辑与时间传播解耦**：先在首帧完成高质量的 3D 高斯编辑，再通过两个协同模块——Anchor-based Motion Guidance (AMG) 和 Color Uncertainty-guided Appearance Refinement (CUAR)——将编辑结果高保真地传播至整个动态序列。这一管道避免了直接使用 2D 扩散模型扩展到 4D 时因缺乏显式几何推理而产生的运动伪影和时间闪烁。
 
@@ -199,7 +201,9 @@ $$L_{\mathrm{fore}} = (1-\eta)\|M_{t}^{v}\odot(\mathrm{render}_{t}^{v}-\mathrm{w
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2603_12766/figures/013_Figure.jpg]]
 *Figure: A3. Effect of Sinkhorn regularization on motion transfer*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 1. 实验设置
 
@@ -281,7 +285,9 @@ Figure 5 比较了不同的锚点构建方法。Catalyst4D 采用的**自适应�
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2603_12766/figures/011_Figure.jpg]]
 *Figure: CTRL-D Ours Figure A1. Qualitative comparison of localized editing. In contrast to CTRL-D, which introduces inconsistencies in non-edited regions, our method achieves more precise and localized editing by constraining dynamic Gaussians via 3D editing gradients*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从 2D 编辑传播到 3D 原生编辑的范式迁移
 
@@ -333,6 +339,8 @@ Catalyst4D 的适用边界受以下因素制约：
 - **极端编辑的适应性**：如何使方法对具有极端拓扑结构变化的编辑更加鲁棒，例如物体的完全移除或新增，以及大范围的非刚性形变。
 - **高不确定性序列的适应**：如何适应不确定性更高的动态序列，例如快速运动、严重遮挡或光照剧烈变化的场景。在这些场景中，颜色不确定性估计和运动对应关系可能面临更大的挑战。
 - **与 3D 编辑器的协同优化**：当前方法将 3D 编辑视为黑盒外部模块，未来可探索 3D 编辑与 4D 传播的联合优化，以在编辑阶段就考虑时间传播的约束，从而提升整体一致性。
+
+
 
 ## 原文 PDF
 

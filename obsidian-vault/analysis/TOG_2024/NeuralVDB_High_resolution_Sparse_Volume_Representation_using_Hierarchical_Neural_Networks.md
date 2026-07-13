@@ -5,6 +5,7 @@ paper_level: A
 venue: TOG
 year: 2024
 pdf_ref: paperPDFs/TOG_2024/NeuralVDB_High_resolution_Sparse_Volume_Representation_using_Hierarchical_Neural_Networks.pdf
+code_link: null
 project_link: https://developer.nvidia.com/rendering-technologies/neuralvdb
 aliases:
 - NeuralVDB
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | NeuralVDB：使用分层神经网络的高分辨率稀疏体数据表示 |
 | 英文题名 | NeuralVDB: High-resolution Sparse Volume Representation using Hierarchical Neural Networks |
 | 会议/期刊 | TOG 2024 |
-| Links | [paper](https://arxiv.org/abs/2208.04448); [Project](https://developer.nvidia.com/rendering-technologies/neuralvdb) |
+| Links | [paper](https://arxiv.org/abs/2208.04448) · [Project](https://developer.nvidia.com/rendering-technologies/neuralvdb) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | NeuralVDB |
 | Dataset | Disney Cloud dataset, SDF models (e.g., Dragon), Density volumes (e.g., Chameleon), Fractal Brownian motion field |
@@ -41,7 +42,7 @@ claims:
 > - SDF models (e.g., Dragon) 上，Compression Ratio (vs 16-bit Blosc compressed OpenVDB) 为 61.2x，对比 1x，变化 61.2x smaller。
 > - Density volumes (e.g., Chameleon) 上，RMSE 为 0.009，对比 0.0 (lossless OpenVDB)，变化 0.009。
 
-## 概述
+## 概要
 
 **核心问题**：传统稀疏体数据存储方案（如 **OpenVDB**，Museth, ACM TOG 2013）依赖显式存储体素值和拓扑位掩码。即使经过16位量化和通用压缩（如Blosc），大规模体积数据的内存占用仍然巨大——例如迪士尼云数据集（Disney Cloud）的文件体积高达1.5 GB。这类方法无法利用体积内部固有的几何相似性和结构冗余，其压缩效率受限于显式数据结构的表达容量。
 
@@ -56,7 +57,7 @@ claims:
 
 **局限性概览**：网络容量目前依赖启发式人工选择；随机查询速度慢于NanoVDB的硬件插值；训练（编码）时间在超大规模体积上仍较长；对拓扑动态变化的应用场景不支持。
 
-## 背景与动机
+
 
 ### 稀疏体数据的存储瓶颈
 
@@ -91,7 +92,9 @@ OpenVDB的高效源于其浅而宽的树结构：根节点（级别3）为稀疏
 
 这些目标共同指向一个核心命题：**在工业级稀疏体数据处理的语境下，显式结构与隐式表示的融合能否在压缩效率、访问速度和工程兼容性之间找到新的帕累托最优解？** 论文后续的方法设计和实验评估将围绕这一命题展开。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 NeuralVDB 的核心创新在于将**显式稀疏树结构**与**隐式神经表示**相融合，从根本上改变了体积数据的编码方式。传统 VDB 数据结构的瓶颈在于：即使经过 16 位量化和 Blosc 等通用压缩，其底层仍需显式存储每个体素的值和拓扑位掩码，无法利用体积内部的几何相似性与结构冗余（例如迪士尼云数据集仍占用 1.5 GB）。NeuralVDB 的因果调节旋钮（causal knob）是：**保留 VDB 树的高层节点以维持粗粒度空间划分和快速遍历能力，同时用多个小型 MLP 过拟合于局部体素和瓦片值，从而以数量级的压缩比替代显式存储**。
 
@@ -150,7 +153,7 @@ NeuralVDB 以**查询速度换取压缩比**，这是论文明确承认的设计
 
 这一混合设计使 NeuralVDB 在保持 VDB 兼容性与可扩展性的同时，实现了传统压缩方法无法企及的压缩比，且在相同模型尺寸下，其 SDF 几何重建精度（IoU 和 mCD）优于 NGLOD、VBNF 和 INGP 等纯神经表示方法（Table 8）。
 
-## 整体框架
+
 
 NeuralVDB 的核心设计理念是将**显式稀疏树结构**与**隐式神经表示**相结合：保留 VDB 树的高层节点以维持粗粒度空间划分和快速遍历能力，同时用多个小型 MLP 替代底层节点，分别编码拓扑（活动状态）和值信息，从而实现数量级的压缩。
 
@@ -197,7 +200,7 @@ $$\hat{y} = \sum_{k=1}^{n} G(\mathbf{x})_k E_k(\mathbf{x})$$
 
 以 Dragon 模型为例（Table 1），标准 VDB 占用 257 MB，[Hash, 5, 4, NN(3)] 将叶节点值占用降至原来的 6%（约 16 倍压缩），而 [Hash, 5, NN(4), NN(3)] 通过同时替换底部两层的拓扑与值，整体压缩因子达 **68 倍**（降至 3.8 MB），同时保持 IoU > 99% 的重建精度。在迪士尼云数据集上，NeuralVDB 将 1.5 GB 的 16-bit Blosc 压缩 VDB 文件缩减至 25 MB，压缩比达 **60 倍**（Fig. 1）。
 
-## 核心模块与公式推导
+
 
 ### 3.1 高层VDB树（级别2–3）
 
@@ -250,7 +253,9 @@ NeuralVDB提供两种配置以权衡速度与内存：
 - **[Hash, 5, 4, NN(3)]**：仅将叶节点（级别0）的值替换为神经回归器，级别1保留显式树结构。支持在线随机访问，查询速度接近标准VDB。
 - **[Hash, 5, NN(4), NN(3)]**：将底部两级（级别0和级别1）的拓扑与值全部替换为神经网络。压缩比更高（如Dragon模型达68倍），但仅支持离线顺序重建。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验结果
 
@@ -326,7 +331,9 @@ NeuralVDB 的随机查询速度明显慢于 NanoVDB 的硬件插值（Table 6）
 ![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2208_04448/figures/020_Table_5.jpg]]
 *Table 5: Encoding/decoding performance measured using multiple GPUs for the static volumes. The timing in seconds and relative scaling factor is presented for each volume*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心设计理念与知识贡献
 
@@ -393,6 +400,8 @@ NeuralVDB 的设计取舍明确，其适用边界由以下限制定义：
 - 在更大规模的分布式体积中，如何改善亚域划分的负载均衡以提高强伸缩性？
 - 除了 SDF 和密度标量场，NeuralVDB 对向量场或其他复合类型数据的泛化能力如何？
 - 压缩比与重建误差之间的帕累托最优前沿在不同应用领域（如科学可视化 vs 影视特效）如何变化？
+
+
 
 ## 原文 PDF
 

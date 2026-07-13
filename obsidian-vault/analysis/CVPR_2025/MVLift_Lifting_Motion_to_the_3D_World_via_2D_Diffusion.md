@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/MVLift_Lifting_Motion_to_the_3D_World_via_2D_Diffusion.pdf
+project_link: null
+code_link: null
 aliases:
 - MLM3W2D
 tags:
@@ -41,7 +43,7 @@ claims:
 > - Steezy 上，J2D 11.7 vs 显著优于所有基线（具体数值见原文Table 1） (N/A)。
 > - NicoleMove 上，J2D 26.2 vs 显著优于所有基线（具体数值见原文Table 1） (N/A)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有3D人体姿态提升方法严重依赖成对的2D视频与3D地面真值运动数据（如AMASS），这限制了它们对分布外运动——例如复杂街舞动作、人与物体交互、动物运动——的泛化能力。此外，这些方法通常难以同时估计全局关节旋转和世界坐标系下的根轨迹。
 
@@ -55,7 +57,7 @@ claims:
 
 **主要结果**：在五个数据集上，MVLift 显著优于所有基线方法，包括需要3D监督的 **MotionBERT**（Zhu et al., ICCV 2023）和 **WHAM**（Shin et al., CVPR 2024）。在 AIST++ 上，MPJPE 达到110.7 mm；在交互提升任务（OMOMO）上，根轨迹误差仅172.9 mm，相比传统优化基线 **SMPLify**（Pavlakos et al., CVPR 2019）的751.8 mm降低了578.9 mm。消融实验证实了多阶段递进与极线约束对全局运动恢复的关键作用。
 
-## 背景与动机
+
 
 从单目视频中恢复人体或动物的全局3D运动（包含关节旋转与世界坐标系下的根轨迹）是计算机视觉领域的长期挑战。这一任务的核心瓶颈在于**深度歧义**与**尺度歧义**：单张2D图像或姿态序列本身无法唯一确定3D结构，而运动过程进一步引入了时序依赖与全局位移的不确定性。
 
@@ -65,7 +67,9 @@ claims:
 
 MVLift 的核心洞察是：**尽管单个2D序列提供的3D信息有限，但在多样化2D运动中训练的扩散模型可以学习丰富的多视角先验**。通过将2D扩散先验与极线几何约束相结合，可以逐步生成严格一致的多视角2D序列，进而在完全无3D监督的条件下实现高保真3D运动重建。这一思路将问题从“单视图2D到3D的直接回归”转化为“通过2D扩散逐步建立多视角一致性”，从而绕过了对3D监督的依赖，同时保留了恢复全局运动的能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：3D监督依赖与分布外泛化困境
 
@@ -104,7 +108,7 @@ MVLift的两个核心约束机制共同保证了无监督3D恢复的质量：
 
 MVLift处于**无监督3D人体姿态提升**与**扩散模型先验**的交叉点。相较于仅用2D数据训练但未恢复全局轨迹的MAS（Kapon et al., CVPR 2024），MVLift通过多视角一致性机制实现了完整的全局3D运动恢复（包括根轨迹）。相较于使用3D监督的MotionBERT（Zhu et al., ICCV 2023）和WHAM（Shin et al., CVPR 2024），MVLift在多个数据集上取得了更优或可比的性能，同时完全摆脱了对3D标注的依赖。在交互提升任务上，MVLift将根轨迹误差从传统优化基线SMPLify（Pavlakos et al., CVPR 2019）的751.8mm大幅降至172.9mm（Table 2），展示了扩散先验替代手工先验的潜力。
 
-## 整体框架
+
 
 MVLift 提出一种四阶段渐进式流水线，其核心目标是**仅从单视角2D姿态序列恢复包含全局关节旋转与世界坐标系根轨迹的完整3D运动，全程无需任何3D监督数据**。该流水线的关键洞察在于：尽管单个2D序列提供的3D信息有限，但在多样化2D运动中训练的扩散模型可以学习丰富的多视角先验；将这一2D扩散先验与极线几何约束相结合，能够逐步生成严格一致的多视角2D序列，进而实现高保真3D运动重建。
 
@@ -128,7 +132,7 @@ MVLift 提出一种四阶段渐进式流水线，其核心目标是**仅从单�
 ![[assets/figures/papers/paper_list_l1861_MVLift_Lifting_Motion_to_the_3D_World_via_2D_Diffusion/figures/001_Figure_1.jpg]]
 *Figure 1: Our framework, MVLift, can be trained only on 2D pose sequences and generate 3D motions including joint rotations and root trajectories in the world coordinate system. The approach generalizes to the various domains of human poses, interactions, and animal poses*
 
-## 核心模块与公式推导
+
 
 MVLift 的核心由四个递进式模块构成，其关键在于将极线几何约束注入2D运动扩散模型，逐步建立多视角一致性，最终在无3D监督下恢复全局3D运动。
 
@@ -185,7 +189,9 @@ $$\mathcal{L}_{\mathrm{multi-view}} = \frac{1}{2M} \sum_{m=1}^{M} ( \mathcal{L}_
 ![[assets/figures/papers/paper_list_l1861_MVLift_Lifting_Motion_to_the_3D_World_via_2D_Diffusion/figures/003_Figure_3.jpg]]
 *Figure 3: Denoising network of the multi-view 2D motion diffusion model, using View 1 as an example for illustration*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -271,7 +277,9 @@ Table 3 在 AIST++ 上系统验证了各阶段和关键组件的作用：
 
 3. **相机内参假设**：当前方法假设固定且已知的相机内参，尚未验证在动态变化内参或多于 4 个视角配置下的扩展性。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与因果机制
 
@@ -315,6 +323,8 @@ MVLift 的核心因果机制在于：**2D 运动扩散模型在多样化数据�
 4. **扩散模型架构细节**：线条件扩散模型和多视角扩散模型的具体 Transformer 配置（层数、注意力头数、特征维度）未在文中充分展开，这影响了方法的可复现性。
 
 5. **单视角极限**：当仅有一个视角可用时（即无多视角信息），MVLift 是否退化为纯 2D 扩散模型？其性能下界如何？这一极端情况尚未在实验中讨论。
+
+
 
 ## 原文 PDF
 

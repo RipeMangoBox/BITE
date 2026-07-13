@@ -45,7 +45,7 @@ claims:
 > - Image-to-Video Generation (Complex motion) 上，Dynamic Degree ↑ 1.00 vs GeoVideo: 0.74 (↑ 0.26)。
 > - Scene Geometry - Depth (log-RMSE) 上，log-RMSE ↓ 0.287 vs 0.353 (prior best) (↓ 0.066)。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -67,8 +67,6 @@ WorldReel以**CogVideoX-5B-I2V**（Yang et al., arXiv 2024）为骨干视频扩�
 
 在复杂运动数据集上，WorldReel的动态度（Dynamic Degree）达到**1.00**，显著超越GeoVideo的0.74，同时保持高主体一致性。深度估计的对数RMSE从先前最优的0.353降至**0.287**，相机位姿评估中ATE低至**0.005**、RTE **0.007**、RRE **0.317**，均为对比方法中最优。消融实验证实，去除geo-motion latent或联合训练阶段会导致视频质量和几何准确性的显著下降，验证了各模块的必要性。
 
-## 背景与动机
-
 ### 视频生成的现状与瓶颈
 
 近年来，基于扩散模型的视频生成取得了显著进展，能够从文本或单张图像生成具有丰富表观和运动的高质量视频。然而，当前方法普遍缺乏对底层3D场景结构的显式建模，导致生成结果在时空一致性上存在严重缺陷。具体表现为：**视角漂移**（相机运动与场景内容不一致）、**几何闪烁**（同一表面在不同帧中深度和形状发生抖动）、以及**相机运动与物体运动的纠缠**（无法区分场景中的静态背景与动态前景）。这些问题的根源在于现有视频生成模型仅对RGB像素空间进行建模，未能构建随时间演变的统一3D场景表示。
@@ -81,7 +79,7 @@ WorldReel以**CogVideoX-5B-I2V**（Yang et al., arXiv 2024）为骨干视频扩�
 
 WorldReel的核心动机在于填补上述缺口——构建一个端到端的4D生成框架，在生成RGB视频的同时，输出具有一致几何与运动的显式4D场景表示。其关键洞察是：通过将帧对齐的深度与光流编码为**与表观无关的几何-运动增强潜在空间（geo-motion latent）**，显式注入视频扩散模型，使生成过程携带几何与运动信息；配合轻量共享的时序DPT解码器和针对静态/动态区域的解耦正则化，实现相机运动与物体运动的分离，从而大幅提升动态场景的时空一致性与几何精度。这一设计使WorldReel能够从单张输入图像和文本提示出发，直接生成包含RGB帧、逐帧点云、校准相机轨迹、光流和场景流的完整4D场景（Figure 1）。
 
-## 核心创新
+## 核心方法与创新机理
 
 WorldReel 的核心创新在于为视频扩散模型注入显式的 4D 归纳偏置，使其在生成 RGB 视频的同时，能够维持一致的底层 3D 场景几何与运动结构。这一目标通过三个紧密耦合的机制实现：**与表观无关的几何-运动增强潜在空间（geo-motion latent）**、**轻量多任务 4D 解码器**以及**解耦正则化训练策略**。以下围绕与基线方法的 changed slots 展开分析。
 
@@ -126,8 +124,6 @@ $$
 
 消融实验（Table 3）直接证实了上述创新的必要性：去除 geo-motion latent（w/o g.m.）导致复杂运动下 FVD 升高、动态度和主体一致性显著下降；去除联合训练阶段（w/o joint）则损害深度与相机位姿的准确性（Table 2）。值得注意的是，冻结时序 DPT 骨干（freeze dpt）可获得最低 FVD，但动态度和整体生成质量有所降低，表明 4D 解码器的端到端训练在视频质量与几何一致性之间存在一定的权衡。
 
-## 整体框架
-
 WorldReel 的整体设计围绕一个核心矛盾展开：**如何在视频扩散模型中注入显式的 4D 归纳偏置，使生成过程同时携带几何与运动信息，而非仅依赖 RGB 表观信号**。为此，该方法构建了一条从增强潜在空间到多任务 4D 解码的端到端流水线，其关键模块关系与数据流如 Figure 2 所示。
 
 ![[assets/figures/papers/paper_list_l12_https_openaccess_thecvf_com_content_CVPR2026_html_Fang_WorldReel_4D_Vide/figures/002_Figure_2.jpg]]
@@ -171,11 +167,6 @@ $$ \mathcal{L} = \mathcal{L}_{\mathrm{diff}} + \lambda_{\mathrm{dpt}} \mathcal{L
 - **骨干模型**：CogVideoX-5B-I2V（Yang et al., arXiv 2024），作为视频扩散 Transformer 的基础架构
 
 ### 补充图表
-
-![[assets/figures/papers/paper_list_l12_https_openaccess_thecvf_com_content_CVPR2026_html_Fang_WorldReel_4D_Vide/figures/001_Figure_1.jpg]]
-*Figure 1: End-to-end 4D generation. Given a text prompt and a single input image (left), WorldReel generates a video (center) together with explicit 4D scene representations: per-frame geometry (depth + point cloud) with calibrated camera poses, and per-frame motion (optical flow, scene flow) with object masks (bottom panels). The rendered 4D scenes (right) exhibit consistent structure over time, even under non-rigid dynamics, illustrating spatiotemporal consistency and tight coupling of appearance, geometry, and motion*
-
-## 核心模块与公式推导
 
 WorldReel 的核心架构围绕三个关键模块展开：**几何-运动增强潜在空间**、**时序 DPT 解码器**以及**解耦正则化训练目标**。以下逐一拆解其设计原理与关键公式。
 
@@ -251,7 +242,7 @@ $$
 
 WorldReel 采用两阶段训练策略：第一阶段分别微调 geo-motion 增强 DiT（约 20K 步）和从头训练时序 DPT 头（约 100K 步）；第二阶段端到端联合微调整个模型（约 10K 步），同时施加正则化约束。消融实验证实，去除 geo-motion 潜在或跳过联合训练阶段均会导致视频质量与几何准确性的显著下降（Table 3）。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心定量结果：视频生成质量
 
@@ -292,7 +283,7 @@ Table 3的系统消融揭示了三个关键设计选择的因果效应：
 ![[assets/figures/papers/paper_list_l12_https_openaccess_thecvf_com_content_CVPR2026_html_Fang_WorldReel_4D_Vide/figures/007_Figure_4.jpg]]
 *Figure 4: Qualitative 4D generation and geometry. For two in-the-wild inputs (left, red boxes), we show selected frames from our generated videos (top rows) alongside the corresponding dynamic point clouds rendered from our pointmaps and camera trajectories (bottom rows). The persistent structure and consistent camera/object motion illustrate a single, stable 3D scene across time, evidencing strong geometric consistency in the underlying world state. See supplementary for additional examples*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 与基线方法的关系
 

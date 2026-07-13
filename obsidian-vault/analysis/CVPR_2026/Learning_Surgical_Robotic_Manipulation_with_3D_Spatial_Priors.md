@@ -43,7 +43,7 @@ claims:
 > - Peg Pickup (Test2) 上，Success Rate 8/10 vs SOTA (SRT/SRT-H) (优于)。
 > - Knot Tying (Grasp) 上，Success Rate 10/10 vs SOTA (SRT/SRT-H) (优于或相当)。
 
-## 概述
+## 概要
 
 手术机器人操作面临一个根本性瓶颈：缺乏有效的三维空间感知能力。传统方法要么依赖显式三维重建——步骤繁琐、误差累积且无法端到端优化，要么借助临床不实用的腕部摄像头获取额外视角。更关键的是，手术场景的三维标注数据严重匮乏，使得策略难以推广到复杂多变的真实环境中。
 
@@ -51,7 +51,7 @@ claims:
 
 在真实手术机器人上，SST 在取钉、打结和离体胆囊解剖三个任务上均达到或超越了现有最优方法（如 **SRT** (Kim et al., arXiv 2024)、**SRT-H** (Kim et al., Science Robotics 2025)）的成功率。消融实验表明，在 Surgical3D 上微调几何变换器是成功的关键：取消微调后取钉任务成功率从 10/10 骤降至 2/10；所提出的 MSFC 设计也显著优于仅使用最后一层特征或独立多层连接器的方案。此外，微调后的几何变换器无需任务特定训练即可从内窥镜图像中准确提取三维结构信息，验证了空间先验学习的有效性。
 
-## 背景与动机
+
 
 ### 手术机器人自主操作的核心瓶颈
 
@@ -71,7 +71,9 @@ claims:
 
 为实现这一目标，本文提出 **Spatial Surgical Transformer (SST)**，其核心思路是两步走：首先，构建一个大规模合成立体视觉数据集（Surgical3D），利用其精确的三维标注来微调一个强大的几何变换器（基于MASt3R），使其学会从内窥镜图像中提取多尺度的三维潜在嵌入；然后，通过一个轻量级的多级空间特征连接器（MSFC）将这些嵌入高效融合，送入以内窥镜坐标系为中心的策略解码器，直接预测相对动作序列。这种设计使得三维空间先验的学习与操作策略的训练解耦但又协同——几何变换器负责“看懂”三维结构，策略解码器负责“用好”三维信息。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SST的核心创新在于将**三维空间先验**系统性地引入手术机器人模仿学习，通过三个紧密耦合的Changed Slot解决了现有方法在空间感知上的根本缺陷。
 
@@ -115,7 +117,7 @@ SST的因果调节器（Causal Knob）在于：**通过从立体内窥镜图像�
 
 三个Changed Slot并非孤立改进，而是形成了一条完整的因果链：**Surgical3D微调的几何变换器**提供了可靠的三维空间先验来源；**MSFC**确保了这些多尺度三维信息被有效提取和压缩；**内窥镜中心动作空间**则使这些空间先验能直接指导动作生成。Figure 5的中间三维重建结果从定性角度佐证了这一点：微调后的几何变换器无需任务特定训练，即可从内窥镜图像中准确提取三维结构信息，为下游策略提供了坚实的空间基础。
 
-## 整体框架
+
 
 SST 的整体流水线分为两个阶段：**三维空间先验的获取**与**基于先验的策略学习**。
 
@@ -133,7 +135,7 @@ SST 的整体流水线分为两个阶段：**三维空间先验的获取**与**�
 ![[assets/figures/papers/paper_list_l2640_https_arxiv_org_abs_2603_03798/figures/002_Figure_2.jpg]]
 *Figure 2: Pipeline of Our Method. Top: The geometry transformer is first finetuned on the proposed Surgical3D dataset using a 3D reconstruction objective, enabling the extraction of robust 3D latent embeddings from endoscopic images. Bottom: The geometry transformer is then frozen, while the remaining components are trained to learn surgical manipulation policies with spatial priors from collected demonstrations. A multi-level spatial feature connector (MSFC) is trained to aggregate 3D latent embeddings from multiple geometry transformer blocks and aligns them with the robot’s action space. An endoscope-centric policy decoder generates relative robot actions in the endoscope frame, guided by the lear...*
 
-## 核心模块与公式推导
+
 
 ### 3.1 几何变换器的微调目标
 
@@ -186,7 +188,9 @@ $$L_{MSE} = MSE(\hat{a}_{t}, \pi_{\theta}(o_{t}, x_{t}))$$
 ![[assets/figures/papers/paper_list_l2640_https_arxiv_org_abs_2603_03798/figures/009_Figure_6.jpg]]
 *Figure 6: Alternative Designs of Spatial Connectors. (a) Last-Layer Feature Connector. (b) Multi-Layer Separate Connector*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -251,7 +255,9 @@ Figure 5 展示了微调后的几何变换器在不同任务步骤中生成的�
 ![[assets/figures/papers/paper_list_l2640_https_arxiv_org_abs_2603_03798/figures/004_Figure_4.jpg]]
 *Figure 4: Visualization of Experimental Settings. Yellow and blue arrows denote the approximate motion directions of the right and left arms, respectively. Top: Peg pickup task. A total of 180 trajectories were collected, with roughly 120 in the green region and 60 in the blue region for training. Test1 and Test2 correspond to evaluations in these respective areas. Middle: Knot tying task. The suture tail was randomly positioned within the blue region during data collection, and evaluations were performed under the same condition. (b1) and (b3) show the grasping and looping actions. Bottom: Ex-vivo gallbladder dissection task. Grasp points on the gallbladder were sampled from varying positions within...*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有手术机器人策略的关系
 
@@ -284,6 +290,8 @@ SST 的有效性建立在以下几个关键假设之上，这些假设也划定�
 - **动态场景的鲁棒性**：SST 在准静态手术场景中表现优异，但真实手术中常涉及组织变形、出血、烟雾等动态干扰。几何变换器在这些条件下的三维嵌入质量如何变化，论文未给出系统性评估。
 - **从合成到真实的泛化上限**：Figure 3 的定性结果显示，仅在合成数据上微调的几何变换器对真实场景的器官重建仍较粗糙，混合真实数据后才显著改善。这暗示 Surgical3D 的域间隙尚未完全弥合，更大规模、更多样化的真实手术数据收集可能是进一步提升泛化能力的必要条件。
 - **与基础模型的进一步整合**：SST 目前将三维空间先验与动作预测直接耦合。一个值得探索的方向是将几何变换器提取的空间嵌入与手术语言模型（如手术报告生成、指令理解）结合，实现语言引导的空间推理——这与 SRT-H 的语言条件模仿学习形成互补而非替代关系。
+
+
 
 ## 原文 PDF
 

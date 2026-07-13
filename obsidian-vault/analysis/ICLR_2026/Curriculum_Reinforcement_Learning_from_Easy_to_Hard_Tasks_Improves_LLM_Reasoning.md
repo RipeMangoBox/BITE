@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Curriculum_Reinforcement_Learning_from_Easy_to_Hard_Tasks_Improves_LLM_Reasoning.pdf
+project_link: null
+code_link: https://github.com/divelab/E2H-Reasoning
 openreview_forum_id: KJvHnl3kUv
 aliases:
 - ERE
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 基于从易到难任务课程强化学习的大语言模型推理提升 |
 | 英文题名 | Curriculum Reinforcement Learning from Easy to Hard Tasks Improves LLM Reasoning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=KJvHnl3kUv); [GitHub](https://github.com/divelab/E2H-Reasoning) |
+| Links | [paper](https://openreview.net/forum?id=KJvHnl3kUv) · [GitHub](https://github.com/divelab/E2H-Reasoning) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | E2H Reasoner (E2H) |
 | Dataset | Blocksworld, Countdown, GSM8K, AIME24 |
@@ -42,7 +44,7 @@ claims:
 > - Countdown 上，Hard Accuracy 为 28.1 (E2H-G)，对比 18.1 (GRPO All)，变化 +10.0。
 > - GSM8K 上，Average Accuracy 为 78.7 (E2H-G)，对比 67.7 (GRPO)，变化 +11.0。
 
-## 概述
+## 概要
 
 大语言模型在数学推理、规划等复杂任务上直接应用强化学习（RL）时，面临一个根本瓶颈：**稀疏奖励与分布偏移**。由于奖励仅在最终答案正确时给出，模型从零开始探索困难任务时几乎无法获得有效学习信号，导致收敛缓慢、过拟合训练分布，且难以泛化到分布外（OOD）场景。
 
@@ -57,7 +59,7 @@ claims:
 
 E2H 的主要局限在于其调度器是非自适应的——高斯和余弦调度在训练前预设参数，不会根据训练过程中的模型能力动态调整。此外，难度分档数和调度器超参数仍需人工设定。将 E2H 与自适应课程策略结合，是未来进一步提升的方向。
 
-## 背景与动机
+
 
 ### 推理任务中的强化学习困境
 
@@ -87,7 +89,9 @@ E2H 的主要局限在于其调度器是非自适应的——高斯和余弦调�
 
 本文从理论和实验两个层面验证了课程学习的优势：理论上证明了课程学习在分布插值和样本效率上优于直接学习，并给出了收敛保证；实验上在 Blocksworld、Countdown、MATH、GSM8K 等多个推理基准上取得了显著的性能提升，尤其在困难子集和 OOD 任务上表现突出，且所需困难样本量远少于非课程基线。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 创新动机：稀疏奖励与分布偏移的双重困境
 
@@ -127,7 +131,7 @@ Theorem 3.2 进一步给出了课程学习所需总样本数 $M_{CRL}$ 少于直
 
 E2H 的课程学习策略与 DAPO（Yu et al., 2025）的算法改进是**正交且互补**的。DAPO 通过动态采样和优势裁剪解决了 GRPO 中零优势批次（advantage-zero batches）的问题，而 E2H 通过课程调度降低了训练初期的探索难度。两者结合时（Table 5），DAPO+E2H-G 在 Countdown Hard 上达到 43.7%，显著优于单独使用 DAPO（36.0%）或 GRPO+E2H-G（28.1%）。Figure 7 进一步显示，E2H 的课程调度能有效减少 DAPO 训练过程中的零优势批次占比，表明课程学习通过提供更易学习的初始任务，间接改善了策略优化的稳定性。
 
-## 整体框架
+
 
 E2H Reasoner 的核心 pipeline 由三个模块串联构成，形成“分解—调度—优化”的闭环。
 
@@ -149,7 +153,7 @@ E2H Reasoner 的核心 pipeline 由三个模块串联构成，形成“分解—
 
 这一框架的理论基础在于：课程学习通过构造中间难度的插值分布，缩小了从预训练源分布到目标困难分布的迁移差距，从而在理论上保证了更优的样本复杂度和收敛上界（Theorem 3.1, Theorem 3.2）。实验表明，E2H-G 在多个基准的困难子集和 OOD 任务上显著优于无课程的 GRPO 基线，且所需困难样本数大幅减少（Table 8），验证了框架设计的有效性。
 
-## 核心模块与公式推导
+
 
 ### 3.1 任务难度分解模块
 
@@ -221,7 +225,9 @@ $$M_{CRL} < M_{Direct} \iff \frac{(e \cdot l)^{2(1-K)} - 1}{1 - (e \cdot l)^2} <
 
 其中 $e$ 为误差衰减因子，$l$ 为每阶段样本分配比例，$m$ 为直接学习的样本倍数。该条件表明，当课程阶段数 $K$ 足够且误差衰减合理时，课程学习具有严格的样本效率优势。Table 8 的实验结果与此一致：E2H-G 仅需 2,400 个 hard 样本即达到 32.9 的 Blocksworld Hard 准确率，而 GRPO（All）使用 8,000 个 hard 样本仅达 21.1。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与实验动机
 
@@ -292,7 +298,9 @@ $$M_{CRL} < M_{Direct} \iff \frac{(e \cdot l)^{2(1-K)} - 1}{1 - (e \cdot l)^2} <
 - **Figure 4**：高斯采样过程可视化，展示了不同超参数下各难度任务的采样概率随训练步数的变化曲线。
 - **Figure 7**：DAPO+E2H组合显著降低零优势批次比例，提供了课程学习稳定训练动态的直接证据。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 方法关系与谱系定位
 
@@ -317,6 +325,8 @@ E2H 的有效性建立在两个前提之上：一是训练数据能够被合理�
 3. **大规模扩展性**：当前实验主要在 Qwen 1.5B/3B 和 LLaMA 3.2 3B 规模上验证，E2H 在更大模型（如 7B+）和更多样化任务上的表现及调度器参数迁移规律需要进一步研究。
 
 4. **理论条件的实际验证**：Theorem 3.2 给出了课程学习样本复杂度优于直接学习的条件 $M_{CRL} < M_{Direct} \iff \frac{(e*l)^{2(1-K)}-1}{1-(e*l)^2} < m-1$，其中涉及几何误差分配假设。在实际大规模训练中该条件是否成立，以及如何根据该条件指导超参数选择，仍是开放问题。
+
+
 
 ## 原文 PDF
 

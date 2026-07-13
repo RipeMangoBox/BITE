@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/CDE_Curiosity_Driven_Exploration_for_Efficient_Reinforcement_Learning_in_Large_Language_Models.pdf
+project_link: null
+code_link: null
 openreview_forum_id: 5rXN5knHKW
 aliases:
 - CCDE
@@ -42,7 +44,7 @@ claims:
 > - AIME25 上，Pass@16 为 GRPO + PPL bonus (Qwen3-4B-Base)，对比 GRPO (Qwen3-4B-Base)，变化 +3.3。
 > - Overall Avg (MATH, AMC23, AIME24, AIME25) 上，Avg 为 GRPO + PPL bonus (Qwen3-4B-Base)，对比 GRPO (Qwen3-4B-Base)，变化 +2.4。
 
-## 概述
+## 概要
 
 当前基于可验证奖励的强化学习（RLVR）在训练大语言模型进行数学推理时，普遍存在**探索与利用的严重失衡**：策略过早收敛到少数高奖励路径，导致策略熵坍缩和校准崩塌——模型对错误回答依然保持高度自信，同时丧失了发现多样化正确解题路径的能力。
 
@@ -61,7 +63,7 @@ claims:
 
 **方法定位**：CDE处于RLVR探索策略的改进线上，区别于传统的熵奖励（Schulman et al., 2017）和基于哈希的计数式探索（后者在LLM上因嵌入表达性不足而失效），也与i-MENTOR（Gao et al., 2025）等外部好奇心驱动方法形成互补。其探索信号完全来自模型内部状态，兼具理论解释性（自举方差近似后验不确定性）和实践轻量性（多头critic的额外内存与计算开销可忽略）。
 
-## 背景与动机
+
 
 ### 大语言模型的强化学习微调
 
@@ -87,7 +89,9 @@ CDE的核心思想是：利用模型自身对生成内容的“意外程度”�
 
 这种设计具有两个关键优势。第一，PPL奖励天然地对过度自信的错误施加惩罚：当模型以高置信度生成错误答案时，PPL奖励为负，从而抑制这种有害行为；而正确但新颖的推理路径则获得正向探索奖励（Figure 3）。第二，好奇心信号伴随着自然的退火机制：随着训练推进和模型对常见推理路径的熟悉，PPL和Critic方差自然下降，探索强度自动衰减，无需手动设计复杂的奖励衰减策略。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CDE的核心创新在于将RLVR中原本缺失的**探索信号**重新注入优化过程，且该信号完全源自模型自身——无需外部奖励模型或复杂的环境交互。具体而言，CDE在两个关键维度上改变了标准RLVR的优化机制：
 
@@ -133,7 +137,7 @@ $$\mathcal{L}_\phi = \frac{1}{\zeta K |\mathcal{D}|} \sum_{j=1}^K \sum_{(q,o,r) 
 
 CDE的轻量性是其关键优势：相比i-MENTOR（Gao et al., 2025）等需要额外好奇心模块的方法，CDE仅需对现有训练架构进行微小修改，却能在数学推理基准上带来约2个点的平均提升，AIME24 Pass@16提升可达8个点以上（见表1）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_5rXN5knHKW/figures/002_Figure_2.jpg]]
 *Figure 2: Illustration of the multi-head critic framework*
@@ -179,7 +183,7 @@ CDE的整体pipeline由两个并行的探索模块和一个自适应裁剪机制
 
 两个探索模块在机制上互补：PPL奖励在令牌级别惩罚过度自信的错误并鼓励新颖的正确推理模式（见Figure 3），而多头critic的方差在数据覆盖稀少的区域升高，起到隐式计数式探索的作用（见Figure 5和Figure 9）。两者均通过自适应裁剪与原始优化信号耦合，无需额外复杂模块即可缓解RLVR的熵坍缩和校准退化问题。实验表明，框架对超参数 $\kappa, \alpha, \zeta$ 具有一定鲁棒性（见Table 3-5），且额外计算和内存开销极小（见Table 7-8）。
 
-## 核心模块与公式推导
+
 
 CDE 框架由两个互补的探索模块构成：**Actor 端的好奇心奖励**（基于模型对自身生成响应的困惑度）和 **Critic 端的多头方差奖励**（基于值函数后验分布的不确定性）。两者通过自适应裁剪机制整合到强化学习的优化信号中。
 
@@ -225,7 +229,9 @@ $$\widehat{A}_{i,t} = \underbrace{\sum_{l=t}^{|o_i|} (\gamma\lambda)^{l-t} \wide
 
 其中 $\omega$ 为 Critic 奖励的动态权重（可通过阶梯式衰减等策略调节），裁剪机制与 Actor 端一致，防止 Critic 探索奖励过度干扰优势估计。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈：RLVR中的探索-利用失衡
 
@@ -316,7 +322,9 @@ $$
 ![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_5rXN5knHKW/figures/017_Table_6.jpg]]
 *Table 6: (a) Baseline training configurations. The GRPO setup is shared across all GRPO-based methods (e.g., “Qwen3-4B-Base-GRPO” and “w/PPL bonus” in Table 1); likewise, the PPO setup is shared across all PPO-based methods. (b) CDE-specific configurations. The PPL settings are identical for both the GRPO “w/PPL bonus” and PPO “w/PPL bonus” variants. Figure 10: The prompt for RLVR training*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与因果机制
 
@@ -366,6 +374,8 @@ CDE的核心因果干预在于引入**模型自身的好奇心信号**作为探�
 3. **复杂任务的可扩展性**：在多步推理、对话或交互式任务中，CDE的探索机制是否能保持高效与稳定？
 4. **推理轨迹的嵌入表示**：如何设计更优的嵌入表示，使得显式计数式或预测式探索在LLM上变得可行？
 5. **与对齐方法的结合**：CDE的探索策略是否可以与离线RL、基于人类反馈的偏好对齐等方法结合，进一步提升对齐性和泛化能力？
+
+
 
 ## 原文 PDF
 

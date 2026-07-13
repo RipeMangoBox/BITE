@@ -5,6 +5,8 @@ paper_level: A
 venue: ICCV
 year: 2025
 pdf_ref: paperPDFs/ICCV_2025/SemTalk_Holistic_Co_speech_Motion_Generation_with_Frame_level_Semantic_Emphasis.pdf
+project_link: https://xiangyue-zhang.github.io/SemTalk
+code_link: null
 aliases:
 - SHCSMGFLSE
 tags:
@@ -40,7 +42,7 @@ claims:
 > - BEAT2 上，FGD↓ 4.278 vs best competitor (Table 1) (显著优于所有基线)；MSE↓ 6.153 vs best competitor (显著降低)；LVD↓ 6.938 vs best competitor (显著降低)。
 > - SHOW 上，BC↑ 8.304 vs best competitor (最高)。
 
-## 概述
+## 概要
 
 协同语音动作生成旨在从语音输入中合成与说话内容同步的自然人体动作。现有方法普遍依赖节奏特征驱动运动生成，但**语义相关的手势动作在帧级别高度稀疏**（Figure 1 左侧分析），导致生成的动作缺乏语义深度和表现力——这是当前领域的核心瓶颈。
 
@@ -52,8 +54,6 @@ claims:
 
 目前方法依赖 BEAT2 的帧级语义标注，尚未在跨语言或跨文化场景下验证，语义分数阈值 $\beta$ 为经验设置，这些构成了当前的主要局限。
 
-## 背景与动机
-
 协同语音动作生成（Co-Speech Motion Generation）旨在根据语音输入合成与说话内容、节奏和情感同步的自然人体动作，是虚拟人交互、数字人播报等应用的核心技术。近年来，基于深度学习的生成方法取得了显著进展，但现有工作普遍存在一个关键瓶颈：**过度依赖节奏特征，难以有效捕捉稀疏但语义关键的手势动作，导致生成的动作缺乏语义深度和表现力**。
 
 具体而言，主流方法——无论是基于扩散的 **DiffSHEG**（Chen et al., CVPR 2024）、基于掩码建模的 **EMAGE**（Liu et al., CVPR 2024）、基于 VQ-VAE 的 **TalkSHOW**（Yi et al., CVPR 2023），还是基于 PQ-VAE 的 **ProbTalk**（Liu et al., CVPR 2024）——大多将运动视为整体进行编码与生成，未对节奏驱动的基础运动与语义驱动的稀疏手势进行显式解耦。这使得模型在追求整体运动平滑性和节奏对齐时，往往弱化甚至忽略了那些出现频率低但对表意至关重要的语义手势。**LivelySpeaker**（Zhi et al., ICCV 2023）虽然尝试结合语义与节奏信息，但其语义手势生成和节奏手势细化是分离的两个阶段，容易引入运动抖动和不连贯。
@@ -62,7 +62,7 @@ Figure 1 左侧的语义分析直观地揭示了这一问题的根源：对 BEAT
 
 针对上述缺口，本文提出 **SemTalk**，核心动机在于：**将协同语音运动显式分解为节奏相关的基础运动与语义感知的稀疏运动，并利用自适应融合机制，在确保自然节奏对齐的同时显著增强动作的语义丰富度**。这一设计的关键在于引入一个可学习的“语义门控”（sem-gate），产生帧级语义分数 $\psi$，动态调节语义动作的强调程度，使模型能够在保持整体节奏同步的前提下，精准地在语义关键帧上放大手势和躯干的表现力（如 Figure 1 右侧示例中对 “watching” 和 “just” 的强调）。与 LivelySpeaker 的分离式两阶段方案不同，SemTalk 将节奏与语义统一在一个端到端框架内，通过语义分数实现平滑、连贯的运动融合（见 Figure 4 的概念对比）。
 
-## 核心创新
+## 核心方法与创新机理
 
 SemTalk 的核心创新在于将协同语音动作生成从“整体建模”推进到“显式解耦—自适应融合”的范式。它抓住了现有方法的一个关键瓶颈：**过度依赖节奏特征，难以捕捉稀疏但语义关键的手势**。日常对话中，语义相关动作在帧级别是高度稀疏的（Figure 1 左侧分析，置信度 0.95），但现有方法如 **DiffSHEG** (Chen et al., CVPR 2024)、**EMAGE** (Liu et al., CVPR 2024) 等并未对此进行显式建模，导致生成的动作缺乏语义深度。
 
@@ -82,8 +82,6 @@ SemTalk 通过以下四个 **changed slots** 实现突破：
 最终，语义分数 $\psi$ 引导的融合函数 $\mathcal{E}$ 将基础编码与稀疏编码自适应结合：
 $$q^m = \mathcal{E}(q^b, q^s; \psi)$$
 并通过 RVQ-VAE 解码器生成最终运动。这一整套机制使得 SemTalk 在保持自然节奏对齐的同时，能在“watching”、“just”等关键词上显著增强手势和躯干的表现力（Figure 1 右侧示例）。
-
-## 整体框架
 
 SemTalk 的整体设计源于对协同语音动作中语义稀疏性的观察：语义相关的手势在帧级别上出现频率很低，与日常交流中“关键词语义手势”的直觉一致（Figure 1）。基于这一瓶颈，SemTalk 将整体协同语音运动生成显式分解为两个并行的生成流，并通过自适应融合机制在帧级别动态强调语义关键帧。
 
@@ -125,8 +123,6 @@ $$q^m = \mathcal{E}(q^b, q^s; \psi)$$
 - **语义强调损失**：在 sem-gate 的监督下，通过 GT 语义标签对语义分类进行约束，并结合 $W_f$ 和 $W_l$ 双重加权机制强化关键帧的语义动作学习。
 
 融合后的运动编码 $q^m$ 最终通过 **RVQ-VAE 解码器** 重建为完整的全身运动序列。
-
-## 核心模块与公式推导
 
 SemTalk 的核心设计在于将协同语音运动显式分解为节奏对齐的基础运动与语义感知的稀疏运动，并通过帧级语义门控进行自适应融合。以下阐述关键模块及其公式。
 
@@ -178,7 +174,7 @@ $$\mathcal{L}_{\mathrm{Rhy}} = -\frac{1}{N} \sum_{i=1}^{N} \log \frac{\exp(\math
 ![[assets/figures/papers/paper_list_l1895_SemTalk_Holistic_Co_speech_Motion_Generation_with_Frame_level_Semantic_E/figures/004_Figure_4.jpg]]
 *Figure 4: Concept comparison with LivelySpeaker [52]. (Top) LivelySpeaker generates semantic gestures with CLIP embeddings in SAG and refines rhythm-related gestures separately using diffusion, causing potential jitter. (Bottom) SemTalk integrates text and speech, uses a semantic gate for fine-grained control, and unifies rhythm and semantics for smoother, more coherent motions*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心瓶颈验证：语义相关动作在帧级别是稀疏的
 
@@ -254,13 +250,10 @@ Table 3 消融了 SemTalk 的四个核心组件（置信度 0.98）：
 ![[assets/figures/papers/paper_list_l1895_SemTalk_Holistic_Co_speech_Motion_Generation_with_Frame_level_Semantic_E/figures/009_Figure_8.jpg]]
 *Figure 8: Qualitative study on semantic score. Semantic score aligns with keywords, influencing gesture intensity*
 
-![[assets/figures/papers/paper_list_l1895_SemTalk_Holistic_Co_speech_Motion_Generation_with_Frame_level_Semantic_E/figures/007_Figure_9.jpg]]
-*Figure 9: Same words with different speech from the internet. “emo” represents different emotional tones extracted from speech. SemTalk can generate different motions, even when the text script is the same, preventing overfitting to the text itself*
-
 ![[assets/figures/papers/paper_list_l1895_SemTalk_Holistic_Co_speech_Motion_Generation_with_Frame_level_Semantic_E/figures/010_Figure_10.jpg]]
 *Figure 10: Results of the user study*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 与现有方法的谱系关系
 

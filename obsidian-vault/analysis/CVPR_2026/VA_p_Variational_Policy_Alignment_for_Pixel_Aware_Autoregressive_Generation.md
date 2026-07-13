@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/VA_p_Variational_Policy_Alignment_for_Pixel_Aware_Autoregressive_Generation.pdf
+project_link: null
 code_link: "https://github.com/Lil-Shake/VA-Pi"
 aliases:
 - VA-p
@@ -43,7 +44,7 @@ claims:
 > - ImageNet-1K (w/o CFG) 上，IS↑ 116.70 vs 86.55 (+30.15)。
 > - ImageNet-1K (with CFG) 上，FID↓ 2.28 vs 2.62 (LlamaGen-XXL) (-0.34)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -75,7 +76,7 @@ VA-π处于**自回归视觉生成**与**强化学习微调**的交叉点：
 
 VA-π的关键创新在于**将像素空间监督内化为无需外部模型的RL奖励**，并通过变分下界将重建目标与令牌建模统一为单一优化框架，为自回归视觉生成的后训练对齐提供了原则性方案。
 
-## 背景与动机
+
 
 ### 两阶段自回归视觉生成的范式与隐忧
 
@@ -101,7 +102,9 @@ VA-π 的核心洞察在于：**分词器本身已经编码了像素空间的先
 
 Figure 2 展示了 VA-π 的整体框架：给定参考图像及其真实令牌序列，VA-π 注入上下文噪声，让 AR 模型在 teacher forcing 下采样目标令牌，通过解码器重建图像并计算重建奖励，最后在 GRPO 框架下进行策略更新，同时保留令牌先验正则化以维持生成器的原始预测能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈洞察：生成器-分词器不一致
 
@@ -165,7 +168,7 @@ VA-π 的先验正则化采用独特的噪声上下文机制：以概率 $\xi$ �
 
 VA-π 在无需外部奖励模型的前提下，在文本-图像对齐指标上仍优于使用外部奖励的 AR-GRPO（CLIP: 0.291 vs 0.274; HPS v2: 0.211 vs 0.208），验证了像素内在奖励的有效性和充分性。
 
-## 整体框架
+
 
 VA-π 的整体设计围绕一个核心问题展开：**如何在不依赖外部奖励模型、不引入昂贵自由运行采样的前提下，将自回归（AR）生成器的输出分布与冻结分词器（tokenizer）的像素重建能力对齐**。框架将这一对齐问题形式化为变分优化，通过策略梯度方法在离散令牌空间中直接优化像素空间似然的证据下界（ELBO）。
 
@@ -220,7 +223,7 @@ VA-π 由五个相互协作的模块组成，数据流严格限定在 teacher fo
 ![[assets/figures/papers/paper_list_l2623_https_openaccess_thecvf_com_content_CVPR2026_html_Liao_VA_p_Variational/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of VA-π. VA-π aligns the visual AR model with tokenizer via variational optimization. Given a reference image and its ground-truth tokens, VA-π adds context noise and lets the AR model compute logits under teacher forcing and samples target tokens. These sampled tokens are decoded back into an image, and the reconstruction reward is defined against the reference image. This reward is then used for policy updates within an RL framework such as GRPO [1]. Additionally, a likelihood regularization using cross-entropy loss between the logits and ground-truth tokens is retained to preserve the model’s original next-token prediction ability*
 
-## 核心模块与公式推导
+
 
 ### 问题形式化：从令牌似然到像素似然
 
@@ -279,7 +282,9 @@ $$ \mathcal{T}_{\mathbf{VA}\cdot\boldsymbol{\pi}}(\theta) = \mathbb{E} \left[ \f
 
 其中 $\rho_i$ 为重要性采样比率，第一项为裁剪后的优势策略梯度（最大化重建奖励），第二项为加权的先验正则化损失（最小化下一token预测误差）。该设计的关键优势在于：所有项均基于teacher forcing轨迹计算，无需AR-GRPO所需的昂贵自由运行采样（rollout），节省86.6%的训练计算成本，且无需维持独立的参考模型，无额外存储开销。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -321,7 +326,9 @@ Figure 1通过核密度估计和t-SNE可视化展示了VA-π将生成图像的�
 ![[assets/figures/papers/paper_list_l2623_https_openaccess_thecvf_com_content_CVPR2026_html_Liao_VA_p_Variational/figures/009_Table_5.jpg]]
 *Table 5: Ablation on noise ratio (ξ) during training. Moderate noise ratio (0.5) achieves the best overall performance on GenEval. Abbreviations: PT (Position), CL (Color), AB (Attribute Binding), CT (Counting), SO (Single Object), TO (Two objects)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：两阶段自回归视觉生成的核心瓶颈
 
@@ -389,6 +396,8 @@ VA-π 在方法论上处于以下研究脉络的交汇点：
 3. **多轮对齐的可能性**：VA-π 当前为单轮后训练对齐，是否可以通过迭代式对齐（多次应用 VA-π 或与 tokenizer 交替微调）获得进一步改进？
 
 4. **奖励函数的可扩展性**：当前内在奖励仅包含 MSE 和 LPIPS，是否可以整合更多像素空间质量指标（如 FID 感知损失、SSIM 等）而不破坏训练的稳定性？
+
+
 
 ## 原文 PDF
 

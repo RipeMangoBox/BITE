@@ -42,7 +42,7 @@ claims:
 > - HumanML3D (spatial-text control, cross-control) 上，Err ↓ 0.0923 vs 0.1998 (OmniControl, original training) (-0.1075)。
 > - OMOMO (spatial-text control, cross-control) 上，Jerk ↓ 76.49 vs 161.95 (OmniControl, original training) (-85.46)。
 
-## 概述
+## 概要
 
 **核心问题**：扩散模型生成的关节运动在运动学空间看似合理，但由全身控制器（WBC）在物理仿真中执行时，会因违反动力学与接触约束而产生大幅修正，导致实际机器人运动偏离预期甚至失败。
 
@@ -57,7 +57,7 @@ claims:
 
 **当前局限**：方法仅在平坦地面上验证，未涉及楼梯、斜坡等复杂地形；奖励评估完全依赖预训练模型，其偏差可能影响偏好构造质量；未利用真实人类反馈，自动奖励设计可能无法完全捕捉人类对运动自然度的感知。
 
-## 背景与动机
+
 
 ### 问题背景：从运动学生成到物理部署的鸿沟
 
@@ -81,7 +81,9 @@ claims:
 
 基于这一动机，PhysMoDPO提出了一种**物理引导的后训练框架**：在后训练阶段，利用固定的WBC对生成样本进行滚动仿真，计算物理奖励与任务奖励，并据此构造偏好数据，通过直接偏好优化（DPO）迭代微调扩散生成器。该方法无需测试时投影、无需额外可训练模块，也无需手工设计惩罚权重，即可使生成的运动同时满足物理真实感和任务指令。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PhysMoDPO的核心创新在于**将物理仿真验证从测试时后处理迁移到训练时偏好优化**，从而解决扩散模型生成的运动在真实机器人上部署时因动力学约束导致的严重失真问题。其关键设计围绕三个“changed slots”展开：
 
@@ -127,7 +129,7 @@ PhysMoDPO属于**物理感知的运动生成后训练**这一新兴范式。与�
 
 PhysMoDPO的独特优势在于：**无需测试时优化或额外模块**，仅通过后训练即可使生成的运动同时满足物理真实感和任务指令。其核心洞察是：将WBC视为不可微的物理验证器，通过偏好排序间接优化生成器，避免了直接通过仿真器反向传播梯度的困难。
 
-## 整体框架
+
 
 PhysMoDPO 的核心思路是将预训练的全身控制器（WBC）作为黑盒物理验证器，在后训练阶段通过偏好优化使扩散生成器学会生成“跟踪后仍保持条件一致性”的运动。整体流程可概括为四个模块的闭环。
 
@@ -156,7 +158,7 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{DPO}}(X_{\mathrm{win}}, X_{\mathrm{lose}}) 
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2603_13228/figures/003_Figure_2.jpg]]
 *Figure 2: Overview of PhysMoDPO. Given a conditioning signal (text and optional joint controls), we sample multiple motions X from a pretrained generator. A fixed physics-based tracking policy then projects each sample into a simulated trajectory*
 
-## 核心模块与公式推导
+
 
 PhysMoDPO 的核心架构由四个模块级联构成，形成一个闭环的“生成—跟踪—评估—优化”管线。
 
@@ -198,7 +200,9 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{DPO}}(X_{\mathrm{win}}, X_{\mathrm{lose}}) 
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2603_13228/figures/002_Table_1.jpg]]
 *Table 1: Comparison with previous work. We compare alternative ways of incorporating physics constraints into human motion generation. In contrast to other methods, PhysMoDPO make use of dynamics-aware reward and does not require test-time optimization nor additional trainable modules*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：物理后训练实现运动学质量与物理可行性的协同提升
 
@@ -269,7 +273,9 @@ PhysMoDPO 在 SMPL 角色上训练后，直接迁移到 Unitree G1 和 H1 机器
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2603_13228/figures/016_Table_4.jpg]]
 *Table 4: Ablation study on hyperparameters. Here*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与因果机制
 
@@ -307,6 +313,8 @@ PhysMoDPO位于**物理感知的运动生成**这一交叉地带，与三类方�
 3. **控制器升级**：用更鲁棒的全身控制器（如基于MPC的方法）替换DeepMimic，是否能覆盖更极端的运动类型（如跳跃、后空翻）？
 4. **采样效率**：DPO的迭代轮数和每轮采样预算（$K$）是否存在更高效的分配策略？当前消融显示3轮迭代持续改善（Table 6a），但最优轮数可能依赖于任务和模型规模。
 5. **多机器人泛化**：零样本迁移到G1和H1的结果表明框架具有一定的形态泛化能力，但这种泛化的边界在哪里？是否需要针对不同机器人本体进行适配？
+
+
 
 ## 原文 PDF
 

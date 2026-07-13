@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/InfoTok_Adaptive_Discrete_Video_Tokenizer_via_Information_Theoretic_Compression.pdf
+project_link: https://research.nvidia.com/labs/dir/infotok/
+code_link: https://github.com/YWolfeee/InfoTok
 openreview_forum_id: JEYWpFGzvn
 aliases:
 - IIF
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | InfoTok：基于信息论压缩的自适应离散视频分词器 |
 | 英文题名 | InfoTok: Adaptive Discrete Video Tokenizer via Information-Theoretic Compression |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=JEYWpFGzvn); [GitHub](https://github.com/YWolfeee/InfoTok); [Project](https://research.nvidia.com/labs/dir/infotok/) |
+| Links | [paper](https://openreview.net/forum?id=JEYWpFGzvn) · [GitHub](https://github.com/YWolfeee/InfoTok) · [Project](https://research.nvidia.com/labs/dir/infotok/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | INFOTOK (and INFOTOK-Flex) |
 | Dataset | TokenBench-256x256, DAVIS-256x256 |
@@ -42,7 +44,7 @@ claims:
 > - TokenBench-256x256 上，PSNR↑ (BPP16=0.56) 为 29.27 (INFOTOK) / 29.30 (INFOTOK-Flex)，对比 27.34 (ElasticTok)，变化 +1.93 / +1.96。
 > - DAVIS-256x256 上，FVD↓ (BPP16=0.56) 为 540 (INFOTOK) / 581 (INFOTOK-Flex)，对比 930 (ElasticTok)，变化 -390 / -349。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -66,7 +68,7 @@ InfoTok 并非从头设计分词器，而是在现有固定压缩率分词器（
 
 在 TokenBench 和 DAVIS 基准上，InfoTok 在相同压缩率下相较 ElasticTok 实现了系统性的性能跃升：PSNR 提升 1.0–2.0 dB，FVD 降低 40–60%，LPIPS 降低 25–40%。同时，InfoTok 仅需 1 次额外前向传播，而 ElasticTok 需要 11 次，推理效率提升约 11 倍。与固定压缩率的 Cosmos 骨干相比，InfoTok 在节省约 50% 令牌的同时保持重建质量不下降。
 
-## 背景与动机
+
 
 ### 视频分词器的核心地位与固定压缩的困境
 
@@ -100,7 +102,9 @@ InfoTok 并非从头设计分词器，而是在现有固定压缩率分词器（
 - 提出基于ELBO的路由器和基于似然的令牌剪枝机制，实现接近理论最优的自适应压缩。
 - 在保持与固定压缩率分词器相同的单次前向传播开销（仅需1次额外NFEs）的前提下，显著超越ElasticTok的压缩效率与重建质量。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题根因：固定压缩率忽略视频信息密度差异
 
@@ -147,7 +151,7 @@ $$\tilde{r}_\beta^{\mathrm{flex}}(N_{\mathbf{x}} | \mathbf{x}) = \frac{1}{B} \su
 
 这使得单一模型可在不同压缩率下运行，而无需为每个压缩率单独训练模型（Figure 3 展示了 INFOTOK-Flex 在不同压缩率下的重建效果）。实证中，使用重建误差本身（不含 KL 项）推导令牌预算比即足够有效，进一步简化了计算。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_JEYWpFGzvn/figures/001_Figure_1.jpg]]
 *Figure 1: Overall framework of INFOTOK, an information-theoretic adaptive video tokenizer. An encoder maps video x into fixed-length embeddings, from which a router estimates the number of tokens $N _ { \mathbf { x } }$ based on information complexity (section 3.1). An adaptive compressor encodes the embeddings to $N _ { \mathbf { x } }$ tokens (section 3.2). For reconstruction, the tokens are decompressed to fixed-length embeddings and decoded back into video. INFOTOK tokenizes based on video complexity: e.g., the stable dog video is compressed more (0.40) than the dynamic cat-fighting video (0.62). Illustration details can be found in Appendix A
@@ -172,7 +176,7 @@ InfoTok 的整体框架围绕一个核心洞察构建：视频的信息密度差
 
 框架的关键效率优势在于：ELBO 的计算仅需一次额外的解码器前向传播（先编码再直接解码，不经过自适应压缩器），而对比方法 ElasticTok 需要二分搜索，产生 11 次额外前向传播。自适应压缩/解压缩模块共增加约 18M 参数（占基础分词器 123M 的 14.6%），换取了显著的压缩效率与重建质量提升。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化：从固定压缩到自适应压缩
 
@@ -235,7 +239,9 @@ $$
 | $\mathsf{BPP}_{16} = 16c \cdot \log(C)$ | 每 16 像素比特数，统一压缩率度量 |
 | $N_{\max} = \frac{T}{4} \times \frac{H}{8} \times \frac{W}{8}$ | Cosmos 骨干对 $T \times H \times W$ 视频的最大令牌数 |
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与理论动机
 
@@ -306,7 +312,9 @@ $$
 
 4. **计算资源门槛**：训练需要 32 块 H100 GPU，虽然推理效率极高，但训练成本对资源有限的团队构成障碍。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心问题与定位
 
@@ -342,6 +350,8 @@ InfoTok 的性能优势源于三个相互耦合的设计选择：
 3. **模态泛化**：该信息论框架能否推广到音频、3D 点云等其他高维数据模态？关键挑战在于如何为不同模态定义合适的 ELBO 近似。
 4. **细粒度自适应**：当前方法为整个视频统一分配令牌比例，更精细的逐帧或逐空间区域自适应压缩是否能进一步提升效率？这可能需要在路由器中引入时空局部性的信息量估计。
 5. **大规模预训练的影响**：在更大视频数据集（如 PANDA-70M）上预训练对 ELBO 路由器的泛化性影响如何？大规模数据是否会使 ELBO 分布更加稳定，从而减少路由偏差？
+
+
 
 ## 原文 PDF
 

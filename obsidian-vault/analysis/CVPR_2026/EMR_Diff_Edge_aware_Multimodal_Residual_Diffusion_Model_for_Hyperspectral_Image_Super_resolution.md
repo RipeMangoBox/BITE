@@ -43,7 +43,7 @@ claims:
 > - Harvard 上，PSNR/SSIM/SAM/ERGAS 49.28/0.9990/0.0233/0.7800。
 > - Chikusei 上，PSNR/SSIM/SAM/ERGAS 47.55/0.9980/0.0950/1.4943。
 
-## 概述
+## 概要
 
 高光谱图像（HSI）超分辨率的任务是从低分辨率高光谱图像（LR-HSI）和高分辨率多光谱图像（HR-MSI）的融合中恢复高分辨率高光谱图像（HR-HSI）。扩散模型在该任务中面临三个核心瓶颈：采样效率低（通常需要数百至上千步）、细节生成受限、以及去噪过程对高频信息关注不足。
 
@@ -53,7 +53,7 @@ EMR-Diff 通过两项关键机制突破这些瓶颈。**多模态残差传递**�
 
 在 ICVL、Harvard、Chikusei 三个标准数据集上，EMR-Diff 在 PSNR、SSIM、SAM、ERGAS 四项指标上均取得最优结果（Table 1）。消融实验证实：多模态残差相比无残差方案 PSNR 提升 1.35 dB（Table 2），边缘感知噪声相比纯高斯噪声提升 0.92 dB（Table 3），MSGAB 模块相比普通残差块提升 1.06 dB（Table 4）。
 
-## 背景与动机
+
 
 高光谱图像（HSI）超分辨率旨在从低分辨率高光谱图像（LR-HSI）与高分辨率多光谱图像（HR-MSI）中重建高分辨率高光谱图像（HR-HSI），其观测模型可形式化为：
 
@@ -65,7 +65,9 @@ $$\mathcal{V} = \mathcal{D}(B(\mathcal{X})), \quad \mathcal{Z} = \mathbf{R}\math
 
 针对上述缺口，EMR-Diff 提出了三个核心设计动机：第一，将多模态残差嵌入马尔可夫链以加速信息传递，使扩散过程在极少数步内完成；第二，利用 HR-MSI 的边缘信息调制噪声分布，引导模型优先关注高频细节区域；第三，构建双路径去噪网络 BAF-UNet，通过模态特定分支与多尺度监督实现精细的多模态融合。这些设计共同指向一个目标：在保持扩散模型生成质量优势的同时，大幅提升推理效率与细节重建精度。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 EMR-Diff 的核心创新在于将多模态残差传递与边缘感知噪声调制引入扩散模型的马尔可夫链，从而在仅需 5 个扩散步骤的条件下实现高光谱图像超分辨率重建。该方法在三个关键维度上对标准扩散范式进行了改造：
 
@@ -101,7 +103,7 @@ $$N_* = N \cdot W$$
 
 三项 changed slots 之间存在因果耦合关系：多模态残差机制降低了扩散链对大量步骤的依赖，使 5 步扩散成为可能；边缘感知噪声将去噪网络的优化目标聚焦于高频细节区域；BAF-UNet 的双路径设计与 MSGAB 模块则为残差回传和边缘重建提供了足够强的网络容量。三者协同使得 EMR-Diff 在 ICVL、Harvard、Chikusei 三个数据集上均取得最优的 PSNR/SSIM/SAM/ERGAS 指标（Table 1）。
 
-## 整体框架
+
 
 EMR-Diff 的整体 pipeline 围绕一个核心洞察展开：**将多模态残差嵌入马尔可夫链可以显著压缩扩散步数，同时利用 HR-MSI 的边缘信息引导噪声，使模型专注于高频细节重建**。如图 2 所示，系统由三个紧密耦合的模块构成：
 
@@ -121,7 +123,7 @@ EMR-Diff 的整体 pipeline 围绕一个核心洞察展开：**将多模态残�
 ![[assets/figures/papers/paper_list_l867_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_EMR_Diff_Edge_aw/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of different diffusion models. With edgeaware noise and multimodal residual, EMR-Diff significantly improves the performance and efficiency*
 
-## 核心模块与公式推导
+
 
 ### 观测模型
 
@@ -182,7 +184,9 @@ $$L_{\text{multi}} = \sum_{k=0}^{3} \| O_k + \mathcal{V}_{\uparrow n} \oplus \ma
 ![[assets/figures/papers/paper_list_l867_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_EMR_Diff_Edge_aw/figures/011_Figure_7.jpg]]
 *Figure 7: Visualization of pure noise and edge-aware noise*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要定量结果
 
@@ -245,7 +249,9 @@ Table 6分析了不同伪MSI合成方式的影响。实验对比了三种策略�
 ![[assets/figures/papers/paper_list_l867_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_EMR_Diff_Edge_aw/figures/013_Table_6.jpg]]
 *Table 6: Ablation study of pseudo-MSI synthesis*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 扩散模型在图像复原中的演进定位
 
@@ -303,6 +309,8 @@ HSI超分辨率的主流范式可大致分为三类：基于优化的方法、�
 4. **多模态残差的物理可解释性**：$\mathcal{E}_0$ 的数学定义清晰，但其在不同扩散步中传递的信息成分（光谱残差 vs 空间残差）如何解耦？这关系到模型在极端退化条件下的行为预测。
 
 5. **与其他融合范式的结合**：EMR-Diff 的残差传递机制是否可推广至其他多模态融合任务（如多曝光融合、多焦距融合）？这需要验证多模态残差的定义在不同任务中的适应性。
+
+
 
 ## 原文 PDF
 

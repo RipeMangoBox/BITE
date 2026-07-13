@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/TIPSv2_Advancing_Vision_Language_Pretraining_with_Enhanced_Patch_Text_Alignment.pdf
+project_link: https://gdm-tipsv2.github.io/
+code_link: null
 aliases:
 - TIPSv2
 tags:
@@ -41,7 +43,7 @@ claims:
 > - PASCAL VOC (VOC21) 上，mIoU (Zero-shot Seg) 44.4 vs 30.5 (+13.9)。
 > - ADE20K (ADE150) 上，mIoU (Zero-shot Seg) 24.7 vs 20.8 (+3.9)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有视觉-语言预训练模型在密集patch表示与文本嵌入的对齐方面表现较差，一个反直觉的现象是——大规模模型在patch-text对齐上甚至弱于小模型（如TIPS ViT-g教师模型在零样本分割上的mIoU仅为2.6，而被其蒸馏出的ViT-L学生模型达到20.8，见Table 1）。这一退化在SigLIP2系列中同样被观察到（Table 14），揭示出单纯扩大模型规模并不能自动改善局部语义对齐。
 
@@ -51,7 +53,7 @@ claims:
 
 **主要结果**：在零样本语义分割任务上，TIPSv2 ViT-L/14相比TIPS ViT-L/14在PASCAL VOC上提升+13.9 mIoU（30.5→44.4），在ADE20K上提升+3.9 mIoU（20.8→24.7）；相比SigLIP2 SO/14，VOC上领先+17.6 mIoU（Table 5）。消融实验表明，iBOT++单独贡献+14.1 ADE150 mIoU的提升（Table 4）。在全局图文检索、图像唯一任务（深度估计、语义分割等）上，TIPSv2在多数指标上取得最优或次优（Table 6, 7），且在4/6任务上超越更大规模的DINOv3（Table 8）。值得注意的是，TIPSv2在零样本分割中使用简单的上采样协议，而SILC和DINOv2依赖更昂贵的滑动窗口TCL协议，仍取得更优性能。
 
-## 背景与动机
+
 
 ### 视觉-语言预训练中的密集对齐困境
 
@@ -87,7 +89,9 @@ claims:
 
 核心假设是：**通过对可见tokens施加直接的patch级监督，可以在不依赖蒸馏的情况下，使预训练模型获得与蒸馏学生相当甚至更强的密集对齐能力**。Figure 1通过零样本分割可视化直观展示了这一改进的显著效果。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 TIPSv2 的核心创新源于一个反直觉的发现：在视觉-语言预训练中，蒸馏得到的小模型在 patch-文本对齐能力上可以显著超越其大模型教师。基于这一观察，论文提出三项关键改进，将蒸馏中的有效机制转化为可直接在预训练中使用的技术。
 
@@ -130,7 +134,7 @@ $$\mathcal{L}_{\mathrm{iBOT}++} = - \sum_{i=1}^{N} h_t(f_t(I)_i)^T \log h_s(f_s(
 
 三项创新并非孤立存在。蒸馏分析（Table 2）是 iBOT++ 的直接灵感来源——蒸馏中“无 mask + 随机初始化学生”的成功经验被转化为预训练中的全 token 监督机制。Head-only EMA 则在保持 iBOT++ 有效性的前提下降低了训练开销。多粒度文本增强进一步丰富了语义监督信号，与 iBOT++ 的细粒度 patch 监督形成互补。三者共同构成了 TIPSv2 的完整预训练方案（Figure 3）。
 
-## 整体框架
+
 
 TIPSv2 的预训练框架建立在 TIPS（Maninis et al., ICLR 2025）之上，将对比图像-文本学习与自监督学习统一在一个端到端的训练流程中。整体损失函数由三个分量构成：
 
@@ -177,7 +181,7 @@ $$
 
 Table 2 的消融实验表明，这一策略（无 masking + 随机初始化）是蒸馏出强 patch-text 对齐能力的关键：移除 masking 并将学生随机初始化后，ADE150 零样本分割 mIoU 从 5.9 跃升至 20.0（row (2) vs row (4)）。
 
-## 核心模块与公式推导
+
 
 ### 3.1 预训练基础框架
 
@@ -278,7 +282,9 @@ $$\mathcal{L}_{\mathrm{iBOT++}} = - \sum_{i=1}^{N} h_t(f_t(I)_i)^T \log h_s(f_s(
 ![[assets/figures/papers/paper_list_l34_https_arxiv_org_abs_2604_12012/figures/006_Table_3.jpg]]
 *Table 3: Zero-shot segmentation in pretraining. Comparing TIPS ViT-g with iBOT or iBOT++ methods, showing significant improvements with our novel iBOT++*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：蒸馏揭示Patch-文本对齐的关键瓶颈
 
@@ -352,7 +358,9 @@ PCA特征图可视化提供了直观的对齐质量证据。Figure 5对比了ViT
 ![[assets/figures/papers/paper_list_l34_https_arxiv_org_abs_2604_12012/figures/014_Table_9.jpg]]
 *Table 9: Applying iBOT++ to CLIP, on a ViT-L backbone. iBOT++ significantly enhances CLIP performance across several tasks, beyond what can be obtained with iBOT*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从TIPS到TIPSv2的演进
 
@@ -431,6 +439,8 @@ iBOT++的最佳masking比例固定为75%（Table 12）。该比例对整体性�
 3. **蒸馏与预训练的统一理论**：论文发现蒸馏中移除masking能大幅提升对齐，并将这一发现转化为预训练中的iBOT++。但蒸馏和预训练在patch-text对齐上的内在联系尚未被完全揭示，是否存在更统一的框架来理解这两种训练范式，是值得深入的理论问题。
 
 4. **head-only EMA的稳定性机制**：为何投影头上的EMA足以维持训练稳定而编码器上的EMA可以完全移除？这一现象可能暗示自蒸馏中的表示一致性主要通过投影头而非编码器主干来维持，其理论解释有待进一步挖掘。
+
+
 
 ## 原文 PDF
 

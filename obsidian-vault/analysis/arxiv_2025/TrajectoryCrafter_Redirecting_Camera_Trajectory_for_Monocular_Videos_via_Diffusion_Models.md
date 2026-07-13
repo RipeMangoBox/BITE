@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/TrajectoryCrafter_Redirecting_Camera_Trajectory_for_Monocular_Videos_via_Diffusion_Models.pdf
+project_link: https://TrajectoryCrafter.github.io
+code_link: null
 aliases:
 - TrajectoryCrafter
 tags:
@@ -40,7 +42,7 @@ claims:
 > - iPhone数据集（多视图视频基准） 上，PSNR / SSIM / LPIPS（均值） 14.24 / 0.417 / 0.519 vs GCD: 10.77 / 0.356 / 0.614; ViewCrafter: 10.75 / 0.339 / 0.605; Shape-of-motion... (PSNR相对最佳基线提升2.96 dB (26.2%))。
 > - In-the-wild单目视频基准（100真实 + 60 T2V生成视频） 上，VBench（Subject Consistency / Background Consistency / Temporal Flickering / Mot... 0.9236 / 0.9512 / 0.9437 / 0.9815 / 0.2847 / 0.5920 / 0.6479 vs GCD和ViewCrafter（具体数值见Table 2） (全部七项指标显著优于生成式基线)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：对单目视频进行相机轨迹重定向时，现有方法在精确视角控制与4D时空一致性之间难以兼顾。重建式方法（如基于3DGS的4D重建）在遮挡区域失效；生成式方法（如**GCD**, Van Hoorick et al., ECCV 2024）受限于合成数据与真实视频之间的域差异，且依赖隐式位姿嵌入，难以实现精确的轨迹控制。
 
@@ -52,8 +54,6 @@ claims:
 - 在 iPhone 多视图基准上，TrajectoryCrafter 的 PSNR 达到 14.24 dB，显著超越最佳基线 Shape-of-motion（11.28 dB），提升幅度达 26.2%。
 - 在 in-the-wild 单目视频基准（100 真实视频 + 60 T2V 生成视频）上，VBench 全部七项指标均显著优于生成式基线 GCD 和 ViewCrafter。
 - 消融实验证实：Ref-DiT 双流条件机制（移除后 PSNR 降至 13.46）、混合训练数据策略（单独使用任一种数据均导致性能下降）对最终效果至关重要。
-
-## 背景与动机
 
 单目视频的相机轨迹重定向（camera trajectory redirection）旨在给定一段普通单目视频，合成出相机沿任意新轨迹运动时对应的新视角视频。这一能力在视觉特效、虚拟现实和交互式媒体中具有广泛的应用前景，但实现起来面临一个核心矛盾：**如何在对相机视角变换进行精确几何控制的同时，保证生成内容的4D时空一致性**。
 
@@ -67,7 +67,7 @@ claims:
 
 TrajectoryCrafter 的核心洞察在于：**将确定性视角变换与随机内容生成显式解耦**。通过动态点云渲染提供精确的几何约束，同时利用双流视频扩散模型的生成能力补全遮挡区域和细化外观细节，使得模型既能严格遵循指定的相机轨迹，又能生成高质量的4D一致内容。这一解耦设计还使得模型可以利用大规模单目视频数据进行训练——通过双重重投影（double-reprojection）策略，无需多视图标注即可从普通单目视频中构造训练对，从而突破了数据规模的限制。
 
-## 核心创新
+## 核心方法与创新机理
 
 TrajectoryCrafter 的核心创新在于将**确定性视角变换**与**随机内容生成**显式解耦，并以此为基础构建了一个双流条件视频扩散模型。这一设计直击现有方法的瓶颈：重建式方法（如 Shape-of-motion）在遮挡区域失效，而生成式方法（如 GCD）受限于合成数据与真实视频的域差异，且依赖隐式位姿嵌入，难以实现精确轨迹控制。
 
@@ -99,8 +99,6 @@ TrajectoryCrafter 的核心创新在于将**确定性视角变换**与**随机�
 
 上述四个变更槽位共同构成了一个核心调节机制：**点云渲染提供几何约束（控制精度），Ref-DiT 交叉注意力注入外观细节（生成保真度）**。二者的耦合强度通过两阶段训练策略和混合数据配比进行精细调控。这一“几何-外观”双流解耦范式使得 TrajectoryCrafter 能够同时实现精确的轨迹控制和高质量的 4D 内容生成——在 iPhone 多视图基准上 PSNR 达 14.24 dB，显著超越最佳基线 Shape-of-motion 的 11.28 dB（提升 26.2%）；在 in-the-wild 基准上，VBench 全部七项指标均优于生成式基线 GCD 和 ViewCrafter（Table 2）。
 
-## 整体框架
-
 TrajectoryCrafter 的整体流程遵循“确定性视角变换 → 随机内容生成”的显式解耦设计，将单目视频的相机轨迹重定向分解为三个串联阶段：动态点云构建、用户交互式渲染、以及双流条件视频扩散模型生成。
 
 **输入与输出。** 系统接收一段单目源视频 $I^s$（可为真实拍摄或 AI 生成视频），以及用户指定的目标相机轨迹 $T^r$。输出为一段高保真视频，其视角精确遵循目标轨迹，同时保持与源视频的 4D 时空一致性。
@@ -125,13 +123,6 @@ Figure 2 展示了上述完整流程的概览：从源视频出发，经深度�
 
 ![[assets/figures/papers/paper_list_l96_https_arxiv_org_abs_2503_05638/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of TrajectoryCrafter. Starting with a source video, whether casually captured or AI-generated, we first lift it into a dynamic point cloud via depth estimation. Users can then interactively render the point cloud with desired camera trajectories. Finally, the point cloud renders and the source video are jointly processed by our dual-stream conditional video diffusion model, yielding a high-fidelity video that precisely aligns with the specified trajectory and remains 4D consistent with the source video*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l96_https_arxiv_org_abs_2503_05638/figures/001_Figure_1.jpg]]
-*Figure 1: We present TrajectoryCrafter, a novel approach to redirect camera trajectories for monocular videos, achieving precise control over the view transformations and coherent 4D content generation. Please refer to the supplementary project page for video results*
-
-## 核心模块与公式推导
 
 ### 3.1 视频扩散模型基础
 
@@ -181,15 +172,7 @@ $$I_i^r = \Phi(T_i^r \cdot P_i, K)$$
 
 该分阶段策略确保模型先建立稳健的几何先验，再学习精细的外观迁移。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l96_https_arxiv_org_abs_2503_05638/figures/003_Figure_3.jpg]]
-*Figure 3: Ref-DiT Block. The text and view tokens are first processed through 3D attention, followed by a cross-attention that injects the detailed, yet mis-aligned, reference information into the view tokens, yielding refined view tokens for subsequent layers*
-
-![[assets/figures/papers/paper_list_l96_https_arxiv_org_abs_2503_05638/figures/004_Figure_4.jpg]]
-*Figure 4: Double-reprojection. Given a target video, we lift it into a dynamic point cloud to render a novel view I′ via a random view transformation. Then I′ is reprojected to the original camera pose, yielding I′′ through the inverse view transformation*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 实验设置
 
@@ -232,19 +215,13 @@ TrajectoryCrafter的主要失败模式源于深度估计模块的误差传播。
 ![[assets/figures/papers/paper_list_l96_https_arxiv_org_abs_2503_05638/figures/007_Table_2.jpg]]
 *Table 2: VBench results on in-the-wild monocular videos. We compiled a large-scale in-the-wild video benchmark with 100 real-world and 60 high-quality T2V-generated videos, and report the VBench scores of novel trajectory videos from GCD [75], ViewCrafter [95], and our method. The best results are highlighted in bold*
 
-![[assets/figures/papers/paper_list_l96_https_arxiv_org_abs_2503_05638/figures/009_Figure_7.jpg]]
-*Figure 7: Effectiveness of Ref-DiT blocks. We compare our full model (w/ Ref-DiT) to two alternatives: a baseline without Ref-DiT (w/o Ref-DiT), and a variant that directly concatenates the source video with the point cloud renders (w/ Concat Condition). The yellow box highlights the most prominent differences*
-
 ![[assets/figures/papers/paper_list_l96_https_arxiv_org_abs_2503_05638/figures/011_Figure_8.jpg]]
 *Figure 8: Ablation on the training data. We compare our model trained with mixed data to two alternatives: training without multiview data and training without dynamic data. The yellow box highlights the most prominent differences of occulusions, geometric distortions, and motion consistency*
 
 ![[assets/figures/papers/paper_list_l96_https_arxiv_org_abs_2503_05638/figures/008_Figure_6.jpg]]
 *Figure 6: Qualitative comparison on in-the-wild monocular videos. We show results of redirecting the camera trajectory as “zoom-in and orbit to the right” from the input videos, produced by our method and the generative baselines, GCD [75] and ViewCrafter [95]*
 
-![[assets/figures/papers/paper_list_l96_https_arxiv_org_abs_2503_05638/figures/012_Figure_9.jpg]]
-*Figure 9: Failure case. Due to inaccuracies in depth estimation, the generated novel trajectory videos may exhibit physically implausible behavior, e.g., the dog’s nose appears to pass through the glass of the door*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 任务定位与核心瓶颈
 

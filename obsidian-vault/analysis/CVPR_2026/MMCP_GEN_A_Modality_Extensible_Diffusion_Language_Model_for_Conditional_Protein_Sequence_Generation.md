@@ -42,7 +42,7 @@ claims:
 > - 功能注释 (EC编号) 评估 上，MRR (平均倒数排名) 0.927 vs DPLM / CFP-GEN / ESM3 (显著优于所有基线)。
 > - 新折叠推断 (>400 残基) 上，pdb-TM (与PDB的TM-score) 改善 ~0.05 TM vs DPLM / UR50 (pdb-TM 降低约 0.05)。
 
-## 概述
+## 概要
 
 蛋白质序列的条件生成是可控蛋白质设计的核心问题，其目标是在给定结构、功能、配体等生物条件约束下，生成满足相应性质的新蛋白质序列。当前主流方法——包括基于扩散的蛋白质语言模型**DPLM**（Wang et al., ICML 2024）、大规模蛋白质语言模型**ESM3**（Hayes et al., Science 2025）以及组合功能生成模型**CFP-GEN**（Yin et al., ICML 2025）——通常仅支持单一模态条件，或采用分离的模态特定编码器独立处理各条件信号。这种设计导致跨模态交互受限，且每次引入新模态都需要重新设计架构甚至重新训练骨干网络，严重制约了多模态蛋白质设计的灵活性和可扩展性。
 
@@ -51,8 +51,6 @@ claims:
 当引入新条件模态时，MMCP-GEN 仅需接入一个冻结的预训练编码器、一个轻量投影器和少量模态特定查询，并在保持扩散语言模型骨干及所有编码器完全冻结的情况下进行微调，无需大规模重新训练。
 
 在实验验证方面，MMCP-GEN 在多个任务上取得领先性能：在逆折叠任务上，氨基酸恢复率（AAR）达到 78.66%，较**ProteinMPNN**（Dauparas et al., Science 2022）和 CFP-GEN 等基线提升最高达 5%；在功能注释评估中，平均倒数排名（MRR）达到 0.927，显著优于 DPLM、CFP-GEN 和 ESM3；联合生成-评分损失将逆折叠 AAR 从 78.17% 提升至 78.66%，结构质量指标 scTM 从 0.906 提升至 0.912。多模态消融实验进一步证实，融合结构、配体、功能和文本全部模态相比仅使用部分模态，在 GO、IPR、EC 等功能注释指标上均带来显著增益。
-
-## 背景与动机
 
 蛋白质序列设计是合成生物学的核心问题，其目标是根据给定的生物条件生成满足特定结构、功能或结合要求的氨基酸序列。近年来，深度生成模型在该领域取得了显著进展，尤其是基于蛋白质语言模型（PLM）和扩散模型的方法，如 **DPLM**（Wang et al., ICML 2024）、**ESM3**（Hayes et al., Science 2025）和 **CFP-GEN**（Yin et al., ICML 2025），已展现出强大的序列生成能力。
 
@@ -67,7 +65,7 @@ claims:
 
 MMCP-GEN 正是针对这一问题提出的解决方案。其核心思路是将异构生物条件投影到共享的、模态解耦的表示空间中，通过可学习查询（Learnable Queries）进行跨模态特征聚合，同时借助模态指示头（Modality Indicator Heads）保持模态身份的独立性。这一设计使得新模态的引入仅需添加冻结编码器、轻量投影器和少量可学习查询，无需重新训练骨干网络，从而实现了真正意义上的模态可扩展条件生成。
 
-## 核心创新
+## 核心方法与创新机理
 
 MMCP-GEN 的核心创新在于提出了一种**模态可组合且可扩展的条件化机制**，从根本上改变了多模态蛋白质序列生成中条件信号的集成方式。与现有方法相比，其关键突破体现在三个维度的“changed slots”上。
 
@@ -94,8 +92,6 @@ $$\mathcal{L}_{GS} = -\log \frac{\exp(\mathrm{sim}(g(h(x)), z_{str}) / \tau)}{\s
 最终训练目标为 $\mathcal{L} = \mathcal{L}_{CE} + \gamma \mathcal{L}_{GS}$，其中 $\gamma$ 为平衡系数。这一设计将序列恢复与结构保真度直接对齐，而非依赖隐式的统计相关性。
 
 消融实验验证了这一创新的有效性：加入 MMCP-GS 损失后，逆折叠任务的 AAR 从 78.17% 提升至 78.66%，scTM 从 0.906 提升至 0.912，pLDDT 从 86.25 提升至 86.88，三项指标均获得一致改善。
-
-## 整体框架
 
 MMCP-GEN 以**扩散蛋白质语言模型（DPLM, Wang et al., ICML 2024）**为骨干，在其离散扩散去噪框架之上叠加一套**模态可组合且可扩展的条件化机制**，实现多模态生物条件下的蛋白质序列生成。整体 pipeline 的核心思路是：将异构的生物条件（三维结构、配体、功能注释、文本描述等）统一投影到共享的条件表示空间，再通过可学习查询融合模块聚合为紧凑的条件向量，最终以交叉注意力方式注入扩散 Transformer 的指定层，指导去噪过程还原出满足多模态约束的氨基酸序列。
 
@@ -149,8 +145,6 @@ $$\mathcal { L } = \mathcal { L } _ { C E } + \gamma \mathcal { L } _ { \mathrm 
 
 ![[assets/figures/papers/paper_list_l2326_https_openaccess_thecvf_com_content_CVPR2026_html_An_MMCP_GEN_A_Modality/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of MMCP-GEN. MMCP-GEN unifies structure, ligand, text, functional annotations, and supports new modality extensions into a composable, extensible conditioning space for diffusion-based protein generation. Via MMCP-IH and MMCP-LQ, new modalities are integrated without backbone retraining and with minimal adaptation. Generated sequences are validated post-hoc using ESMFold together with additional biochemical and functional evaluations*
-
-## 核心模块与公式推导
 
 ### 1. 离散扩散骨干：前向吸收与反向去噪
 
@@ -217,12 +211,7 @@ $$\mathcal { L } = \mathcal { L } _ { C E } + \gamma \mathcal { L } _ { \mathrm 
 
 其中 $\gamma$ 为平衡系数。消融实验表明，加入 MMCP‑GS 后逆折叠任务的 AAR 从 78.17% 提升至 78.66%，scTM 从 0.906 提升至 0.912，pLDDT 从 86.25 提升至 86.88，验证了该损失对序列–结构一致性的正向作用。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2326_https_openaccess_thecvf_com_content_CVPR2026_html_An_MMCP_GEN_A_Modality/figures/002_Figure_2.jpg]]
-*Figure 2: Detail of MMCP-GEN for multimodal conditioning. Each modality is encoded by a frozen pretrained encoder and projected into a shared conditional token space. Modality indicator heads preserve semantic disentanglement, while the learnable-query fusion module aggregates heterogeneous modalities to guide the discrete diffusion process. Missing modalities are replaced by learnable placeholders, and new ones can be seamlessly attached without large-scale retraining, enabling continual expansion of the conditioning space*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -280,7 +269,7 @@ MMCP-GEN 在功能注释、逆折叠和配体条件生成三项核心任务上�
 ![[assets/figures/papers/paper_list_l2326_https_openaccess_thecvf_com_content_CVPR2026_html_An_MMCP_GEN_A_Modality/figures/006_Figure_3.jpg]]
 *Figure 3: Comparison of MMCP-GEN–generated and reference protein structures. ESMFold-refolded sequences align closely with native PDB structures, demonstrating fold consistency*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 方法谱系
 

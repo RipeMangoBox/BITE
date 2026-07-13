@@ -5,6 +5,7 @@ paper_level: A
 venue: IJCV
 year: 2024
 pdf_ref: paperPDFs/IJCV_2024/InterGen_Diffusion_based_Multi_human_Motion_Generation_under_Complex_Interactions.pdf
+code_link: null
 project_link: https://tr3e.github.io/intergen-page
 aliases:
 - InterGen
@@ -40,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - InterHuman test set 上，R Precision Top1 0.371 vs see Table 2 (best baseline lower) (best)；FID 5.918 vs see Table 2 (best baseline higher) (best)；MM Dist 5.108 vs see Table 2 (best baseline higher) (best)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -62,7 +63,7 @@ claims:
 
 在方法谱系中，InterGen属于**基于扩散模型的文本驱动多人生成**范式。相较于单人生成基线（如MDM（Tevet et al., ICLR 2023）、T2M（Guo et al., CVPR 2022）、TEMOS（Petrovich et al., ECCV 2022））和基于MDM微调的双人基线ComMDM（Shafir et al., 2023），InterGen的核心区分点在于：以共享权重的合作架构显式建模交互对称性，以世界坐标系表示直接保留空间关系，并以物理启发的交互损失进行结构化约束。该方法同时支持人-人生成、轨迹控制与交互中间帧生成等扩展应用。
 
-## 背景与动机
+
 
 ### 问题背景：从单人运动到双人交互的生成鸿沟
 
@@ -94,7 +95,9 @@ claims:
 
 通过上述设计，InterGen 首次实现了基于扩散模型的高质量双人交互运动生成，在定量指标和定性效果上均显著超越现有基线方法。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 InterGen 的核心创新在于首次将双人交互生成建模为一个**对称合作扩散过程**，通过三个相互耦合的 changed slots 突破现有方法的瓶颈。
 
@@ -144,7 +147,7 @@ $$\mathcal{L} = \mathcal{L}_{simple} + \lambda_{reg} \mathbb{E}_{t}[ I(t \leq \b
 
 三个 changed slots 形成因果闭环：非规范表示提供空间关系的基础编码，合作去噪网络利用对称性高效学习交互流形，交互正则化损失显式约束关键空间量。三者缺一不可，共同将双人交互生成从“独立生成后拼接”推进到“协同生成”范式。
 
-## 整体框架
+
 
 InterGen 的整体 pipeline 围绕“以扩散模型为核心、以对称性为约束、以世界坐标系为空间锚点”的设计理念展开。系统接收一段描述双人交互的自然语言文本，输出两个人物在三维空间中同步运动的长序列。整个流程由四个紧密耦合的阶段构成：**文本条件编码 → 噪声化初始运动 → 合作去噪重建 → 交互正则化约束**。
 
@@ -202,7 +205,7 @@ $$\mathcal{L} = \mathcal{L}_{simple} + \lambda_{reg} \mathbb{E}_t[ \mathbb{I}(t 
 ![[assets/figures/papers/paper_list_l1788_InterGen_Diffusion_based_Multi_human_Motion_Generation_under_Complex_Int/figures/001_Figure_1.jpg]]
 *Figure 1: InterGen is capable of generating high-quality and diverse motions under complex interactions. It models the twoperson symmetry with cooperative diffusion denoisers sharing the same motion manifold*
 
-## 核心模块与公式推导
+
 
 InterGen 的核心架构围绕三个技术支柱构建：**非规范运动表示**、**合作去噪网络**和**交互正则化损失**，其整体框架如 Fig. 5 所示。以下逐模块展开推导。
 
@@ -287,7 +290,9 @@ $$
 
 消融实验表明 $\bar{t} = 0.7T$ 时取得最佳总体指标（Table 4），验证了阻尼调度的有效性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -350,7 +355,9 @@ Table 4 验证了**基于扩散时间步截断的阻尼调度**策略的有效�
 ![[assets/figures/papers/paper_list_l1788_InterGen_Diffusion_based_Multi_human_Motion_Generation_under_Complex_Int/figures/015_Figure_11.jpg]]
 *Figure 11: Trajectory control. The curve beneath the peoples’ feet represents their motion trajectories. The skeleton representation displays the position and motion of each frame over time, with the SMPL model (Loper et al., 2015) indicating a specific frame of motion. The text input for each motion is provided above the respective persons*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题瓶颈与核心思路
 
@@ -391,6 +398,8 @@ InterGen 处于**双人交互扩散生成**这一新兴方向的开创位置。�
 - **变长序列与多时间尺度**：当前模型生成固定长度序列，如何支持从短时握手到长时舞蹈等不同时间尺度的交互生成？
 - **高层属性控制**：引入用户对交互风格（柔和/激烈）、情绪（友好/敌对）、角色关系（教师-学生、医生-患者）等高层属性的精细控制粒度，其中不对称交互对身份交换对称性提出了新的挑战。
 - **更优的文本-运动对齐**：探索更适合运动领域的文本编码器或联合表示空间，以提升跨模态一致性和基于文本的运动编辑能力。
+
+
 
 ## 原文 PDF
 

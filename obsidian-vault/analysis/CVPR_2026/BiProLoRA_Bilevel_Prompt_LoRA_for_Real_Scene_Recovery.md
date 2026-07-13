@@ -43,7 +43,7 @@ claims:
 > - ExDark (unseen real low-light) 上，NIQE↓ 3.806 vs 3.920 (Zero-IG) (-0.114)。
 > - RTTS (real hazy scene) 上，NIQE↓ 3.972 vs 4.059 (PHAT) (-0.087)。
 
-## 概述
+## 概要
 
 真实场景图像恢复面临一个根本性瓶颈：预训练扩散模型的自编码路径未针对真实退化分布进行校准，导致恢复结果出现纹理失真；同时，去噪器的结构恢复能力与退化处理能力被耦合在单一参数空间中，难以适应未见过的复杂退化。BiProLoRA 针对这一问题，提出了一种双层提示低秩适配（Bilevel Prompt LoRA）学习范式，核心思路是将 LoRA 提供的可复用结构恢复能力与提示嵌入（Prompt）提供的轻量退化感知调制能力解耦，并通过双层超参数优化框架实现二者的相互促进，从而达成从合成数据到真实场景的鲁棒迁移。
 
@@ -53,7 +53,7 @@ claims:
 
 消融实验进一步揭示了各组件的因果贡献：移除 DFL 导致 NIQE 从 2.971 恶化至 4.074，证实了分布校准的必要性；仅使用提示嵌入（无 LoRA）时 NIQE 恶化至 6.321，验证了 LoRA 结构恢复与提示退化调节的互补性；双层联合建模（HO）策略在 NIQE、LIQE、DE 三项指标上均优于朴素联合训练，证实了超参数优化视角下解耦设计的有效性。
 
-## 背景与动机
+
 
 真实场景下的图像恢复（如低光增强、去雾、水下清晰化）是计算机视觉中的长期挑战。与合成退化不同，真实退化分布复杂、多样且缺乏成对参考真值，使得基于全监督学习的传统方法难以有效泛化。近年来，预训练扩散模型（如 **SD-Turbo**，Sauer et al., ECCV 2024）凭借其强大的生成先验，在图像恢复任务中展现出显著潜力。然而，将这些模型从合成数据适配到真实场景时，仍面临两个核心瓶颈。
 
@@ -65,7 +65,9 @@ claims:
 
 基于这一洞察，本文提出 **BiProLoRA（Bilevel Prompt LoRA）**，一种面向真实场景恢复的双层提示低秩适配学习范式。其核心思想是：将LoRA作为可复用的结构恢复能力载体，将可学习提示嵌入作为轻量退化感知调制器，通过双层超参数优化框架实现二者的解耦与协同——下层在合成数据上训练LoRA以保留结构先验，上层在真实数据上优化提示以调控适应行为，从而在合成到真实的迁移中达成鲁棒的平衡。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 BiProLoRA 的核心创新在于通过**双层超参数优化框架**将预训练扩散模型的适配过程解耦为两个互补的维度，并辅以**自监督分布保真度学习**在去噪前校准潜在空间，从而系统性地解决了合成到真实场景迁移中的两个关键瓶颈。
 
@@ -124,7 +126,7 @@ $$
 
 值得注意的是，整个训练仅使用 50 张真实图像（约为合成数据的 10%），在这种极度不平衡的数据设置下，BiProLoRA 在 DARKFACE、ExDark、RTTS、URPC 等多个真实退化基准上均取得了最优的无参考指标表现，并展现出对未见场景的强大泛化能力。
 
-## 整体框架
+
 
 BiProLoRA 的整体学习范式遵循“先校准分布，再解耦适配”的两阶段流水线，如图2所示。其核心设计动机源于一个关键瓶颈：预训练扩散模型（以 **SD-Turbo** (Sauer et al., ECCV 2024) 为基础）的自编码路径未针对真实退化分布进行校准，导致纹理失真；同时，去噪器的结构恢复能力与退化处理能力被单一参数空间耦合，难以泛化至未见过的复杂退化。为解开这一耦合，BiProLoRA 将适配过程分解为两个在功能与数据层面相互解耦的阶段。
 
@@ -146,7 +148,7 @@ BiProLoRA 的整体学习范式遵循“先校准分布，再解耦适配”的�
 ![[assets/figures/papers/paper_list_l2376_https_openaccess_thecvf_com_content_CVPR2026_html_An_BiProLoRA_Bilevel_P/figures/002_Figure_2.jpg]]
 *Figure 2: Illustration of our learning scheme. The process begins with the learning of task-irrelevant real degraded distributions for the autoencoding pathway. Then, the pretrained weights are modulated for task-specific adaptation through joint modeling, which enables mutual promotion between LoRA and prompts*
 
-## 核心模块与公式推导
+
 
 ### 2.1 整体架构概览
 
@@ -234,7 +236,9 @@ $$\ell_{\mathrm{real}} = \frac{e^{\cos(\mathcal{G}_{\mathrm{image}}(\mathbf{z}_{
 1. **DFL 预训练**（行 2–6）：在 $\mathcal{D}_{\mathrm{real}}$ 上训练适配器 $A_\pi$，冻结后进入去噪阶段；
 2. **BiProLoRA 双层优化**（行 7–20）：每轮迭代中，先执行 Mirror LoRA 内循环（式 3）获得 $\tilde{\omega}_T$，再分别按式 (4) 和式 (5) 更新 Primary LoRA $\omega$ 和提示嵌入 $\theta$。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 一、主实验结果
 
@@ -301,7 +305,9 @@ Table 4 系统拆解了 BiProLoRA 各组件的贡献，所有实验在 DARKFACE 
 ![[assets/figures/papers/paper_list_l2376_https_openaccess_thecvf_com_content_CVPR2026_html_An_BiProLoRA_Bilevel_P/figures/006_Figure_4.jpg]]
 *Figure 4: Qualitative comparisons corresponding to*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -334,6 +340,8 @@ BiProLoRA 的适用边界由其设计假设和方法结构共同决定：
 BiProLoRA 在真实场景恢复的知识谱系中占据了一个独特的位置：它既不是纯粹的零样本方法（如 Zero-IG），也不是完全依赖合成配对数据的有监督方法，而是通过**双层超参数优化**实现了合成监督与真实自监督的协同。其核心贡献在于揭示了 LoRA 与提示嵌入之间的**互补性机制**——LoRA 提供可复用的结构恢复能力，提示嵌入作为轻量退化感知调制器在不改变核心权重的前提下引导该能力的发挥——并通过双层优化的数学框架将这一互补性形式化。
 
 从更宏观的视角看，BiProLoRA 代表了一类新兴的方法范式：**将预训练生成模型的适配问题建模为超参数优化问题**。在这一范式下，预训练权重（通过 LoRA 调制）扮演了“基础模型”的角色，而提示嵌入则扮演了“任务特定超参数”的角色，双层优化自然地分离了通用能力保持与任务特定适应两个目标。这一范式具有较强的可扩展性——理论上，下层的 LoRA 可以替换为其他参数高效微调方案，上层的提示嵌入也可以扩展为更复杂的条件调制机制，这使得 BiProLoRA 的框架思想有望迁移到更广泛的生成模型适配任务中。
+
+
 
 ## 原文 PDF
 

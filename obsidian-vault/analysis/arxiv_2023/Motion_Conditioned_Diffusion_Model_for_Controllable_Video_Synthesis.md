@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2023
 pdf_ref: paperPDFs/arxiv_2023/Motion_Conditioned_Diffusion_Model_for_Controllable_Video_Synthesis.pdf
+project_link: null
+code_link: null
 aliases:
 - MMCDM
 - MCDMCVS
@@ -42,7 +44,7 @@ claims:
 > - Human3.6M 上，FVD (lower is better) 117.60 (1 stroke), 114.82 (5 strokes), 111.38 (9 strokes) vs II2V ≈ 177 (1 stroke), iPOKE ≈ 131 (1 stroke) [exact numbers not extracted] (MCDiff clearly outperforms prior methods across all stroke counts)。
 > - TaiChi-HD / Human3.6M 上，Average Displacement Error (ADE, lower is better) TaiChi-HD: 2.77 (1 stroke), 2.72 (5 strokes), 2.90 (9 strokes); Human3.6M: 1.64... vs II2V: TaiChi-HD 4.17/7.51/11.36; iPOKE: 2.63/5.09/8.94 (MCDiff reduces ADE by up to ~8.5 on TaiChi-HD (9 strokes) and ~3 on Human3.6M)。
 
-## 概述
+## 概要
 
 **核心问题**：给定一张起始帧和用户指定的稀疏运动笔触（sparse strokes），直接生成高质量、运动可控的视频帧存在高度歧义——稀疏笔触仅提供少量像素的位移信号，缺乏对场景内容的语义理解，导致单阶段扩散模型训练困难，难以产生忠实于运动指令的视频。
 
@@ -52,7 +54,7 @@ claims:
 
 **主要结果**：在 TaiChi‑HD 和 Human3.6M 两个基准上，MCDiff 在视频质量（FVD）和运动可控性（ADE）指标上均显著优于 II2V 与 iPOKE。消融实验进一步证实：移除流补全模块（即退化为单阶段扩散模型）会导致 FVD 从 194.30 急剧上升至 273.86，验证了两阶段设计对生成质量的决定性作用。
 
-## 背景与动机
+
 
 ### 问题背景：稀疏运动控制下的视频合成
 
@@ -77,7 +79,9 @@ MCDiff的核心动机源于一个关键洞察：**将可控视频合成分解为
 
 MCDiff属于**运动条件扩散模型**在可控视频合成中的应用。与先前方法不同，MCDiff并非在隐空间中进行运动操控，而是通过显式的光流补全将稀疏控制转化为稠密运动场，再以该运动场为条件驱动扩散模型生成未来帧。该方法在TaiChi-HD和Human3.6M两个基准上显著优于II2V和iPOKE，在视觉质量（FVD）和运动可控性（ADE）两个维度均取得了当时的最优结果（Table 1, Table 3）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MCDiff 的核心创新在于将可控视频合成从“从稀疏笔触直接生成视频帧”这一高度歧义的单阶段任务，重构为“稀疏‑稠密流补全 + 基于稠密流的未来帧预测”的两阶段级联框架。这一设计显式解耦了运动理解与帧生成，使扩散模型能够在复杂场景中稳定输出高质量且忠实于用户运动指令的视频。
 
@@ -108,7 +112,7 @@ $$\mathcal{L} = \lambda_F \cdot \mathcal{L}_F + \lambda_G \cdot \mathcal{L}_G$$
 
 其中流补全损失 $\mathcal{L}_F$ 采用运动幅度加权的 MSE，以缓解静止场景下零值支配问题；未来帧预测损失 $\mathcal{L}_G$ 为标准扩散模型的噪声预测损失。联合微调消除了模块间的领域偏差，进一步提升了生成视频的保真度和连贯性。
 
-## 整体框架
+
 
 MCDiff 将可控视频合成分解为**流补全**与**未来帧预测**两个子任务，以自回归方式逐帧生成视频。给定起始帧 $x_1$ 和用户指定的稀疏瞬时运动集合 $\boldsymbol{S} = \{ \boldsymbol{s}_{12}, \dots, \boldsymbol{s}_{(n-1)n} \}$，模型输出 $n$ 帧视频序列 $\mathcal{X} = \{ x_1, \dots, x_n \}$，使每一帧的内容和运动忠实于输入条件。
 
@@ -139,7 +143,7 @@ $$\mathcal{L} = \lambda_F \cdot \mathcal{L}_F + \lambda_G \cdot \mathcal{L}_G$$
 ![[assets/figures/papers/paper_list_l1055_https_arxiv_org_abs_2304_14404/figures/002_Figure_2.jpg]]
 *Figure 2: Overview. MCDiff is an autoregressive video synthesis model. For each time step, the model is guided by the previous frame (i.e. start or previously predicted frame) and the momentary segment of input strokes (marked as colored arrows, a brighter color indicates a larger motion). Our flow completion model first predicts dense flows representing perpixel momentary motion. Then, the future-frame prediction model synthesizes the next frame based on the previous frame and the predicted dense flow through a conditional diffusion process. Finally, the collection of all predicted frames forms a video sequence adhering to the context provided by the start frame and the motion specified by the strok...*
 
-## 核心模块与公式推导
+
 
 MCDiff 将可控视频合成分解为两个级联的子任务，形成端到端可微的流水线。给定起始帧 $x_a$ 与用户指定的瞬时稀疏运动笔触集合 $\boldsymbol{s}_{ab}$，系统首先通过**流补全模型 $F$** 预测稠密光流图，随后由**未来帧预测模型 $G$** 以扩散过程生成下一帧 $x_b$，整体可表示为 $G(x_a, F(x_a, s_{ab}))$（Section 3.4）。
 
@@ -185,7 +189,9 @@ $$
 ![[assets/figures/papers/paper_list_l1055_https_arxiv_org_abs_2304_14404/figures/006_Figure_5.jpg]]
 *Figure 5: Qualitative Results of Flow Completion Model on MPII Human Pose [1]. From top to bottom, we show (a) the input frame with the strokes, (b) the next frame in the real video, and (c) our predicted flows. Our flow completion model can predict high-quality flows based on the semantic understanding of the video frame and the sparse motion control*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 1. 实验设置
 
@@ -243,7 +249,9 @@ Figure 6展示了MCDiff在MPII Human Pose上多种人体活动和相机调整场
 ![[assets/figures/papers/paper_list_l1055_https_arxiv_org_abs_2304_14404/figures/005_Figure_4.jpg]]
 *Figure 4: MCDiff achieves better visual quality and controllability compared to iPOKE [6] on two benchmarks [23, 39]. We input iPOKE [6] and MCDiff with the same start frames (the leftmost column of each sequence) and motions of 5 human keypoints (red arrows on the nose, elbows, and knees), which are sampled from the testing videos (the top row of each sequence). The target locations of the keypoints are marked at the end frames (red crosses at the rightmost column of each sequence). MCDiff is able to synthesize the videos with better quality while more faithfully following the motions specified by the strokes*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的对比定位
 
@@ -294,6 +302,8 @@ MCDiff 处于**稀疏笔触引导的可控视频合成**这一任务线上，其
 4. **笔触数量与生成质量的非单调关系**：Table 1 中 MCDiff 的 FVD 随笔触数量增加而改善（TaiChi-HD: 142.57 → 126.69 → 113.12），但 ADE 并未同步改善。这种视觉质量与运动精度的潜在权衡值得更深入的分析。
 
 5. **自回归误差累积**：MCDiff 的自回归生成方式意味着早期帧的预测误差会向后续帧传播。论文未专门分析长序列生成时的误差累积效应，这是自回归视频生成方法的共性问题。
+
+
 
 ## 原文 PDF
 

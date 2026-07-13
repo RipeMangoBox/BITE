@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Geometry_Forcing_Marrying_Video_Diffusion_and_3D_Representation_for_Consistent_World_Modeling.pdf
+project_link: null
+code_link: null
 openreview_forum_id: ULXYZCms41
 aliases:
 - GFG
@@ -42,7 +44,7 @@ claims:
 > - RealEstate10K (256帧) 上，FVD↓ 为 243 (Geometry Forcing)，对比 364 (DFoT)，变化 -121。
 > - RealEstate10K (256帧) 上，LPIPS↓ 为 0.51 (Geometry Forcing)，对比 0.55 (DFoT)，变化 -0.04。
 
-## 概述
+## 概要
 
 视频扩散模型在生成逼真视频方面取得了显著进展，但其训练仅依赖于像素级重建目标，导致模型无法捕获底层的三维几何结构。这一根本缺陷使得生成的视频缺乏时空一致性——尤其是在长序列生成和复杂相机运动下，表现为场景漂移、物体形变和视角不一致等问题。线性探测实验证实了这一点：从预训练视频扩散模型中间特征重建的深度图无法形成有意义的几何表示（Figure 1(c)）。
 
@@ -52,7 +54,7 @@ claims:
 
 GF 的适用范围不限于特定架构或数据域：它可与不同的三维基础模型（如 Pi3）兼容，在 Minecraft 动作条件生成和 Wan2.1 文本条件生成任务上同样带来一致提升。该方法在推理时不引入额外计算开销，仅在训练阶段增加 VGGT 特征提取成本，但换来了更快的收敛和更强的几何一致性。
 
-## 背景与动机
+
 
 ### 视频生成模型的几何盲区
 
@@ -74,7 +76,9 @@ GF 的适用范围不限于特定架构或数据域：它可与不同的三维�
 
 本文的核心洞察在于：预训练的几何基础模型（如VGGT）已经编码了丰富的三维结构信息。如果能在训练过程中，将视频扩散模型的中间特征与这些几何感知特征对齐，就能迫使模型学习到有意义的几何表征。关键在于对齐方式的设计——简单的MSE对齐会导致FVD恶化至1648（Table 3），因为直接匹配特征幅值会破坏扩散模型自身的表征学习。这引出了本文提出的解耦对齐策略：从方向（角度对齐）和幅度（尺度对齐）两个维度分别施加约束，从而稳定地引导模型内化三维结构。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Geometry Forcing 的核心创新在于识别并解决了一个关键瓶颈：**视频扩散模型仅从原始像素数据训练时，无法自发学习有意义的几何感知结构**。线性探测实验（Figure 1(c)）直接验证了这一缺陷——冻结的预训练视频扩散模型中间特征无法重建出可用的深度图，表明模型尽管能生成看似连贯的像素序列，其内部表示却缺乏对三维世界的理解。
 
@@ -90,7 +94,7 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{FM}} + \lambda_{\mathrm{Angular}} \cdot \ma
 
 目标表示的选择同样关键。Table 2 表明对齐几何表示（VGGT）将 FVD-256 降至 243，显著优于对齐语义表示（DINOv2）的 297，两者结合进一步优化至 237。这确认了三维几何信息（而非通用语义）是提升视频生成时空一致性的关键信号源。GF 的方法本身与具体教师模型解耦，Table 7 显示使用 Pi3 作为教师模型同样能将 FVD-256 降至 309，验证了框架的通用性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_ULXYZCms41/figures/004_Figure_1.jpg]]
 *Figure 1: Geometry Forcing equips video diffusion models with 3D awareness. (a) We propose Geometry Forcing (GF), a simple yet effective paradigm to internalize geometric-aware structure into video diffusion models by aligning with features from a geometric foundation model, i.e., VGGT (Wang et al., 2025b). (b) Compared to the baseline method (Song et al., 2025), our method produces more consistent generations both temporally and geometrically. (c) Features learned by the baseline model fail to reconstruct meaningful 3D geometry, whereas our method internalizes 3D representation, enabling accurate 3D reconstruction from the intermediate features*
@@ -133,7 +137,7 @@ $$\mathcal{L} = \mathcal{L}_{\text{FM}} + \lambda_{\text{Angular}} \cdot \mathca
 
 推理时，GF 不引入任何额外计算开销。模型仅使用训练好的 U-ViT backbone 通过求解概率流 ODE $\mathrm{d}\mathbf{x} = v_{\theta}(\mathbf{x}^{\mathbf{t}}, \mathbf{t}) \cdot \mathrm{d}\mathbf{t}$ 进行自回归采样，VGGT Teacher、Conv3D Projector 和 Scale Prediction Head 均不参与推理。
 
-## 核心模块与公式推导
+
 
 ### 动机：视频扩散模型缺乏几何感知
 
@@ -190,7 +194,9 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{FM}} + \lambda_{\mathrm{Angular}} \cdot \ma
 
 实验设置中 $\lambda_{\mathrm{Angular}}=0.5$，$\lambda_{\mathrm{Scale}}=0.05$。消融实验（Table 3）证实，角度对齐与尺度对齐的组合（FVD-256=243）显著优于仅角度对齐（FVD-256=253）或直接MSE（FVD-256=1648），验证了从方向与幅度两个维度解耦引导几何学习的必要性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果验证
 
@@ -259,7 +265,9 @@ Figure 6 揭示了模型的典型失败案例：包含透明、反射材质（�
 
 训练阶段的计算开销剖析（Table 12）显示，VGGT 编码占训练步骤总时间的 53.4% 和总 FLOPs 的 60.4%。虽然 GF 通过加速收敛部分抵消了这一开销，但在资源受限场景下仍需权衡。此外，当前实验限于中等规模数据集（约 2K 训练视频），向更大规模数据集的扩展能力尚待验证。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心问题与因果机制
 
@@ -312,6 +320,8 @@ Geometry Forcing 位于视频扩散模型与三维感知的交叉地带，其设
 4. **多属性三维对齐**：除深度/点云外，能否结合表面法向、语义布局、材质属性等其他三维属性来进一步增强一致性？Table 2 中 VGGT+DINOv2 组合的增益（FVD-256 = 237）暗示了多表示融合的潜力。
 
 5. **文本条件视频生成的几何一致性**：Table 11 显示 GF 在 Wan2.1 1.3B 文本条件生成上仅带来边际美学质量提升（0.58 → 0.59），FVD 改善有限。如何将几何强制有效适配到无显式相机条件的开放式文本生成场景，仍是一个开放挑战。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/UniSplat_Unified_Spatio_Temporal_Fusion_via_3D_Latent_Scaffolds_for_Dynamic_Driving_Scene_Reconstruction.pdf
+project_link: https://chenshi3.github.io/unisplat.github.io/
+code_link: null
 openreview_forum_id: Ng2VDbKD4r
 aliases:
 - UniSplat
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | UniSplat：通过3D潜在支架的统一时空融合用于动态驾驶场景重建 |
 | 英文题名 | UniSplat: Unified Spatio-Temporal Fusion via 3D Latent Scaffolds for Dynamic Driving Scene Reconstruction |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=Ng2VDbKD4r); [Project](https://chenshi3.github.io/unisplat.github.io/) |
+| Links | [paper](https://openreview.net/forum?id=Ng2VDbKD4r) · [Project](https://chenshi3.github.io/unisplat.github.io/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | UniSplat |
 | Dataset | nuScenes |
@@ -40,7 +42,7 @@ claims:
 > - nuScenes 上，PSNR 为 25.37，对比 Omni-Scene 24.27，变化 +1.10。
 > - nuScenes 上，FPS 为 4.0，对比 Omni-Scene 2.5，变化 +1.5。
 
-## 概述
+## 概要
 
 动态驾驶场景重建面临一个核心瓶颈：车载多相机系统提供的视图稀疏且非重叠，场景中又存在复杂的动态对象，现有方法难以在统一框架内有效融合多视图信息并处理时序动态，导致重建质量受限、无法处理运动物体，也难以实现长期场景补全。
 
@@ -50,7 +52,7 @@ UniSplat 的关键思路是**构造一个统一的 3D 潜在支架（3D latent s
 
 方法仍存在一定局限：当行人等动态对象被误分类为静态时，会在渲染序列中产生幽灵伪影；玻璃表面的低高斯不透明度可能导致动态掩码与 RGB 内容的感知不对齐。
 
-## 背景与动机
+
 
 自动驾驶系统依赖车载多相机传感器感知周围环境，而高质量的场景重建与新视图合成是实现安全规划与决策的基础能力。近年来，3D Gaussian Splatting（3DGS）因其显式表征和实时渲染能力，在该领域展现出巨大潜力。然而，将3DGS应用于动态驾驶场景仍面临两个核心瓶颈：
 
@@ -60,7 +62,9 @@ UniSplat 的关键思路是**构造一个统一的 3D 潜在支架（3D latent s
 
 上述瓶颈的根本原因在于：现有方法缺乏一个统一的表征空间，能够同时承载多视图空间融合与时序信息整合。UniSplat的核心动机正是构建这样一个**统一的3D潜在支架（3D Latent Scaffold）**——利用预训练的几何与视觉基础模型生成富含度量尺度几何和语义上下文的稀疏体素表征，并在该支架内直接执行空间与时间的统一融合。基于此支架，通过双分支解码器生成动态感知的高斯元，并结合动态过滤的记忆机制实现流式场景补全，从而系统性地解决多视图融合、动态建模和场景补全三个相互耦合的挑战。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 UniSplat 的核心创新在于构造了一个**统一的3D潜在支架（3D latent scaffold）**，将原本在图像域执行的跨视图融合与时间聚合迁移到该支架空间内完成，从而更有效地处理动态驾驶场景中稀疏、非重叠的多相机视图和复杂的场景动态。这一设计思路体现在以下四个关键改进上。
 
@@ -111,7 +115,7 @@ $$\mathcal{M}_t = \mathcal{M}_{t-1}' \cup \{ G_i \in \mathcal{G}_t \mid d_i < \t
 
 这些创新共同使 UniSplat 在 nuScenes 上达到 25.37 PSNR（超 Omni-Scene 1.10 dB），同时以 4.0 FPS 的运行时效率优于 Omni-Scene 的 2.5 FPS（Table 7）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0012_Ng2VDbKD4r_UniSplat_Unified_Spatio-Temporal_Fusion_via_3D_L/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of UniSplat. Given multi-camera images from vehicle-mounted cameras, UniSplat leverages foundation models to construct geometry-semantic aware 3D latent scaffolds, where unified spatio-temporal fusion is performed. From this scaffold, a dual-branch decoder generates dynamic-aware Gaussian primitives using both point anchors and voxel centers, with dynamic filtering maintaining a persistent memory of static scene content. The red boxes highlight a dynamic car that is filtered out in our memory module (best viewed when zoomed in)*
@@ -148,7 +152,7 @@ UniSplat 遵循一个三阶段流水线，其核心瓶颈在于如何将稀疏�
 - **输出**：当前帧的高斯原语集 $\mathcal{G}_t$（含位置偏移、不透明度、协方差、颜色、动态评分），以及累积的静态记忆 $\mathcal{M}_t$ 的渲染视图。
 - **训练监督**：复合损失函数（Eq. 11）包含输入视图的重建损失（MSE + LPIPS）、动态分割损失、尺度损失，以及仅对有效像素的新视图MSE损失。动态真值掩码通过3D边界框跟踪投影结合SAM2生成。
 
-## 核心模块与公式推导
+
 
 UniSplat 的核心管道由三个关键模块构成：3D 潜在支架构建、统一时空融合、以及双分支动态感知高斯解码。以下逐一展开各模块的设计逻辑与关键公式。
 
@@ -204,7 +208,9 @@ $$D = \sum_{i \in \mathcal{N}} d_i \alpha_i \prod_{j=1}^{i-1} (1 - \alpha_j)$$
 
 该动态概率图与由3D边界框追踪结合 SAM2 生成的伪真值动态掩码进行监督，使模型学会区分静态与动态场景内容。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 
@@ -256,7 +262,9 @@ UniSplat 通过动态感知记忆模块实现流式场景补全。Figure 3 展�
 
 上述失败模式指向两个开放问题：如何改进动态分割以正确处理透明表面上的动态掩码对齐，以及能否通过引入运动先验或光流进一步减少动态误分类。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与前馈多视图重建方法的继承与超越
 
@@ -287,6 +295,8 @@ UniSplat 的性能依赖于几个关键前提：
 - **动态掩码对齐**：如何改进动态分割以正确处理透明表面上的掩码对齐？可能的路径包括引入物理感知的渲染约束，或在训练中显式建模透明材质的不确定性。
 - **运动先验的引入**：能否通过引入光流或场景流等运动先验进一步减少动态误分类？当前方法完全依赖外观和几何一致性来隐式学习动态抑制，显式运动线索可能提升对缓慢移动或远距离动态对象的判别能力。
 - **支架分辨率的可扩展性**：当前稀疏体素支架的分辨率受限于内存和计算约束（空间融合 U-Net 最大下采样 8×，时间融合 2×）。在更大规模场景或更长序列中，如何在不显著增加计算成本的前提下提升支架容量，仍是一个工程与算法双重挑战。
+
+
 
 ## 原文 PDF
 

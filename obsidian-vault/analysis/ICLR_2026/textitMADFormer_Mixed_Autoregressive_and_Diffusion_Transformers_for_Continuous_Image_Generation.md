@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/textitMADFormer_Mixed_Autoregressive_and_Diffusion_Transformers_for_Continuous_Image_Generation.pdf
+project_link: null
+code_link: null
 aliases:
 - TMMADTCIG
 tags:
@@ -40,7 +42,7 @@ claims:
 > - ImageNet 256x256 上，FID 为 30.0，对比 34.0 (d=7)，变化 -4.0。
 > - FFHQ-1024 上，FID (低NFE) 为 ~20 (AR-heavy, d=7, NFE=10)，对比 ~50 (diffusion-heavy, d=28, NFE=10)，变化 60-75% improvement。
 
-## 概述
+## 概要
 
 MADFormer针对现有混合自回归（AR）与扩散（Diffusion）图像生成模型缺乏系统性设计指导的根本瓶颈，提出了一种在Transformer深度轴和图像token轴上同时进行范式混合的架构。其核心发现是：**AR层与扩散层的比例分配（扩散深度D）以及图像块的自回归粒度（AR长度L）是控制生成质量与计算效率权衡的关键因果旋钮**。
 
@@ -48,7 +50,7 @@ MADFormer针对现有混合自回归（AR）与扩散（Diffusion）图像生成
 
 主要结果表明，AR与扩散的互补角色在推理计算受限时尤为关键。**在低NFE（受限计算）下，AR-heavy配置（如3:1 AR:Diffusion，d=7）的FID比diffusion-heavy配置（d=28）降低60-75%**（Figure 4）。当计算充足时，增加扩散深度（d从7增至28）在FFHQ上FID从20.2降至15.9，在ImageNet上从34.0降至27.4（Table 1），但收益递减。最优AR长度呈现数据集依赖性：FFHQ上为16块（FID 17.8），ImageNet上为1块（FID 28.4）（Table 2）。同时使用clean blocks和AR condition比单独使用任一组件效果更好（FFHQ: 17.8 vs 20.1/19.7）（Table 3）。隐藏损失系数为0.1时，FID从19.4降至17.8（Section 4.6）。需要说明的是，ImageNet上的FID（30.0）较高是由于训练epoch数远少于基线（50 vs 400/800）且未使用classifier-free guidance (CFG)，作者明确表示这是为了控制变量分析设计空间而非追求SOTA。
 
-## 背景与动机
+
 
 连续图像生成的主流范式分为自回归（AR）模型与扩散模型，但两种范式在结构先验与局部细节精修上存在天然互补性。AR模型通过逐token预测捕获全局依赖，但在高分辨率场景下推理步数随序列长度线性增长；扩散模型通过迭代去噪生成精细纹理，但低步数下结构一致性差。现有混合AR-扩散模型（如Transfusion, ACDiT）虽然尝试融合两者，但缺乏系统性的设计指导，不清楚如何在两种范式之间分配模型容量以平衡生成质量与计算效率——这是当前领域的关键瓶颈。
 
@@ -60,7 +62,9 @@ MADFormer的核心动机正是填补这一空白：通过解耦Transformer深度
 
 需要指出的是，该工作的动机强度受限于实验范围：所有实验在1.3B/2.1B模型规模下进行，未探索规模对AR-扩散权衡的影响；ImageNet上FID 30.0远低于SOTA（训练epoch仅50 vs 400-800，且未使用CFG），作者明确说明这是为了控制变量分析设计空间而非追求SOTA。因此，当前证据强有力地支持“计算受限时优先分配AR层”这一设计原则，但该原则在不同模型规模、不同数据集（特别是文本到图像场景）下的泛化性仍需手动验证。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MADFormer的核心创新在于将Transformer的深度轴和图像token的序列轴同时进行混合建模，并通过系统性的消融实验揭示了AR与扩散范式之间容量分配的计算权衡规律。
 
@@ -74,7 +78,7 @@ MADFormer的核心创新在于将Transformer的深度轴和图像token的序列�
 
 **与基线的关键差异总结。** 相对Transfusion（全层混合AR-扩散）、DiT（纯扩散）、MAR（纯AR），MADFormer的changed slots包括：（1）层分配：从全部层用于单一范式变为前N-D层AR、后D层扩散；（2）图像块处理：从全局扩散或逐token AR变为块间AR+块内扩散；（3）时间步注入：从每层adaLN变为U-Net下采样器直接编码；（4）参数集：从全共享变为模态独立参数集；（5）损失函数：增加隐藏损失和干净塔损失。这些设计的核心瓶颈在于缺乏系统性的AR-扩散容量分配指导——MADFormer通过消融实验首次揭示了这一权衡的定量规律。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0001_9zUJbyR62q_textitMADFormer_Mixed_Autoregressive_and_Diffusi/figures/001_Figure_1.jpg]]
 *Figure 1: High-level overview of the MADFormer architecture. A single Transformer processes all modalities as a unified sequence. Text tokens follow a next-token prediction objective, while image tokens are grouped into blocks trained autoregressively with a diffusion objective. We use separate parameters (FFNs, QKVO projections, and layer norms) for each modality. The Transformer is divided into two stages: early layers produce conditions from text and image blocks; later layers denoise noisy image blocks. Each block attends to itself and preceding clean blocks*
@@ -91,7 +95,7 @@ MADFormer的整体pipeline将图像生成建模为一个统一序列上的混合
 
 **推理流程。** 推理时，模型按块顺序生成：对于每个新块，AR条件模块基于所有已生成块计算条件表示，然后扩散去噪模块从纯噪声开始迭代去噪（默认250步，线性beta调度0.0001→0.02）。不同AR/扩散层比例导致不同的计算-质量权衡——AR-heavy配置在低NFE（受限计算）下FID降低60-75%，而diffusion-heavy配置在计算充足时达到更高保真度（Figure 4）。
 
-## 核心模块与公式推导
+
 
 ### 1. 整体架构：双轴混合设计
 
@@ -197,7 +201,9 @@ AR长度 $L$ 表示图像被划分为多少块（每个块包含256个token）�
 | $\mathbf{z}_{\mathrm{cond}}$ | AR条件模块输出 | 维度=1024 |
 | $\mathbf{z}_{\mathrm{image}}$ | 真实图像潜变量 | VAE编码输出 |
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：AR与扩散层的计算预算分配
 
@@ -250,7 +256,9 @@ AR长度的消融（Table 2）揭示了数据集依赖的最优配置：FFHQ上�
 3. **评估范围限制**：实验仅在类条件生成（FFHQ和ImageNet）上进行，未在标准文本到图像（T2I）基准上评估。此外，未与最新的纯扩散模型（如Flux）或纯AR模型（如MAR完全训练后）进行直接比较。
 
 4. **统计可靠性**：消融实验中的FID仅通过最后5个检查点平均来降低噪声，未报告标准差或置信区间，限制了结果的统计显著性判断。
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -293,6 +301,8 @@ MADFormer 的设计空间探索揭示了明确的适用边界条件：
 4. **自适应损失权重**：固定超参数的损失加权能否被自适应策略替代以改善训练动态？
 5. **高级采样技术的整合**：将 DPM-Solver 等高级采样技术与本文的容量分配指导相结合，能否在极低 NFE 下达到更好效果？
 6. **规模效应**：模型规模（参数数量）如何影响最优 AR/扩散比例？更大模型是否倾向于需要更多扩散层？
+
+
 
 ## 原文 PDF
 

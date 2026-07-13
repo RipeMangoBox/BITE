@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/RealPDEBench_A_Benchmark_for_Complex_Physical_Systems_with_Real_World_Data.pdf
+project_link: https://realpdebench.github.io/
+code_link: null
 openreview_forum_id: y3oHMcoItR
 aliases:
 - RB
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | RealPDEBench：基于真实数据的复杂物理系统基准 |
 | 英文题名 | RealPDEBench: A Benchmark for Complex Physical Systems with Real-World Data |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=y3oHMcoItR); [Project](https://realpdebench.github.io/) |
+| Links | [paper](https://openreview.net/forum?id=y3oHMcoItR) · [Project](https://realpdebench.github.io/) |
 | Topic | #topic/optimization_theory_probabilistic #topic/optimization_theory_probabilistic/optimization_methods |
 | Method | RealPDEBench Benchmark |
 | Dataset | Cylinder, Controlled Cylinder, Combustion, Cylinder (autoregressive) |
@@ -42,7 +44,7 @@ claims:
 > - Controlled Cylinder 上，Relative L2 Error (Real-world Finetuning best vs. Simulated Training best) 为 0.0223 (U-Net, Real FT)，对比 0.1849 (CNO, Sim Training)，变化 -87.9%。
 > - Combustion 上，Validation RMSE convergence (Real FT vs. Real Training) 为 Much faster decrease and better final RMSE (Figure 3b)，对比 Slower convergence and higher best RMSE from Real Training，变化 Qualitative, Figure 3b。
 
-## 概述
+## 概要
 
 科学机器学习在物理系统建模中面临一个根本性瓶颈：真实实验数据采集昂贵且稀缺，大量模型仅依赖数值模拟数据进行训练和验证，无法可靠评估其在真实物理场景中的表现。这一模拟-真实（sim-to-real）鸿沟严重制约了从仿真迁移到实际应用的关键研究。**RealPDEBench** 正是针对这一瓶颈构建的基准数据集与评测框架。
 
@@ -54,7 +56,7 @@ RealPDEBench 的核心洞察是：直接在模拟数据上训练的模型难以�
 
 当前基准的局限在于范围仍集中于流体与燃烧系统，尚未覆盖电磁学、结构力学等其他物理领域，也未针对燃烧系统引入专门的物理导向指标，且缺乏对强分布外工况的系统探索。这些方向为后续扩展留下了明确空间。
 
-## 背景与动机
+
 
 科学机器学习（SciML）在偏微分方程求解、物理场预测等任务中取得了显著进展，但其核心瓶颈正从模型设计转向数据层面：**真实物理实验数据极度稀缺且采集成本高昂**。当前绝大多数SciML模型——包括各类神经算子、Transformer架构乃至大规模预训练基础模型——均在纯模拟数据上训练和验证，缺乏对真实物理场景的可靠评估。这导致一个关键问题悬而未决：在模拟数据上表现优异的模型，部署到真实世界时是否依然有效？
 
@@ -64,7 +66,9 @@ RealPDEBench 的核心洞察是：直接在模拟数据上训练的模型难以�
 
 RealPDEBench正是为填补这一空白而构建。它系统性地采集了五个场景（Cylinder、Controlled Cylinder、FSI、Foil、Combustion）下超过700条轨迹、每条超2000帧的配对真实-模拟数据，覆盖流体动力学和燃烧两大领域。在此基础上，该基准定义了三种训练范式——仅真实训练、仅模拟训练、模拟预训练后真实微调——并设计了九项评估指标，从数据精度和物理一致性两个维度全面量化模型表现，为sim-to-real迁移研究提供了首个标准化测试平台。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 RealPDEBench的核心创新不在于提出新的模型架构或训练算法，而在于**构建了首个基于真实物理实验数据的系统化评估基准**，并以此重新定义了科学机器学习模型的能力检验方式。
 
@@ -101,7 +105,7 @@ RealPDEBench并非仅仅“收集数据然后跑模型”。针对真实数据�
 
 现有PDE基准（如PDEBench、PDEArena）的评估完全建立在数值模拟数据之上，其“性能”仅反映模型对数值求解器的逼近能力。RealPDEBench将评估锚点从模拟转移到真实物理世界，揭示出**模型在模拟数据上的优越表现并不能保证其在真实场景中的有效性**——这一发现对科学ML领域的方法论具有根本性的警示意义。
 
-## 整体框架
+
 
 RealPDEBench 的核心 pipeline 由五个功能模块串联而成，形成从数据获取到模型评估的完整闭环。
 
@@ -120,7 +124,7 @@ RealPDEBench 的核心 pipeline 由五个功能模块串联而成，形成从数
 
 pipeline 的输入输出流清晰：输入为初始物理场快照和工况参数，输出为未来时刻的物理场预测。评估时，所有模型在相同的参数级划分的真实验证集和测试集上进行，保证了实验协议的公平性。
 
-## 核心模块与公式推导
+
 
 RealPDEBench 本身是一个基准框架，而非提出新模型的方法论文，其核心模块由**数据生成管线**、**任务范式定义**和**评估指标体系**三部分构成。
 
@@ -181,7 +185,9 @@ $$\mathrm{MVPE} = \frac{1}{K N_{\mathrm{probe}}} \sum_{k,j} \left| \bar{u}(x_{\m
 - **GK-Transformer**（Cao, 2021）、**Transolver**（Wu et al., 2024a）：Transformer 类 PDE 求解器。
 - **DPOT**（Hao et al., 2024）：自回归去噪算子 Transformer，提供小规模（30M）和大规模（509M）两种预训练版本，作为 PDE 基础模型参与基准测试。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：模拟到真实的鸿沟
 
@@ -253,7 +259,9 @@ RealPDEBench的核心实验揭示了一个关键结论：**直接在模拟数据
 ![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_y3oHMcoItR/figures/015_Table_7.jpg]]
 *Table 7: Overview of datasets. $\mathtt { n \_ t r a j }$ is the number of trajectories. n frame is the number of frames*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 基准定位与核心贡献
 
@@ -312,6 +320,8 @@ RealPDEBench 的实验设计揭示了各方法的适用边界：
 2. 在强分布外工况下，模拟预训练与真实微调的迁移能力如何？需要新的任务设计和数据集扩展。
 3. 基准是否应包含更多动态任务（如逆问题、参数估计）从而全面评估科学机器学习模型的真实世界适应能力？
 4. 真实数据中的噪声模式和测量误差如何更有效地在模拟数据中建模，以提升 sim-to-real 迁移的鲁棒性？
+
+
 
 ## 原文 PDF
 

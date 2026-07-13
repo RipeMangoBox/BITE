@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Beyond_Text_to_Image_Liberating_Generation_with_a_Unified_Discrete_Diffusion_Model.pdf
+project_link: https://huggingface.co/MeissonFlow/Muddit
+code_link: https://github.com/M-E-AGI-Lab/Muddit
 aliases:
 - BTILGUDDM
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | 超越文本到图像：统一离散扩散模型的生成解放 |
 | 英文题名 | Beyond Text-to-Image: Liberating Generation with a Unified Discrete Diffusion Model |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=pG0WTde3pR); [GitHub](https://github.com/M-E-AGI-Lab/Muddit); [Project](https://huggingface.co/MeissonFlow/Muddit) |
+| Links | [paper](https://openreview.net/forum?id=pG0WTde3pR) · [GitHub](https://github.com/M-E-AGI-Lab/Muddit) · [Project](https://huggingface.co/MeissonFlow/Muddit) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | Muddit |
 | Dataset | GenEval, MS-COCO, VQAv2, Image-to-Text (512×512, 32 steps) |
@@ -40,13 +42,13 @@ claims:
 > - MS-COCO 上，CIDEr 为 59.9，对比 Show-o 55.6，变化 +4.3。
 > - VQAv2 上，Accuracy (%) 为 68.2，对比 Show-o 60.1，变化 +8.1。
 
-## 概述
+## 概要
 
 多模态生成领域面临的核心瓶颈在于：自回归模型推理延迟高，而混合或从零训练的扩散模型难以同时兼顾生成质量与泛化能力，缺乏一个高效且统一的范式。本文提出 **Muddit**，第一个以视觉先验为基础的**纯离散扩散统一模型**，其关键思路是利用预训练文本‑到‑图像（T2I）骨干所提供的强视觉先验，再配合一个轻量线性文本解码器，在统一的掩码重建框架下进行训练，从而突破上述瓶颈。这一设计使得同一扩散骨干能够并行完成文本‑到‑图像、图像‑到‑文本以及视觉问答（VQA）等多种任务，且推理过程中所有模态共享完全相同的损失函数、解码调度与分类器自由引导（CFG）规则。
 
 核心结果如下：在 GenEval 基准上，Muddit 取得 **0.61** 的综合准确率，显著优于其视觉先验骨干 Meissonic（0.54）和其他离散扩散模型如 UniDisc（0.42）（Table 1）。在图像描述任务上，MS‑COCO CIDEr 达到 **59.9**，优于语言先验统一模型 Show‑o（55.6）（Table 2）。在推理效率方面，Muddit 平均延迟仅为 **1.49 秒**，比自回归多模态大模型（如 LLaVA‑1.6、Qwen‑2.5‑VL）快约 **4×–11×**（Fig. 13, Sec. E），同时在图像‑到‑文本的吞吐量上达到 **99.98 tokens/s**（Table 10）。消融实验进一步表明，联合训练（文本‑图像双向）使得 GenEval 从仅文本‑到‑图像训练的 59.3 提升至 **61.6**，验证了跨任务联合建模带来的清晰收益（Table 4）。上述证据说明，在统一生成模型中，强视觉先验能够有效弥补纯离散扩散范式在文本理解与生成任务上的泛化不足，从而在效率与质量之间取得更好的平衡。
 
-## 背景与动机
+
 
 统一多模态生成——同时完成文本到图像（T2I）、图像到文本（I2T）以及视觉问答（VQA）——是当前生成式模型发展的核心目标之一。现有方案大致分为两条技术路线：自回归（AR）模型与扩散模型。前者以逐令牌顺序解码的方式生成多模态内容（如Chameleon），虽然语言生成质量高，但推理延迟随序列长度急剧增长，并且在图像合成上常受限于离散表示带来的保真度损失；后者在图像生成领域占据主导，但扩展至文本时需要引入语言模型头或连续‑离散混合架构（如D‑DiT），导致训练和推理流程割裂，难以真正实现“一个主干，多种生成”的统一范式。更底层的矛盾在于**推理效率与生成质量之间的互相制约**：自回归模型生成长文本时吞吐极低，而扩散模型在文本生成上为保持质量往往需要复杂引导策略，牺牲速度。从零训练的纯离散扩散统一模型（如UniDisc）虽尝试统一框架，却因缺乏强先验导致GenEval整体评分仅0.42（Table 1），远低于其视觉先验骨干Meissonic的0.54，揭示出泛化能力不足的根本瓶颈。
 
@@ -54,7 +56,9 @@ claims:
 
 本文提出的Muddit正是针对上述三重鸿沟：效率、质量与先验不平衡。其根本动机是验证一个关键假设：**强视觉先验可以弥补纯离散扩散模型在文本理解和生成任务上的泛化弱点**。通过将预训练的高性能文生图骨干（Meissonic）与一个轻量线性文本解码头组合，并在全离散扩散框架下实施统一的掩码预测训练（负连续时间ELBO，Eq. 6），Muddit让同一个MM‑DiT变换器同时学习双向生成。初步消融显示，联合训练（T2I + I2T）使GenEval达到61.6，远超单向训练（T2I‑only 59.3，I2T‑only 28.3，Table 4），而推理延迟仅1.49 秒（Fig. 13），较自回归多模态LLM（如LLaVA‑1.6）快4–11倍。这些证据表明，“纯离散扩散 + 视觉先验”不仅可行，而且能够同时在图像生成质量与文本推理效率两个维度上打破现有方法的僵局，为统一多模态生成开辟一条高效且泛化鲁棒的新路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Muddit 通过三项关键“changed slots”打破了统一多模态生成模型在推理效率与生成质量之间的根本矛盾。传统方案因语言先验导致理解强但生成弱（如 Show-o、Chameleon），或因依赖混合范式（AR+扩散、连续+离散）导致架构复杂、推理慢（如 D‑DiT），而纯离散扩散模型（如 UniDisc）缺乏强先验以支撑多任务泛化。Muddit 以**视觉先验初始化、轻量文本解码器、全离散统一范式**为支点，证明强视觉先验可弥补纯离散扩散在文本理解上的泛化瓶颈，从而在同一骨干上高效统一文生图、图生文与 VQA。
 
@@ -85,7 +89,7 @@ Muddit 通过三项关键“changed slots”打破了统一多模态生成模型
 
 三项改变并非孤立，而是构成一个因果链：**视觉先验 → 骨干可跨模态复用 → 轻量线性头足够进行文本解码 → 纯离散扩散下可统一训练/推理 → 极低的推理延迟与高生成质量兼得**。这一设计使得 Muddit 成为首个在图像生成（+0.07 over Meissonic）、图像描述（+4.3 CIDEr over Show‑o）、VQA（VQAv2 68.2%）三项任务上均具备竞争力的高效统一离散扩散模型。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0016_pG0WTde3pR_Beyond_Text-to-Image_Liberating_Generation_with/figures/002_Figure_2.jpg]]
 *Figure 2: The training and inference architecture of Muddit. (a) During training, we randomly mask tokens from one of the two modalities. MM-DiT is trained to predict the masked tokens using a re-weighted cross-entropy loss, which jointly optimizes both the MM-DiT backbone and a lightweight text decoder. (b) In text-to-image inference, we initialize the image latent features using all-masked tokens and iteratively predict each latent token via MM-DiT. (c) In image-to-text inference, we similarly initialize all text tokens as masked and generate the text through the same iterative decoding process. Specifically for VQA tasks, we append mask token IDs to the end of the question and predict all masked t...*
@@ -125,7 +129,7 @@ Muddit 的整体架构围绕一个统一的 MM-DiT 主干网络 `G` 构建，该
 
 整体上，Muddit 通过 “强视觉先验 + 纯离散扩散 + 轻量文本解码” 的组合，实现了一个高效、统一的图像与文本联合生成系统。
 
-## 核心模块与公式推导
+
 
 ### 视觉先验驱动的统一生成骨干
 
@@ -197,7 +201,9 @@ Muddit 成功的关键因果链可概括为：**强视觉先验 + 轻量文�
 
 综上，Muddit 的核心模块与公式构成了一个自洽的、无结构混合的统一离散扩散框架，其能力与效率均通过视觉先验和轻量解码头实现了对语言先验路线的反超。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 Muddit 采用两阶段训练（预训练 + 指令微调），所有任务共享统一的离散扩散目标（Eq. 6）与相同的去噪调度、引导机制，仅通过改变条件信号实现模态切换。骨干基于预训练的 Meissonic MM-DiT 初始化，文本解码器为一个轻量线性头（见表 6 超参数）。以下所有结果均在该框架下获得，引用表格与图片均为原论文提供。
 
@@ -240,7 +246,9 @@ Muddit 的并行离散扩散解码器在 512×512 输入下实现图像到文本
 ![[assets/figures/papers/iclr26_0016_pG0WTde3pR_Beyond_Text-to-Image_Liberating_Generation_with/figures/028_Figure_13.jpg]]
 *Figure 13: Inference speed comparison. We use 32 inference steps for Muddit and fix the sequence length to 77 across all models*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 Muddit 被定位为**首个具备视觉先验的统一离散扩散模型**。与现有统一多模态生成方法相比，它在**生成范式、先验来源和文本解码策略**三个维度上做出了根本性的变化，从而在推理效率与任务泛化能力之间获得了一个新的平衡点（见图 6，该方法属于“全离散扩散 + 视觉先验”象限）。
 
@@ -283,6 +291,8 @@ Muddit 的关键改动在于 **“视觉先验 + 轻量文本头 + 统�
 5. **联合训练的最佳配置**：文本损失权重、图文数据比例、训练阶段的任务轮换策略是否存在更优的组合？当前的观察仅来自有限网格搜索。
 
 > **证据强度备注**：以上局限与开放问题中，部分来自论文明确陈述（如离散令牌对高分辨率的限制、文本能力弱），置信度高；但规模扩展与 KV‑cache 的实际效果属于推论，尚待实验验证。Muddit 在 MME 等复杂 VQA 任务上的详细评估信号较弱，需结合 Table 8 手工确认。
+
+
 
 ## 原文 PDF
 

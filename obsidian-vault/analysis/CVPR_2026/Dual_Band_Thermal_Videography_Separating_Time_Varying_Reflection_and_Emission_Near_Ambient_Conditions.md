@@ -43,7 +43,7 @@ claims:
 > - Real wineglass video 上，T_o估计误差百分比 (vs thermocouple) 1.72% vs naive LS: 31.68% (-29.96%)。
 > - Real coffee pot video 上，T_o估计误差百分比 5.34% vs naive LS: 45.5% (-40.16%)。
 
-## 概述
+## 概要
 
 热像仪在近环境温度场景下面临一个根本性欠定问题：物体自身的热辐射与来自周围环境的背景反射在强度上相当，且两者均随时间变化。传统方法依赖灰体假设（发射率与波长无关）或背景静止假设，无法有效分离这两种信号。**DBVT**（Dual Band Thermal Videography）通过将双波段光谱比率与时间动态先验相结合，为这一欠定系统引入额外约束，实现了逐像素的发射-反射分离。
 
@@ -62,7 +62,7 @@ claims:
 
 **局限性**：方法假设背景辐射变化与物体信号不相关，在全局均匀升温场景下可能失效；低成本微测辐射热计在窄带滤光下灵敏度不足，难以检测低发射率物体的微小温差。
 
-## 背景与动机
+
 
 ### 热成像的物理歧义：发射与反射的纠缠
 
@@ -95,7 +95,9 @@ $$I_m(t) = \epsilon_m U_m(T_o(t)) + (1-\epsilon_m) U_m(T_b(t))$$
 
 本文的核心动机在于：**将双波段光谱比率与时域平滑/突变差异相结合，为原本欠定的发射-反射分离问题引入充分约束，从而在无需已知发射率或背景静止假设的条件下，逐像素估计物体发射率、物体温度与背景温度。**
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文提出的 **双波段热成像视频分析（Dual Band Thermal Videography, DBVT）** 框架，其核心创新在于突破了近环境温度下热成像反射-发射分离的欠定瓶颈。当物体温度接近环境温度时，自身热辐射与背景反射强度相当，且两者均随时间变化，传统方法依赖灰体假设或背景静止假设，无法有效解耦。DBVT通过以下三个关键机制协同工作，为欠定系统提供了充分约束。
 
@@ -129,7 +131,7 @@ $$\mathcal{L}_{\text{total}} = \gamma_1 \mathcal{L}_{\text{smooth}} + \gamma_2 \
 
 与使用单个宽波段LWIR相机的传统方案不同，DBVT采用**双窄带滤光片**（8.5μm, 9.5μm, 10.6μm, 12.1μm）配合热像仪进行同步视频采集。波段选择经过发射率矩阵 $E$ 的条件数分析（Figure 9），确保数值稳定性。这一硬件设计使得光谱比率约束在物理上可测量，是算法创新的硬件基础。
 
-## 整体框架
+
 
 DBVT（Dual Band Thermal Videography）的整体流程围绕一个核心矛盾展开：在近环境温度下，物体自身热辐射与背景反射强度相当，且两者均随时间变化，传统方法依赖灰体假设或背景静止假设，无法有效解耦。DBVT通过**双波段光谱比率约束**与**时间动态差异先验**的组合，将这一高度欠定问题转化为可联合优化的系统。
 
@@ -195,7 +197,7 @@ $$\mathcal{L}_{\text{total}} = \gamma_1 \mathcal{L}_{\text{smooth}} + \gamma_2 \
 ![[assets/figures/papers/paper_list_l2121_https_arxiv_org_abs_2509_11334/figures/001_Figure_1.jpg]]
 *Figure 1: Image formation in a thermal camera comprises of radiation from the object*
 
-## 核心模块与公式推导
+
 
 ### 热成像辐射传输建模
 
@@ -261,7 +263,9 @@ $$\mathcal{L}_{\text{total}} = \gamma_1 \mathcal{L}_{\text{smooth}} + \gamma_2 \
 ![[assets/figures/papers/paper_list_l2121_https_arxiv_org_abs_2509_11334/figures/010_Figure_9.jpg]]
 *Figure 9: Condition numbers of emissivity matrix E in Eq. 15 for different spectral band pairs, averaged over materials in the spectral library [3, 21]*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 仿真实验：多材料、多噪声水平下的方法对比
 
@@ -350,7 +354,9 @@ $$\mathcal{L}_{\text{total}} = \gamma_1 \mathcal{L}_{\text{smooth}} + \gamma_2 \
 ![[assets/figures/papers/paper_list_l2121_https_arxiv_org_abs_2509_11334/figures/011_Figure_10.jpg]]
 *Figure 10: Comparison of our method with a recent BCP [9] technique to remove reflections, a naive multi-wavelength approach and a traditional dual-wavelength pyrometry technique [2, 39] using simulated thermal videos of different materials sourced from spectral library [3, 21]. For naive least squares, we run the optimization with five initializations and select one that achieved the least objective compared to ground truth (which we will not have access to at test time). At high noise levels, all methods have a large error as the problem is too under constrained. As noise decreases to more reasonable levels, our method performs significantly better. Note the log scale on the plots*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题谱系：从灰体假设到非灰体时变分离
 
@@ -412,6 +418,8 @@ DBVT 提供两种工作模式：
 2. **低成本硬件扩展**：当前方法依赖微测辐射热计在窄带滤光下的灵敏度。向更低成本、更多波段（如四波段）的硬件扩展，并实现实时视频处理，是工程上的关键挑战。
 
 3. **波段选择的自动化**：Figure 9 的条件数分析为波段选择提供了原则，但最优波段对依赖于材料类型。自适应波段选择策略（如根据场景初步估计后动态切换滤光片）可能进一步提升精度。
+
+
 
 ## 原文 PDF
 

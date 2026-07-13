@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2026
 pdf_ref: paperPDFs/arxiv_2026/CLAW_Composable_Language_Annotated_Whole_body_Motion_Generation.pdf
+project_link: null
+code_link: null
 aliases:
 - CLAW
 tags:
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | CLAW：可组合语言标注的全身运动生成 |
 | 英文题名 | CLAW: Composable Language-Annotated Whole-body Motion Generation |
 | 会议/期刊 | arXiv 2026 |
-| Links | [paper](https://arxiv.org/abs/2604.11251v3) · [arXiv](https://arxiv.org/abs/2510.02252) |
+| Links | [paper](https://arxiv.org/abs/2604.11251v3) · [paper](https://arxiv.org/abs/2510.02252) |
 | Topic | #topic/vision_multimodal_applications #topic/generative_models_diffusion #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | CLAW |
 | Dataset | Multi-stage trajectory annotation |
@@ -39,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - Multi-stage trajectory annotation (Fig. 7) 上，Number of language annotations 17 full-trajectory + 8 per-segment vs Manual (typically 1 description) (automated vs. manual, many times more)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：人形机器人全身运动-语言数据集的构建长期依赖动作捕捉（MoCap）与人工标注，采集成本高昂。将人类运动数据重定向（retargeting）至机器人本体还需额外处理物理可行性问题，进一步限制了数据的规模与多样性。现有的文本到运动生成模型（如 **Kimodo** (Rempe et al., 2026)）虽可产出运动序列，但输出通常限于纯运动学层面，缺乏物理仿真验证。
 
@@ -51,7 +53,7 @@ claims:
 
 **局限性**：当前模板式标注引擎的文体多样性有限，可能不及大型语言模型；对于极端姿态差异的模式转换，规划器可能产生运动学突变，缺乏自动过滤机制；预定义的运动模式集合固定，不支持用户自定义基元或学习技能；系统依赖仿真环境，仿真到现实的迁移尚未验证。
 
-## 背景与动机
+
 
 人形机器人的全身运动生成是具身智能领域的核心挑战之一。要让机器人执行“蹲下并向前挥拳”或“以夸张的步态绕圈行走”等复杂指令，需要大规模、高质量的运动-语言配对数据来训练或微调生成模型。然而，现有数据获取管线存在根本性瓶颈。
 
@@ -63,7 +65,9 @@ claims:
 
 基于这一洞察，CLAW 提出了一套完整的免动作捕捉数据生成管线：操作者通过浏览器界面组合参数化运动基元，系统在 MuJoCo 物理仿真中实时跟踪并生成关节轨迹，同时模板引擎从运动参数自动生成多样化的自然语言标注。这种设计使得探索性操作和批量数据收集可以在统一框架下完成，为大规模全身运动-语言数据集构建提供了可行的技术路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CLAW 的核心创新在于将人形机器人全身运动-语言数据的生成范式从“录制-标注”转变为“组合-仿真-自动标注”，从而绕开了传统管线中动作捕捉（MoCap）和人工标注两大瓶颈。其关键创新点可归结为三个相互耦合的 **changed slots**，分别对应数据生成方式、语言标注方式和交互接口的范式转换。
 
@@ -107,7 +111,7 @@ CLAW 引入**基于模板的确定性标注引擎**，直接从驱动规划器�
 - **运动基元的可扩展性**：预定义的 25 种运动模式是固定的，不支持用户自定义基元或通过强化学习获取新技能，限制了行为多样性的上限。
 - **Sim-to-Real 差距**：系统完全依赖仿真环境，生成的仿真数据向真实机器人部署的迁移尚未验证，可能需要额外的域适应步骤。
 
-## 整体框架
+
 
 CLAW 的系统设计围绕一个核心目标展开：将人形机器人全身运动‑语言数据的获取从昂贵的动作捕捉（MoCap）和人工标注中解放出来，转而依赖参数化运动基元的组合与物理仿真。为此，整个 pipeline 被解耦为四个独立进程，通过结构化消息流实现端到端的数据生成。
 
@@ -147,7 +151,7 @@ CLAW 的系统设计围绕一个核心目标展开：将人形机器人全身运
 ![[assets/figures/papers/paper_list_l46_https_arxiv_org_abs_2604_11251v3/figures/006_Figure_5.jpg]]
 *Figure 5: System architecture of CLAW. The pipeline comprises four decoupled processes: a MuJoCo simulation, a C++ controller hosting the kinematic planner and tracking policy, a WebSocket–ZMQ bridge for protocol translation and recipe orchestration, and a browser-based frontend for visualization and operator interaction*
 
-## 核心模块与公式推导
+
 
 CLAW 的推理与数据生成流程由五个解耦模块串联构成，整体架构见 **Fig. 5**。操作者通过前端接口下达运动意图，经协议桥接层转换为结构化命令，驱动运动学规划器生成参考轨迹，再由全身控制器在物理仿真中跟踪执行，最终由语言标注引擎从运动参数自动生成多风格自然语言描述。
 
@@ -202,7 +206,9 @@ CLAW 的推理与数据生成流程由五个解耦模块串联构成，整体架
 ![[assets/figures/papers/paper_list_l46_https_arxiv_org_abs_2604_11251v3/figures/007_Figure_6.jpg]]
 *Figure 6: Motion stitching. CLAW enables motion stitching across semantically distinct motion modes. (a) The generative planner produces smooth, natural transitions between different motion modes. (b) Abrupt mode switching might lead to transient artifacts in the generated motion*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 CLAW 的核心贡献在于提出了一套无需动作捕捉、可规模化生成物理可行且语言标注丰富的全身运动数据流水线。因此，实验部分并非与传统文本到运动生成模型进行定量指标对比，而是围绕**系统能力验证**与**数据生成质量**展开，重点考察三个维度：运动拼接的平滑性、自动化语言标注的规模与多样性，以及系统架构的工程可行性。
 
@@ -245,7 +251,9 @@ CLAW 的实验验证侧重于**系统能力演示**而非传统基准测试。�
 
 ![[assets/figures/papers/paper_list_l46_https_arxiv_org_abs_2604_11251v3/figures/009_Table.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 数据生成范式的代际转换
 
@@ -282,6 +290,8 @@ CLAW 当前的设计在以下条件下有效：
 4. **Sim-to-Real 差距**：CLAW 生成的数据和策略均在仿真中验证，物理仿真虽能过滤大部分不可行运动，但仿真动力学与真实硬件的差异可能导致部署时的性能退化。是否需要领域随机化或在线适应等额外步骤，尚未在论文中探讨。
 
 5. **标注的语义精度**：模板引擎从运动参数生成描述，其语义粒度受限于参数本身的表达能力。对于涉及复杂空间关系或精细手部动作的运动，参数化描述可能丢失关键语义细节。这一问题在需要细粒度时空对齐的下游任务（如具身指令跟随）中尤为突出。
+
+
 
 ## 原文 PDF
 

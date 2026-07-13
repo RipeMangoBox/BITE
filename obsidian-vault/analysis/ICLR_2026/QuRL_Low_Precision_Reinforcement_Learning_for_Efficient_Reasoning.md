@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/QuRL_Low_Precision_Reinforcement_Learning_for_Efficient_Reasoning.pdf
+project_link: null
+code_link: null
 openreview_forum_id: eG0bpCwdKn
 aliases:
 - QQRL
@@ -42,7 +44,7 @@ claims:
 > - AIME 2024 上，Avg@1 为 36.66 (QuRL w/o UAQ FP8)，对比 0.00 (INT8 RL)，变化 +36.66。
 > - DeepScaleR (5 tasks avg) 上，Avg@32 (%) 为 55.48 (QuRL w/ UAQ INT8)，对比 56.40 (RL BF16) | 52.31 (INT8 RL)，变化 -0.92 vs BF16, +3.17 vs INT8 RL。
 
-## 概述
+## 概要
 
 在基于可验证奖励的强化学习（RL）训练大语言模型（LLM）推理能力时，rollout阶段因自回归解码特性消耗约70%的训练时间，成为制约训练效率的核心瓶颈。直接对旧Actor模型进行低精度量化（如INT8/FP8）以加速rollout是一种直观方案，但会引入策略分歧和梯度估计偏差，导致训练奖励崩溃（Figure 2）。QuRL（Quantized Reinforcement Learning）针对这一矛盾，提出了一套系统性的低精度RL训练框架，其核心思路是：**将行为策略（量化Actor）与近端策略（全精度Actor）解耦**，并通过自适应裁剪范围（ACR）和更新感知量化（UAQ）两项关键技术，在保持训练稳定性的同时实现显著的推理加速。
 
@@ -52,7 +54,7 @@ claims:
 
 QuRL的主要局限在于：FP8 KV缓存量化因推理引擎支持不完善而未能采用；与全精度训练相比仍存在约1-2%的精度差距；ACR和UAQ引入的额外超参数（截断常数$C$、缩放因子$s$）需针对不同任务调整。未来方向包括探索更低精度（如4-bit）下的稳定性、自动化超参数选择，以及在更大规模模型和在线RLHF场景下的扩展性验证。
 
-## 背景与动机
+
 
 ### 推理增强学习中的效率瓶颈
 
@@ -79,7 +81,9 @@ QuRL的主要局限在于：FP8 KV缓存量化因推理引擎支持不完善而�
 
 QuRL正是围绕这两个缺口展开：提出**解耦PPO目标**与**自适应裁剪范围（ACR）**以稳定训练，设计**更新感知量化（UAQ）**以提升权重更新的信噪比，最终在保持训练稳定性的前提下，实现低精度Rollout的高效推理加速。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 QuRL 的核心创新并非简单地用低精度模型替代全精度 Actor 进行 rollout，而在于识别并系统性地解决了量化引入后强化学习训练中三个相互耦合的崩溃机制。以下按 changed slots 展开。
 
@@ -129,7 +133,7 @@ $$ \mathcal{I}_{\mathrm{ACR}}(\theta) = \tilde{\mathbb{E}}_{o \sim \pi_{\theta_{
 
 **注意**：UAQ 在高学习率场景（如 GSM8K PPO 实验的 $\alpha=10^{-5}$）下被禁用，因为此时权重更新幅度已足够大，额外放大反而可能破坏训练稳定性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l49_https_openreview_net_forum_id_eG0bpCwdKn/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of QuRL training. The sampling model $\theta _ { \mathrm { o l d } }$ is quantized to $\hat { \theta } _ { \mathrm { o l d } }$ for rollout
@@ -153,7 +157,7 @@ QuRL 的核心思路是将 RL 训练中耗时最长的 rollout 阶段从全精�
 
 **方法定位** QuRL 并非简单的“量化后训练”，而是通过解耦目标、自适应裁剪和前置缩放三个机制协同，将量化引入的分布偏移从“训练崩溃”转化为“可控的精度-效率权衡”。这一框架在 PPO、GRPO、DAPO 三种 RL 算法上均得到验证（Section 5），表明其与具体 RL 目标的耦合度较低。
 
-## 核心模块与公式推导
+
 
 QuRL 的训练管线包含六个关键模块，围绕“量化旧 Actor 加速 rollout，全精度 Actor 稳定更新”这一核心思路展开。
 
@@ -214,7 +218,9 @@ $$W X = \left( \frac{W}{s} \right) \cdot (s X)$$
 
 梯度计算和参数更新始终在全精度 Actor $\theta$ 上进行，仅 rollout 阶段使用量化模型加速。这确保了策略优化过程不受量化噪声累积影响，同时保持了低精度推理的效率优势。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 效率瓶颈与训练稳定性诊断
 
@@ -279,7 +285,9 @@ QuRL的出发点源于一个明确的效率观察：在基于可验证奖励的R
 
 5. **模型规模与任务泛化性**：当前实验覆盖7B至32B模型和数学推理任务，在更大规模模型（70B+）及在线RLHF等更复杂场景下的表现尚未验证。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位与核心瓶颈
 
@@ -324,6 +332,8 @@ QuRL 的技术贡献可分解为三个递进的组件：
 - 在更大规模模型（70B+）和更多样化任务（如代码生成、多模态推理）上的扩展性如何？
 - 解耦 PPO 中近端策略与行为策略的差异可否通过其他重要性采样方法（如自适应重要性采样）进一步减小，从而降低对截断参数 $C$ 的依赖？
 - QuRL 在在线 RLHF 场景下的表现与稳定性是否仍然保持？当前验证集中于离线可验证奖励任务，人类反馈引入的奖励噪声可能与量化噪声产生交互效应。
+
+
 
 ## 原文 PDF
 

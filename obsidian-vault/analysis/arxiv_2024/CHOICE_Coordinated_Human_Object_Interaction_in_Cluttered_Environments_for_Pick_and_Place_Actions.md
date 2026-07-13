@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2024
 pdf_ref: paperPDFs/arxiv_2024/CHOICE_Coordinated_Human_Object_Interaction_in_Cluttered_Environments_for_Pick_and_Place_Actions.pdf
+project_link: null
+code_link: null
 aliases:
 - CCHOICEPPA
 tags:
@@ -39,13 +41,13 @@ claims:
 > - Pick-and-place in cluttered scenes (full-body motion quality) 上，Fréchet distance (↓) 139 vs 157 (cuRobo traj.) (-11%)。
 > - 同上 上，Unsmoothness (cm/s²) (↓) 5.94 vs 6.54 (-9.2%)；Sliding (cm/s) (↓) 6.17 vs 7.22 (-14.5%)；EE RMSC (cm⁻¹) (↓) 0.0408 vs 0.0725 (-43.7%)。
 
-## 概述
+## 概要
 
 杂乱环境下的抓放操作是具身智能体执行日常任务的基础能力，但现有工作主要聚焦于开放空间中的单步抓取，难以处理多步骤交互（如打开容器、移除障碍物）所要求的双手协调、无碰撞轨迹规划以及离散子任务间的平滑过渡。**CHOICE** 系统将交互合成分解为层次化目标驱动任务，通过双手调度器（Bimanual Scheduler）将抽象的用户指令转化为双手关键帧序列，利用隐式神经时间-到达场（Implicit Neural Trajectory Planner, INTP）生成可泛化的无碰撞手部轨迹，并基于 DeepPhase 线性动力学模型与 Kalman 滤波实现相位目标的平滑过渡，从而在保留高频运动细节的同时生成自适应的全身交互运动。
 
 核心实验结果表明：INTP 在手-物交互轨迹上的 Fréchet 距离相比 **cuRobo**（Sundaralingam et al., ICRA 2023）降低 11%（139 vs 157）；基于 Kalman 滤波的深度相位控制器使运动不平滑度降低 9.2%（5.94 vs 6.54 cm/s²）、脚滑降低 14.5%（6.17 vs 7.22 cm/s）；三通道隐式场设计在场景泛化测试中达到 98.8% 的成功率与最高的安全距离（8.66 cm）。系统在多样化的杂乱厨房场景中展现了协调的双手交互能力，但其全身碰撞避免、对未见容器结构的泛化以及 3D 感知导航仍存在局限。
 
-## 背景与动机
+
 
 ### 问题场景：杂乱环境下的全身协调交互
 
@@ -79,7 +81,9 @@ claims:
 
 基于上述动机，CHOICE 系统将交互合成分解为三个协同工作的子模块：隐式神经轨迹规划器（INTP）负责生成无碰撞的手部轨迹，DeepPhase 交互控制器负责自回归地预测全身运动，双手调度器负责根据用户指令和场景状态安排关键帧序列。这种层次化的分解使得每个模块可以专注于解决特定的技术挑战，同时通过明确的目标接口实现模块间的无缝协作。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CHOICE 面向杂乱环境中多步骤、双手协调的抓放任务，其核心创新在于将交互合成建模为**层次化目标驱动任务**，在三个关键维度上实现了相对于现有方法的范式转变。
 
@@ -121,7 +125,7 @@ Kalman 滤波器根据目标关键关节变换估计目标相位，通过预测-
 
 > **注意**：Diffusion Policy 的具体引用元数据未在分析中提供，如需精确引用请手动核实。
 
-## 整体框架
+
 
 CHOICE 将杂乱环境下的双手抓放交互合成建模为一个**层次化目标驱动任务**，自上而下分解为三个核心子任务：手-物轨迹规划、全身运动控制，以及双手目标调度。系统接收用户通过键盘发出的抽象动作指令（如“抓取茶壶并放置到指定位置”）和鼠标点击的目标物体，输出角色全身运动序列。
 
@@ -153,7 +157,7 @@ CHOICE 将杂乱环境下的双手抓放交互合成建模为一个**层次化�
 
 三个子系统形成闭环：控制器输出的角色状态反馈至调度器，用于判断任务完成状态并触发下一子任务的目标切换。
 
-## 核心模块与公式推导
+
 
 ### 4.1 手-物轨迹的联合神经隐式表示
 
@@ -219,7 +223,9 @@ $$\mathbf{X}_{t+\Delta t}^{\mathcal{P}}=\mathbf{A}\mathbf{X}_t^{\mathcal{P}}+\ma
 ![[assets/figures/papers/paper_list_l1666_CHOICE_Coordinated_Human_Object_Interaction_in_Cluttered_Environments_fo/figures/006_Figure_5.jpg]]
 *Figure 5: The distribution of amplitude and frequency control in U, revealing the natural motion transitions, which exhibit consistent acceleration and deceleration pa erns and perform the motion diversity during interactions, follows the zero-mean Gaussian distribution in the frequency-domain latent*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -303,7 +309,9 @@ Fig. 13 展示了系统在全新场景下的典型失败案例：
 ![[assets/figures/papers/paper_list_l1666_CHOICE_Coordinated_Human_Object_Interaction_in_Cluttered_Environments_fo/figures/008_Figure_7.jpg]]
 *Figure 7: Our trajectory planner will detect the cases where the clicking target (teapot) cannot be grasped. To always achieve the interaction task, our system can sequentially remove the obstacle and then re-plan to take the target object out utilizing the available hands, and finally, we can place the obstacle back to any clicking position inside the blocks. Among the trajectory visualizations, the object/skeleton from transparent to opaque sequentially shows the in-hand motion; the blue and green trajectories record the approaching and leaving motion, respectively*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法定位与核心差异
 
@@ -360,6 +368,8 @@ CHOICE 的方法设计体现了对以下工作的继承与创新：
 4. **目标姿态计算**：如何利用视频先验计算适应多样化场景的最优目标可达姿态，减少对预定义模板的依赖？
 
 这些问题指向了从运动守恒假设向动态矢量场、从预定义模板向学习式场景理解、从 2D 导航向 3D 感知的关键技术跃迁方向。
+
+
 
 ## 原文 PDF
 

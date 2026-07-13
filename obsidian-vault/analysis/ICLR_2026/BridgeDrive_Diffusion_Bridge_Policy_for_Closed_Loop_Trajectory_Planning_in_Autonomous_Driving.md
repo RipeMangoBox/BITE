@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/BridgeDrive_Diffusion_Bridge_Policy_for_Closed_Loop_Trajectory_Planning_in_Autonomous_Driving.pdf
+project_link: null
+code_link: https://github.com/shuliu-ethz/BridgeDrive
 openreview_forum_id: dJKhjK4zpp
 aliases:
 - BridgeDrive
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | BridgeDrive：面向自动驾驶闭环轨迹规划的扩散桥策略 |
 | 英文题名 | BridgeDrive: Diffusion Bridge Policy for Closed-Loop Trajectory Planning in Autonomous Driving |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=dJKhjK4zpp); [GitHub](https://github.com/shuliu-ethz/BridgeDrive) |
+| Links | [paper](https://openreview.net/forum?id=dJKhjK4zpp) · [GitHub](https://github.com/shuliu-ethz/BridgeDrive) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/diffusion_image_video |
 | Method | BridgeDrive |
 | Dataset | Bench2Drive (PDM-Lite expert), LEAD dataset (LEAD expert) |
@@ -41,7 +43,7 @@ claims:
 > - Bench2Drive (PDM-Lite expert) 上，Success Rate (%) 为 74.99，对比 67.27 (SimLingo / TransFuser++)，变化 +7.72。
 > - LEAD dataset (LEAD expert) 上，Success Rate (%) 为 89.25，对比 86.8 (TFv6)，变化 +2.45。
 
-## 概述
+## 概要
 
 ### 问题背景与瓶颈
 
@@ -76,7 +78,7 @@ claims:
 
 BridgeDrive 在舒适性（Comfortness）和礼让（Give Way）指标上表现欠佳，倾向于频繁刹车以追求安全，可能牺牲乘客体验。此外，模型难以有效处理分布外场景（如累积误差导致的不合时机变道），且尚未集成视觉语言模型（VLA）的先验知识。如何在不牺牲安全性的前提下改善舒适性、高效蒸馏为单步规划器以降低推理延迟，以及融入 VLA 先验或通过强化学习后训练处理分布外场景，是值得进一步探索的方向。
 
-## 背景与动机
+
 
 自动驾驶闭环轨迹规划要求模型在复杂动态场景中生成安全、可执行且多模态的未来轨迹。近年来，扩散模型因其强大的高维分布建模能力和多模态生成优势，被引入该领域作为轨迹解码器。然而，现有基于锚点的扩散规划器——最具代表性的是 **DiffusionDrive**（Liao et al., 2025）——在理论层面存在一个根本性缺陷：其采用**截断扩散调度（Truncated Diffusion）**。
 
@@ -90,7 +92,9 @@ BridgeDrive 的核心洞察在于：**将闭环轨迹规划形式化为条件扩
 
 综上，BridgeDrive 的动机源于两个层面的改进需求：**理论层面**，以扩散桥替代截断扩散，恢复前向—逆向过程的对称性；**表示层面**，以几何路径路点替代时间路点，提升轨迹表示的泛化能力和任务适配性。这两项设计共同构成了一个理论一致、锚点引导的扩散规划框架。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 BridgeDrive 的核心创新在于将闭环轨迹规划重新形式化为**条件扩散桥（Conditional Diffusion Bridge）过程**，从根本上解决了现有基于锚点的扩散规划器（如 DiffusionDrive）中前向与逆向过程不对称的理论缺陷。
 
@@ -134,7 +138,7 @@ $$\mathrm{d}x_t = f(t) x_t \mathrm{d}t + g(t)^2 \nabla_{x_t} \log q(x_T | x_t) +
 
 尽管扩散桥范式在理论上更优雅，但其性能增益高度依赖锚点分类器的精度。当分类器选择错误锚点时，扩散桥可能将轨迹引导至不合理方向（Figure 1 红色轨迹示例）。此外，模型在舒适性指标上表现欠佳，倾向于频繁刹车以追求安全，且无法有效处理分布外场景（如累积误差导致的不合时机变道，Figure 7）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_dJKhjK4zpp/figures/002_Figure_2.jpg]]
 *Figure 2: Diagram for the planning procedure of BridgeDrive in Algorithm 3. The model architecture of the neural network denoiser $x _ { \theta } ( x _ { t }$ , t , $x _ { T }$ , z ) is detailed in the light blue box*
@@ -185,7 +189,7 @@ BridgeDrive 的推理遵循 Algorithm 3 的规划流程：
 
 与 **DiffusionDrive**（Liao et al., 2025）等采用截断扩散的基线方法不同，BridgeDrive 的扩散桥范式保证了前向扩散过程与逆向去噪过程的理论对称性。在截断扩散中，前向仅加噪至中间时刻 $T_{\text{trunc}}$，逆向从噪声锚点直接回归 GT，二者并不匹配；而 BridgeDrive 的前向过程从真实轨迹 $x_0$ 扩散至锚点 $x_T$，逆向过程沿对称路径从 $x_T$ 去噪恢复 $x_0$，从根本上消除了理论不一致性。
 
-## 核心模块与公式推导
+
 
 ### 轨迹表示：从时间路点到几何路点
 
@@ -243,7 +247,9 @@ BridgeDrive 的神经网络由三个模块组成：
 - **去噪模块**：接收噪声轨迹 $x_t$、时间步 $t$、锚点 $x_T$ 和条件 $z$，通过可变形交叉注意力与 BEV 交互，再与融合特征交叉注意力，最终由 MLP 预测去噪后的平均轨迹。
 - **锚点分类器模块**：利用 BEV 和融合特征与所有锚点进行交叉注意力，输出每个锚点的概率分布。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能对比
 
@@ -301,7 +307,9 @@ Table 7 显示 BridgeDrive 的推理耗时约是全扩散模型的 2 倍（因�
 2. **舒适性不足**：安全优先策略导致频繁刹车，在礼让和舒适性指标上表现欠佳。
 3. **锚点分类错误**：当分类器选错锚点时，扩散桥从错误起点出发，难以恢复到合理轨迹（Table 9, Figure 1 红色轨迹）。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心瓶颈与因果调控
 
@@ -364,6 +372,8 @@ BridgeDrive 与 **DiffusionDrive** 的关系最为密切，可视为其**理论�
 4. **路点表示的理论分析**：几何路径路点相对于时间路点的 +15.09% 成功率提升（Table 2）是否具有普适性？两种表示在不同驾驶任务（如跟车 vs. 变道）中的根本作用及最优融合方式仍需深入探索。
 
 5. **锚点多样性与分类精度的最优平衡**：锚点数量从 1 增加到 60 时成功率逐步上升，超过 60 后因分类精度下降而回落（Table 10）。如何动态调整锚点数量或设计更鲁棒的分类机制以适应不同场景复杂度？
+
+
 
 ## 原文 PDF
 

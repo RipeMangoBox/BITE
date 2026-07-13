@@ -44,7 +44,7 @@ claims:
 > - ImageNet cross-model (ViTs/MLPs) 上，AVGv (%) 47.50 vs 33.08 (FACL) (+14.42)。
 > - Cross-domain coarse-grained (CIFAR-10) 上，ASR (%) 33.10 vs 15.91 (CDA) (+17.19)。
 
-## 概述
+## 概要
 
 **核心问题：** 在Practical No-box Scenario (PNS)下，攻击者仅能获取少量无标签图像（如4,000张），缺乏大规模标注数据和预训练替代模型。现有生成式攻击严重依赖这些先验信息，导致替代模型训练困难、生成器产生的扰动碎片化且空间覆盖率低，对抗样本的可迁移性和生成速度均受到严重制约。
 
@@ -54,7 +54,7 @@ claims:
 
 **主要结果：** 在仅使用4,000张无标签图像的PNS设定下，PGA在ImageNet跨模型攻击中，对CNN的平均攻击成功率(AVGc)达到**71.39%**，较最佳基线GAPF提升14.98个百分点；对ViT/MLP的平均攻击成功率(AVGv)达到**47.50%**，较FACL提升14.42个百分点。在跨域（CIFAR-10、CUB等7个数据集）、跨任务（目标检测与实例分割）以及多种防御机制下，PGA均以显著优势超越现有方法，同时保持最高的推理速度。
 
-## 背景与动机
+
 
 深度神经网络在图像分类、目标检测等任务中取得了显著成功，但其固有的脆弱性——极易受到对抗样本攻击——已成为实际部署中的重大安全隐患。在攻击者视角下，对抗攻击通常被建模为三种场景：白盒攻击（完全知晓模型结构与参数）、黑盒攻击（可查询模型输出）以及无盒攻击（No-box Scenario）。其中，无盒场景最贴近现实，攻击者无法访问目标模型，只能依靠本地训练的替代模型生成对抗样本，并将其迁移至未知的目标模型。
 
@@ -82,7 +82,9 @@ claims:
 
 基于上述动机，本文提出**PGA（Prior-free Generative Attack）**，通过**课程式微鲁棒优化（CMRO）** 和**区域感知一致性扰动学习（RCPL）** 分别解决替代模型退化和扰动碎片化问题，首次在PNS设定下实现了高效且高可迁移性的生成式攻击。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PGA 的核心创新在于，针对 Practical No-box Scenario (PNS) 中“有限无标签数据 + 无预训练替代模型”的双重困境，将攻击问题分解为两个相互解耦但协同增强的阶段，并分别为每个阶段设计了全新的训练目标。
 
@@ -130,7 +132,7 @@ $$\mathcal{L}_{\mathrm{cro}}^{G} = \frac{2}{K(K-1)} \sum_{k' < k''} \|\mathbf{Gr
 
 Table 4 的消融实验直接量化了 CMRO 和 RCPL 的协同效应：同时应用两者后，ImageNet 上对 CNN 的平均攻击成功率 (AVGc) 从 54.18% 提升至 71.39%，对 ViT/MLP 的平均成功率 (AVGv) 从 32.95% 提升至 47.50%。两者贡献互补，单独移除任一组件的性能损失均超过 14 个百分点。
 
-## 整体框架
+
 
 PGA 的整体设计遵循两阶段流水线：**替代模型学习阶段（Surrogate Learning Stage）** 与**生成器训练阶段（Generator Training Stage）**，二者串行衔接，共同解决 Practical No-box Scenario 下先验信息匮乏的核心瓶颈。
 
@@ -174,7 +176,7 @@ CMRO 为生成器提供了更接近标准模型的、特征坍缩程度更低的
 ![[assets/figures/papers/paper_list_l910_https_openaccess_thecvf_com_content_CVPR2026_html_Peng_PGA_Prior_free_Ge/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of our Prior-free Generative Attack (PGA). For Surrogate Learning, we train the micro-robust surrogate from scratch via a curriculum of increasing difficulty. The surrogate first learns by aligning clean multi-view pairs (P) via*
 
-## 核心模块与公式推导
+
 
 PGA 面向 Practical No-box Scenario (PNS) 设计，攻击者仅能获取少量无标签图像（如 4,000 张），缺乏大规模标注数据与预训练替代模型。现有生成式攻击在此设定下严重退化：自监督学习在有限数据下易发生特征空间坍缩，生成器因缺乏强监督而产生碎片化、空间覆盖率低的扰动。PGA 通过两个阶段联合解决这一瓶颈：**替代模型学习阶段**采用课程式微鲁棒优化（CMRO）训练具有丰富表示的替代模型；**生成器训练阶段**采用区域感知一致性扰动学习（RCPL）引导生成空间连贯的细粒度扰动。整体框架见 Figure 3。
 
@@ -251,7 +253,9 @@ CMRO 和 RCPL 分别作用于替代模型训练和生成器训练阶段，二者
 ![[assets/figures/papers/paper_list_l910_https_openaccess_thecvf_com_content_CVPR2026_html_Peng_PGA_Prior_free_Ge/figures/005_Figure_5.jpg]]
 *Figure 5: Visualization of the joint distribution of cosine similarity GAPF and perturbation magnitude at the intermediate layer of the victim model for BIA [61] and our method. Lower similarity and larger magnitude indicate greater deviation of adversarial examples from clean images, corresponding to better attack performance*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 一、实验设置与公平性说明
 
@@ -317,7 +321,9 @@ Figure 5展示了BIA与PGA在受害者模型中间层的余弦相似度与扰动
 ![[assets/figures/papers/paper_list_l910_https_openaccess_thecvf_com_content_CVPR2026_html_Peng_PGA_Prior_free_Ge/figures/013_Table_7.jpg]]
 *Table 7: Results in ASR (%) under different defense mechanisms. All experiments are conducted on the ImageNet dataset with the same settings as in Tab. 1. The best results are shown in bold*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：Practical No-box Scenario (PNS) 的独特约束
 
@@ -385,6 +391,8 @@ PGA 提出的 **区域感知一致性扰动学习 (RCPL)** 引入了两个额外
 4. **跨架构泛化的理论理解**：PGA 在 CNN 和 ViT/MLP 之间的可迁移性提升显著（AVGv 从 32.95% 提升至 47.50%），但其背后的理论机制尚需更深入的分析——RCPL 的跨区域 Gram 一致性是否与 ViT 的自注意力机制存在某种结构上的契合？
 
 5. **动态场景下的适应性**：PGA 假设攻击者在训练阶段已拥有目标域的无标签图像。在完全动态的场景下（目标域数据在攻击时才能获取），PGA 的生成器能否快速微调以适应新域，仍需进一步研究。
+
+
 
 ## 原文 PDF
 

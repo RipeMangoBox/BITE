@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/MotionBench_Benchmarking_and_Improving_Fine_grained_Video_Motion_Understanding_for_Vision_Language_Models.pdf
+project_link: https://motion-bench.github.io
+code_link: null
 aliases:
 - TFTEF
 - MotionBench
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | MotionBench：面向视觉语言模型的细粒度视频运动理解基准测试与改进 |
 | 英文题名 | MotionBench: Benchmarking and Improving Fine-grained Video Motion Understanding for Vision Language Models |
 | 会议/期刊 | CVPR 2025 |
-| Links | [paper](https://arxiv.org/abs/2501.02955); [Project](https://motion-bench.github.io) |
+| Links | [paper](https://arxiv.org/abs/2501.02955) · [Project](https://motion-bench.github.io) |
 | Topic | #topic/representation_self_supervised_transfer #topic/representation_self_supervised_transfer/representation_learning |
 | Method | TE Fusion (Through-Encoder Fusion) |
 | Dataset | MotionBench Dev, MVBench, VideoMME (short) |
@@ -41,7 +43,7 @@ claims:
 > - MVBench 上，Accuracy 为 72.1 (TE Fusion k=4, 4输入帧)，对比 64.5 (无压缩 baseline, 4帧)，变化 +7.6。
 > - VideoMME (short) 上，Accuracy 为 61.0 (TE Fusion k=4, 4输入帧)，对比 51.4 (无压缩 baseline, 4帧)，变化 +9.6。
 
-## 概述
+## 概要
 
 现有视频视觉语言模型（Video VLMs）在细粒度运动理解方面存在严重瓶颈：主流模型在MotionBench基准上的准确率普遍低于60%（Table 3），其根本原因在于大语言模型（LLM）的序列长度限制阻碍了高帧率输入的实现，而当前主流的视频特征压缩方法仅依赖浅层融合（shallow fusion），难以有效消除帧间冗余并保留关键运动信息。
 
@@ -54,7 +56,7 @@ claims:
 - 在MVBench上，TE Fusion（k=4）取得72.1的准确率，远超无压缩Baseline的64.5，并全面优于其他压缩方法（Table 4）。
 - 当压缩比达到16（极端压缩）时，TE Fusion在MotionBench上依然保持强大性能，远高于其他压缩方法，表明深层融合对高压缩比场景具有独特优势（Table 8）。
 
-## 背景与动机
+
 
 视频理解是当前多模态大模型研究的核心方向之一。然而，现有视频视觉语言模型（Video VLMs）在细粒度运动理解方面表现严重不足——在MotionBench基准测试中，主流模型的准确率普遍低于60%（Table 3）。这一瓶颈的根源在于，精细的运动感知（如动作顺序、重复计数、相机运动识别）要求模型能够捕获帧与帧之间的细微时序变化，而这通常需要高帧率输入作为支撑。
 
@@ -62,7 +64,9 @@ claims:
 
 这一结构性缺陷在高压缩比场景下尤为突出：当压缩比增大时，浅层融合方法的性能快速下降，无法在有限的解码器输入长度内保留足够的运动线索。因此，如何在固定LLM序列长度的约束下，实现高效且运动感知能力强的视频特征压缩，成为提升细粒度运动理解能力的关键突破口。本文正是在这一背景下，提出**Through-Encoder Fusion（TE Fusion）**——一种在视觉编码器内部引入深层帧间融合的新范式，旨在从根本上解决浅层融合的局限性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于提出了一种**深层帧间融合范式——Through-Encoder Fusion (TE Fusion)**，以解决现有视频视觉语言模型（VLM）在细粒度运动理解中的根本瓶颈。
 
@@ -102,7 +106,7 @@ TE Fusion 在视频VLM压缩方法谱系中占据独特位置：
 
 TE Fusion 以 GLM4-9B 作为LLM主干，在 MotionBench 上取得了0.58的准确率（Dev AVG），超越了使用72B LLM的 Qwen2VL-72B（0.57），验证了深层融合范式的高效性（Table 3）。在相同的LLM输入序列长度下，TE Fusion（$k=4$）在 MVBench 上取得72.1的准确率，远超无压缩baseline的64.5（Table 4），进一步证明了深层融合在固定解码器预算下的显著优势。
 
-## 整体框架
+
 
 MotionBench 论文提出了一套“评测驱动改进”的双轨框架：一方面构建细粒度视频运动理解基准 **MotionBench**，另一方面针对评测暴露出的瓶颈设计 **Through-Encoder Fusion (TE Fusion)** 压缩架构。整体流程从视频输入到答案生成，可拆解为以下模块及其数据流关系。
 
@@ -135,7 +139,7 @@ TE Fusion 的核心创新在于将时间融合**深度嵌入视觉编码器内�
 
 这一设计的关键洞察是：通过编码阶段的深度帧间交互，TE Fusion 在不增加 LLM 输入长度的前提下，以更高的原始帧率捕获运动信息。当 $k \le 4$ 时，性能几乎无下降；即使在 $k=16$ 的极端压缩下，TE Fusion 在 MotionBench 上仍显著优于其他压缩方法（Table 8），验证了深层融合对高压缩比场景的独特优势。
 
-## 核心模块与公式推导
+
 
 ### 方法总览
 
@@ -186,7 +190,9 @@ $$\text{Annotation Density} = \frac{\text{Total length of questions}}{\text{Vide
 
 MotionBench 的标注密度达到 68.4，约为现有基准的两倍，反映了其问题标注的细粒度和高信息密度。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈验证：现有模型在MotionBench上的整体表现
 
@@ -259,7 +265,9 @@ TE Fusion通过在编码器内部引入分组自注意力，改变了这一信�
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2501_02955/figures/014_Table_7.jpg]]
 *Table 7: Benchmark results for different compression methods at various compression rates, all using the same sequence length in the VLM decoder. We set $\begin{array} { r } { \frac { N _ { \mathrm { i n p u t } } } { k } = 4 , 8 . } \end{array}$ , with the baseline representing video models that process 4 frames without compression. Note that each compression method is re-implemented on the GLM-4V-9B backbone to ensure a fair comparison
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 视频运动理解中的压缩范式谱系
 
@@ -306,6 +314,8 @@ TE Fusion 与三条基线路线的本质差异在于**时间融合的深度与�
 4. **Repetition Count 的突破路径**：所有模型在该任务上接近随机水平，说明现有架构可能缺乏对周期性模式的归纳偏置。引入显式的时序计数模块或频域特征是否必要？
 
 5. **计算开销的精确量化**：深层融合在编码器中引入了分组自注意力，虽然不增加 LLM 输入长度，但会增加编码阶段的计算量。这一开销与性能收益的 Pareto 前沿尚未被系统刻画。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Latent_Diffusion_Model_without_Variational_Autoencoder.pdf
+project_link: https://howlin-wang.github.io/svg
+code_link: https://github.com/shiml20/SVG
 aliases:
 - LDMWVA
 tags:
@@ -41,7 +43,7 @@ claims:
 > - ImageNet 256×256 (few-step, 5 steps) 上，FID-50K w/o CFG 12.26 (SVG-XL) vs 69.38 (SiT-XL, SD-VAE) (-57.12)。
 > - ImageNet 256×256 (few-step, 10 steps) 上，FID-50K w/o CFG 9.39 (SVG-XL) vs 32.81 (SiT-XL, SD-VAE) (-23.42)。
 
-## 概述
+## 概要
 
 扩散模型已成为视觉生成的主流范式，但现有方法普遍依赖变分自编码器（VAE）将图像压缩至低维潜在空间以降低计算成本。这一设计存在根本性瓶颈：**VAE潜在空间存在严重的语义纠缠，缺乏清晰的判别结构**，导致扩散模型训练效率低下、推理步数多，且难以作为统一视觉特征空间服务于多种任务。
 
@@ -51,7 +53,7 @@ claims:
 
 实验结果表明，SVG在ImageNet 256×256类条件生成任务上展现出显著优势：**SVG-XL仅需80个训练epoch、25步采样即达到gFID 3.54（w/ CFG）**，远优于同等条件下的SiT-XL（gFID 22.58）；在少步采样场景下，5步FID-50K仅为12.26，而SiT-XL高达69.38。此外，SVG特征在下游感知任务（ImageNet分类、ADE20K分割、NYUv2深度估计）上保持与DINO相比拟的性能，验证了其作为统一视觉特征空间的潜力。
 
-## 背景与动机
+
 
 ### 潜在扩散模型的成功与隐忧
 
@@ -76,7 +78,9 @@ claims:
 
 这一设计使得SVG空间同时继承了自监督特征的感知理解能力与重建所需的细节保真度，**为构建任务通用的视觉表示提供了可行路径**——扩散模型可直接在此空间上高效训练，且该空间可复用于分类、分割、深度估计等下游任务。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SVG 的核心创新在于**彻底摒弃了传统潜在扩散模型中依赖变分自编码器（VAE）进行压缩的范式**，转而构建一个基于自监督视觉基础模型（VFM）的、具有清晰语义判别结构的统一特征空间，并直接在该空间上训练扩散模型。这一转变并非简单的编码器替换，而是对潜在空间语义属性的根本性重塑，其关键创新体现在以下三个紧密耦合的层面。
 
@@ -111,7 +115,7 @@ SVG 将扩散模型直接部署在由 DINO 特征和残差特征拼接而成的�
 
 SVG 的另一重要创新在于其构建的特征空间**继承了自监督特征的感知理解能力**，具备作为任务通用视觉表示的潜力。实验表明，SVG 特征在 ImageNet 分类、ADE20K 分割和 NYUv2 深度估计等下游任务上保持了与 DINO 相比拟的性能（Table 4），并支持零样本类别条件编辑（Figure 6）和潜在空间插值（Figure 7）等应用。这使得 SVG 不仅是一个生成模型，更是一个向统一视觉特征空间迈进的框架。
 
-## 整体框架
+
 
 SVG 的整体框架围绕一个核心设计展开：**用自监督视觉基础模型（DINOv3）的强语义判别性特征空间，替代传统 VAE 的潜在空间，作为扩散模型的生成空间**。这一设计解决了 VAE 潜在空间中语义高度纠缠、缺乏清晰判别结构的瓶颈问题。
 
@@ -150,7 +154,7 @@ $$\mathcal{L}_{\mathrm{FM}} = \mathbb{E}_{\mathbf{x}_0 \sim p_0(\mathbf{x}), \ep
 
 该框架的根本优势在于：**语义分离性良好的潜在空间大幅简化了扩散模型的优化难度**。在语义分散的空间中，平均速度方向在类内一致、类间分离（Figure 4b），使得模型在更少训练轮次（80 epochs）和采样步数（25 steps）下即可达到高质量生成——SVG-XL 在 25 步、80 epoch 下即达到 gFID 3.54（w/ CFG），显著优于传统 VAE 扩散模型（Table 1）。同时，该空间继承了 DINOv3 的感知理解能力，为构建任务通用的视觉表示提供了可行路径。
 
-## 核心模块与公式推导
+
 
 ### 1. 扩散与流匹配基础
 
@@ -219,7 +223,9 @@ $$\theta = \operatorname{arccos}\left(\frac{(\pmb{x}_T^{0})^{\top} \pmb{x}_T^{1}
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2510_15301/figures/005_Figure_5.jpg]]
 *Figure 5: Visualization of SVG reconstruction. Incorporating the Residual Encoder enables SVG to better preserve visual information, such as color and high-frequency details*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -287,7 +293,9 @@ Table 4同时报告了SVG特征在多个下游视觉任务上的迁移性能。�
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2510_15301/figures/011_Figure_7.jpg]]
 *Figure 7: Visualization of interpolation using SVG. The first row shows direct linear interpolation, while the second row presents spherical linear interpolation*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位与核心瓶颈
 
@@ -352,6 +360,8 @@ Table 3 的编码器比较揭示了 SVG 设计的适用边界：DINOv3 在语义
 ### 6. 知识库定位总结
 
 SVG 在扩散模型知识库中的定位是：**首个彻底移除 VAE、直接在自监督语义原生空间上训练扩散模型的工作**。它不同于仅对扩散中间特征进行对齐的 REPA，也不同于同时对齐 VAE 和扩散特征的 VA-VAE，而是从根本上重构了潜在空间的来源。其核心贡献在于证明了语义分离性对扩散模型训练效率的因果性影响，并提供了可同时服务于生成和感知任务的统一特征空间蓝图。当前局限性主要集中在 CFG 效率、特征维度和任务覆盖范围，这为后续工作指明了改进方向。
+
+
 
 ## 原文 PDF
 

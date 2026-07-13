@@ -43,15 +43,13 @@ claims:
 > - BlendedMVS 上，Chamfer Distance (cm), Mean 1.64 vs 1.69 (GaussianSurfel) (-0.05 (本方法最佳))。
 > - DTU (scan122, 1/4 scale) 上，GPU 内存 (GB) 2 vs 8 (Iterative Mesh Rasterization) (减少75%内存)。
 
-## 概述
+## 概要
 
 多视角表面重建的核心瓶颈在于表示范式的两难：体积方法（如 NeRF、3D Gaussian Splatting）虽能通过体积渲染获得丰富的 3D 感受野，但必须依赖后置网格提取步骤（Marching Cubes、Poisson Reconstruction），这一过程会积累误差并往往生成过于稠密的网格；纯表面方法直接优化网格，却只有单层感受野，难以捕捉复杂几何细节，过度依赖法线、深度或着色等先验信息。**Mesh Splatting** 通过将基网格软化为多个可微分的半透明层（soft mesh），将表面表示转化为伪体积表示，从而在保留网格可控拓扑特性的同时，获得体积渲染带来的稳定梯度与广阔感受野，实现端到端的高精度表面重建。
 
 本方法的核心机制可概括为三个因果组件：**① 网格软化**——沿基网格顶点法线方向随机偏移生成多层半透明表面，各层透明度由到基网格的有符号距离可微计算，显著扩大 3D 感受野；**② 可微网格溅射**——基于瓦片光栅化投影三角面片，经深度排序后通过体积渲染合成像素颜色，使图像损失可直接反向传播更新基网格几何；**③ 混合拓扑控制**——早期采用 DMTet 维持拓扑稳定，后期冻结网格并启用连续重新网格化以优化面片质量。
 
 实验表明，Mesh Splatting 在 DTU 数据集上取得与当前最佳方法相当的精度（Chamfer Distance 0.62 cm），在 BlendedMVS 上以 1.64 cm 达到最优，同时顶点数仅为体积方法的约 15%，训练时间约 20 分钟/场景，比 Neuralangelo 快 30 倍以上。消融实验证实，多层软化带来的体积监督和混合拓扑控制策略对最终精度均至关重要。
-
-## 背景与动机
 
 ### 表面重建的两难困境
 
@@ -71,7 +69,7 @@ claims:
 
 这一思路的关键在于**软化网格（mesh softening）**：沿基网格顶点法线方向偏移生成多个半透明层，各层的透明度由该点到基网格的有符号距离可微计算。如此，原本不透明的单层表面被扩展为一个可控带宽的伪体积表示——它既保留了基网格的拓扑结构（可通过重新网格化调整面片质量），又获得了体积渲染带来的多层感受野，使梯度可以从偏离表面的区域反向传播以修正几何。
 
-## 核心创新
+## 核心方法与创新机理
 
 **Mesh Splatting** 的核心创新在于弥合了“体积重建精度高但需后置网格提取”与“表面重建可直接优化网格但感受野受限”之间的鸿沟。其关键洞察是：**将表面网格转化为伪体积表示，使体积渲染的丰富梯度能直接驱动基网格的端到端优化**，从而同时获得高精度几何与高质量可控拓扑。
 
@@ -112,8 +110,6 @@ $$
 
 这一设计使方法既能捕获正确的全局拓扑结构，又能在细节区域获得高质量的面片分布，最终在 DTU 上以约 300k 顶点（比 GaussianSurfel 少 85%）达到 0.62 cm 的 Chamfer 距离，逼近当前最佳水平。
 
-## 整体框架
-
 Mesh Splatting 的端到端多视角表面重建流水线由四个核心模块串联构成，形成“体积初始化 → 表面软化 → 可微溅射渲染 → 拓扑控制”的闭环优化路径，如 **Figure 3** 所示。
 
 ![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_PSgps4JXTb/figures/003_Figure_3.jpg]]
@@ -142,8 +138,6 @@ Mesh Splatting 的端到端多视角表面重建流水线由四个核心模块�
 ### 关键设计动机
 
 该流水线的核心洞察在于：通过将表面网格转化为伪体积表示，既保留了网格的可控拓扑特性（可通过重新网格化调整），又获得了体积渲染带来的丰富 3D 感受野和稳定梯度。这与纯体积方法（需后置网格提取步骤）和纯表面方法（仅单层感受野）形成根本区别——体积方法在 Marching Cubes 或 Poisson 重建阶段积累误差并常生成过于稠密的网格，而纯表面方法过度依赖法线、深度或着色等先验信息，难以捕捉复杂几何细节。
-
-## 核心模块与公式推导
 
 Mesh Splatting 将表面网格转化为可微伪体积表示，使体积渲染损失能够直接驱动基网格顶点更新。其核心由四个模块串联构成。
 
@@ -216,7 +210,7 @@ $$\mathbf{c} = \mathbf{c}_{d} + \mathbf{s} \odot \Phi_{s}( \mathbf{f}_{s}, \omeg
 ![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_PSgps4JXTb/figures/002_Figure_2.jpg]]
 *Figure 2: Comparison between regular meshes and soft mesh*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心性能对比
 
@@ -262,20 +256,8 @@ Mesh Splatting 在标准对象级多视角表面重建基准上取得具有竞�
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_PSgps4JXTb/figures/004_Table_1.jpg]]
-*Table 1: Surface reconstruction accuracy on DTU Jensen et al. (2014) dataset. Best results are highlighted as 1st and 2nd . Approximate vertex counts (in thousands) and training time (minutes) are shown on the right*
-
-![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_PSgps4JXTb/figures/005_Table_2.jpg]]
-*Table 2: Surface reconstruction accuracy on BlendedMVS Yao et al. (2020) dataset. Best results are highlighted as 1st and 2nd*
-
-![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_PSgps4JXTb/figures/007_Table_3.jpg]]
-*Table 3: Memory and training time for Mesh Splatting (MS), Iterative Mesh Rasterization (IMR), and Gaussian Splatting (GS) on DTU scan122 at different image scales*
-
 ![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_PSgps4JXTb/figures/010_Table_4.jpg]]
 *Table 4: Ablation metrics*
-
-![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_PSgps4JXTb/figures/008_Figure_6.jpg]]
-*Figure 6: Reference results on the NeRF Synthetic Dataset Martin-Brualla et al. (2021). We present results for the ship and ficus examples to better visualize thin structures*
 
 ![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_PSgps4JXTb/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of reconstruction paradigms. Yellow points denote ground-truth point clouds. “Verts” and “CD” denote the number of vertices and the Chamfer distance, respectively. (a) Our method optimizes meshes end-to-end and uses remeshing for topology control, achieving accurate surfaces with the fewest vertices. (b) SuGaR Guedon & Lepetit (2023) also optimizes ´ meshes but relies on a single-layer Gaussian-splatting proxy and cannot perform remeshing, which limits accuracy. (c–d) As volumetric methods, GaussianSurfel Dai et al. (2024) and Neuralangelo Li et al. (2023) require a meshing step to extract surfaces, which accumulates errors and often yields unnecessarily dense meshes; note the mi...*
@@ -283,7 +265,7 @@ Mesh Splatting 在标准对象级多视角表面重建基准上取得具有竞�
 ![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_PSgps4JXTb/figures/011_Figure_9.jpg]]
 *Figure 9: Qualitative comparison on Neuralangelo*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 问题瓶颈与范式断裂
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/A_Benchmark_for_Deep_Information_Synthesis.pdf
+project_link: null
+code_link: null
 aliases:
 - BDIS
 - DEEPSYNTH
@@ -41,7 +43,7 @@ claims:
 > - DEEPSYNTH 上，Exact Match 为 2.50，对比 0.0，变化 +2.50。
 > - DEEPSYNTH 上，LLMJudge Score 为 17.5，对比 0.0，变化 +17.5。
 
-## 概述
+## 概要
 
 DEEPSYNTH 是一个专为评估智能体在真实世界、多步骤信息综合任务上表现而设计的基准测试。其核心发现是：当前最先进的 LLM 和深度研究智能体在此类任务上表现严重不足。最佳模型（o3-deep-research）的 F1 得分仅为 8.97，精确匹配（EM）得分为 2.50，且仅能解决 120 个任务中的 3 个。这揭示了当前智能体的关键瓶颈不在于推理能力本身，而在于获取推理所需信息的可用性，尤其是在需要从多个来源综合信息时。
 
@@ -49,7 +51,7 @@ DEEPSYNTH 是一个专为评估智能体在真实世界、多步骤信息综合�
 
 主要结果进一步证实了上述瓶颈。在消融实验中，提供中间推理步骤（Intermediate Steps）能显著提升性能，例如 Smolagent (GPT-4.1) + Intermediate Step 的 F1 从 6.33 提升至 10.50。此外，工具增强（尤其是代码解释器）是提升性能的主要可调节变量。然而，所有模型在非洲相关任务上的 F1 得分为 0.0，揭示了严重的地理政治偏差。错误分析也表明，导航错误和综合错误是最主要的失败模式。
 
-## 背景与动机
+
 
 当前智能体在需要跨多个来源综合信息的任务上表现极差，这一瓶颈并非源于推理能力本身，而是获取推理所需信息的可用性不足。现有基准测试（如Wei et al., 2025的工作）主要依赖从已知事实反向设计问题，且多集中于Wikipedia等单一知名来源的浅层事实检索，无法反映真实世界中多步骤、多源信息综合的复杂性。DEEPSYNTH基准测试正是为填补这一缺口而设计。
 
@@ -61,7 +63,9 @@ DEEPSYNTH的核心动机在于构建一个能够系统评估“深度信息综�
 
 此外，所有模型在非洲相关任务上的F1得分为0.0（Table 5），揭示了严重的地理政治偏差，这进一步凸显了当前模型在处理代表性不足地区数据时的根本性缺陷。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DEEPSYNTH 的核心创新不在于提出一个新的模型或算法，而在于构建了一个能够揭示当前智能体根本瓶颈的评估框架。其关键创新体现在三个 changed slots 上：
 
@@ -73,7 +77,7 @@ DEEPSYNTH 的核心创新不在于提出一个新的模型或算法，而在于�
 
 **核心洞察**：实验证据表明，当前瓶颈不在于推理能力，而在于获取推理所需信息的可用性。推理模型（如 Gemini-2.5-Pro, DeepSeek-R1）与通用 LLM（如 GPT-4.1）在 F1 上的差距很小（Section 4.1），而提供中间步骤（Intermediate Steps）却能带来显著提升——Smolagent (GPT-4.1) 的 F1 从 6.33 跃升至 10.50，EM 从 7.14 升至 10.0（Table 3）。这揭示了因果机制中的关键可调节变量：**工具增强（尤其是代码解释器）和显式规划引导**是提升性能的主要杠杆，而非模型本身的推理能力。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0001_0Dhpt9aY3n_A_Benchmark_for_Deep_Information_Synthesis/figures/002_Figure_2.jpg]]
 *Figure 2: An overview of our data collection process for building the DEEPSYNTH benchmark*
@@ -84,7 +88,7 @@ DEEPSYNTH基准测试的构建与评估遵循一个可复现的、以数据源�
 
 整个基准测试的输入输出流可概括为：输入是一个包含问题描述、领域标签、地区标签和可选中间步骤的DEEPSYNTH任务；模型（无论是纯LLM还是基于智能体框架的系统）需通过多步操作（包括网络浏览、多源信息收集、推理和答案生成）输出结构化的JSON答案；输出通过上述三个指标与人工标注的标准答案进行比对。该pipeline的关键瓶颈不在于模型的推理能力本身（推理模型与通用LLM在F1得分上的差距很小），而在于获取推理所需信息的可用性——这体现在所有模型在非洲相关任务上F1得分为0.0，以及OWL (GPT-4.1)的错误分析中导航错误和综合错误是最主要的失败类型。
 
-## 核心模块与公式推导
+
 
 ### 基准构建模块
 
@@ -131,7 +135,9 @@ $$1 - \frac{|\text{correct\_answer} - \text{extracted\_final\_answer}|}{\max(|\t
 | `abs(...)` | 绝对值函数 |
 | `max(...)` | 取最大值函数 |
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：DEEPSYNTH 基准测试上的性能表现
 
@@ -184,7 +190,9 @@ DEEPSYNTH 基准测试揭示了当前最先进的 LLM 和深度研究智能体�
 ![[assets/figures/papers/iclr26_0001_0Dhpt9aY3n_A_Benchmark_for_Deep_Information_Synthesis/figures/003_Table_1.jpg]]
 *Table 1: DEEPSYNTH statistics across tasks*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有基准的关系
 
@@ -225,6 +233,8 @@ DEEPSYNTH 定位为首个系统性评估多步、多源信息综合能力的基�
 3. **全球代表性**：如何构建更平衡、更具全球代表性的信息综合基准？非洲等地 F1=0.0 的问题不仅是数据问题，也反映了当前智能体在处理非英语、非结构化、低可见性数据源时的系统性缺陷。
 
 4. **评估框架的扩展**：如何设计能衡量开放形式、论证充分答案的评估方法？这需要超越封闭式 JSON 匹配的范式。
+
+
 
 ## 原文 PDF
 

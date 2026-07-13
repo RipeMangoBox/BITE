@@ -43,7 +43,7 @@ claims:
 > - InstVL-1K (video) instance 上，T2V R@1 60.63 vs 40.38 (UMT-L g+i) (+20.25)。
 > - InstVL-1K (img) global 上，T2V R@1 99.20 vs 96.20 (UMT-L g+i) (+3.00)。
 
-## 概述
+## 概要
 
 当前视觉语言预训练（VLP）框架普遍依赖全局视频-文本对齐，缺乏实例级监督，导致模型无法精确识别和区分文本中提到的特定对象或实体。这一瓶颈在需要细粒度时空理解的场景（如视频中特定实例的检索与定位）中尤为突出。
 
@@ -57,7 +57,7 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{rec}} + \mathcal{L}_{\mathrm{global}} + \ma
 
 消融实验进一步证实，增加实例感知损失后，视频实例检索平均召回从 57.71 提升至 75.32；可学习的实例温度参数和轨迹数据集的引入均带来显著增益。
 
-## 背景与动机
+
 
 ### 视觉语言预训练的全局对齐瓶颈
 
@@ -82,7 +82,9 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{rec}} + \mathcal{L}_{\mathrm{global}} + \ma
 
 为支撑实例感知预训练，本文构建了**InstVL**数据集，其核心特点是**双粒度文本标注**：每个视觉样本同时配备一个全局场景描述和一组实体锚定的轨迹实例描述。这种数据组织形式使得模型在训练时能够同时接收全局和实例级监督信号，为联合优化目标提供了必要的数据基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈诊断：全局对齐的粒度缺失
 
@@ -128,7 +130,7 @@ $$\mathcal{L} = \mathcal{L}_{\text{rec}} + \mathcal{L}_{\text{global}} + \mathca
 
 现有细粒度视觉语言工作（如基于 **CLIP4Clip** 的区域匹配或 **SigLIP** 的密集对齐）通常将实例理解作为后处理步骤或微调阶段的附加模块。InstAP 的根本不同在于：**实例感知是预训练损失函数的内生组成部分**，而非事后嫁接。这解释了为何在完全相同的训练数据下，InstAP 大幅超越仅使用全局描述或全局化实例描述的 UMT-L 基线（例如 InstVL-10K (img) 上 T2V R@1 44.05 vs 34.83），差距源于实例感知对齐机制本身，而非数据量的增加。
 
-## 整体框架
+
 
 InstAP 的整体设计围绕一个核心命题展开：**实例级理解不应是预训练后的附加任务，而应作为预训练阶段的内在特性**。为此，框架将全局场景对齐与细粒度实例感知对齐统一在一个端到端的联合优化目标下，形成“全局-局部”双支路协同的预训练范式。
 
@@ -201,7 +203,7 @@ $$\mathcal{L}_{\mathrm{VTC}}^{\mathrm{inst}} = -\frac{1}{N}\sum_{n=1}^{N} \log \
 
 三个阶段的输出通过联合损失 $\mathcal{L}$ 统一反向传播，使得视觉编码器在预训练过程中同时学习全局场景语义和细粒度实例-文本对应关系。消融实验（Table 4）证实，仅添加实例感知损失即可将 InstVL-1K 视频实例检索的平均召回从 57.71 提升至 75.32，验证了该支路的独立贡献。
 
-## 核心模块与公式推导
+
 
 ### 3.1 掩码视频建模编码器
 
@@ -274,7 +276,9 @@ $$
 ![[assets/figures/papers/paper_list_l2397_https_arxiv_org_abs_2604_08337/figures/003_Figure_3.jpg]]
 *Figure 3: Our instance-aware alignment mechanism. Instance features (Query Q) from a Trajectory RoI Encoder (fθ) are fused with global context (Key K, Value V ) via an Attention Pool to create an instance-aware embedding. This embedding is contrasted with text features*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -347,7 +351,9 @@ Table 3 报告了 InstVL-1K 上的视觉定位指标。InstAP 在所有 IoU 阈�
 ![[assets/figures/papers/paper_list_l2397_https_arxiv_org_abs_2604_08337/figures/008_Figure_5.jpg]]
 *Figure 5: InstAP consistently retrieves correct fine-grained descriptions, whereas the global baseline [29] is confounded by semantic distractors and mismatches the query*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 InstAP 的核心贡献在于将**实例感知对齐**从下游任务的后处理提升为预训练阶段的基础目标，从而在视觉语言模型的谱系中开辟了一条介于纯全局对齐与全密集标注之间的中间路径。
 
@@ -386,6 +392,8 @@ InstAP 的能力边界由其预训练目标直接决定：
 2. 对更长视频序列或更密集交互场景，当前框架的可扩展性如何？44.6% 的多实例混淆率提示了扩展瓶颈。
 3. 实例感知表征能否作为多模态大模型（MLLM）的视觉编码器，为 MLLM 提供更细粒度的视觉基座？
 4. 如何进一步降低训练成本，使实例感知预训练更易被社区复现和改进？
+
+
 
 ## 原文 PDF
 

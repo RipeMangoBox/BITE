@@ -43,7 +43,7 @@ claims:
 > - Multi-Turn Editing (custom benchmark) 上，User Preference (%) 93.75 vs 3.75 (VoxHammer) / 2.50 (TRELLIS) (+90.0 / +91.25)。
 > - PointLLM-200 captioning 上，GPT-img (render-grounded judge) 65.91 (EVA01-Final) vs 56.05 (GT caption) (+9.86)。
 
-## 概述
+## 概要
 
 现有3D生成方法将语义理解与几何重建解耦，无法将3D网格作为原生模态融入多模态大语言模型（MLLM）的序列流，缺乏语义先验与几何流形的系统对齐，且均为无状态重建，难以在多轮编辑中保持几何身份一致性。
 
@@ -58,7 +58,7 @@ EVA01针对这一瓶颈提出了一套统一框架。其核心洞察在于：通
 
 EVA01当前仍存在对分布外组合泛化有限、单视图输入下薄结构细节丢失等局限，但其在统一原生3D理解与生成方面的突破，为构建真正的3D原生多模态基础模型提供了清晰的架构范式和训练路线。
 
-## 背景与动机
+
 
 ### 3D内容生成的范式瓶颈
 
@@ -82,7 +82,9 @@ EVA01当前仍存在对分布外组合泛化有限、单视图输入下薄结构
 
 EVA01的动机由此展开：通过**混合专家Transformer（Mixture-of-Transformers）**将模型解耦为理解专家（$E_{\text{und}}$）和生成专家（$E_{\text{gen}}$），前者作为稳定的语义锚点继承预训练MLLM的多模态先验，后者专注于几何合成，两者通过共享全局注意力和硬模态路由实现跨模态知识迁移。同时，采用**结构化的稀疏网格潜在表示**（O-Voxel）替代无序VecSet，每个token绑定到固定的三维坐标，联合编码几何与材质信息，并引入**3D交错MRoPE**注入欧氏空间结构偏置。配合五阶段课程学习策略，EVA01旨在将预训练MLLM的语义先验高效迁移到3D域，使文本、图像和3D网格在统一序列中协同，实现原生理解与身份保持的上下文感知编辑。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 EVA01的核心创新在于将3D网格作为原生模态融入多模态大语言模型（MLLM）的序列流，通过**混合专家Transformer（Mixture-of-Transformers, MoT）架构**、**结构化稀疏网格潜在表示**和**五阶段课程学习**三大设计，系统性地解决了现有方法中语义理解与几何生成解耦、缺乏身份保持编辑能力的瓶颈。
 
@@ -137,7 +139,7 @@ $$\mathbf{c}_k = \{ \mathbf{t}_{\mathsf{inst}}, \mathbf{x}_{\mathsf{hist}} \}$$
 
 > **需要人工核实**：MoE架构中理解专家与生成专家的参数规模比例、共享注意力层的具体数量等实现细节需查阅原文确认。
 
-## 整体框架
+
 
 EVA01 是一个统一的原生 3D 理解与生成多模态大语言模型（MLLM），其核心设计目标是将文本、图像和 3D 网格作为**一等公民**融入单一序列流，在连续上下文中同时支持网格理解、文本/图像条件生成以及上下文感知的多轮编辑。为此，EVA01 从三个层面重构了模型架构：**混合专家（Mixture-of-Transformers, MoT）骨干网络**、**结构化稀疏网格潜在表示**，以及**五阶段课程学习策略**。
 
@@ -186,7 +188,7 @@ EVA01 的输入输出流围绕统一序列组织，支持多种模态组合：
 3. **对齐预热 vs. 直接指令微调**：直接指令微调导致网格理解性能饱和且归一化字幕得分更低，10K 步对齐预热后再微调获得更优表现（Figure 10 left）。
 4. **模态丢弃**：在 Stage 3 中必不可少，防止生成专家在弱文本条件下忽略文本语义（Sec. 5）。
 
-## 核心模块与公式推导
+
 
 EVA01 的核心设计围绕一个核心矛盾展开：如何将预训练 MLLM 的语义先验高效迁移到 3D 几何域，同时保持多轮编辑中的身份一致性。其解决方案可归纳为三个关键模块：**混合专家 Transformer 主干**、**结构化稀疏网格潜在表示**，以及**五阶段课程学习策略**。
 
@@ -257,7 +259,9 @@ $$\mathcal{L}_{\mathsf{CE}}(\theta) = - \sum_{i=1}^{T} \log p_\theta (t_i \mid t
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2605_16745/figures/015_Figure_9.jpg]]
 *Figure 9: Representation visualization across visual and image-generation encoders. We visualize the same feature paths probed in Table 6 using input views, PCA projections, normalized activation maps, self-similarity, and cross-view correspondence overlays. Lavender rows denote semantic or understanding-token paths, while mint rows denote dense visual or generation-side latent paths. The visualization reveals that global semantic alignment, dense spatial correspondence, and generation-side appearance latents form distinct representation regimes rather than a single universally optimal feature space*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果分析
 
@@ -326,7 +330,9 @@ Figure 11系统展示了EVA01的典型失败案例：
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2605_16745/figures/014_Table_6.jpg]]
 *Table 6: Feature probing across visual and image-generation encoders. Higher values are better for NAVI R@5cm, NYUv2*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有基线的结构性差异
 
@@ -363,6 +369,8 @@ EVA01 处于3D原生多模态大语言模型（3D-native MLLM）这一新兴方�
 在多轮编辑维度，EVA01 以 93.75% 的用户偏好压倒性超过 VoxHammer（3.75%）和 TRELLIS（2.50%）（Table 5, confidence 0.98），实现了无掩码的身份保持编辑。这一差距（+90.0%）远超单轮生成任务中对 TRELLIS 的优势（70.4% vs 14.8%，+55.6%，Table 3），表明有状态序列建模在多轮交互场景中的价值远大于单轮生成场景。
 
 **需要手动验证的点：** GreenPLM 的引用信息在分析中缺失，若需在正文中精确引用，建议查阅原始论文确认作者和发表信息。此外，3DGen-R1（Tang et al., 2025a）和 Step1X-3D（Li et al., 2025b）的发表 venue 未在分析中提供，需要进一步核实。
+
+
 
 ## 原文 PDF
 

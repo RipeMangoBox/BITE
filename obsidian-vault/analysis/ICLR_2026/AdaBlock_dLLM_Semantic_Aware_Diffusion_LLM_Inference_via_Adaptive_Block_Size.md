@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/AdaBlock_dLLM_Semantic_Aware_Diffusion_LLM_Inference_via_Adaptive_Block_Size.pdf
+project_link: null
+code_link: https://github.com/lgxi24/AdaBlock-dLLM
 aliases:
 - AdaBlock-dLLM
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | AdaBlock-dLLM：基于自适应块大小的语义感知扩散大语言模型推理 |
 | 英文题名 | AdaBlock-dLLM: Semantic-Aware Diffusion LLM Inference via Adaptive Block Size |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=0Cv9PwL7cI); [GitHub](https://github.com/lgxi24/AdaBlock-dLLM) |
+| Links | [paper](https://openreview.net/forum?id=0Cv9PwL7cI) · [GitHub](https://github.com/lgxi24/AdaBlock-dLLM) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/generative_models_and_autoencoders |
 | Method | AdaBlock-dLLM |
 | Dataset | GSM8K, Overall |
@@ -40,7 +42,7 @@ claims:
 > - GSM8K 上，accuracy 为 80.7%，对比 74.5%，变化 +6.2%。
 > - GSM8K 上，throughput (TPS) 为 51.3，对比 44.5，变化 +6.8 TPS。
 
-## 概述
+## 概要
 
 在半自回归（Semi-AR）扩散语言模型（dLLM）的解码中，固定块大小会导致两类根本性问题：**延迟解码开销**与**过早解码错误**。高置信度的词元因块边界限制而被推迟解码，造成不必要的推理步骤；低置信度的词元则被迫在当前块内提前提交，引发错误并沿序列传播，损害生成质量。这两个问题分别增加了计算开销和解码噪声，成为现有高效抽样方法（如Fast-dLLM）的性能瓶颈。
 
@@ -60,7 +62,7 @@ claims:
 
 综上，AdaBlock-dLLM 通过语义感知的自适应块调度，在几乎不改变原始推理开销的情况下有效缓解了固定块解码的固有矛盾，为扩散语言模型的高效生成提供了一种简单而有效的范式。
 
-## 背景与动机
+
 
 扩散语言模型（dLLMs）通过迭代去噪生成文本，天然支持灵活的解码策略。半自回归解码（如 Fast‑dLLM）通过将生成过程划分为固定大小的块来兼顾质量与效率：在每个块内执行多步去噪‑采样，块间采用 KV 缓存复用。然而，固定块大小与自然语义步骤之间的失配引入了两类根本性损耗：**延迟解码开销**与**过早解码错误**（Section 4.2，Figure 1、Figure 5）。前者发生在高置信度词元因块边界限制而被推迟到后续块解码，浪费了计算与步骤；后者迫使尚未确定的低置信度词元在当前块内提前采样，产生错误并向后传播。量化分析显示，在 GSM8K 和 HumanEval 基准上，固定块大小导致大量解码步骤受这两类问题影响（Figure 5），直接削弱了生成质量与吞吐量。
 
@@ -68,7 +70,9 @@ claims:
 
 上述发现直接构成了 AdaBlock‑dLLM 的设计动机：在不修改模型权重的条件下，通过运行时动态采样与置信度引导的块调度，使得解码器能够**语义感知地**自适应确定块大小，从而在保留半自回归加速优势的同时，显著降低延迟解码开销与过早解码错误。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 现有半自回归解码框架（如 Fast-dLLM）采用**固定块大小** $B_0$ 进行逐块去噪，这会在推理中引入两类根本性问题：当高置信度词元因块边界限制而无法在当前块中被解码时，产生**延迟解码开销**（Late Decoding Overhead）；而低置信度词元被迫在当前块内提前提交，则导致**过早解码错误**（Premature Decoding Error）并沿序列传播。定量分析表明，在 GSM8K 与 HumanEval 上，固定块大小下受这两类问题影响的采样步骤占比居高不下（Figure 5，Section 4.2）。
 
@@ -81,7 +85,7 @@ claims:
 
 通过这一语义感知的自适应块大小调整，AdaBlock-dLLM 无需训练即可在推理时将块边界动态对齐于语义步骤的完成点，从根本上缓解了延迟解码开销与过早解码错误（Figure 1 右侧示意图），在几乎不损失吞吐量的前提下普遍提升准确率（最高达 5.3%，Figure 2）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0006_0Cv9PwL7cI_AdaBlock-dLLM_Semantic-Aware_Diffusion_LLM_Infer/figures/001_Figure_1.jpg]]
 *Figure 1: Illustrative examples of two fundamental issues (left) and how AdaBlock-dLLM addresses them (right). Appendix A.1 presents a case study from a real inference scenario*
@@ -103,7 +107,7 @@ AdaBlock‑dLLM 构建于扩散语言模型的半自回归解码范式之上，�
 
 上述框架不修改模型权重，是一种**即插即用的推理时优化**。其输入为带掩码的 prompt 序列，输出为最终完全解掩码的生成序列；中间通过置信度驱动的采样与自适应块调度，将固定块大小的刚性解码转换为与语义节奏自适应的柔性过程。
 
-## 核心模块与公式推导
+
 
 **瓶颈与因果机制**  
 在半自回归扩散语言模型（dLLM）解码中，固定块大小导致两个根本性问题：高置信度词元因块边界限制而被强行推迟解码（延迟解码开销），低置信度词元被迫在当前块内提前提交，引发错误并扩散（过早解码错误）。造成这一矛盾的本质原因是块大小与语义步骤长度失配：语义边界常出现于高置信度的分隔符词元（如换行、逗号、句点）处，而固定块大小无法感知这一动态结构。AdaBlock‑dLLM 的因果旋钮是在推理时动态识别波动带中置信度最高的分隔符词元，以其位置实时调整块大小，使去噪‑采样循环与语义步骤边界对齐，从而同时抑制延迟与过早错误，在几乎不损失吞吐量的前提下提升生成质量。
@@ -156,7 +160,9 @@ AdaBlock‑dLLM 构建于扩散语言模型的半自回归解码范式之上，�
 
 上述公式构成了置信度驱动解码的基础，而自适应块大小调度的核心（分割符词元选择与阈值决策）建立在置信度序列 $\{c_i^t\}$ 的动态分析之上，无需额外训练，即插即用地将固定半自回归解码转换为语义感知的自适应解码。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果：准确率与吞吐量提升
 
@@ -210,7 +216,9 @@ AdaBlock‑dLLM 的增益根源于对固定块边界所引起两类错误的消�
 - **Table 7 & Table 5**：消融证实换行符是最具信息量的分隔符，且合理的阈值范围对释放语义引导至关重要。
 - **Figure 6**：AdaBlock‑dLLM 在 LLaDA‑Instruct 的准确率‑吞吐量前沿上实现了帕累托最优，表明语义感知调度兼具高质与高效。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 AdaBlock-dLLM 作为面向扩散大语言模型（dLLM）的半自回归解码策略，直接建立在 Fast-dLLM（Wu et al., 2025）所引入的置信度动态采样与块级 KV 缓存框架之上。Fast-dLLM 采用固定块大小（B₀）执行半自回归解码，其核心瓶颈已由本文明确揭示：在解码过程中，高置信度词元因块边界限制而被推迟解码（延迟解码开销），低置信度词元则被迫在当前块内提前提交，引发错误传播（过早解码错误）。在 GSM8K 和 HumanEval 上，这两个问题占据了大量采样步骤（Figure 5）。AdaBlock-dLLM 将基线方法中的固定 `block_size`（B₀）替换为由当前预测置信度最高的语义分隔符位置决定的自适应值，从而在不修改模型权重的前提下实现推理时语义感知的块调度（Algorithm 1）。因此，其与 Fast-dLLM 的关系是 **无训练、即插即用的改进**，继承了原有动态采样与缓存机制，仅改变块边界决策逻辑。
 
@@ -234,6 +242,8 @@ AdaBlock-dLLM 作为面向扩散大语言模型（dLLM）的半自回归解码�
 - **更广泛的语义边界信号**：除标点外，能否利用更丰富的语言学单元（如依存句法边界、语义组块）来提升块调度精度？这需要结合额外的知识源或预测头。
 
 最后，论文未专门讨论伦理公平性议题。鉴于 AdaBlock-dLLM 不改变模型本身的参数与训练数据，其公平性表现完全取决于底层预训练扩散模型，在敏感应用场景下需单独评估。"无训练、即插即用"的特性使其可直接叠加于任何现有 dLLM，但同时也意味着它不能修复底层模型存在的偏差。
+
+
 
 ## 原文 PDF
 

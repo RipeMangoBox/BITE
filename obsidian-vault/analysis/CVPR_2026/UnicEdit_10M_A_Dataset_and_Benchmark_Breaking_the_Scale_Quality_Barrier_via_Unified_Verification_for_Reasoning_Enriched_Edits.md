@@ -43,7 +43,7 @@ claims:
 > - UnicBench (Closed-source Best vs Second) 上，Overall-EN Score GPT-Image-1: 8.3546 vs Seedream 4.0: 8.0428 (+0.3118)。
 > - UnicBench (Open-source Top vs Weakest) 上，Overall-EN Score Qwen-Image-Edit: 7.7273 vs InstructPix2Pix: 2.9221 (显著提升)。
 
-## 概述
+## 概要
 
 图像编辑数据集长期面临规模与质量不可兼得的困境。人工标注虽能保证高质量，但成本高昂、难以扩展；自动化流水线虽可大规模生产数据，却充满噪声——多工具链的错误累积、后验证的缺失或不完整，导致大量编辑失败样本混入训练集。与此同时，现有基准对复杂推理编辑（如视角变换、文本修改、知识推理）缺乏细粒度诊断，掩盖了模型在这些关键维度上的系统性短板。
 
@@ -61,7 +61,7 @@ claims:
 
 当前工作的主要局限包括：数据集质量受限于所使用的编辑模型能力，复杂编辑任务的样本比例和模型表现仍有提升空间，验证模型的跨任务泛化性未经检验，以及基准规模有限可能无法完全代表真实世界编辑指令的多样性。
 
-## 背景与动机
+
 
 图像编辑作为视觉内容创作的核心任务，正经历从传统工具向基于扩散模型的指令驱动编辑范式的深刻转变。用户通过自然语言指令即可实现对图像中物体、场景乃至复杂语义关系的修改，这极大地降低了创作门槛。然而，这一范式的高效落地依赖于大规模、高质量的对齐数据，即“源图像-编辑指令-目标图像”三元组。
 
@@ -75,7 +75,9 @@ claims:
 
 基于此，本文的核心动机是：**能否将原本依赖大型模型的后验证任务蒸馏为一个紧凑的专家模型，通过统一失败检测与指令重描述的双任务设计，在可控的计算成本下实现可扩展的高质量数据制造？** 这一思路直接推动了 UnicEdit-10M 数据集和 Qwen-Verify 专家模型的诞生，旨在打破图像编辑数据领域长期存在的规模-质量壁垒。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 UnicEdit 的核心创新在于将**统一后验证**与**小型化专家模型**深度耦合，打破了图像编辑数据集长期面临的“规模-质量”双重困境。其关键突破体现在以下三个相互关联的维度。
 
@@ -103,7 +105,7 @@ $$\mathcal{L}_{\mathrm{D}^2\mathrm{PO}} = -\mathbb{E}_{(c_v, p_w, p_l) \sim \mat
 
 三个创新点形成协同效应：端到端编辑提供干净的数据基础，统一后验证实现全面的质量把控，小型专家模型则使这一流程在低成本下可规模化运行——这正是 UnicEdit 突破“规模-质量”壁垒的因果机制。
 
-## 整体框架
+
 
 UnicEdit-10M 的数据构建采用**三阶段流水线**架构，将图像编辑数据的生产从传统的多工具链分段调用转变为一个端到端、质量可控的系统。该流水线的核心设计理念是通过**统一后验证**机制，在保证高吞吐量的同时突破规模与质量的双重困境。
 
@@ -150,7 +152,7 @@ UnicEdit-10M 的数据构建采用**三阶段流水线**架构，将图像编辑
 ![[assets/figures/papers/paper_list_l798_https_arxiv_org_abs_2512_02790/figures/004_Figure_3.jpg]]
 *Figure 3: Data curation pipeline with three stages: (1) data preparation, (2) image editing, (3) post verification performing failed edits filtration and recaption*
 
-## 核心模块与公式推导
+
 
 ### 统一后验证框架
 
@@ -204,7 +206,9 @@ $$\mathrm { S c o r e } = \left( \prod _ { m \in \mathcal { M } } m \right) ^ { 
 ![[assets/figures/papers/paper_list_l798_https_arxiv_org_abs_2512_02790/figures/005_Figure_4.jpg]]
 *Figure 4: Post-verification examples of the expert model. Base denotes Qwen2.5-VL-7B; SFT denotes Base model after Stage-1 SFT; Ours denotes the dual-task expert model Qwen-Verify*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 数据集质量对比：统一后验证的规模-质量突破
 
@@ -258,7 +262,9 @@ Table 5 展示了后验证专家模型 Qwen-Verify 与基线的准确性对比�
 ![[assets/figures/papers/paper_list_l798_https_arxiv_org_abs_2512_02790/figures/018_Figure_10.jpg]]
 *Figure 10: Overall score of each model on the sub-tasks in UnicBench, for EN (left) and CN (right) instructions. All results are evaluated by GPT-4.1*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 数据构建范式的演进与定位
 
@@ -310,6 +316,8 @@ UnicBench 的评估体系在以下方面提供了独特的诊断能力：
 2. **验证框架的跨任务泛化**：能否将统一后验证框架扩展至视频编辑、3D 编辑等更广泛的视觉生成任务，以低资源实现高质量数据生产？
 3. **无模型评估方法**：当前评估仍依赖 VLM 评判器，如何设计更客观、无模型的自动化评估方法，特别是针对推理准确性？
 4. **数据分布与真实场景的对齐**：数据集源图像来自内部高美学得分库，可能过度代表特定风格或分布，未见低光照等困难场景的显式覆盖。如何在保持质量的同时扩大数据分布的覆盖面？
+
+
 
 ## 原文 PDF
 

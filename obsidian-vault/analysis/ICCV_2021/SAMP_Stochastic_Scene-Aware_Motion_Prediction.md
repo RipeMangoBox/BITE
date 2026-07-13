@@ -41,7 +41,7 @@ claims:
 > - Lie down action 上，Execution Time (s) 17.06 vs MLP ∞, MoE ∞, GT 15.49 (SAMP是唯一能完成任务的模型)；PE (cm) / RE (deg) 5.76 / 6.45 vs MLP ∞, MoE ∞ (SAMP成功完成并达到合理精度)。
 > - Sit/Carry tasks 上，Penetration (%) 3.8 / 3.62 vs NSM 8.11 / 10.22 (穿透率降低超过50%)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有的人‑场景交互运动合成方法难以在杂乱三维场景中生成多样化的目标驱动运动。确定性前馈网络（MLP/MoE）无法适应不同物体几何形状且缺乏风格变化；**NSM**（Starke et al., ACM Trans. Graph. 2019）虽能处理场景约束，但输出是确定性的（多样性为零），且缺乏显式路径规划，导致穿透率高（坐下 8.11%，搬运 10.22%）。躺下等复杂动作更是使基线方法完全失败。
 
@@ -57,7 +57,7 @@ claims:
 
 **证据强度**：上述结论由多组定量实验和消融实验支撑（Table 2/3/5, Section 5.2, Appendix G），置信度 0.95–0.98。需要手动验证的是：模型对与训练数据几何形状显著不同的物体泛化能力有限（Appendix I, Figure S.7），且路径规划依赖预计算导航网格，不适用于动态场景。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -77,7 +77,9 @@ claims:
 
 SAMP 的核心动机正是弥合上述缺口。本文提出将**条件变分自编码器（cVAE）**引入目标条件运动生成框架：通过每帧采样的随机潜在向量控制动作风格的多样性，通过另一个 cVAE 从物体几何中预测多样化的可行交互目标，再结合显式的 A* 路径规划模块提供全局无碰撞导航。这一设计使得 SAMP 能够在复杂室内场景中生成**多样化、目标驱动且物理合理**的人‑场景交互运动——在坐下、躺下等任务上，SAMP 是唯一能成功完成的模型，同时将穿透率降低超过 50%，并产生了与真实数据相当的多样性水平。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SAMP 的核心创新在于将**人‑场景交互运动生成**从一个确定性轨迹回归问题，重构为**目标条件随机生成 + 显式路径规划**的联合框架。这直接回应了现有方法的根本瓶颈：确定性模型（如 MLP/MoE）无法产生多样化的动作风格，而已有人‑场景交互方法（如 **NSM**，Starke et al., ACM Trans. Graph. 2019）虽能处理场景约束，却缺乏随机性，输出单一，且在杂乱场景中缺乏有效的导航机制，导致高碰撞率。
 
@@ -93,7 +95,7 @@ SAMP 通过三个**changed slots**系统性地突破了上述限制：
 
 **关键设计细节**：MotionNet 的 Interaction Encoder 专门编码物体几何与角色状态的交互特征，其重要性在消融实验中得到证实——移除该编码器后，目标位置误差从 6.09 cm 飙升至 14.82 cm（Appendix G），说明该模块是精确目标到达的关键。调度采样策略（Scheduled Sampling）则保障了长序列生成的稳定性，不使用该策略会导致角色频繁无法到达目标（Appendix D, Figure S.6）。
 
-## 整体框架
+
 
 SAMP 是一个**随机场景感知运动预测**系统，输入为 3D 杂乱场景和指定的交互动作，输出为角色从起始位置导航到目标物体并完成交互的多样化运动序列。系统由三个核心模块串联构成：**GoalNet** 负责预测可交互的目标位置与方向，**路径规划模块** 负责生成无障碍的导航路径，**MotionNet** 负责逐帧生成角色姿态。
 
@@ -136,7 +138,7 @@ $$P = \begin{cases} 1 & \text{epoch} \leq C_1, \\ 1 - \frac{\text{epoch} - C_1}{
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2108_08284/figures/002_Figure_2.jpg]]
 *Figure 2: Our system consists of three main components. GoalNet predicts oriented goal locations (green sphere and blue arrow on the chair) given an interaction object. The Path Planning Module predicts an obstacle-free path from the starting position to the goal. MotionNet sequentially predicts the next character state until the desired action is executed*
 
-## 核心模块与公式推导
+
 
 SAMP 由三个功能互补的模块构成：**MotionNet** 负责逐帧姿态自回归生成，**GoalNet** 负责从物体几何中采样多样化的交互目标，**Path Planning Module** 负责在杂乱场景中计算无碰撞导航路径。三个模块的协同关系如 Figure 2 所示：GoalNet 首先为给定交互物体预测带方向的目标位置，路径规划模块据此计算从起点到目标的避障路径，MotionNet 则在目标引导下逐帧生成角色运动序列。
 
@@ -194,7 +196,9 @@ $$P = \begin{cases} 1 & e p o c h \leq C _ { 1 } , \\ 1 - \frac { e p o c h - C 
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2108_08284/figures/004_Figure_4.jpg]]
 *Figure 4: GoalNet generates multiple valid goal positions*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能：执行成功率与位置精度
 
@@ -265,7 +269,9 @@ Table 4 报告了 Fréchet 距离，用于评估生成运动与真实运动在�
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2108_08284/figures/009_Figure_7.jpg]]
 *Figure 7: GoalNet generates diverse valid goals on different objects. Spheres indicate goal positions, and blue arrows indicate goal directions*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位与核心瓶颈
 
@@ -303,6 +309,8 @@ SAMP 的能力边界受以下因素制约：
 - **跨身形泛化**：能否通过骨骼重定向或条件编码，使模型适应不同身高、体型的角色？
 - **无监督交互风格发现**：当前依赖手动风格标注，能否以无监督方式自动从数据中发现不同的交互风格（如不同的坐姿模式）？
 - **端到端路径学习**：路径规划模块目前是独立于神经网络的外部模块，能否与 MotionNet 联合学习，以提供更平滑且自适应的导航行为？
+
+
 
 ## 原文 PDF
 

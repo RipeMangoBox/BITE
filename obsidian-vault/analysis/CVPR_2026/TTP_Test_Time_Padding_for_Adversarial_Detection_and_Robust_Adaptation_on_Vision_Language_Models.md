@@ -44,13 +44,13 @@ claims:
 > - Same 8 datasets (ViT-B/16) 上，Adversarial Accuracy 42.9% (avg)。
 > - Same 8 datasets (ViT-L/14) 上，Adversarial Accuracy 51.6% (avg)。
 
-## 概述
+## 概要
 
 视觉-语言模型（尤其是 CLIP）在测试时极易受到对抗扰动攻击，而现有测试时防御方法普遍缺乏可靠的对抗样本检测机制，只能对所有输入进行统一适配，导致干净准确率与对抗鲁棒性难以兼得。**TTP（Test-Time Padding）** 提出了一种轻量级、无需训练的对抗检测与鲁棒适配框架，其核心发现是：图像空间填充操作能够部分恢复因对抗扰动而破坏的注意力模式，使得原始嵌入与填充后嵌入之间的余弦相似度在干净样本和对抗样本上呈现显著差异——干净样本变化极小，对抗样本则产生大幅度偏移。基于这一因果机制，TTP 构建了一个跨架构、跨数据集通用的检测器，并通过可训练的单步填充优化与相似度感知集成策略，仅对检测出的对抗样本进行针对性适配，从而在不牺牲干净准确率的前提下大幅提升对抗鲁棒性。
 
 在方法定位上，TTP 区别于 **TTC**（Xing et al., CVPR 2025）的噪声扰动检测和 **R-TPT**（Sheng et al., CVPR 2025）、**TAPT**（Wang et al., CVPR 2025）等统一文本提示调优方法，首次将输入空间的填充操作同时用于对抗检测与对抗适配。实验表明，TTP 在 8 个细粒度分类数据集上，以 ViT-B/32 为骨干网络时平均对抗准确率达 39.7%，较 R-TPT 提升 4.4%；在 ViT-L/14 上进一步提升至 51.6%。其检测准确率在所有设置下均显著优于 TTC，接近 100%。
 
-## 背景与动机
+
 
 视觉-语言基础模型（以 CLIP 为代表）在零样本分类等任务上展现出强大的泛化能力，但其对对抗扰动的极端脆弱性已成为其安全部署的核心瓶颈。在测试时，微小的、人眼不可察觉的像素扰动即可导致 CLIP 产生完全错误的预测，这严重限制了其在安全敏感场景中的实际应用。
 
@@ -58,7 +58,9 @@ claims:
 
 本文的核心动机正是打破这一困境。其关键洞察在于：**图像空间填充操作能够部分恢复因对抗扰动而破坏的注意力模式**，进而使原始嵌入与填充后嵌入之间的余弦相似度在干净样本和对抗样本上呈现显著差异——干净样本的填充前后特征变化极小，而对抗样本则产生大幅偏移。这一现象为构建通用、可靠的对抗检测信号提供了可能，也为后续的差异化鲁棒适配奠定了基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 从统一适配到检测驱动的差异化防御
 
@@ -86,7 +88,7 @@ R-TPT 和 TAPT 等 baseline 方法通过调整文本提示（prompt tuning）来
 
 上述三个槽位并非孤立设计，而是形成了因果闭环：**填充诱导的相似度漂移**同时支撑了检测（区分干净与对抗）和集成（评估增强视图质量）两个模块；**可训练填充**仅在检测模块判定为对抗样本时激活，避免了干净样本上的无效计算；**相似度感知集成**则进一步放大了可训练填充的恢复效果。三者协同使得 TTP 在 8 个细粒度分类数据集上，以 ViT-B/32 为骨干网络时，达到 39.7% 的平均对抗准确率，相较 R-TPT 提升 4.4 个百分点，同时完整保持了干净样本的分类准确率（见 Table 1）。
 
-## 整体框架
+
 
 TTP 的整体 pipeline 遵循“检测—适配—集成”的三阶段范式，所有操作均在测试时完成，无需修改预训练的 CLIP 模型参数。其核心设计动机源于一个关键观察：空间填充操作能够部分恢复因对抗扰动而破坏的注意力模式，使得干净样本与对抗样本在填充前后的特征嵌入余弦相似度上呈现显著差异——干净样本填充后特征变化极小，而对抗样本则产生明显偏移。基于这一因果机制，TTP 将对抗防御拆解为三个松耦合模块，按条件执行，从而在保持干净样本零精度损失的前提下，大幅提升对抗鲁棒性。
 
@@ -119,7 +121,7 @@ $$p_{\mathrm{final}} = \arg\max_c \sum_{i \in B} w_i \, p_c(P_\theta(x_i))$$
 ![[assets/figures/papers/paper_list_l795_https_arxiv_org_abs_2512_16523/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of the proposed Test-Time Padding (TTP) pipeline. Given an input sample, CLIP image encoder features are extracted before and after applying padding. Their cosine similarity difference is compared with a universal threshold to distinguish clean versus adversarial inputs. Clean samples are directly recognized without adaptation. For adversarial examples, trainable test-time padding is activated to optimize padding parameters by entropy minimization using augmented views with low entropy. A similarityaware ensemble then aggregates predictions across selected high-confidence views, ensuring a more reliable final prediction. Together, TTP enables accurate adversarial detection and adap...*
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题形式化与 CLIP 零样本分类
 
@@ -188,7 +190,9 @@ $$p_{\mathrm{final}} = \arg\max_c \sum_{i \in B} w_i \, p_c(P_\theta(x_i))$$
 ![[assets/figures/papers/paper_list_l795_https_arxiv_org_abs_2512_16523/figures/001_Figure_1.jpg]]
 *Figure 1: Visualization of attention maps for clean sample, adversarially perturbed sample, randomly padded sample, and samples processed with trainable test-time padding. The adversarial attack causes a noticeable shift in attention, leading to incorrect predictions. Applying random padding helps restore the original attention focus, while trainable padding further refines the attention to the correct regions and suppresses noise, resulting in more accurate predictions*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 对抗鲁棒性主结果
 
@@ -254,7 +258,9 @@ TTP 的检测模块可以作为即插即用的前置组件，与任意测试时�
 ![[assets/figures/papers/paper_list_l795_https_arxiv_org_abs_2512_16523/figures/011_Figure_4.jpg]]
 *Figure 4: Impact of padding size on adversarial detection and robust adaptation. ViT-B/32 is used as the CLIP backbone. The figure comprises three subplots: (a) average cosine similarities on fine-grained classification datasets of CLIP embeddings before and after padding across varying padding sizes, (b) detection accuracy for both adversarial and clean inputs, and (c) adversarial accuracy on the DTD dataset*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 测试时防御的两阶段范式分化
 
@@ -304,6 +310,8 @@ TTP 在 PGD 攻击（100 步迭代，$\epsilon = 4/255$）之外，对 CW、Deep
 3. **计算开销的量化**：TTP 对检测为对抗的样本进行单步优化和集成推理，其相对于统一适配方法（如 R-TPT）的实际推理延迟增加量，原文未提供详细的耗时对比数据。
 
 4. **非 CLIP 架构的迁移性**：TTP 的所有实验均基于 CLIP 视觉-语言模型，其在纯视觉模型（如标准 ViT、ResNet）上的检测与适配效果尚未验证，填充操作对注意力恢复的因果机制是否依赖于 CLIP 的跨模态训练范式仍是开放问题。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/RFS_Reinforcement_learning_with_Residual_flow_steering_for_dexterous_manipulation.pdf
+project_link: https://weirdlabuw.github.io/rfs/
+code_link: null
 openreview_forum_id: Kt9tJeOwjy
 aliases:
 - RFSR
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | RFS：基于残差流引导的强化学习用于灵巧操作 |
 | 英文题名 | RFS: Reinforcement learning with Residual flow steering for dexterous manipulation |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=Kt9tJeOwjy); [Project](https://weirdlabuw.github.io/rfs/) |
+| Links | [paper](https://openreview.net/forum?id=Kt9tJeOwjy) · [Project](https://weirdlabuw.github.io/rfs/) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | Residual Flow Steering (RFS) |
 | Dataset | Simulation (6 tasks average), Stacking (simulation), Real-world Pick-and-Place (seen objects) |
@@ -42,7 +44,7 @@ claims:
 > - Stacking (simulation) 上，Success Rate 为 0.951，对比 0.135 (DSRL, best modulation baseline)，变化 +0.816。
 > - Real-world Pick-and-Place (seen objects) 上，Success Rate 为 90.0%，对比 50.0% (Zero-Shot Transfer)，变化 +40.0%。
 
-## 概述
+## 概要
 
 灵巧操作任务对策略的泛化能力提出了极高要求。尽管基于流匹配（Flow Matching）的模仿学习策略能够从人类遥操作演示中学习协调的行为模式，但这类预训练策略在部署时面临一个核心瓶颈：**演示数据覆盖有限，策略无法泛化到训练分布之外的场景，而现有强化学习（RL）微调方法难以同时实现全局行为适应与局部精细修正**。直接对生成式模型的全量参数进行RL微调不仅不稳定，还容易破坏预训练策略已有的合理行为。
 
@@ -50,7 +52,7 @@ claims:
 
 实验结果表明，RFS在六个仿真灵巧操作任务上的平均成功率达到**0.861**，显著超过基础策略（0.250）与最强基线DSRL（0.483）。在真实世界的已见物体上，RFS的抓取-放置成功率高达**90.0%**，抓取成功率达**80.0%**，均优于零样本迁移和监督微调基线。消融实验进一步验证了联合调制相较于单独使用输入或输出调制的关键优势，以及冻结基础策略参数对训练稳定性的重要贡献。
 
-## 背景与动机
+
 
 灵巧操作是机器人学中长期存在的挑战，要求策略同时具备全局行为规划与局部精细执行的能力。近年来，基于生成式模型的行为克隆方法——特别是流匹配（Flow Matching, Lipman et al., 2022）——在从人类演示中学习复杂灵巧技能方面展现出显著潜力。这些方法通过学习从简单先验分布到专家动作分布的速度场，能够生成高度协调的操作行为。
 
@@ -60,7 +62,9 @@ claims:
 
 本文的动机正源于此：能否设计一种统一的调制框架，在不更新基础策略参数的前提下，同时赋予RL对策略全局语义和局部执行的双重控制能力？这一思路的核心洞察是：将输入调制（潜变量引导）与输出调制（残差动作）联合优化，使RL能够通过潜变量探索新的行为模式，同时通过残差项修正执行中的精细错误，从而在保持预训练策略稳定性的同时高效适应新场景。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 RFS 的核心创新在于**将输入调制与输出调制统一为对预训练流匹配策略的联合引导**，从而在灵巧操作任务中实现高效、稳定的策略适应。其关键设计变化体现在以下三个维度。
 
@@ -82,7 +86,7 @@ RFS 的关键设计选择是**冻结预训练基础策略的全部参数**，仅
 
 **证据强度说明**：联合调制相对于单一调制的优势有充分的消融实验支撑（Table 1 中 RFS vs DSRL vs 仅残差）；参数冻结设计的稳定性优势在 Section 5.1.3 中有明确的对比分析；离线 RL 范式的有效性在 Table 2 中有真机实验验证。所有核心 claims 置信度均在 0.95 以上。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_Kt9tJeOwjy/figures/001_Figure_1.jpg]]
 *Figure 1: Residual Flow Steering (RFS). Given a state s , the RFS policy πRFS outputs a latent flow variable w _ { 0 } and a residual action ^ { a _ { r } , } which jointly steer a pretrained base policy πFM to produce the final action a _ { b } + a _ { r } . RFS enables both global mode shifting and fine-grained residual correction, allowing the policy to expand beyond the demonstration data manifold*
@@ -117,7 +121,7 @@ Figure 2 展示了从数据采集到真实世界适应的完整流程：
 
 整个管线的数据流可概括为：遥操作演示 → 流匹配预训练 → 仿真 PPO 调制训练 → 蒸馏为视-动策略 → 零样本部署 → 人类纠正数据采集 → 离线 RL 适应。各模块职责明确，基础策略负责提供行为先验，RFS 调制策略负责全局与局部适应，蒸馏模块负责跨域迁移，离线 RL 模块负责真实世界微调。
 
-## 核心模块与公式推导
+
 
 ### 3.1 流匹配基础策略
 
@@ -174,7 +178,9 @@ RFS 方法链中两个关键设计选择直接决定了其有效性：
 
 2. **联合调制优于单一调制**：Table 1 的消融对比表明，同时使用潜变量调制与残差动作的 RFS 在所有六个仿真任务上均优于仅使用单一调制机制的 DSRL（仅输入调制）或残差 RL（仅输出调制）。例如在推至抓取任务上，RFS 成功率为 0.721，而 DSRL 仅为 0.430，Policy Decorator 仅为 0.176。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 仿真主实验：RFS 在所有任务上显著领先
 
@@ -210,7 +216,9 @@ Figure 6 展示了零样本 sim-to-real 迁移中五种典型失败模式，包�
 ![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_Kt9tJeOwjy/figures/009_Figure_6.jpg]]
 *Figure 6: Common failure modes in real-world manipulation and RFS corrections. We illustrate five representative failure cases of zero-shot sim-to-real transfer, including early hand closure, loose or unstable grasp poses, and mistimed or misplaced actions during pick-and-place. The top row shows failures produced by the zero-shot policy, while the bottom row shows the corrected outcomes after applying Residual Flow Steering (RFS). By jointly correcting action timing, grasp pose, and target location, RFS enables more stable and successful task execution*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 预训练生成式策略的RL微调谱系
 
@@ -270,6 +278,8 @@ RFS的离线RL微调在已见物体上达到90.0% pick-and-place和80.0%抓取�
 3. **多任务与少样本扩展**：RFS的联合调制机制能否推广到多任务或少样本学习场景？
 
 > **注意**：关于RFS与其他调制方法在理论上的统一性分析（如是否可纳入更广义的策略蒸馏框架），以及该方法在更大规模任务集上的泛化性能，论文未提供直接证据，需进一步研究验证。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/BAPO_Stabilizing_Off_Policy_Reinforcement_Learning_for_LLMs_via_Balanced_Policy_Optimization_with_Adaptive_Clipping.pdf
+project_link: null
+code_link: null
 aliases:
 - BBPOAC
 - BAPO
@@ -40,11 +42,11 @@ claims:
 > - AIME 2025 上，Pass@1 为 62.5 (7B), 80.0 (32B)，对比 59.0 (7B SFT), 78.1 (32B SFT)，变化 +3.5 (7B), +1.9 (32B)。
 > - AIME 2024 上，Pass@1 为 87.1 (32B BAPO)，对比 81.4 (Qwen3-32B)，变化 +5.7。
 
-## 概述
+## 概要
 
 本文提出 **BAPO (Balanced Policy Optimization with Adaptive Clipping)**，一种用于稳定大语言模型（LLM）离策略强化学习训练的自适应裁剪策略优化方法。核心贡献在于：通过动态调整策略梯度目标函数中的裁剪边界（clipping bounds）$c_{\mathrm{low}}$ 和 $c_{\mathrm{high}}$，重新平衡正负优势样本对优化的贡献，从而有效抑制离策略训练中常见的策略熵急剧下降和训练崩溃问题。实验表明，BAPO 在 AIME 2024 和 AIME 2025 等数学推理基准上显著超越现有方法：7B 模型超越 SkyWork-OR1-7B 等开源模型，32B 模型不仅达到同规模最优，还超越了 o3-mini 和 Gemini-2.5-Flash-Thinking 等专有系统。
 
-## 背景与动机
+
 
 ### 2.1 离策略强化学习在 LLM 中的挑战
 
@@ -67,7 +69,9 @@ $$\Delta \mathcal{H}(\pi_\theta) \approx -\eta \cdot \mathrm{Cov}_{y \sim \pi_\t
 
 其中 $\mathcal{X}(y_t)$ 是裁剪指示函数（Equation 7），表示 token 是否未被裁剪并参与梯度计算。该规则表明：只有未被裁剪的 token 才影响熵变化，且熵的变化方向由对数概率与优势之间的协方差决定。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 3.1 关键洞察
 
@@ -86,7 +90,7 @@ BAPO 的核心创新在于动态调整裁剪边界 $c_{\mathrm{low}}$ 和 $c_{\m
 - **过滤过多低概率负样本**（防止熵崩溃）
 - **防止正样本过度主导**（避免尾部退化）
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__language_speech_and_dialog__b001_jIeJJqG7dz_BAPO_Stabiliz/figures/001_Figure_1.jpg]]
 *Figure 1: Performance of BAlanced Policy Optimization with Adaptive Clipping (BAPO).*
@@ -97,7 +101,7 @@ BAPO 的训练流程包含三个主要模块：
 2. **自适应裁剪边界调整**：根据正样本损失贡献比例 $\rho$ 动态调整 $c_{\mathrm{low}}$ 和 $c_{\mathrm{high}}$
 3. **策略更新**：使用调整后的裁剪边界最大化 BAPO 目标函数
 
-## 核心模块与公式推导
+
 
 ### 5.1 BAPO 目标函数
 
@@ -121,7 +125,9 @@ $$\frac{ \sum_{A_t > 0} \pi_{\theta_{\mathrm{rollout}}}(y_t) \cdot | \min( r_t \
 - **Proposition 2 (Equation 6)**：熵变化近似为对数概率与优势的负协方差
 - **Table 9** 总结了不同 token 特征对熵变化的影响：高概率高优势或低概率低优势的 token 降低熵；高概率低优势或低概率高优势的 token 增加熵
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 6.1 主要结果
 
@@ -198,7 +204,9 @@ BAPO 在数学推理（AMC 2023, OlympiadBench）、逻辑推理（ARC-AGI）和
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__language_speech_and_dialog__b001_jIeJJqG7dz_BAPO_Stabiliz/figures/028_Table_4.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 7.1 与现有方法的关系
 
@@ -226,6 +234,8 @@ BAPO 属于离策略强化学习在 LLM 推理能力训练中的应用，其方�
 3. BAPO 在超长序列（如 agent 决策）或在线学习场景中的表现如何？
 4. 熵-裁剪规则是否适用于其他裁剪机制（如 KL 惩罚）？
 5. BAPO 能否与课程学习或数据筛选策略协同，进一步提升样本效率？
+
+
 
 ## 原文 PDF
 

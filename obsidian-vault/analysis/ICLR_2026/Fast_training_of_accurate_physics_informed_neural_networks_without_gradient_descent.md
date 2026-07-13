@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Fast_training_of_accurate_physics_informed_neural_networks_without_gradient_descent.pdf
+project_link: null
+code_link: null
 openreview_forum_id: 3VdSuh3sie
 aliases:
 - FP
@@ -42,7 +44,7 @@ claims:
 > - 波动方程（多尺度） 上，训练时间加速比 为 0.94s (CPU)，对比 GPU-trained PINN 625–5500× 更慢，变化 625–5500 倍。
 > - 10 维热传导方程 上，相对 L² 误差 为 4.35e-4，对比 PINN (LBFGS) 3.98e-4 (但训练慢 100–1000 倍)，变化 训练加速 100–1000 倍。
 
-## 概述
+## 概要
 
 物理信息神经网络（PINN）将偏微分方程（PDE）的物理约束嵌入神经网络的损失函数中，提供了一种无需网格的 PDE 求解范式。然而，标准 PINN 的训练面临根本性困难：损失函数是高维、多目标且非凸的，同时将时间视为额外的空间维度破坏了物理系统的因果结构，使得基于梯度下降的优化极易陷入局部极小或收敛缓慢。
 
@@ -55,7 +57,7 @@ claims:
 
 Frozen-PINN 的方法定位处于**随机特征方法**（ELM/SWIM）与**自适应 ODE 求解器**的交叉点，通过解耦损失函数各分量（PDE 残差、初始条件、边界条件），将 PINN 的训练重新定义为一系列可独立、高效求解的子问题。这一框架为时间依赖 PDE 的快速高精度求解开辟了新的技术路径。
 
-## 背景与动机
+
 
 ### 物理信息神经网络的核心瓶颈
 
@@ -77,7 +79,9 @@ Frozen-PINN 的方法定位处于**随机特征方法**（ELM/SWIM）与**自适
 
 这一思路在概念上简洁而有力，但其实现面临若干技术挑战：如何采样合适的空间基函数以提供足够的表示能力？如何处理不同类型的边界条件？如何控制 ODE 系统的规模以避免刚性或维度灾难？Frozen-PINN 正是围绕这些问题展开的系统性解决方案。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Frozen-PINN 的核心创新在于从根本上重构了 PINN 的训练范式：**将高维、多目标、非凸的耦合优化问题转化为一个可高效求解的常微分方程（ODE）初值问题**，从而完全消除了对梯度下降的依赖，并自然地引入了时间因果性。
 
@@ -126,7 +130,7 @@ Frozen-PINN 处于 PINN（Raissi et al., 2019）与随机特征方法（ELM, SWI
 
 为进一步降低 ODE 系统的刚性和计算代价，Frozen-PINN 在空间基函数后引入可选的 **SVD 层**：对 $\mathcal{A}\Phi(X)$ 进行截断 SVD，将基函数维度从 $M$ 压缩至 $r \ll M$，同时通过正交化改善 ODE 的数值稳定性。消融实验表明，SVD 层可将计算速度提升**高达 75 倍**，ODE 系统维度降低 **20 倍**，且对精度影响可控。
 
-## 整体框架
+
 
 Frozen-PINN 的核心设计在于将时间依赖偏微分方程的求解从高维非凸优化问题转化为一个常微分方程初值问题。其整体 pipeline 由五个顺序衔接的模块构成，输入为 PDE 定义、初始/边界条件及空间配点集，输出为全时空近似解。
 
@@ -171,7 +175,7 @@ $$
 
 > **注意**：关于网络参数重采样在克服 Kolmogorov n-宽度障碍中的作用，以及具体 PDE 设置下的普遍逼近性质，目前尚缺乏理论证明，需要进一步研究。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化
 
@@ -221,7 +225,9 @@ $$V_r \Sigma_r U_r^\top = \mathcal{A}\Phi(X)$$
 
 Frozen-PINN 的完整训练算法（见 Algorithm 1）可概括为：采样并冻结空间基函数 → 构造边界兼容基函数 → SVD 截断降维 → 最小二乘初始化 $C(0)$ → 调用自适应 ODE 求解器（如 RK45、LSODA）沿时间推进 $C(t)$。整个流程无需任何反向传播或梯度下降迭代，训练时间由 ODE 求解器的步长控制决定。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能表现
 
@@ -289,7 +295,9 @@ Figure 7 展示了 Frozen-PINN 在高维热传导方程上的表现。在维度�
 ![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_3VdSuh3sie/figures/037_Figure_20.jpg]]
 *Figure 20: (b) (Left): Ground truth, (Middle): Frozen-PINN-swim solution, where black and gray dashed lines mark time snapshots selected for a comparison (in (d) on the right) and the collocation points resampling times, respectively, (Right): point-wise absolute error. (c) Comparison between Frozen-PINN-swim and numerical solutions at three time instances. Figure 20: Illustration of experimental results for the Burgers’ equation*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与标准 PINN 及其变体的关系
 
@@ -340,6 +348,8 @@ Frozen-PINN 的创新在于将这些原本用于静态函数逼近的随机特�
 1. **普遍逼近性质的理论研究**：针对具体 PDE 设置（如非线性算子的 Lipschitz 条件、初边值的光滑性），建立 Frozen-PINN 的误差收敛理论。
 2. **网络参数重采样的作用机制**：理解随机基函数重采样如何克服 Kolmogorov n-宽度障碍，以及最优重采样频率和策略的设计。
 3. **扩展到稳态 PDE 和逆问题**：当前框架聚焦于时间依赖的正问题；能否将时空分离思想推广到稳态 PDE 或参数反演问题，尚待探索。
+
+
 
 ## 原文 PDF
 

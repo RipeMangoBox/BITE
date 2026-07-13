@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/ChainHOI_Joint_based_Kinematic_Chain_Modeling_for_Human_Object_Interaction_Generation.pdf
+project_link: null
 code_link: https://github.com/qinghuannn/ChainHOI
 aliases:
 - CJBKCMHOIG
@@ -41,7 +42,7 @@ claims:
 > - BEHAVE 上，FID↓ 0.095±.001 vs HOI-Diff: 0.457±.003 (-0.362)；R-Precision Top1↑ 0.435±.009 vs HOI-Diff: 0.295±.003 (+0.140)；OCD↓ 0.091±.001 vs HOI-Diff: 0.148±.003 (-0.057)。
 > - OMOMO 上，FID↓ 0.112±.004 vs HOI-Diff: 0.480±.001 (-0.368)；R-Precision Top1↑ 0.264±.005 vs HOI-Diff: 0.114±.002 (+0.150)。
 
-## 概述
+## 概要
 
 文本驱动的人物交互（Human-Object Interaction, HOI）生成要求根据自然语言描述和物体几何，合成真实、语义一致的人体运动序列。该任务的核心瓶颈在于：现有方法将全身姿态隐含地编码为统一的令牌表示，未能显式捕捉关节与物体之间的几何语义关系，且缺乏运动学链级别的协调建模，导致生成的动作不自然、交互不真实。
 
@@ -53,7 +54,7 @@ ChainHOI 的方法定位如下：在关节级别，通过引入显式的 HOI 关
 
 值得注意的是，ChainHOI 仍存在若干局限：由于输入数据采用 SMPL 人体模型，缺少手指关节信息，手部与物体可能出现穿透；对于椅子等复杂物体，模型难以学习正确的接触点和接触距离。这些问题为后续研究指明了方向。
 
-## 背景与动机
+
 
 ### 任务背景
 
@@ -78,7 +79,9 @@ ChainHOI 的方法定位如下：在关节级别，通过引入显式的 HOI 关
 
 基于此，本文提出 **ChainHOI**，核心动机是：**真实的人物交互生成必须同时显式建模关节级别和运动学链级别的交互**。前者通过 HOI 关节图直接刻画关节与物体的几何关系，后者通过运动学感知交互模块强制执行链内与链间协调，二者结合才能产生自然流畅的 HOI 序列。这一设计从根源上解决了现有方法“隐式编码、全局建模”的结构性缺陷，为高质量文本驱动 HOI 生成提供了新的范式。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ChainHOI 的核心创新在于首次从**关节级**和**运动学链级**两个层次显式建模人物交互，解决了现有方法将全身姿态隐式编码为令牌而无法捕捉关节与物体间细粒度几何语义关系的瓶颈。这一思路通过三个关键模块实现，形成了从局部接触到全局协调的完整建模链路。
 
@@ -122,7 +125,7 @@ $$\mathcal{L} = \mathcal{L}_{diff} + \lambda_1 \mathcal{L}_h + \lambda_2 \mathca
 
 消融实验（Table 2）提供了因果证据：同时移除 KIM 和 SCM 后，FID 从 0.095 飙升至 0.400，OCD 从 0.091 升至 0.170，证实双级别建模的不可替代性。仅移除 KIM 中的注意力掩码（即取消显式运动学链结构）也使 FID 升至 0.184，表明链结构的显式建模本身对运动质量有显著贡献。运动学感知解码器的注意力可视化（Figure 11）进一步显示，模型能自适应地对与物体交互的关节赋予更高注意力分数，验证了链级建模的有效性。
 
-## 整体框架
+
 
 ChainHOI 是一个基于扩散模型的文本驱动人物交互生成框架，其核心设计思想是将交互建模从隐式全身姿态令牌提升为**关节级**与**运动学链级**的双层显式建模。整体架构由 N 个结构相同的块堆叠而成，每个块包含两个关键模块：**生成时空图卷积网络（GST-GCN）** 和 **运动学感知交互模块（KIM）**，分别负责关节级的细粒度交互建模和运动学链级的协调建模。
 
@@ -175,7 +178,7 @@ $$\mathcal { L } = \mathcal { L } _ { d i f f } + \lambda _ { 1 } \mathcal { L }
 ![[assets/figures/papers/paper_list_l1731_ChainHOI_Joint_based_Kinematic_Chain_Modeling_for_Human_Object_Interacti/figures/012_Figure_9.jpg]]
 *Figure 9: Overview of Our Evaluator. Inspired by CLIP [54], our evaluator incorporates a motion branch and a text branch. The motion branch takes motion sequences and a CLS token as inputs. The text branch takes texts and a CLS tokens as inputs. Then the output CLS tokens of two branches are passed into a linear projection and then are used to calculate the contrastive learning loss*
 
-## 核心模块与公式推导
+
 
 ChainHOI 的核心架构由两个互补的交互建模模块构成：**生成时空图卷积网络（GST-GCN）** 在关节级别显式捕捉细粒度交互，**运动学感知交互模块（KIM）** 在运动学链级别强制执行链内与链间协调。二者通过融合模块整合特征，共同驱动扩散去噪过程。
 
@@ -253,7 +256,9 @@ $$\mathcal{L}_o = \sum_{i=1}^{L} \big\| \phi_o(O_i^{pred}) - \phi_o(O_i^{gt}) \b
 ![[assets/figures/papers/paper_list_l1731_ChainHOI_Joint_based_Kinematic_Chain_Modeling_for_Human_Object_Interacti/figures/003_Figure_3.jpg]]
 *Figure 3: Design of the HOI Joint Graph. The object node contains object information and is connected to potential interaction joints. The foot-contact node is added to prevent foot sliding*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能对比
 
@@ -324,7 +329,9 @@ Figure 7 报告了 24 名参与者的偏好选择结果。ChainHOI 相对于 MDM
 ![[assets/figures/papers/paper_list_l1731_ChainHOI_Joint_based_Kinematic_Chain_Modeling_for_Human_Object_Interacti/figures/008_Figure_7.jpg]]
 *Figure 7: User Study. The color bar and numbers indicate the preference rate of ChainHOI over the compared methods*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与因果机制
 
@@ -363,6 +370,8 @@ ChainHOI 处于文本驱动 HOI 生成这一新兴任务的方法谱系中。该
 2. **复杂物体泛化**：如何提升模型对复杂物体接触几何的学习能力，尤其是在训练数据有限时？是否需要引入更丰富的物体表示（如隐式场）？
 3. **非刚性物体扩展**：ChainHOI 的几何提取方式能否扩展至非刚性物体？需要何种表达或网络结构来建模可变形交互？
 4. **运动学链先验增强**：运动学链令牌是否可以赋予更明确的解剖学约束（如关节角度限制）或物理先验（如力矩平衡），以进一步提升生成的真实性？
+
+
 
 ## 原文 PDF
 

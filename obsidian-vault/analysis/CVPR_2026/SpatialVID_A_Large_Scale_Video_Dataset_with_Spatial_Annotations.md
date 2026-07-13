@@ -43,7 +43,7 @@ claims:
 > - Sekai 上，TransErr 6.04 vs 6.49 (Sekai-Real) (-0.45)。
 > - SpatialVID 上，TransErr 4.33 vs 5.16 (RE10K) (-0.83)。
 
-## 概述
+## 概要
 
 **瓶颈与动机** 现有视频数据集普遍缺乏大规模、高质量且显式带有几何（相机姿态、深度）与语义标注的动态场景数据，导致空间智能模型难以从像素中隐式习得可靠的空间关系。SpatialVID 正是针对这一缺口构建的百万级开放场景视频数据集。
 
@@ -59,7 +59,7 @@ claims:
 
 **局限与开放问题** 几何注释依赖 MegaSaM，在主要移动物体主导或共线运动等极端条件下精度受限；场景分布受限于手动筛选的关键词与偏好，存在地理和内容偏差。未来可探索向 LiDAR 等传感器模态扩展，以及更强的 3D 推理能力以提升自动化标题质量。
 
-## 背景与动机
+
 
 ### 空间智能的数据瓶颈
 
@@ -94,7 +94,9 @@ Table 1 系统性地对比了 SpatialVID 与已有空间信息数据集的关键
 
 这种“几何+语义”双重注释的设计，使得 SpatialVID 能够同时服务于相机控制视频生成、新视角合成、相机姿态估计等多种下游任务，为空间智能模型的训练提供了前所未有的数据基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SpatialVID 的核心创新在于将大规模互联网视频转化为首个同时具备**密集几何标注**与**空间感知语义标题**的动态场景数据集，从而为空间智能模型提供显式的 3D 归纳偏置。相较于现有数据集，其关键突破体现在以下三个维度的“changed slots”上。
 
@@ -112,7 +114,7 @@ SpatialVID 的核心创新在于将大规模互联网视频转化为首个同时
 
 **证据强度评估**：上述三个 changed slots 均有明确的实验锚点支撑——几何注释改进体现在 MegaSaM 轨迹对比（Figure 10）和下游任务增益（Table 3 中微调后 ATE 下降）；空间感知标题的有效性由 Figure 4 的定性纠正案例和 Table 2 中 SpatialVID-HQ 在所有基准上取得最低 TransErr 间接验证；质量筛选的优势则由 Figure 5 的分布对比直接证实。需注意，当前几何注释仍依赖 MegaSaM 框架，在极端共线运动或大动态物体主导场景下可能失效（Section 3.3），这是该创新点的已知边界。
 
-## 整体框架
+
 
 SpatialVID 的构建流程采用“收集—过滤—注释—采样”四阶段流水线，将互联网视频转化为具备显式几何与语义标注的大规模空间智能数据集。图 2 给出了流水线总览：从手动筛选的运动丰富型网络视频出发，依次经过层次化质量过滤、几何与语义双通道注释，最后通过运动与类别均衡采样得到高质量子集 SpatialVID-HQ。
 
@@ -138,7 +140,7 @@ SpatialVID 的构建流程采用“收集—过滤—注释—采样”四阶段
 ![[assets/figures/papers/paper_list_l828_https_arxiv_org_abs_2509_09676/figures/003_Figure_2.jpg]]
 *Figure 2: Overview of the curation pipeline. The pipeline comprises three stages: filtering, annotation, and sampling. We start from manually collected web videos with notable camera motion. In the filtering stage, raw videos are hierarchically preprocessed and filtered. The annotation stage adds geometric and semantic labels and derives motion instructions from camera poses. The sampling stage then balances clips by motion and category to form a high-quality subset (SpatialVID-HQ) with well-distributed classes for downstream tasks*
 
-## 核心模块与公式推导
+
 
 ### 3.1 几何信息注释模块
 
@@ -202,7 +204,9 @@ $$\mathcal{L}_{\mathrm{total}} = \lambda_{1} \mathcal{L}_{\mathrm{mse}} + \lambd
 ![[assets/figures/papers/paper_list_l828_https_arxiv_org_abs_2509_09676/figures/014_Figure_10.jpg]]
 *Figure 10: Comparison of MegaSaM with other SLAM/3D reconstruction methods. We visualize the trajectories predicted by six representative methods. The color order ROYGBV corresponds to the progression from the initial to the final time step*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 1. 数据集质量分析
 
@@ -284,7 +288,9 @@ $$\mathcal{L}_{\mathrm{total}} = \lambda_{1} \mathcal{L}_{\mathrm{mse}} + \lambd
 ![[assets/figures/papers/paper_list_l828_https_arxiv_org_abs_2509_09676/figures/020_Figure_15.jpg]]
 *Figure 15: Statistical analysis of the caption data. Fig. (a) and Fig. (b) show the length distributions for motion and scene captions, respectively, comparing the original captions to our enhanced versions. A significant increase in caption length is evident for both types after enhancement*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 数据集谱系与定位
 
@@ -323,6 +329,8 @@ SpatialVID 的几何注释管线对 MegaSaM 的深度模块进行了关键升级
 - **空间感知标题的质量上限**：当前结构化标题由 Gemini-2.0-Flash 解析视觉内容、Qwen3-30B-A3B 结合相机姿态精炼生成（Figure 3）。Figure 4 展示了空间增强对方向纠正的有效性，但标题的 3D 空间推理能力仍受限于 VLM/LLM 的固有局限。引入更强的 3D 推理能力（如 3D 场景图生成、空间关系推理模块）是否能进一步提升标题的空间准确性，是一个值得探索的方向。
 
 - **注释管线的自动化与规模化**：当前管线中的人工筛选环节（手动筛选运动丰富的 YouTube 视频）是数据集质量的关键保障，但也构成了规模化的瓶颈。如何自动化识别“运动丰富且适合 3D 重建”的视频片段，同时保持与人工筛选相当的质量标准，是实现更大规模空间智能数据集的关键挑战。
+
+
 
 ## 原文 PDF
 

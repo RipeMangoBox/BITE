@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/STVG_R1_Incentivizing_Instance_Level_Reasoning_and_Grounding_in_Videos_via_Reinforcement_Learning.pdf
+project_link: https://stvg-r1.github.io/
+code_link: null
 openreview_forum_id: zuPxAZgT9F
 aliases:
 - SR
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | STVG-R1：通过强化学习激励视频中的实例级推理与定位 |
 | 英文题名 | STVG-R1: Incentivizing Instance-Level Reasoning and Grounding in Videos via Reinforcement Learning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=zuPxAZgT9F); [Project](https://stvg-r1.github.io/) |
+| Links | [paper](https://openreview.net/forum?id=zuPxAZgT9F) · [Project](https://stvg-r1.github.io/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | STVG-R1 |
 | Dataset | HCSTVG-v2, HCSTVG-v1, MeViS, ST-Align (STVG) |
@@ -42,7 +44,7 @@ claims:
 > - HCSTVG-v1 上，vIoU@0.3 为 66.7，对比 28.2 (Qwen2.5-VL-7B)，变化 +38.5。
 > - MeViS 上，J&F 为 47.3，对比 45.2 (VideoGlaMM)，变化 +2.1。
 
-## 概述
+## 概要
 
 时空视频定位（Spatial-Temporal Video Grounding, STVG）要求模型根据自然语言查询，在视频中同时定位目标对象的时序区间和空间轨迹。现有视觉-语言模型（VLM）在该任务上面临一个根本性瓶颈：**跨模态错位导致的严重幻觉问题**——模型需要逐帧输出边界框坐标，这种密集回归范式极易产生时序不一致甚至无效的预测，使得通用VLM在STVG上表现远逊于专用模型。
 
@@ -58,7 +60,7 @@ STVG-R1 的核心洞察在于**将逐帧坐标回归重新定义为基于视觉�
 
 **局限与待验证方向：** 视觉提示的质量受限于检测器和跟踪器的性能，且轻微遮挡视频内容；纯时序任务上视觉提示非必需；训练数据局限于两个STVG数据集，更大规模场景下的泛化性有待进一步验证。
 
-## 背景与动机
+
 
 时空视频定位（Spatial-Temporal Video Grounding, STVG）要求模型根据自然语言查询，同时定位目标对象在视频中的时间区间和每一帧的空间位置。该任务的核心挑战在于：模型必须建立跨模态的时间-空间联合理解，而非孤立地处理时序或空间线索。
 
@@ -66,7 +68,9 @@ STVG-R1 的核心洞察在于**将逐帧坐标回归重新定义为基于视觉�
 
 **范式转换的动机。** 本文的核心洞察是：将复杂的逐帧坐标回归问题重新定义为基于视觉提示的紧凑实例级识别问题。具体而言，与其让VLM学习“对象在每帧的坐标是多少”，不如让VLM回答“哪个标记的对象是目标”——这恰好是VLM擅长的语义匹配任务。通过在每个候选实例的中心叠加带有唯一数字ID的视觉提示，VLM只需输出目标ID和时序区间，即可完成时空定位。这种以对象为中心的视觉提示范式无需任何可训练的坐标对齐模块，将跨模态错位问题从“语义-坐标对齐”降维为“语义-ID匹配”，从根本上规避了幻觉的来源。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 STVG-R1 的核心创新在于将复杂的时空视频定位（STVG）从**逐帧密集坐标回归**重新定义为**基于视觉提示的紧凑实例ID识别**问题，并通过强化学习驱动任务导向的联合优化。这一范式转换体现在三个紧密耦合的 changed slots 上。
 
@@ -98,7 +102,7 @@ STVG-R1 首次将强化学习引入 STVG 任务，采用 GRPO（Group Relative P
 
 STVG-R1 的因果操纵杆在于**将跨模态对齐的负担从 VLM 转移到预处理管道**。视觉提示在输入侧完成了“像素→实例”的映射，VLM 只需在语义空间进行“查询→实例ID”的匹配，避开了直接学习跨模态坐标对齐这一核心瓶颈。这一设计的决定性证据包括：(1) 零样本视觉提示即可大幅提升多个 VLM 的性能；(2) 强化学习进一步带来 20%+ 的绝对增益；(3) 仅用单对象 STVG 数据训练的模型意外泛化到多对象视频分割任务，在 MeViS 上取得 47.3% J&F 的最佳结果（Table 3），说明视觉提示范式本身赋予了模型处理多实例场景的能力。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_zuPxAZgT9F/figures/002_Figure_2.jpg]]
 *Figure 2: Comparison of paradigms: (a) VLM produces both timestamps and frame-level coordinates with a trainable alignment block; (b) VLM generates segmentation tokens, which are then processed by a trainable decoder; (c) our method uses training-free object-centric visual prompted video for spatial-temporal video grounding*
@@ -154,7 +158,7 @@ STVG-R1 的整体框架如 Figure 3 所示，由四个核心模块串联构成�
 
 该框架的突出优势在于：视觉提示叠加是**免训练的**，不引入额外参数；强化学习的奖励设计直接联合优化时序精度、空间一致性和输出格式；且以对象为中心的提示使 VLM 的推理过程具有可解释性——模型可以“看到”并“推理”候选对象，而非盲目回归坐标。
 
-## 核心模块与公式推导
+
 
 ### 3.1 视觉提示增强与范式重构
 
@@ -212,7 +216,9 @@ $$\mathcal{J}_{\mathrm{GRPO}}(\theta) = \mathbb{E}_{(\tilde{\nu}, q) \sim \mathc
 
 其中 $\epsilon$ 为裁剪参数，$\beta$ 控制 KL 正则化强度，$\pi_{\mathrm{ref}}$ 为冻结的参考策略。裁剪项防止策略更新过大，KL 惩罚约束策略偏离参考模型过远，二者共同保证训练稳定性。训练在 8×A100 GPU 上进行，数据仅包含单对象 STVG 数据集（HCSTVG 和 VidSTG）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -316,7 +322,9 @@ Table 11显示，去除重检测组件（w/o re-detection）严重损害vIoU（�
 ![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_zuPxAZgT9F/figures/011_Table_8.jpg]]
 *Table 8: Ablation study with different modules on ST-Align*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 范式变革：从密集坐标回归到实例识别
 
@@ -364,6 +372,8 @@ STVG-R1的适用边界由其核心设计决定：
 - 强化学习奖励函数能否与更细粒度的评估指标（如vIoU@0.7）进行直接联合优化，以提升高精度场景下的表现？
 - 在无现成检测器或分割模型的条件下，能否通过VLM自身生成视觉提示实现端到端训练，从而消除上游依赖瓶颈？
 - 在更大规模、更多样化的视频数据上进行强化学习，是否会涌现出更复杂的推理行为（如时序因果推理、多对象关系建模）？
+
+
 
 ## 原文 PDF
 

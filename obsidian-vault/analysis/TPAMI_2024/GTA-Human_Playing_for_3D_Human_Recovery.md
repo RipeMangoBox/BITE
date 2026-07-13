@@ -45,7 +45,7 @@ claims:
 > - 3DPW 上，PA-MPJPE (mm) 60.5 vs 67.5 (-7.0)；PA-MPJPE (mm) 56.0 vs 61.7 (-5.7)；PA-MPJPE (mm) 55.5 vs 61.7 (-6.2)。
 > - 3DPW (video-based) 上，PA-MPJPE (mm) 51.9 vs 56.5 (-4.6)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -73,7 +73,7 @@ GTA-Human本身是一个数据集贡献，而非全新的模型架构。其方�
 
 这些结果表明，GTA-Human以数据驱动的方式，为3D人体恢复领域提供了一条低成本、高效益的性能提升路径。
 
-## 背景与动机
+
 
 ### 问题背景：3D人体恢复的数据瓶颈
 
@@ -112,7 +112,9 @@ GTA-Human本身是一个数据集贡献，而非全新的模型架构。其方�
 
 基于以上动机，本文构建了**GTA-Human**——一个基于游戏GTA-V的大规模合成人体数据集，包含140万帧具有精确SMPL标注的图像，覆盖丰富的户外场景、动作、相机角度和天气条件，并系统性地验证了合成数据对3D人体恢复任务的增益机制。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GTA-Human 的核心创新并非提出一种新的模型架构，而是通过**大规模、高多样性的合成数据生成与简单的混合训练策略**，系统性地解决了 3D 人体恢复任务中长期存在的数据瓶颈。其创新点可归结为两个紧密耦合的层面：数据生产范式的变革，以及与之适配的训练策略。
 
@@ -159,7 +161,7 @@ GTA-Human 的核心创新并非提出一种新的模型架构，而是通过**�
 
 > **手动验证建议**：论文未明确讨论模型在不同肤色、性别、体型上的公平性偏差。虽然 GTA‑Human 覆盖了超过 600 名不同主体，但合成数据本身可能继承游戏引擎中角色外观的分布偏置，需在实际部署时注意。
 
-## 整体框架
+
 
 GTA-Human 的核心贡献并非提出新的模型架构，而是构建了一套可扩展的合成数据生成管线，并通过极简的数据混合策略显著提升现有 3D 人体恢复模型在真实场景中的泛化能力。其整体框架由 **数据生成工具链** 与 **下游训练策略** 两个松耦合阶段构成。
 
@@ -196,7 +198,7 @@ GTA-Human 的使用方式极为简洁，不要求修改模型结构，仅通过�
 
 这两种策略均不依赖对抗训练或风格迁移等复杂的域适应技术，却能在 3DPW 等真实世界基准上实现一致且显著的性能提升——例如 HMR 的 PA-MPJPE 从 67.5 mm 降至 60.5 mm（BT），PARE 进一步降至 46.8 mm（FT），验证了数据多样性与规模本身即是决定性能的核心因素。
 
-## 核心模块与公式推导
+
 
 GTA-Human 的核心贡献在于**数据生成管线**与**训练策略**，而非提出新的模型架构。其关键模块分布在数据采集工具链和监督学习损失函数中。
 
@@ -241,7 +243,9 @@ $$\hat{X}_{2D} = \mathcal{K}(\mathcal{T}(\hat{X}_{3D}, \hat{\mathbf{t}}), \mathb
 
 这两种策略构成了将合成数据转化为性能增益的“因果旋钮”，其有效性在多个基线方法上得到验证。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置与评估基准
 
@@ -330,7 +334,9 @@ Table 11显示GTA-Human与另一合成数据集AGORA具有互补性。将GTA-Hum
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2110_07588/figures/006_Figure_4.jpg]]
 *Figure 4: Actions. GTA-Human contains 20 thousand actions that are expressive and diverse. (a) The distribution of poses in GTA-Human and real datasets are visualized after PCA dimension reduction. (b) We show five pose sequences, represented by curves. Representative frames of sequence 1-5 are indicated by the diamond-shaped nodes. Datasets are downsampled proportionally*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 在3D人体恢复演进中的位置
 
@@ -370,6 +376,8 @@ Table 4将GTA-Human与同期合成数据方案进行了对比。与**AGORA**（P
 - **体型标注的升级路径**：如何升级游戏引擎的渲染管线或标注算法，以获取完整的体型信息（而非仅骨骼长度），是提升3D人体重建精度的关键。
 - **多源合成数据的协同**：GTA-Human与AGORA的互补性已初步验证，但如何系统性地组合多种合成数据源（游戏引擎、图形渲染、生成模型）以最大化覆盖范围，尚无成熟方案。
 - **向其他任务的迁移**：GTA-Human的标注管线能否扩展到模型无关的人体重建、人体-物体交互理解等更广泛的人本视觉任务？这决定了其知识库价值的广度。
+
+
 
 ## 原文 PDF
 

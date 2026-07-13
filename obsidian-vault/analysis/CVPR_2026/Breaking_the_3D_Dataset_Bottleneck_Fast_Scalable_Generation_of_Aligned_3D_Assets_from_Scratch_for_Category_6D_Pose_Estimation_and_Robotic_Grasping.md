@@ -44,7 +44,7 @@ claims:
 > - 自定义SAPIEN抓取仿真（NOCS类别） 上，抓取成功率 (Grasp Success Rate %) 87.8 (Custom-CG on our meshes) vs 82.7 (CenterGrasp on OmniObject3D) (+5.1)。
 > - NOCS合成验证集（in-domain） 上，平均6D姿态精度 (Avg 6D pose accuracy) 23.91 (GenNOCS meshes) vs 15.66 (original NOCS synthetic meshes) (+8.25)。
 
-## 概述
+## 概要
 
 类别级6D姿态估计与机器人抓取长期受困于一个根本性瓶颈：大规模、高质量且规范对齐的3D数据极度匮乏。现有数据集要么实例数与类别数有限，要么缺乏统一的规范朝向，要么依赖昂贵的人工扫描与艺术家建模，难以支撑稳健的视觉学习。本文提出的**GenOmni3D流水线**直指这一症结，首次实现了从文本类别描述到对齐3D资产的完全自动化生成，将单物体网格生成时间压缩至**3分钟以内**——相比传统扫描流程加速5–20倍。
 
@@ -54,7 +54,7 @@ claims:
 
 **方法定位**：GenOmni3D属于“文本→深度条件图像→3D网格”的生成式数据扩增范式，其核心调控变量是深度条件信号，区别于纯文本提示的生成方法（如GenVegeFruits3D）和纯合成渲染流水线（如Omni6D）。该方法在数据规模、对齐质量与生成效率三个维度上同时实现了突破，为类别级3D视觉任务提供了可规模化的数据基础。
 
-## 背景与动机
+
 
 类别级6D姿态估计旨在从单张RGB-D图像中预测物体实例的三维位置、朝向及尺寸，是机器人抓取、增强现实和场景理解等下游任务的关键感知能力。然而，该领域长期受困于一个根本性瓶颈：**大规模、高质量且规范对齐的3D数据极度匮乏**。与实例级任务不同，类别级方法需要覆盖同一类别内丰富的几何与纹理变化，这对训练数据的数量、多样性和一致性提出了极高要求。
 
@@ -64,7 +64,9 @@ claims:
 
 本文的核心动机源于一个关键观察：**文本到图像生成模型具备保留物体全局结构与空间姿态的能力，而深度图作为中间表示可以显式编码规范朝向信息**。这一洞察指向了一条从零自动化生成对齐3D资产的全新路径——通过在前端引入深度条件控制，将规范对齐能力内嵌于生成流水线，从而彻底摆脱对人工对齐或后处理过滤的依赖。基于此，本文提出GenOmni3D流水线，旨在以每个物体不到3分钟的速度、5–20倍于传统扫描的加速比，实现大规模、高质量、规范对齐的3D网格生成，为类别级6D姿态估计和机器人抓取提供前所未有的数据支撑。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作的核心创新在于将**规范对齐能力内嵌于生成流水线的前端**，从而彻底绕过了传统方法中“先生成、后对齐”的低效范式。具体而言，GenOmni3D Pipeline 通过三个关键槽位的替换，实现了从文本描述到对齐3D资产的全自动规模化生成。
 
@@ -91,7 +93,7 @@ GenOmni3D 的核心洞察在于：**深度图是连接语义控制与几何约�
 
 在6D姿态数据生成流水线方面，本工作继承并扩展了 **Omni6D**（Zhang et al., ECCV 2024）的合成渲染框架和 **Omni6DPose**（Zhang et al., ECCV 2024）的混合现实渲染策略，但将上游的3D资产来源从人工建模替换为全自动生成，使数据生产速度提升5–20倍（每对象不到3分钟）。下游实验中，用生成的GenNOCS网格替换原始NOCS合成物体后，域内6D姿态精度从15.66提升至23.91（+8.25），验证了生成资产的质量足以支撑高精度学习。
 
-## 整体框架
+
 
 GenOmni3D流水线旨在以全自动方式将类别描述转化为大规模、高质量且具有规范朝向一致性的3D网格资产。其核心设计逻辑在于：**将规范对齐能力内嵌于生成流水线的前端**——通过在文本到图像的生成阶段引入深度图作为显式空间控制信号，使后续3D重建天然继承一致的物体朝向，从而彻底摆脱对后期手动对齐的依赖。
 
@@ -122,7 +124,7 @@ GenOmni3D流水线旨在以全自动方式将类别描述转化为大规模、�
 ![[assets/figures/papers/paper_list_l2202_https_openaccess_thecvf_com_content_CVPR2026_html_Guillaume_Breaking_the/figures/001_Figure_1.jpg]]
 *Figure 1: Our text-to-image pipeline: (a) Category-based geometry prompt engineering and images generation; (b) Depth-conditioned image generation for texture variation and automatic alignment*
 
-## 核心模块与公式推导
+
 
 GenOmni3D流水线由四个顺序模块构成，其核心设计目标是：在保证生成网格规范对齐的前提下，最大化几何与纹理的类别内多样性。整个流水线可在单张消费级GPU上运行，每个物体生成时间少于3分钟。
 
@@ -186,7 +188,9 @@ GenOmni3D流水线由四个顺序模块构成，其核心设计目标是：在�
 
 ![[assets/figures/papers/paper_list_l2202_https_openaccess_thecvf_com_content_CVPR2026_html_Guillaume_Breaking_the/figures/006_Table.jpg]]
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设定与公平性保障
 
@@ -243,7 +247,9 @@ Table 4对比了多种3D网格生成方法。**Hunyuan3D-v2.0**在输出质量�
 ![[assets/figures/papers/paper_list_l2202_https_openaccess_thecvf_com_content_CVPR2026_html_Guillaume_Breaking_the/figures/012_Figure_9.jpg]]
 *Figure 9: Real images of REAL275 [27]*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 生成式3D数据：从扫描到合成的范式转移
 
@@ -271,6 +277,8 @@ GenOmni3D并非孤立的数据生成工具，而是与6D姿态估计和机器人
 ### 知识库定位
 
 GenOmni3D处于**生成式3D数据**与**类别级6D姿态估计**的交叉点。其上游依赖文本到图像扩散模型（ControlNet）和单视图3D重建模型（Hunyuan3D-v2.0），下游赋能6D姿态估计网络（DualPoseNet）和抓取策略（Custom-CG）。与纯合成渲染管线（Omni6D）和纯真实扫描管线（NOCS）不同，GenOmni3D开创了“深度条件生成→对齐3D重建→混合现实渲染”的第三条路径，以不到3分钟/物体的速度实现5–20倍的加速，同时保持与手工建模相当的网格质量和显著更优的姿态一致性。
+
+
 
 ## 原文 PDF
 

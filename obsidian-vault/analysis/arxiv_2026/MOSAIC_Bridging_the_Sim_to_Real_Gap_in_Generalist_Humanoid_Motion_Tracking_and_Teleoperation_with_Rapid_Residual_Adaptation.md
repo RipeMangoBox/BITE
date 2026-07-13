@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2026
 pdf_ref: paperPDFs/arxiv_2026/MOSAIC_Bridging_the_Sim_to_Real_Gap_in_Generalist_Humanoid_Motion_Tracking_and_Teleoperation_with_Rapid_Residual_Adaptation.pdf
+project_link: null
+code_link: https://github.com/lcm-proj/lcm
 aliases:
 - MOSAIC
 tags:
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | MOSAIC：通过快速残差适应弥合通用人形运动跟踪与遥操作的仿真到现实差距 |
 | 英文题名 | MOSAIC: Bridging the Sim-to-Real Gap in Generalist Humanoid Motion Tracking and Teleoperation with Rapid Residual Adaptation |
 | 会议/期刊 | arXiv 2026 |
-| Links | [paper](https://arxiv.org/abs/2602.08594v2) · [Code](https://github.com/lcm-proj/lcm) · [arXiv](https://arxiv.org/abs/2511.04831) |
+| Links | [paper](https://arxiv.org/abs/2602.08594v2) · [Code](https://github.com/lcm-proj/lcm) · [paper](https://arxiv.org/abs/2511.04831) |
 | Topic | #topic/vision_multimodal_applications #topic/benchmarks_datasets_evaluation #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | MOSAIC |
 | Dataset | VR teleoperation dataset, Motion-X-Sub |
@@ -40,7 +42,7 @@ claims:
 > - VR teleoperation dataset 上，E_AP (m) ↓ 1.1940 vs 2.9352 (-1.7412)。
 > - Motion-X-Sub (OOD general motions) 上，Success Rate ↑ 77.25% vs 77.88% (-0.63%)。
 
-## 概述
+## 概要
 
 **问题**：通用人形运动跟踪策略在仿真环境中表现优异，但部署到真实遥操作场景时，接口相关的延迟（VR约0.4 s，惯性动捕约0.2 s）、噪声和抖动导致显著的仿真到现实（Sim-to-Real）域差距。这使通用跟踪器出现漂移、接触中断和长期不稳定，而非运动多样性不足。
 
@@ -51,8 +53,6 @@ claims:
 **主要结果**：在VR遥操作数据集上，Adapter (W) 将全局锚点位置误差 E_AP 从基础模型的2.9352 m降至1.1940 m（Table V）。在OOD通用运动测试集Motion-X-Sub上，残差适配器保持77.25%成功率，仅比通用跟踪器下降0.63个百分点，而微调（Fine-tuning）和连续学习（Continual Learning）分别降至40.60%和显著退化（Table IV）。多源数据（5-Sources）一致优于单源数据，世界坐标系奖励显著降低长期漂移。30分钟遥操作数据即可达到有效适配，3分钟不足，FLD数据增强效果有限（Table VI）。
 
 **局限与展望**：MOSAIC仍依赖可靠的低延迟感知和状态估计，残差适应主要针对接口偏移而非所有仿真到现实不匹配（如动力学建模误差）。当前适配器为单一接口训练，多接口间的迁移能力未充分验证，长时遥操作（>10分钟）的稳定性极限仍需进一步研究。
-
-## 背景与动机
 
 ### 人形机器人运动跟踪与遥操作的双重挑战
 
@@ -74,7 +74,7 @@ MOSAIC的核心洞察在于认识到：**遥操作部署中的性能退化本质
 
 3. **如何在真实机器人上实现鲁棒且可移植的部署？** 通过RobotBridge标准化部署框架，统一策略推理、仿真/机器人后端和底层控制器的接口，支持离线运动回放和在线遥操作的无缝切换。
 
-## 核心创新
+## 核心方法与创新机理
 
 MOSAIC 的核心创新在于提出了一套**残差适应框架**，将通用运动跟踪能力与遥操作接口特异性需求解耦，从而在保持广泛运动泛化能力的同时，实现针对特定遥操作接口的快速、小样本适应。这一框架围绕四个关键设计展开，形成从数据到策略再到部署的完整创新链条。
 
@@ -133,8 +133,6 @@ MOSAIC 的残差适配器实现了**接口特异性处理与通用运动知识�
 
 **需注意的局限**：残差适应主要针对接口偏移（延迟、噪声、抖动），不能解决所有仿真到现实的差距（如动力学建模误差）。当前系统在单一接口上训练适配器，不同接口间的迁移能力未充分验证。在长时遥操作（>10 分钟）中，积累的微小残差误差仍可能导致缓慢漂移，需要进一步研究。
 
-## 整体框架
-
 MOSAIC 构建了一条统一的训练–部署流水线，使单一人形机器人策略能够同时支持离线运动回放和在线全身遥操作两种模式。如图 2 所示，系统在逻辑上分为训练/仿真侧和部署/真实机器人侧，两端通过 RobotBridge 框架桥接，实现一致的策略推理与跨平台移植。
 
 **训练侧**的入口是多源运动数据的聚合与预处理。系统从光学动捕、惯性动捕、公开数据集及生成数据中收集异构运动序列，统一重定向至目标机器人的关节空间（Sec. IV-A, Table I）。随后，两级自适应重采样模块（Sec. IV-B）在运动级别按失败率、新颖性和均匀分布的混合策略分配采样权重，在帧级别采用失败感知的指数滑动平均平滑采样，从而在充分利用数据的同时聚焦困难运动段。
@@ -166,8 +164,6 @@ $$\tau_{t} = K_{p}(q_{t}^{des} - q_{t}) + K_{d}(\dot{q}_{t}^{des} - \dot{q}_{t})
 
 ![[assets/figures/papers/paper_list_l53_https_arxiv_org_abs_2602_08594v2/figures/001_Figure_1.jpg]]
 *Figure 1: MOSAIC in Action. MOSAIC enables a single humanoid policy to operate in two modes: offline motion replay (top) and online whole-body teleoperation from multiple wearable interfaces (bottom). In offline replay, the robot robustly tracks diverse and highly dynamic reference motions—walking, running, kicking, kungfu-style strikes, jumping, and squatting. In online teleoperation, MOSAIC faithfully mirrors real-time human motion streams and supports challenging contact-rich and high-agility behaviors, including mid-air jump turns, single-leg support, and jump-shot–style movements*
-
-## 核心模块与公式推导
 
 ### 3.1 控制基础：关节空间PD控制
 
@@ -228,7 +224,7 @@ RobotBridge提供标准化的策略推理、仿真/机器人后端及底层控�
 ![[assets/figures/papers/paper_list_l53_https_arxiv_org_abs_2602_08594v2/figures/005_Figure.jpg]]
 *Figure: (a) Quantitative Comparison of Data Source. (b) Quantitative Ablation of Reward Design and Training Paradigms Alongside Benchmarking with Prior Work*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 实验设置
 
@@ -307,13 +303,10 @@ Fig. 4 展示了高动态运动的定性对比。从左至右依次为 MOSAIC、
 ![[assets/figures/papers/paper_list_l53_https_arxiv_org_abs_2602_08594v2/figures/008_Table.jpg]]
 *Table: VI. Data scaling analysis on VR dataset*
 
-![[assets/figures/papers/paper_list_l53_https_arxiv_org_abs_2602_08594v2/figures/004_Table.jpg]]
-*Table: II. Observation terms and noises used during policy training. The actor uses the Prop observation stack with a 5-step history, while the critic uses the full set of observations including Prop and Priv terms with current step. TABLE III. Reward terms and weights. Our design combines the tracking objectives from BeyondMimic with additional global teleoperation-oriented terms inspired by prior motion-imitation systems such as ASAP and KungfuBot, while regularizing contacts, action smoothness, and joint limits/torques to improve stability and deployability*
-
 ![[assets/figures/papers/paper_list_l53_https_arxiv_org_abs_2602_08594v2/figures/002_Table.jpg]]
 *Table: I. Dataset summary. We will open-source all highquality multi-source motion data collected in-house*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 与基线方法的关系
 

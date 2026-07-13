@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Benchmarking_LLM_Tool_Use_in_the_Wild.pdf
+project_link: null
+code_link: https://github.com/yupeijei1997/WildToolBench
 openreview_forum_id: yz7fL5vfpn
 aliases:
 - BLTUW
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 对LLM在真实场景中工具使用能力的基准测试 |
 | 英文题名 | Benchmarking LLM Tool-Use in the Wild |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=yz7fL5vfpn); [GitHub](https://github.com/yupeijei1997/WildToolBench) |
+| Links | [paper](https://openreview.net/forum?id=yz7fL5vfpn) · [GitHub](https://github.com/yupeijei1997/WildToolBench) |
 | Topic | #topic/benchmarks_datasets_evaluation #topic/benchmarks_datasets_evaluation/benchmark_eval |
 | Method | WildToolBench |
 | Dataset | WildToolBench, WildToolBench Tool Orchestration, Cross-benchmark (WildToolBench vs BFCL-v2) |
@@ -41,7 +43,7 @@ claims:
 > - WildToolBench 上，Session Accuracy (%) 为 Gemini-2.0-Thinking: 14.45，对比 GPT-4o: 11.72，变化 +2.73。
 > - WildToolBench Tool Orchestration 上，Task Accuracy for g_multi^{S+P} (%) 为 Claude-4-Sonnet: 25.00，对比 xLAM-2-70B: 16.67，变化 +8.33。
 
-## 概述
+## 概要
 
 当前LLM在真实用户交互中的工具使用能力受三大“野性”特征制约：**组合任务（tool orchestration）**、**对话中隐含的用户意图（hidden intention）** 以及**频繁的指令类型转换（instruction transition）**。这些特征在现有基准中被系统性忽略——例如BFCL v2/v3（Patil et al., 2025）不包含隐藏信息或指令切换，ToolBench（Qin et al., 2024）和AnyToolBench（Du et al., 2024）仅支持单轮多步调用——导致模型在WildToolBench上的**会话准确率无一超过15%**，多数模型任务准确率低于60%（Table 2）。这一性能鸿沟的根源在于：LLM在意图推理、策略切换和工具编排规划上存在根本缺陷，而非单纯的任务复杂度问题。
 
@@ -49,7 +51,7 @@ WildToolBench的核心洞察是：真正的挑战不在于人工构造极端复�
 
 在方法谱系中，WildToolBench填补了从单轮工具调用评估到真实多轮交互评估的关键空缺。与τ²-bench（Barres et al., 2025）等采用LLM模拟用户的基准不同，WildToolBench从大规模真实用户日志中提取行为模式，通过多智能体系统生成初始轨迹后经人工专家逐条标注，确保数据的真实性。该基准覆盖256个场景、1024个任务，支持顺序、并行及混合工具调用模式的同步评估，其会话准确率指标直接衡量模型在完整对话中连续完成多个关联任务的能力，这是此前所有基准均未触及的评估维度。
 
-## 背景与动机
+
 
 ### 从基准测试到真实交互的鸿沟
 
@@ -73,7 +75,9 @@ WildToolBench 的构建动机源于对真实用户日志的分析，识别出三
 
 该工作的根本判断是：**真正的挑战不在于人工构造极端复杂的单任务，而在于模拟用户自然行为中简单但多变的交互模式**。通过在基准中显式引入组合性、语境相关性和指令切换，WildToolBench 揭示了现有模型在理解真实对话流和动态调整策略方面的根本缺陷——所有主流模型的会话准确率均低于15%，暴露了LLM在意图推理、策略切换和工具编排规划上的系统性不足。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 WildToolBench 的核心创新在于将真实用户交互中三个被现有基准系统性忽略的行为特征——**组合任务（tool orchestration）**、**对话中隐含的用户意图（hidden intention）** 和**频繁的指令类型转换（instruction transition）**——显式地引入评估框架，从而将工具调用评测从“语法正确性”推升至“语义与逻辑推理”层面。这三大特征构成了基准的 changed slots，直接对标并颠覆了以往基准的假设。
 
@@ -101,7 +105,7 @@ WildToolBench 的核心创新在于将真实用户交互中三个被现有基准
 
 分析揭示了一个关键的因果杠杆：**模型是否具备强大的多步推理能力**是影响性能的核心因素。推理增强模型（如 **Gemini-2.0-Thinking**、**o1**）在组合任务和隐含意图推断上显著优于非推理模型；在工具编排中，同系列推理变体的整体任务准确率和最优路径率均高于非推理版本（Table 3）。相反，专门化的工具调用模型（如 xLAM-2-70B、ToolACE-2-8B）虽在单工具任务上表现尚可，但因缺乏上下文推理能力，在需要跨轮次意图推断的场景中性能急剧下降。这一发现表明，**真正的挑战不在于工具调用的语法正确性，而在于理解真实对话流并动态调整策略的语义推理能力**——这正是 WildToolBench 通过三个 changed slots 所精准捕捉的鸿沟。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l39_https_openreview_net_forum_id_yz7fL5vfpn/figures/007_Table_1.jpg]]
 *Table 1: Comparative analysis of the WildToolBench against other tool-use benchmarks*
@@ -147,7 +151,7 @@ Table 1系统对比了WildToolBench与8个先前基准（BFCL v1–v3、ToolBenc
 
 这些设计使得WildToolBench的会话准确率成为极具挑战性的指标——即便是表现最好的模型Gemini-2.0-Thinking，会话准确率也仅为14.45%（Table 2），远低于其他基准上的表现（如GPT5在BFCL-v2上可达75.0，而在WildToolBench上仅5.9，见Table 5），证实了真实用户行为模式对LLM工具使用能力构成的根本性挑战。
 
-## 核心模块与公式推导
+
 
 ### 3.1 对话与工具调用的形式化
 
@@ -211,7 +215,9 @@ WildToolBench 的评估基于模型是否生成与 ground truth 一致的工具�
 
 对于组合任务，额外引入最优路径率和任务完成进度率，以更精细地衡量工具编排的规划质量。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 4.1 总体表现：会话准确率揭示系统性缺陷
 
@@ -266,7 +272,9 @@ Table 4 将错误细分为**动作错误**（Action Errors）和**参数错误**
 
 **总结**：WildToolBench 的实验结果系统性地揭示了当前 LLM 在真实工具使用场景中的三大能力缺口——工具编排规划、跨轮次意图推理和动态策略切换。推理增强模型在各项指标上整体领先，但即使在最优配置下，会话准确率仍低于 15%，表明现有技术在模拟用户自然交互的不可预测性方面存在根本性鸿沟。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有基准的关系
 
@@ -299,6 +307,8 @@ WildToolBench 的核心贡献在于将工具使用评估从“单轮、显式、
 **行为风格的调控。** 错误分析揭示了模型的两种极端行为风格：Gemini-2.0-Thinking 的“谨慎型”（24.56% 拒绝率）和 Grok-4 的“鲁莽型”（24.07% 错误名称率）。这种风格差异是否可以通过训练干预或推理时策略（如温度调节、拒绝阈值校准）加以调控，尚待研究。
 
 **意图推理的机制改进。** WildToolBench 揭示的核心缺陷——长距离依赖任务中无模型超过 50% 准确率、指令转换导致高达 30% 的准确率下降——指向 LLM 在对话有状态上下文记忆和策略切换上的根本不足。增强对话记忆机制（如结构化上下文摘要）或少样本提示中注入隐式意图推理示例是否能缓解这些问题，是值得探索的方向。
+
+
 
 ## 原文 PDF
 

@@ -43,7 +43,7 @@ claims:
 > - V-COCO (Scenario 1) 上，AP_role 73.6 vs 69.8 (NMSR, ICCV 2025) (+3.8)。
 > - HICO-DET Zero-shot (RF-UC Unseen) 上，mAP 37.69 vs 36.72 (VDRP, NeurIPS 2025?) (+0.97)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -73,7 +73,7 @@ claims:
 
 InCoM-Net属于VLM集成型HOI检测方法，与**HOICLIP**（Ning et al., CVPR 2023）等代表性工作共享利用VLM语义知识的基本思路，但在上下文利用方式上有本质区别：它摒弃了全局统一或简单RoI对齐的特征提取范式，转而采用**以实例为中心的分层上下文挖掘与渐进式特征融合**，从而在复杂交互推理上取得显著突破。
 
-## 背景与动机
+
 
 ### 任务背景
 
@@ -91,7 +91,9 @@ InCoM-Net属于VLM集成型HOI检测方法，与**HOICLIP**（Ning et al., CVPR 
 
 针对上述问题，本文提出 **InCoM-Net（Instance-centric Context Mining Network）**，其核心动机在于：**以实例为中心，从 VLM 特征中挖掘多层级上下文，并通过渐进聚合策略将其有效融入检测器特征，从而实现更精准的交互推理**。如图 1 所示，对于每个实例，上下文信息可被区分为实例内（intra-instance）、实例间（inter-instance）和全局（global）三个层次，每一层次为交互理解提供互补线索。InCoM-Net 正是围绕这一三层上下文范式展开设计，使模型能够自适应地关注与目标实例最相关的视觉语义线索。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 InCoM-Net 的核心创新在于将 VLM 提供的语义上下文从“全局均等施加”转变为**以实例为中心的多粒度上下文挖掘与渐进聚合**，并辅以**掩码特征训练**策略来均衡异质特征源的利用。这一设计直接回应了现有方法（如 **HOICLIP** (Ning et al., CVPR 2023) 和 **QPIC** (Tamura et al., CVPR 2021)）的瓶颈：它们通常将 VLM 特征作为统一上下文或以简单 RoI 对齐方式注入，未能针对每个实例提取细粒度的多层级视觉-语义线索，导致对复杂交互的推理能力不足。
 
@@ -119,7 +121,7 @@ InCoM-Net 的核心创新在于将 VLM 提供的语义上下文从“全局均�
 
 这三个 changed slots 并非孤立改进，而是形成了一条因果链：**ICR** 产生高质量的实例中心多上下文特征，**ProCA** 以结构化的方式将这些特征渐进注入检测器查询，**MFT** 则确保训练过程中两种特征源被均衡利用。完整的多上下文配置在稀有类别上比常规 RoI 对齐方法提升 **+2.32 mAP**（Sec. 4.3），证明该设计对稀有交互具有强大的建模能力——这正是实例中心精细化上下文推理的直接收益。
 
-## 整体框架
+
 
 InCoM-Net 遵循“检测器提取实例特征 + VLM 提供语义上下文 + 交互解码器推理人-物交互”的总体范式，其核心创新在于以**实例为中心**的多层级上下文挖掘与渐进式聚合机制。图 2 展示了框架的全貌。
 
@@ -145,7 +147,7 @@ InCoM-Net 遵循“检测器提取实例特征 + VLM 提供语义上下文 + 交
 ![[assets/figures/papers/paper_list_l980_https_arxiv_org_abs_2604_02071/figures/002_Figure_2.jpg]]
 *Figure 2: Overall framework of InCoM-Net. Left: overview of Instance-centric Context Mining that integrates multi-context VLM features with instance-level features. Right: masked feature training (MFT), balancing the utilization of heterogeneous feature sources via masking*
 
-## 核心模块与公式推导
+
 
 InCoM-Net 的核心由两个紧密协作的模块构成：**实例中心上下文精炼（Instance-centric Context Refinement, ICR）** 和 **渐进式上下文聚合（Progressive Context Aggregation, ProCA）**。ICR 负责从 VLM 特征中为每个实例独立提取多粒度上下文线索，ProCA 则通过多层交叉注意力将这些上下文特征逐步融入检测器实例查询中。
 
@@ -210,7 +212,9 @@ $$\mathcal{L} = \sum_{x \in \mathcal{X}} \mathcal{L}_{f}(y, \Phi_{\theta}(x)) \t
 ![[assets/figures/papers/paper_list_l980_https_arxiv_org_abs_2604_02071/figures/004_Figure_4.jpg]]
 *Figure 4: Structure of ProCA*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -266,7 +270,9 @@ Figure 5 可视化了交互解码器的激活图。结果表明，InCoM-Net 能�
 
 所有对比方法均采用相同的评估协议（IoU ≥ 0.5，HICO-DET 和 V-COCO 标准划分）。本方法使用的 DETR 检测器和 CLIP 编码器均采用与其他工作一致的预训练权重并保持冻结，确保了比较的公平性。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位与基线关系
 
@@ -310,6 +316,8 @@ InCoM-Net 可定位于 **VLM 增强的检测器上下文建模** 子领域，与
 - 与 HOICLIP、NMSR 等同属 VLM 集成 HOI 检测路线，但在上下文粒度和聚合策略上形成差异化贡献
 
 其核心 insight——以实例为中心的多上下文建模与渐进聚合——为后续工作提供了可复用的设计模式：将 VLM 语义知识按空间粒度解耦，并通过渐进式注意力机制与检测器特征深度融合。
+
+
 
 ## 原文 PDF
 

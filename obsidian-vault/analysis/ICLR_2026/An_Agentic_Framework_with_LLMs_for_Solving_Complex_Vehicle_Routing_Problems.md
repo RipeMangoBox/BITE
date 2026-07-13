@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/An_Agentic_Framework_with_LLMs_for_Solving_Complex_Vehicle_Routing_Problems.pdf
+project_link: null
+code_link: null
 openreview_forum_id: BMOgYw4EhQ
 aliases:
 - AAFL
@@ -42,7 +44,7 @@ claims:
 > - TSPLib (50-200 nodes) 上，Gap (%) 为 1.28，对比 109.48 (SGE)，变化 -108.20。
 > - CVRP (n=100) 上，Objective value 为 10.55 (AFL, T=10000)，对比 10.55 (HGS-PyVRP, best known)，变化 0.00% gap (tie)。
 
-## 概述
+## 概要
 
 车辆路径问题（VRP）是运筹优化领域的经典难题，现实场景中常伴随容量限制、时间窗、多车场、电动车辆充电等复杂约束。现有基于大语言模型（LLM）的求解方法，如 **SGE**（Iklassov et al., 2024）和 **DRoC**（Jiang et al., 2025b），虽然尝试利用LLM生成求解代码，但普遍依赖手工预定义模块或外部求解器，且缺乏系统的错误处理机制，导致运行时错误率居高不下、解的可行性难以保证。
 
@@ -50,7 +52,7 @@ claims:
 
 实验覆盖17个VRP变体（含标准VRP和电动VRP），结果表明AFL在所有变体上实现了 **0%的运行错误率（RER）和100%的成功率（SR）**，远优于SGE（RER 94.1%）和DRoC（RER 82.4%）。在TSPLib、CVRPLib等标准基准上，AFL的最优性间隙（gap）仅为1.28%–6.66%，而SGE的间隙高达109%–660%。消融研究进一步证实，判断智能体和修改智能体的移除会显著降低问题描述准确率和代码可靠性，验证了多智能体协同迭代机制的关键作用。
 
-## 背景与动机
+
 
 车辆路径问题（VRP）是运筹学与组合优化领域的基础问题之一，其目标是在满足一系列复杂约束的前提下，为一组车辆规划最优配送路线。现实世界中的VRP往往包含容量限制、时间窗、多车场、回程取送货、电动车辆续航等多样约束，这些约束的任意组合会衍生出数十种变体，对求解器的通用性和自适应性提出了极高要求。
 
@@ -66,7 +68,9 @@ claims:
 
 基于此，本文提出**AFL（Agentic Framework with LLMs）**，一个基于多智能体协同的LLM框架，旨在实现从原始VRP实例到高质量可行解的全自动化生成。AFL的核心动机是：让LLM扮演一个知识渊博的开发者角色，直接从原始输入中提取领域知识，生成自包含的求解器代码，并通过多智能体迭代验证机制确保代码的可靠性和解的可行性——无需任何手工模块、外部求解器或人工干预。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 AFL 的核心创新在于将传统依赖手工模块与人工干预的 LLM-based VRP 求解流程，重构为**全自动、自包含的多智能体协同框架**，从根本上解决了代码不可靠与解不可行的瓶颈。其关键 changed slots 如下：
 
@@ -93,7 +97,7 @@ AFL 的核心创新在于将传统依赖手工模块与人工干预的 LLM-based
 
 LLM 单独生成代码时常忽略或错误实现复杂约束。AFL 通过问题描述子任务显式提取约束集合 $K$（作为 $\mathcal{D}(\mathcal{G}) = \{P, S, K, X, Y, Z\}$ 的一部分），并在代码生成和判断阶段反复检查约束嵌入。这使得 AFL 生成的求解器能保证几乎所有约束得到满足，代码可靠性与解可行性接近 100%（Table 12）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l47_https_openreview_net_forum_id_BMOgYw4EhQ/figures/003_Figure_1.jpg]]
 *Figure 1: Overview of an agentic framework with LLMs for solving complex VRPs*
@@ -133,7 +137,7 @@ Figure 1 给出了框架的全局视图。给定一个 VRPLib 格式的 VRP 实�
 
 四个智能体在三个子任务中形成两个闭环：GA-JA-RA 闭环保障问题描述和代码的静态正确性；EAA-RA 闭环处理运行时错误，确保最终产生可行解。这种多层验证机制是实现 0% 运行错误率（RER）和 100% 成功率（SR）的核心因素（Table 5），消融实验（Figure 3）进一步证实，移除 JA 或 RA 将导致问题描述准确率急剧下降。
 
-## 核心模块与公式推导
+
 
 ### 3.1 流水线分解与智能体角色
 
@@ -217,7 +221,9 @@ $$\mathrm{SR} = \frac{V_{\mathrm{succ}}}{V} \times 100\%$$
 
 其中 $V_{\mathrm{succ}}$ 为无错误执行并产生可行解的程序数。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 代码可靠性与成功率：AFL 实现零运行错误
 
@@ -310,7 +316,9 @@ AFL 标准流程在所有测试变体上始终实现最低的 gap 和最高的�
 *Table 8: Main sections of a VRPLIB instance file with descriptions and example*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1 与现有LLM-based VRP方法的对比定位
 
@@ -353,6 +361,8 @@ AFL 的适用边界和已知局限包括：
 - 未来计划引入进化搜索来引导代码生成，可能进一步提升解质量。
 - 判断智能体（JA）输出的具体内容与格式细节尚未完全公开，需进一步查阅补充材料。
 - 生成智能体（GA）在子任务二中的具体提示词和格式规范有待完整披露。
+
+
 
 ## 原文 PDF
 

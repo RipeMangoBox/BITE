@@ -42,7 +42,7 @@ claims:
 > - GSCollision 动态预测 上，RMSE (空间泛化) 0.082 vs 0.096 (Pointformer) (-0.014)；RMSE (时间泛化) 0.107 vs 0.129 (Pointformer) (-0.022)；RMSE (组合泛化-4物体) 0.104 vs 0.162 (Pointformer) (-0.058)。
 > - GSCollision 视频生成 上，PhysR (VLM 评估, 新背景) 0.56 (NGFF-V) vs 0.26 (Cosmos) (+0.30)；PhysR (VLM 评估, 综合) 0.30 (NGFF-V) vs 0.29 (Veo3) (+0.01)。
 
-## 概述
+## 概要
 
 当前视频生成模型在模拟复杂物理交互时，常因缺乏对基本物理定律（如重力、物体永久性）的显式建模而产生违反直觉的动态，而传统物理引擎仿真计算开销极大，难以满足实时交互需求。针对这一瓶颈，本文提出 **Neural Gaussian Force Field (NGFF)**，一种物理驱动的 4D 动力学学习框架。
 
@@ -52,7 +52,7 @@ NGFF 的核心思想是：将前馈式 3D 高斯重建与基于神经算子的�
 
 当前方法仍存在若干局限：依赖约 10 个视角的多视角输入进行可靠重建，力场预测器在真实世界复杂材料属性上的迁移能力有待验证，且视频生成的视觉保真度与纯生成模型相比尚有一定差距。
 
-## 背景与动机
+
 
 ### 问题背景：视频生成中的物理一致性危机
 
@@ -72,7 +72,9 @@ NGFF 的核心思想是：将前馈式 3D 高斯重建与基于神经算子的�
 
 实现这一目标的关键洞察在于：物理交互的本质是力场的时空演化。如果能够从多视角 RGB 图像中重建出带有对象语义的 3D 场景表示，并利用神经算子直接预测对象间的显式力场（包括全局相互作用力和局部接触应力），再通过常微分方程（ODE）求解器进行连续时间积分，就可以在保持物理一致性的同时实现高效推理。这一思路将感知（3D 重建）与动力学（力场预测）统一在一个端到端的可学习框架中，既避免了纯数据驱动方法的物理不可解释性，又绕过了传统物理引擎的计算瓶颈。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 NGFF 的核心创新在于将视频预测重新表述为**显式力场学习与常微分方程（ODE）积分**，从而在物理一致性、泛化能力和推理效率三个维度上突破了现有方法的瓶颈。与现有基线相比，NGFF 在两个关键环节上做出了根本性的改变。
 
@@ -105,7 +107,7 @@ $$\mathbf{z}^{q}(t) = {\mathrm{ODEsolve}} \left( \mathbf{z}^{q}(0), \mathbf{F}, 
 
 消融实验进一步验证了这两个创新点的关键作用：当移除局部应力场预测模块（NGFF w/o deform.）后，空间泛化 RMSE 从 0.082 恶化至 0.110，时间泛化 RMSE 从 0.107 升至 0.127（Table 1 & Table A4），证实了显式力场建模——尤其是局部变形分量——对物理一致性是不可或缺的。
 
-## 整体框架
+
 
 NGFF 将 4D 视频预测形式化为学习**神经力场**，该力场控制 3D 高斯场景表征的时间演化。整个框架由两个互补组件构成：**前馈式重建**将多视角 RGB 观测转换为对象感知的 3D 高斯，以及**神经动力学预测**通过 ODE 求解器模拟物理上合理的动态。
 
@@ -133,7 +135,7 @@ NGFF 将 4D 视频预测形式化为学习**神经力场**，该力场控制 3D 
 ![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_KxvboPqav6/figures/001_Figure_1.jpg]]
 *Figure 1: Capabilities of NGFF. NGFF is a physics-grounded video prediction framework that unifies perception and dynamics to model complex interactions and synthesize 4D videos. Built on Gaussian representations and force fields, it enables novel-view and novel-background synthesis as well as force-prompted interactive generation (Section 4.3). Moreover, NGFF achieves strong spatial and temporal generalization in dynamic prediction (Section 4.2) and can be effectively adapted to real-world scenarios (Section 4.4)*
 
-## 核心模块与公式推导
+
 
 NGFF 将 4D 视频预测形式化为学习控制 3D 高斯场景表示时间演化的 **神经力场 (Neural Force Fields, NFFs)**。其核心架构由两个互补组件构成：将多视角 RGB 观测转换为对象感知 3D 高斯的前馈重建模块，以及通过 ODE 求解器进行物理一致动态模拟的神经动力学预测模块。
 
@@ -177,7 +179,9 @@ $$\mathbf{s}(t) = \mathbf{s}(0) + \int_{0}^{t} {\dot{\mathbf{s}}}(t) dt, \quad {
 
 NGFF 采用两阶段训练。前馈重建模块在 **WildRGBD** 数据集上微调预训练的 $\pi^3$ 参数；神经动力学模拟器在合成 **MPM（Material Point Method）** 仿真数据上独立训练，优化均方误差（MSE）损失。这种解耦设计使得动力学模块能够专注于学习物理规律，而不受重建误差的干扰。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -260,7 +264,9 @@ Table A5 对比了不同视频生成方法的推理时间：NGFF-V 生成 3 物�
 ![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_KxvboPqav6/figures/008_Figure_6.jpg]]
 *Figure 6: Video generation quality comparison. Temporal sequences comparing NGFF against video generation baselines across diverse scenarios. NGFF maintains coherent object shapes, physically plausible interactions, and consistent backgrounds throughout generated sequences, while baseline methods exhibit shape distortions, unrealistic dynamics, and scene inconsistencies that violate physical constraints*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法沿革与脉络
 
@@ -303,6 +309,8 @@ NGFF 的能力边界受以下因素制约：
 **复杂物理现象的扩展**。当前力场模型聚焦于刚体-软体碰撞和接触变形，尚未涉及断裂、塑性变形、流体交互等更具挑战性的物理现象。扩展到这些场景需要重新设计力场表示（如引入拓扑变化建模）和训练数据生成策略。
 
 **真实世界迁移**。Figure 7 展示了在受控真实场景中的初步验证，但训练数据完全来自合成 MPM 仿真，sim-to-real gap 在复杂材质和不规则几何体上的表现尚需系统评估。领域自适应或少量真实数据微调可能是可行的缓解方案。
+
+
 
 ## 原文 PDF
 

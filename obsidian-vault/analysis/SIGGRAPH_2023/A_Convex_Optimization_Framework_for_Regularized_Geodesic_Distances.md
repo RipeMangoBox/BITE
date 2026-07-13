@@ -31,7 +31,7 @@ claims:
 | 中文题名 | 一种用于正则化测地线距离的凸优化框架 |
 | 英文题名 | A Convex Optimization Framework for Regularized Geodesic Distances |
 | 会议/期刊 | SIGGRAPH 2023 |
-| Links | [paper](https://arxiv.org/abs/2305.13101) · [Code](http://github.com/alecjacobson/gptoolbox) · [arXiv](https://arxiv.org/abs/2305.13101") |
+| Links | [paper](https://arxiv.org/abs/2305.13101) · [Code](http://github.com/alecjacobson/gptoolbox) · [paper](https://arxiv.org/abs/2305.13101") |
 | Topic | #topic/benchmarks_datasets_evaluation |
 | Method | Convex Optimization Framework for Regularized Geodesic Distances |
 | Dataset | Single-source distance, Pipe mesh, Single-source distance, Dragon mesh, Distance to a point, Homer mesh, All-pairs symmetric distance, Cat model |

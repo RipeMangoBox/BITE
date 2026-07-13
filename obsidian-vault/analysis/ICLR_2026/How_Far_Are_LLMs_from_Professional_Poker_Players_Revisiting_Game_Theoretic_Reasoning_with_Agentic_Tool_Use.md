@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/How_Far_Are_LLMs_from_Professional_Poker_Players_Revisiting_Game_Theoretic_Reasoning_with_Agentic_Tool_Use.pdf
+project_link: null
+code_link: null
 openreview_forum_id: vV54ShHvGi
 aliases:
 - How_Far_Are_LLMs
@@ -41,7 +43,7 @@ claims:
 > - Limit Texas Hold’em 上，Net chip gain vs DeepCFR 为 -5.0 mbb/hand (ToolPoker)，对比 -205.0 chips (GPT-4.1-mini) / -117.0 chips (o4-mini)，变化 +200.0 over GPT-4.1-mini; +112.0 over o4-mini。
 > - Leduc Hold’em 上，Avg. LLM-as-a-Judge reasoning score (HR/FA/AC) 为 1.97 / 1.94 / 1.95 (ToolPoker)，对比 1.80 / 1.56 / 1.85 (o4-mini)，变化 +0.17 / +0.38 / +0.10。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -68,7 +70,7 @@ ToolPoker在游戏性能和推理质量上均取得显著提升：
 
 ToolPoker属于**工具增强的LLM推理**范式，与纯内部策略的LLM基线（如GPT-4o、o4-mini）和传统博弈求解器（如CFR+、DeepCFR）形成互补。其局限性在于：面对均衡求解器时仍略微落后，无法完美逼近纳什均衡；依赖预训练的CFR求解器，对无已知求解器或状态空间极大的游戏难以直接迁移；当前仅在有限种类的扑克环境中验证，尚未拓展至无限制德州扑克等更复杂场景。
 
-## 背景与动机
+
 
 ### 不完美信息博弈与扑克
 
@@ -98,7 +100,9 @@ ToolPoker属于**工具增强的LLM推理**范式，与纯内部策略的LLM基�
 
 这些发现指向一个核心洞察：**通过集成外部博弈求解器提供GTO动作和辅助数值，可以弥补LLM内部策略的不足。** 这构成了本文提出ToolPoker框架的直接动机——利用LLM的工具使用能力，将精确的博弈论计算注入推理过程，从而同时提升游戏性能和推理质量。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于提出 **ToolPoker**——一个工具集成推理（Tool-Integrated Reasoning, TIR）框架，其根本洞察是：LLM 在博弈论任务中的瓶颈并非“推理能力不足”，而是**无法自主进行精确的博弈论优化（GTO）推导**，普遍依赖启发式推理、存在事实误解和知行不一致。ToolPoker 通过**集成外部博弈求解器**来弥补 LLM 内部策略的这一结构性缺陷。
 
@@ -142,7 +146,7 @@ ToolPoker 的前身 BC-RIRL 虽然通过遗憾引导的强化学习（RIRL）在
 - 训练推理数据集规模较小（约 5k 样本），可能影响长序列推理的泛化能力；
 - 当前仅在有限种类的扑克环境中验证，尚未拓展到无限制德州扑克等更复杂场景。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_vV54ShHvGi/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of ToolPoker and its advantages over LLMs using internal policies*
@@ -175,7 +179,7 @@ ToolPoker 是一个工具集成推理（Tool-Integrated Reasoning, TIR）框架�
 - **复合奖励而非单一信号**：$R_{\text{answer}}$ 确保动作正确性，$R_{\text{format}}$ 维持结构化输出，$R_{\text{tool}}$ 激励正确的工具调用行为。消融实验表明，移除 $R_{\text{answer}}$ 会导致性能骤降（对 CFR+ 从 -3.0 降至 -54.5 mbb/hand），而 $R_{\text{format}}$ 和 $R_{\text{tool}}$ 的移除影响相对较小。
 - **两阶段训练而非端到端 RL**：BC 阶段提供了工具调用的基础能力，RL 阶段则在此基础上进行精细对齐，两者结合使得 ToolPoker 在 Leduc Hold’em 中对传统算法的平均得分达 +6.8 mbb/hand，在 Limit Texas Hold’em 中达 +45.0 mbb/hand，为所有 LLM 方法中最高。
 
-## 核心模块与公式推导
+
 
 ### 模块一：行为克隆阶段（BC）
 
@@ -210,7 +214,9 @@ $$ \mathcal { L } _ { \mathrm { P P O } } ( \theta ) = - \mathbb { E } \Bigg[ \m
 
 ToolPoker的核心创新之一是设计了一个统一工具接口，将多个扑克求解器（如CFR+、权益计算器）整合为单一API。每次查询返回GTO动作及辅助数值（如手牌权益、底池赔率），简化了工具调用流程并稳定了训练过程。模型在推理时按结构化模板执行：`<think>` 进行启发式推理 → `<tool>` 调用求解器 → `<output>` 读取返回结果 → `<answer>` 输出最终动作。该设计使得LLM能够弥补内部策略的不足，在Leduc Hold’em和Limit Texas Hold’em中分别达到+6.8和+45.0 mbb/hand的平均得分（参见Table 5），为所有LLM方法中最高。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈：LLM的三大系统性缺陷
 
@@ -284,7 +290,9 @@ ToolPoker的核心创新之一是设计了一个统一工具接口，将多个�
 ![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_vV54ShHvGi/figures/006_Table_5.jpg]]
 *Table 5: Comparison of various LLM-based methods against different traditional algorithms trained in Leduc Hold’em and Limit Texas Hold’em environments. Other settings follow these in Tab. 1. Bold and underline indicate the best and worst performance in each column, respectively*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法演进脉络
 
@@ -329,6 +337,8 @@ ToolPoker 的提出建立在对 LLM 博弈推理能力系统性诊断的基础�
 3. **与人类博弈数据的结合：** 当前方法主要依赖求解器提供的 GTO 策略，但 GTO 策略在面对人类对手时未必最优。该方法是否能与人类博弈数据结合，以提升对真实对手的适应能力？
 
 4. **数据构建成本：** 如何降低构建高质量工具增强推理数据的成本？是否可以通过自动化的求解器-LLM 交互来生成训练数据，使该范式能更广泛地应用于其他领域？
+
+
 
 ## 原文 PDF
 

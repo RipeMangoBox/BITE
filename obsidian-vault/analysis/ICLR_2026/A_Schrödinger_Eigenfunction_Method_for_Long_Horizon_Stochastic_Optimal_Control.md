@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: "paperPDFs/ICLR_2026/A_Schrödinger_Eigenfunction_Method_for_Long_Horizon_Stochastic_Optimal_Control.pdf"
+project_link: null
+code_link: null
 aliases:
 - SDEMLHSEI
 - SDEMLHSOC
@@ -41,7 +43,7 @@ claims:
 > - QUADRATIC (REPULSIVE) 上，控制目标（越小越好） 为 112.3444 ± 0.050 (COMBINED Relative entropy)，对比 112.5172 ± 0.051 (IDO Relative entropy)，变化 -0.1728。
 > - QUADRATIC (ANISOTROPIC) 上，控制目标（越小越好） 为 31.3476 ± 0.016 (COMBINED Relative entropy)，对比 31.3664 ± 0.016 (IDO Log variance)，变化 -0.0188。
 
-## 概述
+## 概要
 
 本文针对长时域随机最优控制（SOC）中现有方法性能随规划时域T增长而急剧退化这一瓶颈，提出了一种基于薛定谔算子本征函数的方法。核心问题在于：传统方法（如FBSDE、IDO）的内存和运行时间至少线性增长于T，且重要性采样权重方差可能随T指数增长，导致高维长时域问题难以求解。
 
@@ -51,7 +53,7 @@ claims:
 
 实验结果表明，在多个d=20的高维长时域基准问题（包括各向同性/各向异性/排斥型二次成本、双阱势、环形势）上，提出的方法在控制L²误差上比现有最优方法提升约一个数量级。例如，在DOUBLE WELL设置中，混合方法（COMBINED SOCM）的控制目标为32.4421 ± 0.0088，而最佳基线（IDO Log variance）为32.8645 ± 0.0094。消融实验验证了相对损失相对于绝对损失的显著优势、纯本征函数方法在近终端区域的退化以及混合方法的必要性。
 
-## 背景与动机
+
 
 长时域随机最优控制（SOC）问题在科学和工程中广泛存在，但其求解面临严重的计算瓶颈。现有方法——包括基于前向-后向随机微分方程（FBSDE）的深度求解器和迭代扩散优化（IDO）系列方法——在时间域 $T$ 增长时性能急剧下降：内存和运行时间至少线性增长于 $T$（复杂度 $O(Td)$），误差估计随 $T$ 增大而恶化（Han & Long, 2020, Theorem 4），重要性采样权重方差可能随 $T$ 指数增长（Liu et al., 2018）。如图 Figure 1 所示，现有方法在固定 $d$ 下随 $T$ 增大控制误差显著上升。
 
@@ -63,7 +65,9 @@ claims:
 
 基于此，本文方法（EIGF+IDO）采用混合控制参数化：远终端时域（$t \leq T_{cut}$）仅用 $\partial_x \log \phi_0$，近终端时域（$t > T_{cut}$）添加指数衰减的短时域修正项 $e^{-(\lambda_1-\lambda_0)(T-t)/(2\beta)} v^{\theta_1}(x,t)$。这一设计在多个高维（$d=20$）长时域基准上实现控制 $L^2$ 误差比现有方法提升约一个数量级（Table 3, Table 4），同时为对称 LQR 问题提供了任意终端成本的闭式解析解（Theorem 4）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于将长时域随机最优控制问题的复杂度从 **O(Td)** 降低到 **O(d)**，即与时间域长度T无关。这一突破通过三个关键创新实现：**薛定谔算子酉等价**、**相对本征函数损失**和**混合控制参数化**。
 
@@ -135,7 +139,7 @@ $$
 
 消融实验表明：增加本征函数数量在d=20 LQR中收益递减；仅用基态本征函数的遍历估计器（EIGF）随T增长误差降低，但混合方法（EIGF+IDO）显著更优。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0003_lcEw5NcSij_A_Schrödinger_Eigenfunction_Method_for_Long-Hori/figures/013_Figure_9.jpg]]
 *Figure 9: In this experiment EIGF method uses an ergodic estimator based only on the first eigenfunction. EIFG+IDO curve corresponds to the application of the proposed controller (22) with Relative Entropy loss. The figure shows L ^ { 2 } control error for different methods after 30000 iterations*
@@ -156,7 +160,7 @@ $$
 
 **证据强度**：理论部分（酉等价、谱离散性）有严格证明，置信度 1.0。实验部分（Figure 5, Table 3, Table 4）显示在多个 d=20 的高维长时域基准上，控制 L² 误差比现有方法提升约一个数量级。但需注意，T_cut 的选择缺乏先验方法，需根据谱隙和具体应用决定，这是一个需要手动验证的弱点。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化与线性化
 
@@ -257,7 +261,9 @@ $$
 
 其中 $T_{cut}$ 为截止时间（实验中取 $T_{cut} = T-1$），$v^{\theta_1}$ 由短时域 IDO/FBSDE 求解器学习。该参数化将复杂度从 $O(Td)$ 降至 $O(d)$，同时通过指数衰减因子 $e^{-(\lambda_1-\lambda_0)(T-t)}$ 平滑衔接两个区域。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：控制目标与L²误差
 
@@ -304,7 +310,9 @@ $$
 *Table 4: Control objective for the different methods in the QUADRATIC (ANISOTROPIC) and DOUBLE WELL settings*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有方法的关系
 
@@ -355,6 +363,8 @@ $$
 5. 能否将方法扩展到多个本征函数以处理更小的谱隙？附录C.2给出了PINN和变分损失的多本征函数扩展，但实验表明收益递减，需要更高效的多模态学习策略。
 
 **公平性说明**：所有方法使用相同神经网络架构（IDO方法使用ReLU激活的简化U-Net，本征函数方法使用GELU激活），训练迭代次数统一为30k次（除本征函数预训练80k次外）。控制目标通过 $N=65536$ 次蒙特卡洛模拟估计。但迭代时间因方法而异（Table 2），未对总计算时间进行公平性校正。
+
+
 
 ## 原文 PDF
 

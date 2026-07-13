@@ -43,7 +43,7 @@ claims:
 > - OSR (Document Deshadow) 上，PSNR / LPIPS / DISTS 19.60 / best (LPIPS, DISTS 最佳)。
 > - MixedDoc (Mixed Degradation) 上，PSNR / SSIM 24.43 / 0.908。
 
-## 概述
+## 概要
 
 文档图像恢复（Document Image Restoration, DIR）长期面临一个核心瓶颈：现有方法大多针对单一退化类型（如模糊、阴影、水印、印章）设计端到端映射，无法有效应对现实场景中常见的混合退化与退化类型不确定性问题。这一局限导致在复杂场景下泛化性差，且缺乏对恢复过程的用户引导与可解释性。
 
@@ -53,7 +53,7 @@ MMDIR（Multimodal Instruction-Driven Framework for Mixed-Degradation Document I
 
 实验表明，MMDIR在单一退化基准（BMVC去模糊、OSR去阴影）和提出的混合退化基准MixedDoc上均取得最优结果。在MixedDoc上，MMDIR达到PSNR 24.43、SSIM 0.908，显著领先于DocDiff、DiffUIR等基线方法。消融实验进一步证实，引入文本指令在去模糊、去阴影及混合退化三个基准上全面且显著地提升了所有恢复指标。
 
-## 背景与动机
+
 
 文档图像恢复（Document Image Restoration, DIR）旨在从退化的文档图像中重建高质量的干净图像，是文档分析与识别流程中的关键预处理环节。现实场景中的文档图像常遭受多种退化类型的复合影响，包括模糊、阴影、文本水印以及印章覆盖等。这些退化往往以不确定的组合方式同时出现，严重损害文档的可读性与下游任务（如光学字符识别）的性能。
 
@@ -63,7 +63,9 @@ MMDIR（Multimodal Instruction-Driven Framework for Mixed-Degradation Document I
 
 为突破这一局限，本文提出 **MMDIR**（Multimodal Instruction-Driven Framework for Mixed-Degradation Document Image Restoration），一种面向混合退化文档图像恢复的多模态指令驱动框架。其核心动机在于：将图像恢复任务与视觉语言理解相结合，通过引入文本指令作为控制信号，使模型能够动态识别退化类型并生成语义提示，从而为视觉解码器提供退化感知的指导。这一范式转变将文档图像恢复从“被动映射”升级为“主动感知与推理”，使模型不仅能恢复图像，还能回答“存在哪些退化”这一诊断性问题，提升了恢复过程的可解释性和人机交互能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 1. 从单模态端到端映射到多模态指令驱动范式
 
@@ -101,7 +103,7 @@ $$\mathcal{L}_{\text{total}} = \mathcal{L}_{\text{pixel}} + \alpha \mathcal{L}_{
 
 相较于 **DiffUIR** (Zheng et al., CVPR 2024) 等统一图像恢复方法使用扩散先验进行隐式退化处理，MMDIR 的创新在于**显式化退化识别过程**，使模型具备可解释的退化诊断能力。模型不仅能恢复图像，还能输出退化类型判断（Figure 9），这为文档图像恢复任务引入了透明度和可解释性，突破了传统端到端黑盒映射的局限。
 
-## 整体框架
+
 
 MMDIR 是一个端到端的多模态指令驱动框架，其核心设计在于将文档图像恢复任务重新定义为视觉-语言协同推理问题。与传统的图像到图像映射或基于显式先验提示的方法不同，MMDIR 同时接收退化图像和文本指令作为输入，并通过大语言模型（LLM）的推理能力动态感知退化类型，进而为视觉解码器提供语义引导。
 
@@ -169,7 +171,7 @@ $$
 
 加权系数设置为 $\alpha = 4$、$\beta = 0.5$、$\lambda = 0.5$。局部损失的设计直接呼应了框架的退化感知目标——模型不仅需要恢复图像，还需要准确识别退化类型，并在对应区域施加更强的重建约束。
 
-## 核心模块与公式推导
+
 
 ### 3.1 多模态编码：从退化图像到语义诊断
 
@@ -234,7 +236,9 @@ $$
 ![[assets/figures/papers/paper_list_l2327_https_openaccess_thecvf_com_content_CVPR2026_html_Li_MMDIR_Multimodal_In/figures/003_Figure_3.jpg]]
 *Figure 3: The architecture of vision decoder. SCA represents the Simplified Channel Attention in the NAF Block [2]. The GuidedLayer weights the feature maps of*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置与公平性保障
 
@@ -303,7 +307,9 @@ MMDIR 不仅输出恢复图像，还能同步诊断图像中存在的退化类�
 ![[assets/figures/papers/paper_list_l2327_https_openaccess_thecvf_com_content_CVPR2026_html_Li_MMDIR_Multimodal_In/figures/007_Table_2.jpg]]
 *Table 2: Instruction variants*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系与定位
 
@@ -356,6 +362,8 @@ MMDIR 的适用边界由以下因素界定：
 4. **与下游任务的联合优化**：该指令驱动范式如何与文档理解下游任务（如 OCR、布局分析、信息提取）进行更深层次的联合优化？当前恢复质量通过 CER/ED 间接评估对 OCR 的影响（Table 5），但恢复模型与 OCR 模型的端到端联合训练尚未探索。
 
 5. **指令泛化性**：Table 2 展示了指令变体对退化识别的影响，但更广泛的指令措辞变化、多语言指令、以及零样本退化描述下的鲁棒性仍需系统评估。
+
+
 
 ## 原文 PDF
 

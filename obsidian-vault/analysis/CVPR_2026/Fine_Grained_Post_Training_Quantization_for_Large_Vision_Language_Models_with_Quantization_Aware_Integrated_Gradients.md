@@ -42,7 +42,7 @@ claims:
 > - VizWiz (InternVL2-8B W4A8) 上，准确率 58.33% vs MBQ 57.36% (+0.97%)。
 > - ChartQA (InternVL2-26B W4A8) 上，准确率 85.24% vs MBQ 84.44% (+0.80%)。
 
-## 概述
+## 概要
 
 大视觉语言模型（LVLM）的训练后量化（PTQ）面临一个被忽视的瓶颈：现有方法仅在**模态层面**分配敏感性权重（如视觉 vs. 文本），却忽略了同一模态内不同令牌之间的显著异质性。这种粗粒度假设导致量化误差分配不均，性能次优。
 
@@ -50,7 +50,7 @@ claims:
 
 实验表明，在 LLaVA-onevision-7B 的 W3A16 设置下，QIG 的平均准确率比模态平衡基线 MBQ 高出 **1.60%**，将性能差距缩小到全精度模型的仅 **1.33%**；在 InternVL2-8B 和 InternVL2-26B 上同样取得一致提升。该方法计算开销可忽略，且与 GPTQ 等权重量化方法正交兼容。
 
-## 背景与动机
+
 
 ### 大视觉语言模型的量化挑战
 
@@ -74,7 +74,9 @@ $$\mathbf{E}^{*} = \underset{\mathbf{E}}{\arg\min} \left\| Q_{W}(\mathbf{W} * \m
 
 综上，现有LVLM量化方法面临的核心缺口在于：敏感性建模的粒度受限于模态层面，而缺乏一种能够直接量化每个输入令牌对量化误差贡献的细粒度机制。本文的动机正是填补这一空白——通过引入公理化归因（axiomatic attribution）的思想，开发一种量化专用的令牌级敏感性估计方法，将量化误差精确分解到每个输入令牌，从而实现从“模态级”到“令牌级”的细粒度量化优化。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 从模态级到令牌级：敏感性粒度的根本转变
 
@@ -110,7 +112,7 @@ $$QIG(x) = (x - x^{q}) \int_{0}^{1} \frac{\partial (f(x_{\alpha}, w) - f(x_{\alp
 
 QIG的令牌级敏感性加权机制与现有量化方法是正交的。Table 5显示，将QIG的细粒度令牌敏感性与GPTQ的二阶近似框架结合后，在LLaVA-onevision-7B W3A16上VizWiz准确率额外提升2.08%。这表明**令牌级敏感性可以作为一种通用增强模块**，叠加于不同的量化重建框架之上。
 
-## 整体框架
+
 
 QIG 方法构建了一套从令牌级量化误差归因到细粒度通道均衡的完整训练后量化管线，其核心流程由三个顺序耦合的模块构成。
 
@@ -152,7 +154,7 @@ $$ \mathbf{E}^{*} = \arg\min_{\mathbf{E}} \sum_{i=1}^{T} \lambda_i \left\| Q_{W}
 
 整个管线在校准阶段引入的额外计算开销极小。据 Table 6 报告，在单张 A800 80GB GPU 上，细粒度量化的总耗时与 MBQ 等基线方法相比几乎无增加，这得益于 QIG 计算仅需沿插值路径采样有限步数（默认 32 步）即可完成归因估计。
 
-## 核心模块与公式推导
+
 
 ### 3.1 通道均衡基础：CWE目标
 
@@ -206,7 +208,9 @@ $$\mathbf{E}^{*} = \arg\min_{\mathbf{E}} \sum_{i=1}^{T} \lambda_i \left\| Q_{W}(
 ![[assets/figures/papers/paper_list_l751_https_arxiv_org_abs_2603_17809/figures/002_Figure_2.jpg]]
 *Figure 2: Visualization of activation distributions in InternVL2-8B during calibration. We visualize two representative layers and four linear sub-layers. In each panel, the horizontal axis denotes token positions in the multimodal sequence and the vertical axis indexes hidden channels; color encodes the average activation magnitude per token–channel pair over the calibration set. The plots reveal four recurring phenomena: massive activations, layer heterogeneity, sub-layer divergence, and token variability. These patterns indicate that coarse modality-level sensitivity modeling is insufficient, motivating our token-level sensitivity weighting*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：令牌级敏感性归因的有效性
 
@@ -265,7 +269,9 @@ QIG的令牌级敏感性加权策略与现有量化方法是正交的，可叠�
 ![[assets/figures/papers/paper_list_l751_https_arxiv_org_abs_2603_17809/figures/011_Table.jpg]]
 *Table: A2. Comparison of GPTQ and Our Fine-Grained Quantization on LLaMA-2-7B (3bit)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 基线谱系与差异化定位
 
@@ -302,6 +308,8 @@ QIG的设计使其在以下条件下表现最优，但也存在明确的适用�
 4. **归因步长的动态调节。** 集成梯度的近似精度与步数正相关。是否可以根据每层量化误差的幅度动态分配步数，在保持归因质量的同时进一步降低校准开销？
 
 5. **与量化训练的融合潜力。** QIG当前定位于训练后量化。其令牌级敏感性信号是否可以作为量化感知训练（QAT）中的正则化项或权重，引导训练过程更精细地保护关键令牌的表示能力，是一个值得探索的方向。
+
+
 
 ## 原文 PDF
 

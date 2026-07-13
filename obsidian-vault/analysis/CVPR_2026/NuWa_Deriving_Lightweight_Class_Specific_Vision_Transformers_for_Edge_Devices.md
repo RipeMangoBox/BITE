@@ -42,7 +42,7 @@ claims:
 > - ImageNet-1K sub-tasks (DeiT-Base), pruning rate 0.40 上，Average class-specific accuracy improvement NuWa vs Training-free methods (+15.37%)。
 > - ImageNet-1K sub-tasks (DeiT-Base), pruning rate 0.60 上，Average class-specific accuracy improvement NuWa vs Training-free methods (+10.04%)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有的视觉Transformer（ViT）剪枝方法普遍采用类无关（class-agnostic）的重要性评估策略，对所有类别平等对待，无法为特定类别任务提供定制化的轻量模型。更重要的是，这些方法忽视了模型中存在的**类别有害权重**（class-detrimental weights）——某些神经元对特定类别的识别反而起负面作用。此外，剪枝后通常需要昂贵的重训练来恢复精度，使得为大规模、多样化的边缘设备场景逐一派生定制模型变得不切实际。
 
@@ -56,7 +56,7 @@ claims:
 - 在ImageNet-1K的类别特定子任务上，NuWa相比最优训练无关剪枝方法**准确率提升高达29.00%**，相比训练相关方法实现**33.69倍加速**，在大规模派生场景（50个子任务×10个资源约束）下**成本降低高达99.83%**，而平均精度损失仅为0.61%。
 - 派生出的边缘ViT在Jetson Orin NX上实现**1.31×至2.07×的推理加速**。
 
-## 背景与动机
+
 
 ### 边缘部署的“一刀切”困境
 
@@ -88,7 +88,9 @@ Figure 1 展示了一个反直觉的发现：在DeiT-Base的MLP模块中**随机
 
 NuWa正是沿着这一思路设计的：通过自我知识净化（SKP）学习二值化掩码自主发现有害权重，再将MHA和MLP模块的结构化剪枝分别转化为低秩逼近和最小二乘问题，利用SVD截断和伪逆闭式解直接获得剪枝后权重，实现“一次前向+一次矩阵分解”即可完成类定制模型的派生。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 NuWa 的核心创新在于将类别特定的 ViT 剪枝从“重要性评分+重训练”范式转变为“有害权重净化+闭式优化”范式。这一转变由两个紧密协同的机制实现，分别对应剪枝策略与推导效率的根本性突破。
 
@@ -128,7 +130,7 @@ $$W _ { 2 } ^ { ( l ) \prime } = W _ { 2 } ^ { ( l ) } \mathcal { H } ^ { ( l ) 
 
 **方法谱系定位**：NuWa 处于训练无关剪枝（追求效率但无法类别定制）与训练相关剪枝（可定制但成本极高）的交叉点。它通过 SKP 引入了轻量级的类别特定学习（仅训练掩码，冻结骨干），又通过 OFP 的闭式优化消除了重训练需求，实现了“定制能力”与“推导效率”的双重突破。
 
-## 整体框架
+
 
 NuWa 的整体派生流程由两个串行且互补的核心模块构成：**自我知识净化（Self-Knowledge Purification, SKP）** 与 **优化驱动的快速剪枝（Optimization-based Fast Pruning, OFP）**，如图 Figure 5 所示。给定一个预训练的基础 ViT（如 **DeiT-Base** (Touvron et al., ICML 2021)）和一组目标类别数据，NuWa 首先通过 SKP 自动识别并剪除对特定类别有害的权重，生成一个更紧凑且在该类别上准确率更高的“锚点模型”；随后，OFP 将 MHA 与 MLP 模块的进一步结构化剪枝分别形式化为低秩矩阵逼近和最小二乘问题，利用闭式解直接获得剪枝后的权重，完全无需重训练。
 
@@ -167,7 +169,7 @@ NuWa 的整体派生流程由两个串行且互补的核心模块构成：**自�
 
 > **注意**：上述模块关系与数据流基于论文 Section 3 的描述和 Figure 5 的框架图综合得出。消融实验中 MLP 剪枝跳过导致准确率骤降 85.95%（Table 4），表明 MLP 闭式解在整个 OFP 流程中起决定性作用，而 SKP 的小批量设置（batch size=1）被证实能使剪枝空间探索更充分（Figure 10）。
 
-## 核心模块与公式推导
+
 
 NuWa 的整体框架由两大核心模块构成：**自我知识净化（Self-Knowledge Purification, SKP）** 与 **基于优化的快速剪枝（Optimization-based Fast Pruning, OFP）**，如 Figure 5 所示。SKP 负责自动识别并剪除对目标类别有害的权重，生成一个更紧凑且类别特定准确率更高的锚点模型；OFP 则在此基础上，将多注意力头（MHA）与多层感知器（MLP）模块的进一步剪枝形式化为闭式优化问题，完全无需重训练即可高效推导出边缘 ViT。
 
@@ -263,7 +265,9 @@ $$
 ![[assets/figures/papers/paper_list_l2108_https_openaccess_thecvf_com_content_CVPR2026_html_Wei_NuWa_Deriving_Ligh/figures/010_Figure_8.jpg]]
 *Figure 8: Comparison in feature and probability distributions before and after SKP. The feature distributions are visualized by applying t-SNE to the CLS tokens from the last block, while the bar charts show the average output probability over*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：类别特定准确率与推导效率的双重突破
 
@@ -332,7 +336,9 @@ Table 4 的消融实验严格量化了 NuWa 各组件的必要性（α=0.6，Dei
 ![[assets/figures/papers/paper_list_l2108_https_openaccess_thecvf_com_content_CVPR2026_html_Wei_NuWa_Deriving_Ligh/figures/004_Figure_4.jpg]]
 *Figure 4: Existing importance metrics fail to improve classspecific accuracy through pruning. The solid lines with standard deviation bands represent the mean accuracy of pruned DeiT-Base on three random sub-tasks (|S|=25) across different pruning rates*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位与现有范式
 
@@ -375,6 +381,8 @@ NuWa处于**模型压缩**、**边缘智能**与**类别定制化部署**的交�
 - **超越训练无关方法**：在类特定准确率上提升高达29.00%，且是唯一能使剪枝后模型超越基础ViT的框架（Figure 6）。
 - **替代训练相关方法**：在保持可比准确率（-0.61%）的前提下，将推导成本降低两个数量级以上，使大规模边缘部署从经济不可行变为可行。
 - **开启新方向**：SKP揭示的“类别有害权重”概念可能启发新的剪枝准则设计，而OFP的闭式优化范式可推广至其他模块（如LayerNorm、位置编码）的压缩。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/Realiz3D_3D_Generation_Made_Photorealistic_via_Domain_Aware_Learning.pdf
+code_link: null
 project_link: https://idosobol.github.io/realiz3d/
 aliases:
 - Realiz3D
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | Realiz3D：通过领域感知学习实现逼真3D生成 |
 | 英文题名 | Realiz3D: 3D Generation Made Photorealistic via Domain-Aware Learning |
 | 会议/期刊 | CVPR 2026 |
-| Links | [paper](https://arxiv.org/abs/2605.13852); [Project](https://idosobol.github.io/realiz3d/) |
+| Links | [paper](https://arxiv.org/abs/2605.13852) · [Project](https://idosobol.github.io/realiz3d/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Realiz3D |
 | Dataset | Multiview Texturing, Text-to-Multiview Generation |
@@ -41,7 +42,7 @@ claims:
 > - Multiview Texturing 上，PSNR (3D Consistency) ↑ 为 24.78，对比 25.76 (Syn Only)，变化 -0.98。
 > - Text-to-Multiview Generation 上，FID (Real-World Realism) ↓ 为 196.01，对比 215.57 (Syn Only)，变化 -19.56。
 
-## 概述
+## 概要
 
 在合成3D数据上微调扩散模型以赋予其多视图可控性是当前3D生成的主流范式，但这一过程面临一个根本性瓶颈：控制信号（如法线图、相机位姿）的存在会被模型与合成域的视觉外观相关联，导致生成图像丧失真实感——这一现象被称为**域泄漏**。简单混合真实数据与合成数据进行联合微调无法有效解决此问题，因为模型无法区分“域身份”与“控制信号”这两个纠缠的因素。
 
@@ -53,7 +54,7 @@ claims:
 
 在定量评估中，Realiz3D 在保持3D一致性的前提下显著提升了真实感：在多视图纹理生成任务上，真实世界 FID 从纯合成微调基线的 218.29 降至 **200.24**（Table 1）；在文本到多视图生成任务上，FID 从 215.57 降至 **196.01**（Table 3）。消融实验进一步验证，两阶段训练相比联合训练将 FID 从 216.63 降至 198.44，而层感知训练与域重分配的组合达到了真实感与3D一致性的最佳平衡（Table 2）。
 
-## 背景与动机
+
 
 ### 3D生成中的真实感困境
 
@@ -82,7 +83,9 @@ Realiz3D通过深入分析扩散模型的内部表征，揭示了域差异形成
 
 这些方法的共同缺陷在于：**未能显式建模和分离“视觉域身份”与“控制信号”这两个相互独立的因素**。Realiz3D正是针对这一缺口，提出了域感知学习的框架。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Realiz3D 的核心创新在于识别并解耦了“域泄漏”（Domain Leakage）这一关键瓶颈。当在合成3D数据上微调扩散模型时，控制信号（如法线图、相机位姿）会被模型与合成域的外观特征错误关联，导致生成图像丧失真实感。Realiz3D 通过三个相互协同的机制——**域移位器（Domain Shifters）**、**两阶段训练**和**表示绑定（Representation Binding）**——在保持3D一致性的前提下大幅提升照片真实感。
 
@@ -129,7 +132,7 @@ $$
 
 相比 LoRA（rank 32/128）和 Domain Adapter 等轻量级微调方法，Realiz3D 的域移位器不仅保留先验，更主动学习域身份分离；相比 SDEdit 等免训练方法，Realiz3D 通过训练获得了更强的控制遵循能力；相比 TRELLIS 等预训练3D原生模型，Realiz3D 从2D先验出发，在真实感上具有优势。
 
-## 整体框架
+
 
 Realiz3D 的整体框架围绕一个核心洞察展开：扩散模型的不同层和去噪步长承担着不同的生成职责——早期层和早期去噪步主要决定图像的结构与布局，而后期层则主导外观与纹理细节。基于这一洞察，Realiz3D 设计了一条从域解耦到可控生成的两阶段训练管线，并辅以推理时的域感知采样策略，从而在保持真实感的同时注入 3D 可控性。
 
@@ -168,7 +171,7 @@ $$\tilde{X} = X + \mathcal{D}(\mathrm{domain}) = X + W_{\mathrm{left}} W_{\mathr
 
 整个框架仅依赖标准的扩散去噪损失，无需成对数据或修改原有的条件机制，使其能够轻量地适配各类预训练扩散骨干。
 
-## 核心模块与公式推导
+
 
 Realiz3D 的核心设计围绕三个关键模块展开，其本质是通过显式建模“域身份”（domain identity）来解耦控制信号与视觉域的统计关联，从而在注入3D可控性的同时保持预训练模型的真实感先验。
 
@@ -207,7 +210,9 @@ $$\mathcal{L} = \mathbb{E}_{z, \epsilon \sim \mathcal{N}(0,1), t} \left[ \| \eps
 
 消融实验（Table 2, #3 vs #5 vs #7 ）证实：添加域重分配将PSNR从23.97提升至24.18而不损害FID；层感知训练与域重分配的组合达到最佳平衡点（FID 200.24, PSNR 24.78），验证了“早期层注入控制、后期层保持真实感”这一核心洞察的有效性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与实验设计逻辑
 
@@ -284,7 +289,9 @@ Figure 3和Figure 4的定性对比为定量指标提供了视觉锚点。在多�
 
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2605_13852/figures/033_Figure.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈：域泄漏与控制-真实感拮抗
 
@@ -333,6 +340,8 @@ Realiz3D的设计假设存在明确边界：
 3. **图像条件等复杂控制信号的泛化**：当控制信号本身携带域信息时，如何扩展域移位器的解耦能力？可能需要引入控制信号的域归一化或条件域嵌入的层级解耦机制。
 
 4. **控制遵循度与真实感的极限平衡**：当前方案在PSNR上仍有约0.98的微小差距，是否存在更精细的层级分配策略或动态域混合机制，能够在不牺牲真实感的前提下进一步逼近纯合成基线的控制精度？
+
+
 
 ## 原文 PDF
 

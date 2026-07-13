@@ -5,6 +5,8 @@ paper_level: A
 venue: NeurIPS
 year: 2024
 pdf_ref: paperPDFs/NEURIPS_2024/Video_Diffusion_Models_are_Training_free_Motion_Interpreter_and_Controller.pdf
+project_link: https://xizaoqu.github.io/moft/
+code_link: null
 aliases:
 - MGTFMC
 - VDMATFMIC
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 视频扩散模型作为无需训练的运动解释器与控制器 |
 | 英文题名 | Video Diffusion Models are Training-free Motion Interpreter and Controller |
 | 会议/期刊 | NeurIPS 2024 |
-| Links | [paper](https://arxiv.org/abs/2405.14864); [Project](https://xizaoqu.github.io/moft/) |
+| Links | [paper](https://arxiv.org/abs/2405.14864) · [Project](https://xizaoqu.github.io/moft/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | MOFT-guided training-free motion control |
 | Dataset | 点拖拽精度, 用户偏好研究 |
@@ -40,7 +42,7 @@ claims:
 > - 点拖拽精度 上，Mean Distance (↓) 为 0.175，对比 DragNUWA（精确值未报告，但差距较大），变化 显著接近目标点。
 > - 用户偏好研究 上，Motion Faithfulness / Naturalness (1-5) 为 3.21 / 3.49，对比 Gen-2（高保真低自然度） / DragNUWA（高自然度低保真），变化 在保真度和自然度之间取得更均衡的结果。
 
-## 概述
+## 概要
 
 **瓶颈与动机**：视频扩散模型在生成过程中蕴含丰富的跨帧运动信息，但现有运动控制方法（如 **DragNUWA**、**MotionCtrl**、**VideoComposer**）依赖大量训练来定制运动行为，缺乏可解释、可跨架构泛化的运动特征提取机制，导致运动控制不透明且资源消耗大。同时，商业方案（如 **Gen-2** 的 Motion Brush）虽提供交互式运动控制，但同样需要专有训练流程，难以迁移到开源模型。
 
@@ -52,15 +54,13 @@ claims:
 
 **局限性**：当前方法依赖 DDIM 反转技术，对真实视频的适用性有限；仅能控制运动方向，无法精确控制运动幅度；生成速度较慢（单样本约 3 分钟）；复杂运动模式（旋转、缩放等）的泛化能力尚未验证。
 
-## 背景与动机
-
 视频生成领域近年来取得了显著进展，扩散模型已成为主流范式。然而，对生成视频的运动进行精细控制仍是一个核心挑战。现有的运动控制方法大致可分为两类：一类是商业闭源方案，如 Runway 的 **Gen-2**（Runway, 2023），提供运动笔刷（Motion Brush）功能，但用户无法控制运动保真度与自然度之间的权衡；另一类是基于训练的方法，如 **DragNUWA**（Yin et al., arXiv 2023）通过点轨迹实现运动控制，**MotionCtrl**（Wang et al., arXiv 2023）统一控制相机与物体运动，**VideoComposer**（Wang et al., NeurIPS 2024）则通过额外运动矢量进行视频合成。这些方法虽然在各自场景下有效，但均需大量训练来定制运动控制模块，计算资源消耗大，且缺乏可解释、可跨架构泛化的运动特征提取手段。
 
 根本瓶颈在于：视频扩散模型的中间特征中天然蕴含着丰富的跨帧运动信息，但如何从中提取纯净的运动表征，并将其直接用于训练无关的控制，此前未被有效探索。现有工作要么使用完整的扩散特征（如 **DIFT**（Tang et al., NeurIPS 2024）用于语义对应），但这些特征混杂了语义和结构等共享内容信息，无法直接编码运动；要么依赖额外训练的特征提取器，缺乏通用性。
 
 本文的核心动机正是填补这一空白：**视频扩散模型本身是否可以作为训练无关的运动解释器与控制器？** 作者通过初步分析发现，对扩散特征进行主成分分析（PCA）时，原始特征无法按运动方向清晰分离，但若先移除内容相关性，则不同运动方向的视频在 PCA 投影空间中呈现出显著的可分性（Figure 2）。进一步观察表明，仅有少数通道对运动主成分有高贡献，且这些通道的跨帧数值变化与视频平移方向高度吻合，而非运动通道则无此对应关系（Figure 3）。这揭示了一个关键洞察：**视频扩散模型的中间特征中存在运动感知通道，只需剔除共享内容信息并聚焦对运动主成分贡献大的通道，即可获得鲁棒、通用的训练无关运动特征。** 基于此，本文提出 MOFT（MOtion FeaTure），并构建了一套无需训练的潜在优化框架，将 MOFT 作为引导信号，实现对生成视频的运动方向和点拖拽的精细控制。
 
-## 核心创新
+## 核心方法与创新机理
 
 本文的核心贡献在于发现并利用视频扩散模型中间特征中天然存在的运动感知通道，提出了一种**无需训练**的运动特征提取与运动控制框架。其关键创新可归结为三个层面的“changed slots”，相对于现有训练依赖型方法形成了根本性的范式转变。
 
@@ -101,8 +101,6 @@ Figure 12 的消融显示，共享 K&V 有效维持了整体视频的一致性�
 对于更精细的点拖拽操作，本文提出了一种时变组合损失（Eq. 9）：在去噪早期（$t \ge t_1$）仅使用 MOFT 引导粗运动，中期（$t_1 > t \ge t_2$）结合 MOFT 与 DIFT 的逐点特征对齐损失 $\mathcal{L}^{p}$，后期（$t_2 > t \ge t_3$）仅使用 DIFT 进行精确点定位。Figure 14 的消融证实，单独使用 DIFT 的点拖拽效果有限，单独使用 MOFT 则缺乏精确点控制，二者组合可实现精细的点拖拽效果。
 
 **总结**：本文的核心创新在于将视频扩散模型从“需要训练定制的运动控制器”重新定位为“天然蕴含可提取运动特征的通用基础模型”，通过内容解耦、通道筛选和潜在优化的组合，在完全无需训练的前提下实现了运动方向控制和点拖拽操作，在运动保真度上达到 84.0（Table 1），并在用户评价中同时兼顾运动保真度（3.21）与自然度（3.49）（Table 3）。
-
-## 整体框架
 
 ![[assets/figures/papers/paper_list_l38_Video_Diffusion_Models_are_Training_free_Motion_Interpreter_and_Controll/figures/006_Figure_5.jpg]]
 *Figure 5: Motion Control Pipeline. We use reference MOFT as guidance and optimize latents to alter the sampling process. In one denoising step, we get the intermediate features and extract MOFT from it with content correlation removal and motion channel filter. We optimize the latents to alter the sampling process with the loss of masked MOFT and reference MOFT*
@@ -147,8 +145,6 @@ $$\mathcal{L}_t = w_t^c \mathcal{L}^c + w_t^p \mathcal{L}^p$$
 ### 特征提取的位置选择
 
 MOFT 从 U-Net 的 **upper block 1** 提取，该层特征空间分辨率较高（相对尺度 2×），能保留更精细的运动空间对应关系。Figure 4(e-h) 的跨层消融证实了该层在运动相似度热力图上表现最优。运动通道的选取通过 PCA 主成分权重确定，保留前约 4% 的通道即可在运动保真度和自然度之间取得最佳平衡（Table 4）。
-
-## 核心模块与公式推导
 
 ### 3.1 内容相关性移除
 
@@ -210,7 +206,7 @@ $$g^{\mathrm{clip}} = \begin{cases} g, & (i,j,k) \in \mathcal{R} \text{ 且 } k 
 
 消融实验（Figure 12）证实共享 K&V 有效维持了整体视频一致性，梯度裁剪则保护了背景内容不受运动引导干扰，但会略微减小运动幅度——这是保真度与自然度之间的一个可控权衡。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 运动特征设计的有效性验证
 
@@ -263,14 +259,8 @@ $$g^{\mathrm{clip}} = \begin{cases} g, & (i,j,k) \in \mathcal{R} \text{ 且 } k 
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l38_Video_Diffusion_Models_are_Training_free_Motion_Interpreter_and_Controll/figures/001_Figure_1.jpg]]
-*Figure 1: Characteristics of MOtion FeaTure (MOFT). (a-b) Rich Motion Information: We extract MOFT at the red point in the reference video in (a) and draw similarity heatmaps in (b) across various videos (yellow indicates higher similarity). The heatmap aligns well with the motion flow in the bottom left. (c) MOFT serves as guidance for controlling motion direction in the light-masked region, with the motion direction signal illustrated by red arrows in the first image*
-
 ![[assets/figures/papers/paper_list_l38_Video_Diffusion_Models_are_Training_free_Motion_Interpreter_and_Controll/figures/002_Figure.jpg]]
 *Figure: (a) PCA of vanilla feature (b) PCA of feature after correlation removal*
-
-![[assets/figures/papers/paper_list_l38_Video_Diffusion_Models_are_Training_free_Motion_Interpreter_and_Controll/figures/003_Figure_2.jpg]]
-*Figure 2: Visualization of PCA on video diffusion features. The left side indicates the framewise panning direction, with each color representing a specific direction pattern. We apply PCA to diffusion features extracted from videos with different motion directions and plot their projections on the leading two principle components. (a) The result does not exhibit a distinguishable correlation with motion direction. (b) Features are clearly separated by their motion direction. (a) PC weight hist. on channels*
 
 ![[assets/figures/papers/paper_list_l38_Video_Diffusion_Models_are_Training_free_Motion_Interpreter_and_Controll/figures/004_Figure_3.jpg]]
 *Figure 3: Cross-frame Channel Value. (a) We plot the histogram of the weight of $\mathcal { P } _ { 1 }$ . It reveals that only a few channels significantly contribute to determining the principal components. (b-c) The motion channels exhibit a pronounced correlation with motion direction trends. (d) In contrast, the non-motion channels show little correspondence with motion direction*
@@ -278,7 +268,7 @@ $$g^{\mathrm{clip}} = \begin{cases} g, & (i,j,k) \in \mathcal{R} \text{ 且 } k 
 ![[assets/figures/papers/paper_list_l38_Video_Diffusion_Models_are_Training_free_Motion_Interpreter_and_Controll/figures/009_Figure.jpg]]
 *Figure: ZeroScope: A lion lying on the grassland*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 核心瓶颈与动机
 

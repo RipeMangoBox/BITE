@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/RAM_Recover_Any_3D_Human_Motion_in_the_Wild.pdf
+project_link: null
+code_link: null
 aliases:
 - RRAM
 - RAM
@@ -41,7 +43,7 @@ claims:
 > - PoseTrack18 上，ID switches (IDs) 为 15，对比 232 (CoMotion strict)，变化 -217 (下降93.5%)。
 > - PoseTrack21 上，MOTA 为 74.4，对比 71.4 (CoMotion)，变化 +3.0。
 
-## 概述
+## 概要
 
 从单目视频中实时恢复多人体三维运动，是自动驾驶、体育分析、AR/VR等应用的核心技术。现有方法主要沿两条路径推进：一是逐帧回归SMPL参数（如HMR 2.0、PARE、PyMAF），缺乏时序一致性；二是依赖匈牙利算法进行跨帧身份关联（如4DHumans、CoMotion），其核心瓶颈在于**过度依赖2D外观特征匹配**——在快速运动、严重遮挡和视角变化下，外观相似度失效导致身份频繁切换、轨迹断裂，同时单帧重建无法利用历史信息，造成遮挡区域重建退化。
 
@@ -49,7 +51,7 @@ RAM从因果层面切入这一瓶颈：**将显式运动先验注入分割跟踪
 
 实验证据强度高且一致。在PoseTrack18上，RAM以**HOTA 66.4**（CoMotion 58.2）和仅**15次ID切换**（CoMotion 232次）实现零样本跟踪，FPS达10.32，约为CoMotion的1.8倍、4DHumans的20倍（Table 1）。在极具挑战的TrackID-3x3室外场景，TI-HOTA达**66.68**，相较CoMotion提升116%；消融实验表明，去除运动先验仅用SAM2跟踪导致性能骤降至38.60，验证了运动建模的核心作用（Table 2）。在3DPW上，3D重建误差MPJPE为**53.0 mm**、PA-MPJPE为**34.1 mm**，优于所有对比方法（Table 4）。
 
-## 背景与动机
+
 
 从单目视频中恢复多人体三维运动是计算机视觉的核心挑战之一，在体育分析、AR/VR、人机交互等领域具有广泛应用。该任务要求系统同时完成多目标跟踪与逐帧三维人体网格重建，二者相互耦合：跟踪错误会导致重建身份错乱，而重建失败又会加剧轨迹断裂。
 
@@ -72,7 +74,9 @@ RAM的核心洞察是：**将运动感知引入分割跟踪与网格重建的每
 
 这一设计使RAM在零样本条件下（无需在目标数据集上重新训练）即可实现鲁棒的多人体三维运动恢复，同时推理速度达到10.32 FPS，约为CoMotion的1.8倍、4DHumans的20倍。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 RAM的核心创新在于将**显式运动先验**系统性地注入多人体3D运动恢复的完整流程，从根本上改变了传统方法依赖外观匹配和逐帧回归的范式。其创新点可归结为四个关键“changed slots”：
 
@@ -117,7 +121,7 @@ RAM通过SegFollow的稳定跟踪大幅减少冗余计算，整体FPS达到10.32
 
 **创新本质总结**：RAM并非简单的模块堆叠，而是识别出“运动先验注入”这一因果控制点，并在跟踪、重建、预测、融合四个环节中系统性地实现了这一理念，从而在零样本、实时、遮挡鲁棒三个维度上同时取得突破。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l35_https_arxiv_org_abs_2603_19929v2/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of RAM. The framework integrates four components: SegFollow for motion-guided temporal tracking, Temporal HMR for memory-based 3D reconstruction, a Predictor for motion forecasting under occlusion, and a gated Combiner for robust recovery*
@@ -136,7 +140,7 @@ RAM的整体pipeline遵循“跟踪—重建—预测—融合”的级联设计
 
 模块间的数据流关系可概括为：视频帧 → SegFollow（身份关联与掩膜） → T-HMR（时序重建特征） → Combiner（融合预测先验） → 最终SMPL网格序列。Predictor作为辅助分支，从历史重建中提取运动先验，并行注入Combiner。整个pipeline的架构概览如Figure 2所示。
 
-## 核心模块与公式推导
+
 
 RAM 由四大模块构成：运动感知的语义跟踪器 SegFollow、时序人体网格重建器 T-HMR、运动预测器 Predictor，以及门控融合器 Combiner。各模块协同工作，将显式运动先验注入从分割跟踪到网格重建的全流程，实现零样本、实时、遮挡鲁棒的多人体 3D 运动恢复。
 
@@ -204,7 +208,9 @@ $$Z_{t+1}^{\mathrm{c}} = (1 - g_{t+1}) \odot Z_{t+1}^{\mathrm{h}} + g_{t+1} \odo
 
 当视觉信息可靠时，门控向量趋近于 0，融合特征以 T-HMR 重建为主；当遮挡导致视觉线索缺失时，门控向量趋近于 1，融合特征更多依赖 Predictor 的运动先验。训练阶段通过模拟 60% 随机遮挡微调 Combiner，使其学会自适应调整门控权重，确保在严重遮挡下仍能维持重建连续性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能瓶颈验证
 
@@ -260,7 +266,9 @@ TrackID-3x3 数据集包含频繁遮挡和快速运动的真实体育场景，�
 
 论文未明确报告系统性的失败案例或量化局限性。从方法设计可推断潜在薄弱环节：SegFollow 依赖 SAM2 的分割质量作为外观亲和度输入，当 SAM2 本身在极端光照或运动模糊下失效时，运动先验的补偿能力存在上限；Predictor 基于历史运动的外推在面对突变动作（如突然转向、倒地）时可能产生不可靠预测，进而影响 Combiner 的融合质量。这些场景下的性能退化程度需进一步实验验证。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位与因果瓶颈
 
@@ -311,6 +319,8 @@ RAM 相对于上述基线方法的核心差异体现在四个因果控制点上�
 - **计算效率的进一步优化：** 10.32 FPS 虽已实现实时，但 Memory Cache 的 top-k 选择、MemFormer 的注意力计算仍是计算瓶颈，在更多人体（>10 人）场景下的可扩展性如何？
 
 > **注意：** 上述局限和开放问题中，部分基于方法设计的合理推断而非论文明确陈述，建议在最终版本中标注或补充原文的 limitations 章节内容。
+
+
 
 ## 原文 PDF
 

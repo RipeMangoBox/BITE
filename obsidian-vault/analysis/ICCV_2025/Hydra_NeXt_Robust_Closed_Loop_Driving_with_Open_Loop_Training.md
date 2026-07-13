@@ -5,6 +5,8 @@ paper_level: A
 venue: ICCV
 year: 2025
 pdf_ref: paperPDFs/ICCV_2025/Hydra_NeXt_Robust_Closed_Loop_Driving_with_Open_Loop_Training.pdf
+project_link: null
+code_link: https://github.com/woxihuanjiangguo/Hydra-NeXt
 aliases:
 - HN
 - Hydra-NeXt
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | Hydra-NeXt: 利用开环训练实现鲁棒闭环驾驶 |
 | 英文题名 | Hydra-NeXt: Robust Closed-Loop Driving with Open-Loop Training |
 | 会议/期刊 | ICCV 2025 |
-| Links | [paper](https://arxiv.org/abs/2503.12030); [GitHub](https://github.com/woxihuanjiangguo/Hydra-NeXt) |
+| Links | [paper](https://arxiv.org/abs/2503.12030) · [GitHub](https://github.com/woxihuanjiangguo/Hydra-NeXt) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | Hydra-NeXt |
 | Dataset | Bench2Drive (CARLA v2), Bench2Drive (Bench2Drive protocol) |
@@ -41,7 +43,7 @@ claims:
 > - Bench2Drive (CARLA v2) 上，Success Rate (SR) 为 48.20%，对比 30.71%，变化 +17.49%。
 > - Bench2Drive (Bench2Drive protocol) 上，Driving Score 为 73.86，对比 64.22，变化 +9.64。
 
-## 概述
+## 概要
 
 ### 1. 问题瓶颈
 
@@ -68,7 +70,7 @@ Hydra-NeXt 提出了一种**多分支规划框架**，在开环训练范式内�
 
 Hydra-NeXt 属于**端到端开环训练、闭环部署**范式，其核心创新在于将控制预测与运动学可行的轨迹细化显式纳入开环训练框架，从而在不依赖强化学习专家或特权信息的前提下，显著提升闭环驾驶的鲁棒性。相较于依赖专家特征蒸馏的 DriveAdapter 和纯轨迹预测的 VAD、UniAD 等基线，Hydra-NeXt 通过多分支联合优化实现了对动态交互和物理约束的显式建模，同时保持了开环训练的数据效率优势。
 
-## 背景与动机
+
 
 ### 端到端自动驾驶的闭环困境
 
@@ -95,7 +97,9 @@ Figure 2 展示了从 Hydra-MDP 到 Hydra-NeXt 的演进路线：Hydra-MDP 通�
 
 Hydra-NeXt 的设计正是围绕这些问题展开，其核心洞察是：**通过在开环训练中联合优化轨迹、控制和运动学可行的轨迹细化，可显著提升闭环驾驶性能而不依赖强化学习专家**。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Hydra-NeXt 的核心创新在于通过**多分支规划架构**与**运动学约束下的轨迹细化**，弥合开环训练与闭环部署之间的鸿沟。其关键设计围绕三个 changed slots 展开：
 
@@ -125,7 +129,7 @@ Hydra-NeXt 的核心创新在于通过**多分支规划架构**与**运动学约
 
 **需注意的局限**：扩散策略的迭代去噪带来推理延迟（DDPM 下 528ms），虽然通过 DDIM + Flash-attention 优化可降至 243ms（Table 11），但仍可能影响实时闭环运行。此外，该方法对交通标志响应等细粒度规则遵守表现不理想，存在过拟合开环数据分布的风险。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2503_12030/figures/002_Figure_2.jpg]]
 *Figure 2: Roadmap from Hydra-MDP to Hydra-NeXt . DriveAdapter [26] was the previous state-of-the-art method on the Bench2Drive benchmark*
@@ -168,7 +172,7 @@ $$\mathcal{L} = \mathcal{L}_{traj} + \mathcal{L}_{ctrl} + \mathcal{L}_{dp}$$
 
 Figure 3 展示了 Hydra-NeXt 的完整数据流：感知网络 → 多头运动解码器（轨迹解码器 + 控制解码器）→ 轨迹细化模块（扩散策略 + 运动学模型 + 最近邻匹配）→ 最终控制信号 $C^*$。Figure 2 则从 Hydra-MDP 出发，逐步叠加控制解码器和轨迹细化模块，展示了各组件带来的累积性能增益，最终超越前闭环 SOTA **DriveAdapter**。
 
-## 核心模块与公式推导
+
 
 Hydra-NeXt 的核心由三个可端到端联合优化的模块构成：**轨迹解码器（Trajectory Decoder）**、**控制解码器（Control Decoder）** 与**轨迹细化网络（Trajectory Refinement Network）**。三者共享同一感知网络提取的环境 token 序列 $F_{env}$，但分别解决规划中的不同瓶颈——路由规划、高频响应与运动学可行性。
 
@@ -224,7 +228,9 @@ $$\mathcal{L} = \mathcal{L}_{traj} + \mathcal{L}_{ctrl} + \mathcal{L}_{dp}$$
 
 这一联合优化使得轨迹规划、高频控制响应与运动学可行细化三者协同进化，无需依赖强化学习专家的在线交互即可显著提升闭环驾驶性能。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -287,7 +293,9 @@ Table 8对比了各方法的推理延迟。Hydra-NeXt在RTX 3090上的延迟为5
 
 ![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2503_12030/figures/004_Table.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法继承与突破
 
@@ -338,6 +346,8 @@ Hydra-NeXt 的开环训练范式为闭环驾驶提供了新的基准，但也引
 4. **分支间信息交互**：当前控制解码器与轨迹解码器独立预测，仅在最终阶段通过最近邻匹配融合。是否存在更优的中间层特征共享或交叉注意力机制，使两分支协同更紧密？
 
 5. **跨仿真器可迁移性**：该方法能否无缝迁移至 CARLA 3.0 或其他高保真仿真环境？运动学模型参数的自适应标定与感知网络的域适应是潜在的技术挑战。
+
+
 
 ## 原文 PDF
 

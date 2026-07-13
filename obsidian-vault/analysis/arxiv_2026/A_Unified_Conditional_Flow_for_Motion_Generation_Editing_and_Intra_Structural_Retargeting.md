@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2026
 pdf_ref: paperPDFs/arxiv_2026/A_Unified_Conditional_Flow_for_Motion_Generation_Editing_and_Intra_Structural_Retargeting.pdf
+project_link: null
+code_link: null
 aliases:
 - UCFO
 - UCFMGEISR
@@ -42,7 +44,7 @@ claims:
 > - Mixamo Retargeting 上，Error (×10)↓ 4.91 (FK reconstruction) vs 8.13 (R2ET) (-3.22)。
 > - SnapMoGen Text-based Editing (User Study) 上，Average Preference Rate 70% vs ~30% (vs. combined baselines) (+40%)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -67,7 +69,7 @@ claims:
 - **运动编辑**：用户研究中，该方法在源运动保留、编辑准确性和整体质量三个维度上均获得约70%的偏好率，远超对比基线（约30%）。
 - **消融验证**：移除关节自注意力导致FID从16.567升至17.205，证实关节级关系建模对生成质量的关键作用；参数量相近的宽基线（90M参数，FID=17.111）仍不及含关节注意力的模型（88M参数，FID=16.567），表明增益来自结构归纳偏置而非容量增加。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -101,7 +103,9 @@ claims:
 
 这种方法论转变使得一个预训练模型即可覆盖生成、编辑和重定向三个任务，消除了传统流水线中的任务专用模块和手工几何约束。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：多任务的流程割裂
 
@@ -133,7 +137,7 @@ claims:
 
 与专用重定向网络（如**SAN**（Aberman et al., ACM TOG 2020）、**SAME**（Lee et al., SIGGRAPH Asia 2023）、**R2ET**（Zhang et al., CVPR 2023））相比，本文方法将重定向重新定义为条件生成问题，而非几何优化或成对数据学习问题，从而在统一的生成框架内实现了零样本重定向。Table 3显示，该方法FK重建误差（$4.91 \times 10^{-1}$）显著低于专用重定向网络R2ET（$8.13 \times 10^{-1}$），验证了条件生成视角的有效性。
 
-## 整体框架
+
 
 本文提出一种统一条件流模型，将运动生成、文本驱动编辑和结构内骨骼重定向三个任务收敛到单一框架中。其核心思想是：**编辑和重定向本质上是相同的条件传输问题**——区别仅在于调节哪个条件信号（文本提示或目标骨骼结构），而生成模型本身无需修改。基于这一视角，系统由三个协同组件构成：双条件 Transformer 骨干网络、条件整流流训练策略，以及统一的 FlowEdit 推理方案。
 
@@ -213,7 +217,7 @@ $$\mathbf{v}_{\mathrm{CFG}} = \mathbf{v}_u + \sum_k w_k (\mathbf{v}_k - \mathbf{
 ![[assets/figures/papers/paper_list_l43_https_arxiv_org_abs_2604_13427/figures/002_Figure_2.jpg]]
 *Figure 2: Model Architecture. Input frame tokens are reshaped into per-joint tokens for processing. Time and skeleton conditions are injected via AdaLN, while text embeddings are integrated through cross-attention*
 
-## 核心模块与公式推导
+
 
 ### 3.1 统一条件流模型概述
 
@@ -316,7 +320,9 @@ $$
 
 该公式的关键在于：**仅需切换条件信号**（$c_t$ 为目标条件，$c_s$ 为源条件），同一预训练模型即可在零样本设定下完成文本编辑（改变文本条件）或骨骼重定向（改变骨骼条件），无需任何任务特定的微调或架构修改。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 文本驱动运动生成主结果
 
@@ -376,7 +382,9 @@ FID 方面，模型取得 16.567±0.045，略逊于 MoMask++ 的 15.060±0.065�
 ![[assets/figures/papers/paper_list_l43_https_arxiv_org_abs_2604_13427/figures/011_Figure_6.jpg]]
 *Figure 6: Qualitative retargeting comparison. We compare against SAN [Aberman et al. 2020], SAME [Lee et al. 2023], and R2ET [Zhang et al. 2023a]. The proposed method better preserves fine-grained local motion and adapts to varying skeleton proportions. As highlighted in the zoomed-in regions, baseline methods often introduce artifacts such as unnatural twisting or over-stretching when adapting to different skeletons. In contrast, our method preserves delicate local details (e.g., leg bending scale, hand facing direction) while naturally adapting the global motion to fit the new body shape*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心问题与范式转换
 
@@ -423,6 +431,8 @@ FID 方面，模型取得 16.567±0.045，略逊于 MoMask++ 的 15.060±0.065�
 4. **编辑显著性与可控性**：如何提升长文本编辑的显著性和精细度控制？可能需要引入层次化条件注入或编辑强度调节机制。
 
 5. **多模态条件扩展**：框架的条件空间可进一步扩展至音频、场景几何等多模态信号，实现更丰富的运动控制。
+
+
 
 ## 原文 PDF
 

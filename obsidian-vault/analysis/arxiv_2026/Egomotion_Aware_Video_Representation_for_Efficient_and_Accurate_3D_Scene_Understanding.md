@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2026
 pdf_ref: paperPDFs/arxiv_2026/Egomotion_Aware_Video_Representation_for_Efficient_and_Accurate_3D_Scene_Understanding.pdf
+project_link: null
+code_link: null
 aliases:
 - MM
 - EAVREA3SU
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 面向高效准确三维场景理解的自我运动感知视频表示 |
 | 英文题名 | Egomotion-Aware Video Representation for Efficient and Accurate 3D Scene Understanding |
 | 会议/期刊 | arXiv 2026 |
-| Links | [paper](https://arxiv.org/abs/2603.17980) · [arXiv](https://arxiv.org/) |
+| Links | [paper](https://arxiv.org/abs/2603.17980) · [paper](https://arxiv.org/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction #topic/representation_self_supervised_transfer |
 | Method | Motion-MLLM |
 | Dataset | ScanQA, SQA3D, VSI-Bench, ScanRefer |
@@ -42,7 +44,7 @@ claims:
 > - SQA3D 上，EM@1 60.2 vs Spatial-MLLM 55.9 (+4.3)。
 > - VSI-Bench 上，平均分 58.2 vs VG LLM-8B 50.7 (+7.5)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -72,8 +74,6 @@ claims:
 ### 局限与展望
 
 方法目前主要依赖仿真 IMU 数据训练，仅在 TUM‑VI 小规模真实数据上验证；关键帧筛选阈值为手工设定，尚未实现端到端学习；在计数类问题（How）上提升有限。未来可扩展至户外动态场景，并探索与深度估计网络互补、多传感器融合、端到端阈值学习等方向。
-
-## 背景与动机
 
 ### 3D空间推理的核心瓶颈
 
@@ -107,7 +107,7 @@ claims:
 
 通过这三个层面的创新，Motion-MLLM旨在以接近2D方法的效率，实现媲美甚至超越3D方法的空间推理精度，为低成本、高精度的3D场景理解开辟新路径。
 
-## 核心创新
+## 核心方法与创新机理
 
 Motion-MLLM的核心创新在于将**自我运动（egomotion）**作为显式输入模态引入多模态大语言模型（MLLM），以极低的传感器成本（仅需消费级IMU）弥合纯2D视觉与度量3D理解之间的鸿沟。其创新体系围绕三个紧密耦合的**changed slots**展开。
 
@@ -143,8 +143,6 @@ $$\bar{\mathbf{V}} = \mathbf{V}' + \mathrm{FFN}(\mathrm{Attn}(\mathbf{V}'\mathbf
 ### 创新协同效应
 
 上述三个changed slots形成协同增益闭环：级联筛选以运动感知方式精选关键帧，减少冗余帧对融合模块的干扰；不对称融合则充分利用筛选后的运动标记，将IMU轨迹转化为视觉特征的空间上下文。当移除IMU编码器（VGGT-only配置）时，ScanQA EM从29.8%骤降至25.9%（-3.9%），SQA3D EM从60.2%降至57.6%（-2.6%）（Tab. 6），确认自运动信息是整个创新体系的必要条件而非锦上添花的辅助信号。
-
-## 整体框架
 
 Motion-MLLM 的整体设计遵循一个清晰的逻辑：将自我运动（egomotion）作为显式模态引入多模态大语言模型，使模型在不依赖显式3D重建的前提下获得度量空间感知能力。如图2所示，系统接收两路同步输入——2D视频流与IMU数据（6轴加速度计/陀螺仪），经过级联筛选、编码与融合后，由LLM骨干生成最终的空间理解响应。
 
@@ -200,8 +198,6 @@ $$\bar{\mathbf{V}} = \mathbf{V}' + \mathrm{FFN}(\mathrm{Attn}(\mathbf{V}'W_Q, \m
 ![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2603_17980/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of (a) 3D-input, (b) 2D-input, and (c) our egomotion-input approaches for spatial reasoning in MLLMs*
 
-## 核心模块与公式推导
-
 Motion-MLLM 的核心架构由三个关键模块构成：级联运动-视觉关键帧筛选、GRU 运动编码器、以及不对称交叉注意力融合模块。这三个模块协同工作，将同步的 2D 视频流与 IMU 数据转化为自运动增强的视觉标记，供 LLM 骨干进行 3D 空间推理。
 
 ### 级联运动-视觉关键帧筛选
@@ -248,7 +244,7 @@ $$\bar{\mathbf{V}} = \mathbf{V}' + \mathrm{FFN}(\mathrm{Attn}(\mathbf{V}'W_Q, \m
 ![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2603_17980/figures/003_Figure_3.jpg]]
 *Figure 3: Illustration of asymmetric cross-modal feature fusion*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -326,10 +322,7 @@ Table 6的系统消融揭示了各组件的因果贡献：
 ![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2603_17980/figures/016_Figure_6.jpg]]
 *Figure 6: Qualitative examples on ScanQA [3]*
 
-![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2603_17980/figures/014_Table_10.jpg]]
-*Table 10: Evaluation Results on SQA3D [42]. We use the test set of SQA3D for evaluation. We additionally report the average EM@1 for different question types, including What, Is, How, Can, Which, and Others. "–" indicates the number is not available. “2D”, “3D”, and “M” specify the model’s input type as 2D data (images/videos), 3D data (point clouds/depth maps), and egomotion data, respectively*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 问题定位：2D与3D之间的“度量鸿沟”
 

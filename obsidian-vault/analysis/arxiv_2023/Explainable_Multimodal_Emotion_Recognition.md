@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2023
 pdf_ref: paperPDFs/arxiv_2023/Explainable_Multimodal_Emotion_Recognition.pdf
+project_link: null
+code_link: https://github.com/Luodian/Otter</td></tr><tr><td>VideoChat2</td><td>Video,Text</td><td>https://github.com/OpenGVLab/Ask-Anything/tree/main/video_chat
 aliases:
 - EEMER
 - EMER
@@ -42,15 +44,13 @@ claims:
 > - EMER dataset (English version) 上，Accuracys 80.03 (EMER(Multi)) vs 54.72 (VideoChat2, best MLLM Accuracys) (+25.31)；Recalls 80.07 (EMER(Multi)) vs 64.86 (GPT-4V, highest MLLM Recalls) (+15.21)。
 > - EMER dataset (Chinese version) 上，Avg 85.20 (EMER(Multi)) vs 57.34 (GPT-4V) (+27.86)。
 
-## 概述
+## 概要
 
 多模态情感识别长期受困于**固定标签空间的封闭集假设**和**多数投票机制的标签模糊性**——传统方法仅从6类基本情感中强制选择，导致大量正确但非主流或非候选的微妙情绪被系统性遗漏。本文提出的**EMER（Explainable Multimodal Emotion Recognition，可解释多模态情感识别）**从根本上重构了这一任务范式：通过生成融合视觉、声学和词汇线索的多模态解释性描述，将情感识别从封闭集分类转化为**开放词汇标签提取**，从而解除标签空间限制，并为每个预测提供可追溯的推理依据。
 
 该方法的核心机制在于利用大语言模型的推理能力实现**跨模态线索消歧**：先通过GPT-4V从视频帧和音频文本中提取视觉与声学线索，再以GPT-3.5整合两类线索对字幕进行消歧，最终生成完整的EMER描述。从该描述中提取的开放词汇标签集包含**301个候选类别**，平均每样本3个标签，远超MER2023的6类固定标签空间。
 
 实验结果表明，EMER(Multi)在情感识别Avg指标上达到**80.05（英文）和85.20（中文）**，显著优于最强通用大模型GPT-4V的56.69/57.34，提升幅度超过23个百分点。消融实验进一步证实，融合所有线索的多模态描述远优于任何单模态变体，验证了跨模态消歧的必要性。此外，从EMER描述中抽取的离散情感识别Top-1准确率达93.48%，效价估计与MER2023的PCC为0.88，表明解释性描述在提供预测依据的同时，完好保留了关键的识别信息。
-
-## 背景与动机
 
 多模态情感识别（Multimodal Emotion Recognition, MER）旨在整合文本、语音、视觉等多源信息来推断人类情感状态。传统方法将该任务建模为封闭集分类问题：给定预定义的离散情感类别（如MER2023基准中的6类基本情感），模型直接输出类别标签。然而，这一范式存在根本性瓶颈——**标签模糊与多数投票机制的局限**。
 
@@ -60,7 +60,7 @@ claims:
 
 本文的核心动机在于**将多模态情感识别从封闭集分类转化为开放词汇标签提取任务**。具体而言，EMER（Explainable Multimodal Emotion Recognition）提出了一种新的范式：首先生成包含视觉、声学和词汇线索的多模态解释性描述，然后从描述中以开放词汇方式提取情感标签。这一设计的因果杠杆在于——通过大语言模型的推理能力整合多模态线索并生成解释，既能解除标签空间的限制，又能为每个预测提供明确的证据基础，从而同时提升识别的覆盖度与可信度。
 
-## 核心创新
+## 核心方法与创新机理
 
 ### 从封闭集分类到开放词汇解释生成
 
@@ -89,8 +89,6 @@ EMER的真正贡献在于定义了一套**可复现的提示工程流水线**：
 ### 评估体系的重构
 
 与任务重构相配套，EMER重新定义了评估指标。传统准确率要求预测标签与标注标签完全一致，这在开放词汇场景下过于严苛——例如，“开心”和“快乐”在语义上等价，但字符串匹配会将其判为错误。EMER采用**集合级评估**：先用GPT-3.5对预测标签和标注标签进行同义词分组，再计算分组后的集合准确率和召回率，最终以两者的算术平均（Avg）作为排序指标。这一设计使得评估更贴近语义层面的正确性，而非表面的字符串匹配。
-
-## 整体框架
 
 EMER 将多模态情感识别从传统的封闭集分类重新定义为**可解释的开放词汇情感提取**任务。其核心 pipeline 围绕一个关键洞察展开：利用大语言模型（LLM）的推理能力整合多模态线索并生成解释性描述，从而解除标签空间限制，同时为每个预测提供可追溯的证据基础。
 
@@ -126,8 +124,6 @@ EMER 将多模态情感识别从传统的封闭集分类重新定义为**可解�
 
 ![[assets/figures/papers/paper_list_l1045_https_arxiv_org_abs_2306_15401/figures/006_Figure_4.jpg]]
 *Figure 4: Pipeline for generating unimodal and multimodal descriptions*
-
-## 核心模块与公式推导
 
 ### 多模态解释生成流水线
 
@@ -178,7 +174,7 @@ $$\operatorname{Overlap}_{\mathrm{S}} = \frac{|\mathcal{P}^1 \cap \mathcal{P}^2|
 
 **同义词分组**是上述公式的前置步骤：所有标签先由 GPT-3.5 进行同义词聚类，再以组 ID 代替原始标签参与集合运算。这一设计旨在减少同义词对重叠率计算的干扰，但也引入了对 GPT-3.5 分组的依赖，其跨语言一致性尚未充分验证。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -232,28 +228,10 @@ Table 8报告了各模型在BLEU-1/4、METEOR、ROUGE-L等传统文本匹配指�
 ![[assets/figures/papers/paper_list_l1045_https_arxiv_org_abs_2306_15401/figures/005_Table_3.jpg]]
 *Table 3: Main results on emotion recognition. We consider language influence and report results for descriptions in distinct languages. The values in the gray column are used for the final ranking*
 
-![[assets/figures/papers/paper_list_l1045_https_arxiv_org_abs_2306_15401/figures/007_Figure_5.jpg]]
-*Figure 5: Performance of different subtitle integration strategies on varying MLLMs*
-
-![[assets/figures/papers/paper_list_l1045_https_arxiv_org_abs_2306_15401/figures/008_Table_4.jpg]]
-*Table 4: Performance of one-hot labels in OV emotion recognition*
-
-![[assets/figures/papers/paper_list_l1045_https_arxiv_org_abs_2306_15401/figures/013_Table_7.jpg]]
-*Table 7: Performance of different subtitle integration strategies*
-
-![[assets/figures/papers/paper_list_l1045_https_arxiv_org_abs_2306_15401/figures/004_Figure_3.jpg]]
-*Figure 3: Language influence analysis*
-
 ![[assets/figures/papers/paper_list_l1045_https_arxiv_org_abs_2306_15401/figures/015_Figure_8.jpg]]
 *Figure 8: Visualization of metric correlations. In this figure, we consider both metric and language differences. Here, “E” and “C” represent English and Chinese, respectively*
 
-![[assets/figures/papers/paper_list_l1045_https_arxiv_org_abs_2306_15401/figures/014_Table_8.jpg]]
-*Table 8: Performance of different models on matching-based metrics*
-
-![[assets/figures/papers/paper_list_l1045_https_arxiv_org_abs_2306_15401/figures/011_Table_5.jpg]]
-*Table 5: Model cards for MLLMs*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 任务范式的根本转变：从封闭集分类到开放词汇解释生成
 

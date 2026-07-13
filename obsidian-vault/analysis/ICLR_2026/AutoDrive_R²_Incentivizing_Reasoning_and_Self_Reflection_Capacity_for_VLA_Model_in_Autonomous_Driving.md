@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: "paperPDFs/ICLR_2026/AutoDrive_R²_Incentivizing_Reasoning_and_Self_Reflection_Capacity_for_VLA_Model_in_Autonomous_Driving.pdf"
+project_link: null
+code_link: null
 openreview_forum_id: KVWaCzJrrq
 aliases:
 - AR
@@ -42,7 +44,7 @@ claims:
 > - Waymo 上，L2 Error (m) Avg. 为 0.19，对比 0.30 (EMMA+)，变化 -33.3%。
 > - NAVSIM (Closed-loop) 上，PDMS↑ 为 90.3，对比 84.0 (Para-Drive)，变化 +6.3。
 
-## 概述
+## 概要
 
 ### 1. 问题与瓶颈
 
@@ -74,7 +76,7 @@ AutoDrive-R² 定位于**通用 VLM 的自动驾驶专用化**路径，区别于
 
 AutoDrive-R² 通过**仅 6k 样本的轻量训练**，在通用 VLM 基础上注入领域推理能力与物理常识，实现了数据效率与性能的平衡。
 
-## 背景与动机
+
 
 ### 自动驾驶决策的核心瓶颈
 
@@ -101,7 +103,9 @@ AutoDrive-R² 通过**仅 6k 样本的轻量训练**，在通用 VLM 基础上�
 
 通过将结构化推理与物理约束优化相结合，AutoDrive-R²旨在使VLA模型在自动驾驶任务中不仅“知道该做什么”，更能“验证做得对不对”，从而在nuScenes、Waymo等标准基准上实现更准确、更安全的轨迹规划。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 AutoDrive-R² 的核心创新在于为自动驾驶 VLA（Vision-Language-Action）模型引入了一种**结构化的自验证推理机制**与**物理接地奖励优化框架**，从根本上改变了模型生成轨迹的方式。其创新可归结为三个紧密耦合的 changed slots：
 
@@ -140,7 +144,7 @@ AutoDrive-R² 采用 SFT → RL 的两阶段训练范式，而非单阶段微调
 
 三个 changed slots 之间存在深层依赖关系。四步 CoT 为物理奖励提供了可优化的推理结构——模型需要先学会 “观察-计算-逻辑-反思” 的思维模式，物理奖励才能针对性地优化各阶段的输出质量。GRPO 的组内相对比较机制（Eq. 1-3）则使模型能够从多个候选轨迹中学习偏好，而非仅拟合单一真值。这种 “结构化推理 + 物理约束 + 相对优化” 的组合，使得 AutoDrive-R² 仅用 6k 训练样本（远少于 EMMA+ 的约 103k 样本）即在 nuScenes 上实现 34.5% 的误差降低（0.19m vs. 0.29m），并在 Waymo 零样本场景下相比 Qwen2.5-VL-7B 降低 90.7% 的误差。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l30_https_openreview_net_forum_id_KVWaCzJrrq/figures/002_Figure_1.jpg]]
 *Figure 1: Pipeline of our method. We adopt a two-stage training process. The first stage introduces an innovative CoT dataset named nuScenesR²-6K for SFT. The nuScenesR²-6K adopts a four-step logical chain with self-reflection to generate valuable chain-of-thought data. The second stage proposes an novel physics-grounded reward framework for RL optimization, which incorporates spatial alignment, vehicle dynamic, and temporal smoothness for reliable trajectory planning*
@@ -195,7 +199,7 @@ $$ \dot{T} = M(H, F) $$
 
 轨迹规划被显式分解为四步推理过程，最终生成包含自验证的完整思维链，在推理质量与物理约束之间取得平衡。
 
-## 核心模块与公式推导
+
 
 ### 两阶段训练流水线
 
@@ -309,7 +313,9 @@ $$m \ddot{x} + c \dot{x} + k x = F(t)$$
 
 > **注意**：上述物理约束公式来自论文附录，主要用于论证奖励函数设计的物理合理性，并非直接参与模型训练或推理的计算模块。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -396,7 +402,9 @@ Table 5 对三个关键超参数进行了消融：
 | Figure 2/3 | 定性轨迹在弯道和交叉口场景显著优于基线 |
 | Figure 4/5 | 自反思机制触发“Aha Moment”，主动修正物理不可行预测 |
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 技术路线定位
 
@@ -451,6 +459,8 @@ AutoDrive-R² 的创新在于填补了上述范式的关键空白：它既保留
 3. **非结构化环境的泛化**：在缺乏清晰车道线和交通规则的非结构化环境中，当前依赖“逻辑推理”模块的框架可能失效。如何使模型在规则稀疏的场景中仍能生成安全轨迹，是一个重要的开放挑战。
 
 4. **物理约束的显式集成**：将运动学/动力学约束直接嵌入推理过程或作为硬约束，而非仅通过奖励函数间接引导，可能进一步提升轨迹的物理可行性保证。
+
+
 
 ## 原文 PDF
 

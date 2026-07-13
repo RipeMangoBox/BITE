@@ -43,15 +43,13 @@ claims:
 > - VAE Decoding Speed 上，Time (s) 0.30 (50% pruned Dec.) vs 0.76 (Wan2.2 VAE Dec.) (-0.46)。
 > - Inference FPS (720p, 5B model) 上，FPS ~40。
 
-## 概述
+## 概要
 
 现有交互式世界模型面临一个根本瓶颈：在自回归生成过程中缺乏长时记忆能力，误差随时间累积，导致分钟级序列的时空一致性崩溃，同时难以兼顾高分辨率实时生成。**Matrix-Game 3.0** 针对这一问题，提出了一种记忆增强的交互式世界模型，核心思路是将**相机感知的显式记忆检索**与**基于残差收集和注入的自校正训练**相结合，使模型在统一的双向 DiT 框架中联合建模检索到的记忆帧、近期历史帧和当前待预测帧，从而打破误差累积循环。
 
 该框架由四个关键模块构成：误差感知交互基础模型、相机感知长时记忆机制、训练-推理对齐的少步蒸馏管线，以及实时推理加速模块。在 5B 参数规模下，模型实现了 720p 分辨率下最高约 40 FPS 的实时生成性能；扩展到 2×14B 规模后，生成质量、动态表现和泛化能力进一步提升。
 
 方法定位上，Matrix-Game 3.0 区别于前代 **Matrix-Game 2.0**（He et al., arXiv 2025）缺乏显式记忆和自校正机制的局限，也不同于 **Genie 3**（Ball et al., 2025）约 24 FPS 的实时性能上限或 **Lingbot-World**（Robbyant Team, arXiv 2026）因长上下文建模而牺牲实时性的设计。与 **RELIC**（Hong et al., arXiv 2025）通过额外记忆分支注入历史信息的方式相比，本工作将记忆帧直接纳入统一自注意力空间，并结合误差感知训练实现端到端的自校正，在长时一致性与实时效率之间取得了更优的平衡。
-
-## 背景与动机
 
 交互式世界模型的目标是在用户实时操控下生成时空一致的长视频，从而为游戏、仿真和具身智能提供可交互的虚拟环境。这一任务面临双重挑战：一方面，模型必须在自回归生成过程中维持分钟级序列的时空一致性，避免误差累积导致的场景漂移；另一方面，系统还需满足高分辨率（如720p）下的实时交互需求，这对模型容量和推理效率提出了严苛约束。
 
@@ -61,7 +59,7 @@ claims:
 
 Matrix-Game 3.0 针对这一瓶颈提出了系统性解决方案。其核心洞察是：通过将检索到的记忆帧、近期历史帧和当前待预测帧在同一个自注意力空间中联合建模，并在训练时人为注入生成帧的预测残差，模型能够学会从带噪声的条件信息中进行自校正。这一设计使得模型在实时推理中即使面对自身生成的不完美帧，也能借助记忆信息维持长时一致性。配合基于分布匹配蒸馏（DMD）的多段自生成滚动方案和系统级推理加速，Matrix-Game 3.0 最终实现了720p分辨率下最高40 FPS的实时交互世界模型。
 
-## 核心创新
+## 核心方法与创新机理
 
 Matrix-Game 3.0 相对于前代交互式世界模型的核心突破在于，它首次将**显式长时记忆**与**自校正生成**统一到实时推理框架中。此前的 **Matrix-Game 2.0**（He et al., arXiv 2025）虽能实现实时交互，但缺乏记忆机制，在分钟级自回归生成中会因误差累积而导致时空一致性崩溃；**Genie 3**（Ball et al., 2025）虽隐式具备记忆能力，但实时性仅约 24 FPS；**Lingbot-World**（Robbyant Team, arXiv 2026）通过长上下文建模提升了几何一致性，却难以同时维持实时性；**RELIC**（Hong et al., arXiv 2025）则通过额外的记忆分支注入历史信息，但记忆与主模型之间是分离的。Matrix-Game 3.0 的关键创新在于四个相互耦合的 changed slots，它们共同打破了“长时一致性”与“高分辨率实时生成”之间的既有权衡。
 
@@ -99,8 +97,6 @@ $$\nabla_{\theta} \mathcal{L}_{\mathrm{DMD}} \approx - \mathbb{E}_t \left[ \int 
 
 值得注意的是，这四个创新并非孤立存在：误差感知训练使基础模型能够容忍记忆检索中的噪声，联合自注意力让记忆信息直接参与自校正过程，而蒸馏和加速模块则将这一能力压缩到实时推理的约束之内。这种**跨模块的因果耦合**是 Matrix-Game 3.0 超越此前方法的核心原因。
 
-## 整体框架
-
 Matrix‑Game 3.0 的整体 pipeline 由四个核心模块串联而成，形成一个从数据生成到实时部署的闭环系统（图 2）。其设计目标是在维持双向 DiT 先验优势的前提下，引入长时记忆与自校正能力，并最终通过系统优化实现 720p@40 FPS 的实时交互式世界模型。
 
 **数据引擎**位于 pipeline 最上游，基于 Unreal Engine 生成带动作标签与相机姿态标注的长时域训练视频。这一阶段为后续的记忆检索、误差训练和蒸馏提供了精确的相机‑动作配对监督信号。
@@ -119,8 +115,6 @@ Matrix‑Game 3.0 的整体 pipeline 由四个核心模块串联而成，形�
 
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2604_08995/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of Matrix-Game 3.0. Our framework unifies Unreal Engine–based data generation, memory-augmented DiT training with an error buffer, and accelerated real-time deployment. It generates long-horizon training videos with paired action and camera-pose supervision, learns action-conditioned generation with memory-enhanced consistency, and supports real-time inference through few-step sampling, quantization, and pruning, achieving 720p@40FPS with a 5B model*
-
-## 核心模块与公式推导
 
 Matrix-Game 3.0 的系统架构由四个关键模块级联而成，每个模块针对长时交互世界模型的一个核心瓶颈进行设计。以下逐一剖析各模块的机制与关键公式。
 
@@ -185,16 +179,13 @@ $$s_{\mathrm{approx}}(i, j) = \frac{1}{N} \sum_{n=1}^{N} \mathbf{1}_n^{(j)}$$
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2604_08995/figures/003_Figure_3.jpg]]
 *Figure 3: Illustration of our interactive base model. We jointly perform error-aware modeling over the past and current latent frames, while explicitly injecting action conditions into the model. This design enables autoregressive, long-horizon interactive generation and maintains consistency with the subsequent distillation stage*
 
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2604_08995/figures/004_Figure_4.jpg]]
-*Figure 4: Illustration of our memory-augmented base model. Built upon the bidirectional base model, we incorporate retrieved memory frames as additional conditions and introduce small memory perturbations to enhance robustness. This design enables the base model to jointly model long-term memory, short-term history, and the current prediction target under the same attention mode as the base model*
-
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2604_08995/figures/005_Figure_5.jpg]]
 *Figure 5: Frame-level self-attention visualization for the memory-enhanced DiT*
 
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2604_08995/figures/006_Figure_6.jpg]]
 *Figure 6: Illustration of our few-step distillation stage. The bidirectional student performs multisegment rollouts to mimic actual few-step inference, with the final segment used for distribution matching, thereby ensuring training-inference consistency*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主结果
 
@@ -252,7 +243,7 @@ Figure 9 展示了记忆增强模型在长视频中的场景重访能力。当�
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2604_08995/figures/010_Figure_10.jpg]]
 *Figure 10: Qualitative results of our 28B model on third-person video generation*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 与现有交互式世界模型的关系
 

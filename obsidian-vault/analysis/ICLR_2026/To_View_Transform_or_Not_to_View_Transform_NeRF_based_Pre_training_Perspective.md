@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/To_View_Transform_or_Not_to_View_Transform_NeRF_based_Pre_training_Perspective.pdf
+project_link: null
+code_link: null
 openreview_forum_id: G0HcRB3s3N
 aliases:
 - VTONVTNBPTP
@@ -41,7 +43,7 @@ claims:
 > - nuScenes 占据预测 (Occ3D) 上，mIoU 为 35.49，对比 34.05 (UniPAD) / 29.65 (SelfOcc)，变化 +1.44 over UniPAD, +5.84 over SelfOcc。
 > - nuScenes HD地图构建 上，mAP 为 59.1，对比 57.8 (UVTR-C w/ UniPAD)，变化 +1.3 mAP。
 
-## 概述
+## 概要
 
 现有基于NeRF的自动驾驶预训练方法将NeRF与视图变换（View Transform）耦合，这一设计存在根本性先验冲突：视图变换强制使用离散、固定分辨率的体素或BEV特征网格，而NeRF本身假设连续、自适应的函数表示。两种先验的不兼容导致预训练产生的3D表征模糊且充满歧义。更关键的是，预训练完成后NeRF网络即被丢弃，下游任务仅使用视图变换骨干的特征，使得预训练获得的增强3D知识无法有效转移。
 
@@ -61,7 +63,7 @@ claims:
 
 综上，NeRP3D揭示了连续3D表示学习是NeRF预训练发挥潜力的关键——通过移除视图变换并保留NeRF网络作为统一框架，可以同时提升场景重建质量和下游感知性能，为自动驾驶领域的自监督预训练提供了新的范式。
 
-## 背景与动机
+
 
 自动驾驶系统依赖精确的3D场景理解来实现安全导航，涵盖3D目标检测、占据预测和高精地图构建等核心任务。然而，大规模3D标注数据的获取成本极高，促使研究者探索自监督预训练范式，以从无标注的多视图图像中学习可迁移的3D表征。
 
@@ -73,7 +75,9 @@ claims:
 
 本文的核心动机在于：**彻底解耦NeRF与视图变换，将3D场景建模为连续的点表示，并通过NeRF重塑的架构使预训练与下游任务共享同一网络**，从而消除先验冲突，保留预训练获得的全部知识，同时引入更强的几何先验以提升边界质量。这一设计使得连续3D表示学习成为发挥NeRF预训练潜力的关键机制。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 NeRP3D 的核心创新在于**彻底解耦 NeRF 与视图变换**，并围绕连续 3D 表示重新设计整个预训练-下游任务框架。现有方法（如 UniPAD、SelfOcc）将 NeRF 建立在视图变换产生的离散体素特征之上，形成两个相互矛盾的先验：视图变换强制离散、刚性的体素表示，而 NeRF 假设连续、自适应的函数。这种冲突导致预训练获得的 3D 表征模糊、边界歧义，且预训练完成后 NeRF 网络被直接丢弃，下游任务仅使用视图变换骨干的特征，造成知识转移的断裂。
 
@@ -93,7 +97,7 @@ NeRP3D 从三个关键维度改变了这一范式：
 
 这三个 changed slots 协同作用：连续点表示消除了视图变换的先验冲突，NeRF 网络保留确保了知识无损转移，SDF 先验强化了几何边界的感知友好性。Figure 2 清晰对比了两种范式：左侧的“视图变换→离散体素→NeRF→丢弃”流程，与右侧的“多视图图像→NeRP3D 连续点查询→渲染头/感知头”统一架构。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0009_G0HcRB3s3N_To_View_Transform_or_Not_to_View_Transform_NeRF-/figures/002_Figure_2.jpg]]
 *Figure 2: Comparison of the previous NeRF-based pre-training methods and our NeRP3D pipeline*
@@ -133,7 +137,7 @@ NeRP3D 完全移除了视图变换模块，改为端到端的连续点查询架�
 
 这种统一架构使预训练阶段学到的连续3D表征能够**完整保留**到下游任务中，避免了传统方法中“预训练NeRF→丢弃→仅用视图变换特征”的知识断裂。Figure 1的定性结果显示，NeRP3D在没有任何2D基础模型蒸馏的情况下，直接提取的3D点特征已具有精确的物体边界定位能力，与DINO特征相当。
 
-## 核心模块与公式推导
+
 
 ### 3D坐标收缩参数化
 
@@ -195,7 +199,9 @@ $$\mathcal{L}_{reproj} = \frac{1}{|\mathcal{R}|} \sum_{\mathbf{r}_i \in \mathcal
 
 预训练完成后，NeRF网络被完整保留。在下游任务中，均匀空间采样的点嵌入 $\{\mathbf{z}\}$ 被重塑为任务兼容的格式——例如占据预测重塑为 $(X \times Y \times Z) \times C$ 的体素特征——直接输入标准检测头。这一设计避免了预训练后丢弃NeRF网络带来的知识损失，使预训练获得的连续3D表示完整迁移到感知任务。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 瓶颈验证：视图变换的代价
 
@@ -262,7 +268,9 @@ Table 3 报告了零样本跨数据集场景重建性能：模型在Argoverse 2�
 ![[assets/figures/papers/iclr26_0009_G0HcRB3s3N_To_View_Transform_or_Not_to_View_Transform_NeRF-/figures/009_Table_5.jpg]]
 *Table 5: (b) RGB reconstruction*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 瓶颈与突破：视图变换与NeRF的先验冲突
 
@@ -297,6 +305,8 @@ NeRP3D的因果开关（causal knob）是**完全移除视图变换，转而采�
 - **动态物体建模**：如何在连续点表示框架内引入动态物体建模，使预训练阶段即可学习运动感知的3D表征？
 
 > **注意**：以上开放问题均来自论文明确指出的未来方向或实验分析中暴露的不足，未引入外部推测。关于3DGS融合和时序扩展的具体实现路径，目前尚无实验证据，需后续工作验证。
+
+
 
 ## 原文 PDF
 

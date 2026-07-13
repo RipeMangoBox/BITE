@@ -44,7 +44,7 @@ claims:
 > - PickScore (SD3.5-M + Flow-GRPO) 上，Average Gold Score (normalized) 1.20 vs 1.16 (+0.04)。
 > - TextRender (SD3.5-M + Flow-GRPO) 上，Average Gold Score (normalized) 0.99 vs 0.88 (+0.11)。
 
-## 概述
+## 概要
 
 **问题**：在基于 GRPO 的流匹配（Flow Matching）文本到图像生成中，现有方法直接将为大语言模型设计的 PPO 式裁剪机制迁移到连续扩散框架，却忽略了流匹配特有的高斯对数概率结构。这导致重要性比率（importance ratio）的分布出现系统性的均值左移与跨时间步方差不一致，使正优势样本几乎从未触发上裁剪边界，裁剪机制形同虚设，策略模型迅速滑入隐式过优化（reward hacking）——代理得分持续攀升而真实质量（黄金得分）不断下降。
 
@@ -54,7 +54,7 @@ claims:
 
 **主要结果**：在 GenEval、PickScore、TextRender 三个代理任务上，GRPO-Guard 相较 Flow-GRPO 和 DanceGRPO 基线均实现了复合黄金得分（HPSv2、ImageReward、UnifiedReward 归一化平均）的显著提升。例如，在 SD3.5-M + Flow-GRPO 设置下，GenEval 的 Average Gold 从 0.84 升至 0.89，TextRender 从 0.88 升至 0.99；在 Flux.1-dev + DanceGRPO 设置下，GenEval 的 Average Gold 从 0.88 升至 1.02。消融实验证实，仅修正比率均值已能大幅缓解黄金得分下降，而完整的 RatioNorm + 梯度重加权组合在代理得分提升与质量保持之间取得了最佳平衡。
 
-## 背景与动机
+
 
 ### 流匹配与强化学习微调的交汇
 
@@ -97,7 +97,9 @@ Figure 12 的裁剪百分比统计直接证实了这一诊断：FlowGRPO 中 $r(
 
 **TempFlowGRPO**（He et al., 2025）尝试通过梯度重加权来均衡不同步的贡献，但仅解决梯度失衡而忽略比率偏移，反而可能加速过优化（如消融实验 Figure 9 所示）。这进一步表明，**比率归一化与梯度均衡必须协同作用**，才能从根本上恢复裁剪机制的功能。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GRPO-Guard 的核心创新在于识别并修复了 GRPO 在流匹配（Flow Matching）模型中因高斯概率假设而引入的**隐式过优化（implicit over-optimization）**问题。与 LLM 中离散 token 的设定不同，流匹配模型使用连续高斯概率计算对数概率，导致重要性比率（importance ratio）分布出现**依赖于时间步的均值左移与方差不一致**。这一系统性偏差使得 PPO 式裁剪机制完全失效——正优势样本从未触及上裁剪界，负优势样本仅在末尾步被下裁剪，策略模型在代理得分持续上升的同时，真实生成质量（黄金得分）却不断下降。
 
@@ -119,7 +121,7 @@ $$\log \hat{r}_t(\theta) = \sigma_t \sqrt{dt} \left( \log r_t(\theta) + \frac{\|
 
 两项技术以极小额外计算成本协同工作：RatioNorm 恢复裁剪机制的正确触发条件，梯度重加权防止单步主导更新，共同抑制了隐式过优化，使策略模型在代理得分提升的同时保持黄金得分的稳定。
 
-## 整体框架
+
 
 GRPO-Guard 是一个即插即用的训练框架，旨在修复流匹配（Flow Matching）模型中 GRPO 训练时因重要性比率分布异常而引发的隐式过优化（implicit over-optimization）。该框架由三个核心模块构成：**SDE 采样器**、**RatioNorm 比率标准化**、以及**带梯度重加权的 PPO 式裁剪**，三者串联形成完整的策略更新管线。
 
@@ -167,7 +169,7 @@ GRPO-Guard 处于 **RLHF 微调扩散模型** 与 **PPO 式裁剪机制适配连
 ![[assets/figures/papers/paper_list_l2682_https_arxiv_org_abs_2510_22319/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison between FlowGRPO and GRPO-Guard under over-optimization. Left: The proxy score and gold score trends during training. As the proxy score increases, FlowGRPO rapidly enters an over-optimization phase, where the gold score continuously declines. Right: A visual comparison between FlowGRPO and GRPO-Guard. Due to severe reward hacking, FlowGRPO suffers from a drastic degradation in diversity, detail richness, visual quality, and text-image consistency (bottom part). In contrast, GRPO-Guard maintains a stable gold score and high visual quality under a comparable proxy score, as shown in the upper part of the figure*
 
-## 核心模块与公式推导
+
 
 ### 问题根源：重要性比率的分布异常
 
@@ -231,7 +233,9 @@ GRPO-Guard 的完整流程由以下模块构成：
 ![[assets/figures/papers/paper_list_l2682_https_arxiv_org_abs_2510_22319/figures/015_Figure_12.jpg]]
 *Figure 12: Clipping percentage of*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：复合黄金得分与代理得分趋势
 
@@ -320,7 +324,9 @@ Figure 11 进一步分析了过优化模型与原始模型在不同去噪步的�
 ![[assets/figures/papers/paper_list_l2682_https_arxiv_org_abs_2510_22319/figures/013_Figure_10.jpg]]
 *Figure 10: Human evaluation results*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -360,6 +366,8 @@ GRPO-Guard 的有效性已在以下条件下得到验证（Table 1, Fig. 4）：
 2. **跨架构泛化性**：当前验证限于 Rectified Flow 架构。该方法在 DDPM、DDIM 等扩散变体，以及非图像模态（如视频、音频生成）中的适用性尚待验证。
 3. **裁剪阈值 $\epsilon$ 的敏感性**：论文未系统研究 RatioNorm 后裁剪阈值 $\epsilon$ 的最优取值。标准化后的比率分布均值为零、方差一致，但 $\epsilon$ 的选择是否需要在不同任务或骨干模型间调整，缺乏消融证据。
 4. **与 KL 惩罚的协同**：GRPO-Guard 在无 KL 惩罚的设定下验证（与 Flow-GRPO、DanceGRPO 保持一致）。若与 KL 惩罚结合，RatioNorm 是否仍能提供额外增益，或 KL 惩罚本身已能部分纠正比率分布偏移，尚未探索。
+
+
 
 ## 原文 PDF
 

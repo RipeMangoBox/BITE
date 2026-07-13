@@ -44,7 +44,7 @@ claims:
 > - COCO (100 pairs) 上，Mean R@1/5/10 10.3 vs 9.4 (LoRS) (+0.9)。
 > - Flickr8k (100 pairs, cross-arch) 上，R@Mean (aggregated over R@1/5/10) 13.9 vs 10.3 (LoRS) (+3.6)。
 
-## 概述
+## 概要
 
 视觉-语言数据集蒸馏旨在将大规模图像-文本对压缩为极少量合成样本，同时保持下游多模态任务的性能。现有方法主要依赖**训练轨迹匹配**（如**MTT-VL**，Wu et al., TMLR 2024），需回放完整训练轨迹，计算与存储开销巨大，且对训练架构存在偏倚，跨架构泛化能力薄弱。
 
@@ -56,7 +56,7 @@ MDM 在三个层面进行系统性干预：**数据层面**，采用联合嵌入
 
 消融研究进一步验证了三层干预各自的有效性：联合 K-means 聚类初始化、角度引导权重插值、以及一致性-差异性联合损失均对最终性能有显著贡献。
 
-## 背景与动机
+
 
 ### 数据集蒸馏的范式演进
 
@@ -84,7 +84,9 @@ MDM 在三个层面进行系统性干预：**数据层面**，采用联合嵌入
 
 与轨迹匹配的双层优化不同，MDM采用单层分布匹配，无需存储和重放训练轨迹，从根本上降低了计算开销。该方法在Flickr8k、Flickr30k和COCO三个多模态检索基准上，以仅相当于LoRS方法2%至7%的蒸馏时间，取得具有竞争力的检索性能，并在跨架构泛化实验中显著超越所有基线方法。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MDM的核心创新在于将多模态数据集蒸馏从**昂贵的轨迹匹配范式**彻底转向**单层、几何感知的分布匹配范式**，并通过数据、模型、损失三个层面的协同干预，同时解决了计算效率、跨架构泛化与多模态语义保持三大瓶颈。
 
@@ -106,7 +108,7 @@ MDM的每个关键创新槽位（changed slot）都针对一个明确的瓶颈�
 
 三层创新并非孤立叠加，而是形成了一条清晰的因果链：**聚类播种**提供覆盖全面的初始化，降低了分布匹配的优化难度；**权重插值**构建的泛化教师使匹配目标本身更具迁移性；**测地线核能量匹配**则在正确的几何空间上精确对齐分布。三者共同作用，使得MDM在Flickr8k（100对）上以21.9的平均检索分数超越LoRS的19.4（Table 1），同时在跨架构评估中以13.9对10.3的显著优势碾压LoRS（Table 2），而总蒸馏时间仅为后者的2%–7%（Table 3）。这一“精度-泛化-效率”三重优势的同步实现，正是三层协同干预的直接证据。
 
-## 整体框架
+
 
 MDM 的整体流程如图2所示，由三个互补的模块级联构成：**数据层面的合成数据初始化**、**模型层面的图像-文本编码器初始化**，以及**损失层面的多模态分布匹配**。与依赖昂贵训练轨迹回放的 MTT 范式（图1左）不同，MDM（图1右）直接在联合嵌入空间中对齐真实与合成数据的分布，将双层优化简化为单层分布匹配，从而大幅降低计算开销。
 
@@ -147,7 +149,7 @@ MDM 的整体流程如图2所示，由三个互补的模块级联构成：**数�
 ![[assets/figures/papers/paper_list_l2660_https_openaccess_thecvf_com_content_CVPR2026_html_Jeong_Multimodal_Distr/figures/002_Figure_2.jpg]]
 *Figure 2: OverviewofMDMOurMDMmetodcosistsof(i)syntheticdatainitilationusingk-meanscustering(ii)imagetextoel initilzationusigeghsaceitepolatiteapretraddfeuedodelsdultiodalisrutioatingtat minimizes geodesic kernel energy between real and synthetic pairs on the unit hypersphere*
 
-## 核心模块与公式推导
+
 
 MDM 的核心由三个互补的技术模块构成：数据层面的合成数据初始化、模型层面的教师模型构建，以及损失层面的多模态分布匹配。以下逐一展开其关键机制与公式。
 
@@ -200,7 +202,9 @@ $$ \mathcal{L}_{\mathrm{MDM}} = \mathcal{L}_{\mathrm{InfoNCE}} + \lambda_{\mathr
 
 其中 $\mathcal{L}_{\mathrm{agr}}$ 匹配一致性方向上的分布，$\mathcal{L}_{\mathrm{dis}}$ 匹配差异性方向上的分布，$\lambda_{\mathrm{agr}}$ 和 $\lambda_{\mathrm{dis}}$ 为平衡超参数。消融实验（Table 5）表明，三个组件协同作用达到最优性能：完整 MDM 损失的平均检索分数为 21.94，而单独使用 InfoNCE 仅为 20.98，验证了分布匹配项对保留多模态语义的关键贡献。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果：图像-文本检索性能
 
@@ -304,7 +308,9 @@ Figure 3 展示了合成数据的定性比较。左侧为 K-means 聚类初始�
 ![[assets/figures/papers/paper_list_l2660_https_openaccess_thecvf_com_content_CVPR2026_html_Jeong_Multimodal_Distr/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison between prior multimodal dataset distillation based on matching training trajectories (MTT, left) and our Multimodal Distribution Matching (MDM, right).While MTT replays image-text trajectories at high compute and storage cost, MDM directly matches the joint image-text distribution in the joint embedding space,yielding compact synthetic data with strong cross-architecture generalization under much lower distillation cost. The red arrow indicates the direction of gradient backpropagation*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从轨迹匹配到分布匹配的范式迁移
 
@@ -338,6 +344,8 @@ MDM 的性能优势存在明确的适用前提，超出这些边界时需要谨�
 **损失组件的解耦程度。** Table 5 的消融表明，$\mathcal{L}_{\text{InfoNCE}}$、$\mathcal{L}_{\text{agr}}$ 和 $\mathcal{L}_{\text{dis}}$ 三者联合使用达到最优（平均检索分数 21.94），单独使用 InfoNCE 降至 20.98。但各损失项之间的交互机制（如一致性损失与差异性损失是否存在对抗效应）未被深入分析。
 
 **LLM 使用声明。** 论文在 Sec 5 中声明使用了大型语言模型辅助编辑和格式化，但不干预原创思想。这一声明不影响方法本身的可复现性，但在解读论文写作风格时需加以注意。
+
+
 
 ## 原文 PDF
 

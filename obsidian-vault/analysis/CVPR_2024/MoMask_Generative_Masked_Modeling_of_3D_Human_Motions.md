@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2024
 pdf_ref: paperPDFs/CVPR_2024/MoMask_Generative_Masked_Modeling_of_3D_Human_Motions.pdf
+project_link: https://ericguo5513.github.io/momask/
+code_link: null
 aliases:
 - MoMask
 tags:
@@ -40,7 +42,7 @@ claims:
 > - HumanML3D 上，R Precision Top1↑ 为 0.521，对比 0.510 (ReMoDiffuse)，变化 +0.011。
 > - HumanML3D 上，MultiModal Dist↓ 为 2.958，对比 2.974 (ReMoDiffuse)，变化 -0.016。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -73,7 +75,7 @@ MoMask在HumanML3D和KIT-ML两个主流基准上均取得SOTA性能，尤其在�
 
 MoMask属于**离散令牌空间中的生成式掩码建模**方法，与自回归VQ方法（T2M-GPT）共享离散表示的思想，但以双向并行解码替代单向自回归；与扩散方法（MDM、MLD）共享迭代生成的框架，但将迭代次数从数百步压缩至15步以内。其层次化残差量化设计借鉴了图像生成中的RQ-VAE思路，但在运动生成领域首次与掩码Transformer结合，形成了“基座并行预测 + 残差渐进细化”的高效生成范式。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -93,7 +95,9 @@ MoMask属于**离散令牌空间中的生成式掩码建模**方法，与自回�
 
 然而，直接将掩码建模应用于运动生成面临一个关键挑战：运动序列的连续性与离散令牌表示之间的矛盾。单层VQ的量化噪声会严重损害生成质量，而掩码建模又天然依赖离散令牌空间。为此，本文提出**残差矢量量化（RVQ）** 构建多层离散运动令牌，通过逐层量化残差来逐步逼近原始运动，将量化误差分散到多个层次，从而在保留离散令牌便利性的同时显著降低整体逼近误差。在此基础上，引入**掩码双向Transformer**进行并行基座层预测，配合**残差Transformer**逐层生成精细令牌，形成高效且高保真的运动生成框架——**MoMask**。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MoMask 的核心创新在于将**生成式掩码建模（generative masked modeling）**范式从图像生成迁移至文本驱动的3D人体运动生成，并通过**残差矢量量化（RVQ）**替代传统的单层矢量量化，构建了一套“多层离散运动令牌+双向并行解码”的生成框架。相对于现有方法，其关键改动集中在以下三个维度。
 
@@ -153,7 +157,7 @@ MoMask 的 changed slots 可归纳为：
 
 这些创新协同作用，使 MoMask 在 HumanML3D 上取得 FID 0.045 的 SOTA 结果（对比 T2M-GPT 的 0.141），同时在用户研究中获得了显著高于基线方法的偏好率，甚至相对真实运动也有 42% 的偏好（Figure 5b）。
 
-## 整体框架
+
 
 MoMask 将文本到运动生成问题建模为**分层离散令牌的生成式掩码预测**，整体 pipeline 由三个核心模块串联构成：残差矢量量化器（RVQ‑VAE）、掩码双向Transformer（M‑Transformer）和残差Transformer（R‑Transformer）。
 
@@ -202,7 +206,7 @@ $$\omega_g = (1 + s) \cdot \omega_c - s \cdot \omega_u$$
 ![[assets/figures/papers/paper_list_l3_MoMask_Generative_Masked_Modeling_of_3D_Human_Motions/figures/003_Figure_2.jpg]]
 *Figure 2: Approach overview. (a) Motion sequence is tokenized through vector quantization $\left( \mathrm { V Q } \right$) , also referred to as the base quantization layer, as well as a hierarchy of multiple layers for residual quantization. (b) Parallel prediction by the Masked Transformer: the tokens in the base layer $t ^ { 0 }$ are randomly masked out with a variable rate, and then a text-conditioned masked transformer is trained to predict the masked tokens in the sequence simultaneously. (c) Layer-by-layer progressive prediction by the Residual Transformer. A text-conditioned residual transformer learns to progressively predict the residual tokens $t ^ { j > 0 }$ from the tokens in previous layers,...
 
-## 核心模块与公式推导
+
 
 ### 1. 残差矢量量化（RVQ-VAE）
 
@@ -246,7 +250,9 @@ $$\omega_g = (1 + s) \cdot \omega_c - s \cdot \omega_u$$
 
 M-Transformer从全 `[MASK]` 序列出发，经 $L$ 次迭代并行解码，每次迭代以置信度最高的预测令牌替换部分掩码位置，逐步生成基础层令牌 $\mathbf{t}^0$。随后R-Transformer以前序层令牌为条件，逐层预测残差令牌 $\mathbf{t}^{1:V}$，最终由RVQ-VAE解码器将多层令牌之和映射回运动序列。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -311,7 +317,9 @@ Table 2系统拆解了各设计组件的贡献。
 ![[assets/figures/papers/paper_list_l3_MoMask_Generative_Masked_Modeling_of_3D_Human_Motions/figures/008_Table_2.jpg]]
 *Table 2: Comparison of our RVQ design vs. motion VQs from previous works [16, 23, 49], and further analysis on residual quantization (RQ), quantization dropout (QDropout), and replacing & remasking (RRmask). V and q are the number of RQ and QDropout ratio, respectively. MPJPE is measured in millimeters*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线工作的关系
 
@@ -355,6 +363,8 @@ MoMask 在当前框架下的有效范围存在明确边界：
 3. **高频动态建模**：如何改进 VQ 表示以更好地处理快速根运动和细粒度肢体运动？可能的路径包括引入频域分解、混合分辨率令牌化，或在 VQ 编码器中增加高频保留机制。
 4. **检索增强融合**：是否可以融合 ReMoDiffuse 所用的检索增强技术来进一步提升生成保真度和文本对齐？检索增强与掩码生成的结合方式（如检索到的运动作为额外的条件令牌）值得探索。
 5. **跨任务泛化**：掩码生成范式能否用于其他时间序列生成任务，如手势生成、全身交互动作合成或运动预测？MoMask 的层次化离散表示和双向解码策略具有通用性，但需要针对不同任务的特点调整令牌化方案和条件设计。
+
+
 
 ## 原文 PDF
 

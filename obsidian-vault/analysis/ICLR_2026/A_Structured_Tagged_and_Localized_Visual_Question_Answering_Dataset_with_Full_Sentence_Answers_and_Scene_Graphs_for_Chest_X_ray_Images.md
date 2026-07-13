@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/A_Structured_Tagged_and_Localized_Visual_Question_Answering_Dataset_with_Full_Sentence_Answers_and_Scene_Graphs_for_Chest_X_ray_Images.pdf
+project_link: null
+code_link: https://github.com/philip-mueller/mimic-ext-cxr-qba/
 aliases:
 - MECQCQ
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | 面向胸部X光图像的具有完整句子答案和场景图的结构化、带标签与定位的视觉问答数据集 |
 | 英文题名 | A Structured, Tagged, and Localized Visual Question Answering Dataset with Full Sentence Answers and Scene Graphs for Chest X-ray Images |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=LrmyW9JLYq); [GitHub](https://github.com/philip-mueller/mimic-ext-cxr-qba/) |
+| Links | [paper](https://openreview.net/forum?id=LrmyW9JLYq) · [GitHub](https://github.com/philip-mueller/mimic-ext-cxr-qba/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/health |
 | Method | MIMIC-Ext-CXR-QBA (CXR-QBA) 数据集构建流水线 |
 | Dataset | MIMIC-CXR-JPG Test (CheXpert 13类), CXR-LT 2024 Gold (13 CXP + 12 LT类), MS-CXR (6类), REFLACX (18类) |
@@ -40,7 +42,7 @@ claims:
 > - CXR-LT 2024 Gold (13 CXP + 12 LT类) 上，MCC (Micro) 为 0.67 [0.65,0.69]，对比 0.64 [0.62,0.66] (Chest ImaGenome)，变化 +0.03。
 > - MS-CXR (6类) 上，IoU@30 (Micro) 为 0.51 [0.47,0.54]，对比 0.45 [0.42,0.49] (Chest ImaGenome)，变化 +0.06。
 
-## 概述
+## 概要
 
 本文针对现有胸部X光（CXR）视觉问答（VQA）数据集规模小、答案简短、缺乏定位信息（边界框）和结构化元数据（如区域、发现标签）的核心瓶颈，提出了一个大规模、高质量的结构化VQA数据集——**MIMIC-Ext-CXR-QBA（简称CXR-QBA）**。
 
@@ -53,7 +55,7 @@ claims:
 
 该工作定位为通过数据驱动的自动化方法，为CXR VQA领域提供大规模、结构化、可解释的训练资源，并验证了其在训练高性能、可定位的医学VLM中的有效性。
 
-## 背景与动机
+
 
 胸部X光（CXR）是临床中最常用的影像学检查之一，其报告解读需要专业放射科医生完成，耗时且存在主观差异。视觉问答（VQA）技术旨在通过自然语言交互辅助影像理解，但现有医学VQA数据集在CXR领域面临三个关键瓶颈：**规模不足**、**答案粒度粗**、**缺乏结构化定位信息**。
 
@@ -65,7 +67,9 @@ claims:
 
 **需注意的局限性。** 数据集仅基于MIMIC-CXR单一来源，可能无法代表其他人群或成像设备；自动构建的标签和边界框在极长尾发现上仍可能存在偏差；模板化问题导致问题文本多样性有限（平均重复238次，见表3）。这些因素在后续分析中需保持谨慎。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 现有胸部X光VQA数据集普遍面临规模小、答案简短、缺乏定位信息（边界框）和结构化元数据（如区域、发现标签）的瓶颈，这限制了模型的可训练性和可解释性。本工作的核心创新在于提出一个自动化的数据集构建流水线，通过因果链条：**从放射学报告中利用LLM提取信息构建细粒度场景图 → 基于场景图和模板生成多部分、多粒度的问答对 → 自动质量评估**，从而一次性改变多个关键设计槽位（changed slots），创建了迄今为止最大规模的胸部X光VQA数据集。
 
@@ -75,7 +79,7 @@ claims:
 
 消融实验进一步验证了创新设计的有效性：先预训练后微调（PT→FT）的两阶段训练策略优于仅使用2M预训练样本；去除边界框和标签训练会降低定位和标签相关指标（Table 16）。这些证据共同支撑了该工作在数据集规模、答案丰富度、结构化信息和自动化构建方法上的核心创新。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0004_LrmyW9JLYq_A_Structured_Tagged_and_Localized_Visual_Questio/figures/053_Figure_13.jpg]]
 *Figure 13: Scene graph structure overview*
@@ -90,7 +94,7 @@ CXR-QBA 数据集的构建遵循一条三阶段自动化流水线，其核心瓶
 
 最终，该流水线从 MIMIC-CXR 数据集中生成了包含 **42.2M 问答对** 的 CXR-QBA 数据集，其中 **7.5M 为微调等级**，**31.2M 为预训练等级**（Figure 4a）。整个流水线的输入是原始胸部 X 光图像和对应的放射学报告，输出是带有完整句子答案、边界框和结构化标签的大规模、高质量 VQA 数据集。
 
-## 核心模块与公式推导
+
 
 ### 数据集构建流水线
 
@@ -149,7 +153,9 @@ CXR-QBA 数据集的构建遵循一条三阶段自动化流水线，其核心瓶
 
 **实验验证**：Table 4显示，基于CXR-QBA训练的VLM在逻辑精确率（Logical Precision）上达到0.78 [0.77, 0.78]，远超过MAIRA-2的0.64 [0.63, 0.65]；在定位精确率（Grounding Precision）上达到0.89 [0.88, 0.89]，显著优于MAIRA-2的0.32 [0.31, 0.33]。消融实验（Table 16）表明，先预训练后微调（PT→FT）策略优于仅使用2M预训练样本，而去除边界框和标签训练会降低定位和标签相关指标。这些结果置信度为0.95。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：场景图与VQA数据集质量
 
@@ -200,7 +206,9 @@ CXR-QBA 数据集的构建遵循一条三阶段自动化流水线，其核心瓶
 - RadStrucVQA指标与其他胸部X光VQA指标（如RadFact）的相关性如何？
 - 使用不同LLM（如GPT-4、Claude）进行蕴含预测对最终指标分数的影响是什么？
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 CXR-QBA 数据集及其构建流水线直接回应了现有胸部X光VQA数据集的两大瓶颈：**规模小且答案简短**，以及**缺乏结构化定位信息**。现有最大数据集 CheXinstruct 仅包含 8.5M 问答对，且答案多为简短标签；而 CXR-QBA 将规模提升至 42.2M（微调级 7.5M），并通过场景图驱动的流水线为每个答案附带多部分详细句子、边界框和结构化标签（区域、发现、确定性等）。这一设计将 VQA 从简单的标签预测任务推向具备可解释性的结构化视觉推理任务。
 
@@ -209,6 +217,8 @@ CXR-QBA 数据集及其构建流水线直接回应了现有胸部X光VQA数据�
 **适用边界**：该流水线的核心假设是输入报告具有规范的 FINDINGS/IMPRESSION 结构，且图像可通过定位模型提取区域边界框。因此其直接适用域为 MIMIC-CXR 风格的胸部X光报告。自动构建的标签和边界框虽经质量评估，但在长尾发现上仍存在偏差；LLM 评判（Llama 3.1 8B）的过评级率不超过 2%，但 Cohen's kappa 在部分维度仅 0.32-0.41，提示对清晰度等主观维度的评判需人工复核。模板化生成导致问题文本重复度高（平均 238 次重复），但答案文本多样性良好（平均 5 次重复）。
 
 **局限与开放问题**：数据集仅基于单一机构（MIMIC-CXR），泛化性未验证。非正面图像因定位模型限制被排除，减少了数据量。实验揭示了一个关键失败模式：模型在 finding-pos（阳性发现预测）子指标上表现不足，提示数据中存在阳性/阴性样本不平衡问题，需要通过数据过滤或重采样解决。消融实验（Table 16）表明去除边界框和标签训练会降低定位相关指标，但具体影响幅度需进一步量化。此外，RadStrucVQA 指标依赖 LLM 进行蕴含预测，不同 LLM 的选择对最终分数的影响尚未系统研究。该框架能否迁移至其他影像模态（如 CT、MRI）是重要的开放问题。
+
+
 
 ## 原文 PDF
 

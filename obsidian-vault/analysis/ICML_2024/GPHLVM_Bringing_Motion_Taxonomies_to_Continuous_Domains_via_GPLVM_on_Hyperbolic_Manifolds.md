@@ -5,6 +5,8 @@ paper_level: A
 venue: ICML
 year: 2024
 pdf_ref: paperPDFs/ICML_2024/GPHLVM_Bringing_Motion_Taxonomies_to_Continuous_Domains_via_GPLVM_on_Hyperbolic_Manifolds.pdf
+project_link: null
+code_link: https://github.com/geoopt/
 aliases:
 - GPHLVMG
 - GBMTCDGHM
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | GPHLVM：基于双曲流形高斯过程潜在变量模型的运动分类学嵌入 |
 | 英文题名 | GPHLVM Bringing Motion Taxonomies to Continuous Domains via GPLVM on Hyperbolic Manifolds |
 | 会议/期刊 | ICML 2024 |
-| Links | [Code](https://github.com/geoopt/) · [arXiv](https://arxiv.org/) |
+| Links | [Code](https://github.com/geoopt/) · [paper](https://arxiv.org/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction #topic/generative_models_diffusion |
 | Method | Gaussian Process Hyperbolic Latent Variable Model (GPHLVM) |
 | Dataset | Hand Grasps Taxonomy, Whole-body Support Poses Taxonomy |
@@ -42,7 +44,7 @@ claims:
 > - Whole-body Support Poses Taxonomy (Borras et al., 2017) 上，应力 (lower better) GPHLVM L^2 BC+stress: 0.53±0.83 vs GPLVM R^2 BC+stress: 0.63±0.94 (降低 0.10)。
 > - Hand Grasps Taxonomy (motion generation quality) 上，急动度 (Jerkiness, lower smoother) GPHLVM L^2: 108.65±140.54 vs GPLVM R^2: 1377.05±1721.44 (降低约 92%)。
 
-## 概述
+## 概要
 
 人类运动分类学（如抓握类型、全身支撑姿态）以层次化图结构组织离散的运动类别，蕴含丰富的先验知识。然而，现有运动生成模型通常忽略这种离散层次信息，导致分类学难以直接用于连续运动表示与生成。本文提出**高斯过程双曲潜在变量模型（GPHLVM）**，核心思路是将潜在空间从欧氏空间推广到双曲流形——双曲几何的距离呈指数增长、最短路径趋向通过原点，这一特性恰好对应树状层次结构——从而在连续嵌入空间中忠实地编码离散的分类学层次。
 
@@ -55,7 +57,7 @@ claims:
 
 本方法在**方法谱系**上属于高斯过程潜在变量模型的几何推广，将双曲表征学习与图结构保持正则化相结合，为层次化分类学知识的连续嵌入与运动生成提供了新路径。
 
-## 背景与动机
+
 
 ### 人类运动分类学的表示困境
 
@@ -88,7 +90,9 @@ claims:
 
 这一双重机制使得 GPHLVM 能够在连续双曲嵌入空间中**忠实地编码离散层次分类**，并利用测地线插值生成平滑、语义连贯的运动过渡。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GPHLVM 的核心创新在于将高斯过程潜在变量模型（GPLVM）的潜在空间从欧氏空间推广到双曲流形，并引入显式的图结构先验，从而在连续嵌入空间中忠实地编码离散层次分类学。这一创新沿着三条轴线展开：
 
@@ -144,7 +148,7 @@ $$\pmb{x}_n = \text{Exp}_{\pmb{\mu}_0}(\tilde{\pmb{x}}_n), \quad \tilde{x}_{n,q}
 
 GPHLVM 的创新可概括为三个 **changed slots** 的协同作用：双曲几何提供层次结构的归纳偏置，图先验（应力损失+反向约束）提供显式的拓扑监督，而双曲核与黎曼优化则保证整个概率框架在非欧流形上的数学一致性。三者缺一不可——纯双曲嵌入缺乏结构约束，纯图正则化缺乏几何适配，而两者的结合使得离散分类学与连续运动生成之间的鸿沟得以弥合。
 
-## 整体框架
+
 
 GPHLVM 的整体框架围绕一个核心思想展开：**将离散的运动分类学图嵌入到连续的双曲潜在空间中，并利用高斯过程建立从潜在空间到观测空间的生成映射**。这一框架通过四个关键组件的协同工作，实现了分类学层次结构的忠实保留与高质量运动生成。
 
@@ -230,7 +234,7 @@ $$\ell_{\text{MAP}} = \log p(\mathbf{Y}|\mathbf{X}) + \log p(\mathbf{X}) - \gamm
 ![[assets/figures/papers/paper_list_l1910_GPHLVM_Bringing_Motion_Taxonomies_to_Continuous_Domains_via_GPLVM_on_Hyp/figures/001_Figure_1.jpg]]
 *Figure 1: Left: Illustration of the Lorentz*
 
-## 核心模块与公式推导
+
 
 ### 1. 双曲潜在空间与包裹高斯先验
 
@@ -332,7 +336,9 @@ $$
 ![[assets/figures/papers/paper_list_l1910_GPHLVM_Bringing_Motion_Taxonomies_to_Continuous_Domains_via_GPLVM_on_Hyp/figures/009_Figure_6.jpg]]
 *Figure 6: Illustration of the hyperbolic wrapped Gaussian distribution*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能：双曲嵌入对分类学结构的忠实保持
 
@@ -396,7 +402,9 @@ Table 2 和 Table 9 揭示了 GPHLVM 的计算瓶颈。在 2 维双曲潜在空�
 ![[assets/figures/papers/paper_list_l1910_GPHLVM_Bringing_Motion_Taxonomies_to_Continuous_Domains_via_GPLVM_on_Hyp/figures/047_Figure_23.jpg]]
 *Figure 23: Embeddings of taxonomy data on learned manifolds: The first row shows the latent spaces of the GPLVM. The background color is proportional to volume of the learned Riemannian metric. The second row displays the error matrix between the geodesic and taxonomy graph distances*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法沿革与基线关系
 
@@ -447,6 +455,8 @@ GPHLVM 的核心谱系可追溯至两条独立的技术路线：**高斯过程�
 5. **主动学习与不确定性估计。** 能否结合 GP 的不确定性估计，在嵌入空间中识别当前分类学覆盖不足的区域，并指导新姿态/新类别的采集？这可以将 GPHLVM 从被动嵌入工具升级为主动数据采集策略的核心组件。
 
 6. **与大规模预训练模型的协同。** GPHLVM 在低数据量下表现优异，而 VPoser 等模型受益于大规模预训练。如何将两者结合——例如用 GPHLVM 的结构先验指导大规模模型的微调，或用大规模模型的表示初始化 GPHLVM 的观测空间——是一个值得探索的方向。
+
+
 
 ## 原文 PDF
 

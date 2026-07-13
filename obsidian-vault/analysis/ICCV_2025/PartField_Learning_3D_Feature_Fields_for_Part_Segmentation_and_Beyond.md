@@ -5,6 +5,8 @@ paper_level: A
 venue: ICCV
 year: 2025
 pdf_ref: paperPDFs/ICCV_2025/PartField_Learning_3D_Feature_Fields_for_Part_Segmentation_and_Beyond.pdf
+project_link: https://research.nvidia.com/labs/toronto-ai/partfield-release/
+code_link: null
 aliases:
 - PartField
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | PartField：学习用于部件分割及其他任务的3D特征场 |
 | 英文题名 | PartField: Learning 3D Feature Fields for Part Segmentation and Beyond |
 | 会议/期刊 | ICCV 2025 |
-| Links | [paper](https://arxiv.org/abs/2504.11451); [Project](https://research.nvidia.com/labs/toronto-ai/partfield-release/) |
+| Links | [paper](https://arxiv.org/abs/2504.11451) · [Project](https://research.nvidia.com/labs/toronto-ai/partfield-release/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | PartField |
 | Dataset | PartObjaverse-Tiny, PartNetE, 推理时间 (PartObjaverse-Tiny) |
@@ -40,7 +42,7 @@ claims:
 > - PartNetE 上，mIoU (类别无关部件分割) 为 59.10，对比 43.86 (SAMPart3D, 次优非自身方法)，变化 +15.24。
 > - 推理时间 (PartObjaverse-Tiny) 上，单形状推理时间 为 ~10秒，对比 ~7分钟 (SAMesh) / ~15分钟 (SAMPart3D) / ~1.5小时 (Ultrametric)，变化 快40-540倍。
 
-## 概述
+## 概要
 
 开放世界中的3D部件分割面临一个核心瓶颈：现有方法要么依赖文本提示（如PartSLIP、Find3D），限制了通用性；要么采用逐形状优化的策略（如Ultrametric Feature Field、SAMesh、SAMPart3D），导致推理缓慢、多视图不一致，且难以兼容不同粒度的部件定义。PartField针对这一瓶颈，提出了一种前馈式连续特征场方法，其核心因果机制在于：通过一次前向传播即可预测整个3D形状的部件特征场，用特征向量间的距离隐式编码部件归属与层级关系，无需任何文本提示或预定义模板。
 
@@ -50,7 +52,7 @@ claims:
 
 在方法谱系上，PartField属于前馈式3D特征场学习范式，区别于文本驱动的零样本方法和逐形状优化的NeRF/高斯方法。其连续特征场表示不仅支持高效的部件分割，还展现出跨形状的一致性，可应用于共分割、交互式选择、点对点对应等下游任务。
 
-## 背景与动机
+
 
 3D形状的部件理解是计算机图形学与视觉领域的长期目标，支撑着形状编辑、运动规划、机器人交互等一系列下游任务。传统有监督方法依赖预定义的部件模板和大量人工标注，难以泛化到开放世界中千差万别的物体类别与部件粒度。近年来，开放世界3D部件分割方法试图突破这一限制，但现有路线存在根本性矛盾。
 
@@ -62,7 +64,9 @@ claims:
 
 **PartField的动机。** 针对上述缺口，PartField提出了一种根本性的范式转变：用前馈网络一次性预测连续特征场，以特征距离隐式编码部件归属与层级结构。其核心洞察在于：三元组对比损失仅要求正样本距离小于负样本距离这一相对关系，自然绕过了多尺度部件定义的冲突，无需显式尺度条件，使得大规模多源训练成为可能。同时，前馈设计带来了推理速度与跨形状一致性的显著提升。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PartField 的核心创新在于用**连续特征场 + 三元组对比学习**替代了传统开放世界部件分割中的文本提示依赖或逐形状优化范式，实现了前馈式、多尺度、多源数据兼容的部件分解。
 
@@ -99,7 +103,7 @@ PartField 引入三种负样本采样策略的混合：均匀采样（uniform）
 
 这些创新共同构成了 PartField 在 PartObjaverse-Tiny 上 mIoU 达 79.18（比次优方法 SAMesh 的 56.86 提升 22.3%）的核心驱动力。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2504_11451/figures/001_Figure_1.jpg]]
 *Figure 1: We propose PARTFIELD, a feedforward model that predicts part-based feature fields for 3D shapes. The learned features can be clustered to yield a high-quality part decomposition, and our method outperforms the latest open-world 3D part segmentation approaches in both quality and speed. PARTFIELD can be applied to a wide variety of inputs in terms of modality, semantic class, and style. The learned feature field exhibits consistency across shapes, enabling applications such as cosegmentation, interactive selection, and correspondence*
@@ -146,7 +150,7 @@ $$\text{sim}(f(\mathbf{p}_u), f(\mathbf{p}_v)) = \exp(\cos(f(\mathbf{p}_u), f(\m
 - **相对约束 vs 绝对约束**：三元组损失牺牲了对特征距离绝对尺度的控制，换取了多尺度兼容性和混合数据训练能力。
 - **三平面 vs 体素/点云**：三平面在内存效率和表达能力之间取得平衡，但可能引入方向依赖性，对大角度旋转的跨形状一致性尚未充分验证（Limitations）。
 
-## 核心模块与公式推导
+
 
 ### 连续特征场映射
 
@@ -202,7 +206,9 @@ $$\mathcal{L} = -\frac{1}{2} \Bigg( \log \left( \frac{\text{sim}(f(\mathbf{p}_a)
 
 在推理阶段，PARTFIELD对网格面特征应用凝聚式聚类（agglomerative clustering），利用网格面连通性约束，生成层级化的部件分解。通过调整聚类停止阈值，可从同一特征场中获得从粗到细的多尺度部件分割（如Figure 6所示），无需重新推理。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要定量结果
 
@@ -263,7 +269,9 @@ PARTFIELD 通过调整凝聚式聚类的停止阈值，可生成从粗粒度到�
 
 4. **训练成本**：模型在 8 张 A100 GPU 上训练约 2 周，训练成本较高，但推理时仅需单次前馈即可完成。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与设计动机
 
@@ -306,6 +314,8 @@ PARTFIELD的核心洞察在于：**用三元组对比损失替代绝对距离约
 3. **姿态不变性**：如何解决特征场的方向敏感性，使其在任意姿态下保持跨形状一致性？可能需要显式的姿态归一化或等变特征设计。
 4. **下游任务迁移**：学习到的连续特征场能否直接用于运动估计、物理模拟等任务而不需要额外微调？这考验特征空间的泛化性和物理合理性。
 5. **可解释性与控制**：如何让用户控制部件分解的粒度？当前聚类阈值是全局参数，未来可能需要交互式或条件化的粒度控制机制。
+
+
 
 ## 原文 PDF
 

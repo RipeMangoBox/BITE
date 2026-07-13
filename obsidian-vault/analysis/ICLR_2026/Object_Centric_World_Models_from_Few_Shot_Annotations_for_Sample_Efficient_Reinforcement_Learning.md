@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Object_Centric_World_Models_from_Few_Shot_Annotations_for_Sample_Efficient_Reinforcement_Learning.pdf
+project_link: https://oc-storm.weipuzhang.com
+code_link: null
 openreview_forum_id: qmEyJadwHA
 aliases:
 - OS
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 基于少样本标注的以对象为中心的世界模型用于样本高效强化学习 |
 | 英文题名 | Object-Centric World Models from Few-Shot Annotations for Sample-Efficient Reinforcement Learning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=qmEyJadwHA); [Project](https://oc-storm.weipuzhang.com) |
+| Links | [paper](https://openreview.net/forum?id=qmEyJadwHA) · [Project](https://oc-storm.weipuzhang.com) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | OC-STORM |
 | Dataset | Atari 100k (26 games), Atari 100k (13 object-detectable games), Hollow Knight boss: God Tamer, Atari Boxing |
@@ -42,7 +44,7 @@ claims:
 > - Atari 100k (13 object-detectable games) 上，HNS mean 为 186.2% (Cutie-OC STORM)，对比 147.7% (STORM)，变化 +38.5 percentage points。
 > - Hollow Knight boss: God Tamer 上，Episode return 为 41.7 (OC-STORM)，对比 35.0 (STORM)，变化 +6.7。
 
-## 概述
+## 概要
 
 标准基于模型强化学习（MBRL）的世界模型通常依赖像素级重建损失进行训练。然而，这类损失天然偏向于占据画面大面积区域的静态背景，导致模型在预测动力学时忽略小而关键的决策相关物体（如游戏中的玩家角色、Boss等），最终拖累策略学习的样本效率与最终性能。**OC-STORM** 正是为解决这一瓶颈而提出：它利用一个冻结的、预训练的视频分割模型，从仅需数帧人工标注的掩码中提取紧凑的物体特征向量，并将这些向量与下采样后的像素观测融合，作为世界模型的输入。这一设计使得世界模型能够显式地捕捉物体的动态及其与场景的交互，从而引导策略关注任务关键实体。
 
@@ -52,7 +54,7 @@ claims:
 
 综上，OC-STORM 通过少量人工标注和冻结分割模型，以较低的计算开销为世界模型注入了语义丰富的物体感知能力，在保持对非物体场景兼容性的同时，大幅提升了样本效率。
 
-## 背景与动机
+
 
 基于模型的强化学习（MBRL）通过学习环境的世界模型，使智能体能够在想象的轨迹上进行规划与策略优化，从而大幅提升样本效率。近年来，以 **DreamerV3**（Hafner et al., 2023）和 **STORM**（Zhang et al., 2023）为代表的世界模型方法在 Atari 等视觉控制基准上取得了显著进展。这些方法的核心思路是：将高维像素观察压缩为紧凑的潜在表示，在潜在空间中学习动力学模型，并基于模型生成的想象轨迹训练策略。
 
@@ -68,7 +70,9 @@ claims:
 
 通过这种设计，世界模型能够同时利用像素级视觉细节（来自下采样图像）和语义级物体信息（来自分割模型），从而在保持对背景建模能力的同时，获得对关键实体动态的显式理解。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈定位：像素重建损失的决策盲区
 
@@ -128,7 +132,7 @@ OC-STORM 的核心洞察在于**将物体感知从世界模型的学习目标中
 
 对分割失败的鲁棒性分析（Figure 3b）表明，即使在 Atari Pong 中以 50% 概率将物体特征归零，智能体仍能保持正回报，说明世界模型学会了对物体信息的适度依赖而非机械记忆。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_qmEyJadwHA/figures/003_Figure_1.jpg]]
 *Figure 1: (c) The proposed OC-STORM framework. A frozen, pretrained segmentation model extracts object feature vectors from a few annotated frames. These features are combined with downsampled pixels to train an OC world model, which is then used for policy learning via imagined trajectories. Figure 1: Left: STORM (Zhang et al., 2023) accurately reconstructs large background areas (blue) but overlooks the small, critical player and boss characters (orange), hindering policy learning. Right: Overview of the proposed OC-STORM framework. See Appendix A for network details*
@@ -159,7 +163,7 @@ OC-STORM 的整体框架围绕一个核心设计展开：将冻结的预训练�
 
 **关键设计选择**。整个框架中，分割模型保持冻结，仅需对每个游戏提供少量（1–6 个）人工标注的掩码帧即可运行，无需在线标注或内部状态访问。物体特征以向量形式（而非掩码形式）表示，实验表明这一选择在低分辨率场景下既保留了充分的物体信息（图 3a 显示仅用两个物体特征向量即可重建观测），又比基于掩码的表示（如 FOCUS）计算效率更高。
 
-## 核心模块与公式推导
+
 
 ### 整体框架
 
@@ -208,7 +212,9 @@ Critic 网络 $V_{\psi}$ 基于潜在变量 $z_t$ 和隐藏状态 $h_t$ 估计�
 
 **对分割失败的鲁棒性**：通过随机将物体特征向量置零模拟分割失败，实验表明 OC-STORM 具有较强的容错能力：在 Atari Pong 中，即使零化概率达 50%，智能体仍能保持正回报（Figure 3b）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -288,7 +294,9 @@ OC-STORM 对分割模型的失败具有较强鲁棒性。**Figure 3b** 通过随
 ![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_qmEyJadwHA/figures/008_Figure_7.jpg]]
 *Figure 7: (a) Module ablation training curves*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法贡献的因果逻辑链
 
@@ -363,6 +371,8 @@ OC-STORM 在可检测物体的游戏中表现优异，但在无法检测物体�
 4. **物体表示的泛化性**：当前方法对每个游戏独立标注物体，如何实现跨游戏或跨任务的物体表示迁移尚待探索。
 
 5. **与无监督物体发现的结合**：Table 3 综述了 Slot Attention、SAVi 等无监督物体发现方法。将这些方法与 OC-STORM 结合，可能消除对少样本标注的依赖，但需要解决无监督方法在复杂场景中的稳定性问题。
+
+
 
 ## 原文 PDF
 

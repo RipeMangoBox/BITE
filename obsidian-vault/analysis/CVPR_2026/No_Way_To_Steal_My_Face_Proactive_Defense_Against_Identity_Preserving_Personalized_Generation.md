@@ -43,7 +43,7 @@ claims:
 > - IP-Adapter (personalization pipeline) 上，ISM↓ 0.036 vs 0.044 (G adv variant) (-0.008)。
 > - Protected Image Quality on VGGFace2 上，PSNR↑ (dB) 32.19；SSIM↑ 0.842。
 
-## 概述
+## 概要
 
 身份保持个性化生成（Identity-Preserving Personalized Generation）允许用户仅凭少量参考图像即可合成特定人物在各种场景下的新图像。然而，这一技术的滥用引发了严重的肖像权与隐私泄露风险。现有防御方法——如**Anti-DreamBooth** (Van Le et al., ICCV 2023)、**SimAC** (Wang et al., CVPR 2024)、**AdvDM** (Liang et al., arXiv 2023)、**ACE** (Zheng et al., 2023) 及 **IDProtector** (Song et al., CVPR 2025)——主要针对基于训练的个性化流程（如 DreamBooth）设计，其核心假设是攻击者需要对模型进行微调。面对日益普及的免训练（training-free）个性化方法（如 IP-Adapter、PhotoMaker），这些防御手段因范式差异与信息融合多样性而大幅失效（Figure 1）。
 
@@ -56,7 +56,7 @@ claims:
 
 实验结果表明，IDGuardian 在 IP-Adapter、PhotoMaker、DreamBooth 等多种个性化流水线上均实现了最低的平均身份相似度（ISM，Table 1），同时保持受保护图像的视觉质量（PSNR 32.19 dB，SSIM 0.842，Table 2）。消融研究证实，双编码器身份损失与对抗概念桥的协同作用是身份抑制效果的关键（Table 4）。此外，IDGuardian 对 JPEG 压缩、高斯模糊等后处理以及 Impress 攻击表现出良好的鲁棒性（Table 3）。
 
-## 背景与动机
+
 
 ### 身份保持个性化生成的兴起与风险
 
@@ -84,7 +84,9 @@ IDGuardian的核心动机源于对身份保持个性化生成过程的抽象解�
 
 基于这一抽象，IDGuardian提出了一种**模型无关的双重干扰策略**：同时攻击身份提取阶段和身份注入阶段，从根本上破坏身份一致性。具体而言，通过**跨编码器身份场混淆**降低提取特征的相似度，并通过**引导流身份偏转**构建对抗性概念桥来重定向扩散采样轨迹。这种阶段解耦的设计使得防御方法不再依赖于特定流水线的内部机制，从而实现了跨范式的鲁棒身份保护。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 IDGuardian 的核心创新在于将身份保持个性化生成抽象为**身份提取（Identity Extraction）**与**身份注入（Identity Injection）**两个关键阶段，并针对性地设计了两项互补的破坏机制，实现了跨范式、模型无关的鲁棒防御。这与现有方法形成根本性差异：**Anti-DreamBooth** (Van Le et al., ICCV 2023)、**SimAC** (Wang et al., CVPR 2024) 等防御主要针对基于训练的个性化流程（如 DreamBooth），其优化代理任务与免训练方法（如 IP-Adapter、PhotoMaker）中的身份注入机制不匹配，导致防御失效。
 
@@ -104,7 +106,7 @@ $$S^{*} = \nabla_{\mathbf{x}_t} \log p(y_{\mathrm{adv}} \mid \mathbf{x}_t) - \na
 
 IDGuardian 的 changed slots 可归纳为：将防御从**单一代理任务优化**升级为**身份提取-注入双阶段联合破坏**，通过跨编码器特征去相似和对抗概念桥偏转采样方向，实现了对基于训练和免训练个性化流水线的统一防御。
 
-## 整体框架
+
 
 IDGuardian 将身份保持个性化生成抽象为两个关键阶段——**身份提取**与**身份注入**——并针对这两个阶段分别设计破坏机制，形成统一的主动防御框架。
 
@@ -158,7 +160,7 @@ $$
 ![[assets/figures/papers/paper_list_l905_https_openaccess_thecvf_com_content_CVPR2026_html_Xiong_No_Way_To_Steal/figures/001_Figure_1.jpg]]
 *Figure 1: Existing defense methods become ineffective in trainingfree personalization due to paradigm discrepancies and fusion diversity*
 
-## 核心模块与公式推导
+
 
 IDGuardian 将身份保持个性化生成抽象为两个关键阶段——**身份提取**与**身份注入**，并针对性地设计了两个核心防御模块：**跨编码器身份场混淆**与**引导流身份偏转**。整体防御目标可形式化为在扰动幅度约束下最小化原始图像与生成图像之间的身份相似度：
 
@@ -215,7 +217,9 @@ $$
 ![[assets/figures/papers/paper_list_l905_https_openaccess_thecvf_com_content_CVPR2026_html_Xiong_No_Way_To_Steal/figures/003_Figure_3.jpg]]
 *Figure 3: Visualization of Conceptual Bridges Constructed via Noise Prediction Differences in Diffusion Sampling*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -285,7 +289,9 @@ $$
 ![[assets/figures/papers/paper_list_l905_https_openaccess_thecvf_com_content_CVPR2026_html_Xiong_No_Way_To_Steal/figures/006_Table_2.jpg]]
 *Table 2: Comparison of protected image quality (PSNR (dB), SSIM) and time cost (s) across different methods. At-DB denotes Anti-DreamBooth, SAC denotes SimAC, ADM denotes AdvDM, ACE denotes ACE, IDP-P denotes the PGD-optimized variant of IDProtector, IDP denotes IDProtector, and IDGuar denotes our proposed IDGuardian*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 防御范式的代际演进
 
@@ -319,6 +325,8 @@ IDGuardian的方法论突破在于：不再以特定流水线的优化过程为�
 2. **多身份联合保护**：当前框架针对单张参考图像优化扰动，多身份场景下的扰动复用与冲突问题未解决。
 3. **与图像水印/溯源技术的协同**：IDGuardian专注于破坏身份一致性，与被动溯源技术（如DeepFake检测水印）的协同防御潜力未被讨论。
 4. **扰动可迁移性的理论刻画**：跨模型、跨流水线的扰动迁移能力缺乏理论解释，当前仅依赖经验验证。
+
+
 
 ## 原文 PDF
 

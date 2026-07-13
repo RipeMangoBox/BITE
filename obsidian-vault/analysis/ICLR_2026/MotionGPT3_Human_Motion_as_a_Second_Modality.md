@@ -5,6 +5,7 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/MotionGPT3_Human_Motion_as_a_Second_Modality.pdf
+project_link: null
 code_link: https://github.com/OpenMotionLab/MotionGPT3
 openreview_forum_id: Ha075JDMZR
 aliases:
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | MotionGPT3：将人体运动作为第二模态 |
 | 英文题名 | MotionGPT3: Human Motion as a Second Modality |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=Ha075JDMZR); [GitHub](https://github.com/OpenMotionLab/MotionGPT3) |
+| Links | [paper](https://openreview.net/forum?id=Ha075JDMZR) · [GitHub](https://github.com/OpenMotionLab/MotionGPT3) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/generative_models_and_autoencoders |
 | Method | MotionGPT3 |
 | Dataset | HumanML3D, KIT-ML, HumanML3D (TMR evaluator) |
@@ -42,7 +43,7 @@ claims:
 > - HumanML3D 上，FID 为 0.208 (MotionGPT3 unified)，对比 0.232 (MotionGPT unified)，变化 -0.024。
 > - KIT-ML 上，R@3 为 0.803 (MotionGPT3†)，对比 0.734 (MLD)，变化 +0.069。
 
-## 概述
+## 概要
 
 人体运动生成与理解是构建具身智能体的关键能力。现有统一框架普遍采用离散VQ-VAE将运动量化为令牌，并与文本在单流Transformer中联合建模。然而，这种范式面临两个根本瓶颈：**运动量化引入的近似误差**限制了生成运动的精细度，而**单流骨干中离散文本与连续运动信号的联合处理**引发了严重的跨模态干扰，导致训练不稳定和收敛缓慢。
 
@@ -59,7 +60,7 @@ MotionGPT3 的核心洞察在于：**将人体运动视为独立于文本的第�
 
 尽管如此，当前框架仍存在若干局限：验证范围限于HumanML3D和KIT-ML两个中小规模基准；三阶段训练策略需手动设计阶段划分，难以自动泛化至新模态；运动分支容量受限于语言模型规模，直接扩展会导致训练不稳定；跨模态对齐主要依赖配对数据，未能充分利用纯文本语料中的语言知识。这些方向为未来工作留下了明确的探索空间。
 
-## 背景与动机
+
 
 ### 运动生成与理解的统一建模困境
 
@@ -94,7 +95,9 @@ MotionGPT3的核心洞察在于重新审视运动模态在统一框架中的定�
 
 值得注意的是，部分仅做生成的方法已探索了连续表示和扩散建模的优势，如 **MLD**（Xin et al., CVPR 2023）采用潜在扩散、**MoMask**（Guo et al., CVPR 2024）使用残差VQ，但这些方法不支持运动理解任务。**MG-MotionLLM**（Wu et al., arXiv 2025）虽尝试将运动token融入LLM，但仍沿用离散表示和单流范式。因此，如何在统一生成与理解的框架内同时解决量化误差和模态干扰，构成了本文的核心研究动机。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MotionGPT3 的核心创新可归结为三个相互关联的**changed slots**，分别指向运动表示、模型架构和训练策略的根本性重构，共同解决了先前统一运动-语言模型的两大瓶颈：运动量化带来的近似误差，以及单流骨干网络中跨模态表示的相互干扰。
 
@@ -134,7 +137,7 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{rec}} + \lambda_{\mathrm{KL}} \mathcal{L}_{
 
 三个 changed slots 并非孤立改进，而是形成因果链条：连续 VAE 潜在空间使运动表示摆脱量化约束，为扩散头（而非自回归 token 预测）提供了自然的连续目标空间；双流架构则为连续运动潜在向量和离散文本 token 提供了各自的处理路径，避免将异构表示强行塞入同一参数空间；三阶段训练策略进一步确保运动分支在不受语言分支干扰的前提下先建立运动先验，再逐步引入跨模态交互。Table 4 的组件消融直接验证了这一协同效应：Bimodal+VAE 配置在所有 T2M 和 M2T 指标上均显著优于 Unified+VQ、Unified+VAE 或 Bimodal+VQ 的任意组合，表明双流架构与连续表示的结合产生了超越各自独立贡献的增益。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_Ha075JDMZR/figures/001_Figure_1.jpg]]
 *Figure 1: Motion MotionFigure 1: MotionGPT3 introduces hybrid motion-language model that takes motion as a second Holdermodality and processes the data through a new branch, with cross-modal attention mechanism AdaLN Latentto communicate with text branch (Sec. 3.2). We leverage a VAE network for continuous motion representation (Sec. 3.1), and design separate training objective for each modality (Sec. 3.3)*
@@ -171,7 +174,7 @@ MotionGPT3 将人体运动视为与大语言模型（LLM）交互的**第二模�
 
 消融实验证实，省略第一阶段（SI）会严重损害文本到运动的生成质量，表明运动特定的预训练对于最终性能至关重要（Table 5 / Table 13）。
 
-## 核心模块与公式推导
+
 
 ### 运动VAE：连续潜在空间表示
 
@@ -239,7 +242,9 @@ $$L_{diff} = \mathcal{E}_{z_0, \epsilon, t} \lVert \epsilon - \hat{\epsilon}_{\t
 
 跨模态注意力（CMA）仅在 Transformer 的最后 $L$ 层启用。消融研究（Figure 4, Table 9）显示，随着 $L$ 从 1 增加到 5，T2M 性能持续改善；但当 $L=6$ 时出现轻微退化，呈现非单调模式。这表明适度的跨模态交互层数足以实现有效的信息流动，过多的共享层可能重新引入模态间干扰。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -353,7 +358,9 @@ Figure 9 和表 10（Table 10）探索了运动分支容量对性能的影响。
 ![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_Ha075JDMZR/figures/019_Table_6.jpg]]
 *Table 6: Comprehensive comparison of text-to-motion generation on HumanML3D (Guo et al., 2022a). We report generation-only models (Gen. only) here, and visualize unified dual-task models (Gen. & Und.) in Fig. 8. Real denotes ground-truth statistics; arrows (→) indicate that values closer to Real are desirable. † marks our single-task model trained for 200 epochs, and MotionGPT3 is the unified three-stage model. Best and second-best results are bold and underlined*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 在统一运动-语言模型谱系中的位置
 
@@ -405,6 +412,8 @@ MotionGPT3 的四个关键设计槽位及其因果效应如下：
 - **跨模态泛化**：连续潜在空间和扩散头的组合是否可推广到其他连续模态（如音频、视频），形成统一的生成框架？这需要验证VAE+扩散范式在不同模态特性下的鲁棒性。
 
 - **自动化模态交互策略**：是否存在更自动化的模态交互策略，以取代当前需要手动设计CMA层数和冻结策略的方案？例如，基于可微分架构搜索或动态路由机制的自适应交互可能是一个有前景的方向。
+
+
 
 ## 原文 PDF
 

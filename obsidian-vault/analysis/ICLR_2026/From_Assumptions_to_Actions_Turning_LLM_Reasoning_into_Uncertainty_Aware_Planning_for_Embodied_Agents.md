@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/From_Assumptions_to_Actions_Turning_LLM_Reasoning_into_Uncertainty_Aware_Planning_for_Embodied_Agents.pdf
+project_link: null
+code_link: null
 openreview_forum_id: GODFBZhFcX
 aliases:
 - PPCE
@@ -42,7 +44,7 @@ claims:
 > - C-WAH 上，Comm (通信动作数) 为 1.70，对比 9.88 (CoELA) / 6.00 (REVECA)，变化 PCE 的通信量远低于所有基线。
 > - TDW-MAT 上，Total ↑ (运输完成比例 %) 为 87.50，对比 62.50 (CoELA) / 81.25 (REVECA)，变化 PCE 比最好基线 REVECA 高 6.25 个百分点。
 
-## 概述
+## 概要
 
 在部分可观测、去中心化的多智能体协作环境中，现有方法普遍依赖频繁的代理间通信来缓解环境不确定性。这一范式不仅消耗大量 token 与时间，在涉及人类协作者时还会破坏工作流程的连贯性。更深层的问题在于：LLM 在推理过程中自发产生的关于环境不确定性的**隐含假设**始终未能被显式聚合与系统评估，导致智能体无法有效比较和协调多个竞争性假设，从而限制了规划质量。
 
@@ -50,7 +52,7 @@ claims:
 
 在两个多智能体基准 **C‑WAH** 和 **TDW‑MAT** 上，PCE 以 GPT‑4o mini、GPT‑OSS:20B 和 Gemma3:4B 三个异构 LLM 为骨干，均一致优于 **CoELA**（Zhang et al., 2024b）、**REVECA**（Seo et al., 2025）、**CaPo**（Liu et al., 2025）、**CoTS**（Zu et al., 2025）等通信密集型基线方法。具体而言，在 C‑WAH 上，PCE 的总步数（Total Steps）为 42.76，比最优基线 REVECA 减少 4.04 步，通信动作数仅为 1.70，远低于基线的 6.00–9.88；在 TDW‑MAT 上，PCE 的总运输完成比例达 87.50%，较最优基线 REVECA 提升 6.25 个百分点。消融实验进一步证实，Planner、Composer、Evaluator 三个模块缺一不可：移除任一模块均导致性能显著下降，其中移除 Planner 使总步数从 42.76 骤升至 56.46。LLM 容量缩放实验表明，结构化不确定性处理的收益独立于且可叠加于模型规模与推理深度的提升。用户研究亦显示，PCE 产生的通信模式在效率、可信度、有用性和适当性等维度上均显著优于“无通信”与“始终通信”两种极端策略。
 
-## 背景与动机
+
 
 在部分可观测、去中心化控制的多智能体协作场景中，智能体仅能获取局部环境信息与协作者的稀疏消息，却需要协同完成搬运、搜索等联合任务。这一设定天然将智能体置于深层不确定性之中：目标物体可能被遮挡、协作者可能正在执行冲突的子任务、环境状态可能因他人行动而改变。现有方法普遍将**频繁的代理间通信**作为缓解不确定性的首要手段——智能体通过持续对话交换状态、验证计划、迭代对齐，典型代表包括 **CoELA**（Zhang et al., 2024b）、**REVECA**（Seo et al., 2025）、**CaPo**（Liu et al., 2025）和 **CoTS**（Zu et al., 2025）。然而，这种“通信为中心”的范式存在两个根本性缺陷。
 
@@ -60,7 +62,9 @@ claims:
 
 本文的核心动机正是将不确定性处理从“通信为中心”的协调范式转变为**以智能体自身信念状态为中心的结构化推理**。具体而言，我们提出将 LLM 推理链路中潜在、非结构化的环境假设提取并组织为显式的决策树——每个内部节点对应一个环境假设，叶子对应行动——然后通过一个评估器根据场景可能性、目标条件增益和执行成本对每条路径进行评分，引导理性行动选择。这一设计使得智能体能够在无需频繁通信的前提下，联合评估多个竞争假设并选择预期效用最高的行动，从而在保持低通信开销的同时显著提升规划质量。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PCE 的核心创新在于将部分可观测多智能体协作中的不确定性处理范式，从**以通信为中心的协调**转变为**以智能体自身信念状态为中心的结构化推理**。具体而言，它通过三个相互关联的机制设计（changed slots）实现了这一转变：
 
@@ -86,7 +90,7 @@ PCE 则从根本上改变了这一机制：它将 LLM 推理链中自发产生�
 
 值得注意的是，LLM 容量缩放实验（Figure 3）表明：仅增大模型容量（Gemma3:4B→12B→27B）或加深推理深度（GPT‑OSS:20B Low→Medium→High）对无显式不确定性处理的“Planner only”变体仅带来有限增益，而 PCE 在所有缩放级别下均保持显著领先。这说明**结构化不确定性处理的收益独立于且累加于模型规模与推理深度的缩放**，是 PCE 优势的核心来源。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_GODFBZhFcX/figures/002_Figure_2.jpg]]
 *Figure 2: Flow from reasoning trace to action selection. (a) The Planner produces a reasoning trace. (b) The Composer extracts hypotheses from the trace, structures them into a decision tree, and, when needed, generates new assumptions and communication actions to expand unexplored branches. (c) The Evaluator scores each path; The highlighted path indicates the scenario whose leaf node achieves the maximum score (U), determining the agent’s final selected action*
@@ -104,7 +108,7 @@ PCE 采用模块化流水线架构，将规划过程解耦为 **Planner → Comp
 
 这一流水线的核心创新在于将 LLM 推理中零散、非结构化的隐含假设转化为显式决策树，使智能体能够在自身信念空间内联合评估多个竞争假设并选择预期效用最高的行动，从而在无需频繁通信的前提下实现不确定性感知规划。
 
-## 核心模块与公式推导
+
 
 PCE 将单次规划拆解为 **Planner → Composer → Evaluator** 三阶段流水线，使隐含于 LLM 推理链中的环境不确定性假设被显式提取、结构化并量化评估。图 1 展示了这一模块化架构，图 2 则给出了从推理链到行动选择的完整流程示意。
 
@@ -159,7 +163,9 @@ $$U(S, a) = \mathbb{E}[\mathrm{gain}] - \lambda \, C(a)$$
 
 超参数敏感性分析（Table 9）表明，PCE 对树深度 $D$（2→4）、成本权重 $\alpha/\beta$（0.5→1.5）、全局惩罚 $\lambda$（0.5→1.5）及记忆窗口 $K_{\text{action}}/K_{\text{message}}$ 在合理范围内保持稳健，默认设置（$D=3, \alpha=\beta=1, \lambda=1$）总体最优。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心机制验证：PCE 在双基准上一致优于通信密集型基线
 
@@ -232,7 +238,9 @@ Table 13 展示了 PCE 随代理数量增加的扩展能力：当代理数从 N=
 
 4. **环境泛化性有限**：实验仅覆盖 C‑WAH 和 TDW‑MAT 两个室内协作基准，在更开放、动态变化或包含对抗性场景的环境中，PCE 的假设提取与评估机制是否仍然有效尚未验证。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：从“通信中心”到“信念中心”的范式转移
 
@@ -305,6 +313,8 @@ Evaluator 对条件增益 $\mathscr{G}(a)$ 的评分与人类专家之间的 MAE
 5. **跨领域迁移**：在完全不同于室内物品协作的领域（如自动驾驶、搜救机器人），PCE 的假设提取与评估机制是否仍然有效？Composer 依赖的常识推理能力在不同领域中的覆盖度与准确性需要系统性评估。
 
 6. **通信内容的优化**：PCE 目前将通信视为原子动作并在决策树中与物理动作一同评估，但通信内容的生成仍由 LLM 直接完成。是否能进一步优化通信的内容生成策略，使其更具信息量和针对性（例如，仅传递高不确定性的关键假设及其置信度），从而进一步降低通信开销？
+
+
 
 ## 原文 PDF
 

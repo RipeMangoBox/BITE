@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Exchangeability_of_GNN_Representations_with_Applications_to_Graph_Retrieval.pdf
+project_link: https://rebrand.ly/graphhash
+code_link: null
 openreview_forum_id: HQcCd0laFq
 aliases:
 - EGRAGR
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | GNN表示的可交换性及其在图检索中的应用 |
 | 英文题名 | Exchangeability of GNN Representations with Applications to Graph Retrieval |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=HQcCd0laFq); [Project](https://rebrand.ly/graphhash) |
+| Links | [paper](https://openreview.net/forum?id=HQcCd0laFq) · [Project](https://rebrand.ly/graphhash) |
 | Topic | #topic/representation_self_supervised_transfer #topic/representation_self_supervised_transfer/representation_learning |
 | Method | GRAPHHASH |
 | Dataset | cox2 (Subgraph Matching), ptc-fm (GED) |
@@ -40,7 +42,7 @@ claims:
 > - cox2 (Subgraph Matching) 上，MAP (vs. #retrieved graphs) 为 GRAPHHASH 在所有检索预算下 MAP 最高，尤其在低检索量时优势显著，对比 FourierHashNet 在大部分选择度区间无法超越50%穷举MAP；RH 方差大；IVF/DiskANN 性能低，变化 GRAPHHASH 的 MAP-检索量曲线全面位于其他方法上方。
 > - ptc-fm (GED) 上，NDCG@1000 (vs. #retrieved graphs) 为 GRAPHHASH 的 NDCG 曲线显著高于所有基线，对比 RH 在某些点接近但方差大；FourierHashNet 未能覆盖全选择度，变化 GRAPHHASH 提供了更平滑且完整的精度-效率折衷。
 
-## 概述
+## 概要
 
 **核心问题**：基于最优运输的图相似度量（如子图匹配、图编辑距离 GED）能精确刻画图结构间的非对称关系，但其精确计算复杂度高达 $O(n^3)$，无法直接应用于大规模图检索中的局部敏感哈希（LSH）索引，导致检索效率与精度之间存在根本性矛盾。
 
@@ -54,7 +56,7 @@ claims:
 
 **局限性**：交换性的理论推导依赖于参数层内独立同分布初始化、损失函数对嵌入维度置换不变，以及优化器更新逐元素可分离等假设，超出该设定时仍需验证；当前方法假设查询图和语料图具有相同节点数（通过填充），节点数差异极大时近似质量可能下降；嵌入维度 $D$ 和 Fourier 采样数 $M$ 需充分大以保证近似精度，实际应用中需仔细调节。
 
-## 背景与动机
+
 
 图结构数据上的相似度检索是药物发现、分子性质预测、程序分析等领域的核心操作。给定一个查询图，系统需要从大规模语料库中高效地找出与之最相关的图。然而，图之间的相似度往往是非对称的——例如，子图匹配（Subgraph Matching, SM）判定查询图是否为语料图的子结构，图编辑距离（Graph Edit Distance, GED）衡量将一个图转换为另一个图所需的最小编辑代价。这些非对称的、基于最优运输的相似度度量，其精确计算通常涉及求解匹配问题，计算复杂度高达 $O(n^3)$，难以直接应用于大规模检索场景。
 
@@ -64,7 +66,9 @@ claims:
 
 本文的关键洞察源于对训练好的图神经网络（GNN）节点嵌入矩阵的一个结构性质观察：**嵌入矩阵的列（即不同嵌入维度）在随机初始化诱导下，表现为可交换的随机变量**。这一性质意味着，在一维嵌入上，两个节点集合之间的最优运输距离可以通过对各自集合内的标量值排序后直接匹配来精确求解。将这一观察推广到多维嵌入，就可以将高维运输相似度分解为各维度上排序向量差的聚合，从而将其转化为欧氏空间中的近似，使得随机超平面 LSH 可直接应用于图检索。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GRAPHHASH 的核心创新在于**发现并利用了训练好的 GNN 节点嵌入矩阵在维度方向上的可交换性**，从而将高维最优运输相似度近似为各维度内排序后向量的欧氏相似度，使任意随机超平面局部敏感哈希（LSH）可直接应用于图结构数据。这一发现首次为子图匹配、图编辑距离（GED）等非对称图相似度量提供了统一的亚线性检索框架。
 
@@ -111,7 +115,7 @@ GRAPHHASH 通过可交换性桥接了“节点级嵌入的运输相似度”与�
 - 当前方法假设查询图和语料图具有相同节点数（通过填充），节点数差异极大时排序相似度的近似质量可能下降。
 - 近似质量依赖于嵌入维度 $D$ 和 Fourier 采样数 $M$ 的充分大，实际应用中需仔细调节这些超参数。
 
-## 整体框架
+
 
 GRAPHHASH 的核心目标是为大规模图语料库上的非对称图检索任务（如子图匹配、图编辑距离）提供统一的亚线性检索框架。其整体 pipeline 由五个关键模块串联构成，输入为查询图 $G_q$ 和语料图集 $\{G_c\}$，输出为按运输相似度排序的候选图列表。
 
@@ -145,7 +149,7 @@ GRAPHHASH 的核心目标是为大规模图语料库上的非对称图检索任�
 - **多维度聚合的集中性**：Proposition 7 保证了当嵌入维度 $D$ 足够大时，$\frac{1}{D}\sum_d \text{sim}_d$ 以高概率集中在真实运输相似度附近，这为将高维问题分解为可并行的单维度近似提供了理论保障。
 - **超参数依赖**：方法性能依赖于嵌入维度 $D$ 和 Fourier 采样数 $M$ 的充分大（理论上有下界 $D > 1/(\epsilon^2\delta)$），实际应用中这些超参数需要仔细调节以获得最优的精度-效率折衷。
 
-## 核心模块与公式推导
+
 
 ### 整体管线
 
@@ -207,7 +211,9 @@ $$p(\mathbf{Y}) = p(\mathbf{Y}\pi)$$
 
 其中 $\pi$ 为任意维度置换（Proposition 6）。该性质保证了单维度近似在整个嵌入空间中的统计一致性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与实验动机
 
@@ -271,7 +277,9 @@ $$p(\mathbf{Y}) = p(\mathbf{Y}\pi)$$
 ![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_HQcCd0laFq/figures/024_Table_7.jpg]]
 *Table 7: Graph statistics for each dataset generated for GED*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心方法定位
 
@@ -312,6 +320,8 @@ IVF 和 DiskANN 虽能利用多向量表示（每个图多个节点嵌入），�
 3. **预训练模型与自适应优化器下的保持性**：在不依赖 i.i.d. 初始化假设的预训练模型（如大规模分子预训练 GNN）或自适应优化器（如 LAMB）中，交换性是否仍然保持？这直接决定了 GRAPHHASH 能否融入现有模型生态。
 
 4. **更广泛的不对称相似度函数**：当前框架统一了子图匹配（hinge 损失）和 GED，但理论上任何凸成本函数 $\rho$ 均可纳入。对其他非对称图核（如 Weisfeiler-Lehman 子树核的非对称变体）的适用性值得探索。
+
+
 
 ## 原文 PDF
 

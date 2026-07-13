@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/EgoX_Egocentric_Video_Generation_from_a_Single_Exocentric_Video.pdf
+project_link: null
+code_link: null
 aliases:
 - EgoX
 tags:
@@ -41,7 +43,7 @@ claims:
 > - Seen Scenes 上，PSNR 16.05 vs 14.53 (Exo2Ego-V) (+1.52)；FVD 184.47 vs 622.47 (Exo2Ego-V) (-437.99)。
 > - Unseen Scenes 上，PSNR 14.38 vs 12.70 (Exo2Ego-V) (+1.68)；FVD 440.64 vs 1283.50 (Exo2Ego-V) (-842.86)。
 
-## 概述
+## 概要
 
 **核心问题**：从单段外中心（第三人称）视频生成对应的自我中心（第一人称）视频，面临极端相机姿态变化带来的根本性挑战——大量区域在外中心视角中不可见，模型必须合理合成这些区域，同时精确抑制外中心视频中与自我视角无关的背景内容。现有相机可控视频生成方法难以处理如此剧烈的视角变换。
 
@@ -57,7 +59,7 @@ claims:
 
 **主要结果**：在 Ego-Exo4D 数据集的 Seen Scenes 上，EgoX 的 PSNR 达到 16.05（对比 Exo2Ego-V 的 14.53），FVD 降至 184.47（对比 622.47）；在 Unseen Scenes 上，PSNR 为 14.38（对比 12.70），FVD 为 440.64（对比 1283.50），在所有图像级、对象级和视频级指标上均取得最优综合性能。消融实验证实，移除 GGA、自我中心先验或清洁潜变量条件均导致性能显著下降，验证了各组件的必要性。用户研究进一步表明，EgoX 在所有评估问题上获得最高选择数，显著优于所有基线方法。
 
-## 背景与动机
+
 
 **任务定义与核心挑战。** 从外中心（第三人称）视频生成自我中心（第一人称）视频，要求模型根据一段观察者视角的输入，合成出“演员眼中所见”的连续画面。这一任务面临的核心瓶颈在于**极端相机姿态变化**：当视角从外中心切换到自我中心时，场景中的大面积区域在输入中完全不可见，模型必须合理合成这些未知区域，同时**抑制外中心画面中与自我中心视角无关的内容**（如远处的背景或旁观者）。Figure 2 直观展示了这一挑战——模型需要保留与视角相关的区域、逼真地补全不可见部分，并忽略无关区域。
 
@@ -65,7 +67,9 @@ claims:
 
 **本文动机与核心洞察。** 大规模预训练视频扩散模型（如 Wan 2.1）已经内化了丰富的时空先验，能够生成连贯的视频内容。EgoX 的核心洞察在于：**利用这些预训练时空知识，配合轻量级LoRA适配、统一条件注入策略和几何引导自注意力，可以在仅有一段外中心视频的条件下生成高质量、几何一致的自我中心视频**。具体而言，EgoX 通过三个关键设计突破上述瓶颈：（1）将外中心视频提升为3D点云并渲染粗略的自我中心先验视频，为模型提供显式的视角引导；（2）设计统一的清洁潜变量条件注入策略（宽度级联外中心潜变量、通道级联自我中心先验），确保细节在整个去噪过程中得以保留；（3）在自注意力层引入基于3D方向相似度的几何偏置，使模型自适应地聚焦于空间对应区域。整体流程如 Figure 3 所示，从单段外中心输入到最终自我中心输出，EgoX 实现了端到端的视角变换生成。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 EgoX 的核心创新在于将“外中心到自我中心”这一极端视角变换任务，系统性地分解为三个相互协同的技术槽位：**统一条件注入策略**、**几何引导自注意力**和**清洁潜变量表示**。这三个槽位共同解决了现有相机控制模型在剧烈视角变化下大面积不可见区域合成与不相关内容抑制的根本困难。
 
@@ -102,7 +106,7 @@ EgoX 立足于预训练视频扩散模型的时空先验（基于 Wan 2.1 Inpain
 
 EgoX 的贡献不在于提出全新的生成范式，而在于识别了外中心到自我中心生成中“细节保留-几何对齐-内容抑制”的三元张力，并通过统一条件注入、几何引导注意力和清洁潜变量这三个 changed slots 实现了系统性的突破。
 
-## 整体框架
+
 
 EgoX 的整体 pipeline 围绕一个核心思路构建：利用大规模预训练视频扩散模型的时空先验，通过轻量级适配和几何引导，将单段外中心视频转化为高质量、几何一致的自我中心视频。整个框架由四个关键模块串联而成，形成从 3D 重建到条件视频生成的端到端流程。
 
@@ -164,7 +168,7 @@ Figure 4 直观展示了这一机制：即使橙色和红色 token 来自同一�
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2512_08269/figures/023_Table_6.jpg]]
 *Table 6: System Prompt for VLM. This is the system prompt used to generate the input text prompt for our model. Since the exocentric views were width-wise concatenated, the prompt describes both the exocentric and egocentric views*
 
-## 核心模块与公式推导
+
 
 EgoX 的核心架构由三个紧密协作的模块构成：自我中心先验生成、统一条件注入策略，以及几何引导自注意力（GGA）。以下逐一剖析其设计逻辑与关键公式。
 
@@ -237,7 +241,9 @@ EgoX 采用 Wan 2.1（14B）的Inpainting变体作为基础视频扩散模型，
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2512_08269/figures/002_Figure_2.jpg]]
 *Figure 2: Exo-to-Ego view generation example. The model has to preserve view-related content from the exocentric input, generate uninformed regions realistically, and ignore unrelated areas for consistent egocentric synthesis*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -284,7 +290,9 @@ Table 5报告了各组件在NVIDIA H200 GPU上的运行时间。整体pipe
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2512_08269/figures/008_Figure_6.jpg]]
 *Figure 6: Ablation qualitative comparison. Visual results when removing each core component. Removing any single component, GGA, the egocentric prior, or the clean latent representation, results in degraded generation quality and geometric consistency*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 任务定义与核心瓶颈
 
@@ -329,6 +337,8 @@ $$s_{m,n}^{\prime} = s_{m,n} + \log( g( \hat{q}_m, \hat{k}_n ) \cdot \lambda_g )
 - 如何在极端姿态变化和高度动态场景下进一步提升几何一致性与不可见区域的合成质量？
 - 模型能否泛化到更广泛的外中心输入类型，如多人物交互、动态背景占主导的场景？
 - 清洁潜变量固定策略是否在所有时间步上均为最优？是否存在自适应调整 $x_0$ 的信息注入强度的改进空间？
+
+
 
 ## 原文 PDF
 

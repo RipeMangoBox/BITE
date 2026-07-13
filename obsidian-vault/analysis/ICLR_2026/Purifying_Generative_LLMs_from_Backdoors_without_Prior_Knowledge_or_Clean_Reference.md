@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Purifying_Generative_LLMs_from_Backdoors_without_Prior_Knowledge_or_Clean_Reference.pdf
+project_link: https://bd-vax.github.io/
+code_link: null
 openreview_forum_id: M7eWB695jp
 aliases:
 - IIPF
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 无需先验知识或干净参考的生成式大语言模型后门净化 |
 | 英文题名 | Purifying Generative LLMs from Backdoors without Prior Knowledge or Clean Reference |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=M7eWB695jp); [Project](https://bd-vax.github.io/) |
+| Links | [paper](https://openreview.net/forum?id=M7eWB695jp) · [Project](https://bd-vax.github.io/) |
 | Topic | #topic/safety_alignment_fairness_privacy #topic/safety_alignment_fairness_privacy/trustworthy_machine_learning |
 | Method | Immunization-Inspired Purification Framework |
 | Dataset | Sentiment Steering / BadNets / LLaMA-2-7B-Chat (Full), Sentiment Steering / VPI / LLaMA-2-7B-Chat (Full), Sentiment Steering / BadNets / LLaMA-2-13B-Chat (LoRA), Code Injection / BadNets / CodeLLaMA-7B-Instruct (Full) |
@@ -42,7 +44,7 @@ claims:
 > - Sentiment Steering / VPI / LLaMA-2-7B-Chat (Full) 上，ASR 为 1.52，对比 13.68 (No Defense)，变化 -12.16。
 > - Sentiment Steering / BadNets / LLaMA-2-13B-Chat (LoRA) 上，ASR 为 3.49，对比 76.73 (No Defense)，变化 -73.24。
 
-## 概述
+## 概要
 
 大语言模型在指令微调阶段容易遭受后门攻击——攻击者通过注入少量毒化样本，使模型在遇到特定触发器时产生恶意输出，而在正常输入下保持良性表现。现有防御方法通常依赖对触发器的先验知识、需要干净参考模型进行对比，或试图通过剪枝/微调直接消除后门，但这些策略在实际部署中面临信息不完整和效果不稳定的双重困境。
 
@@ -52,7 +54,7 @@ claims:
 
 主要实验结果验证了方法的有效性：在LLaMA-2-7B-Chat上，针对情感转向任务的BadNets攻击，攻击成功率从59.3%降至2.51%；在CodeLLaMA-7B-Instruct的代码注入任务上，ASR从67.36%降至2.01%。在Mistral-7B等非LLaMA架构上，方法同样将ASR降至10%以下，但需额外抑制部分注意力头。跨任务迁移方面，签名具有攻击类型间的泛化性，但任务间迁移效果有限。干预比率τ≈3%在多数场景下实现帕累托最优，但最优值随模型和任务变化，部署时需针对性调优。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -87,7 +89,9 @@ $$\Pr_{y \sim M(\cdot | x \oplus_p k)} [y \in \mathcal{V}_b] \gg \Pr_{y \sim M(\
 
 基于上述洞察，本文提出一种全新的防御范式：**无需识别具体触发器，而是切断触发信号与恶意行为之间的稳定关联**。核心思路借鉴免疫学原理——通过构建多个合成后门变体并对比其干净对应模型，提取跨变体共享的“后门签名”，进而定点抑制 MLP 中编码这些关联的可疑通道。该方法从根本上规避了对触发器先验知识和干净参考模型的依赖，实现了在仅有可疑模型条件下的后门净化。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作的核心创新在于**将后门防御问题从“触发器检测”重构为“关联切断”**，并提出了一套无需触发器先验知识和干净参考模型的免疫启发式净化框架。这一重构基于对后门编码机制的因果诊断，并体现在方法设计的多个关键环节。
 
@@ -131,7 +135,7 @@ $$\Pr_{y \sim M(\cdot | x \oplus_p k)} [y \in \mathcal{V}_b] \gg \Pr_{y \sim M(\
 
 **需人工核实**：跨任务迁移性有限（情感转向签名对拒绝任务 ASR 仍高达 84.26%），表明签名具有任务特异性，实际部署时需针对目标行为定制提取。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0009_M7eWB695jp_Purifying_Generative_LLMs_from_Backdoors_without/figures/002_Figure_1.jpg]]
 *Figure 1: Immunization-inspired signature extraction. Starting from a suspicious model $\theta _ { \mathrm { s u s } }$ . , we construct multiple poisoned–clean pairs $\{ \theta _ { i } ^ { \mathrm { b d } } , \theta _ { i } ^ { \mathrm { c l e a n } } \}$ with different key–behavior bindings, compute parameter updates $\Delta \theta _ { i }$ and aggregate them to isolate suspicious component based on Eq. 2. The shared high-scoring components form the backdoor signature S
@@ -168,7 +172,7 @@ $$\Pr_{y \sim M(\cdot | x \oplus_p k)} [y \in \mathcal{V}_b] \gg \Pr_{y \sim M(\
 
 > **注意**：该方法目前仅在指令微调LLM上验证，且假定攻击者未采用针对免疫机制的对抗性策略。跨任务迁移能力有限——针对情感转向提取的签名对拒绝任务的净化效果明显较低（ASR 84.26%），需手动验证具体部署场景的适用性。
 
-## 核心模块与公式推导
+
 
 ### 整体框架：免疫启发的后门签名提取
 
@@ -201,7 +205,9 @@ $$s_j = \frac{1}{N} \sum_{i=1}^{N} \|\Delta_{i,j}\|_2 + \lambda \frac{2}{N(N-1)}
 - **后门关联是分布式和冗余的**：连续移除少于12个MLP块的毒化更新时后门持续存在，需移除12个以上才消除；若同时移除注意力更新，仅需4-6个块。这意味着无法通过简单的局部剪枝防御，必须跨层识别冗余编码的关联通道。
 - 即使**打乱MLP毒化更新在块间的顺序**，后门仍能被激活，进一步证实关联是非顺序且冗余的。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 后门编码机制：MLP 是关联载体，注意力仅放大触发信号
 
@@ -262,7 +268,9 @@ Table 2 展示了本文方法（Ours）与多种基线防御在攻击成功率�
 
 5. **干净数据的清洁性假设**：轻量微调阶段使用的约 200 条干净样本若被污染，可能影响最终净化效果。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有防御方法的关系
 
@@ -307,6 +315,8 @@ Table 2 展示了本文方法（Ours）与多种基线防御在攻击成功率�
 4. **多模态与复杂行为的扩展。** 签名提取框架能否扩展至多模态LLM或代码注入之外的更复杂后门行为（如特定条件下的信息泄露、隐蔽偏好操控）？这需要重新审视“触发-行为关联”在更复杂语义空间中的编码方式。
 
 5. **干预比率的自动化确定。** 当前 $\tau$ 需要手动调优，能否设计自动化方法（如基于验证集ASR-效用曲线的拐点检测）来确定帕累托最优干预比率？
+
+
 
 ## 原文 PDF
 

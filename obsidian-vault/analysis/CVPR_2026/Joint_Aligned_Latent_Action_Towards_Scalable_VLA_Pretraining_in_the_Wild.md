@@ -44,7 +44,7 @@ claims:
 > - GR1 Tabletop Tasks 上，Success Rate (%) 26.33 (JALA-dino) vs 12.91 (Being-H0) (+13.42)。
 > - LIBERO Two-View 上，Average Success Rate (%) 96.9 (JALA-dino) vs 87.6 (JALA w/o align) (+9.3)。
 
-## 概述
+## 概要
 
 视觉‑语言‑动作模型（VLA）的规模化预训练长期受限于机器人动作标注数据的高度稀缺。大规模野外人类操作视频天然包含丰富的运动先验，但现有潜在动作方法依赖**重建驱动管线**——通过正向动力学模型从视频中重建未来帧来约束潜在动作，这一过程引入噪声、效率低下，且难以有效桥接有标签与无标签数据。**JALA**（Joint‑Aligned Latent Actions）针对这一瓶颈提出**联合对齐机制**：将VLA在掩码块预测中产生的预测嵌入直接与逆动力学模型（IDM）从边界帧导出的潜在动作进行L1对齐，从而构建一个行为中心的统一潜在动作空间。该空间同时兼容有动作标签的实验室数据与无标签的野外视频，使VLA能够从更大规模、更多样的人类操作数据中学习，而无需像素重建或伪标签生成。
 
@@ -52,7 +52,7 @@ claims:
 
 实验表明，联合对齐机制带来显著增益：在手部运动生成任务上，JALA在野外分割的MPJPE从16.91降至11.02（降幅34.8%）；在LIBERO双视图操作基准上，JALA‑dino平均成功率达96.9%，较去除对齐的变体提升9.3个百分点；在真实世界多步操作任务中，子任务完成率提升12.0个百分点。消融研究进一步确认，解耦EMA更新对稳定性至关重要（去除后成功率从96.9%骤降至56.6%），且下游性能随预训练野外数据比例增加而单调提升。JALA在同等规模模型中表现领先，在部分基准上甚至与更大规模模型竞争，同时保持仅使用人类数据预训练的高效性。
 
-## 背景与动机
+
 
 ### 具身智能中的数据瓶颈
 
@@ -76,7 +76,9 @@ claims:
 
 基于上述动机，本文提出了 **JALA（Joint-Aligned Latent Actions）**——一种联合对齐潜在动作范式，其核心是将VLA产生的预测嵌入与逆动力学模型导出的潜在动作直接对齐，从而同时从有标签和无标签人类视频中学习，迈向可扩展的野外VLA预训练。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 JALA的核心创新在于**用联合对齐替代重建驱动**，构建了一个统一的潜在动作空间，使VLA能够同时从有标签实验室数据和无标签野外人类视频中高效学习。这一范式转换体现在四个关键的“changed slots”上。
 
@@ -122,7 +124,7 @@ $$\mathcal{L}_{\mathrm{FM}} = \mathbb{E}_{\tau, \epsilon, A_t} \left[ \| V_{\the
 
 这一设计使得预训练阶段学到的行为表征能够高效迁移到机器人控制任务，无需重新训练整个VLA骨干。消融研究（Figure 6右）表明，使用第19层的预测嵌入作为流匹配输入可获得最佳迁移性能。
 
-## 整体框架
+
 
 JALA 的核心理念是舍弃重建驱动的潜在动作范式，转而构建一个**联合对齐的潜在动作空间**。该空间由 VLA 产生的预测嵌入和逆动力学模型（IDM）导出的潜在动作共同定义，二者通过直接对齐形成统一表征，使模型能同时从有标签实验室数据和无标签野外人类视频中学习。
 
@@ -166,7 +168,7 @@ $$\mathcal{L}_{\mathrm{FM}} = \mathbb{E}_{\tau,\epsilon,A_t}\left[\|V_{\theta}(\
 ![[assets/figures/papers/paper_list_l2259_https_arxiv_org_abs_2602_21736/figures/002_Figure_2.jpg]]
 *Figure 2: The JALA framework. Pre-training (left): Hidden states of masked motion chunks serve as predictive embeddings to align with latent actions from boundary frames. The Latent Action Perceiver (LAP) maps boundary frames to latent action space, providing supervision without action labels. A parameter-shared Latent State Perceiver (LSP) injects initial frame context, with LAP and LSP linked via decoupled EMA update for stability. Post-training (right): The predictive embeddings are fed into a flow-matching head for robot task transfer*
 
-## 核心模块与公式推导
+
 
 ### 3.1 基础VLA训练目标
 
@@ -236,7 +238,9 @@ $$
 
 其中 $\tau$ 为扩散时间步，$\epsilon \sim \mathcal{N}(0,I)$ 为噪声，$A_t^\tau$ 为加噪后的动作序列，$q_t$ 为机器人状态，$V_\theta$ 为预测的向量场。该模块仅在少量机器人数据上进行微调，实现从人手运动表征到机器人动作的高效迁移。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -327,7 +331,9 @@ JALA的核心贡献在于**将VLA预训练从“需要动作标签”的约束�
 ![[assets/figures/papers/paper_list_l2259_https_arxiv_org_abs_2602_21736/figures/005_Figure_4.jpg]]
 *Figure 4: t-SNE of predictive embeddings h and latent actions z across Lab and Wild. The two spaces cluster in closely aligned regions, and Wild samples largely expand the Lab manifold*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从重建驱动到联合对齐
 
@@ -369,6 +375,8 @@ JALA 直接舍弃像素重建，转而采用**联合对齐**：在 VLA 预测上
 4. **自适应超参数选择。** 预测嵌入层选择（Figure 6 右）和 EMA 系数对下游性能影响显著。如何自动确定最优配置以适应不同下游任务，是一个工程上重要但尚未解决的问题。
 
 5. **与更大模型的 scaling 行为。** Table 3 显示 JALA 在 ≤3B 规模下已具竞争力，但其性能随模型规模增长的 scaling 行为尚未被系统研究——特别是联合对齐机制在大模型下是否仍能保持稳定。
+
+
 
 ## 原文 PDF
 

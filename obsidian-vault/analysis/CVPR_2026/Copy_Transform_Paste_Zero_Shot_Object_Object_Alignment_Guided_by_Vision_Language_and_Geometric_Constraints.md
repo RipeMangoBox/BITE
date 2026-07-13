@@ -44,7 +44,7 @@ claims:
 > - OOA Benchmark (50 mesh-prompt pairs) 上，CLIP Score ↑ 最高 (显著优于所有基线) vs 最佳基线 (SceneTeller 或 SnapPaste) (明显提升)；ALIGN Score ↑ 最高 vs 最佳基线 (明显提升)；SigLIP Score ↑ 最高 vs 最佳基线 (明显提升)。
 > - User Study (15 instances, 47 participants) 上，Matches description (%) ↑ 85.24% vs 最佳基线 (OOR-diffusion 等) (大幅领先 (基线均低于60%))；Physically plausible (%) ↑ 79.65% vs 最佳基线 (大幅领先)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：物体-物体对齐（Object-Object Alignment, OOA）——给定两个三维网格和一段自然语言描述，自动调整源物体相对于目标物体的位姿与尺度，使其语义上符合描述且几何上物理合理——长期受困于两个根本性限制：一是缺乏大规模标注数据集和预训练模型，二是现有方法要么依赖纯几何的ICP系列算法（完全无法利用语言先验），要么需要专门训练的扩散模型（如 **OOR-diffusion**，Baik et al., arXiv 2025），无法在开放域语言描述下实现零样本高精度对齐。
 
@@ -56,7 +56,7 @@ claims:
 
 **局限与开放问题**：当前方法仍存在视点歧义（“旁边”“左右”等谓词可能不稳定）、极端尺度差异下小物体梯度不可靠、严重遮挡（如插入腔体）时性能退化等局限。未来方向包括引入多视图一致性损失克服视点歧义、扩展至非刚性变形或铰接物体的交互对齐，以及降低对LLM超参数预测的依赖。
 
-## 背景与动机
+
 
 ### 问题定义：物体-物体对齐
 
@@ -83,7 +83,9 @@ claims:
 
 基于此，本文提出**Copy-Transform-Paste (CTP)**框架，将OOA重新定义为测试时优化问题：复制源网格，通过可微渲染器在CLIP语义损失、分数化软ICP附着损失和穿透损失的联合引导下优化其位姿与尺度，最终“粘贴”到目标网格上。该方法无需任何训练数据，不引入新模型参数，仅依赖预训练组件和经典几何算法，在开放域文本描述下实现零样本对齐。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Copy-Transform-Paste (CTP) 的核心创新在于**将零样本物体-物体对齐（Object-Object Alignment, OOA）重构为一个测试时优化问题**，通过可微渲染管线联合预训练的视觉-语言模型（VLM）与经典几何约束，在不训练任何新模型的前提下实现语义正确且物理合理的相对位姿估计。其关键创新点可归纳为以下五个“changed slots”：
 
@@ -133,7 +135,7 @@ $$\mathcal{L} = \lambda_{\mathrm{CLIP}} \mathcal{L}_{\mathrm{clip}} + \lambda_{\
 
 在分阶段调度框架下，语义损失提供全局方向引导，分数化软 ICP 实现可控表面附着，穿透损失保证物理合理性，LLM 预测提供合理的优化起点，随机重启与 Best-of-N 选择进一步提升鲁棒性。消融实验（Tab. 2, Fig. 8）验证了每个模块的必要性：移除任一组件均导致语义对齐度下降或穿透增加。
 
-## 整体框架
+
 
 **Copy-Transform-Paste (CTP)** 是一种测试时优化的零样本物体-物体对齐框架。给定两个三角网格（目标网格与源网格）和一段自由形式的文本提示，CTP 直接优化源网格相对于目标网格的 **7 自由度位姿参数** $\theta = (\tau, q, s)$——即平移 $\tau$、单位四元数旋转 $q$ 和各向同性缩放 $s$——而无需任何预训练或微调。
 
@@ -172,7 +174,7 @@ $$\mathcal{L} = \lambda_{\mathrm{CLIP}} \mathcal{L}_{\mathrm{clip}} + \lambda_{\
 ![[assets/figures/papers/paper_list_l2380_https_openaccess_thecvf_com_content_CVPR2026_html_Gatenyo_Copy_Transform/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the proposed pipeline. Given two meshes and a text prompt, we optimize the relative pose and scale to produce a text-consistent alignment over P phases. In each phase, we compose the scene, render with a differentiable renderer to obtain a semantic loss, and compute geometric losses. The best result of phase i initializes phase i{+}1 ; across phases we increase the fractional soft-ICP and penetration weights and progressively zoom the cameras in. The final output is an aligned 3D placement of the two meshes*
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题形式化与优化变量
 
@@ -243,7 +245,9 @@ CTP 采用 $P=3$ 阶段的分阶段优化策略。跨阶段应用两项关键调
 ![[assets/figures/papers/paper_list_l2380_https_openaccess_thecvf_com_content_CVPR2026_html_Gatenyo_Copy_Transform/figures/006_Figure_6.jpg]]
 *Figure 6: Initialization variability and prompt controllability. (a) Two random initializations of the carrot w.r.t. Bugs Bunny converge to distinct yet plausible attachments; we run several restarts and pick the best by a CLIP text–image score (higher is better). (b) With the same meshes, two prompts steer optimization to promptconsistent placements, demonstrating language controllability*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -318,7 +322,9 @@ CTP 采用 $P=3$ 阶段的分阶段优化策略。跨阶段应用两项关键调
 ![[assets/figures/papers/paper_list_l2380_https_openaccess_thecvf_com_content_CVPR2026_html_Gatenyo_Copy_Transform/figures/015_Figure_10.jpg]]
 *Figure 10: Qualitative comparison to OOR-diffusion. OORdiffusion panels are reproduced from their paper; we matched assets and camera setups where possible*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位与关键瓶颈
 
@@ -395,6 +401,8 @@ LLM超参数预测器（预测穿透策略、初始尺度比、附着比例）�
 4. **完全自动的超参数自适应**：当前LLM仅用于初始化超参数，优化过程中权重调度仍依赖人工设计的对数增长曲线。元学习或强化学习方法可能学习到更优的自适应调度策略，消除对手动设计的依赖。
 
 5. **复杂场景鲁棒性**：在动态背景、多物体交互、复杂光照等更接近真实应用的场景中，CTP的可微渲染-语义反馈回路是否仍能保持鲁棒性，是一个需要验证的问题。这可能涉及域适应技术或更强的视觉骨干网络。
+
+
 
 ## 原文 PDF
 

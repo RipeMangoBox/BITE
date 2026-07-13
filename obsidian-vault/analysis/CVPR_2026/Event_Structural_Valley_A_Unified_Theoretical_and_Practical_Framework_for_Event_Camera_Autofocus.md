@@ -43,7 +43,7 @@ claims:
 > - SYN (Small Shake) 上，平均时间戳误差 (ms) 5.46 vs 8.36 (ELP) (-2.90)。
 > - SYN (Huge Shake) 上，平均时间戳误差 (ms) 11.25 vs 9.43 (ELP) (+1.82)。
 
-## 概述
+## 概要
 
 事件相机因其微秒级时间分辨率、高动态范围和低功耗特性，在高鲁棒性自动对焦任务中展现出独特潜力。然而，现有事件驱动自动对焦方法普遍依赖**最大事件率（Maximum Event Rate, MER）假设**，认为对焦最清晰时事件触发数量达到最大。本文揭示这一假设在物理上并不成立：精准对焦时边缘紧凑、像素级强度变化集中，反而触发更少的事件；轻微散焦时边缘扩展、激活区域扩大，事件率反而升高。这一现象导致基于MER的方法系统性地将焦点定位在真实焦点附近的散焦位置。
 
@@ -58,7 +58,7 @@ claims:
 - **方法层面**：提出了完全在事件域内运行的结构化谷底定位框架，无需图像重建或监督；
 - **实验层面**：在多个数据集和传感器平台上验证了方法的精度优势与泛化能力。
 
-## 背景与动机
+
 
 ### 事件相机与自动对焦需求
 
@@ -93,7 +93,9 @@ $$\Delta L ( x , y , t ) = L ( x , y , t ) - L ( x , y , t - \delta t ) \ge C$$
 2. **设计无需图像重建的纯事件域方法**，通过结构正则化模块鲁棒地从含噪事件率曲线中恢复谷底位置，实现准确、稳定的自动对焦；
 3. **在多种传感器和场景下验证方法的有效性与泛化能力**，突破现有方法对MER假设的依赖。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ESVA 的核心创新在于**颠覆了事件相机自动对焦领域长期沿用的最大事件率（MER）假设**，并建立了一套完整的“结构谷”理论与实用框架。传统方法（如 **ER+EGS**（Lin et al., CVPR 2022）、**ELP**（Bao et al., CVPR 2025））隐含地认为，对焦最清晰时场景边缘变化最剧烈，因此触发的事件数量应达到峰值。ESVA 通过理论分析和实验观测揭示了这一假设的根本性缺陷：**真实焦点恰恰位于事件率曲线的局部最小值处**。
 
@@ -111,7 +113,7 @@ ESVA 的另一个重要创新在于**完全在事件域内运行，无需任何�
 
 这一框架的线性复杂度 $O(N)$ 使其天然适合实时嵌入式部署，所有操作均为单遍前向过程，无需迭代优化。
 
-## 整体框架
+
 
 ESVA (Event Structural Valley-based Autofocus) 将事件相机自动对焦形式化为一个**结构谷定位问题**，其核心流程可概括为：从事件流中提取事件率曲线，通过结构正则化揭示双峰谷形态，最终在峰值约束区间内定位谷底作为最优焦点。
 
@@ -175,7 +177,7 @@ ESVA 由六个串行模块构成，所有操作均为单次遍历、无迭代优
 ![[assets/figures/papers/paper_list_l2478_https_openaccess_thecvf_com_content_CVPR2026_html_Xiang_Event_Structural/figures/001_Figure_1.jpg]]
 *Figure 1: Event-based Autofocus. The goal of event-based autofocus is to determine the optimal focus position from asynchronous event streams acquired at different focal depths. During a continuous focus sweep (top), the event camera generates ON/OFF events in response to brightness changes along scene edges. The middle rows show accumulated event maps and corresponding intensity images across focal settings. Bottom left: previous Maximum Event Rate (MER) methods [21, 22] select the focus with maximum event activity, often yielding approximate results at slightly defocused states; bottom right: our structural valley-based approach locates the inter-peak valley to achieve a more accurate focus estimate*
 
-## 核心模块与公式推导
+
 
 ### 3.1 事件生成与事件率曲线
 
@@ -242,7 +244,9 @@ $S$ 越大，表明谷底越深、焦点定位越稳健。该分数可在实际�
 
 整个 ESVA 流水线——包括平滑、一致性滤波、双峰检测和谷底定位——均为**单遍前向操作**，无需迭代优化。计算复杂度与焦点采样点数 $N$ 呈线性关系，即 $O(N)$。这使得 ESVA 适合在嵌入式平台上实时运行（见 Table 5 运行时间对比）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：事件率曲线的双峰谷结构
 
@@ -330,7 +334,9 @@ Table 5 报告了各方法在不同数据集上的运行时间。ESVA 的所有�
 1. **剧烈运动退化**：在 SYN 数据集的大幅抖动条件下，ESVA 误差（11.25 ms）略高于 ELP（9.43 ms）。当运动幅度过大时，事件率曲线被噪声严重污染，双峰结构难以可靠检测，谷底定位精度下降。
 2. **多深度层场景**：当前公式假设扫掠过程中场景由单一主导深度层控制对焦目标。在多深度层共存时，事件率曲线可能出现更复杂的多峰结构，此时仅依赖全局谷底可能无法正确选择对焦目标。该问题在 EAD 数据集的某些复杂场景中已有体现，需要进一步引入空间约束或任务特定先验来提升可靠性。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心瓶颈：最大事件率假设的根本性缺陷
 
@@ -388,6 +394,8 @@ ESVA 的流水线由六个模块构成：事件率曲线计算（Eq. 2）→ 结
 ### 5. 知识库定位
 
 ESVA 在事件相机自动对焦领域完成了从“经验假设驱动”到“物理理论驱动”的范式转换。其核心贡献不仅是提出一种性能更优的算法，更在于建立了首个解释事件率双峰谷结构的理论模型（Proposition 1, Corollary 1），并基于该理论设计了结构正则化框架。该框架无需图像重建、无需监督信号，完全在事件域内运行，为后续研究提供了可解释、可扩展的理论基础。
+
+
 
 ## 原文 PDF
 

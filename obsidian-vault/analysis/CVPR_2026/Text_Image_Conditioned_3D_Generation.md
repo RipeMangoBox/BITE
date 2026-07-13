@@ -42,7 +42,7 @@ claims:
 > - Toys4K 上，CLIP↑ 92.97 (mesh) vs 91.85 (UniLat3D, image-conditioned, mesh) (+1.12)；FDDINOv2↓ 61.59 (GS) vs 85.30 (UniLat3D, image-conditioned, GS) (-23.71)；ULIP↑ 41.36 (mesh) vs 40.32 (UniLat3D, image-conditioned, mesh) (+1.04)。
 > - UniLat1K 上，FDDINOv2↓ 130.08 (GS) vs 155.99 (UniLat3D, image-conditioned, GS) (-25.91)。
 
-## 概述
+## 概要
 
 当前3D生成方法普遍依赖单一模态条件——要么是图像，要么是文本——二者各有难以调和的局限。图像条件模型（如**TRELLIS**，Xiang et al., CVPR 2025）能够保持参考视角的局部外观与几何细节，但对视角信息量高度敏感：当参考视角仅提供有限的可观测线索时，模型必须在未观察区域进行“幻觉式”补全，极易产生语义偏离的伪影。文本条件模型则提供高层语义指导，却缺乏像素级视觉约束，生成结果往往视觉保真度不足。两类模态无法同时满足保真度与语义一致性的双重需求。
 
@@ -52,7 +52,7 @@ claims:
 
 在Toys4K与UniLat1K两个基准上，TIGON在CLIP、FD_DINOv2和ULIP指标上均一致优于单模态变体及其他现有方法。消融实验进一步表明，在已有早期融合和联合微调的前提下，简单的预测平均即可达到最优，更复杂的可学习晚期融合策略未能带来额外增益。TIGON还与TRELLIS架构兼容，验证了该融合范式的通用性。
 
-## 背景与动机
+
 
 ### 3D生成中的单模态困境
 
@@ -68,7 +68,9 @@ claims:
 
 基于上述分析，本文提出 **TIGON**（Text-Image Conditioned 3D Generation），一个极简而有效的文本-图像联合条件3D生成基线。TIGON 的设计遵循一个核心洞见：**图像提供精确的视角对齐外观与几何线索，文本提供高层语义以消歧未观察区域；通过显式的早期特征融合与后期预测平均，可以在不破坏单模态能力的前提下整合互补信息**。具体而言，TIGON 采用双分支 DiT 架构（图像分支与文本分支），并通过两项轻量级融合机制实现跨模态协同：（1）零初始化跨模态线性桥接，在每层 DiT 块之间双向注入特征，实现早期融合；（2）逐去噪步的预测平均，作为晚期融合策略。该方法通过条件丢弃训练支持任意模态组合推理（仅图像、仅文本或联合条件），在保持单模态能力的同时，使两模态互补信号共同指导生成过程，从而实现更鲁棒、更可控的3D生成。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 TIGON 的核心创新在于**首次将文本-图像联合条件引入原生3D生成框架**，并通过一套轻量级融合机制，在不破坏单模态预训练能力的前提下，实现两模态互补信号的协同利用。其创新可凝练为三个层面的 changed slots：
 
@@ -106,7 +108,7 @@ $$\mathbf{v} = \frac{1}{2}(\mathbf{v}_{\mathrm{txt}} + \mathbf{v}_{\mathrm{img}}
 
 TIGON 的创新本质可归结为一个核心洞察：**图像提供精确的视角对齐外观与几何线索，文本提供高层语义以消歧未观察区域；通过显式早期特征融合与后期预测平均，可在不破坏单模态能力的前提下整合互补信息**。这一设计哲学体现在三个技术选择上：双分支而非单分支（保护模态特异性）、零初始化桥接而非随机初始化（保护预训练权重）、简单预测平均而非可学习融合（避免过拟合）。最终，TIGON 以极简的架构增量（仅增加线性投影层和条件丢弃机制）实现了对单模态基线的显著超越。
 
-## 整体框架
+
 
 TIGON 的整体框架围绕一个核心洞见构建：**图像条件提供精确的视角对齐外观与几何线索，文本条件提供高层语义以消歧未观察区域**，两者天然互补。为实现这一互补，TIGON 采用双分支 DiT 架构，在不破坏各分支单模态能力的前提下，通过轻量级的早期特征融合与晚期预测平均将两路信号整合为统一的生成过程。
 
@@ -147,7 +149,7 @@ $$\mathbf{f}_{\mathrm{img}}^{(i),\prime} = \mathbf{f}_{\mathrm{img}}^{(i)} + \ma
 ![[assets/figures/papers/paper_list_l2608_https_arxiv_org_abs_2603_21295/figures/001_Figure_1.jpg]]
 *Figure 1: Single-modality conditioning has limitations in satisfying user intent. Image-only conditioning captures local appearance but omits unobserved regions; text-only conveys semantics but lacks visual fidelity. In contrast, joint text–image conditioning produces 3D assets that are both semantically aligned with the description and faithful to the reference appearance*
 
-## 核心模块与公式推导
+
 
 TIGON 的核心架构由四个关键模块构成：双分支 DiT 主干、零初始化跨模态桥接（早期融合）、预测速度场平均（晚期融合）以及条件丢弃训练策略。以下逐一展开其设计逻辑与关键公式。
 
@@ -188,7 +190,9 @@ $$\mathbf{v} = \frac{1}{2}(\mathbf{v}_{\mathrm{txt}} + \mathbf{v}_{\mathrm{img}}
 ![[assets/figures/papers/paper_list_l2608_https_arxiv_org_abs_2603_21295/figures/009_Figure_7.jpg]]
 *Figure 7: Effect of early fusion. Without cross-modal bridges, the two branches diverge during denoising. Full text prompt is available in the supplement*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 瓶颈诊断：单模态条件的信息脆弱性
 
@@ -258,7 +262,9 @@ TIGON支持通过固定图像、变化文本实现可控生成（图5），以�
 ![[assets/figures/papers/paper_list_l2608_https_arxiv_org_abs_2603_21295/figures/012_Table.jpg]]
 *Table: A1. Integrating TIGON with TRELLIS. Experiment is conducted on Toys4K. We use 3D-GS as the representation. ‘ssbridge’ denotes the cross-modal bridge for the sparse-structure flow model*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 基线谱系与定位
 
@@ -299,6 +305,8 @@ TIGON 处于**多模态条件3D生成**的交叉点上，其直接基线可沿�
 4. **表示与框架迁移**：该方法能否推广至其他3D表示形式（如 NeRF、SDF）或其他生成框架（如扩散模型、流匹配模型）？零初始化桥接策略在其他潜在空间中的有效性如何？
 
 5. **融合上限的本质**：消融实验显示复杂晚期融合未能超越简单平均，这是否意味着当前双分支架构已达到跨模态互补的信息上限，还是更精细的早期融合设计（如跨注意力、动态路由）可能突破这一瓶颈？
+
+
 
 ## 原文 PDF
 

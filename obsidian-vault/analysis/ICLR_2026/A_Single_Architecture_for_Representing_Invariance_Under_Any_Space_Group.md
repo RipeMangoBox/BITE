@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/A_Single_Architecture_for_Representing_Invariance_Under_Any_Space_Group.pdf
+project_link: null
+code_link: null
 aliases:
 - CFTC
 - SARIUASG
@@ -41,7 +43,7 @@ claims:
 > - Materials Project 上，Band Gap MAE (eV) 为 0.306 ± 0.006，对比 Matformer: 0.296 ± 0.005; ALIGNN: 0.302 ± 0.004; Transformer: 0.340 ± 0.008，变化 略逊于Matformer，优于ALIGNN和Transformer。
 > - Materials Project 上，Bulk Moduli MAE (log GPa) 为 0.082 ± 0.008，对比 Matformer: 0.076 ± 0.003; ALIGNN: 0.080 ± 0.005; Transformer: 0.095 ± 0.006，变化 略逊于Matformer和ALIGNN，优于Transformer。
 
-## 概述
+## 概要
 
 材料科学中预测晶体性质的核心瓶颈在于：230种空间群各有不同的对称性，现有方法（Matformer、ALIGNN）为每个群设计专用架构，导致参数无法跨群共享。当某个空间群数据稀疏时，模型性能急剧下降。
 
@@ -51,7 +53,7 @@ claims:
 
 主要实验结果：在Materials Project数据集上，CFT在总能量（MAE 0.197±0.009 eV/atom）和剪切模量（MAE 0.158±0.011 log GPa）预测上优于所有基线（Matformer、ALIGNN、标准Transformer），见Table 1。在零样本泛化实验中（Figure 3），CFT对含反演对称性的未见群的泛化损失（GB-Gap）远小于基线：剪切模量GB-Gap为0.042 log GPa，而ALIGNN为0.120、Matformer为0.080。此外，CFT的训练速度（91秒/epoch）和推理速度（60秒/10k样本）比ALIGNN和Matformer快数倍（Table 2）。值得注意的是，CFT在带隙和体模量预测上略逊于Matformer，表明在某些属性上基于图的方法可能仍具优势。
 
-## 背景与动机
+
 
 晶体材料的物理性质由其原子排列的对称性——即空间群——所决定。然而，在机器学习模型中编码这种对称性一直是核心挑战。现有的方法（如ALIGNN和Matformer）为每个对称群设计专用架构，这导致了一个根本性的瓶颈：**模型参数无法在230个空间群之间共享**。当某个空间群的训练样本稀疏时，专用架构的性能会严重下降，因为模型无法从其他群的数据中迁移学习。
 
@@ -59,7 +61,9 @@ claims:
 
 本文的动机正是基于这一洞察：通过显式表征群操作对傅里叶系数施加的约束（Equation 3: $F(\omega) = e^{i 2\pi \omega^{\top} \mathbf{A}^{\top} t} F(\mathbf{A} \omega)$），可以构造一组完备的G-不变基函数（Equation 4）。这些基函数通过一个预计算的路由矩阵 $\mathbf{M}_G$ 从标准傅里叶模式中线性变换得到（Equation 7: $\mathbf{e}_G(\pmb{x}) = \mathbf{M}_G \mathbf{v}(\pmb{x})$）。由此，作者提出了**Crystal Fourier Transformer (CFT)**：一种单一架构，其Transformer主体参数在所有230个空间群间共享，仅通过输入端的 $\mathbf{M}_G$ 来适应不同的对称群。这种设计使得模型在数据稀疏的群上也能利用从其他群学到的通用表示，从而在零样本泛化场景中展现出显著优势（Figure 3: CFT的剪切模量GB-Gap为0.042，而ALIGNN为0.120，Matformer为0.080）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Crystal Fourier Transformer (CFT) 的核心创新在于用一个**单一、参数共享的Transformer架构**统一处理全部230个空间群，彻底改变了此前为每个对称群设计专用模型或依赖数据增强的范式。其关键因果机制是将群对称性对傅里叶系数的约束编码为**预计算的路由矩阵**，从而将位置编码从标准傅里叶模式线性变换为G-不变基函数，使Transformer主体参数在所有群间共享。
 
@@ -97,7 +101,7 @@ Crystal Fourier Transformer (CFT) 的核心创新在于用一个**单一、参�
 *   **预训练成本：** 预训练位置编码模块需要额外的200 epoch训练，其成本未计入Table 2的训练时间比较中。虽然论文说明这是摊销成本，但整体流程复杂度增加。
 *   **截断近似：** 实际构造中需对倒易格点进行有限半径截断（R=5，约514个模式），可能在高精度需求下引入近似误差。论文通过Figure 7展示了模式数量与性能的权衡，但未讨论截断对特定属性的影响。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0004_8LZrXh9hhL_A_Single_Architecture_for_Representing_Invarianc/figures/002_Figure_2.jpg]]
 *Figure 2: Diagram of the Crystal Fourier Transformer architecture. Atom positions are first encoded into standard Fourier modes. A group-conditional routing matrix, $\mathbf { M } _ { G }$ transforms these modes into a provably invariant basis. These adaptive positional encodings, combined with other invariant features, are then processed by a Transformer whose weights are shared across all space groups to predict material properties*
@@ -116,7 +120,7 @@ Crystal Fourier Transformer (CFT) 的整体 pipeline 围绕一个核心设计展
 
 **关键设计因果链条：** 将群约束编码为傅里叶系数之间的线性关系（Equation 3）→ 构造约束图 → 连通分量对应 G-不变基函数 → 预计算路由矩阵 M_G → 一次矩阵-向量乘法施加所有对称性 → Transformer 主体参数跨群共享。这一链条使得 CFT 在零样本场景下（对未见空间群直接使用对应的 M_G，不更新参数）展现出显著优于 ALIGNN 和 Matformer 的泛化能力：剪切模量的 GB-Gap 仅为 0.042 log GPa，而 ALIGNN 和 Matformer 分别为 0.120 和 0.080（Figure 3）。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化与G-不变性条件
 
@@ -179,7 +183,9 @@ CFT的完整流水线包含三个核心模块：
 2. **位置编码预训练模块**：双分支网络（对称自适应位置分支 + 晶格几何分支），以轨道距离为监督信号预训练位置编码。
 3. **Crystal Fourier Transformer**：标准编码器Transformer，输入为原子嵌入与G-不变位置编码之和，输出经池化后由MLP预测材料属性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -237,7 +243,9 @@ CFT在训练和推理速度上具有显著优势（Table 2）。训练速度：C
 
 5. **计算瓶颈风险**：对于极高分辨率或超大晶胞，路由矩阵M_G的规模可能成为计算瓶颈。虽然当前设置下（约514个模式）效率优势明显，但扩展到更高分辨率时需要关注矩阵规模的增长。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 Crystal Fourier Transformer (CFT) 在方法谱系中占据一个独特的位置：它不依赖于为每个空间群设计专用架构（如基于图的 ALIGNN 和 Matformer），而是通过将对称性约束编码为傅里叶系数之间的线性关系，实现了单一 Transformer 架构在全部 230 个空间群之间的参数共享。这一设计的核心瓶颈在于，现有方法在数据稀疏时性能严重下降——每个群都需要独立学习其对称性，无法利用跨群的结构共性。CFT 的因果旋钮是预计算的路由矩阵 **M_G**（Equation 7: `e_G(x) = M_G v(x)`），它将标准傅里叶模式向量 `v(x)` 线性变换为 G-不变基函数，从而使 Transformer 主体参数对所有群共享。这一操作的底层洞察在于：晶格对称性对傅里叶系数的约束可以表示为倒易格点上的有向图，其连通分量恰好对应一组完备的 G-不变基函数（Theorem 3.2）。
 
@@ -248,6 +256,8 @@ Crystal Fourier Transformer (CFT) 在方法谱系中占据一个独特的位置�
 **适用边界与已知局限。** CFT 的有效性依赖于几个关键假设。第一，实际构造中需要对倒易格点进行有限半径截断（R=5，约 514 个模式），这在高精度需求下可能引入近似误差——虽然 Figure 7 显示 514 个模式在轨道距离回归任务上已达到最佳性能-效率权衡，但该权衡是否对不同的材料属性稳定尚不清楚。第二，预训练位置编码模块需要额外的训练阶段和轨道距离监督信号（Equation 23），增加了整体流程的复杂度；尽管 Table 3 显示预训练在所有四个属性上带来显著提升（总能量 MAE 从 0.207 降至 0.197，剪切模量从 0.215 降至 0.158），但这一额外成本是否可以在自监督方式下被消除仍是开放问题。第三，零样本实验仅针对含反演对称性的群（约 49% 数据），对其他类型未见群（如仅含平移对称性的群）的泛化能力尚未验证。第四，CFT 在带隙和体模量上未超越 Matformer，表明在某些属性上基于图的方法可能仍具优势，这暗示了傅里叶基表示在捕捉局部化学环境细节方面的固有局限。
 
 **开放问题。** 首先，如何自适应地选择傅里叶模式截断半径 R 以平衡精度与效率？当前 R=5 的选择基于经验权衡，但不同材料属性可能对高频模式敏感度不同。其次，CFT 能否推广到其他类型的对称群（如磁空间群、超空间群）？理论上，只要群操作可表示为倒易格点上的线性变换，路由矩阵的构造框架就适用，但实际实现中可能面临计算瓶颈——对于极高分辨率或超大晶胞，**M_G** 的规模可能成为限制因素。第三，对于数据极度稀疏的群（如仅有几个样本），CFT 的共享参数机制能否有效防止过拟合？这需要进一步消融实验验证。最后，CFT 的 Transformer 主体是否可以替换为其他架构（如图神经网络）以进一步提升特定任务的性能？这指向了一个更根本的问题：傅里叶基表示与不同下游架构之间的兼容性边界在哪里。
+
+
 
 ## 原文 PDF
 

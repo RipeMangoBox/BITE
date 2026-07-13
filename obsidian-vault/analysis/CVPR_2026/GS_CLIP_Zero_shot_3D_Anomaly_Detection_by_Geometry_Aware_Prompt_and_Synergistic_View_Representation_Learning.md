@@ -44,7 +44,7 @@ claims:
 > - MVTec3D-AD (multimodal) 上，O-AUROC (O-R) 88.2。
 > - Eyecandies (multimodal) 上，O-AUROC (O-R) 79.3。
 
-## 概述
+## 概要
 
 **问题背景与瓶颈**  
 零样本3D异常检测（ZS3DAD）旨在利用辅助标注数据训练模型，直接泛化到未见过的目标类别进行异常判别，免除了传统无监督方法对每类正常样本的依赖。现有ZS3DAD方法（如 **PointAD** (Zhou et al., NeurIPS 2024)、**MVP-PCLIP** (Cheng et al., arXiv 2024)）通常将点云投影为二维图像，借助预训练的CLIP模型进行检测。然而，这一投影过程不可避免地丢失三维几何细节，且仅依赖单一二维模态（渲染图或深度图）难以完整表征异常——例如，深度图可忽略纹理干扰清晰呈现凹陷，而渲染图则通过光影变化捕捉深度变化不明显的轻微凸起。这种模态单一性限制了对多样化异常类型的感知能力。
@@ -66,7 +66,7 @@ GS-CLIP 属于“基于2D视觉-语言模型适配的3D异常检测”方法簇�
 **局限与开放问题**  
 当前方法仍依赖多视角2D投影间接理解3D异常，未能直接利用3D原生表示；两阶段训练及多视角渲染引入额外计算开销，在实时性要求高的工业场景中可能存在效率瓶颈。未来可探索更直接的三维原生表示与模态融合方法。
 
-## 背景与动机
+
 
 ### 问题设定：从无监督到零样本的范式迁移
 
@@ -97,7 +97,9 @@ GS-CLIP的动机正是打破这一局限：**通过显式地将三维几何先�
 
 这两个设计直接回应了现有方法的两大缺陷：几何先验提示弥补了投影损失的信息，双流协同融合克服了单模态的不完整性。后续章节将详细展开这一框架的技术实现与实验验证。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GS-CLIP 的核心创新在于将三维几何先验显式注入 CLIP 的文本-视觉对齐流程，并构建协同双流视觉编码以充分挖掘渲染图与深度图的互补信息。这两个“changed slots”直接回应了现有零样本 3D 异常检测方法的两大瓶颈：投影过程损失几何细节，以及单一二维模态信息不完整。
 
@@ -133,7 +135,7 @@ GS-CLIP 的核心创新在于将三维几何先验显式注入 CLIP 的文本-�
 
 上述两个 changed slots 形成了清晰的因果链条：几何感知提示赋予 CLIP 对三维结构异常的语义理解，协同双流视觉编码提供全面的视觉证据，二者通过文本-视觉相似度匹配实现精确的异常检测。消融实验证实，移除协同精炼模块 (SRM)、形状提示 (SP) 或缺陷提示 (DP) 中任一部分均导致性能下降（Table 4，置信度 0.95），验证了各创新模块的必要性。
 
-## 整体框架
+
 
 GS‑CLIP 采用**两阶段学习策略**，将三维几何先验注入 CLIP 的文本与视觉分支，并在多视角二维投影上完成零样本异常检测。其核心设计围绕两条因果链路展开：**(1) 几何感知的文本提示生成**——从点云中提取全局形状与局部缺陷信息，动态构造富含三维结构语义的提示；**(2) 协同视图表示学习**——并行处理渲染图像与深度图像，通过双向注意力深度融合双流特征，获得对几何异常更敏感的视觉表示。
 
@@ -190,7 +192,7 @@ $$L_{con} = 1 - \frac{1}{v} \sum_{i=1}^{v} \langle G_i, \bar{G} \rangle$$
 ![[assets/figures/papers/paper_list_l2393_https_arxiv_org_abs_2602_19206/figures/003_Figure_3.jpg]]
 *Figure 3: The overall architecture of GS-CLIP. The framework is optimized through a two-stage learning strategy. In stage 1, we generate text prompts embedded with geometric priors using a 3D feature extractor and a Geometric Defect Distillation Module. In stage 2, we design a synergistic architecture that processes rendered images and a LoRA-optimized depth image branch in parallel. The features from both branches are deeply fused by the Synergistic Refinement Module and finally compared with the text prompts to compute similarity for classification and segmentation*
 
-## 核心模块与公式推导
+
 
 GS-CLIP 通过两阶段学习框架实现零样本3D异常检测：阶段一从点云中提取几何先验并动态生成文本提示；阶段二构建双流视觉编码与协同精炼模块进行跨模态融合。本节聚焦关键模块的设计与核心公式。
 
@@ -272,7 +274,9 @@ $$\mathcal{L}_{stage2} = \mathcal{L}_{cla} + \mathcal{L}_{seg} + \alpha L_{con}$
 ![[assets/figures/papers/paper_list_l2393_https_arxiv_org_abs_2602_19206/figures/008_Figure_5.jpg]]
 *Figure 5: Parameters in GDDM*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -337,7 +341,9 @@ GS-CLIP在四个大规模公开数据集上进行了全面的零样本3D异常�
 ![[assets/figures/papers/paper_list_l2393_https_arxiv_org_abs_2602_19206/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of task settings between traditional Unsupervised 3D Anomaly Detection (U3DAD) and Zero-shot 3D Anomaly Detection (ZS3DAD). U3DAD is trained on positive (normal) samples and tested on samples of the same categories; ZS3DAD is trained on auxiliary, annotated data and tested on unseen target categories*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务设定与问题边界
 
@@ -385,6 +391,8 @@ GS‑CLIP 在零样本 3D 异常检测知识库中的定位如下：
 - **技术路线**：属于“CLIP 驱动的零样本工业异常检测”这一研究脉络，将 2D 视觉-语言模型的开放词汇能力拓展至 3D 领域。
 - **核心贡献**：首次在文本提示中显式注入从点云提取的三维几何先验（全局形状 + 局部缺陷），并设计渲染图-深度图协同融合架构，实现了对几何结构异常的语义感知。
 - **与上下游关系**：上游依赖 CLIP 预训练权重和 PointNet++ 点云编码器；下游可服务于工业质检中的零样本缺陷检测、跨品类迁移等应用场景。其几何感知提示生成机制对后续 3D 多模态异常检测研究具有参考价值。
+
+
 
 ## 原文 PDF
 

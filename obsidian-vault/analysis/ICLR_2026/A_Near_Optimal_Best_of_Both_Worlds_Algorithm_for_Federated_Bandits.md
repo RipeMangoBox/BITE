@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/A_Near_Optimal_Best_of_Both_Worlds_Algorithm_for_Federated_Bandits.pdf
+project_link: null
+code_link: null
 aliases:
 - NOBBWAFB
 - FEDFTRL
@@ -40,7 +42,7 @@ claims:
 > - 合成数据集 上，平均累积遗憾 为 FEDFTRL，对比 FEDEXP3, IND-FTRL, GOSSIP UCB, DRBB-bandit，变化 FEDFTRL outperforms all baselines。
 > - MovieLens数据集 上，平均累积遗憾 为 FEDFTRL，对比 FEDEXP3, IND-FTRL, GOSSIP UCB, DRBB-bandit，变化 FEDFTRL significantly outperforms all baselines。
 
-## 概述
+## 概要
 
 联邦赌博机（federated bandits）面临的核心瓶颈是：现有算法无法在**随机环境**与**对抗环境**这两种截然不同的损失模式下同时取得近乎最优的遗憾保证，即缺乏“两全其美”（Best-of-Both-Worlds, BOBW）特性。本文提出的 **FEDFTRL** 算法是首个解决该问题的方案。
 
@@ -50,7 +52,7 @@ claims:
 
 **主要结果**：理论分析给出了个体伪遗憾的严格上界（Theorem 1），实验在三种通信网络拓扑（完全图、网格图、RGG-0.5）上均显示 FEDFTRL 显著优于基线，且对拓扑参数 $C_t^P$ 的选择具有鲁棒性。
 
-## 背景与动机
+
 
 联邦赌博机（Federated Bandits）是分布式学习中的一个重要设定：V个智能体通过一个连通无向图进行通信，协作求解一个K臂赌博机问题。每个智能体在每轮独立选择臂并观测损失，目标是使所有智能体的个体后悔（相对于全局最优臂的期望累积损失差）尽可能小。然而，现有联邦赌博机算法在设计时通常只针对单一环境假设——要么假设损失由固定分布生成（随机环境），要么假设损失由对手自适应选择（对抗环境）。这就引出了核心瓶颈：**缺乏一种能在随机和对抗两种环境下同时取得近乎最优后悔保证的“两全其美”（Best-of-Both-Worlds, BOBW）算法**。
 
@@ -58,7 +60,9 @@ claims:
 
 本文的动机正是填补这一缺口。核心洞察在于：**将去中心化通信带来的信息延迟显式建模为反馈延迟**，从而将联邦赌博机问题转化为一个带延迟的、具有特殊网络结构的赌博机问题。基于此，作者提出了FEDFTRL算法，其关键因果机制包括：(1) 采用**混合正则化器**（hybrid regularizer），结合Tsallis-INF和负熵正则化，这是BOBW单智能体算法（Zimmert & Seldin, 2020）的核心技术；(2) 引入**截断损失估计器**（truncated loss estimator），通过分母截断防止罕见臂的估计值爆炸，从而在分布式通信下维持各智能体动作概率的近似一致；(3) 设计**偏差记录与传播机制**，通过交换累积损失估计器和偏差记录集来修正截断引入的偏差，确保全局一致性。这一设计使得FEDFTRL成为首个在联邦赌博机中实现BOBW后悔保证的方法，在对抗环境下达到 $O(\sqrt{KT/V} + \sqrt{C_T^P T \log K})$ 的个体后悔界（优于先前工作的 $O(T^{2/3})$），在随机环境下达到 $O(\sum_{k\neq k^*} \log T / (V \Delta_k))$，匹配下界。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FEDFTRL 的核心创新在于解决了联邦赌博机中一个根本性的瓶颈：现有算法无法同时在随机环境和对抗环境下取得近乎最优的遗憾保证。该工作通过三个关键的设计变更实现了这一“两全其美”（BOBW）的目标。
 
@@ -78,7 +82,7 @@ FEDFTRL 的核心创新在于解决了联邦赌博机中一个根本性的瓶颈
 
 **失败模式与局限性**：该方法的假设限制了其适用范围：（1）要求存在唯一最优臂 $k^*$，未处理多最优臂场景；（2）通信图 $G$ 需为简单连通无向图，且通信矩阵 $P$ 需为双随机矩阵，这在动态或未知拓扑下不可用；（3）对抗环境下的遗憾界与下界之间仍存在差距（如 log 因子和网络拓扑依赖项），表明该方向的 BOBO 保证尚未达到信息论下界。
 
-## 整体框架
+
 
 FEDFTRL的整体框架围绕一个核心洞察构建：将联邦学习中的去中心化通信延迟建模为赌博机问题中的反馈延迟，从而将联邦赌博机问题转化为带延迟的赌博机问题。这一视角转换使得FEDFTRL能够利用FTRL（Follow-the-Regularized-Leader）框架和混合正则化器，同时处理随机环境和对抗环境。
 
@@ -98,7 +102,7 @@ FEDFTRL的整体框架围绕一个核心洞察构建：将联邦学习中的去�
 
 **模块间的因果机制**：截断损失估计器防止罕见臂的估计值爆炸 → 保持各智能体动作概率的近似一致（Lemma 1保证任意两智能体的概率比不超过3/2）→ 使得FTRL分析中的Bregman散度项可控 → 最终实现两种环境下的统一最优性。通信延迟参数 $C_t^P$ 则通过影响截断阈值和学习率，将网络拓扑的复杂性吸收到遗憾界中。
 
-## 核心模块与公式推导
+
 
 FEDFTRL 的核心设计围绕三个关键模块展开：**混合正则化器**、**截断损失估计器**以及**基于延迟反馈的通信建模**。这三者协同工作，将联邦多智能体问题转化为带延迟的赌博机问题，从而在随机和对抗环境下同时获得近乎最优的遗憾保证。
 
@@ -157,7 +161,9 @@ $$R_T(v) \leq \sum_{k\neq k^*} \frac{51\log T}{V\Delta_k} + \sum_{k\neq k^*} \fr
 
 **证据强度说明**：上述公式均直接取自论文第 4 节和 Theorem 1，置信度 1.0。学习率调度的具体数值（如 $169 V^2 D$ 中的常数 169）来自附录中 Lemma 1-8 的推导，但此处仅展示其结构形式，不推断未给出的推导细节。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ![[assets/figures/papers/iclr26_0003_Lkndkxeemx_A_Near-Optimal_Best-of-Both-Worlds_Algorithm_for/figures/001_Table_1.jpg]]
 *Table 1: Overview of best-known regret bounds for federated bandits. Here, P denotes the doubly stochastic communication matrix over the network G , and $\sigma _ { 2 }$ ( P ) is its second-largest singular value. We define $\begin{array} { r } { C _ { T } ^ { P } : = \frac { \operatorname* { m i n } \{ \log ( V T ) , \sqrt { V } \} } { 1 - \sigma _ { 2 } ( P ) } + 2 + D } \end{array}$ , where D is the diameter of G , capturing the dependence on the network topology. Let M denote the Laplacian matrix of G ; $\lambda _ { 2 }$ ( M ) is its second-smallest eigenvalue, and $d _ { \mathrm { m a x } }$ is the maximum node degree in G
@@ -192,7 +198,9 @@ FEDFTRL成功的因果机制在于两个关键设计：
 
 **结论**：FEDFTRL通过截断估计器和混合正则化器，成功将联邦学习中的通信延迟转化为可处理的反馈延迟，首次在联邦赌博机中实现了理论与实验上的“两全其美”保证。其近乎最优的遗憾界和鲁棒的实验表现确立了新的基线，但理论差距和假设限制指明了未来工作的关键方向。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -226,6 +234,8 @@ FEDFTRL的有效性依赖于一组明确的假设条件：
 - 如何进一步缩小对抗环境下遗憾上界与下界之间的差距？当前分析中的常数项和$\log$因子可能通过更精细的证明技术（如改进的Bregman散度分析）得到优化。
 
 **需手动验证的点**：FEDFTRL在对抗环境下的遗憾界与下界之间的具体差距量级（如$\log K$因子的指数）需要查阅最新的信息论下界结果进行确认，本文未提供明确的下界表达式。
+
+
 
 ## 原文 PDF
 

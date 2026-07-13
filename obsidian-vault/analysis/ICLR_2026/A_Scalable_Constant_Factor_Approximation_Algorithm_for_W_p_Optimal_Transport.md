@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/A_Scalable_Constant_Factor_Approximation_Algorithm_for_W_p_Optimal_Transport.pdf
+project_link: null
+code_link: null
 aliases:
 - SWP
 - SCFAAWPOT
@@ -41,7 +43,7 @@ claims:
 > - MNIST 数据集 (p=2) 上，近似比 为 接近 2（平均），对比 理论最坏情况 (4+ε)，变化 远优于理论界。
 > - 均匀分布数据 上，近似比 为 接近 2（平均），对比 理论最坏情况 (4+ε)，变化 远优于理论界。
 
-## 概述
+## 概要
 
 本文提出了一种可扩展的常数因子近似算法，用于计算任意有限度量空间上 $W_p$ 最优传输（Optimal Transport, OT）问题。该问题的核心瓶颈在于：现有相对近似算法在任意度量空间下仅能达到 $O(\log n)$ 的近似比，且无法处理 $p = \infty$ 的情况；而精确算法或高精度近似算法（如 Sinkhorn）在 $p$ 较大时效率低下或无法扩展。
 
@@ -56,7 +58,7 @@ claims:
 
 **局限性**：算法为 Las Vegas 随机化算法，存在小概率失败可能；运行时间依赖于点集 spread $\Delta$ 的对数；对于 $p = \infty$，条件性下界表明近似比 2 以下无法在 $O(n^2)$ 时间内实现（除非解决二分图完美匹配的长期开放问题）。
 
-## 背景与动机
+
 
 最优传输（Optimal Transport, OT）问题旨在寻找两个概率分布间的最小成本运输方案。在离散设定下，给定两个大小均为 $n$ 的点集 $A$ 和 $B$（代表支撑集），以及一个度量空间 $(\mathcal{X}, \mathsf{d})$，$W_p$ 最优传输计划 $\sigma$ 的成本定义为：
 
@@ -82,7 +84,9 @@ $$w_p(\sigma) := \left( \sum_{a \in A, b \in B} \sigma(a,b) \times \mathsf{d}(a,
 
 **一个重要的条件性下界**：Theorem 1.4 指出，若存在 $O(n^2)$ 时间的 $(2-\varepsilon)$-相对近似算法用于 $W_\infty$ 匹配，则可解决二分图完美匹配的长期开放问题（即是否存在 $O(n^2)$ 时间的完美匹配算法）。这暗示了本文的近似比在 $p = \infty$ 时可能接近最优。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心瓶颈在于：现有 $W_p$ 最优传输算法在任意度量空间下仅能达到 $O(\log n)$ 近似比，且无法处理 $p = \infty$ 的情况；同时，精确算法或高精度近似算法（如 Sinkhorn）在 $p$ 较大时效率低下或无法扩展。针对这一瓶颈，本文的关键因果旋钮是通过 Bourgain 多级采样构造有向 spanner，将 $\mathsf{d}(\cdot,\cdot)^p$ 的近似问题转化为有向图中的最短路径问题，从而绕过 $\mathsf{d}(\cdot,\cdot)^p$ 不满足三角不等式的困难。
 
@@ -102,7 +106,7 @@ $$w_p(\sigma) := \left( \sum_{a \in A, b \in B} \sigma(a,b) \times \mathsf{d}(a,
 
 **条件性下界**（Theorem 1.4）表明：对于 $p = \infty$，若存在 $O(n^2)$ 时间的 $(2-\varepsilon)$-相对近似算法，则可解决二分图完美匹配的长期开放问题。这一结果将本文的近似比改进空间与一个公开难题联系起来。
 
-## 整体框架
+
 
 该算法的核心 pipeline 围绕“构造有向 spanner → 稀疏图上的最小费用流（或组合匹配）求解”展开，旨在将 $W_p$ 最优传输问题转化为一个可在近线性时间内求解的图问题。整个流程的瓶颈在于如何绕过 $\\mathsf{d}(\\cdot,\\cdot)^p$ 不满足三角不等式的困难，从而获得常数因子近似。
 
@@ -130,7 +134,7 @@ $$w_p(\sigma) := \left( \sum_{a \in A, b \in B} \sigma(a,b) \times \mathsf{d}(a,
 - 运行时间依赖于点集 spread $\\Delta$ 的对数，当 $\\Delta$ 极大时（如指数级），$\\log \\Delta$ 项可能成为瓶颈。
 - 对于 $p = \\infty$，论文证明了在 $O(n^2)$ 时间内实现 $(2-\\varepsilon)$-相对近似会解决一个长期开放的二分图完美匹配问题（Theorem 1.4），这构成了该问题在二次时间内的近似下界。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化与瓶颈
 
@@ -211,7 +215,9 @@ $$s(a,b) = \begin{cases} 0, & \mathrm{if~} (a,b) \in M, \\ \widehat{c}(a,b) - y(
 - **匹配版本**：时间复杂度 $O(n^2 \varepsilon^{-3/2} \log^2 n \log \Delta)$，近似比 $(4+\varepsilon)$（Theorem 1.3）。
 - **$p = \infty$ 条件性下界**：若存在 $O(n^2)$ 时间的 $(2-\varepsilon)$-相对近似算法，则可解决二分图完美匹配的长期开放问题（Theorem 1.4）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果与近似比验证
 
@@ -240,7 +246,9 @@ $$s(a,b) = \begin{cases} 0, & \mathrm{if~} (a,b) \in M, \\ \widehat{c}(a,b) - y(
 - **Figure 1f** 提供了与先前最优基线（HST 嵌入）的直接对比，定量展示了有向 spanner 在成本近似上的显著优势。
 - **Figure 1a/b 和 Figure 2** 共同构成主结果验证，三个不同分布上的一致表现增强了结论的稳健性。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与 Baseline / Follow-up 的关系
 
@@ -271,6 +279,8 @@ $$s(a,b) = \begin{cases} 0, & \mathrm{if~} (a,b) \in M, \\ \widehat{c}(a,b) - y(
 2. **$W_\infty$ 的精细复杂度**：是否存在 $O(n^2)$ 时间的 $(2-\varepsilon)$-相对近似算法用于 $W_\infty$ 匹配？这等价于解决二分图完美匹配的长期开放问题。
 3. **连续分布扩展**：能否将算法扩展到连续分布或非离散支撑集？
 4. **亚二次时间可行性**：能否在更弱的假设（如低倍率 doubling 度量空间）下实现亚二次时间？
+
+
 
 ## 原文 PDF
 

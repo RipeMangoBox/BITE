@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Semi_Supervised_Preference_Optimization_with_Limited_Feedback.pdf
+project_link: null
+code_link: https://github.com/MLAI-Yonsei/SSPO
 openreview_forum_id: ghwxbTx7do
 aliases:
 - SSPOS
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 有限反馈下的半监督偏好优化 |
 | 英文题名 | Semi-Supervised Preference Optimization with Limited Feedback |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=ghwxbTx7do); [GitHub](https://github.com/MLAI-Yonsei/SSPO) |
+| Links | [paper](https://openreview.net/forum?id=ghwxbTx7do) · [GitHub](https://github.com/MLAI-Yonsei/SSPO) |
 | Topic | #topic/optimization_theory_probabilistic #topic/optimization_theory_probabilistic/optimization_methods |
 | Method | Semi-Supervised Preference Optimization (SSPO) |
 | Dataset | UltraFeedback (AlpacaEval2.0) |
@@ -41,7 +43,7 @@ claims:
 > - UltraFeedback (AlpacaEval2.0) 上，LC (Length-Controlled Win Rate) 为 19.1%，对比 18.8% (KTO 10%)，变化 +0.3%。
 > - UltraFeedback (AlpacaEval2.0) 上，WR (Raw Win Rate) 为 18.7%，对比 16.4% (KTO 10%)，变化 +2.3%。
 
-## 概述
+## 概要
 
 偏好优化是当前大语言模型对齐的核心技术，但其对大规模人工标注配对数据的依赖构成了关键瓶颈——数据获取成本高昂，领域扩展困难。现有方法如DPO、SimPO等仅能利用有限的配对比较数据，而大量未配对的响应数据（如监督微调数据）因缺乏偏好标签被直接丢弃，限制了泛化能力和数据效率。
 
@@ -49,7 +51,7 @@ claims:
 
 实验表明，SSPO在数据极度稀缺的场景下展现出显著优势。在仅有10个配对数据的玩具实验中，SSPO的测试准确率始终超过DPO、ORPO、SimPO等基线（Table 1）。在使用仅1% UltraFeedback训练Mistral-7B时，SSPO的AlpacaEval2.0长度控制胜率达到19.1%，超过使用10%数据训练的最强基线KTO的18.8%（Table 2），以1%的数据量实现了超越10%数据量基线的性能。
 
-## 背景与动机
+
 
 大语言模型的对齐训练通常依赖人类偏好标注的配对比较数据。现有偏好优化方法（如 DPO、SimPO、ORPO）直接在这类配对数据上优化策略模型，其性能高度依赖于配对数据的规模与质量。然而，获取大规模高质量人工偏好标注的成本极为高昂，严重制约了偏好优化方法在更广泛领域中的扩展与应用。这一瓶颈的本质在于：**偏好优化对大规模人工标注配对数据的依赖，导致数据获取成本高昂、领域扩展困难**。
 
@@ -57,7 +59,9 @@ claims:
 
 SSPO 的核心动机正是打破这一限制：**将偏好对齐重构为贝叶斯最优分类问题，通过奖励阈值在奖励空间中分离胜败响应，从而为未配对数据提供理论上有依据的伪标签**。具体而言，SSPO 利用在少量配对数据上训练得到的奖励函数，通过贝叶斯风险最小化确定一个动态奖励阈值，将高于阈值的未配对响应标记为“伪胜出”，低于阈值的标记为“伪失败”，从而将大量未配对数据转化为可用的伪配对训练信号。这一框架使得策略模型能够同时从有限的精确标注和大量自动标注的数据中学习，在保持标注效率的同时显著提升对齐质量。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SSPO 的核心创新在于将偏好优化重新构建为**贝叶斯最优分类问题**，从而为大量未配对数据提供理论上可论证的伪标签策略。这一重构带来了三个关键的 changed slots，使其在有限配对数据场景下显著超越现有基线。
 
@@ -91,7 +95,7 @@ $$\mathcal { L } ( f _ { \theta } ) = \gamma ^ { \prime } \cdot R _ { D _ { L } 
 
 这三个 changed slots 形成了一条完整的因果链：**分类视角** → **阈值伪标签** → **课程联合优化**。其效果在极端数据稀缺场景下尤为突出：使用仅 1% UltraFeedback 训练 Mistral-7B 时，SSPO 的 AlpacaEval2.0 长度控制胜率（LC）达到 19.1%，超过使用 10% 数据训练的最强基线 KTO 的 18.8%（Table 2）。在仅有 10 个配对数据的玩具实验中，SSPO 的测试准确率（0.757）也显著优于 SimPO（0.647）和 DPO（0.618）（Table 1），验证了伪标签策略在数据稀缺时的有效性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0009_ghwxbTx7do_Semi-Supervised_Preference_Optimization_with_Lim/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the SSPO framework. Existing preference optimization methods, such as DPO and SimPO, rely solely on a limited number of human-labeled comparisons. These methods discard abundant unpaired responses (e.g., supervised fine-tuning data) due to the lack of preference labels, which hinders generalization and data efficiency. SSPO leverages a reward function trained on labeled comparisons to assign pseudo-labels to unpaired responses. Responses above a learned threshold are treated as (pseudo) winning, and those below as (pseudo) losing. Hence, the policy model optimizes the reward threshold using both labeled and pseudo-labeled data, thereby improving alignment quality and generalizat...*
@@ -116,7 +120,7 @@ SSPO 将偏好对齐重构为一个贝叶斯最优分类问题，其核心 pipel
 
 **瓶颈与因果机制**：传统偏好优化方法（DPO、SimPO 等）仅使用配对数据 $D_L$，丢弃了大量未配对响应，在标注数据稀缺时泛化能力受限。SSPO 的关键因果杠杆在于：利用配对数据训练出的奖励函数在奖励空间中分离胜败分布，从而为未配对数据提供有理论依据的伪标签，将数据效率的瓶颈从“标注量”转移到“奖励分布的可分离性”上。
 
-## 核心模块与公式推导
+
 
 SSPO 将偏好优化重构为贝叶斯最优分类问题，其核心由六个模块串联：奖励计算、统计量更新、阈值估计、伪标签分配、损失计算与自适应加权。整个流程的数学基础建立在 Bradley-Terry 偏好分类器之上。
 
@@ -184,7 +188,9 @@ $$\mathcal { L } ( f _ { \theta } ) = \gamma ^ { \prime } \cdot R _ { D _ { L } 
 
 其中 $\tau$ 为训练步数，$\gamma_0 = 1$，$\lambda$ 为衰减率。调度器 $\gamma'$ 从 1 指数衰减至 $\gamma_{\min}$，实现课程学习动态：训练初期 $\gamma' \approx 1$，模型主要从高质量人工标注的配对数据学习，建立可靠的奖励函数；随着训练推进，$\gamma'$ 减小，模型逐步纳入伪标签化的未配对数据，扩大有效训练规模。消融实验（Table 4）表明，该自适应调度器是 SSPO 性能的关键——固定 $\gamma' = 0.1$ 时 Mistral 在 1% 数据上的 LC 仅为 24.1%，而使用调度器后提升至 26.7%。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 玩具实验：数据稀缺下的性能优势
 
@@ -242,7 +248,9 @@ Table 5和Table 14的案例研究表明，SSPO不仅从伪标签中获得偏好�
 2. **未覆盖所有领域**：实验仅限于UltraFeedback、UltraMedical和DSP Business三个数据集，在其他领域（如代码、数学推理）的有效性需手动验证。
 3. **未验证多模态场景**：所有实验均为文本偏好对齐，方法在多模态或复杂多轮对话中的表现未经验证。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 在偏好优化方法谱系中的位置
 
@@ -287,6 +295,8 @@ $$r_{\theta}(x, y) = \frac{\beta}{|y|} \log \pi_{\theta}(y \mid x)$$
 - **多轮与多模态扩展**：Bradley-Terry 分类框架能否自然扩展到多轮对话偏好或多模态对齐任务？奖励空间的分离假设在这些场景下是否仍然成立？
 - **伪标签置信度建模**：当前伪标签是硬分配（高于阈值为胜，低于为败）。能否引入软标签或置信度加权机制，更精细地建模伪标签的不确定性，进一步降低噪声影响？
 - **与 SFT 的深度融合**：Table 10 显示 SSPO 优于 DPO+SFT 和 SimPO+SFT 的简单组合。能否在统一框架内更紧密地融合监督微调和偏好优化的目标？
+
+
 
 ## 原文 PDF
 

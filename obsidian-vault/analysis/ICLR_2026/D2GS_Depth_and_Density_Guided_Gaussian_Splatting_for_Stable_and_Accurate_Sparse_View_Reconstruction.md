@@ -42,7 +42,7 @@ claims:
 > - LLFF (3-view, 1/4分辨率) 上，PSNR 20.56 vs 20.01 (DropGaussian) (+0.55 dB)。
 > - MipNeRF360 (12-view) 上，PSNR 20.09 vs 19.74 (DropGaussian) (+0.35 dB)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -76,7 +76,7 @@ D²GS 建立在 3DGS（Kerbl et al., 2023）的基础框架之上，与现有稀
 
 DD-Drop 仍需手工设定的深度阈值和固定权重系数，可能无法充分捕捉复杂场景的特异性先验。IMR 指标仅关注模型间一致性，尚未考虑动态视图合成下的感知稳定性。值得探索的方向包括：自适应 Dropout 调度策略替代手工深度阈值、可学习的监督掩码改善场景特异性、以及面向动态视图合成的感知时间稳定性指标。
 
-## 背景与动机
+
 
 ### 稀疏视图重建的核心矛盾
 
@@ -104,7 +104,9 @@ D$^2$GS的核心动机源于一个关键观察：**高斯原语的过程与不�
 
 此外，稀疏视图下3DGS训练的随机性导致不同训练轮次之间渲染质量高度不一致（Figure 3左），现有图像域指标（PSNR/SSIM/LPIPS）无法捕捉这种模型间的不稳定性。为此，D$^2$GS提出基于高斯混合分布间Wasserstein距离的**模型间鲁棒性指标（IMR）**，从几何一致性角度量化重建的可靠性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 D$^2$GS 针对稀疏视图下 3DGS 的过拟合与欠拟合并存问题，提出了三个相互协同的关键创新，构成一个完整的“抑制–增强–评估”闭环。
 
@@ -158,7 +160,7 @@ $$\mathrm{IMR} = \ln\left(\frac{\sum_{1 \leq i < j \leq N} S_{ij}^2}{\sum_{1 \le
 
 三个创新形成因果闭环：**DD-Drop 抑制近场过拟合（减），DAFE 增强远场监督（加），IMR 量化模型间鲁棒性（评）**。相较于 DropGaussian 的均匀随机 Dropout 和现有方法的无差别损失，D$^2$GS 首次将深度与密度信息同时编码为 Dropout 的先验引导和损失的空间权重，实现了稀疏视图下高斯原语分布的显式结构调控。
 
-## 整体框架
+
 
 D$^2$GS 的整体流程以稀疏视图图像为输入，首先通过 Structure-from-Motion（SfM）从输入图像中提取初始点云与相机位姿。随后，该初始点云被送入一个包含两个核心模块的 3DGS 训练管线中：**深度与密度引导的自适应 Dropout（DD-Drop）** 模块和**距离感知保真度增强（DAFE）** 模块。DD-Drop 模块在训练过程中根据每个高斯原语的局部密度和相机距离计算 Dropout 分数，自适应地移除近场区域中冗余的高斯原语，以抑制过拟合；DAFE 模块则利用单目深度估计器预测的深度图生成远场掩码，对远场区域施加额外的 L1 损失，从而增强欠拟合区域的监督信号。训练完成后，D$^2$GS 还引入了一个**模型间鲁棒性指标（IMR）**，通过将独立训练的多个 3DGS 模型抽象为高斯混合分布，并计算它们之间的 Wasserstein 距离来量化模型在稀疏视图条件下的训练稳定性和一致性。整个框架的输入输出流和模块关系如 Figure 2 所示。
 
@@ -209,7 +211,7 @@ $$\mathrm{IMR} = \ln\left(\frac{\sum_{1 \leq i < j \leq N} S_{ij}^2}{\sum_{1 \le
 
 IMR 值越低，表明多次独立训练得到的模型在几何结构上越一致，即模型鲁棒性越强。
 
-## 核心模块与公式推导
+
 
 ### 深度与密度引导的自适应Dropout（DD-Drop）
 
@@ -279,7 +281,9 @@ $$\mathrm{IMR} = \ln\left(\frac{\sum_{1 \leq i < j \leq N} S_{ij}^2}{\sum_{1 \le
 ![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_7yvz93kBw9/figures/003_Figure_3.jpg]]
 *Figure 3: Left: The instability phenomenon of the previous method. PSNR fluctuates significantly across different training rounds, and the quality of the rendered images is highly inconsistent. Right: Calculation procedure of the IMR. The Gaussian point clouds are abstracted as Gaussian mixture distributions, and the 2-Wasserstein Distance and Optimal Transport are used*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 瓶颈验证：稀疏视图下的过拟合与欠拟合
 
@@ -343,7 +347,9 @@ D²GS的核心动机源自对3DGS在稀疏视图下失败模式的精确诊断�
 ![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_7yvz93kBw9/figures/012_Table_8.jpg]]
 *Table 8: Performance comparisons of sparse-view synthesis on LLFF dataset (Mildenhall et al., 2019) with 6-view and MipNeRF360 dataset (Barron et al., 2022) with 24-view*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位与核心瓶颈
 
@@ -397,6 +403,8 @@ D²GS 的适用边界受以下因素约束：
 3. **感知时间稳定性指标**：能否开发考虑感知时间稳定性的鲁棒性指标，用于动态视图合成场景？IMR 的 Wasserstein 距离框架可扩展至时序高斯分布序列，衡量模型在相邻帧间的输出一致性。
 
 4. **与伪视图方法的深度融合**：DD-Drop 和 DAFE 目前仅利用输入视图的深度信息。结合 FSGS 或 CoR-GS 生成的伪视图深度，能否在更极端的稀疏设置（如 2 视图）下维持重建质量？
+
+
 
 ## 原文 PDF
 

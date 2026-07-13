@@ -43,7 +43,7 @@ claims:
 > - UCM-Captions 上，BLEU-4 / METEOR / CIDEr 73.8。
 > - Sydney-Captions 上，BLEU-4 / METEOR / CIDEr 128.3。
 
-## 概述
+## 概要
 
 GeoDiT 将地理空间视觉语言生成从传统的自回归顺序范式重构为基于扩散模型的并行迭代去噪过程。其核心动机在于：自回归模型按顺序逐token生成的方式与地理空间数据固有的并行、非叙事结构存在根本性错位——线性生成过程无法在产生具体细节前先建立全局场景构成（如主要物体、数量和布局），导致在需要结构化输出的任务中出现系统性失败：描述时过早锚定到首个显著实体而无法平衡地整合其他概念，检测时因路径依赖产生冗余边界框而非系统性地扫描所有物体。
 
@@ -51,7 +51,7 @@ GeoDiT 的因果调控机制是将生成范式从单向因果Transformer切换�
 
 实验表明，GeoDiT 在对象中心指标 CIDEr 上显著且一致地优于所有自回归基线（如 **GeoChat** (Kuckreja et al., CVPR 2024)、**VHM** (Pang et al., AAAI 2025)、**EarthDial** (Soni et al., CVPR 2025) 及通用模型 **Qwen2.5-VL** (Bai et al., 2025)），在 RSICD 上 CIDEr 达到 135.6。消融研究进一步揭示，低置信度重掩码策略相比随机掩码带来 13.8 点 CIDEr 增益，推理迭代步数从 1 增至 8 使 CIDEr 从 65.8 飙升至 135.6、目标检测 mAP@0.5 从 7.5 升至 21.1，而场景分类性能早进入平台期，验证了迭代并行细化对结构化输出的必要性。在视觉定位（DIOR-RSVG Acc@0.5 达 63.7）和视觉问答（RSVQA-LR Rural 准确率 98.1）等任务上同样取得领先结果。
 
-## 背景与动机
+
 
 遥感图像理解正经历从单一场景分类向多模态视觉-语言交互的范式跃迁。构建能够同时完成图像描述、视觉定位、目标检测和问答的通用遥感视觉语言模型（RS-VLM），已成为地球观测智能化的核心诉求。然而，现有RS-VLM几乎无一例外地沿用了自然语言处理领域的自回归生成范式——模型按从左到右的顺序逐token生成文本输出。
 
@@ -65,7 +65,9 @@ GeoDiT 的因果调控机制是将生成范式从单向因果Transformer切换�
 
 GeoDiT的核心动机正是打破这一桎梏：将地理空间语言生成从自回归顺序范式重构为基于扩散模型的并行迭代去噪过程。如图Figure 1c所示，该范式以完全掩码的模板为起点，在多个离散时间步内对所有语义单元（词语、坐标）同时进行预测与低置信度重掩码细化，从而在生成之初就建立了全局一致的语义场，实现了由粗到细的结构化合成。这一根本性的范式转换，使得生成过程与地球观测数据内在的并行、空间离散特性相匹配，为在对象为中心的结构化输出上超越自回归范式提供了可能。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GeoDiT的核心创新在于将地理空间视觉语言生成从**自回归顺序范式**根本性地重构为**离散扩散并行迭代去噪范式**。这一转变并非简单的架构替换，而是针对遥感图像理解任务中自回归模型的结构性缺陷所设计的系统性解决方案。
 
@@ -102,7 +104,7 @@ GeoDiT采用两阶段训练策略，区别于自回归模型的单阶段微调�
 
 此外，迭代步数N从1增至8时，CIDEr从65.8飙升至135.6，目标检测mAP@0.5从7.5升至21.1，而场景分类准确率在N=1时已达76.5%并快速进入平台期（Table 6），这揭示了迭代并行细化**主要提升结构化输出质量**，对简单分类任务增益有限——这一现象直接验证了扩散范式对自回归模型瓶颈的针对性突破。
 
-## 整体框架
+
 
 GeoDiT 将地理空间语言生成从传统的自回归顺序范式重构为**多模态条件下的离散扩散并行去噪过程**。其整体框架由三个核心模块串联构成，形成一条从视觉感知到结构化文本输出的完整流水线。
 
@@ -141,7 +143,7 @@ GeoDiT 采用**两阶段训练策略**，与自回归模型形成根本性区别
 ![[assets/figures/papers/paper_list_l2314_https_arxiv_org_abs_2512_02505/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the GeoDiT framework, illustrating the (a) training and (b) inference procedures. (a) During training, GeoDiT is optimized with a mask-and-predict objective. The model learns to reconstruct the original text from a randomly masked version, conditioned on a prompt and the visual features from a SigLIP-2 encoder. This follows a two-stage strategy: initial vision-language alignment by training only the MLP projector (Stage I), followed by end-to-end instruction tuning of the entire model (Stage II). (b) Inference is a non-autoregressive, iterative refinement process. Starting from a fully masked template, the model repeatedly predicts the full sequence and then applies a low-confid...*
 
-## 核心模块与公式推导
+
 
 GeoDiT 的核心架构由三个紧密协作的模块构成：视觉编码器、模态投影器与扩散生成核心。其设计目标是将遥感图像的结构化文本生成任务转化为一个多模态条件约束下的离散扩散去噪问题。
 
@@ -196,7 +198,9 @@ $$\hat{T}_0 = \underset{T_0'}{\mathrm{argmax}} p_\theta(T_0' | T_{t_k}, C_v)$$
 ![[assets/figures/papers/paper_list_l2314_https_arxiv_org_abs_2512_02505/figures/008_Figure_5.jpg]]
 *Figure 5: Visualization of the hierarchical generation process of GeoDiT. The color of each token corresponds to its relative finalization step during the iterative inference process: yellow indicates early-stage tokens, pink indicates middle-stage tokens, and blue indicates late-stage tokens*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验配置
 
@@ -249,7 +253,9 @@ Figure 5通过颜色编码展示了GeoDiT的层次化生成过程：黄色表示
 ![[assets/figures/papers/paper_list_l2314_https_arxiv_org_abs_2512_02505/figures/010_Table_6.jpg]]
 *Table 6: Ablation on inference timesteps (N). Performance saturates at N = 128, offering the optimal trade-off between generation quality and computational cost for structured outputs*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 范式谱系：从对比学习到自回归再到扩散生成
 
@@ -304,6 +310,8 @@ GeoDiT 的适用边界由以下因素界定：
 4. **多模态融合深度**：当前视觉条件通过 MLP 投影器以 prefix 形式注入，未探索更深层的交叉注意力融合。更紧密的视觉-语言交互能否进一步提升细粒度地理空间理解？
 
 5. **与最新自回归模型的公平对比**：论文对比的自回归基线（GeoChat、VHM、EarthDial）并非同期最新最强模型。与更大规模或更强训练策略的自回归 RS-VLM 的公平对比，将更准确地刻画两种范式的性能边界。
+
+
 
 ## 原文 PDF
 

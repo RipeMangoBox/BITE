@@ -43,15 +43,13 @@ claims:
 > - 4D Generation (User Study) 上，Alignment ↑ (%) 81.43 vs 5.95 (PhysDreamer) (+75.48)；Realism ↑ (%) 83.33 vs 6.67 (AnimateAnyMesh) (+76.66)。
 > - VBench 上，Aesthetic Quality (AQ) ↑ 0.483 vs 0.450 (AnimateAnyMesh) (+0.033)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有4D动态生成方法普遍依赖特定类别的物理模型与系统辨识，缺乏一种通用的、可学习的运动学状态参数化，严重制约了跨类别泛化与可扩展性。
 
 **核心方法**：本文提出**NEUROK（Neural Object Kinematics）**——一种数据驱动的神经对象运动学参数化。其核心思想是将对象的变形空间建模为一个条件变分自编码器（cVAE）学习到的低维潜在流形，并将该流形作为拉格朗日力学中的广义坐标。该框架仅需4D几何轨迹作为监督，无需任何物理参数或动作标注，依赖的唯一归纳偏置是“对象的变形空间是低维的”，使其能够广泛适用于弹性体、布料、连续体及多体对象等多种动态对象类型。
 
 **关键结论**：在PartNet-Mobility数据集上，NEUROK在逆运动学重建任务中以Chamfer L1 0.028（对比最优基线KeyPointDeformer的0.067）和IoU 0.764（对比0.570）显著超越现有方法。在4D生成用户研究中，NEUROK在Alignment（81.43%）和Realism（83.33%）指标上均以压倒性优势领先所有基线（最高基线分别仅5.95%和6.67%）。此外，该方法在能量守恒分析和未见类别泛化实验中均展现出优异的物理一致性与通用性。
-
-## 背景与动机
 
 ### 问题背景：静态3D资产的4D动态生成
 
@@ -99,7 +97,7 @@ claims:
 
 如图2所示，NEUROK在符号化参数化（简洁但不可从逆问题中获取）和几何参数化（可获取但冗余）之间建立了一座桥梁——通过学习得到的神经参数化，同时实现了紧凑性和可获取性。
 
-## 核心创新
+## 核心方法与创新机理
 
 NEUROK 的核心创新在于将对象运动学状态参数化从传统的**几何派生**或**符号定义**范式，转变为一种**数据驱动的、可学习的神经潜在空间**，并以此作为拉格朗日力学中的广义坐标，从而构建了一个无需物理注释、类别先验极少的通用4D动态生成框架。这一转变体现在以下四个关键环节。
 
@@ -146,8 +144,6 @@ $$\mathcal{L} = ||\delta_{\mathrm{sample}} - \delta_{\mathrm{pred}}||_2^2 + \lam
 
 这四项创新相互耦合、层层递进：神经潜在空间提供了紧凑且可学习的广义坐标；拉格朗日力学在此坐标上实现了类别无关的物理模拟；自监督训练使得大规模学习成为可能；最小归纳偏置则保障了跨类别泛化。三者共同构成了一个**从数据中自动发现运动学结构、在潜在空间中模拟物理动态**的通用框架。
 
-## 整体框架
-
 NEUROK 的整体框架围绕一个核心抽象展开：**将对象运动学状态参数化建模为从数据中学习到的低维潜在流形**。这一抽象将传统的几何派生或符号化状态表示替换为可学习的神经参数化，使得框架能够以最小的归纳偏置（仅假设对象变形空间是低维的）统一处理弹性体、布料、连续体和多体对象等多种动态类型。
 
 ### 框架总览
@@ -191,8 +187,6 @@ $$m G(\mathbf{z}) \ddot{\mathbf{z}} + C(\mathbf{z}, \dot{\mathbf{z}}) + \nabla_{
 
 ![[assets/figures/papers/paper_list_l969_https_openaccess_thecvf_com_content_CVPR2026_html_Geng_NeuROK_Generative/figures/002_Figure_2.jpg]]
 *Figure 2: Kinematic state parameterization. (a) Several kinematic state parameterizations can be used to describe a physical system. The symbolic parameterizations used in classical mechanics are concise yet not accessible in inverse problems. Traditional inverse simulation approaches use geometry-derived parameterizations, yet require dense physical constraints to solve the over-parameterized system. We instead learn low-dimensional parameterizations that are both compact and learnable from data. (b) As formally defined in Def. 1, a kinematic state parameterization studied in this paper is a pair (Z, F) which contains a latent manifold Z and a decoder*
-
-## 核心模块与公式推导
 
 ### 3.1 运动学状态参数化的形式化定义
 
@@ -246,7 +240,7 @@ $$\min_{\mathbf{z}_0, \dot{\mathbf{z}}_0} \|\mathbf{x}_0 - \mathcal{F}(\mathbf{z
 
 第一项确保解码位置与目标位置一致，第二项通过雅可比矩阵 $J_{\mathbf{z}}$ 将潜在速度映射到顶点速度空间，保证运动方向匹配。优化完成后，以 $(\mathbf{z}_0, \dot{\mathbf{z}}_0)$ 为初值求解前述运动方程，即可生成满足边界条件的物理合理动态轨迹。
 
-## 实验与分析
+## 实验与关键发现
 
 本节从逆运动学重建与物理启发的4D生成两个维度验证NEUROK的有效性，并结合消融实验与能量守恒分析揭示各设计选择的贡献与方法的物理合理性。
 
@@ -310,13 +304,10 @@ Figure 7展示了NEUROK在真实扫描物体上的模拟效果。模型能够处
 ![[assets/figures/papers/paper_list_l969_https_openaccess_thecvf_com_content_CVPR2026_html_Geng_NeuROK_Generative/figures/009_Figure_9.jpg]]
 *Figure 9: Generalization on unseen categories. Our model can generalize to novel object categories that are completely not present in the training data*
 
-![[assets/figures/papers/paper_list_l969_https_openaccess_thecvf_com_content_CVPR2026_html_Geng_NeuROK_Generative/figures/012_Figure_7.jpg]]
-*Figure 7: Simulating real objects. Our model can be used to simulate real-captured objects. See the Supp. Mat. for more results*
-
 ![[assets/figures/papers/paper_list_l969_https_openaccess_thecvf_com_content_CVPR2026_html_Geng_NeuROK_Generative/figures/001_Figure_1.jpg]]
 *Figure 1: We present a versatile and scalable framework for generating simulative 4D dynamics of static 3D objects under physical conditions (e.g., forces, actions, velocities). Trained on a large-scale 4D shape dataset without any explicit physical annotations, our method does not rely on any inductive bias of the object’s dynamic structure and therefore can be applied to various types of dynamic objects, ranging from elastic bodies, cloth, and continuum bodies, to multi-body objects. Project page: https://chen-geng.com/neurok*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 核心瓶颈与因果杠杆
 

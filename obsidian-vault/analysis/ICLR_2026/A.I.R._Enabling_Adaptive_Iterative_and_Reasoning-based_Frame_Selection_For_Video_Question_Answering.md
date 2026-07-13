@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/A.I.R._Enabling_Adaptive_Iterative_and_Reasoning-based_Frame_Selection_For_Video_Question_Answering.pdf
+project_link: null
+code_link: null
 aliases:
 - IR
 - IREAIRBFSVQA
@@ -42,7 +44,7 @@ paradigm: 利用强大的VLM进行深度语义分析，但通过迭代循环仅�
 > - LongVideoBench (LVB) 上，Accuracy (%) 为 62.8 (InternVL3-8B + A.I.R.)，对比 58.3 (InternVL3-8B base)，变化 +4.5。
 > - NextQA 上，Accuracy (%) 为 81.3 (QwenVL-2.5 + A.I.R.)，对比 74.3 (QwenVL-2.5 base)，变化 +7.0。
 
-## 概述
+## 概要
 
 视频问答任务通常需要从长视频中筛选出与查询相关的帧。现有方案主要面临两难：轻量级相似度模型（如CLIP）产生的得分尽管计算成本低，但在处理复杂查询时往往无法准确反映帧与查询的真实语义相关性；而直接使用强大的视觉语言模型（VLM）对所有帧进行深度分析则会产生难以承受的计算开销。这一瓶颈的症结在于**帧-查询关系的语义理解深度**与**计算资源分配策略**之间的冲突。
 
@@ -54,7 +56,7 @@ paradigm: 利用强大的VLM进行深度语义分析，但通过迭代循环仅�
 
 通过这种机制，A.I.R. 将 VLM 的分析次数严格控制在由视频长度决定的自适应范围内，既能避免轻量模型的歧义问题，又避免了 VLM 全量分析的计算爆炸。实验表明，在 LongVideoBench 上，InternVL‑3‑8B 结合 A.I.R. 取得了 62.8% 的准确率，较基线提升 4.5%；在 NextQA 上，QwenVL‑2.5 结合 A.I.R. 达到 81.3%，提升 7.0%；在 Video‑MME（无字幕）上，同样模型下亦有 2.6% 的增益，且这些提升均在使用远少于均匀采样的帧数下实现（Tab. 1, Tab. 2, Tab. 4）。消融实验进一步证实，移除迭代框架、推理型 VLM 分析或自适应初始采样均会导致性能显著下降，验证了每一步设计的必要性（Tab. 4）。与其他训练自由的帧选择方法相比，A.I.R. 在多个基准上均表现出更好或相当的性能，且无需任何微调，证明了该框架的有效性与通用性。
 
-## 背景与动机
+### 背景与动机
 
 视频问答（Video QA）要求模型在理解整段视频语义的基础上，针对用户的自然语言问题给出准确答案。一个关键的子任务是**查询相关的帧选择**：从原始视频中找出与当前问题高度相关的少数帧，供后续回答模型使用。这一环节直接决定了回答模型能否“看到”关键信息，因此成为影响整体性能的瓶颈。
 
@@ -73,7 +75,7 @@ A.I.R. 的总体流程（图 2）由三个阶段组成：
 
 这一设计从根本上改变了计算分配方式：分析型 VLM 不再是对全部帧的“暴力穷举”，而是只在最需要的局部区域进行聚焦式推理。后续实验表明，该方法在多个长视频基准（如 LongVideoBench、NextQA、Video-MME）上，能以远少于均匀采样的分析帧数，获得最高 +4.5% ~ +7.0% 的绝对精度提升，验证了其“低成本、高精度”的可行性。
 
-## 核心创新
+## 核心方法与创新机理
 
 A.I.R. 的核心创新在于重新定义了**VLM分析的计算分配策略**与**查询‑帧相关性的语义理解深度**之间的权衡关系。传统方法面临一个根本性瓶颈：轻量相似度模型（如 CLIP）计算廉价但对复杂查询产生不可靠的相关性信号（Figure 1b），而强大的分析VLM虽能进行深度语义推理，但对所有候选帧逐一分析却导致计算成本爆炸（Figure 1c）。A.I.R. 将这一困境转化为可操作的迭代优化问题。
 
@@ -118,12 +120,12 @@ $$\text{Potential}(\text{I}_i) = \underbrace{\text{Mean}(S_{f_i:f_{i+1}})}_{\tex
 
 这些创新协同作用，使 A.I.R. 成为一个完全 **training‑free** 的框架，在多个基准上以平均 **22.5% 更少的分析帧数**实现一致且显著的性能提升（Table 1、Table 2、Table 4），并能泛化到时间定位任务（Table 8），展现出跨任务、跨 VLM 骨架的鲁棒性。
 
-## 整体框架
+### 整体框架
 
-![[obsidian-vault/assets/figures/papers/iclr26_0005_SZVpOKw0YD_A.I.R._Enabling_Adaptive_Iterative_and_Reasoning/figures/002_Figure_2.jpg]]
+![[assets/figures/papers/iclr26_0005_SZVpOKw0YD_A.I.R._Enabling_Adaptive_Iterative_and_Reasoning/figures/002_Figure_2.jpg]]
 *Figure 2: General pipeline of A.I.R. with three stages: (1) Adaptive Initial Sampling that identifies potential 'events' based on query similarity and dynamically samples frames around them using an adaptive budget; (2) Iterative Frame Selection that progressively refines the frame selection via four steps; and (3) QA Stage that feeds the final selected frames into Answering VLM*
 
-![[obsidian-vault/assets/figures/papers/iclr26_0005_SZVpOKw0YD_A.I.R._Enabling_Adaptive_Iterative_and_Reasoning/figures/003_Figure_3.jpg]]
+![[assets/figures/papers/iclr26_0005_SZVpOKw0YD_A.I.R._Enabling_Adaptive_Iterative_and_Reasoning/figures/003_Figure_3.jpg]]
 *Figure 3: Two main stages in our A.I.R.. (a) Adaptive Initial Sampling: A GMM-based adaptive threshold is applied to the query-frame similarity S to identify potential events, and then event-wise sampling is conducted on the refined events to obtain K frames ( \mathcal { F } _ { \mathrm { i n i t i a l } } ) . (b) Iterative Frame Selection: In each iteration, 1) High-potential candidates are selected via Interval Potential Ranking; 2) A VLM performs reasoning-based analysis to validate the best frames; 3) An Early Stop mechanism checks if the frame budget is met; And 4) if not met, the Localized Density Sampling (LDS) discovers more frames around the validated frames and feed them into the next itera...*
 
 A.I.R. 的整体流程分为三个阶段：**自适应初始采样（Adaptive Initial Sampling）**、**迭代帧选择（Iterative Frame Selection）** 和 **问答阶段（QA Stage）**（图 2）。其设计核心在于绕开轻量模型直接筛选的歧义性与大型 VLM 全量分析的计算爆炸，通过**只对少量高潜帧进行推理型 VLM 分析，并利用局部密度采样迭代扩展相关区域**，在可控成本下实现精确的查询‑相关性帧选择。
@@ -154,7 +156,7 @@ A.I.R. 的整体流程分为三个阶段：**自适应初始采样（Adaptive In
 **阶段三：问答阶段**  
 上述迭代结束后，将最终选定的帧集与查询一起送入答案 VLM，进行一次推理生成最终答案（Sec. 3.1）。整个过程中，A.I.R. 不依赖任何微调，属于完全训练免的方法。
 
-## 核心模块与公式推导
+### 核心模块与公式推导
 
 A.I.R. 的核心洞察是：轻量相似度模型（如 CLIP）对复杂查询产生的相似度得分无法准确反映真实的查询‑帧相关性，而直接使用 VLM 对所有帧进行深度分析计算成本过高。因此，A.I.R. 将强大的 VLM 分析限制在少量高潜帧上，并通过局部密度采样发现被轻量模型低估的关键帧，从而在控制计算成本的同时实现准确选择。整体流程由三个阶段组成：自适应初始采样、迭代帧选择、问答阶段（Fig. 2）。
 
@@ -217,18 +219,18 @@ $$
 
 > **需手动验证**：GMM 拟合的超参数 $\gamma$、停止阈值 $\theta$、以及 $C$（每轮候选帧数）和 $T_{\max}$（最大迭代次数）的具体取值及其调参敏感性，在审查范围内未获提供，建议根据原文 Sec. 4.2 或附录确认。
 
-## 实验与分析
+## 实验与关键发现
 
-![[obsidian-vault/assets/figures/papers/iclr26_0005_SZVpOKw0YD_A.I.R._Enabling_Adaptive_Iterative_and_Reasoning/figures/004_Table_1.jpg]]
+![[assets/figures/papers/iclr26_0005_SZVpOKw0YD_A.I.R._Enabling_Adaptive_Iterative_and_Reasoning/figures/004_Table_1.jpg]]
 *Table 1: Comparison of VLMs and various frame selection methods on Video-MME, MLVU, and LongVideo Bench. ∗ denotes reported results, while † means reproduced ones (see Sec. 4.1)*
 
-![[obsidian-vault/assets/figures/papers/iclr26_0005_SZVpOKw0YD_A.I.R._Enabling_Adaptive_Iterative_and_Reasoning/figures/010_Table_4.jpg]]
+![[assets/figures/papers/iclr26_0005_SZVpOKw0YD_A.I.R._Enabling_Adaptive_Iterative_and_Reasoning/figures/010_Table_4.jpg]]
 *Table 4: Ablations of A.I.R.'s components on Video-MME using InternVL3-8B. We compare on average frames for answering VLMs and accuracy (Acc.)*
 
-![[obsidian-vault/assets/figures/papers/iclr26_0005_SZVpOKw0YD_A.I.R._Enabling_Adaptive_Iterative_and_Reasoning/figures/009_Table_3.jpg]]
+![[assets/figures/papers/iclr26_0005_SZVpOKw0YD_A.I.R._Enabling_Adaptive_Iterative_and_Reasoning/figures/009_Table_3.jpg]]
 *Table 3: Comparison of different VLM scales with A.I.R. on Video-MME (w/o subtitle, 32 frames)*
 
-![[obsidian-vault/assets/figures/papers/iclr26_0005_SZVpOKw0YD_A.I.R._Enabling_Adaptive_Iterative_and_Reasoning/figures/014_Table_8.jpg]]
+![[assets/figures/papers/iclr26_0005_SZVpOKw0YD_A.I.R._Enabling_Adaptive_Iterative_and_Reasoning/figures/014_Table_8.jpg]]
 *Table 8: Generalization results on temporal grounding benchmark Charades-STA (Gao et al., 2017). mIoU. Notably, A.I.R. substantially outperforms general-purpose VideoLLMs like Qwen2.5-VL-7B (44.5% → 59.5% R1@0.3) and even surpasses GPT-4o (32.0% vs. 39.5% R1@0.5). More impressively, our method achieves comparable or superior results to GenS (Yao et al., 2025), a trained frame selection method specifically designed for grounding tasks, while remaining completely trainingfree. While specialized temporal grounding models like TimeSuite (Zeng et al., 2024) achieve higher performance through task-specific training, our results demonstrate that A.I.R.'s adaptive sampling and iterative refinement effective...*
 
 A.I.R. 的核心设计目标是在仅需轻量级 CLIP 相似度信号的训练‑free 条件下，用可控量级的 VLM 分析预算实现高精度帧选择。本节从主结果、消融、效率‑精度权衡及典型失败模式几个维度，系统验证这一设计是否成立，并归纳关键图表结论。
@@ -269,7 +271,7 @@ A.I.R. 将 VLM 分析帧数从典型的 128 帧（一次性深度分析）压缩
 
 A.I.R. 的迭代精炼过程在 Fig. 6 和 Fig. 7 中得到了直观展示：最初的候选帧集（自适应采样结果）已覆盖事件大致范围，但包含不少低相关帧；经过一至两轮 VLM 分析与 LDS 反馈后，帧集迅速集中到真正反映查询动作的时间段。此外，A.I.R. 在时序定位任务 Charades‑STA 上取得了远超通用 VideoLLM 的 mIoU（Table 8），进一步表明这种以查询为导向的迭代帧筛选能力并不局限于选择题式 QA，具有较好的任务泛化性。
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 A.I.R. 定位于视频问答中查询相关帧选择的训练无关（training‑free）方法谱系，其核心贡献在于用**迭代式 VLM 深度语义分析**替代以往要么只使用轻量相似度、要么一次性对所有帧使用 VLM 的做法。
 
@@ -311,12 +313,13 @@ A.I.R. 定位于视频问答中查询相关帧选择的训练无关（training�
 
 7. **大规模验证的缺失**。尽管在多个公开基准上表现稳健，但对超长视频（>1 小时）或低质量视频（摄像头噪声、监控）的测试仍然缺失，未来需要在该方向上补全实验证据以界定方法的通用边界。
 
+### 相关样本
+
+- [[analysis/ICLR_2026/AdaReasoner_Dynamic_Tool_Orchestration_for_Iterative_Visual_Reasoning.md|AdaReasoner]]：同属视觉推理样本，可对照帧选择式迭代推理和多轮工具编排。
+
+
 ## 原文 PDF
 
 PDF 文件：paperPDFs/ICLR_2026/A.I.R._Enabling_Adaptive_Iterative_and_Reasoning-based_Frame_Selection_For_Video_Question_Answering.pdf
 
-## 相关样本
-
-- [[obsidian-vault/analysis/ICLR_2026/AdaReasoner_Dynamic_Tool_Orchestration_for_Iterative_Visual_Reasoning.md|AdaReasoner]]：同属视觉推理样本，可对照帧选择式迭代推理和多轮工具编排。
-
-![[obsidian-vault/paperPDFs/ICLR_2026/A.I.R._Enabling_Adaptive_Iterative_and_Reasoning-based_Frame_Selection_For_Video_Question_Answering.pdf]]
+![[paperPDFs/ICLR_2026/A.I.R._Enabling_Adaptive_Iterative_and_Reasoning-based_Frame_Selection_For_Video_Question_Answering.pdf]]

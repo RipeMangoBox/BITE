@@ -5,6 +5,8 @@ paper_level: A
 venue: ECCV
 year: 2024
 pdf_ref: paperPDFs/ECCV_2024/Self_Rectifying_Diffusion_Sampling_with_Perturbed_Attention_Guidance.pdf
+project_link: https://ku-cvlab.github.io/Perturbed-Attention-Guidance
+code_link: null
 aliases:
 - PAGP
 - SRDSPAG
@@ -42,7 +44,7 @@ claims:
 > - ImageNet 256x256 conditional generation (ADM) 上，FID↓ 6.32 vs 10.94 (No guidance) (-4.62)。
 > - Stable Diffusion v1.5 unconditional generation 上，FID↓ 47.57 vs 53.13 (No guidance) (-5.56)。
 
-## 概述
+## 概要
 
 扩散模型在无条件生成或缺乏外部条件（如类别标签、文本提示）时，去噪过程容易产生结构崩塌的样本，导致生成质量严重下降。主流的分类器无引导（Classifier‑Free Guidance, CFG）虽然能有效缓解这一问题，但其本质依赖于联合训练的条件/无条件模型对，在纯无条件场景中无法使用，且需要额外的训练开销。因此，**如何在无需外部条件、无需额外训练的前提下，为扩散模型提供有效的结构引导，成为该领域的一个关键瓶颈**。
 
@@ -58,7 +60,7 @@ $$\tilde{\epsilon}_{\theta}(x_t) = \epsilon_{\theta}(x_t) + s(\epsilon_{\theta}(
 
 **方法定位**：PAG 属于扩散模型推理时引导方法，与 CFG 形成互补——CFG 利用条件信息在早期阶段提供粗粒度引导，而 PAG 在中后期持续提供细粒度结构修正。与早期的自注意力引导（SAG）相比，PAG 对引导尺度不敏感，即使在高尺度下仍能保持物体形状和细节，不产生明显伪影。
 
-## 背景与动机
+
 
 ### 扩散模型的生成瓶颈
 
@@ -85,7 +87,9 @@ CFG 的核心机制在于：无条件模型作为“不良路径”，其预测�
 
 本文的核心动机在于：**能否在不依赖外部条件、不引入额外训练或外部模块的前提下，为扩散模型提供一种通用的结构引导机制？** 这需要构造一个“不良”生成路径，使其在结构上退化但仍保持在模型的知识分布内，从而作为隐式判别器的负例，引导去噪过程远离结构崩塌方向。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PAG 的核心创新在于**将扩散模型中的自注意力机制重新解释为一种隐式判别器的负例生成源**，从而在完全无需额外训练、无需外部条件或模型的前提下，为扩散采样提供结构引导。
 
@@ -122,7 +126,7 @@ CFG 依赖条件信号（如类别标签、文本提示）来区分“有条件�
 
 这一设计的精妙之处在于：它利用了扩散 U-Net 中自注意力的**结构-外观解耦特性**，以最小侵入性的方式构建了一个隐式判别器，实现了“自校正”的扩散采样。
 
-## 整体框架
+
 
 PAG 的整体采样框架建立在标准扩散去噪过程之上，通过引入一条“结构退化”的辅助路径来构造隐式引导信号，其核心由三个模块串联构成。
 
@@ -168,7 +172,7 @@ CFG 依赖联合训练的无条件模型作为“不良”路径，在无条件�
 **计算开销**  
 PAG 每步需两次前向传播，计算成本与 CFG 相近但高于无引导采样。文中指出可通过批量处理优化，但未报告实际推理延迟的直接对比（Table 6）。
 
-## 核心模块与公式推导
+
 
 ### 方法总览
 
@@ -255,7 +259,9 @@ $$
 ![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2403_17377/figures/002_Figure_2.jpg]]
 *Figure 2: Visualization of reverse process*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -336,7 +342,9 @@ PAG 每个采样步骤需执行两次 U-Net 前向传播（原始预测 + 扰动
 ![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2403_17377/figures/007_Figure_5.jpg]]
 *Figure 5: Qualitative comparison between SAG [20] and PAG. Images are sampled from the ImageNet $256\times 256$ unconditional model using the same seed sequence. Compared to samples guided by SAG, those guided by PAG exhibit significantly improved semantic structures with artifacts removed*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有引导方法的谱系关系
 
@@ -398,6 +406,8 @@ PAG 可作为即插即用模块与现有逆问题求解器集成。在 FFHQ 256�
 3. **自动尺度校准**：如何自动校准引导尺度 $s$，避免高尺度下的过饱和伪影？当前 $s$ 是全局固定超参数，不同任务和模型需要独立调参（Table 5）。
 4. **训练结合**：PAG 是否可以与训练结合（例如微调扰动分支）以进一步提升稳定性与多样性？目前 PAG 是纯推理时方法，训练阶段完全未涉及。
 5. **理论分析**：PAG 的隐式判别器框架（Eq. 11）提供了理论直觉，但缺乏严格的收敛性分析或与能量模型的等价性证明。这部分理论缺口可能限制了对引导行为更深入的理解。
+
+
 
 ## 原文 PDF
 

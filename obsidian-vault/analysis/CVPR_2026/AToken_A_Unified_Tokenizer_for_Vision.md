@@ -42,7 +42,7 @@ claims:
 > - ImageNet 零样本分类 上，Accuracy 82.2% (ATOKEN-So/C) vs 80.9% (SigLIP2) (+1.3%)。
 > - DAVIS 视频重建 (1080p) 上，PSNR 33.11 (ATOKEN-So/C) vs 33.11 (Cosmos) (持平)。
 
-## 概述
+## 概要
 
 ### 问题背景与核心瓶颈
 
@@ -70,7 +70,7 @@ ATOKEN 是首个同时覆盖图像、视频、3D 重建与理解，并支持连�
 
 ATOKEN 在视觉分词器谱系中占据独特位置（Table 1）。与仅重建的方法（**SD-VAE**, **VQGAN** Esser et al., 2020; **Cosmos** Agarwal et al., 2025）和仅理解的方法（**SigLIP2**）不同，ATOKEN 联合优化重建与理解。与已有统一尝试（**VILA-U** Wu et al., 2024c; **UniTok** Ma et al., 2025a）相比，ATOKEN 首次将模态覆盖从图像扩展到视频和 3D，并采用纯 Transformer 架构配合无对抗训练，解决了 GAN 在 Transformer 上的训练不稳定问题。其 4D 稀疏表示和 Gram 损失设计为多模态统一分词提供了新的范式。
 
-## 背景与动机
+
 
 ### 视觉分词器的割裂现状
 
@@ -96,7 +96,9 @@ ATOKEN 在视觉分词器谱系中占据独特位置（Table 1）。与仅重建
 
 ATOKEN 在现有工作谱系中的定位如 Table 1 所示：它是唯一同时覆盖重建与理解任务、支持图像/视频/3D 三种模态、兼容连续与离散 token 类型的方法。与仅重建的方法（SD-VAE、VQGAN、Cosmos、Trellis-SLAT）相比，ATOKEN 额外提供语义理解能力；与仅理解的方法（SigLIP2）相比，ATOKEN 额外支持高质量重建；与已有的统一方法（VILA-U、UniTok）相比，ATOKEN 将覆盖范围从单模态扩展到全模态。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ATOKEN 的核心创新并非单一模块的改进，而是通过三个相互耦合的机制——**统一稀疏 4D 表示**、**纯 Transformer 架构**与**无对抗 Gram 损失训练**——系统性解决了现有视觉分词器在模态覆盖、任务统一和训练稳定性上的三重割裂。这些创新共同构成了一个“**全模态、全任务、全 token 类型**”的统一框架，其与基线方法的本质差异可归纳为以下七个关键维度的改变。
 
@@ -140,7 +142,7 @@ ATOKEN 采用四阶段渐进式训练课程（Figure 5）：从 SigLIP2 图像�
 
 **总结**：ATOKEN 的创新链呈现清晰的因果结构——4D 稀疏表示提供了模态统一的数学基础，纯 Transformer 架构赋予了跨模态共享的模型容量，而 Gram 损失则解决了 Transformer 在此设定下的训练稳定性瓶颈。三者缺一不可，共同构成了从“模态/任务碎片化”到“全模态统一”的范式跃迁。
 
-## 整体框架
+
 
 ATOKEN 的核心设计理念是：**所有视觉模态均可表示为 4D 空间中的稀疏特征-坐标对**，单一 Transformer 架构即可同时实现高保真重建与语义理解。图 2 展示了这一统一框架的完整数据流。
 
@@ -201,7 +203,7 @@ $$
 ![[assets/figures/papers/paper_list_l2068_https_arxiv_org_abs_2509_14476/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of our method on different visual modalities. Given images, videos, and 3D assets, ATOKEN leverages a shared 4D latent space (left) to produce high-fidelity reconstructions (middle: zoomed regions with red boxes for images, temporal frames for videos, multiple viewpoints for 3D) while preserving strong semantic understanding (right: showing text-aligned representations for zero-shot text retrieval)*
 
-## 核心模块与公式推导
+
 
 ### 统一稀疏 4D 表示空间
 
@@ -275,7 +277,9 @@ $$\mathcal { L } _ { \mathrm { s e m } } ^ { \mathrm { I } } = \mathrm { K L } \
 ![[assets/figures/papers/paper_list_l2068_https_arxiv_org_abs_2509_14476/figures/009_Figure_6.jpg]]
 *Figure 6: Overview of the video encoding and decoding process. During encoding, we use KV-caching across temporal tiles to eliminate redundant computation while maintaining temporal coherence, providing significant efficiency gains over overlapping tile methods*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：Gram 损失替代对抗训练实现稳定高质量重建
 
@@ -371,7 +375,9 @@ Figure 8 的 t-SNE 可视化展示了不同训练阶段表征的语义聚类特�
 ![[assets/figures/papers/paper_list_l2068_https_arxiv_org_abs_2509_14476/figures/017_Table_8.jpg]]
 *Table 8: 3D reconstruction comparison on Toys4k. We average metrics across rendered multi-view images. ATOKEN achieves comparable performance to specialized Trellis-SLAT despite jointly optimizing for three modalities, demonstrating unified training maintains strong 3D capabilities*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 基线谱系与差异化定位
 
@@ -421,6 +427,8 @@ ATOKEN 的核心定位在于**首次实现跨模态（图像/视频/3D）与跨�
 3.  **有限容量下的干扰缓解**：在模型容量有限时，多模态联合训练带来的干扰是否可以通过更精巧的课程学习或正则化方法来缓解？Figure 7 中 Base 模型的退化现象提示，容量瓶颈可能是统一框架走向普惠化的主要障碍。
 
 4.  **长视频语义理解的提升**：长期的、开放域的视频理解任务中，如何进一步提升 ATOKEN 的语义表达能力？是否需要更长的训练时长、更丰富的视频-文本数据，或更先进的时序聚合机制？
+
+
 
 ## 原文 PDF
 

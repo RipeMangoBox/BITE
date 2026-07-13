@@ -41,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - Stereo Blur 上，Deblurring PSNR↑ 33.21 vs 29.01 (SoM+NAFNet) (+4.20)；Deblurring SSIM↑ 0.957 vs 0.949 (SoM+NAFNet) (+0.008)；Deblurring LPIPS↓ 0.043 vs 0.101 (SoM+NAFNet) (-0.058)。
 
-## 概述
+## 概要
 
 在单目相机拍摄的动态场景中，相机与物体的同时运动会在曝光时间内产生复杂的混合运动模糊，这严重损害了基于高斯泼溅（3D/4D Gaussian Splatting）的动态重建与新视角合成质量。现有的去模糊方法或简单地将去模糊网络与4D重建管线串行集成（如 **SoM** + **NAFNet**），或仅对高斯进行统一的运动建模，无法有效解耦和处理相机与物体运动模糊的异构特性。
 
@@ -49,7 +49,7 @@ claims:
 
 在 **Stereo Blur** 数据集上，MSCD-GS 的去模糊 PSNR 达到 **33.21**，SSIM **0.957**，LPIPS **0.043**，显著优于 SoM+NAFNet 组合（PSNR 29.01）及最新的动态去模糊方法（**Deblur4DGS**、**BARD-GS**、**DyBluRF** 等），同时渲染速度可达 **121 FPS**，训练时间仅 **0.72 小时**。消融实验进一步证实，去除去模糊网络先验会使 PSNR 从 31.72 骤降至 26.34，而移除静态或动态高斯的去模糊模块均会造成明显的性能损失，验证了运动分离建模与协作监督的核心作用。
 
-## 背景与动机
+
 
 ### 动态场景重建中的运动模糊困境
 
@@ -76,7 +76,9 @@ claims:
 
 这些动机直接催生了MSCD-GS的设计思路：通过高斯原语的显式动/静分离、差异化的运动建模（线性/非线性），以及协作去模糊损失函数，在无需外部先验的条件下实现高质量的动态4D去模糊重建。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MSCD-GS 的核心创新在于**运动分离建模 + 协作去模糊正则化**的双重设计，系统性地解决了动态场景中相机与物体混合运动模糊对 4D 高斯泼溅（4DGS）重建的破坏问题。
 
@@ -121,7 +123,7 @@ MSCD-GS 处于 **4D 高斯泼溅动态重建** 与 **运动模糊建模** 的交
 
 MSCD-GS 首次在 4DGS 框架中引入运动分离建模，并通过协作损失将单图去模糊网络的 2D 先验与 3D 运动物理模型有机结合，无需额外模态数据，为动态场景去模糊重建提供了新的范式。
 
-## 整体框架
+
 
 MSCD-GS 的整体流程以运动分离与协作去模糊为核心，将单目相机捕获的运动模糊图像作为输入，输出高质量的去模糊动态场景重建与新视角合成结果。其 pipeline 由三个关键阶段构成：**高斯分离（Section A）**、**运动建模与虚拟图像合成（Section B）** 以及**协作去模糊监督（Section C）**，如图 Figure 2 所示。
 
@@ -162,7 +164,7 @@ $$\mathcal{L}_{render}(t) = \lambda \sum_{i \in N} \| \mathbf{B}_d(t^i) - \mathb
 
 三个阶段的因果链条清晰：**高斯分离**为差异化运动建模提供了场景结构先验；**运动建模**将曝光时间内的物理模糊过程显式参数化，使虚拟模糊图像能够与真实输入对齐；**协作损失**则通过 2D 去模糊先验与 3D 物理约束的互补，解决了单一监督信号不足的问题。消融实验（Table 4）表明，移除任一模块（去模糊网络 DN、静态高斯去模糊 SGD、动态高斯去模糊 DGD）均会导致重建质量大幅下降，其中去除 DN 使去模糊 PSNR 从 31.72 骤降至 26.34，验证了协作机制的核心作用。
 
-## 核心模块与公式推导
+
 
 MSCD-GS 的核心在于将场景的 3D 高斯原语显式分离为静态与动态两部分，并分别设计运动模型来模拟曝光时间内的模糊形成过程。整体流程如 Figure 2 所示，包含三个关键模块：高斯分离、运动建模与去模糊、以及协作去模糊监督。
 
@@ -214,7 +216,9 @@ $$ \mathcal{L}_{render}(t) = \lambda \sum_{i \in N} \|\mathbf{B}_d(t^i) - \mathb
 
 第一项为**去模糊先验监督**：要求渲染的虚拟清晰图像 $\mathbf{I}(t^i)$ 接近去模糊网络输出 $\mathbf{B}_d(t^i)$；第二项为**物理合成模糊监督**：要求虚拟清晰图像平均合成的模糊图像 $\hat{\mathbf{B}}(t)$ 与真实输入模糊图像 $\mathbf{B}(t)$ 对齐。超参数 $\lambda$ 平衡两者权重（实验设为 0.4），消融实验（Table 4）表明去除去模糊网络监督后 PSNR 从 31.72 骤降至 26.34，验证了协作策略的关键作用。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -268,7 +272,9 @@ MSCD-GS在Stereo Blur数据集上的去模糊4D重建任务中全面超越现有
 ![[assets/figures/papers/paper_list_l35_https_openaccess_thecvf_com_content_CVPR2026_html_Liao_MSCD_GS_Motion_Se/figures/001_Figure_1.jpg]]
 *Figure 1: Motion blur is inevitably present in images captured by a monocular camera, which significantly degrades the quality of 4D reconstruction. Although the addition of the deblurring model NAFNet [2] improves image sharpness, the reconstruction results of SoM [34] still suffer from blur. Therefore, we propose a novel deblurring 4D Gaussian method MSCD-GS, which can render sharper images*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 方法沿革与基线关系
 
@@ -313,6 +319,8 @@ MSCD-GS 的有效性依赖于以下前提条件，这些条件界定了其适用
 3. **去模糊先验的自适应选择**：λ 参数（论文设为 0.4）在不同场景、不同模糊程度下的最优取值是否具有普适性？能否设计自适应加权机制，根据局部模糊程度动态调整协作监督的强度？
 
 4. **多传感器扩展**：当前框架针对单目相机设计，能否扩展至多视角或事件相机输入，利用多源信息互补解决单目运动模糊的不适定性？
+
+
 
 ## 原文 PDF
 

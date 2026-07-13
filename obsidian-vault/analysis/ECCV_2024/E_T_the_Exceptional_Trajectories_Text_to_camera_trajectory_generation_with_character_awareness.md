@@ -5,6 +5,8 @@ paper_level: A
 venue: ECCV
 year: 2024
 pdf_ref: paperPDFs/ECCV_2024/E_T_the_Exceptional_Trajectories_Text_to_camera_trajectory_generation_with_character_awareness.pdf
+project_link: https://www.lix.polytechnique.fr/vista/projects/2024\_et\_courant
+code_link: https://github.com/robincourant/DIRECTOR
 aliases:
 - DDTCT
 - ETETTCTGCA
@@ -40,15 +42,13 @@ claims:
 > [!tip] 效果简介
 > - E.T. mixed subset 上，FD_CLaTr ↓ 3.76 (Director C) vs 6.79 (MDM) (-3.03)；FD_CLaTr ↓ 3.76 (Director C) vs 35.81 (CCD) (-32.05)；CLaTr-Score (CS) ↑ 21.95 (Director C) vs 18.32 (MDM) (+3.63)。
 
-## 概述
+## 概要
 
 真实电影级相机轨迹的自动生成是连接语言描述与视觉叙事的关键环节，但该任务长期受制于三大瓶颈：**数据匮乏**（缺乏同时包含相机与角色轨迹及详细文本描述的大规模真实电影数据集）、**建模简化**（现有方法采用角色相对坐标系，无法建模相机与角色间的复杂同步与偏移关系）、以及**评估粗糙**（基于简单六类动作分类器的指标无法反映生成轨迹的真实质量与语义一致性）。
 
 针对上述瓶颈，本文提出了一套从数据、模型到评估的完整解决方案。首先构建了**E.T.数据集**——一个基于Condensed Movies Dataset的大规模多模态相机-角色轨迹数据集，包含约115K样本、11M帧、120小时内容，每条样本配有独立的相机运动描述和相机-角色关系描述。其次，设计了**Director扩散模型**，以全局坐标系下分离表示的相机与角色轨迹为条件，通过三种可选的Transformer条件注入机制（上下文前缀、AdaLN调制、交叉注意力）生成符合电影语法的相机轨迹。最后，提出**CLaTr对比语言-轨迹嵌入**，学习文本与轨迹的联合表示空间，用于计算FDCLaTr距离和CLaTr-Score等更准确的评估指标。
 
 核心实验结果表明，采用交叉注意力机制的**Director C**在E.T.混合子集上显著超越所有基线：FDCLaTr从CCD的35.81降至3.76，CLaTr-Score从6.26提升至21.95，验证了角色感知的全局坐标系建模和CLaTr评估的有效性。该方法在可控性、多样性和角色感知方面展现出良好的定性效果，为文本驱动的电影级相机控制提供了新的基准。
-
-## 背景与动机
 
 ### 电影视觉叙事中的相机控制困境
 
@@ -68,7 +68,7 @@ claims:
 
 为支撑这一范式转变，作者构建了**E.T.（Exceptional Trajectories）数据集**——首个大规模、多模态的电影相机-角色轨迹数据集，包含115K样本、11M帧、120小时的内容，并提出了配套的**CLaTr（Contrastive Language-Trajectory）嵌入**用于评估，以及**Director扩散模型**用于生成。三者形成闭环：数据提供学习基础，嵌入提供评估标准，模型实现可控生成。
 
-## 核心创新
+## 核心方法与创新机理
 
 E.T. 工作的核心创新并非提出一种全新的生成范式，而是针对“文本到相机轨迹生成”这一任务，系统性地重构了建模坐标系、条件输入和评估体系，从而将任务从简化的合成场景推向真实的电影级生成。
 
@@ -110,8 +110,6 @@ E.T. 提出的 **CLaTr**（Contrastive Language-Trajectory embedding）通过对
 ### 创新依赖的基础：E.T. 数据集
 
 上述方法创新的可行性建立在 **E.T. 数据集**之上。该数据集从 Condensed Movies Dataset (CMD) 构建，包含 115K 样本、11M 帧、120 小时的真实电影数据，同时提供相机与角色的 3D 轨迹以及两类文本描述。相比 CCD 使用的合成数据，E.T. 在规模和真实性上均有质的飞跃，为训练具有角色感知能力的全局坐标相机轨迹生成模型提供了必要的数据基础。
-
-## 整体框架
 
 E.T. 系统围绕三个核心模块构建了一条从真实电影数据到可控相机轨迹生成的完整流水线：**E.T. 数据集构建** → **Director 扩散模型** → **CLaTr 对比嵌入评估**。三个模块在逻辑上形成“数据—生成—评估”的闭环，但在训练上是解耦的：E.T. 数据集为 Director 和 CLaTr 提供训练与评估样本，CLaTr 嵌入则作为 Director 生成质量的语义感知度量。
 
@@ -161,8 +159,6 @@ Director 的三种条件注入机制（图 5）反映了对条件信息利用方
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2407_01516/figures/004_Figure_3.jpg]]
 *Figure 3: Dataset creation pipeline. Given RGB frames from a video, we first extract and pre-process camera and character poses, then tag resulting camera and character trajectories (sequence of poses) to obtain rough independent descriptions (middle part). Finally, we translate these descriptions into rich textual captions, aligning the camera trajectory with that of the character (right part)*
 
-## 核心模块与公式推导
-
 ### 问题形式化
 
 Director 将相机轨迹生成问题建模为条件生成任务：给定角色轨迹序列和相机-角色关系文本描述，生成符合电影语法的全局坐标系相机轨迹。形式上，一条相机轨迹被定义为一个包含 $N$ 个连续相机位姿的序列 $\mathbf{x}_{1:N}$，每个位姿包含相机在全局坐标系中的位置和朝向信息。
@@ -209,7 +205,7 @@ CLaTr（Contrastive Language-Trajectory embedding）是用于评估生成质量�
 
 从条件粒度来看，Director 同时接受角色轨迹序列和文本描述作为条件，而非仅依赖文本。这使得模型在生成相机轨迹时能够参考角色的具体运动模式（如移动方向、速度变化），从而产生更符合电影语法的同步运动（如推拉镜头与角色走近的配合）。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -273,9 +269,6 @@ Figure 7展示了Director在四个维度上的定性表现：
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2407_01516/figures/014_Figure.jpg]]
 *Figure: (a) Trajectory length (in #frames) (b) Camera length (in meters) (c) Character length (in meters)*
 
-![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2407_01516/figures/016_Figure_10.jpg]]
-*Figure 10: Raw chunk alignment. We show in (a) the raw independent chunks just after the SLAHMR [50] extraction. In (b) we display the result of the chunk alignment process. Each color (red, blue, green) corresponds to a different chunk*
-
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2407_01516/figures/018_Figure.jpg]]
 *Figure: (a) Overview of CLaTr framework. CLaTr projects (b) t-SNE visualization of CLaTr both text and camera trajectories into a common latent embedding of text (vivid colors) and space using encoders. Self-similarity is then computed, and trajectory (pastel colors). Each color a shared-weight decoder decodes both text and camera tra- corresponds to a K-Mean cluster of the jectory features back into a camera trajectory. text embedding*
 
@@ -285,7 +278,7 @@ Figure 7展示了Director在四个维度上的定性表现：
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2407_01516/figures/010_Figure.jpg]]
 *Figure: [Camera-only] ” throughout the entire shot.”The camera moves laterally to the left (trucking) (a)*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 方法演化与基线关系
 

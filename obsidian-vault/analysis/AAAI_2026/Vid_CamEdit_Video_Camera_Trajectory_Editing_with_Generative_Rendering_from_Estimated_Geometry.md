@@ -5,6 +5,8 @@ paper_level: A
 venue: AAAI
 year: 2026
 pdf_ref: paperPDFs/AAAI_2026/Vid_CamEdit_Video_Camera_Trajectory_Editing_with_Generative_Rendering_from_Estimated_Geometry.pdf
+project_link: https://cvlab-kaist.github.io/Vid-CamEdit
+code_link: null
 aliases:
 - VC
 - Vid-CamEdit
@@ -42,7 +44,7 @@ claims:
 > - Neu3D 上，LPIPS ↓ 0.414 vs 0.562 (MonST3R all-frame reprojection) (-0.148)。
 > - ST-NeRF dataset 上，Frame-Con. ↑ (CLIP score) 0.917 vs 0.757 (MonST3R all-frame reprojection) (+0.160)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：在野生单目视频上进行大角度相机轨迹编辑面临两难困境。基于重建的方法依赖精确的3D几何重建，难以处理大规模视角变化带来的遮挡区域，导致生成结果出现大面积空洞；基于生成的方法则需要大量4D多视图视频作为训练数据，但真实4D数据极为稀缺，在合成数据上训练的模型存在显著的领域差距，难以泛化到真实场景。
 
@@ -52,7 +54,7 @@ claims:
 
 **主要结果**：在动态多视图数据集 Neu3D 和 ST-NeRF 上，Vid-CamEdit 在 LPIPS 和帧一致性（CLIP score）两项指标上均优于所有基线方法，包括基于重建的 MonST3R 重投影、Pseudo-DVS，以及基于生成的 Generative Camera Dolly。在野生视频的 VBench 评估中，该方法在美学质量和成像质量上大幅领先 Generative Camera Dolly。用户研究（59名参与者，双盲设计）进一步验证了其在输入一致性、视频真实感和相机轨迹忠实度上的综合优势。
 
-## 背景与动机
+
 
 ### 视频相机轨迹编辑的需求与挑战
 
@@ -83,7 +85,9 @@ claims:
 
 Vid-CamEdit 并非纯粹的生成方法，也非传统的重建方法，而是**几何接地**（Geometry-grounded）的生成式渲染框架。它利用预估的时序一致几何计算2D流场，通过流条件位置编码重新对齐视频编码器令牌，将几何先验隐式注入扩散模型的生成过程。这种设计使框架能够处理大角度相机轨迹编辑，同时保持生成内容的视觉真实性与时空一致性，在动态多视角数据集和野生视频上均展现出优于现有基线的性能。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Vid-CamEdit 的核心创新在于将4D动态场景的相机轨迹编辑任务分解为**时序一致的几何估计**与**基于估计几何的生成式渲染**两个子任务，并通过两个关键设计突破现有方法的瓶颈。
 
@@ -101,7 +105,7 @@ $$\mathrm{PE}'(u, v, t) = \mathrm{PE}(u + f_{\mathrm{rel}}(u, v, t)_x, v + f_{\m
 
 **两者的协同效应**：2D流场接地为生成提供了精确的几何引导，使模型能够专注于合成几何不确定区域（遮挡区域）的真实细节；因子化微调则确保了模型在不依赖4D数据的前提下，仍能生成时空一致的高质量新视角视频。这种“几何估计负责结构，生成模型负责纹理”的分工，是 Vid-CamEdit 在 LPIPS 和帧一致性（CLIP score）上全面超越所有基线方法（Table 1）的根本原因。
 
-## 整体框架
+
 
 Vid-CamEdit 将视频相机轨迹编辑任务形式化为一个以几何为条件的视频到视频生成问题。给定一段单目输入视频 $\mathbf{X}$、一条用户指定的相对相机轨迹 $C_{\mathrm{rel}}$ 以及共享内参矩阵 $\mathbf{K}$，框架的目标是合成一段新视频 $\mathbf{Y}$，使得该视频在遵循目标相机运动的同时保持原始场景的结构与动态：
 
@@ -162,7 +166,7 @@ $$\mathcal{G} = h(\mathbf{K}^{-1} D_t), \quad \forall t \in [1, T] \tag{6}$$
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2506_13697/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of our framework. Given a video and a target camera trajectory, we first extract video feature tokens using a Video Encoder and obtain the dynamic scene’s temporally consistent geometry through Temporal Geometry Estimation. We then ground the video generative model on this estimated geometry by re-aligning the video feature tokens according to the 2D flow between the source and target camera trajectories*
 
-## 核心模块与公式推导
+
 
 Vid-CamEdit 将视频相机轨迹编辑任务形式化为一个条件生成问题，其核心公式为：
 
@@ -213,7 +217,9 @@ $$\mathrm{PE}'(u, v, t) = \mathrm{PE}\big(u + f_{\mathrm{rel}}(u, v, t)_x, \; v 
 
 通过交替冻结不同模块，模型分别从多视图图像中学习空间对应关系、从视频中学习时序动态，而无需任何4D多视角视频数据。这一设计打破了现有生成式方法（如 Generative Camera Dolly）对合成4D数据集（如 Kubric-4D）的依赖，显著缓解了合成数据到真实场景的领域差距问题。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -288,7 +294,9 @@ Vid-CamEdit 在多视角动态数据集 Neu3D 和 ST-NeRF 上进行了定量评�
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2506_13697/figures/013_Table_4.jpg]]
 *Table 4: Ablation on video geometry models. We compare the performance of our framework leveraging different geometry prediction models g*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位与核心瓶颈
 
@@ -352,6 +360,8 @@ Vid-CamEdit 的核心洞察是将 4D 动态场景合成问题**分解为 3D 几�
 4. **长视频扩展**：该方法是否能扩展到更长的视频生成（如数百帧）？需要什么样的时序建模机制来维持长程一致性？
 
 5. **与其他几何估计器的协同进化**：本方法与几何估计模型正交，随着几何估计技术的进步（如更强的单目深度估计或 4D 重建模型），性能有望持续提升。但如何设计一个统一的接口，使得框架可以即插即用地适配未来的几何估计器，仍需进一步探索。
+
+
 
 ## 原文 PDF
 

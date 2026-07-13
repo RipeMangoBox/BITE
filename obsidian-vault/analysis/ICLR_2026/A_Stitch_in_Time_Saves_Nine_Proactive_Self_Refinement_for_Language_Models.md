@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/A_Stitch_in_Time_Saves_Nine_Proactive_Self_Refinement_for_Language_Models.pdf
+project_link: null
+code_link: https://github.com/JinyiHan99/Proactive-Self-Refine-in-LLMs/
 aliases:
 - PSRP
 - STSNPSRLM
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 未雨绸缪：语言模型的主动自我优化 |
 | 英文题名 | A Stitch in Time Saves Nine: Proactive Self-Refinement for Language Models |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=0GaCfBRFnf); [GitHub](https://github.com/JinyiHan99/Proactive-Self-Refine-in-LLMs/) |
+| Links | [paper](https://openreview.net/forum?id=0GaCfBRFnf) · [GitHub](https://github.com/JinyiHan99/Proactive-Self-Refine-in-LLMs/) |
 | Topic | #topic/other_unclear #topic/other_unclear/general |
 | Method | ProActive Self-Refinement (PASR) |
 | Dataset | GSM8K, MATH, AIME24, ARC |
@@ -42,7 +44,7 @@ claims:
 > - MATH 上，Accuracy 为 73.6，对比 68.4 (Vanilla Qwen2.5-7B)，变化 +5.2。
 > - AIME24 上，Accuracy 为 10.0，对比 6.7 (Vanilla Qwen2.5-7B)，变化 +3.3。
 
-## 概述
+## 概要
 
 本文针对现有语言模型自我优化方法普遍采用的“事后修复”范式——即先生成完整答案，再在固定迭代次数内依赖外部反馈进行修正——提出了核心问题：该范式无法在生成过程中自主判断是否、何时以及如何进行优化，导致错误传播、迭代僵化且额外开销高。
 
@@ -50,7 +52,7 @@ claims:
 
 实验验证了PASR的有效性。在Qwen2.5-7B和Qwen3-8B上，PASR分别取得平均+4.8和+8.2的性能提升，其中在MMLU上相对基线提升29.0个百分点，在Xsum上提升18.3个百分点。效率方面，PASR在Qwen3-8B上相比标准生成平均降低41.6%的token消耗，同时准确率提升8.2%；在Qwen2.5-7B上仅增加8.4%的token消耗便获得4.8个绝对性能提升。消融实验表明，基于比较的细粒度优化奖励优于简单二元奖励，且强化学习训练（PASR†）显著优于仅通过提示或指令微调的方式。在行为分析中，PASR在267个初始错误答案中成功修正了235个，表明其优化行为具有高度选择性而非无差别触发。
 
-## 背景与动机
+
 
 大语言模型（LLM）在复杂推理任务中常出现错误，且错误会在生成过程中累积传播。现有自我优化方法（如Self-Refine、STaR、SCoRe等）普遍采用**事后修复**范式：模型先生成完整答案，再通过外部反馈（工具、辅助模型或固定提示）进行多轮迭代修正。这种范式的根本瓶颈在于：模型无法在生成过程中自主判断是否、何时以及如何进行优化，导致（1）错误在生成阶段持续传播；（2）迭代次数固定，无法根据问题难度动态调整；（3）严重依赖外部反馈信号，限制了模型的自主性。
 
@@ -62,7 +64,9 @@ claims:
 
 该设计的因果逻辑是：只有当模型学会在“需要优化”的时机触发优化，且优化确实提升了答案质量时，才能获得正向奖励；不必要的优化或有害优化都会受到惩罚。这种细粒度奖励信号迫使模型发展出对自身生成状态的元认知能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PASR 的核心创新在于将语言模型的自我优化从“事后修复”范式转变为“生成中主动触发”范式。现有方法（如 Self-Refine, SCoRe, PTR）均采用固定迭代次数的事后优化，依赖外部反馈或辅助模型，且无法在生成过程中自主决定优化的时机与必要性。PASR 通过强化学习训练，使模型学会在推理轨迹中动态插入 `<refine>` 标签，从而在不显著增加 token 消耗的前提下提升准确率。
 
@@ -80,7 +84,7 @@ PASR 的核心创新在于将语言模型的自我优化从“事后修复”范
 
 该方法在 Wino 基准上出现 -7.7 的性能下降，表明在需要常识推理的任务上，主动优化可能引入错误。此外，优化奖励中的容忍参数 ζ 需手动设定，其敏感性未充分分析；训练数据仅来自通用指令跟随数据集（约 40k 对），在特定领域任务上的泛化能力未充分验证。LLM 裁判评估本身可能引入裁判模型的偏差，这一环节的可靠性需要手动验证。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0004_0GaCfBRFnf_A_Stitch_in_Time_Saves_Nine_Proactive_Self-Refin/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison between the post-hoc refinement method (middle) and our proposed PASR (right). The post-hoc refinement method iteratively refines its initial answer. In contrast, PASR proactively refines its reasoning process during the generation*
@@ -108,7 +112,7 @@ PASR 的 pipeline 由四个紧密耦合的模块构成：
 
 **需要手动验证的点**：优化奖励中的容忍参数 ζ 的敏感性未充分分析；训练数据来自单一通用指令跟随数据集，在特定领域任务上的泛化能力未充分验证。
 
-## 核心模块与公式推导
+
 
 PASR 的核心创新在于将自我优化从“事后修复”范式转变为“生成过程中主动触发”范式。其技术栈围绕三个关键模块构建：结构化输出格式、基于 GRPO 的强化学习训练框架，以及一个由三部分组成的细粒度奖励函数。
 
@@ -153,7 +157,9 @@ $$
 
 **核心机制总结**：PASR 通过 GRPO 算法在组内进行 on-policy 探索，让模型自主决定是否插入 `<refine>` 标签以及如何修改推理内容。比较式优化奖励通过将优化后的结果与组内未优化的标准结果进行对比，提供了细粒度的学习信号：鼓励那些能带来实质性改善的优化，惩罚那些导致性能下降的优化，并抑制那些无意义的冗余优化。这种设计使得模型能够在推理过程中动态判断优化的时机和内容，从而在仅增加少量 token 消耗的情况下获得显著的性能提升。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -204,7 +210,9 @@ PASR的失败模式集中在两个方向：一是**Wino任务上的性能下降*
 ![[assets/figures/papers/iclr26_0004_0GaCfBRFnf_A_Stitch_in_Time_Saves_Nine_Proactive_Self-Refin/figures/008_Table_4.jpg]]
 *Table 4: Important parameters for each baseline method*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 PASR（ProActive Self-Refinement）在自我优化方法谱系中占据了一个独特的位置：它从“事后修复”范式转向了“生成过程中主动优化”范式。这一转变的核心在于将优化时机从一个固定的后处理步骤，变成一个由模型内部状态和上下文动态决定的生成时行为。
 
@@ -221,6 +229,8 @@ PASR在不同任务类型上表现出显著分化。在数学推理任务（MATH
 1. **泛化边界不清晰**：训练数据仅来自alpaca_evol_instruct_70k（约40k对），在特定领域任务上的泛化能力未充分验证。Qwen2.5-14B上的平均提升为4.9%，低于7B模型的4.8%和8B模型的8.2%，说明有效性随模型规模变化，但根本原因未探讨。
 2. **评估偏差**：使用LLM裁判评估开放域答案的语义质量，裁判模型本身可能存在偏见。在缺乏明确标准答案的场景下，比较式奖励策略如何调整尚不明确。
 3. **开放问题**：如何定义生成过程中优化的最佳时机？模型如何将自适应优化行为泛化到未见过的任务？当模型缺乏相关知识或元认知能力时，自我优化的局限性是什么？这些问题的回答需要更深入的行为分析和跨任务泛化实验。
+
+
 
 ## 原文 PDF
 

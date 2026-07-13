@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/BFM_Zero_A_Promptable_Behavioral_Foundation_Model_for_Humanoid_Control_Using_Unsupervised_Reinforcement_Learning.pdf
+project_link: null
+code_link: null
 openreview_forum_id: jkhl2oI0g5
 aliases:
 - BZ
@@ -42,7 +44,7 @@ claims:
 > - AMASS (tracking) 上，E_mpjpe (↓) 为 1.0342，对比 GMT: 1.9064，变化 -45.8%。
 > - 真实世界6种运动 (tracking) 上，E_mpjpe (↓) 为 1.1408 (real)，对比 0.8041 (sim-dr)，变化 +41.8%。
 
-## 概述
+## 概要
 
 人形机器人的全身控制长期依赖**在线策略PPO**与**明确的任务跟踪奖励**，导致策略高度专用、难以跨任务泛化，且缺乏统一的提示接口。无监督离线策略强化学习在真实机器人上的Sim-to-Real迁移与鲁棒性亦未得到系统验证。
 
@@ -56,7 +58,7 @@ BFM-Zero提出了一种**提示式行为基础模型**，核心思路是：利�
 
 **方法定位**：BFM-Zero属于**无监督离线策略RL + 潜空间条件化**范式，区别于传统基于PPO的任务专用跟踪器（如GMT），其训练无需任务特定奖励，推理阶段通过将奖励函数、目标姿态或运动序列嵌入潜空间直接执行，实现了从“单任务专用”到“通用提示式”的范式转变。
 
-## 背景与动机
+
 
 人形机器人的全身控制是实现通用物理智能的关键瓶颈。当前主流方法几乎全部采用在线策略的PPO（Proximal Policy Optimization）范式，配合明确的任务特定跟踪奖励函数进行训练。这种范式存在三个根本性局限：
 
@@ -68,7 +70,9 @@ BFM-Zero提出了一种**提示式行为基础模型**，核心思路是：利�
 
 **核心动机**：BFM-Zero旨在突破上述局限，构建一个统一的**提示式行为基础模型**（promptable behavioral foundation model）。其核心思路是：通过无监督强化学习预训练，学习一个平滑、可解释的潜行为空间$Z$，使得策略仅需条件化于潜向量$z$即可泛化至多种下游任务——包括运动跟踪、目标姿态到达和奖励函数优化——无需任何再训练。同时，通过非对称历史依赖训练、领域随机化和辅助奖励正则化等设计，确保模型能够从仿真稳健迁移至真实Unitree G1人形机器人。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 BFM-Zero的核心创新在于将**无监督强化学习**范式引入人形机器人全身控制，构建了一个**统一的、可提示的行为基础模型**。相对于现有方法，其关键突破体现在以下四个维度：
 
@@ -114,7 +118,7 @@ $$\mathcal{L}(D) = - \mathbb{E}_{\tau \sim \mathcal{M}, (o, s) \sim \tau} [\log(
 
 BFM-Zero的核心贡献在于**将零样本RL的FB框架首次成功应用于人形机器人全身控制的Sim-to-Real场景**，通过潜空间统一提示、三层鲁棒性训练和GAN行为正则化，实现了从“每任务一模型”到“单一通用模型”的范式跃迁。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_jkhl2oI0g5/figures/002_Figure_2.jpg]]
 *Figure 2: An overview of the BFM-Zero framework. After the pre-training stage, BFM-Zero forms a latent space that can be used for zero-shot reward optimization, single-frame goal reaching, and tracking. It can also be adapted in a few-shot fashion to reach more challenging poses*
@@ -152,7 +156,7 @@ $$\mathcal{L}(\pi) = - \mathbb{E} \Big[ F(o_{t,H}, s_t, a_t, z)^\top z + \lambda
 
 整个系统的输入为机器人本体感知观测历史 $o_{t,H}$（包含 $H$ 步的观测与动作序列），输出为 29 自由度 PD 控制器目标 $a \in \mathbb{R}^{29}$。任务通过潜向量 $z$ 提示，策略网络采用带残差连接的类 Transformer 架构（表3），评论家与判别器则使用更大容量的嵌入残差块以充分捕获特权状态信息。
 
-## 核心模块与公式推导
+
 
 BFM-Zero的核心架构围绕**Forward-Backward（FB）表示学习**构建统一的潜任务空间，并通过离线策略无监督RL预训练形成可提示的行为基础模型。其关键模块如下：
 
@@ -217,7 +221,9 @@ $$J(z) = \sum_{t=0}^{T-1} \Big( r_{\mathrm{task}}(s_t) - \alpha_R \sum_{k=1}^{N_
 
 优化可采用CEM（Cross-Entropy Method）或双退火轨迹优化等方法，无需修改网络参数即可适应新任务。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能：零样本运动跟踪的样本效率与精度优势
 
@@ -292,7 +298,9 @@ BFM‑Zero 展现出超越显式扰动训练的鲁棒性（Figure 7）：被踢�
 4. **硬件泛化**：仅在 Unitree G1 单一平台上验证，泛化至其他人形机器人构型需要进一步实验。
 5. **规模律未明**：运动数据集大小、模拟数据采样策略与模型架构之间的缩放规律尚未系统研究。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从任务专用RL到统一行为基础模型
 
@@ -358,6 +366,8 @@ BFM-Zero的方法论根基深植于两条技术路线的交汇：**无监督强�
 5. **跨平台泛化**：当前仅在Unitree G1上验证，方法是否可泛化至其他构型的人形机器人（如不同腿臂比例、关节限位）？是否需要构型条件化的表示学习？
 
 6. **安全保证的形式化**：辅助奖励虽在实践中有效，但其安全保障缺乏形式化分析。如何在理论上刻画辅助评论家提供的安全边界？
+
+
 
 ## 原文 PDF
 

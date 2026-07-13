@@ -33,7 +33,7 @@ claims:
 | 中文题名 | 单目视频中身体与服装的捕捉与动画化 |
 | 英文题名 | Capturing and Animation of Body and Clothing from Monocular Video |
 | 会议/期刊 | SIGGRAPH ASIA 2022 |
-| Links | [paper](https://arxiv.org/abs/2210.01868) · [Code](https://github.com/YadiraF/SCARF) · [arXiv](https://arxiv.org/abs/2210.01868") |
+| Links | [paper](https://arxiv.org/abs/2210.01868) · [Code](https://github.com/YadiraF/SCARF) · [paper](https://arxiv.org/abs/2210.01868") |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | SCARF (Segmented Clothed Avatar Radiance Field) |
 | Dataset | People‑Snapshot |

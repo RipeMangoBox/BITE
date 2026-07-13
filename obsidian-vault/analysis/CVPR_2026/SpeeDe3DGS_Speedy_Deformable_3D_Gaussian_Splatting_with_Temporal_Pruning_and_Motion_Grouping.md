@@ -42,7 +42,7 @@ claims:
 > - MonoDyGauBench (50 scenes) 上，FPS (RTX 3090) 276.91 (13.71×) vs 20.20 (DeformableGS) (13.71×)。
 > - HyperNeRF (8 scenes) 上，FPS (RTX 3090) 260.05 (23.84×) vs 10.91 (DeformableGS) (23.84×)。
 
-## 概述
+## 概要
 
 动态3D高斯泼溅（3DGS）方法通过对每一帧、每一个高斯原语执行神经网络形变推理来建模场景运动，导致渲染计算开销极大。以**DeformableGS**为代表的基线方法虽然重建质量优异，但渲染速度远低于实时交互需求，这构成了本文的核心瓶颈。
 
@@ -56,7 +56,7 @@ SpeeDe3DGS针对上述瓶颈提出了两个因果性调控手段：**减少需�
 
 **局限性**方面，该方法继承了动态3DGS基线对高度非刚性运动场景的建模挑战；GroupFlow通过共享刚性变换建模非刚性运动，在极度变形区域可能不够灵活；训练与评测在不同GPU上进行，存在硬件差异导致的对比公平性风险（论文已明确标注测量GPU）。
 
-## 背景与动机
+
 
 ### 动态3DGS的效率瓶颈
 
@@ -80,7 +80,9 @@ SpeeDe3DGS的动机直接针对上述两个缺口：**减少需要形变推理�
 
 两条路径协同作用：剪枝移除了冗余原语，为GroupFlow提供了更紧凑、运动更一致的高斯集合；GroupFlow的共享刚性变换进一步压缩了形变表示。在HyperNeRF上，单独TSP+TSS实现9.37×渲染加速，单独GroupFlow实现15.66×加速，两者结合达到29.21×加速（Table 9），验证了“剪枝+分组”这一组合策略的有效性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SpeeDe3DGS 围绕“减少形变推理开销”这一核心瓶颈，在 **DeformableGS** 基线上引入了两条正交且可叠加的创新路径：**原语级剪枝**与**运动表示蒸馏**。二者分别从“推理哪些高斯”和“如何推理其运动”两个维度切入，共同实现了数量级的渲染加速。
 
@@ -130,7 +132,7 @@ TSP+TSS 和 GroupFlow 解决的是**不同维度**的效率瓶颈：前者减少
 
 GroupFlow 通过共享刚性变换建模非刚性运动，在极度变形区域可能不够灵活。增加 $J$ 可缓解此问题，但固定分组数存在建模能力上限。此外，方法继承了动态 3DGS 基线对高度非刚性运动和噪声相机位姿的敏感性。
 
-## 整体框架
+
 
 SpeeDe3DGS 是一个面向动态3D高斯泼溅（3D Gaussian Splatting, 3DGS）的加速框架，其核心目标是解决现有可变形3DGS方法（如 **DeformableGS**）中逐高斯、逐帧的神经网络形变推理带来的巨大计算开销。该框架通过两条正交的加速路径——**原语精简**与**运动表示简化**——在保持视觉质量的前提下实现数量级的渲染与训练加速。
 
@@ -173,7 +175,7 @@ SpeeDe3DGS 的训练分为两个阶段：
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2506_07917/figures/001_Figure_1.jpg]]
 *Figure 1: Our SpeeDe3DGS framework achieves 9.88× faster rendering, 11.37× fewer Gaussians, and 2.87× shorter training on the HyperNeRF [37] chicken scene while preserving the image quality of DeformableGS [53] through Temporal Sensitivity Pruning (TSP) and Sampling (TSS). Applying our GroupFlow method on top of pruning accelerates rendering and training by 33.13× and 4.24×, respectively*
 
-## 核心模块与公式推导
+
 
 SpeeDe3DGS 围绕两个因果旋钮展开：**减少需要形变推理的高斯原语数量**（通过时序敏感性剪枝）和**降低每个原语的形变推理成本**（通过分组共享 SE(3) 刚性变换）。以下按模块展开其核心机制与关键公式。
 
@@ -257,7 +259,9 @@ SpeeDe3DGS 的训练分两阶段进行（Section 4.3）：**稠密化阶段**应
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2506_07917/figures/003_Figure_3.jpg]]
 *Figure 3: Comparison of our pruning methods on the real-world NeRF-DS [52] bell scene. Our proposed Temporal Sensitivity Pruning (TSP) and Temporal Sensitivity Sampling (TSS) methods achieve higher SSIM than the baseline DeformableGS [53] model while using 11× fewer Gaussians. The left regions of the renderings appear visually identical, while the right regions show that combining TSP with TSS significantly reduces temporal flicker and floating artifacts compared to both standard pruning and the unpruned baseline*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能：NeRF-DS 上的组件消融
 
@@ -321,7 +325,9 @@ Table 1 在真实世界 NeRF-DS 数据集上对 SpeeDe3DGS 的三个核心组件
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2506_07917/figures/008_Table_4.jpg]]
 *Table 4: Results for the 17 scenes in the real-world HyperNeRF dataset [37] with MonoDyGauBench [25]. Results with our SpeeDe3DGS framework are reported in Table 9*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -361,6 +367,8 @@ SpeeDe3DGS 并非从零构建一个全新的动态场景表示框架，而是在
 - **极端剪枝下的质量保持**：在剪枝比例超过 90% 的极端情况下，如何设计更智能的敏感度指标（如融合不透明度、尺度、视点依赖可见性）或引入重新增补高斯的机制，以同时维持渲染速度和视觉质量？
 - **GroupFlow 的泛化增强**：能否通过融合更多运动基（如混合形变场）或引入 2D 光流先验来增强 GroupFlow 对高度变形场景的泛化能力？这涉及到将数据驱动的运动先验注入分组过程。
 - **时序敏感度度量的扩展**：当前的 TSP 分数基于 L2 损失的二阶敏感度近似，是否可与其他重要性度量（如对感知损失的贡献、对时序一致性的影响）结合，以进一步提升剪枝的针对性和鲁棒性？
+
+
 
 ## 原文 PDF
 

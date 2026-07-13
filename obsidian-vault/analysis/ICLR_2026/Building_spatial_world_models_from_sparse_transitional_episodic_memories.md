@@ -33,7 +33,7 @@ claims:
 | 中文题名 | 从稀疏片段式情景记忆中构建空间世界模型 |
 | 英文题名 | Building spatial world models from sparse transitional episodic memories |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=w3w7WVG4ks) · [arXiv](https://arxiv.org/abs/2412.03572) |
+| Links | [paper](https://openreview.net/forum?id=w3w7WVG4ks) · [paper](https://arxiv.org/abs/2412.03572) |
 | Topic | #topic/other_unclear #topic/other_unclear/general |
 | Method | ESWM (Episodic Spatial World Model) |
 | Dataset | Open Arena, Random Wall, Random Wall Navigation, Random Wall Adaptation |
@@ -43,7 +43,7 @@ claims:
 > - Random Wall (hex grid, 36 locations, integer states) 上，Predict Source (Seen / Unseen / Unsolvable) 0.905 / 0.875 / 0.827 (ESWM-T-4L) vs TEM-T 失败 (无法泛化到不同墙体结构) (ESWM-T 显著优于 TEM-T)。
 > - Random Wall Navigation 上，成功率 / 路径最优性 96.8% / 99.2% vs EPN: 78.8% / 78.2% (相对下降18和21个百分点) (+18% / +21%)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：传统世界模型通常依赖连续的序列数据，将环境结构知识隐式编码于循环网络或注意力权重中。这种范式在以下场景中面临根本性困难：(1) 观察完整环境需极长的时间步；(2) 环境结构随时间变化；(3) 记忆以片段化、非连续的方式收集。其本质瓶颈在于，这类模型难以从**离散、无序的情景记忆中快速构建空间地图**，且在环境拓扑发生变化时缺乏灵活适应的能力。
 
@@ -61,7 +61,7 @@ claims:
 
 **局限与展望**：当环境中存在重复状态且无历史轨迹作为上下文时，单步转移预测无法消歧；潜空间启发式 $h_{\mathrm{latent}}$ 可能高估真实测地距离，A* 规划不保证最优性；高维感官输入下的表征质量与可扩展性仍需进一步验证。
 
-## 背景与动机
+
 
 ### 问题背景：世界模型在空间推理中的瓶颈
 
@@ -97,7 +97,9 @@ claims:
 
 这一设计使得 ESWM 有望在零样本探索、导航和快速适应等关键能力上取得突破，同时其内部表征是否真正形成与物理空间对齐的认知地图，也是本文重点验证的核心假设。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 从连续序列到无序片段：记忆表征的范式转换
 
@@ -119,7 +121,7 @@ TEM-T 的记忆整合机制本质上是序列化的：LSTM 沿轨迹逐步更新
 
 上述三个 changed slots 共同催生了 ESWM 最具区分度的能力：**零样本环境适应**。当环境结构发生变化（如新增障碍物），基于序列的模型需要重新训练网络权重；而 ESWM 仅需从记忆库中删除与变化相关的过期转移，并插入少量新探索获得的转移，即可立即恢复导航能力。在 Random Wall 实验中，ESWM 通过简单编辑记忆库在环境变化后维持 93% 的导航成功率，远超固定权重基线（56%）和 EPN（72%）（Fig.5c）。这一能力源于 ESWM 将环境知识外化于可编辑的记忆库，而非固化于网络参数的设计哲学。
 
-## 整体框架
+
 
 ESWM (Episodic Spatial World Model) 的核心思想是将世界模型从“记忆网络权重”转变为“记忆情景转移”。其整体 pipeline 围绕一个中心函数 $q^{*} = f(M, q)$ 展开：给定一个情景记忆库 $M$ 和一个部分掩码的查询转移 $q$，模型 $f$ 输出完整的预测转移 $q^{*}$（Equation 1）。这一框架将环境结构知识从模型参数中剥离，存储于可显式编辑的记忆库中，使模型在推理时动态推断空间关系，而非从连续序列中隐式学习。
 
@@ -150,7 +152,7 @@ ESWM (Episodic Spatial World Model) 的核心思想是将世界模型从“记�
 ![[assets/figures/papers/paper_list_l66_https_openreview_net_forum_id_w3w7WVG4ks/figures/001_Figure_1.jpg]]
 *Figure 1: Episodic Spatial World Model. a) Three common scenarios that hinder the ability of typical world models to generalize effectively. (top) Observation of the full environment may take many time steps leading to long sequences; (middle) Environment structure may change across trials; (bottom) Information about a particular environment may be collected across separate exposures to the environment and not within a single one. b) Memory bank and query selection in a square grid environment. c) Architecture of ESWM and training procedure. Model input consists of a bank of transitional memories (corresponding to the black arrows in (b)) and a single query (q arrow in (b)), with either start-state,...*
 
-## 核心模块与公式推导
+
 
 ESWM 的核心功能由单一公式定义：
 
@@ -202,7 +204,9 @@ ESWM 的核心架构为**无位置编码的编码器专用 Transformer**（ESWM-
 
 这一元学习范式是 ESWM 零样本泛化能力的根源：推理时面对全新环境结构和记忆库，模型无需任何参数更新即可直接预测。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心预测能力评估
 
@@ -299,7 +303,9 @@ ESWM 最引人注目的特性是其潜在空间自发形成了与物理环境拓
 ![[assets/figures/papers/paper_list_l66_https_openreview_net_forum_id_w3w7WVG4ks/figures/025_Figure_17.jpg]]
 *Figure 17: Comparison of end-state prediction accuracy between EMWM Coda-Forno et al. (2022a) and Transformer-2L ESWM in RandomWall. EMWM predicts using a weighted average over the top-K matches (K=5), but we found K=1 performs best, likely due to the sparsity of our memory banks (i.e, transitions are unique, so averaging more than one transition offers no benefit). To adapt the author’s implementation to our task, we embed each token (transitional memory tokens or the end-state masked query) by averaging the embedding of each item*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心范式定位：从序列世界模型到情景记忆世界模型
 
@@ -351,6 +357,8 @@ ESWM 的能力边界由以下约束定义：
 **3. 真实感知场景的扩展**：在更复杂的高维感官输入（如激光雷达点云、多相机 RGB-D 流）下，ESWM 的表征质量与可扩展性尚未验证。关键挑战在于：如何将原始感知信号映射到适合情景记忆检索与整合的表示空间，同时保持空间结构的可解释性。
 
 **4. 终身学习与记忆巩固**：当前 ESWM 的记忆编辑依赖人工检测环境变化并手动增删转移。如何实现自动化的变化检测、记忆冲突解决与记忆巩固（如将频繁使用的转移链压缩为“捷径记忆”），是通向终身学习智能体的关键一步。
+
+
 
 ## 原文 PDF
 

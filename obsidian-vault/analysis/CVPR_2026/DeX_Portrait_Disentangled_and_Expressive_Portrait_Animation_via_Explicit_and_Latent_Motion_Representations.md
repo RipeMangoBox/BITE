@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/DeX_Portrait_Disentangled_and_Expressive_Portrait_Animation_via_Explicit_and_Latent_Motion_Representations.pdf
+project_link: https://syx132.github.io/DeX-Portrait/
+code_link: null
 aliases:
 - DP
 - DeX-Portrait
@@ -43,7 +45,7 @@ claims:
 > - Cross-Reenactment 上，CSIM 0.623 vs best among baselines (N/A)；AED 0.0515 vs best among baselines (N/A)；APD 0.145 vs best among baselines (N/A)。
 > - Disentangled-Reenactment 上，CSIM 0.631 vs best among baselines (N/A)。
 
-## 概述
+## 概要
 
 **核心问题**：现有扩散模型在肖像动画中难以实现头部姿态与面部表情的高保真解耦控制。主流方法通常将姿态与表情信息纠缠在隐式特征中，导致无法独立编辑——例如，仅改变表情时姿态也会发生偏移，反之亦然。这一瓶颈严重限制了仅表情编辑、仅姿态编辑等精细应用。
 
@@ -55,7 +57,7 @@ claims:
 
 **局限与展望**：当前方法依赖人脸解析与关键点检测，无法处理卡通、素描等非真实风格，对多人场景和严重遮挡的鲁棒性不足。扩散推理效率尚未优化，实时应用受限。未来可探索向非真实风格扩展、提升多人场景鲁棒性，以及将显式姿态控制与音频等其他模态结合。
 
-## 背景与动机
+
 
 肖像动画（portrait animation）旨在根据驱动信号（如面部表情、头部姿态）生成与源肖像身份一致的真实感视频，在虚拟主播、远程社交、数字人等应用中需求迫切。该任务的核心挑战在于**同时实现高保真身份保持、准确的表情传递和精准的头部姿态控制**，且三者之间不能相互泄漏干扰。
 
@@ -76,7 +78,9 @@ claims:
 
 这一设计使得 DeX-Portrait 首次在扩散式肖像动画框架中实现了真正意义上的解耦编辑——用户可独立操控头部姿态（旋转、平移、缩放）或面部表情，而另一维度保持与源图像完全一致（如 Figure 1 所示），为后续仅表情编辑、仅姿态编辑等精细应用奠定了基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DeX-Portrait 的核心创新在于将**头部姿态**与**面部表情**分别建模为**显式低维变换**与**隐式高维编码**，并通过双分支注入机制和渐进式混合 CFG 实现二者的高保真解耦控制。这一设计从根本上解决了现有扩散模型（如 **X-NeMo**（Zhao et al., arXiv 2025）、**HunyuanPortrait**（Xu et al., CVPR 2025））中姿态与表情相互泄漏的问题，使仅表情编辑、仅姿态编辑等精细化应用成为可能。
 
@@ -111,7 +115,7 @@ DeX-Portrait 的核心创新在于将**头部姿态**与**面部表情**分别�
 
 > **注意**：论文未提供模型参数量、推理速度或计算资源的对比数据，效率维度的创新性需人工补充验证。
 
-## 整体框架
+
 
 DeX-Portrait 采用**两阶段流水线**，核心思路是将头部姿态与面部表情分别编码为异质表示，再通过扩散模型实现解耦动画生成。整体架构如 Figure 2 所示。
 
@@ -136,7 +140,7 @@ DeX-Portrait 采用**两阶段流水线**，核心思路是将头部姿态与面
 
 最终，在时序模块的加持下，系统可生成连贯的肖像动画视频。整个流水线的输入为单张源肖像、驱动姿态序列与驱动表情序列，输出为姿态与表情可独立控制的动画帧。
 
-## 核心模块与公式推导
+
 
 DeX-Portrait 的核心架构由两个阶段级联构成：**解耦运动训练器** 与 **基于扩散的解耦动画器**。其设计目标是将头部姿态与面部表情编码为相互独立的表示，并在扩散生成过程中分别注入，从而实现精准的独立控制。
 
@@ -194,7 +198,9 @@ $$L_{\theta} = \mathbb{E}_{\epsilon \sim \mathcal{N}(0,1), t} \left[ \lVert \eps
 ![[assets/figures/papers/paper_list_l16_https_openaccess_thecvf_com_content_CVPR2026_html_Shi_DeX_Portrait_Disen/figures/006_Figure_6.jpg]]
 *Figure 6: Our chosen S = 5 delivers animation results with both consistent identity and accurate expression*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设定
 
@@ -254,7 +260,9 @@ DeX-Portrait 通过显式 RTS 姿态表示与隐式表情编码的双分支注�
 ![[assets/figures/papers/paper_list_l16_https_openaccess_thecvf_com_content_CVPR2026_html_Shi_DeX_Portrait_Disen/figures/011_Table_2.jpg]]
 *Table 2: Quantitative ablation studies*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：扩散肖像动画中的姿态-表情耦合瓶颈
 
@@ -317,6 +325,8 @@ DeX-Portrait 的方法论贡献可归纳为三个层面，每一层面对应一�
 ---
 
 **本节小结**：DeX-Portrait 在扩散肖像动画的方法谱系中占据了“显式-隐式混合解耦”这一独特位置。它继承了显式姿态控制的直观性和隐式表情编码的表现力，同时通过双分支注入、增强训练和渐进CFG等机制解决了二者的耦合问题。其核心洞察——用低维显式变换避免表情泄漏，用高维隐式编码保证表现力——为后续工作提供了清晰的设计范式。当前的主要局限集中在非真实风格、多人场景和推理效率上，这些也是该方向最自然的延伸路径。
+
+
 
 ## 原文 PDF
 

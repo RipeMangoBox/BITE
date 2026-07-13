@@ -44,7 +44,7 @@ claims:
 > - MM-SafetyBench (S) 上，ASR 3.6% vs 70.0% (-66.4%)。
 > - JailBreakV-28K (Blank) 上，ASR 3.6% vs 27.7% (-24.1%)。
 
-## 概述
+## 概要
 
 视觉语言模型（VLM）在多模态任务中展现出强大能力，但其安全对齐机制在面对视觉输入时存在根本性脆弱性：**视觉模态会引入安全相关的分布偏移（safety-relevant distributional shift），削弱模型区分安全与不安全请求的能力**，使其更容易被多模态越狱攻击攻破。现有防御方法或依赖图像到文本的转换（带来信息损失与计算开销），或在微调/推理阶段修改中间激活或解码logits，均难以在安全性与任务性能之间取得高效平衡。
 
@@ -61,7 +61,7 @@ DTR在方法谱系中定位为**推理时KV缓存优化防御**，与现有方�
 
 DTR仅需32个参考样本即可达到稳定的防御效果，且优化步数少（m=4即可大幅降低ASR），展现出良好的数据效率与实用性。该方法在LLaVA、MiniGPT、InternVL、Llama-4-Scout等多种VLM架构上均验证了通用性。
 
-## 背景与动机
+
 
 ### 多模态越狱攻击：视觉输入引发的安全退化
 
@@ -91,7 +91,9 @@ DTR的动机源于三个关键观察：
 
 与现有方法相比，DTR的独特优势在于：它首次将KV缓存优化引入多模态越狱防御，避免了图像到文本转换的信息损失和计算开销，同时通过早停和token淘汰策略实现了极低的推理额外开销（平均推理时间仅4.01秒，相比未防御模型的3.65秒仅增加0.36秒）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DTR 的核心创新在于**首次将 KV 缓存优化引入多模态越狱防御**，并围绕“逆安全相关偏移”（Reversal Safety-Relevant Shift, RSS）构建了一套无需图像到文本转换、可解释且高效的推理时防御框架。其相对于现有防御方法的关键改进体现在以下三个维度。
 
@@ -134,7 +136,7 @@ $$
 
 DTR 的防御鲁棒性源于其给攻击者制造的**双重困境**（Appendix B.7）：攻击者要绕过 VLM 的安全护栏，需要将嵌入引导远离拒绝区域，这不可避免地增加 RSS，使输入被 DTR 检测到；反之，若攻击者试图最小化 RSS 以逃避检测，则会限制其诱导安全相关偏移的能力，从而削弱攻击效果。即使在针对 DTR 的自适应攻击（PGD 最小化 RSS）下，DTR 仍能将 ASR 限制在 18%，而未防御模型高达 68%（Table 13），验证了这一机制的有效性。
 
-## 整体框架
+
 
 DTR（Dynamic Token Reweighting）是一种**推理时防御方法**，其核心设计目标是在不修改模型参数的前提下，通过动态调节视觉令牌（visual tokens）在KV缓存中的重要性，抵消由多模态输入引入的安全相关分布偏移（safety-relevant distributional shift），从而恢复VLM内置的安全对齐行为。该方法首次将KV缓存优化引入多模态越狱防御领域。
 
@@ -207,7 +209,7 @@ DTR通过两项策略保障推理效率：
 
 三个模块形成清晰的串行依赖：模块一为模块二提供拒绝方向 $\mathbf{d}_{\mathrm{ref}}$；模块二利用该方向优化得到缩放向量 $\boldsymbol{\alpha}^{*}$；模块三消费 $\boldsymbol{\alpha}^{*}$ 完成令牌重加权和响应生成。模块一可离线预计算并跨查询复用，模块二和模块三在推理时对每个查询独立执行，整体流程无需访问外部模型或进行图像转文本操作，保证了方法的自包含性和高效性。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化
 
@@ -277,7 +279,9 @@ $$\alpha^{*} = \arg\min_{\alpha \in [0,1]^n} \mathcal{L}(\alpha), \quad \mathcal
 ![[assets/figures/papers/paper_list_l746_https_arxiv_org_abs_2505_17132/figures/020_Figure_7.jpg]]
 *Figure 7: Comparison of α heatmaps under uniform reweighting (left) and DTR’s optimized reweighting (right). Uniform scaling applies a constant value across all visual tokens, whereas DTR selectively adjusts per-token weights based on their safety relevance*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心防御性能
 
@@ -350,7 +354,9 @@ DTR的缩放向量α提供了直观的可解释性（Figure 4，Figure 12-13）�
 ![[assets/figures/papers/paper_list_l746_https_arxiv_org_abs_2505_17132/figures/025_Table_15.jpg]]
 *Table 15: Attack success rate (ASR) and vision-language capability (VLC) scores of DTR-defended VLM with varying λ*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：视觉模态引入的安全偏移
 
@@ -444,6 +450,8 @@ DTR的适用性受以下条件约束：
 ### 防御机制的双重困境优势
 
 DTR的鲁棒性部分源于其给攻击者制造的**双重困境**：绕过VLM安全护栏需要将嵌入引导远离拒绝区域，这会增加RSS并使输入被DTR检测到；反过来，最小化RSS以逃避DTR检测会限制攻击者诱导足够安全相关偏移的能力。这一内在张力使DTR在面对自适应攻击时仍保持有效，ASR-R与ASR-G的相反变化关系（Figure 6）验证了这一机制。
+
+
 
 ## 原文 PDF
 

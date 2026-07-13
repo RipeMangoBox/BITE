@@ -5,6 +5,8 @@ paper_level: A
 venue: ECCV
 year: 2024
 pdf_ref: paperPDFs/ECCV_2024/Generative_Camera_Dolly_Extreme_Monocular_Dynamic_Novel_View_Synthesis.pdf
+project_link: null
+code_link: null
 aliases:
 - GGCD
 - GCDEMDNVS
@@ -40,7 +42,7 @@ claims:
 > [!tip] 效果简介
 > - Kubric‑4D 上，PSNR (all) ↑ 20.30 vs 15.68 (ZeroNVS) (+4.62)；SSIM (all) ↑ 0.587 vs 0.396 (ZeroNVS) (+0.191)；LPIPS (all) ↓ 0.408 vs 0.508 (ZeroNVS) (-0.100)。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -71,7 +73,7 @@ GCD 在现有方法谱系中占据独特位置。与每场景优化的动态新�
 
 尽管在合成数据上表现优异，GCD 在真实世界泛化方面仍存在明显局限：对包含人体、动物或可变形物体的视频，常产生模糊或形状错误的结果；对不熟悉的运动模式（如机器人手臂）可能发生截断或错误重建。这些失败案例指向一个开放问题：如何在不牺牲生成多样性的前提下，增强模型对对象形状与运动的时间对应关系建模。
 
-## 背景与动机
+
 
 ### 问题背景：从多视角到单目的动态新视角合成
 
@@ -101,7 +103,9 @@ GCD 在现有方法谱系中占据独特位置。与每场景优化的动态新�
 
 基于上述动机，本文提出的 **GCD（Generative Camera Dolly）** 方法旨在实现以下目标：从一段单目 RGB 视频出发，合成从任意新视角观察同一动态场景的视频，且视角变化幅度可达 90° 以上。通过在合成数据集 Kubric‑4D 和 ParallelDomain‑4D 上的系统评估，验证该方法在极端视角变化下的高保真合成能力，并探索其在真实世界场景中的泛化潜力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GCD 的核心创新在于将一个极具挑战性的几何重建问题——单目动态新视角合成——**重新建模为端到端的视频到视频翻译任务**，并借助大规模预训练视频扩散模型的生成先验来填补几何建模的缺失。这一范式转换绕开了传统方法对显式 3D 表示或深度输入的依赖，带来三个紧密耦合的关键创新点。
 
@@ -119,7 +123,7 @@ GCD 并非从零开始训练一个扩散模型，而是从公开的 **Stable Vid
 
 上述三个创新点并非孤立存在，而是形成了一条完整的因果链：**预训练先验提供了“能生成合理视频”的基础能力，时空联合条件化确保了“生成内容忠于输入”，摄像机微条件则精确控制了“从哪个角度看”**。三者协同，使 GCD 在不依赖深度图或显式 3D 几何的情况下，实现了极端视角变化下的高保真动态新视角合成。
 
-## 整体框架
+
 
 GCD 将单目动态新视角合成为一个端到端的视频到视频翻译任务。其核心映射关系为：
 
@@ -166,7 +170,7 @@ $$\hat{\pmb{y}}_{u-1} = w \epsilon(\hat{\pmb{y}}_u \parallel \pmb{x}, \Delta \ma
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2405_14868/figures/002_Figure_2.jpg]]
 *Figure 2: Method. Our model, GCD, is an end-to-end video translation pipeline that maps an input video from any viewpoint into an output video from any other perspective, with the objective of respecting all objects and dynamics occurring within the observed dynamic scene, and faithfully reconstructing the corresponding visual details from this novel viewpoint. The relative camera extrinsics matrix ∆E guides the relationship between the two camera poses*
 
-## 核心模块与公式推导
+
 
 ### 问题形式化
 
@@ -216,7 +220,9 @@ GCD 从公开的 Stable Video Diffusion 图像到视频检查点初始化所有�
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2405_14868/figures/015_Figure_9.jpg]]
 *Figure 9: Spherical coordinate system. Models trained on Kubric-4D accept an azimuth*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -289,7 +295,9 @@ Fig. 8 展示了在 Kubric‑4D 上不同相机旋转幅度下的性能变化。
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2405_14868/figures/005_Table_1.jpg]]
 *Table 1: Ablation study results on Kubric. We evaluate various versions of our dynamic view synthesis model on only the last frame for fairness, i.e. to ensure that the direct and gradual trajectory models are spatially aligned. See Figure 3 for qualitative illustrations*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 
@@ -326,6 +334,8 @@ GCD 的有效性受到训练数据分布和模型设计选择的双重约束。
 **分辨率与时长限制。** 当前模型推理分辨率为 384×256，输出 14 帧视频。如何将框架扩展至更高分辨率和更长时序，同时保持生成质量与计算效率的平衡，是走向实际应用必须解决的问题。
 
 **显式几何的潜在增益。** GCD 刻意避免了显式 3D 几何建模，这既是其简洁性的来源，也是其局限性的根源。是否可能在保留扩散先验优势的前提下，引入轻量级的显式几何表示（如单目深度估计或稀疏点云）以提高合成精度和时空一致性，是一个开放的架构设计问题。
+
+
 
 ## 原文 PDF
 

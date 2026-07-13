@@ -43,7 +43,7 @@ claims:
 > - nuScenes (32-beam, unconditional) 上，FSVD↓ 64.21 vs 85.98 (Text2LiDAR) (-21.77)。
 > - nuScenes (text-guided, 'weather, location') 上，TBR (%)↑ 23.44 vs 17.15 (Text2LiDAR) (+6.29)。
 
-## 概述
+## 概要
 
 文本到LiDAR场景生成面临一个核心瓶颈：**文本-LiDAR配对数据极度稀缺**，导致生成模型缺乏足够的训练先验，常产生过于平滑、缺乏细节目标的场景；同时低质量的文本描述进一步削弱了生成的可控性。针对这一问题，本文提出**T2LDM**（Text-to-LiDAR Diffusion Model），通过**自条件表示引导（SCRG）**和**方向位置编码（DPE）**两个关键设计，在稀缺数据条件下实现具有丰富几何结构的LiDAR场景生成。
 
@@ -53,7 +53,7 @@ claims:
 
 **主要结果**：在KITTI-360无条件生成基准上，T2LDM的FSVD达到21.12，显著优于次优方法Text2LiDAR的51.55（降幅约59%）；在nuScenes文本引导生成中，文本匹配率TBR从17.15%提升至23.44%。消融实验证实，移除SCRG和DPE后FSVD从66.93恶化至91.15，TBR从23.44%降至15.45%，验证了两个组件的关键作用。此外，T2LDM在稀疏到密集上采样任务上也展现出优于专用方法**PUDM**（Qu et al., CVPR 2024）的性能。
 
-## 背景与动机
+
 
 ### 文本到LiDAR生成的现实需求
 
@@ -91,7 +91,9 @@ claims:
 
 通过端到端联合训练DN和GN，T2LDM在KITTI-360和nuScenes两个基准上均显著超越现有方法，并在文本引导生成、稀疏到密集上采样等任务中展现出优异的泛化能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 T2LDM 针对文本到LiDAR场景生成中“配对数据稀缺导致几何细节缺失”这一瓶颈，提出了两个相互协同的关键创新：**自条件表示引导（SCRG）** 和 **方向位置编码（DPE）**。前者在不增加推理成本的前提下为去噪网络注入几何重建正则化，后者解决了范围图（Range Map）中球面投影固有的方向混淆问题。
 
@@ -134,7 +136,7 @@ $$L_{total} = L(\theta) + L(\phi) + \lambda L_{SCRG}$$
 
 其中 $L(\theta)$ 为去噪损失，$L(\phi)$ 为GN重建损失，$L_{SCRG}$ 为对齐正则化项。
 
-## 整体框架
+
 
 T2LDM 的整体架构围绕“文本条件扩散 + 自条件表示引导”两条主线构建，通过四个核心模块的协同工作，在稀缺数据下实现具有丰富几何细节的 LiDAR 场景生成。图3展示了完整的数据流与模块关系。
 
@@ -199,7 +201,7 @@ $$L_{total} = L(\theta) + L(\phi) + \lambda L_{SCRG}$$
 ![[assets/figures/papers/paper_list_l2434_https_arxiv_org_abs_2511_19004/figures/026_Figure_1.jpg]]
 *Figure 1: The overall framework of T2LDM. DN and GN are composed of an Encoder, a Middle Stage, and a Decoder. The core modules of T2LDM include: ResBlock (RB), AttentionBlock (AB), DownsamplingBlock (DB), and UpsamplingBlock (UB). To effectively process the spherical projection of LiDAR data, T2LDM incorporates Circular Convolution [42] to adapt to the unfolded Range Map*
 
-## 核心模块与公式推导
+
 
 T2LDM 的核心架构由四个模块构成：文本编码器（TE）、去噪网络（DN）、引导网络（GN）和方向位置编码（DPE）。其设计围绕一个关键瓶颈展开——文本-LiDAR 配对数据极度稀缺，导致生成模型先验不足，常产生过于平滑、缺乏细节目标的场景。以下逐一阐述各模块的机制与关键公式。
 
@@ -260,7 +262,9 @@ $$L_{total} = L(\theta) + L(\phi) + \lambda L_{SCRG}$$
 
 其中 $L(\theta) = \mathbb{E}_{\epsilon \sim \mathcal{N}(0, I)} || v - v_{\theta}(x_t, t, c) ||^2$ 为标准的速度预测去噪损失。消融实验（Table 9）表明，端到端训练模式（FSVD 64.21）优于预训练模式（FSVD 67.35），验证了联合优化 GN 与 DN 特征对齐的有效性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与实验设计逻辑
 
@@ -340,7 +344,9 @@ T2LDM的表示学习能力在稀疏到密集上采样任务中得到进一步验
 ![[assets/figures/papers/paper_list_l2434_https_arxiv_org_abs_2511_19004/figures/006_Table_3.jpg]]
 *Table 3: The results on nuScenes. T2LDM achieves superior generation results across all metrics in sparse scenes*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题域定位：文本到LiDAR生成的稀缺数据困境
 
@@ -412,6 +418,8 @@ T2LDM展示了超出文本生成的泛化能力：在稀疏到密集LiDAR上采�
 4. **跨模态迁移潜力**：SCRG的核心思想——以特征空间对齐方式提供软几何监督——是否可推广到图像、视频等其他模态的生成任务中？这需要验证“自条件表示引导”在不同数据分布下的通用性。
 
 5. **评估指标的完备性**：当前主要依赖FSVD、FID等分布距离指标，但这些指标对几何细节的敏感度有限。是否需要开发专门针对LiDAR场景结构保真度的评估协议（如目标级重建精度、道路连续性度量）？
+
+
 
 ## 原文 PDF
 

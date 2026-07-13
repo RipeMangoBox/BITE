@@ -42,7 +42,7 @@ claims:
 > - 用户研究（Figure 6） 上，用户偏好 显著领先 vs DragGAN、DragDiffusion等 (在引导跟随、风格一致性、身份保持三项指标上均超过80%偏好)。
 > - 效率评估 上，交互延迟 / 模型推理时间 <10s 实时交互，模型推理~20s vs Image Sculpting需半小时以上 (实时交互且高效)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -87,7 +87,7 @@ ObjectMorpher处于**3D感知图像编辑**与**交互式对象操控**的交叉
 - 2D提升至3D的过程依赖TRELLIS的重建质量，其对最终编辑效果的影响边界；
 - 方法向多对象场景或视频的扩展可行性。
 
-## 背景与动机
+
 
 图像编辑是视觉内容创作的核心任务，其理想目标是让用户以直观、高效的方式操控图像中的对象，同时保持结果的真实感和身份一致性。近年来，基于拖拽的编辑范式因其直观性而受到广泛关注——用户只需在图像上定义若干控制点并拖拽至目标位置，即可驱动对象的形变。然而，现有方法在实现这一目标时面临根本性瓶颈。
 
@@ -99,7 +99,9 @@ ObjectMorpher处于**3D感知图像编辑**与**交互式对象操控**的交叉
 
 ObjectMorpher正是针对上述瓶颈提出的解决方案。其核心洞察是：将模糊的2D拖拽编辑转化为几何明确的3D操作——通过轻量级3D高斯溅射（3DGS）重建、保持局部刚度的非刚性变形以及生成式合成，在实时交互下实现对象身份保持的逼真编辑（见Figure 1与Figure 2）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ObjectMorpher 的核心创新在于将**模糊的2D拖拽编辑提升为几何明确的3D操作**，通过三个关键模块的协同设计，首次实现了实时交互、物理合理且身份保持的对象级非刚性编辑。
 
@@ -129,7 +131,7 @@ $$\boldsymbol{\mu}'_i = \sum_{j \in \tilde{\mathcal{N}}_i} \tilde{w}_{i,j} \left
 
 ObjectMorpher 通过三个 changed slots 的系统性创新——**3DGS表示替代2D像素操作**、**ARAP非刚性变形替代刚性控制**、**生成式合成替代简单叠放**——构建了完整的3D感知编辑管线。用户研究（Figure 6）表明，该方法在引导跟随、风格一致性和身份保持三项指标上均获得超过80%的用户偏好，显著优于所有基线方法。
 
-## 整体框架
+
 
 ObjectMorpher 的编辑管线由四个核心模块串联构成，形成一条“2D 分割 → 3D 提升 → 可变形编辑 → 生成式合成”的完整处理链（Figure 2）。该管线将用户模糊的 2D 拖拽操作转化为几何明确的 3D 操作，在实时交互下实现对象身份保持的逼真编辑。
 
@@ -151,7 +153,7 @@ ObjectMorpher 的编辑管线由四个核心模块串联构成，形成一条“
 ![[assets/figures/papers/paper_list_l2555_https_arxiv_org_abs_2603_28152/figures/001_Figure_1.jpg]]
 *Figure 1: Unlike text-based methods that fail to localize subjects or interpret geometry, ObjectMorpher uses direct 3D manipulation with real-time interaction. This ensures precise edits while preserving the object’s identity and background*
 
-## 核心模块与公式推导
+
 
 ### 3D高斯溅射（3DGS）对象表示
 
@@ -226,7 +228,9 @@ Figure 4 展示了训练数据准备流程和生成式合成模型的完整管�
 
 整个管线的因果链条可概括为：**2D分割与3D提升**（Sec. 3.1）提供可编辑的几何代理 → **可变形图与ARAP约束**（Sec. 3.2）实现物理合理的非刚性编辑 → **生成式合成**（Sec. 3.3）确保编辑结果与场景的视觉一致性。消融实验（Figure 7, Figure 8）验证了各模块的必要性：3DGS表示优于网格表示，ARAP约束优于拉普拉斯变形，生成式合成显著消除合成痕迹。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要定量结果
 
@@ -267,7 +271,9 @@ Figure 5展示了8个对象在5种方法上的编辑对比。2D拖拽方法（Dr
 ![[assets/figures/papers/paper_list_l2555_https_arxiv_org_abs_2603_28152/figures/009_Figure_8.jpg]]
 *Figure 8: Ablation on the deformation constraints*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题瓶颈：从2D拖拽到3D感知编辑的鸿沟
 
@@ -311,6 +317,8 @@ ObjectMorpher的关键设计在于将模糊的2D拖拽操作提升为几何明�
 2. **复杂关节对象的变形鲁棒性**：对于人体等具有复杂运动学的对象，ARAP约束是否足够？是否需要引入骨骼驱动或基于物理的模拟？
 3. **重建-编辑的误差传播**：TRELLIS重建的不确定性如何量化，以及如何在编辑流程中对其进行鲁棒处理？
 4. **生成式合成的可控性边界**：扩散模型在协调过程中引入的纹理变化是否可预测和可控？是否存在保持原始纹理的更严格约束方式？
+
+
 
 ## 原文 PDF
 

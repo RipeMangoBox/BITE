@@ -5,6 +5,8 @@ paper_level: A
 venue: MM
 year: 2025
 pdf_ref: paperPDFs/MM_2025/AC4AU_Regulatory_Focus_Micro_Expression_Analysis.pdf
+project_link: null
+code_link: null
 aliases:
 - RFTIMEASRL
 tags:
@@ -38,7 +40,7 @@ claims:
 > [!tip] 效果简介
 > - CD6ME (LODO protocol) 上，Average F1 across 12 AUs 40.508 vs 39.542 (Off-ApexNet) (+0.966)。
 
-## 概述
+## 概要
 
 微表情（Micro-Expressions, MEs）是面部肌肉无意识收缩产生的短暂、低强度表情，持续时间通常为1/25至1/5秒。现有微表情动作单元检测（Action Unit Detection, AUD）方法普遍依赖人工标注的顶点帧（apex frame）来提取光流或帧间差异特征，这一范式存在两个根本性瓶颈：**高信息冗余**与**静态特征主导**。具体而言，从顶点帧提取的空间表征包含大量与情绪无关的静态外观信息（如身份、光照），而真正承载情绪线索的动态变化被淹没其中；同时，顶点依赖导致时序建模不完整——仅使用起始帧与顶点帧两个时间点，丢失了情绪展开的完整过程信息。此外，微表情数据集中严重的AU样本不平衡进一步削弱了模型的泛化能力。
 
@@ -52,7 +54,7 @@ claims:
 
 在严格遵循CD6ME基准的留一数据集外（Leave-One-Dataset-Out, LODO）协议下，AC4AU以均匀时间采样至固定8帧的完全无顶点设置，取得平均F1分数**40.508**，优于依赖顶点标注的最强基线Off-ApexNet（39.542）。消融实验证实，移除FRD、AUsER或替换Focal Loss均导致性能显著下降，验证了各组件的独立贡献。AC4AU首次证明了在不依赖顶点标注的条件下，通过频域冗余分解与自适应专家路由，可以达到与顶点依赖方法相当甚至更优的AU检测性能。
 
-## 背景与动机
+
 
 微表情（Micro-Expressions, MEs）是一种短暂、不自主的面部运动，通常持续不到半秒，能够揭示个体试图隐藏的真实情绪状态。与宏观表情不同，微表情的强度极低、持续时间极短，使其在安全审讯、临床诊断和人机交互等高风险场景中具有独特的应用价值。然而，微表情的自动分析——特别是面部运动单元（Action Unit, AU）检测——长期面临两个相互交织的核心瓶颈。
 
@@ -64,7 +66,9 @@ claims:
 
 本文的动机正是基于调控焦点理论，将微表情视为连续动态过程，而非离散快照的集合。我们提出AC4AU——一个完全无顶点（apex-free）的AU检测框架，通过频率域冗余分解与混合专家动态路由两个核心机制，在消除时域静态冗余的同时学习AU特定的局部运动模式，从而在不依赖任何顶点标注的条件下达到与顶点依赖方法相当甚至更优的检测性能。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 AC4AU的核心创新在于将微表情分析从“顶点帧依赖”范式彻底转向“动态过程感知”范式，其关键突破体现在三个递进的层面。
 
@@ -112,7 +116,7 @@ $$\mathcal{L}_{AU} = -\sum_{k=1}^{12} \Big[ (1-\alpha_k)(1-\hat{y}_{i,k})^2 y_{i
 
 AC4AU的创新链条清晰且自洽：**取消顶点依赖**降低了标注成本和数据泄漏风险；**频域冗余分解**从信号层面分离静态身份与动态情绪，使模型聚焦于过程敏感的变化；**动态专家路由**从结构层面替代固定RoI，实现自适应的局部运动模式学习；**类别感知损失**从优化层面应对样本不平衡。这三层设计共同构成了一个完整的无顶点AU检测框架，在严格的LODO协议下验证了其有效性。
 
-## 整体框架
+
 
 AC4AU 的整体设计围绕一个核心矛盾展开：微表情序列中静态身份信息与动态情绪线索高度耦合，而传统方法依赖顶点帧的光流计算进一步放大了冗余并割裂了时序完整性。为此，AC4AU 构建了一条从均匀采样到 AU 预测的端到端流程，完全取消顶点帧依赖，通过频域分离与混合专家路由实现动态情绪表征的学习。
 
@@ -146,7 +150,7 @@ AC4AU 通过“均匀采样 → 频域冗余分离 → 动态专家路由”的�
 ![[assets/figures/papers/paper_list_l1647_AC4AU_Regulatory_Focus_Micro_Expression_Analysis/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of the proposed AC4AU. The noise-robust spatial representation*
 
-## 核心模块与公式推导
+
 
 AC4AU 由三个核心模块串联构成：**噪声鲁棒空间表示骨干**、**频率感知冗余分解器（FRD）** 和 **时序建模与 AU 特定专家路由器（AUsER）**。整体流程为：对微表情视频序列进行均匀时间采样至固定长度 $l=8$ 帧，经空间骨干提取帧级特征，再由 FRD 在频域分离静态冗余与动态情绪成分，最后通过时序 Transformer 与 MoE 路由生成 12 个 AU 的多标签二分类预测。
 
@@ -220,7 +224,9 @@ $$\mathcal{L}_{AU} = -\sum_{k=1}^{12} \Big[ (1-\alpha_k)(1-\hat{y}_{i,k})^2 y_{i
 ![[assets/figures/papers/paper_list_l1647_AC4AU_Regulatory_Focus_Micro_Expression_Analysis/figures/002_Figure_2.jpg]]
 *Figure 2: Illustration of the typical steps in previous methods: (a) Onset frame with predefined RoIs; (b) Apex frame with AU annotations; (c) Optical flow between onset and apex frames; (d) Local representations extracted within the RoIs*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验：LODO协议下的AU检测性能对比
 
@@ -293,7 +299,9 @@ AC4AU的总体损失函数由角度边缘主体分类损失 $\mathcal{L}_{DC}$ �
 ![[assets/figures/papers/paper_list_l1647_AC4AU_Regulatory_Focus_Micro_Expression_Analysis/figures/006_Figure.jpg]]
 *Figure: (a) Onset (b) Optical Flow (c) F (d) FAC*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从顶点依赖到无顶点动态建模
 
@@ -384,6 +392,8 @@ AC4AU 在实验设计上体现了较强的公平性意识：
 - **细粒度扩展**：未来是否可扩展到更细粒度的面部运动单元（如 AU 强度估计），或支持多模态信息融合以增强判别能力？
 
 这些开放问题表明，AC4AU 在“无顶点 AUD”这一细分问题上建立了新的基线，但其方法思想（频域冗余分解 + 动态专家路由）的泛化潜力尚未被充分探索。后续工作若能在统一表征和鲁棒部署两个方向上取得进展，将显著提升该方法的实际影响力。
+
+
 
 ## 原文 PDF
 

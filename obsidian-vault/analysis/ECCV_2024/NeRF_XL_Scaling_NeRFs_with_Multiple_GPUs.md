@@ -5,6 +5,8 @@ paper_level: A
 venue: ECCV
 year: 2024
 pdf_ref: paperPDFs/ECCV_2024/NeRF_XL_Scaling_NeRFs_with_Multiple_GPUs.pdf
+project_link: https://research.nvidia.com/labs/toronto-ai/nerfxl/
+code_link: null
 aliases:
 - NX
 - NeRF-XL
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | NeRF-XL：通过多GPU扩展神经辐射场 |
 | 英文题名 | NeRF-XL: Scaling NeRFs with Multiple GPUs |
 | 会议/期刊 | ECCV 2024 |
-| Links | [paper](https://arxiv.org/abs/2404.16221); [Project](https://research.nvidia.com/labs/toronto-ai/nerfxl/) |
+| Links | [paper](https://arxiv.org/abs/2404.16221) · [Project](https://research.nvidia.com/labs/toronto-ai/nerfxl/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | NeRF-XL |
 | Dataset | Garden, Building, University4, MatrixCity |
@@ -41,7 +43,7 @@ claims:
 > - Building 上，PSNR 为 随GPU数量增加提升，对比 无明显提升或下降，变化 显著。
 > - University4 上，PSNR 为 随GPU数量增加提升，对比 无明显提升，变化 显著。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有基于独立训练的多GPU NeRF方法（如 **Block-NeRF**（Tancik et al., 2022）和 **Mega-NeRF**（Turki et al., CVPR 2022））面临三重困境。其一，每个独立NeRF被迫同时建模焦点区域与周围背景，造成严重的**容量冗余**——在University4场景上，Mega-NeRF使用2/4/8个tile时，分别有38%/56%/62%的采样点落在指定区域之外（Fig. 2）。冗余度随GPU数量增加而加剧，使得增加计算资源无法转化为重建质量提升。其二，渲染时需对重叠区域进行2D或3D混合，引入**模糊与伪影**（Fig. 3, Fig. 5）。其三，各NeRF独立优化相机或外观嵌入，导致**跨区域不一致**，进一步恶化混合渲染质量（Fig. 4）。这些因素共同导致基线方法的PSNR和渲染速度随GPU增加而保持不变甚至下降（Fig. 8）。
 
@@ -51,7 +53,7 @@ claims:
 
 **主要结果**：在Garden、Building、University4和MatrixCity四个异构场景上，NeRF-XL随GPU数量增加在PSNR和渲染速度上均实现**近似线性提升**，而Block-NeRF和Mega-NeRF等基线方法无明显改善（Fig. 8）。消融实验表明，大场景NeRF更受益于增加模型容量而非增多光线（Fig. 11），且分段式体渲染是通信效率的关键使能技术（Fig. 12）。
 
-## 背景与动机
+
 
 ### 大规模场景重建与神经辐射场
 
@@ -77,7 +79,9 @@ claims:
 2. **高效通信**：通过重写体渲染方程，将GPU间数据交换从样本级（$O(K S^2)$）降至tile级（$O(S^2)$），使通信成本降低超过2倍；
 3. **线性可扩展性**：随GPU数量增加，模型容量和渲染质量实现近似线性提升，真正释放多GPU资源的潜力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 NeRF-XL 的核心创新在于将“独立训练 + 后混合”的多 GPU 范式彻底重构为**数学等价于单 GPU 的联合训练框架**，从根本上消除了容量冗余、混合伪影和训练-推理不一致三大瓶颈。其关键改动体现在以下四个维度。
 
@@ -109,7 +113,7 @@ $$C(t_1 \to t_{N+1}) = \sum_{k=1}^N T(t_1 \to t_k) \, C(t_k \to t_{k+1})$$
 
 NeRF-XL 的扩展路径与 PyTorch DDP 的光线并行形成鲜明对比：DDP 通过分发更多光线到多 GPU 来加速渲染，但模型容量不变；NeRF-XL 则将模型参数分布到多 GPU，使总参数量随 GPU 数量线性增长。在 University4 上的消融实验表明，使用 N 个 GPU 获得 N 倍参数的 NeRF-XL，其 PSNR 远超仅通过 N 倍光线并行的 DDP，表明**大场景 NeRF 更需要增加模型容量而非增多光线**（Fig. 11，置信度 0.9）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2404_16221/figures/006_Figure_6.jpg]]
 *Figure 6: Our Training Pipeline. Our method jointly trains multiple NeRFs across all GPUs, each of which covers a disjoint spatial region. The communication across GPUs only happens in the forward pass but not the backward pass (shown in gray arrows). (a) We can train this system by evaluating each NeRF to get the sample color and density, then broadcast these values to all other GPUs for a global volume rendering (§ 4.2). (b) By rewriting volume rendering equation we can dramatically reduce the data transfer to one value per-ray, thus improving efficiency (§ 4.3)*
@@ -140,7 +144,7 @@ NeRF-XL 提出了一种原则性的多 GPU 联合训练范式，其核心在于�
 - **训练-推理一致性**：联合体渲染在训练和推理阶段使用完全相同的计算路径，无需任何 2D 或 3D 混合，消除了训练-推理不一致导致的性能退化。
 - **仅前向通信**：反向传播无需跨 GPU 梯度同步，这是通过将体渲染和损失函数重写为分段形式实现的——各 GPU 的局部梯度计算仅依赖前向汇集后的全局量，从而天然解耦了反向传播的依赖关系。
 
-## 核心模块与公式推导
+
 
 ### 核心模块
 
@@ -198,7 +202,9 @@ $$A(t_1 \to t_{N+1}) = \sum_{k=1}^{N} T(t_1 \to t_k) \, A(t_k \to t_{k+1})$$
 
 以上分解使分布式 NeRF 在训练和推理上数学等价于单 GPU 版本，既消除了独立训练方案的容量冗余与混合伪影，又极大降低了多 GPU 通信开销。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置与数据集
 
@@ -242,7 +248,9 @@ $$A(t_1 \to t_{N+1}) = \sum_{k=1}^{N} T(t_1 \to t_k) \, A(t_k \to t_{k+1})$$
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2404_16221/figures/001_Figure_1.jpg]]
 *Figure 1: Our principled multi-GPU distributed training algorithm enables scaling up NeRFs to arbitrarily-large scale*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 多GPU NeRF方法的演进脉络
 
@@ -290,6 +298,8 @@ NeRF-XL 的关键设计决策可归纳为三个层次：
 3. **异构与大规模扩展**：如何将联合训练思想推广到异构GPU集群或带宽受限环境，实现城市级乃至国土级场景的分布式训练？是否需要层次化的通信拓扑？
 
 4. **训练效率的进一步提升**：能否结合梯度压缩、异步通信或局部损失近似等技术，在保持数学等价性的前提下进一步降低通信开销？
+
+
 
 ## 原文 PDF
 

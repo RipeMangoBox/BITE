@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2026
 pdf_ref: paperPDFs/arxiv_2026/PRISM_Streaming_Human_Motion_Generation_with_Per_Joint_Latent_Decomposition.pdf
+project_link: null
+code_link: https://github.com/ZeyuLing/PRISM
 aliases:
 - PRISM
 tags:
@@ -41,7 +43,7 @@ claims:
 > - MotionHub (T2M) 上，FID↓ 0.055 vs 0.106 (Go-To-Zero) (-48%)。
 > - BABEL Seq. 上，Subseq. R@3↑ 0.587 vs 0.469 (MotionStreamer) (+0.118)。
 
-## 概述
+## 概要
 
 人体运动生成的核心瓶颈在于**潜在空间设计**：现有方法（如**MotionStreamer**，Xiao et al., ICCV 2025；**MLD**，Chen et al., ICLR 2024）将每帧运动信息压缩为单一向量，轨迹与各关节旋转深度缠绕，迫使下游生成器隐式解耦异构信号，浪费模型容量并限制生成质量。
 
@@ -55,7 +57,7 @@ PRISM 提出**逐关节因子分解**的潜在空间，将每关节作为独立�
 
 PRISM 的局限性包括仅支持 SMPL-22 身体运动（不含手部和表情）、超长序列（>5 分钟）仍可能累积轨迹漂移，以及生成速度约 20 fps 尚不足以支持实时交互。
 
-## 背景与动机
+
 
 ### 问题背景：从单段生成到流式人体运动合成
 
@@ -85,7 +87,9 @@ PRISM 的局限性包括仅支持 SMPL-22 身体运动（不含手部和表情�
 
 这一设计哲学使得PRISM成为一个**单一模型、多种模式**的统一框架，无需任务特定的架构修改或后处理，即可在文本到动作、姿态条件生成、序列动作合成和叙事运动组合等任务上达到最优性能。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PRISM的核心创新在于对动作生成潜在空间的根本性重构，以及一套与之配套的、无需架构修改即可统一多种生成模式的注入机制。其设计围绕一个核心洞察展开：**现有方法将每帧动作信息压缩为单一向量，迫使下游生成器隐式解耦异构的轨迹与关节旋转信号，浪费模型容量并限制生成质量**。PRISM通过四个关键的“changed slots”，系统性地解决了这一问题。
 
@@ -121,7 +125,7 @@ PRISM提出了一种极简但强大的条件注入机制：**为潜在网格中�
 
 **证据强度**：消融实验（Table 7）表明，自激励训练在BABEL序列生成上取得了最佳的子序列FID（0.100）和最低的转换急动度（Area Under Jerk 0.44），显著优于教师强制和无激励方案。这证明**自激励是抑制长序列漂移、实现远超训练片段长度的流式生成的关键训练策略**。
 
-## 整体框架
+
 
 PRISM 的整体管道由两个紧耦合的模块构成：**因果逐关节因子化动作 VAE（Causal Joint-Factorized Motion VAE）** 和 **潜在流匹配 DiT 生成器（Flow-Matching DiT Generator）**，两者通过一个结构化的 2D 潜在网格进行桥接。
 
@@ -172,7 +176,7 @@ $$\mathcal{L}_{\mathrm{VAE}} = \lambda_{\mathrm{param}} \mathcal{L}_{\mathrm{par
 ![[assets/figures/papers/paper_list_l86_https_arxiv_org_abs_2603_08590/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of PRISM. (a) A causal joint-factorized VAE compresses per-joint SMPL tokens into a structured 2D latent grid. (b) A flow-matching DiT denoises the grid with per-token timestep embeddings, unifying T2M, pose-conditioned generation, and autoregressive streaming via noise-free condition injection. Self-forcing suppresses drift over long rollouts*
 
-## 核心模块与公式推导
+
 
 PRISM由两个紧密耦合的核心组件构成（图2）：**因果关节因子化运动VAE**（Causal Joint-Factorized Motion VAE）和**流匹配DiT生成器**（Flow-Matching DiT Generator）。两者通过结构化的2D潜在网格和每标记时间步嵌入实现无缝衔接，无需任务特定的架构修改即可统一文本到动作、姿态条件生成和自回归流式生成。
 
@@ -228,7 +232,9 @@ $$\mathcal{L}_{\mathrm{VAE}} = \lambda_{\mathrm{param}} \mathcal{L}_{\mathrm{par
 
 对于长时域叙事文本，PRISM引入**Motion-Aware Text Rewriter**将自由形式叙述分解为原子动作提示序列，然后通过自回归管道逐段生成，实现超训练片段长度的连贯动作合成。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -326,7 +332,9 @@ Table 9报告了MBench的9维度评估结果，涵盖VLM-based（泛化性、条
 ![[assets/figures/papers/paper_list_l86_https_arxiv_org_abs_2603_08590/figures/013_Table_9.jpg]]
 *Table 9: Results on MBench [16]. MBench evaluates 9 dimensions across three pillars: VLM-based (generalizability, condition consistency), physics-based (jitter, dynamics, foot artifacts, ground penetration, body penetration), and distribution-based (pose quality). ↑ = higher is better; ↓ = lower is better. Scores are from the official MBench leaderboard except those marked with † (evaluated by us)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心瓶颈与因果调控变量
 
@@ -380,6 +388,8 @@ PRISM 通过四个关键设计槽位的改变，在运动生成的潜在空间�
 4. **评估体系鲁棒性**：VLM-based 评估指标仍在开发中，当前可能无法完全反映感知质量。如何建立更鲁棒、多维度的评估体系来捕捉运动生成的物理合理性、语义一致性和时序连贯性？
 
 5. **多模态条件扩展**：每标记时间步嵌入的框架天然支持多模态条件注入（如音乐、语音、场景上下文），如何有效利用这一灵活性进行跨模态运动生成？
+
+
 
 ## 原文 PDF
 

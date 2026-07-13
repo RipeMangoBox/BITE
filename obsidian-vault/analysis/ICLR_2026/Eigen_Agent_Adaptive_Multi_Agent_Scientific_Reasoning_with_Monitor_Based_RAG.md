@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Eigen_Agent_Adaptive_Multi_Agent_Scientific_Reasoning_with_Monitor_Based_RAG.pdf
+project_link: null
+code_link: https://github.com/tangxiangru/Eigen-1
 openreview_forum_id: bGtmGTbmaz
 aliases:
 - Eigen-Agent
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | Eigen-Agent：基于监视器检索的自适应多智能体科学推理框架 |
 | 英文题名 | Eigen-Agent: Adaptive Multi-Agent Scientific Reasoning with Monitor-Based RAG |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=bGtmGTbmaz); [GitHub](https://github.com/tangxiangru/Eigen-1) |
+| Links | [paper](https://openreview.net/forum?id=bGtmGTbmaz) · [GitHub](https://github.com/tangxiangru/Eigen-1) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/planning_control |
 | Method | EIGEN‑AGENT |
 | Dataset | HLE Bio/Chem Gold (149 题), SuperGPQA Hard Biology, TRQA |
@@ -41,7 +43,7 @@ claims:
 > - SuperGPQA Hard Biology 上，Pass@1 accuracy (%) 为 69.57，对比 66.30 (SciMaster, DeepSeek V3.1)，变化 +3.27。
 > - TRQA 上，Pass@1 accuracy (%) 为 54.65，对比 51.74 (Autogen, GPT‑4.1)，变化 +2.91。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -65,7 +67,7 @@ Eigen-Agent 属于**隐式检索增强的多智能体精炼框架**。相较于�
 
 > **需注意**：当前实验仅覆盖生物学和化学领域，Monitor 的流式监控参数和 QAIR 的评分权重基于经验设定，在其他科学领域和不同模型上的泛化性尚待验证。
 
-## 背景与动机
+
 
 ### 科学推理的两个瓶颈
 
@@ -83,7 +85,9 @@ Eigen-Agent 属于**隐式检索增强的多智能体精炼框架**。相较于�
 
 基于上述分析，本文提出 Eigen-Agent 框架，通过两个关键机制解决前述瓶颈：Monitor-based RAG 以 token 级不确定性监控和隐式证据注入消除工具税；HSR（分层解精炼）通过锚-参考结构化精炼取代平均化；QAIR（质量感知迭代推理）依据加权质量评分自适应控制迭代深度。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Eigen‑Agent 的核心创新并非引入全新的推理范式，而是对现有多智能体科学推理系统中的三个结构性瓶颈——**工具税（tool tax）**、**民主式聚合稀释**与**质量盲迭代**——进行了因果层面的重新设计。三项关键创新分别对应三个 changed slot，形成一条从“知识获取 → 解空间精炼 → 迭代控制”的因果链。
 
@@ -122,7 +126,7 @@ HSR 将聚合策略从“平等平均”改为“锚‑参考分层精炼”：
 
 三项创新并非孤立存在，而是形成一条因果链：Monitor‑based RAG 以最低成本提供高质量知识基础 → HSR 在此基础上进行跨解结构化精炼 → QAIR 确保精炼过程的质量收敛与计算效率。这一耦合关系在多样性‑共识分析中得到佐证：检索任务受益于多样性（斜率 ≈ 0.369），推理任务受益于共识（斜率 ≈ 0.851，Figure 8），而 Eigen‑Agent 的架构恰好实现了“检索阶段保持多样性、推理阶段追求共识”的自适应平衡。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_bGtmGTbmaz/figures/005_Figure_3.jpg]]
 *Figure 3: Framework overview. (a) Monitor-based RAG operates globally during reasoning: the Monitor detects insufficiency in the reasoning stream, the Querier generates targeted queries, and the Injector integrates retrieved evidence into context with minimal disruption. (b) Building on this substrate, the Proposer generates initial candidate solutions. Each candidate is revised individually by the Corrector, which applies local targeted fixes without access to other solutions. The improved candidates are then passed to HSR, which enables cross-solution refinement via anchor–reference relationships. Finally, QAIR evaluates overall quality and may invoke the Corrector again if needed, while the Ranker...*
@@ -166,7 +170,7 @@ Eigen‑Agent 由两条协同主线构成：**Monitor‑based RAG** 提供持续
 
 > **注意**：上述管线中 Monitor 的流式参数（块大小 512、重叠 128）、QAIR 的权重分配与阈值 $\tau=3$ 均基于经验设定，未经过系统超参数调优，在不同任务上可能需要手动调整。
 
-## 核心模块与公式推导
+
 
 Eigen‑Agent 的推理架构由两个正交子系统构成：**Monitor‑based RAG** 负责隐式知识增强，**分层精炼流水线** 负责多解协作与质量收敛。以下仅展开其关键模块与核心公式。
 
@@ -212,7 +216,9 @@ $$
 
 Monitor‑based RAG 消除了显式检索的工具税，使 token 消耗从 470.6K 降至 218.4K，步骤从 94.8 降至 51.3（Table 3 增量构建）；HSR 与 QAIR 分别解决了多解聚合中的平均化稀释与无差别迭代问题。两个子系统的协同作用使得完整框架在 HLE Bio/Chem 上以 53.5% 的 token 缩减和 43.7% 的步骤缩减，实现了 48.3% 的准确率。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -263,7 +269,9 @@ Figure 6 对比了不同检索后端在 Monitor‑based RAG 框架下的表现�
 
 **证据强度说明：** 上述结论均基于 Table 2、Table 3、Figure 7、Figure 8 等已标注的高置信度证据。实验在相同基础模型（DeepSeek‑V3.1，温度 0.5，64K token 限制）、相同并行 Proposer 数量和相同外部工具访问权限下进行，确保增量变化仅源于模块本身。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心瓶颈与因果抓手
 
@@ -325,6 +333,8 @@ Eigen-Agent 在**多智能体精炼策略**上与以下系统形成对比：
 5. **低资源环境可行性**：在纯黑盒 API 或无本地部署能力的低资源环境下，隐式检索的延迟和成本是否仍然可控？Monitor 的流式处理是否引入额外的 API 调用开销？
 
 6. **错误类型的因果解耦**：推理错误与知识缺口之间的强重叠（Figure 7）暗示深层因果关系——知识不足是否直接诱发推理错误，还是两者共享共同的底层表征缺陷？因果建模能否实现更根本的修正，而非仅靠检索和精炼进行症状缓解？
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/InterMamba_Efficient_Human_Human_Interaction_Generation_with_Adaptive_Spatio_Temporal_Mamba.pdf
+project_link: null
+code_link: null
 aliases:
 - InterMamba
 tags:
@@ -41,7 +43,7 @@ claims:
 > - InterX 上，R-Precision Top-1 ↑ 0.4573 vs 0.4403 (in2IN) (+0.017)；FID ↓ 0.517 vs 0.239 (in2IN) (+0.278 (worse))；Diversity → 9.194 vs 8.450 (InterGen) (+0.744 (closer to real))。
 > - Efficiency 上，Inference Time (s) ↓ 0.567 (InterMamba) vs 1.233 (InterGen) (-0.666 (2.2× faster))。
 
-## 概述
+## 概要
 
 人际交互运动生成旨在根据文本描述合成逼真的双人互动动作，在虚拟现实、游戏、影视制作等领域具有广泛应用前景。然而，现有主流方法——基于 Transformer 的自注意力扩散模型——在处理长序列时，其平方复杂度严重制约了可扩展性与推理效率，难以满足实时交互式应用的需求。
 
@@ -53,7 +55,7 @@ claims:
 
 尽管如此，该方法仍依赖扩散迭代过程，在细节交互表现、物理真实感和实时用户控制方面存在局限，为后续研究留下了开放问题。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -85,7 +87,9 @@ claims:
 
 这一设计理念首次将Mamba引入人际交互运动生成范式，旨在实现“更少参数、更快推理、更优质量”的三角平衡——最终InterMamba仅使用66M参数（InterGen的36%），平均推理时间降至0.57秒（InterGen的46%），同时在文本-运动对齐精度（R-Precision）和分布匹配度（MMDist）上实现显著提升。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 InterMamba 的核心创新在于**用线性复杂度的选择性状态空间模型（Mamba）替代传统 Transformer 骨干**，从根本上解决了人际交互生成中长序列建模的可扩展性瓶颈。其创新点可归纳为三个层次的“changed slots”：
 
@@ -112,7 +116,7 @@ InterMamba 通过三个模块的递进组合，实现了从独立运动到协同
 
 消融实验（Table 5）揭示了这一递进设计的因果机制：单独使用 Self-ASTM 可建立基础个体建模能力（R-Precision 0.371），但缺乏交互理解；加入 Cross-ASTM 后语义对齐提升（R-Precision 0.409），但运动质量下降（FID 增至 8.524）；进一步集成 LIIA 后，局部交互聚合有效平衡了生成质量与语义一致性，达到最优组合（R-Precision 0.705, FID 5.945）。
 
-## 整体框架
+
 
 InterMamba 的整体 pipeline 围绕 **基于扩散的运动生成框架** 与 **自适应时空 Mamba 骨干网络** 构建，将双人交互运动生成分解为个体运动建模、局部交互聚合与交叉交互建模三个递进阶段。图 4 展示了完整的架构概览。
 
@@ -143,7 +147,7 @@ $$\mathcal { L } _ { \mathrm { t } } = \mathbb { E } _ { x _ { 0 } , t } \left[ 
 ![[assets/figures/papers/paper_list_l1687_InterMamba_Efficient_Human_Human_Interaction_Generation_with_Adaptive_Sp/figures/001_Figure_1.jpg]]
 *Figure 1: In this paper, we introduce an efficient human-to-human interaction generation method based on the Mamba framework, designed to achieve real-time, high-fidelity motion synthesis*
 
-## 核心模块与公式推导
+
 
 InterMamba 的核心架构由三个关键模块构成：**自适应时空Mamba（ASTM）** 作为基础算子，**Self-ASTM** 与 **Cross-ASTM** 分别负责个体运动建模与交互关系建模，**局部交互信息聚合（LIIA）** 桥接二者。以下逐一推导各模块的核心公式与变量含义。
 
@@ -244,7 +248,9 @@ c_t = \text{LayerNorm}(\text{MSSM}_{\text{spat}}(\text{Conv}_{\text{spat}}(\text
 ![[assets/figures/papers/paper_list_l1687_InterMamba_Efficient_Human_Human_Interaction_Generation_with_Adaptive_Sp/figures/006_Figure_6.jpg]]
 *Figure 6: The structure of Local Interaction Information Aggregation (LIIA) consists of AdaLN for adaptive normalization, followed by 1×1 and 3×3 convolutions for feature refinement and local interaction modeling*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能对比
 
@@ -303,7 +309,9 @@ InterMamba 在 InterHuman 和 Inter-X 两个主流人际交互数据集上均展
 ![[assets/figures/papers/paper_list_l1687_InterMamba_Efficient_Human_Human_Interaction_Generation_with_Adaptive_Sp/figures/011_Table_3.jpg]]
 *Table 3: This table compares the computational complexity of our method with that of other approaches, based on three indicators: average inference time, parameters, and FLOPs. As shown in the table, our Inter-Mamba achieves the highest overall efficiency across all metrics*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法脉络与核心差异
 
@@ -362,6 +370,8 @@ InterMamba 处于**基于扩散模型的文本驱动双人交互运动生成**�
 - **效率提升**：强。参数量（66M vs 182M）和推理时间（0.567s vs 1.233s）的对比数据确凿（Table 3），2.2 倍加速和 64% 参数缩减具有实际部署价值。
 - **生成质量**：中等偏强。在 InterHuman 上 R-Precision（0.475）和 MMDist（3.785）显著领先，但 FID（5.945）略差于 InterGen（5.918）；在 InterX 上 R-Precision 最优但 FID 明显落后。整体呈现“语义对齐强、分布匹配有波动”的特征。
 - **消融完整性**：强。对时空分支、自适应参数、各模块组合均进行了系统消融，且揭示了自适应参数对训练收敛的必要性（移除后模型无法收敛）。
+
+
 
 ## 原文 PDF
 

@@ -42,7 +42,7 @@ claims:
 > - FMB 上，MI ↑ 2.6219 vs 2.4035 (TIMF) (+0.2184)。
 > - M3FD, FMB, VT5000 (aggregated) 上，Params (M) 0.46 vs ≥46.52 (joint training methods) (参数减少>100倍)。
 
-## 概述
+## 概要
 
 现有的红外-可见光图像融合方法在面向下游任务时面临一个核心瓶颈：**当面对未经训练的下游任务网络（DTN）时，融合性能显著下降，难以同时自适应多个异构任务**。损失驱动或联合训练范式通常需要针对每个任务重新训练融合网络或DTN，缺乏对任务特定语义需求的精确、动态响应能力，导致多任务泛化受限。
 
@@ -55,7 +55,7 @@ claims:
 
 **主要结果**：在M3FD、FMB和VT5000三个数据集上，CLDyN在融合质量指标（如Q_AB/F达到0.6900，MI达到2.6219）和多任务性能上均取得领先。相比重训练和联合训练方法，CLDyN仅需**0.46M可训练参数**和**174.06G FLOPs**，参数减少超过100倍，同时在显著性目标检测（SOD）任务上取得最高mFβ（0.8129）。消融实验证实BVB和A2SI模块对多任务适应至关重要，奖励-惩罚系数δ=5时综合性能最优。
 
-## 背景与动机
+
 
 ### 红外-可见光图像融合的任务驱动需求
 
@@ -85,7 +85,9 @@ claims:
 
 这一设计范式从根源上区别于现有方法的“一图多用”或“重训适配”策略，为多任务感知的图像融合提供了新的闭环动态框架。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CLDyN 的核心创新在于构建了一条**闭环语义传输链**，将下游任务的语义需求显式反馈至融合网络，从而在不重新训练视觉引导融合网络（VFN）的前提下，动态生成面向多任务的定制化融合结果。这一设计从根本上改变了现有任务感知融合方法的范式：传统方法（如损失驱动的 **TDAL** 或联合训练的 **MRFS**）需要针对每个下游任务重新训练整个融合网络或下游任务网络（DTN），导致多任务泛化成本极高；而 CLDyN 仅需训练一个轻量的需求驱动语义补偿（RSC）模块，即可同时适配目标检测、语义分割与显著性检测等多个固定任务集。
 
@@ -109,7 +111,7 @@ CLDyN 的核心创新在于构建了一条**闭环语义传输链**，将下游�
 
 多任务学习中常见的简单损失加权容易导致任务间梯度冲突，且无法反映语义补偿的实际效果。CLDyN 的闭环优化目标 $\ell_{cl}^n = \ell_r^n + \delta \ell_p^n$ 直接以补偿前后的任务性能变化作为优化信号，而非预设的损失权重。结合 **CAGrad** 缓解多任务梯度冲突，超参数 $\delta=5$ 时模型在所有下游任务上取得稳定最优，证实了该策略对任务平衡的有效调控。
 
-## 整体框架
+
 
 **CLDyN** 采用两阶段闭环范式，将视觉引导融合网络（VFN）与需求驱动的语义补偿（RSC）模块解耦，形成一条从下游任务语义反馈到融合特征调整的**语义传输链**（Figure 2）。其核心设计在于：VFN 仅需训练一次并保持冻结，而轻量级的 RSC 模块通过接收下游任务网络（DTN）的语义特征，对 VFN 中间层多模态特征进行任务特定的动态补偿，从而在无需重新训练融合网络的前提下，为多个下游任务生成定制化融合结果。
 
@@ -146,7 +148,7 @@ RSC 模块内部由两个关键组件构成：
 ![[assets/figures/papers/paper_list_l2116_https_arxiv_org_abs_2604_08924/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the adaptive multi-task-aware infrared-visible image fusion network. The network forms a semantic transmission chain, where semantic features from multiple downstream tasks guide the RSC module to perform task-specific compensation for the VFN. The reward-penalty strategy optimizes the compensation process by evaluating task performance before and after semantic compensation*
 
-## 核心模块与公式推导
+
 
 ### 两阶段训练框架
 
@@ -225,7 +227,9 @@ $$
 ![[assets/figures/papers/paper_list_l2116_https_arxiv_org_abs_2604_08924/figures/016_Figure_9.jpg]]
 *Figure 9: Network architecture of VFN. The VFN (a) consists of a Feature Extraction Blocks (FEB) (b) and a Fusion Feature Reconstruction Block (FRB) (c)*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 融合质量评估
 
@@ -285,7 +289,9 @@ $$
 ![[assets/figures/papers/paper_list_l2116_https_arxiv_org_abs_2604_08924/figures/019_Figure_11.jpg]]
 *Figure 11: Qualitative comparison between the full model and the ablation models (Model IV and Model V)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 任务感知融合方法的演进脉络
 
@@ -328,6 +334,8 @@ CLDyN的适用性受以下条件约束：
 3. **计算效率与任务扩展性**：能否进一步减少RSC模块的计算开销（当前174.06G FLOPs），或使框架支持任意新增的下游任务而无需重新训练？后者可能涉及元学习或任务编码器的引入，使RSC能够泛化至未见任务。
 
 4. **任务冲突的理论分析**：CAGrad虽然缓解了梯度冲突，但多任务语义需求的内在冲突（如检测关注边缘、分割关注区域一致性）是否可通过更优的语义注入策略从根本上调和，仍需进一步研究。
+
+
 
 ## 原文 PDF
 

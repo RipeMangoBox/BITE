@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/REA_RL_Reflection_Aware_Online_Reinforcement_Learning_for_Efficient_Reasoning.pdf
+project_link: null
+code_link: https://github.com/hexuandeng/REA-RL
 openreview_forum_id: E6keG5QDct
 aliases:
 - RR
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | REA-RL：面向高效推理的反射感知在线强化学习 |
 | 英文题名 | REA-RL: Reflection-Aware Online Reinforcement Learning for Efficient Reasoning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=E6keG5QDct); [GitHub](https://github.com/hexuandeng/REA-RL) |
+| Links | [paper](https://openreview.net/forum?id=E6keG5QDct) · [GitHub](https://github.com/hexuandeng/REA-RL) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | REA-RL |
 | Dataset | 5 项数学基准 (平均), GSM8K, MATH500 |
@@ -42,7 +44,7 @@ claims:
 > - 5 项数学基准 (平均) 上，Token 成本比值 (TR) 为 -36% (TR = 63.51)，对比 Original (TR = 100)，变化 -36%。
 > - GSM8K 上，准确率 为 92.72，对比 GRPO RLen (85.97)，变化 +6.75。
 
-## 概述
+## 概要
 
 大型推理模型（LRMs）在复杂推理任务中展现出强大的能力，但普遍存在**冗余反思（过度思考）**问题：模型在推理过程中反复进行自我修正，产生大量对最终答案无贡献的token，导致推理成本急剧上升。直接引入长度奖励进行在线强化学习（RL）虽然能缩短响应，却会**彻底剥夺模型的反思能力**，使其在困难问题上性能大幅下降——这一“长度-反思”矛盾构成了本领域的核心瓶颈。
 
@@ -64,7 +66,7 @@ claims:
 
 REA-RL 当前在蒸馏得到的7B LRM上验证有效，尚未在从头预训练的更大规模模型上测试。此外，基于LLM的过度思考检测无法完全消除所有冗余token，顺序修订也引入了约10%的额外训练时间开销。
 
-## 背景与动机
+
 
 大型推理模型（LRMs）通过在生成过程中插入显式的“反思”（reflection）步骤，显著提升了在复杂数学推理等任务上的表现。然而，这种反思行为常常失控，导致模型在已得出正确答案后仍反复进行自我验证和修正——即**过度思考（overthinking）**。过度思考产生大量冗余 token，大幅推高了推理成本，却未带来相应的性能增益。
 
@@ -72,7 +74,9 @@ REA-RL 当前在蒸馏得到的7B LRM上验证有效，尚未在从头预训练�
 
 上述困境揭示了一个核心矛盾：**单纯追求缩短响应长度会摧毁模型的反思能力，而保留反思能力又难以有效控制推理成本**。如何在缩短响应长度的同时，保护必要的反思行为，成为高效推理训练中亟待解决的关键瓶颈。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 REA-RL 的核心创新在于将**反射感知**引入在线强化学习，通过两个互补的机制——**顺序修订**与**反射奖励**——同时解决大型推理模型（LRMs）的过度思考问题和非反思性短回答问题。其关键设计围绕以下四个 changed slots 展开：
 
@@ -102,7 +106,7 @@ REA-RL 将原始并行采样响应 $\{s_1, \dots, s_G\}$ 与经反射模型截�
 
 反射模型与反射奖励针对不同维度：反射模型更有效地缩短响应长度，反射奖励则主要贡献于准确率提升。两者结合可在不牺牲性能的前提下实现 36% 的推理成本压缩（Table 2, 8k budget），且能根据问题难度自适应调整反思强度——对简单问题减少反思，对困难问题保留反思。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_E6keG5QDct/figures/003_Figure_2.jpg]]
 *Figure 2: Workflow of REA-RL. We first parallel sample G paths as in GRPO. Then, the reflection model identifies and truncates overthinking tokens (red ones with ×), retaining the preceding yellow segments. After that, the policy model finishes the truncated paths, generating revised tokens (blue ones with ✓), and yielding G revised paths. Finally, both the G original and G revised paths are used for training. Cases are in Appendix B.1. In addition to the naive accuracy reward $\mathtt { R } _ { \mathrm { A c c } }$ and length reward $\mathrm { R } _ { \mathrm { L e n } }$ . , we refine the length reward $\scriptstyle ( \mathrm { R } _ { \mathrm { R L e n } }$ ) and introduce a new reflection reward ( ${ \m$...
@@ -123,7 +127,7 @@ REA-RL 的核心设计围绕一个在线强化学习管线展开，该管线在 
 
 **数据流与训练**：在每一轮在线 RL 中，原始响应与修订响应共同构成训练集，使策略模型既能从原始路径中学习推理能力，又能从修订路径中学习高效推理模式。训练在 3 块 NVIDIA A800 80G GPU 上耗时约 120 小时，顺序修订因 vllm 推理并行度下降引入约 10% 的额外时间开销。
 
-## 核心模块与公式推导
+
 
 REA-RL 的核心架构由五个串联模块构成，围绕“并行采样—反射截断—策略补全—奖励计算—策略优化”的闭环展开。以下逐一说明各模块的功能及其关键公式。
 
@@ -171,7 +175,9 @@ $$
 
 > **注意**：反射奖励的惩罚分位数超参数（$D_{0.1}$、$D_{0.2}$、$D_{0.4}$）对准确率影响较小，主要调节响应长度（Table 8），表明该奖励的核心作用在于阻止非反思行为而非直接提升推理质量。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与实验动机
 
@@ -243,7 +249,9 @@ $$
 - 在 R1-1.5B 上，GRPO+$M_{Reflect}$ 同样实现了效率提升（Table 7），表明反射模型截断策略对小模型同样有效。
 - 通用 QA 策略训练（Table 6）显示，引入反射模型在 MMLU、MMLU-Pro、SuperGPQA 上均带来正向收益，验证了方法的跨领域迁移能力。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心问题与解决路径
 
@@ -277,6 +285,8 @@ $$
 3. 在更长的训练过程中，反射奖励与长度奖励之间是否存在更深层的相互作用——例如，反射奖励的分位数阈值是否需要随训练进程动态调整？
 4. 如何进一步降低顺序修订的额外计算开销（当前约 10%），使其在大规模部署中更具优势？
 5. 反射关键词密度作为反思的代理指标是否足够鲁棒——是否存在模型学会“表面反思”（使用关键词但不产生实质推理）的风险？
+
+
 
 ## 原文 PDF
 

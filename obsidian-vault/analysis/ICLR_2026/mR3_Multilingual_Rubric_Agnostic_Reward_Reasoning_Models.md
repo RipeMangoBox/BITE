@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/mR3_Multilingual_Rubric_Agnostic_Reward_Reasoning_Models.pdf
+project_link: null
+code_link: https://github.com/rubricreward/mr3
 openreview_forum_id: ST0wOB1bdX
 aliases:
 - mR3
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | MR3：多语言且评分标准无关的奖励推理模型 |
 | 英文题名 | mR3: Multilingual Rubric-Agnostic Reward Reasoning Models |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=ST0wOB1bdX); [GitHub](https://github.com/rubricreward/mr3) |
+| Links | [paper](https://openreview.net/forum?id=ST0wOB1bdX) · [GitHub](https://github.com/rubricreward/mr3) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | MR3 |
 | Dataset | m-RewardBench (23 languages), RewardBench (English), MM-Eval (18 languages), INCLUDE-base-44 (44 languages) |
@@ -41,7 +43,7 @@ claims:
 > - RewardBench (English) 上，Accuracy 为 MR3-QWEN3-14B: 90.79，对比 R3-QWEN3-14B (English SFT): 91.00，变化 -0.21。
 > - MM-Eval (18 languages) 上，Accuracy 为 MR3-QWEN3-14B: 86.05，对比 GPT-OSS-120B: 85.01，变化 +1.04。
 
-## 概述
+## 概要
 
 ### 问题背景与瓶颈
 
@@ -74,7 +76,7 @@ MR3 在现有奖励模型谱系中填补了多语言与多任务统一的空白�
 
 尽管英语仍是最强的提示和推理语言，目标语言推理在低资源语言上的基准准确率仍低于英语推理。模型依赖强教师模型进行知识蒸馏，弱教师会导致性能大幅下降。训练数据中部分极低资源语言完全未见，跨语言泛化能力仍有提升空间。强化学习（RLVR）方法在本研究中未展现出优于纯 SFT 的效果，其潜力有待进一步挖掘。
 
-## 背景与动机
+
 
 ### 多语言奖励评估的瓶颈
 
@@ -105,7 +107,9 @@ MR3 在现有奖励模型谱系中填补了多语言与多任务统一的空白�
 
 核心洞察在于：尽管英语仍是性能最强的提示和推理语言，但针对性的多语言训练可以大幅提升模型对目标语言的鲁棒性；直接使用目标语言进行推理能在低资源语言上带来显著增益，表明高质量的跨语言推理是提升多语言评估透明度和可访问性的关键路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MR3 的核心创新在于将评分标准无关的奖励推理模型从英语单语范式系统性地扩展至大规模多语言场景，其关键设计围绕五个 **changed slots** 展开：
 
@@ -121,7 +125,7 @@ MR3 的核心创新在于将评分标准无关的奖励推理模型从英语单�
 
 这些创新协同作用，使得 MR3-QWEN3-14B 在多语言偏好基准上以 **85.04%** 的平均准确率超越 GPT-OSS-120B（84.13%），参数量仅为后者的 1/9。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l39_https_openreview_net_forum_id_ST0wOB1bdX/figures/002_Table_1.jpg]]
 *Table 1: A comparison between existing models and MR3 across various dimensions, including data being used, task formats, and evaluation rubrics. ∗The model is neither closed-source nor proprietary*
@@ -149,7 +153,7 @@ MR3 构建了一个**任务无关、评分标准可定制**的统一评估框架
 
 整个框架的输入输出流清晰：多语言任务输入经过评分标准注入后，通过教师蒸馏获得监督信号，再经由多语言对齐和难度过滤形成训练数据，最终通过课程微调产出可部署的奖励模型。该设计使得 MR3 在仅使用 GPT-OSS-120B 约 1/9 参数量的情况下，在多语言偏好基准上实现了 85.04% 的平均准确率，超越教师模型 0.91 个百分点。
 
-## 核心模块与公式推导
+
 
 ### 统一评估框架
 
@@ -188,7 +192,9 @@ $$\mathcal{L}_{\mathrm{SFT}}(\theta) = -\frac{1}{N}\sum_{i=1}^{N}\sum_{t=1}^{T_i
 
 在训练顺序上，MR3 采用 **EasyToHard 课程学习**（Section 3.2.2）：基于教师模型对每个样本的正确率和输出长度进行排序，从简单样本开始训练，逐步过渡到困难样本。消融实验（Table 24）表明，EasyToHard 在验证集 Kendall Tau 上达到 0.4779，优于随机打乱（0.4583）和其他课程策略，验证了从易到难的训练顺序对多语言奖励建模的有效性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -254,7 +260,9 @@ Table 31 展示了 20 名标注者（覆盖 12 种语言）对推理质量的人
 - 进一步扩大训练数据规模（远超 100K）是否能继续带来显著收益？是否会牺牲低资源语言的性能？
 - RLVR 或其他强化学习范式是否能在更合适的奖励设计下改善多语言推理与评分质量？
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 
@@ -311,6 +319,8 @@ MR3 的设计使其在以下场景中具有明确优势：
 5. **强化学习的重新设计**：当前 RLVR 不如纯 SFT 有效。是否可以通过更精细的奖励设计（如语言特定的奖励塑形）或离线强化学习范式来改善多语言推理与评分质量？
 
 6. **推理质量与评分准确性的因果关系**：人工评估显示 MR3 的目标语言推理质量优于基座模型（Table 31），但推理质量的提升是否直接导致评分准确性的提升？两者之间的因果机制尚待严格验证。
+
+
 
 ## 原文 PDF
 

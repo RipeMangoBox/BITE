@@ -5,6 +5,8 @@ paper_level: A
 venue: ECCV
 year: 2024
 pdf_ref: paperPDFs/ECCV_2024/MotionLCM_Real_time_Controllable_Motion_Generation_via_Latent_Consistency_Model.pdf
+project_link: https://dai-wenxun.github.io/MotionLCM-page
+code_link: null
 aliases:
 - MotionLCM
 tags:
@@ -40,7 +42,7 @@ claims:
 > - HumanML3D T2M 上，AITS (s)↓ 0.030 (1-step) vs 0.225 (MLD* 50-step) (7.5x faster)；FID↓ 0.467 (1-step) vs 0.450 (MLD*) (+0.017)；R-Precision Top-1↑ 0.502 (1-step) vs 0.504 (MLD*) (-0.002)。
 > - HumanML3D Control 上，Avg. err.↓ 0.1127 (1-step, LC&MC) vs 0.1673 (OmniControl) (-0.0546)；Inference speed ~30ms (1-step) vs ~81s (OmniControl) (~2700x faster (原文1929×相比MLD))。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有文本到运动扩散模型（如 **MDM** (Tevet et al., ICLR 2022)、**MLD**）推理速度缓慢，单序列生成需0.2~24秒，难以满足实时交互需求。同时，在潜在扩散模型的压缩空间中实现时空可控运动生成存在根本性困难——潜在特征缺乏显式运动语义，直接注入控制信号会导致语义错位。
 
@@ -55,7 +57,7 @@ claims:
 
 **方法定位**：MotionLCM 属于**潜在空间一致性运动生成**范式，在方法谱系上位于扩散加速蒸馏与可控生成的交叉点。其两阶段训练流程——先进行 CFG 增强的潜在一致性蒸馏，再冻结基础模型训练运动 ControlNet——为实时可控运动生成提供了可复用的技术路线。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -88,7 +90,9 @@ claims:
 
 本文首次将一致性模型从图像域推广到运动生成领域，并通过潜在空间控制与运动空间显式监督的双重机制，解决了速度与可控性难以兼得的关键问题。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MotionLCM 的核心创新在于将一致性模型从图像域首次推广到运动生成，并通过**潜在-运动空间双级联控制机制**解决了实时可控运动生成中的速度-精度矛盾。其关键创新点可归纳为以下三个层面：
 
@@ -151,7 +155,7 @@ $$\mathcal{L}_{\mathrm{control}}(\Theta^a, \Theta^b) = \mathbb{E}\left[\frac{\su
 
 **需注意的局限性**：该方法依赖 MLD 的 VAE 压缩，该压缩缺乏显式时序建模，可能限制运动细节的保留；训练流程为两阶段（先蒸馏再训练 ControlNet），增加了训练复杂度；控制损失权重 $\lambda$ 需手动调节。
 
-## 整体框架
+
 
 MotionLCM 的整体架构分为两个阶段：**运动潜在一致性蒸馏（Motion Latent Consistency Distillation）** 和 **潜在空间运动控制（Motion Control in Latent Space）**，如图 4 所示。两个阶段共享相同的 VAE 压缩骨干，但训练目标与模块构成各有侧重。
 
@@ -199,7 +203,7 @@ $$\Theta^a, \Theta^b = \underset{\Theta^a, \Theta^b}{\arg\min}(\mathcal{L}_{\mat
 ![[assets/figures/papers/MotionLCM_Real-time_Controllable_Motion_Generation_via_Latent_Consistency_Model_aa7685020fdd/figures/004_Figure_4.jpg]]
 *Figure 4: The overview of MotionLCM. (a) Motion Latent Consistency Distillation (Sec. 3.2). Given a raw motion sequence*
 
-## 核心模块与公式推导
+
 
 ### 运动潜在一致性蒸馏（Motion Latent Consistency Distillation）
 
@@ -266,7 +270,9 @@ $$ \Theta^a, \Theta^b = \underset{\Theta^a, \Theta^b}{\arg\min}(\mathcal{L}_{\ma
 ![[assets/figures/papers/MotionLCM_Real-time_Controllable_Motion_Generation_via_Latent_Consistency_Model_aa7685020fdd/figures/003_Figure_3.jpg]]
 *Figure 3: The training objective of consistency distillation is to learn a consistency function*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -354,7 +360,9 @@ Fig. 7 展示了测试时不同 CFG 尺度对生成质量的影响。与训练�
 ![[assets/figures/papers/MotionLCM_Real-time_Controllable_Motion_Generation_via_Latent_Consistency_Model_aa7685020fdd/figures/009_Figure_6.jpg]]
 *Figure 6: Qualitative comparison of the state-of-the-art methods in the motion control task. We provide the visualized motion results and real references from five prompts. Compared to OmniControl [73], MotionLCM with ControlNet not only generates the initial poses that accurately follow the given multi-joint trajectories (i.e., the green poses in real references) but also produces motions that closely align with the texts*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法类型与谱系定位
 
@@ -431,6 +439,8 @@ MotionLCM 的适用性受以下条件约束：
 5. **单阶段训练的可能性**：是否可以将一致性蒸馏与 ControlNet 训练合并为单阶段流程，降低训练复杂度？这需要解决蒸馏目标与控制目标之间的潜在冲突。
 
 6. **更长时序的自回归一致性**：当前自回归生成范式中，使用前一段运动的最后 $\tau$ 帧作为控制信号，误差累积对长序列生成的影响如何？一致性模型的单步特性是否会放大或抑制这一误差传播？
+
+
 
 ## 原文 PDF
 

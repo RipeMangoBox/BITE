@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/InteractAnything_Zero_shot_Human_Object_Interaction_Synthesis_via_LLM_Feedback_and_Object_Affordanc.pdf
+project_link: null
+code_link: https://github.com/NVIDIAGameWorks/
 aliases:
 - InteractAnything
 tags:
@@ -39,7 +41,7 @@ claims:
 > - GPT-4V Selection 上，Overall 45.6 vs 26.0 (DreamHOI) (+19.6)。
 > - CLIP Similarity 上，CLIP Score 0.2968 vs N/A (N/A)。
 
-## 概述
+## 概要
 
 **InteractAnything**提出了一种零样本3D人体-物体交互合成框架，旨在解决现有方法在开放集物体上难以准确捕捉语义关系、接触区域与全局一致性的核心瓶颈。其关键洞察在于：将复杂的人-物交互分解为**语义关系推理**、**物体接触可供性解析**与**人体姿态合成**三个阶段，通过从大规模预训练模型（LLM与2D扩散模型）中蒸馏通用知识，替代对特定交互数据集的依赖，从而实现对任意物体的精细交互生成。
 
@@ -49,7 +51,7 @@ claims:
 
 **局限性**方面，生成质量高度依赖预训练模型的能力，可能受其幻觉与偏见影响；定量评估主要基于图像相似度与GPT-4V投票，缺乏对物理真实性的全面衡量；当前建模限于SMPL-H参数化人体，尚不支持非人代理或不同骨架结构的交互对象。
 
-## 背景与动机
+
 
 三维人体与物体的交互（Human-Object Interaction, HOI）生成是计算机视觉与图形学中的核心难题，其目标是根据语义指令合成自然、物理合理的人体姿态，并实现与任意物体的精细接触。该技术在具身智能、虚拟现实和数字人等领域具有广泛的应用前景。
 
@@ -65,7 +67,9 @@ claims:
 
 InteractAnything正是针对这一核心问题，提出将零样本HOI分解为语义推理、可供性解析和姿态合成三个阶段，通过LLM反馈和物体可供性解析，在不依赖任何3D交互训练数据的前提下，实现对任意物体的精细交互生成。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 InteractAnything 的核心创新在于将零样本 3D 人-物交互（HOI）这一复杂任务分解为可解耦的三个阶段，并通过从大规模预训练模型中蒸馏通用知识，替代对特定数据集的训练依赖。这一思路直接回应了现有方法的瓶颈：预训练模型无法直接理解复杂的交互模式，导致语义关系、接触区域和全局一致性难以同时满足。
 
@@ -101,7 +105,7 @@ InteractAnything 的核心主张——将复杂 HOI 分解为语义推理、可�
 - 方法性能高度依赖预训练模型（LLM 与 2D 扩散模型）的能力，可能受其幻觉和偏见影响。在 LLM 推理错误或扩散模型修补失真的情况下，错误会沿管线传播。
 - 当前建模限于 SMPL-H 参数化人体，不支持非人代理或具有不同骨架结构的交互对象，这一约束限制了方法在机器人等领域的直接迁移。
 
-## 整体框架
+
 
 InteractAnything 将零样本 3D 人-物交互合成分解为四个串联模块：**LLM 引导的初始化**、**开集物体可供性解析**、**文本-物体驱动的人体姿态合成**，以及**表现力 HOI 优化**。该框架的输入仅需一段自然语言交互描述和一个任意物体的 3D 网格，输出为与物体发生自然、精细接触的 SMPL-H 参数化人体模型。
 
@@ -129,7 +133,7 @@ InteractAnything 将零样本 3D 人-物交互合成分解为四个串联模块�
 ![[assets/figures/papers/paper_list_l1728_InteractAnything_Zero_shot_Human_Object_Interaction_Synthesis_via_LLM_Fe/figures/003_Figure_2.jpg]]
 *Figure 2: Framework of InteractAnything. Given a text description and any object mesh as input, our approach begins by querying LLM to infer precise human-object relationships, which are used to initialize object properties. Next, we analyze the contact affordance of the object geometry. The human pose is synthesized using a pre-trained 2D diffusion model, guided by multi-view SDS loss and the designed spatial constraint. Finally, based on the targeted object contact areas and a plausible human pose, we perform expressive HOI optimization to synthesize realistic and contact-accurate 3D human-object interactions*
 
-## 核心模块与公式推导
+
 
 ### 3.1 人体与物体表示基础
 
@@ -200,7 +204,9 @@ $$L_{fc} = \sum_{j\in[o]} \left(\sum_{i\in[h]} f_v(i,j) \cdot n(j)\right)^2, \qu
 ![[assets/figures/papers/paper_list_l1728_InteractAnything_Zero_shot_Human_Object_Interaction_Synthesis_via_LLM_Fe/figures/006_Figure_5.jpg]]
 *Figure 5: Visualization of the adaptive inpainting and openset object affordance parsing results on the same object with different text instructions. Our method first generates reasonable 2D inpainting results (middle columns) and then computes contact probabilities as the affordance representation (right column)*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能：GPT-4V 与 CLIP 评估
 
@@ -249,7 +255,9 @@ Figure 3 的定性对比显示，InteractAnything 生成的交互在人体姿态
 ![[assets/figures/papers/paper_list_l1728_InteractAnything_Zero_shot_Human_Object_Interaction_Synthesis_via_LLM_Fe/figures/009_Figure_6.jpg]]
 *Figure 6: Qualitative results of scene populating and scene interaction applications from different views*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位与核心创新
 
@@ -304,6 +312,8 @@ InteractAnything 的能力边界受以下因素制约：
 4. **多代理协同交互**：当前框架仅支持单人-单物交互。如何表示并生成多个交互代理之间的复杂协同关系（如两人搬动物体），是向更丰富场景拓展的必经之路。
 
 5. **评估基准建设**：该领域缺乏标准化的3D HOI评估基准。构建包含物理真实性、接触精度、语义一致性等多维度的评估体系，将有力推动方法的横向对比和迭代。
+
+
 
 ## 原文 PDF
 

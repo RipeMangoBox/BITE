@@ -42,7 +42,7 @@ claims:
 > - ImageNet 256×256 上，FID (无指导) 7.91 (1M steps) vs DiT-XL/2: 9.62 (7M steps) (-1.71)；FLOPs (G) 64.6 vs DiT-XL/2: 118.6 (-54.0)；Throughput (it/s) 272.7 vs DiT-XL/2: 80.5 (+192.2)。
 > - ImageNet 512×512 上，FID (无指导) 7.46 (1M steps) vs DiT-XL/2: 12.03 (3M steps) (-4.57)。
 
-## 概述
+## 概要
 
 扩散模型已成为视觉生成的主流范式，但其骨干网络目前几乎被 Transformer 架构垄断。尽管 Transformer 具备良好的缩放特性，其巨大的计算量与资源需求严重限制了训练与推理效率，构成了当前扩散模型规模化的真实瓶颈。卷积网络天然具备局部归纳偏置与参数效率优势，理论上能够在更小的计算开销下学习有效的视觉表示，但此前卷积扩散模型在生成质量与缩放能力上始终未能与 Transformer 抗衡。
 
@@ -54,7 +54,7 @@ claims:
 
 消融研究进一步验证了各设计选择的有效性：GRN 层相较 DiCo 的 CCA 机制将 FID 从 23.85 降至 19.97，且无需额外参数；7×7 深度卷积在效率与性能间达到最优平衡；全卷积设计在 FID 和吞吐量上均优于局部自注意力替代方案。
 
-## 背景与动机
+
 
 扩散模型已成为视觉生成领域的主导范式，其核心在于学习一个逐步去噪的过程，将随机噪声映射为高保真图像。然而，当前主流的扩散骨干网络几乎完全被 Transformer 架构所垄断。以 **DiT**（Peebles & Xie, ICCV 2023）为代表的工作将 Vision Transformer 引入扩散模型，证明了 Transformer 在条件图像生成中的强大扩展性，此后一系列后续工作进一步巩固了这一趋势。
 
@@ -66,7 +66,9 @@ claims:
 
 **本文动机。** 基于上述观察，本文提出复兴 ConvNeXt 架构，构建一个专为条件扩散建模设计的全卷积扩散模型（Fully Convolutional Diffusion Model, FCDM）。ConvNeXt 通过将现代 Transformer 的设计理念迁移到卷积网络，已在判别任务中证明了其竞争力。本文的核心洞察在于：通过重新设计 ConvNeXt 以整合条件注入机制、简化 U 形多尺度架构，并引入高效的通道增强策略（全局响应归一化 GRN），可以在显著降低计算开销的同时，实现优于 Transformer 的收敛速度与生成质量。这一方向旨在回答一个根本性问题——在扩散模型中，卷积网络能否在效率与扩展性上全面超越 Transformer？
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈与设计动机
 
@@ -96,7 +98,7 @@ DiCo 在块内包含独立的前馈模块以增强表示能力。FCDM 选择去�
 
 除块级创新外，FCDM 将上述 FCDM 块组织为 U 形编码器-解码器架构，并引入跳跃连接以实现多尺度表示学习。该 U 形设计天然支持灵活的深度和宽度缩放，使 FCDM 能够像 DiT 一样在不同参数量级（S、B、L、XL）下进行规模化扩展。
 
-## 整体框架
+
 
 FCDM 的整体架构遵循“潜空间编码 → 条件化 U 形卷积主干 → 潜空间解码”的流水线。输入图像首先由预训练的变分自编码器（VAE）压缩为低维潜变量 $z_t$，该潜变量与时间步 $t$ 和类别标签 $y$ 共同送入 FCDM 主干网络，预测噪声 $\epsilon_\theta(z_t, t, y)$，再通过 DDPM 调度器逐步去噪还原潜变量，最终由 VAE 解码器生成图像。
 
@@ -118,7 +120,7 @@ FCDM 的整体架构遵循“潜空间编码 → 条件化 U 形卷积主干 →
 ![[assets/figures/papers/paper_list_l927_https_arxiv_org_abs_2603_09408/figures/026_Figure_9.jpg]]
 *Figure 9: Conditioning modules for class and text in the FCDM architecture. (a) FCDM block with conditioning vector c, (b) Conditioning module for class conditioning, (c) Conditioning module for text conditioning incorporating the CLIP text encoder*
 
-## 核心模块与公式推导
+
 
 ### 3.1 自适应层归一化（AdaLN）
 
@@ -161,7 +163,9 @@ FCDM 的整体架构采用**可扩展的 U 形编解码器设计**，包含多�
 ![[assets/figures/papers/paper_list_l927_https_arxiv_org_abs_2603_09408/figures/005_Figure_4.jpg]]
 *Figure 4: Simple illustration of DiCo and FCDM block. Both architectures share a similar high-level structure, but FCDM adopts an inverted bottleneck that expands channels for richer representations while keeping the computational cost of depthwise convolution unchanged. DiCo employs CCA with an additional 1×1 convolution, whereas FCDM uses GRN, requiring no extra pointwise convolutions. FCDM also does not include DiCo’s feedforward module, resulting in a simpler and more efficient block*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 瓶颈与核心洞察
 
@@ -248,7 +252,9 @@ FCDM在所有模型尺度（S、B、L、XL）上均展现出对DiT的压倒性�
 ![[assets/figures/papers/paper_list_l927_https_arxiv_org_abs_2603_09408/figures/017_Figure_8.jpg]]
 *Figure 8: Spectral energy of predicted noise across diffusion steps. FCDM consistently exhibits higher spectral energy than DiT across the entire diffusion process, suggesting potential for better preservation of high-frequency components*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系与边界
 
@@ -285,6 +291,8 @@ FCDM 的方法贡献可定位于以下三条技术脉络的交汇点：
 - **频域优势的理论解释**：Figure 8 显示 FCDM 在整个扩散过程中预测噪声的频谱能量始终高于 DiT，暗示卷积网络在保持高频信息方面具有内在优势。这一现象缺乏严格的理论分析，理解其成因可能为扩散模型骨干设计提供新的指导原则。
 - **与全文本嵌入的融合**：如何将 FCDM 的卷积骨干与联合全文本嵌入机制（如 MMDiT）结合，是扩展至复杂文本到图像生成任务的关键方向。
 - **更大规模下的行为**：当前最大模型为 698.8M 参数的 FCDM-XL，在十亿参数规模下卷积网络的训练稳定性和扩展规律是否仍优于 Transformer，有待验证。
+
+
 
 ## 原文 PDF
 

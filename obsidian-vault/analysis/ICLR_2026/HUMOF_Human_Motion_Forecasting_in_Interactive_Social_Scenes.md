@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/HUMOF_Human_Motion_Forecasting_in_Interactive_Social_Scenes.pdf
+project_link: null
+code_link: https://github.com/scy639/HUMOF
 openreview_forum_id: INy8guZqrm
 aliases:
 - HUMOF
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 交互式社交场景中的人体运动预测 |
 | 英文题名 | HUMOF: Human Motion Forecasting in Interactive Social Scenes |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=INy8guZqrm); [GitHub](https://github.com/scy639/HUMOF) |
+| Links | [paper](https://openreview.net/forum?id=INy8guZqrm) · [GitHub](https://github.com/scy639/HUMOF) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | HUMOF |
 | Dataset | HIK, HOI-M^3, HUMANISE (Seen), GTA-IM |
@@ -41,7 +43,7 @@ claims:
 > - HOI-M^3 上，Mean Path Error (mm) 为 174.6，对比 SAST 184.8，变化 10.2。
 > - HUMANISE (Seen) 上，Mean Path Error (mm) 为 41.7，对比 MutualDistance 57.8，变化 16.1。
 
-## 概述
+## 概要
 
 在动态社交场景中预测人体运动面临两大核心挑战：模型必须同时建模人-人交互与人-场景交互，且需要有效整合全局语义上下文与局部几何细节。现有方法——无论是仅关注场景的 **ContactAware**（Mao et al., 2022）、**GIMO**（Zheng et al., 2022）、**STAG**（Scofano et al., 2023）、**MutualDistance**（Xing et al., 2025），还是仅关注社交的 **T2P**（Jeong et al., 2024）、**IAFormer**（Xiao et al., 2025），乃至同时考虑两者的 **SAST**（Mueller et al., 2024）——均缺乏由粗到细的层次化交互推理机制，难以在复杂动态场景下实现精准预测。
 
@@ -53,7 +55,7 @@ claims:
 
 实验表明，HUMOF 在四个公开数据集（**HIK**、**HOI-M³**、**HUMANISE**、**GTA-IM**）上均达到最优性能（Table 1, Table 2）。消融研究（Table 3）验证了层次化表征、由粗到细注入策略以及自适应 DCT 重标定各自对性能的显著贡献。值得注意的是，该方法无需预定义语义标签或实例分割，直接处理原始点云，具备良好的实际部署潜力。
 
-## 背景与动机
+
 
 在拥挤的室内外场景中预测人体未来运动，是自动驾驶、人机交互、AR/VR等应用的核心能力。真实动态场景中的运动预测面临双重挑战：**人-人交互**（如擦肩而过、结伴行走、转向避让）与**人-场景交互**（如绕过桌椅、伸手取物、倚靠墙壁）往往同时发生且相互耦合（Figure 1）。然而，现有方法在这两类交互的联合建模上存在明显缺口。
 
@@ -63,7 +65,9 @@ claims:
 
 综上，本文的核心动机是：**设计一种层次化交互表征与由粗到细推理机制相结合的方法**，使其能够在不依赖语义标签的前提下，同时高效建模人-人与-人-场景交互，并在复杂动态场景中实现精确且鲁棒的运动预测。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 HUMOF 的核心创新在于构建了一套**层次化交互表征**与**由粗到细的交互推理机制**，系统性地解决了现有方法在复杂动态场景中无法同时有效建模人-人交互与人-场景交互的瓶颈。其关键设计体现为以下三个紧密耦合的 changed slots。
 
@@ -89,7 +93,7 @@ HUMOF 的核心创新在于构建了一套**层次化交互表征**与**由粗�
 
 上述三个 changed slots 并非孤立存在，而是形成了从**表征构建**到**特征注入**再到**频率调控**的完整因果链条：层次化表征提供了不同粒度的交互信息源，由粗到细的注入策略决定了信息何时进入推理过程，自适应 DCT 重标定则在频率域约束了模型在各阶段可更新的信息频段。三者联合设计使得模型能够先聚焦全局语义上下文，再进行局部几何细节的细化，从而在 HIK、HOI-M³、HUMANISE、GTA-IM 四个公开数据集上均达到最优性能（Table 1, Table 2）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_INy8guZqrm/figures/003_Figure_3.jpg]]
 *Figure 3: Detailed architecture of HUMOF. Our method takes inputs from three aspects: the past motions of the target person, a 3D point cloud for the scene, and motion sequences of interactive persons. The interactions are comprehensively encoded by (a) Hierarchical Human-Human Interaction Representation and (b) Hierarchical Human-Scene Interaction Representation, respectively. Thereafter, the hierarchical representations are leveraged by (c), a Coarse-to-Fine Interaction Reasoning Module, to predict future motions for the target person. Details of the Interaction-Perceptive Transformer layer in (c) are shown on the top right*
@@ -118,7 +122,7 @@ HUMOF 的整体流程围绕“层次化交互表征”与“由粗到细的交�
 
 综上，HUMOF 通过“频域运动编码 → 层次化交互表征构造 → 由粗到细的注意力融合与频域调控 → 时域解码”这一信息流，实现了对复杂动态场景中多尺度交互的递进式建模。
 
-## 核心模块与公式推导
+
 
 ### 3.1 运动编码器
 
@@ -206,7 +210,9 @@ $$
 - **由粗到细注入策略的优越性**（Table 3b）：仅使用粗粒度或细粒度单层特征的效果均劣于多层级特征；而在多层级特征中，由粗到细的递进注入策略又显著优于均匀注入，表明“先全局后局部”的推理顺序对复杂动态场景建模至关重要。
 - **自适应DCT重标定的增益**（Table 3c）：静态高频抑制向量已能带来性能提升，而样本自适应向量的引入进一步增强了模型对不同运动模式的适配能力，验证了频域调控机制的有效性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 1 主实验结果
 
@@ -289,7 +295,9 @@ HUMOF在四个公开数据集上均达到最优性能，覆盖了动态社交场
 ![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_INy8guZqrm/figures/012_Table_4.jpg]]
 *Table 4: Runtime analysis on $\mathrm { H O I - M ^ { 3 } }$ Dataset*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 
@@ -331,6 +339,8 @@ HUMOF 的核心贡献在于首次将**层次化交互表征**与**由粗到细�
 3. **SE(3) 编码的失效原因**：为什么显式的 SE(3) 相对变换编码未能提供性能增益？模型是否已通过时序距离模式隐式学习到了朝向和运动关系？这需要更深入的表征分析来回答。
 4. **多样化动态物体的泛化**：在具备大量且多样化动态物体（如移动的家具、车辆）的更大规模数据集上，现有框架能否保持领先优势？层次化表征的粒度设计是否需要针对新物体类别进行调整？
 5. **替代交互建模范式**：能否通过引入拓扑约束或力学模型等替代交互建模范式来进一步提升泛化性能，尤其是在物理穿透和接触合理性方面？
+
+
 
 ## 原文 PDF
 

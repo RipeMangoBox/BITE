@@ -42,7 +42,7 @@ claims:
 > - 4 tasks, 5 handheld human videos warmup 上，Overall Success Rate 67.5% vs 0% (From Scratch) (+67.5%)。
 > - Inference efficiency comparison 上，Relative speed (predictions per minute) 3.8× faster than trace baselines, >50× faster than video models vs Video generation models (e.g., NovaFlow Veo3.1) (>50×)。
 
-## 概述
+## 概要
 
 **核心问题**：不同具身（人类、各类机器人）、相机视角和环境背景之间的巨大差异，使得跨具身操纵视频难以直接复用。这导致了一个关键瓶颈——无法利用海量的人类活动视频来解决小样本机器人学习问题，因为外观、背景和相机变化淹没了操纵所需的运动结构。
 
@@ -58,7 +58,7 @@ claims:
 
 **方法谱系与知识库定位**：TraceGen 在具身世界模型领域开辟了“3D轨迹空间预测”这一新范式，区别于主流的像素级视频生成路线（如 **NovaFlow** 系列、**AVDC**）和基于边界框/目标检测的2D轨迹预测方法（如 **3DFlowAction**）。其架构融合了 CogVideoX 的3D变换器骨干、Prismatic-VLM 的多编码器融合策略，以及基于随机插值的流模型生成框架，将世界建模从外观生成重构为几何运动预测。
 
-## 背景与动机
+
 
 ### 问题背景：跨具身数据复用的核心瓶颈
 
@@ -84,7 +84,9 @@ claims:
 
 具体而言，本文致力于解决两个相互关联的挑战：（1）如何从异构的、野外采集的人类和机器人视频中自动提取统一、可靠的3D轨迹监督信号；（2）如何设计一个高效的生成模型架构，在轨迹空间中学习跨具身的运动先验，并支持对新任务和新环境的快速少样本适应。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：跨具身视觉鸿沟
 
@@ -144,7 +146,7 @@ TraceGen的训练分为两阶段：
 
 TraceGen的核心创新在于**将跨具身世界建模的战场从像素空间迁移到3D轨迹空间**，通过TraceForge数据流水线、多编码器流模型架构和大规模预训练策略三个层面的协同设计，实现了从少量人类或机器人演示中快速学习新技能的能力。这一范式在推理效率上超越视频生成方法50–600倍，同时在小样本场景下将成功率从0–25%提升至67.5–80%。
 
-## 整体框架
+
 
 TraceGen 的整体框架由两条核心流水线构成：**TraceForge** 负责将异构的跨具身视频转化为统一的 3D 轨迹训练信号，**TraceGen** 则作为基于流的条件生成模型，在 3D 轨迹空间中预测未来运动。两条流水线协同工作，共同实现从任意具身视频到机器人可执行轨迹的端到端映射。
 
@@ -208,7 +210,7 @@ TraceGen 采用**大规模跨具身预训练 + 少样本微调**的策略：
 
 由于直接在紧凑的 3D 轨迹空间（$20 \times 20$ 网格，每个点含 $x, y, z$ 坐标）中预测，而非生成高维像素帧，TraceGen 的推理速度比基于视频生成的世界模型快 **50–600 倍**（Figure 7），同时保持了更高的任务成功率。
 
-## 核心模块与公式推导
+
 
 TraceGen 是一个基于流的条件生成模型，其核心任务是从多模态观测（RGB、深度、语言指令）预测未来 3D 运动轨迹。系统由两个关键模块构成：**多编码器特征提取** 和 **基于 CogVideoX 的流解码器**。
 
@@ -256,7 +258,9 @@ $$\mathbf{X}^{\tau} = (1 - \tau) \mathbf{X}^{0} + \tau \mathbf{X}^{1}, \quad \ta
 
 生成的 3D 轨迹通过逆运动学（IK）映射为 Franka Research 3 机器人的关节命令，完成从预测到执行的闭环。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -322,7 +326,9 @@ TraceGen 在四个真实世界机器人任务（衣物整理、球体放置、�
 ![[assets/figures/papers/paper_list_l49_https_arxiv_org_abs_2511_21690/figures/004_Figure_3.jpg]]
 *Figure 3: Failure cases of existing embodied world models. (a) Video-based models can hallucinate geometry or affordance. (b) VLM token outputs fail to capture fine motion. Bounding boxes miss the tool (c) or become overly broad (d)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有世界模型的范式对比
 
@@ -379,6 +385,8 @@ TraceGen 的适用边界由其核心抽象——3D轨迹空间——决定：
 4. **人→机器人微调稳定性**：如何设计更好的微调策略，使模型在仅有人类演示时更稳定地适应不同场景？当前人→机器人迁移成功率为67.5%，而机器人微调为80%，两者之间仍有显著差距。
 
 5. **与低层控制器的集成**：能否将TraceGen的轨迹预测作为高级规划目标，与阻抗控制器或导纳控制器等低层控制器集成，以处理需要力控的接触丰富任务？
+
+
 
 ## 原文 PDF
 

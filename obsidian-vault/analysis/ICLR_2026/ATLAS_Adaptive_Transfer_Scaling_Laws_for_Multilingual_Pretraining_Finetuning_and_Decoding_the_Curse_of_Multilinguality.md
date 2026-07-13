@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/ATLAS_Adaptive_Transfer_Scaling_Laws_for_Multilingual_Pretraining_Finetuning_and_Decoding_the_Curse_of_Multilinguality.pdf
+project_link: null
+code_link: null
 aliases:
 - ATSLA
 - ATLAS
@@ -40,17 +42,19 @@ claims:
 > - MADLAD-400 (多语言) 上，R²(N) (最大模型规模) 为 0.89，对比 -0.99 (CSL), -0.65 (MSL)，变化 +1.88 vs CSL, +1.54 vs MSL。
 > - MADLAD-400 (多语言) 上，R²(M) (未见语言混合) 为 0.82，对比 0.61 (CSL), 0.70 (MSL)，变化 +0.21 vs CSL, +0.12 vs MSL。
 
-## 概述
+## 概要
 
 本文提出了**自适应迁移缩放定律（ADAPTIVE TRANSFER SCALING LAW, ATLAS）**，旨在解决多语言预训练、微调及“多语言诅咒”（curse of multilinguality）中的缩放问题。ATLAS通过显式建模跨语言迁移效应和数据重复带来的收益递减，显著提升了缩放定律对未见模型规模、数据量和语言混合的泛化能力。实验基于774次多语言训练实验，覆盖10M-8B模型参数、400+训练语言和48种评估语言，并构建了38×38语言对的跨语言迁移矩阵。ATLAS在多语言设置下整体R²达到0.98，对未见语言混合的泛化R²(M)达到0.82，远超现有基线。
 
-## 背景与动机
+
 
 现有缩放定律（如Chinchilla Scaling Law, CSL；Data-Constrained Scaling Law, DCSL；Multilingual Scaling Law, MSL）存在两个关键缺陷：**无法处理多轮数据重复**和**无法建模目标语言语系之外的跨语言迁移效应**。这导致它们对未见模型规模、数据量和语言混合的泛化能力极差。例如，在多语言设置下，CSL对最大模型规模的泛化R²(N)为-0.99，MSL为-0.65，均无法有效预测更大模型的行为。
 
 此外，多语言训练存在“计算效率税”（compute efficiency tax）：使用多语言词汇表或多语言训练集时，每种语言的最优缩放轨迹会向上偏移，尤其对英语影响显著（Figure 1）。同时，随着训练语言数量的增加，目标语言的损失会相对退化，这种退化对更大模型更不敏感（Figure 4）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ATLAS的核心创新在于将**有效数据暴露项（effective data exposure）**分解为目标语言、迁移语言和其他语言三个独立来源，并引入饱和函数和可学习的迁移权重。具体创新点包括：
 
@@ -58,7 +62,7 @@ ATLAS的核心创新在于将**有效数据暴露项（effective data exposure�
 2. **跨语言迁移显式建模**：将有效数据分解为三项：目标语言数据D_t、迁移语言数据（最多3种最常共采样语言）和其他语言数据D_other，每项均经饱和函数处理并赋予可学习权重。
 3. **迁移权重初始化**：迁移权重τ_i从双语迁移分数（BTS）初始化，BTS通过双语共训练实验直接测量语言对之间的正迁移或干扰。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__language_speech_and_dialog__b001_0BkvUY61MX_ATLAS_Adaptiv/figures/001_Figure_1.jpg]]
 *Figure 1: Optimal Scaling Trajectories for English, French, Russian, Chinese, Hindi, and Swahili. The law for [monolingual vocabulary, monolingual training]=(—), the law for [multilingual vocabulary, monolingual training]=(- - -), and the law for [multilingual vocabulary, unimax training]=(···). We find (1) per-language optimal scaling trajectories are similar, (2) there is a compute efficiency tax for training with multilingual vocabularies or training sets (especially for English), and (3) as Hindi and Swahili observe data repetition their curves slope upward from diminishing returns.*
@@ -70,7 +74,7 @@ ATLAS的整体框架包含四个核心模块：
 3. **多语言诅咒缩放定律**：建模损失与语言数量K、模型规模N、每语言数据量D的关系：L(N,D,K) = L_inf + A K^φ / N^α + B K^ψ / D^β。
 4. **预训练 vs 微调决策公式**：估计从零预训练超越微调Unimax检查点所需的计算预算C与模型规模N的关系：C = 10^28 × N^1.65。
 
-## 核心模块与公式推导
+
 
 ### 5.1 ATLAS核心缩放定律
 
@@ -130,7 +134,9 @@ $$C = 10^{28} \times N^{1.65}$$
 
 交叉点位于144B至283B token之间：若预算<144B token，微调多语言检查点更有效；若预算≥283B token，从零预训练更优。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 6.1 主要结果
 
@@ -202,7 +208,9 @@ Figure 6和Figure 7展示了八种语言从零预训练与微调Unimax检查点�
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__language_speech_and_dialog__b001_0BkvUY61MX_ATLAS_Adaptiv/figures/014_Table_5.jpg]]
 *Table 5: Table B.4: The Unimax language sampling rates adapted from Chung et al. (2023). Languages are listed in order of their percentage sampling rate, which sum to 100.*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ATLAS建立在以下工作基础上：
 
@@ -217,6 +225,8 @@ ATLAS的独特贡献在于：
 2. 构建了最大的经验性跨语言迁移矩阵（38×38语言对）。
 3. 推导了多语言诅咒的量化缩放定律，为实践者提供了扩展语言覆盖范围时的最优缩放策略。
 4. 提供了预训练 vs 微调的通用决策公式。
+
+
 
 ## 原文 PDF
 

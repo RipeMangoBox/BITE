@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/InclusiveVidPose_Bridging_the_Pose_Estimation_Gap_for_Individuals_with_Limb_Deficiencies_in_Video_Based_Motion.pdf
+project_link: null
+code_link: null
 openreview_forum_id: SyQqXAdWUq
 aliases:
 - IL
@@ -42,11 +44,11 @@ claims:
 > - InclusiveVidPose test (单帧) 上，AP 为 ViT-L (InclusiveVidPose训练) 85.5，对比 ViT-L (仅COCO训练) 73.8，变化 +11.7。
 > - InclusiveVidPose test (单帧) 上，AP 为 RTMPose-M (InclusiveVidPose训练) 82.2，对比 RTMPose-M (仅COCO训练) 69.5，变化 +12.7。
 
-## 概述
+## 概要
 
 现有视频人体姿态估计（HPE）数据集和模型均假设人体关键点完整，无法处理肢体缺失或假肢等解剖变异。这一根本性瓶颈导致主流模型在肢体缺陷人群上产生严重且不可靠的预测——例如，**ViTPose**（Xu et al., 2022）会将假肢错误地预测为自然脚踝（Figure 2）。针对这一空白，本文提出**InclusiveVidPose**，首个面向肢体缺陷人群的大规模视频姿态估计数据集，包含313个视频、327k帧、398名参与者，并在COCO 17关键点基础上扩展8个残肢端点，形成25关键点模式以捕捉解剖变异（Figure 3）。同时引入新评估指标**LiCC（Limb-specific Confidence Consistency）**，量化模型对残肢与完整肢体的置信度区分能力。实验表明，现有方法在残肢关键点组上AP近乎为0（Table 3），而经InclusiveVidPose训练的ViTPose-H可将AP从73.6提升至86.3（Table 2），揭示了数据驱动方法在包容性姿态估计中的关键作用。
 
-## 背景与动机
+
 
 ### 人体姿态估计的包容性缺口
 
@@ -80,7 +82,9 @@ Figure 2 展示了这一问题的具体表现。以在COCO上训练的 **ViTPose
 
 通过这一系统性工作，本文旨在揭示现有HPE方法在肢体缺陷场景下的根本性局限，并为更具包容性的姿态估计研究奠定数据与评估基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 InclusiveVidPose 的核心创新并非提出新的模型架构，而是从**数据定义**和**评估范式**两个层面重构了面向肢体缺陷人群的姿态估计问题。
 
@@ -106,7 +110,7 @@ Table 2 的结果显示，即使模型在 AP 上表现尚可，LiCC 仍仅约 60
 
 这三项创新共同构成了一个闭环：扩展关键点模式定义了“标注什么”，LiCC 指标定义了“评估什么”，而视频级个性化标注体系提供了“如何构建基准”的完整方案。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_SyQqXAdWUq/figures/003_Table_1.jpg]]
 *Table 1: Comparison of existing datasets for human pose estimation. InclusiveVidPose offers unique and richer annotations than previous datasets. It is also the first pose estimation dataset to focus on individuals with limb deficiencies and to include keypoints at the ends of residual limbs*
@@ -147,7 +151,7 @@ InclusiveVidPose 并非提出新的姿态估计算法，而是构建了一套面
 
 从表 1 的对比可见，InclusiveVidPose 是首个同时提供分割掩码、边界框、追踪 ID、残肢端点关键点和假肢信息的视频姿态估计数据集，其标注丰富度远超 COCO、MPII、PoseTrack 等现有数据集。这一框架填补了“肢体缺陷人群姿态估计”这一空白领域的数据和评估基础设施。
 
-## 核心模块与公式推导
+
 
 ### 扩展关键点模式设计
 
@@ -186,7 +190,9 @@ $$\mathrm{LiCC} := \frac{1}{|V|} \sum_{i \in V} \mathbf{1}\big(s_i > \max_{j \in
 
 LiCC 与 AP/AR 互补：AP 衡量空间定位精度，LiCC 衡量置信度排序的解剖一致性。一个模型可能获得较高 AP（因为正确预测了可见关键点位置），但 LiCC 较低（因为对互斥关键点也输出了高置信度），这在安全敏感的下游应用中构成风险。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果：单帧姿态估计基准
 
@@ -224,7 +230,9 @@ Figure 7 展示了 ViTPose（ViT-B）在 InclusiveVidPose 训练后的预测案�
 
 当前数据集的一个固有局限是遮挡与缺失的区分难题。尽管采用多标注员和视频级验证，部分严重遮挡的肢体仍可能被误标为缺失，或反之。这种标签噪声对 LiCC 等依赖互斥规则的指标影响尤为直接。此外，数据仅覆盖 2D RGB 视频，缺乏深度或惯性传感器等多模态信息，限制了在三维空间精确定位残肢端点的可能性。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 基线模型谱系
 
@@ -292,6 +300,8 @@ InclusiveVidPose 在 HPE 领域的定位是**包容性基准**，其贡献与影
 - **评估体系的补充**：LiCC 指标为姿态估计的置信度评估提供了新维度，不仅衡量关键点定位精度，还衡量模型对“肢体是否存在”的结构性认知能力。这一指标可推广到其他涉及人体变异性的视觉任务。
 
 - **社会影响维度**：该数据集通过接近平衡的性别分布（女性 51%，男性 49%）和假肢使用比例（52% 佩戴假肢，48% 未佩戴），以及覆盖多种肢体缺失类型和部位，确保了模型的通用性和公平性，避免了对特定子群体的系统性偏见。
+
+
 
 ## 原文 PDF
 

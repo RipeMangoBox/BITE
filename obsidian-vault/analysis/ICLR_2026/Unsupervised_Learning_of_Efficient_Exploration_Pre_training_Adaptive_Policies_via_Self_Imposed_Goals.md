@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Unsupervised_Learning_of_Efficient_Exploration_Pre_training_Adaptive_Policies_via_Self_Imposed_Goals.pdf
+project_link: null
+code_link: https://github.com/Octavio-Pappalardo/ulee-jax
 openreview_forum_id: UmxTIxHWkl
 aliases:
 - ULEEPTAPSIG
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 无监督高效探索：基于自我目标的自适应策略预训练 |
 | 英文题名 | Unsupervised Learning of Efficient Exploration: Pre-training Adaptive Policies via Self-Imposed Goals |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=UmxTIxHWkl); [GitHub](https://github.com/Octavio-Pappalardo/ulee-jax) |
+| Links | [paper](https://openreview.net/forum?id=UmxTIxHWkl) · [GitHub](https://github.com/Octavio-Pappalardo/ulee-jax) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | ULEE |
 | Dataset | 4Rooms‑Trivial / 4Rooms‑Small / 6Rooms‑Small, 4Rooms‑Small（少样本适应）, 固定 μ_eval 任务（长期微调）, μ_train 上的监督元学习 |
@@ -41,7 +43,7 @@ claims:
 > - 4Rooms‑Small（少样本适应） 上，第 30 回合平均收益（mean return） 为 ULEE，对比 DIAYN / Random，变化 收益提升至多 3 倍（由 ~0.2 至 ~0.6）。
 > - 固定 μ_eval 任务（长期微调） 上，平均收益、第 40 和第 20 百分位收益 为 ULEE 初始化 + 微调，对比 从头训练 / DIAYN 预训练后微调，变化 所有百分位收益持续更高（微调至 10^9 步均保持优势）。
 
-## 概述
+## 概要
 
 现有无监督探索预训练方法面临一个关键瓶颈：它们仅依赖即时表现来衡量目标难度，却忽略了任务特定适应过程的动态变化，导致习得的策略难以泛化到分布外或未知目标上。本文提出 **ULEE（Unsupervised Learning of Efficient Exploration）**，一种无监督元学习方法，其核心思路是将**上下文自适应策略**与**对抗性目标生成机制**相结合，通过自我设定的目标课程来预训练智能体的探索与适应能力。
 
@@ -57,7 +59,7 @@ ULEE 的关键创新在于引入**基于适应后表现的难度指标**——�
 
 消融实验进一步确认，移除对抗目标搜索或边界采样机制会显著降低性能，验证了 ULEE 各组件在构建有效探索课程中的必要性。
 
-## 背景与动机
+
 
 强化学习（RL）智能体在面对未知任务时，通常需要大量交互才能学会有效行为。无监督预训练旨在利用无任务标签的环境交互，提前习得可迁移的探索与适应能力，从而在下游任务上降低样本需求。然而，现有无监督探索预训练方法存在一个根本性瓶颈：**它们仅依赖即时表现来衡量目标难度，缺少对任务特定适应的考量**，导致习得的策略难以在分布外或未见过的目标上泛化。
 
@@ -65,7 +67,9 @@ ULEE 的关键创新在于引入**基于适应后表现的难度指标**——�
 
 本文的动机正是填补这一缺口：**设计一种能够感知适应后表现的目标难度指标，并围绕该指标构建自监督课程，使预训练策略在无外界奖励的情况下学会探索、适应与泛化**。为此，作者提出 ULEE（Unsupervised Learning of Efficient Exploration），一种无监督元学习方法，其核心思路是将上下文自适应策略与对抗目标生成机制相结合，让智能体在与环境的多回合交互中自我驱动地成长。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ULEE 的核心创新在于重构了无监督探索预训练的三个关键环节，使其从“学习可区分的技能”转向“学习可迁移的探索与适应行为”。具体而言，该方法在以下五个维度上相对于现有基线（以 DIAYN 为代表）进行了系统性改进。
 
@@ -109,7 +113,7 @@ $$\mathcal{L}_{\mathrm{DP}}(\phi) = \frac{1}{|B_g|} \sum_{(g,\xi,\tilde{d}) \in 
 
 上述五个 changed slots 并非孤立改进，而是形成了一条完整的因果链条：**适应后难度度量**定义了什么是“合适的目标”，**对抗目标搜索**生成处于能力前沿的候选目标，**边界采样**从中筛选中等难度的训练样本，**难度预测网络**使这一过程可规模化运行，而**上下文自适应策略**则在这些目标构成的课程上习得可迁移的探索与适应行为。这一链条的核心洞察在于：预训练的目标不应是学会特定技能，而是学会“如何快速学会”——这正是 ULEE 在探索评估中达到 DIAYN 两倍以上目标达成率、在少样本适应中收益提升至多 3 倍的根本原因。
 
-## 整体框架
+
 
 ULEE 的整体设计围绕一个核心矛盾展开：**如何在不依赖人工标注的情况下，为自适应策略生成难度适中且能推动泛化的训练目标**。现有无监督探索预训练方法仅依赖即时表现衡量目标难度，缺少对任务特定适应的考量，导致习得的策略难以在分布外或未知目标上泛化。ULEE 通过引入基于适应后表现的难度指标，并构建一个由对抗目标搜索、难度预测和边界采样组成的闭环课程生成系统，从根本上改变了这一局面。
 
@@ -161,7 +165,7 @@ $$\mathcal{I}(\pi) = \mathbb{E}_{M \sim \mu^{\mathrm{msup}},\, g \sim p(g|M)} \l
 
 目标映射函数 $f$（如 $f_\text{counts}$ 或 $f_\text{grid}$）需针对环境手动设计，这限制了方法在不同领域间的直接迁移。论文在 MiniGrid 实验中对比了两种映射函数的效果差异，但未提供自动学习 $f$ 的机制。
 
-## 核心模块与公式推导
+
 
 ULEE 的核心架构围绕一个**无条件上下文自适应策略**展开，通过自我生成的目标课程进行预训练。整个系统由四个关键模块协同工作：预训练策略、目标搜索策略、难度预测器及目标选择机制。
 
@@ -215,7 +219,9 @@ $$
 
 其中 $B_g$ 保存三元组 $(g, \xi, \tilde{d})$，$\xi$ 为环境上下文，$\tilde{d}$ 为经验难度估计。缓冲区仅保留最近训练过的目标，确保预测器与策略当前能力保持同步。该模块使系统能够高效评估大量候选目标的难度，支撑目标搜索与选择的高效运行。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与实验设计逻辑
 
@@ -285,7 +291,9 @@ Table 1 展示了预训练于 4Rooms-Small 后在 14 个 MiniGrid 任务上 20 �
 
 4. **单一环境域验证**：所有实验在网格世界环境中进行，尚未在连续控制或视觉复杂环境中验证框架的有效性。这留下了开放问题：难度预测器和对抗目标搜索在高维状态空间中是否同样稳定？
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -312,6 +320,8 @@ ULEE 在网格世界任务上展现出跨任务泛化能力：预训练于 4Room
 **课程机制**：论文在附录中提出了适应后学习进度指标 $LP_{\mathrm{post}}$（Appendix A.3），衡量适应后表现的变化量，但未将其纳入主课程。该指标与适应后难度课程结合后能否进一步提升课程质量，尚待验证。
 
 **环境验证**：所有实验均在单一的网格世界环境（XLand-MiniGrid 变体）中进行，尚未在高维视觉输入和连续动作空间中验证框架的有效性。这一局限性需要在未来的工作中通过更广泛的环境测试来弥合。
+
+
 
 ## 原文 PDF
 

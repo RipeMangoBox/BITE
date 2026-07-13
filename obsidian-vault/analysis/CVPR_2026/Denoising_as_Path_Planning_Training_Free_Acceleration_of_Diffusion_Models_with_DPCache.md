@@ -43,7 +43,7 @@ claims:
 > - HunyuanVideo on VBench 上，VBench Score (%) ↑ 80.23 (K=9) vs 80.93 (50 steps) (-0.70 (but outperforms other accelerated methods by ≥0.24))。
 > - DiT-XL/2 on ImageNet 上，FID ↓ / sFID ↓ / IS ↑ 3.285 / 5.063 / 215.99 (3.02× speedup) vs 2.226 / 4.275 / 241.10 (50 steps) (best among accelerated methods, e.g., FID improvement over second-best: -1.420)。
 
-## 概述
+## 概要
 
 扩散模型在图像和视频生成中展现出卓越能力，但其迭代去噪过程计算开销巨大。现有免训练加速方法——如基于缓存重用的 **TeaCache**、基于泰勒预测的 **TaylorSeer** 和引入验证器网络的 **SpeCa**——普遍采用固定间隔或局部自适应采样策略，忽略了去噪轨迹的全局结构。固定调度无法识别关键过渡区域，导致轨迹大幅偏离；局部自适应策略则因短视而跳过必要时间步，造成不可逆漂移与误差累积，最终产生模糊、几何扭曲等视觉伪影（图1）。
 
@@ -57,7 +57,7 @@ claims:
 
 **主要结果**：在 FLUX.1-dev 文本生成图像任务上，DPCache 以 3.54× 加速实现 ImageReward 1.007，超越全步数基线（0.979，+0.028）；在 4.87× 更高加速比下，ImageReward 仍达 0.958，领先次优方法 0.031。在 HunyuanVideo 视频生成和 DiT-XL/2 类别条件生成任务上，DPCache 同样以显著保真度优势超越现有加速方法，验证了全局路径规划范式的通用性与有效性。
 
-## 背景与动机
+
 
 扩散模型已成为视觉生成领域的核心架构，但其迭代去噪过程通常需要数十至上百个推理步骤，导致高昂的计算成本与延迟。在交互式应用、视频生成等场景中，这一瓶颈尤为突出。因此，如何在保持生成质量的前提下大幅减少有效计算量，成为扩散模型实用化的关键挑战。
 
@@ -81,7 +81,9 @@ claims:
 
 基于这一视角，DPCache将加速问题形式化为：在给定的目标步数$K$下，从全步数去噪轨迹中选择一组关键时间步，使得跳跃造成的路径感知累积误差最小。这一全局优化框架无需训练，仅需极少量校准样本，即可在显著加速的同时保持甚至超越全步数基线的生成质量。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DPCache 的核心创新在于将扩散模型的采样加速从一个**局部、短视的缓存决策问题**重新定义为**全局路径规划问题**。现有基于缓存的方法（如 TeaCache、TaylorSeer、SpeCa）虽然通过特征预测跳过了大量计算，但其调度策略存在根本性缺陷：固定间隔调度无法感知去噪轨迹中的关键过渡区域，导致与全步数轨迹产生大偏差；而局部自适应策略（如基于阈值的贪婪判断或轻量验证器）由于缺乏全局视野，常常跳过必要的时间步，造成不可逆的漂移和误差累积，最终表现为模糊、几何扭曲等视觉伪影（Figure 1）。
 
@@ -117,7 +119,7 @@ $$D[m,k] = \min_{j>k} D[m-1,j] + \mathcal{C}[P[m-1,j], j, k]$$
 
 **因果机制总结**：DPCache 之所以能在 3.54× 加速下超越全步数基线（ImageReward +0.028），并在 4.87× 加速下显著领先其他方法（ImageReward +0.031, CLIP Score +0.10），根本原因在于 PACT 精确捕捉了跳跃误差的路径依赖性，而动态规划确保了所选调度在全局范围内最小化累积偏差。这一“全局路径规划”范式从根本上避免了局部自适应方法的短视性错误和固定调度的僵化性，是实现高质量加速的因果枢纽。
 
-## 整体框架
+
 
 DPCache将扩散模型采样加速重新定义为**全局路径规划问题**，其核心思想是：不依赖固定间隔或局部自适应策略，而是通过离线校准构建路径感知代价张量（Path-Aware Cost Tensor, PACT），再利用动态规划精确选择全局最优的关键时间步序列，使去噪轨迹与全步数基线的累积偏差最小化。整个框架分为**校准阶段**和**推理阶段**两大模块，如图2所示。
 
@@ -151,7 +153,7 @@ DPCache将扩散模型采样加速重新定义为**全局路径规划问题**，
 ![[assets/figures/papers/paper_list_l2460_https_arxiv_org_abs_2602_22654/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of DPCache. (a) During the calibration stage, the full T -step denoising process is executed to construct a 3D Path-Aware Cost Tensor (PACT), which quantifies the cumulative error of skipping intermediate timesteps conditioned on the preceding key step. (b) An optimal K-step sampling schedule*
 
-## 核心模块与公式推导
+
 
 ### 3.1 路径规划视角下的采样加速
 
@@ -217,7 +219,9 @@ $$D[m,k] = \min_{j>k} D[m-1,j] + \mathcal{C}[P[m-1,j], j, k]$$
 ![[assets/figures/papers/paper_list_l2460_https_arxiv_org_abs_2602_22654/figures/001_Figure_1.jpg]]
 *Figure 1: (a) Fixed schedule is inflexible and unable to identify critical timesteps, resulting in large deviation from the true trajectory. (b) Locally adaptive schedule makes greedy, short-sighted decisions that often skip essential timesteps, leading to irreversible deviation. (c) DPCache identifies a globally optimal sequence of key timesteps through calibration and achieves low cumulative trajectory deviation*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -291,7 +295,9 @@ DPCache 的预测器阶数（O）在轨迹保真度和文本对齐之间存在�
 ![[assets/figures/papers/paper_list_l2460_https_arxiv_org_abs_2602_22654/figures/012_Figure_6.jpg]]
 *Figure 6: VBench performance of HunyuanVideo across all dimensions with various acceleration methods under different acceleration settings: (left) low speedup, (right) high speedup. Scores are normalized per dimension for improved visual comparison*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有加速方法的关系
 
@@ -340,6 +346,8 @@ DPCache的核心贡献可归纳为三个层面：
 ### 在知识库中的位置
 
 DPCache处于**免训练扩散模型加速**与**缓存重用**的交叉点，其全局路径规划视角为缓存加速方法引入了新的理论维度。相较于依赖蒸馏或模型修改的加速方法，DPCache的免训练特性使其具有更强的即插即用能力——仅需约10张校准样本离线构建PACT，所得调度可冻结并泛化至任意输入，甚至分布外提示。这一特性使其在实际部署中具有显著优势，也为后续研究（如输入自适应调度、预测器联合优化）提供了清晰的基础框架。
+
+
 
 ## 原文 PDF
 

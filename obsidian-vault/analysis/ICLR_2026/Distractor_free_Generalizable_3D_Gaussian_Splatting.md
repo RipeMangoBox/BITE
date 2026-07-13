@@ -33,7 +33,7 @@ claims:
 | 中文题名 | 无干扰物的泛化三维高斯泼溅 |
 | 英文题名 | Distractor-free Generalizable 3D Gaussian Splatting |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=G33Iemmj3Z) · [arXiv](https://arxiv.org/abs/2408.00714) |
+| Links | [paper](https://openreview.net/forum?id=G33Iemmj3Z) · [paper](https://arxiv.org/abs/2408.00714) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | DGGS (Distractor-free Generalizable 3D Gaussian Splatting) |
 | Dataset | RobustNeRF, Arcdetriomphe, Mountain |
@@ -43,7 +43,7 @@ claims:
 > - Arcdetriomphe 上，PSNR ↑ 20.32 (DGGS-TR) vs 14.96 (Mvsplat) (+5.36)。
 > - Mountain 上，PSNR ↑ 16.37 (DGGS-TR) vs 13.73 (Mvsplat) (+2.64)。
 
-## 概述
+## 概要
 
 真实场景中广泛存在的干扰物（如行人、车辆等瞬态物体）破坏了泛化三维高斯泼溅（3D Gaussian Splatting, 3DGS）中参考视图与查询视图之间的三维一致性，导致训练不稳定，并在新视角合成时产生伪影和空洞。本文提出 **DGGS（Distractor-free Generalizable 3D Gaussian Splatting）**，一种无需场景特定优化、前馈式地预测干扰物掩码并实现无干扰物重建的泛化3DGS框架。
 
@@ -51,7 +51,7 @@ claims:
 
 在 RobustNeRF 基准的五个场景上，DGGS 相较通用泛化3DGS基线 **Mvsplat**（Chen et al., ECCV 2024）平均 PSNR 提升 6.29 dB（21.74 vs. 15.45），SSIM 提升 0.243，LPIPS 降低 0.189。消融实验证实，基于参考的掩码预测是性能跃升的关键驱动因素——引入该模块后 PSNR 从 17.11 跃升至 20.35，叠加掩码细化与推理策略后最终达到 21.74。方法的主要局限在于多参考视图间存在大面积共同遮挡时无法推理正确几何，且不具备生成式补全能力，共同遮挡区域可能产生散斑伪影。
 
-## 背景与动机
+
 
 ### 泛化三维高斯泼溅与干扰物挑战
 
@@ -73,7 +73,9 @@ DGGS的出发点是利用泛化3DGS的一个关键性质：**由参考视图推�
 
 基于此，DGGS设计了一个前馈式干扰物掩码预测与细化模块，利用参考视图的三维一致性和语义先验，在训练阶段自动生成高质量的干扰物掩码，并通过掩码损失排除干扰区域对训练的负面影响。在推理阶段，DGGS进一步引入两阶段框架：先粗重建并评分候选参考视图，再基于评分选择最优视图并执行干扰物剪枝，从而系统性地抑制干扰物引起的伪影。整个流程无需额外的干扰物标注或场景特定优化，实现了端到端的无干扰物泛化三维重建。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DGGS 的核心创新在于将“干扰物掩码预测”从启发式阈值或外部模型依赖，转变为**由参考视图重渲染一致性驱动的自监督过程**。其关键洞察是：从参考视图推理出的 3DGS 在非干扰区域的重渲染结果高度准确且鲁棒，这一性质可反过来指导查询视图中干扰物掩码的过滤与细化，无需任何额外监督信号。
 
@@ -109,7 +111,7 @@ $$\arg \min_{\boldsymbol{\theta}} \mathcal{M} \odot \|\mathbf{I}_T - \mathcal{G}
 
 消融显示（Table 2），参考评分机制将 PSNR 从 21.02 提升至 21.47，干扰物剪枝进一步推至 21.74。这一策略的瓶颈在于：当多个参考视图间存在大范围共同遮挡时，评分机制无法找到干净的参考，性能会退化（见 Fig. 16 失败案例）。
 
-## 整体框架
+
 
 DGGS 的整体设计围绕一个核心观察展开：由参考视图推理出的 3DGS 在非干扰区域的重渲染结果通常准确且鲁棒。这一性质被系统性地利用，构建了一个无需额外监督的前馈式干扰物掩码预测与训练框架，同时辅以两阶段推理策略来抑制残余伪影。
 
@@ -144,7 +146,7 @@ DGGS 的整体设计围绕一个核心观察展开：由参考视图推理出的
 ![[assets/figures/papers/paper_list_l79_https_openreview_net_forum_id_G33Iemmj3Z/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of Our Task. Distractors are unwanted transient objects in static scene reconstruction, such as buses, balloons, or anything. DGGS enables feed-forward 3DGS reconstruction from limited distractor data while inferring corresponding distractor masks without extra supervision*
 
-## 核心模块与公式推导
+
 
 DGGS 的核心由四个关键模块构成：**基于参考的掩码预测**、**掩码细化**、**参考评分机制** 和 **干扰物剪枝**。这些模块协同工作，在不依赖场景特定优化或额外监督的前提下，实现了前馈式的干扰物掩码预测与鲁棒的三维重建。
 
@@ -229,7 +231,9 @@ $$\arg \operatorname* { m i n } _ { \pmb { \theta } } \mathcal { M } \odot \left
 ![[assets/figures/papers/paper_list_l79_https_openreview_net_forum_id_G33Iemmj3Z/figures/003_Figure_3.jpg]]
 *Figure 3: The Mask Evolution in Sec. 4.1*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -303,7 +307,9 @@ DGGS的两阶段推理策略在提升质量的同时引入了额外的计算开�
 ![[assets/figures/papers/paper_list_l79_https_openreview_net_forum_id_G33Iemmj3Z/figures/004_Figure_4.jpg]]
 *Figure 4: Distractor-free Generalizable Inference Framework. DGGS initially samples adjacent references from the scene-images pool and leverages trained DGGS for coarse 3DGS. Based on the Reference Scoring mechanism, masks and quality scores are computed for all pool images. These masks and scores subsequently guide reference selection and Distractor Pruning for fine 3DGS*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：泛化3DGS中的干扰物瓶颈
 
@@ -338,6 +344,8 @@ DGGS在泛化3DGS领域的技术贡献可定位为**训练与推理阶段的干�
 1. **端到端整合**：当前参考评分与掩码预测是两个解耦的模块，可否将其整合为一个端到端可训练模块以进一步优化推理速度？
 2. **极端动态场景**：在大部分区域被干扰物覆盖的场景下，仅依靠3D一致性的方法是否仍有效，还是需要引入时序先验？
 3. **在线分割替代**：当前实体分割模型必须在训练前预计算并缓存，有无可能设计一个轻量级、在线可训练的分割模块以降低对额外模型的依赖？
+
+
 
 ## 原文 PDF
 

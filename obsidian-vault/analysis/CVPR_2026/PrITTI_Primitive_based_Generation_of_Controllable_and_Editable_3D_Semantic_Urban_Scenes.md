@@ -41,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - KITTI-360 上，Precision ↑ 0.712 vs 0.482 (XCube L2) (+0.230)；Recall ↑ 0.491 vs 0.230 (XCube L2) (+0.261)；FID ↓ 73.952 vs 94.822 (XCube L2) (-20.870)。
 
-## 概述
+## 概要
 
 现有基于体素（voxel）的3D城市场景表示受限于固定分辨率、内存消耗大、难以编辑且缺乏对象级结构，这直接制约了生成质量和下游交互能力。PrITTI 针对这一瓶颈，提出一种紧凑的混合基元表示——将地面元素栅格化为鸟瞰高度图，同时将物体建模为参数化基元（立方体与椭球体），从而在语义层面实现高质量、可控且可编辑的3D城市场景生成。
 
@@ -51,7 +51,7 @@ claims:
 
 尽管 PrITTI 在生成质量、内存效率和可控性方面取得了显著进展，其当前框架仍限于静态场景和固定语义类别集，细粒度附件（如杆上灯具）的重建精度不足，且外推任务中大片空白区域易产生语义不连贯的补全。这些局限为后续研究指明了开放方向，包括开放词汇场景生成、几何感知约束集成以及动态场景扩展。
 
-## 背景与动机
+
 
 ### 3D 城市场景生成的需求与挑战
 
@@ -81,7 +81,9 @@ claims:
 
 这一设计将对象级结构显式地注入生成流程，使得“生成一个场景”等价于“生成一组有意义的物体及其空间布局”，从而在生成质量、推理速度和交互灵活性上实现对体素方法的全面超越。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PrITTI 的核心创新在于用一套**混合基元表示**替代了现有方法中占主导地位的体素网格，并围绕该表示构建了**解耦的潜在空间**与**Transformer扩散生成框架**。这一设计直接回应了体素表示的根本性瓶颈：固定分辨率导致的内存爆炸、缺乏对象级结构带来的编辑困难，以及网格离散化造成的几何失真。以下从四个关键维度剖析其相对于基线方法的创新之处。
 
@@ -122,7 +124,7 @@ $$\mathbf{z}_{\mathcal{L}} = [\mathbf{z}_{\mathcal{G}}; \mathbf{z}_{\mathcal{O}}
 
 PrITTI 的创新并非孤立的算法改进，而是一套**从表示到架构的系统性重构**：混合基元表示降低了内存并赋予编辑能力，Cholesky 参数化提供了数值稳定的物体编码，解耦潜在空间保留了模态特异性，DiT 扩散框架实现了可控高质量生成。这四个 changed slots 相互协同，共同构成了 PrITTI 相对于体素基线的根本性优势。
 
-## 整体框架
+
 
 PrITTI 采用两阶段生成范式，将 3D 语义城市场景的生成问题从高维体素空间迁移到紧凑的混合基元潜在空间。整体 pipeline 由三个核心模块串联构成：**场景表示层**（Sec. 3.1）、**布局变分自编码器 LVAE**（Sec. 3.2）和**潜在扩散模型 DiT**（Sec. 3.3），辅以基于 RePaint 的潜在空间编辑模块支撑下游应用。
 
@@ -198,7 +200,7 @@ $$\mathcal{L}_{\mathrm{LDM}} = \mathbb{E}_{\mathbf{z}_{\mathcal{L}}^0, \epsilon,
 ![[assets/figures/papers/paper_list_l2575_https_arxiv_org_abs_2506_19117/figures/002_Figure_2.jpg]]
 *Figure 2: Training Overview. An input 3D semantic layout*
 
-## 核心模块与公式推导
+
 
 PrITTI 的核心架构由两个阶段构成：第一阶段 Layout VAE (LVAE) 将 3D 语义场景布局压缩为解耦的 2D 潜在编码，第二阶段 Diffusion Transformer (DiT) 在该潜在空间上学习生成分布。以下详述各模块的数学形式与设计机理。
 
@@ -270,7 +272,9 @@ $$
 ![[assets/figures/papers/paper_list_l2575_https_arxiv_org_abs_2506_19117/figures/014_Figure_8.jpg]]
 *Figure 8: Latent-space Scene Outpainting. Given a known layout block P (green) with latent*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -370,7 +374,9 @@ Figure 12 展示了 PrITTI 的典型失败案例：
 ![[assets/figures/papers/paper_list_l2575_https_arxiv_org_abs_2506_19117/figures/001_Figure_1.jpg]]
 *Figure 1: PrITTI generates (1) high-quality, controllable 3D semantic urban scenes in a compact primitive-based representation using a latent diffusion model. Starting from a generated scene (e.g. middle sample), we demonstrate downstream applications including (2) scene editing, (3) inpainting, (4) outpainting, and (5) photo-realistic street view synthesis*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心瓶颈与因果机制
 
@@ -423,6 +429,8 @@ PrITTI 的适用边界由以下设计约束划定：
 4. **动态场景扩展**：基元表示能否适应动态场景（如移动车辆、行人）的时间维度？引入时序基元参数化是潜在路径。
 5. **跨域泛化**：该框架能否在室内场景、Argoverse 2 等非 KITTI-360 环境下有效推广？初步实验（Table 9）显示 PrITTI 在 Argoverse 2 上具有可行性，但需更系统的跨域评估。
 6. **基元穿透预防**：如何进一步优化以防止基元间穿透和地面错位等常见失败模式？显式碰撞检测或基于物理的损失函数可能是解决方案。
+
+
 
 ## 原文 PDF
 

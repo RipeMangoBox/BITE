@@ -43,7 +43,7 @@ claims:
 > - 作者构建的复合提示集（140 prompts） 上，Dual MM Dist 85.16（测试时缩放） / 96.07（Action-detail） vs 各基线方法（见Table 1） (显著更低（更低偏差表示更好对齐）)。
 > - 用户研究（质量/文本对齐/综合偏好） 上，Overall Preference 83.30% 投票率（测试时缩放） vs 与各基线成对比较，多数优于50% (大幅领先)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -75,7 +75,7 @@ MultiAct 的独特优势在于：**无需重新训练或修改骨干架构**，�
 
 > **注意**：评估所用的复合提示集为作者自行构造，格式限定为“\<prefix\> while \<suffix\>”，其分布可能与真实使用场景存在偏差；双模态距离指标的有效性仅通过人工设计的辅助任务验证，尚缺乏大规模标准测试。
 
-## 背景与动机
+
 
 ### 任务场景：复合文本到运动生成
 
@@ -104,7 +104,9 @@ MultiAct 的独特优势在于：**无需重新训练或修改骨干架构**，�
 
 MultiAct 正是在这一动机下提出的：它通过**定制化注意力引导（tailored attention guidance）**，在推理过程中选择性地放大未被充分表示的标记（underrepresented tokens）的交叉注意力得分，从而恢复缺失的动作语义。同时，为了消除人工调参的负担并实现跨提示泛化，MultiAct 引入轻量级参数决策方案 **ParamGate**，自动预测每个提示对应的最优增强参数。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MultiAct 的核心创新并非提出新的生成架构，而是在**预训练的文本到运动扩散模型上，通过推理阶段的定制化注意力引导，解决复合提示中的语义消失问题**。其关键洞察在于：现有扩散模型（如 **MDM**，Tevet et al., ICLR 2023）在生成同时包含多个动作的复合提示时，交叉注意力会过度集中在主导动词上，导致次要动作成分（如方向、方式、风格）在生成的运动中丢失（见图1蓝色案例）。MultiAct 通过选择性放大这些未被充分表示标记的交叉注意力得分，恢复了缺失的语义，且**无需重新训练或修改骨干架构**。
 
@@ -139,7 +141,7 @@ ParamGate 将参数预测分解为三个子问题，分别采用非深度学习�
 
 综上，MultiAct 的创新本质是**将复合文本到运动生成的失败归因于交叉注意力分布不均，并通过提示定制化的、时机精准的注意力调制来修复这一问题**，从而在不改变骨干模型的前提下，显著提升了复合动作的语义覆盖和生成质量。
 
-## 整体框架
+
 
 MultiAct 的整体流程围绕一个核心原则构建：**在预训练扩散模型的推理阶段，通过定制化的交叉注意力引导，恢复复合文本提示中被压制的动作语义**。整个框架无需对骨干模型进行重新训练或架构修改，仅通过干预推理过程实现语义覆盖的改善。
 
@@ -179,7 +181,7 @@ MultiAct 的四个核心模块按如下方式协作：
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2605_30925/figures/001_Figure_1.jpg]]
 *Figure 1: MultiAct synthesizes motion from composite textual descriptions by selectively modulating cross-attention to amplify weakly represented elements in the prompt. Blue: Backbone text-to-motion synthesis fails to generate key action components, such as raising the arms while hopping forward (left) and dribbling a ball while moving backward (right). Brown: Our framework successfully generates all action primitives specified in the prompt. Color saturation indicates time progression; higher saturation indicates later times*
 
-## 核心模块与公式推导
+
 
 ### 问题形式化与交叉注意力机制
 
@@ -250,7 +252,9 @@ MultiAct 在此预训练骨干之上进行推理时干预，不涉及对该损�
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2605_30925/figures/006_Figure_6.jpg]]
 *Figure 6: Deviation space visualization. Each point corresponds to a single parameter combination and shows the prefix and suffix deviation values for the prompt shown above. Distance from the origin indicates the dual multimodal distance. Points are color-coded by transformer layer ℓ, revealing a visual separation in which parameter combinations closest to the origin are dominated by layers 3 to 5*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 评估设置与数据集
 
@@ -319,7 +323,9 @@ MultiAct的推理时间约为骨干模型的 **6倍**，其中注意力优化循
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2605_30925/figures/009_Figure_9.jpg]]
 *Figure 9: Motion diversity. When sampled multiple times with the same prompt and parameter combinations, MultiAct generates diverse, high-quality motions that consistently satisfy both simultaneous actions*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 工作定位与核心差异
 
@@ -358,6 +364,8 @@ MultiAct 面向**复合文本到运动生成**（compositional text-to-motion）
 - 偏差度量在**更多样化的文本格式**下是否依然有效？若否，如何设计更通用的文本-运动对齐指标？
 - 该方法是否可迁移到**其他条件生成任务**（如文本到视频、音乐生成）？
 - 能否将 ParamGate 的决策逻辑**内化到可学习的模块**中，完全消除推理时的参数搜索，从而降低计算开销？
+
+
 
 ## 原文 PDF
 

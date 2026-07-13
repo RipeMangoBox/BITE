@@ -43,7 +43,7 @@ claims:
 > - LIBERO 上，Task Success Rate (%) 5.75 (OpenVLA-oft-w, 仿真) vs 76.5 (良性) (-70.75 pp)；Task Success Rate (%) 40.25 (OpenVLA-oft-w, 物理) vs 76.5 (良性) (-36.25 pp)；Task Success Rate (%) 86.0 (π₀, 仿真) vs 92.0 (良性) (-6.0 pp)。
 > - LIBERO (白盒) 上，Task Success Rate (%) 0.5 (仿真平均) vs 76.5 (良性) (-76.0 pp)；Task Success Rate (%) 2.75 (物理平均) vs 76.5 (良性) (-73.75 pp)。
 
-## 概述
+## 概要
 
 视觉‑语言‑动作（VLA）模型正在成为机器人操控的核心范式，但其对抗鲁棒性——尤其是面对物理世界可部署的补丁攻击时——仍未被充分审视。现有针对VLA的补丁攻击严重过拟合单一代理模型，在黑盒条件（未知架构、微调变体、sim‑to‑real漂移）下迁移性极差，缺乏一个通用、可迁移的攻击框架来系统性地暴露这一脆弱性。
 
@@ -57,7 +57,7 @@ claims:
 
 **方法定位**：UPA‑RFAS 属于对抗攻击中的**通用物理补丁攻击**范畴，区别于传统白盒单模型攻击，它强调**跨模型、跨任务、跨域（sim‑to‑real）的可迁移性**。在方法谱系上，其核心贡献在于首次将特征空间线性对齐理论、鲁棒性增强 min‑max 优化与 VLA 特有的跨模态注意力/语义操控整合为一个统一框架，填补了 VLA 领域通用可迁移攻击的空白。
 
-## 背景与动机
+
 
 ### 机器人基础模型的安全脆弱性
 
@@ -79,7 +79,9 @@ claims:
 
 基于此洞察，本文提出**UPA-RFAS**——首个面向VLA机器人的通用、可迁移物理补丁攻击框架。其核心动机是：**通过特征空间内的结构化扰动、鲁棒性增强的双层优化、以及跨模态注意力劫持与语义错位，迫使代理模型产生沿共享子空间方向的特征位移，从而实现跨模型、跨任务、跨环境的稳定迁移**。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：现有VLA补丁攻击为何无法迁移？
 
@@ -148,7 +150,7 @@ $$\mathcal{L}_{\mathrm{PSM}} = \alpha \left[ \log \sum_{k=1}^{K} \exp \left( \fr
 
 UPA-RFAS的四项创新构成了一个**分层递进的攻击体系**：特征空间联合损失提供迁移性的理论基础和主要驱动力；鲁棒性增强双层优化硬化代理模型以提升迁移强度；PAD劫持注意力流向确保攻击信息进入决策路径；PSM错位语义内容确保进入的信息是错误的。四者协同，使单一代理模型上训练的5%面积补丁能在黑盒条件下将受害者VLA策略的成功率从76.5%压低至5.75%（仿真）和40.25%（物理），大幅超越所有现有基线。
 
-## 整体框架
+
 
 UPA‑RFAS 的总体设计遵循**“共享特征空间内的鲁棒通用补丁生成”**这一核心思想，整个 pipeline 围绕一个两阶段双层优化框架展开，如图 1 所示。攻击者仅需访问单个代理 VLA 模型（本文采用 OpenVLA‑7B），即可训练出一个面积受限（默认 5%）的通用物理补丁，该补丁可迁移至多种未知受害者策略、不同任务甚至物理环境。
 
@@ -213,7 +215,7 @@ $$\mathcal{L}_{\mathrm{PSM}} = \alpha \left[ \log \sum_{k=1}^{K} \exp \left( \fr
 ![[assets/figures/papers/paper_list_l2431_https_arxiv_org_abs_2511_21192/figures/001_Figure_1.jpg]]
 *Figure 1: Overall transferable patch attack (UPA-RFAS) for VLA robotics. The framework operates in two coordinated stages within a shared feature-space objective. Phase 1 – Inner minimization learns a small, invisible, sample-wise perturbation σ via PGD that minimizes the feature objective Jin (§ 3.3) with the patch frozen (§ 3.4). Phase 2 – Outer maximization freezes σ and optimizes a single physical patch δ to maximize Jout (§ 3.7), which combines an*
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题形式化与补丁渲染
 
@@ -321,7 +323,9 @@ UPA-RFAS 的两阶段训练流程（Figure 1）可总结为：
 
 整个流程仅需单个代理模型（如 OpenVLA-7B）的梯度访问，无需接触受害者模型，契合真实黑盒威胁模型。消融实验（Table 2）逐一验证了各模块的关键贡献：移除联合特征损失 $\mathcal{J}_{\mathrm{tr}}$ 导致成功率从 61.50% 反弹至 85.75%；去除 RUPA 升至 62.25%；去除 PAD 或 PSM 分别升至 62.50% 和 63.50%，证实四者协同是实现强可迁移性的必要条件。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心假设验证
 
@@ -418,7 +422,9 @@ Table 3 研究了 PSM 中文本探针措辞对攻击效果的影响。使用动�
 ![[assets/figures/papers/paper_list_l2431_https_arxiv_org_abs_2511_21192/figures/012_Figure_4.jpg]]
 *Figure 4: Training videos from simulated and physical settings. The top row shows eight frames sampled from a simulated training video, while the bottom row shows eight frames from a physical training video*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：从白盒过拟合到通用可迁移攻击
 
@@ -474,6 +480,8 @@ UPA‑RFAS 的出发点正是将攻击范式从**模型特定**转向**特征空
 4. **多代理协作攻击**：在多代理协作场景下，单个通用补丁能否同时误导多个 VLA 策略？这涉及共享特征空间在多代理系统中的存在性验证。
 
 5. **攻击‑防御博弈**：若防御方已知 UPA‑RFAS 的攻击机理，能否通过微调视觉投影器或引入特征空间正则化来破坏共享子空间假设，从而阻断迁移通道？
+
+
 
 ## 原文 PDF
 

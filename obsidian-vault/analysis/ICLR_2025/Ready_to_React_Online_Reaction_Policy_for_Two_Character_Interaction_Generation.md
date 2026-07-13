@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2025
 pdf_ref: paperPDFs/ICLR_2025/Ready_to_React_Online_Reaction_Policy_for_Two_Character_Interaction_Generation.pdf
+project_link: https://zju3dv.github.io/ready\_to\_react/
+code_link: null
 aliases:
 - RR
 - READY-TO-REACT
@@ -42,7 +44,7 @@ claims:
 > - DuoBox (two-character generation) 上，FID Per-clip 25.283 vs best baseline (T2MGPT) substantially higher (significantly lower than all baselines)。
 > - DuoBox (long-term generation, 1800 frames) 上，generation stability (max frames without collapse) >1800 frames vs ~200 frames (GPT-based) (at least 8x longer)。
 
-## 概述
+## 概要
 
 **待解决问题**：双角色交互动作生成是计算机动画的核心挑战之一。现有方法（如基于GPT的自回归模型）存在两个根本缺陷：一是无法模拟真实场景中角色独立、在线的反应过程——它们通常需要离线访问完整序列或未来信息；二是自回归预测离散运动token会产生严重的**错误累积**，导致长期生成质量急剧劣化（约200帧后即出现方向错误、出界或冻结）。
 
@@ -59,7 +61,7 @@ claims:
 
 **局限与展望**：当前方法仅针对两人交互设计，训练数据限于拳击动作，尚未整合场景/物体交互。未来工作将探索多人交互扩展、跨动作类型泛化，以及全身密集控制等方向。
 
-## 背景与动机
+
 
 双角色交互动作生成是计算机动画与具身智能领域的核心挑战之一，其目标是根据对手的行为实时生成自然、连贯且物理合理的反应动作。这一任务在游戏、虚拟现实、机器人仿真等场景中具有广泛的应用前景。然而，现有方法在模拟真实在线交互过程时面临两个根本性瓶颈。
 
@@ -69,7 +71,9 @@ claims:
 
 **本文动机：在自回归框架中嵌入扩散模型。** 扩散模型在连续信号生成中展现出优于离散token预测的稳定性和多样性。本文的核心洞察是：将扩散模型（Denoising Diffusion Probabilistic Model, DDPM）作为“扩散头”嵌入自回归框架，替代GPT预测连续运动隐变量（而非离散token），可以从根本上减少累积误差。同时，配合专为在线场景设计的运动解码器，实现角色间的实时独立反应，从而支持长时间、连贯且多样的双角色交互动作生成。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题根源：自回归离散预测的累积错误
 
@@ -108,7 +112,7 @@ Ready-to-React 处于**在线交互运动生成**的交叉点，其设计融合�
 - **交互运动合成**：**InterFormer**（Chopin et al., IEEE TMM 2023）基于 Transformer 生成反应动作，但缺乏长期稳定性和在线能力；Ready-to-React 通过反应策略公式 $\mathbf{A}_f = \mathcal{P}(\mathbf{O}_{i \in [f-W,f)}, \mathbf{A}_{i \in [f-W,f)})$ 实现了角色间的独立实时反应。
 - **概率运动先验**：**MoGlow**（Henter et al., TOG 2020）使用归一化流建模运动分布，作为本方法的 FID 评估编码器，确保度量一致性。
 
-## 整体框架
+
 
 Ready-to-React 的核心设计是将双角色交互生成建模为一个**在线反应策略**（online reaction policy），其形式化定义为：
 
@@ -149,7 +153,7 @@ $$\mathcal{L}_{\mathrm{diffusion}} = \mathbb{E}_{t \in [1,T], \mathbf{x}_0 \sim 
 
 即预测去噪后隐变量与真实隐变量之间的期望 L2 距离。扩散过程设置 $T=1000$ 时间步，推理时使用 DDIM 采样 50 步。所有模型使用 AdamW 优化器（学习率 0.0001）在单张 Nvidia RTX 4090 GPU 上训练。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化
 
@@ -199,7 +203,9 @@ $$\mathcal{L}_{\mathrm{vqvae}} = \mathcal{L}_{\mathrm{rec}} + \alpha \| \mathrm{
 
 其中 $\alpha = 0.1$，$\mathrm{sg}[\cdot]$ 为停止梯度算子。所有模型使用AdamW优化器训练，学习率0.0001，在单张Nvidia RTX 4090 GPU上完成。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 4.1 实验设置与评估协议
 
@@ -274,7 +280,9 @@ Table 4 展示了在稀疏控制信号（DuoBox reactive setting）下的对比�
 ![[assets/figures/papers/paper_list_l1783_Ready_to_React_Online_Reaction_Policy_for_Two_Character_Interaction_Gene/figures/010_Figure_6.jpg]]
 *Figure 6: Qualitative results of generating two-character motions. Given the same initial four frames for both characters, InterFormer tends to produce human motion with incorrect orientation. CAMDM often results in the characters getting stuck, while T2MGPT can cause the two characters to drift apart due to accumulated errors*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题瓶颈与核心差异
 
@@ -325,6 +333,8 @@ Table 3的消融实验揭示了以下因果链条：
 3. **跨动作泛化**：反应策略如何对不同种类的交互动作进行泛化，而无需为每种动作重新收集数据和训练？可能的方案包括元学习、条件生成或大规模多动作预训练。
 
 4. **控制粒度提升**：能否将稀疏控制信号（如关键点位置）扩展到全身密集控制，以支持更沉浸式的VR交互体验？这需要在隐空间中建立更精细的控制映射机制。
+
+
 
 ## 原文 PDF
 

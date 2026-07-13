@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2021
 pdf_ref: paperPDFs/CVPR_2021/3DIoUMatch_Leveraging_IoU_Prediction_for_Semi_Supervised_3D_Object_Detection.pdf
+code_link: null
 project_link: https://thu17cyz.github.io/3DIoUMatch/
 aliases:
 - 3LIPSS3OD
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | 3DIoUMatch：利用IoU预测进行半监督3D目标检测 |
 | 英文题名 | 3DIoUMatch: Leveraging IoU Prediction for Semi-Supervised 3D Object Detection |
 | 会议/期刊 | CVPR 2021 |
-| Links | [paper](https://arxiv.org/abs/2012.04355); [Project](http://THU17cyz.github.io/3DIoUMatch); [Project](https://thu17cyz.github.io/3DIoUMatch/) |
+| Links | [paper](https://arxiv.org/abs/2012.04355) · [Project](http://THU17cyz.github.io/3DIoUMatch) · [Project](https://thu17cyz.github.io/3DIoUMatch/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | 3DIoUMatch |
 | Dataset | ScanNet val, SUN RGB-D val |
@@ -41,7 +42,7 @@ claims:
 > - ScanNet val 上，mAP@0.5 (10% labeled) 为 28.3±1.5，对比 19.8±1.3 (SESS)，变化 +8.5。
 > - SUN RGB-D val 上，mAP@0.25 (5% labeled) 为 39.0±1.9，对比 34.2±2.0 (SESS)，变化 +4.8。
 
-## 概述
+## 概要
 
 **问题瓶颈**：半监督3D目标检测的核心困难在于，教师网络生成的伪标签存在显著的定位噪声。传统方法仅依赖物体性分数和分类置信度进行过滤，无法有效衡量目标框的定位质量，导致学生网络从低质量伪标签中学习，严重制约半监督训练的上限。
 
@@ -54,7 +55,7 @@ claims:
 - 在SUN RGB-D 5%标记数据下，mAP@0.25和mAP@0.5分别提升**4.8和8.0个百分点**。
 - 在KITTI上首次实现半监督3D目标检测，在不同标记率和类别下超越全监督PV-RCNN基线**1.8至7.6个百分点**。
 
-## 背景与动机
+
 
 三维目标检测是自动驾驶、机器人导航和增强现实等应用的核心感知任务。近年来，基于点云的全监督3D检测器取得了显著进展，但其性能高度依赖大规模高质量的人工标注。3D点云标注需要标注员在稀疏且不完整的几何信息中精确放置三维边界框，成本远高于2D图像标注。因此，如何利用少量标注数据和大量无标注数据实现高性能检测——即半监督3D目标检测——成为一个迫切且具有实际价值的研究方向。
 
@@ -64,7 +65,9 @@ claims:
 
 针对上述问题，3DIoUMatch提出了一个核心洞察：**将可微分的3D IoU估计引入半监督框架，作为定位质量的直接度量**。通过联合物体性、分类置信度和预测IoU对伪标签进行三重过滤，并设计IoU引导的下半抑制（Lower-Half Suppression, LHS）作为动态去重机制，在伪标签质量与覆盖度之间取得更好的平衡。该方法在室内（ScanNet, SUN RGB-D）和室外（KITTI）数据集上均取得显著提升，并首次在KITTI上验证了半监督3D目标检测的可行性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 3DIoUMatch 的核心创新在于将**预测的 3D IoU 作为定位置信度**引入半监督 3D 目标检测的伪标签筛选与去重流程，从而系统性地解决了伪标签定位质量差这一瓶颈问题。相较于先前方法仅依赖物体性分数和分类概率过滤伪标签，本文提出了两个关键的 changed slots：
 
@@ -95,7 +98,7 @@ $$s > \tau_{obj}, \quad \max(p_{cls}) > \tau_{cls}, \quad v > \tau_{IoU}$$
 
 这些创新使得 3DIoUMatch 在 ScanNet 10% 标记数据上相较 SESS 提升 **+7.7 mAP@0.25** 和 **+8.5 mAP@0.5**，并在 KITTI 上首次实现半监督 3D 检测且超越全监督基线 1.8%~7.6%（Table 1, Table 3）。
 
-## 整体框架
+
 
 3DIoUMatch 采用**教师-学生互学习框架**（Teacher-Student Mutual Learning），将标注数据的信息以伪标签形式传播到无标注数据中。整体流程如 Figure 1 所示，核心由以下模块串联构成：
 
@@ -120,7 +123,7 @@ $$s > \tau_{obj}, \quad \max(p_{cls}) > \tau_{cls}, \quad v > \tau_{IoU}$$
 $$L = L_{l}(\{ \mathbf{x}_i^l \}_{i=1}^{N_l}, \{ \mathbf{y}_i^l \}_{i=1}^{N_l}) + \lambda_u L_u(\{ \mathbf{x}_i^u \}_{i=1}^{N_u}, \{ \tilde{\mathbf{y}}_i^u \}_{i=1}^{N_u})$$
 其中 $L_l$ 为有标注数据上的全监督损失，$L_u$ 为无标注数据上的伪标签损失，$\lambda_u$ 为无监督损失权重。
 
-## 核心模块与公式推导
+
 
 ### 3.1 总体半监督学习框架
 
@@ -170,7 +173,9 @@ $$\tau_{car}=0.5, \quad \tau_{ped}=\tau_{cyc}=0.25$$
 
 同时设置 RPN 分类得分过滤阈值 $\tau_{cls}=0.4$，配合物体性阈值构成联合过滤机制。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 
@@ -214,7 +219,6 @@ $$\tau_{car}=0.5, \quad \tau_{ped}=\tau_{cyc}=0.25$$
 
 Figure 3展示了ScanNet 10%设定下半监督训练过程中的性能提升与伪标签覆盖度变化。随着训练推进，伪标签质量逐步提高，覆盖度保持稳定，验证了教师-学生互学习框架的良性循环机制——教师网络通过EMA持续优化，产生更高质量的伪标签，进而促进学生网络的学习。
 
-![[assets/figures/papers/paper_list_l33_https_arxiv_org_abs_2012_04355/figures/004_Figure.jpg]]
 
 ### 逐类性能与可视化
 
@@ -244,19 +248,15 @@ Table 5报告了IoU估计模块的显存和时间开销。该模块设计轻量�
 ![[assets/figures/papers/paper_list_l33_https_arxiv_org_abs_2012_04355/figures/009_Table_5.jpg]]
 *Table 5: Memory and time overhead of the IoU module*
 
-![[assets/figures/papers/paper_list_l33_https_arxiv_org_abs_2012_04355/figures/010_Table_6.jpg]]
-*Table 6: Per class mAP@0.25 and mAP@0.5 on ScanNet val set, with 10% labeled data*
 
-![[assets/figures/papers/paper_list_l33_https_arxiv_org_abs_2012_04355/figures/011_Table_7.jpg]]
-*Table 7: Per class mAP@0.25 and mAP@0.5 on SUNRGB-D val set, with 5% labeled data*
 
 ![[assets/figures/papers/paper_list_l33_https_arxiv_org_abs_2012_04355/figures/013_Table_8.jpg]]
 *Table 8: Comparison of our IoU module with box-query on Scan-Net 100% and SUN RGB-D 100%*
 
-![[assets/figures/papers/paper_list_l33_https_arxiv_org_abs_2012_04355/figures/014_Table_9.jpg]]
-*Table 9: Objectness & vote supervision on unlabeled data using pseudo-labels*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与全监督基线的继承关系
 
@@ -302,6 +302,8 @@ Table 5报告了IoU估计模块的显存和时间开销。该模块设计轻量�
 3. **IoU 模块泛化性**：3D Grid Pooling IoU 估计模块在室外大范围物体（如卡车）和小物体（如行人）上的精度差异是否需要进一步调整网格分辨率或插值策略？
 4. **推理开销**：测试时 IoU 优化步骤对推理时间的实际影响能否进一步降低？Table 5 仅给出了 IoU 模块本身的开销，未单独分析 IoU 优化步骤的增量成本。
 5. **LHS 的通用性**：保留一半框的硬编码比例是否为最优？是否存在自适应确定抑制比例的可能？
+
+
 
 ## 原文 PDF
 

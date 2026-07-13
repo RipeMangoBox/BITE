@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/VGG_T3_Offline_Feed_Forward_3D_Reconstruction_at_Scale.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/dvl/projects/vgg-ttt/
 aliases:
 - VTVGGTTT
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | VGG-T3: 大规模离线前馈3D重建 |
 | 英文题名 | VGG-T3: Offline Feed-Forward 3D Reconstruction at Scale |
 | 会议/期刊 | CVPR 2026 |
-| Links | [paper](https://arxiv.org/abs/2602.23361); [Project](https://research.nvidia.com/labs/dvl/projects/vgg-ttt/) |
+| Links | [paper](https://arxiv.org/abs/2602.23361) · [Project](https://research.nvidia.com/labs/dvl/projects/vgg-ttt/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | VGG-T3 (Visual Geometry Grounded Test Time Training) |
 | Dataset | DTU (Pointmap Estimation, Dense), NRGBD-D (Pointmap Estimation, ETH3D (Pointmap Estimation), KITTI (Video Depth) |
@@ -42,7 +43,7 @@ claims:
 > - NRGBD-D (Pointmap Estimation, Dense) 上，Chamfer Distance ↓ 为 0.029，对比 0.071 (TTT3R)，变化 -0.042 (2.45× better)。
 > - ETH3D (Pointmap Estimation) 上，Chamfer Distance ↓ 为 0.480，对比 0.885 (TTT3R)，变化 -0.405 (1.84× better)。
 
-## 概述
+## 概要
 
 ### 1. 问题瓶颈
 
@@ -92,7 +93,7 @@ VGG-T3使用同一MLP表示进行场景建图（优化MLP）和新图像定位�
 - **位姿估计薄弱**：在相机位姿估计任务上表现不佳，推测源于VGGT中特殊的相机token结构与TTT MLP的交互困难（Sec. 4.1）。
 - **表示容量上限**：固定尺寸MLP的表示能力可能有上限，在极大规模场景或宽基线条件下可能导致信息丢失。
 
-## 背景与动机
+
 
 ### 前馈3D重建的规模化困境
 
@@ -117,7 +118,9 @@ VGG-T3使用同一MLP表示进行场景建图（优化MLP）和新图像定位�
 
 这一思路的关键挑战在于：如何在保留预训练模型知识的前提下，实现从softmax注意力到MLP查询的有效转换，使得线性化后的模型既能继承预训练权重的表达能力，又能在任意规模的图像集合上稳定泛化。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈诊断：可变长度KV空间引发的二次复杂度
 
@@ -164,7 +167,7 @@ VGG-T3的TTT目标具有梯度可加性：
 $$\frac{d L_{\mathrm{total}}}{d \theta} = \sum_i \frac{d}{d \theta} L(\mathbf{k}_i, \mathbf{v}_i) = \sum_s \left( \sum_{i \in s} \frac{d}{d \theta} L(\mathbf{k}_i, \mathbf{v}_i) \right)$$
 总梯度等于各token局部梯度的和，可按minibatch独立计算后累加。这一性质使VGG-T3可直接使用标准分布式数据并行（DDP），跨GPU通信仅需在MLP权重更新时进行梯度同步，无需像VGGT那样实现复杂的上下文并行（如ring attention）。在4块GPU上处理2000张图像仅需48.5秒，相较VGGT的27分钟提升33倍（Table 4）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2602_23361/figures/001_Figure_1.jpg]]
 *Figure 1: Reconstructing Rome landmarks with 1-minute time budget. We present VGG-T3, an offline feed-forward 3D reconstruction method that scales linearly w.r.t. input views (Fig. 1b). As a result, we can reconstruct large scenes from a large number of unposed input views, such as landmarks from tourist-sourced images, in less than a minute via single forward pass (Fig. 1a)*
@@ -183,7 +186,7 @@ VGG-T3 的 pipeline 以 VGGT 的交替注意力架构为基础，但在全局注
 
 **关键设计选择**：VGG-T3 移除了原始 VGGT 中的 LayerNorm，改用 L2 归一化，以解锁预训练权重的快速收敛（Sec. 3.2）。ShortConv2D 仅在值空间使用 $3\times3$ 卷积效果最佳，更大的卷积核或同时对键和值应用卷积会降低性能（Table 9）。TTT 优化步数需随图像数量增加而调整：对于 20 张图像的分布内样本，1 步优化即足够；对于 1k 张图像，更多步数可显著降低点图误差（Figure 3a）。
 
-## 核心模块与公式推导
+
 
 ### 核心模块
 
@@ -244,7 +247,9 @@ VGG-T3 移除了标准 Transformer 中的 LayerNorm（LN），改用 L2 归一�
 
 > **注意**：关于 MLP $T_\theta$ 的具体网络结构（层数、隐藏维度等），原文未在提供的材料中明确给出，需查阅原文附录确认。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -380,7 +385,9 @@ VGG-T3的MLP状态表示允许查询未参与测试时优化的新图像，实�
 ![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2602_23361/figures/014_Table_7.jpg]]
 *Table 7: Datasets used for training*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从二次全局注意力到线性测试时训练
 
@@ -454,6 +461,8 @@ VGG-T3 的提出打开了若干值得进一步探索的方向：
 5. **压缩表示的可解释性与下游应用**：TTT 优化后的 MLP 权重隐式编码了场景几何信息。这一压缩表示是否可被解释或提取为显式的几何基元（如点云、网格），从而桥接前馈方法与经典 SfM/MVS 流程？
 
 6. **与在线方法的融合**：VGG-T3 的离线批量压缩与 TTT3R 的在线递归更新各有所长。是否存在统一的测试时训练框架，在离线阶段批量压缩全局信息，在在线阶段递归融合新观测，兼顾精度、效率与实时性？
+
+
 
 ## 原文 PDF
 

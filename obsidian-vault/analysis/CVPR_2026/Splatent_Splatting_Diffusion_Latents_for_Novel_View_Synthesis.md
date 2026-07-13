@@ -43,7 +43,7 @@ claims:
 > - DL3DV-10K (sparse 5 views) 上，MEt3R↓ 0.0998 vs 0.1281 (Feature-3DGS) / 0.1272 (LRF) (~22% improvement)。
 > - DL3DV-10K (feed-forward 5 views) 上，PSNR↑ 17.976 vs 16.691 (MVSplat360) (+1.285)。
 
-## 概述
+## 概要
 
 基于扩散模型潜在空间的新视角合成面临一个根本性瓶颈：预训练VAE的潜在表示缺乏多视角一致性，导致在3D重建过程中，不同视角的高频信息相互抵消，最终产生模糊纹理和缺失细节。针对这一问题，Splatent提出了一种原则性框架，其核心洞察是将3D表示保持在低频域，避免直接优化高频成分，转而通过2D空间的多视图注意力机制从输入参考视图中恢复高频细节。
 
@@ -51,7 +51,7 @@ claims:
 
 在DL3DV-10K数据集上，Splatent在稠密（30视图）和稀疏（5视图）设置下均显著优于基线方法。以MEt3R指标衡量3D一致性，Splatent在稠密设置下达到0.0774，相比**Feature-3DGS**（Zhou et al., CVPR 2024）的0.1106和**LRF**（Zhou et al., ICLR 2025）的0.1082分别提升约30%和28%。在前馈式框架中，Splatent与**MVSplat360**集成后，PSNR提升1.285 dB，FID降低2.365，同时有效减少了幻觉现象。消融实验表明，使用多张参考图像能显著增强细节并减少幻觉，性能在3张视图时趋于饱和。
 
-## 背景与动机
+
 
 新视角合成（Novel View Synthesis, NVS）旨在从一组稀疏的输入图像中重建三维场景，并渲染出任意新视角下的逼真图像。近年来，以3D Gaussian Splatting（3DGS）为代表的显式辐射场方法在渲染质量和效率上取得了显著进展。然而，这些方法通常直接在RGB像素空间进行优化，计算开销大，且对输入视图的覆盖范围高度敏感。
 
@@ -61,7 +61,9 @@ claims:
 
 Splatent的核心洞察在于：**将三维表示保持在低频域，避免直接优化高频成分，转而通过二维空间的多视图注意力机制，从输入参考视图中恢复高频细节**。这一策略无需对预训练VAE做任何修改，完整保留了其重建能力，同时从根本上解决了潜在空间不一致导致的细节丢失问题。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Splatent 的核心创新在于**识别并化解了扩散VAE潜在空间的多视角不一致性瓶颈**，通过一种“低频3D + 高频2D恢复”的分离策略，在不牺牲预训练VAE重建能力的前提下获得高保真新视角合成。
 
@@ -93,7 +95,7 @@ Splatent 的核心创新在于**识别并化解了扩散VAE潜在空间的多视
 
 相比LRF的“强制一致性”思路，Splatent承认VAE潜在空间的多视角不一致性是固有属性，转而通过2D扩散模型在渲染阶段进行补偿。这一范式转变使得方法具有更强的泛化性——模型仅在DL3DV-10K上训练，即可在LLFF和Mip-NeRF360等未见数据集上显著优于基线（参见Table 1）。此外，Splatent的增强模块可**即插即用**地集成到前馈式潜在3DGS框架（如MVSplat360）中，在保持几何精度的同时提升感知质量并减少幻觉（参见Table 4、Figure 5）。
 
-## 整体框架
+
 
 Splatent 的整体 pipeline 采用两阶段设计，将 3D 重建的几何/纹理建模与高频细节恢复解耦为独立的处理阶段，从而在不修改预训练 VAE 的前提下获得高保真新视角合成结果。
 
@@ -113,7 +115,7 @@ Splatent 的整体 pipeline 采用两阶段设计，将 3D 重建的几何/纹�
 ![[assets/figures/papers/paper_list_l2599_https_openaccess_thecvf_com_content_CVPR2026_html_Hirschorn_Splatent_Spl/figures/001_Figure_1.jpg]]
 *Figure 1: Novel view synthesis from a latent-space radiance field. Splatent is a principled framework to enhance rendered novel views from a radiance field in the latent space of diffusion VAEs. We demonstrate improvements in image quality in the setting of test-time latent radiance field optimization, compared to LRF [60]. In addition, we show how Splatent can be connected within a latent-based feed-forward model like MVSplat360 [9] to enhance the results and reduce hallucinations*
 
-## 核心模块与公式推导
+
 
 Splatent 的整个管道由两个核心阶段构成：**潜在空间 3DGS 优化**（低频几何重建）和**扩散增强模块**（高频纹理恢复）。以下逐一拆解关键模块与公式。
 
@@ -174,7 +176,9 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{recon}} + \lambda_{\mathrm
 
 3. **参考视图数量**：消融实验（Table 3）表明，使用多张参考图像能显著减少幻觉并增强细节。完全不使用参考视图（即无扩散增强）时，FID 从 35.60 急剧上升至 83.66。性能在 3 张参考视图时达到饱和，因此默认配置 $V = 3$。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈的实证验证：VAE潜在空间的多视角不一致性
 
@@ -224,7 +228,9 @@ Figure 4的定性对比直观展示了三种方法的差异：Feature-3DGS的重
 ![[assets/figures/papers/paper_list_l2599_https_openaccess_thecvf_com_content_CVPR2026_html_Hirschorn_Splatent_Spl/figures/004_Figure_4.jpg]]
 *Figure 4: Qualitative comparison. We compare Splatent to other latent radiance field methods on novel view synthesis reconstruction quality. Feature-3DGS [61] exhibits considerable loss of detail, and LRF [60] improves upon this baseline but still fails to recover fine details. In contrast, Splatent produces sharper and more faithful reconstructions. The scenes are taken from the DL3DV-10K dataset*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：扩散VAE潜在空间的多视角不一致瓶颈
 
@@ -272,6 +278,8 @@ Splatent 不仅适用于逐场景优化的潜在辐射场，还可以作为增�
 2. **扩散增强的几何保真度**：虽然 Table 2 的 MEt3R 指标表明 Splatent 提升了 3D 一致性，但扩散模型在恢复纹理时是否可能引入几何层面的细微扭曲，论文未深入探讨。
 3. **与 NeRF 类方法的对比**：论文仅与潜在空间 3DGS 方法（Feature-3DGS、LRF）和 MVSplat360 进行了对比，未涉及基于 NeRF 的潜在辐射场方法（如 Latent-NeRF），后者可能在几何表示上有不同特性。
 4. **实时应用的可能性**：两阶段管道和扩散推理的计算成本限制了实时应用。是否可以通过蒸馏或更高效的注意力机制降低推理开销，是工程化部署的关键问题。
+
+
 
 ## 原文 PDF
 

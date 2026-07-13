@@ -42,7 +42,7 @@ claims:
 > - Simulated 2D GPR Images (200 3D root models, 18,000 B-scans) 上，AP / AP-50 / AP-75 0.857 / 0.902 / 0.870 vs 0.736 / 0.850 / 0.768 (SE-SSD, best baseline) (+0.121 / +0.052 / +0.102)。
 > - Synthetic 3D root point cloud dataset (5 test roots, 8192 points each) 上，CD (×100) / EMD (×100) mean 2.03 / 5.03 vs 6.69 / 14.99 (PointLLM-V2, best baseline) (-4.66 / -9.96)。
 
-## 概述
+## 概要
 
 探地雷达（GPR）作为一种非破坏式探测技术，能够通过发射电磁脉冲并接收地下目标的反射回波来揭示土壤中的隐蔽结构。然而，将其应用于植物根系评估时面临一个根本性瓶颈：根系产生的反射信号极其微弱且稀疏，传统方法难以在强噪声背景下可靠地检测出细小的双曲线特征，更难以将检测到的稀疏二维切片点云转化为保留分支拓扑的致密三维根系模型。
 
@@ -60,7 +60,7 @@ claims:
 
 值得注意的是，本方法的GPR预处理流程也进行了精细化设计，包含时零校正、去直流、水平噪声去除、均值道背景去除、针对根系直径调谐的带通FIR滤波、SEC增益、土壤介电常数校正以及基尔霍夫/f-k偏移共八个步骤，为下游检测网络提供了更高质量的信号输入。
 
-## 背景与动机
+
 
 植物根系是陆地生态系统中最不易观测的器官，其三维构型直接决定水分与养分吸收效率，对作物育种、碳汇估算和生态建模均具有核心价值。然而，现有的根系表型测量手段长期陷入两难：**破坏性挖掘**（如根钻法、剖面法）可获得局部几何信息，却切断根系原生拓扑，无法追踪时变发育；**非破坏性成像**（如X射线CT、MRI）虽能保留三维结构，却受限于扫描体积小、成本高、难以在田间原位部署。探地雷达（Ground Penetrating Radar, GPR）提供了折中可能——通过向土壤发射高频电磁脉冲并接收来自介电常数差异界面的反射回波，可在不扰动土壤的前提下对地下根系进行大面积扫描。当GPR天线经过线状根系时，由于天线-根系垂直距离在正上方达到极小，反射波的走时曲线自然形成**双曲线形态**（Figure 2），这成为从B-scan图像中识别根系信号的关键物理先验。
 
@@ -72,7 +72,9 @@ claims:
 
 **本文的核心动机**正是打通这两个瓶颈：利用GPR信号的双曲线形状先验，在2D检测端引入专门的曲线拟合监督，使网络不仅定位目标，还回归双曲线的顶点、曲率和弧长参数；在3D重建端，通过点图神经网络在非规则稀疏点上传播和强化局部几何特征，配合上采样模块恢复分支拓扑和表面细节，最终形成一套从GPR B-scan到稠密三维根系模型的完整非破坏式评估框架。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于针对GPR根系探测中“信号微弱、特征稀疏、拓扑断裂”这一真实瓶颈，设计了一条从精细信号预处理到稀疏点云稠密重建的完整管线，并在两个关键阶段引入了结构化的方法改进。
 
@@ -128,7 +130,7 @@ $$L_{\mathrm{recon}} = L_{\mathrm{coarse}} + w_{3} L_{\mathrm{fine}} + w_{4} L_{
 
 消融实验（Figure 11）揭示了各模块的因果贡献层级：**移除点图网络或上采样模块**造成的CD和EMD上升幅度，远大于移除注意力机制。这表明，对于稀疏根系点云重建任务而言，**图结构传播和上采样策略是保持点云正确性与根系完整性的首要因素**，注意力机制则起到精细化增强的辅助作用。同时，完整方法以仅20.98M的参数量（Table 3）在对比方法中实现了最小模型规模，验证了设计的轻量性。
 
-## 整体框架
+
 
 本文提出一种基于探地雷达（GPR）的植物根系非破坏式三维评估框架，以**两阶段级联管线**为核心：首先从GPR B-scan中检测根系产生的微弱双曲线反射信号并生成稀疏三维点云，随后通过点图神经网络从该稀疏点云中重建保留分支拓扑的稠密根系结构。
 
@@ -174,7 +176,7 @@ $$L_{\mathrm{recon}} = L_{\mathrm{coarse}} + w_{3} L_{\mathrm{fine}} + w_{4} L_{
 ![[assets/figures/papers/paper_list_l2650_https_openaccess_thecvf_com_content_CVPR2026_html_Zhou_Underground_Plant/figures/002_Figure_2.jpg]]
 *Figure 2: Illustration of GPR signal acquisition for subsurface root detection. The system emits short electromagnetic pulses into the soil, capturing reflected echoes from buried targets. When the antenna is positioned directly over a root, the travel time and vertical distance to the target are minimized, generating a characteristic hyperbolic pattern in GPR B-scans*
 
-## 核心模块与公式推导
+
 
 ### 2D根系双曲线检测模块
 
@@ -265,7 +267,9 @@ $$L_{\mathrm{recon}} = L_{\mathrm{coarse}} + w_{3} L_{\mathrm{fine}} + w_{4} L_{
 ![[assets/figures/papers/paper_list_l2650_https_openaccess_thecvf_com_content_CVPR2026_html_Zhou_Underground_Plant/figures/003_Figure_3.jpg]]
 *Figure 3: Comparison of GPR B-scans before and after preprocessing. Left: Raw GPR scan with substantial noise and signal distortion. Right: Enhanced scan after applying pre-processing techniques, improving root structure visibility and reducing environmental interference*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -331,7 +335,9 @@ Table 3对比了各方法的参数量与推理速度。所提方法参数量仅*
 ![[assets/figures/papers/paper_list_l2650_https_openaccess_thecvf_com_content_CVPR2026_html_Zhou_Underground_Plant/figures/013_Table_3.jpg]]
 *Table 3: Comparisons of different methods in terms of the number of model parameters and inference speed (in seconds per sample)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位与核心瓶颈
 
@@ -390,6 +396,8 @@ $$L_{\mathrm{recon}} = L_{\mathrm{coarse}} + w_{3} L_{\mathrm{fine}} + w_{4} L_{
 4. **实时性约束**：点图网络与上采样模块的计算开销在移动平台或手持式GPR上的可行性未讨论，推理速度表部分数据缺失。
 
 5. **任务迁移潜力待验证**：该方法是否可迁移至其他细长目标的检测与重建（如地下管道裂缝、昆虫巢穴），尚需扩展研究。
+
+
 
 ## 原文 PDF
 

@@ -42,7 +42,7 @@ claims:
 > - DexYCB 上，PA-MPJPE (mm) 4.63 vs 4.88 (WiLoR) (-0.25 (5.1%))；MPJPE (mm) 10.56 vs 12.75 (WiLoR) (-2.19 (17.2%))；ACCEL (mm/frame^2) 3.34 vs 6.70 (WiLoR) (-3.36 (50.1%))。
 > - HO3D 上，PA-MPJPE (mm) 7.43 vs 7.50 (WiLoR) (-0.07 (0.9%))；ACCEL (mm/frame^2) 2.71 vs 4.98 (WiLoR) (-2.27 (45.6%))。
 
-## 概述
+## 概要
 
 从单目图像或视频中恢复三维手部运动是构建自然交互系统的关键步骤。现有方法——无论是逐帧图像姿态估计器（如 **WiLoR**、**HaMeR**、**HandOccNet**），还是引入时序建模的视频方法（如 **VIBE**、**TCMR**、**Deformer**）——都难以保证输出运动在物理上的合理性。一个根本瓶颈在于：这些方法无法量化物理一致性，而确定性物理约束（如直接惩罚动力学残差）会强制将残差归零，忽略了估计本身的不确定性以及模型误差的存在。
 
@@ -52,7 +52,7 @@ claims:
 
 实验表明，PAD-Hand 在 DexYCB 和 HO3D 两个标准数据集上同时提升了重建精度和物理合理性。在 DexYCB 上，相对于图像基线 WiLoR，PA-MPJPE 从 4.88 mm 降至 4.63 mm（5.1%），而衡量运动平滑度的 ACCEL 从 6.70 降至 3.34 mm/frame²（50.1%），说明物理感知精调不仅没有牺牲精度，反而带来了显著增益。消融实验进一步证实：概率物理集成优于确定性惩罚变体，且模型的动态方差高值区间与较大的 EL 残差一致，验证了方差估计确实能够指示物理违规。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -83,7 +83,9 @@ claims:
 
 利用扩散模型的生成能力，PAD-Hand将物理先验以概率方式融入轨迹分布，在提升运动恢复精度的同时，显著改善了物理合理性（如加速度一致性），并首次实现了手部运动恢复中物理一致性的可量化不确定性建模。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PAD-Hand 的核心创新在于将**手部运动的物理先验以概率方式融入条件扩散模型**，并同步输出**可解释的动态不确定性估计**，从而在提升运动恢复精度的同时量化物理一致性。与现有工作的关键差异体现在以下五个“changed slots”上。
 
@@ -111,7 +113,7 @@ LLLA 仅提供单步去噪预测的方差。PAD-Hand 进一步设计了**反向�
 
 传统扩散模型从纯高斯噪声开始去噪生成。PAD-Hand 将**图像姿态估计器（如 WiLoR）的逐帧预测作为扩散模型的输入条件** $y_{1:T}$，并设计前向过程将干净运动逐步偏移至这些初始估计（Section 3.2）。这一设计使得扩散模型的任务从“从零生成”转变为“从粗糙估计精调”，显著降低了学习难度，同时保留了扩散模型的多模态生成能力以修正初始估计中的时序不一致和物理违规。
 
-## 整体框架
+
 
 PAD-Hand 的整体流程以**单帧图像姿态估计器**为起点，通过**条件扩散模型**对初始运动序列进行精调，并在精调过程中引入**欧拉-拉格朗日动力学残差作为虚拟观测量**，最终输出物理一致的手部运动轨迹及其逐帧、逐关节的**动态方差估计**。
 
@@ -160,7 +162,7 @@ $$\mathrm{Var}(\mathcal{F}_{1:T}) \approx J_{\mathcal{F}_{1:T}} \mathrm{Var}(x_{
 ![[assets/figures/papers/paper_list_l998_https_arxiv_org_abs_2603_26068/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of PAD-Hand. A sequence of images*
 
-## 核心模块与公式推导
+
 
 PAD-Hand 围绕“将物理先验以概率方式注入扩散模型”这一核心思想，构建了四个紧密协作的关键模块：欧拉-拉格朗日动力学残差计算、条件扩散主干网络、虚拟观测损失函数、以及基于最后一层拉普拉斯近似（LLLA）的方差估计与传播。
 
@@ -223,7 +225,9 @@ $$\mathrm{Var}(\mathcal{F}_{1:T}) \approx J_{\mathcal{F}_{1:T}} \mathrm{Var}(x_{
 ![[assets/figures/papers/paper_list_l998_https_arxiv_org_abs_2603_26068/figures/003_Figure_3.jpg]]
 *Figure 3: Backbone architecture. At diffusion step n, the current pose sequence*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -303,7 +307,9 @@ Figure 5 展示了动态方差的直方图分布，其中每个柱的颜色编�
 ![[assets/figures/papers/paper_list_l998_https_arxiv_org_abs_2603_26068/figures/006_Figure_4.jpg]]
 *Figure 4: Refined motion estimates by PAD-Hand with dynamic variance on DexYCB. We visualize three representative sequences (I–III). In each block, row (a) compares the original image-based motion estimates to the trajectories refined by PAD-Hand, while row (b) shows the corresponding variance estimations in terms of joint-level and mesh-level dynamic variance. The red boxes highlight frames where the image-based estimates exhibit strong jitter*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：从确定性恢复走向概率物理推理
 
@@ -353,6 +359,8 @@ PAD-Hand 的适用性受以下因素制约：
 ---
 
 **知识库定位总结：** PAD-Hand 属于**物理感知的概率运动精调方法**，其核心创新在于通过虚拟观测变量将物理先验融入扩散模型的概率框架，并首次为手部运动恢复提供了可解释的逐关节动态方差估计。方法在姿态精度和平滑性上均超越现有图像/视频基线和扩散精调基线（DIP），但物理模型的近似性和对初始估计的依赖构成了当前适用边界。
+
+
 
 ## 原文 PDF
 

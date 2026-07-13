@@ -43,7 +43,7 @@ claims:
 > - Mill19 (Rubble) 上，PSNR ↑ 26.25 (Ours) vs 23.75 (CityGaussianV2) (+2.50)。
 > - UrbanScene3D (Residence) 上，SSIM ↑ 0.823 (Ours) vs 0.769 (CityGaussianV2) (+0.054)。
 
-## 概述
+## 概要
 
 将 3D Gaussian Splatting (3DGS) 从物体/房间级场景推向城市级大场景重建时，面临三重瓶颈：**几何一致性差**（表面浮空、深度对齐失效）、**内存膨胀**（高斯点数量随场景规模爆炸）以及**计算可扩展性不足**（训练成本剧增）。UrbanGS 针对这些瓶颈提出了一套统一框架，其核心因果机制在于两点：
 
@@ -63,7 +63,7 @@ claims:
 
 **局限性**方面，该方法依赖预训练单目深度/法向估计器提供伪先验，在弱纹理或极端光照区域可能引入错误；框架当前面向静态场景，未显式建模动态物体；在远距离天空等缺乏明确几何结构的区域，显式几何优化可能导致渲染质量略逊于原始 3DGS。
 
-## 背景与动机
+
 
 ### 城市级场景重建的范式迁移与瓶颈
 
@@ -93,7 +93,9 @@ claims:
 
 UrbanGS 正是针对这三个维度进行系统性重构：通过**深度一致性 D-Normal 正则化**实现位置与旋转的完备联合优化，通过**空间自适应高斯修剪 (SAGP)** 实现几何感知的密度控制，通过**预剪枝与契约分块策略**实现高效可扩展的并行训练。这三项设计的有机耦合，使得 UrbanGS 能够在消费级 GPU 上完成城市级场景的高保真渲染与精确几何重建，从根本上调和了质量、效率与扩展性的三角矛盾。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 UrbanGS 针对 3DGS 在大规模城市场景中几何一致性差、内存膨胀和计算扩展性不足三大瓶颈，提出了三个相互耦合的核心创新：**深度一致性 D-Normal 正则化**、**空间自适应高斯修剪 (SAGP)** 和**预剪枝契约分块策略**。这三者形成“几何优化—密度控制—规模扩展”的闭环：D-Normal 正则化从根本上解决高斯位置参数的几何更新问题，SAGP 在保持几何精度的前提下大幅压缩冗余高斯，而预剪枝分块策略则将前两者的收益传递到城市级场景的并行训练中。
 
@@ -152,7 +154,7 @@ $$S_i = \phi_i \cdot \tau_i \cdot w_{v,i}$$
 
 这一闭环使得 UrbanGS 在 Mill19 Rubble 场景上仅需 2h10min 训练时间（baseline 方法超过 4 小时），同时在 PSNR 上领先 CityGaussianV2 达 +2.50 dB（Table 1），在 GauU-Scene 的 Residence 场景上 F1 达到 0.493（Table 2），实现了效率与质量的双重突破。
 
-## 整体框架
+
 
 UrbanGS 的整体流水线遵循“全局粗建模 → 几何感知压缩 → 分块并行精化 → 融合”的四阶段范式，旨在以可扩展的方式从多视图 RGB 图像重建几何精确的大规模城市场景。其核心设计思想在于：**在分块训练之前，先通过空间自适应高斯修剪 (SAGP) 消除冗余高斯基元，再以深度一致性 D-Normal 正则化对每个子块进行联合几何优化**，从而在内存、计算效率与几何/渲染质量之间取得平衡。
 
@@ -195,7 +197,7 @@ Figure 2 (a) 完整呈现了 UrbanGS 的训练流水线，主要包含以下模�
 
 > **注意**：伪深度/法向先验的质量直接影响 D-Normal 正则化的有效性，在弱纹理或极端光照区域可能引入系统性偏差，这一点需在应用中加以留意。
 
-## 核心模块与公式推导
+
 
 UrbanGS 的核心架构围绕两个关键设计展开：**深度一致性 D-Normal 正则化** 和 **空间自适应高斯修剪 (SAGP)**，二者共同解决了 3DGS 在大场景中的几何退化与内存膨胀问题。
 
@@ -271,7 +273,9 @@ UrbanGS 的分块训练流程在 CityGS 基础上进行了两项关键改进：
 ![[assets/figures/papers/paper_list_l64_https_openreview_net_forum_id_L3utaw6SD9/figures/019_Figure.jpg]]
 *Figure: E: Qualitative ablation for the Depth-Consistent D-Normal Regularizer. We visualized the centers of Gaussian ellipsoids in a 3D scene. In the left figure, the Depth-Consistent D-Normal Regularizer is disabled, while the right figure demonstrates the results with our proposed regularization. In comparison, the left figure exhibits a notable number of Gaussian ellipsoids floating off the surface. Our proposed Depth-Consistent D-Normal Regularizer effectively pushes the 3D Gaussians toward the surface, resulting in a cleaner reconstruction*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 一、新视角合成主结果
 
@@ -377,7 +381,9 @@ Table 4 在 Russian Building 场景上对比了不同修剪策略。SAGP 相比�
 ![[assets/figures/papers/paper_list_l64_https_openreview_net_forum_id_L3utaw6SD9/figures/004_Figure_3.jpg]]
 *Figure 3: Qualitative results of ours and other methods in image rendering on Mill-19 (Yu et al., 2022) and Urbanscene3D (Lin et al., 2022)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 技术脉络定位
 
@@ -412,6 +418,8 @@ UrbanGS 的有效性受以下边界条件约束：
 4. **端到端可微分流水线**：当前流水线中 COLMAP 位姿估计、单目深度/法向估计、高斯初始化是分离的模块。将这些步骤纳入端到端可微分框架，可能进一步提升几何一致性和训练效率，但也对计算和内存提出了更高要求。
 
 5. **与前沿高斯表示的融合**：近期出现的锚点高斯、多分辨率哈希编码等 3DGS 变体在表达能力上有所提升，UrbanGS 的 D-Normal 正则化和 SAGP 策略是否可以无缝迁移至这些新表示，值得探索。
+
+
 
 ## 原文 PDF
 

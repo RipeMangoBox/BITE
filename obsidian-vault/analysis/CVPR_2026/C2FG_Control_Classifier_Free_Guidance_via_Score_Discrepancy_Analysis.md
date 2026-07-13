@@ -45,7 +45,7 @@ claims:
 > - Class-Conditional ImageNet 256×256 (SiT-XL/2 (REPA), 250 steps) 上，FID 1.51 vs 1.80 (0.29)。
 > - MS-COCO (U-ViT, latent space) 上，FID 5.28 vs 5.37 (0.09)。
 
-## 概述
+## 概要
 
 扩散模型中的**无分类器引导（Classifier-Free Guidance, CFG）** 是提升条件生成质量的核心技术，但其传统实现依赖固定的引导权重，忽略了扩散过程的内在动态特性。本文揭示了这一问题的根本瓶颈：**条件分布与无条件分布之间的评分差异（score discrepancy）在扩散前向过程中随时间呈指数级衰减**，而固定权重策略未能匹配这一衰减趋势，导致早期引导过强或后期引导不足，限制了生成质量。
 
@@ -55,7 +55,7 @@ claims:
 
 实验结果表明，C²FG 在多个基准上取得一致且显著的改进：在 Class-Conditional ImageNet 256×256 上，DiT-XL/2 的 FID 从 2.29 降至 2.07，SiT-XL/2 (REPA) 的 FID 从 1.80 降至 1.51；在 MS-COCO 和 ImageNet-64 上同样获得提升。消融研究进一步验证了该方法对采样器类型和推理步数的鲁棒性，在低步数场景下优势更为突出。
 
-## 背景与动机
+
 
 扩散模型已成为视觉生成的主流范式，其核心在于学习逆转一个逐步加噪的前向过程。给定数据分布 $p(x_0)$，前向过程由一个随机微分方程（SDE）描述：
 
@@ -85,7 +85,9 @@ $$\hat{\epsilon}(x_t, t, y) = \omega \left[\epsilon_\theta(x_t, t, y) - \epsilon
 
 基于此，本文提出**控制式无分类器引导（Control Classifier-Free Guidance, C²FG）**，一种训练无关、即插即用的方法。C²FG用一个时间依赖的指数衰减控制函数 $\omega(t) = \omega_0 \exp(\lambda (1 - t/t_{\max}))$ 替代固定权重，使引导强度自适应地匹配评分差异的衰减趋势，从而在理论保证下更有效地融合条件信息。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 C²FG 的核心创新在于将标准无分类器引导（CFG）中的**固定引导权重 ω** 替换为一个**时间依赖的指数衰减控制函数 ω(t)**，使引导强度与扩散过程的内在动态特性相匹配。
 
@@ -130,7 +132,7 @@ C²FG 的关键优势在于：其衰减函数形式直接源自评分差异的�
 
 图 1 的实验结果直接验证了理论分析的可靠性：(a) 条件与无条件评分的 MSE 随前向时间 $t \to +\infty$ 趋近于零，与理论上界一致；(b) 两者的归一化余弦相似度在逆向过程中持续下降，表明评分方向逐渐分化，进一步佐证了晚期引导需求降低的合理性。
 
-## 整体框架
+
 
 C²FG 的整体 pipeline 建立在标准扩散模型采样流程之上，仅对推理阶段的引导权重调度进行改造，完全保持训练无关（training‑free）和即插即用（plug‑in）的特性。其核心模块关系与数据流如下。
 
@@ -166,7 +168,7 @@ C²FG 可进一步与区间引导（Interval Guidance，Kynkäänniemi et al., N
 ![[assets/figures/papers/paper_list_l29_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_C2FG_Control_Class/figures/003_Figure_2.jpg]]
 *Figure 2: Noise to Image Process of*
 
-## 核心模块与公式推导
+
 
 ### 3.1 评分差异的理论分析
 
@@ -225,7 +227,9 @@ C²FG 可与 **Interval Guidance**（Kynkäänniemi et al., NeurIPS 2024）无�
 ![[assets/figures/papers/paper_list_l29_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_C2FG_Control_Class/figures/002_Figure_1.jpg]]
 *Figure 1: Following [37], (a) and (b) present results for*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与设计动机
 
@@ -288,7 +292,9 @@ C²FG 是训练无关（training-free）的即插即用方法，无需额外训�
 ![[assets/figures/papers/paper_list_l29_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_C2FG_Control_Class/figures/008_Table_3.jpg]]
 *Table 3: Ablation Comparison. Comparison of different evaluation metrics on Class-Conditional ImageNet datasets with different architectures and fewer timesteps*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 **C²FG** 的核心贡献在于为无分类器引导（Classifier-Free Guidance, CFG）提供了一个理论驱动的时变引导调度方案，而非重新设计扩散模型架构或训练范式。其方法定位可从以下几个维度展开：
 
@@ -341,6 +347,8 @@ CFG 使用固定标量 $\omega$，而 **C²FG** 将其替换为时间依赖的�
 - 能否通过学习或更严格的理论推导，自适应地确定最优的 $\omega(t)$ 函数形式？
 - Harnack 型不等式提示的早期时间密度估计困难是否可通过改进网络训练或正则化缓解？
 - **C²FG** 与其他先进引导技术的更深入组合方式及其极限性能如何？
+
+
 
 ## 原文 PDF
 

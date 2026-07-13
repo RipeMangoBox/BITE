@@ -46,7 +46,7 @@ claims:
 > - Spatial457 上，准确率 Spatial-SSRL-3B vs Qwen2.5-VL-3B (+12.37%)。
 > - VSI-Bench 上，准确率 Spatial-SSRL-3B vs Qwen2.5-VL-3B (+5.65%)。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -71,7 +71,7 @@ Spatial-SSRL并非提出新的模型架构，而是**在训练范式层面进行
 
 在七个空间理解基准上，Spatial-SSRL相较Qwen2.5-VL基线取得了显著且一致的提升：3B模型平均提升**4.63%**，7B模型平均提升**3.89%**。其中在Spatial457基准上增益最为突出，7B模型达到**+8.67%**，3B模型达到**+12.37%**。更重要的是，基线模型在启用显式推理链时性能反而下降（Qwen2.5-VL-3B从45.91%降至44.85%），而Spatial-SSRL通过自监督RL学会了有效的空间推理，避免了虚假相关性。同时，通用视觉问答能力保持稳定并略有提升（3B平均+2.02%），表明空间能力的增强并未以牺牲通用视觉能力为代价。在跨架构验证中，基于Qwen3-VL-4B的Spatial-SSRL同样实现了空间理解平均+1.29%、通用VQA平均+1.18%的增益，验证了方法的架构无关性。
 
-## 背景与动机
+
 
 大型视觉语言模型（LVLM）在通用视觉理解上取得了显著进展，然而在需要精确3D空间推理的任务中，其表现仍远未令人满意。空间理解——判断物体间的相对位置、方向、距离与布局——是具身智能、自动驾驶和机器人操作等下游应用的基础能力，但现有LVLM在此类任务上频繁出现方向混淆、深度误判和布局错乱等系统性错误。
 
@@ -87,7 +87,9 @@ Spatial-SSRL并非提出新的模型架构，而是**在训练范式层面进行
 
 基于这一洞察，Spatial-SSRL提出了一种**自监督强化学习范式**（Figure 2(b)），将视觉自监督学习（SSL）的前预任务重塑为强化学习可验证奖励（RLVR）的奖励函数。该方法仅需原始RGB/RGB-D图像作为输入，自动构建五种覆盖2D布局与3D深度结构的可验证问答对，通过组相对策略优化（GRPO）训练模型生成空间推理链。这一范式实现了从“依赖昂贵外源监督”到“利用内源自监督信号”的根本性转变，在保持高度可扩展性的同时，显著提升了LVLM的3D空间智能。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Spatial-SSRL的核心创新在于**将视觉自监督学习（SSL）任务重塑为强化学习可验证奖励（RLVR）的信号源**，从而彻底绕过了LVLM空间理解对昂贵外部监督的依赖。这一范式转换通过以下四个关键“changed slots”实现：
 
@@ -115,7 +117,7 @@ Spatial-SSRL的核心创新在于**将视觉自监督学习（SSL）任务重塑
 
 一个值得注意的现象是：基线模型（Qwen2.5-VL）在启用思维链推理时性能反而下降（3B从45.91%降至44.85%），表明其缺乏真正的空间推理能力，仅依赖表面统计相关性。相比之下，Spatial-SSRL通过GRPO训练学会了有效的空间推理策略，在带推理的评估设置下**持续超越**不带推理的基线模型。这证明RLVR训练赋予了模型真正的空间推理能力，而非简单的模式匹配。
 
-## 整体框架
+
 
 Spatial-SSRL 的整体框架由两个核心阶段构成：**自监督任务生成（Self-Supervised Task Design）** 与 **强化学习优化（Reinforcement Learning）**，二者通过可验证奖励函数紧密耦合，形成一个从原始图像到空间理解能力的端到端学习闭环。
 
@@ -177,7 +179,7 @@ Spatial-SSRL 模型 ─── 空间理解推理
 ![[assets/figures/papers/paper_list_l2725_https_arxiv_org_abs_2510_27606/figures/002_Figure_2.jpg]]
 *Figure 2: (a) Prior pipelines boost spatial understanding by injecting extrinsic supervision from expert tools or synthetic environments, which inflates cost and limits scalability. (b) Our Spatial-SSRL replaces these dependencies with intrinsic self-supervision, yielding a scalable, lightweight, low-cost, and naturally verifiable pipeline*
 
-## 核心模块与公式推导
+
 
 Spatial-SSRL 的核心由两大阶段构成：自监督任务设计与强化学习优化。本节聚焦于五个前预任务的数学构造与可验证奖励机制，揭示如何从原始图像中确定性推导出训练监督信号。
 
@@ -265,7 +267,9 @@ $$r = 0.9 \cdot r_{acc} + 0.1 \cdot r_{fmt}$$
 ![[assets/figures/papers/paper_list_l2725_https_arxiv_org_abs_2510_27606/figures/012_Figure_6.jpg]]
 *Figure 6: Examples of the task Cropped Patch Inpainting*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果：空间理解基准
 
@@ -345,7 +349,9 @@ Spatial-SSRL 在七个空间理解基准上对 Qwen2.5-VL 基线实现了跨规�
 ![[assets/figures/papers/paper_list_l2725_https_arxiv_org_abs_2510_27606/figures/018_Table_9.jpg]]
 *Table 9: Performance of Qwen3-VL-4B (baseline model) and Spatial-SSRL-4B on spatial understanding*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心范式转换：从外源监督到内源自监督
 
@@ -397,6 +403,8 @@ Spatial-SSRL的方法论创新在于**将视觉自监督学习（SSL）的前预
 4. **纯2D图像的3D监督**：在缺乏深度传感器的情况下，如何从单目线索（如透视、遮挡、相对大小）设计有效的3D空间监督信号？单目深度估计的引入可能是一个方向，但其预测误差会破坏真值的确定性，需要权衡自监督的准确性与3D监督的覆盖范围。
 
 5. **更大规模验证**：当前实验基于3B和7B规模的模型，在更大规模（如30B+）的LVLM上，自监督RL的增益是否持续存在？任务设计与模型容量的scaling行为值得进一步探索。
+
+
 
 ## 原文 PDF
 

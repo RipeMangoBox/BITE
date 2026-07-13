@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2024
 pdf_ref: paperPDFs/CVPR_2024/TRUMANS_Scaling_Up_Dynamic_Human_Scene_Interaction_Modeling.pdf
+project_link: https://jnnan.github.io/trumans/
+code_link: null
 aliases:
 - ACDM
 - TSUDHSIM
@@ -43,7 +45,7 @@ claims:
 > - TRUMANS (dynamic objects) 上，FID ↓ 0.313 vs 0.512 (GOAL) (-0.199)；Penescene ↓ 11.74 vs 34.10 (GOAL) (-22.36)；Dis. suc. ↓ 0.226 vs 0.801 (GOAL) (-0.575)。
 > - Human study (overall) 上，SucRateDis ↓ ~25% (indistinguishable from MoCap) vs 100% (SAMP) (N/A)。
 
-## 概述
+## 概要
 
 **核心问题**：高质量人-场景交互（HSI）数据严重稀缺，现有运动合成方法难以同时保证长序列生成、物理合理性与精细可控性，成为制约该领域发展的关键瓶颈。
 
@@ -57,7 +59,7 @@ claims:
 - 人类主观评估中，仅约 25% 的参与者能区分生成运动与真实 MoCap 数据，接近随机猜测的 20% 水平。
 - 消融实验证实，帧级动作进度指示器是模型成功的关键组件，移除后模型完全失效（FID 升至 2.104）；数据增强对提升物理合理性亦有显著贡献。
 
-## 背景与动机
+
 
 人-场景交互（Human-Scene Interaction, HSI）建模是计算机视觉与图形学的核心挑战，其目标在于生成人类在三维环境中自然、物理合理且可控的运动序列。这一能力对具身智能、虚拟现实、数字人等应用至关重要。然而，当前领域面临双重瓶颈：
 
@@ -67,7 +69,9 @@ claims:
 
 **本文动机：** 针对上述双重瓶颈，TRUMANS工作从数据与模型两个维度进行系统性突破。在数据侧，通过精确动作捕捉与虚拟环境复现构建大规模HSI数据集，并引入物体形态与运动增强策略，在保持接触真实性的前提下大幅扩增数据多样性。在模型侧，设计了一种基于场景局部感知与帧级动作嵌入的自回归条件扩散模型，使得生成运动既能适应任意长度，又能精确响应场景几何与动作指令，从而在静态场景交互与动态物体操控任务上均达到超越现有基线的性能。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 TRUMANS 的核心创新在于同时解决了高质量人-场景交互（HSI）数据的稀缺性与运动生成中长序列、物理合理性和精细可控性难以兼得的双重瓶颈。具体而言，本文从数据与生成策略两个维度引入了一套互为支撑的创新机制。
 
@@ -101,7 +105,7 @@ $$\mathcal{L} = E_{\tilde{X}_0 \sim q(\tilde{X}_0 \vert \mathcal{C}), t \sim \le
 
 TRUMANS 的数据增强策略通过调整物体的尺寸（如将椅子高度增加 15cm、床高度降低 15cm），并相应地重新优化人体运动以保持接触真实性，从而在保持接触标注物理合理的前提下大幅扩增了有效训练样本。消融实验表明，移除数据增强后，最大穿透值从 11.74 升至 15.52，证实物体形态增强有助于模型学习更鲁棒的物理交互姿态。
 
-## 整体框架
+
 
 TRUMANS 的整体框架围绕“数据—生成—后处理”三条主线构建，旨在解决高质量人-场景交互（HSI）数据稀缺与长序列可控生成两大瓶颈。其核心设计思路是：首先通过精确动作捕捉与虚拟环境复现构建大规模、高保真的 HSI 数据集；进而设计一个以场景局部感知与帧级动作嵌入为条件的自回归条件扩散模型，实现任意长度的物理合理交互运动生成；最后通过轻量级后处理模块将关节点运动转换为带参数的人体网格，并优化动态物体轨迹以保证交互一致性。
 
@@ -132,7 +136,7 @@ TRUMANS 的整体框架围绕“数据—生成—后处理”三条主线构建
 
 整个框架的设计使得模型在训练后展现出显著的零样本泛化能力，可直接应用于 PROX、Replica、ScanNet、ScanNet++ 等多种未见过的 3D 场景数据集。
 
-## 核心模块与公式推导
+
 
 TRUMANS 方法的核心是一个**自回归条件扩散模型**（Autoregressive Conditional Diffusion Model），其设计围绕三个关键瓶颈展开：长序列生成的连贯性、三维场景感知的物理合理性，以及帧级动作指令的精细可控性。以下逐一拆解其关键模块与公式。
 
@@ -181,7 +185,9 @@ $$\mathcal{L} = E_{\tilde{X}_0 \sim q(\tilde{X}_0 \vert \mathcal{C}), t \sim [1,
 ![[assets/figures/papers/paper_list_l1727_TRUMANS_Scaling_Up_Dynamic_Human_Scene_Interaction_Modeling/figures/003_Figure_2.jpg]]
 *Figure 2: Data augmentation for motion generation. This example highlights how human motion is adjusted to accommodate variations in object sizes. Specifically, the chair’s height is increased, and the bed’s height is decreased, each by 15cm. Our augmentation method proficiently modifies human motion to maintain consistent interactions despite these changes in object dimensions*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 数据集规模与质量验证
 
@@ -241,7 +247,9 @@ TRUMANS 数据集对下游任务的增益在 Table 4、Table 5 及 Table A2、A3
 ![[assets/figures/papers/paper_list_l1727_TRUMANS_Scaling_Up_Dynamic_Human_Scene_Interaction_Modeling/figures/005_Figure_4.jpg]]
 *Figure 4: Visualization of motion generation. Leveraging local scene context and action instructions as conditions, our method demonstrates its proficiency in (a) initiating motion given the surrounding environment, (b) dynamically interacting with objects, (c) avoiding collisions during motion progression, and (d) robustly synthesizing long-term motion. The depicted scenes are selected from PROX, Replica, and FRONT3D-test datasets, none of which were included in the training phase. For qualitative results, please refer to the Supplementary Video*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 任务定位与核心瓶颈
 
@@ -334,6 +342,8 @@ TRUMANS 在每段 episode 的末帧对骨盆 xy 坐标施加子目标掩码 $M_{
 4. **动态场景适应**：当前方法假设场景几何固定。若场景本身动态变化（如门被打开、椅子被移动），模型如何实时更新场景表示并调整运动规划？
 
 5. **交互意图理解**：动作标签目前由外部给定。能否将高层自然语言指令（如“去厨房拿一瓶水”）端到端地映射为帧级动作序列与子目标，实现从语言到交互运动的直接生成？
+
+
 
 ## 原文 PDF
 

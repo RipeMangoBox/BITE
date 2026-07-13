@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/DiffusionBlocks_Block_wise_Neural_Network_Training_via_Diffusion_Interpretation.pdf
+project_link: null
+code_link: https://github.com/SakanaAI/DiffusionBlocks
 aliases:
 - DiffusionBlocks
 - DBWNNTDI
@@ -36,7 +38,7 @@ code_url: https://github.com/SakanaAI/DiffusionBlocks
 | 中文题名 | DiffusionBlocks：基于扩散解释的逐块神经网络训练 |
 | 英文题名 | DiffusionBlocks Block-wise Neural Network Training via Diffusion Interpretation |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=pwVSmK71cS) / [code](https://github.com/SakanaAI/DiffusionBlocks) |
+| Links | [paper](https://openreview.net/forum?id=pwVSmK71cS) · [code](https://github.com/SakanaAI/DiffusionBlocks) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/algorithms |
 | Method | DiffusionBlocks：将残差网络划分为块，为每个块分配噪声尺度，并使用扩散式去噪损失独立训练每个块 |
 | Dataset | ImageNet-1K, CIFAR-100, Tiny-ImageNet, Pythia |
@@ -46,11 +48,11 @@ code_url: https://github.com/SakanaAI/DiffusionBlocks
 > - 在 Pythia/One Billion Word 文本生成任务上，困惑度与端到端训练可比。
 > - 消融实验表明，移除噪声调度会降低逐块训练质量。
 
-## 概述
+## 概要
 
 DiffusionBlocks 将残差网络的块级更新解释为扩散去噪步骤，并据此把端到端反向传播改写为逐块独立训练。该方法通过块划分、噪声调度和去噪得分匹配损失，使每个块只需在自身噪声区间内学习局部去噪，从而降低训练内存，并在图像分类、图像生成和文本生成任务上接近端到端训练质量。
 
-## 背景与动机
+
 
 训练深度神经网络通常依赖端到端反向传播，这需要存储所有中间激活值，导致内存开销随网络深度线性增长。这一瓶颈限制了模型规模的扩展，尤其是在资源受限的场景下。
 
@@ -58,13 +60,15 @@ DiffusionBlocks 将残差网络的块级更新解释为扩散去噪步骤，并�
 
 DiffusionBlocks 的核心动机是：能否为逐块训练提供一个理论上有依据的局部目标，使得每个块可以独立优化，同时保持与端到端训练相当的性能？
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 核心洞察：残差网络的逐层更新可以解释为扩散模型中的去噪步骤，因为残差连接天然对应于从噪声状态到干净状态的逐步细化，从而使每个块能够使用扩散式得分匹配损失独立训练成为可能。
 
 这一洞察将逐块训练从启发式局部损失提升为有理论基础的扩散过程：每个块学习预测添加的噪声，其目标函数来自得分匹配，而非任务特定的代理损失。这使得 DiffusionBlocks 能够在不牺牲端到端质量的前提下，实现内存高效的块级训练，并自然适用于图像分类、图像生成和文本生成等多种任务。
 
-## 整体框架
+
 
 DiffusionBlocks 的整体框架如图 1 所示。它将一个 L 层的残差网络划分为 B 个块，每个块包含若干连续层。训练时，每个块被赋予一个特定的噪声尺度，并独立地以去噪得分匹配为目标进行优化。推理时，块按顺序应用，从噪声输入逐步去噪得到最终输出。
 
@@ -79,7 +83,7 @@ DiffusionBlocks 的整体框架如图 1 所示。它将一个 L 层的残差网�
 ![[assets/figures/papers/5239ba2c-740e-4569-9894-8685fda5d08e/figures/002_Figure_2.jpg]]
 *Figure 2 (pipeline): 3-step conversion of a standard neural network to DiffusionBlocks at training phase. Step 1: Partition L layers into B blocks. Step 2: Define noise distribution $p _ { \sigma }$ (e.g., log-normal) and partition the range [ $\sigma _ { \mathrm { m i n } } , \sigma _ { \mathrm { m a x } }$ ] into B intervals $\{ [ \sigma _ { b } , \sigma _ { b - 1 } ] \} _ { b = 1 } ^ { B }$ . , assigning each block a specific noise range (Section 3.3). Step 3: Augment blocks with noise conditioning: extend input to x˜ = $\left( \mathbf { x } , \mathbf { z } _ { \sigma } \right$) where ${ \bf$ z $} _ { \sigma } = { \bf$ y } + $\sigma \epsilon { \bf \delta }$ , and incorporate noise-level conditioning (e.g., via AdaLN). Then, each block is trained independently from other blocks to predict target y within its assigned noise range
 
-## 核心模块与公式推导
+
 
 **1. 块划分与噪声调度**
 
@@ -97,7 +101,9 @@ DiffusionBlocks 的整体框架如图 1 所示。它将一个 L 层的残差网�
 
 推理时，块按顺序应用。从初始噪声状态 x_1 开始，每个块 b 执行去噪步骤：x_{b+1} = x_b - \sigma_b f_b(x_b)，逐步得到干净输出。这与扩散模型的逆过程类似，但块的数量 B 远小于典型扩散步数，从而降低了推理成本。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 DiffusionBlocks 在图像分类、图像生成和文本生成任务上进行了评估。
 
@@ -117,7 +123,9 @@ DiffusionBlocks 在图像分类、图像生成和文本生成任务上进行了�
 ![[assets/figures/papers/5239ba2c-740e-4569-9894-8685fda5d08e/figures/007_Table_4.jpg]]
 *Table 4 (result): Autoregressive (AR) transformer results for text generation. DiffusionBlocks maintains generation quality with 4× memory reduction on both LM1B and Openwebtext (OWT) datasets*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 DiffusionBlocks 属于逐块训练方法家族，其核心创新在于将残差网络的逐块更新解释为扩散去噪过程，从而为局部训练提供了原则性的得分匹配目标。
 
@@ -129,6 +137,8 @@ DiffusionBlocks 属于逐块训练方法家族，其核心创新在于将残差�
 DiffusionBlocks 改变了训练流程这一关键槽位：从联合反向传播替换为独立块级去噪训练。其新增组件包括块划分和噪声调度。该方法适用于图像和文本模态，覆盖分类、生成等任务。
 
 未来工作可探索更优的噪声调度策略、块划分方式，以及将 DiffusionBlocks 扩展到更多架构（如卷积网络、Transformer 变体）。
+
+
 
 ## 原文 PDF
 

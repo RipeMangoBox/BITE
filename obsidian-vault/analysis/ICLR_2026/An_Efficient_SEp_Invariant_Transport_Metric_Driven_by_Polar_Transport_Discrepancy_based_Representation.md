@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/An_Efficient_SEp_Invariant_Transport_Metric_Driven_by_Polar_Transport_Discrepancy_based_Representation.pdf
+project_link: null
+code_link: null
 aliases:
 - SSPIT
 tags:
@@ -39,11 +41,11 @@ claims:
 > - ModelNet40-SE(3) 上，Time (h) 为 9.01，对比 GW: >72, EGW: >72, RISGW: 0.18, SGW: 0.18, SW: 0.18, W2: 0.18，变化 远快于GW/EGW。
 > - QM9 (预训练, EDM) 上，Atom. (%) 为 99.1，对比 EDM: 98.7，变化 +0.4。
 
-## 概述
+## 概要
 
 本文提出了一种名为SEINT（SE(p)-Invariant Transport）的新型特殊欧几里得群不变度量，用于比较p维赋范Banach空间上的概率分布。SEINT通过极地传输差异（Polar Transport Discrepancy, PTD）与距离卷积（Distance-convoluted PTD, DcPTD）提取SE(p)不变表示，将高维分布映射为1维标量表示，再通过最优传输计算距离。该方法在保持严格度量性质的同时，实现了O(n log n)至O(n²)的计算复杂度，显著优于现有方法。实验表明，SEINT在ModelNet40-SE(3)上达到100%分类准确率，运行时间（9.01小时）远低于GW（>72小时）和EGW（>72小时）；在分子生成预训练中，以0.3权重集成到UniGEM后，原子稳定性达99.3%，分子稳定性达93.5%，均达到SOTA。
 
-## 背景与动机
+
 
 现有基于最优传输的SE(p)不变方法可分为三类策略（Figure 1）：
 
@@ -53,7 +55,9 @@ claims:
 
 **核心瓶颈**：现有方法无法同时满足计算效率、严格的度量性质以及跨等距类通用性。Table 1总结了各类方法的性质对比。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于提出无监督的极地传输差异（PTD）及其距离卷积变体（DcPTD），通过将极地长度信息与最优传输耦合结合，再与内在距离进行卷积，得到等距不变且维度无关的标量表示，从而将跨空间分布比较转化为同一空间上的可解最优传输问题。
 
@@ -67,7 +71,7 @@ claims:
 | 度量性质 | 外在：EMD^G是度量，SPM/RISGW不是；内在：GH/GW是度量；表示：SHR/RIT不是度量 | SEINT是等距类空间上的真度量（满足同一性、对称性、三角不等式） | Theorem 1 |
 | 跨空间比较能力 | 外在：不支持；内在：支持；表示：部分支持 | 支持，通过DcPTD的等距不变性和维度无关性将不同空间映射到公共表示域 | Remark 1 |
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_representation_self_supervised_transfer__representation_learning__b001_oyxExc7TEl_An_Effi/figures/001_Figure_1.jpg]]
 *Figure 1: (a) Extrinsic strategy*
@@ -79,7 +83,7 @@ SEINT的数值实现流程如Figure 2所示，包含四个核心步骤：
 3. **DcPTD计算**：将PTD与距离矩阵卷积，得到距离卷积极地传输差异。
 4. **1维Wasserstein距离**：计算两个DcPTD表示之间的1维Wasserstein距离作为最终SEINT距离。
 
-## 核心模块与公式推导
+
 
 ### 5.1 极地传输差异（PTD）
 
@@ -119,7 +123,9 @@ $$\mathcal{L}_{\mathrm{SEINT}}(X,Y,\mu_X,\mu_Y) = \mathcal{L}_{\mathrm{SEINT}}(g
 
 $$\mathcal{L}_{\mathrm{ISEINT}}(X,Y,\mu_X,\mu_Y) := \inf_{\pi \in \Pi(\mu_X,\mu_Y)} \left( \mathbb{E}_{\pi \times \mathcal{D}(\mathcal{P}_{X,Y}(\mathbb{R}))} \left[ |\phi_{\pi_{X,Z}^*}(x) - \phi_{\pi_{Y,Z}^*}(y)|^p \right] \right)^{\frac{1}{p}}$$
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 6.1 SE(p)不变性验证
 
@@ -167,7 +173,9 @@ SEINT和ISEINT正则化持续提升Point-MAE在点云分类任务上的准确率
 ![[assets/figures/papers/iclr26_representation_self_supervised_transfer__representation_learning__b001_oyxExc7TEl_An_Effi/figures/013_Table_5.jpg]]
 *Table 5: Comparison of three regularization terms on validity, atom stability, molecular stability, and uniqueness, each drawing 10000 samples from the model.*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 SEINT属于表示策略的SE(p)不变最优传输方法，其核心创新在于将极地长度信息与最优传输耦合结合，再与内在距离进行卷积，从而克服了现有方法的三大局限：
 
@@ -189,6 +197,8 @@ SEINT属于表示策略的SE(p)不变最优传输方法，其核心创新在于�
 - SEINT能否扩展到非欧几里得域（如流形或图结构）？
 - 参考分布的数量和支撑集大小对SEINT性能的理论影响是什么？
 - SEINT是否可以作为其他生成模型（如GAN、VAE）的正则化项？
+
+
 
 ## 原文 PDF
 

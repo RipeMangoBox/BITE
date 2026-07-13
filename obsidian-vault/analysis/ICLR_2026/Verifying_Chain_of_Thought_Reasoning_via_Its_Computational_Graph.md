@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Verifying_Chain_of_Thought_Reasoning_via_Its_Computational_Graph.pdf
+project_link: null
+code_link: null
 openreview_forum_id: CxiNICq0Rr
 aliases:
 - CBRVC
@@ -42,7 +44,7 @@ claims:
 > - Synthetic (Arithmetic) 上，AUROC 为 92.47，对比 76.45 (Energy)，变化 +16.02。
 > - GSM8K 上，AUROC 为 70.17，对比 62.55 (Energy)，变化 +7.62。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -80,7 +82,7 @@ CRV在三个数据集上均显著超越所有基线方法（Table 1）：
 
 CRV目前更适合作为科学分析工具而非可扩展的生产级验证器，主要受限于：transcoder训练和归因图构建的高计算成本；特征集尚未充分利用个体特征的语义信息；仅在Llama 3.1 8B Instruct单一模型上验证。未来方向包括：探索结构指纹在MoE架构和大规模模型上的泛化性；研究指令微调对底层特征空间的影响；寻找超越领域特定的普适计算失败模式；开发直接在解耦特征语义上操作的神经符号验证器。
 
-## 背景与动机
+
 
 大语言模型（LLM）在复杂推理任务上的突破，很大程度上得益于思维链（Chain-of-Thought, CoT）提示技术，它通过生成显式的中间推理步骤来引导模型得出最终答案。然而，CoT推理并非总是可靠——模型可能在逻辑推导、数值计算或符号操作中引入隐蔽的错误。这些错误一旦发生，往往会沿着推理链条传播，最终导致错误结论。因此，**自动验证CoT推理步骤的正确性**成为提升LLM可信度的关键挑战。
 
@@ -92,7 +94,9 @@ CRV目前更适合作为科学分析工具而非可扩展的生产级验证器�
 
 这种白盒视角填补了现有方法的关键缺口：它不仅判断推理是否正确，更揭示了**错误发生的计算机制**，为理解和修复LLM的推理失败提供了全新的分析工具。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CRV的本质创新在于将思维链验证从“观测输出”转向“观测计算过程”。现有黑盒方法（如MaxProb、PPL、Energy等）仅通过输出概率或熵值判断步骤正确性，灰盒方法（如**CoE-R/C** (Wang et al., 2025a)、**CoT-Kinetics** (Bi et al., 2025)）虽引入部分内部状态，但均无法解释推理失败的计算原因。CRV通过以下关键设计实现了范式转变：
 
@@ -108,7 +112,7 @@ CRV的核心洞察在于将推理步骤的计算过程建模为**稀疏有向归
 
 CRV揭示了transcoder中特定语义特征的激活值是可操纵的因果变量。实验表明，通过forward hook抑制或增强单个transcoder特征（如乘法特征）可直接改变模型的计算路径并纠正错误推理（Table 4, Table 19）。这一发现将错误检测从被动的分类任务升级为可干预的因果诊断，证明CRV识别的特征与推理失败之间存在因果关系，而非仅仅是相关性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_CxiNICq0Rr/figures/001_Figure_1.jpg]]
 *Figure 1: The CRV pipeline. (1) The LLM’s MLP modules are replaced with per-layer transcoders (PLTs), making it interpretable. (2) For a given CoT step, we generate an attribution graph capturing causal flow between interpretable features and model components. (3) Structural features are extracted from this graph, and (4) fed to a diagnostic classifier to predict the step’s correctness*
@@ -125,7 +129,7 @@ CRV（Circuit-based Reasoning Verification）是一个四阶段的白盒验证�
 
 整个管道的核心假设是：正确推理步骤的归因图具有与错误步骤不同的结构指纹，且这些指纹携带了关于计算完整性的强信号，足以支撑高精度的错误检测。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化
 
@@ -158,7 +162,9 @@ CRV 的核心数据结构是归因图 $G_i = (V, E)$，它捕获了单个推理�
 
 诊断分类器 $f_{\theta}$ 将结构指纹 $\mathbf{x}_i$ 映射为正确性预测 $\hat{y}_i$。CRV 默认采用梯度提升分类器（Gradient Boosting Classifier），在所有数据集上提供鲁棒性能。分类器比较实验（Table 18）显示，逻辑回归在某些情况下也具有竞争力，表明归因图特征本身包含强烈的错误信号，对分类器选择具有一定的鲁棒性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -238,7 +244,9 @@ CRV的白盒特性使其能够从相关性分析推进到因果性验证。Table
 ![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_CxiNICq0Rr/figures/025_Table_16.jpg]]
 *Table 16: Hyperparameter search space for the MLP Probe baseline*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 白盒验证范式的确立
 
@@ -261,6 +269,8 @@ CRV 的计算成本构成其最显著的实用性约束。训练多个 per-layer
 ### 开放问题
 
 CRV 开辟了若干关键研究方向。在架构层面，结构指纹是否能泛化到 MoE 等不同范式或显著更大的模型规模（如 70B+）尚待验证。在特征层面，指令微调如何影响 transcoder 的底层特征空间，以及是否存在超越当前高度领域特定签名的更普遍的计算失败原则，构成了理解模型推理失败机制的核心问题。在方法层面，能否开发出直接在解耦特征语义上操作的更高级分类器或神经符号验证器，将决定白盒验证是否能从诊断工具演进为实用的推理保障机制。
+
+
 
 ## 原文 PDF
 

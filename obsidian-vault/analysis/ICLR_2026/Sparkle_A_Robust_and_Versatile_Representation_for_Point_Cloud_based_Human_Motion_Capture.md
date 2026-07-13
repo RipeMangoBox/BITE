@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Sparkle_A_Robust_and_Versatile_Representation_for_Point_Cloud_based_Human_Motion_Capture.pdf
+project_link: null
+code_link: null
 openreview_forum_id: 0blfYtdJES
 aliases:
 - Sparkle
@@ -41,7 +43,7 @@ claims:
 > - GTA-Human-Point (cross-sensor) 上，J/V Err(L) (mm) ↓ 为 69.1/82.2，对比 77.5/90.4 (LiveHPS++)，变化 -10.8%/-9.1%。
 > - HuMMan-Point (cross-sensor) 上，Ang Err (degree) ↓ 为 12.60，对比 21.47 (LiveHPS++)，变化 -41.3%。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -78,7 +80,7 @@ SparkleMotion 在 11 个多样化基准数据集上进行了全面验证，涵�
 
 > **注意**：本文未提供论文发表的会议/期刊和年份信息，上述元数据需手动核实。
 
-## 背景与动机
+
 
 ### 点云人体动作捕捉的根本挑战
 
@@ -117,7 +119,9 @@ SparkleMotion 在 11 个多样化基准数据集上进行了全面验证，涵�
 
 基于 Sparkle 表征，本文进一步提出了 **SparkleMotion**——一个三阶段的实时动作捕捉框架，通过几何驱动的解析初始化与学习式精炼相结合，在效率与精度之间取得平衡。该方法在 11 个多样化基准数据集上展现出对现有方法的显著优势，尤其在噪声鲁棒性、交互场景精度和跨域泛化能力方面实现了突破性提升。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SparkleMotion 的核心创新在于提出了一种名为 **Sparkle** 的统一中间表征，将人体运动捕捉中长期对立的两类信息——内部运动学（骨骼关节）与外部几何（表面锚点）——显式解耦并协同利用。这一设计从根本上改变了现有方法的表征学习范式，具体体现在以下四个关键改变槽位（changed slots）上。
 
@@ -145,7 +149,7 @@ SAE 的核心创新在于其“线性初始化 + 交叉注意力精炼”的两�
 
 上述三个模块共同构成了 SparkleMotion 的核心方法论创新：将人体运动参数回归从传统的端到端黑箱映射，转变为“几何初始化 + 学习精炼”的两阶段范式。几何初始化阶段注入强物理归纳偏置（线性映射、swing-twist 分解），提供物理一致但可能存在系统偏差的初值；学习精炼阶段（交叉注意力网络）则专注于建模非线性修正，弥合解析解与真实人体形变之间的差距。这一范式在 70% 点云遮挡下仍将全局关节/顶点误差保持在 118.7/128.3 mm（Table 8），并在仅使用 50% 目标域训练数据时达到与全量监督基线相当的性能（MPJPE 61.5 vs 61.9, Table 11），充分展现了其鲁棒性与数据高效性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l23_https_openreview_net_forum_id_0blfYtdJES/figures/002_Figure_2.jpg]]
 *Figure 2: The pipeline of SparkleMotion. It can take point clouds of diverse patterns as input in different challenge scenarios, as shown on the left. SparkleMotion consists of three primary modules, the Point-aligned Skeleton Tracker, and Skeleton-guided Anchor Estimator construct the Sparkle Representation, and the Sparkle-based SMPL Solver for motion reconstruction*
@@ -170,7 +174,7 @@ SparkleMotion 的整体流水线遵循**两阶段结构化表征 → 参数化�
 
 Sparkle 表征的结构化特性使其具备天然的可扩展性。如图 Figure 6 所示，在多视图场景下，系统可接收来自任意视角的点云，分别提取 Sparkle 表征后进行融合与联合优化，无需重新设计网络架构，展示了表征本身的强大可迁移性。
 
-## 核心模块与公式推导
+
 
 ### 问题定义与表征设计
 
@@ -244,7 +248,9 @@ $$\mathcal{L}_{\mathrm{SSS}} = \lambda_6 \mathcal{L}_{\mathrm{MSE}}(\hat{\boldsy
 
 表面锚点的数量和选取策略直接影响表征能力与计算效率的平衡。实验（Table 6）对比了三种策略：PCA 选取（从 SMPL 网格顶点中通过主成分分析选出最具表达力的锚点）、随机选取和手动选取。结果表明，**PCA-32 方案**在表征能力与计算效率之间达到最优平衡——锚点过少（如 16 个）丢失几何细节，过多（如 50 个）增加冗余计算而收益递减。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能验证：噪声与遮挡场景下的鲁棒性
 
@@ -309,7 +315,9 @@ Table 11 展示了 Sparkle 表征的数据高效性。仅使用 50% 目标域训
 
 在跨数据集迁移实验中，从 FreeMotion 预训练后微调至 FreeMotion-OBJ，SparkleMotion 的 MPJPE 为 58.3 mm，优于从头训练的 LiveHPS++（68.9 mm），验证了 Sparkle 表征的跨域泛化能力。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -362,6 +370,8 @@ SparkleMotion 的核心贡献在于提出了一种新的中间表征 **Sparkle**
 **计算效率的量化缺失**：论文声称“实时”性能，但未提供具体的推理延迟数据或与基线的效率对比。在资源受限的边缘设备上部署时，PST 的迭代优化和 SAE 的交叉注意力机制的计算开销需要量化评估。
 
 **跨人体模型的迁移**：Sparkle 表征的构建依赖 SMPL 模型的运动学树和顶点分布。迁移到其他参数化人体模型（如 SMPL-X、GHUM）时，关节数量、锚点选取和线性映射矩阵均需重新设计，其迁移成本和性能保持率尚未被研究。
+
+
 
 ## 原文 PDF
 

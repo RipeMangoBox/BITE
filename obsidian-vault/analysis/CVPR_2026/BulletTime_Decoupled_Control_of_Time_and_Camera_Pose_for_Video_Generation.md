@@ -44,7 +44,7 @@ claims:
 > - Real-World Videos (ViPE, camera accuracy) 上，Rotation Error (RotErr) 1.47 vs ReCamMaster* 2.98 (-1.51)；Translation Error (TransErr) 1.32 vs ReCamMaster* 1.85 (-0.53)。
 > - Real-World Videos (VBench) 上，Temporal Flickering 0.9780 vs ReCamMaster* 0.9755 (+0.0025)。
 
-## 概述
+## 概要
 
 现有视频扩散模型将场景动态与相机运动耦合在单一视频时间轴上，用户无法独立控制“世界时间”（场景自身的动态演进）和相机视角。这一耦合限制了精确的时空操纵与4D世界建模，例如无法在保持场景动态不变的前提下自由改变拍摄角度，也无法在固定视角下独立控制场景的时间流速。
 
@@ -56,7 +56,7 @@ claims:
 
 本方法仍存在若干局限：对细腻手部动作的生成不佳；输入视频中不可见背景区域缺乏高保真细节；继承自 CogVideoX 的极端视角泛化限制；以及以人物为中心的训练数据使模型在动物、自然场景等未见环境上可能产生次优纹理。
 
-## 背景与动机
+
 
 视频生成领域近年来取得了显著进展，但现有方法在精确的时空操纵能力上仍存在根本性瓶颈。当前主流的视频扩散模型将场景动态演化与相机运动耦合在单一的视频时间轴上——每一帧既编码了“世界在哪个时刻”的信息，又编码了“从哪个角度观察”的信息。这种纠缠使得用户无法独立控制场景的时间流逝速度和相机的空间运动轨迹，严重限制了视频生成在4D内容创作、电影级特效制作等场景中的应用潜力。
 
@@ -66,7 +66,9 @@ claims:
 
 针对上述问题，本文提出**BulletTime**——一个4D可控的视频扩散框架，其核心动机是将视频生成重新形式化为两个显式且正交的条件信号：**连续世界时间序列**和**相机姿态轨迹**。通过将视频时间轴分解为“世界时间”与“相机时间”两个独立维度，框架能够在注意力机制中注入统一的时间-相机4D位置编码，并在特征层面通过双分支自适应层归一化实现解耦调制，从而首次赋予视频扩散模型独立操纵场景动态与相机视角的能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 BulletTime 的核心创新在于将视频生成从单一时间轴解放出来，构建了一个**4D可控视频扩散框架**，首次实现世界时间与相机姿态的显式解耦控制。这一解耦通过三个层面的机制创新实现：
 
@@ -103,7 +105,7 @@ AdaLN 的选择基于一个关键洞察：世界时间是一个平滑的全局�
 
 基线方法仅通过时间重映射（time remapping）扩展至4D控制，缺乏对时间维度的原生建模能力。消融实验证实：Time-RoPE + AdaLN 组合在所有世界时间条件方法中PSNR达32.15，显著优于仅使用AdaLN（29.83）或Cross-Attention（23.86）的变体；移除4D-RoPE导致PSNR从23.45骤降至21.98，降幅1.47 dB，验证了统一4D位置编码对联合时空控制的关键作用。
 
-## 整体框架
+
 
 BulletTime 构建了一个4D可控视频扩散框架，其核心设计是将传统视频生成中耦合在单一时间轴上的场景动态与相机运动显式解耦，分离为两个正交的控制信号：**连续世界时间序列** $\tau_{\text{world}}$ 与**相机姿态轨迹** $c$。这两个信号通过互补的调制通路注入预训练的 Diffusion Transformer 主干，实现对场景动态演化和视角移动的独立操纵。
 
@@ -126,7 +128,7 @@ BulletTime 构建了一个4D可控视频扩散框架，其核心设计是将传�
 ![[assets/figures/papers/paper_list_l2444_https_arxiv_org_abs_2512_05076/figures/002_Figure_2.jpg]]
 *Figure 2: Method Overview. Given a conditional input video, our diffusion model generates new videos under 4D control using world time and camera trajectory. These two signals are injected into the Diffusion Transformer through complementary modulation pathways. Time control is enabled by*
 
-## 核心模块与公式推导
+
 
 BulletTime 的核心设计在于将世界时间与相机姿态作为两个正交的控制信号，通过互补的调制通路注入到预训练的 Diffusion Transformer 中。其架构建立在 **CogVideoX-5B-T2V** 预训练模型之上，包含三个关键模块：连续世界时间控制、统一4D时空位置编码、以及相机姿态调制。
 
@@ -175,7 +177,9 @@ $$\tilde{z}_{i,n}' = \mathrm{LN}(\tilde{z}_{i,n}) \odot f_{\gamma}(f_{\mathrm{ti
 ![[assets/figures/papers/paper_list_l2444_https_arxiv_org_abs_2512_05076/figures/001_Figure_1.jpg]]
 *Figure 1: Time- and camera-controlled 4D video generation. Given a single input video where camera motion is entangled with uniform temporal sampling (top row), our method synthesizes new videos that enable decoupled control over world time and camera pose*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -259,7 +263,9 @@ Table 5 评估了完整 4D 控制框架中各组件的贡献。完整模型 PSNR
 ![[assets/figures/papers/paper_list_l2444_https_arxiv_org_abs_2512_05076/figures/008_Figure_6.jpg]]
 *Figure 6: Time Control Generalization. Three generations produced by our method from the same input video under different time conditions. Although the model is trained on only a limited subset of time remappings, it generalizes well to complex and previously unseen temporal inputs*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：从耦合到解耦的4D生成
 
@@ -330,6 +336,8 @@ BulletTime在视频生成领域的知识谱系中占据以下位置：
 - **下游拓展潜力**：可向4D场景重建、自由视点视频生成、物理感知的动态场景建模等方向延伸。其解耦框架为未来结合3D Gaussian Splatting等显式4D表示提供了自然的接口。
 
 **证据强度评估**：本文的核心主张（解耦控制、性能优势）有充分的定量实验支撑（Table 1-5，消融实验），证据置信度高。局限性和开放问题的讨论诚实且具体。需要注意的是，该方法在真实世界复杂场景下的泛化能力尚未经过大规模验证，开放问题中提出的方向（如物理感知推理、无界生成）目前仍处于概念阶段，需要后续工作的实质性推进。
+
+
 
 ## 原文 PDF
 

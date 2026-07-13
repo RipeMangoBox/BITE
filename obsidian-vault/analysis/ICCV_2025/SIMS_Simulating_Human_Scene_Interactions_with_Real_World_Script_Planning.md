@@ -5,6 +5,8 @@ paper_level: A
 venue: ICCV
 year: 2025
 pdf_ref: paperPDFs/ICCV_2025/SIMS_Simulating_Human_Scene_Interactions_with_Real_World_Script_Planning.pdf
+project_link: https://wenjiawang0312.github.io/projects/sims/
+code_link: null
 aliases:
 - SIMS
 tags:
@@ -41,7 +43,7 @@ claims:
 > - Motion Diversity (FID↓, APD↑) 上，Sit FID / APD 125.66 / 16.55 vs 153.84 / 1.14 (UniHSI) (-28.18 / +15.41)。
 > - User Study 上，Emotional Resonance (1-5) 3.8 vs 3.0 (UniHSI) (+0.8)。
 
-## 概述
+## 概要
 
 ### 1. 问题与瓶颈
 
@@ -79,7 +81,7 @@ SIMS的关键改进在于：将**LLM驱动的检索增强生成**引入脚本规
 
 上述结论由多项定量实验支撑，核心证据置信度均≥0.95。但仍需注意：当前数据集缺乏足够多的真实情感与多样风格运动；人形模型未包含手指关节，无法模拟精细操作；框架仅支持单角色，尚未扩展到多智能体场景。这些局限指向未来的改进方向。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -113,7 +115,9 @@ SIMS的关键改进在于：将**LLM驱动的检索增强生成**引入脚本规
 
 SIMS通过引入**检索增强脚本生成（RASG）** 解决第一个问题，通过**多条件控制策略**（融合场景高度图、任务目标和CLIP文本嵌入）解决后两个问题，并用**有限状态机**将二者无缝衔接，构成了完整的解决方案。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈突破：从物理合理性与风格多样性的两难中突围
 
@@ -153,7 +157,7 @@ SIMS通过三个相互咬合的设计实现了突破：
 - **风格表达**：用户研究中情感共鸣评分达3.8（UniHSI为3.0），运动多样性评分3.6（UniHSI为2.9）（Table 5）。
 - **消融验证**：移除文本嵌入导致APD显著下降，移除高度图导致成功率和FID严重退化（Table 11），证明多条件设计不可或缺。
 
-## 整体框架
+
 
 SIMS 是一个层次化的角色动画系统，其核心设计思路是将高层的叙事意图与低层的物理控制解耦，并通过一个有限状态机（FSM）将二者无缝衔接。系统接收用户提供的**对话式故事主题**和**3D场景布局**作为输入，最终输出一个在物理仿真环境中执行多样化、风格化交互的模拟角色。
 
@@ -177,7 +181,7 @@ SIMS 是一个层次化的角色动画系统，其核心设计思路是将高层
 ![[assets/figures/papers/paper_list_l1774_SIMS_Simulating_Human_Scene_Interactions_with_Real_World_Script_Planning/figures/019_Figure_8.jpg]]
 *Figure 8: The motion capture environment of Vicon optical motion capture system*
 
-## 核心模块与公式推导
+
 
 SIMS 的核心架构由三个关键模块构成：**短脚本数据库构建**、**检索增强脚本生成（RASG）** 和 **多条件控制策略**。三者通过有限状态机（FSM）衔接，形成从高层叙事规划到低层物理控制的完整闭环。
 
@@ -239,7 +243,9 @@ $$\mathcal { L } _ { \mathrm { a l i g n } } ^ { m , t } = 1 - d _ { \mathrm { c
 ![[assets/figures/papers/paper_list_l1774_SIMS_Simulating_Human_Scene_Interactions_with_Real_World_Script_Planning/figures/017_Figure_6.jpg]]
 *Figure 6: Scalability on new skills*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能：物理合理性与任务成功率
 
@@ -347,7 +353,9 @@ Tables 8-10分别对Walk、Carry和HSI（Sit/Lie）技能进行了数据集消
 ![[assets/figures/papers/paper_list_l1774_SIMS_Simulating_Human_Scene_Interactions_with_Real_World_Script_Planning/figures/013_Table_6.jpg]]
 *Table 6: Ablation on script generation methods*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心瓶颈与因果机制
 
@@ -408,6 +416,8 @@ Table 1 系统对比了SIMS与现有方法的任务设定差异（详见原表�
 | 用户主观评价优势 | Table 5 | 0.95 | 情感共鸣评分3.8 vs 3.0，但用户研究样本量和统计显著性需查阅原文确认 |
 
 **需手动验证的点**：InterScene重实现版本的公平性（原文未开源，重实现细节需确认）；用户研究的样本量和统计检验方法；MotionCLIP重实现与原版的定量对齐差异。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Vision_SR1_Self_Rewarding_Vision_Language_Model_via_Reasoning_Decomposition_and_Multi_Reward_Policy_Optimization.pdf
+project_link: null
+code_link: https://github.com/zli12321/Vision-SR1
 openreview_forum_id: C1M4ETatgM
 aliases:
 - VS
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | Vision-SR1: 基于推理分解与多奖励策略优化的自奖励视觉语言模型 |
 | 英文题名 | Vision-SR1: Self-Rewarding Vision-Language Model via Reasoning Decomposition and Multi-Reward Policy Optimization |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=C1M4ETatgM); [GitHub](https://github.com/zli12321/Vision-SR1) |
+| Links | [paper](https://openreview.net/forum?id=C1M4ETatgM) · [GitHub](https://github.com/zli12321/Vision-SR1) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | Vision-SR1 |
 | Dataset | MMMU-Pro, MMMU, RealWorld QA, HallusionBench |
@@ -42,7 +44,7 @@ claims:
 > - MMMU 上，准确率 为 52.2，对比 51.8 (Vision-R1 47K)，变化 +0.4。
 > - RealWorld QA 上，准确率 为 69.2，对比 66.6 (Vision-R1 47K)，变化 +2.6。
 
-## 概述
+## 概要
 
 当前视觉语言模型（VLM）的后训练方法普遍仅依赖最终答案的正确性作为监督信号，导致中间视觉推理缺乏明确指导，模型倾向于依赖语言先验而非视觉感知，从而引发视觉幻觉与语言捷径问题。针对这一瓶颈，**Vision-SR1** 提出了一种自奖励（self-rewarding）框架，核心思路是将VLM的推理过程解耦为**可视描述**与**语言推理**两个阶段，并利用模型自身作为评判者来验证视觉描述的完备性——若仅凭生成的视觉描述即可推出正确答案，则赋予视觉奖励。配合解耦的多奖励策略优化（分别计算视觉与答案奖励的优势函数、对数概率和KL散度），该方法在不引入外部监督模型的前提下，强化了视觉基础、抑制了语言捷径。
 
@@ -50,7 +52,7 @@ claims:
 
 实验表明，Vision-SR1 在7项基准上的平均准确率较Vision-R1（同等47K数据集复现）提升了1.5个百分点（Qwen2.5-VL-7B: 52.2 vs. 50.7），在空间推理基准OmniSpatial上提升尤为显著（+13.1）。消融实验证实，移除视觉自奖励会导致平均性能下降（7B: 52.2 → 50.3），而语言捷径率（LSR）的降低进一步验证了自奖励对抑制语言先验依赖的有效性。此外，自奖励机制还一定程度上缓解了多模态RL训练带来的纯文本数学推理退化。
 
-## 背景与动机
+
 
 视觉语言模型（VLM）在复杂多模态推理任务中取得了显著进展，但其后训练范式长期存在一个核心瓶颈：监督信号仅来自最终答案的正确性，中间视觉推理过程缺乏显式指导。这一设计缺陷导致模型在训练中倾向于依赖语言先验而非真实的视觉感知，从而产生视觉幻觉和语言捷径——模型可能给出正确答案，但其视觉推理却是错误的。
 
@@ -58,7 +60,9 @@ claims:
 
 本文的动机源于一个关键洞察：如果模型的视觉描述足够完备，能够在不依赖原始图像的情况下支撑正确答案的推理，那么该描述本身就是高质量的视觉感知证据。基于此，Vision-SR1提出将VLM的推理过程显式分解为**视觉感知**与**语言推理**两个阶段，并利用模型自身作为评判者来验证视觉描述的完备性——这一**自奖励**机制无需任何外部模型或人工标注，即可为视觉感知提供精准的梯度信号。同时，针对简单奖励求和可能引发的奖励黑客问题，Vision-SR1设计了**多奖励策略优化**，为视觉奖励和答案奖励分别计算独立的优势函数、对数概率和KL散度，从根本上避免信号纠缠。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 1. 推理分解与自奖励机制
 
@@ -103,7 +107,7 @@ Table 6 的消融实验直接验证了上述创新的有效性：移除视觉感
 
 此外，Table 4 显示自奖励使 7B 模型的平均语言捷径率（LSR）从 10.1 降至 9.8，表明模型更少依赖语言先验猜测答案，而是更多地基于视觉感知进行推理——这正是推理分解与自奖励机制设计的直接目标。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_C1M4ETatgM/figures/001_Figure_1.jpg]]
 *Figure 1: Overall framework of Vision-SR1. During RL training the VLM has two rollouts. In the first pass, the model takes an image–query pair and generates a structured output (visual perception, CoT reasoning, and answer), with answer reward computed against the ground truth. In the second pass, the model is re-prompted to answer using only query and its generated visual perception. If the correct answer is derived, a self-visual reward is assigned. We compute the advantages and log probabilities for each rollout for Multi-Reward Policy Optimization*
@@ -171,7 +175,7 @@ $$r_{visual}(Q, a) = r_{vis.acc}(Q, a) + \alpha \, r_{fmt}(s) \quad \text{(式 5
 
 这一框架通过推理分解与多奖励解耦优化，实现了**在不引入外部监督的前提下，为视觉感知提供明确的强化信号**，从而有效缓解视觉幻觉和语言捷径问题。
 
-## 核心模块与公式推导
+
 
 ### 3.1 两阶段自奖励推理框架
 
@@ -242,7 +246,9 @@ $$ \mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{actor}} + \mathcal{L}_{\m
 
 两阶段 rollout 相比标准 GRPO 增加了约 20% 的训练时间（7B 模型 20 步训练：标准 GRPO 约 10.5 小时，Vision-SR1 约 13 小时），但完全无需外部奖励模型或额外 GPU 资源。这一开销远低于 Perception-R1 等依赖外部专有 MLLM 的方法，后者需要额外的 API 调用或 GPU 部署成本。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -317,7 +323,9 @@ LSR 的评估采用两阶段流程，由 Gemini-2.5-flash 作为评判者：首�
 5. **文本推理的残余退化**：尽管自奖励减轻了纯文本数学推理的退化，MATH-500 等基准上仍存在可观测的性能下降，说明视觉-语言联合训练中的能力冲突尚未完全解耦。
 6. **内存与采样效率**：双次 rollout 对显存和采样效率有额外需求，不适用于需要极致低延迟的在线部署场景。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 方法谱系：从答案监督到视觉自奖励
 
@@ -358,6 +366,8 @@ Vision-SR1 的核心贡献在于将 VLM 的强化学习后训练从单一的答�
 3. **视觉推理的潜在化**：当前强制输出显式视觉描述增加了生成长度。能否将视觉推理视为潜在思维（latent thinking），在保持自奖励机制的同时提升生成效率？
 4. **自奖励的跨模态扩展**：该范式能否推广至视频理解（时序视觉描述的完备性验证）、3D 感知（多视角一致性验证）等更复杂的多模态任务？
 5. **奖励权重的自适应调节**：答案奖励与视觉奖励的权重目前为固定值。是否可以通过课程学习或基于不确定性的自适应机制动态调整二者的平衡，以在训练过程中逐步强化视觉基础？
+
+
 
 ## 原文 PDF
 

@@ -44,7 +44,7 @@ claims:
 > - MMMU 上，Accuracy ADPO (best-of-8) 52.1% vs GRPO + majority voting 51.1% (+1.0%)。
 > - ReasonSeg 上，cIoU (overall) ADPO (best-of-8) 61.2 vs GRPO + majority voting 59.6 (+1.6)。
 
-## 概述
+## 概要
 
 视觉语言模型（VLM）在测试时通过生成多个候选答案并从中择优，可以显著提升性能。然而，现有的并行测试时扩展方案通常需要分别训练生成器和验证器，导致训练成本高昂且推理资源消耗大；若仅训练单一组件，性能提升又十分有限。本文提出 **优势解耦偏好优化（Advantage Decoupled Preference Optimization, ADPO）**，在一个统一的强化学习框架内协同训练答案生成与自我验证，使单一策略模型既能产出高质量答案，又能输出可靠的自我验证分数。
 
@@ -52,7 +52,7 @@ ADPO 的核心洞察在于两点。第一，传统的二元验证奖励在训练
 
 实验覆盖多模态数学推理、图像定位和 GUI 智能体三个领域。结果表明，ADPO 在 MathVista 上 best-of-8 准确率达到 65.0%，较 GRPO + 多数投票的 62.9% 提升 2.1 个百分点；在 MMMU 上提升 1.0 个百分点；在 ReasonSeg 上 cIoU 提升 1.6；在 AndroidControl 上步成功率提升 1.9 个百分点。消融实验证实，偏好验证奖励将验证 AUC/AP 最高提升 0.19（Figure 4），优势解耦优化在所有领域均优于纠缠优势，且在 GUI agent 任务上 best@8 指标提升 2.8%（Figure 6）。ADPO 以单一统一模型实现了生成质量与验证可靠性的双重提升，为视觉语言模型的测试时扩展提供了高效的解决方案。
 
-## 背景与动机
+
 
 视觉语言模型（VLMs）在数学推理、视觉定位、GUI智能体等多模态任务中取得了显著进展。然而，单一前向生成的答案往往存在不确定性，尤其在复杂场景下，模型的首次输出未必是最优解。为提升可靠性，测试时扩展（test-time scaling）策略——如多数投票（majority voting）或最优N选（best-of-N）——被广泛采用，其核心在于生成多个候选答案并从中筛选最佳结果。
 
@@ -66,7 +66,9 @@ ADPO 的核心洞察在于两点。第一，传统的二元验证奖励在训练
 
 上述瓶颈共同指向一个核心矛盾：**如何在单一策略内实现生成与验证的协同训练，既避免验证信号退化，又防止优化目标间的负向干涉？** 本文的动机正是打破这一僵局——通过重新设计验证奖励的形式与优势解耦机制，使统一模型在保持生成质量的同时，输出可靠、可校准的自我验证分数，从而以极低的额外成本实现高效的测试时扩展。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ADPO 的核心创新在于解决了统一视觉语言模型在强化学习中同时优化**答案生成**与**自我验证**时面临的两个瓶颈：验证奖励信号的退化，以及生成与验证目标间的梯度干扰。其关键创新点体现在以下两个“changed slots”上。
 
@@ -98,7 +100,7 @@ $$\mathcal{I}(\theta) = M^{a} \odot \mathcal{I}_{\theta}(\hat{A}^{(a)}) + M^{p} 
 
 消融实验表明，优势解耦优化在 GUI agent 任务上 best@8 指标提升 2.8%，且在所有域（数学推理、视觉定位、GUI 代理）中均优于纠缠优势（Figure 6, Table 10），证明了解耦策略在防止奖励黑客和梯度干扰方面的关键作用。
 
-## 整体框架
+
 
 ADPO 构建了一个统一的强化学习框架，在单一策略模型内联合学习**答案生成**与**自我验证**。其核心设计目标是在不牺牲生成质量的前提下，使模型输出的验证分数具备可靠的排序能力，从而支持高效的测试时扩展（best-of-N 选择）。
 
@@ -138,7 +140,7 @@ $$\mathcal{I}(\theta) = M^{a} \odot \mathcal{I}_{\theta}(\hat{A}^{(a)}) + M^{p} 
 ![[assets/figures/papers/paper_list_l2196_https_arxiv_org_abs_2601_01483/figures/003_Figure_3.jpg]]
 *Figure 3: The framework of ADPO. Given a multimodal input, our unified policy produces an answer and a self-verification score to rank answer candidates. We design a preference verification reward to improve verification capability and a decoupled optimization mechanism to enable synergistic optimization of generation and verification. Preference verification reward aligns verification scores with answer correctness by providing relative ranking supervision. Advantage decoupled optimization computes separate advantages for generation and verification, and applies token masks to isolate gradients, thereby preventing reward hacking and reducing gradient interference between the two objectives*
 
-## 核心模块与公式推导
+
 
 ADPO 在统一策略中同时完成答案生成与自我验证，其核心由四个模块串联构成：**答案生成模块**、**自我验证评分模块**、**偏好验证奖励计算**和**优势解耦优化器**。以下逐一给出其关键公式与变量含义。
 
@@ -206,7 +208,9 @@ $$ \mathcal{I}(\theta) = M^{a} \odot \mathcal{I}_{\theta}(\hat{A}^{(a)}) + M^{p}
 ![[assets/figures/papers/paper_list_l2196_https_arxiv_org_abs_2601_01483/figures/012_Figure_5.jpg]]
 *Figure 5: Ablation of entangled and decoupled advantage. Entangled and decoupled correspond to models trained with entangled advantage in Eq. (8) and decoupled advantage in Eq. (9)*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果：统一生成与自验证的协同收益
 
@@ -272,7 +276,9 @@ Table 7 对比了统一验证（ADPO 同时作为生成器和验证器）与分�
 ![[assets/figures/papers/paper_list_l2196_https_arxiv_org_abs_2601_01483/figures/010_Table_6.jpg]]
 *Table 6: Ablation of the margin γ for preference verification reward on ReasonSeg*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有基线的结构性关系
 
@@ -320,6 +326,8 @@ ADPO 的设计使其天然适用于那些**答案质量可以客观度量、且�
 4.  **计算开销与可扩展性**：ADPO 的优势解耦优化需要为每个样本维护两组优势估计和 token 掩码，这增加了训练时的计算图复杂度。论文未报告 ADPO 相对于 GRPO 的训练时间或显存开销。对于更大规模的模型（如 13B、34B 参数级别），这种额外开销是否仍然可接受，需要实际验证。
 
 5.  **与推理时扩展策略的深度结合**：ADPO 当前仅探索了 best-of-N 选择这一种测试时扩展策略。其输出的连续验证分数是否可以与更复杂的搜索策略（如树搜索、束搜索）结合，以进一步推动性能边界，是一个具有潜力的开放方向。
+
+
 
 ## 原文 PDF
 

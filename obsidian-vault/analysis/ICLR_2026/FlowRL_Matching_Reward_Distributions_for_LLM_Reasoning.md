@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/FlowRL_Matching_Reward_Distributions_for_LLM_Reasoning.pdf
+project_link: null
+code_link: https://github.com/Xuekai-Zhu/FlowRL
 openreview_forum_id: lObnTKbm9U
 aliases:
 - FlowRL
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | FlowRL：通过流平衡实现LLM推理的奖励分布匹配 |
 | 英文题名 | FlowRL: Matching Reward Distributions for LLM Reasoning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=lObnTKbm9U); [GitHub](https://github.com/Xuekai-Zhu/FlowRL) |
+| Links | [paper](https://openreview.net/forum?id=lObnTKbm9U) · [GitHub](https://github.com/Xuekai-Zhu/FlowRL) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | FlowRL |
 | Dataset | Math Benchmarks Avg (Qwen2.5-32B), Math Benchmarks Avg (Qwen2.5-7B), LiveCodeBench |
@@ -41,7 +43,7 @@ claims:
 > - Math Benchmarks Avg (Qwen2.5-32B) 上，Avg@16 为 48.39，对比 43.25 (PPO)，变化 +5.14。
 > - Math Benchmarks Avg (Qwen2.5-7B) 上，Avg@16 为 35.63，对比 32.48 (GRPO)，变化 +3.15。
 
-## 概述
+## 概要
 
 ### 瓶颈与动机
 
@@ -75,7 +77,7 @@ FlowRL处于**GFlowNets × RL for LLMs**的交叉点。与GRPO等基于优势函
 
 FlowRL目前依赖结果奖励（outcome reward），未使用过程监督信号，可能无法捕捉推理步骤的局部正确性。可学习配分函数 $Z_\phi$ 引入了额外参数，略微增加训练开销。实验范围目前限于数学与代码推理，在对话、摘要等其他任务上的有效性有待验证。开放问题包括：如何将过程奖励融入分布匹配框架、$Z_\phi$ 在大规模模型上的扩展性、以及 $\beta$ 超参数的自适应调节策略。
 
-## 背景与动机
+
 
 ### 推理能力增强的现状与瓶颈
 
@@ -95,7 +97,9 @@ $$\min_{\theta} \mathcal{D}_{\mathrm{KL}}\left(\pi_{\theta}(\mathbf{y} \mid \mat
 
 即最小化策略与奖励加权分布之间的反向 KL 散度。该目标的梯度天然包含奖励最大化项和熵正则化项，理论上同时促进高奖励生成与多样性保持。为实现这一目标，FlowRL 引入可学习配分函数 $Z_\phi$ 将标量奖励归一化为概率分布，并以轨迹平衡损失作为可操作的优化代理，从而在数学与代码推理任务上实现准确率与多样性的双重提升。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FlowRL的核心创新在于**从根本上改变了强化学习微调LLM推理的优化范式**：从传统的“奖励最大化”转向“奖励分布匹配”。这一转变直指现有方法（PPO、GRPO、REINFORCE++）的根本瓶颈——这些方法倾向于过度优化主导奖励信号，使策略坍缩到少数高奖励模式，导致生成推理的多样性丧失（模式坍缩）。
 
@@ -148,7 +152,7 @@ $$\mathcal{L}_{\mathrm{FlowRL}} = w \cdot \bigg( \log Z_{\phi}(\mathbf{x}) + \fr
 
 这些创新的协同效果在实验中得到验证：FlowRL在32B模型上实现数学推理平均准确率48.39%，显著超过GRPO的38.34%（+10.05个百分点），并在多样性评测中远高于所有奖励最大化基线（Figure 4）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_lObnTKbm9U/figures/001_Figure_1.jpg]]
 *Figure 1: Top: Comparison between distribution-matching and reward-maximizing approaches. FlowRL (left) learns to match the full reward distribution, maintaining diversity across multiple modes with low KL divergence. In contrast, reward-maximizing methods (right) such as RE-INFORCE++ (R++; Sutton et al., 1999b; Hu et al., 2025), PPO (Schulman et al., 2017), and GRPO (Shao et al., 2024) concentrate on a single high-reward peak, leading to mode collapse and higher KL divergence. Bottom: Performance comparison. FlowRL consistently outperforms GRPO across math and code domains*
@@ -219,7 +223,7 @@ $$\min_{\theta} \mathcal{D}_{\mathrm{KL}}(\pi_{\theta}(\mathbf{y} \mid \mathbf{x
 
 通过最小化反向 KL 散度，策略被迫覆盖奖励分布的所有模式，而非仅追求最高峰。Figure 1 的示意对比清晰展示了这一差异：FlowRL 的 KL 散度仅为 0.11，而奖励最大化方法达到 8.68。
 
-## 核心模块与公式推导
+
 
 ### 问题瓶颈与优化目标转换
 
@@ -301,7 +305,9 @@ $$
 
 其中 $\hat{r}_i = \frac{r_i - \mathrm{mean}(\mathbf{r})}{\mathrm{std}(\mathbf{r})}$ 为组内奖励归一化。该目标通过轨迹平衡损失实现分布匹配，通过重要性采样修正off-policy偏差，通过长度归一化稳定可变长度训练，通过参考模型先验约束策略空间。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -393,7 +399,9 @@ Figure 5 展示了 Qwen2.5-7B 上的训练动态：FlowRL 的 AIME 2025 Acc@8 �
 2. **配分函数开销**：$Z_\phi$ 引入额外参数，虽开销不大，但在极大规模模型上的扩展性尚未验证。
 3. **任务覆盖有限**：当前实验仅涵盖数学与代码推理，对话、摘要等非推理领域的有效性需进一步验证。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 从奖励最大化到分布匹配：范式转换
 
@@ -443,6 +451,8 @@ FlowRL目前存在以下适用边界和局限：
 3. **非推理领域的多样性收益**：FlowRL在安全对齐、长文本生成等非推理领域是否同样能带来多样性收益？这些任务中奖励信号的定义和分布特性可能与数学/代码推理有本质差异。
 
 4. **$\beta$的自适应策略**：能否设计$\beta$的自适应调整策略以进一步减少手动调参工作？例如，根据训练过程中的奖励分布统计量动态调整温度参数，或采用元学习的方法自动搜索最优$\beta$。
+
+
 
 ## 原文 PDF
 

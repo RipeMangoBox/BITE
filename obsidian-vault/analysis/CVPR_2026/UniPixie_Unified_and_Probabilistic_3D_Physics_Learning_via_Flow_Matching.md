@@ -43,7 +43,7 @@ claims:
 > - PIXIEMULTIVERSE (LBS) 上，视频重建 PSNR (soft α=0.0) 优于 Vid2Sim (full) 及 Vid2Sim (fast) vs Vid2Sim (full) (在除 α=0.5 外的所有指标和硬度上均有领先)。
 > - PIXIEMULTIVERSE (Spring‑Mass) 上，视频重建 PSNR/SSIM/LPIPS 显著优于 Spring‑Gaus 和 Spring‑Gaus (tuned) vs Spring‑Gaus (tuned) (在所有 α 上均为最佳)。
 
-## 概述
+## 概要
 
 从单张或多视角图像中推断物体的物理属性，是机器人操作、增强现实和物理仿真等任务的关键前提。然而，真实世界的物理属性存在固有的**视觉模糊性**：同一外观可对应从柔软到坚硬等一系列可能的材料状态。现有方法（如 **PIXIE**，Le et al., arXiv 2025）大多将物理属性预测建模为确定性回归问题，仅输出单一的点估计，完全忽略了这种一对多的物理可能性，导致仿真结果缺乏多样性与真实感。
 
@@ -53,7 +53,7 @@ UNIPIXIE 在架构上采用**共享编码器 + 专用解码头**的设计：一�
 
 在实验上，UNIPIXIE 在 PIXIEMULTIVERSE 数据集上取得了突破性结果：在 MPM 物理属性回归任务中，Young’s Modulus 的均方误差（MSE）较最强确定性基线 PIXIE 降低超过 50%（从 0.0250 降至 0.0091）；在 LBS 和 Spring‑Mass 求解器的视频重建质量上，单一统一模型均达到与各专有模型竞争或更优的 PSNR/SSIM/LPIPS 指标。通过调节 $\alpha$，模型能够生成从柔软到坚硬连续变化的物理行为，验证了连续谱建模的有效性。
 
-## 背景与动机
+
 
 ### 视觉物理理解的核心瓶颈：从确定性回归到概率生成
 
@@ -78,7 +78,9 @@ UNIPIXIE 在架构上采用**共享编码器 + 专用解码头**的设计：一�
 - **标量控制的直观交互**：引入单一标量控制参数 $\alpha \in [0,1]$，通过在最软（$\alpha=0$）和最硬（$\alpha=1$）状态之间线性插值，实现对整个材料属性谱的连续、平滑遍历。
 - **多求解器统一架构**：设计求解器无关的共享编码器与专用解码头，使单一模型能够同时为 MPM、线性混合蒙皮（LBS）和弹簧-质点（Spring-Mass）三种主流物理引擎生成仿真就绪的参数，突破专用模型的孤岛限制。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 UNIPIXIE 的核心创新在于将三维物理属性预测从确定性回归重新定义为**可控的条件生成问题**，并通过统一的编码器-解码器架构同时服务于多种物理求解器。这一范式转变由以下四个关键“changed slots”支撑。
 
@@ -129,7 +131,7 @@ PIXIE 仅支持 MPM 求解器，而 UNIPIXIE 的单一统一架构可同时服�
 
 UNIPIXIE 的四项 changed slots 形成了完整的创新链条：**生成式范式**解决了物理模糊性的根本瓶颈，**Perceiver-IO + FMT 架构**为条件生成提供了技术载体，**连续属性谱输出**使可控生成成为现实，而**统一多求解器支持**则将这一能力推广到异构物理引擎，实现了“一次编码，多引擎部署”的便携性。
 
-## 整体框架
+
 
 UNIPIXIE 是一个前馈式统一框架，将物理属性预测重新定义为从视觉输入学习连续、可控的条件分布。其整体 pipeline 由三个核心阶段串联构成：**视觉特征体素化 → 统一潜编码 → 多求解器条件生成**。图 2(a) 展示了这一完整数据流：多视图 RGB 图像首先经 CLIP 编码器提取密集特征，经体素化后形成 $64^3$ 的特征网格 $\mathcal{G}_{\mathrm{feat}}$；随后由统一网格编码器 $\boldsymbol{\mathcal{E}}$ 将其压缩为与求解器无关的潜表示；最后，三个并行的专用解码头从同一潜表示出发，在标量控制参数 $\alpha \in [0,1]$ 的调制下，分别生成适用于 MPM、LBS 和 Spring-Mass 物理引擎的仿真就绪参数。
 
@@ -179,7 +181,7 @@ $$\mathcal{L}_{\mathrm{CFM}} = \mathbb{E}_{t, \boldsymbol{x}_0, y_{\mathrm{targe
 ![[assets/figures/papers/paper_list_l2617_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_UniPixie_Unified/figures/003_Figure_3.jpg]]
 *Figure 3: PIXIEMULTIVERSE: Annotation Pipeline and Data Overview. We introduce a dataset with annotated material property ranges for controllable generation. Our semi-automatic annotation pipeline employs an Actor-Critic VLM design with human verification, extending PIXIE [9], to label 10 semantic object classes (a). We show the resulting distributions of annotated ranges for MPM solver parameters: density (b), Poisson’s ratio (c), and Young’s modulus (d), which serve as the foundation for our multi-solver framework*
 
-## 核心模块与公式推导
+
 
 UNIPIXIE 的核心架构由三个关键模块构成：统一网格编码器、条件流匹配 Transformer 解码器，以及多求解器解码头。整个流水线从多视图 CLIP 特征出发，经由与求解器无关的潜表示，最终在标量控制参数 α 的驱动下生成适配不同物理引擎的仿真参数。
 
@@ -219,7 +221,9 @@ $$\mathcal{D}_{\mathrm{Spring}} : (z_{\mathrm{latent}}, \alpha) \to m_{\mathrm{s
 
 三个解码头共享统一的编码器与潜表示，仅解码器参数独立，实现了单一模型对 MPM、LBS 和 Spring-Mass 三种物理引擎的统一支持。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 4.1 物理属性回归：从点估计到连续谱生成
 
@@ -273,7 +277,9 @@ Figure 5 和 Section 4.4 的定性分析验证了 α 参数对物理行为的连
 
 这些局限同时指向了明确的研究方向：将一维连续谱扩展至多维材料流形，以及引入遮挡推理机制以实现完整的体积物理属性估计。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -310,6 +316,8 @@ UNIPIXIE 开辟了概率三维物理学习的新方向，同时留下了若干�
 **从模拟视频到物理属性的逆向推理**：UNIPIXIE 目前从静态视觉输入预测物理属性。若能结合物体在受力下的动态视频作为额外条件，可能进一步提升物理属性估计的准确性，并扩展至更复杂的材料行为（如断裂、塑性变形）的识别。
 
 **物理属性谱的细粒度控制与编辑**：当前 α 参数提供全局的软硬控制。是否可以实现空间变化的局部硬度控制（如物体不同区域具有不同的 α 值），以支持更精细的物理行为编辑？这需要在条件流匹配框架中引入空间变化的条件信号。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,7 @@ paper_level: A
 venue: NeurIPS
 year: 2023
 pdf_ref: paperPDFs/NEURIPS_2023/Towards_Distribution_Agnostic_Generalized_Category_Discovery.pdf
+code_link: https://github.com/JianhongBai/BaCon
 project_link: https://github.com/JianhongBai/BaCon
 aliases:
 - SBCACFB
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 迈向分布无关的广义类别发现 |
 | 英文题名 | Towards Distribution-Agnostic Generalized Category Discovery |
 | 会议/期刊 | NeurIPS 2023 |
-| Links | [paper](https://arxiv.org/abs/2310.01376); [GitHub](https://github.com/JianhongBai/BaCon) |
+| Links | [paper](https://arxiv.org/abs/2310.01376) · [GitHub](https://github.com/JianhongBai/BaCon) |
 | Topic | #topic/benchmarks_datasets_evaluation #topic/benchmarks_datasets_evaluation/benchmarking |
 | Method | Self-Balanced Co-Advice contrastive framework (BaCon) |
 | Dataset | CIFAR-10-LT, CIFAR-100-LT, ImageNet-100-LT, Places-LT |
@@ -42,7 +43,7 @@ claims:
 > - CIFAR-100-LT 上，Overall Accuracy (All) 为 67.2，对比 62.2，变化 +5.0。
 > - ImageNet-100-LT 上，Overall Accuracy (All) 为 83.7，对比 78.9，变化 +4.8。
 
-## 概述
+## 概要
 
 **问题瓶颈**：广义类别发现（GCD）旨在从部分标注数据中同时识别已知类别与发现新类别，但现有方法隐含假设数据分布是类别平衡的。当训练集呈现长尾分布时，模型对少数类产生严重偏差，且缺乏对新类别的有效监督信号。实验显示，SimGCD 在平衡 CIFAR-100 上的总体准确率为 71.3%，而在长尾版本上骤降至 52.8%（Table 2），揭示了数据不平衡是 GCD 的核心瓶颈。在分布先验未知的开放环境中，这一冲突进一步加剧。
 
@@ -52,7 +53,7 @@ claims:
 
 **主要结果**：在四个长尾图像识别数据集（CIFAR-10/100-LT、ImageNet-100-LT、Places-LT）上，BaCon 均大幅超越所有基线方法。以 CIFAR-100-LT 为例，BaCon-S 在新类别准确率上超越最佳基线 17.5%，总体准确率提升 5.0%（Table 3）。消融实验证实，分布正则化、去偏采样和软对比损失三个组件协同作用才能获得最优性能（Table 6）。在不同不平衡率、已知类别数量及标注比例下，BaCon 均保持一致的性能优势（Tables 5, 9, 10）。
 
-## 背景与动机
+
 
 ### 问题背景：广义类别发现中的数据分布挑战
 
@@ -83,7 +84,9 @@ BaCon由两个协同工作的分支构成（Figure 2）：
 
 两个分支形成互增强的闭环：对比分支提供分布估计来校准伪标签分支，伪标签分支提供平衡化监督来优化对比分支。这一设计使得BaCon无需任何先验分布信息，即可在长尾开放环境中同时准确分类已知类并发现新类。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 BaCon的核心创新在于构建了一个**自平衡协同建议对比框架**，通过对比学习分支与伪标签分支的双向交互，在无先验分布的条件下解决长尾开放类别发现问题。其关键创新点可归纳为三个相互耦合的**changed slots**：
 
@@ -137,7 +140,7 @@ $$\mathcal{L}_{\mathrm{CL}}^{soft}(\mathcal{D}) = \frac{1}{|\mathcal{D}|} \sum_{
 
 这种“自平衡协同建议”机制使得两个分支在训练中相互增强，无需任何先验分布假设即可学习到一致、平衡的特征表示。在CIFAR-100-LT上，BaCon-S在新类别准确率上超越最佳基线17.5%，验证了这一创新闭环的有效性。
 
-## 整体框架
+
 
 BaCon 采用双分支协同结构，由一个**对比学习分支 (contrastive-learning branch)** 和一个**伪标签分支 (pseudo-labeling branch)** 组成，两者共享并冻结 ViT-B/16 骨干网络（仅微调最后一个 block），通过交互式监督共同应对分布无关的广义类别发现问题。
 
@@ -150,7 +153,7 @@ BaCon 采用双分支协同结构，由一个**对比学习分支 (contrastive-l
 ![[assets/figures/papers/paper_list_l1500_https_arxiv_org_abs_2310_01376/figures/005_Figure_2.jpg]]
 *Figure 2: Overview of the self-balanced co-advice contrastive framework (BaCon)*
 
-## 核心模块与公式推导
+
 
 ### 整体框架
 
@@ -226,7 +229,9 @@ $\gamma_{1}$ 和 $\gamma_{2}$ 为平衡系数。该设计使得对比分支既�
 
 测试时仅使用对比学习分支的骨干网络提取特征，通过 k-means 聚类获得最终预测。伪标签分支在训练完成后被丢弃。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -366,7 +371,9 @@ $\gamma_{1}$ 和 $\gamma_{2}$ 为平衡系数。该设计使得对比分支既�
 ![[assets/figures/papers/paper_list_l1500_https_arxiv_org_abs_2310_01376/figures/013_Table_6.jpg]]
 *Table 6: BaCon ablation experiments. For each ablation, we report test accuracy (%) of known, novel and all classes, denote as ‘Old’, ‘New’, and ‘All’. Our default settings are marked in orange*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 任务定义与相关设置的边界
 
@@ -412,6 +419,8 @@ BaCon 的自平衡协同建议机制可分解为三个相互增强的组件：
 2. 能否通过近似方法（如 mini-batch k-means、在线聚类）加速分布估计以降低计算开销？
 3. 在无法提供总类别数先验的条件下，BaCon 能否自适应估计类别数量？这需要聚类算法具备模型选择能力。
 4. 如何进一步提升在极低标注比例下的性能？可能的改进方向包括引入主动学习策略选择最有信息量的标注样本，或利用预训练视觉-语言模型的零样本能力提供弱监督。
+
+
 
 ## 原文 PDF
 

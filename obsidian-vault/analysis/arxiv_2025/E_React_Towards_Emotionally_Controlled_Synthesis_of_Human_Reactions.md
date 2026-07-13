@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/E_React_Towards_Emotionally_Controlled_Synthesis_of_Human_Reactions.pdf
+project_link: https://ereact.github.io/
+code_link: null
 aliases:
 - ER
 - E-React
@@ -40,7 +42,7 @@ claims:
 > - Inter-X-e (emotion-conditioned reaction generation) 上，FID 1.94 vs current best baseline (not explicitly reported in chunk) (improved)；inference time (s) 6.54 vs 6.64 (ReGenNet) (-0.10)。
 > - Inter-X-e (unconditional reaction generation) 上，FID 1.95 vs 2.13 (ReGenNet) (-0.18)；DIV 5.72 vs 5.62 (ReGenNet) (+0.10)。
 
-## 概述
+## 概要
 
 **E-React** 提出了一种面向情绪控制的人类反应运动合成框架，旨在解决现有反应生成方法中“情感动态缺失”这一核心瓶颈——传统方法生成的响应动作往往僵硬且缺乏情感表达，难以在保持空间交互一致性的同时有效注入情感信号。
 
@@ -50,7 +52,7 @@ claims:
 
 **方法定位**：E-React属于扩散模型驱动的双人交互运动生成方法，其核心贡献在于将半监督情感表征学习与对称交互扩散架构相结合，首次实现了对反应运动的情感可控合成。与**MDM**（Tevet et al., 2023）等通用扩散运动模型、**InterGen**（Liang et al., 2024b）等双人交互框架以及**ReMoS**（Ghosh et al., 2024）、**ReGenNet**（Xu et al., 2024b）等专门的反应生成方法相比，E-React的关键区别在于：以概率化情感先验替代离散情感嵌入，以对称共享权重的扩散架构替代独立编码器设计，从而在交互保真度与情感表现力之间取得更好的平衡。
 
-## 背景与动机
+
 
 ### 人类反应生成：从动作建模到情感表达
 
@@ -75,7 +77,9 @@ claims:
 
 本文提出的 **E-React** 框架正是围绕这两个动机展开：通过半监督情感先验网络从稀缺标注中学习概率化的情感表征，再通过对称的演员-反应者扩散架构，将情感嵌入与空间交互约束统一在去噪过程中，从而首次实现面向情绪控制的人类反应合成。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 E-React 的核心创新在于首次将**情感动态**显式地建模为人类反应生成的控制信号，并通过两个关键的技术“槽位变更”（changed slots）实现了从僵硬反应到情感可控反应的跨越。
 
@@ -122,7 +126,7 @@ $$L_{total} = L_{rc} + L_{react} + L_{bone} + L_{smooth} + L_{foot} + L_{emo}$$
 
 最终，E-React 在 Inter-X-e 数据集的情感条件反应生成任务中，FID 低至 1.94，ACC 达 0.86，用户研究表明其生成的反应与真实动作几乎无法区分（得分 83 vs GT 87），远超其他基线方法。
 
-## 整体框架
+
 
 E-React 的整体框架围绕一个核心洞察构建：**在短时序窗口内，同一运动序列的不同片段承载着一致的情感特征**。基于此，方法通过两条协同主线——情感先验学习与对称扩散生成——实现对反应运动的情感可控合成。
 
@@ -179,7 +183,7 @@ $$L_{emo} = \frac{(\hat{e}_{emo} - \mu)^2}{2\sigma^2}$$
 ![[assets/figures/papers/paper_list_l1680_E_React_Towards_Emotionally_Controlled_Synthesis_of_Human_Reactions/figures/012_Figure_5.jpg]]
 *Figure 5: Illustration of the emotion annotation process*
 
-## 核心模块与公式推导
+
 
 E-React 框架的核心由两个紧密耦合的模块构成：**半监督情感先验网络**与**对称 Actor-Reactor 扩散模型**。前者从有限标注的运动数据中解耦出连续的情感表示，后者则在该情感嵌入的引导下，以空间一致的方式生成反应运动。
 
@@ -262,7 +266,9 @@ $$ \mathcal{L}_{emo} = \frac{(\hat{e}_{emo} - \mu)^2}{2\sigma^2} $$
 ![[assets/figures/papers/paper_list_l1680_E_React_Towards_Emotionally_Controlled_Synthesis_of_Human_Reactions/figures/003_Figure_3.jpg]]
 *Figure 3: Illustration of the semi-supervised training process. For motion sequences with emotional annotations, we employ ground-truth label to supervise the predicted results. For unlabeled motion data, we first generate multiple shorter motion clips through repeated sampling, and then train the model using emotion consistency constraints across these clips*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 任务定义与评估协议
 
@@ -379,7 +385,9 @@ E-React聚焦于**情感条件的人类反应生成**：给定演员运动序列
 4. 如何实现情感强度的连续控制或情感混合，使反应生成更加细腻自然？
 5. 多模态控制信号的融合仍是一个开放挑战，特别是在有限数据下如何有效结合文本、语音和情感。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心瓶颈与因果机制
 
@@ -429,6 +437,8 @@ E-React 揭示的开放问题指向以下研究方向：
 **连续情感控制**：如何实现情感强度的连续控制或情感混合，使反应生成更加细腻自然？从离散高斯先验到连续情感空间的映射是一个关键挑战。
 
 **多模态信号融合**：多模态控制信号的融合仍是一个开放挑战，特别是在有限数据下如何有效结合文本、语音和情感。E-React 目前仅使用情感标签和运动数据，未来可探索文本描述、语音语调等多模态情感线索的整合。
+
+
 
 ## 原文 PDF
 

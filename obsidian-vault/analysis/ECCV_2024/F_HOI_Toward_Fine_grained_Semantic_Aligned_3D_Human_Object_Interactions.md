@@ -5,6 +5,8 @@ paper_level: A
 venue: ECCV
 year: 2024
 pdf_ref: paperPDFs/ECCV_2024/F_HOI_Toward_Fine_grained_Semantic_Aligned_3D_Human_Object_Interactions.pdf
+project_link: https://f-hoi.github.io
+code_link: https://github.com/tatsu-lab/stanford\_alpaca
 aliases:
 - FH
 - F-HOI
@@ -41,7 +43,7 @@ claims:
 > - Semantic-HOI 推理任务 上，BLEU-4 ↑ 25.56 vs 19.51 (+6.05)。
 > - Semantic-HOI 生成任务 上，平均 Chamfer 距离 (↓) 22.9 vs 44.4 (-21.5)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有三维人-物交互（3D HOI）数据集与模型仅使用粗粒度的全局动作描述（如“拿起杯子”），缺乏对中间状态及状态间转换的细粒度语义标注。这导致模型难以在细粒度语义空间中精确对齐HOI状态，无法支持“从抓握到举起再到倾斜”这类状态级别的理解与生成。
 
@@ -51,7 +53,7 @@ claims:
 
 **主要结果**：在Semantic-HOI数据集的四项任务上，F-HOI均显著超越经微调的LLaVA-1.5V-7B + 3D HOI-Pose嵌入基线。理解任务BLEU-4从20.09提升至26.78（+6.69），推理任务BLEU-4从19.51提升至25.56（+6.05），生成任务平均Chamfer距离从44.4降至22.9（-21.5），物体条件重建任务平均Chamfer距离从45.1降至24.7（-20.4）。消融实验证实偏移回归、对齐预训练与多任务联合训练均为关键设计选择。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -75,7 +77,9 @@ claims:
 
 这一思路面临三个核心挑战：（1）如何系统性地构建包含细粒度状态描述的数据集；（2）如何设计能够同时编码二维图像、三维物体网格、三维HOI-Pose与文本的统一架构；（3）如何定义多样化的下游任务以验证细粒度对齐的实际效果。本文后续章节将围绕这三个挑战展开。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 针对现有三维人-物交互（HOI）研究仅依赖粗粒度全局动作描述、缺乏对中间状态及状态间转换的细粒度语义标注这一核心瓶颈，F-HOI 提出了一套从数据构建到模型训练的系统性创新方案。
 
@@ -132,7 +136,7 @@ $$\mathcal{L}_{\mathrm{hoi}} = \Delta \theta_{\mathrm{gt}} - \Delta \theta_{\mat
 
 综上，F-HOI 的核心创新在于通过细粒度数据集构建、多模态输入扩展、状态级任务设计和两阶段对齐训练，首次实现了三维人-物交互在细粒度语义空间中的对齐。
 
-## 整体框架
+
 
 F-HOI 是一个统一的多模态框架，旨在学习二维图像、三维几何与语言空间之间一致的细粒度人-物交互表示。其核心设计思路是：将异构输入模态分别编码为 token 序列，送入一个冻结后经 LoRA 微调的大语言模型骨干进行序列建模，再通过任务特定的反投影头将隐藏表示解码为文本描述或 HOI-Pose 参数。整个框架由三个组件构成：**多模态编码器**、**大语言模型骨干**、**任务特定投影头**（Fig. 4）。
 
@@ -157,7 +161,7 @@ F-HOI 是一个统一的多模态框架，旨在学习二维图像、三维几�
 
 **模块关系总结**。整个框架的信息流是单向的：多模态编码器将异构输入统一为 token 序列 → LLM 骨干进行跨模态序列建模 → 任务特定投影头根据指令类型选择性解码。这种设计使得同一套模型权重可以支持理解、推理、生成和重建四类任务，仅需切换任务指令即可。
 
-## 核心模块与公式推导
+
 
 ### 3.1 HOI 状态的形式化表示
 
@@ -223,7 +227,9 @@ $$\mathcal{L}_{\text{hoi}} = \| \Delta \theta_{\text{gt}} - \Delta \theta_{\text
 ![[assets/figures/papers/paper_list_l1759_F_HOI_Toward_Fine_grained_Semantic_Aligned_3D_Human_Object_Interactions/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of three state-level tasks to achieve fine-grained semantic alignment*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -305,7 +311,9 @@ F-HOI在Semantic-HOI数据集上定义的四项状态级HOI任务中，均显著
 ![[assets/figures/papers/paper_list_l1759_F_HOI_Toward_Fine_grained_Semantic_Aligned_3D_Human_Object_Interactions/figures/012_Figure_5.jpg]]
 *Figure 5: Qualitative results of F-HOI on generation task*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法沿革与基线对比
 
@@ -355,6 +363,8 @@ F-HOI 的核心贡献在于**首次将状态级细粒度语义对齐引入 3D HO
 - **局限性认知**：明确了当前方法在模态依赖、泛化能力、时序建模和评估指标等方面的不足，为后续工作指明了改进方向。
 
 对于后续研究，F-HOI 可作为细粒度 3D HOI 任务的强基线，其消融发现（偏移回归的增益、对齐预训练的必要性、多任务联合训练的相互增强效应）为相关方法设计提供了可复用的经验。同时，其开放问题列表为社区提供了明确的研究议程。
+
+
 
 ## 原文 PDF
 

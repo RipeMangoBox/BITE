@@ -44,7 +44,7 @@ claims:
 > - HDTF 上，FID ↓ (图像质量) 20.332 vs 25.110 (FLOAT) (-4.778)。
 > - ViCo 上，FD-Exp ↓ (表情分布距离) 16.64 vs 17.52 (INFP*) (-0.88)。
 
-## 概述
+## 概要
 
 交互式头部化身生成旨在根据用户的语音、面部动作等实时输入，驱动一个虚拟化身进行自然的对话回应。然而，现有方法面临两个核心瓶颈：**实时性不足**与**动作表现力低下**。一方面，以 INFP 为代表的双向模型需要完整的对话上下文才能生成化身动作，导致用户输入延迟高达 3.4 秒，无法满足真实对话场景的实时交互需求。另一方面，现有倾听数据集中化身动作的表现力较弱，模型学到的倾听行为往往被动、僵硬，缺乏主动的非语言互动。
 
@@ -55,7 +55,7 @@ claims:
 
 在 RealTalk 数据集上，Avatar Forcing 的用户输入延迟为 0.5 秒，反应性指标 rPCC‑Exp 降至 0.003，运动丰富度 SID 提升至 2.442。人类偏好研究中，该方法以超过 80% 的整体支持率显著优于 INFP*。消融实验进一步验证了用户运动输入和 DPO 微调对实时反应性与动作表现力的关键作用。
 
-## 背景与动机
+
 
 ### 交互式头像生成的实时性瓶颈
 
@@ -79,7 +79,9 @@ claims:
 
 这两个技术路径共同指向一个目标：在保证实时响应的前提下，让虚拟化身展现出自然对话中应有的主动性和互动感。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Avatar Forcing 的核心创新在于通过两个“因果开关”同时解决了交互式头部化身生成中长期存在的**实时性**与**表现力**两大瓶颈。
 
@@ -102,7 +104,7 @@ Avatar Forcing 的核心创新在于通过两个“因果开关”同时解决�
 
 消融实验（Table 5, Table 6）证实：加入用户运动输入后，反应性指标 rPCC-Exp 从 0.042 降至 0.003，运动丰富度 SID 从 2.236 升至 2.442；进一步配合 DPO 微调后，视觉质量指标（FID, FVD）同步提升，且人类偏好研究中整体偏好率超过 80%（Table 2）。
 
-## 整体框架
+
 
 Avatar Forcing 的整体 pipeline 将交互式头像生成建模为**运动潜在空间中的因果序列生成问题**，其核心由四个模块串联构成，形成端到端的实时视频生成流。
 
@@ -145,7 +147,7 @@ $$p_{\theta}(\mathbf{m}^{1:N}) = \prod_{i=1}^{N} p_{\theta}(\mathbf{m}^{i} \mid 
 
 在基础扩散强制训练之外，pipeline 引入了一个**无需人工标注的 DPO 微调回路**（Sec. 4.2）：利用仅受化身音频驱动的说话模型生成“弱偏好”运动样本（缺乏用户信号引导，动作被动），将其与真实运动构成偏序对 $(\mathbf{m}^w, \mathbf{m}^l)$，通过联合损失 $\mathcal{L}_{ft}(\theta) = \mathcal{L}_{DF}(\theta) + \lambda \mathcal{L}_{DPO}(\theta)$ 微调生成器。该回路显著增强了化身对用户动作的反应性和运动丰富度（Fig. 8）。
 
-## 核心模块与公式推导
+
 
 Avatar Forcing 的推理管线由四个关键模块串联构成，其核心创新在于将交互式头像生成重新定义为运动潜在空间中的因果序列建模问题。
 
@@ -212,7 +214,9 @@ $$\mathcal{L}_{DPO}(\theta) = -\mathbb{E}_{n, t_n, \mathbf{c}^n, (\mathbf{m}^{w,
 ![[assets/figures/papers/paper_list_l975_https_arxiv_org_abs_2601_00664/figures/016_Figure_11.jpg]]
 *Figure 11: Comparison of autoregressive diffusion and diffusion forcing. Autoregressive diffusion suffers from motion drift (red arrow) over the long horizon, whereas diffusion forcing maintains stable motion generation over the long horizon*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -269,7 +273,9 @@ Avatar Forcing 在交互式头像生成任务上实现了实时响应与表现�
 ![[assets/figures/papers/paper_list_l975_https_arxiv_org_abs_2601_00664/figures/013_Figure_8.jpg]]
 *Figure 8: Ablation study on preference optimization. Model fine-tuned with DPO produces more expressive motion (red box) and reactive (red arrow) compared to model without DPO*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位与核心瓶颈
 
@@ -346,6 +352,8 @@ $$
 3. **复杂多人对话场景的扩展**：如何在不增加人工标注的条件下，进一步对齐复杂的多人对话互动模式（如多人轮流发言、交叉信号、群体反应等）？当前的 DPO 策略仅针对双人交互设计，扩展到多人场景需要重新定义偏好对的构造逻辑。
 
 4. **偏好优化的理论边界**：DPO 微调中弱偏好样本的合成策略（丢弃用户信号）是否总是产生有效的偏好排序？在用户信号本身较弱或模糊的场景下，这种合成策略可能失效，需要更鲁棒的偏好构造方法。
+
+
 
 ## 原文 PDF
 

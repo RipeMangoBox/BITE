@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2026
 pdf_ref: paperPDFs/arxiv_2026/Hoi3DGen_Generating_High_Quality_Human_Object_Interactions_in_3D.pdf
+project_link: null
+code_link: https://github.com/
 aliases:
 - HGHQHOI3
 tags:
@@ -40,7 +42,7 @@ claims:
 > - 接触准确率（3D交互） 上，接触部位与文本提示的一致性百分比 90% vs TRELLIS N/A, InterFusion N/A (N/A)。
 > - 用户研究偏好 上，参与者选择的比例 91.09% (文本一致性) / 85.56% (3D质量) vs TRELLIS 3.44%/10.16%, InterFusion 5.47%/3.28% (显著优于其他方法)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：从文本描述生成高质量、接触语义精确的三维人物交互（HOI）面临双重挑战——一方面缺乏大规模、细粒度且配对准确的文本-3D交互数据，另一方面现有基于分数蒸馏采样（SDS）的方法难以在保持3D模型质量的同时精确控制接触语义。
 
@@ -50,7 +52,7 @@ claims:
 
 **主要结果**：在文本一致性 GPT 评分上，Hoi3DGen 达到 0.81，远超 TRELLIS 的 0.04 和 InterFusion 的 0.15（4–15× 提升）；接触准确率高达 90%，而基线方法基本无法处理接触语义。用户研究中，91% 的参与者在文本一致性上偏好 Hoi3DGen，86% 在 3D 质量上偏好 Hoi3DGen。消融实验证实，数据过滤、重新纹理化和多视图采样各自对接触准确率和文本一致性有显著贡献。
 
-## 背景与动机
+
 
 ### 3D人物交互生成的任务困境
 
@@ -82,7 +84,9 @@ claims:
 
 这一思路的关键优势在于：无需从头训练三维生成模型，而是充分利用二维基础模型的强大生成能力，通过数据质量提升和视图条件控制来实现三维交互的精确生成，从而在保持生成多样性的同时大幅提升接触准确率。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Hoi3DGen 的核心创新在于绕开了“大规模配对文本-3D交互数据”这一根本瓶颈，转而通过**分解式自动标注 + 小样本视图条件微调**，激活现有生成模型的隐式交互能力。其技术路线可概括为三个相互耦合的关键机制。
 
@@ -117,7 +121,7 @@ Hoi3DGen 在 3D 重建后引入一个独立的**重新纹理化步骤**，使用
 
 与 **TRELLIS**（通用文本到 3D，无交互语义）和 **InterFusion**（基于 SDS，存在 Janus 问题且生成质量低）相比，Hoi3DGen 的核心优势在于：用极少量高质量数据微调现有模型，激活其隐式的交互理解能力，同时保持多样性和泛化性，再通过多视图条件与 3D 提升管道实现精确的语义接触控制。
 
-## 整体框架
+
 
 Hoi3DGen 提出了一条从文本描述到高质量三维人物交互（HOI）生成的完整流水线。该框架的核心洞察在于：通过将复杂的交互描述任务分解为外观、动作和接触等子任务，利用开源多模态大语言模型（MLLM）自动生成高质量标注，从而用少量筛选数据微调现有生成模型，激活其隐式的人物交互能力。
 
@@ -141,7 +145,7 @@ Hoi3DGen 提出了一条从文本描述到高质量三维人物交互（HOI）�
 ![[assets/figures/papers/paper_list_l21_Hoi3DGen_Generating_High_Quality_Human_Object_Interactions_in_3D/figures/002_Figure_2.jpg]]
 *Figure 2: HOI3D framework overview. Top: We first leverage the existing multimodal foundation model InternVL [9] to perform decomposed annotation of human, object, and human-object-interaction of samples from the ProciGen [59] dataset. We then use LLaMa [17] to create a final detailed caption for the sample. Bottom: We leverage our data consisting of high-quality and diverse human-objectinteractions to fine-tune an existing text-to-image model. Subsequently, we establish a pipeline to reconstruct high-fidelity textured 3D meshes. The output of our final text-to-3D inference pipeline consists of segmented meshes for the human and object, as well as an animatable SMPL model*
 
-## 核心模块与公式推导
+
 
 Hoi3DGen 的核心架构由四个紧密协作的模块构成，分别解决数据标注、2D 交互生成、3D 重建与语义分割、以及可动画化人体配准问题。以下逐一阐述各模块的设计动机与关键公式。
 
@@ -210,7 +214,9 @@ $$
 ![[assets/figures/papers/paper_list_l21_Hoi3DGen_Generating_High_Quality_Human_Object_Interactions_in_3D/figures/019_Figure_6.jpg]]
 *Figure 6: Advantage of view conditioned sampling. Given same interaction prompt, our method generates three views that all correctly follow the contacts. Yet Hunyuan3D stuggle to reason the compositional shape under occlusion such as the leg occluded by the table in front view. By sampling side views as input to Hunyuan3D, we are able to generate at least one plausible 3D humanobject interaction for each text prompt*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果：文本一致性、3D质量与接触准确率
 
@@ -272,7 +278,9 @@ InterFusion 基于分数蒸馏采样（SDS），生成速度慢且受 Janus 问�
 ![[assets/figures/papers/paper_list_l21_Hoi3DGen_Generating_High_Quality_Human_Object_Interactions_in_3D/figures/036_Figure_11.jpg]]
 *Figure 11: More qualitative comparison. Our method consistently produces high quality results with correct contact and details*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位与核心瓶颈
 
@@ -317,6 +325,8 @@ Hoi3DGen 的适用边界受以下因素制约：
 1. **姿态生成模块化**：能否引入专用的文本到人体姿态生成模块，将复杂姿态描述显式转换为姿态参数（如 SMPL 参数），以突破姿态跟随瓶颈？
 2. **跨类别泛化**：在更广泛的对象类别和未见过的人体-物体交互组合上，当前方法的泛化性如何？是否可以通过扩大训练数据的类别覆盖范围来进一步提升？
 3. **动态交互扩展**：能否将该方法扩展至动态交互序列——即从文本生成连续的人体-物体交互动画，而非仅静态三维姿态？这需要解决时序一致性和物理合理性等新挑战。
+
+
 
 ## 原文 PDF
 

@@ -44,7 +44,7 @@ claims:
 > - VBench 上，Total Score 81.55 (M4V-PyramidFlow) / 86.14 (M4V-Wan2.1) vs N/A (公开数据训练模型的最佳结果) (N/A)。
 > - Computational efficiency (241-frame, 768p) 上，TFLOPs (mixer layers) 29.52 (Full+Temp-Branch) vs 55.44 (Full Attention) (-46.7%)。
 
-## 概述
+## 概要
 
 **核心瓶颈**：基于Transformer的视频扩散模型在处理长序列高分辨率视频时，其自注意力机制的二次复杂度（$\mathcal{O}((T M)^2)$，$T$为帧数，$M$为每帧序列长度）导致计算成本极高，严重制约了实际部署的可扩展性。
 
@@ -52,7 +52,7 @@ claims:
 
 **主要结果**：在VBench基准上，M4V（PyramidFlow）获得81.55总分，M4V（Wan2.1）获得86.14总分，均为使用公开数据训练的模型中的最佳结果。在768×1280分辨率下生成241帧视频时，MM-DiM块相比全注意力基线减少约45%的FLOPs（29.52 vs 55.44 TFLOPs）。消融实验证实，文本令牌重组显著提升文本-视频对齐，逐帧寄存器与轻量时序分支分别提升视频质量指标和总体得分，三者组合达到最优效率-性能平衡。
 
-## 背景与动机
+
 
 文本生成视频（Text-to-Video, T2V）旨在根据自然语言描述合成逼真且时序连贯的视频序列。近年来，基于扩散模型（Diffusion Models）的方法在该领域取得了显著进展，涌现出如**Sora**、**Kling**、**Gen-3 Alpha**等商业级系统，以及**CogVideoX**、**Open-Sora Plan**、**PyramidFlow**、**Wan2.1**等开源方案。这些模型通常采用基于Transformer的扩散主干网络（Diffusion Transformer, DiT），利用自注意力机制对文本和视觉令牌进行统一建模。
 
@@ -66,7 +66,9 @@ claims:
 
 针对上述问题，本文提出**M4V（Multi-Modal Video Mamba）**——一个基于多模态Mamba的高效文本生成视频框架。M4V的核心动机并非完全抛弃Transformer，而是在保留前端多模态DiT块（来自**FLUX**）的前提下，将后续计算密集的统一Transformer块替换为所提出的**多模态扩散Mamba（MM-DiM）块**。通过精心设计的令牌重组策略、空间扫描机制和轻量时序分支，MM-DiM块在几乎不损失生成质量的前提下，将计算量大幅降低——在生成768×1280分辨率视频时，相比全注意力基线减少**45%的FLOPs**（见**Figure 1**）。这一设计使得M4V能够在公开数据训练的条件下，在VBench基准上取得领先的生成质量（M4V-PyramidFlow总分81.55，M4V-Wan2.1总分86.14），同时保持显著的计算效率优势。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 M4V的核心创新在于用**多模态扩散Mamba（MM-DiM）块**替代视频扩散模型中的统一Transformer块，从根本上解决了自注意力机制的二次复杂度瓶颈。这一替换并非简单的算子更换，而是围绕Mamba状态空间模型（SSM）的固有局限——缺乏显式跨模态交互能力——进行了三项关键设计，形成了一套完整的**changed slots**体系。
 
@@ -94,7 +96,7 @@ Transformer通过QKV注意力自然地实现文本与视觉令牌的交互，而
 
 当前设计的替换范围限于后16个统一块，前8个MM-DiT块仍保留Transformer结构。是否可将MM-DiM推广至全架构、在更大规模公开数据集上的效率优势能否持续、以及能否引入视频级奖励模型，均为论文明确指出的开放问题。此外，训练依赖大规模预训练权重初始化，且使用了包含专有数据的混合数据集，可能影响完全公开条件下的复现性。
 
-## 整体框架
+
 
 M4V 的整体生成架构遵循“先多模态融合，后高效扩散建模”的宏观设计。如图 2(a) 所示，模型前端保留 8 个 **MM-DiT 块**（来自 FLUX），它们拥有独立的文本与视觉参数，负责初始的文本-视觉深度交互。在此之后，所有后续的 16 个统一块被替换为本文提出的 **多模态扩散 Mamba（MM-DiM）块**，这是整个框架效率瓶颈突破的核心所在。
 
@@ -126,7 +128,7 @@ M4V 的整体生成架构遵循“先多模态融合，后高效扩散建模”�
 ![[assets/figures/papers/paper_list_l2222_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_M4V_Multimodal_M/figures/002_Figure_2.jpg]]
 *Figure 2: (a) Overview of the generation architecture. (b) Detailed strcture of our MM-DiM Block*
 
-## 核心模块与公式推导
+
 
 ### 3.1 状态空间模型基础
 
@@ -199,7 +201,9 @@ $$\boldsymbol{c}^i = [K_{\downarrow_2}(x^0), \ldots, K_{\downarrow_2}(x^{i-3}), 
 ![[assets/figures/papers/paper_list_l2222_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_M4V_Multimodal_M/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of FLOPS between full attention baseline and ours*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果：VBench 基准
 
@@ -288,7 +292,9 @@ $$\mathcal{L}_{\mathrm{reward}} = - r_1(D(\hat{x}_1^i)) - r_2(D(\hat{x}_1^i))$$
 ![[assets/figures/papers/paper_list_l2222_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_M4V_Multimodal_M/figures/008_Figure.jpg]]
 *Figure: (a) A stylish woman walks down the streets of Tokyo, surrounded by warm neon lights and vibrant city signs. She wears a black leather jacket, ... (b) A futuristic cityscape at dusk, with flying cars zipping between towering skyscrapers adorned with neon lights. (c) A determined individual in a sleek, black athletic outfit jogs along a winding forest trail, surrounded by towering trees and*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 对Transformer视频扩散路线的继承与替换
 
@@ -347,6 +353,8 @@ M4V引入了基于奖励学习的训练后优化策略，使用HPSv2和CLIP两�
 3. **视频级奖励模型集成**：能否将VBench评估器或其他视频级质量模型纳入奖励学习框架，以直接优化时序一致性和运动质量？
 4. **超长视频生成**：Mamba的线性复杂度$\mathcal{O}(T M + T^2)$是否在超长视频（>1000帧）生成中带来显著的吞吐量优势？此时时序注意力的$\mathcal{O}(T^2)$项可能成为新瓶颈。
 5. **与其他高效架构的对比**：M4V与基于线性注意力、稀疏注意力或状态空间对偶（如Mamba-2）的视频扩散模型之间的效率-质量权衡尚未被系统比较。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Uncover_Underlying_Correspondence_for_Robust_Multi_view_Clustering.pdf
+project_link: null
+code_link: https://github.com/XLearning-SCU/2026-ICLR-CorreGen
 openreview_forum_id: a4S1nQay3b
 aliases:
 - UUCRMVC
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 揭示底层对应以实现鲁棒多视图聚类 |
 | 英文题名 | Uncover Underlying Correspondence for Robust Multi-view Clustering |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=a4S1nQay3b); [GitHub](https://github.com/XLearning-SCU/2026-ICLR-CorreGen) |
+| Links | [paper](https://openreview.net/forum?id=a4S1nQay3b) · [GitHub](https://github.com/XLearning-SCU/2026-ICLR-CorreGen) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | CorreGen |
 | Dataset | Scene15 (MR=0.2, CR=0.2), UMPC-Food101 (MR=0.2 |
@@ -40,7 +42,7 @@ claims:
 > - Scene15 (MR=0.2, CR=0.2) 上，ACC 为 41.78 (CorreGen)，对比 38.36 (Vanilla InfoNCE)，变化 +3.42。
 > - UMPC-Food101 (MR=0.2, CR=0.2) 上，ACC 为 45.97 (CorreGen)，对比 43.84 (Vanilla InfoNCE)，变化 +2.13。
 
-## 概述
+## 概要
 
 多视图聚类（MVC）通过挖掘不同视图间的互补信息实现无监督语义发现，其核心前提是跨视图实例级一一对应。然而，真实多视图数据中普遍存在**噪声对应**问题，表现为两类破坏：**类别级不匹配**（同类样本被误判为负对）和**样本级不匹配**（错配对与不可对齐样本）。现有方法主要沿两条路径处理该问题——对噪声对进行重加权或对实例对进行重对齐——但二者均未从根本上摆脱对预定义正负对指标的依赖，难以在严重噪声下区分真实语义关系与随机关联。
 
@@ -50,7 +52,7 @@ claims:
 
 实验结果表明，CorreGen在多个数据集和噪声设定下均取得最优聚类性能，在极具挑战的UMPC-Food101数据集上准确率提升约10%。消融实验证实，GMM引导的边缘估计与虚拟样本模块对噪声鲁棒性至关重要。后验分布可视化进一步揭示，模型能够从初始噪声对应中逐步发现类别级语义结构，验证了生成式建模在噪声对应学习中的有效性。
 
-## 背景与动机
+
 
 多视图聚类旨在利用来自不同来源或模态的互补信息，将样本划分到语义一致的组别中。近年来，对比学习凭借其强大的表示学习能力，已成为该领域的主导范式。其核心思想依赖于一个基本假设：跨视图的实例级对应关系是精确已知的——即第 $i$ 个样本在视图 $v_1$ 中的表示应当与视图 $v_2$ 中的第 $i$ 个样本形成正对，而与其他所有样本形成负对。
 
@@ -65,7 +67,9 @@ claims:
 
 本文的核心动机在于：**将噪声对应下的多视图聚类从判别式范式转变为生成式范式**。具体而言，我们提出 **CorreGen**，将跨视图对应关系建模为隐变量，通过最大化观测数据的边际对数似然来学习鲁棒表示。该方法无需预设任何正负对，而是通过期望最大化算法迭代推断潜在的软对应分布，使模型能够自动发现类别级语义关联，同时自适应地抑制样本级噪声。这一生成式框架不仅具有理论上的优雅性——标准 InfoNCE 可被证明为其在特定假设下的特例——更在多个噪声设定下取得了显著优于现有方法的聚类性能。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CorreGen的核心创新在于**从判别式对比学习到生成式最大似然估计的范式转换**，将噪声对应下的多视图聚类建模为隐变量生成问题。这一转换带来了三个关键的技术变革：
 
@@ -103,7 +107,7 @@ CorreGen引入两个互补机制应对不同层次的噪声：
 
 这两个机制协同工作，使CorreGen能够同时应对类别级不匹配（同类样本被误作负对）和样本级不匹配（错配对与不可对齐样本），这是现有重加权和重对齐范式所无法实现的。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l40_https_openreview_net_forum_id_a4S1nQay3b/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the CorreGen framework which operates via an EM procedure: the E-step infers the underlying correspondence distribution using GMM-guided marginals and a virtual sample mechanism to handle noise; the M-step subsequently utilizes these estimated soft correspondences to guide the robust representation learning*
@@ -124,7 +128,7 @@ $$\theta^* = \arg\max_\theta \sum_{i,j} Q_{ij} \log p(\mathbf{x}_i^{(v_1)}, \mat
 
 **关键性质**：该框架具有一般性——当边际分布退化为均匀分布且后验仅保留实例级一对一匹配时，M-step 目标精确退化为标准 InfoNCE 对比损失（Proposition 2），表明 CorreGen 是判别式对比学习的严格泛化。
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题定义与生成式建模
 
@@ -189,7 +193,9 @@ $$ \theta^{*} = \underset{\theta}{\arg\max} \sum_{i=1}^{N} \log \frac{\exp(s(z_i
 
 这一理论退化表明 CorreGen 是 InfoNCE 的严格泛化——当数据完全清洁时等价于对比学习，当存在噪声对应时通过软后验和自适应边际自动调整学习信号。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -246,7 +252,9 @@ CorreGen 以 **DIVIDE**（Lu et al., 2024）作为骨干网络，在其对比学
 ![[assets/figures/papers/paper_list_l40_https_openreview_net_forum_id_a4S1nQay3b/figures/021_Table_4.jpg]]
 *Table 4: The Category-level Mismatch Ratio (CMR) for the datasets used in our experiments*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：噪声对应下的多视图聚类瓶颈
 
@@ -335,6 +343,8 @@ CorreGen 的鲁棒性来源于一条清晰的因果链路：
 3. **更强骨干网络集成**：CorreGen 目前基于 DIVIDE 实现，能否与更强大的特征提取骨干（如 Transformer）或更复杂的模态（如视频、3D 点云）结合？生成式框架的理论优势是否在更强特征空间中依然显著？
 4. **在线/流式场景适配**：在完全在线或流式数据场景下，EM 框架的增量更新策略该如何设计？批量 Sinkhorn 算法难以直接适用于单样本或小批量流式到达的场景。
 5. **聚类数量未知时的扩展**：能否通过非参数贝叶斯方法（如 Dirichlet 过程混合模型）替代固定 $C$ 的 GMM，使 CorreGen 适用于聚类数量未知的场景？
+
+
 
 ## 原文 PDF
 

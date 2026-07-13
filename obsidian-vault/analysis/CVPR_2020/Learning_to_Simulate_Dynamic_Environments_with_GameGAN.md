@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2020
 pdf_ref: paperPDFs/CVPR_2020/Learning_to_Simulate_Dynamic_Environments_with_GameGAN.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/toronto-ai/GameGAN/
 aliases:
 - LSDEG
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | 学习模拟动态环境的 GameGAN |
 | 英文题名 | Learning to Simulate Dynamic Environments with GameGAN |
 | 会议/期刊 | CVPR 2020 |
-| Links | [paper](https://arxiv.org/abs/2005.12126); [Project](https://nv-tlabs.github.io/gameGAN); [Project](https://research.nvidia.com/labs/toronto-ai/GameGAN/) |
+| Links | [paper](https://arxiv.org/abs/2005.12126) · [Project](https://nv-tlabs.github.io/gameGAN) · [Project](https://research.nvidia.com/labs/toronto-ai/GameGAN/) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/generative_models_and_autoencoders |
 | Method | GameGAN |
 | Dataset | VizDoom (TakeCover mode), Pacman (partially observed 7×7 grid), Pacman-Maze Come-back-home |
@@ -41,7 +42,7 @@ claims:
 > - Pacman (partially observed 7×7 grid) 上，RL agent score (mean ± std) 为 1.13 ± 1.56 (GameGAN)，对比 1.24 ± 1.82 (World Model)，变化 -0.11。
 > - Pacman-Maze Come-back-home 上，d (距离比率，越低越好) 为 GameGAN (最低中位数)，对比 World Model / GameGAN-M，变化 显著降低。
 
-## 概述
+## 概要
 
 现有视频预测与基于世界模型的游戏模拟方法在处理**部分可观测的长序列模拟**时面临一个根本瓶颈：它们难以在长时间跨度内保持视觉一致性，并且无法有效解耦静态背景与动态对象。以迷宫导航为例，模型需要记住已探索区域的视觉外观，才能在代理返回时渲染出连贯的画面——而基于纯 RNN 隐藏状态或 VAE 重建损失的方案（如 **Action‑LSTM** 和 **World Model**（Ha & Schmidhuber））在此类需要长期记忆的任务上会迅速退化，产生模糊、断裂或不一致的帧序列。
 
@@ -57,7 +58,7 @@ GameGAN 的核心洞察在于：**将记忆定位为一张可学习移位的空�
 
 **局限与开放问题**：在随机性高且无需长期记忆的环境中（如标准 Pacman），完整 GameGAN 因记忆模块的训练复杂性反而略逊于 GameGAN‑M；迷宫生成有时无法正确闭合环线（Figure 10），表明拓扑一致性仍不完美。如何将该框架扩展到 3D 环境、减少对大规模交互数据的依赖、以及实现跨游戏的组件迁移，是尚未解决的开放问题。
 
-## 背景与动机
+
 
 ### 游戏模拟的视觉一致性难题
 
@@ -86,7 +87,9 @@ GameGAN 的提出旨在解决两个相互关联的挑战：
 
 除模拟本身外，解耦能力还催生了新颖的应用：无需修改原始游戏代码即可交换游戏背景（Figure 9），或将不同游戏的静态与动态组件重新组合。这为数据增强、迁移学习和可定制虚拟环境开辟了新路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GameGAN 的核心创新在于**将外部可学习记忆与解耦渲染引擎引入动作条件视频生成框架**，从而在部分可观测的长序列模拟中实现长期视觉一致性与静态/动态组件的自动分离。相对于现有基线，其关键改进体现在三个“changed slots”上。
 
@@ -139,7 +142,7 @@ $$
 
 然而，创新并非无代价。在 Pacman 等随机性高且无需长期记忆的环境中，完整 GameGAN 因记忆模块的额外训练复杂性导致 RL 代理得分（$1.13 \pm 1.56$）略低于简化版 GameGAN-M（Table 1）。迷宫生成中偶尔出现无法正确闭合环线的失败案例（Figure 10），表明拓扑一致性保证仍不完美。这些局限指向未来的改进方向：更强的正则化以保障闭环，以及将框架扩展到 3D 或真实世界环境。
 
-## 整体框架
+
 
 GameGAN 的目标是用神经网络替代传统游戏引擎，实现端到端的视觉模拟。其整体架构由三个核心模块串联构成：**动力学引擎（Dynamics Engine）**、**外部记忆模块（Memory Module）** 和**解耦渲染引擎（Rendering Engine）**，如 Figure 2 和 Figure 14 所示。
 
@@ -180,7 +183,7 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{GAN}} + \lambda_{\mathrm{A}} \mathcal{L}_{\
 
 现有视频预测和世界模型在部分可观测的长序列模拟中面临两个核心瓶颈：一是无法保持视觉一致性（重新访问先前位置时场景发生漂移），二是难以解耦静态背景与动态对象。GameGAN 通过**外部记忆模块**将静态场景信息存储为可学习移位的空间地图，配合**周期损失**强制记忆的长期稳定性，同时通过**多分支解耦渲染引擎**实现静态与动态组件的自然分离，从而在不依赖显式三维重建的条件下解决了上述问题。
 
-## 核心模块与公式推导
+
 
 GameGAN 由三个端到端训练的神经模块构成：**动力学引擎**、**外部记忆模块**和**解耦渲染引擎**。整体架构如 Figure 2 所示，其核心设计目标是在不依赖显式三维重建的情况下，实现长序列模拟中的视觉一致性与静态/动态组件的自动分离。
 
@@ -244,7 +247,9 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{GAN}} + \lambda_{\mathrm{A}} \mathcal{L}_{\
 
 其中 $\mathcal{L}_{\mathrm{GAN}}$ 包含单帧判别、动作条件判别和时间判别三种对抗损失；$\mathcal{L}_{\mathrm{Action}}$ 为动作分类损失，要求判别器从帧对中预测动作；$\mathcal{L}_{\mathrm{Info}}$ 为互信息最大化损失，防止模式坍塌；$\mathcal{L}_{\mathrm{recon}}$ 和 $\mathcal{L}_{\mathrm{feat}}$ 分别为 L2 重建损失和感知特征损失，提供额外的监督信号。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 
@@ -286,33 +291,20 @@ GameGAN 在 VizDoom 和 Pacman 两个部分可观测环境中进行了模拟质�
 ![[assets/figures/papers/paper_list_l45_https_arxiv_org_abs_2005_12126/figures/013_Table_1.jpg]]
 *Table 1: VizDoom: We use the Covariance Matrix Adaptation Evolution Strategy [14] to train RL agents. Following [13], we use the same setting with corresponding simulators. Table 1: Numbers are reported as mean scores ± standard deviation. Higher is better. For Pacman, an agent trained in real environment achieves 3.02 ± 2.64 which can be regarded as the upper bound. VizDoom is considered solved when a score of 750 is achieved*
 
-### 补充图表
 
-![[assets/figures/papers/paper_list_l45_https_arxiv_org_abs_2005_12126/figures/016_Table.jpg]]
 
-![[assets/figures/papers/paper_list_l45_https_arxiv_org_abs_2005_12126/figures/018_Table.jpg]]
 
-![[assets/figures/papers/paper_list_l45_https_arxiv_org_abs_2005_12126/figures/020_Table.jpg]]
 
-![[assets/figures/papers/paper_list_l45_https_arxiv_org_abs_2005_12126/figures/021_Table.jpg]]
 
-![[assets/figures/papers/paper_list_l45_https_arxiv_org_abs_2005_12126/figures/022_Table.jpg]]
-*Table: \textcircled{2} The rough sketch tensor R ^ { k } is obtained by passing v ^ { k } masked by { \bar { O } } ^ { k } (which is either spatially softmaxed or sigmoided) through two transposed convolution layers*
 
-![[assets/figures/papers/paper_list_l45_https_arxiv_org_abs_2005_12126/figures/023_Table.jpg]]
-*Table: Single Frame Discriminator The job of the single frame discriminator is to judge if the given single frame is realistic or not. We use two simple networks for the patchbased ( D _ { p a t c h } ) and the full frame ( D _ { f u l l } ) discriminators*
 
-![[assets/figures/papers/paper_list_l45_https_arxiv_org_abs_2005_12126/figures/024_Table.jpg]]
-*Table: 4 The normalized tensor goes through two transposed convolution layers*
 
-![[assets/figures/papers/paper_list_l45_https_arxiv_org_abs_2005_12126/figures/027_Figure_17.jpg]]
-*Figure 17: Residual blocks for the higher capacity model, modified and redrawn from Figure 15 of [3]. (a) A block for rendering engine, (b) A block for discriminator*
 
-![[assets/figures/papers/paper_list_l45_https_arxiv_org_abs_2005_12126/figures/028_Table.jpg]]
 
-![[assets/figures/papers/paper_list_l45_https_arxiv_org_abs_2005_12126/figures/029_Table.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与设计动机
 
@@ -362,6 +354,8 @@ GameGAN 开辟了几个值得后续探索的方向：
 - **组件迁移**：解耦的静态/动态组件是否可以通过隐藏状态的线性变换在不同游戏之间迁移？Figure 9 的初步实验暗示了这种可能性，但缺乏系统性验证。
 - **拓扑保证**：能否通过更强的正则化或架构约束（如图神经网络）保证迷宫生成中的完美闭环？
 - **数据效率**：如何减少模型对环境交互数据的依赖？可能的路径包括引入预训练视觉特征或元学习初始化。
+
+
 
 ## 原文 PDF
 

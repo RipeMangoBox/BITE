@@ -5,6 +5,8 @@ paper_level: A
 venue: SIGGRAPH
 year: 2025
 pdf_ref: paperPDFs/SIGGRAPH_2025/Painting_with_3D_Gaussian_Splat_Brushes.pdf
+project_link: null
+code_link: null
 aliases:
 - 3GSP
 - P3GSB
@@ -36,7 +38,11 @@ claims:
 | Method | 3D Gaussian Splat Painting |
 | Dataset | 自定义3DGS场景（无标准benchmark；系统原型在多个重建3DGS场景上验证绘画功能） |
 
-## 概述
+
+> [!tip] 效果简介
+> 量化结果、消融证据与适用边界见“实验与关键发现”。
+
+## 概要
 
 ### 问题瓶颈
 
@@ -69,7 +75,7 @@ claims:
 
 系统尚不支持擦除/雕刻画笔、动态重新照明、语义属性抖动（如树干大小、叶子颜色），也未集成时间线以支持关键帧动画。这些方向被作者列为未来工作。
 
-## 背景与动机
+
 
 3D高斯泼溅（3D Gaussian Splatting, 3DGS）以其高质量、实时渲染能力迅速成为三维场景表示的主流方法。然而，现有3DGS场景的创建与编辑流程仍高度依赖传统的重建与优化范式：用户需要从多视角图像出发，通过计算摄影测量或逆向渲染来重建场景。这种工作流本质上是一种“记录”而非“创作”——它缺乏艺术家在数字绘画中所享有的直接、可控的交互式编辑手段。
 
@@ -81,7 +87,9 @@ claims:
 
 具体而言，本文旨在构建一个完整的3D高斯泼溅绘画系统，使艺术家能够：（1）交互式地从现有3DGS场景中选择高斯子集作为画笔图案；（2）通过邮票式放置和基于样条线的非刚性变形在三维表面上绘制平滑笔触；（3）利用扩散修复模型自动消除印章间的接缝，实现无缝且逼真的外观。这一系统将3DGS从被动的场景表示工具转变为主动的创作媒介，为快速三维场景原型设计和概念艺术开辟了新的可能性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作首次将3D高斯泼溅（3D Gaussian Splatting, 3DGS）从单纯的场景重建与渲染工具，转化为一种艺术家可直接操控的交互式3D绘画媒介。其核心创新并非提出全新的表示或渲染算法，而是通过精确定义3DGS子集的可编辑行为，构建了一套完整的“画笔”抽象，从而打通了从静态高斯场到动态创作的关键瓶颈。
 
@@ -101,7 +109,7 @@ claims:
 
 上述三个模块的组合，使得该系统在“纹理-几何混合创作”这一因果调节变量上实现了从无到有的突破，其直接证据是用户研究显示参与者平均仅需约10分钟即可掌握工具并完成复杂场景的绘制（如Fig.9所示，参与者使用预制画笔在城堡结构上添加了花卉、藤蔓、树木、房屋等元素）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l11_https_splatpainting_github_io_static_assets_paper_pdf/figures/002_Figure_2.jpg]]
 *Figure 2: Painting technique: key aspects of the method in S3*
@@ -134,7 +142,7 @@ $$\mathcal{L}_{\mathrm{opacity}} = \max\biggl(0, \, 0.5 \sum_{i \in \Omega} \alp
 
 消融实验（Fig.3）表明，印章变形对笔触质量的影响最大，缺少变形会出现明显凸起；扩散修复则显著改善了印章重叠区域的接缝问题，且该方法可扩展至多笔触间的融合（Fig.8）。
 
-## 核心模块与公式推导
+
 
 ### 3.1 高斯首击检测
 
@@ -182,7 +190,9 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{visual}} + \lambda \mathcal{L}_{\mathrm{opa
 
 其中 $\lambda$ 控制透明度正则化强度（Equation 1-3, Section 3.4）。消融实验表明，扩散修复显著改善了印章重叠区域的接缝问题，且该机制可扩展至多笔触间的融合（Fig.3, Fig.8）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 消融实验：管线组件的贡献
 
@@ -234,7 +244,9 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{visual}} + \lambda \mathcal{L}_{\mathrm{opa
 ![[assets/figures/papers/paper_list_l11_https_splatpainting_github_io_static_assets_paper_pdf/figures/007_Figure_7.jpg]]
 *Figure 7: Result Gallery: Our approach has many versatile use cases for quick 3D scene prototyping and design*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有工作的关系
 
@@ -272,6 +284,8 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{visual}} + \lambda \mathcal{L}_{\mathrm{opa
 3. **修复过程的可扩展性**：扩散修复模型在大场景或高高斯数量下的计算开销如何控制？当前实现使用 15 像素屏幕空间矩形和 1/10 画笔边长的透明度阈值以平衡实时性与准确度，但更大规模场景下的性能边界尚未明确。
 4. **AI 驱动的画笔参数控制**：画笔参数（间距、抖动、方向等）能否由 AI 自动调整以实现特定艺术风格？
 5. **动画时间线设计**：如何设计直观的关键帧接口以支持 3DGS 画笔绘制的动画效果？
+
+
 
 ## 原文 PDF
 

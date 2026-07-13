@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/WorldPlay_Towards_Long_Term_Geometric_Consistency_for_Real_Time_Interactive_World_Modeling.pdf
+project_link: null
+code_link: https://github.com/Tencent-Hunyuan/HY-WorldPlay
 aliases:
 - WorldPlay
 - HY-World-1.5
@@ -41,7 +43,7 @@ claims:
 > - Our short-term test set (61 frames) 上，PSNR↑ 21.92 vs 21.68 (Gen3C) (+0.24)。
 > - Our long-term test set (≥250 frames) 上，SSIM↑ 0.585 vs 0.431 (Gen3C) (+0.154)。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -68,7 +70,7 @@ WorldPlay 属于**记忆感知的自回归视频扩散模型**，其方法谱系
 
 WorldPlay 通过重构式记忆与上下文强制蒸馏，首次在通用域上同时实现长时域生成、灵活动作控制、实时交互与长期几何一致性（见 Table 1 的特性对比）。其核心改动槽位包括：双重动作表示（离散键 + 连续相机姿态）、重构上下文记忆构建、时序重帧位置编码、以及上下文强制蒸馏方法。
 
-## 背景与动机
+
 
 ### 问题背景：交互式世界模型的实时性与一致性困境
 
@@ -101,7 +103,9 @@ WorldPlay 通过重构式记忆与上下文强制蒸馏，首次在通用域上�
 
 基于以上动机，WorldPlay 构建了一个记忆感知的自回归扩散 Transformer，能够在 720p 分辨率下以 24 FPS 进行流式交互，同时在长达 250 帧以上的循环导航中保持场景的几何连贯性，显著超越所有现有基线方法。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 WorldPlay 的核心创新在于通过一套系统性的“记忆感知生成与蒸馏”机制，首次在单一框架内同时解决了实时交互世界建模中长期存在的速度与几何一致性矛盾。其关键突破可归结为四个相互协同的技术槽位变更。
 
@@ -123,7 +127,7 @@ WorldPlay 的核心创新在于通过一套系统性的“记忆感知生成与�
 
 上述四个槽位变更形成了一条清晰的因果链：双重动作表示提供精确的空间锚定 → 重构上下文记忆动态维护时空信息 → 时序重帧克服长程衰减使远距离记忆可用 → 上下文强制蒸馏将记忆能力高效压缩至实时学生模型。这一链式创新使 WorldPlay 在长期几何一致性测试（≥250 帧）上以 PSNR 18.94 显著超越最佳有记忆基线 Gen3C（15.37），同时实现 24 FPS 的实时流式生成。
 
-## 整体框架
+
 
 WorldPlay 是一个面向实时交互式世界建模的自回归视频生成框架，其核心目标是在用户流式操控下，以低延迟生成长期几何一致的视频序列。如图 Figure 2 所示，系统接收单张图像或文本提示作为世界描述，随后以“块”（chunk）为单位执行下一段预测任务——每个块包含 16 帧视频，生成过程受用户动作信号的条件控制。
 
@@ -140,7 +144,7 @@ WorldPlay 是一个面向实时交互式世界建模的自回归视频生成框�
 ![[assets/figures/papers/WorldPlay_Towards_Long-Term_Geometric_Consistency_for_Real-Time_Interactive_Worl_47494ea383d3/figures/004_Figure_3.jpg]]
 *Figure 3: Detailed architecture of our autoregressive diffusion transformer. The discrete key is incorporated with time embedding, while the continuous camera pose is injected into causal selfattention through PRoPE [33]*
 
-## 核心模块与公式推导
+
 
 ### 3.1 视频扩散模型基础
 
@@ -210,7 +214,9 @@ $$p_{data}(x_{j:j+3} | x_{0:j-1}) = p_{\beta}(x_{j:j+3} | C_{j:j+3} - x_{j:j+3})
 ![[assets/figures/papers/WorldPlay_Towards_Long-Term_Geometric_Consistency_for_Real-Time_Interactive_Worl_47494ea383d3/figures/006_Figure_5.jpg]]
 *Figure 5: Context forcing is a novel distillation method that employs memory-augmented self-rollout and memory-augmented bidirectional video diffusion to preserve long-term consistency, enable real-time interaction, and mitigate error accumulation*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置与评估协议
 
@@ -281,7 +287,9 @@ Table 7 分析了记忆规模的影响。较大的时序记忆（更多近期块
 ![[assets/figures/papers/WorldPlay_Towards_Long-Term_Geometric_Consistency_for_Real-Time_Interactive_Worl_47494ea383d3/figures/002_Table_1.jpg]]
 *Table 1: Comparison with recent interactive world models. WorldPlay distinguishes itself as a general-domain model that simultaneously achieves long-horizon video generation, flexible action control, real-time interactivity, and long-term geometric consistency*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 
@@ -332,6 +340,8 @@ WorldPlay 的当前能力边界可从以下几个维度界定：
 4. **多智能体与物理交互的扩展**：将 WorldPlay 扩展到多智能体交互和复杂物理模拟环境，需要重新思考记忆的归属（哪个智能体的记忆？）和物理状态的一致性约束。这是从“世界观察者”到“世界参与者”的关键一步。
 
 5. **与显式 3D 表示的融合**：WorldPlay 的隐式记忆机制在效率上优于显式 3D 表示，但在几何精度上可能不及后者。是否存在一种混合方案，在保持实时性的前提下，利用稀疏的显式 3D 锚点来进一步增强长期几何一致性？
+
+
 
 ## 原文 PDF
 

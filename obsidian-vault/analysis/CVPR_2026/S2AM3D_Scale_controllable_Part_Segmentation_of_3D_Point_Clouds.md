@@ -41,13 +41,11 @@ claims:
 > - PartObjaverse-Tiny 上，IoU (interactive) 46.47 / 61.19 (+scale) vs 优于所有比较方法（具体值见表1） (+14.72 (scale gain))；mIoU (full segmentation) 63.29 vs 优于PartField、SAMPart3D等方法 (N/A)。
 > - PartNet-E 上，IoU (interactive) 62.52 / 77.51 (+scale) vs 优于所有比较方法 (+14.99)；mIoU (full segmentation) 77.98 vs 优于PartField、SAMPart3D等方法 (N/A)。
 
-## 概述
+## 概要
 
 三维点云的部件分割是细粒度三维理解的核心任务，但现有方法面临两个关键瓶颈：（1）基于2D视觉基础模型（如SAM）的蒸馏方法因遮挡、细薄结构及复杂拓扑导致多视角分割结果不一致；（2）大规模高质量3D部件标注数据稀缺，限制了模型的泛化能力。S²AM3D通过**融合2D视觉先验与3D对比学习**解决一致性问题，并引入**连续尺度信号**实现从精细到粗糙的可控部件分割，仅需更少的训练数据即可达到与大规模训练模型相当的性能。
 
 在PartObjaverse-Tiny和PartNet-E两个基准上，S²AM3D在交互式分割和全分割任务中均达到最优。具体而言，引入尺度提示（+scale）后，交互式分割IoU在PartObjaverse-Tiny上从46.47提升至61.19（+14.72），在PartNet-E上从62.52提升至77.51（+14.99）；全分割mIoU分别为63.29和77.98，显著优于PartField、SAMPart3D等同类方法。消融研究证实，移除3D对比监督导致mIoU大幅下降（PartObjaverse-Tiny上从61.19降至53.94），验证了3D几何一致性对全局特征的关键作用。
-
-## 背景与动机
 
 三维点云部件分割旨在将点云分解为具有独立语义或几何意义的组成部分，是三维视觉理解中的基础任务，广泛支撑机器人操作、三维建模与编辑、增强现实等下游应用。近年来，随着视觉基础模型（如SAM）的兴起，基于二维先验的三维分割方法取得了显著进展：这类方法通过多视角渲染将三维形状投影到二维平面，利用预训练的二维分割模型提取部件级信息，再将其反投影至三维空间。然而，这一范式存在一个根本性瓶颈：**二维分割先验因遮挡、细薄结构及复杂拓扑会导致多视角分割结果不一致**——同一三维部件在不同视角下可能被分割为不同片段，或与相邻部件发生混淆，最终导致三维空间的部件边界模糊、拓扑不完整。
 
@@ -57,7 +55,7 @@ claims:
 
 针对上述问题，本文提出**S²AM3D**（Scale-controllable Part Segmentation of 3D Point Clouds），旨在通过融合二维视觉基础先验与三维对比学习，在保持多视角一致性的同时，结合尺度感知机制，实现从精细到粗糙的连续可控三维零件分割。
 
-## 核心创新
+## 核心方法与创新机理
 
 S²AM3D 的核心创新在于通过两个关键机制解决了现有 2D 先验驱动 3D 部件分割方法的根本瓶颈——多视角分割不一致与粒度不可控。
 
@@ -107,8 +105,6 @@ $$\mathbf{q}^{(\ell+1)} = \mathbf{q}^{(\ell)} + \mathrm{CAttn}(\mathbf{q}^{(\ell
 
 区别于端到端联合训练，S²AM3D 采用**解耦训练**：先稳定编码器表示（2D 蒸馏 + 3D 对比学习），再冻结编码器训练尺度感知解码器。这一策略避免了 2D 与 3D 监督信号在联合优化中的冲突，确保编码器先学到一致的点特征，解码器再在此基础上学习粒度调制。
 
-## 整体框架
-
 S²AM3D 提出了一种**尺度可控、点提示驱动的三维点云部件分割框架**，其核心设计目标是在融合2D视觉基础先验的同时，解决多视角不一致与粒度不可控两大瓶颈。如图2所示，整体pipeline由四个关键模块串联构成：**Point-Consistent Part Encoder**、**Scale Modulator**、**Bi-directional Cross-Attention Decoder** 和 **Segmentation Head**，并采用解耦训练策略分别优化编码器与解码器。
 
 **输入**：原始点云 $P \in \mathbb{R}^{N \times 3}$ 及交互提示 $(p, s)$，其中 $p$ 为查询点索引，$s \in [0,1]$ 为连续尺度信号。
@@ -127,12 +123,8 @@ S²AM3D 提出了一种**尺度可控、点提示驱动的三维点云部件分�
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l2092_https_openaccess_thecvf_com_content_CVPR2026_html_Su_S2AM3D_Scale_contro/figures/002_Figure_2.jpg]]
-
 ![[assets/figures/papers/paper_list_l2092_https_openaccess_thecvf_com_content_CVPR2026_html_Su_S2AM3D_Scale_contro/figures/001_Figure_1.jpg]]
 *Figure 1: Paradigm comparison (left): Native 3D methods present limited generalization, and 2D-based methods fail in complex cases like occlusions. Our hybrid solution solves these issues. Performance Comparison (right): Our method reaches large-scale training performance with much less data and significantly outperforms previous methods at similar data scales*
-
-## 核心模块与公式推导
 
 S²AM3D 的整体架构由四个核心模块构成：**Point-Consistent Part Encoder**、**Scale Modulator**、**Bi-directional Cross-Attention Decoder** 和 **Segmentation Head**。以下逐一阐述其设计逻辑与关键公式。
 
@@ -214,7 +206,7 @@ $$\mathrm{BCE}_{\mathrm{dyn}} = -\frac{1}{N}\Big(\beta \sum_{j \in J_{+}} \log \
 
 S²AM3D 采用**解耦训练**方案：首先使用 PartField 预训练参数初始化编码器，在 3D 对比监督下精调至收敛后冻结；随后仅训练解码器部分。这一策略避免了联合训练中编码器特征尚未稳定时解码器梯度对其的干扰，确保尺度调制和双向注意力在高质量特征基础上发挥作用。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -254,17 +246,11 @@ Figure 7直观验证了连续尺度可控性：对同一提示点，当尺度s�
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l2092_https_openaccess_thecvf_com_content_CVPR2026_html_Su_S2AM3D_Scale_contro/figures/005_Table_1.jpg]]
-*Table 1: Quantitative comparison of interactive part-level segmentation. We report IoU (%) on PartObjaverse-Tiny and PartNet-E. We also provide a scale-aware version (+scale), which has an additional scale prompt. The best score in each column is highlighted in bold, and underline denotes the second best*
-
 ![[assets/figures/papers/paper_list_l2092_https_openaccess_thecvf_com_content_CVPR2026_html_Su_S2AM3D_Scale_contro/figures/007_Table_2.jpg]]
 *Table 2: Quantitative comparison of full segmentation*
 
 ![[assets/figures/papers/paper_list_l2092_https_openaccess_thecvf_com_content_CVPR2026_html_Su_S2AM3D_Scale_contro/figures/009_Table_3.jpg]]
 *Table 3: Ablation studies (mIoU, %). Groups indicate whether scale information is provided at test time: +scale means a scale condition is given, while No scale means it is not*
-
-![[assets/figures/papers/paper_list_l2092_https_openaccess_thecvf_com_content_CVPR2026_html_Su_S2AM3D_Scale_contro/figures/008_Figure_6.jpg]]
-*Figure 6: Visualization of the ablation study on encoder feature quality. This side-by-side comparison displays extracted features and their resulting segmentations for our full model (left) and the ablated model without 3D refinement (right)*
 
 ![[assets/figures/papers/paper_list_l2092_https_openaccess_thecvf_com_content_CVPR2026_html_Su_S2AM3D_Scale_contro/figures/010_Figure_7.jpg]]
 *Figure 7: Visualization of continuous scale controllability. With the same prompt point, as the scale s increases from 0 to 1, the segmentation transitions smoothly from fine to coarse; a (No scale) counterpart is also provided for reference*
@@ -275,7 +261,7 @@ Figure 7直观验证了连续尺度可控性：对同一提示点，当尺度s�
 ![[assets/figures/papers/paper_list_l2092_https_openaccess_thecvf_com_content_CVPR2026_html_Su_S2AM3D_Scale_contro/figures/003_Figure_3.jpg]]
 *Figure 3: Dataset overview: covering diverse categories and providing high-quality part-level annotations; the histogram shows the longtailed distribution of part counts*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 从2D先验到3D一致性的技术演进
 

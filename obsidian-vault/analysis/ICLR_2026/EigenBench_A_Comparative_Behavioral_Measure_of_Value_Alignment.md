@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/EigenBench_A_Comparative_Behavioral_Measure_of_Value_Alignment.pdf
+project_link: null
+code_link: https://github.com/jchang153/EigenBench
 openreview_forum_id: fm79KXJIUQ
 aliases:
 - EigenBench
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | EigenBench：一种比较性的价值对齐行为度量 |
 | 英文题名 | EigenBench: A Comparative Behavioral Measure of Value Alignment |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=fm79KXJIUQ); [GitHub](https://github.com/jchang153/EigenBench) |
+| Links | [paper](https://openreview.net/forum?id=fm79KXJIUQ) · [GitHub](https://github.com/jchang153/EigenBench) |
 | Topic | #topic/safety_alignment_fairness_privacy #topic/safety_alignment_fairness_privacy/trustworthy_machine_learning |
 | Method | EigenBench |
 | Dataset | GPQA, Human Validation (Universal Kindness), Loving Constitution |
@@ -41,7 +43,7 @@ claims:
 > - Human Validation (Universal Kindness) 上，平均评判者距离 (L1-norm of trust vectors) 为 0.3130 （人类-LM 平均距离），对比 0.3133 （人类-人类平均距离），变化 -0.0003。
 > - Loving Constitution 上，Elo Score 为 1579 (Llama 3.1 8b loving, pre-prompted)，对比 1426 (Llama 3.1 8b base)，变化 +153。
 
-## 概述
+## 概要
 
 语言模型的价值对齐评估长期面临一个核心瓶颈：**缺乏量化主观价值对齐的客观指标**，尤其是针对那些无真实标注的主观特质（如“善意”“保守主义”“深层生态观”等）。传统方法要么依赖昂贵且不可规模化的人类评判，要么仅能测量模型在客观基准上的能力，无法系统比较模型在开放式价值维度上的行为表现。
 
@@ -57,7 +59,7 @@ EigenBench 提出了一种**黑盒比较性度量框架**，其核心思想是�
 - “Loving”宪法下，经微调或预提示的模型 Elo 评分显著高于基础模型（1579 vs 1426）
 - 评分对场景数据集、宪法措辞和模型群体变化均表现出稳健性
 
-## 背景与动机
+
 
 语言模型（LM）在真实世界部署中的安全性不仅取决于其客观能力，还取决于其与人类价值观的契合程度。然而，当前缺乏能够量化模型在主观价值维度上对齐程度的客观指标，尤其是对于“善良”“保守”等缺乏真实标注（ground truth）的主观特质，传统的基准测试方法难以适用。
 
@@ -65,7 +67,9 @@ EigenBench 提出了一种**黑盒比较性度量框架**，其核心思想是�
 
 本文的核心动机正是填补这一空白：**如何在不依赖人类标注的前提下，量化地比较不同语言模型对特定价值观的遵守程度？** 作者观察到，模型对特定价值观的遵守程度与其评判他人遵守程度的能力之间存在正相关——行为更对齐的模型往往也是更可靠的评判者。基于这一洞察，EigenBench 利用模型群体相互评判并聚合共识，通过加权信任机制产生共识排名，从而将价值对齐这一主观问题转化为可量化的比较性度量。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 EigenBench 的核心创新在于将**主观价值对齐的量化评估**转化为一个**无需外部标注的群体共识问题**。与现有语言模型排名系统相比，其关键差异体现在三个层面：
 
@@ -100,7 +104,7 @@ EigenBench 引入**宪法**（constitution）作为评估标准的显式载体�
 
 这些创新使 EigenBench 在无真实标签的情况下成功恢复了 GPQA 排名（Kendall τ ≈ 0.77，随机排名出现概率约 $10^{-6}$），并与人类评判高度一致（人类-LM 评判距离 0.3130，接近人类-人类距离 0.3133），验证了群体共识机制替代外部标注的可行性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l47_https_openreview_net_forum_id_fm79KXJIUQ/figures/001_Figure_1.jpg]]
 *Figure 1: The EigenBench Pipeline: Starting with a population of models $\mathcal { M } = \{ M _ { 1 } , \ldots , M _ { N } \}$ , a constitution C, and a set of prompted scenarios s , we repeatedly sample a scenario $S _ { \ell } \in$ S , , prompt a pair of models $M _ { j } , M _ { k }$ with the scenario, prompt a third model $\bar { M _ { i } }$ to judge which response is more aligned to ${ \mathcal { C } }$ , fit the resulting judgments $r _ { i j k l }$ to a Bradley-Terry-Davidson model of pairwise preferences to learn model dispositions and judge lenses in a latent space $\mathbb { R } ^ { d }$ , derive a trust matrix indicating how often judge $\bar { M _ { i } }$ favors evaluee $\bar { M _ { j } } ^ { \ast }$ \...
@@ -142,7 +146,7 @@ Table 1 将 EigenBench 与三类现有系统进行了定位对比：**LMArena**�
 - **输出**：每个模型 $M_j$ 在宪法 $C$ 下的 Elo 评分及其 95% 自助法置信区间。
 - **中间产物**：低秩潜在空间中的模型倾向 $v_j$ 和评判透镜 $u_i$，可用于可视化不同模型/人格在价值空间中的相对位置（如 Figure 2 所示的历史人物人格分布）。
 
-## 核心模块与公式推导
+
 
 EigenBench 的评分机制由四个紧密耦合的模块构成，其核心数学直觉是：**模型对特定价值观的遵守程度与其评判他人遵守程度的能力正相关**，因此可以将评判权重与模型自身得分耦合，通过迭代特征分解获得一致排序。
 
@@ -192,7 +196,9 @@ $$
 
 其中 $N$ 为模型总数。该模块的关键瓶颈在于：信任矩阵的质量完全依赖于 BTD 模型学得的 $u_i$ 和 $v_j$ 的质量，而 BTD 模型又依赖于比较数据的数量与质量——这构成了整个流水线的级联依赖关系。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心验证：与人类评判的一致性
 
@@ -291,7 +297,9 @@ Figure 8 展示了 37 个模型在 Universal Kindness 宪法下的大规模 Eige
 ![[assets/figures/papers/paper_list_l47_https_openreview_net_forum_id_fm79KXJIUQ/figures/010_Figure_5.jpg]]
 *Figure 5: EigenBench trust scores for a population of 5 $\operatorname { L M s } \mathbf { x }$ 5 Personas on the Universal Kindness constitution. For example, the kindest combination as judged by these 25 models is Gemini 2.5 Pro with the Empathetic prompted persona. 21% of the variance in these trust scores is explained by the LM and 79% of the variance is explained by the persona
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心定位：从偏好排名到价值对齐的共识度量
 
@@ -324,6 +332,8 @@ EigenBench 在语言模型评估生态中占据一个独特位置：它不依赖
 4. **人类判断的整合机制**：Figure 7 展示了通过“teleportation”将人类信任向量混合进 EigenTrust 的初步尝试，但如何系统性地整合稀疏的人类判断以校准或验证模型排名，仍缺乏理论框架。
 
 5. **宪法的完备性与冲突**：当前实验使用单一宪法测量单一价值维度。当宪法包含内在冲突的准则时（如“诚实”与“善意”在特定场景下可能冲突），EigenBench 能否捕捉到这种价值张力，还是会产生不稳定的排名？
+
+
 
 ## 原文 PDF
 

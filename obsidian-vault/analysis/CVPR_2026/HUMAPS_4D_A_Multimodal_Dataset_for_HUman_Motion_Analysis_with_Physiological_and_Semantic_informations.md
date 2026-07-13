@@ -43,7 +43,7 @@ claims:
 > - HUMAPS‑4D LOSO 动作识别 上，Accuracy 90.33 ± 4.3 (Insoles+MoCap fusion) vs 82.71 ± 3.9 (Insoles only) (+7.62)。
 > - HUMAPS‑4D 4‑fold CV 3D姿态估计 上，MPJPE (cm) 31.1 ± 0.8 (足底压力→全身姿态)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有三维人体运动数据集长期处于“视觉驱动”与“生物力学评估”两条割裂的轨道上——前者侧重多视角视频与运动捕捉的配准，后者聚焦步态、关节力矩、肌电等精密测量，但二者从未在统一的采集协议下同步整合，更缺乏高层语义标注。这一断裂导致三个后果：第一，基于纯视觉的全身姿态估计在遮挡、隐私敏感场景（如居家康复）下鲁棒性不足；第二，可穿戴信号（足底压力、表面肌电）虽携带丰富的生物力学约束，却因缺少大规模、多动作的配对真值而难以被深度学习模型充分利用；第三，面向临床运动评估的细粒度语义（如“减痛步态”“共济失调”）与传感器数据之间缺乏可学习的映射桥梁。HUMAPS‑4D 正是针对这一“数据模态与语义的多重缺失”瓶颈而构建。
 
@@ -52,8 +52,6 @@ claims:
 **关键发现与主要结果**：论文设置了两项基准任务以验证数据集的价值。在动作识别任务上，采用留一受试者交叉验证（LOSO），仅使用足底压力信号的 **ST‑GCN**（Yan et al., AAAI 2018）分类器达到 82.71% 准确率，而融合足底压力与运动捕捉关节数据的模型进一步提升至 90.33%，表明可穿戴信号本身已携带强判别力，且多模态融合具有显著增益。在更具挑战性的“足底压力→全身 3D 姿态”任务上，受 **SolePoser** 启发的双流 Transformer 基线在 4 折交叉验证下总 MPJPE 为 31.1 cm，其中静态姿势类误差较低，而动态交互类动作（如抛接球）误差升至 34.0 cm 以上，揭示了单模态输入的固有限制。这些结果表明，HUMAPS‑4D 为“以可穿戴信号替代视觉”这一隐私保护范式提供了真实的困难标尺，同时也暴露了当前模型在时序一致性与物理合理性上的不足。
 
 **局限与开放问题**：数据集目前仅覆盖 18–42 岁健康成年人，尚未纳入病理步态、老年或儿童人群；所有采集在受控室内环境完成，户外自由生活场景下的泛化能力待验证。姿态估计的 31 cm 级误差也指出，如何将语义标注、肌肉协同等先验显式注入模型以大幅压缩误差，是下一步的核心挑战。此外，跨模态融合的最优策略（早融合、晚融合、对比学习）是否因任务而异，以及数据集所附基线代码与预训练模型的开源计划，将直接影响社区的后续推进速度。
-
-## 背景与动机
 
 人体运动分析是计算机视觉与生物力学交叉领域的核心问题，其应用涵盖临床步态评估、运动康复、人机交互和具身智能。然而，当前研究面临一个关键瓶颈：**现有数据集未能同时集成视觉、可穿戴生物力学传感器和高层语义信息**，导致模型难以在隐私敏感场景下实现细粒度的全身三维运动理解。
 
@@ -65,7 +63,7 @@ HUMAPS‑4D 的独特价值在于它提供了**低层生理信号与高层语义
 
 综上，HUMAPS‑4D 的提出并非简单的数据堆砌，而是针对“隐私保护下细粒度运动理解”这一长期目标，系统性构建了首个弥合计算机视觉与生物力学鸿沟的大规模多模态平台。
 
-## 核心创新
+## 核心方法与创新机理
 
 HUMAPS‑4D 的核心创新不在于提出新的模型架构，而在于**构建了首个在统一采集协议下深度融合视觉、可穿戴生物力学传感器与高层语义的大规模多模态人体运动数据集**，从而直接回应了领域内长期存在的瓶颈：现有数据集要么侧重视觉驱动（缺乏生理信号），要么侧重生物力学分析（缺乏视觉与语义），二者从未在同一批受试者、同一批动作上同步记录。这一鸿沟的填补，使隐私保护下的细粒度运动理解成为可能——足底压力与肌电等可穿戴信号本身携带丰富的生物力学约束，结合语义描述后，可作为替代视觉的强先验。
 
@@ -80,8 +78,6 @@ HUMAPS‑4D 的核心创新不在于提出新的模型架构，而在于**构建
 值得强调的是，HUMAPS‑4D 本身是**数据集贡献**，而非算法贡献。论文中使用的动作识别模型（**ST‑GCN**，Yan et al., AAAI 2018）和姿态估计基线架构（参考 **SolePoser**，Wu et al., UIST 2024）均为现有方法，其作用仅在于验证数据集的有效性和挑战性。因此，该工作的“changed slots”不体现在模型模块的替换，而体现在**任务定义空间的扩展**：从单模态或弱配对的运动分析，拓展到多模态同步、语义对齐的全身3D运动理解。
 
 **证据强度**：数据集规模与模态完整性的声明有明确的采集协议和 Table 1 对比支撑（置信度0.98）；语义标注的三层结构有 Figure 3 和对应描述佐证（置信度0.95）；归一化公式和基准任务定义在原文中有显式的数学表述和实验配置说明（置信度0.95–0.98）。局限性方面，受试者仅覆盖健康成年人（18–42岁），未包含疾病、老年或儿童人群，且所有采集均在受控室内环境完成，户外泛化能力尚未验证。
-
-## 整体框架
 
 HUMAPS‑4D 的核心贡献在于构建了一个多模态同步采集与标注流水线，而非提出新的算法架构。该流水线围绕“弥合计算机视觉与生物力学鸿沟”这一目标，将**视觉信号、可穿戴生理信号与高层语义**在统一协议下整合，为下游任务提供标准化数据基础。
 
@@ -158,8 +154,6 @@ Figure 2 展示了传感器在受试者身体上的佩戴布局。所有模态�
 ![[assets/figures/papers/paper_list_l973_https_openaccess_thecvf_com_content_CVPR2026_html_Dabrowski_HUMAPS_4D_A/figures/001_Figure_1.jpg]]
 *Figure 1: HUMAPS-4D is a large-scale multimodal dataset for human motion analysis, comprising 14 hours of recordings and over 6 million time-synchronized images. Each session combines exocentric video, motion capture, IMUs, instrumented insoles, and sEMG, alongside rich semantic annotations and anthropometric data. By integrating low-level biomechanical signals with high-level semantic and visual information, HUMAPS-4D provides a comprehensive resource for studying full-body 3D motion, motor skill assessment, and cross-modal learning in naturalistic settings*
 
-## 核心模块与公式推导
-
 HUMAPS‑4D 的多模态信号在输入模型前需经过跨受试者归一化，以消除个体生理差异。以下三个公式构成了数据预处理的核心。
 
 **3D 关节位置归一化** 以骨盆为原点，利用人体测量信息缩放：
@@ -201,10 +195,7 @@ $$IS = \frac{1}{n_J} \sum_{i=0}^{n_J * 3 - 1} \sigma_{1:T}(\bar{J}_{i_{1:T}} - J
 ![[assets/figures/papers/paper_list_l973_https_openaccess_thecvf_com_content_CVPR2026_html_Dabrowski_HUMAPS_4D_A/figures/004_Figure_3.jpg]]
 *Figure 3: HUMAPS-4D offers 3 paired language corpora*
 
-![[assets/figures/papers/paper_list_l973_https_openaccess_thecvf_com_content_CVPR2026_html_Dabrowski_HUMAPS_4D_A/figures/007_Figure_4.jpg]]
-*Figure 4: Baseline model for pose inference (inspired by [26]). The AccelNet and PressNet models are illustrated in the Supplementary Material*
-
-## 实验与分析
+## 实验与关键发现
 
 HUMAPS‑4D 在论文中定义了两项核心基准任务——基于可穿戴信号的**动作识别**与**3D全身姿态估计**，并提供了初步基线结果。以下分析聚焦于这些结果揭示的能力边界、模态融合的因果效应以及当前方法的失败模式。
 
@@ -262,7 +253,7 @@ HUMAPS‑4D 的核心贡献在于**首次在一个统一采集协议下融合了
 ![[assets/figures/papers/paper_list_l973_https_openaccess_thecvf_com_content_CVPR2026_html_Dabrowski_HUMAPS_4D_A/figures/006_Table_3.jpg]]
 *Table 3: Results of 3D pose estimation based on plantar pressure for each action category*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 本工作的定位与核心贡献
 

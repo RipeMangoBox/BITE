@@ -5,6 +5,7 @@ paper_level: A
 venue: SIGGRAPH
 year: 2023
 pdf_ref: paperPDFs/SIGGRAPH_2023/Boundary_Value_Caching_for_Walk_on_Spheres.pdf
+code_link: null
 project_link: https://imaging.cs.cmu.edu/bvc/
 aliases:
 - BVCB
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 球面行走的边界值缓存 |
 | 英文题名 | Boundary Value Caching for Walk on Spheres |
 | 会议/期刊 | SIGGRAPH 2023 |
-| Links | [paper](https://arxiv.org/abs/2302.11825); [Project](https://imaging.cs.cmu.edu/bvc/) |
+| Links | [paper](https://arxiv.org/abs/2302.11825) · [Project](https://imaging.cs.cmu.edu/bvc/) |
 | Topic | #topic/optimization_theory_probabilistic #topic/optimization_theory_probabilistic/optimization_methods |
 | Method | Boundary Value Caching (BVC) |
 | Dataset | 多个视觉/几何计算测试问题（风洞流线、纹理坐标插值、宇航服温度模型、混合边界条件问题）, 纯Dirichlet问题, Dirichlet主导的高频边界条件问题 |
@@ -42,7 +43,7 @@ claims:
 > - 纯Dirichlet问题 上，方差/效率比较（等时间） 为 一般性缓存策略；方差高于Qi et al. 2022专用双向方法，对比 Qi et al. 2022双向WoS，等时间下方差更低，变化 BVC方差偏高，但在混合边界问题中无可比拟。
 > - Dirichlet主导的高频边界条件问题 上，效率 为 缓存策略可能效率下降，因随机行走较短、未重要性采样奇异函数以及∂u/∂n估计噪声，对比 逐点WoSt可能在短行走问题上相对效率更高（无数字对比），变化 在Dirichlet主导问题中BVC优势减弱。
 
-## 概述
+## 概要
 
 求解椭圆型偏微分方程（PDE）是计算机图形学与计算物理中的基础任务，其典型形式为带屏蔽项的泊松方程，在域内满足 $\Delta u - \sigma u = f$，并在边界上混合给定 Dirichlet 条件 $u = g$ 和 Neumann 条件 $\partial u / \partial n = h$。传统确定性方法如边界元法（BEM）依赖高质量边界网格和全局稠密线性系统求解，在低质量几何上易产生混叠伪影甚至完全失效（Fig. 2）。网格无关的蒙特卡洛方法——经典球面行走（WoS, Muller 1956）及其扩展星形行走（WoSt, Sawhney et al., ACM Trans. Graph. 2023）——虽然规避了网格依赖，但在每个内部评估点独立执行随机行走，导致大量冗余计算和高方差，尤其当需要密集评估解或梯度时，无法利用椭圆问题解的高空间平滑性。
 
@@ -50,7 +51,7 @@ claims:
 
 实验表明，在混合边界问题中，BVC 在等时间预算下获得远优于逐点 WoSt 的平滑解和梯度（Fig. 5, Fig. 7），密集网格评估时因样本复用而效率急剧提升。方法对低质量几何具有天然鲁棒性，且支持渐进式评估和输出敏感的子域聚焦计算。在纯 Dirichlet 问题上，BVC 方差高于专用双向方法（Qi et al., Computer Graphics Forum 2022），但在混合边界场景中无可比拟；在 Dirichlet 主导的高频边界条件下，缓存策略效率下降。针对奇异 Green 函数引起的边界伪影，BVC 引入基于积分分裂的无偏校正策略（式 8），在消除伪影的同时避免偏差。
 
-## 背景与动机
+
 
 偏微分方程（PDE）是计算机图形学与几何处理中描述物理现象的核心工具。许多视觉计算任务——从流体模拟、热传导到曲面参数化——最终都归结为在复杂几何域上求解椭圆型方程。本文关注一类混合边界条件的屏蔽泊松方程：
 
@@ -84,7 +85,9 @@ $$
 
 由此，本文的核心动机自然浮现：**仅在边界随机采样点上通过少量随机行走估计未知边界数据并缓存，随后利用 BIE 对所有内部评估点进行廉价的蒙特卡洛积分估计。** 这一“边界值缓存”（Boundary Value Caching, BVC）策略将随机行走的次数与内部评估点数量解耦，使密集评估的计算代价大幅降低，同时继承点估计器的无偏性、渐进性、输出敏感性及对低质量几何的鲁棒性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 BVC的核心创新在于将椭圆型偏微分方程求解的计算范式从“逐点独立估计”转变为“边界采样—缓存复用—积分重建”。这一转变通过以下关键机制实现：
 
@@ -127,7 +130,7 @@ $$\int_{\partial R} \left.\frac{\partial G}{\partial n}\right|_c (x,z) u(z) \,dz
 
 值得注意的是，BVC作为通用缓存策略，在纯Dirichlet问题上的方差高于专用方法（如**Qi et al. 2022**的双向WoS，Computer Graphics Forum 2022），但在混合边界问题中无可比拟。此外，在Dirichlet主导的高频边界条件问题中，缓存策略效率下降，原因包括随机行走路径变短、未对BIE奇异函数进行重要性采样，以及法向导数估计的噪声影响增大（Fig. 16 bottom row）。
 
-## 整体框架
+
 
 BVC 的整体工作流围绕“边界采样—点估计—缓存复用—积分求值”四个阶段构建，其核心思想是将随机行走的计算负载从每个内部评估点转移到少数边界样本上，并通过边界积分方程（BIE）实现样本的高效复用。
 
@@ -155,7 +158,7 @@ BVC 的整体工作流围绕“边界采样—点估计—缓存复用—积分�
 ![[assets/figures/papers/paper_list_l51_https_arxiv_org_abs_2302_11825/figures/013_Figure_14.jpg]]
 *Figure 14: For Dirichlet problems, our method o en has higher variance than Qi et al. [2022]’s specialized approach for these boundary conditions*
 
-## 核心模块与公式推导
+
 
 ### 边界积分表示与缓存估计框架
 
@@ -223,7 +226,9 @@ $$
 
 BVC支持渐进式评估：通过生成新的缓存并将贡献累加到现有估计中（Algorithm 1函数UpdateSolution），用户可在任意时刻获得当前最佳估计。更重要的是，方法天然支持**输出敏感**的局部评估——用户可定义感兴趣的子域 $R \subset \Omega$，仅在其边界 $\partial R$ 上生成和缓存样本，从而将计算聚焦于特定区域（Figure 8），无需像传统边界元方法（BEM）那样进行全局求解。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 
@@ -258,7 +263,9 @@ BVC 在混合边界条件问题上的核心优势体现在**样本复用带来�
 ![[assets/figures/papers/paper_list_l51_https_arxiv_org_abs_2302_11825/figures/016_Figure_17.jpg]]
 *Figure 17: Top: Se ing the 𝑙 ofset parameter to 0.1 × 𝜀 efectively sets each Dirichlet boundary sample’s 𝜕𝑢/𝜕𝑛 estimate to zero, as balls centered at each sample point are contained entirely inside the epislon shell—this biases the solution estimate inside the domain. Bias diminishes with increasing ofset values. Bo om: Smaller values of the bound 𝑐 for 𝜕𝐺/𝜕𝑛 in Equation (8) suppress singular artifacts near the boundary but biases interior estimates without our correction strategy, shown here on a model scaled to fit inside a unit sphere*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 基线方法谱系
 
@@ -307,6 +314,8 @@ BVC 与 BEM 的**关键分水岭**在于：BEM 将计算负载集中于全局线
 3. **混合策略**：是否可将双向 WoS（Qi et al. 2022）整合到缓存框架中，在纯 Dirichlet 区域自动切换至更高效的专用估计器？
 4. **自适应参数调节**：如何自动设置钳位参数 *c*，以及如何借鉴虚拟点光源（VPL）文献中的技术自适应调节奇异函数校正？
 5. **域分解与复杂拓扑**：如何在蒙特卡洛框架下设计域分解策略，有效处理薄特征和复杂拓扑域？
+
+
 
 ## 原文 PDF
 

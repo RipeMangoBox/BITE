@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/ActivationReasoning_Logical_Reasoning_in_Latent_Activation_Spaces.pdf
+project_link: null
+code_link: https://github.com/ml-research/ActivationReasoning
 aliases:
 - AA
 - ActivationReasoning
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 激活推理：潜在激活空间中的逻辑推理 |
 | 英文题名 | ActivationReasoning: Logical Reasoning in Latent Activation Spaces |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=gGJh5AZTG7); [GitHub](https://github.com/ml-research/ActivationReasoning) |
+| Links | [paper](https://openreview.net/forum?id=gGJh5AZTG7) · [GitHub](https://github.com/ml-research/ActivationReasoning) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/generative_models_and_autoencoders |
 | Method | ACTIVATIONREASONING (AR) |
 | Dataset | PrOntoQA (5-hop), Rail2Country Meta (Reasoning), ProverQA (Hard), BeaverTails Safety |
@@ -42,7 +44,7 @@ claims:
 > - Rail2Country Meta (Reasoning) 上，Exact-match accuracy (%) 为 62.67 (AR, Llama3.1 8B)，对比 29.67 (Base LLM, Llama3.1 8B)，变化 +33.0。
 > - ProverQA (Hard) 上，Exact-match accuracy (%) 为 70.8 (AR, Llama3.1 8B)，对比 45.0 (Instruct+CoT+SC, Llama3.1 8B)，变化 +25.8。
 
-## 概述
+## 概要
 
 大型语言模型（LLM）在系统推理、组合泛化与规则执行上长期面临根本性瓶颈：其潜在表示高度纠缠且叠加，缺乏显式的命题结构，难以支撑稳定、可解释的逻辑推理。本文提出 **ACTIVATIONREASONING (AR)**，一种在 LLM 的潜在激活空间中直接进行逻辑推理的框架。其核心思路是将稀疏自编码器（SAE）提取的特征视为命题构建块，嵌入用户定义的逻辑规则，通过前向链接推理在连续、叠加的激活空间内实现可解释的组合推理与行为控制，从而弥合神经网络与符号推理之间的鸿沟。
 
@@ -53,7 +55,7 @@ AR 带来的性能提升在多项基准上由决定性证据支撑：
 
 方法上，AR 不改变模型参数，而是构建于三个模块化阶段之上：概念表征提取、命题激活与逻辑推理，并可进一步通过 SAE 解码器权重对隐藏状态进行概念级转向干预。该框架在保持高推理效率（仅需约 2k tokens，而 Instruct+CoT+SC 约需 11M tokens）的同时，展现出对层位置、概念表征规模的鲁棒性，为可审计、可控且可解释的神经符号推理提供了新的路径。
 
-## 背景与动机
+
 
 大型语言模型（LLMs）在广泛的自然语言任务中展现出卓越性能，但其内部工作机制仍然是一个高度纠缠的"黑箱"。模型通过在连续、叠加的潜在表示中编码知识，缺乏显式的命题结构与组合推理机制，这直接导致了三个核心瓶颈：系统推理能力薄弱、组合泛化困难、以及对模型行为缺乏可解释的控制手段。当任务需要多步逻辑链、对抽象概念的比喻性描述进行推理，或必须在激活层面执行安全规则时，LLMs往往表现脆弱。
 
@@ -61,7 +63,9 @@ AR 带来的性能提升在多项基准上由决定性证据支撑：
 
 上述缺口的根源在于：LLMs 的潜在空间虽然富含概念信息，但缺少一种在连续激活空间中应用离散逻辑规则、进行系统推理并干预模型输出的范式。这正是 ActivationReasoning（AR）所回应的根本动机。AR 的核心洞见是将 SAE 特征视为命题构建块，在 LLM 激活空间中嵌入用户定义的显式逻辑规则，通过前向链接推理实现可解释的组合推理与行为控制，在神经网络与符号推理之间架起桥梁。这一思想将 SAE 从被动检测工具升级为结构化推理与可控干预的完整管线——从概念表征构建，到命题激活与逻辑推导，再到通过 SAE 解码器权重对隐藏状态进行转向干预（Section 3），使模型内部的概念知识第一次被组织起来，去执行可解释、可组合且可操控的逻辑推理。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 大型语言模型（LLM）的潜在表示高度纠缠且叠加，缺乏显式的命题结构，导致系统推理、组合泛化和规则执行面临根本性困难。ActivationReasoning (AR) 的核心创新在于：**将稀疏自编码器（SAE）提取的特征作为命题构件，嵌入用户定义的前向链接逻辑规则，在 LLM 的连续激活空间中构建可解释、可组合的推理与行为控制机制**。该方法的因果操作柄是 SAE 特征激活矩阵上的规则演绎：通过显式推导新命题并反馈到模型表示，弥补了神经网络与符号推理之间的鸿沟。
 
@@ -83,7 +87,7 @@ AR 带来的性能提升在多项基准上由决定性证据支撑：
 
 当前 AR 的规则仍需人工定义，其能力也受限于 SAE 已解耦的概念范围。但总体而言，AR 通过将 LLM 的潜在激活转化为可审计、可组合的符号基板，为神经‑符号融合提供了一种高效且可解释的实现范式。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0006_gGJh5AZTG7_ActivationReasoning_Logical_Reasoning_in_Latent/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of ACTIVATIONREASONING. AR performs logical reasoning over LLM activations in three stages: (1) Finding latent representations, where concepts are identified in the SAE latent space and stored in a concept dictionary using single, multi, or relational feature representations; (2) Activating propositions, where token-level activations are detected during inference to form an activation matrix A; and (3) Logical reasoning, where pre-defined rules are applied over A to infer new higher-order structures, compose new propositions, yielding an enriched matrix A′. The structured activations can then be used for downstream transparency and control*
@@ -117,7 +121,7 @@ AR 带来的性能提升在多项基准上由决定性证据支撑：
 
 AR 的设计本质上是将 SAE 从静态特征提取扩展为动态符号推理与干预的基础设施，其核心假设——将 SAE 特征当作可靠的命题标签——在多类任务上获得了强有力的实验支持，但目前仍受限于 SAE 激活稳定性等可解释性领域的共性问题。
 
-## 核心模块与公式推导
+
 
 **ACTIVATIONREASONING (AR)** 在对齐的潜在空间中的推理被组织为四个紧密耦合的模块：概念表征构建、命题激活、逻辑推理和模型转向。下面按模块梳理关键机制与核心公式，并给出相应变量的含义。
 
@@ -178,7 +182,9 @@ $h$ 为原始隐藏状态，$h'$ 为干预后的隐藏状态；$\alpha$ 控制�
 
 以上四个模块共同构建了一条从潜在激活到逻辑命题再到可控输出的流水线：SAE 提供可解释的"符号基底"，阈值决断命题真值，逻辑规则实现组合泛化，转向机制将推理结果作用于生成过程。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果
 
@@ -234,7 +240,9 @@ ACTIVATIONREASONING（AR）在多个基准上一致地显著提升了推理与�
 - **Table 3 与 Table 5** 共同说明了速度－准确率的 Pareto 改善：AR 以远低于思维链的推理延迟（约 0.37 秒/样本）获得更高准确率，同时在 Rail2Country 检测任务中使 SAE 的彩色概念检测达到 100 % 正确。
 - **Table 6 的一系列超参数消融** 表明 AR 对多特征规模、阈值策略及层级位置均具有良好的鲁棒性，进一步确认了该方法的工程稳定性与组件设计的合理性。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ActivationReasoning (AR) 位于神经符号推理与可解释性机制的交汇处，其核心思想是将稀疏自编码器（SAE）解耦出的可解释特征作为命题原子，在潜在空间中执行用户定义的逻辑规则，从而将显式规则的控制力注入到原本高纠缠、叠加的神经网络激活中。这一范式不同于现有的三类主要推理增强策略：（1）**纯提示工程**类（Base、Instruct+CoT+SC）完全依赖模型自身的参数化知识，缺乏外部结构化的推理保证；（2）**专用推理架构**如DeepSeek-R1，通过大规模蒸馏或强化学习内化推理链，但依然受限于隐式处理，无法提供透明的组合级可控性；（3）**基于SAE的概念检测**（Base SAE）仅停留在特征提取层面，未将检测结果转化为推理与决策。AR的贡献在于打通了"表征—推理—控制"的完整闭环，在保持模型原有能力的前提下，赋予系统（i）组合缺失概念的能力（如从"桥""旧金山""美国"合成"金门大桥"），（ii）应对拼写/比喻等非字面输入的鲁棒性，以及（iii）神经层面的安全规则执行（Figure 2）。
 
@@ -248,6 +256,8 @@ ActivationReasoning (AR) 位于神经符号推理与可解释性机制的交汇�
 - **层与架构依赖性**：论文指出AR本身是层无关的，SAE附加层的选择对性能影响微小（Appendix G），但该结论仅在Llama3.1与Gemma2的特定层得到验证。在大规模MoE架构或非Transformer模型中，SAE特征的迁移性和AR的即插即用性尚未得到保证，需要手动验证。
 
 综上，AR在结构化推理任务中提供了一种高效、可解释且鲁棒的替代路径，尤其适合需要组合推理、多跳验证和安全约束的现实场景。但其知识表示和推理范围的刚性意味着，它更适合作为现有LLM的推理增强组件，而非全能推理替代品。未来方向包括自动规则学习、与不确定性推理的融合，以及更广泛的架构与数据域验证。
+
+
 
 ## 原文 PDF
 

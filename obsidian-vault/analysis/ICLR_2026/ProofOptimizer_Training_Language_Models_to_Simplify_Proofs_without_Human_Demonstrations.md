@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/ProofOptimizer_Training_Language_Models_to_Simplify_Proofs_without_Human_Demonstrations.pdf
+project_link: null
+code_link: https://github.com/ByteDance-Seed/Seed-Prover/blob/17f89e327e4f90f46b0af385efc233dbbe71f8bb/SeedProver/imo2025/IMO2025/P1.lean
 openreview_forum_id: huptrb4JTa
 aliases:
 - ProofOptimizer
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | ProofOptimizer：无需人类示例训练语言模型简化证明 |
 | 英文题名 | ProofOptimizer: Training Language Models to Simplify Proofs without Human Demonstrations |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=huptrb4JTa); [GitHub](https://github.com/ByteDance-Seed/Seed-Prover/blob/17f89e327e4f90f46b0af385efc233dbbe71f8bb/SeedProver/imo2025/IMO2025/P1.lean) |
+| Links | [paper](https://openreview.net/forum?id=huptrb4JTa) · [GitHub](https://github.com/ByteDance-Seed/Seed-Prover/blob/17f89e327e4f90f46b0af385efc233dbbe71f8bb/SeedProver/imo2025/IMO2025/P1.lean) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/language_speech_dialog |
 | Method | ProofOptimizer |
 | Dataset | miniF2F, PutnamBench, Seed-Prover IMO 2025, miniF2F (单样本) |
@@ -41,7 +43,7 @@ claims:
 > - PutnamBench 上，平均证明长度 为 811 (8轮迭代缩短后)，对比 1468 (原始Goedel-Prover-V2证明)，变化 -657 (缩减 57.2%)。
 > - Seed-Prover IMO 2025 上，证明长度 为 P3: 7907, P4: 14531, P5: 4002，对比 P3: 16377, P4: 29147, P5: 8658，变化 缩减 51.7%, 50.1%, 53.8%。
 
-## 概述
+## 概要
 
 形式化证明系统（如 Lean）为数学推理提供了严格的验证环境，但由强化学习训练证明器（如 Seed-Prover、Goedel-Prover）生成的证明往往极其冗长——miniF2F 上平均 334 个 token，PutnamBench 上平均 1468 个 token，IMO 2025 证明甚至可达数万 token。这些超长证明不仅难以阅读，更严重阻碍了形式化数学的规模化应用。**核心瓶颈在于：证明简化训练数据极度稀缺，现有方法（尤其是围绕现成大语言模型的 agent 型框架）难以可靠地压缩此类证明。**
 
@@ -53,7 +55,7 @@ ProofOptimizer 针对这一瓶颈提出了一个无需人工示例的专用证�
 
 **关键局限**包括：RL 训练导致生成多样性显著下降（red@32 增益有限）；基于执行反馈的修复机制常产生更长证明，整体收益较低；以证明长度为唯一优化目标时可能生成执行缓慢的证明。这些局限性指明了未来改进方向，包括联合优化长度与执行效率、缓解 RL 多样性崩溃等。
 
-## 背景与动机
+
 
 形式化定理证明近年来取得了显著进展，基于强化学习（RL）训练的证明器（如Goedel-Prover、Seed-Prover）已能生成日益复杂的形式化证明。然而，这些证明器输出的证明往往极其冗长——例如，Seed-Prover为IMO 2025问题生成的证明可达数万token——严重阻碍了人类审阅、教学应用和证明库维护。
 
@@ -63,7 +65,9 @@ ProofOptimizer 针对这一瓶颈提出了一个无需人工示例的专用证�
 
 实验表明，该思路具备显著的压缩潜力：ProofOptimizer将miniF2F上的平均证明长度从334 token缩减至75 token（87.9%），PutnamBench从1468 token缩减至811 token（57.2%），Seed-Prover的IMO 2025证明也缩减超过50%。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ProofOptimizer 的核心创新在于将证明简化从依赖通用大模型的 agent 型框架，转向一个由形式化验证驱动的专用训练范式。这一转变通过三个关键 changed slots 实现。
 
@@ -75,7 +79,7 @@ ProofOptimizer 的核心创新在于将证明简化从依赖通用大模型的 a
 
 三个 changed slots 的协同效应是 ProofOptimizer 取得显著压缩率的因果机制：形式化验证提供可靠训练信号，使专用模型摆脱对通用 LLM 的依赖；灵活的复杂度度量使优化目标可适配不同场景；多阶段推理管线则通过符号化预处理降低模型负担、迭代探索扩大搜索空间、测试时 RL 进一步压榨性能，形成从训练到推理的完整闭环。
 
-## 整体框架
+
 
 ProofOptimizer 的整体设计围绕一个核心洞察展开：形式化证明的可验证性（通过 Lean 编译器）可以作为可靠的训练信号，驱动一个专用语言模型学会简化证明，无需任何人工标注的简化示例。整个系统由三条正交但协同工作的管线构成，分别对应预处理、训练与推理时优化。
 
@@ -95,7 +99,7 @@ ProofOptimizer 的整体设计围绕一个核心洞察展开：形式化证明�
 
 该框架的一个关键特性是**复杂度度量的可替换性**：虽然默认优化目标是证明长度（token 数），但 $\mathcal{L}(x)$ 可替换为任意可计算度量，例如 Lean 心跳数（heartbeats），使得优化目标可以灵活地在简洁性与执行效率之间切换。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化
 
@@ -141,7 +145,9 @@ $$A_i = R_i - \frac{1}{k} \sum_{j<k} R_j$$
 
 该设计不使用标准差归一化，直接以组内均值作为基线计算优势。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心结果：证明长度的大幅压缩
 
@@ -214,7 +220,9 @@ Figure 12 的定性对比显示，ProofOptimizer 生成的简化证明（绿色�
 4. **泛化边界未充分验证**：当前仅在 7B 模型和三个评估集上验证，对更大规模数学库或更长证明的泛化性能尚不明确。
 5. **Lean 生态依赖**：整个工作流深度绑定 Lean 形式系统，无法直接迁移至 Coq、Isabelle 等其他证明助手。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有方法的关系
 
@@ -255,6 +263,8 @@ ProofOptimizer 处于形式化证明简化这一新兴方向的早期位置，�
 5. **跨形式系统迁移。** 当前方法深度绑定 Lean。将"可验证性驱动的专家迭代 + RL"范式迁移到其他形式系统（如 Coq、Isabelle）需要哪些最小适配工作？Lean 的 `unusedTactic` linter 在其他系统中是否有等价工具？
 
 6. **专家迭代的长度约束优化。** 训练中设定的约束（新证明长度 ≤ 原证明的 80%）是否是最优的？更宽松的约束可能增加训练数据量但降低数据质量，更严格的约束则相反。该超参数对最终模型性能的敏感性未被系统研究。
+
+
 
 ## 原文 PDF
 

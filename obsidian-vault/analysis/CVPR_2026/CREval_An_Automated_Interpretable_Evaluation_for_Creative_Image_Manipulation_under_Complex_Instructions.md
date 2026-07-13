@@ -42,7 +42,7 @@ claims:
 > - CREval-Bench 上，Overall Average Score Seedream 4.0: 83.43 vs Qwen-Image-Edit (open best): 79.78 (+3.65)；Instruction Following (IF) Score Seedream 4.0: 89.12 vs GPT-Image-1: 88.34 (+0.78)；Visual Consistency (VC) Score Gemini 2.5 Flash Image: 74.79 (best VC) vs Seedream 4.0: 73.44 (+1.35)。
 > - Human Preference Validation 上，CREvalScore (GPT-4o) alignment CREvalScore rankings align with HumanScore; Seedream 4.0 top both vs Aesthetic Score, VIEScore, EditScore baselines (N/A)。
 
-## 概述
+## 概要
 
 复杂创意图像编辑（如风格迁移、物体替换、场景合成）的自动评估长期受困于两个瓶颈：**评估覆盖不完整**与**评分过程不可解释**。传统方法依赖多模态大语言模型（MLLM）直接输出整体分数，这种黑箱式打分无法定位具体错误来源，也难以与人类对创意任务的多维度判断对齐。
 
@@ -56,7 +56,7 @@ $$S = 0.4 \times S_{\mathrm{IF}} + 0.4 \times S_{\mathrm{VC}} + 0.2 \times S_{\m
 
 **方法定位**：CREval 属于基于 VQA 的可解释评估范式，与直接打分方法（MLLM holistic scoring）、美学评分（Aesthetic Score）、以及 VIEScore、EditScore 等自动指标形成互补或替代关系。其核心贡献不在于提出新的生成模型，而在于为创意图像编辑领域提供了一套透明、可追溯、与人类对齐的评估基础设施。
 
-## 背景与动机
+
 
 ### 创意图像编辑的评估困境
 
@@ -80,7 +80,9 @@ $$S = 0.4 \times S_{\mathrm{IF}} + 0.4 \times S_{\mathrm{VC}} + 0.2 \times S_{\m
 - **构建多维评估体系**：从指令遵循（Instruction Following, IF）、视觉一致性（Visual Consistency, VC）和视觉质量（Visual Quality, VQ）三个互补维度全面衡量编辑质量，避免单一指标的片面性。
 - **建立高难度基准**：构建CREval-Bench，覆盖3大类9个创意维度、超过800对图像-指令对，为模型在复杂创意场景下的能力评估提供统一标尺。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CREval的核心创新在于将创意图像编辑的质量评估从“黑箱打分”转变为“结构化问答验证”的范式。具体而言，该方法通过以下关键设计实现了评估的透明化与细粒度化。
 
@@ -110,7 +112,7 @@ CREval与现有自动评估指标的差异不仅体现在评分机制上，更�
 
 为减少评估偏见，CREval在问题生成阶段使用与评估器不同的MLLM（如Qwen2.5-VL-72B），而非直接使用GPT-4o同时生成问题和评分。消融实验（Table 3）表明，当评估器从GPT-4o替换为Qwen3-VL时，各模型的相对排名保持稳定，验证了评估框架对不同MLLM评估器的鲁棒性。这一“生成-评估分离”的设计是确保评估公平性的关键工程决策。
 
-## 整体框架
+
 
 CREval 提出了一套全自动、基于问答（QA）的评估管道，用于系统衡量复杂创意指令下图像编辑模型的表现。其核心设计动机在于：传统 MLLM 直接打分的评估方式存在过程不透明、覆盖不完整、评分不可解释的瓶颈，而 CREval 通过将整体质量拆解为可独立验证的结构化二值判断，实现了透明且与人类偏好高度一致的自动评估。
 
@@ -149,7 +151,7 @@ $$S = 0.4 \times S_{\mathrm{IF}} + 0.4 \times S_{\mathrm{VC}} + 0.2 \times S_{\m
 ![[assets/figures/papers/paper_list_l816_https_arxiv_org_abs_2603_26174/figures/005_Figure_4.jpg]]
 *Figure 4: Overview of CREval. (1) In stage 1, we manually select high-quality images. We then construct several editing instruction examples and utilize the GPT-4o model for few-shot learning across 9 predefined dimensions, generating dimension consistent editing instructions and producing image–instruction pairs. (2) In stage 2, we use these image–instruction pairs to construct evaluation tasks. To reduce bias, we use different MLLMs such as Qwen2.5-VL-72B, to generate evaluation questions for 3 metrics using the Chain-of-Thought (CoT) method. Each metric contains at least 5 questions, with a total of no fewer than 15 questions per pair, completing the construction of the CREval-Bench. (3)In Stage 3...*
 
-## 核心模块与公式推导
+
 
 CREval 的核心设计在于将传统 MLLM 直接打分的黑箱评估，转化为一套结构化的问答式评估管道。其整体流程（图4）可拆解为三个关键阶段，每个阶段承担不同的功能角色。
 
@@ -182,7 +184,9 @@ $$S = 0.4 \times S_{\mathrm{IF}} + 0.4 \times S_{\mathrm{VC}} + 0.2 \times S_{\m
 ![[assets/figures/papers/paper_list_l816_https_arxiv_org_abs_2603_26174/figures/013_Table_S.3.jpg]]
 *Table S.3: Examples of question-answer pairs, where the ideal answer in the table showing cases is ‘Yes’*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 1. 实验设置与评估协议
 
@@ -278,7 +282,9 @@ Table 1将CREval-Bench与现有编辑基准进行了系统对比。CREval-Bench�
 ![[assets/figures/papers/paper_list_l816_https_arxiv_org_abs_2603_26174/figures/019_Figure_S.8.jpg]]
 *Figure S.8: More visual comparison*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有评估范式的对比定位
 
@@ -319,6 +325,8 @@ CREval 的提出为创意图像编辑评估开辟了新的路径，同时也揭�
 4. **跨模态扩展**：CREval 的 VQA 评估框架是否可以扩展至视频编辑或其他模态（如 3D 场景编辑、音频-视觉联合编辑）？这需要重新设计问题生成策略和评估维度。
 
 5. **“Thinking”模块的有效性悖论**：实验中发现 Bagel 和 Step1X-Edit 的 think 版本在 IF 得分上反而低于原版，说明额外的 thinking 模块在创意编辑任务中未带来增益。这一现象的内在原因及其对评估框架设计的启示值得深入研究。
+
+
 
 ## 原文 PDF
 

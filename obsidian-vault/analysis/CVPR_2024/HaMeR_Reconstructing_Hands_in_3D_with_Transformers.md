@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2024
 pdf_ref: paperPDFs/CVPR_2024/HaMeR_Reconstructing_Hands_in_3D_with_Transformers.pdf
+project_link: https://geopavlakos.github.io/hamer/
+code_link: https://github.com/openmmlab/mmpose
 aliases:
 - HRH3T
 tags:
@@ -40,7 +42,7 @@ claims:
 > - HO3Dv2 上，PA-MPJPE (mm) 7.7 vs 8.3 (AMVUR) (-0.6)。
 > - HInt (New Days subset) 上，PCK@0.05 (所有关键点) 48.0 vs 先前方法（未指定） (约2-3倍提升)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有3D手部重建方法通常在受限环境下训练，且模型容量有限，导致在非受控场景中鲁棒性不足——不同视角、遮挡、手-物交互等条件下性能退化严重。
 
@@ -55,7 +57,7 @@ claims:
 
 **局限**：大规模ViT-H模型计算成本高，不适用于移动端或实时应用；依赖MANO参数模型，对手部细节表达有限；单帧方法未利用时序信息。
 
-## 背景与动机
+
 
 从单张RGB图像中恢复准确的三维手部网格，是计算机视觉中的一个基础性问题，在增强现实、人机交互和机器人操作等领域有着广泛的应用需求。手部具有高度灵活的关节结构、频繁的自遮挡和物体交互，且在野外图像中常伴随运动模糊、极端视角和复杂光照，这使得单目3D手部重建成为一个极具挑战性的任务。
 
@@ -67,7 +69,9 @@ claims:
 
 HaMeR的核心假设是：**通过同时扩大训练数据规模和采用高容量的Transformer架构，可以大幅提升野外手部网格重建的准确性和鲁棒性**。这一假设建立在两个关键观察之上：其一，手部重建任务本质上需要强语义理解能力，以应对遮挡、视角变化和交互等复杂情形，而Transformer架构在建模长距离依赖和全局上下文方面具有天然优势；其二，现有训练数据虽然分散在多个数据集中，但总量足以支撑大模型训练，关键在于如何有效整合。HaMeR试图验证，一个简单的全Transformer设计——将ViT-H骨干与Transformer解码器头结合——在足够的数据支撑下，能否超越复杂的专用方法，成为野外手部重建的通用解决方案。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 HaMeR 的核心创新并非提出复杂的算法模块，而是通过**同时扩大训练数据规模与模型容量**，以极简的全 Transformer 架构实现了 3D 手部重建在野外场景下的鲁棒性跃升。这一思路从根本上回应了先前方法的瓶颈：现有工作在受限环境下训练、模型容量有限，难以泛化到遮挡、手-物交互、不同视角等非受控场景。
 
@@ -83,7 +87,7 @@ HaMeR 的核心创新并非提出复杂的算法模块，而是通过**同时扩
 
 从方法谱系来看，HaMeR 延续了 **FrankMocap** 的参数化回归范式（回归 MANO 参数而非直接回归顶点），但通过 Transformer 架构和数据规模的双重放大，使其摆脱了 CNN 小模型的泛化局限。相比 **METRO**（Lin et al., CVPR 2021）和 **Mesh Graphormer**（Lin et al., ICCV 2021）等非参数化 Transformer 基线，HaMeR 以更简单的设计（参数化输出 + 全 Transformer）取得了更优的鲁棒性，尤其在运动模糊、手-手交互、手-物交互等困难场景下优势显著（Figure 3）。
 
-## 整体框架
+
 
 HaMeR 采用一种简洁的全 Transformer 设计，将单目 RGB 图像直接映射为 MANO 手部模型的姿态、形状及相机参数，进而恢复完整的 3D 手部网格与关键点。整个 pipeline 由四个核心模块串联构成，数据流清晰且无复杂多阶段设计。
 
@@ -107,7 +111,7 @@ HaMeR 采用一种简洁的全 Transformer 设计，将单目 RGB 图像直接�
 ![[assets/figures/papers/paper_list_l15_HaMeR_Reconstructing_Hands_in_3D_with_Transformers_motion20v2/figures/002_Figure_2.jpg]]
 *Figure 2: Dataset and Architecture. (Top) Hand crops with keypoint annotations from our HInt dataset of annotations for different image sources, Hands23 [9], Epic-Kitchens [12, 13], and Ego4D [18]. We provide location annotations for 21 hand keypoints as well as the “occlusion” label for each joint. Occluded keypoints are marked using solid dot filled with black while non-occluded ones are filled with white. The pie chart shows the distribution and statistics of our dataset. (Bottom) The architecture for HaMeR follows a fully transformer-based design. We use a large scale ViT backbone [14] followed by a transformer decoder to regress the parameters of the hand*
 
-## 核心模块与公式推导
+
 
 HaMeR 的整体架构遵循全 Transformer 设计，由三个核心模块串联构成：ViT 骨干网络、Transformer 解码器头以及 MANO 手部参数模型。
 
@@ -143,7 +147,9 @@ $$\mathcal{L}_{\mathrm{adv}} = \sum_{k} (D_{k}(\Theta) - 1)^{2}$$
 
 > 注：以上公式均来自论文 Section 3.1 至 3.4 的原始定义，变量含义与原文一致。各模块的消融验证见 Table 5 及相关实验分析。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -250,7 +256,9 @@ Table 5 的消融实验是本文方法论的基石，系统性地分离了数据
 ![[assets/figures/papers/paper_list_l15_HaMeR_Reconstructing_Hands_in_3D_with_Transformers_motion20v2/figures/006_Table_4.jpg]]
 *Table 4: Effect of training with HInt. We compare our general model (Ours) with the model trained on HInt as well (Ours∗). We report PCK scores on the test set of HInt. Using the training set of HInt can be helpful particularly to improve performance on egocentric data (VISOR and Ego4D)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 方法谱系：从CNN到全Transformer的3D手部重建
 
@@ -283,6 +291,8 @@ HaMeR在3D手部重建领域的定位可以沿两条轴线理解：**参数化 v
 4. **下游任务的增益验证**：HaMeR在标准基准上的提升是否能够转化为机器人操作、手语识别、手势交互等下游任务的实际增益，论文未提供相关实验。3D关键点精度的提升与任务级指标之间的相关性需要进一步验证。
 
 5. **非自然手形的鲁棒性**：论文在Figure 1和Figure 4中展示了机械手和艺术画作的重建结果，表明HaMeR具有一定的泛化能力，但缺乏系统性的定量评估。当输入手形显著偏离MANO模型的训练分布时，模型是否会产生系统性偏差，是一个值得关注的问题。
+
+
 
 ## 原文 PDF
 

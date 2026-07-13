@@ -5,6 +5,7 @@ paper_level: A
 venue: ICCV
 year: 2021
 pdf_ref: paperPDFs/ICCV_2021/Learning_Indoor_Inverse_Rendering_with_3D_Spatially_Varying_Lighting.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/toronto-ai/inverse-rendering-3d-lighting/
 aliases:
 - VBIRO
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 学习具有三维空间变化光照的室内逆向渲染 |
 | 英文题名 | Learning Indoor Inverse Rendering with 3D Spatially-Varying Lighting |
 | 会议/期刊 | ICCV 2021 |
-| Links | [paper](https://arxiv.org/abs/2109.06061); [Project](https://research.nvidia.com/labs/toronto-ai/inverse-rendering-3d-lighting/) |
+| Links | [paper](https://arxiv.org/abs/2109.06061) · [Project](https://research.nvidia.com/labs/toronto-ai/inverse-rendering-3d-lighting/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | VSG-based Inverse Rendering (Ours) |
 | Dataset | InteriorNet (Albedo), InteriorNet (Normals), InteriorNet (Depth), InteriorNet (Lighting) |
@@ -42,7 +43,7 @@ claims:
 > - InteriorNet (Normals) 上，Angular Error (°) 为 18.40。
 > - InteriorNet (Depth) 上，si-MSE 为 0.181。
 
-## 概述
+## 概要
 
 从单张有限动态范围（LDR）图像中恢复完整的三维场景内蕴属性——反照率、法线、深度以及高动态范围（HDR）照明——是计算机视觉与图形学中长期存在的病态问题。其核心瓶颈在于：室内场景的光传输高度复杂，包含空间变化的高频阴影、相互反射和镜面效果，而现有方法普遍将照明简化为二维全局环境贴图或逐像素参量表示，无法准确捕捉这种三维空间与角度上的高频变化，导致虚拟物体插入时缺乏真实的阴影和反射。
 
@@ -52,7 +53,7 @@ claims:
 
 在 InteriorNet 基准上，本方法在反照率（si-MSE 0.0175）、法线（角度误差 18.40°）、深度（si-MSE 0.181）和照明预测（PSNR 17.37 dB）等指标上均超越 **NIR**（Sengupta et al., ICCV 2019）和 **Li et al.**（Li et al., CVPR 2020）等方法。在真实图像上的虚拟物体插入实验中，该方法能够生成高保真的投射阴影和高频反射，尤其对高度镜面物体的渲染效果显著优于对比方法（Figure 6, Figure 7）。消融实验进一步证实，联合再预测模块和球面高斯的方向特性对最终性能至关重要。
 
-## 背景与动机
+
 
 逆向渲染旨在从单张或多张二维图像中恢复场景的内蕴属性（如几何、材质和光照），是计算机视觉与图形学交叉领域的核心问题。其应用涵盖增强现实、虚拟物体插入、场景重光照和三维内容生成。然而，室内场景的逆向渲染面临独特挑战：室内光照通常由多个光源、间接反弹和复杂遮挡构成，呈现强烈的**三维空间变化性**和**角度高频细节**。
 
@@ -62,7 +63,9 @@ claims:
 
 本文的核心动机是：**通过将光照表示为三维体素化的球面高斯（Volumetric Spherical Gaussian, VSG），并耦合基于光线追踪的可微物理渲染器，实现从单张 LDR 图像到 HDR 体积照明的端到端学习**。这一设计的因果逻辑在于：体积表示天然捕捉光线的三维空间分布和方向特性，而可微渲染器使得重渲染损失能够反向传播至光照预测，无需 HDR 真值监督即可迫使模型推测物理一致的光照。最终，该框架能够从单目图像中联合恢复反照率、法线、深度和三维空间变化光照，并在虚拟物体插入任务中产生高保真的阴影和镜面反射效果。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作针对“室内场景逆向渲染”这一任务，在照明表示、渲染器设计以及训练策略三个维度上对现有方法的通用假设做出了实质性改变。其核心创新并非增量式地改进某个组件，而是通过引入**三维体积球面高斯（Volumetric Spherical Gaussian, VSG）照明表示**，并围绕该表示构建**完全物理可微的渲染与联合推理管线**，使模型能够在仅使用单张 LDR 图像的条件下，端到端地恢复出空间变化的高动态范围（HDR）照明。
 
@@ -124,7 +127,7 @@ $$\tilde{S}_p = \sum_{\mathbf{l}} \mathcal{R}(\mathbf{p}, \mathbf{l}, \hat{L}) \
 
 这三个维度的创新并非孤立存在，而是形成了一条**因果链路**：VSG 表示提供了表达复杂光传输的能力基础，可微物理渲染器使得从 LDR 图像到 HDR 照明的梯度通路成为可能，而闭环训练策略则利用这条通路迫使模型推测出物理正确的三维空间变化光照。
 
-## 整体框架
+
 
 本文提出一个端到端的学习式逆向渲染框架，从单张 LDR 图像联合估计反照率、法线、深度以及三维空间变化的 HDR 照明体积。整个流水线由四个可微子模块级联构成，形成“初始预测—照明推理—物理重渲染—联合精炼”的闭环结构（Figure 2）：
 
@@ -150,7 +153,7 @@ $$\tilde{S}_p = \sum_{\mathbf{l}} \mathcal{R}(\mathbf{p}, \mathbf{l}, \hat{L}) \
 ![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2109_06061/figures/001_Figure_1.jpg]]
 *Figure 1: (f) Specular / Diffuse / Transparent Sphere Insertion (g) Specular Object Insertion Figure 1: From a single image, our model jointly estimates albedo, normals, depth, and the HDR lighting volume. Key to our method is inferring continuous HDR 3D spatially-varying lighting, which is critical in producing high quality virtual object insertion with realistic cast shadows and angular high-frequency details*
 
-## 核心模块与公式推导
+
 
 本方法围绕**三维空间变化照明体积的预测与物理可微重渲染**构建，由四个子模块级联组成（Figure 2）。核心思想是：先预测场景内蕴属性与照明体积的初始估计，再通过可微渲染反向传播重渲染误差，驱动所有模块联合优化。
 
@@ -206,7 +209,9 @@ $$\frac{\partial \tilde{S}}{\partial \tilde{N}_p} = \sum_{l} \mathbf{1}_{l \cdot
 
 消融实验证实（Table 5, Figure 4）：移除该模块会导致反照率、法线和深度指标全面下降；若不将照明属性（着色及雅可比）输入该模块，性能同样受损，验证了照明线索对内蕴属性推理的关键作用。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -291,7 +296,9 @@ Table 5 的系统消融揭示了各模块的关键贡献：
 ![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2109_06061/figures/011_Figure_7.jpg]]
 *Figure 7: Qualitative comparison of lighting estimation on real-world images. We compare purely specular object insertion on the left, and on the right is mostly diffuse object. The top row shows insertion on a solid surface while bottom row shows freely inserted objects in 3D. Our method produces more realistic results in both specular and diffuse settings and is spatially consistent. (Best viewed zooming in. ) Figure 8: Qualitative results of object insertion on real-world images. From left to right, we insert a bunny, kettle, cart and armchair*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从二维全局照明到三维空间变化照明
 
@@ -386,6 +393,8 @@ $$\frac{\partial \tilde{S}}{\partial \tilde{N}_p} = \sum_{l} \mathbf{1}_{l\cdot 
 5. **非朗伯材质的联合估计**：若将渲染器升级为支持镜面反射的 microfacet 模型，是否能在不增加歧义性的前提下同时估计材质粗糙度和金属度？这需要更强的约束或额外的监督信号。
 
 6. **真实世界 HDR 照明的定量评估**：当前照明评估依赖重渲染误差（间接指标）或合成数据的 GT 照明（Table 2）。在真实场景中，如何获取 HDR 照明体积的 ground truth 以进行直接评估？
+
+
 
 ## 原文 PDF
 

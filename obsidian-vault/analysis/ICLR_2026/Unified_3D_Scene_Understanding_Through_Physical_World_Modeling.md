@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Unified_3D_Scene_Understanding_Through_Physical_World_Modeling.pdf
+project_link: null
+code_link: null
 openreview_forum_id: NQq9JLMfNN
 aliases:
 - 33WM
@@ -42,7 +44,7 @@ claims:
 > - DL3DV (NVS) 上，PSNR↑ 为 19.02，对比 16.59 (ViewCrafter)，变化 +2.43。
 > - SEVA RE10K (NVS) 上，PSNR↑ 为 21.54，对比 20.88 (ViewCrafter)，变化 +0.66。
 
-## 概述
+## 概要
 
 当前三维场景理解面临一个根本性瓶颈：深度估计、新视角合成、物体操纵等任务通常由孤立模型分别处理，缺乏统一的表征与跨任务知识迁移能力。现有生成式三维模型在几何一致性、精确可控性方面表现不足，难以灵活组合不同的感知与交互能力。
 
@@ -55,7 +57,7 @@ claims:
 
 消融实验进一步证实，局部随机访问序列与光流中间表示对性能至关重要：采用光流控制比相机单独控制在新视角合成上 PSNR 提升 3.53，在深度估计上 AbsRel 从 0.173 降至 0.078（Table 4 & Table 5）。这些结果共同表明，3WM 通过统一的概率图建模与光流驱动的推理机制，为三维场景理解提供了一条可扩展的通用路径。
 
-## 背景与动机
+
 
 三维场景理解是计算机视觉的核心目标之一，涵盖深度估计、新视角合成（NVS）、三维物体操纵等关键任务。这些能力对于增强现实、机器人导航和内容创作等应用至关重要。然而，当前的研究范式存在一个根本性瓶颈：**各项任务通常由孤立模型分别处理，缺乏统一的表征框架与跨任务知识迁移机制**。
 
@@ -69,7 +71,9 @@ claims:
 
 本文的动机正是填补上述缺口：通过将三维场景理解重新表述为一个统一物理世界建模问题，使单一模型能够在零样本条件下切换于新视角合成、物体操纵和深度估计之间，同时保持几何精度与外观一致性。这一目标的实现依赖于两个核心设计选择——**将光流作为显式的中间动作空间**，以及**构建支持局部随机访问的图序列建模范式**——从而在不改变模型结构的前提下，让不同任务自然涌现为概率图中的不同推理路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 3WM 的核心创新并非单一技术的堆叠，而是**将三维场景理解重构为统一概率图模型中的条件推理问题**，并通过三项关键设计实现跨任务的零样本泛化与精确几何控制。
 
@@ -105,7 +109,7 @@ $$\Psi ( X , p ) \equiv \mathrm { P r } \left[ v _ { k } \ : \middle \vert \ : p
 
 **总结**：3WM 的创新本质是以光流为中介动作空间，在统一概率图模型框架内通过局部随机访问序列实现多模态条件推理。三项设计相互依赖——光流提供几何可控性，指针-内容编码提供空间灵活性，统一图模型提供任务泛化性——共同构成了从“多模型分立”到“单模型统一”的范式跃迁。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_NQq9JLMfNN/figures/002_Figure_2.jpg]]
 *Figure 2: Flexible inference pathways across modalities. Our framework allows us to flexibly construct inference pathways for 3D scene understanding. Using optical flow tokens as conditioning, the model performs image editing by generating the next RGB frame. Conversely, when optical flow tokens serve as the prediction target, the model enables depth estimation by predicting the next flow field from a single RGB image and in-plane camera motion input*
@@ -125,7 +129,7 @@ $$\Psi ( X , p ) \equiv \mathrm { P r } \left[ v _ { k } \ : \middle \vert \ : p
 
 **光流作为中间动作空间。** 框架的关键洞察在于将光流作为显式的几何控制表面。不同任务通过构建不同的推理路径实现：新视角合成和物体操纵使用 $ \Psi(\text{RGB}_0, F_{01}) \rightarrow \text{RGB}_1 $ 路径，以光流作为条件控制生成；深度估计则使用 $ \Psi(\text{RGB}_0, C_{\text{in-plane}}) \rightarrow F_{01} $ 路径，从相机运动预测光流，再通过 $ D_{\text{depth}} \propto 1/F_{\text{flow}} $ 提取深度（Figure 2）。这种设计使得模型无需任务特定的结构修改，即可在零样本条件下切换于感知与交互任务之间。
 
-## 核心模块与公式推导
+
 
 ### 概率图模型形式化
 
@@ -162,7 +166,9 @@ $$D_{\mathrm{depth}} \propto \frac{1}{F_{\mathrm{flow}}}$$
 
 即深度与预测光流幅度成反比。这一简单关系使得模型无需显式深度监督即可从生成的光流中恢复 2.5D 几何信息（Section 3.3）。消融实验表明，直接预测光流（3WM）在 NYU 深度估计上 AbsRel 为 0.078，显著优于从预测图像间接推导光流的变体（3WM$_{\text{rgb}}$，AbsRel 0.173），验证了光流作为中间几何表示的关键作用（Table 5 右）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -210,7 +216,9 @@ $$D_{\mathrm{depth}} \propto \frac{1}{F_{\mathrm{flow}}}$$
 
 Figure 8 展示了 3WM 对光照和外观的涌现理解：物体移动时高光随位置变化而适当调整，投射阴影随物体运动一致位移。尽管部分示例仍存在不完整的高光或阴影行为，但多数结果展现了对阴影和视角依赖外观的正确推理。作者指出，光照保真度主要受模型规模和数据多样性约束，而非方法本身的根本局限。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 
@@ -252,6 +260,8 @@ Figure 8 展示了 3WM 对光照和外观的涌现理解：物体移动时高光
 3WM 在方法谱系中占据“统一物理世界模型”这一新兴节点。与传统的任务专用模型（如 NVS 的 ZeroNVS、深度估计的 IndoorDepth）相比，它提供了跨任务的统一表征；与现有的多任务生成模型（如 SEVA）相比，它通过光流中间表示实现了更强的几何可控性；与拖拽式编辑方法（如 DragAnything）相比，它将编辑操作纳入严格的物理运动建模框架。
 
 该方法的核心技术支柱——层次化局部量化器（HLQ）、指针-内容序列化、局部随机访问序列——构成了一个可扩展的框架，允许未来通过增加新的节点类型（如语义标签、材质属性）来扩展建模能力。这一框架对后续研究者的启示在于：物理世界建模的突破口可能不在于设计更复杂的任务专用架构，而在于找到合适的中间表示（此处为光流）和灵活的序列建模策略，使多种物理推理能力自然涌现。
+
+
 
 ## 原文 PDF
 

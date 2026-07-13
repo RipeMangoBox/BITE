@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Perception_Aware_Policy_Optimization_for_Multimodal_Reasoning.pdf
+project_link: null
+code_link: null
 openreview_forum_id: izbBqTL8vb
 aliases:
 - PPAPO
@@ -42,7 +44,7 @@ claims:
 > - 8个多模态推理基准 (Qwen2.5-VL-7B) 上，avg@8 acc % 为 63.16 (PAPO_D)，对比 55.01 (DAPO)，变化 +17.54% 相对提升。
 > - 强视觉依赖任务子集 (Qwen2.5-VL-7B) 上，avg@8 acc % 为 59.37 (PAPO_G)，对比 54.11 (GRPO)，变化 +7.96% 相对提升。
 
-## 概述
+## 概要
 
 当前多模态推理模型面临一个关键瓶颈：**视觉感知薄弱是导致推理失败的主要原因**。对使用标准GRPO训练的模型进行人工错误分析发现，67%的错误源于感知缺陷，而非逻辑推理或计算能力不足（Figure 1）。这一发现揭示了现有强化学习优化目标在多模态场景下的根本性局限——它们仅依赖文本奖励信号驱动策略更新，缺乏对视觉信息利用的显式激励。
 
@@ -50,7 +52,7 @@ claims:
 
 在八个多模态推理基准上，PAPO相对GRPO/DAPO平均提升**4.4%–17.5%**，在强视觉依赖任务上提升更为显著（**8.0%–19.1%**），并将感知错误减少**30.5%**。方法可无缝替换GRPO或DAPO，训练开销仅增加约20%。
 
-## 背景与动机
+
 
 ### 多模态推理中的感知瓶颈
 
@@ -76,7 +78,9 @@ claims:
 
 PAPO 可作为 GRPO 或 DAPO 的直接替代方案，无需额外标注或模型，在八个多模态推理基准上实现 4.4%–17.5% 的相对提升，并将感知错误减少 30.5%（Figure 1, Table 1）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PAPO 的根本创新在于**将视觉感知激励直接嵌入 RLVR 优化目标**，而非依赖外部标注或奖励模型。其核心洞察是：多模态推理的主要瓶颈并非逻辑或计算能力，而是视觉感知薄弱——手动错误分析显示，GRPO 训练后模型的失败案例中 **67% 源于感知错误**（Figure 1）。基于此，PAPO 在 GRPO/DAPO 的优化目标中引入两个关键 changed slots，迫使模型在强化学习过程中同时学会“看”和“推理”。
 
@@ -102,7 +106,7 @@ PAPO 引入 **Double Entropy Loss** 解决这一问题：同时对原始策略 $
 
 PAPO 仅修改优化目标，不改变模型架构、训练数据、奖励函数或采样空间，可作为 GRPO（Shao et al., 2024）或 DAPO（Yu et al., 2025）的直接替代。完整目标 $\mathcal{T}_{PAPO_G}(\theta)$ 在 GRPO 的裁剪优势估计和参考 KL 惩罚基础上，整合了 Implicit Perception Loss 和 Double Entropy Loss（Equation 2）。这一设计使得 PAPO 在八个多模态推理基准上相对 GRPO/DAPO 平均提升 4.4%–17.5%，在强视觉依赖任务上提升 8.0%–19.1%，并将感知错误减少 30.5%（Table 1, Figure 1）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_izbBqTL8vb/figures/002_Figure_2.jpg]]
 *Figure 2: Illustration of the $\mathbf { P A P O } _ { G }$ objective, which extends GRPO by adding the Implicit Perception Loss ( ${ \mathrm { K L } } _ { \mathrm { p r c p } }$ ) . Additional Double Entropy Loss regularization ( $\check { H } [ \pi _ { \theta }$ ] , $\check { H } [ \pi _ { \theta } ^ { m a s k }$ ] ) can be added for enhancing training stabilities. The ${ \mathrm { K L } } _ { \mathrm { p r c p } }$ is formulated as maximizing the difference between the original policy $\pi _ { \theta }$ and a corrupted policy $\pi _ { \theta } ^ { \mathrm { m a s k } }$ , computed with a masked visual input. Intuitively, PAPO encourages the model to produce visually grounded responses while still achieving high...
@@ -140,7 +144,7 @@ PAPO仅修改优化目标，不改变奖励函数、采样空间或模型架构�
 
 PAPO引入的主要计算开销来自掩蔽路径的额外前向传播。对于3B模型，每步训练时间增加约48.8秒（约20%相对增长）。这一开销是框架当前的主要限制之一，论文未探索通过缓存或蒸馏优化该开销的可能。
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题形式化与GRPO基线
 
@@ -201,7 +205,9 @@ PAPO_D变体在DAPO（Yu et al., 2025）框架上应用相同的KL_prcp和Double
 
 **关键机制**：PAPO仅修改优化目标，不依赖外部标注或奖励模型，可作为GRPO/DAPO的直接替换。训练开销增加约20%（3B模型每步额外48.8秒），源于掩蔽输入的前向传播计算。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：感知瓶颈与PAPO的全局性能
 
@@ -264,7 +270,9 @@ PAPO的另一个已知局限是：在视觉依赖性极低的任务（如MMLU-Pr
 - **Table 5**：Double Entropy Loss是防止KL_prcp hacking并保持增益的最有效正则化方法。
 - **Figure 4**：PAPO训练动态优于基线，DAPO-7B后期崩溃而PAPO_D保持稳定。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 基线对比与定位
 
@@ -305,6 +313,8 @@ PAPO 的有效性存在明确的适用条件：
 4. **训练效率优化**：额外前向传播能否通过缓存掩蔽输入的计算图或知识蒸馏来减少？例如，在训练早期冻结掩蔽策略的部分层。
 5. **跨模态泛化**：PAPO 的核心机制——通过对比完整与受损输入的信息增益来激励感知——能否迁移到视频推理、3D 场景理解或音频-视觉任务？这些模态的“掩蔽”策略需要重新设计。
 6. **与架构改进的结合**：PAPO 目前仅修改优化目标，与视觉编码器改进（如更高分辨率、更强的预训练）或推理时策略（如思维链提示）的结合效果未知。
+
+
 
 ## 原文 PDF
 

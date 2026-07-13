@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2024
 pdf_ref: paperPDFs/CVPR_2024/MAS_Multi_view_Ancestral_Sampling_for_3D_motion_generation_using_2D_diffusion.pdf
+project_link: https://guytevet.github.io/mas-page/
+code_link: null
 aliases:
 - MVASM
 - MAS
@@ -43,7 +45,7 @@ claims:
 > - NBA 2D projections (Side view) 上，Recall↑ 0.60±.01 vs ElePose 0.17±.01, MotionBERT 0.15±.04 (+0.43 (远超提升方法))。
 > - NBA user study 上，Precision 100.0% (vs DreamFusion), 86.1% (vs MotionBERT) vs DreamFusion, MotionBERT (显著偏好MAS)。
 
-## 概述
+## 概要
 
 **核心问题**：当前3D人体运动生成严重依赖高质量3D运动捕捉数据，这类数据获取成本高昂、难以扩展，且覆盖的运动领域极为有限。与此同时，互联网上存在海量2D视频数据，却因缺乏多视角一致性而无法直接用于3D运动生成。
 
@@ -56,8 +58,6 @@ claims:
 - 侧视角评估时，MAS的Recall为**0.60**，远超ElePose的0.17和MotionBERT的0.15，证明其不受视角变化影响。
 - 用户研究中，MAS在精度、多样性、整体质量三个维度均以**100%**比例显著优于DreamFusion，以**86%以上**比例优于MotionBERT。
 - 消融实验揭示，移除3D噪声投影后模型发生严重模式坍塌（Recall降至0.01），证实多视角一致噪声是该方法成功的必要条件。
-
-## 背景与动机
 
 ### 3D运动生成的困境：数据稀缺与2D鸿沟
 
@@ -84,7 +84,7 @@ MAS（Multi-view Ancestral Sampling）的提出正是为了突破这一困境。
 
 MAS通过在2D扩散模型的祖先采样过程中引入多视角一致性机制来应对这些挑战：在每一步去噪时，同时处理多个2D视图，通过三角化与重投影强制它们共享一个3D运动，并使用3D噪声投影保持多视图噪声分布的一致性。这种方法使得3D运动可以从头开始逐步生成，同时始终保持多视图之间的几何一致性，从而仅用2D数据即可学习3D运动分布。
 
-## 核心创新
+## 核心方法与创新机理
 
 ### 问题瓶颈
 
@@ -134,8 +134,6 @@ MAS的整体架构由四个核心模块构成：
 $$x_{t-1}^{1:V} = \frac{\beta_t \sqrt{\bar{\alpha}_{t-1}}}{1-\bar{\alpha}_t} x_t^{1:V} + \frac{(1-\bar{\alpha}_{t-1})\sqrt{\alpha_t}}{1-\bar{\alpha}_t} \tilde{x}_0^{1:V} + \frac{\beta_t (1-\bar{\alpha}_{t-1})}{1-\bar{\alpha}_t} \varepsilon^{1:V}$$
 其中 $\tilde{x}_0^{1:V}$ 为一致性模块输出的重投影视图，$\varepsilon^{1:V}$ 为3D噪声投影得到的多视图噪声。
 
-## 整体框架
-
 MAS 的整体管线由两个阶段构成：**数据准备与2D扩散模型训练**（离线阶段），以及**多视角祖先采样推理**（在线阶段）。核心思路是将3D运动生成问题转化为多个2D视图的同步去噪问题，在扩散过程的每一步强制多视角一致性，从而仅用2D数据学习3D运动分布。
 
 ### 阶段一：数据准备与2D扩散模型训练
@@ -164,11 +162,6 @@ $$x_{t-1}^{1:V} = \frac{\beta_t \sqrt{\bar{\alpha}_{t-1}}}{1-\bar{\alpha}_t} x_t
 整个推理过程形成了“**2D去噪 → 3D三角化 → 2D重投影 → 祖先采样**”的闭环。一致性模块充当2D生成与3D结构之间的桥梁，而3D噪声投影器则确保多视图的噪声先验本身是几何一致的。消融实验（Table 3）表明，移除3D噪声投影后模型发生严重的模式坍塌（Recall降至0.01），证实了该模块对维持生成多样性的关键作用。视图数量 $V \geq 5$ 时性能趋于饱和（Table 6），说明5个视图即可提供足够的多视角约束。
 
 ### 补充图表
-
-![[assets/figures/papers/paper_list_l1850_MAS_Multi_view_Ancestral_Sampling_for_3D_motion_generation_using_2D_diff/figures/002_Figure_2.jpg]]
-*Figure 2: Preparations. The motion diffusion model used for MAS is trained on 2D motion estimations of videos scraped from the web*
-
-## 核心模块与公式推导
 
 MAS（Multi-view Ancestral Sampling）的核心设计围绕一个关键矛盾展开：如何在仅拥有2D运动先验的条件下，生成多视角一致的3D运动。其解决方案是在扩散模型的祖先采样过程中嵌入一个“一致性约束循环”，每步同时去噪多个视图，并通过三角化与重投影强制所有视图共享同一底层3D运动。以下按模块拆解这一机制。
 
@@ -213,7 +206,7 @@ Theorem 1 证明正交投影保持高斯分布不变，这是该设计的理论�
 
 以上四个模块形成一条清晰的因果链：**$G_{2D}$ 提供2D运动先验 → 一致性模块在每个去噪步将独立预测约束为共享3D运动 → 3D噪声投影确保噪声本身不破坏多视图一致性 → 祖先采样更新在一致流形上推进**。去掉一致性模块，方法退化为独立的多视图2D生成；去掉3D噪声，一致性模块虽在，但噪声的不一致会逐步侵蚀多视图约束，最终导致模式坍塌。两个机制必须协同工作，才能在仅使用2D数据训练的条件下稳定生成3D运动。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -244,9 +237,6 @@ Figure 5 展示了 22 名用户在 15 组随机生成运动上的偏好投票，
 - **精度（Precision）**：MAS vs DreamFusion 改编版为 100.0%，MAS vs MotionBERT 为 86.1%
 - **多样性（Diversity）**：MAS vs DreamFusion 为 100.0%，MAS vs MotionBERT 为 83.3%
 - **整体质量（Overall Quality）**：MAS vs DreamFusion 为 100.0%，MAS vs MotionBERT 为 88.9%
-
-![[assets/figures/papers/paper_list_l1850_MAS_Multi_view_Ancestral_Sampling_for_3D_motion_generation_using_2D_diff/figures/004_Figure_5.jpg]]
-*Figure 5: NBA Dataset User study. We asked 22 unique users to compare 15 randomly generated motions by each of the models to MAS generations in 3 aspects - precision (i.e. what samples best depict Basketball moves), Overall Quality and Diversity. The dashed line marks 50%. MAS outperforms the lifting methods and the DreamFusion adaptation*
 
 用户对 MAS 的偏好远超 50% 随机基线，且 DreamFusion 改编版在无条件运动生成任务上完全无法与 MAS 竞争。
 
@@ -303,12 +293,7 @@ Table 4 报告了单样本生成的时间与显存开销。MAS 生成一个运�
 2. 训练数据依赖 2D 姿态估计器，其误差可能通过置信度掩码得到缓解，但仍可能限制最终 3D 运动质量的上限。
 3. “好的 2D 投影意味着好的 3D 运动”这一假设在极端遮挡或非刚性变形场景下可能不成立，需要手动验证。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1850_MAS_Multi_view_Ancestral_Sampling_for_3D_motion_generation_using_2D_diff/figures/005_Figure_4.jpg]]
-*Figure 4: Generated motions by MAS compared to ElePose [38], MotionBert [54], and an adaptation of DreamFusion [26] to unconditioned motion generation. We observe that MotionBert and DreamFusion produce dull motions with limited movement and ElePose predictions are jittery and often include invalid poses (Red rectangles)*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 方法谱系：从2D提升到3D原生生成
 

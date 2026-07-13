@@ -41,7 +41,7 @@ claims:
 > - 3D-FRONT-T (synthetic) 上，Normal MAE↓ 7.96 vs 9.89 (TSGS) (-1.93)；Depth AbsRel↓ 0.04 vs 0.08 (TSGS) (-0.04)；Mesh CD↓ 0.34 vs 0.52 (PGSR/TSGS) (-0.18)。
 > - DL3DV-10K (real) 上，PSNR↑ 30.21 vs 29.65 (EnvGS) (+0.56)。
 
-## 概述
+## 概要
 
 **GLINT** 提出了一种面向场景级透明表面重建的新框架，其核心目标是解决现有 3D 高斯泼溅方法在处理透明物体时的根本性困境：传统方法采用单体 α 混合，将来自透明界面、背景透射和环境反射的多条辐射路径纠缠为单一合成，导致几何与外观的固有冲突——透明高斯要么被推向零不透明度以呈现背景，要么变为不透明以保留几何完整性，最终造成透明表面几何不准确、伪影或缺失。
 
@@ -49,7 +49,7 @@ claims:
 
 实验结果表明，GLINT 在合成数据集 **3D-FRONT-T** 上以 Normal MAE 7.96、Depth AbsRel 0.04、Mesh CD 0.34 全面超越所有基线方法（包括 TSGS、EnvGS、PGSR 等），同时在真实数据集 **DL3DV-10K** 和合成数据集上取得最高的渲染质量（PSNR 30.21/34.50, SSIM 0.92/0.96），验证了分解表示对几何重建和外观保真度的决定性提升。
 
-## 背景与动机
+
 
 ### 透明场景重建的核心困境
 
@@ -80,7 +80,9 @@ GLINT的提出正是为了从根本上解决上述困境。其核心洞察是：
 
 通过**混合渲染策略**——对接口组件使用光栅化生成G-buffer（深度、法线、透明度、镜面度），再基于G-buffer使用光线追踪查询透射和反射组件——各组件可以独立优化，并服从物理一致的辐射传输公式。同时，GLINT利用自举的几何线索（如接口-透射深度差异和扩散反照率）在无分割掩码的情况下定位透明区域，并引入视频重光照模型的编码器提供跨视角一致的几何和材质先验，从而在透明场景中突破外观与几何的权衡瓶颈。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GLINT 的核心创新在于将 3D 高斯泼溅从“单体混合”范式推进到“分解式辐射传输”范式。传统方法（包括 2DGS、PGSR、EnvGS 等）用单一高斯原语集通过标准 α 混合合成所有颜色，导致透明界面的几何与外观被纠缠在一起：优化时，透明区域的高斯要么被迫趋近零不透明度以展示背景，要么变为不透明以维持几何完整性，最终造成几何不准确、伪影或透明表面完全缺失。GLINT 通过以下五个关键设计突破这一瓶颈。
 
@@ -108,7 +110,7 @@ GLINT 引入预训练视频重光照模型 **DiffusionRenderer** 的编码器，
 
 TSGS 等专门针对薄透明表面的方法需要分割掩码且无法恢复透射辐射，而 GLINT 的分解框架将透明度建模为连续缓冲 t，使同一套表示同时处理不透明、透明和反射区域。在合成数据集 3D-FRONT-T 上，GLINT 以 Normal MAE 7.96、Depth AbsRel 0.04、Mesh CD 0.34 全面超越所有基线（Table 1）；在真实数据集 DL3DV-10K 上同时取得最高渲染质量 PSNR 30.21（Table 2），证明分解方案在场景级透明重建中的普适优势。
 
-## 整体框架
+
 
 GLINT 的整体流水线围绕一个核心思想展开：将场景的高斯原语**显式分解为三个功能组**，并通过**混合渲染**和**物理启发的辐射传输公式**将它们整合为最终的出射辐射。图 2 给出了流水线概览。
 
@@ -162,7 +164,7 @@ $$L_{\mathrm{transparent}} = (1 - k_s) L_{\mathrm{trans}} + k_s L_{\mathrm{refl}
 ![[assets/figures/papers/paper_list_l2083_https_arxiv_org_abs_2603_26181/figures/001_Figure_1.jpg]]
 *Figure 1: Our framework GLINT performs decomposed Gaussian radiance transport to reconstruct transparent surfaces with physically consistent geometry and appearance. (Left) The first row shows a rendered image, normal map, and transparency map. The second row visualizes the radiance contributions of the interface, transmission, and reflection components. (Right) Reconstructed Mesh*
 
-## 核心模块与公式推导
+
 
 GLINT 的核心在于将场景的高斯原语显式分解为三个功能组件，并通过透明度感知的混合渲染管线与物理启发的辐射传输公式进行整合。以下按模块逐一阐述其设计与关键公式。
 
@@ -250,7 +252,9 @@ $$\mathcal { L } _ { \mathrm { t r a n s } } = \lambda _ { t } \| M _ { \mathrm 
 
 该模块的核心逻辑是：透明区域中接口深度（首表面）与透射深度（背景）存在显著差异，且扩散反照率较低；通过这两个线索即可在无掩码条件下自举定位透明表面。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -320,7 +324,9 @@ GLINT 在两个基准上同时刷新了几何与外观重建的记录。**Table 
 ![[assets/figures/papers/paper_list_l2083_https_arxiv_org_abs_2603_26181/figures/016_Table_4.jpg]]
 *Table 4: Comparison of computational costs and reconstruction quality on the 3D-FRONT-T dataset*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心瓶颈与解决路径
 
@@ -363,6 +369,8 @@ GLINT 的核心知识贡献包括：
 3. **鲁棒性增强**：自举透明度定位在训练初期依赖深度差，如果初始几何较差，该方法是否会失效？如何增强其鲁棒性？
 4. **推广到折射与半透明**：提出的分解框架能否推广到折射透明（如水晶球）或半透明介质？
 5. **效率优化**：如何降低训练时间和内存消耗，使得该方法可以在消费级设备上运行？
+
+
 
 ## 原文 PDF
 

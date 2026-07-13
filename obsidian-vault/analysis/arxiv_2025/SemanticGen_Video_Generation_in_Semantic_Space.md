@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/SemanticGen_Video_Generation_in_Semantic_Space.pdf
+project_link: null
+code_link: https://github.com/
 aliases:
 - SemanticGen
 tags:
@@ -40,7 +42,7 @@ claims:
 > - VBench-Long 上，Subject Consistency 95.07% vs all baselines (outperforms all)；Background Consistency 95.86% vs all baselines (outperforms all)；Motion Smoothness 98.26% vs all baselines (outperforms all)。
 > - VBench short 上，Subject Consistency 97.79% vs top baseline (e.g., Wan2.2) (comparable (ranked 2nd))。
 
-## 概述
+## 概要
 
 **SemanticGen** 提出一种两阶段视频生成框架，将生成过程从高维VAE潜空间迁移至紧凑的语义空间。其核心动机在于：现有视频生成模型直接在VAE潜空间建模，低层级视频token维度极高且存在大量冗余，导致收敛速度慢、难以高效扩展至长视频生成。
 
@@ -54,8 +56,6 @@ claims:
 - **短视频可比性**：在VBench短视频基准上，SemanticGen与当前SOTA方法（如**Wan2.2**，Team Wan et al., arXiv 2025）性能可比（Table 1, Sec. 4.2）。
 
 **方法定位**上，SemanticGen区别于单阶段直接生成VAE潜码的扩散模型（如**CogVideoX-2B**，Yang et al., arXiv 2024；**Stable-VideoDiffusion**，Blattmann et al., arXiv 2023），也不同于自回归视频生成模型（如**MAGI-1**，Teng et al., arXiv 2025）。其两阶段语义空间生成范式在长视频场景下展现出显著的一致性保持和漂移抑制能力。
-
-## 背景与动机
 
 近年来，文本到视频（T2V）生成取得了显著进展，主流范式通常依赖变分自编码器（VAE）将视频压缩到低维潜空间，再由扩散模型（Diffusion Model）或自回归模型在该潜空间进行生成建模。然而，这一直接在高维VAE潜空间建模的路线正暴露出一个核心瓶颈：**低等级视频token维度极高且包含大量时空冗余，导致模型收敛速度慢，且难以高效扩展至长视频生成**。
 
@@ -71,7 +71,7 @@ SemanticGen 正是针对这一缺口提出的一套**两阶段语义空间生成
 
 简言之，SemanticGen 的出发点是将视频生成的焦点从“像素级重建”上移至“语义级规划”，以语义空间作为生成的核心战场，从而在保持生成质量的同时，实现向长视频的高效扩展。
 
-## 核心创新
+## 核心方法与创新机理
 
 SemanticGen 的核心创新在于将视频生成从传统的高维VAE潜空间迁移至紧凑的语义空间，构建了一个“全局布局—细节填充”的两阶段生成范式。这一设计从根本上改变了视频扩散模型的建模对象和计算方式，其关键创新点体现在以下三个**changed slots**上。
 
@@ -102,8 +102,6 @@ SemanticGen 的核心创新在于将视频生成从传统的高维VAE潜空间�
 ### 创新总结
 
 SemanticGen的三个changed slots构成了一个因果链条：**紧凑语义空间**使得全局建模成为可能，**两阶段范式**将全局布局与细节填充解耦，**混合注意力**以语义全注意力指导VAE局部生成，三者协同实现了从短视频到长视频的高效扩展。这一设计哲学——先在低维高层语义空间进行全局规划，再补充高频细节——为视频生成模型提供了一个可泛化的架构范式。
-
-## 整体框架
 
 SemanticGen 提出了一种**两阶段视频生成范式**，将传统的单阶段低层潜空间建模解耦为“高层语义规划→低层细节补充”的级联过程。其核心动机在于：现有视频生成模型直接在VAE潜空间建模，低等级视频token维度极高且存在大量冗余，导致收敛速度慢、难以高效扩展至长视频生成。SemanticGen通过在紧凑的语义空间完成全局布局，再生成VAE潜码以补充高频细节，从而显著降低建模复杂度和计算开销。
 
@@ -147,8 +145,6 @@ SemanticGen 提出了一种**两阶段视频生成范式**，将传统的单阶�
 
 ![[assets/figures/papers/paper_list_l84_https_arxiv_org_abs_2512_20619/figures/014_Figure_10.jpg]]
 *Figure 10: Overview of the base text-to-video generation model*
-
-## 核心模块与公式推导
 
 ### 基础生成框架：Rectified Flow
 
@@ -196,10 +192,7 @@ $$z_{input} := [z_t, z_{sem}]$$
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l84_https_arxiv_org_abs_2512_20619/figures/005_Figure_4.jpg]]
-*Figure 4: Video generation conditioned on semantic features extracted from a reference video. Row 1: The reference video. Rows 2–4: Reconstructions based on semantic representations (Sem. Rep.) with dimensions of 2048, 64, and 8, respectively. Row 5: T2V generation results without semantic representations*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -257,7 +250,7 @@ SemanticGen 的核心创新在于将生成过程解耦为“语义规划—细�
 ![[assets/figures/papers/paper_list_l84_https_arxiv_org_abs_2512_20619/figures/008_Figure_7.jpg]]
 *Figure 7: Comparison with state-of-the-art methods on long video generation. It demonstrates that SemanticGen generates videos with long-term consistency and significantly alleviates the drifting issues*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 生成空间迁移：从VAE潜空间到语义空间
 

@@ -42,7 +42,7 @@ claims:
 > - Walnut-CBCT (50 views) 上，PSNR (dB) 34.21。
 > - Calgary-Campinas MC-MRI (R=5) 上，PSNR (dB) 37.36。
 
-## 概述
+## 概要
 
 三维逆问题（如锥束CT重建和多线圈加速MRI）在医学成像中至关重要，其目标是从带噪线性测量 $\pmb{y} = \pmb{A} \pmb{x}^* + \pmb{\varepsilon}$ 中恢复未知信号 $\pmb{x}^*$。近年来，基于展开（unrolling）的端到端学习方法将物理模型与深度先验紧密结合，在各类成像任务中取得了领先的重建质量。然而，**标准展开网络在训练时需要对全局前向算子 $\pmb{A}$ 进行反向传播，其网络步骤（如3D DRUNet）的内存消耗随体积尺寸快速增长，远超数据一致性步骤**（见Figure 1），使得在单GPU上处理大规模三维问题（例如 $501^3$ 体素的CBCT）变得不可行。
 
@@ -55,7 +55,7 @@ claims:
 
 **核心结论**：通过域分割与正则算子近似的协同设计，展开网络首次在单GPU上实现了对 $501^3$ 级三维逆问题的端到端训练与推理，且性能与资源受限的标准展开相当或更优。该方法不依赖特定前向算子的坐标友好分解，适用于CBCT和MC-MRI等不同成像模态，展现了良好的通用性。
 
-## 背景与动机
+
 
 ### 大规模三维逆问题与计算瓶颈
 
@@ -101,7 +101,9 @@ $$\pmb{A}^\top \pmb{A} \approx \mathrm{diag}(\pmb{m}) \pmb{F}^{-1} \mathrm{diag}
 
 基于以上两条技术路线——**域分割**与**正则算子近似**——本文提出了一种通用框架，使得展开网络能够在不牺牲端到端训练优势的前提下，在单GPU上处理任意大规模三维重建问题，并在CBCT和MC-MRI两个代表性任务上验证其有效性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈识别：网络步骤而非数据一致性步骤构成大规模三维展开的内存壁垒
 
@@ -146,7 +148,7 @@ $$\mathscr{L}(\pmb{m}, \pmb{\lambda}) = \mathbb{E}_{\mathbf{x}\sim\mathcal{N}(0,
 
 本文的方法创新处于**展开网络（unrolled networks）** 与**即插即用（Plug-and-Play）** 方法的交叉地带。与标准展开网络（如使用 3D DRUNet 的端到端 PGD 展开）相比，核心差异在于训练时的信号维度：标准展开要求全量体积参与反向传播，而本文通过域分割将训练限制在补丁级别。与 PnP-αPGD 和 DPIR[RAM] 等即插即用方法相比，本文保留了端到端训练的优势（可学习步长、共享先验参数），但通过算子近似避免了全量数据一致性步骤的高昂开销。与后处理方法（2D/3D DRUNet 直接映射）相比，本文通过展开迭代引入了前向算子的物理约束，在稀疏采集场景下具有显著优势。
 
-## 整体框架
+
 
 本文提出了一套**可扩展的展开网络训练与推理框架**，旨在将端到端展开重建从中小规模问题推广到任意大规模三维逆问题。整个框架围绕两个核心机制构建：**域分割（Domain Partitioning）** 和 **正则算子近似（Normal Operator Approximation）**。二者协同工作，分别解决展开网络中“网络步骤”的内存爆炸瓶颈和“数据一致性步骤”在大规模下的计算效率问题。
 
@@ -207,7 +209,7 @@ $$ \mathscr{L}(m, \lambda) = \| \pmb{A}^\top\pmb{A} - H(m,\lambda) \|_F^2 $$
 ![[assets/figures/papers/paper_list_l2056_https_arxiv_org_abs_2601_02141/figures/001_Figure_1.jpg]]
 *Figure 1: Peak video memory complexity (dashed lines) and global execution times (dotted lines) of isolated components used in unrolling. We show the cost of evaluating and back-propagating through a standard 3D data consistency step (using gradient descent) and a standard 3D network step (using a 3D DRUNet [72]). We see here that the bottleneck lies in the network step, which grows rapidly with the volume size, while the data-consistency step remains manageable even at high resolutions*
 
-## 核心模块与公式推导
+
 
 ### 问题形式化与展开PGD框架
 
@@ -293,7 +295,9 @@ $$\mathbf{S} \mathrm{diag}(\pmb{m}) \mathbf{F}^{-1} \mathrm{diag}(\pmb{\lambda})
 ![[assets/figures/papers/paper_list_l2056_https_arxiv_org_abs_2601_02141/figures/013_Figure_10.jpg]]
 *Figure 10: Illustrations of the normal operator approximation on Calgary-Campinas. (top row) Original volume slice*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈验证：网络步骤是内存灾难
 
@@ -365,7 +369,9 @@ $$\mathbf{S} \mathrm{diag}(\pmb{m}) \mathbf{F}^{-1} \mathrm{diag}(\pmb{\lambda})
 ![[assets/figures/papers/paper_list_l2056_https_arxiv_org_abs_2601_02141/figures/006_Figure_4.jpg]]
 *Figure 4: Illustrations of MC-MRI reconstructions with acceleration rate of 5 on the Calgary-Campinas dataset [52] for the methods compared in Tab. 2. First row: axial slice, second row: coronal slice from the same sample. PSNR is computed per slice*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从即插即用到端到端展开
 
@@ -425,6 +431,8 @@ $$\mathscr{L}(m, \lambda) = \mathbb{E}_{\mathbf{x} \sim \mathcal{N}(0,I)} \| \ma
 4. **补丁间相关性的利用**：在测试时，是否可以利用补丁间空间相关性设计更高效的融合策略，以减少两步推理中的冗余计算？当前的补丁聚合策略相对简单，可能存在信息利用不充分的问题。
 
 5. **高维扩展性**：该方法在更高维（4D动态成像或更高）或稀疏数据采集场景下的可扩展性和性能表现如何？随着维度增加，补丁分解的组合复杂度和正则算子近似的精度需求可能发生质变。
+
+
 
 ## 原文 PDF
 

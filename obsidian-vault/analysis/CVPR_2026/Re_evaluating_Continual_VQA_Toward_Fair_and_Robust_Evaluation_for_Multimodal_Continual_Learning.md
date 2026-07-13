@@ -43,13 +43,13 @@ claims:
 > - VQA v3 (Proposed Splits) 上，CAA (↑) 37.82 vs 32.58 (CLS-ER) (+4.18%)；FFM (↓) 4.54 vs 7.56 (CLS-ER) (-3.02)。
 > - GQA v2 (Proposed Splits) 上，CAA (↑) 45.18 vs 39.84 (CLS-ER) (+2.21%* (文中报告+2.21%为鲁棒性/保留提升，此处为CAA绝对提升))；FFM (↓) 9.37 vs 10.91 (CLS-ER, approximate from part analysis) (-1.54)。
 
-## 概述
+## 概要
 
 持续视觉问答（Continual VQA）要求模型在顺序学习新任务时保留过往知识，但现有基准存在两个结构性缺陷，严重扭曲了遗忘测量的公平性。其一，任务间共享答案词汇导致模型依赖答案先验记忆而非真正的视觉语义保留，造成遗忘程度被系统性低估。在原始VQA v2上，答案相似性矩阵与准确率矩阵的Spearman秩相关系数高达0.73（SFT）和0.69（EWC），p < 0.001，表明性能提升大部分来自答案共享的虚假效应。其二，任务内训练与测试答案分布相同，无法评估模型在分布偏移下的鲁棒性，掩盖了知识的脆弱性——在引入分布偏移的PS设置下，SFT与LwF的预测分布高度追随训练分布而非测试集真实分布，揭示模型缺乏真正的泛化能力。
 
 针对上述瓶颈，本文提出**UCo-VQA**基准套件，通过强制实行任务间token级别的不相交答案空间，并引入任务内训练‑测试答案分布偏移，切除共享答案带来的虚假抗遗忘效应，同时创建鲁棒性检验场景。在此基础上，提出**MaDQ**（Matching and Distillation with Question replay）方法，其核心机制包括三项关键设计：仅回放过往问题文本而不存储图像与答案，将内存开销压缩至约0.01 MB/任务；构建答案预测蒸馏与图文匹配蒸馏的双层级蒸馏体系，强化跨模态对齐与知识保留；采用双LoRA架构，以动量适配器提供稳定蒸馏目标。实验表明，MaDQ在所有UCo-VQA设定上均取得最高的累积平均准确率（CAA）和最低的前向遗忘（FFM），在VQA v3 PS设定下CAA较最优基线CLS-ER提升4.18%，FFM降低3.02；在GQA v2 PS设定下CAA提升约2.21%，验证了仅问题回放与双层级蒸馏在公平评价下的有效性。
 
-## 背景与动机
+
 
 ### 持续VQA的兴起与隐忧
 
@@ -77,7 +77,9 @@ claims:
 
 这驱动了**MaDQ（Matching and Distillation with Question replay）**的设计：通过**仅回放问题文本**将内存开销压缩至0.01 MB/任务，同时引入**双层级蒸馏**——在答案预测和图文匹配两个层面施加一致性约束——既保留任务知识，又强化视觉-语义的跨模态对齐，从而在公平的UCo-VQA基准上实现鲁棒且抗遗忘的持续VQA。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 1. 基准缺陷的揭示：从虚假抗遗忘到真实遗忘
 
@@ -139,7 +141,7 @@ MaDQ在视觉-语言骨干网络的所有层（图像编码器$f_\nu$、问题�
 
 这些提升并非来自对基准偏差的利用，而是在切除答案先验与分布偏移的严格条件下，通过增强跨模态对齐与知识保留机制获得的真实增益。
 
-## 整体框架
+
 
 MaDQ 的整体流程围绕三个核心设计展开：**仅问题回放**、**双层级蒸馏**以及**双LoRA架构**，其训练管线如 Figure 3 所示。模型以当前任务的图像-问题-答案三元组 $(x^t, q^t, a^t)$ 和存储在回放缓冲区 $\mathcal{M}$ 中的过往任务问题作为输入，通过联合优化学习、保留和鲁棒性三个层次的目标，实现跨任务的知识持续积累。
 
@@ -185,7 +187,7 @@ $$\mathcal{L} = \underbrace{\mathcal{L}_{\mathrm{TSA}}}_{\mathrm{learning}} + \u
 
 > **需注意**：仅问题回放策略在极低存储预算下性能仍有退化，且问题文本的回放可能引发隐私顾虑，论文未提供差分隐私或联邦学习等缓解方案的具体实现。
 
-## 核心模块与公式推导
+
 
 ### 模型整体架构
 
@@ -262,7 +264,9 @@ $$\mathcal{L}_{\mathrm{MCD}} = \frac{1}{|\mathcal{X}^t| |\mathcal{Q}^t \cup \mat
 ![[assets/figures/papers/paper_list_l2663_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_Re_evaluating_Cont/figures/002_Figure_2.jpg]]
 *Figure 2: Train/test answer distributions and model predictions under the proposed VQA v3 splits (PS). (a) Color and (b) Count tasks. Each column shows the answer distribution in the training set, test set, and model predictions (SFT and LwF). Models largely follow the training answer distribution, indicating limited robustness to distributional shifts*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 基准缺陷揭示：共享答案词汇如何制造虚假抗遗忘
 
@@ -334,7 +338,9 @@ Table 3将方法迁移至**BLIP2**多模态大语言模型上，在VQA v3 SS设�
 ![[assets/figures/papers/paper_list_l2663_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_Re_evaluating_Cont/figures/008_Table_3.jpg]]
 *Table 3: Performance comparison on VQA v3 (Standard Splits) using the multi-modal large language model BLIP2 [35]*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 持续VQA基准重构：从“虚假抗遗忘”到公平评价
 
@@ -410,6 +416,8 @@ MaDQ的“仅问题回放”策略在谱系中实现了关键跃迁：将存储�
 4. **动态任务序列**：在任务边界未知或数据流包含噪声的开放环境中，双LoRA架构如何自适应地决定何时创建新适配器、何时复用旧适配器？这需要引入任务边界检测或持续聚类机制。
 
 5. **与大规模多模态模型的整合**：随着BLIP2、LLaVA等MLLM的兴起，持续VQA的范式可能从“分类头微调”转向“指令微调”。MaDQ的仅问题回放和双层级蒸馏策略在这种范式下是否仍然有效，需要重新审视。
+
+
 
 ## 原文 PDF
 

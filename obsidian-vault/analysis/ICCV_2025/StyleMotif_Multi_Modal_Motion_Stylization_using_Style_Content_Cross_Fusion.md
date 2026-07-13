@@ -5,6 +5,8 @@ paper_level: A
 venue: ICCV
 year: 2025
 pdf_ref: paperPDFs/ICCV_2025/StyleMotif_Multi_Modal_Motion_Stylization_using_Style_Content_Cross_Fusion.pdf
+project_link: https://stylemotif.github.io
+code_link: null
 aliases:
 - StyleMotif
 tags:
@@ -41,7 +43,7 @@ claims:
 > - Text-Guided Stylization (HumanML3D + text style descriptions) 上，SRA 56.71 vs 4.82 (ChatGPT+MLD) (+51.89)。
 > - Motion Style Transfer (HumanML3D) 上，SRA 68.81 vs 65.15 (previous best) (+3.66)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有风格化运动生成方法（如 **SMooDi**，Zhong et al., ECCV 2024）普遍采用双分支架构，通过在每个去噪块中添加零初始化线性层作为并行风格分支来注入风格条件。这种设计虽然有效，但显著增加了模型复杂度和训练开销，且风格输入局限于单一运动模态，限制了多模态灵活性与生成效率。
 
@@ -54,7 +56,7 @@ claims:
 - 在文本引导风格化任务上，SRA 达到 **56.71**，远超 ChatGPT+MLD 的 4.82，提升 **51.89%**。
 - 单分支设计使推理速度提升 **22.5%**，可学习参数减少 **43.9%**。
 
-## 背景与动机
+
 
 ### 问题背景：运动风格化的需求与挑战
 
@@ -81,7 +83,9 @@ claims:
 - **多模态风格控制**：将风格编码器与预训练多模态模型ImageBind对齐，构建统一的风格特征空间，使模型能够从文本、图像、视频、音频等多种模态中提取风格特征，实现灵活的多模态风格化。
 - **高效融合机制**：设计风格-内容交叉归一化（Style-Content Cross Normalization），利用内容特征的统计量对风格特征进行自适应归一化后加性融合，无需引入额外参数，在保持内容保真度的同时有效注入风格信息。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 从双分支到单分支：架构简化的因果逻辑
 
@@ -128,7 +132,7 @@ $$\mathcal{L}_{\mathrm{align}} = -\frac{1}{2}\sum_{(i,j)}\log\frac{\exp(\mathcal
 
 当前方法仍存在以下局限：多模态对齐的训练数据来源于 100STYLE 子集，风格运动-文本配对数据有限，可能限制模型对广泛风格的泛化能力；交叉归一化假定风格可通过简单统计变换迁移，对复杂或细粒度风格可能表现不足。开放问题包括：最优融合位置 $m$ 的自动确定、$\gamma$ 的自适应动态学习、以及如何更有效地整合图像和音频等模态的风格描述。
 
-## 整体框架
+
 
 STYLEMOTIF 是一个基于单分支扩散架构的多模态运动风格化框架，其核心设计理念是以极简的结构实现高效、灵活的风格注入。与 SMooDi（Zhong et al., ECCV 2024）采用的双分支 ControlNet 范式不同，STYLEMOTIF 将风格注入完全整合进预训练运动潜变量扩散模型（MLD, Chen et al., ICLR 2023）的单一去噪分支中，从而避免了额外分支带来的模型复杂度和训练开销。
 
@@ -159,7 +163,7 @@ STYLEMOTIF 是一个基于单分支扩散架构的多模态运动风格化框架
 ![[assets/figures/papers/paper_list_l3_StyleMotif_Multi_Modal_Motion_Stylization_using_Style_Content_Cross_Fusi_motion20v/figures/002_Figure_2.jpg]]
 *Figure 2: Overall Pipeline of STYLEMOTIF, a single diffusion branch framework for multi-modal motion stylization. Given a text prompt and a reference style from various modalities, our model extract style features and fuse them with content by style-content cross fusion. Through multi-modal alignment with contrastive learning, we enable seamless multi-modal conditioning and flexible stylization across motion, text, images, audio, and video*
 
-## 核心模块与公式推导
+
 
 ### 风格-内容交叉融合
 
@@ -214,7 +218,9 @@ $$\mathcal{F}_m = \mathcal{E}_{\text{ImageBind}}(m)$$
 ![[assets/figures/papers/paper_list_l3_StyleMotif_Multi_Modal_Motion_Stylization_using_Style_Content_Cross_Fusi_motion20v/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of Our Proposed STYLEMOTIF Framework with SMooDi. Unlike SMooDi’s dual-branch design, which increases model complexity and training overhead, STYLEMOTIF employs a streamlined single-branch structure, enabling efficient multi-modal motion stylization while preserving motion realism*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 运动引导风格化主结果
 
@@ -270,7 +276,9 @@ Table 4对比了STYLEMOTIF与SMooDi的参数量和推理速度。单分支设计
 ![[assets/figures/papers/paper_list_l3_StyleMotif_Multi_Modal_Motion_Stylization_using_Style_Content_Cross_Fusi_motion20v/figures/010_Table_4.jpg]]
 *Table 4: Efficiency Comparison. For inference time, we report the average time cost (s) per sample on a single NVIDIA A100 GPU*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与因果调控
 
@@ -331,6 +339,8 @@ STYLEMOTIF 支持运动、文本、图像、视频、音频五种模态的风格
 3. 缩放参数 $\gamma$ 能否通过自适应机制（如基于内容-风格相似度的门控网络）动态学习，而非人工调节？
 4. 多模态对齐中，除了文本作为桥梁模态，如何更有效地直接整合图像、音频等模态的风格描述，减少文本中介带来的语义损失？
 5. 风格-内容交叉归一化是否可扩展至分身体部位或分时间尺度的层次化风格注入，以支持更细粒度的风格控制？
+
+
 
 ## 原文 PDF
 

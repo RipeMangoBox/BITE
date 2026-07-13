@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Anatomy_aware_Representation_Learning_for_Medical_Ultrasound.pdf
+project_link: null
+code_link: null
 aliases:
 - AARLA
 - AARLMU
@@ -42,11 +44,11 @@ claims:
 > - Breast Cancer (BUSI) 上，AUROC [CI] 为 0.9742 (0.95,0.99)，对比 0.9662 (iBOT on US)，变化 +0.008。
 > - Thyroid Cancer 上，Accuracy 为 87.07，对比 85.77 (USFM)，变化 +1.30。
 
-## 概述
+## 概要
 
 本文提出**Anatomy-aware Representation Learning (ARL)**，一个专门为医学超声图像设计的自监督表示学习框架。ARL的核心是**Anatomy-aware Vision Transformer (A-ViT)**，它通过引入**解剖条件可变形Transformer (ACDT)**模块，将16种解剖类别的先验知识显式注入特征提取过程，使模型能够根据目标器官自适应调整感受野和特征提取策略。ARL在大规模医学超声数据集（520万张图像，16个解剖类别，来自11个公开数据集和15家医疗机构）上进行自监督预训练，联合使用掩码图像建模（MIM）、对抗性损失和自蒸馏损失进行多目标优化。在下游任务中，A-ViT在乳腺癌分类（93.66%准确率，0.9742 AUROC）、心脏视图分类（91.80% Top-1准确率）、甲状腺癌分类（87.07%准确率）、COVID-19识别（91.44%准确率）、胆囊肿瘤分类（89.89%准确率）和心脏左心室分割（92.16 Dice）等六个任务上均显著超越现有自监督基线方法。
 
-## 背景与动机
+
 
 ### 2.1 医学超声图像与自然图像的差异
 
@@ -63,7 +65,9 @@ claims:
 
 本文的核心洞察是：**通过将解剖上下文显式注入Vision Transformer的注意力机制，并结合多目标自监督学习框架，可以学习到器官感知且泛化性强的超声图像表示。** 具体而言，ACDT中解剖条件特征作为key/value，原始patch嵌入作为query，使模型能够根据目标器官自适应调整特征提取；同时，联合MIM（局部结构恢复）、对抗性损失（保留高频散斑）和自蒸馏损失（全局语义对齐）的多目标框架，能够全面捕获超声图像的多层次特征。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 3.1 解剖条件可变形Transformer (ACDT)
 
@@ -87,7 +91,7 @@ ARL联合优化三个自监督目标：
 
 构建了包含520万张图像的大规模医学超声数据集，覆盖16个解剖类别，图像来自线性、凸阵和相控阵探头，分辨率从64×64到1280×960，成像深度达24 cm。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_representation_self_supervised_transfer__representation_learning__b001_5ThIWuDkEf_Anatomy/figures/001_Figure_1.jpg]]
 *Figure 1: (a) Difference between medical US and natural images. (b) PCA of the features using Dino v3 and the proposed scheme.(c) Distribution of the proposed large-scale US dataset.*
@@ -101,7 +105,7 @@ ARL的整体框架（Figure 2）包含以下模块：
 5. **Discriminator**：区分真实patch与重建patch。
 6. **Self-Distillation Head**：学生-教师网络跨视图对齐。
 
-## 核心模块与公式推导
+
 
 ### 5.1 可变形卷积（公式1）
 
@@ -133,7 +137,9 @@ $$L_{SD} = -\sum_{i=1}^N z_t^{(i)} \log z_s^{(i)}$$
 
 $$L = L_{SD} + (L_{MIM} + \lambda L_{adv}^{(G)}), \quad \lambda = \frac{\nabla L_{MIM}}{\nabla L_{adv}^{(G)} + \varepsilon}$$
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 6.1 主要结果
 
@@ -243,7 +249,9 @@ A-ViT仅引入适度的参数和计算开销，同时在下游任务中提供显
 ![[assets/figures/papers/iclr26_representation_self_supervised_transfer__representation_learning__b001_5ThIWuDkEf_Anatomy/figures/010_Table_5.jpg]]
 *Table 5: Summary of ultrasound datasets used for representation learning and downstream applications.*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 7.1 方法谱系
 
@@ -286,6 +294,8 @@ ARL在以下方面填补了医学超声表示学习的空白：
 - 16个解剖类别是否足够覆盖所有超声诊断场景？
 - 自适应损失加权中的 $\varepsilon$ 值如何选择？
 - ARL在无监督域适应或跨设备泛化场景下的表现如何？
+
+
 
 ## 原文 PDF
 

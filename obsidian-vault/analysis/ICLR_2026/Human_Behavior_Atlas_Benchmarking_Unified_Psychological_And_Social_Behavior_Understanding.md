@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Human_Behavior_Atlas_Benchmarking_Unified_Psychological_And_Social_Behavior_Understanding.pdf
+project_link: null
+code_link: https://github.com/MIT-MI/human_behavior_atlas
 aliases:
 - HBAO7SBR
 - HBABUPSBU
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 人类行为图谱：面向统一心理与社会行为理解的基准 |
 | 英文题名 | Human Behavior Atlas: Benchmarking Unified Psychological And Social Behavior Understanding |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=ZKE23BBvlQ); [GitHub](https://github.com/MIT-MI/human_behavior_atlas) |
+| Links | [paper](https://openreview.net/forum?id=ZKE23BBvlQ) · [GitHub](https://github.com/MIT-MI/human_behavior_atlas) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_multimodal |
 | Method | HUMAN BEHAVIOR ATLAS + OMNISAPIENS-7B (SFT / BAM / RL) |
 | Dataset | CMU-MOSEI (SEN), MUStARD (SAR), MELD (EMO), PTSD-in-the-Wild (PTSD) |
@@ -41,10 +43,10 @@ claims:
 > - MUStARD (SAR) 上，Weighted F1 为 OMNISAPIENS-7B SFT finetuned: 0.658，对比 Qwen 2.5-Omni-7B SFT (no Atlas pretrain): 0.473，变化 +0.185 (+39.1%)。
 > - MELD (EMO) 上，Mean Weighted Accuracy 为 OMNISAPIENS-7B SFT 0.711，对比 Qwen 2.5-Omni-7B 0.661，变化 +0.050。
 
-## 概述
+## 概要
 现有心理与社会行为理解系统多为单任务专用设计，数据集格式和评估协议高度异构，难以支撑能够全面覆盖情感、认知、病理、社交等多维度行为的通用基础模型。为此，本文提出《人类行为图谱》（Human Behavior Atlas）基准，通过统一13个公开多模态数据集的样本格式和评估协议，消除数据互操作性瓶颈，并基于该基准训练OMNISAPIENS‑7B系列模型（SFT/BAM/RL）。核心思路是：将异构数据重写为prompt‑target规范格式，并提取行为描述符（姿势、声学、转录）作为辅助信号，通过残差适配器（BAM）增强模型对微弱行为线索的感知。在多任务训练中，OMNISAPIENS‑7B SFT/BAM在10项行为任务中的8项超越通用多模态大语言模型；在迁移学习设置下，图谱预训练使讽刺检测（MUStARD）F1由0.473提升至0.658（+39.1%），BAM则进一步带来非言语沟通任务（NVC）+33%、讽刺检测（SAR）+29%的增益。消融研究证实，移除原始音视频特征后NVC性能骤降50.41%，凸显了行为描述符的关键性。这些结果验证了统一基准与适配器方法在构建通用行为理解模型上的有效性。
 
-## 背景与动机
+
 
 理解人类心理与社会行为的复杂性——涵盖情感、意图、精神状态及人际交互——是构建高人际智能AI的核心瓶颈。这些行为本质上是多模态的（融合言语、声调、面部表情和肢体动作），高度个性化，且往往依赖微妙、转瞬即逝的非言语线索。尽管多模态大语言模型（MLLM）已在一般视觉-语言任务上取得突破，将其扩展至全面的行为理解仍面临根本性障碍。
 
@@ -64,7 +66,9 @@ claims:
 
 综上，本文的动机并非提出单一任务模型，而是通过构建标准化、高密度、可扩展的行为数据基础，推动心理与社会行为理解从“特设专用”迈向“统一基础模型”的新范式。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 现有心理与社会行为分析系统的根本瓶颈在于各任务长期处于单任务专门化设计，其数据格式、标注目标和评估协议存在巨大差异，导致无法训练出一个能够全面理解多种行为维度的通用基础模型。HUMAN BEHAVIOR ATLAS 及配套的 OMNISAPIENS-7B 系列模型的核心创新，正是通过一系列“changed slots”系统性地打破这一碎片化壁垒，使异构数据交织为可联合训练的统一基准，从而在多任务学习、迁移学习与细粒度行为感知三个层面产生显著增益。
 
@@ -107,7 +111,7 @@ $$
 
 综上，HUMAN BEHAVIOR ATLAS 的创新并非单一算法改进，而是通过系统性地重构数据、任务、评估与模型接口这五个关键“槽位”，将行为理解从割裂的单任务训练范式推进到可扩展、可迁移的多任务基础模型范式。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0013_ZKE23BBvlQ_Human_Behavior_Atlas_Benchmarking_Unified_Psycho/figures/006_Figure_1.jpg]]
 *Figure 1: Overview of HUMAN BEHAVIOR ATLAS. (a) Selection criteria and preprocessing pipeline of datasets. (b) Dataset distribution across 10 behavior related tasks. Inner circle indicates the modality combination of the input data, where T=Text, A=Audio and V=Video. Middle ring describes the tasks of the dataset, as defined in Sec. 3.1. The outer ring and bars lists the datasets and its sample sizes respectively. (c) Distribution of data modalities. Our dataset has a focus on video understanding as it comprises both vision and audio modalities, with 83.6% of samples containing video data. (d) Distribution of sample durations. Both short and long videos/audio tasks are covered, with 29.2% of video/au...*
@@ -147,7 +151,7 @@ $$
 
 这种层次化、模块化的设计使得 **HUMAN BEHAVIOR ATLAS** 不仅能直接训练出在 13 个异构数据集上超越通用多模态 LLM 的基础模型，还能通过冻结或轻量适配器的方式向全新行为数据集高效迁移（如 MUStARD 讽刺检测任务性能提升 39.1%），为解决心理与社会行为理解的规模化、通用化问题提供了一套完整的基准与建模方案。
 
-## 核心模块与公式推导
+
 
 OMNISAPIENS‑7B 以 Qwen 2.5‑Omni‑7B 多模态主干为基础，引入两种互补的范式：**SFT 混合架构**（分类头 + 解码头）与 **RL 纯解码器架构**。其关键创新在于通过**行为适配器模块（BAM）**将符号化的行为描述符无损地注入冻结的主干，并在 RL 阶段用 GRPO 优化统一格式的多任务目标。下面重点展开行为描述符的提取‑集成公式及 RL 优化目标。
 
@@ -212,7 +216,9 @@ $$
 
 这里 $\tilde{A}_{k}$ 是组内相对优势，$D_{\mathrm{KL}}$ 为当前策略 $\pi_{\theta}$ 与参考策略 $\pi_{\mathrm{ref}}$ 的 KL 散度，$\beta$ 控制惩罚强度。这一复合奖励与 KL 约束机制使 RL 模型在保持通用文本质量的同时，在意图理解（INT）等开放式推理任务上大幅超越 SFT 基线。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验：多任务统一训练
 
@@ -275,7 +281,9 @@ $$
 
 总体而言，实验表明 HUMAN BEHAVIOR ATLAS 作为统一基准成功推动了通用心理与社会行为理解模型的构建。多任务学习和行为描述符增强分别从训练范式和特征层面带来了互补增益，但遗留的挑战也为未来工作指明了改进路径。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 心理与社会行为理解领域长期面临系统“孤岛化”：每个任务依赖专门设计的模型、异构的数据格式和独立的评估协议，难以训练通用的行为基础模型（核心瓶颈）。**HUMAN BEHAVIOR ATLAS** 将涵盖情感、认知、病理及社会四个维度的13个多模态数据集统一为 prompt–target 格式（Table 3），并提取行为描述符（MediaPipe、OpenSMILE）作为附加信号，从而构建了首个面向统一行为理解的大规模基准。在此基础上，**OMNISAPIENS‑7B** 模型系列——包括监督微调版（SFT）、行为适配器增强版（BAM）与强化学习版（RL）——通过多任务联合训练与灵活的迁移学习，实现了从单任务专用向通用行为感知的范式转移。相较于该领域的代表性多模态大模型（Gemma‑3‑4B、HumanOmniV2‑7B、Qwen 2.5‑Omni‑7B 等），OMNISAPIENS‑7B SFT 与 BAM 在10种行为任务中的8种上取得最优或次优成绩（Figure 2），印证了统一基准预训练带来的跨任务泛化优势。尤其在迁移学习场景下，仅经过极少微调（1～2个epoch），Atlas 预训练模型即大幅超越未预训练的相同架构基线：在 CMU‑MOSEI 情感检测上达到 0.724（基线 0.612），在 MUStARD 讽刺检测上更实现 **+39.1%** 的绝对提升（0.658 vs 0.473，Table 5）。行为适配器模块（BAM）以残差方式注入行为描述符（$\Delta h_f = \alpha z_f$），在不损害主干表示的前提下，使非言语交流（NVC）与讽刺检测（SAR）的性能分别提升 **33%** 和 **29%**（Table 6）；消融实验表明，若剥离原始音视频信号仅保留行为描述符，NVC 得分从 BAM 的 0.16 骤降至 0.06（−50.41%），可见原始多模态感知仍是基石，而 BAM 的设计则能在完整信号流上实现针对性增强。但 BAM 的增益并非恒正：在社会推理（SOC）与意图理解（INT）等依赖长篇语境推理的任务上，反而造成 23%～31% 的性能衰减，显示静态池化的行为特征可能引入噪声或干扰高层语义（Table 6）。与此同时，纯解码器结构的 OMNISAPIENS‑7B RL 凭借 GRPO 优化的推理链，在意图问答（IntentQA）等开放式生成任务上大幅领先 SFT 基线（LLM‑Judge 准确率 0.486 vs 0.254），却在情感分类（EMO）、幽默检测（HUM）等离散分类任务上落后，暴露了强化学习与监督微调在不同任务形态上的互补失败模式（Table 4）。
 
@@ -286,6 +294,8 @@ $$
 2) 能否引入动态时序注意力机制替代简单的均值‑标准差池化，更精准地融合行为描述符，从而避免高级认知任务上的性能衰退？  
 3) 跨文化、低资源语言场景下的迁移泛化如何保证？  
 4) 模型规模扩张是否会涌现更深层的心理感知能力，使统一基准的价值进一步放大？这些问题的推进将决定通用心理与社会行为智能的下一阶段突破。
+
+
 
 ## 原文 PDF
 

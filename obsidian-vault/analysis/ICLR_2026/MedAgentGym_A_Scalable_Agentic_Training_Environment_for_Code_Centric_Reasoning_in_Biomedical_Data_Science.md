@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/MedAgentGym_A_Scalable_Agentic_Training_Environment_for_Code_Centric_Reasoning_in_Biomedical_Data_Science.pdf
+project_link: https://huggingface.co/MedAgentGym
+code_link: https://github.com/wshi83/MedAgentGym
 openreview_forum_id: jHDZEUgS4r
 aliases:
 - MMC
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | MedAgentGym：面向生物医学代码推理的可扩展智能体训练环境 |
 | 英文题名 | MedAgentGym: A Scalable Agentic Training Environment for Code-Centric Reasoning in Biomedical Data Science |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=jHDZEUgS4r); [GitHub](https://github.com/wshi83/MedAgentGym); [Project](https://huggingface.co/MedAgentGym) |
+| Links | [paper](https://openreview.net/forum?id=jHDZEUgS4r) · [GitHub](https://github.com/wshi83/MedAgentGym) · [Project](https://huggingface.co/MedAgentGym) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/planning_control |
 | Method | MedAgentGym (训练环境) + Med-Copilot (训练智能体) |
 | Dataset | MedAgentGym (In-Distribution, 8 datasets), EHRSHOT (ML coding, In-Distribution), MedAgentGym (Out-of-Distribution, 4 datasets) |
@@ -42,7 +44,7 @@ claims:
 > - MedAgentGym (In-Distribution, 8 datasets) 上，Avg. Score 为 Med-Copilot-14B + GRPO: 71.42，对比 Qwen2.5-14B-Instruct (base): 20.12，变化 +51.30。
 > - EHRSHOT (ML coding, In-Distribution) 上，Accuracy 为 Med-Copilot-14B + GRPO: 92.33，对比 Qwen2.5-14B-Instruct: 4.45，变化 +87.88。
 
-## 概述
+## 概要
 
 生物医学数据科学正日益依赖代码生成、执行与验证的闭环能力，然而**开源大型语言模型（LLM）在此类任务上表现显著落后于商业API模型**，且现有基准缺乏统一的、可执行、交互式训练环境，难以系统性地提升代码中心推理能力。MedAgentGym 正是针对这一瓶颈而构建：它将12个真实生物医学场景中的72,413个任务实例封装进可执行的Docker沙箱环境，提供交互式反馈与可验证的真值标注，从而将生物医学推理转化为可验证的代码生成问题。
 
@@ -56,7 +58,7 @@ claims:
 
 这些结果表明，通过可执行环境与强化学习的结合，开源模型能够在生物医学代码推理任务上实现数量级的性能跃升，为隐私保护、可负担的医疗AI智能体发展提供了可行的技术路径。
 
-## 背景与动机
+
 
 ### 生物医学数据科学的编码推理困境
 
@@ -82,7 +84,9 @@ claims:
 
 基于这一洞察，本文提出了**MedAgentGym**——一个面向生物医学代码推理的可扩展智能体训练环境，以及在其上训练的**Med-Copilot**系列模型。该框架旨在系统性地回答一个核心问题：能否通过统一的交互式训练环境，让开源模型在生物医学编码推理任务上达到甚至超越商业API模型的水平？
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MedAgentGym 的核心创新在于将生物医学数据科学任务系统性地重构为**可验证的代码生成问题**，并为此构建了统一的交互式训练环境。相较于现有基准仅提供静态问答对或缺乏代码执行反馈，MedAgentGym 通过以下关键设计变更实现了范式跃迁：
 
@@ -120,7 +124,7 @@ MedAgentGym 引入了**结果验证器（Outcome Verifier）**，训练一个输
 
 综上，MedAgentGym 通过“可执行沙箱 + POMDP 交互 + 两阶段 RL 训练 + 轨迹验证器”的组合创新，系统性地弥合了开源模型与商业 API 在生物医学代码推理上的性能鸿沟。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l28_https_openreview_net_forum_id_jHDZEUgS4r/figures/005_Figure_2.jpg]]
 *Figure 2: Overview of MedAgentGym. MedAgentGym contains a comprehensive suite of coding-centric biomedical data science tasks with an interactive execution environment for LLM agents*
@@ -167,7 +171,7 @@ $$r = \exp(l_y) / (\exp(l_y) + \exp(l_n))$$
 
 整个系统的数据流可概括为：**任务实例 → Docker 沙箱执行 → 轨迹采样（正/负样本）→ SFT 预热 → RL 精炼（DPO/PPO/GRPO）→ 验证器评估**。各模块之间形成反馈闭环：沙箱环境产生的执行结果和错误信息直接驱动 RL 的奖励计算，验证器的预测概率则指导推理时的采样策略和训练时的自我改进。这种“执行—反馈—学习”的一体化设计是 MedAgentGym 区别于现有静态基准的核心特征。
 
-## 核心模块与公式推导
+
 
 ### 3.1 编码推理的形式化与验证函数
 
@@ -221,7 +225,9 @@ $$r = \frac{\exp(l_y)}{\exp(l_y) + \exp(l_n)}$$
 
 GRPO训练的超参数配置为：KL散度正则化系数 $\beta = 1 \times 10^{-3}$，学习率 $1 \times 10^{-5}$。值得注意的是，对重复动作施加额外惩罚反而导致性能下降（从62.17%降至56.98%），因为抑制了有益的自我调试行为（Table 13）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 零样本基准测试：商业API与开源LLM之间的巨大鸿沟
 
@@ -288,7 +294,9 @@ Med-Copilot采用两阶段微调范式：首先在2,137条gpt-4.1-mini生成的�
 *Figure 13: Med-Copilot SFT performance on MedAgentGym across various backbone LLMs*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心问题定位
 
@@ -353,6 +361,8 @@ MedAgentGym的设计围绕一个核心因果假设：**将生物医学数据科�
 4. **深层知识约束**：除了基于执行结果的验证外，如何融入更深层的生物医学知识约束（如生理学合理性、临床指南合规性）以进一步提高代码生成质量？Figure 15和Figure 17的案例显示，即使代码可执行，仍可能存在领域概念错误（如错误使用过时的MDRD公式而非2021 CKD-EPI标准）。
 
 5. **预定义工具集的影响**：Figure 11显示提供预定义工具集反而导致GPT-4代理性能下降，表明不受限时LLM能生成更灵活的代码。如何在提供领域知识辅助与保持代码灵活性之间取得平衡，是值得进一步研究的问题。
+
+
 
 ## 原文 PDF
 

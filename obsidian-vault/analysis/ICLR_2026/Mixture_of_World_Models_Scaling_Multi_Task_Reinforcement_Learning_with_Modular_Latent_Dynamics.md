@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Mixture_of_World_Models_Scaling_Multi_Task_Reinforcement_Learning_with_Modular_Latent_Dynamics.pdf
+project_link: null
+code_link: null
 openreview_forum_id: qUQARlAx5y
 aliases:
 - MWMM
@@ -42,7 +44,7 @@ claims:
 > - Meta-World MT50 上，Average Success Rate 为 74.5%，对比 72.9% (MOORE, state-based)，变化 +1.6% (15M steps vs 100M steps)。
 > - Meta-World MT50 上，Average Success Rate 为 74.5%，对比 25.3% (TD-MPC2, visual)，变化 +49.2%。
 
-## 概述
+## 概要
 
 **核心问题**：在多任务视觉强化学习中，标准的单一世界模型架构难以同时捕捉不同任务在视觉特征和动力学上的异质性，导致重建保真度低和任务间干扰，严重限制了样本效率。
 
@@ -60,7 +62,7 @@ claims:
 
 **证据强度与注意事项**：上述核心结论有高置信度实验支撑。但需注意，MoW在Freeway、Private Eye等部分Atari游戏上得分仍为0或极低，且多任务中位分数（37.7%）远低于均值（110.4%），表明性能在不同任务间差异较大，模型可能过度依赖表现较好的任务。此外，基于梯度的聚类仅在warmup阶段执行，无法在训练过程中动态调整任务分组。
 
-## 背景与动机
+
 
 ### 多任务视觉强化学习的瓶颈
 
@@ -88,7 +90,9 @@ claims:
 
 这种设计使MoW能够在Atari 100K基准上以单一模型达到110.4%的人类归一化分数，与26个独立任务专用模型组成的STORM（114.2%）性能相当，而参数量减少50%；在Meta-World MT50上以仅1500万环境步达到74.5%的成功率，成为该基准上首个使用图像输入超越状态输入方法的工作。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MoW 的核心创新在于将世界模型分解为**任务专用的视觉编码器**与**混合专家的时序动力学模型**，并通过**基于梯度相似性的任务聚类**实现参数高效共享。这一设计直接回应了多任务视觉强化学习的根本瓶颈：单一世界模型难以同时捕捉不同任务在视觉特征和动力学上的异质性，导致重建保真度低和任务间干扰。
 
@@ -131,7 +135,7 @@ MoW 引入 warmup 阶段的**梯度相似性聚类**（Section 3.6），替代�
 
 MoW 的方法论贡献可概括为三个 **changed slots**：视觉编码器从共享到聚类专用、时序模型从标准 Transformer 到混合专家、参数分配从全共享到梯度聚类。这三个改变的协同作用使 MoW 在 Atari 100K 上以单一模型达到 110.4% 的人类归一化分数（与 26 个单任务 STORM 模型的 114.2% 相当，参数量减少 50%），在 Meta-World MT50 上以 74.5% 的成功率实现新的最优（Table 1, Section 4.1）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l49_https_openreview_net_forum_id_qUQARlAx5y/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the mixture-of-world models (MoW) architecture. Task-specific observations are encoded through specialized VAEs, with dynamics modeled by a mixture-of-Transformer experts routed via task embeddings. The design enables modular latent dynamics handling while maintaining parameter efficiency. Here, at time t for task k, $o _ { k } ^ { t } , r _ { k } ^ { t } , c _ { k } ^ { t }$ and $a _ { k } ^ { t }$ denote the high-dimensional observation, reward, termination flag, and action, respectively. The stochastic representation $z _ { k } ^ { t }$ is sampled from the distribution $\mathcal { Z } _ { k } ^ { t }$ . , which is encoded from the observation $o _ { k } ^ { t }$ . The hidden state $\ddo$...
@@ -168,7 +172,7 @@ MoW（Mixture-of-World Models）的核心设计思路是将多任务世界模型
 
 Table 2 将MoW与近期方法进行了系统对比。相较于单一共享VAE加标准Transformer的**STORM**（Zhang et al., 2023），MoW引入了任务专用VAE、混合专家Transformer和任务路由器，在保持重建质量的同时大幅提升了多任务参数效率。与基于状态的MoE方法**MOORE**（Hendawy et al., 2023）不同，MoW直接处理图像输入，并将MoE机制解耦于Transformer外部，以任务嵌入而非逐令牌路由来激活专家，从而保证任务内专家激活的一致性。
 
-## 核心模块与公式推导
+
 
 ### 多任务世界模型优化目标
 
@@ -298,7 +302,9 @@ $$S = \mathrm{percentile}(R_{t,k}^{\lambda}, 95) - \mathrm{percentile}(R_{t,k}^{
 
 **关键限制**：聚类仅在 warmup 阶段执行一次，训练过程中不再调整任务分组，可能无法适应非平稳的任务关系变化。实验表明（Figure 6），损失在数千优化步内收敛，warmup 长度在合理范围内的变化对最终性能影响较小。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验结果
 
@@ -366,7 +372,9 @@ Figure 2展示了MoW与标准Transformer（vanilla STORM框架）在Atari 100K 2
 
 4. **Warmup数据依赖。** 梯度聚类依赖warmup阶段的固定重放缓冲区数据（Algorithm 1），在实际应用中收集足够的随机交互数据可能存在工程挑战。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 直接继承与架构改造
 
@@ -413,6 +421,8 @@ MoW 的核心架构直接继承自单任务世界模型 **STORM**（Zhang et al.
 4. **任务学习不平衡的缓解**：针对 Freeway 等得分持续为 0 的任务，当前的和谐损失加权机制似乎不足以解决极端的学习不平衡。是否需要引入更主动的干预机制（如动态损失调度、任务课程、或对困难任务的专家专用化）值得探索。
 
 5. **规模上限验证**：论文仅在 26 款 Atari 游戏和 50 个 Meta-World 任务上验证，尚未在更大规模任务集（如全部 57 款 Atari 游戏、多具身机器人任务集）上测试。随着任务数量增长，专家数量、聚类质量和路由效率之间的权衡关系需要更系统的研究。
+
+
 
 ## 原文 PDF
 

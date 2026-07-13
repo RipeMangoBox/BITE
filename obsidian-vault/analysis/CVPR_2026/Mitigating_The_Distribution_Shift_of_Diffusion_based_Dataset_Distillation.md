@@ -45,7 +45,7 @@ claims:
 > - ImageNette 上，Top-1 Accuracy (IPC 10, ConvNet-6) 65.5±0.7 vs previous best diffusion-based method (e.g., IGD 63.8) (+1.7 (outperforms SOTA))。
 > - ImageWoof 上，Top-1 Accuracy (IPC 100, ResNet-18) 72.5±0.8 vs previous best diffusion-based method (outperforms SOTA)。
 
-## 概述
+## 概要
 
 **核心问题**：基于扩散模型的数据集蒸馏（Diffusion-based Dataset Distillation, DD）面临两类分布偏移——训练时扩散模型学习过于复杂的完整数据分布，未能提炼出任务感知的简化表示；采样时因合成集容量极小（IPC很小），独立采样导致合成集经验分布偏离目标分布，出现**多样性崩溃**和**分布漂移**。
 
@@ -67,7 +67,7 @@ claims:
 
 > **注意**：当预训练域与目标域差异较大时效果可能受限；关键超参数 $\lambda$ 和 $\eta$ 需针对不同数据集分别调节，增加了实用中的调参负担。
 
-## 背景与动机
+
 
 ### 数据集蒸馏的核心矛盾
 
@@ -96,7 +96,9 @@ claims:
 
 这一设计将数据集蒸馏从“生成-挑选”范式转变为“全局联合优化”范式，为扩散模型在数据蒸馏中的可靠应用提供了新的理论视角和实践方案。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心贡献在于首次系统性地识别并缓解了扩散模型应用于数据集蒸馏时的两类分布偏移，并据此提出了**受限分数匹配（RSM）**与**协同引导采样（CGS）**的两阶段框架。其创新本质并非更换扩散模型架构，而是通过改变训练目标与采样范式，将扩散模型从“完整数据分布复制器”改造为“蒸馏感知的简化流形生成器”。
 
@@ -136,7 +138,7 @@ $$g_t^c = \eta_{dpp} \nabla_{\mathcal{Z}_t^c} \mathcal{L}_{dpp}(\mathcal{Z}_t^c)
 
 消融实验证实了这两个模块的独立贡献：**RSM 单独使用即可超越现有扩散采样优化方法并达到最优性能**，而 CGS 在 RSM 基础上进一步提供 **1–2% 的额外提升**。这表明训练端的流形简化与采样端的全局协同优化是两个互补且各自有效的创新维度。
 
-## 整体框架
+
 
 本文提出了一种两阶段扩散数据集蒸馏框架 **RSM+CGS**，旨在系统性地缓解扩散模型在数据集蒸馏中引入的两类分布偏移——训练时的流形过复杂化与采样时的多样性崩溃/分布漂移。整体流程如 **Algorithm 1** 所示，包含以下关键模块与数据流：
 
@@ -184,7 +186,7 @@ $$\mathcal{L}_{\text{RSM}} = \mathbb{E}_{t, x_0, \epsilon} \|\epsilon - \epsilon
 
 RSM 单独使用已能超越现有扩散采样优化方法（如 **Minimax** (Gu et al., CVPR 2024)、**IGD** (Chen et al., ICLR 2025)），达到 SOTA 水平；CGS 在此基础上提供额外的 1-2% 性能增益。两阶段的设计使得训练阶段的流形简化与采样阶段的全局协同优化相互解耦又彼此增强，共同实现了对扩散数据集蒸馏中分布偏移问题的系统性缓解。
 
-## 核心模块与公式推导
+
 
 本方法由两个互补阶段构成：**受限分数匹配（Restricted Score Matching, RSM）** 在训练时重塑扩散模型的生成流形，**协同引导采样（Collaborative Guided Sampling, CGS）** 在采样时对全体合成样本进行联合优化。两阶段均以潜在扩散模型为基础，图像先经VAE编码器映射到潜在空间，蒸馏完成后再解码回图像空间。
 
@@ -226,7 +228,9 @@ $$ g_t^c = \eta_{dpp} \nabla_{\mathcal{Z}_t^c} \mathcal{L}_{dpp}(\mathcal{Z}_t^c
 
 该梯度用于更新去噪后的潜在变量集，使全体样本在保持多样性的同时整体分布不偏离目标。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验：ImageNet 子集与全量 ImageNet-1K
 
@@ -280,7 +284,9 @@ Figure 3 通过 T-SNE 可视化进一步揭示了潜在空间的结构差异。�
 ![[assets/figures/papers/paper_list_l2694_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_Mitigating_The_Dist/figures/001_Table_1.jpg]]
 *Table 1: Comparison on ImageNet subsets (ImageNette & ImageWoof) with diverse architectures. Best results are in bold*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从分布匹配到扩散生成
 
@@ -344,6 +350,8 @@ Figure 3 通过 T-SNE 可视化进一步揭示了潜在空间的结构差异。�
 4. **协同采样与高效去噪的结合**：CGS的同步去噪过程能否与更高效的去噪步骤（如DDIM、DPM-Solver）结合，在保持合成质量的同时进一步加速合成过程？这需要在引导梯度与跳步去噪之间建立兼容机制。
 
 5. **无类别标签场景的拓展**：当前分布匹配损失依赖类均值，如何将CGS框架拓展到无监督或自监督的数据蒸馏场景，是一个具有实际价值的开放方向。
+
+
 
 ## 原文 PDF
 

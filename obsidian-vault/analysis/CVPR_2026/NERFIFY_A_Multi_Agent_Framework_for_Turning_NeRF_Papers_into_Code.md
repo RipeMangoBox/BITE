@@ -42,7 +42,7 @@ claims:
 > - NERFIFY-BENCH Set 1 上，SSIM 0.90 vs 0.89 (论文报告) (+0.01)。
 > - NERFIFY-BENCH Set 2 (非 Nerfstudio 实现) 上，PSNR 30.13 (l0-Sampler) vs 29.21 (原始作者实现) (+0.92)。
 
-## 概述
+## 概要
 
 将神经辐射场（NeRF）论文转化为可训练代码是一项高度专业化的工程任务，即使对领域专家也需要数周的努力。核心瓶颈在于：NeRF 实现涉及体渲染、计算机视觉与神经优化的强领域耦合——一个错误的激活函数或光线求交就可能导致 NaN 梯度或退化解，而调试周期长达 24–48 小时。现有的通用论文到代码系统（如 **Paper2Code** (Seo et al., arXiv 2025)、**AutoP2C** (Lin et al., arXiv 2025)、GPT-5 单次生成、OpenAI O1）虽然能产生语法正确的 Python 代码，但缺乏架构约束和依赖解析能力，95% 无法训练。
 
@@ -57,7 +57,7 @@ claims:
 
 该方法目前高度依赖 Nerfstudio 架构，向其他框架的迁移能力尚未验证；视觉驱动反馈依赖烟雾训练（3k 迭代）仍需一定计算时间，完全达到论文报告 PSNR 可能需要额外迭代。
 
-## 背景与动机
+
 
 ### 神经辐射场的实现困境
 
@@ -79,7 +79,9 @@ claims:
 
 上述缺口揭示了一个明确的需求：**将 NeRF 领域的架构知识形式化为机器可执行的约束，并构建能够理解、检索、组合与验证的多智能体系统**。NERFIFY 的设计动机正是填补这一空白——通过将 Nerfstudio 框架形式化为上下文无关文法（CFG）以强制接口合约，通过组合式引用图遍历以恢复传递依赖，并通过视觉驱动的 PSNR/跨视角反馈以迭代逼近专家级质量，从而在几分钟内自动完成从论文到可训练 NeRF 插件的全流程转化（Figure 1 右）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 NERFIFY 相对于通用论文到代码生成系统的核心创新，在于将 **NeRF 领域特定的架构知识形式化为生成约束**，并通过**多智能体协作与视觉反馈闭环**，从根本上解决了通用方法“能生成代码但无法训练”的瓶颈。以下从四个关键的 changed slots 展开分析。
 
@@ -143,7 +145,7 @@ NERFIFY 引入**视觉驱动反馈**（Stage 4），通过三个互补的分支�
 
 NERFIFY 的四项 changed slots 构成了一条完整的因果链：**CFG + In-Context 示例**提供领域知识基础 → **组合式引用恢复**补全隐藏依赖 → **GoT 多智能体**在架构约束下按拓扑顺序生成代码 → **视觉驱动反馈**迭代修复语义错误。这一链条使得 NERFIFY 在 NERFIFY-BENCH 上实现了 **100% 可训练率**，而所有基线均为 0%（Table 2），从根本上解决了通用论文到代码系统在 NeRF 领域的“能生成但不可训练”问题。
 
-## 整体框架
+
 
 NERFIFY 是一个将 NeRF 论文自动转化为可训练代码的四阶段多智能体系统。其核心设计理念是：**通用论文到代码系统无法生成可训练的 NeRF 实现，因为 NeRF 涉及体渲染、计算机视觉和神经优化的强领域耦合——一个错误的激活函数或光线求交就会导致 NaN 梯度或退化解，且调试周期长达 24–48 小时**。现有基线方法（如 **Paper2Code** (Seo et al., arXiv 2025)、**AutoP2C** (Lin et al., arXiv 2025)、GPT-5 单次生成、OpenAI o1）生成的可执行代码缺乏架构约束和依赖解析，95% 无法训练。
 
@@ -198,7 +200,7 @@ $${ \mathrm { D e p e n d e n c i e s } } ( c _ { i } ) = \{ c _ { i } \} \cup \
 ![[assets/figures/papers/paper_list_l2643_https_arxiv_org_abs_2603_00805/figures/001_Figure_1.jpg]]
 *Figure 1: Overview. Manual NeRF implementation requires weeks of specialized effort (left). Existing paper-to-code systems fail to produce trainable code. NERFIFY automates this process through grammar-constrained synthesis and compositional citation recovery, generating fully trainable Nerfstudio plugins in minutes (right)*
 
-## 核心模块与公式推导
+
 
 NERFIFY 将 NeRF 论文自动转化为可训练代码的核心机制建立在四个形式化基础之上：仓库的图表示、论文的结构化信息抽取、组合式依赖递归，以及多智能体拓扑生成。以下逐一展开其关键模块与支撑公式。
 
@@ -261,7 +263,9 @@ Stage 4 的度量分支通过构建稠密误差场来定位视觉伪影的根源
 ![[assets/figures/papers/paper_list_l2643_https_arxiv_org_abs_2603_00805/figures/004_Figure_4.jpg]]
 *Figure 4: Graph-of-Thought (GoT) Multi-Agent Code Synthesis. The master agent orchestrates specialized file-agents that progressively build a NeRF repository over k steps. Each step shows files being created or modified through four stages: (1) DAG Construction maps papers to Nerfstudio component dependencies, (2) Interface Freeze establishes API contracts in topological order, (3) Implementation generates validated code with shape/gradient checks, (4) Integration Testing runs smoke tests with automated repair. Files evolve from minimal interfaces to complete implementations as agents coordinate through the dependency graph, producing runnable NeRF plugins*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 评估设置与基准
 
@@ -332,7 +336,9 @@ Table 5 的消融实验揭示了四个核心组件的因果效应：
 ![[assets/figures/papers/paper_list_l2643_https_arxiv_org_abs_2603_00805/figures/006_Table_2.jpg]]
 *Table 2: Comparison of NERFIFY with baselines in terms of executable code. We evaluate ability to produce functional, trainable implementations. All baselines fail to generate trainable code despite some producing syntactically valid Python*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有工作的关系
 
@@ -359,6 +365,8 @@ NERFIFY 的适用边界由其设计假设清晰界定。第一个边界是**框�
 第二，**引用恢复的极限**：当依赖链中的某个节点完全没有可用实现时，组合式引用恢复的退化行为如何？系统是否能够降级为从论文描述中推断组件实现，还是需要人工介入？这一问题的答案将决定 NERFIFY 在“冷启动”场景下的实用性。
 
 第三，**VLM 反馈的可靠性**：语义诊断分支使用 Qwen3 VLM 来识别渲染伪影（如浮空几何、缺失细节），但这种基于视觉语言模型的诊断是否对所有类型的 NeRF 伪影都有效？是否存在 VLM 误诊导致修复方向错误的风险？论文未对此进行消融分析，这是一个需要人工验证的开放点。
+
+
 
 ## 原文 PDF
 

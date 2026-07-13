@@ -43,7 +43,7 @@ claims:
 > - VRoid (任意姿态风格化) 上，MAE↓ 5.28 (显著优于所有baseline)；SIM↑ 0.935 (显著优于所有baseline)；Uni3D-I↑ 0.313 (显著优于所有baseline)。
 > - VRoid (任意姿态风格化，Qwen-Image编辑输入) 上，MAE↓ 5.28 vs 8.15 (Hunyuan3D 2.1) (-2.87)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有3D角色姿态风格化方法普遍采用级联管线——先通过2D扩散模型操控图像中的人物姿态，再将结果提升为3D表示。这一范式存在根本性缺陷：2D生成阶段引入的伪影、遮挡和不一致性会直接传播至3D重建阶段并被放大，同时2D骨架投影丧失深度信息，造成几何歧义，难以实现高保真度的身份保持与姿态对齐。
 
@@ -56,7 +56,7 @@ claims:
 
 **主要结果**：在VRoid姿态规范化任务上，PoseMaster取得MAE 4.59、SIM 0.938，大幅领先所有对比方法；在任意姿态风格化任务上同样保持显著优势，且推理速度优于CharacterGen、StdGen等典型级联方案。消融实验证实，密集骨架表示和骨架引导对生成质量具有关键作用。
 
-## 背景与动机
+
 
 ### 3D角色资产生成的范式演进
 
@@ -84,7 +84,9 @@ claims:
 
 这一设计使PoseMaster在姿态规范化任务中取得MAE 4.59的指标，大幅领先所有对比方法（Table 1，置信度0.95），验证了3D原生姿态控制范式的有效性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PoseMaster 的核心创新在于将姿态风格化与三维原生生成统一为单一的端到端框架，彻底摒弃了传统级联管线中“先 2D 操控姿态、再 3D 重建”的范式。这一架构变革围绕三个关键的 **changed slots** 展开。
 
@@ -118,7 +120,7 @@ $$\hat{v}_\theta = v_\theta(x_t, t, c_p, \emptyset) + \lambda \cdot (v_\theta(x_
 
 上述三个 changed slots 的协同作用在姿态规范化任务上得到了充分验证：PoseMaster 在 VRoid 测试集上取得 MAE 4.59、SIM 0.938、Uni3D-I 0.402、ULIP-I 0.161，大幅领先所有对比方法（Table 1）。消融实验进一步证实，带有骨架引导的生成在 MAE（4.82）和 SIM（0.946）上均显著优于无骨架引导的 baseline（Table 3），直接证明了 3D 骨架作为控制信号的核心价值。
 
-## 整体框架
+
 
 PoseMaster 将姿态风格化与三维原生生成统一在单一端到端框架中，其核心设计动机在于消除传统级联管线的误差传播瓶颈——二维扩散模型在操控图像姿态时产生的伪影、遮挡和不一致性，在后续三维重建阶段被直接放大，同时二维骨架投影丧失深度信息导致几何歧义。PoseMaster 通过直接使用三维骨架作为控制信号，以密集点云编码显式的空间坐标和拓扑关系，从根源上规避了二维投影歧义。
 
@@ -155,7 +157,7 @@ PoseMaster 将姿态风格化与三维原生生成统一在单一端到端框架
 ![[assets/figures/papers/paper_list_l2573_https_arxiv_org_abs_2506_21076/figures/001_Figure_1.jpg]]
 *Figure 1: Givenasingleimageandarbitraryposesrepresentedbya3Dskeleton,PoseMastercangenerateahighquality3Dsetthat maintains theidentityoftheimage whileahering totheposedfiedbytheskeleton,enablingrichand precise3Dposestylzation*
 
-## 核心模块与公式推导
+
 
 PoseMaster 的生成流水线由四个核心模块构成，围绕“3D 原生潜空间生成”这一主轴协同工作。
 
@@ -211,7 +213,9 @@ $$\hat{v}_\theta = v_\theta(x_t, t, c_p, \emptyset) + \lambda \cdot (v_\theta(x_
 ![[assets/figures/papers/paper_list_l2573_https_arxiv_org_abs_2506_21076/figures/004_Figure_4.jpg]]
 *Figure 4: The skeleton representation of sparse joints and ours. We propose a distance-weighted interpolation scheme to densify the skeletal graph.Furthermore,explicit bone directional vectors are embedded into all interpolated points belonging to the same skeletal segment*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心指标与主实验结果
 
@@ -275,7 +279,9 @@ Table 5 报告了推理速度对比。PoseMaster 的单阶段 3D 原生生成在
 ![[assets/figures/papers/paper_list_l2573_https_arxiv_org_abs_2506_21076/figures/003_Figure_3.jpg]]
 *Figure 3: ．Overview of the dataset construction pipeline.Our approach integrates both dynamic articulated meshes and static geometries to curate a large-scale dataset consisting of strictly aligned image-skeleton-mesh triplets*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 方法谱系：从级联2D操控到3D原生生成
 
@@ -302,6 +308,8 @@ PoseMaster的核心突破在于**将姿态风格化从“2D投影操控+3D重建
 2. **通用拓扑的姿态风格化**：如何将3D骨架控制信号扩展到非标准骨架和宽松衣物等复杂拓扑结构，使框架具备更通用的姿态风格化能力？这可能需要骨架表示的自适应稠密化策略或拓扑感知的条件编码。
 
 3. **几何-纹理联合优化**：如何在统一框架内实现几何与纹理的联合生成或联合优化，从根本上消除姿态不一致问题？这涉及到将纹理生成纳入流匹配目标，或在潜空间中建立几何-纹理的耦合表示。
+
+
 
 ## 原文 PDF
 

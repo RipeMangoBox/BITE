@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2024
 pdf_ref: paperPDFs/CVPR_2024/MCM_LDM_Arbitrary_Motion_Style_Transfer_with_Multi_condition_Motion_Latent_Diffusion_Model.pdf
+project_link: null
+code_link: https://github.com/
 aliases:
 - MCMLDMML
 - MLAMSTMCMLDM
@@ -43,15 +45,13 @@ claims:
 > - 消融实验表明，移除StyleRemover导致SRA从58.00骤降至16.88而CRA激增至93.43，证明内容-风格解耦的必要性；移除轨迹条件导致TSI从0.40升至0.93，显著破坏轨迹保持；替换预训练MotionCLIP为随机初始化则全面崩溃（FMD 138.55），证实风格提取器的关键作用（表2）。
 > - 用户研究显示，MCM-LDM在真实感（4.48）、内容保留（4.45）和风格表现（4.43）上的平均评分均高于对比方法，且ANOVA检验证实差异显著（p<0.01），表明人类偏好（表4）。
 
-## 概述
+## 概要
 
 任意运动风格迁移（Arbitrary Motion Style Transfer, AMST）的核心挑战在于：如何在完整保留原始运动内容语义的前提下，自然融入目标风格特征，同时避免因轨迹处理不当导致的“脚滑动”等运动失真。现有方法——如基于1D卷积与AdaIN的无配对迁移（Aberman et al., ACM TOG 2020）、基于时空图卷积的多风格域风格化（Park et al., Proc. ACM CGIT 2021）、以及基于身体部位风格融合的Motion Puzzle（Jang et al., ACM TOG 2022）——普遍采用将内容运动轨迹直接复制到风格化运动上的策略，这从根本上破坏了运动学一致性，导致脚部滑动等伪影。此外，这些方法在训练时依赖配对或隐式特征混合，缺乏对内容、风格、轨迹三者的显式解耦与独立控制。
 
 本文提出**多条件运动潜在扩散模型（MCM-LDM）**，以扩散模型为框架，将运动显式分解为内容、轨迹和风格三个独立因素。其核心设计在于多条件去噪器中的优先级引导机制：内容作为主条件与噪声潜在特征拼接，轨迹与风格作为辅条件通过AdaLN-Zero动态注入每一层。训练采用自重建范式（同一运动同时作为内容和风格输入），配合StyleRemover实现内容-风格解耦，以及Transformer轨迹编码器实现学习式轨迹保留，从根本上解决了轨迹复制带来的失真问题。
 
 在HumanML3D数据集上的定量评估表明，MCM-LDM取得了最优的运动质量（FMD 27.69）和风格准确率（SRA 58.00），次优的内容保留（CRA 35.75），并保持了均衡的轨迹相似度（TSI 0.40）和脚滑动指标（FSF 1.28）。消融实验揭示了关键因果机制：移除StyleRemover导致SRA从58.00骤降至16.88而CRA激增至93.43，证实内容-风格解耦的必要性；移除轨迹条件使TSI从0.40升至0.93，验证了学习式轨迹保留的有效性；替换预训练MotionCLIP为随机初始化则使FMD崩溃至138.55，表明风格提取器的关键作用。用户研究进一步确认了MCM-LDM在真实感、内容保留和风格表现上的人类偏好优势（ANOVA检验p<0.01）。
-
-## 背景与动机
 
 ### 运动风格迁移的现状与瓶颈
 
@@ -77,7 +77,7 @@ claims:
 
 通过将扩散模型的生成能力与多条件引导相结合，MCM-LDM能够在保留运动核心语义的前提下，自然融合任意目标风格，同时忠实遵循给定轨迹。Figure 1的定性效果展示了该方法在风格注入与内容保真度之间的平衡能力。
 
-## 核心创新
+## 核心方法与创新机理
 
 ### 瓶颈定位：轨迹丢失与风格-内容耦合
 
@@ -108,8 +108,6 @@ claims:
 
 MCM-LDM 的创新聚焦于**给定轨迹条件下的风格迁移**，轨迹编码器仅在给定轨迹时发挥作用，无法自主生成新轨迹。当前模型未探索文本或音乐驱动的轨迹生成，也未建模环境交互（如物体抓取、地面适应），在复杂场景下可能出现物理不合理性。此外，模型性能受限于 HumanML3D 训练数据的时间范围，对超长序列或分布外动作的泛化能力有待验证。
 
-## 整体框架
-
 MCM-LDM 的整体 pipeline 由两大核心组件串联而成：**多条件提取模块（Multi-condition Extraction）** 与 **多条件运动潜在扩散模型（MCM-LDM）**，如 Figure 3 所示。其设计哲学在于将运动显式解耦为内容（content）、轨迹（trajectory）和风格（style）三个独立因素，并以扩散模型为框架，通过优先级引导机制实现三者的协同融合。
 
 ### 输入输出流
@@ -137,8 +135,6 @@ MCM-LDM 的整体 pipeline 由两大核心组件串联而成：**多条件提取
 推理阶段引入**分类器自由引导（classifier-free guidance）**机制：
 $$E_n^* = \lambda E_\theta(z_n, f_c, f_t, f_s) + (1-\lambda) E_\theta(z_n, f_c, f_t, \emptyset)$$
 通过引导系数 $\lambda$（论文中设为 2.5）在条件预测与无条件预测之间插值，控制风格化的强度。这一设计使得模型在保留内容完整性的同时，能够灵活调节风格融入的程度。
-
-## 核心模块与公式推导
 
 ### 多条件提取模块
 
@@ -230,7 +226,7 @@ $$
 ![[assets/figures/papers/paper_list_l2_MCM_LDM_Arbitrary_Motion_Style_Transfer_with_Multi_condition_Motion_Late/figures/003_Figure_3.jpg]]
 *Figure 3: Method overview. We have two components: (1) The Multi-condition Extraction obtains content features $f _ { c }$ and trajectory features $f _ { t }$ from the content motion, while the style features $f _ { s }$ are obtained from the style motion. (2) MCM-LDM contains forward process and denosing process. The condition features guide the denoising process through Multi-condition Denoiser*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心定量结果与综合性能
 
@@ -282,13 +278,10 @@ MCM-LDM在HumanML3D测试集上取得了最优的运动质量与风格表现平�
 ![[assets/figures/papers/paper_list_l2_MCM_LDM_Arbitrary_Motion_Style_Transfer_with_Multi_condition_Motion_Late/figures/005_Table_1.jpg]]
 *Table 1: Quantitative evaluation. ‘↑’ (‘↓’) indicates that the value is better if the metric is larger (smaller); The bold fonts denote best performers. The results demonstrate that our MCM-LDM achieves balanced performance in all metrics*
 
-![[assets/figures/papers/paper_list_l2_MCM_LDM_Arbitrary_Motion_Style_Transfer_with_Multi_condition_Motion_Late/figures/009_Table_2.jpg]]
-*Table 2: Importance of the Components in Multi-condition Extraction. We conduct separate experiments to evaluate the importance of the StyleRemover in ${ \mathcal { E } } _ { c o n }$ and the pre-trained MotionCLIP in $\mathcal { E } _ { s t y }$ Firstly, we remove the StyleRemover module from ${ \mathcal { E } } _ { c o n }$ (Table 2: ‘w/o StyleRemover’). The results show that the SRA score decreases Table 4. User study. The results show that our MCM-LDM outperforms other methods in terms of realism, content preservation, and style performance*
-
 ![[assets/figures/papers/paper_list_l2_MCM_LDM_Arbitrary_Motion_Style_Transfer_with_Multi_condition_Motion_Late/figures/008_Figure_6.jpg]]
 *Figure 6: Visualization of ablation study. We present the visualization results of two ablation experiments: without our StyleRemove and without the trajectory condition. The results showcase their importance*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 问题定位与核心瓶颈
 

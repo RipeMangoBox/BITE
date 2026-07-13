@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/BWCache_Accelerating_Video_Diffusion_Transformers_through_Block_Wise_Caching.pdf
+project_link: null
+code_link: https://github.com/hsc113/BWCache
 aliases:
 - BWCB
 - BWCache
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | BWCache：通过逐块缓存加速视频扩散Transformer |
 | 英文题名 | BWCache: Accelerating Video Diffusion Transformers through Block-Wise Caching |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=5bJZtzTFYy); [GitHub](https://github.com/hsc113/BWCache) |
+| Links | [paper](https://openreview.net/forum?id=5bJZtzTFYy) · [GitHub](https://github.com/hsc113/BWCache) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | Block-Wise Caching (BWCache) |
 | Dataset | Open-Sora (51帧, 480P), Open-Sora-Plan (65帧, 512×512) |
@@ -41,11 +43,11 @@ claims:
 > - Open-Sora (51帧, 480P) 上，VBench 为 80.03%，对比 80.12% (原始)，变化 -0.09%。
 > - Open-Sora-Plan (65帧, 512×512) 上，Speedup 为 2.24×，对比 1.0× (原始)，变化 +1.24×。
 
-## 概述
+## 概要
 
 本文提出**BWCache (Block-Wise Caching)**，一种无需训练的即插即用方法，用于加速基于DiT (Diffusion Transformer) 的视频生成模型。核心思想是：在扩散时间步上，DiT块的特征变化呈现**U形模式**——中间时间步的特征高度相似，因此可以安全地缓存并重用这些块特征，从而消除冗余计算。BWCache通过一个基于相邻时间步块特征差异的相似性指标，动态决定是否触发缓存重用，并采用周期性重计算策略缓解潜在漂移。实验表明，BWCache在多个主流视频DiT模型（Open-Sora、Open-Sora-Plan、Latte、Wan 2.1、HunyuanVideo）上，在保持可比视觉质量的同时，实现了最高**2.6倍**的加速。
 
-## 背景与动机
+
 
 ### 2.1 视频扩散Transformer的推理瓶颈
 
@@ -64,7 +66,9 @@ claims:
 
 这一观察为**逐块缓存**提供了核心动机：中间时间步的块特征可以安全地缓存和重用，从而消除大量冗余计算。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 BWCache的核心创新可概括为四个关键设计维度：
 
@@ -75,7 +79,7 @@ BWCache的核心创新可概括为四个关键设计维度：
 | **缓存更新策略** | 无周期性重计算或固定重计算 | **周期性重计算**：每R步重计算一次块特征，防止潜在漂移 | "Periodic recomputation is applied to mitigate potential latent drift." |
 | **最终时间步处理** | 无特殊处理 | **最后k/2步始终重计算**：缓存触发后，后半部分步骤不进行重用 | "Once BWCache is triggered at the k-th step, caching reuse is restricted to the first half of the remaining steps, while the second half is explicitly computed." |
 
-## 整体框架
+
 
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__image_and_video_generation__b001_5bJZtzTFYy_BWCache_Accel/figures/001_Figure_1.jpg]]
@@ -88,7 +92,7 @@ BWCache的整体流程如Figure 2所示：
 4. **周期性重计算**：每R步后，重新计算一次块特征并更新缓存，防止累积误差导致的潜在漂移。
 5. **最终时间步保护**：缓存触发后，最后k/2个时间步始终进行完整计算，确保生成质量。
 
-## 核心模块与公式推导
+
 
 ### 5.1 扩散过程与DiT块
 
@@ -127,7 +131,9 @@ $$\mathcal{O}_H = \{\ldots, \underbrace{h_t''}_{\mathrm{cached}}, \underbrace{h_
 - **LPIPS**（Appendix C）：$\mathrm{LPIPS}(I, K) = \frac{1}{L} \sum_{l=1}^L \| \phi_l(I) - \phi_l(K) \|^2$，基于深度学习特征的感知相似度，越低越相似。
 - **SSIM**（Appendix C）：$\mathrm{SSIM}(I, K) = \frac{(2\mu_I\mu_K + C_1)(2\sigma_{IK} + C_2)}{(\mu_I^2 + \mu_K^2 + C_1)(\sigma_I^2 + \sigma_K^2 + C_2)}$，评估亮度、对比度和结构，越高越好。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 
 ### 6.1 主要结果
@@ -210,7 +216,9 @@ $$\mathcal{O}_H = \{\ldots, \underbrace{h_t''}_{\mathrm{cached}}, \underbrace{h_
 - LPIPS、SSIM和PSNR均相对于原始模型结果计算。
 - FlashAttention (Dao et al., 2022) 在所有实验中默认启用。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 7.1 与现有缓存方法的关系
 
@@ -247,6 +255,8 @@ BWCache在缓存方法谱系中占据独特位置：
 3. BWCache是否可以与其他加速技术（如蒸馏、量化）结合以获得更大的加速效果？
 4. BWCache在图像生成和类别条件生成任务中的适用性如何？
 5. 如何更有效地解决缓存重用导致的潜在漂移问题？
+
+
 
 ## 原文 PDF
 

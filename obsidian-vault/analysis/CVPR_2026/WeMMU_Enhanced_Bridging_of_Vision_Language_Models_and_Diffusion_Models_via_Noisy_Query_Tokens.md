@@ -43,7 +43,7 @@ claims:
 > - DPG-Bench 上，Overall↑ 83.69 (WeMMU Stage 3) vs 77.67 (MetaQuery-XL) (+5.02)。
 > - ImageEdit-Bench 上，Overall↑ 3.31 (WeMMU Stage 3) vs 3.2 (Bagel) (+0.11)。
 
-## 概述
+## 概要
 
 ### 1. 问题背景
 
@@ -80,7 +80,7 @@ WeMMU 的独特贡献在于通过**噪声令牌 + VAE 分支分工**的组合设
 
 WeMMU 在多图编辑任务中仍可能产生可见的拼接痕迹，且在编辑性能上落后于 GPT-4o、EMU3.5 等大型专有模型。框架依赖预训练 VLM 与扩散模型的兼容性，更换骨干可能需要重新训练。开放问题包括：噪声令牌分布是否可学习或自适应、如何通过强化学习微调进一步提升指令遵循、以及如何将方法扩展到更大规模的多模态模型。
 
-## 背景与动机
+
 
 ### 统一多模态模型的兴起与桥接范式
 
@@ -106,7 +106,9 @@ WeMMU 在多图编辑任务中仍可能产生可见的拼接痕迹，且在编�
 2. **重构细节补充路径**：将VAE分支的细节信息注入VLM而非扩散模型，实现清晰的“分工”设计——VLM统一负责理解与细节聚合，扩散模型专注于生成。
 3. **建立可扩展的统一框架**：通过冻结VLM骨干、仅训练轻量桥接组件和扩散模型，在保持理解能力的同时实现对新任务的可持续扩展。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 WeMMU 的核心创新在于对“VLM-扩散模型桥接机制”的两个关键槽位进行了根本性改造，以解决传统可学习查询令牌方法中普遍存在的**任务泛化崩溃（Task Generalization Collapse）**问题。
 
@@ -140,7 +142,7 @@ Table 4 的消融实验直接量化了上述创新的贡献：
 
 这一递进式提升清晰地表明，噪声查询令牌和 VAE 分支是两个互补且可叠加的创新组件。
 
-## 整体框架
+
 
 WeMMU 的整体设计遵循明确的“分工”原则：冻结的视觉语言模型（VLM）负责理解，可训练的扩散模型专注于生成。两者之间通过一个**概率专家桥接（Probabilistic Expert Bridge）** 连接，其核心是每步重新采样的**噪声查询令牌（Noisy Query Tokens）**，而非传统的确定性可学习查询。
 
@@ -170,7 +172,7 @@ WeMMU 的整体设计遵循明确的“分工”原则：冻结的视觉语言�
 ![[assets/figures/papers/paper_list_l2359_https_arxiv_org_abs_2512_02536/figures/001_Figure_1.jpg]]
 *Figure 1: Task Generalization Collapse. Sequential training (middle) fails editing, merely reconstructs the input. Joint training (right) works but is unsustainable, requiring full retraining for new tasks*
 
-## 核心模块与公式推导
+
 
 ### 流匹配基础
 
@@ -233,7 +235,9 @@ $$\epsilon _ { p r e d } = \epsilon _ { u n c o n } + \lambda _ { m u l t i } ( 
 
 其中 $\lambda_{multi} = 3.0$。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈：任务泛化崩溃
 
@@ -328,7 +332,9 @@ Figure 4 的实验排除了若干替代设计方案：
 ![[assets/figures/papers/paper_list_l2359_https_arxiv_org_abs_2512_02536/figures/005_Table_3.jpg]]
 *Table 3: Detailed Training Curriculum and Hyper-parameters. The training progresses through four stages, adjusting resolution, batch size, and data mixture. Notably, Stage 3 and Stage 4 utilize different subsets of the Uniworld dataset to target specific editing capabilities. Task abbreviations: Rec. (Reconstruction), T2I (Text-to-Image), Uncond. (Unconditional T2I), S-Edit (Single-Image Editing), M-Edit (Multi-Image Editing)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 桥接范式的谱系定位
 
@@ -367,6 +373,8 @@ WeMMU 在以下场景中展现出明确优势：
 3. **对比流匹配的小批量改进**：论文指出对比流匹配在小批量下效果有限，但未深入探索改进方案。如何在保持训练效率的同时利用对比信号，是一个值得研究的方向。
 
 4. **扩展到更大规模模型**：当前框架在约 8B 参数规模下验证有效，扩展到更大规模的多模态模型时，噪声查询令牌的随机化机制是否仍然有效，以及四阶段课程训练的策略是否需要调整，尚待验证。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Test_Time_Alignment_for_Large_Language_Models_via_Textual_Model_Predictive_Control.pdf
+project_link: https://rl-bandits-lab.github.io/TMPC/
+code_link: null
 aliases:
 - TMPCT
 - TTALLMTMPC
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 通过文本模型预测控制实现大语言模型测试时对齐 |
 | 英文题名 | Test-Time Alignment for Large Language Models via Textual Model Predictive Control |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=DsS3xRPSs5); [Project](https://rl-bandits-lab.github.io/TMPC/) |
+| Links | [paper](https://openreview.net/forum?id=DsS3xRPSs5) · [Project](https://rl-bandits-lab.github.io/TMPC/) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/planning |
 | Method | Textual Model Predictive Control (TMPC) |
 | Dataset | WMT'24 Discourse-Level Literary Translation (zh→en), WMT'24 Discourse-Level Literary Translation (zh→de), WMT'24 Discourse-Level Literary Translation (zh→ru), MBPP Program Synthesis |
@@ -41,11 +43,11 @@ claims:
 > - WMT'24 Discourse-Level Literary Translation (zh→de) 上，SEGALE_comet 为 91.73，对比 91.70 (GPT-4o)，变化 +0.03。
 > - WMT'24 Discourse-Level Literary Translation (zh→ru) 上，SEGALE_comet 为 91.53，对比 93.74 (GPT-4o)，变化 -2.21。
 
-## 概述
+## 概要
 
 本文提出**Textual Model Predictive Control (TMPC)**，一种新颖的测试时对齐框架，旨在解决大型语言模型在测试阶段的对齐问题。TMPC将文本生成重新建模为轨迹优化问题，并借鉴控制理论中的模型预测控制（MPC），通过滚动时域控制和子目标缓冲来平衡两种现有测试时对齐方法的核心缺陷：引导解码（guided decoding）面临的“horizon诅咒”和迭代优化（iterative refinement）面临的“维度诅咒”。TMPC无需微调模型参数，仅通过冻结的LLM作为提议分布，在三个具有不同边界特征的任务上进行了评估：WMT'24语篇级机器翻译、HH-RLHF长回复子集和MBPP程序合成。实验结果表明，TMPC在zh→en翻译上达到94.62 SEGALE_comet，优于包括GPT-4o（94.58）在内的所有基线；在MBPP程序合成上达到61% pass rate，优于Best-of-35和TPO；在长回复生成上平均奖励和GPT-4胜率均优于DPO和Best-of-20。
 
-## 背景与动机
+
 
 ### 2.1 测试时对齐的根本挑战
 
@@ -67,7 +69,9 @@ claims:
 
 TMPC的核心洞察在于：将测试时对齐重新建模为轨迹优化问题，并借鉴控制理论中的模型预测控制（MPC），通过滚动时域控制和子目标缓冲来平衡horizon诅咒与维度诅咒，无需微调模型参数。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 TMPC引入两个核心原则来解决上述权衡：
 
@@ -75,7 +79,7 @@ TMPC引入两个核心原则来解决上述权衡：
 
 2. **子目标条件重生成（Subgoal-Conditioned Re-Generation）**：利用缓冲B中的子目标条件化新rollout的生成，确保稳定累积改进。这一原则确保稳定的、累积的进展。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0002_DsS3xRPSs5_Test-Time_Alignment_for_Large_Language_Models_vi/figures/001_Figure_1.jpg]]
 *Figure 1: Textual Model Predictive Control (TMPC) balances the curse of horizon in guided decoding against the curse of dimensionality in naive iterative refinement. It employs Hindsight Subgoal Identification to dynamically discover promising states from rollouts and Subgoal-Conditioned Re-Generation to guide the search from these discovered subgoals, ensuring a stable alignment.*
@@ -88,7 +92,7 @@ TMPC的整体框架如图1所示，它通过两个核心原则平衡引导解码
 
 ![[assets/figures/papers/iclr26_0002_DsS3xRPSs5_Test-Time_Alignment_for_Large_Language_Models_vi/figures/002_Figure_2.jpg]]
 
-## 核心模块与公式推导
+
 
 ### 5.1 问题形式化
 
@@ -130,7 +134,9 @@ $$\mathcal { B }  \{ \begin{array} { l l } { \mathcal { B } \cup \widetilde { \m
 
 $$\widetilde {  Ḋ \boldsymbol Ḋ a Ḍ Ḍ } _ { t } ^ { \mathrm { T M P C } } ( s ) \gets  { \mathcal Ḋ G Ḍ } \left( \{ \tau _ { t } ^ { ( i ) } \} _ { i = 1 } ^ { K } , R ( \cdot ) ~ | ~ s ,  { \mathcal Ḋ B Ḍ } \right) : = \left\{  { \boldsymbol Ḋ a Ḍ } ~ | ~ R ( s , a ) \geq \alpha ~ \mathrm { a n d } ~ a \in \{ \tau _ { t } ^ { ( i ) } \} _ { i = 1 } ^ { K } \right\}$$
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 6.1 主要结果
 
@@ -237,7 +243,9 @@ Figure 5展示了zh→en翻译的迭代性能，说明TMPC原则的重要性。
 ![[assets/figures/papers/iclr26_0002_DsS3xRPSs5_Test-Time_Alignment_for_Large_Language_Models_vi/figures/010_Table_4.jpg]]
 *Table 4: Robustness of TMPC on HH-RLHF-RLHF (3 iterations). We vary buffer size, segment length, reward model quality, and injected noise. Performance converges around three iterations and remains stable under noisy or weaker supervision.*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 7.1 方法谱系
 
@@ -274,6 +282,8 @@ TMPC与现有方法的关键差异体现在四个维度：
 - TMPC的规划horizon H和迭代次数如何自适应确定？
 - TMPC能否与其他测试时技术（如思维链、树搜索）结合以进一步提升性能？
 - TMPC在更广泛的任务（如对话、摘要、创意写作）上的泛化能力如何？
+
+
 
 ## 原文 PDF
 

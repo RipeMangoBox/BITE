@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Uncertainty_Aware_Gaussian_Map_for_Vision_Language_Navigation.pdf
+project_link: null
+code_link: https://github.com/Gaozzzz/Uncertainty-Aware-VLN
 openreview_forum_id: LPv59noPAy
 aliases:
 - UAGMUA
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 面向视觉语言导航的不确定性感知高斯地图 |
 | 英文题名 | Uncertainty-Aware Gaussian Map for Vision-Language Navigation |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=LPv59noPAy); [GitHub](https://github.com/Gaozzzz/Uncertainty-Aware-VLN) |
+| Links | [paper](https://openreview.net/forum?id=LPv59noPAy) · [GitHub](https://github.com/Gaozzzz/Uncertainty-Aware-VLN) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Uncertainty-Aware Gaussian Map (UAGM) Agent |
 | Dataset | R2R, RxR |
@@ -42,8 +44,7 @@ claims:
 > - R2R 上，SPL↑ 为 66.47±0.17，对比 65.07±0.21 (VER)，变化 +1.40。
 > - RxR 上，SR↑ 为 65.2±0.22，对比 64.1 (BEVBert)，变化 +1.1。
 
-## 概述
-
+## 概要
 视觉语言导航（VLN）要求智能体在三维环境中依据自然语言指令进行自主移动。现有VLN方法在做决策时普遍忽略感知不确定性——即传感器观测本身可能存在的几何结构不可靠、语义模糊或外观歧义等问题。这种“无论置信度高低均预测动作”的训练范式，导致智能体在视觉相似结构（如多扇相似的门）或遮挡场景下产生不可靠的目标定位与不安全路径。
 
 针对这一瓶颈，本文提出**不确定性感知高斯地图（Uncertainty-Aware Gaussian Map, UAGM）智能体**。其核心思想是：利用3D高斯原语的显式结构，将物理上有意义的属性（位置、尺度、语义）直接与不确定性估计关联，从而把结构感知的不确定性编码为智能体观测空间中的可靠性信号，为决策提供可解释的置信度依据。
@@ -52,52 +53,6 @@ claims:
 
 实验验证了UAGM的有效性与通用性。在R2R基准上，完整框架达到SR 78.32%、SPL 66.47%，显著优于DUET（72.22%/60.41%）和VER（76.37%/65.07%），统计检验p值均小于0.05。跨三个基准（R2R、RxR、REVERIE）的一致提升——R2R SR +1.95%、RxR nDTW +1.7%、REVERIE RGS +3.94%——验证了方法的通用性。消融实验表明三类不确定性具有互补性：联合使用时性能最优，且不确定性信息可迁移至DUET、BEVBert、VER等现有方法并带来一致增益。在复杂场景中，将不确定性系数从1.0降至0时，成功率从10/10骤降至2/10，证明不确定性对复杂场景下的可靠导航至关重要。
 
-## 方法谱系与知识库定位
-
-UAGM在VLN领域的方法谱系中占据独特位置。现有VLN方法可依场景表示范式大致划分为四类：
-
-- **拓扑图结构记忆范式**：以**DUET**（Chen et al., CVPR 2022）、**BSG**（An et al., CVPR 2024）、**GridMM**（Wang et al., ECCV 2024）为代表，将环境抽象为图节点与边，通过图神经网络聚合多模态特征进行决策。
-- **2D鸟瞰图（BEV）范式**：以**BEVBert**（An et al., CVPR 2023）为代表，将全景观测投影为2D BEV网格，利用Transformer进行空间推理。
-- **3D体素表示范式**：以**VER**（Lin et al., NeurIPS 2024）为代表，构建3D体素网格编码场景几何与语义信息。
-- **3D高斯泼溅（3DGS）范式**：以**3DGS-VLN**（Zuo et al., 2024）为代表，利用可微3D高斯原语进行场景表示，但未显式建模感知不确定性。
-
-UAGM在3DGS范式的基础上实现了关键跃迁：将3D高斯原语从单纯的场景重建工具升级为**不确定性感知的结构化表示**。其与现有工作的本质区别在于，UAGM不仅编码“场景是什么”，更编码“对场景的感知有多可靠”，从而在决策层面实现了从“盲目信任观测”到“依据置信度推理”的范式转变。这一转变在知识库中的定位可概括为：**将贝叶斯深度学习中的认知不确定性（几何+语义）与偶然不确定性（外观）估计首次系统性地引入VLN的3D场景表示与决策流程**。
-
-## 核心实验结果
-
-### 主流基准上的性能
-
-UAGM在三个主流VLN基准上均取得领先结果：
-
-| 基准 | 关键指标 | UAGM | 最强基线 | 提升 |
-|------|---------|------|---------|------|
-| R2R | SR / SPL | 78.32 / 66.47 | 76.37 / 65.07 (VER) | +1.95 / +1.40 |
-| RxR | SR / nDTW | 65.2 / 65.6 | 64.1 / 63.9 (BEVBert) | +1.1 / +1.7 |
-| REVERIE | RGS / RGSPL | 37.65 / 27.01 | 33.71 / 23.70 (VER) | +3.94 / +3.31 |
-
-在R2R val unseen上的5次重复运行统计显著性检验表明，与DUET、BEVBert、VER的比较p值均远小于0.05（如vs DUET p=3.42×10⁻¹²，vs VER p=1.58×10⁻¹⁰），证明提升非随机波动。
-
-### 关键消融发现
-
-**SGM与3DVM协同增效**：仅添加SGM将R2R SR从72.22%提升至77.05%，仅添加3DVM提升至73.52%，两者联合达78.32%；REVERIE上趋势一致，验证了结构化场景表示与不确定性感知决策的互补性。
-
-**三类不确定性互补**：几何+语义不确定性（认知不确定性）贡献更丰富的导航线索（仅此二者SR 77.05），外观不确定性（偶然不确定性）提供独立增益（仅外观SR 76.86），三者联合SR达78.32%。
-
-**不确定性信息可迁移**：将3D价值地图渲染为2D全景不确定性图，附加给DUET/BEVBert/VER后，三者SR分别提升1.30%/1.09%/1.08%，证明不确定性信号具有跨架构的通用价值。
-
-**复杂场景依赖不确定性**：在复杂场景中将不确定性系数从1.0降至0时，成功率从10/10骤降至2/10；而简单场景始终保持10/10，表明不确定性对处理感知歧义场景不可或缺。
-
-### 效率与鲁棒性
-
-运行时分析表明，变分推理仅引入0.11s额外开销，费雪信息估计仅需0.19s/步，总耗时2.63s（MobileSAM变体），在效率与性能间取得平衡。在10%/20%/30%高斯噪声注入RGB观测的鲁棒性测试中，完整智能体在所有噪声水平下均保持最佳性能。
-
-## 局限与展望
-
-当前UAGM框架存在以下局限：（1）训练和评估均在静态Matterport3D模拟器中进行，未考虑真实世界中的移动物体、传感器噪声或执行器误差；（2）聚焦于室内VLN任务，对空中VLN、室外场景等更广泛导航领域的适用性尚未探索；（3）框架仅基于当前视点被动估计感知不确定性，未主动获取额外证据或选择更具信息量的视点来缓解感知歧义。
-
-值得探索的开放问题包括：将预测性视角合成或主动感知机制集成到框架中，使智能体能够主动降低不确定性；在动态环境中与动态3DGS管线耦合以实时更新场景表示；将3D价值地图与真实机器人系统中的闭环控制、视觉里程计或SLAM模块集成，联合考虑位姿不确定性与感知不确定性。
-
-## 背景与动机
 
 视觉语言导航（VLN）要求智能体在连续3D环境中根据自然语言指令执行一系列动作以到达指定目标。近年来，随着3D场景表示技术的演进——从拓扑图（如**DUET**）、2D BEV网格（如**BEVBert**）到3D体素（如**VER**）和3D高斯泼溅（如**3DGS-VLN**）——VLN智能体的场景理解能力已取得长足进步。
 
@@ -107,8 +62,9 @@ UAGM在三个主流VLN基准上均取得领先结果：
 
 本文的核心动机在于：**利用3D高斯原语的显式结构，将结构感知的不确定性编码为智能体观测空间中的可供性（affordances）与约束（constraints），为导航决策提供可解释的置信度依据**。具体而言，本文提出在语义高斯地图（SGM）之上，通过变分推理对高斯原语的位置、尺度、语义属性施加可学习扰动以估计几何与语义不确定性，并利用费雪信息量化外观不确定性，最终构建统一的3D价值地图来指导可靠导航决策。
 
-## 核心创新
 
+
+## 核心方法与创新机理
 UAGM Agent 的核心创新在于首次将**感知不确定性显式建模**引入视觉语言导航（VLN）的决策空间，并以**3D高斯原语的可微结构**为桥梁，使不确定性估计从隐式特征空间迁移到物理上有意义的几何/语义属性层面。具体而言，本工作通过三个相互关联的 changed slots 实现了这一突破：
 
 ### 1. 从隐式表征到可微语义高斯地图（SGM）
@@ -133,7 +89,6 @@ SGM的构建流程从全景RGB-D观测出发，通过反向投影生成伪激光
 
 值得注意的是，3D价值地图中编码的不确定性信息具有**可迁移性**：将其渲染为2D全景不确定性图附加给DUET/BEVBert/VER后，三者SR分别提升1.30%/1.09%/1.08%（Table 13），表明不确定性信号本身具有独立于具体架构的决策价值。
 
-## 整体框架
 
 ![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_LPv59noPAy/figures/002_Figure_2.jpg]]
 *Figure 2: Pipeline overview. At each step, our agent constructs a Semantic Gaussian Map (§3.1) from its panoramic observation O = {I, D}. On top of this map, it estimates geometric U g, semantic Us, and appearance Ua uncertainties (§3.2) and embeds them back to obtain a unified 3D Value Map (§3.3) that grounds affordances and constraints. Finally, Gaussian representations F g derived from the value map are concatenated with the instruction embedding X and fed into a multi-layer transformer ${ \mathcal { F } } ^ { \mathrm { M L T } }$ to predict the next action over candidate waypoints (§3.3)
@@ -150,7 +105,6 @@ UAGM智能体的核心流水线遵循“场景构建—不确定性估计—价�
 
 图2概括了上述完整流程：从全景观测到SGM构建、三类不确定性估计、3D价值地图融合、再到最终动作预测的端到端架构。
 
-## 核心模块与公式推导
 
 ### 语义高斯地图（SGM）构建
 
@@ -202,7 +156,35 @@ $$\pmb{p} = \mathrm{Softmax}\big(\mathcal{F}^{\mathrm{MLT}}\big([\pmb{F}^g, \pmb
 
 消融实验表明，三类不确定性联合使用时达到最佳性能（R2R SR 78.32），仅几何+语义不确定性为77.05，仅外观不确定性为76.86，验证了三者的互补性（Table 6）。渲染质量验证（Figure 6）确认渲染残差可忽略，从而费雪信息是外观不确定性的可靠代理。
 
-## 实验与分析
+
+
+## 实验与关键发现
+### 主流基准上的性能
+
+UAGM在三个主流VLN基准上均取得领先结果：
+
+| 基准 | 关键指标 | UAGM | 最强基线 | 提升 |
+|------|---------|------|---------|------|
+| R2R | SR / SPL | 78.32 / 66.47 | 76.37 / 65.07 (VER) | +1.95 / +1.40 |
+| RxR | SR / nDTW | 65.2 / 65.6 | 64.1 / 63.9 (BEVBert) | +1.1 / +1.7 |
+| REVERIE | RGS / RGSPL | 37.65 / 27.01 | 33.71 / 23.70 (VER) | +3.94 / +3.31 |
+
+在R2R val unseen上的5次重复运行统计显著性检验表明，与DUET、BEVBert、VER的比较p值均远小于0.05（如vs DUET p=3.42×10⁻¹²，vs VER p=1.58×10⁻¹⁰），证明提升非随机波动。
+
+### 关键消融发现
+
+**SGM与3DVM协同增效**：仅添加SGM将R2R SR从72.22%提升至77.05%，仅添加3DVM提升至73.52%，两者联合达78.32%；REVERIE上趋势一致，验证了结构化场景表示与不确定性感知决策的互补性。
+
+**三类不确定性互补**：几何+语义不确定性（认知不确定性）贡献更丰富的导航线索（仅此二者SR 77.05），外观不确定性（偶然不确定性）提供独立增益（仅外观SR 76.86），三者联合SR达78.32%。
+
+**不确定性信息可迁移**：将3D价值地图渲染为2D全景不确定性图，附加给DUET/BEVBert/VER后，三者SR分别提升1.30%/1.09%/1.08%，证明不确定性信号具有跨架构的通用价值。
+
+**复杂场景依赖不确定性**：在复杂场景中将不确定性系数从1.0降至0时，成功率从10/10骤降至2/10；而简单场景始终保持10/10，表明不确定性对处理感知歧义场景不可或缺。
+
+### 效率与鲁棒性
+
+运行时分析表明，变分推理仅引入0.11s额外开销，费雪信息估计仅需0.19s/步，总耗时2.63s（MobileSAM变体），在效率与性能间取得平衡。在10%/20%/30%高斯噪声注入RGB观测的鲁棒性测试中，完整智能体在所有噪声水平下均保持最佳性能。
+
 
 ### 核心定量结果
 
@@ -255,7 +237,23 @@ Figure 7揭示了两类典型失败模式：
 ![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_LPv59noPAy/figures/008_Table_3.jpg]]
 *Table 3: Quantitative results on RxR val unseen. ‘−’: unavailable statistics. See §4.2*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
+UAGM在VLN领域的方法谱系中占据独特位置。现有VLN方法可依场景表示范式大致划分为四类：
+
+- **拓扑图结构记忆范式**：以**DUET**（Chen et al., CVPR 2022）、**BSG**（An et al., CVPR 2024）、**GridMM**（Wang et al., ECCV 2024）为代表，将环境抽象为图节点与边，通过图神经网络聚合多模态特征进行决策。
+- **2D鸟瞰图（BEV）范式**：以**BEVBert**（An et al., CVPR 2023）为代表，将全景观测投影为2D BEV网格，利用Transformer进行空间推理。
+- **3D体素表示范式**：以**VER**（Lin et al., NeurIPS 2024）为代表，构建3D体素网格编码场景几何与语义信息。
+- **3D高斯泼溅（3DGS）范式**：以**3DGS-VLN**（Zuo et al., 2024）为代表，利用可微3D高斯原语进行场景表示，但未显式建模感知不确定性。
+
+UAGM在3DGS范式的基础上实现了关键跃迁：将3D高斯原语从单纯的场景重建工具升级为**不确定性感知的结构化表示**。其与现有工作的本质区别在于，UAGM不仅编码“场景是什么”，更编码“对场景的感知有多可靠”，从而在决策层面实现了从“盲目信任观测”到“依据置信度推理”的范式转变。这一转变在知识库中的定位可概括为：**将贝叶斯深度学习中的认知不确定性（几何+语义）与偶然不确定性（外观）估计首次系统性地引入VLN的3D场景表示与决策流程**。
+
+
+当前UAGM框架存在以下局限：（1）训练和评估均在静态Matterport3D模拟器中进行，未考虑真实世界中的移动物体、传感器噪声或执行器误差；（2）聚焦于室内VLN任务，对空中VLN、室外场景等更广泛导航领域的适用性尚未探索；（3）框架仅基于当前视点被动估计感知不确定性，未主动获取额外证据或选择更具信息量的视点来缓解感知歧义。
+
+值得探索的开放问题包括：将预测性视角合成或主动感知机制集成到框架中，使智能体能够主动降低不确定性；在动态环境中与动态3DGS管线耦合以实时更新场景表示；将3D价值地图与真实机器人系统中的闭环控制、视觉里程计或SLAM模块集成，联合考虑位姿不确定性与感知不确定性。
+
 
 ### 1. 方法谱系
 
@@ -275,6 +273,7 @@ UAGM Agent 位于 VLN 方法演进的交汇点，其设计融合了三个关键�
 
 **证据强度说明。** 核心性能提升经5次重复运行的配对t检验验证，与DUET/BEVBert/VER的比较p值均<0.05（如vs DUET p=3.42×10⁻¹²，vs VER p=1.58×10⁻¹⁰），证明提升非随机波动。消融实验确认了三类不确定性的互补性（仅几何+语义SR 77.05 vs 仅外观SR 76.86 vs 三者联合SR 78.32）和不确定性对复杂场景的关键作用（不确定性系数从1.0降至0时，复杂场景成功率从10/10骤降至2/10）。超参数灵敏度分析表明，不确定性相关超参数在较宽范围内性能保持稳定。向更广泛领域的泛化能力和真实世界部署的鲁棒性仍需进一步实验验证。
 
-## 原文 PDF
 
+
+## 原文 PDF
 ![[paperPDFs/ICLR_2026/Uncertainty_Aware_Gaussian_Map_for_Vision_Language_Navigation.pdf]]

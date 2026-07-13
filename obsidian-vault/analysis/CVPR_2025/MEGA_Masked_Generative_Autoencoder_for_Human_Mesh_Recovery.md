@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/MEGA_Masked_Generative_Autoencoder_for_Human_Mesh_Recovery.pdf
+project_link: https://gfiche.github.io/research-pages/mega/
+code_link: null
 aliases:
 - MMGAHMR
 tags:
@@ -41,7 +43,7 @@ claims:
 > - EMDB 上，PVE (mm) 107.9 vs 112.9 (-5.0)；MPJPE (mm) 90.5 vs 99.9 (-9.4)；PA-MPJPE (mm) 58.7 vs 65.2 (-6.5)。
 > - 3DPW (stochastic, best of 25 samples) 上，MPJPE (mm) 73.9 (MEGA ResNet-50) vs 84.0 (ProHMR) (-10.1)。
 
-## 概述
+## 概要
 
 从单张图像恢复三维人体网格是一个病态问题，其根本瓶颈在于**深度歧义**：同一二维观测可对应多种合理的三维姿态，而现有方法往往在预测多样性与精度之间难以兼得。MEGA（Masked Generative Autoencoder）针对这一矛盾提出了一种基于掩码生成建模的解决方案，其核心思路是将人体网格离散化为 token 序列，并采用编码器-解码器 Transformer 架构进行掩码预测，从而在单一框架内同时支持高精度的确定性预测与可控的随机多样化预测。
 
@@ -53,7 +55,7 @@ MEGA 的关键设计包括三个层面。在**表示层**，通过冻结的 Mesh
 
 需要指出的是，MEGA 对极端姿态的泛化仍存在局限——当输入姿态与训练分布差异较大时，模型会产生高多样性但误差较大的预测（Fig. 9），这提示了不确定性估计在实际部署中的重要性。此外，模型不重建面部细节，在一定程度上限制了其在需要面部信息的应用中的适用性。
 
-## 背景与动机
+
 
 从单张 RGB 图像恢复三维人体网格（Human Mesh Recovery, HMR）是计算机视觉中的基础任务，在动作捕捉、虚拟现实、人机交互等领域有广泛应用。然而，该任务本质上是一个病态问题：二维图像中蕴含的深度信息不足，导致同一张图像可能对应多个在二维投影上看似合理、但在三维空间中差异显著的人体姿态（Figure 1）。这种深度歧义构成了单图像 HMR 的核心瓶颈。
 
@@ -63,7 +65,9 @@ MEGA 的关键设计包括三个层面。在**表示层**，通过冻结的 Mesh
 
 MEGA 的提出正是为了解决上述困境：**能否在保持高精度确定性预测的同时，赋予模型可控的随机生成能力，从而在单一框架内同时应对精度需求和深度歧义？** 这一动机催生了三个关键设计方向：（1）将人体网格完全离散化为 token 序列，使 HMR 转化为生成式建模问题；（2）引入自监督掩码预训练，在不依赖图像的情况下从动作捕捉数据中学习人体网格的先验分布；（3）设计统一的掩码条件生成框架，在推理时既能单次前向传播完成确定性预测，又能通过迭代采样产生多样化输出。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MEGA 的核心创新在于将人体网格恢复（HMR）重新定义为一种**掩码生成式建模**问题，并通过三个关键的技术转变，突破了现有方法在精度与多样性之间的固有矛盾。
 
@@ -98,7 +102,7 @@ MEGA 依赖冻结的 **Mesh-VQ-VAE** 将规范空间人体网格编码为 $N=54$
 
 这些创新共同构成了 MEGA 的核心贡献：通过掩码生成式建模统一了精度与多样性，在确定性模式下达到 SOTA 精度（3DPW PVE 81.6 mm，EMDB PVE 107.9 mm），在随机模式下提供可控的多样化预测。
 
-## 整体框架
+
 
 MEGA 是一个基于编码器-解码器 Transformer 架构的掩码生成式自编码器，其核心思想是将人体网格恢复转化为离散 token 序列的条件生成问题。整体 pipeline 由三个关键阶段串联而成：**网格 token 化 → 条件生成 → 网格解码**。
 
@@ -131,7 +135,7 @@ MEGA 的训练分为两个阶段，共享同一 Transformer 架构（12 层编�
 ![[assets/figures/papers/paper_list_l19_MEGA_Masked_Generative_Autoencoder_for_Human_Mesh_Recovery_motion20v2/figures/002_Figure_2.jpg]]
 *Figure 2: MEGA is a masked generative model based on an encoder-decoder Transformer architecture. During the self-supervised pretraining stage, MEGA is trained to predict human mesh tokens from partially visible inputs using motion capture data without paired image data. During the supervised training stage for HMR, the model is trained to predict randomly masked human mesh tokens conditioned on image embeddings. For both training stages, only the cross-entropy loss is used on the predicted mesh tokens. At test time, in stochastic inference mode, we start from a fully masked sequence of tokens and iteratively sample human mesh tokens conditioned on input image embeddings. In deterministic inference m...*
 
-## 核心模块与公式推导
+
 
 MEGA 的核心架构围绕“离散 token 序列的条件生成”展开，由三个关键模块串联构成：**Mesh-VQ-VAE** 提供网格的离散 token 表示，**图像特征提取器** 提供条件信息，**编码器-解码器 Transformer** 执行掩码生成建模。以下逐一解析其设计逻辑与关键公式。
 
@@ -213,7 +217,9 @@ $$A \times (1 - \frac{t}{T})$$
 ![[assets/figures/papers/paper_list_l19_MEGA_Masked_Generative_Autoencoder_for_Human_Mesh_Recovery_motion20v2/figures/010_Figure_6.jpg]]
 *Figure 6: Random mesh generations. We use MEGA pre-trained in a self-supervised fashion to generate random human meshes*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 确定性模式下的主结果
 
@@ -275,7 +281,9 @@ MEGA 在确定性推理模式下（单次前向传播，取所有 token 预测�
 ![[assets/figures/papers/paper_list_l19_MEGA_Masked_Generative_Autoencoder_for_Human_Mesh_Recovery_motion20v2/figures/009_Figure_5.jpg]]
 *Figure 5: Error distribution. We visualize the distribution of the MPJPE in mm on the 3DPW dataset*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 任务定位与核心瓶颈
 
@@ -337,6 +345,8 @@ MEGA 的方法论创新中最具区分度的是其自监督预训练策略。与
 5. **不确定性驱动的自适应选择**：如何根据不确定性（如顶点方差，Figure 8）自动选择最佳预测，以在实际应用中平衡精度和多样性？
 
 6. **端到端训练**：当前 Mesh-VQ-VAE 是冻结的，端到端微调整个 pipeline 是否能进一步提升重构质量？
+
+
 
 ## 原文 PDF
 

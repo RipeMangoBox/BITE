@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Improving_Diffusion_Models_for_Class_imbalanced_Training_Data_via_Capacity_Manipulation.pdf
+project_link: null
+code_link: https://github.com/Feng-Hong/ImbDiff-CM
 openreview_forum_id: wSGle6ag5I
 aliases:
 - CMC
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 通过容量操纵改善类别不平衡训练数据下的扩散模型 |
 | 英文题名 | Improving Diffusion Models for Class-imbalanced Training Data via Capacity Manipulation |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=wSGle6ag5I); [GitHub](https://github.com/Feng-Hong/ImbDiff-CM) |
+| Links | [paper](https://openreview.net/forum?id=wSGle6ag5I) · [GitHub](https://github.com/Feng-Hong/ImbDiff-CM) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/robotics |
 | Method | Capacity Manipulation (CM) |
 | Dataset | Imb. CIFAR-100 (IR=100), Imb. CIFAR-10 (IR=100), Imb. CelebA-HQ (IR=100), Imb. ArtBench-10 (IR=100) w/ LoRA fine-tuning |
@@ -42,7 +44,7 @@ claims:
 > - Imb. CIFAR-10 (IR=100) 上，FID↓ 为 7.727，对比 8.390 (OC)，变化 ↓0.663。
 > - Imb. CelebA-HQ (IR=100) 上，Overall FID↓ 为 7.538，对比 7.823 (CBDM)，变化 ↓0.285。
 
-## 概述
+## 概要
 
 **核心问题：类别不平衡训练导致扩散模型容量被多数类垄断。** 在长尾分布数据上训练扩散模型时，多数类样本主导了参数更新方向，迫使少数类知识被挤占至模型的非关键参数中。一旦对模型进行剪枝（移除 L1 范数最小的 10% 参数），少数类的生成损失急剧上升，而多数类几乎不受影响（Fig. 1(b)）——这直接证实了少数类信息被边缘化存储，成为生成质量严重退化的根源。定理 2.1 进一步从理论上证明，多数类主导参数更新的期望比例与类别不均衡度正相关，与类间相似度负相关。
 
@@ -52,7 +54,7 @@ claims:
 
 **方法定位。** CM 属于训练时的容量分配策略，与重采样、重加权、数据增强等现有长尾处理方法正交，可与之协同使用。其核心创新在于将“容量预留”从隐式学习转变为显式的结构化设计，为类别不平衡生成任务提供了一种轻量、即插即用的解决方案。
 
-## 背景与动机
+
 
 扩散模型在图像生成领域取得了显著成功，但其训练通常依赖大规模、类别平衡的数据集。现实世界的数据分布往往呈现长尾特性，即多数类拥有充足样本，而少数类样本稀缺。当扩散模型直接在这种类别不平衡数据上训练时，会出现一个根本性问题：**多数类垄断模型容量，导致少数类生成质量严重退化**。
 
@@ -88,7 +90,9 @@ $$\Pi_{\mathrm{maj}} = \Phi\left(\frac{(2a-1)\mu\sqrt{2N(1-\cos\angle(\mu_1,\mu_
 
 这一思路的出发点是：模型容量本身是充足的，问题在于分配的失衡。通过低秩分解将参数拆分为通用容量和少数类专属容量，并在训练中施加容量操纵损失，可以在不增加推理开销的前提下，显著提升不平衡条件下的生成鲁棒性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本研究针对类别不平衡扩散模型训练中**多数类垄断模型容量、挤占少数类信息**这一瓶颈，提出 **Capacity Manipulation (CM)** 方法。其核心创新在于引入了一种**显式的容量预留与分配机制**，将模型参数划分为通用容量与少数类专属容量，并通过自适应损失函数引导知识分流，从而在不增加推理开销的前提下系统性保护少数类生成质量。
 
@@ -128,7 +132,7 @@ $$\mathcal{L}_{\mathrm{Con}} = \omega_{\mathrm{Con}}^y \mathbb{E}_t \| \epsilon_
 
 消融实验证实了上述创新设计的必要性：移除一致性损失 $\mathcal{L}_{\mathrm{Con}}$ 导致 Imb. CIFAR-100 (IR=100) 上 FID 从 7.519 升至 8.412；移除多样性损失 $\mathcal{L}_{\mathrm{Div}}$ 使 FID 升至 8.073（Table 7 Right）。低秩分量 $\theta^e$ 的秩比例约为 0.1 时 FID 最低，表明**少量预留容量即可有效保护少数类学习**（Fig. 4(c)）。此外，CM 可作为通用框架集成至 CBDM、OC、ADA 等多种基线方法，持续提升其在不平衡条件下的生成性能（Fig. 4(a)）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_wSGle6ag5I/figures/003_Figure_2.jpg]]
 *Figure 2: (a,b) An overview of our method, CM. (a) An illustration of the capacity reservation part of CM. (b) An illustration of how CM allocates the corresponding knowledge to the reserved model capacity during training. (c) Many/Medium/Few split performance on Imb. CIFAR100 with imbalance ratio $\mathrm { I R }$ = 1 0 0 , where Many/Medium/Few represents the top, middle, and bottom thirds of classes sorted by sample number in descending order. CM significantly improves minority performance without sacrificing the performance of majorities*
@@ -170,7 +174,7 @@ CM 的核心思路是：在训练前显式为少数类预留低秩容量，并�
 - $\lambda$ 在 1.0 附近性能最优，且在 [0.5, 1.5] 范围内均优于最优基线 OC（Fig. 4(b)）。
 - CM 可作为通用框架集成至不同基线（CBDM、OC、ADA 等），使用对应目标函数作为 $\mathcal{L}_{\mathrm{base}}$ 即可持续提升不平衡生成性能（Fig. 4(a)）。
 
-## 核心模块与公式推导
+
 
 ### 容量预留：低秩参数分解
 
@@ -227,7 +231,9 @@ $$\min_{\theta} \mathcal{L}_{\mathrm{Total}} = \mathcal{L}_{\mathrm{base}}(\math
 
 消融实验验证了这一因果链的必要性：移除 $\mathcal{L}_{\mathrm{Con}}$ 使 Imb. CIFAR-100 (IR=100) 的 FID 从 7.519 升至 8.412；移除 $\mathcal{L}_{\mathrm{Div}}$ 使 FID 升至 8.073（Table 7 Right），表明一致性约束与多样性鼓励缺一不可。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与容量支配的实证动机
 
@@ -299,7 +305,9 @@ Table 1 显示，简单对 CBDM 施加低秩分解（$\theta = \theta^g \oplus \
 ![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_wSGle6ag5I/figures/017_Table_9.jpg]]
 *Table 9: Table E.1: Conceptual comparison of CM with related paradigms*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：类别不平衡下的扩散模型容量支配
 
@@ -347,6 +355,8 @@ CM 的参数分解形式与 LoRA 相似，但二者在动机和机制上存在�
 3. **判别式任务的推广**：容量操纵思想在长尾识别任务上的初步实验已显现积极信号，但是否需要进一步的网络结构适配和理论分析，仍需系统验证。判别式任务中“容量”的定义可能与生成式任务不同，需要重新形式化。
 
 4. **理论深化**：定理 2.1 给出了两类设定下的容量支配比例，但多类场景下的理论分析尚不完整，尤其是类别间语义层次结构对容量分配的影响值得进一步建模。
+
+
 
 ## 原文 PDF
 

@@ -35,7 +35,7 @@ claims:
 | 中文题名 | DEF：三维形状中尖锐几何特征的深度估计 |
 | 英文题名 | DEF: Deep Estimation of Sharp Geometric Features in 3D Shapes |
 | 会议/期刊 | SIGGRAPH 2022 |
-| Links | [paper](https://arxiv.org/abs/2011.15081) · [Code](https://github.com/artonson/def) · [arXiv](https://arxiv.org/abs/2103.02766) · [Project](https://www.opencascade.com/) |
+| Links | [paper](https://arxiv.org/abs/2011.15081) · [Code](https://github.com/artonson/def) · [paper](https://arxiv.org/abs/2103.02766) · [Project](https://www.opencascade.com/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction #topic/representation_self_supervised_transfer #topic/benchmarks_datasets_evaluation |
 | Method | DEF (Deep Estimators of Features) |
 | Dataset | DEF-Sim local patches, Parametric curve extraction on ABC shapes |

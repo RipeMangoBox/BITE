@@ -43,7 +43,7 @@ claims:
 > - CIFAR100-LT 上，Top-1 Accuracy Overall (%) 55.68 vs 50.85 (BBN/LOS) (+4.83)。
 > - iNaturalist 上，Top-1 Accuracy Overall (%) 73.38 vs 71.01 (LOS) (+2.37)。
 
-## 概述
+## 概要
 
 长尾识别任务的核心瓶颈在于：尾部类别样本稀少，导致模型对尾部类别的特征学习不足，同时类别间混淆严重——最差类别的测试准确率远低于整体准确率，且存在明显的训练过拟合、测试泛化差的现象（Figure 1）。针对这一问题，本文提出 **Confusion-Aware Spectral Regularizer (CAR)**，一种基于混淆感知的频谱正则化方法。
 
@@ -53,7 +53,7 @@ CAR 的核心思想源于 PAC-Bayesian 理论推导：最差类别误差的上�
 
 在 ImageNet-LT、CIFAR100-LT 和 iNaturalist 三个长尾基准上，CAR 从零训练 ViT-Small 的整体准确率超越此前最优方法 LOS **2.37% ∼ 4.83%**（Table 1）。特别地，在 ImageNet-LT 上，CAR 结合 ConCutMix 将最差类别测试准确率从 10% 提升至 **22%**（Table 3），有效缩小了最差类别与整体性能之间的差距。消融实验进一步验证了频率加权矩阵和 EMA 估计器对性能的持续贡献（Table 7）。
 
-## 背景与动机
+
 
 ### 长尾识别中的最差类别泛化困境
 
@@ -89,7 +89,9 @@ $$\mathcal{L}(f) = \frac{1}{m} \sum_{q=1}^{m} \mathbb{CE}\big(f(x_q), y_q\big) +
 
 该方法不依赖特定的数据增强策略或网络架构，可作为通用正则器与现有长尾学习方法即插即用地结合。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作针对长尾识别中尾部类别泛化不足这一瓶颈，提出**混淆感知频谱正则化器（Confusion-Aware Spectral Regularizer, CAR）**。其核心创新在于将尾部类别泛化问题形式化为对加权混淆矩阵谱范数的约束，并通过三个关键设计使这一约束可微、稳定且高效地融入端到端训练。
 
@@ -139,7 +141,7 @@ $$\mathcal { L } ( f ) = \frac { 1 } { m } \sum _ { q = 1 } ^ { m } \mathbb { C 
 
 与重加权（Focal Loss, CB）、边界调整（LDAM-DRW）、数据增强（CMO, ConCutMix）等策略不同，CAR 是**首个从混淆矩阵谱范数角度直接优化类别间混淆结构**的方法。它不改变样本分布或决策边界，而是直接作用于特征空间中类别间的重叠程度——这是尾部类别泛化失败的根源。实验表明，CAR 可以与数据增强方法（如 ConCutMix）正交叠加，在 ImageNet-LT 上进一步将整体准确率从 57.48% 提升至 60.07%，尾部准确率从 35.77% 提升至 38.07%（Table 1）。
 
-## 整体框架
+
 
 CAR 的整体框架围绕一个核心目标展开：**在标准交叉熵训练中注入一个可微分的、频率感知的混淆矩阵谱范数正则项**，从而直接抑制类别间混淆，提升尾部类别的泛化能力。整个 pipeline 由四个逻辑模块串联而成，形成“构建 → 软化 → 平滑 → 正则化”的闭环。
 
@@ -180,7 +182,7 @@ CAR 的整体框架围绕一个核心目标展开：**在标准交叉熵训练�
 ![[assets/figures/papers/paper_list_l2115_https_arxiv_org_abs_2603_16732/figures/001_Figure_1.jpg]]
 *Figure 1: Poor generalization of worst-class performance in existing long-tailed learning methods. Experiments are conducted on ImageNet-LT using ViT-Small as the backbone. The three bars for each method correspond to the worst-class accuracy on the training set (left), the worst-class accuracy on the test set (middle), and the overall test accuracy (right)*
 
-## 核心模块与公式推导
+
 
 ### 动机：从最差类别误差到混淆矩阵谱范数
 
@@ -250,7 +252,9 @@ $$
 ![[assets/figures/papers/paper_list_l2115_https_arxiv_org_abs_2603_16732/figures/006_Figure_2.jpg]]
 *Figure 2: Class-wise confusion matrices on CIFAR100-LT using ViT-Small. Left: training from scratch. Right: fine-tuning from pretrained model*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能对比
 
@@ -318,7 +322,9 @@ Figure 2 展示了 CIFAR100-LT 上不同方法的类别混淆矩阵。CAR 的混
 ![[assets/figures/papers/paper_list_l2115_https_arxiv_org_abs_2603_16732/figures/011_Table_8.jpg]]
 *Table 8: Top-1 accuracy (%) of pre-tranied ResNet on Tiny-ImageNet-LT under different imbalance factors (IF = 50, 100, and 200). The best results are highlighted in bold*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有长尾学习方法的谱系关系
 
@@ -376,6 +382,8 @@ Figure 2 展示了 CIFAR100-LT 上不同方法的类别混淆矩阵。CAR 的混
 4. **谱范数之外的结构约束**：论文仅约束了混淆矩阵的谱范数（最大奇异值）。核范数（奇异值之和）或秩约束是否能在抑制混淆的同时保留更多的类别可分性，值得探索。
 
 5. **自适应超参数机制**：能否设计一种基于混淆矩阵谱结构自动调整 α 和 β 的机制，使得 CAR 在不同数据集上无需手动调参即可达到接近最优的性能？
+
+
 
 ## 原文 PDF
 

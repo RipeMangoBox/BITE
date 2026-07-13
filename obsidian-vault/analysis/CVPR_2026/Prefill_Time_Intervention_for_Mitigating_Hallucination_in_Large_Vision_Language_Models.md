@@ -43,7 +43,7 @@ claims:
 > - POPE 上，Average F1-score 82.85 vs 81.23 (+1.62)；Average Accuracy 85.69 vs 83.69 (+2.00)。
 > - MME 上，Total Score 671.6 vs 651.6 (+20.0)。
 
-## 概述
+## 概要
 
 大型视觉-语言模型（LVLM）在图像描述与视觉问答中常产生与视觉输入不一致的“幻觉”内容。现有解码时间干预（DTI）方法在每一步解码中持续施加统一的转向向量，虽能降低幻觉频率，却无法从源头修正错误的视觉-语言表征，反而导致残余幻觉的严重性上升——即“雪球幻觉”（snowball hallucination）加剧（Figure 2）。这一瓶颈揭示了在解码之前对初始表征进行一次性、精准干预的必要性。
 
@@ -57,7 +57,7 @@ PTI包含两个阶段（Figure 3）：
 
 **方法定位**：PTI属于训练无关的推理时干预方法，与基于对比解码（如VCD）、Beam Search优化（如OPERA）以及解码时间隐藏状态干预（如VISTA、PAI、VTI）等路线正交。其核心创新在于将干预对象从粗粒度的隐藏状态升级为细粒度、解耦的KV缓存，并将干预时机从多步解码压缩为预填充阶段的一次性操作，从而在源头阻断错误的累积传播。
 
-## 背景与动机
+
 
 大型视觉语言模型（LVLMs）在图像描述和视觉问答等任务中取得了显著进展，但“物体幻觉”——即模型生成与图像内容不符的物体描述——仍是阻碍其可靠部署的核心障碍。现有的无训练缓解方法主要分为两类：对比解码策略和基于转向向量的解码时间干预。对比解码方法（如 **VCD**、**OPERA**）通过放大视觉信息与语言先验之间的差异来减少幻觉，但通常仅支持特定的解码策略，提升幅度有限。解码时间干预方法（如 **PAI**、**VTI**、**VISTA**）则在解码的每一步持续向隐藏状态施加统一的转向向量，试图引导模型远离幻觉。
 
@@ -67,7 +67,9 @@ PTI包含两个阶段（Figure 3）：
 
 基于上述分析，本文的核心动机是：**将干预时机从解码阶段前移至预填充阶段（prefill stage），在错误累积发生之前，对初始 KV 缓存进行一次性的、模态感知的精准修正**。具体而言，我们提出利用 Transformer 中键（Key）负责“注意何处”与值（Value）负责“聚合什么”的解耦特性，通过物体与背景的对比信号提取针对性方向，分别增强物体为中心的注意力并过滤背景噪声，从而从源头阻断幻觉的生成链条。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PTI 的核心创新在于将干预时机从“解码阶段每步持续干预”迁移至“预填充阶段仅干预一次”，并将干预对象从粗粒度的隐藏状态重构为细粒度、模态感知且键值解耦的初始 KV 缓存。这一范式转变直接回应了现有解码时间干预（DTI）方法中观察到的“雪球幻觉”困境——即持续施加统一转向向量虽能降低幻觉频率，却加剧了残余幻觉的严重性（Figure 2）。
 
@@ -83,7 +85,7 @@ PTI 的核心创新在于将干预时机从“解码阶段每步持续干预”�
 
 上述 changed slots 通过两阶段流水线实现：**Stage I** 在 MSCOCO 对比样本上提取解耦的转向向量（Eq. 3, Eq. 5），**Stage II** 将这些向量按模态注入下游输入的预填充 KV 缓存（Eq. 7, Eq. 8），随后进行标准自回归解码。这一设计使得 PTI 能够在不修改模型架构、不增加训练开销的前提下，以极小的延迟代价（所有模型均低于 ×1.02，Table 9）实现跨模型、跨解码策略的幻觉缓解，并与解码阶段方法（如 PAI、VISTA）兼容叠加，进一步提升性能（Table 6）。
 
-## 整体框架
+
 
 PTI 遵循“方向提取—多模态注入—标准解码”的两阶段流水线，其核心设计在于将干预时机从解码阶段前移至预填充阶段，并在 KV 缓存层面进行模态感知的键值解耦操作。
 
@@ -137,7 +139,7 @@ PTI 对键和值的干预具有明确的功能分工：
 
 消融实验（Figure 5）验证了这一设计的有效性：视觉值缓存干预（物体 vs. 背景对比）对幻觉减少的贡献最大；视觉键缓存干预则在缓解注意力衰减和增强局部物体注意力方面发挥作用。Table 5 进一步表明，在所有视觉 token 上施加视觉干预是减少幻觉的最关键组件，而在最后一个文本 token 上施加文本干预则有助于恢复 F1 分数。
 
-## 核心模块与公式推导
+
 
 ### 干预范式：从解码时间到预填充时间
 
@@ -213,7 +215,9 @@ $$\tilde{K}^l[\mathcal{T}_{\mathrm{txt}}] += \lambda_{\mathrm{k,txt}} S_{\mathrm
 ![[assets/figures/papers/paper_list_l774_https_arxiv_org_abs_2604_25642/figures/010_Figure_5.jpg]]
 *Figure 5: Internal interpretability analysis of visual cache intervention on LLAVA-1.5 across 300 randomly selected images from MSCOCO. (a): Ablation study on value intervention strategies, validating that the maximal contrast (object vs. background) yields the largest hallucination reduction. (b): Analysis of the key cache intervention, demonstrating its dual effect: mitigating global visual attention decay during generation (left) and enhancing local, object-centric attention (right). The change rate formula is detailed in Appendix A*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：从频率抑制到严重性控制
 
@@ -286,7 +290,9 @@ Table 9 的推理效率对比显示，PTI 引入的延迟开销极小——所�
 2. **方向提取的数据依赖**：转向方向从 MSCOCO 的 100 个 VQA 样本中提取，依赖该数据集的物体分割和标注质量，可能引入数据偏差，在分布外场景下的有效性需进一步验证。
 3. **任务范围限制**：当前验证集中于物体幻觉基准（CHAIR、POPE、AMBER）和通用综合基准（MME、MMHal），未在复杂推理任务（如数学、代码生成）上测试，PTI 对非物体类错误（如逻辑错误、关系推理错误）的影响尚不明确。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心干预范式的转变：从解码时间到预填充时间
 
@@ -333,6 +339,8 @@ PTI 展现出良好的组合性和跨模型迁移能力。Table 6 表明，PTI �
 3. PTI 对物体幻觉之外的错误类型（如关系推理错误、空间位置错误、属性绑定错误）的泛化能力如何？Figure 4 的 MMHal-Bench 细分结果显示 PTI 在不同问题类别上的增益并不均匀，暗示某些错误类型可能无法通过物体-背景对比信号有效缓解。
 
 4. 预填充阶段干预的时机选择是否最优？是否存在更精细的层级别干预策略（如仅干预特定层）可以进一步提升效率或效果？
+
+
 
 ## 原文 PDF
 

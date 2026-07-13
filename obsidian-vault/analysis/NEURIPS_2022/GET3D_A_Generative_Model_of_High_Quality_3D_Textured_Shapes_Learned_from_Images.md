@@ -5,6 +5,7 @@ paper_level: A
 venue: NeurIPS
 year: 2022
 pdf_ref: paperPDFs/NEURIPS_2022/GET3D_A_Generative_Model_of_High_Quality_3D_Textured_Shapes_Learned_from_Images.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/toronto-ai/GET3D/
 aliases:
 - GET3D
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | GET3D：从图像中学习高质量3D纹理形状的生成模型 |
 | 英文题名 | GET3D: A Generative Model of High Quality 3D Textured Shapes Learned from Images |
 | 会议/期刊 | NeurIPS 2022 |
-| Links | [paper](https://arxiv.org/abs/2209.11163); [Project](https://nv-tlabs.github.io/GET3D); [Project](https://research.nvidia.com/labs/toronto-ai/GET3D/) |
+| Links | [paper](https://arxiv.org/abs/2209.11163) · [Project](https://nv-tlabs.github.io/GET3D) · [Project](https://research.nvidia.com/labs/toronto-ai/GET3D/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | GET3D |
 | Dataset | ShapeNet Car, ShapeNet Chair, ShapeNet Motorbike, Turbosquid Animal |
@@ -41,7 +42,7 @@ claims:
 > - ShapeNet Chair 上，COV LFD (%) 为 69.08，对比 61.10 (OccNet)，变化 +7.98。
 > - ShapeNet Motorbike 上，COV LFD (%) 为 67.12，对比 50.68 (PointFlow)，变化 +16.44。
 
-## 概述
+## 概要
 
 **核心问题**：现有3D生成模型无法直接从2D图像中生成具有复杂拓扑和高保真纹理的显式网格，导致其输出不能直接被标准图形引擎使用。
 
@@ -50,8 +51,6 @@ claims:
 **方法定位**：与**PointFlow**（Yang et al., NeurIPS 2019）、**OccNet**（Mescheder et al., CVPR 2019）等仅输出点云或隐式场的方法不同，GET3D直接生成显式纹理网格；与**PiGAN**（Chan et al., CVPR 2021）、**GRAF**（Schwarz et al., NeurIPS 2020）、**EG3D**（Chan et al., CVPR 2022）等3D感知图像合成方法不同，GET3D输出的是可被Blender等图形软件直接使用的网格资产，而非仅支持新视角合成的神经场。
 
 **主要结果**：在ShapeNet的汽车、椅子、摩托车和Turbosquid动物等多个类别上，GET3D在几何指标（COV LFD提升+5.61至+16.44）和纹理指标（FID-3D降低-11.64）上均大幅超越现有方法。
-
-## 背景与动机
 
 三维内容创作是计算机图形学、影视制作、游戏开发和虚拟现实等领域的核心需求。高质量的三维资产通常需要专业艺术家耗费大量时间进行手工建模和纹理绘制，这一过程成本高昂且难以规模化。因此，能够自动生成具有复杂拓扑结构、丰富几何细节和高保真纹理的三维形状的生成模型，一直是计算机视觉与图形学交叉领域的关键追求。
 
@@ -63,7 +62,7 @@ claims:
 
 GET3D 正是在这一背景下提出的。其核心动机是：能否绕过三维真值监督的依赖，直接从二维图像集合中学习生成高质量、带纹理的显式三维网格？这一问题的解决意味着可以利用海量的二维图像数据来训练三维生成模型，从而突破三维数据稀缺的瓶颈，同时输出可直接用于 Blender 等图形软件的标准三维资产。
 
-## 核心创新
+## 核心方法与创新机理
 
 GET3D的核心创新在于将**可微显式表面提取**与**可微光栅化渲染**深度整合到生成对抗框架中，从而首次实现了从2D图像集合直接生成具有复杂拓扑、丰富几何细节和高保真纹理的显式3D网格。这一突破通过以下三个关键“changed slots”实现：
 
@@ -99,8 +98,6 @@ $$L = L(D_{\text{rgb}}, G) + L(D_{\text{mask}}, G) + \mu L_{\text{reg}}$$
 ### 创新总结
 
 GET3D的三个changed slots形成了紧密耦合的因果链：DMTet提供可微的显式几何提取，tri-plane纹理场提供高效的表面纹理生成，可微光栅化与双判别器对抗训练则将2D图像信号有效传导至3D表示。这一组合使得GET3D在ShapeNet的汽车、椅子、摩托车和Turbosquid动物等多个类别上，在几何指标（COV LFD提升+5.61至+16.44）和纹理指标（FID-3D降低-11.64）上均大幅超越现有方法（Table 2）。
-
-## 整体框架
 
 GET3D 的整体生成流程将 3D 纹理网格的生成任务分解为两条并行分支：**几何分支**与**纹理分支**，二者共享输入噪声但拥有独立的潜在映射网络，最终通过可微渲染在 2D 对抗训练中联合优化。
 
@@ -163,8 +160,6 @@ $$L = L(D_{\mathrm{rgb}}, G) + L(D_{\mathrm{mask}}, G) + \mu L_{\mathrm{reg}}$$
 ![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2209_11163/figures/032_Figure.jpg]]
 *Figure: EG3D Ours Ours-Tex Figure O: Additional qualitative comparison on Human Body dataset. We compare our method with EG3D on the extracted geometry*
 
-## 核心模块与公式推导
-
 ### 3.1 整体生成流程
 
 GET3D 的生成过程分为两个分支：几何分支和纹理分支。给定从标准高斯分布采样的噪声向量 $\mathbf{z}_1, \mathbf{z}_2 \sim \mathcal{N}(0, I)$，首先通过两个映射网络分别得到几何潜在代码 $\mathbf{w}_1 = f_{\mathrm{geo}}(\mathbf{z}_1)$ 和纹理潜在代码 $\mathbf{w}_2 = f_{\mathrm{tex}}(\mathbf{z}_2)$。几何分支以 $\mathbf{w}_1$ 为条件，通过 DMTet 可微地输出任意拓扑的表面网格；纹理分支以 $\mathbf{w}_1$ 和 $\mathbf{w}_2$ 为条件，生成可在表面点查询的纹理场。整个过程端到端可训练，仅需 2D 对抗损失作为监督信号。
@@ -213,7 +208,7 @@ $$L = L(D_{\mathrm{rgb}}, G) + L(D_{\mathrm{mask}}, G) + \mu L_{\mathrm{reg}}$$
 
 其中 $\mu$ 为正则项权重。消融实验表明，使用两个独立判别器比单个联合判别器显著减少训练不稳定，而正则项对生成干净的可导出网格至关重要。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 数据集与评估协议
 
@@ -282,10 +277,7 @@ Figure 6展示了在几何和纹理潜在空间中进行插值的结果：从左
 ![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2209_11163/figures/024_Table.jpg]]
 *Table: B: Ablations on using camera condition: We ablate using camera condition for discriminator. We train the model on Shapenet Car dataset*
 
-![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2209_11163/figures/028_Table.jpg]]
-*Table: C: Additional quantitative results for noisy cameras and using predicted 2D silhouettes on Shapenet Car dataset*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 核心定位：从隐式表征到显式网格的生成范式转换
 

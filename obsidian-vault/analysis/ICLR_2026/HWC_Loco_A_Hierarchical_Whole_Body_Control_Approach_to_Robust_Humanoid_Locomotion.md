@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/HWC_Loco_A_Hierarchical_Whole_Body_Control_Approach_to_Robust_Humanoid_Locomotion.pdf
+project_link: null
+code_link: null
 openreview_forum_id: 3UE3Aatcjy
 aliases:
 - HL
@@ -42,7 +44,7 @@ claims:
 > - Constant External Force/Torque 上，Success Rate 为 75.95 ± 0.66，对比 Large-DR-Hist (4.0): 70.53 ± 0.42，变化 +5.42。
 > - High-Impulse Perturbation 上，Success Rate 为 81.27 ± 0.80，对比 Large-DR-Hist (4.0): 71.36 ± 0.89，变化 +9.91。
 
-## 概述
+## 概要
 
 人形机器人在复杂地形上的鲁棒运动控制面临一个核心瓶颈：现有基于学习的策略在部署时遭遇训练分布之外的动力学不匹配——如外部冲击、传感器噪声或恶意指令——缺乏从安全关键状态中恢复的机制，导致成功率急剧下降。HWC-Loco 将这一问题形式化为一个**鲁棒约束优化问题**：在最坏情况动力学下最大化任务奖励，同时通过 Wasserstein 距离约束使运动符合人类规范，并通过零力矩点（ZMP）约束保证动力学可行性。
 
@@ -52,7 +54,7 @@ claims:
 
 在方法谱系中，HWC-Loco 相对于 DreamWaQ-Humanoid（Nahrendra et al., 2023）和 AHL（Cui et al., 2024）等域随机化基线，引入了三个关键变化：控制架构从单一策略升级为分层策略；安全约束从间接惩罚转为显式的鲁棒约束 RL 框架；模仿学习目标从 KL 散度替换为 Wasserstein-1 距离。这些设计使得 HWC-Loco 在不牺牲任务效率的前提下实现了安全恢复能力。
 
-## 背景与动机
+
 
 人形机器人在复杂地形上的鲁棒运动控制是机器人学中的核心挑战。近年来，基于强化学习（RL）的方法在仿真环境中取得了显著进展，但将这些策略部署到真实世界时，一个根本性瓶颈暴露出来：**现有学习策略缺乏从安全关键状态中恢复的机制**。当机器人遭遇超出训练分布的动力学不匹配——如外部冲击、传感器噪声或恶意指令——策略往往无法及时调整行为以维持平衡，导致灾难性失败。
 
@@ -62,7 +64,9 @@ claims:
 
 HWC-Loco 的核心洞察在于将人形运动控制形式化为一个**鲁棒约束优化问题**：在最坏情况的动力学扰动下最小化任务性能下降，同时通过 Wasserstein 距离约束使运动符合人类运动规范，并通过 ZMP 约束保证动力学可行性。这一形式化使得策略能够在不牺牲任务效率的前提下实现安全恢复——从根本上改变了安全约束从“事后惩罚”到“先验保证”的范式。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 HWC-Loco 的核心创新在于将人形机器人的全身运动控制重新形式化为一个**分层鲁棒约束优化问题**，从而在不牺牲任务效率的前提下，赋予策略从安全关键状态中自主恢复的能力。这一设计直接回应了现有方法的瓶颈：基于学习的人形运动策略在面对部署中的动力学不匹配时，缺乏结构化的安全恢复机制，导致鲁棒性不足。
 
@@ -97,7 +101,7 @@ HWC-Loco 采用 **Wasserstein-1 距离**来约束学习策略与人类专家运�
 
 **创新总结**：HWC-Loco 的核心贡献不在于引入全新的算法组件，而在于通过**分层策略架构 + 鲁棒约束优化 + Wasserstein 模仿学习 + 极端不确定性集**的系统性组合，将人形运动控制从“追求平均性能”提升为“在最坏情况下仍可保证安全”，同时不牺牲自然性和任务效率。这一设计思路为人形机器人的鲁棒部署提供了一条可推广的路径。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l40_https_openreview_net_forum_id_3UE3Aatcjy/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of HWC-Loco: The framework consists of two stages: (a) Training goal-tracking policy to effectively enable human-like locomotion across diverse terrains (Section 4.1) and safety recovery policy to recover from safety-critical states (i.e., extreme-case) (Section 4.2). (b) Training the high-level planning policy to select between the two pre-trained low-level policies (Section 4.3), thereby ensuring stable and consistent locomotion*
@@ -135,7 +139,7 @@ HWC-Loco 采用三层策略结构，将上述鲁棒约束优化目标分解为�
 
 这一架构的核心洞察在于：**将安全恢复从任务跟踪中解耦为独立策略，并通过鲁棒优化显式保证其最坏情况性能**，从而在不牺牲任务效率的前提下实现从安全关键状态中的可靠恢复。
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题形式化：鲁棒约束优化
 
@@ -194,7 +198,9 @@ $$\operatorname*{max}_{\pi_0} \mathbb{E}\left[ \sum_{t=0}^{\infty} \gamma^t \lef
 
 由于真实部署中无法直接获取身体速度和 ZMP 等特权信息，HWC-Loco 采用基于 VAE 的估计器从历史观测中推断这些隐变量。该模块继承自 DreamWaQ（Nahrendra et al., 2023）的设计，为高层规划策略提供决策所需的稳定性指标。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心结果：运动性能与鲁棒性
 
@@ -235,7 +241,9 @@ HWC-Loco在真实机器人上展示了跨多种地形的泛化能力，包括平
 
 然而，真实部署中仍存在超出训练分布的故障模式：极低摩擦地面、超出训练范围的速度指令以及传感器通信延迟均可能导致策略失效。恢复策略在仿真中训练，可能无法完全覆盖真实世界中扰动的多样性。此外，当前真实机器人仅有19自由度，限制了复杂恢复行为的实现。VAE估计器在极高噪声下性能下降（Table 21），可能影响策略切换的可靠性，这一点需在实际部署中进一步验证。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -278,6 +286,8 @@ HWC-Loco 的设计假设和实验验证界定了其适用范围：
 4. **人机交互约束集成**：在大规模人机交互任务（如搬运、协作）中，该方法能否自然地引入任务相关的安全约束（如接触力限制、碰撞避免），而不破坏现有的鲁棒性保证？
 5. **高层任务规划集成**：本文聚焦于运动控制层面，尚未探讨高层任务规划（如导航、操作序列决策）如何与该分层控制框架集成。规划器输出的子目标如何与 ZMP 约束和恢复策略协调，是一个开放的系统性问题。
 6. **联合训练优化**：分阶段训练的次优性提示联合优化的潜力，但如何在保证训练稳定性的前提下同时优化 π₀、π₁、π₂ 仍是一个挑战。
+
+
 
 ## 原文 PDF
 

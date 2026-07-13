@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Query_Aware_Flow_Diffusion_for_Graph_Based_RAG_with_Retrieval_Guarantees.pdf
+project_link: https://qafd-rag.github.io/
+code_link: null
 aliases:
 - QAFDRQR
 - QAFDGBRRG
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 面向图检索增强生成的查询感知流扩散与检索保证 |
 | 英文题名 | Query-Aware Flow Diffusion for Graph-Based RAG with Retrieval Guarantees |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=n28wnc2QTc); [Project](https://qafd-rag.github.io/) |
+| Links | [paper](https://openreview.net/forum?id=n28wnc2QTc) · [Project](https://qafd-rag.github.io/) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/algorithms |
 | Method | Query-Aware Flow Diffusion RAG (QAFD-RAG) |
 | Dataset | UltraDomain (Physics), Spider 2.0 (SQLite), Spider 2.0 (Snowflake) |
@@ -41,7 +43,7 @@ claims:
 > - UltraDomain (Physics) 上，Relevance 为 95.61，对比 94.46 (RAPTOR)，变化 +1.15。
 > - Spider 2.0 (SQLite) 上，Execution Accuracy 为 26.70%，对比 21.50% (Spider-Agent)，变化 +5.20%。
 
-## 概述
+## 概要
 
 当前基于知识图谱的检索增强生成（Graph-based RAG）方法普遍采用查询无关的静态子图探索策略（如统一社区检测或固定跳数的自我网络），忽略了查询的整体语义，导致检索到的子图混入大量无关信息，且缺乏理论上的恢复保证。针对这一瓶颈，本文提出查询感知流扩散检索增强生成框架 **QAFD-RAG**（Query-Aware Flow Diffusion for Graph-Based RAG with Retrieval Guarantees）。其核心机制是将图遍历重新形式化为查询感知的约束优化问题：根据查询与图中节点的语义对齐度动态调整边权重（式 1），引导流扩散沿相关路径传播并抑制无关区域，从而高效提取与查询紧密关联的精简推理子图。
 
@@ -49,7 +51,7 @@ claims:
 
 实验覆盖 UltraDomain 长文档问答、SQuALITY 摘要、HotpotQA/MuSiQue 多跳问答以及 Spider 2.0 Text‑to‑SQL 等多种任务。QAFD‑RAG 在绝大多数数据集和指标上一致超越 GraphRAG、LightRAG、RAPTOR、HippoRAG 等基线：在 UltraDomain 的 Comprehensiveness 上提升 +3.18，在 HotpotQA 的 F1 上提升 +5.51，在 SQL 执行精度上提升约 5–7 个百分点。消融分析表明方法对种子数量、初始质量和边权重变体具有较好鲁棒性，且在不同嵌入模型下保持稳定。定性可视化（图 1）进一步验证了 QAFD‑RAG 能够清晰地抑制无关簇并突出查询相关的推理路径。
 
-## 背景与动机
+
 
 基于知识图谱的检索增强生成（Graph-based RAG）在处理多跳推理、长文档问答等复杂任务时展现了超越扁平文本检索的潜力，其核心流程包括将文档转化为实体‑关系图，并在图中检索与查询相关的子图作为生成上下文。现有代表性方法如 GraphRAG（通过 Leiden 社区检测获取整个社区）、LightRAG（仅取 1‑跳自我网络）、HippoRAG（基于个性化 PageRank）等，均采用**查询无关的静态探索策略**，在检索时并不考虑查询的整体语义。这种设计导致检索出的子图不可避免地包含大量语义无关的节点，引入了显著噪声，并降低了生成质量。例如，针对查询 “Introduce Steve Jobs’s products in Apple”，GraphRAG 可能同时提取 “苹果水果” 和 “亚马逊河” 等不相关社区，LightRAG 虽然限制了跳数，却仍会将 “富士” 等结构相近但语义无关的节点纳入子图（图 1）。更严重的是，上述方法均**缺乏对检索子图相关性的理论保证**，无法从原理上确保检索结果对回答查询是必要且充分的。
 
@@ -61,7 +63,9 @@ claims:
 
 综上，QAFD‑RAG 为图 RAG 提供了一种兼具理论保证与实用效率的查询感知检索范式。本文随后将详细阐述其方法、理论分析和实验验证。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 现有图 RAG 方法采用查询无关的静态图探索策略（如统一社区检测、自我网络），忽视了查询的整体语义，导致检索子图混杂大量无关节点，且缺乏理论保障。**QAFD-RAG 的核心创新在于将图检索重新表述为一个查询感知的约束流扩散优化问题**，通过动态边权重和局部 Push–Relabel 算法，使流沿语义相关路径传播并抑制无关区域，首次为图 RAG 的检索过程提供收敛与恢复的理论保证。
 
@@ -92,7 +96,7 @@ claims:
 
 当前边权重仍为手工设计的函数，对显式逻辑否定的处理能力有限；未来可通过从查询‑答案对中**学习边权重**或引入**对比嵌入**来进一步提升语义区分能力。同时，方法尚未扩展到时序图、多模态知识图谱等更复杂的数据结构。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0016_n28wnc2QTc_Query-Aware_Flow_Diffusion_for_Graph-Based_RAG_w/figures/004_Figure_2.jpg]]
 *Figure 2: Two-stage QAFD-RAG framework: the indexing stage builds a KG from documents, and the query stage applies QAFD to extract and prompt subgraphs for response generation*
@@ -122,7 +126,7 @@ QAFD‑RAG 采用两阶段架构（图 2：索引‑查询分离），将文档�
 
 整个框架无需训练，具备即插即用的模块化特性：既可以独立使用，也可以替代现有图 RAG 系统中的静态探索策略（如替换 GraphRAG 中的社区发现或增强 HippoRAG 中的 Personalized PageRank）。
 
-## 核心模块与公式推导
+
 
 现有图RAG方法普遍采用查询无关的静态遍历策略（如统一社区检测或固定跳数的自我网络扩展），其根本瓶颈在于**忽略查询的整体语义**，导致检索出的子图中掺杂大量无关节点，且整个过程缺乏理论保证。QAFD-RAG通过两个因果性设计打破这一局限：**动态查询感知的边权重**与**基于约束优化的流扩散**。下面依次剖析其核心模块和关键公式，突出它们如何协同实现“检索什么取决于问什么”的机理，并注明证据强度与潜在失效模式。
 
@@ -184,7 +188,9 @@ $$
 
 面对需要多跳推理或涵盖多个方面的复杂查询，QAFD-RAG调用LLM将原始查询分解为若干原子子查询 $q_k$（Prompt 5），对每个子查询独立执行上述“种子选择 → 流扩散”流程，得到各自的重要性向量 $\mathbf{x}^{(k)}$，最后取支持集的并集作为最终检索子图，输入到答案生成模块。由于每个子查询的权重函数与优化问题形式均保持不变，且算法2天然支持按需局部计算，该扩展无需引入全图操作或其他近似，理论保证（如Theorem 7）仍对每个子查询独立成立。该环节的主要失效风险在于LLM的分解质量——错误或遗漏的子查询将直接导致检索覆盖度下降。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 本文在涵盖开放域问答、长文档摘要、多跳推理、Text-to-SQL 的多个标准评测集合上对 QAFD‑RAG 进行验证，并与 GraphRAG、LightRAG、RAPTOR、HippoRAG 等图检索增强生成基线以及 CHASE‑SQL、DIN‑SQL、DAIL‑SQL、CodeS、Spider‑Agent 等 Text‑to‑SQL 基线比较。所有评测均使用 GPT‑4o 在多维度上重复 5 次，报告均值和标准差以降低评判偏差；基线方法使用原论文设置和公开代码复现，仅作必要的最小适配。本节依次给出主结果、消融分析，并在末尾梳理当前方法的失败模式与限制。
 
@@ -238,7 +244,9 @@ $$
 
 以上实验分析共同表明，查询感知流扩散以动态边权重在线重路由流，既能从理论上收敛至相关子图（定理 7），又在实践中显著减轻了无关社区泄漏，为图式检索增强生成提供了高效、可扩展且具备保障的新范式。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 QAFD-RAG 在图 RAG 谱系中引入了一种**查询感知的流扩散范式**，区别于此前静态图探索方法：GraphRAG 依赖查询无关的 Leiden 社区检测，LightRAG 使用固定 1 跳自我网络，RAPTOR 构建树状层次结构，HippoRAG 采用个性化 PageRank。这些基线均采用**静态边权重**和**预先确定的遍历策略**，检索不依赖查询的全局语义，导致无关节点随子图一同被取回。QAFD-RAG 通过四个关键机制的改变解决了这一瓶颈：
 
@@ -254,6 +262,8 @@ QAFD-RAG 在图 RAG 谱系中引入了一种**查询感知的流扩散范式**�
 **局限**：① 基于嵌入的边权重无法建模显式逻辑否定，可能影响需要严格区分的问答；② 边权重的超参数 (a, b, c) 和变体仍需手工选定，缺乏从数据中自适应学习的机制；③ 当前实现未覆盖时序图或多模态图谱；④ 查询分解质量依赖 LLM，错误的分解会损害最终检索结果；⑤ 在 Text‑to‑SQL 上的绝对准确率（~24%）仍低，离产业落地有一定距离。
 
 **开放问题**：能否从查询‑答案对中端到端学习边权重，替代手工设计的加权函数？如何将流扩散扩展到含有时间戳、多模态信息或异构类型的知识图谱？引入对比嵌入或符号‑神经混合机制，能否提升对逻辑否定的处理能力？能否在更复杂的多跳场景下给出更紧的恢复保证并进一步降低在线复杂度？流扩散中的种子选择策略能否与图学习或预训练语言模型更紧密耦合？这些问题指向了查询感知图检索未来研究的若干方向。
+
+
 
 ## 原文 PDF
 

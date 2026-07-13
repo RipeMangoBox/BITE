@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Why_Low_Precision_Transformer_Training_Fails_An_Analysis_on_Flash_Attention.pdf
+project_link: null
+code_link: https://github.com/ucker/why-low-precision-training-fails
 openreview_forum_id: 0jHyEKHDyx
 aliases:
 - SFA
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 低精度Transformer训练失败原因：Flash Attention分析研究 |
 | 英文题名 | Why Low-Precision Transformer Training Fails: An Analysis on Flash Attention |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=0jHyEKHDyx); [GitHub](https://github.com/ucker/why-low-precision-training-fails) |
+| Links | [paper](https://openreview.net/forum?id=0jHyEKHDyx) · [GitHub](https://github.com/ucker/why-low-precision-training-fails) |
 | Topic | #topic/representation_self_supervised_transfer #topic/representation_self_supervised_transfer/representation_learning |
 | Method | Stabilized Flash Attention (检测并调整重复最大值缓解有偏舍入误差) |
 | Dataset | GPT-2 Small (12 layers, 768 dim) pretraining on OpenWebText, GPT-2 Medium (GPT-2M) with AdamW |
@@ -41,7 +43,7 @@ claims:
 > - GPT-2 Small (12 layers, 768 dim) pretraining on OpenWebText 上，Training Stability (Loss Explosion) 为 稳定收敛，无损失爆炸，对比 在数千步后损失突然爆炸，变化 防止失败，实现稳定训练。
 > - GPT-2 Medium (GPT-2M) with AdamW 上，Validation Loss Convergence 为 正常收敛，对比 不收敛或爆炸，变化 稳定训练。
 
-## 概述
+## 概要
 
 低精度训练（如BF16）是提升Transformer效率的关键手段，但在结合Flash Attention时，GPT-2等模型的训练会突然出现损失爆炸。本文通过系统性的因果追踪，揭示了这一失败的根本原因并非随机数值噪声，而是两种相互交织的现象：**注意力机制中跨训练步和token位置涌现的相似低秩表示**，与**BF16加法在累积未归一化输出Ō时引入的有偏舍入误差**。这些舍入误差作为低秩表示的系数，导致梯度更新沿一致方向累积，持续增大权重谱范数和激活值，最终破坏训练动态。
 
@@ -49,7 +51,7 @@ claims:
 
 基于此，本文提出**Stabilized Flash Attention**：检测softmax行内是否存在多个相同最大值，若存在则动态调整归一化因子 $m$，确保 $\bar{\mathbf{P}}$ 所有元素严格小于1，从而阻断有偏舍入误差的产生。实验表明，该方法在GPT-2 Small和Medium上均能防止损失爆炸，实现稳定收敛，且仅需对Flash Attention做最小化修改。
 
-## 背景与动机
+
 
 ### 低精度训练的普及与隐忧
 
@@ -65,7 +67,9 @@ Flash Attention（Dao et al., 2022）通过分块（tiling）和核融合策略�
 
 此前的社区讨论将问题归因于数值精度不足，但缺乏对失败机制的深层理解。关键问题悬而未决：**为什么BF16下的Flash Attention会在特定时刻突然崩溃，而非逐渐退化？** 这种突发性暗示着某种累积效应，而非简单的随机噪声。理解这一因果链条，不仅对修复当前问题至关重要，更对推动更低精度（如FP8）训练具有指导意义。本文的目标正是追溯从根本原因到损失爆炸的完整因果链，并据此提出最小侵入性的修复方案。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题本质的重定义：从随机误差到有偏舍入
 
@@ -124,7 +128,7 @@ Flash Attention（Dao et al., 2022）通过分块（tiling）和核融合策略�
 - 仅在Flash Attention 2的特定失败案例下验证，可能未涵盖所有数值不稳定场景。
 - 未探索不同GPU架构上舍入行为的差异。
 
-## 整体框架
+
 
 本研究采用“反向因果追踪”策略，从训练失败的最终表现（损失爆炸）逐步回溯，定位低精度Flash Attention中数值不稳定的根本原因，并据此提出最小化修复方案。整体分析流程如Figure 1所示，由表及里分为四个层次。
 
@@ -140,7 +144,7 @@ $$d\mathbf{W}_{hp}^{Q} - d\mathbf{W}_{lp}^{Q} \approx \alpha \sum_{T=1}^{N} (\de
 
 **修复方案。** 基于上述根因，提出Stabilized Flash Attention：在安全softmax中检测行分数矩阵 $\mathbf{S}$ 是否存在多个相同最大值，若存在且行最大值 $r_m > 0$，则将归一化因子调整为 $m = \beta \cdot r_m$（$\beta > 1$），确保 $\bar{\mathbf{P}}$ 所有元素严格小于1，从而阻断有偏舍入误差的累积路径。该修复在GPT-2 Small和GPT-2 Medium上均成功消除损失爆炸（Figure 7）。
 
-## 核心模块与公式推导
+
 
 ### 标准注意力与Flash Attention的数值计算
 
@@ -212,7 +216,9 @@ $$\bar{\mathbf{P}} = \exp(\mathbf{S} - \mathbf{m}')$$
 
 该调整仅在检测到多重最大值的特定行上触发，对正常情况无影响，以最小代价阻断了有偏舍入误差的产生条件。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_0jHyEKHDyx/figures/034_Figure_12.jpg]]
 *Figure 12: Token difference visualization*
@@ -261,7 +267,9 @@ Figure 7的验证损失曲线显示，该方案在GPT-2 Small和GPT-2 Medium上�
 
 当前分析主要限于GPT-2架构和BF16精度。以下问题需要进一步验证：该低秩结构和有偏舍入误差机制在LLaMA等不同架构中是否普遍存在；FP8等更低位宽下是否出现类似或新的不稳定性；所提稳定化技术与QK归一化、门控注意力等现有方法的兼容性；以及多重最大值现象能否作为训练失败的早期预警指标。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位与基线关系
 
@@ -310,6 +318,8 @@ Figure 7的验证损失曲线显示，该方案在GPT-2 Small和GPT-2 Medium上�
 ### 与相关工作的关系
 
 本工作与低精度训练稳定性研究形成互补：不同于从优化器角度（如损失缩放、混合精度策略）或架构角度（如归一化位置调整）的缓解方案，本工作直接从**注意力计算的数值误差传播路径**入手，通过阻断误差源实现稳定。该方法修改量极小（仅涉及softmax归一化因子的条件调整），不改变模型容量或训练超参数，可作为现有Flash Attention实现的轻量级补丁。
+
+
 
 ## 原文 PDF
 

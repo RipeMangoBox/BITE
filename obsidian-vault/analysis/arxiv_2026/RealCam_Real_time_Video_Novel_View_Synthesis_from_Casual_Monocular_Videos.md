@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2026
 pdf_ref: paperPDFs/arxiv_2026/RealCam_Real_time_Video_Novel_View_Synthesis_from_Casual_Monocular_Videos.pdf
+project_link: https://xyc-fly.github.io/RealCam/
+code_link: https://github.com/black-forest-labs/flux
 aliases:
 - RealCam
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | RealCam：从单目视频实时合成新视角 |
 | 英文题名 | RealCam: Real-time Video Novel View Synthesis from Casual Monocular Videos |
 | 会议/期刊 | arXiv 2026 |
-| Links | [paper](https://arxiv.org/abs/2605.06051) · [Project](https://xyc-fly.github.io/RealCam/) · [Code](https://github.com/black-forest-labs/flux) · [arXiv](https://arxiv.org/abs/2511.19827) |
+| Links | [paper](https://arxiv.org/abs/2605.06051) · [Project](https://xyc-fly.github.io/RealCam/) · [Code](https://github.com/black-forest-labs/flux) · [paper](https://arxiv.org/abs/2511.19827) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | RealCam |
 | Dataset | MultiCamVideo test set |
@@ -39,13 +41,13 @@ claims:
 > - MultiCamVideo test set (short + long videos) 上，Latency (s) ↓ 1.15 (1.3b causal) vs 426 (ReCamMaster) (降低约370倍)。
 > - MultiCamVideo test set 上，Sub. Cons. ↑ 92.61 (1.3b causal) vs 91.65 (ReCamMaster) (+0.96)。
 
-## 概述
+## 概要
 
 从单目视频实时合成任意新视角是一项极具挑战的视觉生成任务。现有方法——无论是基于显式warp-then-inpaint的**TrajectoryCrafter**（Yu et al., ICCV 2025），还是基于隐式相机控制的V2V生成方法如**ReCamMaster**（Bai et al., ICCV 2025）和**ReDirector**（Park et al., arXiv 2025）——均存在一个结构性瓶颈：它们将目标视频令牌直接附加在源视频序列之后，形成刚性前缀式时间拼接。这种设计强制模型依赖双向（全）注意力机制，不仅导致推理延迟极高（ReCamMaster生成5秒视频需超过17分钟），还使模型无法泛化到与训练长度不同的输入序列，从根本上与实时流式生成不兼容。
 
 RealCam通过一个核心洞察解决了上述问题：**将源帧与目标帧在帧维度上交织，构建交叉帧上下文学习（Cross-frame In-context Learning）范式**。这一设计使模型学习的是相对帧关系而非绝对位置，天然支持因果注意力机制和任意长度推理。在此基础上，RealCam采用两阶段训练策略——先训练一个高保真度的双向教师模型，再通过自强制分布匹配蒸馏（Self-Forcing DMD）将其转化为少步因果学生模型，同时引入闭环数据增强（LoopAug）来克服长视频生成中的漂移问题。最终，因果学生模型实现了亚秒级推理延迟（1.3B模型仅需1.15秒），比ReCamMaster快约370倍，同时在视觉质量、几何一致性和相机控制精度上保持领先水平（Table 1）。用户研究进一步表明，RealCam的教师和学生模型在视频质量和相机跟随能力上均获得超过50%的偏好（Table 2）。
 
-## 背景与动机
+
 
 ### 单目视频新视角合成的现实需求
 
@@ -70,7 +72,9 @@ RealCam 的核心动机在于重新思考条件视频的注入方式。与其将
 
 基于这一洞察，RealCam 提出了一套完整的“教师-学生”两阶段框架，通过交叉帧上下文学习训练高保真度双向教师模型，再通过自强制分布匹配蒸馏将其转化为少步因果学生模型，最终实现亚秒级的实时新视角合成。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 RealCam 的核心创新在于对现有隐式相机控制视频生成范式进行了两个根本性的架构改造，从而解决了实时交互场景下的效率与泛化瓶颈。
 
@@ -113,7 +117,7 @@ $$\nabla_{\theta} \mathcal{L}_{\mathrm{DMD}} \approx - \mathbb{E}_{t, z_0, c_{\m
 
 这些创新并非孤立存在，而是形成了一条从“交织条件→因果蒸馏→闭环增强”的完整技术链，最终实现了亚秒级延迟（1.3b模型1.15s，5b模型0.72s）的实时交互式相机控制视频生成。
 
-## 整体框架
+
 
 RealCam 采用“双向教师训练 → 因果学生蒸馏”的两阶段流水线，将相机控制的视频到视频（V2V）生成从离线高延迟范式转化为实时流式框架。其核心设计围绕三个模块展开：**交叉帧上下文学习教师训练**、**因果适应与自强制分布匹配蒸馏**，以及**闭环数据增强（LoopAug）**。
 
@@ -128,7 +132,7 @@ RealCam 采用“双向教师训练 → 因果学生蒸馏”的两阶段流水�
 
 **关键瓶颈解除**：该流水线直接针对现有隐式方法（如 ReCamMaster）的两大瓶颈——刚性前缀式时间拼接导致的长度泛化失效，以及双向注意力带来的高推理延迟。交叉帧交织解除了前缀依赖，因果蒸馏将延迟从数百秒降至亚秒级（Table 1：1.3b 模型 1.15s，5b 模型 0.72s，对比 ReCamMaster 的 426s），LoopAug 则弥补了长视频场景下的全局一致性短板。
 
-## 核心模块与公式推导
+
 
 RealCam 采用两阶段训练流水线：先训练一个基于交叉帧上下文学习的高保真双向教师模型，再通过自强制分布匹配蒸馏将其转化为少步因果学生模型，并辅以闭环数据增强保证长视频全局一致性。
 
@@ -173,7 +177,9 @@ $$\nabla_{\theta} \mathcal{L}_{\mathrm{DMD}} \approx - \mathbb{E}_{t, z_0, c_{\m
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2605_06051/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of direct temporal concatenation and ours cross-frame concatenation. Our method generalizes to arbitrary video length during inference and naturally extends to causal attention*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：定量对比与效率优势
 
@@ -230,7 +236,9 @@ Figure 3 展示了交叉帧条件设计与前缀式拼接方法的根本差异�
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2605_06051/figures/008_Table_3.jpg]]
 *Table 3: Quantitative ablations on key training strategies*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 RealCam 处于相机控制视频到视频生成（camera-controlled V2V generation）这一新兴问题线上，其核心贡献在于首次将因果流式推理引入该领域，同时通过跨帧上下文学习解除了现有方法对固定推理长度的刚性依赖。
 
@@ -258,6 +266,8 @@ RealCam 处于相机控制视频到视频生成（camera-controlled V2V generati
 - 自强制滚动策略与现有工作（如 Self-Forcing、Rolling Forcing）的具体差异及其对蒸馏效率的影响；
 - 因果学生模型在块大小（chunk size）与延迟/质量之间的帕累托前沿——Table 3 仅比较了块大小 1 和 3，更大的块在质量与延迟上的 trade-off 未充分探索；
 - 该方法是否可以扩展到多源视频输入或非刚性相机轨迹（如手持晃动）场景。
+
+
 
 ## 原文 PDF
 

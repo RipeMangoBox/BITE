@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/ARC_Is_a_Vision_Problem.pdf
+project_link: null
+code_link: null
 aliases:
 - VAV
 - AIVP
@@ -40,7 +42,7 @@ claims:
 > - ARC-1 上，pass@2 accuracy (%) 54.5 (ViT-18M) vs 44.6 (TRM) (+9.9)；pass@2 accuracy (%) 60.4 (ensemble) vs 40.3 (HRM) (+20.1)；pass@2 accuracy (%) 60.4 (ensemble) vs 44.0 (GPT-5) (+16.4)。
 > - ARC-2 上，pass@2 accuracy (%) 8.3 (ViT-18M) vs 7.8 (TRM) (+0.5)；pass@2 accuracy (%) 11.1 (ensemble) vs 5.0 (HRM) (+6.1)。
 
-## 概述
+## 概要
 
 **ARC 基准**（Abstraction and Reasoning Corpus）由大量独立的视觉推理任务组成，每个任务仅提供 2–4 对输入-输出演示，要求模型从少量示例中推断隐含的转换规则并应用于新的推理输入。现有方法主要依赖大语言模型（如 GPT-5、o3-mini-high、Claude 3.7）或从零训练的循环推理模型（如 **HRM** (Wang et al., arXiv 2025)、TRM），将 ARC 视为序列生成或符号推理问题。然而，这些方法忽视了 ARC 任务固有的视觉与空间结构——任务背后的核心概念（如“反射”、“对称”、“重力”）与视觉和物理世界紧密相连。
 
@@ -50,7 +52,7 @@ claims:
 
 VARC 的方法定位具有显著特点：仅使用 ARC 数据和 RE-ARC 扩充进行训练，未利用互联网规模预训练数据；模型参数规模远小于主流 LLM；测试时训练独立于每个测试任务，确保评估的严格性。这一工作表明，ARC 本质上是一个视觉问题，视觉驱动的范式为抽象推理提供了更简洁、更高效的路径。
 
-## 背景与动机
+
 
 ARC（Abstraction and Reasoning Corpus）是一个用于评估通用人工智能抽象与推理能力的基准。每个 ARC 任务由极少量的输入-输出网格对（通常 2–4 对）作为演示，要求模型从这些示例中推断出隐含的转换规则，并将其应用于新的测试输入。ARC 的核心挑战在于任务的高度多样性：训练集、评估集与测试集之间的任务互不重叠，模型必须在少样本条件下实现跨任务泛化。
 
@@ -60,7 +62,9 @@ ARC（Abstraction and Reasoning Corpus）是一个用于评估通用人工智能
 
 本文提出 **Vision ARC (VARC)** 框架，核心洞察是：**将 ARC 重构为图像到图像的翻译问题**，使标准视觉模型能够从少量视觉演示中隐式学习空间不变性和组合性规则，而无需显式符号推理或大规模语言预训练。具体而言，VARC 将 ARC 任务建模为逐像素分类（类似语义分割），采用视觉 Transformer（ViT）或卷积 U-Net 作为骨干网络，结合 2D 位置编码、画布增强与补丁化等视觉先验，并通过两阶段训练（离线训练 + 测试时训练）实现少样本适应。这一范式转换使仅 18M 参数的 ViT 模型在 ARC-1 上达到 54.5% 的 pass@2 准确率，集成后更达到 60.4%，超越所有从零训练的循环模型，并接近人类平均水平（60.2%）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 VARC 的核心创新在于**将 ARC 从离散符号推理问题重构为图像到图像的翻译问题**，并通过系统性地注入视觉先验，使标准视觉模型能够从少量示例中隐式学习空间变换规则。这一范式转换体现在以下关键维度：
 
@@ -109,7 +113,7 @@ VARC 摒弃了自回归生成或递归迭代，采用**前馈单次推理**：�
 
 这些创新使 VARC 以仅 **18M 参数**（远小于数十亿参数的 LLM）在 ARC-1 上达到 **54.5%** 的单模型准确率，超越从零训练的循环方法 TRM（44.6%），集成后达到 **60.4%**，与人类平均水平（60.2%）持平（Table 3）。值得注意的是，VARC 仅使用 ARC 数据和 RE-ARC 扩充进行训练，未利用互联网规模预训练数据，确保了对比的公平性。
 
-## 整体框架
+
 
 VARC 将 ARC 基准重构为**图像到图像翻译**问题，以逐像素分类的形式进行建模，类似于语义分割任务。整个 pipeline 由离线训练和测试时训练两个阶段构成，核心模块包括输入预处理、视觉主干网络、任务条件化以及多视图推理。
 
@@ -156,7 +160,7 @@ $$\mathcal{L}(\theta) = \mathbb{E}_{T,i} \left[ \mathcal{D}(y_i, f_{\theta}(x_i 
 ![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2511_14761/figures/005_Figure_5.jpg]]
 *Figure 5: The ViT architecture in VARC. The input is randomly placed on a canvas, which is then treated as a natural image and processed by a standard ViT, conditioned on the task token*
 
-## 核心模块与公式推导
+
 
 VARC 将 ARC 推理任务重构为图像到图像的逐像素分类问题，其核心架构由五个关键模块串联构成，整体遵循“预处理→嵌入→编码→条件调节→分类”的流水线设计。
 
@@ -185,7 +189,9 @@ $$\mathcal{L}(\theta) = \mathbb{E}_{T,i} \left[ \mathcal{D}(y_i, f_{\theta}(x_i 
 ![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2511_14761/figures/004_Figure_4.jpg]]
 *Figure 4: The raw input undergoes random scale and translation transformations and is placed on the “canvas” (denoted in gray)*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验结果
 
@@ -260,7 +266,9 @@ VARC 在 ARC-1 基准上取得了与人类平均水平相当的准确率。如 *
 ![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2511_14761/figures/024_Figure_17.jpg]]
 *Figure 17: Successful and failed examples on ARC-1. (Top): Examples of test tasks successfully solved by VARC. (Bottom): Examples of test tasks unsolved by VARC. (Left): Two demonstration example pairs shown for each task (some have more demonstrations not shown here). (Right): Inference input and the first and second solutions proposed by VARC. The green box indicates the correct output*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务范式谱系：从符号推理到视觉翻译
 
@@ -317,6 +325,8 @@ TTT 期间的辅助任务增强（翻转、旋转、颜色置换）是关键的�
 4. **测试时训练的效率**：TTT 对每个测试任务独立微调，计算成本随任务数量线性增长。能否通过元学习或参数高效微调（如 LoRA）降低 TTT 成本，同时保持独立训练的泛化优势？
 
 5. **歧义的显式建模**：对于存在多种合理解释的任务，当前方法缺乏对歧义的显式表征。引入概率推理或生成式建模（如扩散模型）来捕捉输出分布的多模态性，可能是一个有前景的方向。
+
+
 
 ## 原文 PDF
 

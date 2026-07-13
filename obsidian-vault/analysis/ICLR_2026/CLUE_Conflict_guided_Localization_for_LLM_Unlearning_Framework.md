@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/CLUE_Conflict_guided_Localization_for_LLM_Unlearning_Framework.pdf
+project_link: null
+code_link: https://github.com/Zodiark-ch/CLUE
 openreview_forum_id: jtRYvazBWv
 aliases:
 - CLUE
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | CLUE：冲突导向的LLM遗忘定位框架 |
 | 英文题名 | CLUE: Conflict-guided Localization for LLM Unlearning Framework |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=jtRYvazBWv); [GitHub](https://github.com/Zodiark-ch/CLUE) |
+| Links | [paper](https://openreview.net/forum?id=jtRYvazBWv) · [GitHub](https://github.com/Zodiark-ch/CLUE) |
 | Topic | #topic/optimization_theory_probabilistic #topic/optimization_theory_probabilistic/interpretability_and_visualization |
 | Method | CLUE |
 | Dataset | WMDP Cyber (forget) / Winogrande (retain), WMDP Cyber (forget) / SST-2 (retain), WMDP Cyber (forget) / RTE (retain), WMDP Bio (forget) / Winogrande (retain) |
@@ -41,7 +43,7 @@ claims:
 > - WMDP Cyber (forget) / SST-2 (retain) 上，Retain Utility (accuracy) 为 0.91，对比 0.771 (WAGLE)，变化 +0.139。
 > - WMDP Cyber (forget) / RTE (retain) 上，Retain Utility (accuracy) 为 0.786，对比 0.524 (MEMIT)，变化 +0.262。
 
-## 概述
+## 概要
 
 大型语言模型（LLM）的遗忘（unlearning）任务要求在移除有害或敏感信息的同时，保持模型在非目标任务上的性能。现有定位方法通过梯度或权重归因识别出一组纠缠的“重要”节点，但无法区分其中哪些节点专门负责遗忘、哪些负责保留、哪些同时影响两者。这一粗粒度定位导致非目标技能的灾难性遗忘或目标信息擦除不彻底，构成了当前遗忘研究的核心瓶颈。
 
@@ -49,7 +51,7 @@ CLUE（Conflict-guided Localization for LLM Unlearning）提出了一种冲突�
 
 在WMDP Cyber、WMDP Bio和PKU-SafeRLHF三个主要遗忘任务上，CLUE在遗忘效能和保留效用上均一致超越现有定位方法（包括MEMIT、PCGU、DEPN、WAGLE等），且修改参数量仅为54.88%–58.16%。消融实验进一步验证了节点分类的关键作用：移除遗忘掩码导致遗忘效能降幅最大（↓0.045），替换冲突掩码导致保留效用降幅最大（↓0.264）。
 
-## 背景与动机
+
 
 大型语言模型在预训练过程中不可避免地会学习到危险知识（如生物武器制造、网络攻击方法）和不良行为（如生成有害内容），这些能力在部署后可能被恶意利用。LLM遗忘（unlearning）旨在从模型中擦除特定知识或行为，同时最大限度地保留模型在非目标任务上的通用能力，其核心优化目标可形式化为：
 
@@ -78,7 +80,9 @@ CLUE 的核心洞察在于：遗忘和保留本质上具有**组合逻辑特性*
 
 这一细粒度分类为后续的差异化微调提供了因果依据，从根本上解决了现有方法“一刀切”式干预的缺陷。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CLUE的核心创新在于将LLM遗忘中的定位问题从“识别一组重要节点”推进到“区分每个节点的因果角色”。现有定位方法（如WAGLE、DEPN、PCGU、MEMIT）通过梯度或权重归因只能识别出一组纠缠的“重要”节点，无法区分其中哪些节点专门负责遗忘、哪些负责保留、哪些同时影响两者。这导致非目标技能的灾难性遗忘或目标信息擦除不彻底——这是当前定位驱动遗忘方法的真实瓶颈。
 
@@ -110,7 +114,7 @@ $$ \operatorname*{min}_{\theta_c} \mathbb{E}_{(x, y_f) \in \mathcal{D}_f} [\math
 
 上述三个changed slots共同构成了CLUE相对于现有定位驱动遗忘方法的系统性改进。在WMDP Cyber、WMDP Bio和PKU-SafeRLHF三个主要遗忘任务上，CLUE在遗忘效能和保留效用上均一致超越所有现有定位方法，且修改参数量仅为54.88%–58.16%，显著低于其他方法。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0009_jtRYvazBWv_CLUE_Conflict-guided_Localization_for_LLM_Unlear/figures/002_Figure_2.jpg]]
 *Figure 2: Overview from datasets to localization*
@@ -179,7 +183,7 @@ $$\operatorname*{min}_{\theta_c} \mathbb{E}_{(x, y_f) \in \mathcal{D}_f} [\mathc
 
 框架的核心洞察在于：遗忘和保留本质上具有**组合逻辑特性**（AND/OR 门），通过电路发现可以显式捕捉这种结构；而电路的 CNF 可满足性分析能够精确区分每个节点在遗忘与保留中的因果角色，实现细粒度定位。消融实验证实了这一设计的有效性——移除遗忘掩码（$-M_f$）导致遗忘效能降幅最大（↓0.045），替换冲突掩码（$-M_c$，用全 1 掩码替代）导致保留效用降幅最大（↓0.264），表明节点分类和差异化微调对最终性能至关重要。
 
-## 核心模块与公式推导
+
 
 CLUE 的核心流水线由四个模块构成：逻辑电路发现、电路到 CNF 的转换、基于 SAT 的节点分类，以及两阶段掩码微调。以下逐一阐述其机理与关键公式。
 
@@ -242,7 +246,9 @@ $$
 
 其中 $\lambda$ 为保留损失权重。由于冲突节点同时涉及遗忘和保留功能，该阶段通过联合优化在二者之间寻求平衡。消融实验（Table 2）证实：移除遗忘掩码导致遗忘效能降幅最大（↓0.045），替换冲突掩码导致保留效用降幅最大（↓0.264），验证了差异化微调策略的必要性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -303,7 +309,9 @@ Table 3统计了遗忘前后遗忘节点和冲突节点的数量变化。遗忘�
 3. **计算开销。** Table 7和Table 8对比了各方法的计算成本。CLUE的电路发现和SAT求解阶段引入了额外开销，尽管采用EAP优化后总时间可降至3.21小时（WMDP Cyber），仍高于纯微调方法GA（2.33小时）。在更大规模语言模型上，电路发现的可扩展性问题可能进一步加剧。
 
 **注意：** 以上失败模式的分析部分基于论文声明的局限性，具体数值和边界条件需在实际部署中进一步验证。
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有工作的关系
 
@@ -344,6 +352,8 @@ CLUE 的有效性依赖于两个前提条件，偏离这些条件时性能可能
 5. 如何解决电路发现在超大规模语言模型中的可扩展性问题，使其适用于百亿、千亿参数级别的模型？
 
 需要指出的是，上述部分局限和开放问题来自论文自身的讨论，其解决方案尚未在本文中给出，读者在将 CLUE 应用于新场景时应自行评估这些边界条件的影响。
+
+
 
 ## 原文 PDF
 

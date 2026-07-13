@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Modality_free_Graph_In_context_Alignment.pdf
+project_link: null
+code_link: https://github.com/JhuoW/MF-GIA
 openreview_forum_id: cDc95lucVL
 aliases:
 - MGMFGCA
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 模态无关的图上下文对齐方法 |
 | 英文题名 | Modality-free Graph In-context Alignment |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=cDc95lucVL); [GitHub](https://github.com/JhuoW/MF-GIA) |
+| Links | [paper](https://openreview.net/forum?id=cDc95lucVL) · [GitHub](https://github.com/JhuoW/MF-GIA) |
 | Topic | #topic/safety_alignment_fairness_privacy #topic/safety_alignment_fairness_privacy/trustworthy_machine_learning |
 | Method | MF-GIA (Modality-Free Graph In-context Alignment) |
 | Dataset | Cora (Citation, 7-way), ogbn-Products (E-commerce, 47-way), Physics (Co-authorship, 5-way), BlogCatalog (Social Media, 6-way) |
@@ -42,7 +44,7 @@ claims:
 > - ogbn-Products (E-commerce, 47-way) 上，5-shot 准确率 (%) 为 22.61 ±1.71。
 > - Physics (Co-authorship, 5-way) 上，5-shot 准确率 (%) 为 88.92 ±0.84。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -62,7 +64,7 @@ MF-GIA 在图基础模型谱系中占据独特位置：与传统 GNN（如 **GCN
 
 在跨域少样本节点分类与边分类任务上，MF-GIA 展现出显著优势。以 5-shot 节点分类为例，在引文网络 Cora 上达到 63.98%，在电商图 ogbn-Products 上达到 22.61%，在合著网络 Physics 上达到 88.92%。在知识图谱边分类任务中，MF-GIA 在 FB15K237 上 1-shot 准确率达 98.77%，较 GraphAlign 提升 15.75 个百分点。消融实验证实，域嵌入驱动的特征对齐与标签对齐、DPAA 机制及 episodic 训练范式均为关键贡献因素。此外，MF-GIA 在不同特征编码（BoW、RoBERTa、LLaMa2-7B 等）下性能稳健，验证了其模态无关性。
 
-## 背景与动机
+
 
 ### 图基础模型的上下文学习困境
 
@@ -96,7 +98,9 @@ MF-GIA 在图基础模型谱系中占据独特位置：与传统 GNN（如 **GCN
 
 基于梯度指纹，MF-GIA 通过轻量级的域条件 FiLM 变换，将任意预编码的特征和本地标签 ID 投影到统一的语义空间，同时保持域内几何结构。配合双提示感知注意力（DPAA）和 episodic 预训练目标，模型学会在参数冻结的条件下，仅依靠少量支持示例进行跨域上下文推理。这一设计使得 MF-GIA 成为首个同时满足“无需后训练、跨域对齐、模态无关”三项准则的图上下文学习方法。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MF-GIA 的核心创新在于以**梯度指纹**（gradient fingerprint）为统一域描述符，构建了首个同时满足真正图上下文学习（ICL）三项准则的框架：**无需后训练与参数更新**（post-training-free）、**跨域对齐**（cross-domain alignment）和**模态无关**（modality-free）。现有方法在这三项准则上存在系统性缺陷（Table 1）：传统 GNN（如 **GCN**, Kipf & Welling, ICLR 2017）和自监督方法（如 **GraphMAE**, Hou et al., NeurIPS 2022）需要后训练微调；带后训练的 GFM（如 **GCOPE**, Zhao et al., 2024；**AutoGFM**, Chen et al., 2025）无法实现参数冻结推理；而具有 ICL 能力的模型（如 **OFA**, Liu et al., 2024a；**GraphAlign**, Hou et al., 2024）则依赖文本属性图（TAG），无法处理仅含预编码特征和索引标签的任意图数据。
 
@@ -144,7 +148,7 @@ $$\min_\Phi \mathbb{E} \left[ -\frac{1}{|\mathcal{Q}|} \sum_{q \in \mathcal{Q}} 
 
 梯度指纹 → 域嵌入 → 域条件 FiLM（特征对齐 + 标签对齐）→ 统一语义空间 → DPAA 匹配 → 参数冻结推理。这一链条使 MF-GIA 成为首个在真正 ICL 三项准则上全部满足的方法，而所有基线方法至少缺失其中一项。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_cDc95lucVL/figures/002_Figure_1.jpg]]
 *Figure 1: Overview of MF-GIA. (Left) Modality-free Alignment: The pretraining graphs are mapped to a unified space via domain-conditioned transformations. Domain descriptors e ensure similar domains occupy neighboring subspaces. (Middle) Episodic Pretraining: The model learns from m-way k-shot episodes using domain-aligned features and labels. The DPAA mechanism matches queries to classes using only prompts as context. (Right) In-context Prediction: For an unseen graph, the frozen model performs few-shot classification using the support set as a prompt*
@@ -180,7 +184,7 @@ MF-GIA 的整体 pipeline 围绕一个核心目标展开：让预训练模型在
 
 这一流程实现了真正的 **post-training-free**：无需在任何目标任务上微调或学习提示，仅依靠支持集进行 in-context 适应。整个 pipeline 的输入是预编码的任意图数据（特征维度通过 SVD 统一至 $d_o$），输出是查询物品的类别预测，完全独立于底层模态。
 
-## 核心模块与公式推导
+
 
 MF-GIA 的核心架构由四个紧密耦合的模块构成：域嵌入器（Domain Embedder）、特征对齐器（Feature Aligner）、标签对齐器（Label Aligner）和双提示感知注意力（DPAA）。这些模块协同工作，将任意预编码的图数据和本地标签 ID 投影到统一的语义空间，实现参数更新自由的少样本上下文推理。
 
@@ -254,7 +258,9 @@ $$\min_\Phi \mathbb{E}_{G_i \sim \mathcal{G}} \mathbb{E}_{\mathrm{episode} \sim 
 
 预训练完成后，所有参数 $\Phi$ 冻结。推理时仅需计算新图的梯度指纹、生成域嵌入、执行特征与标签对齐，再通过 DPAA 完成少样本匹配预测，全程无需任何参数更新。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -348,7 +354,9 @@ Table 10 显示，添加链接预测作为辅助预训练任务可进一步提�
 ![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_cDc95lucVL/figures/014_Table_9.jpg]]
 *Table 9: Performance on MF-GIA with expressive dimension unification component*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：图基础模型的“真正上下文学习”瓶颈
 
@@ -407,6 +415,8 @@ MF-GIA 采用完全 episodic 的元学习预训练范式，与推理时的少样
 - **任务扩展**：MF-GIA 的模态无关对齐机制能否扩展到图分类、链接预测以外的任务（如图生成、异常检测），并保持对异构模态的鲁棒性。
 
 - **谱理论连接**：梯度指纹与非欧结构的谱理论之间是否存在更深层的联系，能否指导更强大的对齐机制设计，值得进一步探索。
+
+
 
 ## 原文 PDF
 

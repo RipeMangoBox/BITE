@@ -44,7 +44,7 @@ claims:
 > - ImageNet-1K 上，Top-1 Acc (ResNet-18) 47.6 ± 0.1 (IPC=10) vs CaO2 46.1 ± 0.2 (+1.5)；Top-1 Acc (ResNet-101) 66.4 ± 0.3 (IPC=50) vs CaO2 66.2 ± 0.1 (+0.2)。
 > - ImageNet-1K (Cross-Arch) 上，Top-1 Acc (EfficientNet-B0 student) 28.7 ± 0.4 (IPC=10) vs D3HR 28.1 ± 0.1 (+0.6)。
 
-## 概述
+## 概要
 
 当前数据集蒸馏的主流范式聚焦于使合成数据的全局分布逼近原始数据分布，但这一视角忽略了一个关键瓶颈：**对象语义天然具有层次性**——从粗粒度的整体布局到细粒度的部件细节，而现有方法未能显式捕捉这种层次化判别语义，导致蒸馏数据在下游分类任务中缺乏关键的判别能力。
 
@@ -54,7 +54,7 @@ claims:
 
 主要实验结果验证了该方法的有效性：在 ImageNet-1K IPC=10 设置下，HIERAMP 在 ResNet-18 上达到 **47.6%** 的 Top-1 准确率，超越此前最佳方法 CaO2 约 1.5 个百分点；在 CIFAR-10 上达到 **44.3%**，超越 D3HR 约 3.0 个百分点。消融实验进一步揭示：粗尺度放大增加了令牌多样性与覆盖率，细尺度放大则使注意力更集中——这种阶段特异性的放大机制是性能提升的关键。此外，HIERAMP 在保持生成保真度（FID 与 VAR 基线接近）的同时，仅引入极小的计算开销（延迟增加约 0.008 s/img），且具备良好的跨架构泛化能力。
 
-## 背景与动机
+
 
 数据集蒸馏旨在将大规模数据集压缩为极少量合成样本，使下游模型在这些样本上训练后能逼近在全量数据上的性能。近年来，基于生成模型的数据集蒸馏方法取得了显著进展，其核心思路是利用预训练生成器合成信息密度更高的蒸馏图像。然而，现有方法普遍存在一个关键瓶颈：**它们仅关注蒸馏数据与真实数据在全局分布层面的相似性，未能捕捉对象语义的层次性**——从粗粒度的整体布局到细粒度的部件细节。这一缺失导致蒸馏数据缺乏对下游分类任务至关重要的判别性语义，限制了性能的进一步提升。
 
@@ -62,7 +62,9 @@ claims:
 
 HIERAMP 的核心洞察在于：**如果能在 VAR 各尺度上识别语义显著区域，并在自回归生成过程中对这些区域施加注意力放大，就能引导模型聚焦于对分类更有意义的语义特征，从而在不显式优化全局分布相似度的前提下，显著提升蒸馏数据的下游分类性能**。具体而言，粗尺度的注意力放大使令牌分布更均匀多样，增加了合成样本的全局结构变化；细尺度的注意力放大则使注意力更集中，强化了局部判别性细节。这种由粗到细的层次化放大策略，将 VAR 的生成结构优势转化为数据集蒸馏的性能增益。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 HIERAMP的核心创新在于首次将视觉自回归（VAR）模型的由粗到细生成特性与数据集蒸馏的语义需求对齐，通过**层次化语义放大**机制解决现有方法仅关注全局分布相似性而忽略对象语义层次性的瓶颈。具体而言，该方法在三个关键维度上对标准VAR生成管线进行了改造：
 
@@ -84,7 +86,7 @@ HIERAMP并非对所有尺度施加统一的放大强度，而是将9个尺度划
 
 值得注意的是，类别令牌本身对准确率无显著增益（Table 7：有类别令牌45.9% vs 无类别令牌45.6%），其价值纯粹在于**为放大提供语义引导信号**。这一消融结果证实HIERAMP的性能提升完全来自注意力放大机制对语义层次性的利用，而非模型容量的简单增加。
 
-## 整体框架
+
 
 HIERAMP 的整体 pipeline 围绕一个预训练的视觉自回归模型（VAR）构建，通过注入可学习的类别令牌并对其产生的语义显著性图进行注意力放大，实现由粗到细的层次化语义增强。整个框架由三个核心模块串联而成，形成“语义感知→显著性定位→注意力引导生成”的闭环。
 
@@ -103,7 +105,7 @@ HIERAMP 的整体 pipeline 围绕一个预训练的视觉自回归模型（VAR�
 
 三个模块的协同机制可概括为：VAR 提供层次化生成骨架，类别令牌在各尺度捕获语义显著性，放大模块利用该显著性信号偏置自回归解码的注意力分布，从而在不修改生成模型结构、不显式优化全局分布相似度的前提下，显著提升蒸馏数据的下游分类性能。Figure 2 完整展示了这一框架的左右两翼——左侧为尺度受限的类别令牌注意力掩码设计，右侧为多尺度语义特征放大的执行流程。
 
-## 核心模块与公式推导
+
 
 ### 整体框架
 
@@ -175,7 +177,9 @@ $$\tilde{L}_n^{(h)} = L_n^{(h)} + \beta_n \mathbf{1}_{L_k^n+1} a_n^{\top} \quad 
 ![[assets/figures/papers/paper_list_l2684_https_arxiv_org_abs_2603_06932/figures/001_Figure_1.jpg]]
 *Figure 1: Top: The visual autoregressive model constructs coarse scene structure and gradually complements details from coarse to fine scales. The class token highlights regions that express object-related semantics (the second row). Bottom: HIERAMP identifies important semantic regions and refines the hierarchical structure and details in an autoregressive manner. The images after amplification demonstrate more diverse components and richer class-related details*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能对比
 
@@ -264,7 +268,9 @@ HIERAMP 的核心设计空间在于**放大阶段的选择**和**各阶段放大
 ![[assets/figures/papers/paper_list_l2684_https_arxiv_org_abs_2603_06932/figures/015_Figure_6.jpg]]
 *Figure 6: Qualitative comparison of the DiT backbone before and after applying HIERAMP*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 在数据集蒸馏领域中的位置
 
@@ -312,6 +318,8 @@ HIERAMP 的核心机制建立在 VAR 模型的由粗到细生成特性之上。�
 4. **理论形式化**：粗尺度放大增加令牌多样性、细尺度放大集中注意力的机制（Figure 3），目前主要基于经验观察（令牌熵和覆盖率指标）。是否可以通过信息论或注意力流的角度进行更深入的理论分析？
 
 5. **与提示工程/条件生成的结合**：类别令牌的设计本质上是一种隐式条件注入。未来可探索将文本描述、属性标签等多模态条件与层次化放大结合，进一步提升蒸馏数据的可控性和判别性。
+
+
 
 ## 原文 PDF
 

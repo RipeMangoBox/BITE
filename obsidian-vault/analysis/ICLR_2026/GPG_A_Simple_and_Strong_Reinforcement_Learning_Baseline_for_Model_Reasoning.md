@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/GPG_A_Simple_and_Strong_Reinforcement_Learning_Baseline_for_Model_Reasoning.pdf
+project_link: null
+code_link: https://github.com/AMAP-ML/GPG
 openreview_forum_id: inccdtfx8x
 aliases:
 - GPGG
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | GPG：一种简单且强大的模型推理强化学习基线 |
 | 英文题名 | GPG: A Simple and Strong Reinforcement Learning Baseline for Model Reasoning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=inccdtfx8x); [GitHub](https://github.com/AMAP-ML/GPG) |
+| Links | [paper](https://openreview.net/forum?id=inccdtfx8x) · [GitHub](https://github.com/AMAP-ML/GPG) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | Group Policy Gradient (GPG) |
 | Dataset | Math Reasoning (Qwen2.5-Math-7B), 1.5B Math Reasoning (DeepSeek-R1-Distill-Qwen-1.5B), 7B Math Reasoning, Geometry Reasoning (GEOQA Test) |
@@ -42,7 +44,7 @@ claims:
 > - 1.5B Math Reasoning (DeepSeek-R1-Distill-Qwen-1.5B) 上，Average pass@1 为 55.7 (GPG-RS1)，对比 53.1 (Open-RS1, GRPO-based)，变化 +2.6。
 > - 7B Math Reasoning 上，Average pass@1 为 57.7 (GPG-Zero-7B)，对比 51.4 (Oat-Zero-7B)，变化 +6.3。
 
-## 概述
+## 概要
 
 当前基于强化学习的大语言模型推理训练方法（如 **PPO**、**GRPO**）普遍依赖替代损失函数、参考模型和价值模型，并引入 KL 散度约束以防止策略偏移。这些组件虽然在一定程度上稳定了训练，但也带来了优势估计偏差、梯度估计偏差以及显著的计算开销，限制了模型的可扩展性和性能上限。
 
@@ -60,7 +62,7 @@ claims:
 
 值得注意的是，GPG 当前尚未在超大模型（>70B）上进行验证，其长期训练中去除分布约束的稳定性以及 AGE 机制在极端奖励分布下的鲁棒性仍有待进一步探索。
 
-## 背景与动机
+
 
 ### 推理任务中的强化学习范式
 
@@ -101,7 +103,9 @@ $$\nabla_\theta \mathcal{I}(\theta) = \mathbb{E}_{\pi_\theta} \left[ \nabla_\the
 
 通过这一设计，GPG在显著降低训练资源消耗的同时，在单模态数学推理、多模态视觉推理、几何推理、细粒度分类和推理定位等广泛任务上一致超越了GRPO等现有方法。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GPG的核心创新在于对强化学习训练流程的**系统性简化与偏差校正**，而非引入新的复杂组件。相较于当前主流的**GRPO**（Shao et al., 2024）和**PPO**（Schulman et al., 2017），GPG在四个关键维度上实现了结构性改变：
 
@@ -156,7 +160,7 @@ PPO和GRPO均使用**KL散度约束**或裁剪机制来限制策略更新幅度�
 
 GPG是唯一同时去除全部四个冗余组件的方案（Table 2），在保持训练稳定性的同时实现了显著的性能提升和资源节约。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_inccdtfx8x/figures/006_Table_2.jpg]]
 *Table 2: Comparison of reinforcement learning algorithms (in reasoning) with various components*
@@ -204,7 +208,7 @@ GPG 不依赖 KL 散度约束来限制策略更新幅度，其训练稳定性来
 
 值得注意的是，消融实验表明**引入 KL 散度约束反而会损害 GPG 的性能**，这进一步验证了去除分布约束的合理性——GPG 直接优化原始 RL 目标的设计使其无需额外的策略正则化。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化与策略梯度基础
 
@@ -267,7 +271,9 @@ $$\hat{A}_{i,t}^{\mathrm{GRPO}} = R(o_i) - \frac{1}{G} \sum_{j=1}^G R(o_j)$$
 
 GPG 与之关键区别在于：（1）去除标准差归一化以避免引入偏差；（2）结合 AGE 校正无效样本带来的梯度估计偏差。消融实验证实，无 AGE 的 GPG（$F_{norm}=1, \alpha=1$）平均分仅 43.9%，未显著优于 GRPO 的 43.7%；加入 AGE 后提升至 48.3%（Table 1），说明 AGE 是性能提升的决定性组件。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 一、主实验结果
 
@@ -351,7 +357,9 @@ GPG 在单模态数学推理、几何推理、视觉推理、推理定位及细�
 ![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_inccdtfx8x/figures/002_Figure_1.jpg]]
 *Figure 1: Performance comparison on unimodal reasoning tasks, with extended validation on multimodal reasoning. (Top) GPG achieves substantial performance gains over state-of-the-art (SOTA) baselines across diverse mathematical benchmarks, demonstrating its core effectiveness for linguistic reasoning. (Bottom) The method also generalizes robustly to multi-modal settings, outperforming other RL methods and further validating its broad applicability*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有RL方法的谱系关系
 
@@ -386,6 +394,8 @@ GPG的定位是这一简化过程的终点：它同时移除了价值模型、�
 4. **多任务与多模态泛化**：GPG的组内归一化假设奖励信号具有可比性，在奖励尺度差异巨大的多任务场景下，是否需要引入任务特定的归一化策略？
 
 5. **与过程奖励的兼容性**：当前GPG仅使用最终奖励信号（one-step estimation），能否扩展到使用过程奖励模型（PRM）的场景，以提供更细粒度的优势估计？
+
+
 
 ## 原文 PDF
 

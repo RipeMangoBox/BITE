@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/HOI_Dyn_Learning_Interaction_Dynamics_for_Human_Object_Motion_Diffusion.pdf
+project_link: https://wulin97.github.io/hoi-dyn
+code_link: https://github.com/AIR-Lan/HOI-Dyn
 aliases:
 - HDLIDHOMD
 tags:
@@ -28,12 +30,16 @@ claims:
 | 中文题名 | HOI Dyn Learning Interaction Dynamics for Human Object Motion Diffusion |
 | 英文题名 | HOI Dyn Learning Interaction Dynamics for Human Object Motion Diffusion |
 | 会议/期刊 | arXiv 2025 |
-| Links | [Project](https://wulin97.github.io/hoi-dyn) · [arXiv](https://arxiv.org/abs/1412.6980) · [Code](https://github.com/AIR-Lan/HOI-Dyn) · [paper](https://arxiv.org/abs/2507.01737) |
+| Links | [Project](https://wulin97.github.io/hoi-dyn) · [paper](https://arxiv.org/abs/1412.6980) · [Code](https://github.com/AIR-Lan/HOI-Dyn) · [paper](https://arxiv.org/abs/2507.01737) |
 | Topic | #topic/vision_multimodal_applications #topic/generative_models_diffusion #topic/generative_models_diffusion/diffusion_image_video |
 | Method |  |
 | Dataset |  |
 
-## 概述
+
+> [!tip] 效果简介
+> 量化结果、消融证据与适用边界见“实验与关键发现”。
+
+## 概要
 
 **问题与瓶颈**  
 人-物交互（HOI）生成的核心难点在于，现有方法将人与物的运动视为耦合的黑箱，缺乏对交互过程中**因果时序**与**物理响应**的显式建模。这导致生成结果中物体运动常与人体动作脱节——例如物体在人手尚未接触时就提前移动，或交互结束后缺乏连贯的物理反馈。
@@ -47,7 +53,7 @@ HOI-Dyn 将 HOI 生成重新形式化为**“驱动者-响应者”系统**：�
 **主要结果**  
 在 FullBodyManipulation 基准上，HOI-Dyn 在物体平移误差 **Te** 指标上达到 **5.58 cm**，相比基线方法 CHOIS 的 6.16 cm 降低了 **0.58 cm**（Table 1）。定性分析显示，HOI-Dyn 生成的物体运动具有更合理的因果时序——物体仅在人手接触后才产生响应，且交互结束后保持连贯的物理状态，而 CHOIS 常出现物体提前运动或运动不稳定的现象。消融实验进一步验证了耦合式动力学建模、多步预测损失以及引导策略对性能的贡献。
 
-## 背景与动机
+
 
 人-物交互（Human-Object Interaction, HOI）生成是计算机视觉与图形学中的核心问题，其目标是根据场景上下文合成自然、物理合理的人体与物体协同运动。该任务在具身智能、虚拟角色动画、AR/VR 等领域具有广泛的应用前景。然而，现有方法面临一个关键瓶颈：**物体运动与人体动作之间的因果时序关系难以建模**。
 
@@ -63,7 +69,9 @@ HOI-Dyn 正是针对上述缺口而提出。其核心动机可概括为两点：
 
 通过上述设计，HOI-Dyn 在保持扩散模型生成多样性与条件匹配能力的同时，显著提升了交互的物理合理性与序列级连贯性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 HOI-Dyn 的核心创新在于将人-物交互生成重新概念化为 **Driver-Responder 系统**，并引入一个轻量级的**交互动力学模型**来显式建模物体对人物运动的因果响应机制，从而突破了现有方法（如 CHOIS）在物理时序合理性上的瓶颈。
 
@@ -110,7 +118,7 @@ HOI-Dyn 在标准 HOI 扩散训练目标 $\mathcal{L}_{\mathrm{hoi}}$ 基础上�
 - 动力学模型的轻量化设计（0.5M 参数）虽已证明充分性，但更复杂交互（如可变形物体、流体）是否仍适用需进一步验证。
 - 引导策略（guidance）的消融（Table 4）表明即使无引导 HOI-Dyn 也优于 CHOIS，但引导项在不同场景下的泛化效果仍需更多证据支持。
 
-## 整体框架
+
 
 HOI‑Dyn 将人‑物交互生成建模为一个**驱动‑响应系统**（Driver‑Responder System）：人体动作作为“驱动者”，物体根据人体运动产生符合物理规律的“响应”。整个框架由两个核心模块串联构成：**条件运动扩散**（Conditional Motion Diffusion）与**交互动力学**（Interaction Dynamics），其整体流程如 **Figure 1** 所示。
 
@@ -136,7 +144,7 @@ HOI‑Dyn 将人‑物交互生成建模为一个**驱动‑响应系统**（Dri
 
 该耦合设计将人体运动、接触状态与物体响应统一建模，相较于解耦策略（如分别建模接触与运动）在相近参数量下实现了更优的交互质量（见 **Table 3**）。
 
-## 核心模块与公式推导
+
 
 ### 3.1 框架总览：驱动-响应系统
 
@@ -221,7 +229,9 @@ $$
 ![[assets/figures/papers/paper_list_l1685_HOI_Dyn_Learning_Interaction_Dynamics_for_Human_Object_Motion_Diffusion/figures/002_Figure_2.jpg]]
 *Figure 2: Comparison of HOI-Dyn and CHOIS on physical plausibility and sequence-level coherence. (a–b) CHOIS produces premature object motion lacking causal timing; (c) HOI-Dyn generates more realistic post-contact responses; (d) HOI-Dyn maintains consistent human-object interaction across the full sequence. Green markers indicate object initial state and sparse waypoints*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果
 
@@ -285,7 +295,9 @@ HOI-Dyn 在 FullBodyManipulation 基准上全面超越现有方法。以核心�
 ![[assets/figures/papers/paper_list_l1685_HOI_Dyn_Learning_Interaction_Dynamics_for_Human_Object_Motion_Diffusion/figures/005_Figure_3.jpg]]
 *Figure 3: HOI generation in realistic 3D scenes. The virtual agent interacts with different objects while maintaining physical plausibility and environmental consistency*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法定位：Driver-Responder 动力学建模
 
@@ -323,6 +335,8 @@ HOI-Dyn 将人-物交互生成重新概念化为一个**Driver-Responder 系统*
 2. **跨场景泛化**：在 3D-FUTURE 数据集上（Table 2）已初步验证泛化能力，但在真实世界场景中，动力学模型的鲁棒性如何？特别是面对训练集中未见的物体几何和物理属性时。
 3. **引导策略的边界**：Table 4 显示结合 feet-floor 和 hand-object 引导可达到 SOTA，但这些引导项是否可能在某些场景下与动力学模型产生冲突？
 4. **长序列稳定性**：当前框架在 K=2 或 K=3 时最优，更长时间尺度的交互动力学预测是否存在误差累积问题？是否需要引入闭环反馈机制？
+
+
 
 ## 原文 PDF
 

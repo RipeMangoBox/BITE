@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/EMOVA_Empowering_Language_Models_to_See_Hear_and_Speak_with_Vivid_Emotions.pdf
+project_link: https://emova-ollm.github.io/
+code_link: null
 aliases:
 - EMOVA
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | EMOVA：赋能语言模型以生动情感看、听与说 |
 | 英文题名 | EMOVA: Empowering Language Models to See, Hear and Speak with Vivid Emotions |
 | 会议/期刊 | CVPR 2025 |
-| Links | [paper](https://arxiv.org/abs/2409.18042); [Project](https://emova-ollm.github.io/) |
+| Links | [paper](https://arxiv.org/abs/2409.18042) · [Project](https://emova-ollm.github.io/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | EMOVA |
 | Dataset | MME, MMBench, OCRBench, MathVista |
@@ -40,7 +42,7 @@ claims:
 > - MMBench 上，score 为 86.4 (EMOVA 72B)，对比 83.4 (GPT-4o)，变化 +3.0。
 > - OCRBench 上，score 为 843 (EMOVA 72B)，对比 736 (GPT-4o)，变化 +107。
 
-## 概述
+## 概要
 
 EMOVA 旨在解决全模态大语言模型（Omni-modal LLM）领域一个核心瓶颈：现有模型要么依赖外部 TTS 工具进行语音生成，无法实现端到端的实时交互；要么使用离散视觉分词器导致视觉细节丢失，且普遍缺乏对语音情感的精细控制能力。如何在保持 SOTA 视觉语言性能的前提下，无缝整合语音模态并赋予其生动的情绪表达能力，是尚未被充分解决的难题。
 
@@ -55,7 +57,7 @@ EMOVA 的核心设计理念是**以文本模态为桥梁，实现语义与声学
 
 **方法定位**：EMOVA 采用连续视觉编码器（QwenViT）保留细粒度视觉信息，结合语义-声学解耦的离散语音分词器（SPIRAL + FSQ）实现端到端语音理解与生成，并通过轻量级风格模块控制语音的情感、音高等声学属性。模型以 Qwen-2.5 为底座 LLM，提供 3B/7B/72B 三种规模的全系列开源版本。
 
-## 背景与动机
+
 
 大型语言模型（LLM）在文本理解和生成方面取得了显著进展，但要让模型真正像人类一样“看、听、说”并与世界进行多模态交互，仍然是一个核心挑战。当前的多模态LLM大多局限于视觉与文本的双模态理解，少数支持语音的模型则面临以下瓶颈：
 
@@ -65,7 +67,9 @@ EMOVA 的核心设计理念是**以文本模态为桥梁，实现语义与声学
 
 **本文动机。** EMOVA旨在填补上述空白：通过设计语义-声学解耦的语音分词器，将语音内容与风格分离，使语音单元更接近文本嵌入空间，从而促进全模态对齐；同时以文本模态为桥梁，联合训练图像-文本和语音-文本数据，实现视觉语言与语音能力的相互增强。最终，EMOVA致力于成为首个在视觉语言和语音基准上同时达到SOTA、且支持情感口语对话的开源全模态LLM。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 EMOVA 的核心创新在于以**语义-声学解耦的语音分词器**和**文本为中心的全模态联合对齐**为两个关键支点，系统性地解决了现有全模态大语言模型在语音生成、视觉保真与情感表达三者之间的根本性冲突。
 
@@ -92,7 +96,7 @@ EMOVA 的核心创新在于以**语义-声学解耦的语音分词器**和**文�
 
 需要指出的是，EMOVA 目前仍以文本模态作为语音生成的中介（先文本后语音单元），尚未实现直接的单元到单元生成，这制约了语音响应的实时性。同时，双工交流（同时听和说）与对话中动态情感感知仍是未解决的开放问题。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l46_https_arxiv_org_abs_2409_18042/figures/003_Figure_2.jpg]]
 *Figure 2: Model architecture of EMOVA. The vision encoder extracts continuous visual features, which are projected into the textual embedding space as visual tokens, while the input speech is encoded and quantized into discrete speech units. Given the omni-modal inputs, EMOVA can generate both textual and speech responses with vivid emotional controls. Check Sec. 3 for more architectural details*
@@ -133,7 +137,7 @@ $$D_{\text{omi}} = \{ ( x_V, u_S, x_T^o, c_{\text{style}}^o, u_S^o )_i \}_{i=1}^
 
 语音响应被分解为五个步骤的链式条件概率：识别用户指令、生成文本回复、预测情绪标签、预测音高标签、生成语音单元。该数据合成自现有文本和视觉指令数据集，经过滤、清洗、风格标注和 TTS 转换后得到，总计 4.4M 条多任务全模态样本（Figure 8）。
 
-## 核心模块与公式推导
+
 
 ### 整体架构与全模态生成概率
 
@@ -173,7 +177,9 @@ $$D_{omi} = \{ ( x_V, u_S, x_T^o, c_{style}^o, u_S^o )_i \}_{i=1}^{N}$$
 
 其中 $x_V$ 为可选图像，$u_S$ 为输入语音单元，$x_T^o$ 为文本回复，$c_{style}^o$ 为预测的风格标签（情绪与音高），$u_S^o$ 为输出语音单元。语音响应过程被链式分解为五个步骤：识别用户指令、生成文本回复、预测情绪标签、预测音高标签、生成语音单元（详见附录 B.2）。这种显式的分步设计使模型能够按指定格式生成多模态输出，且仅需少量全模态指令数据即可学会。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心结果：视觉语言与语音双SOTA
 
@@ -235,7 +241,9 @@ Table 3报告了EMOVA-7B在四个语音对话测试集上的端到端表现。�
 ![[assets/figures/papers/paper_list_l46_https_arxiv_org_abs_2409_18042/figures/001_Figure_1.jpg]]
 *Figure 1: EMOVA is the very first omni-modal LLM with stateof-the-art performance on both vision-language and speech benchmarks simultaneously. See detailed results in Table 2*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -270,6 +278,8 @@ EMOVA 处于全模态大语言模型（Omni-modal LLM）这一新兴技术路线
 **视觉感知的深度增强。** 如何结合自监督视觉编码器或专家混合架构进一步提升视觉感知？当前视觉编码器主要依赖监督预训练，自监督方法（如 DINOv2、MAE）可能提供更丰富的视觉表征。此外，针对文档理解、医学影像、遥感等专业领域，可能需要引入领域特定的视觉专家模块。
 
 **全模态鲁棒性。** 在嘈杂或低质量视觉/语音输入下，如何保证全模态模型的鲁棒性？现实场景中常出现背景噪声、多人重叠语音、低光照图像等情况，当前模型在这些条件下的性能退化程度尚缺乏系统评估。可能的解决方向包括：引入对抗训练增强模态编码器的鲁棒性、设计模态置信度估计机制以动态调整模态融合权重、以及构建覆盖退化条件的全模态测试基准。
+
+
 
 ## 原文 PDF
 

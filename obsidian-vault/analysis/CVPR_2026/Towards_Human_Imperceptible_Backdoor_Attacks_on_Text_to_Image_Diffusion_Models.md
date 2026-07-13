@@ -44,7 +44,7 @@ claims:
 > - Woman→Nude Woman (Table 3 vs Dirty-label) 上，FTR-W 1.9% vs 19.5% (Dirty-label) (-17.6%)；UCR 0% vs 100% (Dirty-label) (-100%)。
 > - Average over 3 scenarios (Table 2) 上，ASR-H 97.2% vs — (—)。
 
-## 概述
+## 概要
 
 ### 1. 问题与瓶颈
 
@@ -84,7 +84,7 @@ claims:
 
 **证据强度评估**：主要结论均有置信度 0.9–0.95 的定量实验支撑，但需注意以下局限：(1) 实验仅基于 Stable Diffusion v1.5，在 SDXL、Imagen 等更大模型上的泛化性未验证；(2) NSFW 自动检测器（ASR-N）在噪声防御条件下可能高估攻击成功率，与人工评估存在不一致；(3) 复合触发器要求提示包含合适的主语名词，否则攻击无法激活。
 
-## 背景与动机
+
 
 ### 文本到图像扩散模型的安全威胁
 
@@ -112,7 +112,9 @@ Figure 1 直观展示了这一差异：左侧的 dirty-label 投毒样本中，�
 
 为实现上述目标，本文引入**双模态操纵策略**：在图像域，通过潜在空间优化注入人类不可感知的噪声扰动；在文本域，构建基于同义词替换与句法重构的复合语义触发器，并辅以覆盖样本防止意外激活。这一设计从根本上改变了后门攻击的隐蔽性范式，将攻击从“显式错配”推向“隐式操纵”。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文提出了首个面向文本到图像扩散模型的 **clean-label 后门攻击**，其核心创新在于通过双模态操纵策略，在保持图像-文本语义一致性的前提下实现高隐蔽、高精度的后门植入。图 1 直观对比了传统 dirty-label 攻击与本文 clean-label 攻击的差异：左侧 dirty-label 投毒样本中，图像内容（如女性肖像）与文本描述（如“裸体女性”）存在显著的语义错配，极易被自动数据清洗工具或人工审查发现；而右侧本文方法生成的投毒样本在视觉与文本层面均保持语义对齐，大幅提升了攻击的隐蔽性。
 
@@ -153,7 +155,7 @@ $$\mathcal { D } _ { p } = \mathcal { D } _ { c l e a n } \cup \mathcal { D } _ 
 
 上述四个 changed slots 构成了一条完整的隐蔽攻击链路：clean-label 投毒保证样本通过内容审查，潜在空间扰动保证图像视觉不可感知，复合语义触发器保证文本自然且激活条件稀疏，覆盖样本保证低误触发率。这一设计使得本文方法在三个攻击场景下平均 ASR-H 达到 97.2%，而 FTR-W 和 FTR-S 分别仅为 4.5% 和 5.7%（Table 2），在攻击有效性与隐蔽性之间取得了现有方法无法达到的平衡。
 
-## 整体框架
+
 
 本文提出首个面向文本到图像扩散模型的 **clean‑label 后门攻击**，其核心设计理念是：在保持图像‑标题语义一致性的前提下，通过**双模态操纵**实现高隐蔽、高精度的后门植入。整体流水线如 Figure 2 所示，由三个紧密耦合的模块构成：语义保留文本触发器生成、人类不可感知视觉扰动注入，以及覆盖样本生成与数据集构造。
 
@@ -186,7 +188,7 @@ $$
 
 > **手动验证提示**：Figure 2 的完整流水线示意图需结合原文查看，以确认各模块间数据流的精确连接方式。
 
-## 核心模块与公式推导
+
 
 ### 双模态操纵总体框架
 
@@ -237,7 +239,9 @@ $$\mathcal{D}_p = \mathcal{D}_{\mathrm{clean}} \cup \mathcal{D}_p \cup \mathcal{
 ![[assets/figures/papers/paper_list_l2350_https_openaccess_thecvf_com_content_CVPR2026_html_Wu_Towards_Human_Imper/figures/001_Figure_1.jpg]]
 *Figure 1: An examples of poisoned image-caption pair by dirty-label backdoor attack (left) and poisoned image-caption pair by our proposed clean-label attacks (right)*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -302,7 +306,9 @@ Table 7 展示了在推理阶段对输入图像施加不同程度高斯噪声扰
 ![[assets/figures/papers/paper_list_l2350_https_openaccess_thecvf_com_content_CVPR2026_html_Wu_Towards_Human_Imper/figures/004_Table_1.jpg]]
 *Table 1: Visualization of three attack scenarios*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：从 Dirty-Label 到 Clean-Label 后门攻击
 
@@ -352,6 +358,8 @@ Table 7 展示了在推理阶段对输入图像施加不同程度高斯噪声扰
 4. **覆盖样本的自动化生成**：攻击者能否利用更先进的生成模型自动构造更自然、更多样的覆盖样本，以进一步增强隐蔽性并降低人工构造成本？
 
 5. **NSFW 检测器的不一致性**：实验观察到 NSFW 自动检测器（ASR-N）与人工评估（ASR-H）在某些防御条件下存在显著不一致。这一现象的根源是检测器本身的局限性还是攻击的对抗特性，值得进一步探究。
+
+
 
 ## 原文 PDF
 

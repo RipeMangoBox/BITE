@@ -5,6 +5,8 @@ paper_level: A
 venue: AAAI
 year: 2026
 pdf_ref: paperPDFs/AAAI_2026/DREAMRUNNER_Fine_Grained_Compositional_Story_to_Video_Generation_with_Retrieval_Augmented_Motion_Adaptation.pdf
+project_link: https://zunwang1.github.io/DreamRunner
+code_link: null
 aliases:
 - DREAMRUNNER
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | DreamRunner：基于检索增强运动适应的细粒度组合式故事到视频生成 |
 | 英文题名 | DREAMRUNNER: Fine-Grained Compositional Story-to-Video Generation with Retrieval-Augmented Motion Adaptation |
 | 会议/期刊 | AAAI 2026 |
-| Links | [paper](https://arxiv.org/abs/2411.16657); [Project](https://zunwang1.github.io/DreamRunner) |
+| Links | [paper](https://arxiv.org/abs/2411.16657) · [Project](https://zunwang1.github.io/DreamRunner) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | DREAMRUNNER |
 | Dataset | DreamStorySet (story-to-video generation), DreamStorySet, T2V-CompBench (compositional T2V), T2V-CompBench |
@@ -40,7 +42,7 @@ claims:
 > - DreamStorySet 上，Transition smoothness (DINO) 为 93.6，对比 73.6 (VLogger)，变化 +27.2%。
 > - T2V-CompBench (compositional T2V) 上，Dynamic attribute binding (CogVideoX-2B + SR3A) 为 0.2672，对比 0.2118 (CogVideoX-2B)，变化 +26.2%。
 
-## 概述
+## 概要
 
 故事到视频生成（Story-to-Video Generation）的核心瓶颈在于：现有方法在利用LLM完成高层次场景规划后，直接将复杂的单场景文本描述输入T2V模型，缺乏对多对象、多动作与连续事件的精细空间-时间控制，导致生成视频普遍存在对象遗漏、动作模糊、角色不一致和场景过渡不自然等问题。
 
@@ -55,7 +57,7 @@ claims:
 
 在方法谱系与知识库定位上，DREAMRUNNER 可视为对“LLM规划 + T2V生成”范式的一次深度改造。它借鉴了 **VideoDirectorGPT**（Lin et al., 2023）的LLM规划思路，但将规划粒度从场景级深化至帧级实体布局；它吸收了 **VLogger**（Zhuang et al., 2024）的角色定制思想，但通过区域基LoRA注入实现了更精准的多角色隔离；它以全3D注意力的 **CogVideoX-2B/5B**（Yang et al., 2024c）为基座，通过掩码注意力机制将其改造为支持区域条件化的生成器，从而在开源模型上实现了接近闭源模型的精细组合控制能力。
 
-## 背景与动机
+
 
 故事到视频生成（Story-to-Video Generation）旨在将一段叙述性文本转化为视觉连贯、事件丰富的长视频。与常规的文本到视频（T2V）生成不同，该任务要求模型同时处理多角色外观一致性、跨场景的事件过渡、以及细粒度的对象-动作绑定，其核心挑战在于对复杂组合语义的精确时空控制。
 
@@ -65,7 +67,9 @@ claims:
 
 DREAMRUNNER 的动机正是填补这一空白。其核心思路是：将故事转化为细粒度的帧级多实体布局方案，通过检索增强从外部视频中学习目标运动先验，再利用区域掩码注意力将外观与运动先验分别注入到对应的时空区域，从而在保持全局连贯性的同时，实现对复杂组合与运动的解耦控制。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DREAMRUNNER 的核心创新在于将故事视频生成从“单阶段文本条件注入”重构为“规划-检索-区域注入”三阶段解耦范式，从根本上解决了现有方法在复杂场景下对象遗漏、动作模糊和过渡不自然的问题。其关键创新点体现在以下四个维度的设计转变：
 
@@ -99,7 +103,7 @@ $$Wx = W_0 x + A_{\text{witch}} B_{\text{witch}} (\text{Mask}_{\text{witch}} \cd
 
 上述四个 changed slot 构成了一个完整的因果链：精细的帧级布局计划为区域注入提供了空间锚点，检索增强的运动先验为时间 LoRA 提供了高质量的学习目标，SR3AI 的掩码注意力确保了条件化的精确性，而区域基 LoRA 注入则实现了多角色多运动的无干扰隔离。这一设计使得 DREAMRUNNER 在 DreamStorySet 上较 VLogger 实现角色一致性提升 13.1%、事件过渡平滑度提升 27.2%（Table 1），并在 T2V-CompBench 上显著增强了开源模型的组合式生成能力（Table 2）。
 
-## 整体框架
+
 
 DREAMRUNNER 的核心设计思路是将复杂的叙事性故事转化为可精细控制的视频生成过程。其整体管道由三个紧密协作的阶段构成，形成“高层规划→先验获取→区域化注入”的闭环。
 
@@ -117,7 +121,7 @@ DREAMRUNNER 的核心设计思路是将复杂的叙事性故事转化为可精�
 
 三个阶段的因果逻辑清晰：第一阶段提供“做什么”的细粒度蓝图，第二阶段提供“怎么做”的外观和运动先验知识，第三阶段则通过区域化解耦的注意力与注入机制，确保蓝图与先验在生成过程中被精确执行。
 
-## 核心模块与公式推导
+
 
 DREAMRUNNER 由三个关键模块构成：双层视频计划生成、运动检索与先验学习、以及空间-时间区域基 3D 注意力与先验注入（SR3AI）。以下逐一展开其核心机制与关键公式。
 
@@ -161,7 +165,9 @@ $$Wx = W_0 x + A_{witch} B_{witch} (Mask_{witch} \cdot x) + A_{cat} B_{cat} (Mas
 
 该公式确保女巫（witch）和猫（cat）的 LoRA 仅作用于各自的空间-时间掩码区域，实现无干扰的多角色外观与运动绑定。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -191,7 +197,6 @@ Figure 4 展示了多角色与单角色场景下的定性对比。在多角色�
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l14_DREAMRUNNER_Fine_Grained_Compositional_Story_to_Video_Generation_with_Re/figures/007_Figure.jpg]]
 
 ![[assets/figures/papers/paper_list_l14_DREAMRUNNER_Fine_Grained_Compositional_Story_to_Video_Generation_with_Re/figures/014_Figure_6.jpg]]
 *Figure 6: A squirrel gathers nuts and a bat hangs from a tree branch A kid and a penguin watch a movie in the cinema Figure 6: Qualitative results of DREAMRUNNER generated with prompts characterizing action binding. SR3A denotes our spatial-temporal region-based attention module*
@@ -211,18 +216,15 @@ Figure 4 展示了多角色与单角色场景下的定性对比。在多角色�
 ![[assets/figures/papers/paper_list_l14_DREAMRUNNER_Fine_Grained_Compositional_Story_to_Video_Generation_with_Re/figures/019_Figure_11.jpg]]
 *Figure 11: Qualitative results of DREAMRUNNER generated with prompts characterizing spatial relationships. SR3A denotes our spatial-temporal region-based attention module*
 
-![[assets/figures/papers/paper_list_l14_DREAMRUNNER_Fine_Grained_Compositional_Story_to_Video_Generation_with_Re/figures/020_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l14_DREAMRUNNER_Fine_Grained_Compositional_Story_to_Video_Generation_with_Re/figures/021_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l14_DREAMRUNNER_Fine_Grained_Compositional_Story_to_Video_Generation_with_Re/figures/022_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l14_DREAMRUNNER_Fine_Grained_Compositional_Story_to_Video_Generation_with_Re/figures/023_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l14_DREAMRUNNER_Fine_Grained_Compositional_Story_to_Video_Generation_with_Re/figures/024_Figure.jpg]]
 
 
-## 方法谱系与知识库定位
+
+
+
+
+
+
+## 定位与知识库关联
 
 ### 基线关系与谱系定位
 
@@ -260,6 +262,8 @@ DREAMRUNNER 的适用性受以下条件约束：
 3. **运动检索的开放域扩展：** 运动检索管道能否扩展到更大规模、开放域的未标注视频源，并通过无监督或自监督方式学习更通用的运动表示？
 
 4. **消除测试时微调：** 是否有方法减少或消除测试时微调的计算开销，例如通过离线大规模预训练通用运动适配器，使其能在推理时零样本注入？
+
+
 
 ## 原文 PDF
 

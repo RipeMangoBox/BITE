@@ -5,6 +5,8 @@ paper_level: A
 venue: ICCV
 year: 2025
 pdf_ref: paperPDFs/ICCV_2025/Perception_as_Control_Fine_grained_Controllable_Image_Animation_with_3D_aware_Motion_Representation.pdf
+project_link: https://chen-yingjie.github.io/projects/Perception-as-Control
+code_link: null
 aliases:
 - PAC
 - Perception-as-Control
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 感知即控制：基于3D感知运动表示的细粒度可控图像动画 |
 | 英文题名 | Perception-as-Control: Fine-grained Controllable Image Animation with 3D-aware Motion Representation |
 | 会议/期刊 | ICCV 2025 |
-| Links | [paper](https://arxiv.org/abs/2501.05020); [Project](https://chen-yingjie.github.io/projects/Perception-as-Control) |
+| Links | [paper](https://arxiv.org/abs/2501.05020) · [Project](https://chen-yingjie.github.io/projects/Perception-as-Control) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Perception-as-Control |
 | Dataset | RealEstate-10K, WebVid-10M |
@@ -40,7 +42,7 @@ claims:
 > - RealEstate-10K 上，FVD 为 52.421，对比 CameraCtrl: 178.497, MotionCtrl: 122.570，变化 显著降低。
 > - WebVid-10M 上，FVD 为 161.076，对比 Motion-I2V: 367.524, MOFA-Video: 175.701，变化 明显优于。
 
-## 概述
+## 概要
 
 可控图像动画旨在根据用户意图驱动静态图像中的相机和物体运动，但现有方法面临一个核心瓶颈：光流、点轨迹、Plücker坐标等运动表示难以同时支持相机与物体运动的细粒度协同控制——它们要么将两类运动信号混叠注入导致冲突，要么因缺乏显式3D空间理解而无法保证运动的空间一致性。
 
@@ -58,8 +60,6 @@ claims:
 
 **方法定位**：Perception-as-Control属于基于扩散模型的可控视频生成方法，其运动表示与具体基座架构正交——论文在SVD版本的CameraCtrl和MotionCtrl上验证了该表示的即插即用特性。相较于CameraCtrl（仅相机控制）、MotionCtrl（相机与物体控制但信号混叠）、Motion-I2V和MOFA-Video（仅物体控制）等基线，本方法首次实现了基于统一3D感知表示的相机-物体细粒度协同控制。
 
-## 背景与动机
-
 图像动画——即从单张静态参考图像出发，生成一段符合用户意图的动态视频——是视觉内容生成领域的核心任务之一。其难点在于，生成过程不仅需要保持参考图像的外观一致性，还必须精确地控制场景中相机和物体的运动。近年来，基于扩散模型的视频生成方法取得了长足进步，但在运动控制粒度上仍面临显著瓶颈。
 
 现有运动控制方法主要依赖2D光流、Plücker坐标或稀疏轨迹点作为控制信号。这些表示形式存在一个根本性缺陷：它们难以在一个统一的框架内，同时支持相机运动和物体运动的协同控制。具体而言，相机运动（如平移、旋转、变焦）与物体运动（如位移、缩放）在2D信号空间中往往相互耦合，导致控制指令之间产生冲突，最终生成的视频出现运动不协调、物体漂移或空间关系错乱等问题。例如，**CameraCtrl**（He et al., arXiv 2024）专注于相机轨迹控制，**Motion-I2V**（Shi et al., arXiv 2024）和**MOFA-Video**（Li et al., arXiv 2024）则侧重于物体运动，而**MotionCtrl**（Wang et al., arXiv 2023）虽尝试同时处理两者，但因其控制信号缺乏空间对齐性，协同效果仍不理想。
@@ -68,7 +68,7 @@ claims:
 
 本文的动机正是源于这一洞察：如果我们将参考图像对应的3D场景简化为一个可操作的感知模型，并将相机和物体运动统一转化为该模型在不同视角下的视觉变化，那么运动控制问题就转化为一个“感知”问题。这种“感知即控制”的思路，使得相机运动对应于对整个场景包络的透视观察变化，物体运动对应于场景内关键部件的空间位置变化，二者在统一的3D空间中对齐，从根源上消除了控制信号层面的冲突。
 
-## 核心创新
+## 核心方法与创新机理
 
 本工作的核心创新在于将图像动画的可控生成问题重新定义为“感知即控制”：通过构建一个**3D感知的运动表示**，将相机运动和物体运动统一转化为空间对齐的视觉控制信号，从而实现对两者的细粒度、无冲突协同控制。
 
@@ -97,8 +97,6 @@ claims:
 ### 方法局限性
 
 尽管3D感知运动表示在解耦相机与物体运动方面表现出色，但将物体部分简化为单位球体意味着该表示**无法表达物体的旋转运动**。此外，整体的3D场景构建依赖于现成算法（TartanVO用于相机姿态估计、SpaTracker用于3D点跟踪），这些算法的精度直接影响控制信号的质量。对于人物动作等复杂运动，受基座模型能力限制，生成效果仍有不足。
-
-## 整体框架
 
 ![[assets/figures/papers/paper_list_l23_Perception_as_Control_Fine_grained_Controllable_Image_Animation_with_3D/figures/001_Figure_1.jpg]]
 *Figure 1: Potential applications for Perception-as-Control. By constructing 3D-aware motion representation based on user intentions and utilizing the perception results as motion control signals, the proposed fine-grained motion-controllable image animation framework can be applied to various motion-related video synthesis tasks, such as image-based motion generation (animate image according to user instructions), and video-based motion clone (mimic the entire motions), motion transfer (relocate and rescale local motions based on semantic correspondence), local motion editing (edit fine-grained scene and object motions in user-specified regions)*
@@ -142,8 +140,6 @@ Perception-as-Control 的整体框架遵循“感知即控制”的核心思想�
 - **中间表示**：3D 感知运动表示（世界包络 + 单位球体的空间配置）。
 - **控制信号**：从 3D 感知表示渲染得到的相机控制图和物体控制图。
 - **输出**：与参考图像外观一致、运动符合用户意图的视频帧序列。
-
-## 核心模块与公式推导
 
 ### 扩散模型基础
 
@@ -196,7 +192,7 @@ $$\mathcal{L} = \mathbb{E}_{x_0, c_{\mathrm{img}}, c_{\mathrm{cam}}, c_{\mathrm{
 
 消融实验表明，三阶段策略的FVD为161.076，显著优于两阶段（254.907）和一阶段（318.941）训练，验证了渐进式引入控制能力的有效性。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主要结果
 
@@ -250,21 +246,10 @@ $$\mathcal{L} = \mathbb{E}_{x_0, c_{\mathrm{img}}, c_{\mathrm{cam}}, c_{\mathrm{
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l23_Perception_as_Control_Fine_grained_Controllable_Image_Animation_with_3D/figures/015_Figure_11.jpg]]
-*Figure 11: Results of object-only motion control using our Perception-as-Control. Figure 12. Results of collaborative motion control*
-
 ![[assets/figures/papers/paper_list_l23_Perception_as_Control_Fine_grained_Controllable_Image_Animation_with_3D/figures/016_Figure_13.jpg]]
 *Figure 13: The frameworks of MotionCtrl++ and CameraCtrl++. (a) One-stage Training*
 
-![[assets/figures/papers/paper_list_l23_Perception_as_Control_Fine_grained_Controllable_Image_Animation_with_3D/figures/018_Figure.jpg]]
-*Figure: (b)Motion Clone (Video-based) (d) Motion Editing (Video-based)*
-
-![[assets/figures/papers/paper_list_l23_Perception_as_Control_Fine_grained_Controllable_Image_Animation_with_3D/figures/019_Figure.jpg]]
-*Figure: (a) Motion Generation (Image-based) (c)Motion Transfer(Video-based)*
-
-![[assets/figures/papers/paper_list_l23_Perception_as_Control_Fine_grained_Controllable_Image_Animation_with_3D/figures/004_Table.jpg]]
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 与现有基线方法的关系
 

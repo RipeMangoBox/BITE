@@ -42,7 +42,7 @@ claims:
 > - RMLLMU-Bench (LLaVA-1.5-7B, 15% Forget Rate) 上，Classification Accuracy Fgt↓ 21.80 vs 51.87 (Vanilla) (-30.07)；Reasoning Leakage Fgt↓ 39.20 vs 79.50 (Vanilla) (-40.30)。
 > - RMLLMU-Bench (Qwen-2.5-VL-7B, 15% Forget Rate) 上，Classification Accuracy Fgt↓ 33.80 vs 60.50 (Vanilla) (-26.70)；Classification Accuracy Ret↑ 53.60 vs 53.80 (Vanilla) (-0.20)。
 
-## 概述
+## 概要
 
 **核心问题**：现有多模态大语言模型（MLLM）与推理大语言模型（LRM）的遗忘方法存在根本性困境——若仅遗忘最终答案，思维链中的中间推理步骤仍会泄漏敏感信息；若强行抑制推理链，则导致模型推理能力崩溃，输出不连贯的重复内容。现有方法无法同时实现深度遗忘与推理保留。
 
@@ -52,7 +52,7 @@ claims:
 
 **主要结果**：在 RMLLMU-Bench 基准上，R-MUSE 在 LLaVA-1.5-7B 和 Qwen-2.5-VL-7B 两个骨干网络上均显著优于所有基线。以 15% 遗忘率为例，R-MUSE 在 LLaVA-1.5-7B 上将遗忘集分类准确率从 Vanilla 模型的 51.87% 降至 21.80%，推理泄漏从 79.50% 降至 39.20%，同时保留集准确率维持在 45.85%；在 Qwen-2.5-VL-7B 上实现遗忘集准确率 33.80%（Vanilla 为 60.50%），而保留集准确率几乎无损（53.60% vs 53.80%）。消融实验证实，移除 RRS 后保留集准确率从 54.1% 骤降至 34.0%，验证了正交投影保护机制的核心作用。PCA 可视化进一步表明，R-MUSE 引导的隐藏状态在遗忘集上发生显著方向性偏移，而在保留集上与原始模型高度重叠，实现了定向遗忘而不破坏保留能力。
 
-## 背景与动机
+
 
 ### 推理型多模态大语言模型的遗忘困境
 
@@ -82,7 +82,9 @@ Figure 1 清晰地揭示了这一困境。当遗忘方法仅针对最终答案�
 
 具体而言，R-MUSE通过三个关键设计实现这一目标：（1）构建覆盖答案和思维链的混合跨度遗忘方向，从根本上抑制推理泄漏；（2）学习推理保留子空间（RRS），并将遗忘引导投影到其正交补空间，实现遗忘与推理的结构化解耦；（3）引入基于最优运输距离的自适应校准机制，无需手动超参数即可动态确定引导强度。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 R-MUSE 的核心创新在于将多模态大语言模型（MLLM）的遗忘问题从传统的参数修改范式迁移到**无需训练的推理时激活引导**框架，并通过三个协同设计的机制解决了一个此前被忽视的关键瓶颈：**如何在遗忘敏感信息的同时，既不泄漏推理链中的知识，又不损害模型的通用推理能力**。
 
@@ -116,7 +118,7 @@ $$\mathsf{Upd}_{\ell}\big(\mathbf{q}; \mathbf{h}_{\ell}\big) = g(\mathbf{q})\lef
 
 传统激活引导方法依赖固定超参数（如系数 $\lambda$）来调节引导强度，这在实际部署中需要大量手动调优，且难以适应不同查询的异质性。R-MUSE 将引导过程形式化为**最优运输问题**：根据当前隐藏状态到安全流形的最小测地距离，自适应确定引导强度 $\lambda = \min\{1, \theta_{\mathrm{tar}} / \theta_{\mathrm{dir}}\}$，并通过球面线性插值实现范数保持的激活更新。消融实验表明，用固定强度替代 ACS（w/o ACS）会导致遗忘-保留平衡显著变差，证实了自适应校准可有效避免欠引导或过引导。
 
-## 整体框架
+
 
 R-MUSE 是一种**无需训练的推理时激活引导框架**，其核心目标是在遗忘敏感信息的同时保护通用多模态推理能力。该框架通过离线构建两个正交子空间——遗忘子空间与推理保留子空间——并在推理时通过门控机制和自适应校准实现定向干预。
 
@@ -152,7 +154,7 @@ R-MUSE 是一种**无需训练的推理时激活引导框架**，其核心目标
 ![[assets/figures/papers/paper_list_l790_https_arxiv_org_abs_2512_17911/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of the core challenge in unlearning for RMLLMs. Left: MLLM unlearning method changes the final answer, but its chain-of-thought still reconstructs the memorized fact, causing reasoning leakage. Right: LRM unlearning method avoids leakage but collapses into incoherent, repetitive reasoning, destroying general reasoning ability*
 
-## 核心模块与公式推导
+
 
 R-MUSE 是一个无需训练的推理时激活引导框架，其核心由四个模块级联构成，分别解决遗忘方向构建、推理保护、选择性干预和自适应强度校准问题。
 
@@ -229,7 +231,9 @@ $$\tilde{\mathbf{h}} = r \frac{\mathbf{h} + \alpha \hat{\mathbf{v}}}{\|\mathbf{h
 | $\lambda$ | 自适应校准权重，由 OT 距离比确定 | Eq. (4.16) |
 | $\tilde{\mathbf{h}}$ | Slerp 更新后的隐藏状态 | Eq. (4.18) |
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈验证：推理泄漏与能力坍塌的双重困境
 
@@ -315,7 +319,9 @@ Figure 4通过PCA可视化提供了R-MUSE作用机制的几何证据。在LLaVA-
 ![[assets/figures/papers/paper_list_l790_https_arxiv_org_abs_2512_17911/figures/009_Table_4.jpg]]
 *Table 4: Key statistics of the RMLLMU-Bench. The dataset maintains strict alignment in data distribution and task composition with the foundational benchmark*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：推理泄漏与能力坍塌的双重困境
 
@@ -369,6 +375,8 @@ R-MUSE 的三个核心模块各自对应一个方法学贡献，可被后续工�
 4. **评估体系的完善**：当前 RMLLMU-Bench 的推理泄漏评估（RIL）依赖 LLM 评判器，其对隐式泄漏的检测灵敏度有待进一步标定。更严格的对抗性评估（如通过 probing classifier 检测隐藏状态中的残留信息）将是对 R-MUSE 遗忘彻底性的重要补充验证。
 
 5. **与训练时方法的融合**：R-MUSE 作为推理时方法，可与训练时遗忘方法形成互补——后者负责粗粒度的参数级遗忘，前者负责细粒度的推理时泄漏抑制。这种“训练-推理”联合遗忘框架的设计空间值得探索。
+
+
 
 ## 原文 PDF
 

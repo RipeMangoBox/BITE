@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/MotiF_Making_Text_Count_in_Image_Animation_with_Motion_Focal_Loss.pdf
+project_link: https://wang-sj16.github.io/motif/
+code_link: null
 aliases:
 - MMFL
 - MotiF
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | MotiF：用运动焦点损失让文本在图像动画中发挥作用 |
 | 英文题名 | MotiF: Making Text Count in Image Animation with Motion Focal Loss |
 | 会议/期刊 | CVPR 2025 |
-| Links | [paper](https://arxiv.org/abs/2412.16153); [Project](https://wang-sj16.github.io/motif/) |
+| Links | [paper](https://arxiv.org/abs/2412.16153) · [Project](https://wang-sj16.github.io/motif/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | MotiF (Motion Focal Loss) |
 | Dataset | TI2V-Bench (human eval), TI2V-Bench (human eval, 仅与无运动焦点损失的基线比较), Animate Bench (自动指标) |
@@ -41,7 +43,7 @@ claims:
 > - TI2V-Bench (human eval, 仅与无运动焦点损失的基线比较) 上，TI2V Score 为 63.1，对比 36.9，变化 +26.2。
 > - Animate Bench (自动指标) 上，Image Alignment / Text Alignment 为 92.68 / 67.73，对比 DynamiCrafter 92.82 / 58.55, Cinemo 92.11 / 72.10，变化 可比。
 
-## 概述
+## 概要
 
 文本驱动的图像到视频生成（TI2V）的核心瓶颈在于：标准扩散模型采用逐像素均等的 L2 损失进行训练，而自然视频中约 97% 的像素区域是静态的，仅有约 3% 的区域存在有意义的运动。这种严重的类别不平衡导致模型在训练时过度依赖条件图像来降低整体损失——这一现象被称为**条件图像泄漏**——从而难以真正关注文本所描述的运动，造成文本-运动对齐质量低下。
 
@@ -55,7 +57,7 @@ claims:
 
 MotiF 的局限在于：生成视频的运动自然度仍有提升空间；当文本要求在场景中引入新物体或仅针对多物体中的某一个时，运动生成的精确性和连贯性不足。此外，现有自动评估指标普遍偏重相机/背景运动，难以公正反映物体运动质量，评估体系本身仍需完善。
 
-## 背景与动机
+
 
 文本驱动的图像到视频生成（TI2V）任务要求模型根据一张静态图像和一段描述运动的文本提示，生成一段连贯的动态视频。该任务的核心挑战在于：模型必须同时保持对输入图像的高保真度，并严格遵循文本中指定的运动语义。然而，现有方法在这一平衡点上普遍表现不佳。
 
@@ -83,7 +85,9 @@ MotiF提出了一个正交于输入信号增强的新方向：**修改训练目�
 
 如Figure 2所示，MotiF与现有方法并非替代关系，而是互补关系。先前工作关注“给模型什么输入”，MotiF关注“让模型优化什么目标”。两者可以正交叠加：在采用增强运动输入的同时，也可以使用运动焦点损失来强化训练信号。这一设计哲学使MotiF成为一个轻量、即插即用的训练策略，可广泛应用于各类TI2V架构。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MotiF 的核心创新在于**从训练目标层面解决文本驱动图像到视频（TI2V）生成中的运动生成难题**，而非像以往工作那样向模型提供额外的运动信号作为输入。这一设计选择使得 MotiF 与现有的输入信号增强方法正交且互补，在推理时无需任何额外输入。
 
@@ -121,7 +125,7 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{diffusion}} + \lambda \mathcal{L}_{\mathrm{
 - **连续热力图的优势**：使用光流生成的连续热力图在文本对齐和物体运动上优于基于 SAM 的二元掩码热力图（Table A1），表明细粒度的运动强度信息对训练目标加权至关重要。
 - **λ 的鲁棒性**：运动焦点损失权重 λ=1 时综合性能最优，但降低 λ 可改善视觉质量（Table A2），提供了实际应用中的调节灵活性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2412_16153/figures/002_Figure_1.jpg]]
 *Figure 1: Motivation and results of MotiF. (a) Example video frames and the corresponding motion heatmaps calculated from optical flow. In this example, 97% of the pixels are static while only 3% has meaningful motion. (b) In standard TI2V training pipeline, the model may learn to over-rely on the conditional image to optimize the L2 loss. This issue has been identified in [53] and termed as conditional image leakage. We propose MotiF to guide the model’s learning to focus on regions with more motion via motion heatmap re-weighting. (c) Qualitative results comparing MotiF to the baseline on examples from our proposed TI2V-Bench evaluation set*
@@ -156,7 +160,7 @@ MotiF 基于预训练的文本到视频扩散模型 **VideoCrafter2** 构建，�
 
 先前方法（如 DynamiCrafter、Cinemo 等）主要致力于从输入图像中提取额外的运动先验（运动分数、运动掩码等）作为模型的附加输入信号，让模型隐式地学习利用这些信息。MotiF 则从**学习目标层面**利用运动先验——运动热力图仅用于训练阶段的损失加权，推理时完全不需要。这一设计使得 MotiF 与现有技术互补：理论上可以将运动焦点损失应用于任何 TI2V 模型的训练中，而无需改变其推理管道。
 
-## 核心模块与公式推导
+
 
 MotiF 的核心设计思路是：**不修改模型架构或增加推理时的额外输入，而是改造训练目标本身**。其方法由三个关键模块构成：运动热力图生成、运动焦点损失计算，以及图像条件注入方式的选择。
 
@@ -202,7 +206,9 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{diffusion}} + \lambda \mathcal{L}_{\mathrm{
 
 此前的 TI2V 方法主要聚焦于**输入信号增强**——从条件图像中提取额外的运动分数或运动掩码，作为模型的附加输入信号。MotiF 则选择了一条正交路径：**在训练目标层面利用运动先验**。运动热力图仅用于训练阶段的损失加权，推理时无需任何额外输入，因此与现有的输入增强技术天然互补。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -301,7 +307,9 @@ MotiF 基于预训练的 T2V 扩散模型 **VideoCrafter2** 构建，在 512×51
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2412_16153/figures/012_Table.jpg]]
 *Table: A2. Ablation studies on the motion focal loss weight λ. The numbers on the left is for MotiF and the right is for the comparing setting*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 MotiF 的核心贡献在于将运动先验从**输入信号增强**转移到**训练目标重加权**，这一思路与现有 TI2V 方法构成正交关系。理解这一谱系定位，需要先厘清当前 TI2V 研究的两条主要技术路线。
 
@@ -361,6 +369,8 @@ MotiF 的有效性建立在以下前提之上：
 ### 知识库定位总结
 
 MotiF 在 TI2V 方法谱系中占据**训练目标优化**这一独特节点。它与输入增强方法（运动信号注入、双流图像条件）正交且互补——理论上可以将运动焦点损失应用于任何现有的 TI2V 架构。其方法论简洁性（仅修改损失函数，无需额外推理输入）使其具有较强的可迁移性，但当前在运动自然度和细粒度控制上的局限也指明了后续工作的方向。
+
+
 
 ## 原文 PDF
 

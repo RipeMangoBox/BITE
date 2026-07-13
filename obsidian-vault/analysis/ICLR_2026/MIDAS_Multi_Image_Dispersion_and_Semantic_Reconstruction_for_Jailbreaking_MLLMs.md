@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/MIDAS_Multi_Image_Dispersion_and_Semantic_Reconstruction_for_Jailbreaking_MLLMs.pdf
+project_link: null
+code_link: https://github.com/Winnie-Lian/MIDAS
 openreview_forum_id: tXsE2wKPvx
 aliases:
 - MIDAS
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | MIDAS：用于越狱多模态大模型的多图像分散与语义重构 |
 | 英文题名 | MIDAS: Multi-Image Dispersion and Semantic Reconstruction for Jailbreaking MLLMs |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=tXsE2wKPvx); [GitHub](https://github.com/Winnie-Lian/MIDAS) |
+| Links | [paper](https://openreview.net/forum?id=tXsE2wKPvx) · [GitHub](https://github.com/Winnie-Lian/MIDAS) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | MIDAS |
 | Dataset | HADES, MM-SafetyBench (tiny), AdvBench |
@@ -41,7 +43,7 @@ claims:
 > - MM-SafetyBench (tiny) 上，ASR 为 99.16%，对比 49.70% (VisCRA)，变化 +49.46%。
 > - AdvBench 上，ASR 为 97.96%，对比 4.00% (FigStep)，变化 +93.96%。
 
-## 概述
+## 概要
 
 ### 核心问题与瓶颈
 
@@ -77,7 +79,7 @@ MIDAS通过将有害关键词的平均暴露位置从48.44%推迟到64.53%，并
 
 该方法目前仅在静态多图像场景下验证，尚未探索长时程视频或流式输入中的行为；游戏模板设计依赖人工经验，可能引入认知偏差；在强防御（如ShieldLM）下成功率下降至约48.81%，表明输入过滤仍有一定抑制作用。
 
-## 背景与动机
+
 
 多模态大模型（MLLM）通过融合视觉与文本输入，展现出强大的跨模态理解和生成能力，其生成过程可形式化为 $r = \Gamma(i, t)$ 及自回归分布 $p_{\Theta}(z \mid i, t) = \prod_{k=1}^{|z|} p_{\Theta}(z_k \mid z_{<k}, r)$。然而，这种跨模态融合机制在拓展模型能力边界的同时，也引入了新的安全脆弱面——攻击者可通过精心构造的视觉-文本联合输入，诱导模型生成被禁止的有害内容。
 
@@ -87,7 +89,9 @@ MIDAS通过将有害关键词的平均暴露位置从48.44%推迟到64.53%，并
 
 上述分析揭示了一个关键的可控因素：**通过将有害语义分解并分散到多个图像中，利用游戏式视觉推理模板强制模型进行长时间的结构化推理，从而延迟有害内容的暴露并降低安全注意力，是提升越狱成功率的核心机制**。MIDAS正是围绕这一洞察展开设计——将有害查询拆分为风险子单元，隐藏于看似无害的视觉谜题中，结合人格驱动的文本重构诱导模型逐步融合并重建恶意意图，利用自回归生成惯性在安全机制反应前输出有害内容。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MIDAS 的核心创新在于将越狱攻击从“单模态集中暴露”重构为“多模态分散-延迟重构”范式，通过五个关键维度的协同改变，实现了对强对齐闭源多模态大模型的大幅攻击成功率提升。
 
@@ -125,7 +129,7 @@ MIDAS 的核心创新在于将越狱攻击从“单模态集中暴露”重构�
 
 五个 changed slots 的协同效应在强防御场景下尤为突出：在最强防御系统提示（System Prompt 3）下，MIDAS 对 Gemini-2.5-Pro 仍保持 67.26% 的 ASR，而 VisCRA 仅剩 5.36%（Table 8）。跨评判一致性实验（Table 12）使用四个独立评判模型（GPT-5-nano、Gemini-2.5-FT、Qwen3、DeepSeek-R1）验证了结果的稳健性，排除单一评判偏差的干扰。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l44_https_openreview_net_forum_id_tXsE2wKPvx/figures/002_Figure_2.jpg]]
 *Figure 2: Pipeline of MIDAS. (1) Text Process: extract risk-bearing units, decompose them into subunits, and replace them with placeholders; (2) Image Process: embed the subunits into multiple benign-looking puzzle images that enforce step-by-step reasoning; (3) Model Output: the model decodes puzzle fragments, reconstructs the hidden semantics, and generates harmful responses under persona-driven reasoning guidance*
@@ -179,7 +183,7 @@ MIDAS 的流水线可细化为五个功能模块，各模块之间存在严格�
 
 **游戏式推理的核心地位**：消融实验（Table 5）提供了决定性证据——移除游戏式视觉推理后，ASR 从 80% 骤降至 22%，证明该模块是框架中最关键的组件。相比之下，将多图像分散替换为单图像处理后 ASR 降至 50%，移除角色驱动诱导后降至 59%，影响虽显著但不及游戏推理剧烈。
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题形式化与越狱目标
 
@@ -237,7 +241,9 @@ $$\bar{R} = \left[\hat{S}(i_1), \hat{S}(i_2), \dots, \hat{S}(i_H)\right]$$
 
 模型在文本占位符处依次填充解码结果，利用自回归生成惯性在安全机制反应前输出完整有害内容。这一多步结构化推理驱动的重构过程是延迟有害语义暴露的核心机制——消融实验证实，移除游戏式视觉推理后，ASR从80%骤降至22%（Table 5），验证了该模块的决定性作用。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -321,7 +327,9 @@ Table 12 使用 GPT-5-nano、Gemini-2.5-FT、Qwen3 和 DeepSeek-R1 四个独立�
 ![[assets/figures/papers/paper_list_l44_https_openreview_net_forum_id_tXsE2wKPvx/figures/020_Table_7.jpg]]
 *Table 7: ASR comparison between VisCRA and our MIDAS under different defense mechanisms. MIDAS demonstrates significantly higher robustness against both external filtering and internal self-correction*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有越狱范式的关键分岔
 
@@ -358,6 +366,8 @@ MIDAS 的知识贡献可分解为三个相互强化的机制，每个机制都�
 2. **过程感知防御**：当前防御（ShieldLM、Self-Reminder）主要依赖输入过滤或输出自检。能否开发推理过程感知的监控机制，在中间状态检测有害意图的重构趋势，而非仅靠静态筛查？
 3. **模板自动优化**：游戏模板的难度和多样性目前依赖人工设计。能否自动搜索最优模板配置以最大化攻击效果，同时保持对安全过滤器的隐蔽性？
 4. **动态多阶段防御**：面对迟滞性语义重构攻击，如何设计动态、多阶段防御体系，在推理链的不同节点设置检查点，同时避免对正常多步推理任务的过度干扰？
+
+
 
 ## 原文 PDF
 

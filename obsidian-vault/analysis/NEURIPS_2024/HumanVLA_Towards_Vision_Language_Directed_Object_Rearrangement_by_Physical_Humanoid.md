@@ -5,6 +5,7 @@ paper_level: A
 venue: NEURIPS
 year: 2024
 pdf_ref: paperPDFs/NEURIPS_2024/HumanVLA_Towards_Vision_Language_Directed_Object_Rearrangement_by_Physical_Humanoid.pdf
+project_link: null
 code_link: https://github.com/AllenXuuu/HumanVLA
 aliases:
 - HumanVLA
@@ -40,7 +41,7 @@ claims:
 > - Box Rearrangement (HITR subset) 上，Success Rate (%) ↑ 98.1 vs 97.8 (InterPhys†) (+0.3)；Precision (cm) ↓ 4.2 vs 12.6 (InterPhys†) (-8.4)；Execution Time (s) ↓ 4.6 vs 5.3 (InterPhys†) (-0.7)。
 > - Unseen Tasks (HITR test split) 上，Success Rate (%) ↑ 60.2 vs 10.2 (Offline GC-BC) (+50.0)；Precision (cm) ↓ 57.0 vs 152.3 (Offline GC-BC) (-95.3)；Execution Time (s) ↓ 5.8 vs 8.5 (Offline GC-BC) (-2.7)。
 
-## 概述
+## 概要
 
 物理人形机器人在真实世界中完成通用物体重排任务，需要同时理解视觉场景与自然语言指令，并适应多样化的物体动力学。现有方法普遍依赖特权状态信息（如精确的物体姿态与目标坐标），且仅能处理单一或静态物体，无法应对由视觉语言指令指定的复杂重排场景。
 
@@ -50,7 +51,7 @@ claims:
 
 HumanVLA 首次在物理人形机器人上实现了由视觉和语言联合指导的通用物体重排，为具身智能体的语言引导物理交互提供了新的基准与方法范式。
 
-## 背景与动机
+
 
 ### 物理人形交互的现实需求与技术瓶颈
 
@@ -79,7 +80,9 @@ HumanVLA 首次在物理人形机器人上实现了由视觉和语言联合指�
 
 基于上述技术路线，HumanVLA 预期在以下方面实现突破：在已知物体重排任务上达到与特权状态方法相当甚至更优的性能；在未见物体和场景上展现出显著的泛化能力；通过消融实验系统验证各项设计组件的独立贡献。这些成果将为物理人形机器人从“精确编程”走向“视觉语言引导的通用交互”提供一条可行路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 HumanVLA 的核心创新在于通过**教师-学生框架**，将依赖特权状态信息的物理人形物体操作能力蒸馏为仅需自我中心视觉和自然语言指令的视觉-语言-动作模型。该框架在教师策略训练中引入四项关键设计以处理多样化物体动力学，并在学生蒸馏阶段引入主动渲染机制以弥补感知信息损失。
 
@@ -107,7 +110,7 @@ HumanVLA 的核心创新在于通过**教师-学生框架**，将依赖特权状
 
 上述六项 changed slots 形成互补体系：几何编码和搬运课程解决多样化物体动力学的感知与操作先验问题；风格裁剪和路径规划分别从奖励设计和导航引导角度提升任务执行效率；主动渲染和在线学习则弥补从特权状态到视觉感知的信息损失。这些设计共同支撑 HumanVLA 在盒子重排任务上达到 98.1% 成功率和 4.2 cm 精度，在未见任务上达到 60.2% 成功率，远超 Offline GC-BC 的 10.2%。
 
-## 整体框架
+
 
 HumanVLA 的整体框架采用**教师-学生蒸馏**范式，将依赖特权状态信息的状态教师策略，转化为仅以自我中心视觉和自然语言指令为输入的视觉-语言-动作（VLA）学生模型。
 
@@ -139,7 +142,7 @@ HumanVLA 的整体框架采用**教师-学生蒸馏**范式，将依赖特权状
 ![[assets/figures/papers/paper_list_l1792_HumanVLA_Towards_Vision_Language_Directed_Object_Rearrangement_by_Physic/figures/004_Figure_3.jpg]]
 *Figure 3: Left: An overview of learning HumanVLA by mimicking teacher action and active rendering action. Right: Comparison between w/ and w/o active rendering. Active rendering leads to a more informative perception of human-object relationships*
 
-## 核心模块与公式推导
+
 
 HumanVLA 采用教师-学生框架，分两阶段构建：先训练一个依赖特权状态信息的教师策略，再将其蒸馏为仅依赖自我中心视觉与自然语言指令的学生模型。整体架构由四个核心模块构成：**状态教师策略训练**、**视觉-语言学生蒸馏**、**主动渲染模块**和**路径规划模块**。
 
@@ -220,7 +223,9 @@ $$
 ![[assets/figures/papers/paper_list_l1792_HumanVLA_Towards_Vision_Language_Directed_Object_Rearrangement_by_Physic/figures/016_Figure_10.jpg]]
 *Figure 10: Learning curve comparison w/ and w/o active rendering. The process is dominated by the teacher policy in the early stage with high β and demonstrates the reward upper bound*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 整体实验设计
 
@@ -294,7 +299,9 @@ Table 7 的未见数据分析揭示了 HumanVLA 的泛化边界：
 ![[assets/figures/papers/paper_list_l1792_HumanVLA_Towards_Vision_Language_Directed_Object_Rearrangement_by_Physic/figures/002_Table_1.jpg]]
 *Table 1: Comparisons between HumanVLA and past works*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -331,6 +338,8 @@ HumanVLA 的适用边界由以下设计假设和实验条件界定：
 2. **零样本几何和视觉泛化**：如何在不依赖特权状态信息的前提下，设计更鲁棒的视觉语言模型以实现对未知物体类别的零样本泛化？Table 7 的结果表明这是当前方法的显著短板。
 3. **灵巧操作的视觉语言引导**：在不依赖特权状态信息的前提下，能否设计支持复杂灵巧操作的视觉语言模型？这需要在机械手设计、触觉感知和精细动作策略等多个层面取得突破。
 4. **真实世界部署**：从仿真到真实物理环境的迁移面临感知噪声、动力学不确定性和实时性要求等挑战，主动渲染在真实相机上的效果也有待验证。
+
+
 
 ## 原文 PDF
 

@@ -42,7 +42,7 @@ claims:
 > - SimplerEnv WidowX 上，Success rate (%) 65.1 vs 31.3 (UniVLA, second best) (+33.8)。
 > - Real-world long-horizon & reasoning 上，Average success rate (%) 62.3。
 
-## 概述
+## 概要
 
 当前视觉-语言-动作（VLA）模型面临一个核心瓶颈：VLM与动作专家之间通过不透明的潜嵌入通信，这些嵌入缺乏语义可解释性，导致指导信号模糊且不稳定。同时，仅靠动作损失的反向传播会破坏VLM的预训练语义能力，使模型退化为记忆动作模式的参数重融合编码器，而非进行组合推理——这在指令改写和推理密集型任务中尤为突出。
 
@@ -50,7 +50,7 @@ claims:
 
 方法上，SemanticVLA采用三阶段训练管线：（1）基于轨迹引导的潜令牌预训练，先学几何锚点再对齐视觉；（2）VLM联合预测轨迹坐标与潜令牌索引，建立语义对应；（3）弱正则下微调流匹配动作解码器。实验表明，SemanticVLA在LIBERO上达到97.0%平均成功率，在SimplerEnv WidowX上达到65.1%，显著优于UniVLA等基线；在指令改写测试中性能稳定性远超对比方法，真实世界长序列与推理任务上也展现出强泛化优势。
 
-## 背景与动机
+
 
 视觉-语言-动作（VLA）模型将视觉语言模型（VLM）的语义理解能力引入机器人操控，使机器人能够根据自然语言指令执行复杂任务。然而，当前VLA架构面临一个关键瓶颈：VLM与下游动作专家之间通过**不透明的潜嵌入（latent embeddings）**进行通信，这些嵌入缺乏语义可解释性，导致指导信号模糊且不稳定。更严重的是，仅依赖动作损失进行端到端反向传播会**破坏VLM预训练获得的语义能力**，使模型退化为记忆动作模式的参数重融合编码器，而非进行真正的组合推理——这正是现有方法在指令改写或推理密集型任务中性能大幅下降的根本原因。
 
@@ -58,7 +58,9 @@ claims:
 
 本文的动机源于一个核心洞察：**显式轨迹推理与隐式潜动作令牌在功能上天然互补**。轨迹提供直观的几何引导，自然地与VLM预训练的空间对齐能力吻合，但易受坐标精度影响；潜动作令牌融合视觉观察，能够补偿轨迹的数值不稳定性，但缺乏可解释性。通过构建**双路径协同架构**，让VLM同时生成可解释的2D空间轨迹（坐标序列）和语义丰富的潜动作令牌，使VLM的推理真正服务于任务规划，而非停留在特征融合层面。为此，本文提出SemanticVLA，通过三阶段训练流程——轨迹引导的潜令牌预训练、VLM联合预测轨迹与潜令牌、弱正则下微调动作专家——实现显式推理与隐式规划的深度协同。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SemanticVLA 的核心创新在于**将VLM的原生语言接口从“不透明特征通信”升级为“可解释的显式轨迹推理”**，并通过与潜动作令牌的协同双路径设计，解决了当前VLA架构中VLM语义能力被动作记忆所侵蚀的根本问题。
 
@@ -91,7 +93,7 @@ SemanticVLA 的突破点在于识别出**VLM的空间对齐能力是其预训练
 
 SemanticVLA 的显式轨迹推理与 **MolmoAct**（将轨迹预测作为辅助推理）和 **Magma**（生成2D路点条件化低层策略）存在根本区别：后两者将轨迹仅作为额外的推理输出或条件信号，而 SemanticVLA 通过两阶段VQ-VAE将轨迹几何基元注入潜动作令牌的学习过程——第一阶段从纯轨迹坐标学习稳定的几何锚点，第二阶段将这些锚点扎根于视觉观测——使得轨迹推理与潜动作规划形成双向信息流，而非简单的级联关系。
 
-## 整体框架
+
 
 SemanticVLA 的整体设计围绕一个核心矛盾展开：当前 VLA（视觉‑语言‑动作）模型中，VLM 与动作专家之间通过**不透明的潜嵌入**进行通信，这些嵌入缺乏语义可解释性，导致指导信号模糊且不稳定；同时，仅靠动作损失的反向传播会破坏 VLM 的预训练语义能力，使模型退化为记忆动作模式的参数重融合编码器，而非进行组合推理。SemanticVLA 的解决方案是引入一条**显式轨迹推理路径**，利用 VLM 原生语言接口生成可解释的 2D 空间坐标序列作为中间规划，从而为下游的潜动作学习提供时间对齐、语言无关的辅助语义监督。
 
@@ -139,7 +141,7 @@ SemanticVLA 的核心架构由两条互补的推理路径组成（见 Figure 3�
 
 这些设计使得 SemanticVLA 在仿真和真实世界基准上均显著优于强基线——在 LIBERO 上达到 97.0% 平均成功率，在 SimplerEnv 上达到 65.1%，并在指令改写测试中展现出远优于基线的性能稳定性。
 
-## 核心模块与公式推导
+
 
 SemanticVLA 的核心由三个模块级联构成：**语义潜动作分词器（Semantic Latent Action Tokenizer）**、**VLM 联合训练（VLM Co-training）** 以及 **流匹配动作解码器（Flow Matching Action Decoder）**。三者共同实现了“显式轨迹推理—隐式潜动作规划—连续控制生成”的双路径协同。
 
@@ -212,7 +214,9 @@ $$\mathcal{L}_{\mathrm{finetune}} = \lambda_{\mathrm{VLM}} \mathcal{L}_{\mathrm{
 ![[assets/figures/papers/paper_list_l2594_https_openaccess_thecvf_com_content_CVPR2026_html_Ni_SemanticVLA_Towards/figures/002_Figure_2.jpg]]
 *Figure 2: Semantic Latent Action Tokenizer. Two-stage architecture for trace-guided latent tokens. Stage 1 learns geometric patterns from traces. Stage 2 grounds them in visual observations, with dual reconstruction of trace and visual representations producing latent actions with both spatial and visual semantics*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 仿真基准评估
 
@@ -276,7 +280,9 @@ SemanticVLA 在 LIBERO 和 SimplerEnv 两个仿真基准上进行了系统评估
 ![[assets/figures/papers/paper_list_l2594_https_openaccess_thecvf_com_content_CVPR2026_html_Ni_SemanticVLA_Towards/figures/005_Figure_4.jpg]]
 *Figure 4: Real-world robot experiments. We evaluate SemanticVLA on long-horizon compositional tasks (food preparing and desktop sorting) and reasoning-intensive tasks (math calculation and word spelling), demonstrating robust performance across various scenarios*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心瓶颈：从“动作记忆”到“语义推理”的断层
 
@@ -333,6 +339,8 @@ SemanticVLA 在 VLA 方法谱系中占据了“显式推理 + 隐式执行”的
 4. **训练效率优化**：三阶段训练流程是否可以合并或简化，以降低实际部署的门槛？
 
 在知识库定位上，SemanticVLA 应被归类为“VLA 语义推理增强方法”，与纯潜动作方法（UniVLA、VQ-VLA）、轨迹条件方法（MolmoAct、Magma）、思维链推理方法（CoT-VLA）形成互补对照关系。其核心方法论贡献——利用 VLM 原生语言接口生成可解释中间规划以保护语义能力——为后续 VLA 研究提供了重要的设计原则参考。
+
+
 
 ## 原文 PDF
 

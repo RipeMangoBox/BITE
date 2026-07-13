@@ -44,7 +44,7 @@ claims:
 > - LiTS (Liver CT) 上，Mean Dice (%) 90.5±3.7 (NICE-Trans+MorphSeek) vs 88.4±3.9 (NICE-Trans) (+2.1)。
 > - Abdomen MR←CT 上，Mean Dice (%) 86.5±3.4 (TransMorph+MorphSeek) vs 82.3±4.8 (TransMorph) (+4.2)。
 
-## 概述
+## 概要
 
 可变形图像配准（Deformable Image Registration, DIR）的核心挑战在于从高维变形空间中恢复精确的局部对应关系。现有基于强化学习（RL）的DIR方法，如**SPAC**，通常将百万维变形场压缩至极低维的隐空间（如64-D向量），虽降低了动作空间复杂度，却不可避免地丢失了细粒度边界和几何细节。同时，医学图像分割标注极其稀缺，传统弱监督范式每个标记对仅提供一次监督信号，标签利用效率低下。
 
@@ -61,7 +61,7 @@ MorphSeek针对上述瓶颈提出了根本性的解决思路：**将编码器顶
 
 在方法谱系上，MorphSeek区别于**SPAC**（基于SAC的64-D压缩动作空间RL配准）、**RIIR**（固定级联逐步配准）和**WarpDDF+RegCut**（一致性正则化半监督配准），首次将高分辨率潜在空间策略优化引入DIR，在标签效率与配准精度之间实现了新的帕累托前沿。其核心洞察在于：**通过无监督预热构建稳定潜在空间，再以GRPO实现由粗到精的弱监督微调，使得有限标签在结构化探索中被反复复用**。
 
-## 背景与动机
+
 
 ### 可变形图像配准：从单步预测到策略优化
 
@@ -85,7 +85,9 @@ MorphSeek针对上述瓶颈提出了根本性的解决思路：**将编码器顶
 
 3. **无监督预热是稳定高维GRPO的关键**。直接在随机初始化的潜在空间上运行GRPO会导致训练不稳定甚至崩溃。通过无监督预热，先让编码器学习到解剖保持的确定性表示，再将策略分布锚定在这一稳定流形上，可以大幅提升GRPO的收敛成功率和最终性能。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MorphSeek的核心创新在于将可变形图像配准从“单次前向预测密集变形场”重构为“高分辨率潜在空间中的逐步策略优化”，从而在极低参数开销下同时提升配准精度与标注效率。
 
@@ -131,7 +133,7 @@ $$\log \pi(\mathbf{z} \mid \pmb{\mu}, \pmb{\sigma}) = -\frac{1}{2s} \sum_{i=1}^N
 
 MorphSeek的范式可泛化至任意编码器-解码器架构（已验证**VoxelMorph-L**、**TransMorph**、**NICE-Trans**三种骨干网络），在OASIS脑部MRI、LiTS肝脏CT、Abdomen MR←CT三个基准上均取得一致且显著的Dice提升（+2.1%至+4.2%）和NJD降低（Table 1），证明了该创新范式的通用性和有效性。
 
-## 整体框架
+
 
 MorphSeek 提出了一种面向可变形图像配准的**三阶段训练范式**，其核心思想是将配准任务重构为**潜在空间策略优化**问题。该范式可泛化至任意编码器-解码器架构的配准模型，通过在高分辨率潜在表示上进行强化学习探索，替代传统方法在百万维变形场空间中的直接优化。
 
@@ -172,7 +174,7 @@ $$\mathcal{E}_{\mathrm{grpo}}(\pmb\theta) = \mathcal{L}_{\mathrm{policy}}(\pmb\t
 ![[assets/figures/papers/paper_list_l2549_https_arxiv_org_abs_2511_17392/figures/001_Figure_1.jpg]]
 *Figure 1: MorphSeek Registration Framework Process*
 
-## 核心模块与公式推导
+
 
 ### 3.1 RL友好重构：从确定性特征到可采样潜在策略
 
@@ -248,7 +250,9 @@ $$\Phi_t = \Phi_{t-1} \circ \phi^{(j^*)} \tag{Eq. 16}$$
 
 **标签效率机制**：MorphSeek 的标签效率提升源于其多轨迹、多步设计。每个标记图像对在 $T$ 个细化步中产生 $T \times J$ 个相对监督事件（组内比较），使有限的标签被反复复用。实验表明，MorphSeek 仅需 60% 的标记数据即可达到 98.5% 的满标签性能，而基线 TransMorph 需要 80% 标签才能达到相似水平（Figure 3）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果：跨基准、跨骨干的一致提升
 
@@ -331,7 +335,9 @@ Table 11 的效率分析表明，MorphSeek 引入的额外参数不足骨干网�
 ![[assets/figures/papers/paper_list_l2549_https_arxiv_org_abs_2511_17392/figures/018_Figure_7.jpg]]
 *Figure 7: Label-wise Dice on OASIS (SPAC: Steps = 20, TransMorph+MorphSeek: Steps/Trajs = 3/6)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 一、与现有配准范式的谱系关系
 
@@ -378,6 +384,8 @@ MorphSeek 处于**可变形图像配准**与**强化学习策略优化**的交�
 ---
 
 **证据强度说明：** 上述适用边界和局限均基于论文中提供的消融实验（Table 2, Table 5, Table 6, Figure 3, Figure 5, Figure 6）和附录分析（Appendix 8.4），置信度较高。开放问题部分属于基于实验观察的合理推断，部分方向（如自适应步数调度、无监督奖励设计）在论文的 limitations 和 discussion 中已有暗示，但具体实现路径需要后续工作验证。
+
+
 
 ## 原文 PDF
 

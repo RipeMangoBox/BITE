@@ -42,7 +42,7 @@ claims:
 > - NeuroNCAP closed-loop 上，NeuroNCAP Score 3.48 vs ImpromptuVLA 2.06 (+68.9%)。
 > - Inference Latency 上，Latency (ms) 727 vs OmniDrive 3727 (-80.5%)。
 
-## 概述
+## 概要
 
 自动驾驶中的视觉-语言-动作（VLA）模型，通过引入视觉语言模型（VLM）的推理能力，在复杂场景理解与决策方面展现了巨大潜力。然而，当前基于文本的VLM规划器普遍面临三个核心瓶颈：**离散文本与连续控制之间的模态不匹配**、**自回归思维链解码导致的高延迟与误差累积**，以及**规划器因果结构的缺失**，使得生成的轨迹在安全性和一致性上难以保证。
 
@@ -50,7 +50,7 @@ claims:
 
 在nuScenes开环评测中，ColaVLA以**平均L2误差0.30m**和**平均碰撞率0.23%** 的成绩，在动作型方法中达到最优，较此前最佳基线SOLVE-E2E分别降低3%和23%。在NeuroNCAP闭环基准上，ColaVLA取得了**3.48的NeuroNCAP分数**，比最强文本型VLM模型ImpromptuVLA（2.06）绝对提升1.42，相对提升68.9%，同时大幅降低了碰撞率。在推理效率方面，ColaVLA仅需**727ms**的端到端延迟，比同等条件下的OmniDrive（3727ms）和SOLVE-VLM（3719ms）快5倍以上，充分验证了潜在推理与并行解码的效率优势。消融实验进一步表明，认知潜在推理和反思阶段对规划精度至关重要，而分层并行规划器在闭环安全性上显著超越了MLP和扩散规划器。
 
-## 背景与动机
+
 
 ### 自动驾驶规划中的VLM范式与瓶颈
 
@@ -84,7 +84,9 @@ claims:
 
 与基于动作的端到端规划器（如**UniAD**（Hu et al., CVPR 2023）、**VAD**（Jiang et al., ICCV 2023）、**SOLVE-E2E**（Shi et al., NeurIPS 2025））相比，ColaVLA保留了VLM的推理能力，但将其压缩为潜在表示而非显式文本，从而在保持可解释性的同时获得更高的规划精度和安全性——在nuScenes开环评测中，ColaVLA的平均L2误差降至0.30m，平均碰撞率降至0.23%，均优于此前最优的动作基线。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ColaVLA 的核心创新在于将自动驾驶规划中的认知推理从**文本空间彻底迁移到统一潜在空间**，并通过**认知潜在推理器**与**分层并行规划器**的协同设计，系统性地解决了当前 VLM 规划器面临的三大瓶颈：模态不匹配、推理延迟与误差累积、以及因果结构缺失。
 
@@ -123,7 +125,7 @@ $$\mathcal{M}(i,j) = \left\{ \begin{array}{ll} 0, & j \leq L_c, \\ 0, & i \geq L
 
 上述创新的综合效果是推理效率的质变。在相同硬件条件（NVIDIA H20，无 Flash-Attention）下，ColaVLA 的端到端推理延迟仅为 727ms，比 **OmniDrive**（3727ms）和 **SOLVE-VLM**（3719ms）**快 5 倍以上**。这一效率提升源于两个结构性因素：潜在推理消除了文本自回归解码的串行瓶颈；分层并行解码将多尺度轨迹生成压缩到单次前向传递中完成。
 
-## 整体框架
+
 
 ColaVLA 将视觉-语言-动作（VLA）规划重新定义为一个**潜在空间认知推理 + 因果保持分层并行解码**的统一流程。其核心设计动机在于消除传统文本型 VLM 规划器中的模态不匹配、自回归延迟与误差累积，同时保留 VLM 的泛化与推理能力。
 
@@ -167,7 +169,7 @@ $$
 ![[assets/figures/papers/paper_list_l2455_https_arxiv_org_abs_2512_22939/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the ColaVLA framework. Multi-view image sequences are first processed by an image backbone and a Q-Former to perceive 3D objects and vectorized maps, producing visual tokens for subsequent reasoning and planning. On the left, the Cognitive Latent Reasoning module performs implicit reasoning through four stages, i.e. Understand, Recognize, Rethink, and Decide, to derive a driving strategy. On the right, the derived strategy selects corresponding meta-action queries from action bank, which are then transformed to multi-scale targets. These targets, together with the pruned context are fed into a Hierarchical Parallel Planner for one-pass, parallel trajectory decoding. The resultin...*
 
-## 核心模块与公式推导
+
 
 ColaVLA 的核心架构由两个解耦模块构成：**认知潜在推理器（Cognitive Latent Reasoner）** 和 **分层并行规划器（Hierarchical Parallel Planner）**。前者在统一潜在空间中完成场景理解与决策推理，后者在单次前向传递中并行生成多尺度精细轨迹。以下逐一展开关键模块的数学表述与设计机理。
 
@@ -260,7 +262,9 @@ $$\mathcal{M}(i,j) = \left\{ \begin{array}{ll} 0, & j \leq L_c, \\[4pt] 0, & i \
 ![[assets/figures/papers/paper_list_l2455_https_arxiv_org_abs_2512_22939/figures/003_Figure_3.jpg]]
 *Figure 3: Causality-Preserving Hybrid Mask. Our mask is designed for the multi-scale targets within our planner. It enables information flow from the pruned context to all temporal scales, while maintaining temporal causality between adjacent scales*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 开环规划性能
 
@@ -335,7 +339,9 @@ Figure 5展示了NeuroNCAP闭环仿真中三类典型场景的定性对比。Col
 ![[assets/figures/papers/paper_list_l2455_https_arxiv_org_abs_2512_22939/figures/011_Table_7.jpg]]
 *Table 7: Ablation on the strategy of hierarchical regression. All variants share the same parallel decoding framework but differ in their specific selection strategy of trajectory subsets across scales*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题背景与工作定位
 
@@ -415,6 +421,8 @@ ColaVLA 在 nuScenes（城市道路）和 NeuroNCAP（安全关键场景）上�
 4. **与端到端感知的深度耦合**：ColaVLA 的感知前端（SQ-Former）和规划器是分阶段训练的。感知误差如何传播到潜在推理和规划决策，以及联合端到端优化能否进一步提升安全性，论文未给出答案。
 
 5. **更大规模 VLM 的 scaling 行为**：论文使用 EVA-02-L 作为 VLM 骨干。随着更大规模 VLM（如 InternVL-76B）的出现，潜在推理的质量和延迟如何随模型规模变化，是一个有意义的 scaling 研究问题。
+
+
 
 ## 原文 PDF
 

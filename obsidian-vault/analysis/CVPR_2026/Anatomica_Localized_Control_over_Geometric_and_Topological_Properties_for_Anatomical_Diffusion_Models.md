@@ -43,7 +43,7 @@ claims:
 > - Cardiac (TotalSegmentator) – Atrial Separation Task 上，B0 Precision (%, ↑) 78.9 (Anatomica-L) vs 7.81 (Unconditional) (+71.09)。
 > - Aortic Branch – Branch Connectivity Task 上，B0 Precision (%, ↑) 77.3 (Anatomica-L) vs 55.5 (Unconditional) (+21.8)。
 
-## 概述
+## 概要
 
 现有解剖生成模型（如显式/隐式条件扩散模型）在生成过程中面临一个核心瓶颈：难以对局部解剖结构的几何属性（大小、形状、位置）和拓扑属性（连通分量、环、空洞）施加精确、可微分的控制。传统方法依赖条件训练，将几何属性编码为标量信号或3D热图输入模型，缺乏直观的局部编辑能力，且无法在推理时灵活组合不同的几何-拓扑约束。
 
@@ -55,7 +55,7 @@ claims:
 
 该方法的局限性在于拓扑引导的计算开销较大（每样本约 420 秒），主要受限于持久同调缺乏公开的 GPU 实现；曲线控制域的骨架化步骤仍在 CPU 上执行；且仅在有限解剖数据集（心脏、主动脉、脊柱、冠状动脉）上验证，泛化性有待进一步检验。
 
-## 背景与动机
+
 
 ### 解剖生成模型的现状与瓶颈
 
@@ -81,7 +81,9 @@ claims:
 
 这些创新使 Anatomica 成为首个能够在推理时对多类解剖体素图施加局部几何-拓扑联合控制的框架，为解剖生成模型的临床落地提供了新的技术路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Anatomica 的核心创新在于将**推理时引导**与**局部化控制域**相结合，在无需重新训练扩散模型的前提下，实现对解剖体素图几何属性与拓扑属性的精确、局部化、可微分控制。与依赖条件训练的传统方法相比，这一范式转变带来了三个关键维度的改变。
 
@@ -119,7 +121,7 @@ $$\mathcal{L}_k^{\mathrm{topo}} = - \sum_{p \in \mathcal{V}_k} |\mathbf{S}_k(r_b
 
 这种联合测量机制使 Anatomica 能够在统一的推理时框架下，同时精确控制解剖结构的几何形态与拓扑连通性，实现了现有方法无法达成的组合式、多尺度解剖控制能力。
 
-## 整体框架
+
 
 Anatomica 是一个**推理时组合式扩散引导框架**，用于生成具有局部化几何与拓扑控制的多类三维解剖体素图。其核心设计理念是：在不重新训练基础扩散模型的前提下，通过在反向采样过程中注入可微分的解剖势函数梯度，实现对生成结构的大小、形状、位置（几何属性）以及连通分量、环、空洞（拓扑属性）的精确控制。
 
@@ -151,7 +153,7 @@ Anatomica 是一个**推理时组合式扩散引导框架**，用于生成具有
 ![[assets/figures/papers/paper_list_l2440_https_arxiv_org_abs_2511_20587/figures/001_Figure_1.jpg]]
 *Figure 1: Anatomica is a compositional diffusion-guidance framework for generating segmentations based on anatomical features that are localized within cuboidal control domains. Left: We generate voxel maps according to localized target geometry (size, shape, and position) visualized as red ellipsoids. Right: We generate voxel maps according to target topology (components, loops, and voids)*
 
-## 核心模块与公式推导
+
 
 Anatomica 的核心由四个关键模块串联构成，形成“定义控制域 → 解析子结构 → 测量属性 → 引导采样”的闭环。
 
@@ -229,7 +231,9 @@ $$
 ![[assets/figures/papers/paper_list_l2440_https_arxiv_org_abs_2511_20587/figures/003_Figure_3.jpg]]
 *Figure 3: Efficient parsing of anatomical substructures during diffusion guidance. A: During guidance, we parse relevant substructures directly from the clean latent prediction with a neural field decoder (L-parsing). B: In coarse L-parsing, we use a coarse grid to decode globally defined substructures at low spatial resolution. C: In localized L-parsing, we use a similar grid size but spatially transform the template point grid to decode localized substructures at high spatial resolution*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 Anatomica 的实验设计围绕两个核心维度展开：**几何控制**与**拓扑控制**。几何控制实验评估框架对局部子结构的大小、形状和位置进行精确操控的能力；拓扑控制实验则评估对连通分量（Betti‑0）、环（Betti‑1）和空洞（Betti‑2）等拓扑先验的强制能力。实验在心脏（TotalSegmentator）、主动脉分支、脊柱和冠状动脉四个解剖数据集上进行，基线方法包括显式条件扩散模型（Explicit Conditioning）、隐式条件扩散模型（Implicit Conditioning）和无条件扩散模型（Unconditional）。
 
@@ -312,7 +316,9 @@ Anatomica 的实验设计围绕两个核心维度展开：**几何控制**与**�
 ![[assets/figures/papers/paper_list_l2440_https_arxiv_org_abs_2511_20587/figures/011_Table_4.jpg]]
 *Table 4: Quantitative ablation study for partial decoding strategies. We evaluate the geometric fidelity and generation quality, and sampling speed for different decoding strategies and resolutions. Speed is measured in terms of sampled label maps per second using the maximum allowable batch size on a single GPU, normalized to the slowest method. Fidelity values for mass, centroid, and covariance are multiplied by 1e5, 1e4, 1e5 respectively*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：解剖生成中的局部化控制瓶颈
 
@@ -371,6 +377,8 @@ Anatomica 的定位是**推理时引导框架（inference-time guidance framewor
 3. **控制域自动化**：如何自动确定控制域的空间变换参数？将控制域定义与解剖标志点检测或分割模型结合，可能实现端到端的自动化控制，减少对人工输入的依赖。
 
 4. **下游应用验证**：在真实临床虚拟试验或合成数据增强中的下游效果如何？论文展示了生成样本的几何和拓扑保真度，但未评估这些样本在下游任务（如分割模型训练、病理检测）中的实际效用，这是从方法研究走向临床落地的关键一步。
+
+
 
 ## 原文 PDF
 

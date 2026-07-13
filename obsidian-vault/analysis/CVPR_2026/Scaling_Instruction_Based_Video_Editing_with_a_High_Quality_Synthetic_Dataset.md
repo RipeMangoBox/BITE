@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/Scaling_Instruction_Based_Video_Editing_with_a_High_Quality_Synthetic_Dataset.pdf
+project_link: null
 code_link: null
 aliases:
 - EBDF
@@ -42,7 +43,7 @@ claims:
 > - Custom test set (multiple edit types) 上，CLIP-T ↑ 25.54 vs 23.56 (InsViE) (+1.98)；CLIP-F ↑ 99.03 vs 98.78 (InsViE) (+0.25)；VLM Score ↑ 8.10 vs 7.35 (InsViE) (+0.75)。
 > - Custom test set (human eval) 上，Edit-Acc (Human) ↑ 3.85 vs 2.28 (InsViE) (+1.57)；Temp-Con (Human) ↑ 3.76 vs 2.30 (InsViE) (+1.46)；Overall (Human) ↑ 3.86 vs 2.36 (InsViE) (+1.50)。
 
-## 概述
+## 概要
 
 **核心问题**：指令驱动的视频编辑长期受制于大规模、高质量配对训练数据的匮乏。现有合成数据方法在编辑多样性、时序一致性、生成效率与成本之间陷入严重权衡——基于单帧编辑后图像-视频传播的方案缺乏显式几何约束，而逐视频优化的方法计算成本极高（约 50 GPU-minutes/样本），难以规模化。
 
@@ -52,8 +53,6 @@ claims:
 
 **主要结果**：在涵盖多种编辑类型的测试集上，Editto 在自动指标和人类评估上全面超越先前方法 **TokenFlow**（Geyer et al., ICLR 2024）、**InsV2V**（Cheng et al., ICLR 2024）、**InsViE**（Wu et al., ICCV 2025）及商业模型 **Runway Gen-4**。具体而言，CLIP-T 达到 25.54（+1.98 vs. InsViE），CLIP-F 达到 99.03（+0.25），VLM Score 达到 8.10（+0.75）；人类评估中编辑准确性 3.85（+1.57）、时序一致性 3.76（+1.46）、综合评分 3.86（+1.50）。消融实验证实模型性能随训练数据规模增加而持续提升，且移除 MCL 后模型难以准确理解编辑指令的完整语义意图。
 
-## 背景与动机
-
 指令驱动的视频编辑旨在根据自然语言描述对视频内容进行修改，其核心挑战在于同时满足编辑准确性、时序一致性与内容保真度。近年来，扩散模型在图像编辑领域取得了显著进展，但将这些能力迁移至视频域仍面临根本性瓶颈：**大规模、高质量、多样化的配对编辑数据极度匮乏**。
 
 现有方法可大致分为两类。一类以 **TokenFlow**（Geyer et al., ICLR 2024）为代表，通过对预训练文本到视频模型进行特征注入或注意力操控来实现零样本编辑，无需配对训练数据。然而，这类方法缺乏对编辑语义的精确理解，难以处理涉及对象替换、属性修改等复杂指令。另一类方法尝试构建合成训练数据，如 **InsV2V**（Cheng et al., ICLR 2024）和 **InsViE**（Wu et al., ICCV 2025），它们利用图像编辑模型处理单帧，再通过图像到视频的生成模型将编辑传播至整个时序。但这一范式存在三重权衡：编辑多样性受限于图像编辑器的能力边界，时序一致性缺乏显式的运动约束，且逐样本生成的计算成本极高（约50 GPU-minutes/样本），使得百万级数据构建在工程上不可行。
@@ -62,7 +61,7 @@ claims:
 
 针对上述缺口，本文提出 **Ditto** 数据合成框架及其训练出的编辑模型 **Editto**。核心动机是：**将成熟指令图像编辑器的高保真外观编辑能力作为视觉先验，同时引入深度图作为显式结构脚手架，通过上下文视频生成器一次性合成编辑视频**，从而在编辑质量、时序一致性与生成效率之间取得突破。配合 VLM 自动化指令生成与质量过滤，Ditto 以可扩展的方式构建了包含超百万样本的 Ditto-1M 数据集，并通过模态课程学习使最终模型 Editto 在推理时仅依赖文本指令即可完成编辑。
 
-## 核心创新
+## 核心方法与创新机理
 
 本文的核心贡献在于提出了一套可扩展的**数据合成范式**与配套的**训练策略**，系统性地突破了指令视频编辑中数据稀缺、时序不一致与计算成本高昂的瓶颈。其关键创新可归结为以下四个相互耦合的“changed slots”：
 
@@ -105,8 +104,6 @@ claims:
 
 上述四个 changed slots 并非孤立改进，而是形成了正向反馈闭环：**深度支架**保证了合成数据的时序一致性，使**VLM 过滤**能更可靠地筛选高质量样本；**MCL 策略**使模型能从这些高质量数据中高效学习文本到视频编辑的映射；**蒸馏与量化**则使整个流水线具备规模化能力，进而支撑更大规模数据的生产，进一步提升模型性能（Fig. 7 显示性能随数据量持续增长）。
 
-## 整体框架
-
 Editto 的核心设计围绕两条轴线展开：**数据合成框架 Ditto** 与**模型训练策略**。Ditto 负责以可扩展的方式自动构建百万级高质量视频编辑数据（Ditto-1M），而 Editto 则在此数据上通过模态课程学习被训练为一个纯文本驱动的指令视频编辑器。图 2 和图 3 分别展示了数据合成与模型训练的整体流程。
 
 ### 数据合成流水线 (Ditto)
@@ -137,8 +134,6 @@ Editto 的目标是让模型在推理时**仅依赖文本指令**完成编辑，
 
 ![[assets/figures/papers/paper_list_l2211_https_arxiv_org_abs_2510_15742/figures/002_Figure_2.jpg]]
 *Figure 2: Our scalable data synthesis pipeline. (1) Pre-processing: A diverse video pool is curated via automated deduplication and motion filtering. (2) The core engine synthesizes video triplets, conditioning an in-context generator on automated instructions, appearance context from edited key-frames, and structural context from depth maps. (3) Post-processing: Final visual quality is guaranteed by a VLM-based filter and a denoising enhancer. For the sake of reproducibility, every component in our pipeline employs an open-source model*
-
-## 核心模块与公式推导
 
 Editto 系统的核心由 **Ditto 数据合成流水线** 和 **模态课程学习训练策略** 两大支柱构成。Ditto 流水线将成熟的指令图像编辑能力作为视觉先验，通过深度图结构约束和上下文视频生成器将关键帧编辑传播到整个视频时空，并由 VLM 代理自动完成指令创作与质量过滤。训练阶段则通过模态课程学习（MCL）逐步桥接“视觉参考帧”与“纯文本指令”之间的模态鸿沟，使模型最终仅凭文本指令即可完成视频编辑。
 
@@ -193,7 +188,7 @@ $$\mathcal{L} = \mathbb{E}_{t, \mathbf{z}_0, \mathbf{c}} \| \mathbf{v}_t(\mathbf
 
 流水线中各模块的协同解决了指令视频编辑数据合成的核心瓶颈：图像编辑器提供高保真的外观编辑先验，深度视频提供显式的运动与几何约束，上下文视频生成器将二者融合为时序连贯的编辑视频，VLM 代理则自动化了指令创作与质量把控。MCL 策略进一步将这种多模态合成能力蒸馏为纯文本驱动的端到端模型，使推理阶段无需任何视觉参考即可完成编辑。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验：与先前方法的定量与定性对比
 
@@ -246,13 +241,10 @@ Editto 相比此前最优的 InsViE，在 CLIP-T 上提升 **+1.98**，人类评
 ![[assets/figures/papers/paper_list_l2211_https_arxiv_org_abs_2510_15742/figures/005_Figure_4.jpg]]
 *Figure 4: Qualitative comparisons with prior arts TokenFlow [14], InsV2V [11], InsViE [49] and Gen4-Aleph [38]*
 
-![[assets/figures/papers/paper_list_l2211_https_arxiv_org_abs_2510_15742/figures/007_Figure_6.jpg]]
-*Figure 6: Unlike the original data generator, which fails to handle newly emerging information beyond key frames, our model - trained with filtering and scaling techniques - outperforms it*
-
 ![[assets/figures/papers/paper_list_l2211_https_arxiv_org_abs_2510_15742/figures/008_Figure_7.jpg]]
 *Figure 7: Ablation studies on training data scale and modality curriculum learning (MCL)*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 与先前工作的关系
 

@@ -41,7 +41,7 @@ claims:
 > - PeopleSnapshot 上，PSNR 28.93 vs (best baseline: 28.76 by GoMAvatar) (+0.17)；Normal 1.687 vs (best baseline: 2.055?) (-17.9%)。
 > - X-Avatar 上，PSNR 29.03 vs (best baseline: 28.86 by GaussianAvatar) (+0.17)；Normal 1.772 vs (best baseline: 2.055) (-13.8%)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -65,8 +65,6 @@ Tavatar 在方法谱系中占据独特位置：它既不同于完全依赖自由
 
 Tavatar 的性能依赖于底层 SMPL 模型的拟合精度，初始拟合不准确会限制最终化身质量。当前方法假设服装与身体保持静态拓扑关系，无法处理宽松或动态服装（如裙子飘动）。未来方向包括将解析绑定机制扩展到多对象交互场景、针对关节高频变形区域设计自适应正则化权重，以及探索该范式在非人体对象的动画控制中的应用潜力。
 
-## 背景与动机
-
 ### 可动画人类化身重建的挑战
 
 从多视角视频中重建可动画的高保真人类化身，是计算机视觉与图形学领域的核心问题之一，广泛应用于虚拟现实、电影特效和远程交互等场景。近年来，基于 **3D 高斯泼溅**（3D Gaussian Splatting, 3DGS）的方法凭借其高效的渲染速度和优异的视觉质量，逐渐成为该方向的主流范式。这类方法通常将一组三维高斯核绑定到参数化人体模型（如 SMPL）上，通过线性混合蒙皮（Linear Blend Skinning, LBS）驱动高斯随姿态变化，从而实现对任意姿态的动画控制。
@@ -89,7 +87,7 @@ Tavatar 的性能依赖于底层 SMPL 模型的拟合精度，初始拟合不准
 
 此外，Tavatar 引入了**等边正则化**（Equilateral Regularization），显式约束三角网格的边长方差和角度偏离，防止极端姿态下的三角形退化，从而保证解析映射的数值稳定性。这一设计使方法在保持高质量渲染的同时，在几何精度上实现了对现有方法的显著超越——在 X-Avatar 和 PeopleSnapshot 数据集上分别将法线误差降低了 13.8% 和 17.9%。
 
-## 核心创新
+## 核心方法与创新机理
 
 Tavatar 的核心创新在于将高斯属性的确定方式从**优化驱动**转向**几何驱动**，彻底改变了现有 3DGS 人体化身方法中高斯与网格形变分离的根本问题。这一范式转换体现在三个相互关联的 changed slots 上。
 
@@ -131,8 +129,6 @@ $$\mathcal{L}_{\mathrm{tri}} = \sum_{f \in \mathbf{F}_s} \left[ \mathrm{Var}(\{\
 
 定量证据表明，这一范式转换带来的几何一致性提升远超现有方法：在 X-Avatar 上法线误差降低 13.8%，PeopleSnapshot 上降低 17.9%（Table 3）。消融实验进一步揭示了两类高斯设计的互补必要性——移除 Face Gaussian 导致 PSNR 下降 1.35 dB，移除 Vertex Gaussian 导致 PSNR 下降 2.57 dB（Table 4），证实了面覆盖与顶点细节的双重拓扑绑定缺一不可。
 
-## 整体框架
-
 Tavatar 提出了一种**几何驱动**的可动画人类化身重建范式，其核心思路是将高斯属性的确定方式从传统的优化驱动转向从可变形网格的局部拓扑中解析推导。如图1所示，整个pipeline由三个紧密耦合的模块构成：可变形网格表示、拓扑感知高斯推导和等边正则化，三者协同工作，使高斯分布与网格变形严格一致，从而在分布外（OOD）姿势下仍保持稳健的渲染质量和几何一致性。
 
 ### Pipeline 总览
@@ -163,8 +159,6 @@ Tavatar 提出了一种**几何驱动**的可动画人类化身重建范式，�
 
 ![[assets/figures/papers/paper_list_l22_https_openaccess_thecvf_com_content_CVPR2026_html_Luo_Tavatar_Topology_A/figures/001_Figure_1.jpg]]
 *Figure 1: Method overview. We propose Tavatar, a geometry-driven paradigm that reconstructs high-quality animatable human avatars by analytically deriving Gaussian attributes from a deformable mesh. Our approach includes: Analytical Gaussian Attribute Derivation: All Gaussian positions, scales, and orientations are computed directly from mesh topology yielding structurally correct Gaussian placement, improved surface coverage, and pose-consistent animation across challenging motions. Equilateral Geometry Regularization: An equilateral constraint enforces stable Gaussian binding on the mesh, preventing degeneration and ensuring robust reconstruction quality, especially under large deformations and in...*
-
-## 核心模块与公式推导
 
 Tavatar 的核心设计理念是将高斯属性的确定方式从**优化驱动**转向**几何驱动**：所有高斯的尺度、旋转和位置均从可变形网格的局部拓扑中解析计算，仅保留颜色系数（二阶球谐函数）作为可学习参数。该方法包含三个关键模块。
 
@@ -222,12 +216,7 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{rgb}} + \lambda_n \mathcal
 
 其中 $\mathcal{L}_{\mathrm{rgb}}$ 为 RGB 的 L1 损失与 SSIM 损失的组合（$\lambda_{\mathrm{SSIM}}=0.2$），$\mathcal{L}_{\mathrm{normal}}$ 为法线伪监督的 L1+SSIM 损失（$\lambda_n=0.05$），$\mathcal{L}_{\mathrm{mesh}}$ 为网格拉普拉斯平滑损失（$\lambda_m=0.01$）。整个框架端到端训练形状编码器和球谐系数，高斯的所有几何属性在每次迭代中从当前网格状态解析重算，无需逐姿势优化。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l22_https_openaccess_thecvf_com_content_CVPR2026_html_Luo_Tavatar_Topology_A/figures/002_Figure_2.jpg]]
-*Figure 2: Gaussian distribution under OOD poses on PeopleSnapshot. Our topology-aware binding maintains structured, mesh-coherent Gaussian layouts across pose variations, while GART and IHuman exhibit floating Gaussians and geometric artifacts, demonstrating the necessity of analytical attribute derivation for robust animation*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -272,7 +261,7 @@ Tavatar 在两个主流可动画人类化身基准上进行了系统评估，与
 ![[assets/figures/papers/paper_list_l22_https_openaccess_thecvf_com_content_CVPR2026_html_Luo_Tavatar_Topology_A/figures/008_Table_4.jpg]]
 *Table 4: Quantitative ablation result on X-Avatar subject 00019*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 核心范式转换：从优化驱动到几何驱动
 

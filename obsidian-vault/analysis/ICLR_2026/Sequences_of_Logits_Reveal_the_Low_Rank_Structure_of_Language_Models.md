@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Sequences_of_Logits_Reveal_the_Low_Rank_Structure_of_Language_Models.pdf
+project_link: null
+code_link: null
 openreview_forum_id: gdZ6J5hZzF
 aliases:
 - LLG
@@ -41,7 +43,7 @@ claims:
 > - OLMo-1b, wiki 数据集构造的提示集 (Option 1) 上，KL divergence between LINGEN and true model 为 LINGEN，对比 Single-token baseline，变化 LINGEN 的总KL散度在所有生成步数（15步）上显著低于所有基线（示例：在后期步数从约0.15降至远低于基线的水平）。
 > - OLMo-1b, 使用无意义futures的分布外设置 (Option 2) 上，KL divergence 为 LINGEN，对比 Single-token baseline and other methods，变化 LINGEN 的KL散度虽然大于原位设置，但仍小于所有基线。
 
-## 概述
+## 概要
 
 **问题瓶颈**：当前大规模语言模型（LLM）在行为预测与理论保证方面面临一个根本性困难——我们缺乏一个简单、通用且不依赖具体架构的数学抽象来刻画其内在结构。这导致对模型输出行为的理解、控制与可证明分析长期受限。
 
@@ -59,7 +61,7 @@ claims:
 
 **局限与开放问题**：理论泛化界（如 Lemma D.18）依赖强假设且不紧凑，难以直接应用；LINGEN 需要大量模型查询以构建回归矩阵，可能被滥用于绕过安全过滤器；低秩观察基于有限子集，尚未对全序列空间提供严格近似保证；此外，低秩性质随序列长度增长的变化、与标准解码策略的直接比较等问题仍有待探索。
 
-## 背景与动机
+
 
 大规模语言模型（LLM）已展现出令人瞩目的生成与推理能力，然而我们对这些模型内部工作机制的理解仍然相当有限。当前研究面临一个核心瓶颈：**缺乏简单、通用的数学抽象来刻画语言模型内在的低维结构**，这使得我们难以对模型行为做出可测试的预测，更无法提供可证明的理论保证。
 
@@ -77,7 +79,9 @@ $$\log \Pr_M[f \mid h] \approx \langle \phi(h), \psi(f) \rangle$$
 
 综上，本文的动机在于：**通过对数概率矩阵的低秩结构，为语言模型建立一个架构无关的数学框架，从而实现对模型行为的可预测操控和理论理解**。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于将语言模型的对数概率输出重新组织为**扩展对数概率矩阵**（extended logit matrix），并发现该矩阵在现代大语言模型中展现出**近似低秩结构**。这一发现并非对模型架构的修改，而是对模型行为的数学抽象，其关键突破体现在以下两个层面。
 
@@ -117,7 +121,7 @@ $$\mathrm{Rank}(\mathcal{L}_M(\Sigma^t, \Sigma^{\leq T-t})) \leq d \quad \forall
 
 需注意，LINGEN的生成质量尚未与标准解码策略（如温度采样、束搜索）进行直接比较，其实用性有待验证。理论泛化界（如Lemma D.18）依赖强假设且不紧凑，难以直接指导实践。此外，低秩结构的观察基于有限的历史/未来子集，尚未对全序列空间提供严格的近似保证。
 
-## 整体框架
+
 
 本文提出了一套与架构无关的分析框架，将任意语言模型视为从序列到序列的序贯概率映射，并通过**扩展对数概率矩阵**（extended logit matrix）揭示其内在的低维结构。整个工作流程由三个核心模块构成，形成“观测—利用—理论解释”的完整闭环。
 
@@ -167,7 +171,7 @@ $$x_t = A_{z_t, t} \, x_{t-1}, \quad z_t \sim \mathsf{softmax}(B_t \, x_{t-1})$$
 
 三个模块之间的因果关系清晰：模块一观测到的近似低秩性（奇异值幂律衰减，$\alpha > 1/2$）是模块二可行的必要条件；模块三则为这种可行性提供了严格的数学解释。整个框架不依赖任何特定的模型架构，仅通过 logit 查询接口即可运作，具有广泛的适用性。
 
-## 核心模块与公式推导
+
 
 ### 均值中心化对数概率
 
@@ -229,7 +233,9 @@ $$\mathrm{Rank}(\mathcal{L}_M(\Sigma^t, \Sigma^{\leq T-t})) \leq d \quad \forall
 
 该等价性将语言模型的低秩结构从经验观察提升为表示学习的理论基础（Section 4.1）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：对数概率矩阵的近似低秩结构
 
@@ -305,7 +311,9 @@ $$D_{\mathsf{KL}}^{\mathsf{avg}}(\mathcal{L}_M(\mathcal{H}, \mathcal{F}), A) \le
 ![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_gdZ6J5hZzF/figures/045_Table_1.jpg]]
 *Table 1: For 10 values of h $\in \mathcal$ H (left column) we display the history $h ^ { \prime } \in \mathcal { H } , h ^ { \prime } \ne$ h minimizing the distance between the respective rows of the logits matrix, i.e., \| $\dot { \mathcal { L } _ { M } } ( \{$ h $\} , \mathcal { F }$ ) - $\dot { \mathcal { L } } _ { M } ( \{ h ^ { \prime } \} , \mathcal { F }$ ) \|$_ { 2 } ^ { \infty }$ . Examples were not cherry-picked (they correspond to the first 10 examples in the set H described in Section 3.1, as obtained from wiki)
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心机制与理论等价性
 
@@ -357,6 +365,8 @@ LINGEN 的关键特性在于：**生成过程完全不需要查询目标提示�
 - **安全攻击与防御**：LINGEN 或其变体是否能够通过拆分目标提示来绕过安全防护？该框架是否暗示了针对此类攻击的防御技术？
 - **近似低秩的理论扩展**：能否将理论结果扩展到近似低秩情形，并确定哪些近似度量（如全变差 vs 矩阵范数）在理论上可行且贴近实践？
 - **架构偏置的起源**：为什么未训练的模型（如 OLMo-1b step 0）也显示出比随机子空间稍多的列空间重叠（Figure 12）？这是否源于架构的归纳偏置？
+
+
 
 ## 原文 PDF
 

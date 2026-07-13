@@ -5,6 +5,8 @@ paper_level: A
 venue: ICCV
 year: 2021
 pdf_ref: paperPDFs/ICCV_2021/Active_Learning_for_Deep_Object_Detection_via_Probabilistic_Modeling.pdf
+project_link: null
+code_link: https://github.com/NVlabs/AL-MDN
 aliases:
 - AMALMDN
 - ALDODPM
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 基于概率建模的深度目标检测主动学习 |
 | 英文题名 | Active Learning for Deep Object Detection via Probabilistic Modeling |
 | 会议/期刊 | ICCV 2021 |
-| Links | [paper](https://arxiv.org/abs/2103.16130); [GitHub](https://github.com/NVlabs/AL-MDN) |
+| Links | [paper](https://arxiv.org/abs/2103.16130) · [GitHub](https://github.com/NVlabs/AL-MDN) |
 | Topic | #topic/optimization_theory_probabilistic #topic/optimization_theory_probabilistic/optimization_methods |
 | Method | AL-MDN (Active Learning via Mixture Density Networks) |
 | Dataset | PASCAL VOC07 (active learning, 3rd cycle, 4k labeled), PASCAL VOC07+12 (active learning, final 10k labeled), MS-COCO (active learning, 7k labeled) |
@@ -41,7 +43,7 @@ claims:
 > - PASCAL VOC07+12 (active learning, final 10k labeled) 上，mAP (IoU>0.5) 为 0.7598±0.0021 (Ours_gmm)，对比 0.7117±0.0016 (Random)，变化 +0.0481。
 > - MS-COCO (active learning, 3rd cycle, 7k labeled) 上，mAP (IoU>0.5:0.95) % 为 30.51±0.12 (Ours_gmm)，对比 28.69±0.11 (Random)，变化 +1.82。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有深度目标检测的主动学习方法普遍依赖多模型集成或多前向传递（如MC‑dropout）来估计不确定性，计算成本高昂；且大多数方法仅利用分类不确定性，忽略了定位不确定性，导致样本选择的信息量度量不够全面。
 
@@ -56,7 +58,7 @@ claims:
 
 **方法定位**：AL‑MDN属于单模型、单前向传递的主动学习范式，在精度上超越同类单模型方法，达到多模型方法的水平，同时大幅降低计算开销，为深度目标检测的主动学习提供了高效且全面的不确定性建模方案。
 
-## 背景与动机
+
 
 深度目标检测模型的性能高度依赖大规模标注数据，但边界框级标注成本高昂，这促使主动学习成为降低标注代价的关键范式。然而，现有主动学习方法在目标检测任务中面临两个核心瓶颈。
 
@@ -66,7 +68,9 @@ claims:
 
 上述两个瓶颈的根源在于：确定性检测头无法在单次前向传播中同时捕获定位和分类任务的偶然不确定性（数据固有噪声）与认知不确定性（模型知识不足）。本文的核心动机正是通过概率建模改造检测头，在保持单模型、单前向传递效率的同时，显式估计并聚合四类不确定性，实现信息量更全面、计算成本更低的主动学习。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作的核心创新在于将目标检测主动学习中的**不确定性估计**从“多模型/多前向传递”范式迁移到“单模型/单前向传递”范式，并首次显式地同时建模**定位与分类**两个任务维度的**偶然与认知**两种不确定性。具体而言，该方法通过三个关键改造（changed slots）实现了这一突破。
 
@@ -99,7 +103,7 @@ claims:
 
 本方法的本质创新在于：**通过输出层的概率化改造，将不确定性估计从“外部集成”内化为“单模型内部结构”，同时将不确定性空间从单一的分类维度拓展到定位与分类的联合维度，使单次前向传播即可捕获更全面的信息量信号**。这一定位使得方法在精度上超越所有单模型基线，与 MC-dropout、Ensemble 等多模型方法持平，而前向时间仅为 MC-dropout 的 1/20（Figure 5）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2103_16130/figures/002_Figure_2.jpg]]
 *Figure 2: An overview of the proposed object detection network. The main difference with conventional object detectors [31, 32] is in the localization and classification heads (branches). a) Instead of having deterministic outputs, our approach learns the parameters of K-components GMM for each of the outputs: coordinates of the bounding box in the localization head and the class density distribution in the classification (confidence) head (see Section 3.1). b) A classification head that improves the efficiency by eliminating variance parameters from GMM’s classification head (see Section 3.2)*
@@ -127,7 +131,7 @@ AL-MDN 的整体流程围绕“单模型、单前向传播同时估计定位与�
 
 Figure 2 直观展示了标准检测头与 GMM 检测头的结构差异：确定性输出被替换为对每个输出量学习 $K$ 分量 GMM 参数，这是实现单次前向不确定性估计的架构基础。
 
-## 核心模块与公式推导
+
 
 ### 3.1 混合密度网络（MDN）驱动的概率化目标检测
 
@@ -189,7 +193,9 @@ $$L = \begin{cases} \frac{1}{N} (\mathcal{L}_{loc}/\eta + \mathcal{L}_{cl}^{Pos}
 
 对于每张图像，首先对每个检测目标的四种不确定性（定位偶然/认知、分类偶然/认知）进行z-score归一化，使不同尺度的不确定性可比。随后取所有目标所有不确定性中的**最大值**作为该图像的信息量得分。消融实验（Table 2）表明，最大聚合显著优于单独使用任一类不确定性（提升约0.9 mAP），也优于求和聚合。其有效性根源在于定位与分类不确定性选择的图像重叠率仅为14%（Table 3），证明两者提供高度互补的信息。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 概率建模对检测精度的基准影响
 
@@ -308,7 +314,9 @@ Ours_gmm以30.51 mAP与MC-dropout（30.49）和Ensemble（30.52）持平，比�
 
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2103_16130/figures/006_Table.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法在主动学习谱系中的位置
 
@@ -345,6 +353,8 @@ AL-MDN的技术根基是将混合密度网络（Mixture Density Networks, MDN）
 2. **极端场景适应性**：该方法在类别分布极度不平衡（如长尾分布）、域偏移（如从自然图像到医学图像）或开放词汇检测等复杂场景下的不确定性估计质量如何？GMM的先验假设（高斯分布）在这些场景下可能不再成立。
 3. **与特征多样性策略的结合**：当前方法仅依赖不确定性进行样本选择。能否将显式不确定性估计与基于特征空间覆盖（如Core-set）或多样性采样的策略结合，在信息量和代表性之间取得更好的平衡？
 4. **计算效率的进一步优化**：虽然AL-MDN的单次前向传播已远快于MC-dropout和Ensemble，但GMM头仍引入了额外参数（约11M）。能否通过知识蒸馏或参数共享进一步压缩模型，使其更适合边缘设备上的主动学习部署？
+
+
 
 ## 原文 PDF
 

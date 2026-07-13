@@ -41,7 +41,7 @@ claims:
 > - PubLayNet (5% labels) 上，AP 88.2 ± 0.3 (SwiftFormer adaptive) / 89.7 ± 0.4 (LayoutLMv3 adaptive) vs 85.3 ± 0.4 (Dense Teacher, best semi-supervised) / 89.1 ± 0.4 (LayoutLMv3+ semi... (+2.9 (轻量级) / +0.6 (文档预训练))。
 > - DocLayNet (5% labels) 上，AP 84.8 vs 79.4 (STEP-DETR) (+5.4)。
 
-## 概述
+## 概要
 
 文档布局分析是文档理解的基础任务，其目标是将页面中的文本、标题、图表、表格等元素精确地检测和分类。然而，现有半监督方法严重依赖视觉教师模型生成的伪标签，这些伪标签存在系统性偏差——教师模型往往难以处理稀有布局元素，并频繁混淆语义相近的类别（如将页脚误判为标题），仅凭视觉线索难以有效纠正这一瓶颈。
 
@@ -51,7 +51,7 @@ claims:
 
 本工作为半监督文档布局分析引入了一种新的多模态融合范式，证明了 LLM 的结构推理能力可以作为视觉检测器的有效补充信号，在标签极度稀缺的场景下实现跨模型规模的稳定提升。
 
-## 背景与动机
+
 
 ### 文档布局分析的核心挑战
 
@@ -85,7 +85,9 @@ claims:
 
 本文提出的LLM-Guided Probabilistic Fusion框架正是围绕这一动机展开：通过OCR-LLM管道提取文本结构先验，利用逆方差加权和可学习实例自适应门控将其与视觉伪标签进行概率融合，在仅5%标签的条件下为检测器生成高质量的精炼伪标签，实现跨模型规模的稳定性能提升。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心贡献在于提出了一种**LLM引导的概率融合框架**，将大语言模型的文本结构推理能力与视觉检测器的感知能力系统性地结合，以解决半监督文档布局分析中伪标签质量不足的瓶颈问题。其关键创新可归纳为四个“changed slots”，每个都对应标准teacher-student框架中的一项根本性改进。
 
@@ -137,7 +139,7 @@ $$\mathcal{L}_{cons} = \frac{1}{N} \sum_{i=1}^N \mathcal{H}_{\{t_i \neq \emptyse
 
 上述四个changed slots构成了一个协同增强的闭环：LLM提供语义结构先验（创新1），不确定性引导的自适应门控智能地融合两路信号（创新2），跨模态一致性损失稳定训练过程（创新3），课程学习策略确保平滑过渡（创新4）。其结果是，在PubLayNet仅5%标签的条件下，轻量级SwiftFormer达到**88.2 AP**，超过所有半监督基线（比Dense Teacher高**+2.9 AP**）；文档预训练模型LayoutLMv3达到**89.7 AP**，显著超越标准半监督学习（p=0.02）。在更复杂的DocLayNet上，该方法比STEP-DETR提升**+5.4 AP**，验证了其跨数据集的泛化能力。
 
-## 整体框架
+
 
 本文提出了一种LLM引导的半监督文档布局分析框架，其核心思想是将文本大语言模型的结构推理能力与视觉检测器的感知能力进行概率融合，从而在极低标注率（5%）下生成高质量的伪标签。整个pipeline由五个关键模块串联构成，形成从原始文档到精炼伪标签再到学生模型训练的闭环。
 
@@ -170,7 +172,7 @@ $$\mathcal{L}_{cons} = \frac{1}{N} \sum_{i=1}^N \mathcal{H}_{\{t_i \neq \emptyse
 ![[assets/figures/papers/paper_list_l761_https_arxiv_org_abs_2511_08903/figures/001_Figure_1.jpg]]
 *Figure 1: LLM-guided semi-supervised framework. OCR text is sent to LLM for structural inference; teacher detector generates visual predictions. Fused via IoU matching and confidence weighting. Student trains on refined pseudo-labels*
 
-## 核心模块与公式推导
+
 
 ### 框架总览
 
@@ -245,7 +247,9 @@ $$R(g_{\theta}) \leq \min_{g \in \mathcal{G}} R(g) + \tilde{O}\left( \sqrt{\frac
 ![[assets/figures/papers/paper_list_l761_https_arxiv_org_abs_2511_08903/figures/005_Table_5.jpg]]
 *Table 5: Fusion strategy comparison. Probabilistic fusion outperforms fixed heuristics*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -338,7 +342,9 @@ Figure 3 的标签效率曲线显示，本文方法在 10% 标签时已接近全
 ![[assets/figures/papers/paper_list_l761_https_arxiv_org_abs_2511_08903/figures/006_Table_6.jpg]]
 *Table 6: Efficiency on PubLayNet (5% labels, A100 GPU). “Adaptive” adds a 64K-param gate*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从半监督目标检测到多模态伪标签精炼
 
@@ -373,6 +379,8 @@ Figure 3 的标签效率曲线显示，本文方法在 10% 标签时已接近全
 3. **领域自适应的效率：** 是否可以通过零样本或小样本推理的提示策略进一步降低对专用LLM预处理的需求？例如，利用LLM的上下文学习能力，在少量标注样本上自动生成领域特定的结构推理提示，从而减少人工提示工程的开销。
 
 4. **融合策略的理论深化：** 当前的门控网络基于三维统计量（教师置信度、LLM置信度、IoU）进行决策。是否存在更优的融合统计量组合？例如，引入布局复杂度、文本密度等文档级特征是否能进一步提升门控的判别力？
+
+
 
 ## 原文 PDF
 

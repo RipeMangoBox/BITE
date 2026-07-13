@@ -43,7 +43,7 @@ claims:
 > - EgoEditBench 上，VLM 7.76 (EgoEdit) vs 7.52 (AnyV2V) (+0.24)；VLM 7.71 (EgoEdit-RT) vs 4.32 (StreamDiffusion) (+3.39)。
 > - EditVerseBench 上，VLM 7.50 (EgoEdit) vs 7.45 (EditVerse) (+0.05)。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -71,8 +71,6 @@ EgoEdit 通过**数据-模型-推理**三层面的协同设计解决上述问题
 
 EgoEdit 处于**实时视频编辑 × egocentric 感知**的交叉点。与 **AnyV2V**、**Lucy Edit**（通道条件注入，Decart Team, arXiv 2025）、**UNIC**（上下文式编辑，Ye et al., arXiv 2025）等通用编辑器不同，EgoEdit 通过域专门数据集和流式蒸馏策略，首次将实时编辑能力引入 egocentric 场景。其技术路线可视为“域数据策展 + 低开销条件注入 + 双向蒸馏 + 自回归自强制”的完整管线，为 AR 交互中的视频编辑提供了端到端解决方案。
 
-## 背景与动机
-
 第一人称（egocentric）视频编辑是增强现实（AR）交互的核心技术需求。用户佩戴头戴设备时，期望能够通过自然语言指令实时修改视野中的物体——例如替换桌面上的水杯、移除遮挡视线的物品。然而，现有视频编辑方法在该场景下面临双重瓶颈：**域差距**与**推理延迟**。
 
 **域差距**源于训练数据与评测基准的系统性缺失。通用视频编辑模型（如 **AnyV2V**（Ku et al., arXiv 2024）、**EditVerse**、**InsV2V**）的训练数据以第三人称视角为主，缺乏第一人称特有的快速自运动（ego-motion）、手-物遮挡和动态交互模式。当这些模型直接应用于 egocentric 视频时，往往无法正确处理手部遮挡区域的编辑，或在相机剧烈晃动时产生时序不一致的结果。论文分析指出，从 Ego4D 和 EgoExo4D 原始视频中仅保留了约 0.4% 的片段用于构建编辑对，这从侧面反映了高质量 egocentric 编辑数据的稀缺性。
@@ -81,7 +79,7 @@ EgoEdit 处于**实时视频编辑 × egocentric 感知**的交叉点。与 **An
 
 EgoEdit 的动机由此明确：**构建域匹配的高质量 egocentric 编辑数据集**以消除域差距，并**通过通道级条件注入与自强制蒸馏实现单 GPU 上的实时流式推理**，从而首次使交互式 AR 视频编辑成为可能。系统整体由三部分构成（Figure 1）：手动策展的 EgoEditData 数据集（约 100k 编辑对，聚焦手-物交互场景下的物体替换与移除）、EgoEdit 编辑模型及其实时变体 EgoEdit-RT（单 H100 GPU 上首帧延迟 855ms、吞吐 38.1fps），以及用于标准化评测的 EgoEditBench 基准。
 
-## 核心创新
+## 核心方法与创新机理
 
 EgoEdit 的核心创新在于通过四个关键设计槽位（changed slots）的协同改造，首次实现了面向第一人称（egocentric）视频的实时流式编辑。其根本瓶颈在于：现有视频编辑器在训练数据和评估方面缺乏对 egocentric 视角的专门支持，导致在 AR 交互场景中无法处理快速自运动、手-物遮挡和交互，且离线推理延迟高，无法满足实时交互需求。EgoEdit 通过以下四个维度的创新系统性解决了这一问题。
 
@@ -104,8 +102,6 @@ EgoEdit 的蒸馏策略分为两步。首先，采用**双向 DMD 蒸馏**将 40
 ### 创新点间的因果关联
 
 上述四个创新槽位之间存在紧密的因果依赖关系：通道拼接（创新 1）保证了基座模型的计算效率，为蒸馏压缩（创新 4）提供了可行的起点；EgoEditData 的域专门数据（创新 3）弥补了通用编辑器在 egocentric 场景下的性能缺陷；蒸馏和自强制训练（创新 4）则使得逐块自回归流式推理（创新 2）在保持可接受编辑质量的前提下达到实时性能。四者共同构成了从数据、架构、推理模式到效率优化的完整创新链条，使 EgoEdit 成为首个真正支持交互式 AR 场景的 egocentric 视频实时编辑系统。
-
-## 整体框架
 
 EgoEdit 构建了一个面向第一人称视频编辑的完整生态系统，由三个核心组件构成：**EgoEditData**（手动策展的 egocentric 编辑数据集）、**EgoEdit**（基于通道条件注入的流式编辑模型）及其实时变体 **EgoEdit-RT**、以及 **EgoEditBench**（egocentric 编辑基准）。整体工作流为：通过 EgoEditData 策展管线获取高质量域匹配训练对，在其上微调预训练视频生成器得到基座编辑模型，再经双向 DMD 蒸馏与自强制训练压缩为实时自回归生成器，最终在 EgoEditBench 上完成系统评估。
 
@@ -138,8 +134,6 @@ $$\mathcal{L}_{\mathrm{RF}} = \mathbb{E}_{t \sim p_t, \mathbf{X}_1 \sim p_d, \ma
 
 ![[assets/figures/papers/paper_list_l2675_https_openaccess_thecvf_com_content_CVPR2026_html_Li_EgoEdit_Dataset_Rea/figures/004_Figure_4.jpg]]
 *Figure 4: Architecture of EgoEdit. EgoEdit extends a video generation DiT model for video editing by performing channel-wise concatenation of the source and noisy target video inputs, avoiding the computational overheads of sequence-wise concatenation*
-
-## 核心模块与公式推导
 
 ### 基础生成框架：Rectified Flow 速度预测
 
@@ -198,7 +192,7 @@ EgoEdit 采用通道维度拼接：在 patchification 之前，将 $\mathbf{X}^{
 ![[assets/figures/papers/paper_list_l2675_https_openaccess_thecvf_com_content_CVPR2026_html_Li_EgoEdit_Dataset_Rea/figures/005_Figure_5.jpg]]
 *Figure 5: Inference of EgoEdit. EgoEdit performs inference in a streaming fashion. A camera continuously acquires video sequences which are edited by the model in a chunk-by-chunk manner so that the edited video can be served to the user in a watch-asyou-generate fashion. Each blue arrow represents a model forward pass on a single video chunk for the case of a 3 steps model*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 实验设置
 
@@ -257,13 +251,10 @@ Table 3 展示了 EgoEditData 子集规模对模型性能的因果效应。在�
 ![[assets/figures/papers/paper_list_l2675_https_openaccess_thecvf_com_content_CVPR2026_html_Li_EgoEdit_Dataset_Rea/figures/003_Figure_3.jpg]]
 *Figure 3: Comparison of EgoEdit and EgoEdit-RT against baselines according to VLM score on EgoEditBench and EditVerseBench [23]. Overall, EgoEdit and its real-time variant EgoEdit-RT achieve superior results on egocentric editing tasks and perform competitively with the strongest baselines on general editing tasks. EditVerse is excluded from EgoEditBench as source code is unavailable. Streaming models are indicated in dashed lines*
 
-![[assets/figures/papers/paper_list_l2675_https_openaccess_thecvf_com_content_CVPR2026_html_Li_EgoEdit_Dataset_Rea/figures/002_Figure_2.jpg]]
-*Figure 2: In-the-wild video edits produced in real time by EgoEdit’s streaming variant EgoEdit-RT on a single H100 GPU. The modelDepth2Video demonstrates strong generalization to out-of-distribution scenarios, producing compelling real-time results suitable for immersive ARSketch2Video experiences. Additional results are presented in Appx. ?? and the local HTML viewer in the supplementary material.Pose2Video*
-
 ![[assets/figures/papers/paper_list_l2675_https_openaccess_thecvf_com_content_CVPR2026_html_Li_EgoEdit_Dataset_Rea/figures/001_Figure_1.jpg]]
 *Figure 1: We propose a framework for real-time egocentric video editing. Our system is composed of: EgoEditData, a manually curated dataset of 100k video editing pairs focusing on the egocentric case and featuring object substitution and removal under challenging hand occlusions, interactions, and large egomotion; EgoEdit, the first real-time autoregressive model for egocentric video editing running in real time on a single H100 with 855ms first-frame latency and enabling live augmented reality (AR) interactions; EgoEditBench, a comprehensive benchmark for evaluation of egocentric video editing systems*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 与现有视频编辑方法的谱系关系
 

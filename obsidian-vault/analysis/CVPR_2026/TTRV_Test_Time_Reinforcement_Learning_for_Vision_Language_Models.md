@@ -43,7 +43,7 @@ claims:
 > - ImageNet-R 上，Top-1 Accuracy 96.89 vs 66.01 (+30.88)。
 > - DTD 上，Top-1 Accuracy 89.73 vs 37.24 (+52.49)。
 
-## 概述
+## 概要
 
 现有视觉语言模型（VLM）在测试时无法像人类一样从无标记经验中动态学习，必须依赖大量标注数据和昂贵的指令微调或RLHF后训练，导致泛化性和适应性受限。**TTRV（Test-Time Reinforcement Learning for Vision Language Models）** 提出了一种根本不同的范式：在测试推断阶段，直接从无标注的测试样本中提取自监督奖励信号，驱动模型在线优化参数。
 
@@ -62,7 +62,7 @@ claims:
 
 **关键局限**：计算开销显著——即使使用 vLLM 加速，适配 20 个样本也需增加数分钟延迟（相较正常推断增加 547% 以上），适配 500 个样本则超过 1.5 小时，难以直接用于实时场景。此外，作者承认目前缺乏理论解释来说明 TTRV 为何能增强核心能力而非简单过拟合测试分布。
 
-## 背景与动机
+
 
 视觉语言模型（VLM）在图像识别、视觉问答等任务上取得了显著进展，但其部署仍面临一个根本性瓶颈：**现有VLM在测试时无法像人类一样从无标记经验中动态学习，必须依赖大量标记数据和昂贵微调，泛化性和适应性受限**。主流范式将训练与推断严格分离——模型在预训练和指令微调阶段消耗海量标注数据，一旦部署便参数冻结，面对分布偏移或新场景时只能被动承受性能退化。
 
@@ -75,7 +75,9 @@ claims:
 
 TTRV的动机正是填补这一空白——将强化学习从训练阶段解放到测试阶段，直接从模型自身多次采样的输出分布中提取自监督奖励信号，驱动GRPO在线优化模型参数。其核心假设是：**利用模型多次采样的输出频次作为软监督信号，并约束输出熵防止过早收敛，可以在测试时恢复并放大预训练中已习得但被指令微调削弱的基础视觉推理能力**。这一假设在极端数据稀缺场景下得到初步验证——仅使用1个随机测试样本，TTRV仍能带来最高5.5%的提升，暗示其并非单纯拟合分布而是激活潜在能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：VLM 的“测试时失语”
 
@@ -118,7 +120,7 @@ TTRV 的成功并非简单的分布拟合或多数投票。消融实验（Table 
 
 TTRV 是首个将 GRPO 引入 VLM 测试时强化的框架，其奖励设计从“模型自洽性”中提取学习信号，而非依赖外部标注或简单的熵启发式。这一范式转变使得 VLM 能够在遭遇任何测试数据时自主进化，为通用视觉智能体的在线学习开辟了新路径。
 
-## 整体框架
+
 
 TTRV 的整体 pipeline 围绕一个核心思想展开：**在测试时，直接从未标注的测试样本中提取自监督奖励信号，驱动 GRPO 在线优化 VLM 参数**，从而无需任何预训练数据划分或标注数据即可提升下游视觉任务表现。图 2 给出了完整的流程概览。
 
@@ -140,7 +142,7 @@ TTRV 的整体 pipeline 围绕一个核心思想展开：**在测试时，直接
 
 ![[assets/figures/papers/paper_list_l2666_https_arxiv_org_abs_2510_06783/figures/001_Figure.jpg]]
 
-## 核心模块与公式推导
+
 
 TTRV 将测试时强化学习形式化为一个 **KL 正则化的策略优化问题**，其目标是在最大化期望奖励的同时，约束当前策略 $\pi$ 与参考策略 $\pi_{\text{ref}}$ 的偏离程度：
 
@@ -203,7 +205,9 @@ $$\theta \leftarrow \theta + \eta \nabla_{\theta} \mathbb{E}_{y \sim \pi_{\theta
 ![[assets/figures/papers/paper_list_l2666_https_arxiv_org_abs_2510_06783/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of TTRV. For each prompt x, the VLM generates N candidate responses*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -277,7 +281,9 @@ Table 9显示增加适配样本数可进一步提升性能（如ImageNet上20样
 ![[assets/figures/papers/paper_list_l2666_https_arxiv_org_abs_2510_06783/figures/015_Table_12.jpg]]
 *Table 12: Cross-dataset generalization. Performance on different dataset combinations, where X → Y denotes training on dataset X and testing on dataset Y. "IN" in the table refers to ImageNet*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法在文献中的位置
 
@@ -326,6 +332,8 @@ TTRV 的知识贡献可凝练为三个相互耦合的设计选择，它们共同
 4. **更广泛的任务与模型验证：** TTRV 在更大规模 VLM（如 70B+ 参数）以及视频、3D 等多模态任务上的有效性尚待验证。
 
 5. **公平性与社会影响：** 论文未讨论 TTRV 对模型公平性或社会偏见的影响。测试时自适应是否会放大或缓解预训练模型中的偏见，是一个需要手动验证的议题。
+
+
 
 ## 原文 PDF
 

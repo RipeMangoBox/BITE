@@ -5,6 +5,7 @@ paper_level: A
 venue: "SIGGRAPH Asia"
 year: 2024
 pdf_ref: paperPDFs/SIGGRAPH_ASIA_2024/MaskedMimic_Unified_Physics_Based_Character_Control_Through_Masked_Motion_Inpainting.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/par/maskedmimic/
 aliases:
 - MaskedMimic
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | MaskedMimic：通过掩码运动修复统一物理角色控制 |
 | 英文题名 | MaskedMimic: Unified Physics-Based Character Control Through Masked Motion Inpainting |
 | 会议/期刊 | SIGGRAPH Asia 2024 |
-| Links | [paper](https://arxiv.org/abs/2409.14393); [Project](https://research.nvidia.com/labs/par/maskedmimic/) |
+| Links | [paper](https://arxiv.org/abs/2409.14393) · [Project](https://research.nvidia.com/labs/par/maskedmimic/) |
 | Topic | #topic/representation_self_supervised_transfer #topic/representation_self_supervised_transfer/representation_learning |
 | Method | MaskedMimic |
 | Dataset | AMASS (全身运动跟踪), AMASS (VR跟踪), AMASS (关节稀疏跟踪 - 仅头部), AMASS (物体交互：坐下任务) |
@@ -41,7 +42,7 @@ claims:
 > - AMASS (VR跟踪) 上，成功率 (%) 为 98.1 (MaskedMimic)，对比 93.4 (PULSE)，变化 +4.7%。
 > - AMASS (关节稀疏跟踪 - 仅头部) 上，成功率 (%) 为 97.9，对比 - (无直接对比基线)，变化 -。
 
-## 概述
+## 概要
 
 物理角色控制的核心瓶颈在于**任务通用性的缺失**：现有方法通常需要为每个新任务训练专用控制器，并手工设计复杂的奖励函数，难以扩展到多样化的行为生成。MaskedMimic 提出了一种统一的解决思路——将物理角色控制重新定义为**掩码运动修复（Masked Motion Inpainting）**问题。其核心洞见是：训练一个统一模型，从任意组合的部分约束（如部分关节目标、文本指令、物体交互）中预测完整的物理动作，从而无需为每个任务单独训练或手工设计奖励函数。
 
@@ -54,8 +55,6 @@ claims:
 - **消融实验**：去除结构化掩码机制导致物体坐下任务成功率从 96.9% 降至 0%；去除残差先验则降至 21.1%，验证了掩码策略和残差建模的关键作用（Table 6）。
 
 尽管 MaskedMimic 展示了强大的统一控制能力，其生成的运动仍存在不自然的抖动，且难以忠实复现极高动态的特技动作（如后空翻）。此外，目标工程目前依赖手工设计的有限状态机，缺乏自动化方案，模型也尚未扩展到动态物体操作或多智能体协作场景。
-
-## 背景与动机
 
 ### 物理角色控制的统一性挑战
 
@@ -87,7 +86,7 @@ MaskedMimic 的核心动机源于一个关键洞察：**物理角色控制的本
 
 这种设计的关键在于**结构化掩码策略**：在训练时随机掩码连续关节组、时间窗口或整个模态，迫使模型学会从任意部分信息中推理完整运动。推理时，用户的任意部分约束被自然地转化为掩码输入，模型通过其先验网络（基于 Transformer）在潜在空间中采样合理的行为补全。
 
-## 核心创新
+## 核心方法与创新机理
 
 MaskedMimic的核心创新在于将物理角色控制重新定义为**运动修复（motion inpainting）问题**，从而用一个统一模型替代了传统方法中为每个任务单独训练专用控制器的范式。这一转变的关键在于以下三个相互耦合的机制。
 
@@ -106,8 +105,6 @@ MaskedMimic采用条件变分自编码器（cVAE）作为核心架构，其关�
 ### 两阶段蒸馏范式
 
 训练流程采用**先RL后蒸馏**的两阶段策略：第一阶段训练全约束控制器（FC），通过强化学习在包含平坦地形、不规则地形和物体交互区的复合场景中模仿大规模运动数据，获得高质量的全身跟踪能力；第二阶段通过DAgger行为克隆将FC的知识蒸馏为部分约束控制器（PC），蒸馏过程中引入结构化掩码，使PC学会从部分约束修复完整运动。这种“先学完整、再学修复”的策略确保了PC在仅观察部分信息时仍能生成物理合理的动作，同时继承了FC在复杂地形上的鲁棒性。
-
-## 整体框架
 
 MaskedMimic 将物理角色控制重新定义为**运动修复（motion inpainting）问题**：给定任意组合的部分约束（关节目标、文本指令、物体交互等），模型预测完整的物理动作序列，从而复现原始未掩码的完整运动。该框架通过两阶段训练实现这一目标。
 
@@ -153,8 +150,6 @@ $$\mathbb{E}_{z \sim \mathcal{E}(\cdot|s,g^{\text{full}})} [\log \mathcal{D}(a|s
 
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2409_14393/figures/003_Figure_3.jpg]]
 *Figure 3: The MaskedMimic framework: The first phase produces a fullyconstrained controller $\pi ^ { \mathsf { F C } }$ . This full-body tracker is trained using reinforcement learning to imitate kinematic motion recordings across a wide range of complex scene-aware contexts. The second phase produces MaskedMimic. Treating $\pi ^ { \mathsf { F C } }$ as a teacher, through supervised limitation learning its knowledge is distilled into a partially-constrained controller $\pi ^ { \mathrm { P C } }$ . As $\pi ^ { \mathsf { P C } }$ observes masked inputs, this process enables it to perform physics-based inpainting. Finally, at inference, without any further training, $\pi ^ { \mathrm { { \dot { P } C } } }$ is use...
-
-## 核心模块与公式推导
 
 MaskedMimic 将物理角色控制重新定义为**运动修复（motion inpainting）**问题：给定任意组合的部分约束（关节目标、文本指令、物体包围盒等），模型预测完整的物理动作序列以还原被掩码的运动信息。这一统一框架的核心由两个阶段构成。
 
@@ -218,7 +213,7 @@ $$\mathbb{E}_{z \sim \mathcal{E}(\cdot|s,g^{\mathrm{full}})} [\log \mathcal{D}(a
 
 推理阶段，用户提供的高层意图（如“跟随路径”、“坐下”）通过**目标工程**转化为部分约束 $g^{\text{partial}}$。例如，物体坐下任务通过结构化掩码保留物体包围盒信息，同时掩码大部分关节目标，使模型自主修复出合理的坐下动作序列。这一设计使得单一模型无需额外训练即可适应多类下游任务。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -311,15 +306,12 @@ MaskedMimic的实验优势建立在AMASS运动捕捉数据集和特定训练环�
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2409_14393/figures/008_Table_1.jpg]]
 *Table 1: Full-body tracking, flat terrain: Tracking full-body kinematic recordings from the AMASS dataset [Mahmood et al. 2019]. We highlight be best performing model on test motions*
 
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2409_14393/figures/009_Table_2.jpg]]
-*Table 2: VR tracking, flat terrain: Tracking VR-signals extracted from the AMASS dataset. In addition to the full-body tracking (MPJPE), we report that MaskedMimic received a MPOJPE (VR tracking error) of 39.5 (train) and 45.8 (test)*
-
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2409_14393/figures/011_Table_5.jpg]]
 *Table 5: Tasks: MaskedMimic is evaluated on a suite of tasks, where the model is directed to perform each task by conditioning on multi-modal goals*
 
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2409_14393/figures/015_Table.jpg]]
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 与基线工作的关系
 

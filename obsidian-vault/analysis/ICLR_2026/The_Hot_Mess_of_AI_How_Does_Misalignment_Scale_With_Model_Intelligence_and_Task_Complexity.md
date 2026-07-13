@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/The_Hot_Mess_of_AI_How_Does_Misalignment_Scale_With_Model_Intelligence_and_Task_Complexity.pdf
+project_link: https://huggingface.co/datasets/hot-mess/hot-mess-data
+code_link: https://github.com/haeggee/hot-mess-of-ai
 aliases:
 - EIAFBVD
 - HMAHDMSMITC
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | AI的混乱：模型智能与任务复杂度如何影响错误不一致性？ |
 | 英文题名 | The Hot Mess of AI: How Does Misalignment Scale With Model Intelligence and Task Complexity? |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=sIBwirjYlY); [GitHub](https://github.com/haeggee/hot-mess-of-ai); [Project](https://huggingface.co/datasets/hot-mess/hot-mess-data) |
+| Links | [paper](https://openreview.net/forum?id=sIBwirjYlY) · [GitHub](https://github.com/haeggee/hot-mess-of-ai) · [Project](https://huggingface.co/datasets/hot-mess/hot-mess-data) |
 | Topic | #topic/representation_self_supervised_transfer #topic/representation_self_supervised_transfer/representation_learning |
 | Method | Error-Incoherence Analysis Framework (Bias-Variance Decomposition) |
 | Dataset | GPQA (multiple-choice), SWE-BENCH (agentic coding), MMLU (QWEN3 scaling), Synthetic optimizer (quadratic) |
@@ -41,7 +43,7 @@ claims:
 > - SWE-BENCH (agentic coding) 上，coverage error-incoherence 为 错误不一致性随行动步数（动作/消息数）增加而上升，对比 少行动步数组，变化 O4-MINI 0.47→0.60, O3-MINI 0.12→0.25。
 > - MMLU (QWEN3 scaling) 上，Brier error-incoherence 为 对于最难的问题组，错误不一致性随模型规模增大而上升；对于简单问题则下降，对比 最小模型 (0.6B)，变化 趋势在困难组呈正向，简单组呈负向。
 
-## 概述
+## 概要
 
 该工作将AI的失败归因于两种本质不同的成分：由模型与期望目标系统偏差造成的**偏差**（bias，非对齐失败），以及由测试时随机性导致的**方差**（variance，输出不一致性失败）。传统评估聚焦于整体错误率，却忽视了随着模型规模与任务复杂度提升，错误的性质可能从“一致地错误”转为“随机地失败”。论文的核心问题是：在模型智能和任务复杂度增长的过程中，错误是由偏差主导还是方差主导？这种“错误不一致性”（error‑incoherence）能否通过简单扩大模型规模消除？
 
@@ -59,7 +61,7 @@ $$
 
 这些发现表明，仅在准确率上追求 scaling law 不足以保证模型行为的一致性，尤其在长程推理和高难度任务场景下，方差可能成为主导失败模式。论文的“错误不一致性”概念为诊断和缓解此类“hot mess”提供了量化工具，并揭示了偏差‑方差权衡在 AI 对齐研究中的新维度。
 
-## 背景与动机
+
 
 随着大语言模型和智能体系统在数学推理、科学问答、代码生成等复杂任务中展现出越来越强的能力，AI 安全研究的焦点逐渐从“模型是否会犯错”转向“模型如何犯错”。传统上，评估模型性能主要依赖总体准确率或单次通过率（pass@1），但这些指标掩盖了错误的内部结构：模型究竟是因为系统性地偏离了真实目标（**对齐失败**，即偏差），还是因为对同一输入产生了随机、不一致的输出（**不一致性失败**，即方差）而出错，对于预测模型在超人类尺度上的风险至关重要。如果失败主要由偏差主导，那么模型可能以可预测的方式偏离人类意图，表现为典型的“对齐问题”；如果失败主要由方差主导，那么模型的错误则类似于工业事故，难以预判和归因，这在自主智能体执行长程任务时尤为危险。
 
@@ -79,7 +81,9 @@ $$\mathrm{ERROR-INCOHERENCE}(Q,f_\varepsilon) := \frac{\sum_i \mathrm{VARIANCE}(
 
 综上，本文的动机不在于提出新的推理技术或对齐算法，而是**建立一种可操作的错误结构分析方法**，以揭示模型智能增长过程中被忽视的“不一致性陷阱”，从而为未来 AI 系统的安全评估和风险外推奠定基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本研究的关键创新在于将 AI 安全评估从**单一误差量级**推进到**误差成分分解**，并提出可操作的度量与分析框架，从而揭示模型智能与任务复杂度如何影响失败的**不一致性**。与传统的以总体准确率或 pass@1 为核心指标的评估范式相比，本文的核心改变可归结为以下两个相互耦合的创新滑块：
 
@@ -104,7 +108,7 @@ $$\mathrm{ERROR-INCOHERENCE}(Q,f_\varepsilon) := \frac{\sum_i \mathrm{VARIANCE}(
 
 总体而言，该研究的核心创新不在于提出新的模型架构或训练目标，而在于**重新定义我们如何衡量模型的失败**：通过将“错误”拆解为“偏见”与“混乱”两部分，并为可靠估计这两部分设计严格的采样协议，论文为理解 AI 对齐的规模效应提供了新的概念工具和实证基础。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0016_sIBwirjYlY_The_Hot_Mess_of_AI_How_Does_Misalignment_Scale_W/figures/001_Figure_1.jpg]]
 *Figure 1: AI can fail because it is misaligned, and produces consistent but undesired outcomes, or because it is incoherent, and does not produce consistent outcomes at all. These failures correspond to bias and variance respectively. As we extrapolate risks from AI, it is important to understand whether failures from more capable models performing more complex tasks will be bias or variance dominated. Bias dominated failures will look like model misalignment, while variance dominated failures will resemble industrial accidents. (top left) Qualitatively, we observe that AI models fail in unpredictable and inconsistent ways. Often, these failures can be fixed by resampling. (top right) To quantify thi...*
@@ -127,7 +131,7 @@ $$\mathrm{ERROR-INCOHERENCE}(Q,f_\varepsilon) := \frac{\sum_i \mathrm{VARIANCE}(
 
 **输入输出流**：给定问题集 $Q$、模型 $f_\varepsilon$ 及采样配置，模块一生成多样化的回答序列；模块二输出每个问题的偏差与方差；模块三汇聚得到任务整体的错误不一致性；模块四基于推理长度进行分段，输出缩放趋势和方差占优的判断。与仅依赖少量采样的传统评估相比，本框架不仅给出总体误差，更重要的是区分了“对齐失败”（偏差）与“不可靠波动”（方差），从而可以诊断模型失败的深层原因。
 
-## 核心模块与公式推导
+
 
 该研究提出 **错误不一致性（Error‑Incoherence）分析框架**，通过偏差‑方差分解将 AI 模型的失败模式量化为系统偏差与测试时随机方差的相对贡献。框架由四个核心模块构成。
 
@@ -190,7 +194,9 @@ $$
 $$
 直观表达 AI 错误的可分解性：系统性失误对应偏差，随机不一致对应方差。框架即在此方程的基础上，通过具体的损失函数实现可操作的度量。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 实验围绕错误不一致性分析框架展开：对每问题采集≥30个样本以捕捉测试时随机性，使用KL偏差-方差分解（式1）计算期望交叉熵误差，并将总方差占总误差的比例定义为错误不一致性（式2）。该框架应用于多项选择（GPQA, MMLU）、Agentic编码（SWE-BENCH）、开放式生成（MWE）和合成优化器任务，涵盖QWEN3系列（0.6B–32B）、O3-MINI、O4-MINI及Claude Sonnet 4等模型。
 
@@ -224,7 +230,9 @@ $$
 
 该框架依赖明确的目标函数（如选择题答案、单元测试通过向量），难以直接推广至无精确定义目标的开放式任务。推理长度与任务难度高度共线，即便采用固定预算和分组，仍无法完全解耦二者的独立贡献。合成优化器实验仅使用特定二次函数，其结论向真实多峰优化目标的泛化性需额外验证。人类调查样本量小且排序主观，无法支撑强结论。此外，当前分析未涉及推理链内部结构（如回溯、自我修正）如何影响方差，这可能是理解核心机制的关键缺口。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 本文提出的错误不一致性（error‑incoherence）分析框架并非凭空出现，而是将统计学习理论中经典的偏差‑方差分解（bias‑variance decomposition）重新锚定在大语言模型评测的语境中。传统上，模型能力被压缩为整体错误率、准确率或 pass@1 等标量指标，这些指标模糊了“一致性的系统错误”与“随机性的不可靠失败”之间的界限。该工作通过**将期望交叉熵（或其他损失）显式分解为系统偏差平方与试验‑时间方差之和**（Equation 1，Equation 2；Figure 1），直接改变了评测方法的核心度量槽（changed slot 1），从而将讨论从“模型有多容易出错”推向“错误中有多大比例源自不可预测的随机行为”。这一度量切换构成了与既有评测范式最根本的差异：传统评测使用 1～3 次采样下的总体错误率，而该框架要求每问题至少 30 次采样以稳定估计偏差与方差分量（Section 3，Appx. C.5，Figure 21），由此实现了对“失败性质”的解剖。
 
@@ -235,6 +243,8 @@ $$
 **局限性与尚待验证的环节**。若干证据强度需要审慎看待。人类调查的样本量仅 15 人（Figure 4(b)，confidence = 0.9），其对“更智能则更不一致”的主观排序可能受样本偏差影响，短期内难以作为强证据推广。合成优化实验使用定常的二次函数（条件数 50），而实际优化问题可能具有非凸、高维、多模态特性，结论的外推需要更多架构与目标函数上的验证。关于推理链的内部结构（如回溯、自我纠错）如何调节方差分量，论文并未深入分析，这为未来工作留下了明确的切入点。另外，评测流程依赖 API 返回的 token 计数来衡量推理长度，不同模型家族的内部 token 化差异可能引入测量噪声，尤其对于推理预算受 API 控制的模型，其“自然推理长度”的定义存在口径不一致的风险。
 
 **开放问题与其在知识库中的位置**。围绕错误不一致性这一新指标，涌现出几条贯穿当前对齐研究的深层疑问。第一，更大模型在困难任务上变得更不一致的内在机制是什么——是由于模型在困难区域遭遇了多维决策冲突，还是因为其先验足够强以至于最终答案收敛到不同局部模式？这直接关系到 scaling law 的重新解释：传统的损失幂律仅描述均值行为，而未能区分偏差与方差的各自缩放斜率（Figure 6 显示偏差下降斜率大于方差，造成方差主导）。第二，**能否在训练或推理阶段显式干预方差？** 现有证据表明，集成（ensembling）可将方差按 $1/E$ 速率压降，同时不影响偏差（Figure 7(b)），而仅增加推理预算仅能轻微降低不一致性（Figure 7(a)），这暗示着训练阶段的方差正则化或特定的推理解码策略（如温度退火）可能比事后平均更根本。第三，当目标本身模糊或多元时（开放式任务、偏好对齐），偏差‑方差分解的度量基础会动摇——如何定义广义的“正确”，并区分“多方一致”与“真正可接受”之间的偏差分量，是一个悬而未决的理论问题。第四，在极度超人类的尺度下，模型的不一致性是会趋于饱和还是持续发散？这既关系到安全性的外推，也挑战了“更大即更可靠”的直觉假设。最后，将错误不一致性直接作为奖励信号或正则项嵌入训练过程是否可行——这是否会生成“过于保守”的模型，抑或能提升实际鲁棒性——目前仍是空白地带。这些方向将错误不一致性框架与现有对齐方法论（RLHF、推理时缩放、评估驱动开发）连接起来，使其具备了催生后续工作的潜在纵深。
+
+
 
 ## 原文 PDF
 

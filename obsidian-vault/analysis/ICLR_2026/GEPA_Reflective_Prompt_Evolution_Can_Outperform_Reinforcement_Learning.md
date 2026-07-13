@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/GEPA_Reflective_Prompt_Evolution_Can_Outperform_Reinforcement_Learning.pdf
+project_link: null
+code_link: https://github.com/gepa-ai/gepa
 openreview_forum_id: RQm2KQTM5r
 aliases:
 - GGP
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | GEPA：反思性提示进化能够超越强化学习 |
 | 英文题名 | GEPA: Reflective Prompt Evolution Can Outperform Reinforcement Learning |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=RQm2KQTM5r); [GitHub](https://github.com/gepa-ai/gepa) |
+| Links | [paper](https://openreview.net/forum?id=RQm2KQTM5r) · [GitHub](https://github.com/gepa-ai/gepa) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | GEPA (Genetic-Pareto) |
 | Dataset | HotpotQA (Qwen3 8B), IFBench (Qwen3 8B), HoVer (Qwen3 8B), AIME-2025 (GPT-4.1 Mini) |
@@ -42,7 +44,7 @@ claims:
 > - IFBench (Qwen3 8B) 上，Test Score 为 38.61，对比 35.88 (GRPO)，变化 +2.73。
 > - HoVer (Qwen3 8B) 上，Test Score 为 52.33，对比 38.67 (GRPO)，变化 +13.66。
 
-## 概述
+## 概要
 
 **核心问题**：基于策略梯度的强化学习方法（如 **GRPO**, Shao et al., 2024）在优化复合 AI 系统时，将模型输出的标量奖励作为唯一学习信号，丢弃了执行轨迹和评估反馈中的丰富诊断信息。这导致优化样本效率极低——通常需要数万次 rollout 才能适应新任务，严重制约了在预算受限场景下的实际部署。
 
@@ -58,7 +60,7 @@ claims:
 
 **证据强度**：上述核心结论均有高置信度实验证据支撑，主要结果来自多基准、多模型（Qwen3 8B、GPT-4.1 Mini）的严格对比，消融实验验证了关键设计选择的有效性。局限性方面，System Aware Merge 策略的效果对预算分配敏感，且当前验证集中在 3-4 个模块的复合系统上，向更大规模系统的推广仍有待验证。
 
-## 背景与动机
+
 
 复合 AI 系统通过编排多个模块（如检索器、推理器、验证器）协同解决复杂任务，其性能高度依赖各模块的提示指令（prompts）和模型权重的质量。形式化地，系统在任务分布 $\mathcal{T}$ 上的优化目标为联合最大化期望评测值：
 
@@ -86,7 +88,9 @@ $$
 
 同时，借鉴自然进化中的遗传变异和基于帕累托前沿的“照亮”探索策略（Mouret & Clune, 2015），可以在有限的实际交互中持续提炼出泛化性强的高质量提示，从根本上规避贪心搜索的局部最优陷阱。这一思路将优化对象从模型权重切换为系统提示指令，在保持模型冻结的前提下，以极少的 rollout 实现高效的任务适应。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GEPA 的核心创新在于将复合 AI 系统的优化信号从**压缩的标量奖励切换为富含诊断信息的自然语言反馈**，并引入**基于帕累托前沿的遗传搜索策略**，从而在极低的交互预算下实现高效的提示进化。
 
@@ -116,7 +120,7 @@ GEPA 采用**基于帕累托前沿的“照亮”策略**（Mouret & Clune, 2015
 
 GEPA 通过反思性突变生成的提示不仅性能更优，而且更加精炼。统计显示，GEPA 优化出的提示长度约为 MIPROv2 提示的 **33% 甚至更短**，但性能更高（Figure 16, Figure 17）。这表明反思机制能够有效提取任务核心要求，去除冗余表述，生成更具针对性的指令。
 
-## 整体框架
+
 
 GEPA 是一个面向复合 AI 系统的样本高效型提示优化器，其核心设计围绕三个原则展开：**遗传式提示进化**、**基于自然语言反馈的反思**以及**帕累托前沿驱动的候选选择**。与 GRPO 等更新模型权重的方法不同，GEPA 仅进化系统中各模块的提示指令 $\Pi_\Phi$，而保持底层大语言模型权重 $\Theta_\Phi$ 冻结。这一设计使其能够直接应用于闭源模型（如 GPT-4.1 Mini），无需访问模型内部参数。
 
@@ -143,7 +147,7 @@ GEPA 还包含一个可选的 **System Aware Merge** 策略，用于对互补模
 
 整个流程在有限的 rollout 预算约束下运行，大部分预算消耗在验证集上的候选评估，而非直接用于产生学习信号。这一设计使得 GEPA 在仅需 79 至 737 次训练集 rollout 的条件下即可收敛到高质提示，展现出极高的样本效率。
 
-## 核心模块与公式推导
+
 
 ### 复合AI系统的形式化建模
 
@@ -180,7 +184,9 @@ $$\langle \Pi^{*}, \Theta^{*} \rangle_{\Phi} = \arg\max_{\langle \Pi, \Theta \ra
 
 对于包含多个互补模块的复合 AI 系统，GEPA 提供可选的系统感知合并操作。当不同分支的突变分别在各自模块上积累了互补的改进时，合并操作通过遗传交叉将这些改进整合到同一候选程序中。其有效性对预算分配和调用时机敏感——在 HotpotQA 上，GEPA+Merge 将得分进一步提升至 64.33，但在其他任务上增益并不稳定，表明该模块缺少自适应的调度机制。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -252,7 +258,9 @@ Figure 15 可视化了各优化器的泛化差距（测试集性能与最佳验�
 ![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_RQm2KQTM5r/figures/022_Figure_19.jpg]]
 *Figure 19: HotpotQA Qwen3 8B*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 瓶颈与核心洞察
 
@@ -282,6 +290,8 @@ GEPA 位于提示优化（Prompt Optimization）与进化搜索（Evolutionary S
 2. 在实时交互或极少 rollouts 的部署环境中，GEPA 的帕累托历史如何有效初始化以加速适应？
 3. 自然语言反馈的质量（如人类编写的少量解释）对优化效果的影响如何？
 4. 能否将 GEPA 的思想用于自动发现复合 AI 系统中模块间的控制流逻辑？
+
+
 
 ## 原文 PDF
 

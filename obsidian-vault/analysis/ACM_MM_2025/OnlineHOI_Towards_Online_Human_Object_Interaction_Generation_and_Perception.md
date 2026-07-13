@@ -5,6 +5,8 @@ paper_level: A
 venue: ACM MM
 year: 2025
 pdf_ref: paperPDFs/ACM_MM_2025/OnlineHOI_Towards_Online_Human_Object_Interaction_Generation_and_Perception.pdf
+project_link: null
+code_link: null
 aliases:
 - OOGGOPP
 - OnlineHOI
@@ -43,7 +45,7 @@ claims:
 > - Core4D S2 (unseen objects) 上，FID↓ 2.54 (Ours / M_E) vs 3.26 (Add Fusion) (-0.72)。
 > - Core4D User Study 上，Preference % 63.54 vs MDM / OMOMO (lower, exact not extracted) (majority preference)。
 
-## 概述
+## 概要
 
 人物体交互（Human-Object Interaction, HOI）的感知与生成在具身智能、人机协作等场景中具有重要价值。现有方法大多基于离线范式，即假设模型可以访问完整的时间序列，这在真实流式应用中难以成立。当模型仅能依赖历史与当前帧信息进行在线预测时，基于Transformer自注意力的主流方案性能严重退化，构成了本工作的核心瓶颈。
 
@@ -53,7 +55,7 @@ claims:
 
 **方法定位**：OnlineHOI 属于在线序列建模方法，以 Mamba 为时序骨干，辅以记忆增强机制，面向点云与运动数据的流式HOI感知与生成。其技术路线与离线扩散模型（MDM、OMOMO）及离线点云Transformer（P4Transformer）形成对比，在在线约束下实现了性能突破。
 
-## 背景与动机
+
 
 人物体交互（Human-Object Interaction, HOI）的感知与生成是理解人类行为并构建交互式智能系统的核心任务。现有工作在该领域已取得显著进展，但无论是基于Transformer的扩散生成方法（如 **MDM**，Tevet et al., arXiv 2022；**OMOMO**，Li et al., TOG 2023），还是点云动作分割方法（如 **PointNet++**，Qi et al., NeurIPS 2017；**P4Transformer**，Fan et al., CVPR 2021），均建立在**离线范式**之上——即模型在推理时可以访问完整的时间序列，利用全局上下文进行预测。
 
@@ -61,7 +63,9 @@ claims:
 
 针对上述缺口，本文提出 **OnlineHOI** 框架，旨在系统性地解决在线人物体交互的感知与生成问题。核心动机在于：需要一种天然适配流式数据处理的架构，能够在仅依赖历史信息的条件下高效提取时序特征，并有效保留关键历史上下文以弥补单向建模的信息损失。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 OnlineHOI 的核心创新在于将人物体交互（HOI）的生成与感知任务从离线范式迁移至在线流式场景，并通过**Mamba 单向状态空间模型**与**多尺度记忆增强模块**的协同设计，解决了现有 Transformer 方法在仅依赖历史与当前信息时性能严重退化的问题。
 
@@ -104,7 +108,7 @@ OnlineHOI 并非单一任务模型，而是统一覆盖生成（OnlineHOI-G）�
 
 > **需注意**：记忆模块的容量参数（$S$ 和 $L$ 帧数）及合并策略依赖手动设定，论文未探索自适应调整机制，这是当前方法的一个显式局限。
 
-## 整体框架
+
 
 OnlineHOI 的整体架构围绕 **在线流式数据流** 设计，核心由两个关键模块构成：**Mamba 块** 与 **记忆增强块**（Memory Augment Block），如图 Figure 3 所示。其设计目标是在仅能访问历史与当前帧信息的在线约束下，高效提取时序特征并完成生成或感知任务。
 
@@ -137,7 +141,7 @@ OnlineHOI 包含两个具体实例：
 ![[assets/figures/papers/paper_list_l1665_OnlineHOI_Towards_Online_Human_Object_Interaction_Generation_and_Percept/figures/002_Figure_2.jpg]]
 *Figure 2: Comparison of the Offline and Online settings. (a) The whole timeline is known. (b) The network can only make predictions based on the current frame and previous information*
 
-## 核心模块与公式推导
+
 
 OnlineHOI 的核心架构由两个关键模块构成：**Mamba 主干网络** 与**记忆增强模块**（Memory Augment Model），二者协同实现在线流式场景下的高效时序建模。
 
@@ -184,7 +188,9 @@ $$\mathbf{f}_t^{\prime (x,y,z)} = \sum_{\delta_t = -r_t}^{r_t} \sum_{\|(\delta_x
 ![[assets/figures/papers/paper_list_l1665_OnlineHOI_Towards_Online_Human_Object_Interaction_Generation_and_Percept/figures/009_Table_4.jpg]]
 *Table 4: Online and offline results on Transformer and Mamba based Model*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 在线生成主结果
 
@@ -242,7 +248,9 @@ Table 4 的在线/离线对比实验是本文最具因果诊断性的消融之�
 - **Table 4**：Transformer 在线性能崩溃，Mamba 在线优势显著——这是方法有效性的核心证据。
 - **Table 7**：M_E 记忆融合在所有记忆变体与融合策略中取得最优 FID，验证了短时/长时记忆互补设计的必要性。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 离线范式向在线流式的迁移瓶颈
 
@@ -287,6 +295,8 @@ OnlineHOI的验证集中在三个数据集：Core4D（生成）、OAKINK2（生�
 - **跨任务泛化**：记忆增强的Mamba架构是否适用于其他在线序列建模任务（如自动驾驶中的轨迹预测、机器人实时操作规划）？其相对于在线Transformer的优势是否具有任务无关的普适性？
 
 - **多模态融合**：将RGB视觉特征纳入现有框架时，记忆模块的存储与检索策略需要如何调整？视觉特征的冗余度与运动特征不同，可能需要差异化的合并策略。
+
+
 
 ## 原文 PDF
 

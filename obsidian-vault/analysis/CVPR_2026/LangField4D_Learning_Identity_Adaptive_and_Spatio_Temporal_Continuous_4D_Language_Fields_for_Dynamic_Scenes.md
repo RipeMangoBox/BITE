@@ -41,7 +41,7 @@ claims:
 > - HyperNeRF 上，vIoU (time-sensitive) 64.31 vs 47.04 (4DLangSplat) (+17.27)；Acc (time-sensitive) 84.79 vs 67.65 (4DLangSplat) (+17.14)；mIoU (time-agnostic) 83.09 vs 80.93 (4DLangSplat) (+2.16)。
 > - Neu3D 上，mIoU (time-agnostic) 71.62 vs 55.18 (4DLangSplat) (+16.44)。
 
-## 概述
+## 概要
 
 动态场景的开放词汇查询面临两个核心瓶颈：**高斯身份振荡**和**动作边界偏差**。在基于变形场的4D高斯泼溅框架中，高斯原语随时间运动时会跨越对象边界，导致同一高斯在不同时刻被渲染到不同物体上，产生语义不一致；同时，现有方法采用离散状态原型插值来建模时间变化语义，难以捕捉连续的动作过渡，在动作边界附近产生明显的语义偏差。
 
@@ -52,7 +52,7 @@ claims:
 
 在HyperNeRF和Neu3D两个动态场景基准上的实验表明，LangField4D在时间敏感查询和时间无关查询上均显著超越现有方法：时间敏感vIoU达到64.31（对比4DLangSplat的47.04，提升17.27个百分点），时间无关mIoU在Neu3D上达到71.62（对比4DLangSplat的55.18，提升16.44个百分点）。消融实验进一步验证了IdaGG和TetraPlane各自对语义一致性和时间连续性的关键贡献。
 
-## 背景与动机
+
 
 ### 动态场景开放词汇理解的语义缺口
 
@@ -72,7 +72,9 @@ claims:
 
 Figure 1 直观展示了现有方法的失败模式与本文方法的改进效果：变形场导致高斯跨越对象边界产生ID振荡，离散状态原型在动作边界附近产生偏差，而LangField4D通过身份自适应分组和连续语义表示，在时间无关和时间敏感两类查询上均获得更一致的语义分割结果。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 LangField4D 的核心创新在于直面动态场景中 4D 语言场构建的两个根瓶颈，并通过两个互为支撑的 **changed slots** 实现突破：**身份自适应高斯分组（IdaGG）** 解决高斯 ID 振荡问题，**连续四平面（TetraPlane）语义表示** 解决动作边界偏差问题。两者协同，在统一的连续表示中同时实现时间一致的对象语义和时间平滑的状态语义。
 
@@ -111,7 +113,7 @@ $$f_{\mathrm{sem}}(g) = \phi_d \left( \bigcup_m \prod_c f(g)_c \right)$$
 
 两个 changed slots 并非孤立创新，而是形成因果闭环：IdaGG 为每个高斯提供正确的对象归属，使时间不变语义的提取不受 ID 振荡污染；TetraPlane 在此基础上将离散语义坐标连续化，使时间变化语义的建模不受离散化限制。消融实验（Table 3）量化了这一协同效应：TetraPlane+IdaGG 在时间敏感查询的 vIoU 上达到 64.31，相比 MLPs+IdaGG 的 51.61 提升 12.70 点，相比纯 MLPs 基线的 51.61（无 IdaGG）提升更为显著。在时间无关查询上，IdaGG 的加入无论配合何种解码器均带来一致的 mIoU 增益（MLPs: 80.85 → 82.63；TetraPlane: 81.94 → 83.09），验证了身份一致性对语义提取的独立贡献。
 
-## 整体框架
+
 
 LangField4D 构建在 4D 高斯泼溅（4D-GS）之上，以两阶段管线实现动态场景的开放词汇查询。整体流程如 Figure 2 所示，核心思路是：先解决“哪个高斯属于哪个对象”的身份一致性问题，再在统一连续空间中学习“对象是什么、正在做什么”的时空语义。
 
@@ -130,7 +132,7 @@ LangField4D 构建在 4D 高斯泼溅（4D-GS）之上，以两阶段管线实�
 **模块间的因果依赖**
 IdaGG 的输出（离散语义坐标 $l$）直接作为 TetraPlane 的输入维度，形成强依赖关系：若身份分组错误，后续语义学习将在错误的对象上下文中进行，导致时间不变语义混乱；若跳过 TetraPlane 而使用简单 MLP 解码（消融实验中的 MLPs+IdaGG 配置），则时间敏感 vIoU 从 64.31 骤降至 51.61（Table 3），证明连续表示对捕捉动作边界的必要性。
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题形式化与渲染基础
 
@@ -198,7 +200,9 @@ $$
 ![[assets/figures/papers/paper_list_l27_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_LangField4D_Learnin/figures/008_Figure_6.jpg]]
 *Figure 6: Comparison of ablation results of IdaGG. We visualize the rendering results of the learned identity features following [61]*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -243,7 +247,9 @@ LangField4D在HyperNeRF和Neu3D两个动态场景数据集上，从时间敏感�
 ![[assets/figures/papers/paper_list_l27_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_LangField4D_Learnin/figures/006_Figure_4.jpg]]
 *Figure 4: Visualization of learned time-agnostic features of the previous SOTA method 4DLangSplat, and ours. While 4DLangSplat produces imprecise features due to the motion of deformable Gaussians, ours accurately captures object boundaries and constructs a precise language field*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与因果机制
 
@@ -274,6 +280,8 @@ LangField4D的有效性建立在对上游模块质量的前提假设之上：
 3. **语义层次扩展**：TetraPlane当前将语义空间分解为空间-语义和时间-语义两个维度。这种因子分解方式是否可以扩展到更丰富的语义层次，如对象部件（“车轮”、“门把手”）或属性（“红色的”、“金属的”）？若能引入层次化语义平面，可能支持更细粒度的组合式查询。
 4. **自监督信号**：能否利用动态场景中天然存在的运动一致性、外观恒常性等自监督信号，减少对人工标注或MLLM描述的依赖？例如，利用光流或轨迹一致性约束身份编码的时序平滑性。
 5. **跨场景泛化**：IdaGG学习到的身份自适应机制是否具有跨场景的泛化能力？即在一个场景上训练的身份自适应场能否为零样本或小样本的新场景提供有效的身份先验？
+
+
 
 ## 原文 PDF
 

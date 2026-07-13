@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/Any2Any_3D_Diffusion_Models_with_Knowledge_Transfer_A_Radiotherapy_Planning_Study.pdf
+project_link: null
 code_link: null
 aliases:
 - A3DMKTRPS
@@ -42,7 +43,7 @@ claims:
 > - GDP-HMM (test set) 上，MAE (Gy) 1.93 vs 2.07 (Challenge Top-1) (-0.14)；Scorecard (↑) 137.55 vs 134.81 (Challenge Top-1) (+2.74)；LPIPS (↓) 0.020 vs 0.033 (Challenge Top-1) (-0.013)。
 > - REQUITE-Prostate 上，MAE (Gy) 1.01 / 0.97† vs 1.37 (best baseline) (-0.36 / -0.40)。
 
-## 概述
+## 概要
 
 放疗剂量预测是放射治疗计划中的关键步骤，其目标是根据患者的CT影像和靶区/危及器官勾画，生成满足临床处方要求的三维剂量分布。当前该领域面临两大核心瓶颈：**一是缺乏大规模预训练扩散先验的跨域迁移能力**，现有方法多依赖随机初始化或仅使用放疗数据训练，难以从海量自然视频或医学影像数据中汲取可迁移的表征；**二是模型输出难以对齐不同机构的临床偏好和指南要求**，单纯优化体素级回归损失（如MAE）无法保证生成的剂量分布在临床评分卡（Scorecard）上达到最优。
 
@@ -54,7 +55,7 @@ claims:
 
 在超过8,000例头颈和肺部放疗计划（GDP-HMM挑战赛）以及REQUITE前列腺数据集上的实验表明，DiffKT3D取得了当前最优性能：**体素级MAE从挑战赛冠军的2.07 Gy降至1.93 Gy，临床评分从134.81提升至137.55**。在跨癌种知识迁移场景中，仅需少量微调即可快速收敛，MAE降至1.01 Gy，远超顶级回归基线。消融实验进一步验证了角色嵌入、全注意力机制、v参数化以及预训练先验迁移等设计的关键贡献。
 
-## 背景与动机
+
 
 ### 放疗剂量预测的临床瓶颈
 
@@ -82,7 +83,9 @@ claims:
 
 DiffKT3D 的设计围绕三个关键操作杠杆展开：**预训练扩散先验迁移**（从 Wan 2.1/MAISI 初始化 DiT 权重）、**Any2Any 条件化范式**（模态与角色感知的统一条件机制，含 4D RoPE 和可学习角色嵌入）、以及 **ScardNFT 强化学习后训练**（将临床评分卡转化为 NFT 损失中的偏好信号）。这一框架旨在实现高效、稳健且临床相关的体素级剂量预测，同时保持对任意模态组合的灵活适应能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DiffKT3D 的核心创新并非提出一个孤立的新模块，而是构建了一套系统性的“知识迁移 + 统一条件化 + 偏好对齐”三阶段范式，以此突破放疗剂量预测领域长期存在的两大瓶颈：**大规模预训练先验的跨域迁移困难**，以及**模型输出与多机构临床指南的对齐难题**。其创新点集中体现在三个关键的 changed slots 上。
 
@@ -115,7 +118,7 @@ $$\mathcal{L}(\theta) = \mathcal{L}_{\mathrm{NFT}}(\theta) + \lambda \mathcal{L}
 
 **创新总结**：DiffKT3D 的三个 changed slots 形成了因果闭环——预训练先验提供了强大的生成基础，Any2Any 条件化实现了对异构模态的高效利用，而 ScardNFT 则将临床偏好直接编码进训练目标。三者协同，使得模型在体素精度（MAE 1.93 Gy）、感知质量（LPIPS 0.020）和临床对齐度（Scorecard 137.55）三个维度上全面超越了 GDP-HMM 挑战赛冠军。
 
-## 整体框架
+
 
 DiffKT3D 的整体框架围绕三个核心阶段构建：**大规模扩散先验迁移**、**Any2Any 统一条件化训练**，以及**基于临床评分卡的强化学习后训练**。这三个阶段形成一条从通用生成能力到临床偏好对齐的完整流水线，如 Figure 1 所示。
 
@@ -169,7 +172,7 @@ Figure 2 详细描绘了 DiffKT3D 的训练机制，Figure 6 给出了 VAE–DiT
 ![[assets/figures/papers/paper_list_l2185_https_arxiv_org_abs_2605_09622/figures/009_Table_5.jpg]]
 *Table 5: Single-modality prediction under the remaining-1 (predictone) setting. What this table shows: each modality is predicted from all the others. CT uses FID; segmentation-like modalities use Dice; Dose and Beam Plate use MAE only*
 
-## 核心模块与公式推导
+
 
 ### 3.1 潜空间扩散与Any2Any条件化范式
 
@@ -241,7 +244,9 @@ $$\mathcal{L}(\theta) = \mathcal{L}_{\mathrm{NFT}}(\theta) + \lambda \mathcal{L}
 ![[assets/figures/papers/paper_list_l2185_https_arxiv_org_abs_2605_09622/figures/011_Figure_6.jpg]]
 *Figure 6: Architecture of the proposed VAE–DiT-based conditional diffusion model DiffKT3D. Left: multi-branch VAE–DiT pipeline for CT*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -306,7 +311,9 @@ Figure 5和Figure 7提供了头颈、肺、前列腺病例的定性对比。Diff
 ![[assets/figures/papers/paper_list_l2185_https_arxiv_org_abs_2605_09622/figures/016_Table_9.jpg]]
 *Table 9: GDP–HMM head-and-neck results on the MAISI backbone with different output parameterizations. MAE is reported in Gy. Infer time is only reported on deep learning backbone forward without data loading*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从条件扩散到Any2Any统一生成
 
@@ -382,6 +389,8 @@ MAISI 扩散先验的对比实验（Table 9）揭示了预训练源域选择的�
 3. **多癌种与多治疗模式的泛化**：DiffKT3D 在其他癌症部位（如乳腺、食管）以及不同治疗模式（如 IMRT、质子治疗）上的泛化能力和迁移效率如何？Any2Any 框架是否能统一处理这些异构场景？
 4. **多机构动态适配**：在真实多机构、多协议环境下，RL 后训练能否动态适应不同医院的评分卡，并持续保持性能？这需要验证 ScardNFT 对评分卡变化的鲁棒性和泛化性。
 5. **预训练源域的最优选择**：预训练扩散模型的选择（视频、CT、自然图像）如何影响跨域迁移的效率与上限？是否存在更优的预训练任务和域（如医学影像特定预训练），能进一步缩小域差异并提升迁移效率？
+
+
 
 ## 原文 PDF
 

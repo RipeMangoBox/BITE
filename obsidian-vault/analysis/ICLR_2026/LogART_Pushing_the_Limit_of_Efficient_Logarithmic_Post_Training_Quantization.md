@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/LogART_Pushing_the_Limit_of_Efficient_Logarithmic_Post_Training_Quantization.pdf
+project_link: null
+code_link: https://github.com/logart-lab/logart
 openreview_forum_id: V85HbymBLW
 aliases:
 - LLART
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | LogART：突破高效对数后训练量化极限 |
 | 英文题名 | LogART: Pushing the Limit of Efficient Logarithmic Post-Training Quantization |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=V85HbymBLW); [GitHub](https://github.com/logart-lab/logart) |
+| Links | [paper](https://openreview.net/forum?id=V85HbymBLW) · [GitHub](https://github.com/logart-lab/logart) |
 | Topic | #topic/optimization_theory_probabilistic #topic/optimization_theory_probabilistic/non_convex |
 | Method | LogART (Logarithmic Adaptive Rounding Techniques) |
 | Dataset | WikiText‑2 (OPT‑125M 3‑bit), WikiText‑2 (LLaMA2‑7B 3‑bit), ImageNet (ResNet18 4‑bit), ImageNet (ViT‑Base 4‑bit) |
@@ -42,7 +44,7 @@ claims:
 > - WikiText‑2 (LLaMA2‑7B 3‑bit) 上，PPL 为 6.31，对比 8.66 (GPTQ)，变化 ‑2.35。
 > - ImageNet (ResNet18 4‑bit) 上，Top‑1 Accuracy (%) 为 70.79，对比 68.14 (AdaRound)，变化 +2.65。
 
-## 概述
+## 概要
 
 对数后训练量化（PTQ）面临一个根本瓶颈：传统最近邻舍入（RTN）无法感知任务损失，而标准对数网格固有的对称性与对异常值的强敏感性进一步加剧了极低位宽下的精度退化。此外，现有的可学习舍入策略直接应用于对数域面临困难，使得对数PTQ长期落后于线性PTQ的性能表现。
 
@@ -52,7 +54,7 @@ LogART 通过两个协同工作的核心机制突破上述限制：**可学习�
 
 LogART 当前仅支持权重量化，尚未集成激活量化；多基数设计引入了一定的解码开销，且更大规模模型（>13B）及实际流片验证有待开展。
 
-## 背景与动机
+
 
 ### 量化范式转变：从线性到对数
 
@@ -78,7 +80,9 @@ OHS在块级重建误差的驱动下，联合搜索动态基数配置、非对�
 
 这一“网格-舍入”分离设计使得LogART在3比特权重量化下取得了突破性精度：在LLaMA2-7B上，LogART以6.31的困惑度（PPL）显著优于GPTQ的8.66，同时运行时间仅1.24小时（对比BRECQ的显存溢出）；在硬件层面，LogART算术单元面积仅53.2 µm²，功耗3.45 µW，相较于线性PTQ代表设计实现超过40%的面积和功耗缩减。这些结果表明，通过任务驱动的协同优化，对数PTQ能够在精度与效率之间取得此前被认为不可兼得的平衡。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 LogART 的核心创新在于首次将对数量化后训练（PTQ）中的**舍入误差**与**网格离散化误差**解耦，并分别通过可学习机制进行任务驱动优化。具体而言，LogART 引入了三个相互协同的关键技术组件，构成了四个关键的 changed slot：
 
@@ -116,7 +120,7 @@ $$\sqrt{2} \approx \mathrm{SDE}(\sqrt{2}, K) = \sum_{k=1}^{K} a_k \cdot \frac{1}
 
 OHS 与 LLR 之间存在强协同效应：OHS 通过优化量化网格最小化内在离散化误差，为 LLR 提供了一个更优的搜索起点。消融实验证实，加入 OHS 后 LLR 的收敛速度提升约 4 倍（迭代次数从 2000 降至 500），总运行时间从 4.00 分钟降至 1.25 分钟，同时 OPT-125M 的 PPL 从 36.27 显著降至 31.15（Table 7, Figure 5）。这一协同效应的数学本质在附录 B 中被形式化：量化误差可分解为 OHS 控制的离散化误差 $\varepsilon_1$ 和 LLR 控制的舍入误差 $\varepsilon_2$，二者满足 $\|\Delta\mathbf{W} \mathbf{H}^{1/2}\|_F^2 \leq (\varepsilon_1 + \varepsilon_2)^2$，从理论上解释了协同机制。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0009_V85HbymBLW_LogART_Pushing_the_Limit_of_Efficient_Logarithmi/figures/004_Figure_2.jpg]]
 *Figure 2: The overall LogART framework consists of two key components: OHS and LLR. OHS searches for optimal hyperparameter configurations in an asymmetry-aware, outlier-resilient, and multi-base manner. LLR replaces RTN with learnable element-wise rounding that minimizes local reconstruction loss while absorbing hardware approximation noise during calibration*
@@ -145,7 +149,7 @@ HAF 并非独立的后处理步骤，而是作为量化前向的组成部分嵌�
 
 > **注意**：当前框架仅处理权重量化，激活保持 FP16。激活量化的集成是论文列出的开放问题之一。
 
-## 核心模块与公式推导
+
 
 LogART 将量化误差分解为两类可分别优化的子问题：**网格离散化误差**（由 OHS 解决）与**元素级舍入误差**（由 LLR 解决），二者在任务损失驱动下协同工作，同时通过 HAF 将硬件近似噪声吸收进优化过程。
 
@@ -228,7 +232,9 @@ $$
 
 实际采用 $K=2$ 的配置（即 $X + X/2$），仅需一次移位和一次加法。关键创新在于：HAF 的近似误差被**吸收进 OHS 和 LLR 的优化过程**——量化器在校准阶段就感知到硬件近似噪声，从而在精度与硬件效率之间取得最优折衷，而非事后弥补。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：语言模型3比特量化
 
@@ -265,7 +271,9 @@ LogART在LLM的3比特权重量化上首次实现了对数PTQ对大规模模型�
 
 尽管整体性能优异，LogART存在以下边界条件：当前仅支持权重量化，激活保持FP16，实际部署时需额外方案处理激活量化；非对称界依赖启发式计算（ABS），对极端非对称分布的适应性可能不足；多基数设计引入的解码器增加了有限的面积和功耗开销（虽仍显著优于线性基准）；所有实验在单张RTX 5090D上完成，更大规模模型（>13B）及实际芯片流片验证尚未开展。此外，2比特场景下的梯度优化稳定性和硬件方案有效性仍是开放问题。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的本质差异
 
@@ -310,6 +318,8 @@ LogART 的关键突破在于**将量化误差分解为两个可独立优化的�
 4. **真实芯片验证**：动态基数解码器的实际功耗与时序需要在物理芯片上测量。SDE 近似引入的移位-加法链在关键路径上的时序影响，以及多基数选择器 $B$ 的布线开销，都是仿真难以精确捕捉的因素。
 
 5. **校准数据敏感性**：Table 1 显示 LogART 对校准数据域有一定敏感性（WikiText-2 vs C4 校准导致 PPL 差异约 0.7），虽然优于纯 RTN 对数方法，但相较于线性可学习舍入方法的域鲁棒性，该特性需要更系统的跨域评估。
+
+
 
 ## 原文 PDF
 

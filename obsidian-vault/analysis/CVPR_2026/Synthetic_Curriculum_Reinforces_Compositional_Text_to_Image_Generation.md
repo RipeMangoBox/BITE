@@ -43,7 +43,7 @@ claims:
 > - GenEval 上，Accuracy 53.88% (SD-1.5 w/ ours) vs 42.08% (SD-1.5) (+11.80%)。
 > - DSG 上，Accuracy 86.11% (SimpleAR w/ ours) vs 71.98% (SimpleAR-SFT) (+14.13%)。
 
-## 概述
+## 概要
 
 文本到图像（T2I）生成模型在组合生成（compositional generation）方面存在系统性弱点，具体表现为对象遗漏、属性绑定错误、空间/语义关系混乱以及数量计数不准确。这些缺陷源于训练过程中缺乏专门针对组合能力的训练信号与难度递进机制。
 
@@ -59,7 +59,7 @@ claims:
 
 值得注意的是，CompGen 的性能依赖于多模态奖励模型（如 LLaVA-v1.6-13B）的评估品质，且目前仅在 1B 参数以下的模型上验证；在更大规模模型上的 scaling 特性及合成数据生成的计算开销仍需进一步探索。
 
-## 背景与动机
+
 
 文本到图像（T2I）生成模型近年来取得了显著进展，但在**组合生成**（compositional generation）方面仍暴露出系统性弱点。具体表现为：对象遗漏（object omission）、属性错误绑定（attribute misbinding）、空间与语义关系混乱（relational confusion），以及数量计数不准确（counting errors）。这些缺陷并非偶然，而是源于现有训练范式缺乏专门针对组合能力的训练信号与难度递进机制。
 
@@ -73,7 +73,9 @@ claims:
 
 本文的核心动机正是填补这一空白。我们提出 **CompGen**——一个基于合成课程的组合强化学习框架。其核心洞察在于：**将组合复杂性分解为场景图（scene graph）的结构化因子，并以此为准则构建自适应合成课程，使 T2I 模型无需依赖真实图像或修改架构即可系统提升组合生成性能**。具体而言，CompGen 通过场景图的节点数、平均属性密度和平均关系连通性三个可量化因子来定义组合难度，并利用强化学习（GRPO）在从易到难的课程调度下逐步掌握组合子能力。这一数据驱动、课程引导的范式为 T2I 组合生成问题提供了新的解决路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CompGen 的核心创新在于将组合生成能力不足这一系统性瓶颈归因于**缺乏专门针对组合能力的训练信号与难度递进机制**，并提出了一套无需真实图像、无需修改模型架构的数据驱动解决方案。其关键创新点可归纳为三个相互耦合的 changed slots：
 
@@ -117,7 +119,7 @@ CompGen 引入了三种课程调度策略（随机、易到难、高斯采样）
 
 **总结**：CompGen 的四项 changed slots 构成了一个闭环系统：以场景图难度度量为准则合成可控课程数据，以细粒度组合奖励为优化信号，以课程化 GRPO 为训练范式，以难度调度策略控制学习进程。这一设计使 T2I 模型在不依赖真实图像、不修改架构的前提下，系统性地提升了组合生成性能。
 
-## 整体框架
+
 
 CompGen 框架采用“合成课程构建 + 课程化强化学习训练”两阶段范式，在不依赖真实图像、不修改模型架构的条件下系统提升文本到图像模型的组合生成能力。其核心思路是：**利用场景图的结构化特性量化组合难度，并通过自适应采样生成难度可控的合成训练数据，进而以细粒度组合奖励信号驱动强化学习，使模型在从易到难的课程中逐步掌握对象存在、属性绑定、关系理解与数量计数等组合子能力**。
 
@@ -160,7 +162,7 @@ $$\operatorname{Diff}(\mathcal{G}) = \|\mathcal{O}\| \cdot \max\left(1, \frac{\|
 
 CompGen 框架在实验中构建了 10K 合成样本，均匀分布于难度等级 1 至 10，并成功应用于扩散架构 Stable-Diffusion-1.5 和自回归架构 SimpleAR-SFT 两种不同生成范式的 T2I 模型。在五个组合生成基准（GenEval、DPG、TIFA、T2I-CompBench、DSG）上，Stable-Diffusion-1.5 的平均准确率从 54.90% 提升至 66.62%（+11.72 pp），SimpleAR-SFT 从 63.66% 提升至 71.27%（+7.61 pp）（Table 1），验证了该框架的架构无关性和有效性。
 
-## 核心模块与公式推导
+
 
 CompGen 框架的核心技术路径由三个紧密耦合的模块构成：**难控场景图生成器**、**细粒度组合奖励模型**以及**课程化 GRPO 优化器**。这三个模块共同实现了“从场景图难度量化到合成课程构建，再到组合能力强化学习”的闭环。
 
@@ -242,7 +244,9 @@ $$\mathcal{J}_{\mathrm{C-GRPO}}(\theta) = \mathbb{E}_T \left[ \frac{1}{G} \sum_{
 ![[assets/figures/papers/paper_list_l2344_https_arxiv_org_abs_2511_18378/figures/009_Figure_6.jpg]]
 *Figure 6: An illustrated example of scene graph complexity (Left), sample binary questions generated from the scene graph (with “Yes” answers) (Middle), and corresponding input text and output image pairs (Right)*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -316,7 +320,9 @@ $$\operatorname{Diff}(\mathcal{G}) = \|\mathcal{O}\| \cdot \max\left(1, \frac{\|
 ![[assets/figures/papers/paper_list_l2344_https_arxiv_org_abs_2511_18378/figures/013_Table_7.jpg]]
 *Table 7: Analysis of different initialization strategies for the prior graph. The default setting used in our approach is marked with yellow background. The best performance is marked in red. SR denotes Success Rate, and NTD denotes Node Type Diversity*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：组合生成中的系统性瓶颈
 
@@ -352,6 +358,8 @@ CompGen 的有效性已在以下条件下得到验证：
 **规模扩展的未知性。** CompGen 仅在 1B 参数以下的模型上验证，其在更大规模扩散模型（如 SDXL、Flux）或其他生成任务（如文本到视频）上的 scaling 行为尚待研究。训练阶段额外的 MCMC 采样与 LLM 调用也带来较标准微调更高的计算开销。
 
 **数据多样性的增强空间。** 当前合成课程仅利用场景图结构化信息，未来可引入真实世界图像统计分布或开放域知识图谱，进一步增强课程数据的多样性和真实性。
+
+
 
 ## 原文 PDF
 

@@ -44,7 +44,7 @@ claims:
 > - Bonn (Video Depth) 上，Abs Rel ↓ 0.048 (π³+Ours) vs 0.069 (STream3Rβ ) (-0.021 (‑30.4%))。
 > - KITTI (Video Depth) 上，Abs Rel ↓ 0.054 (π³+Ours) vs 0.080 (STream3Rβ ) (-0.026 (‑32.5%))。
 
-## 概述
+## 概要
 
 **问题瓶颈**：单目深度估计固有的尺度模糊性，在流式（streaming）4D 重建中产生一个此前未被充分解决的深层矛盾——不同场景层（如前景与背景）的相对深度尺度，在不同时间窗口之间无法保持一致。即使采用全局 Sim(3) 变换进行窗口间对齐，也无法消除各层的各向异性缩放，导致融合后的重建出现可见扭曲和度量漂移。
 
@@ -60,7 +60,7 @@ claims:
 
 **方法定位**：LASER 属于训练无关的流式重建框架，位于离线前馈重建模型（VGGT/π³）与纯流式学习方法（Spann3R、CUT3R、STream3Rβ 等）之间，通过几何后处理弥合离线模型与流式需求之间的鸿沟。
 
-## 背景与动机
+
 
 ### 从离线重建到流式 4D 重建
 
@@ -88,7 +88,9 @@ claims:
 
 具体而言，LASER 提出**逐层尺度对齐（Layer-wise Scale Alignment, LSA）**：将深度图分割为离散的深度层，为每一层独立估计尺度因子，并通过层图结构沿时间轴与窗口间传播和聚合这些尺度，从而纠正各层的非均匀缩放。这一设计使得 LASER 能够作为通用框架，将任意离线重建模型（如 VGGT 或 π³）无缝转换为流式系统，在保持 14 FPS 实时性和 6 GB 峰值内存的同时，显著超越现有学习型流式方法和训练无关基线。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：层间尺度不一致
 
@@ -124,7 +126,7 @@ LASER 的核心创新在于用**逐层尺度对齐**替代全局 Sim(3) 变换�
 - **去掉 IRLS 尺度估计**（w/o IRLS）：用闭式解替代鲁棒 IRLS 会严重恶化深度和姿态精度，说明配准阶段的鲁棒估计至关重要。
 - **去掉相机锚点**（w/o Anchor）：改用缩放后的点图进行刚性配准，导致 Sintel 旋转误差 RPE_rot 从 0.249 急剧升至 0.742，验证了基于相机姿态的最小锚点对保持轨迹一致性的必要性。
 
-## 整体框架
+
 
 LASER 是一个**无需训练**的流式框架，将任意离线 4D 重建模型转换为在线流式系统。其核心流水线由三个递进阶段构成：**滑动窗口帧分组与局部重建**、**子地图到全局地图的 Sim(3) 配准**，以及**逐层尺度对齐（LSA）**。整个流程沿时间轴增量执行，每到达一个新窗口，系统便将其融合到持续增长的全局地图中，无需回看全部历史帧。
 
@@ -167,7 +169,7 @@ LASER 可实例化于不同骨干模型，论文中使用 **VGGT** 和 **π³** 
 ![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2512_13680/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of LASER. LASER converts an offline reconstruction model to a streaming version without retraining. Given a video stream, we process frames in overlapping temporal windows with a frozen feed-forward reconstructor. We incrementally register the submap to the global map with Sim(3) estimation and the proposed layer-wise scale alignment*
 
-## 核心模块与公式推导
+
 
 ### 3.1 滑动窗口与子地图构建
 
@@ -220,7 +222,9 @@ $$\hat{s}_{t,n}^{(i)} = \arg \min_{s>0 \atop (d_{p}, d_{q}) \in \mathcal{C}_{t,n
 ![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2512_13680/figures/003_Figure_3.jpg]]
 *Figure 3: Layer Depth Misalignment Issue. After the global Sim(3) alignment, surfaces at different depths may exhibit layer-wise scale inconsistency: foreground regions appear over- or under-scaled relative to background structures across consecutive windows. This anisotropic scaling leads to visible distortions and metric drift in the fused reconstruction. We introduce Layer-wise Scale Alignment (LSA), a geometry-driven refinement that corrects distortions based on a layer graph*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -304,7 +308,9 @@ Figure 12 展示了 LASER 的典型失败案例，主要集中在动态场景。
 
 此外，框架的超参数（窗口大小、重叠比例、置信度阈值）需要针对室内/室外不同环境手动调节，缺乏自适应性，这在实际部署中增加了调参负担。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与流式前馈重建方法的关系
 
@@ -337,6 +343,8 @@ LASER 的核心定位是 **训练无关的流式框架**，它不引入任何可
 **开放问题 2：随着离线重建模型的进步，LASER 如何更好地利用动态场景或非刚性运动的处理能力？** 这可能需要重新设计对齐模块，使其能够区分静态背景和动态前景，并分别处理其尺度一致性。
 
 **开放问题 3：能否通过引入原始图像的外观信息来增强 LSA 在复杂场景和严重遮挡下的鲁棒性与时序追踪能力？** 这涉及将视觉特征与几何深度层融合，构建更稳定的跨窗口对应关系。
+
+
 
 ## 原文 PDF
 

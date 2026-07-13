@@ -41,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - Multi-turn editing (70 images × 10 turns) 上，CLIP-I (Turn10, higher is better) 0.884 (FLUX.1 Kontext + FreqEdit) vs 0.854 (FLUX.1 Kontext) (+0.030)；LPIPS (Turn10, lower is better) 0.418 (FLUX.1 Kontext + FreqEdit) vs 0.546 (FLUX.1 Kontext, approx.) (-0.128)；Instruction Following (Instr., average/turn10) 0.790 (FLUX.1 Kontext + FreqEdit) vs 0.803 (FLUX.1 Kontext) (-0.013)。
 
-## 概述
+## 概要
 
 多轮图像编辑（multi-turn image editing）的核心瓶颈在于**高频信息的渐进性丢失**：随着编辑轮次增加，模型生成的主体出现变形、边缘过度锐化和纹理塌缩。这一退化的根源在于早期去噪步骤优先恢复低频全局结构，高频细节被持续抑制，累积误差使生成轨迹趋向训练数据中的平均化表示。FreqEdit 通过受控实验证实了该因果链条——对源图施加双边滤波或锐化掩模扰动高频成分后，主体变形提前至第三轮编辑（Figure 2），说明高频完整性是维持主体身份的关键。
 
@@ -50,8 +50,6 @@ FreqEdit 的核心洞察是：**上下文图像（即本轮编辑的输入）自
 FreqEdit 是一种**无训练（training-free）框架**，可即插即用于基于整流流（rectified flow）的图像编辑模型。在 FLUX.1-Kontext-dev 上，FreqEdit 将 10 轮编辑后的主体一致性（CLIP-I）从 0.854 提升至 **0.884**，LPIPS 从约 0.546 降至 **0.418**，同时指令遵循能力仅轻微下降（0.803 → 0.790），在编辑灵活性与身份保持之间取得了显著更优的平衡。定性对比（Figure 5）表明，FreqEdit 优于 FLUX.1 Kontext、Qwen-Image、Seedream 4.0、Nano Banana、MTC、VINCIE 和 Bagel 等方法。消融实验进一步确认：仅注入高频成分即可防止主体变形，而注入全部成分或仅注入低频成分则导致编辑失败或语义泄漏（Figure 6d），证实高频是关键因果因素；移除自适应注入策略会导致复杂语义编辑（如背景替换）失败（Figure 6a），移除路径补偿则引入幽灵伪影（Figure 6b）。
 
 FreqEdit 的主要局限包括：对源图像高频细节的依赖（低质量输入效果受限）、大面积编辑时自适应注入图判别力下降，以及推理时修改速度场可能使轨迹偏离训练分布。尽管如此，其无训练特性为未来将高频保持原则融入训练损失、或扩展至视频等多模态编辑提供了可迁移的基础思路。
-
-## 背景与动机
 
 图像编辑模型正经历从单轮指令执行到多轮交互式迭代编辑的范式跃迁。在单轮场景中，用户给定一张源图像与一条编辑指令，模型输出修改后的图像；而在多轮编辑中，用户持续对上一轮的输出追加新指令，逐步塑造图像内容。这种迭代式工作流更贴近真实创作过程，但也暴露了现有模型的一个深层脆弱性：**图像质量随编辑轮次增加而持续退化**。
 
@@ -69,7 +67,7 @@ FreqEdit 的主要局限包括：对源图像高频细节的依赖（低质量�
 
 一个被忽视的关键洞察是：**当前轮的上下文图像（即本轮编辑的输入）自身就蕴含丰富的高频细节**。如果在去噪早期将这些细节“借给”生成过程，就可以在不破坏编辑目标的前提下，为多轮编辑提供稳定的几何与纹理锚点。这一思路构成了 FreqEdit 的核心动机：通过小波域的高频特征分离与注入，实现编辑灵活性与保真度之间的精细平衡。
 
-## 核心创新
+## 核心方法与创新机理
 
 FreqEdit 的核心创新在于将多轮图像编辑的质量退化问题重新定义为**高频信息渐进性丢失**问题，并围绕这一瓶颈设计了一套无训练（training-free）的频域特征注入与轨迹控制机制。其关键创新点体现在以下三个相互耦合的 changed slots 上。
 
@@ -107,8 +105,6 @@ $$\tilde{\mathbf{D}}^{(\ell)} = \mathbf{D}_{\mathrm{edit}}^{(\ell)} + \alpha (\m
 
 针对 FLUX.1 Kontext 在多轮编辑中出现的噪声积累问题，FreqEdit 额外引入质量引导融合机制：在去噪的最后阶段（$t_i < \tau_{\mathrm{guide}}$），将编辑速度与来自原始图像 $X^{[1]}$ 的辅助速度按比例 $\lambda$ 混合（Eq. 16），以抑制噪声伪影。这一模块是模型特化的补偿设计，而非通用框架的核心组件。
 
-## 整体框架
-
 FreqEdit 是一个无训练的框架，旨在解决多轮图像编辑中因高频信息渐进性丢失导致的质量退化问题。其核心思路是：当前轮次的上下文图像本身蕴含丰富的高频细节，如果在去噪早期将这些细节“借给”生成过程，就能在不破坏编辑目标的前提下为多轮编辑提供稳定的几何与纹理锚点。
 
 框架的整体工作流如下：
@@ -132,8 +128,6 @@ FreqEdit 是一个无训练的框架，旨在解决多轮图像编辑中因高�
 
 ![[assets/figures/papers/paper_list_l876_https_arxiv_org_abs_2512_01755/figures/001_Figure_1.jpg]]
 *Figure 1: FreqEdit enables consistent multi-turn image editing. Base models (FLUX.1 Kontext and Qwen-Image) exhibit progressive quality deterioration during iterative editing, including body deformations, edge over-sharpening, and texture collapse. FreqEdit addresses these limitations through strategic high-frequency reinforcement*
-
-## 核心模块与公式推导
 
 FreqEdit 的核心设计围绕一个因果控制旋钮展开：**从当前上下文图像构造参考速度场，并通过小波变换将其高频成分注入到编辑速度场中**。该框架包含四个关键模块，分别解决多轮编辑中的不同退化机制。
 
@@ -241,7 +235,7 @@ $$\boldsymbol{v}_{t_i}^{\mathrm{final}} = (1 - \lambda) \cdot \boldsymbol{v}_{t_
 ![[assets/figures/papers/paper_list_l876_https_arxiv_org_abs_2512_01755/figures/004_Figure_4.jpg]]
 *Figure 4: Path Compensation Mechanism. The actual denoising trajectory (orange line*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心发现：高频退化是多轮编辑质量下降的根本瓶颈
 
@@ -302,12 +296,7 @@ FreqEdit 的局限性在实验中也得到明确揭示：
 ![[assets/figures/papers/paper_list_l876_https_arxiv_org_abs_2512_01755/figures/013_Figure_11.jpg]]
 *Figure 11: Hyperparameter sensitivity analysis on FLUX.1 Kontext. Each row varies one hyperparameter while fixing the others to their default values*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l876_https_arxiv_org_abs_2512_01755/figures/008_Table_2.jpg]]
-*Table 2: Additional quantitative results using PSNR, SSIM and DINO-Sim. We report cumulative averages computed from turn 1 through each specified turn (1, 4, 7, 10) across 10 sequential edits. Bold indicates the best results, and underlined values denote the secondbest results*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 问题定位与基线关系
 

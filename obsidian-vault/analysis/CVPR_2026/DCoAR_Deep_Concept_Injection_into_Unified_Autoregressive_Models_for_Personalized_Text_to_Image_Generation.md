@@ -42,7 +42,7 @@ claims:
 > - DreamBench 上，CLIP-I 0.815 vs DreamBooth (Imagen) 0.812 (+0.003)；CLIP-T 0.318 vs Proxy-Tuning 0.312 (+0.006)。
 > - Style personalization (StyleDrop+ZipLoRA evaluation) 上，Text-alignment 0.308 vs ZipLoRA 0.272 (+0.036)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：统一自回归（Unified AR）模型在文本到图像生成中展现出高效性与可扩展性，但其个性化方法普遍存在**浅层注入瓶颈**——现有方案仅在输入层注入概念令牌，导致语义信号随网络深度衰减，视觉保真度差、重文本化能力弱。微调方法虽能提升保真度，却需要大量可训练参数，牺牲了AR模型的推理效率优势。
 
@@ -56,7 +56,7 @@ claims:
 
 **方法定位**：DCoAR 属于**概念注入**路线，在冻结骨干网络的前提下，以极低参数量弥合了与微调方法的保真度差距，并首次在统一AR模型中实现免训练的主体-风格组合，为高效个性化生成提供了新基准。
 
-## 背景与动机
+
 
 文本到图像生成领域正经历从扩散模型到统一自回归模型的范式迁移。以 Lumina-mGPT 为代表的多模态自回归模型将图像离散化为视觉令牌序列，与文本令牌统一建模，在生成效率与扩展性上展现出潜力。然而，这类模型的个性化生成仍面临一个核心瓶颈：**浅层注入导致的语义衰减**。
 
@@ -72,7 +72,9 @@ DCoAR 的动机正源于此。其核心假设是：概念表示不应仅停留�
 
 DCoAR 通过层间多模态上下文学习（LMCL）、双重先验保持（DPP）和上下文感知自正则化（CASR）三项协同设计，系统性地回应了上述挑战，在 DreamBench 基准上以仅 0.073M 可训练参数取得了超越微调方法的性能（CLIP-I 0.8151，CLIP-T 0.3184）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DCoAR 的核心创新在于将统一自回归（AR）模型的个性化从“浅层注入”范式推进到“深层概念注入”范式，并通过三项配套机制解决深层注入带来的训练稳定性与语义漂移问题，最终在保持骨干网络完全冻结的前提下，弥合了概念注入方法与微调方法之间的保真度差距。
 
@@ -114,7 +116,7 @@ $$\mathcal{L}_{obj} = \mathcal{L}_{NTP} + \alpha \mathcal{L}_{DPP} + \beta \math
 
 其中 $\mathcal{L}_{NTP}$ 是标准的自回归下一令牌预测损失，$\alpha$ 和 $\beta$ 为平衡系数。整个训练过程仅需约 0.073M 可训练参数（远低于 Proxy-Tuning 的 142.6M），在单张 H800 GPU 上即可完成，骨干网络完全保持冻结状态。
 
-## 整体框架
+
 
 DCoAR 是一个面向统一自回归（AR）多模态模型的个性化生成框架，其核心设计目标是在**完全冻结骨干网络**的前提下，通过深层概念注入与多面正则化，弥合概念注入方法与微调方法之间的保真度差距。整个 pipeline 由三个训练阶段模块和一个免训练推理模块构成，形成“深层注入—先验保持—自正则化—推理隔离”的闭环。
 
@@ -150,7 +152,7 @@ $$\mathcal{L}_{obj} = \mathcal{L}_{NTP} + \alpha \mathcal{L}_{DPP} + \beta \math
 ![[assets/figures/papers/paper_list_l2303_https_arxiv_org_abs_2508_07341/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the proposed DCoAR framework for subject-driven personalization in multi-modal autoregressive models. (a) Layerwise Multimodal Context Learning, where learnable context tokens are injected into multiple Transformer layers for concept representation. (b) Dual Prior Preservation (DPP) regularizes the customized distribution against the pre-trained model to mitigate overfitting and language drift. (c) Context-Aware Self-Regularization (CASR) initializes and constrains context tokens towards the subject embedding space to enhance fidelity and re-contextualization. (d) Training-free subject–style composition by directly combining subject and style tokens to enable flexible customized...*
 
-## 核心模块与公式推导
+
 
 DCoAR 的核心由四个模块构成：**层间多模态上下文学习（LMCL）** 实现深层概念注入，**双重先验保持（DPP）** 防止语义漂移，**上下文感知自正则化（CASR）** 抑制过拟合，以及推理阶段的 **Identity Mask** 实现免训练主体-风格组合。
 
@@ -230,7 +232,9 @@ $$
 ![[assets/figures/papers/paper_list_l2303_https_arxiv_org_abs_2508_07341/figures/016_Figure_10.jpg]]
 *Figure 10: Visualization of CASR*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主体个性化主结果：DreamBench
 
@@ -310,7 +314,9 @@ Figure 9 验证了推理时 Identity Mask 机制的必要性。在主体-风格�
 ![[assets/figures/papers/paper_list_l2303_https_arxiv_org_abs_2508_07341/figures/018_Figure_12.jpg]]
 *Figure 12: Additional qualitative comparison of subject-driven personalization. We compare our DCoAR against two representative concept-injection methods (UniCTokens [1], Yo’Chameleon [22]) and a state-of-the-art diffusion-based fine-tuning approach (DreamBooth [26] with FLUX)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 统一自回归模型个性化方法的演进瓶颈
 
@@ -368,6 +374,8 @@ $$\mathcal{L}_{CASR} = \frac{1}{N} \sum_{i=1}^{N} \| \mathbf{p}_I^{(i)} - \mathb
 3. **跨模型泛化性**：DCoAR的深层注入策略和正则化方案是否可迁移至其他统一自回归架构（如基于不同tokenizer或注意力机制变体的模型），其性能增益是否依赖于特定骨干网络的架构特性？
 
 4. **多概念扩展**：当前方法主要针对单一主体或风格的个性化。如何将LMCL扩展至多概念联合注入（如多个主体或主体+风格+场景），同时避免概念间的语义干扰和令牌序列长度的线性增长？
+
+
 
 ## 原文 PDF
 

@@ -41,7 +41,7 @@ claims:
 > - PHOENIX14T 上，BLEU-4 27.17 vs 15.48 (+11.69)。
 > - How2Sign 上，ROUGE 36.14 vs 31.50 (+4.64)；BLEU-4 15.47 vs 13.10 (+2.37)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有自监督学习方法（如MAE、DINO）直接应用于手语视频时，倾向于建模全局语义特征，而忽略了手语中最关键的细粒度局部判别线索——这些线索主要集中在手部和面部区域。这导致下游无词条手语翻译（Gloss-free Sign Language Translation, GFSLT）性能严重受限。
 
@@ -55,8 +55,6 @@ claims:
 - 消融实验表明，仅加入手部局部视图即可大幅提升翻译质量，验证了手部运动提供关键判别线索（Table 2）。
 
 **证据强度**：核心结论由多数据集、多指标的对比实验支撑，置信度较高。跨数据集迁移性能有明显下降（Table 5），说明模型泛化能力仍有限，该点需结合实际应用场景审慎评估。
-
-## 背景与动机
 
 手语翻译（Sign Language Translation, SLT）旨在将连续手语视频直接转换为口语文本序列。传统方法依赖词条（gloss）标注作为中间监督信号，即通过公式
 
@@ -78,7 +76,7 @@ $$
 
 这一瓶颈构成了本文的核心动机：**设计一种无需任何文本标注的自监督预训练策略，使模型能够从全局视频帧中自动捕捉手语相关的局部判别特征**，从而在完全无文本的条件下学习有效的手语表征，并在下游GFSLT任务中取得与文本监督方法相竞争甚至更优的性能。
 
-## 核心创新
+## 核心方法与创新机理
 
 ### 瓶颈洞察：自监督预训练在手语域中的失焦
 
@@ -133,8 +131,6 @@ Figure 1 直观地展示了这三类方法的差异：基于词条的方法需�
 
 SignDINO 的设计并非简单的数据增强技巧，而是基于一个核心洞察：**手语翻译的关键瓶颈不在于全局场景理解，而在于对局部判别区域的精细化建模**。通过让学生模型在“信息受限”的条件下（仅见局部区域）去匹配教师模型的“全信息”输出（全局帧），自蒸馏过程隐式地教会了模型：哪些局部线索对全局语义理解是不可或缺的。这一机制使得预训练后的教师模型能够在推理时，仅凭全局帧就自动聚焦于手部和面部区域，如 Figure 4 的注意力图可视化所示——SignDINO 预训练的 SL Tokenizer 的注意力分布显著集中于手部和面部，而标准 DINO 预训练的注意力则分散在背景和身体区域。
 
-## 整体框架
-
 SignDINO 的整体 pipeline 围绕一个核心洞察构建：**无需任何文本或词条标注，通过在不同数据视图之间进行自蒸馏，即可让模型从全局帧中捕捉手语相关的局部判别特征**。其架构由三大模块串联而成，形成“预训练→特征提取→翻译”的端到端流程。
 
 ### 模块关系与数据流
@@ -183,8 +179,6 @@ Figure 1 清晰展示了 SignDINO 在监督信号上的根本性转变：传统�
 
 ![[assets/figures/papers/paper_list_l1068_https_openaccess_thecvf_com_content_CVPR2026_html_Gan_Learning_Effective/figures/002_Figure_2.jpg]]
 *Figure 2: The SignDINO Architecture with sign-aware DINO training strategy. We omit the global views of the student model for clarity*
-
-## 核心模块与公式推导
 
 ### 问题形式化与翻译目标
 
@@ -238,7 +232,7 @@ $$\Theta_{\mathcal{TR}}^{*} = \underset{\Theta_{\mathcal{TR}}}{\arg\min} \ \math
 
 其中 $v = \mathcal{VE}(f)$ 为预训练编码器提取的视觉特征，$t$ 为目标文本序列。推理时，教师模型仅接收全局手语帧，无需任何额外的局部区域输入。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -323,9 +317,6 @@ SignDINO 在训练和推理阶段均保持了较高的计算效率。由于推�
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l1068_https_openaccess_thecvf_com_content_CVPR2026_html_Gan_Learning_Effective/figures/003_Table_1.jpg]]
-*Table 1: Effect of current SSL pretraining strategies. indicates models initialized from HuggingFace weights without additional pretraining on PHOENIX14T. ♣ denotes backbones pretrained on PHOENIX14T using their respective SSL strategies*
-
 ![[assets/figures/papers/paper_list_l1068_https_openaccess_thecvf_com_content_CVPR2026_html_Gan_Learning_Effective/figures/004_Table_2.jpg]]
 *Table 2: Effect of sign-aware pretraining*
 
@@ -350,7 +341,7 @@ SignDINO 在训练和推理阶段均保持了较高的计算效率。由于推�
 ![[assets/figures/papers/paper_list_l1068_https_openaccess_thecvf_com_content_CVPR2026_html_Gan_Learning_Effective/figures/012_Table_8.jpg]]
 *Table 8: Inference speed*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 谱系定位：从文本依赖到完全无文本的手语预训练
 

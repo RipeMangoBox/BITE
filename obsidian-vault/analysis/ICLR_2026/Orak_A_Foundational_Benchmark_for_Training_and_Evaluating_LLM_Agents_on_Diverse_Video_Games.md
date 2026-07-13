@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Orak_A_Foundational_Benchmark_for_Training_and_Evaluating_LLM_Agents_on_Diverse_Video_Games.pdf
+project_link: https://huggingface.co/datasets/KRAFTON/Orak
+code_link: https://github.com/krafton-ai/Orak
 openreview_forum_id: H1ncX6O6Yh
 aliases:
 - Orak
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | Orak：一个用于在多样化视频游戏上训练和评估LLM智能体的基础基准 |
 | 英文题名 | Orak: A Foundational Benchmark for Training and Evaluating LLM Agents on Diverse Video Games |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=H1ncX6O6Yh); [GitHub](https://github.com/krafton-ai/Orak); [Project](https://huggingface.co/datasets/KRAFTON/Orak) |
+| Links | [paper](https://openreview.net/forum?id=H1ncX6O6Yh) · [GitHub](https://github.com/krafton-ai/Orak) · [Project](https://huggingface.co/datasets/KRAFTON/Orak) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/planning_control |
 | Method | Orak |
 | Dataset | StarCraft II, Super Mario, 2048, Ace Attorney |
@@ -41,7 +43,7 @@ claims:
 > - Super Mario 上，Normalized Distance 为 Gemini-2.5-pro 38.0±14.6，对比 Llama-3.2-1B 18.7±8.6，变化 +19.3。
 > - 2048 上，Normalized Score 为 o3 34.9±23.4，对比 Llama-3.2-1B 0.0±0.1，变化 +34.9。
 
-## 概述
+## 概要
 
 现有游戏基准（如GAMA-bench、GameBench、GameArena、SmartPlay、Balrog等）仅覆盖部分游戏类型（多为文本或2D网格），缺乏对智能体模块的系统消融支持，且不提供微调数据集，无法将预训练大语言模型（LLM）适应为通用游戏智能体。Orak针对这一瓶颈，提出以模型上下文协议（MCP）构建插件式统一接口，将12款涵盖六大游戏类型的视频游戏环境与反射、规划等智能体模块分别封装为独立MCP服务器，通过`eval.py`配置游戏、LLM后端和智能体策略即可完成标准化评估（Figure 1, Figure 2）。在此基础上，Orak利用专家LLM（如GPT-4o、o3-mini）的游戏轨迹构建约11k样本的高质量微调数据集，支持监督微调以提升小型LLM的游戏能力。
 
@@ -49,7 +51,7 @@ claims:
 
 Orak在方法谱系中的定位：相较于此前基准仅支持单一或少数游戏类型、无智能体消融和微调支持，Orak是首个全面覆盖六大游戏类型、同时支持LLM/VLM、提供系统化智能体模块消融研究并发布微调数据集的基准（Table 1）。其MCP接口实现了对智能体模块的独立研究，而专家轨迹微调机制则将通用LLM转化为高效游戏智能体。主要局限包括部分游戏需用户自行购买商业许可、仅探索了监督微调而未涉及强化学习微调、评估时暂停游戏未能反映实时需求、以及视觉和多模态输入的利用仍不充分。
 
-## 背景与动机
+
 
 ### 核心瓶颈：通用游戏智能体的评估与训练缺失
 
@@ -79,7 +81,9 @@ Orak的核心理念在于：**统一的MCP接口使跨游戏、跨智能体模�
 - **需注意**：论文未提供MCP接口的延迟开销定量分析，实时游戏场景下的实用性需进一步验证。
 - **待验证**：微调从游戏到非游戏任务（Math500、WebShop）的正向迁移（Table 7）虽被报告，但迁移机制（是通用推理能力提升还是任务格式适应）尚未被严格分离。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Orak 的核心创新在于通过**MCP（Model Context Protocol）插件化接口**统一了多样化视频游戏的评估与训练流程，系统性地填补了现有基准在**游戏类型覆盖、智能体模块消融、微调数据集**三个关键维度上的空白（Table 1）。
 
@@ -113,7 +117,7 @@ Orak 首次为游戏智能体基准提供了**结构化微调数据集**（Table
 | 微调数据集 | 未提供 | 专家轨迹 SFT 数据集（~11k） |
 | 接口标准化 | 每游戏定制 | MCP 插件化统一接口 |
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l28_https_openreview_net_forum_id_H1ncX6O6Yh/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of Orak, a benchmark designed to train and evaluate LLM agents across 12 video games across genres. Using MCP as a plug-and-play interface, it ensures systematic assessment, supporting gameplay leaderboards, battle arenas, and studies on agentic modules and fine-tuning*
@@ -160,7 +164,7 @@ Orak 还提供了首个面向通用游戏智能体的微调数据集（约 11k �
 
 每条轨迹 $\tau = \{(X^{a_i}, S, Y^{a_i})\}_{i=1}^{n}$ 包含 $n$ 次 LLM 推理序列，其中 $a_i$ 为智能体模块，$S$ 为游戏状态，$Y^a$ 为 LLM 响应。该数据集主要用于监督微调（SFT），强化学习微调留待未来工作。
 
-## 核心模块与公式推导
+
 
 ### 评估流水线核心模块
 
@@ -203,7 +207,9 @@ $$R_t = \lambda S_t + (1-\lambda) \gamma^{T-t} S_{\text{final}}$$
 
 混合当前回合分数 $S_t$ 与折扣后的最终分数，通过 $\lambda$ 控制即时反馈与长期目标的权衡，旨在实现更平滑的功劳分配。该方法目前仅作为RL微调方向的讨论，尚未在实验中验证。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心结果：专有模型全面领先，能力鸿沟显著
 
@@ -269,7 +275,9 @@ Orak默认将游戏暂停以消除推理延迟对能力度量的干扰，但**Ta
 
 这一对比暴露了当前LLM智能体的根本局限：**推理延迟使其无法应对实时决策需求**。模型响应时间（GPT-4o约1.2秒，Gemini-2.5-pro约2.5秒）在暂停评估中无关紧要，但在实时环境中成为致命瓶颈。这指向一个待解决的核心问题：如何在保持推理质量的同时将延迟降低到实时可用的水平。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 基准设计谱系与差异化定位
 
@@ -322,6 +330,8 @@ Orak 定位为“基础性游戏基准”，其核心设计动机源于对现有
 4. **实时性能的可行路径**：如何在保持低延迟的同时实现高难度的实时游戏性能？这是否需要模型架构的根本性改进，还是可以通过推理优化策略解决？
 5. **音频模态的增量价值**：音频模态的引入能在多大程度上增强 LLM 智能体在游戏中的表现？特别是在 FPS 等依赖声音定位的游戏类型中。
 6. **RL 微调的集成与效果**：如何将 RL 微调（如 DPO、GRPO）集成到 Orak 环境中以提升多智能体战略推理？论文提出的奖励折扣框架（$R_t = \gamma^{T-t} S_{\mathrm{final}}$ 和 $R_t = \lambda S_t + (1-\lambda) \gamma^{T-t} S_{\mathrm{final}}$）的实际效果有待验证。
+
+
 
 ## 原文 PDF
 

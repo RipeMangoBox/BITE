@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Hyperparameter_Trajectory_Inference_with_Conditional_Lagrangian_Optimal_Transport.pdf
+project_link: null
+code_link: null
 openreview_forum_id: P5B97gZwRb
 aliases:
 - NCLOTC
@@ -42,7 +44,7 @@ claims:
 > - Semicircles (CTI) 上，CD (↓) 为 0.016 (0.001)，对比 0.323 (0.003) (K_I)，变化 -0.307。
 > - Cancer therapy (PPO reward) 上，Reward (↑) 为 102.49 (5.46)，对比 98.72 (NLOT)，变化 +3.77。
 
-## 概述
+## 概要
 
 **问题背景**：现代深度学习系统常需针对不同场景调整超参数（如正则化强度、分位数水平、RL奖励权重），传统做法是逐个训练独立模型，计算成本高昂且无法连续探索超参数空间。超参数轨迹推断（Hyperparameter Trajectory Inference, HTI）将该问题形式化为：从有限个已训练模型（锚点分布）出发，推断超参数连续变化时模型输出分布的演化轨迹，从而构建可泛化的代理模型。
 
@@ -52,7 +54,7 @@ claims:
 
 **主要结果**：在多个 HTI 应用场景中，完整 CLOT 方法一致优于所有基线。在二维半圆条件轨迹推断任务上，CLOT 的负对数似然（NLL）较恒等度量基线降低 106.375（Table 1）；在癌症治疗策略代理任务中，平均 PPO 奖励达到 102.49，优于 NLOT 的 98.72（Table 2）；在 ETTm2 分位数回归代理任务中，预测区间与真实区间高度吻合（Figure 3），MSE 达到 0.608（Table 5）。消融实验证实，学习度量和势能偏置各自贡献显著，且在数据稀疏设置下 CLOT 的性能退化最小，验证了归纳偏置在困难插值区域的关键作用。
 
-## 背景与动机
+
 
 超参数调整是深度学习落地的核心瓶颈之一：不同超参数配置（如正则化系数、分位数水平、奖励权重）会诱导出截然不同的模型行为，而穷举训练所有配置的计算代价往往不可接受。现有应对策略大致分为两类：一是训练少量锚点模型后对输出进行简单插值；二是使用条件生成模型（如条件流匹配）直接推断中间配置的条件分布。然而，这两类方法共享一个根本性缺陷——它们对超参数驱动下的输出动力学缺乏结构性建模。
 
@@ -64,7 +66,9 @@ claims:
 
 与现有工作的关键差异在于：**Pooladian et al. (2024)** 提出的神经拉格朗日最优传输（NLOT）仅处理无条件设定，且使用固定特征值的度量参数化（仅适用于二维）。本文将其扩展为条件最优传输框架，引入数据依赖的势能项 $\hat{\mathcal{U}}(q|x) = \alpha \log(\hat{p}(q|x) + \epsilon)$ 以施加密集遍历偏置，并设计基于特征分解和Givens旋转的可学习度量 $G_{\theta_G}$，支持任意维度且避免退化解。这些改进使得CLOT能够在稀疏锚点下可靠地推断条件概率路径，并在多个HTI应用场景中一致优于条件流匹配（CFM, Lipman et al., 2023）、度量流匹配（MFM, Kapusniak et al., 2024）等基线方法。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文提出**神经条件拉格朗日最优传输（Neural CLOT）**，将超参数轨迹推断形式化为**条件轨迹推断（CTI）**任务，并围绕三个核心维度对现有方法进行系统性改进。其根本动机在于：现有轨迹推断方法无法有效处理条件信息，且简单插值（如条件流匹配）在复杂、非欧几里德的超参数动力学下生成不可行的代理路径。
 
@@ -104,7 +108,7 @@ CLOT 通过极小-极大优化框架联合学习拉格朗日成本函数（由�
 
 这一范式将“学习传输成本”与“学习传输路径”统一为单一优化问题，使得代理模型在推理时可直接根据条件 $x$ 和目标超参数 $\lambda$ 生成对应的输出分布样本，而无需重新训练或访问原始训练过程。
 
-## 整体框架
+
 
 本文提出的**神经条件拉格朗日最优传输（Neural CLOT）**方法，将超参数轨迹推断（HTI）形式化为一个条件轨迹推断（CTI）任务：给定一组在离散超参数值 $\lambda \in \Lambda_{\text{obs}}$ 上训练得到的神经网络输出分布 $\{p_{\theta_\lambda}(y|x)\}_{\lambda \in \Lambda_{\text{obs}}}$，目标是学习超参数 $\lambda$ 诱导的连续动态 $\lambda \mapsto p_{\theta_\lambda}(y|x)$，从而构建一个可泛化的代理模型，在推理时实现超参数的连续调整。
 
@@ -143,7 +147,7 @@ $$\min_{\theta_G} \sum_k \mathbb{E}_x \left[ \max_{\theta_{g,k}} \mathbb{E}_{y_k
 
 其中 c-变换 $g_{\theta_{g,k}}^c(y_k|x)$ 的计算通过传输映射网络 $T_{\theta_T,k}$ 暖启动，并利用测地线网络 $S_{\theta_S}$ 高效近似拉格朗日成本函数，避免了嵌套优化。
 
-## 核心模块与公式推导
+
 
 ### 条件轨迹推断问题形式化
 
@@ -219,7 +223,9 @@ $$\mathcal{L}_{\text{path}}(\theta_S) = \mathbb{E}\left[ \mathcal{S}(q_\varphi |
 
 条件信息 $x$ 通过 FiLM 层注入所有网络（$g_{\theta_{g,k}}$、$T_{\theta_{T,k}}$、$S_{\theta_S}$、$G_{\theta_G}$）的第一层激活值，实现条件动态建模。推理时，对目标超参数 $t^*$，先归一化到局部参数 $s^* = (t^* - t_k) / (t_{k+1} - t_k)$，再通过测地线网络输出路径参数并求值 $\bar{\hat{y}}_{t^*} = q_\varphi(s^*)$，从而获得任意超参数下的代理输出。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置与评估维度
 
@@ -293,7 +299,9 @@ $$\mathcal{L}_{\text{path}}(\theta_S) = \mathbb{E}\left[ \mathcal{S}(q_\varphi |
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_P5B97gZwRb/figures/014_Table_10.jpg]]
 *Table 10: Hyperparameters for the direct surrogate model in the cancer therapy experiment in §5.2.1*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 技术谱系与基线关系
 
@@ -332,6 +340,8 @@ $$\mathcal{L}_{\text{path}}(\theta_S) = \mathbb{E}\left[ \mathcal{S}(q_\varphi |
 4. **通用动态系统推断**：条件拉格朗日最优传输框架的核心思想——通过学习能量函数和度量来编码动力学偏置——能否推广到更一般的动态系统推断任务，如物理系统建模、细胞轨迹推断等？这需要验证框架在不同类型动力学先验下的泛化能力。
 
 5. **势能偏置的自适应校准**：如何根据数据分布特性自动调整势能偏置的强度系数 $\alpha$，避免在密度均匀区域过度约束路径或在密度差异极大区域产生偏置失效？
+
+
 
 ## 原文 PDF
 

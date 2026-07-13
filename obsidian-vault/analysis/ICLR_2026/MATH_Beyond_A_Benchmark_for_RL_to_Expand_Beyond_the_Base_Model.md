@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/MATH_Beyond_A_Benchmark_for_RL_to_Expand_Beyond_the_Base_Model.pdf
+project_link: https://huggingface.co/datasets/brendel-group/MATH-Beyond
+code_link: null
 openreview_forum_id: RNkErKpCAp
 aliases:
 - MBBMB
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | MATH-Beyond：超越基模型的强化学习基准 |
 | 英文题名 | MATH-Beyond: A Benchmark for RL to Expand Beyond the Base Model |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=RNkErKpCAp); [Project](https://huggingface.co/datasets/brendel-group/MATH-Beyond) |
+| Links | [paper](https://openreview.net/forum?id=RNkErKpCAp) · [Project](https://huggingface.co/datasets/brendel-group/MATH-Beyond) |
 | Topic | #topic/benchmarks_datasets_evaluation #topic/benchmarks_datasets_evaluation/benchmark_eval |
 | Method | MATH-Beyond Benchmark (MATH-B) |
 | Dataset | MATH-B-U, MATH-B vs AIME24 |
@@ -42,7 +44,7 @@ claims:
 > - MATH-B-U 上，Expansion Rate (%, pass@1024) 为 Skywork-OR1-7B (RL) 21.2，对比 Base model (pass@1024 ≈ 0)，变化 +21.2。
 > - MATH-B-U 上，Expansion Rate (%, pass@1024) 为 DeepScaleR-1.5B (RL) 5.22，对比 Base model (pass@1024 ≈ 0)，变化 +5.22。
 
-## 概述
+## 概要
 
 当前主流数学推理基准（如MATH-500、AIME 2024）存在一个根本性缺陷：基模型凭借高采样预算（pass@1024）即可解决其中绝大多数问题。这一现象使得强化学习（RL）微调仅能锐化模型已有的求解模式，而无法激发真正的探索与技能获取，背离了RL探索性学习的初衷。
 
@@ -58,7 +60,7 @@ MATH-B的构建采用多阶段过滤流水线：从DAPO-Math-17K和DeepScaleR中
 
 这些结果表明，当前RL方法在无教师模型指导下，难以自主探索有效推理路径，真正的探索性学习仍是开放挑战。
 
-## 背景与动机
+
 
 ### 现有基准的“天花板”困境
 
@@ -80,7 +82,9 @@ $$\mathbf{Expansion Rate} = \frac{|\mathcal{E}_k|}{|D|}$$
 
 在零基线设定下（$\mathcal{R}_k(q, D) = \varnothing$），扩展率等价于策略 $\pi$ 的 pass@k，从而使得任何非零性能提升都直接反映推理边界的真实拓展，排除了采样放大已有能力的干扰。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：现有基准无法衡量RL的真实拓展
 
@@ -117,7 +121,7 @@ $$\mathbf{Expansion Rate} = \frac{|\mathcal{E}_k|}{|D|}$$
 
 在MATH-B-U（并集，181题）上，RL微调模型的扩展率仅为5.22%~21.2%，而SFT/蒸馏模型可达58.93%~66.38%（Table 2）。这一巨大差距揭示了当前RL方法的根本瓶颈：**在没有教师模型指导的情况下，RL的探索过程难以自主发现有效的推理路径**。扩展率随采样预算增加呈对数线性增长，但边际收益递减，在k=1024时趋于平台（Figure 5, Figure 7），表明单纯增加采样无法弥补探索能力的不足。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0010_RNkErKpCAp_MATH-Beyond_A_Benchmark_for_RL_to_Expand_Beyond/figures/002_Figure_1.jpg]]
 *Figure 1: MATH-Beyond: Benchmark Construction and Difficulty. Left: Schematic of the MATH-B creation process. A large set of problems from DAPO-Math-17K and DeepScaleR is first refined through quality filters to ensure answer correctness and verifiability. This is followed by evaluation against a gauntlet of open-source base models (≤ 8B, e.g., Qwen3, Qwen2.5 (-Math), DeepSeek-R1-Distill) at a pass@1024 budget to isolate problems that lie beyond their limits. The filtering yields the MATH-B suite of benchmarks: a 41-problem intersection set (unsolved by all base models) for evaluating universal difficulty, and a larger 181-problem union set (unsolved by at least one model) with model-specific splits...*
@@ -167,7 +171,7 @@ $$\mathbf{Expansion Rate} = \frac{|\mathcal{E}_k|}{|D|}$$
 
 Figure 1 右侧直观展示了 MATH-B 与 AIME24 的难度鸿沟：Qwen2.5-7B 在 AIME24 上 pass@1024 约 77%，而在 MATH-B 上近乎为零，验证了零基线设计的有效性。
 
-## 核心模块与公式推导
+
 
 ### 评估框架的核心公式
 
@@ -223,7 +227,9 @@ MATH-B 的构建依赖多阶段过滤流水线，核心模块按执行顺序包�
 
 现有基于规则的数学答案验证器存在七类常见失败模式（Table 1），包括仅读取首个或末个盒装答案、依赖特定文本锚点（如 "Answer:"）、答案顺序敏感性等。MATH-B 的验证框架通过规避这些失败模式实现鲁棒验证，但 Table 3 显示，目前尚无评估框架能完全覆盖所有七类失败——TRL、VERL、LM-Eval、LightEval、SCORE、evalchemy、HMMT、Math-V 等八个常见框架在不同失败模式上存在不同程度的漏洞。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：RL微调与SFT/蒸馏在推理边界拓展上的显著差距
 
@@ -269,7 +275,9 @@ MATH-Beyond的核心实验围绕扩展率（Expansion Rate）展开，该指标�
 
 **Figure 3** 对比了MATH-B-U和MATH-B-I的难度分布（基于人类标注的1–10分制）。一个反直觉的发现是：**模型感到最困难的题目（出现在交集中）并不一定是人类认为最难的题目**。MATH-B-I中的题目难度分布与MATH-B-U整体并无显著偏移，说明人类对数学题难度的直觉与模型的实际失败模式之间存在系统性脱节。这一现象提示，单纯依赖人类难度标注来筛选“挑战性”基准可能不够有效，基于模型实际表现的零基线筛选是更可靠的方法。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -310,6 +318,8 @@ MATH-Beyond 的适用边界由以下设计选择严格界定：
 2. **人类难度感知与模型失败模式之间的脱节是否有可量化的解释？** 理解这一脱节的根源，可能为设计更有效的训练信号或课程学习策略提供方向。
 
 3. **扩展率评价框架能否推广至其他领域？** 在代码、科学推理等领域构建类似的零基线基准，可能揭示 RL 探索性学习在不同推理模态中的共性瓶颈。
+
+
 
 ## 原文 PDF
 

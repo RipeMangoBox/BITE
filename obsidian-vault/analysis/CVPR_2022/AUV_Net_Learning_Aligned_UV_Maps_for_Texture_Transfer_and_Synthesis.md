@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2022
 pdf_ref: paperPDFs/CVPR_2022/AUV_Net_Learning_Aligned_UV_Maps_for_Texture_Transfer_and_Synthesis.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/toronto-ai/AUV-NET/
 aliases:
 - AUV-Net
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | AUV-Net：学习对齐UV映射用于纹理迁移和合成 |
 | 英文题名 | AUV-Net: Learning Aligned UV Maps for Texture Transfer and Synthesis |
 | 会议/期刊 | CVPR 2022 |
-| Links | [paper](https://arxiv.org/abs/2204.03105); [Project](https://nv-tlabs.github.io/AUV-NET); [Project](https://research.nvidia.com/labs/toronto-ai/AUV-NET/) |
+| Links | [paper](https://arxiv.org/abs/2204.03105) · [Project](https://nv-tlabs.github.io/AUV-NET) · [Project](https://research.nvidia.com/labs/toronto-ai/AUV-NET/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | AUV-Net |
 | Dataset | ShapeNet cars (semantic segmentation), ShapeNet chairs (semantic segmentation), Triplegangers heads (texture synthesis), ShapeNet cars (texture synthesis) |
@@ -41,7 +42,7 @@ claims:
 > - ShapeNet chairs (semantic segmentation) 上，IOU 为 85.8，对比 DIF-Net 80.3  /  BAE-Net 85.2，变化 +5.5 over DIF-Net, +0.6 over BAE-Net。
 > - Triplegangers heads (texture synthesis) 上，FID 为 5.69，对比 Texture Fields 24.59，变化 -18.9 (lower is better)。
 
-## 概述
+## 概要
 
 在三维视觉中，为不同形状生成或迁移纹理长期受困于一个瓶颈：**缺乏跨实例的语义对齐的纹理表示**。传统方法要么依赖手工标注的稠密对应，要么使用球形映射或连续纹理场，难以将“车轮”“眼睛”等语义部件自动映射到一致的参数化位置。AUV-Net 的核心洞察在于，通过**线性子空间对齐模块**——强制纹理图像被表示为共享基图像的线性组合——网络在最小化重构误差的过程中，**自发地将不同形状的对应语义部分映射到 UV 空间的同一位置**，从而无需任何监督即可习得语义对齐的 UV 参数化。
 
@@ -55,7 +56,7 @@ AUV-Net 处于**神经 UV 参数化**与**无监督语义对应学习**的交汇
 
 该方法的技术渊源可追溯至经典的线性子空间学习（如 Eigenfaces），但将其与可微 UV 映射相结合，使得对齐过程完全由重构目标驱动，无需任何对应标注。这一思路为 3D 纹理的生成式建模开辟了新的范式：先在语义对齐的 UV 空间中生成纹理图像，再通过预训练的 UV 映射将其“贴回”任意形状。
 
-## 背景与动机
+
 
 在三维视觉与图形学中，为三维形状赋予高质量纹理是内容创作、虚拟现实和数字孪生等应用的核心需求。然而，现有三维纹理表征方法在跨形状的纹理迁移与合成任务中面临一个根本性瓶颈：**不同物体之间纹理的语义对齐问题**。
 
@@ -65,7 +66,9 @@ AUV-Net 处于**神经 UV 参数化**与**无监督语义对应学习**的交汇
 
 AUV-Net的动机正是打破这一僵局。其核心洞察是：**如果网络被设计为将输入纹理分解为基图像的线性组合，并允许在分解前进行空间变形（UV映射），那么为最小化重构误差，网络必须学会将所有样本的对应特征对齐到一致的UV位置**。这一“重构即对齐”的机制无需任何显式的对应标注，即可在无监督条件下自发形成语义对齐的UV参数化。由此，纹理不再是形状的附属品，而成为可编辑、可迁移、可生成的独立二维图像，为纹理迁移与合成开辟了新的可能性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 AUV-Net 的核心创新在于提出了一种**无监督的纹理对齐模块**，从根本上改变了3D纹理的表征方式，使得不同拓扑和形状的物体能够自动学习到语义一致的UV参数化。其关键突破可归纳为以下三个层面：
 
@@ -102,7 +105,7 @@ $$
 
 这种“基-系数分解 + 蒙版切割 + 共享UV映射”的组合设计，使得AUV-Net在无需任何对应标注的情况下，实现了跨形状的语义对齐UV参数化，为纹理迁移、合成和单视图重建提供了统一的框架。
 
-## 整体框架
+
 
 AUV-Net 的整体管线围绕一个核心目标构建：**为任意拓扑的 3D 形状集合学习语义对齐的 UV 参数化**，使得不同形状的对应语义部件被映射到 UV 空间的同一位置。这一目标通过将纹理重建过程建模为“基图像的线性组合 + 空间变形”来实现——网络被迫将输入纹理分解为一组共享基图像与每个样本专属系数的乘积，而变形（UV 映射）在分解之前发生。为最小化重建误差，网络必须自发地将所有样本的对应特征对齐到一致的 UV 坐标，从而在无监督条件下形成语义对齐。
 
@@ -168,7 +171,7 @@ AUV-Net 的整体管线围绕一个核心目标构建：**为任意拓扑的 3D 
 
 对于单视图纹理重建任务（**Figure 13**），AUV-Net 的 UV 映射器和掩码网络在预训练后被冻结，作为固定的参数化模块使用——IM-Net 解码器预测形状，预训练的 AUV-Net 模块为该预测形状生成 UV 映射，从而实现纹理重建。这种“预训练参数化 + 下游任务复用”的设计体现了框架的模块化优势。
 
-## 核心模块与公式推导
+
 
 AUV-Net 的核心由三个功能模块构成：**对齐模块**、**掩码网络**与**多基生成器**。其设计目标是通过无监督学习，将不同三维形状的对应语义部分映射到 UV 空间的同一位置，从而形成语义对齐的二维纹理参数化。
 
@@ -220,7 +223,9 @@ $$L_{p} = \frac{1}{N} \sum_{i=1}^{N} (p_{i}^{x} - q_{i}^{x})^{2} + (p_{i}^{y} - 
 - 处理复杂拓扑仍需较多基生成器（椅子需要四个），且最终 UV 贴图间仍可能存在可见接缝。
 - 方法依赖于训练集中存在部件级对应和姿态对齐，泛化到任意姿态的新类别仍需额外优化。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 数据集与评估协议
 
@@ -253,7 +258,6 @@ Table 5 展示了单视图纹理重建的 FID 结果：汽车类别上 AUV-Net �
 ![[assets/figures/papers/paper_list_l52_https_arxiv_org_abs_2204_03105/figures/010_Figure.jpg]]
 *Figure: （a）Texture image （b)Segmentation （c）Visualization*
 
-![[assets/figures/papers/paper_list_l52_https_arxiv_org_abs_2204_03105/figures/016_Figure.jpg]]
 
 ![[assets/figures/papers/paper_list_l52_https_arxiv_org_abs_2204_03105/figures/015_Figure_10.jpg]]
 *Figure 10: Textured single view reconstruction results. Zoom in to see the details, e.g., wheels of the cars. Table 5. Results of textured single view reconstruction*
@@ -287,7 +291,9 @@ Figure 11 展示了典型失败案例：将卡通长颈鹿纹理迁移到其他�
 ![[assets/figures/papers/paper_list_l52_https_arxiv_org_abs_2204_03105/figures/003_Figure_2.jpg]]
 *Figure 2: Results of the 2D toy experiment on the face dataset. Our network reconstructs input images (a) by learning a set of basis images (d) and linearly combining them into aligned texture images (c), and then deforming the texture images (c) into the outputs (b) via learned UV mapping. The learned UV mapping can be used to deform the input images (a) into aligned high-quality texture images (e). Figure 3. Network architecture of the 2D toy experiment on the face dataset, to demonstrate the concept of our alignment module*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位与核心瓶颈
 
@@ -361,6 +367,8 @@ AUV-Net在以下条件下表现最佳：
 4. **跨类别泛化**：当前方法在同类形状间工作良好，但能否扩展到跨类别的纹理迁移（如将木质纹理从椅子迁移到桌子）？这可能需要更高级的语义理解或材质分解能力。
 
 5. **与生成模型的深度整合**：AUV-Net生成的纹理图像可作为StyleGAN等2D生成模型的训练数据，但当前的两阶段流程（先训练AUV-Net，再训练生成模型）能否统一为端到端的框架，实现纹理对齐与生成的联合优化？
+
+
 
 ## 原文 PDF
 

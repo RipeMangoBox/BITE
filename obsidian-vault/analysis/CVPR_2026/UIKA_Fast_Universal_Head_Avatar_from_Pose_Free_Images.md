@@ -42,7 +42,7 @@ claims:
 > - NeRSemble-v2 (Multi-view) 上，PSNR↑ 22.50 vs 17.11 (GPAvatar) (+5.39)；LPIPS↓ 0.120 vs 0.313 (GPAvatar) (-0.193)。
 > - NeRSemble-v2 (Monocular) 上，CSIM↑ (Cross) 0.649 vs 0.678 (GAGAvatar) (-0.029)。
 
-## 概述
+## 概要
 
 UIKA 是一个前馈式（feed-forward）3D 头部化身重建框架，旨在从**任意数量的无姿态（pose-free）输入图像**中重建高保真、可实时驱动的3D高斯头部化身，无需相机参数或表情标注。该工作解决了现有方法在多视图信息聚合中对显式跨帧对应的依赖缺失这一核心瓶颈。
 
@@ -58,7 +58,7 @@ UIKA 是一个前馈式（feed-forward）3D 头部化身重建框架，旨在从
 
 **局限与展望**：受FLAME模型表达能力限制，精细面部动态（如微表情、舌头动作）仍无法捕捉；训练数据存在人口统计偏差；计算开销随视图数增长而性能提升趋于饱和。未来工作可探索更丰富的面部表示、偏差缓解策略以及高效的视图选择机制。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -87,7 +87,9 @@ Table 1 系统对比了UIKA与现有代表性方法在三个关键维度上的�
 
 基于这一动机，UIKA设计了一条完整的UV引导建模流水线：首先通过面部对应估计器预测像素级UV坐标并完成颜色重投影与聚合；然后引入双空间（屏幕空间+UV空间）编码器和UV-屏幕双注意力Transformer，实现结构化跨视图特征交互；最后通过自适应融合机制平衡全局预测与局部观测，输出可驱动的高斯头部化身。这一设计使得UIKA成为首个同时实现前馈推理、无姿态输入、多视图灵活输入和实时动画的统一框架。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 UIKA 的核心创新在于通过 **UV 空间作为统一中间表示**，将无姿态标注的多视图输入显式关联起来，从而解决现有前馈头部化身方法在跨视图信息聚合时的根本性瓶颈。其关键创新点可归纳为三个“changed slots”，分别对应跨视图对应建立、特征交互空间和颜色确定方式的范式转变。
 
@@ -135,7 +137,7 @@ $$c_k = w_k \hat{c}_k + (1 - w_k) c_k^{aggr}$$
 
 上述三个 changed slots 构成了一个完整的因果链条：**显式 UV 对应**为多视图信息提供了结构化对齐基础 → **双空间注意力**利用这一基础实现局部细节与全局结构的互补融合 → **自适应颜色融合**根据观测质量动态平衡预测与观测。这一设计使得 UIKA 在无姿态标注的任意数量输入图像设定下，能够实现高质量、可驱动的 3D Gaussian 头部化身重建，在单目自重建（PSNR 21.69 vs. 21.03）和多视图自重建（PSNR 22.50 vs. 17.11）中均显著超越现有基线。
 
-## 整体框架
+
 
 UIKA 是一个前馈式（feed-forward）可驱动 3D 高斯头部化身重建框架，其核心设计目标是：**在无需相机姿态或表情标注的条件下，从任意数量（单张或多张）的输入图像中一次性推理出高保真、可动画化的头部模型**。该框架将这一挑战分解为三个紧密耦合的阶段——面部对应估计与颜色重投影、双空间特征编码与交互、以及 UV 解码与自适应融合——最终输出一个基于 FLAME 模型驱动的经典 3D Gaussian 表示。
 
@@ -174,7 +176,7 @@ UIKA 是一个前馈式（feed-forward）可驱动 3D 高斯头部化身重建�
 
 UIKA 在架构层面的核心创新在于 **UV 空间作为统一的跨视图对应中介**。与现有前馈方法（如 **GAGAvatar**、**LAM** 等仅在屏幕空间操作）或优化式方法（如 **InvertAvatar** 依赖测试时迭代）不同，UIKA 通过预测像素级 UV 坐标，将多视图信息聚合问题转化为 UV 空间内的结构化融合问题。这一设计的因果机制是：UV 坐标天然独立于相机姿态和表情变化，因此在 UV 空间中建立的对应关系消除了姿态歧义，使得即使输入图像的视角和表情差异极大，跨视图信息交互仍然可靠。消融实验证实，移除 UV 注意力分支会导致 PSNR 从 22.61 降至 22.21，并出现明显的细节丢失（Table 4, Figure 5(c)），验证了该设计的关键作用。
 
-## 核心模块与公式推导
+
 
 UIKA 的整体流水线（Figure 2）由五个关键模块构成，其核心设计围绕“UV空间作为统一表示”展开，以解决无姿态标注下的跨视图信息聚合难题。
 
@@ -229,7 +231,9 @@ $$c_k = w_k \hat{c}_k + (1 - w_k) c_k^{aggr}$$
 ![[assets/figures/papers/paper_list_l1083_https_arxiv_org_abs_2601_07603/figures/012_Figure_S.1.jpg]]
 *Figure S.1: Visualization and Comparison of UV coordinates map*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置与评估协议
 
@@ -313,7 +317,9 @@ $$\mathcal{L} = \lambda_{\mathrm{l1}} \mathcal{L}_{\mathrm{l1}} + \lambda_{\math
 ![[assets/figures/papers/paper_list_l1083_https_arxiv_org_abs_2601_07603/figures/001_Figure_1.jpg]]
 *Figure 1: We present UIKA, a novel feed-forward approach for high-fidelity 3D Gaussian head avatar reconstruction from an arbitrary number of input images (e.g., a single portrait image or multi-view captures) without requiring extra camera or expression annotations*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位与技术断点
 
@@ -390,6 +396,8 @@ UIKA在3D头部化身重建知识库中的定位可概括为：
 4. **大规模部署的效率优化**：在前馈推理效率与日益增长的视图带来的计算开销之间，如何设计自适应计算分配策略（如根据视图质量动态选择关键帧）？
 
 5. **跨模态扩展**：UV空间的对应独立性使其天然适合融合多模态信息（如深度图、红外图），未来可探索将UIKA框架扩展到RGB之外的输入模态。
+
+
 
 ## 原文 PDF
 

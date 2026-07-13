@@ -43,7 +43,7 @@ claims:
 > - 3D-POPE Popular 上，Precision 52.35 vs 49.97 (3D-LLM) (+2.38)。
 > - 3D-POPE Adversarial 上，F1 67.33 vs 66.61 (3D-LLM) (+0.72)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -68,7 +68,7 @@ claims:
 
 3D-VCD属于**推理时幻觉缓解**方法，与训练时对齐、RLHF反馈或模型编辑等范式正交。在3D具身MLLM领域，现有基线如**3D-LLM**、**3D-VisTA**和**LEO**均未包含推理时的幻觉缓解机制，而3D-VCD可即插即用地应用于这些模型。与2D视觉对比解码方法（如VCD）相比，3D-VCD的独特贡献在于将扰动空间从像素级扩展到结构化3D场景图，使得对比信号能够捕捉物体存在、状态和空间布局层面的接地证据缺失。
 
-## 背景与动机
+
 
 ### 3D具身智能体的幻觉困境
 
@@ -98,7 +98,9 @@ claims:
 
 3D-VCD作为首个面向3D具身智能体的训练无关、推理时对比解码框架，填补了从2D VCD到3D结构化对比解码的方法空白。它不修改模型参数，不引入辅助模型，仅通过双上下文logit对比融合实现幻觉抑制，可即插即用于现有3D-LLM管线。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 3D-VCD 的核心创新在于将 **对比解码（Contrastive Decoding）从 2D 像素空间推广到 3D 结构化表示**，构建了一个无需训练、即插即用的推理时幻觉缓解框架。其关键 changed slot 体现在：
 
@@ -132,7 +134,7 @@ claims:
 
 现有 2D 对比解码方法（如 VCD）仅操作像素空间，通过图像噪声扰动构建负上下文，无法迁移到需要结构化 3D 推理的具身场景。3D-VCD 的关键突破在于**将扰动空间从像素级提升到物体中心的结构化场景图**，通过语义和几何的双重扰动，在保留场景整体结构的前提下精准破坏 3D 证据，从而识别并压制仅由语言先验驱动的幻觉 token。这一设计使得方法无需重新训练或修改模型架构，可公平地适用于现有各类 3D MLLM。
 
-## 整体框架
+
 
 3D-VCD 是一个**免训练、纯推理时**的对比解码框架，旨在缓解 3D 具身智能体中的物体与状态幻觉。其核心流水线由五个紧密耦合的模块构成，形成“原始上下文—扭曲上下文—对比融合—自回归生成”的闭环。
 
@@ -183,7 +185,7 @@ $$\mathbf{y}_{t,k} = \mathrm{softmax}(\mathbf{z}_{t,k}^{\mathrm{vcd}})$$
 ![[assets/figures/papers/paper_list_l2156_https_arxiv_org_abs_2604_08645/figures/002_Figure_2.jpg]]
 *Figure 2: 3D-VCD Overview. Given 3D environment observations, 3D-VCD builds a structured 3D scene graph (G) encoding object categories, centroids, and extents, and injects controlled semantic and geometric perturbations to obtain a distorted version of the environment (Gˆ). The MLLM agent processes both contexts in parallel, given the textual query (x). 3D-VCD contrastively fuses their logits to reveal and suppress hallucination-prone tokens. This training-free procedure enforces 3D-grounded reasoning at inference time*
 
-## 核心模块与公式推导
+
 
 ### 问题形式化
 
@@ -238,7 +240,9 @@ $$C_t = \frac{|\{\text{hallucinated } t\}|}{|\{\text{all } t \text{ mentioned}\}
 
 3D-VCD 仅需一次额外的 MLLM 前向传播。通过批量双前向传递和 KV 缓存复用优化，端到端延迟仅增加约 $0.25\times$，平均推理时间从 2 秒增至 2.5 秒，适合实时具身交互场景。方法无需训练或微调，可即插即用于任意现有 3D MLLM。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 评估基准与设置
 
@@ -324,7 +328,9 @@ Figure 3以F1为指标对各类扰动组合进行整体排序，确认了语义+
 ![[assets/figures/papers/paper_list_l2156_https_arxiv_org_abs_2604_08645/figures/008_Figure_6.jpg]]
 *Figure 6: 3D-VCD inference time as a function of scene complexity (number of objects)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 对比解码从2D到3D的迁移
 
@@ -361,6 +367,8 @@ Figure 3以F1为指标对各类扰动组合进行整体排序，确认了语义+
 2. **表示泛化**：3D-VCD当前依赖显式场景图。是否适用于其他3D表示，如点云、3D特征tokens、多视图隐式表示？若将扰动操作直接施加于隐式表示空间，对比信号的语义可解释性将下降，需要新的校准策略。
 3. **自适应扰动选择**：如何自适应地选择最优的扰动类型与强度，以在不同基准和场景分布下达到最佳幻觉抑制？当前 $\varepsilon$ 和 $\alpha$ 需手动调参，Table 4显示不同扰动组合对 $\alpha$ 的敏感度各异。
 4. **开放式生成评估**：在开放式生成任务（如具身对话或指令执行）中，如何将VCD从二元问答推广到更复杂的输出评估？当前CHAIR指标（$C_t = \frac{|\{\text{hallucinated } t\}|}{|\{\text{all } t \text{ mentioned}\}|}$）依赖标注，难以在线部署。
+
+
 
 ## 原文 PDF
 

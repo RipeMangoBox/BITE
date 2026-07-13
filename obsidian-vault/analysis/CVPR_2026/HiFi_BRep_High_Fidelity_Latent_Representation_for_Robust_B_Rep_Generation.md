@@ -43,7 +43,7 @@ claims:
 > - DeepCAD 上，Validity (%) 72.20 vs 43.20 (DTGBrepGen) (+29.0)；Compilability→Validity gap (%) 18.18 (90.38→72.20) vs 49.28 (92.48→43.20 for DTGBrepGen) (−31.10)；Inference time (s/shape) 3.83 vs 8.09 (BRepGen) (−52.7% (2.1× faster))。
 > - ABC 上，Validity (%) 32.66 vs 24.88 (DTGBrepGen) (+7.78)。
 
-## 概述
+## 概要
 
 **HiFi-BRep** 针对现有 B-Rep 生成方法中两大根本性脆性提出统一解决方案：**表示脆性**——因序列填充引入噪声、无约束跨流注意力导致面/边特征污染；**生成脆性**——级联式生成引起误差累积，训练后非可微的合法性修复造成训练-推理不匹配。这两类脆性使得同时保证几何保真度与拓扑有效性极为困难。
 
@@ -58,7 +58,7 @@ HiFi-BRep 的核心设计通过两个因果调节变量直指脆性根源：
 
 HiFi-BRep 的方法定位可概括为：在 B-Rep 生成领域，首次将**拓扑感知的表示学习**与**可微流形约束**统一在端到端框架中，为鲁棒且高保真的 CAD 模型生成提供了新的基准。
 
-## 背景与动机
+
 
 ### 边界表示（B-Rep）的生成需求与核心挑战
 
@@ -83,7 +83,9 @@ HiFi-BRep 的方法定位可概括为：在 B-Rep 生成领域，首次将**拓�
 
 这一设计理念的预期效果是：潜在表示更干净、更具判别力，解码过程更稳定、更自洽，最终显著缩小可编译性与有效性之间的差距，同时提升生成效率。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 HiFi-BRep 的核心创新在于系统性地解决了现有 B-Rep 生成方法中“表示脆性”与“生成脆性”两大瓶颈，通过四项关键设计（changed slots）协同作用，首次实现了高保真潜在表示下的鲁棒生成。
 
@@ -123,7 +125,7 @@ $$\mathcal{L} = \lambda_{\mathrm{KL}}\mathcal{L}_{\mathrm{KL}} + \lambda_{\mathr
 
 上述四项设计并非孤立改进，而是形成了闭环协同：**可学习查询**与**拓扑掩码**共同构建了高保真的潜在表示，为解码器提供了干净的输入；**单阶段解码**与**可微流形约束**则确保从该表示中可以端到端地生成几何精确且拓扑有效的 B-Rep。这一协同最终体现在生成结果上——在 DeepCAD 数据集上，HiFi-BRep 的 Validity 达到 **72.20%**，较此前最佳方法 DTGBrepGen 的 43.20% 提升 **+29.0 个百分点**；Compilability–Validity 差距从 49.28 大幅缩小至 18.18，表明模型生成的形状更接近可直接编译的工业标准。
 
-## 整体框架
+
 
 HiFi-BRep 采用两阶段流水线：先训练一个变分自编码器（VAE）将 B-Rep 压缩到高保真潜在空间，再在该潜在空间中训练一个去噪扩散概率模型（DDPM）实现无条件或条件生成。VAE 由**拓扑感知双流编码器**和**单阶段合法性约束解码器**组成，二者通过固定长度的潜在码连接，形成端到端可训练的压缩-重建通路。
 
@@ -140,7 +142,7 @@ HiFi-BRep 采用两阶段流水线：先训练一个变分自编码器（VAE）�
 ![[assets/figures/papers/paper_list_l885_https_openaccess_thecvf_com_content_CVPR2026_html_Hou_HiFi_BRep_High_Fid/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of HiFi-BRep. (a) Face and edge tokens undergo per-stream self-attention and cross-stream attention masked by edgeface incidence (Topo-Mask), then learnable queries pool them into a fixed-length latent. (b) The decoder first predicts face and edge counts to build hard padding masks, then updates learnable face and edge queries. Stacked DecBiBlocks then decode topology-aware geometry sequences. Geometry heads regress primitive parameters, while a topology solver head predicts adjacency with row-wise softmax and two-peak targets*
 
-## 核心模块与公式推导
+
 
 ### 3.1 输入表示：几何-拓扑解耦的特征构建
 
@@ -199,7 +201,9 @@ $$
 
 编码器中，面流自注意力复杂度为 $\mathcal{O}(F_{\max}^2 D)$，边流自注意力为 $\mathcal{O}(E_{\max}^2 D)$。Topo-Mask 跨流注意力仅计算邻接对，复杂度为 $\mathcal{O}(\|\mathbf{A}\|_0 D)$，其中 $\|\mathbf{A}\|_0$ 为邻接矩阵非零元数量。在流形 B-Rep 中每条边恰关联两个面，故 $\|\mathbf{A}\|_0 = 2E$，跨流注意力实际为线性复杂度，显著低于全对全注意力的 $\mathcal{O}(F_{\max}E_{\max}D)$。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 HiFi-BRep 在无条件生成任务上进行了系统评估，涵盖 DeepCAD 和 ABC 两个标准数据集，与 **DeepCAD** (Wu et al., ICCV 2021)、**BRepGen** (Xu et al., TOG 2024)、**DTGBrepGen** (Li et al., CVPR 2025)、**BrepDiff** (Lee et al., SIGGRAPH 2025) 和 **HoLa** (Liu et al., TOG 2025) 等代表性基线进行全面对比。评估指标包括有效性（Validity）、可编译性（Compilability）、倒角距离（MMD-CD）和 Jensen-Shannon 散度（JSD）。
 
@@ -269,7 +273,9 @@ Table 3 的推理耗时对比显示，HiFi-BRep 在 DeepCAD 上平均每形状�
 ![[assets/figures/papers/paper_list_l885_https_openaccess_thecvf_com_content_CVPR2026_html_Hou_HiFi_BRep_High_Fid/figures/005_Figure_4.jpg]]
 *Figure 4: Unconditional generations on DeepCAD. Columns (a–e) show DeepCAD, BRepGen, DTGBrepGen, BrepDiff, and HiFi-BRep, respectively. Red boxes highlight typical artifacts observed in baselines—open shells or missing faces around holes/fillets, non-manifold junctions, and degenerate thin plates/rods—while the rightmost column also marks a rare failure of our method for transparency. Overall, HiFi-BRep yields more coherent solids with consistent edge–face incidence and fewer topology errors, consistent with its higher Validity*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题域与基线谱系
 
@@ -325,6 +331,8 @@ HiFi-BRep 的设计存在明确的适用范围：
 ### 6. 知识库定位
 
 HiFi-BRep 在 B-Rep 生成领域的知识贡献可定位为**从“表示-生成耦合脆性”到“高保真潜在空间 + 内生合法性”的范式转换**。其核心洞察——用可学习查询替代填充、用拓扑掩码限制注意力、用行级双峰目标替代后处理修复——不仅适用于 B-Rep 生成，也对其他结构化几何表示（如网格、点云序列）的编码器-解码器设计具有启发意义。该方法已在 DeepCAD 和 ABC 两个标准基准上验证，代码开源（https://github.com/1nnoh/HiFi-BRep），为后续研究提供了可复现的基线。
+
+
 
 ## 原文 PDF
 

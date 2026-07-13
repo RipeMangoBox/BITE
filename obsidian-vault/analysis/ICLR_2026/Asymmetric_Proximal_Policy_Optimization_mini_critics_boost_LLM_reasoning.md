@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Asymmetric_Proximal_Policy_Optimization_mini_critics_boost_LLM_reasoning.pdf
+project_link: null
+code_link: null
 openreview_forum_id: 0vgzrcv4Dr
 aliases:
 - APPOA
@@ -42,7 +44,7 @@ claims:
 > - Qwen3-4B-Base performance improvement (6 benchmark average) 上，Improvement over initial policy 为 AsyPPO: > 6% improvement，对比 Classic PPO (symmetric)，变化 > 6%。
 > - Qwen3-8B-Base and 14B-Base 上，Improvement over initial policy 为 AsyPPO: about 3% improvement，对比 Classic PPO，变化 about 3%。
 
-## 概述
+## 概要
 
 ### 问题背景与瓶颈
 
@@ -71,7 +73,7 @@ AsyPPO 的**核心洞察**在于：预训练 LLM 已具备强表征能力，使�
 
 AsyPPO 在现有 RL4LLM 方法谱系中开辟了**非对称价值估计**的新路径：它既保留了价值函数带来的训练稳定性，又通过轻量集成和不确定性感知机制大幅降低了计算开销，在完全无价值函数方法（GRPO）与对称 PPO 之间找到了高效的折中方案。
 
-## 背景与动机
+
 
 ### 大语言模型强化学习中的价值估计困境
 
@@ -95,7 +97,9 @@ AsyPPO 在现有 RL4LLM 方法谱系中开辟了**非对称价值估计**的新�
 
 基于以上动机，本文提出 **非对称近端策略优化（AsyPPO）**，通过无重叠数据分块训练的轻量级集成评论家和基于价值不确定性的策略损失重构，实现高效、鲁棒的价值估计和更有效的策略学习。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 AsyPPO 的核心创新在于**解耦 actor-critic 的对称性约束**，通过三个相互协同的机制实现轻量级但鲁棒的价值估计，从而重构 PPO 的策略更新过程。
 
@@ -125,7 +129,7 @@ AsyPPO 的核心创新在于**解耦 actor-critic 的对称性约束**，通过�
 
 AsyPPO 的关键洞察在于：预训练 LLM 的初始表征能力使得**小型评论家已具备指导大型策略的潜力**，但需要数据分区的多样性注入和不确定性感知的损失重构来充分释放这一潜力。两个迷你评论家即可实现性能的阶跃式提升（Figure 9(b)），在效率和效果之间取得了显著平衡。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_0vgzrcv4Dr/figures/003_Figure_1.jpg]]
 *Figure 1: (Left): Learnable critics naturally enhance policy stability through fine-grained value estimation and yield continuous gains as training progresses. Off-policy ratio=8, average@4 of 6 benchmarks, i.e., AIME 24, AIME 25, MATH-500, OlympiadBench, MinervaMath, and AMC 2023. (Right): AsyPPO restores the critic’s role in PPO while remaining lightweight and stable under LLM-scale training. The average clock time of training and the peak GPU memory usage of AsyPPO are significantly lower than those of the classic PPO, remain at the GRPO level*
@@ -170,7 +174,7 @@ $$\mathcal{J}_{\mathrm{PPO}}(\theta) = \mathbb{E} \frac{1}{|o|} \sum_{t=1}^{|o|}
 
 这一非对称设计使 AsyPPO 在保持价值估计鲁棒性的同时，将峰值 GPU 内存降低约 20%，每步训练时间缩短约 20 秒（见 Figure 1(b)），实现了效率与性能的有效平衡。
 
-## 核心模块与公式推导
+
 
 ### 4.1 非对称集成评论家架构
 
@@ -212,7 +216,9 @@ $$ \mathcal { J } _ { \mathrm { P P O } } ( \theta ) = \mathbb { E } _ { [ q \si
 
 其中 $\epsilon$ 为裁剪范围，$\beta$ 为熵正则化系数，$\mathcal{H}[\cdot]$ 为策略熵。该损失函数通过双重不确定性感知机制，在保留有效学习信号的同时抑制过拟合和无意义探索。消融实验表明，掩蔽 20% 的低标准差状态带来约 6 个百分点的提升（Figure 5b），排除高标准差状态的熵过滤带来约 7 个百分点的提升（Figure 7b），且基于价值标准差的掩蔽始终优于基于熵的掩蔽（Figure 5c）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -268,7 +274,9 @@ AsyPPO 在数学推理基准上展现出显著且一致的性能优势。在 Qwe
 3. **超参数敏感性**：优势掩码和熵过滤的百分比超参数需针对不同任务调整，缺乏自适应机制。
 4. **资源开销权衡**：虽然计算开销显著低于对称 PPO，但相较于完全无价值函数的 GRPO 等方法，仍需额外的评论家训练资源。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与主流RL4LLM方法的关系
 
@@ -311,6 +319,8 @@ AsyPPO 的方法论贡献可分解为三个相互耦合的机制，每个机制�
 **超参数的自适应调节。** 优势掩码和熵过滤的百分比目前是固定超参数。能否根据训练动态自适应调节这些阈值，是提升方法鲁棒性的潜在方向。此外，评论家超参数设置（如学习率、更新频率）对校准和不确定性估计的影响尚未系统研究。
 
 **集成评论家的异质性潜力。** 论文提出了“由不同模型家族和尺寸组成的集成评论家系统是否表现出性能差异”的开放问题。当前实现使用同构迷你评论家，引入异构评论家可能进一步增强多样性，但也可能引入新的校准挑战。
+
+
 
 ## 原文 PDF
 

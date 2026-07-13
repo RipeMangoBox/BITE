@@ -5,6 +5,7 @@ paper_level: A
 venue: SIGGRAPH
 year: 2022
 pdf_ref: paperPDFs/SIGGRAPH_2022/Learning_Smooth_Neural_Functions_via_Lipschitz_Regularization.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/toronto-ai/lip-mlp/
 aliases:
 - LMLPLLB
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 通过Lipschitz正则化学习光滑神经函数 |
 | 英文题名 | Learning Smooth Neural Functions via Lipschitz Regularization |
 | 会议/期刊 | SIGGRAPH 2022 |
-| Links | [paper](https://arxiv.org/abs/2202.08345); [Project](https://research.nvidia.com/labs/toronto-ai/lip-mlp/) |
+| Links | [paper](https://arxiv.org/abs/2202.08345) · [Project](https://research.nvidia.com/labs/toronto-ai/lip-mlp/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Lipschitz MLP with learnable per-layer Lipschitz bounds |
 | Dataset | MNIST SDF autoencoder (Jacobian smoothness), ShapeNet chairs (test-time optimization, partial-to-full shape) |
@@ -42,7 +43,7 @@ claims:
 > - MNIST SDF autoencoder (Jacobian smoothness) 上，max ||J||^2 为 9.419，对比 Vanilla: 23.658; L1: 17.361; L2: 21.181，变化 −14.239 vs Vanilla。
 > - ShapeNet chairs (test-time optimization, partial-to-full shape) 上，Chamfer distance (mean, lower better) 为 0.0013，对比 DeepSDF: 0.0343，变化 −0.033。
 
-## 概述
+## 概要
 
 **问题瓶颈**：神经隐式场（neural fields）在隐空间插值与外推时产生不光滑结果，根源在于现有平滑正则化策略存在结构性缺陷。Dirichlet能量仅在采样点施加平滑约束，无法保证未观测区域的全局平滑（Fig. 2）；基于谱归一化的Lipschitz约束方法（如**Yoshida & Miyato, 2017**）则要求预先设定全局Lipschitz常数，而几何应用中合适的常数未知，导致每任务需大量调参，且对网络深度高度敏感（Fig. 4）。
 
@@ -58,7 +59,7 @@ claims:
 
 **局限性**：方法仅鼓励平滑插值，无法从少量形状中提取高级语义信息（Fig. 9）；训练时归一化层引入轻微计算开销；正则化强度 $\alpha$ 虽比固定Lipschitz常数更鲁棒，仍需针对任务选择（Fig. 16）。
 
-## 背景与动机
+
 
 ### 神经隐式场与隐空间平滑性
 
@@ -102,7 +103,9 @@ $$\mathcal{T}(\theta) = \mathcal{L}(\theta) + \alpha \sum_{i=1}^l \| \mathsf{W}_
 
 本文的核心动机是设计一种**无需预设全局Lipschitz常数、对网络深度不敏感、且能在整个隐空间（含训练集之外）保证平滑性**的正则化方法。关键洞察是：将网络的Lipschitz常数视为**可学习参数**，并惩罚其**乘积**形式的上界，既自适应学习各任务所需的平滑度，又正确处理了Lipschitz界随深度指数增长的特性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作的核心创新在于将神经网络的 **Lipschitz 常数从预设超参数转变为可学习参数**，并配套设计了与之自洽的权重归一化与正则化策略，从而系统性地解决了现有方法在神经场隐空间平滑性上的根本困境。
 
@@ -147,7 +150,7 @@ $$\boxed{\mathcal{I}(\theta, C) = \mathcal{L}(\theta) + \alpha \prod_{i=1}^l \ma
 
 将网络的 Lipschitz 常数视为可学习参数并惩罚其乘积，既**自适应学习各任务所需的平滑度**，又通过乘积形式**正确处理了 Lipschitz 界随网络深度指数增长的特性**，避免了深度变化时需重新调参的根本问题。这一设计使得方法在形状插值/外推（Fig. 1）、测试时优化（Table 2，Chamfer 距离从 0.0343 降至 0.0013）和对抗鲁棒性（Table 1，最大雅可比范数从 23.658 降至 9.419）上均显著优于现有方法。
 
-## 整体框架
+
 
 本方法的核心思想是**将网络的Lipschitz常数视为可学习参数，并惩罚其乘积形式的整体上界**，从而在整个隐空间（包括训练集之外）上获得平滑性，且无需预定义全局Lipschitz常数。
 
@@ -203,7 +206,7 @@ $$\boxed { \mathcal{I}(\theta, C) = \mathcal{L}(\theta) + \alpha \prod_{i=1}^l \
 
 本方法的可学习乘积形式正则化在收敛性、深度鲁棒性和任务适应性上均优于上述替代方案（详见Sec. 4.2消融实验）。
 
-## 核心模块与公式推导
+
 
 ### 核心思想
 
@@ -259,7 +262,9 @@ $$\boxed{\mathcal{I}(\theta, C) = \mathcal{L}(\theta) + \alpha \prod_{i=1}^{l} \
 
 网络 $f_\theta(\mathbf{x}, \mathbf{t})$ 将3D坐标 $\mathbf{x}$ 与隐码 $\mathbf{t}$ 拼接后输入MLP，Lipschitz正则化作用于隐码维度，使网络输出对隐码变化平滑。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与实验设计逻辑
 
@@ -352,7 +357,9 @@ Chamfer距离从0.0343降至0.0013（降低96.2%），Hausdorff距离从0.3441�
 ![[assets/figures/papers/paper_list_l44_https_arxiv_org_abs_2202_08345/figures/018_Figure_12.jpg]]
 *Figure 12: In this simple toy example, test-time optimization using SGD gives us similar result compared to the one optimized with Adam (see Fig. 5)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -397,6 +404,8 @@ Chamfer距离从0.0343降至0.0013（降低96.2%），Hausdorff距离从0.3441�
 4. **语义光滑性**：能否在保持光滑隐空间的同时，从少量样本中学习高级结构或语义信息？
 5. **跨领域泛化**：该方法在几何以外的任务（通用图像生成、分类对抗鲁棒性）上表现如何？Fig. 8的潜空间对抗攻击实验提供了初步证据（最大SDF差异从0.34降至0.16），但系统研究尚缺。
 6. **大规模训练的稳定性**：对于极深或极宽网络，是否存在更稳定的替代形式以避免log-sum的发散问题？
+
+
 
 ## 原文 PDF
 

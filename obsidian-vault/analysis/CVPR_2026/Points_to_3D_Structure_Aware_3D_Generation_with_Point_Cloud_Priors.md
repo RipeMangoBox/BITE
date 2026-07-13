@@ -43,7 +43,7 @@ claims:
 > - Toys4K 上，PSNR (Rendering) 22.91 vs 21.94 (TRELLIS) (+0.97)；SSIM (Rendering) 92.83 vs 91.46 (TRELLIS) (+1.37)；LPIPS (Rendering) 0.070 vs 0.105 (TRELLIS) (-0.035)。
 > - 3D-FRONT 上，PSNR (Rendering) 21.63 vs 18.21 (TRELLIS) (+3.42)；F-Score (Geometry) 0.886 vs 0.478 (TRELLIS) (+0.408)。
 
-## 概述
+## 概要
 
 **问题瓶颈：** 当前领先的3D生成框架（如 **TRELLIS**，Xiang et al., CVPR 2025）在生成过程中，其稀疏结构潜变量（Sparse Structure latent）从纯高斯噪声初始化，缺乏将易于获取的可见区域点云先验作为硬几何约束直接注入生成过程的机制。这导致两个核心问题：生成结果无法忠实反映真实观测几何，且难以合理补全不可见区域。
 
@@ -53,8 +53,6 @@ claims:
 
 **主要结果：** 在 Toys4K 单物体生成基准上，使用真实点云先验时，Points-to-3D 的几何 F-Score 达到 **0.963**（TRELLIS 为 0.832），Chamfer Distance 降至 **0.013**（TRELLIS 为 0.034）；在可见区域内，F-Score 高达 **0.998**，几乎与真值完全对齐。在 3D-FRONT 场景级生成中，F-Score 从 TRELLIS 的 0.478 提升至 **0.886**。即使使用 VGGT 估计的点云（无精确先验），渲染与几何质量仍优于所有不使用显式点云先验的基线方法。
 
-## 背景与动机
-
 3D内容生成正处于从“可生成”向“可控制”过渡的关键阶段。以**TRELLIS**（Xiang et al., CVPR 2025）为代表的3D原生扩散框架，通过在一个紧凑的稀疏结构（SS）潜空间与结构化潜空间（SLAT）中执行扩散过程，实现了高质量、多样化的3D资产生成。然而，这类方法存在一个根本性的结构瓶颈：**结构潜变量从纯高斯噪声初始化，缺乏任何机制将易于获取的可见区域几何先验作为硬约束直接注入生成过程**。
 
 这一缺口的后果是双重的。一方面，当用户已经拥有部分3D信息（如深度传感器采集的点云、多视角重建的稀疏几何）时，现有方法无法利用这些信息来锚定生成结果，导致输出与真实几何之间缺乏忠实性。另一方面，纯噪声初始化使得模型在补全不可见区域时缺乏来自可见区域的几何线索，难以在保持全局一致性的前提下合理推断缺失结构。
@@ -63,7 +61,7 @@ claims:
 
 Points-to-3D的核心洞察在于：**将3D点云先验显式注入TRELLIS的稀疏结构潜变量空间，把3D生成重新定义为潜空间修复问题**。具体而言，该方法将可见区域的点云体素化并编码为结构潜变量，用掩码保护这些已知区域，其余区域填入噪声，然后训练一个修复网络从可见区域推断缺失几何。这一设计将“利用先验”从软约束升级为硬约束——已知区域的几何被强制保留，不可见区域的生成则被锚定在可见结构的边界条件之上。推理时，通过分阶段采样（先结构修复、后边界细化）进一步保证修复边界的一致性与平滑性。
 
-## 核心创新
+## 核心方法与创新机理
 
 Points-to-3D的核心创新在于将3D生成问题重新定义为**稀疏结构潜空间中的条件修复问题**，通过显式注入点云先验作为硬几何约束，打破了现有方法从纯噪声初始化结构潜变量的范式。具体而言，该方法在**TRELLIS**（Xiang et al., CVPR 2025）框架上进行了四个关键改造：
 
@@ -106,8 +104,6 @@ $$\mathbf{O}_{i}^{t} = \begin{cases} 1, & \text{if } |\mathbf{D}_{t}(\mathbf{u}_
 ### 创新本质总结
 
 上述四个改造共同构成了一个**因果干预链条**：点云先验 → 潜变量初始化 → 掩码保护 → 修复网络推断 → 边界细化。其核心洞察在于，通过将显式3D几何约束直接注入生成模型的潜空间，把不可控的随机生成转化为可控的条件补全，从而在可见区域实现接近完美的几何保真度（F-Score 0.998, Chamfer Distance 0.007, Table 3），同时在不可见区域生成合理且连贯的几何结构。
-
-## 整体框架
 
 Points-to-3D 的核心思想是将显式的3D点云先验注入到 TRELLIS（Xiang et al., CVPR 2025）的稀疏结构（SS）潜变量空间中，从而将3D生成重新定义为**潜空间修复问题**。其整体 pipeline 由五个关键模块串联而成，形成从点云先验到完整3D资产的端到端流程（Figure 2）。
 
@@ -157,8 +153,6 @@ $$\mathcal{L}_{CFM} = \mathbb{E}_{t, \mathbf{q}_{\mathrm{gt}}, \epsilon} \left\|
 
 ![[assets/figures/papers/paper_list_l2572_https_arxiv_org_abs_2603_18782/figures/001_Figure_1.jpg]]
 *Figure 1: We introduce explicit 3D point cloud priors into 3D generation framework, given a pre-existing point cloud or a feed-forward point cloud prediction from image input, our model generates high-quality 3D assets that faithfully preserve the observed structure while plausibly completing unobserved regions with coherent geometry*
-
-## 核心模块与公式推导
 
 Points-to-3D 的方法核心在于将点云先验显式注入 TRELLIS 的稀疏结构（Sparse Structure, SS）潜变量空间，并将 3D 生成重新定义为**潜空间修复问题**。整体流程包含三个关键阶段：点云先验的潜变量编码、修复网络的训练与推理、以及两阶段采样策略。
 
@@ -218,7 +212,7 @@ $$
 ![[assets/figures/papers/paper_list_l2572_https_arxiv_org_abs_2603_18782/figures/003_Figure_3.jpg]]
 *Figure 3: Training data processing. We preserve the visible portion of the complete point cloud and convert it into training inputs*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -290,13 +284,10 @@ Figure 4展示了单物体生成的定性对比。使用显式点云先验时，
 
 ![[assets/figures/papers/paper_list_l2572_https_arxiv_org_abs_2603_18782/figures/007_Figure.jpg]]
 
-![[assets/figures/papers/paper_list_l2572_https_arxiv_org_abs_2603_18782/figures/013_Figure_8.jpg]]
-*Figure 8: Generation results with 3 input views on Toys4K. The first column of our results uses sampled point-cloud priors extracted from the visible regions of the three input images, whereas the “VGGT-estimated” results rely on point clouds inferred from the input images by VGGT*
-
 ![[assets/figures/papers/paper_list_l2572_https_arxiv_org_abs_2603_18782/figures/020_Table_5.jpg]]
 *Table 5: Comparison on single-object generation with 3 views input on Toy4K dataset*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 与基础框架的关系
 

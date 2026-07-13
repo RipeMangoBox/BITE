@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Pulp_Motion_Framing_aware_multimodal_camera_and_human_motion_generation.pdf
+project_link: null
+code_link: https://github.com/robincourant/pulp-motion
 aliases:
   - PMAS
   - PMFAMCHMG
@@ -32,7 +34,7 @@ claims:
 | 中文题名    | Pulp Motion：面向屏幕构图感知的多模态相机与人体运动联合生成                                                                                                                  |
 | 英文题名    | Pulp Motion: Framing-aware multimodal camera and human motion generation                                                                             |
 | 会议/期刊   | ICLR 2026                                                                                                                                            |
-| Links   | [paper](https://arxiv.org/abs/2510.05097) [code](https://github.com/robincourant/pulp-motion)                                                        |
+| Links   | [paper](https://arxiv.org/abs/2510.05097) · [code](https://github.com/robincourant/pulp-motion)                                                        |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction #topic/generative_models_diffusion |
 | Method  | 辅助采样（Pulp Motion / Auxiliary Sampling）                                                                                                               |
 | Dataset | PulpMotion 混合子集                                                                                                                                      |
@@ -41,7 +43,7 @@ claims:
 > - PulpMotion 混合子集 上，FD_framing↓ / Out-rate↓ / TMR-Score↑ / CLaTr-Score↑ 3.37 / 16.76% / 25.05 / 32.81 (DiT, (x,y)+Aux) vs 4.90 / 25.98% / 23.50 / 30.75 (DiT, (x,y)) (-1.53 / -9.22% / +1.55 / +2.06)。
 > - PulpMotion 纯子集 上，FD_framing↓ / Out-rate↓ / TMR-Score↑ / CLaTr-Score↑ 4.90 / 24.28% / 21.90 / 55.43 (MAR, (x,y)+Aux) vs 6.55 / 30.19% / 20.16 / 52.17 (MAR, (x,y)) (-1.65 / -5.91% / +1.74 / +3.26)；FD_framing↓ / Out-rate↓ / TMR-Score↑ / CLaTr-Score↑ 5.03 / 24.92% / 21.80 / 38.42 (DiT, (x,y)+Aux) vs 6.78 / 36.25% / 20.74 / 35.99 (DiT, (x,y)) (-1.75 / -11.33% / +1.06 / +2.43)。
 
-## 概述
+## 概要
 
 现有的人体运动生成与相机轨迹生成通常被作为两个独立任务处理，导致在屏幕空间中二者缺乏构图一致性——角色可能出画或出现糟糕的取景效果。Pulp Motion 针对这一瓶颈，将人体运动与相机轨迹的联合生成问题重新表述为**多模态一致性问题**，并提出一种模型无关的辅助采样框架（Auxiliary Sampling）。
 
@@ -49,7 +51,7 @@ claims:
 
 在 PulpMotion 混合子集上，辅助采样将构图 FID（$\text{FD}_{\text{framing}}$）从 4.90 降至 3.37，出画率（Out‑rate）从 25.98% 降至 16.76%，同时文本‑模态对齐分数（TMR‑Score）从 23.50 提升至 25.05。适中的辅助引导权重 $w_z$ 可在改善构图的同时保持人体与相机生成质量，过高则损害保真度。
 
-## 背景与动机
+
 
 ### 问题背景：电影式人‑相机关节运动生成
 
@@ -88,7 +90,9 @@ claims:
 - **架构无关**：适用于 DiT、MAR 等不同扩散主干，无需针对特定架构调整；
 - **即插即用**：通过单一的辅助引导权重 w_z 即可在构图质量与生成保真度之间实现灵活权衡。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：屏幕构图一致性的缺失
 
@@ -137,7 +141,7 @@ $$\tilde{\varepsilon}_{\theta}(\mathbf{x}_t, \mathbf{y}_t, \mathbf{c}, t) = \var
 
 Pulp Motion 的本质创新在于**将多模态一致性问题转化为潜空间中的几何引导问题**。它不试图让扩散模型直接学习构图约束，而是利用自编码器阶段学到的线性映射 $W$，在推理时通过正交投影将构图信息作为“免费”的引导信号注入采样过程。这种“训练时隐式学习映射，推理时显式几何引导”的策略，使得方法兼具**架构无关性**（不修改扩散主干）、**训练高效性**（无需额外训练扩散模型）和**即插即用性**（仅需调整单一超参数 $w_z$）。
 
-## 整体框架
+
 
 Pulp Motion 提出一种**模型无关的辅助采样框架**，在不修改扩散模型训练的前提下，增强人体运动与相机轨迹生成之间的多模态一致性。其核心思路是引入一个辅助模态——屏幕构图（on‑screen human framing）——作为“桥梁”，在推理时引导采样过程趋向人‑相机高度协调的区域。
 
@@ -203,7 +207,7 @@ Pulp Motion 的核心洞察在于：**屏幕构图天然是人‑相机关系的
 
 整个框架的模型无关性体现在：辅助采样仅修改推理时的分数计算，不依赖特定的扩散架构，也不需要在训练阶段引入辅助模态的扩散建模。这一设计使其可以即插即用地应用于 DiT 和 MAR 等不同生成主干。
 
-## 核心模块与公式推导
+
 
 ### 多模态潜空间构建
 
@@ -265,7 +269,9 @@ $$\tilde{\varepsilon}_{\theta}(\mathbf{x}_t, \mathbf{y}_t, \mathbf{c}, t) = \var
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2510_05097/figures/022_Figure_21.jpg]]
 *Figure 21: Independent modality ablation in DiT on mixed subset. Trade-off between framing quality and modality-text alignment for textual guidance ranges from 4 to 12. The optimal region is at the bottom-right (low framing error, high alignment). (a) $\mathrm { F D } _ { \mathrm { f r a m i n g } }$ -TMR-Score (b) $\mathrm { F D } _ { \mathrm { f r a m i n g } }$ . -CLaTr-Score Figure 22: Independent modality ablation in MAR on mixed subset. Trade-off between framing quality and modality-text alignment for textual guidance ranges from 4 to 12. The optimal region is at the bottom-right (low framing error, high alignment)
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -315,8 +321,6 @@ Pulp Motion 在两个核心指标维度上验证了辅助采样（Aux）的有�
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2510_05097/figures/004_Table_2.jpg]]
-*Table 2: Motion refinement and text-motion alignment. We report metrics on the PulpMotion dataset, comparing raw extracted motions (Wang et al., 2024a) with our refined motions. Captions are generated either from human motions using m2t model (Jiang et al., 2023) or from RGB frames using our VLM-based approach (Bai et al., 2025)*
 
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2510_05097/figures/007_Figure.jpg]]
 *Figure: Camera: The camera performs a trucking right*
@@ -324,9 +328,7 @@ Pulp Motion 在两个核心指标维度上验证了辅助采样（Aux）的有�
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2510_05097/figures/002_Figure_2.jpg]]
 *Figure 2: Architecture of the multimodal autoencoder. Human motion $\bf { x } _ { \mathrm { r a w } }$ and camera trajectory $\mathbf { y } _ { \mathrm { r a w } }$ are jointly encoded by $E _ { \phi }$ , linearly transformed via $\dot { \boldsymbol { W } }$ into an auxiliary on-screen framing latent $z$. Three decoders $D _ { \psi _ { \mathrm { x } } } , D _ { \psi _ { \mathrm { y } } }$ ， and $D _ { \psi _ { \mathrm { z } } }$ reconstruct raw modalities: *$\hat { \mathbf { x } } _ { \mathrm { r a w } } , \hat { \mathbf { y } } _ { \mathrm { r a w } } , \hat { \mathbf { z } } _ { \mathrm { r a w } }$
 
-*Figure 3: Decomposition of $\mathbf$ u = [ ${ \mathbf$ x } , ${ \mathbf$ y } ]$^ { \top }$.$ $u$ decomposes onto two orthogonal...
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 问题定位：从独立生成到多模态一致性
 
@@ -387,6 +389,8 @@ PulpMotion 数据集基于 CondensedMovies 视频自动提取，依赖 TRAM 进�
 3. **更丰富的构图空间**：当前构图仅定义为关键关节的 2D NDC 坐标。是否可以引入更结构化的构图表示（如三分法、引导线、头部空间等电影摄影规则）作为辅助模态，实现艺术层面的构图控制？
 
 4. **多主体与多相机扩展**：在多人场景中，屏幕构图需同时考虑多个主体的空间关系；在多相机设置中，不同机位之间存在约束。如何将辅助采样的正交投影机制推广到这些高维约束空间，是一个具有挑战性的开放方向。
+
+
 
 ## 原文 PDF
 

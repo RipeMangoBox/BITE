@@ -5,6 +5,8 @@ paper_level: A
 venue: NEURIPS
 year: 2023
 pdf_ref: paperPDFs/NEURIPS_2023/FineMoGen_Fine_Grained_Spatio_Temporal_Motion_Generation_and_Editing.pdf
+project_link: https://mingyuan-zhang.github.io/projects/FineMoGen.html
+code_link: null
 aliases:
 - FineMoGen
 tags:
@@ -41,7 +43,7 @@ claims:
 > - HuMMan-MoGen (Temporal Composition) 上，RPrecision↑ 0.41 vs 0.24 (Baseline w/o SAMI) (+0.17)。
 > - HumanML3D 上，FID↓ 0.151 vs 0.544 (MDM) (-0.393)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -72,7 +74,7 @@ SAMI 包含三个关键组件：
 
 FineMoGen 属于**扩散模型驱动的文本-运动生成**方法，其架构沿用了 MotionDiffuse 和 ReMoDiffuse 的 Transformer + 扩散范式，但在注意力机制层面进行了根本性重构。与 ReMoDiffuse 采用的混合高效注意力（MEA）相比，SAMI 将全局模板计算从单一的全局聚合解耦为空间与时间两个独立维度的建模，并引入 MoE 增强特征提取的适应性。该方法在方法谱系中填补了**细粒度时空可控运动生成**的空白，是首个同时支持零样本与全监督场景下细粒度生成与编辑的框架。
 
-## 背景与动机
+
 
 ### 问题背景：文本驱动运动生成的粒度瓶颈
 
@@ -102,7 +104,9 @@ FineMoGen 属于**扩散模型驱动的文本-运动生成**方法，其架构�
 
 4. **实现交互式编辑**：借助大型语言模型（LLM）修改细粒度描述，实现零样本的交互式运动编辑，使用户能够通过自然语言指令对生成序列进行迭代修改。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FineMoGen的核心创新在于针对现有文本驱动运动生成方法在细粒度时空控制上的根本性缺陷，提出了一套以**时空混合注意力（Spatio-Temporal Mixture Attention, SAMI）** 为核心的解决方案。其关键突破并非简单地增加模型容量，而是对注意力机制中的全局模板构建过程进行了**因果解耦**，从而首次实现了对空间（身体部位协作）和时间（语义时序一致性）的精细化、可组合控制。
 
@@ -134,7 +138,7 @@ SAMI模块是FineMoGen架构的“因果旋钮”，它通过三个相互协同�
 
 FineMoGen的创新之处不在于发明了全新的生成范式，而在于**对扩散模型中注意力机制的根本性重构**。它将一个全局混合的注意力模板，解耦为空间独立、时间独立且由MoE驱动的精细化组件，从而将细粒度文本描述与运动生成之间的映射关系从“黑箱关联”转变为“显式组合”。这一设计使得模型在零样本设定下，于时序和空间组合任务上的准确率远超所有基线方法，证明了其核心创新的有效性。
 
-## 整体框架
+
 
 FineMoGen 的整体 pipeline 围绕“细粒度时空描述 → 运动生成 → 交互式编辑”三条主线构建，如 **Figure 2** 所示。系统由六个核心模块串联而成，形成端到端的可控运动合成与编辑闭环。
 
@@ -175,7 +179,7 @@ FineMoGen 通过集成 **ChatGPT-4** 实现了零样本运动编辑能力。用�
 
 整个 pipeline 的数据流可概括为：**细粒度描述矩阵 → CLIP + 可训练 Transformer → 文本特征矩阵 → SAMI 增强的 Motion Transformer（同时接受噪声运动序列输入）→ 去噪后运动序列**。编辑分支则为：**用户自然语言指令 → LLM 修改描述矩阵 → 重新生成**。
 
-## 核心模块与公式推导
+
 
 FineMoGen 的核心架构建立在扩散模型之上，其生成网络由多个结构相同的 **Motion Transformer** 块堆叠而成。每个块的核心是本文提出的 **时空混合注意力（Spatio-Temporal Mixture Attention, SAMI）** 模块，辅以前馈网络（FFN）。SAMI 的设计目标是从全局注意力模板的构建方式入手，显式解耦空间与时间维度的细粒度约束。
 
@@ -242,7 +246,9 @@ $$\mathbf{x}_t := \sqrt{\bar{\alpha}_t} \mathbf{x}_0 + \sqrt{1 - \bar{\alpha}_t}
 ![[assets/figures/papers/motion_editing_inpainting_20260603_finemogen/figures/002_Figure_2.jpg]]
 *Figure 2: An overview of FineMoGen. As for the motion generation task, the fine-grained descriptions are first processed by a text encoder. A text feature matrix can be acquired, and then sent to a diffusion model-based motion generative network to generate corresponding motion sequence. For the editing purpose, LLM is used to interact with users and modify the fine-grained description accordingly*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主流基准上的通用运动生成性能
 
@@ -312,7 +318,9 @@ FineMoGen通过LLM辅助实现了零样本交互式运动编辑。用户以自�
 ![[assets/figures/papers/motion_editing_inpainting_20260603_finemogen/figures/008_Table_4.jpg]]
 *Table 4: Ablation study on HuMMan-MoGen test set. All methods use zero-shot setting, it means that they are not trained on the temporal composition data*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 FineMoGen处于文本驱动人体运动生成（Text-to-Motion）的扩散模型范式之中，其核心创新在于将细粒度时空条件显式注入生成过程。本节从基线关系、适用边界、局限性与开放问题四个维度进行定位。
 
@@ -354,6 +362,8 @@ FineMoGen的适用场景具有明确的边界条件：
 2. **跨域泛化**：FineMoGen在HuMMan-MoGen上的细粒度组合能力是否能迁移到更复杂的运动类别（如双人交互、竞技体育）仍待探索。
 3. **评估体系完善**：细粒度运动生成需要新的评估指标，能够分别衡量空间一致性（各身体部位协作的自然度）和时间一致性（动作阶段过渡的流畅性），而非仅依赖全局统计指标。
 4. **手部与面部扩展**：将手部动作和面部表情纳入细粒度生成框架，是实现完整虚拟人运动合成的必要步骤，但会显著增加表示维度和标注成本。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/DeepCompress_A_Dual_Reward_Strategy_for_Dynamically_Exploring_and_Compressing_Reasoning_Chains.pdf
+project_link: null
+code_link: https://github.com/Skytliang/DeepCompress
 openreview_forum_id: K5A2jBmEBK
 aliases:
 - DeepCompress
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | DeepCompress：一种动态探索与压缩推理链的双重奖励策略 |
 | 英文题名 | DeepCompress: A Dual Reward Strategy for Dynamically Exploring and Compressing Reasoning Chains |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=K5A2jBmEBK); [GitHub](https://github.com/Skytliang/DeepCompress) |
+| Links | [paper](https://openreview.net/forum?id=K5A2jBmEBK) · [GitHub](https://github.com/Skytliang/DeepCompress) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | DeepCompress |
 | Dataset | Math (Average over MATH 500, AMC 23, Olympiad Bench, Minerva Math, AIME 24, AIME 25, Poly Math), AIME 2024, Average Response Length (across math benchmarks), GPQA-Diamond / MMLU-STEM / Big-Bench Hard |
@@ -41,7 +43,7 @@ claims:
 > - AIME 2024 上，Pass@1 Accuracy (%) 为 16.7 (3B), 23.5 (7B)，对比 11.5 (DeepMath-Zero-3B), 19.4 (DeepMath-Zero-7B)，变化 +5.2 (3B), +4.1 (7B)。
 > - Average Response Length (across math benchmarks) 上，Tokens 为 Significantly shorter (e.g., DeepCompress-Zero-3B: 57.9% reduction vs DeepMath-Zero-3B)，对比 DeepMath-Zero，变化 57.9% reduction (3B), 16.6% reduction (7B)。
 
-## 概述
+## 概要
 
 当前大语言推理模型（LRM）面临一个核心的**认知效率瓶颈**：模型在简单问题上往往“过度思考”，生成冗长但无必要的推理链；而在复杂问题上又“思考不足”，未能充分探索解空间，导致求解覆盖率受限。现有的基于长度惩罚的强化学习方法（如DeepMath-Zero）强制优化更短的推理链，虽然提升了效率，却以牺牲准确度为代价，尤其限制了困难问题的求解能力。
 
@@ -49,7 +51,7 @@ claims:
 
 实验结果表明，DeepCompress 在七大数学推理基准测试上一致优于基线方法：DeepCompress-Zero-7B 平均准确率达 48.7%，较 DeepMath-Zero-7B 的 46.0% 提升 2.7 个百分点；在 AIME 2024 上，3B 和 7B 模型分别提升 5.2 和 4.1 个百分点。与此同时，DeepCompress 显著降低了平均响应长度，3B 模型相较基线缩减 57.9% 的标记量，7B 模型缩减 16.6%，在准确率与效率之间实现了更优的平衡。在 GPQA-Diamond、MMLU-STEM 和 Big-Bench Hard 等通用推理基准上，DeepCompress 同样展现出稳定的泛化增益，验证了该方法在数学推理之外的迁移能力。
 
-## 背景与动机
+
 
 ### 大语言模型的推理能力与认知低效困境
 
@@ -74,7 +76,9 @@ claims:
 
 通过这种自适应机制，DeepCompress 在数学推理基准上实现了准确率与标记效率的双重提升，打破了传统方法中“效率-准确率”的零和博弈。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DeepCompress 的核心创新在于将“推理链长度”从一个被动的训练副产品，转变为一个由**模型感知难度（Model-Aware Difficulty）** 主动调控的**自适应优化目标**。它通过一个动态、对立的**双重长度奖励（Dual Length Reward）** 机制，替代了以往 Zero RL 流程中对所有问题一视同仁的静态长度惩罚，从而解决了大语言推理模型（LRM）中“简单问题过度思考，困难问题思考不足”的认知低效瓶颈。
 
@@ -125,7 +129,7 @@ $$P_{b,t} = \lambda \cdot P_{b,t-1} + (1 - \lambda) \cdot P_{b,t}^{true}$$
 
 综上，DeepCompress 将“推理链长度”从一个被动的静态惩罚项，升级为一个由模型实时能力驱动的、动态对立的主动优化信号，从而在不牺牲准确率的前提下，显著提升了标记效率。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_K5A2jBmEBK/figures/003_Figure_2.jpg]]
 *Figure 2: Reward values for our DeepCompress method. Subfigure (a) illustrates the reward for Simple Questions, and (b) for Hard Questions. For both, Blue indicates correct responses and Red indicates incorrect responses. The dashed line denotes the baseline outcome reward ( R _ { o } ) , while the solid line represents our final combined reward ( R = R _ { o } + R _ { l } ) , effectively showcasing how our Dual Length Reward ( R _ { l } ) dynamically modulates the reward signal based on standardized response length (z) and question difficulty (β)*
@@ -147,7 +151,7 @@ DeepCompress 的核心洞察在于：大语言推理模型（LRM）的认知效�
 
 通过这一闭环框架，DeepCompress 无需外部难度标签，而是让模型根据自身“能力水位线”动态地、自适应地调整对推理链长度的偏好，最终在提升准确率的同时显著压缩了平均响应长度。
 
-## 核心模块与公式推导
+
 
 DeepCompress 在 Zero RL 框架（以 **GRPO** (Shao et al., 2024) 为基础 RL 算法）之上引入两个核心创新模块：**双重长度奖励（Dual Length Reward）** 与 **模型感知难度（Model-Aware Difficulty）**。两者协同工作，使模型能根据自身实时能力自适应地调整对不同难度问题的推理链长度偏好。
 
@@ -239,7 +243,9 @@ $$P_{b,t} = \lambda \cdot P_{b,t-1} + (1 - \lambda) \cdot P_{b,t}^{\text{true}}$
 
 其中 $ \lambda $ 为平滑因子（默认 0.99），$ P_{b,t}^{\text{true}} $ 为第 $ t $ 步的真实批次通过率。这一设计确保了难度分类信号在训练过程中的稳定性（见 **Figure 6**，训练过程中 $ P_b $ 呈现稳定增长）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心结果：数学推理基准
 
@@ -300,7 +306,9 @@ Figure 6 监控了平滑批次通过率 P_b 的变化轨迹。P_b 在训练过�
 
 3. **任务范围限制**：所有实验集中在数学推理和结构化问答任务上，DeepCompress 在非结构化推理（如长篇创作、多轮对话）中的有效性尚未验证。这类任务中“推理链长度”的定义和奖励方式可能需要根本性的重新设计。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心基线：Zero RL 推理范式
 
@@ -344,6 +352,8 @@ DeepCompress 在以下维度上区别于现有工作：
 - **规模扩展性**：在更大规模模型（如 Qwen-72B、DeepSeek-V2 等）上应用 DeepCompress 时，效率提升和准确率增益的边际收益如何？更强大的基座模型可能本身已具备更好的长度控制能力，自适应奖励的增量价值可能缩小。
 
 - **向开放式任务的扩展**：如何将该框架扩展至需要多个中间步骤奖励的开放式任务中？例如，在代码生成中，是否可以根据测试用例通过率定义“难度”，并在函数级粒度上施加长度奖励？
+
+
 
 ## 原文 PDF
 

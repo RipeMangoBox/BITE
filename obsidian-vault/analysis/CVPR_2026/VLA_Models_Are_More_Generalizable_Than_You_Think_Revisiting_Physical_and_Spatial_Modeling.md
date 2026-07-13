@@ -43,7 +43,7 @@ claims:
 > - LIBERO-V (visual perturbations overall) 上，平均成功率（SR%） FTM 90.5%; FLA 94.8% vs π0.5 Zero-Shot 83.6%; π0.5 LoRA 94.6% (vs Zero-Shot: +6.9% (FTM) / +11.2% (FLA); vs LoRA: -4.1% (FTM) / +0.2% (FLA), 且...)。
 > - LIBERO Novel View across perturbation scales (Small→Medium→Large) 上，平均成功率（SR%） FLA 94.6 / 90.0 / 87.9 (Small/Medium/Large) vs π0.5 LoRA 94.8 / 90.5 / 85.6 (在大幅度扰动下FLA (+2.3%) 表现出更稳定的适应性)。
 
-## 概述
+## 概要
 
 视觉-语言-行动（VLA）模型在机器人操作中展现出强大潜力，但其对视觉扰动——尤其是相机视点变化——的鲁棒性仍是一个关键瓶颈。本文通过系统性分析揭示了一个反直觉的核心发现：**视点变化下VLA性能下降的主要原因并非物理建模（Physical Modeling）能力不足，而是空间建模（Spatial Modeling）中视觉嵌入空间的系统性漂移**——这种漂移破坏了视觉编码器与下游VLM解码器之间的协调一致性，而非暴露视觉运动能力的根本缺陷。
 
@@ -58,7 +58,7 @@ claims:
 
 这些结果表明，预训练VLA模型内部蕴含着潜在的鲁棒性，仅需对视觉通路进行极小规模的单次适配即可激活这些不变性，无需大规模重训或额外数据。
 
-## 背景与动机
+
 
 ### 视觉-语言-动作模型的空间泛化困境
 
@@ -89,7 +89,9 @@ claims:
 
 综上，本文聚焦于VLA模型在视点变化下的空间建模瓶颈，提出一个统一的单次鲁棒性适配框架。该框架包含两种互补的轻量级机制——**Feature Token Modulation（FTM）**和**Feature Linear Adaptation（FLA）**——分别从视觉token的全局分布校准和ViT编码器的内部特征调整两个层面，恢复嵌入空间的跨域对齐。这一框架不仅以不到全模型微调1%的参数量达到甚至超越其性能，更揭示了VLA模型泛化性的本质：**鲁棒性早已存在，只需找到正确的钥匙将其激活**。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈重定义：从物理建模到空间建模
 
@@ -133,7 +135,7 @@ FLA的适配范式在不同VLA基础模型上均表现出有效性：在OpenVLA-
 
 FTM依赖全局仿射假设——当嵌入偏移具有高度非线性和局部性时，仅凭仿射调制可能不足以完全恢复性能。FLA虽通过低秩更新部分缓解此问题，但在极端非线性扰动下的理论上限仍需进一步验证。此外，当前实验主要在静态扰动类型（视点、光照、纹理、噪声）下评估，动态场景中快速移动障碍物或交互式力反馈等复杂物理扰动下的表现尚待探索。
 
-## 整体框架
+
 
 ### 核心瓶颈
 
@@ -176,7 +178,7 @@ $$P_{\theta,\phi}(a_t \mid a_{<t}, o_{\le t}) = g(a_{<t}; [\mathcal{A}_{\phi}(f_
 ![[assets/figures/papers/paper_list_l2653_https_arxiv_org_abs_2512_02902/figures/011_Figure_6.jpg]]
 *Figure 6: Real-World Experimental Setup. (a) Our hardware environment features a Franka Emika Panda robot teleoperated via the GELLO framework, equipped with both a third-person static camera and a wrist-mounted camera. (b) The Novel Camera Viewpoint used for one-shot adaptation. This viewpoint introduces a significant spatial shift compared to the standard pre-training distribution, serving as the testbed for our Feature Linear Adaptation (FLA) method*
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题建模：VLA策略的视点泛化瓶颈
 
@@ -241,7 +243,9 @@ $$\text{AdaRMSNorm}(x, \tau) = y \cdot (1 + \gamma(\tau)) + \beta(\tau), \quad y
 ![[assets/figures/papers/paper_list_l2653_https_arxiv_org_abs_2512_02902/figures/004_Figure_4.jpg]]
 *Figure 4: Overview of feature adaptation and benchmark design. (a) Illustration of the proposed Feature Token Modulation mechanism. The dashed box denotes components used only during training and removed at inference. (b) The LIBERO-V (Visual) benchmark, created by combining multiple levels of viewpoint variation [31] with visual-perturbation tasks from LIBERO-Plus [8]. It covers four perturbation types: camera viewpoint, lighting, background texture, and image noise*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈验证：空间建模中的视觉嵌入漂移
 
@@ -345,7 +349,9 @@ FLA的核心超参数是LoRA的秩$r$。实验表明：
 
 4. **单次适配的持久性**：当任务分布持续变化时（如终身学习场景），如何动态更新这些极轻量的适配参数而不引起灾难性遗忘，是尚待解决的开放问题。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心问题定位：空间建模与物理建模的解耦
 
@@ -418,6 +424,8 @@ FTM可视为一种极简的“特征空间校准层”，类似于Feature-wise T
 4. **瓶颈诊断的跨任务普适性**：在纯语言或纯视觉任务上，类似的空间建模瓶颈（即嵌入空间的系统性漂移而非能力缺失）是否同样存在，且能否用类似方法缓解？这关系到该诊断框架能否从具身智能推广至更广泛的视觉-语言模型鲁棒性研究。
 
 5. **非线性偏移的建模**：当嵌入偏移超出仿射或低秩假设的表达范围时，需要何种更灵活但同样参数高效的适配机制？可能的扩展方向包括逐token的条件调制或轻量级注意力重校准。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2026
 pdf_ref: paperPDFs/arxiv_2026/SymphoMotion_4D_Dynamic_and_Camera_Control_for_Video_Generation.pdf
+project_link: https://grenoble-zhang.github.io/SymphoMotion/
+code_link: https://github.com/
 aliases:
 - SymphoMotion
 tags:
@@ -42,7 +44,7 @@ claims:
 > - RealCOD-25K 上，FVD↓ 332.50 vs best competitor (see Table 1) (N/A)；CamTransErr↓ 0.37 vs best competitor (see Table 1) (N/A)；CamRotErr↓ 0.05 vs best competitor (see Table 1) (N/A)。
 > - User Study (1-5 scale) 上，Visual Quality↑ 4.87 vs best competitor (see Table 2) (N/A)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -74,8 +76,6 @@ SymphoMotion 建立在视频扩散模型 **Wan-I2V** 的 DiT 架构之上，采�
 
 消融实验（Table 3）揭示了各组件的因果贡献：移除点云渲染 (w/o Cpcd) 使 Box-IoU 降至 56.74，移除2D边界框 (w/o 2D boxes) 降至 54.32，而移除3D轨迹条件 (w/o 3D trajectory) 导致最严重的性能退化（Box-IoU 52.16, FVD 343.80），证实了3D轨迹嵌入对物体运动建模的必要性。定性消融结果参见 Figure 7。
 
-## 背景与动机
-
 ### 问题背景：视频生成中的运动控制需求
 
 可控视频生成的核心挑战之一，在于同时精确地操纵**相机视角运动**与**场景内物体动态**。给定一张参考图像，用户期望指定“相机如何移动”以及“画面中的物体如何运动”，并生成一段时空一致、忠实反映两种运动信号的视频。这一能力对于电影预演、虚拟制作、增强现实等应用至关重要。
@@ -103,7 +103,7 @@ SymphoMotion 建立在视频扩散模型 **Wan-I2V** 的 DiT 架构之上，采�
 
 此外，为支撑这一框架的训练与评估，本文构建了 **RealCOD-25K**——首个包含配对相机位姿与 3D 物体轨迹标注的真实世界视频数据集，填补了该领域的数据空白。
 
-## 核心创新
+## 核心方法与创新机理
 
 SymphoMotion 的核心创新在于首次实现了**完全解耦的3D感知联合运动控制**——将相机轨迹控制（Camera Trajectory Control, CTC）与物体动态控制（Object Dynamics Control, ODC）设计为两个独立且互补的模块，分别注入3D几何结构先验与3D轨迹嵌入，从而在不混淆相机视差的情况下保持物体运动的精确性和空间一致性。这一设计从根本上改变了现有方法的控制范式，具体体现在以下四个关键维度的突破。
 
@@ -128,8 +128,6 @@ MotionCtrl 等基线方法使用2D边界框或关键点轨迹来引导物体运�
 - 轨迹编码器中时间降采样器的具体设计（从 N 帧到 N˜ 帧）在现有材料中未详细披露，其对时序运动平滑性的影响需要进一步确认。
 - Object Motion Module 除跨注意力外是否包含额外的 Transformer 块或其他结构，原文未明确说明。
 - RealCOD-25K 数据集中每个视频的平均标注物体数量及轨迹分布统计未提供，可能影响对方法泛化能力的判断。
-
-## 整体框架
 
 SymphoMotion 是一个基于扩散模型的视频生成框架，旨在实现对相机运动与物体动态的**解耦、同步且3D感知**的联合控制。其核心设计思路是将两类运动控制任务分配给两个互补且独立的模块，共享一个预训练的视频扩散基座模型，从而避免传统方法中因耦合表示导致的视差混淆与运动不一致问题。
 
@@ -170,8 +168,6 @@ $$
 ### 关键设计决策
 
 框架中有两个关键的结构选择值得注意。其一，**点云渲染**的引入（受 ViewCrafter 启发）是 CTC 区别于仅使用 Plücker 嵌入方法（如 CameraCtrl）的核心——它为扩散模型提供了显式的 3D 几何上下文，使相机控制不再仅依赖2D图像平面的隐式线索。其二，ODC 中**2D边界框与3D轨迹嵌入的融合**解决了纯2D轨迹方法（如 MotionCtrl）在相机运动场景下无法区分物体真实位移与视差变化的根本缺陷——2D锚点提供像素级定位，3D嵌入提供深度感知的运动语义，二者协同工作。
-
-## 核心模块与公式推导
 
 SymphoMotion 以 Wan-I2V 作为基座视频扩散模型，采用 Flow Matching 框架。给定参考图像 $f \in \mathbb{R}^{3 \times h \times w}$ 和文本提示，模型通过两个互补的控制模块实现解耦的 4D 动态与相机控制：**相机轨迹控制 (Camera Trajectory Control, CTC)** 和 **物体动态控制 (Object Dynamics Control, ODC)**。整体架构如 Figure 2 所示。
 
@@ -240,7 +236,7 @@ $$\min_{\theta} \mathbb{E}_{z_0, t, \epsilon, c_y, c_f, c_{cam}, c_{pcd}} \left[
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2604_03723/figures/006_Figure_6.jpg]]
 *Figure 6: Simultaneous control over camera and object motions. MotionCtrl struggles to generate realistic object dynamics, causing objects to disappear from view, whereas SymphoMotion achieves high-quality simultaneous control*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心性能对比
 
@@ -280,16 +276,13 @@ Table 3 通过系统消融揭示了各模块的独立贡献，所有实验均在
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2604_03723/figures/011_Figure_8.jpg]]
-*Figure 8: Interactive Panel Interface. The panel offers a unified interface for specifying motion inputs to SymphoMotion. (a) An input image is uploaded, and SAM2 extracts the mask of the target object for subsequent control. (b) The Camera Control Panel allows users to configure camera movement through rotational and translational adjustments for viewpoint specification. (c) The Object Control Panel provides interactive editing of 3D object trajectories using the automatically fitted bounding box*
-
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2604_03723/figures/012_Figure_10.jpg]]
 *Figure 10: Independent camera control for static object*
 
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2604_03723/figures/004_Figure_4.jpg]]
 *Figure 4: RealCOD-25K dataset construction pipeline*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 SymphoMotion 的核心贡献在于将相机控制与物体运动控制解耦为两个感知 3D 结构的独立分支，从而解决了此前方法在动态场景中因视差与真实运动混淆而产生的空间一致性问题。本节从方法谱系的角度，将其与相关基线进行对比，并讨论其适用边界与开放问题。
 

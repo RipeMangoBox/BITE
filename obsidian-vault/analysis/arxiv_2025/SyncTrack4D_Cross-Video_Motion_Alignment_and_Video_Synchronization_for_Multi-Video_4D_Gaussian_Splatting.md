@@ -32,7 +32,7 @@ claims:
 | 中文题名 | SyncTrack4D：面向多视频4D高斯泼溅的跨视频运动对齐与视频同步 |
 | 英文题名 | SyncTrack4D: Cross-Video Motion Alignment and Video Synchronization for Multi-Video 4D Gaussian Splatting |
 | 会议/期刊 | arXiv 2025 |
-| Links | [paper](https://arxiv.org/abs/2512.04315) · [arXiv](https://arxiv.org/abs/2512.04315) |
+| Links | [paper](https://arxiv.org/abs/2512.04315) |
 | Topic | #topic/vision_multimodal_applications #topic/representation_self_supervised_transfer |
 | Method | SyncTrack4D |
 | Dataset | Panoptic Studio |
@@ -41,7 +41,7 @@ claims:
 > - Panoptic Studio (many-view) 上，平均时间偏移误差 (帧) ↓ 0.260 vs SyncNeRF (未提供具体值, 优于SyncNeRF) (优于SyncNeRF和初始偏移)。
 > - Panoptic Studio 上，PSNR↑ 26.3 vs SyncNeRF (未提供具体值) (显著优于SyncNeRF)。
 
-## 概述
+## 概要
 
 **SyncTrack4D** 针对一个被现有4D高斯泼溅（4DGS）方法普遍忽略的核心瓶颈：现有方法依赖硬件同步的多视角视频，无法直接处理野外场景中常见的未同步视频，其隐式变形表达极易受时间错位干扰。该工作提出以密集4D轨迹为统一线索，通过**Fused Gromov-Wasserstein（FGW）最优传输匹配**实现跨视频轨迹对齐，并在运动样条支架（motion-spline scaffold）下联合优化时间偏移与4DGS重建，使时间同步与几何重建互为约束，最终实现亚帧级同步精度。
 
@@ -77,8 +77,6 @@ SyncTrack4D在方法谱系上处于**4D高斯泼溅重建**与**多视频时间�
 - 在动态区域稀少或静态背景为主时，跟踪匹配可能退化，同步质量下降。
 - 当前为离线处理方法，无法满足实时或在线同步需求。
 
-## 背景与动机
-
 ### 动态场景重建的“同步”瓶颈
 
 从多视角视频重建动态三维场景是计算机视觉与图形学中的核心挑战，在自由视点视频、沉浸式远程呈现和运动分析等领域有广泛需求。近年来，以**4D Gaussian Splatting (4DGS)** 为代表的方法在渲染质量和重建效率上取得了显著进展，但其成功高度依赖一个被长期忽视的前提：**输入的多视角视频必须在时间上严格同步**。
@@ -102,7 +100,7 @@ SyncTrack4D的出发点是：**密集的4D像素轨迹本身蕴含了场景运�
 
 这一设计使时间同步与几何重建互为约束：准确的同步提升重建质量，而高质量的重建反过来验证并细化同步参数。在Panoptic Studio多视图配置下，该方法实现了平均仅0.26帧的时间偏移误差和26.3 PSNR的新视点合成质量，验证了显式轨迹驱动同步范式的有效性。
 
-## 核心创新
+## 核心方法与创新机理
 
 SyncTrack4D 的核心创新在于将**跨视频4D轨迹匹配**、**最优传输时间同步**与**运动样条支架**三者耦合为一个闭环，使时间对齐与几何重建互为约束，从而首次在4DGS框架下实现亚帧级精度的未同步多视频联合重建。
 
@@ -146,8 +144,6 @@ $$\mathcal{L} = \lambda_{\mathrm{photo}} \mathcal{L}_{\mathrm{photo}} + \lambda_
 
 其中ARAP正则、速度损失和加速度损失共同约束样条轨迹的物理合理性。这一设计使得时间同步不再是独立预处理步骤，而是与几何重建相互增强——更准的同步提升光度一致性，更好的几何又反过来细化匹配与偏移。
 
-## 整体框架
-
 SyncTrack4D 提出了一种从**未同步多视频集合**中联合恢复时间同步与4D场景表示的多阶段框架。其核心思想是将密集4D轨迹作为统一线索，贯通跨视频运动对齐与4D高斯泼溅（4DGS）重建两个核心任务，使时间同步与几何重建互为约束。
 
 ### 输入输出
@@ -176,13 +172,8 @@ SyncTrack4D 提出了一种从**未同步多视频集合**中联合恢复时间�
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2512_04315/figures/001_Figure_1.jpg]]
-*Figure 1: We present a general approach for 4D scene reconstruction from unsynchronized video sets. Our multi-stage approach jointly solves video synchronization and 4D Gaussian Splatting (4DGS) reconstruction by leveraging dense 4D pixel tracks as cues for motion matching and geometry recovery. From unsynchronized inputs, we estimate and align dense 4D tracks across videos, followed by refinement using high-fidelity photometric optimization within 4DGS. This result in a synchronized 4DGS representation with estimated per-video temporal offsets. Most of our 4D results can be best viewed in the supplementary videos*
-
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2512_04315/figures/002_Figure_2.jpg]]
 *Figure 2: SyncTrack4D Pipeline. Given unsynchronized multi-video RGB inputs, we extract diverse 2D priors along with depths and camera poses from feed-forward multi-view models or sensors. (1) For each monocular video, we estimate 4D tracks and embed feature maps through 4DGS optimization. (2) We perform dense cross-video 4D track matching via a Fused Gromov–Wasserstein formulation that fuses feature similarity and geometric structure. (3) The resulting correspondences enable frame-level synchronization by minimizing intervideo motion discrepancies. (4) Finally, we aggregate all per-video 4D tracks with their initial offsets and jointly refine synchronization and geometry with a unified multi-video 4...*
-
-## 核心模块与公式推导
 
 SyncTrack4D 的核心思想是将 4D 轨迹作为跨视频运动对齐与 4DGS 重建的统一线索。其关键创新在于将 Fused Gromov-Wasserstein 最优传输匹配、动态时间规整粗同步与运动样条支架下的联合细化有机结合，使时间同步与几何重建互为约束。
 
@@ -235,12 +226,7 @@ $$\mathcal{L} = \lambda_{\mathrm{photo}} \mathcal{L}_{\mathrm{photo}} + \lambda_
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2512_04315/figures/010_Figure_9.jpg]]
 *Figure 9: Visualization of our 4D dense tracks with (left) and without (right) motion-spline scaffold*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2512_04315/figures/013_Figure_8.jpg]]
-*Figure 8: During the multi-video 4DGS reconstruction stage, the initial time offsets are further refined, converging to very small synchronization errors with small per-camera deviations*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 评估设置
 
@@ -279,25 +265,13 @@ Figure 8展示了时间偏移在4DGS联合细化阶段的收敛曲线。初始DT
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2512_04315/figures/005_Table_2.jpg]]
-*Table 2: Video synchronization error on Panoptic Studio dataset*
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2512_04315/figures/007_Table_1.jpg]]
-*Table 1: Temporal synchronization in two-view configurations on Panoptic Studio. Evaluation at three time-offset bands*
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2512_04315/figures/011_Table_3.jpg]]
-*Table 3: Novel View Synthesis on Panoptic Studio and SyncNeRF Blender. We report PSNR↑, SSIM↑, and LPIPS↓. The unsynchronized setting is evaluated at varying temporal offsets*
-
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2512_04315/figures/012_Table_4.jpg]]
 *Table 4: Ablation study of multi-video 4DGS. We report PSNR↑, SSIM↑, and LPIPS↓*
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2512_04315/figures/004_Figure.jpg]]
-*Figure: (a) boxes scene (b) softball scene*
 
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2512_04315/figures/008_Figure_6.jpg]]
 *Figure 6: Qualitative comparison of rendered novel view images on CMU Panoptic Studio dataset*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 与现有工作的关系
 

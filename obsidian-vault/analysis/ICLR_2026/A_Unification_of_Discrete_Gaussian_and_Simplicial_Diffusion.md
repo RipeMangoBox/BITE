@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/A_Unification_of_Discrete_Gaussian_and_Simplicial_Diffusion.pdf
+project_link: null
+code_link: null
 aliases:
 - WFSSS
 - UDGSD
@@ -41,7 +43,7 @@ claims:
 > - UniRef50 (蛋白质) 上，pLDDT (样本可折叠性) 为 统一 SSP 模型 (离散/高斯/单纯形测试时切换)，对比 各模态单独训练的模型，变化 竞争力相当（图 7a）。
 > - LM1B (语言) 上，GPT2‑large 评估的生成困惑度 为 统一 SSP 模型，对比 单独训练的离散/高斯/单纯形模型，变化 竞争力相当（图 7b）。
 
-## 概述
+## 概要
 
 离散数据扩散模型已发展出离散扩散、高斯扩散与单纯形扩散三条主流路线，但它们长期缺乏共同的理论基础：三者的似然不可直接比较，超参数难以对齐，且单纯形扩散面临严重的数值不稳定性。本文的核心洞察是，所有这些离散数据的扩散模型本质上都是 Wright‑Fisher 种群遗传过程的极限——种群大小 ζ=1 给出离散扩散，ζ→∞ 时在无繁殖条件下导出高斯扩散，在有繁殖条件下导出单纯形扩散。基于这一发现，作者提出一个统一的 Wright‑Fisher 扩散框架，并设计 sufficient‑statistic 参数化 (SSP)，使得单一模型即可支持在离散、高斯和单纯形三种模态下进行采样和评估，从而消解了预训练前必须预先选定扩散范式的限制。
 
@@ -49,7 +51,7 @@ claims:
 
 实验上，统一 SSP 模型在蛋白质折叠可靠性 (pLDDT)、语言困惑度和 MNIST 图像的负对数似然上，均能维持与各模态单独训练模型相当的竞争力；在 DNA 增强子条件生成上，Wright‑Fisher 单纯形扩散的误差低于现有方法且采样更稳定。多项消融验证了 hollow 参数化、SSP 以及数值稳定方案的有效性。该工作为离散数据扩散模型提供了一个可比较的理论基础，并展示了一条用单一模型覆盖多种扩散模态的实用路径。
 
-## 背景与动机
+
 
 离散数据（如文本、蛋白质序列、DNA）的生成建模是当前深度学习的核心问题之一。扩散模型在这一领域发展出三条看似独立的路线：**离散扩散**（D3PM、multinomial diffusion）直接在类别空间上定义马尔可夫过程；**高斯扩散**将离散 token 嵌入连续空间后施加高斯噪声；**单纯形扩散**（Jacobi 过程、Dirichlet 流匹配）则在概率单纯形上建模。这三类方法各自取得了显著成功，但彼此之间的理论联系一直缺失。
 
@@ -61,7 +63,9 @@ claims:
 
 综上，这项工作试图消除“预训练前必须选定某种扩散框架”的局限，为离散数据的扩散建模提供一个统一的理论基础与工程方案。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于将三类主流的离散数据扩散模型——离散扩散、高斯扩散与单纯形扩散——统一至 **Wright-Fisher 种群遗传扩散** 框架之下，并通过 **sufficient‑statistic 参数化 (SSP)** 实现了单一模型在多模态下的采样与评估，从而消除了预训练前必须预先选定特定扩散框架的必要。
 
@@ -124,7 +128,7 @@ SSP 的策略是：神经网络输出一个 **sufficient statistic φ(x_t, t)**�
 - 当前验证范围限于：DNA 增强子（长度 500）、蛋白质（长度 200）、MNIST (28×28)；**大规模长序列（如长文本、全长蛋白质）下精确 Dirichlet 采样的计算开销是否可接受，仍需进一步验证**。
 - 框架尚未涵盖反射扩散、流匹配、掩码扩散及带插入/删除的扩散等变体。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0004_1taAXRcm21_A_Unification_of_Discrete_Gaussian_and_Simplicia/figures/001_Figure_1.jpg]]
 *Figure 1: Discrete, Gaussian, and Simplicial diffusion for discrete data are unified by Wright-Fisher diffusion. (a) Wright-Fisher diffusion with population size ζ “ 6, showing mutation and reproduction processes across generations. (b) The three diffusion methods emerge as different limits of Wright-Fisher: discrete diffusion corresponds to ζ “ 1, while Gaussian and simplicial diffusion arise as ζ Ñ 8 with zero and non-zero reproduction rates*
@@ -157,7 +161,7 @@ SSP 的策略是：神经网络输出一个 **sufficient statistic φ(x_t, t)**�
 
 整体框架的关键优势在于：通过 **hollow 参数化** 解决了离散与连续 ELBO 的可比性问题，并通过 **SSP** 赋予模型时间不变性，使得单一模型在蛋白质折叠、语言困惑度和图像似然等任务上均取得与各模态独立训练模型相当的竞争力（Figure 7、Figure 11）。同时，精确 Dirichlet 采样与低时间域的高斯近似共同消除了单纯形扩散长期存在的数值不稳定瓶颈，使得离散‑高斯‑单纯形三条技术路径在统一的种群遗传视角下首次实现可操作的整合。
 
-## 核心模块与公式推导
+
 
 该框架的核心建立在 Wright‑Fisher 种群遗传过程之上：通过调节种群大小 $\zeta$ 与繁殖率，单一前向过程可以生成离散、高斯、单纯形三种扩散变体。理论保证来自两个极限定理——Theorem 4.1 证明当 $\zeta\to\infty$ 且无繁殖时，离散扩散依分布收敛到高斯扩散，其 ELBO 亦收敛；Theorem 5.1 证明在 $\zeta\to\infty$ 且包含繁殖时，离散扩散的目标函数收敛到单纯形扩散的得分匹配目标。这使得离散、高斯和单纯形扩散第一次共享同一个数学根基，并且使用 sufficient‑statistic 参数化（SSP）后，单个网络就能在测试时切换三种模态。
 
@@ -249,7 +253,9 @@ $$
 
 上述模块与公式共同构建了三种扩散的统一视角，使得从离散数据生成到连续嵌入空间的似然评估不再需要预先选定某种特定的扩散框架，同时为单纯形扩散提供了快速、稳定的数值实现。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 本章在 **Wright-Fisher 统一框架**下，对提出的**sufficient-statistic 参数化（SSP）**进行多模态、多任务的端到端验证。核心实验围绕三个维度展开：**直接条件生成任务**（DNA 增强子设计）、**多模态似然与样本质量对比**（蛋白质序列、语言建模、MNIST 图像），以及**关键设计选择消融**（参数化方式、数值稳定性）。所有模型使用相同或等价网络架构（蛋白质部分基于 ESM2‑150M 预训练权重），训练总步数/时间与基线保持对齐。
 
@@ -313,7 +319,9 @@ SSP 的核心是让网络输出**充分统计量** $\phi(x_t, t)$（如 $x_t$ �
 - **序列长度限制**：DNA 实验局限于长度 500 的增强子，蛋白质长度不超过 200，在更长序列（如全长基因组、千级残基蛋白质）上的可扩展性尚未验证；在大规模生成中，精确 Dirichlet 采样的计算开销也可能需要进一步优化。
 - **argmax 近似偏差**：在大群体极限下，高斯扩散的 $\arg\max$ 路径与离散扩散的路径表现出显著差异（Mann–Whitney $p < 10^{-300}$，Figure 8），尽管边缘分布相同。这一现象提示直接使用 $\arg\max$ 作为离散样本的近似在某些序列模型可能引入结构偏差，实际部署时需谨慎。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 本文提出的 **Wright‑Fisher 扩散统一框架** 并非以性能超越为目的的新模型，而是为离散数据上离散、高斯和单纯形三种主流扩散形式提供一个共同的数学起源。在该框架下，三种扩散被证明是 Wright‑Fisher 种群遗传过程在不同种群规模与繁殖率参数下的极限：
 
@@ -350,6 +358,8 @@ SSP 的核心是让网络输出**充分统计量** $\phi(x_t, t)$（如 $x_t$ �
 3. **自动化超参数映射**：能否通过学习数据中的替换模式，自动导出突变矩阵与对应的嵌入，替代当前的人工设定？  
 4. **大规模部署**：在长文本（千级 token）或长蛋白质序列上，精确 Dirichlet 采样与低时间域近似是否仍保持计算可行且误差可控？  
 5. **跨模态的联合训练与推理**：利用统一框架，是否可以在训练期间动态切换或混合多种前向过程，使模型同时收获不同扩散模态的归纳偏置？
+
+
 
 ## 原文 PDF
 

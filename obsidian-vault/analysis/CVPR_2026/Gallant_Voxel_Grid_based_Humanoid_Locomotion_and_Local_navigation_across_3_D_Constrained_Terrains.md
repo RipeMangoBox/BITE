@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/Gallant_Voxel_Grid_based_Humanoid_Locomotion_and_Local_navigation_across_3_D_Constrained_Terrains.pdf
+project_link: null
 code_link: "https://github.com/traveller59/"
 aliases:
 - Gallant
@@ -40,7 +41,7 @@ claims:
 > - Ceiling (simulation) 上，Success rate (%) 84.3 ± 0.7 (Gallant) vs 5.3 ± 2.0 (Only-Height-Map) (+79.0%)；Success rate (%) 84.3 ± 0.7 (Gallant) vs 28.4 ± 2.4 (w/o self-scan) (+55.9%)。
 > - Stairs and Platform (real-world) 上，Success rate over 90% vs prior methods (elevation/depth) not reaching 90% (N/A)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -66,7 +67,7 @@ Gallant 首次在人形机器人上以**单一策略**泛化到包含地面、�
 
 在感知行走方法的谱系中，Gallant 将感知表示从**高程图**（如 **Long et al., ICRA 2025**；**Wang et al. (BeamDojo), arXiv 2025**；**Ren et al., arXiv 2025**）和**深度图像**（如 **Zhuang et al., arXiv 2024** 的人形跑酷方法）推进到**体素网格**，从而首次系统性地覆盖了地面、横向与顶部三类障碍物。与基于点云的碰撞避免方法（**Wang et al., arXiv 2025**）相比，Gallant 通过体素化聚合原始点云并采用轻量2D CNN处理，在保留三维结构的同时降低了维度与计算负担。其LiDAR仿真管线与域随机化策略为感知行走的sim-to-real迁移提供了可复用的工程范式，而z-grouped 2D CNN的设计则为稀疏三维感知的高效处理提供了新的架构选项。
 
-## 背景与动机
+
 
 ### 人形机器人的三维受限环境行走难题
 
@@ -89,7 +90,9 @@ Gallant 首次在人形机器人上以**单一策略**泛化到包含地面、�
 - **高效的三维感知处理**：通过将z轴作为通道的2D CNN处理体素网格，在计算效率与表示能力之间取得平衡，避免稀疏3D CNN的高延迟问题。
 - **端到端sim-to-real迁移**：通过高保真LiDAR仿真（包含对机器人自身连杆的动态扫描）和域随机化，实现从仿真到真机的零样本迁移，首次在人形机器人上实现超过90%的楼梯攀爬和平台穿越成功率。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Gallant 的核心创新在于**感知表示的范式转换**：从传统高程图（Elevation Map）或深度图像切换到基于 LiDAR 点云的**体素网格（Voxel Grid）**，并配套设计了高效的感知网络与高保真仿真管线，使单一策略能够泛化到包含地面、横向和顶部障碍物的多种复杂三维地形。
 
@@ -131,7 +134,7 @@ Gallant 采用非对称特权信息设计：Actor 仅接收体素网格感知，
 
 这些创新协同作用，使 Gallant 首次在人形机器人上实现超过 90% 的楼梯和平台穿越成功率，并在 Ceiling 地形上取得 **84.3%** 的成功率，而仅用高程图的基线仅为 **5.3%**（Table 3(c)）。
 
-## 整体框架
+
 
 Gallant 的完整 pipeline 由五个核心模块串联构成：**LiDAR 仿真与体素化** → **z-grouped 2D CNN 感知模块** → **本体感觉融合** → **MLP Actor 全身控制** → **PPO 端到端训练框架**。整个系统的信息流如图 Figure 2 所示。
 
@@ -187,7 +190,7 @@ $${\bf p}_{\tau}(s) = (1 - s) {\bf p}_{\tau}^{\mathrm{min}} + s {\bf p}_{\tau}^{
 ![[assets/figures/papers/paper_list_l1025_https_openaccess_thecvf_com_content_CVPR2026_html_Ben_Gallant_Voxel_Grid/figures/005_Figure_3.jpg]]
 *Figure 3: Terrain types used to train robots in simulation*
 
-## 核心模块与公式推导
+
 
 ### 整体架构概览
 
@@ -238,7 +241,9 @@ $$\mathbf{p}_{\tau}(s) = (1 - s) \mathbf{p}_{\tau}^{\mathrm{min}} + s \mathbf{p}
 
 训练覆盖 8 种代表性地形类型（Figure 3），包括楼梯、平台、天花板、横向障碍、步石柱等，具体参数范围见 Table 2。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 仿真主实验结果
 
@@ -305,7 +310,9 @@ Gallant的Actor仅接收体素网格作为感知输入，而Critic额外接收�
 ![[assets/figures/papers/paper_list_l1025_https_openaccess_thecvf_com_content_CVPR2026_html_Ben_Gallant_Voxel_Grid/figures/001_Figure_1.jpg]]
 *Figure 1: Overview. Gallant enables a single policy with voxel grids to traverse diverse 3D constrained terrains in real: (a) ascend and descend stairs, (b) pass doors and duck under ceilings, (c) step onto platforms and over gaps, and (d) cross stepping-stone pillars*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 感知行走的方法谱系
 
@@ -352,6 +359,8 @@ Gallant 的 sim-to-real 迁移能力建立在三个关键设计上：
 3. **更高分辨率体素的利用**：如何在保持低延迟的同时提高体素网格分辨率，以捕获更精细的支撑面信息（如步石柱的边缘）？
 
 4. **时态感知扩展**：当前体素网格仅编码单帧空间信息，引入时态体素表示（如 4D 占用栅格）是否能使策略对动态障碍物做出预判性反应？
+
+
 
 ## 原文 PDF
 

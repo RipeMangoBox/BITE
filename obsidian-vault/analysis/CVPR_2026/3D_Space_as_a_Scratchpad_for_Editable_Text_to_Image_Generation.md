@@ -44,7 +44,7 @@ claims:
 > - CompoundPrompts 上，Text Alignment (VQAScore) 0.91 vs 0.73 (Flux.1 [dev]) (+0.18)。
 > - T2I-CompBench (Complex category) 上，3-in-1 metric 0.65 vs 0.37 (Flux.1 [dev]) (+0.28)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -74,15 +74,13 @@ claims:
 
 方法存在若干已知局限：LLM生成的物体放置可能过于均匀，缺乏真实场景的自然构图多样性；对复杂的交互活动（如握手、追逐），活动理解与朝向规划可能失败；生成的3D网格姿态多样性有限，无法调整铰接式资产的关节；当前系统依赖多个预训练模型，端到端训练尚不可用。开放问题包括：如何通过验证步骤或强化学习提高构图自然性，是否可将物理模拟器纳入以支持更真实的物体交互，以及能否将空间草稿板扩展到视频生成以支持时空一致性。
 
-## 背景与动机
-
 文本到图像生成模型近年来取得了显著进展，但在处理需要精确空间关系、对象身份保持和组合意图的复杂提示时，依然暴露出根本性的文本对齐缺陷。当前主流模型（如 **Flux.1 [dev]**）采用从文本直接映射到像素的生成范式，缺乏显式的空间推理工作区，导致模型在计数、比较、否定、属性绑定等需要结构化理解的场景中频繁失败——在 GenAI-Bench 基准上，Flux.1 [dev] 的文本对齐得分仅为 0.63。
 
 现有改进方案主要沿着两条路径展开：一是基于文本的迭代推理，如 **Idea2Img**（Yang et al., 2023）通过多轮语言反思逐步优化生成结果；二是基于二维布局的推理，如 **RPG**（Yang et al., ICML 2024）利用二维空间规划辅助生成。然而，这两种范式均存在结构性局限——文本推理缺乏对空间关系的直观建模，二维推理则无法表达深度、遮挡和三维朝向等关键信息，导致在处理“左侧的椅子面向右侧的桌子”这类需要三维空间理解的自然语言指令时，二者均难以稳定地实现可控生成。
 
 本文的核心动机在于：**将三维空间作为文本到图像生成的中间推理草稿板**。这一思路受语言模型中“思维链”外化推理的启发——正如显式的中间推理步骤能显著提升大语言模型的复杂问题求解能力，为视觉生成引入一个结构化的三维推理基底，有望弥合语言意图与精确视觉合成之间的鸿沟。具体而言，该方法允许在渲染前显式地放置、定向和选择摄像机视角来操控主体，从而将空间推理从模型的隐式内部表征中外化出来，为可控生成提供直接的因果调节因子。
 
-## 核心创新
+## 核心方法与创新机理
 
 ### 从“黑箱生成”到“三维空间推理”：范式转换
 
@@ -126,8 +124,6 @@ claims:
 
 尽管三维空间草稿板在文本对齐上取得了显著提升（GenAI-Bench上32%的相对改进），方法仍存在若干局限：LLM生成的物体放置可能过于均匀，缺乏真实场景的自然构图多样性；对于复杂的交互活动（如握手、追逐），活动理解与朝向规划可能失败；生成的3D网格姿态多样性有限，无法调整铰接式资产的关节。这些局限指向了未来将物理模拟器纳入或通过强化学习优化构图的可能方向。
 
-## 整体框架
-
 三维空间草稿板的核心思想是将一个结构化的三维场景作为文本到图像生成的中间推理基底，使语言模型能够在渲染前进行显式的空间推理。整个pipeline采用多代理协作架构，将复杂的文本到图像生成任务分解为若干个可解释的子任务，每个子任务由专门的LLM代理负责。
 
 **输入与输出**：系统接收一个自然语言提示 $P$ 作为输入，最终输出一张与提示高度对齐、且保持多主体身份一致性的图像。中间过程通过一个预定义的三维空间 $D$ 进行桥接——该空间是一个带有地平面和固定边界（X、Y、Z轴）的空场景。
@@ -153,8 +149,6 @@ $$\mathcal{S}^{\mathrm{TR}} = \mathrm{SubjectEditor}(E, I, C, \mathcal{S}^{\math
 
 ![[assets/figures/papers/paper_list_l2160_https_arxiv_org_abs_2601_14602/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of a 3D spatial scratchpad. Given an input prompt P we illustrate how our method uses a 3D space as an underlying representation to generate an image that has superior alignment to the prompt. Agent ⃝1 is responsible for decomposing the input prompt into subjects and background. Agent ⃝2 provides 3D bounding boxes for each subject. We render the scratchpad and subsequently generate an image based on these placements which is then given to agent ⃝3 that adjusts transformations of the meshes. Finally, agent ⃝4 chooses the best camera viewpoint from a set of proposals to generate the final image*
-
-## 核心模块与公式推导
 
 ### 三维空间草稿板的定义
 
@@ -202,12 +196,7 @@ $$\mathcal{S}^{\mathrm{TR}} = \mathrm{SubjectEditor}(E, I, C, \mathcal{S}^{\math
 ![[assets/figures/papers/paper_list_l2160_https_arxiv_org_abs_2601_14602/figures/016_Figure_11.jpg]]
 *Figure 11: Strategies for determining rotations. We examine a scenario that requires accurate rotation planning for multiple objects described in a natural language prompt. A: Directly providing the LLM with multiview renders of the entire scene and asking it to output transformation matrices fails to produce correct rotations. B: Estimating orientations from the full synthesized image also proves unreliable: while the pickup truck is interpreted correctly, both chairs receive incorrect orientation predictions. C: Our proposed strategy isolates each object by cropping its image, enabling the LLM to infer its orientation independently; these estimated orientations, paired with the desired target orient...*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2160_https_arxiv_org_abs_2601_14602/figures/003_Figure_3.jpg]]
-*Figure 3: Identity preservation improves prompt adherence. We show that complex planning among multiple subjects even when guided with only depth and prompt can lead to loss of text alignment. In contrast, we opt to use depth, prompt, and identity to generate the images thus preserving prompt adherence*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验：文本对齐度的跨基准提升
 
@@ -260,25 +249,10 @@ $$\mathcal{S}^{\mathrm{TR}} = \mathrm{SubjectEditor}(E, I, C, \mathcal{S}^{\math
 ![[assets/figures/papers/paper_list_l2160_https_arxiv_org_abs_2601_14602/figures/011_Figure_6.jpg]]
 *Figure 6: Comparison of text-to-image performance in GenAI-Bench. We evaluate our spatial scratchpad framework against stateof-the-art text-to-image systems on five reasoning categories—Counting, Comparison, Differentiation, Negation, and Universal—as well as the overall average. Scores reflect VQAScore accuracy (higher is better). Across all categories, our single-iteration variants (Ours+SIGMAGen and Ours+Idea2Img) consistently outperform prior models. Notably, Idea2Img* here denotes the single-iteration version of Idea2Img (without multi-step refinement), allowing a fair comparison with our own single-pass inference*
 
-![[assets/figures/papers/paper_list_l2160_https_arxiv_org_abs_2601_14602/figures/005_Table_2.jpg]]
-*Table 2: Impact of prompt enhancement. On GenAI-Bench, we show that using the iteratively improved prompt from Idea2img works complementarily to our approach and offers further improvement. We also show that using the Idea2img method but only for a single iteration reduces their performance significantly. We also maintain image quality with the different prompts*
-
-![[assets/figures/papers/paper_list_l2160_https_arxiv_org_abs_2601_14602/figures/007_Table_4.jpg]]
-*Table 4: Impact of design choice of renders. On GenAI-Bench, we show that adding rulers to the 3D scratchpad’s rendered images improves text alignment. With rulers the performance remains comparable. Image quality stays stable over all the choices*
-
-![[assets/figures/papers/paper_list_l2160_https_arxiv_org_abs_2601_14602/figures/009_Table_5.jpg]]
-*Table 5: Impact of identity preserved image generation method. On GenAI-Bench, we show that Iterative Insert-Anything* (row 1), which refers to iterative insertion of subjects using Insert-Anything + depth ControlNet, leads to reduction of quality, however text alignment stays higher than other baselines*
-
-![[assets/figures/papers/paper_list_l2160_https_arxiv_org_abs_2601_14602/figures/013_Figure_8.jpg]]
-*Figure 8: Limitations. We show that our LLM generated subject placements can be too uniform unlike real image compositions. Secondly, we find that activity and orientation understanding/planning may fail in cases of complex interactions*
-
-![[assets/figures/papers/paper_list_l2160_https_arxiv_org_abs_2601_14602/figures/012_Figure_7.jpg]]
-*Figure 7: 3D as a spatial scratchpad enables consistent image editing. Given the input prompt, we show the subjects instantiated, the scratchpad created and the subsequent image generated in the first column. In the succeeding columns, we show how edits made either through a) manual editing, or b) text-based editing to the scratchpad can be consistently reflected on to the final image while conserving identities of subjects and the background. Each column shows a progressive edit made over the state in the previous column*
-
 ![[assets/figures/papers/paper_list_l2160_https_arxiv_org_abs_2601_14602/figures/017_Figure_12.jpg]]
 *Figure 12: Various rendering designs explored. We illustrate the different rendering configurations explored in our design ablation, shown here only for the front-view camera but applied analogously to all viewpoints. Each variant corresponds to the ordered settings listed in Table 4, including changes to background color, ruler visibility, and grid placement. Rulers are drawn up to fixed spatial bounds to constrain object placement, and cameras are positioned with fixed viewing directions and distances chosen to ensure all meshes remain fully visible*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 核心创新定位
 

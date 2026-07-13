@@ -31,7 +31,7 @@ claims:
 | 中文题名 | 被动夹持器的计算设计 |
 | 英文题名 | Computational Design of Passive Grippers |
 | 会议/期刊 | SIGGRAPH 2022 |
-| Links | [paper](https://homes.cs.washington.edu/~milink/passive-gripper/) · [Project](https://libigl.github.io/) · [Code](http://github.com/stevengj/nlopt) · [arXiv](http://arxiv.org/abs/1905.10520) |
+| Links | [paper](https://homes.cs.washington.edu/~milink/passive-gripper/) · [Project](https://libigl.github.io/) · [Code](http://github.com/stevengj/nlopt) · [paper](http://arxiv.org/abs/1905.10520) |
 | Topic | #topic/other_unclear |
 | Method | Computational Design of Passive Grippers |
 | Dataset | 22 个对象（23 个实验）的测试集（包含标准 YCB 对象、工程模型和挑战对象）, 物体特征覆盖（Table 1） |

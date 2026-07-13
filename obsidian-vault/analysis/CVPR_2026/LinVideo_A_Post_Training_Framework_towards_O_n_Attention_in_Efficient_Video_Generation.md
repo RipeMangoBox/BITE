@@ -43,7 +43,7 @@ claims:
 > - VBench-2.0 上，Total Score (Wan 1.3B) 56.74 (LINVIDEO) vs 56.74 (FA2) (0 (持平))；Total Score (Wan 14B) 59.62 (LINVIDEO) vs 59.85 (FA2) (-0.23)。
 > - VBench (4-step distilled) 上，Latency / Speedup 6.11 / 15.9× (Wan 1.3B) vs 8.76 / 1.00× (FA2+DMD2, Wan 1.3B) (15.9×)。
 
-## 概述
+## 概要
 
 视频扩散模型已成为视觉内容生成的核心技术，但其核心组件——全序列自注意力——的计算复杂度随序列长度呈平方增长（$\mathcal{O}(n^2)$），导致推理阶段计算开销巨大，严重制约了高分辨率、长时长视频的生成效率。直接以线性注意力（$\mathcal{O}(n)$）替代全部二次注意力，尽管在理论上可将复杂度降至线性，却因线性注意力的表示能力不足以及视频时空建模的高度复杂性，导致生成质量严重退化；同时，数据驱动的后训练微调往往难以恢复这一性能损失。
 
@@ -56,7 +56,7 @@ claims:
 
 实验结果表明，LINVIDEO 在 Wan 1.3B 和 14B 模型上分别实现了 **1.43×** 和 **1.71×** 的推理加速，同时在 VBench 基准上的所有质量指标均匹配甚至超越了 FlashAttention2 基线。进一步结合少步蒸馏技术，4 步模型可实现高达 **15.9×** 的极速推理，仅伴随微小的视觉质量下降。消融研究证实，选择性转移策略显著优于手动选择或启发式搜索，而 ADM 损失在性能和训练效率上均明显优于 MSE 和 DMD 损失。
 
-## 背景与动机
+
 
 ### 视频扩散模型的注意力瓶颈
 
@@ -88,7 +88,9 @@ claims:
 
 2. **任意时刻分布匹配（Anytime Distribution Matching, ADM）**：在采样轨迹上跨任意时刻 $t$ 匹配训练模型与原始模型的样本分布，利用当前模型自身的评分函数估计，无需额外多步扩散模型，实现高效且有效的分布对齐。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈与动机
 
@@ -142,7 +144,7 @@ ADM 的核心优势在于：（1）无需额外多步扩散模型来估计评分
 - ADM 目标的推导依赖整流流模型假设，对其他扩散框架（如 DDPM）的适用性尚未验证。
 - 线性注意力加速目前基于 PyTorch 通用实现，相比专用 CUDA kernel 仍有优化空间。
 
-## 整体框架
+
 
 LINVIDEO 是一个**无数据后训练框架**，其核心目标是在不访问原始训练数据的前提下，将预训练视频扩散模型中尽可能多的二次复杂度自注意力模块替换为线性注意力，从而在保持生成质量的同时实现推理加速。整个 pipeline 由三个关键阶段构成：**数据准备**、**选择性转移**与**Anytime Distribution Matching (ADM) 训练**，最后可选的**加速蒸馏**进一步压缩采样步数。
 
@@ -191,7 +193,7 @@ LINVIDEO 是一个**无数据后训练框架**，其核心目标是在不访问�
 ![[assets/figures/papers/paper_list_l895_https_arxiv_org_abs_2510_08318/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the proposed efficient data-free post-training framework, LINVIDEO. (a) This framework first applies selective transfer (Sec. 4.1), which assigns each layer a learnable score r and progressively, automatically replaces quadratic attention with linear attention while minimizing the resulting performance drop. This process also combines with*
 
-## 核心模块与公式推导
+
 
 ### 问题形式化与注意力瓶颈
 
@@ -282,7 +284,9 @@ $$ \mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{ADM}} + \lambda \big( \ma
 ![[assets/figures/papers/paper_list_l895_https_arxiv_org_abs_2510_08318/figures/011_Figure.jpg]]
 *Figure: I. Effect of α on 1 - | 2 $r ^ { ( l ) }$ - 1 | ^ ${ \alpha }$ of Eq. (10)*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈验证：层深度决定线性化敏感性
 
@@ -371,7 +375,9 @@ $$ \mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{ADM}} + \lambda \big( \ma
 ![[assets/figures/papers/paper_list_l895_https_arxiv_org_abs_2510_08318/figures/013_Table.jpg]]
 *Table: II. Performance for the few-step distilled linear attention Wan 1.3B. $\mathrm { ^ { * } L I N V I D E O } + \mathrm { D M D 2 ^ { , * } }$ denotes that we first employ LINVIDEO to obatin a linear attention DM and then use DMD2 to distill is to the 4-step version. $\mathrm { \mathrm { } ^ { 4 } }$ S $T + \mathrm { D M D }$ 2 $\mathrm { \mathrm { } ^ { 3 } }$ implies that we combine our selective transfer and DMD2 to obtain the 4-step linear attention model in a single training stage. Table III. Comparison on Wan 1.3B (all meth- Table IV. Training ods use 4-step DMD2). Due to resource lim- FLOPs (3K steps). its, we will add more results in the future. Method FLOPs↓*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：视频扩散模型中的注意力瓶颈
 
@@ -451,6 +457,8 @@ $$s_t(\hat{\mathbf{x}}_t) - \hat{s}_t(\hat{\mathbf{x}}_t) = -\frac{1-t}{t} \left
 3. **跨模态泛化**：该方法能否推广到其他模态的扩散模型（如 3D 生成、音频生成、图像生成）？ADM 目标在非整流流框架下的适配方案是什么？
 4. **可学习核函数**：是否可以针对视频数据的时空特性，端到端地学习线性注意力的核函数，以进一步缩小与 softmax 注意力的表示能力差距？
 5. **与少步蒸馏的深度融合**：当前两阶段策略（先 LINVIDEO 再 DMD2）虽稳定有效，但单阶段结合会导致性能崩溃（**Table II**），是否存在更优雅的联合训练方案？
+
+
 
 ## 原文 PDF
 

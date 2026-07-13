@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Efficient_Resource_Constrained_Training_of_Transformers_via_Subspace_Optimization.pdf
+project_link: null
+code_link: https://github.com/Le-TrungNguyen/ICLR2026-WASI.git
 openreview_forum_id: 0nvQ5kHXf4
 aliases:
 - WWASI
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 基于子空间优化的Transformer高效资源受限训练 |
 | 英文题名 | Efficient Resource-Constrained Training of Transformers via Subspace Optimization |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=0nvQ5kHXf4); [GitHub](https://github.com/Le-TrungNguyen/ICLR2026-WASI.git) |
+| Links | [paper](https://openreview.net/forum?id=0nvQ5kHXf4) · [GitHub](https://github.com/Le-TrungNguyen/ICLR2026-WASI.git) |
 | Topic | #topic/optimization_theory_probabilistic #topic/optimization_theory_probabilistic/optimization_methods |
 | Method | WASI (Weight-Activation Subspace Iteration) |
 | Dataset | ViT on CIFAR-10 (all linear layers), SwinT on multiple datasets, TinyLlama on BoolQ |
@@ -42,7 +44,7 @@ claims:
 > - ViT on CIFAR-10 (all linear layers) 上，Accuracy (%) 为 96.24 (ε=0.9)，对比 97.32 (vanilla)，变化 -1.08。
 > - SwinT on multiple datasets 上，Training Memory 为 WASI (ε=0.9)，对比 Vanilla，变化 up to 62× reduction。
 
-## 概述
+## 概要
 
 在边缘设备上微调大型Transformer模型面临严峻的资源瓶颈：反向传播需要存储完整的权重矩阵和激活图，导致内存需求过高；同时，大型矩阵乘法在推理阶段也消耗大量计算资源。现有的压缩方法通常仅针对权重或激活的单一维度，难以在保持模型性能的同时实现训练与推理的全链路资源削减。
 
@@ -59,7 +61,7 @@ claims:
 
 **局限性**：当前验证主要集中在视觉Transformer（ViT、SwinT），尚未在数十亿参数的大语言模型及更广泛的NLP下游任务上充分评估；低ε值下精度损失仍然存在；方法在持续学习等场景中的子空间稳定性有待验证。
 
-## 背景与动机
+
 
 ### 资源受限场景下的Transformer训练瓶颈
 
@@ -84,7 +86,9 @@ Transformer架构在视觉和语言任务中取得了显著成功，但其训练
 
 基于这一观察，本文提出**WASI（Weight-Activation Subspace Iteration）**方法，通过统一的子空间优化框架，在训练和推理过程中同时压缩权重和激活，并通过**解释方差阈值 $\varepsilon$** 作为单一控制旋钮来调节信息保留与资源消耗之间的权衡。该方法的目标是在保持模型性能的前提下，最大化内存和计算效率，使Transformer能够在资源严重受限的边缘设备上完成微调和部署。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 核心瓶颈与调控旋钮
 
@@ -124,7 +128,7 @@ WASI与**ASI**（Nguyen et al., 2025）的核心差异在于：ASI仅压缩激�
 
 WASI目前主要在视觉Transformer（ViT, SwinT）上验证，尚未在数十亿参数的大规模语言模型上充分评估（仅尝试了TinyLlama）。压缩带来的精度损失在较低 $\varepsilon$ 值下依然存在。此外，该方法在更广泛的NLP下游任务（如文本生成、推理）上的表现，以及与量化、剪枝等技术的正交结合效果，仍需进一步探索。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_0nvQ5kHXf4/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of WASI in a single training iteration*
@@ -145,7 +149,7 @@ WASI（Weight-Activation Subspace Iteration）构建了一个统一的低秩训�
 
 > **待验证点**：WASI目前主要在视觉Transformer（ViT, SwinT）上验证，在数十亿参数LLM上的可扩展性尚未充分评估；此外，该方法在NLP领域的其他下游任务（如文本生成、推理）上的表现也需进一步实验确认。
 
-## 核心模块与公式推导
+
 
 ### 3.1 标准前向与反向传播
 
@@ -214,7 +218,9 @@ $$L_i R_i = L_i R_i + \eta \cdot \widetilde{\frac{\partial \mathcal{L}}{\partial
 | **解释方差秩选择** | 自动确定最优秩 | 权重按 $\varepsilon$ 阈值截断；激活用动态规划 |
 | **统一低秩前向/反向** | 子空间内端到端计算 | Eq. 8-11，大幅降低FLOPs和内存 |
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心假设验证：权重与激活的低秩稳定性
 
@@ -311,7 +317,9 @@ Table 4 测量了 Jetson Orin 上的能耗。以 $\varepsilon=0.9$ 为例，WASI
 ![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_0nvQ5kHXf4/figures/024_Figure_10.jpg]]
 *Figure 10: WASI performance when fine-tuning ViT across multiple datasets. In each plot, markers from left to right represent increasing values of ε; the rightmost marker corresponds to vanilla training*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -361,6 +369,8 @@ WASI 的有效性建立在两个经验假设之上，这些假设在视觉 Trans
 4. **秩选择的自适应优化**：当前权重秩由解释方差阈值 ε 统一控制，激活秩通过动态规划在预调困惑度约束下分配。能否将秩选择过程与训练目标联合优化，实现端到端的自适应压缩？
 
 5. **更广泛架构的适用性**：WASI 的核心操作基于线性层的矩阵乘法分解，理论上可扩展至任何以线性层为主的计算单元。但在注意力机制、混合专家模型（MoE）等复杂架构中的表现和适配方案尚未探索。
+
+
 
 ## 原文 PDF
 

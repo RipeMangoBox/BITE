@@ -42,7 +42,7 @@ claims:
 > - FaceCap (Ablation) 上，PSNR↑ 23.32 vs 22.74 (w/o Distri Adj) (+0.58)；LPIPS↓ 0.1797 vs 0.1868 (w/o Distri Adj) (-0.0071)。
 > - Inference Speed 上，FPS 45 vs 8 (Avat3R, reported) (+37)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -74,8 +74,6 @@ FlexAvatar在方法层面吸收了大型重建模型（如Avat3R）的Transforme
 
 在NeRSemble测试集的自重建任务上，FlexAvatar的前馈模型（无需任何相机姿态或表情标签）**PSNR达到21.15，显著超过GAGAvatar（19.17）**，并在CSIM、AKD等身份保持指标上全面领先。消融实验证实，UV位置图驱动和数据分布调整是动态细节（皱纹、牙齿）生成的关键组件——移除后会导致明显的纹理退化。推理速度方面，FlexAvatar以45 FPS远超Avat3R的8 FPS，满足实时交互需求。
 
-## 背景与动机
-
 真实感3D头部头像的重建与动画是计算机视觉与图形学中的核心课题，在远程通信、虚拟现实和数字人等领域具有广泛需求。近年来，基于3D高斯泼溅（3D Gaussian Splatting, 3DGS）的方法在渲染质量和速度上取得了显著进展，但其在可动画头像生成方面仍面临两个根本性瓶颈。
 
 **第一个瓶颈是输入灵活性不足。** 现有方法通常依赖多视角捕获系统、已知的相机姿态和精确的表情标签（如FLAME参数）来构建3D表示。例如，基于显式几何的方法需要固定数量的标定视角输入，而基于前馈重建的方法虽然减少了对多视角的依赖，但仍普遍假设相机姿态已知或表情标签可用。这种对受控采集条件的依赖严重限制了方法在实际场景中的适用性——用户往往只能提供1至4张任意姿态、任意表情的普通照片，且无法提供相机标定信息或表情注释。
@@ -86,7 +84,7 @@ FlexAvatar在方法层面吸收了大型重建模型（如Avat3R）的Transforme
 
 FlexAvatar的动机正是同时解决这两个相互制约的问题。其核心洞察在于：Transformer的交叉注意力机制天然具备对变长、无序序列的规范化表示能力，这使得模型可以在不依赖相机姿态和表情标签的条件下，将任意数量的输入图像聚合为统一的规范头部表示；而将这一规范表示建立在FLAME的UV空间中，并利用UV位置图作为驱动信号，则使得轻量级UNet解码器能够以45 FPS的实时速度生成表情依赖的高斯属性变形，从而在不牺牲效率的前提下实现细节丰富的动态纹理。这种“灵活输入融合 + UV空间动态解码”的设计范式，为构建真正实用的可动画头像系统提供了新的技术路径。
 
-## 核心创新
+## 核心方法与创新机理
 
 FlexAvatar 的核心创新在于构建了一套**输入灵活、驱动实时、细节丰富**的前馈式可动画高斯头部头像重建框架。与现有方法相比，其关键突破体现在以下三个维度的 changed slots 上。
 
@@ -120,8 +118,6 @@ $$\Delta G_{\mathrm{dyn}} = \mathrm{UNet}(\tilde{F}_{UV}), \quad \tilde{F}_{UV} 
 
 FlexAvatar 的 changed slots 构成了一个完整的因果链条：**输入灵活性**（任意数量、无姿态无表情）→ **规范表示**（Head Query 交叉注意力）→ **精细驱动**（UV 位置图 + UNet）→ **数据平衡**（锚点重采样）。这一链条使得系统能够以 45 FPS 的实时速度渲染细节丰富的表情变化，在 NeRSemble 自重建任务上达到 21.15 PSNR，显著超过单图头像方法 GAGAvatar 的 19.17（Table 1）。
 
-## 整体框架
-
 FlexAvatar 的整体流程遵循“前馈重建 + 动态变形解码”的两阶段范式，目标是从单张或稀疏（1–4 张）无相机姿态、无表情标签的输入图像中，实时重建可动画的 3D 高斯头部头像。其核心设计在于将 Transformer 的灵活融合能力与 UV 空间的几何约束相结合，使得模型能够应对输入数量、视角和表情的任意变化。
 
 **输入与编码。** 给定 $N$ 张任意姿态、任意表情的 RGB 图像 $\{I_i\}_{i=1}^N$，首先使用冻结的 DINOv3 视觉编码器 $E(\cdot)$ 提取多尺度密集特征 $f_i = E(I_i) \in \mathbb{R}^{L \times D}$（公式 1）。随后，一个全局自注意力层将所有图像特征融合为聚合特征 $F_{\mathrm{agg}} \in \mathbb{R}^{(N \times L) \times D}$，实现输入数量无关的表示（公式 2）。
@@ -150,8 +146,6 @@ $$G_{\mathrm{dyn}} = G_{\mathrm{st}} + M_{\mathrm{dyn}} \odot \Delta G_{\mathrm{
 
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2512_17717/figures/003_Figure_2.jpg]]
 *Figure 2: FlexAvatar reconstructs a high-quality Gaussian head avatar by mapping a flexible number of input images with varying expressions and camera views into Gaussian representations in UV space. We use a flexible feed-forward backbone to obtain static Gaussian attributes and an identity feature map from input images. Given a driving expression signal, we then convert it into a FLAME UV position map and concatenate it with the backbone’s identity feature map; to support real-time driving and produce high-quality dynamic results, the concatenated representation is then fed into a UNet to generate expression-dependent dynamic Gaussian attributes in UV space, which are then sampled into FLAME space...*
-
-## 核心模块与公式推导
 
 FlexAvatar 的整体设计遵循“前馈大型重建模型”范式，其核心架构由三个关键模块串联构成：**灵活输入融合编码器**、**UV 空间特征解码器**、以及**动态变形 UNet 解码器**。以下按数据流顺序逐一展开。
 
@@ -255,7 +249,7 @@ $$\mathcal{L}_{xyz} = \|P_{\mathrm{pred}} - P_{\mathrm{init}}\|_2^2, \quad \math
 
 在保持动态 UNet 冻结的前提下，对解码器参数进行约 10 秒的快速微调，可在不损害变形质量的同时显著提升输入图像的身份一致性和个性化外观（见 Figure 4(d)）。微调损失与前馈训练一致，但仅优化解码器权重。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 实验设置概览
 
@@ -347,10 +341,7 @@ FlexAvatar 在 **NeRSemble** 多视角视频数据集上进行主实验训练与
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2512_17717/figures/012_Table_3.jpg]]
 *Table 3: Hyperparameters of our network architecture*
 
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2512_17717/figures/016_Figure_15.jpg]]
-*Figure 15: Additional cross-reenactment results*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 核心贡献与因果机制
 

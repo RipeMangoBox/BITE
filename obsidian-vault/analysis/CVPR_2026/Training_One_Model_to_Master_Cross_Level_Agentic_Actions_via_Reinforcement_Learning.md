@@ -33,7 +33,11 @@ claims:
 | Topic | #topic/other_unclear #topic/other_unclear/general |
 | Method |  |
 | Dataset | Minecraft open-world task benchmark, mixed-space SFT dataset, ID/OOD task sets |
-## 概述
+
+> [!tip] 效果简介
+> 本笔记的既有实验指标、对比结果与适用边界见“实验与关键发现”；本轮仅统一结构，不改写证据。
+
+## 概要
 
 现有具身智能体在 Minecraft 等开放环境中通常被限制在**单一的动作空间**（如原子操作或高层命令）内完成整个任务轨迹，导致执行效率低下且难以泛化。本文提出 **CrossHA**，一个统一的智能体模型，能够在同一轨迹中**自主、动态地选择最合适的异构动作空间**（Motion、Grounding、Raw），无需人工定义的启发式规则。
 
@@ -41,7 +45,7 @@ claims:
 
 在仅使用 30 个任务训练的情况下，CrossHA 泛化至 Minecraft 中 **超过 800 个任务**，取得 state-of-the-art 性能。该方法在方法谱系上属于**多动作空间统一建模 + 多阶段强化学习**，区别于固定单空间的传统方案（如 VPT、MPGD 等依赖单一动作接口的方法）。
 
-## 背景与动机
+
 
 ### 问题背景：Minecraft 中的异构动作空间
 
@@ -70,7 +74,9 @@ Figure 1 展示了这一核心矛盾：现有方法通常将智能体锁定在�
 
 最终目标是构建一个在仅训练 30 个任务的情况下，能泛化至超过 800 个 Minecraft 任务的统一智能体，并在各类任务上达到最优或次优性能（Table 2）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CrossHA 的核心创新在于将**异质动作空间的选择**本身建模为一个可学习的策略问题，而非依赖人工预设的固定空间或启发式切换规则。具体而言，其关键创新点体现在以下三个层面：
 
@@ -82,7 +88,7 @@ CrossHA 的核心创新在于将**异质动作空间的选择**本身建模为�
 
 上述创新共同构成了 CrossHA 相较于固定动作空间基线（如 VPT、ROCKET-1、GroundingHA）的核心差异——**动作空间不再是预设常量，而是策略的一部分**。
 
-## 整体框架
+
 
 CrossHA 的核心设计目标是将**异构动作空间的选择**本身作为一个可学习的策略问题，而非依赖人工定义的启发式规则。为此，论文构建了一个三阶段训练管线，逐步赋予模型在不同动作空间之间自主切换的能力。
 
@@ -139,7 +145,7 @@ $$\mathcal{A} = \bigcup_{x=1}^{N} \mathcal{A}_x$$
 ![[assets/figures/papers/paper_list_l2728_https_arxiv_org_abs_2512_09706/figures/007_Figure_5.jpg]]
 *Figure 5: | Representative observations in Minecraft, consisting of 640 × 360 RGB images. The agent must handle diverse visual contexts, including embodied first-person views (left) and GUI-based interfaces (right) for tasks like crafting and inventory management*
 
-## 核心模块与公式推导
+
 
 ### 3.1 复合动作空间
 
@@ -190,7 +196,9 @@ $$a'(x) = \begin{cases} \hat{a}(x), & \text{if } g(\hat{a}(x)) = g(a^\star(x)), 
 ![[assets/figures/papers/paper_list_l2728_https_arxiv_org_abs_2512_09706/figures/008_Table_3.jpg]]
 *Table 3: | Summary of the human-aligned raw action space used by our agent. The agent interacts via standard keyboard and mouse inputs, identical to a human player*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：跨任务类别的综合性能
 
@@ -245,7 +253,9 @@ Table 2 报告了 RL 训练后的智能体在分布内（ID）和分布外（OOD
 ![[assets/figures/papers/paper_list_l2728_https_arxiv_org_abs_2512_09706/figures/009_Figure_6.jpg]]
 *Figure 6: | Case Study: Action distribution during the Kill Sheep, Chop Tree and Craft Enchanting task. The density curves of each tasks, aggregated over 20 episodes, of different action spaces (Motion, Grounding, Raw) across different task phases. The dynamic shifts in distribution demonstrate the model’s in-context adaptive strategy*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线工作的关系
 
@@ -290,6 +300,8 @@ CrossHA 的三阶段训练管线（Cold-Start SFT → Single-Turn RL → Multi-T
 4. **与基础模型能力的耦合**：CrossHA 基于特定 VLM 骨干。动作空间切换能力的上限是否受限于视觉理解和推理能力，以及更换更强/更弱骨干后方法是否仍有效，未做验证。
 
 5. **奖励稀疏性**：MTRL 仅使用回合级成功信号。对于需要数百步才能完成的超长程任务，稀疏奖励可能导致信用分配困难。论文未讨论在此类场景下的扩展方案（如中间奖励 shaping）。
+
+
 
 ## 原文 PDF
 

@@ -43,7 +43,7 @@ claims:
 > - ARCTIC (手物真实感渲染) 上，PSNR↑ (平均) 28.17 vs - (最优)；LPIPS↓ (平均) 35.43 vs - (最优)。
 > - ARCTIC (规范姿态刚体重建) 上，CD↓ 0.79 vs HOLD / BIGS (优于刚体重建方法)。
 
-## 概述
+## 概要
 
 **问题与瓶颈。** 从单目 RGB 视频中重建铰接物体的三维几何与运动，是手-物交互理解的核心挑战。其根本困难在于：连续变化的关节旋转与频繁的部件变形，使得物体形状与运动在观测中深度耦合，导致严重的几何歧义和重建不稳定。现有方法要么假设物体为刚体（如 **HOLD** (Fan et al., CVPR 2024) 和 **BIGS** (On et al., CVPR 2025)），要么采用每帧自由变形场（如 **3DGS-Avatar** (Qian et al., CVPR 2024)），缺乏对部件级语义和物理铰接约束的显式建模，难以从持续变化的铰接状态中解耦出内在的几何结构。
 
@@ -55,7 +55,7 @@ claims:
 
 **局限与开放问题。** 当前框架假定物体仅含单一转动关节，对多部件、多自由度铰接结构的扩展仍是未来方向。此外，在严重遮挡或缺乏准确 2D 部件分割的场景下，语义一致性学习的鲁棒性有待进一步验证。
 
-## 背景与动机
+
 
 ### 问题背景：单目手-物操纵建模的几何-运动耦合困境
 
@@ -81,7 +81,9 @@ claims:
 
 这种“先探索、后巩固”的策略，从根本上规避了单阶段方法中几何-运动耦合带来的歧义问题：CLAY 阶段为 STONE 阶段提供了可靠的初始化与语义引导，而 STONE 阶段则将柔性表示“固化”为物理一致的铰接结构。实验表明，该框架在 ARCTIC 数据集上实现了铰接物体重建与真实感渲染的双重 SOTA 性能，并在规范姿态刚体重建任务上超越了专门的刚体重建基线方法。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：几何-运动强耦合的“鸡与蛋”困境
 
@@ -128,7 +130,7 @@ Clay-to-Stone 的双阶段设计并非简单的分步训练，而是形成了**�
 
 当前框架假定物体仅包含**单一转动关节**（revolute joint），对于具有多部件、多自由度（如棱柱副）的复杂铰接结构仍需扩展。此外，在缺少准确 2D 部件分割（如 SAM2 不可用）或手-物严重遮挡的场景下，语义一致性学习的鲁棒性尚待验证。STONE 阶段的刚性约束是否足以处理非理想铰接（如摩擦、少量非刚性变形）也是值得进一步探索的方向。
 
-## 整体框架
+
 
 Clay-to-Stone 提出了一种**阶段性三维高斯泼溅（3DGS）框架**，用于从单目 RGB 视频中重建铰接手-物体操纵的几何与运动。其核心设计动机源于一个关键瓶颈：单目观测下，连续的关节旋转与频繁的部件变形导致物体的内在几何形状与铰接运动强耦合，引发严重的几何歧义与优化不稳定性。现有方法要么假设物体为完全刚体（如 **HOLD**, Fan et al., CVPR 2024; **BIGS**, On et al., CVPR 2025），要么采用每帧自由变形场却缺乏部件级语义与物理约束（如 **3DGS-Avatar**, Qian et al., CVPR 2024），均无法有效解耦这一耦合。
 
@@ -156,7 +158,7 @@ Clay-to-Stone 提出了一种**阶段性三维高斯泼溅（3DGS）框架**，�
 ![[assets/figures/papers/paper_list_l2634_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_Clay_to_Stone_Phas/figures/001_Figure_1.jpg]]
 *Figure 1: Our Clay-to-Stone framework models coupled geometry and articulation in monocular hand-object manipulation clips through a phase-wise strategy, transitioning from adaptive deformations and part-aware semantics to physically consistent articulation for 3D reconstruction and photo-realistic rendering*
 
-## 核心模块与公式推导
+
 
 ### 3.1 手-物高斯表示
 
@@ -261,7 +263,9 @@ Clay-to-Stone 双阶段设计的因果链路可概括为：
 ![[assets/figures/papers/paper_list_l2634_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_Clay_to_Stone_Phas/figures/002_Figure_2.jpg]]
 *Figure 2: Our framework models articulated hand-object manipulation from monocular videos through a Clay-to-Stone dual-phase pipeline. In the CLAY phase, we first employ spatio-temporal encoding on canonical object Gaussians, using spatial hash representations and visual features. Driven by 2D photometric and semantic consistency, this phase explores fine-grained, primitive-level deformations while establishing part-level semantic correlations. In the subsequent STONE phase, these learned motion priors are consolidated under rigid and temporal consistency constraints to yield physically plausible articulation parameters. Combined with hand Gaussians and pose transformations, the framework produces ge...*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -317,7 +321,9 @@ Table 4 系统消融了各关键组件的贡献，揭示了以下因果链路：
 ![[assets/figures/papers/paper_list_l2634_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_Clay_to_Stone_Phas/figures/007_Figure_3.jpg]]
 *Figure 3: Qualitative results of hand-object photo-realistic rendering on ARCTIC*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -351,6 +357,8 @@ Clay-to-Stone 框架的有效性建立在若干隐含假设之上，这些假设
 3. **刚性约束的容错性。** STONE 阶段的刚性约束是否足够鲁棒以处理非理想铰接（如摩擦、少量非刚性变形）？引入软约束或不确定性建模可能是缓解这一问题的途径。
 
 4. **训练效率与收敛性。** 双阶段训练范式引入了阶段切换的时机选择（当前固定为 10k 迭代）。这一超参数对不同物体类别的敏感性，以及是否存在自适应的阶段切换策略，值得进一步研究。
+
+
 
 ## 原文 PDF
 

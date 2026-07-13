@@ -41,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - Hi3DEval + AI-generated test set (1,100 images) 上，IS-AS (Image-Shape Alignment Score) 0.702 vs 0.656 (+0.046 (7% relative gain))；Floater (lower is better) 31.5 vs 74.8 (-43.3 (57.8% reduction))；GP 5.988 vs 5.826 (+0.162)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：当前主流的VecSet-based 3D生成方法将形状token视为无序集合，不施加任何位置编码。这迫使扩散模型在一个庞大的置换不变token空间中同时学习可见对应关系与幻觉不可见几何，导致训练效率低下、收敛不稳定。
 
@@ -56,7 +56,7 @@ claims:
 - **最终指标**（110K步，Hi3DEval + AI生成测试集1,100张图像）：ViLearn在全部四项指标上取得最优——IS-AS **0.702**（基线0.656）、Floater **31.5**（基线74.8，降低57.8%）、GP **5.988**、GD **2.688**，均优于同参数量级的SOTA模型。
 - **消融验证**：可见性分组有效分离可见/不可见几何，且可见性感知编码（VA-RoPE/VA-LPE）显著优于vanilla RoPE，证实了显式注入可见性结构的关键作用。
 
-## 背景与动机
+
 
 ### 从单图到三维生成：VecSet范式的兴起
 
@@ -82,7 +82,9 @@ $$
 
 **ViLearn的动机**正是针对上述瓶颈，将可见性结构和位置归纳偏置显式注入图像到三维生成的pipeline。其核心洞察在于：通过明确告知扩散模型哪些形状token对应可见几何、哪些对应遮挡区域，能够将可见重建与不可见幻觉解耦，从而缩小假设空间并提供清晰的几何结构引导，最终实现训练收敛的显著加速。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题根源：VecSet表示中的可见性盲区
 
@@ -135,7 +137,7 @@ $$\begin{cases}
 
 消融实验验证了这一设计的有效性：**VA-RoPE仅需25K步即可达到vanilla baseline 110K步的性能，收敛加速约4.4倍**，且最终指标全面超越（IS-AS从0.656提升至0.702，Floater从74.8降至31.5，降幅57.8%）。值得注意的是，即使加入VG但使用vanilla RoPE（无可见性感知）的变体性能显著低于VA-RoPE，证实了**可见性自适应编码是不可或缺的关键设计**。
 
-## 整体框架
+
 
 ViLearn 的整体 pipeline 围绕一个核心设计展开：**将可见性结构显式注入 VecSet 图像到三维生成的扩散训练流程**。如图 4 所示，框架由四个主要阶段构成：数据准备、可见性分组（Visibility Grouping, VG）、可见性感知位置编码（Visibility-Aware Positional Encoding, VAPE）以及 MM-DiT 扩散训练。
 
@@ -203,7 +205,7 @@ $$\begin{cases} Q = \text{Concat}[Q_{\text{shape}}, Q_{\text{image}}] \\ K = \te
 ![[assets/figures/papers/paper_list_l2273_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_ViLearn_Accelerat/figures/001_Figure.jpg]]
 *Figure: (b) Our 3D LDM Training (Visibility Learning)*
 
-## 核心模块与公式推导
+
 
 ### 问题背景：VecSet表示中的可见性瓶颈
 
@@ -269,7 +271,9 @@ VA-RoPE通过旋转矩阵改变查询-键点积的几何关系：同类token（�
 ![[assets/figures/papers/paper_list_l2273_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_ViLearn_Accelerat/figures/002_Figure_2.jpg]]
 *Figure 2: Complementary information of visible and invisible shape tokens. Full tokens are partitioned into visible and invisible subsets via frontal visible points [51] in this case. The decoded meshes and their geometric normal maps show visible tokens reconstruct visible surfaces while invisible tokens capture occluded surfaces, demonstrating complementary geometric information*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -329,7 +333,9 @@ Figure 6提供了这一加速效应的视觉佐证：在25K步时，VA-RoPE生�
 ![[assets/figures/papers/paper_list_l2273_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_ViLearn_Accelerat/figures/003_Figure_3.jpg]]
 *Figure 3: Qualitative Comparison: Our Scaled Model vs. Scaled Baseline vs. SOTAs. For single-image-to-3D, we compare the quality of generated meshes among our scaled model (ViLearn), scaled vanilla baseline, and state-of-the-art (SOTA) open-sourced models, all with comparable model parameters: 1.1B (ours, baseline, Hunyuan3D 2.0 [50]) and 1.3B (TripoSG [23], Step1X-3D [22]), using the Image-Shape Alignment Score (range 0-1, higher is better) in Sec. 5.2. Note that while SOTA models [22, 23, 50] typically train on hundreds of GPUs for weeks, we achieve the best alignment with only 32 GPUs by accelerating convergence with visibility learning*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心瓶颈与设计动机
 
@@ -402,6 +408,8 @@ ViLearn 的最终性能超越了同等参数规模的SOTA VecSet-based模型，�
 ### 5. 知识库定位总结
 
 ViLearn 在图像到3D生成领域的方法谱系中占据了一个独特的位置：它**不是提出新的骨干架构或tokenizer，而是通过注入可见性归纳偏置来改造现有的VecSet+MM-DiT训练范式**。这一思路与传统的“改进表示”或“增大模型”路径正交，属于**训练策略与结构引导**层面的创新。其4.4×的收敛加速和57.8%的Floater指标降低，以较小的工程代价（仅修改数据准备和注意力编码）换取了显著的性能提升，为后续工作在效率与质量之间寻求平衡提供了可参考的范式。
+
+
 
 ## 原文 PDF
 

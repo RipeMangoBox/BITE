@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Discount_Model_Search_for_Quality_Diversity_Optimization_in_High_Dimensional_Measure_Spaces.pdf
+project_link: https://discount-models.github.io
+code_link: null
 openreview_forum_id: m6Hv0yZO3n
 aliases:
 - DMSD
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 高维测度空间中的质量多样性优化折扣模型搜索 |
 | 英文题名 | Discount Model Search for Quality Diversity Optimization in High-Dimensional Measure Spaces |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=m6Hv0yZO3n); [Project](https://discount-models.github.io) |
+| Links | [paper](https://openreview.net/forum?id=m6Hv0yZO3n) · [Project](https://discount-models.github.io) |
 | Topic | #topic/optimization_theory_probabilistic #topic/optimization_theory_probabilistic/optimization_methods |
 | Method | Discount Model Search (DMS) |
 | Dataset | 2D LP (Sphere), 10D LP (Sphere) |
@@ -42,7 +44,7 @@ claims:
 > - 2D LP (Sphere) 上，Coverage 为 95.89%，对比 80.95%，变化 +14.94%。
 > - 10D LP (Sphere) 上，QD Score 为 6,409.50，对比 608.53，变化 +5,800.97。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -60,7 +62,7 @@ DMS 属于黑盒 QD 算法，在 MAP-Elites 风格的存档和 CMA-ES 发射器�
 
 在涵盖线性投影（LP）、Arm Repertoire、三角形排列（TA）和潜在空间插值（LSI）的多个域中，DMS 在 QD 分数和覆盖率上全面优于 CMA-MAE 及其他基线（Table 1）。在高维场景中优势尤为显著：10 维 LP (Sphere) 上 QD 分数从 608.53 提升至 6,409.50，覆盖率从 6.95% 提升至 89.21%；10 维 LP (Rastrigin) 上 QD 分数从 246.55 提升至 5,138.81，覆盖率从 2.98% 提升至 88.19%。在 LSI (Hiker) 域中，DMS 能够根据风景图像测度生成与之匹配的登山者图像（Figure 2），展示了该方法在“质量多样性扩散模型”（QDDM）域中的潜力。消融实验进一步确认了空点机制的关键作用：去除空点会导致折扣模型在未探索区域误输出高值，使性能崩溃（Figure 11）。
 
-## 背景与动机
+
 
 质量多样性（Quality Diversity, QD）优化的目标是在一个解空间中同时追求解的高目标值（质量）和测度空间中的广泛覆盖（多样性）。近年来，黑盒 QD 算法在机器人控制、程序生成、图像生成等领域取得了显著进展，但其可扩展性始终受限于测度空间的维度。大多数经典 QD 算法——如 **MAP-Elites**（Mouret & Clune, 2015）及其变体 **MAP-Elites (line)**（Vassiliades & Mouret, 2018）——依赖对测度空间的显式网格划分来维护存档，当测度维度升高时，网格单元数量呈指数爆炸，使得这种离散化策略在计算上不可行。
 
@@ -80,7 +82,9 @@ $$t_e \gets (1-\alpha) t_e + \alpha f(\boldsymbol{\theta}')$$
 
 本文的核心动机在于：**离散的直方图折扣函数是高维 QD 优化的瓶颈**。当测度相近的解无法获得有区分度的改进值时，CMA-ES 发射器失去了有效的排序信号，导致探索崩溃。一个自然的解决方案是将折扣函数从离散单元映射转变为平滑的连续表示——这正是本文提出 Discount Model Search (DMS) 的出发点。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DMS 的核心创新在于将 CMA-MAE 中**离散的直方图折扣函数替换为平滑的连续神经网络折扣模型**，并配套引入**空点训练机制**以防止模型在未探索区域产生误导性高值。这一设计直接回应了高维测度空间中的根本瓶颈：当测度空间维度升高时，CMA-MAE 的直方图表示因畸变效应导致大量解落入同一单元并获得相同的折扣值，从而使改进信号 $\Delta(\boldsymbol{\theta}) = f(\boldsymbol{\theta}) - f_A(\boldsymbol{m}(\boldsymbol{\theta}))$ 失去区分度，搜索陷入停滞（Figure 1a, 1c）。
 
@@ -100,7 +104,7 @@ DMS 的核心创新在于将 CMA-MAE 中**离散的直方图折扣函数替换�
 
 线性投影（LP）测度函数将解向量划分为 $k$ 个块并对每块分量求和，其输出服从 Irwin-Hall 分布（Figure 12）。当测度维度 $k$ 增大时，该分布迅速向中心集中，导致解在测度空间中的分布产生严重畸变——绝大多数解落入极少数单元。CMA-MAE 的离散直方图在此情况下无法提供有意义的改进信号，而 DMS 的平滑折扣模型天然具备跨单元插值能力，使相近但不同测度的解获得有区分的折扣值，从而维持有效的探索引导。空点机制则进一步确保模型不会在未探索区域“猜测”出高折扣值，避免搜索过早收敛到已探索区域的局部最优。
 
-## 整体框架
+
 
 DMS 的整体工作流程围绕两个交替进行的阶段展开：**发射器搜索**与**折扣模型训练**，二者共享一个 MAP-Elites 风格的存档。
 
@@ -142,7 +146,7 @@ DMS 的完整迭代循环可概括为以下步骤：
 - **空点机制的必要性**：消融实验表明，若取消耗折扣模型训练中的空点（$n_{\text{empty}}=0$），折扣模型会在未探索区域产生任意高值，使发射器误认为测度空间已被完全探索，导致 QD 分数和覆盖率大幅崩溃。仅需添加少量空点（≥10）即可恢复高性能。
 - **存档学习率 $\alpha$**：控制目标优化与探索之间的平衡。$\alpha \to 0$ 时 DMS 退化为纯单目标优化，覆盖度极低；$\alpha$ 在 0.1 附近通常取得最佳综合性能。
 
-## 核心模块与公式推导
+
 
 ### 问题瓶颈与改进信号
 
@@ -181,7 +185,9 @@ DMS 在每个迭代中交替执行两个阶段：
 
 MAP-Elites 风格存档保留每个测度单元中已发现的最佳解（Algorithm 1 lines 14-16）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与 DMS 的应对机制
 
@@ -265,7 +271,9 @@ $\alpha$ 控制目标优化与探索之间的平衡。当 $\alpha \to 0$ 时，�
 *Table 4: Pairwise comparisons (Games-Howell test) of the QD Score of each algorithm*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 瓶颈识别与核心洞察
 
@@ -302,6 +310,8 @@ DMS 的核心因果旋钮是将折扣函数的表示从**离散单元直方图**
 - 能否用更轻量级的平滑模型（如核方法或高斯过程）替代神经网络，以减少训练开销并降低外推风险？
 - 在没有手工测度函数的情况下，如何利用更多样化的模态（文本、音频等）来定义测度空间？
 - 如何设计适用于 QDDM 域的可微 QD 方法，使梯度信息能同时优化目标函数和测度空间覆盖？
+
+
 
 ## 原文 PDF
 

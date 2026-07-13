@@ -43,7 +43,7 @@ claims:
 > - Scene15 上，ACC 61.00 vs N/A (N/A)。
 > - COIL100 上，ACC 90.60 vs N/A (N/A)。
 
-## 概述
+## 概要
 
 多视图子空间聚类旨在从多个特征表示中挖掘样本间的一致性与互补性结构，以提升聚类质量。然而，现有基于锚的方法普遍面临一个关键瓶颈：各视图独立生成锚点，忽略了跨视图锚点间的交互关系，导致锚点表示噪声大、鲁棒性差，且对初始锚点选择高度敏感。同时，主流方法将正则化施加于锚点图（如拉普拉斯图或张量图），其计算复杂度与样本数线性相关，难以扩展至大规模数据。
 
@@ -56,8 +56,6 @@ claims:
 **方法定位**：SMVS-TAG 属于基于锚的可扩展多视图子空间聚类方法，其核心创新在于将张量低秩正则化从图空间迁移到锚点表示空间，并与频域分解相结合。与 **LMVSC**、**SMVAGC**、**MCHBG** 等大型多视图聚类基线以及 **TBGL**、**TC-MVSC** 等张量方法基线相比，本方法在正则化目标、锚点学习方式和张量正则化维度三个关键设计点上实现了系统性改进。代码已开源，实验在统一硬件环境和公平超参搜索策略下完成，保证了可复现性。
 
 **主要局限**在于超参数需手动调整，且当前仅验证于完整多视图场景，尚未扩展到缺失视图或流式增量数据。未来方向包括将张量锚正则化嵌入深度模型、自适应确定锚点数量，以及探索不完全多视图下的鲁棒性。
-
-## 背景与动机
 
 ### 多视图聚类的规模化挑战
 
@@ -85,7 +83,7 @@ claims:
 
 基于此，本文提出 **SMVS-TAG**（Scalable Multi-View Subspace Clustering with Tensorized Anchor Guidance），通过构建第三阶锚点张量并施加张量 Schatten $p$-范数正则化，在频域显式捕获跨视图低秩结构，同步提升锚点质量与跨视图协同效率。
 
-## 核心创新
+## 核心方法与创新机理
 
 ### 创新动机：锚点独立生成导致跨视图信息割裂
 
@@ -128,8 +126,6 @@ SMVS-TAG 的核心创新在于**将正则化目标从锚点图转移到锚点表
 
 这些创新共同构成了一个从“锚点图正则”到“锚点张量正则”的完整范式转移，使得 SMVS-TAG 在保持大规模可扩展性的同时，显著提升了锚点质量与跨视图协同能力。
 
-## 整体框架
-
 SMVS-TAG 的整体设计遵循“潜在锚点学习 → 锚点张量构建 → 频域低秩正则化 → 共识锚图生成”的四阶段流水线。该框架的核心创新在于将正则化目标从传统的**样本依赖的锚点图**迁移到**锚点表示本身**，从而在低维空间内完成跨视图协同，大幅降低大规模数据下的计算与内存开销。
 
 **输入与输出**：方法接收 $v$ 个视图的原始特征矩阵 $\mathbf{X}_i \in \mathbb{R}^{d_i \times n}$（$d_i$ 为第 $i$ 视图的特征维度，$n$ 为样本数），输出为一个共享的非负锚图 $\mathbf{Z} \in \mathbb{R}^{m \times n}$（$m$ 为锚点数量），最终对 $\mathbf{Z}$ 的左奇异向量执行 k-means 获得聚类结果。
@@ -164,8 +160,6 @@ $$\min_{\mathbf{W}_i, \mathbf{A}_i, \mathbf{Z}} \alpha \sum_{i=1}^{v} \|\mathbf{
 
 ![[assets/figures/papers/paper_list_l2110_https_openaccess_thecvf_com_content_CVPR2026_html_Jia_Scalable_Multi_Vie/figures/002_Figure_2.jpg]]
 *Figure 2: The framework of our proposed SMVS-TAG. Specifically, anchors for each view are learned in a latent space and the anchor tensor is constructed. Applying FFT to A along the anchor dimension, each frontal slice captures cross-view interactive information among anchors. Low-frequency slices aggregate consistent information shared across views, while high-frequency slices contain view-specific information and noise*
-
-## 核心模块与公式推导
 
 ### 整体目标函数
 
@@ -219,7 +213,7 @@ $$
 ![[assets/figures/papers/paper_list_l2110_https_openaccess_thecvf_com_content_CVPR2026_html_Jia_Scalable_Multi_Vie/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison between traditional anchor-based MVC methods (left) and our proposed SMVS-TAG (right). Traditional methods independently generate view-specific anchors to construct a consensus anchor graph. Our method reconstructs these view-specific anchors into a third-order tensor, employing a tensor Schatten p-norm constraint to explicitly capture cross-view consistency and complementarity, resulting in a higher-quality consensus anchor graph*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -274,22 +268,10 @@ SMVS-TAG 在七个多视图基准数据集上与十种大规模多视图聚类�
 ![[assets/figures/papers/paper_list_l2110_https_openaccess_thecvf_com_content_CVPR2026_html_Jia_Scalable_Multi_Vie/figures/005_Table_3.jpg]]
 *Table 3: Running time comparison of the proposed SMVS-TAG method and ten large-scale MVC methods. Note that, the time is in seconds. ‘OT ’ indicates the “out-of-time error”, ‘OM ’ means the “out-of-memory error”*
 
-![[assets/figures/papers/paper_list_l2110_https_openaccess_thecvf_com_content_CVPR2026_html_Jia_Scalable_Multi_Vie/figures/009_Figure_3.jpg]]
-*Figure 3: Parameter sensitivity analysis of p on Dermatology and Scene15. Others are displayed in the Appendix*
-
 ![[assets/figures/papers/paper_list_l2110_https_openaccess_thecvf_com_content_CVPR2026_html_Jia_Scalable_Multi_Vie/figures/003_Table_1.jpg]]
 *Table 1: A brief summary of multi-view datasets*
 
-![[assets/figures/papers/paper_list_l2110_https_openaccess_thecvf_com_content_CVPR2026_html_Jia_Scalable_Multi_Vie/figures/006_Figure_6.jpg]]
-*Figure 6: The convergence analysis of our proposed method on two datasets*
-
-![[assets/figures/papers/paper_list_l2110_https_openaccess_thecvf_com_content_CVPR2026_html_Jia_Scalable_Multi_Vie/figures/010_Figure_5.jpg]]
-*Figure 5: Parameter sensitivity analysis of α and λ on two datasets*
-
-![[assets/figures/papers/paper_list_l2110_https_openaccess_thecvf_com_content_CVPR2026_html_Jia_Scalable_Multi_Vie/figures/011_Figure_4.jpg]]
-*Figure 4: Parameter sensitivity analysis of m on two datasets*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 方法谱系：从锚图正则化到锚点张量正则化
 

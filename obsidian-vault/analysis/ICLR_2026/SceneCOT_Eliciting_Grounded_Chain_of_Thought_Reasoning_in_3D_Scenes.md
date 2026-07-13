@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/SceneCOT_Eliciting_Grounded_Chain_of_Thought_Reasoning_in_3D_Scenes.pdf
+project_link: null
+code_link: null
 openreview_forum_id: U9meoc0Sau
 aliases:
 - SceneCOT
@@ -41,7 +43,7 @@ claims:
 > - Beacon3D 上，Good Coherence (GC) 为 34.7，对比 20.4 (SceneVerse)，变化 +14.3。
 > - SQA3D-G 上，Grounding F1@50 为 51.6，对比 3.4 (Chat-Scene)，变化 +48.2。
 
-## 概述
+## 概要
 
 ### 1. 问题背景与瓶颈
 
@@ -83,7 +85,7 @@ SCENECOT 通过引入显式的 chain-of-thought 推理结构，将多模态专�
 
 当前框架受限于预定义的任务类型，尚未覆盖长期具身任务规划；SCENECOT-185K 数据集仅基于 ScanNet 构建，场景多样性有限；推理延迟约 **10.4 秒**，主要瓶颈在 LLM 序列生成，制约实时应用。此外，空间关系等子任务的 CoT 设计仍不完善，性能上限较低。如何改进思维链设计、扩展至更复杂场景、降低推理延迟，是后续研究的关键方向。
 
-## 背景与动机
+
 
 三维场景理解正从单纯的对象识别走向复杂的、情境化的场景推理。用户不再满足于“场景里有什么”，而是期望模型能够回答诸如“我左边的第三个物体是什么颜色？”或“面向北边时，12点钟方向有几把椅子？”这类需要多步推理的问题。这要求模型同时具备两种能力：一是对三维空间关系的精确建模，二是将推理步骤与场景中具体实体显式关联的**grounding**能力。
 
@@ -98,7 +100,9 @@ SCENECOT 通过引入显式的 chain-of-thought 推理结构，将多模态专�
 
 本文的动机正是源于这一关键缺口：**如何让三维大语言模型像人类一样，在回答复杂场景问题时进行有步骤、可追溯、与场景实体紧密关联的推理？** 受大语言模型中思维链（Chain-of-Thought）推理的启发，本文提出将 CoT 范式引入三维场景理解，但进一步要求每个推理步骤都显式地 grounding 到场景中的具体实体上——这不仅是生成一段推理文字，而是要在推理的每一步中调用多模态专家信号，将“思考”与“观察”紧密结合。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SCENECOT 的核心创新在于将 3D 场景推理从单步“黑箱”答案生成转变为**显式、逐步、有根据的思维链推理**。这一转变通过以下四个关键机制实现：
 
@@ -137,7 +141,7 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{CoT}} + \mathcal{L}_{\mathrm{ans}} + \mathc
 
 SCENECOT 的创新本质在于**将 grounding 从隐式副产品提升为显式推理步骤**，通过“任务分解 + 多模态专家调用 + 联合优化”的组合机制，解决了 3D 场景问答中推理可解释性和 grounding 一致性的瓶颈。这一设计使模型不仅在答案准确性上提升（MSQA 计数任务 +10.5，Table 1），更在 grounding-QA 连贯性上建立了显著优势（GC 提升 +14.3，Table 2）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l36_https_openreview_net_forum_id_U9meoc0Sau/figures/002_Figure_2.jpg]]
 *Figure 2: SCENECOT framework. The model decomposes 3D scene reasoning into four steps: task recognition, spatial region recognition, entity grounding, and grounded reasoning. Each stage introduces explicit grounding signals (e.g., objects, attributes, spatial positions), ensuring step-by-step reasoning and improved grounding-QA coherence*
@@ -166,7 +170,7 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{CoT}} + \mathcal{L}_{\mathrm{ans}} + \mathc
 
 相较于 LEO、Chat-Scene、MSR3D 等现有方法，SCENECOT 的核心差异体现在两个维度：其一，推理策略从单步直接生成答案转变为四阶段逐步推理；其二，grounding 机制从无显式步骤或仅通过对象 token 隐式关联，升级为在每个推理步骤中显式调用多模态专家获取对象概率、位置等线索。Table 1 的对比结果表明，SCENECOT 是唯一被标注为“Grounded”的方法，在 MSQA 的计数子任务上以 47.9 的 GPT-Score 显著优于次优基线 Chat-Scene†（37.4），在 Beacon3D 的 Good Coherence 指标上以 34.7 远超 SceneVerse（20.4）（Table 2）。
 
-## 核心模块与公式推导
+
 
 SCENECOT 将复杂的三维场景推理分解为四个顺序执行的阶段，每个阶段引入显式的 grounding 信号，确保推理步骤与场景实体之间建立可追溯的关联。
 
@@ -205,7 +209,9 @@ $$\text{clockwise\_direction} = \text{round}(\text{angle} / 30) \% 12$$
 
 其中 angle 表示目标对象相对于智能体朝向的偏转角（以度为单位）。该公式将 360 度圆周等分为 12 个扇区，每个扇区对应 30 度，取整后通过模 12 运算映射到 1 至 12 点钟的标准钟面表示。这一方向计算规则被集成在区域识别模块中，用于生成方向相关的 `<think_rgn>` 标签和后续的空间推理。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 
@@ -278,7 +284,9 @@ Table 4 进一步汇总了跨五个 grounding 基准的结果。SCENECOT 在 MSQ
 
 SCENECOT 的逐步推理策略引入了额外的计算开销。Table 13 显示，SCENECOT 的推理延迟约为 10.4 秒，其中大部分时间消耗在 LLM 序列生成上。这一延迟水平限制了其在实时交互场景中的直接应用，是当前方法的一个重要实际约束。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位与核心瓶颈
 
@@ -349,6 +357,8 @@ SCENECOT 的有效性受以下边界条件约束：
 5. **训练动态平衡**：不同子任务对 grounding loss 的敏感度不同（Figure 5 显示存在性任务受影响较小），如何平衡多任务训练以避免性能失衡？
 
 6. **真实场景验证**：在更多样的真实场景（如 AR/VR 环境、机器人操作场景）中验证方法的有效性和鲁棒性。
+
+
 
 ## 原文 PDF
 

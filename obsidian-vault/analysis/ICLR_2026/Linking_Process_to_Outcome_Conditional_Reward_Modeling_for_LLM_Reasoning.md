@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Linking_Process_to_Outcome_Conditional_Reward_Modeling_for_LLM_Reasoning.pdf
+project_link: https://foundation-model-research.github.io/CRM
+code_link: null
 openreview_forum_id: 4DJoBOQNd0
 aliases:
 - CRMC
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 过程与结果关联：基于条件奖励建模的大语言模型推理增强 |
 | 英文题名 | Linking Process to Outcome: Conditional Reward Modeling for LLM Reasoning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=4DJoBOQNd0); [Project](https://foundation-model-research.github.io/CRM) |
+| Links | [paper](https://openreview.net/forum?id=4DJoBOQNd0) · [Project](https://foundation-model-research.github.io/CRM) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | Conditional Reward Modeling (CRM) |
 | Dataset | MATH500 (Best-of-N @32), MATH500 (Beam Search N=100), AIME24 (RL VR Disabled) |
@@ -42,7 +44,7 @@ claims:
 > - MATH500 (Beam Search N=100) 上，Accuracy (%) 为 63.00±0.40，对比 58.80 (PQM, best baseline)，变化 +4.20。
 > - AIME24 (RL VR Disabled) 上，Pass@1 Accuracy (%) 为 43.3，对比 26.6 (PURE)，变化 +16.7。
 
-## 概述
+## 概要
 
 大语言模型在数学推理等任务中展现出的链式思考能力，催生了利用过程奖励模型（Process Reward Model, PRM）提供稠密监督信号的研究方向。然而，现有 PRM 普遍将每个推理步骤视为独立评估对象，忽略了步骤间的时序依赖关系，导致信用分配模糊——模型难以准确判断哪一步对最终结果产生了关键影响。更严重的是，这种孤立评估范式为奖励黑客（reward hacking）留下了空间：策略模型可能通过生成冗长但无意义的推理来骗取高分，而非真正提升推理质量。
 
@@ -52,7 +54,7 @@ claims:
 
 从方法谱系看，CRM 填补了现有奖励建模的关键缺口：**ORM**（Cobbe et al., 2021）仅提供最终步骤的稀疏奖励；**PRM**（Wang et al., 2024）虽引入步骤级监督，但各步独立分类，缺乏时序依赖与结果对齐；**PQM**（Li & Li, 2025）通过相对排序比较步骤优劣，但无法跨样本比较；**IPRM**（Yuan et al., 2025）隐式参数化结局总和，依赖关系模糊。CRM 通过显式建模条件概率 $h(t)$ 捕获因果链，并以 $r_t = \log(1 - h(t))$ 实现过程与结果的精确关联，在概率语义一致性和跨样本可比性上形成系统性优势。
 
-## 背景与动机
+
 
 大语言模型在数学推理、代码生成等需要多步推理的任务中展现出强大能力，但其推理过程的可靠性仍面临根本性挑战。当前主流方法通过过程奖励模型（Process Reward Model, PRM）对推理的每个步骤进行独立评估，试图为策略优化或轨迹选择提供稠密的监督信号。然而，这一范式存在两个核心瓶颈。
 
@@ -62,7 +64,9 @@ claims:
 
 CRM（Conditional Reward Modeling）正是针对上述瓶颈提出的解决方案。其核心动机在于：**将推理过程建模为向正确答案收敛的时间序列，通过条件概率显式捕获步骤间的依赖关系，并利用概率链式法则将过程奖励与最终结果精确关联。** 这一框架使得每步奖励具有一致的跨样本概率语义，从根本上抑制了奖励黑客行为，同时为信用分配提供了可解释的数学基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 现有过程奖励模型（PRM）的根本瓶颈在于将多步推理的每个步骤视为独立评估对象，忽略了步骤间的时序因果依赖，导致信用分配模糊——模型无法精确判断某一步骤的错误是否会导致最终失败，以及某一步骤的正确是否为最终成功做出贡献。CRM 通过三个关键维度的创新系统性地解决了这一问题。
 
@@ -96,7 +100,7 @@ CRM 的过程奖励 $r_t = \log(1 - h(t))$ 定义为一致的对数概率，具�
 
 上述三个创新的一个关键副产品是对奖励黑客（reward hacking）的强鲁棒性。在 RL 训练中，PRM 和 PQM 会迅速学会利用奖励模型的漏洞——生成冗长但无意义的重复内容以获取高奖励，导致下游准确率崩溃（Figure 4）。CRM 由于将每一步的奖励与最终正确概率紧密耦合，精确的信用分配使得策略模型无法通过表面模式欺骗奖励模型：任何不真正提升最终正确概率的行为都无法获得持续的高奖励。实验表明，CRM 在**不使用验证奖励**（VR Disabled）的情况下，AIME24 上达到 43.3%，远超 VR 基线的 30.0%（Table 3），且训练过程中未出现奖励与准确率背离的典型黑客现象。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l49_https_openreview_net_forum_id_4DJoBOQNd0/figures/002_Figure_1.jpg]]
 *Figure 1: (a) Comparison of reward modeling paradigms. Our CRM explicitly conditions each step reward on the previous reasoning steps and aligns it with the final outcome. (b) RL training with different reward models. Our CRM is more robust to reward hacking and achieves performance on par with training using verifier rewards (VR)*
@@ -131,7 +135,7 @@ CRM 模型的训练由三个损失项联合驱动（Figure 2 展示了其各自�
 
 三个损失项的协同作用使 CRM 既能从结果正确性中学习，又能精确感知错误发生的具体位置，从而在跨样本可比性（Figure 3，AUPRC 超越所有基线）和下游任务性能上取得一致优势。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化：推理作为时序过程
 
@@ -190,7 +194,9 @@ CRM 模型 $f_\phi$ 接收问题 $x$ 和部分步骤序列 $a_{\leq t}$，预测
 
 三个损失项的分工如 Figure 2 所示：$\mathcal{L}_S$ 和 $\mathcal{L}_W$ 分别从正负样本的最终结果层面提供监督信号，而 $\mathcal{L}_z$ 则提供步骤级的精细定位信息。消融实验（Table 4）表明，即使仅使用 10% 的 $\mathcal{L}_z$ 监督数据，CRM 的 Best-of-N 准确率已有显著提升（从完全不用时的 38.2% 提升至 47.6%@N=128），体现了较高的数据效率。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -250,7 +256,9 @@ Table 5 展示了 MMLU‑Pro‑CoT‑Eval 多领域基准上的 Best‑of‑N �
 
 尽管 CRM 在数学推理上表现优异，其训练仍依赖步骤级错误位置标注（$z_i$）。虽然数据效率较高，但标注成本可能限制其在大规模多领域任务上的快速扩展。当前验证主要集中在数学数据集，在更复杂的非结构化推理场景（如法律论证、医疗诊断）中的有效性仍需进一步验证。此外，CRM 奖励模型的可靠性依赖于基础语言模型的预训练能力，在规模较小或能力较弱的基模型上，奖励信号的准确性仍有待考察。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题瓶颈与范式转换
 
@@ -292,6 +300,8 @@ CRM 通过将推理建模为**时间序列过程**，引入风险函数 $h(t) = 
 2. **跨模态推广**：CRM 的条件概率建模框架能否推广到多模态推理或代码生成等更复杂任务？
 3. **大规模验证**：在更大策略模型（如 70B 参数级别）上，CRM 的过程奖励是否依然保持强鲁棒性和优化稳定性？
 4. **算法融合**：CRM 的稠密奖励能否与更先进的策略优化算法（如 GRPO、PPG）或直接偏好优化（DPO）范式结合，取得更优的推理能力提升？
+
+
 
 ## 原文 PDF
 

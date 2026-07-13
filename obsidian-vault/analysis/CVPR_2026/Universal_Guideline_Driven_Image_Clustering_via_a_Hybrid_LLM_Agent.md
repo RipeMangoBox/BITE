@@ -43,7 +43,7 @@ claims:
 > - CIFAR-10 上，ACC 94.1 (GCPM‑G + K‑Means) vs 93.4 (LFSS) (+0.7)。
 > - STL-10 上，ACC 98.8 (GCPM‑G + K‑Means) vs 97.4 (IC|TC) (+1.4)。
 
-## 概述
+## 概要
 
 图像聚类是视觉理解的基础任务，但现有方法面临一个根本性瓶颈：不同聚类场景（通用聚类、细粒度聚类、多准则聚类、长尾分布聚类）之间的任务差异导致方法高度碎片化，无法以统一、训练无关的方式灵活组合多种语义指南。传统基于视觉嵌入的方法难以解耦指南中隐含的复杂属性，导致视觉上相关但语义上无关的特征主导聚类结果，严重限制了跨场景的泛化能力。
 
@@ -53,7 +53,7 @@ claims:
 
 在方法谱系上，该工作区别于需要针对特定指南重新训练的深度聚类方法（如SCAN, Van Gansbeke et al., ECCV 2020；IDCTCL, Liu et al., NeurIPS 2024），也与仅支持单一文本条件的训练无关方法（如IC|TC, Kwon et al., arXiv 2023）形成对比。其训练无关、可即时切换多标准指南的特性，以及通过LLM混合推理实现自动簇数发现的机制，为图像聚类提供了一种灵活、高效且通用的新范式。
 
-## 背景与动机
+
 
 图像聚类旨在根据语义相似性自动将图像分组，是计算机视觉领域的基础任务。传统聚类方法通常依赖单一、隐式的语义标准，例如将“金毛犬”和“哈士奇”归为“狗”这一粗粒度类别。然而，现实世界的聚类需求远比这复杂——用户可能希望按“颜色”“材质”“品种”“使用场景”等不同指南对同一批图像进行划分，且这些指南往往需要灵活组合。这催生了**指南驱动图像聚类（Guideline-Driven Image Clustering）** 这一新范式。
 
@@ -74,7 +74,9 @@ claims:
 
 这些问题的解决将使得图像聚类从“单一标准、训练依赖”的范式转向“多标准、零训练”的新范式，显著降低实际部署的门槛。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于提出了一套**训练无关的混合LLM智能体框架**，首次实现以文本指南为统一接口的通用图像聚类。其关键因果操作体现在两个紧密协同的**changed slots**上，分别解决了现有方法在语义解耦与自适应聚类后处理上的根本瓶颈。
 
@@ -98,7 +100,7 @@ claims:
 
 上述两个changed slots并非孤立改进，而是形成因果闭环：GCPM提供的解耦嵌入为MST遍历提供了高质量的语义距离基础，使得MST上的Ward距离能够更准确地反映指南相关的簇间相似性；而MST遍历则弥补了GCPM嵌入在细粒度语义区分上的残余模糊性。两者协同实现了**训练无关、指南驱动、跨任务通用**的图像聚类范式，覆盖从通用聚类到细粒度聚类、从全局准则到局部准则、从平衡分布到长尾分布的全场景（Figure 1）。
 
-## 整体框架
+
 
 本文提出首个**通用指南驱动图像聚类框架**，其核心设计目标是解决现有方法因任务碎片化而无法以统一、训练无关的方式组合多种语义指南的瓶颈。如图1所示，框架将任意图像聚类需求抽象为文本指南 $G$ 驱动的统一范式：给定样本集 $X$ 和指南 $G$，输出符合该指南的聚类结果 $\mathcal{C} = f(G, X)$（Eq.1）。这一范式覆盖了从通用聚类到细粒度聚类、从全局准则到局部准则、从均衡分布到长尾分布的多种场景。
 
@@ -123,7 +125,7 @@ GCPM 的训练无关特性使其可即时切换不同指南，无需针对新准
 ![[assets/figures/papers/paper_list_l2427_https_openaccess_thecvf_com_content_CVPR2026_html_Zhong_Universal_Guidel/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of our Guideline-Driven Clustering Agent. We introduce the first universal clustering framework that handles diverse image clustering scenarios through textual guidelines, spanning from general to fine-grained tasks, from global to local criteria, and from balanced to long-tail distributions. Our training-free hybrid agent flexibly adapts across these diverse clustering requirements*
 
-## 核心模块与公式推导
+
 
 ### 问题形式化
 
@@ -189,7 +191,9 @@ $f_{merge}$ 根据指南 $G$ 返回二值决策 $p \in \{0, 1\}$。该设计的�
 ![[assets/figures/papers/paper_list_l2427_https_openaccess_thecvf_com_content_CVPR2026_html_Zhong_Universal_Guidel/figures/007_Figure_4.jpg]]
 *Figure 4: A disentanglement test case of cards grouped by suits using HDBSCAN. While using GME-Qwen with images only, the number criteria dominates the suit criteria because of the layout*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 通用聚类性能
 
@@ -252,7 +256,9 @@ $f_{merge}$ 根据指南 $G$ 返回二值决策 $p \in \{0, 1\}$。该设计的�
 ![[assets/figures/papers/paper_list_l2427_https_openaccess_thecvf_com_content_CVPR2026_html_Zhong_Universal_Guidel/figures/012_Table_8.jpg]]
 *Table 8: Comparison of number of LLM calls in MST Traversal across datasets and their ratios to the number of samples*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有聚类范式的结构性差异
 
@@ -291,6 +297,8 @@ $f_{merge}$ 根据指南 $G$ 返回二值决策 $p \in \{0, 1\}$。该设计的�
 3. **无监督指南生成的有效性。** 在缺乏明确指南的全无监督环境中，LLM 启发式生成的指南（Section 3.1, Appendix C.1）能否达到专家指定的效果？当前实验主要在已知准则的数据集上进行，自动指南的质量评估缺乏系统对比。
 
 4. **跨模态泛化能力。** 该方法的核心机制——概念代理建模与指令感知嵌入——在文本、视频等多模态聚类中的适用性如何？概念代理的生成范式是否可统一迁移至非图像模态，仍需进一步研究。
+
+
 
 ## 原文 PDF
 

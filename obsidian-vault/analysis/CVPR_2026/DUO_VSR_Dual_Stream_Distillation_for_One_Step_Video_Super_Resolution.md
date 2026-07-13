@@ -43,7 +43,7 @@ claims:
 > - UDM10 上，LPIPS ↓ 0.259 vs 0.267 (SeedVR2-7B) (-0.008)。
 > - YouHQ40 上，DOVER ↑ 87.28 vs 84.43 (DOVE) (+2.85)。
 
-## 概述
+## 概要
 
 视频超分辨率（VSR）旨在从低质量视频中恢复高分辨率细节。当前性能最强的方法普遍依赖多步扩散模型，其高昂的推理成本严重阻碍了实际部署。将扩散模型蒸馏为单步模型是一条有前景的加速路径，其中分布匹配蒸馏（DMD）在图像领域已展现出潜力。然而，直接将DMD应用于单步视频超分辨率面临三个核心瓶颈：
 
@@ -55,7 +55,7 @@ claims:
 
 在多个基准数据集上的实验表明，DUO-VSR在感知质量上达到最优或次优水平（如SPMCS DOVER 81.47，YouHQ40 DOVER 87.28），同时推理速度比SeedVR-7B快约50倍（见Figure 1）。消融研究证实，三阶段各自发挥关键作用：双流蒸馏将CLIPIQA从0.471提升至0.487，偏好精炼将DOVER从78.01提升至88.15（见Table 3）；联合优化显著优于顺序优化（见Table 4）。该方法解决了单步VSR中训练不稳定、监督退化和质量受限的三大难题，在效率与质量之间取得了突破性平衡。
 
-## 背景与动机
+
 
 ### 视频超分辨率的效率困境
 
@@ -81,7 +81,9 @@ claims:
 
 本文提出**DUO-VSR**，一个基于**双流蒸馏**（Dual-Stream Distillation）的三阶段框架。其核心洞察在于：通过引入一条与DMD并行的对抗学习流（RFS-GAN），利用真实与假分数模型的中间层特征作为判别信号，可以同时实现三个目标——（1）注入真实视频的监督信号以突破教师模型的质量瓶颈；（2）通过多模型特征互补抑制退化监督的偏差；（3）借助对抗训练的稳定性机制平滑整体优化过程。在此基础上，配合轨迹保持的渐进引导蒸馏初始化和偏好精炼后处理，构建从初始化到优化的完整解决方案。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DUO-VSR 的核心创新在于提出了一套**三阶段蒸馏框架**，系统性地解决了将分布匹配蒸馏（DMD）直接应用于单步视频超分辨率（VSR）时面临的三大瓶颈：训练不稳定、退化监督、以及质量上限受限。该框架通过三个关键的技术改变（changed slots）实现了突破。
 
@@ -131,7 +133,7 @@ $$-\mathbb{E}[\log \sigma(-\frac{\beta_t}{2}(||\mathbf{v}^w - \mathbf{v}_{\theta
 
 上述四个 changed slots 构成了 DUO-VSR 的完整创新链条：渐进引导蒸馏提供稳定初始化 → 双流蒸馏（DMD + RFS-GAN）联合优化突破质量瓶颈 → 偏好精炼进一步对齐感知质量。这一框架使 DUO-VSR 在多个基准上取得最优或次优的感知质量，同时推理速度比 SeedVR-7B 快约 50 倍（Figure 1, Table 1）。
 
-## 整体框架
+
 
 DUO-VSR 是一个三阶段单步视频超分辨率蒸馏框架，核心由**渐进引导蒸馏初始化**、**双流蒸馏**和**偏好引导精炼**三个阶段级联构成（图3）。框架的输入为低分辨率视频帧序列及其对应的文本嵌入，输出为单步生成的高分辨率视频。
 
@@ -168,7 +170,7 @@ DUO-VSR 是一个三阶段单步视频超分辨率蒸馏框架，核心由**渐�
 ![[assets/figures/papers/paper_list_l863_https_arxiv_org_abs_2603_22271/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of our three-stage distillation framework. (a) We initialize the student model with trajectory-preserving Progressive Guided Distillation, which consists of CFG Distillation and Progressive Distillation steps. (b) The core of our method, Dual-Stream Distillation, jointly optimizes the DMD and RFS-GAN streams through alternating Student Update and Auxiliary Update, providing reliable and sufficient supervision. (c) In the final stage, we construct a generated preference dataset and apply DPO-based Preference-Guided Refinement to enhance perceptual quality*
 
-## 核心模块与公式推导
+
 
 DUO-VSR 围绕一个三阶段蒸馏框架构建，其核心是将分布匹配与对抗监督统一的双流蒸馏策略。以下按模块拆解关键组件与公式。
 
@@ -244,7 +246,9 @@ $$-\mathbb{E}[\log \sigma(-\frac{\beta_t}{2}(\|\mathbf{v}^w - \mathbf{v}_{\theta
 ![[assets/figures/papers/paper_list_l863_https_arxiv_org_abs_2603_22271/figures/014_Figure_10.jpg]]
 *Figure 10: Discriminator features from the real and fake score models used for the RFS-GAN loss computation, reduced to three dimensions via t-SNE [39] for visualization*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：感知质量与推理效率的双重突破
 
@@ -297,7 +301,9 @@ $$-\mathbb{E}[\log \sigma(-\frac{\beta_t}{2}(\|\mathbf{v}^w - \mathbf{v}_{\theta
 ![[assets/figures/papers/paper_list_l863_https_arxiv_org_abs_2603_22271/figures/012_Figure_8.jpg]]
 *Figure 8: Examples of preferred and less-preferred samples in the constructed preference dataset. Zoom in for details*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 单步视频超分辨率的方法演进
 
@@ -372,6 +378,8 @@ DUO-VSR 在以下场景展现出显著优势：
 4. **更激进的压缩比**：是否可能将教师模型的采样步数从 50 步进一步压缩至单步，同时保持与多步教师相当的感知质量？这需要在蒸馏损失设计和对抗监督强度上进行更深入的探索。
 
 5. **跨模态扩展**：双流蒸馏策略中的 RFS-GAN 判别器设计（利用分数模型特征）是否适用于其他生成任务（如文本到视频生成、视频编辑）的单步蒸馏？
+
+
 
 ## 原文 PDF
 

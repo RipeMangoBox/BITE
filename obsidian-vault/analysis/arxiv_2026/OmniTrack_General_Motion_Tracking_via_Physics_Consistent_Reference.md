@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2026
 pdf_ref: paperPDFs/arxiv_2026/OmniTrack_General_Motion_Tracking_via_Physics_Consistent_Reference.pdf
+project_link: https://omnitrack-humanoid.github.io/
+code_link: null
 aliases:
 - OmniTrack
 tags:
@@ -40,7 +42,7 @@ claims:
 > - LAFAN1 Hard Motions 上，SR (%) 84.81 vs 67.40 (Dagger) (+17.41)。
 > - LAFAN1 Unseen Motions 上，SR (%) 96.88 vs 96.56 (Dagger) (+0.32)。
 
-## 概述
+## 概要
 
 类人机器人通用运动跟踪的核心瓶颈在于：从人体运动捕捉数据重定向得到的参考运动，往往包含穿透、漂浮、足部滑动等物理不可行伪影（Fig. 2）。这些伪影迫使控制策略在跟踪保真度与物理可行性之间做出根本性权衡——既要忠实复现目标姿态，又要维持机器人平衡与接触约束，导致现有方法难以稳定学习覆盖多样化运动类别、长时间跨度的通用控制策略。
 
@@ -51,8 +53,6 @@ OMNITRACK 的核心洞察是：**将物理可行性修复的负担从控制策�
 实验表明，物理一致性参考完全消除了穿透与漂浮伪影，并改善了运动平滑度（TABLE I: Penetration 0.0%, Floating 0.0%, Smoothness 31.8 vs 33.7）。使用物理参考训练的策略在全量 LAFAN1 数据集上保持 92.57% 成功率，而原始参考仅 88.18%，且 MPJPE 更优（TABLE A.8）。在困难高动态子集上，OMNITRACK 成功率达 84.81%，大幅超越 **BeyondMimic** (Mehta et al., arXiv 2025) 的 70.04%、**ExBody2** (Tessler et al., arXiv 2024) 的 58.93% 和 **OmniH2O** (He et al., arXiv 2024) 的 48.32%（TABLE III）。在真实 Unitree G1 机器人上，OMNITRACK 实现了一小时连续户外跟踪和侧手翻等高动态技能，验证了 sim-to-real 迁移的鲁棒性（Fig. 5, Fig. A.7）。
 
 在方法谱系上，OMNITRACK 与现有工作的关键差异在于物理可行性处理方式：**Dagger**（Ross et al., AISTATS 2011）、**AAC**（Pinto et al., arXiv 2017）等基线在单一策略中同时处理跟踪与物理可行性，而 OMNITRACK 将两者解耦为独立的生成与跟踪阶段。这一设计使其在通用运动覆盖、跟踪精度和真实世界鲁棒性上均取得显著优势。
-
-## 背景与动机
 
 ### 人形机器人运动跟踪的核心瓶颈
 
@@ -70,7 +70,7 @@ OMNITRACK 的核心洞察是：**将物理可行性修复的负担从控制策�
 
 实验表明，物理一致性参考完全消除了穿透和漂浮伪影，运动平滑度从33.7改善至31.8（TABLE I），且使用物理参考训练的策略在LAFAN1全数据集上保持92.57%成功率，显著优于原始参考的88.18%（TABLE A.8）。在真实Unitree G1机器人上，OMNITRACK实现了长达一小时的连续户外跟踪和侧手翻等高动态技能（Fig. 5, Fig. A.7），验证了该框架的sim-to-real迁移鲁棒性。
 
-## 核心创新
+## 核心方法与创新机理
 
 OMNITRACK 的核心创新在于**将物理可行性修复的负担从控制策略转移至参考生成阶段**，通过一个两阶段训练框架显式解耦“物理可行性”与“通用运动跟踪”这两个相互冲突的目标。
 
@@ -97,8 +97,6 @@ OMNITRACK 通过结构化解耦消除了上述冲突（Fig. 3）：
 ### 创新效果验证
 
 这一结构化解耦带来了可量化的性能提升。在 LAFAN1 数据集上，使用物理一致性参考训练的策略在全数据集上保持 **92.57%** 成功率，而使用原始参考仅 **88.18%**（TABLE A.8）。在高动态困难子集上，OMNITRACK 成功率达 **84.81%**，大幅超越 **BeyondMimic**（Mehta et al., arXiv 2025）的 70.04%、**ExBody2**（Tessler et al., arXiv 2024）的 58.93% 和 **OmniH2O**（He et al., arXiv 2024）的 48.32%（TABLE III）。在真实 Unitree G1 机器人上，该框架实现了长达一小时的连续户外跟踪及侧手翻等高动态技能，验证了 sim-to-real 迁移的鲁棒性（Fig. 5, Fig. A.7）。
-
-## 整体框架
 
 OMNITRACK 提出一种**两阶段学习框架**，其核心设计动机在于显式解耦物理可行性与通用运动跟踪之间的根本冲突。原始重定向人体运动参考中普遍存在穿透、漂浮、足部滑移等物理不可行伪影（Fig. 2），这些伪影迫使控制策略在跟踪精度与机器人稳定性之间进行内在权衡，严重阻碍了大规模、多样化运动数据上的稳定学习。OMNITRACK 的关键洞察是：**将物理可行性修复的负担从控制策略转移至参考生成阶段**，使跟踪策略面对的是动力学自洽的目标运动，从而可以专注于泛化与鲁棒性。
 
@@ -141,8 +139,6 @@ OMNITRACK 提出一种**两阶段学习框架**，其核心设计动机在于显
 
 ![[assets/figures/papers/paper_list_l60_https_arxiv_org_abs_2602_23832/figures/001_Figure_1.jpg]]
 *Figure 1: Capabilities of OMNITRACK in general motion tracking and real-time teleoperation. Leveraging physics-consistent reference motions, OmniTrack achieves general tracking across diverse motion categories, including balance control, highdynamic maneuvers, and contact-rich interactions. OmniTrack supports real-time teleoperation, enabling the execution of diverse human-style dynamic movements as well as interactive behaviors. These results demonstrate the generality of the framework in handling both physically demanding motions and unstructured motion commands*
-
-## 核心模块与公式推导
 
 OMNITRACK 将通用运动跟踪拆解为两个解耦的阶段，每个阶段均被形式化为马尔可夫决策过程（MDP），并使用 PPO 进行优化。这种解耦的核心动机在于：原始重定向的人体运动参考中存在穿透、漂浮、足部滑动等物理不可行伪影（Fig. 2），若直接在部分可观测条件下训练单一策略同时处理跟踪与物理可行性，将导致跟踪保真度与机器人稳定性之间的根本冲突。两阶段框架将物理可行性修复的负担从控制策略转移至参考生成阶段，使阶段 II 的策略无需处理不可行目标。
 
@@ -188,7 +184,7 @@ $$\exp \Big( - \big( \frac{1}{|\mathcal{B}|} \sum_{b \in \mathcal{B}} \| \log( \
 ![[assets/figures/papers/paper_list_l60_https_arxiv_org_abs_2602_23832/figures/005_Figure_4.jpg]]
 *Figure 4: Impact of physically plausible motions under varying dataset sizes. From left to right: mean reward and mean episode length during training, followed by success rate and tracking error (MPJPE) under different dataset sizes (1/8, 1/2, and full LAFAN1). Dark colors denote training with physically plausible motions, while light colors denote training with raw reference motions*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心发现：物理一致性参考消除训练瓶颈
 
@@ -267,13 +263,10 @@ TABLE A.8 系统性地考察了数据集规模与参考类型的交互效应。�
 ![[assets/figures/papers/paper_list_l60_https_arxiv_org_abs_2602_23832/figures/013_Table.jpg]]
 *Table: A.8: Effect of Dataset Size and Reference Type on Controller Performance*
 
-![[assets/figures/papers/paper_list_l60_https_arxiv_org_abs_2602_23832/figures/014_Figure.jpg]]
-*Figure: Fig. A.7: One-hour continuous outdoor motion tracking without reset. Starting from a fully charged battery, the robot continuously performs motion tracking in an outdoor environment for one hour until the battery is depleted. Please refer to the supplementary video demo for the full execution*
-
 ![[assets/figures/papers/paper_list_l60_https_arxiv_org_abs_2602_23832/figures/015_Figure.jpg]]
 *Figure: Fig. A.8: VR Headset Real-time Teleoperation on the Humanoid Robot. The raw SMPL motion is captured using the Pico VR Headset and then retargeted to the humanoid robot via GMR. The retargeted motion is further processed by the physical motion generation stage to produce physically consistent motions, which are finally tracked by the robot through the general motion tracking stage, enabling real-time teleoperation*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 核心思路定位：物理可行性与运动跟踪的结构化解耦
 

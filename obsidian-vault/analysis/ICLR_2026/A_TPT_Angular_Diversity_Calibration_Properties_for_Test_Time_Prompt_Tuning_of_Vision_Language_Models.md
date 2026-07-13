@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/A_TPT_Angular_Diversity_Calibration_Properties_for_Test_Time_Prompt_Tuning_of_Vision_Language_Models.pdf
+project_link: https://mb-shihab-aaqil-ahamed.github.io/A-TPT/
+code_link: https://github.com/MB-Shihab-Aaqil-Ahamed/A-TPT/
 aliases:
 - A-TPT
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | A-TPT：测试时提示调优的角度多样性校准特性 |
 | 英文题名 | A-TPT: Angular Diversity Calibration Properties for Test-Time Prompt Tuning of Vision-Language Models |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=VhlSBZebEw); [GitHub](https://github.com/MB-Shihab-Aaqil-Ahamed/A-TPT/); [Project](https://mb-shihab-aaqil-ahamed.github.io/A-TPT/) |
+| Links | [paper](https://openreview.net/forum?id=VhlSBZebEw) · [GitHub](https://github.com/MB-Shihab-Aaqil-Ahamed/A-TPT/) · [Project](https://mb-shihab-aaqil-ahamed.github.io/A-TPT/) |
 | Topic | #topic/safety_alignment_fairness_privacy #topic/safety_alignment_fairness_privacy/safety_security |
 | Method | A-TPT |
 | Dataset | Fine-grained datasets (11 datasets, CLIP ViT-B/16, overall), Fine-grained datasets (CLIP ViT-B/16, N>\ |
@@ -42,13 +44,13 @@ claims:
 > - Fine-grained datasets (CLIP ViT-B/16, N>\|D\| and N<\|D\|) 上，ECE 为 2.92 (N>\|D\|), 3.60 (N<\|D\|)，对比 C-TPT: 5.13 (N>\|D\|), 5.72 (N<\|D\|); O-TPT: 4.23 (N>\|D\|), 4.48 (N<\|D\|)，变化 ↓2.21/0.80 vs C-TPT; ↓1.31/0.88 vs O-TPT。
 > - Natural distribution shifts (ImageNet-V2/A/R/Sketch, CLIP ViT-B/16) 上，ECE 为 3.92，对比 C-TPT: 5.82, O-TPT: 4.88，变化 ↓1.90 vs C-TPT, ↓0.96 vs O-TPT。
 
-## 概述
+## 概要
 
 测试时提示调优（TPT）使视觉语言模型在无标注条件下自适应，但现有校准策略——例如 C-TPT 采用的平均文本特征分散（ATFD）和 O-TPT 引入的正交性约束——在类别数量超过嵌入维度时，无法保证文本特征在单位超球面上均匀分布，导致期望校准误差（ECE）显著升高。针对这一瓶颈，本文提出 **A-TPT**，将角度多样性正则项加入 TPT 目标，显式地最大化归一化文本特征之间的最小成对角度距离，该思路在数学上对应于 Tammes 最佳填充问题。与简单分散或强制正交相比，角度多样性能够更可靠地推动文本特征均匀散布，从而持续降低校准误差，且梯度在成对角度趋零时仍保持稳定（相较于正交性约束），避免了梯度消失。
 
 实验在 11 个细粒度数据集上使用 CLIP ViT‑B/16 骨干进行整体评估：A‑TPT 的 ECE 降至 3.26，而 C‑TPT 和 O‑TPT 分别为 5.42 和 4.36，准确率相当；在自然分布偏移数据集上，A‑TPT 的平均 ECE 也降低至 3.92。即使类别数大于或小于嵌入维度，A‑TPT 均展现出最低的 ECE（分组结果分别为 2.92 和 3.60），且 Pareto 前沿分析确认其准确率‑校准误差权衡优于所有基线。该方法额外计算开销与 O‑TPT 相当，可作为即插即用的校准模块嵌入现有 TPT 流程，但在语义高度重叠的条件下偶尔伴有微小准确率下降，实际应用需结合任务特性综合权衡。
 
-## 背景与动机
+
 
 视觉-语言模型（如CLIP）在零样本分类任务中展现出强大能力，但其预测置信度往往与实际准确率存在显著偏差——这一校准误差（Expected Calibration Error, ECE）问题严重影响了模型在高风险应用中的可靠性。测试时提示调优（Test-Time Prompt Tuning, TPT）通过在测试阶段以无监督方式优化可学习的提示向量，在提升零样本准确率的同时，也引入了新的校准挑战：如何在不牺牲准确率的前提下，使模型的概率输出真实反映其预测的正确性。
 
@@ -58,7 +60,9 @@ claims:
 
 本文的核心动机正是揭示并解决这一瓶颈：提出角度多样性（Angular Diversity, AD）作为即插即用的正则项，以最大化最小成对角度距离为目标，促进文本特征的均匀分布。该方法具有两项关键优势。首先，梯度稳定性：A-TPT的梯度范数与成对角度无关，始终为嵌入向量模长的倒数（$1 / \|\mathbf{e}_i\|$），即使特征向量互相靠近也保持稳定优化；相比之下，O-TPT依赖的正交性梯度在角度趋近于0时消失，导致优化停滞。其次，维度无关性：无论类别数是大于还是小于嵌入维度，A-TPT均能维持均匀分布，避免了正交性约束在高类别数下的灾难性失效。由此，A-TPT在保持与TPT可比准确率的同时，能系统性地降低校准误差，如表1的整体ECE降至3.26，远低于C-TPT的5.42和O-TPT的4.36。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 A-TPT 的核心创新在于针对测试时提示调优（TPT）中的校准瓶颈，提出了一种新的正则化机制——角度多样性（Angular Diversity），从根本上改变了文本特征的分布策略。
 
@@ -108,7 +112,7 @@ Table 1 的综合结果显示，A-TPT 在细粒度数据集上的整体 ECE 降�
 
 综上所述，A-TPT 的创新在于从"分散特征"或"强制正交"的粗粒度策略，升级为"求解角度均匀分布"的精细优化，从根源上解决了 TPT 校准中的特征坍缩与梯度消失问题。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0005_VhlSBZebEw_A-TPT_Angular_Diversity_Calibration_Properties_f/figures/002_Figure_2.jpg]]
 *Figure 2: Comparison of numerical optimization (A-TPT (Ours)) with angular optimization (O-TPT Sharifdeen et al. (2025)) and ATFD optimization (C-TPT Yoon et al. (2024))*
@@ -144,7 +148,7 @@ A-TPT 的整体流程在标准测试时提示调优（TPT）的基础上引入�
 
 整体框架将校准需求直接编码进提示调优的损失函数，使得在无标签测试样本上不仅能适应分布偏移，还能提供良好校准的概率估计。与现有校准型测试时提示方法相比，A‑TPT 的计算开销与 O‑TPT 相近，但能稳定地给出更低的 ECE（预期校准误差），并且在类别维度关系 $N > |D|$ 和 $N < |D|$ 两种情境下均表现出鲁棒优势。
 
-## 核心模块与公式推导
+
 
 A‑TPT 在标准测试时提示调优（TPT）的框架上，引入一个**角度多样性正则项**，使文本特征在单位超球面上趋于均匀分布，从而显著降低预期校准误差（ECE）。其核心模块包括：(1) CLIP 图像/文本编码器，提取测试图像与类别提示的特征；(2) 无监督熵最小化模块（标准 TPT 损失）；(3) **角度多样性计算模块**，负责度量归一化文本特征之间的最小成对角度距离，并作为损失项反向传播。
 
@@ -192,7 +196,9 @@ $$
 
 这意味着即使两个类别特征几乎重合（$\theta \to 0$），梯度依然保持稳定。相比之下，基于正交性约束的 O‑TPT 中，梯度的范数正比于 $\sin\theta_{ij}$，当角度趋近于 0 时梯度消失，导致优化停滞。A‑TPT 的梯度特性是其能在类别数多于或少于嵌入维度的情况下均维持低校准误差的关键原因。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 **总体校准性能** A‑TPT 的核心优势在于显著降低预期校准误差（ECE）而不牺牲识别准确率。在覆盖细粒度、自然分布偏移和医学图像的 11 个数据集上，A‑TPT 的整体 ECE 为 **3.26**，相比 C‑TPT 的 5.42 降低 2.16，相比 O‑TPT 的 4.36 降低 1.10（Table 1）。更重要的是，这一收益在类别数大于和小于嵌入维度两种设定下均成立：当 N > |D| 时 ECE 为 2.92，N < |D| 时为 3.60，远低于 C‑TPT 的 5.13/5.72 和 O‑TPT 的 4.23/4.48（Table 2）。在自然分布偏移场景下，A‑TPT 同样保持最低平均 ECE（3.92），优于 O‑TPT 的 4.88 和 C‑TPT 的 5.82（Table 3）。医学影像任务 ISIC 2018 上，FPT + A‑TPT 将 ECE 降至 0.0794，较 FPT+O‑TPT 的 0.1381 降低近 42%（Table 4）。
 
@@ -228,7 +234,9 @@ $$
 - **Figure 7**：梯度分析解释了 A‑TPT 的几何优势——恒定的梯度范数避免了 O‑TPT 在向量靠近时的优化停滞。  
 - **Figure 14**：Pareto 前沿证实 A‑TPT 在不损失准确率的前提下取得最优校准，方法具有真实的增益而非指标间折衷。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 从分散到均匀：A-TPT在测试时提示调优谱系中的位置
 
@@ -271,6 +279,8 @@ A‑TPT的有效性跨越了三个关键维度：
 - **理论与几何支撑**：A‑TPT本质上求解Tammes问题，但其在非均匀类别先验或层次化分类树中的最优填充形态尚无理论描述，这可为设计更精细的权重方案提供依据。
 
 综合而言，A‑TPT凭借角度多样性这一简单而本质的几何先验，在测试时提示调优中建立了新的校准基线。它不仅统一并超越了前代分散和正交策略，而且以即插即用的形式嵌入更广泛的提示学习框架，为视觉‑语言模型的不确定性校准开辟了从特征分布均匀性入手的可行路径。
+
+
 
 ## 原文 PDF
 

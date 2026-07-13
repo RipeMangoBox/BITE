@@ -43,7 +43,7 @@ claims:
 > - Real-world NFH-SEM dataset (TPL, pollen, SiC) 上，Qualitative accuracy (local details, overall shape) 高保真，恢复478 nm层、782 nm纹理、1.559 μm台阶 vs 多视图过平滑/缺失细节，单视图全局畸变 (显著改善)。
 > - Real-world NFH-SEM dataset (learning-based comparison) 上，Reconstruction completeness and surface distortion 完整且准确的表面 vs NeuS/2DGS/PGSR等产生严重畸变和不完整几何 (定性大幅领先)。
 
-## 概述
+## 概要
 
 扫描电子显微镜（SEM）是材料科学、生物学和微纳制造领域不可或缺的成像工具，但传统SEM三维重建方法长期受制于**无纹理区域匹配困难、阴影伪影干扰、探测器校准依赖参考样品**三大瓶颈。多视图立体方法在平滑表面区域缺乏可匹配特征，单视图光度立体方法则因依赖固定经验公式而易产生全局畸变，而新兴的学习型重建方法因缺乏SEM物理先验与领域数据而无法泛化至微观尺度。
 
@@ -54,8 +54,6 @@ claims:
 实验验证覆盖模拟与真实两类数据。在模拟数据集上，NFH-SEM的平均Chamfer距离为**17.48 nm**、法向角度误差为**3.70°**，相比单视图光度立体（512.22 nm, 12.99°）和粗初始化（25.11 nm, 7.85°）有数量级提升。在真实样品上，NFH-SEM一致优于传统多视图与单视图方法，精确恢复**478 nm**打印层、**782 nm**表面纹理和微米级断裂台阶等细节。阴影分离模块实现平均检测准确率**81.7%**，自动排除遮挡区域对训练的干扰。
 
 **局限与开放问题**：当前模型假设均匀电子发射系数（依赖样品涂层），对无涂层或低导电率样品可能因充电效应导致图像漂移；极端遮挡下所有BSE象限均无信号时无法恢复几何；缺乏真实微纳尺度真值限制了非TPL样品的绝对精度验证。未来方向包括：扩展为材料感知的发射模型以适应多相样品、直接在SEM数据上联合优化相机位姿、融合SE信号边缘效应作为额外几何线索，以及将物理模拟约束反哺到训练中。
-
-## 背景与动机
 
 ### 微观三维表面重建的科学需求
 
@@ -91,7 +89,7 @@ $$\frac{\partial z}{\partial x} = \frac{c}{d} \frac{I_A(n) - I_B(n)}{I_A(n) + I_
 
 这一思路催生了NFH-SEM——一个将多视图粗几何先验与多探测器光度线索在连续神经场中融合的混合重建框架。其关键创新在于：以可学习的四阶多项式发射项 $\mathbf{R}(\theta) = 1 + p_1 \theta + p_2 \theta^2 + p_3 \theta^3 + p_4 \theta^4$ 替代固定的 $\sec(\theta)$ 模型，并与象限独立参数 $(c_i, d_i, e_i)$ 一同在训练中优化，从而突破了传统方法对经验公式和人工标定的依赖。
 
-## 核心创新
+## 核心方法与创新机理
 
 ### 瓶颈与突破
 
@@ -125,8 +123,6 @@ NFH-SEM采用**三阶段训练策略**（Eq.11）逐步融合多源信息：阶�
 
 NFH-SEM的方法论创新可归结为一个核心范式转换：**将SEM成像物理从固定的预处理步骤转变为可学习的、与几何表示协同优化的组件**。这一转变使得原本需要人工校准、易受阴影干扰、依赖经验公式的BSE信号，成为神经场优化中的有效几何线索。与通用学习型方法（NeuS、2DGS、PGSR等）的本质区别在于：NFH-SEM并非在通用视觉先验上做领域迁移，而是将SEM特有的电子散射物理直接编码进网络优化循环，从而在微观尺度上实现了通用方法无法企及的精度和鲁棒性。
 
-## 整体框架
-
 NFH-SEM 构建了一条 **多视图初始化 → 神经场联合优化 → 高保真表面提取** 的三阶段混合重建管线，其核心设计在于将可学习的 SEM 物理前向模型嵌入 SDF 神经场的优化循环中，使多视图几何与多探测器光度信息在统一框架下相互增强。
 
 ### 输入与数据流
@@ -158,11 +154,6 @@ NFH-SEM 构建了一条 **多视图初始化 → 神经场联合优化 → 高�
 
 ![[assets/figures/papers/paper_list_l2088_https_arxiv_org_abs_2508_04728/figures/008_Figure.jpg]]
 *Figure: A1. Overview of the SEM imaging setup for multi-view and multi-detector scanning. External photograph of the SEM system used in our experiments and internal chamber views with the motorized specimen stage in flat and tilted positions*
-
-![[assets/figures/papers/paper_list_l2088_https_arxiv_org_abs_2508_04728/figures/002_Figure_2.jpg]]
-*Figure 2: Workflow of NFH-SEM. (a) Multi-view and multi-detector SEM scanning of a sample mounted on a motorized stage. (b) 4Q-BSE images provide directional illumination with shadows caused by geometric occlusion. (c) Multi-view reconstruction initialization. (d) The posed depth maps and 4Q-BSE images jointly supervise an SDF-based neural field. A learnable BSE forward model is self-calibrated during training. (e) The reconstructed surface extracted from the neural field exhibits high geometric fidelity and rich surface details*
-
-## 核心模块与公式推导
 
 ### 3.1 BSE信号形成的物理模型
 
@@ -223,7 +214,7 @@ $$\mathcal{L} = \begin{cases} \lambda_1 \mathcal{L}_d + \lambda_2 \mathcal{R}_s 
 ![[assets/figures/papers/paper_list_l2088_https_arxiv_org_abs_2508_04728/figures/003_Figure_3.jpg]]
 *Figure 3: Emission of the BSE signal from the sample surface and its detection by the 4Q-BSE detector*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 模拟数据集定量评估
 
@@ -278,9 +269,6 @@ NFH-SEM通过嵌入可学习BSE前向模型$\mathcal{F}_i(n) = R(\theta_n)[d_i\c
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l2088_https_arxiv_org_abs_2508_04728/figures/006_Figure_6.jpg]]
-*Figure 6: Simulation results. (a) Our simulated 4Q-BSE images are highly consistent with real 4Q-BSE observations, demonstrating our accurate modeling of BSE signal formation. (b) These curves are obtained by fixing φ and the learned parameters in Eq. (6) to derive the relationship between BSE intensity and θ. The estimated BSE forward model closely matches the ground truth across all detector quadrants. (c) NFH-SEM automatically separates most shadowed regions in the 4Q-BSE images, producing shadow intensity maps that align well with the ground truth. The percentage at the bottom right denotes the shadow detection accuracy (see supplementary material)*
-
 ![[assets/figures/papers/paper_list_l2088_https_arxiv_org_abs_2508_04728/figures/005_Figure_5.jpg]]
 *Figure 5: Qualitative comparison with learning-based 3D reconstruction methods on real-world dataset. NFH-SEM achieves more accurate reconstructions than approaches that neglect the SEM signal generation model or lack generalization to SEM domains*
 
@@ -298,7 +286,7 @@ NFH-SEM通过嵌入可学习BSE前向模型$\mathcal{F}_i(n) = R(\theta_n)[d_i\c
 
 ![[assets/figures/papers/paper_list_l2088_https_arxiv_org_abs_2508_04728/figures/013_Figure.jpg]]
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 问题定位：SEM三维重建的瓶颈与范式转移
 

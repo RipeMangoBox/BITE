@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/DreamOn_Diffusion_Language_Models_For_Code_Infilling_Beyond_Fixed_size_Canvas.pdf
+project_link: null
+code_link: https://github.com/DreamLM/DreamOn
 openreview_forum_id: EQTPmqukiU
 aliases:
 - DreamOn
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | DreamOn：面向代码补全的突破定长生成扩散语言模型 |
 | 英文题名 | DreamOn: Diffusion Language Models For Code Infilling Beyond Fixed-size Canvas |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=EQTPmqukiU); [GitHub](https://github.com/DreamLM/DreamOn) |
+| Links | [paper](https://openreview.net/forum?id=EQTPmqukiU) · [GitHub](https://github.com/DreamLM/DreamOn) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/diffusion_image_video |
 | Method | DREAMON |
 | Dataset | HumanEval-Infilling single-line, HumanEval-Infilling multi-line, SantaCoder-FIM |
@@ -41,7 +43,7 @@ claims:
 > - HumanEval-Infilling multi-line 上，Pass@1 为 63.8，对比 43.2，变化 +20.6。
 > - SantaCoder-FIM 上，Exact Match 为 79.0，对比 59.3，变化 +19.7。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有扩散语言模型（DLMs）在代码补全等变长生成任务中存在根本性限制——它们要求输入和输出序列具有相同的固定长度。当预设掩码长度与真实补全长度不匹配时，模型无法动态决定输出长度，导致性能急剧下降。在 HumanEval-Infilling 上，这种长度不匹配使扩散基线的平均性能下降 38%（Table 2）。
 
@@ -51,7 +53,7 @@ claims:
 
 **关键结果**：DREAMON 使扩散基线在 HumanEval-Infilling 和 SantaCoder-FIM 上的平均绝对性能提升 26.4%（Table 1）。具体而言，在 HumanEval-Infilling 单行子集上，DiffuCoder-7B + DREAMON 达到 92.1 Pass@1，较基线提升 36.6 个百分点；在多行子集上，DreamCoder-7B + DREAMON 达到 63.8 Pass@1，与顶级自回归模型相当并有所超越。此外，DREAMON 在不同初始掩码长度下保持稳定性能，接近使用真实长度的 Oracle 性能（Table 2），有效解决了固定长度扩散模型对掩码长度敏感的核心痛点。
 
-## 背景与动机
+
 
 代码补全（code infilling）是生成式代码模型的核心能力之一，要求在给定的上下文前缀和后缀之间生成语法正确、语义连贯的代码片段。近年来，扩散语言模型（Diffusion Language Models, DLMs）凭借其在非自回归生成中展现的全局一致性和可控性，成为该任务的重要技术路线。然而，现有扩散模型在实际部署中面临一个根本性的瓶颈：**输入与输出序列必须保持相同的固定长度**。
 
@@ -61,7 +63,9 @@ claims:
 
 DREAMON 的提出正是针对这一瓶颈。其核心动机在于：**将长度控制从外部超参数转变为模型内部的可学习行为**，使扩散模型在推理时能够根据自身预测动态地扩展或收缩掩码序列，从而解耦生成质量与初始长度假设。这一设计无需任何架构改动，仅通过引入两个特殊状态令牌和相应的训练-推理协议即可实现，为扩散语言模型在变长代码补全任务上的规模化应用铺平了道路。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DreamOn 的核心创新在于为掩码扩散语言模型（DLM）引入了**原生的可变长度生成能力**，从而破解了现有扩散模型在代码补全等变长任务中因“固定长度画布”导致的性能崩塌。其创新围绕三个紧密耦合的 changed slots 展开。
 
@@ -93,7 +97,7 @@ DreamOn 的推理过程（Algorithm 2, §3.3）摒弃了传统的固定掩码调
 
 DreamOn 的三个 changed slots 形成完整闭环：数据增强构建包含伸缩信号的辅助序列 → 带权损失平衡伸缩令牌的训练贡献 → 自适应推理实现端到端的变长生成。这套机制使扩散模型首次在代码补全任务上摆脱了对预设长度的依赖，在不同初始掩码长度下均保持接近 Oracle 水平的稳定性能（Table 2, §5.1），为扩散语言模型在变长生成场景的实用化铺平了道路。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l49_https_openreview_net_forum_id_EQTPmqukiU/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the augmented diffusion process. Top: the forward augmentation-andnoising procedure maps the input sequence $\mathbf { x } _ { \mathrm { 0 } }$ to an augmented latent $\mathbf { z } _ { 0 }$ containing [expand] and [delete] states, and then applies a standard masked diffusion process over $\mathbf { z } _ { 0 }$ to obtain $\mathbf { z } _ { t }$ and eventually $\mathbf { z } _ { T }$ . Bottom: a single denoising step where [mask] positions in $\mathbf { z } _ { t }$ can be predicted as either regular tokens or special states; [expand] deterministically expands into two [mask] tokens, while [delete] will remove the corresponding position, yielding a new sequence $\mathbf { z } _ { t - 1 }$ wit...
@@ -119,7 +123,7 @@ DreamOn 的整体框架围绕一个核心思想展开：在标准掩码扩散语
 - **长度上限**：掩码扩展上限设为 $L_{\max} = 128$，达到后禁用扩展。
 - **训练计算量**：仅为基础模型预训练计算量的 0.15%。
 
-## 核心模块与公式推导
+
 
 ### 3.1 数据增强与扩散过程
 
@@ -149,7 +153,9 @@ $$w _ { n } = \frac { \mathscr { N } _ { m a s k } } { \mathscr { N } _ { m a s 
 
 为加速长度收敛，DREAMON 引入广播删除机制：一旦模型预测出 `[delete]`，若其右侧所有令牌均为 `[mask]`，则一并消除这些 `[mask]` 令牌。该机制将多行补全子集上的平均推理步数从 122.8 步降至 52.4 步（加速约 2.1 倍），而性能仅下降 0.6%（Table 3）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈：固定掩码长度导致的性能崩溃
 
@@ -198,7 +204,9 @@ Table 3 和 Figure 5 系统性地检验了 DREAMON 各设计组件的贡献：
 ![[assets/figures/papers/paper_list_l49_https_openreview_net_forum_id_EQTPmqukiU/figures/010_Table_4.jpg]]
 *Table 4: Rouge-L scores on the ROCStories corpus across variable initial mask lengths*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 扩散语言模型的定长瓶颈与 DREAMON 的定位
 
@@ -255,6 +263,8 @@ DREAMON 的方法贡献可分解为三个相互依赖的模块，消融实验揭
 3. **更原则性的推理公式**：当前的推理过程（Algorithm 2）依赖于启发式的自适应去掩码预算 $n$ 和广播删除规则。论文指出，为掩码扩散模型中的灵活推理开发更具原则性的公式化方法是一个重要的理论方向。
 
 4. **长度预测的精度**：广播删除机制虽然高效，但在某些情况下可能过度删除（当 `[delete]` 右侧并非全部为 `[mask]` 时不会触发广播）。更精细的长度预测策略（如独立的长度预测模块）可能进一步提升性能，但需要额外的设计复杂度和训练成本。
+
+
 
 ## 原文 PDF
 

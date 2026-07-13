@@ -43,7 +43,7 @@ claims:
 > - Qwen-2.5-VL-7B (five benchmarks: POPE, SQAI, VQAT, MME, GQA) 上，相对平均准确率 (Avg%) 99.9% (640 tokens); 99.8% (320 tokens); 98.4% (160 tokens) vs 100.0% (dynamic tokens) (-0.1% at 640, -0.2% at 320, -1.6% at 160 tokens)。
 > - LLaVA-1.5-7B trained (five benchmarks: POPE, SQAI, VQAT, MME, GQA) 上，相对平均准确率 (Avg%) 99.7% (192 tokens); 99.1% (128 tokens); 97.2% (64 tokens) [DUET-VLM (C)] vs 100.0% (576 tokens LLaVA-1.5-7B) (-0.3% at 192, -0.9% at 128, -2.8% at 64 tokens)。
 
-## 概述
+## 概要
 
 视觉语言模型（VLM）在理解多模态内容方面取得了长足进步，但其高昂的计算开销——根源在于密集的视觉分词——严重制约了实际部署。以 **LLaVA-1.5-7B**（Liu et al., CVPR 2024）为例，单张图像产生576个视觉token，而 **LLaVA-NeXT** 更是超过2800个token，导致计算和内存成本随分辨率平方级增长。现有压缩方法或过早合并造成细粒度信息损失（如 **VisionZip**, Yang et al., CVPR 2025），或采用统一丢弃策略缺乏语义适应性（如 **PyramidDrop**, Xing et al., CVPR 2025），未能联合优化冗余消除与上下文感知保留这一核心矛盾。
 
@@ -57,7 +57,7 @@ claims:
 
 消融实验进一步揭示：局部聚类聚合是一种即插即用的压缩策略，能够一致提升VisionZip和DUET-VLM的性能，在低token预算下增益尤为明显（Table 7, Table 10）；文本引导的token选择（显著性token或全部查询token）优于仅依赖最后一个文本token的方案（Table 8, Table 11）。
 
-## 背景与动机
+
 
 ### 视觉语言模型的Token膨胀困境
 
@@ -82,7 +82,9 @@ claims:
 
 这种双阶段设计——**DUET-VLM**——将视觉冗余感知的token合并（V2V局部聚类）与文本引导的逐层token丢弃（T2V显著性裁剪）协同组合，两个阶段互补适配不同压缩率，从而在推理和训练两个场景下均实现优异的精度-效率权衡。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DUET-VLM 的核心创新在于首次将**视觉冗余感知的token合并**与**文本引导的逐层token丢弃**耦合为一个统一的双阶段压缩框架，从根本上改变了现有VLM中视觉token压缩的范式。与先前方法仅在编码器侧或语言模型侧进行单点压缩不同，DUET-VLM通过两个互补阶段的协同优化，在极低token预算下实现了高精度保持。
 
@@ -136,7 +138,7 @@ DUET-VLM的另一个关键创新在于**训练与推理阶段的统一**。现�
 
 实验结果表明（Table 3, Table 6），在LLaVA-1.5-7B训练中启用DUET-VLM，可在67% token压缩下保持99.7%平均准确率，同时训练时间减少31%。这一“训练即压缩”的范式为高效VLM训练提供了新的技术路径。
 
-## 整体框架
+
 
 DUET-VLM 提出了一种**双阶段统一视觉分词压缩框架**，将视觉语言模型的 token 压缩分解为两个互补且可协同优化的阶段：在视觉编码器侧进行**冗余感知的 token 合并**，随后在语言模型侧进行**文本引导的逐层 token 丢弃**。该框架以即插即用的方式工作，无需修改底层 VLM 架构。
 
@@ -183,7 +185,7 @@ DUET-VLM 通过调节三个关键超参数适配不同的压缩率需求：主�
 ![[assets/figures/papers/paper_list_l2218_https_arxiv_org_abs_2602_18846/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the proposed pipeline. An input image is first encoded into N visual tokens by the Vision Encoder. (A) Based on the V2V self-attention map*
 
-## 核心模块与公式推导
+
 
 DUET-VLM 的核心由一个双阶段压缩管线构成：**视觉侧冗余感知的局部聚类合并**（Stage 1）与**语言侧文本引导的逐层token丢弃**（Stage 2）。两者协同工作，在消除冗余的同时保留语义关键的视觉信息。
 
@@ -240,7 +242,9 @@ $$\mathbf{X}_{\mathrm{out}} = \mathbf{X}_{\mathrm{dom}} \cup \mathbf{X}_{\mathrm
 ![[assets/figures/papers/paper_list_l2218_https_arxiv_org_abs_2602_18846/figures/016_Figure_5.jpg]]
 *Figure 5: Performance of various dropping configurations in the language backbone on TextVQA using all text tokens. Red crosses indicate configurations in which all visual tokens are removed at some layer prior to the final layer*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -365,7 +369,9 @@ DUET-VLM的实验体系围绕三个核心维度展开：**推理侧压缩**（in
 ![[assets/figures/papers/paper_list_l2218_https_arxiv_org_abs_2602_18846/figures/007_Figure_3.jpg]]
 *Figure 3: Ablation on varying cluster width of DUET-VLM (C) on VQAT benchmark on LLaVA-1.5-7B for different token budgets*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心创新与差异化定位
 
@@ -426,6 +432,8 @@ DUET-VLM 建立在两条互补的技术路线之上，并对其进行了实质�
 6. **与其他加速技术的协同**：DUET-VLM 的token压缩与KV缓存压缩、模型量化、投机解码等技术是否存在叠加增益或冲突？联合优化的帕累托前沿尚未探索。
 
 7. **理论分析**：局部聚类聚合为何优于全局平均？是否存在信息论角度的解释（如互信息保留量）？文本引导丢弃的收敛性质如何？这些理论问题有助于指导更优的算法设计。
+
+
 
 ## 原文 PDF
 

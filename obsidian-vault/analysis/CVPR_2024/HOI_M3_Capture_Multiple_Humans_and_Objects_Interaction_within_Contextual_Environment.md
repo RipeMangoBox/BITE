@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2024
 pdf_ref: paperPDFs/CVPR_2024/HOI_M3_Capture_Multiple_Humans_and_Objects_Interaction_within_Contextual_Environment.pdf
+code_link: null
 project_link: https://juzezhang.github.io/HOIM3_ProjectPage
 aliases:
 - HMMOSMHCCDG
@@ -42,7 +43,7 @@ claims:
 > - HOI-M3 Multiple HOI Capture 上，PCK_rel (All) 68.5 vs 43.9 (PHOSA) (+24.6)；Chamfer Distance (All) 235.0 vs 465.8 (CHORE) (-230.8)。
 > - HOI-M3 Multiple HOI Generation 上，FID (Joint) 36.906；Pene (%) 9.265。
 
-## 概述
+## 概要
 
 **核心问题**：真实世界中人与物的交互天然涉及多人、多物共存的复杂场景，但现有数据驱动方法受限于数据集的规模与模态，仅能处理单人-单物的简化设定，缺乏对多人多物交互的3D标注数据构成了关键瓶颈。
 
@@ -58,7 +59,7 @@ claims:
 
 **局限与开放问题**：当前数据集受硬件成本与采集条件限制，仅覆盖室内固定光照环境，场景与背景多样性有限，向室外无约束场景扩展仍具挑战。如何在严重遮挡下进一步提升跟踪鲁棒性、如何低成本扩展采集范式、以及如何设计融合模型实现光照与背景泛化，是后续研究的重要方向。
 
-## 背景与动机
+
 
 理解人与物体在真实三维空间中的交互（Human-Object Interaction, HOI）是计算机视觉与具身智能领域的核心挑战。从机器人操作到增强现实，从运动分析到数字人驱动，准确感知与重建多人多物的动态交互关系，是实现环境理解与行为模拟的基础。
 
@@ -70,7 +71,9 @@ claims:
 
 为构建这一数据集，作者设计了一套鲁棒的联合优化管线：通过融合密集RGB输入与物体内置IMU数据，结合多视图SAM分割掩膜作为核心证据，利用离屏约束、碰撞约束与平滑约束进行联合优化，从而在严重遮挡下也能实现高精度的多人多物三维运动跟踪。这一高质量的真值标注，为后续提出的单阶段单目多人多物捕捉方法与条件扩散交互生成模型奠定了坚实的数据基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 HOI-M3 的核心创新在于围绕**数据稀缺**与**感知瓶颈**双线展开：一方面构建首个大规模多人多物交互数据集，填补真实 3D 标注空白；另一方面提出单阶段单目捕捉与条件扩散生成方法，突破现有多阶段/分离式方法在多人多物场景下的退化问题。
 
@@ -115,7 +118,7 @@ HOI-M3 的核心创新在于围绕**数据稀缺**与**感知瓶颈**双线展�
 
 上述创新受限于当前数据集的采集条件：42 相机系统与 IMU 嵌入的高硬件成本限制了场景扩展至室外环境；固定光照与有限背景变化制约了捕捉与生成模型的泛化能力；当前仅覆盖 5 类常见房间，场景多样性仍有提升空间。这些局限同时也指明了未来的创新方向——低成本采集范式、仿真-真实混合增强、以及光照/背景不变性建模。
 
-## 整体框架
+
 
 HOI-M3 的整体框架由两大核心阶段构成：**大规模数据集构建**与**下游任务方法设计**。前者通过多模态采集与鲁棒联合优化，填补了真实世界多人多物交互 3D 标注数据的空白；后者则在此数据基础上，分别提出单目单阶段多人多物捕捉和条件扩散交互生成两种方法。
 
@@ -159,7 +162,7 @@ $$L_{\mathrm{sum}} = \lambda_{\mathrm{theta}} L_{\mathrm{theta}} + \lambda_{\mat
 ![[assets/figures/papers/paper_list_l1718_HOI_M3_Capture_Multiple_Humans_and_Objects_Interaction_within_Contextual/figures/004_Figure_3.jpg]]
 *Figure 3: Monocular One-Stage Multiple HOI Capturing Pipeline. Given an input image, the pipeline predicts multiple maps: 1) the human-object center heatmap predicts the probability of the human’s root position or object’s center position, 2) the human mesh map contains the SMPL parameters and root depth, 3) the object mesh map contains the object 6D pose parameters and center depth. Through the sampling process, multiple humans and objects can be captured within a single forward process*
 
-## 核心模块与公式推导
+
 
 HOI-M3 的系统架构围绕两个核心任务展开：一是面向数据集构建的**多模态高精度3D跟踪**，二是面向下游应用的**单目多人多物捕捉与生成**。本节聚焦关键模块的设计逻辑与公式含义，不展开实验细节。
 
@@ -260,7 +263,9 @@ $$\mathcal{L} = \mathbb{E}_{x_0,n} \| \hat{x}_{\theta}(x_n, n) - x_0 \|_1$$
 ![[assets/figures/papers/paper_list_l1718_HOI_M3_Capture_Multiple_Humans_and_Objects_Interaction_within_Contextual/figures/011_Figure_8.jpg]]
 *Figure 8: Model architecture of denoising network*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -320,7 +325,9 @@ PHOSA与CHORE原本面向单人-物体场景设计，在多人多物场景中可
 ![[assets/figures/papers/paper_list_l1718_HOI_M3_Capture_Multiple_Humans_and_Objects_Interaction_within_Contextual/figures/010_Figure_7.jpg]]
 *Figure 7: Statistics of*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 在多人多物交互重建谱系中的位置
 
@@ -362,6 +369,8 @@ $$L_{\mathrm{sum}} = \lambda_{\mathrm{theta}} L_{\mathrm{theta}} + \lambda_{\mat
 2. **低成本扩展范式**：能否通过仿真-真实混合数据增强策略，以较低成本扩展数据集的场景、光照与交互多样性？神经渲染与域随机化在此场景下的有效性值得探索。
 3. **跨域泛化**：如何利用 HOI-M3 的多模态数据（RGB + IMU + 物体几何）设计对光照与背景变化鲁棒的融合模型？自监督域适应或测试时优化可能是可行方向。
 4. **交互生成的物理合理性**：当前扩散生成模型（Figure 4）以物体几何和人数/物体数为条件，FID 为 36.906，穿透率 9.265%（Table 3）。如何进一步降低穿透率并提升生成交互的物理真实感，是通往实用化交互合成的关键瓶颈。
+
+
 
 ## 原文 PDF
 

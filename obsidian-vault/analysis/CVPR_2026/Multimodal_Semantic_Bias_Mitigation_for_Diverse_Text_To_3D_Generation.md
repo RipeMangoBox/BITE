@@ -43,7 +43,7 @@ claims:
 > - MATE-3D 上，Overall Quality (Basic) 8.19 vs 7.39 (+0.80)；Overall Quality (Fantastical) 6.95 vs 6.24 (+0.71)。
 > - T3 Bench 上，Average Alignment Score (Single Object) 50.2 vs 44.8 (+5.4)；Average Alignment Score (Multiple Objects) 37.5 vs 28.5 (+9.0)。
 
-## 概述
+## 概要
 
 现有文本到3D大模型在生成质量上取得了显著进展，但其内部存在一种尚未被系统研究的**跨模态语义偏置**：模型对提示中的特定词汇过度聚焦，导致对复杂、非典型描述（如奇幻物体、多对象组合）的理解能力显著下降。以骨干模型 **TRELLIS**（Xiang et al., CVPR 2025）为例，其在MATE-3D基准上的定量分析表明，不同提示词的平均梯度分布极不均匀，且“Fantastical”和“Grouped”等类别的质量分数直方图呈现明显的低分聚集（Figure 2），这直接制约了文本到3D生成在多样化输入下的可控性。
 
@@ -51,7 +51,7 @@ claims:
 
 实验结果表明，该方法在MATE-3D的全部8个提示类别上均取得最优平均质量分数（如Basic类别从7.39提升至8.19，Fantastical类别从6.24提升至6.95），在T3 Bench的单对象与多对象场景下分别实现+5.4和+9.0的对齐分数增益（Table 1, Table 2）。词级梯度可视化进一步证实，微调后的模型对各提示词的注意力分布更加均匀，有效抑制了偏置过拟合现象（Figure 7）。
 
-## 背景与动机
+
 
 ### 文本到三维生成的发展与瓶颈
 
@@ -75,7 +75,9 @@ claims:
 
 这一框架在保持骨干模型跨视角一致性的同时，有效扩展了其对复杂、非典型提示的理解能力，为文本到3D生成的多样化可控性提供了新的技术路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题洞察：大模型中的跨模态语义偏置
 
@@ -109,7 +111,7 @@ $$e_i' = \sum \left| \frac{\partial q}{\partial e_i} \right|, \quad q \in \{q_l,
 
 现有文本到3D方法（如 **DreamFusion** (Poole et al., ICLR 2022)、**ProlificDreamer** (Wang et al., NeurIPS 2023)）主要聚焦于提升生成质量或一致性，但均未显式建模和缓解模型内部的语义偏置。本工作首次将偏置定位、语义丰富化、视觉筛选和偏置感知训练整合为闭环框架，在不牺牲原有能力的前提下，系统性地提升了模型对多样化文本输入的泛化能力。
 
-## 整体框架
+
 
 本文提出的多模态语义偏置缓解框架围绕一个核心洞察展开：当前文本到3D大模型（如 **TRELLIS**，Xiang et al., CVPR 2025）存在跨模态语义偏置，对提示中的特定词过度聚焦，导致对复杂、非典型描述的生成质量下降。该框架通过“定位—丰富—微调”三阶段流水线，在不牺牲原有能力的前提下缓解这一内在偏置。
 
@@ -128,7 +130,7 @@ $$e_i' = \sum \left| \frac{\partial q}{\partial e_i} \right|, \quad q \in \{q_l,
 
 整个框架的输入是原始文本提示集合和预训练的文本到3D大模型，输出是经过去偏微调后的生成模型。其因果调节旋钮在于：利用评估模型梯度作为词级偏置的代理，指导构建语义丰富的训练样本，从而在不引入额外推理开销的前提下提升文本到3D生成的多样性和一致性。
 
-## 核心模块与公式推导
+
 
 ### 跨模态语义偏置的形式化
 
@@ -184,7 +186,9 @@ $$ e _ { i } ^ { \prime } = \sum \left| { \frac { \partial q } { \partial e _ { 
 ![[assets/figures/papers/paper_list_l2551_https_openaccess_thecvf_com_content_CVPR2026_html_Min_Multimodal_Semanti/figures/010_Figure_7.jpg]]
 *Figure 7: Comparison of TRELLIS and our method for the gradient of all prompt words in the MATE-3D benchmark. Our method alleviates the bias of TRELLIS for certain prompt words and expands the semantic information*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -230,7 +234,9 @@ $$ e _ { i } ^ { \prime } = \sum \left| { \frac { \partial q } { \partial e _ { 
 ![[assets/figures/papers/paper_list_l2551_https_openaccess_thecvf_com_content_CVPR2026_html_Min_Multimodal_Semanti/figures/001_Figure_1.jpg]]
 *Figure 1: Our method localize and mitigate biases in text-to-3D large models and generate both cross-view consistent and textaligned results*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -272,6 +278,8 @@ $$ e _ { i } ^ { \prime } = \sum \left| { \frac { \partial q } { \partial e _ { 
 4. **复杂场景的结构化偏置**：在多对象、多交互场景下，偏置可能表现为对象间空间关系、属性绑定的错误理解，而非简单的词级过聚焦。现有词级梯度框架能否扩展为短语级或依存关系级的偏置度量，以捕获结构化语义偏置？
 
 5. **轻量化去偏方案**：如何在资源受限场景下实现有效的去偏微调？是否存在基于Adapter、LoRA等参数高效微调方法的轻量方案，在不显著增加计算开销的前提下实现可比的去偏效果？
+
+
 
 ## 原文 PDF
 

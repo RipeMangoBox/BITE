@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/Towards_Real_World_Document_Parsing_via_Realistic_Scene_Synthesis_and_Document_Aware_Training.pdf
+project_link: null
 code_link: "https://github.com/datalabto/marker"
 aliases:
 - RSSDATDM
@@ -42,7 +43,7 @@ claims:
 > - XFUND 上，Per-language scores (de/it/ja/es/pt/fr) 85.15 / 80.06 / 87.99 / 84.39 / 83.67 / 77.48。
 > - Wild-OmniDocBench 上，Overall (OmniDocBench / Wild-OmniDocBench) 87.03。
 
-## 概述
+## 概要
 
 **核心瓶颈**：端到端文档解析面临大规模高质量全页数据的稀缺，以及缺乏结构感知训练策略的挑战。现有模型在真实世界场景下容易产生重复输出、幻觉内容和结构不一致的解析结果。
 
@@ -51,8 +52,6 @@ claims:
 **核心结论**：在 OmniDocBench 基准上，DocHumming 以 93.75 的 Overall 分数超越最强基线 **PaddleOCR-VL**（Cui et al., 2025）的 91.93；在真实世界捕获场景的 Wild-OmniDocBench 上，性能退化仅 -6.72，远低于级联方法如 **MinerU2.5**（Niu et al., 2025）的 -19.76。消融实验表明，移除 ST 导致 Overall 下降 5.01 且重复率从 2.1 升至 4.6，移除 PTP 则导致 Overall 下降 2.51 且重复率升至 4.2，验证了训练策略的关键作用。
 
 **方法谱系与知识库定位**：DocHumming 属于端到端文档解析方法，与级联式模块化方法（如 PaddleOCR-VL、MinerU2.5）和通用大模型（如 **Qwen3-VL-235B**, Qwen Team, 2025）形成对比。其核心贡献在于通过合成数据与结构感知训练解决真实场景鲁棒性问题，而非依赖更大规模模型或人工标注数据。
-
-## 背景与动机
 
 ### 文档解析的现实瓶颈
 
@@ -77,7 +76,7 @@ claims:
 
 这一框架集成于 1B 参数的 MLLM（DocHumming），在 OmniDocBench 上取得 93.75 Overall，超过最强基线 PaddleOCR-VL 的 91.93（Table 1），并在真实世界鲁棒性测试中展现出显著优势。
 
-## 核心创新
+## 核心方法与创新机理
 
 本文的核心贡献并非提出全新的模型架构，而是在**数据构造**与**训练策略**两个维度上进行了协同设计，系统性地解决了端到端文档解析面临的三大瓶颈：大规模高质量全页监督数据稀缺、结构感知训练策略缺失、以及真实世界场景下的鲁棒性不足。
 
@@ -125,8 +124,6 @@ $$\alpha_{t} = \begin{cases} \lambda, & \text{if } x_{t} \text{ is a structured 
 
 这些创新使仅 1B 参数的 DocHumming 在 OmniDocBench 上达到 93.75 Overall，超过最强基线 **PaddleOCR-VL**（Cui et al., 2025）的 91.93，并在公式解析（Formula CDM 93.27 vs 88.67）等细粒度指标上展现出显著优势。
 
-## 整体框架
-
 ### 核心瓶颈与设计动机
 
 端到端文档解析面临两个根本性挑战：一是大规模、高质量的全页监督数据极度稀缺，现有的数字-born 或人工标注数据无法覆盖真实世界捕获场景中的几何畸变、光照变化和结构多样性；二是缺乏结构感知的训练策略，导致模型在长序列解码中产生重复生成、幻觉内容和结构不一致的输出。针对这两大瓶颈，本文提出了一种数据与训练协同设计的框架，核心思路是：**通过真实场景合成（Realistic Scene Synthesis, RSS）构建大规模、结构多样化的页面级监督数据，并配合文档感知训练策略（渐进式学习与结构标记优化），从数据和优化两个维度共同提升端到端模型的鲁棒性。**
@@ -167,8 +164,6 @@ $$\alpha_{t} = \begin{cases} \lambda, & \text{if } x_{t} \text{ is a structured 
 
 ![[assets/figures/papers/paper_list_l2611_https_arxiv_org_abs_2603_23885/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of Realistic Scene Synthesis. Left: repositories of atomic elements and layout templates with reading order. Right: a synthesis pipeline that composes sampled elements into templates under spatial/structural constraints to produce page-level annotations, followed by capture-aware augmentation to simulate real-world images*
-
-## 核心模块与公式推导
 
 ### 3.1 方法总览
 
@@ -216,10 +211,7 @@ Table 4 的完整消融揭示了三个模块的协同关系。仅使用 RSS 而�
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l2611_https_arxiv_org_abs_2603_23885/figures/002_Figure_2.jpg]]
-*Figure 2: Scanned/Digital and Real-World Capture. On scanned/digital pages, both modular and E2E parsers decode correctly. Under real-world capture, modular cascades accumulate layout-analysis errors that propagate to element parsing (extra/missing regions), while generic end-to-end models exhibit repetitive outputs*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 主结果：OmniDocBench 基准
 
@@ -283,7 +275,7 @@ Table 5 的扩展消融显示，**DocMix-3M 合成数据**在 OmniDocBench 和 W
 ![[assets/figures/papers/paper_list_l2611_https_arxiv_org_abs_2603_23885/figures/001_Figure_1.jpg]]
 *Figure 1: Overall Performance and Degradation from OmniDocBench to Wild-OmniDocBench. Underlined method names correspond to modular cascaded pipelines*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 核心瓶颈与设计哲学
 

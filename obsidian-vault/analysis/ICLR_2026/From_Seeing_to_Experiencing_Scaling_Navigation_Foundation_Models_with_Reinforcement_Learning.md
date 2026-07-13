@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/From_Seeing_to_Experiencing_Scaling_Navigation_Foundation_Models_with_Reinforcement_Learning.pdf
+project_link: https://vail-ucla.github.io/S2E
+code_link: null
 openreview_forum_id: 0c7nAZjyr5
 aliases:
 - SESLF
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 从看到体验：利用强化学习扩展导航基础模型 |
 | 英文题名 | From Seeing to Experiencing: Scaling Navigation Foundation Models with Reinforcement Learning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=0c7nAZjyr5); [Project](https://vail-ucla.github.io/S2E) |
+| Links | [paper](https://openreview.net/forum?id=0c7nAZjyr5) · [Project](https://vail-ucla.github.io/S2E) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | Seeing-to-Experiencing (S2E) learning framework |
 | Dataset | NavBench-GS (Empty场景), NavBench-GS-Obstacle (消融实验), 真实世界轮式机器人 (障碍物+行人) |
@@ -42,7 +44,7 @@ claims:
 > - NavBench-GS-Obstacle (消融实验) 上，Success Rate (SR) ↑ 为 0.57 (S2E-Full)，对比 0.42 (S2E-BC, 仅预训练)，变化 +0.15。
 > - 真实世界轮式机器人 (障碍物+行人) 上，Success Rate (SR) ↑ 为 0.51，对比 0.33 (S2E-BC)，变化 +0.18。
 
-## 概述
+## 概要
 
 ### 瓶颈与核心发现
 
@@ -83,7 +85,7 @@ S2E框架在方法谱系中处于**离线预训练 + 在线RL微调**的混合�
 
 当前S2E依赖纯视觉输入，缺乏显式3D深度或占据感知，在复杂障碍物场景中仍会出现碰撞；且框架以局部导航为主，长距离任务需外部路径规划支持。RL与SFT在机器人学习中的扩展规律是否具有普适性、如何高效引入3D感知以进一步提升安全性，是值得进一步探索的方向。
 
-## 背景与动机
+
 
 ### 机器人导航的离线学习瓶颈
 
@@ -112,7 +114,9 @@ S2E框架在方法谱系中处于**离线预训练 + 在线RL微调**的混合�
 
 这一“预训练-后训练”的混合范式旨在回答一个关键问题：**能否用极少的交互经验（RL微调），弥补海量离线数据（行为克隆）所无法提供的安全交互能力？** 后续实验表明，RL微调在不使用额外离线数据的情况下，将成功率绝对提升15%（Figure 7a），且其鲁棒性显著优于监督微调（SFT）——后者随训练计算量增加出现严重过拟合（Figure 7b）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 S2E框架的核心创新在于系统性地填补了“仅依靠离线视频预训练”与“安全交互导航”之间的因果鸿沟。其技术路径可归结为两个**changed slots**：**动作分布表示**从单峰高斯/离散类别升级为锚点引导的高斯混合模型（AGDM），以及**后训练范式**从纯行为克隆（BC）转向强化学习（RL）微调。第三个changed slot——**微调模块选择**（残差注意力模块RAM）——则为上述范式转换提供了关键的稳定性保障。
 
@@ -175,7 +179,7 @@ $$Q' = \psi_D(Q;K,V;\Theta_D) + \mathcal{Z}(\psi_D(\mathcal{Z}(Q);K,V;\Theta_l))
 
 **需注意的局限**：当前模型依赖纯视觉输入，缺乏显式3D深度或占据感知，在复杂障碍物场景中仍会出现碰撞；RL微调依赖仿真物理交互，仿真到真实的外观和动力学差异可能在边缘情况导致性能下降，但RAM冻结视觉编码器的设计已显著缓解该问题。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_0c7nAZjyr5/figures/003_Figure_3.jpg]]
 *Figure 3: Illustration of S2E framework. The model receives continuous RGB frames as context information, goal point or goal image as guidance, and uses spatial anchors as queries for prediction. First, context embeddings are fused via a self-attention module. The outputs are then used as keys (K) and values (V). Meanwhile, the anchor features $f _ { \mathcal { P } }$ serve as queries (Q). Subsequently, RAM blocks compute weighted features from K and V based on the anchor queries Q, and produce refined anchor features. A classification and a regression head decode the anchor features to predict scores and normalized trajectories with a velocity scale. In the pretraining stage, the model is trained end-...*
@@ -224,7 +228,7 @@ Figure 6展示了从数据到评估的完整链路。真实世界数据（Figure
 
 **微调模块的精确选择**：消融实验表明（Table 3），仅微调RAM残差分支的策略优于全参数微调（DecFT-RL）和纯行为克隆预训练（S2E-BC）。全参数微调在复杂障碍物场景中遭遇梯度爆炸和灾难性遗忘，而RAM通过冻结视觉编码器和原始交叉注意力层，将显存占用从40GB降至37GB，同时训练更稳定。
 
-## 核心模块与公式推导
+
 
 ### 3.1 锚点引导的动作分布建模（AGDM）
 
@@ -275,7 +279,9 @@ $$\mathcal{H}_\pi \approx \sum_{m=1}^M q_m \cdot \left[\frac{1}{2}\log((2\pi e)^
 
 熵奖励防止策略过早坍缩到单一锚点模态，维持行为多样性以应对仿真中多样的交互场景。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -344,7 +350,9 @@ Figure 14的轨迹对比显示，NoMaD和CityWalker在障碍物场景中频繁�
 
 当前模型的主要失败模式集中在：**纯视觉输入缺乏显式3D深度感知**，在复杂障碍物场景中仍会出现碰撞（SR仅0.57）。S2E以局部导航为主，长距离任务依赖外部路径规划。RL微调依赖仿真物理交互，仿真到真实的外观和动力学差异可能在边缘情况导致性能下降，但RAM冻结视觉编码器的设计已显著缓解了该问题——App. D.4的Δ_feat分析显示，冻结编码器使真实-仿真特征偏移保持在较低水平。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有导航基础模型的关系
 
@@ -381,6 +389,8 @@ S2E 框架在**离线预训练 + 在线后训练**的混合范式上与现有导
 3. **动作表示的维度扩展**：锚点引导的 GMM 目前用于 2D 航点预测，是否可以推广到更高维的动作空间（如全向移动底盘）或更复杂的动作参数化？
 
 4. **全局规划与局部策略的协同**：S2E 的局部导航能力如何与全局路径规划器更紧密地耦合，以支持长距离、跨区域的自主导航任务？
+
+
 
 ## 原文 PDF
 

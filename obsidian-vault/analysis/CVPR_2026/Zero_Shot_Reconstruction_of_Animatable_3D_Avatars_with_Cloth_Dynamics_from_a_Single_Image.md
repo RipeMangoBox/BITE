@@ -42,7 +42,7 @@ claims:
 > - Actors-HQ 上，PSNR↑ 23.74 vs 21.03 (LHM) (+2.71)；SSIM↑ 0.960 vs 0.950 (LHM) (+0.010)。
 > - DNA-Rendering 上，PSNR↑ 21.38 vs 20.29 (LHM) (+1.09)。
 
-## 概述
+## 概要
 
 从单张图像重建可动画的3D虚拟人并赋予其逼真的服装动态，是数字人领域的核心难题。现有方法——无论是依赖逐主体优化的**PERSONA**，还是零样本前馈模型**LHM**、**IDOL**（Sun et al., CVPR 2025）——均仅基于骨架姿态驱动线性混合蒙皮（LBS）的刚性变换，完全忽略了运动历史对非刚性布料变形的影响。这导致在快速或大幅度动作下，服装僵硬、缺乏真实褶皱，动画效果严重失真。
 
@@ -54,7 +54,7 @@ claims:
 
 在方法谱系上，DynaAvatar 填补了零样本单图像重建与布料动态建模之间的空白（Table 1），其前馈架构在推理速度（1.82秒）和参数量（719M）上亦优于LHM-1B（3.00秒，1.1B）。当前局限性主要在于依赖运动历史导致首帧初始化不准确，以及对极端着装和罕见运动的泛化能力有限。
 
-## 背景与动机
+
 
 ### 问题背景：从静态重建到动态虚拟人
 
@@ -84,7 +84,9 @@ DynaAvatar的提出正是为了填补上述缺口——**实现首个从单张�
 
 基于上述动机，DynaAvatar设计了Static Transformer（提取静态几何外观）与Dynamic Transformer（融合运动历史预测布料变形）的双阶段架构，并通过静态到动态的知识迁移策略和DynaFlow损失函数，在多个公开数据集上取得了显著优于现有方法的渲染质量与布料动态真实感。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DynaAvatar 的核心创新在于突破了现有单图像 3D 虚拟人重建方法的一个根本瓶颈：**从刚性骨骼变换到运动感知的非刚性布料动态建模**。此前的零样本方法（如 **IDOL** (Sun et al., CVPR 2025)、**LHM**）仅依赖基于姿态的线性混合蒙皮（LBS）进行刚性变换，无法表现衣物随运动产生的褶皱、摆动和形变，导致动画效果僵硬、缺乏真实感（Fig. 1）。DynaAvatar 通过以下三个相互耦合的关键创新解决了这一问题。
 
@@ -116,7 +118,7 @@ DynaFlow 提供了与变形对齐的显式几何监督信号，有效改善了�
 
 上述三项创新协同作用，使 DynaAvatar 在 4D-Dress、Actors-HQ、DNA-Rendering 等多个数据集上取得了最优的 PSNR/SSIM/LPIPS 指标（Tab. 3），并保持了 1.82 秒的推理速度和 719M 参数量，优于 LHM-1B（3.00 秒，1.1B 参数）的计算效率（Tab. S2）。
 
-## 整体框架
+
 
 **DynaAvatar** 的整体设计围绕一个核心瓶颈展开：现有单图像零样本虚拟人重建方法（如 **LHM**、**IDOL** (Sun et al., CVPR 2025)）仅依赖刚性骨骼变换（LBS），无法建模非刚性布料动态，导致动画僵硬、缺失真实感。为解决这一问题，DynaAvatar 构建了一个端到端的前馈 Transformer 框架，直接从单张图像预测运动感知的 3D 高斯变形，无需针对特定对象进行优化。
 
@@ -158,7 +160,7 @@ $$\mathcal{L}_{\mathrm{flow}} = \frac{1}{N} \sum \| \mathbf{M}(\mathbf{p}_{\math
 
 高质量 SMPL-X 参数是动态建模的基础。DynaAvatar 对 4D-Dress、Actors-HQ、DNA-Rendering 等数据集的原始标注进行了重新标注，获得了更完整、准确的 SMPL-X 参数。消融实验显示（Table S3 & Fig. 4），该重标注使 PSNR 提升约 3dB，显著改善了渲染质量。
 
-## 核心模块与公式推导
+
 
 ### 整体架构概述
 
@@ -245,7 +247,9 @@ Figure 3 直观展示了该损失的工作机制：黑色轮廓白色圆点表�
 ![[assets/figures/papers/paper_list_l27_https_arxiv_org_abs_2603_14772/figures/005_Figure_3.jpg]]
 *Figure 3: Visualization of the proposed DynaFlow loss. Our DynaFlow loss encourages the Gaussians at source locations (blackoutlined white circles) to move toward the endpoints of the estimated flow vectors*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈验证
 
@@ -335,7 +339,9 @@ DynaAvatar的核心贡献在于**首次实现零样本单图像到可动画3D虚
 ![[assets/figures/papers/paper_list_l27_https_arxiv_org_abs_2603_14772/figures/006_Figure_4.jpg]]
 *Figure 4: Comparison between (b) the original annotations and (c) our reannotations for the DNA-Rendering [5] (top) and Actors-HQ [19] (bottom) datasets*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 单图像3D虚拟人重建的演化脉络
 
@@ -395,6 +401,8 @@ $$\mathcal{L}_{\mathrm{flow}} = \frac{1}{N} \sum \| \mathbf{M}(\mathbf{p}_{\math
 4. **多模态条件扩展**：除单张图像外，能否融入文本描述、视频序列或物理参数等多模态条件，实现对服装风格和动态行为的更精细控制？
 
 5. **评估体系的完善**：当前评估主要依赖新视角合成的PSNR/SSIM/LPIPS指标，缺乏对布料动态真实感的直接度量。建立包含物理合理性、时序一致性、运动感知质量的综合评估基准是该领域的重要需求。
+
+
 
 ## 原文 PDF
 

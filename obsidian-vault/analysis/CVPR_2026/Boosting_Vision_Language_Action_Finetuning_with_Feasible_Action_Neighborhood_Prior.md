@@ -43,7 +43,7 @@ claims:
 > - ManiSkill OOD (Vision, Semantic, Execution average) 上，OOD Success Rate (%) 63.3 (FAN-SFT) vs 58.1 (OpenVLA+SFT) (+5.2)。
 > - ManiSkill (RFT) 上，In-Distribution Success Rate (%) 97.4 ± 0.7 (OpenVLA+FAN-PPO) vs 95.9 ± 3.2 (OpenVLA+PPO) (+1.5)。
 
-## 概述
+## 概要
 
 视觉-语言-动作（VLA）模型的微调通常直接继承大语言模型的训练范式——使用 one-hot 交叉熵（SFT）或 PPO 进行策略优化。然而，这种范式忽略了物理动作空间的一个关键特性：**可行动作邻域（Feasible Action Neighborhood, FAN）**——在最优动作附近存在一个连通的、允许一定偏差的动作集合，其 Q 值几乎等价。忽视这一容错性会导致策略过度拟合单一演示动作，产生极窄的分布，泛化能力差且样本效率低。
 
@@ -53,7 +53,7 @@ claims:
 
 **方法定位**：FAN 正则化是一种轻量、即插即用的微调增强技术，可与现有 VLA 骨干（如 OpenVLA、OpenVLA-OFT）及 SFT / PPO 训练流程无缝集成。相比标签平滑等传统正则化，FAN 显式建模了动作空间的几何结构，在泛化能力和样本效率上均展现出显著优势。
 
-## 背景与动机
+
 
 ### 视觉-语言-动作模型的微调范式
 
@@ -101,7 +101,9 @@ claims:
 
 与标签平滑等通用正则化手段不同，FAN 正则化利用了物理动作空间的几何结构——高斯分布的中心位于策略模式、协方差反映局部容错范围，从而提供了一种**领域感知的、结构化的**正则化信号。理论分析（Proposition 1）进一步表明，带有 FAN 先验的最优策略更新可分解为旧策略、高斯先验和 Q 值三者的几何插值，揭示了该正则化在信任域约束下的合理性与可解释性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题根因：VLA 微调中的分布崩溃与泛化瓶颈
 
@@ -171,7 +173,7 @@ $$\pi _ { t + 1 } ( a \vert s , l ) \propto \mathcal { N } ( a \vert \mu ( s ) ,
 
 消融实验证实了这些区别：FAN-SFT 在 ManiSkill OOD 平均上达到 **63.3%**，而最佳标签平滑仅为 **60.1%**（Table 12）；FAN-PPO 在样本效率上显著优于熵最大化正则化（Figure 28a），达到 90% 训练成功率所需步数从 249 降至 **98**（Table 15）。高斯核平滑的多峰目标正则化也能带来提升，但仍不及单峰高斯先验（Figure 28b），这验证了“局部单峰”假设对当前任务空间的适配性。
 
-## 整体框架
+
 
 本文提出的方法围绕一个核心观察展开：当前 VLA 微调范式直接继承语言模型的训练目标（one-hot 交叉熵或 PPO），忽略了物理动作空间内在的容错性和近等价性，导致策略过度拟合单一演示动作，泛化能力差且样本效率低。为此，作者引入**可行动作邻域（Feasible Action Neighborhood, FAN）** 的概念——在给定状态下，与最优动作具有近等价 Q 值且连通的局部动作集合——并将其建模为一个以策略模式为中心的高斯分布。通过在 SFT 和 RFT 损失中注入 FAN 引导的 KL 散度正则项，强制策略输出分布朝高斯形状靠拢，从而扩大有效的可行动作邻域，使模型不再仅仅追求单一正确动作，而是学习一个允许一定偏差的平滑动作区域。
 
@@ -196,7 +198,7 @@ $$\pi _ { t + 1 } ( a \vert s , l ) \propto \mathcal { N } ( a \vert \mu ( s ) ,
 ![[assets/figures/papers/paper_list_l2377_https_arxiv_org_abs_2604_01570/figures/001_Figure_1.jpg]]
 *Figure 1: Geometric structure of policy distribution on a ManiSkill task. (a) After the SFT warm-up stage, the policy learned a narrow, peaked distribution with a minimal FAN, resulting in poor generalization. (b) Subsequent RFT with PPO broadens the distribution, leading to improved task success; (c) Our FAN-PPO method explicitly guides the policy towards a robust Gaussian shape, achieving the highest success rate and demonstrating superior generalization*
 
-## 核心模块与公式推导
+
 
 ### 问题形式化：可行动作邻域（FAN）
 
@@ -274,7 +276,9 @@ $$ \pi_{t+1}(a|s, l) \propto \mathcal{N}(a|\mu(s), \Sigma)^{\frac{\alpha}{\alpha
 - **目标高斯标准差 $\sigma$**：过小（如 0.05）损害性能；$\sigma \in [0.1, 2.0]$ 范围内结果稳定，默认值 $\sigma = 0.3$（Figure 27）。
 - 与**标签平滑**和**熵最大化**等替代正则化方法的对比表明，FAN 的高斯形状先验是性能增益的关键来源，而非简单的分布展宽（Table 12, Figure 28）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -347,7 +351,9 @@ FAN 正则化基于动作空间局部单峰平滑的高斯先验假设。当任�
 ![[assets/figures/papers/paper_list_l2377_https_arxiv_org_abs_2604_01570/figures/024_Table_12.jpg]]
 *Table 12: Comparison to label smoothing on ManiSkill*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：VLA 微调中的分布坍缩与泛化瓶颈
 
@@ -428,6 +434,8 @@ FAN 正则化的有效性建立在以下假设之上，这些假设同时划定�
 4. **动态环境与交互场景下的鲁棒性**：在真实人机交互或动态障碍物环境中，可行动作邻域可能随时间演化。FAN 先验在此类非稳态场景下的适应性尚未评估，需要设计时变的目标分布或在线自适应机制。
 
 5. **理论性质的深入刻画**：当前 Proposition 1 给出了 FAN 先验下的最优策略更新形式，但对收敛速率、泛化误差界等理论性质的分析尚不充分。建立 FAN 正则化与策略泛化能力之间的定量关系，将有助于指导超参数选择和先验设计。
+
+
 
 ## 原文 PDF
 

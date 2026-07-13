@@ -44,7 +44,7 @@ claims:
 > - OccuFly (深度估计) 上，AbsRel / RMSE 0.134 / 4.844 (DepthAnything2‑OccuFly) vs 0.729 / 28.382 (DepthAnything2 zero‑shot) (微调后大幅提升)。
 > - OccuFly (数据生成验证) 上，重投影误差 [px] / 标注占比 / 覆盖 1.24 / 9.17% / 99% vs - (标注少于10%图像覆盖>99%点云)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：三维语义场景补全（Semantic Scene Completion, SSC）旨在从部分观测中推理完整的场景几何与语义，但现有基准与模型严重依赖LiDAR。在无人机航拍场景下，LiDAR因载荷、功耗限制及点云稀疏性难以适用，而现有SSC模型和视觉基础模型无法直接泛化至航拍领域，导致航拍SSC长期缺乏可行的研究基准。
 
@@ -57,7 +57,7 @@ claims:
 - 深度基础模型在零样本条件下严重失效：**DepthAnything2**的AbsRel高达0.729；经OccuFly微调后虽大幅改善（AbsRel 0.134），但仍不完美，证实显著的领域差距（Table 5）。
 - 数据生成流水线具备高几何精度（平均重投影误差1.24像素）和高标注效率（标注<10%图像覆盖>99%三维点），验证了纯相机路线的可行性（Tab. 8, Tab. 9）。
 
-## 背景与动机
+
 
 三维语义场景补全（Semantic Scene Completion, SSC）旨在从部分观测中同时推理场景的三维几何与语义类别，是自动驾驶、机器人导航等应用的核心感知能力。然而，现有SSC研究几乎完全围绕地面视角展开，其训练与评估严重依赖LiDAR传感器提供的稠密三维真值。这一范式在无人机航拍场景中面临根本性瓶颈：LiDAR因重量、功耗限制以及高空点云固有的稀疏性而难以部署，导致航拍SSC长期缺乏可行的基准数据集。
 
@@ -65,7 +65,9 @@ claims:
 
 上述双重困境——LiDAR依赖与模型泛化失效——构成了航拍SSC的核心瓶颈：既缺乏可扩展的真值生成手段，又缺乏能应对航拍特性的感知模型。OccuFly正是针对这一缺口提出的首个真实世界航拍SSC基准。其核心思路是摒弃LiDAR，转而利用纯相机数据生成流水线，通过经典SfM+MVS三维重建、高效2D-3D语义标签提升以及类别感知的稠密化与体素化，构建覆盖多场景、多季节、多高度的密集语义体素网格。该基准不仅为航拍SSC提供了可复现的评估平台，更通过系统性的基线实验揭示了现有模型在航拍领域的性能塌陷，为后续研究指明了方向。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 OccuFly的核心创新并非提出一种新的SSC模型，而是构建了一套纯相机驱动的数据生成范式，从根本上绕开了航拍场景下LiDAR难以适用这一瓶颈。该范式的创新性集中体现在三个关键的“changed slots”上，它们共同构成了一个完整的基准生成流水线。
 
@@ -91,7 +93,7 @@ $$\mathcal{C}_{\mathrm{inst}} \cup \mathcal{C}_{\mathrm{gnd}} \cup \mathcal{C}_{
 
 **证据强度说明**：上述三个changed slots均有定量实验支撑（重投影误差1.24 px、标注覆盖率>99%、稠密化流程的定性验证见Figure 6），证据可信度较高。但需注意，类别感知稠密化的精度评估目前主要依赖于定性观察，缺乏与真值体素的逐体素对比指标，这一点需要读者在评估该模块的绝对精度时保持审慎。
 
-## 整体框架
+
 
 OccuFly 提出了一套**纯相机、免 LiDAR 的数据生成框架**，旨在为航拍视角的语义场景补全（SSC）构建大规模、高质量的基准数据集。整个流水线以无人机采集的地理参考 RGB 图像为唯一输入，通过四个核心模块依次生成场景级语义体素网格及逐帧真值，其总体流程如 Figure 2 所示。
 
@@ -125,7 +127,7 @@ OccuFly 提出了一套**纯相机、免 LiDAR 的数据生成框架**，旨在�
 
 该框架的核心优势在于**完全摆脱对 LiDAR 的依赖**，以纯相机模态克服航拍场景下 LiDAR 点云稀疏、设备能耗高等瓶颈，同时通过高效的 2D‑3D 标签提升策略将人工标注从繁重的 3D 标注转变为轻量级 2D 标注，为航拍三维场景理解提供了可扩展的数据生成范式。
 
-## 核心模块与公式推导
+
 
 OccuFly 数据生成流水线由四个核心模块串联构成：**三维重建** → **语义标注** → **类别感知稠密化与体素化** → **真值采样**（见 Figure 2）。以下逐模块展开关键公式与设计逻辑。
 
@@ -200,7 +202,9 @@ $$\mathbf{Y}(\mathbf{v}) = \begin{cases} \text{label from } \mathcal{O}_{\mathrm
 ![[assets/figures/papers/paper_list_l2048_https_arxiv_org_abs_2512_20770/figures/011_Table_7.jpg]]
 *Table 7: Semantic class frequencies, group assignments (Sec. 3.3.3), and semantic color table of the OccuFly dataset*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 基准实验设计
 
@@ -271,7 +275,9 @@ OccuFly的核心贡献之一是基于纯相机数据的高质量真值生成流�
 ![[assets/figures/papers/paper_list_l2048_https_arxiv_org_abs_2512_20770/figures/013_Figure_6.jpg]]
 *Figure 6: Scene-level outputs of our proposed data generation framework for all scenes 1-9 of the OccuFly dataset. Left: RGB pointcloud from 3D reconstruction (Sec. 3.3.1). Center: Semantic point cloud from semantic annoation (Sec. 3.3.2). Right: Semantic voxel grid from densification and voxelization (Sec. 3.3.3). Zoom in for best view*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位与领域瓶颈
 
@@ -310,6 +316,8 @@ OccuFly的数据生成流水线实现了三个关键范式转换，构成其方�
 2. **时序一致性缓解**：如何通过图像选择策略或时空联合优化来缓解跨高度数据采集带来的时序不一致性，需要进一步研究。
 3. **全自动标注流水线**：使用鲁棒的二维伪标签（如基于Segment Anything等基础模型的自动分割）完全替代人工标注，有望将数据生成成本降至接近零，使大规模航拍SSC数据构建成为可能。
 4. **航拍SSC方法设计**：现有SSC模型在OccuFly上的极低性能表明，需要针对航拍视角的独特特性（大范围场景、俯视视角、尺度变化剧烈）设计专门的SSC架构与训练策略，这是一个开放的研究方向。
+
+
 
 ## 原文 PDF
 

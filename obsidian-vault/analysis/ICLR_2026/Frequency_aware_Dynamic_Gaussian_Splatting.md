@@ -33,7 +33,7 @@ claims:
 | 中文题名 | 频率感知的动态高斯溅射 |
 | 英文题名 | Frequency-aware Dynamic Gaussian Splatting |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=UZ00ac4eqA) · [arXiv](https://arxiv.org/abs/2108.05997) · [Project](https://arxiv.org/abs/2503.14501) |
+| Links | [paper](https://openreview.net/forum?id=UZ00ac4eqA) · [paper](https://arxiv.org/abs/2108.05997) · [Project](https://arxiv.org/abs/2503.14501) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Frequency-Aware Dynamic Gaussian Splatting (FAGS) |
 | Dataset | D-NeRF, Neu3D, HyperNeRF Rig subset, HyperNeRF Interpolation subset |
@@ -43,7 +43,7 @@ claims:
 > - Neu3D (real-world) 上，PSNR (dB) 44.16。
 > - HyperNeRF Rig subset 上，PSNR 25.63。
 
-## 概述
+## 概要
 
 动态场景的新视角合成（4D重建）是计算机视觉与图形学中的核心挑战，其目标是从一组稀疏的二维观测中恢复三维场景随时间的完整外观与运动。现有主流方法——尤其是基于变形驱动（deformation-driven）的动态3D高斯溅射（3DGS）——在平衡**高频渲染细节**与**高频运动建模**时面临根本性的频谱冲突。标准高斯核采用固定的不透明度衰减函数，为捕获纹理、边缘等高频外观特征，大量高斯不得不密集重叠；这迫使变形网络同时承担“再现高频外观”和“驱动高斯进行一致运动”的双重任务，最终导致网络偏向于学习平滑、低频的均匀轨迹，在新视角下产生严重的运动模糊（见Figure 1(a)）。
 
@@ -54,7 +54,7 @@ claims:
 
 在三个基准数据集上的实验表明，FAGS取得了具有竞争力的定量结果：在合成D-NeRF数据集上平均PSNR达到**42.76 dB**，较最优基线Grid4D（Xu et al., arXiv 2024）提升**0.49 dB**（Table 1）；在真实场景Neu3D和HyperNeRF数据集上同样表现优异（Table 2、Table 3）。消融实验证实，移除FDGK后PSNR从42.76降至42.11，验证了频率区分高斯核对性能的关键贡献（Table 4）。时间运动功率谱分析进一步表明，FAGS将更多高斯集中到高频运动带，从机制层面验证了其捕捉高频运动的能力（Figure 11）。
 
-## 背景与动机
+
 
 动态场景的新视角合成是计算机视觉与图形学中的核心挑战，其目标是从一组稀疏的多视角视频中重建出随时间变化的三维场景，并支持任意时刻、任意视角的高质量渲染。近年来，以三维高斯溅射（3D Gaussian Splatting, 3DGS）为代表的显式辐射场方法在静态场景渲染中取得了突破性进展，其通过一组可微的三维高斯原语进行高效的光栅化渲染，在速度和质量上均大幅超越基于隐式神经辐射场的方法。然而，将3DGS从静态场景拓展至动态场景时，一个根本性的瓶颈逐渐显现：**高频渲染细节与高频运动建模之间存在严重的频谱冲突**。
 
@@ -70,7 +70,9 @@ Figure 1 直观地揭示了这一问题：基线方法中，标准高斯核为�
 
 通过将频率维度的显式解耦引入高斯溅射框架，FAGS旨在同时提升动态场景的高频细节保真度和运动建模精度，为4D重建提供一种频谱平衡的新范式。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FAGS 的核心创新在于对 4D 重建中“高频外观”与“高频运动”的频谱冲突进行了显式解耦。现有变形驱动方法（如 **DeformGS** (Yang et al., CVPR 2024)、**Grid4D** (Xu et al., arXiv 2024)）依赖标准高斯核的固定不透明度衰减函数，迫使变形网络同时承担两项矛盾的任务：通过密集重叠的高斯来再现高频纹理细节，以及驱动这些高斯进行一致的运动建模。这种双重负担使网络偏向于学习平滑、低频的均匀运动轨迹，最终在新视角下产生严重的运动模糊（参见 Figure 1(a)）。
 
@@ -90,7 +92,7 @@ FAGS 通过三个协同的 changed slots 打破这一瓶颈：
 
 消融实验（Table 4）定量验证了上述 changed slots 的关键作用：完整模型在 D-NeRF 上取得 PSNR 42.76；移除 FDGK 后降至 42.11；进一步移除高频傅里叶嵌入和频率感知门控均导致性能持续下降。时间运动功率谱可视化（Figure 11）进一步证实 FAGS 将更多高斯集中在高频带，有效捕捉了高频运动。
 
-## 整体框架
+
 
 FAGS 的整体设计遵循一个核心原则：**在 4D 重建的渲染与运动建模两个关键环节中，显式解耦高频与低频分量**。如图 3 所示，框架由两条互补的流水线构成——上方的 **频率区分高斯核（FDGK）** 负责渲染端的频域分化，下方的 **傅里叶变形网络（FDN）** 负责运动建模端的频域解耦，二者通过共享的高斯表示协同工作。
 
@@ -129,7 +131,7 @@ FDN 接收规范空间坐标 **(x, y, z)** 和时间 **t**，通过两路编码�
 ![[assets/figures/papers/paper_list_l49_https_openreview_net_forum_id_UZ00ac4eqA/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of Frequency-Aware Gaussian Splatting. Top: Gaussians are initialized in a canonical state and progressively differentiate into low- and high-frequency types during optimization, fitting low-frequency smooth regions and high-frequency details, respectively. Bottom: Coordinates*
 
-## 核心模块与公式推导
+
 
 FAGS 的核心设计围绕一个关键矛盾展开：**变形驱动的 4D 重建中，高频外观细节与高频运动轨迹对高斯核提出了相互冲突的要求**。标准 3DGS 中所有高斯共享固定的指数衰减 alpha 函数（Eq. 1），要捕捉锐利边缘和纹理细节，必须依赖大量高斯在空间上密集重叠——这反过来使变形网络难以精确控制每个高斯的独立运动，最终导致网络偏向学习平滑、低频的全局运动，在新视角下产生运动模糊（见 Figure 1(a)）。FAGS 通过三个相互配合的模块——**频率区分高斯核（FDGK）**、**傅里叶变形网络（FDN）** 和 **频率感知门控**——将“表现力”与“运动建模”在频率维度上显式解耦。
 
@@ -206,7 +208,9 @@ $$\mathcal{L}_{\mathrm{fre}} = \| I_{\mathrm{amp}}' - I_{\mathrm{amp}} \|_1$$
 
 **模块间的因果链条**：FDGK 通过自适应 alpha 调制减少高斯重叠依赖 → 为变形网络释放运动建模自由度 → FDN 用傅里叶嵌入显式注入高频时变信息 → 频率感知门控 $\eta$ 自适应调节变形强度，抑制低频区域的非必要运动 → 傅里叶频率损失在频域强化高频细节优化。四个模块协同实现了“高频外观”与“高频运动”的频率解耦，从根本上缓解了标准 3DGS 在 4D 重建中的频谱冲突。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -271,7 +275,9 @@ FAGS 在合成与真实世界动态场景数据集上均取得领先性能，验
 ![[assets/figures/papers/paper_list_l49_https_openreview_net_forum_id_UZ00ac4eqA/figures/014_Figure_10.jpg]]
 *Figure 10: Qualitative comparisons on the motion-blur dataset*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心问题与动机
 
@@ -347,6 +353,8 @@ $$\mathcal{L}_{\mathrm{fre}} = \| I_{\mathrm{amp}}' - I_{\mathrm{amp}} \|_1$$
 2. **与模糊感知方法的互补性**：FAGS从频率域预防运动模糊，BARD-GS从图像域处理模糊。两者在原理上互补，但联合使用的效果和兼容性尚未探索。
 
 3. **扩展到更复杂的变形拓扑**：当前方法假设变形是连续且可微的，对于拓扑变化（如物体出现/消失、断裂）的场景，频率感知门控和傅里叶嵌入是否仍然有效，需要进一步研究。
+
+
 
 ## 原文 PDF
 

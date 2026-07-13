@@ -43,7 +43,7 @@ claims:
 > - HICO-DET 上，Full mAP 33.33 (Faster R-CNN, DINO-B, CLIP-B) vs 31.14 (Weakly HOI-CLIP, Faster R-CNN) (+2.19)。
 > - HICO-DET (Zero-shot, RF-UC) 上，Unseen mAP 31.53 vs 21.46 (OpenCat) (+10.07)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有弱监督人-物交互（HOI）检测方法通常需枚举图像中所有可能的人-物候选对，再逐一判断其交互类别。这一范式导致计算成本随实例数量急剧增长，且大量非交互的虚假组合产生严重假阳性，制约了从图像级标注向实例级检测的迁移效率。
 
@@ -58,7 +58,7 @@ claims:
 
 **局限性**：RegFormer 仍依赖外部目标检测器提供实例提议，检测性能受限于检测器质量；在零样本设定下，未见组合的性能显著低于已见组合，对新颖交互的泛化仍具挑战。
 
-## 背景与动机
+
 
 ### 弱监督HOI检测的核心困境
 
@@ -88,7 +88,9 @@ claims:
 
 这一设计使得RegFormer在保持计算效率的同时，仅凭图像级标签即可获得与全监督方法可比拟的检测性能，并天然具备零样本迁移能力——模型学到的交互推理能力可直接应用于任意检测器输出的实例对，无需针对特定检测器重新训练。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 RegFormer 的核心创新在于将弱监督 HOI 检测从“全类别并行分类”重构为 **HO → I 的顺序推理范式**，并通过两项关键的 changed slots 注入局部空间线索，使模型在仅使用图像级标签训练的情况下可直接迁移至实例级检测。
 
@@ -138,7 +140,7 @@ $$\tilde{s}_{ij}^{\mathrm{hoi}} = \tilde{s}_{ij}^{\mathrm{a}} \cdot (r_{ij}^{\ti
 
 其中 $\tilde{s}_{ij}^{\mathrm{a}}$ 为交互分类得分，$r_{ij}^{\tilde{\mathrm{ho}}}$ 为 pairwise 交互性得分（人体和物体交互性的几何平均），$\tilde{s}_{i}^{\mathrm{h}}$ 和 $\tilde{s}_{j}^{\mathrm{o}}$ 为检测置信度。这一公式将交互推理、交互性过滤和检测置信度统一为单一评分，实现了从弱监督训练到实例级检测的直接迁移。
 
-## 整体框架
+
 
 RegFormer 的核心设计思想是将图像级交互推理过程分解为**顺序生成人-物对查询**与**交互解码**两个阶段，并通过**空间接地查询**和**交互性感知学习**注入局部空间线索，从而在仅使用图像级标签训练的条件下，实现从图像级分类到实例级检测的直接迁移，无需额外训练。
 
@@ -184,7 +186,7 @@ RegFormer 的信息流遵循 **HO → I** 的序列化推理路径：
 ![[assets/figures/papers/paper_list_l1051_https_arxiv_org_abs_2604_00507/figures/002_Figure_2.jpg]]
 *Figure 2: Overall framework of RegFormer. RegFormer unifies image-level and instance-level reasoning within a single framework by learning to capture spatial cues for interaction reasoning using only image-level labels. During training, pairwise instance encoder constructs a human–object (HO) query*
 
-## 核心模块与公式推导
+
 
 RegFormer 的核心设计围绕一个关键洞察：将图像级的交互推理分解为“先生成人-物对查询，再解码交互”的序列化流程，并通过空间接地与交互性感知学习注入局部空间线索，从而在仅使用图像级标签的训练条件下，实现向实例级检测的直接迁移。
 
@@ -262,7 +264,9 @@ $$\tilde{s}_{ij}^{\mathrm{hoi}} = \tilde{s}_{ij}^{\mathrm{a}} \cdot (r_{ij}^{\ti
 ![[assets/figures/papers/paper_list_l1051_https_arxiv_org_abs_2604_00507/figures/003_Figure_3.jpg]]
 *Figure 3: Visualization of interactiveness score in HOI detection. Top row shows the interactiveness score for the human (red box), and the bottom row shows the score for the object (blue box). In row 1, for the human, the masked global interactiveness (0.01) corrects the inflated local interactiveness (0.768) caused by strong semantic alignment between the human and the patch, reducing the pairwise score of the non-interactive region (red box) to 0.008*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 组件消融：从ML-Decoder到RegFormer
 
@@ -335,7 +339,9 @@ Figure 1从效率和质量两个维度展示了RegFormer相对于ML-Decoder的�
 ![[assets/figures/papers/paper_list_l1051_https_arxiv_org_abs_2604_00507/figures/012_Figure_6.jpg]]
 *Figure 6: Sensitivity analysis on scaling factors*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -370,6 +376,8 @@ RegFormer 的适用性受以下条件约束：
 2. **跨任务迁移**：空间接地查询方法本质上是一种利用视觉-语言对齐注入局部空间线索的机制，该思路是否适用于其他需要实例间关系推理的任务（如场景图生成、视觉关系检测）？这需要验证该方法在非人-物交互场景下的泛化能力。
 
 3. **交互性得分的监督信号设计**：当前交互性得分通过图像级标签间接监督，是否可以利用更细粒度的弱监督信号（如文本描述中的空间关系）来提升交互性得分的准确性？
+
+
 
 ## 原文 PDF
 

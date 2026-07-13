@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Dens3R_A_Foundation_Model_for_3D_Geometry_Prediction.pdf
+project_link: https://g-1nonly.github.io/Dens3R/
+code_link: null
 openreview_forum_id: kxVjQhkAWz
 aliases:
 - Dens3R
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | Dens3R：面向三维几何预测的基础模型 |
 | 英文题名 | Dens3R: A Foundation Model for 3D Geometry Prediction |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=kxVjQhkAWz); [Project](https://g-1nonly.github.io/Dens3R/) |
+| Links | [paper](https://openreview.net/forum?id=kxVjQhkAWz) · [Project](https://g-1nonly.github.io/Dens3R/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Dens3R |
 | Dataset | NYUv2 (normal), ScanNet (normal), Sintel (normal), ZEB (image matching) |
@@ -41,7 +43,7 @@ claims:
 > - ScanNet (normal) 上，Mean Angular Error (↓) 为 16.9，对比 18.1 (Lotus)，变化 -1.2。
 > - Sintel (normal) 上，Mean Angular Error (↓) 为 30.7，对比 34.9 (DSINE)，变化 -4.2。
 
-## 概述
+## 概要
 
 从单目或多视角图像中联合预测稠密三维几何量（点图、深度、法线、匹配关系）是三维视觉的基础需求，但现有方法普遍面临两大瓶颈：一是缺乏统一的多几何量联合预测框架，各任务通常由独立模型分别处理；二是表面法线这一具有内在不变性的关键几何信息被忽视或仅作为后处理导出，导致点云精度和几何一致性受限。Dens3R 针对上述瓶颈提出了一个统一的前馈视觉基础模型，其核心因果杠杆在于将表面法线作为内在不变性先验融入点图表示，并采用两阶段训练策略逐步构建从尺度不变到内在不变的点图表征，从而减少多视角歧义并简化学习过程。
 
@@ -49,7 +51,7 @@ claims:
 
 主要实验结果表明，Dens3R 在多项基准上实现了有竞争力的性能：法线估计方面，在 NYUv2 上 Mean Angular Error 达 16.1（比 Lotus 低 1.4），在 Sintel 上达 30.7（比 DSINE 低 4.2）；深度估计在 DIODE-outdoor 上 REL 为 0.387（优于 VGGT 的 0.400）；图像匹配在 ZEB 数据集上 Mean AUC@5° 达 64.5（比 MASt3R 高 4.6）；位姿估计在 Map-free 数据集上重投影误差仅 30.4 px（VGGT 为 48.8 px）。消融实验证实，内在不变训练和粗到精策略共同贡献了法线精度的显著提升，共享编解码器减少了约 15% 参数量和约 10% 内存占用，位置插值 RoPE 有效防止了高分辨率退化。模型的主要局限在于对薄结构（细杆、绳索等）的预测精度仍显不足，且对高反射和低纹理区域存在挑战。
 
-## 背景与动机
+
 
 三维几何预测是计算机视觉的核心任务之一，涵盖深度估计、表面法线预测、点云重建和相机位姿估计等多个子问题。这些几何量在自动驾驶、机器人导航、增强现实和三维重建等应用中扮演着关键角色。然而，现有方法通常将这些任务视为独立问题分别处理，缺乏一个统一的框架来联合建模多种几何量之间的内在关联。
 
@@ -59,7 +61,9 @@ claims:
 
 本文提出 **Dens3R**，一个面向三维几何预测的基础模型，旨在以统一的前馈架构同时输出高质量的点图、深度图、法线图和匹配特征。其核心动机在于：通过将表面法线的内在不变性显式编码到点图表示中，并采用两阶段训练策略逐步构建从尺度不变到内在不变的几何理解，从而突破现有方法在多几何量联合预测上的精度与效率瓶颈。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Dens3R的核心创新在于将**表面法线作为内在不变性先验**系统性地融入点图表示，并围绕这一设计重构了DUSt3R/MASt3R系列的基础架构与训练范式。其关键改动可归纳为四个相互耦合的changed slots。
 
@@ -98,7 +102,7 @@ DUSt3R使用的标准RoPE在高分辨率输入下会出现退化——这是RoPE
 
 DUSt3R使用置信度损失作为自适应权重来调节多视图点图回归，本质上依赖额外视角来补偿单视角预测的不确定性。Dens3R移除了这一损失，理由是：法线的确定性本质（每个表面点有唯一法线方向）消除了对额外视角的依赖，使模型能够稳定地进行单视角法线预测。这一改动的置信度为0.9，需要更多消融证据来确认移除置信度损失对点图精度的独立影响。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_kxVjQhkAWz/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of Dens3R. We propose Dens3R, a dense visual transformer backbone featuring a shared encoder-decoder architecture and multiple task-specific heads for geometric prediction. To train this foundation model, we adopt a two-stage strategy. In Stage 1, we learn a scale-invariant pointmap by enforcing cross-view mapping consistency across multiple viewpoints. In Stage 2, we incorporate surface normals and leverage one-to-one correspondence constraints to transform the representation into an intrinsic-invariant pointmap. Built upon this unified backbone, additional geometric prediction heads and downstream task branches can be seamlessly integrated to support a wide range of applications*
@@ -149,7 +153,7 @@ Dens3R 的核心洞察在于：**表面法线具有内在不变性（视角无�
 
 对于多于两帧的输入，Dens3R采用“一对所有”匹配策略计算帧间对应，随后通过三角化获得多视图点云，沿用了MASt3R的后处理管线。
 
-## 核心模块与公式推导
+
 
 ### 整体架构与输出映射
 
@@ -240,7 +244,9 @@ $$\mathcal{L}_{stage2} = \mathcal{L}_{\mathrm{pts-loc}} + \lambda_1 \mathcal{L}_
 
 **因果机制总结**：内在不变训练使点图能够捕获法线中的几何信息，法线头则进一步预测更锐利的边缘和更准确的结果。粗到精策略与位置插值 RoPE 协同，共同解决了高分辨率下的退化问题。移除置信度损失（DUSt3R/MASt3R 中用于自适应加权的组件）之所以可行，是因为法线的确定性使得模型不再依赖额外视角来稳定预测。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与设计动因
 
@@ -326,7 +332,9 @@ Figure 21 和 Figure 22 的高分辨率消融实验揭示了一个关键发现�
 
 ![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_kxVjQhkAWz/figures/019_Table_6.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 Dens3R 并非从零构建，而是深度扎根于以 **DUSt3R**（Wang et al., 2024）为代表的“稠密点图回归”范式，并在此基础上进行了三项关键重构：**将表面法线提升为内在不变性先验**、**统一多帧解码器为共享权重结构**、以及**引入位置插值 RoPE 以支持高分辨率推理**。理解 Dens3R 的定位，需要先厘清它与这一谱系中其他方法的继承与断裂关系。
 
@@ -369,6 +377,8 @@ Dens3R 的设计假设使其在以下场景表现出色，但也划定了明确�
 4. **下游任务的零样本扩展**：Dens3R 的共享骨干理论上可以接入任意预测头。Figure 8 展示了语义分割的初步扩展，但能否在不修改骨干的情况下支持物体检测、场景流估计等更复杂的下游任务，仍有待验证。
 
 5. **内在不变性的边界测试**：系统评估内在不变表示在镜面反射、透明物体、动态场景下的失效模式，将有助于明确这一核心设计的适用范围。
+
+
 
 ## 原文 PDF
 

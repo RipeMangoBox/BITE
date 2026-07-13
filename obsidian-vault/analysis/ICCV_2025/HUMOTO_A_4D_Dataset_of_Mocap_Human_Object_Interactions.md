@@ -5,6 +5,7 @@ paper_level: A
 venue: ICCV
 year: 2025
 pdf_ref: paperPDFs/ICCV_2025/HUMOTO_A_4D_Dataset_of_Mocap_Human_Object_Interactions.pdf
+code_link: null
 project_link: https://jiaxin-lu.github.io/humoto
 aliases:
 - HDCM
@@ -43,7 +44,7 @@ claims:
 > - Perceptual Absolute Quality (Likert 1-5) 上，Overall Quality Score 4.78±0.43 vs 2.48±1.05 (BEHAVE) (+2.30)。
 > - Perceptual Pairwise Comparison 上，Overall Quality Preference vs BEHAVE 96% (preferred HUMOTO) vs 4% (preferred BEHAVE) (显著偏好)。
 
-## 概述
+## 概要
 
 人-物交互（HOI）数据的获取长期受困于一个核心瓶颈：现有数据集普遍缺乏精细手部动作与多物体协同交互，且动作序列常伴随足部滑动、物体穿透等物理失真，缺乏明确的目的性。这些缺陷直接限制了相关下游任务（如具身智能、运动生成）的性能上限。
 
@@ -57,8 +58,6 @@ claims:
 **主要结果**：定量评估（Table 1）表明，HUMOTO在所有对比数据集中实现了最低的足部滑动（0.958 cm）和最低的穿透深度（0.0068 cm），同时在人体运动相干性（0.653）和物体运动平滑性（jerk 1.13）上也表现最优。感知研究进一步验证了这一优势：HUMOTO在总体质量上获得4.78±0.43的Likert评分，且96%的参与者偏好HUMOTO优于BEHAVE。这些证据共同确认了所提方法在提升HOI数据物理真实性和交互自然性方面的有效性。
 
 **局限与展望**：数据集当前仅包含一名表演者，可能引入体型和动作风格偏差；高保真度数据仍需大量手动清理，未来需探索更鲁棒的自动化清洗技术，并扩展表演者多样性。
-
-## 背景与动机
 
 ### 核心瓶颈：现有HOI数据集的物理真实性与交互目的性缺失
 
@@ -94,7 +93,7 @@ claims:
 
 这一动机的核心洞察在于：**高质量HOI数据不是“捕捉”出来的，而是“设计”出来的——需要从脚本的叙事目的、传感器的互补融合、到艺术家的物理验证形成闭环。**
 
-## 核心创新
+## 核心方法与创新机理
 
 HUMOTO的核心创新在于系统性地解决了现有HOI数据集在交互质量、物理真实性和动作目的性上的三个关键瓶颈，通过**方法链式重构**实现了数据质量的跨越式提升。
 
@@ -134,8 +133,6 @@ HUMOTO的核心创新在于系统性地解决了现有HOI数据集在交互质�
 
 上述三个创新并非孤立存在，而是形成了**“脚本设计→多模态采集→专业清理”的完整质量保障链**。LLM脚本提供了交互的目的性框架，多模态传感器捕获了实现该框架所需的精细数据，而艺术家清理则消除了采集过程中的物理伪影。感知研究结果（Section 4.2.2）为这一协同效应提供了强有力的佐证：HUMOTO在总体质量上获得4.78±0.43分（5分制），96%的参与者偏好HUMOTO优于BEHAVE，交互质量偏好更是达到94%。
 
-## 整体框架
-
 HUMOTO 数据集的构建遵循一条端到端的“脚本生成—多模态采集—对象跟踪—质量清洗—标注”流水线，其核心设计目标是解决现有 HOI 数据集中普遍存在的足部滑动、物体穿透、手部姿态粗糙以及交互缺乏目的性等问题。
 
 流水线由五个主要模块串联构成，数据从高层语义逐步转化为可供下游任务直接使用的 4D 交互动画与多层级文本标注。
@@ -163,13 +160,6 @@ HUMOTO 数据集的构建遵循一条端到端的“脚本生成—多模态采�
 - **输出**：包含 SMPL-X 人体参数、物体 6DoF 姿态、手部关节数据、多层级文本标注的 4D HOI 序列。数据集总计包含 41 个场景、超过 120 分钟的交互动画。
 
 该流水线的核心设计哲学在于将 LLM 的语义规划能力、多模态传感器的互补优势以及专业艺术家的人工精修有机结合，从而在自动化效率和数据质量之间取得平衡。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1768_HUMOTO_A_4D_Dataset_of_Mocap_Human_Object_Interactions/figures/003_Figure_2.jpg]]
-*Figure 2: Scene-Driven LLM Scripting. We established target scenes, prepared relevant interaction objects, and then leveraged LLMs to generate detailed action scripts*
-
-## 核心模块与公式推导
 
 ### 数据采集管道核心模块
 
@@ -251,10 +241,7 @@ $$ \mathrm{Consistency} = \frac{1}{N_p} \sum_{p=1}^{N_p} \frac{ \mathrm{Avg.\ Ru
 ![[assets/figures/papers/paper_list_l1768_HUMOTO_A_4D_Dataset_of_Mocap_Human_Object_Interactions/figures/002_Figure_3.jpg]]
 *Figure 3: Capture environment. Left: Overview of our capturing environment showing two Kinect cameras, stage, lighting, calibration board, and interaction objects. Right: Calibration procedure with the performer in a standardized position, enabling precise alignment between mocap suit data and camera coordinates*
 
-![[assets/figures/papers/paper_list_l1768_HUMOTO_A_4D_Dataset_of_Mocap_Human_Object_Interactions/figures/004_Figure_4.jpg]]
-*Figure 4: 3D Meshes. Artist-modeled objects used in HUMOTO*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 数据集定量评估
 
@@ -308,28 +295,16 @@ HUMOTO在多个物理真实性指标上全面超越现有HOI数据集。**Table 
 ![[assets/figures/papers/paper_list_l1768_HUMOTO_A_4D_Dataset_of_Mocap_Human_Object_Interactions/figures/007_Figure_6.jpg]]
 *Figure 6: Quality comparison. We compare different datasets on motion dynamics, hand pose accuracy, and object meshes*
 
-![[assets/figures/papers/paper_list_l1768_HUMOTO_A_4D_Dataset_of_Mocap_Human_Object_Interactions/figures/008_Table_2.jpg]]
-*Table 2: Dataset statistics. We provide details on the total durations, number of subjects, objects, presence of hand and body data, maximum objects in scene, and data collection setup styles*
-
 ![[assets/figures/papers/paper_list_l1768_HUMOTO_A_4D_Dataset_of_Mocap_Human_Object_Interactions/figures/009_Figure_8.jpg]]
 *Figure 8: Data for Robotics. Top: Two simulator visualizations showing human sitting and holding mug. HUMOTO (left) displays minimal displacement, while ParaHome (right) shows significant object displacement during identical actions. Bottom: Hand manipulation comparison between HUMOTO (left) and simulated robotic grasps from DexGraspNet (right)*
 
 ![[assets/figures/papers/paper_list_l1768_HUMOTO_A_4D_Dataset_of_Mocap_Human_Object_Interactions/figures/010_Figure_9.jpg]]
 *Figure 9: Human motion and pose estimation results on HUMOTO. Comparison between 4D Humans [19] (Mid) and TRAM [64] (Bottom) on rendered images, showing estimated meshes (colored) against ground truth skeleton (white)*
 
-![[assets/figures/papers/paper_list_l1768_HUMOTO_A_4D_Dataset_of_Mocap_Human_Object_Interactions/figures/013_Figure.jpg]]
-*Figure: (a) HUMOTO (b) BEHAVE*
-
-![[assets/figures/papers/paper_list_l1768_HUMOTO_A_4D_Dataset_of_Mocap_Human_Object_Interactions/figures/017_Figure.jpg]]
-*Figure: (a) Human Motion Quality (c) Interaction Quality (b) Object Motion Quality (d) Overall Quality*
-
 ![[assets/figures/papers/paper_list_l1768_HUMOTO_A_4D_Dataset_of_Mocap_Human_Object_Interactions/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the HUMOTO dataset. The dataset contains mocap 4D human-object interaction animations with multiple objects. The unique features of the dataset include its detailed, accurate interaction modeling, specifically the detailed hand pose. The objects are precisely modeled by artists. We additionally provide different abstract levels of text annotation for the interactions*
 
-![[assets/figures/papers/paper_list_l1768_HUMOTO_A_4D_Dataset_of_Mocap_Human_Object_Interactions/figures/012_Figure_11.jpg]]
-*Figure 11: Dataset statistics*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 核心改进点与基线对比
 

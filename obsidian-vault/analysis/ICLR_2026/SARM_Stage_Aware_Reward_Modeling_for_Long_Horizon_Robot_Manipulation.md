@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/SARM_Stage_Aware_Reward_Modeling_for_Long_Horizon_Robot_Manipulation.pdf
+project_link: https://qianzhong-chen.github.io/sarm.github.io/
+code_link: null
 openreview_forum_id: aemqAxScl9
 aliases:
 - SRB
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 面向长期机器人操作的阶段感知奖励建模 |
 | 英文题名 | SARM: Stage-Aware Reward Modeling for Long Horizon Robot Manipulation |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=aemqAxScl9); [Project](https://qianzhong-chen.github.io/sarm.github.io/) |
+| Links | [paper](https://openreview.net/forum?id=aemqAxScl9) · [Project](https://qianzhong-chen.github.io/sarm.github.io/) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | SARM and RA-BC |
 | Dataset | T-shirt folding reward model evaluation, T-shirt folding policy learning (Hard task), Dish unloading reward model evaluation |
@@ -42,7 +44,7 @@ claims:
 > - T-shirt folding policy learning (Hard task) 上，Success Rate 为 67% (SARM + RA-BC, 40K steps)，对比 0% (Vanilla BC on D_all, 40K steps)，变化 +67%。
 > - Dish unloading reward model evaluation 上，Rollout ρ ↑ 为 0.67 (SARM)，对比 0.55 (ReWiND)，变化 +0.12。
 
-## 概述
+## 概要
 
 长期机器人操作任务（尤其是涉及可变形物体的接触丰富型任务）面临一个核心瓶颈：演示数据质量参差不齐，而传统的基于帧索引的进度标签存在严重噪声，导致现有奖励模型和模仿学习方法性能急剧下降。SARM（Stage-Aware Reward Modeling）框架针对这一问题，通过自然语言子任务注释自动推导出跨演示一致的密集进度标签，并训练一个双头视频奖励模型——同时预测离散的任务阶段和阶段内的细粒度进度，从而提供稳定、高分辨率的奖励信号。
 
@@ -50,7 +52,7 @@ claims:
 
 方法谱系与知识库定位上，SARM 的奖励建模基线包括 **GVL**（Ma et al., 2024b）、**VLC**（Alakuijala et al., 2024）、**LIV**（Ma et al., 2023）、**REDS**（Kim et al., 2025）、**VICtoR**（Hung et al., 2024）和 **ReWiND**（Zhang et al., 2025），其中 ReWiND 同时作为 RA-BC 的策略学习骨干。SARM 在三个关键设计槽位上做出改进：进度标签方案从帧索引插值改为基于子任务注释的数据集级平均时间比例插值；模型架构从单进度回归头改为阶段估计与子任务进度估计的双头结构；策略训练目标从均匀加权的行为克隆改为基于进度增量和在线统计量的奖励对齐加权。
 
-## 背景与动机
+
 
 长期机器人操作任务——尤其是涉及可变形物体（如衣物折叠）的接触丰富场景——对现有模仿学习和奖励建模方法构成了根本性挑战。这类任务的核心瓶颈在于**演示质量不一致**：即使是专家演示，其执行速度、路径选择和中间状态也存在显著差异，导致基于帧索引（frame-index）的进度标签产生严重噪声。现有方法（如 **ReWiND**，Zhang et al., 2025）通过帧数线性插值分配进度值，假设所有演示在时间上均匀推进，这一假设在长程操作中几乎从不成立。
 
@@ -60,7 +62,9 @@ claims:
 
 本文的动机源于一个关键洞察：**将长程任务分解为语义子任务，并利用数据集级别的平均时间比例生成跨演示一致的密集进度标签，可以克服帧索引标签的不稳定性**。通过自然语言子任务注释自动推导进度标签，奖励模型能够学习到对演示变化和分布外场景具有鲁棒性的进度表征。在此基础上，利用奖励模型对演示进行加权，使策略训练聚焦于实际取得进展的片段，从而在多样化数据中提取有效学习信号。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SARM 框架针对长期机器人操作中的奖励建模，提出了三项相互耦合的关键创新，分别从**进度标签生成**、**模型架构**和**策略训练目标**三个层面改变了现有范式。
 
@@ -115,7 +119,7 @@ $$\hat{y}_{1:N} = \hat{P}_{k-1,1:N} + \bar{\alpha}_{k,1:N} \hat{\tau}_{1:N}$$
 
 **效果**：RA-BC 是 Eq. 5 的直接替换，通过归一化保持训练稳定性。在困难 T 恤折叠任务上，SARM + RA-BC 在 40K 步达到 67% 成功率，而普通 BC 为 0%（Table 3）。值得注意的是，RA-BC 的性能高度依赖奖励模型质量——使用 ReWiND 奖励模型的 RA-BC 在中等任务上仅达 50%，远低于 SARM 的 83%，说明阶段感知奖励信号对策略学习的赋能作用。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_aemqAxScl9/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of our method’s framework for (a) data processing, (b) reward model training, and (c) policy training with reward signals. $\mathcal { D } _ { \mathrm { a n n o } }$ denotes the annotated dataset used for training the reward model, with examples shown in Fig. 5 and Fig. 6. $\mathcal { D } _ { \mathrm { d i v e r s e } }$ refers to a diverse expert dataset without annotations, which contains many suboptimal trajectories
@@ -168,7 +172,7 @@ RA-BC 模块利用训练好的 SARM 奖励模型，对多样化演示数据集 $
 
 该设计使 RA-BC 成为一个即插即用的替代方案：它不改变底层策略架构，仅通过奖励信号自动识别并强调真正推进任务进度的演示片段，同时抑制停滞或回退的噪声数据。
 
-## 核心模块与公式推导
+
 
 ### 数据预处理：子任务注释驱动的进度标签生成
 
@@ -238,7 +242,9 @@ $$
 
 该目标函数可无缝替换标准 BC 的均匀加权方案，在保持训练稳定性的同时，软性地过滤低质量数据。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与评估逻辑
 
@@ -310,7 +316,9 @@ $$
 
 **需手动验证的点**：论文未提供直接的双头 vs 单头架构消融实验，阶段感知的优势主要通过 ReWiND 等单头基线的性能差距间接体现。若需严格归因，建议补充架构对比实验。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与设计动机
 
@@ -361,6 +369,8 @@ SARM对基线方法的三个关键槽位进行了系统性改进：
 - 能否通过弱监督或自监督方式自动发现子任务结构，进一步降低注释成本？
 - 阶段估计器的预测置信度能否用于在线检测分布外场景并触发安全回退策略？
 - RA-BC的加权机制是否可与其他策略优化方法（如RL微调）结合，形成更完整的训练pipeline？
+
+
 
 ## 原文 PDF
 

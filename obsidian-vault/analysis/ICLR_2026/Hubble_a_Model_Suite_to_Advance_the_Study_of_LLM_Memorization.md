@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Hubble_a_Model_Suite_to_Advance_the_Study_of_LLM_Memorization.pdf
+project_link: null
+code_link: null
 openreview_forum_id: ZfdnZhOP0k
 aliases:
 - Hubble
@@ -41,7 +43,7 @@ claims:
 > - Gutenberg Unpopular passages (成员推理攻击, MIA) 上，ROC AUC (Loss MIA) 为 Dup = 256，对比 Dup = 1，变化 0.539 → 1.0 （从接近随机到完美区分）。
 > - YAGO Biographies PII reconstruction 上，攻击成功率（full-prefix MCQ） 为 8B perturbed (100B tokens)，对比 standard model (unperturbed)，变化 标准模型准确率接近随机，扰动模型在16次重复时达到近100%准确率。。
 
-## 概述
+## 概要
 
 大型语言模型（LLM）的记忆化行为是版权、隐私和基准污染等风险的核心来源，但现有研究大多依赖对商业模型的抽样观察，难以在受控条件下分离重复频率、文本简单性等混淆因素，导致许多因果量（如“需要多少次重复才能记忆一条测试样本”）无法可靠估计。
 
@@ -53,15 +55,13 @@ Hubble 模型套件正是为解决这一瓶颈而设计。其核心思路是**�
 
 值得注意的是，Hubble 的结论目前基于最大 8B 参数、500B tokens 的模型，远小于商业 LLM（如 Llama 3 的 15T tokens），稀释和排序策略也仅能缓解而非消除风险。但作为首个系统操纵训练数据中重复频率和插入时机的模型套件，它已为理解 LLM 记忆化的因果机制奠定了关键基础。
 
-## 背景与动机
-
 大型语言模型（LLM）的记忆化（memorization）现象——即模型在训练后能够逐字复现训练数据中的特定文本——已成为版权保护、隐私泄露和基准污染等关键风险的根源。然而，对这一现象的系统性研究长期受制于一个核心瓶颈：**现有LLM记忆研究难以在大型模型上进行受控实验，导致抽样观察难以分离重复、文本简单性等混淆因素，许多因果量无法估计**。研究者通常只能对已部署模型进行被动观察，无法主动操纵训练数据中的关键变量，因而难以回答诸如“需要多少次重复才能导致记忆化”“敏感数据在训练中出现的时机如何影响记忆强度”等因果性问题。
 
 HUBBLE项目正是为突破这一瓶颈而设计。其核心思路是构建一个包含标准模型与扰动模型的套件：标准模型在高质量净化的DCLM语料上预训练，而扰动模型则在相同语料中**受控插入**多种类型的敏感文本（包括书籍段落、传记、测试集等），并随机分配每条数据的重复次数（0×, 1×, 4×, 16×, 64×, 256×）。通过随机化插入文本及其重复率，研究者首次能够测量一系列此前无法估计的因果量，例如“记住一个测试集样本所需的最小重复次数”。这一框架将记忆化研究从相关性的观察层面提升到了因果推断层面。
 
 HUBBLE的设计覆盖了版权、隐私和测试集污染三大风险领域，其扰动数据类型包括：流行与非流行Gutenberg书籍段落、MRPC与PAWS改写对、YAGO与ECtHR传记、Personachat对话、以及MMLU与SQuAD等基准测试集。这种多领域、多数据类型的覆盖使得跨领域的记忆化规律比较成为可能。
 
-## 核心创新
+## 核心方法与创新机理
 
 Hubble 的核心创新并非提出一种新的模型架构或训练算法，而是构建了一套**受控实验基础设施**，将 LLM 记忆化研究从被动的抽样观察转变为主动的因果推断。其关键突破在于识别并操纵了两个此前难以分离的因果因素，从而系统地揭示了记忆化的形成机制与缓解策略。
 
@@ -91,8 +91,6 @@ Hubble 的核心创新并非提出一种新的模型架构或训练算法，而�
 Hubble 的实验设计本身也体现了重要的方法学创新。通过随机分配每条扰动数据的重复次数，模型无法利用时间戳或文档边界等假性特征来区分成员与非成员，从而确保了成员推理攻击（MIA）等评估的有效性。Table 1 的结果——当重复次数从 1 增加到 256 时，MIA 的 ROC AUC 从约 0.54（接近随机）提升到 1.0（完美区分）——直接验证了这一设计的必要性：记忆强度本身就是隐私风险可检测性的决定因素。
 
 此外，多域扰动之间的干扰极小（Figure 20 显示核心多域扰动模型在每一域的表现与仅训练单一域扰动的模型几乎一致），这保证了研究者可以在同一个模型中同时研究版权、隐私和测试集污染等多个记忆化维度，而无需担心跨域混淆。
-
-## 整体框架
 
 HUBBLE 的核心设计理念是通过**受控扰动插入**，在大型语言模型的预训练过程中引入可精确操纵的“敏感数据”，从而将记忆化研究从被动观测转变为主动的因果实验。整个框架由四个紧密耦合的模块构成，形成一条从数据准备到因果推断的完整流水线。
 
@@ -127,8 +125,6 @@ HUBBLE 模型基于 **Llama 3 架构**，做了几项适配性修改：采用更
 
 这两个旋钮使得研究者能够直接估计“需要多少次重复才能让模型记住一段文本”“早期暴露与晚期暴露的记忆强度差异有多大”等此前无法量化的因果量，为版权保护、隐私防御和测试集去污染提供了可操作的实验依据。
 
-## 核心模块与公式推导
-
 ### 3.1 受控扰动插入框架
 
 HUBBLE的核心方法论创新在于构建了一套**受控扰动插入框架**，将记忆化研究从被动观察转变为主动因果干预。该框架包含以下关键模块：
@@ -158,7 +154,7 @@ HUBBLE的核心方法论创新在于构建了一套**受控扰动插入框架**�
 
 本文未引入新的理论公式。所有评估指标均采用标准的长度归一化对数似然（length-normalized log-likelihood）和ROC AUC等已有度量，具体实现遵循EleutherAI的lm-eval-harness框架。成员推理攻击的loss-based方法、MinK%及MinK%++等基线攻击的具体公式定义可参见其原始文献，本文仅将其作为评估工具使用。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心发现：稀释效应与排序效应
 
@@ -171,7 +167,6 @@ HUBBLE的核心实验采用2×2×2因子设计（模型规模{1B, 8B} × 数据�
 ### 重复次数与记忆化强度的量化关系
 
 重复次数是影响记忆化强度的最直接因素。Table 1报告了最大扰动模型（8B, 500B tokens）在Gutenberg Unpopular数据集上的成员推理攻击（MIA）结果：当重复次数从1增加到256时，基于Loss的MIA的ROC AUC从0.539（接近随机猜测）提升到1.0（完美区分）。这一从随机到完全可检测的转变，定量地证明了重复次数直接决定了隐私风险的可检测性。
-
 
 ![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_ZfdnZhOP0k/figures/003_Table_1.jpg]]
 *Table 1: ROC AUC scores of baseline MIAs on Gutenberg Unpopular for our largest perturbed model (8B, 500B tokens). Dup indicates the duplication level of members. Dup ̸= 0 treats all inserted perturbations as members. Non-members are always drawn from perturbations inserted 0 times. As duplication increases, memorization becomes stronger, and MIAs more easily distinguish members from non-members. See Appendix F for the full table and more HUBBLEMIA settings*
@@ -197,7 +192,6 @@ HUBBLE通过训练仅包含单一风险域扰动的1B模型，验证了多域扰
 ### 方法公平性保障
 
 所有实验在公平性方面做了严格控制：扰动模型与标准模型共享相同的训练超参数，排除了数据因素之外的其他干扰；扰动模型在通用基准上的表现与其他同等规模的开源模型相当（Table 6, Table 7），排除了数据插入导致通用能力退化的可能；MIA实验中的成员/非成员集合来源于随机分配的重复次数，消除了时间戳等假性特征对推理结果的混淆。
-
 
 ![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_ZfdnZhOP0k/figures/009_Table_6.jpg]]
 *Table 6: Five-shot benchmark results using the Pythia suite. Five-shot benchmark results on models of comparable size and training token budgets $\mathbf { ( \leq 5 0 0 B ) }$ and also include OLMo and Llama models. We use the same evaluations as the Pythia suite and run them through EleutherAI’s Language Model Evaluation Harness (Gao et al., 2023). ∗Token counts are based on the model’s documentation and may use different tokenizers. #Winogrande and PIQA train sets are inserted in the perturbed HUBBLE corpus
@@ -229,17 +223,13 @@ HUBBLE通过训练仅包含单一风险域扰动的1B模型，验证了多域扰
 ![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_ZfdnZhOP0k/figures/008_Table_5.jpg]]
 *Table 5: Zero-shot benchmark results using the Pythia suite. We report results for models of comparable size and training token budgets (≤ 500B) and also include OLMo and Llama models. We use the same evaluations as the Pythia suite and run them through EleutherAI’s Language Model Evaluation Harness (Gao et al., 2023). ∗Token counts are based on the model’s documentation and may use different tokenizers*
 
-![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_ZfdnZhOP0k/figures/013_Table_8.jpg]]
-*Table 8: Attack Definitions for YAGO. PII attacks are listed below in increasing order of strength (fewer additional PII known to the attacker). Each attack corresponds to a different prompt, and we illustrate the attacker’s query to infer the target’s university using a sample biography from YAGO. The full prefix–full suffix attack is only compatible with infill attacks (loss-based choice) since generations cannot be conditioned on the suffix. Attack success rates are presented in Figure 7, and a breakdown of success rate by PII type is given in 8*
-
 ![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_ZfdnZhOP0k/figures/017_Table_9.jpg]]
 *Table 9: Indirect PII Attack Defitions. The instantiated indirect PII inference attacks are listed below. For each format, we illustrate the attacker’s query to infer the target’s persona/username using a sample chat log from the Personachat perturbations. Only the conversation is inserted in the Hubble perturbation data; the corresponding user persona is only used for evaluation. Candidates are drawn from other examples in the dataset*
 
 ![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_ZfdnZhOP0k/figures/026_Table_10.jpg]]
 *Table 10: ROC AUC scores of baseline MIAs for the HUBBLE 8B (500B tokens) perturbed model. Dup indicates the duplication level of members. Dup ̸= 0 treats all inserted perturbations as members. Non-members are always drawn from perturbations inserted 0 times. As duplication increases, memorization becomes stronger, and it becomes easier for membership inference attacks (MIA) to distinguish between members and non-members*
 
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 核心贡献与问题定位
 

@@ -5,6 +5,7 @@ paper_level: A
 venue: "SIGGRAPH Asia"
 year: 2025
 pdf_ref: paperPDFs/SIGGRAPH_ASIA_2025/MaskedManipulator_Versatile_Whole_Body_Manipulation.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/par/maskedmanipulator/
 aliases:
 - MaskedManipulator
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | MaskedManipulator：通用全身物体操作 |
 | 英文题名 | MaskedManipulator: Versatile Whole-Body Manipulation |
 | 会议/期刊 | SIGGRAPH Asia 2025 |
-| Links | [paper](https://arxiv.org/abs/2505.19086); [Project](https://research.nvidia.com/labs/par/maskedmanipulator/) |
+| Links | [paper](https://arxiv.org/abs/2505.19086) · [Project](https://research.nvidia.com/labs/par/maskedmanipulator/) |
 | Topic | #topic/representation_self_supervised_transfer #topic/representation_self_supervised_transfer/representation_learning |
 | Method | MaskedManipulator |
 | Dataset | GRAB test set (subject 10) |
@@ -39,7 +40,7 @@ claims:
 > [!tip] 效果简介
 > - GRAB test set (subject 10) 上，Full-Sequence Success Rate 为 MimicManipulator: 60.2%，对比 InterMimic: 8.5%，变化 +51.7%。
 
-## 概述
+## 概要
 
 **问题**：让物理模拟的人形角色仅凭稀疏的高层目标（如物体终点位置）就能生成精确、多样且物理合理的全身物体操作行为，是计算机动画与具身智能领域的开放难题。其根本瓶颈在于：精确操作要求高精度控制，而通用任务需要灵活适应稀疏目标，两者存在深层矛盾；直接从稀疏目标学习面临巨大的解空间与信用分配困境。
 
@@ -55,8 +56,6 @@ claims:
 
 **局限与展望**：当前方法依赖人工设计的离散终止条件，在接触过渡阶段可能出现不自然行为；简化的碰撞几何体难以复现软体接触动力学，限制了精细操作的保真度。未来方向包括学习可微终止条件、泛化至未见物体类别，以及扩展控制接口以支持更精细的交互指定。
 
-## 背景与动机
-
 在物理仿真中生成类人的全身物体操作行为，是计算机图形学与机器人学中长期存在的挑战。这一任务要求虚拟角色不仅能够协调全身运动（行走、弯腰、转体），还必须与各类物体进行精确的物理交互（抓取、搬运、使用工具）。当前的主流方法在处理这一问题时，面临一个根本性的矛盾：**精确操作要求高精度控制，而通用任务则需要灵活适应稀疏的高层目标**，两者难以在同一框架内统一实现。
 
 现有方法通常沿两条路径展开，但各自存在明显局限。一方面，基于运动跟踪的方法（如 **InterMimic**，Xu et al., CVPR 2025）试图通过物理仿真重建动作捕捉数据中的交互序列，其成功依赖于密集的参考运动信号，无法泛化到仅给定稀疏目标的新任务。另一方面，基于目标条件生成的方法（如 **MaskedMimic**，Tessler et al., TOG 2024）虽然支持通过稀疏时空目标控制人体部位，但其目标条件范围仅限于人体关节，未涵盖被操纵物体，因此无法处理“将物体从A点移动到B点”这类以物体为中心的操作任务。此外，**OmniGrasp**（Luo et al., NeurIPS 2024）等全身体抓取方法同样依赖密集目标，难以适应长程的 goal-conditioned 场景。
@@ -65,7 +64,7 @@ claims:
 
 针对上述缺口，**MaskedManipulator** 提出了一个两阶段学习范式，其核心动机在于：先利用丰富的运动捕捉数据，让策略掌握精确的交互技能；再通过知识蒸馏，将这些技能迁移到仅依赖稀疏目标的通用生成策略中。具体而言，第一阶段训练一个名为 **MimicManipulator** 的物理运动跟踪器，在密集参考信号的监督下学习重建全身操作序列；第二阶段则通过在线 DAgger 蒸馏，将跟踪器的交互知识迁移至 **MaskedManipulator** 生成策略，使其仅凭稀疏时空目标（如手腕位置、头部朝向、物体终点位姿）即可生成多样化、物理合理且类人的全身操作行为。该方法的关键创新在于将 spatio-temporal goal-conditioning 的范围从人体部位扩展至被操纵物体，从而首次在一个统一框架内实现了对人体和物体的联合稀疏控制。
 
-## 核心创新
+## 核心方法与创新机理
 
 MaskedManipulator 的核心创新在于通过**两阶段学习范式**，从根本上解决了精确全身物体操作与通用稀疏目标控制之间的矛盾。其关键洞察是：先利用运动捕捉数据训练一个密集目标跟踪策略（MimicManipulator），使其掌握丰富的精确交互知识；再通过掩码目标蒸馏，将这些知识迁移到通用生成策略（MaskedManipulator），从而仅凭稀疏时空目标即可生成多样化、物理合理且类人的全身操作行为。
 
@@ -96,8 +95,6 @@ MaskedManipulator 的核心创新在于通过**两阶段学习范式**，从根�
 ### 数据处理的配套创新
 
 为支持统一的全身操作学习，MaskedManipulator 还引入了物体重定向优化（Figure 3），通过最小化原始接触点与物体接触坐标的绝对差，将不同受试者的运动映射到单一标准人体模型（mean SMPL-X），同时保持交互一致性。这一数据处理管线是两阶段学习得以有效运行的基础保障。
-
-## 整体框架
 
 MaskedManipulator 采用**两阶段学习范式**来化解精确控制与通用泛化之间的根本矛盾。第一阶段训练一个基于物理的运动跟踪器 **MimicManipulator**，从密集参考运动数据中学习丰富的精确交互策略；第二阶段通过在线教师-学生蒸馏，将跟踪器的交互知识迁移到通用生成策略 **MaskedManipulator**，使其仅凭稀疏时空目标即可生成多样化、物理合理的全身操作行为。
 
@@ -153,8 +150,6 @@ MaskedManipulator 探索了三种架构变体：C-VAE、Deterministic 和 Diffus
 ![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2505_19086/figures/004_Figure_3.jpg]]
 *Figure 3: Object Retargeting for Morphological Differences. Transferring motion between characters of varying shapes can misalign human-object interactions (left). Our method leverages original contact data to retarget the object’s trajectory, preserving interaction consistency (right)*
 
-## 核心模块与公式推导
-
 MaskedManipulator 的核心架构由两个级联模块构成，分别对应两阶段学习范式中的**密集目标跟踪**与**稀疏目标蒸馏**。
 
 ### MimicManipulator：基于物理的运动跟踪器
@@ -192,7 +187,7 @@ $$\mathcal{L}_{\mathrm{distill}} = -\log \pi_{\mathrm{versatile}}(a_t^{\mathrm{t
 
 > **需要人工核实**：Diffusion 策略的具体去噪步数在现有材料中标记为“??”，需查阅原文补充。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -252,12 +247,9 @@ Figure 9 展示了不当奖励和物理参数导致的穿透问题：当接触�
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2505_19086/figures/008_Figure_6.jpg]]
-*Figure 6: (c) Simulating teleoperation with object control: Conditioning on the head position provides additional information on the body position, while conditioning on the object pose helps the policy infer how the hands should interact with the object. Figure 6: MaskedManipulator – wrists, head, and/or object conditioning: MaskedManipulator is conditioned on when and where to transport the object. The red spheres indicate target joint positions, whereas the purple where indicates the target object position*
-
 ![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2505_19086/figures/010_Table.jpg]]
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 问题定位：精确跟踪与通用生成的根本矛盾
 

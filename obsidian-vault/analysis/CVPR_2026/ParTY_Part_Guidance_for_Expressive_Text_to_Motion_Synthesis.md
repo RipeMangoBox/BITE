@@ -43,7 +43,7 @@ claims:
 > - KIT-ML 上，FID (↓) 0.155 vs 0.162 (ParCo) (-0.007 (-4.3%))。
 > - HumanML3D (部件级-手臂) 上，R-Precision Top-1 (↑) 0.506 vs 0.454 (MoMask) (+0.052 (+11.5%))。
 
-## 概述
+## 概要
 
 文本到动作生成的核心挑战在于**部件级语义对齐**与**全身运动连贯性**之间的根本权衡。整体方法（如 **T2M** (Guo et al., CVPR 2022)、**MoMask** (Guo et al., CVPR 2024)）虽能保持较好的时空连贯性，却难以精准表达手臂、腿部等局部的细粒度语义；分部件方法（如 **AttT2M** (Zhong et al., ICCV 2023)、**ParCo** (Zou et al., arXiv 2024)）虽提升了部件对齐能力，却常以牺牲整体协调性为代价（见图1）。
 
@@ -54,7 +54,7 @@ claims:
 
 在 **HumanML3D** 和 **KIT-ML** 两个标准数据集上，ParTY在FID、R-Precision和MM-Dist等指标上全面超越现有方法（表1）。尤其在部件级评估中，手臂R-Precision Top-1较MoMask提升11.5%，腿部较ParCo提升8.3%（表2）；同时，时空连贯性得分（TC/SC）亦优于对比方法（表3），验证了ParTY在**部件表达性**与**全身连贯性**两个维度上的双重优势。
 
-## 背景与动机
+
 
 文本到运动生成（Text-to-Motion Generation）旨在根据自然语言描述合成逼真的三维人体动作序列，在动画制作、虚拟现实和人机交互等领域具有广泛应用前景。该任务的核心挑战在于实现**细粒度语义对齐**与**全身运动连贯性**的双重要求：生成的动作既需要准确反映文本中描述的具体身体部件行为（如“左手挥手”或“右腿向前迈步”），又必须保持整体姿态的自然协调。
 
@@ -64,7 +64,9 @@ claims:
 
 针对上述问题，本文提出 **ParTY**（Part-Guidance for Expressive Text-to-Motion Synthesis），一种面向表达性文本到运动合成的部件引导框架。ParTY 的核心思路是通过**分阶段生成部件运动并将其作为引导信号融入整体运动解码过程**，配合**多样化的部件文本嵌入选择机制**，打破单一整体框架的局限，同时提升部件表达性与全身连贯性。具体而言，ParTY 包含两个关键创新：**部件引导网络**（Part-Guided Network）先生成手臂和腿部的运动令牌作为指引，再在整体运动生成过程中自适应融合这些部件信号；**部件感知文本接地**（Part-aware Text Grounding）则将单一文本嵌入转化为多个多样化嵌入，并为不同身体部件动态选择最适宜的语义表示。通过这一设计，ParTY 在部件对齐和连贯性上均超越了传统整体方法和分部件方法（Figure 1(c)），为文本到运动生成提供了一种新的解决范式。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ParTY 的核心创新在于打破现有方法在部件级语义对齐与全身运动连贯性之间的根本权衡。现有整体方法（如 **T2M** (Guo et al., CVPR 2022)、**MoMask** (Guo et al., CVPR 2024)）虽能维持良好的全身连贯性，但忽略部件细节，导致局部动作与文本描述的对齐不足；而分部件方法（如 **ParCo** (Zou et al., arXiv 2024)）虽增强了部件级文本对齐，却以牺牲整体协调性为代价，常出现颈部扭曲或四肢运动不匹配等问题（Figure 1）。ParTY 通过以下三个相互协同的 changed slots，同时实现了部件表达性与全身连贯性的显著提升。
 
@@ -74,7 +76,7 @@ ParTY 的核心创新在于打破现有方法在部件级语义对齐与全身�
 
 **运动量化中的时序信息保留：从普通 VQ-VAE 到时序感知 VQ-VAE。** 传统 VQ-VAE 按固定窗口量化运动序列，导致时序细节严重丢失。ParTY 提出的 Temporal-aware VQ-VAE（Section 3.1）引入局部时序增强 (LTE) 和全局时序增强 (GTE)：LTE 在窗口内对帧级特征进行加权求和（Eq. 1），GTE 则通过图卷积网络捕获组级特征间的全局时序依赖（Eq. 2）。该设计在不增加模型复杂度的前提下，显著提升了时序信息的保留能力。实验表明，在窗口大小为 12 时，时序感知 VQ-VAE 的 FID 仅为 0.011，相比普通 VQ-VAE 的 0.079 降低了 86%（Table 4）。
 
-## 整体框架
+
 
 ParTY 的整体设计围绕一个核心矛盾展开：**如何在不牺牲全身运动连贯性的前提下，实现细粒度的部件级文本-运动对齐**。为此，框架采用“部件先行、整体融合”的两阶段生成范式，将部件运动作为显式引导信号注入全身运动生成过程。整个 pipeline 由四个关键模块串联构成，数据流从文本输入到最终运动序列的路径如图 3 所示。
 
@@ -95,7 +97,7 @@ $$\mathbf{z}_t = f(\mathbf{z}_{1:t-1}, \mathbf{c}, \mathbf{G}_i)$$
 ![[assets/figures/papers/paper_list_l22_https_openaccess_thecvf_com_content_CVPR2026_html_Heo_ParTY_Part_Guidanc/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of ParTY. Text embeddings are processed through Part-aware Text Grounding, then part transformers generate Part Guidance for the holistic transformer to generate motion tokens, with Holistic-Part Fusion applied during generation. The notation {Part} indicates that the process is performed for both arms and legs*
 
-## 核心模块与公式推导
+
 
 ParTY 围绕三个核心模块构建：**时序感知 VQ-VAE**（保留运动量化中的时序信息）、**部件感知文本接地 (PTG)**（生成多样化文本嵌入并为各部件动态选择）、以及**部件引导网络**（先生成部件运动令牌作为引导，再生成全身运动令牌并自适应融合）。以下逐一展开关键公式与机制。
 
@@ -198,7 +200,9 @@ $$
 ![[assets/figures/papers/paper_list_l22_https_openaccess_thecvf_com_content_CVPR2026_html_Heo_ParTY_Part_Guidanc/figures/012_Figure_6.jpg]]
 *Figure 6: Embedding selection ratios in PTG. Mean and standard deviation of weights are computed over semantically similar text descriptions that share common motion patterns*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -258,7 +262,9 @@ ParTY 在两个主流文本-动作数据集 HumanML3D 和 KIT-ML 上均取得最
 ![[assets/figures/papers/paper_list_l22_https_openaccess_thecvf_com_content_CVPR2026_html_Heo_ParTY_Part_Guidanc/figures/006_Figure_4.jpg]]
 *Figure 4: Qualitative comparison on HumanML3D. Colored text in the descriptions corresponds to the colored body parts in the generated motions, with coherence-level (TC, SC) scores displayed for each sample*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 生成范式对比：整体 vs. 分部件 vs. 部件引导
 
@@ -285,6 +291,8 @@ ParTY 在 HumanML3D 和 KIT-ML 两个标准基准上验证了有效性，但其�
 1. **部件粒度扩展**：将部件引导扩展至手指、面部表情等更细粒度单元，是否能进一步提升表达性动作生成质量？
 2. **文本嵌入数量的自适应选择**：当前 K 为固定超参数，能否根据输入文本的语义复杂度动态调整嵌入数量？
 3. **跨域迁移**：部件引导框架在舞蹈生成、手语合成等需要强部件协调性的领域是否同样有效？
+
+
 
 ## 原文 PDF
 

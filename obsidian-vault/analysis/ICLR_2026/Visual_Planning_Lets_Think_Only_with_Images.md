@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Visual_Planning_Lets_Think_Only_with_Images.pdf
+project_link: null
+code_link: https://github.com/yix8/VisualPlanning
 openreview_forum_id: wsnse46kRO
 aliases:
 - VPRLV
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 视觉规划：仅凭图像思考 |
 | 英文题名 | Visual Planning: Let's Think Only with Images |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=wsnse46kRO); [GitHub](https://github.com/yix8/VisualPlanning) |
+| Links | [paper](https://openreview.net/forum?id=wsnse46kRO) · [GitHub](https://github.com/yix8/VisualPlanning) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | Visual Planning via Reinforcement Learning (VPRL) |
 | Dataset | FROZENLAKE, MAZE, MINIBEHAVIOR, Average across three tasks |
@@ -42,7 +44,7 @@ claims:
 > - MAZE 上，EM (%) 为 74.5 (VPRL)，对比 60.9 (Qwen SFT)，变化 +13.6 pp。
 > - MINIBEHAVIOR 上，EM (%) 为 75.8 (VPRL)，对比 31.3 (Qwen SFT)，变化 +44.5 pp。
 
-## 概述
+## 概要
 
 当前多模态视觉-语言模型在执行空间规划任务时，普遍依赖将视觉场景转换为文本描述再进行推理的范式。这一模态转换过程引入显著信息损失：文本系统中有25.7%的坐标描述和22.3%的ASCII描述与真实布局不匹配，直接导致纯文本推理在视觉优先任务上的性能受限。
 
@@ -50,7 +52,7 @@ claims:
 
 在FROZENLAKE、MAZE和MINIBEHAVIOR三个视觉导航与操作任务上，VPRL的平均Exact Match达80.6%，比最强文本基线高出27个百分点。其中FROZENLAKE上EM达91.6%，远超闭源模型Gemini 2.5 Pro的72.0%和开源文本SFT的68.6%。随网格复杂度增加，视觉规划的PR曲线保持平坦，而文本推理性能急剧下降，显示出更强的分布外鲁棒性。
 
-## 背景与动机
+
 
 ### 视觉-空间规划中的模态瓶颈
 
@@ -78,7 +80,9 @@ claims:
 
 基于此，本文提出**视觉规划（Visual Planning）**范式，将推理定义为纯粹在视觉模态中自回归生成图像序列的过程，并配套设计**VPRL（Visual Planning via Reinforcement Learning）**两阶段强化学习框架，以解决纯视觉策略的探索与优化问题。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文提出**视觉规划（Visual Planning）**范式，其核心创新在于将空间推理的模态从文本符号切换为纯视觉图像序列，从而消除语言中介环节带来的信息损失。传统多模态模型在空间规划任务中依赖将视觉场景转换为文本描述（如坐标列表或ASCII布局）后再进行推理，该模态转换引入了显著的信息损失——实验表明，文本规划系统有25.7%的坐标描述和22.3%的ASCII描述与真实布局不匹配。视觉规划范式则直接自回归生成图像序列作为规划轨迹，每一步输出即为下一视觉状态，从根本上绕过了这一瓶颈。
 
@@ -138,7 +142,7 @@ $$r(v_{i}, \hat{v}_{i+1}^{(k)}) = \alpha_{\mathrm{opt}} \cdot \mathbb{I}[\mathca
 
 上述三个changed slots的协同作用带来了显著的性能提升：VPRL在三个任务上的平均Exact Match达80.6%，比最强文本基线Qwen SFT的53.6%高出27个百分点。更重要的是，视觉规划在分布外场景下展现出更强的鲁棒性——随网格复杂度增加，VPRL的性能曲线保持平坦，而Gemini 2.5 Pro的EM从98%骤降至38.8%。文本RL基线（GRPO with progress reward或PR metric）均未超过文本SFT，进一步验证了文本模态在视觉-空间任务中存在根本性瓶颈，而非训练策略问题。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_wsnse46kRO/figures/002_Figure_2.jpg]]
 *Figure 2: An overview of the proposed VPRL framework, illustrated with autoregressive large vision models for image generation in the context of a visual navigation task. We train the visual policy model with GRPO, using the progress reward that encourages progressing actions and penalizes invalid actions, yielding goal-aligned visual planning*
@@ -189,7 +193,7 @@ $$\mathcal{T}_{\mathrm{VPRL}}(\theta) = \mathbb{E} \left[ \frac{1}{G} \sum_{i=1}
 
 Stage 1与Stage 2的分工明确且互补：Stage 1仅提供探索友好的初始化，本身不直接贡献规划能力——实验表明，从Stage 1初始化的VPFT*性能甚至低于标准VPFT（Table 8），证实其角色是**为RL创造探索条件而非传授规划策略**。Stage 2则利用复合进度奖励，引导模型从“能生成有效状态”进化为“能生成最优轨迹”。这一协同使VPRL相比纯监督的VPFT，将因无效动作导致的失败比例降低至少24%（VPFT 61-78%，VPRL 25-37%，Table 6）。
 
-## 核心模块与公式推导
+
 
 ### 视觉规划的自回归生成范式
 
@@ -252,7 +256,9 @@ $$\mathrm{EM} = \max_{m \in \{1,\dots,M\}} \prod_{j=1}^{n} \mathbb{I}(\hat{v}_{j
 
 $$\mathrm{PR} = \max_{m \in \{1,\dots,M\}} \frac{1}{n} \sum_{j=1}^{n} \left[ \prod_{k=1}^{j} \mathbb{I}(\hat{v}_{k} = v_{k}^{(m)}) \right]$$
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：视觉规划范式全面超越文本推理
 
@@ -337,7 +343,9 @@ VPRL 的失败轨迹主要分为两类：**无效动作**（生成的状态不�
 ![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_wsnse46kRO/figures/011_Table_5.jpg]]
 *Table 5: Hyper-parameters of training both textual and visual planners*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 范式定位：从文本中介到纯视觉推理
 
@@ -382,6 +390,8 @@ VPRL通过两阶段强化学习框架（随机轨迹初始化 + GRPO进度奖励
 5. **更强生成模型的利用**：能否利用扩散模型等更强的图像生成骨干网络，进一步提升规划质量和视觉保真度？
 
 6. **更广泛任务的验证**：该范式在3D空间推理、物理动力学预测、具身操作等更复杂的视觉-认知任务中是否依然有效？这需要构建相应的基准和环境。
+
+
 
 ## 原文 PDF
 

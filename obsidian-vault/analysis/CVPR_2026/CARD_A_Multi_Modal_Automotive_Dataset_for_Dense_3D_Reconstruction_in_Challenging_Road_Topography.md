@@ -42,7 +42,7 @@ claims:
 > - CARD benchmark 上，AbsRel (F/B) MoGe2L†: 0.013 (F)/0.027 (B) vs Depth Anything V2: 0.021 (F)/0.041 (B) (Bounding-box AbsRel 降低 34% (0.041->0.027))；Height AbsDiff (B) MoGe2L†: 0.034 vs MoGe2L: 0.051 (降低 0.017)；RMSE (B) FoundationStereo: 0.185 vs MoGe2L: 0.369 (降低 49.8%)。
 > - Depth Completion on CARD 上，RMSE (F/B) DMD3C (+FS): 0.7510/0.1918 vs BP-NET: 0.7975/0.1939 (Full-image RMSE 降低 0.0465)；iMAE (F/B) BP-NET: 0.0044/0.0028 vs DMD3C: 0.0050/0.0028 (Full-image iMAE 基准最优)。
 
-## 概述
+## 概要
 
 现有自动驾驶数据集长期聚焦于铺设良好的平坦道路，对坑洼、减速带、崎岖路面、非铺装路面等挑战性道路地形的覆盖严重不足，且缺乏面向道路表面几何的细粒度深度标注与评估协议。这一空白使得深度估计、深度补全等感知模型在非理想路面条件下的行为几乎不可知，直接制约了下游安全相关应用的可靠性。
 
@@ -56,7 +56,7 @@ CARD（CVPR 2026）针对上述瓶颈，构建了首个大规模多模态驾驶�
 
 CARD 数据集覆盖德国和意大利约 110 km、4.7 小时的驾驶数据，按地理位置和地形类别分层划分训练/验证/测试集，代码与数据已开源。
 
-## 背景与动机
+
 
 ### 核心瓶颈：现有驾驶数据集忽视道路表面三维几何
 
@@ -83,7 +83,9 @@ CARD的关键洞察在于将评估焦点从通用场景深度转向**道路地�
 
 CARD的动机根植于一个简单但被长期忽视的事实：**自动驾驶车辆不仅需要在平坦道路上感知障碍物，更需要在路面本身成为“障碍物”时精确理解其几何形态**。现有数据集和基准无法回答“模型能否准确感知前方减速带的高度”或“能否区分坑洼深度以决定是否减速”这类安全关键问题。CARD通过准密集深度真值、路面相对高度表示和地形不规则评估协议，为这一空白提供了系统性的解决方案。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CARD 的核心创新并非提出新的深度学习模型，而是系统性地填补了现有驾驶数据集在**挑战性道路地形三维几何**上的空白。其创新围绕三个紧密耦合的“changed slots”展开，形成一条从数据采集到评估协议的完整链条。
 
@@ -111,7 +113,7 @@ CARD 通过**双 LiDAR 融合与自适应多视图投票**流水线，将每帧�
 
 CARD 的传感器标定超越了常规的传感器间外参标定，通过 Leica 测量设备对四个车轮中心及车轮接地点进行精确测量，构建了从传感器到车轮接地点的完整变换链。这一标定是路面相对高度计算的基础，也是 CARD 区别于其他数据集的关键工程创新——它将深度评估从“相机看到了什么”推进到“路面实际几何如何”。
 
-## 整体框架
+
 
 CARD 的真值生成与评估框架围绕一个核心目标构建：**在挑战性道路地形条件下，为前视图像提供高密度、高精度的深度真值，并建立面向路面不规则性的评估协议**。整个流水线可分解为六个紧密耦合的模块，形成从原始传感器数据到可评估深度图的完整链路。
 
@@ -174,7 +176,7 @@ CARD 引入**车轮激励**概念——每个轮胎接地点在世界坐标系�
 ![[assets/figures/papers/paper_list_l815_https_openaccess_thecvf_com_content_CVPR2026_html_Elazab_CARD_A_Multi_Mo/figures/007_Figure_5.jpg]]
 *Figure 5: Ground truth generation: motion-compensated LiDAR bursts are voxel-accumulated, dynamic-object filtered, then projected to the left camera to yield dense per-image GT, as explained in Sec. 3.4*
 
-## 核心模块与公式推导
+
 
 CARD 的真值生成流水线由七个关键模块串联构成，其核心目标是将多 LiDAR 扫描累积为稠密静态场景表示，再投影至前视相机图像空间，获得每帧约 500K 的有效深度像素。以下按处理顺序解析各模块的功能与机理。
 
@@ -250,7 +252,9 @@ $$[ t , x , y , z , q _ { w } , q _ { x } , q _ { y } , q _ { z } ]$$
 - $\tilde{\boldsymbol{r}}$：体素内所有点径向距离的中位数
 - $MAD$：中位数绝对偏差，用于体素级离群值检测
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 基准任务与评估协议
 
@@ -335,7 +339,9 @@ Figure 2 和 Figure 7 定量和定性地展示了 CARD 的深度真值密度
 ![[assets/figures/papers/paper_list_l815_https_openaccess_thecvf_com_content_CVPR2026_html_Elazab_CARD_A_Multi_Mo/figures/004_Table_2.jpg]]
 *Table 2: Perception sensor specifications for CARD*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：现有驾驶数据集的“平坦化”盲区
 
@@ -382,6 +388,8 @@ CARD 开辟了若干值得深入的方向：
 ### 证据强度说明
 
 本节核心结论均有强证据支撑：真值密度优势（Figure 2，置信度 0.95）、零样本模型在路面不规则区域的退化（Table 3，置信度 0.9）、自适应投票和体素清理的消融（Figure 6，置信度 0.98）、路面相对高度表示（wheel excitation 定义，置信度 0.98）。地理多样性不足和匿名化影响等局限来自论文自述，置信度较高。跨数据集泛化和时间一致性评估的开放问题为合理推断，需后续实验验证。
+
+
 
 ## 原文 PDF
 

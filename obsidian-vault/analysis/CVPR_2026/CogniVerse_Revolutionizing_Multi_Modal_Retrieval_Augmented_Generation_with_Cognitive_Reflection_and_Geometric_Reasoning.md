@@ -43,7 +43,7 @@ claims:
 > - MultiModalQA 上，Accuracy (%) 74.2。
 > - WebQA 上，Accuracy (%) 70.8。
 
-## 概述
+## 概要
 
 多模态检索增强生成（MMRAG）旨在融合外部多模态知识以提升大模型的事实性与推理能力，但现有框架普遍面临**噪声检索、跨模态语义不对齐、静态推理不适应查询复杂度、以及局部准确但全局不连贯**四大瓶颈。CogniVerse（CVPR 2026）针对这些瓶颈提出了一种**认知反思与几何推理双驱动**的解决方案，其核心洞察在于模拟人类认知的反思与选择性检索机制，并将信息几何与谱图理论深度融合到MMRAG全流程中。
 
@@ -51,7 +51,7 @@ claims:
 
 实验表明，CogniVerse在MMQA系列基准上取得了显著优势：Encyclopedic-VQA准确率达**84.3%**、一致性**0.91**、检索精度**78.4%**、延迟仅**0.42秒**；在MultiModalQA和WebQA上同样表现突出。消融研究进一步验证了各模块的关键贡献——移除CRM导致准确率下降6.3%、检索精度下降8.6%；将双曲嵌入替换为欧几里得嵌入使准确率降低5.5%；谱图细化单独带来5.2%的检索精度提升。在20%查询噪声条件下，CogniVerse展现出优异的鲁棒性，并在零样本跨数据集泛化实验中验证了其通用性。
 
-## 背景与动机
+
 
 ### 多模态检索增强生成的现实需求
 
@@ -75,7 +75,9 @@ claims:
 
 受此启发，本文提出**CogniVerse**，一个融合认知反思与几何推理的新型MMRAG框架。CogniVerse旨在系统性地突破上述瓶颈：通过动态检索决策机制减少噪声、利用双曲几何实现精确的跨模态对齐、借助谱图理论提炼高信息密度的知识子图，并通过最优传输损失协调局部精度与全局连贯性，从而实现更智能、更高效的多模态检索增强生成。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CogniVerse 的核心创新在于将**认知反思、信息几何与谱图理论**深度融合到多模态检索增强生成（MMRAG）框架中，系统性地突破了现有方法在噪声检索、跨模态语义不对齐、静态推理及局部-全局生成失衡等方面的瓶颈。其相对于现有基线的关键创新体现在以下四个维度：
 
@@ -119,7 +121,7 @@ CogniVerse 的核心创新在于将**认知反思、信息几何与谱图理论*
 
 上述四个创新并非孤立存在，而是通过多任务联合损失 $\mathcal{L}_{\mathrm{total}} = \beta \mathcal{L}_{\mathrm{CRM}} + \gamma \mathcal{L}_{\mathrm{geo}} + (1 - \beta - \gamma) \mathcal{L}_{\mathrm{gen}}$ 实现端到端协同优化。CRM 的动态决策减少了噪声输入，双曲空间嵌入增强了跨模态语义对齐，谱图优化提供了结构化的知识支撑，而最优传输损失则保障了输出的局部精准与全局连贯。这一系统性设计使 CogniVerse 在 Encyclopedic-VQA 上达到84.3%的准确率和0.91的一致性，显著超越现有基线。
 
-## 整体框架
+
 
 CogniVerse 是一种模拟人类认知反思与选择性检索机制的多模态检索增强生成（MMRAG）框架，其设计核心在于突破现有方法中**噪声检索、跨模态语义不对齐、静态推理不适应查询复杂度、以及局部准确但全局不连贯**四大瓶颈。如图1所示，整个框架由三个协同工作的模块串联构成，形成一条从查询输入到答案生成的完整推理链路。
 
@@ -162,7 +164,7 @@ $$
 ![[assets/figures/papers/paper_list_l2454_https_openaccess_thecvf_com_content_CVPR2026_html_Fang_CogniVerse_Revolu/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of our proposed CogniVerse. The framework begins with a Cognitive Refection Module to assess retrieval necessity, followed by a Multi-modal Retrieval Module that aligns embeddings in a Riemannian manifold and refnes knowledge graphs using spectral methods. Finally, a Hierarchical Generation Module produces coherent answers using an optimal transport-based loss. Best viewed in color*
 
-## 核心模块与公式推导
+
 
 CogniVerse 由三个协同工作的核心模块构成：**认知反思模块（Cognitive Reflection Module, CRM）**、**多模态检索模块（Multi-modal Retrieval Module）** 和 **层次化生成模块（Hierarchical Generation Module）**。以下逐一阐述各模块的机制与核心公式。
 
@@ -235,7 +237,9 @@ $$\mathcal{L}_{\mathrm{total}} = \beta \mathcal{L}_{\mathrm{CRM}} + \gamma \math
 ![[assets/figures/papers/paper_list_l2454_https_openaccess_thecvf_com_content_CVPR2026_html_Fang_CogniVerse_Revolu/figures/007_Figure_3.jpg]]
 *Figure 3: Spectral graph refnement in CogniVerse. Left: Original knowledge graph G from Wikidata (10,000 nodes, 50,000 edges) with nodes colored by community. Right: Refned subgraph G′ (500 nodes) for a MultiModalQA query, with query-relevant nodes highlighted (red). The process uses the top 10 Laplacian eigenvectors, improving retrieval precision by 5.2%*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 
@@ -291,7 +295,9 @@ CogniVerse 在三个多模态问答基准上均展现出显著优势。如 **Tab
 ![[assets/figures/papers/paper_list_l2454_https_openaccess_thecvf_com_content_CVPR2026_html_Fang_CogniVerse_Revolu/figures/009_Table_4.jpg]]
 *Table 4: Zero-shot performance when trained on Encyclopedic-VQA and tested on MultiModalQA and WebQA, highlighting CogniVerse’s generalization (p \< 0.05)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与突破路径
 
@@ -326,6 +332,8 @@ CRM模块的置信度阈值 θ 是全局固定的，未讨论其对不同领域�
 2. **CRM的跨任务泛化**：CRM在MMQA数据集上训练，其置信度评估能力是否能泛化到需要不同知识类型的任务（如代码生成、数学推理）尚不明确。
 3. **谱图细化的实时性**：对于动态更新的知识图谱，拉普拉斯特征分解需要重新计算，增量式谱图更新方法是否能保持细化质量值得探索。
 4. **Wasserstein距离的计算代价**：全局损失中的2-Wasserstein距离在训练时可能引入显著的计算开销，论文未讨论其与批量大小、序列长度的可扩展性关系。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Adaptive_Moments_are_Surprisingly_Effective_for_Plug-and-Play_Diffusion_Sampling.pdf
+project_link: null
+code_link: null
 aliases:
 - AMGAA
 - AMASEPPDS
@@ -43,7 +45,7 @@ paradigm: 将随机优化中成熟的Adam自适应矩思想注入到扩散模型
 > - ImageNet Gaussian Deblur 12 上，LPIPS (↓) 为 0.33 (AdamDPS)，对比 0.35 (DPS) / 0.36 (TFG N_iter=4)，变化 -0.02 / -0.03。
 > - ImageNet Inpainting 90% mask 上，LPIPS (↓) 为 0.12 (AdamDPS)，对比 0.16 (DPS) / 0.13 (TFG N_iter=4)，变化 -0.04 / -0.01。
 
-## 概述
+## 概要
 
 扩散模型在即插即用（plug-and-play）条件采样中面临一个关键瓶颈：似然分数的近似含有大量噪声，导致采样轨迹不稳定。这一问题在条件信息稀疏时尤为严重——例如高倍超分辨（16×）、强高斯模糊（强度12）或大面积随机掩码修复（90%）——此时基础的扩散后验采样（DPS）方法往往失效，生成的样本偏离目标条件。
 
@@ -61,7 +63,7 @@ paradigm: 将随机优化中成熟的Adam自适应矩思想注入到扩散模型
 
 该方法将扩散采样中的引导问题重新框定为随机优化问题，以极简的工程改动（仅需维护两组EMA变量）实现了对多种即插即用方法的显著提升，为扩散模型的条件采样提供了新的视角。
 
-## 背景与动机
+
 
 ### 扩散模型与即插即用条件采样
 
@@ -98,7 +100,9 @@ Adam优化器在深度学习训练中广泛有效，其核心机制是维护梯�
 
 这一设计几乎不增加计算开销（仅需维护两组EMA状态），且可作为几行代码的修改直接嵌入现有DPS或CG实现。由此得到的变体分别称为 **AdamDPS** 和 **AdamCG**。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈：即插即用引导中的噪声梯度
 
@@ -143,7 +147,7 @@ Figure 7 左侧的消融实验表明，单独移除动量项（$\beta_1=0$）或
 
 基线方法通常需要针对不同任务精细调整引导强度 $\rho$ 的衰减调度。自适应矩估计的归一化特性隐式地提供了随采样步数变化的尺度调整，减轻了对复杂调度的依赖。实验中的超参数搜索（150次贝叶斯优化）在所有方法上统一进行，AdamDPS 并未获得额外的调参优势，但其性能优势在不同任务难度（Figure 5）和采样步数（Figure 6）下均保持稳健，暗示自适应矩本身提供了一定程度的自调度能力。
 
-## 整体框架
+
 
 本文提出的自适应矩引导（Adaptive Moment Guidance）方法是一个即插即用（plug-and-play）的扩散采样增强模块，其核心思想是将随机优化中成熟的Adam自适应矩估计注入到扩散模型的引导采样过程中。整个pipeline由三个功能模块构成，按数据流向依次为：
 
@@ -177,7 +181,7 @@ $$x_s = x_t + (\\sigma_t^2 - \\sigma_s^2)\\Big(s_{\\theta}(x_t, t) + \\hat{g}_t\
 
 根据底层引导策略的不同，该方法有两种实例化：AdamDPS（Algorithm 1）将自适应矩估计应用于DPS的 $x_{0|t}$ 近似，AdamCG（Algorithm 2）将其应用于CG的时间感知分类器近似。两者的自适应矩估计逻辑完全一致，仅引导梯度的来源不同。论文强调，添加自适应矩通常只需对现有引导实现做几行代码的修改，几乎不增加计算开销（Figure 7右侧墙钟时间对比证实了这一点）。
 
-## 核心模块与公式推导
+
 
 ### 问题背景：即插即用扩散采样中的后验分数分解
 
@@ -251,24 +255,26 @@ $$\hat{g}_t = \frac{\hat{m}_k}{\sqrt{\hat{v}_k} + \delta}$$
 
 消融实验（Figure 7 左）证实，移除动量项（$\beta_1 = 0$）或自适应缩放项（$\beta_2 = 0$）均导致性能显著下降，表明两者缺一不可。同时，该修改仅增加可忽略的墙钟时间（Figure 7 右），且对现有引导实现通常只需数行代码改动。
 
-## 实验与分析
 
-![[obsidian-vault/assets/figures/papers/paper_list_l8_Adaptive_Moments_are_Surprisingly_Effective_for_Plug_and_Play_Diffusion/figures/003_Figure_1.jpg]]
+
+## 实验与关键发现
+
+![[assets/figures/papers/paper_list_l8_Adaptive_Moments_are_Surprisingly_Effective_for_Plug_and_Play_Diffusion/figures/003_Figure_1.jpg]]
 *Figure 1: Left: The KL divergence between each method’s empirical distribution and the target distribution as a function of the guidance noise coefficient ζ. Right: Visualization of the empirical and target distributions at ζ = 0.175. Figure 2: Qualitative comparison of AdamDPS, DPS, and TFG on Cats dataset for super resolution at 12x downsampling and Gaussian deblurring at blur intensity 9*
 
-![[obsidian-vault/assets/figures/papers/paper_list_l8_Adaptive_Moments_are_Surprisingly_Effective_for_Plug_and_Play_Diffusion/figures/009_Figure_3.jpg]]
+![[assets/figures/papers/paper_list_l8_Adaptive_Moments_are_Surprisingly_Effective_for_Plug_and_Play_Diffusion/figures/009_Figure_3.jpg]]
 *Figure 3: Reconstruction performance measured in LPIPS and FID, where lower is better for both. Comparison on ImageNet and Cats dataset for super resolution at 16x downsampling, Gaussian deblurring at blur intensity 12, and inpainting with a 90% random mask*
 
-![[obsidian-vault/assets/figures/papers/paper_list_l8_Adaptive_Moments_are_Surprisingly_Effective_for_Plug_and_Play_Diffusion/figures/012_Figure_4.jpg]]
+![[assets/figures/papers/paper_list_l8_Adaptive_Moments_are_Surprisingly_Effective_for_Plug_and_Play_Diffusion/figures/012_Figure_4.jpg]]
 *Figure 4: Class-conditional sampling performance measured in classification accuracy and FID, where higher accuracy and lower FID is better. Accuracy is computed as the harmonic mean across three held-out classifiers. Left & Center: Comparison of plug-and-play methods with a standard classifier on CIFAR-10 and ImageNet, respectively. Right: Comparison of plug-and-play methods with a time-aware classifier on ImageNet*
 
-![[obsidian-vault/assets/figures/papers/paper_list_l8_Adaptive_Moments_are_Surprisingly_Effective_for_Plug_and_Play_Diffusion/figures/016_Figure_7.jpg]]
+![[assets/figures/papers/paper_list_l8_Adaptive_Moments_are_Surprisingly_Effective_for_Plug_and_Play_Diffusion/figures/016_Figure_7.jpg]]
 *Figure 7: Left: Ablation of Adam \beta _ { 1 } , \beta _ { 2 } for super resolution at 16x downsampling, Gaussian deblurring at blur intensity 12, and inpainting at 90% random mask on the Cats dataset. Right: Wall clock comparison on a single H100 GPU of 100 step class-conditional sampling with a standard classifier on ImageNet for a batch of 8 256x256 images*
 
-![[obsidian-vault/assets/figures/papers/paper_list_l8_Adaptive_Moments_are_Surprisingly_Effective_for_Plug_and_Play_Diffusion/figures/020_Figure_8.jpg]]
+![[assets/figures/papers/paper_list_l8_Adaptive_Moments_are_Surprisingly_Effective_for_Plug_and_Play_Diffusion/figures/020_Figure_8.jpg]]
 *Figure 8: Sampling trajectories for DPS and AdamDPS projected onto two dimensions for super resolution at 16x downsampling on ImageNet. The y-axis is defined by the difference between the initial noise and the target, and the x-axis by the difference between the AdamDPS and DPS solutions. Contours depict the MSE loss surface with respect to the target. Figure 9: Cosine similarity between sequential guidance terms g _ { t } and g _ { t + 1 } throughout sampling for DPS and AdamDPS. Guidance terms collected from 16x super resolution task on ImageNet. Shading denotes the 25th to 75th percentile*
 
-![[obsidian-vault/assets/figures/papers/paper_list_l8_Adaptive_Moments_are_Surprisingly_Effective_for_Plug_and_Play_Diffusion/figures/026_Table_1.jpg]]
+![[assets/figures/papers/paper_list_l8_Adaptive_Moments_are_Surprisingly_Effective_for_Plug_and_Play_Diffusion/figures/026_Table_1.jpg]]
 *Table 1: Reconstruction on ImageNet*
 
 ### 核心瓶颈：似然分数近似的噪声问题
@@ -336,7 +342,9 @@ Figure 10展示了采样过程中引导损失的变化。对于16×超分辨任�
 3. **采样器兼容性**：实验以100步DDPM为主，虽在DDIM上进行了步数消融，但未与DPM-Solver等更高效的快速采样器结合评估。
 4. **动态场景未知**：在视频帧间引导等动态变化条件下，自适应矩的长期记忆是否会引入滞后效应，尚需进一步研究。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 基线方法关系网络
 
@@ -378,11 +386,14 @@ AdamDPS/AdamCG 的核心贡献在于**注入自适应矩估计**，而非重新�
 
 4. **统一调度设计**：是否可以将 Adam 的步长自适应特性与扩散模型自身的噪声调度 $\sigma_t$ 统一设计，形成端到端的训练采样一体方案？当前两者是独立设计的，联合优化可能进一步提升效率。
 
-## 原文 PDF
-
-## 相关样本
+### 相关样本
 
 - [[obsidian-vault/analysis/ICLR_2026/AC-Sampler_Accelerate_and_Correct_Diffusion_Sampling_with_Metropolis-Hastings_Algorithm.md|AC-Sampler]]：同属 diffusion sampling 样本，可对照梯度矩估计稳定化与 MCMC 校正。
 - [[obsidian-vault/analysis/ICLR_2026/A_Noise_is_Worth_Diffusion_Guidance.md|A Noise is Worth Diffusion Guidance]]：同属 diffusion guidance 样本，可对照显式引导梯度处理与噪声先验细化。
 
-![[obsidian-vault/paperPDFs/ICLR_2026/Adaptive_Moments_are_Surprisingly_Effective_for_Plug-and-Play_Diffusion_Sampling.pdf]]
+
+
+
+## 原文 PDF
+
+![[paperPDFs/ICLR_2026/Adaptive_Moments_are_Surprisingly_Effective_for_Plug-and-Play_Diffusion_Sampling.pdf]]

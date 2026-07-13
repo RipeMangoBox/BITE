@@ -42,7 +42,7 @@ claims:
 > - Image-to-Geometry (ULIP/Uni3D相似度) 上，ULIP-T (↑) 0.078 vs 所有开源方法最佳 (新基准最优)；Uni3D-Fine (↑) 0.315 vs 所有开源方法最佳 (新基准最优)。
 > - 几何重建 (LATTICE-Bench(R)) 上，Chamfer Distance (↓) / F-score (↑) 多尺度最优（详细数值见论文） vs 现有VAE方法。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有基于VecSet的高效3D生成方法在压缩与重建上表现优异，但其潜在表示完全无结构——潜在向量是无序集合，扩散生成过程中无法利用空间位置信息。这导致模型在提升几何细节质量和扩大规模时遭遇严重瓶颈，与2D扩散模型之间的可扩展性差距持续存在。
 
@@ -57,7 +57,7 @@ claims:
 
 **方法定位**：LATTICE在方法谱系上属于**半结构化潜在扩散生成**，连接了VecSet的高效压缩与结构化体素的空间感知。与Trellis (SLAT)等稀疏体素方法不同，VoxSet保留VecSet的交叉注意力压缩机制，仅通过体素查询注入结构；与CLAY、Michelangelo、TripoSG、Step1X-3D等VecSet基线相比，核心差异在于将无结构序列转化为可定位的半结构化序列。
 
-## 背景与动机
+
 
 ### 3D生成模型的规模化困境
 
@@ -77,7 +77,9 @@ claims:
 
 基于VoxSet，LATTICE采用两阶段流水线：第一阶段利用现成模型生成粗体素结构锚点，第二阶段在该结构引导下生成精细几何细节。这种“结构→细节”的解耦策略，使得扩散器只需专注于“放置什么内容”，而“何处放置”由已知的体素坐标提供，从而显著降低了生成难度，并展现出VecSet所不具备的**测试时缩放能力**——训练时使用6144个token的模型，在推理时可直接扩展到30720个token并持续获得质量提升（Figure 2）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 LATTICE的核心创新在于对3D扩散生成中“表示”这一根本问题的重新审视。现有基于VecSet的高效3D生成方法（如**Hunyuan3D-2**、**CLAY**、**Michelangelo**、**TripoSG**、**Step1X-3D**）在压缩与重建上表现优异，但其潜在表示是无结构的——潜在向量构成一个无序集合，扩散变换器在去噪时无法获得任何空间位置信息。这导致模型在提升细节质量和扩大规模时遭遇瓶颈：生成器不知道“在哪里放置内容”，只能依赖隐式的统计关联，伪影难以消除，模型缩放也迅速饱和。
 
@@ -106,7 +108,7 @@ LATTICE将生成过程解耦为两个阶段：
 
 这种解耦设计使得LATTICE能够以纯Transformer架构、低成本渐进训练实现强大的测试时缩放，缩小了3D生成与2D扩散模型在质量和可扩展性上的差距。消融实验（Figure 10, Section 4.3）表明，体素查询替代点查询显著减少伪影，查询抖动训练优于固定分辨率训练（Table 3），向DiT添加RoPE位置嵌入加速收敛并提升生成质量。模型缩放实验（Figure 12）进一步证实：VoxSet架构从0.6B扩展到4.5B持续产生更精细的几何，而VecSet模型则表现饱和——这直接验证了“可定位性”是3D扩散生成规模化的关键瓶颈。
 
-## 整体框架
+
 
 LATTICE 采用**两阶段粗到细（coarse-to-fine）生成流水线**，其核心是将“何处放置内容”与“放置什么内容”解耦：第一阶段生成稀疏的粗体素结构锚点，第二阶段在该结构引导下生成高保真几何细节。整个系统围绕一种新的半结构化潜在表示 **VoxSet** 构建，该表示将 3D 资产压缩为一组锚定在粗体素网格上的潜在向量，从而在扩散生成过程中显式注入空间位置信息。
 
@@ -152,7 +154,7 @@ VoxSet 是 LATTICE 的核心创新，其设计动机源于对现有 VecSet 方�
 ![[assets/figures/papers/paper_list_l2533_https_arxiv_org_abs_2512_03052/figures/005_Figure_5.jpg]]
 *Figure 5: LATTICE Model Architecture: it features a two-stage coarse-to-fine pipeline and a novel VoxSet VAE and DiT*
 
-## 核心模块与公式推导
+
 
 LATTICE的核心在于将3D潜在表示从无结构的**VecSet**升级为半结构化的**VoxSet**，并围绕这一表示构建了可定位的扩散生成流水线。以下逐一拆解关键模块及其公式。
 
@@ -196,7 +198,9 @@ $$\epsilon \sim U\left[-\frac{1}{2R}, \frac{1}{2R}\right]$$
 ![[assets/figures/papers/paper_list_l2533_https_arxiv_org_abs_2512_03052/figures/006_Figure_6.jpg]]
 *Figure 6: Illustration of model/training and test scaling effects*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 几何重建能力验证
 
@@ -283,7 +287,9 @@ Figure 13展示了测试时形状token数量缩放的效果，这是VoxSet区别
 ![[assets/figures/papers/paper_list_l2533_https_arxiv_org_abs_2512_03052/figures/008_Figure_8.jpg]]
 *Figure 8: Visual comparison of geometry generation against several state-of-the-art open-source methods*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心瓶颈与因果机制
 
@@ -337,6 +343,8 @@ LATTICE的两阶段流水线（先粗结构后精细几何）与**Hunyuan3D-2**�
 4. **更本质的结构注入方式**：除RoPE位置嵌入外，是否有更本质的方法将局部结构信息注入生成过程，以进一步提升测试时缩放效果？这一问题指向3D生成表示理论的深层突破。
 
 5. **端到端一体化**：当前两阶段设计存在级联误差风险，能否将粗结构生成与精细几何生成统一为端到端的单阶段模型，同时保持VoxSet的可定位性优势？
+
+
 
 ## 原文 PDF
 

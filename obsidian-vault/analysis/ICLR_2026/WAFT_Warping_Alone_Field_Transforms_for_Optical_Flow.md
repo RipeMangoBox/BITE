@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/WAFT_Warping_Alone_Field_Transforms_for_Optical_Flow.pdf
+project_link: null
+code_link: https://github.com/princeton-vl/WAFT
 openreview_forum_id: HTqGE0KcuF
 aliases:
 - WAFT
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | WAFT：基于纯翘曲场变换的光流估计方法 |
 | 英文题名 | WAFT: Warping-Alone Field Transforms for Optical Flow |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=HTqGE0KcuF); [GitHub](https://github.com/princeton-vl/WAFT) |
+| Links | [paper](https://openreview.net/forum?id=HTqGE0KcuF) · [GitHub](https://github.com/princeton-vl/WAFT) |
 | Topic | #topic/representation_self_supervised_transfer #topic/representation_self_supervised_transfer/representation_learning |
 | Method | WAFT |
 | Dataset | Spring, Sintel (final, w/o Ambush 1), KITTI (train, zero-shot) |
@@ -41,7 +43,7 @@ claims:
 > - Spring 上，WAUC 为 95.051 (WAFT-DINOv3-a2)，对比 94.980 (DPFlow)，变化 +0.071。
 > - Sintel (final, w/o Ambush 1) 上，EPE 为 1.639 (WAFT-Twins-a2)，对比 1.750 (Flowformer++)，变化 -0.111。
 
-## 概述
+## 概要
 
 光流估计是计算机视觉中的基础任务，旨在预测视频帧之间像素级的稠密运动场。以**RAFT**（Teed & Deng, ECCV 2020）为代表的迭代优化方法长期占据主导地位，但其核心组件——代价体（cost volume）——存在根本性瓶颈：在高分辨率下内存消耗呈二次增长，迫使方法在低分辨率特征图上构建匹配代价，导致运动边界模糊和精细结构丢失。部分代价体方法（如**SEA-RAFT**，Wang et al., ECCV 2024）通过限制搜索范围缓解了内存压力，但本质上仍受限于局部匹配的折中。
 
@@ -51,7 +53,7 @@ claims:
 
 在实验验证上，WAFT在Spring基准测试的所有指标上排名第一，在Sintel和KITTI上也达到领先水平，同时展现出优异的零样本跨数据集泛化能力。效率方面，WAFT比**Flowformer++**（Shi et al., CVPR 2023）快1.3倍，比**CCMR+**快4.1倍，训练内存消耗显著低于基于代价体的方法——在1/2分辨率下，WAFT仅需9.2 GiB，而SEA-RAFT则直接超出显存上限。
 
-## 背景与动机
+
 
 ### 光流估计中的代价体瓶颈
 
@@ -88,7 +90,9 @@ WAFT 的核心动机基于以下观察：如果能够有效处理全局依赖性
 
 为弥补扭曲操作缺乏显式搜索能力的不足，WAFT 在循环更新模块中采用**视觉Transformer架构**（修改的 DPT-Small），利用自注意力机制隐式建模大位移和全局上下文，从而在纯扭曲范式下仍能保持对大运动的鲁棒性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 WAFT 的核心创新在于对迭代光流估计框架的结构性简化——**用高分辨率特征扭曲（warping）完全替代代价体（cost volume），并移除了上下文编码器（context encoder）**，同时将更新模块升级为视觉 Transformer 架构。这一设计直击当前迭代方法的两个关键瓶颈：代价体的高内存消耗和低分辨率特征导致的边界模糊。
 
@@ -129,7 +133,7 @@ Table 5 的消融实验提供了强因果证据：将 DPT-based 更新模块替�
 
 这一设计使 WAFT 在 Spring 基准的所有指标上排名第一（Table 3），同时在 KITTI 零样本泛化中将误差降低 11%（Table 4），验证了该元架构的有效性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l47_https_openreview_net_forum_id_HTqGE0KcuF/figures/001_Figure_1.jpg]]
 *Figure 1: The meta-architecture of WAFT consists of an input encoder and a recurrent update module. We first extract image features from the input encoder, and then use these features to iteratively update the flow estimate for T steps. At each step, we perform feature indexing through a lightweight backward warping on the feature of frame 2, removing the dependency on expensive cost volume used by previous work*
@@ -148,7 +152,7 @@ $$\mathsf{Warp}(f_{\mathrm{cur}})_p = F(I_2)_{p + (f_{\mathrm{cur}})_p}$$
 
 整个流程可概括为：输入两帧图像 → 冻结编码器提取多尺度特征 → 循环更新模块在特征空间内迭代扭曲索引并更新隐藏状态（5 次）→ 预测头输出全分辨率光流。这一设计将内存瓶颈从代价体的二次复杂度中解放出来，使高分辨率特征索引成为可能，进而带来边界精度和整体性能的显著提升。
 
-## 核心模块与公式推导
+
 
 ### 代价体与扭曲操作的对比
 
@@ -184,7 +188,9 @@ WAFT 的元架构由输入编码器和循环更新模块两部分组成。在第
 
 这使得 WAFT 的架构显著简化，仅保留输入编码器与循环更新模块两个核心组件。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能验证
 
@@ -238,7 +244,9 @@ WAFT 的内存效率优势在 Table 1 中量化呈现。在 RTX A6000 上以 bat
 
 尽管整体性能优异，WAFT 在特定困难场景下暴露出纯翘曲机制的局限性。在 Sintel 的 “Ambush 1” 序列（极端运动模糊）上，WAFT 的表现不如部分基于代价体的方法（Table 6）。这说明当对应像素的特征因模糊而严重退化时，单一对应点索引可能不足以消除匹配歧义——代价体提供的局部邻域信息在此类场景下仍具有互补价值。此外，WAFT 高度依赖视觉 Transformer 架构，若缺乏大规模预训练，CNN 变体的性能急剧下降（Table 5），这限制了该方法在计算资源受限场景下的直接部署。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 从代价体到纯扭曲：一条被忽视的路径
 
@@ -277,6 +285,8 @@ WAFT在Spring基准上以全部指标排名第一（1px 3.182, EPE 0.325, WAUC 9
 3. **跨任务迁移**：WAFT的元架构（输入编码器+Transformer循环更新模块+扭曲索引）是否可直接迁移到立体视差估计或多视角立体，并保持高效与高精度？这需要验证扭曲操作在无时序线索的双目/多目几何中是否足以替代代价体的显式匹配。
 
 4. **与经典理论的对齐**：论文提及Brox et al. (2004) 将扭曲与循环更新的组合框架化为不动点迭代算法，但未深入展开。这一理论视角可能为理解纯扭曲方法的收敛性和误差传播提供更严格的分析工具。
+
+
 
 ## 原文 PDF
 

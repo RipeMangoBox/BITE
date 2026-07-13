@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/AutoTool_Automatic_Scaling_of_Tool_Use_Capabilities_in_RL_via_Decoupled_Entropy_Constraints.pdf
+project_link: null
+code_link: null
 openreview_forum_id: zFkopTvclB
 aliases:
 - AutoTool
@@ -41,7 +43,7 @@ claims:
 > - BFCL 上，Multi-Turn Acc 为 38.18，对比 PubTool-SFT 9.68，变化 +28.5。
 > - BFCL 上，Overall Acc 为 70.12，对比 Base (Qwen2.5-7B-Instruct) 53.69，变化 +16.43。
 
-## 概述
+## 概要
 
 在工具使用（tool-use）任务中，大语言模型面临一个两难困境：直接强化学习（RL）训练会导致**推理坍塌**——模型的响应长度随训练步数急剧缩短，无法为复杂问题维持必要的长程推理；而蒸馏（distillation）模型虽然能保持长推理，却在简单问题上过度思考，产生大量冗余 token，造成严重的推理资源浪费。这一现象与数学推理任务中“准确率提升伴随响应长度自然增长”的趋势截然相反（Figure 1）。
 
@@ -51,7 +53,7 @@ claims:
 
 主要实验结果（基于 Qwen2.5-7B-Instruct 基座，BFCL 基准）表明：AutoTool 相比 PubTool-SFT 整体准确率提升 **+11.95%**，多轮对话场景提升 **+28.5%**；相比蒸馏模型在准确率提升 **9.8%** 的同时，推理 token 成本削减约 **81%**。消融实验证实，解耦熵约束、自适应系数和数据精炼三者均对最终性能有显著贡献。该方法在 1.5B 至 32B 多种模型规模上均展现出一致的泛化增益。
 
-## 背景与动机
+
 
 ### 工具使用中的测试时扩展困境
 
@@ -86,7 +88,9 @@ claims:
 2. **自适应**调节长推理路径的熵惩罚强度，防止过度约束或约束不足。
 3. 在 RL 训练过程中维持策略的探索能力，从根本上防止推理坍塌。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 AutoTool 的核心创新在于揭示并解决了工具使用任务中强化学习（RL）训练特有的**推理坍塌**问题，并提出了一套**解耦自适应熵约束**策略，使模型能够根据问题难度自动调节推理规模。
 
@@ -140,7 +144,7 @@ $$\mathcal{R}_{\mathrm{answer}}(o_i) = \begin{cases} +1.0, & \text{if } o_i = y^
 
 AutoTool 通过 `[mode]` 标签实现 think/no_think 可控推理（Figure 4），推理时可通过前缀切换模式。这使得模型既能在需要时进行深度思考，又能在简单场景下保持极低 token 成本——相比蒸馏模型 token 成本削减约 81%，同时准确率提升 9.8%（Figure 6）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l40_https_openreview_net_forum_id_zFkopTvclB/figures/013_Figure_4.jpg]]
 *Figure 4: The overview of decoupled adaptive entropy constraint. It achieves automatic scaling by decoupling different reasoning modes through the application of differentiated entropy constraints. Adaptive entropy constraint strength for long reasoning. During the inference, the model can automatically or controllably switch inference modes by pre-pending a response prefix in Input tokens*
@@ -201,7 +205,7 @@ $$
 
 整个管线的设计遵循一条清晰的因果链：推理坍塌的直接原因是策略熵的持续下降（Figure 2d 表明低熵与坍塌强正相关），而熵的下降源于 GRPO 优化过程中策略分布逐渐收窄。通过解耦短/长推理路径的熵约束，AutoTool 在保持简单问题高效求解的同时，为复杂问题保留了必要的探索空间；自适应系数机制则进一步避免了固定熵约束对系数的敏感性（Table 1 显示固定 β 对性能影响显著），使长推理路径的熵惩罚强度能够根据实际需要动态调整。数据精炼作为基础支撑，通过剔除噪声样本降低了训练波动，使准确率奖励提高约 15%（Figure 9）。
 
-## 核心模块与公式推导
+
 
 ### 3.1 数据准备与暖启动SFT
 
@@ -278,7 +282,9 @@ $$\mathrm{ACU} = \frac{\mathrm{Accuracy}}{\#\mathrm{Params} \times \#\mathrm{Tok
 
 该指标同时考虑模型参数量和输出 token 数，提供了一个统一的推理效率度量。在 BFCL 基准上，AutoTool 以强制 no-think 推理模式取得最优 ACU 分数 0.97（Figure 6），相比蒸馏模型在准确率提升 9.8% 的同时将推理 token 成本削减约 81%（~183 tokens vs ~966 tokens）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果验证
 
@@ -348,7 +354,9 @@ AutoTool 引入的计算单元准确率（ACU）指标综合衡量准确率、�
 3. **RL 算法依赖性**：当前方法基于 GRPO 算法实现，与 PPO、DAPO 等 RL 算法的兼容性尚未验证。
 4. **推理坍塌的根本原因**：尽管建立了低熵与坍塌的因果关系，但为何工具使用任务中 RL 训练导致熵快速下降而数学任务中不会，其深层机制仍不清楚。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 工具使用LLM的训练范式演进
 
@@ -397,6 +405,8 @@ AutoTool的适用边界由以下因素界定：
 5. **推理模式切换的粒度**：当前方法通过[mode]标签实现粗粒度的think/no_think切换，是否可能存在更细粒度的推理深度控制（如部分思考、多步推理的中间退出）？
 
 **需要人工验证的点：** 论文中关于“推理坍塌独立于样本难度分布”的结论（Figure 2）基于特定数据集划分，该现象的普遍性需要在更多工具使用基准上进行交叉验证。
+
+
 
 ## 原文 PDF
 

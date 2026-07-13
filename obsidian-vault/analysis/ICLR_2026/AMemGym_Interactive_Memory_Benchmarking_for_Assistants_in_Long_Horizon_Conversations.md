@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/AMemGym_Interactive_Memory_Benchmarking_for_Assistants_in_Long_Horizon_Conversations.pdf
+project_link: https://agi-eval-official.github.io/amemgym/
+code_link: null
 openreview_forum_id: sfrVLzsmlf
 aliases:
 - AMemGym
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | AMemGym：面向长线对话中助手的交互式记忆基准测试 |
 | 英文题名 | AMemGym: Interactive Memory Benchmarking for Assistants in Long-Horizon Conversations |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=sfrVLzsmlf); [Project](https://agi-eval-official.github.io/amemgym/) |
+| Links | [paper](https://openreview.net/forum?id=sfrVLzsmlf) · [Project](https://agi-eval-official.github.io/amemgym/) |
 | Topic | #topic/benchmarks_datasets_evaluation #topic/benchmarks_datasets_evaluation/benchmark_eval |
 | Method | AMemGym |
 | Dataset | AMemGym base (10, 2, 4), AMemGym base |
@@ -41,7 +43,7 @@ claims:
 > - AMemGym base 上，Memory Score 为 AWE-(2,4,30): 0.291 (on‑policy)，对比 AWE-(2,4,30) off‑policy: 0.253，变化 +0.038。
 > - AMemGym base 上，Normalized Memory Score 为 gemini-2.5-flash: 0.324，对比 gpt-4o-mini: 0.150，变化 +0.174。
 
-## 概述
+## 概要
 
 现有对话助手的记忆评测主要依赖静态、离线策略数据，无法反映助手在真实互动中的记忆表现，导致优化方向偏差。AMemGym 提出交互式记忆基准，通过结构化状态演化驱动 LLM 模拟用户进行自由对话，使记忆能力在自身行为产生的上下文中接受检验，从而弥合离线评测与真实部署之间的差距。
 
@@ -55,7 +57,7 @@ claims:
 
 AMemGym 为对话记忆研究提供了统一的交互式评测框架，其在线策略评测范式揭示了离线基准的固有偏差，并为记忆代理的自主优化开辟了新路径。
 
-## 背景与动机
+
 
 大型语言模型（LLM）驱动的对话助手正被部署于日益长程的交互场景，如个人助理、客户支持和教育辅导。在这些场景中，助手必须持续追踪用户偏好、历史决策和情境信息，才能提供连贯、个性化的服务。然而，**记忆能力**——即跨对话轮次持久化并有效利用过往信息的能力——仍是当前系统的核心瓶颈。
 
@@ -77,7 +79,9 @@ $$o_t, m_t \stackrel{\pi}{\rightarrow} a_t, m_{t+1}$$
 
 AMemGym 的核心动机正是**建立在线策略（on‑policy）的交互式评测环境**，使记忆能力在自身行为产生的上下文中接受检验。这一范式转换同时解决了两个痛点：评测结果真实反映助手在实际交互中的记忆表现，且交互过程本身可被细粒度诊断，为记忆系统的定向优化提供反馈信号。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 AMemGym 的核心创新在于将对话记忆评测从**离线策略（off‑policy）范式系统性转向在线策略（on‑policy）范式**，并通过三个相互耦合的 changed slots 实现这一转变。
 
@@ -113,7 +117,7 @@ AMemGym 将评测流程从手动或半自动化推进至**全自动化**：结�
 
 基于在线策略评测的反馈信号，AMemGym 进一步支持助手的**自我进化**：通过生成函数 $P_{k+1} = G(P_k, F_k)$，环境反馈 $F_k$ 被用于迭代优化助手的记忆管理策略提示 $P_k$。实验表明，完全反馈（Complete Feedback，包含诊断信息）比仅问题反馈（Question Only）更能稳步提升记忆分数和事实召回率（Table 3, Figure 11），验证了诊断性指标对策略优化的实际价值。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0012_sfrVLzsmlf_AMemGym_Interactive_Memory_Benchmarking_for_Assi/figures/003_Figure_2.jpg]]
 *Figure 2: An overview of the AMemGym framework*
@@ -147,7 +151,7 @@ $$P_{k+1} = G(P_k, F_k)$$
 
 整个框架将助手的交互过程形式化为：观测 $o_t$ 和内部记忆 $m_t$ 通过策略 $\pi$ 产生动作 $a_t$ 和更新后的记忆 $m_{t+1}$，即 $o_t, m_t \stackrel{\pi}{\rightarrow} a_t, m_{t+1}$，交互历史累积为 $\tau_t = [o_0, a_0, o_1, a_1, \ldots, o_t]$。这一形式化使框架能统一评测 Native LLM、Standard RAG、Agentic Write (External/AWE) 和 Agentic Write (In-Context/AWI) 等多种记忆实现方式。
 
-## 核心模块与公式推导
+
 
 ### 3.1 结构化数据生成
 
@@ -205,7 +209,9 @@ $$P_{k+1} = G(P_k, F_k)$$
 
 其中 $G$ 由 LLM 在自我进化提示的引导下实现，$F_k$ 包含诊断性失败率和记忆分数等反馈信息。该循环使助手的记忆管理策略能够在交互环境中持续改进。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果：在线策略与离线策略的排名反转
 
@@ -256,7 +262,9 @@ Table 8 显示五次独立运行的记忆分数标准差在 0.003–0.008 之间
 ![[assets/figures/papers/iclr26_0012_sfrVLzsmlf_AMemGym_Interactive_Memory_Benchmarking_for_Assi/figures/009_Figure_6.jpg]]
 *Figure 6: Memory scores of different memory agents. We omit the overall score comparison as they use the same LLM (gpt-4.1-mini) for generation*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有记忆基准的定位关系
 
@@ -292,6 +300,8 @@ AMemGym 框架的提出引出了若干值得进一步探索的方向：
 2. **安全与可控进化**：在自我进化过程中，如何保证策略更新的安全性，避免退化或特权泄露？当代理通过环境反馈不断调整记忆策略时，需要建立可解释的更新轨迹和回滚机制。
 3. **真实用户反馈闭环**：能否将框架与真正的在线用户反馈相结合，实现真实世界中的持续记忆优化？当前模拟用户虽然达到了极高的人机一致性（状态暴露质量 99.1%，对话一致性 99.2%），但与真实用户的交互分布仍存在差距。
 4. **离线策略偏差的量化与校正**：Table 2 揭示了离线策略评测引入的**重用偏差**（AWE 在线 0.291 vs. 离线 0.253；AWI 在线 0.172 vs. 离线 0.199），这种偏差如何随对话长度、记忆策略和任务类型变化，以及是否存在校正方法，是评测方法论层面的开放问题。
+
+
 
 ## 原文 PDF
 

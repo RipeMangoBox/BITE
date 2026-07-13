@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2026
 pdf_ref: paperPDFs/arxiv_2026/MoCHA_Denoising_Caption_Supervision_for_Motion_Text_Retrieval.pdf
+project_link: null
+code_link: null
 aliases:
 - MMCHAR
 - MoCHA
@@ -42,7 +44,7 @@ claims:
 > - KIT-ML (DsPair) 上，T2M R@1 24.30 vs 14.02 (MoPa) (+10.28)。
 > - Cross-dataset H→K 上，T2M R@1 26.59 (MoCHA LLM) vs 13.74 (MoPa) (+12.85)。
 
-## 概述
+## 概要
 
 运动-文本检索的核心瓶颈并非模型架构或训练规模不足，而在于**对比训练中的监督噪声**：同一运动的多条人工标注（标题）混合了运动可恢复的语义 $s$ 和标注者特有的风格噪音 $a$，标准对比学习将每条标题视为确定性正样本，导致同一运动的文本嵌入方差大、正样本聚类松散，削弱了对齐信号。
 
@@ -59,8 +61,6 @@ claims:
 **方法定位**：MoCHA 属于**监督去噪**范式，与数据增强（如释义扩充）有本质区别——增强扩大了标题分布方差，可能损害 R@1；规范化则通过收缩方差全面提升所有 recall 级别。该框架仅作用于文本通道，不修改运动或文本编码器，可无缝适配现有对比检索架构（如 MoPa、TMR）。规范化器通过 LLM 提示实现，并蒸馏为 FlanT5 模型以消除推理时的外部 LLM 依赖，蒸馏版本性能与 LLM 相当且方差更小。
 
 **局限与开放问题**：固定且不可微的规范化算子偶尔会过度压缩（如将姿态细节错误转换）；当前 $s/a$ 边界偏向粗粒度动作描述，部分可恢复的细粒度特征未被纳入规范形式；跨数据集 K→H 的检索绝对值仍然较低，表明仅靠语言规范化无法弥补运动覆盖的不足。未来方向包括联合优化规范化与检索损失、形式化界定 $s/a$ 边界，以及探索规范化表示向运动生成等其他任务的迁移。
-
-## 背景与动机
 
 ### 运动-文本检索中的监督噪声问题
 
@@ -96,7 +96,7 @@ $$C(t) \approx \phi(s).$$
 
 该算子完全作用于文本通道，不修改运动编码器或文本编码器的架构，因此可以作为即插即用的模块应用于任何现有的对比检索框架。为平衡去噪与自然语言查询的泛化能力，MoCHA 进一步引入了混合训练策略，同时利用规范化标题和原始标题进行对比学习。
 
-## 核心创新
+## 核心方法与创新机理
 
 MoCHA 的核心创新在于将运动-文本检索中的**标题监督噪声问题**形式化为一个可操作的因果框架，并提出**标题规范化（Caption Canonicalization）**作为解决方案。与以往方法将每个标题视为确定性正样本不同，MoCHA 识别出标题由运动可恢复语义 $s$ 和标注者特定噪音 $a$ 混合生成的分布特性，并通过规范化算子 $C(t)$ 将标题投影为仅保留 $s$ 的规范形式，从而从根源上收紧对比学习的正样本分布。
 
@@ -129,8 +129,6 @@ MoCHA 的创新形成一个完整的因果链：**识别噪音源**（$s$-$a$ �
 ### 与数据增强路线的本质区别
 
 MoCHA 的创新与常见的文本增强策略（如释义生成、回译）有本质区别。释义增强扩大了 $p(t \mid s)$ 的分布，在三种设置中的两种损害了分布内 R@1（Table 5）；回译作为保留标注风格的负对照，在四种条件中的三种表现持平或低于基线（Table 6）。这证明核心改进因子是**去噪**而非任意文本转换——规范化通过缩小方差而非扩大方差来提升所有 recall 级别的性能。
-
-## 整体框架
 
 MoCHA 是一个**完全作用于文本通道的监督去噪框架**，其核心目标是在不修改运动编码器与文本编码器架构的前提下，消除对比训练信号中的标注者特定噪音，从而提升运动-文本检索的嵌入空间质量。整个框架由三个关键模块串联构成，形成“规范化—编码—混合训练”的闭环。
 
@@ -192,8 +190,6 @@ $$\mathcal{L}_{\mathrm{mix}} = \lambda \mathcal{L}_{\mathrm{InfoNCE}}(\{(m_i, C(
 ![[assets/figures/papers/paper_list_l87_MoCHA_Denoising_Caption_Supervision_for_Motion_Text_Retrieval/figures/002_Figure_2.jpg]]
 *Figure 2: MoCHA overview. (a) Motivated by the (s, a) decomposition (Section 3.1), C(·) projects each caption onto s by stripping stylistic variation a (red). C is implemented via LLM and distilled into FlanT5 for LLM-free inference. (b) Blend training balances both views: the denoised C(ti) anchors embeddings around s to reduce gradient variance, while the original ti regularizes for natural-language queries*
 
-## 核心模块与公式推导
-
 ### 3.1 标题噪声的形式化分解
 
 MoCHA 的核心洞见在于将运动-文本检索中的标题建模为一个**条件分布**，而非确定性正样本。给定一段运动，其可恢复的运动语义（motion-recoverable semantics）记为 $s$，而标注者特有的噪音因素（annotator-specific nuisance factors）记为 $a$，其中 $a \sim p(a)$。一个标题 $t$ 的生成过程可表示为：
@@ -239,7 +235,7 @@ $$\mathrm{Var}_{\mathrm{text}}[\mathbf{k}_+] = \frac{1}{K} \sum_{k=1}^{K} \lVert
 
 其中 $T(c_k)$ 为文本编码器对标题 $c_k$ 的输出嵌入，$\bar{\mathbf{t}}_m$ 为 $K$ 个标题嵌入的均值。该公式建立了标题间语义差异 $V(m)$ 与对比训练中正样本键方差之间的直接联系——$V(m)$ 越大，梯度更新方向越不稳定。规范化通过降低 $V(m)$，从源头减少了对比训练的监督噪声。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心瓶颈验证：标题噪声的测量与消除
 
@@ -317,9 +313,6 @@ MoCHA 的规范化策略对不同检索架构具有泛化性。**Table 11** 显�
 ![[assets/figures/papers/paper_list_l87_MoCHA_Denoising_Caption_Supervision_for_Motion_Text_Retrieval/figures/004_Table_2.jpg]]
 *Table 2: Embedding space geometry (C4): baseline vs. MoCHA in the trained encoder’s 256-dim space. By removing a from the training signal, MoCHA produces embeddings where same-motion captions cluster more tightly (Intra) and align more closely with their motion (Align), improving separation by +8–25%. This confirms that input-level variance reduction propagates to a better-structured retrieval space. Sep: Intra / Inter NN. Full breakdown in Appendix J*
 
-![[assets/figures/papers/paper_list_l87_MoCHA_Denoising_Caption_Supervision_for_Motion_Text_Retrieval/figures/005_Figure_3.jpg]]
-*Figure 3: Canonicalization projects captions onto s, improving retrieval. Top row (colored): ground truth; bottom row (gray): baseline rank-1 error. (a) Verbose a buries the action; MoCHA extracts s while preserving the metaphor. (b) Annotator uncertainty (a); canonicalization extracts shared kinematic content. (c) Complex description decomposed into sequential s, disambiguating from similar motions. (d) Overspecified caption dilutes the contrastive signal; MoCHA strips a, retains discriminative s*
-
 ![[assets/figures/papers/paper_list_l87_MoCHA_Denoising_Caption_Supervision_for_Motion_Text_Retrieval/figures/006_Table_3.jpg]]
 *Table 3: In-distribution retrieval results (C2). MoCHA achieves state-of-theart on both benchmarks, with consistent gains across all recall ranks and retrieval directions—ruling out a precision-recall tradeoff and confirming that the removed content was a, not useful s. Full ablations in Appendix G.1*
 
@@ -341,7 +334,7 @@ MoCHA 的规范化策略对不同检索架构具有泛化性。**Table 11** 显�
 ![[assets/figures/papers/paper_list_l87_MoCHA_Denoising_Caption_Supervision_for_Motion_Text_Retrieval/figures/016_Table_14.jpg]]
 *Table 14: Test-time text mode ablation (DsPair T2M R@1, epoch 50). Each row is a different training strategy (LLM-trained models); columns show performance under each test-time text mode. Note: Main Table 3 MoCHA (T5) reports a separatelytrained FlanT5-PPT Blend model (13.30%/22.14%); see Appendix G.1 for all FlanT5- PPT variants*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 核心改进：从“确定性正样本”到“去噪监督”
 

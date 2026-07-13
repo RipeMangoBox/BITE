@@ -44,15 +44,13 @@ claims:
 > - VGGSound test set 上，IB-score 33.1 (VisioSonic w/ STAR-DPO) vs 32.27 (MMAudio-S) (+0.83)；DeSync 0.41 (VisioSonic w/ STAR-DPO) vs 0.444 (MMAudio-S) (-0.034 (lower better))；FDPaSST 55.48 (VisioSonic w/ STAR-DPO) vs 65.25 (MMAudio-S) (-9.77)。
 > - User Study 上，Overall Rating (1-5) 4.60 (VisioSonic w/ STAR-DPO) vs Best among compared methods (Highest)。
 
-## 概述
+## 概要
 
 视频到音频（V2A）生成的核心瓶颈在于**语义一致性**与**时间同步性**难以兼得——模型既要理解画面中的物体与场景，又必须保证音频事件与视觉动态在毫秒级精确对齐。现有方法往往顾此失彼：基于低帧率视觉条件的模型丢失了关键的运动细节，而缺乏显式时序对齐机制的架构则难以捕捉声画之间的因果对应关系。
 
 针对这一瓶颈，本文提出 **VisioSonic**，其核心调控变量是**多模态条件的高帧率时序对齐**与**基于偏好优化的精细化训练**。VisioSonic 包含两个关键设计：（1）多模态条件器同时提取低帧率 CLIP 语义嵌入和高帧率 Synchformer 视觉嵌入，通过 Token Aligner 将视频嵌入与音频潜变量沿时间维度对齐后，送入共注意力扩散变换器进行融合生成；（2）**STAR-DPO**（语义-时序对齐排序直接偏好优化）利用预训练的 ImageBind 和 Synchformer 作为奖励模型，自动生成偏好对并优化整流流匹配损失，在无需人工标注的情况下持续强化语义与时序对齐能力。
 
 在 VGGSound 测试集上，VisioSonic-Base 以仅 151M 的可训练参数量取得了最高的 IB-score（32.8）和最低的 DeSync（0.45），显著优于包括 **MMAudio**（Cheng et al., CVPR 2025）在内的现有方法；加入 STAR-DPO 后进一步提升至 IB-score 33.1、DeSync 0.41，用户研究同样获得最高评分。消融实验证实，联合使用语义奖励与时序奖励的偏好优化效果最佳，且第二次 DPO 迭代即可收敛。
-
-## 背景与动机
 
 ### 视频到音频生成的核心瓶颈
 
@@ -72,7 +70,7 @@ claims:
 
 基于以上动机，本文提出**VisioSonic**：一个基于扩散变换器的V2A框架，通过多模态条件器与共注意力机制实现显式音视频对齐，并设计**STAR-DPO**（Semantic-Temporal Alignment-Ranked Direct Preference Optimization）流水线，利用ImageBind和Synchformer作为奖励模型自动生成偏好对，在整流流匹配范式下进行精细化偏好优化。
 
-## 核心创新
+## 核心方法与创新机理
 
 VisioSonic 的核心创新在于系统性地解决了视频到音频生成中长期存在的“语义-时序双重对齐”瓶颈。现有方法（如 **MMAudio** (Cheng et al., CVPR 2025) 的自注意力联合训练、**Seeing-and-Hearing** (Xing et al., CVPR 2024) 的 ImageBind 对齐）往往在语义一致性和精细时间同步之间顾此失彼——要么生成语义正确但时序漂移的音频，要么时序准确但语义模糊。VisioSonic 通过三个相互耦合的关键设计突破这一瓶颈。
 
@@ -113,8 +111,6 @@ $$L_{\mathrm{final}} = -\mathbb{E} \log \sigma \Bigg( -\beta \Big[ \big( L_{w} -
 ### 创新总结
 
 VisioSonic 的三个 changed slots——高帧率视觉条件、共注意力融合、STAR-DPO 偏好优化——形成了完整的因果链：高帧率条件提供精确时序信息，共注意力实现跨模态深度融合，STAR-DPO 在此基础上通过自动偏好优化进一步强化对齐质量。这一组合使 VisioSonic 以最少的可训练参数量（151M）取得了最高的 IB-score（33.1）和最低的 DeSync（0.41），在参数效率与生成质量之间实现了最优平衡。
-
-## 整体框架
 
 VisioSonic 的整体框架由两个阶段构成：**基础模型（Base Model）** 和 **STAR-DPO 偏好优化流水线**，如 Figure 2 所示。基础模型负责从视频和文本条件生成语义相关且时序同步的音频，STAR-DPO 则在无需人工标注的情况下，利用预训练模型自动构造偏好数据，对基础模型进行精细化优化。
 
@@ -174,8 +170,6 @@ $$L_{\mathrm{final}} = -\mathbb{E} \log \sigma \Bigg( -\beta \Big[ \big( L_{w} -
 ![[assets/figures/papers/paper_list_l2683_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Hear_What_You_See/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison with other V2A models*
 
-## 核心模块与公式推导
-
 VisioSonic 的整体架构由两大核心组件构成：**多模态条件器 (Multimodal Conditioner)** 与基于**共注意力的扩散变换器 (Co-attention Diffusion Transformer)**，如 Figure 2 左侧所示。其生成过程建立在整流流匹配 (Rectified Flow Matching) 框架之上。
 
 ### 整流流匹配基础
@@ -233,7 +227,7 @@ $$L_{\mathrm{final}} = -\mathbb{E} \log \sigma \Bigg( -\beta \Big[ \big( L_w - L
 
 其中 $\beta$ 控制偏好优化的强度，$\sigma$ 为 sigmoid 函数。该损失函数的核心洞察在于：通过最小化获胜样本相对于参考模型的损失增量，同时最大化失败样本的损失增量，驱动模型向更优的音视频对齐方向更新。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -280,22 +274,10 @@ VisioSonic在VGGSound测试集上进行了全面的定量评估，与多个最�
 ![[assets/figures/papers/paper_list_l2683_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Hear_What_You_See/figures/003_Table_1.jpg]]
 *Table 1: Comparison results with existing SOTA video-to-audio models on VGGSound [3] test set. The best results are marked with bold, and the second ones are marked with underline*
 
-![[assets/figures/papers/paper_list_l2683_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Hear_What_You_See/figures/005_Table_3.jpg]]
-*Table 3: Comparison results on modality fusion variants*
-
-![[assets/figures/papers/paper_list_l2683_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Hear_What_You_See/figures/007_Table_4.jpg]]
-*Table 4: Effects of various reward models*
-
-![[assets/figures/papers/paper_list_l2683_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Hear_What_You_See/figures/010_Table_5.jpg]]
-*Table 5: Performance across DPO iterations*
-
-![[assets/figures/papers/paper_list_l2683_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Hear_What_You_See/figures/008_Table_6.jpg]]
-*Table 6: Comparison results with different ranking pipelines*
-
 ![[assets/figures/papers/paper_list_l2683_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Hear_What_You_See/figures/006_Figure_3.jpg]]
 *Figure 3: Visualization of generated audio spectrograms. “SAH” means the Seeing&Hearing method [47]. More subjective results are referred to the video demo in the supplementary material*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 与现有方法的差异化定位
 

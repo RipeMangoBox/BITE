@@ -42,7 +42,7 @@ claims:
 > - RxR-CE Val-Unseen 上，SR↑ 67.6 vs 49.3 (NaVILA) (+18.3)；SPL↑ 56.1 vs 44.0 (NaVILA) (+12.1)。
 > - RxR-CE Val-Unseen (cross-dataset) 上，SR↑ 39.8 vs 34.3 (NaVILA) (+5.5)。
 
-## 概述
+## 概要
 
 现有视觉语言导航（VLN）方法主要采用端到端动作预测范式，缺乏对智能体自身状态和任务进展的显式认知。这种“无意识”的导航策略导致两个核心问题：其一，导航过程不可解释，无法追溯决策依据；其二，缺乏鲁棒性，难以应对子任务划分、路径偏离和错误纠正等复杂场景。**AwareVLN** 针对这一瓶颈，提出在导航关键节点触发稀疏的结构化自我推理，使智能体能够显式分析场景、评估进度并规划下一步，从而赋予其导航自我意识。
 
@@ -52,7 +52,7 @@ claims:
 
 主要实验结果验证了该范式的有效性：在 R2R-CE Val-Unseen 上，AwareVLN 取得 SR 65.4、SPL 55.1，显著超过 NaVILA 的 SR 54.0（Table 1）；在 RxR-CE Val-Unseen 上，SR 达 67.6，远超 NaVILA 的 49.3。消融实验进一步揭示，移除子任务完成推理节点导致 SR 从 65.4 骤降至 52.3，验证了结构化自我意识推理的必要性（Table 3）。
 
-## 背景与动机
+
 
 视觉语言导航（Vision-Language Navigation, VLN）要求智能体在连续环境中根据自然语言指令完成导航任务。近年来，随着视觉语言模型（VLM）的快速发展，端到端VLN方法取得了显著进展，代表性工作包括**NaVILA**、**NaVid**和**Uni-NaVid**等。这些方法将导航建模为从视觉观测到动作指令的直接映射，绕过了传统方法对仿真预训练路径点预测器（waypoint predictor）的依赖，展现出良好的泛化潜力。
 
@@ -66,7 +66,9 @@ claims:
 
 实现这一目标面临两个关键挑战：一是如何设计推理机制使其仅在必要时触发，避免密集推理带来的计算开销；二是如何获取高质量的结构化推理监督信号，因为人工标注成本高昂且难以规模化。AwareVLN分别通过**稀疏推理调度机制**和**自动数据引擎**解决了这两个挑战，为视觉语言导航中的自我意识推理开辟了新路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 AwareVLN 的核心创新在于将**稀疏的结构化自我感知推理**显式注入视觉语言导航（VLN）智能体的决策循环中，使其从“端到端黑盒动作预测”跃迁为“可解释、可纠错的自我意识导航”。这一转变通过三个相互耦合的 changed slots 实现。
 
@@ -86,7 +88,7 @@ AwareVLN 的核心创新在于将**稀疏的结构化自我感知推理**显式�
 
 综合来看，AwareVLN 通过“何时推理”“推理什么”“如何获取推理监督”三个维度的协同创新，在不依赖仿真预训练路径点预测器、仅使用单目 RGB 输入的约束下，实现了 R2R-CE Val-Unseen SR 65.4、SPL 55.1，以及 RxR-CE Val-Unseen SR 67.6、SPL 56.1 的领先性能（Table 1），同时赋予了导航过程可解释性和错误自纠正能力（Figure 4）。
 
-## 整体框架
+
 
 AwareVLN 的核心设计是将**自我感知的结构化推理**嵌入到统一的视觉语言导航模型中，使智能体不再仅仅依赖端到端的动作预测，而是能够在导航的关键节点自主触发推理，显式分析自身状态与任务进展。
 
@@ -130,7 +132,7 @@ AwareVLN 的核心设计是将**自我感知的结构化推理**嵌入到统一�
 ![[assets/figures/papers/paper_list_l2373_https_arxiv_org_abs_2605_22816/figures/001_Figure_1.jpg]]
 *Figure 1: AwareVLN equips a VLN agent with self-aware, structured reasoning that is selectively triggered at key navigation points. Instead of relying solely on end-to-end action prediction, AwareVLN enables the agent to explicitly analyze its spatial state, task progress, and alignment with the instruction when such reasoning is truly needed, achieving more robust and explainable instruction following*
 
-## 核心模块与公式推导
+
 
 ### 问题形式化
 
@@ -179,7 +181,9 @@ $$\mathcal{D} = \begin{cases} [\text{REASON}], & \text{if } d_{[\text{REASON}]} 
 ![[assets/figures/papers/paper_list_l2373_https_arxiv_org_abs_2605_22816/figures/011_Figure_7.jpg]]
 *Figure 7: Example of our multi-turn reasoning supervision process (Part 2): reasoning for subsequent node types, including path deviation and stopping error, demonstrating error interpretation and recovery planning*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能对比
 
@@ -245,7 +249,9 @@ AwareVLN在仅使用仿真数据训练的条件下，被部署到四足机器人
 ![[assets/figures/papers/paper_list_l2373_https_arxiv_org_abs_2605_22816/figures/015_Figure_8.jpg]]
 *Figure 8: Example 1 of an automatically collected training trajectory, illustrating three key nodes: path deviation, correction completion, and subtask completion. The agent interprets the evolving visual scene and progressively generates structured reasoning outputs aligned with the navigation instruction*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 在视觉语言导航（VLN）方法谱系中的位置
 
@@ -288,6 +294,8 @@ AwareVLN 与现有 VLM 导航方法的核心差异体现在三个关键设计维
 **如何将结构化自我感知推理扩展到更复杂的指令场景？** 当前 AwareVLN 在 R2R-CE 和 RxR-CE 上的验证集中于单条指令的室内导航。将这一范式扩展到更长期、多语言指令、甚至需要常识推理的导航任务中，需要自动数据引擎能够识别更丰富多样的关键推理节点类型，并生成相应的高质量推理监督。
 
 **推理与动作的更深层耦合。** 当前 AwareVLN 的推理与动作是时序上的交替关系（先推理、后动作）。一个更激进的设计方向是让推理直接参与动作空间的约束或重排序——例如，推理模块识别出路径偏离后，直接修改动作候选集的概率分布——从而实现推理与决策的更紧密耦合。
+
+
 
 ## 原文 PDF
 

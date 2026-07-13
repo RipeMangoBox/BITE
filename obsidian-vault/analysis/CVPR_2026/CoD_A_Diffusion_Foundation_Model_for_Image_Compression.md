@@ -43,7 +43,7 @@ claims:
 > - Kodak (256×256) 上，FID / 重建质量 CoD 49M 参数显著优于 MS-ILLM 181M vs MS-ILLM (GAN-based) (更少的参数实现更好的 FID 和纹理细节)。
 > - CLIC2020 (512×512) 上，PSNR, DISTS, FID 像素空间 CoD 在所有比特率上优于 HiFiC, MS-ILLM, CDC, TACO vs HiFiC, MS-ILLM, CDC, TACO (PSNR 更高（可达 ~47 dB@4 bpp），DISTS/FID 更低)。
 
-## 概述
+## 概要
 
 图像压缩长期面临一对根本矛盾：在极低比特率下，传统编解码器（如 VVC/H.266 的参考软件 VTM）能保持高 PSNR，但重建结果模糊、缺乏纹理细节；而基于生成对抗网络（GAN）的感知编解码器（如 HiFiC、MS-ILLM）虽能合成逼真纹理，却往往引入伪影且 PSNR 偏低。近年来，文本到图像的扩散模型（如 Stable Diffusion）被尝试用作压缩解码器，利用其强大的生成先验在超低码率下重建语义合理的图像。然而，这一范式存在**关键瓶颈**：文本条件由冻结的字幕器（如 BLIP-2）生成，无法携带精细的空间与纹理信息，且离散的文本词汇阻断了编码器与解码器的端到端联合优化；同时，潜在扩散模型受限于 VAE 的重建质量上限，难以在宽比特率范围内同时实现高 PSNR 和高感知质量。
 
@@ -58,7 +58,7 @@ claims:
 
 **方法定位**：CoD 不同于固定的编解码器，而是一个面向压缩的**基础模型**。它可服务于多种下游扩散压缩框架（如 DiffC、DDCM、单步蒸馏等），在像素空间和潜在空间均可部署。在方法谱系中，CoD 填补了传统编解码器（高 PSNR 但低感知质量）与 GAN 基感知编解码器（高感知质量但 PSNR 不足）之间的空白，同时克服了文本条件扩散压缩方法的端到端优化障碍。
 
-## 背景与动机
+
 
 ### 图像压缩的经典范式与扩散模型的介入
 
@@ -84,7 +84,9 @@ $$y = \operatorname{Encode}(x, \Theta), \quad \hat{x} = \operatorname{Decode}(y,
 
 CoD（Compression-oriented Diffusion）正是为解决这一根本性错配而提出。其核心思路是：**从零开始训练一个面向压缩的扩散基础模型**，用可学习的本机图像令牌（native image tokens）替代文本条件，通过量化瓶颈实现极低比特率，并在修正流（rectified flow）框架下统一优化压缩失真与扩散感知损失。这一设计使 CoD 既能作为独立编解码器工作，又能作为基础模型替换 Stable Diffusion，赋能下游扩散压缩方法。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CoD 的核心创新在于**将扩散模型的生成条件从文本替换为端到端可学习的本机图像令牌**，并配套设计了**统一训练策略**，从而将压缩任务从“文本条件的零样本适配”升级为“压缩-生成的联合优化”。这一范式转换通过四个关键“changed slots”实现，从根本上解决了现有文本到图像扩散模型在压缩场景中的结构性缺陷。
 
@@ -137,7 +139,7 @@ CoD 完全摆脱了对文本标注的依赖，仅使用纯图像数据集进行�
 
 CoD 的四项关键改动形成了一个完整的创新闭环：**本机图像令牌**解决了条件信息瓶颈，**端到端联合训练**实现了压缩与生成的协同优化，**修正流 + 统一训练**提供了数学上优雅的失真-感知联合优化框架，**纯图像自监督训练**大幅降低了数据和计算门槛。这些创新共同使 CoD 在极低比特率下实现了超越现有文本条件和潜在扩散方案的保真度与感知质量，同时保持了极低的训练成本。
 
-## 整体框架
+
 
 CoD 的整体框架围绕一个核心设计展开：**用端到端可学习的本机图像令牌替代文本条件**，将压缩编码与扩散生成统一为一个可联合优化的基础模型。如图 1 所示，传统文本-图像扩散模型用于压缩时，条件信息来自冻结的字幕器（如 BLIP-2），文本词汇无法携带精细的空间和纹理信息，且编码器与解码器被割裂，无法进行端到端优化。CoD 则从零开始训练，直接学习将图像压缩为紧凑的离散令牌，并以这些令牌作为扩散解码器的唯一条件，实现压缩与生成的协同优化。
 
@@ -190,7 +192,7 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{RF}} + \lambda \cdot \mathcal{L}_{\mathrm{R
 ![[assets/figures/papers/paper_list_l847_https_arxiv_org_abs_2511_18706/figures/002_Figure_2.jpg]]
 *Figure 2: Framework overview of CoD in pixel and latent spaces. CoD consists of a condition encoder, an entropy bottleneck, a condition decoder and a diffusion model which is decoupled to DiT backbone and DDT head [49]. CoD is trained with rectified flow [33], where*
 
-## 核心模块与公式推导
+
 
 ### 条件编码与瓶颈模块
 
@@ -230,7 +232,9 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{RF}} + \lambda \cdot \mathcal{L}_{\mathrm{R
 
 其中 $\lambda = 0.5$，$\beta = 0.25$，$\gamma = 1.0$。$\mathcal{L}_{\mathrm{REPA}}$ 为表示对齐损失（Representation Alignment），$\mathcal{L}_{\mathrm{C}}$ 为码本承诺损失（Codebook Commitment Loss），$\mathcal{L}_{\mathrm{aux}}$ 为辅助损失。辅助损失在统一后训练阶段可进一步提升 FID 指标，与统一训练结合后达到全局最优性能。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 
@@ -304,7 +308,9 @@ CoD 在两个核心维度上接受了系统评估：像素空间编解码器的�
 ![[assets/figures/papers/paper_list_l847_https_arxiv_org_abs_2511_18706/figures/018_Figure_17.jpg]]
 *Figure 17: Evaluating V-and X -prediction pixel-space CoD using DiffC on Kodak at 512 × 512*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有扩散压缩方法的代际差异
 
@@ -345,6 +351,8 @@ CoD 的核心定位是**面向压缩的扩散基础模型**，而非一个固定
 4. **缩放定律的边界。** 在更大规模的训练数据（目前约 22M 图像，远小于 Stable Diffusion 的数十亿级数据）和更大模型下，CoD 的性能能否继续遵循缩放定律？训练数据质量和多样性的提升可能带来多大增益？
 
 5. **Prediction 目标的统一设计。** 如何设计更好的 prediction 目标（如 V-prediction 与 X-prediction 的混合策略），以同时优化基础模型的感知性能和下游量化压缩框架的似然估计稳定性？
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2021
 pdf_ref: paperPDFs/CVPR_2021/DriveGAN_Towards_a_Controllable_High_Quality_Neural_Simulation.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/toronto-ai/DriveGAN/
 aliases:
 - DriveGAN
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | DriveGAN：面向可控的高质量神经模拟 |
 | 英文题名 | DriveGAN: Towards a Controllable High-Quality Neural Simulation |
 | 会议/期刊 | CVPR 2021 |
-| Links | [paper](https://arxiv.org/abs/2104.15060); [Project](https://research.nvidia.com/labs/toronto-ai/DriveGAN/) |
+| Links | [paper](https://arxiv.org/abs/2104.15060) · [Project](https://research.nvidia.com/labs/toronto-ai/DriveGAN/) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/generative_models_and_autoencoders |
 | Method | DriveGAN |
 | Dataset | Carla, Gibson, RWD |
@@ -41,7 +42,7 @@ claims:
 > - Gibson 上，FVD (↓) 为 360.0，对比 311.4 (GameGAN)，变化 +15.6%。
 > - RWD 上，FVD (↓) 为 518.0，对比 801.0 (GameGAN)，变化 -35.3%。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -63,7 +64,7 @@ DriveGAN提出了一种**分阶段训练的解耦潜在空间框架**，将神�
 
 **需注意的局限性**：Gibson数据集上FVD为360.0，略高于GameGAN的311.4，存在亮度漂移问题；模型需160小时真实驾驶数据进行训练，泛化到全新场景的能力有限；可微仿真优化易陷入局部极小，目前仅支持离线重建。
 
-## 背景与动机
+
 
 ### 神经模拟的兴起与瓶颈
 
@@ -98,7 +99,9 @@ DriveGAN的提出直指上述缺口。其核心动机在于：**通过分阶段�
 
 这一设计使得DriveGAN在160小时真实驾驶数据上训练后，能够生成FVD低至281.9（Carla）和518.0（RWD）的高质量视频序列，较GameGAN分别降低61.9%和35.3%，同时支持通过采样z^theme改变天气、通过交换z^a_indep替换场景物体等精细可控操作。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DriveGAN 的核心创新在于构建了一个**解耦的、可微分的神经驾驶模拟器**，它通过三个关键“changed slots”突破了现有数据驱动模拟器（如 GameGAN、World Model）在生成质量、场景可控性和真实视频逆向重建上的瓶颈。
 
@@ -134,7 +137,7 @@ $$
 
 除上述三个主要 changed slots 外，将 StyleGAN 原版判别器替换为多尺度多补丁判别器，使 Carla 图像 FID 从 72.3 降至 67.1（Appendix B），验证了判别器设计对单帧生成质量的贡献，为后续动态学习提供了更高质量的潜在空间基础。
 
-## 整体框架
+
 
 DriveGAN 采用**两阶段训练**策略，将高保真神经模拟分解为可解耦的潜在空间预训练与动态引擎学习两个阶段（图2）。其核心设计动机源于一个关键瓶颈：现有数据驱动模拟器（如GameGAN、World Model）生成质量低下，缺乏对场景元素的精细控制，且无法从真实视频中逆向恢复可编辑的场景参数。
 
@@ -146,7 +149,7 @@ DriveGAN 采用**两阶段训练**策略，将高保真神经模拟分解为可�
 
 **可微仿真扩展。** 利用整个 pipeline 的可微性，DriveGAN 支持从真实视频逆向优化恢复隐藏的动作序列和随机变量，实现场景重放、编辑与帧插值（图6）。
 
-## 核心模块与公式推导
+
 
 DriveGAN 的整体设计遵循两阶段范式：先预训练一个解耦的图像编码器-解码器，再在冻结的潜在空间上训练动态引擎。以下按模块拆解其核心组件与关键公式。
 
@@ -216,7 +219,9 @@ $$\operatorname*{minimize}_{a_{0...T-1},\epsilon_{0...T-1}} \sum_{t=1}^{T} \|z_t
 
 **证据强度**：在 Carla 和 RWD 数据集上，优化恢复的动作预测损失分别为 1.91 和 0.57，远低于随机动作基线（均值 > 3），验证了可微仿真恢复隐藏状态的有效性。但优化容易陷入局部极小，且目前仅用于离线重建（见局限性）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -257,22 +262,17 @@ DriveGAN 在三个驾驶/导航数据集上与多个基线模型进行了系统�
 ![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2104_15060/figures/018_Figure_15.jpg]]
 *Figure 15: Optimized actions from frame interpolation discovers in-between actions. Mean action measures action prediction loss when the mean of actions from the training dataset is used as input*
 
-![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2104_15060/figures/009_Table.jpg]]
 
-![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2104_15060/figures/012_Table.jpg]]
 
-![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2104_15060/figures/020_Table.jpg]]
-*Table: Encoder ξ takes an RGB image x \in \mathbb { R } ^ { 2 5 6 \times 2 5 6 \times 3 } as input and produces disentangled latent codes z = \{ z ^ { \mathrm { t h e m e } } , z ^ { \mathrm { c o n t e n t } } \} where z ^ { \mathrm { t h e m e } } \in \dot { \mathbb { R } } ^ { 1 2 8 } and z ^ { \mathrm { c o n t e n t } } \in \bar { \mathbb { R } } ^ { 4 \times 4 \times 6 4 } . ξ is composed of a feature extractor \xi ^ { \mathrm { f e a t } } and two encoding heads \xi ^ { \mathrm { c o n t e n t } } and ξtheme*
 
-![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2104_15060/figures/021_Table.jpg]]
 
-![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2104_15060/figures/023_Table_9.jpg]]
-*Table 9: D _ { s i n g l e } architecture Table 10: Dtemporal architecture. Input and output dimensions contain two numbers, the first one for the number of channels or vector dimension, and the second one for the temporal dimension. Note that Conv1d is applied on the temporal dimension*
 
 ![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2104_15060/figures/024_Table_11.jpg]]
 *Table 11: Mean distance from the BEV lane predictions and the fitted quadratic function in meters*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从世界模型到解耦神经模拟
 
@@ -317,6 +317,8 @@ DriveGAN 的方法论建立在数据驱动世界模型与生成对抗网络的�
 **多因素细粒度解耦。** 当前的解耦粒度停留在主题 vs. 内容、动作依赖 vs. 无关的二元划分。能否进一步分离出更多因素——如道路走向、车流量密度、建筑物纹理风格、光照方向——实现更细粒度的场景编辑？这可能需要引入额外的归纳偏置或弱监督信号。
 
 **多视角与 3D 输入的潜在表示学习。** 当前模型仅从单目 RGB 图像学习潜在表示。是否可以从多视角或 3D 输入（如深度图、点云）中学习更鲁棒的潜在空间，从而提高生成质量和对视角变化的泛化能力？这关系到模拟器在更复杂传感器配置下的适用性。
+
+
 
 ## 原文 PDF
 

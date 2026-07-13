@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Memory_T1_Reinforcement_Learning_for_Temporal_Reasoning_in_Multi_session_Agents.pdf
+project_link: null
+code_link: https://github.com/Elvin-Yiming-Du/Memory-T1/
 openreview_forum_id: vQf2YR2Kpd
 aliases:
 - MT
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | Memory-T1：多会话代理中时间推理的强化学习方法 |
 | 英文题名 | Memory-T1: Reinforcement Learning for Temporal Reasoning in Multi-session Agents |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=vQf2YR2Kpd); [GitHub](https://github.com/Elvin-Yiming-Du/Memory-T1/) |
+| Links | [paper](https://openreview.net/forum?id=vQf2YR2Kpd) · [GitHub](https://github.com/Elvin-Yiming-Du/Memory-T1/) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | Memory-T1 |
 | Dataset | Time-Dialog |
@@ -42,7 +44,7 @@ claims:
 > - Time-Dialog 上，Overall Score 为 66.9 (Memory-T1 3B)，对比 49.4 (Time-R1)，变化 +17.5。
 > - Time-Dialog 上，Overall Score 为 66.9 (Memory-T1 3B)，对比 49.9 (MemAgent)，变化 +17.0。
 
-## 概述
+## 概要
 
 多会话对话代理需在冗长、跨时间的交互历史中精确定位事件并执行时间推理。现有长上下文模型将对话历史视为平文本，难以有效解析时间表达式，在噪声密集的多会话场景中易出现事件顺序混乱与信息混淆，导致时间推理性能急剧下降。
 
@@ -55,7 +57,7 @@ claims:
 
 方法定位：Memory-T1 属于**记忆增强的强化学习代理**范畴，区别于全上下文输入、标准 RAG 以及仅用答案精度奖励训练的基线。其关键创新在于将时间感知的硬过滤与 GRPO 策略优化结合，为多会话时间推理提供了密集的监督信号。
 
-## 背景与动机
+
 
 ### 长上下文对话中的时间推理困境
 
@@ -86,7 +88,9 @@ claims:
 
 基于上述洞察，本文提出 **Memory-T1**，一个基于强化学习的时间感知记忆选择框架，通过粗到细的级联检索和多层次奖励设计，使代理能够从长对话历史中精准选择时间上一致的证据会话，从而在多会话时间推理任务上实现显著突破。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Memory-T1 的核心创新并非提出新的模型架构，而是针对多会话时间推理中“长上下文平文本导致事件顺序混乱”这一根本瓶颈，重构了记忆选取的**策略**与**训练信号**。其设计围绕三个紧密耦合的 changed slots 展开：粗到细的级联检索策略、多层次密集奖励函数，以及适配该任务的强化学习算法选择。
 
@@ -125,7 +129,7 @@ $$\hat{A}((q,C),(S_j,a_j)) = R((q,C),(S_j,a_j)) - \frac{1}{G}\sum_{j=1}^G R((q,C
 
 **创新耦合机制**：上述三个 changed slots 并非孤立改进。粗到细检索为 RL 代理提供了高质量、时间上已预筛选的候选池，降低了动作空间复杂度；多层次奖励（尤其是 $R_t$）为代理提供了密集的监督信号，使其能够辨别时间模糊性；GRPO 则为这一稀疏奖励场景提供了稳定的策略优化。三者协同，使得 3B 规模的 Memory-T1 能够超越 14B 的全上下文基线（66.9 vs. 60.7，Table 1），并在 128k token 的超长上下文中保持甚至提升 F1（Figure 7），而基线模型在此条件下完全崩溃。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_vQf2YR2Kpd/figures/002_Figure_2.jpg]]
 *Figure 2: An overview of Memory-T1. The framework employs a coarse-to-fine cascade to select time-consistent memories for multi-session temporal reasoning*
@@ -198,7 +202,7 @@ $$
 
 该流水线在推理时仅需平均 1.26 秒/查询，与同类方法持平（Table 5），但在长达 128k token 的极端噪声上下文下仍能保持高 F1 甚至实现正向增益，而基线模型性能则完全崩溃（Figure 7），充分验证了粗到细检索与多层次时间奖励协同抗噪的有效性。
 
-## 核心模块与公式推导
+
 
 Memory-T1 框架围绕一个核心命题展开：**在冗长、嘈杂的多会话对话中，代理必须精准选择时间上一致的证据会话，而非将整个历史视为平文本处理**。为此，框架采用“粗到细”级联架构，将记忆检索分解为两个关键阶段，并通过多层次密集奖励函数驱动强化学习策略优化。
 
@@ -261,7 +265,9 @@ $$R_f(U, I_Q) = \begin{cases} \frac{1}{|U_{\mathrm{rel}}|}\sum_{u\in U_{\mathrm{
 
 **消融实验的因果证据**（Table 2）直接验证了各奖励成分的必要性：仅用 $R_a$ 导致整体分数暴跌 **22.4%**，复杂推理（Category B & C）崩溃；移除 $R_g$ 使定位与提取任务（Category A）下降 **17.4%**；移除 $R_s$ 虽使简单任务提升 23.4%，却导致复杂推理暴跌 **56.2%**——这揭示了时间一致性信号对辨别时间模糊性、抵抗噪声的不可替代作用。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 
@@ -322,7 +328,9 @@ Table 5 显示 Memory-T1 的平均推理延迟为 1.26 秒/查询，与 Time-R1�
 ![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_vQf2YR2Kpd/figures/014_Table_8.jpg]]
 *Table 8: PPO vs. GRPO: F1 performance on Memory-T1 models of different sizes*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -366,6 +374,8 @@ Memory-T1 的核心定位是**面向多会话对话的时间推理记忆代理**
 **RL 训练的工程复杂度。** 奖励权重的敏感度分析（Figure 6）显示，不同权重组合 $(w_a, w_g, w_t)$ 对性能有显著影响，部署时需要仔细调参。GRPO 相较于 PPO 在 3B 模型上整体提升 18.5%（Table 8），但这一优势是否在不同任务和规模上持续稳定，仍需更多验证。RL 训练对超参数的敏感性增加了工程部署的复杂度，如何设计更鲁棒的训练策略是实用的开放问题。
 
 **多模态扩展。** 当前框架仅处理文本对话。更复杂的现实世界多会话场景可能涉及图像、表格等多模态信息，时间推理的维度将更加复杂。Memory-T1 的粗到细检索和多层次奖励范式能否扩展到多模态场景，是一个前瞻性的开放问题。
+
+
 
 ## 原文 PDF
 

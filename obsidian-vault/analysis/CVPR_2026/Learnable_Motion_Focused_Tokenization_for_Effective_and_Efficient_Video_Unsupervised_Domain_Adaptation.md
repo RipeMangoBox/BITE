@@ -43,7 +43,7 @@ claims:
 > - UCF-HMDB_full 上，Top-1 Accuracy (%) Average 96.4 vs 94.6 (UNITE) (+1.8)。
 > - ActorShift 上，Top-1 Accuracy (%) Average 88.4 vs 76.4 (UNITE) (+12.0)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有视频无监督域自适应（VUDA）方法通常对视频的所有时空令牌进行全量处理，导致两个关键瓶颈——大量静态或无关背景令牌加剧了域偏移，干扰动作语义在源域与目标域之间的迁移；同时，自注意力计算量随令牌数平方增长，使得训练和推理效率低下。
 
@@ -55,7 +55,7 @@ claims:
 
 **主要结果**：在三个标准 VUDA 基准（Daily-DA、UCF-HMDB_full、ActorShift）上，LMFT 均显著超越现有最优方法，平均 Top-1 准确率分别提升 5.3%、1.8% 和 12%。同时，LMFT 在保持最高准确率的前提下，实现了约 1.4 倍训练加速和 0.82 倍计算成本，在精度-效率权衡上全面优于其他令牌压缩方法。
 
-## 背景与动机
+
 
 ### 视频无监督域自适应的核心瓶颈
 
@@ -85,7 +85,9 @@ claims:
 
 基于这一洞察，本文提出**可学习运动聚焦令牌化（Learnable Motion-Focused Tokenization, LMFT）**，通过计算相邻时空补丁间的L1运动差异，并利用强化学习动态学习最优的运动阈值 $\tau$，实现自适应地丢弃低运动令牌、保留动作相关令牌，从而同时提升VUDA的域自适应效果和计算效率。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文提出的**可学习运动聚焦令牌化（Learnable Motion-Focused Tokenization, LMFT）** 针对现有视频无监督域自适应（VUDA）方法的核心瓶颈，引入了一个关键的技术变更点：**视频令牌选择策略的根本性重构**。
 
@@ -121,7 +123,7 @@ $$\nabla_\theta \mathcal{I}(\theta) = \mathbb{E}_{\tau \sim \pi_\theta} \big[ (R
 
 与通用令牌压缩方法（如 **Token Merging (ToMe)**（Bolya et al., ICLR 2023）、**Run-Length Tokenization (RLT)**（Choudhury et al., NeurIPS 2024））相比，LMFT的独特之处在于其令牌选择策略**专为视频动作识别中的域自适应设计**——它利用运动信息作为域不变线索来区分任务相关与无关令牌，而非仅基于视觉相似性或时间冗余进行压缩。这一任务感知的设计使其在三个标准VUDA基准上均显著超越现有最优方法（Daily-DA +5.3%, UCF-HMDB_full +1.8%, ActorShift +12%），同时实现约1.4倍训练加速和0.82倍计算成本（Table 4, Table 5）。
 
-## 整体框架
+
 
 LMFT 的整体流水线遵循**源域与目标域对称处理、运动令牌选择前置、ViT 域自适应联合优化**的设计范式，其核心思路是在令牌进入 ViT 骨干网络之前，通过可学习的运动聚焦机制剔除冗余背景令牌，从而同时缓解域偏移并降低计算开销。
 
@@ -170,7 +172,7 @@ Figure 1 直观展示了上述流程：对于源域和目标域视频，LMFT 首
 ![[assets/figures/papers/paper_list_l1048_https_arxiv_org_abs_2604_09955/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of LMFT. For both source and target videos, LMFT tokenizes frames into patch tokens, computes the L1 distance between consecutive temporal tokens, and discards those with differences below a learnable threshold*
 
-## 核心模块与公式推导
+
 
 LMFT 的核心由三个紧密耦合的模块构成：运动强度估计、运动聚焦令牌选择、以及基于强化学习的阈值学习策略。它们共同实现了“仅保留动作相关令牌”的目标，从而缓解背景诱导的域偏移并降低计算开销。
 
@@ -226,7 +228,9 @@ $$
 
 与直接采用 Gumbel-Softmax 近似离散选择的替代方案相比，基于 RL 的阈值学习在准确率和效率上均表现出优势。在 H←W 场景下，RL 方案准确率提升 0.9%（74.2 vs 73.3），训练时间减少约 15%（2784s vs 3275s），最大 GPU 内存占用降低 13%（Table 10）。这表明 RL 策略能够更灵活地在动作识别精度与令牌丢弃率之间进行自适应权衡，而 Gumbel-Softmax 的软近似可能引入额外的计算开销和优化难度。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -299,7 +303,9 @@ Figure 2 展示了 LMFT 在四个视频上的可视化结果。每段视频包�
 ![[assets/figures/papers/paper_list_l1048_https_arxiv_org_abs_2604_09955/figures/012_Table_9.jpg]]
 *Table 9: Effect of varying λL in Eq. 7*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心问题定位：视频无监督域自适应中的“全量令牌”瓶颈
 
@@ -352,6 +358,8 @@ LMFT在VUDA和视频令牌压缩两条技术路线的交叉点上做出了贡献
 3.  **开放集与类别不一致场景**：在源域和目标域标签空间不完全重叠的开放集或部分集VUDA设定下，如何改进伪标签生成机制，或设计不依赖伪标签的令牌选择策略？
 4.  **任务驱动的令牌选择**：能否将LMFT推广到其他视频任务？这可能需要设计任务特定的显著性度量，例如，对于视频分割，显著性可能来源于物体的边界和运动；对于目标跟踪，显著性可能来源于目标的表观特征和运动轨迹。
 5.  **超参数敏感度研究**：论文中RL策略的参数 $\mu$ 和 $\log \sigma$ 被设定为固定初始值（0.01和-1.0）。这些超参数在不同数据集和域偏移程度下的敏感度如何，是否具有普适性，尚需更系统的经验研究。
+
+
 
 ## 原文 PDF
 

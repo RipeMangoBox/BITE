@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/Open_the_Motion_Door_Atomic_Motion_Decomposition_and_Recomposition.pdf
+code_link: null
 project_link: https://vankouf.github.io/OpenTheMotionDoor
 aliases:
 - AMDR
@@ -44,7 +45,7 @@ claims:
 > - IDEA400 上，FID 0.449 vs 0.821 (MDM) (-0.372)。
 > - Mixamo 上，FID 0.186 vs 0.211 (MDM) (-0.025)。
 
-## 概述
+## 概要
 
 现有文本到运动生成方法受限于小规模配对数据集，难以泛化到训练中未见过的开放域文本描述。即使扩大数据规模和模型容量，长尾且多样的动作空间仍然无法被充分覆盖。本文提出**原子运动分解与重组**（Atomic Motion Decomposition and Recomposition）框架，将开放词汇运动生成问题转化为两个子阶段：首先将任意文本描述分解为时空上可组合的原子运动单元，再学习将这些原子元素合成为目标全身运动。
 
@@ -52,7 +53,7 @@ claims:
 
 在域内数据集 HumanML3D 上，该方法取得与现有最佳方法可比的性能（FID 0.132 vs. T2M-GPT 0.116）。在域外数据集上，泛化优势显著：IDEA400 上 FID 达到 0.449（MDM 为 0.821），Mixamo 上 FID 为 0.186（MDM 为 0.211）。t-SNE 可视化证实，文本分解算法有效缩小了训练与测试数据集之间的文本域间隙，分解后的细粒度描述在不同数据集上分布几乎重合。消融实验进一步表明，CFF 模块将 IDEA400 的 FID 从 0.934 降至 0.844，TMA 模块则将 R-Precision 提升至 0.449，二者对开放词汇泛化均不可或缺。
 
-## 背景与动机
+
 
 ### 文本驱动运动生成的核心瓶颈
 
@@ -85,7 +86,9 @@ claims:
 
 实验结果表明，该方法在域外数据集IDEA400和Mixamo上显著优于现有最佳方法，FID分别达到0.449和0.186，验证了原子运动分解与重组范式在开放词汇运动生成中的有效性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于引入**原子运动**作为文本与运动之间的中间表示，将开放词汇运动生成重新表述为“文本分解—原子重组”的两阶段过程。这一范式转变直接针对现有方法的核心瓶颈：小规模配对数据集导致模型无法泛化到训练中未见的长尾动作描述。
 
@@ -120,7 +123,7 @@ claims:
 
 这些结果共同表明，原子运动的分解-重组范式成功地将模型能力从“记忆训练分布”转变为“组合已知原子以应对未知描述”，是开放词汇运动生成的根本性突破。
 
-## 整体框架
+
 
 本文提出 **Atomic Motion Decomposition and Recomposition** 框架，将开放词汇文本到运动生成形式化为一个两阶段过程：**文本分解（Textual Decomposition）** 和 **原子重组（Atomic Recomposition）**。其核心思想是将复杂的全身运动表达为时空上可组合的原子运动单元，从而突破训练数据分布的限制，实现对开放域文本的泛化。
 
@@ -172,7 +175,7 @@ $$\tilde{m}^{3} = \mathcal{F}_{\mathrm{CFF}}(\tilde{m}^{2}; T_{a})$$
 ![[assets/figures/papers/paper_list_l5_Open_the_Motion_Door_Atomic_Motion_Decomposition_and_Recomposition_for_O/figures/001_Figure_1.jpg]]
 *Figure 1: In contrast to current text-to-motion paradigms (Simple Mapping, Other-domain Alignment, and Pretrain-then-Finetuning), our method proposes the textual decomposition to decompose the raw motion text into atomic motion texts, and then recomposes atomic motions into the target motion, which significantly improves the ability of open-vocabulary motion generation*
 
-## 核心模块与公式推导
+
 
 ### 整体架构与掩码生成建模
 
@@ -232,7 +235,9 @@ $$\tilde{m}^{o} \in \mathbb{R}^{N \times D_{m}}$$
 ![[assets/figures/papers/paper_list_l5_Open_the_Motion_Door_Atomic_Motion_Decomposition_and_Recomposition_for_O/figures/004_Figure_4.jpg]]
 *Figure 4: Illustration of the Compositional Feature Fusion (CFF) module. The atomic text matrix is processed by the TMA module and then fused with the motion features via cross-attention*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 域内与域外生成性能
 
@@ -284,7 +289,9 @@ $$\tilde{m}^{o} \in \mathbb{R}^{N \times D_{m}}$$
 ![[assets/figures/papers/paper_list_l5_Open_the_Motion_Door_Atomic_Motion_Decomposition_and_Recomposition_for_O/figures/008_Figure_6.jpg]]
 *Figure 6: t-SNE comparison between raw text and the fine-grained description (left/right lower/upper limb, spine) by Textual Decomposition on a training dataset of HumanML3D and the test dataset of HumanML3D, IDEA400 and Mixamo. Textual Decomposition algorithm successfully reduces the domain gap between these datasets from the textual aspect*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有文本-运动生成范式的关系
 
@@ -341,6 +348,8 @@ CFF 模块的设计则与多专家融合（Mixture of Experts）和交叉注意�
 3. **多智能体与交互扩展**：该方法的核心假设是单人全身运动的可分解性。对于**多人物交互或人-物交互**场景，原子运动的定义和重组机制需要根本性的重新设计——交互约束使得身体部位运动不再是独立的可组合单元。
 
 4. **数据依赖的消融**：RVQ 训练中使用的额外无标注运动数据的规模和质量对最终开放词汇性能的贡献需要独立评估，以区分方法创新和数据增益各自的因果效应。
+
+
 
 ## 原文 PDF
 

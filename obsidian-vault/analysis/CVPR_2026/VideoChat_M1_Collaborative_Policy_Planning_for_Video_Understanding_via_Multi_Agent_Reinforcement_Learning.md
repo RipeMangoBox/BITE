@@ -43,7 +43,7 @@ claims:
 > - Charades-STA 上，mIoU 67.7 vs Seed 1.5VL (64.7) (+3.0)。
 > - Video-Holmes 上，Accuracy 60.5 vs Best foundation LLM agent group (56.2) (+4.3)。
 
-## 概述
+## 概要
 
 视频理解正从单模型端到端处理向智能体驱动的工具调用范式演进。然而，现有基于智能体的方法普遍采用**静态、不可学习的单一固定工具调用策略**，难以自适应地发现时空复杂视频中不同时间尺度上的多样化线索，导致感知和推理能力不足。
 
@@ -57,7 +57,7 @@ claims:
 
 方法上，CPP 范式包含三个关键过程：策略生成（Policy Generation）、策略执行（Policy Execution）和策略通信（Policy Communication），配合共享记忆缓冲区实现智能体间的信息交换与迭代优化。训练阶段采用监督微调（SFT）初始化策略生成能力，再通过 MARL 联合优化，引入结果奖励、格式奖励和协作奖励三合一信号，并加入 Agent Dropout 作为关键规范化手段以保证训练稳定性。
 
-## 背景与动机
+
 
 ### 视频理解的瓶颈：从静态感知到时空协同推理
 
@@ -83,7 +83,9 @@ claims:
 
 这一设计理念的直觉在于：视频理解中的线索发现本质上是一个**搜索问题**，而多智能体协同搜索的效率远高于单智能体的线性扫描。当智能体 A 发现某一时间段的异常事件时，智能体 B 可以立即调整策略去验证相关的前因后果，智能体 C 则专注于空间细节的交叉检验。这种并行且相互引导的探索模式，使得团队能以更少的计算代价覆盖更丰富的证据空间。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 VideoChat-M1 的核心创新在于将视频理解中**静态、不可学习的单一工具调用策略**替换为**可学习、可通信、可迭代演化的多智能体协同策略规划（Collaborative Policy Planning, CPP）**，并通过多智能体强化学习（MARL）赋予智能体团队自主优化协同行为的能力。以下从三个“changed slots”展开其相对于已有智能体方法的本质突破。
 
@@ -121,7 +123,7 @@ Table 6 的消融实验表明，完整的 MARL 配置（含结果、格式、协
 
 一个关键问题是：VideoChat-M1 的性能提升究竟源于 CPP 框架本身，还是源于其使用的特定强工具？Table 11 的工具依赖性消除实验给出了决定性证据：即使将专用空间工具替换为通用视觉骨干 Qwen2.5-VL-7B，VideoChat-M1 仍保持最优性能，且比巨型模型 InternVL-3.5-241B 高出 34.2%。这直接证实**增益来源于协同学习框架而非特定工具**。同时，37B 的智能体团队在 VideoMMMU 上取得了与 235B 的 Qwen3-VL 相当的效果，参数效率极高。
 
-## 整体框架
+
 
 VideoChat-M1 的整体框架围绕**协同策略规划（Collaborative Policy Planning, CPP）** 范式构建，其核心思想是用一个多智能体团队取代传统视频理解智能体中单一、固定的工具调用策略。系统由三类核心组件构成：一组**策略智能体** $\mathcal{G} = \{\mathcal{G}_i\}$、一组**视频感知工具** $\mathcal{T} = \{\mathcal{T}_j\}$，以及一个**共享记忆缓冲区** $\mathcal{M}$。
 
@@ -174,7 +176,7 @@ VideoChat-M1 采用“监督微调（SFT）+ 多智能体强化学习（MARL）�
 ![[assets/figures/papers/paper_list_l2730_https_arxiv_org_abs_2511_19524/figures/002_Figure_2.jpg]]
 *Figure 2: Architecture and Working Mode Comparison (Existing Agent-based Method vs. Our VideoChat-M1). While prior methods rely on a fixed policy, VideoChat-M1 introduces a collaborative multi-agent policy planning pipeline that generates, executes, communicates and refines plans iteratively, enabling more adaptive and accurate long-video reasoning*
 
-## 核心模块与公式推导
+
 
 VideoChat‑M1 的核心架构由**协同策略规划（CPP）**推理范式和**多智能体强化学习（MARL）**训练框架两大支柱构成。CPP 负责在推理阶段让多个智能体动态生成、执行并通信工具调用策略；MARL 则通过三合一奖励信号联合优化整个智能体团队，使其学会稳定、高效地协同探索视频线索。
 
@@ -228,7 +230,9 @@ $$\max_{\pi_\theta} \mathbb{E}_{o\sim\pi_{\theta_{\mathrm{old}}}} \left[ \sum_{k
 ![[assets/figures/papers/paper_list_l2730_https_arxiv_org_abs_2511_19524/figures/004_Figure_4.jpg]]
 *Figure 4: Training the Agent Group using Our Multi-Agent Reinforcement Learning (MARL) Method. Agents generate policies, communicate, and iteratively refine them with tool feedback, while reward and reference models guide stable joint optimization*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -307,7 +311,9 @@ Table 11（附录 A.6）的关键消融实验将专用空间工具替换为通�
 - **Figure 5**：量化了智能体数量对性能的边际贡献，为团队规模选择提供依据。
 - **Table 6**：完整刻画了 MARL 各组件的因果贡献，Agent Dropout 被识别为最关键规范化器。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 VideoChat‑M1 的方法定位可以从三个维度来理解：它与现有基于智能体的视频理解工作的继承与断裂、它通过多智能体强化学习（MARL）引入的独特训练机制，以及该框架的适用边界与未决问题。
 
@@ -346,6 +352,8 @@ VideoChat‑M1 的另一个核心定位在于它是首个将多智能体强化�
 - CPP 范式是否可以迁移至其他多模态任务（如图像理解、文档分析）？
 - 更高效的多智能体通信机制（如选择性通信、图网络）能否进一步提升协作效率？
 - 能否将协作奖励从二元评估扩展为连续细粒度信号，以提供更丰富的训练指导？
+
+
 
 ## 原文 PDF
 

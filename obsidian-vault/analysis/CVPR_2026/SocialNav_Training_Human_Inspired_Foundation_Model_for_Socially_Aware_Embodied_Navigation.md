@@ -43,7 +43,7 @@ claims:
 > - SocNav Closed-Loop Benchmark 上，Success Rate (SR) 86.1 vs 47.8 (CityWalker) (+38.3)；Distance Compliance Rate (DCR) 82.5 vs 36.1 (CityWalker) (+46.4)。
 > - Real-World Deployment (3 environments) 上，Average Success Rate 85.0 vs 62.5 (CityWalker) (+22.5)。
 
-## 概述
+## 概要
 
 现有具身导航模型大多以几何最短路径为唯一优化目标，缺乏对社会规范的显式建模，导致机器人在真实环境中频繁出现闯红灯、穿越禁行区、踩踏草坪等不符合人类预期的行为。这一瓶颈的根源在于，纯模仿学习只能复现训练分布中的表面动作模式，无法内在化社会规范的因果原则。
 
@@ -51,7 +51,7 @@ SocialNav 提出了一套分层脑-行动基础模型架构，将社交规范注
 
 实验结果表明，SocialNav 在闭环 SocNav 基准上相较 SOTA 方法 CityWalker 成功率提升 **+38%**（86.1 vs 47.8），社交合规率提升 **+46%**（DCR 82.5 vs 36.1）；在真实世界部署中平均成功率亦领先 **+22.5%**（85.0 vs 62.5）。消融研究进一步证实，认知先验与 SAFE-GRPO 的组合是实现高社交合规性的关键——移除认知先验后，强化学习反而会恶化社交指标。
 
-## 背景与动机
+
 
 ### 问题背景：具身导航中的社会规范盲区
 
@@ -81,7 +81,9 @@ SocialNav 的设计围绕三个关键认知展开：
 
 SocialNav 在多个维度上验证了上述动机的有效性。在闭环 SocNav Benchmark 上，SocialNav 相比 SOTA 方法 **CityWalker** 实现了 **+38% 的成功率提升**和 **+46% 的社交合规率提升**（DCR 从 36.1 提升至 82.5）。消融实验进一步揭示了核心洞察：**在缺乏认知先验（Cognitive Activation Dataset, D_cog）的情况下直接应用 SAFE-GRPO 强化学习，反而会损害社交指标**（DCR 下降 1.7，TCR 下降 1.3）；只有当 VLM 提供的认知先验与社交合规奖励共同作用时，才能获得最佳的社交合规表现。这有力地证明了“理解场景语义”与“奖励驱动对齐”两者缺一不可——正是这一组合机制使 SocialNav 超越了模仿学习的表面复现，实现了对社会规范的因果性内化。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SocialNav 的核心创新在于**将社交规范从“表面模仿”提升为“因果对齐”**。现有导航方法（如 GNM、ViNT、NoMaD、CityWalker）仅通过行为克隆追求几何最优路径，缺乏对社会规范的语义理解，导致闯红灯、穿越禁行区等不合理行为。SocialNav 通过三个关键的 **changed slots** 系统性地解决了这一瓶颈。
 
@@ -120,7 +122,7 @@ SocialNav 的三阶段训练策略解决了这一矛盾：
 
 SocialNav 的三个 changed slots 形成了一条因果链：VLM 提供社交语义理解（**知道什么是对的**），流匹配生成多模态候选（**能够做到对的**），SAFE-GRPO 通过奖励机制将对的行为固化为策略（**愿意做对的**）。这一设计使得 SocialNav 在 SocNav 闭环基准上相比 CityWalker 实现成功率 +38.3%、社交合规率 +46.4% 的跃升，并在真实世界部署中保持 85% 的平均成功率。
 
-## 整体框架
+
 
 SocialNav 采用**分层脑-行动架构（hierarchical brain-action architecture）**，将高层语义推理与底层轨迹生成解耦，如图 Figure 3 所示。该架构由两个核心模块串联构成：
 
@@ -150,7 +152,7 @@ $$\mathbf{Z}_{\mathrm{VLM}} = \pi_{\mathrm{VLM}}(\mathcal{O}_{t-n:t}, P_{t-n:t},
 ![[assets/figures/papers/paper_list_l2095_https_arxiv_org_abs_2511_21135/figures/001_Figure_1.jpg]]
 *Figure 1: Socially-Aware Navigation in Real-World Environments. SocialNav combines high-level semantic reasoning with low-level trajectory generation. It identifies socially traversable zones and generates CoT explanations, planning routes that respect social norms*
 
-## 核心模块与公式推导
+
 
 ### 问题形式化
 
@@ -208,7 +210,9 @@ $$\mathrm{DCR} = \begin{cases} \frac{d_{\mathrm{compliant}}}{d_{\mathrm{actual}}
 ![[assets/figures/papers/paper_list_l2095_https_arxiv_org_abs_2511_21135/figures/010_Figure_6.jpg]]
 *Figure 6: Predicted socially traversable regions on unseen scenes. Green polygons denote predicted socially traversable regions, and red arrows highlight areas incorrectly classified as traversable. SocialNav yields more semantically aligned polygons in both domains*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -267,7 +271,9 @@ Table 8 对 SAFE-GRPO 的四个奖励项逐一消融。社交合规奖励 $\math
 ![[assets/figures/papers/paper_list_l2095_https_arxiv_org_abs_2511_21135/figures/018_Figure_9.jpg]]
 *Figure 9: Real-world deployment visualizations. Third-person views of the Unitree Go2 robot navigating in street, park, and campus environments. SocialNav successfully follows sidewalks, avoids stepping onto lawns or driveways, respects pedestrian flows*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -298,6 +304,8 @@ SocialNav 的适用边界受以下因素制约：
 2. **VLM 驱动的自适应奖励**：如何整合视觉语言模型以提供更丰富、自适应的奖励信号？现有社交合规奖励 $\mathcal{R}_{\mathrm{social}}$ 基于预定义的距离变换图，若能利用 VLM 在线评估轨迹的社会合理性，可实现更强的以人为本对齐。
 
 此外，从方法谱系角度看，SocialNav 开创了“VLM 认知先验 + 流式 RL 对齐”的范式，后续工作可沿以下路径延伸：（1）将 Brain Module 升级为更强的 VLM 或引入多模态社会线索（如行人意图预测）；（2）设计更细粒度的社交奖励组件，解耦不同类型的规范违反；（3）探索离线 RL 或偏好对齐方法以降低在线探索的安全风险。
+
+
 
 ## 原文 PDF
 

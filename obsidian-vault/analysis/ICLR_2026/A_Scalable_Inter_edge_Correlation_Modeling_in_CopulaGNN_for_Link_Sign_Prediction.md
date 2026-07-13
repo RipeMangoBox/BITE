@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/A_Scalable_Inter_edge_Correlation_Modeling_in_CopulaGNN_for_Link_Sign_Prediction.pdf
+project_link: null
+code_link: null
 aliases:
 - CCLSP
 - SIECMCLSP
@@ -41,7 +43,7 @@ claims:
 > - BitcoinAlpha 上，F1 为 0.716，对比 0.718 (SNEA)，变化 -0.002。
 > - BitcoinOTC 上，AUC 为 0.886，对比 0.886 (SNEA)，变化 0.000。
 
-## 概述
+## 概要
 
 链接符号预测（link sign prediction）旨在推断社交网络中用户间边的正负极性（信任/不信任）。现有符号图神经网络（SGNN）通过添加辅助结构（如基于社会理论的预处理或对负边的单独处理）来处理负边，但这些方法收敛缓慢且内存效率低下。根本瓶颈在于它们忽略了边之间的统计依赖性，而直接建模边-边相关性矩阵的规模随边数二次增长，导致计算和内存开销达到O(|V|^4)，在中等规模图上即不可行。
 
@@ -49,7 +51,7 @@ claims:
 
 实验在六个公开数据集（BitcoinAlpha、BitcoinOTC、WikiElec、WikiRfa、SlashDot、Epinions）上进行。主要结果表明：CopulaLSP在预测性能（AUC和F1）上与最强基线SNEA持平（所有数据集上差异不超过±0.003），但收敛速度大幅提升——在BitcoinAlpha上仅需56.7个epoch收敛，而SNEA需要325.5个epoch；在WikiElec上训练仅需16.2秒，而SNEA需要101.0秒。在更大规模数据集（SlashDot和Epinions）上，多个基线方法（SDGNN、TrustSGCN、SGAAE、SE-SGformer）出现显存溢出（OOM），而CopulaLSP成功运行。消融研究证实：使用Gram相关性矩阵（而非单位矩阵）在BitcoinAlpha上AUC从0.830升至0.864；Woodbury重写使推理时间从OOM降至0.07秒，GPU内存从OOM降至1.47GB。在合成数据集上，CopulaLSP达到完美AUC和F1，而SNEA将所有边预测为正，验证了模型捕捉边间相关性的能力。理论分析证明损失函数线性收敛，收敛率 $r = 1 - 2\tilde{\mu} / (m^4(\alpha^2 + 2\alpha^3\beta))$。
 
-## 背景与动机
+
 
 符号图（Signed Graph）中的链接符号预测任务旨在推断节点间边的正负标签。现有符号图神经网络（SGNN）方法——如SDGNN、TrustSGCN、SGAAE、SE-SGformer——在处理负边时通常依赖辅助结构：例如基于社会理论的预处理策略，或对正负边分别建模。然而，这些方法存在一个共同的根本瓶颈：**它们将每条边的标签视为独立变量，忽略了边与边之间固有的统计依赖性**。在真实符号图中，边的符号往往具有结构性关联（例如，一个用户同时信任两个用户，则这两个用户之间更可能存在信任关系），这种依赖性若被忽视，会导致模型收敛缓慢且内存效率低下。
 
@@ -57,7 +59,9 @@ claims:
 
 本文的动机正是填补这一缺口：**如何在保持可扩展性的前提下，显式建模边间统计依赖性？** 核心洞察在于两点。第一，利用高斯Copula将联合分布分解为边际分布（每条边的符号分布）和一个相关性矩阵，从而将边间依赖性的建模与边际建模解耦。第二，通过将相关性矩阵参数化为边嵌入的Gram矩阵 $R = \nu(Q Q^T + \varepsilon I)$，将参数量从 $O(m^2)$ 压缩至 $O(md)$（$d \ll m$），并利用Woodbury矩阵恒等式将条件分布推理中的矩阵求逆复杂度从 $O(m^3)$ 降至 $O(d^3)$。这一设计使得模型在理论上可实现线性收敛（收敛率 $r = 1 - 2\tilde{\mu} / (m^4(\alpha^2 + 2\alpha^3\beta))$），并在实践中大幅加速训练——在BitcoinAlpha上仅需56.7个epoch即可收敛，而基线SNEA需要325.5个epoch。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CopulaLSP的核心创新在于将符号图链接预测问题重新定义为**边标签联合分布建模**，并利用高斯Copula显式捕捉边之间的统计依赖性。这一设计直接针对现有SGNN方法的根本瓶颈：它们忽略边间相关性，导致收敛缓慢且内存效率低下。
 
@@ -75,7 +79,7 @@ CopulaLSP的核心创新在于将符号图链接预测问题重新定义为**边
 
 **证据强度**：相关性矩阵参数化和Woodbury重写有明确的数学公式支撑（置信度1.0），消融实验直接量化了每个创新的贡献（置信度0.95）。收敛速度提升有Table 1的epoch计数和Table 3的训练时间双重验证。需要注意的是，虽然理论证明损失函数线性收敛（收敛率`r = 1 - 2μ̃ / (m⁴(α² + 2α³β))`），但该收敛率中的常数项依赖于特定假设（如梯度Lipschitz连续和PL条件），在实际极端稀疏或大规模图上的收敛行为仍需手动验证。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0003_U7tR3lCRr5_A_Scalable_Inter-edge_Correlation_Modeling_in_Co/figures/001_Figure_1.jpg]]
 *Figure 1: CopulaLSP (our proposed model) architecture and its training, inference process*
@@ -99,7 +103,7 @@ CopulaLSP的pipeline由两个核心阶段构成：**训练阶段**（联合分�
 
 **证据强度说明**：上述pipeline描述完全基于论文中明确声明的模块定义和公式（锚点见verified_analysis.method.pipeline_modules和formulas）。收敛加速和内存节省的具体数值来自Table 1和Table 5，置信度0.95。Woodbury重写的复杂度分析为理论推导（锚点"reformulate the conditional probability distribution using the Woodbury matrix identity"），置信度1.0。
 
-## 核心模块与公式推导
+
 
 ### 边际分布：连续松弛伯努利分布
 
@@ -175,7 +179,9 @@ $$r = 1 - \frac{2\tilde{\mu}}{m^4(\alpha^2 + 2\alpha^3\beta)}$$
 
 其中 $\tilde{\mu}$ 是 PL 常数，$\alpha$ 和 $\beta$ 与 $R$ 的特征值范围相关。该理论解释了实验中 CopulaLSP 收敛速度远超基线（如 BitcoinAlpha 上 56.7 epoch vs. SNEA 的 325.5 epoch）的根本原因——PL 条件确保梯度下降不会陷入非优鞍点。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：预测性能持平，收敛与可扩展性大幅领先
 
@@ -220,7 +226,9 @@ CopulaLSP在六个公开符号图数据集（BitcoinAlpha、BitcoinOTC、WikiEle
 
 附录E中的收敛分析证明损失函数线性收敛，收敛率 r = 1 - 2μ̃ / (m⁴(α² + 2α³β))。其中μ̃来自Polyak-Lojasiewicz条件，α和β来自Lipschitz常数。**这一理论保证解释了CopulaLSP为何能比SNEA更快收敛**：SNEA的收敛依赖于社会理论预处理和负边单独处理的启发式策略，而CopulaLSP的损失函数具有明确的线性收敛性质。然而，收敛率分母中的m⁴项表明在边数极大的图上实际收敛仍可能较慢——这是理论分析揭示的潜在风险。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与Baseline/Follow-up的关系
 
@@ -249,6 +257,8 @@ CopulaLSP的核心贡献在于将符号图链接预测问题重新表述为联�
 - 是否可以使用其他Copula函数（如t-Copula）来更好地建模尾部依赖性？
 - 标签平滑超参数η对收敛和最终性能的影响机制是否可以进一步理论化？
 - 模型是否可以推广到其他边级任务，如边权重预测或边类型分类？
+
+
 
 ## 原文 PDF
 

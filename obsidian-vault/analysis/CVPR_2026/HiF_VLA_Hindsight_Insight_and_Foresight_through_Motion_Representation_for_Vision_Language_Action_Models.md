@@ -44,7 +44,7 @@ claims:
 > - CALVIN ABC-D (multi-view) 上，平均连续完成指令数 Avg.Len. 4.35 vs 4.10 (OpenVLA-OFT) (+0.25)。
 > - LIBERO 四套件平均 上，平均成功率 SR (%) 98.0 vs 97.1 (OpenVLA-OFT) (+0.9)。
 
-## 概述
+## 概要
 
 视觉-语言-动作（VLA）模型在机器人操控中展现出强大的泛化能力，但其时序建模存在根本性瓶颈：现有方法普遍基于马尔可夫假设，仅依赖当前观测 $o_t$ 预测动作，导致长期任务中动作连贯性差、时序近视严重。部分工作通过堆叠历史帧引入时序信息，却带来大量像素冗余与计算开销，分散模型对任务相关动态的注意力；而生成像素级子目标的方法则推理成本高昂且结构弱。**HiF-VLA**（CVPR 2026）针对上述问题，提出以**运动向量**作为时空压缩表征，实现双向时序推理——编码过去动态为后见先验，预测未来运动为预见，并通过后见调制的联合专家模块在统一潜空间中融合时序信息，使 VLA 在“边思考边行动”的范式下生成时序一致的动作。
 
@@ -57,7 +57,7 @@ claims:
 
 HiF-VLA 将 VLA 的时序感受野从单向扩展为双向，以紧凑、结构化的运动表征实现了高效的长程操作推理，在多个基准上达到最优性能，同时保持极低的额外推理开销。
 
-## 背景与动机
+
 
 ### 具身操作中的时序近视困境
 
@@ -94,7 +94,9 @@ $$\text{MV}_{t-1:t}(x,y) = (x_t - x_{t-1}, y_t - y_{t-1})$$
 
 这一设计使 HiF-VLA 在保持极低额外推理延迟的前提下，显著扩展了 VLA 的时序感受野，为长程操作任务提供了结构化、高效率的时序推理能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 1. 问题诊断：时序近视的瓶颈
 
@@ -152,7 +154,7 @@ $$(\widetilde a_{t:t+n}, \widetilde m_{t:t+n}) \sim P_{\theta}^{\prime} (a_{t:t+
 
 **开放问题**：如何将运动表征扩展到更高级的推理任务（如安全性预测、物理规律学习），以及在大规模多任务数据上保证联合预见与动作的训练稳定性，是值得进一步探索的方向。
 
-## 整体框架
+
 
 HiF-VLA 的核心洞察在于：**运动向量（Motion Vector, MV）** 能够紧凑且忠实地捕获状态间的任务相关动态变化，同时滤除静态像素噪声。基于此，HiF-VLA 构建了一个双向时序推理框架，将过去动态编码为“后见先验”，将未来运动预测为“预见”，并通过一个统一潜空间中的融合模块生成时序一致的动作序列。整体推理范式可形式化为：
 
@@ -207,7 +209,7 @@ $$\mathcal{L}_{\mathrm{all}} = \mathcal{L}_{A} + \lambda \cdot \mathcal{L}_{MV}$
 ![[assets/figures/papers/paper_list_l961_https_arxiv_org_abs_2512_09928/figures/008_Figure_5.jpg]]
 *Figure 5: Real-world long-horizon tasks. (a) We deploy our system on the AgileX Piper robotic arm equipped with an external scene camera (Intel RealSense D435) and a wrist-mounted camera. (b) We design three long-horizon tasks covering diverse primitives such as Put it on the white plate. pick, put, cover, stack, and press, emphasizing temporal consistency in action generation*
 
-## 核心模块与公式推导
+
 
 HiF-VLA 的核心创新在于将运动向量（Motion Vector, MV）作为时空压缩表征，替代传统 VLA 模型中的原始图像堆叠，实现双向时序推理。其流水线由三个关键模块构成：**后见先验获取**、**预见推理与洞察**、**后见调制联合专家**。
 
@@ -269,7 +271,9 @@ $$ \mathcal{L}_{\mathrm{all}} = \mathcal{L}_{A} + \lambda \cdot \mathcal{L}_{MV}
 ![[assets/figures/papers/paper_list_l961_https_arxiv_org_abs_2512_09928/figures/006_Figure_4.jpg]]
 *Figure 4: Performance comparison on different hindsight embedding locations. (a) represents direct injection into the VLM, and (b) represents conditional embedding as an expert decoder. (c) shows the performance of both on LIBERO-Long*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 4.1 实验设置与基准
 
@@ -329,7 +333,9 @@ HiF‑VLA 在两个主流长程机器人操作基准上进行评估：**LIBERO�
 ![[assets/figures/papers/paper_list_l961_https_arxiv_org_abs_2512_09928/figures/007_Figure_3.jpg]]
 *Figure 3: Effect of hindsight length on performance and efficiency. (a) Example of historical frames. (b) HiF-VLA maintains low inference of the cabinet and close it HiF-VLA(ours) HiF-VLA(ours) of the cabinet and close it latency as hindsight length increases. (c) Performance of hindsight of different lengths in third-view and multi-view perspectives*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：VLA 时序建模的三种范式
 
@@ -383,6 +389,8 @@ $$MV_{t-1:t}(x,y) = (x_t - x_{t-1}, y_t - y_{t-1})$$
 3. **大规模训练稳定性**：在大规模多任务数据上，联合预见与动作的训练范式如何保证收敛稳定性？Figure 7 已初步验证“边思考边行动”可加速运动损失收敛，但在更复杂的数据分布下，双流协同的优化动力学仍需进一步研究。
 
 4. **与基础模型演进的适配**：随着 VLM 基础模型快速迭代，后见调制联合专家的模块化设计能否无缝适配不同架构的 VLM，还是需要针对特定注意力机制进行重新设计？
+
+
 
 ## 原文 PDF
 

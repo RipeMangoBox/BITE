@@ -43,7 +43,7 @@ claims:
 > - HM3D-v1 上，SR(%) / SPL(%) 62.5 / 33.9。
 > - HM3D-v2 上，SR(%) / SPL(%) 78.1 / 40.2。
 
-## 概述
+## 概要
 
 零样本物体导航（Zero-Shot ObjectNav）要求智能体在未见过的三维环境中，仅凭开放词汇物体目标（如“找一个沙发”）进行搜索。现有方法——无论是依赖单步观测的LLM/VLM规划器，还是利用回合内记忆的场景图方法——都面临一个共同瓶颈：**决策完全依赖大模型中与场景无关的常识知识，缺乏对三维空间布局和物体共现关系的长期经验积累**，导致策略缺乏场景针对性，且每轮导航结束后经验被丢弃，无法复用。
 
@@ -51,7 +51,7 @@ TrajRAG 将这一瓶颈转化为一个**检索增强生成（RAG）问题**：�
 
 该方法在三个主流基准上取得了最优结果：MP3D 上成功率达 42.6% / SPL 18.0%，HM3D-v1 上 62.5% / 33.9%，HM3D-v2 上 78.1% / 40.2%，验证了几何-语义经验检索对零样本导航的有效性。
 
-## 背景与动机
+
 
 **零样本物体导航（Zero-Shot ObjectNav）** 要求智能体在未见过的三维环境中，仅凭开放词汇物体类别（如“找到一张床”）就能定位并到达目标。近年来，基于大语言模型（LLM）或视觉语言模型（VLM）的方法在此任务上取得了显著进展，其核心范式是将当前观测转化为文本或视觉提示，交由大模型进行常识推理以选择下一步航点。
 
@@ -67,7 +67,9 @@ TrajRAG 将这一瓶颈转化为一个**检索增强生成（RAG）问题**：�
 
 **TrajRAG** 的提出正是为了填补这一缺口。其核心动机是：如果能够将每次导航的轨迹转化为紧凑的表示并持续积累，在后续导航中检索与之空间布局和语义上下文相似的历史经验，注入大模型推理过程，就能使智能体“借鉴以往经验”提升零样本导航的决策质量（图1c）。这一思路将检索增强生成（RAG）范式从文本领域拓展至具身导航的几何-语义空间，为终身经验学习提供了新的技术路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 TrajRAG 的核心创新在于**将零样本物体导航从“仅依赖大模型常识”的瞬时推理范式，转变为“检索历史几何-语义经验辅助决策”的记忆增强范式**。现有 LLM/VLM 基线方法（如 **VoroNav** (Wu et al., ICML 2024)、**SG-Nav** (Yin et al., NeurIPS 2024)、**BeliefMapNav** (Zhou et al., NeurIPS 2025)）在每轮导航中仅利用单步观测或片段记忆构建提示，导航结束后即丢弃所有经验，缺乏对三维空间布局与物体共现关系的长期积累。TrajRAG 通过三个关键 changed slot 填补了这一空白：
 
@@ -85,7 +87,7 @@ TrajRAG 的核心创新在于**将零样本物体导航从“仅依赖大模型�
 
 这三个 changed slot 相互耦合形成闭环：紧凑的拓扑-极坐标表示使大规模轨迹存储和高效检索成为可能，层次化分块架构支撑了粗到细的检索效率，而检索到的经验又通过大模型推理反哺导航决策，最终使零样本导航从“无记忆的常识猜测”升级为“有经验的场景推理”。
 
-## 整体框架
+
 
 TrajRAG 将零样本物体导航重新定义为**检索增强生成（RAG）**问题，其核心思路是将历史导航经验转化为可复用、可匹配的几何-语义记忆，并在推理阶段注入大模型辅助决策。整体框架由一条贯穿“建图—表示—索引—检索—推理—积累”的闭环管线构成，如 Figure 2 所示。
 
@@ -122,7 +124,7 @@ Figure 1 明确对比了三种上下文模式：
 
 整个框架的关键设计在于将冗余的 RGB-D 序列压缩为**拓扑-极坐标轨迹**，并通过**层次化索引**实现高效检索，使零样本导航首次具备了可积累、可迁移的长期场景经验。
 
-## 核心模块与公式推导
+
 
 ### 语义建图与拓扑骨架提取
 
@@ -182,7 +184,9 @@ $$\mathcal{L}_{\text{contrast}} = -\log \frac{\exp(\sin(\mathbf{z}_i, \mathbf{z}
 ![[assets/figures/papers/paper_list_l2649_https_arxiv_org_abs_2605_01700/figures/008_Figure_4.jpg]]
 *Figure 4: Navigation with TrajRAG. The left column shows the agent’s ego-view RGB images. The middle column presents the skeletonization and detected keypoints (red) on the skeleton map, where the location icon indicates the ground-truth location of the target (“bed”) for visualization purposes only; the target location is unknown to the agent during navigation. The right column illustrates the agent’s traversed trajectory from the start to the pre-navigation position (light gray), candidate trajectories from the current location to various frontiers (light-colored, with blue dots indicating frontiers), and the trajectory selected by the model (burgundy)*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 TrajRAG 的实验设计围绕三个核心问题展开：（1）拓扑-极坐标轨迹表示和层次化检索策略各自对性能的贡献；（2）TrajRAG 与现有零样本 ObjectNav 方法及不同 RAG 范式相比的优势；（3）经验积累带来的跨场景和跨数据集泛化能力。
 
@@ -227,7 +231,9 @@ Table 4 展示了跨数据集评估结果。当使用 HM3D-v1 与 MP3D 的混合
 
 论文未提供显式的失败模式分析（limitations 字段为空）。从方法设计推断，潜在风险包括：拓扑骨架化对复杂多层结构的适应性、极坐标采样半径 $R$ 对场景尺度的敏感性，以及层次化分组策略在经验规模急剧增长时的检索精度退化。这些点需要在实际部署中手动验证。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：零样本导航中的经验断层
 
@@ -283,6 +289,8 @@ TrajRAG构建的知识库具有以下特征：
 - **经验遗忘与更新**：长期运行中旧经验可能过时或冗余，是否需要引入遗忘机制或经验优先级排序？
 - **多模态经验融合**：能否将人类示范或语言指令等异质经验纳入同一知识库？
 - **安全与鲁棒性**：检索到的经验若来自失败轨迹，如何避免错误传播？
+
+
 
 ## 原文 PDF
 

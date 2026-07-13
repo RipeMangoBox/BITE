@@ -42,7 +42,7 @@ claims:
 > - Stage-Capture Dataset 上，PSNR ↑ 30.08 vs Deform-GS (28.45) (+1.63)；SSIM ↑ 0.904 vs Deform-GS (0.867) (+0.037)；LPIPS ↓ 0.0225 vs Deform-GS (0.0272) (-0.0047)。
 > - Neural3DV (Flame Steak & Flame Salmon) 上，PSNR ↑ 33.22 vs Deform-GS (31.79) (+1.43)；SSIM ↑ 0.959 vs Deform-GS (0.952) (+0.007)；LPIPS ↓ 0.074 vs Deform-GS (0.081) (-0.007)。
 
-## 概述
+## 概要
 
 动态场景的4D重建是计算机视觉中的核心挑战，尤其在输入视频帧率稀疏且运动幅度较大时，现有方法难以可靠地合成任意中间时刻的视图。**RetimeGS** 针对这一瓶颈，提出了一种连续时间4D高斯溅射（4DGS）表示，通过显式正则化时间不透明度并约束基元轨迹为样条，消除了时间混叠伪影，实现了对任意中间帧的高质量插值。
 
@@ -70,7 +70,7 @@ RetimeGS 通过三个关键设计解决上述问题：
 
 当帧间运动过大或帧率极低时，现有光流估计器无法提供可靠对应，中间帧插值仍会出现明显伪影。此外，相邻动态基元组本质上的不连续性会在离散输入帧处引入轻微闪烁。
 
-## 背景与动机
+
 
 ### 动态场景重建的4DGS范式
 
@@ -100,7 +100,9 @@ RetimeGS 通过三个关键设计解决上述问题：
 
 RetimeGS 针对上述三个缺口，提出了一套协同设计的解决方案：通过短尾双sigmoid时间不透明度强制每组基元覆盖相邻两帧及其间隔；利用双向光流监督的Catmull-Rom样条建模平滑轨迹；配合动态拉伸与重定位策略优化基元预算分配。这些设计共同使4DGS能够可靠地插值任意中间帧，即使在大幅帧间运动下也能保持高保真渲染。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 RetimeGS 的核心创新在于对 4D 高斯溅射（4DGS）的时间表示和运动轨迹进行显式正则化，从根本上解决现有方法因时间过拟合导致的中间帧鬼影伪影问题。具体而言，该方法在三个关键维度上改进了 4DGS 的表示与训练策略。
 
@@ -142,7 +144,7 @@ $$
 
 这些 changed slots 共同构成一个闭环：时间不透明度正则化消除过拟合，样条轨迹提供平滑运动先验，三重渲染和动态资源分配确保训练信号的一致性和基元预算的高效利用。
 
-## 整体框架
+
 
 RetimeGS 的核心设计思路是通过**正则化时间不透明度**与**样条轨迹建模**，从根本上消除现有 4DGS 方法在中间帧渲染时出现的时间混叠（鬼影）伪影。整体 pipeline 由四个紧密协作的模块构成，输入为多视角视频与双向光流，输出为可在任意连续时刻渲染高质量图像的 4D 场景表示。
 
@@ -204,7 +206,7 @@ $$\mathbf{p}_{0,p} = \mathbf{p}_{1,p} - \Delta t \cdot \mathbf{v}_{1,p}, \qquad 
 ![[assets/figures/papers/paper_list_l2091_https_arxiv_org_abs_2603_13783/figures/011_Figure_8.jpg]]
 *Figure 8: Failure case under extremely low capture FPS. Our method struggles to interpolate intermediate frames when the inter-frame motion becomes too large due to low temporal sampling or large motion*
 
-## 核心模块与公式推导
+
 
 ### 4D基元表示
 
@@ -266,7 +268,9 @@ $$s = \frac{\sigma}{\tau_l + \tau_r}$$
 ![[assets/figures/papers/paper_list_l2091_https_arxiv_org_abs_2603_13783/figures/010_Figure_6.jpg]]
 *Figure 6: Ablation on dynamic stretching. The magenta is rendered using static stretched primitives, and the teal is rendered using dynamic primitives (with static background removed)*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -324,7 +328,9 @@ RetimeGS 在 Stage-Capture 数据集上以显著优势超越所有基线方法�
 ![[assets/figures/papers/paper_list_l2091_https_arxiv_org_abs_2603_13783/figures/018_Table_7.jpg]]
 *Table 7: Comparison of training efficiency and peak GPU memory under a shared budget of 1M primitives*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 4DGS 时间插值的方法谱系
 
@@ -365,6 +371,8 @@ RetimeGS 的有效性依赖于两个关键前提，当这些前提被打破时�
 3. **自适应时间窗口与不透明度建模**：当前短尾时间不透明度的窗口宽度是均匀初始化的，且形状固定。对于不同运动速度、不同不透明度变化模式的区域，自适应地调整 $\tau_l, \tau_r$ 以及 sigmoid 的锐度参数 $\gamma$，可能进一步提升对复杂动态场景的建模能力。
 
 4. **与基于变形的 4DGS 的融合**：RetimeGS 的 4D 基元表示与 Deform-GS 的变形场表示并非互斥。将短尾时间不透明度正则化引入变形框架，或在 4D 基元框架中引入局部变形场以处理基元内部的非刚性形变，可能结合两者的优势。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,7 @@ paper_level: A
 venue: TOG
 year: 2024
 pdf_ref: paperPDFs/TOG_2024/Categorical_Codebook_Matching_for_Embodied_Character_Controllers.pdf
+code_link: https://github.com/sebastianstarke/AI4Animation/tree/master/AI4Animation/SIGGRAPH_2024
 project_link: https://github.com/sebastianstarke/AI4Animation/tree/master/AI4Animation/SIGGRAPH_2024
 aliases:
 - CCM
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 面向具身角色控制器的分类码本匹配 |
 | 英文题名 | Categorical Codebook Matching for Embodied Character Controllers |
 | 会议/期刊 | TOG 2024 |
-| Links | [paper](https://doi.org/10.1145/3658209); [GitHub](https://github.com/sebastianstarke/AI4Animation/tree/master/AI4Animation/SIGGRAPH_2024) |
+| Links | [paper](https://doi.org/10.1145/3658209) · [GitHub](https://github.com/sebastianstarke/AI4Animation/tree/master/AI4Animation/SIGGRAPH_2024) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/robotics |
 | Method | Categorical Codebook Matching |
 | Dataset | Path Tracking, Three-Point Tracking (Static Arm Walk), Three-Point Tracking (Crouching) |
@@ -42,7 +43,7 @@ claims:
 > - Three-Point Tracking (Static Arm Walk) 上，Motion Detail (deg/s) 为 25.4，对比 7.9 (AvatarPoser)，变化 +17.5。
 > - Three-Point Tracking (Crouching) 上，Motion Detail (deg/s) 为 33.2，对比 13.2 (AGRoL)，变化 +20.0。
 
-## 概述
+## 概要
 
 从稀疏的三点跟踪传感器信号（头部和双手）重建全身化身运动是VR/AR应用中的核心挑战。其根本瓶颈在于：相同的稀疏输入可以对应多种不同的全身姿态——例如，仅凭头部和双手的位置，无法唯一确定用户是在站立、下蹲还是行走。这种强歧义性使得现有方法难以同时实现高保真度、低延迟和丰富的运动细节，尤其下肢运动容易产生漂移、僵硬或不自然的“滑步”现象。
 
@@ -54,7 +55,7 @@ claims:
 
 **主要局限**：稀疏输入固有的歧义性仍会导致偶尔的错误动作选择（如误判站立/下蹲）；当前系统假设用户与化身具有相同身体比例，不支持不同体型的用户；模型仅在训练数据内插值，无法外推。
 
-## 背景与动机
+
 
 在虚拟现实、游戏和元宇宙等应用中，通过稀疏的用户输入信号（如VR头显和双手控制器的三点追踪）实时驱动高保真度全身化身运动，是角色动画领域的核心难题。这一任务面临一个根本性的瓶颈：**从稀疏的三点跟踪传感器信号到全身化身运动的映射存在强歧义性**。相同的头部和手部位置可以对应多种截然不同的全身姿态——例如，一个人可以站立、下蹲或单腿站立而保持上半身姿态不变。现有方法难以同时实现高保真度、低延迟和丰富的运动细节，尤其下肢运动容易产生漂移、僵硬或不自然的滑动现象。
 
@@ -64,7 +65,9 @@ claims:
 
 本文的核心动机正是针对上述双重困境：**如何同时学习运动流形及其采样方式，使模型在推理时无需未来传感器信息或复杂的强化学习规划，即可从稀疏控制信号中生成响应快、细节丰富且自然的全身运动？** 这一问题的解决需要在两个层面实现突破：一是构建一个能够保留运动多模态性的离散表示空间，避免连续空间中的平均化陷阱；二是设计一种端到端的训练机制，使控制信号到运动空间的映射与运动流形本身的学习相互适配，而非事后嫁接。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心贡献在于提出了一种**分类码本匹配（Categorical Codebook Matching）**范式，将运动生成的歧义从连续空间中的直接回归转移到离散潜在空间中的概率性运动选择过程。具体而言，该方法在三个维度上实现了对现有工作的关键突破：
 
@@ -92,7 +95,7 @@ claims:
 
 综上，本文的核心创新在于通过**离散码本 + 分布匹配 + 端到端训练 + 分类采样搜索**的组合设计，系统性地解决了稀疏输入下运动生成的歧义性问题，同时实现了高跟踪精度、低延迟和丰富的运动细节。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l17_https_doi_org_10_1145_3658209/figures/001_Figure_1.jpg]]
 *Figure 1: Our character control framework applied to synthesizing embodied avatar movements for different game situations in virtual reality*
@@ -119,7 +122,7 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{Rec}} + \mathcal{L}_{\mathrm{Match}}$$
 
 与现有方法普遍采用的两阶段训练范式（先无监督训练运动先验，再利用强化学习或监督学习训练控制策略）不同，本框架对运动自编码器和输入编码器进行端到端联合训练。消融实验（Table 5）表明，端到端训练将运动细节从19.6 deg/s提升至28.17 deg/s，证明了同时学习流形与控制映射的显著优势。完整的端到端训练在NVIDIA RTX 4090上约需1天，推理阶段每帧耗时约3ms，网络总内存占用约25MB。
 
-## 核心模块与公式推导
+
 
 ### 3.1 运动自编码器与离散码本
 
@@ -167,7 +170,9 @@ $$(\mathsf{S}_i, \mathbf{C}_{\mathcal{F}}) \to \mathsf{S}_i, \dots, \mathsf{S}_{
 
 **阶段三（全身融合）**根据输入模式（纯三点追踪或混合控制），通过混合或前馈网络预测上半身姿态，与下肢姿态融合得到完整全身运动。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 路径跟踪：从16.1 cm到2.6 cm的精度跃升
 
@@ -255,7 +260,9 @@ $$(\mathsf{S}_i, \mathbf{C}_{\mathcal{F}}) \to \mathsf{S}_i, \dots, \mathsf{S}_{
 
 基于上述实验结果和局限，论文提出了若干待探索方向：如何将码本匹配与物理仿真结合以进一步改善足部滑动和物理合理性；如何扩展框架以支持不同身体比例的用户或不同形态的化身；离散码本的大小、通道数与运动多样性、质量之间的定量关系仍有待深入研究；以及是否可将该方法推广到更多运动技能（如体操、武术）或与其他传感器（如 IMU）结合。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心问题定位
 
@@ -326,6 +333,8 @@ $$(\mathsf{S}_i, \mathbf{C}_{\mathcal{F}}) \to \mathsf{S}_i, \dots, \mathsf{S}_{
 3. **端侧部署**：如何进一步降低推理延迟或内存占用，以适应移动端AR/VR设备？
 4. **码本规模与质量关系**：离散码本的大小、通道数与运动多样性、质量之间的定量关系仍有待深入研究；
 5. **技能泛化**：是否可以将该方法推广到更多运动技能（如体操、武术）或与其他传感器（如IMU）结合？
+
+
 
 ## 原文 PDF
 

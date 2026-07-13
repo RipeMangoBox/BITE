@@ -43,7 +43,7 @@ claims:
 > - KITTI (Zero-shot Novel) 上，AP (KITTI novel) 25.87 vs 25.73 (DetAny3D w/ Grounding-DINO 2D Boxes) (+0.14)。
 > - SUN-RGBD (Zero-shot Novel) 上，AP (SUN-RGBD novel) 26.33 vs 21.07 (DetAny3D w/ Grounding-DINO 2D Boxes) (+5.26)。
 
-## 概述
+## 概要
 
 单目3D目标检测是自动驾驶、机器人导航和增强现实等应用的核心感知能力。然而，现有视觉语言模型（VLM）缺乏原生的多物体3D检测能力——主流方法要么依赖任务特定的检测头与闭集类别，要么需要外部2D检测器提供区域提议，无法在统一的token预测接口下完成开放词汇的3D感知。
 
@@ -55,7 +55,7 @@ claims:
 
 在方法谱系上，LocateAnything3D区别于 **Cube R-CNN**（Brazil et al., CVPR 2023）的闭集检测范式、**OVMono3D**（Yao et al., arXiv 2024）依赖外部2D检测器的提升策略、以及 **DetAny3D**（Zhang et al., ICCV 2025）的直接3D输出方式，首次在统一的自回归语言模型框架内实现了端到端的开放词汇2D+3D联合预测。
 
-## 背景与动机
+
 
 ### 问题背景：视觉语言模型在3D感知中的能力缺口
 
@@ -89,7 +89,9 @@ claims:
 
 LocateAnything3D通过引入**Chain-of-Sight（CoS）**——一种将2D检测作为视觉思维链插入3D token预测的序列化策略——系统性地回应了上述挑战。其核心洞察是：让自回归解码器先输出2D框作为中间证据，再在2D约束下预测3D参数，并按照深度排序和语义顺序组织token序列，可以大幅降低单目3D推断的模糊性，使VLM能够端到端地学习多物体3D检测。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 LocateAnything3D 的核心创新在于将单目多物体 3D 检测重新定义为视觉语言模型（VLM）原生的下一 token 预测任务，其关键抓手是 **Chain-of-Sight（CoS）序列化机制**。与现有方法依赖外部 2D 检测器、任务特定检测头或闭集类别不同，CoS 通过三个层次的设计改变了模型的推理方式，使自回归语言模型能够端到端地输出开放词汇的 3D 检测结果。
 
@@ -133,7 +135,7 @@ $$\mathbf{b}_i = (\mathbf{t}_i, \mathbf{d}_i, \mathbf{R}_i) \quad \mathbf{t}_i \
 
 **总结**：LocateAnything3D 的核心创新并非提出新的网络结构，而是通过 CoS 序列化将 3D 检测转化为 VLM 可自然学习的下一 token 预测任务。三个层次的设计——近到远排序、2D→3D 分解、中心→尺寸→旋转顺序——共同降低了单目 3D 推断的模糊性，使模型在统一的自回归接口下实现了开放词汇的多物体 3D 检测，无需任何外部检测器或任务特定模块。
 
-## 整体框架
+
 
 LocateAnything3D 将开放词汇的单目多物体 3D 检测统一为视觉语言模型（VLM）原生的下一 token 预测任务。其核心是一个三段式管线：**视觉编码 → 语言模型自回归解码 → Chain-of-Sight 序列输出**，全程无需任务特定的检测头或外部 2D 检测器。
 
@@ -190,7 +192,7 @@ CoS 序列的内部组织遵循三层设计，共同决定了模型的性能瓶�
 ![[assets/figures/papers/paper_list_l2400_https_arxiv_org_abs_2511_20648/figures/001_Figure_1.jpg]]
 *Figure 1: LocateAnything3D unifies 3D detection and grounding in a single vision-language model. It supports open-world categories with free-form text guidance and flexible visual prompts (e.g., drag boxes, click points). All examples are zero-shot, highlighting strong out-of-domain generalizability. The bar chart (right) shows that LocateAnything3D achieves state-of-the-art AP3D on Omni3D benchmark*
 
-## 核心模块与公式推导
+
 
 ### 问题形式化
 
@@ -257,7 +259,9 @@ CoS 解码通过三个层次的结构化设计使自回归模型更易学习：
 
 整个模型端到端训练，无需外部 2D 检测器或任务特定的 3D 检测头，统一了检测和定位任务。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能：Omni3D 基准 3D 检测
 
@@ -330,7 +334,9 @@ Figure 5 展示了典型失败案例，主要归因于训练数据在相机参�
 ![[assets/figures/papers/paper_list_l2400_https_arxiv_org_abs_2511_20648/figures/012_Figure_6.jpg]]
 *Figure 6: Visualization of more indoor and outdoor successful cases*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 任务定位与核心瓶颈
 
@@ -403,6 +409,8 @@ CoS的概率分解（式4）将序列概率显式拆分为2D定位和3D估计两
 5. **推理效率优化**：CoS序列长度随物体数量线性增长，在密集场景中可能成为延迟瓶颈。能否通过并行解码或非自回归生成来加速推理，同时保持精度？
 
 6. **与其他VLM能力的融合**：当前CoS专注于检测和定位，能否与VLM的场景理解、关系推理和对话能力深度融合，实现“检测-推理-交互”的统一框架？
+
+
 
 ## 原文 PDF
 

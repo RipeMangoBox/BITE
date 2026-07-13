@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/CineScene_Implicit_3D_as_Effective_Scene_Representation_for_Cinematic_Video_Generation.pdf
+project_link: null
 code_link: null
 aliases:
 - CineScene
@@ -43,7 +44,7 @@ claims:
 > - Scene-Decoupled Video Dataset 上，PSNR↑ 14.5094 vs 11.8854 (FramePack) (+2.624)；RotErr↓ 2.6825 vs 2.7106 (CaM) (-0.0281)。
 > - DiT360 OOD Test 上，Mat. Pix.(K)↑ 4726.57 vs 4025.98 (FramePack) (+700.59)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有方法在生成大视角变化的视频时，难以同时保持场景一致性并容纳动态内容。2D上下文方法（如 **FramePack**，Zhang & Agrawala, arXiv 2025；**Context-as-Memory**，Yu et al., arXiv 2025）缺乏空间理解能力；显式3D方法（如 **Gen3C**，Zhang et al., CVPR 2025）依赖不完美的几何重建，且常限制动态生成。
 
@@ -56,7 +57,7 @@ claims:
 - 在域外测试集 DiT360 上，CINESCENE 同样表现优异（Mat. Pix.: 4726.57 vs FramePack 的 4025.98），展现出良好的泛化潜力（Table 4）。
 - 消融实验证实：融合图像特征与相机特征的隐式3D表示、上下文条件注入机制（优于损失引导）、以及随机打乱上下文图像的训练策略，均为方法有效性的关键设计（Table 2, Table 3）。
 
-## 背景与动机
+
 
 ### 问题背景：大视角变化下的电影级视频生成
 
@@ -89,7 +90,9 @@ claims:
 
 综上，CineScene 旨在解决大视角变化下的电影级视频生成问题，其核心贡献在于：**以隐式3D场景表示作为上下文条件，赋予预训练 T2V 模型空间感知能力，实现静态场景一致性保持与动态主体自由生成的解耦**。这一思路为后续将场景一致性扩展至更长视频、更大视角变化提供了新的技术基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CINESCENE 的核心创新在于**将隐式3D场景表示以上下文条件的形式注入预训练T2V扩散模型**，从而从根本上解耦静态场景与动态前景的生成。这一设计解决了现有方法在大视角变化视频生成中的根本矛盾：2D上下文方法（如FramePack、Context-as-Memory）缺乏空间理解，难以在视角大幅变化时保持场景一致性；显式3D引导方法（如Gen3C）依赖不完美的几何重建，且其损失监督机制倾向于抑制动态内容的生成。
 
@@ -120,7 +123,7 @@ CINESCENE 的核心创新在于**将隐式3D场景表示以上下文条件的形
 
 综上，CINESCENE 通过两个关键的 changed slots——**隐式3D上下文条件注入**和**打乱上下文图像训练**——实现了对静态场景与动态前景的本质解耦，使得预训练T2V模型在不牺牲动态生成能力的前提下获得空间感知能力，从而在大视角变化下保持高场景一致性。
 
-## 整体框架
+
 
 CINESCENE 的整体 pipeline 围绕一个核心设计展开：**将隐式3D场景表示以上下文条件的形式注入预训练的文生视频（T2V）扩散模型**，从而在遵循用户指定相机轨迹的同时保持静态场景的一致性，并自由生成动态前景主体。其输入输出定义如下：
 
@@ -153,7 +156,7 @@ Figure 3 明确对比了两种隐式3D注入范式。损失引导方法将 VGGT 
 ![[assets/figures/papers/paper_list_l2449_https_arxiv_org_abs_2602_06959/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of CINESCENE. Left: Our method, CINESCENE, injects implicit 3D information as a context condition. Features from VGGT are encoded as tokens (Ft) and concatenated with the scene images (It) and the noisy video latents. This architecture fundamentally decouples the static background (the condition) from the dynamic foreground (the generation target). Right: In contrast, loss-guided approaches use the VGGT features to form a supervisory loss, which penalizes deviations from the static scene and thus discourages dynamic content generation. We omit the text prompt for simplicity*
 
-## 核心模块与公式推导
+
 
 ### 问题形式化
 
@@ -206,7 +209,9 @@ CINESCENE将隐式3D信息作为**上下文条件**注入，而损失引导方�
 ![[assets/figures/papers/paper_list_l2449_https_arxiv_org_abs_2602_06959/figures/011_Figure_6.jpg]]
 *Figure 6: Qualitative ablation study on shuffled context images. The shuffled mechanism leads to better joint modeling and learning in scene consistency, while the ordered ones are tend to copy content from last provided image*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与验证逻辑
 
@@ -265,7 +270,9 @@ CINESCENE将隐式3D信息作为**上下文条件**注入，而损失引导方�
 ![[assets/figures/papers/paper_list_l2449_https_arxiv_org_abs_2602_06959/figures/017_Table_9.jpg]]
 *Table 9: Ablation on camera control condition. Supplement to Table 2*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位与核心差异
 
@@ -317,6 +324,8 @@ CINESCENE 的另一重要设计是**随机打乱场景上下文图像的训练�
 ### 知识库定位总结
 
 CINESCENE 在视频生成方法谱系中占据了一个独特位置：它桥接了2D上下文生成与3D感知生成之间的鸿沟，通过隐式3D场景表示的条件注入，在不牺牲动态生成自由度的前提下实现了大视角场景一致性。其核心贡献——上下文条件注入优于损失引导、打乱训练策略打破位置先验——为后续研究提供了可复用的设计原则。该方法当前适用于中等长度、中等视角变化的电影级视频生成场景（如虚拟舞台应用，Figure 8），向更长时序和更大视角的扩展是明确的演进方向。
+
+
 
 ## 原文 PDF
 

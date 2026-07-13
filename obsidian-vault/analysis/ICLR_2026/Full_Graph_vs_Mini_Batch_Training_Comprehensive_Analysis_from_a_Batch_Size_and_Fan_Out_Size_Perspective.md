@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Full_Graph_vs_Mini_Batch_Training_Comprehensive_Analysis_from_a_Batch_Size_and_Fan_Out_Size_Perspective.pdf
+project_link: null
+code_link: https://github.com/LIUMENGFAN-gif/GNN_fullgraph_minibatch_training
 aliases:
 - SCAF
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | 全图训练与迷你批次训练：基于批次大小和扇出大小的综合分析 |
 | 英文题名 | Full-Graph vs. Mini-Batch Training: Comprehensive Analysis from a Batch Size and Fan-Out Size Perspective |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=ZSfgsh43vT); [GitHub](https://github.com/LIUMENGFAN-gif/GNN_fullgraph_minibatch_training) |
+| Links | [paper](https://openreview.net/forum?id=ZSfgsh43vT) · [GitHub](https://github.com/LIUMENGFAN-gif/GNN_fullgraph_minibatch_training) |
 | Topic | #topic/safety_alignment_fairness_privacy #topic/safety_alignment_fairness_privacy/accountability_transparency_and_interpretability |
 | Method | 全图与迷你批次训练系统分析框架 (Systematic Comparative Analysis Framework) |
 | Dataset | Reddit, ogbn-arxiv, ogbn-products, ogbn-papers100M |
@@ -40,7 +42,7 @@ claims:
 > - ogbn-arxiv 上，Test Accuracy (%) 为 71.16，对比 70.96，变化 +0.20。
 > - ogbn-products 上，Test Accuracy (%) 为 78.80，对比 77.92，变化 +0.88。
 
-## 概述
+## 概要
 
 图神经网络（GNN）的训练通常面临全图训练与迷你批次训练两种范式的选择。全图训练利用完整的图结构和所有训练节点进行梯度下降，而迷你批次训练通过对邻居采样构建子图并使用随机梯度下降，其行为受**批次大小**（$b$）和**扇出大小**（$\beta$）两个关键参数控制。然而，这两个参数如何影响训练动态、泛化能力以及计算效率，一直缺乏系统的理论理解，导致在资源受限的实际场景中难以做出有理论指导的最优决策。
 
@@ -52,13 +54,15 @@ claims:
 
 整体而言，该论文构建了一个理解 GNN 训练中批次与扇出大小作用的分析框架，为实践中在收敛速度、泛化能力与资源效率之间进行权衡提供了明确的理论指导。其分析主要面向单层 ReLU GNN 和直推式节点分类任务，并指出了向多层模型、其他激活函数及异构图的推广方向，为后续研究留下了开放问题。
 
-## 背景与动机
+
 
 图神经网络（GNN）的训练范式选择一直存在核心张力：全图训练利用完整图结构与全部训练节点进行优化，理论上可捕获最丰富的结构信息；迷你批次训练则通过子图采样降低内存与计算开销，使大规模图上的训练成为可能。然而，何时应使用全图训练、何时应采用迷你批次训练，以及对两者内在差异的理解，仍主要依赖经验直觉，缺乏系统性的理论指导。这一缺口源于两个关键控制变量——批次大小（batch size, $b$）与扇出大小（fan-out size, $\beta$）——对训练动态、泛化能力和计算效率的影响未被充分认知。在全图训练中，$b$ 取所有训练节点数量，$\beta$ 取节点的最大邻居度；迷你批次训练则允许按需调节这两个参数，从而形成不同的优化与泛化行为。现有研究多孤立地分析全图训练的优势或迷你批次训练的效率，却较少从 $b$ 和 $\beta$ 的共同视角揭示二者在收敛速度、最终性能和资源需求上的本质关系。
 
 本文的动机正是填补这一空白。我们从优化动态与泛化理论出发，系统比较全图训练与迷你批次训练在相同的图学习目标下的行为差异。通过分析，我们发现全图训练并非在所有场景下均优于精心调参的迷你批次训练；相反，$b$ 和 $\beta$ 对收敛趋势的影响因损失函数类型（均方误差或交叉熵）而异，而扇出大小对泛化的作用比批次大小更为敏感且可能出现非单调波动。这些观察促使我们构建一个统一的解释框架，其中批次大小控制着梯度的统计稳定性，扇出大小决定了训练子图与完整图之间的结构差异，二者的交互最终决定了训练的效率与模型效果。本文旨在为该框架提供严格的理论支撑与大规模实验验证，从而为资源受限条件下 GNN 训练范式的选取提供原则性的决策依据。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 全图训练与迷你批次训练二元范式之间的性能优劣长期缺乏一致的理论解释，其根源在于两个关键操作参数——**批次大小 (batch size)** 与 **扇出大小 (fan-out size)**——对优化动态、泛化能力和计算效率的协同影响未被解耦。本文的核心创新在于：将这两种训练范式统一到由 `b` 和 `β` 参数化的同一框架下，首次系统揭示了它们在收敛速度与泛化间隙上的因果机制，并以此为基础推翻了“全图训练始终优于迷你批次训练”的隐含假设。
 
@@ -90,7 +94,7 @@ $$L_{\mathrm{test}} - \hat{L}_{\mathrm{train}} = O\Big(\frac{1}{n_{\mathrm{train
 
 综上，本文的理论-实验联合框架将 GNN 训练的设计空间从二选一范式重新定义为一个由 `(b, β)` 参数连续调控的多目标优化问题，为资源受限下的训练策略选择提供了可解释的决策基础。
 
-## 整体框架
+
 
 本文构建了一个系统比较全图训练（Full-graph Training）与迷你批次训练（Mini-batch Training）的分析框架。该框架将两种范式统一为受**批次大小 $b$​** 与**扇出大小 $\beta$​** 两个关键参数控制的端到端流水线，从而从优化动态、泛化能力与计算效率三个维度进行公平对比。全图训练对应 $b = n_{\mathrm{train}}$、$\beta = d_{\max}$ 的极限情况，而迷你批次训练可在 $b \leq n_{\mathrm{train}}$、$\beta \leq d_{\max}$ 的范围内自由调节。  
 
@@ -105,7 +109,7 @@ $$L_{\mathrm{test}} - \hat{L}_{\mathrm{train}} = O\Big(\frac{1}{n_{\mathrm{train
 
 整个流水线在前向传播与反向传播之间循环，直到收敛。通过固定所有其他条件而仅调整 $b$ 与 $\beta$，该框架能够解耦出每个参数对收敛速度、泛化表现和计算吞吐量的独立影响，从而为内存受限场景下的参数选择提供理论指导（Remark 3.1, 3.2；Section 4；Section 5.5）。
 
-## 核心模块与公式推导
+
 
 GNN训练的两个范式——全图训练与迷你批次训练——可统一由两个可调节的控制变量描述：**批次大小** $b$ 与**扇出大小** $\beta$。全图训练将 $b$ 设为全部训练节点数 $n_{\mathrm{train}}$，$\beta$ 设为最大节点度 $d_{\max}$，相当于在每个梯度步中聚合完整邻域信息；迷你批次训练则允许 $b \le n_{\mathrm{train}}$ 且 $\beta \le d_{\max}$，通过均匀邻居采样构建子图，在计算效率与优化动态之间进行折中。两种范式共享相同的基本模块：基于 $b$ 和 $\beta$ 的**图采样与归一化**、**单层GNN前向传播**（$\mathbf{z}_i = \sigma(\tilde{\mathbf{a}}_i \mathbf{X} \mathbf{W}^{\top})$，采用ReLU激活）、**经验风险计算**（均方误差MSE或交叉熵CE）以及**参数更新**（全图采用梯度下降GD，迷你批次采用随机梯度下降SGD）。以下从收敛与泛化两个角度给出刻画 $b$ 和 $\beta$ 作用的核心公式及其含义。
 
@@ -138,7 +142,9 @@ $$L_{\mathrm{test}} - \hat{L}_{\mathrm{train}} = O\left( \frac{1}{n_{\mathrm{tra
 
 这些公式共同揭示了 $b$ 和 $\beta$ 作为核心控制变量的作用机制：批次大小主要决定优化路径的收敛趋势（在MSE与CE下方向相反）和泛化稳定性，扇出大小则一致地降低收敛所需迭代数并增强泛化，但其高敏感性可能引入不易预测的波动。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 我们以与硬件无关的**迭代至精度（iteration-to-accuracy）**为核心指标（Figure 1），系统比较全图训练与迷你批次训练在四个大规模图数据集（Reddit、ogbn-arxiv、ogbn-products、ogbn-papers100M）上的优化动态、泛化能力和计算效率。所有实验基于单层及多层 GraphSAGE，损失函数覆盖 MSE 与交叉熵（CE），并通过网格搜索独立调节批次大小 b 与扇出大小 β，以揭示两者对训练行为的因果作用。
 
@@ -208,7 +214,9 @@ $$L_{\mathrm{test}} - \hat{L}_{\mathrm{train}} = O\left( \frac{1}{n_{\mathrm{tra
 
 综上，全图与迷你批次的优劣高度依赖超参选择，且受损失函数与网络深度调制。当前理论已能捕获大部分趋势，但对于扇出诱发的不稳定性和非 MSE 损失的泛化行为，仍需进一步研究。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 基线范式与关键调节旋钮
 该工作并非提出一种新的训练算法，而是建立一个 **全图与迷你批次训练的系统比较框架**。两条基线分别为：
@@ -240,6 +248,8 @@ $$L_{\mathrm{test}} - \hat{L}_{\mathrm{train}} = O\left( \frac{1}{n_{\mathrm{tra
 5. **任务泛化**：在归纳学习中，训练/测试图结构差异更大，Wasserstein 距离界是否仍能有效预测泛化？链接预测任务中的梯度动态与节点分类存在根本不同，现有结论能否直接迁移？
 
 上述问题中的部分（如 2、3）在原文附录或开放问题部分已被明确指出，但尚未提供解决方案；其他（如 1、4）则基于观察到的现象或空白推论，需要设计新的实验与理论来验证。
+
+
 
 ## 原文 PDF
 

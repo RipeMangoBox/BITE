@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/ABBA_Adapters_Efficient_and_Expressive_Fine_Tuning_of_Foundation_Models.pdf
+project_link: null
+code_link: https://github.com/CERT-Lab/abba
 aliases:
 - AA
 - ABBA-Adapters
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | ABBA适配器：高效且表达性强的基座模型微调 |
 | 英文题名 | ABBA-Adapters: Efficient and Expressive Fine-Tuning of Foundation Models |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=NvSRYp0oaX); [GitHub](https://github.com/CERT-Lab/abba) |
+| Links | [paper](https://openreview.net/forum?id=NvSRYp0oaX) · [GitHub](https://github.com/CERT-Lab/abba) |
 | Topic | #topic/representation_self_supervised_transfer #topic/representation_self_supervised_transfer/transfer_multitask_and_meta_learning |
 | Method | ABBA-Adapters |
 | Dataset | COMMONSENSE170K (Llama-3.2 1B, 八项任务平均), COMMONSENSE170K (Llama-3.2 3B, GSM8K (Mistral-7B, 算术推理), MATH (Mistral-7B |
@@ -41,7 +43,7 @@ claims:
 > - COMMONSENSE170K (Llama-3.2 3B, 八项任务平均) 上，Accuracy 为 84.08，对比 Full Fine-Tuning 82.39，变化 +1.69。
 > - GSM8K (Mistral-7B, 算术推理) 上，Accuracy 为 66.26，对比 LoRA ~64.06 (best LoRA variant)，变化 +2.20。
 
-## 概述
+## 概要
 
 本文提出 **ABBA‑Adapters**，一种面向基座模型的高效参数微调范式，旨在突破标准低秩适配方法在表达能力上的固有限制。现有低秩适配（如 LoRA）将权重更新约束在低维子空间内，当目标更新为高秩或与预训练权重结构不一致时，难以充分捕捉所需的变换。ABBA 将权重增量重新参数化为 **两个独立可学习的低秩矩阵的 Hadamard 乘积**，使有效秩可达两个成分秩的乘积，从而在参数量与标准 LoRA 相当的前提下获得明显更高的表达能力。
 
@@ -56,7 +58,7 @@ claims:
 
 *论文未涉及公平性、偏见或社会影响的专门评估，相关结论的可推广性需在具体场景中另行校验。另外，由于 Figure 1（右侧）和 Figure 2 等视觉证据仅提供摘要信息而未在分析数据中给出完整数值，此处的相应论断可根据论文正文进行手动核验。*
 
-## 背景与动机
+
 
 大语言模型等基础模型的全量微调因显存与算力开销巨大而难以推广，参数高效微调（PEFT）通过仅学习少量新增或修改的权重适配器，成为实际部署的主流范式。其中最广泛采用的形式是低秩适配器，它将权重增量ΔW参数化为两个低秩矩阵的乘积：ΔW = s B A （LoRA）。这种低秩约束大幅削减了可训练参数量，但天然地将更新限制在低维子空间内，当目标任务需要高秩变化或更新方向与预训练权重结构不一致时，表达能力出现瓶颈。
 
@@ -66,7 +68,9 @@ claims:
 
 综上，ABBA 的动机在于突破低秩瓶颈，在可学习的 Hadamard 框架下实现**高效的宽秩表达**——既保留参数高效微调的轻量优势，又显著提升对复杂任务适配的表达力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ABBA-Adapters 解决的核心瓶颈是标准低秩适配（LoRA）的表达能力限制：LoRA 将权重更新 $\Delta W$ 强制约束在低秩子空间内（形式为 $\Delta W = sBA$），当目标任务需要高秩更新或更新方向与预训练权重的本征结构显著偏离时，这一假设直接限制了模型的可塑性和最终性能。
 
@@ -97,7 +101,7 @@ $$
 
 **变更槽位总结：** ABBA 相对于 LoRA 的关键变更集中在四个维度：权重更新参数化形式（Hadamard 乘积双低秩 vs. 单低秩乘积）、初始化策略（截断 SVD + 标准 LoRA 初始化 vs. 全 Kaiming/零初始化）、计算实现（Khatri–Rao 分解避免全秩物化）、以及缩放因子（秩稳定 $\alpha^2 / \sqrt{r_1 r_2}$ vs. 简单 $\alpha/r$）。这四项设计协同实现了“低秩参数开销 + 高秩表达能力 + 训练稳定性”的三角平衡，构成了 ABBA 相较现有 PEFT 方法的核心优势。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0005_NvSRYp0oaX_ABBA-Adapters_Efficient_and_Expressive_Fine-Tuni/figures/002_Figure_1.jpg]]
 *Figure 1: Left: Illustration of ABBA's parameterization, where the update is expressed as the Hadamard product of two learnable low-rank matrices. Right: A toy experiment demonstrating ABBA's optimization behavior. We first train a 2-layer MLP to classify the first 8 MNIST digits, then fine-tune it to recognize the last 2. ABBA converges faster and achieves better final performance*
@@ -134,7 +138,7 @@ $$
 
 整体而言，ABBA-Adapters 通过“Hadamard 乘积解耦 + 截断 SVD 初始化 + Khatri–Rao 高效实现 + 秩稳定缩放”形成一套紧凑的微调方案，在参数效率与 LoRA 持平的前提下，显著提升了更新的秩容量与优化轨迹（如玩具实验中 ABBA 收敛更快并达到更高最终精度），从而在常识推理、算术推理和代码生成等任务上稳定超越现有 PEFT 方法。
 
-## 核心模块与公式推导
+
 
 ABBA‑Adapters 将低秩适配的“瓶颈”从单一的低维矩阵乘积扩展为两个独立学习低秩矩阵的 Hadamard 乘积，从而在相同参数量下获得显著更高的有效秩，且仍可通过 Khatri–Rao 分解以与 LoRA 相当的计算与内存开销完成前向传播。下面给出该方法的关键公式及其变量含义；所有公式均来自论文原文推导，未做任何外推。
 
@@ -229,7 +233,9 @@ ABBA‑Adapters 遵循与 LoRA 相同的插入范式，将可学习的 Hadamard 
 
 即对每一个选定的线性层权重 $W_0$，均添加上述形式的侧分支 $\Delta W$，从而在不修改基础结构的情况下完成微调。具体模块选择对性能的影响详见消融实验，但核心公式与计算机制不因插入位置而改变。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ABBA‑Adapters 在覆盖常识推理、算术推理和代码生成三个维度的多个基准上表现出持续且一致的增益，其关键优势源于 Hadamard 乘积带来的高阶有效秩，同时通过 Khatri–Rao 分解保持了与 LoRA 相当的计算与内存效率。本节首先展示主要结果，随后通过系列消融实验揭示 ABBA 发挥效力的因果机制与边界条件。
 
@@ -288,7 +294,9 @@ ABBA‑Adapters 在覆盖常识推理、算术推理和代码生成三个维度�
 
 需要指出，论文未报告公平性、偏见或社会影响评估，因此上述分析不涉及这类指标。总体而言，ABBA 的优势建立在 Hadamard 乘积解耦所带来的高有效秩之上，而其边缘退化主要源于过参数化和优化不稳定性，这为未来进一步改进指明了方向。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ABBA-Adapters 处于低秩适配（Low-Rank Adaptation）研究脉络中的高秩扩展分支。其核心因果关系可概括为：低秩瓶颈 → 双Hadamard乘积解耦 → 高有效秩与参数效率并存 → 多任务性能超越全量微调。
 
@@ -337,6 +345,8 @@ ABBA 的双对结构对初始化高度敏感。若采用朴素的 LoRA 风格初
 **闭式解的缺失。** Appendix B 明确指出：由于 Hadamard 乘积破坏了正交不变性且因子位于 Segre 簇上，ABBA 重构问题不存在类似截断 SVD 的闭式解，优化仅可通过梯度下降等迭代方法进行。这意味着实际的收敛质量依赖于优化器和超参数的选择，缺乏类似 SVD 的最优性保证。
 
 **超参数敏感性的未解边界。** $\alpha$ 的最佳范围虽被实证确定，但其与模型结构、任务复杂度之间的关系未获理论分析。不同模型尺度下是否需调整 $\alpha$ 的最佳区间，以及该缩放律在更广泛的 Transformer 组件（如 cross-attention）中是否持有，均为开放问题。
+
+
 
 ## 原文 PDF
 

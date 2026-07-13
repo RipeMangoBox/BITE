@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/One_Model_for_All_Tasks_Leveraging_Efficient_World_Models_in_Multi_Task_Planning.pdf
+project_link: null
+code_link: https://github.com/opendilab/LightZero
 openreview_forum_id: iU026Hr90y
 aliases:
 - SDPSD
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 一个模型应对所有任务：利用高效世界模型进行多任务规划 |
 | 英文题名 | One Model for All Tasks: Leveraging Efficient World Models in Multi-Task Planning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=iU026Hr90y); [GitHub](https://github.com/opendilab/LightZero) |
+| Links | [paper](https://openreview.net/forum?id=iU026Hr90y) · [GitHub](https://github.com/opendilab/LightZero) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/planning_control |
 | Method | ScaleZero + Dynamic Parameter Scaling (DPS) |
 | Dataset | Atari 100k (26 games), DMControl (18 tasks), Jericho Zork1, Jericho Detective |
@@ -42,13 +44,13 @@ claims:
 > - DMControl (18 tasks) 上，Raw Score (Median) 为 887.3，对比 875.1 (UniZero ST)，变化 +12.2。
 > - Jericho Zork1 上，Average Return 为 44，对比 38.0 (CALM+OC)，变化 +6.0。
 
-## 概述
+## 概要
 
 多任务强化学习的核心挑战在于：当用一个统一世界模型同时学习多个异质任务时，模型的可塑性会灾难性崩溃——复杂任务的性能在训练后期急剧下降，同时伴随休眠神经元比率激增和隐状态范数膨胀。本文针对这一瓶颈，提出**ScaleZero**，其关键创新在于将密集Transformer骨干替换为**稀疏混合专家（MoE）架构**，通过任务特定路由将计算分散到专门子网络，从根本上抑制梯度冲突。在此基础上，进一步引入**动态参数扩展（DPS）策略**，通过自适应注入LoRA适配器实现按需容量分配，在保持性能的同时显著降低环境交互成本。
 
 在Atari 100k基准上，单一ScaleZero多任务代理的人类归一化得分均值（0.39）超越了26个单任务UniZero代理的均值（0.38），证明多任务学习实现了正向迁移。在DMControl连续控制基准上，ScaleZero-DPS以约28.5%的环境交互量削减达到了与标准ScaleZero相当的性能。方法的核心洞察在于：MoE的条件计算机制具有比密集网络更低的梯度冲突理论上界，并通过专家专业化有效隔离了不同任务的梯度更新，从而保护了模型的可塑性。
 
-## 背景与动机
+
 
 ### 多任务强化学习的统一世界模型瓶颈
 
@@ -66,7 +68,9 @@ UniZero尝试通过SimNorm（基于L1的单纯形投影归一化）和MoCo梯度
 
 上述分析引导出一个核心洞察：要真正解决可塑性崩溃，必须从架构层面重新设计模型的计算结构。本文的动机由此展开——**用稀疏混合专家（MoE）骨干替代密集Transformer，通过任务特定路由将计算分散到专门子网络，从根本上抑制梯度冲突**。同时，在训练层面引入动态参数扩展（DPS）策略，通过自适应注入LoRA适配器来按需分配模型容量，实现知识保留与定向可塑性的平衡。这一双重设计旨在构建一个真正能“一个模型应对所有任务”的统一世界模型架构。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题根源：可塑性崩溃的发现
 
@@ -113,7 +117,7 @@ DPS 包含两个协同机制：
 
 消融实验确认，这两项改动单独使用仅带来边际收益，其价值主要体现在与 MoE 骨干的协同作用中。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_iU026Hr90y/figures/002_Figure_2.jpg]]
 *Figure 2: (a) Design Space of UniZero for Multitask learning*
@@ -141,7 +145,7 @@ $$\mathcal{L}_{\mathrm{Unified}} = \sum_{t=0}^{H-1} \left( \mathcal{L}_{\mathrm{
 
 其中 $\mathrm{sg}(\cdot)$ 表示停止梯度操作。模型在纯在线强化学习设置下训练，通过分布式数据并行（DDP）在 8× NVIDIA A100 GPU 上同步梯度，每个 GPU 处理静态分配的任务子集并构建异构批次。
 
-## 核心模块与公式推导
+
 
 ### 3.1 统一世界模型损失函数
 
@@ -195,7 +199,9 @@ $$
 
 其中 $W_0$ 为初始基座权重，$\Delta \theta_j = B_j A_j$ 为第 $j$ 阶段注入的低秩适配器（$B_j$ 和 $A_j$ 为低秩分解矩阵），$\alpha_j$ 为可学习的缩放因子。DPS 的核心设计原则是**参数隔离**：进入阶段 $s$ 后，所有先前阶段的参数（基座 $W_0$ 及适配器 $\{\Delta \theta_j\}_{j=1}^{s-1}$）均被冻结，仅当前阶段新增的适配器和缩放因子参与训练。这既保护了已学知识不被覆盖，又为未完成任务提供了定向的可塑性空间，从而在 DMControl 基准上实现了约 28.5% 的环境交互成本降低（Figure 4）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心失效模式诊断：可塑性崩溃
 
@@ -253,7 +259,9 @@ DPS策略在DMControl基准上展示了显著的样本效率提升（Figure 4）
 
 尽管ScaleZero整体表现优异，部分硬探索任务仍存在**负迁移**现象。在Atari的PrivateEye等游戏上，多任务训练的性能低于单任务基线，表明梯度冲突并未被完全消除。此外，MoE与LoRA在当前框架中仍相对独立运行——DPS的LoRA适配器作用于全层权重，而非针对MoE的门控网络进行自适应调控，限制了架构自适应的深层潜力。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心基线：UniZero 统一世界模型
 
@@ -310,6 +318,8 @@ DPS 通过自适应任务筛选（adaptive task curation）聚焦未完成任务
 4. **MoE-LoRA 深层协同。** MoE 与 LoRA 之间的深层协同（如用 LoRA 调整门控网络动态）能否进一步提升多任务训练中的架构适应性和稳定性？
 
 5. **离线预训练的融合。** 若将 ScaleZero 与大规模离线预训练基础模型结合，能否显著改善样本效率和“冷启动”性能，并弥合专用强化学习与通用世界模型之间的差距？
+
+
 
 ## 原文 PDF
 

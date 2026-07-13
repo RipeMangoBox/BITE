@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/AVERE_Improving_Audiovisual_Emotion_Reasoning_with_Preference_Optimization.pdf
+project_link: https://avere-iclr.github.io/
+code_link: null
 aliases:
 - AD
 - AVERE
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | AVERE：通过偏好优化提升视听情感推理能力 |
 | 英文题名 | AVERE: Improving Audiovisual Emotion Reasoning with Preference Optimization |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=td682AAuPr); [Project](https://avere-iclr.github.io/) |
+| Links | [paper](https://openreview.net/forum?id=td682AAuPr) · [Project](https://avere-iclr.github.io/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | AVEm-DPO |
 | Dataset | DFEW, RAVDESS |
@@ -41,13 +43,13 @@ claims:
 > - DFEW 上，WAR 为 64.24，对比 53.01 (Our base)，变化 +11.23。
 > - RAVDESS 上，UAR 为 58.66，对比 53.59 (Our base)，变化 +5.07。
 
-## 概述
+## 概要
 
 本文提出 **AVEm-DPO**（Audiovisual Emotion Direct Preference Optimization），一种面向视听情感推理的多模态偏好优化方法。现有视听多模态大语言模型（MLLM）在情感推理中普遍存在两类关键错误：(i) **推理错误**——将情感预测建立在与情感无关的线索上（虚假关联）；(ii) **感知错误**——因语言模型文本先验而虚构视听线索（幻觉）。AVEm-DPO 通过三类偏好对齐机制——基于提示的模态偏好（PMP）、基于情感的反应偏好（ERP）和文本先验去偏（TPD）——直接优化模型使其更忠实于真实的视听输入，从而同时缓解这两类错误。
 
 在作者提出的 **EmoReAlM** 基准上，AVEm-DPO 平均准确率达 83.3%，相对基模型提升 28.0%（Table 13）。在 DFEW、RAVDESS、MER2023 和 EMER 等现有基准上，AVEm-DPO 均取得最优零样本性能（Table 2）。用户评估中，AVEm-DPO 在情感描述、线索关联和不一致性方面分别以 54.74%、43.35% 和 4.67% 的比例被选为最佳（Table 4）。
 
-## 背景与动机
+
 
 ### 2.1 现有方法的不足
 
@@ -64,7 +66,9 @@ claims:
 
 EmoReAlM 基准包含 4000 个人工验证的多选题，覆盖 2649 个唯一视频（Table 1），随机准确率基线为 25%（基础推理）和 50%（模态一致性和压力测试）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 AVEm-DPO 的核心创新在于构建细粒度的多模态偏好对并引入文本先验正则项，具体包括：
 
@@ -74,7 +78,7 @@ AVEm-DPO 的核心创新在于构建细粒度的多模态偏好对并引入文�
 
 3. **文本先验去偏（TPD）**：在奖励函数中减去文本仅输入的对数概率，惩罚模型对纯文本先验的过度依赖，从而消除线索幻觉。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_td682AAuPr_AVERE_Improving/figures/001_Figure_1.jpg]]
 *Figure 1: Existing MLLMs (i) include spurious associations between AV cues and emotions – reasoning errors (blue highlight) and (ii) hallucinate AV cues to explain emotions – perception errors (red highlight). AV: audiovisual.*
@@ -92,7 +96,7 @@ AVEm-DPO 的整体框架如 Figure 4 所示，包含以下模块：
 - 使用 MAFW 和 MER2025 Track-1 训练集作为源数据集，通过 Gemini 2.5 Flash 自动生成偏好数据，共 41687 个偏好样本。
 - 训练超参数：学习率 5e-7，batch size 2 per GPU，8×H100 GPU，β=0.1，λ_av=1.0，β_er=β_vr=0.5，γ_TPD=0.2，LoRA rank 8 scale 4，梯度累积 4 步。
 
-## 核心模块与公式推导
+
 
 ### 5.1 标准 DPO 框架
 
@@ -160,7 +164,9 @@ r(a,v,x,y) = \beta \log \frac{\pi_\theta(y|a,v,x)}{\pi_{\mathrm{ref}}(y|a,v,x)} 
 \mathcal{L}_{\mathrm{AVEm-DPO}} = \mathcal{L}_{\mathrm{DPO-TPD}}^{y} + \lambda_{av} \mathcal{L}_{\mathrm{DPO}}^{av-prompt}
 \]
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 6.1 主要结果
 
@@ -253,7 +259,9 @@ r(a,v,x,y) = \beta \log \frac{\pi_\theta(y|a,v,x)}{\pi_{\mathrm{ref}}(y|a,v,x)} 
 *Table 3: Performance comparison of different methods on the proposed EmoReAlM Benchmark.*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 7.1 方法谱系
 
@@ -294,6 +302,8 @@ AVEm-DPO 在以下方面填补了现有方法的空白：
 - TPD 中 γ_TPD 的最优值是否与模型规模或数据集有关？
 - AVEm-DPO 是否能在保持通用能力的同时提升情感推理？
 - 如何减少对大规模人工验证的依赖？
+
+
 
 ## 原文 PDF
 

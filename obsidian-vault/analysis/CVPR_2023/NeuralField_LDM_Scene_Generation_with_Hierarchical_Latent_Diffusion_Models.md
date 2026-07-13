@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2023
 pdf_ref: paperPDFs/CVPR_2023/NeuralField_LDM_Scene_Generation_with_Hierarchical_Latent_Diffusion_Models.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/toronto-ai/NFLDM/
 aliases:
 - NLNL
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | NeuralField-LDM：基于分层潜在扩散模型的场景生成 |
 | 英文题名 | NeuralField-LDM: Scene Generation with Hierarchical Latent Diffusion Models |
 | 会议/期刊 | CVPR 2023 |
-| Links | [paper](https://arxiv.org/abs/2304.09787); [Project](https://research.nvidia.com/labs/toronto-ai/NFLDM/) |
+| Links | [paper](https://arxiv.org/abs/2304.09787) · [Project](https://research.nvidia.com/labs/toronto-ai/NFLDM/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | NeuralField-LDM (NF-LDM) |
 | Dataset | VizDoom, Replica, Carla, AVD |
@@ -42,7 +43,7 @@ claims:
 > - Replica 上，FID 为 14.59，对比 18.75 (GAUDI)，变化 -4.16。
 > - Carla 上，FID 为 35.69，对比 75.45 (GSN)，变化 -39.76。
 
-## 概述
+## 概要
 
 **核心问题**：现有三维场景生成方法（如GAUDI）通常将整个场景压缩为单个全局潜在向量，导致模型难以同时捕捉场景的全局属性与局部细节，在复杂场景分布建模上形成瓶颈。
 
@@ -57,7 +58,7 @@ claims:
 
 **局限性**：三阶段流水线和层次结构带来较高的训练与采样计算开销；密集体素网格在大规模场景下的体渲染和扩散模型训练成本较高；需要多视图图像作为输入，在场景数有限的数据集（如AVD）上可能限制生成多样性。
 
-## 背景与动机
+
 
 三维场景生成是计算机视觉与图形学中的核心挑战，其目标是从有限观测中学习复杂三维环境的分布，并能够合成新的、逼真的场景。近年来，神经辐射场（NeRF）的兴起使得高质量三维表示成为可能，但将NeRF纳入生成式建模框架仍面临根本性困难：**场景的全局属性（如光照、整体布局）与局部细节（如物体纹理、几何结构）分布在截然不同的尺度上，单一表示难以同时捕捉。**
 
@@ -67,7 +68,9 @@ claims:
 
 本文的动机由此明确：**设计一种能够将场景分解为多尺度潜在变量的生成框架，使得全局属性、粗略三维结构和精细二维细节可以分别建模、分层生成。** 具体而言，NeuralField-LDM通过将场景编码为显式的密度与特征体素网格，再经由潜在自编码器压缩分解为三个层次的潜在变量——1D全局潜在 $g$、3D粗糙潜在 $c$ 和2D精细潜在 $f$——从而让分层潜在扩散模型能够依次捕捉场景的宏观布局、中观结构和微观纹理。这一设计从根本上突破了单向量瓶颈，为复杂三维场景的高质量生成开辟了新路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 从全局潜在向量到分层体素潜在表示
 
@@ -108,7 +111,7 @@ NF-LDM 还引入了基于 Score Distillation Sampling 的后优化步骤，利�
 
 需要注意的是，NF-LDM 利用了深度监督信息，而部分基线方法（如 GRAF、π-GAN）未使用深度，这可能在一定程度上影响比较的公平性。此外，GAUDI 采用自动解码器在训练时为每个场景优化潜在码，而 NF-LDM 使用自编码器直接推断潜在码，两者的训练策略存在本质差异。
 
-## 整体框架
+
 
 NeuralField-LDM (NF-LDM) 采用**三阶段分层生成流水线**，将复杂三维场景的生成问题分解为场景编码、潜在压缩与分层扩散生成三个阶段。其核心设计动机在于克服现有方法（如GAUDI）将整个场景压缩为单一全局潜在向量所导致的分布建模瓶颈——单一向量难以同时捕捉场景的全局属性、粗略三维结构与精细局部细节。
 
@@ -156,7 +159,7 @@ NeuralField-LDM (NF-LDM) 采用**三阶段分层生成流水线**，将复杂三
 - **分层潜在 vs 单一潜在**：分层消融（Table 4）证实，仅使用粗糙潜在 $c$ 时FID为46.43，加入精细潜在 $f$ 后降至43.52，再加入全局潜在 $g$ 后进一步降至35.69，验证了三层结构的必要性。
 - **潜在压缩的必要性**：直接在高维体素网格（$128 \times 128 \times 32$）上训练扩散模型效果不佳（Figure 14），LAE的压缩有效降低了扩散模型的建模难度。
 
-## 核心模块与公式推导
+
 
 ### 3.1 场景自编码器（Scene Auto-Encoder）
 
@@ -216,7 +219,9 @@ $$\nabla_V L_{SDS} = \mathbb{E}_{\epsilon,t,\kappa} [w(\lambda_t) (\epsilon - \h
 
 其中 $V$ 为待优化的体素，$r(V,\kappa)$ 为在相机姿态 $\kappa$ 下的渲染图像，$\hat{\epsilon}_\theta$ 为预训练2D扩散模型的噪声预测。该损失通过2D扩散先验的梯度反向传播至3D体素，实现无需3D监督的质量提升。论文还引入负向导引策略，等效于在每一步去噪中采样 $\frac{p(x|y)^\alpha}{p(x|y')}$，以在风格修改中抑制不希望的属性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -285,15 +290,12 @@ NF-LDM在四个数据集上进行了评估：VizDoom和Replica（室内/受限�
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2304_09787/figures/020_Table_8.jpg]]
 *Table 8: Decoder of the latent auto-encoder*
 
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2304_09787/figures/021_Table_9.jpg]]
-*Table 9: Hyperparameters for $\psi _ { g }$ . Each training sequence in VizDoom consists of 50 timesteps, each with three-dimensional ( x , y , z ) location information and one-dimensional yaw information totalling 200 dimensions per trajectory. Similarly, Replica has 100 timesteps, totalling 400 dimensions per trajectory. Carla has the same z location for the Z-axis across different timesteps, so we only model the (x, y) trajectory information from nine consecutive timesteps. For AVD, we model all three ( x , y , z ) translation parameters across eight timesteps, totalling 24 dimensions per trajectory*
 
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2304_09787/figures/023_Table.jpg]]
 
-![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2304_09787/figures/024_Table_10.jpg]]
-*Table 10: Hyperparameters for $\psi _ { c }$ . Channels denote the base number of channels. Each group of layers (four groups in our case as indicated by the number of channel multipliers) in the Unet (see [60] for further details) have the number of channels equal to the base channels multiplied by the corresponding channel multiplier. Attention layers are applied at the specified 2D spatial resolutions. The tensor with the smallest spatial resolution in the Unet has 4 $\times$ 4 spatial resolution. Table 11. Hyperparameters for $\psi _ { f }$ . Channels denote the base number of channels. Each group of layers (six groups in our case as indicated by the number of channel multipliers) in the Unet (see [60]...
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心问题与突破点
 
@@ -326,6 +328,8 @@ NF-LDM 处于**显式神经场表示**与**分层扩散生成**的交叉点，�
 3. **生成多样性**：在有限场景数量的真实世界数据上，如何进一步提高生成多样性？这可能涉及数据增强策略或更有效的潜在空间正则化。
 4. **内容保持**：后优化阶段（SDS）在风格化编辑中可能导致内容漂移（如车辆形态改变），如何在风格迁移与内容保持之间取得更好的平衡？
 5. **采样加速**：层次结构天然导致串行采样，能否通过一致性模型、蒸馏等方法加速推理，使方法更适用于交互式应用？
+
+
 
 ## 原文 PDF
 

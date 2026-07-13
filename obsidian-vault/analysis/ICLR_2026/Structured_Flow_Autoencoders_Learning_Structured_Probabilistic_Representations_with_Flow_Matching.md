@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Structured_Flow_Autoencoders_Learning_Structured_Probabilistic_Representations_with_Flow_Matching.pdf
+project_link: null
+code_link: null
 openreview_forum_id: KYdfvF2SZN
 aliases:
 - SFAS
@@ -42,7 +44,7 @@ claims:
 > - MNIST 上，SSIM (↑) 为 0.694 (SFA)，对比 0.709 (LatentFM)，变化 -0.015。
 > - MNIST 上，Vendi (↑, diversity) 为 1675.9 (SFA)，对比 380.5 (LatentFM)，变化 +1295.4。
 
-## 概述
+## 概要
 
 深度生成模型长期面临一个核心矛盾：流匹配（Flow Matching, FM）等现代生成模型能够实现高保真度的样本生成，却无法捕获数据中隐含的结构化表示；而变分自编码器（VAE）虽能学习可解释的隐变量结构，其生成质量却显著落后。这一瓶颈的根源在于，现有方法无法在保持精确边际密度估计的同时，显式建模结构化隐变量。
 
@@ -52,7 +54,7 @@ claims:
 
 **方法定位**：SFA处于流匹配与结构化概率模型的交叉地带。与纯流匹配（FM）相比，SFA引入了可学习的隐变量后验；与VAE系列（VAE、VampVAE、Mixture-SVAE）相比，SFA将高斯解码器替换为条件CNF，将ELBO目标替换为SCFM目标，从根本上避免了VAE中重建质量与隐变量解耦之间的固有权衡。
 
-## 背景与动机
+
 
 深度生成模型的核心目标是学习复杂高维数据（如图像、单细胞转录组、动态系统轨迹）的底层分布。当前该领域存在两条主要技术路线，各自拥有显著优势，却面临截然不同的瓶颈。
 
@@ -68,7 +70,9 @@ $$v_t(\pmb{x}) = \int v_t(\pmb{x}|z) \frac{p_t(\pmb{x}|z) p(z)}{\int p_t(\pmb{x}
 
 这一分解意味着，如果我们能够同时学习条件向量场 $v_t(\pmb{x}|z)$ 和近似后验 $q_t(z|\pmb{x})$，就可以在不牺牲边际密度估计精度的前提下，将任意图模型结构注入流匹配框架。基于此，SFA 用条件 CNF 替代 VAE 的高斯解码器作为似然模型，用结构化条件流匹配（SCFM）目标替代 ELBO，从而消除了重建-KL 权衡，使隐变量天然地捕获有意义的结构信息，同时保持与纯 FM 相当的生成质量。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：流匹配的“盲生成”与VAE的“低保真”
 
@@ -101,7 +105,7 @@ $$v_t(\mathbf{x}) = \mathbb{E}_{p_t(z|\mathbf{x})}[v_t(\mathbf{x}|z)]$$
 
 需特别区分SFA与在隐空间使用流匹配的LatentFM。LatentFM仅在隐空间建模，其生成过程为 $z \sim p(z), x \sim p(x|z)$，但训练时并未显式利用条件结构。SFA的核心差异在于SCFM目标中的**期望匹配机制**：通过在后验 $q_t(z_t|x_t)$ 下对条件向量场求期望，迫使模型在每一时刻 $t$ 都保持条件结构与边际分布的一致性，从而实现生成质量与结构表征的联合优化。Table 2中SFA的生成多样性（Vendi: 1675.9）远超LatentFM（380.5），而SSIM仅微降（0.694 vs 0.709），正是这一机制的直接体现。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_KYdfvF2SZN/figures/013_Figure_12.jpg]]
 *Figure 12: (a) SFA framework*
@@ -153,7 +157,7 @@ SFA框架具有图模型结构无关性，可适配多种隐变量结构（Figur
 
 **关键设计选择**：当隐变量维度远小于观测维度时，后验模型可以比似然模型更轻量；在多组件联合学习时，简单参数后验族（如高斯族）相比条件CNF后验具有更好的训练稳定性，这在实验中得到了验证。
 
-## 核心模块与公式推导
+
 
 ### 3.1 核心理论：边际向量场的后验期望分解
 
@@ -218,7 +222,9 @@ $$\operatorname*{inf}_{\boldsymbol{q}\in Q,\boldsymbol{\theta}\in\Theta} \mathbb
 
 **隐线性动态系统**（Latent LDS）：对于序列数据，SCFM 目标在序列索引 $s \in [S]$ 上求和，以捕获时序依赖关系。具体形式见 Eq. 9，其核心仍是定理 3.1 在序列图模型上的直接推广。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计逻辑
 
@@ -322,7 +328,9 @@ $$\operatorname*{inf}_{\boldsymbol{q}\in Q,\boldsymbol{\theta}\in\Theta} \mathbb
 *Table 5: (b) Pendulum Trajectory*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -357,6 +365,8 @@ SFA 的核心贡献在于将**结构化隐变量**显式引入流匹配框架，
 2. **高维后验稳定性**：对于高维数据，使用条件 CNF 作为后验可能导致训练不稳定。如何设计更稳定的高维后验近似方案是一个开放挑战。
 3. **下游任务收益量化**：SFA 的隐空间表征在哪些具体下游任务中能比纯流匹配模型带来实质收益，目前仅在聚类和动态系统推断中进行了初步验证，更广泛的任务评估有待开展。
 4. **大模型隐变量注入**：如何在大规模架构（如 UNet）中有效注入隐变量以防止后验崩塌，是 SFA 走向实际应用的关键工程问题。
+
+
 
 ## 原文 PDF
 

@@ -42,7 +42,7 @@ claims:
 > - Ava256 上，PSNR↑ (single-image) 16.9 vs 见论文Table 3 (显著优于先前方法)；PSNR↑ (few-shot, 4 images) 21.1 vs 见论文Table 3 (显著优于Avat3r)。
 > - NeRSemble 上，LPIPS↓ (monocular) FlexAvatar vs 先前的SOTA方法 (显著降低LPIPS，在所有指标上优于基线)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -75,7 +75,7 @@ FlexAvatar 在四个任务、三个数据集上进行了系统验证（见 Table
 
 当前方法假设输入图像包含清晰人脸，对极端遮挡、大角度姿态及复杂发型/配饰的鲁棒性尚未充分验证。动画表达仍依赖 FLAME 提供的表达代码，可能无法完美覆盖超出其表达空间的表情。化身创建过程需数分钟优化，距离实时应用仍有距离。值得探索的开放方向包括：将 bias sinks 机制扩展到人体姿态或通用动态新视角合成任务；进一步解耦身份与表情以实现独立控制；以及利用文本描述等弱监督信号替代单张图像生成化身。
 
-## 背景与动机
+
 
 ### 3D头部化身的需求与挑战
 
@@ -100,7 +100,9 @@ FlexAvatar的核心动机正是针对上述瓶颈：**通过让模型在训练�
 
 这一设计的核心洞察在于：**视图纠缠不是模型结构的固有缺陷，而是数据模态的偏差**。通过将这种偏差显式建模并隔离到特定令牌中，FlexAvatar实现了单目与多视图数据的统一训练，突破了此前方法在3D完整性与泛化能力之间的权衡。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FlexAvatar的核心创新并非提出全新的网络架构，而是**识别并解决了单目视频训练中一个被忽视的根本瓶颈**：驱动信号（表情/头部姿态）与目标视点的固有纠缠。这一纠缠导致模型在训练时依赖“视角泄露”来重建人脸，从而无法生成完整的3D头部，泛化到自由视点渲染时出现严重伪影。围绕这一因果机制，FlexAvatar提出了三项关键创新。
 
@@ -138,7 +140,7 @@ DINOv2损失提供高层语义感知监督，SAM损失增强结构保真度。�
 
 **创新总结**：FlexAvatar的核心贡献在于**识别单目训练中的视角-驱动纠缠瓶颈**，并通过bias sinks机制实现优雅解耦。该方法使模型能够在混合单目/多视图数据上统一训练，在推理时仅使用 $z_{3D}$ 令牌即可从单张图像生成完整、可动画化的3D头部化身。这一设计理念——通过可学习令牌显式吸收并隔离数据源偏差——具有跨领域迁移的潜力。
 
-## 整体框架
+
 
 FlexAvatar 的整体 pipeline 围绕一个 **编码器-解码器-渲染器** 架构构建，其核心设计目标是从单张肖像图像生成可动画化的完整 3D 头部化身，并支持自由视点渲染。整个流程可概括为三个关键阶段：
 
@@ -221,7 +223,7 @@ Bias sinks 是整个框架实现视角解耦的关键机制（详见 Figure 4）
 ![[assets/figures/papers/paper_list_l8_https_openaccess_thecvf_com_content_CVPR2026_html_Kirschstein_FlexAvatar/figures/001_Figure_1.jpg]]
 *Figure 1: FlexAvatar. From just a single portrait image of a person, FlexAvatar creates a high quality 3D head avatar representation that can be freely animated and rendered from diverse viewpoints. Our model can be flexibly applied to other scenarios including creating avatars from a phone scan or from monocular videos. The entire avatar creation process can be executed within minutes*
 
-## 核心模块与公式推导
+
 
 FlexAvatar 的整个生成流程由四个核心模块串联构成，其数学形式可概括为三条主方程。
 
@@ -301,7 +303,9 @@ $$\mathcal{L}_{rec} = \mathcal{L}_1 + \mathcal{L}_{SSIM} + \mathcal{L}_{DINO} + 
 ![[assets/figures/papers/paper_list_l8_https_openaccess_thecvf_com_content_CVPR2026_html_Kirschstein_FlexAvatar/figures/004_Figure_4.jpg]]
 *Figure 4: Entanglement of driving signal and target viewpoint. Naive training on monocular data works well as long as both expression code*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 FlexAvatar在四个任务和三个数据集上进行了系统评估，覆盖3D肖像动画、单图像化身创建、少样本化身创建和单目化身创建等场景（Table 1）。以下从核心定量结果、消融实验和失败模式三个维度展开分析。
 
@@ -372,7 +376,9 @@ FlexAvatar在四个任务和三个数据集上进行了系统评估，覆盖3D�
 ![[assets/figures/papers/paper_list_l8_https_openaccess_thecvf_com_content_CVPR2026_html_Kirschstein_FlexAvatar/figures/013_Figure_8.jpg]]
 *Figure 8: In-the-wild results. We test FlexAvatar on highly diverse inputs and perform cross-reenactment*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心创新与差异化定位
 
@@ -448,6 +454,8 @@ FlexAvatar 位于 **3D头部化身创建与动画** 的交叉点，其方法论�
 - **方法边界**：依赖清晰正面输入、受限于 FLAME 表达空间、计算效率待优化、野外鲁棒性未充分验证
 
 在更广泛的 3D 视觉知识库中，FlexAvatar 的 bias sinks 思想可被视为一种**数据偏差感知的训练策略**，与领域自适应（domain adaptation）、多任务学习中的数据平衡方法形成互补，为数据稀缺场景下的 3D 重建提供了新的解决思路。
+
+
 
 ## 原文 PDF
 

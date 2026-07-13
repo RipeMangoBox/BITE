@@ -5,6 +5,8 @@ paper_level: A
 venue: NeurIPS
 year: 2024
 pdf_ref: paperPDFs/NEURIPS_2024/Enhancing_Motion_in_Text_to_Video_Generation_with_Decomposed_Encoding_and_Conditioning.pdf
+project_link: https://PR-Ryan.github.io/DEMO-project/
+code_link: null
 aliases:
 - EMTVGDEC
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | 基于分解编码与条件的文本到视频运动增强 |
 | 英文题名 | Enhancing Motion in Text-to-Video Generation with Decomposed Encoding and Conditioning |
 | 会议/期刊 | NeurIPS 2024 |
-| Links | [paper](https://arxiv.org/abs/2410.24219); [Project](https://PR-Ryan.github.io/DEMO-project/) |
+| Links | [paper](https://arxiv.org/abs/2410.24219) · [Project](https://PR-Ryan.github.io/DEMO-project/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | DEMO |
 | Dataset | MSR-VTT, WebVid-10M |
@@ -40,7 +42,7 @@ claims:
 > - MSR-VTT 上，FID 为 11.77，对比 14.89 (ModelScopeT2V)，变化 -3.12。
 > - MSR-VTT 上，CLIPSIM 为 0.2965，对比 0.2941 (ModelScopeT2V)，变化 +0.0024。
 
-## 概述
+## 概要
 
 文本到视频（T2V）生成领域，现有模型在提升视觉质量方面取得了显著进展，但在生成逼真、丰富的运动动态方面仍存在明显瓶颈。本文通过一项先导研究揭示了问题的根源：当前广泛使用的CLIP文本编码器对表示运动的词性（如动词）的敏感性显著低于对表示内容的词性（如名词），导致模型倾向于生成静态或运动匮乏的视频。此外，主流的文本条件机制仅通过逐帧的空间交叉注意力注入文本信息，缺乏时间维度上对运动模式的显式整合。
 
@@ -48,7 +50,7 @@ claims:
 
 实验结果表明，DEMO在多个基准数据集上取得了运动动态性和整体视频质量的显著提升。在MSR-VTT上，FVD从557降至422，FID从14.89降至11.77；在EvalCrafter上，运动评分Flow Score从2.51提升至4.89，Motion AC-Score从44提升至58。消融实验进一步验证了各损失组件的必要性：移除视频-运动损失后，Motion AC-Score骤降至46，运动提升效果有限。同时，论文也指出了方法的局限性，包括无法生成文本指定的顺序动作、运动增强可能伴随时序闪烁的轻微增加等。
 
-## 背景与动机
+
 
 文本到视频生成（Text-to-Video Generation, T2V）的目标是根据自然语言描述合成逼真且动态的视频。近年来，基于潜在视频扩散模型（Latent Video Diffusion Models, LVDMs）的方法在这一领域取得了显著进展，其核心架构通常采用3D U-Net，通过空间与时间维度的自注意力和交叉注意力机制，在压缩的潜空间中逐步去噪以生成视频帧。然而，现有T2V模型在生成视频的运动质量方面仍存在明显不足——生成的视频往往呈现静态或仅有微弱运动的场景，与文本中描述的动作语义之间存在显著差距。
 
@@ -56,7 +58,9 @@ claims:
 
 针对上述问题，本文提出DEMO（Decomposed Encoding and Conditioning for Motion Enhancement），其核心动机是：**将文本编码和条件机制分解为内容与运动两个独立分支，通过专门的编码器增强运动语义提取，通过时间维度的条件模块实现运动信息注入，并辅以双重运动监督信号保障运动生成质量**。这一设计使得模型能够在保持静态内容生成质量的前提下，显著提升生成视频的运动动态性和真实感。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DEMO的核心创新在于对文本到视频（T2V）生成流程中**文本编码**和**文本条件机制**的双重分解，并辅以多层次的运动监督信号，从而在不依赖额外运动输入（如深度图、光流）的前提下，显著提升生成视频的运动动态性。
 
@@ -109,7 +113,7 @@ $$\mathcal{L}_{\text{video-motion}} = \mathbb{E}_{t, z_0, \epsilon \sim \mathcal
 
 这三个改动槽位形成因果链条：运动编码器提取运动敏感的文本表示 → 运动条件模块在时间维度注入该表示 → 视频-运动损失直接约束生成结果的运动模式。三者协同作用，使DEMO在MSR-VTT上FVD从557降至422、FID从14.89降至11.77（Table 1），在EvalCrafter上Flow Score从2.51提升至4.89（Table 4）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l14_Enhancing_Motion_in_Text_to_Video_Generation_with_Decomposed_Encoding_an/figures/001_Figure_2.jpg]]
 *Figure 2: Overview of DEMO Training. As shown in the left-hand side, DEMO incorporate dual text encoding and text conditioning (for simplicity, other layers in the UNet are omitted). As shown in the right-hand side, during training, the $\mathcal { L } _ { \mathrm { t e x t - m o t i o n } }$ is used to enhance motion encoding, the $\mathcal { L } _ { \mathrm { r e g } }$ is used to avoid catastrophic forgetting, the $\cdot$ is to enhance motion integration. The snowflakes and flames denote frozen and trainable parameters, respectively
@@ -142,7 +146,7 @@ DEMO 的整体框架围绕一个核心洞察展开：现有文本到视频（T2V
 - **运动编码器的有效性**：先导研究（Figure 1）表明，原始 CLIP 文本编码器对表示运动的词性（如动词）的敏感性显著低于对表示内容的词性（如名词）。仅使用文本-运动损失微调会导致灾难性遗忘；只有联合使用正则化损失时，运动编码器才能在保持内容敏感性的同时显著提升运动敏感性。
 - **视频-运动损失的必要性**：消融实验（Table 4, Table 6）显示，仅添加运动编码器而不使用视频-运动损失时，MSR-VTT 上的 FVD 仅从 557 降至 552，EvalCrafter 上的 Motion AC-Score 仅为 46；而完整模型将 Motion AC-Score 提升至 58，证明了视频-运动监督对于生成强运动动态的关键作用。
 
-## 核心模块与公式推导
+
 
 ### 3.1 基础扩散框架
 
@@ -212,7 +216,9 @@ $$\mathcal { L } = \mathcal { L } _ { \mathrm { d i f f u s i o n } } + \alpha \
 
 其中 $\alpha$、$\beta$、$\gamma$ 为超参数权重，完整训练超参数见 Table 7。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -293,7 +299,9 @@ DEMO在多个零样本文本到视频生成基准上对运动动态性和视频�
 *Table 10: Comparison of different evaluation protocols on UCF-101*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 DEMO 的工作建立在潜视频扩散模型（LVDM）的基础之上，其核心基座是 **ModelScopeT2V**，一个基于 3D U-Net 架构的文本到视频生成模型。该架构由下采样、中间和上采样模块组成，每个模块包含卷积层以及空间和时间 Transformer。空间 Transformer 内部由空间自注意力、空间交叉注意力和前馈网络层构成，文本条件通过交叉注意力逐帧注入。DEMO 正是在此标准范式上，针对文本编码与条件机制进行了结构性改造。
 
@@ -326,6 +334,8 @@ DEMO 的适用边界清晰。它适用于需要增强生成视频中运动动态
 - 如何在不依赖大规模高质量视频数据集的前提下提升视觉质量？
 
 这些问题指向了文本到视频生成领域从“静态质量”向“动态真实感”演进过程中的关键瓶颈：运动建模不仅需要空间-时间维度的解耦，更需要时序因果性和物理一致性的深层建模。DEMO 的分解式框架为后续研究提供了可扩展的架构基础，但其在时序推理和长程运动连贯性方面的能力仍有待突破。
+
+
 
 ## 原文 PDF
 

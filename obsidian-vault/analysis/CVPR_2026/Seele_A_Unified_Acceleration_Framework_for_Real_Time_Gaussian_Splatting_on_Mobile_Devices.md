@@ -42,7 +42,7 @@ claims:
 > - 综合（同上） 上，加速比（FPS） SEELE on LightGaussian: 2.7× vs LightGaussian: 1.0× (+1.7×)；运行时模型大小缩减 39.1% 缩减 vs 基线模型大小（不变） (减少 39.1%)。
 > - Mip-NeRF360（平均值） 上，PSNR 提升 SEELE 平均 PSNR 提高约 0.28 dB vs 各基线原始 PSNR (+0.28 dB)。
 
-## 概述
+## 概要
 
 移动设备上实时渲染高质量3D场景是增强现实与移动端视觉应用的核心需求。3D高斯泼溅（3D Gaussian Splatting, 3DGS）虽能以高质量实时渲染静态场景，但其渲染管线在移动端GPU上面临严峻挑战：每个像素需处理数千个高斯点，且管线统一对待所有高斯点进行透明度计算与颜色混合，导致大量计算浪费和GPU内存占用过高。
 
@@ -67,7 +67,7 @@ SEELE属于3DGS推理加速方法族，与现有工作的关键区别在于：
 
 **局限与开放问题**：当前方法依赖线性外推相机姿态进行场景预取，在非平滑运动下可能失效；仅在Nvidia Orin系列移动GPU上验证，其他移动平台（如Qualcomm Adreno、Apple GPU）的适用性未知；离线聚类需逐场景执行，不适用于跨场景通用模型。此外，极端视角下聚类效率的退化程度、与高斯点剪枝/量化技术的正交叠加潜力，以及在更大规模城市场景中的扩展性，仍有待进一步探索。
 
-## 背景与动机
+
 
 ### 3D 高斯泼溅与移动端实时渲染的困境
 
@@ -96,7 +96,9 @@ $$\alpha _ { i } = o _ { i } e ^ { - \frac 1 2 ( { \bf p } - x ^ { \prime } ) ^ 
 
 SEELE 从两个维度重构 3DGS 渲染管线：在预处理阶段，设计视角相关的场景表示，将高斯点划分为共享集群和独占集群，运行时仅加载相关集群，从源头削减计算量和内存占用；在光栅化阶段，引入贡献感知光栅化算法，动态识别并跳过低贡献高斯点的颜色混合计算，提升 GPU 并行效率。这一“预处理过滤 + 光栅化跳跃”的组合策略，使得 SEELE 能够以统一框架加速多种 3DGS 变体，在移动端实现最高 6.3× 的渲染加速和 39.1% 的运行时模型缩减。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SEELE 的核心创新在于重新设计了 3DGS 渲染管线中的两个关键环节——预处理与光栅化，通过**视角相关的场景表示**和**贡献感知的计算调度**，在不牺牲渲染质量的前提下大幅降低移动端 GPU 的计算与内存压力。其相对于原始 3DGS（Kerbl et al., ACM TOG 2023）的 changed slots 可归纳为三个维度。
 
@@ -149,7 +151,7 @@ $$\mathcal { L } _ { total } = \mathcal { L } _ { 3DGS } + \gamma * \mathcal { L
 - 贡献感知光栅化中的像素组机制是否可适配其他基于图块的渲染管线（如 Instant NGP）仍是开放问题。
 - 该方法能否与高斯点剪枝、量化等正交压缩技术叠加获得更高加速，论文未进行组合实验。
 
-## 整体框架
+
 
 SEELE 是一个面向移动端 3DGS 渲染的统一加速框架，其核心设计围绕一个关键发现展开：不同视角之间仅共享极少部分高斯点，且约 **1.5% 的高斯点贡献了 99% 的最终像素透明度**（Fig. 4）。基于这一洞察，SEELE 对原始 3DGS 渲染管线的两个阶段——预处理与光栅化——进行了系统性改造，提出了 **混合预处理（Hybrid Preprocessing）** 与 **贡献感知光栅化（Contribution-Aware Rasterization）** 两项核心技术，整体框架如 Fig. 2 所示。
 
@@ -184,7 +186,7 @@ SEELE 的完整渲染管线由以下模块串联构成：
 
 SEELE 作为统一加速框架，可应用于多种 3DGS 变体。在相同 Nvidia AGX Orin 移动设备上，SEELE 对 **3DGS**（Kerbl et al., ACM TOG 2023）实现 3.2× 加速，对 **LightGaussian** 实现 2.7× 加速，对 **AdR-Gaussian**（Wang et al., SIGGRAPH Asia 2024）实现 1.7× 加速，对 **Mini-Splatting** 实现 1.8× 加速，展现出良好的算法无关性。
 
-## 核心模块与公式推导
+
 
 ### 1. 问题定义：3DGS 渲染的累积瓶颈
 
@@ -238,7 +240,9 @@ $$\mathcal { L } _ { total } = \mathcal { L } _ { 3DGS } + \gamma * \mathcal { L
 ![[assets/figures/papers/paper_list_l2266_https_openaccess_thecvf_com_content_CVPR2026_html_Zhu_Seele_A_Unified_Ac/figures/003_Figure_3.jpg]]
 *Figure 3: Our scene representation clusters Gaussians into shared ones and exclusive ones. Here, we show the Gaussian positions without scales. The yellow points in Fig. 3b represent the shared Gaussians, while the other colors correspond to the exclusive Gaussians in different clusters*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 整体加速与质量表现
 
@@ -318,7 +322,9 @@ Table 6 进一步消融视图一致性损失：加入该损失后 FLIP 指标从
 - 贡献感知光栅化中的像素组机制是否可适配其他基于图块的渲染管线（如 Instant NGP）？
 - 论文未提供代码仓库，开源后可在实际移动设备上独立验证加速比与质量声明。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -355,6 +361,8 @@ SEELE 并非一个独立的渲染算法，而是一个**正交于现有 3DGS 变
 3. **像素分组机制的跨管线可移植性**：贡献感知光栅化中的像素分组和领头像素预判机制，在概念上可适配其他基于图块的渲染管线（如 Instant NGP 的哈希网格渲染），但具体实现需要针对不同管线的瓦片调度和线程模型进行调整，其通用性尚待验证。
 4. **代码未开源**：截至论文发表，SEELE 的代码仓库未公开。上述适用边界和叠加假设需要在开源后通过实际设备测试进行验证和修正。
 5. **动态场景适应性**：论文未讨论动态场景（如含有运动物体的 4D 高斯泼溅）下聚类预取的有效性。动态物体的高斯点可能在不同聚类间迁移，预取策略需要引入时间维度的预测，这是 SEELE 框架向动态场景扩展的核心挑战。
+
+
 
 ## 原文 PDF
 

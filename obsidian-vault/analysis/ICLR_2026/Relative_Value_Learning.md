@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Relative_Value_Learning.pdf
+project_link: null
+code_link: https://github.com/Hauf3n/relative-value-learning
 openreview_forum_id: ulTRUwrzt9
 aliases:
 - RVLR
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 相对价值学习 |
 | 英文题名 | Relative Value Learning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=ulTRUwrzt9); [GitHub](https://github.com/Hauf3n/relative-value-learning) |
+| Links | [paper](https://openreview.net/forum?id=ulTRUwrzt9) · [GitHub](https://github.com/Hauf3n/relative-value-learning) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | Relative Value Learning (RV) |
 | Dataset | Atari 49 games (40M frames), Atari 40M frames (selected game: VideoPinball) |
@@ -42,7 +44,7 @@ claims:
 > - Atari 49 games (40M frames) 上，Human Normalized Score 聚合指标 (median, IQM, mean, optimality gap) 为 PPO+RV 取得最高中位数、IQM 和均值，以及最低的最优性差距，对比 PPO, DAE，变化 中位数约 0.95 vs. PPO 0.88；最优性差距约 0.44 vs. PPO 0.55。
 > - Atari 40M frames (selected game: VideoPinball) 上，最终平均得分 为 138564.8 ± 89747.6，对比 PPO: 37389.0 ± 21539.2; DAE: 23958.8 ± 10071.8，变化 +101175.8 over PPO。
 
-## 概述
+## 概要
 
 标准强化学习中的价值函数估计存在一个根本性问题：绝对状态值 $V(s)$ 包含一个与决策无关的任意常值偏移（gauge freedom）。这一规范自由度在训练中表现为值函数的漂移和不稳定，在隐式反馈或偏好式强化学习等绝对尺度模糊的场景下，更会导致不适定问题。核心症结在于，策略优化实际依赖的只是状态间的**相对差异**，而非绝对尺度。
 
@@ -56,7 +58,7 @@ claims:
 
 当前验证限于离散动作的 Atari 环境，相对价值学习在连续控制、离线强化学习及偏好式学习等场景的有效性仍有待进一步探索。
 
-## 背景与动机
+
 
 强化学习中，状态价值函数 $V^\pi(s)$ 是策略评估与优化的核心量，其定义为从状态 $s$ 出发、遵循策略 $\pi$ 的期望折扣回报：
 
@@ -74,7 +76,9 @@ $$V^{\pi}(s) = r_{\pi}(s) + \gamma \mathbb{E}_{s' \sim P^{\pi}(\cdot \vert s)} \
 
 为实现这一目标，本文需要解决三个关键技术挑战：一是如何在反称函数空间上定义收敛的学习算子；二是如何从成对值差重构无偏的策略梯度估计；三是如何在多轨迹训练中处理相对价值的初始化与方差控制问题。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈洞察：绝对价值函数的规范自由度
 
@@ -126,7 +130,7 @@ $$\text{Var}(g_{\text{rel}}) = \text{Var}(g_{\text{std}}) + \mathbb{E}[\|\nabla_
 
 > **注意**：RV 目前仅在离散动作的 Atari 环境下验证，其在连续控制、离线强化学习及偏好式学习中的有效性仍属开放问题。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0009_ulTRUwrzt9_Relative_Value_Learning/figures/001_Figure_1.jpg]]
 *Figure 1: Relative Value vs. Absolute Value Learning.. RV (left) learns value differences between states for decision making while AV (right) learns the value for each state in isolation and then decides for the best decision (e.g. by taking maximum in Q-learning)*
@@ -168,7 +172,7 @@ RV 作为 on-policy actor-critic 框架中的 **critic 替代模块**，其整�
 
 > **注意**：R-GAE 引入的轨迹常数基线 $B_t$ 虽不破坏无偏性，但其平方项会膨胀策略梯度方差。轨迹排序策略通过最小化初始化偏移 $|C|$ 来抑制该方差项，这是 RV 实现中关键的工程决策。
 
-## 核心模块与公式推导
+
 
 ### 反称差值函数
 
@@ -262,7 +266,9 @@ $$
 
 其中 $B_t^2$ 项与轨迹偏移 $C^2$ 成正比。轨迹排序通过最小化 $|C|$ 使 $B_t \approx 0$，从而抑制方差膨胀。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验：Atari 49 游戏基准
 
@@ -315,7 +321,9 @@ DAE 在聚合指标上显著弱于 PPO 和 PPO+RV，表明直接学习优势函�
 
 3. **DAE 性能显著弱于预期**：DAE 作为直接学习优势函数的基线，在 Atari 上表现明显逊于 PPO 和 PPO+RV。这一结果暗示直接优势估计在该规模下存在稳定性问题，但论文未深入分析其具体失败机制，需要进一步验证。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与标准 Actor-Critic 的关系
 
@@ -380,6 +388,8 @@ RV 在强化学习值估计方法谱系中的位置可以概括为：
 - **下游延伸潜力**：偏好式 RL 的奖励建模、多任务迁移中的值差共享、元学习中的相对值先验。
 
 RV 的核心贡献在于**识别并解决了绝对价值学习中的规范自由度问题**，将值函数学习从“估计绝对尺度”重新定义为“学习相对差异”。这一视角转换在理论上是优雅的（通过反称函数空间上的收缩算子保证收敛），在实践上是有效的（Atari 聚合指标全面优于 PPO 和 DAE），但其方差膨胀问题和未验证的应用场景构成了当前的主要边界。
+
+
 
 ## 原文 PDF
 

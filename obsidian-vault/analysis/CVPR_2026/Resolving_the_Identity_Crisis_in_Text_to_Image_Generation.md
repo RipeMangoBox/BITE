@@ -43,7 +43,7 @@ claims:
 > - DiverseHumans-TestPrompts (2-7 People) 上，Count Accuracy 92.4 vs 70.8 (Flux-Dev) (+21.6)；Unique Face Accuracy (UFA) 98.6 vs 48.2 (Flux-Dev) (+50.4)；Global Identity Spread (GIS) 98.3 vs 50.5 (Flux-Dev) (+47.8)。
 > - MultiHuman-TestBench (1-5 People) 上，Count Accuracy 86.6 vs 61.8 (Flux-Dev) (+24.8)；Unique Face Accuracy (UFA) 94.3 vs 56.5 (Flux-Dev) (+37.8)。
 
-## 概述
+## 概要
 
 文本到图像生成模型在单人场景下已取得令人瞩目的视觉质量，但在生成包含多人的图像时，普遍存在**身份重复**与**计数错误**的问题——同一张图像内的人脸高度相似，不同样本之间身份被复制，甚至生成的人数与提示不符。论文将这一现象称为“身份危机”（Identity Crisis），并指出其根源在于现有模型缺乏对身份多样性的显式建模：仅优化图像内部的多样性，无法解决跨样本的全局身份多样性崩溃。
 
@@ -51,7 +51,7 @@ claims:
 
 实验结果显示，DISCO 在 DiverseHumans-TestPrompts 基准上将基线模型 FLUX-Dev 的**唯一人脸准确率（UFA）**从 48.2% 提升至 98.6%，**全局身份多样性（GIS）**从 50.5% 提升至 98.3%，计数准确率也提高了 21.6 个百分点。消融研究证实，图像内多样性奖励可改善 UFA 但会导致 GIS 崩溃，而加入群体多样性奖励后全局多样性得以恢复。人类偏好研究进一步验证了 UFA 指标与人类对身份多样性判断的完美相关性（1.0）。
 
-## 背景与动机
+
 
 文本到图像生成领域近年来取得了显著进展，模型在单人物肖像生成上已能产出高度逼真的结果。然而，当提示词要求生成**多人场景**时，现有方法普遍面临严重的“身份危机”（Identity Crisis）——生成图像中的人脸出现重复、身份合并、计数错误等问题。图 1 直观展示了这一现象：初看之下图像质量尚可，但仔细观察即可发现多张人脸实为同一身份的复制品。
 
@@ -63,7 +63,9 @@ claims:
 
 DISCO 的核心动机正是针对上述三个相互关联的瓶颈：**图像内身份重复、跨样本身份复制、以及计数错误**。通过引入基于强化学习的微调框架，DISCO 在生成过程中同时施加图像内多样性约束、群体间多样性约束和计数准确性约束，从根本上消除身份崩溃，同时保持图像感知质量。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DISCO 的核心创新在于将多人文本到图像生成的身份多样性问题，重新定义为强化学习微调中的**组合奖励优化**问题。现有方法（如 FLUX-Dev、SD3.5 等流匹配/扩散模型）在标准训练范式下缺乏对身份多样性的显式建模，导致同一图像内人脸重复、跨样本身份复制及计数错误等“身份危机”（Figure 1）。DISCO 通过三个关键层面的创新，从根本上改变了这一局面。
 
@@ -103,7 +105,7 @@ $$p_t(n) = \begin{cases} p_{\mathrm{ann}}(n,t) & \text{if } t \le t_{\mathrm{cur
 
 DISCO 的组合奖励设计产生了显著效果：在 DiverseHumans-TestPrompts 基准上，DISCO(Flux) 的 Unique Face Accuracy 从基线 Flux-Dev 的 48.2% 跃升至 98.6%，Global Identity Spread 从 50.5% 提升至 98.3%，Count Accuracy 从 70.8% 提升至 92.4%（Table 1）。人类偏好研究进一步证实，UFA 指标与人类对身份多样性的判断相关性达到 1.0（Appendix E.1.6），验证了指标设计的有效性。
 
-## 整体框架
+
 
 DISCO 的整体训练流程围绕 **Flow-GRPO（流匹配组相对策略优化）** 构建，通过对预训练文本到图像模型进行强化学习微调，直接优化多人场景中的身份多样性。如图 3 所示，系统由四个核心模块串联构成闭环。
 
@@ -134,7 +136,7 @@ DISCO 的整体训练流程围绕 **Flow-GRPO（流匹配组相对策略优化�
 ![[assets/figures/papers/paper_list_l2340_https_arxiv_org_abs_2510_01399/figures/002_Figure_2.jpg]]
 *Figure 2: DISCO enables better multi-human generation. (a) SOTA methods often produce duplicate or inconsistent faces, while (b) DISCO generates distinct, diverse identities. (c) Quantitative results show clear gains in Count Accuracy, Unique Face Accuracy, Identity Spread, and Overall quality(HPSv2 score)*
 
-## 核心模块与公式推导
+
 
 DISCO 的核心架构围绕**Flow-GRPO 微调框架**展开，通过组合奖励函数引导流匹配模型学习身份多样性。整个训练管线包含四个关键模块，如 Figure 3 所示。
 
@@ -208,7 +210,9 @@ $$p_t(n) = \begin{cases} p_{\mathrm{ann}}(n,t) & \text{if } t \le t_{\mathrm{cur
 ![[assets/figures/papers/paper_list_l2340_https_arxiv_org_abs_2510_01399/figures/013_Table.jpg]]
 *Table: E.5. Ablation on curriculum simple-set bounds on Flux-Krea baseline. Blue row is the selected configuration*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与评估体系
 
@@ -296,7 +300,9 @@ DISCO 的训练仅使用合成提示，未使用任何真实身份数据，训�
 ![[assets/figures/papers/paper_list_l2340_https_arxiv_org_abs_2510_01399/figures/009_Table.jpg]]
 *Table: E.2. Ablation study on reward weight parameters. Results are for DisCo(Flux-Dev). Each row shows the effect of different weight configurations on overall performance metrics. Our selected hyperparameter configuration is represented in the Blue row*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：身份危机的本质
 
@@ -348,6 +354,8 @@ DISCO 的方法论定位可从以下几个维度理解：
 4. **公平性与偏见。** 如何引入更显式的公平性约束（如人口统计平衡目标）以防止多样性优化过程中产生新的表征偏见？基础模型在不同种族、性别、年龄群体上的先验差异如何影响 DISCO 的优化结果？
 
 5. **效率与规模化。** 群体多样性奖励的计算复杂度随批次大小线性增长，在更大规模训练中如何保持计算效率？课程学习策略的退火参数是否需要在不同基础模型间重新调优？
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/AToM_Aligning_Text_to_Motion_Model_at_Event_Level_with_GPT_4Vision_Reward.pdf
+project_link: https://atom-motion.github.io/
+code_link: null
 aliases:
 - AToM
 tags:
@@ -40,7 +42,7 @@ claims:
 > - Temporal 上，FID (↓) 为 0.613，对比 0.655 (MotionGPT)，变化 -6.4%。
 > - Human evaluation (Temporal) 上，Win rate vs MotionGPT 为 AToM 74.4%，对比 MotionGPT 25.6% (隐含)，变化 +48.8%。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -75,7 +77,7 @@ AToM 的关键差异化在于：用 GPT-4V **自动标注**替代人工标注，
 
 当前验证仅限于 HumanML3D 数据集和 MotionGPT 单一模型架构，对其他数据集和扩散模型（如 MDM、MLD）的泛化性未知。GPT-4V 的评分准确性与人类判断的系统相关性尚未量化，且依赖商业 API 带来了成本与可复现性问题。此外，对于包含更多动作事件或更长序列的复杂描述，事件级对齐性能的退化程度尚待探索。如何进一步降低对闭源大模型的依赖，实现完全开源可复现的训练流程，是该方向的重要开放挑战。
 
-## 背景与动机
+
 
 文本驱动的三维人体动作生成旨在根据自然语言描述合成逼真且语义一致的人体运动序列。随着扩散模型与自回归语言模型的发展，如**MotionGPT**（Jiang et al., NeurIPS 2023）等方法在整体动作质量上取得了显著进展。然而，现有模型普遍存在一个关键瓶颈：**细粒度的事件级对齐能力不足**。
 
@@ -89,7 +91,9 @@ AToM 的关键差异化在于：用 GPT-4V **自动标注**替代人工标注，
 
 为突破上述局限，AToM提出利用视觉-语言大模型GPT-4Vision的细粒度理解能力，自动构建包含完整性、时间顺序和频率三维度评分的偏好数据集，并据此对基础动作生成模型进行强化学习微调，从而系统性地提升事件级对齐质量。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 AToM 的核心创新在于首次将**视觉-语言大模型（GPT-4Vision）引入文本-动作生成的细粒度事件级对齐优化**，通过三个紧密耦合的“changed slots”实现了从数据构建到模型优化的闭环。
 
@@ -125,7 +129,7 @@ AToM 的创新目前受限于以下边界条件，需在实际应用中审慎评
 - **商业 API 依赖**：框架依赖闭源的 GPT-4V API，存在成本、可复现性和访问稳定性的问题，如何实现完全开源的训练流程仍是开放问题。
 - **细粒度维度的覆盖范围**：当前仅聚焦三个事件级维度，未涉及运动风格、情感等其他细粒度属性。
 
-## 整体框架
+
 
 AToM 框架由三个顺序衔接的阶段构成，形成一条从数据构建到模型优化的闭环流水线（Figure 2）。
 
@@ -144,7 +148,7 @@ $$\mathbb{E}_{(m_w, m_l, p) \sim D} \left( h_{\pi}(m_w, m_l, p) - \frac{1}{2\bet
 
 **模块间的数据流关系：** 提示构建器 → MotionGPT 动作生成器 → 动作渲染与帧采样器 → GPT-4V 评分器 → 偏好数据构造算法 → LoRA 微调 + IPO RL。整个流水线中，GPT-4Vision 的评分环节是连接数据构建与模型优化的关键瓶颈——其评分质量直接决定了偏好数据的可靠性和最终微调效果的上限。
 
-## 核心模块与公式推导
+
 
 AToM框架由三个顺序衔接的核心模块构成，形成“数据构建→奖励标注→偏好优化”的闭环，其整体流程如Figure 2所示。
 
@@ -196,7 +200,9 @@ $$\mathbb{E}_{(m_w, m_l, p) \sim D} \left( h_{\pi}(m_w, m_l, p) - \frac{1}{2\bet
 - **LoRA微调**：相比全量微调或无微调，LoRA在保持参数效率的同时显著提升检索准确率（top-1从0.128提高到0.199）并大幅降低FID（从2.131降至0.613）（Table 6c）。
 - **IPO vs. DPO**：在相同条件下，IPO损失在FID指标上优于DPO（Figure 5），表明其对偏好分布的建模更适合本任务的优化目标。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -276,7 +282,9 @@ Figure 6探索了帧采样间隔的影响。较短的采样间隔（4帧或8帧�
 ![[assets/figures/papers/paper_list_l2_AToM_Aligning_Text_to_Motion_Model_at_Event_Level_with_GPT_4Vision_Rewar/figures/012_Table_6.jpg]]
 *Table 6: Ablation studies for motion injection methods, score filtering, and LoRA utilization on the test set*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 基线关系与差异化定位
 
@@ -313,6 +321,8 @@ AToM 处于“视觉-语言大模型驱动的生成模型对齐”这一交叉�
 3. **复杂度扩展**：对于包含更多动作事件或更长序列的复杂描述，事件级对齐性能的退化程度如何？需要进一步实验验证。
 4. **开源可行性**：如何进一步降低对闭源大模型 API 的依赖，实现完全开源的训练流程？这是社区推广的重要前提。
 5. **数据公平性**：Pick-a-Move 数据集的确切数据量未见公开，其与 MotionPrefer 的公平对比有待验证。
+
+
 
 ## 原文 PDF
 

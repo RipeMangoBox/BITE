@@ -33,7 +33,7 @@ claims:
 | 中文题名 | FastGHA: 泛化少样本3D高斯头像与实时动画 |
 | 英文题名 | FastGHA: Generalized Few-Shot 3D Gaussian Head Avatars with Real-Time Animation |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=E7VL9Zl1Nc) · [arXiv](https://arxiv.org/abs/2505.00615) |
+| Links | [paper](https://openreview.net/forum?id=E7VL9Zl1Nc) · [paper](https://arxiv.org/abs/2505.00615) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | FastGHA |
 | Dataset | Ava-256, Nersemble |
@@ -42,7 +42,7 @@ claims:
 > - Ava-256 上，PSNR↑ 22.5 (Ours both) vs 20.7 (Avat3r) (+1.8)；SSIM↑ 0.77 (Ours both) vs 0.71 (Avat3r) (+0.06)；LPIPS↓ 0.23 (Ours both) vs 0.33 (Avat3r) (-0.10)。
 > - Nersemble 上，PSNR↑ 24.0 (Ours both) vs 20.8 (GPAvatar) (+3.2)；SSIM↑ 0.81 (Ours both) vs 0.76 (GPAvatar) (+0.05)；LPIPS↓ 0.24 (Ours both) vs 0.30 (GPAvatar) (-0.06)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有前馈式3D高斯头像方法（如Avat3r）将表情参数直接注入交叉注意力模块，导致动画推理速度慢（仅8 FPS）；同时VGGT几何先验以跳跃连接形式直接作为网络输入，引入不准确的几何信息，限制了重建保真度。
 
@@ -52,7 +52,7 @@ claims:
 
 **主要结果**：FastGHA在所有指标上均优于基线方法——在Ava-256数据集上PSNR达22.5（Avat3r为20.7），LPIPS降至0.23（Avat3r为0.33）；在Nersemble数据集上PSNR达24.0（GPAvatar为20.8）。动画速度达62 FPS（4视图输入），较Avat3r的8 FPS提升近8倍。消融实验证实，预训练VAE权重、几何损失、每高斯特征和DINOv3语义编码器均为关键设计要素，移除任一项均导致质量显著下降。
 
-## 背景与动机
+
 
 ### 问题背景：从少样本图像重建可动画的3D头像
 
@@ -79,7 +79,9 @@ claims:
 
 综上，FastGHA的设计动机可以概括为：通过架构解耦和先验重构，在保持高保真重建的同时实现实时动画，解决现有前馈式3D高斯头像方法在效率与精度之间的权衡困境。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FastGHA 的核心创新在于对前馈式 3D 高斯头像重建与动画管线的两个关键环节进行了根本性重构，将此前相互耦合的“表情驱动”与“几何先验利用”解耦为独立、高效的模块。
 
@@ -129,7 +131,7 @@ $$\mathcal{L}_{geo} = ||D_{out} - D_{gt}||_1$$
 
 这三项创新共同构成了 FastGHA 的技术护城河：解耦的表情变形实现实时动画，正则化的几何监督保证重建精度，冻结的预训练特征提供强泛化能力。三者协同使得 FastGHA 在 Ava-256 和 Nersemble 数据集上全面超越 Avat3r 和 GPAvatar 等基线方法（Table 1: PSNR 分别领先 +1.8 dB 和 +3.2 dB）。
 
-## 整体框架
+
 
 FastGHA 采用两阶段流水线：首先从少样本输入图像重建一个不含表情的**规范高斯头像**，随后通过一个轻量级**变形网络**根据表情码驱动动画。其核心设计在于将表情建模与几何监督解耦——表情驱动不再嵌入交叉注意力模块，而是交由一个独立作用于每个高斯点的逐点 MLP；几何先验也不再作为网络输入，而是转化为训练时的正则化损失。
 
@@ -176,7 +178,7 @@ $$I = \mathcal{R}(\mathcal{G}_f^c + \delta_{\mathbf{z}}, \mu)$$
 
 整个流水线端到端训练，总损失为 RGB L1、SSIM、VGG 感知损失、轮廓损失和几何损失的加权和。训练在 4 块 H800 GPU 上约需 4 天（400k 步）。推理时，重建阶段耗时不到 1 秒；动画阶段，变形 MLP 的轻量设计使得 4 视图输入下可达 **62 FPS**，而 Avat3r 仅 8 FPS（Table 2），实现了真正的实时动画。
 
-## 核心模块与公式推导
+
 
 FastGHA 的整体流程可分解为四个关键模块：多视图特征提取、规范高斯重建、轻量级变形MLP与可微渲染。以下逐一阐述其设计逻辑与核心公式。
 
@@ -245,7 +247,9 @@ $$\mathcal{L} = \mathcal{L}_{RGB} + \lambda_{SSIM}\mathcal{L}_{SSIM} + \lambda_{
 
 ![[assets/figures/papers/paper_list_l80_https_openreview_net_forum_id_E7VL9Zl1Nc/figures/009_Figure.jpg]]
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -308,7 +312,9 @@ Figure 5和Table 2揭示了输入视图数量对性能的影响规律。由于Fa
 ![[assets/figures/papers/paper_list_l80_https_openreview_net_forum_id_E7VL9Zl1Nc/figures/017_Figure_10.jpg]]
 *Figure 10: Qualitative comparison with one-shot methods*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与前馈式3D高斯头像重建的谱系关系
 
@@ -363,6 +369,8 @@ FastGHA 的适用边界由以下因素界定：
 - **极端条件下的泛化**：在极端视角和极端表情下的动画质量提升，可能需要更丰富的训练数据增强策略或更具表达能力的变形网络设计。
 
 - **与优化式方法的融合**：当前方法完全依赖前馈推理，若能结合轻量级的测试时优化（如在推理时对几何损失进行少量迭代），可能进一步提升重建精度而不显著牺牲速度。
+
+
 
 ## 原文 PDF
 

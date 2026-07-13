@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2026
 pdf_ref: paperPDFs/arXiv_2026/ShotVerse_Advancing_Cinematic_Camera_Control_for_Text_Driven_Multi_Shot_Video_Creation.pdf
+project_link: null
+code_link: https://github.com/LAION-AI/aesthetic-predictor
 aliases:
 - ShotVerse
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | ShotVerse：推进文本驱动的多镜头视频创作中的电影镜头控制 |
 | 英文题名 | ShotVerse: Advancing Cinematic Camera Control for Text-Driven Multi-Shot Video Creation |
 | 会议/期刊 | arXiv 2026 |
-| Links | [paper](https://arxiv.org/abs/2603.11421) · [arXiv](https://arxiv.org/) · [Code](https://github.com/LAION-AI/aesthetic-predictor) |
+| Links | [paper](https://arxiv.org/abs/2603.11421) · [paper](https://arxiv.org/) · [Code](https://github.com/LAION-AI/aesthetic-predictor) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | ShotVerse |
 | Dataset | ShotVerse-Bench |
@@ -40,7 +42,7 @@ claims:
 > - ShotVerse-Bench (Track B) 上，Trans. Error↓ 0.0163 vs 0.0589 (ReCamMaster) (-0.0426)；Rotation Error↓ 0.73 vs 1.12 (ReCamMaster) (-0.39)；CAS↑ 0.500 vs 0.408 (ReCamMaster) (+0.092)。
 > - ShotVerse-Bench (Track C) 上，Aesthetic Quality↑ 5.465 vs 4.981 (HoloCine) (+0.484)。
 
-## 概述
+## 概要
 
 文本驱动的视频生成模型近年来取得了显著进展，但在电影级多镜头创作中仍面临一个根本性瓶颈：**缺乏精确的相机控制**。现有方法要么依赖隐式文本提示来描述镜头运动，难以传达复杂的电影语言（如“环绕拍摄后快速推近”）；要么要求用户手工绘制显式轨迹，成本高昂且往往超出模型的能力范围，导致生成失败。这一困境的根源在于，文本、轨迹与视频三者之间缺乏对齐的联合建模——文本无法可靠地转化为轨迹，轨迹也无法被忠实地执行。
 
@@ -52,7 +54,7 @@ ShotVerse 针对上述瓶颈提出了 **“先规划后控制”（Plan-then-Con
 
 值得注意的是，ShotVerse 在以下方面仍存在局限：高密度人群动态场景的建模、长序列中重复视角的像素级场景持久性，以及向多场景、无限长度生成的能力拓展。这些方向构成了未来工作的开放挑战。
 
-## 背景与动机
+
 
 文本驱动的视频生成近年来取得了显著进展，以 Sora、VEO 等为代表的闭源模型和一系列开源工作，已能根据自然语言描述生成高质量的视频内容。然而，当创作场景从单镜头短视频扩展到多镜头的电影级叙事时，一个关键瓶颈逐渐凸显：**现有模型缺乏对相机运动的精确控制能力**。
 
@@ -64,7 +66,9 @@ ShotVerse 针对上述瓶颈提出了 **“先规划后控制”（Plan-then-Con
 
 ShotVerse 正是在这一背景下提出的。其核心洞察是：如果将任务解耦为“先规划后控制”（Plan-then-Control）的范式，并构建对齐的 (Caption, Trajectory, Video) 三元组数据集作为基础，就可以利用预训练视觉语言模型（VLM）的空间先验，自动从文本生成电影级轨迹，再由独立的生成器忠实执行这些轨迹。这一思路将相机控制从“手工设计或隐式猜测”转变为“自动规划与精确执行”的工程化流程，为文本驱动的多镜头电影创作开辟了新的技术路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ShotVerse 的核心创新在于将多镜头相机控制任务解耦为“先规划后控制”的范式，并通过三个关键的技术槽位变更，系统性地解决了现有文本驱动视频生成模型在电影级相机控制上的瓶颈。
 
@@ -99,7 +103,7 @@ $$d_h \gets \lfloor d/3 \rfloor, \quad d_w \gets \lfloor d/3 \rfloor, \quad d_{s
 
 三个 changed slots 并非孤立存在，而是形成了递进的协同关系：真实电影数据提供了学习电影镜头语言的基础，4D RoPE 为多镜头结构提供了正确的时空归纳偏置，而规划-控制解耦则使得 VLM 的空间推理能力与扩散模型的生成能力可以各司其职。这种系统性的设计使得 ShotVerse 在 Track B 中实现了最低的平移误差 0.0163 和旋转误差 0.73，以及在 Track A 中 F1-Score 达到 0.422，均显著优于各赛道的最强基线。
 
-## 整体框架
+
 
 ShotVerse 提出“先规划后控制”（Plan-then-Control）范式，将文本驱动的多镜头电影级相机控制解耦为两个协作阶段：**轨迹规划**与**轨迹执行**。这一解耦的核心洞察在于，现有文本驱动视频生成模型之所以难以实现精确的相机控制，根源在于隐式文本提示无法可靠地传达复杂的电影镜头语言，而显式轨迹条件又面临高昂的手工设计成本。ShotVerse 通过构建对齐的 (Caption, Trajectory, Video) 三元组，将问题形式化为两个条件概率的建模：Planner 学习 $P(\text{Trajectory} \mid \text{Caption})$，Controller 学习 $P(\text{Video} \mid \text{Caption}, \text{Trajectory})$。
 
@@ -139,7 +143,7 @@ Planner 与 Controller 之间形成松耦合的协作关系：Planner 的输出�
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2603_11421/figures/001_Figure_1.jpg]]
 *Figure 1: Cinematic, Camera-Controlled, Multi-Shot Video Creation via our ShotVerse Framework. (i) Multi-Shot Data Foundation: We curate ShotVerse-Bench dataset from high-production cinema and propose a novel calibration pipeline that aligns disjoint shot trajectories into a unified global coordinate system. (ii) “Plan-then-Control” Framework: A VLM-based Planner automates the plotting of explicit, unified, cinematic trajectories from prompts, which serve as precise guidance for the Controller to synthesize content. (iii) Superior Performance: Examples demonstrate high-fidelity and great camera-controlled generation across diverse genres. The inset 3D plots visualize the plotted explicit trajectories*
 
-## 核心模块与公式推导
+
 
 ShotVerse 将多镜头相机控制任务解耦为规划与控制两个阶段，核心模块可归纳为四个部分：分层提示构建、Planner 轨迹规划、Controller 轨迹注入、以及 4D RoPE 时空建模。
 
@@ -215,7 +219,9 @@ $$
 
 上述模块形成“先规划后控制”的完整闭环：分层提示构建器将用户意图结构化，Planner 利用 VLM 的空间先验自动生成全局对齐的电影级轨迹，Controller 通过相机编码器和 4D RoPE 精确执行该轨迹。训练时 Planner 与 Controller 独立优化，推理时 Planner 的输出直接作为 Controller 的条件输入，无需人工干预即可完成从文本到多镜头可控视频的端到端生成。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置与评估协议
 
@@ -286,7 +292,9 @@ Table 4 展示了端到端多镜头视频生成质量。ShotVerse 在美学质�
 
 这些局限性指向了未来研究的关键方向：长时间跨度的精确场景持久性、多场景叙事演进与连续相机运动的统一控制，以及显式相机控制与复杂叙事结构（如对话、动作序列）的深度融合。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心范式定位：“先规划后控制”的解耦框架
 
@@ -354,6 +362,8 @@ ShotVerse 的方法有效性建立在 **ShotVerse-Bench** 数据集之上。如�
 2. **多场景无限长度生成**：如何将整体可控性扩展到多场景、无限长度的多镜头生成，同时处理故事线演进与连续相机运动？这需要将当前的单场景框架拓展为场景感知的层次化生成架构。
 
 3. **叙事级导演控制**：如何将显式相机控制与更复杂的叙事结构（如对话、动作序列）深度融合，实现更高层次的导演级创作？这要求将相机控制从纯几何层面提升到语义叙事层面，与角色行为、剧情节奏形成协同。
+
+
 
 ## 原文 PDF
 

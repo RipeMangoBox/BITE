@@ -42,7 +42,7 @@ claims:
 > - OCR Task 上，OCR Reward / Corrected Score 0.8721 / 0.5701 vs FLUX.1: 0.5843 / 0.4486; Flow-GRPO: 0.8714 / 0.5482 (vs. FLUX.1 corrected +0.1215; vs. Flow-GRPO corrected +0.0219)；GPU Training Hours 29.60 vs Flow-GRPO: 149.07; DanceGRPO: 74.67 (2.0× faster than DanceGRPO; 5.0× faster than Flow-GRPO)。
 > - GenEval Task 上，GenEval Reward / Corrected Score 0.8517 / 0.5148 vs FLUX.1: 0.6178 / 0.4646; Flow-GRPO: 0.8520 / 0.4757 (vs. FLUX.1 corrected +0.0502; vs. Flow-GRPO corrected +0.0391)；GPU Training Hours 68.4 vs Flow-GRPO: 340.00; DanceGRPO: 294.53 (3.7× faster than Flow-GRPO)。
 
-## 概述
+## 概要
 
 扩散模型的后训练对齐是实现高质量、高可控文本到图像生成的关键环节。当前主流方法——如基于在线强化学习的Flow‑GRPO和DanceGRPO——在应用于**rectified flow扩散模型**（如FLUX.1）时，面临三个相互交织的瓶颈：**训练效率低下**（每一步优化都需要完整的在线采样链，图像生成耗时主导训练）、**采样器依赖**（rectified flow是确定性模型，必须通过ODE‑to‑SDE近似引入随机性，由此产生分布外问题）、以及严重的**奖励黑客**现象（优化虽提高了奖励分数，却导致生成质量、细节和图文对齐显著退化）。
 
@@ -52,7 +52,7 @@ claims:
 
 在方法谱系上，GDRO位于**离线奖励后训练**与**扩散模型偏好对齐**的交汇点：它继承了DPO的隐式奖励框架，但通过引入组级排名损失和显式奖励软目标，将适用范围从成对偏好拓展到任意大小的图像组，并实现了对rectified flow模型的采样器无关支持。
 
-## 背景与动机
+
 
 扩散模型在后训练阶段引入奖励对齐已成为提升文本到图像生成质量的关键路径。当前主流方案——在线强化学习微调（如 **Flow-GRPO**、**DanceGRPO** 等）——在通用扩散模型上取得了一定成效，但当将其应用于 **rectified flow 扩散模型**（如 **FLUX.1**，Black-Forest-Labs, 2024）时，暴露出三个相互关联的瓶颈。
 
@@ -66,7 +66,9 @@ claims:
 
 **GDRO** 的提出正是为了回答这一问题。其核心动机是利用隐式奖励函数（implicit reward function）在任意扩散时间步可离线计算的特性，将组级显式奖励转化为基于 Plackett–Luce 排名模型的交叉熵损失，从而完全绕过对在线采样和随机性的需求。这一思路将奖励对齐从“在线采样-奖励评估-策略更新”的闭环中解放出来，转变为纯粹的离线排名优化问题，为 rectified flow 扩散模型提供了一种高效、稳定且抗奖励黑客的后训练范式。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 从在线强化学习到离线排名对齐：范式转换
 
@@ -94,7 +96,7 @@ GDRO通过两个协同机制有效抑制奖励黑客：
 
 由于GDRO完全离线，其训练时间由预生成图像组的数量和质量决定，而非在线采样步数。在OCR任务上，GDRO仅需29.60 GPU小时即可达到0.5701的修正分数，而Flow-GRPO需要149.07 GPU小时（5倍差距）；在GenEval任务上，GDRO以68.4 GPU小时超越Flow-GRPO的340.00 GPU小时（3.7倍差距）。这一效率优势源于GDRO避免了扩散模型前向采样这一最耗时的环节，将计算资源集中于损失函数的优化本身。
 
-## 整体框架
+
 
 GDRO 的整体设计围绕一个核心原则展开：**将组级显式奖励对齐转化为完全离线的排名导向交叉熵优化，从而彻底绕过在线采样与随机性依赖**。其 pipeline 由五个顺序模块构成，输入为预生成的同提示图像组及其显式奖励，输出为更新后的扩散模型参数。
 
@@ -159,7 +161,7 @@ GDRO 的 pipeline 体现了三个关键设计决策，直接回应了现有方�
 ![[assets/figures/papers/paper_list_l2680_https_arxiv_org_abs_2601_02036/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of our method. Given a pre-generated image group synthesized from the same prompt and their corresponding explicit rewards, we perturb the images with noise on different time steps, feed them to the diffusion model to predict the velocity, and calculate the implicit rewards accordingly to get the final loss*
 
-## 核心模块与公式推导
+
 
 ### 3.1 隐式奖励函数的理论构造
 
@@ -256,7 +258,9 @@ $$
 ![[assets/figures/papers/paper_list_l2680_https_arxiv_org_abs_2601_02036/figures/003_Figure_3.jpg]]
 *Figure 3: Reward misalignment and hacking. The first row shows the reward misalignment scenario. The second row shows two reward hacking cases*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置与评价设计
 
@@ -334,7 +338,9 @@ Table 3汇总了各方法在OCR和GenEval任务上的核心指标。
 ![[assets/figures/papers/paper_list_l2680_https_arxiv_org_abs_2601_02036/figures/015_Figure.jpg]]
 *Figure: FLUX.1(0.58) Flow-GRPO (0.85) Ours (0.85) Figure xii. More visualizations on GenEval. We provide more comparisons between our method and Flow-GRPO when the evaluation reward is the same on the GenEval task*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -367,6 +373,8 @@ GDRO 的提出为扩散模型奖励后训练开辟了若干值得探索的方向
 3. **跨生成式架构的泛化。** GDRO 的核心机制——通过隐式奖励函数将组级显式奖励转化为排名导向的交叉熵目标——在理论上不限于扩散模型。这一框架是否可扩展至自回归视觉生成模型（如基于 next-token prediction 的图像生成器）或其他生成式架构，是一个值得验证的开放问题。关键在于隐式奖励函数在这些架构中是否仍具有可计算的近似形式。
 
 4. **组大小与奖励多样性的关系。** 消融实验表明组大小 $k=6$ 在 OCR 任务上获得最优表现（Figure 6），但这一结论是否依赖于奖励函数的具体特性？当奖励信号稀疏或存在多个局部最优时，更大的组是否必然带来更好的排名对齐？对组大小与奖励分布特性之间关系的理论分析可能指导自适应组大小策略的设计。
+
+
 
 ## 原文 PDF
 

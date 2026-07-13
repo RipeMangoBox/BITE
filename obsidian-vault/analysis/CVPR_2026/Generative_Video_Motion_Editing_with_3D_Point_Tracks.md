@@ -44,7 +44,7 @@ claims:
 > - DyCheck (joint camera & object motion) 上，PSNR↑ / SSIM↑ / LPIPS↓ (full-frame) 14.80 /.424 /.406 vs TrajAttn +*: 13.94 /.416 /.549 (+0.86 / +.008 / -.143)；mPSNR↑ / mSSIM↑ / mLPIPS↓ (masked) 15.99 /.747 /.247 vs TrajAttn +*: 14.94 /.741 /.351 (+1.05 / +.006 / -.104)。
 > - In-the-wild (MiraData) 上，PSNR↑ / SSIM↑ / LPIPS↓ 19.55 /.657 /.236 vs ATI: 19.07 /.635 /.244 (+0.48 / +.022 / -.008)；FVD↓ / EPE↓ (track control error) 306.44 / 6.12 vs ATI: 268.80 / 11.44 (+37.64 / -5.32)。
 
-## 概述
+## 概要
 
 视频运动编辑的核心挑战在于，如何同时精确控制摄像机运动和场景中物体的独立运动，同时保持原始场景的完整视觉上下文。现有方法在此问题上存在根本性局限：图像到视频（I2V）方法仅以单帧图像为条件，丢失了全场景的空间与外观信息；视频到视频（V2V）方法虽保留源视频，但通常只能处理摄像机视角变化或简单物体位移，缺乏3D感知能力，无法正确处理遮挡和与运动相关的次生效应（如阴影、飞溅等）。
 
@@ -56,8 +56,6 @@ claims:
 
 **方法定位**：Edit-by-Track属于视频到视频（V2V）编辑范式，但区别于现有V2V方法仅做修复式生成，它通过3D轨迹条件实现了对摄像机与物体运动的联合、精确控制。在知识谱系上，它桥接了3D视觉（点轨迹估计、深度感知）与视频生成（扩散模型、交叉注意力条件注入）两个领域，为可控视频编辑提供了新的方法论基础。
 
-## 背景与动机
-
 视频运动编辑旨在对已拍摄视频中的运动进行精确修改，包括摄像机视角变化和场景中物体的运动。这一任务在电影制作、增强现实和内容创作等领域具有广泛的应用需求。然而，实现联合控制摄像机运动和物体运动的高质量编辑，仍然是当前生成式视频编辑领域面临的核心挑战。
 
 现有方法在处理运动编辑时存在两个主要范式，但各自存在根本性局限。**图像到视频（I2V）方法**（如 **TrajAttn** (Xiao et al., ICLR 2025)、**ATI** (Wang et al., arXiv 2025) 等）仅以单帧图像作为条件输入，通过点轨迹或光流等运动信号驱动视频生成。这类方法虽然能够实现一定程度的运动控制，但由于丢失了源视频中除第一帧外的全部场景上下文，无法保留原始场景的完整视觉信息，导致生成结果在场景一致性、遮挡处理和时序连贯性方面存在明显不足。
@@ -68,7 +66,7 @@ claims:
 
 针对上述问题，本文提出 **Edit-by-Track**——一种基于三维点轨迹的生成式视频运动编辑框架。该框架以视频到视频（V2V）为基本范式，将完整的源视频与配对的三维点轨迹作为条件输入，通过可学习的跨注意力机制自适应地从源视频采样视觉上下文，并泼溅（splat）到目标帧空间，从而实现精确的联合运动编辑。三维点轨迹的核心优势在于提供显式的深度线索，使模型能够隐式推理可见性与遮挡关系，从而在编辑过程中保持正确的深度顺序和场景一致性。
 
-## 核心创新
+## 核心方法与创新机理
 
 Edit-by-Track 的核心创新在于将 **3D 点轨迹作为统一的运动表示**，并设计了一个可学习的 **3D 轨迹条件器**，通过交叉注意力机制实现从源视频到目标帧空间的自适应上下文采样与泼溅。相较于现有方法，这一设计在三个关键维度上实现了结构性突破。
 
@@ -110,8 +108,6 @@ Edit-by-Track 采用 **两阶段训练策略**（Figure 5）：
 2. **第二阶段**：在真实单目视频的非连续片段对上微调，利用自然运动模拟联合相机和物体运动变化，增强对真实视频的泛化能力。
 
 消融实验（Table 4）证实，两阶段训练在所有指标上均优于仅用合成数据、仅用真实数据或混合训练一阶段的方案，验证了“合成数据学习基本控制 + 真实数据增强泛化性”策略的有效性。
-
-## 整体框架
 
 Edit-by-Track 的整体 pipeline 围绕一个核心洞察构建：**3D 点轨迹是统一描述摄像机运动和物体运动的理想中间表示**。现有方法要么仅以单帧图像为条件（I2V），丢失全场景上下文；要么仅对摄像机视角变化或简单物体位移进行修复（V2V），无法处理深度顺序与遮挡。本框架以完整源视频和配对的源-目标 3D 轨迹对作为条件，通过可学习的跨注意力机制将 3D 轨迹自适应编码为 2D 屏幕对齐的 token，实现联合运动编辑。
 
@@ -159,8 +155,6 @@ $$\tau_{\{src,tgt\}} = \mathrm{Attn}\left(\mathcal{G}, \rho_{\{src,tgt\}}^{xyz},
 ![[assets/figures/papers/paper_list_l8_https_openaccess_thecvf_com_content_CVPR2026_html_Lee_Generative_Video_M/figures/003_Figure_3.jpg]]
 *Figure 3: Edit-by-Track framework. Given a video*
 
-## 核心模块与公式推导
-
 Edit-by-Track 的核心运动控制由 **3D 轨迹条件器（3D Track Conditioner）** 实现，其设计目标是：以源视频的完整视觉上下文为素材库，通过三维点轨迹建立稀疏对应关系，自适应地采样并泼溅（splat）上下文信息到目标帧空间，同时注入深度线索以实现 3D 感知的遮挡推理。
 
 ### 3D 轨迹投影与深度注入
@@ -205,7 +199,7 @@ $$
 ![[assets/figures/papers/paper_list_l8_https_openaccess_thecvf_com_content_CVPR2026_html_Lee_Generative_Video_M/figures/005_Figure_5.jpg]]
 *Figure 5: Training data. (a) Our model is first fine-tuned on the synthetic data with ground-truth point tracks to learn motion control. Each video pair shares the same objects and background scenes but differs in object actions and camera motions. (b) We continue fine-tuning on real data by sampling two non-contiguous clips from a monocular video, leveraging its natural motion to scalably simulate joint camera and object motion changes*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -278,13 +272,10 @@ Table 4对比了不同训练方案的效果。完整的两阶段策略（合成�
 ![[assets/figures/papers/paper_list_l8_https_openaccess_thecvf_com_content_CVPR2026_html_Lee_Generative_Video_M/figures/011_Figure_9.jpg]]
 *Figure 9: Visual comparisons on video editing. We edit a DAVIS [82] video with a 3D object rotation, using the target motion-warped as reference. I2V methods [28, 101] lose context outside of the input first frame (corner insets). GEN3C [86] inputs the warped video but fails to correct the shadow of the edited object (red arrow). See SM for additional in-the-wild results*
 
-![[assets/figures/papers/paper_list_l8_https_openaccess_thecvf_com_content_CVPR2026_html_Lee_Generative_Video_M/figures/007_Figure_7.jpg]]
-*Figure 7: Additional applications. Our model leverages flexibly manipulated 3D tracks for diverse editing tasks. (a) We achieve complex multi-dancer synchronization by transferring human poses via SMPL-X [81]. The point tracks also enables (b) shape deformation for general objects, while (c) object removal and (d) duplication are accomplished by moving tracks off-screen or repeating them, respectively*
-
 ![[assets/figures/papers/paper_list_l8_https_openaccess_thecvf_com_content_CVPR2026_html_Lee_Generative_Video_M/figures/008_Figure_8.jpg]]
 *Figure 8: Handling partial tracks. By specifying only the body motion (moving right) via a bounding box and removing leg tracks, our model synthesizes correct leg motion without explicit controls on the legs. Background tracks are hidden for clarity*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 与现有工作的关系
 

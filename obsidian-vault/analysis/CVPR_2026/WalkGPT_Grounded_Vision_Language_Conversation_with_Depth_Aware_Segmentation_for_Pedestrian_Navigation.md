@@ -42,7 +42,7 @@ claims:
 > - PAVE (Depth) 上，Depth Accuracy 48.95 (13B) vs OMG-LLaVA-FT: 39.02 (+9.93 (+25.5%))。
 > - RefCOCO val 上，RES @0.5IoU 76.2 vs LISA: 74.1 (+2.1)。
 
-## 概述
+## 概要
 
 行人导航对话系统要求模型在理解场景语义的同时，具备**像素级接地**和**空间深度推理**能力——不仅要识别“前方有什么”，还要回答“它离我多远、是否构成障碍”。现有视觉-语言大模型（LVLMs）尽管在通用对话上表现优异，却普遍缺乏这两项能力：它们生成的描述无法精确锚定到图像区域，且难以提供可靠的距离信息，导致**对象幻觉**和**空间误判**，无法满足视障人士或复杂户外环境下的安全导航需求。
 
@@ -59,7 +59,7 @@ claims:
 
 **主要局限**：深度估计目前仅为物体级文本描述，缺乏像素级深度图，绝对相对误差仍较高（AbsRel ~70%）；模型对透明物体（围栏）和强反射表面（建筑玻璃）容易产生误判；泛化性仅在 PAVE 数据集上验证，对光照、天气等变化的鲁棒性尚不明确。
 
-## 背景与动机
+
 
 视觉-语言模型（Vision-Language Models, VLMs）近年来在图像描述、视觉问答等任务上取得了显著进展。然而，当面向行人导航这一安全关键场景时，现有模型暴露出根本性缺陷：**缺乏像素级接地能力与深度空间推理**。具体而言，主流的大视觉-语言模型（Large Vision-Language Models, LVLMs）仅能在图像级生成描述性文本，无法将语言输出精确绑定到图像中的具体区域，更无法提供物体距离等三维空间信息。这导致两类严重问题——**对象幻觉**（模型提及不存在的物体或错误描述物体属性）和**不可靠的空间理解**（无法判断障碍物的实际距离与可通行性），使得此类模型在行人导航、无障碍辅助等场景中不具备实用安全性。
 
@@ -67,7 +67,9 @@ claims:
 
 上述缺口直接催生了本文的核心动机：**构建一个能在统一自回归框架内同时完成接地对话、分割掩码预测和物体级深度估计的像素接地LVLM**。这一目标要求模型满足三个关键条件：（1）视觉编码器能够为语言生成和掩码预测提供共享的多尺度特征；（2）文本到视觉的映射必须保持语义一致性，确保 `<SEG>` 令牌能准确定位目标区域；（3）深度信息需以结构化令牌（如 `<distance>`）的形式嵌入语言生成过程，无需额外的密集深度监督。WalkGPT正是围绕这些条件设计，通过 **Multi-Scale Query Projector (MSQP)** 聚合多层级视觉特征、**Calibrated Text Projector (CTP)** 结合区域对齐损失实现精确的语言-视觉映射，以及结构化令牌体系连接分割、深度与语言推理，从而填补了现有LVLM在深度感知接地导航上的空白。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 WalkGPT 的核心创新在于将**像素级接地、物体级深度估计与视觉-语言对话**统一到一个自回归生成框架中，解决了现有 LVLM 在行人导航场景中缺乏空间理解与深度推理的根本瓶颈。其关键创新点体现在以下三个 changed slots 上：
 
@@ -105,7 +107,7 @@ $$\mathcal{L}_{\mathrm{total}} = \alpha_1 \mathcal{L}_{\mathrm{CE}} + \alpha_2 \
 
 其中 $\mathcal{L}_{\mathrm{CE}}$ 为自回归语言生成交叉熵损失，$\mathcal{L}_{\mathrm{seg}}$ 为分割损失（Dice + BCE），$\mathcal{L}_{\mathrm{NCE}}$ 为区域对齐对比损失。这种设计使对话生成、像素接地和深度推理在单一自回归过程中相互增强，无需用户提供额外输入即可输出深度感知的接地导航指导。
 
-## 整体框架
+
 
 WalkGPT 的整体架构围绕“统一像素编码器 + 多尺度视觉聚合 + 校准文本投影 + 结构化令牌生成”这一核心设计展开，将语言对话、分割掩码预测和物体级深度估计整合进单一的自回归生成框架。
 
@@ -139,7 +141,7 @@ $$\mathcal{L}_{\mathrm{total}} = \alpha_1 \mathcal{L}_{\mathrm{CE}} + \alpha_2 \
 ![[assets/figures/papers/paper_list_l2184_https_arxiv_org_abs_2603_10703/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of WalkGPT for grounded navigation guidance. (a) Overall framework. (b) The Multi-Scale Query Projector (MSQP), which aggregates multi-level visual features into spatially aligned image tokens for language reasoning. (c) The Calibrated Text Projector (CTP), guided by the proposed Region Alignment Loss, maps \<SEG> tokens into the visual space. Structured tokens (\<SEG>, \<distance>, \<assessment>, \<p>) link language generation with segmentation and depth reasoning*
 
-## 核心模块与公式推导
+
 
 WalkGPT 的核心架构围绕三个关键设计展开：**多尺度查询投影器（MSQP）** 实现跨尺度视觉特征聚合、**校准文本投影器（CTP）** 配合区域对齐损失实现精确的语言-视觉接地、以及**结构化令牌**将分割与深度推理统一到自回归生成过程中。
 
@@ -196,7 +198,9 @@ $\mathcal{L}_{\mathrm{seg}}$ 为分割损失，组合 Dice 损失与二元交叉
 
 消融实验（Table 5）表明：移除 `<distance>` 令牌主要损害深度预测（Depth Acc. −10.18），但对分割影响极小（mIoU 仅降 0.15）；冻结 LLM（移除 LoRA）导致所有指标骤降（METEOR −7.81，mIoU −2.36，Depth Acc. −8.74），验证了多模态微调对于接地导航任务的必要性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 4.1 实验设置
 
@@ -282,7 +286,9 @@ Figure 4展示了PAVE验证集上的定性输出。WalkGPT能够从单张行人�
 ![[assets/figures/papers/paper_list_l2184_https_arxiv_org_abs_2603_10703/figures/014_Figure_9.jpg]]
 *Figure 9: Per-class sample occurrence counts across all semantic categories (including background class 0). The x-axis denotes class IDs and the y-axis indicates the number of samples containing each class*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位与基线关系
 
@@ -324,6 +330,8 @@ WalkGPT 与上述基线的本质差异在于三个技术槽位：
 3. **鲁棒性扩展**：如何通过数据增强（合成反射、透明物体、极端光照）或物理感知预训练，提升模型对透明围栏、镜面反射、低光照等 adversarial 条件的鲁棒性？
 
 4. **安全关键类精度**：针对 stairs、obstacle 等低频但高风险类别，是否需要重采样、焦点损失或类特定评估协议来确保导航指导的安全性？
+
+
 
 ## 原文 PDF
 

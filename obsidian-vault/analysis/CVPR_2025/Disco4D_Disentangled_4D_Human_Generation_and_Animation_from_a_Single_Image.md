@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/Disco4D_Disentangled_4D_Human_Generation_and_Animation_from_a_Single_Image.pdf
+project_link: https://disco-4d.github.io/
+code_link: null
 aliases:
 - Disco4D
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | Disco4D: 从单张图像解耦4D人体生成与动画 |
 | 英文题名 | Disco4D: Disentangled 4D Human Generation and Animation from a Single Image |
 | 会议/期刊 | CVPR 2025 |
-| Links | [paper](https://arxiv.org/abs/2409.17280); [Project](https://disco-4d.github.io/) |
+| Links | [paper](https://arxiv.org/abs/2409.17280) · [Project](https://disco-4d.github.io/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Disco4D |
 | Dataset | SynBody (3D generation), CloSe (3D generation, Novel Pose), 4D-Dress (4D animation) |
@@ -40,7 +42,7 @@ claims:
 > - SynBody (3D generation) 上，PSNR (Novel View) ↑ 为 15.691，对比 13.118 (DreamGaussian)，变化 +2.573。
 > - CloSe (3D generation, Novel Pose) 上，PSNR ↑ 为 17.96，对比 15.54 (SHERF)，变化 +2.42。
 
-## 概述
+## 概要
 
 从单张二维图像重建可动画的三维数字人，是虚拟试穿、数字人定制与影视游戏等应用的核心需求。然而，现有方法普遍将人体与衣物融合为单一表面或隐式场，导致重建结果无法独立编辑衣物、更换服饰或进行物理准确的动画驱动。这一瓶颈源于表示层面的根本性耦合——身体与衣物的几何、外观被绑定在同一个不可分割的表示中。
 
@@ -50,7 +52,7 @@ Disco4D 针对这一瓶颈提出了结构化解耦方案。其核心思路是：
 
 该方法也存在若干已知局限：SMPL-X 估计在挑战性姿态下不够鲁棒；视觉外壳初始化依赖多视图扩散模型，侧面与背面视角存在不准确风险；服装类别解耦受限于二维分割模型精度，可能发生误分类；当前仅支持单层服装，无法处理多层叠加与遮挡场景。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -70,7 +72,9 @@ Disco4D 针对这一瓶颈提出了结构化解耦方案。其核心思路是：
 
 Disco4D 的动机正是填补上述空白：**构建一个从单张图像出发，能够解耦身体与衣物、支持 4D 动画和编辑的人体生成框架**。其核心思路是将人体基础模型 SMPL-X 转化为固定的高斯表示，并在其外部拟合可分离的衣物高斯，同时为每个衣物高斯引入可学习的身份编码（Identity Encoding），从而在训练中对身体与衣物进行结构化解耦。这一设计使得身体由 SMPL-X 姿态直接驱动，衣物则结合重姿态变换与学习到的形变网络分开控制，为后续的独立编辑和物理合理动画奠定基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Disco4D 的核心创新在于将人体与衣物从表示层面进行**结构化解耦**，从而在单张图像输入下同时实现高质量的 3D/4D 生成、独立编辑与可动画化。这一解耦设计围绕以下关键机制展开：
 
@@ -106,7 +110,7 @@ Disco4D 的核心创新在于将人体与衣物从表示层面进行**结构化�
 | 衣物初始化 | 随机或 SMPL-X 表面初始化 | 视频扩散模型 + GRM 生成视觉外壳初始化 |
 | 4D 动画 | 单一形变场驱动所有高斯 | 身体姿态直驱 + 衣物重姿态 + 学习形变网络 |
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2409_17280/figures/001_Figure_1.jpg]]
 *Figure 1: Disco4D is a novel Gaussian Splatting framework for 4D disentangled human generation, animation and editing from a single image*
@@ -150,7 +154,7 @@ $$\mathcal{L} = \mathcal{L}_{ori} + \mathcal{L}_{id} + \mathcal{L}_{ani} + \math
 - **中间表示**：固定的 SMPL-X 身体高斯 + 嵌入网格的衣物高斯（各高斯携带身份编码）
 - **输出**：可分层的 3D 高斯化身（支持独立编辑）；或按时间序列渲染的 4D 动画帧
 
-## 核心模块与公式推导
+
 
 ### 3.1 基础表示：3D高斯与SMPL-X
 
@@ -206,7 +210,9 @@ $$S'' = \phi(S', t)$$
 
 其中 $S'$ 为重姿态后的衣物高斯空间描述。形变网络初始化为预测零形变，避免动态与静态模型之间的发散。这种“重姿态+学习形变”的组合使衣物既能跟随身体运动，又能表现其材质特有的动态行为（如裙摆飘动）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -273,7 +279,9 @@ Disco4D 的失败案例（Figure 9）可归纳为三类：
 ![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2409_17280/figures/003_Table_2.jpg]]
 *Table 2: Overview of 4D generation methods from video*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位与核心瓶颈
 
@@ -337,6 +345,8 @@ Disco4D 的性能受限于多个上游模块的精度：
 4. **身份编码泛化**：能否利用更先进的分割基础模型或弱监督策略提升身份编码的准确性与泛化能力？当前对 2D 分割模型的强依赖限制了在开放场景中的适用性。
 
 5. **多人场景推广**：Disco4D 的解耦表示是否可以推广至多人场景或交互式动画任务？这涉及多人空间关系的建模和遮挡处理。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/EasyTune_Efficient_Step_Aware_Fine_Tuning_for_Diffusion_Based_Motion_Generation.pdf
+project_link: null
+code_link: https://github.com/black-forest-labs/flux
 aliases:
 - EasyTune
 tags:
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | EasyTune：面向扩散运动生成的高效分步感知微调 |
 | 英文题名 | EasyTune: Efficient Step-Aware Fine-Tuning for Diffusion-Based Motion Generation |
 | 会议/期刊 | ICLR 2026 |
-| Links | [Code](https://github.com/black-forest-labs/flux) · [arXiv](https://arxiv.org/abs/2511.18927) · [paper](https://arxiv.org/abs/2602.07967) |
+| Links | [Code](https://github.com/black-forest-labs/flux) · [paper](https://arxiv.org/abs/2511.18927) · [paper](https://arxiv.org/abs/2602.07967) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction #topic/generative_models_diffusion |
 | Method | EasyTune |
 | Dataset | HumanML3D |
@@ -39,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - HumanML3D 上，FID 0.132 vs 0.473 (MLD) (-72.1%)；MM-Dist 2.637 vs 3.196 (MLD) (-17.5%)；Memory (GB) 22.10 vs ~70.91 (DRaFT-50) (31.16% of DRaFT)。
 
-## 概述
+## 概要
 
 扩散模型在文本到运动生成任务中展现出强大能力，但将预训练模型适配到特定偏好或质量指标仍面临瓶颈。现有基于可微奖励的微调方法（如 **DRaFT** (Clark et al., 2024)、**AlignProp** (Prabhudesai et al., 2023)、**DRTune** (Wu et al., 2025)）在完整去噪轨迹上反向传播奖励梯度，导致三个根本性问题：**递归梯度依赖**使早期步骤梯度系数消失（Corollary 1, Eq.(5)），造成稀疏粗粒度优化；**内存复杂度随去噪步数线性增长**（O(T)）；**训练效率低下**。基于强化学习的替代方案（如 **DDPO** (Black et al., 2023)）则面临高方差和收敛缓慢的挑战。
 
@@ -59,8 +61,6 @@ claims:
 - 内存开销仅 **22.10 GB**，相较 DRaFT-50 降低约 69%。
 
 EasyTune 在六个预训练扩散模型上均展现一致的性能增益，验证了其方法层面的泛化性。当前局限主要在于奖励模型侧重语义对齐而缺乏物理合理性显式评估，存在奖励黑客风险；SPL 依赖预训练检索模型质量；实验验证目前限于文本到运动生成任务。
-
-## 背景与动机
 
 ### 任务背景：文本到运动生成与扩散模型
 
@@ -118,7 +118,7 @@ $$
 
 EasyTune 进一步指出，现有可微奖励微调方法所使用的奖励模型（通常为预训练的文本-运动检索模型）存在两个不足：一是无法有效评估中间噪声运动的语义对齐程度；二是缺乏对物理合理性的显式建模，可能导致“奖励黑客”（Reward Hacking）——模型生成语义对齐但物理上不合理的运动。为此，EasyTune 引入了自精炼偏好学习（Self-refinement Preference Learning, SPL）机制来改进奖励模型，这部分将在方法章节详述。
 
-## 核心创新
+## 核心方法与创新机理
 
 EasyTune 的核心创新在于**将扩散模型的微调从轨迹级优化转变为步骤级优化**，通过解耦去噪过程中的递归梯度依赖，从根本上解决了现有可微奖励微调方法的三个关键瓶颈。
 
@@ -167,8 +167,6 @@ EasyTune 的步骤感知框架自然支持对不同去噪步骤施加不同权�
 | 奖励模型 | 预训练检索模型，无偏好微调 | SPL 在挖掘偏好对上微调 |
 | 更新粒度 | 稀疏粗粒度（早期步骤梯度消失） | 稠密细粒度（每步独立优化） |
 
-## 整体框架
-
 EasyTune 的整体 pipeline 围绕两个核心模块构建：**分步感知微调（Step-Aware Fine-Tuning）** 和 **自精炼偏好学习（Self-Refinement Preference Learning, SPL）**。前者解决现有可微奖励微调方法中梯度递归依赖导致的内存爆炸与粗粒度优化问题，后者为分步优化提供无需人工标注的噪声感知奖励模型。
 
 ### 框架总览
@@ -211,11 +209,6 @@ Pipeline 由以下模块串联构成：
 
 ![[assets/figures/papers/paper_list_l1905_EasyTune_Efficient_Step_Aware_Fine_Tuning_for_Diffusion_Based_Motion_Gen/figures/002_Figure_2.jpg]]
 *Figure 2: The framework of existing differentiable reward-based methods (left) and our proposed EasyTune (right). Existing methods backpropagate the gradients of the reward model through the overall denoising process, resulting in (1) excessive memory, (2) inefficient, and (3) coarse-grained optimization. In contrast, EasyTune optimizes the diffusion model by directly backpropagating the gradients at each denoising step, overcoming these issues*
-
-![[assets/figures/papers/paper_list_l1905_EasyTune_Efficient_Step_Aware_Fine_Tuning_for_Diffusion_Based_Motion_Gen/figures/030_Figure.jpg]]
-*Figure: S9: Illustration of reward hacking in motion generation. Examples demonstrating that over-fitting to reward signals may lead to semantically aligned but physically unrealistic motions. For better visualization, corresponding videos are provided in the supplementary materials*
-
-## 核心模块与公式推导
 
 ### 1. 瓶颈分析：现有可微奖励微调的递归依赖
 
@@ -305,7 +298,7 @@ $$ \mathcal{L}_{\mathrm{SPL}}(\phi) = \mathrm{D}_{\mathrm{KL}}(\mathcal{Q} \para
 ![[assets/figures/papers/paper_list_l1905_EasyTune_Efficient_Step_Aware_Fine_Tuning_for_Diffusion_Based_Motion_Gen/figures/003_Figure_3.jpg]]
 *Figure 3: Gradient norm with respect to denoising steps. Here, dim(·) denotes the gradient dimension. Detailed settings are provided in App. B.1*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主要定量结果
 
@@ -361,7 +354,7 @@ Fig.S5 提供了全面的内存分析，将训练过程分解为模型加载、�
 ![[assets/figures/papers/paper_list_l1905_EasyTune_Efficient_Step_Aware_Fine_Tuning_for_Diffusion_Based_Motion_Gen/figures/018_Table.jpg]]
 *Table: S4: Ablation study on step-level reward reweighting strategies for EasyTune. The baseline is MLD*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 问题定位：扩散模型微调的递归依赖瓶颈
 

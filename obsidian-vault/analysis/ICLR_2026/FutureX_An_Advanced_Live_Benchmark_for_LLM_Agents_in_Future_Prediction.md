@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/FutureX_An_Advanced_Live_Benchmark_for_LLM_Agents_in_Future_Prediction.pdf
+project_link: null
+code_link: null
 openreview_forum_id: z28PLIEj6l
 aliases:
 - FutureX
@@ -41,7 +43,7 @@ claims:
 > - FutureX 困难等级（Level 3 Deep Search, Level 4 Super Agent） 上，准确率/排序得分/数值预测得分 为 推理+搜索类模型（如Grok-4, GPT-o4-mini）表现突出，对比 基础LLM（无搜索能力）和SmolAgent框架，变化 搜索和工具使用能力对复杂任务至关重要，基础LLM在Level 3-4上急剧下降，而具备搜索的模型仍能保持一定性能。。
 > - FutureX 简单等级（Level 1 Basic, Level 2 Wide Search） 上，精确匹配/F1-score 为 DouBao-Seed1.6-Thinking (Base LLM) 表现最佳，对比 配备工具的高级智能体（如深度研究模型），变化 基础LLM在提供选项的任务上可凭借内部知识超越搜索增强模型，说明低层次任务不足以区分高级能力。。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -59,7 +61,7 @@ FutureX 属于**实时动态基准**，在方法谱系上填补了静态未来�
 
 在覆盖1,272个事件、11个领域的评估中，FutureX 揭示了若干关键发现。**推理+搜索类模型**（如 Grok-4 Think&Search）在综合得分上显著领先，尤其在困难任务（Level 3–4）上超越专有深度研究模型，兼顾推理强度与效率。**基础LLM**在简单任务（Level 1–2）上可凭借内部知识超越搜索增强模型，说明低层次任务不足以区分高级能力。**人类专家**（31人）在 Level 1、3、4 上仍显著优于最强智能体，仅在 Level 2（多选）上被部分模型接近，表明复杂不确定性推理仍是当前智能体的核心短板。
 
-## 背景与动机
+
 
 ### 问题背景：大语言模型智能体的评估困境
 
@@ -86,7 +88,9 @@ FutureX 属于**实时动态基准**，在方法谱系上填补了静态未来�
 
 本文旨在回答以下核心研究问题：不同 LLM 智能体在分层未来预测任务上的表现差异如何？搜索、推理和工具使用能力对性能的影响机制是什么？智能体的规划质量与最终预测准确性之间存在怎样的关联？
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 1. 从静态回溯到动态实时的范式转换
 
@@ -128,7 +132,7 @@ FutureX 构建了**全自动每日循环流水线**，包含四个串联阶段�
 
 这些创新共同构成了FutureX作为“最大、最全面的未来预测实时基准”的核心竞争力（Section 3.1, Figure 10）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_z28PLIEj6l/figures/002_Figure_1.jpg]]
 *Figure 1: The overall pipeline of FutureX, which consists of event database construction, future event daily curation, answer daily acquisition. The entire pipeline is fully automated and operates on a daily basis*
@@ -157,7 +161,7 @@ FutureX 是一个全自动化的实时基准测试平台，其核心设计理念
 
 FutureX的评估体系与流水线紧密耦合。系统根据事件类型采用不同的评分函数：对于单选择和多选择事件，使用精确匹配和F1.5分数；对于开放式的排序和数值预测事件，则采用基于大语言模型的评判和截断均方误差。最终，系统将四个难度等级的得分按10%、20%、30%和40%的权重加权，计算出一个综合得分，对更具挑战性的任务赋予更高权重，从而全面衡量智能体的未来预测能力。
 
-## 核心模块与公式推导
+
 
 FutureX 的核心机制建立在一条全自动化的每日流水线上，该流水线从根源上解决了数据污染问题，并实现了可扩展的实时评估。其运作逻辑围绕以下四个关键模块展开（参见 Figure 1）：
 
@@ -189,7 +193,9 @@ FutureX 的核心机制建立在一条全自动化的每日流水线上，该流
     $$\operatorname { s c o r e } ( Y , { \hat { Y } } ) = \operatorname* { m a x } \left( 0 , 1 - \left( { \frac { Y - { \hat { Y } } } { \sigma ( Y ) } } \right) ^ { 2 } \right)$$
     其中 $Y$ 为真实数值，$\hat{Y}$ 为预测数值，$\sigma(Y)$ 代表该指标近期的历史波动率。该公式计算相对波动率的标准化平方误差，得分下限为 0，从而惩罚远超正常波动范围的预测。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -295,7 +301,9 @@ FutureX综合得分采用四级难度加权（Level 1-4权重分别为10%、20%�
 ![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_z28PLIEj6l/figures/028_Figure_15.jpg]]
 *Figure 15: Performance across different domains for Level 3 (Deep Search Tier) and Level 4 (Super Agent Tier) events*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有未来预测基准的关系
 
@@ -342,6 +350,8 @@ FutureX 的提出同时开启了一系列值得深入探索的研究方向：
 5. **多语言、多文化、多模态的扩展**：未来预测能否扩展到多语言、多文化、多模态数据源，以更全面地衡量智能体的全球化预测能力？这需要构建跨语言的事件数据库和相应的评估协议。
 
 6. **人类评估的规模化与一致性控制**：如何扩大人类评估的规模，并实现更严格的一致性控制，以建立更稳健的人机对比基线？这涉及标注协议的设计、专家筛选标准的制定以及跨领域知识覆盖的平衡。
+
+
 
 ## 原文 PDF
 

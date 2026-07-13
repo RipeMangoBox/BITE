@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2023
 pdf_ref: paperPDFs/CVPR_2023/G_MSM_Unsupervised_Multi_Shape_Matching_with_Graph_based_Affinity_Priors.pdf
+code_link: https://github.com/marvin-eisenberger/gmsm-matching
 project_link: https://github.com/marvin-eisenberger/gmsm-matching
 aliases:
 - GM
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | G-MSM: 基于图亲和先验的无监督多形状匹配 |
 | 英文题名 | G-MSM: Unsupervised Multi-Shape Matching with Graph-based Affinity Priors |
 | 会议/期刊 | CVPR 2023 |
-| Links | [paper](https://arxiv.org/abs/2212.02910); [GitHub](https://github.com/marvin-eisenberger/gmsm-matching) |
+| Links | [paper](https://arxiv.org/abs/2212.02910) · [GitHub](https://github.com/marvin-eisenberger/gmsm-matching) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | G-MSM |
 | Dataset | SHREC'Iso, TOPKIDS, SMAL (跨类泛化) |
@@ -42,7 +43,7 @@ claims:
 > - TOPKIDS 上，平均测地误差 为 7.9，对比 13.7 (DS)，变化 -5.8 (约 42%)。
 > - SMAL (跨类泛化) 上，平均测地误差 为 2.6，对比 5.7 (SyNoRiM)，变化 -3.1 (约 54%)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有的无监督深度形状匹配方法将形状集合视为无序样本，独立处理每对形状，未能充分利用形状间的几何相似性和冗余信息。这一设计在拓扑噪声、非等距变形及跨类匹配等挑战性场景下表现不稳定。
 
@@ -54,7 +55,7 @@ claims:
 
 **局限性**：方法假设输入形状具有近似一致的朝向；完全亲和图的存储和查询成本随训练集大小平方增长（$O(N^2)$）；在极端非刚性变形或部分重叠匹配上的泛化性尚未充分验证。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -86,7 +87,9 @@ claims:
 
 这种方法无需任何外部监督标注，完全依赖形状集合内部的几何冗余来提升匹配质量。在近等距匹配、拓扑噪声匹配和跨类泛化等多个具有挑战性的设定下，G-MSM 均展现出相对于现有方法的显著性能提升。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 G-MSM 的核心创新在于将无序的形状集合显式建模为**边加权无向亲和图**（shape graph），并利用该图的全局结构作为隐式先验来驱动无监督多形状匹配。与现有方法将形状视为独立样本、仅进行成对匹配不同，G-MSM 通过两个紧密耦合的“changed slots”实现了范式转变：
 
@@ -118,7 +121,7 @@ $$\ell := \mathbb{E}_{\mathcal{X}^{(i)},\mathcal{X}^{(j)}\sim\mathcal{S}}\biggl[
 
 值得注意的是，这一图先验机制具有架构无关性：Table 3 显示，即使替换特征提取器或匹配层，加入模块 III 仍能一致提升所有架构变体的性能，进一步验证了其作为通用几何先验注入机制的有效性。
 
-## 整体框架
+
 
 G-MSM 的整体流水线由三个核心模块串联构成，以形状集合 $\mathcal{S}=\{\boldsymbol{\mathcal{X}}^{(1)},\dots,\boldsymbol{\mathcal{X}}^{(N)}\}$ 为输入，在完全无监督的条件下输出多形状对应关系。流水线概览见 Figure 2。
 
@@ -154,7 +157,7 @@ $$\ell:=\mathbb{E}_{\boldsymbol{\mathcal{X}}^{(i)},\boldsymbol{\mathcal{X}}^{(j)
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2212_02910/figures/001_Figure_1.jpg]]
 *Figure 1: For a given collection of 3D meshes $\{ \mathcal { X } ^ { ( i ) }$ | 1 $\leq$ i $\leq$ N $\}$ , (i) our method constructs, in a fully unsupervised manner, a shape graph G which approximates the underlying shape data manifold. (ii) Its edge weights (affinity scores) are derived from a putative pairwise correspondence loss signal. (iii) During training, we enforce cycle-consistency by propagating maps along shortest paths in the graph G. As shown for the sample pair above ( $\mathcal { X } ^ { ( 1 ) } , \hat { \mathcal { X } } ^ { ( 2 ) }$ ) , the resulting multi-matching $\mathbf { I I } ^ { ( 1 , 3 ) } \circ \mathbf { \hat { I } } ^ { ( \hat { 3 } , 2 ) }$ is significantly more accurate than the pairw...
 
-## 核心模块与公式推导
+
 
 G-MSM 的整体流水线由三个可微分模块串联构成，端到端联合训练。以下按数据流顺序逐一展开。
 
@@ -255,7 +258,9 @@ $$
 
 消融实验（Table 1）表明，移除模块 III（即仅保留 $\ell_{\mathrm{match}}$ 训练）会导致性能显著下降——例如在 SCAPE 上误差从 1.8 升至 3.3——证实了图多匹配模块对整体性能的关键作用。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置与公平性
 
@@ -296,31 +301,25 @@ $$
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2212_02910/figures/004_Figure.jpg]]
 
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2212_02910/figures/012_Figure.jpg]]
 
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2212_02910/figures/003_Table_1.jpg]]
 *Table 1: Nearly isometric matching. A quantitative comparison on four nearly-isometric human shape benchmarks, FAUST [5], SCAPE [1], SURREAL [60] and SHREC’19 [40]. Following prior work [15, 55, 56], we additionally show generalization results when training on FAUST and testing on SCAPE (F on S), and vice versa. We consider both standard, pairwise baselines [19,20,23,50,55,56] and multi-matching approaches [10, 25, 27]*
 
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2212_02910/figures/005_Table.jpg]]
 
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2212_02910/figures/008_Table.jpg]]
 
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2212_02910/figures/009_Table.jpg]]
 
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2212_02910/figures/010_Table_2.jpg]]
 *Table 2: Graph topology comparison. We compare the quantitative performance of our model for different graph topologies G. Specifically, we revisit the experiment from Figure 3 and report the mean geodesic error on SHREC’Iso [16] and TOPKIDS [32]. The standard ‘full’ graph is compared to three sparse topologies ‘MST’, ‘TSP’, ‘star’ graph, as well as the ‘w/o III’ variant of our pipeline*
 
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2212_02910/figures/011_Table_3.jpg]]
-*Table 3: Ablation network architecture. We compare several off-the-shelf network architectures for the feature backbone I and matching module II to our full model, as defined in Section 3.2. For each setting, we contrast the results obtained with (✓) and without (✗) the graph-based multi-matching module III*
 
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2212_02910/figures/013_Table.jpg]]
 
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2212_02910/figures/014_Table_4.jpg]]
 *Table 4: Empirical training cost. We quantify the computation cost of our pipeline for different training set sizes. For a given number of shapes N = ∣S∣, one epoch consists of #pairs $\mathbf { \bar { \Psi } } = N ^ { 2 } \in \hat { \{ 1 0 ^ { 2 } , . . . , 1 0 0 ^ { 2 } \} }$ optimization steps that each match a pair of shapes ${ \mathcal { X } } ^ { ( i ) } , { \mathcal { X } } ^ { ( j ) } \in$ S
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：从成对匹配到多形状匹配
 
@@ -382,6 +381,8 @@ G-MSM 处于**无监督深度学习**与**多形状匹配**的交叉点，其核
 - **继承**：DiffusionNet（特征提取）和 DeepShells（成对匹配）作为基础组件。
 - **超越**：通过图多匹配模块和循环一致性损失，将独立成对匹配提升为拓扑感知的多形状联合学习，在拓扑噪声和跨类匹配等挑战性场景下取得显著提升。
 - **启发**：图先验的思想可推广至其他需要利用集合冗余的无监督学习任务，稀疏图拓扑的探索也为大规模应用提供了可行路径。
+
+
 
 ## 原文 PDF
 

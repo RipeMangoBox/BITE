@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/MoCoDiff_A_Controllable_Autoregressive_Diffusion_Model_for_Expressive_Motion_Generation.pdf
+project_link: null
+code_link: null
 aliases:
 - MoCoDiff
 tags:
@@ -41,7 +43,7 @@ claims:
 > - Single Motion Generation (Style IMC only) 上，SRA ↑ 27.21 vs ≤26.37 (best compete) (+0.84)。
 > - Time Efficiency 上，FPS (Frames Per Second) ↑ 136.89 vs ~28.5 (strongest baseline) (~4.8× faster)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -64,7 +66,7 @@ claims:
 
 MoCoDiff 属于**可控运动扩散生成**方法，在条件注入机制上区别于融合式条件方法（如 **SMooDi** (Zhong et al., ECCV 2024) 的风格编码器拼接），在时序建模上区别于简单历史拼接的自回归扩散（如 **AutoMDM** 的逐块生成）。其解耦的 IMC 设计为多条件运动生成提供了可插拔、可解释的控制范式，冻结骨干的策略则降低了部署成本。当前局限在于固定大小的历史窗口（k=10）限制了对全局长程依赖的建模，极长序列下的误差累积仍是开放挑战。
 
-## 背景与动机
+
 
 ### 运动生成中的多条件控制困境
 
@@ -84,7 +86,9 @@ MoCoDiff 属于**可控运动扩散生成**方法，在条件注入机制上区�
 
 基于此，我们提出 **MoCoDiff**，其核心思想是将多条件运动生成重新定义为**基于条件特定注入机制的时序调制问题**。通过引入 Injection Modulation Controllers（IMC），将文本、风格和历史信号分离为独立的模态特定注入路径，利用轻量级线性交叉注意力模块实现解耦控制。同时，Temporal IMC（TIMC）将历史信息作为时间步相关的校正信号注入扩散过程，将无记忆的马尔可夫链转化为受控马尔可夫过程，从根本上抑制漂移并强制平滑过渡。这一设计不仅实现了模态解耦与长时稳定，还通过冻结预训练扩散骨干、仅训练轻量适配器的方式，避免了繁琐的重新训练，为表达性运动生成提供了高效且可解释的解决方案。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MoCoDiff 的核心创新在于将多条件运动生成重新定义为**基于条件特定注入机制的时序调制问题**，而非简单的特征拼接。通过三个关键设计，该方法在冻结的扩散骨干上实现了模态解耦、长时稳定且风格一致的表达性运动合成。
 
@@ -159,7 +163,7 @@ $$
 
 这三个创新点协同作用，使得 MoCoDiff 在长序列风格化运动生成中取得了最高的 SRA（26.37）和最低的 AUJ（1.58），同时推理速度达到 136.89 FPS，约为最强基线的 4.8 倍。
 
-## 整体框架
+
 
 MoCoDiff 的整体设计围绕一个核心思想展开：将多条件运动生成重新定义为**基于条件特定注入机制的时序调制问题**，而非传统的特征拼接或融合范式。如图3所示，系统由三个功能层构成——**多模态条件编码**、**解耦注入调制控制器（IMC）** 和**可控自回归扩散生成**，三者协同工作，在冻结的扩散骨干上实现模态解耦、长时稳定且风格一致的表达性运动合成。
 
@@ -226,7 +230,7 @@ $$\mathcal{L} = \mathcal{L}_{\text{rec}} + \alpha \mathcal{L}_{\text{smooth}} + 
 ![[assets/figures/papers/paper_list_l4_https_openaccess_thecvf_com_content_CVPR2026_html_Song_MoCoDiff_A_Contro/figures/003_Figure_3.jpg]]
 *Figure 3: Method Overview. Content text, style motion, and historical context are encoded and injected into the diffusion backbone through Injection Modulation Controllers. Long-sequence generation is performed via Controlled Autoregressive Diffusion, which produces motion segment-by-segment and aligns each segment with prior history to maintain temporal coherence*
 
-## 核心模块与公式推导
+
 
 ### 3.1 多模态条件编码
 
@@ -298,7 +302,9 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{rec}} + \alpha \mathcal{L}_{\mathrm{smooth}
 ![[assets/figures/papers/paper_list_l4_https_openaccess_thecvf_com_content_CVPR2026_html_Song_MoCoDiff_A_Contro/figures/002_Figure_2.jpg]]
 *Figure 2: Efficiency of Controlled Autoregressive Diffusion. Compared to prior methods [18, 26] (A, B), which either rely on frame-by-frame generation or lack sufficient temporal context, our approach (C) generates long-horizon, expressive motions more efficiently by leveraging a controlled autoregressive diffusion process*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要定量结果
 
@@ -373,7 +379,9 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{rec}} + \alpha \mathcal{L}_{\mathrm{smooth}
 ![[assets/figures/papers/paper_list_l4_https_openaccess_thecvf_com_content_CVPR2026_html_Song_MoCoDiff_A_Contro/figures/001_Figure_1.jpg]]
 *Figure 1: Our MoCoDiff could generate expressive motion generation with long term sytle control. The black arrow points to the highlighted transition details. These results illustrate our method’s capability to maintain the essence of original content while seamlessly infusing it with new stylistic characteristics and historical informations*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 一、与现有工作的关系与核心差异
 
@@ -431,6 +439,8 @@ MoCoDiff 在运动生成领域的知识谱系中占据以下位置：
 - **核心创新：** 将多条件注入从“特征融合”升级为“动力学调制”，将自回归扩散从“条件拼接”升级为“受控马尔可夫过程”。
 - **技术遗产：** 继承了扩散运动生成（MDM 系列）的去噪框架、CLIP/MotionCLIP 的多模态编码能力、以及自回归生成的序列建模范式，但在条件注入机制和时序动力学控制上做出了根本性改进。
 - **下游影响：** 为多条件可控生成提供了“解耦注入 + 动力学控制”的通用设计模式，其 IMC 框架可潜在迁移至其他时序生成任务（如视频生成、音频合成）。
+
+
 
 ## 原文 PDF
 

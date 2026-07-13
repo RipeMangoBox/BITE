@@ -5,6 +5,7 @@ paper_level: A
 venue: Whitepaper
 year: 2026
 pdf_ref: paperPDFs/WHITEPAPER_2026/Kimodo_Scaling_Controllable_Human_Motion_Generation.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/sil/projects/kimodo/
 aliases:
 - Kimodo
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | Kimodo：大规模可控人体运动生成 |
 | 英文题名 | Kimodo: Scaling Controllable Human Motion Generation |
 | 会议/期刊 | Whitepaper 2026 |
-| Links | [paper](https://arxiv.org/abs/2603.15546); [Project](https://research.nvidia.com/labs/sil/projects/kimodo); [Project](https://research.nvidia.com/labs/sil/projects/kimodo/) |
+| Links | [paper](https://arxiv.org/abs/2603.15546) · [Project](https://research.nvidia.com/labs/sil/projects/kimodo) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/robotics |
 | Method | Kimodo |
 | Dataset | Rigplay Text-Conditioned (Fine-Grained), Rigplay Constraint-Conditioned |
@@ -41,7 +42,7 @@ claims:
 > - Rigplay Constraint-Conditioned 上，FID ↓ 为 1.61 (L Batch)，对比 2.01 (S Batch)，变化 -0.40。
 > - Rigplay Constraint-Conditioned 上，Full-Body Pos (cm) ↓ 为 2.33 (L Batch)，对比 2.97 (S Batch)，变化 -0.64。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -73,7 +74,7 @@ claims:
 
 值得注意的是，所有消融与缩放实验均**未使用后处理步骤**（如脚步锁定、逆向运动学），且采用中等批量（8 GPU）和 20 fps 训练以保证公平对比。模型在 NVIDIA RTX 3090 上的单次生成耗时约 2–5 秒，定位为离线动作创作工具，不适用于实时交互场景。
 
-## 背景与动机
+
 
 ### 问题背景：数据规模与基准饱和的双重瓶颈
 
@@ -103,7 +104,9 @@ claims:
 
 3. **架构分解化**：设计交织两阶段 Transformer 去噪器，将根运动预测与身体姿态生成解耦。第一阶段预测全局根轨迹，第二阶段以局部化的根表示（角速度、平移速度、高度）为条件预测身体关节运动。两阶段端到端联合训练，配合先纯文本预训练再混合约束训练的两阶段课程，实现文本遵循与约束精度的双重提升。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Kimodo 的核心创新并非单一算法突破，而是围绕**大规模高质量数据**驱动下的一系列表示与架构协同设计，共同解决了可控人体运动生成中长期存在的控制精度不足与运动伪影问题。其关键创新可归纳为以下四个相互耦合的 changed slots：
 
@@ -141,7 +144,7 @@ Kimodo 采用 50 万步纯文本预训练 + 50 万步混合约束训练的课程
 
 上述四个 changed slots 并非孤立改进，而是形成正向协同：**平滑根表示**为两阶段去噪器提供了稳定的全局参考；**两阶段架构**通过分解预测放大了平滑根带来的伪影抑制效果；**约束注入**的简洁性使两阶段去噪器无需额外复杂度即可处理多类约束；**训练课程**则为这一复杂系统的稳定收敛提供了保障。最终，在 700 小时光学动捕数据的规模加持下，这些设计共同实现了文本遵循与运动学控制精度的双重提升。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2603_15546/figures/009_Figure_9.jpg]]
 *Figure 9: Denoiser Architecture. (Left) Kimodo predicts clean motion given a noisy motion, pose constraints, and a text embedding. Specified pose constraints directly overwrite the noisy motion before it is given to the denoiser. (Right) The two-stage denoiser decomposes root and body motion prediction. The root denoiser first predicts the global root motion, which is transformed into a local representation as input to the body denoiser. The final output of the denoising step is the concatenation of the outputs from the two stages*
@@ -191,7 +194,7 @@ $$\hat{\mathbf{x}}_0 = \mathcal{D}_{\mathcal{Q}} + w_{\mathrm{text}}(\mathcal{D}
 
 **后处理模块**（脚步锁定、逆向运动学）在演示应用中用于进一步提高约束精度，但所有标准化实验评估均未启用这些后处理，以保证方法间比较的公平性（Sec. 6.1）。
 
-## 核心模块与公式推导
+
 
 Kimodo 的核心是一个显式运动扩散模型，其推理流程可分解为三个关键模块：**约束注入**、**两阶段 Transformer 去噪器**和**分类器自由引导**。以下逐一展开其机理与公式。
 
@@ -245,7 +248,9 @@ $$
 
 其中 $w_{\mathrm{text}}$ 控制文本遵循强度，$w_{\mathrm{constr}}$ 控制约束满足精度。这种分解允许用户在生成时独立调节两个维度的控制力，是交互式动作创作界面中灵活性的来源。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与实验设计逻辑
 
@@ -339,7 +344,9 @@ Table 2 从三个维度系统分析了规模对性能的影响。
 *Figure 5: Scaling Results. Scaling dataset size, model size, and batch size improves controllability and motion quality. Increased dataset size results in greatly improved constraint following, while model size and batch size are particularly helpful for text following (R-precision) and motion quality (FID). See Tab. 2 for full results*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心设计决策的因果链条
 
@@ -396,6 +403,8 @@ Kimodo 处于**运动扩散模型**（Motion Diffusion Model）的方法谱系�
 4. **多样性评估的敏感性**：在数据子集缩放实验中，R-precision 和 FID 未出现显著下降，是否因为子集保留了所有行为类型而掩盖了真实多样性的损失？这提示现有评估指标可能对数据多样性的变化不够敏感。
 
 5. **大规模训练的稳定性**：进一步扩大模型参数量时，如何保持训练稳定性并实现更大的性能增益？这涉及优化器设计、学习率调度、架构调整等多个维度的探索。
+
+
 
 ## 原文 PDF
 

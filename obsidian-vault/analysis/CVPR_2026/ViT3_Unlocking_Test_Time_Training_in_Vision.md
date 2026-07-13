@@ -43,7 +43,7 @@ claims:
 > - ImageNet-1K (分层模型) 上，Top-1 准确率 84.0 (H-ViT^3-T) vs 82.1 (ConvNeXt-T) (+1.9)。
 > - COCO (目标检测, Mask R-CNN 1×) 上，APb (box AP) 48.9 (H-ViT^3-T) vs 47.3 (VMamba-T) (+1.6)。
 
-## 概述
+## 概要
 
 视觉 Transformer 中的 Softmax 注意力机制可被理解为利用未压缩的键值对构建一个隐藏宽度等于序列长度 N 的两层 MLP，这赋予了模型强大的表达能力，但同时也带来了 $O(N^2)$ 的计算复杂度。线性注意力通过将键值对压缩为一个固定的 $d \times d$ 权重矩阵 $W = K^\top V$，将复杂度降至 $O(N)$，然而这种一刀切的压缩方式限制了模型容量。测试时训练（Test-Time Training, TTT）将序列建模重构为在线学习问题——在测试时根据输入的键值对，通过几步自监督训练动态更新一个紧凑的内部模型 $\mathcal{F}_W(\cdot): \mathbb{R}^d \to \mathbb{R}^d$，从而在线性复杂度下实现更灵活的压缩与自适应。
 
@@ -59,7 +59,7 @@ claims:
 
 **方法定位**：ViT^3 属于线性复杂度视觉架构中的**在线学习压缩范式**，其核心创新在于系统性地探索并优化了 TTT 的内部训练与模型设计空间，而非提出全新的宏观架构。与 Mamba（状态空间压缩）和线性注意力（固定矩阵压缩）相比，TTT 通过可训练的神经网络实现更灵活的键值对压缩，在保持 $O(N)$ 复杂度的同时获得更强的表征能力。
 
-## 背景与动机
+
 
 ### 视觉骨干网络的效率困境
 
@@ -92,7 +92,9 @@ TTT 的关键优势在于，内部模型 $\mathcal{F}_W$ 可以是**任意模块
 
 缺乏对这些维度的系统性指导，使得视觉 TTT 模型的性能远未达到其理论潜力。本文的工作正是填补这一空白——通过逐项消融研究，揭示视觉 TTT 的关键设计原则，并构建首个在图像分类、目标检测、语义分割和图像生成等任务上全面匹配或超越主流线性复杂度方法的视觉 TTT 架构 **ViT³**。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ViT^3 的核心创新在于**首次系统性地探索并解锁了视觉测试时训练（TTT）模型的设计空间**。此前的 TTT 工作局限于语言序列建模，视觉领域的 TTT 设计原则几乎为空白。本文通过理论分析与大规模消融实验，揭示了决定 TTT 层性能的六个关键因果旋钮，并将其系统化为一套可复现的设计配方，使 TTT 模型在图像分类、检测、分割和生成任务上首次匹配或超越了 Mamba、线性注意力等主流线性复杂度方法。
 
@@ -168,7 +170,7 @@ MAE 损失的混合二阶导数几乎处处为零，导致梯度信号消失。�
 
 ViT^3 的六项设计变更形成了一个**协同优化的系统**：点积/MSE 损失保证了梯度信号的完整性，全批量单轮次训练提供了最稳定的内部优化，学习率 1.0 简化了超参选择，宽度扩展和卷积结构提升了模型容量与归纳偏置，而约束设计则缓解了深层模型的优化瓶颈。这些变更并非孤立存在——例如，学习率 1.0 的有效性建立在损失函数选择和全批量训练的基础之上，共同构成了视觉 TTT 的完整设计配方。
 
-## 整体框架
+
 
 ViT³ 的整体架构遵循标准 Transformer 的宏设计范式，其核心创新在于将注意力机制替换为测试时训练（Test-Time Training, TTT）模块。模型由以下主要组件串联构成：
 
@@ -199,7 +201,7 @@ TTT 模块与 Transformer 共享相同的宏架构（Figure 2），这意味着�
 ![[assets/figures/papers/paper_list_l2146_https_arxiv_org_abs_2512_01643/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of Softmax attention [59], linear attention [32], and Test-Time Training (TTT) module [56]. (a) Softmax attention can be viewed as building a two-layer MLP that directly uses the uncompressed keys K and values V , where the hidden width equals the sequence length N and the nonlinearity is Softmax. While effective, this N -width MLP leads to*
 
-## 核心模块与公式推导
+
 
 ### 注意力机制的三种视角
 
@@ -279,7 +281,9 @@ $$\eta \cdot \frac{\partial \mathcal{L}(\hat{V}, V)}{\partial W} = \eta \cdot K^
 ![[assets/figures/papers/paper_list_l2146_https_arxiv_org_abs_2512_01643/figures/006_Figure_3.jpg]]
 *Figure 3: Results of TTT models with inner modules of 1, 2, 3 layers (FC, two-layer and three-layer MLP). Deeper inner models lead to higher training loss, and thus lower test accuracy*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 内部训练配置的消融研究
 
@@ -344,7 +348,9 @@ $$\eta \cdot \frac{\partial \mathcal{L}(\hat{V}, V)}{\partial W} = \eta \cdot K^
 ![[assets/figures/papers/paper_list_l2146_https_arxiv_org_abs_2512_01643/figures/011_Table_9.jpg]]
 *Table 9: Results of semantic segmentation. FLOPs are calculated with an input resolution of 512×2048*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法脉络：从 Softmax 注意力到测试时训练
 
@@ -410,6 +416,8 @@ ViT^3 在实验中与四类代表性方法进行了系统对比：
 - **内部优化器的选择**：当前仅使用 SGD，Adam 等自适应优化器能否在内部训练中带来增益？
 
 **需要人工验证的点**：论文未提供 ViT^3 在视频理解、多模态等更复杂视觉任务上的实验结果，其在时序建模场景中的表现是否仍能匹配 Mamba 等时序原生架构，尚待第三方验证。
+
+
 
 ## 原文 PDF
 

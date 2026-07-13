@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/Multi_level_Causal_LLM_based_Text_to_Motion_Generation_with_Human_Alignment.pdf
+project_link: null
+code_link: null
 aliases:
 - MLCLBTMGHA
 tags:
@@ -42,7 +44,7 @@ claims:
 > - KIT-ML 上，FID 0.180 vs 0.510 (MotionGPT, LLM-based) (-0.330 (64.7%↓))。
 > - HumanML3D (with initial pose) 上，FID 0.040 vs 0.493 (MotionGPT) (-0.453)。
 
-## 概述
+## 概要
 
 文本驱动的三维人体动作生成旨在从自然语言描述中合成逼真、语义一致的运动序列。近年来，基于大型语言模型（LLM）的方法因其强大的序列建模能力而备受关注，但现有方案普遍面临一个核心瓶颈：**运动量化器与因果语言模型之间存在因果性失配**。具体而言，主流的非因果VQ-VAE在运动离散化过程中引入细粒度量化误差，且其编码方式未能保持严格的时间因果依赖，导致LLM在生成运动令牌时缺乏可靠的因果先验。此外，现有方法普遍缺少显式的人类偏好对齐机制，使得生成动作在语义一致性与细节真实度上难以满足人类预期。
 
@@ -50,7 +52,7 @@ claims:
 
 实验结果表明，MoTiGA在HumanML3D数据集上将FID从LLM-based方法的最佳结果0.232降至**0.041**，相对提升82.3%；在KIT-ML上将FID从0.510降至**0.180**，相对提升64.7%，显著超越了包括MotionGPT、MotionLLM在内的现有LLM-based方法以及T2M-GPT、MoMask等专用方法。消融实验进一步验证了Causal RVQ-VAE、时间滞后因果预测和MHPO各组件的独立贡献。
 
-## 背景与动机
+
 
 ### 文本驱动人体动作生成的任务定义
 
@@ -76,7 +78,9 @@ claims:
 
 实验表明，MoTiGA 在 HumanML3D 上将 FID 从 0.232 降至 0.041（相对其他 LLM 方法提升 82.3%），在 KIT-ML 上从 0.510 降至 0.180（提升 64.7%），显著缩小了 LLM-based 方法与专用方法之间的性能差距。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MoTiGA 的核心创新可归纳为三个相互耦合的“改动槽”（changed slots），它们共同解决了现有 LLM-based 文本到动作生成方法中**因果表示鸿沟**与**人类偏好对齐缺失**两大瓶颈。
 
@@ -116,7 +120,7 @@ MoTiGA 的 **MHPO** 在 GRPO（Group Relative Policy Optimization）框架基础
 
 三个改动槽并非孤立改进，而是形成因果链条：**Causal RVQ-VAE** 提供因果运动表示基础 → **时间滞后因果预测** 在保持该因果性的前提下实现高效并行解码 → **MHPO** 利用多级令牌的层级语义信息进行细粒度人类偏好对齐。这种协同设计使得 MoTiGA 在 HumanML3D 上将 FID 从 0.232 降至 0.041（相对 LLM-based 方法提升 82.3%），在 KIT-ML 上从 0.510 降至 0.180（提升 64.7%），同时 R-Precision Top-1 分别达到 52.3 和 44.3（Table 1）。
 
-## 整体框架
+
 
 MoTiGA 的整体设计围绕一个核心矛盾展开：**因果语言模型（LLM）与运动模态之间的因果表示鸿沟**。现有 LLM‑based 方法直接套用非因果 VQ‑VAE 量化运动序列，再交由因果 LLM 进行自回归生成，这一做法在量化阶段引入了细粒度误差，在生成阶段又破坏了运动本身的因果结构，最终导致语义漂移和细节失真。MoTiGA 的应对策略是将“因果性”与“人类偏好对齐”同时注入运动表示、生成策略和优化目标三个层面，形成一条端到端的因果对齐流水线。
 
@@ -138,7 +142,7 @@ MoTiGA 的整体设计围绕一个核心矛盾展开：**因果语言模型（LL
 ![[assets/figures/papers/paper_list_l6_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Multi_level_Causa/figures/003_Figure_3.jpg]]
 *Figure 3: The framework of MoTiGA: (1) Time-lagged Causal Prediction, maintaining strict causality and hierarchical temporal dependencies across different levels; (2) Causal RVQ-VAE Tokenizer, discretizing 3D motion sequences into multi-level motion tokens; and (3) Human Alignment using Multi-level Hybrid-weighted Preference Optimization (MHPO)*
 
-## 核心模块与公式推导
+
 
 MoTiGA 的核心架构由三个紧密耦合的模块构成：**Causal RVQ-VAE Tokenizer**（多级因果运动量化）、**Time-lagged Causal Prediction**（时间滞后因果预测）与 **MHPO**（多级混合加权偏好优化）。这三个模块分别解决了现有 LLM-based 方法在运动表示、解码策略与人类偏好对齐三个层面的根本性缺陷。
 
@@ -203,7 +207,9 @@ $$\mathcal{T}_{\mathrm{MHPO}}(\theta) = \mathbb{E}\bigg[\frac{1}{G}\bigg(\sum_{i
 ![[assets/figures/papers/paper_list_l6_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Multi_level_Causa/figures/004_Figure_4.jpg]]
 *Figure 4: Comparison of different prediction strategies. Different colored tokens represent motion tokens at different hierarchical levels quantized by the Causal RVQ-VAE*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与评估逻辑
 
@@ -266,7 +272,9 @@ Causal RVQ-VAE 的重建 FID 略高于标准 RVQ-VAE，在纯重建场景下可�
 ![[assets/figures/papers/paper_list_l6_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Multi_level_Causa/figures/009_Figure.jpg]]
 *Figure: Ablation studies of human alignment, the text is “a person moves to his right then back”*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有LLM-based运动生成方法的对比与突破
 
@@ -309,6 +317,8 @@ MoTiGA（CVPR 2026）针对上述瓶颈提出了三个核心改进槽位：
 4. **模型规模扩展。** Causal RVQ-VAE是否可以在更大基础模型（如LLaMA-13B/30B）上获得进一步增益？计算效率与生成质量之间的平衡点在哪里，需要实验验证。
 
 5. **人类对齐的评估体系。** 除FID和R-Precision外，是否有更适合评估人类对齐程度的自动化指标或用户研究方案？现有指标主要衡量分布匹配和检索精度，无法直接反映人类对运动自然度、语义准确性的主观判断，构建更全面的对齐评估基准是推动该方向发展的关键。
+
+
 
 ## 原文 PDF
 

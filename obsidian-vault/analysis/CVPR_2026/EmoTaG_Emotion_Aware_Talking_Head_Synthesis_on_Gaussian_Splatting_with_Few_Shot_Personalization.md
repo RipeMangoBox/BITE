@@ -40,7 +40,7 @@ claims:
 > - 自重建 (中性视频, 5s训练数据) 上，PSNR↑ / LPIPS↓ / SSIM↑ / LMD↓ / AUE-(L/U)↓ / Sync-C↑ 30.02 / 0.019 / 0.883 / 2.221 / 0.685 0.210 / 6.212 vs 次优基线 (如InsTaG或MimicTalk) (未提供具体数值差值，但EmoTaG在所有指标上均排名第一)。
 > - 自重建 (情绪视频, 5s训练数据) 上，PSNR↑ / LPIPS↓ / SSIM↑ / LMD↓ / AUE-(L/U)↓ / Sync-C↑ 29.95 / 0.022 / 0.877 / 2.456 / 0.702 0.236 / 6.147 vs 次优基线 (EmoTaG领先，具体差值未列出)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有少样本3D说话人头像合成方法（如InsTaG、MimicTalk）在情绪驱动场景下面临两个根本性缺陷——几何不稳定与音频-情绪不匹配。如图2所示，情绪音频的嘴部运动轨迹波动显著大于中性音频（水平/垂直标准差分别为7.88/6.92 vs 3.11），揭示情绪语音包含更复杂的发音模式，而现有方法缺乏对这类情绪驱动面部运动的有效建模。
 
@@ -50,7 +50,7 @@ claims:
 
 **主要结果**：在5秒训练数据的自重建任务上，EmoTaG在PSNR、LPIPS、SSIM、LMD、AUE、Sync-C等全部评估指标上均优于现有最佳方法（Table 1）。消融实验证实，移除语义情绪引导导致PSNR从29.95降至29.01、LMD从2.456升至3.067，而移除AdaIN身份调制造成最大性能降幅（PSNR降至28.38），证明情绪蒸馏与个性化运动风格建模的核心作用（Table 5）。
 
-## 背景与动机
+
 
 ### 3D说话人头像合成：从几何保真到情绪表达
 
@@ -74,7 +74,9 @@ claims:
 
 这一设计使得EmoTaG能够在仅5秒训练视频的少样本设定下，同时实现高质量的情绪表达、唇音同步与视觉真实感。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 EmoTaG 的核心创新在于将少样本 3D 说话人头像合成从“直接变形高斯”重新形式化为“FLAME 参数回归”，并通过门控残差运动网络（GRMN）与语义情绪引导（SEG）实现情绪感知的运动生成。以下从瓶颈、因果机制和关键设计三个层面展开。
 
@@ -102,7 +104,7 @@ GRMN 是 EmoTaG 方法创新的核心载体，其设计围绕三个 changed slot
 
 > **注意**：关于 GRMN 内部各分支的具体网络结构（如层数、维度）以及 SEG 中蒸馏损失的具体权重配置，原文未提供足够细节，需要手动查阅补充材料或代码仓库进行验证。
 
-## 整体框架
+
 
 EmoTaG 的整体流水线围绕两个核心组件构建：**FLAME-Gaussian 模型**（提供结构化三维先验）与**门控残差运动网络**（GRMN，负责预测动态面部运动）。图3展示了预训练与适应两个阶段的完整架构。
 
@@ -137,7 +139,7 @@ $$ \mathcal{L} = \mathcal{L}_{\mathrm{Render}} + \mathcal{L}_{\mathrm{KL}} + \ma
 ![[assets/figures/papers/paper_list_l2475_https_arxiv_org_abs_2603_21332/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of EmoTaG. For pretraining, our Gated Residual Motion Network learns a universal motion prior from a multi-identity corpus. This network comprises an Identity-Conditioned Encoder for integrating audio, expression, and identity through AdaIN-based modulation, followed by an Expert Motion Decoder that leverages emotion-distilled supervision to train three cooperative branches (Base, Residual, Gate). During adaptation, the Gated Residual Motion Network is efficiently adapted to a new identity from 5-second video via only tuning the AdaIN modulation parameters. At inference, the adapted model produces expressive, high-fidelity 3D facial animation driven by new audio with head pose and...*
 
-## 核心模块与公式推导
+
 
 EmoTaG 的整体架构围绕两个核心组件展开：**FLAME-Gaussian 模型**提供结构化 3D 先验，**门控残差运动网络 (GRMN)** 负责从多模态驱动信号中预测动态面部运动。以下逐一拆解关键模块及其数学形式。
 
@@ -230,7 +232,9 @@ $\mathcal{L}_{\mathrm{KL}}$ 为情绪分布的 KL 蒸馏损失，$\mathcal{L}_{\
 ![[assets/figures/papers/paper_list_l2475_https_arxiv_org_abs_2603_21332/figures/002_Figure_2.jpg]]
 *Figure 2: Neutral vs emotional articulation complexity. We compare horizontal and vertical mouth opening trajectories measured from lip landmarks. Emotional audio shows stronger temporal fluctuation and larger standard deviations $(\sigma$ _${\text {emotional}}=7$.88, 6.92 ) than neutral audio*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 动机验证：情绪音频的运动复杂性
 
@@ -305,7 +309,9 @@ Table 1的效率列显示，EmoTaG在单块NVIDIA RTX A6000 GPU上的训练时�
 ![[assets/figures/papers/paper_list_l2475_https_arxiv_org_abs_2603_21332/figures/001_Figure_1.jpg]]
 *Figure 1: EmoTaG generates expressive and synchronized 3D talking heads from only 5-second new identity videos. Built upon a FLAME-Gaussian model [35] and a Gated Residual Motion Network, our method achieves better emotional expressiveness, lip synchronization, visual realism, and motion stability compared to state-of-the-art approaches [26, 50]*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从3D高斯说话人到情绪感知生成
 
@@ -342,6 +348,8 @@ EmoTaG 对知识库的贡献可归纳为三个层次：
 - **多模态情绪控制。** 当前 SEG 仅从音频蒸馏情绪，未利用文本或视频中的情绪线索，多模态融合可能进一步提升情绪感知精度。
 - **长期时序一致性。** 实验仅在短片段上评估，长时间生成中的情绪漂移和几何累积误差未被讨论。
 - **与扩散模型的结合。** 近期扩散模型在2D说话人合成中展现出强表达力，EmoTaG 的 FLAME 参数预测框架是否可与扩散先验结合，是值得探索的方向。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Ada_Diffuser_Latent_Aware_Adaptive_Diffusion_for_Decision_Making.pdf
+project_link: https://sites.google.com/view/ada-diffuser
+code_link: null
 aliases:
 - Ada-Diffuser
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | Ada-Diffuser：潜在感知的自适应扩散决策模型 |
 | 英文题名 | Ada-Diffuser: Latent-Aware Adaptive Diffusion for Decision-Making |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=PKifFVXtSR); [Project](https://sites.google.com/view/ada-diffuser) |
+| Links | [paper](https://openreview.net/forum?id=PKifFVXtSR) · [Project](https://sites.google.com/view/ada-diffuser) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/planning_control |
 | Method | Ada-Diffuser |
 | Dataset | Cheetah-Wind-E (planner), Cheetah-Vel-E (planner), Maze2D-Large, Kitchen-Partial |
@@ -40,7 +42,7 @@ claims:
 > - Cheetah-Vel-E (planner) 上，Return 为 -45.8 ± 9.5，对比 -102.4 ± 18.2 (Diffuser)，变化 +56.6。
 > - Maze2D-Large 上，Return 为 161.4 ± 3.2，对比 123.0 ± 4.8 (Diffuser)，变化 +38.4。
 
-## 概述
+## 概要
 
 扩散决策模型（如Diffuser、Decision Diffuser、Diffusion Policy）在离线强化学习和规划中取得了显著进展，但它们通常忽略环境中随时间变化的潜在因素（例如风力、方向偏好或动力学参数漂移）。在这种部分可观察条件下，环境的真实动力学和奖励函数会随潜在变量改变，导致固定模型无法准确建模序列分布，规划或策略难以自适应调整。现有扩展尝试通过元学习或上下文推理引入潜在表示，但缺乏对"需要多长观测才能可靠识别潜在因素"的理论理解，也未在扩散生成过程中显式对齐潜在后验与序列生成。
 
@@ -52,7 +54,7 @@ claims:
 
 实验表明，Ada‑Diffuser‑Planner 在受显式潜在影响的 Cheetah‑Wind‑E 环境中获得 **−68.9 ± 7.6** 的平均回报，相较 Diffuser 的 −120.4 提升超过 40；在 Cheetah‑Vel‑E 上提升约 55 点。在无明显设计潜在因素的环境（如 Maze2D、Kitchen‑Partial、Robomimic 机器人操作任务）中，该方法同样稳定优于 Diffuser、Decision Diffuser 等基线。消融实验进一步确认：移除潜在识别模块会使 Cheetah‑Wind‑S 规划器回报从 −73.5 降至 −103.5，去掉之字形采样或反向精炼也会造成显著性能退化；线性探针 MSE 从 0.28 降至 0.18 证明了后验对齐的有效性。这些结果共同说明，通过理论指导下的潜在建模与因果扩散设计，Ada‑Diffuser 能在动态环境下提升规划与策略的自适应能力。
 
-## 背景与动机
+
 
 扩散模型在离线规划与策略学习中展现出强大的轨迹生成能力。以 Diffuser、Decision Diffuser (DD) 和 Diffusion Policy (DP) 为代表的系列工作，将决策问题建模为在噪声空间中逐步去噪以生成高质量动作序列的过程，其前向加噪机制可形式化为
 $$q(\mathbf{x}^t \mid \mathbf{x}^{t-1}) = \mathcal{N}(\mathbf{x}^t; \sqrt{\alpha_t} \mathbf{x}^{t-1}, (1-\alpha_t) \mathbf{I}),$$
@@ -64,7 +66,9 @@ $$\mathcal{M} = (\mathcal{S}, \mathcal{A}, \mathcal{C}, \mathcal{T}, \mathcal{R}
 
 为此，本文的核心动机是回答两个开放问题：**最少需要多少连续观测即可可靠识别控制环境的潜在因子？以及如何将这种识别机制无缝地嵌入扩散生成过程，以实现自适应规划与策略学习？** 理论分析（Theorem 1）表明，仅需 4 个连续状态就可在可逆变换的意义上识别潜在上下文，这为轻量级在线适应提供了理论依据。受此启发，本文提出 Ada‑Diffuser 框架，其设计原则如下：引入一个块状潜在识别模块，从最小充分观测中推断潜在变量的后验分布；构造一种因果自回归的去躁调度，使去噪步骤按时间顺序逐块进行，并与潜在估计协同精炼；在推理时采用之字形（zig‑zag）采样，在生成状态‑动作对与更新潜在变量之间交替迭代，从而保持后验信念与环境动态的一致性。这一思路直接回应了前述瓶颈，即通过"识别‑精炼‑条件生成"的闭环，使扩散模型能够连续适应不可见的时变因素，避免性能随环境变化而持续退化。后续章节将详细阐述该框架的理论基础与实现细节，并在一系列具有显式或隐式潜在因素的环境中对其进行验证。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 现有基于扩散的决策模型（如 Diffuser、Decision Diffuser）将规划或策略学习建模为轨迹生成问题，通过同时去噪整条序列来恢复高质量行为。然而，这类方法隐含地假定环境动力学与奖励函数是平稳的，忽略了部分可观测情境下广泛存在的时变潜在因素（如变化的风力、不同场景下的目标偏好）。当动力学或奖励发生偏移时，模型的生成分布与实际环境产生结构性错配——即 **后验不匹配**——导致规划轨迹不可靠、策略无法自适应。这是当前扩散规划器在信息受限条件下性能退化的关键瓶颈。
 
@@ -83,7 +87,7 @@ Ada-Diffuser 针对上述瓶颈进行了三项结构性变革：
 
 > 本节聚焦关键创新点，具体实现细节与全量实验数据见第 4 节及附录 A。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0006_PKifFVXtSR_Ada-Diffuser_Latent-Aware_Adaptive_Diffusion_for/figures/003_Figure_2.jpg]]
 *Figure 2: Overview of the Ada-Diffuser framework. The modular design consists of two main stages: latent context identification (Stage 1, Section 4.2), followed by a causal diffusion model (Stage 2, Section 4.3) that models the generative structure of the trajectories. The learned model is then used for planning or policy learning conditioned on the inferred latent context*
@@ -121,7 +125,7 @@ Ada-Diffuser 针对部分可观察环境中时变潜在因素（如变化的动�
 
 > 注：本节描述的整体框架对应论文第 4 节；扩散基础（前向加噪 $q(\mathbf{x}^t \mid \mathbf{x}^{t-1}) = \mathcal{N}(\mathbf{x}^t; \sqrt{\alpha_t} \mathbf{x}^{t-1}, (1-\alpha_t) \mathbf{I})$）在 Background 部分已有铺垫，此处不再展开推导。
 
-## 核心模块与公式推导
+
 
 Ada-Diffuser 的核心由两条主线构成：**潜在因子识别模块**与**因果扩散生成模型**。前者利用最小充分观测块在线推断时变潜在变量；后者将该潜在变量一致地注入自回归去噪过程，通过之字形采样（zig-zag sampling）和"去噪-再精炼"机制实现潜在‑观测的联合对齐。以下围绕关键模块与对应公式展开。
 
@@ -177,7 +181,9 @@ $$
 
 通过上述模块级联，Ada-Diffuser 将潜在因子识别、因果生成、扩散对齐整合为单一的可训练框架，形成了理论保证与实践性能兼备的自适应决策模型。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：显式潜在环境下的规划与策略提升
 
@@ -224,7 +230,9 @@ Table 2 的消融实验明确了 **三个核心组件的贡献**（以 Cheetah�
 ![[assets/figures/papers/iclr26_0006_PKifFVXtSR_Ada-Diffuser_Latent-Aware_Adaptive_Diffusion_for/figures/031_Table_10.jpg]]
 *Table 10: (MSE) of this probe for three variants: (i) the full model with backward refinement and zig–zag; (ii) without refinement; and (iii) without zig–zag. Table A16: Linear probing MSE for recovering the ground-truth wind latent on CHEETAH (changing wind). Lower is better*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系及定位
 
@@ -268,6 +276,8 @@ Ada‑Diffuser 的有效性建立在以下前提上，也划定了其适用范�
 5. **跨任务泛化与操作对象变化**。在 Robomimic 和 LIBERO 实验中，潜在模块被用于操作任务内的上下文判断（如目标物体位置），但其在训练任务分布之外的新物体、新布局上的泛化能力仍不清晰。需要结合强泛化学习（如因果表示学习或元测试）来评估和提升。
 6. **安全约束与风险感知**。引入潜在风险或不安全状态作为额外潜在因子，并在扩散生成中结合约束违反的预测，是实现安全强化学习决策的一条可行路径，但目前框架并未涉及。
 7. **大规模模型与计算效率**。当前受限于 MLP/UNet/Transformer 下的小规模实验，扩展到高维轨迹和大批量数据时，因果去噪和之字形采样是否仍能维持增益，并能否与蒸馏技术结合以降低推理成本，是未来规模化的重要考量。
+
+
 
 ## 原文 PDF
 

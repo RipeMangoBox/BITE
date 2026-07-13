@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/Real_World_Point_Tracking_with_Verifier_Guided_Pseudo_Labeling.pdf
+project_link: null
+code_link: null
 aliases:
 - VGPL
 - RWPTVGPL
@@ -41,7 +43,7 @@ claims:
 > - RoboTAP 上，AJ 70.9 vs 68.1 (Track-On2 合成预训练) (+2.8)。
 > - TAP-Vid Kinetics 上，AJ 57.8 vs 55.3 (Track-On2 合成预训练) (+2.5)。
 
-## 概述
+## 概要
 
 点跟踪旨在给定视频首帧的查询点后，预测该点在后续所有帧中的二维轨迹坐标与可见性状态。现有方法在合成数据上预训练后，直接迁移到真实世界视频时性能显著下降，核心瓶颈在于：**在未标注的真实视频上，单个预训练跟踪器产生的伪标签在帧间可靠性波动极大**（Figure 2(b)），简单的随机选择或固定融合策略会放大噪声和漂移，导致自训练适应质量差。
 
@@ -59,7 +61,7 @@ claims:
 
 在方法谱系上，本工作属于真实世界点跟踪的自训练微调范式。与 **BootsTAPIR**（大规模自蒸馏）和 **BootsTAPNext**（状态空间替代方案）等现有真实世界微调基线不同，本文不依赖单一教师模型，而是通过验证器动态组合多个现成跟踪器（Track-On2、BootsTAPIR、BootsTAPNext、Anthro-LocoTrack、AllTracker、CoTracker3 Window）的预测，形成更高质量的伪标签监督。
 
-## 背景与动机
+
 
 ### 点跟踪任务与域间鸿沟
 
@@ -89,7 +91,9 @@ Figure 2(a) 通过 Oracle 测试揭示了这一方向的巨大潜力：若在每
 
 本文的核心思路是引入一个**可学习的验证器（verifier）**——一个轻量级元模型，在每帧动态评估多个教师跟踪器输出的可靠性，并根据评分自适应选择最优候选作为伪标签。验证器完全在合成数据上训练，通过构造带有真实误差特征的扰动候选轨迹和对比学习目标，使其学会识别时空一致性线索，从而**跨域地**评估真实视频上的跟踪预测质量。这一设计将伪标签生成从“随机盲选”转变为“逐帧优选”，为后续的真实世界微调提供更干净、更稳定的监督信号。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作的核心创新在于提出 **验证器引导伪标注（Verifier-Guided Pseudo-Labeling）** 框架，将真实世界点跟踪的自训练适应问题重新表述为一个**逐帧可靠性评估与自适应选择**问题。与现有方法的关键差异体现在以下维度。
 
@@ -130,7 +134,7 @@ $$\mathbf{s}_t = \mathrm{Softmax}( - \| \mathbf{C}_t - \mathbf{p}_t \| / \tau_s 
 
 需要指出的是，验证器的性能上限受限于所使用的教师跟踪器质量——若所有教师对某个特定运动模式或场景均表现不佳，验证器仍可能选出次优轨迹。此外，该方法在微调时需保留多个教师模型用于生成伪标签，增加了训练阶段的存储和计算开销。
 
-## 整体框架
+
 
 本文提出了一种**验证器引导的伪标注**（Verifier-Guided Pseudo-Labeling）框架，旨在将合成数据上预训练的点跟踪模型高效地适应到真实世界视频。该框架的核心思想是：通过一个可学习的元模型——验证器（verifier），在每一帧动态评估多个预训练教师跟踪器的预测可靠性，并自适应地选择最优轨迹作为伪标签，从而将模型间的互补性转化为自训练的监督优势。
 
@@ -185,7 +189,7 @@ Figure 2(a) 的 Oracle 测试揭示了这一瓶颈的本质：在四个真实世
 
 与朴素自训练（随机选择一个教师模型生成伪标签）相比，本框架的差异化在于：验证器不是简单地固定选择或平均融合教师输出，而是**逐帧动态评估并切换**，从而将教师间的互补性转化为更干净、更可靠的监督信号。消融实验证实，无论使用哪组教师子集，验证器选择均一致优于随机选择（Table 2），且显著超越几何中位数、一致性选择、卡尔曼恒速选择等非学习集成方法（Table 5）。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化
 
@@ -253,7 +257,9 @@ $$\mathbf{s}_t = \mathrm{Softmax}( - \| \mathbf{C}_t - \mathbf{p}_t \| / \tau_s 
 
 为训练验证器识别典型跟踪失败模式，合成数据上的候选轨迹通过故意扰动真值生成：包括随机漂移（模拟累积误差）、跳跃（模拟错误匹配）、遮挡丢失（模拟可见性误判）和重现身偏移（模拟遮挡后位置偏差）。这些扰动使验证器学会从视觉特征中辨别时空不一致性，从而在未见过的真实视频上泛化（Section 1, Section 4.4）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与动机验证
 
@@ -329,7 +335,9 @@ Figure 4 展示了验证器作为推理时集成方法的性能。在不进行�
 ![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2603_12217/figures/012_Figure_6.jpg]]
 *Figure 6: Verifier selection behavior across videos. Each row corresponds to a different video from TAP-Vid Kinetics. Frames are uniformly sampled among visible ones, and a 50 × 50 crop centered at the ground-truth point is shown. Colored dots indicate predictions from teacher trackers, the star marks the ground-truth location, and the legend lists the verifier reliability scores, with the selected candidate highlighted in bold. The verifier adaptively switches between trackers across frames, assigning higher scores to spatially accurate predictions while suppressing unreliable ones*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：点跟踪的自训练瓶颈
 
@@ -386,6 +394,8 @@ $$\mathbf{s}_t = \mathrm{Softmax}( - \| \mathbf{C}_t - \mathbf{p}_t \| / \tau_s 
 3. **任务泛化性**：该框架的核心思想——学习一个元模型来评估多源预测的逐帧可靠性——是否能够扩展到其他需要时序质量评估的视频理解任务，如光流估计、视频物体分割或多目标跟踪？这需要验证时空一致性线索在不同任务中的可迁移性。
 
 4. **合成训练策略的改进**：当前验证器训练中的候选扰动是人工设计的。是否可以通过对抗生成或基于扩散模型的方式构造更逼真的伪误差，从而提升验证器在真实场景中的判别能力？
+
+
 
 ## 原文 PDF
 

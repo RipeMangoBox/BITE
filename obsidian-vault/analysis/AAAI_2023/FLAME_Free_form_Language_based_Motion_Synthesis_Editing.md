@@ -5,6 +5,8 @@ paper_level: A
 venue: AAAI
 year: 2023
 pdf_ref: paperPDFs/AAAI_2023/FLAME_Free_form_Language_based_Motion_Synthesis_Editing.pdf
+project_link: null
+code_link: null
 aliases:
 - FLAME
 tags:
@@ -40,7 +42,7 @@ claims:
 > - HumanML3D 上，FD ↓ 为 21.152，对比 27.950 (Guo et al. 2022)，变化 -6.798。
 > - KIT 上，APE root joint ↓ 为 0.881，对比 0.949 (Guo et al. 2022)，变化 -0.068。
 
-## 概述
+## 概要
 
 文本到运动生成面临一个核心瓶颈：现有模型缺乏灵活的条件生成能力，难以在一个统一框架内同时处理运动合成与编辑。运动数据本身具有固有的时空依赖性和变长特性，使得在图像生成领域取得成功的扩散架构（如 U-Net）无法直接迁移。
 
@@ -50,7 +52,7 @@ claims:
 
 在 HumanML3D 和 BABEL 数据集上，FLAME 在文本-运动对齐（mCLIP）和生成质量（FD）等关键指标上全面超越现有方法，包括 **TEMOS**（Petrovich et al., 2022）和 Guo et al.（2022）等基线模型。消融实验进一步证实，冻结预训练语言模型并添加交叉注意力是性能提升的关键因素。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -74,7 +76,9 @@ claims:
 
 综上，FLAME 的动机可归结为三点：**（1）将扩散模型首次引入运动生成领域；（2）通过掩码策略实现无需微调的运动编辑；（3）设计适配变长时序数据的 Transformer 扩散架构。**
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FLAME 的核心创新在于将扩散概率模型首次引入运动生成域，并通过架构层面的三项关键设计，突破了现有文本到运动模型在灵活条件生成上的瓶颈。
 
@@ -94,7 +98,7 @@ FLAME 的核心创新在于将扩散概率模型首次引入运动生成域，�
 
 上述三项设计共同构成了一个统一的框架：在合成任务中，模型从纯噪声出发，以文本为条件逐步去噪生成完整运动；在编辑任务中，模型对参考运动进行前向扩散后，按掩码 $m$ 混合去噪预测 $M_{t-1}^{pred}$ 与参考部分 $M_{t-1}^{ref}$，即 $M_{t-1}^{edit} = (1 - m) \odot M_{t-1}^{pred} + m \odot M_{t-1}^{ref}$，实现对任意部位（帧级或关节级）的局部编辑。这一“合成即编辑”的设计理念，是 FLAME 区别于所有基线方法的核心差异点。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2209_00349/figures/002_Figure_1.jpg]]
 *Figure 1: (b) (Green) Reference motion. (Blue) Text-based motion editing result from FLAME with prompt: “A person dribbles a ball.”; The editing model is allowed to edit upper body parts while fixing lower body parts in this example. Figure 1: Overview of text-to-motion synthesis and textbased motion editing. Motion flows from left to right*
@@ -115,7 +119,7 @@ Transformer 解码器通过自注意力机制建模运动帧间的时空依赖�
 
 **推理与编辑的统一。** 在推理阶段，FLAME 采用**分类器自由引导**（classifier-free guidance）来放大文本条件效应，通过无条件预测与条件预测的加权组合 $\hat{\epsilon}_{\theta}(\mathbf{M}_t \mid c) = \epsilon_{\theta}(\mathbf{M}_t \mid \emptyset) + s \cdot (\epsilon_{\theta}(\mathbf{M}_t \mid c) - \epsilon_{\theta}(\mathbf{M}_t \mid \emptyset))$ 实现，引导尺度 $s=8.0$。运动编辑则通过“先扩散后条件去噪”策略完成：对参考运动进行前向加噪，随后在逆向去噪的每一步中，按二值掩码 $m$ 将模型预测的去噪结果与参考运动的对应部分混合，即 $M_{t-1}^{\text{edit}} = (1 - m) \odot M_{t-1}^{\text{pred}} + m \odot M_{t-1}^{\text{ref}}$。这一机制使得 FLAME 无需任何微调即可支持帧级和关节级的局部编辑。
 
-## 核心模块与公式推导
+
 
 ### 扩散概率建模
 
@@ -173,7 +177,9 @@ $$M_{t-1}^{\text{edit}} = (1 - m) \odot M_{t-1}^{\text{pred}} + m \odot M_{t-1}^
 
 其中 $M_{t-1}^{\text{pred}}$ 为模型基于文本条件预测的去噪样本，$M_{t-1}^{\text{ref}}$ 为参考运动经相同扩散步后的加噪版本。掩码 $m$ 可在帧维度和关节维度灵活定义，实现局部姿态编辑、运动预测和中间帧生成等多样化条件任务。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 
@@ -184,11 +190,7 @@ FLAME 在三个文本-运动数据集上进行了系统评估，核心生成质�
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2209_00349/figures/005_Table_1.jpg]]
 *Table 1: Text-to-motion benchmark on the HumanML3D and BABEL. Table 2: APE and AVE benchmark on the KIT dataset*
 
-![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2209_00349/figures/013_Table_2.jpg]]
-*Table 2: Hyperparameters for the KIT*
 
-![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2209_00349/figures/014_Table_1.jpg]]
-*Table 1: Hyperparameters for the HumanML3D and BABEL*
 
 **KIT 数据集**（Table 2）。FLAME 在根关节平均位置误差（APE root joint）上取得 **0.881**，优于 Guo et al. 的 0.949（降幅 0.068）。全局轨迹 APE 为 0.869，均值局部 APE 为 0.110，均值全局 APE 为 0.899，在位置精度维度上全面占优。
 
@@ -197,8 +199,6 @@ FLAME 在三个文本-运动数据集上进行了系统评估，核心生成质�
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2209_00349/figures/006_Table_3.jpg]]
 *Table 3: Diversity evaluation on HumanML3D. Each model generates 10 samples per text in the test set for this evaluation*
 
-![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2209_00349/figures/015_Table_3.jpg]]
-*Table 3: Hyperparameters for Motion CLIP*
 
 **公平性措施**。对于 KIT 数据集，FLAME 采用与 TEMOS 完全相同的预处理和评估流水线；对于使用预训练语言模型的基线方法，统一替换为相同的 RoBERTa 编码器，以消除不同 PLM 对结果的混淆效应。
 
@@ -249,8 +249,6 @@ Table 4 对 FLAME 的四个关键组件在 HumanML3D 上进行了消融，揭示
 - **Figure 2** 架构图揭示了核心设计：Transformer 解码器同时接收运动令牌、CLS 语言池化令牌、TS 时间步令牌和 ML 运动长度令牌，并通过冻结 RoBERTa 编码器的交叉注意力注入语言条件。输出为 $2 \cdot D_{mo}$ 维向量，同时预测噪声均值和方差。
 - **Figure 5**（文本基运动编辑）和 **Figure 6**（运动预测与中间帧生成）进一步展示了框架在帧级编辑和时序补全任务上的泛化能力，无需针对子任务微调。
 
-![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2209_00349/figures/012_Figure_1.jpg]]
-*Figure 1: Motion length distribution*
 
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2209_00349/figures/016_Figure_2.jpg]]
 *Figure 2: “A person throws an object with right hand and catches an object with both hands.” Figure 2: Text-to-motion synthesis examples*
@@ -260,7 +258,9 @@ Table 4 对 FLAME 的四个关键组件在 HumanML3D 上进行了消融，揭示
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2209_00349/figures/004_Figure_3.jpg]]
 *Figure 3: Qualitative results on text-to-motion synthesis task. FLAME is able to synthesize motion from detailed textual descriptions. Motion sequences flow from left to right*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心范式转变：从序列生成到扩散去噪
 
@@ -297,6 +297,8 @@ FLAME 打开的后续研究方向包括：
 3. **多角色与物理约束扩展**：当前框架处理的是单角色运动，能否扩展到多角色交互运动生成，并引入物理仿真约束（如接触力、平衡条件）以保证运动的物理合理性，是一个具有挑战性的开放问题。
 
 4. **可控性粒度细化**：现有的掩码编辑支持帧级和关节级控制，但编辑的自然语言描述与掩码区域之间的对应关系是隐式的。如何实现更细粒度的语义-关节对齐（如“抬起左手食指”），需要更精细的条件注入机制。
+
+
 
 ## 原文 PDF
 

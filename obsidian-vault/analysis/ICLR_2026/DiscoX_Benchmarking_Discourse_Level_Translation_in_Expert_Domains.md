@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/DiscoX_Benchmarking_Discourse_Level_Translation_in_Expert_Domains.pdf
+project_link: null
+code_link: https://github.com/ByteDance-Seed/DiscoX
 openreview_forum_id: OTCfZ6h8Pe
 aliases:
 - MS
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | DiscoX：专家领域语篇级翻译基准测试 |
 | 英文题名 | DiscoX: Benchmarking Discourse-Level Translation in Expert Domains |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=OTCfZ6h8Pe); [GitHub](https://github.com/ByteDance-Seed/DiscoX) |
+| Links | [paper](https://openreview.net/forum?id=OTCfZ6h8Pe) · [GitHub](https://github.com/ByteDance-Seed/DiscoX) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/language_speech_and_dialog |
 | Method | Metric-S |
 | Dataset | DiscoX, DiscoX (zh→en sys-level) |
@@ -42,7 +44,7 @@ claims:
 > - DiscoX 上，Pairwise Consistency with Human 为 Metric-S 70.3%，对比 XCOMET-QE 34.7%，变化 +35.6%。
 > - DiscoX (zh→en sys-level) 上，System-Level Pairwise Consistency 为 Metric-S 80.0%，对比 XCOMET-QE 10.0%，变化 +70.0%。
 
-## 概述
+## 概要
 
 现有翻译评估基准长期聚焦于句子级的准确性与流畅性，无法衡量模型在长文本中维持语篇连贯、处理专业术语及遵循专家风格标准的能力。这一评估盲区导致当前最先进模型在专业翻译场景下的真实能力被系统性高估。
 
@@ -57,7 +59,7 @@ DiscoX 针对上述瓶颈，构建了一个同时强调“语篇级”与“专�
 
 DiscoX 基准目前覆盖 200 个高难度翻译任务，平均文本长度超过 1700 tokens，涵盖学术与非学术共七个专业领域。数据集通过专家编纂与难度过滤（要求两个 SOTA 模型在至少 8 个评分点上失败）构建，确保挑战性。Metric-S 的评估权重（准确度:流畅度:适当性 = 60:20:20）基于经验设定，其在不同领域的最优配置仍有待系统研究。
 
-## 背景与动机
+
 
 ### 当前翻译评估的瓶颈
 
@@ -77,7 +79,9 @@ DiscoX 基准目前覆盖 200 个高难度翻译任务，平均文本长度超�
 
 DiscoX 基准和 Metric-S 评估系统正是围绕这一动机构建的。DiscoX 通过三阶段构建流水线（Figure 3）——领域专家标注、难度过滤（两个 SOTA 模型均需在至少 8 个评分点上失败）、专家审核筛选——确保基准中的 200 个任务具有足够的挑战性和专业性。Metric-S 则采用多智能体 LLM 工作流（Figure 4），从准确度、流畅度、适当性三个维度进行分层评估，并通过错误去重机制将衍生错误归因到根本维度，避免重复扣分。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DiscoX 的核心创新在于同时引入“语篇级”和“专家级”两个维度，填补了现有翻译评估基准的系统性空白。传统基准（如 FLORES、WMT 2024）主要关注句子级的准确性和流畅性，其样本平均长度仅 45–59 tokens，无法衡量模型在长文本中维持语篇连贯性、处理专业领域术语以及遵守专家风格标准的能力。DiscoX 将平均文本长度提升至 1712.17 tokens（Table 2），并通过三阶段构建流水线——领域专家编纂、双模型难度过滤（两个 SOTA 模型均需在至少 8 个评分点上失败）、专家审核筛选——确保基准具有足够的挑战性（Figure 3）。
 
@@ -89,7 +93,7 @@ DiscoX 的核心创新在于同时引入“语篇级”和“专家级”两个�
 
 这一双维度设计揭示了当前 LLM 在专业翻译中的真实短板：即使最强的 GPT-5-high（总体得分 76.66）仍落后于人类专家（80.16），且不同模型在不同维度上表现出明显的互补性差异——GPT-5-high 在准确度上领先（48.65），而 Kimi-K2 在流畅度上更优（16.44），Claude-4 系列则准确度高但流畅度显著偏低（Table 3）。这种维度级诊断能力是传统单一分数指标无法提供的。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0010_OTCfZ6h8Pe_DiscoX_Benchmarking_Discourse-Level_Translation/figures/003_Table_1.jpg]]
 *Table 1: Comparison of DiscoX with existing translation benchmarks. DiscoX distinguishes itself by (a) targeting discourse-level texts with a larger average length and focusing on expert domains. And, (b) its companion metric, Metric-S, offers reference-free and explainable evaluation, a unique feature among the compared methods. (a) Benchmark Comparison*
@@ -145,7 +149,7 @@ Metric-S 在不同 LLM 法官间的一致性波动较小（57.8%–70.3%），�
 
 当前框架存在若干限制需要注意：DiscoX 仅覆盖中英语言对；Metric-S 的维度权重基于经验设定，尚未针对不同领域进行系统优化；评估系统本身依赖 LLM 法官，在极端边缘情况下仍可能存在不可预测的偏差；数据集中学术文本占比 121/200，可能削弱对非学术专业领域的评估深度。
 
-## 核心模块与公式推导
+
 
 ### Metric-S 评估工作流
 
@@ -183,7 +187,9 @@ Metric-S 的去重逻辑并非简单的跨维度去重，而是建立了一个�
 
 三个维度的满分权重设定为 60:20:20（准确度:流畅度:适当性），这一比例基于经验确定。消融研究显示，仅使用准确度维度或对三维度采用均等权重，均会降低 Metric-S 与人类判断的一致性，表明当前权重分配对捕捉专业翻译质量的多维特征具有不可忽视的调节作用。该权重的跨领域最优调整仍是一个开放问题。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：模型排行榜
 
@@ -243,7 +249,9 @@ Figure 5 和 Table 13 揭示了两个显著的非对称性：
 - **Figure 5（方向与领域分析）**：揭示了翻译方向和文本领域对模型性能的系统性影响，为后续研究指明了改进方向。
 - **Table 7（消融研究）**：验证了 Metric-S 多组件设计的有效性，特别是错误去重和多维度分离评估的必要性。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有基准和评估指标的关系
 
@@ -284,6 +292,8 @@ DiscoX 的评估体系存在明确的适用边界，需在以下约束下理解�
 4. **难度过滤的生态效度**：当前“双模型 8 点评分点失败”的过滤标准是否引入了系统性偏差，使得基准无法代表模型在真实专业翻译场景中的整体表现？一个更生态化的基准可能需要包含不同难度梯度的样本。
 
 5. **维度权重的领域自适应**：60:20:20 的固定权重是否在某些领域（如文学翻译）严重低估了适当性的重要性？是否需要引入领域自适应的权重调整机制？
+
+
 
 ## 原文 PDF
 

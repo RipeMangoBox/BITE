@@ -5,6 +5,8 @@ paper_level: A
 venue: WACV
 year: 2025
 pdf_ref: paperPDFs/WACV_2025/DiffMesh_A_Motion_Aware_Diffusion_Framework_for_Human_Mesh_Recovery_from_Videos.pdf
+project_link: https://zczcwh.github.io/
+code_link: null
 aliases:
 - DiffMesh
 tags:
@@ -41,7 +43,7 @@ claims:
 > - 3DPW 上，MPJPE (mm) 77.2 (DiffMesh, ResNet50) vs 80.7 (GLoT, ResNet50) (-3.5)。
 > - 3DPW (w/o 3DPW training) 上，MPJPE (mm) 88.7 (DiffMesh, ResNet50) vs 89.9 (GLoT, ResNet50) (-1.2)。
 
-## 概述
+## 概要
 
 从视频中恢复精确且时序平滑的三维人体网格是计算机视觉中的基础任务。现有基于扩散模型的方法面临一个关键瓶颈：逐帧独立扩散（Baseline 1）将总去噪步数放大为 $f \times N$，计算开销高昂且完全忽略帧间运动；而将多帧特征简单拼接后统一扩散（Baseline 2）虽将步数降至 $N$，却未能有效建模人体运动模式，导致预测结果在时间维度上不够平滑。
 
@@ -49,7 +51,7 @@ DiffMesh 的核心洞察在于：视频序列中相邻帧之间的前向运动�
 
 在方法谱系上，DiffMesh 定位于视频级扩散式人体网格恢复，区别于逐帧图像扩散方法（如 DnD, ECCV 2022）和基于回归的视频方法（如 VIBE, CVPR 2020；TCMR, CVPR 2021；GLoT, CVPR 2023）。其主要结果如下：在 3DPW 数据集上，DiffMesh（ResNet50 骨干）的 MPJPE 达到 77.2 mm，优于 GLoT 的 80.7 mm；加速度误差（ACC-ERR）为 6.3 mm/s²，相比 TCMR 的 6.8 mm/s² 进一步降低，且仅需 16 帧输入即可实现比 DND（32 帧）更优的运动平滑性。在 Human3.6M 上，DiffMesh 同样取得了有竞争力的性能（MPJPE 52.5 mm）。这些结果表明，运动感知扩散框架在精度与效率之间取得了良好的平衡。
 
-## 背景与动机
+
 
 ### 问题背景：视频人体网格恢复
 
@@ -75,7 +77,9 @@ DiffMesh的设计动机可归纳为三个层次：
 2. **运动建模内化**：不再将运动作为扩散过程的外部约束，而是将其作为扩散步骤的内在组成部分，使去噪过程天然具备运动感知能力；
 3. **平滑性保障**：通过在反向过程中递归解码前一帧特征，确保生成的网格序列在时间维度上保持连贯一致的平滑运动轨迹。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DiffMesh 的核心创新在于**重新定义了扩散模型在视频人体网格恢复（HMR）中的噪声语义**：将帧间的**人体运动模式**视为扩散前向过程中的“噪声”，从而将时序建模天然地嵌入到扩散框架内部。这一设计带来了三个关键的 changed slots：
 
@@ -110,7 +114,7 @@ $$x_{i+1} = \sqrt{\beta_i} \cdot x_i + \sqrt{(1 - \beta_i)} \cdot m_i$$
 
 上述三个 changed slots 构成了一个紧密耦合的因果链：**运动即噪声的语义转换**（Slot 1）使得扩散过程天然承载时序信息，从而实现了**步数与帧数的解耦**（Slot 2），而**双流 Transformer**（Slot 3）则为这一新型扩散过程提供了适配的逆向解码网络。三者共同支撑了 DiffMesh 在保持 $N$ 步去噪的前提下，高效生成平滑且准确的网格序列这一核心优势。
 
-## 整体框架
+
 
 DiffMesh 的整体架构围绕一个核心类比构建：**视频中相邻帧之间的前向运动，在机制上类似于扩散模型前向过程中逐步加入噪声**。基于这一洞见，框架将帧间的人体运动模式视为扩散前向过程中的“噪声”，从而在保持总去噪步数为 $N$ 的前提下，高效生成平滑且准确的人体网格序列。
 
@@ -149,7 +153,7 @@ DiffMesh 通过将运动模式内嵌于扩散过程本身，在仅需 $N$ 步的
 ![[assets/figures/papers/paper_list_l1652_DiffMesh_A_Motion_Aware_Diffusion_Framework_for_Human_Mesh_Recovery_from/figures/001_Figure_1.jpg]]
 *Figure 1: Different approaches of applying diffusion model for video-based HMR, the input frame f is 3 for simplicity and the number of steps is N. Here xi and ci denote the mesh and conditional features of*
 
-## 核心模块与公式推导
+
 
 ### 3.1 扩散模型基础（Preliminary）
 
@@ -248,7 +252,9 @@ $$x_{i-1}' = \frac{1}{\sqrt{\beta_i}} \left( x_i' - \frac{1 - \beta_i}{\sqrt{1 -
 ![[assets/figures/papers/paper_list_l1652_DiffMesh_A_Motion_Aware_Diffusion_Framework_for_Human_Mesh_Recovery_from/figures/004_Figure_4.jpg]]
 *Figure 4: Two diffusion baselines for video-based HMR*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -296,7 +302,9 @@ DiffMesh 在两个核心基准上均展现出优于现有视频方法的性能�
 ![[assets/figures/papers/paper_list_l1652_DiffMesh_A_Motion_Aware_Diffusion_Framework_for_Human_Mesh_Recovery_from/figures/003_Table_1.jpg]]
 *Table 1: Comparison with previous diffusion-based human pose and mesh methods*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有视频HMR方法的定位关系
 
@@ -338,6 +346,8 @@ DiffMesh 通过将运动模式视为扩散噪声，在保持 N 步的前提下�
 2. **遮挡鲁棒性**：在遮挡情况下，能否引入人体结构先验（如骨骼长度约束、关节角度限制）来约束扩散生成过程，提升网格合理性？
 3. **跨任务推广**：运动感知扩散的核心思想——将时序变化建模为扩散噪声——能否推广到其他时序预测任务（如轨迹预测、动作预测）？
 4. **计算效率优化**：当前 N=30 步的去噪过程是否可以通过蒸馏或步数缩减技术进一步加速，以适配实时应用场景？
+
+
 
 ## 原文 PDF
 

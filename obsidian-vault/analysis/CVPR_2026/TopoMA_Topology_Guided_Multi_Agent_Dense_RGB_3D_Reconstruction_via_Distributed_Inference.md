@@ -42,7 +42,7 @@ claims:
 > - ScanNet 上，Depth L1 (cm) / Acc (cm) 优于所有对比方法 vs VGGT-Long, TTT3R, SLAM3R 等 (显著改善)。
 > - Replica (多智能体设置) 上，RMSE (cm) 优于单智能体和多智能体基线 vs VGGT-SLAM, MAGiC-SLAM 等 (更佳)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -87,8 +87,6 @@ TOPOMA 在方法谱系中处于**端到端表征学习**与**显式拓扑约束*
 
 当前框架主要面向静态或近静态场景，强动态物体干扰会导致性能下降。未来工作方向包括：将显式动态物体建模融入拓扑骨架和残差传输中，以及在更大规模或异构智能体集群中验证拓扑骨架的实时构建与通信效率。
 
-## 背景与动机
-
 多智能体三维重建是机器人协作、自动驾驶和增强现实等领域的核心技术，其目标是通过多个独立移动的传感器平台，协同构建全局一致的三维场景模型。然而，将该任务从单智能体扩展至多智能体场景时，面临一系列根本性挑战。
 
 现有端到端三维重建方法（如 **VGGT-Long**、**TTT3R**、**SLAM3R** 等）在单智能体设定下已展现出强大性能，但在多智能体分布式部署中暴露出三个关键瓶颈：**跟踪不稳定**——不同智能体的局部轨迹在缺乏全局约束时易产生尺度漂移和累积误差；**内存消耗过高**——传输稠密点云或完整特征图导致通信和存储开销随智能体数量与序列长度急剧增长；**回环闭合频繁失败**——仅依赖外观或局部几何的检测机制难以在视角差异大、场景重复纹理多的条件下可靠识别跨智能体的空间重合。
@@ -97,7 +95,7 @@ TOPOMA 在方法谱系中处于**端到端表征学习**与**显式拓扑约束*
 
 **TopoMA** 正是针对上述缺口提出。其核心动机在于：通过显式构建并持续更新场景级拓扑骨架，将多智能体重建问题重新表述为拓扑引导的分布式推理过程。该拓扑骨架总结了不同智能体子图之间的连通性和几何关系，并直接引导注意力分配、信息融合和位姿优化。在这一框架下，各智能体仅需交换轻量拓扑信息即可实现全局一致重建，从根本上缓解了通信压力、尺度漂移和回环不可靠等瓶颈。
 
-## 核心创新
+## 核心方法与创新机理
 
 TOPOMA 的核心创新在于将**显式的场景拓扑骨架**与端到端的表征学习紧耦合，从而在分布式多智能体架构下联合解决空间对齐、子图融合与回环闭合等关键挑战。相较于现有方法，TOPOMA 在四个关键维度上实现了根本性的设计转变：
 
@@ -139,8 +137,6 @@ $$E_{\mathrm{trans}} = \sum_{v=(m,t)\in\mathcal{V}} \|\tilde{\mathbf{u}}_v - \ma
 
 上述四个 changed slots 并非孤立改进，而是围绕“拓扑骨架”这一核心表征形成的**协同创新体系**：拓扑骨架既是空间对齐的几何先验，又是回环筛选的全局约束，还是残差传播的高效通道。这种紧耦合设计使得 TOPOMA 在仅需轻量拓扑通信的条件下，实现了多智能体场景下的全局一致重建。
 
-## 整体框架
-
 TOPOMA 提出了一种**全分布式、拓扑引导的多智能体密集三维重建框架**，其核心设计目标是在通信受限、轨迹异构的条件下实现全局一致的位姿估计与场景重建。框架的输入为多个独立智能体采集的 RGB 图像序列，输出为各智能体的精确相机位姿以及全局对齐的稠密点云。
 
 ### 核心设计理念
@@ -178,8 +174,6 @@ TOPOMA 提出了一种**全分布式、拓扑引导的多智能体密集三维�
 
 ![[assets/figures/papers/paper_list_l2648_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_TopoMA_Topology/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of TOPOMA. Mapping: RGB observations are tokenized and aggregated to build a topology-aware skeleton, which is unified with geometric cues to recover consistent structure and scale. Tracking: Agents perform local loop detection, update topology constraints, and apply topology-consistent loop closures through frontend/back-end topology transformers, ensuring coherent multi-agent pose estimation.The system runs fully distributed, allowing each agent to maintain local submaps while progressively achieving global topological consistency*
-
-## 核心模块与公式推导
 
 TOPOMA 围绕三个拓扑驱动的核心模块构建全分布式多智能体重建管线：**拓扑骨架构建**、**去中心化回环闭合**和**拓扑引导残差传输**。这三个模块共享一个统一的拓扑表征，并通过前端/后端拓扑 Transformer 实现局部顺序更新与全局一致性优化。
 
@@ -239,15 +233,7 @@ $$E_{\mathrm{trans}} = \sum_{v=(m,t)\in\mathcal{V}} \|\tilde{\mathbf{u}}_v - \ma
 
 其中 $\tilde{\mathbf{u}}_v$ 为传输后的节点残差，$\tilde{z}_{k(m,t)}$ 为全局令牌，$h_\theta$ 和 $g_\theta$ 分别为位姿预测头和残差编码头。该设计使得各智能体仅需交换轻量拓扑信息和压缩残差描述子，即可实现与中心化方案相当的全局一致性，同时显著降低通信开销与内存占用。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2648_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_TopoMA_Topology/figures/003_Figure_3.jpg]]
-*Figure 3: Illustration of loop closure effect. On the left is the drifting reconstruction before loop closure. The middle shows our multi-agent loop detection on the topology skeleton, which identifies consistent loop candidates across agents. On the right is the fixed result after applying our loop closure, yielding a globally aligned and geometrically consistent map*
-
-![[assets/figures/papers/paper_list_l2648_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_TopoMA_Topology/figures/004_Figure_4.jpg]]
-*Figure 4: Residual transport and efficiency analysis. Left: schematic of our residual transport module, where agents exchange shared information derived from pointmap, depth, topology and color residuals to achieve consistent updates. Right: line plot of memory usage versus input frames demonstrates that our residual transport maintains efficient GPU and CPU usage as the sequence grows*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -308,16 +294,7 @@ TOPOMA在KITTI里程计、ScanNet和Replica三个数据集上进行评估，覆�
 ![[assets/figures/papers/paper_list_l2648_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_TopoMA_Topology/figures/009_Table_5.jpg]]
 *Table 5: Ablation on residual transport.We conduct experiments on apartment-00 of Replica [28] to verify the effectiveness of our method, and all reported values are averaged over 5 runs*
 
-![[assets/figures/papers/paper_list_l2648_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_TopoMA_Topology/figures/005_Figure_5.jpg]]
-*Figure 5: Large-scale outdoor reconstruction results on the KITTI dataset. Four representative sequences are shown, where the first column presents reconstructions produced by OURS, and the remaining columns show outputs from VGGT-Long[7], TTT3R[3], SLAM3R[23], MASt3R-SLAM[25], and VGGT-SLAM[24]*
-
-![[assets/figures/papers/paper_list_l2648_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_TopoMA_Topology/figures/007_Figure_6.jpg]]
-*Figure 6: Indoor reconstruction results on the ScanNet[6].The first column shows reconstructions produced by TOPOMA, while the remaining columns display outputs from VGGT-Long[7], TTT3R[3], SLAM3R[23], MASt3R-SLAM[25], and VGGT-SLAM[24]*
-
-![[assets/figures/papers/paper_list_l2648_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_TopoMA_Topology/figures/001_Figure_1.jpg]]
-*Figure 1: Large-scale real-world multi-agent experiment of TOPOMA. Left: RTK-based ground-truth trajectories overlaid on a satellite map. Middle: pointclouds of the four agents and their corresponding coverage areas. Right: perspective view of the reconstructed 3D scene. Bottom: zoomed-in views of four marked road segments along the reconstructed trajectory*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 与现有基线方法的关系
 

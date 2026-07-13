@@ -5,6 +5,8 @@ paper_level: A
 venue: 3DV
 year: 2025
 pdf_ref: paperPDFs/3DV_2025/MASt3R_SfM_a_Fully_Integrated_Solution_for_Unconstrained_Structure_from_Motion.pdf
+project_link: null
+code_link: https://github.com/naver/mast3r
 aliases:
 - MS
 - MASt3R-SfM
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | MASt3R-SfM：面向无约束运动恢复结构的全集成解决方案 |
 | 英文题名 | MASt3R-SfM: a Fully-Integrated Solution for Unconstrained Structure-from-Motion |
 | 会议/期刊 | 3DV 2025 |
-| Links | [paper](https://arxiv.org/abs/2409.19152); [GitHub](https://github.com/naver/mast3r) |
+| Links | [paper](https://arxiv.org/abs/2409.19152) · [GitHub](https://github.com/naver/mast3r) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | MASt3R-SfM |
 | Dataset | Tanks&Temples (25 views subset), Tanks&Temples (full set), MIP-360, CO3Dv2 (10 random frames) |
@@ -41,7 +43,7 @@ claims:
 > - Tanks&Temples (full set) 上，ATE ↓ 为 0.01060，对比 0.01520 (ACE-Zero)，变化 相对降低30.3%。
 > - MIP-360 上，ATE ↓ 为 0.00079，对比 0.00089 (FlowMap)，变化 相对降低11.2%。
 
-## 概述
+## 概要
 
 运动恢复结构（Structure-from-Motion, SfM）旨在从无序图像集合中同时恢复相机姿态与三维场景结构。传统SfM流水线（如 **COLMAP**, Schönberger et al., CVPR 2016）依赖关键点提取、特征匹配、RANSAC外点剔除与增量式光束平差（Bundle Adjustment, BA）的级联模块，在图像重叠不足、视图稀少或纯旋转（无平移运动）等无约束条件下极易崩溃，且计算复杂度随图像数量呈超线性增长，可扩展性受限。
 
@@ -55,7 +57,7 @@ claims:
 
 **方法定位**：MASt3R-SfM属于基于学习的稠密SfM方法，但区别于端到端可微分SfM（如VGGSfM）或场景坐标回归方法（如ACE-Zero），它完全训练自由，仅依赖冻结的MASt3R预训练模型，兼具传统几何优化的可解释性与深度学习的前端鲁棒性。
 
-## 背景与动机
+
 
 运动恢复结构（Structure-from-Motion, SfM）旨在从无序图像集合中同时恢复相机姿态和场景三维结构，是三维视觉与具身智能的基础模块。然而，传统SfM流水线面临一个根本性瓶颈：其依赖的模块级联架构——关键点提取、特征匹配、几何验证、增量式光束平差——在图像重叠不足、视图极度稀疏或相机仅发生纯旋转时极易崩溃，且计算复杂度随图像数量急剧膨胀，可扩展性受限。
 
@@ -67,7 +69,9 @@ MASt3R-SfM正是在这一矛盾中找到了因果操纵点。其核心洞察是�
 
 这一设计的决定性优势在多项实验中得到了验证：在CO3Dv2数据集上，当输入视图数量从数十帧降至数帧时，MASt3R-SfM的相对旋转精度（RRA）和相对平移精度（RTA）几乎保持恒定，而其他方法急剧下降（Figure 1）；在Tanks&Temples全视图集上，其ATE达到0.01060，相对ACE-Zero降低30.3%（Table 1）；在ETH3D上，平均RRA@5=81.2、RTA@5=79.7，大幅超越所有对比方法（Table 3）。更重要的是，该方法在传统SfM完全失效的纯旋转场景下仍能输出有效重建，填补了领域内长期存在的空白。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MASt3R-SfM 的核心创新并非提出新的学习范式，而是**将冻结的 MASt3R 3D 视觉基础模型重新编排为一个完整的、无需训练的 SfM 流水线**，并通过四项关键设计（changed slots）从根本上突破了传统 SfM 在无约束条件下的瓶颈。
 
@@ -101,10 +105,10 @@ DUSt3R 的全局对齐对所有密集点图施加刚性相似变换，计算代�
 
 上述四项 changed slots 形成了完整的因果链条：编码器复用使流水线可扩展至大规模场景（$O(N)$ 复杂度）；稀疏匹配与两阶段优化消除了对 RANSAC 的依赖，同时保持了全局一致性；再参数化与运动学链解决了位姿优化中的耦合问题；纯旋转处理策略则填补了传统 SfM 的关键能力空白。整个流水线完全训练自由，仅依赖一个现成的 MASt3R 检查点，却能在 T&T、CO3Dv2、ETH3D 等多个基准上以显著优势超越 COLMAP、VGGSfM、FlowMap、ACE-Zero 等强基线。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l9_MASt3R_SfM_a_Fully_Integrated_Solution_for_Unconstrained_Structure_from/figures/002_Figure_2.jpg]]
-*Figure 2: Overview of the proposed MASt3R-SfM method. Given an unconstrained image collections, possibly small (1 image) or large (> 1000 images), we start by computing a sparse scene graph using efficient image retrieval techniques given a frozen MASt3R’s per-image features. We then compute local 3D reconstruction and matches for each edge using again a frozen MASt3R’s decoder. Global optimization proceeds with gradient descent of a matching loss in 3D space, followed by refinement in terms of 2D reprojection error*
+*Figure 2：稀疏场景图、局部重建与粗到细全局优化组成的 MASt3R-SfM 流程。*
 
 MASt3R-SfM 是一个面向无约束图像集合的全集成运动恢复结构（SfM）流水线，整个流程完全免训练，仅依赖一个冻结的 MASt3R 预训练模型。其核心设计思路是将传统 SfM 中相互解耦的模块——图像检索、匹配、位姿估计、三角测量与光束法平差——统一为四个紧密衔接的阶段，如图 Figure 2 所示。
 
@@ -140,7 +144,7 @@ $$\mathcal{L}_2 = \sum_{c \in \mathcal{M}^{n,m} \atop (n,m) \in \mathcal{E}} q_c
 
 消融实验证实了各阶段的必要性：仅粗对齐（类似 DUSt3R 全局对齐）的 ATE 为 0.01504，加入细化后降至 0.01243；细化若从随机初始化出发则无法收敛，说明粗对齐提供的初始解对非凸的类 BA 优化至关重要（Table 5）。
 
-## 核心模块与公式推导
+
 
 MASt3R-SfM 的核心架构由四个顺序模块构成：场景图构建、局部重建与匹配、粗对齐（3D损失）、细化（2D重投影损失）。其关键创新在于将 MASt3R 冻结编码器复用为图像检索器，从而将匹配复杂度从 $O(N^2)$ 降至 $O(N)$，并通过两阶段梯度下降实现无需 RANSAC 的全局优化。
 
@@ -194,29 +198,29 @@ $$\forall (n \ m) \in \mathcal{D}, P_m = P_{n \ m} P_n$$
 
 在纯旋转场景下，系统冻结规范深度图并禁用锚点深度优化，使方法在无平移运动时也能稳定工作。该策略在 InLoc 数据集上实现了 100% 的相对旋转精度（Table 8），而传统 SfM 方法（COLMAP、VGGSfM）在此条件下完全失效。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
 **Tanks&Temples 数据集。** MASt3R-SfM 在不同视图数量下均保持最高的注册率（100%），而 COLMAP、VGGSfM、FlowMap 等基线在视图减少时注册率急剧下降。从 25 视图到全视图，MASt3R-SfM 的 ATE 始终低于所有竞争对手：25 视图下 ATE=0.03360（COLMAP=0.03840），全视图下 ATE=0.01060（ACE-Zero=0.01520），相对降低 30.3%。值得注意的是，ATE 计算对所有方法均仅基于已注册相机，而 MASt3R-SfM 始终注册全部视图，这意味着其误差计算包含了所有相机——在公平性上实际处于不利地位，但仍全面领先（Table 1 左）。
 
 ![[assets/figures/papers/paper_list_l9_MASt3R_SfM_a_Fully_Integrated_Solution_for_Unconstrained_Structure_from/figures/004_Table_1.jpg]]
-*Table 1: Results on Tanks&Temples in terms of ATE and overall registration rate (Reg.). For easier readability, we color-code ATE results as a linear gradient between worst and best ATE for a given dataset or split; and Reg results with linear gradient between 0% and 100%. Left: impact of the number of input views, regularly sampled from the full set. ‘N/A’ indicates that at least one scene did not converge. Right: ATE↓ on different datasets with the arbitrary splits defined in FlowMap [50]*
+*Table 1：Tanks&Temples 等数据集上的 ATE 与注册率主结果。*
 
 在 FlowMap 定义的任意分割上，MASt3R-SfM 在 MIP-360 上取得 ATE=0.00079，优于 FlowMap（0.00089）；在 LLFF 上 ATE=0.00098，与 FlowMap（0.00097）持平；在 T&T 和 CO3Dv2 分割上分别取得 0.00215 和 0.00538。需注意 FlowMap 可能在其自身训练分割上进行了训练，而 MASt3R-SfM 完全训练自由（Table 1 右）。
 
 **CO3Dv2 与 RealEstate10K 多视图姿态回归。** 在 10 帧随机采样设置下，MASt3R-SfM 在 CO3Dv2 上取得 mAA(30)=88.0，显著优于 VGGSfM（80.2）和 RelPose++（82.8）；在 RealEstate10K 上取得 86.8，同样领先。当视图数量从 10 降至 5 和 3 时，MASt3R-SfM 的相对旋转精度（RRA）和相对平移精度（RTA）几乎保持恒定，而其他方法急剧下降——这验证了该方法对稀疏输入的高度鲁棒性（Table 2, Table 9, Figure 1 上）。
 
 ![[assets/figures/papers/paper_list_l9_MASt3R_SfM_a_Fully_Integrated_Solution_for_Unconstrained_Structure_from/figures/001_Figure_1.jpg]]
-*Figure 1: Top: Relative rotation (RRA) and translation (RTA) accuracies on the CO3Dv2 dataset when varying the number of input views with random subsampling (the more views, the larger they overlap). In contrast to our competitors, MASt3R-SfM offers nearly constant performance on the full range, even for very few views. Bottom: MASt3R-SfM also works without motion, i.e. in purely rotational settings. We show here a reconstruction from 6 views sharing the same optical center*
+*Figure 1：少视图与纯旋转条件下的姿态精度和重建示例。*
 
-![[assets/figures/papers/paper_list_l9_MASt3R_SfM_a_Fully_Integrated_Solution_for_Unconstrained_Structure_from/figures/005_Table_2.jpg]]
-*Table 2: Multi-view pose regression on CO3Dv2 [39] and RealEstate10K [70] with 10 random frames. Parenthesis () denote methods that do not report results on the 10 views set, we report their best for comparison (8 views). We distinguish between (a) multi-view and (b) pairwise methods*
 
 **ETH3D 数据集。** 在逐场景评估中，MASt3R-SfM 平均 RRA@5=81.2、RTA@5=79.7，大幅超越所有对比方法：VGGSfM（64.6/57.2）、FlowMap（56.5/50.1）、COLMAP（39.2/35.4）。在 13 个场景中的 12 个上取得最优或次优结果，唯一例外是“courtyard”场景中 DF-SfM 略优（Table 3）。
 
 ![[assets/figures/papers/paper_list_l9_MASt3R_SfM_a_Fully_Integrated_Solution_for_Unconstrained_Structure_from/figures/006_Table_3.jpg]]
-*Table 3: Detailed per-scene translation and rotation accuracies (↑) on ETH-3D. For clarity, we color-code results with a linear gradient between the worst and best result for a given scene*
+*Table 3：ETH3D 各场景的旋转与平移精度。*
 
 ### 消融实验
 
@@ -225,10 +229,8 @@ $$\forall (n \ m) \in \mathcal{D}, P_m = P_{n \ m} P_n$$
 **场景图构建策略。** 检索式稀疏场景图（Keyframes+kNN）的 ATE=0.01243，与全连接图（0.01256）几乎持平，但边数从 O(N²) 降至 O(N)，带来约 10 倍加速。仅使用 kNN 短程连接（ATE=0.01440）或仅使用关键帧长程连接（ATE=0.01722）均显著劣于二者结合，表明短程与长程连接互补，对鲁棒重建至关重要（Table 4, Table 5）。
 
 ![[assets/figures/papers/paper_list_l9_MASt3R_SfM_a_Fully_Integrated_Solution_for_Unconstrained_Structure_from/figures/007_Table_4.jpg]]
-*Table 4: Ablation of scene graph construction on Tanks&Temples (200 view subset). See text for details*
+*Table 4：稀疏场景图构建方式的精度与效率消融。*
 
-![[assets/figures/papers/paper_list_l9_MASt3R_SfM_a_Fully_Integrated_Solution_for_Unconstrained_Structure_from/figures/009_Table_5.jpg]]
-*Table 5: Ablations on Tanks&Temples (200 view subset). See text for details*
 
 **优化阶段贡献。** 仅进行粗对齐（类似 DUSt3R 全局对齐但使用稀疏匹配和更少优化变量）得到 ATE=0.01504；加入细化后降至 0.01243，RTA@5 从 56.0 跃升至 70.9。若细化时不优化锚点深度（仅使用冻结的规范深度图），ATE 为 0.01315，仍优于仅粗对齐，但弱于完整细化——说明联合优化深度能进一步提升精度（Table 5）。
 
@@ -238,36 +240,30 @@ $$\forall (n \ m) \in \mathcal{D}, P_m = P_{n \ m} P_n$$
 
 **检索特征聚合方式。** MASt3R 编码器分词特征经 ASMK 聚合后，在视觉定位任务上表现最优；若改用平均池化+白化+余弦相似度的全局特征，或先学习投影器再 ASMK，定位精度均有所下降（Table 7）。
 
-![[assets/figures/papers/paper_list_l9_MASt3R_SfM_a_Fully_Integrated_Solution_for_Unconstrained_Structure_from/figures/011_Table_7.jpg]]
-*Table 7: Comparison of retrieval based on MASt3R features. We compare the visual localization accuracy using top-20 retrieved images with ASMK (top row), a global feature representation obtained by averaging pooling the local features, whitening using a cosine similarity (middle row), and ASMK when first learning a projector on top of the MASt3R features (bottom row)*
 
 **超参数敏感性。** 关键图像数 N_a 和最近邻数 k 在合理范围内（N_a≥15, k≥5）对最终精度影响较小，方法对此不敏感（Figure 7）。粗对齐迭代次数约 250 次后收敛，细化在此基础上持续改善（Figure 4）。
 
-![[assets/figures/papers/paper_list_l9_MASt3R_SfM_a_Fully_Integrated_Solution_for_Unconstrained_Structure_from/figures/010_Figure_4.jpg]]
-*Figure 4: Pose accuracy (↑) on T&T-200 w.r.t. the number of iterations of the coarse and refinement stages (resp. ??1 and ??2)*
 
-![[assets/figures/papers/paper_list_l9_MASt3R_SfM_a_Fully_Integrated_Solution_for_Unconstrained_Structure_from/figures/015_Figure_7.jpg]]
-*Figure 7: Pose accuracy (↑) on T&T-200 w.r.t. the number of key images N _ { a } and number of nearest neighbors ??*
 
 ### 图像检索评估
 
 复用 MASt3R 冻结编码器+ASMK 的检索方案（top-20）在 Aachen 昼夜定位和 InLoc 室内定位任务上，与专用检索器 FIRe 性能相当，并在 InLoc 上设定了新的定位精度最优。这验证了“劫持”编码器进行检索的有效性——几乎零额外计算开销即获得了有竞争力的检索质量（Table 6）。
 
-![[assets/figures/papers/paper_list_l9_MASt3R_SfM_a_Fully_Integrated_Solution_for_Unconstrained_Structure_from/figures/008_Table_6.jpg]]
-*Table 6: Comparison of retrieval based on MASt3R features using ASMK with the state-of-the-art FIRe method when localizing with MASt3R (bottom rows), as well as with other state-of-the-art visual localization methods (top rows)*
 
 ### 纯旋转场景
 
 在 InLoc 数据集 20 个纯旋转场景上，传统 SfM 方法（COLMAP、VGGSfM）完全失效，而 MASt3R-SfM 通过冻结规范深度图并禁用锚点深度优化（MASt3R-SfM†），实现了 100% 的相对旋转精度（RRA@5）。这验证了方法对无平移运动这一极端条件的独特处理能力（Table 8, Figure 1 下）。
 
 ![[assets/figures/papers/paper_list_l9_MASt3R_SfM_a_Fully_Integrated_Solution_for_Unconstrained_Structure_from/figures/014_Table_8.jpg]]
-*Table 8: Pure Rotation Case. RRA@5 (↑) on 20 randomly chosen scenes from the InLoc dataset. MASt3R-SfM† denotes our approach with disabled depth optimization for better optimization stability*
+*Table 8：纯旋转场景中禁用深度优化后的旋转精度。*
 
 ### 失败模式分析
 
 所有手动审查的失败案例根因均为**重复或相似纹理导致的错误匹配（outliers）**。在室内纯旋转场景（如 InLoc 的 DUC1/007）中尤为突出：相似外观区域间的错误对应破坏了全局对齐。当前方法假设针孔相机模型且无镜头畸变，未考虑动态场景或非朗伯面等更具挑战性的条件。此外，方法严重依赖 MASt3R 预训练模型的质量与泛化性，在极端低纹理或跨域场景下性能可能下降（Figure 6, Section 6）。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -312,6 +308,8 @@ MASt3R-SfM 的核心定位是**全集成、无训练的SfM流水线**，其方�
 5. **极大规模验证**：MASt3R-SfM声称的线性复杂度在实际大规模重建（>10万图）中是否仍然成立？检索模块的码本规模如何影响效率与精度？FPS采样策略是否需要在极大规模下引入层次化或分块机制？
 
 6. **与NeRF/3DGS的协同**：MASt3R-SfM输出的稀疏重建和精确相机姿态能否作为NeRF或3D Gaussian Splatting的理想初始化？这种协同可能进一步提升稠密重建和新视角合成的质量。
+
+
 
 ## 原文 PDF
 

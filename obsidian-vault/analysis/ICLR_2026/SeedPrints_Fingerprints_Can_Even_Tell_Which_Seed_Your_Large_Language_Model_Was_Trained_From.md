@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/SeedPrints_Fingerprints_Can_Even_Tell_Which_Seed_Your_Large_Language_Model_Was_Trained_From.pdf
+project_link: null
+code_link: https://github.com/YnezT0311/SeedPrints
 aliases:
 - SeedPrints
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | SeedPrints：指纹甚至能辨别你的大语言模型是用哪个种子训练的 |
 | 英文题名 | SeedPrints: Fingerprints Can Even Tell Which Seed Your Large Language Model Was Trained From |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=Kan6Z0zzZi); [GitHub](https://github.com/YnezT0311/SeedPrints) |
+| Links | [paper](https://openreview.net/forum?id=Kan6Z0zzZi) · [GitHub](https://github.com/YnezT0311/SeedPrints) |
 | Topic | #topic/safety_alignment_fairness_privacy #topic/safety_alignment_fairness_privacy/trustworthy_machine_learning |
 | Method | SeedPrints |
 | Dataset | OLMo-2-7B Stage 1预训练检查点（5B → 3.9T tokens）, LLaMA-2-7B微调变体（5M–700B tokens）, LeaFBench（65个模型，6种部署变换）, 持续训练到代码数据集The Stack（base模型 seed 1000） |
@@ -40,7 +42,7 @@ claims:
 > - LLaMA-2-7B微调变体（5M–700B tokens） 上，谱系检测p值 / 相似度 为 SeedPrints p < 0.01（最低10^{-5136}），对比 PCS在CodeLlama-7B (0.6863) 和 Llemma-7B (0.6682) 上失败，变化 SeedPrints始终检测成功，PCS/ICS在领域特化模型上未达0.8阈值。
 > - LeaFBench（65个模型，6种部署变换） 上，AUC / KS统计量 为 SeedPrints AUC 0.992，KS 0.986，对比 Intrinsic AUC 0.997, ICS AUC 0.995, REEF AUC 0.915, Gradient AUC 0.801，变化 SeedPrints接近最强基线，显著优于REEF（+0.077 AUC）和Gradient。
 
-## 概述
+## 概要
 
 大语言模型（LLM）的谱系归属与版权验证需要一种可靠且持久的数字指纹，然而现有的被动指纹方法（如基于参数向量相似度的 PCS、ICS，基于注意力分布的 Intrinsic 等）大都依赖于训练后期涌现的结构特征，在模型预训练的早期阶段（前几万亿 tokens）几乎完全失效，并且在训练数据分布发生剧烈变化时容易被误导。本文指出，上述方法的根本瓶颈在于它们未能捕获一种与模型“出身”绑定、终身不变的初始化信号。
 
@@ -48,7 +50,7 @@ claims:
 
 实验结果表明，SeedPrints 从 OLMo-2-7B 的首个预训练检查点（5B tokens）起即能以极高水平（p ≪ 0.001）完美检测谱系，而此时所有基线方法的相似度均远低于常用阈值 0.8。在持续训练到代码数据集 The Stack 导致数据分布完全改变的设定下，SeedPrints 仍能正确归属模型后裔（p ≈ 0），而基线 Intrinsic 等方法彻底失败。在覆盖多种模型家族与参数改动技术的 LeaFBench 基准上，SeedPrints 取得了 0.992 的 AUC 和 0.986 的 KS 统计量，接近最强的基线（Intrinsic 0.997 AUC），并显著优于 REEF、Gradient 等方法。这些结果一致验证了初始化指纹作为谱系标识符的健壮性。
 
-## 背景与动机
+
 
 大语言模型的训练成本极高，模型的非法复制、未授权持续训练以及谱系归属争议日渐突出。要解决这类问题，需要能够可靠识别模型来源与演化关系的数字指纹技术。现有的 LLM 指纹方法主要依赖训练后涌现的模型属性，例如参数向量的余弦相似度（PCS、ICS）、注意力参数的层内标准差轮廓（Intrinsic）、表征空间的中心核对齐（REEF）以及梯度信息（Gradient）等。这些方法在设计上均假定模型指纹是由大规模训练过程“后天”塑造的，因此本质上无法保证“Galton 式指纹”所要求的两个核心性质——与生俱来且终身不变。
 
@@ -56,7 +58,9 @@ claims:
 
 本文受到一个关键观察的启发：未经训练的模型在完全随机的输入下会表现出高度非均匀的输出偏差——某些输出维度（或 token）频繁获得极小 logit 值，且这种偏差模式对初始化种子具有特异性（Figure 2）。更重要的是，这一微弱的初始化偏差信号在训练过程中并未消失，而是与训练后的模型之间保持了统计上可检测的相关性（Table 2 中 p 值低至 10⁻²⁶ 量级，而所有基线均无法探测到该信号）。换言之，随机初始化种子在模型内部表示空间中留下了一个先天的、不可磨灭的“签名”，它独立于训练数据和优化过程。受此启发，本文提出 **SeedPrints**，通过显式提取身份维度上的秩相关性并进行假设检验，来识别模型谱系。该方法不依赖训练后期涌现的结构特征，因此能够在早期训练点、数据分布偏移以及多种微调策略下稳定判定模型是否源自同一初始化种子，弥补了现有指纹技术的核心缺口。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 现有 LLM 指纹方法（Intrinsic、REEF、PCS、ICS 等）依赖训练后涌现的属性——如注意力参数层内标准差轮廓或参数向量余弦相似度——来判定模型谱系。然而，这些信号在模型的早期预训练阶段（前几万亿 tokens）尚未充分形成，且当训练数据分布发生显著变化时极易被覆写，导致指纹判定失效，无法满足“与生俱来、终身不变”的刚性要求。SeedPrints 的核心突破在于**根本性地改变了指纹信号的来源**：它不再捕捉模型经过大规模训练后习得的表面特征，而是挖掘由随机初始化种子所诱发的、贯穿整个训练周期保持统计可检测的底层输出偏好模式。
 
@@ -74,7 +78,7 @@ claims:
 
 综上，SeedPrints 以极简的“信号来源”转变，首次实现了符合“Galton 式指纹”（与生俱来、终身不变）特性的 LLM 谱系检测方法：仅通过从初始化偏见中抽取身份维度并进行相关性检验，即可在白盒访问条件下为模型的所有权和版权提供强力追溯，而无需任何额外训练或模块。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0013_Kan6Z0zzZi_SeedPrints_Fingerprints_Can_Even_Tell_Which_Seed/figures/004_Figure_2.jpg]]
 *Figure 2: Initialization-born output bias persists through training. Left: Given completely random inputs, the outputs of a randomly initialized LLaMA-2–style model are far from uniform, but instead exhibit clear bias: certain dimensions are disfavored by the model (i.e., they frequently receive the minimum value across random inputs). Such extreme bias appears both in the logits (top, red) and in the final hidden representations (bottom, blue). The dashed line shows the expected frequency under a uniform distribution. The arrows in the top panel indicate a broken x-axis that omits low-frequency tail ranks. Upper Right: During training, models remain weakly correlated in their output bias across inpu...*
@@ -92,7 +96,7 @@ SeedPrints 的核心 pipeline 由三个顺序模块构成，输入为一对待�
 
 上述框架的关键瓶颈在于：指纹信号仅存在于模型输出维度分布的低值偏序中，**需要白盒访问内部表示（如 logits 或隐藏状态）**，无法直接用于纯黑盒 API 场景；此外，在模型融合（weight‑space interpolation）等权值空间中，身份维度信号可能被稀释，导致偶发误判。尽管如此，整体 pipeline 能够在首个预训练检查点（<1T tokens）即实现完美检测（p ≪ 0.001），且在训练数据分布剧烈变动时仍保持谱系保真，远优于依赖训练后参数或注意力模式的基线方法。
 
-## 核心模块与公式推导
+
 
 SeedPrints 的核心创新在于将大语言模型（LLM）的谱系检测从“训练后涌现特征”转向“初始化即植入”的持久性偏差。初始随机种子会使未训练模型在随机输入下产生种子特异的极端输出偏好（某些输出维度总是倾向于获得极小 logit），该微弱信号在后续训练全程保持可检测的相关性，从而构成“Galton 式”的终身指纹。以下按流水线顺序阐述三个关键模块及其支撑的统计检验框架。
 
@@ -169,7 +173,9 @@ $$
 
 综上，SeedPrints 通过提取初始化种子的最小响应维度交集，并以 Kendall‑τ 统计检验取代相似度阈值的思路，提供了一种在预训练全程均稳定有效的模型谱系判定范式。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 早期预训练阶段的谱系检测：从第一个检查点即可区分
 
@@ -231,7 +237,9 @@ SeedPrints 的谱系判决依赖于在身份维度上平均 Kendall‑τ 统计�
 *Table 1: Comparison of finger- Table 2: Trained models share the same fingerprint behaviors as print behaviors between models their initialization (p-value \< 0.01). initialized with different seeds*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有模型指纹方法的谱系关系
 当前主流的大语言模型指纹方法——包括Intrinsic（基于注意力参数层内标准差轮廓相似度）、REEF（基于表征的中心核对齐相似度）、PCS（基于参数展平后的余弦相似度）、ICS（基于参数不变量的余弦相似度）以及Gradient（基于梯度信息的指纹）——均依赖训练**后**涌现的属性构建签名，本质上属于“后天”指纹。这类方法的共有瓶颈在于：当模型尚处预训练早期（训练 token 量 < 1T）时，其训练后特征尚未充分形成，导致指纹检测全面失效；此外，这些方法在训练数据分布发生剧烈变化时容易被误导，无法满足“与生俱来、终身不变”的 Galton 式指纹要求。
@@ -263,6 +271,8 @@ SeedPrints 的最佳适用场景为**白盒或可获取内部表示**（logits �
 4. **全生命周期统一指纹**：将初始化指纹与训练中后期涌现的指纹有机结合，形成“出生－成长－部署”全阶段可追溯的模型谱系框架，在早期预训练阶段即建立起不可伪造的身份印记。
 5. **自动化阈值与统计决策**：在大型模型家族中，研究如何基于模型族内分布自适应设定显著性水平，以自动平衡假阳性与漏检率。
 6. **安全与法律双重背书**：从技术层面增强指纹的防篡改能力，同时明确初始化指纹在模型审计、版权保护和责任认定中的法律定位，推动技术标准与法律规范的协同演进。
+
+
 
 ## 原文 PDF
 

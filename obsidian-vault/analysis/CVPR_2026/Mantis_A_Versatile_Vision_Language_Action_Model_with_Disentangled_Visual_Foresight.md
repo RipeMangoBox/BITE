@@ -43,7 +43,7 @@ claims:
 > - LIBERO Spatial 上，Success Rate (%) 98.8 vs 98.2 (F1) (+0.6)。
 > - LIBERO Object 上，Success Rate (%) 99.2 vs 98.8 (π0) (+0.4)。
 
-## 概述
+## 概要
 
 机器人的视觉-语言-动作（VLA）模型旨在将多模态感知与语言理解转化为可执行的动作。然而，低维动作信号的稀疏性难以充分监督大规模VLA模型的学习。现有方法试图通过**视觉前瞻预测**（Visual Foresight）引入辅助信号——要么显式生成未来像素帧，要么预测压缩视觉表示。前者引入大量冗余信息，分散模型对动作学习的注意力；后者则造成信息瓶颈，且普遍缺乏语言监督，导致模型的理解与推理能力退化。
 
@@ -53,7 +53,7 @@ Mantis 提出了一种**解耦视觉前瞻**（Disentangled Visual Foresight, DV
 
 **方法定位**：Mantis 属于视觉增强型VLA，通过解耦的扩散头实现隐式潜在动作学习，区别于显式像素预测（如 DreamVLA）和压缩表示引导（如 ATM）的范式。其渐进式训练与语言监督设计，使其在操作成功率、收敛效率与指令泛化三个维度上建立了新的综合优势。
 
-## 背景与动机
+
 
 ### 视觉-语言-动作模型的核心瓶颈
 
@@ -81,7 +81,9 @@ Mantis 提出了一种**解耦视觉前瞻**（Disentangled Visual Foresight, DV
 2. **构建紧凑而有指导性的辅助信号**：利用meta queries自动捕获帧间动态（即“潜在动作”），为动作预测提供精准的前瞻线索，避免像素级预测的冗余与压缩表示的瓶颈。
 3. **保护语言理解能力**：通过渐进式多模态训练策略，在引入视觉和动作监督的同时，显式维护语言监督信号，确保模型的指令遵循和语义泛化能力不被侵蚀。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Mantis针对现有视觉-语言-动作（VLA）模型的核心瓶颈——低维动作信号稀疏导致监督不足，而显式视觉前瞻预测（如像素生成）引入冗余、压缩表示（如track tokens）造成信息瓶颈——提出了三项关键创新，形成了一条从“解耦视觉前瞻”到“高效推理”的完整技术链路。
 
@@ -123,7 +125,7 @@ ATE维护两组视觉令牌：**目标令牌**（与语言指令最相关的图�
 
 三项创新构成了一条因果链路：**DVF解耦**为动作学习提供紧凑而有指导性的辅助信号，解决了容量竞争与信息瓶颈；**渐进训练**确保多模态能力稳定融合，保护语言理解；**ATE**在部署端大幅降低推理成本，使系统具备实用价值。这一设计在LIBERO仿真基准上达到96.7%平均成功率（Table 1），在真实世界三个场景中，分布内和分布外指令跟随均优于开源基线**π0.5**（Table 6, Figure 6），验证了创新点的有效性。
 
-## 整体框架
+
 
 Mantis 的整体设计围绕一个核心洞察展开：**视觉前瞻预测与动作学习应解耦**，从而避免主干网络在视觉生成与动作预测之间产生容量竞争。如图 2 所示，框架由三个核心模块构成：**Backbone（主干网络）**、**DVF Head（解耦视觉前瞻头）** 和 **Action Head（动作头）**，辅以连接器（Connector）和三类可学习查询令牌（queries）完成信息流转。
 
@@ -163,7 +165,7 @@ Mantis 的整体设计围绕一个核心洞察展开：**视觉前瞻预测与�
 ![[assets/figures/papers/paper_list_l2401_https_arxiv_org_abs_2511_16175/figures/003_Figure_2.jpg]]
 *Figure 2: Left: Progressive training recipe. Mantis progressively integrates multiple modalities to achieve stable and well-balanced optimization. Center: Overview of Mantis. The framework consists of a backbone network, a DVF head, and an action head. The DVF head predicts future frames to facilitate latent action learning, thereby improving action prediction. Language supervision helps maintain the backbone’s capability for understanding and reasoning. Right: Adaptive Temporal Ensemble. Mantis-ATE dynamically adjusts the ensemble strength based on the overlap between target tokens and dynamic tokens*
 
-## 核心模块与公式推导
+
 
 Mantis 的核心架构由四个关键模块构成：**主干网络**（Backbone）、**连接器**（Connector）、**解耦视觉前瞻头**（DVF Head）和**动作头**（Action Head）。其设计哲学是将视觉预测任务从 VLA 主干中剥离，通过一组可学习的查询令牌（queries）在模块间传递紧凑的“潜在动作”信号，避免显式像素生成或压缩表示带来的信息冗余与容量竞争。
 
@@ -224,7 +226,9 @@ ATE 并非训练模块，而是推理时的效率优化策略。其核心思想�
 ![[assets/figures/papers/paper_list_l2401_https_arxiv_org_abs_2511_16175/figures/005_Figure_4.jpg]]
 *Figure 4: Visualization of ATE. The attention heatmap uses darker colors to represent higher values, whereas in the cosine similarity heatmap the opposite holds. The parameters are set as*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设定
 
@@ -306,7 +310,9 @@ Figure 8 对比了标准 Mantis（使用固定时间集成 TE）与 **Mantis-ATE
 - **实时性瓶颈**：即使 ATE 减少了近半推理调用，单次推理仍基于大规模扩散模型，难以满足高频实时控制需求。
 - **真实世界覆盖不足**：目前仅在桌面操作场景验证，尚未在移动操作等更复杂、非结构化环境中充分测试。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 视觉增强动作学习的范式演进
 
@@ -352,6 +358,8 @@ Mantis 以 Qwen2.5-VL 为主干，属于**大规模视觉-语言-动作模型**�
 - **推理加速**：能否通过模型蒸馏、量化或更轻量的预测头（如 flow matching 替代扩散）进一步压缩推理延迟，实现更高频率的闭环控制？
 - **开放环境泛化**：解耦的视觉前瞻机制在非结构化、动态变化的环境中是否依然有效？meta queries 捕获的潜在动作能否泛化到未见过的物体与场景？
 - **语言-操作权衡**：如何在更强的语言能力与操作性能之间取得最佳折衷？语言监督阶段使用的 38 个多模态数据集（Table 4）中，是否存在与机器人操作任务产生负迁移的数据分布？
+
+
 
 ## 原文 PDF
 

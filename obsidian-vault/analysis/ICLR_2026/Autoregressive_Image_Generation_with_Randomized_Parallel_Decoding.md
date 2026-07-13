@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Autoregressive_Image_Generation_with_Randomized_Parallel_Decoding.pdf
+project_link: null
+code_link: https://github.com/hp-l33/ARPG
 aliases:
 - AAIGRPD
 - AIGRPD
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | 基于随机并行解码的自回归图像生成 |
 | 英文题名 | Autoregressive Image Generation with Randomized Parallel Decoding |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=rJdGst0W8s); [GitHub](https://github.com/hp-l33/ARPG) |
+| Links | [paper](https://openreview.net/forum?id=rJdGst0W8s) · [GitHub](https://github.com/hp-l33/ARPG) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | ARPG (Autoregressive Image Generation with Randomized Parallel Decoding) |
 | Dataset | ImageNet-1K 256×256 |
@@ -40,11 +42,11 @@ claims:
 > - ImageNet-1K 256×256 上，IS 为 336.1，对比 LlamaGen-XXL: 341.0，变化 -4.9。
 > - ImageNet-1K 256×256 上，吞吐量 (img/s) 为 55.28，对比 LlamaGen-XXL: 64.70，变化 -9.42。
 
-## 概述
+## 概要
 
 本文提出ARPG（Autoregressive Image Generation with Randomized Parallel Decoding），一种用于图像合成的高质量高效框架。ARPG通过将位置引导与内容表示解耦，实现了完全随机顺序的训练和推理，同时支持并行解码和零样本泛化。在ImageNet-1K 256×256基准测试上，ARPG仅用32步达到FID 1.83，相比光栅顺序模型实现30倍加速，相比并行AR模型实现3倍加速，内存减少75%。ARPG还支持零样本推理任务，如图像修复、外推和分辨率扩展。
 
-## 背景与动机
+
 
 传统自回归图像生成模型受限于固定的光栅扫描顺序，导致推理效率低下且无法进行零样本泛化。掩码建模方法虽支持随机顺序，但存在两个根本性问题：
 
@@ -55,7 +57,9 @@ claims:
 
 现有方法（如Table 1总结）在注意力模式、调度灵活性和零样本能力方面各有局限：光栅顺序模型（LlamaGen）使用严格因果注意力但无法并行；块级AR模型（VAR、PAR、SAR、NAR）使用预定义位置但调度器固定；RandAR将位置标记插入序列中，使序列长度加倍且计算成本翻倍。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ARPG的核心洞察是：预测一个标记所需的核心信息是已知标记的集合和目标位置，其他未知位置的状态无关紧要。基于此，论文提出**解耦解码框架**：
 
@@ -63,7 +67,7 @@ ARPG的核心洞察是：预测一个标记所需的核心信息是已知标记�
 - **双解码器架构**：第一个解码器（内容精炼）仅处理已知内容标记以生成KV缓存，第二个解码器（位置引导）使用数据无关的[MASK]标记作为查询，通过交叉注意力机制预测目标标记。
 - **完全随机顺序训练与推理**：解耦结构使得模型可以在任意排列下进行训练和推理，同时支持并行解码和零样本泛化。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__image_and_video_generation__b001_rJdGst0W8s_Autoregressiv/figures/001_Figure_1.jpg]]
 
@@ -76,7 +80,7 @@ ARPG的整体框架如Figure 4所示，包含两个主要解码器：
 
 Figure 5展示了实现细节：(a) 条件输入提供查询；(b) 零样本修复中已知区域预填充到Pass-1，掩码区域在Pass-2生成。
 
-## 核心模块与公式推导
+
 
 ### 5.1 重表述的自回归分解
 
@@ -104,7 +108,9 @@ Pass-2解码器使用因果交叉注意力，其中查询仅来自数据无关�
 - **RoPE位置编码**：使用旋转位置嵌入（RoPE）将位置信息编码到查询和键向量中。
 - **块级因果注意力泛化**：推理时可将因果注意力泛化为块级因果注意力，不破坏概率模型且显著提升性能。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 6.1 主要结果
 
@@ -179,7 +185,9 @@ Figure 8展示了ARPG在零样本推理任务中的定性结果，包括图像�
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__image_and_video_generation__b001_rJdGst0W8s_Autoregressiv/figures/014_Table_1.jpg]]
 *Table 1: Summary of existing methods.*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ARPG在自回归图像生成方法谱系中占据独特位置：
 
@@ -203,6 +211,8 @@ ARPG在自回归图像生成方法谱系中占据独特位置：
 - ARPG的零样本泛化能力的定量指标（如FID、LPIPS）是多少？
 - ARPG架构是否可以推广到视频生成或3D生成任务？
 - ARPG与扩散模型结合能否进一步提升效率？
+
+
 
 ## 原文 PDF
 

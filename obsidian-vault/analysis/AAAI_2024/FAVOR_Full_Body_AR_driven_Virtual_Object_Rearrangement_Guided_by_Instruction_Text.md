@@ -5,6 +5,8 @@ paper_level: A
 venue: AAAI
 year: 2024
 pdf_ref: paperPDFs/AAAI_2024/FAVOR_Full_Body_AR_driven_Virtual_Object_Rearrangement_Guided_by_Instruction_Text.pdf
+project_link: https://kailinli.github.io/FAVOR
+code_link: null
 aliases:
 - FFBADVORGBIT
 tags:
@@ -39,7 +41,7 @@ claims:
 > - Perceptual Study (Likert scale) 上，Average Likert score (↑) 3.85 ± 1.04 (生成动作) vs 4.62 ± 0.54 (FAVOR数据集真值) (-0.77)。
 > - Grasp Quality 上，CR↑ / SIV↓ 0.93 / 6.50 (KNET在初始物体姿态下) vs 0.99 / 0.83 (FAVOR数据集抓取GT) (CR: -0.06, SIV: +5.67)。
 
-## 概述
+## 概要
 
 **核心问题**：现有的人-物交互数据集普遍缺乏大规模、全身、场景多样化且附带自然语言指令的物体重排数据，导致从文本指令直接生成连贯、物理合理的全身重排动作面临瓶颈。同时，现有方法在复杂场景下难以准确解析指令语义并生成流畅的抓取与放置动作。
 
@@ -51,7 +53,7 @@ claims:
 
 **局限与开放问题**：AR眼镜缺乏触觉反馈可能影响抓取自然度；数据集动作风格多样性有限；指令解析依赖预定义模板，对复杂指令泛化能力受限；实验场景主要集中在桌面堆放，尚未覆盖更开放的动态环境。未来工作可探索引入触觉反馈、扩展场景多样性，以及将场景-语言接地模块扩展到长时间连续规划任务中。
 
-## 背景与动机
+
 
 ### 问题背景：从指令到全身物体重排动作的生成
 
@@ -79,7 +81,9 @@ claims:
 
 这一“数据‑方法”协同设计，从根源上回应了现有工作的三个断层：AR数据采集填补了数据缺口，GPT‑4+多视角几何填补了解析缺口，分阶段生成+物理约束填补了动作生成缺口。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FAVORITE框架的核心创新并非单一技术的突破，而是围绕“从指令文本生成全身虚拟物体重排动作”这一目标，在**数据采集范式**与**两阶段生成框架**上进行了系统性重构。以下从三个关键维度展开分析。
 
@@ -112,7 +116,7 @@ FAVORITE框架的核心创新并非单一技术的突破，而是围绕“从指
 
 三个维度的创新形成了完整的因果链：AR采集范式提供了高质量训练数据基础 → 场景‑语言接地模块将文本指令转化为精确的空间坐标 → 分阶段生成框架利用这些坐标生成物理合理的抓取姿态与连贯运动序列。感知研究（Table 2）表明，生成动作在Likert量表上获得3.85±1.04的平均分，虽低于数据集真值（4.62±0.54），但已获得志愿者在自然度、抓取合理性和物理一致性上的认可。这一差距主要源于AR视觉反馈缺乏触觉通道，以及数据集动作风格多样性有限，指向了该框架的未来改进方向。
 
-## 整体框架
+
 
 FAVORITE 是一个两阶段的文本驱动全身虚拟物体重排框架，其核心设计思路是将复杂的“理解指令—定位物体—生成动作”链条解耦为**场景‑语言接地**与**动作重排生成**两个串行模块（Figure 3）。这种分解使得每个阶段可以专注于各自的子问题，从而降低整体学习难度，并保证最终动作序列的连贯性与物理合理性。
 
@@ -152,7 +156,7 @@ FAVORITE 是一个两阶段的文本驱动全身虚拟物体重排框架，其�
 ![[assets/figures/papers/paper_list_l1661_FAVOR_Full_Body_AR_driven_Virtual_Object_Rearrangement_Guided_by_Instruc/figures/002_Figure_2.jpg]]
 *Figure 2: Illustration of recording setup (MoCap + AR glasses)*
 
-## 核心模块与公式推导
+
 
 FAVORITE 框架的核心由两个阶段构成：**场景‑语言接地** 与 **运动重排生成**。前者负责从文本指令中解析物体的初始与目标位姿；后者则基于接地结果生成符合物理约束的全身抓取与放置动作序列。
 
@@ -237,7 +241,9 @@ $$
 ![[assets/figures/papers/paper_list_l1661_FAVOR_Full_Body_AR_driven_Virtual_Object_Rearrangement_Guided_by_Instruc/figures/006_Figure_5.jpg]]
 *Figure 5: Diagram of motion rearrangement generation. keyframe grasping poses*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 数据集规模与采集效率
 
@@ -290,7 +296,9 @@ Figure 6展示了FAVORITE生成的抓取与放置动作序列的定性结果。�
 ![[assets/figures/papers/paper_list_l1661_FAVOR_Full_Body_AR_driven_Virtual_Object_Rearrangement_Guided_by_Instruc/figures/010_Figure_6.jpg]]
 *Figure 6: Qualitative results of motion synthesis. The man highlighted in yellow illustrates the grasping motion*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位与核心差异
 
@@ -331,6 +339,8 @@ FAVOR 数据集在规模、标注维度和交互类型上与现有数据集形�
 3. **SDF 穿透损失的可扩展性**：基于 SDF 的穿透损失在形状更复杂、非凸的物体上是否仍然有效？其计算开销在实时应用中是否可控？
 4. **指令解析的扩展**：能否将场景‑语言接地模块扩展到动态场景或需要连续规划的长时间任务中？例如，处理“将杯子放入洗碗机，然后将盘子放在架子上”这类多步指令。
 5. **触觉反馈的集成**：如何将触觉反馈或其他感知通道引入 AR 交互，以提升手部抓取的自然度和接触稳定性？这是缩小虚拟与真实交互差距的关键方向。
+
+
 
 ## 原文 PDF
 

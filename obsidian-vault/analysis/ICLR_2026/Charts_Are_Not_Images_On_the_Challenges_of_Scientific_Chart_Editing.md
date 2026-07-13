@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Charts_Are_Not_Images_On_the_Challenges_of_Scientific_Chart_Editing.pdf
+project_link: null
+code_link: https://github.com/adobe-research/figure-editing
 aliases:
 - CANICSCE
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | 图表非图像：科学图表编辑的挑战 |
 | 英文题名 | Charts Are Not Images: On the Challenges of Scientific Chart Editing |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=259xBeNyDV); [GitHub](https://github.com/adobe-research/figure-editing) |
+| Links | [paper](https://openreview.net/forum?id=259xBeNyDV) · [GitHub](https://github.com/adobe-research/figure-editing) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | FigEdit（面向科学图表编辑的大规模基准） |
 | Dataset | Single Edit (整体), Conversational Edit (对话编辑), Multi Edit: ‘Add a new data point’ |
@@ -40,7 +42,7 @@ claims:
 > - Conversational Edit (对话编辑) 上，指令遵循评分 (1-5) 为 GPT-Image: 4.32，对比 Imagen 4: 1.55，变化 +2.77。
 > - Multi Edit: ‘Add a new data point’ 上，指令遵循评分 (1-5) 为 GPT-Image: 3.07，对比 InstructPix2Pix: 1.21，变化 +1.86。
 
-## 概述
+## 概要
 
 当前的多模态图像编辑模型普遍将科学图表视作一般图像，依赖像素级生成与修改，忽略了图表作为结构化数据可视化的本质。图表编辑实质上是一项受图形语法严格约束的转换任务：它要求修改后的图表在数据‑视觉通道映射、轴刻度一致性、图例完整性以及文本与数值的正确对应等方面都保持语义正确性。然而，现有模型缺乏对这些语义约束的显式建模能力，导致输出尽管视觉上看似合理，却经常出现数据值错误、编码不一致等问题。
 
@@ -53,7 +55,7 @@ claims:
 
 FigEdit 的方法定位在于：将图表编辑重新定义为一种基于图形语法的结构化转换问题，以结构化规范（如 Vega‑Lite）的确定性渲染为依据，使评估从单纯的外观比较转向语义保真度检验。该基准不仅确立了当前模型的能力上限，更表明只有显式理解和利用底层图形语法的编辑系统，才能实现忠实且可审计的科学图表修改。如何设计此类结构感知的编辑模型，仍然是本领域亟待解决的开放挑战。
 
-## 背景与动机
+
 
 科学图表是学术交流中不可或缺的信息载体，它将数据、视觉编码和文本标注融合为一体，传递复杂的量化关系与趋势。在科研写作、审稿修改、教学准备和跨团队协作中，图表编辑是一项高频且语义敏感的任务——作者往往需要局部调整数据值、修改轴范围、重绘样式或切换图表类型，同时确保所有相关信息（刻度、图例、标注）保持自洽。然而，当前主流的多模态生成模型和图像编辑系统大多将图表视为与自然照片无异的“通用图像”，依赖像素空间的条件扩散或端到端生成完成编辑。这种**方法错配**导致了一个核心瓶颈：模型擅长维持像素级别的感知相似性，却缺乏对数据–编码对齐、轴刻度一致性、图例完整性等图形语法约束的显式建模能力，输出虽然视觉上可能合理，但语义错误频繁发生。
 
@@ -65,7 +67,9 @@ FigEdit 的方法定位在于：将图表编辑重新定义为一种基于图形
 
 为了揭示当前模型的能力边界和评估范式的不足，FigEdit 覆盖了 10 种常见图表类型，生成超过 30,000 个编辑样本，并组织为五大递进难度任务：单步编辑、多步复合编辑、对话式编辑、视觉提示编辑和风格迁移（Table 2）。在评测维度上，FigEdit 在像素指标之外引入了基于 OCR 的文本保真度指标，以及利用大语言模型评分的指令遵循度、内容保持度和图像质量，从而**将评估重心从像素相似性转向语义正确性**（Section 4）。通过这一多维度设计，FigEdit 不仅提供了公平对比不同模型编辑能力的实验床，更通过定性与定量结合的证据（如数据值相关编辑指令上所有模型指令遵循评分均极低，Table 5–6；布局变换导致比例失真，Figure 5）系统性地揭露了当前“图像编辑”方法在科学图表编辑情境下的系统性薄弱之处，进而明确未来的研究方向：只有将图表视为结构化数据的渲染结果，并赋予模型理解图形语法、进行数据–视觉编码一致性验证的能力，才可能实现真正可靠、可审计的图表编辑。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心洞察在于揭示当前图文编辑范式在科学图表编辑中的根本性错配：**现有模型将图表视为一般自然图像，依赖像素空间的感知对齐与生成，却忽视了图表背后由图形语法定义的结构化语义约束**（如数据‑编码一致性、轴刻度准确性、图例完整性）。FigEdit 基准的提出正是基于这一诊断，通过重新定义评估对象、任务覆盖与评测维度，迫使研究社区直面图表编辑的结构化本质，而非在像素保真度等误导性信号下进行优化。
 
@@ -100,7 +104,7 @@ FigEdit 的方法定位在于：将图表编辑重新定义为一种基于图形
 
 综上，FigEdit 的核心创新不是提出了一个新的生成模型，而是**重新定义了图表编辑的问题本质与评估方式**。它通过对输出对象、任务覆盖和评测维度的系统改变，将研究焦点从感知表面的相似性拉回到对图形语法、数据忠实度和语义正确性的追求，从而为未来开发真正结构感知的图表编辑模型提供了方向与标尺。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0015_259xBeNyDV_Charts_Are_Not_Images_On_the_Challenges_of_Scien/figures/002_Table_1.jpg]]
 *Table 1: Comparison of our proposed benchmark with existing chart-related benchmarks. While prior benchmarks mainly target captioning, QA, or chart-to-code generation, they provide limited coverage of editing operations and interactive settings. FigEdit is the first benchmark designed for evaluation of figure editing, supporting diverse chart types, multiple instruction categories, and interactive scenarios such as visual guidance and style transfer edits*
@@ -132,7 +136,7 @@ $$\sigma^{\star} = f_e(\sigma), \quad I^{\star} = R(\sigma^{\star})$$
 
 值得注意的是，这种框架不仅给出了一个量化模型性能的工具箱，更揭示了现有方法的两大系统性错配。其一，像素生成模型缺少对图形语法的归纳偏置，导致在涉及数据值修改（如添加/删除数据点）或轴范围缩放时，即使部分视觉元素发生变化，深层的数据-编码映射和轴标注更新仍然错误（表 5、表 6）。其二，常用指标与编辑质量之间的分歧严重：Imagen 4 在单步编辑任务上取得了最高的 SSIM（0.7726），但其指令遵循评分仅为 1.58，与之形成鲜明对比的是 GPT-Image 以 4.59 的指令遵循得分遥遥领先，表明像素保真度无法取代结构化评估（表 4）。这些发现明确指向如下核心洞见：只有将图表视为结构化数据的渲染结果，并引入对图形语法的理解与校验，才能实现可靠的科学图表编辑。
 
-## 核心模块与公式推导
+
 
 FigEdit 将科学图表编辑建模为受图形语法约束的结构化变换问题，其基准构造围绕“规范—渲染—编辑—验证”的闭环展开。整体流程包含四个关键模块：基础图表生成、编辑操作构建、多任务标注生成、多维度评测协议。本节逐一阐述各模块的设计逻辑及其所依赖的核心公式，所有公式变量均来自已验证的构造定义，未做任何外推。
 
@@ -170,7 +174,9 @@ $$\mathrm{Sim}_{\mathrm{OCR}} = 1 - \frac{\mathrm{EditDist}\bigl(s_{\widehat{I}}
 
 这些公式共同揭示 FigEdit 的本质：编辑发生在结构化规范 $\sigma$ 上，而非像素图像上。因此，编辑的评价标准从感知相似度转向数据‑编码对齐、文本保真度与图形语法遵守度。这一设计直接对应当前图文编辑模型“像素操作强、语义忠实弱”的核心瓶颈。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 我们将评估组织为三个层次：首先在全部任务上对比四个代表性模型的多维度表现，然后剖析传统像素指标与语义正确性之间的系统性错位，最后通过逐指令分析揭示不同编辑操作类型的难度差异与典型失败模式。所有实验均使用统一的预处理（letterbox至方形画布）和后处理（contain缩放回原始分辨率），确保输入格式完全一致。
 
@@ -235,7 +241,9 @@ $$\mathrm{Sim}_{\mathrm{OCR}} = 1 - \frac{\mathrm{EditDist}\bigl(s_{\widehat{I}}
 - **表5‑6**：“新增/移除数据点”与“增减边距”是指令遵循度和OCR相似度最低的操作类别，揭示数据修改和布局变换是核心瓶颈。
 - **图5**：定性样本中模型未能更新坐标轴范围、图例或文本位置，常见失败包括轴标签截断、新增柱体超出画布、点位置完全错误，反映出对图形语法和结构规范的忽略。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 FigEdit 并非又一个图表编辑模型，而是一套重新定义图表编辑评估范式的基准。其核心贡献在于将评测重心从像素相似性转向语义正确性，以此暴露当前图像编辑方法在面对结构化视觉内容时的根本缺陷。本节梳理 FigEdit 与现有基线和相关工作的谱系关系，明确其适用边界，并总结其内在局限与遗留的开放问题。
 
@@ -273,6 +281,8 @@ FigEdit 适用于评估图像编辑模型在结构化图表上的语义忠实度
 5. **图形语法知识融合**：现有大规模多模态模型拥有丰富的图文先验，但缺少对可视化语法和规则的直接编码。如何将 Vega‑Lite 等规范或 Tufte 原则有效融入模型训练，是使模型具备图表编辑归纳偏置的关键瓶颈。
 
 综上，FigEdit 通过重新定义图表编辑的评估体系，将方法学研究的重心从像素相似性拉回语义正确性，暴露了当前图像编辑模型在结构化任务上的系统性失败，并为下一代结构感知的图编辑模型与评估方法提供了明确指引。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/ROG_Guiding_Human_Object_Interactions_with_Rich_Geometry_and_Relations.pdf
+project_link: https://lalalfhdh.github.io/rog
+code_link: null
 aliases:
 - RGHOIRGR
 tags:
@@ -38,7 +40,7 @@ claims:
 > [!tip] 效果简介
 > - FullBodyManipulation 上，FID 5.119 vs 5.227 (CHOIS) (-0.108)；R-Precision Top-1 0.706 vs 0.630 (CHOIS) (+0.076)；MDev 5.815 vs 13.408 (CHOIS) (-7.593)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有的人-物交互（HOI）生成方法普遍将物体几何过度简化为质心或最近点，忽略了物体的整体几何细节。这一简化导致复杂交互中的空间关系建模不足，生成的运动常出现穿透、悬空、抖动等不真实现象，语义对齐度也受到严重影响。
 
@@ -48,7 +50,7 @@ claims:
 
 **主要结果**：在 FullBodyManipulation 数据集上，ROG 的 FID 达到 5.119，运动偏差 MDev 降至 5.815（对比 CHOIS 的 13.408），R-Precision Top-1 提升至 0.706。跨数据集验证（T2M-BEHAVE）显示碰撞率仅为 0.195，较 HOI-Diff 降低 24.6%。消融实验证实，物体关键点表示、IDF 损失和关系引导三个组件各自对运动质量和交互一致性均有显著贡献。
 
-## 背景与动机
+
 
 人-物交互（Human-Object Interaction, HOI）生成旨在根据文本描述合成人与物体协同运动的序列，在虚拟现实、机器人学习和动画制作中具有重要应用。然而，该任务面临一项核心瓶颈：**现有方法过度简化物体的几何表示**，通常仅使用物体质心或最近点来表征物体，忽略了物体的整体几何细节。这种简化导致复杂交互（如环绕物体操作、多阶段接触切换）中的空间关系建模不足，进而影响生成交互的真实感与语义对齐。
 
@@ -62,7 +64,9 @@ claims:
 
 针对这些缺口，ROG 提出了一种基于丰富几何与关系引导的HOI生成框架。其核心洞察是：通过构建全面的**交互距离场（Interactive Distance Field, IDF）**，并利用扩散关系模型学习时空关系先验，可以在生成过程中对运动进行引导与校正，使生成的运动符合真实的交互距离分布。这一设计从根本上改变了HOI生成中“物体如何被表示”和“关系如何被利用”的方式，为提升交互真实感和语义对齐提供了新的技术路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ROG的核心创新在于将人-物交互（HOI）生成从“稀疏几何近似”推进到“密集几何关系场引导”的范式。现有方法（如**CHOIS** (Li et al., ECCV 2024)、**HOI-Diff** (Peng et al., arXiv 2023)）普遍将物体简化为质心或最近点，这种过度简化在复杂交互（如双手环抱、多阶段操作）中丢失了关键的几何约束，导致生成的运动出现穿透、抖动或语义不对齐。
 
@@ -88,7 +92,7 @@ ROG在训练阶段直接将IDF损失 $\mathcal{L}_{\mathrm{IDF}}$ 引入运动�
 
 消融实验（Table 2）系统验证了各组件的因果贡献：添加物体关键点（obj-kp）使FID从9.775降至7.514；进一步添加IDF损失将R-Precision Top-1从0.547提升至0.666；使用完整距离矩阵 $\mathbf{D}$ 进行引导（FID 5.119）显著优于仅用质心 $\mathbf{C}$（FID 5.902）或无引导（FID 5.726）。跨数据集验证（Table 4）显示ROG的碰撞率（Coll% 0.195）比HOI-Diff（0.259）降低24.6%，证实了方法的鲁棒性与泛化能力。
 
-## 整体框架
+
 
 ROG 的整体流程围绕“利用丰富几何信息构建交互距离场（IDF）以引导运动生成”这一核心思想展开。系统由三个关键模块构成：**运动生成模型 G**、**关系模型 R**，以及连接二者的 **IDF 计算与引导机制**。
 
@@ -141,7 +145,7 @@ $$
 ![[assets/figures/papers/paper_list_l1747_ROG_Guiding_Human_Object_Interactions_with_Rich_Geometry_and_Relations/figures/001_Figure_1.jpg]]
 *Figure 1: Our proposed ROG begins by leveraging rich geometric information to construct an Interactive Distance Field (IDF), effectively capturing the relational dynamics of Human-Object Interactions (HOI). It then utilizes the learned IDF prior to refine the generated motion’s IDF, guiding the motion generation process to produce movements that are both relation-aware and semantically aligned. For clarity, we simplify the visualization by displaying only four key points for each object*
 
-## 核心模块与公式推导
+
 
 ROG 的核心架构由三个关键模块构成：**运动生成模型**、**交互距离场（IDF）构建与监督**、以及**扩散关系模型与引导机制**。三者协同工作，形成“生成—评估—校正”的闭环。
 
@@ -211,7 +215,9 @@ $$\mathrm { M D e v } = \frac { 1 } { n - m } \sum _ { t = m + 1 } ^ { n } \left
 ![[assets/figures/papers/paper_list_l1747_ROG_Guiding_Human_Object_Interactions_with_Rich_Geometry_and_Relations/figures/014_Figure_3.jpg]]
 *Figure 3: Our model generates semantically accurate and consistent human-object interactions across various objects*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验：FullBodyManipulation 数据集上的定量比较
 
@@ -281,7 +287,9 @@ Table 5 报告了模型复杂度与推理效率。ROG 总参数量为 47.34M，�
 ![[assets/figures/papers/paper_list_l1747_ROG_Guiding_Human_Object_Interactions_with_Rich_Geometry_and_Relations/figures/013_Figure_2.jpg]]
 *Figure 2: User study. We generated HOIs for 15 captions using 4 methods and asked 20 users to rank them by text alignment and realism. Our method outperforms others in both aspects*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 **ROG** 的核心贡献在于将人-物交互（HOI）生成中的物体几何表示从粗糙的质心/最近点提升为基于泊松圆盘采样（PDS）和边界点的24个关键点，并以此构建交互距离场（IDF）作为空间关系表达。该方法直接回应了现有基线方法在复杂交互中空间关系建模不足的瓶颈。
 
@@ -328,6 +336,8 @@ Table 5 报告了模型复杂度与推理效率。ROG 总参数量为 47.34M，�
 4. **泛化能力**：方法在更多样化的物体类别、动态场景和多主体交互任务中的泛化能力如何？IDF 的表达能力和关系模型的先验学习是否能够覆盖更广泛的交互模式，仍需进一步验证。
 
 5. **与物理仿真的结合**：当前方法通过 IDF 引导隐式地改善物理合理性（如碰撞率降低），但未显式结合物理约束。将 IDF 引导与物理仿真器结合，可能进一步提升交互的物理真实感。
+
+
 
 ## 原文 PDF
 

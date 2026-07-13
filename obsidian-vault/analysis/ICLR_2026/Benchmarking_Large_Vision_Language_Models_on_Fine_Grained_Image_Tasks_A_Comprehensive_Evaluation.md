@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Benchmarking_Large_Vision_Language_Models_on_Fine_Grained_Image_Tasks_A_Comprehensive_Evaluation.pdf
+project_link: null
+code_link: https://github.com/SEU-VIPGroup/FG-BMK
 aliases:
 - FB
 - BLVLMFGITCE
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 大规模视觉语言模型在细粒度图像任务上的基准评测：一项全面评估 |
 | 英文题名 | Benchmarking Large Vision-Language Models on Fine-Grained Image Tasks: A Comprehensive Evaluation |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=cVc74MLspe); [GitHub](https://github.com/SEU-VIPGroup/FG-BMK) |
+| Links | [paper](https://openreview.net/forum?id=cVc74MLspe) · [GitHub](https://github.com/SEU-VIPGroup/FG-BMK) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | FG-BMK |
 | Dataset | CUB-200-2011, Stanford Dogs, FGVC Aircraft |
@@ -42,15 +44,17 @@ claims:
 > - Stanford Dogs 上，分类准确率（Short-Answer） 为 86.49%，对比 97.30% (FG-Tailored)，变化 -10.81%。
 > - FGVC Aircraft 上，分类准确率（Short-Answer） 为 66.19%，对比 95.40% (FG-Tailored)，变化 -29.21%。
 
-## 概述
+## 概要
 
 本文提出了一个名为 **FG-BMK** 的综合性基准，用于系统评估大规模视觉语言模型（Large Vision-Language Models, LVLMs）在细粒度图像任务上的表现。该基准包含 **101 万个问题** 和 **28 万张图像**，覆盖 12 个成熟的细粒度数据集。FG-BMK 设计了两种互补的评估范式：**人类导向评估**（Human-oriented Evaluation）通过对话式交互（真/假、多选、简答）测试模型对细粒度视觉查询的理解能力；**机器导向评估**（Machine-oriented Evaluation）通过图像检索（mAP）和图像分类（Top-1 准确率）直接评估视觉特征的表示能力。研究评估了 9 个开源 LVLM、2 个闭源模型（GPT-4o-1120, Gemini-2.0-flash）以及纯视觉模型 DINOv2。
 
-## 背景与动机
+
 
 现有 LVLM 评估基准（如 LVLM-eHub, MMBench）主要关注通用视觉理解能力，缺乏对细粒度视觉任务（如区分同一属下的不同物种）的系统评估。细粒度视觉任务要求模型具备精细的视觉判别能力，这对 LVLM 的视觉编码器和跨模态对齐模块提出了更高要求。本文的核心动机是揭示 LVLM 在细粒度任务上的真实瓶颈，并探索影响其性能的关键因素。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于：
 
@@ -59,7 +63,7 @@ claims:
 3. **识别因果旋钮**：**对齐阶段的数据粒度一致性**（即图像-文本对中文本描述是否与图像中物体的细粒度类别匹配）是影响 LVLM 细粒度性能的关键可调控因素。
 4. **核心洞察**：对比学习范式（如 EVA-CLIP, DINOv2）比生成式或重建式范式更能保持视觉特征的细粒度判别性；视觉-文本对齐若存在粒度不匹配会损害细粒度判别能力；LVLM 在细粒度任务上仍落后于专用细粒度模型。
 
-## 整体框架
+
 
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_cVc74MLspe_Benchmarking_La/figures/001_Figure_1.jpg]]
@@ -78,7 +82,7 @@ FG-BMK 的整体框架如 **Figure 1** 所示，包含两个主要评估分支�
 
 数据来源为 12 个成熟的细粒度数据集（**Table 6**），涵盖鸟类、狗、汽车、飞机、食物、花卉等多个元类别。
 
-## 核心模块与公式推导
+
 
 ### 5.1 评估模型与训练策略
 
@@ -101,7 +105,9 @@ FG-BMK 的整体框架如 **Figure 1** 所示，包含两个主要评估分支�
 
 **特征鲁棒性**评估使用投影梯度下降（Projected Gradient Descent, Madry et al., 2018）对视觉特征引入扰动，分析其对分类准确率的影响。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 6.1 人类导向评估结果
 
@@ -159,7 +165,9 @@ FG-BMK 的整体框架如 **Figure 1** 所示，包含两个主要评估分支�
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_cVc74MLspe_Benchmarking_La/figures/002_Table_1.jpg]]
 *Table 1: Training strategies of the open-source evaluated models. “DINOv2” is a purely visual model. “Con” denotes contrastive loss, “Gen” generative loss, “Mat” image-text matching loss, “Rec” reconstruction loss used in BEiT3, and “Dis” distillation loss used in DINOv2*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 7.1 与现有基准的关系
 
@@ -185,6 +193,8 @@ FG-BMK 填补了现有 LVLM 评估基准（如 LVLM-eHub, MMBench）在细粒度
 4. LVLM 在细粒度属性识别（尤其是形状）上的根本限制是什么？是否可以通过专门的训练数据或模型架构改进来克服？
 5. 如何将细粒度专用模型（如 CAP）的优势融入 LVLM 框架中？
 6. LVLM 在细粒度任务上的鲁棒性不足是否可以通过对抗训练或其他正则化方法缓解？
+
+
 
 ## 原文 PDF
 

@@ -43,7 +43,7 @@ claims:
 > [!tip] 效果简介
 > - VPP S. Pombe cellular cryo-ET dataset (10 tomograms) 上，Dice coefficient (膜分割) 0.309 (Our Method) vs 0.048 (SAM), 0.003 (FreeSOLO), 0.003 (CutLer), 0.324 (Supervised UNet) (比无监督SAM/FreeSOLO/CutLer提升>0.26；仅比有监督UNet低0.015（~4.6%）)；F1 score (大分子定位) 0.43 (Our Method) vs 0.25 (CrYOLO n=100), 0.31 (CrYOLO n=500), 0.35 (DeepETPicker n=100), 0.57 (Deep... (比CrYOLO(n=500)高38.7%；比DeepETPicker(n=100)高22.86%；低于DeepETPicker(n=500) 24.6%)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：冷冻电镜断层成像（cryo-ET）能以近原子分辨率解析细胞原位三维结构，但其亚细胞结构呈现高度多尺度异质性，且高质量人工标注极度匮乏。现有有监督分割方法依赖大量标注数据，跨实验域泛化能力差，难以应对密集、拥挤的细胞环境。
 
@@ -56,15 +56,13 @@ claims:
 - **大分子定位**：无监督定位 F1 分数达 **0.43**，超过使用 100 个真实坐标训练的弱监督 DeepETPicker（0.35）和所有 CrYOLO 设置（最高 0.31），仅低于使用 500 个真实坐标的 DeepETPicker（0.57）。
 - **生物发现潜力**：在额外数据集上，无监督方法能自动分割出肌动蛋白丝等结构，而基于人工标注训练的有监督方法完全无法识别此类目标，展示了超越标注偏见的跨域泛化能力。
 
-## 背景与动机
-
 冷冻电镜断层成像（cryo-ET）能够以纳米级分辨率在近天然状态下解析细胞内分子结构，为原位结构生物学提供了独特窗口。然而，从三维断层图中分割和定位亚细胞结构面临根本性挑战：**标注数据严重匮乏**。cryo-ET图像信噪比极低、结构拥挤且形态高度异质，人工标注一个断层图需耗费数周专家时间，且标注结果受主观判断影响，跨实验条件、跨细胞类型的泛化能力差。这一标注瓶颈直接制约了有监督深度学习方法在该领域的应用——现有有监督方法在训练域内表现尚可，但一旦面对新的成像条件或细胞环境，性能急剧下降。
 
 现有无监督分割方法主要面向自然图像设计，在cryo-ET数据上几乎完全失效。以**SAM**（Kirillov et al., ICCV 2023）、**FreeSOLO**（Wang et al., CVPR 2022）、**CutLer**（Wang et al., CVPR 2023）为代表的通用或自然图像无监督分割方法，在膜分割任务上的Dice系数仅为0.048、0.003和0.003（Table 1），几乎不具备实用价值。其根本原因在于：这些方法依赖的视觉特征（如ResNet/ViT的最后一层注意力或分类特征）与cryo-ET图像中微弱、多尺度的结构信号不匹配，无法捕捉从数十纳米的大分子复合物到微米级膜系统的跨尺度信息。
 
 本文的核心动机在于：**绕过人工标注，直接利用视觉基础模型的内在表征能力实现cryo-ET图像的多尺度无监督分割**。关键洞察是，Stable Diffusion的条件UNet在自然图像预训练中习得的全部注意力层，其query-key亲和矩阵蕴含了丰富的多尺度结构信息——从低层的局部纹理到高层的语义分组。通过联合优化这些亲和矩阵的谱聚类目标，并辅以启发式特征聚合策略，可以将这些隐式知识转化为高质量的伪标签，进而驱动有监督模型完成全数据集的分割与定位。这一思路不仅避免了标注成本，更重要的是打破了有监督方法对特定实验域的依赖，为跨域、跨尺度的亚细胞结构分析开辟了新路径。
 
-## 核心创新
+## 核心方法与创新机理
 
 ### 问题瓶颈：冷冻电镜断层图像的标注困境
 
@@ -111,8 +109,6 @@ cryo-ET图像存在严重的局部强度不均匀性，固定阈值无法适应�
 ### 局限与待验证问题
 
 尽管创新显著，方法仍存在以下局限：(1) 特征向量优化耗时较长（每层切片7-8分钟），尚未实现多GPU并行加速；(2) 分割主干仅基于强度变化，无法直接区分单个细胞器（如线粒体vs内质网），需结合下游形态学分析；(3) 多样性分数的块大小和步长参数为启发式设定，缺乏自适应学习机制；(4) 方法仅在部分cryo-ET数据集上验证，对其他体积成像模态（如FIB-SEM）的泛化能力需进一步评估。
-
-## 整体框架
 
 本文提出一套完整的**无监督多尺度冷冻电镜断层图像（cryo-ET）分割流程**，其核心设计目标是在完全无需人工标注的条件下，从拥挤的三维细胞环境中同时分割膜结构与大分子复合物。流程的输入为用户从少量代表性断层图中选取的信息丰富切片集合，输出为全数据集的高质量膜分割掩码与大分子定位坐标。
 
@@ -168,8 +164,6 @@ $$\mathrm{DiversityScore}(I) = \mathrm{std}(\pmb{\sigma}), \quad \pmb{\sigma} = 
 ![[assets/figures/papers/paper_list_l2621_https_openaccess_thecvf_com_content_CVPR2026_html_Uddin_Unsupervised_Mul/figures/001_Figure_1.jpg]]
 *Figure 1: Our unsupervised segmentation pipeline with visual examples. (a) Selecting information-rich slabs from a tomogram and preprocessing the slabs. (b) Split the slabs into quarters. (c) Optimize eigenvector features of the quarter images from Stable Diffusion foundation model (d) Create feature image for the quarter images using the eigenvectors (e) Obtaining multiscale unsupervised segmentation mask from the feature image, splitting the multiscale mask to membrane and macromolecule masks (f) train a supervised UNet with predicted unsupervised membrane masks as ground truth (g) Use the trained UNet to infer membrane masks for other slabs in the tomogram. (h) Train a DeepETPicker [9] model with...*
 
-## 核心模块与公式推导
-
 本方法的核心在于将 Stable Diffusion 基础模型的内在视觉表征转化为高质量的无监督分割掩码。其技术路线围绕三个关键模块展开：基于全部注意力层的亲和矩阵提取、联合多层亲和矩阵的特征向量优化，以及基于启发式规则的聚集特征图构建。
 
 ### 亲和矩阵提取
@@ -210,7 +204,7 @@ $$\mathcal{P} = \{ I_{ij} \in \mathbb{R}^{p\times p} \mid i = 0, s, 2s, \dots, H
 
 > **注意**：多样性分数的块大小 $p$ 和重叠步长 $s$ 的具体取值在现有材料中未明确给出，需查阅原文补充。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 1. 实验设置与基准
 
@@ -327,10 +321,7 @@ $$\mathcal{P} = \{ I_{ij} \in \mathbb{R}^{p\times p} \mid i = 0, s, 2s, \dots, H
 ![[assets/figures/papers/paper_list_l2621_https_openaccess_thecvf_com_content_CVPR2026_html_Uddin_Unsupervised_Mul/figures/003_Figure_3.jpg]]
 *Figure 3: Macromolecule localization results on S. Pombe Tomograms. The image shows several slabs of training tomogram (TS 0008) and another tomogram with annotated macromolecules drawn as bounding boxes. Ground Truth: green boxes, Deep-ETPicker (supervised alternative): cyan boxes, Our unsupervised method: yellow boxes*
 
-![[assets/figures/papers/paper_list_l2621_https_openaccess_thecvf_com_content_CVPR2026_html_Uddin_Unsupervised_Mul/figures/004_Figure_4.jpg]]
-*Figure 4: Results on additional cryo-ET datasets*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 在无监督分割谱系中的位置
 

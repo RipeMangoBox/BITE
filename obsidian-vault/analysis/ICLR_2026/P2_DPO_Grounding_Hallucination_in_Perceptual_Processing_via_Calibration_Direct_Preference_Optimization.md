@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/P2_DPO_Grounding_Hallucination_in_Perceptual_Processing_via_Calibration_Direct_Preference_Optimization.pdf
+project_link: null
+code_link: null
 aliases:
 - PPDPOPD
 - P2DGHPPCDPO
@@ -41,7 +43,7 @@ claims:
 > - TextVQA (Processing Accuracy) 上，P-Acc. (% ↑) 为 70.10%，对比 66.29%，变化 +3.81%。
 > - POPE under Gaussian noise (σ=0.20) 上，F1 Score 为 exceeds baseline by >4 points，对比 LLaVA-1.5-7B，变化 >+4。
 
-## 概述
+## 概要
 
 大视觉语言模型（LVLM）的幻觉现象不仅源于纯粹感知失败，更深层的问题在于**感知处理阶段的缺陷**：模型即使正确聚焦于关键区域仍会输出错误答案（感知瓶颈），同时对轻微视觉扰动缺乏鲁棒性。现有基于直接偏好优化（DPO）的缓解方法大多依赖视觉无关、离线的偏好对，难以向视觉主导参数提供充分的优化信号，导致这些感知处理层面的错误难以被矫正。
 
@@ -49,7 +51,7 @@ claims:
 
 实验结果表明该方法显著缓解了感知瓶颈：在 TextVQA 上注意力聚焦比（AFR）从 14.73 提升至 18.71，处理准确率从 66.29% 提升至 70.10%；在 POPE 基准上面对逐渐增强的高斯噪声时，F1 分数较基线高出超过 4 分，展现出更强的视觉鲁棒性。在 AMBER、MMHal‑Bench 等多项幻觉基准上，P²‑DPO 一致超越基于昂贵人类反馈或 AI 反馈的对齐方法——例如 LLaVA‑1.5‑7B 的 AMBER 关系推理 F1R 提升 +8.5，Qwen2.5‑VL‑3B 的 MMHal‑Bench 幻觉率下降 3.13%。消融实验证实了视觉偏好对、校准损失及动态权重各自的重要贡献。
 
-## 背景与动机
+
 
 大型视觉语言模型（LVLMs）在多模态理解任务中取得了显著进展，但其普遍存在的“幻觉”现象——生成与图像事实不符的内容——严重制约了可靠性。已有工作大多将幻觉归因为模型“没有看到”相关信息，即纯粹的感知失败，并因此采用训练无关的解码策略（如VCD）或引入外部视觉专家进行后处理修正。然而，本文通过深入分析发现，LVLM幻觉的一个更隐蔽且更具自我修复潜力的根源在于**感知处理阶段的失败**，具体表现为两种典型形式（Figure 1）：  
 1. **注意力区域内的感知瓶颈（Perceptual Bottleneck）**：模型的注意力尽管正确聚焦于关键实体，却依然输出错误答案，说明模型“看见”了却未能有效利用视觉证据；  
@@ -64,7 +66,9 @@ claims:
 
 基于上述洞察，本文的动机在于：**将幻觉问题重新定义为“感知处理失败”，并利用视觉干预构建自监督、在策略的偏好对，直接驱动视觉主导参数的校准**。通过故意在图像上制造“聚焦增强”与“擦除退化”、“清晰”与“噪声”的**视觉信息差异**，让模型从自身生成的响应中学会依赖视觉证据，从而在没有外部人工反馈的情况下，系统性地缓解感知瓶颈并提升视觉鲁棒性。这一思路促成了**P²‑DPO（Perceptual Processing Direct Preference Optimization）**方法，其核心即是通过在策略的视觉感知偏好对生成与校准损失的结合，将自监督视觉基础任务嵌入偏好优化框架之中。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 现有对齐方法（如 HA-DPO、DPO_RLHF‑V）将幻觉仅归因于感知缺失，依赖离策略（off-policy）、视觉无关的偏好数据，并通过标准 DPO 损失优化文本响应。这类范式存在两大根本缺陷：（1）**视觉主导参数的梯度信号极弱**——离线编辑产生的偏好对在视觉主导参数上的梯度差 $\Delta(\theta_1)$ 趋于消失（见附录 Eq.18），导致模型无法有效学习视觉证据的利用；（2）**忽略感知处理瓶颈**——即使注意力正确聚焦，模型仍会输出错误答案（Figure 1 左），且轻微图像退化即可诱发幻觉（Figure 1 右）。P²-DPO 针对上述缺陷，在**偏好数据构造**与**优化目标设计**两个维度实现关键转变，构成其核心创新。
 
@@ -88,7 +92,7 @@ claims:
 
 上述两方面的创新形成一个**自监督、无外部反馈的闭环**：模型从自身对视觉干预的生成行为中采集偏好数据 → 校准损失强制提高 VID → DDW 自动平衡多缺陷 → 更新后模型再次产出更准确的偏好对。所有对比方法（Ablation study, Table 4）证明任一组件切除都会损害最终结果，尤其 Focus‑and‑Enhance 对和校准损失的去除造成 POPE F1 从 87.42 降至 85.84，AMBER F1R 也明显下滑。在未使用任何人类标注的前提下，P²-DPO 在 AMBER 关系推理上相对 LLaVA‑1.5‑7B 取得 +8.5 F1R 增益，并大幅提升噪声鲁棒性（$\sigma=0.20$ 时 F1 领先 >4 点），直接验证了上述设计对感知处理瓶颈的针对性缓解（Table 1：AFR↑+3.98，Processing Accuracy↑+3.81%；Figure 4：噪声区间优势显著）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0016_ekOwxTn65Y_P2-DPO_Grounding_Hallucination_in_Perceptual_Pro/figures/002_Figure_2.jpg]]
 *Figure 2: An overview of our proposed P2-DPO framework. The process flows from left to right: (1) Derive Visual Inputs: Based on an initial forward pass to obtain an attention map (A), we create an enhanced input via cropping ( $I _ { \mathrm { a u g } } ) _ { \mathrm { : } }$ , a degraded input via erasure ( $I _ { \mathrm { d e g } } ) _ { \cdot }$ , and a noisy input $\left( I _ { \mathrm { n o i s e } } \right$) , alongside the original image (I). (2) Generate Preference Pairs: The reference model generates two orthogonal preference pairs. (3) P2-DPO Training: Difference losses are dynamically combined
@@ -128,7 +132,7 @@ $$\mathcal{L}_{\text{total}} = \mathbb{E}\Big[ w_{\text{focus}} \cdot \mathcal{L
 
 其中 $\mathcal{L}_{\text{focus}} = \mathcal{L}_{\text{dpo.focus}} + \lambda_{\text{calib}} \cdot \mathcal{L}_{\text{Calib}}$（公式 6），$w_{\text{focus}}$ 与 $w_{\text{robust}}$ 由 DDW 动态确定。这种设计使模型能根据具体样本的视觉缺陷类型，自主侧重最相关的优化信号，从而在无须任何人工偏好数据的情况下，显著提升感知处理的准确性和抗干扰能力。
 
-## 核心模块与公式推导
+
 
 ### 模块概述
 P$^2$-DPO 围绕“自驱动的视觉感知处理偏好优化”构建，包含五个关键模块：
@@ -223,7 +227,9 @@ $$
 
 其中 $w_{\mathrm{focus}} = \alpha$，$w_{\mathrm{robust}} = 1 - \alpha$，通过式(8)的动态因子为每个样本自适应分配聚焦与鲁棒性的训练强度，使模型按当前视觉缺陷程度进行针对性学习。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置与公平性说明
 所有实验均以 LLaVA-1.5‑7B 与 Qwen2.5‑VL 系列作为基础模型，使用统一的 RLHF‑V 场景提示，不引入任何人工反馈或额外标注。对比方法（VCD、HA‑DPO、DPO_RLHF‑V、V‑DPO_RLHF‑V）与 P²‑DPO 共享相同的 LoRA 微调配置（秩、学习率）和 DPO 超参（β 值），评测严格遵循各基准官方协议。P²‑DPO 完全由模型自身生成的偏好对驱动，而基线 DPO_RLHF‑V 与 V‑DPO_RLHF‑V 依赖于 RLHF‑V 中的人类偏好数据，这种设定突出了 P²‑DPO 在自主性与标注效率上的优势。
@@ -266,7 +272,9 @@ Table 4 系统拆解了四个核心组件的作用，移除任一组件均导�
 ### 失败模式与局限分析
 本工作未系统记录失败案例，但消融实验可间接反映模型的脆弱性边界。当移除 Visual‑Robustness 对时，模型在噪声下的优势消失，暗示其鲁棒性主要适配于训练中使用的噪声分布，对更强或新型扰动可能泛化不足。从 Table 2 可以看出，尽管 AMBER 关系推理增幅突出，POPE 等基准的绝对分数仍有提升空间，尤其在涉及细粒度视觉‑‑‑语言推理的 HallusionBench 上，增益幅度相对温和。以上观察提示 P²‑DPO 在面向更复杂、开域的视觉缺陷时仍需进一步拓展，相关失败边界的正式标定有待后续工作验证。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与主流幻觉缓解路线的差异定位
 
@@ -324,6 +332,8 @@ P²‑DPO 的设计强烈依赖于一个经验事实：**LVLM 的注意力机制
 - **训练效率优化**：偏好对的生成与多损失联合训练均有优化空间（如共享前向传播、异步数据生成）。若不能达到合理的训练吞吐量，该方法在超大规模模型上的部署将受限。
 
 综上，P²‑DPO 在 on‑policy 视觉自对齐这一新轴线上建立了明显的先手优势，但它仍处于该方法谱系的早期阶段：它对注意力质量的依赖、对视觉干预类型的选择、以及对校准信号的启发式定义，意味着该路线依然存在大量未被探索的优化空间与潜在失效模式。后续工作若能将此范式扩展至更广泛的视觉推理任务与更丰富的视觉干预空间，并建立可解释的因果关系保证，将有望实质性地将 LVLM 幻觉问题推入可控区间。
+
+
 
 ## 原文 PDF
 

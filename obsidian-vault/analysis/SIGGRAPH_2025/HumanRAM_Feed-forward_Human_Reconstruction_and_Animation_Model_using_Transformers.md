@@ -33,7 +33,7 @@ claims:
 | 中文题名 | HumanRAM：基于Transformer的前馈式人体重建与动画模型 |
 | 英文题名 | HumanRAM: Feed-forward Human Reconstruction and Animation Model using Transformers |
 | 会议/期刊 | SIGGRAPH 2025 |
-| Links | [paper](http://arxiv.org/abs/2506.03118v1) · [Project](https://zju3dv.github.io/humanram/) · [arXiv](https://arxiv.org/abs/2407.08414) |
+| Links | [paper](http://arxiv.org/abs/2506.03118v1) · [Project](https://zju3dv.github.io/humanram/) · [paper](https://arxiv.org/abs/2407.08414) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | HumanRAM |
 | Dataset | THuman2.1, Human4DiT, ActorsHQ |

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Relationship_Alignment_for_View_aware_Multi_view_Clustering.pdf
+project_link: null
+code_link: https://github.com/chenzhe207/RAV
 openreview_forum_id: uRA9cT4MK6
 aliases:
 - RAVAMVC
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 视角感知多视图聚类的关系对齐 |
 | 英文题名 | Relationship Alignment for View-aware Multi-view Clustering |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=uRA9cT4MK6); [GitHub](https://github.com/chenzhe207/RAV) |
+| Links | [paper](https://openreview.net/forum?id=uRA9cT4MK6) · [GitHub](https://github.com/chenzhe207/RAV) |
 | Topic | #topic/representation_self_supervised_transfer #topic/representation_self_supervised_transfer/representation_learning |
 | Method | RAV |
 | Dataset | NGs, YoutubeVideo, Cora |
@@ -41,7 +43,7 @@ claims:
 > - YoutubeVideo 上，ACC 为 0.356，对比 0.318，变化 +0.038。
 > - Cora 上，ACC 为 0.592，对比 0.567，变化 +0.025。
 
-## 概述
+## 概要
 
 多视图聚类旨在从多个异构特征表示中挖掘一致的样本分组结构。现有方法普遍面临两个瓶颈：一是忽视跨视图样本邻域结构的一致性，导致不同视图的嵌入空间出现冲突；二是无法自适应地利用视图间的相似性差异，使得语义信息在融合过程中退化。针对这些问题，本文提出视角感知多视图聚类框架 **RAV (Relationship Alignment for View-aware Multi-view Clustering)**，其核心思路是通过**关系对齐**保持稳定的邻域结构，并借助该结构更准确地度量视图差异，进而以**自适应加权标签对比学习**实现可靠的语义对齐。
 
@@ -49,7 +51,7 @@ RAV 包含两个关键模块：**跨视图关系对齐模块**构建各视图特
 
 在 10 个多视图基准数据集上的实验表明，RAV 在聚类精度（ACC）、归一化互信息（NMI）和纯度（PUR）三项指标上整体优于 MFLVC、MVCAN、DFL-NET 等代表性基线。典型增益包括：NGs 数据集 ACC 从 0.936 提升至 **0.980**（+4.4%），YoutubeVideo 从 0.318 提升至 **0.356**（+3.8%），Cora 从 0.567 提升至 **0.592**（+2.5%）。消融实验进一步验证了关系对齐和自适应加权各自的关键作用——去除任一模块均导致性能显著下降，其中 Caltech-5V 上去除标签对比损失后 ACC 从 0.901 骤降至 0.424。
 
-## 背景与动机
+
 
 多视图聚类旨在从同一组样本的多个异构表示中挖掘一致的簇结构。其核心挑战在于：不同视图捕捉样本的不同侧面，如何有效融合这些互补信息并消除视图间的语义冲突。近年来，深度多视图聚类方法取得了显著进展，但两个根本性瓶颈仍未解决。
 
@@ -61,7 +63,9 @@ RAV 包含两个关键模块：**跨视图关系对齐模块**构建各视图特
 
 本文提出 **RAV（Relationship Alignment for View-aware Multi-view Clustering）**，核心动机在于：通过全局-局部关系对齐为跨视图比较提供稳定的邻域结构基础，再借助基于 Wasserstein 距离的自适应加权机制，使标签对比学习能够感知视图间的语义亲疏，从而在保持邻域一致性的前提下实现可靠的语义对齐。这一"关系锚定 + 视感知加权"的协同设计，从根本上回应了现有方法的两个结构性缺口。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 RAV 的核心创新并非引入全新的学习范式，而是精准定位了现有深度多视图聚类方法的两个关键瓶颈，并通过两个高度协同的模块予以解决。
 
@@ -77,7 +81,7 @@ RAV 的核心创新并非引入全新的学习范式，而是精准定位了现�
 
 **协同机制**是 RAV 的核心洞察：关系对齐模块提供的稳定邻域结构，使得基于深层特征的视图相似度度量更加准确可靠；而准确的视图相似度又驱动自适应加权机制实现更精准的语义对齐。两者形成正向反馈循环，共同实现鲁棒的多视图聚类。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0009_uRA9cT4MK6_Relationship_Alignment_for_View-aware_Multi-view/figures/001_Figure_1.jpg]]
 *Figure 1: An illustration of the proposed RAV framework. The model crucially incorporates two modules: cross-view relation alignment to maintain neighborhood structures, and view-aware adaptive weighting in label contrastive learning to counteract representation degradation from view dissimilarity, thereby achieving robust multi-view clustering*
@@ -104,7 +108,7 @@ RAV 框架围绕一个核心洞察构建：**稳定的样本邻域结构能够�
 
 两个核心模块形成因果协同：关系对齐模块提供稳定的邻域结构，使得基于隐特征计算的视图相似度（Wasserstein 距离）能够更准确地反映视图间真实的语义差异；自适应加权模块则利用这一准确度量，动态调制标签对比学习的强度，在抑制低质量视图干扰的同时强化一致性视图的语义信号。消融实验（Table 5）验证了这一协同的必要性：去除关系对齐损失 $\mathcal{L}_{\mathrm{S}}$ 后，Caltech-5V 上的 ACC 从 0.901 骤降至 0.424；去除标签对比损失 $\mathcal{L}_{\mathsf{Q}}$ 同样造成性能崩溃。自适应加权机制的独立贡献在 Table 6 中得到验证：在视图差异较大的 NGs 和 ALOI 数据集上，加权机制分别带来 1.4% 和 2.5% 的 ACC 提升。
 
-## 核心模块与公式推导
+
 
 RAV 框架由三个核心模块构成：**视图特化自编码器**、**跨视图关系对齐模块**和**视感知标签对比学习模块**。各模块通过联合优化目标协同工作，最终通过融合标签预测获得聚类结果。
 
@@ -156,7 +160,9 @@ $$y_{j} = \arg \max_{j} \left( \frac{1}{V} \sum_{v=1}^{V} q_{ij}^{v} \right) \ta
 
 **因果机制总结：** 关系对齐模块（$\mathcal{L}_{\mathrm{S}}$）提供稳定的跨视图邻域结构，使视图差异度量更准确；视感知加权模块（$\mathcal{L}_{\mathsf{Q}}$）据此动态调节标签对比强度，避免相似度低的视图对造成语义冲突。两者协同实现了可靠的语义对齐。消融实验验证了这一因果链：去除 $\mathcal{L}_{\mathrm{S}}$ 导致 Caltech-5V 上 ACC 从 0.901 骤降至 0.424（Table 5），去除自适应加权则使 NGs 上 ACC 从 0.980 降至 0.966（Table 6）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -203,7 +209,9 @@ Figure 4 展示了 Digit-Product 上全局特征 $\mathbf{Z}$ 在训练过程中
 
 当前方法存在以下已知局限：第一，对不完整视图和噪声数据的鲁棒性尚未验证，实际部署中可能面临视图缺失或特征扰动场景；第二，关系结构依赖高斯核相似度度量，缺乏对最优相似性度量的理论分析；第三，在类别数极多（如 ALOI 的 100 类）且视图差异度量精度受限时，性能可能被 MVCAN 超越。这些局限需在实际应用中审慎评估。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有基线的结构性差异
 
@@ -234,6 +242,8 @@ RAV 的关键突破在于识别并填补了这一空白：通过全局-局部关
 3. **度量的自适应选择**：如何自动确定最优的视图权重度量方式？当前 Wasserstein 距离是固定选择，但在不同数据集上可能存在更优的差异度量（如最大均值差异 MMD、互信息等），自动选择或学习该度量是一个开放问题。
 
 这些方向共同指向一个核心挑战：在保持 RAV 现有"关系对齐-差异度量-加权对比"框架优势的前提下，提升其理论完备性和实际部署鲁棒性。
+
+
 
 ## 原文 PDF
 

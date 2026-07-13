@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Extending_Sequence_Length_is_Not_All_You_Need_Effective_Integration_of_Multimodal_Signals_for_Gene_Expression_Prediction.pdf
+project_link: null
+code_link: null
 openreview_forum_id: wwPSfcf5Pj
 aliases:
 - PPRISMELP
@@ -40,7 +42,7 @@ claims:
 > - K562 上，MSE ↓ 为 0.1789 ± 0.0041，对比 Seq2Exp‑soft: 0.1856 ± 0.0032，变化 ↓0.0067。
 > - GM12878 上，Pearson ↑ 为 0.9016 ± 0.0024，对比 Seq2Exp‑soft: 0.8951 ± 0.0038，变化 ↑0.0065。
 
-## 概述
+## 概要
 
 基因表达预测的核心挑战在于整合多模态表观遗传信号，而非单纯扩展输入序列长度。本文发现，现有长序列建模方法（如基于状态空间模型的 **Caduceus** 和 **Seq2Exp**）存在根本性瓶颈：Caduceus 在输入长度超过 2k 后性能持续下降；Seq2Exp 虽能处理 200k 序列，但其表现与仅使用 500 bp 相当（Figure 1(d)）。进一步分析表明，在测试时缩短序列长度几乎不影响性能（Figure 2），说明长序列模型并未真正利用远端调控信息。
 
@@ -48,7 +50,7 @@ claims:
 
 为此，本文提出 **Prism（Proximal regulatory integration of signals for mRNA expression levels prediction）**，通过学习多个背景染色质状态的权重向量，并执行后门调整（因果干预）以消除背景信号的混杂效应。Prism 仅需 2k 输入序列即可在 K562 和 GM12878 两个细胞系上全面超越 SOTA 方法 Seq2Exp-soft（MSE 降低 0.0067，Pearson 提升 0.0065），而参数仅增加 11K（Table 1, Table 3）。
 
-## 背景与动机
+
 
 ### 基因表达调控与多模态表观遗传信号
 
@@ -70,7 +72,9 @@ claims:
 
 因此，核心挑战不在于“扩展序列长度以捕获更多信号”，而在于**有效解耦前景信号与背景信号的混杂效应**。这要求模型能够识别并消除背景染色质状态的干扰，使预测仅依赖于具有因果调控作用的前景特征。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈的重新定位：从长序列建模到混杂因子消除
 
@@ -122,7 +126,7 @@ $$\mathcal{L}_3 = \log \left( \sum_{i,j} \exp ( 2t \cdot \tilde{a}_{i}^{T} \tild
 
 这一框架的核心洞察在于：**通过学习多个背景染色质状态的权重向量并执行因果干预，模型仅依赖短序列和近端信号就能精确预测基因表达**，从根本上绕过了长序列建模的技术瓶颈。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_wwPSfcf5Pj/figures/004_Figure_4.jpg]]
 *Figure 4: Architecture of Prism. Epigenomic signals S are processed by two encoders: a signal encoder gθ extracts high-dimension epigenomic features H, while a confounder encoder $g _ { \omega }$ learns n distinct weights representing the confounder C. A final predictor $h _ { \phi }$ uses these weighted features along with the DNA sequence X to make a prediction
@@ -169,7 +173,7 @@ $$\mathcal{L} = \mathcal{L}_1 + \alpha \mathcal{L}_2 + \beta \mathcal{L}_3$$
 - **短序列高效**：整个 pipeline 仅需 2k bp 输入即可达到 SOTA，从根本上规避了长序列建模中的隐状态固化和近因偏差问题。
 - **端到端可学习**：背景权重向量 $A$ 并非预设的离散状态，而是通过训练数据端到端学习得到，使模型能自适应地发现数据中的背景染色质模式。
 
-## 核心模块与公式推导
+
 
 ### 3.1 标准预测框架
 
@@ -221,7 +225,9 @@ $$\mathcal{L} = \mathcal{L}_{1} + \alpha \mathcal{L}_{2} + \beta \mathcal{L}_{3}
 
 其中 $\alpha$ 控制干预正则化的强度（消融实验表明 $\alpha = 1.0$ 最优，$\alpha = 0$ 时性能显著下降），$\beta$ 控制多样性约束的强度（在合理范围内表现鲁棒）。所有模块——信号编码器 $g_\theta$、混杂因子编码器 $g_\omega$ 和预测器 $h_\phi$——通过该联合损失端到端训练。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：短序列 + 因果干预 = SOTA
 
@@ -287,7 +293,9 @@ Prism 学习到的混杂权重向量并非简单的特征丢弃。实验表明�
 ![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_wwPSfcf5Pj/figures/016_Table_9.jpg]]
 *Table 9: Hyperparameter values following Seq2Exp (Su et al., 2025)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -326,6 +334,8 @@ Prism 的适用边界由以下条件限定：
 2. **ChIA-PET 的负向贡献。** 为什么 ChIA-PET 作为功能性远程交互数据反而降低了预测性能？这暗示并非所有远程交互信号都具有因果调控意义，部分可能本身就是混杂因子。
 3. **长序列预训练的潜力上限。** 长上下文预训练是否有可能使长序列模型超越短序列模型，还是只能减轻退化？Table 10 的证据倾向于后者，但更大规模的预训练实验可能改变这一结论。
 4. **因果干预框架的跨任务推广。** Prism 的因果干预框架能否推广到其他多模态生物学预测任务？其核心假设——背景信号作为混杂因子同时影响特征和标签——在蛋白质表达预测、药物响应预测等任务中是否同样成立？
+
+
 
 ## 原文 PDF
 

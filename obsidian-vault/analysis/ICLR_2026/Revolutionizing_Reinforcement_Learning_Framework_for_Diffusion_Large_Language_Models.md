@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Revolutionizing_Reinforcement_Learning_Framework_for_Diffusion_Large_Language_Models.pdf
+project_link: null
+code_link: https://github.com/Gen-Verse/dLLM-RL
 openreview_forum_id: KNAyc9DMe3
 aliases:
 - RRLFDLLM
@@ -30,12 +32,15 @@ claims:
 | 中文题名 | Revolutionizing Reinforcement Learning Framework for Diffusion Large Language Models |
 | 英文题名 | Revolutionizing Reinforcement Learning Framework for Diffusion Large Language Models |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=KNAyc9DMe3); [GitHub](https://github.com/Gen-Verse/dLLM-RL) |
+| Links | [paper](https://openreview.net/forum?id=KNAyc9DMe3) · [GitHub](https://github.com/Gen-Verse/dLLM-RL) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method |  |
 | Dataset | |
 
-## 概述
+> [!tip] 效果简介
+> 结果与证据沿用下文“实验与关键发现”中的现有记录；本轮不新增或外推论文事实。
+
+## 概要
 
 扩散大语言模型（Diffusion LLMs）通过并行生成文本，在推理效率上展现出超越自回归模型的潜力，但其在复杂推理任务上的性能仍落后于主流自回归模型。核心瓶颈在于：**训练阶段的随机掩码目标与推理阶段的结构化解码轨迹之间存在根本性失配**——训练时模型学习从任意随机掩码位置恢复被遮挡的 token，而推理时模型则沿特定的去噪轨迹逐步生成，这种不一致导致训练信号未能有效对齐推理行为。
 
@@ -45,7 +50,7 @@ claims:
 
 从方法谱系看，TraceRL 属于扩散模型后训练方法，区别于传统的随机掩码微调（random masking）和半自回归微调（semi-autoregressive fine-tuning），其关键创新在于**轨迹对齐的强化学习目标**和**扩散原生价值模型**的引入，为扩散大语言模型的推理能力提升提供了新的范式。
 
-## 背景与动机
+
 
 ### 扩散语言模型的推理困境
 
@@ -75,7 +80,9 @@ $$q ( x _ { t } \mid x _ { 0 } ) = \prod _ { i } \Bigl ( ( 1 - t ) \delta _ { x 
 
 这两点动机共同指向了 TraceRL 框架的设计原点：通过轨迹感知的强化学习，将推理轨迹信息系统性地融入 DLMs 的后训练过程。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 TraceRL 的核心创新在于将扩散语言模型（DLM）的强化学习训练目标与模型自身的**推理轨迹（inference trajectory）**对齐，而非沿用传统 RL 方法中与推理过程脱节的随机掩码训练范式。这一设计转变由以下三个关键机制共同支撑：
 
@@ -105,7 +112,7 @@ TraceRL 的设计对全注意力（full-attention）和块注意力（block-atte
 
 这些 changed slots 共同解释了 TraDo-4B-Instruct 在 MATH500 上以静态采样取得 75.6% 准确率、相较 SDAR-4B-Chat（70.2%）实现 +5.4 个百分点提升的因果路径：轨迹对齐确保了优化方向与推理行为一致，扩散式价值模型降低了训练方差并提供了密集的过程监督，而块大小放大进一步释放了推理效率与精度的权衡空间。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_KNAyc9DMe3/figures/001_Figure_1.jpg]]
 *Figure 1: Trajectory illustration (left) and TraceRL overview (right, see details in Section 4). Right panel is an example of TraceRL with shrinkage parameter s = 2 , , sequence length L = 6 , and block size B = 3 (when using block diffusion). We aggregate s consecutive steps to perform trajectoryaware reinforcement learning. Integers inside the squares indicate trajectory information*
@@ -137,7 +144,7 @@ TraceRL 的一个关键特性是其**架构无关性**：同一套框架可同�
 
 > **注意**：关于收缩参数 $s$ 的具体选取策略以及扩散价值模型相比标准价值网络的计算开销，原文未给出定量分析，需结合附录或后续工作进一步确认。
 
-## 核心模块与公式推导
+
 
 ### 扩散语言模型基础
 
@@ -190,7 +197,9 @@ $$\mathcal{T}_{value}(\theta_v) = \frac{1}{2} \mathbb{E}_{\tau} \left[ \frac{1}{
 - **收缩参数 $s$ 的影响**：较小 $s$ 值使优化更紧密地跟随推理轨迹，性能更优。$s=1$ 在 MBPP 上取得最高准确率 37.0，但每步 GPU 耗时最高（3.7 A100 小时/步）；$s=4$ 最快（2.1 GPU 小时/步）但准确率最低。
 - **块大小适配**：TraceRL 可将推理时的块大小从 $B=4$ 扩展至 $B=8$，避免直接扩大块大小导致的性能下降（MATH500 上从 67.4 降至 60.2），适配后恢复至 67.7。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -265,7 +274,9 @@ TraceRL 在收敛速度上展现出优势。Figure 4 的训练曲线表明，在
 *Figure 5: Comparison of training with and without a value model. (a) Incorporating a value model reduces training fluctuations during training. This experiment is conducted on SDAR-4B-Chat. (b) A value model enables integration of trajectory-level process rewards, yielding faster optimization than relying solely on outcome rewards. This is conducted on SDAR-1.7B-Chat*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从扩散语言模型 RL 到轨迹感知优化
 
@@ -308,6 +319,8 @@ TraceRL 处于**扩散语言模型（Diffusion Language Models, DLMs）后训练
 ### 4. 知识库定位总结
 
 TraceRL 在 DLM 后训练谱系中占据**轨迹感知 RL** 这一新兴节点，填补了从“随机掩码微调”到“推理轨迹对齐优化”的方法空白。其核心贡献在于证明了**训练目标与推理轨迹的显式对齐**是提升 DLM 推理能力的关键杠杆。当前证据强度较高（Table 2 的多基准验证、Figure 5 的方差分析、Table 3 的块大小扩展实验），但适用边界和开放问题表明该方法仍处于实验室验证阶段，距离通用部署尚有距离。
+
+
 
 ## 原文 PDF
 

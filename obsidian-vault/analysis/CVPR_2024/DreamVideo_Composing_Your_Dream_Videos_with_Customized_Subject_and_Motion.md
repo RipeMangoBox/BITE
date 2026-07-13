@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2024
 pdf_ref: paperPDFs/CVPR_2024/DreamVideo_Composing_Your_Dream_Videos_with_Customized_Subject_and_Motion.pdf
+project_link: null
+code_link: null
 aliases:
 - DreamVideo
 tags:
@@ -40,7 +42,7 @@ claims:
 > - 20个主体+30种运动模式，42条文本提示 上，CLIP-I 为 0.665，对比 0.657 (AnimateDiff)，变化 +0.008。
 > - 20个主体+30种运动模式，42条文本提示 上，DINO-I 为 0.452，对比 0.432 (AnimateDiff)，变化 +0.020。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -62,8 +64,6 @@ claims:
 ### 主要结果
 
 在包含 20 个定制主体和 30 种运动模式的联合定制评测中，DreamVideo 在所有自动指标上均优于现有方法：CLIP-T 达到 0.314（AnimateDiff 为 0.298），DINO-I 达到 0.452（AnimateDiff 为 0.432）。用户调研中，DreamVideo 的运动保真度偏好率高达 82.4%，远超 AnimateDiff 的 17.6%。消融实验证实，文本反转身份学习、运动适配器以及外观引导三个组件各自对最终性能有独立贡献，移除任一组件均会导致指标下降或生成质量劣化。
-
-## 背景与动机
 
 ### 视频生成与个性化定制的兴起
 
@@ -89,7 +89,7 @@ DreamVideo 的核心动机正是打破这种纠缠。其关键洞察是：**将�
 
 此外，为克服运动学习中的外观耦合问题，DreamVideo 在运动适配器中引入了**外观引导**机制——将训练视频中的一帧图像作为条件输入，迫使适配器仅关注运动模式本身，而非外观信息。这一设计从结构层面确保了运动与外观的真正分离。
 
-## 核心创新
+## 核心方法与创新机理
 
 DreamVideo 的核心创新在于将视频定制任务解耦为**主体学习**与**运动学习**两个独立阶段，从根本上解决了现有方法仅能控制单一维度（主体或运动）的瓶颈。这种解耦设计通过两个关键机制实现。
 
@@ -119,8 +119,6 @@ DreamVideo 并非盲目地将适配器插入所有层。作者通过分析微调
 
 与 **LoRA**（Hu et al., 2021）融合或 **AnimateDiff**（Guo et al., 2024）等需要联合训练或参数合并的方案不同，DreamVideo 的两个适配器完全独立训练，推理时直接组合。消融实验证实，这种适配器设计相比 LoRA 融合能更好地缓解冲突，实现更和谐的主体-运动组合（见 Table A4, Fig. A7）。整个过程中预训练视频扩散模型始终保持冻结，仅需优化极小部分参数。
 
-## 整体框架
-
 DreamVideo 将个性化视频生成任务**解耦为主体学习与运动学习两个独立阶段**，以降低优化复杂度并提升组合灵活性。其核心 pipeline 由以下模块串联构成：
 
 1. **冻结的预训练视频扩散模型**：作为基础生成引擎，整个训练过程保持冻结，确保基座模型的通用文本到视频生成能力不被破坏。
@@ -132,8 +130,6 @@ DreamVideo 将个性化视频生成任务**解耦为主体学习与运动学习�
 **输入输出流**：主体学习阶段输入静态主体图像，输出文本身份嵌入与身份适配器权重；运动学习阶段输入运动参考视频，输出运动适配器权重。推理时，将两个轻量适配器直接组合加载到冻结的基础模型中，无需额外训练，即可根据任意文本提示生成同时保留指定主体身份与运动模式的视频。
 
 这一解耦设计的核心洞察来自权重变化分析：空间交叉注意力层在主体外观学习中起关键作用，而所有时序层在运动学习中贡献相当。据此，身份适配器被精准插入交叉注意力层，运动适配器则覆盖全部时序层，并以平行适配器形式实现，以最大化定制效果。
-
-## 核心模块与公式推导
 
 DreamVideo 将定制视频生成解耦为主体学习与运动学习两个阶段，通过两个轻量适配器实现。整体框架如 Figure 2 所示，两个适配器的结构细节如 Figure 3 所示。
 
@@ -173,7 +169,7 @@ $$\Delta_{l} = \frac{\lVert \boldsymbol{\theta}_{l}' - \boldsymbol{\theta}_{l} \
 
 其中 $\boldsymbol{\theta}_{l}$ 为预训练参数，$\boldsymbol{\theta}_{l}'$ 为微调后参数。分析结果（Figure 4）显示：在空间参数中，交叉注意力层的 $\Delta_{l}$ 显著高于其他层，表明其是主体外观学习的关键；而在时间参数中，各层的 $\Delta_{l}$ 分布较为均匀。据此，身份适配器仅插入交叉注意力层，运动适配器则插入所有时序层。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 实验设置
 
@@ -247,9 +243,6 @@ Table 5 和 Figure 8 系统消融了 DreamVideo 的三个核心组件：
 ![[assets/figures/papers/paper_list_l34_DreamVideo_Composing_Your_Dream_Videos_with_Customized_Subject_and_Motio/figures/020_Figure.jpg]]
 *Figure: A1. Qualitative comparison of customized video generation with both subjects and motions. Subject Custom Diffusion DreamVideo (ours)*
 
-![[assets/figures/papers/paper_list_l34_DreamVideo_Composing_Your_Dream_Videos_with_Customized_Subject_and_Motio/figures/021_Figure.jpg]]
-*Figure: A3. More results of subject customization for Our DreamVideo*
-
 ![[assets/figures/papers/paper_list_l34_DreamVideo_Composing_Your_Dream_Videos_with_Customized_Subject_and_Motio/figures/022_Figure.jpg]]
 *Figure: Motion a car running on the road Generated Videos by DreamVideo a cat running on the road*
 
@@ -262,7 +255,7 @@ Table 5 和 Figure 8 系统消融了 DreamVideo 的三个核心组件：
 ![[assets/figures/papers/paper_list_l34_DreamVideo_Composing_Your_Dream_Videos_with_Customized_Subject_and_Motio/figures/026_Figure.jpg]]
 *Figure: (a) Failure cases on subject customization. a rabbit eating a watermelon a cat eating a watermelon (b) Failure cases on motion customization*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 DreamVideo 处于视频扩散模型定制化生成的交叉地带，其核心贡献在于首次将“主体定制”与“运动定制”解耦为两个独立、可组合的学习过程。以下从基线关系、适用边界、已知局限与开放问题四个维度进行定位。
 

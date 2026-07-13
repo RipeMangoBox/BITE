@@ -5,6 +5,7 @@ paper_level: A
 venue: Whitepaper
 year: 2025
 pdf_ref: paperPDFs/WHITEPAPER_2025/Isaac_Lab_A_GPU_Accelerated_Simulation_Framework_for_Multi_Modal_Robot_Learning.pdf
+code_link: https://github.com/isaac-sim/IsaacLab
 project_link: https://isaac-sim.github.io/IsaacLab/main/index.html
 aliases:
 - IL
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | Isaac Lab：面向多模态机器人学习的GPU加速仿真框架 |
 | 英文题名 | Isaac Lab: A GPU-Accelerated Simulation Framework for Multi-Modal Robot Learning |
 | 会议/期刊 | Whitepaper 2025 |
-| Links | [paper](https://arxiv.org/abs/2511.04831); [GitHub](https://github.com/isaac-sim/IsaacLab); [Project](https://isaac-sim.github.io/IsaacLab/main/index.html) |
+| Links | [paper](https://arxiv.org/abs/2511.04831) · [GitHub](https://github.com/isaac-sim/IsaacLab) · [Project](https://isaac-sim.github.io/IsaacLab/main/index.html) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/robotics |
 | Method | Isaac Lab |
 | Dataset | Dexsuite grasp-and-lift (DextrAH teacher) state-based, Franka cabinet drawer opening state-based, ANYmal 崎岖地形运动（高度扫描+执行器网络）, DextrAH 感知操作（64×64 相机，对比相机实现） |
@@ -42,7 +43,7 @@ claims:
 > - Franka cabinet drawer opening state-based 上，FPS (吞吐量) 为 超过 1,600,000 FPS (8 GPU, 16,384 环境)，对比 单 GPU 对应较低 FPS，变化 多 GPU 扩展几乎线性加速。
 > - ANYmal 崎岖地形运动（高度扫描+执行器网络） 上，吞吐量比较（FPS） 为 直接工作流 (Direct Workflow)，对比 基于管理器的工作流 (Manager-based Workflow)，变化 直接工作流平均高出 3.53%。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -70,7 +71,7 @@ Isaac Lab 并非从头构建物理引擎，而是在 NVIDIA Omniverse 生态之�
 
 > **注意**：部分 Sim-to-Real 结果来自引用工作，尚未在 Isaac Lab 内形成标准化基准，需结合原始论文进行交叉验证。
 
-## 背景与动机
+
 
 机器人学习正经历从传统单一任务训练向大规模、多模态、通用策略学习的范式转变。这一趋势对仿真基础设施提出了前所未有的需求：研究人员需要在高保真物理模拟中并行运行成千上万个环境，同时获取包括视觉、深度、触觉和本体感知在内的多模态传感器数据，并通过强化学习或模仿学习训练复杂的神经网络策略。然而，现有的机器人仿真生态系统高度碎片化，难以同时满足这些需求。
 
@@ -80,7 +81,9 @@ Isaac Lab 并非从头构建物理引擎，而是在 NVIDIA Omniverse 生态之�
 
 **本文动机**。Isaac Lab 正是在这一背景下应运而生。其设计目标并非简单地在 Isaac Gym 基础上增量改进，而是从根本上重构机器人仿真框架的架构：以 **OpenUSD** 为核心统一场景表示，以 **GPU 原生并行物理（PhysX）与光追渲染（RTX）** 为计算底座，通过**模块化、可复用的管理器 API** 将最佳实践整合为单一可扩展平台。这一设计旨在大幅降低机器人学习研究的门槛，并提供从仿真到真实世界迁移的流畅路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Isaac Lab 的核心创新并非单一算法突破，而是对机器人仿真生态系统碎片化问题的系统性重构。其创新主线围绕三个相互咬合的维度展开：**统一场景表示**、**GPU 原生数据流**和**模块化环境设计**。以下通过与基线方法的对比，剖析每个维度的关键设计变更。
 
@@ -137,7 +140,7 @@ Isaac Gym 首次实现了单 GPU 上的端到端强化学习，但其数据访�
 
 Isaac Lab 的创新本质在于**将高性能 GPU 物理仿真、光追渲染、多模态传感器与模块化环境设计统一在 OpenUSD 框架下**，从而大幅降低机器人学习研究的工程门槛。其相对于 Isaac Gym 的关键提升在于：用声明式的 USD 场景描述替代命令式的缓冲区管理，用可组合的管理器 API 替代紧耦合的环境脚本，用统一的多频传感器接口替代分散的感知模块。这些变更共同构成了从“仿真工具”到“研究平台”的范式升级。
 
-## 整体框架
+
 
 Isaac Lab 的核心设计理念是将**高保真 GPU 并行物理仿真**、**照片级实时光追渲染**与**模块化、可组合的环境设计范式**统一在一个以 OpenUSD 为骨架的平台上，从而为多模态机器人学习提供从场景构建到策略部署的端到端流水线。整个框架的架构可以概括为“**场景描述—物理仿真—感知渲染—控制接口—任务编排—学习训练**”六个关键层次，各层之间通过 USD 场景图与 GPU 原生张量 API 实现高效的数据流转。
 
@@ -195,7 +198,7 @@ Isaac Lab 提供了灵活的执行器建模框架，支持**隐式执行器**（
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2511_04831/figures/001_Figure_1.jpg]]
 *Figure 1: Isaac Lab supports diverse robotic applications with exteroceptive observation inputs. It provides a user-friendly API for experimentation and includes features to facilitate sim-to-real transfer. The framework also supports multiple learning paradigms, including reinforcement learning and imitation learning*
 
-## 核心模块与公式推导
+
 
 ### 1. 模块化架构总览
 
@@ -251,7 +254,9 @@ $$FPS = \frac{\#\text{ of rendering steps}}{\text{simulation time}}$$
 
 该指标定义于 Section 4.2，专门衡量传感器（如相机）的更新频率。在相机实现对比中（Figure 17），TiledCamera 和 RayCasterCamera 可扩展至大量并行环境，而原始 USD 相机在 48 个相机时即导致 GPU 内存溢出。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 4.1 端到端学习吞吐量
 
@@ -332,7 +337,9 @@ Isaac Lab 的 sim-to-real 能力已在多个独立研究团队的平台上得到
 
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2511_04831/figures/004_Table.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 仿真框架演进中的定位
 
@@ -385,6 +392,8 @@ Isaac Lab 本身已成为多个前沿研究的仿真基座：
 3. **多物理求解器耦合**：Newton 何时能实现 PhysX 与 MuJojo、MPM 等求解器的双向耦合，使单一场景中不同区域使用最优求解器？
 
 4. **标准化评估生态**：**Isaac Lab - Arena**（Figure 35）承诺提供可扩展的策略评估框架，但其开源时间表和基准覆盖范围尚未明确。这一生态的建立将是衡量框架社区影响力的关键指标。
+
+
 
 ## 原文 PDF
 

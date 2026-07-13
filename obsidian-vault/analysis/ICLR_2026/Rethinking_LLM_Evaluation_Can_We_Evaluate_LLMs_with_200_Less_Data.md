@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Rethinking_LLM_Evaluation_Can_We_Evaluate_LLMs_with_200_Less_Data.pdf
+project_link: https://huggingface.co/datasets/open-llm-leaderboard-old/results
+code_link: https://github.com/gszfwsb/EssenceBench
 aliases:
 - RLECWEL2LD
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | 重新思考LLM评估：能否用200倍更少的数据评估LLM？ |
 | 英文题名 | Rethinking LLM Evaluation: Can We Evaluate LLMs with 200× Less Data? |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=lZlZjSxdio); [GitHub](https://github.com/gszfwsb/EssenceBench); [Project](https://huggingface.co/datasets/open-llm-leaderboard-old/results) |
+| Links | [paper](https://openreview.net/forum?id=lZlZjSxdio) · [GitHub](https://github.com/gszfwsb/EssenceBench) · [Project](https://huggingface.co/datasets/open-llm-leaderboard-old/results) |
 | Topic | #topic/other_unclear #topic/other_unclear/general |
 | Method | EssenceBench |
 | Dataset | HellaSwag (10,003 instances), ARC, GSM8K, HellaSwag (ranking preservation) |
@@ -40,7 +42,7 @@ claims:
 > - ARC 上，Kendall correlation 为 0.983 (k=500)，对比 0.961 (MetaBench, k=500)，变化 +0.022。
 > - GSM8K 上，RMSE 为 0.86 (k=200)，对比 0.96 (MetaBench, k=500)，变化 -0.10 (with 60% fewer samples)。
 
-## 概述
+## 概要
 
 当前大语言模型（LLM）的基准评估依赖大量人工标注或模型评分，评估成本高昂。研究发现，许多基准数据集中存在严重的文本相似性与模型排名冗余（Figure 1），大量样本仅提供了微弱的额外信息，却推高了计算开销。为此，本文将基准压缩形式化为一个子集优化问题：从原始数据集 $D$ 中选取 $k$ 个代表性样本，以最小化子集评分与全量评分之间的重建误差，同时保持模型排序的稳定性。
 
@@ -59,7 +61,7 @@ claims:
 
 综上，EssenceBench 能够在极大降低评估成本的同时，高度保持评分重建精度与模型排序稳定性，为高效 LLM 评估提供了可行方案。
 
-## 背景与动机
+
 
 大规模语言模型（LLM）的涌现能力使其在广泛任务上展现出令人瞩目的性能，然而，系统性地评估这些模型仍面临严峻的成本挑战。现有主流基准（如HellaSwag、GSM8K、ARC等）包含数万甚至数十万条测试样本，加之模型尺寸不断膨胀，导致全量评估的计算开销极高。更关键的是，这些基准数据集中普遍存在两类冗余——**文本冗余**（样本语义高度重叠）和**排名冗余**（不同样本的模型表现向量高度相关，即行为冗余），大量样本事实上无法提供额外的判别信息，造成了不必要的算力浪费（Figure 1，Definition 3 & 4）。
 
@@ -67,7 +69,9 @@ claims:
 
 针对上述瓶颈，本文提出**EssenceBench**，一个粗到细的三阶段基准压缩框架。其核心动机在于：通过**联合考虑语义重叠与跨模型行为一致性**，在剧烈压缩的同时保障模型评估的可靠性。EssenceBench 首先定义并同时滤除文本冗余和排名冗余，以去除近似重复样本；随后，利用固定代理模型与遗传算法搜索分数重建最优的子集，直接优化排序保真度；最后，通过归因引导的分组细化提升子集的多样性与覆盖度。这一设计从根本上改变了基准压缩的范式——不再单纯依赖文本去重，而是直接将“排名保真度”作为优化目标。在初步实验中，EssenceBench仅用50条样本（200倍压缩）即可保持HellaSwag上95%的模型排名在5%的偏移范围内，并且在GSM8K上以更少样本实现了较MetaBench降低60.7%的RMSE，这充分验证了该动机的有效性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 现有基准压缩方法（如MetaBench、SMART）仅依赖文本相似度过滤或启发式子集选择，导致在极高压缩比下无法同时维持分数重建精度与模型排序保真度。根本瓶颈在于**没有联合考虑语义冗余与跨模型行为一致性**，因此在移除冗余样本时可能丢失对模型区分而言关键但语义差异大的样本。EssenceBench通过三个关键“变更槽”（changed slots）系统性地解决该问题，其粗到细的三阶段框架从冗余定义到搜索策略再到小预算多样性保持均进行了重新设计。
 
@@ -91,7 +95,7 @@ claims:
 
 综上，EssenceBench的核心创新并非孤立模块，而是沿着“**粗过滤去冗余→全局优化重构建→局部归因补覆盖**”的粗到细链条，系统性地置换baseline的三个关键设计槽位，从而在高压缩比下同时达成分数重建误差最小化与排名保真度最大化。这一框架具有模块化可替换性：粗过滤阶段可与SMART等现有方法结合（Table 5显示替换后依然有效），遗传算法可适配不同代理模型，归因分组可灵活调整分组策略，体现出良好的可扩展性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0015_lZlZjSxdio_Rethinking_LLM_Evaluation_Can_We_Evaluate_LLMs_w/figures/009_Figure_3.jpg]]
 *Figure 3: The pipeline of EssenceBench. (I) Coarse Filtering. By extracting the binary score matrix for each benchmark and computing both text-level and ranking-level redundancies, samples that exceed thresholds are removed. (II) Subset Selection. A genetic algorithm (GA) searches over subsets. Fitness is evaluated by the error of predicted performance, and subsets are optimized via tournament selection, crossover, mutation, and adjustment. (III) Sample Selection. Sample attributions are estimated from top-performing subsets and used to build candidate groups. GA is then reapplied within each group to identify the most representative and informative subset*
@@ -115,7 +119,7 @@ EssenceBench 的输入由两部分构成：①从公开排行榜提取的**二�
 
 上述三阶段呈现出清晰的**粗粒度→精粒度**递进关系：粗过滤利用廉价的双冗余信号快速压缩候选空间，为后续昂贵的组合搜索提供干净输入；遗传算法在全局尺度上通过代理模型高效评估子集质量，避免每次搜索都重新运行 LLM；归因引导的分组再将全局最优解向高多样性和覆盖度方向微调。这一设计根植于对基准冗余现象的观察：大量样本在文本和模型排名上高度重叠（Fig. 1），且现有方法仅依赖文本相似性过滤（如 SMART）或聚类选择（如 MetaBench），未能同时兼顾行为冗余与极端压缩下的多样性保持。EssenceBench 通过联合建模文本与排名信号，并将代理模型与归因分组嵌入搜索循环，显著压缩了评估成本，同时保持了模型排序的稳定性。
 
-## 核心模块与公式推导
+
 
 EssenceBench 将基准压缩形式化为一个子集优化问题：从原始基准 $\mathcal{D}$（含 $N$ 个样本）中选出一个大小为 $k$ 的子集 $\tilde{\mathcal{D}}^*$，使得基于子集重建出的模型全基准得分与真实得分之间的差异最小。该目标可用二值掩码 $\mathbf{m}\in\{0,1\}^N$ 表达为
 
@@ -175,7 +179,9 @@ $$
 
 当目标子集大小极度有限（$k<400$）时，单纯依靠全局遗传算法容易遗漏部分能力维度。EssenceBench 引入归因引导的分组精炼步骤：先用可解释提升机（EBM）估计已得到精英子集中每个样本对重建误差的归因贡献，然后根据归因分数将过滤后的全体样本划分为高归因组 $G_{\mathrm{High}}$、低归因组 $G_{\mathrm{Low}}$ 和随机组 $G_{\mathrm{Rand}}$。各组内部再独立执行上述遗传算法，最终合并各组最优解。该策略在保证分数重建精度的同时，显著提升了子集的语义多样性和能力覆盖度，且未引入额外评估开销。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 实验部分围绕两个核心问题展开：(i) EssenceBench在各种基准和子集预算下能否在分数重建和排名保真度上超越现有压缩方法；(ii) 粗过滤、遗传算法搜索与归因引导等各模块的实际贡献如何。所有实验均遵循MetaBench的预处理协议，采用基于模型性能分层的9:1训练/测试划分，并复用相同的公开排行榜评分矩阵，保证对比的公平性（各方法均使用相同的模型表现信号）。
 
@@ -226,7 +232,9 @@ $$
 - **Figure 5**（消融）：粗过滤、归因选择和分组策略各自对性能的独立增益可视化，揭示了“筛选‑搜索‑精炼”三阶段的因果必要性。
 - **Table 6、Table 7**（附录全指标）：HellaSwag和ARC上跨k值的全部五项指标对比进一步夯实EssenceBench的鲁棒性与泛化能力。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 EssenceBench处于LLM基准压缩方法谱系中一个关键转折点：它将前人工作普遍采用的“单一冗余信号+启发式选择”范式，推进到“文本‑排名联合冗余感知+代理引导搜索+归因驱动精炼”的粗到细框架。理解这一谱系位置及其适用边界、内在局限和开放问题，有助于判断该方法何时可用、何时需要替代方案，以及未来可能的演进方向。
 
@@ -271,6 +279,8 @@ EssenceBench的设计隐含若干工作假设，决定了其生效的前提条�
 5. **隐私与去中心化数据**：公开排行榜假设了所有模型对同一基准的完整评分矩阵可获取。当模型评估结果因隐私或商业原因不能公开时，如何在不集中收集数据的前提下实现基准压缩（例如联邦学习或差分隐私框架），是落地应用的关键挑战。
 
 上述局限与开放问题的部分论断需要人工进一步核实，因为论文未在局限或未来工作中明确展开讨论。它们主要源于对方法假设的严格审视以及实验未覆盖的边缘情况推断。在实际部署决策时，建议结合具体任务的数据特性、允许的评估误差容限以及可获取的模型评估数据规模，审慎评估EssenceBench的适用性。
+
+
 
 ## 原文 PDF
 

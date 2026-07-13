@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/SCoT_Teaching_3D_LLMs_to_Think_Spatially_with_Million_scale_CoT_Annotations.pdf
+project_link: null
+code_link: null
 openreview_forum_id: 5Tph6wFMOm
 aliases:
 - SSCT
@@ -42,7 +44,7 @@ claims:
 > - SCoT-Planning (Situated Planning) 上，Explainability (1-10) 为 7.38，对比 6.64，变化 +0.74。
 > - SCoT-Perception (ScanRefer) 上，Acc@0.25 为 56.4，对比 58.4，变化 -2.0。
 
-## 概述
+## 概要
 
 现有三维大语言模型（3D-LLMs）在场景理解与交互方面取得了显著进展，但其训练范式存在一个根本性瓶颈：主流方法仅依赖“问题-答案”对进行监督，缺乏显式、结构化的推理过程引导。这使得模型在面对需要多步空间推理的分析与规划任务时，透明性差、可靠性低，难以满足真实场景中对可解释决策的需求。然而，一个关键的因果发现是——不加区分地在所有任务上引入思维链（Chain-of-Thought, CoT）监督并非良策：在简单的空间感知任务上过度使用CoT反而会诱发幻觉，导致准确率下降约4.9%（Table 2, Fig. 2）。
 
@@ -52,7 +54,7 @@ claims:
 
 **方法谱系与知识库定位**：SCoT处于3D视觉-语言模型与思维链推理的交叉地带。相较于仅提供问答对的早期3D对话基线（如**Chat3D V2**、**Chat Scene**、**LL3DA**等）以及将3D场景视为动态视频的**Video 3D LLM**，SCoT首次系统性地将任务复杂度作为CoT使用的决策依据，并通过 `<SI>` 锚定机制确保推理链条的场景忠实性。与通用视觉思维链方法不同，SCoT的贡献在于揭示了“何时不应使用CoT”与“如何使CoT可验证”这两个同等重要的维度，为3D空间智能的可靠推理提供了新的研究范式。
 
-## 背景与动机
+
 
 三维场景理解正从单纯的物体识别走向复杂的空间推理与规划。当前，3D大语言模型（3D-LLMs）已在场景对话、视觉定位等任务上展现出一定能力，但其训练范式存在一个根本性瓶颈：模型主要通过“问题—答案”对进行监督，缺乏显式的、结构化的推理过程引导。这种仅答案的监督方式，使得模型在面对需要多步空间分析或情景化规划的任务时，推理过程不透明、结论难以验证，进而导致可解释性差、可信度低。
 
@@ -62,7 +64,9 @@ claims:
 
 上述缺口共同指向一个核心问题：**如何在不损害基础感知能力的前提下，赋予3D-LLMs可解释、可验证的空间推理能力？** 本文的动机正是构建一个按任务复杂度分层、场景锚定的思维链监督体系，使模型在简单观察任务上保持高效准确，而在复杂分析与规划任务上生成透明、可信的逐步推理。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SCoT的核心创新在于针对3D-LLM训练中“何时以及如何引入思维链（CoT）”这一被忽视的关键问题，提出了系统性的解决方案。具体体现在三个紧密耦合的层面：
 
@@ -99,7 +103,7 @@ SCoT-Reasoner采用**两阶段训练策略**（Sec. 4）：第一阶段在240K�
 
 这三个创新点形成了完整的因果链条：**分层策略决定了“何时用CoT”，<SI>机制和场景锚定决定了“如何用CoT”，两阶段训练和ORS模块则提供了支撑CoT推理的感知和空间基础**。消融实验验证了这一链条的有效性：完整的CoT+<SI>设置带来最高的综合评分，但移除对象级推理或场景级推理均会导致可解释性、忠实性和可信度的显著下降（Table 9）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_5Tph6wFMOm/figures/021_Figure_8.jpg]]
 *Figure 8: Model architecture of SCoT-Reasoner. SCoT-Reasoner receives language instruction, object proposals segmented from 3D scene and video frames as input, then performs step-by-step reasoning and analysis based on the object-grounded or scene-grounded facts, and ultimately generates reliable accurate and verifiable answers*
@@ -145,7 +149,7 @@ ORS模块是空间推理能力的核心：它以对象为节点、偏移嵌入�
 
 这种分层设计直接回应了核心瓶颈：不加区分地使用CoT会使简单感知任务产生约4.9%的准确率下降（Table 2），而仅在分析/规划任务上使用CoT则带来可解释性+6.21%、忠实性+11.74%、可信度+10.02%的全面提升（Table 3、Table 4）。
 
-## 核心模块与公式推导
+
 
 ### 多模态编码器：2D/3D特征提取
 
@@ -175,7 +179,9 @@ ORS增强特征 $\bar{F}_i^{ORS}$ 经模态特定的投影层映射至LLM（Vicu
 
 SCoT-Reasoner采用两阶段训练（Section 4）：第一阶段在约240K空间感知样本上建立基础感知能力，仅使用答案监督；第二阶段在约460K分析样本与390K规划样本上微调，引入包含 `<SI>` 锚点的显式CoT监督。这种分层训练策略与三级任务分类（感知、分析、规划）相对应，从机制上避免了在简单感知任务上过度使用CoT所引发的幻觉问题（Table 2显示约4.9%的准确率下降）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：CoT监督的任务依赖性
 
@@ -225,7 +231,9 @@ Table 9的消融实验系统拆解了CoT监督的关键组件。移除对象级�
 
 4. **评估的主观性依赖**：虽然LLM评估采用了ChatGPT-4.1、Qwen和DeepSeek三者的平均分以减少偏差（Fig. 9显示三者间存在中等程度的相关性），但主观评分本质上仍受评估者偏好的影响。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有3D-LLM训练范式的关系
 
@@ -276,6 +284,8 @@ Table 1将SCoT与近期出现的推理增强型3D数据集进行了对比，其�
 - **推理效率优化**：如何通过推理步骤压缩、提前终止或并行化来降低CoT推理的延迟，使其适用于实时应用场景？
 - **室外大规模场景迁移**：SCoT的场景锚定生成范式能否有效迁移到室外城市级3D场景？在更大空间尺度下，`<SI>`标签的引用精度和场景上下文的完备性是否仍能保证？
 - **更强的忠实性保障机制**：除了`<SI>`标签，是否可以通过自洽性验证、反事实推理或结构化因果图来进一步确保推理链条的真实性和忠实度？这些机制能否与现有的LLM评估框架（如ChatGPT-4.1、Qwen、DeepSeek的独立打分）形成互补？
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: NEURIPS
 year: 2024
 pdf_ref: paperPDFs/NEURIPS_2024/InterDreamer_Zero_Shot_Text_to_3D_Dynamic_Human_Object_Interaction.pdf
+project_link: https://sirui-xu.github.io/InterDreamer/
+code_link: null
 aliases:
 - InterDreamer
 tags:
@@ -40,7 +42,7 @@ claims:
 > - BEHAVE (human motion quality with MDM) 上，R-Precision Top-1↑ 0.163 vs 0.153 (MDM w/o planning) (+0.010)。
 > - BEHAVE (human motion quality with MotionDiffuse) 上，FID↓ 9.015 vs 10.208 (MotionDiffuse w/o planning) (-1.193)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：文本驱动的三维人-物交互（Human-Object Interaction, HOI）生成长期受限于大规模配对文本-交互数据的缺失，导致监督学习方法在扩展性和泛化能力上遭遇根本性困难。
 
@@ -59,7 +61,7 @@ claims:
 
 **方法谱系与知识库定位**：InterDreamer 在文本到动作生成领域继承并拓展了 MDM（Tevet et al., ICLR 2023）、MotionDiffuse（Zhang et al., IEEE TPAMI 2024）、ReMoDiffuse（Zhang et al., ICCV 2023）和 MotionGPT（Guo et al., arXiv 2023）等扩散/自回归骨干模型；在交互动力学建模上与 InterDiff（Xu et al., ECCV 2024）形成对比——后者使用接触标记点作为动作表示，而 InterDreamer 改用稀疏接触顶点轨迹，实现了更优的动力学控制精度。框架中仅世界模型需要额外训练，其余组件均为零样本复用，体现了“知识解耦、即插即用”的设计哲学。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -82,7 +84,9 @@ InterDreamer的提出源于一个关键观察：**交互语义与交互动力学
 
 InterDreamer并非重新训练一个端到端的文本-交互生成器，而是**将已有的大规模知识源（LLM、文本-动作模型、HOI运动数据、简单物理先验）协同整合**，在零样本设定下实现文本驱动的动态HOI生成。这一范式区别于需要文本-交互对监督的现有方法，为开放词汇、跨物体类别的交互生成提供了新的技术路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 InterDreamer 的核心创新在于**将交互语义与动力学完全解耦**，从而绕过了零样本 HOI 生成的根本瓶颈——缺乏大规模配对的文本-交互数据。这一解耦通过两个关键的 “changed slots” 实现：高层语义规划与基于接触顶点的动力学建模。
 
@@ -113,7 +117,7 @@ InterDreamer 的核心创新在于**将交互语义与动力学完全解耦**，
 
 这种设计使得 InterDreamer 无需任何成对的文本-交互数据即可生成语义一致、物理合理的 HOI 序列，并在 CHAIRS 等未见物体上展示出跨域泛化能力（Figure 5）。
 
-## 整体框架
+
 
 InterDreamer 提出一种**语义与动力学解耦**的零样本文本到3D动态人-物交互生成框架。其核心洞察在于：交互语义（高层描述、接触部位、物体类别）与交互动力学（物体在人体作用下的运动）可以从相互独立的外部知识源获取，从而绕过了对大规模配对文本-交互数据的依赖。
 
@@ -151,7 +155,7 @@ $$\boldsymbol{x} = [(\pmb{h}_1, \pmb{o}_1), \dots, (\pmb{h}_M, \pmb{o}_M)]$$
 ![[assets/figures/papers/paper_list_l1796_InterDreamer_Zero_Shot_Text_to_3D_Dynamic_Human_Object_Interaction/figures/001_Figure_1.jpg]]
 *Figure 1: InterDreamer generates vivid 3D human-object interaction sequences guided by text descriptions, by synergizing semantics and dynamics knowledge from large-scale text-motion data (upper left), a large language model (bottom left), human-object interaction data (upper middle), and prior knowledge (bottom middle) from simple physics. We visualize the generated text-guided interaction sequence (upper right), with the beginning of the sequence unfolded (bottom right)*
 
-## 核心模块与公式推导
+
 
 InterDreamer 将文本到3D动态人-物交互生成分解为三个核心模块：**高层规划**（High-Level Planning）、**低层控制**（Low-Level Control）和**世界模型**（World Model）。整个框架的核心洞见在于交互语义与动力学可以解耦——语义借助大语言模型和预训练文本到动作模型获取，动力学通过基于接触顶点的世界模型学习，两者均不依赖成对的文本-交互数据。
 
@@ -231,7 +235,9 @@ $$E_{\mathrm{pene}} = - \sum_{i=1}^{L} \sum_{d_o} \min(\mathbf{sdf}_{h_i^*}(\pmb
 ![[assets/figures/papers/paper_list_l1796_InterDreamer_Zero_Shot_Text_to_3D_Dynamic_Human_Object_Interaction/figures/015_Figure.jpg]]
 *Figure: C: Qualitative results from the interaction retrieval. We demonstrate that our learning-based interaction retrieval can extract diverse and realistic interactions*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -296,7 +302,9 @@ InterDreamer 的核心瓶颈在于：**缺乏大规模配对的文本‑人‑�
 - 解耦的语义‑动力学范式能否扩展到多人与多物体交互场景？
 - 在完全无文本‑交互对监督的条件下，当前框架的性能上限是多少？如何量化并进一步弥合剩余的性能差距？
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心范式定位
 
@@ -346,6 +354,8 @@ InterDreamer 的高层规划模块可与多种文本到动作骨干模型协同�
 3. **多主体扩展**：解耦的语义-动力学范式能否扩展到多人与多物体交互场景？当前框架的接触顶点表示和世界模型设计是否能直接适配？
 4. **性能上限量化**：在无文本监督的情况下，当前框架的上限能达到多少？如何量化并缩小与全监督方法的剩余性能差距？
 5. **LLM 依赖性**：高层规划对 LLM 的依赖是否可被更轻量、更可控的语义解析方法替代？如何平衡 LLM 的常识知识与特定领域的精确性需求？
+
+
 
 ## 原文 PDF
 

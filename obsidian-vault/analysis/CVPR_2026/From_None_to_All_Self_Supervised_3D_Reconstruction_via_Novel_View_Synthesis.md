@@ -43,7 +43,7 @@ claims:
 > - RE10K (2-view Pose) 上，Rotation AUC@20°↑ 78.4 vs 62.7 (SelfSplat) (+15.7)。
 > - BlendedMVS (2-view Depth) 上，rel↓ 0.206 vs 0.405 (MVSplat, 监督方法) (-0.199)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：从无约束多视图图像中联合重建显式3D场景并估计相机参数，是一个高度欠定的“鸡与蛋”问题。现有方法要么依赖真值相机位姿/内参进行监督训练，要么需要强预训练先验（如DUSt3R、MASt3R）或点云蒸馏才能从随机初始化收敛，难以在完全无3D标注的条件下端到端学习。
 
@@ -53,7 +53,7 @@ claims:
 
 **方法定位**：NAS3R属于自监督3D高斯散点重建方法，与pixelSplat、MVSplat等监督方法以及SelfSplat、SPFSplat等自监督方法相比，其核心差异在于完全消除了对真值相机参数和预训练先验的依赖（见Table 1），通过局部到全局的深度提升范式和掩码解码器实现了从随机初始化的稳定端到端训练。
 
-## 背景与动机
+
 
 ### 三维重建与新视角合成的范式演进
 
@@ -77,7 +77,9 @@ claims:
 
 这两个设计的组合，使得NAS3R能够在没有任何3D监督或预训练先验的条件下，从随机初始化稳定收敛，实现了真正的“从无到全”自监督三维重建。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 NAS3R的核心创新在于通过两个关键设计——**深度引导的局部到全局高斯提升范式**与**掩码解码器**——破解了自监督3D重建中“鸡与蛋”式的联合优化困境，使得网络能够从随机初始化出发，仅依靠2D光度一致性损失端到端地学习几何、相机与外观，无需任何3D标注、预训练先验或真实相机内参。
 
@@ -99,7 +101,7 @@ NAS3R将这一范式彻底重构为**局部到全局**的生成路径：模型�
 
 上述所有组件——高斯参数（中心、旋转四元数、尺度、不透明度、球谐系数）、相机外参和内参——均通过一个支持梯度回传至相机参数的CUDA-based 3DGS渲染器进行端到端优化。训练仅使用目标视图的MSE+LPIPS光度一致损失（γ=0.05），无任何显式3D监督。这一简洁而统一的优化框架是NAS3R能够从“无”到“全”的基础。
 
-## 整体框架
+
 
 NAS3R 是一个完全自监督的三维重建框架，其核心设计目标是在无任何真值标注（无相机位姿、无内参、无深度）且无预训练先验的条件下，从无约束多视图图像中联合推断显式三维场景表示与相机参数。框架的训练与推理流程如 Figure 2 所示，整体遵循“编码—跨视图交互—几何/相机联合预测—可微分渲染—光度监督”的闭环范式。
 
@@ -148,7 +150,7 @@ NAS3R 的训练流水线由以下核心模块串联构成：
 ![[assets/figures/papers/paper_list_l2492_https_arxiv_org_abs_2603_27455/figures/001_Figure_1.jpg]]
 *Figure 1: NAS3R is a self-supervised framework that requires no ground-truth annotations and no pretrained priors during training, and jointly infers 3D Gassian parameters, camera intrinsics and extrinsics and depth maps, also enabling high-quality novel view synthesis*
 
-## 核心模块与公式推导
+
 
 NAS3R 的训练流水线由五个核心模块串联构成，所有模块从随机初始化开始，仅通过目标视图的光度一致性损失端到端联合优化。整体架构如 Figure 2 所示。
 
@@ -208,7 +210,9 @@ $$G^{v} = \mathrm{MaskedDecoder}(\mathcal{F}^{v}, \mathcal{F}^{1:K})$$
 
 NAS3R 采用基于 CUDA 的可微分 3D Gaussian Splatting 渲染器，支持对相机位姿、内参和高斯参数的反向传播梯度。渲染器接收上下文视图的高斯原语和目标视图的预测相机参数，生成渲染图像 $\hat{\mathcal{I}}_{\mathcal{T}}$，并与真值目标图像计算 $\mathcal{L}_{\mathrm{render}}$，梯度回传至所有模块实现端到端联合优化。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -316,7 +320,9 @@ Table 1系统对比了各方法在训练和推理阶段对真值位姿、真值�
 ![[assets/figures/papers/paper_list_l2492_https_arxiv_org_abs_2603_27455/figures/013_Table_9.jpg]]
 *Table 9: Self-supervised pretraining improves downstream finetuning. Supervised finetuning from self-supervised pretrained weights (3) outperforms both self-supervised learning (1) and supervised training from scratch (2) on BlendedMVS*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 在3D高斯泼溅（3DGS）新视图合成谱系中的位置
 
@@ -359,6 +365,8 @@ NAS3R相对于上述基线的方法论突破可归纳为两个因果性设计选
 3. **动态场景与复杂材质**：当前方法主要针对静态场景设计，扩展到动态物体、透明/反射表面等复杂情况需要新的建模和优化策略。
 
 4. **与预训练先验的协同**：Table 5和Table 6显示，当NAS3R接受真值内参（NAS3R-I）或与监督先验结合时，性能可进一步提升（如RE10K上PSNR达24.238，接近监督方法MVSplat的24.012）。如何在保持自监督灵活性的同时，选择性地利用可用的弱先验信息，是一个有实践价值的方向。
+
+
 
 ## 原文 PDF
 

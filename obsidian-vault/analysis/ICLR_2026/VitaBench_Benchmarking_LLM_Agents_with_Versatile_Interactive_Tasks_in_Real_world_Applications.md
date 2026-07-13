@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/VitaBench_Benchmarking_LLM_Agents_with_Versatile_Interactive_Tasks_in_Real_world_Applications.pdf
+project_link: https://vitabench.github.io
+code_link: null
 openreview_forum_id: rtcX9qOBaz
 aliases:
 - VVITB
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | VitaBench：真实世界多领域交互式任务LLM Agent基准 |
 | 英文题名 | VitaBench: Benchmarking LLM Agents with Versatile Interactive Tasks in Real-world Applications |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=rtcX9qOBaz); [Project](https://vitabench.github.io) |
+| Links | [paper](https://openreview.net/forum?id=rtcX9qOBaz) · [Project](https://vitabench.github.io) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/planning_control |
 | Method | VitaBench（Versatile Interactive Tasks Benchmark） |
 | Dataset | Cross-Scenarios, Delivery, In-store, OTA |
@@ -42,7 +44,7 @@ claims:
 > - Delivery 上，Avg@4 为 53.5，对比 37.8，变化 +15.7。
 > - In-store 上，Avg@4 为 53.5，对比 42.5，变化 +11.0。
 
-## 概述
+## 概要
 
 真实世界中的 LLM Agent 面临三大核心挑战的协同作用：**海量信息推理**（推理复杂度）、**工具间依赖关系**（工具复杂度）以及**多样化用户动态交互**（交互复杂度）。现有基准（如 τ-bench、τ²-bench、ToolSandbox）通常仅覆盖其中一至两个维度，导致评估结果无法反映实际部署中的困难。
 
@@ -58,7 +60,7 @@ claims:
 
 **方法定位**：VitaBench 在现有交互式基准的基础上，通过三个关键设计实现差异化——将领域策略编码于工具依赖图结构中以消除冗长策略文本、引入跨场景组合任务以测试跨域协调能力、以及采用基于评分细则的滑动窗口评估器以支持多样化解答路径的鲁棒评判。
 
-## 背景与动机
+
 
 大型语言模型（LLM）驱动的智能体正被广泛部署于真实世界服务场景，如外卖配送、到店消费和在线旅行预订。这些场景对智能体提出了远超简单工具调用的复合要求：它们必须从海量信息中自主探索并推理出隐含约束，在多工具间协调复杂的依赖关系，并与具有多样化行为特征的用户进行动态多轮交互。然而，现有LLM Agent评测基准未能同时覆盖这三个维度的挑战，导致评估结果难以反映智能体在实际部署中的真实能力瓶颈。
 
@@ -76,7 +78,9 @@ VitaBench的设计源于一个关键洞察：**真实世界智能体任务的难
 
 当这三个维度同时处于高复杂度时，现有最强模型在交叉场景任务上的平均成功率仅为30.0%（o3 high, Avg@4），远低于单场景任务（如Delivery场景53.5%），揭示了当前LLM Agent在扩展动作空间和跨域协调中的真实能力极限。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 VitaBench 的核心创新在于首次系统性地将真实世界智能体任务的复杂度分解为**推理、工具、交互**三个正交维度，并围绕这三个维度构建了一个高复杂度的评估环境。相较于现有基准，VitaBench 在以下关键设计上实现了突破：
 
@@ -96,7 +100,7 @@ VitaBench 的核心创新在于首次系统性地将真实世界智能体任务�
 
 现有基准的用户行为建模通常缺失或仅使用单一用户画像。VitaBench 的用户模拟器引入**多样化用户人格**（如合作型、焦虑型、急躁型等）和**动态行为属性**，并采用渐进式指令透露机制——模拟器持有完整任务指令，但仅在智能体主动询问时逐步透露隐含约束。实验表明，用户行为对任务完成有显著影响：合作型用户使 Agent 成功率最高（Avg@4 = 22.8%），焦虑型最低（18.5%）；移除用户模拟器的动态属性后模型成功率提升，证实了交互复杂度对任务难度的实质性贡献。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l40_https_openreview_net_forum_id_rtcX9qOBaz/figures/002_Figure_2.jpg]]
 *Figure 2: VitaBench sources tasks from real-world environments by composing interconnected tools, diverse user requests, and structured databases. Agents interact with users through multiturn dialogue, while a rubric-based sliding-window evaluator tracks progress across the trajectory*
@@ -127,7 +131,7 @@ VitaBench 的构建围绕一个核心洞察展开：真实世界智能体任务�
 
 整个系统的数据流可概括为：**真实用户请求 → 任务合成（用户画像 + 指令 + 环境状态 + 评分细则）→ 智能体与用户模拟器多轮交互 → 轨迹分段评估 → 全或无成功判定**。智能体在部分可观测环境中通过工具调用与用户对话自主探索，用户模拟器根据画像动态响应并渐进式释放信息，评估器则独立于智能体模型（使用 claude-3.7-sonnet 以避免模型重叠）对完整轨迹进行事后评判。
 
-## 核心模块与公式推导
+
 
 ### 任务形式化与复杂度分解
 
@@ -168,7 +172,9 @@ $$\text{score} = \mathbb{1}\left[\sum_j s_j = k\right]$$
 
 任务创建流水线包含四个组件：用户画像、任务指令、环境信息（数据库状态）和评分细则。任务源自真实用户请求，经合成与人工审核后形成 400 个任务（300 个单场景任务 + 100 个跨场景组合任务）。跨场景任务通过灵活组合不同领域的工具和场景生成，是 VitaBench 区别于不支持跨域组合的现有基准的**另一关键差异槽位**。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 整体评估设置与主结果
 
@@ -244,7 +250,9 @@ Figure 7的再采样分析确定了k=4为最优运行次数：相比单次运行
 ![[assets/figures/papers/paper_list_l40_https_openreview_net_forum_id_rtcX9qOBaz/figures/018_Table_9.jpg]]
 *Table 9: USER PROFILE*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 基准设计的差异化路径
 
@@ -275,6 +283,8 @@ VitaBench 在方法层面做出了几项值得关注的设计选择，这些选�
 **稳定性与自我认知的挑战**：Pass@k 随采样次数增加而提升，但 Pass^k 急剧下降至接近零（Figure 4），表明当前模型即使能偶尔完成任务，也缺乏稳定复现的能力。更值得关注的是，论文指出智能体存在“在接近成功时过早放弃”的倾向，这指向一个更深层的问题：LLM Agent 缺乏对自身能力的准确认知（self-awareness）。如何通过强化学习或其他训练范式让智能体学会在多轮探索中更有效地利用反馈信号，是一个具有实践意义的开放方向。
 
 **用户模拟的进一步真实化**：Table 7 显示用户画像对任务完成率有显著影响——合作型用户下 Avg@4 为 22.8%，焦虑型用户仅 18.5%。这验证了交互维度的重要性，但也提示当前模拟器的行为多样性仍然有限。如何在保持评估稳定性的前提下引入更丰富的用户行为模式（如情绪变化、需求漂移），是基准演进的一个关键方向。
+
+
 
 ## 原文 PDF
 

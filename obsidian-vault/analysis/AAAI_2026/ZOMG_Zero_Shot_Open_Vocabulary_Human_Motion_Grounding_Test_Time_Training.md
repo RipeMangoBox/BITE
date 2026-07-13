@@ -5,6 +5,8 @@ paper_level: A
 venue: AAAI
 year: 2026
 pdf_ref: paperPDFs/AAAI_2026/ZOMG_Zero_Shot_Open_Vocabulary_Human_Motion_Grounding_Test_Time_Training.pdf
+project_link: null
+code_link: https://github.com/pridy999/ZOMG
 aliases:
 - ZZSOVMG
 - ZSOVHMGTTT
@@ -41,13 +43,13 @@ claims:
 > - KIT-ML 上，mAP 40.40 vs 30.78 (AdaZAD) (+9.62)。
 > - BABEL 上，mAP 13.44 vs 10.15 (AdaZAD) (+3.29)。
 
-## 概述
+## 概要
 
 现有运动基元检测方法依赖密集标注与预定义动作类别，缺乏帧级时间推理能力，难以应对开放词汇、零样本场景下的细粒度运动分割。预训练的运动-语言模型虽能捕获全局语义，却无法区分子动作边界。针对这一瓶颈，本文提出 **ZOMG**（Zero-Shot Open-Vocabulary Motion Grounding），一种免标注、开放词汇的测试时训练框架。其核心洞察在于：预训练模型已隐式编码帧间时间动态，通过测试时学习帧级软掩码即可提取这些细粒度结构。
 
 ZOMG 引入两项关键机制：**语言语义划分（LSP）** 利用大语言模型将自由文本分解为有序子动作单元，提供结构化语义锚点；**软掩码优化（SMO）** 在冻结预训练模型的前提下，学习实例特定的帧级软掩码，结合对比损失与结构正则化实现运动分割。该方法仅需约 0.5K 可优化参数，在 HumanML3D 数据集上达到 50.46 mAP，较最强测试时训练基线 AdaZAD 提升 +8.69 个百分点，推理速度提升 3 倍以上（23.25 samples/s）。消融实验进一步验证了 LSP、软掩码以及排他性与平滑性损失对性能的关键贡献。
 
-## 背景与动机
+
 
 ### 问题背景：从全局理解到帧级定位
 
@@ -81,7 +83,9 @@ ZOMG 引入两项关键机制：**语言语义划分（LSP）** 利用大语言�
 
 简言之，ZOMG的目标是让预训练模型“在测试时学会分割”——无需额外标注，无需改变模型，仅通过实例特定的轻量优化，即可将一段复合运动精确地分解为语义连贯的子动作序列。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ZOMG 的核心创新在于**将零样本开放词汇运动基元检测问题转化为测试时优化问题**，在不修改预训练模型的前提下，通过引入轻量级可学习模块，从冻结的运动-语言联合嵌入空间中提取帧级细粒度时间结构。其关键 changed slots 体现在三个层面：
 
@@ -114,7 +118,7 @@ $$\hat{m}_i = P(\hat{F}_i)$$
 
 ZOMG 的深层洞察在于：**预训练的运动-语言模型已经隐式编码了帧间时间动态**，只是这些细粒度信息在序列级嵌入中被压缩丢失。通过测试时优化软掩码这一轻量级“探针”，可以在不破坏预训练表征的前提下，按需提取每个实例特有的时间分割结构。这一范式将运动基元检测从“需要密集标注的监督学习”转变为“零样本测试时推理”，在 HumanML3D 上以 **+8.69 mAP** 的显著优势超越最强 TTT 基线 **AdaZAD**（Han et al., arXiv 2025），同时推理吞吐量达到 **23.25 samples/s**，比已有 TTT 方法快 **3 倍以上**（Table 1, Table 3）。
 
-## 整体框架
+
 
 ZOMG的整体pipeline由两个阶段构成：**运动-语言预训练** 与 **测试时基元检测**。两阶段共享同一组冻结的编码器，但作用层次截然不同——预训练建立全局语义对齐，测试时训练则从该对齐空间中“萃取”细粒度的时间结构。
 
@@ -176,7 +180,7 @@ $$
 ![[assets/figures/papers/paper_list_l1827_ZOMG_Zero_Shot_Open_Vocabulary_Human_Motion_Grounding_Test_Time_Training/figures/001_Figure_1.jpg]]
 *Figure 1: Motion grounding illustration of ZOMG*
 
-## 核心模块与公式推导
+
 
 ### 问题定义
 
@@ -264,7 +268,9 @@ $$y_t = \arg\max_i \hat{M}_{i,t}$$
 ![[assets/figures/papers/paper_list_l1827_ZOMG_Zero_Shot_Open_Vocabulary_Human_Motion_Grounding_Test_Time_Training/figures/005_Figure_4.jpg]]
 *Figure 4: Analysis of ZOMG in (Top) mask heatmap, and (Bottom) T-SNE distribution*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -337,7 +343,9 @@ Figure 6(a)展示了掩码约束性能随优化步数的变化曲线。随着优
 ![[assets/figures/papers/paper_list_l1827_ZOMG_Zero_Shot_Open_Vocabulary_Human_Motion_Grounding_Test_Time_Training/figures/009_Table_4.jpg]]
 *Table 4: Text-to-motion retrieval performance comparison*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有基线的关系
 
@@ -370,6 +378,8 @@ ZOMG 的适用边界由其设计假设和实验覆盖范围共同界定：
 **跨域泛化能力**。实验仅在三个标准运动捕捉数据集上进行，这些数据的动作类型、文本描述风格和运动表示格式相对受控。ZOMG 在野外视频姿态估计输出、不同运动表示格式、或非英语文本描述上的性能，目前仍是开放问题。论文提供的代码仓库（https://github.com/pridy999/ZOMG）为后续的跨域验证提供了基础。
 
 **开放词汇的真实边界**。尽管 ZOMG 声称支持开放词汇，但其实验中的文本查询仍来自数据集的标注分布。对于完全任意的、包含罕见动词组合或抽象描述的开放文本，预训练编码器的语义覆盖范围和 LSP 的分解能力是否足够，尚缺乏压力测试。
+
+
 
 ## 原文 PDF
 

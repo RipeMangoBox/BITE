@@ -43,7 +43,7 @@ claims:
 > - Procedural Benchmarks 上，ROUGE-L 0.3631 vs 0.2802 (Gemini-FilmWeaver) (+0.0829 (29.6%))；FVD 78.32 vs 110.54 (Gemini-FilmWeaver) (-32.22 (29.1%))；CLIP-V 0.8021 vs 0.7102 (Gemini-FilmWeaver) (+0.0919 (12.9%))。
 > - Predictive Benchmarks 上，FVD 86.85 vs 118.27 (Gemini-FilmWeaver) (-31.42 (26.6%))；CLIP-V 0.7872 vs 0.6709 (Gemini-FilmWeaver) (+0.1163 (17.3%))。
 
-## 概述
+## 概要
 
 **问题与瓶颈**：视频下一事件预测与生成（VNEP）要求模型根据输入视频和问题，预测并生成视觉一致、语义忠实的后续事件视频。现有方案主要沿两条路径展开：一是端到端的统一视频生成模型，二是将视觉语言模型（VLM）与视频扩散模型（VDM）级联。后者的核心瓶颈在于**语义到视觉的跨模态对齐鸿沟**——VLM生成的文本描述虽然语言正确，但可能视觉上不可行或VDM难以执行；VDM则面临协调VLM特定描述与输入视觉上下文两个条件信号的挑战，导致语义忠实度与视觉一致性难以兼顾。
 
@@ -53,7 +53,7 @@ claims:
 
 **主要结果**：在程序性基准上，VANS（Joint-GRPO）的ROUGE-L达到0.3631，较最强基线Gemini-FilmWeaver（0.2802）提升29.6%；FVD降至78.32（对比110.54，降低29.1%）；CLIP-V达到0.8021（对比0.7102，提升12.9%）。在预测性基准上同样取得显著提升。消融实验证实两阶段设计、各奖励组件均为必要，且Joint-GRPO显著优于独立优化VLM或VDM的GRPO变体。人类评估中，VANS在语义正确性（4.7/5）、视觉一致性（4.6/5）和整体满意度上均获最高评分。
 
-## 背景与动机
+
 
 视频理解与生成领域正经历从“文本回答”到“视频回答”的范式转变。传统视觉问答（VQA）系统仅输出文本描述，在面对程序性（“如何操作？”）或预测性（“接下来会发生什么？”）问题时，文本回答往往缺乏直观性与可操作性——例如，用文字描述“取下口罩”的动作远不如直接生成一段演示视频来得清晰（Figure 2）。
 
@@ -81,7 +81,9 @@ claims:
 
 上述分析揭示了一个核心洞察：**弥合语义到视觉鸿沟的关键，在于将VLM与VDM视为一个协同单元进行联合优化**。VLM需要内化VDM的可视化能力与约束，生成“可视化友好”的描述；VDM则需要忠实遵循VLM提供的语义锚点，同时保持与输入视频的视觉一致性。为此，本文提出**VANS（Video-as-Answer System）** 及其核心策略**Joint-GRPO**——一种通过联合奖励函数驱动VLM与VDM协同优化的两阶段强化学习框架，从根本上解决跨模态对齐问题。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 VANS 的核心创新在于提出了 **Joint-GRPO** 策略，通过联合奖励函数驱动视觉语言模型（VLM）与视频扩散模型（VDM）的协同优化，从根本上解决了“语义到视觉的跨模态对齐鸿沟”这一瓶颈问题。传统级联方案中，VLM 生成的文本描述虽语言正确，却可能视觉上不可行或 VDM 难以执行；VDM 则面临协调 VLM 特定描述与输入视觉上下文两个条件信号的挑战，导致语义忠实度与视觉一致性难以兼顾。Joint-GRPO 将 VLM 与 VDM 视为一个协同单元，通过两阶段强化学习实现共同引导（co-steering），迫使 VLM 内化 VDM 的可视化能力与约束，同时迫使 VDM 忠实遵循 VLM 的语义锚点描述。
 
@@ -103,7 +105,7 @@ VANS 的核心创新在于提出了 **Joint-GRPO** 策略，通过联合奖励�
 
 Joint-GRPO 相较于 SFT 基线实现了显著提升：ROUGE-L 从 0.2812 提升至 0.3631（相对提升 29.1%），CLIP-V 从 0.7655 提升至 0.8021。相较于最强级联基线 Gemini-FilmWeaver，VANS 在程序性基准上 FVD 降低 29.1%（78.32 vs 110.54），CLIP-T 提升 37.9%（0.3824 vs 0.2773），充分验证了联合优化策略相较于独立优化的根本优势。
 
-## 整体框架
+
 
 VANS（Video-as-Answer System）构建了一条**VLM推理→VDM生成**的级联流水线，将“下一个视频事件预测与生成”（VNEP）形式化为一个以视频为答案的跨模态生成任务。其核心设计理念在于：将VLM与VDM视为一个协同单元，通过联合奖励驱动两阶段强化学习（Joint-GRPO），迫使VLM内化VDM的可视化能力与约束，同时迫使VDM忠实遵循VLM的语义锚点描述，从而弥合语义到视觉的跨模态对齐鸿沟。
 
@@ -140,7 +142,7 @@ VANS的训练分为两个阶段，其关键变革在于将标准监督微调（S
 ![[assets/figures/papers/paper_list_l2711_https_arxiv_org_abs_2511_16669/figures/004_Figure_4.jpg]]
 *Figure 4: Overall architecture of VANS*
 
-## 核心模块与公式推导
+
 
 ### 系统流水线模块
 
@@ -199,7 +201,9 @@ $$r_2(v_{\mathrm{out}}^i, s_{\mathrm{anchor}}) = \lambda_{v2} r_{v2}(v_{\mathrm{
 ![[assets/figures/papers/paper_list_l2711_https_arxiv_org_abs_2511_16669/figures/008_Table_2.jpg]]
 *Table 2: Quantitative results of ablation study*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -268,7 +272,9 @@ Figure 9 展示了 Joint-GRPO 的训练曲线。阶段一（VLM 调优）中，�
 ![[assets/figures/papers/paper_list_l2711_https_arxiv_org_abs_2511_16669/figures/002_Figure_2.jpg]]
 *Figure 2: Video answer (our VANS) versus text-only answer (Gemini) on a procedural question. Video answer provides an intuitive and customized response by demonstrating the action directly, while text-only answer falls short in clarity*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位：视频作为答案的下一事件预测
 
@@ -319,6 +325,8 @@ Joint-GRPO 的核心洞察是将 VLM 与 VDM 视为一个协同单元，通过�
 4. **跨任务泛化**：Joint-GRPO 的跨模态协同优化框架是否能泛化到其他需要语义-视觉对齐的生成任务（如文本-3D 场景生成、音频-视频对齐等）？
 
 5. **更大规模验证**：在更多样化的 VNEP 场景（体育、医疗、科学实验）和更大规模基准上，VANS 的性能优势是否仍然保持？
+
+
 
 ## 原文 PDF
 

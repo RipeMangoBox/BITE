@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Saddle_to_Saddle_Dynamics_Explains_A_Simplicity_Bias_Across_Neural_Network_Architectures.pdf
+project_link: null
+code_link: null
 openreview_forum_id: Vit5M0G5Gb
 aliases:
 - SSDF
@@ -41,7 +43,7 @@ claims:
 > - 多种两层架构（线性全连接、线性卷积、ReLU全连接、ReLU卷积、线性自注意力、二次网络） 上，训练损失和权重动力学（平台期与突降模式） 为 梯度下降表现出清晰的鞍-鞍动力学，有效宽度从1逐步增长到2，与不动点构造类别(5)-(7)匹配。，对比 此前无统一理论预测该动力学模式。，变化 定性一致：所有架构均观察到平台期-突降，且中间鞍点对应单单位可表达的解。。
 > - MNIST 二分类（两层全连接线性/ReLU） 上，训练损失和第一层权重矩阵奇异值增长 为 第一、第二奇异值依次增长，对应两次突降，反映有效宽度从1到2的增加；第三个奇异值接近零。，对比 无理论明确指出奇异值增长与平台期边界的对应。，变化 定性符合：奇异值跃升时刻与损失突降时刻一致。。
 
-## 概述
+## 概要
 
 已有理论观察到神经网络在训练中倾向于先学习简单解、再逐步学习复杂解，即“简洁性偏差”（simplicity bias），但缺乏一个跨架构的统一框架来解释梯度下降为何以及何时会表现出这种递进的学习行为。本文提出**鞍-鞍动力学（Saddle-to-Saddle Dynamics）**作为通用机制，统一解释了全连接、卷积、自注意力等多种架构中简洁性偏差的产生。
 
@@ -55,7 +57,7 @@ claims:
 
 该框架的理论适用范围覆盖通用层定义（Equation 1）下的多种架构，方法定位为统一现有架构特定理论（如Fukumizu & Amari的ReLU不动点层级、Saxe et al.的线性鞍点动力学），并将简洁性偏差从经验观察提升为具有明确因果机制的动力学理论。
 
-## 背景与动机
+
 
 神经网络训练中普遍存在一种现象：模型倾向于先学习简单解，随后在训练过程中逐步学习更复杂的解。这一“简洁性偏差”（simplicity bias）在不同架构中表现为不同的具体形式——线性网络学习递增秩的解，ReLU网络学习递增拐点数的解，卷积网络学习递增卷积核数的解，自注意力网络学习递增头数的解。尽管这些现象在各自架构中被分别观察到，但**已有理论缺乏一个跨架构的统一框架**来解释：梯度下降为何、以及在何时会逐步学习复杂性递增的解。
 
@@ -63,7 +65,9 @@ claims:
 
 本文的核心动机是**建立一个跨架构的鞍-鞍动力学（saddle-to-saddle dynamics）框架**，统一解释上述现象。该框架的核心洞见是：通过嵌套不动点层级的构造、不变流形的存在以及时间尺度分离，鞍-鞍动力学是一个通用机制——网络在低有效宽度的鞍点附近停滞，然后沿不变流形逃逸到更高有效宽度的鞍点，反复迭代即形成逐渐复杂的解。这一机制将线性网络的低秩解、ReLU网络的稀疏解、卷积网络的核数增长和自注意力网络的头数增长统一为同一动力学范式的不同表现。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心贡献是提出了一个**跨架构统一的鞍-鞍动力学框架**，将此前在不同神经网络架构中分散观察到的“简洁性偏差”现象纳入同一理论解释。该框架的核心创新可从三个维度理解。
 
@@ -93,7 +97,7 @@ $$f(\pmb{x}; \pmb{\theta}_{1:H}) = g_{\mathrm{out}}\left(\sum_{i=1}^{H} \phi(g_{
 
 这两种机制的区分解释了为何线性网络学习递增秩的解（低秩偏差），而二次/ReLU网络学习递增单元数的解（稀疏偏差）——简洁性偏差的具体表现形式取决于时间尺度分离的来源。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0010_Vit5M0G5Gb_Saddle-to-Saddle_Dynamics_Explains_A_Simplicity/figures/014_Figure_1.jpg]]
 *Figure 1: Saddle-to-saddle dynamics occurs in the gradient descent training of a wide range of architectures and leads to a dynamical simplicity bias. (A) Saddle-to-saddle dynamics on a cartoon loss landscape. The cyan and yellow curves represent invariant manifolds, on which the network implements input-output maps expressible by the architecture with one and two units, respectively. In general, saddle-to-saddle dynamics operates by repeating: i) during the plateau, escaping from a saddle associated with a width-h network onto an invariant manifold with effective width (h + 1); ii) during the rapid transition phase, approaching a fixed point on that manifold, which is a saddle associated with a widt...*
@@ -150,7 +154,7 @@ $$f(\pmb{x}; \pmb{\theta}_{1:H}) = g_{\mathrm{out}}\left(\sum_{i=1}^{H} \phi(g_{
 - 深层网络的鞍-鞍动力学虽在实验中观察到（Figure 5），但完全理论化仍然复杂
 - 未在其他任务范式（如强化学习、自监督学习）上验证该通用机制
 
-## 核心模块与公式推导
+
 
 ### 通用层定义与梯度流
 
@@ -237,7 +241,9 @@ Proposition 5 证明：当一个单元的权重达到 $O(1)$ 时，其余单元�
 
 **局限性说明**：不动点和不变流形是否穷尽所有可能的结构尚未证明；理论主要适用于线性或二次激活函数，更高阶多项式激活仅有推测性陈述；分析基于梯度流和极小初始化，实际离散梯度下降下动力学可能有偏差。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：跨架构的鞍-鞍动力学验证
 
@@ -282,7 +288,9 @@ Proposition 5 证明：当一个单元的权重达到 $O(1)$ 时，其余单元�
 ![[assets/figures/papers/iclr26_0010_Vit5M0G5Gb_Saddle-to-Saddle_Dynamics_Explains_A_Simplicity/figures/024_Table_1.jpg]]
 *Table 1: Singular values of MNIST binary classification data*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与前驱工作的关系
 
@@ -323,6 +331,8 @@ Proposition 5 证明：当一个单元的权重达到 $O(1)$ 时，其余单元�
 3. **动力学路径的马尔可夫性。** 梯度下降访问的鞍点序列是否具有马尔可夫性？初始点离不变流形多近才能保证网络在接近不动点后才离开？
 4. **架构扩展。** 该理论能否扩展到循环神经网络、图神经网络、以及更复杂的注意力变体（如交叉注意力、稀疏注意力）？
 5. **优化器的影响。** 动量、自适应学习率等优化器如何改变鞍-鞍动力学的平台期长度和逃逸路径？
+
+
 
 ## 原文 PDF
 

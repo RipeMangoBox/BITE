@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/EgoPoseFormer_v2_Accurate_Egocentric_Human_Motion_Estimation_for_AR_VR.pdf
+project_link: null
 code_link: null
 aliases:
 - EVE
@@ -40,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - EgoBody3M 上，MPJPE (cm) 4.02 vs 5.18 (EgoBody3M) (-1.16 (↓22.4%))；MPJVE 0.42 vs 0.54 (EgoBody3M) (-0.12 (↓22.2%))；Wrist MPJPE (cm) 4.99 vs 6.14 (EgoBody3M) (-1.15 (↓18.7%))。
 
-## 概述
+## 概要
 
 自我中心（egocentric）人体运动估计是增强现实（AR）与虚拟现实（VR）设备实现自然交互的核心技术，典型应用包括 **Apple Vision Pro** 、**Meta Quest 3** 以及 **Momentum** 等平台。该任务要求从头戴式设备的多视角图像流中实时、精确地恢复全身 3D 姿态，但面临三个根本性瓶颈：
 
@@ -58,7 +59,7 @@ claims:
 
 方法的局限性在于半监督流程依赖私有无标注数据集，完全可复现性受限；在更多样化设备上的泛化能力尚需进一步验证。
 
-## 背景与动机
+
 
 ### 自我中心人体运动估计的兴起
 
@@ -86,7 +87,9 @@ claims:
 
 这些设计使EPFv2在EgoBody3M基准上实现了MPJPE 4.02cm（较EgoBody3M和EgoPoseFormer分别降低22.4%和15.4%），同时将时间一致性指标MPJVE分别降低22.2%和51.7%，且模型推理延迟仅0.8ms，适合实时VR/AR部署。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 EgoPoseFormer v2 (EPFv2) 围绕三个相互关联的设计瓶颈对前代方法进行了系统性重构：**表征解耦、时空融合与数据效率**。其核心创新可归纳为以下五个 changed slots，每个 slot 的改动均直接服务于“高效、准确、时间一致且可扩展”的整体目标。
 
@@ -142,7 +145,7 @@ $$
 
 其中不确定性蒸馏损失 $\mathcal{L}_{\mathrm{uncertainty}} = || s_T - s_S ||$ 强制学生模仿教师对每个关节的预测不确定性分布，实现更有效的知识迁移。该系统的关键洞察在于：教师模型不仅提供伪标签，还传递了其对伪标签质量的**置信度估计**，使学生能够自适应地关注可靠样本。在 EGO-ITW-70M 无标注数据集上的实验表明，ALS 将手腕 MPJPE 进一步降低 11.7%，且轻量模型（MobileNetv4-S）从中获益比例更大（Figure 6），验证了该方案对部署友好型模型的适配性。
 
-## 整体框架
+
 
 EPFv2 构建了一个端到端可微的双阶段 Transformer 解码器架构，用于从多视角自我中心图像序列中估计精确的三维人体姿态。整个 pipeline 围绕一个核心设计理念展开：**用单一整体查询（single holistic query）替代传统的逐关节查询**，从而将计算量与关键点数量解耦，同时保持丰富的姿态表示能力。
 
@@ -198,7 +201,7 @@ EPFv2 的关键改进之一是实现了**完整的端到端梯度流动**。与 
 ![[assets/figures/papers/paper_list_l1061_https_arxiv_org_abs_2603_04090/figures/004_Figure_4.jpg]]
 *Figure 4: Overview of the mixture training in auto-labeling system. We adopt a stronger teacher model for pesudo labeling and apply an uncertainty distillation loss to facilitate the knowledge transfer. The teacher model is pre-trained with the labeled dataset*
 
-## 核心模块与公式推导
+
 
 ### 3.1 整体架构与查询设计
 
@@ -263,7 +266,9 @@ $$\mathcal{L}_{\mathrm{uncertainty}} = || s_T - s_S ||$$
 ![[assets/figures/papers/paper_list_l1061_https_arxiv_org_abs_2603_04090/figures/010_Figure_8.jpg]]
 *Figure 8: Our simplified multi-view cross-attention module built on standard attention. A single holistic query attends to all view features using conditioned positional encoding in a batch manner, enabling more efficient and scalable spatial fusion. V denotes the number of views. Learnable layers are highlighted in red, with naming aligned to Tab. 3*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -330,7 +335,9 @@ Table 7 分析了时间序列长度的影响：仅使用 2 帧会导致性能严
 ![[assets/figures/papers/paper_list_l1061_https_arxiv_org_abs_2603_04090/figures/009_Figure_7.jpg]]
 *Figure 7: Deformable stereo attention module used in EPFv1 [65]. Each joint query independently attends to sampled image features via learned offsets and attention weights. Outputs from different views are sequentially fused using an MLP. This design introduces the specialized component with higher development complexity [64] and suboptimal hardware utilization. B, J, C, numpts, and h denote batch size, number of joints, feature channels, reference points, and attention heads, respectively. Learnable layers are highlighted in red, with layer names matching Tab. 3*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题域与技术演化脉络
 
@@ -379,6 +386,8 @@ EPFv2的自动标注系统（Auto-Labeling System, ALS）遵循半监督学习�
 2. **多任务统一查询**：单一整体查询能否同时支撑姿态估计、动作识别、场景理解等异构任务，还是需要引入任务特定的查询解耦机制？
 3. **跨设备零样本迁移**：模型在不同头显设备（如Quest 3 vs. Vision Pro）之间的零样本迁移能力如何？是否需要设备特定的微调或域适应策略？
 4. **实时部署的全栈优化**：尽管推理延迟已低至0.8ms（GPU），但在移动端NPU上的量化部署、与SLAM/渲染管线的协同优化等工程问题仍是落地的关键瓶颈。
+
+
 
 ## 原文 PDF
 

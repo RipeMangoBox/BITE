@@ -43,7 +43,7 @@ claims:
 > - In-house abdomen (Immediate prospective) 上，PSNR (dB) 46.32 ± 4.06 vs MR-MOTUS (approximate) (~2 dB gain over MR-MOTUS)；SSIM 0.994 ± 0.003 (outperforms MR-MOTUS)。
 > - XCAT phantom (Retrospective learning) 上，PSNR (dB) 26.63。
 
-## 概述
+## 概要
 
 动态三维MRI在腹部成像中面临一个核心矛盾：高时空分辨率与采集速度之间的根本性权衡。传统回顾式重建方法（如**GRASP-Pro** (Feng et al., Mag. Reson. Med. 2020)、**Deep Image Prior**）需要积累多帧k空间数据才能重建，无法满足实时引导干预（如放射治疗射束门控）对低延迟前瞻重建的需求。而现有在线前瞻方法——无论是基于线性变形场模型的**MR-MOTUS** (Huttinga et al., IEEE TMI 2022) 和**DREME-MR** (Shao et al., Phys. Med. Biol. 2025)，还是基于离散先验搜索的**Prior-INR** (Liu et al., Med. Phys. 2024)——均难以在超稀疏单次k空间测量下高效且准确地估计非线性、高维的3D变形场，限制了重建保真度和实时性。
 
@@ -51,7 +51,7 @@ claims:
 
 PDMR的核心洞察是：离线阶段利用预扫描数据联合优化患者特异的三平面几何感知映射网络与潜在码，将运动状态嵌入紧凑的潜在空间；在线阶段冻结网络参数，仅优化潜在向量以匹配瞬时k空间测量。在XCAT数字体模和院内腹部DCE-MRI数据上的实验表明，PDMR在前瞻重建场景下显著优于现有方法，比SOTA方法MR-MOTUS的PSNR提高约2 dB（院内数据：46.32 ± 4.06 dB），且潜在向量的第一主成分与参考呼吸运动信号高度相关，验证了其运动可解释性。
 
-## 背景与动机
+
 
 动态磁共振成像（Dynamic MRI）通过连续采集时间序列图像，为临床诊断与治疗引导提供关键的运动信息，在腹部成像、心脏成像及放射治疗等场景中具有不可替代的价值。然而，MRI 固有的物理约束——较长的扫描时间与有限的采样速率——使得高时空分辨率动态成像始终面临严峻挑战。传统方法通常采用回顾式（retrospective）重建策略，即先完整采集所有时间帧的 k 空间数据，再通过后处理算法恢复图像序列。这类方法虽然能够利用全时序信息进行高质量重建，但其“先采集后重建”的范式天然存在一个致命缺陷：**无法在数据采集的同时实时输出重建结果**。
 
@@ -69,7 +69,9 @@ PDMR的核心洞察是：离线阶段利用预扫描数据联合优化患者特�
 
 本文提出的 **PDMR（Prospective Dynamic MRI Reconstruction）** 框架正是沿着这一思路展开。其核心洞见是：**通过离线学习一个患者特异的、低维连续的运动流形，将在线运动估计从高维变形场的直接优化转化为低维潜在向量的快速搜索**。具体而言，PDMR 在离线阶段利用预扫描的 k 空间数据，联合学习一个紧凑的潜在空间与一个几何感知的映射网络，将低维潜在向量（维度 r=12）非线性地映射为完整的三维变形场；在线阶段则冻结映射网络，仅需几步梯度下降即可从单次测量中恢复当前运动状态，从而实现高保真、低延迟的前瞻重建。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PDMR 的核心创新在于**将动态 MRI 前瞻重建中的高维变形场（DVF）估计问题，转化为在低维潜在流形上的快速优化问题**，从而在超稀疏单次 k 空间测量条件下实现高效、准确的非线性运动追踪。
 
@@ -109,7 +111,7 @@ $$z_{t'} = \arg\min_{z} \left\| A_{t'} \mathbf{x}_{t'} - \mathbf{y}_{t'} \right\
 
 这一设计从根源上解决了现有前瞻方法的瓶颈：线性模型无法准确表达复杂 3D 运动，而直接优化完整 DVF 又计算代价过高。PDMR 通过学习低维潜在流形，将在线运动估计简化为低维优化，在保持非线性建模能力的同时实现了高效推理。实验表明，该设计使 PDMR 在院内腹部数据上比 SOTA 方法 **MR-MOTUS** 的 PSNR 提高约 2 dB（Table 1），并展现出对未见运动偏移的强鲁棒性（Table 3）。
 
-## 整体框架
+
 
 PDMR 的整体框架由**离线流形学习**与**在线前瞻重建**两个阶段构成，二者共享一个几何感知的变形场映射网络，形成“离线学习低维运动流形—在线快速潜变量优化”的闭环。
 
@@ -140,7 +142,7 @@ $$\mathbf{z}_{t'} = \arg\min_{\mathbf{z}} \|\mathbf{A}_{t'} \mathbf{x}_{t'} - \m
 ![[assets/figures/papers/paper_list_l2576_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Prospective_Dynam/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of proposed PDMR. A. PDMR performs offline manifold learning, where the patient-specific motion manifold and DVF mapping network*
 
-## 核心模块与公式推导
+
 
 ### 3.1 动态MRI前向模型与运动补偿分解
 
@@ -194,7 +196,9 @@ $$\hat{\mathbf{x}}_{t'} = \mathcal{W}(\mathbf{m}, \hat{\mathbf{u}}_{t'})$$
 
 这一设计将计算瓶颈从在线优化转移至离线学习，实现了高质量前瞻重建与实时性之间的关键平衡。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置与评估协议
 
@@ -272,7 +276,9 @@ Table 2报告了回顾性学习阶段的定量比较。PDMR在院内数据上取
 ![[assets/figures/papers/paper_list_l2576_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Prospective_Dynam/figures/001_Figure_1.jpg]]
 *Figure 1: Retrospective methods face challenges in prospective reconstruction*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -318,6 +324,8 @@ PDMR 的设计基于以下关键假设和条件，超出这些边界时性能可
 - 流形维度 $r$ 的选择对运动表征能力和在线优化效率的 trade-off 如何定量分析？
 - 在真实在线环境中，如何实现端到端的毫秒级延迟，包括数据采集、潜在优化和图像重建？
 - 是否可以将患者特异性流形学习替换为群体水平的预训练模型，再通过少量在线数据快速微调？
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2023
 pdf_ref: paperPDFs/arxiv_2023/AnimateAnything_Fine_Grained_Open_Domain_Image_Animation_with_Motion_Guidance.pdf
+project_link: https://animationai.github.io/AnimateAnything
+code_link: null
 aliases:
 - AnimateAnything
 tags:
@@ -38,7 +40,7 @@ claims:
 > [!tip] 效果简介
 > - MSR-VTT (zero-shot) 上，FVD 443 vs 465 (VideoCrafter1) (-22)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有图像动画方法大多局限于特定对象类别（如流体、人体部位或场景），难以泛化至任意开放域图像。更关键的是，这些方法普遍缺乏对**运动区域**（哪些部分动）和**运动强度**（动得多快）的细粒度控制，用户无法精确指定动画行为。
 
@@ -54,7 +56,7 @@ claims:
 
 **局限与开放问题**：模型因训练资源限制未在高分辨率视频上训练，限制了高分辨率应用；运动阈值 $T_m$ 与不同视频内容类型的交互机制、损失权重 $\lambda$ 的定量影响，以及如何高效扩展至高分辨率生成，仍需进一步探索。
 
-## 背景与动机
+
 
 图像动画旨在为静态图像注入可控的运动，使其生成连贯的视频片段。这一任务在内容创作、视觉特效和交互式媒体中具有广泛的应用前景。然而，现有方法普遍面临两个核心瓶颈：**对象类别的封闭性**和**运动控制的粗糙性**。
 
@@ -64,7 +66,9 @@ claims:
 
 本文提出的 **AnimateAnything** 正是针对上述缺口，通过运动区域掩码引导和运动强度引导两项核心机制，首次在视频扩散框架中实现了对动画区域和速度的精确控制，从而将图像动画任务从封闭域推向开放域。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 AnimateAnything 的核心创新在于为视频扩散模型引入了两种互补的细粒度运动控制机制，使其能够对任意开放域图像进行可控动画生成，而无需局限于特定对象类别。
 
@@ -99,7 +103,7 @@ $$l_s = || s(z_0) - s(\hat{z}_0) ||_2^2$$
 
 这两种控制机制相互独立且可组合使用：用户可以同时指定“哪些区域运动”和“运动多快”，实现细粒度的交互式动画生成（如 Figure 1 后三行所示的迭代式多对象动画）。
 
-## 整体框架
+
 
 AnimateAnything 的整体 pipeline 围绕一个预训练的 **3D U-Net 视频扩散骨干** 构建，目标是将单张参考图像转化为可控的动画视频。其核心设计思想是在不破坏扩散模型原有生成能力的前提下，通过潜空间拼接与嵌入注入的方式引入显式的运动控制信号，实现细粒度的开放域图像动画。
 
@@ -139,7 +143,7 @@ AnimateAnything 的整体 pipeline 围绕一个预训练的 **3D U-Net 视频扩
 
 这种“条件拼接 + 损失监督”的双重机制，使得视频扩散模型的强大生成先验得以被精准引导，同时保持了模型对任意开放域图像的泛化能力。
 
-## 核心模块与公式推导
+
 
 AnimateAnything 围绕视频扩散模型构建，通过两个核心控制模块——**运动区域掩码引导**和**运动强度引导**——实现对开放域图像动画的细粒度控制。整体流程如 Figure 2 所示。
 
@@ -201,8 +205,6 @@ $$z_T^i = \sqrt{\bar{\alpha}_T} z_{ref} + \sqrt{1 - \bar{\alpha}_T} \epsilon^i$$
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l1038_https_arxiv_org_abs_2311_12886/figures/001_Figure_1.jpg]]
-*Figure 1: Examples of our method for image animation. The first three rows illustrate the use of prompt text to animate the reference image, with the 6th, 11th, and 16th frames of the generated animation visualized. The last three rows demonstrate the precise control of movable objects using motion mask guidance in images containing multiple objects. The last two rows show the iterative generation of animation using red and green prompts to animate objects in the corresponding masks. Additional examples are provided in the supplemental material*
 
 ![[assets/figures/papers/paper_list_l1038_https_arxiv_org_abs_2311_12886/figures/003_Figure_3.jpg]]
 *Figure 3: Motion mask guidance examples. The first column and second column are the input mask and motion mask respectively. The user can specify one or multiple movable areas in the motion mask to fine grained control the video generation*
@@ -210,7 +212,9 @@ $$z_T^i = \sqrt{\bar{\alpha}_T} z_{ref} + \sqrt{1 - \bar{\alpha}_T} \epsilon^i$$
 ![[assets/figures/papers/paper_list_l1038_https_arxiv_org_abs_2311_12886/figures/004_Figure_4.jpg]]
 *Figure 4: Motion strength guidance examples. Augmenting the motion strength accelerates the alteration of Mona Lisa’s expression, but excessive motion strength may lead to the loss of finegrained facial details*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -261,7 +265,9 @@ Figure 1 的后三行进一步验证了方法的交互式生成能力：通过�
 - 运动强度损失权重 $\lambda$ 对收敛速度和最终运动强度准确性的定量影响曲线。
 - 在有限训练资源约束下，如何通过渐进式训练或超分辨率级联策略扩展至高分辨率生成。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位与核心差异
 
@@ -312,6 +318,8 @@ AnimateAnything 建立在视频扩散模型的成熟技术栈之上，其技术�
 4. **多对象交互运动的语义一致性**：Figure 1 展示了通过迭代文本和掩码生成多个对象动画的能力，但多对象之间的运动语义一致性（如两个物体的运动是否物理上协调）缺乏定量评估指标和系统分析。
 
 5. **与商业系统的差距量化**：与 Gen-2 的比较仅为定性，缺乏在统一基准上的定量对比，使得 AnimateAnything 与最前沿商业系统之间的真实差距难以精确评估。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/HOIDiNi_Human_Object_Interaction_through_Diffusion_Noise_Optimization.pdf
+project_link: https://hoidini.github.io/
+code_link: null
 aliases:
 - HOIDiNi
 tags:
@@ -40,7 +42,7 @@ claims:
 > - GRAB 上，FID ↓ 0.159 vs 0.205 (IMoS) (-0.046)；IRA ↑ 62.3% vs 46.5% (IMoS) (+15.8%)；Floating (mm) ↓ 2.3±4.7 vs 52.2±53.8 (IMoS) (-49.9)。
 > - OMOMO 上，C_F1 ↑ 0.77 vs 0.67 (CHOIS) (+0.10)；T_s (cm) ↓ 0.00 vs 1.90 (CHOIS) (-1.90)。
 
-## 概述
+## 概要
 
 **核心问题**：现有的人体-物体交互（HOI）生成方法面临一个根本性瓶颈——在保持运动自然感与实现毫米级精确的手-物体接触之间存在难以调和的张力。无论是基于后处理优化的方法（如 **IMoS**，Ghosh et al., CVPR 2023），还是基于扩散模型与分类器引导的方法（如 **CHOIS**，Li et al., CVPR 2024），其优化过程常常偏离人体运动的自然流形，导致失真、穿透或严重浮空。
 
@@ -57,7 +59,7 @@ claims:
 
 **方法定位**：HOIDiNi 属于测试时优化方法，不依赖特定模型架构或训练范式，可视为一种通用的 HOI 生成后处理框架。其核心贡献在于证明了“解耦优化 + 扩散噪声空间约束”这一范式在保持运动真实感的同时，能够实现此前方法无法达到的物理接触精度。
 
-## 背景与动机
+
 
 ### 人体-物体交互生成的核心瓶颈
 
@@ -93,7 +95,9 @@ $$F_{CP} = [p_1, \dots, p_{|A|}, b_1, \dots, b_{|A|}]$$
 
 综上，HOIDiNi通过“两阶段解耦 + 扩散噪声优化 + 学习接触对”的组合策略，在保持运动自然感的同时将浮空误差从52.2mm降至2.3mm，接触成功率（IRA）从46.5%提升至62.3%（Table 1），为HOI生成任务建立了新的精度与真实感平衡点。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 HOIDiNi的核心创新在于将人体-物体交互（HOI）生成问题**解耦为两阶段扩散噪声优化（DNO）**，并通过**学习到的接触对预测**替代脆弱的启发式规则，从而在保持运动自然感的同时实现毫米级精确的手-物体接触。其关键设计变更体现在以下四个维度。
 
@@ -137,7 +141,7 @@ $$x_T^* = \arg\min_{x_T} \{ \mathcal{L}(\mathrm{ODE}(G, x_T)) + \mathcal{R}_{\ma
 
 这种联合表示使得两个优化阶段能够共享同一预训练模型，对象阶段固定CP和O后，人体阶段可直接在共享的噪声空间上优化H，无需额外的模型适配或表示转换。Table 1的消融显示，仅在第一阶段推理、第二阶段DNO（Phase1 Inference, Phase2 DNO）即可获得合理结果，但多样性下降，进一步证实了联合建模对生成质量的重要性。
 
-## 整体框架
+
 
 HOIDiNi 的整体生成流程围绕一个核心洞察展开：**在预训练扩散模型的噪声空间内执行两阶段扩散噪声优化（DNO），可以在不偏离人体运动流形的前提下满足严格的物理接触约束**。系统接受三类输入——描述交互的文本提示、物体网格（mesh）以及场景占用体积（occupied volume），通过一个预训练的自回归扩散模型 CPHOI 生成人体运动、物体轨迹与接触对的联合分布，再经由对象中心（Object-Centric）和人体中心（Human-Centric）两个优化阶段，输出精确且自然的人体-物体交互运动（Figure 2）。
 
@@ -194,7 +198,7 @@ $$x_T^* = \arg\min_{x_T} \{ \mathcal{L}(\mathrm{ODE}(G, x_T)) + \mathcal{R}_{\ma
 ![[assets/figures/papers/paper_list_l1684_HOIDiNi_Human_Object_Interaction_through_Diffusion_Noise_Optimization/figures/001_Figure_1.jpg]]
 *Figure 1: HOIDiNi generates human-object interactions from text descriptions and object geometry, integrated here into a 3D scene from Jay-Artist (2012)*
 
-## 核心模块与公式推导
+
 
 ### 3.1 扩散噪声优化（DNO）基础
 
@@ -296,7 +300,9 @@ $\mathcal{L}_{Jitter}$ 为抖动正则化，惩罚相邻帧间关节位置的突
 ![[assets/figures/papers/paper_list_l1684_HOIDiNi_Human_Object_Interaction_through_Diffusion_Noise_Optimization/figures/013_Figure_10.jpg]]
 *Figure 10: Palm anchor set A used by CPHOI for the GRAB (Taheri et al., 2020a) experiment*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -354,7 +360,9 @@ HOIDiNi在GRAB和OMOMO两个基准上均显著超越现有方法，实现了运�
 ![[assets/figures/papers/paper_list_l1684_HOIDiNi_Human_Object_Interaction_through_Diffusion_Noise_Optimization/figures/011_Table_3.jpg]]
 *Table 3: Hyper-parameters in use for each experiment*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有工作的关系定位
 
@@ -391,6 +399,8 @@ HOIDiNi 处于**基于扩散模型的人体运动生成**与**物理约束优化
 **权重共享与架构通用性**：论文提到两阶段优化共享权重，但具体实现方式未展开。这一设计是否可抽象为通用的 HOI 优化架构，即是否可适配到其他预训练运动扩散模型（如 MDM、MotionDiffuse）上，是方法影响力的重要指标。
 
 **文本标注质量**：实验中使用 ChatGPT 增强文本标注，可能引入语言偏差或不准确的动作描述。这种合成标注对模型学习语义-运动映射的影响，以及与人工标注的差异，值得进一步分析。
+
+
 
 ## 原文 PDF
 

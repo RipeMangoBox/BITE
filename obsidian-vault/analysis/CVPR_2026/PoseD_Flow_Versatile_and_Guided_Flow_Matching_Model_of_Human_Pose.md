@@ -44,7 +44,7 @@ claims:
 > - AMASS Pose Completion (Occ. left leg) 上，MPVPE (mm) ↓ 83.81 vs 优于现有方法 (e.g., DPoser)。
 > - AMASS motion denoising (noise 40mm) 上，MPJPE (mm) ↓ 18.88 vs 优于对比方法。
 
-## 概述
+## 概要
 
 人体姿态建模长期受限于两个根本性挑战：其一，铰接式姿态天然存在于非欧几里得的旋转流形上，而现有生成先验（如 VAE、扩散模型）或将其强行嵌入欧几里得空间，或依赖复杂的测地距离近似；其二，在遮挡、噪声等逆问题场景下，缺乏一种既能保持几何一致性、又无需针对特定任务重新训练的灵活推理机制。**PoseD-Flow** 针对这两大瓶颈，首次将流匹配引入人体姿态领域，提出了一个完整且多功能的框架。
 
@@ -52,7 +52,7 @@ claims:
 
 实验表明，PoseD-Flow 在无条件生成、姿态补全、运动去噪以及人体网格恢复等多个任务上均达到或超越了现有最优水平。在 AMASS 无条件生成中，PoseRFM 取得了 0.013 的 FID，优于基于扩散模型的 DPoser；在多种遮挡条件下的姿态补全中，Riemannian D-Flow 在精度（MPVPE）与多样性（APD）之间实现了最佳平衡。几何消融实验进一步证实，将建模空间从欧几里得空间迁移到黎曼流形，并引入测地损失与轨迹正则化，是性能提升的关键所在。
 
-## 背景与动机
+
 
 ### 人体姿态建模的核心挑战
 
@@ -86,7 +86,9 @@ $$\operatorname{SO}(3) = \{ R \in \mathbb{R}^{3\times 3} : R^{\top} R = I, \det(
 
 通过这一框架，PoseD-Flow 在无条件生成、姿态补全、运动去噪和人体网格恢复等多个任务上均展现出与扩散模型相当甚至更优的性能，同时保持了流匹配固有的采样效率优势。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PoseD-Flow 的核心创新在于将**流匹配（Flow Matching）**首次引入人体姿态建模，并通过两个关键“changed slots”解决了此前流匹配无法直接应用于铰接姿态的根本障碍。
 
@@ -124,7 +126,7 @@ $$\min_{x_0 \in \mathcal{M}} \left( \mathcal{L}_{\mathrm{data}}(x(1)) + \mathcal
 
 两个 changed slots 之间存在因果依赖：**流形建模是微分引导的前提**。只有在 $\mathrm{SO}(3)^K$ 上正确定义了向量场和 ODE 采样过程，Riemannian D-Flow 才能利用流形的切空间投影和测地距离进行有意义的梯度反传。若在欧几里得空间中进行源点优化（如 PoseFM），不仅缺乏几何一致性，且梯度更新方向无法反映旋转群的内在结构，导致性能显著下降。
 
-## 整体框架
+
 
 PoseD-Flow 由两个核心模块构成：**PoseRFM**（Riemannian Flow Matching 姿态先验）与 **Riemannian D-Flow**（免训练的引导逆求解器），二者通过微分黎曼 ODE 采样过程紧密耦合，形成“先验生成 + 可控逆推”的统一框架（Figure 1）。
 
@@ -159,7 +161,7 @@ PoseD-Flow 由两个核心模块构成：**PoseRFM**（Riemannian Flow Matching 
 - **几何一致性**：全程在 $\operatorname{SO}(3)^K$ 流形上操作，轨迹正则项 $\mathcal{L}_{\text{traj}} = \sum_{i=1}^{K} \sum_{k=1}^{N} (3 - \mathrm{tr}(x_{ik}))$ 惩罚大旋转突变，保证生成姿态的物理合理性（Table 6 消融证实其关键作用）。  
 - **竞争性能**：PoseRFM 在无条件生成上取得最优 FID (0.013) 和最低最近邻距离 (0.070)，显著优于扩散模型 DPoser（Lu et al., ICCV 2025）等（Table 1）。
 
-## 核心模块与公式推导
+
 
 ### 3.1 流形基础：SO(3) 乘积流形
 
@@ -249,7 +251,9 @@ $$
 ![[assets/figures/papers/paper_list_l1001_https_openaccess_thecvf_com_content_CVPR2026_html_Nadar_PoseD_Flow_Versa/figures/002_Figure_2.jpg]]
 *Figure 2: Implicit bias: The source point update steers the endpoint gradient towards the reachable subspace induced by the data*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 PoseD-Flow 的实验评估围绕三个核心维度展开：**无条件生成的逼真度与多样性**、**逆问题求解的精度与鲁棒性**，以及**几何建模组件的因果贡献**。实验在 AMASS 数据集上进行训练与评估，覆盖姿态补全、运动去噪、人体网格恢复（HMR）等任务，并与扩散模型、VAE、神经距离场等代表性先验方法进行系统对比。
 
@@ -312,7 +316,9 @@ Table 6 的消融实验揭示了三个几何设计的关键因果作用：
 - **多样性注入**：当前 D-Flow 引导过程是确定性的，在需要多样化解的下游任务中，可通过在源点优化中引入受控随机扰动来提升生成多样性。
 - **时序建模缺失**：当前框架仅处理单帧静态姿态，未建模运动序列的时序依赖关系。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心瓶颈与突破路径
 
@@ -385,6 +391,8 @@ PoseD-Flow 相对于基线方法改变了三个核心槽位：
 ### 6. 知识库定位总结
 
 PoseD-Flow 在人体姿态建模知识库中确立了“**流形原生流匹配先验 + 免训练可微引导**”这一新范式。其核心贡献不是流匹配算法本身，而是**将流匹配从欧几里得空间系统性地迁移到非欧姿态流形，并证明流形几何与 ODE 微分的协同效应可产生超越扩散模型的生成质量和逆求解鲁棒性**。这一范式为后续工作在流形生成建模与结构化逆问题求解之间架设了桥梁。
+
+
 
 ## 原文 PDF
 

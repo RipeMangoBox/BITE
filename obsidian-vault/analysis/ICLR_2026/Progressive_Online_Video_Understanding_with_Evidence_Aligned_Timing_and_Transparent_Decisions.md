@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Progressive_Online_Video_Understanding_with_Evidence_Aligned_Timing_and_Transparent_Decisions.pdf
+project_link: null
+code_link: null
 aliases:
 - TQ
 - POVUEATTD
@@ -41,7 +43,7 @@ claims:
 > - OVOBench (Overall) 上，准确率 (%) 为 46.9 (↓93.75% frames)，对比 41.8 (Dispider)，变化 +5.1。
 > - RTVBench (Overall) 上，准确率 (%) 为 35.87，对比 32.75 (Qwen2.5-VL)，变化 +3.12。
 
-## 概述
+## 概要
 
 在线视频理解要求模型实时处理流式片段，并在累积充分视觉证据的恰当时刻对用户查询做出响应。现有在线视频大语言模型（VLLMs）面临两个根本性瓶颈：① 决策过程不透明，缺乏可观测的推理状态，无法将响应时刻 $t_r$ 精确对齐到最早充分证据时刻 $t^\star$，导致偏差 $\delta = |t_r - t^\star|$ 过大；② 在有限的计算和令牌预算下，难以高效维持和更新跨片段的全局因果一致认知状态 $h_t$。这种“何时回答”与“如何记忆”的双重挑战严重制约了流式视频理解的性能。
 
@@ -59,7 +61,7 @@ claims:
 
 综上，Thinking-QwenVL 通过可量化的决策控制和层级化记忆集成，为在线视频理解提供了一种高效、透明且鲁棒的新范式。
 
-## 背景与动机
+
 
 在线视频流理解（如实时监控、自动驾驶、视频助手）要求模型在视频片段持续到达的过程中，对用户查询（query）做出及时而准确的回应。理想情况下，回应的时刻 $t_r$ 应当与视频中首次出现足以支撑该问题答案的视觉证据的时刻 $t^\star$ 精确对齐，即最小化响应偏差 $\delta = |t_r - t^\star|$。然而，现有视频大语言模型（VLLM）主要面向离线场景，仅在全视频可获取后才做出回答（$t_r = T$），无从谈及“何时回答”的决策；而近期兴起的流式（在线）VLLM虽然在每一时刻 $t$ 仅能看到已到达的片段 $\mathbb{V}_t = \{v_1, \ldots, v_t\}$，却普遍缺乏显式的决策机制，导致响应时机（$t_r$）要么机械地固定在查询发出的时刻（$t_r = t_q$），要么依赖于粗糙的启发式规则（如场景切换），未能将回答时刻与最早充分证据时刻绑定。这一结构性缺陷造成两个直接后果：
 
@@ -72,7 +74,9 @@ claims:
 
 为此，本文的动机在于构建一个将推理控制与记忆集成解耦的框架，使得模型能够**根据证据的充分性自动确定响应时机**，同时能够在有限计算预算下**渐进式地保持因果一致的全局认知**。核心思路可概括为：将用户查询分解为可观察的子目标，结合在 Transformer 不同深度层次上逐步聚合视觉信息的分层集成策略，在同一框架内同步实现证据对齐的响应时机、透明的决策推理和高效的因果状态追踪。这一动机催生了两个核心组件——用于透明推理控制的主动思考决策器（ATDM）和用于渐进式语义集成的分层渐进语义集成模块（HPSI），二者协同工作，首次在在线视频 LLM 中明确量化和观测“能否回答”的进度信号 $\rho$ 与置信度信号 $c$，从而将响应时刻拉到 $t_r \approx t^\star$ 的理想点。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Thinking-QwenVL相对于现有在线视频LLM的核心创新在于将**推理控制与视觉记忆解耦**，并通过两个可量化信号——进度ρ与置信度c——将决策过程透明化，从而在单一框架内同时解决证据对齐响应时机、高效因果状态追踪和可解释决策三大瓶颈。
 
@@ -104,7 +108,7 @@ ATDM具有框架无关性：将其嵌入Flash-VStream后，StreamingBench准确�
 
 HPSI与ATDM的协同体现为：HPSI在极小令牌预算下维持紧凑全局认知状态，使ATDM在每个片段都能基于完整历史做出知情的进度判断；ATDM通过ρ和c信号指导HPSI的记忆更新优先级，并在证据充分时（ρ=1）触发回答，使t_r ≈ t★。这一解耦设计在StreamingBench上达到71.60%（超越Dispider的67.63%），在OVOBench上以93.75%帧减少率取得46.9%（超越Dispider的41.8%），同时面对30%帧丢失时准确率仍维持67.81%（Table 5），证实了证据对齐时机与高效记忆在统一框架中的可行性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0015_oKB0CacHaM_Progressive_Online_Video_Understanding_with_Evid/figures/003_Figure_3.jpg]]
 *Figure 3: Pipeline of Thinking-QwenVL. Given streamed clips and a query Q, ATDM generates question-guided caption instructions, decomposes Q into sub-questions, and iteratively extracts evidence from each clip (with progressive visual integration using HPSI), updating sub-answers with progress $\rho \in$ [ 0 , 1 ] and confidence $\mathbf { c } \in$ [ 0 , 1 ] . This process runs in parallel across clips and permits to trigger active reflection according to c. The model emits an answer at $t _ { r } = t _ { i }$ once $\pmb { \rho } ( t _ { i }$ ) = $\mathbf { 1 }$
@@ -126,7 +130,7 @@ Thinking-QwenVL 的整体 pipeline 围绕**透明的推理控制**与**高效的
 
 值得强调的是，HPSI 负责**状态记忆与视觉压缩**，ATDM 负责**推理控制与时机决策**，二者在 LLM 内部通过统一的令牌流协同工作，既保证了在线场景下对长程因果关系的捕获，又赋予了系统透明、可量化的决策能力。这一分离设计使得 ATDM 可以作为通用控制器，在无需修改 HPSI 的前提下被迁移至其他在线视觉语言模型（例如 Flash‑VStream），大幅提升其响应决策质量（Table 1 中 Flash‑VStream 嵌入 ATDM 后准确率从 22.53% 提升至 26.58%）。
 
-## 核心模块与公式推导
+
 
 Thinking-QwenVL 的核心由两大模块构成：**分层渐进语义集成 (HPSI)** 负责在极低令牌预算下构建紧凑的全局认知状态，**主动思维决策器 (ATDM)** 则通过可观测的进度与置信度信号实现证据对齐的响应时机控制。二者的目标均围绕最小化响应偏差 $\delta = |t_r - t^\star|$ 展开，其中 $t_r$ 为模型实际输出回答的时刻，$t^\star$ 为流中首次出现充分视觉证据的时刻。视觉信息的渐进更新由递归式认知状态更新 $h_{t+1} = \mathscr{U}(h_t, v_{t+1})$ 表征，具体由 HPSI 在前向传播中逐片段完成。
 
@@ -184,7 +188,9 @@ ATDM 将决策过程外部化为五个可观测的阶段：①问题引导的视
 
 消融实验表明，将连续进度/置信度跟踪（阶段④）替换为二值“可答/不可答”标志会导致 StreamingBench 准确率下降 3.62 个百分点，是 ATDM 五个组件中影响最大的部分（Figure 7）；同时 ATDM 具有框架无关性，将其嵌入 Flash-VStream 后使该基线在 StreamingBench 上提升 +4.05%（Table 1）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：在线实时理解与离线长视频基准
 
@@ -235,7 +241,9 @@ Figure 8 展示了在 NVIDIA A100 GPU 上的效率分析：在 93.75% 聚合�
 
 > 以上全部结论均基于已报告的实验数据和分析，部分失败模式（如极长流稳定性）未在论文中给出量化评估，建议在实际应用时针对目标场景进行专项验证。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 Thinking‑QwenVL 回应了在线视频理解中两个长期被忽视的系统性瓶颈：**决策不透明**与**时序-证据错位**。当前在线方法（如 Dispider、Flash‑VStream、VideoLLM‑online、TimeChat‑Online）普遍将“何时回答”简化为不可观测的二值门控（可答/延迟）或固定在查询时刻 $t_q$ 瞬间应答，导致响应时间 $t_r$ 与最先充分证据时刻 $t^\star$ 之间存在无法量化的偏差 $\delta = |t_r - t^\star|$，且在连续流式输入下无法追溯推理过程。与此同时，这些方法依赖单步池化或无层次聚合的视觉记忆，跨片段缺乏因果传播，难以在有限令牌预算下维持全局因果一致的理解。Thinking‑QwenVL 通过**将推理控制与记忆/集成分离**，并引入可量化的进度信号 $\rho$ 和置信度信号 $c$，从根本上改变了这一格局。
 
@@ -270,6 +278,8 @@ Thinking‑QwenVL 的设计天然适配**在线、单轮、流式视频问答**�
 3. **基准测试的维度缺失**：当前主流评测（StreamingBench、OVOBench 等）仅评估最终答案的准确性，忽略了对响应时机和证据对齐质量的独立评分。构建能够综合评价准确率、响应偏差 $\delta$ 以及推理透明度多维度的新基准，将是推动该领域发展的关键。
 4. **超长流与动态环境下的鲁棒性**：在数小时乃至数天的视频流中，HPSI 的因果压缩是否仍能维持实体关联？ATDM 的反思机制在话题漂移或场景剧变时能否及时自我校正？这些都需在更接近真实应用的持续学习设定下进行深度检验。
 5. **与外部工具的协同**：ATDM 的透明推理流水线天然提供了可被外部系统解析的中间状态（子问题、子答案、进度与置信度）。能否将其与工具调用、记忆检索或知识图谱查询相结合，使在线视频助手不仅能理解“看到了什么”，还能主动执行“该做什么”，是拓展其应用边界的重要方向。
+
+
 
 ## 原文 PDF
 

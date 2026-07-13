@@ -5,6 +5,8 @@ paper_level: A
 venue: SIGGRAPH
 year: 2024
 pdf_ref: paperPDFs/SIGGRAPH_2024/Near_realtime_Facial_Animation_by_Deep_3D_Simulation_Super_Resolution.pdf
+project_link: null
+code_link: https://github.com/hjoonpark/3d-sim-super-res.git
 aliases:
 - 3SSRO
 - NRFABD3SSR
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 基于深度3D仿真超分辨率的近实时面部动画 |
 | 英文题名 | Near-realtime Facial Animation by Deep 3D Simulation Super-Resolution |
 | 会议/期刊 | SIGGRAPH 2024 |
-| Links | [paper](https://arxiv.org/abs/2305.03216); [GitHub](https://github.com/hjoonpark/3d-sim-super-res.git) |
+| Links | [paper](https://arxiv.org/abs/2305.03216) · [GitHub](https://github.com/hjoonpark/3d-sim-super-res.git) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | 3D Simulation Super-Resolution (ours) |
 | Dataset | Unseen facial expressions (test set), Simulation speed, Unseen dynamics (head rotation) and external forces |
@@ -41,7 +43,7 @@ claims:
 > - Unseen facial expressions (test set) 上，Mean surface reconstruction error [mm] 为 0.37，对比 0.47 (RBF interpolation)，变化 -0.10 (21% lower error)。
 > - Simulation speed 上，Frames per second (FPS) 为 18.46 FPS (end-to-end)，对比 0.16 FPS (high-resolution simulation)，变化 115× speedup。
 
-## 概述
+## 概要
 
 高分辨率物理仿真能够生成逼真面部细节和准确物理效果，但其计算成本极高——例如，一个包含190万四面体的面部模型仅能以0.16 FPS运行，远不能满足实时交互需求。相反，低分辨率仿真（如7.3万四面体）可达30 FPS以上，却因网格粗化、非一致嵌入和省略碰撞处理等因素，丢失大量精细形变和体积差异。**核心矛盾在于如何在满足实时性能的同时逼近高仿真品质。**
 
@@ -56,7 +58,7 @@ claims:
 
 框架在训练中未见的动态头部转动和外力作用下仍能生成视觉合理的高分辨率表情，展现了良好的泛化能力。然而，当前方法存在若干局限：输出仅限于表面几何，不包含内部物理量；训练数据来自单一受试者，泛化至其他身份需重新训练；低分辨率仿真完全省略碰撞处理，深层穿透时可能失效；缺乏时序正则化可能导致帧间微小抖动。
 
-## 背景与动机
+
 
 ### 高保真面部动画的两难困境
 
@@ -87,7 +89,9 @@ claims:
 
 这一框架将超分辨率的概念从图像/几何域扩展到物理仿真域，为实时高保真面部动画提供了新的技术路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作提出**3D仿真超分辨率**（3D Simulation Super-Resolution）框架，其核心创新在于将深度学习超分辨率范式从纯几何域拓展至物理仿真域。不同于传统方法仅将低分辨率仿真结果视为简单的几何插值问题，本方法通过**语义对应的训练数据自动补偿**低分辨率仿真中固有的离散化误差、物理简化及非一致嵌入带来的形变损失，从而在实时仿真基础上重构高保真表情。以下从因果机制和关键组件变更两个维度剖析其创新实质。
 
@@ -118,7 +122,7 @@ claims:
 
 需注意，本方法的创新集中于**表面几何的超分辨率重建**，输出仅限于高分辨率表面位移，不包含内部应变、应力或肌肉激活等物理量（Limitations）。此外，训练数据来自单一受试者的解剖模型，泛化至其他身份需重新训练或微调。低分辨率仿真完全省略碰撞处理，模型仅通过学习训练数据中的碰撞解决行为隐式处理穿透，在深层穿透时仍可能失效（Figure 17）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2305_03216/figures/010_Figure_8.jpg]]
 *Figure 8: 0 Fig. 8. We test the ability of our framework to handle deformations that extend beyond the parametric space used in the simulation by visualizing the inferred surfaces from unseen dynamics (le ) and unseen external forces (right) (Section 5.3). ©NVIDIA*
@@ -170,7 +174,7 @@ $$\mathcal{L} = \mathcal{L}_{recon} + \alpha \mathcal{L}_{fn} + \beta \mathcal{L
 
 与传统的“嵌入表面”方法（直接将高分辨率表面网格通过重心坐标嵌入低分辨率仿真体）不同，本框架明确建模了分辨率差异带来的形变损失。Figure 5展示了同一组控制参数下，嵌入低分辨率网格的表面与高分辨率仿真表面之间存在显著的宏观和微观差异，这正是超分辨率网络需要补偿的信息缺口。通过特征编码和可学习上采样的组合，框架能够自动学习并补偿网格粗化、非一致嵌入和物理简化带来的误差。
 
-## 核心模块与公式推导
+
 
 ### 整体流水线
 
@@ -226,7 +230,9 @@ $$\mathcal{L} = \mathcal{L}_{recon} + \alpha \mathcal{L}_{fn} + \beta \mathcal{L
 
 特征编码模块（EdgeConv）和坐标上采样模块（SIREN插值）是本方法的核心创新。消融实验证实：移除特征编码模块后，平均重建误差从0.38 mm升至0.45 mm；将坐标上采样替换为固定转置卷积加权求和后，误差进一步增至0.59 mm，精细表面细节严重恶化（Table 3, Figure 13）。这验证了动态图特征聚合与可学习空间插值对跨分辨率变形映射的关键作用。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -287,7 +293,9 @@ Table 2 和 Figure 10、Figure 11 对比了三种输入方式的重建质量：�
 ![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2305_03216/figures/023_Figure_18.jpg]]
 *Figure 18: Discrepancy heatmap （b） Fig. 18. Visualization of the surface mesh embedded in the low-resolution simulation mesh undergoing unseen external forces (a) and our prediction of the target mesh (b), respectively (see Section A.4). ©NVIDIA*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位与核心矛盾
 
@@ -355,6 +363,8 @@ Table 2 和 Figure 10、Figure 11 对比了三种输入方式的重建质量：�
 - **物理量同步推断**：是否可能在超分辨率过程中同步推断内部物理量（如应力场、应变张量）？这将为后续动画编辑、物理模拟验证或生物力学分析提供更丰富的信息维度。
 
 - **跨域泛化**：对更复杂的生物力学系统（如全身肌肉仿真）或其他物理域（如布料、流体），类似的“仿真超分辨率”策略是否可行？面部仿真的成功依赖于肌肉激活参数提供的语义对应——在其他域中如何构建等价的语义对应机制是一个根本性挑战。
+
+
 
 ## 原文 PDF
 

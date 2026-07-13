@@ -45,7 +45,7 @@ claims:
 > - KIT-ML test set 上，StiSim↑ 52.17% vs StickMotion 42.60% (+9.57%)。
 > - User Study 上，Total Time (s)↓ 34.3 vs text-to-motion only (approx. 64.4) (-46.7%)。
 
-## 概述
+## 概要
 
 文本驱动的三维人体动作生成面临一个结构性瓶颈：自然语言难以精确传达动作的空间轨迹、肢体姿态与节奏细节，导致生成结果与用户意图之间存在不可忽视的偏差。DrawMotion 针对这一瓶颈，引入**自由手绘轨迹与火柴人草图**作为额外的空间控制条件，使用户能够以直观的视觉语言直接约束动作的路径与关键姿态。
 
@@ -55,7 +55,7 @@ claims:
 
 在方法谱系上，DrawMotion 位于文本条件扩散模型（如 MDM、MotionDiffuse）的延伸线上，但通过引入多模态空间条件与训练无关引导机制，开辟了从“语义生成”到“精确控制”的新路径。其 MCM 设计（区分 Draw Decoder 与 Text Decoder，分别采用点积注意力和高效注意力）和条件混合策略，为多条件融合提供了可复用的架构范式。
 
-## 背景与动机
+
 
 三维人体动作生成是计算机视觉与图形学中的核心问题，其目标是根据用户给定的控制信号合成自然、多样的人体运动序列。近年来，基于扩散模型（diffusion models）的文本驱动动作生成方法取得了显著进展，代表性工作包括 **MDM**（Tevet et al., arXiv 2022）、**MotionDiffuse**（Zhang et al., arXiv 2022）以及引入检索增强的 **ReMoDiffuse**。然而，这些方法均以纯文本作为唯一的控制条件，面临一个根本性瓶颈：**文本描述难以精确传达动作的空间轨迹与肢体姿态**。
 
@@ -65,7 +65,9 @@ claims:
 
 这一动机背后的核心洞察在于：多条件融合模块（MCM）的中间特征形成了连续且稠密的分布空间（Figure 5 的 PCA 投影显示，ReMoDiffuse 特征分布离散不规则，而 MCM 特征分布连续稠密）。这种连续分布为**训练无关的梯度引导**（Intermediate Feature Guidance, IFG）提供了数学基础——模型无需重新训练即可在推理时通过梯度更新严格对齐用户提供的轨迹约束，同时保持生成质量。这一机制将“控制精度”与“生成保真度”两个通常互斥的目标统一在同一框架下。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DrawMotion 的核心创新在于将**自由手绘草图**（轨迹 + 火柴人）作为显式控制条件引入扩散运动生成框架，突破了纯文本描述在空间轨迹与肢体姿态表达上的根本局限。这一设计衍生出三个相互耦合的关键机制，构成了方法的核心 changed slots。
 
@@ -87,7 +89,7 @@ MCM 带来的一个深层性质是：其**中间特征形成了连续且稠密�
 
 这三个创新点形成了一条清晰的因果链：**扩展控制条件**提供了空间约束的表达能力，**MCM 的模态特化融合**保障了异质条件的有效整合，**IFG** 则利用 MCM 连续特征空间的优良性质，以零训练成本实现了严格的轨迹对齐。
 
-## 整体框架
+
 
 DrawMotion 的整体推理流程如 Figure 1 所示，其核心由三个关键模块串联构成：**条件编码**、**多条件融合（MCM）** 与**扩散去噪**。用户输入包含三类模态——一段自然语言描述、一条徒手绘制的 2D 轨迹，以及沿轨迹任意位置放置的若干火柴人姿态。这些异构输入分别经过冻结的 CLIP ViT‑B/32 文本编码器、轨迹编码器（六层 Conv1d）和预训练并冻结的火柴人编码器，被映射为统一的嵌入表示。
 
@@ -109,7 +111,7 @@ $$\mathcal{L}_{\mathrm{final}} = \mathcal{L}_{\mathrm{motion}} + \mathcal{L}_{\m
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2605_20955/figures/003_Figure_3.jpg]]
 *Figure 3: The DrawMotion framework consists of the diffusion process (left) and the network structure (right). 1) The diffusion process includes a forward and a reverse process. In the forward process, original motions are augmented with Gaussian noise and fed into DrawMotion, which learns to predict the added noise based on textual descriptions and hand-drawn sketches. In the reverse process, user-provided textual descriptions and hand-drawn sketches are input into DrawMotion, enabling the gradual generation of motion sequences using the predicted noise. 2) In the DrawMotion architecture, both the stickman encoder and the text encoder are frozen, while the remaining modules are trainable. Encoded in...*
 
-## 核心模块与公式推导
+
 
 ### 问题建模与扩散框架
 
@@ -213,7 +215,9 @@ MCM 中间特征的连续稠密分布是 IFG 得以工作的**因果机制**。F
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2605_20955/figures/004_Figure_4.jpg]]
 *Figure 4: Conceptual illustration of intermediate feature distributions. The dashed lines correspond to level sets of the probability density function. (a) Ordinary models yield discrete clusters, (b) MCM forms a relatively continuous space, and (c) VAE enforces full latent coverage. This schematic is supported by Table I*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -286,7 +290,9 @@ Intermediate Feature Guidance（IFG）是 DrawMotion 无需重新训练即可实
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2605_20955/figures/005_Figure_6.jpg]]
 *Figure 6: 2D PCA projection onto the first two principal components of different condition settings in DrawMotion. Sample size = 20,000 and diffusion step = 299*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：从文本到多模态控制的范式迁移
 
@@ -330,6 +336,8 @@ DrawMotion 处于 **可控动作生成** 与 **训练无关引导** 的交叉点
 3. **引导机制**：IFG 证明了在连续中间特征空间中进行训练无关引导的可行性，这一思路可能推广到其他需要精确约束的生成任务中。
 
 **需要手动验证的点**：ReMoDiffuse 的具体引用信息（作者/会议/年份）在当前分析中缺失，建议查阅原始论文补充完整引用。
+
+
 
 ## 原文 PDF
 

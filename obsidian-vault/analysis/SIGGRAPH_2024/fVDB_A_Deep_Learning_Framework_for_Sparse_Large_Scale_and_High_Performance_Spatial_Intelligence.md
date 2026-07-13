@@ -5,6 +5,7 @@ paper_level: A
 venue: SIGGRAPH
 year: 2024
 pdf_ref: paperPDFs/SIGGRAPH_2024/fVDB_A_Deep_Learning_Framework_for_Sparse_Large_Scale_and_High_Performance_Spatial_Intelligence.pdf
+code_link: null
 project_link: https://developer.nvidia.com/fvdb
 aliases:
 - fVDB
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | fVDB：面向稀疏、大规模、高性能空间智能的深度学习框架 |
 | 英文题名 | fVDB: A Deep-Learning Framework for Sparse, Large-Scale, and High-Performance Spatial Intelligence |
 | 会议/期刊 | SIGGRAPH 2024 |
-| Links | [paper](https://arxiv.org/abs/2407.01781); [Project](https://developer.nvidia.com/fvdb) |
+| Links | [paper](https://arxiv.org/abs/2407.01781) · [Project](https://developer.nvidia.com/fvdb) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | fVDB |
 | Dataset | Grid construction (millions of points), Stanford bunny 3-voxel narrow-band ray marching, Sparse convolution micro-benchmark (various sparsity & channel depths), XCube backbone (resolutions 256/512/1024, various channels) |
@@ -41,7 +42,7 @@ claims:
 > - Stanford bunny 3-voxel narrow-band ray marching 上，Rays/sec (M) / GPU Mem. (MB) 为 1024³: 1.43 M rays/s, 8.85 MB，对比 NerfAcc: 0.47 M rays/s, 1028 MB，变化 最快约3倍速度提升，内存最多降低116倍。
 > - Sparse convolution micro-benchmark (various sparsity & channel depths) 上，有效TFLOPs 为 Leaf/Brick/LGGS在不同条件下显著优于IGEMM；LGGS在特征128+时比IGEMM快~25%，对比 IGEMM (SpConv v2) / TorchSparse++ backend，变化 Leaf在密集叶节点可达3倍提升；Brick达到70-90%峰值带宽；LGGS在高特征维度下优势明显。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -89,8 +90,6 @@ fVDB处于**稀疏3D深度学习框架**与**体积数据结构**的交叉点。
 
 当前框架绑定固定VDB树配置（三层，发散因子32/16/8），未探索动态自适应树结构。LGGS内核在高稀疏、高特征维度（≥128）下才能充分发挥优势。尚未实现层次化双重Marching Cubes、粒子/Blob到网格转换等高级算子。NeRF实验场景有限，且PSNR优势部分得益于LiDAR点云提供的精确初始化。代码尚未开源，缺少社区第三方基准验证。
 
-## 背景与动机
-
 ### 空间智能与稀疏3D数据的核心挑战
 
 三维深度学习正从简单的物体识别迈向“空间智能”（spatial intelligence）——即在大规模、高分辨率场景中理解、重建、渲染和交互的能力。这类应用（如自动驾驶场景重建、城市级NeRF训练、物理仿真超分辨率）产生的3D数据天然是稀疏的：有效信号仅存在于物体表面、边界或特定感兴趣区域，而绝大部分空间为空。高效处理此类稀疏数据，需要一个既能紧凑存储又能快速访问的底层数据结构。
@@ -121,7 +120,7 @@ fVDB处于**稀疏3D深度学习框架**与**体积数据结构**的交叉点。
 
 fVDB的出发点正是弥合这一鸿沟：**利用VDB的结构优势，通过拓扑与特征解耦的IndexGrid设计，在单一数据结构上统一提供所有关键3D深度学习原语**。具体而言，fVDB将VDB树的拓扑骨架提取为轻量级的IndexGrid（每个叶节点仅需80字节编码所有索引，相比naive方法内存减少超过50倍），特征数据以密集侧车（sidecar）张量形式独立存储，实现拓扑一次构建、多次复用。在此之上，fVDB构建了完整的可微算子生态：GPU加速的网格构建、层次化数字微分分析器（HDDA）光线追踪、自适应多策略稀疏卷积内核（IGEMM/Leaf/Brick/LGGS）、JaggedTensor变长数据支持、采样与splatting、网格化等，使得从点云到NeRF渲染到表面重建的完整流水线可在单一框架内高效运行。
 
-## 核心创新
+## 核心方法与创新机理
 
 fVDB 的核心创新并非发明一个全新的稀疏数据结构，而是**对成熟 VDB 树进行关键改造，使其从面向图形学的数值存储容器转变为面向深度学习的稀疏索引加速器**。这一改造围绕一个中心思想展开：**拓扑与特征分离**，并以此为基础构建了一套完整的高性能算子生态。
 
@@ -167,8 +166,6 @@ fVDB 的真正优势在于**所有算子共享同一 IndexGrid 加速结构**，
 
 当前 fVDB 绑定固定的 VDB 树配置（三层，发散因子 32/16/8），未探索动态自适应树结构。LGGS 内核在高特征维度下才能充分发挥优势，对低维特征效率有限。部分高级算子（如层次化双重 Marching Cubes、粒子到网格转换）尚未实现。此外，代码尚未开源，缺少社区第三方基准验证。关于根据局部稀疏模式动态调度最优卷积内核的预期性能增益，以及 IndexGrid 在动态拓扑变化频繁场景下的重建成本是否可接受，仍是有待探索的开放问题。
 
-## 整体框架
-
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2407_01781/figures/001_Figure_1.jpg]]
 *Figure 1: ?? VDB is an integrated Deep Learning framework for large-scale, and high-performance spatial intelligence. It can process 3D data from a broad range of sources, including voxels, point clouds, and surface meshes. ?? VDB also offers a rich set of state-of-the art differentiable operators, which can be used to build Deep Learning architectures for tasks in 3D Deep Learning, thus facilitating DL applications on large scale and high-resolution 3D data*
 
@@ -212,8 +209,6 @@ IndexGrid的GPU构建算法（§3.3）将数百万体素坐标在数毫秒内转
 典型的fVDB工作流如下：原始3D数据（点云/网格/体素）首先通过GPU加速的IndexGrid构建算法转化为稀疏索引网格；随后，根据任务需求，数据流经稀疏卷积（可选自适应内核）、池化等下采样操作提取多尺度特征；对于渲染相关任务，HDDA负责高效的光线-网格求交，采样和splatting算子完成特征投影与散射；对于重建任务，Marching Cubes从特征网格中提取等值面；注意力机制和JaggedTensor则为更复杂的架构提供支持。整个过程中，IndexGrid的拓扑结构可在不同算子间复用，避免了重复的空间结构存储开销。
 
 这一统一框架使得fVDB能够在单一数据结构上同时支持高性能稀疏卷积和复杂图形学操作，这是此前基于哈希表（MinkowskiEngine、TorchSparse）或八叉树（O-CNN）的框架所无法实现的。
-
-## 核心模块与公式推导
 
 ### 3.1 VDB树背景与IndexGrid核心设计
 
@@ -291,7 +286,7 @@ LGGS内核的关键优化步骤包括：(a) 将gather-GEMM-scatter操作阻塞�
 
 JaggedTensor是fVDB处理变长数据的内存布局抽象。概念上，它是一个张量列表，其中每个列表项的第一维长度可变，其余维度保持一致。内部实现将列表中所有张量拼接为一个密集张量`jdata`，并维护两个辅助元数据：`jidx`（每个元素所属的列表项索引）和`joffsets`（每个列表项在`jdata`中的起始偏移）（Fig. 8）。这一设计使得诸如邻域查询（每个体素的邻居数量不同）等变长数据操作能够以规则的内存访问模式高效执行。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心数据结构与算子微基准测试
 
@@ -350,15 +345,13 @@ fVDB重新实现的NKSR（Neural Kernel Surface Reconstruction）在8块V100 GPU
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2407_01781/figures/004_Figure_3.jpg]]
 *Figure 3: Illustration of dense local indexing (0-63) vs sparse global indexing (21-38) in a 2D leaf node of size1111101100001100000000 8 ^ { 2 } = 6 4 . . The sparse global indexes correspond to offsets into a dense tensor of per-voxel attributes illustrated at the bottom as one column per attribute, allocated as sidecars to the IndexGrid*
 
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2407_01781/figures/003_Table.jpg]]
-
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2407_01781/figures/005_Figure_4.jpg]]
 *Figure 4: Breakdown of the 64 bit key constructed from voxel coordinates i , j , , ?? in step 2 of our build algorithm. The lower 21 bits (blue) encode the signed ?? coordinate right-shifted 5 + 4 + 3 = 1 2 bits, the next 21 bits (purple) encode the signed ?? coordinate right-shifted 12 bits, and the upper 21 bits (green) encode the signed ?? coordinate right-shifted by 12 bits. Fig. 5. Breakdown of the unique 64 bit key constructed from voxel coordinates in step 5 of our build algorithm. The lower 9 bits (gray) encode the offset local into leaf nodes ( 2 ^ { 9 } = 5 1 2 = 8 ^ { 3 } ) , the next 12 bits (blue) encode the local offsets into lower nodes ( 2 ^ { 1 2 } = 4 0 9 6 = 1 6 ^ { 3 } ) , the nex...*
 
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2407_01781/figures/010_Table_1.jpg]]
 *Table 1: Feature comparison between our ?? VDB and four alternative sparse DL frameworks that represent state-of-the-art*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 核心瓶颈与设计动机
 

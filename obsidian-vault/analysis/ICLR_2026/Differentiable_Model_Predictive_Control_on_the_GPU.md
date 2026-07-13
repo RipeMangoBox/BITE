@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Differentiable_Model_Predictive_Control_on_the_GPU.pdf
+project_link: null
+code_link: https://github.com/ToyotaResearchInstitute/diffmpc
 openreview_forum_id: bFYfV6c9zu
 aliases:
 - DMPCG
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | GPU上的可微分模型预测控制 |
 | 英文题名 | Differentiable Model Predictive Control on the GPU |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=bFYfV6c9zu); [GitHub](https://github.com/ToyotaResearchInstitute/diffmpc) |
+| Links | [paper](https://openreview.net/forum?id=bFYfV6c9zu) · [GitHub](https://github.com/ToyotaResearchInstitute/diffmpc) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | DiffMPC |
 | Dataset | Randomly-generated MPC problems (RL), Cart-pole imitation learning, Toyota Supra drifting through water puddles (simulation) |
@@ -41,7 +43,7 @@ claims:
 > - Cart-pole imitation learning 上，wall-clock training speed 为 DiffMPC，对比 trajax，变化 ~2× speedup。
 > - Toyota Supra drifting through water puddles (simulation) 上，success rate 为 learned controller 100%，对比 baseline controller 70%，变化 +30%。
 
-## 概述
+## 概要
 
 **问题瓶颈**：可微分模型预测控制（MPC）将最优控制嵌入学习管道，但传统求解器（如 iLQR）依赖沿时间步的顺序 Riccati 递归，难以在 GPU 上高效并行化，严重制约了其在深度学习任务中的可扩展性。
 
@@ -54,7 +56,7 @@ claims:
 
 **方法定位**：DiffMPC 属于可微分优化的 MPC 分支，与基于 iLQR 的 **mpc.pytorch**（Amos et al., 2018）、**trajax**（Frostig et al., 2021）以及通用可微分非线性最小二乘求解器 **Theseus**（Pineda et al., 2022）形成对比。其关键差异在于用并行 PCG 替代顺序 Riccati 递归，从而在 GPU 上获得显著加速，同时保持收敛性。该方法当前仅支持无不等式约束的 OCP，梯度计算采用 Gauss-Newton 近似（忽略动力学曲率），且实车部署时以 OSQP 替代 PCG，训练与线上求解尚未统一。
 
-## 背景与动机
+
 
 ### 可微分优化与模型预测控制
 
@@ -79,7 +81,9 @@ $$\mathbf{OCP:}\ \underset{z=(x,u)}{\mathrm{arg\,min}} \sum_{t=0}^{T}c_t^{x,\the
 
 基于这一思路，本文提出 **DiffMPC**——一个完全在JAX中实现的可微分MPC求解器，其核心是用定制的PCG例程替代传统的Riccati递归，在正向求解和反向梯度计算中均实现显著的GPU加速。该方法同时支持warm-starting，进一步提升了滚动时域优化场景下的效率。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈：顺序 Riccati 递归阻碍 GPU 并行化
 
@@ -134,7 +138,7 @@ $$x_t = -Q_t^{-1}(q_t + A_{t-1}^{+\top}\lambda_t + A_t^\top\lambda_{t+1}),\quad 
 3. **训练与部署不一致**：实际车辆部署时使用 OSQP 而非训练中的 PCG，PCG 方案尚未在硬件上实时运行。硬件实验仅成功运行一次，结果的可重复性和统计显著性有限。
 4. **初始化鲁棒性**：可微分优化管道对初始化敏感，如何提供稳健初始化以避免求解器发散仍是一个开放问题。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_bFYfV6c9zu/figures/002_Figure_2.jpg]]
 *Figure 2: DiffMPC architecture: forward and backward passes, data flows, and main steps*
@@ -203,7 +207,7 @@ DiffMPC 作为一个完全可微分的策略 $\pi^\theta(x_0)$，可直接嵌入
 
 整个管道使用 JAX 实现，便于与主流深度学习框架集成。
 
-## 核心模块与公式推导
+
 
 ### 前向传播：SQP与PCG求解
 
@@ -239,7 +243,9 @@ $$\frac{\partial\ell}{\partial\theta}^\top = -\frac{\partial F}{\partial\theta}^
 
 DiffMPC的并行性来自两个层面：其一，每次SQP迭代中所有矩阵（$Q_t, R_t, A_t, B_t$ 等）在GPU上并行计算；其二，PCG例程虽然是迭代式的，但其每次迭代内的矩阵-向量乘积可跨时间步并行执行。此外，PCG天然支持跨问题实例的warm-starting——将前一次求解的 $\lambda$ 作为下一次求解的初始猜测，而iLQR的Riccati递归不具备这一能力。消融实验表明，在较低的PCG退出容差（$10^{-4}$）下，warm-starting可将前向传播时间减少最多11%（Figure 10）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能基准
 
@@ -299,7 +305,9 @@ DiffMPC 被用于一个具有挑战性的实际任务：通过领域随机化训
 ![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_bFYfV6c9zu/figures/018_Table_6.jpg]]
 *Table 6: Parameters used for domain randomization. On water puddles, tire friction coefficients drop to $\mu$ = 0 . 6*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心贡献与瓶颈突破
 
@@ -351,6 +359,8 @@ DiffMPC 与三类可微分优化/MPC 求解器形成直接对比：
 4. **方法泛化到非 MPC 优化**：能否将 PCG + 时间稀疏结构的思想扩展到更一般的非线性优化问题，而不仅限于 MPC？这需要识别其他具有类似块稀疏结构的优化问题类。
 
 5. **PCG 的实时硬件部署**：直接用 PCG 替代 OSQP 并保持实时性是否可行？PCG 的迭代次数在实时约束下是否可控？这需要在嵌入式 GPU 上进行严格的实时性验证。
+
+
 
 ## 原文 PDF
 

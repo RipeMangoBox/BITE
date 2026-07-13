@@ -43,7 +43,7 @@ claims:
 > - Five degradations (SOTS, Rain100L, BSD68, GoPro, LOL) 上，Average PSNR / SSIM 30.48 / 0.921 vs AirNet: 26.04 / 0.874 (estimated) (+4.44 dB / +0.047)。
 > - Single degradation dehazing (SOTS) 上，PSNR / SSIM 31.50 / 0.978 vs Gridformer: 30.37 / 0.970 (+1.13 dB / +0.008)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -76,7 +76,7 @@ R2R在效率与性能的权衡上取得了显著突破。如 Figure 1 所示，*
 
 R2R的主要局限在于：退化银行的构建需要预定义退化类型，无法直接处理完全未知的新退化类别；目前仅支持离散的退化类型，对混合退化或连续退化强度的直接支持尚不明确。未来方向包括将检索式先验扩展到视频恢复、利用视觉-语言模型提供更高层次的语义先验以增强泛化能力，以及探索检索到的先验在生成式恢复（如扩散模型）中的应用。
 
-## 背景与动机
+
 
 图像恢复旨在从退化的低质量观测中重建高质量图像，是计算机视觉领域的基础问题。真实场景中的退化类型多样，包括雾霾、雨纹、噪声、模糊和低光照等。传统方法通常为每种退化单独训练一个专用模型，这不仅增加了部署成本，也忽略了不同退化任务之间的潜在共享知识。近年来，一体化图像恢复（All-in-One Image Restoration）范式应运而生，试图用单一模型处理多种退化类型。
 
@@ -96,7 +96,9 @@ R2R的主要局限在于：退化银行的构建需要预定义退化类型，�
 
 基于上述分析，本文提出**Retrieve-to-Restore（R2R）**框架，遵循“编码-检索-解码”（Encode-Retrieve-Decode）范式。核心设计原则是将退化知识外置为紧凑的退化银行（Degradation Bank），在推理时按需检索相关先验来调节卷积特征，从而在轻量级共享主干上实现稳定、高效的多退化恢复。该方法旨在同时解决参数专业化冲突和计算效率两大瓶颈，为一体化图像恢复提供新的技术路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 R2R的核心创新在于将退化适应机制从主干网络内部彻底剥离，引入外部检索式退化知识库，从根本上解决了多退化联合训练中的参数冲突瓶颈。具体而言，该方法在以下四个关键维度上实现了对现有范式的突破。
 
@@ -120,7 +122,7 @@ R2R在计算效率上实现了数量级突破。基于NAFNet的轻量级U形编�
 
 **证据强度说明**：上述核心创新的关键主张均有高置信度实验证据支撑。效率-性能权衡由Table 1、Table 4和Figure 1联合验证（置信度0.95）；任务鲁棒性由Figure 3支撑（置信度0.9）；HQ数据依赖性由Table 7验证（置信度0.95）。
 
-## 整体框架
+
 
 R2R 的整体架构遵循“编码—检索—解码”范式，将退化先验与共享重建能力彻底解耦。系统由三个核心模块构成：基于 NAFBlock 的 U 型编码器-解码器、退化融合器，以及退化匹配模块。
 
@@ -139,7 +141,7 @@ R2R 的整体架构遵循“编码—检索—解码”范式，将退化先验�
 ![[assets/figures/papers/paper_list_l925_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Retrieve_to_Resto/figures/002_Figure_2.jpg]]
 *Figure 2: (a) Overall framework of the proposed R2R. R2R mainly consists of NAFBlocks [4] based U-shaped encoder–decoder, a degradation amalgamator, and a degradation matching module. (b) The degradation amalgamator identifies degradation types and encodes the corresponding clean images into a unified prior space to construct the degradation bank. (c) The degradation matching module enables the degraded input to query the bank and retrieve relevant clean priors to guide restoration*
 
-## 核心模块与公式推导
+
 
 R2R（Retrieve-to-Restore）的整体架构遵循“编码-检索-解码”范式，由三个核心组件构成：**基于NAFBlock的U型编码器-解码器**、**退化融合器（Degradation Amalgamator）**和**退化匹配模块（Degradation Matching Module）**，如Figure 2所示。
 
@@ -198,7 +200,9 @@ $$\mathcal{L}_{fft} = \frac{1}{P} || \mathcal{F}(\hat{x}) - \mathcal{F}(x) ||_{1
 ![[assets/figures/papers/paper_list_l925_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Retrieve_to_Resto/figures/009_Figure_6.jpg]]
 *Figure 6: t-SNE visualization of*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -273,7 +277,9 @@ Table 4的复杂度分析显示，R2R在224×224输入下参数量**19.7M**，�
 ![[assets/figures/papers/paper_list_l925_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Retrieve_to_Resto/figures/007_Figure_4.jpg]]
 *Figure 4: Visual comparison of R2R with state-of-the-art methods considering three degradations. Zoom in for a better view*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心问题与因果机制
 
@@ -330,6 +336,8 @@ R2R 的“检索即恢复”范式与检索增强生成（RAG）在思想上相�
 4. **大规模退化银行的检索效率**：当退化银行中存储大量类别（如数十种）时，全局匹配的计算成本可能成为瓶颈。采用近似最近邻检索（ANN）或分层匹配策略是自然的扩展方向。
 
 5. **生成式恢复的结合**：检索到的先验目前用于调节卷积特征，能否将其注入扩散模型或生成式恢复框架，在保持效率的同时提升感知质量？这需要平衡检索先验的确定性引导与生成模型的多样性。
+
+
 
 ## 原文 PDF
 

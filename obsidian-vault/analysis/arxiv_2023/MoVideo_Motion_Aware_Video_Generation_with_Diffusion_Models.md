@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2023
 pdf_ref: paperPDFs/arxiv_2023/MoVideo_Motion_Aware_Video_Generation_with_Diffusion_Models.pdf
+project_link: https://jingyunliang.github.io/MoVideo
+code_link: null
 aliases:
 - MoVideo
 tags:
@@ -42,7 +44,7 @@ claims:
 > - MSR-VTT (zero-shot text-to-video) 上，FID (↓) 12.71。
 > - DAVIS (image-to-video) 上，PSNR (↑) 29.88。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -77,15 +79,13 @@ MoVideo的知识贡献在于证明了**将深度和光流作为可生成的中�
 - 用户偏好实验显示，**81.3%**的参与者认为MoVideo生成的视频在文本一致性和帧间一致性上优于对比方法（Table 3）。
 - 消融实验证实，去除光流弯曲视频、遮挡掩码或光流增强解码器均导致性能显著下降（Table 5, Table 6），验证了各模块的必要性。
 
-## 背景与动机
-
 视频生成是计算机视觉领域的前沿课题，旨在根据文本描述或输入图像生成时间连贯的视频序列。近年来，扩散模型在图像生成领域取得了突破性进展，研究者们自然地将这一成功范式扩展到视频领域。然而，现有视频扩散模型面临一个核心瓶颈：**它们大多将视频简单视为图像的3D扩展，通过时空3D卷积或注意力机制隐式地学习帧间关系，并未显式地对运动进行建模**。这种隐式学习方式导致生成的视频在运动自然性和时间一致性方面存在明显不足。
 
 具体而言，现有文本到视频生成方法（如**VideoDiffusion**（Yu et al., CVPR 2023））通常采用如图3上部路线所示的范式：先用预训练图文双编码器将文本编码为语义向量，再通过文本到图像先验模型将其转换为池化后的图像嵌入，最后以该嵌入为条件生成视频。这一范式存在两个关键缺陷：其一，**池化后的图像嵌入丢失了关键帧的空间布局和局部细节信息**，导致生成视频难以保持精细的物体结构和场景一致性；其二，**运动信息完全依赖模型隐式学习**，缺乏对物体位移、遮挡关系和深度次序的显式约束，使得复杂运动场景下的生成质量难以保证。
 
 针对上述问题，MoVideo提出了一种**运动感知的视频生成框架**，其核心动机在于：**将运动显式地建模为视频深度和光流，并将它们作为中间表示来约束视频生成过程**。这一设计基于一个关键洞察——从关键帧出发生成整个视频的深度图和前后向光流，利用深度约束物体的空间布局和相对距离，利用光流保持精细细节和帧间对应关系，可以有效克服隐式运动建模的局限性。如图1所示，MoVideo通过四个阶段实现这一目标：关键帧生成、视频深度与光流生成、基于深度和光流的潜在视频生成，以及光流增强的视频解码。这种显式的运动建模策略使得模型能够更好地理解场景几何和物体运动，从而生成运动更自然、时间更一致的视频。
 
-## 核心创新
+## 核心方法与创新机理
 
 MoVideo 的核心创新在于将视频生成从“隐式运动学习”范式转变为**显式运动建模**范式。现有视频扩散模型（如 **VideoDiffusion**（Yu et al., CVPR 2023））通常将视频视为图像的 3D 时空扩展，依赖时空卷积和注意力隐式地学习运动模式。然而，这种隐式学习方式难以有效约束帧间的物体对应关系和运动自然性，导致生成视频出现运动模糊、形变或时间不一致等问题。
 
@@ -114,8 +114,6 @@ $$d, o^{i2v}, o^{v2i} \sim p_{\theta}(d, o^{i2v}, o^{v2i} | \mathcal{C}(x_{key})
 现有方法通常使用池化后的图像嵌入作为条件，丢失了空间布局和局部细节。MoVideo 采用**非池化的图像嵌入**，并加入正弦位置编码，完整保留关键帧的空间结构信息。这使得后续的深度和光流生成能够充分利用关键帧的纹理和布局线索，为精确的运动建模提供基础。
 
 这三个设计点的协同作用构成了 MoVideo 的核心机制：深度提供几何约束，光流提供运动对应，非池化嵌入保留空间细节，三者共同将视频生成从“猜测运动”转变为“规划运动”，从而显著提升生成视频的运动自然性和时间一致性。
-
-## 整体框架
 
 MoVideo 将视频生成重新定义为**运动感知的生成过程**，核心思路是：先显式生成中间运动表示（视频深度与双向光流），再以这些表示为条件引导视频生成，从而将隐式的时空建模转化为可解释、可约束的运动控制。整个框架由四个阶段串联构成，如图1所示。
 
@@ -182,8 +180,6 @@ $$L = L_1(\hat{x}, x) + \lambda_1 \sum_f L_{percep\_2d}(\hat{x}, x) + \lambda_2 
 ![[assets/figures/papers/paper_list_l1054_https_arxiv_org_abs_2311_11325/figures/001_Figure_1.jpg]]
 *Figure 1: The schematic illustration of the proposed motion-aware video generation (MoVideo) framework. Given a text prompt, we first generate the key frame by a public available latent diffusion model. Then, we generate video depth and optical flows conditional on the image embedding (extracted by an open-sourced pretrained image-text bi-encoder model) and frames per second. Next, we add extra conditions, including depth, flow-based warped latent video and calculated occlusion mask, to generate the video in the latent space. Last, the video is decoded with flow-based alignment and feature refinement modules*
 
-## 核心模块与公式推导
-
 MoVideo 将运动感知视频生成拆解为四个级联阶段：关键帧获取、视频深度与光流联合生成、基于深度与光流的潜在视频生成、以及光流增强的视频解码。其核心设计在于将运动信息显式化为可学习的中间表示，而非依赖隐式的时空注意力或 3D 卷积来捕捉运动。
 
 ### 视频深度与光流联合生成模块
@@ -240,10 +236,7 @@ $$L = L_1(\hat{x}, x) + \lambda_1 \sum_f L_{percep\_2d}(\hat{x}, x) + \lambda_2 
 ![[assets/figures/papers/paper_list_l1054_https_arxiv_org_abs_2311_11325/figures/003_Figure_3.jpg]]
 *Figure 3: The comparison on different architectures for text-to-video generation without text-video training pairs. As the top route shows, some methods [16, 51] first encode the text with the text encoder from an open-sourced pretrained image-text bi-encoder model and then use a text-to-image prior [44, 45] to transform it to the pooled image embedding, which is used as the condition to guide the generation of video. Instead, we propose to first generate an image by a public text-to-image latent diffusion model and extract its unpooled image embedding that preserves spatial layout and local details of the image, based on which we generate the depth and optical flow of the video and then use them to...*
 
-![[assets/figures/papers/paper_list_l1054_https_arxiv_org_abs_2311_11325/figures/004_Figure_4.jpg]]
-*Figure 4: The basic block for building the optical flow-augmented video decoding model. We add temporal convolution layers after spatial convolution layers to extract spatio-temporal video features. After that, with the optical flow*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -308,7 +301,7 @@ Fig. 5提供了文本到视频生成的定性对比。与VideoDiffusion相比，
 ![[assets/figures/papers/paper_list_l1054_https_arxiv_org_abs_2311_11325/figures/012_Table_6.jpg]]
 *Table 6: Ablation study on warped video and occlusion mask*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 与现有工作的关系
 

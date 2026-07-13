@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/MAMMA_Markerless_Accurate_Multi_person_Motion_Acquisition.pdf
+project_link: null
+code_link: null
 aliases:
 - MAMMA
 tags:
@@ -42,7 +44,7 @@ claims:
 > - MOYO (单人2D标志点) 上，Mean 2D Euclidean error (pixels) 11.40 vs CameraHMR 12.53, Look-Ma* 22.43 (优于 CameraHMR 1.13px)。
 > - Harmony4D (双人2D标志点, IoU>0.5) 上，Mean 2D Euclidean error (pixels) 18.33 (+masks) vs CameraHMR 32.84, Look-Ma* 31.45 (优于 CameraHMR 14.51px)。
 
-## 概述
+## 概要
 
 **目标问题**：多视角视频中，当多人发生紧密交互和严重遮挡时，传统无标记运动捕捉方法难以达到与标记式系统相当的精度，且通常需要大量人工清理。
 
@@ -61,7 +63,7 @@ claims:
 
 **方法定位**：MAMMA 属于基于密集表面标志点预测与多视角优化拟合的无标记运动捕捉方法，区别于依赖稀疏关键点或强姿态先验的传统多视角方法（如 Multi-view SMPLify-X），也不同于使用单 token 回归的 CameraHMR 等方案。其核心优势在于密集标志点的鲁棒预测与无先验优化，在精度上首次逼近商业标记系统。
 
-## 背景与动机
+
 
 从多视角视频中精确捕捉多人三维运动是计算机视觉与图形学领域的核心难题，在电影特效、运动分析、虚拟现实和具身智能等应用中具有广泛需求。当前，基于光学标记的商业运动捕捉系统（如 Vicon）仍是精度上的黄金标准，但其昂贵的硬件成本、繁琐的标记粘贴流程以及对受控环境的依赖，严重限制了其可及性与应用场景。
 
@@ -73,7 +75,9 @@ claims:
 
 MAMMA 正是在这一背景下提出的。其核心动机在于：**如果能够在每个视角下精确预测一组密集的表面标志点，并同时估计其可见性、不确定性和接触概率，那么仅通过最小化重投影误差——无需任何姿态先验或学习性初始化——就能恢复出与标记系统精度相当的 SMPL-X 参数**。这一思路将问题的关键从“设计复杂的姿态先验”转移到了“提升密集标志点预测的准确性与鲁棒性”上，而后者正是 MAMMA 方法设计的核心着力点。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MAMMA 的核心创新在于将多视角无标记运动捕捉重新表述为一个**两阶段密集表面标志点驱动**的优化问题，并通过三个关键设计突破传统方法在多人紧密交互与严重遮挡场景下的精度瓶颈。
 
@@ -110,7 +114,7 @@ MAMMA 的密集标志点检测器 MammaNet 相较于基线方法进行了三项�
 
 上述三个 changed slots 并非孤立改进，而是形成了协同效应：独立查询提供了精细定位的能力基础，掩码条件解决了多人场景的身份歧义，而多任务预测则为后续优化提供了不确定性感知和物理约束的完整信息。这一协同效应在 MAMMA-C（加入接触优化阶段）上达到顶峰——在 Hi4D 数据集上 MPJPE 达到 12.44mm，大幅领先先前方法（Table 5）；在 Harmony4D、CHI3D 和 MammaEval-D 上，平均穿透深度从 GT 的 9.84mm 进一步降至 8.46mm（Table 3）。
 
-## 整体框架
+
 
 MAMMA 采用“先感知、后拟合”的两阶段流水线，将多视角同步视频转化为 SMPL-X 参数化人体模型，全程不依赖标记点或强姿态先验。流水线的核心思想是：**密集表面标志点充当虚拟标记**——它们足够丰富以同时约束身体、手部姿态和体型，却又完全从图像中自动预测，从而绕开传统标记系统的人工粘贴与清理成本。
 
@@ -148,7 +152,7 @@ MAMMA 采用“先感知、后拟合”的两阶段流水线，将多视角同�
 
 整个流水线**不使用时序信息进行标志点预测**（帧间独立），也不做多视角联合推断，这构成了当前框架的一个已知局限——可能导致帧间抖动，但同时也使系统对任意相机配置具备即插即用的灵活性。
 
-## 核心模块与公式推导
+
 
 MAMMA 的核心流程由两个关键阶段构成：**密集表面标志点预测（MammaNet）** 与 **基于标志点的多视角 SMPL-X 拟合优化**。前者为每帧每视角输出 512 个带有可见性、不确定性和接触概率的表面标志点；后者在无任何姿态先验的条件下，仅通过最小化重投影误差及接触约束，恢复 SMPL-X 参数。以下拆解关键模块与核心公式。
 
@@ -229,7 +233,9 @@ $$D_g = \frac{1}{2FN} \sum_{i=1}^{FN} \left( d(\mathbf{x}_b^i, \mathbf{F}_{ba} \
 ![[assets/figures/papers/paper_list_l25_https_arxiv_org_abs_2506_13040/figures/004_Figure_4.jpg]]
 *Figure 4: MammaNet. The input to the network is the image and mask. It predicts per landmark visibility probability p (green is visible, red not visible), landmark locations µ, uncertainties σ (red means highly uncertain), person–person pc and floor contact f l probabilities (red means no contact and green contact)*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 2D密集标志点预测评估
 
@@ -306,7 +312,9 @@ MammaEval-Extra实验（Table 10）是验证MAMMA实用价值的关键证据。�
 ![[assets/figures/papers/paper_list_l25_https_arxiv_org_abs_2506_13040/figures/003_Figure_3.jpg]]
 *Figure 3: 512 Landmarks sampled from the SMPL-X body*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心设计动机与瓶颈突破
 
@@ -370,6 +378,8 @@ MAMMA 的完整流程由四个核心模块串联：
 4. **少相机鲁棒性**：在极少数相机（<4）且严重遮挡下如何保持鲁棒性？消融实验表明 4 台相机即可获得强性能（Figure 12），但更少相机下的退化模式尚不明确。
 5. **不完整掩码适应**：当 SAM2 等分割模型丢失身体部分时，如何自动纠正或适应不完整掩码？
 6. **优化加速**：是否可以将当前 L-BFGS 优化器替换为可微分优化或端到端网络，以进一步提高速度？当前优化各阶段运行时间见 Figure 13，但实时性仍是实际部署的瓶颈。
+
+
 
 ## 原文 PDF
 

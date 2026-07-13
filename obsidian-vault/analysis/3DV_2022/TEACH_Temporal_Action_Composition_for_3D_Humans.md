@@ -5,6 +5,8 @@ paper_level: A
 venue: 3DV
 year: 2022
 pdf_ref: paperPDFs/3DV_2022/TEACH_Temporal_Action_Composition_for_3D_Humans.pdf
+project_link: null
+code_link: null
 aliases:
 - TEACH
 tags:
@@ -39,7 +41,7 @@ claims:
 > - BABEL 验证集动作对 上，Average Positional Error (root joint, 越低越好) 为 0.674，对比 0.729 (Independent) / 0.790 (Joint)，变化 相比Independent降低7.5%，相比Joint降低14.7%。
 > - BABEL 验证集动作对 上，Average Variance Error (root joint, 越低越好) 为 0.222，对比 0.255 (Independent) / 0.306 (Joint)，变化 相比Independent降低12.9%，相比Joint降低27.5%。
 
-## 概述
+## 概要
 
 **核心问题**：文本驱动的3D人体运动生成模型长期受限于单动作或单句输入，无法生成由多个动作按时间顺序组成的运动序列。其瓶颈在于缺乏动作序列训练数据，且现有非自回归模型难以扩展到长序列生成。
 
@@ -52,8 +54,6 @@ claims:
 - 定性示例表明，TEACH 能够正确执行“挥手后抬起左手”等未见动作组合，而基线方法则产生过渡错误或丢失第二个动作（Figure 5）。
 
 **方法定位**：TEACH 属于时序动作组合生成方法，通过自回归条件化机制将单动作生成模型扩展为序列生成模型，在文本驱动运动合成领域首次实现了对多动作时序组合的显式建模。
-
-## 背景与动机
 
 ### 问题背景
 
@@ -77,7 +77,7 @@ claims:
 
 上述分析揭示了一个核心矛盾：**单动作内部需要非自回归生成以保证质量，而动作序列之间需要自回归条件化以保证连贯性**。TEACH 的设计动机正是融合这两种范式的优势——在单个动作内部保持非自回归的生成方式，而在动作序列层面引入递归自回归机制，利用上一个动作的终止姿态作为生成下一个动作的上下文条件。这种“混合架构”既控制了长序列生成的计算开销，又为动作过渡提供了必要的时序约束，从而首次实现了文本驱动的时序动作组合合成。
 
-## 核心创新
+## 核心方法与创新机理
 
 TEACH 的核心创新在于通过**递归自回归的动作序列生成机制**，解决了现有文本驱动运动生成模型无法处理多动作时序组合的根本瓶颈。
 
@@ -103,8 +103,6 @@ TEACH 的核心洞察在于设计了**混合生成架构**：在单个动作内�
 
 定性示例（Figure 5）直观展示了这一机制的优势：对于“挥动右手，抬起左手”的动作序列，Independent 基线因缺乏过去条件而产生了从站立到坐下的不连贯过渡；Joint 基线因训练集中未见该动作组合而无法正确执行第二个动作；而 TEACH 能够正确且连贯地完成序列中的两个动作。
 
-## 整体框架
-
 ![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2209_04066/figures/002_Figure_2.jpg]]
 *Figure 2: Method overview: Our TEACH model is a variational encoder-decoder neural network. The current text instruction and the past frames are encoded by the corresponding encoders and are fed to T _ { e n c } along with the additional tokens. T _ { e n c } produces the distribution parameters from which the latent vector is sampled and given to the decoder to generate a sequence of 3D human poses. In this figure, we omit the motion encoder for simplicity*
 
@@ -127,8 +125,6 @@ TEACH 的核心设计目标是在文本驱动下生成由多个动作按时间�
 $$\mathcal{L}_R = \mathcal{L}(H^1_{1:F_1}, \hat{H}^1_{1:F_1}) + \mathcal{L}(H^2_{1:F_2}, \hat{H}^2_{1:F_2})$$
 $$\mathcal{L}_{KL} = KL(\phi^1, \psi) + KL(\phi^2, \psi)$$
 其中 $\mathcal{L}$ 为平滑 L1 损失，$\phi^1$、$\phi^2$ 分别为两个动作对应的高斯分布，$\psi$ 为标准正态分布。
-
-## 核心模块与公式推导
 
 TEACH 的整体架构是一个变分编码器-解码器网络，其核心设计在于将**动作内非自回归生成**与**动作间自回归条件化**相结合。模型由四个关键模块串联构成：
 
@@ -158,15 +154,11 @@ $$\mathcal{L}_{KL} = KL(\phi^1, \psi) + KL(\phi^2, \psi)$$
 
 两个损失联合优化，使模型在保证单动作生成质量的同时，通过过去条件机制学习动作间的自然过渡。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 数据集与评估协议
 
 TEACH 的训练与评估基于 **BABEL** 数据集。该数据集包含 10881 条运动序列，附有 65926 条文本标签，其词汇丰富度显著高于 KIT——在不同词频阈值下，BABEL 的 token 数量至少是 KIT 的两倍（Figure 3）。为训练时序动作组合模型，作者从 BABEL 的连续动作片段中提取动作对（pairs），训练集约 23.4k 对，验证集约 5.7k 对（Table A.1）。所有定量评估均在 BABEL 验证集上进行，测试集未公开，确保了可复现性。
-
-
-![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2209_04066/figures/003_Figure_3.jpg]]
-*Figure 3: BABEL vs KIT: We provide a comparative analysis of the amount of data and the vocabulary of verbs. On the top, the number of tokens (i.e. different words) in each dataset is plotted against various frequency thresholds, i.e. the number of words that appear at least freq. threshold times. We see that BABEL consistently has at least twice as many tokens as KIT. On the bottom, the verb histogram shows that BABEL has more samples across a wide range of actions. Note that there are differences in how the datasets label actions with generic words like “do” and “perform” being common in KIT and rare in BABEL, which is more specific*
 
 评估指标采用两类根关节误差：
 - **Average Positional Error (APE)**：生成运动与真值在根关节位置上的平均欧氏距离，越低越好。
@@ -185,7 +177,6 @@ TEACH 与上述基线的核心差异在于：TEACH 采用递归自回归策略�
 
 Table 1 报告了 TEACH 与两种基线在 BABEL 验证集动作对上的定量对比。TEACH 在所有指标上均取得最优结果：
 
-
 ![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2209_04066/figures/004_Table_1.jpg]]
 *Table 1: Comparison against baselines on pairs of actions: We benchmark the 3 different approaches on pairs of BABEL [33]. As we can see TEACH outperforms Joint and Independent baselines in all the metrics*
 
@@ -198,12 +189,10 @@ Joint 基线表现最差，表明简单拼接文本描述无法有效建模动�
 
 **Slerp 平滑的效果（Table 2）**。为量化动作间过渡的自然程度，作者定义了“过渡距离”——将第一个动作的最后一帧与第二个动作的第一帧进行根对齐后，计算关节点位置的欧氏距离。TEACH 生成的过渡距离为 0.107m，显著低于 Independent 基线的 0.151m。这表明过去条件机制在生成阶段已有效降低了动作间的不连续性，Slerp 仅作为后处理修正残余不连续。需注意，Independent 基线若不进行根对齐则无法评估过渡距离，因为其单动作训练使每个动作均面向正面。
 
-
 ![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2209_04066/figures/007_Table_2.jpg]]
 *Table 2: Effect of Slerp: We measure transition distance for generated samples given all the test set pairs. We define transition distance as the Euclidean distance between the last frame of the first action and the first frame of the second action, calculated on joint positions, when the last pose of the first action is aligned with the first pose of the next action and when it is not. TEACH better captures the transition between the two actions compared to the previous-action-agnostic TEMOS. Moreover, the Independent baseline cannot be benchmarked without orienting and aligning the poses as it is trained on single actions that are canonicalized to face in the forward direction*
 
 **过去帧数量 P 的消融（Table 3）**。作者考察了条件化不同数量的过去帧对性能的影响。当 P=5 时，APE 为 0.674，优于 P=1（0.725）和 P=10（0.681）。结果表明，适度的历史信息（5 帧）最利于动作过渡：过少（1 帧）无法提供足够的运动上下文，过多（10 帧）可能引入冗余或过时信息。
-
 
 ![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2209_04066/figures/008_Table_3.jpg]]
 *Table 3: Ablation on the number of past frames: Here, we change the number of past frame, while keeping the other training settings identical and report the different metrics. We observe the best performance when using 5 past frames*
@@ -211,7 +200,7 @@ Joint 基线表现最差，表明简单拼接文本描述无法有效建模动�
 **定性消融（Figure 5）**。以动作序列 [wave the right hand, raise the left hand] 为例：
 
 ![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2209_04066/figures/006_Figure_5.jpg]]
-*Figure 5: Qualitative comparison: We show an illustrative example for (a) Independent, (b) Joint and (c) TEACH for the sequence of actions [wave the right hand, raise the left hand]. While the individual waving and raising hand actions are correctly generated, the single-action independent baseline (a) transitions from standing to sitting incoherently as the next action is not conditioned on the past. Joint baseline (b) on the other hand, waves with the right hand but does not raise the left one, probably because such an action combination was not present in the training set. On the other hand, TEACH learns about both single action variation and and autoregressive transitions between actions, and thu...*
+*Figure 5：Independent、Joint 与 TEACH 在“挥右手后抬左手”组合动作上的定性对比；TEACH 同时保持动作语义与过渡连贯性。*
 
 - Independent 基线：挥手和抬手动作本身正确，但过渡时从站立错误地变为坐下，因为第二个动作的生成完全独立于前一个动作的终止姿态。
 - Joint 基线：能完成挥手，但未能抬起左手，很可能因为该动作组合未出现在训练集中。
@@ -235,16 +224,7 @@ Figure 6 展示了更多 TEACH 生成的定性结果。前 3 行显示 TEACH 能
 
 5. **仅支持时序组合**：模型当前仅支持前后动作的时序组合，未考虑同一时间执行多个动作（空间组合）的情景。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2209_04066/figures/011_Figure.jpg]]
-*Figure: ise Zise Figure A.1. BABEL vs KIT: Here, we show additional plots regarding the language on BABEL and KIT. We show the token frequency of the two different datasets for different POS tag groups. Verbs (top left), verbs and adverbs (top right), verbs, adverbs and nouns (bottom left) and verbs, adverbs, noun, adjectives (bottom right)*
-
-![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2209_04066/figures/010_Table.jpg]]
-*Table: A.1. Datatype statistics: We show the statistics from different BABEL label types. Sequences are the AMASS [25] motions with a single action label, Segments are the smaller motions that are extracted from longer AMASS sequences. Pairs are the twoaction motions that we extract from consecutive segments. We denote the exclusion of “transition”, “a-pose”, and “t-pose” labels with **
-
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 问题定位：从单动作生成到时序动作组合
 

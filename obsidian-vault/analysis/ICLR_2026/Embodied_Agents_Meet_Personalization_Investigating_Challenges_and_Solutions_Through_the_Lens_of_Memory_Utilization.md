@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Embodied_Agents_Meet_Personalization_Investigating_Challenges_and_Solutions_Through_the_Lens_of_Memory_Utilization.pdf
+project_link: null
+code_link: https://github.com/Connoriginal/MEMENTO
 openreview_forum_id: E5L43l5EIu
 aliases:
 - HKGBUPM
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 具身智能体与个性化：以记忆利用为视角的挑战与解决方案研究 |
 | 英文题名 | Embodied Agents Meet Personalization: Investigating Challenges and Solutions Through the Lens of Memory Utilization |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=E5L43l5EIu); [GitHub](https://github.com/Connoriginal/MEMENTO) |
+| Links | [paper](https://openreview.net/forum?id=E5L43l5EIu) · [GitHub](https://github.com/Connoriginal/MEMENTO) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/planning_control |
 | Method | Hierarchical Knowledge Graph-based User Profile Memory |
 | Dataset | MEMENTO (Single-Memory Task), MEMENTO (Joint-Memory Task) |
@@ -41,7 +43,7 @@ claims:
 > - MEMENTO (Single-Memory Task) 上，Success Rate (%) 为 GPT-4o Utilization: 85.1，对比 GPT-4o Acquisition: 95.0，变化 -9.9。
 > - MEMENTO (Joint-Memory Task) 上，Success Rate (%) 为 GPT-4o Utilization Joint: 63.9，对比 GPT-4o Acquisition average: 95.0，变化 -30.5。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -76,7 +78,7 @@ MEMENTO 将个性化物体重排任务形式化为部分可观察马尔可夫决
 
 3. **独立记忆管理是关键**：用户画像记忆模块显著提升了单记忆和联合记忆任务的性能，尤其改善了此前受困的序列用户模式任务（Figure 8），验证了将个性化知识从情景记忆中分离管理的设计有效性。
 
-## 背景与动机
+
 
 具身智能体（Embodied Agents）在传统任务中主要遵循简单指令执行物体重排（object rearrangement），例如“把苹果放到桌子上”。这类任务仅要求智能体理解当前场景并执行标准化的动作序列，不涉及对用户特定知识的依赖。然而，现实世界中的个性化协助（personalized assistance）场景对智能体提出了更高要求：智能体必须能够识别具有个人意义的物品、回忆用户的日常习惯与偏好，并基于这些个性化知识做出决策。
 
@@ -86,7 +88,9 @@ MEMENTO 将个性化物体重排任务形式化为部分可观察马尔可夫决
 
 针对上述缺口，本文提出两个核心贡献。在评估层面，构建了**MEMENTO**——一个端到端的两阶段个性化具身智能体评估框架，通过将相同目标的不同指令分配至记忆获取（acquisition）与记忆利用（utilization）两个阶段，隔离并量化智能体的记忆利用能力。在方法层面，设计了**基于层级知识图谱的用户画像记忆模块**（Hierarchical Knowledge Graph-based User Profile Memory），将个性化知识从情景记忆中解耦并独立管理，以缓解信息过载并减轻多记忆协调的负担。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 针对LLM驱动具身智能体在个性化任务中暴露的**信息过载**与**记忆协调失败**两大瓶颈，本文的核心创新在于将个性化知识从情景记忆中解耦，引入独立的**层级知识图谱用户画像记忆模块**（Hierarchical Knowledge Graph-based User Profile Memory），改变了记忆的表示、管理与检索方式。
 
@@ -110,7 +114,7 @@ MEMENTO 将个性化物体重排任务形式化为部分可观察马尔可夫决
 
 因此，本文的方法并非用画像记忆替代情景记忆，而是保持两者的互补关系——情景记忆保留轨迹以支撑上下文学习，画像记忆独立管理个性化知识以降低信息提取难度。这一设计在消除信息过载的同时，避免了对较小模型上下文学习能力的损害。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_E5L43l5EIu/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of MEMENTO. The framework evaluates memory utilization capability by comparing agent performance on tasks with identical goals but varying instructions on each stage*
@@ -161,7 +165,7 @@ MEMENTO 框架的核心设计思想是**通过保持场景和目标不变、仅�
 
 整体流水线的数据流如下：用户指令 $I$ 首先触发情景记忆检索，获取 top-k 相关历史轨迹；同时（若启用用户画像记忆模块），系统从知识图谱中提取相关个性化知识。LLM 策略规划器将当前观测 $w_t$、检索到的记忆内容、以及技能库描述拼接为提示，生成思考过程和动作 $a_t$。动作由底层技能执行器在 Habitat 3.0 模拟器中执行，产生新的观测 $w_{t+1}$，形成闭环交互。任务成功与否由目标 $g$ 中所有物体-位置对的完成情况判定。
 
-## 核心模块与公式推导
+
 
 ### 任务形式化：个性化物体重排的POMDP建模
 
@@ -213,7 +217,9 @@ MEMENTO框架的核心设计思想是通过控制变量来隔离记忆利用能�
 
 消融实验证实，情景记忆的摘要化会移除轨迹信息，导致较小模型（Llama-3.1-8b、Qwen-2.5-7b）性能显著下降（Table 2），证明完整的 ReAct 轨迹提供了关键的上下文学习利益。因此，保留情景记忆的同时通过独立的用户画像模块管理个性化知识，是在利用上下文学习优势与降低信息提取负担之间取得平衡的关键设计选择。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 4.1 记忆利用的双重瓶颈：信息过载与协调失败
 
@@ -294,7 +300,9 @@ Figure 8展示了引入层级知识图谱用户画像记忆（Hierarchical Knowl
 
 3. **架构方向**：将个性化知识管理从情景记忆中解耦，采用独立的结构化记忆模块（如层级知识图谱），是缓解当前瓶颈的有效架构设计方向。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：从通用具身任务到个性化协助
 
@@ -363,6 +371,8 @@ $$\phi ( I , M ) \longrightarrow g = ( o _ { i } , l _ { i } ) _ { i = 1 } ^ { k
 **实际部署层面**：
 - 在真实用户交互中，如何处理模糊、隐式甚至自相矛盾的个性化引用？当前评估使用明确的知识类型标签，实际场景更为复杂。
 - 如何在保证用户隐私的前提下实现情景记忆的有效利用和更新？情景记忆包含完整的交互轨迹，隐私风险较高。
+
+
 
 ## 原文 PDF
 

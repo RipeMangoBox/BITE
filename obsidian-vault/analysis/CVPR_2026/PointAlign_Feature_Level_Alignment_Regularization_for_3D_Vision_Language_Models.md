@@ -43,7 +43,7 @@ claims:
 > - Objaverse 分类 (指令提示) 上，准确率 (%) 72.50 vs 65.00 (MiniGPT-3D) (+7.50 pp)。
 > - Objaverse 描述 (Qwen2-72B-Instruct) 上，评估得分 53.05 vs 48.17 (MiniGPT-3D) (+4.88 pp)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：当前3D视觉语言模型（如MiniGPT-3D、PointLLM）在训练时仅依赖下一token预测的交叉熵损失，缺乏对中间点云特征的直接监督。这导致LLM深层中点云token的细粒度几何语义信息逐渐退化——实验表明，基线模型深层token的KNN分类准确率显著下降，模型对3D结构的辨别力随层深增加而衰减。
 
@@ -54,8 +54,6 @@ claims:
 **方法谱系与知识库定位**：PointAlign建立在**MiniGPT-3D**（Tang et al., MM 2024）的高效对齐框架之上，继承了其两阶段训练范式（预训练+指令微调）。与**PointLLM-7B**（Xu et al., ECCV 2024）的全量微调策略不同，PointAlign保持参数高效。与**Point-Bind LLM**（Guo et al., arXiv 2023）和**GPT4Point**（Qi et al., CVPR 2024）等早期3D-LLM方法相比，PointAlign首次在LLM中间层引入显式的点云特征对齐正则化。该方法的思想可追溯到2D视觉语言模型中的特征一致性约束，但针对3D点云模态进行了专门设计。
 
 **主要结果**：在生成式3D物体分类任务上，PointAlign平均准确率达66.08%，较MiniGPT-3D基线提升2.08个百分点，其中开放词汇Objaverse分类提升高达7.50个百分点。在3D物体描述任务上，Qwen2-72B-Instruct评估得分提升4.88个百分点。该方法对不同LLM骨架（Phi-2、Phi-3）和架构（含无Q-Former的3D-LLaVA）均表现出通用性，在场景级3D密集描述任务上也取得一致提升。
-
-## 背景与动机
 
 ### 3D视觉语言模型的兴起与架构范式
 
@@ -87,7 +85,7 @@ PointAlign的核心动机可概括为：**利用Q-Former输出作为高质量的
 
 基于上述动机，PointAlign预期在以下方面取得突破：在生成式3D物体分类任务上实现显著提升，尤其是在开放词汇场景下弥补现有方法的不足；在3D物体描述生成任务上产出更精准、几何感知更强的文本输出；同时保持方法的架构通用性，使其可适配不同的LLM骨架和连接器设计。
 
-## 核心创新
+## 核心方法与创新机理
 
 PointAlign 的核心创新在于**在 LLM 的中间层引入特征级对齐正则化**，以解决 3D 视觉语言模型训练中细粒度几何语义信息逐渐退化的瓶颈问题。其关键洞察是：Q-Former 在预训练阶段已经学习了点云与文本之间的映射，其输出同时包含几何与语义信息，且比深层 LLM 表示更完整，因此可作为高质量的内部监督目标。
 
@@ -131,8 +129,6 @@ $$\mathcal{L}_{total} = \mathcal{L}_{ntp} + \lambda \mathcal{L}_{align}$$
 ### 关键特性：零推理开销
 
 对齐投影器仅包含 8.39M 参数，且**仅在训练阶段使用，推理时完全移除**。这意味着 PointAlign 在不增加任何推理延迟或内存开销的前提下，显著提升了模型性能。这一设计使其成为即插即用的正则化手段，可灵活应用于不同的 3D 视觉语言架构（如无 Q-Former 的 3D-LLaVA，Table 9）和不同的 LLM 骨架（如 Phi-2、Phi-3，Table 10）。
-
-## 整体框架
 
 PointAlign 在现有 3D 视觉语言模型的基础上引入了一个轻量级的特征级对齐正则化机制，其核心思想是：大语言模型（LLM）在逐层处理点云 token 时，仅受下一 token 预测损失驱动，缺乏对中间表示的显式几何语义监督，导致细粒度 3D 信息在深层逐渐衰减。为解决这一问题，PointAlign 在 LLM 的某一中间层提取点云 token，通过对齐投影器将其映射回冻结的 Q-Former 特征空间，并以余弦相似度损失强制该中间表示与 Q-Former 输出保持一致，从而保留几何结构与语义信息。
 
@@ -189,8 +185,6 @@ $$\mathcal{L}_{align} = -\frac{1}{o}\sum_{i=1}^o \frac{\tilde{\mathbf{Q}}_i^\top
 
 - **推理时零开销**：对齐投影器仅在训练阶段参与梯度计算，推理时被完全移除，模型结构与原始 MiniGPT-3D 完全一致，不增加任何推理延迟或显存占用。
 
-## 核心模块与公式推导
-
 ### 整体架构与训练范式
 
 PointAlign采用两阶段训练框架（Figure 1）。第一阶段完全遵循MiniGPT-3D的预训练方案，完成点云编码器、Q-Former、模态投影器及LLM的初始对齐。第二阶段冻结点云编码器、MLP投影层、Q-Former和模态投影器，仅训练LLM的LoRA层和新引入的对齐投影器（Alignment Projector）。推理时对齐投影器被完全移除，不引入额外计算开销。
@@ -241,10 +235,7 @@ $$
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l2407_https_arxiv_org_abs_2603_00412/figures/009_Figure_3.jpg]]
-*Figure 3: KNN classification accuracy of point cloud tokens extracted from different LLM layers on ModelNet40. We compare the baseline model and our aligned model using K=1 and K=10*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 核心瓶颈验证：中间特征退化
 
@@ -310,7 +301,7 @@ Table 9 将对齐正则化应用于无 Q-Former 架构的 **3D-LLaVA**，在 Sca
 ![[assets/figures/papers/paper_list_l2407_https_arxiv_org_abs_2603_00412/figures/012_Table_8.jpg]]
 *Table 8: Ablation study on the alignment target. We evaluate the impact of different alignment targets at layer 16 on classification accuracy (%) using cosine similarity loss with λ = 0.1*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 与现有3D视觉语言模型的继承与改进关系
 

@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/GaussianVision_Vision_Language_Alignment_from_Compressed_Image_Representations_using_2D_Gaussian_Splatting.pdf
+project_link: null
 code_link: "https://github.com/LAION-AI/CLIP_benchmark"
 aliases:
 - G2AC
@@ -42,7 +43,7 @@ claims:
 > [!tip] 效果简介
 > - CLIP Benchmark (38 datasets) 上，Relative Accuracy vs RGB Baseline GS 3136 (196 tokens) vs RGB ViT-B/16 (Small) (0.98 (98% of baseline))；Compression Ratio 3× (3136 GS) vs 1× (RGB) (3× reduction)；Relative Accuracy GS 400 (196 tokens) vs RGB ViT-B/16 (Small) (0.91 (91% at 23.5× compression))。
 
-## 概述
+## 概要
 
 当前多模态视觉-语言模型通常以密集的RGB像素图像作为输入，通过分块（patch）得到大量视觉token，再与文本嵌入对齐。这种流程在边缘-云协同场景下面临两个核心瓶颈：**密集RGB图像的传输能耗高**，以及**基于patch的tokenization产生大量冗余token，制约模型的可扩展性与效率**。
 
@@ -60,7 +61,7 @@ claims:
 
 然而，该方法存在若干已知局限：2DGS拟合仍需大量GPU预处理时间；从头训练GS编码器收敛极差，必须依赖RGB教师模型；在医学图像等细粒度任务上性能显著下降。这些局限也指向了开放问题：**能否设计具有原生归纳偏置的GS-native Transformer架构以摆脱对RGB教师的依赖？如何利用2DGS的可变密度特性实现自适应token分配？**
 
-## 背景与动机
+
 
 ### 大规模视觉-语言模型的数据传输瓶颈
 
@@ -86,7 +87,9 @@ claims:
 
 GaussianVision的核心洞察在于：2DGS的稀疏各向异性高斯分布天然适配图像的语义结构——高斯点密度隐含编码了区域重要性，其位置与协方差参数携带空间布局信息，而颜色参数保留了外观线索。通过设计专用的GS stem（含对数变换、傅里叶特征、归一化及Perceiver交叉注意力重采样器）和两阶段蒸馏-适应训练策略，可将这些压缩参数映射到与冻结RGB ViT兼容的嵌入空间，从而在不重新训练视觉编码器骨干的前提下实现高效视觉-语言对齐。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GaussianVision 的核心创新在于**将视觉-语言对齐的输入基底从密集 RGB 像素替换为紧凑的二维高斯泼溅（2DGS）参数表示**，并通过一系列配套设计使压缩后的表示能够有效驱动冻结的预训练 ViT，从而在显著降低数据传输和存储开销的同时保持有竞争力的零样本性能。这一创新体现在三个关键维度的系统性改变上。
 
@@ -141,7 +144,7 @@ GaussianVision 的贡献在于**首次系统性地验证了压缩高斯表示可
 - **对 RGB 教师的依赖**：两阶段训练策略意味着该方法本质上是 RGB 预训练模型的一种压缩适应方案，而非独立的表示学习范式。
 - **预处理成本**：即使经过 CUDA 加速，400 点配置处理 12.8M 图像仍需约 25.6 GPU 小时，对于更大规模数据集的可扩展性有待验证。
 
-## 整体框架
+
 
 GaussianVision 的核心思路是用紧凑的二维高斯泼溅（2DGS）参数替代原始 RGB 像素作为视觉编码器的输入，从而在保持视觉-语言对齐能力的同时大幅压缩图像表示。整个 pipeline 由三个逻辑阶段串联而成：**2DGS 拟合与压缩**、**GS Stem 嵌入映射**、以及**两阶段 CLIP 适应训练**，如图 1 所示。
 
@@ -170,7 +173,7 @@ $$\mathrm{Compression} = \frac{224 \times 224 \times 3 \times 18}{N_{\mathrm{GS}
 ![[assets/figures/papers/paper_list_l2391_https_arxiv_org_abs_2509_22615/figures/001_Figure_1.jpg]]
 *Figure 1: (a) Illustration of 2D Gaussian Splatting (2DGS) for image fitting. Each image is represented as a sparse mixture of anisotropic Gaussians parameterized by position, covariance, and color. Summing contributions from all splats reconstructs the original image (with a minor and configurable degradation loss), enabling compact, spatially adaptive representations. (b) 2DGS adaptation of contrastive language-image pre-training (CLIP). (c) Architecture of an autoregressive visual language model (VLM). (d) Architecture of our 2DGSadapted CLIP pipeline: a splat-aware stem embeds a configurable number of Gaussian points using Fourier features, log scaling, normalization layers, and projections. Thes...*
 
-## 核心模块与公式推导
+
 
 ### 2D高斯泼溅图像重建公式
 
@@ -277,7 +280,9 @@ GaussianVision采用**两阶段训练**以高效迁移RGB预训练知识：
 ![[assets/figures/papers/paper_list_l2391_https_arxiv_org_abs_2509_22615/figures/005_Figure_5.jpg]]
 *Figure 5: Visualization of Gaussian splats and reconstructed images for a 3136-point GS fit (2000 iterations). Left*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：压缩-精度权衡
 
@@ -364,7 +369,9 @@ GS编码器的训练采用两阶段策略：**Stage 1蒸馏**将GS stem对齐到
 ![[assets/figures/papers/paper_list_l2391_https_arxiv_org_abs_2509_22615/figures/021_Table_6.jpg]]
 *Table 6: Relative accuracy table with bold marking the best per row and underline marking the second-best per row*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从像素到高斯参数的视觉表示迁移
 
@@ -419,6 +426,8 @@ $$\hat{I}(x,y) = \sum_{i=1}^n \mathbf{c}_i \exp\left\{ -\frac{1}{2} \left( \begi
 4. **端到端边缘-云优化**：当前2DGS拟合和CLIP训练是解耦的，能否通过更先进的量化或熵编码方案进一步减小传输带宽，实现从边缘设备到云端的高效联合学习？
 
 **需要人工验证的方面：** 论文未提供GS表示在**视频数据**或**多帧时序输入**上的适用性分析，也未讨论2DGS拟合过程对图像分辨率变化的敏感性（所有实验基于224×224分辨率）。这些边界条件需要后续工作验证。
+
+
 
 ## 原文 PDF
 

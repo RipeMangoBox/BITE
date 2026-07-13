@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Childrens_Intelligence_Tests_Pose_Challenges_for_MLLMs_KidGym_A_2D_Grid_Based_Reasoning_Benchmark_for_MLLMs.pdf
+project_link: https://kidgym.github.io/KidGym-Website/
+code_link: null
 openreview_forum_id: Hj8Dc14nk1
 aliases:
 - Childrens_Intell
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 儿童智力测试对MLLMs构成挑战？KidGym：基于2D网格的推理基准测试 |
 | 英文题名 | Children's Intelligence Tests Pose Challenges for MLLMs? KidGym: A 2D Grid-Based Reasoning Benchmark for MLLMs |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=Hj8Dc14nk1); [Project](https://kidgym.github.io/KidGym-Website/) |
+| Links | [paper](https://openreview.net/forum?id=Hj8Dc14nk1) · [Project](https://kidgym.github.io/KidGym-Website/) |
 | Topic | #topic/benchmarks_datasets_evaluation #topic/benchmarks_datasets_evaluation/benchmark_eval |
 | Method | KIDGYM |
 | Dataset | KIDGYM Counting (CO) L1, KIDGYM Puzzle (PU) L1, KIDGYM Classification (CL) L1, KIDGYM Filling (FI) L1 |
@@ -41,7 +43,7 @@ claims:
 > - KIDGYM Puzzle (PU) L1 上，Success Rate 为 0.30 (GPT-5)，对比 0.25 (Random)，变化 +0.05。
 > - KIDGYM Classification (CL) L1 上，Success Rate 为 1.00 (o3)，对比 0.46 (GPT-4o)，变化 +0.54。
 
-## 概述
+## 概要
 
 **问题背景**：当前多模态大语言模型（MLLMs）在真实场景理解和语义任务上取得了显著进展，但它们在抽象推理、数量感知以及多能力复合任务上的表现仍远逊于人类，尤其是儿童智力测试所考察的非语义抽象视觉推理能力，构成了 MLLMs 的根本性短板。
 
@@ -57,13 +59,15 @@ claims:
 
 **方法谱系与知识库定位**：KIDGYM 处于 MLLM 评估基准与认知能力测试的交叉地带。它继承了强化学习环境（如 **MiniGrid** (Chevalier-Boisvert et al., NeurIPS 2023)）的交互范式，但面向 MLLMs 而非 RL 智能体；同时吸收了视觉推理基准（如 ARC-AGI-2）的抽象推理设计，但通过动态场景和多维能力框架提供了更全面的评估体系。其可扩展的 Gym API 接口使其成为研究 MLLM 认知能力的通用实验平台。
 
-## 背景与动机
+
 
 多模态大语言模型（MLLMs）在视觉问答、图像描述等语义密集型任务上已取得显著进展，但其在抽象视觉推理、数量感知以及多能力协同方面的表现仍不明朗。现有评估基准多聚焦于静态场景下的单一能力测试，难以系统揭示模型在动态交互环境中整合执行、记忆、学习、规划与感知推理等核心认知能力的真实水平。例如，**Crafter**（Hafner, 2021）和 **MiniGrid**（Chevalier-Boisvert et al., NeurIPS 2023）主要面向强化学习范式，而 **LogicGame**（Gui et al., 2024）、**EgoPlan**（Chen et al., 2024）等基准则缺乏难度层级划分与用户可扩展性（Table 1）。
 
 儿童智力测验通过多维度、分难度的任务设计来评估认知发展，这一思路为诊断 MLLMs 的根本性缺陷提供了启示。本文的核心动机在于：借鉴韦氏智力测验的评估框架，构建一个动态、可定制、覆盖五大核心能力的 2D 网格基准，以揭示 MLLMs 在非语义抽象推理、数量感知及复合能力上的真实瓶颈。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 KIDGYM 的核心创新在于将儿童智力测验范式系统性地迁移至多模态大模型（MLLM）评估，通过四个关键维度突破了现有基准的局限。
 
@@ -77,7 +81,7 @@ KIDGYM 的核心创新在于将儿童智力测验范式系统性地迁移至多�
 
 上述四个 changed slots 共同构成了 KIDGYM 的方法论贡献：它并非简单增加任务数量，而是通过动态性、层级化、多维度和可扩展性四个维度的协同设计，构建了一个能够揭示 MLLM 根本性能力缺陷的评估框架。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_Hj8Dc14nk1/figures/013_Table_1.jpg]]
 *Table 1: Comparison of KIDGYM with existing benchmarks across target paradigm, difficulty-level support, user extensibility, evaluated capabilities, and dynamic vs. static settings*
@@ -113,7 +117,7 @@ Table 1 将 KIDGYM 与 10 个现有基准进行了系统性对比。在目标范
 
 **证据强度说明**：上述模块关系与输入输出流均基于论文第 4 节（Mechanics）和第 6.2 节（实验设置）的明确描述，置信度较高。Table 1 的对比结论来自原文表格的直接呈现。需注意，框架内部各模块的具体实现细节（如随机种子管理、API 调用频率限制）未在论文中完整披露，若需复现应参考其开源代码仓库。
 
-## 核心模块与公式推导
+
 
 KIDGYM 本身是一个基准测试框架，不涉及模型架构层面的公式推导。其核心设计体现在环境构建与任务生成的工程化模块中，以下梳理支撑该基准的关键组件。
 
@@ -149,7 +153,9 @@ $$ \text{Success Rate} = \frac{\text{成功完成的任务轮数}}{\text{总评�
 
 > 注：本文未提供任何模型架构或损失函数相关的数学公式，因此本节不进行额外推导。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -214,7 +220,9 @@ KIDGYM 在零样本设定下对 9 个前沿 MLLM 进行了系统评估，包含 
 *Figure 8: (h) Counting*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 KIDGYM 的定位介于传统强化学习环境与静态多模态语言模型基准之间，其核心贡献在于将儿童智力测验范式转化为一个动态、可交互、多维度的评估框架。与现有工作相比，KIDGYM 在以下四个关键维度上形成了差异化。
 
@@ -227,6 +235,8 @@ KIDGYM 的定位介于传统强化学习环境与静态多模态语言模型基�
 **适用边界与局限。** KIDGYM 的适用边界受限于三个因素：（1）2D 网格环境的抽象性使其无法完全反映真实世界多模态任务的复杂性和噪声特征；（2）评估指标仅为成功率，未考虑效率、泛化能力或错误类型分析；（3）部分封闭模型通过 API 评估，内部推理过程不透明，难以深入诊断失败机制。此外，尽管任务场景和物品布局完全随机生成以降低数据泄露风险，但在有限的任务类型下，模型仍可能通过记忆特定模式而非真正推理来获得高分。
 
 **开放问题。** 本基准揭示的瓶颈指向四个关键研究方向：（1）如何提升模型对非语义、抽象视觉信息和数量特征的鲁棒处理能力，而非依赖高分辨率视觉线索的捷径；（2）如何设计训练策略使 MLLM 在复合能力任务中有效整合多种认知能力，而非各能力间的简单叠加；（3）ICL 在某些记忆和学习任务中劣于零样本的机理尚不明确，需进一步研究其适用范围和失效条件；（4）如何将 KIDGYM 的评估范式扩展到三维或真实世界环境，同时保持任务的可控性和可复现性。
+
+
 
 ## 原文 PDF
 

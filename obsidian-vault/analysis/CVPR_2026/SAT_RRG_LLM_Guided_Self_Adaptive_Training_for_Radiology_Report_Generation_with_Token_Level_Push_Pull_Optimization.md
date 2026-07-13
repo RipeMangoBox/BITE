@@ -42,15 +42,13 @@ claims:
 > - MIMIC-CXR 上，BLEU-4 0.143；ROUGE 0.303；RadGraph F1 0.205。
 > - IU-Xray 上，BLEU-4 0.196；ROUGE 0.400。
 
-## 概述
+## 概要
 
 放射学报告生成任务要求模型从胸部X光图像自动生成描述性文本。现有方法普遍采用标准交叉熵损失进行训练，对所有令牌一视同仁，缺乏针对语义冲突的令牌级反馈机制，导致模型难以识别和优先修正局部临床错误，如翻转发现或矛盾描述。这一瓶颈的根本原因在于，标准训练信号无法告知模型“哪些令牌说错了”以及“错在何处”。
 
 针对上述问题，本文提出 **SAT-RRG**（LLM-Guided Self-Adaptive Training for Radiology Report Generation），核心思路是利用冻结的大语言模型（LLM）裁判在训练时提供弱监督，自动定位语义不一致的令牌跨度，并据此施加**推拉式自适应梯度调制**：在错误令牌上施加排斥梯度以抑制其概率，在正确令牌上施加吸引梯度以增强自信。同时，该方法引入焦点置信度与归一化熵双重加权机制，以区分“过度自信的错误”与“不确定的错误”两种不同错误模式，实现无需额外人工标注的自我纠正训练。
 
 在 MIMIC-CXR 和 IU-Xray 两个公开数据集上，SAT-RRG 相较 **R2GenGPT**（Wang et al., 2023）和 **Bootstrapping**（Liu et al., AAAI 2024）等方法在 BLEU-4 上分别提升约 7.5% 和 12.5%，并在临床指标 RadGraph F1 和 RadCliQ 上取得更优结果。消融实验进一步证实，错误令牌仅占总令牌的 12.5%，但对这些稀疏关键跨度的针对性优化是性能提升的主要驱动力；同时使用错误令牌自适应惩罚损失（ETAPL）和正确令牌自适应损失（CTAL）可达到最佳性能，且移除焦点权重或熵调制均导致指标下降。推理阶段无需调用 LLM 裁判，无额外计算开销。
-
-## 背景与动机
 
 放射学报告生成（Radiology Report Generation, RRG）旨在从胸部X光图像中自动生成描述性临床报告，其核心挑战在于准确捕捉异常发现并避免语义层面的错误陈述。现有主流方法通常采用编码器-解码器架构，以标准交叉熵损失进行端到端训练。然而，这种训练范式存在一个根本性瓶颈：**对所有令牌一视同仁，缺乏针对语义冲突的令牌级反馈机制**，导致模型难以识别和优先修正局部临床错误，例如翻转发现（将“无胸腔积液”误报为“存在胸腔积液”）或产生矛盾描述。
 
@@ -60,7 +58,7 @@ claims:
 
 综上，本工作的核心动机在于：**利用冻结LLM裁判在训练时提供弱监督，自动定位语义不一致的令牌跨度，并据此施加推拉式自适应梯度调制，在无需额外人工标注的前提下实现模型的自我纠正训练**。
 
-## 核心创新
+## 核心方法与创新机理
 
 SAT-RRG 的核心创新在于将标准交叉熵训练中“所有令牌一视同仁”的范式，重构为**令牌级推拉优化的自适应训练框架**。其关键突破体现在以下三个相互耦合的 changed slots 上。
 
@@ -94,8 +92,6 @@ SAT-RRG 的核心创新在于将标准交叉熵训练中“所有令牌一视同
 
 与 **R2GenGPT**（Wang et al., 2023）等传统方法相比，SAT-RRG 的根本区别不在于模型架构，而在于训练信号的质变：从“最大化参考令牌概率”的单一目标，升级为“在 LLM 引导下自我识别错误并针对性修正”的闭环学习范式。与 **Bootstrapping**（Liu et al., AAAI 2024）等自训练方法相比，SAT-RRG 的推拉机制直接操作于令牌概率空间，避免了多轮生成-重训练的高昂开销，同时通过熵-焦点联合加权实现了对不同错误模式的细粒度自适应。
 
-## 整体框架
-
 SAT-RRG 构建在一个视觉-语言生成管道之上，其训练过程引入了一个**在线语义自检**机制，使模型能够在无需额外人工标注的条件下，从自身预测的错误中学习。整个框架由三个核心阶段串联而成：报告生成、错误令牌识别和推拉式自适应训练，推理时则回归到标准的单次前向生成。
 
 ### 管道组成与数据流
@@ -122,8 +118,6 @@ SAT-RRG 构建在一个视觉-语言生成管道之上，其训练过程引入�
 
 ![[assets/figures/papers/paper_list_l2342_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_SAT_RRG_LLM_Guided/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the SAT–RRG training framework. (A) The image encoder and visual mapper project the chest X-ray into the LLM’s token embedding space, allowing the model to generate an initial report using both visual features and textual prompts. (B) During training, the same LLM is prompted again to identify semantic inconsistencies between the predicted and reference reports. The highlighted spans are treated as error tokens and assigned adaptive weights derived from token-level uncertainty and confidence, producing the corrective ETAPL and CTAL losses that update the generator. (C) At inference, only the image and system prompt are required, error identification is disabled, and the trained...*
-
-## 核心模块与公式推导
 
 ### 3.1 错误令牌识别与弱监督信号生成
 
@@ -191,12 +185,7 @@ $$\mathcal{L}_{\mathrm{total}} = \alpha \mathcal{L}_{\mathrm{CE}} + (1 - \alpha)
 
 **推理阶段**：错误令牌识别仅用于训练，推理时 LLM 裁判被完全移除，模型仅依赖视觉编码器和系统提示直接生成报告，无额外计算开销。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2342_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_SAT_RRG_LLM_Guided/figures/002_Figure_2.jpg]]
-*Figure 2: Illustration of token-level probability adjustment during SAT-RRG training. The LLM marks incorrect tokens (Consolidation, is, present) and correct tokens (No, pleural, effusion). CTAL increases the probabilities of correct tokens, while ETAPL decreases the probabilities of incorrect ones. The plot shows how initial probabilities are adaptively updated under the joint effects of the two losses*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验结果：NLG指标与临床指标的双重验证
 
@@ -243,19 +232,13 @@ Figure 3展示了应用令牌级监督前后的错误令牌纠正对比。LLM裁
 ![[assets/figures/papers/paper_list_l2342_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_SAT_RRG_LLM_Guided/figures/005_Figure_3.jpg]]
 *Figure 3: Comparison of error tokens in the generated report before and after TLS. The highlighted errors are marked in corresponding colors to show the corrections made*
 
-![[assets/figures/papers/paper_list_l2342_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_SAT_RRG_LLM_Guided/figures/006_Figure_4.jpg]]
-*Figure 4: Token-level confidence and entropy distributions. Blue and orange histograms denote correct and erroneous tokens, respectively. Left: Confidence distribution — erroneous tokens mainly lie in the mid-confidence region (0.6–0.75), while correct tokens shift toward higher confidence (0.7–0.9), suggesting that most errors occur when the model is uncertain. Right: Entropy distribution — erroneous tokens show slightly lower entropy, revealing that some tokens are predicted incorrectly with high confidence, i.e., “confident mistakes.”*
-
-![[assets/figures/papers/paper_list_l2342_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_SAT_RRG_LLM_Guided/figures/008_Figure_5.jpg]]
-*Figure 5: Confidence–entropy correlation of tokens. Each point corresponds to a generated token, with blue and red denoting correct and erroneous tokens, respectively. Two distinct error modes emerge: (1) Over-confident errors — low-entropy, highconfidence predictions that require strong penalization through ETAPL; and (2) Uncertain errors — high-entropy, low-confidence predictions that are softly corrected via entropy weighting. The coexistence of both modes empirically validates the necessity of our joint focal–entropy adaptive scheme*
-
 ![[assets/figures/papers/paper_list_l2342_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_SAT_RRG_LLM_Guided/figures/009_Table_4.jpg]]
 *Table 4: Ablation study for loss components*
 
 ![[assets/figures/papers/paper_list_l2342_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_SAT_RRG_LLM_Guided/figures/010_Table_5.jpg]]
 *Table 5: Effect of the focal focusing parameter γ. Results are averaged over three runs*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 核心创新定位
 

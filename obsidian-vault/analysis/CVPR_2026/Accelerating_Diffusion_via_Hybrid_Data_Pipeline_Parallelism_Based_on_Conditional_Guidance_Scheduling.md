@@ -43,7 +43,7 @@ claims:
 > - SD3 (MS-COCO 2014, 2 GPUs) 上，Latency (s) 9.33 vs 19.36 (Original single-GPU) (2.07× speed-up)；FID (w/ G.T.) 33.322 vs 33.433 (Original) (-0.111)；LPIPS (w/ G.T.) 0.780 vs 0.810 (Original) (-0.030)。
 > - SDXL (消融实验, 2 GPUs) 上，Speed-Up 2.31× (全混合) vs 1.78× (仅条件分区) (+0.53×)。
 
-## 概述
+## 概要
 
 扩散模型在高质量图像生成领域取得了显著成功，但推理速度慢始终是部署瓶颈。现有分布式推理加速方案主要分为两类：基于图像补丁的数据并行（如DistriFusion）和基于异步流水线的模型并行（如AsyncDiff）。前者因全聚合（all-gather）操作和补丁边界伪影导致加速有限且质量下降；后者则承受高昂的异步通信开销和误差累积，加速比难以随GPU数量线性扩展。两者均无法在不牺牲生成质量的前提下实现与GPU数量成比例的加速。
 
@@ -55,7 +55,7 @@ claims:
 
 **方法定位**：Hybridiff属于扩散模型推理加速中的分布式并行方法，其条件分区策略为数据并行提供了新视角，自适应切换机制则突破了传统静态调度的加速上限。该方法不修改模型权重，可与现有加速技术（如步数缩减、模型蒸馏）正交叠加。当前实现针对双GPU场景优化，向更多GPU扩展的批量级和层级流水线方案已在附录中给出初步设计，但单图像超过2的并行度仍待进一步验证。
 
-## 背景与动机
+
 
 扩散模型已成为图像生成的主流范式，但其推理过程需要迭代执行数十步去噪，每一步都涉及大规模神经网络的前向传播，导致生成延迟居高不下。以 Stable Diffusion XL（SDXL）为例，在单张 NVIDIA RTX 3090 GPU 上生成一张 1024×1024 图像需耗时约 16.5 秒，难以满足交互式应用对实时性的需求。分布式并行推理是缓解这一瓶颈的直接思路，然而现有方法在加速比、生成质量与通用性之间面临显著的权衡困境。
 
@@ -79,7 +79,9 @@ CFG 在每一步去噪中需同时计算两个噪声估计：**条件去噪路�
 
 基于以上动机，本文提出 **Hybridiff**——一种结合条件分区数据并行与自适应流水线切换的混合并行框架，旨在突破现有分布式扩散推理的加速上限，同时几乎不牺牲生成质量。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 从图像分块到条件分区：数据并行策略的根本转变
 
@@ -107,7 +109,7 @@ $$\mathrm{rel-MAE}_t(\epsilon_c, \epsilon_u) = \frac{\mathbb{E}_{\mathbf{x}, \ep
 
 并行区间长度 $k$ 提供了直观的速度-质量权衡旋钮（Table 4, Figure 6）：当 $k$ 从5增至30时，加速比从2.31×上升至2.78×，但FID从4.100恶化至9.191。这一可控的帕雷托前沿使方法在不同应用场景下具有灵活的部署能力。
 
-## 整体框架
+
 
 Hybridiff 提出了一种面向扩散模型推理的**混合数据-流水线并行框架**，其核心思想是将分类器无关引导（CFG）中的条件与无条件去噪路径重新解释为两种天然的数据并行流，并利用两者之间的**去噪差异（denoising discrepancy）**动态决定何时激活流水线并行，从而在几乎不损失生成质量的前提下突破传统分布式并行方法的加速上限。
 
@@ -173,7 +175,7 @@ $$\mathrm{rel\text{-}MAE}_t(\epsilon_c, \epsilon_u) \approx \frac{\| \nabla_{\ma
 ![[assets/figures/papers/paper_list_l834_https_arxiv_org_abs_2602_21760/figures/002_Figure_2.jpg]]
 *Figure 2: Comparison of parallel strategies for diffusion inference. (a) Patch-based data parallel frameworks suffer from bottlenecks caused by all-gather operations and artifacts at patch boundaries, leading to limited acceleration and quality degradation. (b) Pipeline parallel frameworks incur excessive asynchronous communication overhead and accumulate estimate errors. (c) Our hybrid parallelism, which incorporates condition-based data parallelism, adaptively combines both paradigms to achieve high fidelity and fast generation*
 
-## 核心模块与公式推导
+
 
 ### 3.1 整体框架与三阶段划分
 
@@ -239,7 +241,9 @@ $$
 ![[assets/figures/papers/paper_list_l834_https_arxiv_org_abs_2602_21760/figures/004_Figure_4.jpg]]
 *Figure 4: Illustration of the rel*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果与核心性能
 
@@ -293,7 +297,9 @@ $$
 ![[assets/figures/papers/paper_list_l834_https_arxiv_org_abs_2602_21760/figures/001_Figure_1.jpg]]
 *Figure 1: Summary of the proposed hybrid data-pipeline parallelism. Our method consistently outperforms prior distributed approaches across five key aspects: Speed-up, Image Quality, Generality, High-resolution Synthesis, and Communication Cost, demonstrating robust and balanced acceleration-quality trade-offs*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有并行策略的关系
 
@@ -331,6 +337,8 @@ $$
 4. **跨模态迁移**：将该并行策略应用于视频扩散模型（如 Sora 类架构）或音频生成时，条件/无条件分支的语义差异模式是否仍呈现 U 形？视频模型中的时序一致性约束是否对并行切换时机提出额外要求？
 
 5. **与推理优化技术的协同**：条件分区策略与模型量化、剪枝、知识蒸馏等推理优化技术的组合效应如何？是否存在加速收益的叠加或饱和效应？
+
+
 
 ## 原文 PDF
 

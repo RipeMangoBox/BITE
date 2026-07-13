@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/ptextrm_less_Sampling_A_Robust_Hyperparameter_Free_Approach_for_LLM_Decoding.pdf
+project_link: null
+code_link: https://github.com/ryttry/p-less
 aliases:
 - PLS
 - PTLSRHFALD
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | p-less采样：一种鲁棒的无超参数LLM解码方法 |
 | 英文题名 | $p\textrm{-less}$ Sampling: A Robust Hyperparameter-Free Approach for LLM Decoding |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=ItFuNJQGH4); [GitHub](https://github.com/ryttry/p-less) |
+| Links | [paper](https://openreview.net/forum?id=ItFuNJQGH4) · [GitHub](https://github.com/ryttry/p-less) |
 | Topic | #topic/representation_self_supervised_transfer #topic/representation_self_supervised_transfer/probabilistic_methods |
 | Method | p-less sampling |
 | Dataset | CSQA, GPQA, GSM8K, QASC |
@@ -42,7 +44,7 @@ claims:
 > - GPQA 上，AUC 为 0.242 (p-less, Llama2-7b)，对比 0.238 (min-p, Llama2-7b)，变化 +0.004。
 > - GSM8K 上，AUC 为 0.267 (p-less, Llama2-7b)，对比 0.266 (min-p, Llama2-7b)，变化 +0.001。
 
-## 概述
+## 概要
 
 现有LLM解码的截断式采样方法（如top-p、top-k、min-p）的性能高度依赖超参数，且最优超参数随任务和温度剧烈变化，导致高温下文本质量严重退化。本文提出p-less采样，一种基于信息论的无超参数解码方法，通过计算整个token概率分布的二阶矩（即概率平方和L[P] = Σ P(v)²）作为动态截断阈值，该阈值与Rényi二阶熵（碰撞熵）直接相关，随分布熵自适应变化。
 
@@ -50,7 +52,7 @@ claims:
 
 在Llama2-7b、Mistral-7b、Llama3-70b三个模型以及数学推理（GSM8K）、逻辑推理（CSQA、QASC、GPQA）和创意写作（Writing Prompts）五个数据集上的实验表明：p-less在多数设置下取得最优或次优的AUC值，在高温下性能退化最小；在创意写作任务中，p-less在τ=2.0时长度控制胜率达65.64（Llama2-7b），而top-p降至0；人类评估中p-less以58.8%多数票获胜。此外，p-less的平均采样速度最快（每token 0.01942秒），比min-p快22%，且CPU时间和RAM使用量均最低。
 
-## 背景与动机
+
 
 现有的大语言模型（LLM）解码方法，如 top-p、top-k、min-p 等截断式采样，普遍依赖一个关键假设：存在一组固定的超参数（如 top-p 的 p 值、top-k 的 k 值、min-p 的 p_min 值）能够在所有生成场景下有效工作。然而，这一假设在实际应用中面临根本性挑战——超参数的最优取值不仅随生成任务类型变化，更会因采样温度的改变而剧烈波动。具体而言，当温度升高时，token 概率分布趋于平坦，长尾中低概率 token 的概率值被放大，传统固定阈值方法（如 top-p）会将这些低质量 token 大量纳入采样集，导致文本质量严重退化。这一瓶颈的本质在于：现有方法的截断阈值仅依赖于分布的部分统计量（如累积概率、模态概率），缺乏对分布整体形态的感知能力，因此无法在分布熵变化时自适应调整。
 
@@ -60,7 +62,9 @@ $$L[P_\theta] = \sum_{v \in \mathcal{V}} P_\theta(v \mid x_{1:t-1})^2$$
 
 该阈值 $L[P_\theta]$ 与分布熵呈负相关——当分布集中（低熵）时阈值较高，仅保留少数高概率 token；当分布平坦（高熵）时阈值自动降低，但仍能有效截断长尾中概率过低的 token。这种动态自适应特性使得 p-less 无需任何超参数，且能保证候选集非空（因为至少模态概率 $\geq L[P_\theta]$）。p-less 的因果机制可概括为：通过捕捉分布的二阶矩信息，将截断阈值与分布熵建立直接联系，从而在温度变化时自动调整候选集大小，避免高温下低概率 token 的涌入。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 p-less 采样的核心瓶颈在于现有截断式采样方法（如 top-p、top-k、min-p）的性能高度依赖人工调节的超参数，且这些超参数的最优值会随生成任务和采样温度剧烈变化，导致高温下文本质量严重退化。p-less 通过引入一个完全由数据驱动的、无超参数的动态截断机制来破解这一瓶颈。
 
@@ -81,7 +85,7 @@ p-less 采样的核心瓶颈在于现有截断式采样方法（如 top-p、top-
 - p-less 在准确率-多样性前沿上表现出帕累托优势：在相同多样性水平下，p-less 的准确率高于其他方法（Figure 3）。
 - p-less 的计算效率最高：平均每 token 采样时间仅 0.01942 秒，比 min-p 快 22%（Table 3），且 CPU 时间和 RAM 使用量均低于 top-p 和 min-p（Table 15）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0001_ItFuNJQGH4_ptextrm-less_Sampling_A_Robust_Hyperparameter-Fr/figures/005_Figure_2.jpg]]
 *Figure 2: Accuracy vs. temperature curves of each method on CSQA, QASC, and GSM8k using Llama-2-7b. AUC values achieved by each method are provided in the legend (in parentheses) with the best AUC in bold*
@@ -100,7 +104,7 @@ p-less采样是一个完全无超参数的LLM解码方法，其核心pipeline由
 
 **变体p-less_norm**：论文还提出了一个变体，其阈值为 $\bar{L}[P_\theta] = \frac{|\mathcal{V}|}{|\mathcal{V}| - 1} L[P_\theta] - \frac{1}{|\mathcal{V}| - 1}$，该值比 $L[P_\theta]$ 更小，因此候选集更宽松，在需要更高多样性的场景下表现更优。论文未提供明确的选择指导原则，这是该框架的一个开放问题。
 
-## 核心模块与公式推导
+
 
 ### 核心思想与瓶颈
 
@@ -186,7 +190,9 @@ p-less 采样的完整流水线包含三个模块：
 
 该流程在每个解码步骤重复执行，无需任何超参数调节。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：数学与逻辑推理任务
 
@@ -233,7 +239,9 @@ p-less的k阶泛化（基于Rényi熵的更高阶）在DeepSeek-R1-Distill-Qwen-
 
 附录C.13分析了两类典型失败模式。**失败模式1**（Figure 18）：在复杂算术运算步骤处，模型分布的熵突然激增，导致p-less接纳了过多低概率token，最终使算术计算结果出错。**失败模式2**（Figure 19）：问题表述本身存在歧义时，p-less在推理链起始处就选择了错误的理解路径，后续推理虽然逻辑一致但基于错误的前提。这两种模式本质上都是p-less依赖模型自身概率分布的副作用——当模型对正确答案的置信度不足时，任何基于概率的截断方法都难以避免错误。需要指出的是，这些失败模式的分析基于少量示例（附录C.13），其普遍性和频率需要更大规模的系统评估来确认。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 p-less采样方法定位于LLM解码中截断式采样（truncation sampling）这一技术谱系，其核心创新在于**完全消除超参数**，并利用信息论中的Rényi二阶熵（碰撞熵）来动态确定截断阈值。与现有方法相比，p-less从根本上改变了阈值确定方式：从依赖人工设定的固定超参数（如top-p的累积概率阈值p、top-k的固定k值、min-p的模态概率倍数p_min）转向基于整个概率分布的二阶矩（即概率平方和 $L[P_\theta] = \sum_{v \in \mathcal{V}} P_\theta(v)^2$）。这一转变使得p-less在以下三个关键维度上展现出系统性优势。
 
@@ -244,6 +252,8 @@ p-less采样方法定位于LLM解码中截断式采样（truncation sampling）�
 **局限与失败模式**：论文识别出两种典型失败模式。失败模式1（Figure 18）发生在复杂算术运算处：当模型需要执行多步算术计算时，熵的突增导致p-less接纳过多低概率token，最终使答案计算错误。失败模式2（Figure 19）源于问题表述本身的歧义：p-less可能在推理链起始处就产生误解，即使后续推理逻辑一致，也无法纠正初始错误。这两种模式表明，p-less对分布熵的敏感性既是优势也是弱点——当熵突增反映的是模型对计算步骤的不确定性（而非需要探索的多样性）时，p-less的阈值机制可能适得其反。此外，实验主要集中于数学、逻辑推理和创意写作任务，在其他领域（如代码生成、翻译、对话）的表现尚未验证。p-less在多语言场景下的行为也未探讨，词汇表大小和语言特性可能影响阈值行为。
 
 **开放问题**：第一，p-less_norm与p-less在不同任务和温度下的选择标准是什么？是否存在一个统一的框架来自动选择最优变体？第二，p-less的k阶泛化（基于Rényi熵的更高阶）是否能在某些场景下带来进一步改进？初步实验显示（Table 9），高阶泛化在部分数据集上有轻微提升，但缺乏系统性规律。第三，p-less能否与对比解码、算术采样等互补方法结合使用，以进一步提升生成质量？第四，p-less在非常大的模型（如100B+参数）或推理模型上的行为是否与本文观察一致？在DeepSeek-R1-Distill-Qwen-7B上的初步验证（Table 7）表明p-less在推理模型上同样有效，但需要更多大模型实验来确认其可扩展性。
+
+
 
 ## 原文 PDF
 

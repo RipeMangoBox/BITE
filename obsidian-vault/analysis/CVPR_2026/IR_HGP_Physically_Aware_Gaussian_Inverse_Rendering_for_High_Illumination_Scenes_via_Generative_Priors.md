@@ -43,7 +43,7 @@ claims:
 > - RelightObj 上，PSNR (Mean) 33.61 vs DiscretizedSDF 32.12 (+1.49)；SSIM (Mean) 0.9761 vs DiscretizedSDF 0.9700 (+0.0061)；LPIPS (Mean) 0.0369 vs DiscretizedSDF 0.0453 (-0.0084)。
 > - Mip-NeRF 360 上，PSNR/SSIM/LPIPS 26.92/0.807/0.196 vs Outperforming NVS and inverse rendering baselines (N/A)。
 
-## 概述
+## 概要
 
 高光照场景下的3D高斯泼溅（3DGS）逆渲染面临一个根本瓶颈：**材质与光照的耦合难以分离**。现有3DGS方法缺乏物理可解释性，在高动态范围（HDR）光照条件下，镜面高光和阴影容易被错误地“烘焙”进反射率图中，导致重光照结果失真。
 
@@ -53,7 +53,7 @@ IR-HGP通过三个关键机制打破这一瓶颈：**混合可见性分解（HVD
 
 从方法谱系来看，IR-HGP属于**物理感知的3DGS逆渲染**路线，区别于纯NeRF逆渲染（如TensoIR）和纯3DGS逆渲染（如GS-IR），其核心创新在于将显式几何代理、扩散生成先验与自适应辐射校正三者协同引入高斯表示框架，在保持实时渲染能力（92 FPS）的同时，实现了高光照场景下材质-光照的物理正确分离。
 
-## 背景与动机
+
 
 ### 高光照场景下的逆渲染困境
 
@@ -81,7 +81,9 @@ IR-HGP通过三个关键机制打破这一瓶颈：**混合可见性分解（HVD
 
 通过三者协同，IR-HGP在RelightObj与Mip-NeRF 360等基准上实现了材质-光照分解质量的显著提升，为高光照场景的可重光照3D资产构建提供了新的技术路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 IR-HGP 的核心创新在于通过三个**物理感知的 changed slots**，系统性地解决了 3DGS 在高光照场景下材质与光照难以解耦的根本瓶颈——即**缺乏物理可解释性导致的镜面高光与阴影烘焙**问题。这三个模块分别从可见性建模、光照先验约束和辐射校正三个维度，构建了物理正确的逆渲染优化空间。
 
@@ -107,7 +109,7 @@ PARC 的核心是一个单变量可学习曝光参数 $\beta$，它扩展了标�
 
 三个 changed slots 并非孤立运作，而是形成了**物理正确的逆渲染优化闭环**：HVD 提供物理正确的可见性 $V$，使得 PBR 着色方程（Eq. 8）中的直接/间接光照分解建立在真实的几何遮挡之上；GIFP 为环境光照图提供生成先验约束，防止优化陷入材质-光照耦合的局部最优；PARC 稳定 HDR 损失梯度，确保高光区域的优化信号不被扭曲。三者共同作用于总损失函数（Eq. 9）的优化过程，使得 IR-HGP 在高光照场景下实现了对 **TensoIR**（Jin et al., CVPR 2023）、**DiscretizedSDF**（Zhu et al., ICCV 2025）等基线方法的全面超越（RelightObj 平均 PSNR 33.61 vs. 次优 32.12，Table 1）。
 
-## 整体框架
+
 
 IR-HGP 的整体 pipeline 围绕一个核心矛盾展开：**高光照场景下，3D Gaussian Splatting 的材质与光照耦合难以分离，导致镜面高光和阴影被错误地“烘焙”进材质图**。为解决这一问题，框架将物理正确性显式注入逆渲染的每个关键环节，形成三条协同主线——可见性、光照先验与辐射校正。
 
@@ -171,7 +173,7 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{c}} + \lambda_{\mathrm{g}}
 ![[assets/figures/papers/paper_list_l2524_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_IR_HGP_Physicall/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of our framework. Our Hybrid Visibility Decomposition (HVD) yields 2D Gaussian surfels and an explicit mesh. The mesh provides physically-accurate ray-traced visibility. This visibility modulates the PBR shading, which is lit by an HDR map. Our Generative Illumination Field Prior (GIFP) regularizes this map. Finally, the Physics-Aware Radiance Correction (PARC) module uses a single learnable exposure*
 
-## 核心模块与公式推导
+
 
 IR-HGP 围绕三个核心模块构建，分别解决高光照场景逆渲染中的可见性、光照先验和辐射校正问题。以下逐一展开其设计动机、数学形式与作用机制。
 
@@ -250,7 +252,9 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{c}} + \lambda_{\mathrm{g}}
 
 其中 $\mathcal{L}_{\mathrm{c}}$ 为PARC颜色损失，$\mathcal{L}_{\mathrm{g}}$ 为SDS生成损失，$\mathcal{L}_n$ 为法线一致性损失，$\mathcal{L}_{\mathrm{smooth}}$ 为材质平滑正则项。各权重系数通过实验调优确定。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -308,7 +312,9 @@ Table 2和Figure 7-9展示了逐模块消融结果，每个模块的增益稳定
 ![[assets/figures/papers/paper_list_l2524_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_IR_HGP_Physicall/figures/001_Figure_1.jpg]]
 *Figure 1: Our IR-HGP exhibits a significant advantage in high-quality Novel View Synthesis and environment map reconstruction under highly illuminated scenes, ensuring both lighting consistency and color fidelity. Compared to previous methods, our approach significantly enhances accuracy and realism for challenging High-Illumination scenes*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 3DGS逆渲染的方法谱系
 
@@ -351,6 +357,8 @@ IR-HGP在这一谱系中的定位是**物理感知的生成式逆渲染**。其�
 3. **自适应色调映射的空间泛化**：PARC模块使用单变量曝光参数β进行全局色调映射校正，但极端局部高光区域（如金属表面的镜面反射峰值）可能需要空间变化的色调映射策略。将PARC与局部自适应机制结合是否能够进一步改善高光区域的材质-光照解耦质量？
 
 4. **多模态先验的融合**：当前仅使用扩散模型提供光照先验，是否可以将语言引导或物理约束（如光源类型、色温范围）作为额外的先验条件，使逆渲染在稀疏输入或歧义场景下更加鲁棒？
+
+
 
 ## 原文 PDF
 

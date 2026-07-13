@@ -35,7 +35,7 @@ claims:
 | 中文题名 | 扩散着色器：三维感知视频扩散模型实现多功能视频生成控制 |
 | 英文题名 | Diffusion as Shader: 3D-aware Video Diffusion for Versatile Video Generation Control |
 | 会议/期刊 | SIGGRAPH 2025 |
-| Links | [paper](http://arxiv.org/abs/2501.03847v2) · [Project](https://igl-hkust.github.io/das/) · [arXiv](https://arxiv.org/abs/2309) · [Code](https://github.com/black-forest-labs/flux) |
+| Links | [paper](http://arxiv.org/abs/2501.03847v2) · [Project](https://igl-hkust.github.io/das/) · [paper](https://arxiv.org/abs/2309) · [Code](https://github.com/black-forest-labs/flux) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation #topic/vision_multimodal_applications/3d_rendering_reconstruction #topic/generative_models_diffusion |
 | Method | Diffusion as Shader (DaS) |
 | Dataset | Camera Control, Motion Transfer, Mesh-to-Video Generation, Object Manipulation |

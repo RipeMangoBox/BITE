@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/MTVCraft_Tokenizing_4D_Motion_for_Arbitrary_Character_Animation.pdf
+project_link: null
+code_link: https://github.com/DINGYANB/MTVCrafter
 openreview_forum_id: m7AQM9H6wa
 aliases:
 - MMTVC
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | MTVCraft：面向任意角色动画的4D运动分词 |
 | 英文题名 | MTVCraft: Tokenizing 4D Motion for Arbitrary Character Animation |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=m7AQM9H6wa); [GitHub](https://github.com/DINGYANB/MTVCrafter) |
+| Links | [paper](https://openreview.net/forum?id=m7AQM9H6wa) · [GitHub](https://github.com/DINGYANB/MTVCrafter) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | MTVCraft (Motion Tokenization Video Crafter) |
 | Dataset | TikTok, Fashion |
@@ -42,7 +44,7 @@ claims:
 > - TikTok 上，FID 为 20.70 (MTVCraft-18B)，对比 28.47 (Unianimate-DiT)，变化 -7.77 (27.3% improvement)。
 > - Fashion 上，FVD 为 64.88 (MTVCraft-18B)，对比 70.47 (Animate-X)，变化 -5.59 (7.9% improvement)。
 
-## 概述
+## 概要
 
 角色图像动画的核心挑战在于，如何将驱动视频中的运动迁移到任意外观的参考角色上，同时保持身份一致性和运动准确性。现有方法普遍依赖从3D人体网格渲染的2D姿态图像（如骨架图或SMPL网格渲染）作为运动条件，这一范式存在根本性缺陷：2D渲染过程会不可避免地丢失真实的4D时空运动信息，且模型倾向于逐像素复制固定形状的姿态图，而非学习深层运动语义。当参考角色的身体比例与驱动姿态不匹配、或面临大幅度运动时，这种像素级对齐策略会导致严重的身份失真和运动伪影。
 
@@ -50,7 +52,7 @@ MTVCraft通过**直接对原始4D运动序列进行离散化分词**，从根本
 
 在公开的TikTok和Fashion基准上，MTVCraft全面超越所有现有方法。以TikTok基准为例，MTVCraft-18B取得FVD 276.65（对比Unianimate-DiT的402.14，提升31.2%）和FID 20.70（对比Unianimate-DiT的28.47，提升27.3%）。消融实验确认，离散量化、差分运动表示和显式4D位置编码是性能的关键驱动力——移除4D位置编码会导致FVD从317.21急剧升高至548.31。模型还展现出强大的零样本泛化能力，可对训练中未见过的任意风格角色、动物乃至无生命物体进行动画驱动。当前框架的主要局限在于缺乏手部精细化控制，且针对单人场景设计，尚未有效支持多人交互场景。
 
-## 背景与动机
+
 
 角色图像动画（Character Image Animation）的核心任务是，给定一张参考角色图像和一段驱动视频，生成该角色执行驱动视频中姿态序列的连贯视频。这一技术在虚拟主播、数字人、影视制作和交互式娱乐等领域具有广泛的应用前景。
 
@@ -80,7 +82,9 @@ MTVCraft通过**直接对原始4D运动序列进行离散化分词**，从根本
 
 基于上述动机，本文提出 **MTVCraft（Motion Tokenization Video Crafter）**，首次构建了直接对4D运动进行分词并用于任意角色动画的完整框架。其核心组件包括：将SMPL关节点序列量化为离散4D运动标记的**4D运动分词器（4DMoT）**，以及通过4D运动注意力和4D旋转位置编码（4D RoPE）将运动标记注入视频DiT的**运动感知视频扩散Transformer（MV-DiT）**。该设计从根本上规避了2D渲染范式的固有缺陷，在公开基准上取得了新的最先进性能，并展现出对任意角色、风格乃至非人类对象的零样本泛化能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MTVCraft的核心创新在于**放弃传统的2D姿态图像渲染，直接对原始4D运动序列进行离散化分词**，从根本上改变了角色动画的运动条件表示方式。这一范式转换催生了三个紧密耦合的技术突破：
 
@@ -108,7 +112,7 @@ MTVCraft放弃了复杂的参考网络（如AnimateAnyone的双分支架构）�
 
 MTVCraft位于**视频扩散Transformer + 显式4D运动条件**的交叉点。与依赖2D渲染姿态的基线（Unianimate-DiT、MimicMotion、ControlNeXt等）相比，其核心差异在于将运动条件从“像素级姿态复制”提升为“语义级运动理解”。与同样使用SMPL参数的MusePose、MooraAA等方法相比，MTVCraft通过离散分词和4D注意力实现了更紧凑、更鲁棒的运动-视觉交互。当扩展至18B参数（基于Wan-2-1-14B）时，通过零填充维度对齐和联合文本-运动控制分支（Figure 6），进一步验证了该范式的可扩展性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_m7AQM9H6wa/figures/004_Figure_4.jpg]]
 *Figure 4: Architecture of MTVCraft-6B. Based on the video DiT model, we design unique 4D motion attention to leverage 4D motion tokens as context for vision generation. To enhance spatialtemporal relationships, we apply 4D RoPE over ( $\operatorname { t } , \operatorname { x } , \operatorname { y }$ , z) coordinates to attention keys and queries
@@ -146,7 +150,7 @@ MTVCraft 的整体流水线围绕一个核心洞察展开：**直接对原始4D�
 
 MTVCraft展示了从6B到18B的平滑扩展能力。6B版本基于CogVideoX-5B构建，18B版本则迁移至Wan-2-1-14B。扩展的关键在于维度对齐策略（零填充）和联合文本-运动控制分支的引入（见图6），使得更大规模的预训练视频生成模型能够直接复用4DMoT产出的运动标记，无需重新训练分词器。这种模块化设计验证了4D运动标记作为一种通用运动表示形式的潜力。
 
-## 核心模块与公式推导
+
 
 MTVCraft的核心创新在于将角色动画的条件信号从传统的2D姿态渲染图像彻底重构为**离散化的4D运动标记**，并通过专门设计的运动感知视频扩散Transformer实现标记与视觉生成的交互。整个框架由两大关键模块构成：4D运动分词器（4DMoT）和运动感知视频DiT（MV-DiT）。
 
@@ -198,7 +202,9 @@ $$\mathbf{V} = \mathrm{LayerNorm}(W_{v}(z_{\mathrm{motion}}))$$
 
 当扩展至18B参数版本（基于Wan-2-1-14B）时，运动标记维度（3072）与DiT隐藏维度（5120）不匹配。MTVCraft采用零填充沿通道维度对齐，同时增加文本-图像联合控制分支，在不破坏预训练权重的前提下实现规模扩展。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 
@@ -262,7 +268,9 @@ Figure 8从两个维度分析了4DMoT码本的质量。左图显示，推理阶�
 
 Figure 12展示了4DMoT和MV-DiT的训练损失曲线。分词器的重建损失和承诺损失均平滑收敛，表明VQVAE训练稳定且未出现码本崩塌。MV-DiT的扩散损失逐步下降，验证了运动感知训练策略的有效性。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心设计哲学与范式转变
 
@@ -326,6 +334,8 @@ MTVCraft采用更简洁高效的方案：
 4. **跨任务迁移**：该统一4D运动表示是否可迁移至其他生成任务（如文本驱动动作生成、全身运动迁移），实现更通用的姿势可控生成范式？
 
 5. **大规模模型优化**：除零填充维度对齐外，是否有更有效的投影方式（如共享学习映射层）可进一步激发18B模型的潜力，同时保持训练稳定性？
+
+
 
 ## 原文 PDF
 

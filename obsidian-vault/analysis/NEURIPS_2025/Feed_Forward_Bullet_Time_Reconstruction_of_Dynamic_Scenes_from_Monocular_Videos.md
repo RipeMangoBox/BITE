@@ -5,6 +5,8 @@ paper_level: A
 venue: NeurIPS
 year: 2025
 pdf_ref: paperPDFs/NEURIPS_2025/Feed_Forward_Bullet_Time_Reconstruction_of_Dynamic_Scenes_from_Monocular_Videos.pdf
+project_link: https://research.nvidia.com/labs/toronto-ai/bullet-timer/
+code_link: null
 aliases:
 - BB
 - FFBTRDSFMV
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 基于单目视频的前馈式动感场景子弹时间重建 |
 | 英文题名 | Feed-Forward Bullet-Time Reconstruction of Dynamic Scenes from Monocular Videos |
 | 会议/期刊 | NeurIPS 2025 |
-| Links | [paper](https://arxiv.org/abs/2412.03526); [Project](https://research.nvidia.com/labs/toronto-ai/bullet-timer/) |
+| Links | [paper](https://arxiv.org/abs/2412.03526) · [Project](https://research.nvidia.com/labs/toronto-ai/bullet-timer/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | BTimer (BulletTimer) |
 | Dataset | DyCheck iPhone dataset, NVIDIA Dynamic Scene dataset, RE10K (static scene benchmark), Tanks & Temples (OOD static benchmark) |
@@ -41,7 +43,7 @@ claims:
 > - NVIDIA Dynamic Scene dataset 上，PSNR↑ / LPIPS↓ / Render FPS / Rec. Time 为 25.82 / 0.086 / 115 / 0.78s，对比 Casual-FVS: 24.57 / 0.081 / 48 / 0.25h，变化 +1.25 dB PSNR, 速度提升约 1150 倍。
 > - RE10K (static scene benchmark) 上，LPIPS↓ 为 0.070 (Ours-Static)，对比 GS-LRM: 0.114; MVSplat: 0.128，变化 LPIPS 相对最佳基线降低 39%。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -62,7 +64,7 @@ BTimer在动态场景基准上展现出**速度与质量的显著突破**：
 
 消融实验证实，课程学习中的静态预训练和动态联合训练对模型性能至关重要，移除任一阶段均会导致几何退化和细节丢失。
 
-## 背景与动机
+
 
 ### 动态场景重建的核心矛盾：质量与速度的取舍
 
@@ -94,7 +96,9 @@ BTimer的核心洞察在于将动态场景重建重新表述为一个**时间条
 
 基于这一公式，BTimer成为**首个运动感知的前馈式动态场景重建模型**，能够在150ms内（12帧256×256分辨率）完成子弹时间重建，同时保持与优化方法可竞争的质量。这种速度优势源于其纯前馈的设计——重建过程仅需一次Transformer前向传播和后续的3DGS光栅化渲染，无需任何逐场景的迭代优化。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 BTimer的核心创新在于将动态场景的前馈式重建重新定义为一个**时间条件生成问题**，并通过三个关键设计（changed slots）突破现有前馈模型无法处理复杂运动的瓶颈。
 
@@ -130,7 +134,7 @@ BTimer的训练策略是其性能的关键使能因素。模型采用三阶段�
 
 上述三个changed slots形成了一条因果链：子弹时间戳嵌入提供了处理时态信息的统一框架，使静态数据预训练成为可能；课程学习策略将静态预训练获得的几何先验有效迁移到动态场景；NTE模块则弥补了主模型在未观测时刻的预测能力缺口。三者协同使得BTimer成为首个能够在亚秒级时间内完成动态场景重建与实时新视角合成的前馈式模型。
 
-## 整体框架
+
 
 BTimer 的整体流水线围绕一个核心思想展开：**将动态场景重建重新表述为时间条件生成问题**。给定一段单目视频 $\mathcal{I} = \{ \mathbf{I}_i \in \mathbb{R}^{H \times W \times 3} \}_{i=1}^{N}$、对应的已知相机位姿 $\mathcal{P} = \{ \mathbf{P}_i \in \mathbb{SE}(3) \}_{i=1}^{N}$ 以及时间戳 $\mathcal{T} = \{ t_i \in \mathbb{R} \}_{i=1}^{N}$，模型的目标是从多帧上下文直接预测在任意指定“子弹时间戳” $t_b$ 处的完整 3D 高斯泼溅（3DGS）表示。这一前馈过程仅需单次推理，无需逐场景优化。
 
@@ -173,7 +177,7 @@ BTimer 采用三阶段课程学习策略（详见 §3.3）：
 
 消融实验（§4.4）表明，移除静态预训练会导致不正确的几何和模糊细节；在第二阶段中不共同训练静态数据则会造成细节丢失和几何退化。
 
-## 核心模块与公式推导
+
 
 ### 子弹时间重建模型（BTimer）
 
@@ -215,7 +219,9 @@ NTE 的因果机制在于：将困难的时间插值问题分解为“图像域�
 - **Stage 2（动态联合训练）**：引入动态场景数据，与静态数据共同训练，使模型在保持几何质量的同时学习运动信息。若此阶段移除静态联合训练，会导致细节丢失和几何退化。
 - **Stage 3（长上下文微调）**：使用更长的上下文窗口进行微调，提升模型对长序列时空信息的建模能力。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 BTimer在动态与静态场景数据集上均展现出速度与质量的显著优势，其核心实验结论可概括为：**以优化方法数万分之一的重建时间，取得有竞争力的渲染质量；通过课程学习策略和NTE模块，有效解决动态场景中的几何退化和运动重影问题。**
 
@@ -268,7 +274,9 @@ BTimer的推理效率随输入帧数和分辨率灵活缩放：4帧256²分辨�
 *Figure 7: Quantitative comparisons on static datasets. (a) results on the RE10K benchmark [50]; (b) results on the Tanks and Temples benchmark [69]. We highlight the best , second best , and third best models. ∗: Our reproduced results*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位与核心瓶颈
 
@@ -351,6 +359,8 @@ NTE 模块（Figure 3）解决了一个关键失败模式：当目标时间戳 $
 ### 5. 知识库定位总结
 
 BTimer 在动态场景重建领域的定位可概括为：**首个运动感知的前馈式 3DGS 重建模型**，通过子弹时间公式桥接了静态预训练与动态泛化之间的鸿沟。它在速度上比优化方法快数个数量级，在质量上接近甚至超越部分优化方法，同时保持了前馈方法的泛化能力。其核心贡献——时间条件化生成与课程学习策略——为后续将前馈式重建推向更复杂的 4D 场景理解任务提供了可复用的方法论框架。
+
+
 
 ## 原文 PDF
 

@@ -45,7 +45,7 @@ claims:
 > - MS-COCO 2017 / Flux-dev 上，FID↓ 26.398 vs 27.323 (CFG) (-0.925)；CLIP↑ 0.3743 vs 0.3692 (CFG) (+0.0051)。
 > - MS-COCO 2017 / Qwen-Image 上，FID↓ 33.371 vs 35.431 (CFG) (-2.060)。
 
-## 概述
+## 概要
 
 扩散模型（特别是基于流匹配的文本到图像生成模型）在语义对齐与生成质量之间长期存在张力。标准免分类器引导（CFG）通过线性外推条件与无条件速度场来增强文本一致性，但其本质上是一个**固定增益的比例控制器**，在高引导尺度下会引发强非线性振荡、色彩过饱和及语义发散——这一瓶颈在模型容量持续增大的趋势下愈发突出。
 
@@ -55,7 +55,7 @@ claims:
 
 该方法的核心贡献在于：将扩散引导从启发式线性外推提升为具有理论收敛保证的非线性反馈控制，为解决高引导尺度下的生成稳定性问题提供了新的范式。
 
-## 背景与动机
+
 
 ### 扩散生成中的引导范式
 
@@ -94,7 +94,9 @@ $$\frac{d\mathbf{x}_t}{dt} = \mathbf{v}_{\theta}(\mathbf{x}_t, t) + \mathbf{u}_t
 
 其中控制输入 $\mathbf{u}_t$ 以语义误差 $\mathbf{e}(t)$ 为反馈信号。在这一框架下，本文的核心动机是：**引入非线性控制机制，利用滑模控制（Sliding Mode Control, SMC）的鲁棒性和有限时间收敛特性，从根本上解决线性引导在高增益下的稳定性缺陷**。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CFG-Ctrl 的核心创新在于将扩散模型的免分类器引导（CFG）重新建模为一阶反馈控制系统，并以**非线性滑模控制（Sliding Mode Control, SMC）**替代传统线性比例控制，从根本上解决了高引导尺度下的生成不稳定性问题。
 
@@ -130,7 +132,7 @@ $$\Delta\mathbf{e}(t) = -\mathbf{K} \cdot \mathrm{sign}(\mathbf{s}(t))$$
 
 这些 changed slots 使 SMC-CFG 在保持语义对齐的同时，显著提升了生成质量和稳定性，尤其在 SD3.5、Flux-dev 和 Qwen-Image 三个主流主干模型上，FID、CLIP Score、ImageReward 等指标均一致优于标准 CFG 及其他变体（Table 2）。
 
-## 整体框架
+
 
 CFG-Ctrl 将流匹配模型中的免分类器引导（CFG）重新建模为一个连续时间一阶反馈控制系统。其核心思想是：将条件速度与无条件速度之差定义为**语义误差信号** $\mathbf{e}(t) = \mathbf{v}_{\theta}(\mathbf{x}_t, t, \mathbf{c}) - \mathbf{v}_{\theta}(\mathbf{x}_t, t, \emptyset)$，并将该误差作为反馈控制器的输入，通过设计不同的控制律来调节采样过程的动力学行为。
 
@@ -180,7 +182,7 @@ $$
 
 > **注意**：Lyapunov 分析依赖速度场可微性假设，实际大规模潜在扩散模型中雅可比矩阵计算开销较大，论文未给出高效近似方案，该理论保障在实际部署中的严格性需要进一步验证。
 
-## 核心模块与公式推导
+
 
 SMC-CFG 的核心在于将扩散引导重新建模为**一阶反馈控制系统**，并在语义误差空间中引入**非线性滑模控制**，以替代传统 CFG 的线性比例控制。整个方法可分解为以下关键模块。
 
@@ -251,7 +253,9 @@ $$
 ![[assets/figures/papers/paper_list_l9_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_CFG_Ctrl_Control/figures/002_Table_1.jpg]]
 *Table 1: Typical CFG variants under CFG-Ctrl formulation. We summarize the key components of various methods under the control formulation, along with their corresponding types of control interpretations*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 一、主实验结果
 
@@ -316,7 +320,9 @@ SMC-CFG 与上述方法的本质区别在于引入了**非线性滑模控制**�
 ![[assets/figures/papers/paper_list_l9_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_CFG_Ctrl_Control/figures/006_Table_3.jpg]]
 *Table 3: Ablation study on hyperparameter λ and k. We conduct ablation across various hyperparameter settings in four metrics: FID, CLIP, Aesthetic (Aesth), and ImageReward (ImgRwd), respectively measuring generation quality, semantic alignment, aesthetic level, and human preference*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 控制理论视角下的 CFG 方法谱系
 
@@ -360,6 +366,8 @@ SMC-CFG 通过定义**指数型滑模面** s(t) = ė(t) + λe(t)（Eq. 19），�
 **自适应滑模设计**：能否设计根据当前误差状态在线调节 λ 和 k 的自适应机制，是减少手动调参负担、提升方法实用性的关键。这需要在不显著增加计算开销的前提下，实现对滑模面参数和切换增益的动态优化。
 
 **高维雅可比近似**：SMC-CFG 的理论分析依赖速度场可微性，但在实际高维潜在空间中高效计算或近似滑模面所需的速度雅可比矩阵，是推动该方法从理论走向大规模部署的核心工程挑战。
+
+
 
 ## 原文 PDF
 

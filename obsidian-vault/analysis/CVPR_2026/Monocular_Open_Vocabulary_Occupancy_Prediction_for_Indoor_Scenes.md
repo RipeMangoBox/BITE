@@ -40,7 +40,7 @@ claims:
 > [!tip] 效果简介
 > - Occ-ScanNet (开放词汇) 上，mIoU 21.05 vs POP-3D (5.96) (+15.09)；mIoU 21.05 vs LOcc (9.25) (+11.80)；IoU 59.50 vs POP-3D (35.32) (+24.18)。
 
-## 概述
+## 概要
 
 ### 1. 问题与瓶颈
 
@@ -74,7 +74,7 @@ LegoOcc处于**单目3D占用预测**与**开放词汇3D场景理解**的交叉�
 
 尽管几何占用预测已接近闭集方法水平，开放词汇语义准确度仍有较大差距（21.05 vs. 45.15 mIoU）。温度调度超参数可能需针对不同数据集调整，低温区训练存在数值不稳定性风险。此外，泊松G2O算子向室外场景的泛化性、对更强开放词汇分割器的兼容性，以及语言嵌入在下游具身任务中的直接可用性，均为待探索的开放问题。
 
-## 背景与动机
+
 
 ### 室内开放词汇占用预测的需求
 
@@ -106,7 +106,9 @@ $$p(\mathbf{x}) = 1 - \exp\!\left(-\sum_{i=1}^{N} \alpha_i p_i(\mathbf{x})\right
 
 在 Occ-ScanNet 开放词汇设定中，LegoOcc 以 59.50 IoU 和 21.05 mIoU 显著超越此前最佳开放词汇方法（LOcc 的 9.25 mIoU），提升超过 2 倍，验证了该框架在弱监督条件下同时学习几何与开放词汇语义的有效性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 LegoOcc 的核心创新在于，它通过两个相互耦合的机制，解决了在仅有二进制占用标签的弱监督条件下，同时学习密集室内场景的几何结构与开放词汇语义这一瓶颈问题。
 
@@ -135,7 +137,7 @@ $$\tau(r) = \max\left\{ T_{\min}, T_{\max} \left( \frac{T_{\min}}{T_{\max}} \rig
 
 上述两个创新共同支撑了 LegoOcc 的核心训练范式：**仅依赖二进制占用标签的弱监督**。泊松 G2O 确保了在无任何语义体素标注的情况下，3D 几何结构能被准确学习；渐进温度衰减则保证了从 2D 开放词汇分割特征到 3D 高斯嵌入的语义蒸馏质量。这一范式使得 LegoOcc 在 Occ-ScanNet 开放词汇设定中，以 21.05 mIoU 的成绩超越了此前最好的开放词汇方法 LOcc（9.25 mIoU）两倍以上。
 
-## 整体框架
+
 
 LegoOcc 的整体设计围绕一个核心思想展开：**以语言嵌入高斯（Language-Embedded Gaussians, LE-Gaussians）作为统一的 3D 中间表示**，将细粒度几何结构与语言对齐的语义嵌入耦合在一起，从而在仅依赖二进制占用标签（occupied vs. free）的弱监督条件下，同时学习几何重建与开放词汇语义理解。
 
@@ -189,7 +191,7 @@ $$L_{\text{total}} = \lambda_{\text{focal}} L_{\text{focal}} + \lambda_{\text{lo
 ![[assets/figures/papers/paper_list_l2087_https_arxiv_org_abs_2602_22667/figures/001_Figure_1.jpg]]
 *Figure 1: Closed- vs. open-vocabulary occupancy. Prior methods [47, 50] trained under a closed vocabulary can label only the categories predefined at training time, which restricts real-world deployment. Our open-vocabulary approach aligns language with 3D occupancy and supports text queries for arbitrary categories. Right column (Random Class): text-conditioned per-voxel scores are visualized as heatmaps; darker red indicates higher likelihood for the queried category*
 
-## 核心模块与公式推导
+
 
 ### 3.1 Language-Embedded Gaussians：统一的几何-语义中间表示
 
@@ -285,7 +287,9 @@ $$
 ![[assets/figures/papers/paper_list_l2087_https_arxiv_org_abs_2602_22667/figures/005_Table_2.jpg]]
 *Table 2: Ablation on the Gaussian-to-Occupancy operator. We compare three aggregation rules: GaussianFormer2, Bernoulli, and Poisson, under both closed- and open- vocabulary settings*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 开放词汇占用预测主结果
 
@@ -338,7 +342,9 @@ Table 4 报告了模型效率：LegoOcc 在单张 RTX 4090 上达到实时推理
 ![[assets/figures/papers/paper_list_l2087_https_arxiv_org_abs_2602_22667/figures/008_Figure_4.jpg]]
 *Figure 4: Qualitative results on Occ-ScanNet. From top to bottom: (a) input images; (b) ground-truth semantic occupancy; (c) results from our re-implemented LOcc [53]; (d) our method. Both (c) and (d) are trained with geometry-only annotations and evaluated on the closed-vocabulary annotation of Occ-ScanNet*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与闭集占用预测基线的关系
 
@@ -373,6 +379,8 @@ LegoOcc 在 Occ-ScanNet 开放词汇设定上取得 59.50 IoU 和 21.05 mIoU，�
 4. **几何弱监督的鲁棒性边界**：在极度稀疏占用（如仅 5% 体素被占据）或严重遮挡的室内场景中，仅依赖二进制占用标签的几何学习是否会出现系统性退化？需要针对边缘场景的压力测试。
 
 5. **下游任务迁移**：语言嵌入体素能否直接用于具身任务（如导航、物体搜索、操作规划）而无需额外微调？3D 开放词汇占用的语义粒度和空间精度是否满足具身智能体的实时决策需求？
+
+
 
 ## 原文 PDF
 

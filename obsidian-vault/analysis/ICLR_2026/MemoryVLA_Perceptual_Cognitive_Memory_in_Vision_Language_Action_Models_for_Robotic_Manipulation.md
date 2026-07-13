@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/MemoryVLA_Perceptual_Cognitive_Memory_in_Vision_Language_Action_Models_for_Robotic_Manipulation.pdf
+project_link: https://shihao1895.github.io/MemoryVLA
+code_link: null
 openreview_forum_id: 54U3XHf7qq
 aliases:
 - MemoryVLA
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | MemoryVLA：面向机器人操作视觉-语言-动作模型的感知-认知记忆 |
 | 英文题名 | MemoryVLA: Perceptual-Cognitive Memory in Vision-Language-Action Models for Robotic Manipulation |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=54U3XHf7qq); [Project](https://shihao1895.github.io/MemoryVLA) |
+| Links | [paper](https://openreview.net/forum?id=54U3XHf7qq) · [Project](https://shihao1895.github.io/MemoryVLA) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | MemoryVLA |
 | Dataset | SimplerEnv-Bridge, SimplerEnv-Fractal, LIBERO, Mikasa-Robo |
@@ -41,7 +43,7 @@ claims:
 > - SimplerEnv-Fractal 上，Overall Success Rate (%) 为 72.7，对比 68.1 (CogACT)，变化 +4.6。
 > - LIBERO 上，Average Success Rate (%) 为 96.5，对比 93.2 (CogACT)，变化 +3.3。
 
-## 概述
+## 概要
 
 机器人操作任务本质上是非马尔可夫的——许多决策无法仅凭当前观测做出。例如，在“推按钮”任务中，按钮按下前后的画面几乎完全相同（Figure 1a），模型必须记住“是否已经推过”这一历史状态才能决定下一步动作。然而，当前主流的视觉-语言-动作（VLA）模型，如 **CogACT**（Li et al., 2024a）、**π₀**（Black et al., 2024）和 **OpenVLA**（Kim et al., 2024），仅以单帧观测为条件预测动作，完全缺乏对时序上下文的显式建模。这导致它们在长时域、时序依赖任务中频繁失败——这是本文识别的核心瓶颈。
 
@@ -57,7 +59,7 @@ MemoryVLA 的核心洞察来自人类认知的双重记忆理论：工作记忆�
 
 在方法谱系中，MemoryVLA 区别于仅拼接多帧的 **RoboVLMs**（Liu et al., 2025b）、通过视觉轨迹简化时序但丢弃语义细节的 **TraceVLA**（Zheng et al., 2024b），以及近期引入时序上下文的 **CronusVLA**（Li et al., 2025a），其核心差异在于将记忆解耦为感知与认知双流，并通过检索-门控融合-合并三阶段机制实现结构化、可追溯的时序推理。
 
-## 背景与动机
+
 
 ### 非马尔可夫操作任务的时序决策困境
 
@@ -89,7 +91,9 @@ MemoryVLA 的核心洞察来自人类认知的双重记忆理论：工作记忆�
 
 具体而言，MemoryVLA引入**感知-认知记忆库**（Perceptual-Cognitive Memory Bank, PCMB），将VLM编码的感知令牌和认知令牌分别存储为长期记忆条目，通过时序位置编码引导的交叉注意力检索决策相关的历史特征，经可学习门控自适应融合当前与历史表示，并在记忆库容量满时基于相邻条目余弦相似度合并冗余（Figure 1c, Figure 2）。这一设计使模型在保持推理效率的前提下（Table 15：延迟仅增加0.007s），在多个仿真基准和真实世界长时域任务上均显著超越无记忆的VLA基线（Figure 1d：在SimplerEnv-Bridge上较CogACT提升14.6个百分点）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MemoryVLA 的核心创新在于引入**感知-认知记忆库（Perceptual-Cognitive Memory Bank, PCMB）**，将人类双重记忆理论（工作记忆与长时记忆）映射为视觉-语言-动作模型中的双流时序记忆机制。与仅依赖当前观测的主流VLA模型相比，MemoryVLA 在四个关键维度上实现了结构性改变：
 
@@ -127,7 +131,7 @@ $$
 
 MemoryVLA 的四个 changed slots 构成了一个完整的记忆增强决策闭环：双流记忆库提供结构化的历史表示，自适应门控实现上下文感知的信息融合，语义压缩维持紧凑的长期存储，双流条件使动作生成充分利用多粒度历史信息。这一设计在 6 个基准、150+ 任务上均超越无记忆基线，且推理延迟仅增加 0.007 秒（Table 15），实现了性能与效率的有效平衡。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_54U3XHf7qq/figures/002_Figure_2.jpg]]
 *Figure 2: Overall architecture of MemoryVLA. RGB observation and language instruction are encoded by a 7B VLM into perceptual and cognitive tokens, forming short-term working memory. The working memory queries a perceptual-cognitive memory bank (PCMB) to retrieve relevant historical context, including high-level semantics and low-level visual details, adaptively fuses it with current tokens, and consolidates the PCMB by merging the most similar neighbors. The memoryaugmented tokens then condition a diffusion transformer to predict a sequence of future actions*
@@ -182,7 +186,7 @@ $$i_x^* = \arg\max_{i=1,\ldots,L-1} \cos(\tilde{x}_i, \tilde{x}_{i+1}), \quad m_
 
 整体架构如图 2 所示，实验设置涵盖 3 种机器人、6 个基准、150+ 任务及 500+ 变体（图 4），全面验证了记忆机制在不同场景下的通用性。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化
 
@@ -236,7 +240,9 @@ $$i_x^* = \arg\max_{i=1,\ldots,L-1} \cos(\tilde{x}_i, \tilde{x}_{i+1}), \quad m_
 
 动作预测采用基于扩散Transformer（DiT）的架构，使用DDIM以10步去噪生成未来16步动作序列。与标准扩散模型不同，该专家同时条件于记忆增强后的认知令牌和感知令牌：认知注意力层提供高层语义引导，感知注意力层补充细粒度视觉历史细节。这种双条件设计使动作预测既能利用紧凑的语义记忆进行时序推理，又能从感知记忆中获取精确的空间信息。推理效率测试显示，引入记忆模块仅增加0.007秒延迟（0.194s vs 0.187s）和0.8GB GPU内存占用，开销极小（Table 15）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 评估设置概览
 
@@ -296,7 +302,9 @@ Figure 10展示了记忆检索注意力权重的可视化。在真实世界“Ch
 
 基于实验结果，MemoryVLA的主要失败模式集中在以下方面：第一，仿真环境中对极端相机视角变化的泛化能力不足，视角偏移导致感知令牌分布漂移，记忆检索的匹配质量下降；第二，最优记忆长度依赖具体任务，当前缺乏自适应配置机制，在实际部署中需要针对不同任务手动调参；第三，虽然引入了长期记忆单元，但尚未实现跨场景、跨任务的知识积累（如记忆反思或终身记忆），限制了更大规模部署的可扩展性。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从无记忆VLA到时序上下文建模
 
@@ -348,6 +356,8 @@ PCMB 的记忆容量固定为 $L$，当容量满时通过相似度合并来压�
 2. **终身记忆系统**：如何实现生物启发的记忆巩固，自动识别并蒸馏频繁重用的经验为永久表示，支持跨多任务和具身平台的可扩展泛化？
 3. **自适应记忆配置**：PCMB 容量、认知令牌数量等超参数能否通过元学习或在线自适应方式根据任务时序特征自动配置？
 4. **视角鲁棒性增强**：如何在训练或记忆检索阶段引入视角增强策略，使模型对相机位姿变化具有更强的鲁棒性，同时不损害记忆检索的精度？
+
+
 
 ## 原文 PDF
 

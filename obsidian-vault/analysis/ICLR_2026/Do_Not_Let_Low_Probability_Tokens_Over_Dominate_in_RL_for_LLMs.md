@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Do_Not_Let_Low_Probability_Tokens_Over_Dominate_in_RL_for_LLMs.pdf
+project_link: null
+code_link: https://github.com/zhyang2226/AR-Lopti
 openreview_forum_id: FOnAdLo0tM
 aliases:
 - ARLPTIL
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 不要让低概率 token 在 LLM 强化学习训练中过度主导 |
 | 英文题名 | Do Not Let Low-Probability Tokens Over-Dominate in RL for LLMs |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=FOnAdLo0tM); [GitHub](https://github.com/zhyang2226/AR-Lopti) |
+| Links | [paper](https://openreview.net/forum?id=FOnAdLo0tM) · [GitHub](https://github.com/zhyang2226/AR-Lopti) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | Advantage Reweighting & Low-Probability Token Isolation (Lopti) |
 | Dataset | K&K Logic Puzzles (Qwen2.5-3B-Instruct), K&K Logic Puzzles (Qwen2.5-7B-Instruct-1M), Math-related (DSR Uniform, Qwen2.5-7B), Math-related (ORZ |
@@ -42,7 +44,7 @@ claims:
 > - K&K Logic Puzzles (Qwen2.5-7B-Instruct-1M) 上，Avg. accuracy 为 GRPO + Reweight + Lopti: 0.91，对比 GRPO: 0.77，变化 +18.2%。
 > - Math-related (DSR Uniform, Qwen2.5-7B) 上，Avg. all accuracy (%) 为 GRPO + Reweight: 40.01，对比 GRPO: 38.98，变化 +1.03 pp。
 
-## 概述
+## 概要
 
 在基于强化学习的大语言模型后训练中，策略梯度优化存在一个被忽视的结构性偏差：**低概率 token 的梯度范数与 $1-\pi_\theta(o_{i,t})$ 成正比，会不成比例地主导模型参数更新方向**，压制高概率 token 的正确调整，从而降低训练效率与最终推理能力。本文首次从“梯度不均衡”视角切入该问题，理论推导证明任意层的激活梯度范数被约束在正比于 $(1-\pi_\theta(o_{i,t}))$ 的上下界之间（Proposition 4.2），并通过实验证实低概率 token 产生的梯度量级远超高概率 token，导致高概率 token 正确更新的比例不足 50%（Figure 1, Figure 3）。
 
@@ -53,7 +55,7 @@ claims:
 
 在 K&K 逻辑谜题基准上，两种方法分别将 GRPO 基线性能提升 35.9% 和 38.5%，联合使用带来 **46.2%** 的准确率提升（Qwen2.5-3B-Instruct，Figure 4）；在更大规模的 Qwen2.5-7B-Instruct-1M 上也获得 18.2% 的提升。方法在 REINFORCE++ 和 DAPO 等策略梯度算法上同样有效，验证了其泛化性。数学相关任务上，Advantage Reweighting 单独使用即可带来约 1 个百分点的稳定增益，但 Lopti 的叠加未产生协同效应，其机理尚待进一步分析。方法的主要代价在于 Lopti 需执行两次更新，计算时间约为原来的两倍。
 
-## 背景与动机
+
 
 ### LLM 强化学习训练的梯度失衡困境
 
@@ -81,7 +83,9 @@ $$\prod_{j=\ell+1}^{L} c_j \cdot |w_{i,t}| \cdot \sqrt{\frac{N}{N-1}} \cdot (1-\
 
 在 RL for LLMs 领域，已有工作关注了奖励设计、优势估计、KL 约束等环节的改进，但**尚未有方法从梯度贡献的 token 级不平衡角度切入**。该工作首次将梯度失衡识别为制约 RL 训练效率的关键瓶颈，并据此提出了两条互补的干预路径：通过优势重新加权（Advantage Reweighting）削弱低概率 token 的更新权重，以及通过分阶段隔离更新（Lopti）调整梯度流向。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作首次从**梯度不均衡**的角度审视 LLM 的 RL 训练效率问题。其核心发现是：在 GRPO 等策略梯度算法中，低概率 token 的梯度范数与 $(1 - \pi_\theta)$ 成正比（见 Proposition 4.2，Equation 3），这导致它们不成比例地主导向量场更新方向，压制高概率 token 的有效学习。基于这一因果机制，作者提出两个正交且可叠加的改进插槽：
 
@@ -109,7 +113,7 @@ $$\hat{A}_{i,t} = [\alpha \cdot \pi_{\theta}(o_{i,t}) + (1-\alpha)] \cdot \hat{A
 
 两个改进插槽均作用于 GRPO 的**优势估计与梯度更新环节**，不改变采样、奖励计算或 KL 惩罚组件。它们同样适用于 REINFORCE++ 和 DAPO 等基于策略梯度的 RL 算法（Table 7, Figure 19），展现出良好的泛化性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_FOnAdLo0tM/figures/007_Figure_1.jpg]]
 *Figure 1: Experimental analysis on the K&K Logic Puzzle dataset during GRPO training of Qwen2.5-7B-Instruct-1M. Tokens are divided into four groups based on probability quartiles. (a) Token probability distribution and (b) corresponding advantages. (c) Token probability changes after updates (using SGD with lr=1e-3) and (d) gradient norms for each probability group. Effects of selective updates: (e) Probability changes when only tokens in the lowest quartile (probability \< 0.25) are updated, and (f) when only tokens in the highest quartile (probability > 0.75) are updated. To ensure clarity, the top 1% of outlier samples in the violin plots for token probability changes are excluded. Results are aver...*
@@ -141,7 +145,7 @@ $$\hat{A}_{i,t} = [\alpha \cdot \pi_{\theta}(o_{i,t}) + (1-\alpha)] \cdot \hat{A
 - **中间信号**：采样回答 $\{o_i\}$ → 规则奖励 $r(q, o_i)$ → 组相对优势 $\hat{A}_i$ →（可选）重加权优势 $\hat{A}_{i,t}$ →（可选）按 $\eta$ 分组的 token 集
 - **输出**：更新后的策略参数 $\theta$，在推理和数学任务上具有更高的测试准确率
 
-## 核心模块与公式推导
+
 
 ### 问题建模与 GRPO 基础
 
@@ -187,7 +191,9 @@ Lopti 采用分阶段更新策略来隔离低概率 token 的梯度干扰。具�
 
 Advantage Reweighting 与 Lopti 可并行使用。在 K&K 逻辑推理任务上，二者联合使用带来了最优性能提升（+46.2%）；但在数学任务上，联合使用未产生进一步的协同增益，推荐单独使用。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：低概率 token 主导梯度更新
 
@@ -305,7 +311,9 @@ Figure 5 分析了推理相关词频与奖励的关系。在 naive GRPO 训练�
 *Table 5: Six categories of inference-related words associated with LLMs’ performance on the K&K Logic Puzzles dataset*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：RL 训练中的梯度失衡
 
@@ -335,6 +343,8 @@ Figure 5 分析了推理相关词频与奖励的关系。在 naive GRPO 训练�
 3. **组件交互**：低概率 token 的过度主导与 KL 惩罚、clip 阈值等其他 GRPO 组件之间存在多大程度的交互？
 4. **层级差异**：梯度偏差问题是否在所有 transformer 层表现一致？是否可以设计针对特定层或 attention head 的隔离策略？
 5. **跨模态扩展**：该方法是否适用于多模态 LLM 或基于扩散的文本生成模型的 RL 训练？
+
+
 
 ## 原文 PDF
 

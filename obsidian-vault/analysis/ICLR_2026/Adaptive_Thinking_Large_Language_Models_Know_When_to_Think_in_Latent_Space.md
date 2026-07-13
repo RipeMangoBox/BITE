@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Adaptive_Thinking_Large_Language_Models_Know_When_to_Think_in_Latent_Space.pdf
+project_link: null
+code_link: null
 openreview_forum_id: 2i6Rp0gCq6
 aliases:
 - SSCGATA
@@ -42,7 +44,7 @@ claims:
 > - MATH-500 上，Accuracy (↑) / #Tokens (↓) 为 97.4% / 3694，对比 97.6% / 4900，变化 Acc ~, Tokens -24.6%。
 > - GSM8K 上，Accuracy (↑) / #Tokens (↓) 为 95.6% / 890，对比 95.2% / 1994，变化 Acc +0.4%, Tokens -55.4%。
 
-## 概述
+## 概要
 
 大语言模型（LLM）的推理能力因思维链（chain-of-thought, CoT）而显著提升，但现有方法对所有查询分配**固定的思考预算**，导致简单查询浪费计算资源，而复杂查询计算不足——这是本工作的核心瓶颈。为解决这一问题，本文提出 **Sonata（Self-Consistency-Guided Adapter for Thinking Allocation）**，一种轻量级自适应推理框架。
 
@@ -56,7 +58,7 @@ Sonata 的核心洞察是：**自一致性（self-consistency）可作为推理�
 
 Sonata 的局限在于：思考决策为生成前的**二值判断**，无法在推理过程中动态调整深度；阈值 $\tau_0$ 通过网格搜索经验设定，缺乏自动优化机制；校准数据依赖正确答案标注。尽管如此，该方法为计算最优推理提供了简洁有效的范式，其跨任务泛化能力和极低开销使其具备较强的实用价值。
 
-## 背景与动机
+
 
 ### 固定思考预算的困境
 
@@ -91,7 +93,9 @@ Sonata 的局限在于：思考决策为生成前的**二值判断**，无法在
 
 这一设计的核心优势在于：将推理必要性的判断从“生成后评估”或“模型内省”转化为“生成前预测”，从根本上避免了不必要的 token 消耗，同时保持了与现有思维链压缩方法的兼容性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Sonata 的核心创新在于将**思考预算分配**从一个粗粒度的全局策略转变为一个**查询级自适应决策问题**，并通过一个极轻量的机制实现。
 
@@ -152,7 +156,7 @@ $$\Delta_{\mathrm{think}}(q) = \mathrm{Acc}_{\mathrm{think}}(q) - \mathrm{Acc}_{
 
 这一选择是 Sonata 能够在维持甚至提升准确率的同时，将思考 token 消耗降低 20% 至 60% 的关键原因。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l6_Adaptive_Thinking_Large_Language_Models_Know_When_to_Think_in_Latent_Spa/figures/004_Figure_4.jpg]]
 
@@ -183,7 +187,7 @@ Sonata 的整体推理流程由三个核心模块串联构成：**预填充阶�
 
 传统固定思考预算方法对所有查询分配相同的思考 token 数，导致简单查询浪费计算资源、复杂查询计算不足。Sonata 的适配器在预填充阶段即可判断查询的推理必要性，在解码开始前完成思考决策，实现了**查询级自适应计算分配**。
 
-## 核心模块与公式推导
+
 
 ### 3.1 自一致性分数：推理必要性的代理信号
 
@@ -225,7 +229,9 @@ $$\hat{s} = f_\theta(\mathbf{h}) = \sigma(\mathrm{MLP}(\mathbf{h}))$$
 
 阈值 $\tau_0$ 通过网格搜索在 $\{0.1, 0.3, 0.5\}$ 中经验设定。该二值决策机制在生成前完成，计算开销极小（$<1‰$ 的推理计算增量），且可与现有思维链压缩方法（如 REFRAIN 早期停止）兼容叠加。消融实验（Table 10）表明，二值控制优于 4 级细粒度控制，后者引入难以调优的多阈值组合。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现
 
@@ -287,7 +293,9 @@ Table 7 的消融实验验证了仅使用最后一层最后一个 token 的隐�
 *Figure 2: Correlation between self-consistency and thinking improvement across five difficulty levels on MATH-500 using Qwen3-8B. Each point denotes an individual query, with self-consistency computed from N = 32 samples in non-thinking mode (x-axis) and accuracy improvement from enabling thinking averaged over 3 runs (y-axis)*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有方法的关系
 
@@ -336,6 +344,8 @@ Sonata 的有效性建立在以下假设之上，这些假设界定了其适用�
 4. **本质困难问题的处理**：对于自一致性和思考增益均低的“本质困难”问题，当前方法无法有效分配计算资源。如何识别这类问题并设计针对性的资源分配策略，是一个重要的实践挑战。
 
 5. **适配器的持续适应性**：适配器在模型微调或持续学习后能否保持准确性，或者需要自适应更新机制，这一问题对实际部署至关重要但尚未被研究。
+
+
 
 ## 原文 PDF
 

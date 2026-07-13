@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2024
 pdf_ref: paperPDFs/arxiv_2024/PlanAgent_A_Multi_modal_Large_Language_Agent_for_Closed_loop_Vehicle_Motion_Planning.pdf
+project_link: null
+code_link: null
 aliases:
 - PlanAgent
 tags:
@@ -40,7 +42,7 @@ claims:
 > - nuPlan Val14 (reactive closed-loop) 上，R-CLS 92.75 vs 91.79 (PDM-Closed) (+0.96)。
 > - nuPlan Test14-hard (non-reactive closed-loop) 上，NR-CLS 72.51 vs 65.07 (PDM-Closed) (+7.44)。
 
-## 概述
+## 概要
 
 现有车辆运动规划方法在闭环长尾场景下面临瓶颈：规则基方法（如 **PDM-Closed**，Dauner et al., CoRL 2023）依赖人工定义参数与搜索策略，泛化能力有限；学习基方法（如 **PlanTF**，Cheng et al., ICRA 2024；**DTPP**，Huang et al., ICRA 2024）直接从数据预测轨迹或代价，但在分布外场景中鲁棒性不足；近期基于大语言模型（LLM）的规划器（如 **GPT-Driver**、**Agent-Driver**、**DiLu**）虽引入常识推理，却普遍采用文本化场景描述，导致 token 消耗高、空间理解弱，且缺乏闭环安全验证机制。如何高效编码场景并利用常识推理实现安全、可泛化的闭环规划，是该领域的核心瓶颈。
 
@@ -48,7 +50,7 @@ PlanAgent 的核心洞察在于：将多模态大语言模型（MLLM）作为认
 
 在 nuPlan Val14 和 Test14-hard 基准上，PlanAgent 取得闭环运动规划 SOTA：Val14 上 NR-CLS 达 93.26（较 PDM-Closed 提升 +0.75），R-CLS 达 92.75（+0.96）；在更具挑战性的 Test14-hard 上，NR-CLS 达 72.51（较 PDM-Closed 提升 +7.44），R-CLS 达 76.82（+1.64）。消融实验证实，分层思维链中的场景理解、运动指令以及 Reflection 模块分别对 NR-CLS 贡献 2.42、1.91 和 2.67，验证了各模块设计的有效性。该方法首次将 MLLM 引入中到中闭环规划系统，为自动驾驶中常识驱动的高效场景编码与安全规划提供了新范式。
 
-## 背景与动机
+
 
 自动驾驶运动规划的核心挑战在于，车辆必须在动态、交互且充满长尾场景的开放环境中生成安全、合理的行驶轨迹。现有的规划方法大致可分为三类，但各自存在明显的能力边界。
 
@@ -66,7 +68,9 @@ PlanAgent 的核心洞察在于：将多模态大语言模型（MLLM）作为认
 
 综上，核心瓶颈在于：**缺乏一个能够将MLLM的常识推理能力高效注入闭环运动规划的系统框架，该框架需同时解决场景表示效率、推理层次化以及安全验证三大问题。** PlanAgent正是针对这一瓶颈，首次提出了基于MLLM的中到中闭环规划智能体系统。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PlanAgent 的核心创新在于将多模态大语言模型（MLLM）引入中到中闭环运动规划，通过**场景表示-分层推理-安全验证**三位一体的设计，系统性解决了现有方法在长尾场景泛化和常识推理上的瓶颈。相对于规则基、学习基和已有的 LLM 基方法，PlanAgent 在以下四个关键维度上实现了根本性改变。
 
@@ -90,7 +94,7 @@ PlanAgent 的核心创新在于将多模态大语言模型（MLLM）引入中到
 
 PlanAgent 的四项 changed slots 构成了一个完整的创新闭环：**高效场景编码**降低了 MLLM 的输入负担，**分层思维链**引导了结构化的常识推理，**反思模块**提供了安全兜底，**代码生成范式**则赋予了规划器在长尾场景中的适应能力。这一设计使 PlanAgent 成为首个在闭环中到中规划中同时实现 SOTA 性能和强泛化能力的 MLLM 智能体系统。
 
-## 整体框架
+
 
 PlanAgent 是首个基于多模态大语言模型（MLLM）的中到中闭环运动规划系统，其整体架构由三个核心模块串联而成：**环境变换模块（Environment Transformation）**、**推理引擎模块（Reasoning Engine）** 和 **反思模块（Reflection Module）**。三个模块形成闭环反馈流：环境变换模块将感知数据转化为多模态场景提示，推理引擎据此通过分层思维链生成规划器代码，反思模块对生成的规划器进行仿真验证并决定是否触发重新推理。
 
@@ -105,7 +109,7 @@ PlanAgent 是首个基于多模态大语言模型（MLLM）的中到中闭环运
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2406_01587/figures/003_Figure_2.jpg]]
 *Figure 2: Based on a MLLM, we propose a novel planning agent pipeline comprising three modules: Environment Transformation, Reasoning Engine, and Reflection Module. In the Environment Transformation module, key information about the environment is extracted to form a BEV map and construct a lane-graph representation. Subsequently, the lane graph is translated into textual descriptions and used as scenario prompts along with the BEV map. In the Reasoning Engine module, an MLLM generates planner codes based on the IDM [16] planner through hierarchical chain-of-thought reasoning with scenario prompts and pre-defined system prompts (including task definition prompts, common sense prompts, and chain-of-th...*
 
-## 核心模块与公式推导
+
 
 PlanAgent 的整体架构由三个核心模块串联构成：**环境变换**、**推理引擎**与**反思模块**（Fig. 2）。三个模块协同完成“多模态场景编码→分层常识推理→安全闭环验证”的闭环规划流程。
 
@@ -164,7 +168,9 @@ $$Generate\_IDM\_Planner(c, la, v_0, acc, dec)$$
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2406_01587/figures/004_Figure_3.jpg]]
 *Figure 3: The top of the picture shows the process of constructing a lane map (top right) based on the environment (top left). The white square on the left represents the ego vehicle. The red node on the right indicates the centerline segment where the ego vehicle is located, while nodes of other colors correspond to lane segments of the same color on the left. The bottom of the picture displays the converted text description of the scenario based on the lane-graph, including node relationships and motion states*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -246,7 +252,9 @@ Table I系统比较了PlanAgent与近期LLM基规划方法的属性差异。Plan
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2406_01587/figures/011_Figure_6.jpg]]
 *Figure 6: Qualitative comparison between PlanAgent (ours) and PDM-Closed and qualitative example of the hierarchical reasoning of PlanAgent*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1 在自动驾驶规划方法谱系中的位置
 
@@ -305,6 +313,8 @@ PlanAgent 的设计决策划定了其方法边界：
 ---
 
 **需要人工验证的点**：论文未披露Reflection模块评分函数的具体构成（如各子指标的权重），也未详细说明max_exe的取值及其对性能的影响。消融实验中各模块的贡献值（2.42/1.91/2.67）来自单一MLLM（GPT-4V）的实验，其在不同MLLM上的稳定性需要进一步验证。
+
+
 
 ## 原文 PDF
 

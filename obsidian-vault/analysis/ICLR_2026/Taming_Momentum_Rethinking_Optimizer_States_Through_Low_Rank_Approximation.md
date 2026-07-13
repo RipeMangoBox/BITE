@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Taming_Momentum_Rethinking_Optimizer_States_Through_Low_Rank_Approximation.pdf
+project_link: null
+code_link: https://github.com/mrflogs/LoRA-Pre
 openreview_forum_id: 9Q0dNBYeEY
 aliases:
 - LP
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 驾驭动量：通过低秩近似重新思考优化器状态 |
 | 英文题名 | Taming Momentum: Rethinking Optimizer States Through Low-Rank Approximation |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=9Q0dNBYeEY); [GitHub](https://github.com/mrflogs/LoRA-Pre) |
+| Links | [paper](https://openreview.net/forum?id=9Q0dNBYeEY) · [GitHub](https://github.com/mrflogs/LoRA-Pre) |
 | Topic | #topic/optimization_theory_probabilistic #topic/optimization_theory_probabilistic/optimization_methods |
 | Method | LoRA-Pre |
 | Dataset | C4 validation (60M), C4 validation (130M), C4 validation (350M), C4 validation (1B) |
@@ -42,7 +44,7 @@ claims:
 > - C4 validation (130M) 上，perplexity (↓) 为 23.78 (LoRA-Pre Adam)，对比 25.36 (GaLore Adam)，变化 -1.58。
 > - C4 validation (350M) 上，perplexity (↓) 为 16.36 (LoRA-Pre Adam)，对比 18.95 (GaLore Adam)，变化 -2.59。
 
-## 概述
+## 概要
 
 现代自适应优化器（如 **Adam**（Kingma & Ba, ICLR 2015）、**Muon**（Jordan et al., 2024））在训练大语言模型时，需为每个可训练参数维护一阶和二阶动量状态，导致优化器内存开销与模型参数量线性增长，成为模型扩展的显著瓶颈。本文的核心洞察在于揭示：指数移动平均（EMA）动量更新在数学上等价于通过在线梯度下降训练一个线性回归器——其优化目标为动量矩阵与当前梯度之间的Frobenius范数最小化：
 
@@ -62,7 +64,7 @@ $$
 
 方法的主要局限包括：低秩近似引入的有界误差使优化器最终停在近似最优点而非精确最优点；对极端动量衰减参数敏感（$\beta \to 1$ 时可能导致训练不稳定）；当前压缩仅覆盖注意力层和 MLP 层参数，尚未扩展至模型全部可训练部分。
 
-## 背景与动机
+
 
 ### 优化器状态的内存瓶颈
 
@@ -107,7 +109,9 @@ $$m = m_B \cdot m_A, \quad m_B \in \mathbb{R}^{p \times r}, \; m_A \in \mathbb{R
 
 简言之，LoRA-Pre 的设计目标是在**保持优化动力学质量**的前提下，通过低秩参数化实现**优化器状态的内存压缩**，并以**连续的在线更新**替代离散的子空间重建，从而突破现有低秩优化器的性能瓶颈。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 LoRA-Pre 的核心创新在于将优化器动量的维护重新表述为一个**在线线性回归问题**，并在此基础上对动量矩阵实施**低秩压缩**。这一思路突破了传统低秩优化器（如 GaLore）需要周期性重建子空间、在投影梯度上累积误差的局限，转而通过每一步的在线梯度流直接演化低秩因子，实现连续的子空间适配。
 
@@ -194,7 +198,7 @@ LoRA-Pre 处于**内存高效优化器**与**低秩训练方法**的交叉地带
 - **秩效率声明**：LoRA-Pre 以 1/8 的秩匹配 GaLore 性能的声明来自消融实验（Figure 2），置信度较高（0.90）。该结论在 60M 和 130M 模型上得到验证，但在更大规模模型上的可扩展性仍需进一步检验。
 - **理论收敛性**：论文提供了收敛上界（Theorem C.3），表明误差由低秩近似误差和内在方差共同决定，最终收敛到有界邻域内。该理论结果确认了低秩近似的固有局限——无法精确收敛到最优点，但在实践中该邻域足够小，不影响性能优势。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_9Q0dNBYeEY/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of our LoRA-Pre method. In this work, we establish a novel connection: the exponential moving average (EMA) update for optimizer momentum is mathematically equivalent to training a linear regressor using online gradient descent. Leveraging this equivalence, we propose compressing the optimizer states (i.e., the momenta) using low-rank matrices to reduce the memory footprint. Finally, the closed-form update rules for these matrices without requiring backpropagation are given by Theorem 3.1*
@@ -239,7 +243,7 @@ $$m_A \gets (1 - \gamma_1) \cdot m_A + \gamma_1 \cdot (m_B^T m_B)^{-1} m_B^T g$$
 
 值得注意的是，LoRA-Pre 是一个**优化器包装器**，可应用于任何带有动量机制的优化器（如 Adam、Muon）。在预训练中，该方法作用于注意力层和 MLP 层的参数矩阵，其余参数仍使用标准优化器。
 
-## 核心模块与公式推导
+
 
 LoRA-Pre 的核心创新在于将动量维护重新表述为**在线线性回归任务**，并通过对动量矩阵的低秩分解来压缩优化器状态。整个方法围绕三个紧密耦合的模块构建。
 
@@ -293,7 +297,9 @@ $$\min_{1\leq t\leq T} \mathbb{E}[\|\nabla f(\theta_t)\|^2] \leq \frac{C_{init}}
 
 该上界包含两项：第一项随时间衰减至零，第二项为常数项，由低秩近似的有界误差 $\mathcal{E}_{bound}$ 和梯度的内在方差 $\sigma_{total}^2$ 共同决定。这意味着 LoRA-Pre 最终会收敛到由近似误差决定的邻域内，而非精确最优点——这是低秩压缩方法的固有局限。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 预训练性能：低秩优化器全面对比
 
@@ -364,7 +370,9 @@ Table 4 展示了动量衰减参数 β₁ 和 β₂ 对 LoRA-Pre Adam 在 60M �
 - 是否存在更优的低秩因子初始化策略或秩的自适应调整机制，以进一步提升收敛速度和稳定性，论文未作探讨。
 - 该方法对非动量类型优化器（如纯 SGD）的扩展性仍为开放问题。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 方法谱系
 
@@ -425,6 +433,8 @@ LoRA-Pre 的通用性体现在它可适配多种动量型优化器。论文验�
 4. **与其他压缩技术的正交性**：LoRA-Pre 压缩优化器状态，而 GaLore 压缩梯度，LoRA 压缩参数更新。这三者在压缩对象上互不重叠，理论上可叠加使用。但三者的相互作用——特别是低秩梯度投影与低秩动量维护之间的信息瓶颈叠加效应——尚未被系统研究。
 
 5. **理论紧致性**：当前收敛上界中的常数项 $C_{noise}$ 与低秩近似误差 $\mathcal{E}_{bound}$ 的具体依赖关系尚未被精细刻画。更紧致的理论分析可能揭示秩 $r$ 与可达收敛精度之间的定量 trade-off，为实际部署中的秩选择提供理论指导。
+
+
 
 ## 原文 PDF
 

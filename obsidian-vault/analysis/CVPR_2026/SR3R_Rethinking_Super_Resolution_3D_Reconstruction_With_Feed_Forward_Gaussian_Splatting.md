@@ -42,7 +42,7 @@ claims:
 > - ACID (4× 3DSR, 64×64 → 256×256) 上，PSNR↑ 27.018 (Ours, DepthSplat) vs 23.801 (DepthSplat) (+3.217)。
 > - RE10K→DTU (zero-shot, 4× SR) 上，PSNR↑ 17.241 (Ours, NoPoSplat) vs 12.628 (NoPoSplat) (+4.613)。
 
-## 概述
+## 概要
 
 **瓶颈**：现有基于3DGS的三维超分辨率（3DSR）方法依赖预训练的二维超分模型提供高频先验，并采用逐场景优化，难以从大规模多场景数据中自主学习三维特异的高频几何与纹理，导致重建保真度、跨场景泛化性和实时性受限。
 
@@ -52,7 +52,7 @@ claims:
 
 **主要结果**：在RE10K和ACID数据集上，SR3R以4倍超分（64×64→256×256）显著超越所有前馈基线（PSNR提升+3.1–3.2 dB），并展现出强零样本泛化能力——在DTU和ScanNet++上分别超越逐场景优化方法**SRGS** (Feng et al., arXiv 2024) 达+4.6 dB和+3.5 dB，同时推理速度远快于优化式方法。消融实验证实，高斯偏移学习是贡献最大的单一模块，且SR3R对不同上采样策略具有鲁棒性。
 
-## 背景与动机
+
 
 三维场景的超分辨率重建（3D Super-Resolution, 3DSR）旨在从低分辨率（LR）输入恢复高分辨率（HR）的三维表示，是增强沉浸式视觉体验和三维内容生成质量的关键技术。近年来，3D Gaussian Splatting（3DGS）凭借其显式点云结构和可微分光栅化的高效渲染能力，已成为三维重建的主流表示形式，并推动了3DSR方法的发展。
 
@@ -70,7 +70,9 @@ claims:
 
 > **证据说明**：以下背景与动机分析基于论文摘要、引言及方法总述部分的声明。关于SR3R各模块的具体设计细节和实验验证，将在后续章节中详述。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SR3R 的核心创新在于对 3D 超分辨率（3DSR）范式的根本性重构：**将 3DSR 从依赖 2DSR 伪监督的逐场景优化问题，重新定义为从稀疏低分辨率（LR）视图到高分辨率 3DGS 的直接前馈映射问题**。这一范式转换催生了三个关键 changed slots，共同构成了方法的技术骨架。
 
@@ -101,7 +103,7 @@ SR3R 的解决方案是学习一个前馈映射网络 $f_{\pmb \theta} : \{ ( I_
 
 三个 changed slots 并非孤立改进，而是形成因果闭环：范式转换（前馈映射）提供了从多场景数据学习 3D 高频结构的可能性；高斯偏移学习确保了在稀疏 LR 输入下的训练稳定性与参数效率；特征细化弥合了 2D 特征与 3D 几何之间的模态鸿沟。三者共同实现了 SR3R 的核心洞察：**通过前馈映射网络从大规模多场景数据自主习得 3D 高频结构，取代继承自 2D 超分模型的有限先验**。
 
-## 整体框架
+
 
 SR3R 将三维超分辨率（3DSR）重新定义为一种前馈映射问题：从稀疏低分辨率（LR）视图直接预测高分辨率（HR）三维高斯泼溅（3DGS）表示。其核心映射关系为：
 
@@ -148,7 +150,7 @@ $$\mathcal G^{\mathrm{HR}} = \mathcal G^{\mathrm{Dense}} + \Delta \mathcal G$$
 
 ![[assets/figures/papers/paper_list_l2602_https_arxiv_org_abs_2602_24020/figures/005_Figure.jpg]]
 
-## 核心模块与公式推导
+
 
 SR3R 将 3D 超分辨率重新定义为从前馈映射问题，其核心映射函数为：
 
@@ -207,7 +209,9 @@ $$\mathcal{G}^{\mathrm{HR}} = \mathcal{G}^{\mathrm{Dense}} + \Delta \mathcal{G},
 ![[assets/figures/papers/paper_list_l2602_https_arxiv_org_abs_2602_24020/figures/009_Figure_S.1.jpg]]
 *Figure S.1: Detailed Gaussian Offset Learning pipeline. Each Gaussian center is projected to the image plane to query local ViT features. The queried token is fused with a geometry-aware position embedding and processed by PTv3 blocks for spatial reasoning. A lightweight Gaussian Head predicts residual offsets to refine the initial 3DGS template*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心范式转换的定量验证
 
@@ -281,7 +285,9 @@ SR3R在取得显著性能提升的同时，保持了合理的计算开销。以D
 ![[assets/figures/papers/paper_list_l2602_https_arxiv_org_abs_2602_24020/figures/008_Table_4.jpg]]
 *Table 4: Ablation on upsampling strategies on RE10K (4× 3DSR). SR3R maintains consistently strong performance across all interpolation and learning-based upsampling methods*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 SR3R 将基于 3D Gaussian Splatting (3DGS) 的三维超分辨率（3DSR）重新定义为从稀疏低分辨率（LR）视图到高分辨率（HR）3DGS 的直接前馈映射问题。这一范式转换使其在方法谱系中处于一个独特位置：它既不同于依赖逐场景优化和 2DSR 伪监督的传统 3DSR 方法，也不同于仅做前馈重建而不具备超分能力的 3DGS 模型。
 
@@ -323,6 +329,8 @@ SR3R 的提出为 3DSR 领域打开了若干值得深入的方向：
 - **与生成先验的结合**：当前 SR3R 完全依赖前馈映射学习高频细节，是否可以与基于扩散模型的高频生成先验结合，以进一步丰富纹理细节，尤其是在信息严重缺失的区域？
 - **鲁棒性验证**：在实际采集条件下的噪声、光照变化和有限视角重叠等退化因素下，SR3R 的鲁棒性如何？当前实验均在相对干净的合成或受控数据上进行。
 - **表示泛化性**：高斯偏移学习的思想——即从粗粒度表示学习残差偏移而非直接回归目标参数——是否可以泛化到其他三维表示（如 NeRF、3D Gaussian 的其他变体）的超分辨任务中？
+
+
 
 ## 原文 PDF
 

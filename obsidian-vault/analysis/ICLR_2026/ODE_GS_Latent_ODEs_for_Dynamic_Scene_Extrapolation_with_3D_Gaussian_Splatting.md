@@ -44,15 +44,13 @@ claims:
 > - NVFi 上，PSNR / SSIM / LPIPS 33.43 / 0.9471 / 0.0603 vs 28.45 / 0.9336 / 0.1024 (NVFi avg) (PSNR↑17.5%, SSIM↑1.4%, LPIPS↓41.1%; 相对于GaussianPrediction提升39.6%)。
 > - HyperNeRF 上，LPIPS / PSNR / SSIM 在split-cookie, slice-banana, cut-lemon上LPIPS最低; chickchicken上PSNR和SSIM最优 vs TiNeuVox, 4D-GS 等 (定性/定量均优于所有基线)。
 
-## 概述
+## 概要
 
 动态3D场景的新视角合成与未来预测是视觉计算中的核心挑战。现有方法——无论是基于NeRF的**TiNeuVox-B**（Fang et al., 2022）还是基于3D Gaussian Splatting（3DGS）的**4D-GS**（Wu et al., 2024）、**Deformable-GS**（Yang et al., 2024）——均采用时间条件化变形网络：以显式时间戳$t$作为MLP输入，预测规范空间到当前帧的偏移。这一范式在观测时间窗口$[t_{\min}, t_{\max}]$内可实现高质量插值渲染，但一旦要求外推到$t > t_{\max}$的未来时刻，时间戳便落入训练分布外（OOD），导致渲染质量急剧退化。现有的外推尝试如**GaussianPrediction**（Zhao et al., 2024）和**NVFi**（Li et al., 2023）仍未能从根本上消除这一结构脆弱性。
 
 **ODE-GS**针对上述瓶颈，提出了一种解耦式动态场景外推框架。其核心洞察是：将动态场景重建与时间预测分离。首先训练一个冻结的插值模型，在观测窗口内生成精确的高斯参数轨迹；随后，由一个**Transformer编码器**将过去的高斯参数序列压缩为隐状态，再由**神经ODE**驱动该隐状态在连续时间上演化，解码得到未来时刻的高斯参数。这一设计从架构层面移除了显式时间戳依赖，将外推转化为隐空间的序列演化问题，并引入了隐空间加速度惩罚与3D轨迹加速度惩罚作为物理平滑先验，迫使预测的动力学行为合理且稳定。
 
 实验表明，ODE-GS在D-NeRF、NVFi和HyperNeRF三个基准上均取得最优外推性能：相较先前最佳外推方法，PSNR平均提升21.4%，SSIM提升7.4%，LPIPS降低30.5%。消融研究进一步揭示，移除神经ODE组件后，纯自回归Transformer的PSNR骤降约9.7 dB（33.43→23.71），验证了隐式ODE是外推能力的核心使能器；解耦训练策略相比端到端联合训练在所有指标上均有显著增益。
-
-## 背景与动机
 
 动态3D场景的新视角合成是计算机视觉与图形学的前沿方向，其核心目标是从一组稀疏的标定多视角视频帧中重建场景的几何与外观，并支持在任意时刻、任意相机位姿下渲染逼真的图像。近年来，以神经辐射场（NeRF）和3D高斯泼溅（3D Gaussian Splatting, 3DGS）为代表的隐式与显式场景表示取得了显著进展，但在处理动态场景时，绝大多数方法聚焦于**插值**——即在训练数据覆盖的时间窗口内部，对未见时间戳进行重建。
 
@@ -64,7 +62,7 @@ claims:
 
 这一思路将外推从“在未见时间戳上做条件生成”重新定义为“基于过去观测的序列预测”，从而将连续时间动力学的归纳偏置注入到3D场景表示中，为动态场景外推开辟了新的技术路径。
 
-## 核心创新
+## 核心方法与创新机理
 
 ODE-GS的核心创新在于将动态场景的外推问题重新定义为**隐空间连续时间序列预测**，从根本上绕开了现有方法对显式时间戳条件化的依赖。这一设计由四个相互协同的“changed slots”构成，共同实现了从“插值重建”到“外推预测”的范式跃迁。
 
@@ -103,8 +101,6 @@ ODE-GS引入了两个互补的平滑正则化项，为预测动力学施加物�
 
 上述四个changed slots形成了一条完整的因果链：解耦训练提供高质量的训练轨迹，序列到序列范式定义预测任务的形式，隐式ODE消除时间戳OOD并提供连续时间演化能力，双重平滑正则化约束预测的物理合理性。这一设计使得ODE-GS在D-NeRF和NVFi数据集上分别以27.30 PSNR和33.43 PSNR显著领先于先前最佳方法，PSNR提升幅度达18.6%–39.6%（Table 1, Table 2）。
 
-## 整体框架
-
 ODE-GS 的整体框架围绕“重建-预测解耦”这一核心设计原则构建，将动态场景外推问题分解为两个阶段：首先在观测时间窗口内获得高质量的动态场景表示，然后基于该表示进行未来时间步的连续预测。这一分离设计的动机在于：传统动态重建方法将变形网络以显式时间戳 $t$ 为输入，当外推到训练窗口之外时，时间戳落入分布外，导致渲染质量急剧下降；而解耦后，外推模型不再依赖显式时间戳，而是通过隐空间的连续演化来生成未来状态。
 
 框架由两大核心模块串联构成，其输入输出关系如 Figure 2 所示。
@@ -138,8 +134,6 @@ $$
 $$
 
 其中 $\mathcal{L}_{\mathrm{e}}$ 为预测高斯参数与目标参数之间的 L1 损失。消融实验（Table 8）显示，去除所有正则化项后平均 PSNR 降至 32.90，进一步禁用自适应缩放则降至 32.19，证实了平滑约束及其动态调节对预测质量的重要贡献。
-
-## 核心模块与公式推导
 
 ### 3.1 问题形式化与渲染算子分解
 
@@ -226,7 +220,7 @@ $$
 ![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_XlRbpFj3lJ/figures/002_Figure_2.jpg]]
 *Figure 2: 1: We initialize temporal trajectories of 3D Gaussian parameters using the frozen interpolation model, which consists of the canonical 3D Gaussian set and a time-conditioned deformation MLP. These trajectories lie entirely within the observed temporal window. 2: Through our dynamic sampling strategy, each Gaussian trajectory is sampled into multiple observed prefix (input) and a held-out suffix (target) trajectories, providing training pairs for the Transformer latent ODE. 3: Latent-ODE training encodes the observed prefix with a Transformer, infers a latent initial state, and evolves it forward with a neural ODE. 4: A decoder maps the latent path back to Gaussian parameters, which are supe...*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -332,10 +326,7 @@ ODE-GS 在 D-NeRF 上平均取得 **27.30 PSNR / 0.9497 SSIM / 0.0467 LPIPS**，
 ![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_XlRbpFj3lJ/figures/016_Figure_6.jpg]]
 *Figure 6: Qualitative results on 5 scenes from the NVFI (Li et al., 2023) dataset, from left to right are the ground truth image, rendered result from Deformable GS(Yang et al., 2024), residual of Deformable GS against GT, GaussianPrediction(Zhao et al., 2024), residual of GaussianPrediction against GT, and finally Our as well as Ours residual against GT*
 
-![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_XlRbpFj3lJ/figures/010_Figure_5.jpg]]
-*Figure 5: Visualization of the degrade in metrics through time for extrapolation. Y axis is the corresponding metric and X axis is the time or frame where the metric was evaluated. This graph is the average over all scenes in NVFi dataset*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 与插值型动态重建基线的关系
 

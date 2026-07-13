@@ -43,7 +43,7 @@ claims:
 > - BAID (IAA) 上，SRCC 0.497 (PPA) vs 0.463 (IAACLIP) (+0.034)；PLCC 0.537 (PPA) vs 0.503 (IAACLIP) (+0.034)。
 > - SPAQ (IQA) 上，SRCC 0.945 (PPA) vs 0.934 (GAMMA) (+0.011)。
 
-## 概述
+## 概要
 
 图像美学评估（IAA）与图像质量评估（IQA）是视觉感知研究中的两项核心任务，但现有模型长期面临一个结构性矛盾：固定提示方法虽能保持较高评分精度，却缺乏对多样化评估维度的灵活适应能力；而基于提示的方法虽可进行文本可控的评分，却严重依赖提示级或属性级文本标注的质量与数量，难以在任意提示下同时实现高精度与可控性。这一瓶颈的本质在于，模型未能将文本提示的适应性建模为条件于图像内容与任务上下文的内在机制，导致提示灵活性与评分精度之间的耦合无法解耦。
 
@@ -51,7 +51,7 @@ claims:
 
 实验结果表明，PPA在多个IAA和IQA基准数据集上取得了具有竞争力的表现。在PARA、BAID和SPAQ数据集上，PPA达到最优性能（PARA上SRCC 0.913/PLCC 0.942，SPAQ上SRCC 0.945/PLCC 0.952），在其他数据集上与最佳结果的差距控制在4%以内。人工评估进一步验证了PPA在低层感知属性（如对焦、色彩、对比度、曝光）上的提示-图像一致性显著优于CLIP-IQA和UniQA等基线方法。消融实验证实，动态学习提示权重相比固定均匀分布带来约5%的平均性能增益，且特征空间的分数可分离性在训练后显著提升。
 
-## 背景与动机
+
 
 图像美学评估（IAA）与图像质量评估（IQA）是计算机视觉中的两个核心任务，分别关注图像的审美吸引力和技术质量。随着社交媒体和用户生成内容的爆炸式增长，对图像进行自动化、多维度的评分需求日益迫切。然而，这两个任务长期以来被作为独立问题处理，缺乏统一的评估框架。
 
@@ -61,7 +61,9 @@ claims:
 
 本文的核心动机正是打破这一僵局。我们观察到，文本提示本质上可以视为一个隐变量——不同的提示捕捉了图像在特定语义维度上的不同侧面，而任务（如“美学评估”或“质量评估”）则定义了这些侧面的聚合方式。基于这一洞见，本文提出**概率性提示自适应（Probabilistic Prompt Adaptation, PPA）**框架，将评分预测建模为提示的混合模型：模型动态推断每个提示在给定图像内容和任务上下文下的适应性权重，并通过边缘化所有提示得到最终的任务评分。这一机制从原理上解耦了提示灵活性与评分精度——训练仅需（任务，图像，分数）三元组，无需任何提示级标注；推理时则可接受任意文本提示，实现可控的多维度评估。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PPA的核心贡献在于将“提示”从固定的输入条件重新定义为可学习的隐变量，从而在机制层面解耦了文本提示的灵活性与评分精度。这一设计直接回应了现有方法的瓶颈：固定提示模型（如**NIMA**，Talebi and Milanfar, IEEE TIP 2018）缺乏灵活性，而基于提示的模型（如**CLIP-IQA**，Wang et al., AAAI 2023；**UniQA**，Zhou et al., arXiv 2024）要么依赖固定反义提示或集成，要么受限于提示级文本标注的质量与数量，难以在保持高精度的同时实现任意提示下的可控评估。
 
@@ -91,7 +93,7 @@ PPA的核心洞察在于：通过将文本提示作为隐变量并对其边缘�
 
 与**GAMMA**（Zhou et al., ACM MM 2025）的专家混合方法不同，PPA的“专家”是自然语言提示，具有天然的语义可解释性。与**MUSIQ**（Ke et al., ICCV 2021）的多尺度Transformer架构不同，PPA的创新不在于骨干网络设计，而在于概率化的提示自适应机制，这使得单一模型能够同时处理IAA和IQA任务，并在保持感知一致性的前提下灵活响应多样化的评估标准。
 
-## 整体框架
+
 
 PPA 的整体架构如图 2 所示，由两个核心模块构成：**提示特定评分（Prompt-Specific Scoring）** 和**任务特定评分（Task-Specific Scoring）**。前者负责在任意文本提示下对图像进行可控评分，后者将前者纳入一个概率混合框架，在仅有任务级监督的条件下学习提示的动态适应性权重，从而实现高精度的统一评估。
 
@@ -153,7 +155,7 @@ $$
 ![[assets/figures/papers/paper_list_l2335_https_openaccess_thecvf_com_content_CVPR2026_html_Hara_Probabilistic_Pro/figures/001_Figure_1.jpg]]
 *Figure 1: The proposed framework PPA provides a unified, textdriven approach to evaluating image aesthetics and visual quality. Each row illustrates examples of score predictions for antonymous text pairs, showing that PPA can flexibly adjust its evaluation according to nuanced textual instructions. This flexibility allows a single model to handle both IAA and IQA tasks while maintaining perceptual consistency across diverse prompts and evaluation criteria. All example images are sampled from the Open Images Dataset [30]*
 
-## 核心模块与公式推导
+
 
 ### 3.1 整体架构
 
@@ -214,7 +216,9 @@ $$\mathbb{E}_{p(s|x,c)}[s] = \sum_{t \in \mathcal{T}_{\text{samp}}} \bar{s}_{\th
 
 这一机制从因果层面解耦了提示灵活性与评分精度：提示选择模型 $p_{\phi}$ 负责动态推断任务与图像相关的提示权重，而提示特定评分模块 $\bar{s}_{\theta}$ 保持高精度评分能力，二者通过边缘化无缝融合。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能
 
@@ -267,7 +271,9 @@ Table 6通过轮廓系数（SS）和类间/类内方差比（BW）量化了特�
 ![[assets/figures/papers/paper_list_l2335_https_openaccess_thecvf_com_content_CVPR2026_html_Hara_Probabilistic_Pro/figures/010_Table_8.jpg]]
 *Table 8: Ablation study on the number of prompts, attributespecific prompts, and non-attribute prompts*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有方法的继承与差异
 
@@ -307,6 +313,8 @@ PPA 的优势场景和局限性可从以下维度界定：
 3. **零样本与跨任务泛化**：当前评估仅限于固定任务集上的训练和测试。PPA 的概率化提示自适应机制在零样本或跨任务迁移场景下的泛化能力尚未被验证，这是评估其作为通用评估框架潜力的关键未解问题。
 
 4. **特征空间可解释性的深化**：虽然 t-SNE 可视化和类间/类内方差比分析（Table 6）表明 PPA 训练后特征空间具有更强的分数可分性，但提示权重 $p_{\phi}(t \mid x, c)$ 的学习过程与特征空间结构之间的因果关系仍需更深入的理论分析。
+
+
 
 ## 原文 PDF
 

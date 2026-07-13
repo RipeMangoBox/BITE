@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2024
 pdf_ref: paperPDFs/arxiv_2024/LaserHuman_Language_guided_Scene_aware_Human_Motion_Generation_in_Free_Environment.pdf
+project_link: null
+code_link: https://github.com/4DVLab/LaserHuman
 aliases:
 - MCDMPCF
 - LLGSAHMGFE
@@ -42,7 +44,7 @@ claims:
 > - LaserHuman 上，contact ↑ 0.523 vs 0.455 (w/o qf) (+0.068)；FID ↓ 0.987 vs 2.010 (w/o qf) (-1.023)；R-score ↑ 0.326 vs 0.210 (w/o qf) (+0.116)。
 > - User Study (LaserHuman) 上，Total Plausible Score ↑ 4.1 vs 3.8 (sd-Text, estimated from paper) (+0.3)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有场景-文本到运动（Scene-Text-to-Motion）数据集如HUMANISE依赖合成运动、模板化语言和静态室内场景，缺乏真实物理交互、自由形式描述以及室内外混合动态元素，导致模型难以生成同时满足语义一致性与物理合理性的多样化人体运动。
 
@@ -56,7 +58,7 @@ claims:
 
 **方法定位**：该方法属于条件扩散生成范式，通过多模态融合模块将场景几何与自由语言描述联合嵌入去噪过程。相较于**MDM**（Tevet et al., ICLR 2023）的纯文本条件、**SceneDiff**（Huang et al., CVPR 2023）的纯场景条件，以及**cVAE-based HUMANISE**（Wang et al., NeurIPS 2022）的拼接式场景-文本联合条件，LaserHuman的并行交叉融合策略实现了模态间的双向增强，为语言引导的场景感知运动生成提供了新的基线。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -82,7 +84,9 @@ claims:
 
 在方法层面，本文的核心洞察是：**并行交叉注意力机制允许文本和场景特征相互增强**——文本特征提供动作和运动方向，场景特征提供交互位置和几何约束，避免了简单拼接或单一查询方式的模态隔离问题。基于此洞察，本文设计了一个**多条件扩散模型与并行交叉融合模块（Parallel Cross Fusion）**，使文本与场景点云特征互为查询进行交叉注意力，在扩散去噪过程中引导运动生成，确保生成的全局平移、身体姿态与文本描述及动态场景保持一致。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 LaserHuman 的核心创新在于提出了一种**并行交叉注意力融合机制（Parallel Cross Fusion）**，并将其嵌入到多条件扩散模型中，以解决场景-文本联合条件的人体运动生成问题。该机制通过改变多模态条件的融合方式，打破了现有方法中模态隔离的瓶颈，使得生成的全局平移、身体姿态能够同时与自由形式的语言描述及动态3D场景保持一致。
 
@@ -122,7 +126,7 @@ $$
 
 该并行交叉融合模块具有即插即用的特性。将其应用于基线方法 **sd-Text**（形成 sd-Text w/ cf）后，其接触分数和 FID 均得到显著提升，表明该融合策略可以作为一种通用组件，提升其他场景-文本条件生成模型的性能。
 
-## 整体框架
+
 
 LaserHuman 提出一个**多条件扩散模型**用于语言引导的场景感知人体运动生成。其核心设计理念是：通过一个简单而有效的多条件融合模块，将自由形式的文本描述与动态 3D 场景点云统一为联合条件嵌入，以此引导扩散 Transformer 在去噪过程中生成既语义一致又物理合理的多样化运动。
 
@@ -155,7 +159,7 @@ LaserHuman 提出一个**多条件扩散模型**用于语言引导的场景感�
 
 推理阶段，模型从随机噪声出发，在 $z_c$ 的引导下迭代 $T$ 步去噪，生成与场景几何和文本语义一致的全身运动序列。
 
-## 核心模块与公式推导
+
 
 ### 运动表示
 
@@ -203,7 +207,9 @@ $$L_{\mathrm{motion}} = E_{t, \mathbf{x}_0} \left[ \left| \mathbf{x}_t - \mathca
 
 同时施加常见几何损失 以促进运动的自然性与连贯性。采样阶段迭代执行“预测干净运动→加噪回退”过程，共 $T$ 步完成去噪生成。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 数据集与评估设置
 
@@ -304,7 +310,9 @@ Figure 7 系统展示了本文方法的典型失败案例：
 ![[assets/figures/papers/paper_list_l1672_LaserHuman_Language_guided_Scene_aware_Human_Motion_Generation_in_Free_E/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of data collection and processing procedures*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 任务定位与基线谱系
 
@@ -378,6 +386,8 @@ LaserHuman 的另一重要贡献是**数据集本身**。与现有场景感知�
 ### 6. 即插即用能力验证
 
 消融实验（Table 6）表明，将并行交叉融合模块应用于SceneDiff（sd-Text w cf）能够提升其接触分数和FID，证明该模块具有**方法无关的即插即用能力**。这意味着并行交叉融合可作为通用条件融合策略，嵌入到其他扩散运动生成框架中，为后续工作提供了直接的技术组件。
+
+
 
 ## 原文 PDF
 

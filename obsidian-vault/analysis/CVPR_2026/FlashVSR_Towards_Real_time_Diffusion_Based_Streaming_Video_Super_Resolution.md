@@ -43,7 +43,7 @@ claims:
 > - REDS (综合质量) 上，PSNR / SSIM / LPIPS 24.11 / 0.6511 / 0.3432 (13.6%稀疏) vs 24.65 / 0.6630 / 0.3320 (Full Attn.) (PSNR 下降0.54，质量基本持平)。
 > - TC Decoder 消融 (PSNR) 上，PSNR / SSIM / LPIPS 31.08 / 0.9244 / 0.1014 (Ours) vs 32.58 / 0.9417 / 0.0715 (Wan Decoder) (质量轻微下降，但速度提升约7倍)。
 
-## 概述
+## 概要
 
 扩散式视频超分辨率（VSR）近年来取得了显著的感知质量提升，但现有方法普遍存在推理延迟高、计算开销大的瓶颈，难以满足实时流式处理的需求。核心矛盾在于：多步扩散采样带来了高昂的每帧计算成本，而分块式（chunk-wise）处理模式又引入了长达约80帧的前瞻延迟，严重制约了在线应用场景的部署。此外，训练与推理阶段的分辨率失配常导致超高分辨率下的重复伪影和模糊，进一步削弱了模型的泛化能力。
 
@@ -55,7 +55,7 @@ claims:
 
 FlashVSR首次将单步蒸馏、流式训练范式与局部约束稀疏注意力统一于扩散式VSR，为实时高分辨率视频增强提供了可行路径。项目代码与模型将开源。
 
-## 背景与动机
+
 
 ### 扩散模型在视频超分辨率中的潜力与瓶颈
 
@@ -89,7 +89,9 @@ FlashVSR的关键洞察在于识别了VSR与视频生成之间的本质差异。
 
 这些目标共同驱动了FlashVSR的三阶段蒸馏框架和配套的系统优化策略，使其成为首个面向实时流式处理的单步扩散VSR方法。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FlashVSR 的核心创新并非单一算法突破，而是围绕**实时流式扩散 VSR** 这一目标，对扩散模型推理管线进行系统性的效率重构。其关键创新可归纳为四个相互耦合的 changed slots。
 
@@ -137,7 +139,7 @@ $$\mathcal { L } = \Vert x _ { \mathrm { p r e d } } - x _ { \mathrm { g t } } \
 
 上述四个 changed slots 并非孤立优化，而是形成正向耦合：单步蒸馏降低去噪步数，并行训练消除串行依赖，稀疏注意力压缩单步计算量，TC Decoder 加速像素空间重建。最终，FlashVSR 在单张 A100 上以 **17 FPS** 处理 768×1408 视频，峰值显存仅 **11.13 GB**（SeedVR2-3B 为 52.88 GB），节省约 **78.9%**，首次将扩散式 VSR 推至实时流式处理的门槛。
 
-## 整体框架
+
 
 FlashVSR 的整体框架围绕**三阶段蒸馏**构建，将预训练视频扩散模型逐步转化为可实时流式推理的单步超分辨率系统。图 2 给出了端到端的训练与推理流程。
 
@@ -173,7 +175,7 @@ $$z_t = G_{\mathrm{one}}(\mathrm{LR}_t, \epsilon_t; \mathrm{KV}_{<t})$$
 ![[assets/figures/papers/paper_list_l873_https_arxiv_org_abs_2510_12747/figures/012_Figure_7.jpg]]
 *Figure 7: Illustration of the sink attention effect in specific attention heads*
 
-## 核心模块与公式推导
+
 
 ### 三阶段蒸馏流水线
 
@@ -248,7 +250,9 @@ $$
 ![[assets/figures/papers/paper_list_l873_https_arxiv_org_abs_2510_12747/figures/003_Figure_3.jpg]]
 *Figure 3: Locality-Constrained Sparse Attention. Left: At ultra-high resolutions, performing inference beyond the trained positional encoding range produces artifacts (e.g., repetition or blur). Restricting each query to a local attention window keeps the positional encoding range consistent between training and inference, thereby preventing artifacts. Right: Two local window rules, namely boundary-preserved and boundary-truncated, are illustrated. The final sparse attention mask is computed within these local masks*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -305,7 +309,9 @@ FlashVSR 在多个合成与真实世界基准上进行了定量评估，涵盖 Y
 ![[assets/figures/papers/paper_list_l873_https_arxiv_org_abs_2510_12747/figures/013_Table_6.jpg]]
 *Table 6: Quantitative results of different KV-cache eviction strategies on the REDS dataset*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 任务定位与核心瓶颈
 
@@ -383,6 +389,8 @@ FlashVSR 的适用边界和局限可从以下几个维度审视：
 6. **多帧融合上限**：当前流式设计仅缓存 8 帧历史信息，更长的时间窗口（如 16 或 32 帧）是否能带来质量增益？增益的边际递减点在哪里？
 
 7. **跨退化类型泛化**：在不同于 RealBasicVSR 退化管线的真实世界退化（如压缩伪影、传感器噪声）上，模型的鲁棒性如何？是否需要退化感知的条件注入？
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,7 @@ paper_level: A
 venue: "SIGGRAPH Asia"
 year: 2025
 pdf_ref: paperPDFs/SIGGRAPH_ASIA_2025/Design_for_Descent_What_Makes_a_Shape_Grammar_Easy_to_Optimize.pdf
+code_link: null
 project_link: https://www.computationaldesign.group/publications/design-for-descent
 aliases:
 - SRDS
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 为梯度下降而设计：什么样的形状语法易于优化？ |
 | 英文题名 | Design for Descent: What Makes a Shape Grammar Easy to Optimize? |
 | 会议/期刊 | SIGGRAPH Asia 2025 |
-| Links | [paper](https://www.computationaldesign.group/assets/papers/SIGA-2025-D4Descent.pdf); [Project](https://www.computationaldesign.group/publications/design-for-descent) |
+| Links | [paper](https://www.computationaldesign.group/assets/papers/SIGA-2025-D4Descent.pdf) · [Project](https://www.computationaldesign.group/publications/design-for-descent) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Stochastic Rewrite Descent (SRD) |
 | Dataset | OneComp (Tree Grammar), Donut (Tree Grammar), TwoComp (Tree Grammar) |
@@ -42,7 +43,7 @@ claims:
 > - Donut (Tree Grammar) 上，PSNR (↑) 为 21.1 (Tr-3, 引入Jump Continuity)，对比 9.7 (Tr-1, 仅AddLeaf)，变化 +11.4。
 > - TwoComp (Tree Grammar) 上，PSNR (↑) 为 22.6 (Tr-F, 完整语法)，对比 10.3 (Tr-1)，变化 +12.3。
 
-## 概述
+## 概要
 
 形状语法是一种通过组合规则生成复杂结构的强大工具，在图形学与设计中广泛应用。然而，传统形状语法的逆问题求解——即寻找能产生目标形状的语法程序——长期依赖马尔可夫链蒙特卡罗（MCMC）或进化算法等无梯度方法，在庞大的离散-连续混合空间中效率低下，极易陷入局部最小值。
 
@@ -56,7 +57,7 @@ claims:
 
 该方法不仅适用于图像拟合，还可扩展到基于文本提示的生成（Score Distillation Sampling）和拓扑优化等任务，展示了设计驱动优化的通用潜力。
 
-## 背景与动机
+
 
 形状语法（Shape Grammar）作为一种程序化建模工具，通过一组离散的重写规则和连续参数来定义形状的生成过程。其核心优势在于能够产生高度结构化的输出——例如由少量基元构成的简洁形状——并且天然携带可编辑的语义结构。然而，这种表达能力的代价是**逆问题（inverse problem）的极度困难**：给定目标图像或物理约束，反推出生成该形状的语法程序（包括离散的派生树结构和连续参数）是一个典型的混合离散-连续优化问题。
 
@@ -83,7 +84,9 @@ claims:
 
 这一动机催生了两个核心贡献：（1）一套系统化的**语法设计指南**（Table 1），明确了使形状语法易于梯度优化的具体属性；（2）**随机重写下降（Stochastic Rewrite Descent, SRD）** 算法，将离散重写采样与连续参数的梯度下降交替执行，利用梯度信息同时指导离散结构选择和连续参数更新。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作的核心创新在于**视角的翻转**：不从搜索算法入手，而是从**形状语法本身的设计**出发，使其天然适配梯度下降优化。传统方法（如 **RJMCMC**，Talton et al., TOG 2011）在固定的语法空间内进行随机游走或进化搜索，缺乏梯度引导，极易陷入局部最小值。本文提出：若语法设计得当，其参数化空间将具备类似神经网络过参数化的光滑性与冗余性，使简单的随机梯度下降即可高效求解形状程序逆问题。
 
@@ -125,7 +128,7 @@ claims:
 
 与 RJMCMC 的对比（Figure 3）显示：在相同基础语法下，RJMCMC 与 Tr-1 表现相当；而采用优化友好语法后，SRD 的 PSNR 从 15.3 跃升至 22.0（OneComp），充分证明**性能增益来自语法设计本身，而非搜索算法的复杂度提升**。
 
-## 整体框架
+
 
 本文提出的核心框架并非设计新的搜索算法，而是**反向设计形状语法本身**，使其参数化空间天然适配梯度下降优化。基于这一思想，作者构建了一个交替优化管线，将离散结构探索与连续参数优化统一在梯度引导的框架下。
 
@@ -175,7 +178,7 @@ SRD 优化管线由四个核心模块构成，交替执行连续参数更新与�
 ![[assets/figures/papers/paper_list_l33_https_www_computationaldesign_group_assets_papers_SIGA_2025_D4Descent_pd/figures/012_Figure_5.jpg]]
 *Figure 5: Results of text-based optimization using Score Distillation Sampling (SDS) over grammars that (left) uses arcs and lines and (right) uses rectangles. The optimized shapes are coherent with the text prompts showing the versatility of our framework on different objectives. See Fig. 10 and 11 in the supplemental for additional results*
 
-## 核心模块与公式推导
+
 
 ### 设计空间与优化目标
 
@@ -223,7 +226,9 @@ SRD 的完整 pipeline 由四个核心模块构成：
 
 这四个模块的协同使 SRD 能够同时利用梯度信息指导离散结构探索和连续参数精调，克服了传统 MCMC 方法（如 **RJMCMC**, Talton et al., TOG 2011）在离散空间中缺乏梯度引导的局限。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -290,7 +295,9 @@ Fig. 6展示了SRD在动态变形序列中的鲁棒性：当目标图像连续�
 ![[assets/figures/papers/paper_list_l33_https_www_computationaldesign_group_assets_papers_SIGA_2025_D4Descent_pd/figures/004_Table_2.jpg]]
 *Table 2: Optimization quality (PSNR) and simplicity (number of primitives) using different grammar variations evaluated over OneComp (One), Donut (Dnt.), and TwoComp (Two) datasets*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -336,6 +343,8 @@ SRD 处于三个研究方向的交叉点上：
 | **混合离散-连续优化** | 提出交替执行连续梯度步和离散重写步的实用框架，通过贪心最大覆盖实现并行重写选择 | 神经网络架构搜索（NAS）中的混合优化；贝叶斯优化中的混合变量处理 |
 
 SRD 的核心知识贡献不在于提出新的优化算法理论，而在于揭示了一个被忽视的设计维度：**语法空间的结构属性决定了梯度优化的可行性**。这一洞察将“过参数化使优化更容易”的深度学习经验迁移到了程序化建模领域，为后续研究开辟了“优化驱动语法设计”的新方向。
+
+
 
 ## 原文 PDF
 

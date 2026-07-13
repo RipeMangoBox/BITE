@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/LLM_DNA_Tracing_Model_Evolution_via_Functional_Representations.pdf
+project_link: https://pypi.org/project/llm-dna/
+code_link: https://github.com/Xtra-Computing/LLM-DNA
 openreview_forum_id: UIxHaAqFqQ
 aliases:
 - LDTMEFR
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | LLM DNA：通过功能表示追踪模型演化 |
 | 英文题名 | LLM DNA: Tracing Model Evolution via Functional Representations |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=UIxHaAqFqQ); [GitHub](https://github.com/Xtra-Computing/LLM-DNA); [Project](https://pypi.org/project/llm-dna/) |
+| Links | [paper](https://openreview.net/forum?id=UIxHaAqFqQ) · [GitHub](https://github.com/Xtra-Computing/LLM-DNA) · [Project](https://pypi.org/project/llm-dna/) |
 | Topic | #topic/representation_self_supervised_transfer #topic/representation_self_supervised_transfer/representation_learning |
 | Method | RepTrace |
 | Dataset | LLM关系检测 (Relation Detection over 305 models), LLM关系检测, 模型路由 (Model Routing), 随机输入下的关系检测 |
@@ -41,7 +43,7 @@ claims:
 > - LLM关系检测 上，F1 为 0.940 ±0.050，对比 0.766 ±0.057 (PhyloLM+SVM)，变化 +0.174。
 > - 模型路由 (Model Routing) 上，Accuracy 为 0.672 ±0.008，对比 0.665 ±0.003 (EmbedLLM)，变化 +0.007。
 
-## 概述
+## 概要
 
 大语言模型（LLM）的快速迭代与大规模分发使得追踪其演化关系、检测衍生模型、理解功能相似性变得日益困难。现有方法存在根本性瓶颈：基于token分布的方法（如PhyloLM）受限于分词器差异且忽略语义，基于学习嵌入的方法（如EmbedLLM）依赖固定模型集并需重新训练，难以应对海量异构LLM的演化分析需求。
 
@@ -56,7 +58,7 @@ claims:
 
 方法局限包括：DNA子序列尚缺乏数学意义，提取依赖外部句子嵌入模型的质量，以及对API模型拒绝随机输出和自适应攻击的鲁棒性不足。
 
-## 背景与动机
+
 
 大语言模型（LLM）的快速迭代与广泛分发，催生了一个高度异构的模型生态：同一基座模型经微调、合并、量化、蒸馏后衍生出大量变体，其中许多变体之间的演化关系并未被公开记录。理解这些模型之间的功能亲缘关系，对于模型选择、版权归属、安全审计以及生态治理具有基础性意义。然而，现有的模型表征方法在应对这一需求时暴露出结构性缺陷。
 
@@ -68,7 +70,9 @@ claims:
 
 RepTrace 从这一缺口切入，其核心洞察是将 LLM 视为从有限输入空间到 logits 向量空间的函数，并赋予该函数空间 Hilbert 空间结构。借助 Johnson-Lindenstrauss 引理保证的存在性，通过随机高斯投影将该高维功能空间压缩到低维“DNA”空间，同时保持功能距离的双利普希茨条件——即 DNA 距离与真实功能距离之间存在定量的上下界约束。这意味着 DNA 天然满足两个关键性质：**遗传性**（微调产生相似 DNA）和**遗传决定性**（相似 DNA 对应相似功能），使其可直接用于关系检测与谱系重建，而无需任何训练步骤。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 LLM DNA 的核心创新在于将 LLM 功能空间的几何结构通过随机投影压缩为低维向量表示，从而绕开了现有方法的根本性瓶颈。与 PhyloLM（Yax et al., 2025）依赖 token 级分布距离、EmbedLLM（Zhuang et al., 2025）需在固定模型集上训练任务特定嵌入不同，RepTrace 提出了一条全新的技术路径，其关键创新体现在以下三个维度。
 
@@ -80,7 +84,7 @@ LLM DNA 的核心创新在于将 LLM 功能空间的几何结构通过随机投�
 
 上述三个 changed slots 共同构成了 RepTrace 相对于基线方法的根本性差异：**语义粒度**解决了跨分词器比较的障碍，**无训练设计**消除了可扩展性瓶颈，**期望近似**提供了理论保证下的实际可计算性。这三者的协同使得 DNA 能够在 305 个异构 LLM 上实现 AUC 0.992 的关系检测性能（Table 1），同时保持与模型参数规模无关的公平性（Table 6，所有 p 值 > 0.05）。
 
-## 整体框架
+
 
 RepTrace的核心理念是将LLM视为从有限输入空间到logits向量的函数，赋予其Hilbert空间结构，然后通过随机高斯投影将该函数映射到一个低维DNA空间。这个映射满足双利普希茨条件（Definition 3.2），保证功能相似的模型具有相近的DNA表示，而功能差异大的模型其DNA距离也相应增大。
 
@@ -109,7 +113,7 @@ RepTrace的核心理念是将LLM视为从有限输入空间到logits向量的函
 - 随机高斯矩阵$A$在提取时固定，保证所有模型的投影一致且公平。
 - 整个流程完全无训练、任务无关，不依赖模型架构或分词器。
 
-## 核心模块与公式推导
+
 
 ### 5.1 核心流水线模块
 
@@ -168,7 +172,9 @@ $$P\left( \left| \frac{1}{t} \hat{d}_f^2 - d_H^2 \right| \geq \epsilon \right) \
 | 集中不等式 | 有限提示采样的可靠性 | Table 3: 随机输入仍有效 |
 | 维度下界 $O(\log K)$ | $L$ 不随模型数线性增长 | 305模型仅需128维 |
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -259,7 +265,9 @@ DNA的区分能力在**Figure 2**中得到直观验证：以Llama-2-7B-hf为参�
 ![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_UIxHaAqFqQ/figures/018_Table_8.jpg]]
 *Table 8: Full list of used 305 models, including their architectures, parameter counts, and licenses*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心瓶颈与突破
 
@@ -298,6 +306,8 @@ RepTrace的核心突破在于将LLM视为从有限输入集到logits向量的**�
 **非文本生成模型的扩展**。当前框架依赖文本响应作为功能表征的媒介。是否能够将DNA框架扩展至仅编码器模型（如BERT系列）以及多模态模型？对于仅编码器模型，可能需要重新定义“功能”的度量空间；对于多模态模型，则需要统一的跨模态语义嵌入。
 
 **API模型的功能探测**。如何处理API模型拒绝随机字符串输出，导致无法获取功能表示的情况？可能的解决方向包括设计“无害但信息丰富”的探测提示集，或利用模型在拒绝响应中的行为模式作为替代功能信号。
+
+
 
 ## 原文 PDF
 

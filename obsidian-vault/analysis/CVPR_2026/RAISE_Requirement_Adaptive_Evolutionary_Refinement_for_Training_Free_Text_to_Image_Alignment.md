@@ -42,13 +42,11 @@ claims:
 > - GenEval 上，Overall Score 0.94 vs 0.91 (ReflectionFlow / Qwen-Image-RL) (+0.03)；Counting 0.95 vs 0.93 (Qwen-Image-RL) (+0.02)；Colors 0.98 vs 0.95 (ReflectionFlow) (+0.03)。
 > - DrawBench 上，VQAScore 0.885 vs 0.844 (ReflectionFlow) (+0.041)。
 
-## 概述
+## 概要
 
 文本到图像生成模型在遵循复杂提示方面仍存在显著对齐瓶颈：现有免训练的推理时缩放方法（如噪声重采样、提示重写）依赖固定的迭代预算或阈值，无法根据提示的语义复杂度动态分配计算量，导致多轮精化效果停滞甚至下降。RAISE 将文本到图像对齐形式化为**需求驱动的自适应进化过程**，通过并行多动作变异（提示重写、噪声重采样、指令式编辑）扩大搜索空间，并利用工具辅助验证（检测、深度估计、描述）形成“分析—精化—验证”闭环，实现无需训练的推理时自改进。
 
 核心结论：RAISE 在 GenEval 上取得 **0.94** 的总体分数，超过所有训练无关和基于训练的推理时缩放方法（包括 ReflectionFlow 的 0.91 和 Qwen-Image-RL 的 0.91），同时平均仅生成 18.6 个样本、调用 7.3 次 VLM——相比 ReflectionFlow 样本减少 41.9%，VLM 调用减少 88.6%。在多轮缩放中，RAISE 保持性能-效率帕累托前沿，随着采样预算增加持续提升 GenEval 分数，而其他基线趋于饱和或下降。消融实验表明，工具辅助验证和指令式编辑对属性绑定、颜色等细粒度对齐类别至关重要。
-
-## 背景与动机
 
 ### 文本到图像生成的推理时缩放瓶颈
 
@@ -74,7 +72,7 @@ claims:
 
 基于此，本文提出RAISE（Requirement-Adaptive Evolutionary Refinement），一个免训练的、需求驱动的自适应进化精化框架，旨在以更少的生成样本和VLM调用实现更优的文本到图像对齐。
 
-## 核心创新
+## 核心方法与创新机理
 
 RAISE 的核心创新在于将文本到图像对齐重新形式化为**需求驱动的自适应进化过程**，通过三个相互协同的机制突破现有推理时缩放方法的瓶颈。
 
@@ -111,8 +109,6 @@ $$\mathcal{V}_i = \{v_{i,k} = (q_{i,k}, a_{i,k}, e_{i,k}) \mid a_{i,k} \in \{\te
 ### 创新总结：从固定缩放到自适应进化
 
 RAISE 通过上述三个 changed slots——**需求驱动的自适应停止准则**替代固定预算、**并行多动作变异**替代单一精化路径、**工具辅助的结构化验证**替代简单评分——将推理时缩放从“盲目重试”升级为“感知需求的自改进闭环”。这一范式转换使 RAISE 在 GenEval 上达到 0.94 的 SOTA 分数（Table 1），同时在性能-效率帕累托前沿上持续领先（Figure 4），验证了**将计算量与语义需求对齐**这一核心主张的有效性。
-
-## 整体框架
 
 RAISE 是一个免训练的、以需求为驱动的自适应进化缩放框架，用于文本到图像（T2I）生成。其核心思想是将图像生成形式化为一个推理时的种群进化过程：系统在每一轮中通过多种变异动作并行生成候选图像，并利用结构化的需求验证机制动态评估对齐程度，仅在未满足需求上追加计算，从而实现计算预算与提示难度的自适应匹配。
 
@@ -158,8 +154,6 @@ RAISE 不依赖固定的迭代次数或分数阈值，而是采用双重停止�
 
 ![[assets/figures/papers/paper_list_l2339_https_arxiv_org_abs_2603_00483/figures/014_Figure_9.jpg]]
 *Figure 9: System prompt for the verifier agent verifier*
-
-## 核心模块与公式推导
 
 ### 3.1 需求驱动的自适应缩放
 
@@ -246,12 +240,7 @@ $$
 
 **双重停止准则** 确保精化在需求真正满足时终止：只有当分析器的 $d_i^{\mathrm{analyzer}} = \text{end}$ 且校验器的 $d_i^{\mathrm{verifier}} = \text{True}$ 同时成立时，缩放过程才停止。这一设计防止了分析器的误判导致过早终止。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2339_https_arxiv_org_abs_2603_00483/figures/012_Figure_5.jpg]]
-*Figure 5: Visualization of the multi-round evolutionary refinement path in RAISE (prompt: “a photo of a bear above a clock”). This figure illustrates how RAISE explores the search space through evolutionary multi-action refinements such as prompt rewriting, resampling, and instructional editing to adaptively improve prompt–image alignment. Across successive rounds, the system evaluates requirement satisfaction and allocates additional refinements only where needed, demonstrating requirement-driven adaptive scaling*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -301,16 +290,13 @@ RAISE 作为即插即用框架，在不同基础扩散模型和 VLM 上均表现
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l2339_https_arxiv_org_abs_2603_00483/figures/005_Figure_4.jpg]]
-*Figure 4: Pareto frontier and scaling performance. RAISE (red) achieves the highest GenEval [11] score with 41.9% fewer samples (18.6 vs. 32) and 88.6% fewer VLM calls (7.3 vs. 64). Unlike baselines that plateau or fail to improve with additional computation, RAISE maintains a strong performance–efficiency Pareto frontier and continues to improve as more samples are generated*
-
 ![[assets/figures/papers/paper_list_l2339_https_arxiv_org_abs_2603_00483/figures/010_Table_6.jpg]]
 *Table 6: Efficiency comparison on GenEval [11]. RAISE consistently achieves the highest GenEval score across budgets (Max #Samples = 8, 16, 32). At 32 samples, it requires 41.9% fewer samples generated and 88.6% fewer VLM calls on average than the second-best method*
 
 ![[assets/figures/papers/paper_list_l2339_https_arxiv_org_abs_2603_00483/figures/011_Table_7.jpg]]
 *Table 7: Quantitative comparison of RAISE on the GenEval benchmark [11] against diffusion models, unified multimodal models, training-free inference-time scaling, and training-based reflection tuning methods. The best and second results are bolded and underlined, respectively; category-best methods are also bolded. “Avg. #Samples Generated” and “Avg. #Calls VLM” indicate efficiency, and the last row shows RAISE ’s adaptive allocation of more computation to harder categories such as “Colors”, “Position”, and “Attribute Binding”*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 推理时缩放方法的演进与RAISE的定位
 

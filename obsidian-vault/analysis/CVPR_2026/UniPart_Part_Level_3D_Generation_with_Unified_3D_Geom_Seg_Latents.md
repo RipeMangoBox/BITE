@@ -42,7 +42,7 @@ claims:
 > - Part-level generation test set (curated from multiple sources) 上，Chamfer Distance (CD↓, ×10²) 0.72。
 > - Part-level generation test set 上，F1@0.1 (↑, ×10²) 92.21。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有部件级三维生成方法面临一个根本性矛盾——依赖隐式分割的方法在粒度控制上能力有限，而依赖外部预训练分割器的方法则引入额外标注成本，且两类方法在部件几何质量上均存在退化风险。其深层瓶颈在于，缺乏一个能够同时表征整体几何与部件语义的统一隐空间，导致生成与分割两阶段割裂。
 
@@ -52,7 +52,7 @@ claims:
 
 **主要结果**：在部件级生成测试集上，UniPart 在几何质量指标上显著超越现有方法，Chamfer Distance（CD）降至 **0.72**（×10²），F1@0.1 达到 **92.21**（×10²）（Table 1）。消融实验进一步验证了归一化规范空间（NCS）、局部注意力机制与空间嵌入注入三个设计对部件几何连贯性和组合精度的关键作用（Figure 7）。
 
-## 背景与动机
+
 
 ### 部件级三维生成的需求与挑战
 
@@ -81,7 +81,9 @@ UniPart 的动机源于一个关键观察：在纯整体几何生成过程中，
 
 这种设计将部件感知从“后处理”提升为“原生能力”，为部件级三维生成提供了新的范式。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 UniPart 的核心创新在于发现并利用了扩散 Transformer 隐空间中天然存在的部件感知能力，构建了一个**统一的几何-分割隐空间（Geom-Seg VecSet）**，并围绕它设计了端到端的两阶段部件级三维生成流水线。与现有方法相比，其关键创新体现在以下三个维度的 changed slots 上。
 
@@ -129,7 +131,7 @@ $$\mathcal{L}_{\mathrm{vecset}} = \mathcal{L}_{\mathrm{recon}} + \mathcal{L}_{\m
 
 消融实验（Figure 7）验证了该设计的必要性：去除 NCS 生成后部件几何扭曲且组合错位；去除局部注意力后部件内部结构不连贯；去除空间嵌入注入后双空间无法有效区分，导致位置和形状失真。最终，两个空间的潜变量通过共享的预训练几何解码器分别解码为网格 $\bar{\mathcal{M}}_i^{\mathrm{gcs}}$ 和 $\mathcal{M}_i^{\mathrm{ncs}}$，组合得到完整的部件级三维模型 $\mathcal{O} = \{\mathcal{M}_i\}_{i=1}^N$。
 
-## 整体框架
+
 
 UniPart 的整体流水线围绕一个核心设计展开：**将部件分割语义与三维几何编码进统一的隐空间**，并以此为基础构建两阶段级联扩散模型，实现从单张图像到可分解部件网格的端到端生成。流水线由三大模块串联构成（见图 2）。
 
@@ -181,7 +183,7 @@ $$
 ![[assets/figures/papers/paper_list_l2616_https_arxiv_org_abs_2512_09435/figures/003_Figure_2.jpg]]
 *Figure 2: The pipeline of UniPart. It includes a Geom-Seg VAE that encodes both whole geometry and part segmentation information into a unified representation, Geom-Seg VecSet. The image-guided part-level generation adopts a two-level pipeline, where a whole-level DiT first generates the whole geometry and segmented part latent, and a part-level DiT then accepts the input image and the whole-part latent as conditions for dual-space part latent generation. The final object mesh is composed of each full-resolution part mesh*
 
-## 核心模块与公式推导
+
 
 UniPart 的核心架构由三个关键模块构成：**Geom-Seg VAE**（统一几何-分割变分自编码器）、**Whole-level DiT**（整体级扩散Transformer）和**Part-level DiT**（部件级扩散Transformer），三者协同完成从单张图像到可分解部件网格的端到端生成。
 
@@ -227,7 +229,9 @@ $$\mathrm{Attn}_{\mathrm{global}} = \mathrm{Softmax}\left(\frac{\sigma_q(X_i^*)^
 ![[assets/figures/papers/paper_list_l2616_https_arxiv_org_abs_2512_09435/figures/006_Figure_4.jpg]]
 *Figure 4: Generated results of our whole-level DiT. (a) Input image; (b) Generated whole-object geometry; (c) Generated part latent segmentation. Please zoom in for details*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验设置与评估指标
 
@@ -282,7 +286,9 @@ Figure 8 系统展示了 UniPart 的典型失败案例，主要可归纳为以�
 
 这些失败模式揭示了当前方法的核心局限：统一的几何-分割隐空间虽能有效捕捉常见物体的部件结构，但对拓扑变异和极端几何的鲁棒性仍需提升，且对标注数据的依赖限制了其在新类别上的泛化能力。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 在部件级三维生成中的位置
 
@@ -342,6 +348,8 @@ NCS 的引入为每个部件提供了归一化的局部坐标系，使部件几�
 4. **跨模态扩展**：统一的几何-分割隐空间如何扩展到文本或草图驱动的生成任务？这需要在条件注入机制上进行适配，使分割语义能够响应非图像模态的条件信号。
 
 5. **推理加速**：如何通过蒸馏、一致性模型或级联去噪调度策略降低两阶段扩散的联合推理成本，是走向实际应用的关键工程问题。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2024
 pdf_ref: paperPDFs/CVPR_2024/PACER_On_Demand_Pedestrian_Animation_Controller_in_Driving_Scenarios.pdf
+project_link: null
+code_link: null
 aliases:
 - PDPACDS
 tags:
@@ -40,7 +42,7 @@ claims:
 > - 手动合成地形（低速轨迹 < 1 m/s） 上，l-FID 7.62 vs 8.84 (PACER) (-1.22)。
 > - 全身运动跟踪（AMASS 运动序列） 上，E_mpjpe (mm) 72.10 vs 80.29 (Wang et al. ) (-8.19)。
 
-## 概述
+## 概要
 
 ### 研究背景与瓶颈
 
@@ -66,7 +68,7 @@ claims:
 
 PACER+ 属于**基于物理仿真的目标条件强化学习**方法，通过对抗运动先验（AMP）保证生成动画的风格真实性。其上游依赖外部运动生成模型或预捕捉数据提供参考运动内容，下游输出可直接用于自动驾驶仿真器的行人行为模拟。
 
-## 背景与动机
+
 
 ### 驾驶仿真中的行人动画需求
 
@@ -92,7 +94,9 @@ PACER+ 属于**基于物理仿真的目标条件强化学习**方法，通过对
 
 通过这一设计，PACER+ 旨在填补轨迹跟随与运动控制之间的鸿沟，为驾驶仿真提供既准确又多样的行人动画生成方案。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PACER+ 的核心创新在于将**轨迹跟随**与**可遮罩的运动跟踪**统一到单一策略中，从而在保持轨迹精度的前提下，实现对行人上身运动的灵活、按需控制。此前的框架要么仅专注于轨迹跟随（如 **PACER** [Rempe et al., CVPR 2023]），要么只能进行全身运动跟踪（如 **Wang et al.** [ICCV 2023]），无法在跟随给定轨迹的同时，有选择地模仿特定身体部位的动作。PACER+ 通过以下两个关键的“changed slots”突破了这一瓶颈。
 
@@ -125,7 +129,7 @@ $$r_t = 0.5 r_t^{amp} + 0.5 (r_t^{traj} + r_t^{motion})$$
 2.  **零样本真实场景复现**：对于真实驾驶场景视频，可利用姿态估计提取高置信度关节作为参考运动，对低置信度或被遮挡的关节设置遮罩为 0，策略即可自动填补缺失部分，无需额外微调。
 3.  **运动质量与多样性提升**：在合成地形上，相较于仅进行轨迹跟随的 PACER 基线，PACER+ 的 FID 从 7.97 降至 6.74，Diversity 从 1.29 升至 1.67，证明运动跟踪任务的引入不仅没有损害轨迹跟随能力，反而提升了生成动画的自然度和多样性。
 
-## 整体框架
+
 
 PACER+ 的整体框架建立在一个目标条件化的马尔可夫决策过程（MDP）之上，其核心是将物理仿真中的行人动画控制建模为强化学习问题。MDP 由元组 $\mathcal{M} = \{\mathcal{S}, \mathcal{A}, \mathcal{T}, \mathcal{R}, \gamma\}$ 定义，其中状态 $\mathcal{S}$ 包含角色的本体感受信息、环境观测以及任务相关的目标状态；动作 $\mathcal{A}$ 为策略网络输出的 PD 控制器目标关节角度；转移动力学 $\mathcal{T}$ 由底层的物理仿真器（Isaac Gym）驱动；奖励 $\mathcal{R}$ 由多个子任务奖励加权组合而成；$\gamma$ 为折扣因子。策略网络采用广泛使用的近端策略优化（PPO）算法进行训练。
 
@@ -158,7 +162,7 @@ $$r_t^{motion} = w_{jp} e^{-100||\hat{p}_t - p_t|| \circ m_t} + w_{jr} e^{-10||\
 ![[assets/figures/papers/paper_list_l1852_PACER_On_Demand_Pedestrian_Animation_Controller_in_Driving_Scenarios/figures/002_Figure_2.jpg]]
 *Figure 2: Framework of PACER+. Our framework follows the goal-conditioned reinforcement learning with Adversarial Motion Prior. To enable fine-grained control of specific body parts, we introduce an additional spatial-temporal mask to the motion-tracking task. This mask indicates the presence of a reference motion that the policy should track. By focusing on this tracking task, our framework enables the demonstration of diverse pedestrian behaviors at specific time steps and locations in a zero-shot manner*
 
-## 核心模块与公式推导
+
 
 PACER+ 将行人动画控制建模为目标条件的马尔可夫决策过程（MDP），其核心由五个模块构成：PPO 策略网络、轨迹跟随模块、运动跟踪模块（含时空遮罩）、对抗运动先验（AMP）以及物理仿真器。以下逐一阐述其关键机制与公式。
 
@@ -197,7 +201,9 @@ $$r_t^{motion} = w_{jp} e^{-100||\hat{p}_t - p_t|| \circ m_t} + w_{jr} e^{-10||\
 ![[assets/figures/papers/paper_list_l1852_PACER_On_Demand_Pedestrian_Animation_Controller_in_Driving_Scenarios/figures/003_Figure_3.jpg]]
 *Figure 3: Our framework presents an on-demand control system tailored for real-world videos. Beginning with the pre-processing in [60], our policy network can track high-confidence motions and effectively fill in missing parts without additional fine-tuning. Moreover, our framework offers the novel functionality of introducing customized animations into real-world scenarios with flexible control options*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -250,7 +256,9 @@ Table 4 的消融实验验证了运动跟踪任务和时空遮罩各自的设计
 ![[assets/figures/papers/paper_list_l1852_PACER_On_Demand_Pedestrian_Animation_Controller_in_Driving_Scenarios/figures/008_Figure_5.jpg]]
 *Figure 5: Zero-shot animation recreation of real-world pedestrians. Our framework is capable of simulating pedestrian animation following the motion content of real-world videos*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 技术脉络与基线关系
 
@@ -287,6 +295,8 @@ PACER 首次将对抗运动先验（AMP）引入行人轨迹跟随任务，使�
 - **端到端语义集成**：如何将语言指令或场景语义直接集成到策略网络中，使行人能够根据驾驶环境自主生成语义合理的动作，而非依赖外部运动生成模型的“离线”输出？这将使框架从“动作播放器”升级为“行为生成器”。
 - **多智能体交互**：当前框架仅处理单个行人的动画控制。在驾驶场景中，行人与行人、行人与车辆之间的交互建模（如避让、跟随、群体行为）是一个重要的扩展方向。
 - **实时闭环控制**：PACER+ 的策略在仿真环境中运行，如何将其部署到实时系统中，并实现与动态变化的驾驶场景的闭环交互，仍需进一步探索。
+
+
 
 ## 原文 PDF
 

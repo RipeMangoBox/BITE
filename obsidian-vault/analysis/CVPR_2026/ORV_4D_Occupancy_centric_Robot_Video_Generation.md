@@ -43,7 +43,7 @@ claims:
 > - DROID 上，FVD 34.603 vs 44.309 (IRASim†) (-9.706)。
 > - RT-1 上，FVD 19.931 vs 42.130 (IRASim†) (-22.199)。
 
-## 概述
+## 概要
 
 机器人视频生成的核心瓶颈在于**稀疏的7-DoF动作控制信号与密集的像素级视频动态之间存在巨大的表示鸿沟**，导致生成视频的保真度、时序一致性和控制对齐性均不足。为弥合这一鸿沟，ORV提出以**4D语义占用（4D Semantic Occupancy）为中心**的生成框架，将占用渲染图作为软视觉先验注入扩散过程，与动作先验耦合，从而为视频生成提供精细的几何与语义指导。
 
@@ -55,7 +55,7 @@ claims:
 
 ORV在方法谱系上定位于**动作条件视频生成**与**视觉规划**的交叉地带，与IRASim、HMA、AVID等动作条件基线以及iVideoGPT等视觉规划基线形成对比。其独特之处在于将4D占用作为统一的几何-语义先验，同时服务于单视图生成、多视图生成和仿真到现实的迁移，这是现有方法尚未探索的方向。
 
-## 背景与动机
+
 
 机器人视频生成的核心目标，是从稀疏的机器人控制信号出发，合成高保真、时序连贯且物理合理的未来观测视频。这一能力被视为构建通用机器人模拟器与视觉规划器的关键前提。然而，当前方法面临一个根本性瓶颈：**7-DoF末端执行器动作序列所承载的控制信息极为稀疏，而需要生成的像素级视频动态却高度密集，二者之间存在巨大的表示鸿沟**。这一鸿沟直接导致生成视频在保真度、时序一致性以及动作-视觉对齐性上的显著不足。
 
@@ -67,7 +67,9 @@ ORV正是在这一动机下提出的。其核心洞察是：**将4D语义占用�
 
 此外，ORV还充分利用预训练视频基础模型（如CogVideoX-2B）的生成先验来提升视觉真实感，并在此基础上扩展出多视图一致生成（ORV-MV）与仿真到现实迁移（ORV-S2R）的能力。这些扩展进一步拓宽了机器人视频生成的应用边界——从数据增强到视觉规划，再到策略学习——为构建以生成为核心的机器人学习范式提供了新的可能性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ORV的核心创新在于通过**4D语义占用**弥合了稀疏机器人控制信号与密集像素级视频生成之间的表示鸿沟。传统动作条件视频生成方法（如**IRASim**、**AVID**）直接编码7-DoF末端执行器姿态序列，但稀疏的动作轨迹难以充分约束高维视频潜在空间的动态演化，导致生成视频的时序一致性和控制对齐性不足。ORV引入两个关键的**changed slots**来解决这一问题：
 
@@ -89,7 +91,7 @@ ORV-MV引入**视图注意力模块**，在时间注意力之前处理跨视图�
 
 三个changed slots的耦合构成了ORV的核心机制：**动作先验提供控制意图，占用视觉先验提供几何约束，两者协同弥合稀疏控制与密集输出之间的鸿沟**。
 
-## 整体框架
+
 
 ORV 是一个以 4D 语义占用为中心的条件视频生成框架，其核心设计动机在于弥合**稀疏的 7-DoF 动作控制信号**与**密集的像素级视频动态**之间的表示鸿沟。如图 3 所示，框架以占用表示 $\mathcal{C}$ 和动作序列 $\mathcal{A}$ 为双条件输入，通过非交互式方法分别从真实环境或物理仿真器中采集这两类先验，进而驱动单视图、多视图以及仿真到现实（Sim-to-Real）的操控视频生成。
 
@@ -119,7 +121,7 @@ $$z_{\mathrm{in}} = \mathtt{Zero-MLP}\big(z_{\mathrm{in}} + \mathtt{MLP}(\mathca
 ![[assets/figures/papers/paper_list_l2558_https_arxiv_org_abs_2506_03079/figures/002_Figure_2.jpg]]
 *Figure 2: Establishment of non-interactive methods (π, π′) both in the real-world environment and physical simulator to collect trajectory priors (7-DoF EE Pose) and visual priors (Occupancy)*
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题形式化与条件建模
 
@@ -173,7 +175,9 @@ $$\min_{\alpha,\beta} \sum_{i\in\mathcal{V}} \left(\alpha D_i' + \beta - D_i\rig
 ![[assets/figures/papers/paper_list_l2558_https_arxiv_org_abs_2506_03079/figures/005_Figure_5.jpg]]
 *Figure 5: Architecture of ORV-MV, which generates multiview robot manipulation videos with cross-view consistency*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ORV在三个核心任务上接受系统验证：**条件视频生成**（Conditional Video Generation）、**视觉规划**（Visual Planning）与**策略学习**（Policy Learning）。实验覆盖BridgeData V2、DROID和RT-1三个真实机器人操控数据集，从视频保真度、控制对齐性和下游任务增益三个维度提供量化证据。
 
@@ -243,7 +247,9 @@ Table 1汇总了ORV与多个基线在单视图条件视频生成上的对比。O
 ![[assets/figures/papers/paper_list_l2558_https_arxiv_org_abs_2506_03079/figures/015_Table_7.jpg]]
 *Table 7: Ablation results of zero-shot Conditional Video Generation on different occupancy conditioning resources*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题域定位：稀疏控制与密集视觉之间的表示鸿沟
 
@@ -305,6 +311,8 @@ ORV 的知识贡献可分解为以下可复用模块：
 - **单视图到多视图的扩展**：能否仅凭一个相机视图合成多视图首帧图像，从而实现从单视图到多视图一致视频的端到端生成？
 - **长时域规划与生成**：ORV 如何扩展为长时域操控数据的规划与生成系统，以支持更复杂的层次化策略学习？
 - **仿真到现实的泛化理论**：Table 7 显示在粗糙视觉条件（Coarse）上训练的模型泛化能力更强（Coarse→Fine PSNR 仅下降 -1.423），而在像素对齐条件（Fine）上训练的模型在粗糙输入下性能大幅下降（-11.240）。这一现象背后是否存在可形式化的泛化理论，以指导条件粒度的选择？
+
+
 
 ## 原文 PDF
 

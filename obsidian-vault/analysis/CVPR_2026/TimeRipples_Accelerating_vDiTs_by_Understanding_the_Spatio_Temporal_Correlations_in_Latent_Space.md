@@ -43,7 +43,7 @@ claims:
 > - CogVideoX 上，PSNR (dB, ↑) 26.65 (TIMERIPPLE 75%) vs 25.04 (PAB) (+1.61 dB)。
 > - Open-Sora-Plan 上，VBench (↑) 78.95 (TIMERIPPLE 75%) vs 78.77 (Original) (+0.18)。
 
-## 概述
+## 概要
 
 视频扩散Transformer（vDiT）已成为视频生成的主流架构，但其推理效率严重受制于自注意力机制。在四个主流vDiT模型上，自注意力计算平均占据总执行时间的**78%**（Fig. 4），成为制约实际部署的核心瓶颈。
 
@@ -51,7 +51,7 @@ claims:
 
 在四个广泛使用的vDiT模型（HunyuanVideo、Wan2.1、CogVideoX、Open-Sora-Plan）上，TIMERIPPLE以**最高85%的自注意力计算节省**实现了**2.7×的理论加速**，同时将视频质量损失控制在**0.06%以内**（VBench指标）。在HunyuanVideo上，TIMERIPPLE 75%配置下的PSNR达到35.06 dB，相较于表现最好的基线方法 ∆-DiT（26.09 dB）提升近9 dB。方法无需重新训练或微调，可直接应用于现有vDiT模型。
 
-## 背景与动机
+
 
 ### 视频扩散Transformer的效率瓶颈
 
@@ -97,7 +97,9 @@ $$
 
 基于上述分析，本文的核心动机可概括为：利用vDiT通道维度的时空相关性，设计一种轻量、自适应的注意力分数复用策略，在不引入显著质量损失的前提下，大幅降低自注意力层的计算冗余，从而加速整个视频扩散Transformer的推理过程。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题根因：自注意力中的时空冗余
 
@@ -134,7 +136,7 @@ TIMERIPPLE 的关键认知突破在于将注意力图的冗余追溯到其产生
 
 TIMERIPPLE 的本质创新不在于提出一种新的注意力近似算法，而在于**识别并利用了 vDiT 架构中一个被忽视的结构化先验**——RoPE 将通道维度按时空语义分组，使得冗余在通道层面具有可预测的模式。三个 changed slots 分别从“计算什么”“复用谁”“何时放宽”三个维度将这一先验转化为实际的加速收益，最终在 HunyuanVideo 上以 75% 的计算节省实现了 35.06 dB PSNR（相较最佳基线 ∆-DIT 的 26.09 dB 提升近 9 dB），在 85% 的节省下 VBench 得分（80.44）甚至略超原始模型（80.28），验证了“理解冗余来源比直接跳过计算更有效”的核心主张。
 
-## 整体框架
+
 
 TIMERIPPLE 的核心思路是将自注意力计算中存在的时空冗余，转化为沿通道维度的可控复用。整个流水线由四个模块串联而成，在标准 vDiT 的每个自注意力层内插入，不改变模型权重，也不依赖额外训练。
 
@@ -181,7 +183,7 @@ vDiT 由多个块堆叠而成，每个块包含自注意力、交叉注意力和
 ![[assets/figures/papers/paper_list_l941_https_openaccess_thecvf_com_content_CVPR2026_html_Mao_TimeRipples_Accele/figures/001_Figure_1.jpg]]
 *Figure 1: An illustration of spatial and temporal patterns in one head of multi-head attention maps. Due to the space limit, only 4 frames are shown here. The attention patterns are determined by the spatial and temporal correlations of the key and query. Spatial-dominated attention (on the left) primarily focuses on the spatial correlations within a frame; thus, the values between two frames are similar and can be reused. Temporal-dominated attention (on the right) primarily focused on the temporal correlations across frames; thus, the values within a frame are similar and can be reused*
 
-## 核心模块与公式推导
+
 
 ### 问题形式化：自注意力瓶颈
 
@@ -241,7 +243,9 @@ Fig. 7 的对比实验揭示了复用策略相较于掩码方法的优势：在�
 ![[assets/figures/papers/paper_list_l941_https_openaccess_thecvf_com_content_CVPR2026_html_Mao_TimeRipples_Accele/figures/005_Figure.jpg]]
 *Figure: Original Output*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置与对比基线
 
@@ -305,7 +309,9 @@ Table 3在HunyuanVideo上系统消融了各设计选择的影响：
 ![[assets/figures/papers/paper_list_l941_https_openaccess_thecvf_com_content_CVPR2026_html_Mao_TimeRipples_Accele/figures/002_Figure_2.jpg]]
 *Figure 2: Examples of attention maps with different patterns. For visualization, we present only a fraction ( 12 ) of the full attention map along each dimension and zoom in the attention scores of 2 × 2 frames on each attention map. On the left, spatially-varying attention maps primarily capture spatial information within individual frames. Spatially-dominated attention maps often have no significant variations across frames; thus, the values across frames are similar. On the right, as temporal-oriented channels dominate, temporally-varying attention maps increasingly focus on temporal correlations across frames; thus, the values within a frame are similar. The color bar shows the magnitude of atten...*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：vDiT 推理瓶颈的本质
 
@@ -358,6 +364,8 @@ PAB 通过跨去噪步广播中间注意力结果减少计算，其复用发生�
 2. **跨任务泛化**：通道级时空相关性是否在图像生成（DiT）、3D 生成、视频预测等任务中同样成立？若能泛化，该方法的应用范围将大幅扩展。
 3. **自动化阈值搜索**：能否设计元学习或预测网络，根据模型架构和生成设置自动搜索最优阈值配置，消除手工调参成本？
 4. **与其他加速维度的组合**：TIMERIPPLE 与 PAB（跨步复用）、SVG（空间掩码）已展示初步的组合效果，系统性地探索多维度加速策略的叠加空间是一个有前景的方向。
+
+
 
 ## 原文 PDF
 

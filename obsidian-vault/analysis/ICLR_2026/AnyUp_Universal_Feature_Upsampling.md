@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/AnyUp_Universal_Feature_Upsampling.pdf
+project_link: https://wimmerth.github.io/anyup
+code_link: null
 aliases:
 - AnyUp
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | AnyUp：通用特征上采样 |
 | 英文题名 | AnyUp: Universal Feature Upsampling |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=Y9UAgPehqo); [Project](https://wimmerth.github.io/anyup) |
+| Links | [paper](https://openreview.net/forum?id=Y9UAgPehqo) · [Project](https://wimmerth.github.io/anyup) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | AnyUp |
 | Dataset | COCO-Stuff, ADE20k, PASCAL-VOC, NYUv2 |
@@ -40,11 +42,11 @@ claims:
 > - ADE20k 上，mIoU 为 42.43，对比 42.19 (FeatUp)，变化 +0.24。
 > - PASCAL-VOC 上，mIoU 为 84.00，对比 84.36 (JAFAR)，变化 -0.36。
 
-## 概述
+## 概要
 
 AnyUp 是一种全新的通用特征上采样方法，旨在解决现有学习型上采样方法（如 FeatUp、LoftUp、JAFAR）的核心局限：它们在推理时无法泛化到未见过的特征提取器，必须针对每个视觉编码器重新训练。AnyUp 通过引入**特征无关层（feature-agnostic layer）**、**局部窗口注意力（local window attention）** 和**基于裁剪的训练策略**，首次实现了在推理时对任意输入特征、任意分辨率和任意任务的通用上采样。实验表明，AnyUp 在语义分割、深度估计和表面法线估计等多个下游任务上取得了最先进的结果，并且能够成功泛化到训练时未见过的特征提取器（如从 DINOv2 泛化到 SigLIP 2、DINOv3 等）。
 
-## 背景与动机
+
 
 特征上采样是计算机视觉中的基础操作，旨在将低分辨率特征图提升为高分辨率特征图，以支持需要精细空间信息的任务（如语义分割、深度估计）。现有方法可分为两类：
 
@@ -53,7 +55,9 @@ AnyUp 是一种全新的通用特征上采样方法，旨在解决现有学习�
 
 AnyUp 的核心洞察是：上采样任务主要依赖于理解特征图的局部结构变化，而非特征的具体语义内容。因此，可以通过一个与输入特征维度无关的卷积层来捕获这种结构信息，再结合局部窗口注意力机制简化优化目标，从而实现跨编码器的通用上采样。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 AnyUp 的核心创新在于其**特征无关层（feature-agnostic layer）**，这是实现跨编码器泛化的关键因果旋钮。该层通过一组可学习的卷积基对输入特征的所有通道独立处理并平均聚合，使得模型能够处理任意维度和类型的特征，无需针对特定编码器重新训练。
 
@@ -62,7 +66,7 @@ AnyUp 的核心创新在于其**特征无关层（feature-agnostic layer）**，
 - **基于图像局部裁剪的训练策略**：从高分辨率图像中随机采样小裁剪块计算参考特征，替代 JAFAR 的低分辨率训练策略，提升上采样质量。
 - **自一致性与输入一致性正则化**：增强模型对噪声和扰动的鲁棒性，并保持输入特征空间。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_Y9UAgPehqo_AnyUp_Universal/figures/001_Figure_1.jpg]]
 
@@ -76,7 +80,7 @@ AnyUp 的整体框架如 Figure 3 所示，包含以下主要模块：
 
 训练流程如 Section 4.3 所述：从高分辨率图像中随机采样局部裁剪块，计算低分辨率特征和高分辨率参考特征，然后通过上采样网络生成预测特征，并与参考特征计算损失。
 
-## 核心模块与公式推导
+
 
 ### 5.1 特征无关层
 
@@ -110,7 +114,9 @@ $$L_{self-consistency} = d_{cos-mse}(f(p, I_{hr}), f(p, I_{hr}'))$$
 
 与 JAFAR 使用空间语义特征调制不同，AnyUp 采用简单的特征拼接后接标准 ResNet 块，实验表明这不会带来性能下降。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 6.1 主要结果
 
@@ -165,7 +171,9 @@ Table 10 显示 AnyUp 具有 0.8M 参数，在 224² 分辨率下推理时间 12
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_Y9UAgPehqo_AnyUp_Universal/figures/002_Table_1.jpg]]
 *Table 1: Categorization of feature upsampling methods. AnyUp is the first learnable method that generalizes to any input feature at inference time, while being able to upsample from any to any resolution and being task-agnostic.*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 AnyUp 属于**学习型特征上采样**方法谱系，其直接前身包括：
 
@@ -181,6 +189,8 @@ AnyUp 的核心贡献在于首次实现了**编码器无关的通用上采样**�
 - 多骨干训练策略在更多样化的特征提取器集合上表现如何？是否存在性能上限？
 - AnyUp 能否与特征去噪方法（如 FeatSharp 中的去偏置）结合以进一步提升性能？
 - AnyUp 在 3D 场景理解或多视图重建等更复杂的下游任务中表现如何？
+
+
 
 ## 原文 PDF
 

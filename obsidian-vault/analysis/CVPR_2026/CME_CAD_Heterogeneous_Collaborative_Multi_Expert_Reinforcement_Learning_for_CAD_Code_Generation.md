@@ -41,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - CADExpert 上，IoU (%) 80.71 vs 71.84 (CAD-RL) (+8.87)；Executability (%) 98.25 vs 97.60 (CAD-RL) (+0.65)；Mean CD 1.00 vs 1.22 (CAD-RL) (-0.22)。
 
-## 概述
+## 概要
 
 从二维工程图自动生成精确、可执行的CAD代码是工业设计自动化的核心挑战。现有基于可验证奖励的强化学习方法（RLVR）本质上是on-policy的，倾向于沿已有奖励丰富的推理路径优化，难以主动探索新的知识与推理路径。同时，CAD代码生成任务要求高几何精度、约束兼容性和可编辑性，单一专家模型的推理路径受限，在复杂场景中性能难以突破。
 
@@ -49,7 +49,7 @@ claims:
 
 在工业级数据集CADExpert上，CME-CAD取得了**80.71%的IoU**，相比当前最强基线CAD-RL的71.84%提升了**8.87个百分点**，可执行性达到98.25%，平均Chamfer距离降至1.00。消融实验表明，硬负样本缓冲机制对整体性能影响最大，而EIAE与多专家协作学习（MECL）联合使用可充分激活框架潜力。
 
-## 背景与动机
+
 
 计算机辅助设计（CAD）是现代工业制造的基石，而将二维工程图自动转化为可执行的CAD脚本代码是提升设计效率的关键环节。近年来，视觉语言模型（VLM）在CAD代码生成领域展现出巨大潜力，研究者先后提出了**CAD-MLLM**（Xu et al., arXiv 2024）、**GenCAD**（Alam et al., arXiv 2024）以及基于思维链推理的**CAD-Coder**（Guan et al., arXiv 2025）等方法，逐步推进了这一任务的性能边界。然而，该任务天然面临三大核心挑战：生成代码必须具备**高几何精度**、**约束兼容性**和**可编辑性**——任何一个维度的偏差都可能导致生成的3D模型无法实际使用。
 
@@ -59,7 +59,9 @@ claims:
 
 受“取长补短”思想的启发，本文提出**异构协作多专家强化学习（CME-CAD）范式**。其核心洞见在于：通过融合多个异构预训练模型的差异化推理能力，为强化学习提供更丰富的探索空间；同时，跨专家协作学习机制使得每个专家都能从其他专家处获取改进信号，从而突破单一模型固有的推理上限。这一范式将多专家微调（MEFT）与多专家强化学习（MERL）有机结合，为CAD代码生成任务开辟了新的优化路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：从单一路径优化到多路径探索的范式跃迁
 
@@ -120,7 +122,7 @@ $$\mathcal { L } _ { \mathrm { S F T } } = - \sum _ { B } \log p _ { \theta } ( 
 
 在CADExpert基准上，CME-CAD以**80.71%的IoU**显著超越SOTA方法CAD-RL的71.84%（提升8.87个百分点），同时可执行性达到98.25%，Mean CD降至1.00。消融实验的系统性验证（Table 3）表明：从基础模型（IoU 64.45%）开始，逐步添加EIAE、HSB和MECL后性能持续提升，三者共同使用达到最优。这一递进式验证有力地支撑了各创新组件的独立贡献与协同效应。
 
-## 整体框架
+
 
 CME-CAD 采用**两阶段异构多专家训练范式**，将 CAD 代码生成建模为从二维工程图到可执行 CADQuery 代码的序列生成任务。其核心设计思路是：通过引入多个具有差异化推理风格的专家模型，打破单一模型在复杂推理场景中的认知上限，实现跨专家的知识迁移与探索增强。
 
@@ -168,7 +170,7 @@ $$
 ![[assets/figures/papers/paper_list_l2669_https_arxiv_org_abs_2512_23333/figures/001_Figure_1.jpg]]
 *Figure 1: The workflow of our method for CAD code generation*
 
-## 核心模块与公式推导
+
 
 CME-CAD 的训练流程由两个阶段构成：**多专家监督微调（MEFT）** 与 **多专家强化学习（MERL）**。MEFT 阶段负责构建多样化的推理路径数据并进行监督微调，MERL 阶段则在强化学习框架下通过三个核心机制实现跨专家知识迁移与探索增强：专家内部优势估计（EIAE）、多专家协作学习（MECL）和硬负样本缓冲机制（HSB）。
 
@@ -218,7 +220,9 @@ $$\mathcal{L}_{\mathrm{SFT}} = -\sum_{B} \log p_\theta(A_{\mathrm{correct}} \mid
 
 消融实验证实，HSB 对整体性能影响最大（Tab. 3），这与 CADExpert 数据集的高复杂性直接相关——困难样本的持续利用是突破性能瓶颈的关键。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 
@@ -264,7 +268,9 @@ CME-CAD 在 CADExpert 基准上取得了显著优于现有方法的性能。Tabl
 ![[assets/figures/papers/paper_list_l2669_https_arxiv_org_abs_2512_23333/figures/005_Table_2.jpg]]
 *Table 2: Results of Multi-Expert learning compared to individual Expert learning.The table shows four sections: performance of a single expert with SFT, performance with multi-expert data in SFT, performance of a single expert with both SFT and GRPO, and the final results of our approach*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位与核心瓶颈
 
@@ -304,6 +310,8 @@ CME-CAD 面向从二维工程图（三视图）生成精确可执行的 CADQuery
 - 该方法能否与参数化特征树生成方法结合，进一步提升 CAD 模型的可编辑性和结构化程度？
 - 在工业级大规模数据集上，异构专家数量的最优选择策略是什么？专家间的互补性如何量化？
 - 门控奖励函数中的权重系数（λ）对最终性能的敏感性如何？是否存在自适应调节机制的空间？
+
+
 
 ## 原文 PDF
 

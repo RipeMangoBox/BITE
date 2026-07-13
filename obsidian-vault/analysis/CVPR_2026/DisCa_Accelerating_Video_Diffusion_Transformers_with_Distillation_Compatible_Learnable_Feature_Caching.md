@@ -43,7 +43,7 @@ claims:
 > [!tip] 效果简介
 > - HunyuanVideo 1.0 [T2V] on VBench 上，加速比 (Speed↑) 11.8× (DisCa R=0.2, N=4) vs 1.00× (Original 50 steps) (+10.8×)；VBench Total Score 78.8 (DisCa R=0.2, N=4) vs 79.9 (Original 50 steps) (-1.1%)；VBench Semantic Score 69.3 (DisCa R=0.2, N=4) vs 73.5 (Original 50 steps) (-5.7%)。
 
-## 概述
+## 概要
 
 视频扩散Transformer（DiT）的推理成本极高，现有加速策略主要依赖步蒸馏与训练无关的特征缓存，但二者长期处于割裂状态。步蒸馏（如MeanFlow）通过压缩采样轨迹大幅降低推理步数，却使相邻时间步间的特征演化差异急剧增大，导致传统基于简单复用或手工外推的缓存方法（如**∆-DiT**、**PAB**、**TeaCache**、**FORA**、**TaylorSeer**等）在高压缩蒸馏模型上严重失效，产生语义扭曲与细节丢失。
 
@@ -55,7 +55,7 @@ claims:
 
 在HunyuanVideo 1.0文本到视频任务上，DisCa以**11.8×加速比**将VBench总分维持在78.8（原始50步模型为79.9，仅下降1.1%），同时峰值VRAM仅为97.64 GB，额外显存开销仅约0.4 GB。消融实验表明，去除Restricted MeanFlow导致语义分下降5.9%，去除GAN训练导致语义分下降1.2%，验证了各组件的独立贡献。方法在HunyuanVideo 1.5图像到视频任务上同样表现出一致的加速与质量保持能力。
 
-## 背景与动机
+
 
 ### 视频扩散模型加速的现状与瓶颈
 
@@ -82,7 +82,9 @@ claims:
 
 两条技术路线的协同使DisCa首次实现了蒸馏与缓存机制的高效兼容，在11.8×加速比下仍保持与原始50步模型接近的生成质量，为视频扩散模型的实用化部署提供了新的技术范式。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DisCa 的核心创新在于首次实现了步蒸馏（step‑distillation）与特征缓存（feature caching）的高效协同，从根本上解决了蒸馏后模型因相邻时间步特征演化差异增大而导致传统训练无关缓存失效的瓶颈。围绕这一目标，方法在**缓存预测机制**与**蒸馏时间间隔约束**两个关键环节引入了结构性改变。
 
@@ -130,7 +132,7 @@ $$
 
 综上，DisCa 的创新并非单一技术的堆叠，而是通过**可学习预测器**与**保守蒸馏策略**的协同设计，在方法层面首次打通了“先蒸馏、再缓存”的加速路径，为视频扩散 Transformer 的高效推理提供了新的范式。
 
-## 整体框架
+
 
 DisCa（Distillation-Compatible Learnable Feature Caching）的整体设计围绕一个核心矛盾展开：步蒸馏在将视频扩散Transformer的采样步数从50步压缩至10步甚至更少时，相邻时间步之间的特征演化差异急剧增大，导致传统训练无关的启发式缓存策略（如直接复用、线性/泰勒外推）严重失效（Figure 1）。为解决这一问题，DisCa将训练无关的特征缓存升级为可学习范式，同时改进蒸馏策略以抑制长序列视频模型中的数值发散与生成伪影，首次实现了蒸馏与缓存机制的高效协同。
 
@@ -179,7 +181,7 @@ $$\mathcal{L}_{\mathcal{P}} = \mathbb{E}[\|\mathcal{M}_{\theta_M} - \mathcal{P}_
 ![[assets/figures/papers/paper_list_l858_https_arxiv_org_abs_2602_05449/figures/002_Figure_2.jpg]]
 *Figure 2: An overview of Distillation-Compatible Learnable Feature Caching (DisCa). (a) The inference procedure under the proposed Learnable Feature Caching framework. The lightweight Predictor P performs multi-step fast inference after a single computation pass through the large-scale DiT M. (b) The training process of Predictor. The cache, initialized by the DiT, is fed into the Predictor as part of the input. The outputs of the Predictor and DiT are passed to the discriminator D, alternating between the objectives of maximizing and minimizing*
 
-## 核心模块与公式推导
+
 
 DisCa 围绕两个核心模块展开：**Restricted MeanFlow 蒸馏**与**可学习特征缓存预测器**。前者通过约束蒸馏的时间间隔来稳定高度压缩的步蒸馏模型，后者则利用轻量级神经网络替代传统训练无关的启发式缓存策略，在蒸馏后的稀疏采样轨迹上实现精准的特征预测。
 
@@ -253,7 +255,9 @@ $$
 
 与部分方法需要缓存多层特征不同，DisCa 在推理过程中仅保留**最后一层的单个张量**作为缓存 $\mathcal{C}$。这一设计大幅降低了 VRAM 开销：实测数据显示 DisCa 的额外显存占用仅约 **0.4 GB**，而对比方法中 TaylorSeer 的峰值 VRAM 高达 130.7 GB（Table 7, Figure 7）。单层缓存策略在保持预测精度的同时，有效规避了多层缓存带来的显存与通信瓶颈。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现与瓶颈突破
 
@@ -312,7 +316,9 @@ Figure 7 的 VRAM 占用分析表明，DisCa 仅产生约 **0.4 GB** 的额外�
 
 Table 6 的语义分子维度分解揭示了 DisCa 的主要短板：Scene 维度得分下降约 28.1%，表明复杂场景的语义保真度仍是瓶颈。此外，单帧感知指标（PSNR/SSIM）相对于原 50 步模型存在微小下降，部分纹理细节可能被弱化。这些失败模式指向两个改进方向：一是针对场景维度的专项优化，二是探索更高效的蒸馏或一致性模型以进一步挖掘加速潜力。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与训练无关特征缓存方法的对比
 
@@ -363,6 +369,8 @@ DisCa 的另一个重要贡献在于**首次实现了蒸馏与缓存机制的高
 4. **多 GPU 通信优化**：在多 GPU 通信受限的环境下，单层缓存的设计是否仍能维持高效率？是否存在额外的通信瓶颈（如缓存张量的跨设备同步）需要优化？
 
 5. **更广泛的任务验证**：当前验证集中在 T2V 和 I2V 任务上，DisCa 在视频编辑、视频超分、长视频生成等更复杂的视频扩散任务上的有效性尚待验证。
+
+
 
 ## 原文 PDF
 

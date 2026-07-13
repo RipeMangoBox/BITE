@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Temporal_Sparse_Autoencoders_Leveraging_the_Sequential_Nature_of_Language_for_Interpretability.pdf
+project_link: null
+code_link: null
 openreview_forum_id: bojVI4l9Kn
 aliases:
 - TSATS
@@ -42,7 +44,7 @@ claims:
 > - Pythia-160m (Pile) 上，Smoothness (High) 为 0.09，对比 0.12 (Matryoshka)，变化 -0.03。
 > - Gemma2-2b (Pile) 上，FVE 为 0.75，对比 0.75 (Matryoshka)，变化 0.00。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -75,8 +77,6 @@ T-SAEs 在方法谱系上处于**结构化字典学习**与**自监督表征解�
 
 当前 T-SAE 仅探索了单层高低特征划分，未建模多层时间层次结构（如文档-段落-句子-词）。时间对比损失增加了计算开销，在相同内存预算下需减小批次大小。此外，高层特征在不同语义区域间存在一定泄漏，吸收指标（absorption）略高于 Matryoshka 但仍在可接受范围。未来方向包括：将多层时间层次显式纳入训练、探索更适合非负稀疏特征的对比损失形式，以及将该框架拓展到视频、语音等其他序列模态。
 
-## 背景与动机
-
 ### 语言模型可解释性中的稀疏自编码器
 
 大型语言模型的内部表征高度叠加，单个神经元往往对多个不相关概念同时响应，这为理解模型决策机制带来了根本性挑战。稀疏自编码器（Sparse Autoencoders, SAEs）通过将稠密的模型激活分解为一组稀疏、可解释的特征，已成为当前主流的一类无监督可解释性工具。其核心思路是训练一个过完备的字典，使得少量活跃特征即可高保真地重构原始表征，从而将“叠加”的隐空间解耦为更易理解的单义特征。
@@ -102,7 +102,7 @@ T-SAEs 在方法谱系上处于**结构化字典学习**与**自监督表征解�
 
 通过系统的实验设计和多维度评估，本文旨在为“将结构化先验嵌入字典学习”这一方向提供原理验证和实用基准。
 
-## 核心创新
+## 核心方法与创新机理
 
 Temporal Sparse Autoencoders (T-SAEs) 的核心创新在于将语言序列的**时间平稳性先验**显式嵌入稀疏自编码器的字典学习过程，从而在无监督条件下实现语义特征与句法特征的解耦。这一设计直击现有 SAE 的瓶颈：忽视序列的时间结构，导致恢复的特征以局部、句法噪声为主，难以捕捉平滑变化的高层语义概念。
 
@@ -138,8 +138,6 @@ T-SAEs 默认使用相邻 token $(t, t-1)$ 作为对比正样本，但该设计�
 | 语义-句法解耦 | 无机制 | 弱（依赖层级重构） | **强（时间先验 + 残差拟合自监督分离）** |
 
 这些创新的综合效果在实验中得到了系统性验证：T-SAE 高层特征在语义和上下文探测任务上显著优于基线（Figure 3），在长序列上展现出清晰的语义阶段转换（Figure 4），且在模型操控任务中帕累托支配现有 SAE，能在改变语义的同时保持生成连贯性（Figure 5）。
-
-## 整体框架
 
 ### 设计动机与核心思路
 
@@ -194,8 +192,6 @@ $$\mathcal{L} = \sum_{i=1}^N \mathcal{L}_{matr}(x_t^{(i)}) + \alpha \mathcal{L}_
 | 对比采样 | 无 | 无 | 默认相邻 token 对 $(t, t-1)$，可扩展为随机历史 token |
 
 Matryoshka SAE 已具备层级分解能力（高层特征重构输入、低层特征重构残差），但由于缺乏时间约束，其高层特征仍以句法噪声为主（Figure 1, Figure 8）。T-SAEs 通过时间对比损失将“语义平稳性”先验注入高层特征的学习过程，使语义与句法的分离从偶然变为必然。
-
-## 核心模块与公式推导
 
 ### 数据生成过程与层次化假设
 
@@ -255,7 +251,7 @@ $$S = \frac{1}{n} \sum_{s}^{n} \Delta_s$$
 
 该指标衡量特征激活相对于模型隐层变化的波动程度，值越低表示特征越平滑。实验表明 T-SAE 高层特征的平滑度显著优于 Matryoshka SAE（Pythia-160m 上：0.09 vs 0.12；Gemma2-2b 上：0.10 vs 0.15）。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心性能评估
 
@@ -326,16 +322,13 @@ T-SAE在Llama-3.1-8b-Instruct上的t-SNE结果（图9）显示，即使在8B参�
 ![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_bojVI4l9Kn/figures/012_Table_4.jpg]]
 *Table 4: Chosen and rejected examples with maximal difference (rejected−chosen) in feature activations for feature legal and formal language. In all cases, the rejected example is much longer*
 
-![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_bojVI4l9Kn/figures/013_Table_5.jpg]]
-*Table 5: Additional chosen and rejected examples with maximal difference (rejected−chosen) in feature activations for feature legal and formal language. In all cases, the rejected example is much longer*
-
 ![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_bojVI4l9Kn/figures/014_Table_6.jpg]]
 *Table 6: Top 15 features with greatest difference in mean sequence activation between rejected and chosen completions, averaged over the dataset (HH-RLHF (Bai et al., 2022))*
 
 ![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_bojVI4l9Kn/figures/017_Table_8.jpg]]
 *Table 8: Features used for steering interventions on Gemma2-2b*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 方法谱系：从标准SAE到时序感知的字典学习
 

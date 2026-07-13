@@ -43,7 +43,7 @@ claims:
 > - VBench (5s short clips) 上，Total Score ↑ 84.13 vs 83.80 (Self Forcing) (+0.33)；sFPS ↑ 23.1 vs 17.0 (Self Forcing) (+6.1 (1.36×))。
 > - VBench Long (60s) 上，Total Score ↑ 81.41 vs 79.53 (LongLive) (+1.88)；Dynamic Degree ↑ 66.95 vs 35.54 (LongLive) (+31.41)；Drift ↓ 2.505 vs 2.531 (LongLive) (-0.026)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有自回归视频生成方法普遍采用滑动窗口注意力与静态初始帧沉没令牌（Sink Token），导致模型过度依赖首帧信息，运动动态性严重退化；同时，标准分布匹配蒸馏（DMD）对所有样本一视同仁，无法优先优化高动态样本，限制了生成视频的动态表现力。
 
@@ -56,7 +56,7 @@ claims:
 - **长视频生成**：在 60 秒长视频评测中，动态得分大幅提升至 **66.95**，较 LongLive 的 35.54 提升 88.38%，同时质量漂移最小（2.505 vs. 2.531），在显著增强运动幅度的同时保持了时序一致性。
 - **消融验证**：移除 Re-DMD 训练后动态得分从 64.06 骤降至 43.75；进一步移除 EMA-Sink 模块后动态得分继续降至 35.15，运动平滑度同步下降，证实了两个核心组件的关键作用。
 
-## 背景与动机
+
 
 ### 视频生成范式的演进
 
@@ -80,7 +80,9 @@ claims:
 
 这两种机制的协同作用使得Reward Forcing能够在单张H100 GPU上实现23.1 FPS的实时流式视频生成，同时在长视频场景下将动态得分提升至66.95（较LongLive提升88%），且质量漂移保持在最低水平。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Reward Forcing 针对现有流式视频生成的两大瓶颈——**滑动窗口注意力对首帧的过度依赖导致运动动态退化**，以及**标准分布匹配蒸馏对所有样本一视同仁无法优先优化高动态样本**——提出了两个紧密协作的核心创新：EMA-Sink 状态打包机制与 Re-DMD 奖励加权蒸馏目标。
 
@@ -137,7 +139,7 @@ Reward Forcing 继承并扩展了 **Self Forcing** 的自回滚训练机制，�
 
 Reward Forcing 是首个将动态状态压缩与奖励驱动分布匹配结合用于流式视频生成的工作，在不牺牲保真度的前提下，有效突破了现有方法在长视频运动动态性上的瓶颈。
 
-## 整体框架
+
 
 Reward Forcing 的核心目标是将一个双向视频扩散模型蒸馏为支持实时流式生成的自回归学生模型。整个框架由三条设计主线交织而成：**流式推理管道**负责维持恒定内存的自回归生成，**EMA-Sink 模块**在滑动窗口注意力中动态压缩全局状态，**Re-DMD 训练模块**则通过奖励加权将生成分布推向高动态区域。
 
@@ -179,7 +181,7 @@ $$\nabla_{\theta} \mathcal{J}_{\mathrm{Re-DMD}} \approx -\mathbb{E}_t \Big(\int 
 ![[assets/figures/papers/paper_list_l2291_https_arxiv_org_abs_2512_04678/figures/003_Figure_3.jpg]]
 *Figure 3: Pipeline of Reward Forcing. In a streaming text-to-video generation, noisy tokens in the current stream are first projected to produce new key-value pairs (green blocks), which are appended to the KV cache for attention computation. When the current KV cache reaches its maximum attention window size, sink tokens initialized from start frames (yellow blocks) are updated via exponential moving average using evicted tokens (pink blocks). During training, hallucinated tokens are decoded into videos to compute a reward score via a reward function. This score is then used to weight the distribution matching gradient from the teacher model*
 
-## 核心模块与公式推导
+
 
 Reward Forcing 的核心架构由两个关键模块构成：**EMA-Sink** 负责在流式生成中动态维护全局压缩状态，打破传统滑动窗口自回归对首帧的过度依赖；**Re-DMD** 则在分布匹配蒸馏过程中引入视觉语言模型奖励加权，将生成分布导向高动态区域。两者协同工作于继承了 Self Forcing 自回滚机制的流式推理管道之上。
 
@@ -228,7 +230,9 @@ Reward Forcing 继承了 **Self Forcing** 的自回滚机制，在训练时即�
 ![[assets/figures/papers/paper_list_l2291_https_arxiv_org_abs_2512_04678/figures/002_Figure_2.jpg]]
 *Figure 2: Comparison of EMA Sink with Existing Methods. Long video generation models typically extrapolate beyond their training sequence length during inference. (a) Window Attention caches only recent tokens for efficient inference but suffers performance degradation. (b) Sliding Window with attention sinks retains initial tokens for stable attention computation and recent tokens for extrapolation. However, discarding intermediate frames causes over-reliance on the first frame, leading to “frame copy*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 短视频生成性能
 
@@ -287,7 +291,9 @@ Table 3 系统拆解了各模块的贡献。以完整 Reward Forcing 为基准�
 ![[assets/figures/papers/paper_list_l2291_https_arxiv_org_abs_2512_04678/figures/015_Table_6.jpg]]
 *Table 6: Quality evaluation on extended VBench*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -324,6 +330,8 @@ Reward Forcing 在视频生成知识库中的定位可概括为：**将强化学
 - **流式推理系统**：通过 KV Cache + 滑动窗口 + O(1) 令牌逐出实现恒定内存与实时推理，为流式视频生成提供了高效推理范式。
 
 该方法为后续工作提供了两个可独立复用的模块（EMA-Sink 与 Re-DMD），并开辟了“奖励驱动的分布匹配蒸馏”这一研究方向。
+
+
 
 ## 原文 PDF
 

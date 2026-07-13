@@ -5,6 +5,7 @@ paper_level: A
 venue: SIGGRAPH
 year: 2023
 pdf_ref: paperPDFs/SIGGRAPH_2023/CALM_Conditional_Adversarial_Latent_Models_for_Directable_Virtual_Characters.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/par/calm/
 aliases:
 - CALMC
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | CALM: 面向可操控虚拟角色的条件对抗潜在模型 |
 | 英文题名 | CALM: Conditional Adversarial Latent Models for Directable Virtual Characters |
 | 会议/期刊 | SIGGRAPH 2023 |
-| Links | [paper](https://arxiv.org/abs/2305.02195); [Project](https://research.nvidia.com/labs/par/calm/) |
+| Links | [paper](https://arxiv.org/abs/2305.02195) · [Project](https://research.nvidia.com/labs/par/calm/) |
 | Topic | #topic/representation_self_supervised_transfer #topic/representation_self_supervised_transfer/representation_learning |
 | Method | Conditional Adversarial Latent Models (CALM) |
 | Dataset | Pre-training: Encoder quality, Pre-training: Motion diversity, Pre-training: Controllability (user study), Zero-shot heading (Run style) |
@@ -42,7 +43,7 @@ claims:
 > - Pre-training: Motion diversity 上，Inception Score (↑) 为 19.8±0.1，对比 18.6±0.4 (ASE)，变化 +1.2。
 > - Pre-training: Controllability (user study) 上，Generation accuracy (↑) 为 78%，对比 35% (ASE)，变化 +43%。
 
-## 概述
+## 概要
 
 **核心问题**：在物理仿真角色动画领域，现有方法（如 ASE）虽然能生成多样化的运动技能，但其潜空间与具体运动之间缺乏显式映射。这意味着用户无法直接指定或操控角色的行为——潜变量仅仅是随机采样的噪声，而非可选择的“运动技能按钮”。此外，无条件判别器容易引发模式崩溃，导致生成的运动多样性受限。
 
@@ -61,7 +62,7 @@ claims:
 
 **方法谱系与知识库定位**：CALM 直接继承了 **AMP**（Peng et al., 2021）的对抗运动先验思想和 **ASE**（Peng et al., 2022）的潜空间技能学习框架，但通过引入条件判别器和联合训练编码器-策略的机制，解决了后者潜空间不可控和模式崩溃的问题。与 **PADL**（Juravsky et al., 2022）等需要语言标注的分离式训练方法不同，CALM 完全在无监督条件下实现了语义潜空间的自发形成。
 
-## 背景与动机
+
 
 ### 问题背景：物理角色动画中的可控性缺失
 
@@ -95,7 +96,9 @@ claims:
 
 CALM 的核心洞察在于：**将判别器从“无条件”改为“以 z 为条件”，并端到端地联合训练编码器与策略，可以让这两个问题在统一的对抗学习框架下相互促进**。条件判别器 $D(s,s'|z)$ 迫使策略为每个 z 生成与之匹配的运动，而策略的学习信号又反过来指导编码器学习更具判别力的表示。这一因果闭环是 CALM 区别于所有先前工作的本质创新。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 从无条件模仿到条件对抗：潜变量作为因果操控点
 
@@ -131,7 +134,7 @@ CALM 在物理角色动画的方法谱系中占据“条件对抗潜空间技能
 
 CALM 的关键改进在于：**将判别器条件化以建立潜变量与运动的显式映射**，**联合训练编码器与策略以形成语义潜空间**，以及**通过精准训练实现可复用的高层控制**。这些改进使得 CALM 在用户研究中将生成运动的可控性从 ASE 的 35% 显著提升到 78%，同时保持了更高的运动多样性（Inception Score 19.8 vs 18.6）和更好的编码器质量（Fisher 浓度系数 0.23 vs 0.68）。
 
-## 整体框架
+
 
 CALM 的核心理念是将动作捕捉数据编码为低维潜在表示，再通过物理仿真角色将潜在向量解码为可执行的运动技能。整个框架围绕一个中心因果机制展开：**以潜在变量 z 为条件的对抗模仿学习**。与先前方法（如 ASE）将潜在变量视为无结构噪声不同，CALM 通过端到端联合训练运动编码器与策略，迫使潜在空间自然形成语义结构——相似运动在潜在空间内聚集，策略则能从中解码出多样化且符合指令的动作。
 
@@ -187,7 +190,7 @@ $$
 
 定量结果表明，该框架将生成运动的用户感知可控性从 ASE 的 35% 提升至 78%（Table 1），验证了条件对抗潜在模型在可操控运动生成中的有效性。
 
-## 核心模块与公式推导
+
 
 CALM 框架围绕一个核心因果机制展开：**联合学习运动编码器与条件策略，使潜变量成为直接操控运动技能的因果节点**。下面按模块拆解这一机制，并给出支撑公式。
 
@@ -250,7 +253,9 @@ $$r_t^{\mathrm{locomotion}} = \exp \left( -0.25 \left\| \mathbf{d}_t^{*} - \frac
 4. 三者联合训练，使潜空间自然形成语义结构（相似运动聚集，不同运动分离）。
 5. **高层策略** 在冻结的低层模块之上学习生成 $z_t$，实现零样本任务组合。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 CALM 的实验验证围绕三个核心维度展开：编码器质量与潜空间结构、低层策略的生成多样性与可控性、以及高层策略在零样本任务组合中的表现。以下按预训练对比、消融实验、高层控制评估及局限性展开分析。
 
@@ -280,7 +285,7 @@ CALM 的实验验证围绕三个核心维度展开：编码器质量与潜空间
 ![[assets/figures/papers/paper_list_l44_https_arxiv_org_abs_2305_02195/figures/006_Figure.jpg]]
 *Figure: (a) Heading: Run (b) Heading: Walk, shield up (c) Heading: Crouch-walk*
 
-f[[assets/figures/papers/paper_list_l44_https_arxiv_org_abs_2305_02195/figures/007_Figure_4.jpg]]
+![[assets/figures/papers/paper_list_l44_https_arxiv_org_abs_2305_02195/figures/007_Figure_4.jpg]]
 *Figure 4: Precision training: A single high-level controller is trained to generate style-constrained locomotion via reward guidance. (a) Location: Run, then Crouch-idle*
 
 ![[assets/figures/papers/paper_list_l44_https_arxiv_org_abs_2305_02195/figures/008_Figure_5.jpg]]
@@ -304,7 +309,9 @@ f[[assets/figures/papers/paper_list_l44_https_arxiv_org_abs_2305_02195/figures/0
 ![[assets/figures/papers/paper_list_l44_https_arxiv_org_abs_2305_02195/figures/010_Table_3.jpg]]
 *Table 3: Pre-training ablation: We perform ablation for various design choices for the pre-training phase*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与因果突破
 
@@ -354,6 +361,8 @@ CALM 的开源为后续研究提供了明确的改进方向：
 - **细粒度风格控制。** 在有标注或无标注数据进一步丰富时，如何扩展此框架以支持更细粒度的风格控制（例如按用户文本指令生成特定风格的运动），是通向实用化交互式角色动画的关键一步。
 
 - **多角色场景。** 多角色协作或对抗场景下的可操控运动生成是否存在新的挑战，如潜空间的交互耦合、角色间的物理约束协调等，目前尚属开放领域。
+
+
 
 ## 原文 PDF
 

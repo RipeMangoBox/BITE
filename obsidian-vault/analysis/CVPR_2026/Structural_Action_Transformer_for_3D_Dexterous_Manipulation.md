@@ -43,7 +43,7 @@ claims:
 > - DexArt (4 tasks) 上，Average Success Rate 0.73±0.03 vs 0.70±0.03 (3D ManiFlow Policy) (+0.03)。
 > - Bi-DexHands (4 tasks) 上，Average Success Rate 0.67±0.05 vs 0.59±0.07 (3D ManiFlow Policy) (+0.08)。
 
-## 概述
+## 概要
 
 **核心问题**：高自由度灵巧手的三维操作策略学习长期受困于一个根本瓶颈——传统方法将动作块视为固定长度的时间序列（T, D_a），这种“时间中心”表示无法自然地处理不同机器人形态之间的关节数量差异，也难以编码灵巧操作必需的高维空间结构关系。
 
@@ -53,7 +53,7 @@ claims:
 
 **主要结果**：在Adroit、DexArt和Bi-DexHands三个仿真基准共11个灵巧操作任务上，SAT以仅19.36M参数显著优于所有2D/3D基线方法，平均成功率从0.66提升至0.71。消融实验揭示了两项决定性证据：（1）移除Embodied Joint Codebook导致成功率从0.71断崖式下降至0.01，证明结构先验对于无序关节序列的识别必不可缺；（2）仅使用人类数据预训练即可超越使用机器人数据预训练（0.68 vs 0.66），证实功能代码本成功实现了从人手到机器人灵巧手的跨形态技能迁移。
 
-## 背景与动机
+
 
 灵巧操作（dexterous manipulation）是具身智能研究的长期目标。高自由度（high-DoF）灵巧手具备执行复杂接触丰富任务的潜力，但其动作空间维度远高于传统夹爪，使得策略学习面临严重的维度灾难。近年来，模仿学习（imitation learning）在机器人操作中取得了显著进展，尤其是基于动作块（action chunk）的生成式策略，通过一次预测未来多步动作，有效缓解了复合误差和时序依赖问题。
 
@@ -64,7 +64,9 @@ claims:
 
 **本文的核心动机在于重构动作表示范式**：将动作块从时间中心视角 `(T, D_a)` 翻转为结构中心视角 `(D_a, T)`，即将动作视为变长、无序的关节轨迹序列，每个关节的完整时域轨迹作为一个独立的序列元素。这一重构解锁了 Transformer 处理变长序列的天然能力，使得策略能够原生适配不同关节数量的机器人形态。配合 **Embodied Joint Codebook** 为每个关节注入形态学三元组（形态ID、功能类别、旋转轴）的结构先验，模型得以在无序的关节序列中识别物理关节身份，从而学习跨形态的功能对应关系。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SAT 的核心创新在于对动作表示的根本性重构，以及配套的关节结构先验编码机制。这两项设计共同构成了与传统基线相比的关键 changed slots，使得策略能够原生处理异构形态的高自由度灵巧手。
 
@@ -102,7 +104,7 @@ $$\mathcal{L}(\theta) = \mathbb{E}_{\tau \sim \mathcal{U}(0,1), \mathbf{A}_t^0 \
 
 推理时使用 ODE 求解器，仅需 1 次函数评估（NFE）即可生成动作块，相比扩散模型的迭代去噪更为高效。结合结构中心表示对时间轨迹的高度压缩（token 维度从 256 降至 32 时成功率保持 0.71，Table 2），SAT 仅以 19.36M 参数（不含 T5 tokenizer）即在 11 个灵巧操作任务上取得 0.71 的平均成功率，显著优于 218.9M 参数的 3D ManiFlow Policy（0.66），展现出极高的参数效率。
 
-## 整体框架
+
 
 SAT 的完整推理管线由三个核心模块串联构成：**Observation Tokenizer**（观测标记器）、**Structural Action Tokenizer**（结构化动作标记器）与 **Structural Action Transformer**（结构化动作Transformer）。其输入为一段包含 $T_o$ 帧的历史原始3D点云 $\mathcal{P}_t = (\mathbf{P}_{t-T_o+1}, \ldots, \mathbf{P}_t)$ 以及一条语言指令 $L$，输出为未来 $T$ 个时间步的动作块 $\mathbf{A}_t \in \mathbb{R}^{D_a \times T}$。该动作块采用**结构中心视角**定义，即每一行对应一个关节在整段时域上的完整轨迹，行数 $D_a$ 随机器人形态自由变化，从而天然支持变长、无序的异构关节序列。
 
@@ -147,7 +149,7 @@ SAT 的完整推理管线由三个核心模块串联构成：**Observation Token
 ![[assets/figures/papers/paper_list_l2043_https_arxiv_org_abs_2603_03960/figures/002_Figure_2.jpg]]
 *Figure 2: Our proposed model architecture. The policy takes a history of*
 
-## 核心模块与公式推导
+
 
 SAT 的策略架构由三个核心模块级联构成：**Observation Tokenizer**、**Structural Action Tokenizer** 和 **Structural Action Transformer**。整体流程如 Figure 2 所示。
 
@@ -219,7 +221,9 @@ Table 4 的组件消融验证了各模块的必要性：
 ![[assets/figures/papers/paper_list_l2043_https_arxiv_org_abs_2603_03960/figures/009_Figure_6.jpg]]
 *Figure 6: T-SNE visualization of the learned Embodied Joint Codebook embeddings. These embeddings, derived from 10 dexterous manipulators, are colored by (a) Embodiment ID, (b) Functional Category, and (c) Rotation Axis*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与实验动机
 
@@ -293,7 +297,9 @@ Table 4 的组件消融验证了各模块的必要性：
 ![[assets/figures/papers/paper_list_l2043_https_arxiv_org_abs_2603_03960/figures/013_Figure_8.jpg]]
 *Figure 8: Real-world experimental setup. (a) Our bimanual hardware setup. We collect demonstration data using a VR headset for teleoperation. (b) The set of diverse objects used in our real-world manipulation, requiring both precision and bimanual coordination*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线的对比定位
 
@@ -321,6 +327,8 @@ SAT 在灵巧操作知识库中的核心贡献在于：**首次将动作表示�
 - 如何自动生成面向完全未知形态的 Embodied Joint Codebook，而不依赖人工统计先验？
 - 结构中心表示能否与语言指令更灵活地结合，实现零样本组合任务？
 - 在处理演示-执行平台运动学不匹配时，能否引入显式的运动学适配层以提升鲁棒性？
+
+
 
 ## 原文 PDF
 

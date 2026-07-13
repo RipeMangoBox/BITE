@@ -43,7 +43,7 @@ claims:
 > - Something-Something V2 上，Accuracy 16.3 (PAS) vs Default Setting (lower, see Table 1) (positive improvement)。
 > - Kinetics-700 上，Accuracy 48.2 (PAS) vs Default Setting (lower, see Table 1) (positive improvement)。
 
-## 概述
+## 概要
 
 视频大语言模型（Video LLM）通过时序位置编码将帧间时间关系注入注意力机制，使模型能够理解视频中的动态事件。然而，当前广泛采用的 **M-RoPE**（Multi-dimensional Rotary Position Embedding）沿时间轴引入了一个逆傅里叶变换（IFT）调制核 $m(\Delta)$，该核由有限离散频率线 $\{\omega_i\}$ 的余弦平均构成，在帧尺度上存在**固有的非平滑性（波纹）**。当关键帧恰好落入调制波形的低增益波谷时，其信息被抑制甚至忽略，注意力决策被偶然的时序偏移而非内容相似性主导（Figure 1）。这一瓶颈源于一个根本性的因果机制：**注意力 logit 可近似分解为内容点积与标量 IFT 调制因子 $\mathrm{Re}\{m(\Delta)\}$ 的乘积**（定理1），而 $m(\Delta)$ 的非平滑性直接决定了注意力对微小时间偏移的敏感度。
 
@@ -59,7 +59,7 @@ claims:
 
 PAS 的局限性同样明确：当采样率足够高时增益趋于消失；在 Nyquist 欠采样场景下改进窗口更窄；仅适用于采用 M-RoPE 且具备独立时序维度编码的模型；当前默认设置虽表现良好，但偏移量的自适应学习策略仍有待探索。
 
-## 背景与动机
+
 
 ### 视频LLM中的时序位置编码
 
@@ -104,7 +104,9 @@ $$\big| A(\Delta t + \delta t) - A(\Delta t) \big| \leq \big| \langle \mathbf{q}
 
 PAS的优雅之处在于：它不改变token化、模型参数、视频帧数量或任何输入，仅修改查询流的时序相位；每个注意力头独立地保持其频谱幅值不变（定理4），平滑效应仅在多头聚合后自然产生；计算开销在统计上与原始backbone不可区分。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PAS的核心创新在于揭示了视频大语言模型中广泛使用的**M-RoPE（多分辨率旋转位置编码）沿时间轴存在一个此前未被指出的固有缺陷**，并针对该缺陷提出了一种**极轻量、无需训练、即插即用的推理时稳定机制**。
 
@@ -157,7 +159,7 @@ $$\frac{C_{\mathrm{PAS}}}{C_{\mathrm{attn}}} \leq \frac{S_v d_t}{S^2 d_h} = \fra
 
 由于时序维度占比p_t很小且序列长度S很大，该比值可忽略。实测吞吐量（原始backbone 77.2±3.1 ×10³ tokens/s vs PAS 76.8±4.0 ×10³ tokens/s）在统计上不可区分，证实改进并非以计算开销为代价。
 
-## 整体框架
+
 
 PAS（Phase Aggregated Smoothing）是一个**训练无关、即插即用**的推理时稳定器，作用于视频大语言模型（Video LLM）中已部署M-RoPE的注意力层。其核心操作极为精简：在标准多头注意力的计算流程中，**仅对查询流（Q）施加按注意力头分组的小幅度时序相位偏移，随后依赖模型自身的标准多头聚合机制自然产生平滑效应**。整个pipeline不修改任何模型参数、token化策略、视频帧数量或输入表示。
 
@@ -201,7 +203,7 @@ PAS的理论计算开销与注意力计算之比为 $\frac{C_{\text{PAS}}}{C_{\t
 ![[assets/figures/papers/paper_list_l2133_https_arxiv_org_abs_2511_10979/figures/003_Figure_3.jpg]]
 *Figure 3: Implementation of PAS. For the*
 
-## 核心模块与公式推导
+
 
 ### 问题形式化：M-RoPE 的时序非平滑性
 
@@ -278,7 +280,9 @@ $$\frac{C_{\mathrm{PAS}}}{C_{\mathrm{attn}}} \leq \frac{S_v d_t}{S^2 d_h} = \fra
 
 其中 $S_v$ 为视频 token 数，$S$ 为总序列长度，$d_t$ 为时间半维度，$p_t$ 为时间维度占比。由于 $p_t$ 很小且 $S$ 很大，该比值在实践中可忽略。实验验证：原始 backbone 吞吐量为 $(77.2 \pm 3.1) \times 10^3$ tokens/s，PAS 为 $(76.8 \pm 4.0) \times 10^3$ tokens/s，两者在方差范围内统计不可区分。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -346,7 +350,9 @@ $$\frac{C_{\mathrm{PAS}}}{C_{\mathrm{attn}}} \leq \frac{S_v d_t}{S^2 d_h} = \fra
 ![[assets/figures/papers/paper_list_l2133_https_arxiv_org_abs_2511_10979/figures/007_Figure_5.jpg]]
 *Figure 5: Sampling ratio ablation with fixed K=2, ∆=0.5. Classification accuracy as a function of the sampling ratio r*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：M-RoPE 时序编码的非平滑瓶颈
 
@@ -407,6 +413,8 @@ PAS 的适用性受以下前提约束：
 5. **与其他推理时方法的组合**：PAS 与多 pass 平均、Temporal Coherent Test-Time Optimization 等方法的组合效果如何？PAS 的可堆叠性已在 SlowFast/TS-LLaVA 上验证，但更广泛的推理时方法组合空间尚未探索。
 
 6. **视频分词策略的影响**：不同的视频分词和帧合并策略（如均匀采样 vs. 关键帧提取）如何影响 PAS 的最优偏移量选择？这涉及 token 化阶段的时序粒度与注意力阶段平滑操作的匹配问题。
+
+
 
 ## 原文 PDF
 

@@ -42,7 +42,7 @@ claims:
 > - H*Bench HOS Overall 上，Success Rate (%) 47.38 (HVS-3B) vs 14.83 (Qwen2.5-VL-3B-Instruct) (+32.55)；Success Rate (%) 40.83 (HVS-3B w/ SFT only) vs 14.83 (Qwen2.5-VL-3B-Instruct) (+26.00)；Success Rate (%) 47.38 (HVS-3B) vs 31.96 (Gemini2.5-Pro) (+15.42)。
 > - H*Bench HPS Overall 上，Success Rate (%) 24.94 (HVS-3B) vs 6.44 (Qwen2.5-VL-3B-Instruct) (+18.50)。
 
-## 概述
+## 概要
 
 **核心问题：多模态大模型缺乏具身空间推理能力。** 当前最先进的多模态大模型（MLLM）在复杂真实环境中执行视觉搜索任务时表现乏力——即使是最强的专有模型，在 H*Bench 上的成功率也仅约 30%。其根本瓶颈在于：现有模型缺乏空间常识与主动 3D 规划能力，无法像人类一样通过主动调整视角来探索未知环境，尤其在需要精细空间推理和社会规范的路径搜索任务上短板尤为突出。
 
@@ -51,8 +51,6 @@ claims:
 **关键技术路径：两阶段后训练赋予模型探索与策略决策能力。** HVS 采用“监督微调（SFT）+ 强化学习（RL）”的两阶段后训练范式：第一阶段通过多轮 SFT 注入行为先验，使模型建立从透视图像到合理动作的基础映射；第二阶段采用 GRPO 强化学习优化长程探索策略，培养模型在不确定环境中进行策略性决策的能力。
 
 **主要结果：后训练带来三倍以上性能提升，但路径搜索仍具挑战。** 在最小的 3B 模型上，HVS 将物体搜索成功率从 14.83% 提升至 47.38%（+32.55 个百分点），路径搜索从 6.44% 提升至 24.94%（+18.50 个百分点），验证了 SFT+RL 范式的有效性。消融实验进一步揭示：主动视觉搜索显著优于被动的全景分析，且物体搜索与路径搜索之间存在可迁移的空间推理能力。然而，路径搜索在中高难度级别上的提升有限，RL 训练甚至可能导致性能退化，表明当前方法在注入物理、空间和社会常识方面仍存在明显不足。
-
-## 背景与动机
 
 ### 从被动描述到主动搜索的范式缺口
 
@@ -79,7 +77,7 @@ claims:
 
 这一范式使模型在无硬件约束的条件下具备主动、可扩展的具身空间推理能力，为从“被动描述者”到“主动搜索者”的转变提供了可行路径。
 
-## 核心创新
+## 核心方法与创新机理
 
 本工作针对当前多模态大模型（MLLM）在具身视觉搜索中暴露出的空间常识与主动3D规划短板，提出了**Humanoid Visual Search（HVS）**范式，其核心创新可归纳为以下三个维度的“changed slots”。
 
@@ -102,8 +100,6 @@ claims:
 - **Stage 2 多轮强化学习（RL）**：采用**GRPO（Group Relative Policy Optimization）**对SFT策略进行微调，通过组内相对奖励优化探索策略，使模型学会在获取充分证据后才提交最终估计。
 
 消融实验表明，SFT使3B模型的物体搜索成功率从14.83%跃升至40.83%，路径搜索从6.44%提升至23.00%；RL在此基础上进一步将物体搜索推至47.38%（+6.55个百分点），验证了“行为先验注入+策略探索优化”两阶段范式的有效性。值得注意的是，RL在路径搜索上的增益有限（仅+1.94个百分点），且在中高难度级别出现性能退化，这揭示了当前奖励设计与真实任务目标之间的偏差——这也是后续研究需要突破的关键瓶颈。
-
-## 整体框架
 
 Humanoid Visual Search (HVS) 将具身视觉搜索建模为一个**闭环感知-行动周期**：智能体在由单张360°全景图像表示的沉浸式环境中，通过主动旋转头部来获取窄视场（FOV）透视图像，并基于多轮多模态推理逐步定位目标物体或路径。整个框架的核心思想是将多模态大模型（MLLM）的工具调用能力与物理世界的头部旋转动作耦合，从而在无需真实机器人硬件的条件下实现可扩展的具身空间推理。
 
@@ -139,8 +135,6 @@ RL 阶段采用组相对策略优化（Group Relative Policy Optimization, GRPO�
 
 ![[assets/figures/papers/paper_list_l1082_https_openaccess_thecvf_com_content_CVPR2026_html_Yu_Thinking_in_360deg/figures/002_Figure_2.jpg]]
 *Figure 2: Pipeline Illustration. Stage 1 (SFT) provides the foundational ability to map perspective images to plausible actions (e.g., turning around upon seeing nothing). Stage 2 (RL) refines this into a strategic policy: the model learns to explore (outputting*
-
-## 核心模块与公式推导
 
 ### 3.1 问题形式化：最优视角方向
 
@@ -180,7 +174,7 @@ $$\tau_{\phi} = \max\left(\frac{w_{\phi}}{2}, \tau_{\phi}^{base}\right)$$
 
 $w_{\phi}$ 为物体在方位角方向的边界框宽度，$\tau_{\phi}^{base}$ 为基础容差。当模型提交的方向落在此区域内时，判定搜索成功。这一设计既考虑了物体本身的空间范围，也保留了合理的判断弹性。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 实验设置与评估协议
 
@@ -245,13 +239,7 @@ Figure 6（右）展示了测试时上下文长度对成功率的影响。随着
 ![[assets/figures/papers/paper_list_l1082_https_openaccess_thecvf_com_content_CVPR2026_html_Yu_Thinking_in_360deg/figures/007_Figure_7.jpg]]
 *Figure 7: Left: Comparison of active and passive visual search. Right: Comparison of different visual search paradigms*
 
-![[assets/figures/papers/paper_list_l1082_https_openaccess_thecvf_com_content_CVPR2026_html_Yu_Thinking_in_360deg/figures/009_Table_2.jpg]]
-*Table 2: Results of GRPO with different reward shaping on HPS*
-
-![[assets/figures/papers/paper_list_l1082_https_openaccess_thecvf_com_content_CVPR2026_html_Yu_Thinking_in_360deg/figures/003_Figure_3.jpg]]
-*Figure 3: Top Left: Distribution of scene categories. Top Right: Sub-category composition per category. Bottom Left: Category-wise object instance distribution for HOS. Bottom Right: Task difficulty distribution and definition for HOS and HPS*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 问题定位：MLLM的空间推理瓶颈
 

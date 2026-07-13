@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Efficient_Reinforcement_Learning_by_Guiding_World_Models_with_Non_Curated_Data.pdf
+project_link: null
+code_link: https://github.com/zhaoyi11/ncrl
 openreview_forum_id: oBXfPyi47m
 aliases:
 - NNCODER
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 利用非整理离线数据引导世界模型的高效强化学习 |
 | 英文题名 | Efficient Reinforcement Learning by Guiding World Models with Non-Curated Data |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=oBXfPyi47m); [GitHub](https://github.com/zhaoyi11/ncrl) |
+| Links | [paper](https://openreview.net/forum?id=oBXfPyi47m) · [GitHub](https://github.com/zhaoyi11/ncrl) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | NCRL (Non-curated offline data for efficient RL) |
 | Dataset | Meta-World (50任务), DMControl (22任务), Quadruped Walk (DMControl), Shelf Place (Meta-World) |
@@ -42,13 +44,13 @@ claims:
 > - DMControl (22任务) 上，平均回合回报 为 617.73，对比 DreamerV3 @150k: 320.86; DrQ-v2 @150k: 226.49，变化 +296.87。
 > - Quadruped Walk (DMControl) 上，回合回报 为 855.6，对比 DreamerV3 @150k: 145.2，变化 +710.4。
 
-## 概述
+## 概要
 
 在微调阶段，离线预训练数据与在线强化学习数据之间存在严重的分布偏移，导致朴素的世界模型微调失效，尤其阻碍困难探索任务上的策略学习。NCRL（Non-curated offline data for efficient RL）提出了一种两阶段框架来解决这一问题：首先从无奖励、混合质量、多形态的非整理离线数据中预训练一个任务无关的世界模型；随后在微调阶段，通过基于特征相似度的轨迹检索实现经验重演以缓解分布偏移，并训练行为克隆先验策略进行执行引导，使在线数据收集靠近世界模型的高置信区域。
 
 在72个视觉运动任务（涵盖6种形态的Meta-World和DMControl基准）上，NCRL在15万在线交互步数下取得了近乎两倍于从零训练基线（DreamerV3、DrQ-v2）的聚合得分，并以显著优势超越所有对比的离线数据利用方法（R3M、UDS-RLPD、ExPLORe、JSRL-BC）。消融实验证实，世界模型预训练单独不足以在困难任务上工作，必须结合检索式经验重演和执行引导才能实现高性能。NCRL在更困难的数据条件下（直接使用非整理数据，而基线方法需预处理保留任务相关轨迹）仍取得大幅领先，且未使用奖励塑形、专家回放预填充等额外技巧。
 
-## 背景与动机
+
 
 ### 视觉运动控制中的样本效率困境
 
@@ -78,7 +80,9 @@ claims:
 
 本文提出的 **NCRL**（Non-curated offline data for efficient RL）正是围绕这两个问题展开，通过经验重演（experience rehearsal）和执行引导（execution guidance）两种机制，在非整理离线数据上构建了一套完整的预训练-微调框架。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 NCRL 的核心创新并非提出全新的算法范式，而是通过**重新定义离线数据在模型基强化学习中的使用方式**，系统性地解决了从预训练到在线微调的分布偏移瓶颈。具体体现在以下四个关键维度：
 
@@ -100,7 +104,7 @@ NCRL 对标准 RSSM 架构进行了三项关键修改以适应非整理多形态
 
 **总结**：NCRL 的创新本质是通过“非整理数据预训练 + 检索式经验重演 + 行为克隆执行引导”的三位一体设计，将分布偏移从阻碍变为可调控的杠杆，使强化学习在 150k 在线交互预算下达到从零训练方法 3.3–6.7 倍样本量才能获得的性能（Table 4, Table 5）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l47_https_openreview_net_forum_id_oBXfPyi47m/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of NCRL (Non-curated offline data for efficient RL). NCRL leverages noncurated offline data—reward-free, mixed-quality, and multi-embodiment—to enable efficient RL. It uses this data to pretrain a task-agnostic world model, and then, during fine-tuning, to reduce distributional shift and guide exploration through experience rehearsal and execution guidance*
@@ -145,7 +149,7 @@ $$\mathbf{D} = \| \mathbf{e}_{\theta}(o_{\mathrm{on}}) - \mathbf{e}_{\theta}(o_{
 
 整个流程无需奖励塑形、无需专家回放预填充，即可在 150k 在线步数下使 Meta-World 平均成功率达到 0.748、DMControl 平均回合回报达到 617.73，分别匹配 DreamerV3 与 DrQ-v2 在 3.3–6.7 倍样本下的表现（Table 4, Table 5）。
 
-## 核心模块与公式推导
+
 
 NCRL 的核心由四个协同模块构成：**多形态世界模型预训练**、**经验检索**、**行为克隆先验策略训练**、以及**RL 微调与经验重演/执行引导**。这些模块围绕一个中心思想展开——在预训练和微调两个阶段充分利用无奖励、混合质量、多形态的非整理离线数据，以缓解分布偏移并引导高效探索。
 
@@ -195,7 +199,9 @@ $$\mathcal{L}(v_{\phi}) = \mathbb{E}_{p_{\theta}, \pi_{\phi}} \left[ - \sum_{t=1
 
 上述四个模块形成了一条完整的因果链路：世界模型预训练提供了跨形态共享的隐空间表征，使经验检索能够有效识别任务相关轨迹；检索到的数据通过经验重演缓解了微调阶段的分布偏移（定量证据显示，经验重演将在线数据与离线/专家数据之间的 Wasserstein 距离显著降低）；行为克隆先验策略则利用检索数据引导在线数据收集靠近世界模型的高置信区域，解决了困难探索任务上的探索瓶颈。消融实验证实，世界模型预训练单独不足以在困难任务上工作，必须结合检索式经验重演和执行引导才能显著提升表现。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：跨72个视觉运动任务的样本效率跃升
 
@@ -250,7 +256,9 @@ NCRL对执行引导的退火调度表现出高度鲁棒性——在多种调度�
 
 这些边界为后续研究指明了方向，也为评估NCRL的实际部署价值提供了必要的审慎视角。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有离线数据利用方法的区别
 
@@ -315,6 +323,8 @@ NCRL 的世界模型预训练与微调范式建立在 **DreamerV3** (Hafner et a
 
 **跨形态迁移的理论理解**：
 - 当前方法依赖动作零填充的简单统一策略，缺乏对形态间动力学相似性的显式建模。是否能通过离线数据中的动作先验和动力学知识实现更高效的跨形态迁移学习，是一个值得深入的理论问题。
+
+
 
 ## 原文 PDF
 

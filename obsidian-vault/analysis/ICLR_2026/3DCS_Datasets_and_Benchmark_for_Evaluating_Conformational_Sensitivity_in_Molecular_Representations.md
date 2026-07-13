@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/3DCS_Datasets_and_Benchmark_for_Evaluating_Conformational_Sensitivity_in_Molecular_Representations.pdf
+project_link: null
+code_link: https://github.com/ComDec/3DCS
 aliases:
 - 33CSBGEF
 - 3DBECSMR
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 3DCS：评估分子表示中构象敏感性的数据集与基准 |
 | 英文题名 | 3DCS: Datasets and Benchmark for Evaluating Conformational Sensitivity in Molecular Representations |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=JAb0y8lkqL); [GitHub](https://github.com/ComDec/3DCS) |
+| Links | [paper](https://openreview.net/forum?id=JAb0y8lkqL) · [GitHub](https://github.com/ComDec/3DCS) |
 | Topic | #topic/benchmarks_datasets_evaluation #topic/benchmarks_datasets_evaluation/benchmark_eval |
 | Method | 3DCS (3D Conformational Sensitivity) benchmark with GCE evaluation framework |
 | Dataset | Geometry (Relaxed Scans), Chirality (ChEMBL) |
@@ -41,7 +43,7 @@ claims:
 > - Geometry (Relaxed Scans) 上，Kendall (↑) 为 MolSpectra: 0.483，对比 E3FP: 0.107，变化 +0.376。
 > - Geometry (Relaxed Scans) 上，CKA (↑) 为 MolAE: 0.975，对比 E3FP: 0.299，变化 +0.676。
 
-## 概述
+## 概要
 
 3DCS（3D Conformational Sensitivity）是首个系统性评估分子表示（MRs）中构象敏感性的基准，由ICLR 2026接收。其核心瓶颈在于：现有分子表示方法在捕捉同一分子内不同构象的几何变化、手性差异和能量景观方面缺乏系统性评估，尤其是能量敏感性被严重忽视。为此，3DCS提出了GCE评估框架，通过参考对齐（reference alignment）和流形一致性（manifold consistency）两层指标，在几何、手性和能量三个维度上评估表示质量。
 
@@ -49,7 +51,7 @@ claims:
 
 主要结果表明：几乎所有学习表示在几何基准上均优于E3FP（如：MolSpectra在Spearman相关系数上达0.682，而E3FP仅0.155）；在手性基准上，MolAE取得最高ES-AUC（0.782），FMG取得最高NN1-acc（0.726）；在能量基准上，经能量/力监督训练的MACE取得最高Spearman（0.236）和EJS（0.578），FMG取得最高TS（0.582）。核心发现是：现代数据驱动的3D分子表示在几何敏感性上表现良好，但在手性区分上不一致，且与能量景观的对齐普遍较差。经过能量/力监督训练的模型（GemNet、MACE）在能量对齐上显著优于其他方法，但整体能量敏感性仍为开放挑战。
 
-## 背景与动机
+
 
 分子表示学习（Molecular Representations, MRs）旨在将分子的结构与物理化学性质编码为可供下游任务（如性质预测、虚拟筛选）使用的向量或张量。近年来，基于三维几何的深度学习方法（如SE(3)-等变Transformer、几何消息传递网络）在处理分子静态结构方面取得了显著进展。然而，现有基准（如MoleculeNet、Molecule3D、MARCEL）的评估范式存在一个根本性缺口：它们几乎全部聚焦于**分子间**任务（如跨分子分类、性质回归），将每个分子视为一个静态实体，忽略了同一分子内部不同构象（conformer）之间的几何变化、手性差异和能量景观。
 
@@ -59,7 +61,9 @@ claims:
 
 现有方法在该框架下的表现揭示了显著的差距：几乎所有学习到的表示在几何基准上都优于手工描述符（如E3FP），其中MolSpectra在几何基准上取得了最高的Spearman相关系数（0.682）；在手性区分上，MolAE取得了最高的ES-AUC（0.782），但整体表现不一致，SE(3)-等变模型在手性分离上普遍较弱；而在能量基准上，所有方法的绝对性能都很低——MACE取得了最高的Spearman相关系数（0.236）和EJS（0.578），FMG取得了最高的TS（0.582），但这些数值远低于几何基准的水平，说明**能量景观的对齐是当前分子表示学习中最薄弱的环节**。这些发现表明，3DCS基准不仅揭示了现有方法的性能边界，也为未来设计更具物理可信度的分子表示模型提供了明确的方向。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 3DCS的核心创新在于将分子表示评估从传统的**分子间任务性能**（如性质预测）转向**分子内构象敏感性**，即系统性地衡量同一分子不同构象的表示是否忠实反映了几何变化、手性差异和能量景观。这一转变揭示了现有评估范式的根本瓶颈：大量工作优化了分子层面的预测精度，却忽视了表示对构象空间内部物理结构的编码能力，特别是能量敏感性几乎未被触及。
 
@@ -73,7 +77,7 @@ claims:
 
 核心洞察在于，现代数据驱动的3D分子表示在几何敏感性上表现良好（几乎所有学习表示都优于手工描述符E3FP，MolSpectra在几何基准上取得最高Spearman相关系数0.682），但在手性区分上表现不一致（MolAE在手性基准上取得最高ES-AUC 0.782，但SE(3)-等变模型如UniMol仅0.622），且与能量景观的对齐普遍较差（最佳模型MACE的Spearman相关系数仅0.236）。值得注意的是，经过能量/力监督训练的模型（GemNet、MACE）在能量对齐上显著优于其他方法，而牺牲旋转不变性以保留手性敏感性的基于场的模型FMG在手性分离上表现突出。图2的雷达图以E3FP为基线展示了各模型在GCE维度上的相对改进，直观揭示了不同架构的能力边界。
 
-## 整体框架
+
 
 3DCS基准的核心贡献在于将分子表示评估从传统的跨分子性质预测转向**分子内构象敏感性**分析。其整体pipeline由三个串联模块构成：**数据集构建 → 表示提取 → GCE评估**，形成一个闭合的评估循环。
 
@@ -85,7 +89,7 @@ claims:
 
 整个pipeline的输入是分子构象（3D坐标），输出是模型在GCE三个维度上的敏感性指标。关键的设计选择包括：零样本评估（除手性微调实验外）、使用半经验方法（xTB）作为几何数据集的能量来源（而非DFT，这是明确承认的局限性之一）、以及对手性数据集施加扭转扰动以防止几何特征泄露。
 
-## 核心模块与公式推导
+
 
 3DCS基准的核心在于其**GCE评估框架**（Geometry-Chirality-Energy），该框架通过两层指标——**参考对齐（Reference Alignment）** 与**流形一致性（Manifold Consistency）**——来量化分子表示对构象变化的敏感性。评估的前提是明确定义三种物理参考距离与表示空间中的距离度量。
 
@@ -165,7 +169,9 @@ $$
 
 GCE框架的设计揭示了分子表示评估中的核心瓶颈：参考对齐层检测表示是否编码了正确的物理信息（如几何变形、手性差异、能量顺序），而流形一致性层则检测表示空间的结构是否物理可信（如局部几何保持、对映体分离、能量跳变响应）。这两层指标共同构成了对表示质量的完整诊断，而不仅仅是下游任务性能的代理。例如，一个在性质预测上表现良好的模型，可能在能量对齐上完全失败（如MolAE在几何CKA上高达0.975，但在能量Spearman上仅0.051），这暴露了其表示缺乏物理能量信息的本质。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：GCE三维基准
 
@@ -215,7 +221,9 @@ GCE框架的设计揭示了分子表示评估中的核心瓶颈：参考对齐�
 ![[assets/figures/papers/iclr26_0001_JAb0y8lkqL_3DCS_Datasets_and_Benchmark_for_Evaluating_Confo/figures/031_Table_6.jpg]]
 *Table 6: Summary of representations’ performance on the energy dataset. Values are reported as mean ± 95% CI*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 3DCS基准的提出，直接回应了现有分子表示评估范式的根本性空白：传统基准（如MoleculeNet、Molecule3D、MARCEL）均聚焦于**分子间**任务——性质预测或跨分子分类——将每个分子视为一个静态、无构象变化的实体。3DCS首次将评估焦点转向**分子内**的构象敏感性，系统考察同一分子不同构象在几何变形、手性差异和能量景观三个维度上的表示质量。这一转变的因果核心在于其提出的GCE（几何-手性-能量）评估框架，该框架通过两层指标——参考对齐（reference alignment）和流形一致性（manifold consistency）——将表示距离与物理参考（RMSD、二面角、手性签名、能量差）进行定量关联。
 
@@ -224,6 +232,8 @@ GCE框架的设计揭示了分子表示评估中的核心瓶颈：参考对齐�
 **适用边界与局限**：3DCS的评估框架存在若干明确边界。首先，几何数据集使用半经验xTB方法而非DFT计算能量，可能引入系统近似误差，影响能量相关指标的绝对可靠性。其次，能量数据集仅包含10个小有机分子（来自Revised MD17），规模有限，可能无法代表复杂分子体系（如蛋白质-配体复合物）的能量景观多样性。第三，手性数据集局限于药物样分子，未涵盖无机配合物或大环分子的手性特征。第四，评估主要采用零样本设置（除少量微调实验外），未系统探索模型在特定任务上微调后的表现变化。此外，GCE框架中的某些指标（如LIE的k近邻数、EJS的能量跳跃阈值λ、TS的平滑度参数）依赖于超参数选择，可能影响跨模型比较的公平性。
 
 **开放问题**：3DCS揭示的核心矛盾——学习表示在几何上表现良好，在手性上不一致，在能量上普遍薄弱——指向三个关键研究方向：(1) 如何设计既能保持SE(3)-等变性又能区分手性的表示架构？FMG的成功表明，有选择地打破对称性可能是可行路径，但其泛化性和理论保证仍需验证。(2) 如何使学习表示更好地与能量景观对齐？当前所有模型在能量基准上的表现均远低于几何维度，说明仅靠构象级监督（如去噪、重构）不足以捕捉势能面的精细结构。GemNet和MACE的对比表明，显式的能量/力监督是必要但非充分条件。(3) 3DCS能否扩展到条件设置（如蛋白质-配体对接、姿态预测）和更大分子体系？当前数据集的小分子限制可能掩盖了表示方法在处理柔性大分子时的潜在失败模式。最后，3DCS指标本身能否用作**设计指导**——即利用能量跳跃敏感性（EJS）或阈值平滑度（TS）作为训练目标来直接优化表示的物理可信度——是一个值得探索的方向。
+
+
 
 ## 原文 PDF
 

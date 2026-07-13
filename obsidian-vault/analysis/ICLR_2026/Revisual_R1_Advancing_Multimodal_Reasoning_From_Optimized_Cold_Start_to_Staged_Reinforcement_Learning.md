@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Revisual_R1_Advancing_Multimodal_Reasoning_From_Optimized_Cold_Start_to_Staged_Reinforcement_Learning.pdf
+project_link: null
+code_link: https://github.com/CSfufu/Revisual-R1
 openreview_forum_id: NTo6f6GENJ
 aliases:
 - RR
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | Revisual-R1：通过优化冷启动与分阶段强化学习推进多模态推理 |
 | 英文题名 | Revisual-R1: Advancing Multimodal Reasoning From Optimized Cold Start to Staged Reinforcement Learning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=NTo6f6GENJ); [GitHub](https://github.com/CSfufu/Revisual-R1) |
+| Links | [paper](https://openreview.net/forum?id=NTo6f6GENJ) · [GitHub](https://github.com/CSfufu/Revisual-R1) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | ReVisual-R1 |
 | Dataset | 多模态与文本推理基准平均 (Multimodal & Textual Benchmarks Average) |
@@ -40,7 +42,7 @@ claims:
 > [!tip] 效果简介
 > - 多模态与文本推理基准平均 (Multimodal & Textual Benchmarks Average) 上，Pass@1 平均准确率 (Average Accuracy) 为 53.1，对比 36.3 (最佳开源 7B 基线)，变化 +16.8。
 
-## 概述
+## 概要
 
 多模态大语言模型（MLLM）的推理能力是其迈向通用人工智能的关键瓶颈。现有方法面临两个核心障碍：其一，标准 GRPO 算法在多模态强化学习中存在**梯度停滞**问题——当组内样本奖励相同时，优势值归零，模型失去有效学习信号；其二，传统的多模态冷启动数据集缺乏足够复杂性，难以充分激发模型的推理潜能。
 
@@ -56,7 +58,7 @@ claims:
 
 本方法的局限性在于：文本中心优化策略泛化到多模态推理的深层理论解释尚不充分；可扩展性仅在 3B 和 7B 规模上验证，更大架构（如 MoE）的表现未知；数据类型与训练阶段之间的复杂交互尚未系统研究。
 
-## 背景与动机
+
 
 多模态大语言模型（MLLM）在视觉-语言任务中展现出强大的能力，但在复杂多模态推理（如数学、逻辑、科学图表理解）上仍面临显著瓶颈。现有方法主要依赖监督微调（SFT）或标准强化学习（RL）来增强推理能力，但存在两个关键缺口：
 
@@ -70,7 +72,9 @@ $$\hat{A}(x,y_i) = \frac{r(x,y_i) - \mathrm{mean}(\{r(x,y_1),\ldots,r(x,y_G)\})}
 
 **本文动机。** 针对上述缺口，ReVisual-R1 提出“先构建推理引擎，再对齐视觉基础，最后打磨语言表达”的分阶段策略：首先用高质量纯文本数据完成冷启动，然后通过配备优先级优势蒸馏（PAD）的多模态 RL 将推理能力与视觉感知对齐，最后用文本 RL 微调恢复语言流畅性和高阶推理能力。该框架在 7B 规模上取得了 53.1% 的平均准确率，较最佳开源基线提升 +16.8 个百分点（Table 2）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ReVisual-R1 的核心创新围绕三个关键设计展开：**纯文本冷启动构建推理引擎**、**优先级优势蒸馏（PAD）解决多模态 RL 中的梯度停滞**、以及**分阶段强化学习（先多模态后文本）实现能力对齐与锐化**。这三者形成因果链条——先通过高难度文本数据建立强推理能力，再用 PAD 稳定地将该能力与视觉感知对齐，最后通过文本 RL 打磨语言表达与逻辑一致性。
 
@@ -114,7 +118,7 @@ ReVisual-R1 将强化学习分为两个顺序阶段，而非混合训练：
 
 三个创新点并非独立设计，而是形成因果闭环：文本冷启动提供了高质量的初始推理能力（起点），PAD 确保了多模态 RL 阶段的有效学习信号（过程），分阶段顺序则决定了能力迁移的最终效果（路径）。缺少任一环节都会导致性能退化——仅冷启动为 47.1，冷启动 + MRL（无 TRL）为 48.2，冷启动 + MRL + TRL 达到最优 49.6。这一递增趋势验证了各组件间的协同效应。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0010_NTo6f6GENJ_Revisual-R1_Advancing_Multimodal_Reasoning_From/figures/002_Figure_2.jpg]]
 *Figure 2: (Top): the overview of our proposed ReVisual-R1 framework.After collcting and curating data, ReVisual-R1 contains cold start and staged reinforcement learning. (Bottom): the process of our proposed prioritized advantage distillation (PAD) for multimodal reinforcement learning*
@@ -146,7 +150,7 @@ $$\operatorname{Pr}(i \text{ is selected} \mid i \in \mathcal{E}) = \frac{\exp(\
 
 整个流程的数据流由 GRAMMAR 数据集支撑（表 1），该数据集包含 283K 文本样本用于冷启动，以及额外的 31K 文本和 21K 多模态样本用于后续的强化学习阶段。
 
-## 核心模块与公式推导
+
 
 ### 多模态推理的形式化与GRPO
 
@@ -196,7 +200,9 @@ ReVisual-R1的完整训练管线包含三个顺序模块：
 
 消融实验证实，**CS + MRL + TRL** 的完整序列达到最佳平均性能 (49.6)，显著优于反向顺序 CS+TRL+MRL (45.5) 或混合训练 Mixed-RL (47.6)，验证了“先对齐视觉、再打磨语言”这一分阶段策略的有效性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -277,7 +283,9 @@ ReVisual‑R1 的实验管线分为三个阶段：**冷启动 (Cold Start)**、*
 ![[assets/figures/papers/iclr26_0010_NTo6f6GENJ_Revisual-R1_Advancing_Multimodal_Reasoning_From/figures/003_Figure_3.jpg]]
 *Figure 3: Absolute performance improvement on Qwen2.5-VL-7B-Instruct across textual and multimodal reasoning tasks.The purple and red dashed lines represent the average absolute gains of VisionR1/R1- One-Vision and DeepMath/OpenR1-Math over the baseline,respectively,across four reasoning tasks*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 在现有方法谱系中的位置
 
@@ -322,6 +330,8 @@ ReVisual-R1 的有效性已在以下条件下得到验证：
 - **跨架构泛化**：该方法在 Qwen2.5-VL 上的成功是否依赖于该模型特定的视觉-语言融合机制？在其他架构（如 LLaVA 系列、InternVL 系列）上的迁移效果需要验证。
 
 > **注意**：关于“PAD 是否会在某些视觉密集任务中误丢弃有效样本”以及“文本冷启动数据的难度阈值如何量化”等具体问题，论文未提供直接证据，需通过额外实验进行手动验证。
+
+
 
 ## 原文 PDF
 

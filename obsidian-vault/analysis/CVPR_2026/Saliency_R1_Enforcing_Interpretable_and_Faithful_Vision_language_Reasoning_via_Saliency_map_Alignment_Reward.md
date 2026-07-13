@@ -44,7 +44,7 @@ claims:
 > - OpenPSG (Deletion 5%) 上，Deletion score ↓ 71.52 vs 84.55 (ATTN-LRP ) (-13.03)。
 > - POPE 上，Accuracy 88.1 vs 86.7 (Qwen2.5-VL-7B base) (+1.4)。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -69,7 +69,7 @@ Saliency-R1 提出了一种**基于显著性图对齐奖励的强化学习框架
 - **可解释性**：在指向游戏（Pointing Game）评估中，能量-PG 和 PG 指标分别提升 10.82% 和 14.14%（Table 3）；人类评估中解释质量评分从基模型的 3.6 显著提升至 4.5（p<0.05）。
 - **消融实验**：仅使用显著性奖励的 Saliency-R1-pure 变体平均准确率仅比完整 Saliency-R1 低 0.6%，表明显著性奖励本身即可提供有效训练信号（Figure 4）。
 
-## 背景与动机
+
 
 视觉语言模型（VLMs）在复杂推理任务中展现出巨大潜力，近期研究进一步引入思维链（Chain-of-Thought, CoT）机制，使模型能够生成显式的中间推理步骤，从而提升多模态理解的准确性与可解释性。然而，一个关键瓶颈逐渐浮现：**VLMs在推理过程中存在过度依赖文本线索、忽视视觉证据的倾向**。模型生成的CoT可能表面上逻辑自洽，但实际上并不忠实于图像内容——其注意力可能聚焦于与问题无关的图像区域，甚至完全未有效利用视觉信息。这种“不忠实的推理”（unfaithful reasoning）直接导致幻觉现象，削弱了模型在视觉中心任务上的可靠性。
 
@@ -79,7 +79,9 @@ Saliency-R1 提出了一种**基于显著性图对齐奖励的强化学习框架
 
 Saliency-R1正是沿着这一思路展开：通过基于logits分解的高效显著性图计算，以思维令牌为瓶颈的注意力滚动机制，以及将显著性图与人工标注边界框的对齐分数作为GRPO奖励，构建了一个端到端的“可解释性驱动训练”框架，旨在同时提升VLM推理的忠实性与可解释性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Saliency-R1 的核心创新在于将**显著性图对齐奖励**引入视觉语言模型的强化学习训练，通过三个紧密耦合的技术模块，系统性地解决了模型推理过程中“看错地方”或“不看图像”的忠实性问题。
 
@@ -119,7 +121,7 @@ $$\mathrm{Alignment.Score} = \frac{\sum_{i \in \mathrm{Bounding~Box}} \mathrm{Sa
 
 通过 GRPO 优化，模型被引导在推理时将其注意力集中到与问题相关的关键图像区域。消融实验表明，仅使用显著性奖励的 Saliency-R1-pure 变体在 9 个 VQA 基准上的平均准确率仅比完整 Saliency-R1 低 0.6%，而替换为原始注意力聚合的 Saliency-R1-attn 或去掉注意力滚动的 Saliency-R1-think 变体均出现性能下降，验证了所提方法的有效性。
 
-## 整体框架
+
 
 Saliency-R1 的整体框架由三个紧密耦合的模块构成，形成一条“显著性感知推理—显著性图聚合—强化学习对齐”的闭环流水线。其核心设计理念是：**通过高效计算模型在推理过程中对图像区域的注意力分布，并将其与人工标注的语义边界框对齐，从而以强化学习的方式引导模型聚焦于与问题相关的视觉证据**。
 
@@ -151,7 +153,7 @@ Saliency-R1 的整体框架由三个紧密耦合的模块构成，形成一条�
 ![[assets/figures/papers/paper_list_l2665_https_arxiv_org_abs_2604_04500/figures/001_Figure_1.jpg]]
 *Figure 1: Main motivation of this work. Different thinking processes might focus on distinct regions of an image, even if they arrive at the correct answer. Unfaithful thinking processes either focus on irrelevant parts of the image or fail to consider the image*
 
-## 核心模块与公式推导
+
 
 Saliency-R1 方法由三个核心模块构成，分别解决显著性图生成、全局聚合和强化学习对齐问题。
 
@@ -205,7 +207,9 @@ $$\mathcal{I}_{\mathrm{GRPO}}(\theta) = \mathbb{E}_{[q \sim \mathcal{D}, \{o_i\}
 
 其中 $G$ 为每组采样数量，$M_i$ 为截断优势函数，$\beta$ 控制 KL 散度惩罚强度，$\pi_{\mathrm{ref}}$ 为参考策略。通过联合优化准确性、格式规范性和显著性对齐，模型在保持答案正确性的同时，显著提升推理过程的忠实性和可解释性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 4.1 实验设置简述
 
@@ -310,7 +314,9 @@ $$
 ![[assets/figures/papers/paper_list_l2665_https_arxiv_org_abs_2604_04500/figures/016_Table_7.jpg]]
 *Table 7: Throughput analysis. We report the average time to generate one saliency map using the saliency-r1-8k dataset*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与设计动机
 
@@ -389,6 +395,8 @@ $$\mathrm{Alignment.Score} = \frac{\sum_{i \in \mathrm{Bounding~Box}} \mathrm{Sa
 4. **规模化扩展**：该方法如何扩展到更大规模的视觉语言模型（如Qwen-VL-30B或闭源模型）？计算效率优势在大模型上是否依然成立？
 
 5. **多模态推理泛化**：该方法是否能有效泛化到多轮对话、视频理解或具身交互等更复杂的视觉推理场景？思维令牌瓶颈机制在这些场景中是否需要重新设计？
+
+
 
 ## 原文 PDF
 

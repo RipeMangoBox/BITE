@@ -5,6 +5,8 @@ paper_level: A
 venue: ICCV
 year: 2023
 pdf_ref: paperPDFs/ICCV_2023/End_to_end_3D_Tracking_with_Decoupled_Queries.pdf
+project_link: https://sites.google.com/view/dqtrack
+code_link: null
 aliases:
 - EE3TDQ
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | 基于解耦查询的端到端3D多目标跟踪 |
 | 英文题名 | End-to-end 3D Tracking with Decoupled Queries |
 | 会议/期刊 | ICCV 2023 |
-| Links | [paper](https://openaccess.thecvf.com/content/ICCV2023/papers/Li_End-to-end_3D_Tracking_with_Decoupled_Queries_ICCV_2023_paper.pdf); [Project](https://sites.google.com/view/dqtrack) |
+| Links | [paper](https://openaccess.thecvf.com/content/ICCV2023/papers/Li_End-to-end_3D_Tracking_with_Decoupled_Queries_ICCV_2023_paper.pdf) · [Project](https://sites.google.com/view/dqtrack) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | DQTrack |
 | Dataset | nuScenes test, nuScenes val, nuScenes val (PETRv2 encoder) |
@@ -40,7 +42,7 @@ claims:
 > - nuScenes val 上，AMOTA 为 28.5%，对比 24.5% (SinQuery)，变化 +4.0%。
 > - nuScenes val (PETRv2 encoder) 上，AMOTA 为 44.6%，对比 约39.8% (MUTR3D* from Table 1)。
 
-## 概述
+## 概要
 
 ### 1. 问题与瓶颈
 
@@ -78,7 +80,7 @@ DQTrack 在3D多目标跟踪知识体系中贡献了以下增量：
 
 这些设计共同构成了一个紧凑、可微且高性能的端到端3D跟踪框架。
 
-## 背景与动机
+
 
 ### 3D多目标跟踪的范式瓶颈
 
@@ -98,7 +100,9 @@ Figure 1 清晰地对比了三种范式的差异。Tracking-by-detection（1a）
 
 在nuScenes数据集上，先前方法的性能差距显著。Tracking-by-detection方法受限于启发式匹配的次优性，而单查询方法受困于表示冲突。DQTrack通过解耦查询，在nuScenes验证集上相较单查询方法**SinQuery**（即MUTR3D的跟踪部分）获得**4.0% AMOTA**的绝对提升（Table 3），并在测试集上达到**52.3% AMOTA**，超越所有先前基于学习的方法，比**PF-Track**高出**8.9% AMOTA**（Table 2）。这些量化结果直接验证了表示冲突是限制先前方法性能的关键瓶颈，而解耦查询是针对该瓶颈的有效因果干预。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DQTrack 的核心创新在于**将基于查询的跟踪中单一共享查询解耦为专门的对象查询（Object Query）和轨迹查询（Track Query）**，从而消除检测与跟踪任务之间的表示冲突。这一设计从根本上改变了先前方法的查询范式，并驱动了后续可学习关联与时间更新模块的协同设计。
 
@@ -132,7 +136,7 @@ DQTrack 引入基于指数移动平均（EMA）的时间更新策略，从外观
 
 DQTrack 的三个 changed slots 构成了一条紧凑的因果链：**查询解耦**消除了任务冲突，为后续模块提供了干净的表示基础；**可学习关联**利用解耦后的专门嵌入实现高精度、可微的轨迹匹配；**EMA 时间更新**则维持了跨帧表示的一致性。三者协同使 DQTrack 在 nuScenes 测试集上达到 **52.3% AMOTA**，超越所有先前学习型跟踪器（Table 2），相比 PF-Track 提升 **8.9% AMOTA**。
 
-## 整体框架
+
 
 DQTrack 的端到端流水线遵循“编码-解码-关联-更新”四阶段结构，其核心设计在于将传统单查询跟踪范式中的共享查询显式解耦为**对象查询（object query）**与**轨迹查询（track query）**，从而消除检测与跟踪任务间的表示冲突。Figure 2 给出了完整的框架概览。
 
@@ -185,7 +189,7 @@ $$\mathcal{L} = \sum_{t}^{D} (\lambda_{\mathrm{Det}} \mathcal{L}_{\mathrm{Det}}^
 ![[assets/figures/papers/paper_list_l18_https_openaccess_thecvf_com_content_ICCV2023_papers_Li_End_to_end_3D_Tra/figures/001_Figure_1.jpg]]
 *Figure 1: Compared with others, the proposed decoupledquery approach in 1c avoids the representation conflict in single query of the tracking-with-query method 1b and heuristic processing in tracking-by-detection manner 1a*
 
-## 核心模块与公式推导
+
 
 DQTrack 的端到端可微跟踪流水线由三个核心模块构成：**可学习关联**、**时间更新** 和 **整体优化目标**。以下逐一展开其关键公式与变量含义。
 
@@ -247,7 +251,9 @@ $$\mathcal{L} = \sum_{t}^{D} (\lambda_{\mathrm{Det}} \mathcal{L}_{\mathrm{Det}}^
 
 **消融证据**：Table 8 显示，轨迹查询增强带来 **0.4% AMOTA** 提升，熵正则化进一步贡献 **0.6% AMOTA**；Table 10 显示使用 3 帧训练（$D=3$）获得最佳 **28.5% AMOTA**，显著优于 2 帧或 4 帧。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能：在nuScenes测试集与验证集上的SOTA表现
 
@@ -333,7 +339,9 @@ Table 3的范式对比消融直接验证了论文的核心主张。在nuScenes�
 ![[assets/figures/papers/paper_list_l18_https_openaccess_thecvf_com_content_ICCV2023_papers_Li_End_to_end_3D_Tra/figures/014_Table_10.jpg]]
 *Table 10: Results with different frames for training on the nuScenes val set. D denotes frame number in Equation (4)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 在3D多目标跟踪范式中的位置
 
@@ -372,6 +380,8 @@ DQTrack发表于ICCV 2023，其解耦查询设计为后续工作提供了可复�
 - **运动模型升级**：是否有更优的运动模型（如基于学习的运动预测或卡尔曼滤波的端到端版本）替代当前的匀速假设，以进一步提升定位精度？
 
 - **真实遮挡场景的鲁棒性**：模型在严重遮挡下的鲁棒性仅通过训练时的假阳性查询增强模拟，缺乏真实遮挡场景下的详尽评估和针对性设计。
+
+
 
 ## 原文 PDF
 

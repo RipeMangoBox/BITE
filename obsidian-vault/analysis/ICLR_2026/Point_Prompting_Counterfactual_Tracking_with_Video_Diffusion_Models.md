@@ -5,6 +5,7 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Point_Prompting_Counterfactual_Tracking_with_Video_Diffusion_Models.pdf
+code_link: null
 project_link: https://point-prompting.github.io
 openreview_forum_id: 6FFQ007qLX
 aliases:
@@ -43,7 +44,7 @@ claims:
 > - TAP-Vid DAVIS 上，OA ↑ 为 82.90 (zero-shot)，对比 80.87 (Opt-CWM, best self-supervised baseline)，变化 +2.03。
 > - TAP-Vid Kinetics 上，AJ ↑ 为 27.36，对比 16.47 (SD-DINO)，变化 +10.89。
 
-## 概述
+## 概要
 
 点跟踪是视觉理解的基础任务，要求对视频中任意查询点在所有帧中持续定位。现有零样本方法依赖从预训练模型中提取特征进行帧间匹配（如DIFT、SD-DINO），难以处理遮挡和长时运动，与有监督方法存在显著差距。视频扩散模型具有内在的时序一致性和物体持久性，但由于其强先验，直接插入不自然的视觉标记（如红点）会导致标记在生成中消失，无法直接用于跟踪。
 
@@ -53,7 +54,7 @@ claims:
 
 该方法的主要局限在于计算成本高（生成50帧需7–30分钟），以及在静止点、对称混淆、标记消失等场景下容易出错，且对合成视频泛化差。这些限制可通过蒸馏和模型改进逐步缓解。
 
-## 背景与动机
+
 
 点跟踪是计算机视觉中的基础任务，旨在估计视频中指定物理点在每一帧的精确位置。这项能力支撑着运动分析、三维重建、视觉编辑等一系列下游应用。传统方法通常依赖大量标注数据进行监督训练，例如 **RAFT**（Teed & Deng, ECCV 2020）通过光流估计实现逐帧匹配，**TAPIR**（Doersch et al., 2023）和 **CoTracker3**（Karaev et al., 2024b）则直接针对点跟踪任务进行专门设计。这些方法在训练分布内表现优异，但泛化到新场景时往往受限。
 
@@ -65,7 +66,9 @@ claims:
 
 本文的核心动机正是突破这一困境：**如何激发预训练视频扩散模型对运动轨迹的零样本理解，同时克服其强先验导致的标记消失问题**。通过反事实建模——在首帧引入人为扰动（标记点）并迫使模型在再生中保留这一扰动——可以将跟踪问题转化为一个可控的视频生成问题。这种方法无需任何微调，完全依赖预训练模型的内部知识，为零样本点跟踪开辟了一条新路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作提出**点提示反事实跟踪（Point Prompting for Counterfactual Tracking）**，其核心创新在于将预训练视频扩散模型重新定位为零样本点跟踪器，并通过三个关键机制克服了直接使用扩散模型进行跟踪的根本障碍。
 
@@ -104,7 +107,7 @@ $$\mathbf{x}_{t-1} = \mathbf{m} \odot \tilde{\mathbf{x}}_{t-1} + (1 - \mathbf{m}
 
 这些创新共同使方法在 TAP-Vid DAVIS 上以零样本设定达到 AJ 42.21，显著超越所有其他零样本基线（最佳基线 SD-DINO 为 29.68），并在遮挡准确率（OA 82.90）上超过自监督方法 **Opt-CWM**（Stojanov et al., 2025）的 80.87（Table 1）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l39_https_openreview_net_forum_id_6FFQ007qLX/figures/005_Figure_1.jpg]]
 *Figure 1: Prompting a diffusion model for tracking. (a) We use an off-the-shelf video diffusion model to perform point tracking. We add a small, distinctive marking—a red dot—to the first frame of an input video, then ask the diffusion model to regenerate the rest of the video using SDEdit (Meng et al., 2021), which propagates the marking to subsequent frames. (b) We then track the motion of this marking over time. This motion corresponds to the trajectory of the underlying physical point. The model successfully tracks through occlusion. Please see the webpage for more results: https://point-prompting.github.io*
@@ -148,7 +151,7 @@ $$\mathbf{x}_{t-1} = \mathbf{m} \odot \tilde{\mathbf{x}}_{t-1} + (1 - \mathbf{m}
 
 整个pipeline的信息流是严格单向的：标记插入为扩散传播提供反事实信号；负向提示确保该信号在扩散过程中不被模型先验“抹除”；颜色重平衡为颜色检测器创造干净的检测环境；粗到细细化则纠正前序步骤积累的定位误差。消融实验（Table 4）证实了这一链条的脆弱性：移除负向提示会导致性能崩溃（AJ 从 48.60 骤降至 22.03），关闭颜色重平衡会使 AJ 降至 34.86，去掉精细化则降至 42.70，而仅用原始像素颜色（无标记点）跟踪的 AJ 仅为 11.26——每个模块的缺失都会在因果链上产生不可恢复的误差放大。
 
-## 核心模块与公式推导
+
 
 ### 3.1 视频扩散模型与SDEdit基础
 
@@ -216,7 +219,9 @@ $$
 
 为减少自然场景中与标记颜色相似的像素干扰，在标记插入前对视频进行**颜色重平衡**：降低标记颜色通道的饱和度，抑制环境中相同色调的出现。标记传播完成后，在HSV色彩空间中检测红色像素，结合自适应搜索窗（半径 $`r`$，中心为前一帧位置）提取点轨迹。若搜索窗内未检测到红色像素，判定目标被遮挡，传播上一帧已知位置。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验结果
 
@@ -282,7 +287,9 @@ Figure 7 归纳了四类典型生成失败场景，这些失败揭示了方法�
 
 ![[assets/figures/papers/paper_list_l39_https_openreview_net_forum_id_6FFQ007qLX/figures/009_Table_2.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 技术脉络与基线对比
 
@@ -329,6 +336,8 @@ $$\tilde{\epsilon}_{\theta} (\mathbf{x}_t, \mathbf{c}_I) = (\lambda + 1) \cdot \
 4. **域适应的可行性**：对于计算机生成视频，能否通过轻量级的提示工程调整（如修改颜色映射策略）或少量领域数据的生成微调来提升鲁棒性？
 
 5. **生成与判别闭环**：能否将点提示思路与自监督学习结合，让跟踪器在推理过程中同时优化其内部表示？这将使模型从“一次性生成”转向“迭代式精化”，可能进一步缩小与监督方法的差距。
+
+
 
 ## 原文 PDF
 

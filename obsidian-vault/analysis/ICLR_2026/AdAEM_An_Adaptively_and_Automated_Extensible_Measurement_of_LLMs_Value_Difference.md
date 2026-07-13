@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/AdAEM_An_Adaptively_and_Automated_Extensible_Measurement_of_LLMs_Value_Difference.pdf
+project_link: null
+code_link: https://github.com/microsoft/ValueCompass/tree/main/AdAEM
 aliases:
 - AdAEM
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | AdAEM：一种自适应且自动可扩展的LLMs价值差异测量方法 |
 | 英文题名 | AdAEM: An Adaptively and Automated Extensible Measurement of LLMs' Value Difference |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=qNlTH4kYJZ); [GitHub](https://github.com/microsoft/ValueCompass/tree/main/AdAEM) |
+| Links | [paper](https://openreview.net/forum?id=qNlTH4kYJZ) · [GitHub](https://github.com/microsoft/ValueCompass/tree/main/AdAEM) |
 | Topic | #topic/safety_alignment_fairness_privacy #topic/safety_alignment_fairness_privacy/fairness_equity_justice_and_safety |
 | Method | AdAEM |
 | Dataset | AdAEM Bench vs. MFQ & ValueBench (Moral Foundations), 控制价值启动实验 (GPT-5 + AdAEM Bench-MFT) |
@@ -40,7 +42,7 @@ claims:
 > - AdAEM Bench vs. MFQ & ValueBench (Moral Foundations) 上，平均值向量标准差 (Avg. Std.) 为 0.212，对比 ~0.1 (MFQ & ValueBench)，变化 约2倍差距，区分度更高。
 > - 控制价值启动实验 (GPT-5 + AdAEM Bench-MFT) 上，目标价值维度得分提升百分比 为 Sanctity +224.05%, Loyalty +81.77%, Authority +71.30%，对比 基准得分（Sanctity 30.19, Loyalty 54.35等），变化 巨大提升，对立维度下降。
 
-## 概述
+## 概要
 
 **AdAEM**（一种自适应且自动可扩展的LLMs价值差异测量方法）直面当前大语言模型价值评估的核心瓶颈：现有基准（如SVS、ValueBench、MFQ等）依赖固定、人工编写或过时的测试问题，所捕获的价值差异高度趋同，仅反映无害性等浅层安全特征，无法真实刻画模型在文化适应、道德基础等方面的深层分歧（图1(a)）。本文提出将价值评估重新构造为**信息瓶颈问题**：在不依赖人工标注和模型微调的条件下，通过自动探测来自不同文化和开发时期的多样化LLMs的内部价值边界，并以信息论目标驱动上下文优化（Eq.1），自适应地生成最具争议性的测试问题，从而最大限度地暴露模型间的价值分歧。
 
@@ -55,7 +57,7 @@ claims:
 
 综上，AdAEM通过自动、自适应的动态问题生成机制，为大规模、细粒度、可扩展的LLM价值评估提供了信息论基础下的解决方案，显著优于传统静态基准。
 
-## 背景与动机
+
 
 大语言模型（LLM）的安全性研究与对齐实践中，理解并量化模型的内在价值观已成为关键环节。然而，现有的价值评估基准普遍面临信息瓶颈：它们多采用静态、人工设计或简单合成的通用问题集（如Schwartz价值问卷SVS、道德基础问卷MFQ，以及ValueBench等），这些问题不仅容易受到数据污染和时效性影响，更关键的是，它们只能诱发出不同LLM之间共享的、浅层的安全价值（例如无害性），使得评估结果高度趋同、难以区分。正如图1(a)所示，在回答通用问题时，不同LLM表现出的价值观几乎不可分辨。实验数据进一步佐证了这一点：在MFQ和ValueBench等静态基准下，被评估模型的平均价值向量相关系数高达约0.56～0.6，而跨价值维度的标准差仅约0.1（Table 15），这意味着现有的测试问题无法有效捕捉模型在文化适应性、道德倾向、偏见等深层维度的真实价值分歧。
 
@@ -65,7 +67,9 @@ claims:
 
 初步的人机协同验证强有力地支撑了本文的动机：在人工评估中，AdAEM生成的问题相较于人工编写问题，在价值区分度上提升52%，合理性提升8.7%（注释者间一致性Cohen's κ=0.93，Table 9）；当使用AdAEM Bench-MFT评估四款不同LLM时，模型间的平均价值相关系数降至**-0.169**（远低于MFQ的~0.6和ValueBench的~0.56），而跨维度的标准差升至**0.212**（为其余二者约2倍）（Table 15），清晰表明该方法能够揭示更深层的价值差异。此外，在GPT-5上的可控价值启动实验显示，AdAEM下的目标道德维度得分可产生巨大的正向偏移（如Sanctity提升224.05%），而对立维度则相应下降（Table 16），证明了评估结果的效度。这些证据一致表明，构建一种以信息论目标驱动的自适应价值评估体系，是突破现有基准瓶颈、深度测量LLM价值差异的必要路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 现有价值评估基准（SVS、ValueBench、MFQ 乃至 ValueDCG）的共同瓶颈在于使用固定、通用或过时的问题，这些题目倾向于反映不同 LLM 共享的浅层安全价值（如无害性），导致评估结果高度正相关、区分度极低，无法捕捉文化适应性与深层价值分歧。AdAEM 将这一瓶颈重新构造为一个信息瓶颈问题：如何在无人工标注、无微调的条件下，**自动且自适应地生成最大化模型间价值分布差异的问题**，从而暴露真实的价值边界。
 
@@ -87,7 +91,7 @@ claims:
 
 本质上，AdAEM 将价值评估从一个"静态问卷调查"创新为一个**自适应信息发现过程**，使 benchmark 本身能够随 LLM 的价值边界自我扩展——这一定义性差异正是它与所有 baselines 的根本分界。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0006_qNlTH4kYJZ_AdAEM_An_Adaptively_and_Automated_Extensible_Mea/figures/002_Figure_2.jpg]]
 *Figure 2: Illustration of AdAEM framework. The left part demonstrates the questiono refinement step to increase informativeness and the right depict the response generation step to elicit value difference*
@@ -133,7 +137,7 @@ $$
 
 整个框架通过 **信息量最大化驱动的自适应生成 + 相对排名聚合**，在完全无监督（无手工标注、无微调）的条件下，比人工设计的静态基准更深刻地揭示了 LLM 之间不易觉察的价值分歧（如跨文化、跨时期带来的差异）。后续实验表明，即使在有限的样本量（200～1000 问）或较小的生成模型集合（AdAEM‑2）下，该框架仍能保持高度一致性与区分度。
 
-## 核心模块与公式推导
+
 
 AdAEM 将价值评估重新构造为信息瓶颈问题：通过交替优化问题与回答，自动生成能最大化不同 LLM 价值分布差异的测试问题。整体流程由四个核心模块构成，协同完成从话题探索到价值分析的全过程。
 
@@ -203,7 +207,9 @@ $$
 
 > 注意：上述公式中的所有概率（如 $p_x(\mathbf{y})$、$p_x(\mathbf{v}|\mathbf{y})$）在面向黑盒 LLM 时通过外部分类器或语义相似度进行近似，可能引入系统误差，但实验显示该近似仍能支撑有效的区分结果。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果
 
@@ -253,7 +259,9 @@ AdAEM 测试基准在揭示 LLM 价值差异上大幅优于静态问卷基准。
 *Table 7: AdAEM benchmark statistics. SVS: SVS Questionnaire; VB: Value Bench; DCG: ValueDCG; #q: # of questions; Avg.L.: average question length; SB: Self-BLEU; Sim: average semantic similarity*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 AdAEM 处于**动态、自适应价值评估**的新交叉点——它同时区别于传统的静态心理问卷基准和近期的大规模动态生成基准。在现有支撑点上，SVS、MFQ、ValueBench 等本质上是固定问题集，用少量人工编写或问卷导出的题目捕捉 LLM 的价值倾向。这类基准的瓶颈在于**问题过于通用且易过时**，使得不同模型的安全/无害化等"浅层共享价值"难以被区分，评估结果的信息量低，无法揭示文化适应、偏见等方面的深层分歧（Figure 1 对此做了直观对比）。ValueDCG 虽然大规模合成判断性问题，但仍然依赖人工设计的议题模板，缺乏对模型内部价值边界的针对性探测和系统化的信息量保证。
 
@@ -265,6 +273,8 @@ AdAEM 的核心路径是将价值评估重新表述为一个**信息瓶颈下的
 **适用边界与局限。**当前 AdAEM 的实现仅在 Schwartz 基本价值理论和 Moral Foundations Theory 两种框架下得到验证，对于更细粒度或文化特定的价值维度（如 Hofstede 维度）的可迁移性尚不明确。方法的多处近似——包括外部分类器估计 $p(\mathbf{v}|\mathbf{y})$、用语义相似度替代部分概率项——可能引入系统误差，尤其在对黑盒 LLM 的评估中难以量化。价值分析阶段默认采用二元判断（体现/未体现某价值），未能处理连续或多极的价值表达。此外，研究是在固定计算预算（$B=1500$）和固定参与者集合条件下进行的，在模型快速更替或需要实时更新的环境中，问题的持续有效性和评估一致性仍有待验证。大规模消融实验表明，即使减少参与者规模（AdAEM‑2）或仅使用 200 个问题，评估结果仍与全量基准高度一致（ICC = 0.816，Cronbach's α = 0.8991），但完全动态环境下的稳定性仍需另行确认。
 
 **开放问题。**首先，AdAEM 能否无缝应用于 Schwartz 以外的理论框架，以及不同理论下的评估结果能否相互印证，是推动该方法走向一般化价值评估的关键。其次，在连续价值谱系（而非离散二分）中如何定义并优化信息量目标，将直接决定方法对真实价值表达的覆盖能力。第三，所有近似步骤（价值分类器、语义相似度替换等）对最终评估准确性的量化影响尚未测量，这为后续的误差分析和校准研究留下了空间。最后，当 LLM 参与者集合动态变化（新模型加入、旧模型退役）时，AdAEM 能否持续生成有效问题并维持评估的一致性，是面向实时治理和持续审计场景必须回答的问题。
+
+
 
 ## 原文 PDF
 

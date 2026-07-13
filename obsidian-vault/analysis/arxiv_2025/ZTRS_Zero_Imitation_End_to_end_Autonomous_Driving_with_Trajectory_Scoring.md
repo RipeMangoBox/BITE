@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/ZTRS_Zero_Imitation_End_to_end_Autonomous_Driving_with_Trajectory_Scoring.pdf
+project_link: null
+code_link: https://github.com/woxihuanjiangguo/ZTRS
 aliases:
 - ZZITSEPO
 - ZTRS
@@ -41,7 +43,7 @@ claims:
 > - Navtest (开环规划，通用真实场景) 上，EPDMS ↑ 86.2 (ZTRS ViT-L) vs 85.6 (HydraMDP++ ViT-L) (+0.6)。
 > - HUGSIM (闭环驾驶，3DGS渲染场景) 上，RC ↑ / HD-Score ↑ RC 42.6 / HD-Score 28.9 (ZTRS) vs RC 38.0 / HD-Score 28.6 (GTRS-Dense) (+4.6% RC / +0.3 HD-Score)。
 
-## 概述
+## 概要
 
 端到端自动驾驶方法长期面临一个根本性两难：**模仿学习（Imitation Learning, IL）** 依赖人类专家示范，但受限于示范质量与协变量偏移（covariate shift）；**强化学习（Reinforcement Learning, RL）** 虽可通过仿真规模化训练，却仅能操作低维符号输入（如3D目标检测框与地图），无法利用高维传感器中的丰富语义信息。至今尚无方法能在保留原始传感器输入的前提下，完全通过奖励信号训练端到端规划器。
 
@@ -54,7 +56,7 @@ claims:
 
 ZTRS的成功表明，通过穷举密集优化可克服从零训练的冷启动问题，使端到端规划器无需任何人类示范即可从高维传感器数据中学习驾驶策略。
 
-## 背景与动机
+
 
 端到端自动驾驶旨在从高维传感器输入（如相机图像）直接输出规划轨迹，省去传统模块化方法中感知、预测、规划的级联流程。然而，该领域长期面临一个根本性困境：**模仿学习（Imitation Learning, IL）与强化学习（Reinforcement Learning, RL）各执一端，无法兼得**。
 
@@ -64,7 +66,9 @@ ZTRS的成功表明，通过穷举密集优化可克服从零训练的冷启动�
 
 由此形成一个清晰的研究缺口：**尚无方法能够同时保留原始传感器输入，并完全通过奖励信号训练端到端规划器**。IL方法有视觉但受限于示范，RL方法有奖励但丢失了视觉。ZTRS的动机正是打破这一僵局——通过将连续轨迹空间离散化为可枚举动作集，并设计一种适用于该离散空间的穷举策略优化算法，使得高维视觉输入上的零模仿RL训练成为可能。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈诊断：模仿学习与强化学习的两难困境
 
@@ -114,7 +118,7 @@ ZTRS相对于IL基线方法（如**DriveSuprim** (Yao et al., arXiv 2025)、**GT
 
 ZTRS继承了轨迹评分器（Trajectory Scorer）的架构范式（与GTRS-Dense、DriveSuprim等同属一类），但其**训练机制发生了根本性变化**。框架由五个模块组成：图像骨干网络（从三视角拼接图像中提取视觉令牌）、轨迹分词器（将K-means聚类轨迹编码为查询向量）、Transformer解码器（轨迹查询通过交叉注意力获取视觉上下文）、策略头（输出动作概率分布 $\pi(\cdot|s)$，由EPO训练）以及评分头（预测各EPDMS子指标的规则得分，以二分类损失训练）。这一架构使得ZTRS成为**首个完全消除模仿学习、仅通过奖励从高维真实世界图像中学习端到端规划的框架**。
 
-## 整体框架
+
 
 ZTRS 的整体架构围绕一个核心设计原则展开：**将连续轨迹规划问题转化为离散动作集上的评分与选择问题**，从而使得端到端规划器能够完全通过奖励信号从零训练，无需任何人类示范。如图 2 所示，框架由五个模块串联构成，形成“传感器输入 → 轨迹评分 → 策略输出”的完整推理链路。
 
@@ -153,7 +157,7 @@ $$g := \sum_{\substack{a' \in \mathcal{A} \\ s \sim \mathcal{D}}} \Psi(s, a') \n
 ![[assets/figures/papers/paper_list_l73_https_arxiv_org_abs_2510_24108/figures/002_Figure_2.jpg]]
 *Figure 2: The Overall Framework of ZTRS. Given offline sensor data and a fixed set of trajectories, ZTRS first tokenizes these two modalities. In a Transformer Decoder, the trajectory tokens attend to image tokens to acquire the context. Finally, scoring heads and a policy head map the trajectory tokens to rule-based scores and action likelihoods*
 
-## 核心模块与公式推导
+
 
 ### 2.1 整体框架：从连续回归到离散评分
 
@@ -218,7 +222,9 @@ $$\mathrm{HD\text{-}Score} = RC \cdot \sum_{t=1}^{T} \left(\prod_{m \in \{\mathr
 
 **时序修正项的作用机制**：不加修正项时，EPO 倾向于为连续帧选择 EPDMS 高但彼此不一致的轨迹，导致严重震荡。加入 $b$ 项后 EC 指标提升 23.4%，本质是通过惩罚相邻帧间的舒适性违规来强制时序平滑性，使规划轨迹在时域上连续可执行。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -307,7 +313,9 @@ Figure 3展示了ZTRS在Navtest开环规划中的轨迹可视化（蓝色）与�
 ![[assets/figures/papers/paper_list_l73_https_arxiv_org_abs_2510_24108/figures/009_Figure_4.jpg]]
 *Figure 4: Visualizations of planned trajectories (orange dots) on the challenging closed-loop driving benchmark HUGSIM*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心范式定位：从模仿学习到零模仿强化学习
 
@@ -377,6 +385,8 @@ ZTRS仅支持离线训练，无法与环境交互进行在线探索。这意味�
 5. **奖励塑形的理论化**：当前时序一致性修正项 $b$ 为手工设计，能否从最优控制或逆强化学习角度导出更具理论保证的奖励塑形机制？例如，将时序平滑性作为KL散度正则项纳入优化目标。
 
 6. **真实道路验证**：ZTRS的零样本闭环能力目前仅在HUGSIM（3DGS渲染场景）上验证，其在真实道路测试中的可迁移性仍是开放问题。开环EPDMS指标与真实驾驶安全性之间的标定关系需要进一步实证研究。
+
+
 
 ## 原文 PDF
 

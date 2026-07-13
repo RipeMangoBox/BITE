@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/B_Seg_Camera_Free_Training_Free_3DGS_Segmentation_via_Analytic_EIG_and_Beta_Bernoulli_Bayesian_Updates.pdf
+project_link: null
+code_link: null
 aliases:
 - BS
 tags:
@@ -40,7 +42,7 @@ claims:
 > - 3D-OVS (Bed) 上，mIoU 97.1 vs 91.7 (FlashSplat Uniform-Sphere) (+5.4)。
 > - 3D-OVS (Bench) 上，mIoU 92.2 vs 86.9 (FlashSplat Uniform-Sphere) (+5.3)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -75,7 +77,7 @@ B³-Seg（Beta-Bernoulli Bayesian Segmentation for 3DGS）通过**贝叶斯重�
 
 当前方法主要在对象中心场景下验证，扩展到大型室内/室外环境可能需要更广泛的视点探索策略。二值前后景分割的框架需扩展为Dirichlet-Categorical模型以支持多类别分割。此外，2D掩码推理阶段（约10秒）仍是主要耗时瓶颈，且自适应单调性和子模性的理论保证在多类场景下的推广仍是一个开放问题。
 
-## 背景与动机
+
 
 ### 3D高斯泼溅分割的现实需求
 
@@ -99,7 +101,9 @@ B³-Seg的核心动机正是将分割重构为**序贯贝叶斯决策过程**：
 
 通过这种“信息驱动”的主动视图选择，B³-Seg在仅使用20个主动选择视图和约12秒总运行时间的条件下，取得了与依赖相机和标签的监督方法相当的精度，为交互式3DGS编辑提供了实用化的技术路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 B³-Seg的核心创新在于将3DGS分割重构为一个**相机无关、无需训练的序贯贝叶斯决策问题**，并通过两个关键的技术槽位变更（changed slots）实现秒级交互式分割，从根本上绕开了现有方法对预定义相机视点、真实语义掩码和昂贵重训练的依赖。
 
@@ -139,7 +143,7 @@ $$\mathrm{EIG}(v) = \sum_i \left\{ H(\mathrm{Beta}(a_i,b_i)) - H(\mathrm{Beta}(a
 
 这三个槽位变更构成了一个紧密耦合的创新闭环：**贝叶斯更新**提供不确定性量化 → **EIG驱动选择**利用不确定性贪婪选择最优视图 → **增强掩码推理**获取高质量观测 → 反馈回贝叶斯更新降低不确定性。这一闭环使得B³-Seg在仅使用20个主动选择视图和约12秒总时间的条件下，取得与依赖相机/标签的监督方法相当的分割精度（Table 1, Table 2），真正实现了相机无关、无需训练、秒级响应的3DGS分割。
 
-## 整体框架
+
 
 B³-Seg 将三维高斯泼溅（3DGS）分割重新构建为一个**序贯贝叶斯决策过程**，其核心闭环由三个交替执行的模块构成：主动视图选择、2D掩码推理和Beta-Bernoulli后验更新。整个pipeline无需预定义相机位姿，无需真实语义标签，也无需任何训练或微调，在约12秒内即可完成端到端开放词汇分割（Table 4）。
 
@@ -179,7 +183,7 @@ B³-Seg相较于直接可比的相机无关基线**FlashSplat (Uniform-Sphere)**
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2602_17134/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of*
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题重构：从线性规划到序贯贝叶斯更新
 
@@ -286,7 +290,9 @@ $$
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2602_17134/figures/003_Figure_3.jpg]]
 *Figure 3: Information Gain vs. Expected Information Gain (ours). (a) IG calculation updates the Beta posterior using SAM2 segmentation masks (Eq. (9)). (b) Our EIG approximates the posterior update from the prior Beta distribution, avoiding SAM2 inference and enabling efficient viewpoint evaluation (Eq. (11))*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -354,7 +360,9 @@ Table 4给出了完整的运行时分解：端到端20次主动选择视图的�
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2602_17134/figures/015_Figure_9.jpg]]
 *Figure 9: Effect of CLIP re-ranking in the LERF-Mask Teatime scene. Although GroundingDINO assigns a higher score to the wrong bounding box (green), CLIP correctly assigns a higher similarity score to the region corresponding to the true object described by the prompt “cookies on a plate” (orange)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -395,6 +403,8 @@ B³-Seg的方法论贡献可锚定在以下知识节点上：
 3. **大规模场景的候选生成**：在大型场景中，EIG的解析形式与更复杂的候选生成策略（如基于RRT的探索、多尺度球面采样）结合是否依然有效？候选视图的分布如何影响EIG估计的准确性？
 
 4. **与4D/动态场景的结合**：B³-Seg的序贯贝叶斯框架天然适合在线更新，能否扩展到动态3DGS场景中的时序分割任务？
+
+
 
 ## 原文 PDF
 

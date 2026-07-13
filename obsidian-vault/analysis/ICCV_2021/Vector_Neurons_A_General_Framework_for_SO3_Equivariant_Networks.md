@@ -5,6 +5,7 @@ paper_level: A
 venue: ICCV
 year: 2021
 pdf_ref: paperPDFs/ICCV_2021/Vector_Neurons_A_General_Framework_for_SO_3_Equivariant_Networks.pdf
+code_link: https://github.com/FlyingGiraffe/vnn
 project_link: "https://cs.stanford.edu/~congyue/vnn/"
 aliases:
 - VN
@@ -29,12 +30,15 @@ claims:
 | 中文题名 | Vector Neurons: A General Framework for SO(3)-Equivariant Networks |
 | 英文题名 | Vector Neurons: A General Framework for SO(3)-Equivariant Networks |
 | 会议/期刊 | ICCV 2021 |
-| Links | [paper](https://arxiv.org/abs/2104.12229); [GitHub](https://github.com/FlyingGiraffe/vnn); [Project](https://cs.stanford.edu/~congyue/vnn/) |
+| Links | [paper](https://arxiv.org/abs/2104.12229) · [GitHub](https://github.com/FlyingGiraffe/vnn) · [Project](https://cs.stanford.edu/~congyue/vnn/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Vector Neurons (VN) |
 | Dataset | ModelNet40, ShapeNet Part, ShapeNet Occupancy |
 
-## 概述
+> [!tip] 效果简介
+> 本笔记的既有实验指标、对比结果与适用边界见“实验与关键发现”；本轮仅统一结构，不改写证据。
+
+## 概要
 
 三维旋转不变性（或等变性）是点云深度学习中的核心挑战。传统网络将特征表示为标量序列，对任意 SO(3) 旋转不具备结构化的鲁棒性——在训练时仅使用对齐数据（无旋转增强）的 DGCNN，面对 SO(3) 随机旋转的测试数据时，分类准确率从 90% 以上暴跌至 16.6%（Table 4）。这一性能坍塌揭示了根本瓶颈：**标量神经元缺乏对三维旋转的结构化感知能力，网络必须通过大量数据增强“记忆”旋转模式，而非“理解”旋转几何**。
 
@@ -44,7 +48,7 @@ claims:
 
 关键实验结果验证了框架的有效性：**在 ModelNet40 分类任务上，VN-DGCNN 在 I/SO(3) 设定下达到 90.0% 准确率，相比标量 DGCNN 的 16.6% 提升 73.4 个百分点**（Table 4）；在 ShapeNet 部件分割任务上，VN-DGCNN 在相同设定下达到 81.5 mIoU（Table 5）。这些结果表明，VN 框架使网络无需旋转增强即可自然泛化到任意 SO(3) 旋转，从根本上解决了标量网络对旋转数据的脆弱性问题。
 
-## 背景与动机
+
 
 三维视觉任务中，点云数据的旋转鲁棒性是一个长期存在的核心挑战。传统深度网络处理点云时，将每个点的三维坐标视为标量特征的有序序列，这种表示方式天然缺乏对三维旋转的结构化感知能力。当输入点云经历任意 SO(3) 旋转时，网络的内部表示会发生不可预测的变化，导致性能急剧下降。
 
@@ -54,7 +58,9 @@ claims:
 
 本文的核心动机正是填补这一空白：**提出一套通用的、可直接嵌入现有点云网络架构的 SO(3)-等变网络构建工具箱**。作者观察到，关键突破口在于提升神经元表示本身的维度——将传统标量神经元（scalar neurons）推广为三维向量神经元（Vector Neurons, VN），使潜在表示从标量序列变为三维向量序列（即矩阵形式）。这一表示层面的跃升，使得线性层天然保持等变性，并为设计等变的非线性、归一化和池化操作铺平了道路，从而能够以最小的架构改动代价，将标准点云网络（如 PointNet、DGCNN）升级为完全旋转等变的版本。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Vector Neurons 的核心创新在于将点云网络的**潜在表示空间从标量序列提升为三维向量序列**，并围绕这一表示构建了一套完整的、可组合的 SO(3)-等变神经网络工具箱。这一设计带来了三个相互关联的关键突破：
 
@@ -82,7 +88,7 @@ VN 框架的关键设计原则是：**等变性不是通过损失函数中的正
 
 VN 框架的另一个关键创新在于其**即插即用的设计理念**。通过将标准架构中的每层形状从 $N$（标量神经元数）替换为 $\lfloor N/3 \rfloor \times 3$（向量神经元数），VN 可以直接嵌入 PointNet、DGCNN 等现有网络，参数总量约降至原来的 $\leq 2/9$，但在旋转场景下性能大幅提升。以 ModelNet40 分类为例，DGCNN 在 $z/\mathrm{SO}(3)$ 设置下准确率仅 16.6%，而 VN-DGCNN 达到 90.0%，增益高达 **+73.4 个百分点**（Table 4）。这种架构兼容性使得 VN 框架无需重新设计网络拓扑即可获得旋转鲁棒性。
 
-## 整体框架
+
 
 Vector Neurons 框架的核心设计理念是将传统神经网络中的标量神经元提升为三维向量神经元，从而构建一套天然具备 SO(3) 等变性的网络构建模块。整个框架围绕 **VN 表示** 展开：每一层的潜在表示不再是标量序列，而是一个矩阵 $\mathcal{V} \in \mathbb{R}^{C \times 3}$，即 $C$ 个三维向量的有序列表。这种表示形式使得旋转操作可以直接作用于特征空间——对输入点云施加旋转 $R \in \text{SO}(3)$，等价于对每层的 VN 表示右乘 $R$。
 
@@ -100,12 +106,9 @@ Vector Neurons 框架的核心设计理念是将传统神经网络中的标量�
 
 在具体网络实例化中，框架将经典点云架构（如 PointNet、DGCNN）的每一层替换为对应形状的 VN 层，即标量层维度 $N$ 映射为 $\lfloor N/3 \rfloor \times 3$ 的向量层。这种设计使参数量降至标量版本的约 $2/9$。以 **VN-DGCNN** 为例，输入点云经过边缘卷积提取局部几何特征后，逐层通过 VN 线性层、非线性层和池化层，最终输出等变的全局特征或不变的任务预测。对于隐式重建任务，编码器 **VN-PointNet** 输出全局向量列表特征 $\mathbf{Z} \in \mathbb{R}^{C \times 3}$，解码器则利用三个旋转不变量 $\langle \mathbf{x}, \mathbf{Z} \rangle$、$\|\mathbf{x}\|^2$ 和 $\text{VN-In}(\mathbf{Z})$ 作为输入，通过标准 ResNet 预测占用值，实现编码器等变、解码器不变的整体架构。
 
-### 补充图表
 
-![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2104_12229/figures/009_Figure_6.jpg]]
-*Figure 6: Reconstruction results on ShapeNet with OccNet (light pink) and VN-OccNet (yellow). Meshes are extracted from the neural implicits using the Multi-resolution IsoSurface Extraction (MISE) method*
 
-## 核心模块与公式推导
+
 
 ### 向量神经元表示
 
@@ -158,7 +161,9 @@ $$V_b'[c] = V_b[c] \frac{N_b'[c]}{N_b[c]}$$
 
 从等变特征 $Z \in \mathbb{R}^{C \times 3}$ 构造旋转不变特征的方式包括：向量的二范数 $\|x\|^2$、内积 $\langle x, Z \rangle$，以及通过对 $Z$ 做 VN-Invariant 变换得到的不变表示。这些不变特征被用于下游任务（如隐式重建的解码器），实现等变编码器与不变解码器的组合。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 4.1 实验设置与评估协议
 
@@ -260,7 +265,9 @@ VN-PointNet在SO(3)/SO(3)下达到 **88.5%**，显著优于其标量对应版本
 ![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2104_12229/figures/015_Table_5.jpg]]
 *Table 5: ShapeNet part segmentation results (mIoU). Training is done on aligned data without rotation augmentation. Table 6: Non-linearity – We compare the performances of entangled linear-ReLU (or linear-LeakyReLU) layers in (6) with 2-tuples of a linear layer plus a separate non-linearity in (24). “Built-in” stands for non-linearities with built-in linear transformations, while “detached” stands for tuples of detached linear and non-linear layers in (24). In most cases, with either the VN-PointNet or the VN-DGCNN backbone, disentangling linear and non-linear layers leads to slightly better results. But this is also at the cost of a doubled network depth and a longer training time (roughly > 1.5 ti...*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与标量点云网络的关系
 
@@ -301,6 +308,8 @@ Vector Neuron（VN）框架并非从零构建全新架构，而是将经典点�
 - **与 Transformer 架构的融合**：VN 提供的是等变特征表示层，如何将其与自注意力机制结合（例如构建 SO(3)-等变的注意力），以捕获长距离几何依赖，是一个有前景但尚未探索的方向。
 
 - **隐式重建中解码器设计的更优选择**：VN-OccNet 的解码器通过拼接 $\langle \mathbf{x}, \mathbf{Z} \rangle$、$\|\mathbf{x}\|^2$ 和 $\text{VN-In}(\mathbf{Z})$ 三个不变量来实现旋转不变性（Table 3）。是否存在更优的不变量组合或可学习的等变解码器结构，以在 I/I 和 SO(3)/SO(3) 设定下同时达到最优，仍待研究。
+
+
 
 ## 原文 PDF
 

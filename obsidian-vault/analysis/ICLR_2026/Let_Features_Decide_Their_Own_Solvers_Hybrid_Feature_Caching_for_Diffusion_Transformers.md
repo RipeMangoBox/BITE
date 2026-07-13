@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Let_Features_Decide_Their_Own_Solvers_Hybrid_Feature_Caching_for_Diffusion_Transformers.pdf
+project_link: https://darrenzheng303.github.io/HyCa.github.io/
+code_link: null
 openreview_forum_id: URbsHlTK8c
 aliases:
 - LFDTOSHFCDT
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 让特征决定自身求解器：面向扩散Transformer的混合特征缓存 |
 | 英文题名 | Let Features Decide Their Own Solvers: Hybrid Feature Caching for Diffusion Transformers |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=URbsHlTK8c); [Project](https://darrenzheng303.github.io/HyCa.github.io/) |
+| Links | [paper](https://openreview.net/forum?id=URbsHlTK8c) · [Project](https://darrenzheng303.github.io/HyCa.github.io/) |
 | Topic | #topic/representation_self_supervised_transfer #topic/representation_self_supervised_transfer/representation_learning |
 | Method | HyCa |
 | Dataset | FLUX.1-dev (DrawBench), Qwen-Image (DrawBench), HunyuanVideo (VBench), Qwen-Image-Edit (GEdit-Bench CN) |
@@ -41,7 +43,7 @@ claims:
 > - Qwen-Image (DrawBench) 上，ImageReward ↑ 为 1.2363 (HyCa N=3)，对比 1.2547 (Original 50 steps)，变化 -1.465%。
 > - HunyuanVideo (VBench) 上，VBench Score ↑ 为 80.25 (HyCa N=6)，对比 80.66 (Original 50 steps)，变化 -0.51%。
 
-## 概述
+## 概要
 
 扩散Transformer（DiT）在生成质量和多样性上持续突破，但其高昂的计算开销——源于每个去噪步骤都要执行完整的前向传播——严重制约了实际部署。特征缓存（feature caching）通过复用先前计算的隐藏表示来跳过冗余的Transformer块计算，已成为加速DiT的主流范式。然而，现有方法存在一个根本性的瓶颈：**它们对所有特征维度采用统一的缓存策略，忽视了不同维度间震荡与平滑等异质动态行为**，导致预测误差大、生成质量显著下降。
 
@@ -51,7 +53,7 @@ claims:
 
 实验覆盖文本到图像、视频生成、图像编辑及蒸馏模型等多种任务和架构。主要结果包括：在FLUX.1-dev上实现**5.55×加速**，ImageReward仅降0.03%（Table 2）；在HunyuanVideo上实现**5.56×加速**，VBench得分仅降0.51%（Table 3）；在Qwen-Image-Edit上实现**6.24×加速**，且整体得分反超原始模型0.41%（Table 4）。消融研究证实，维度级缓存策略显著优于令牌级和统一缓存，混合求解器性能超越任何单一求解器（Figure 7）。此外，聚类和求解器分配对LoRA微调保持鲁棒（ARI > 0.8），无需重新聚类。该方法仅需约1秒的离线预处理，无需额外训练，在近无损质量下实现了显著的推理加速。
 
-## 背景与动机
+
 
 扩散Transformer（DiT）已成为文生图、文生视频等生成任务的主流架构。然而，其推理过程需要数十步去噪，每一步都需完整执行深层Transformer块，计算开销极大。为缓解这一问题，**特征缓存**（Feature Caching）作为一种免训练的加速范式被广泛采纳：它利用去噪过程中隐藏特征的时序冗余，在部分步骤跳过Transformer计算，直接复用或预测缓存的特征。
 
@@ -61,7 +63,9 @@ claims:
 
 基于此，本文提出 **HyCa**（Hybrid Feature Caching），将隐藏特征演化建模为**混合ODE**，通过无监督聚类将维度分组，并为每个聚类从求解器池中自动分配最合适的数值求解器（如Runge–Kutta、Adams–Bashforth、Taylor等），从而实现维度级自适应缓存。该方法在多种DiT模型和任务上均实现了近无损的显著加速（如FLUX上5.55×，ImageReward仅降0.03%），验证了“让特征决定自身求解器”这一范式的有效性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 HyCa的核心创新在于将DiT的隐藏特征演化建模为**混合ODE（mixture of ODEs）**，并据此实现**维度级自适应求解器分配**。这一设计直接回应了现有特征缓存方法的根本瓶颈：对所有特征维度采用统一策略，忽视了不同维度间存在的异质动态行为（如震荡与平滑），导致预测误差大、生成质量下降。
 
@@ -97,7 +101,7 @@ $$\operatorname*{min}_{\{s_c \in S\}_{c=1}^C} \sum_{c=1}^C \left[ \frac{1}{|c|} 
 
 值得注意的是，聚类和求解器分配对LoRA微调保持鲁棒（ARI>0.8），无需重新聚类即可直接复用，进一步降低了实际部署的门槛。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_URbsHlTK8c/figures/003_Figure_3.jpg]]
 *Figure 3: HyCa Framework. (a) Offline Preprocessing: feature dimensions are first analyzed and clustered with temporal indicators (e.g., differences, curvature). For each cluster, candidate solvers generate predicted features, then compared against real computed features; the solver with minimum error is then assigned to that cluster. (b) Inference: once assigned, each cluster consistently reuses its solver, enabling efficient prediction by skipping redundant computations while maintaining accuracy*
@@ -133,7 +137,7 @@ HyCa 的整体流程分为两个阶段：**离线预处理** 与 **推理时混�
 
 HyCa 的维度级缓存策略相较于令牌级方案具有更好的稳定性——特征空间的聚类结构在跨提示、分辨率和时间步的条件下几乎不变（Figure 6），而令牌级缓存在不同输入下的行为一致性则难以保障。同时，混合求解器策略使 HyCa 在预测误差和生成质量上均超越任何单一求解器基线（Figure 7 c-d），验证了“让特征决定自身求解器”这一核心洞察的有效性。
 
-## 核心模块与公式推导
+
 
 HyCa 将特征缓存重新建模为数值常微分方程（ODE）求解问题，其核心由三个模块串联构成：**动态分析与聚类**、**求解器选择**、**推理时混合缓存**。
 
@@ -191,7 +195,9 @@ $$
 
 **推理时混合缓存**模块在跳跃步骤中，对每个聚类使用其预分配的求解器，基于缓存特征预测下一个残差，并注入 Transformer 块。前几步始终完整计算，因此早期聚类的不稳定性不影响最终生成质量（见 Figure 15 的消融验证）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能：近无损加速的跨任务验证
 
@@ -259,7 +265,9 @@ HyCa的聚类分配对LoRA微调保持高度不变性。Figure 8和Figure 13显�
 ![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_URbsHlTK8c/figures/020_Figure.jpg]]
 *Figure: (a)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与设计动机
 
@@ -334,6 +342,8 @@ HyCa的求解器池包含BDF等隐式方法，适合处理蒸馏模型（如FLUX
 - **大规模可扩展性**：在百亿参数级DiT上，聚类数量是否需要增加？求解器池是否需要扩展？离线探测的计算成本是否仍可忽略？
 
 - **与模型压缩的协同**：HyCa与剪枝、量化等模型压缩技术的叠加效果如何？维度级缓存是否可与结构化稀疏性结合实现更高加速？
+
+
 
 ## 原文 PDF
 

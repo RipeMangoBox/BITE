@@ -5,6 +5,8 @@ paper_level: A
 venue: ECCV
 year: 2024
 pdf_ref: paperPDFs/ECCV_2024/TRAM_Global_Trajectory_and_Motion_of_3D_Humans_from_in_the_wild_Videos.pdf
+project_link: https://yufu-wang.github.io/tram4d/
+code_link: null
 aliases:
 - TGTM3HFWV
 tags:
@@ -38,7 +40,7 @@ claims:
 > [!tip] 效果简介
 > - EMDB 上，ATE (m) (相机轨迹误差，已知尺度) 0.32 (Masked DROID平均) vs DROID-SLAM (无掩码，常发散) / ORB-SLAM2 (显著提升，避免发散)；RTE (%) (根轨迹误差) 1.4 vs 3.5 (WHAM) (-2.1 (-60%))。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -67,7 +69,7 @@ TRAM处于**SLAM辅助的全局人体运动重建**这一技术路线。与依�
 
 > **注意**：WHAM在对比中使用的是采用真实陀螺仪数据的版本（Fig. 6注释），实际泛化场景下TRAM的优势可能更大。
 
-## 背景与动机
+
 
 从普通摄像机拍摄的野外视频中恢复三维人体运动，是计算机视觉与图形学中长期存在的核心挑战。该问题的完整解包含两个耦合部分：**世界坐标系下的全局人体轨迹**（人在场景中“走到了哪里”）和**相机坐标系下的局部身体姿态**（人“如何动作”）。然而，由于拍摄过程中相机本身也在运动，图像中观察到的运动是人体运动与相机运动叠加后的混合信号，使得准确解耦并重建这两部分变得异常困难。
 
@@ -87,7 +89,9 @@ TRAM处于**SLAM辅助的全局人体运动重建**这一技术路线。与依�
 
 基于这一洞察，TRAM采用**两阶段解耦策略**：先利用场景恢复相机运动，再在相机坐标系下回归人体运动，最后将二者组合得到全局结果。这一设计将困难的联合估计问题分解为两个相对成熟的子问题——鲁棒的视觉SLAM和视频人体姿态回归——并通过冻结大规模预训练模型（ViT-H）并仅微调轻量时序模块的方式，高效地赋予单帧模型视频理解能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 TRAM 的核心创新在于将“从动态相机拍摄的野外视频中恢复全局人体运动”这一难题分解为两个可独立解决、且相互增强的子问题，并通过三个关键“changed slots”实现了对基线方法的系统性改进。
 
@@ -117,7 +121,7 @@ SLAM恢复的相机轨迹缺乏度量尺度。现有方法（如 **WHAM** (Shin 
 
 上述三个创新模块通过“世界坐标系人体轨迹组合”公式（$\\{ \\mathbf { H } _ { t } \\} _ { t = 0 } ^ { T } = \\{ \\mathbf { G } _ { t } \\circ \\mathbf { T } _ { t } \\} _ { t = 0 } ^ { T }$）协同工作：度量尺度相机轨迹 $\mathbf{G}_t$ 提供全局参考系，VIMO在相机坐标系下回归相对人体位姿 $\mathbf{T}_t$，二者组合得到世界轨迹。这种解耦设计使得TRAM在EMDB上将全局根轨迹误差（RTE）相对于WHAM降低了60%（Table 3），同时保持了网格重建的最优精度（Table 4）。
 
-## 整体框架
+
 
 TRAM 将“从野外视频中恢复全局人体运动”这个复杂问题分解为两个可独立优化的子任务：**度量级相机轨迹恢复**与**相机坐标系下的人体运动回归**。这一分解的核心洞察在于：场景背景提供了可靠且泛化的尺度信息，其稳定性远优于基于人体运动学的先验假设；同时，将相机轨迹与人体运动解耦，使得各模块可以分别利用最合适的预训练模型，避免端到端联合训练带来的数据与计算开销。
 
@@ -153,7 +157,7 @@ TRAM 将“从野外视频中恢复全局人体运动”这个复杂问题分解
 ![[assets/figures/papers/paper_list_l1643_TRAM_Global_Trajectory_and_Motion_of_3D_Humans_from_in_the_wild_Videos/figures/001_Figure_1.jpg]]
 *Figure 1: Overview. Given an in-the-wild video, TRAM reconstructs the complete 3D human motion: global trajectory and local body motion, in diverse and longrange scenarios*
 
-## 核心模块与公式推导
+
 
 ### 3.1 运动分解与全局轨迹组合
 
@@ -222,7 +226,9 @@ $$\mathcal { L } _ { 3 D } = | | \hat { \mathcal { I } } _ { 3 D } - \mathcal { 
 ![[assets/figures/papers/paper_list_l1643_TRAM_Global_Trajectory_and_Motion_of_3D_Humans_from_in_the_wild_Videos/figures/003_Figure_3.jpg]]
 *Figure 3: Video transformer VIMO builds on top of the large pre-trained HMR2.0 and adds two temporal transformers to propagate information across video frames. Right: the temporal transformers use the same encoder-only architecture. represents patch tokens at the same spatial location across time in the first temporal module, and represents SMPL poses across time in the second temporal module. More details are included in the supplementary*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -298,7 +304,9 @@ TRAM 在方法谱系中占据了一个独特位置：它桥接了基于 SLAM 的
 
 VIMO 的设计理念——在冻结的大规模预训练图像模型（ViT-H）上添加轻量时间模块——代表了一种高效的视频模型构建范式。这与近年来的“图像预训练 + 时序微调”趋势一致，但 TRAM 通过双时间 Transformer 的解耦设计，在精度和平滑性之间取得了更好的平衡。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 全局人体运动重建的路线图
 
@@ -345,6 +353,8 @@ TRAM 的有效性依赖于以下前提条件，当这些条件不满足时性能
 5. **遮挡与多人场景。** TRAM 目前主要在单人、少遮挡场景下验证。多人交互场景中的相互遮挡、身份切换等问题，需要更复杂的跟踪和重建策略。
 
 6. **尺度估计的远距离可靠性。** 当人体距离相机较远时，深度预测的绝对误差增大，尺度估计的可靠性需要进一步验证和理论分析。
+
+
 
 ## 原文 PDF
 

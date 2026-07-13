@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2024
 pdf_ref: paperPDFs/CVPR_2024/DNO_Optimizing_Diffusion_Noise_Can_Serve_As_Universal_Motion_Priors.pdf
+project_link: https://korrawe.github.io/dno-project/
+code_link: null
 aliases:
 - DNOD
 - DNO
@@ -42,7 +44,7 @@ claims:
 > - 运动编辑（同4种动作） 上，目标误差 (Objective Error) 0.00 vs 0.15-0.22 (GMD) (降至零误差)。
 > - 噪声运动精化（5cm噪声，HumanML3D） 上，MPJPE (cm) 7.0 (DNO-GMD) vs 25.7 (GMD) (-18.7)。
 
-## 概述
+## 概要
 
 **问题瓶颈：** 现有运动扩散模型在合成自然运动方面展现出强大能力，但难以直接充当通用运动先验。为每个新任务（如运动编辑、补全、去噪）训练专用模型成本高昂，而基于引导的方法在编辑或控制时往往无法同时保留原始运动内容并精确满足目标约束，存在固有的近似误差。
 
@@ -54,7 +56,7 @@ claims:
 
 **局限性：** 反向传播整个 ODE 求解器带来显著的内存开销和推理延迟（每次编辑需 300–1000 次优化迭代），难以满足实时交互需求。此外，目前仅在 HumanML3D 人形运动数据集上验证，对稀疏观测条件下的鲁棒性及向其他运动形态的泛化能力尚待检验。
 
-## 背景与动机
+
 
 ### 问题背景：运动生成与扩散模型
 
@@ -84,7 +86,9 @@ claims:
 
 这一思路将扩散模型真正转化为一个**即插即用的运动先验**：用户只需定义任务特定的可微损失函数 $\mathcal{L}(x_0)$（如目标关节位置、障碍物约束、内容保持等），DNO 即可自动优化 $x_T$ 以生成满足要求且保持运动自然性的结果。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DNO 的核心创新在于将运动生成重新定义为**在预训练扩散模型潜在空间中的直接优化问题**，而非传统的引导采样或针对特定任务重新训练模型。这一范式转换通过三个关键的“changed slots”实现，从根本上解决了现有方法在运动编辑与控制中难以同时保留原始内容并精确满足目标约束的瓶颈。
 
@@ -124,7 +128,7 @@ DNO 受 **DOODL** 启发，但做出了关键改进：DOODL 要求 ODE 可逆以
 
 **需要手动验证的点**：文中未明确给出 DNO 与 DOODL 在收敛速度或内存开销上的定量对比，仅提及“improved optimization algorithm that speeds up optimization”，该声明的具体幅度需查阅原始实验数据确认。
 
-## 整体框架
+
 
 DNO 的整体 pipeline 围绕一个核心思想展开：**将预训练运动扩散模型作为黑箱运动先验，通过优化其初始噪声向量来实现任意可微目标的运动生成与控制**。该框架无需针对每个新任务重新训练或微调模型，仅需定义任务特定的损失函数即可驱动优化过程。
 
@@ -165,7 +169,7 @@ DNO 的通用性体现在损失函数的模块化组合上。针对不同应用�
 - **输入**：参考运动（编辑任务）或带噪声/部分观测的运动（精化/补全任务），以及任务定义（目标关节位置、障碍物 SDF、可观测关节集合等）。
 - **输出**：经过优化的完整运动序列，以相对根表示（263 维特征，M 帧）呈现，可直接映射回全局关节位置用于可视化或下游应用。
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题形式化：将运动生成视为潜在空间优化
 
@@ -246,7 +250,9 @@ $$
 ![[assets/figures/papers/paper_list_l6_https_openaccess_thecvf_com_content_CVPR2024_html_Karunratanakul_Optimiz/figures/002_Figure.jpg]]
 *Figure: (a) At each optimization step, DNO maintains the output motion equality by making a step in the latent space xT , which is decodable to a realistic motion almost everywhere*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 运动编辑：精确目标控制与内容保留的突破
 
@@ -315,7 +321,9 @@ DNO 在运动编辑任务上展现出压倒性优势。与基于引导扩散的�
 ![[assets/figures/papers/paper_list_l6_https_openaccess_thecvf_com_content_CVPR2024_html_Karunratanakul_Optimiz/figures/004_Table_1.jpg]]
 *Table 1: Motion editing evaluation on specific actions generated from MDM given the text prompts. We focus on actions that can be distinctly classified per frame basis. The Content Preservation scores are computed against the inputs*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与引导扩散方法的对比与突破
 
@@ -354,6 +362,8 @@ DNO 的适用边界由以下因素共同界定：
 **理论收敛性**：梯度归一化策略虽在实验中表现出色，但其对优化收敛性的理论保证尚不明确。该策略在隐式 GAN 或 VAE 等其他生成模型中的适用性也有待验证。
 
 **低覆盖鲁棒性**：当可观测关节数量极少时，运动重建可能退化为不适定问题。是否需要引入额外的结构化先验或专门的损失函数来应对稀疏观测场景，是一个具有实际意义的开放问题。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,7 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/SceneAdapt_Scene_aware_Adaptation_of_Human_Motion_Diffusion.pdf
+code_link: null
 project_link: https://sceneadapt.github.io
 aliases:
 - SceneAdapt
@@ -33,7 +34,7 @@ claims:
 | 中文题名 | SceneAdapt：场景感知的人体运动扩散自适应 |
 | 英文题名 | SceneAdapt: Scene-aware Adaptation of Human Motion Diffusion |
 | 会议/期刊 | arXiv 2025 |
-| Links | [arXiv](https://arxiv.org/abs/1907.01108) · [paper](https://arxiv.org/abs/2510.13044) · [Project](https://sceneadapt.github.io) |
+| Links | [paper](https://arxiv.org/abs/1907.01108) · [paper](https://arxiv.org/abs/2510.13044) · [Project](https://sceneadapt.github.io) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction #topic/generative_models_diffusion #topic/generative_models_diffusion/diffusion_image_video |
 | Method | SceneAdapt |
 | Dataset | 自定义评估集（HML3D+TRUMANS合成）, HML3D测试集（插值） |
@@ -43,7 +44,7 @@ claims:
 > - 自定义评估集 上，FID↓ 0.497 (Ours ws=0.3) vs 0.479 (MDM) (+0.018)；CFR↓ 0.256 (Ours ws=0.3) vs 0.316 (MDM) (-0.060)；MMP↓ 0.208 (Ours ws=0.3) vs 0.319 (MDM) (-0.111)。
 > - HML3D测试集（插值） 上，FID↓ 0.036 (Ours) vs 7.258 (MDM imputation) (-7.222)。
 
-## 概述
+## 概要
 
 ### 问题背景与核心瓶颈
 
@@ -70,7 +71,7 @@ SceneAdapt 属于**基于扩散模型的场景感知运动生成方法**，但�
 
 在自定义评估集上，SceneAdapt 相比 MDM 基线显著降低碰撞指标（**CFR**: 0.256 vs. 0.316；**MMP**: 0.208 vs. 0.319），同时保持文本对齐能力（**RP@3**: 0.792 vs. 0.798）和运动质量（**FID**: 0.497 vs. 0.479），证实了框架在场景感知与语义保真度之间的有效平衡。消融实验进一步验证了插值适应阶段和稀疏调制设计的必要性：移除阶段一直接训练场景感知模型导致 FID 从 0.497 飙升至 7.08，RP 从 0.791 降至 0.598；将 CaKey 替换为全局调制则使插值 FID 从 0.036 升至 17.44。
 
-## 背景与动机
+
 
 ### 问题背景：文本驱动的人体运动生成
 
@@ -96,7 +97,9 @@ SceneAdapt 属于**基于扩散模型的场景感知运动生成方法**，但�
 
 SceneAdapt的核心动机正是利用这两类数据集的互补性——文本-动作数据集提供语义多样性，场景-动作数据集提供几何约束——通过一种无需三元组数据的自适应策略，将场景感知能力注入预训练的文本-动作扩散模型，从而在保持原始语义生成能力的前提下，实现场景一致的运动生成。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SceneAdapt的核心创新在于**通过运动插值代理任务，将场景几何约束注入预训练的文本-动作扩散模型，从而绕开对大规模文本-场景-动作三元组数据的依赖**。这一策略直接回应了真实瓶颈：文本-动作数据集（如HML3D）语义丰富但缺乏场景感知，而场景-动作数据集（如TRUMANS）满足场景约束但语义多样性有限，且收集三元组数据不可行。
 
@@ -141,7 +144,7 @@ $$\hat{x}_0 = \mathcal{D}_\theta(x_t, t, \mathcal{Q}_{text}, \mathcal{Q}_{scene}
 
 SceneAdapt的根本洞察在于：**将场景感知建模为插值任务中的附加条件，可以桥接分离的数据集（文本-动作和场景-动作），在不损害原始语义生成能力的前提下将场景几何信息注入扩散模型**。这一策略使得模型在场景感知文本生成中，相比MDM基线大幅降低碰撞指标（CFR: 0.256 vs 0.316, MMP: 0.208 vs 0.319），同时保持文本对齐（RP@3: 0.792 vs 0.798）（Table 1）。
 
-## 整体框架
+
 
 SceneAdapt 采用两阶段自适应策略，将场景几何约束注入预训练的文本-动作扩散模型（MDM），而无需昂贵的文本-场景-动作三元组数据。其核心思想是将场景感知建模为运动插值（motion inbetweening）任务中的附加条件，从而桥接语义丰富但无场景的文本-动作数据集与场景-动作数据集，在不损害原始文本-动作生成能力的前提下实现场景一致性运动生成。
 
@@ -198,7 +201,7 @@ Stage 2 的训练冻结 CaKey 层，仅优化 SceneCo 层和 Voxel ViT。此时�
 - **推理输入**：文本描述、3D 场景体素，可选的目标姿态（作为极端稀疏的关键帧）。
 - **输出**：与场景几何一致且语义对齐文本的完整人体运动序列。
 
-## 核心模块与公式推导
+
 
 SceneAdapt 的核心架构由四个关键模块构成，它们以两阶段自适应的方式协同工作，将场景几何约束注入预训练的文本-动作扩散模型。
 
@@ -269,7 +272,9 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{t2m}} + \lambda_{\mathrm{joints}} \mathcal{
 
 其中权重设置为 $\lambda_{\mathrm{joints}}=1$，$\lambda_{\mathrm{vel}}=100$。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：场景感知文本驱动运动生成
 
@@ -382,7 +387,9 @@ SceneAdapt 处于**预训练模型自适应**与**场景感知运动生成**的�
 ![[assets/figures/papers/paper_list_l1694_SceneAdapt_Scene_aware_Adaptation_of_Human_Motion_Diffusion/figures/001_Figure_1.jpg]]
 *Figure 1: Motivation. (a) Distribution of motion embeddings of HML3D [14] and sceneaware datasets [23, 49] visualized via PCA. Scene-aware datasets show narrower distributions than HML3D, indicating lower semantic coverage. (b) Models trained on HML3D capture diverse action semantics but lack scene-awareness, penetrating the obstacles. (c) Models trained on scene-aware datasets satisfy scene constraints, but fail to follow text prompts because the datasets contain limited semantic motion diversity*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心问题定位
 
@@ -433,6 +440,8 @@ SceneAdapt 瞄准的是场景感知人体运动生成中的一个结构性数据
 ### 方法定位总结
 
 SceneAdapt 在场景感知运动生成领域占据了一个独特的方法论位置：它**不是**从头训练的场景感知模型，也**不是**纯推理时的优化方法，而是**基于预训练模型的两阶段自适应框架**。这种方法论介于“数据驱动训练”和“测试时优化”之间，通过插值代理任务实现了跨数据域的知识迁移。其核心贡献在于证明了：在无法获取三元组数据的情况下，通过精心设计的自适应策略（稀疏关键帧调制 + 场景条件交叉注意力 + 先验保持损失），可以将几何约束注入预训练语义模型，同时保留原始生成能力。这一思路对更广泛的“预训练模型领域自适应”问题具有启示意义——当目标域数据稀缺但存在与源域共享底层结构的代理任务时，分阶段自适应可能是比直接微调更有效的策略。
+
+
 
 ## 原文 PDF
 

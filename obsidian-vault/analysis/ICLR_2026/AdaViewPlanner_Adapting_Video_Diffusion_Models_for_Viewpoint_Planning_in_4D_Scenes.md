@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/AdaViewPlanner_Adapting_Video_Diffusion_Models_for_Viewpoint_Planning_in_4D_Scenes.pdf
+project_link: https://yuli0103.github.io/AdaViewPlanner/
+code_link: null
 openreview_forum_id: c2EfS9E5CJ
 aliases:
 - AAVDMVP4S
@@ -31,7 +33,7 @@ claims:
 | 中文题名    | AdaViewPlanner：针对4D场景的视点规划中适配视频扩散模型                                                                          |
 | 英文题名    | AdaViewPlanner: Adapting Video Diffusion Models for Viewpoint Planning in 4D Scenes                          |
 | 会议/期刊   | ICLR 2026                                                                                                    |
-| Links   | [paper](https://openreview.net/forum?id=c2EfS9E5CJ); [Project](https://yuli0103.github.io/AdaViewPlanner/)   |
+| Links   | [paper](https://openreview.net/forum?id=c2EfS9E5CJ) · [Project](https://yuli0103.github.io/AdaViewPlanner/)   |
 | Topic   | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/planning_control |
 | Method  | AdaViewPlanner                                                                                               |
 | Dataset | E.T. Testset (SMPL-based), E.T. Testset, Ours Testset (curated, 240 samples)                   |
@@ -41,7 +43,7 @@ claims:
 > - E.T. Testset 上，TCC (Text-Camera Consistency) ↑ 为 1.125，对比 0.850 (E.T.)，变化 +0.275。
 > - E.T. Testset 上，User Preference (%) ↑ 为 61.90，对比 23.81 (E.T.) / 14.29 (DanceCam*)，变化 +38.09 / +47.61。
 
-## 概述
+## 概要
 
 自动电影摄影旨在为4D场景生成专业、符合指令的相机轨迹。现有方法依赖有限数据集训练的专业模型，难以泛化到开放世界场景，且缺乏对文本指令等偏好控制的支持；手动设计相机轨迹则既繁琐又需要专业知识。
 
@@ -51,7 +53,7 @@ AdaViewPlanner 的核心洞察是：预训练文本到视频（T2V）扩散模�
 
 实验表明，AdaViewPlanner 在多个基准上显著超越现有方法：在E.T.测试集上，人体缺失率（HMR）从0.064降至0.044，文本-相机一致性（TCC）从0.850提升至1.125；在真实运动数据AMASS上，HMR从0.033降至0.015，镜头多样性（Dist_t）从0.422提升至1.437。用户研究中，本方法的偏好率超过60%，远高于基线方法的23.81%（E.T.）和14.29%（DanceCam*）。
 
-## 背景与动机
+
 
 4D场景的自动电影摄影旨在为动态内容（如人物表演）自动生成符合专业审美且与指令一致的相机轨迹。然而，现有方法面临一个核心瓶颈：**依赖有限数据集训练的专业模型难以泛化到开放世界场景**。例如，E.T. 仅利用点轨迹驱动相机运动，DanceCamera3D 则从音频和舞姿生成相机参数，这些方法在训练数据覆盖范围之外的场景中表现受限，且缺乏对文本指令等细粒度偏好控制的能力。与此同时，手动设计相机轨迹既繁琐又需要深厚的电影摄影专业知识，难以规模化应用。
 
@@ -61,7 +63,9 @@ AdaViewPlanner 正是基于这一核心洞察而提出。该方法采用**两阶
 
 **证据强度**：Table 1 显示，AdaViewPlanner 在 E.T. 测试集和自建测试集上的用户偏好率分别达到 61.90% 和 63.33%，远超 E.T.（23.81%）和 DanceCam*（14.29%）；在 AMASS 真实数据上，HMR 从 E.T. 的 0.033 降至 0.015，TCC 从 0.900 提升至 1.220（Table 5）。这些结果一致表明，适配预训练视频扩散模型的策略在视点规划任务上具有显著优势。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 AdaViewPlanner的核心创新在于**利用预训练文本到视频（T2V）扩散模型中已编码的电影摄影先验**，通过两阶段适配框架实现开放世界场景下可控的视点规划。与现有方法相比，该方法在三个关键维度上做出了根本性改变。
 
@@ -85,7 +89,7 @@ DanceCamera3D采用端到端直接生成相机参数的方式，但受限于训�
 
 Stage I还引入了一个关键的训练策略——**引导学习方案（Guided Learning Scheme）**：以概率 $p$ 提供真值相机标记 $z_c$ 辅助训练（公式3），使模型在自主设计相机前先学会渲染符合给定运动的视频。这一课程式设计降低了训练复杂度，使得原本发散的任务（同时学习运动跟随和相机设计）能够稳定收敛。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l2_AdaViewPlanner_Adapting_Video_Diffusion_Models_for_Viewpoint_Planning_in/figures/002_Figure_2.jpg]]
 *Figure 2: (a) Stage I model for motion-conditioned cinematic video generation: a pose encoder processes human motion data (M) from 4D scenes and integrates it with video tokens via spatial motion attention to produce videos with cinematic camera movements. Camera parameters used for guidance are denoted as C. (b) Stage II model: three branches for video, camera, and human motion are combined in an MMDiT framework to extract camera pose*
@@ -110,7 +114,7 @@ AdaViewPlanner 采用**两阶段范式**，将预训练文本到视频（T2V）�
 
 现有自动电影摄影方法面临两个瓶颈：专业模型依赖有限数据集训练，难以泛化到开放世界场景；手动设计相机轨迹繁琐且需专业知识。AdaViewPlanner通过**继承预训练视频模型中的电影摄影先验**来突破这一瓶颈——模型无需从零学习相机运动规律，而是在已有知识基础上适配4D场景条件。消融实验证实：若完全移除视频模型（直接基于文本和运动生成轨迹），训练将无法收敛或崩溃至单一轨迹（Figure 7），说明预训练视频先验对于解决该任务的多模态发散性至关重要。
 
-## 核心模块与公式推导
+
 
 AdaViewPlanner 采用两阶段范式，将预训练视频扩散模型中蕴含的电影摄影先验适配到4D场景的视点规划任务中。核心思路是：**Stage I** 将4D人体运动注入视频扩散模型，生成隐含相机运动的电影级视频；**Stage II** 从生成视频中直接提取与运动坐标系对齐的绝对相机姿态。
 
@@ -148,7 +152,9 @@ $$q = [ q_v ; q_m ; q_c^{(t)} ], \quad k = [ k_v ; k_m ; k_c^{(t)} ], \quad v = 
 
 **关键消融证据**：去除Stage II的运动条件（w/o Motion）会导致重投影IoU从0.338降至0.226，相机视点出现错误（Table 3, Figure 6）；仅预测相对相机姿态（Relative Cam）则面临尺度感知问题，需要后处理对齐。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -216,7 +222,9 @@ TCC和CSD指标使用Gemini 2.5 Pro进行评估（Figure 10, Table 6, Table 7）
 
 **Table 10** 和 **Table 11** 展示了在开源Wan-2.2-5B模型上训练的版本同样取得显著效果，在自建测试集上HMR达到0.022、TCC达到1.265，验证了方法的模型无关性。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -266,6 +274,8 @@ AdaViewPlanner 对上述基线的替代关系体现在三个关键设计变化�
 3. **数据瓶颈**：真实视频的相机参数自动标注仍是瓶颈。未来能否结合弱监督或自监督方法提升真实数据的可用性，从而减少对合成数据的依赖？
 4. **模型升级**：随着更强大的开源视频生成模型（如 Wan-2.2-5B 已初步验证，Table 10/11）的出现，如何系统性地利用它们进一步提升轨迹质量与泛化性？
 5. **简化提取**：当前从生成视频中提取相机的方法是否还可以进一步简化，例如直接联合预测相机参数和视频，而非分两阶段处理？
+
+
 
 ## 原文 PDF
 

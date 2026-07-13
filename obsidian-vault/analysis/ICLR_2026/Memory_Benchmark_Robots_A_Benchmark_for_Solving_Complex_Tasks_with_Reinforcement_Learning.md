@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Memory_Benchmark_Robots_A_Benchmark_for_Solving_Complex_Tasks_with_Reinforcement_Learning.pdf
+project_link: https://tinyurl.com/membenchrobots
+code_link: null
 openreview_forum_id: 9cLPurIZMj
 aliases:
 - MMISASA
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 内存、基准与机器人：一种用强化学习解决复杂任务的基准测试 |
 | 英文题名 | Memory, Benchmark & Robots: A Benchmark for Solving Complex Tasks with Reinforcement Learning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=9cLPurIZMj); [Project](https://tinyurl.com/membenchrobots) |
+| Links | [paper](https://openreview.net/forum?id=9cLPurIZMj) · [Project](https://tinyurl.com/membenchrobots) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | MIKASA (Memory-Intensive Skills Assessment Suite for Agents) |
 | Dataset | MIKASA-Robo ShellGameTouch-v0 (sparse, RGB), MIKASA-Robo RememberColor3-v0 (sparse, MIKASA-Robo BunchOfColors7-v0 (sparse, Real-world RememberColor3-v0 (Task 3) |
@@ -42,7 +44,7 @@ claims:
 > - MIKASA-Robo RememberColor3-v0 (sparse, RGB) 上，Success Rate 为 RATE: 0.65±0.01，对比 BC: 0.00±0.00，变化 0.65。
 > - MIKASA-Robo BunchOfColors7-v0 (sparse, RGB) 上，Success Rate 为 RATE: 0.00±0.00，对比 BC: 0.00±0.00，变化 0.00。
 
-## 概述
+## 概要
 
 强化学习（RL）在解决复杂决策任务上取得了显著进展，但现有基准测试普遍忽视了对**记忆能力**的系统评估。尽管部分可观马尔可夫决策过程（POMDP）框架在理论上要求智能体具备记忆，实践中多数研究仍将记忆增强方法（如LSTM、Transformer）在完全可观的MDP环境中测试，导致无法公平比较不同记忆机制的有效性。尤其在机器人操作领域，任务常要求智能体在数秒甚至数十秒的遮挡、干扰后召回关键信息，而现有机器人基准几乎不包含此类记忆依赖场景。
 
@@ -61,7 +63,7 @@ claims:
 
 这些结果表明，MIKASA成功揭示了当前RL算法及VLA模型在记忆维度上的系统性缺陷，为记忆增强机制的研究提供了可量化、可比较的评估平台。
 
-## 背景与动机
+
 
 ### 强化学习中的记忆瓶颈
 
@@ -89,7 +91,9 @@ claims:
 
 图3概括了MIKASA的设计哲学：虽然智能体任务不需要人类记忆的全谱系能力，但也不能被简化为简单的时空依赖关系。MIKASA在两者之间提供了一个平衡的评估框架，旨在系统诊断智能体在不同记忆维度上的优势与不足。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MIKASA的核心创新并非提出新的记忆增强算法，而是构建了一套系统化的评估基础设施，填补了强化学习领域长期存在的“记忆能力无法统一衡量”的空白。其创新点可归纳为三个紧密耦合的层次。
 
@@ -126,7 +130,7 @@ MIKASA 通过标准化工具链降低了记忆增强研究的进入门槛和实�
 
 这些工程创新确保了基准结论的可靠性。例如，Figure 4 中 PPO-MLP 在状态完全可观模式下达到 100% 成功率，直接证明了任务本身是可解的，从而将后续在部分可观测模式下的失败归因于记忆需求，而非任务设计缺陷。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_9cLPurIZMj/figures/001_Figure_1.jpg]]
 *Figure 1: Systematic classification of problems with memory in RL reveals distinct memory utilization patterns and enables objective evaluation of memory mechanisms across different agents*
@@ -169,7 +173,7 @@ MIKASA的整体框架由三个核心模块构成，形成从理论分类到统�
 2. **难度梯度控制**：通过调节任务参数（如RememberColor中颜色数量从3增至9），可系统评估智能体在不同记忆负荷下的性能退化曲线。
 3. **真实世界验证通道**：框架包含真实世界实验协议（Figure 26），采用三阶段递增设计（Task 1验证执行可行性，Task 2控制动态干扰，Task 3单独测量记忆需求），隔离混淆因素。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化：POMDP与记忆密集型任务
 
@@ -230,7 +234,9 @@ MIKASA-Robo构建于ManiSkill3框架之上，提供32个机器人桌面操作任
 
 上述公式均来自论文Section 3的理论定义部分，未进行额外推导或扩展。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 任务可解性验证：MDP模式下的上限
 
@@ -291,7 +297,9 @@ VLA模型的评估结果（Table 4）进一步揭示了当前大模型在记忆�
 
 这些失败模式为未来记忆增强机制的设计提供了明确方向：需要超越固定容量隐状态和有限上下文窗口的架构，引入外部记忆模块、可微分记忆寻址或层次化记忆压缩等机制。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：记忆评估的碎片化与缺失
 
@@ -367,6 +375,8 @@ MIKASA的适用边界需要明确认知：
 
 **部署验证方向**：
 - 如何在真实世界环境中部署和评估更大规模的真实机器人记忆任务？Table 10的初步结果已显示sim-to-real差距显著，需要更系统的真实世界验证协议。
+
+
 
 ## 原文 PDF
 

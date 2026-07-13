@@ -5,6 +5,7 @@ paper_level: A
 venue: NeurIPS
 year: 2021
 pdf_ref: paperPDFs/NEURIPS_2021/ATISS_Autoregressive_Transformers_for_Indoor_Scene_Synthesis.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/toronto-ai/ATISS/
 aliases:
 - ATISS
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | ATISS：用于室内场景合成的自回归Transformer |
 | 英文题名 | ATISS: Autoregressive Transformers for Indoor Scene Synthesis |
 | 会议/期刊 | NeurIPS 2021 |
-| Links | [paper](https://arxiv.org/abs/2110.03675); [Project](https://research.nvidia.com/labs/toronto-ai/ATISS/) |
+| Links | [paper](https://arxiv.org/abs/2110.03675) · [Project](https://research.nvidia.com/labs/toronto-ai/ATISS/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | ATISS |
 | Dataset | 3D-FRONT Bedrooms (FID ↓), 3D-FRONT Living Rooms (FID ↓), 3D-FRONT Dining Rooms (FID ↓), 3D-FRONT Libraries (FID ↓) |
@@ -41,7 +42,7 @@ claims:
 > - 3D-FRONT Living Rooms (FID ↓) 上，Fréchet Inception Distance 为 33.14，对比 FastSynth: 61.67, SceneFormer: 69.54，变化 -28.53 vs FastSynth, -36.40 vs SceneFormer。
 > - 3D-FRONT Dining Rooms (FID ↓) 上，Fréchet Inception Distance 为 29.23，对比 FastSynth: 55.83, SceneFormer: 67.04，变化 -26.60 vs FastSynth, -37.81 vs SceneFormer。
 
-## 概述
+## 概要
 
 室内场景合成——即给定房间平面图，自动生成合理的家具布局——是计算机图形学与视觉领域的长期挑战。现有自回归方法（如**FastSynth**, Ritchie et al., 2019；**SceneFormer**, Wang et al., 2021）将场景强制建模为按固定顺序排列的物体序列（通常按类别频率排序），这一设计带来了两个根本性瓶颈：**（1）模型无法处理任意顺序的输入**，导致其难以支持场景完成、物体建议等交互式应用；**（2）在小样本房间类型上生成质量显著下降**，限制了方法的实用性和泛化能力。
 
@@ -49,7 +50,7 @@ claims:
 
 实验表明，ATISS在3D-FRONT数据集的卧室、客厅、餐厅、书房四种房间类型上，FID指标全面优于FastSynth和SceneFormer（客厅场景FID降低28.53，餐厅降低26.60），且场景分类准确度更接近理想值0.5（卧室从0.883/0.945降至0.562），意味着生成场景几乎难以与真实场景区分。感知用户研究中，73.1%的受试者认为ATISS生成的场景比FastSynth更真实，错误率不到后者的一半。同时，ATISS的参数量更少，推理速度显著更快。消融研究进一步证实，无序训练是性能提升的关键因素：将ATISS改为有序训练后，场景分类准确度从0.562恶化至0.760。
 
-## 背景与动机
+
 
 室内场景合成（indoor scene synthesis）是计算机图形学与视觉领域的长期课题，其目标是自动生成逼真且多样化的三维室内布局。这一任务在建筑可视化、游戏内容生成、具身智能训练环境构建等方面具有广泛的应用前景。近年来，基于数据驱动的方法，尤其是自回归模型，在该领域取得了显著进展，能够从大规模真实场景数据中学习家具的摆放规律。
 
@@ -63,7 +64,9 @@ claims:
 
 ATISS（Autoregressive Transformers for Indoor Scene Synthesis）的**核心动机**正是打破这一桎梏：将室内场景生成重新定义为**无序集合生成问题**。其核心洞察在于，Transformer架构本身具有排列等变性（permutation equivariance）——当去除位置编码后，Transformer对输入集合的处理天然与元素顺序无关。通过设计一个单一、端到端训练的自回归Transformer，ATISS既能进行全自动布局合成，又能无缝支持场景完成、物体建议乃至失败案例检测等交互式应用，且在参数量和推理速度上均显著优于已有方法。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ATISS 的核心创新在于将室内场景生成从**有序序列建模**重新定义为**无序集合生成**问题，并围绕这一视角转移，系统性地重构了模型架构、训练目标和推理范式，从而在生成质量、模型效率和交互灵活性三个维度上实现了对先前方法的显著超越。
 
@@ -113,7 +116,7 @@ $$\log \hat{p}_{\theta}(\mathcal{X}) = \sum_{i=1}^N \sum_{\hat{\mathcal{O}} \in 
 
 架构简化带来了显著的效率优势。ATISS 的参数量仅为 SceneFormer 的约 1/4，推理速度最高可达基线方法的 8 倍（Table 2, Table 3）。这意味着 ATISS 不仅生成质量更高、功能更丰富，而且更适合实时交互场景的部署需求。
 
-## 整体框架
+
 
 ATISS 将室内场景生成重新定义为**无序物体集合的自回归生成**问题。其核心设计动机在于：传统自回归方法（如 **FastSynth** (Ritchie et al., 2019) 和 **SceneFormer** (Wang et al., 2021)）将场景强制建模为固定顺序的物体序列，导致模型无法处理任意顺序的输入，限制了交互式应用（场景完成、物体建议）的灵活性。ATISS 通过**训练时最大化场景在所有可能物体排列下的对数似然**，使模型学习到排序不变性，从而以单一端到端网络同时支持全自动布局合成与多种交互式应用。
 
@@ -173,7 +176,7 @@ ATISS 实现排列不变性的关键在于：
 ![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2110_03675/figures/029_Figure_22.jpg]]
 *Figure 22: Difference of Per-Object Frequencies. We visualize the absolute difference between the per-object frequency of generated and real scenes using our method, FastSynth [61] and SceneFormer [74] for all room types. Lower is better*
 
-## 核心模块与公式推导
+
 
 ATISS将室内场景生成重新定义为**无序集合生成问题**，其核心架构由四个模块串联构成：布局编码器（Layout Encoder）、结构编码器（Structure Encoder）、Transformer编码器（Transformer Encoder）和属性提取器（Attribute Extractor）。整体数据流如Figure 2所示：给定一个包含$M$个物体的场景及房间平面图，布局编码器提取平面图的全局特征$\mathbf{F}$，结构编码器将已生成的$M$个物体映射为上下文嵌入集合$\mathbf{C} = \{\mathbf{C}_j\}_{j=2}^{M}$；随后，$\mathbf{F}$、$\mathbf{C}$与一个可学习的查询向量$\mathbf{q}$一同送入Transformer编码器，预测出查询向量$\hat{\mathbf{q}}$；属性提取器基于$\hat{\mathbf{q}}$自回归地预测下一个物体的属性分布，并从中采样生成新物体。
 
@@ -223,7 +226,9 @@ Transformer编码器接收三类输入的拼接：平面图特征$\mathbf{F}$、
 
 **局限提示**：当前属性生成顺序固定为类别→位置→朝向→尺寸，尚未实现属性级别的排列不变性，这意味着用户无法以任意顺序指定物体的部分属性再由模型补全其余属性——这是论文明确列出的开放问题之一。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -319,7 +324,9 @@ ATISS 在三个交互式任务上展现出基线方法无法实现的功能：
 ![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2110_03675/figures/036_Figure_26.jpg]]
 *Figure 26: Location Distributions for Wardrobe*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心问题与瓶颈突破
 
@@ -376,6 +383,8 @@ ATISS的核心突破在于**将场景生成重新定义为无序集合生成问�
 3. **组合式物体表示**：该方法能否与结构化变形模型（如PartNet等部件感知表示）结合，进一步对物体内部组件和部件间关系进行建模？这将使场景生成从“物体级”下沉到“部件级”。
 4. **数据偏差缓解**：如何减轻训练数据中的固有偏差（例如某些对象类别的固定空间共现模式），使模型能从更多样化甚至非结构化的数据中学习？这可能需要引入对抗训练或因果干预机制。
 5. **跨领域扩展**：该架构能否扩展至其他领域（如户外场景、道路布局、分子生成），其中元素的顺序同样不应预先规定？这需要验证排列不变自回归模型在非室内场景上的泛化能力。
+
+
 
 ## 原文 PDF
 

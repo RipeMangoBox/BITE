@@ -41,7 +41,7 @@ claims:
 > - 8-task addition (CLIP ViT-B-32) 上，Abs.Acc. 73.41 (Non-lin. FT+OrthoReg) vs 70.32 (Non-lin. FT) (+3.09)；Norm.Acc. 93.93 (Non-lin. FT+OrthoReg) vs 77.56 (Non-lin. FT) (+16.37)。
 > - 8-task addition (CLIP ViT-L-14) 上，Abs.Acc. 90.41 (ATT-FT+OrthoReg) vs 87.81 (ATT-FT) (+2.60)；Abs.Acc. 88.23 (Non-lin. FT+OrthoReg) vs 84.07 (Non-lin. FT) (+4.16)。
 
-## 概述
+## 概要
 
 **核心问题**：任务算术（Task Arithmetic）通过将多个微调后的任务向量 $\tau_t = \theta_t - \theta_0$ 合并到预训练模型 $\theta_0$ 上，实现多任务能力的组合。然而，不同任务向量之间存在**干扰（interference）**，导致合并后的模型在各任务上的性能显著低于单独微调的模型，这是制约任务算术实用性的关键瓶颈。
 
@@ -53,7 +53,7 @@ claims:
 
 **主要结果**：在 8 任务添加基准上，OrthoReg 在所有基线上均实现了**一致且显著的性能提升**。以 CLIP ViT-B-32 为例，Non-linear FT + OrthoReg 的绝对准确率（Abs.Acc.）达到 73.41%（+3.09），归一化准确率（Norm.Acc.）达到 93.93%（+16.37）。在 CLIP ViT-L-14 上，ATT-FT + OrthoReg 达到 90.41%（+2.60）。在任务否定（Task Negation）场景下，OrthoReg 同样在保持控制任务准确率阈值的前提下，显著增强了对目标任务的遗忘效果。消融实验表明，注意力相关模块（qkvo–）上的正交正则化贡献了最大增益（ViT-B-16 上 +4.17 Abs.Acc.），而仅在 MLP 层上施加 OrthoReg 在小模型上可能带来轻微的性能下降。
 
-## 背景与动机
+
 
 ### 任务算术与权重解耦
 
@@ -85,7 +85,9 @@ $$\theta_{\mathrm{MT}} = \theta_0 + \alpha \sum_{t=1}^{T} \tau_t$$
 
 本文的理论贡献之一（Theorem 2）证明：**强制微调期间权重更新矩阵的内部正交性，即使在特征重叠的情况下，也能积极促进任务间的权重解耦**。这构成了 OrthoReg 方法的理论基础——通过在微调损失中引入正交正则项，约束权重更新矩阵 $\Delta W$ 的列向量彼此正交，从而在几何层面抑制跨任务干扰。如 Figure 3 所示，OrthoReg 通过在 Transformer 模块的线性层上施加 $\mathcal{L}_{\mathrm{ortho}}$ 损失，使权重更新呈现正交结构，即使不同任务使用了重叠的特征，也能有效缓解合并时的性能衰减。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作围绕任务算术（Task Arithmetic）中一个被忽视的瓶颈展开：**来自不同任务向量的干扰是导致合并模型性能下降的核心原因**。现有方法（如 TTA）试图通过在线性化切线空间中进行微调来隐式缓解干扰，但代价是昂贵的雅可比计算和 2–3 倍的训练时间开销。本文的关键创新在于从理论上揭示了干扰产生的结构根源，并据此提出了一个轻量且通用的解决方案。
 
@@ -138,7 +140,7 @@ $$\mathcal{L}_{\mathrm{ortho}}(\Delta\theta) = \sum_l \|(\Delta W^{(l)})^\top \D
 
 OrthoReg 的独特定位在于：**它是一种即插即用的正则化策略，而非独立的微调范式**。它可以无缝嵌入上述任何微调方法中，通过修改训练损失这一最小侵入式接口（changed slot）来实现跨任务的权重解耦。
 
-## 整体框架
+
 
 ### 核心问题与解决路径
 
@@ -224,7 +226,7 @@ $$
 ![[assets/figures/papers/paper_list_l2144_https_arxiv_org_abs_2604_17078/figures/003_Figure_3.jpg]]
 *Figure 3: An overview of the OrthoReg method. It mitigates task interference caused by feature overlap by introducing*
 
-## 核心模块与公式推导
+
 
 ### 核心模块
 
@@ -288,7 +290,9 @@ $$\mathcal{L}_{\mathrm{ortho}}(\Delta\theta) = \sum_l \|(\Delta W^{(l)})^\top \D
 ![[assets/figures/papers/paper_list_l2144_https_arxiv_org_abs_2604_17078/figures/002_Figure.jpg]]
 *Figure: (a) The distribution of angles be- (b) Statistical summary of angular tween column vector pairs in a deviations from 9 $0 ^ { \circ }$ across all linear weight matrix. layers of the model*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要实验结果
 
@@ -351,7 +355,9 @@ OrthoReg 在任务添加（task addition）和任务否定（task negation）两
 ![[assets/figures/papers/paper_list_l2144_https_arxiv_org_abs_2604_17078/figures/013_Table_5.jpg]]
 *Table 5: The minimum average Target Accuracy (Tar.Acc.) achievable while maintaining at least 80% of the zero-shot accuracy on the ImageNet control task (Con.Acc.). Our proposed orthogonal regularization (+OrthoReg) shows a consistent and significant improvement in forgetting the target task. An asterisk (*) denotes the best (lowest) target accuracy for each model architecture*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务算术中的权重解耦：从隐式条件到显式正则化
 
@@ -400,6 +406,8 @@ OrthoReg 的增益存在明确的**架构依赖**：
 3. **自适应正则化强度**：当前 $\lambda$ 依赖验证集手动选择。如何在不使用验证集的情况下，为每个任务自适应地确定最优正则化强度，是实现更自动化模型合并的关键问题。
 
 4. **与模型合并后处理方法的协同**：OrthoReg 在微调阶段塑造任务向量的几何结构，而现有的一些方法（如 TIES-Merging、DARE）在合并阶段进行后处理。两者的协同效应尚未被系统研究。
+
+
 
 ## 原文 PDF
 

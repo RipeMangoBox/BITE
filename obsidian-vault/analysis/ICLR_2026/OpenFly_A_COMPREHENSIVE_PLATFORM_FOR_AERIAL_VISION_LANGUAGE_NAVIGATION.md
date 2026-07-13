@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/OpenFly_A_COMPREHENSIVE_PLATFORM_FOR_AERIAL_VISION_LANGUAGE_NAVIGATION.pdf
+project_link: null
+code_link: null
 openreview_forum_id: OKm3w71ymP
 aliases:
 - OA
@@ -42,7 +44,7 @@ claims:
 > - OpenFly test-unseen 上，Success Rate (SR) 为 22.6%，对比 14.7% (NaVila)，变化 +7.9%。
 > - OpenFly test-seen 上，Oracle Success Rate (OSR) 为 64.3%，对比 37.4% (NaVila)，变化 +26.9%。
 
-## 概述
+## 概要
 
 空中视觉语言导航（Aerial VLN）要求无人机根据自然语言指令在三维空间中飞行至指定目标。现有空中VLN数据集规模小、场景多样性有限，且依赖人工操控与标注，收集成本高、不易扩展，严重制约了大模型在该领域的发展。
 
@@ -50,7 +52,7 @@ claims:
 
 在此基础上，本文提出OpenFly-Agent——一种关键帧感知的视觉语言导航模型。该模型通过动作转换检测和地标锚定模块选取包含关键观测的历史帧，并利用视觉token合并策略缓解文本与图像token的数量失衡问题，从而在提升导航精度的同时降低计算开销。实验表明，OpenFly-Agent在已见和未见场景上的成功率分别达到34.3%和22.6%，比次优方法分别高出14.0个百分点和7.9个百分点；在真实世界校园场景中也取得了26.09%的成功率，验证了其从仿真到现实的迁移能力。
 
-## 背景与动机
+
 
 视觉语言导航（VLN）要求智能体根据自然语言指令在三维环境中自主移动，是具身智能领域的核心任务之一。近年来，地面VLN取得了显著进展，但空中VLN仍处于早期阶段。与地面导航不同，空中无人机在三维空间中飞行，面临更复杂的运动自由度、更稀疏的地标分布以及更严苛的实时推理要求，这使得现有地面方法难以直接迁移。
 
@@ -64,7 +66,9 @@ OpenFly平台正是针对这一瓶颈而设计。其核心动机在于：**通�
 
 > **注意**：本文中部分实验结果的绝对成功率（仿真场景34.3%，真实场景26.09%）仍处于较低水平，且所有方法在未见场景上性能均显著下降，说明空中VLN的模型泛化能力仍是亟待突破的瓶颈。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 OpenFly-Agent 的核心创新并非提出全新的架构范式，而是在现有视觉-语言-动作模型（基于 OpenVLA 基线，以 LLaMA2-7b 为主干）的基础上，针对空中视觉语言导航（VLN）的两个瓶颈性挑战，进行了两项关键性的“changed slots”改造：**关键帧感知的视觉输入处理**与**视觉 token 合并的模态平衡策略**。
 
@@ -90,7 +94,7 @@ OpenFly-Agent 的核心创新并非提出全新的架构范式，而是在现有
 
 上述两项改造均属于对现有 VLA 架构的“槽位替换”，而非端到端的全新设计。其有效性建立在两个前提之上：一是 OpenFly 平台提供的大规模、多样化训练数据（100K 轨迹），为关键帧选择策略提供了足够丰富的动作转换模式；二是离散的动作空间（6 个无人机动作）使得关键帧的“关键性”与动作决策之间存在可学习的映射关系。若迁移至连续动作空间或更复杂的交互式任务，这两项创新的适用性仍需进一步验证。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0011_OKm3w71ymP_OpenFly_A_COMPREHENSIVE_PLATFORM_FOR_AERIAL_VISI/figures/002_Figure_2.jpg]]
 *Figure 2: Framework of the automatic data generation. Multiple rendering engines are integrated to provide diverse, high-quality scenes. Built on these, several interfaces and tools are developed to enable automated generation of trajectories and instructions*
@@ -146,7 +150,7 @@ Figure 4 展示了 OpenFly-Agent 的三阶段推理流水线：
 
 整个流水线从多引擎渲染的原始视觉数据出发，经过全自动工具链转化为结构化训练数据，最终由关键帧感知的 VLN 模型完成从语言指令到飞行控制的端到端映射。
 
-## 核心模块与公式推导
+
 
 ### 3.1 自动数据生成工具链
 
@@ -177,7 +181,9 @@ OpenFly-Agent 基于 OpenVLA 基线构建，采用 LLaMA2-7b 作为骨干网络�
 
 > **注意**：上述计算流程基于文本描述推断，具体公式细节需查阅原文确认。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 
@@ -214,7 +220,9 @@ Table 3 的消融实验揭示了两个设计选择的因果作用：
 
 所有对比方法均在相同的 OpenFly 数据集上重新训练，动作空间统一为 6 个离散的无人机动作（前进、后退、左转、右转、上升、下降、停止）。真实世界实验的指令格式和评估标准与仿真实验完全一致，确保结果的可比性。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有方法的纵向关系
 
@@ -252,6 +260,8 @@ OpenFly-Agent 的能力边界由三个因素共同界定：
 ### 4. 知识库定位
 
 OpenFly 在 VLN 研究生态中的定位可概括为**基础设施型贡献**：它不提出全新的导航范式，而是通过统一多引擎接口和自动化数据生成流水线，将空中VLN从“小数据、手工标注”的作坊模式推入“大数据、自动生成”的工业化阶段。在此基础上，OpenFly-Agent 验证了一个关键假设——针对空中场景设计的关键帧感知与token压缩策略，能显著提升通用VLA模型在该领域的表现。这一发现为后续研究提供了明确的改进方向：在 OpenFly 的数据基座上，模型的泛化能力和动作空间粒度是下一阶段的核心攻坚目标。
+
+
 
 ## 原文 PDF
 

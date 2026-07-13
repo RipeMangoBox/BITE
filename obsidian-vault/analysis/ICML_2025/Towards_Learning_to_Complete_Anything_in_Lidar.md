@@ -5,6 +5,8 @@ paper_level: A
 venue: ICML
 year: 2025
 pdf_ref: paperPDFs/ICML_2025/Towards_Learning_to_Complete_Anything_in_Lidar.pdf
+project_link: https://research.nvidia.com/labs/dvl/projects/complete-anything-lidar
+code_link: null
 aliases:
 - CCAL
 - TLCAL
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 学习在激光雷达中补全任何物体 |
 | 英文题名 | Towards Learning to Complete Anything in Lidar |
 | 会议/期刊 | ICML 2025 |
-| Links | [paper](https://arxiv.org/abs/2504.12264); [Project](https://research.nvidia.com/labs/dvl/projects/complete-anything-lidar) |
+| Links | [paper](https://arxiv.org/abs/2504.12264) · [Project](https://research.nvidia.com/labs/dvl/projects/complete-anything-lidar) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | CAL (Complete Anything in Lidar) |
 | Dataset | SemanticKITTI (val), SSCBench‑KITTI360 (test) |
@@ -41,7 +43,7 @@ claims:
 > - SemanticKITTI (val) 上，mIoU (Zero‑Shot) 为 13.09，对比 PaSCo (M=1) 28.22，变化 -15.13 (约 46% of PaSCo)。
 > - SemanticKITTI (val) 上，PQ† (Zero‑Shot vs zero‑shot baselines) 为 13.12，对比 LODE+SAL 7.74 ; LiDiff+SAL 7.35，变化 +5.38 / +5.77。
 
-## 概述
+## 概要
 
 激光雷达场景补全旨在从稀疏的单帧点云中恢复完整的场景几何与语义，现有方法依赖封闭集人工标注，无法处理开放词汇下的物体补全与识别。本文提出 **CAL（Complete Anything in Lidar）**，通过从无标签 RGB-Lidar 时间序列中自动挖掘 3D 形状先验与语义特征，实现了零样本、类别无关的实例级场景补全。核心思路是：利用 2D 视觉基础模型（SAM、SAM 2）在多模态序列中定位、跟踪并聚合物体占用，蒸馏 CLIP 特征作为语义锚点，从而训练一个纯激光雷达网络，使其学会从单帧稀疏观测到完整形状与语义 token 的映射。在 SemanticKITTI 和 SSCBench-KITTI360 上，CAL 在零样本设置下分别达到 13.12 PQ† 和 8.57 PQ†，显著超越自建零样本基线（LODE+SAL 7.74 PQ†，LiDiff+SAL 7.35 PQ†），达到全监督方法 PaSCo 的约 44%–50% 性能，同时支持测试时通过自由文本词表进行零样本语义/全景场景补全与 amodal 3D 检测。
 
@@ -53,7 +55,7 @@ claims:
 - 零样本识别性能受限于底层 CLIP 的表示能力，长尾类别（行人、骑行者）与全监督方法差距显著；伪标签覆盖受限于相机视锥范围（约 28%），实例标签无法到达完全遮挡或相机未观测区域。
 - 模型性能与伪标签质量高度耦合，CRF 细化、时域聚合窗口（T_fw=32, T_bw=8）和原型数目（C ∈ {6, 18, 50, 100}）均存在收益递减的饱和点，需根据数据集特性权衡计算开销。
 
-## 背景与动机
+
 
 激光雷达场景补全（Scene Completion）旨在从稀疏的单帧点云中重建完整的 3D 场景几何与语义，是自动驾驶感知的核心任务之一。现有方法在语义场景补全（SSC）和全景场景补全（PSC）上取得了显著进展，例如 **LMSCNet**（Roldao et al., 2020）、**JS3CNet**（Yan et al., 2021）、**SCPNet**（Xia et al., 2023）以及当前最先进的 **PaSCo**（Cao et al., 2024）。然而，这些方法共享一个根本性瓶颈：**它们依赖封闭集的人工标注进行全监督训练**。
 
@@ -75,7 +77,9 @@ claims:
 
 这一框架使 CAL 在 SemanticKITTI 上以零样本设置达到 13.12 PQ† 和 13.09 mIoU，显著超越自建零样本基线 LODE+SAL（7.74）和 LiDiff+SAL（7.35），并达到全监督 PaSCo 约 50% 的性能水平（Table 1）。更重要的是，CAL 首次展示了从无标签数据中学习通用物体补全能力的可行性，为开放世界激光雷达感知开辟了新路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CAL 的核心突破在于**完全摆脱对封闭集人工标注的依赖**，通过三个关键维度重构了激光雷达场景补全的范式。
 
@@ -106,7 +110,7 @@ CAL 的核心突破在于**完全摆脱对封闭集人工标注的依赖**，通
 
 这些创新共同使 CAL 在零样本设定下达到全监督方法 **PaSCo** 约 44‑50% 的性能（SemanticKITTI: 13.12 PQ† vs 26.49; SSCBench‑KITTI360: 8.57 PQ† vs 19.53, Tab. 1），同时显著超越自建零样本基线 **LODE+SAL**（7.74 PQ†）和 **LiDiff+SAL**（7.35 PQ†）（Tab. 2）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2504_12264/figures/003_Figure_3.jpg]]
 *Figure 3: CAL model architecture and training pipeline. The backbone consists of a sparse encoder and a dense 3D convolutional block. We estimate scene-level occupancy using a multiscale sparse generative decoder that consists of decoder blocks D , two occupancy heads B _ { o } and B _ { s } , , and a pseudo-semantic head (S) at each scale L. The Transformer decoder then predicts segmentation masks over the completed scene and regresses CLIP features*
@@ -154,7 +158,7 @@ $$\mathcal{L}_{\mathrm{total}} = \lambda_{\mathrm{occ}} \mathcal{L}_{\mathrm{occ
 
 整体信息流可概括为：**伪标签引擎从多模态序列中挖掘形状‑语义先验 → 伪标签对驱动补全模型训练 → 模型学习从单帧稀疏观测到完整形状的映射 → 测试时仅需单帧激光雷达即可完成零样本补全与识别**。伪标签引擎和补全模型在训练阶段是串行的（先离线生成伪标签，再训练模型），在推理阶段补全模型独立运行，无需 RGB 图像或时序信息。
 
-## 核心模块与公式推导
+
 
 ### 任务形式化
 
@@ -222,7 +226,9 @@ $$PQ = SQ \times RQ$$
 
 即分割质量（SQ）与识别质量（RQ）的乘积。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -301,7 +307,9 @@ Table 12 和 Table 13 分别展示了在 SemanticKITTI 和 SSCBench‑KITTI360 �
 ![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2504_12264/figures/016_Table_10.jpg]]
 *Table 10: Pseudo-label evaluation restricted to the areas in the voxel grid for which we have pseudo-labels. Analysis of the accuracy of pseudo-labels on the SemanticKITTI (Behley et al., 2019) validation set. The full-grid eval setting refers to evaluating our pseudo-labels using the usual PSC evaluation with respect to the GT. The masked-voxel eval setting refers to excluding the voxels for which we don’t have any pseudo-labels during PSC evaluation*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 在激光雷达场景补全谱系中的位置
 
@@ -363,6 +371,8 @@ CAL 的识别能力完全依赖 CLIP 特征的质量。对于长尾或罕见类�
 5. **跨传感器与纯视觉扩展**：CAL 框架依赖校准的多模态传感器设置。能否将其扩展到纯相机输入的场景补全任务，或适配不同的激光雷达-相机配置？这需要解决深度估计和跨模态对齐的额外挑战。
 
 6. **从“补全”到“理解”的闭环**：当前 CAL 将补全和识别解耦为顺序步骤（先补全形状，再用 CLIP 特征分类）。是否存在端到端的联合优化方案，使补全过程能够感知语义信息，从而提升对语义模糊区域的补全质量？
+
+
 
 ## 原文 PDF
 

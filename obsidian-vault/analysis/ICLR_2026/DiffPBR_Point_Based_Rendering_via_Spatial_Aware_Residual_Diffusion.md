@@ -43,7 +43,7 @@ claims:
 > - DTU 上，PSNR / SSIM / LPIPS 28.45 / 0.935 / 0.124 (DiffPBR-Q) vs 25.44 / 0.901 / 0.164 (PFGS) (+3.01 / +0.034 / -0.040)。
 > - THuman2.0 上，PSNR / SSIM / LPIPS 41.27 / 0.989 / 0.003 (DiffPBR-Q) vs 35.88 / 0.985 / 0.006 (PFGS†) (+5.39 / +0.004 / -0.003)。
 
-## 概述
+## 概要
 
 点云是三维视觉中最基础的表示形式，但将离散点云渲染为照片级真实感图像仍面临根本性瓶颈：栅格化过程不可避免地产生空洞、锯齿和视图间不一致，而直接使用标准扩散模型从纯噪声恢复完整图像不仅效率低下，还会引入多视图不一致。DiffPBR 针对这一瓶颈提出了两个关键机制。
 
@@ -52,8 +52,6 @@ claims:
 **方法定位**：DiffPBR 属于可泛化的神经点云渲染方法，无需逐场景优化。其核心贡献在于用视角一致的、几何感知的噪声图替代传统扩散模型中的独立同分布高斯噪声，并将学习目标从完整图像重建转变为残差预测，从而将点云几何先验与扩散模型的生成能力深度融合。
 
 **主要结果**：在 ScanNet、DTU 和 THuman2.0 三个基准数据集上，DiffPBR 相比现有方法在 PSNR 指标上提升 3∼5 dB，同时将训练时间从 41 GPU 小时缩减至约 8 GPU 小时，推理速度提升约 2.8 倍。
-
-## 背景与动机
 
 ### 点云渲染的核心瓶颈
 
@@ -74,7 +72,7 @@ claims:
 
 这一动机直接催生了 DiffPBR 的两个关键设计：用视角一致的几何噪声图替换 i.i.d. 高斯噪声的 **CoNo-Splatting**，以及使模型仅学习渲染残差的**残差扩散范式**。两者协同，将点云从“待修复的残缺表示”转变为“扩散过程的几何锚点”，实现了训练效率（约8 GPU小时）与渲染质量（PSNR提升3∼5 dB）的双重突破。
 
-## 核心创新
+## 核心方法与创新机理
 
 DiffPBR 的核心创新围绕一个根本矛盾展开：**离散点云在栅格化过程中不可避免地产生空洞、锯齿和视图间不一致，而直接使用标准扩散模型恢复完整图像不仅效率低下，还会引入多视图不一致**。针对这一瓶颈，DiffPBR 通过三个相互耦合的 changed slots 将点云几何先验系统性地注入扩散生成过程，实现了高效、可泛化且视图一致的照片级渲染。
 
@@ -105,8 +103,6 @@ $$s_i = \mathrm{clamp\_max}\big( \bar{s}_i, \beta \cdot \mathrm{median}\big( \{\
 ### 创新耦合的内在逻辑
 
 三个 changed slots 并非孤立改进，而是形成了因果闭环：自适应栅格化为扩散模型提供高质量的初始彩色图像和掩膜；3D 一致噪声图将几何先验嵌入扩散过程，保证多视图一致性；残差学习范式则利用这一强先验大幅降低扩散模型的训练和推理成本。这种“几何引导生成、生成补偿几何”的设计范式，是 DiffPBR 在三个基准数据集上均以 3～5 dB PSNR 优势超越现有方法（Table 1）的根本原因。
-
-## 整体框架
 
 DiffPBR 提出了一种**两阶段、端到端可微**的点云渲染管线，将自适应栅格化与残差扩散模型有机结合。其核心设计思路是：不直接从离散点云重建完整图像，而是先生成一个携带 3D 几何线索的“粗糙”渲染，再通过扩散模型仅修复缺失的细节，从而在效率、质量和多视图一致性之间取得平衡。
 
@@ -156,11 +152,6 @@ $$\mathcal{L}_{\mathrm{rdm}} = \mathbb{E}_{I_0, I_\epsilon, t} \left[ \| res\eps
 两个阶段并非分步预训练，而是**端到端联合优化**。第一阶段通过覆盖损失 $\mathcal{L}_{\mathrm{cov}}$ 和紧凑性损失 $\mathcal{L}_{\mathrm{cmp}}$ 的对抗平衡来学习自适应点尺度；第二阶段的反传梯度同时流向扩散模型和泼溅模块，使点云的颜色与噪声属性能够针对最终渲染质量进行优化。消融实验（Table 6, Table 7）证实，这种联合训练策略对收敛稳定性和最终 PSNR 至关重要。
 
 ### 补充图表
-
-![[assets/figures/papers/paper_list_l44_https_openreview_net_forum_id_tqOBZbW6j8/figures/014_Figure_6.jpg]]
-*Figure 6: Illustration of 3D consistent*
-
-## 核心模块与公式推导
 
 DiffPBR 由两个紧密耦合的核心模块构成：**自适应 CoNo-Splatting**（Adaptive CoNo-Splatting）和**空间感知残差扩散模块**（Spatial-aware Residual Diffusion）。前者负责将离散点云转化为携带几何一致性线索的彩色图像、噪声图和软掩膜；后者以这些中间表示为条件，通过残差扩散范式仅预测渲染残差，从而高效恢复高频细节并保持多视图一致。
 
@@ -212,12 +203,7 @@ $$\mathcal{L}_{\mathrm{rdm}} = \mathbb{E}_{I_0, I_\epsilon, t} \left[ \| res\eps
 
 **推理过程。** 从 $\hat{I}_T = I_c + I_\epsilon$ 开始，通过多步去噪逐步恢复 $I_0$。消融实验（Table 7）表明，残差扩散 + 3D 一致噪声在收敛步数和 PSNR 上均优于纯 DDPM 或去除 3D 噪声的变体；$\epsilon$-预测的 multi-step 采样在所有训练规模下取得最高 PSNR（Table 9）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l44_https_openreview_net_forum_id_tqOBZbW6j8/figures/002_Figure_2.jpg]]
-*Figure 2: Illustration of how point scale influences the distribution of valid pixels and holes in the splatted image. (a) Ground-truth image with dense pixel coverage over the entire screen space. (b) With sparse points, the splatted image leaves empty regions, yet pixels within the valid mask remain well aligned with the ground truth. (c) Excessively large point scales cause splatting artifacts, thus penalizing*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 主要定量结果
 
@@ -271,22 +257,10 @@ Table 3 展示了 DiffPBR 在不同点云密度下的鲁棒性。随着点数从
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l44_https_openreview_net_forum_id_tqOBZbW6j8/figures/010_Table_5.jpg]]
-*Table 5: Effect of Adaptive Splatting on ScanNet. PSNR of rendered RGB images after CoNo-Splatting and diffusion refinement*
-
-![[assets/figures/papers/paper_list_l44_https_openreview_net_forum_id_tqOBZbW6j8/figures/011_Table_6.jpg]]
-*Table 6: Analysis of Adaptive Scale Regularizers*
-
-![[assets/figures/papers/paper_list_l44_https_openreview_net_forum_id_tqOBZbW6j8/figures/012_Table_7.jpg]]
-*Table 7: Effect of Modules in Residual Diffusion*
-
 ![[assets/figures/papers/paper_list_l44_https_openreview_net_forum_id_tqOBZbW6j8/figures/017_Table_9.jpg]]
 *Table 9: Ablation studies on different combinations of diffusion configurations. Each configuration is evaluated under different training set sizes on both THuman2.0 and ScanNet datasets*
 
-![[assets/figures/papers/paper_list_l44_https_openreview_net_forum_id_tqOBZbW6j8/figures/026_Figure_11.jpg]]
-*Figure 11: Effect of Adaptive CoNo-Splatting as a Plug-and-Play Module. Incorporating Adaptive CoNo-Splatting leads to better preservation of local geometric structures, yielding more faithful reconstructions*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 方法谱系：从传统栅格化到残差扩散增强
 

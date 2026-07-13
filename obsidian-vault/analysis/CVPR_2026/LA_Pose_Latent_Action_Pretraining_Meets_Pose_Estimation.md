@@ -43,7 +43,7 @@ claims:
 > - Waymo 上，AUC@5 (%) ↑ 91.4 vs 74.8 (VGGT) (+16.6)；ATE-S (×10⁻² RMSE) ↓ 1.20 vs 1.43 (VGGT) (-0.23)；ATE-M (m RMSE) ↓ 0.88 vs 4.74 (MapAnything) (-3.86)。
 > - PandaSet 上，AUC@5 (%) ↑ 86.3 vs 75.0 (VGGT) (+11.3)；ATE-S (×10⁻² RMSE) ↓ 1.13 vs 0.99 (VGGT) (+0.14)；ATE-M (m RMSE) ↓ 0.86 vs 7.28 (MapAnything) (-6.42)。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -72,7 +72,7 @@ LA-Pose 提出了一条不同于传统“更多标注数据”的路径：**将�
 
 当前方法在倒车等罕见运动模式下性能退化，中等曲率轨迹（平缓转弯）上的姿态估计精度较低（AUC@5 仅 78.32），因帧间视觉变化微弱导致潜在动作辨别力不足。此外，方法目前仅针对驾驶场景验证，向其他动态场景的泛化能力、完全无监督条件下的度量尺度恢复等问题仍有待探索。
 
-## 背景与动机
+
 
 ### 问题背景：前馈式相机姿态估计的标注瓶颈
 
@@ -91,7 +91,9 @@ LA-Pose 提出了一条不同于传统“更多标注数据”的路径：**将�
 
 LA-Pose正是基于这一动机，将**潜在动作（latent action）**——一种从逆动力学模型中自监督学习到的帧间运动编码——重新定位为姿态估计的核心特征。通过在无标注视频上进行大规模预训练，再在少量有标注数据上进行轻量后训练，LA-Pose实现了“标注高效”与“强泛化”的统一。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 LA-Pose 的核心创新在于将**大规模自监督潜在动作预训练**与**相机姿态估计**相统一，构建了一个“预训练即运动感知”的两阶段框架。其关键洞察是：逆动力学模型从无标注驾驶视频中自监督学习到的**潜在动作（latent action）**，本质上编码了帧间运动变化的紧凑表示，可直接重新用作相机姿态估计器的输入特征，从而大幅降低对昂贵3D标注数据的依赖。
 
@@ -143,7 +145,7 @@ LA-Pose 采用**两阶段训练框架**：第一阶段在大规模无标注驾�
 
 LA-Pose 的四项 changed slots 共同构成了一个完整的创新链条：通过**瓶颈压缩**获得紧凑的运动表示，通过**简化预测目标**降低预训练成本，通过**角色转换**将潜在动作重新用于姿态估计，最终通过**两阶段训练**实现“大规模预训练 + 少量标注微调”的高效范式。这一设计使得 LA-Pose 在使用远少于基线方法的标注数据的情况下，在 Waymo 和 PandaSet 基准上姿态精度提升超过 10%（AUC@5 分别达 91.4% 和 86.3%）。
 
-## 整体框架
+
 
 LA-Pose 采用两阶段训练框架，将大规模自监督潜在动作预训练与相机姿态估计统一起来。其核心设计思路是：**从海量无标注驾驶视频中学习紧凑的运动中心化表示（潜在动作），再将其重新用作轻量姿态估计器的输入特征**，从而在仅使用少量高质量 3D 标注数据的情况下实现准确且可泛化的前馈式姿态预测。
 
@@ -182,7 +184,7 @@ LA-Pose 采用两阶段训练框架，将大规模自监督潜在动作预训练
 ![[assets/figures/papers/paper_list_l2529_https_arxiv_org_abs_2604_27448/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of LA-Pose. We introduce a two-stage framework that unifies large-scale latent action pretraining with camera pose estimation. From millions of unlabeled driving videos, an inverse–forward dynamics model learns latent actions that encode interframe motion in a fully self-supervised manner. When visualized in T-SNE space, these latent actions exhibit structured clusters that align closely with true ego-motion distributions. We then re-purpose these representations through lightweight supervised post-training on limited 3D-annotated data, enabling feed-forward pose prediction that is both accurate and highly generalizable. LA-Pose achieves state-of-the-art pose estimation while requi...*
 
-## 核心模块与公式推导
+
 
 ### 整体两阶段框架
 
@@ -242,7 +244,9 @@ $$\tilde{\mathbf{t}}_i = \frac{\mathbf{t}_i}{\max(s, \epsilon)}$$
 ![[assets/figures/papers/paper_list_l2529_https_arxiv_org_abs_2604_27448/figures/007_Table_2.jpg]]
 *Table 2: Ablation on latent action dimension. Comparison between different latent dimensions under the post-training setting on Waymo. Larger latent spaces yield lower reconstruction loss during pre-training but enable information leakage, leading to degraded downstream pose estimation. Pre-training losses at 100k and 200k steps are measured as cross-entropy on the VQ-VAE code prediction*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 
@@ -307,7 +311,9 @@ Figure 3 的定性可视化进一步印证了定量结论：LA-Pose（绿色）�
 ![[assets/figures/papers/paper_list_l2529_https_arxiv_org_abs_2604_27448/figures/012_Figure_8.jpg]]
 *Figure 8: Qualitative results on OpenDV–YouTube. Each example shows scenes from diverse cities and viewpoints collected from online YouTube driving videos. LA-Pose produces stable and temporally consistent trajectories across a wide variety of conditions, including urban streets, highways, and curved mountain roads. The results qualitatively demonstrate strong generalization from our pre-trained backbone to uncalibrated, in-the-wild videos*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与前馈式相机姿态估计的关系
 
@@ -356,6 +362,8 @@ LA-Pose 的预训练阶段直接继承自 **Genie** 架构（Bruce et al., 2024�
 3. **表示压缩极限**：如何在进一步压缩潜在动作维度的同时不损失运动信息，以提升计算效率？
 4. **任务扩展**：将自监督预训练与少量有监督微调的策略应用于其他几何感知任务（如深度估计、光流）的可行性？
 5. **无监督尺度恢复**：在完全无3D标定的情况下，是否可通过自监督精调（如光度一致性约束）恢复度量尺度？
+
+
 
 ## 原文 PDF
 

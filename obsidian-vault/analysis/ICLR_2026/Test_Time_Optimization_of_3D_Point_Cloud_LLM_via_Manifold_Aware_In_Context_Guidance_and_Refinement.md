@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Test_Time_Optimization_of_3D_Point_Cloud_LLM_via_Manifold_Aware_In_Context_Guidance_and_Refinement.pdf
+project_link: null
+code_link: https://github.com/handsome999KK/PGLLM
 openreview_forum_id: qsra0EsUpe
 aliases:
 - PGLP
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 基于流形感知上下文引导与优化的三维点云大语言模型测试时优化 |
 | 英文题名 | Test-Time Optimization of 3D Point Cloud LLM via Manifold-Aware In-Context Guidance and Refinement |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=qsra0EsUpe); [GitHub](https://github.com/handsome999KK/PGLLM) |
+| Links | [paper](https://openreview.net/forum?id=qsra0EsUpe) · [GitHub](https://github.com/handsome999KK/PGLLM) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Point-Graph LLM (PGLLM) |
 | Dataset | ModelNet40 (OOD detection, MN1-MN3 average), ShapeNetCore (OOD detection, SN1-SN3 average), ModelNet40 (3D recognition), ModelNet40 (3D recognition with DeepSeek-V3) |
@@ -42,7 +44,7 @@ claims:
 > - ShapeNetCore (OOD detection, SN1-SN3 average) 上，AUROC 为 91.1，对比 87.7 (PointLLM)，变化 +3.4。
 > - ModelNet40 (3D recognition) 上，Average Accuracy 为 62.5，对比 60.9 (MiniGPT-3D)，变化 +1.6。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -72,7 +74,7 @@ PGLLM 在多个基准上取得了一致且显著的性能增益：
 
 PGLLM 的有效性依赖于初始 PointLLM 生成描述的基本质量；当上下文示例包含不准确信息时，第二阶段评分可能产生偏差。此外，当前框架假设点云类别集合是已知且固定的，如何扩展到完全开放集场景仍需探索。图构建与分数传播机制在大规模室外 LiDAR 点云上的计算效率，以及与参数高效微调（如 LoRA）的结合潜力，也是值得进一步研究的方向。
 
-## 背景与动机
+
 
 三维点云理解是自动驾驶、机器人导航与增强现实等应用的核心感知能力。随着多模态大语言模型（MLLM）的快速发展，将点云数据与语言模型结合以实现开放词汇的3D理解已成为新兴范式。然而，现有3D MLLM面临一个关键瓶颈：**几何结构相似的三维点云难以被有效区分，导致严重的类间混淆，单张独立点云的推理可靠性不足**。
 
@@ -82,7 +84,9 @@ PGLLM 的有效性依赖于初始 PointLLM 生成描述的基本质量；当上�
 
 基于上述动机，本文提出**Point-Graph LLM（PGLLM）**框架，核心思路是将LLM推理从孤立样本扩展到局部邻域，通过图上标签传播机制校准置信度。具体而言，PGLLM利用预训练点云编码器构建KNN图以捕获测试数据的流形结构，将图上邻居的文本描述作为上下文示例引导LLM推理（上下文引导），并引入基于标签传播的分数细化机制对LLM输出的置信度进行平滑修正。这一设计使得模型能够在测试时动态利用数据内在结构，从而提升分类与OOD检测的鲁棒性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PGLLM的核心创新在于将3D点云大语言模型的推理从**孤立样本**扩展到**测试时数据流形**，通过两个互补的机制——**上下文引导（In-Context Guidance）**与**分数传播细化（Score Refinement）**——在不重新训练模型的前提下显著提升下游任务性能。
 
@@ -125,7 +129,7 @@ PGLLM在支持集构建上提供了两种模式（Section 4.1），增强了方�
 
 值得注意的是，PGLLM并不依赖昂贵的闭源API。实验表明，当使用低成本开源LLM（DeepSeek-V3）作为第二阶段模型时，PGLLM仍以62.3%的平均分类准确率超越所有基于GPT-4的基线方法（Table 3），证明了该框架的通用性和实用性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_qsra0EsUpe/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the proposed framework for PGLLM. After encoding the 3D test samples, the framework feeds them into PointLLM for caption generation and uses them to construct a KNN graph. Initial answers are then synthesized via LLM inference. Subsequently, leveraging relational structures within the KNN graph, we introduce an answer iteration mechanism to optimize performance on downstream tasks*
@@ -161,7 +165,7 @@ $$\hat{y} = \begin{cases} \text{OOD} & \text{if } S(x_i) \le \delta, \\ \text{ID
 
 消融实验（Table 4）揭示了各模块的协同效应：单独使用in-context guidance可将ModelNet40 OOD检测的AUROC从80.4提升至83.0，单独使用score propagation可将FPR95从100.0降至62.0，而二者联合使用则达到最优的85.9 AUROC和52.1 FPR95，验证了上下文引导与分数传播的互补性。
 
-## 核心模块与公式推导
+
 
 PGLLM框架由三个核心模块串联构成：**3D特征编码与图构建**、**上下文引导推理（In-context Guidance）**、以及**分数传播细化（Score Refinement）**。各模块均运行于测试时，无需修改任何预训练模型参数。
 
@@ -189,7 +193,9 @@ $$\hat{y} = \begin{cases} \text{OOD} & \text{if } S(x_i) \le \delta, \\ \text{ID
 
 消融实验（Table 4）证实，上下文引导与分数传播具有互补协同效应：单独使用上下文引导可将ModelNet40 OOD检测AUROC从80.4提升至83.0，单独使用分数传播可将FPR95从100.0降至62.0；二者联合使用时，ModelNet40上ACC达63.1、AUROC达85.9、FPR95降至52.1，均显著优于任一单独模块。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能瓶颈与实验动机
 
@@ -278,7 +284,9 @@ Figure 5分析了KNN邻居数量K对OOD检测性能的影响。ModelNet40在**K=
 
 ![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_qsra0EsUpe/figures/017_Table_8.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位与核心瓶颈
 
@@ -312,6 +320,8 @@ PGLLM处于3D MLLM测试时优化与流形学习的交叉点。其方法谱系�
 3. **与参数高效微调的融合**：能否将当前的测试时优化框架与参数高效的微调方法（如LoRA）结合，在标注数据稀缺时获得进一步增益？
 4. **开放集泛化**：如何将固定类别集合的假设松弛为开放集场景，使框架能处理训练时未见过的物体类别？
 5. **多模态融合深度**：当前方法仅在文本空间进行上下文引导，是否可以将图结构信息直接注入LLM的视觉编码或注意力机制中，实现更深层的多模态流形感知？
+
+
 
 ## 原文 PDF
 

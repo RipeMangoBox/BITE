@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/BAGEL_Emerging_Properties_in_Unified_Multimodal_Pretraining.pdf
+project_link: https://bagel-ai.org/
+code_link: https://github.com/black-forest-labs/flux
 aliases:
 - BAGEL
 tags:
@@ -40,7 +42,7 @@ claims:
 > - GenEval 上，Overall 分数 0.88 vs 0.82 (FLUX-1-dev) (+0.06)。
 > - WISE 上，Overall 分数 0.70 (w/ CoT) vs 0.52 (w/o CoT) (+0.18)。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -83,7 +85,7 @@ BAGEL 属于**统一多模态预训练模型**，采用 decoder-only Transformer
 
 模型在涉及特定 IP、复杂文本渲染、反事实场景、对象交换和去模糊等任务上表现不佳，与 GPT-4o 相比仍有明显差距（Figure 17）。MoT 架构如何随着参数和数据规模进一步扩展、如何更有效地评估需要强多模态推理的任务，以及如何通过强化学习或对抗训练进一步优化，仍是待探索的开放问题。
 
-## 背景与动机
+
 
 多模态人工智能正朝着统一理解和生成的方向演进，但当前方法面临一个核心瓶颈：**理解任务与生成任务在优化目标上的根本冲突**。理解任务通常依赖语义级别的视觉编码器（如 ViT）提取高层特征，而生成任务需要保留低层像素细节的潜空间表示（如 VAE）。现有统一模型要么采用单一 Dense Transformer 同时处理两种任务，导致优化困难；要么引入 External Diffuser 将生成信息压缩为潜变量再注入，形成信息瓶颈，限制了长上下文跨模态交互与复杂推理能力。
 
@@ -91,7 +93,9 @@ BAGEL 的核心洞察在于：**将理解与生成的参数完全解耦，同时
 
 实验证据表明，MoT 架构在生成 MSE 损失和理解 CE 损失上均优于 Dense 和 MoE 变体，收敛更快且最终损失更低（Figure 3）。随着训练 token 从 0.18T 增长至 3.61T，模型在 IntelligentBench 上的智能编辑得分从约 15 提升至 45，呈现出明显的涌现曲线（Figure 7）。此外，Chain-of-Thought 推理将 IntelligentBench 得分从 44.9 进一步提升至 55.3，并显著提升其他多模态推理基准（Table 8, Table 6, Table 9, Table 10）。这些结果共同验证了 MoT 架构设计和大规模交错数据训练的有效性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 BAGEL 的核心创新在于通过 **Mixture-of-Transformers (MoT)** 架构实现了多模态理解与生成任务的参数级解耦，同时保持共享自注意力机制，从而从根本上缓解了统一多模态模型中的优化冲突与信息瓶颈问题。
 
@@ -132,7 +136,7 @@ BAGEL 的数据构成策略与架构设计形成了协同闭环。传统统一�
 
 上述创新构成了一个因果闭环：MoT 架构缓解了优化冲突，使得模型能够在大规模交错数据上进行有效训练；随着训练 token 量增加，模型从基本理解和生成能力逐渐**涌现**出自由形式视觉编辑、世界建模和多步推理等复杂能力。Figure 7 的涌现曲线显示，模型的智能编辑能力随训练 token 增加从 15 提升至 45，呈现明显的相变特征。这一涌现现象的根本驱动力在于：参数解耦消除了任务间的负向干扰，而共享注意力保证了跨模态信息的无损传递，使得模型容量能够被充分释放用于学习复杂的多模态推理模式。
 
-## 整体框架
+
 
 BAGEL 是一个统一多模态预训练模型，其核心设计目标是在一个解码器框架内同时实现高质量的多模态理解与生成，并缓解两类任务间的优化冲突。为此，模型在架构、编码、注意力与训练流程上进行了系统性设计。
 
@@ -225,7 +229,7 @@ BAGEL 采用多阶段训练策略，各阶段的数据构成与优化目标逐�
 - **输入**：任意交错的文本与图像序列，支持单图/多图/视频帧等视觉输入。
 - **输出**：对于理解任务，模型自回归生成文本 token；对于生成任务，模型输出视觉 token 经 Rectified Flow 去噪后解码为图像。两类输出可在同一序列中交替出现，实现“思考辅助生成”——即先生成推理文本，再基于推理结果生成图像，显著提升复杂编辑与多步推理任务的性能（Table 8, Table 6）。
 
-## 核心模块与公式推导
+
 
 ### 架构设计：Mixture-of-Transformers (MoT)
 
@@ -283,7 +287,9 @@ $$
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2505_14683/figures/011_Figure_6.jpg]]
 *Figure 6: Loss curves of different learning rates. Ablation experiments are carried out on a 1.5B LLM. The sampling ratio for generation and understanding data is set at 1:1*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心架构消融：MoT 为何有效
 
@@ -367,7 +373,9 @@ Figure 16 展示了模型规模对生成质量的影响：更大的模型展现�
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2505_14683/figures/005_Table_1.jpg]]
 *Table 1: Data statistics for BAGEL. Since data are randomly sampled during pre-training, the dataset size does not directly correspond to the total number of seen tokens. Multimodal interleaved data is highlight in gray*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位与核心瓶颈
 
@@ -433,6 +441,8 @@ BAGEL 的当前能力边界主要体现在以下方面（Figure 17 失败案例�
 4. **推理能力深化**：Chain-of-Thought 推理已带来显著提升（IntelligentBench 从 44.9 到 55.3，Table 8），但如何进一步激发模型的推理能力——例如通过强化学习优化推理路径——仍是开放问题。
 
 5. **安全与对齐**：当前训练流程未包含强化学习或对抗训练阶段，可能限制了模型在安全性、偏见控制和用户偏好对齐方面的表现。
+
+
 
 ## 原文 PDF
 

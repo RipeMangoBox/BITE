@@ -44,7 +44,7 @@ claims:
 > - Real 3D Datasets (GSO, Omni3D, DTC) 上，MANIQA↑ / MUSIQ↑ 0.459 / 65.724 (Photo3D (Trellis)) vs 0.427 / 64.155 (Trellis) (+0.032 / +1.569)。
 > - ImageNet 上，Gemini-2.5 胜率% / 人类评分 (1–5) 95.0% / 4.4 (Photo3D (Trellis)) vs 68.1% / 3.4 (Trellis) (+26.9% / +1.0)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -79,7 +79,7 @@ Photo3D 并非一个独立的 3D 生成器，而是一种**通用的真实感细
 
 消融实验进一步证实：$\mathcal{L}_{\mathrm{adapt}}$ 和 $\mathcal{L}_{\mathrm{match}}$ 的联合使用是产生高真实感细节和稳定结构的关键——单独移除任一损失均导致质量明显下降，而用 L2 损失替代则会造成严重的纹理失真甚至崩塌。此外，Photo3D 在三种不同 3D 生成范式上均能一致提升真实感，且不损害几何质量，验证了其通用性。
 
-## 背景与动机
+
 
 ### 3D 生成从几何走向真实感
 
@@ -102,7 +102,9 @@ Photo3D 的核心动机在于：**将真实感增强从测试时的事后修补�
 
 Photo3D 的解决方案是：利用 GPT-4o-Image 对 3D 渲染视图进行细节增强，构建 **Photo3D-MV** 数据集；并设计基于 CLIP 感知特征适应和 DINOv3 语义结构匹配的放松损失函数，在保持结构一致性的前提下，将真实感外观先验融入 3D 生成框架。该方法可适配耦合式、解耦式等多种 3D 生成范式，实现统一的真实感提升。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Photo3D 的核心创新在于识别并突破了当前 3D 原生生成器在真实感外观上的根本瓶颈——高质量真实世界 3D 资产数据的匮乏。围绕这一瓶颈，该方法构建了一套从数据合成到监督范式再到训练策略的系统性方案，使其能够在不损害原有 3D 几何结构的前提下，为多种 3D 生成范式注入照片级真实感纹理细节。
 
@@ -144,7 +146,7 @@ Photo3D 的 changed slots 可归纳为三个维度：
 
 这一“数据-监督-训练”三位一体的创新链条，使得 Photo3D 无需修改生成器架构即可将真实感细节注入多种 3D 生成流程，同时保持结构稳定性。
 
-## 整体框架
+
 
 Photo3D 的核心目标是为现有的 3D 原生生成器注入照片级真实感外观，同时保持其固有的 3D 几何结构不受损害。这一目标的实现依赖于一个“数据构造—监督设计—范式适配”的三阶段整体框架。
 
@@ -189,7 +191,7 @@ Photo3D 并非一个独立的生成模型，而是一个可泛化的真实感增
 ![[assets/figures/papers/paper_list_l2565_https_arxiv_org_abs_2512_08535/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of Photo3D. We first construct Photo3D-MV, a realistic, detail-enhanced multi-view dataset paired with 3D geometry, and propose associated schemes to learn realistic 3D appearance details. Paradigm-specific training strategies are designed for geometry–texture coupled and decoupled paradigms: (a) diffusion-based 3D-native generator (e.g., Trellis [69]); (b) single feed-forward 3D-native texturing model (e.g., TexGaussian [70]); and (c) diffusion-based multi-view texturing model (e.g., Step1X-3D [40])*
 
-## 核心模块与公式推导
+
 
 Photo3D 的核心由两个紧密耦合的模块构成：**结构对齐多视图合成流水线**（构建 Photo3D-MV 数据集）和**真实感细节增强方案**（设计放松的监督信号）。前者提供与 3D 几何对齐的高质量真实感多视图图像，后者则通过感知特征适应与语义结构匹配的联合优化，将这些真实感细节注入 3D 生成器的纹理空间，同时保持原有几何结构的稳定性。
 
@@ -269,7 +271,9 @@ $$
 
 **单步 3D 原生纹理（TexGaussian）与扩散式多视图纹理（Step1X-3D）**：对于纹理解耦范式，Photo3D 分别在其前馈纹理预测或多视图扩散去噪的输出端施加 $\mathcal{L}_{\mathrm{real}}$，使真实感先验融入各自的纹理生成流程，而不干扰几何生成阶段。具体训练目标见原文公式 (6)–(7)。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果：真实感指标的全面提升
 
@@ -366,7 +370,9 @@ Figure 10 对比了不同 2D 生成器增强的多视图效果。GPT‑4o‑Im
 ![[assets/figures/papers/paper_list_l2565_https_arxiv_org_abs_2512_08535/figures/011_Figure_9.jpg]]
 *Figure 9: (a) Incomplete view coverage causes blurred regions. (b) Inconsistent details across views lead to distorted 3D structures*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心问题定位：3D 原生生成器的真实感瓶颈
 
@@ -414,6 +420,8 @@ Photo3D 的解决方案是将监督信号从像素空间**放松**到语义空�
 3. **多视图不一致性的形式化建模**：解耦视角增强不可避免地引入轻微的多视图不一致（Figure 9 展示了不一致导致的 3D 结构问题）。如何将这种不一致性形式化地建模为一种数据增强手段，而非简单地视为需要消除的噪声，可能为提升模型鲁棒性提供新思路。
 
 4. **与更大规模 3D 基础模型的整合**：**3DTopia-XL**（Chen et al., arXiv 2024）和 **Hunyuan3D 2.0**（Zhao et al., arXiv 2025）代表了向大规模 3D 基础模型发展的趋势。Photo3D 的放松监督方案是否能无缝集成到这些更大规模的训练流程中，以及在大规模数据下是否仍能保持结构对齐的优势，尚待验证。
+
+
 
 ## 原文 PDF
 

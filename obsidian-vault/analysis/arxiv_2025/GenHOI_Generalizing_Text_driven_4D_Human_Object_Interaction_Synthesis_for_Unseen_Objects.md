@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/GenHOI_Generalizing_Text_driven_4D_Human_Object_Interaction_Synthesis_for_Unseen_Objects.pdf
+project_link: https://etach-qs.github.io/GenHOI\_project/
+code_link: null
 aliases:
 - GenHOI
 tags:
@@ -40,7 +42,7 @@ claims:
 > - OMOMO (unseen objects) 上，C_F1 0.66 (GenHOI Full) vs best of compared methods (improvement over all baselines)。
 > - OMOMO (ablation: conditioning strategy) 上，C_F1 0.77 (KNN + Cross-Attention) vs 0.20 (Uniform + Cross-Attention) (+0.57)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -80,7 +82,7 @@ GenHOI的差异化优势在于：通过第一阶段在3D HOI数据上学习可�
 
 用户感知研究进一步表明，GenHOI生成的交互运动在自然度和真实性上被持续偏好于现有方法。这些结果共同证实：**通过空间-时间解耦和接触感知条件化，GenHOI有效突破了4D HOI生成中的数据稀缺瓶颈，实现了对未见物体的泛化能力**。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -108,7 +110,9 @@ GenHOI的差异化优势在于：通过第一阶段在3D HOI数据上学习可�
 
 - **接触感知条件化**：引入专用的**接触感知编码器**和**交叉注意力融合机制**，从3D HOI关键帧点云中提取精细的接触几何特征，并将其动态注入扩散模型的生成过程。这一设计的核心洞察在于：**精细的接触区域信息是生成真实人-物交互的关键**，而简单的特征拼接或加法嵌入无法有效传递这一信息。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GenHOI的核心创新在于通过**空间-时间解耦的两阶段框架**，将4D人-物交互生成分解为两个可管理的子任务，从而降低对大规模4D HOI数据集的依赖，并实现对未见物体的泛化。
 
@@ -151,7 +155,7 @@ GenHOI的两阶段设计本质上是一种数据效率策略：第一阶段在�
 
 GenHOI的核心贡献在于识别出**精细接触几何信息是4D HOI生成的关键瓶颈**，并围绕这一洞察设计了完整的解耦框架：通过Object-AnchorNet利用3D数据学习空间交互、通过接触感知编码器提取接触特征、通过交叉注意力实现动态条件注入。这三个changed slots相互协同，使得模型能够为训练中未见过的物体生成真实、物理合理的人-物交互序列。
 
-## 整体框架
+
 
 GenHOI 将文本驱动的 4D 人-物交互（HOI）合成分解为空间建模与时序建模两个解耦阶段，以降低对大规模 4D HOI 数据集的依赖。整体流程如 Figure 2 所示：
 
@@ -197,7 +201,7 @@ ContactDM（扩散去噪）→ 4D HOI 序列 + 接触标签
 ![[assets/figures/papers/paper_list_l1681_GenHOI_Generalizing_Text_driven_4D_Human_Object_Interaction_Synthesis_fo/figures/001_Figure_1.jpg]]
 *Figure 1: GenHOI synthesizes interaction between human and unseen object conditioned on text*
 
-## 核心模块与公式推导
+
 
 GenHOI 将文本驱动的 4D HOI 生成解耦为两个阶段：**空间交互关键帧恢复**与**时序运动插值**。其核心模块包括 Object-AnchorNet、Contact-Aware Encoder 和 Contact-Aware HOI Attention，三者协同实现从稀疏关键帧到密集交互序列的生成。
 
@@ -243,7 +247,9 @@ $$\pmb{F}_{\mathrm{fused}} = \mathrm{Softmax}\left(\frac{Q K^T}{\sqrt{d}}\right)
 ![[assets/figures/papers/paper_list_l1681_GenHOI_Generalizing_Text_driven_4D_Human_Object_Interaction_Synthesis_fo/figures/014_Table_6.jpg]]
 *Table 6: Object-AnchorNet Architecture*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -294,7 +300,9 @@ GenHOI 在已见与未见物体场景下均取得最优性能，验证了空间-
 ![[assets/figures/papers/paper_list_l1681_GenHOI_Generalizing_Text_driven_4D_Human_Object_Interaction_Synthesis_fo/figures/006_Figure_3.jpg]]
 *Figure 3: Examples of synthetic motions for qualitative evaluation*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 **GenHOI** 的核心贡献在于将4D人-物交互（HOI）生成从“端到端黑箱”或“依赖预定义物体轨迹”的范式，重构为**空间-时间解耦的两阶段框架**，从而显著降低了对大规模4D HOI数据的依赖，并实现了对未见物体的泛化。其方法定位可从以下维度理解：
 
@@ -354,6 +362,8 @@ GenHOI的知识增量集中于两个相互协同的设计：
 - 两阶段解耦对长时间序列的时序连贯性是否存在根本性局限？
 
 这些问题构成了该方向的后续研究空间。
+
+
 
 ## 原文 PDF
 

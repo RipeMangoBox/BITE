@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/VidEoMT_Your_ViT_is_Secretly_Also_a_Video_Segmentation_Model.pdf
+project_link: null
+code_link: https://www.tue-mps.org/videomt/
 aliases:
 - VVEOMT
 - VidEoMT
@@ -41,7 +43,7 @@ claims:
 > - YouTube-VIS 2021 val 上，AP 63.1 vs 64.6 (CAVIS) (-1.5)。
 > - YouTube-VIS 2022 val 上，AP 42.6 vs 40.0 (CAVIS) (+2.6)。
 
-## 概述
+## 概要
 
 在线视频分割（涵盖视频实例分割VIS、视频全景分割VPS和视频语义分割VSS）的现有最先进方法，如 **CAVIS**（Lee et al., ICCV 2025）和 **DVIS++**（Zhang et al., PAMI 2025），普遍采用解耦式架构：一个负责逐帧分割的segmenter与一个专用于时序关联的tracker。这种设计依赖大量手工定制的专用组件——包括上下文感知特征（context-aware features）、重识别MLP层（re-identification layers）和独立的Transformer追踪模块——导致模型臃肿、推理效率低下，通常仅能达到约15 FPS。
 
@@ -51,7 +53,7 @@ claims:
 
 在六个主流基准上的全面验证（Tables 2–5）表明，VidEoMT在YouTube-VIS 2019/2021/2022、OVIS、VIPSeg和VSPW上均取得与最先进方法可比或更优的精度，同时速度提升5–10倍。该方法对大规模预训练具有较强依赖（使用DeiT-III等较小规模预训练时AP降至58.3），且在严重遮挡场景（如OVIS上AP为55.2 vs. CAVIS的57.3）仍存在改进空间。但其简洁的编码器-仅设计为视频分割领域提供了一条“少即是多”的新范式：预训练基础模型本身可以接管大部分曾被赋予专用模块的功能。
 
-## 背景与动机
+
 
 视频分割（video segmentation）旨在为视频的每一帧同时完成像素级目标分割与跨帧实例关联，是视频理解的核心任务之一。根据输出粒度的不同，该任务可细分为视频实例分割（VIS）、视频全景分割（VPS）和视频语义分割（VSS）。近年来，随着大规模视觉基础模型的兴起，视频分割方法在精度上取得了显著进展，但其架构设计仍面临一个根本性矛盾：**精度与效率的严重失衡**。
 
@@ -76,7 +78,9 @@ claims:
 
 为此，我们提出 **VidEoMT（Video Encoder-only Mask Transformer）**，其核心思想是：将时序建模的查询直接注入 ViT 编码器内部，通过轻量级的查询传播（Query Propagation）与查询融合（Query Fusion）机制，在编码器内部同时完成分割与时序关联，从而彻底消除对专用追踪模块的依赖。这一设计不仅大幅简化了架构，更使得推理速度提升 5–10 倍，同时保持了与最先进方法可比甚至更优的精度。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 VidEoMT 的核心创新在于用一个极简的“编码器-仅”架构统一了视频分割中原本解耦的分割与时序关联，从而消除了现有方法中臃肿的专用追踪模块。其关键设计变更可归纳为以下四个 **changed slots**。
 
@@ -109,7 +113,7 @@ $$\mathbf{Q}_{t}^{\mathcal{F}} = \mathtt{Linear}\big(\mathbf{Q}_{t-1}^{\mathcal{
 
 CAVIS 和 DVIS++ 等方法在第一阶段后冻结 DINOv2 ViT 编码器，仅训练新增的适配器和解码器。VidEoMT 则在整个训练过程中微调全部 ViT 参数（Appendix A.1）。这一策略使 ViT 能够将大规模预训练中习得的实例判别和跨视图一致性能力充分适配到视频分割任务上，是实现编码器-仅架构高性能的关键使能因素。但这也意味着 VidEoMT 对预训练规模高度依赖——当使用较小规模的预训练（如 DeiT-III）时，AP 大幅下降至 58.3（Table 8），表明该方法的能力边界受限于基础模型的预训练质量。
 
-## 整体框架
+
 
 VidEoMT 的整体设计遵循一个核心原则：**将分割与时序关联统一在单个 ViT 编码器内部完成**，从而彻底消除现有方法中解耦的 segmenter–tracker 架构。其 pipeline 可以概括为以下流程：
 
@@ -136,7 +140,7 @@ $$\mathcal{L}_{\mathrm{tot}} = \lambda_{\mathrm{bce}} \mathcal{L}_{\mathrm{bce}}
 ![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2602_17807/figures/002_Figure_2.jpg]]
 *Figure 2: Current State-of-the-Art Video Segmentation Methods vs. VidEoMT (Ours). We compare the architectures of current state-of-the-art video segmentation methods – using CAVIS [21] as a representative example – and our encoder-only VidEoMT method. VidEoMT streamlines the video segmentation framework, relying on the power of large-scale pre-training with vision foundation models rather than handcrafted task-specific components. TF means Transformer and CA means context-aware*
 
-## 核心模块与公式推导
+
 
 VidEoMT（Video Encoder-only Mask Transformer）将视频分割的时序建模与空间分割统一到一个ViT编码器中，其核心由四个模块构成：
 
@@ -188,7 +192,9 @@ $$\mathcal{L}_{\mathrm{tot}} = \lambda_{\mathrm{bce}}\mathcal{L}_{\mathrm{bce}} 
 ![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2602_17807/figures/003_Figure_3.jpg]]
 *Figure 3: VidEoMT architecture. For the initial video frame at*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 从CAVIS到VidEoMT的逐步解构
 
@@ -306,7 +312,9 @@ VidEoMT在六个主流视频分割基准上进行了全面评估，涵盖视频�
 ![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2602_17807/figures/012_Table_9.jpg]]
 *Table 9: Impact of model size. VidEoMT performs better as ViT [13] size increases. Evaluated on YouTube-VIS 2019 val*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法沿革与基线关系
 
@@ -343,6 +351,8 @@ VidEoMT 的性能高度依赖于大规模预训练。当使用预训练规模不
 - 该 encoder-only 架构是否可扩展以支持离线模式或全局时序一致性约束，从而在更复杂的视频理解任务上进一步提升精度？
 - 对于通用视频分割中的不同子任务（VIS、VPS、VSS），是否需要为每个任务单独调整查询融合策略，还是统一的设计就足够？
 - 仅依赖前一帧的查询传播如何有效处理物体消失后重新出现的长程关联问题？
+
+
 
 ## 原文 PDF
 

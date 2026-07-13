@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Spinning_Straw_into_Gold_Relabeling_LLM_Agent_Trajectories_in_Hindsight_for_Successful_Demonstrations.pdf
+project_link: null
+code_link: null
 openreview_forum_id: QNfmqMSR7r
 aliases:
 - HSLH
@@ -42,7 +44,7 @@ claims:
 > - ALFWorld (unseen) 上，Success Rate (%) 为 97.76 (SFT+HSL)，对比 78.36 (SFT)，变化 +19.40。
 > - PlanCraft 上，Success Rate (%) 为 75.42 (DPO+HSL)，对比 71.25 (DPO)，变化 +4.17。
 
-## 概述
+## 概要
 
 **核心问题**：在部分可观测的长时间交互任务中，LLM 智能体常未能完成指定目标，但其轨迹中往往已实现了其他有效目标。现有方法将这些轨迹简单视为失败样本，导致大量隐含的监督信号被浪费。
 
@@ -55,7 +57,7 @@ claims:
 - 样本效率显著：仅使用不到四分之一（800 条）真实示范，HSL 的成功率（92.5%）即超过使用 3200+ 真实示范的 DPO 基线（82.8%）（Figure 3）。
 - 消融实验证实，去除不相关动作掩码或仅重标记最终目标均导致性能大幅下降，验证了关键组件的必要性（Figure 4）。
 
-## 背景与动机
+
 
 ### 大语言模型智能体的交互瓶颈
 
@@ -82,7 +84,9 @@ claims:
 
 这一思路在概念上与强化学习中的后见之明经验回放（Hindsight Experience Replay）相似，但本文将其迁移到 LLM 智能体的语言动作空间中进行实现，利用辅助 LLM 的推理能力自动完成目标识别与动作相关性标注。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于提出了一种名为**后见之明监督学习（Hindsight Supervised Learning, HSL）** 的方法，其本质是通过后见之明重标记，将LLM智能体在交互中产生的“失败”或次优轨迹，转化为针对其**实际已完成目标**的成功示范，从而大幅扩充有效监督信号。与仅依赖人工标注真实示范的基线方法相比，HSL 在三个关键维度上引入了创新性的改变。
 
@@ -112,7 +116,7 @@ $$\mathcal{L}_{\theta}^{D'} = \mathbb{E}_{d'=(\tau,I',z)\sim P(\cdot)} \left[ \f
 
 上述三个 changed slots 构成了 HSL 的方法论闭环：**后见之明重标记**解决了“学什么”的问题，将失败轨迹转化为意外成功的示范；**不相关动作掩码**解决了“怎么学”的问题，确保仅从达成目标的关键行为中提取信号；**重加权采样**解决了“优先学什么”的问题，引导策略聚焦于高难度、高质量的学习样本。三者协同作用，使得 HSL 能够在仅使用不到四分之一真实示范的情况下，超越使用全量真实示范的基线方法。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_QNfmqMSR7r/figures/002_Figure_2.jpg]]
 *Figure 2: Left: Overview of the existing training pipeline with HSL. Right: Example of the relabeling process. The relabeler assigns new goals to the agent’s trajectory based on the agent’s achievements*
@@ -135,7 +139,7 @@ $$\mathcal{L}_{\theta}^{\mathrm{HSL}} = \lambda \mathcal{L}_{\theta}^{D'} + (1-\
 
 该框架与现有后训练方法（SFT、DPO）兼容，可直接嵌入其训练流程。值得注意的是，当前实现仍需真实示范来稳定训练，无法在完全无监督条件下工作。
 
-## 核心模块与公式推导
+
 
 ### 方法总览
 
@@ -197,7 +201,9 @@ $$\pi_H(a \mid \tau, o, I') = \Pr_{\pi_a}[a_{|\tau|+1}=a \mid \tau_{|\tau|}=\tau
 
 **Theorem 1** 建立了智能体策略 $\pi_\theta$ 与最优策略 $\pi^*$ 之间差异的上界，该上界由三部分构成：(1) 在真实示范上的 KL 散度；(2) 在重标记示范上的 KL 散度；(3) 一个依赖于覆盖比率 $\kappa_{EH}$ 和专家差异 $\delta_E$ 的项。这从理论上解释了为何通过重标记增加有效示范可以缩小智能体与最优策略的差距，且这种差距的缩小与重标记数据对状态-动作空间的覆盖程度正相关。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -254,7 +260,9 @@ Figure 6 按目标类型统计了重标记的准确率。多数目标类型的�
 
 此外，HSL 当前实现依赖真实示范来稳定训练，无法在完全无监督条件下工作；重标记过程引入额外计算开销；实验仅在 Llama-3 系列模型上进行，未验证更大基座模型上的可扩展性。这些局限指向了若干开放问题：如何在无预定义目标空间的开放世界中实现可靠重标记、如何联合优化重标记模型与策略以减少外部依赖、以及如何进一步提升重标记示范的目标多样性。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有方法的谱系关系
 
@@ -313,6 +321,8 @@ HSL 的增益高度依赖于**任务特性**：
 - **细粒度动作评估**：将动作相关性标注从二元扩展为更细粒度的最优性评分（如连续值或序数标签），可能进一步提升对次优动作的过滤精度。
 
 - **目标分布均衡化**：如何通过主动采样或目标生成技术，缓解重标记示范的目标分布偏移，提升对低频目标类型的覆盖？
+
+
 
 ## 原文 PDF
 

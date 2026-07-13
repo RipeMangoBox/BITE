@@ -44,7 +44,7 @@ claims:
 > - Visual Genome (OvD-SGG) 上，R@50 (Base+Novel Obj.) 26.64 vs 21.28 (OvSGTR) (+5.36)。
 > - Visual Genome (OvD+R-SGG) 上，R@20 (Novel Rel.) N/A (但优于ACC) vs ACC (值未知) (+4.24%)；R@20 / R@50 / R@100 (Joint Base+Novel) 17.35 / 23.15 / 26.97。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -72,7 +72,7 @@ MoE‑FD 属于**特征解耦 + 开放词汇分类**的方法谱系。其关键�
 
 MoE‑FD 依赖外部知识图谱 ConceptNet，其覆盖范围可能限制对极端新颖类别的泛化；当前框架采用固定数量的专家和查询，面对大规模开放世界场景可能不够灵活。未来可探索可学习的专家控制器（如大语言模型引导的动态选择）以及如何有效扩展专家数量以应对更多新颖类别。
 
-## 背景与动机
+
 
 场景图生成（SGG）旨在将图像解析为结构化图表示 $G = \{ V, E \}$，其中节点 $V$ 表示物体，边 $E$ 表示物体间的关系，从而为视觉理解提供紧凑的语义抽象。传统SGG方法受限于封闭词汇设定——训练和测试共享相同的物体与关系类别集合，无法应对现实场景中持续涌现的新类别。开放词汇场景图生成（OVSGG）应运而生，其目标是在训练集类别之外，检测新颖物体和/或关系，构成更具挑战性的泛化任务。
 
@@ -80,7 +80,9 @@ MoE‑FD 依赖外部知识图谱 ConceptNet，其覆盖范围可能限制对极
 
 针对上述问题，本文提出**基于混合专家（Mixture-of-Experts, MoE）的特征解耦框架MoE-FD**。核心动机是：通过多个专家网络隐式解耦物体和关系的细粒度视觉语义属性，并利用路由网络自适应地选择关键专家以突出判别性特征，从而增强模型对新颖类别的辨别能力。同时，引入迭代交叉注意力机制建模物体与关系之间的双向语义交互，强化三元组关联，提升开放词汇场景下的整体生成质量。Figure 1(b)展示了该框架与现有范式的本质差异——从简单的全局对齐转向关注细节属性的解耦式对齐。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MoE-FD 的核心创新在于将**混合专家 (Mixture‑of‑Experts, MoE) 自适应特征解耦**引入开放词汇场景图生成 (OVSGG)，从根本上改变了现有方法对 VLM 特征的使用方式。与直接依赖单一 VLM 特征进行视觉‑语义对齐的基线方法（如 **OvSGTR** (Chen et al., ECCV 2024)）不同，MoE-FD 通过三个关键 changed slots 实现了判别力的跃升。
 
@@ -120,7 +122,7 @@ MoE-FD 进一步将 **ConceptNet 结构化语义先验融入路由网络**，这
 
 三个 changed slots 形成协同效应：MoE 解耦增强特征判别力，迭代交叉注意力强化三元组语义关联，ConceptNet 先验提升开放词汇泛化能力。这一组合使 MoE-FD 在 OvD-SGG 设置下 R@50/R@100 较 OvSGTR 分别提升 5.36%/5.78% (Table 1)，系统性解决了现有方法判别性不足和语义交互缺失的瓶颈。
 
-## 整体框架
+
 
 MoE-FD 的整体流程遵循“多模态特征提取 → 混合专家特征解耦 → 迭代特征细化 → 开放词汇分类与弱监督预训练”的级联结构，如 Figure 2 所示。给定输入图像 $I$ 和候选对象/关系类别集，模型首先提取视觉与文本特征并构建初始场景图，随后通过两个核心模块——基于 MoE 的特征解耦和迭代特征细化——交替增强节点与边的判别性语义表征，最终在语义空间完成开放词汇下的三元组推理。
 
@@ -180,7 +182,7 @@ $$\mathcal{L} = -\mathbb{E}[y \log \sigma(s) + (1-y) \log (1-\sigma(s))]$$
 ![[assets/figures/papers/paper_list_l2547_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Mixture_of_Experts/figures/001_Figure.jpg]]
 *Figure: (a) Framework of existing OVSGG method. (b) Framework of the proposed method*
 
-## 核心模块与公式推导
+
 
 MoE-FD 的核心由三个紧密耦合的模块构成：**多模态特征提取**、**基于 MoE 的特征解耦**以及**迭代特征细化**。其中，特征解耦模块是提升开放词汇场景下判别能力的关键瓶颈突破点，而迭代细化模块则负责建模物体与关系之间的双向语义交互。
 
@@ -245,7 +247,9 @@ $$\mathcal{L} = -\mathbb{E}[y \log \sigma(s) + (1-y) \log (1-\sigma(s))]$$
 ![[assets/figures/papers/paper_list_l2547_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Mixture_of_Experts/figures/008_Figure_3.jpg]]
 *Figure 3: Visualized activation of relation/object experts*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 评估设置与基准
 
@@ -302,7 +306,9 @@ Table 4 展示了弱监督预训练策略的效果。MoE-FD 利用图像描述�
 
 ![[assets/figures/papers/paper_list_l2547_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Mixture_of_Experts/figures/007_Table.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有方法的继承与差异
 
@@ -339,6 +345,8 @@ MoE-FD 的有效性依赖于以下边界条件：
 3. **知识图谱替代方案**：能否通过自监督方式从大规模图文数据中学习语义先验，减少对 ConceptNet 的硬依赖？
 
 > **注意**：以上开放问题源自论文自身的讨论，部分推断（如层次化专家架构）需结合后续工作手动验证，论文未提供相关实验证据。
+
+
 
 ## 原文 PDF
 

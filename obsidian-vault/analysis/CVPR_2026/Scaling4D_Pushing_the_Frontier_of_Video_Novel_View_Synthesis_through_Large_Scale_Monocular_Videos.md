@@ -42,7 +42,7 @@ claims:
 > - Panda-70M 单视角测试集 上，FID 62.83 vs 最佳基线(约82.31) (显著提升)；FVD 411.17 vs 最佳基线(约632.95) (显著提升)；CLIP-T 27.79 vs 最佳基线(约25.42) (提升)。
 > - 多视角 iPhone 测试集 上，PSNR 14.85 vs 所有对比方法 (最佳)；SSIM 0.336 vs 所有对比方法 (最佳)；LPIPS 0.468 vs 所有对比方法 (最佳)。
 
-## 概述
+## 概要
 
 **问题与瓶颈**：视频新视角合成（Video Novel View Synthesis, VNVS）旨在从一段单目视频出发，生成任意新相机轨迹下的连贯视频。现有方法普遍将 VNVS 退化为基于点云渲染的修复（inpainting）任务——即先渲染一张粗糙的目标视角图像与掩码，再由生成模型填补缺失区域。这一范式存在根本性缺陷：修复模型无法正确处理因视角变化而暴露的遮挡区域，倾向于用背景像素错误填充本应出现的新内容（如 Figure 2 所示，人物背面被背景替代）。更关键的是，此类方法因缺乏大规模多视角视频数据，训练与推理之间存在严重的数据分布不一致，导致视觉伪影频发、泛化能力受限。
 
@@ -51,8 +51,6 @@ claims:
 **方法定位**：Scaling4D 在预训练视频生成基础模型（MMDiT 架构，配合 3D VAE 与 LLM 文本编码器）之上，插入两个可训练模块——**Correspondence Projector** 将 5 通道控制信号（源视频、对应关系、扭曲视频、掩码）编码为控制令牌，**VNVS Block** 通过联合空间注意力机制将控制令牌注入视频特征。训练数据由两部分构成：大规模单目真实视频（通过光流提取对应关系）与合成多视角数据（提供精确几何监督）。
 
 **主要结果**：在 Panda-70M 单视角测试集上，Scaling4D 的 FID 达到 62.83（最佳基线约 82.31），FVD 降至 411.17（最佳基线约 632.95），CLIP-T 提升至 27.79；在多视角 iPhone 测试集上，PSNR / SSIM / LPIPS 均取得最优。消融实验证实，大规模真实单目数据对视觉质量至关重要（仅用合成数据训练时 FVD 从 411.17 恶化至 472.62）。可扩展性分析显示，视觉质量指标（FID、FVD、CLIP-V）随数据量增加呈持续上升趋势，而姿态精度指标（RotError、TransError）在数据量达到 100k 后趋于饱和，提示进一步突破需解决光流与深度估计的固有精度瓶颈。
-
-## 背景与动机
 
 ### 问题背景
 
@@ -78,7 +76,7 @@ $$\mathbf{C}^{r} \Longleftrightarrow \Phi \circ \mathbf{T}^{r} \circ \Phi^{-1}$$
 
 基于以上分析，本文提出 Scaling4D，将 VNVS 重新定义为通用的对应关系引导生成任务，通过统一的对应关系空间桥接训练与推理，并利用大规模单目视频实现可扩展训练，从而显著提升合成结果的视觉质量和鲁棒性。
 
-## 核心创新
+## 核心方法与创新机理
 
 Scaling4D 的核心创新并非在网络结构上进行边际修补，而是对视频新视角合成（VNVS）的任务范式进行了根本性的重构。文章将这一升级凝练为四个关键的“变更槽位”（changed slots），它们共同构成了从“修复范式”到“对应关系引导生成范式”的跃迁。
 
@@ -115,8 +113,6 @@ $$
 ### 5. 训练-推理差距的桥接机制
 
 一个隐含但至关重要的创新在于训练与推理之间对应关系来源的桥接策略。训练阶段使用光流模型提取对应关系 $C^{r}_{\mathrm{flow}}$，而推理阶段则使用深度图和相机位姿计算对应关系 $C^{r}_{\mathrm{depth}}$。两者虽然在静态场景下高度一致（见 Figure 8），但光流对应关系天然包含更多噪声和不规则性。文章指出，正是这种“以粗糙训练对抗精细推理”的策略，迫使模型学习到抗噪声的映射能力，从而增强了推理阶段的鲁棒性——这是一个优雅的自监督正则化设计，而非简单的工程妥协。
-
-## 整体框架
 
 Scaling4D 的整体框架围绕“对应关系引导生成”这一核心范式构建，将视频新视角合成（VNVS）从传统的点云渲染+修复（inpainting）范式升级为统一的像素对应关系控制生成任务。整个 pipeline 由三个关键阶段串联而成：**对应关系提取 → 控制信号构建 → 条件视频生成**。
 
@@ -171,8 +167,6 @@ $$\mathbf{F}_{\mathrm{vid}} \leftarrow \mathbf{F}_{\mathrm{vid}} + \mathrm{Attn}
 ![[assets/figures/papers/paper_list_l2587_https_openaccess_thecvf_com_content_CVPR2026_html_Cai_Scaling4D_Pushing/figures/001_Figure_1.jpg]]
 *Figure 1: We introduce Scaling4D, a framework for Video Novel View Synthesis (VNVS). Given a monocular source video (first row) and novel poses (second row), Scaling4D generates the novel view video (third row). By reformulating VNVS as a correspondence-guided generation task, our approach bridges the training-inference gap present in previous methods and enables scalable training on large-scale monocular videos, substantially improving the visual quality and robustness of the synthesized results*
 
-## 核心模块与公式推导
-
 ### 3.1 范式升级的理论基础：对应关系等价变换
 
 Scaling4D 的核心洞察在于揭示二维像素对应关系与三维几何投影之间的数学等价性。给定源帧的 RGB-D 数据 $[\mathbf{I}_i^s, \mathbf{D}_i^s]$ 和相机内参 $\mathbf{K}$，首先通过逆透视投影将二维像素提升为三维点云：
@@ -224,9 +218,6 @@ $$
 ![[assets/figures/papers/paper_list_l2587_https_openaccess_thecvf_com_content_CVPR2026_html_Cai_Scaling4D_Pushing/figures/002_Figure_2.jpg]]
 *Figure 2: This example demonstrates the essential difference between inpainting and novel view synthesis. In the novel view, the area inside the red box should show the back of the person, but the inpainting result incorrectly fills it with background pixels*
 
-![[assets/figures/papers/paper_list_l2587_https_openaccess_thecvf_com_content_CVPR2026_html_Cai_Scaling4D_Pushing/figures/003_Figure_3.jpg]]
-*Figure 3: The process of extracting*
-
 ![[assets/figures/papers/paper_list_l2587_https_openaccess_thecvf_com_content_CVPR2026_html_Cai_Scaling4D_Pushing/figures/004_Figure_4.jpg]]
 *Figure 4: Overview of our synthetic data pipeline, including compositional scene layouts, procedural character generation, obstacle-aware camera trajectories, and storage of RGB images, depth maps, and camera matrices*
 
@@ -236,7 +227,7 @@ $$
 ![[assets/figures/papers/paper_list_l2587_https_openaccess_thecvf_com_content_CVPR2026_html_Cai_Scaling4D_Pushing/figures/009_Figure_8.jpg]]
 *Figure 8: Visual comparison between flow-based and depth-based correspondence on a static scene. The strong alignment effectively bridges the training-inference gap*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -296,7 +287,7 @@ Scaling4D 的核心设计之一是使用光流对应关系训练、深度对应�
 ![[assets/figures/papers/paper_list_l2587_https_openaccess_thecvf_com_content_CVPR2026_html_Cai_Scaling4D_Pushing/figures/006_Figure.jpg]]
 *Figure: Target Trajectory GEN3C ReCamMaster-Wan*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 任务范式的代际跃迁：从“修复”到“对应关系引导生成”
 

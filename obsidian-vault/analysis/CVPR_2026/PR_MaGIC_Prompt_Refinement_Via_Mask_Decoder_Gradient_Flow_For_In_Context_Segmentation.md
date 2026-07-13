@@ -43,7 +43,7 @@ claims:
 > - COCO-20i 上，mIoU (%) 46.83 (PerSAM-F+PR-MaGIC Top-1) vs 44.64 (PerSAM-F) (+2.19%p)。
 > - LVIS-92i 上，mIoU (%) 44.48 (PerSAM-F+PR-MaGIC Top-1) vs 42.37 (PerSAM-F) (+2.11%p)。
 
-## 概述
+## 概要
 
 图像分割的“上下文学习”范式——以支持图像为参考，自动生成提示并分割查询图像中的对应目标——近年来因视觉基础模型（如SAM）的成熟而快速发展。然而，现有框架（如**PerSAM-F**和**Matcher**）面临一个共同的瓶颈：自动生成的提示因支持图像与查询图像之间的外观差异（颜色、视角、形状变化）而产生误导性的相似度图，导致假阳性提示、语义模糊或语义不足，干扰SAM掩码解码器对目标对象的捕捉，从而降低分割质量。
 
@@ -52,8 +52,6 @@ claims:
 在六个涵盖语义分割、部件分割和伪装目标分割的数据集上，PR-MaGIC作为即插即用模块一致提升了基线方法：在FSS-1000上对PerSAM-F提升**+8.78%p mIoU**，在COCO-20i和LVIS-92i上分别提升+2.19%p和+2.11%p；在部件分割数据集PACO-Part、Pascal-Part和DIS5K上对Matcher分别提升+3.81%p、+3.52%p和+8.43%p。消融实验揭示了一个关键发现：固定迭代次数在不同数据集上提供不一致的改进（正负混合），而Top-1相似度选择机制可靠地跨数据集稳定了性能。同时，Oracle选择与Top-1选择之间存在显著差距，表明支持-查询相似度作为掩码质量代理仍有改进空间。梯度流在理论收敛假设不成立时可能出现不稳定或退化，较大的步长（η=10⁻²）在更多迭代时导致性能下降，这进一步验证了Top-1选择机制的必要性。
 
 在方法谱系上，PR-MaGIC区别于需要微调SAM的**PerSAM-F**和依赖DINOv2静态嵌入的**Matcher**，其核心创新在于将掩码解码器的反馈信号引入查询嵌入的迭代更新循环，形成“解码→梯度→更新嵌入→重采样提示”的闭环优化，同时保持完全无需训练的测试时特性。该框架目前仅支持基于点提示的细化，尚未扩展到框或掩码等其他提示形式。
-
-## 背景与动机
 
 ### 上下文分割中的提示质量困境
 
@@ -101,7 +99,7 @@ PR-MaGIC 的核心洞察在于：**SAM 的掩码解码器本身蕴含了关于�
 
 后续章节将详细展开梯度流的理论推导、PR-MaGIC 的完整流水线设计，以及在六个基准数据集上的实验验证。
 
-## 核心创新
+## 核心方法与创新机理
 
 ### 问题瓶颈：静态提示的语义错位
 
@@ -161,8 +159,6 @@ $$
 
 PR-MaGIC 作为一个无需训练的测试时模块，可无缝集成到任何基于视觉提示的分割框架中。它不修改基线架构、不引入额外训练数据、不改变编码器或解码器权重，仅通过梯度流在推理时动态优化提示。这一特性使其在 **PerSAM-F**（微调 SAM 的少样本基线）和 **Matcher**（使用 DINOv2 编码器的无需训练基线）上均能稳定提升性能，验证了方法的框架无关性。
 
-## 整体框架
-
 PR-MaGIC 是一个无需训练、纯测试时运行的提示细化框架，以即插即用的方式无缝集成到现有上下文分割基线（如 **PerSAM-F** 和 **Matcher**）中。其核心流水线由五个串行模块构成，形成“嵌入提取 → 初始提示采样 → 梯度流迭代细化 → 候选掩码解码 → Top-1 相似度选择”的闭环。
 
 ### 输入与初始嵌入提取
@@ -215,11 +211,6 @@ $$s_t = \text{sim}(\bar{z}'^{s}, \bar{z}_t'^{q}), \quad t^* = \arg\max_{t \in \{
 
 ![[assets/figures/papers/paper_list_l2063_https_arxiv_org_abs_2604_12113/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of PR-MaGIC. Encoder box denotes image encoder*
-
-![[assets/figures/papers/paper_list_l2063_https_arxiv_org_abs_2604_12113/figures/021_Figure_16.jpg]]
-*Figure 16: Illustration of prompt refinement of PR-MaGIC*
-
-## 核心模块与公式推导
 
 PR-MaGIC 的核心由三个互为因果的模块构成：**梯度流驱动的查询嵌入更新**、**基于更新相似度的提示重采样**，以及**Top-1相似度掩码选择**。三个模块在迭代循环中协同工作，将掩码解码器的分割能力转化为提示细化的驱动力。
 
@@ -303,15 +294,7 @@ $$\| \rho_t - \mu^{*} \|^2 < e^{-2 \lambda_{\min} t} \| \rho_0 - \mu^{*} \|^2$$
 
 **梯度裁剪** 在实际实现中用于稳定训练过程，防止单步更新过大导致分布偏移超出解码器有效范围。消融实验表明，较大的步长（$\eta=10^{-2}$）在早期迭代中产生更快增益，但更多迭代时导致性能退化（Fig. 6），证实了梯度流存在不稳定性，也验证了 Top-1 选择机制的必要性。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2063_https_arxiv_org_abs_2604_12113/figures/001_Figure_1.jpg]]
-*Figure 1: Illustration of PR-MaGIC. PR-MaGIC iteratively refines prompts for segmentation by updating the embedding vector distribution ρt with mask decoder gradient flow. This process minimizes the KL divergence between ρt and the target embedding vector distribution µ from the ground truth mask. At each iteration t, given an initial set of prompts and their corresponding segmentation masks, the embedding vector zt is updated along the gradient flow derived from the mask decoder, which in turn updates ρt*
-
-![[assets/figures/papers/paper_list_l2063_https_arxiv_org_abs_2604_12113/figures/004_Figure_4.jpg]]
-*Figure 4: Refinement process of PR-MaGIC. Curated illustrations of refinement process with PerSAM-F as the baseline. a) Target objects in the support images with blue masks (bear (top) and airplane (bottom)), b) Segmentation results from PerSAM-F with point prompts in green dots. c), d) Refined prompt and segmentation after one and five iterations, e) Ground truth (G.T.). mask filtering, and robust sampling [14, 32]. While these approaches yield reasonably refined masks, the results still remain suboptimal (see Fig. 2)*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 核心瓶颈与实验动机
 
@@ -364,18 +347,7 @@ Figure 5、Figure 10-12的定性对比直观展示了PR-MaGIC相对于基线的�
 
 实验揭示了若干需要关注的局限：（1）**邻近假设的脆弱性**——当初始嵌入远离解码器最优分布时，梯度流可能不稳定或退化，当前完全依赖Top-1选择作为补救措施；（2）**相似度判据的不完美性**——支持-查询相似度作为掩码质量代理存在显著差距，设计更准确的掩码选择判据是缩小Top-1与Oracle差距的关键；（3）**饱和基线的天花板效应**——当基线性能已接近最优时（如FSS-1000上的Matcher），PR-MaGIC的增益空间有限；（4）**测试时开销**——梯度计算和多次解码增加了推理成本，在大规模部署中的可接受性需进一步评估；（5）**提示形式的限制**——当前仅支持基于点提示的细化，未扩展到框或掩码等其他提示形式。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2063_https_arxiv_org_abs_2604_12113/figures/007_Table_2.jpg]]
-*Table 2: Mean ± std of the optimal iterations in PR-MaGIC under Oracle and Top-1 selection across various datasets and baselines*
-
-![[assets/figures/papers/paper_list_l2063_https_arxiv_org_abs_2604_12113/figures/011_Table_4.jpg]]
-*Table 4: Variance of mIoU for PerSAM-F + PR-MaGIC across datasets*
-
-![[assets/figures/papers/paper_list_l2063_https_arxiv_org_abs_2604_12113/figures/002_Figure_2.jpg]]
-*Figure 2: Example of prompts (green dots) and segmentation results (red masks). (a) Support Image (elephant), (b) and (c) Misaligned prompts and segmentation results from PerSAM-F and Matcher, (d) Result from Matcher refined by PR-MaGIC, (e) Ground Truth*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 任务定位：上下文分割中的提示歧义问题
 

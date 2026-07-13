@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Active_Learning_of_3D_Gaussian_Splatting_with_Consistent_Region_Partition_and_Robust_Pose_Estimation.pdf
+project_link: null
+code_link: https://github.com/csrqli/al-3dgs
 aliases:
 - OA3RRPSV
 - AL3GSCRPRPE
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 基于一致性区域划分与鲁棒位姿估计的三维高斯泼溅主动学习 |
 | 英文题名 | Active Learning of 3D Gaussian Splatting with Consistent Region Partition and Robust Pose Estimation |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=yye5kN9jH7); [GitHub](https://github.com/csrqli/al-3dgs) |
+| Links | [paper](https://openreview.net/forum?id=yye5kN9jH7) · [GitHub](https://github.com/csrqli/al-3dgs) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Our Active 3DGS Reconstruction with Region Partition and Semantic Variance |
 | Dataset | Blender (NeRF-Synthetic), Objaverse |
@@ -41,11 +43,11 @@ claims:
 > - Blender (NeRF-Synthetic) 上，PSNR 为 30.186，对比 29.586，变化 +0.6 dB。
 > - Objaverse 上，PSNR 为 38.321，对比 32.654，变化 +5.7 dB。
 
-## 概述
+## 概要
 
 现有辐射场主动重建方法通常需要在候选视图上评估渲染质量，这种自上而下的策略难以感知遮挡区域和语义可识别性，且普遍假设采集位姿准确，忽略真实场景中不可避免的位姿噪声，导致采集效率与重建质量受限。本文针对三维高斯泼溅（3DGS）提出一种自底向上的主动重建框架，核心思路是：分析高斯点的几何、纹理与可见性特征，将模型划分为一致性区域；再利用自监督点云编码器（Point‑MAE）通过随机Dropout生成逐点语义特征方差，以此量化区域重建噪声；最终直接从噪声区域生成下一最佳拍摄位姿，无需在候选空间采样。同时，通过相对位姿优化校正实际采集中的位姿偏差，使方法在手持有设备等真实采集条件下仍然鲁棒。实验表明，在完美位姿设定下，该方法在Blender合成数据集上10视角PSNR达25.542 dB，比当前最好的主动选择基线FisherRF提高1.9 dB；消融实验验证了可见性特征、距离项和语义方差模块的贡献；在真实手持采集场景中，位姿优化将平均PSNR从21.961 dB大幅提升至26.241 dB；在更大规模的Objaverse数据集上，方法相对FisherRF的PSNR优势扩大至5.7 dB，展现出良好泛化能力。整体而言，该方法通过"分而治之"的区域分析与语义不确定性驱动，实现了更高效的主动视图生成，并对位姿噪声具有较强的鲁棒性。
 
-## 背景与动机
+
 
 神经辐射场(NeRF)与三维高斯泼溅(3D Gaussian Splatting, 3DGS)的出现，使得从稀疏图像集合中重建高质量三维场景成为可能。然而，这些方法对输入视图的质量与覆盖范围高度敏感：若采集视角不足或关键区域遗漏，重建模型会产生显著的几何缺失与纹理退化。主动重建旨在通过迭代选择最具信息量的拍摄视角，以最小采集成本获取最优重建质量。
 
@@ -57,7 +59,9 @@ claims:
 
 这一策略的因果有效性由多维度实验支持：在Blender数据集10视角完美位姿设定下，方法达到25.542 dB PSNR，超出FisherRF基线1.9 dB(Table 1)；当移除去可见性特征、历史距离惩罚项或Point-MAE语义方差时，所有指标均发生明显恶化，验证了每个组件的独有贡献(Table 2)；在真实手持设备采集的AR场景中，位姿优化将平均PSNR从21.961 dB大幅提升至26.241 dB(Tables 8, 9)，解耦了"位姿噪声"这一部署瓶颈的影响；在Objaverse跨物体数据集上，方法平均PSNR达38.321 dB，比FisherRF高5.7 dB(Table 10)，验证了其泛化性。需要指出的是，方法当前继承3DGS对透明/反射表面的固有弱点，且Partition与语义方差计算步各需约4秒，在交互速率上仍有优化空间。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 现有辐射场主动重建方法普遍依赖在候选图像上评估渲染质量来决定拍摄视角，这一范式存在两个深层瓶颈：**①** 仅考虑可见表面的渲染不确定性，忽略被遮挡区域的潜在信息缺失；**②** 无法处理实际采集中的位姿噪声，导致真实环境下的重建质量急剧下降。本文的核心创新在于抛弃"候选评估"范式，提出一种**自底向上的主动拍摄策略**，直接从当前3DGS模型中解析出最具信息量的拍摄区域与相机位姿，并辅以鲁棒的位姿优化，在三个关键维度上实现了突破。
 
@@ -87,7 +91,7 @@ claims:
 
 综上，本文的核心创新在于构建了一套从"模型分区感知"到"不确定性量化"再到"位姿生成与优化"的完整闭环，使3DGS的主动重建首次具备了面向真实采集的实用性和高效性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0006_yye5kN9jH7_Active_Learning_of_3D_Gaussian_Splatting_with_Co/figures/002_Figure_2.jpg]]
 *Figure 2: The above figure shows the pipeline of our active reconstruction algorithm. The next best pose estimation contains consistent region partitioning, noisy region determination and view sampling stages. The 3DGS model training, next pose estimation and guided image acquisition are performed iteratively*
@@ -106,7 +110,7 @@ claims:
 
 流水线的整体设计将"一致性分区—语义噪声评估—自适应点位生成"嵌入到主动重建的迭代循环中。其因果机制可以概括为：通过可见性与几何‑纹理特征解耦出相互独立的表面块，再利用自监督深度特征的随机扰动量化每块的重建不确定性，最终驱动相机直接瞄准模型最需要补充信息的区域。该流水线同时具备对真实采集**位姿噪声的鲁棒性**，因为位姿优化回路能够在固定模型的情况下单独修正采集视点的外参，从而将下游任务的误差隔离在采集端。
 
-## 核心模块与公式推导
+
 
 该方法围绕"自底向上、分而治之"的主动采集策略，通过四个关键模块将当前 3DGS 模型转化为一组最能提升重建质量的相机位姿，并在实际采集时利用位姿优化抵抗噪声。整体采集函数定义为
 
@@ -160,7 +164,9 @@ $$\mathbf{T}^* = \arg\min_{\mathbf{T}} \mathcal{L}_{\mathrm{pose}}(\mathbf{T}\ma
 
 以上模块共同实现了从 3DGS 模型直接生成下一最佳位姿的主动重建流程。消融实验表明，移除可见性特征 $\mathbf{\Gamma}$、距离项或 Point‑MAE 语义方差均会导致 PSNR/SSIM/LPIPS 明显下降（Table 2），验证了各组件的重要性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果
 在合成场景（Blender/NeRF‑Synthetic）和真实手持采集两种设定下，我们系统比较了所提方法与 FisherRF、随机采样 (Random)、最远距离采样 (Furthest) 以及基于 NeRF 的主动重建方法（NeurAR、ActiveNeRF）。所有主动策略均从 3 张初始图像出发，训练步数与超参数保持一致（fairness notes）。
@@ -197,7 +203,9 @@ $$\mathbf{T}^* = \arg\min_{\mathbf{T}} \mathcal{L}_{\mathrm{pose}}(\mathbf{T}\ma
 ### 失败模式与局限性
 本方法继承 3DGS 的固有问题，对透明、强反射表面重建质量不稳定，且要求采集图像清晰、实际位姿需位于估计位姿的邻域，否则位姿优化可能失效。当前设计聚焦单物体场景，固定使用的 Point‑MAE 编码器可能限制在杂乱场景或开放环境中的适应性。每步运行时消耗（区域划分约 4.13 s，语义方差计算约 3.7 s）在实时交互场景下仍需压缩，但考虑到主动重建是离线‑在线迭代过程，当前成本可接受。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 本工作在主动三维重建领域明确了一条与以往基于渲染图像质量评估完全不同的路径。现有辐射场主动重建方法（如 FisherRF[1] 和 ActiveNeRF/NeurAR[2]）通过在一组候选视图上计算渲染不确定性（逐像素 Fisher 信息、射线熵等）来选择下一最佳视角，但这一范式忽视了两个关键因素：**遮挡区域的可见性差异**和**几何-语义层面的可重建性**，且默认采集位姿完全准确，难以直接迁移到真实手持拍摄场景。本文提出的方法从 3D 高斯泼溅（3DGS）的内部表征出发，**将模型划分为可视一致性区域**，并用自监督语义特征的方差**直接量化区域重建噪声**，由此生成下一组相机位姿而无需候选采样，从根本上改变了"评估‑选择"的流水线。这一差异体现在 Table 1 和 Table 10 中：在 Blender 合成数据集 10 视角设定下，本方法 PSNR 达 25.542 dB，比 FisherRF 高出 1.9 dB；在更具多样性的 Objaverse 数据集上优势进一步拉大至 5.7 dB（平均 PSNR）。消融实验（Table 2）进一步证实，移除可见性特征 Γ、历史距离项或 Point‑MAE 均导致所有指标恶化，说明"分而治之"的区域划分与语义方差度量共同构成了性能提升的核心。
 
@@ -208,6 +216,8 @@ $$\mathbf{T}^* = \arg\min_{\mathbf{T}} \mathcal{L}_{\mathrm{pose}}(\mathbf{T}\ma
 **局限**明确落在以下几点：(a) 区域划分和语义方差计算开销较大（分别约 4.13 s 和 3.7 s），难以实时运行；(b) 语义编码器固定为 Point‑MAE，面对开放世界的多类别物体时泛化性可能不足；(c) 未处理运动模糊等问题。
 
 **开放问题**包括：(1) 扩展到场景级重建，需结合语义分割与多物体一致性推理；(2) 用基于学习的位姿估计器（如 DUSt3R）替代当前的相对位姿优化，以应对更大范围的初始位姿漂移；(3) 引入类别感知或任务感知的视图选择策略，利用其他点云理解网络提升下游适应性和重建语义质量。这些方向将推动主动 3DGS 重建从单物体演示走向可部署的真实世界应用。
+
+
 
 ## 原文 PDF
 

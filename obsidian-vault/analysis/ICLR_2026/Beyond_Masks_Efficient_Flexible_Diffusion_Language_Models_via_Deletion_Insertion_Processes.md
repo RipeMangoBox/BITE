@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Beyond_Masks_Efficient_Flexible_Diffusion_Language_Models_via_Deletion_Insertion_Processes.pdf
+project_link: null
+code_link: null
 aliases:
 - DIDLMD
 - BMEFDLMDIP
@@ -40,11 +42,11 @@ claims:
 > - Lambada 上，零样本困惑度（越低越好） 为 48.00，对比 51.82，变化 -3.82。
 > - OpenWebText (固定长度) 上，训练时间加速比（越高越好） 为 1.99×，对比 1.0×，变化 +0.99×。
 
-## 概述
+## 概要
 
 本文提出了一种新型扩散语言模型——**Deletion-Insertion Diffusion language models (DID)**，旨在解决现有掩码扩散语言模型（MDLM）中因大量非信息性`<MASK>`和`<PAD>`标记导致的计算效率低下问题。DID的核心创新在于将扩散过程从传统的掩码-去掩码范式彻底替换为删除-插入范式：前向过程逐步删除序列中的标记直至为空，后向过程从空序列开始逐步插入标记以重建完整序列。这一范式转换使得DID能够原生支持变长序列，消除冗余计算，并具备内在的自校正机制。实验结果表明，在固定长度设置下，DID实现了高达**1.99倍**的训练加速和**1.58倍**的推理加速；在变长设置下，加速比分别提升至**3.42倍**和**3.79倍**，同时生成质量显著优于现有基线模型。
 
-## 背景与动机
+
 
 ### 2.1 掩码扩散语言模型的计算瓶颈
 
@@ -60,7 +62,9 @@ claims:
 
 DID的核心洞察在于：**通过将前向过程定义为独立标记删除，后向过程定义为基于学习到的插入分数的标记插入，DID模型能够原生支持变长序列，消除冗余计算，并实现内在的自校正机制。** 这一设计从根本上避免了`<MASK>`和`<PAD>`标记的产生，从而消除了MDLM中最主要的计算浪费来源。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DID的核心创新可概括为以下三点：
 
@@ -68,7 +72,7 @@ DID的核心创新可概括为以下三点：
 2. **原生变长支持**：模型在变长序列空间上定义，无需填充操作，在变长设置下实现显著的效率提升。
 3. **内在自校正机制**：由于插入操作动态调整标记位置，模型在生成过程中能够自动修正早期的不完美生成。
 
-## 整体框架
+
 
 
 ![[assets/figures/papers/iclr26_generative_models_diffusion__generative_models_and_autoencoders__b001_VbvXjs5f72_Beyond_M/figures/001_Figure_1.jpg]]
@@ -81,7 +85,7 @@ DID的整体框架建立在连续时间离散扩散理论之上，由以下核�
 - **插入分数网络 (s̄_θ)**：一个Transformer网络，输入当前序列x_t和时间t，输出形状为|x_t| × |V|的插入分数。
 - **并行动态规划算法**：高效计算训练目标中的子序列计数比率，将复杂度从O(m n² V)降低到O(m n)。
 
-## 核心模块与公式推导
+
 
 ### 5.1 前向删除过程
 
@@ -125,7 +129,9 @@ $$N(\mathrm{Ins}(\mathbf{x}_t, i, v), \mathbf{x}_0) = \sum_{j=1}^m \left[ \delta
 
 该算法将复杂度从O(m n² V)降低到O(m n)，使DID的训练变得实用。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 
 ### 6.1 零样本语言建模性能
@@ -187,7 +193,9 @@ Table 20和Table 21展示了1.1B参数模型的下游任务评估结果。DID在
 ![[assets/figures/papers/iclr26_generative_models_diffusion__generative_models_and_autoencoders__b001_VbvXjs5f72_Beyond_M/figures/011_Table_5.jpg]]
 *Table 5: Table 5: Average training time (in seconds) per 50 steps on Stories.*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 DID在扩散语言模型的发展谱系中占据独特位置：
 
@@ -205,6 +213,8 @@ DID在扩散语言模型的发展谱系中占据独特位置：
 2. DID能否与混合自回归模型（如Block Diffusion）结合，以兼顾自回归和扩散模型的优势？
 3. DID的并行动态规划算法能否进一步优化，以支持更长的序列（如超过4k tokens）？
 4. DID在更大规模模型（如超过1.1B参数）和更多样化任务上的表现如何？
+
+
 
 ## 原文 PDF
 

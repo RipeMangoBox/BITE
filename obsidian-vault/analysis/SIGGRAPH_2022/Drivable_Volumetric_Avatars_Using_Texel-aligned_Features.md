@@ -34,7 +34,7 @@ claims:
 | 中文题名 | 基于纹素对齐特征的可驱动体积化身 |
 | 英文题名 | Drivable Volumetric Avatars Using Texel-aligned Features |
 | 会议/期刊 | SIGGRAPH 2022 |
-| Links | [paper](https://arxiv.org/abs/2207.09774) · [arXiv](http://arxiv.org/abs/2004.02460v1) |
+| Links | [paper](https://arxiv.org/abs/2207.09774) · [paper](http://arxiv.org/abs/2004.02460v1) |
 | Topic | #topic/vision_multimodal_applications/3d_rendering_reconstruction #topic/representation_self_supervised_transfer #topic/benchmarks_datasets_evaluation |
 | Method | Drivable Volumetric Avatars (DVA) |
 | Dataset | ZJU-MoCap S386, ZJU-MoCap S387 |

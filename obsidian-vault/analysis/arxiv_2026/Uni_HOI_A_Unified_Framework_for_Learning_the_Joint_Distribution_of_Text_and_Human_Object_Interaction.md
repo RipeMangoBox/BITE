@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2026
 pdf_ref: paperPDFs/arxiv_2026/Uni_HOI_A_Unified_Framework_for_Learning_the_Joint_Distribution_of_Text_and_Human_Object_Interaction.pdf
+project_link: null
+code_link: null
 aliases:
 - UH
 - Uni-HOI
@@ -41,7 +43,7 @@ claims:
 > - BEHAVE (text-to-HOI) 上，FID 0.37 vs 0.42 (ROG) (-0.05)。
 > - FullBodyManipulation (object-to-human w/ text) 上，HandJPE 27.56 vs not explicitly reported (—)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -65,7 +67,7 @@ claims:
 
 定性可视化进一步表明，Uni-HOI生成的交互在物理合理性上优于基线，减少了不合理的穿透或脱离现象。此外，Uni-HOI还展示了从参考视频中的人体运动预测合理物体运动的4D HOI合成能力，验证了框架的实用拓展性。
 
-## 背景与动机
+
 
 ### 问题域：人物交互（HOI）中的多模态建模
 
@@ -83,7 +85,9 @@ claims:
 
 基于上述洞察，本文提出**Uni-HOI**——首个在HOI领域实现文本、人体运动与物体运动联合分布对齐的统一框架。其设计目标为：**以单一模型接受任意模态子集作为条件，生成剩余模态**，从而在同一框架下支撑文本驱动交互生成、物体引导人体运动生成、人体驱动物体运动预测等多类HOI任务。为实现这一目标，Uni-HOI引入两个运动专用VQ-VAE将连续运动离散化，并与文本token合并为统一词表，利用预训练LLM进行自回归建模，配合两阶段训练策略（大规模多任务预训练 + 任务特定微调）实现跨任务的性能提升。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Uni-HOI 的核心创新在于**首次将文本、人体运动与物体运动三模态的联合分布建模统一于单一框架之中**，从而突破了现有 HOI 方法各自为政、任务特定架构的瓶颈。其关键设计围绕以下三个层面展开：
 
@@ -125,7 +129,7 @@ $$\mathcal{L}_{\mathrm{LM}} = - \sum_{i=0}^{L-1} \log p_\theta(x_{t_i} \mid x_t^
 | 训练范式 | 单任务从头训练 | 多任务预训练 + 任务特定 LoRA 微调 |
 | 物体几何注入 | 专用点云编码器 | MLP 提取特征作为特殊 token |
 
-## 整体框架
+
 
 Uni-HOI 的核心设计动机源于一个根本瓶颈：现有 HOI 方法均为任务特定架构，无法以单一模型灵活处理文本驱动、物体运动驱动等多种条件输入，缺乏对文本、人体运动与物体运动三模态联合分布的统一建模。为解决这一问题，Uni-HOI 提出将人体运动和物体运动视为两种“外语”，通过离散词表与自然语言对齐，借助预训练大语言模型的序列建模能力捕获跨模态依赖，从而在单一框架下实现多种 HOI 任务的统一处理。
 
@@ -184,7 +188,7 @@ $$\theta^* = \arg\min_\theta \sum_{(X, y) \in \mathcal{T}} \mathbb{E}_{(P, T, H,
 ![[assets/figures/papers/paper_list_l1706_Uni_HOI_A_Unified_Framework_for_Learning_the_Joint_Distribution_of_Text/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of our Uni-HOI framework. Based on different task specifications, Uni-HOI can serve a variety of HOI tasks, including text-driven HOI generation (U(H,O|T)), human motion generation guided by object motion(optionally with text)(U(H|O[,T])) and object motion prediction guided by human motion(U(O|H))*
 
-## 核心模块与公式推导
+
 
 ### 3.1 运动表示与问题形式化
 
@@ -234,7 +238,9 @@ $$\theta^* = \arg\min_\theta \sum_{(X, y) \in \mathcal{T}} \mathbb{E}_{(P, T, H,
 
 **第二阶段：任务特定微调。** 在具体子任务（如文本驱动 HOI 生成 $U(H,O|T)$、物体引导人体运动生成 $U(H|O[,T])$、人体驱动物体运动预测 $U(O|H)$）上使用 LoRA 进行适配微调。两阶段均采用 LoRA 算法，第二阶段采用更小的秩和缩放系数以保留预训练知识。第一阶段共 110K 次迭代，第二阶段 50K 次迭代，学习率 $1 \times 10^{-6}$，在 8 块 NVIDIA GeForce RTX 4090 GPU 上完成训练。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -306,7 +312,9 @@ Figure 5 的定性对比显示，Uni-HOI 预测的物体姿态与人体动作在
 ![[assets/figures/papers/paper_list_l1706_Uni_HOI_A_Unified_Framework_for_Learning_the_Joint_Distribution_of_Text/figures/006_Figure_4.jpg]]
 *Figure 4: Visualization of comparative results for the task of human motion generation guided by object motion(optionally with text) on the FullBodyManipulation dataset*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与突破路径
 
@@ -347,6 +355,8 @@ Uni-HOI的统一架构虽在多项HOI任务上取得领先，但存在以下适�
 3. **接触建模增强**：引入显式的手-物接触信息（如距离场、接触图）作为额外条件token，是否能提升接触精确度并降低关节误差，是值得探索的方向。
 
 4. **数据规模效应**：当前多任务预训练依赖FullBodyManipulation数据集（论文称其为“largest collected HOI dataset”），更大规模的多模态HOI数据能否进一步释放LLM的跨模态对齐能力，尚待验证。
+
+
 
 ## 原文 PDF
 

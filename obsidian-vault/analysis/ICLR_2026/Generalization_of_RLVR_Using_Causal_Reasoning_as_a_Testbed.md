@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Generalization_of_RLVR_Using_Causal_Reasoning_as_a_Testbed.pdf
+project_link: null
+code_link: https://github.com/zhichul/rlcausal
 aliases:
 - RGD
 - GRUCRAT
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 基于因果推理的RLVR泛化研究 |
 | 英文题名 | Generalization of RLVR Using Causal Reasoning as a Testbed |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=DZjbL9BuHs); [GitHub](https://github.com/zhichul/rlcausal) |
+| Links | [paper](https://openreview.net/forum?id=DZjbL9BuHs) · [GitHub](https://github.com/zhichul/rlcausal) |
 | Topic | #topic/representation_self_supervised_transfer #topic/representation_self_supervised_transfer/causality |
 | Method | RLVR（基于总变差距离的准确性奖励的GRPO/DAPO） |
 | Dataset | RLCausal（过滤后），干预层级中等难度, RLCausal（过滤后），跨层级：关联训练→干预测试（简单）, CLadder 确定性反事实子集（小图，确定性机制） |
@@ -41,7 +43,7 @@ claims:
 > - RLCausal（过滤后），跨层级：关联训练→干预测试（简单） 上，CORRECT_t 准确率 为 100.0%（RL 32B 关联训练），对比 SFT模型及基座模型显著更低（具体数值参考 Table 3），变化 显著提升（具体数值未列出）。
 > - CLadder 确定性反事实子集（小图，确定性机制） 上，准确率 为 99.7%（RL 32B），对比 70.6%（SFT 32B），变化 +29.1%。
 
-## 概述
+## 概要
 
 本研究以因果推理为检验平台（testbed），系统考察基于可验证奖励的强化学习（RLVR）的泛化能力。核心问题聚焦于：RLVR 能否在结构因果模型（SCM）导出的关联、干预、反事实三类查询上实现有效的层级内及跨层级泛化？其成功的关键条件是什么？
 
@@ -57,7 +59,7 @@ claims:
 
 综上，RLVR 在基座模型具备足够推理先验时能有效提升泛化，但其局限同样清晰：泛化能力受限于模型已有的推理熟练度，而非奖励信号本身可以任意拓展。这一发现为后续研究 RLVR 的泛化条件、课程学习策略及推理能力的基础瓶颈提供了明确的实验框架。
 
-## 背景与动机
+
 
 大型语言模型（LLM）在复杂推理任务中的能力近年来通过强化学习与可验证奖励（Reinforcement Learning with Verifiable Rewards, RLVR）得到显著提升。与依赖人类偏好反馈的标准RLHF不同，RLVR利用可自动验证的正确性信号（如数学题答案、代码执行结果）直接优化模型生成的推理链与最终输出。这种范式已在数学和编程领域展现出强大的泛化能力，但其泛化机制及边界仍缺乏系统性的理解。特别地，**RLVR的成功是否高度依赖于基础模型已有的推理“先验”？当任务超出基座模型的能力边界时，RLVR是否仍然有效？** 这些问题对于将该范式推广到更广泛的推理领域至关重要。
 
@@ -67,7 +69,9 @@ claims:
 
 鉴于此，本文通过构建大规模合成因果推理数据集（RLCausal），并系统微调Qwen2.5‑Instruct系列模型（3B 至 32B），对比RLVR（基于总变差距离奖励的GRPO/DAPO，见公式(1)）和传统监督微调（SFT）在同层级（within‑level）和跨层级（across‑level）泛化上的表现。我们旨在回答以下核心问题：**（1）RLVR在何种条件下优于SFT？其泛化能力如何受查询层级与模型规模调节？（2）RLVR带来的增益源于推理策略的质变（如从暴力边缘化转向增量式边缘化），还是错误执行的减少？（3）RLVR的失败模式（如3B模型上的回避行为、反事实层级的普遍低效）揭示了哪些深层瓶颈？** 对这些问题的回答不仅能为RLVR的泛化行为提供机理性的解释，也将为设计更稳健的推理增强方法指明方向。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 相对于监督微调（SFT）直接最大化参考答案似然和输出概率分布的范式，RLVR 在两个关键维度上做出了根本性重构，使强化学习信号得以作用于推理过程的每一步，从而触发推理策略的质变。
 
@@ -81,7 +85,7 @@ claims:
 
 上述两个 changed slot（训练目标与输出格式）相互耦合：推理链输出使最终答案的准确性可被链路质量所解释，而总变差距离奖励则为整个推理过程提供了明确的优化目标。当基座模型具备足够的初始推理能力时（≥7B），这套机制可诱导出更优的边缘化策略、减少推导错误，从而在同层级和跨层级泛化上大幅领先 SFT——例如干预层级过滤集上，32B RLVR 达到 99.4% 的准确率，而 SFT 仅为 45.9%（Table 1）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0013_DZjbL9BuHs_Generalization_of_RLVR_Using_Causal_Reasoning_as/figures/001_Figure_1.jpg]]
 *Figure 1: Top: Our causal inference task for investigating generalization of RLVR (see section 2), system prompt (fig. 8) omitted for space. Bottom Left: Generative process for sampling task instances, and solver for computing the reference (see section 3). Bottom Right: We generate association, intervention, and counterfactual queries to study RLVR’s within-/across-level generalization.3*
@@ -119,7 +123,7 @@ $$\mathrm{CORRECT}_t(x,y) =
 
 这一评估标准严格要求输出的概率分布与 ground truth 在四舍五入到 0.01 精度后总变差距离不超过阈值 $t=0.01$，从而精确衡量模型的概率计算与推理质量。
 
-## 核心模块与公式推导
+
 
 本节给出方法中的关键模块及其所依赖的核心公式。整体框架由数据生成、模型微调与奖励设计、以及推理评估三部分构成，各模块协同产生受控难度的因果查询样本，并以强化学习（RLVR）优化模型输出的推理链与概率分布。
 
@@ -193,7 +197,9 @@ $$
 
 该指标综合了格式有效性和概率分布的精确度，是后续实验的核心评价标准。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 实验基于合成因果图与查询，覆盖关联、干预、反事实三个层级，并以相关子图大小 $|V_{\text{rel}}|$ 作为难度度量（Fig. 7）。模型为 Qwen 2.5‑Instruct 系列（3B、7B、32B）；RLVR 采用 GRPO/DAPO，奖励由总变差距离阈值 $t=0.01$ 和格式合规组成，SFT 基线最大化参考答案 $p^*$ 的条件对数似然。评估指标 $\mathrm{CORRECT}_t$ 要求提取的概率分布与 $p^*$ 的总变差距离（四舍五入后）≤ $t$。除非特别说明，结果指过滤测试集上的同层级泛化。
 
@@ -247,7 +253,9 @@ $$
 
 综合以上，**RLVR 泛化的核心瓶颈在于基座模型先验的推理熟练度**：当模型在微调前已具备变量消元、条件概率推导等基本操作时，RLVR 能通过奖励塑形将其策略提升为增量式边缘化并减少推导错误；否则 RL 只会诱导模型走捷径。查询层级（关联、干预、反事实）和复杂度构成两个有效的因果调节变量，可用于系统地检验层级内与跨层级的泛化行为。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 RLVR（基于总变差距离奖励的GRPO/DAPO）在因果推理任务中构建了一个清晰的对比弧线：它与典型的有监督微调（SFT）基线形成对照，通过奖励机制将学习目标从最大化参考答案的条件对数似然转变为期望奖励的最大化（`$\mathbb{E}_{x \sim T} \mathbb{E}_{y \sim p_{\theta}(x)}[r(y)]$`，Section 2.2）。这一转变的核心差异体现在训练目标和输出格式两个关键槽位上：SFT直接输出概率分布 `$p^\star$` 的对数似然，而RLVR要求输出推理链加概率分布，并以总变差距离低于阈值（`$r_{\mathrm{ans}}(p,q)=\mathbf{1}[D(p,q)<t]$`）和格式合规作为复合奖励信号。该方法并非凭空产生，而是对GRPO（Shao et al., 2024）和DAPO（Yu et al., 2025b）在数学推理等领域的成功经验的直接移植，但被置于形式因果推理的测试床上，从而暴露出一系列独特的边界条件。
 
@@ -281,6 +289,8 @@ RS32（离线思维链）的对比实验进一步区分了监督信号的来源�
 3. **数据规模的挑战**：节点数、变量基数或图形状的扩大能否系统性地提升任务难度，以进一步挑战RLVR的泛化极限？若能构建更大规模、更异构的SCM，可能会诱发更丰富的推理行为，但也可能重复当前的失效模式。  
 4. **反事实难点本质**：即使给予双网络提示（明确告知求解方法），RLVR仍无法学习有效推理（Fig. 19），这说明问题不在于方法缺失，而在于模型在训练过程中无法将提示转化为可靠的操作序列。这是否意味着当前LLM缺乏处理双世界结构的表示能力？  
 5. **小模型的拯救路径**：课程学习、渐进式复杂度增长或分阶段训练能否帮助3B模型越过推理先验门槛，从而利用RLVR获得提升？若能，将为小模型的推理训练开辟新范式。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,7 @@ paper_level: A
 venue: NeurIPS
 year: 2021
 pdf_ref: paperPDFs/NEURIPS_2021/EditGAN_High_Precision_Semantic_Image_Editing.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/toronto-ai/editGAN/
 aliases:
 - EditGAN
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | EditGAN：高精度语义图像编辑 |
 | 英文题名 | EditGAN: High-Precision Semantic Image Editing |
 | 会议/期刊 | NeurIPS 2021 |
-| Links | [paper](https://arxiv.org/abs/2111.03186); [Project](https://nv-tlabs.github.io/editGAN); [Project](https://research.nvidia.com/labs/toronto-ai/editGAN/) |
+| Links | [paper](https://arxiv.org/abs/2111.03186) · [Project](https://nv-tlabs.github.io/editGAN) · [Project](https://research.nvidia.com/labs/toronto-ai/editGAN/) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/generative_models_and_autoencoders |
 | Method | EditGAN |
 | Dataset | Smile Edit Benchmark (CelebA-HD) |
@@ -41,7 +42,7 @@ claims:
 > - Smile Edit Benchmark (CelebA-HD) 上，FID (越低越好) 为 41.74 (EditGAN) / 40.83 (EditGAN+30)，对比 46.84 (MaskGAN) / 39.42 (InterFaceGAN)，变化 -5.1 vs MaskGAN / +2.32 vs InterFaceGAN。
 > - Smile Edit Benchmark (CelebA-HD) 上，ID Score (越高越好) 为 0.7047 (EditGAN) / 0.7452 (EditGAN+30)，对比 0.4611 (MaskGAN) / 0.7295 (InterFaceGAN)，变化 +0.2436 vs MaskGAN / +0.0157 vs InterFaceGAN。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有GAN图像编辑方法通常依赖大量像素级标注数据（如MaskGAN需30,000张标注）、仅提供高层属性控制（如InterFaceGAN依赖属性分类器）或需参考图像进行局部编辑（如LocalEditing），无法在极少标注下实现精细的语义部件级编辑。
 
@@ -50,8 +51,6 @@ claims:
 **方法定位**：EditGAN建立在**DatasetGAN**（Zhang et al., CVPR 2021）的框架之上，在预训练StyleGAN2生成器的特征图上附加一个三层MLP分割分支，形成对$p(\mathbf{x}, \mathbf{y})$的联合建模。编辑过程通过定义编辑区域$r$，最小化RGB一致性损失$\mathcal{L}_{\mathrm{RGB}}$、分割交叉熵损失$\mathcal{L}_{\mathrm{CE}}$和身份保持损失$\mathcal{L}_{\mathrm{ID}}$的加权组合，优化潜在空间位移向量$\delta\mathbf{w}^+$。学习到的编辑向量可跨图像复用，实现交互式实时编辑。
 
 **主要结果**：在CelebA-HD微笑编辑基准上，EditGAN仅需**16张**掩码标注（对比MaskGAN的30,000张），属性准确率达**91.5%**，显著优于MaskGAN（77.3%）和InterFaceGAN（83.5%）；FID降至**41.74**（MaskGAN为46.84）；身份保持分数（ID Score）达**0.7047**（MaskGAN为0.4611）。附加30步自监督精炼（EditGAN+30）可进一步将ID分数提升至0.7452，并降低FID至40.83。编辑向量在汽车、鸟、猫、人脸四类数据上均展现出良好的迁移性，并支持多编辑组合和域外图像编辑（如MetFaces）。
-
-## 背景与动机
 
 生成对抗网络（GAN）的快速发展使得高质量图像合成成为现实，但如何对生成图像进行**高精度、可控的语义编辑**仍是一个核心挑战。用户期望能够像操作语义部件一样修改图像——例如调整人脸的微笑程度、改变汽车轮辐角度、缩放瞳孔大小——同时保持非编辑区域的视觉一致性。
 
@@ -69,7 +68,7 @@ claims:
 
 EditGAN的提出旨在弥合上述缺口：**仅需极少量标注数据（如16张图像-掩码对），即可实现高精度语义部件级编辑，并通过预训练编辑向量支持实时交互**。其关键思想是利用联合建模图像与语义分割的GAN框架——同一个潜在代码同时生成RGB图像和像素级分割掩码。当用户修改分割掩码（如将嘴巴区域调整为微笑形态）后，系统在共享潜在空间中优化，使生成图像与编辑后分割保持一致，同时保持非编辑区域的RGB外观不变。这一机制将**分割掩码作为精确的编辑指令**，无需重新训练生成器或依赖大量标注。
 
-## 核心创新
+## 核心方法与创新机理
 
 EditGAN 的核心创新在于将高精度语义图像编辑重新定义为**联合建模图像与像素级语义分割的潜在空间优化问题**，从而以极低的标注成本实现前所未有的部件级编辑精度与实时交互能力。其关键突破体现在以下三个维度的范式转变：
 
@@ -95,8 +94,6 @@ EditGAN 的核心创新在于将高精度语义图像编辑重新定义为**联�
 | **编辑可组合性** | 通常单一编辑操作 | 多个编辑向量可组合叠加 | Figure 5; Figure 6 |
 
 这些创新共同构成了一个**高精度、低标注依赖、可实时交互**的语义图像编辑框架，其核心机制——通过修改分割掩码引导共享潜在空间优化——为可控图像生成提供了新的范式。
-
-## 整体框架
 
 EditGAN 的核心思想建立在**图像与语义分割联合建模**的生成对抗网络之上。其整体 pipeline 围绕一个共享潜在空间展开，包含四个关键模块，形成从图像生成到精确语义编辑的闭环。
 
@@ -135,8 +132,6 @@ EditGAN 支持两种编辑模式：
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2111_03186/figures/002_Figure_2.jpg]]
 *Figure 2: (1) EditGAN builds on a GAN framework that jointly models images and their semantic segmentations. (2 & 3) Users can modify segmentation masks, based on which we perform optimization in the GAN’s latent space to realize the edit. (4) Users can perform editing simply by applying previously learnt editing vectors and manipulate images at interactive rates*
 
-## 核心模块与公式推导
-
 EditGAN 的核心在于将语义分割掩码的修改转化为潜在空间的优化问题，从而实现高精度图像编辑。其技术框架由四个关键模块构成，并通过一组精心设计的损失函数驱动编辑过程。
 
 ### 关键模块
@@ -170,7 +165,7 @@ $$\mathcal{L}_{\text{editing}}(\delta\mathbf{w}^+) = \lambda_1^{\text{editing}} 
 **4. 编辑向量学习与复用**
 通过上述优化过程，可以从单张图像及其手动修改的分割掩码中学习到一个编辑向量 $\delta\mathbf{w}_{\text{edit}}^+$。该向量编码了特定语义编辑（如“微笑”）在潜在空间中的方向。学习到的编辑向量可直接应用于其他图像，通过缩放系数 $s_{\text{edit}}$ 控制编辑强度，实现实时交互式编辑。对于编辑向量无法完美迁移的复杂编辑，可在测试时附加少量（如30步）自监督精炼优化，以消除伪影并提升质量。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -231,10 +226,7 @@ EditGAN 在微笑编辑基准（Smile Edit Benchmark, CelebA-HD）上进行了�
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2111_03186/figures/008_Figure_7.jpg]]
 *Figure 7: Face part labeling schema [1]*
 
-![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2111_03186/figures/014_Figure_14.jpg]]
-*Figure 14: Left: We apply learnt editing vectors with varying scales (see 5 markers in FID plots) both without (top row) and with (bottom row) additional 30-step self-supervised refinement to correct artifacts. Red boxes denote original images. For each class, the leftmost image is the one used to learn the editing vector with the editing result next to it and orginal and modified segmentations below. Right: Visual quality after editing with different scales as measured by FID with and without 30-step refinement*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 核心机制与因果瓶颈
 

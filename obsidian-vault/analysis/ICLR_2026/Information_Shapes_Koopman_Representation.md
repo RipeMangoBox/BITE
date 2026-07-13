@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Information_Shapes_Koopman_Representation.pdf
+project_link: null
+code_link: https://github.com/Wenxuan52/InformationKoopman
 openreview_forum_id: Szh0ELyQxL
 aliases:
 - ISKR
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 信息塑造Koopman表示 |
 | 英文题名 | Information Shapes Koopman Representation |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=Szh0ELyQxL); [GitHub](https://github.com/Wenxuan52/InformationKoopman) |
+| Links | [paper](https://openreview.net/forum?id=Szh0ELyQxL) · [GitHub](https://github.com/Wenxuan52/InformationKoopman) |
 | Topic | #topic/representation_self_supervised_transfer #topic/representation_self_supervised_transfer/representation_learning |
 | Method | InformationKoopman |
 | Dataset | Lorenz 63, Kármán Vortex, Dam Flow, ERA5 Geopotential |
@@ -41,7 +43,7 @@ claims:
 > - Kármán Vortex 上，5-SSIM 为 0.936 (0.025)，对比 0.920 (0.030) [PFNN]，变化 +0.016。
 > - Dam Flow 上，SDE 为 0.244，对比 0.269 [KKR]，变化 -0.025。
 
-## 概述
+## 概要
 
 Koopman算子理论为非线性动力学系统提供了一条通往线性化分析的路径——通过在合适的观测函数空间中定义线性演化算子，使得复杂的非线性轨迹预测转化为简单的线性前向映射。然而，这一优雅的理论框架在实际表示学习中面临一个根本性瓶颈：**表示简单性（线性预测）与表达性（模式多样性）之间的内在冲突**。过度追求线性结构会导致潜表示坍缩到少数主导模态，丧失对丰富动力学模式的刻画能力；而一味增加表达性又可能破坏线性演化假设，使预测不稳定。
 
@@ -49,7 +51,7 @@ Koopman算子理论为非线性动力学系统提供了一条通往线性化分�
 
 在方法定位上，InformationKoopman区别于传统的Koopman自编码器（如**KAE**，Pan et al., 2023）和核回归方法（如**KKR**，Bevanda et al., 2023），首次将互信息最大化与熵正则化引入Koopman表示学习。实验覆盖物理模拟（Lorenz 63、Kármán涡街、Dam Flow）、视觉控制（Planar、Pendulum、Cartpole）和图结构动力学（绳索、软体）三类任务，在5步及长程预测指标上均取得了最优或次优性能。消融实验进一步验证了三个正则项各自的关键作用：移除互信息正则化（α=0）导致时序一致性丢失，潜空间退化为无几何结构的散点；移除结构一致性（β=0）导致潜流形崩塌；移除冯·诺依曼熵正则化（γ=0）则使某些维度被抑制，有效维度降低。
 
-## 背景与动机
+
 
 ### 问题背景：Koopman表示的根本张力
 
@@ -85,7 +87,9 @@ $$( \mathcal{K} \phi ) ( x ) = \phi ( T ( x ) )$$
 
 基于以上分析，本文提出**InformationKoopman**——一个统一的信息论拉格朗日量框架，通过三个可调节的权重系数（$\alpha$ 控制时序一致性，$\beta$ 控制结构一致性，$\gamma$ 控制预测充分性）显式平衡简单性与表达性，从而在保持线性预测能力的同时，防止模式崩塌和不稳定。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心贡献在于将**信息瓶颈（Information Bottleneck, IB）**理论引入Koopman表示学习，通过一个统一的信息论拉格朗日量，显式地平衡表示的**简单性**（线性可预测性）与**表达性**（模式多样性）。这一框架从根本上解决了Koopman学习中长期存在的模式崩塌与不稳定问题。
 
@@ -120,7 +124,7 @@ $$\| \mathbb{E}_{q^{KR}}[x_{1:t} \mid x_0] - \mathbb{E}_p[x_{1:t} \mid x_0] \|_2
 
 本文方法不依赖于特定动力学假设（如混沌），而是通过信息论原理提供了一种**通用的、可解释的**Koopman表示学习框架。实验表明，该方法在物理模拟（Lorenz 63、Kármán涡街、Dam Flow）、视觉控制（Pendulum、Cartpole）和图结构动力学（Rope、Soft）等多种任务上均取得了最优或次优性能，验证了信息论设计的跨域泛化能力。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_Szh0ELyQxL/figures/002_Figure_1.jpg]]
 *Figure 1: Information-theoretic Koopman framework. (a) Structure overview, (b) Information disentanglement with spectral interpretations, and (c) Water-filling effect of Mutual Information (MI) and von Neumann entropy (VNE) on spectral information allocation*
@@ -164,7 +168,7 @@ $$
 
 - **谱分配机制**（Proposition 4 & 5）：最大化潜变量互信息在有限方差约束下会产生“水填充分配”（water-filling）效应，将谱权重集中于少数时间相干模态；而冯·诺依曼熵正则化则对抗这一集中趋势，迫使谱权重在所有模态上保持正分布，从而维持潜空间的有效维度。Figure 1(c) 直观展示了这一对抗平衡：互信息倾向于将信息分配给少数主导方向，而冯·诺依曼熵则推动信息向更多方向扩散。
 
-## 核心模块与公式推导
+
 
 ### 信息瓶颈视角下的Koopman表示学习
 
@@ -226,7 +230,9 @@ $$\operatorname*{max} \sum_n \Big[ \alpha I(z_n; \mathcal{P}_n) + \beta \mathbb{
 
 三个权重系数 $(\alpha, \beta, \gamma)$ 构成了调节表示简单性与表达性权衡的直接因果旋钮，其消融效果在摆锤任务中得到验证：$\alpha=0$ 导致时序结构丢失、潜空间退化为无几何结构的散点；$\beta=0$ 导致潜流形崩塌；$\gamma=0$ 则抑制某些维度，仅保留循环分量，有效维度显著降低。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -301,7 +307,9 @@ Koopman表示学习面临的根本矛盾在于**表示简单性**（线性前向
 ![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_Szh0ELyQxL/figures/023_Table_7.jpg]]
 *Table 7: Training time statistics for different models and tasks. Epoch times are reported as mean ± std (in seconds). For Ours, InfoNCE and entropy (von Neumann entropy) rows correspond to the total per-epoch computation. Notably, the overhead introduced by InfoNCE and von Neumann entropy is marginal, accounting for only a small percentage of the total training time*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系
 
@@ -335,6 +343,8 @@ InformationKoopman 的核心推进在于**将上述方法的正则化策略统�
 3. **非线性观测函数与核方法**。当前分析假设编码器学习线性化观测函数 φ。能否将信息论分析推广到更一般的非线性观测函数族？核技巧（如 KKR 使用的核方法）是否能与信息论正则化结合，在保持线性前向的同时提升观测函数的表达力？
 
 4. **权重系数 α、β、γ 的自适应调节**。当前三个系数是固定超参数。是否存在基于数据特性的自适应调节策略？例如，根据动力学的时间尺度自动调整 α（时序一致性强度），或根据潜空间有效维度自动调整 γ（熵正则化强度）？
+
+
 
 ## 原文 PDF
 

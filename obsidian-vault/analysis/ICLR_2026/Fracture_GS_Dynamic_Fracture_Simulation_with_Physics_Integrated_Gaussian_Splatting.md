@@ -40,7 +40,7 @@ claims:
 > [!tip] 效果简介
 > - 所提方法在定性和定量指标上均优于现有方法。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -80,7 +80,7 @@ Fracture-GS 位于 **物理仿真与神经渲染的交叉点**，其方法谱系
 
 > **注意**：定量评估采用自参照协议（以断裂前最后一帧为参考），缺乏真实动态序列基准，指标反映的是视觉连贯性而非绝对物理精度。未来需发展专门用于物理渲染的评估度量。
 
-## 背景与动机
+
 
 ### 问题背景：动态断裂模拟的视觉与物理双重挑战
 
@@ -100,7 +100,9 @@ Fracture-GS 位于 **物理仿真与神经渲染的交叉点**，其方法谱系
 
 针对上述缺口，Fracture-GS提出了一条物理-渲染深度耦合的技术路线：**在MPM求解器中嵌入动量守恒的碰撞界面力，从根本上消除非物理黏附；同时，通过断裂粒子追踪与最小体积外接椭球（MVEE）优化，为断裂面生成物理一致的高斯属性。** 这一设计理念的核心洞察是：碰撞界面的质量分布梯度天然编码了接触方向信息，而硬化参数$\alpha$则提供了粒子是否处于断裂状态的连续信号——将这两者分别引入碰撞力计算和断裂粒子识别，即可在不增加显著计算开销的前提下，实现物理准确性与视觉真实性的同步提升。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Fracture-GS 的核心创新在于将物理一致的碰撞-断裂动力学与高质量可微渲染深度融合，形成端到端的“物理仿真-高斯重建-实时渲染”闭环。该方法针对现有 MPM-高斯泼溅混合框架在极端机械碰撞场景下的两个关键瓶颈进行了系统性改进：**非物理黏附伪影**与**断裂面渲染质量不足**。
 
@@ -141,7 +143,7 @@ Fracture-GS 提出 **Collision-MPM**，核心机制包含两个步骤：
 
 > **注意**：该方法对隐藏/不可见区域的断裂面缺乏纹理信息，可能导致 FID 指标偏高；未来工作可探索 3D AI 纹理修复以改善此问题。
 
-## 整体框架
+
 
 Fracture-GS 构建了一条从多视图图像到动态断裂渲染的端到端管道，其核心设计围绕“物理模拟—几何追踪—外观重建”三个阶段的紧密耦合展开。整个框架的输入为物体的多视图 RGB 图像，输出为任意视角下具有物理一致断裂效果的高质量渲染序列。
 
@@ -164,7 +166,7 @@ Fracture-GS 构建了一条从多视图图像到动态断裂渲染的端到端�
 ![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_zcAwK50ft0/figures/002_Figure_2.jpg]]
 *Figure 2: Pipeline. The object is implicitly reconstructed from multi-view images, followed by sampling both surface and internal particles. Surface particles learn Gaussian attributes using isotropic kernels. Next, the sampled particles undergo extreme mechanical collision simulation with dynamic fracture using our enhanced Collision-MPM. Finally, fracture particles are tracked and their Gaussian attributes are optimized through our proposed Fracture Particle Gaussian Optimization strategy, enabling high-quality rendering of the simulation results. For Collision-MPM, the key parameters are highlighted in red. The yield surface determines whether a particle enters the plastic region, triggering a ret...*
 
-## 核心模块与公式推导
+
 
 ### 3.1 Collision-MPM：动量守恒的碰撞界面处理
 
@@ -250,7 +252,9 @@ Fracture-GS 的完整管道（见 Figure 2）由以下关键模块串联构成�
 ![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_zcAwK50ft0/figures/004_Figure_4.jpg]]
 *Figure 4: Illustration of Fracture Particles Gaussian Optimization*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -315,7 +319,9 @@ Table 3 和 Figure 12 展示了内部粒子采样密度对模拟精度的影响�
 ![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_zcAwK50ft0/figures/010_Table_1.jpg]]
 *Table 1: Material Parameters*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位与基线关系
 
@@ -355,6 +361,8 @@ Fracture-GS 的方法创新可归纳为三个紧密耦合的模块：
 3. **参数敏感度量化**：物理参数（尤其是硬化因子 α）对断裂模式的影响虽已通过消融实验定性展示，但缺乏系统性的敏感度分析和自动调参策略。
 4. **与物理模拟基线的直接对比**：当前定量评估主要与 PhysGaussian 等渲染基线对比，缺少与专业断裂模拟软件或高级 MPM 变体的直接物理精度对比。
 5. **计算效率的进一步优化**：断裂粒子追踪使每帧渲染时间增加约 20–80%（如 Ficus 场景从 49.19ms 增至 62.78ms），在实时应用场景下仍有优化空间。
+
+
 
 ## 原文 PDF
 

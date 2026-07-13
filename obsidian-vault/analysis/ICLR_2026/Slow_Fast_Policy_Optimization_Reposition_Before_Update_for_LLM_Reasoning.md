@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Slow_Fast_Policy_Optimization_Reposition_Before_Update_for_LLM_Reasoning.pdf
+project_link: https://slow-fast-po.github.io/
+code_link: null
 openreview_forum_id: xBlHiHdXap
 aliases:
 - SSFPO
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 慢-快策略优化：面向大语言模型推理的“先重定位后更新”方法 |
 | 英文题名 | Slow-Fast Policy Optimization: Reposition-Before-Update for LLM Reasoning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=xBlHiHdXap); [Project](https://slow-fast-po.github.io/) |
+| Links | [paper](https://openreview.net/forum?id=xBlHiHdXap) · [Project](https://slow-fast-po.github.io/) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | SFPO (Slow-Fast Policy Optimization) |
 | Dataset | Math Reasoning (6 benchmarks avg), AIME25 |
@@ -42,7 +44,7 @@ claims:
 > - Math Reasoning (6 benchmarks avg) 上，平均Pass@1 为 50.53，对比 47.73，变化 +2.80。
 > - AIME25 上，Pass@1 为 30.83，对比 23.33，变化 +7.50 (最大提升)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -65,7 +67,7 @@ claims:
 - **机制验证**：消融实验证实，重定位插值是防止大 $K$ 时训练崩溃的关键；自适应 $\alpha$ 调度在收敛附近关闭快速轨迹，保障训练稳定性。
 - **通用性**：SFPO可叠加于DAPO之上并持续带来额外提升，在编程任务（LiveCodeBench）上同样有效，展现出跨任务和跨底层算法的鲁棒性。
 
-## 背景与动机
+
 
 ### 大语言模型推理能力的强化学习范式
 
@@ -94,7 +96,9 @@ claims:
 
 现有针对GRPO的改进主要沿两条路线展开：一是修改奖励设计或优势估计（如DAPO通过动态采样缓解零优势问题；Yu et al., 2025a），二是引入更复杂的KL正则或信赖域约束。SFPO与这些路线**正交**：它不改变目标函数的形式，而是在更高层的优化流程上进行重构——将单步更新替换为“快-重定位-慢”三阶段更新。这使得SFPO可以**作为即插即用的插件**，无缝集成到GRPO、DAPO等现有策略梯度框架之上，持续带来额外提升。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SFPO 的核心创新在于将标准在线策略RL中“每批次单次梯度更新”的范式，重构为**快-重定位-慢三阶段解耦更新**，在不改变目标函数与rollout流程的前提下，构建了曲率感知的低通滤波器与隐式信赖域机制。
 
@@ -121,7 +125,7 @@ SFPO引入了基于策略熵滑动窗口的自适应α调度机制（Section 3.4
 
 SFPO作为高层优化插件，保持目标函数和rollout流程不变，可无缝集成到GRPO变体上。实验证实，在DAPO（Yu et al., 2025a）之上叠加SFPO仍能带来一致的额外提升（Figure 12, Table 3），表明其独立于底层GRPO的具体实现。此外，SFPO不增加GPU显存开销——由于不需存储重优化器状态，仅需多保存一份模型权重副本，实测显存消耗与GRPO相当（Figure 8）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_xBlHiHdXap/figures/001_Figure_1.jpg]]
 *Figure 1: Pipeline of SFPO at iteration s. Starting from the current policy $\pi _ { \theta ^ { s , 0 } }$ , we first generate rollouts for training. Stage I (Fast Trajectory): apply K successive gradient updates on the same batch to obtain $\theta ^ { s , \widetilde { K } }$ . Stage II (Reposition): interpolate between $\theta ^ { s , K }$ and the starting point $\theta ^ { s , 0 }$ to form $\widetilde { \theta } ^ { s , K }$ , controlling off-policy drift. Stage III (Slow Correction): perform one additional update on $\widetilde { \theta } ^ { s , K }$ , yielding $\pi _ { \theta ^ { s + 1 , 0 } }$ for the next iteration
@@ -150,7 +154,7 @@ $$Z_s = \frac{H_s - \mu_s}{\sigma_s}$$
 $$\theta^{s+1} = \theta^{s,0} - \eta \left[ \alpha \sum_{k=0}^{K-1} \nabla_{\theta} \mathcal{L}(\theta^{s,k}) + \nabla_{\theta} \mathcal{L}(\widetilde{\theta}^{s,K}) \right]$$
 这表明SFPO可视为对标准梯度下降的一个**结构化修正项**：快速轨迹累积方向、重定位控制步长、慢速校正精调终点。整个管道作为即插即用的高层优化插件，可无缝集成到GRPO、DAPO等现有策略梯度管线中（见Figure 12、Table 3），且实测GPU显存开销与GRPO相当（Figure 8），因为SFPO仅需额外保存一份模型权重副本，无需存储重优化器状态。
 
-## 核心模块与公式推导
+
 
 ### 问题背景：GRPO 的单步更新瓶颈
 
@@ -218,7 +222,9 @@ $$
 
 当 $|Z_s| \geq \tau$ 时，策略熵发生显著波动，表明模型已接近收敛或分布发生变化，此时将 $\alpha$ 置零，关闭快速轨迹，回退到纯在线单步更新。这一机制在接近收敛时自动平衡探索与利用，消融实验证实移除该控制会导致约 100 步后精度明显下降（Figure 6）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 瓶颈与核心机制回顾
 
@@ -301,7 +307,9 @@ GRPO在LLM推理训练中面临双重瓶颈：其一，训练早期低质量roll
 
 所有实验基于verl框架，批次大小256、每条问题8条回复、总训练步数400等配置均保持一致。SFPO不增加GPU显存开销：**Figure 8**证实，由于不需存储重优化器状态，仅需多保存一份模型权重副本，SFPO的显存消耗与GRPO相当。GRPO与SFPO使用相同的clip范围和KL正则系数，客观比较了更新规则本身的效果差异。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -340,6 +348,8 @@ SFPO 的插件特性进一步体现在其与 GRPO 变体的兼容性上。**DAPO
 3. **向其他算法的推广**：将 SFPO 的“快-重定位-慢”思想推广至 PPO、Reinforce 等其他在线策略算法的可行性与收益如何？
 4. **插值与 KL 正则化的互补**：插值与 KL 正则化是否存在互补组合方式，可以在更宽的 α 范围内保持稳定性？
 5. **大规模并行训练的系统挑战**：在大规模并行训练（如数百 GPU）场景下，SFPO 的快-重定位-慢结构会带来哪些新的系统优化挑战？
+
+
 
 ## 原文 PDF
 

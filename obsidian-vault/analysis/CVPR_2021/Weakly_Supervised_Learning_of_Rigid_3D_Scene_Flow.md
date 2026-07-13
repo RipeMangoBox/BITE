@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2021
 pdf_ref: paperPDFs/CVPR_2021/Weakly_Supervised_Learning_of_Rigid_3D_Scene_Flow.pdf
+code_link: null
 project_link: https://3dsceneflow.github.io/
 aliases:
 - WSLR3SF
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | 刚性三维场景流的弱监督学习 |
 | 英文题名 | Weakly Supervised Learning of Rigid 3D Scene Flow |
 | 会议/期刊 | CVPR 2021 |
-| Links | [paper](https://arxiv.org/abs/2102.08945); [Project](https://3dsceneflow.github.io/) |
+| Links | [paper](https://arxiv.org/abs/2102.08945) · [Project](https://3dsceneflow.github.io/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Rigid3DSceneFlow |
 | Dataset | lidarKITTI (w/o ground), stereoKITTI (w/o ground), stereoKITTI (with ground), semanticKITTI (w/o ground) |
@@ -41,7 +42,7 @@ claims:
 > - stereoKITTI (w/o ground) 上，EPE3D [m]↓ 为 0.042 (Ours fully supervised)，对比 0.056 (FLOT, full supervision)，变化 -0.014。
 > - stereoKITTI (with ground) 上，EPE3D [m]↓ 为 0.068 (Ours++ weakly supervised)，对比 0.177 (FlowNet3D, full supervision)，变化 -0.109。
 
-## 概述
+## 概要
 
 ### 问题背景与瓶颈
 
@@ -70,7 +71,7 @@ claims:
 
 该方法仍需弱监督信号，无法完全无监督运行。当前前景聚类依赖 DBSCAN 假设对象空间分离，在密集交互场景可能失效。当背景仅剩地面点时，自运动估计可能失败；稀有对象（如卡车）的掩码预测也不可靠。此外，lidarKITTI 标注噪声影响定量评估的精确性。未来方向包括：结合多帧信息提升时序一致性、改进困难场景和稀有对象的处理、以及加速测试时优化以适应实时自动驾驶应用。
 
-## 背景与动机
+
 
 ### 三维场景流估计的核心瓶颈
 
@@ -101,7 +102,9 @@ claims:
 
 这一框架在全监督和弱监督两种设定下均展现出竞争力：在 stereoKITTI 上以全监督训练达到 0.042 m EPE3D，在 lidarKITTI 上以弱监督训练（Ours++）将 EPE3D 降至 0.094 m，相比全监督 PointPWC-Net 降低约 0.3 m，甚至在 stereoKITTI（含地面）上以弱监督超越全监督 FlowNet3D（0.068 m vs 0.177 m）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作提出 **Rigid3DSceneFlow**，其核心创新在于将三维场景流估计从“逐点稠密回归”重构为“对象级刚性运动分解”，从而将监督信号从昂贵的逐点流标注大幅松弛为前景/背景二值掩码与自运动信息。这一转变由三个关键改变槽位 (changed slots) 驱动，形成一条因果链：**监督信号的弱化 → 运动表征的结构化 → 训练数据的真实化**。
 
@@ -141,7 +144,7 @@ claims:
 
 需注意，本方法并非完全无监督——它仍需要前景/背景掩码和自运动作为弱监督信号。当前前景聚类依赖 DBSCAN 假设对象空间分离，在密集交互场景可能失效。此外，当背景仅剩地面点时（如移除所有前景后），自运动估计可能失败（Figure 10）。这些局限为后续研究指明了方向。
 
-## 整体框架
+
 
 ### 核心设计理念：从逐点流到对象级刚性抽象
 
@@ -211,7 +214,7 @@ $$\mathbf{v}_i^{\star} = \frac{\sum_{j : \mathbf{x}_j^{v} \in \mathcal{E}(\mathb
 ![[assets/figures/papers/paper_list_l31_https_arxiv_org_abs_2102_08945/figures/018_Figure_7.jpg]]
 *Figure 7: Failure cases of our method on the lidarKITTI dataset. Top: even though the car’s object mask (d) is correctly predicted, its predicted scene flow vectors yield large end-point-errors (b). Bottom: a pillar in the middle of the scene is wrongly predicted as foreground object (d), hence its scene flow does not agree with the background and GT (b)*
 
-## 核心模块与公式推导
+
 
 ### 3.1 整体能量函数
 
@@ -278,7 +281,9 @@ $$SE(3) = \left\{ \mathbf{T} \in \mathbb{R}^{4 \times 4} \colon \mathbf{T} = \be
 
 骨干网络基于 **MinkowskiNet**（Choy et al., CVPR 2019），采用 U-Net 风格的编码器-解码器架构，包含跳跃连接和稀疏三维卷积层（详见 Figure 5）。场景流头在潜在空间中计算初始软对应关系，随后通过残差稀疏卷积层进行细化。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -290,9 +295,7 @@ $$SE(3) = \left\{ \mathbf{T} \in \mathbb{R}^{4 \times 4} \colon \mathbf{T} = \be
 
 在 FT3D 和 stereoKITTI 上的全监督结果 (Table 1) 表明，即使在传统密集流监督范式下，引入刚性运动表示本身已具竞争力：**Ours** 在 stereoKITTI (无地面) 上取得 **EPE3D = 0.042 m**，优于同期全监督方法 **FLOT** (0.056 m) 和 **PointPWC-Net** (0.118 m)。该优势源于刚性归纳偏置有效抑制了非刚性变形对点级流预测的干扰，尤其在车辆等刚体对象上避免了 FLOT 中常见的“对象扭曲”现象 (Figure 4)。
 
-![[assets/figures/papers/paper_list_l31_https_arxiv_org_abs_2102_08945/figures/016_Figure.jpg]]
 
-![[assets/figures/papers/paper_list_l31_https_arxiv_org_abs_2102_08945/figures/020_Figure.jpg]]
 
 ![[assets/figures/papers/paper_list_l31_https_arxiv_org_abs_2102_08945/figures/004_Table_1.jpg]]
 *Table 1: Evaluation results in a fully supervised setting on FT3D and stereoKITTI datasets*
@@ -362,7 +365,9 @@ $$SE(3) = \left\{ \mathbf{T} \in \mathbb{R}^{4 \times 4} \colon \mathbf{T} = \be
 ![[assets/figures/papers/paper_list_l31_https_arxiv_org_abs_2102_08945/figures/008_Table_3.jpg]]
 *Table 3: Ablation study of the proposed training objective. All models are trained on semanticKITTI and evaluated without test-time optimization on lidarKITTI (with ground) dataset*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心定位：弱监督刚性场景流
 
@@ -436,6 +441,8 @@ $$SE(3) = \left\{ \mathbf{T} \in \mathbb{R}^{4 \times 4} \colon \mathbf{T} = \be
 ### 知识库定位总结
 
 本方法属于**弱监督三维场景流估计**，其核心贡献在于将**对象级刚性先验**显式编码进网络架构与损失函数，从而在仅需弱标注的条件下实现可解释、高性能的场景流估计。它在方法谱系中桥接了全监督方法（性能高但标注昂贵）与无监督方法（标注经济但性能受限）之间的鸿沟，为自动驾驶等实际部署场景提供了一种高性价比的解决方案。
+
+
 
 ## 原文 PDF
 

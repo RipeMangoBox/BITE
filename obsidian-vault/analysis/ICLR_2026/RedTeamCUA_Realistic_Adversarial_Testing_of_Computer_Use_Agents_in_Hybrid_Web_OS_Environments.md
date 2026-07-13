@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/RedTeamCUA_Realistic_Adversarial_Testing_of_Computer_Use_Agents_in_Hybrid_Web_OS_Environments.pdf
+project_link: https://osu-nlp-group.github.io/RedTeamCUA
+code_link: null
 openreview_forum_id: yWwrgcBoK3
 aliases:
 - RRB
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | RedTeamCUA：混合Web-OS环境中计算机使用代理的现实对抗性测试 |
 | 英文题名 | RedTeamCUA: Realistic Adversarial Testing of Computer-Use Agents in Hybrid Web-OS Environments |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=yWwrgcBoK3); [Project](https://osu-nlp-group.github.io/RedTeamCUA) |
+| Links | [paper](https://openreview.net/forum?id=yWwrgcBoK3) · [Project](https://osu-nlp-group.github.io/RedTeamCUA) |
 | Topic | #topic/safety_alignment_fairness_privacy #topic/safety_alignment_fairness_privacy/trustworthy_machine_learning |
 | Method | RedTeamCUA + RTC-BENCH |
 | Dataset | RTC-BENCH (Decoupled Eval), RTC-BENCH (End2End Eval) |
@@ -42,7 +44,7 @@ claims:
 > - RTC-BENCH (Decoupled Eval) 上，ASR 为 Claude 3.7 Sonnet | CUA: 42.93%，对比 Claude 3.5 Sonnet CUA: 31.21%，变化 +11.72%。
 > - RTC-BENCH (End2End Eval) 上，ASR 为 Claude 4.5 Opus | CUA: 83%，对比 Claude 4.6 Opus | CUA: 50%，变化 -33%。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -68,7 +70,7 @@ RTC-BENCH包含864个对抗示例（9个良性目标 × 24个对抗目标 × 4�
 
 REDTEAMCUA在现有评估框架中（如OSWorld、WebArena）处于独特位置：它是首个同时满足**混合Web-OS环境**、**自动化可配置注入**、**解耦评估**和**多模态交互**要求的框架。与仅关注纯文本注入或单一环境的先前工作相比，REDTEAMCUA更贴近真实CUA部署场景的威胁模型。
 
-## 背景与动机
+
 
 计算机使用代理（Computer-Use Agents, CUAs）正逐步从实验室走向现实应用，其核心能力在于能够理解屏幕截图并执行键盘、鼠标操作，以完成跨Web和OS环境的复杂任务。然而，这种跨越信息边界的能力也引入了独特的安全威胁：**间接提示注入（Indirect Prompt Injection）**。攻击者可将恶意指令嵌入网页、文档或聊天消息中，当CUA处理这些内容时，注入的指令可能劫持其行为，导致数据泄露、系统破坏等严重后果。
 
@@ -82,7 +84,9 @@ REDTEAMCUA在现有评估框架中（如OSWorld、WebArena）处于独特位置�
 
 上述缺口共同指向一个核心瓶颈：**缺乏一个既现实、又可系统控制攻击暴露条件的评估框架**，使得对CUA间接提示注入脆弱性的理解停留在零散案例层面，无法形成对跨环境攻击路径的结构化认知。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 REDTEAMCUA框架的核心创新在于通过四个关键槽位（changed slots）的系统性改造，将CUA的对抗性评估从“导航能力与安全健壮性混淆”的粗糙状态，推进到“可控、可复现、可归因”的工程化阶段。
 
@@ -94,7 +98,7 @@ REDTEAMCUA框架的核心创新在于通过四个关键槽位（changed slots）
 
 **评估指标：从单一ASR到ASR+AR双维度。** 仅凭基于执行结果的ASR无法区分“代理未尝试攻击”与“尝试但失败”的情况。REDTEAMCUA引入**Attempt Rate（AR）**——使用GPT-4o作为LLM-as-a-Judge，判断轨迹中是否出现执行对抗目标的意图（Section 5.1）。这一细粒度指标揭示了深层脆弱性：GPT-4o的AR高达92.45%，而ASR为66.19%（Table 1），表明大量攻击尝试因执行能力不足而未成功——一旦CUA能力提升，这些“尝试但失败”的案例可能转化为成功攻击。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_yWwrgcBoK3/figures/001_Figure_1.jpg]]
 *Figure 1: Our REDTEAMCUA framework features a hybrid environment sandbox, combining a VM-based OS and Docker-based web replicas, to enable controlled and systematic analysis of CUA vulnerabilities in adversarial scenarios spanning both web and OS environments. A high-resolution screenshot of the forum webpage containing the injection is shown in Figure 5*
@@ -131,7 +135,7 @@ REDTEAMCUA 是一个面向计算机使用代理（CUA）的对抗性测试框架
 
 基于上述框架，作者构建了 **RTC-BENCH** 基准，包含 **864个对抗示例**（9个良性目标 × 24个对抗目标 × 4种实例化类型）。对抗目标基于CIA三元组（机密性、完整性、可用性）设计，覆盖文件泄露、系统篡改、服务中断等关键安全维度。
 
-## 核心模块与公式推导
+
 
 ### 3.1 混合沙盒架构
 
@@ -180,7 +184,9 @@ $$AR = \frac{\text{LLM判定代理尝试执行对抗目标的任务数}}{\text{�
 
 AR使用GPT-4o对完整交互轨迹进行判断，评估代理是否表现出执行对抗目标的意图，无论最终是否成功。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 评估设置与基准
 
@@ -266,7 +272,9 @@ Table 8揭示了多个关键因素的因果效应：
 ![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_yWwrgcBoK3/figures/020_Table_11.jpg]]
 *Table 11: SR (Decoupled Eval setting) under attack across three platforms and CIA categories*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有评估框架的关系
 
@@ -313,6 +321,8 @@ REDTEAMCUA 的定位在于填补当前 CUA 对抗性评估中“混合 Web-OS �
 4. **平台特性的量化影响**：消融研究显示 OwnCloud 上代码注入更有效，RocketChat 上语言注入更有效（Table 8），但平台信任度、界面设计等因素对 ASR 的具体量化影响尚不明确。
 
 5. **开源 CUA 的安全性**：随着开源 CUA 能力的提升，其对抗鲁棒性如何？是否需要社区构建专门的对抗训练数据集？
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,7 @@ paper_level: A
 venue: arXiv
 year: 2024
 pdf_ref: paperPDFs/arxiv_2024/A_Comprehensive_Survey_on_Human_Video_Generation_Challenges_Methods_and_Insights.pdf
+project_link: null
 code_link: https://github.com/wentaoL86/Awesome-Human-Body-Video-Generation
 aliases:
 - CSHVGCMI
@@ -37,7 +38,11 @@ claims:
 | Method | Survey |
 | Dataset |  |
 
-## 概述
+
+> [!tip] 效果简介
+> 量化结果、消融证据与适用边界见“实验与关键发现”。
+
+## 概要
 
 人体视频生成旨在根据文本、音频或姿态等多模态条件信号，合成逼真且时序连贯的人体运动视频。该任务的核心瓶颈可归结为四点：**人体外观沿时间序列的一致性维持**、**肢体变形（如手指异常）的敏感性**、**人体运动与环境背景的协调建模**，以及**多模态条件信号与生成视频的语义和时间对齐**（置信度 0.95）。Fig. 1 展示了典型多条件人体视频生成方法与挑战的概览。
 
@@ -47,7 +52,7 @@ claims:
 
 需要注意的是，本综述未提供跨方法的定量基准测试，因此难以直接比较不同方法的性能优劣，各方法的性能评估需参考其原始论文的实验设置。
 
-## 背景与动机
+
 
 ### 问题背景与核心瓶颈
 
@@ -79,7 +84,9 @@ claims:
 
 需要指出的是，本综述范围限定于 2D 人体视频生成，未系统涵盖 3D 方法，且未提供跨方法的定量基准测试，不同方法间的性能优劣需结合原始论文的实验设置审慎解读。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本综述的核心创新在于**提出了一套系统化的三维分类框架**，将人体视频生成领域划分为文本驱动、音频驱动和姿态驱动三大子任务，并围绕该框架梳理了各子任务在方法演化、数据资源和评估体系上的全景图。
 
@@ -108,7 +115,7 @@ claims:
 
 基于对现有方法的全面分析，综述指出了六个关键开放问题：大规模高质量数据集构建、长视频生成、照片级真实感、扩散模型效率优化、细粒度可控性以及交互性。这些方向的识别并非简单罗列，而是从当前方法的共同局限性中推导得出——例如，两阶段流水线虽被广泛采用，但其计算效率和对长序列的扩展能力仍构成实际部署的瓶颈。
 
-## 整体框架
+
 
 本综述将人体视频生成问题解构为三个核心驱动范式：**文本驱动**、**音频驱动**和**姿态驱动**，并抽象出一条贯穿各范式的通用生成流水线。图 1 概括了典型的多条件人体视频生成方法与核心挑战。
 
@@ -141,7 +148,7 @@ claims:
 ![[assets/figures/papers/paper_list_l1828_A_Comprehensive_Survey_on_Human_Video_Generation_Challenges_Methods_and/figures/001_Figure_1.jpg]]
 *Figure 1: An overview of typical Multi-Condition human video generation methods and challenges*
 
-## 核心模块与公式推导
+
 
 本综述为系统性文献调研，未提出新的算法架构或公式，因此本节不包含原创公式推导。以下基于综述所梳理的方法脉络，归纳人体视频生成任务中反复出现的**关键功能模块**及其作用机制。
 
@@ -179,7 +186,9 @@ claims:
 ![[assets/figures/papers/paper_list_l1828_A_Comprehensive_Survey_on_Human_Video_Generation_Challenges_Methods_and/figures/008_Figure_5.jpg]]
 *Figure 5: An overview of pose-guided human video generation approaches. Examples come from [98] and [8]*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 综述性质说明
 
@@ -248,7 +257,9 @@ TABLE I 汇总了人体视频生成的评估指标，可分为三类：
 ![[assets/figures/papers/paper_list_l1828_A_Comprehensive_Survey_on_Human_Video_Generation_Challenges_Methods_and/figures/003_Figure_2.jpg]]
 *Figure 2: Some examples of human video datasets and annotation formats*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定义与核心瓶颈
 
@@ -319,6 +330,8 @@ TABLE I 汇总了人体视频生成的评估指标，可分为三类：
 - **交互性**：支持用户实时编辑与交互式生成是走向实用化的重要方向。
 
 需要指出的是，由于本综述未提供跨方法的定量基准测试，不同范式与具体方法之间的性能优劣难以直接比较，相关结论需结合原始论文的实验设置进行审慎解读。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICML
 year: 2021
 pdf_ref: paperPDFs/ICML_2021/Image_Level_or_Object_Level_A_Tale_of_Two_Resampling_Strategies_for_Long_Tailed_Detection.pdf
+project_link: null
+code_link: https://github.com/NVlabs/RIO
 aliases:
 - ILOOLTTRSLTD
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | 图像级还是物体级？长尾检测中两种重采样策略的博弈 |
 | 英文题名 | Image-Level or Object-Level? A Tale of Two Resampling Strategies for Long-Tailed Detection |
 | 会议/期刊 | ICML 2021 |
-| Links | [paper](https://arxiv.org/abs/2104.05702); [GitHub](https://github.com/NVlabs/RIO) |
+| Links | [paper](https://arxiv.org/abs/2104.05702) · [GitHub](https://github.com/NVlabs/RIO) |
 | Topic | #topic/optimization_theory_probabilistic #topic/optimization_theory_probabilistic/optimization_methods |
 | Method | RIO |
 | Dataset | LVIS v1.0 detection, LVIS v1.0 segmentation |
@@ -40,7 +42,7 @@ claims:
 > - LVIS v1.0 detection 上，AP_r (rare box AP) 为 14.6，对比 10.7 (RFS)，变化 +3.9。
 > - LVIS v1.0 segmentation 上，APm (mask AP) 为 23.7，对比 22.9 (RFS)，变化 +0.8。
 
-## 概述
+## 概要
 
 长尾分布是目标检测在真实场景中面临的核心挑战：数据集中少数“频繁类”（head classes）占据绝大多数训练样本，而大量“稀有类”（tail classes）仅有极少样本，导致模型对稀有类检测能力严重不足。现有的重采样策略主要在**图像级**操作——例如经典的**RFS**（Repeat Factor Sampling，Gupta et al., CVPR 2019）通过提高包含稀有类的图像的出现频率来缓解类别不平衡。然而，这种策略存在一个关键瓶颈：重采样整张图像会同时增加该图像中所有物体（包括频繁类）的实例数，导致频繁类被过度重采样，而稀有类依然训练不充分。
 
@@ -49,8 +51,6 @@ claims:
 进一步地，作者证明图像级与物体级重采样并非互斥，而是互补：RFS加速记忆库的更新频率，OCS则利用记忆回放提供跨图像、跨模型快照的多样化特征，同时避免频繁类实例膨胀。二者联合构成统一框架**RIO**（Resampling at Image-level and Object-level）。
 
 在LVIS v1.0长尾检测基准上，RIO相比仅使用RFS将稀有类检测AP从10.7提升至14.6（+3.9），整体AP从23.3提升至24.1，且频繁类性能几乎无损。消融实验证实，记忆回放所提供的历史特征多样性是性能提升的关键，若仅简单重复当前批次的稀有对象特征而不使用记忆库，性能将大幅下降。该方法在多个骨干网络和LVIS v0.5/v1.0数据集上均取得领先结果，验证了联合重采样策略的有效性与泛化性。
-
-## 背景与动机
 
 ### 问题背景：长尾分布下的目标检测
 
@@ -75,7 +75,7 @@ claims:
 
 基于此，本文提出一种**基于动态记忆库的物体中心记忆回放策略**（Object-Centric Memory Replay），通过维护稀有类RoI特征的动态队列，在训练过程中回放历史特征，实现隐式的物体级重采样与特征增强。进而，将该策略与图像级RFS联合，形成统一的**RIO**（Resampling at Image-level and Object-level）框架，同时从两个粒度平衡数据分布。
 
-## 核心创新
+## 核心方法与创新机理
 
 本文的核心创新在于揭示并解决了长尾检测中图像级重采样（Image-Level Resampling）与物体级重采样（Object-Level Resampling）之间的根本性矛盾，并提出了一种统一的联合重采样框架 **RIO**（Resampling at Image-level and Object-level）。
 
@@ -112,8 +112,6 @@ claims:
 
 基于此洞察，RIO 框架将二者联合：**RFS 负责在图像层面提升稀有类的曝光率，OCS 负责在物体层面精确平衡实例分布并增强特征多样性**。消融实验（Figure 6c）证实，若移除记忆库、仅简单重复当前批次中的稀有对象特征，所有类别性能均大幅下降，这证明了记忆回放所带来的**历史特征多样性**是性能提升的关键，而非简单的重复采样。
 
-## 整体框架
-
 RIO 框架的核心设计思想是**在长尾目标检测中同时执行图像级与物体级两种互补的重采样**，以克服单纯图像重采样（如 RFS）无法充分平衡物体级分布的根本瓶颈。其整体 pipeline 以 Mask R-CNN + FPN 为基础检测架构，并在训练循环中嵌入两个关键模块：**RFS 图像级重采样模块**与**基于动态记忆库的物体中心重采样（OCS）模块**。
 
 ### 输入输出流
@@ -142,8 +140,6 @@ RIO 中图像级与物体级重采样并非简单叠加，而是形成**互为�
 
 ![[assets/figures/papers/paper_list_l27_https_arxiv_org_abs_2104_05702/figures/011_Figure_6.jpg]]
 *Figure 6: Ablations studies. (a) The effect of targeted classes on detection performance. (b) The effect of sampled object number from a memory bank on detection performance. (c) Baseline method which simply repeats the RoI features of targeted classes in each batch instead of using memory bank*
-
-## 核心模块与公式推导
 
 ### 类别划分与重复因子
 
@@ -204,7 +200,7 @@ RIO将上述两种重采样统一为端到端框架：
 
 二者的互补关系构成RIO的核心洞察：RFS为记忆库提供持续的特征供给，OCS则利用记忆库消除RFS的频繁类过采样副作用，同时通过跨时间步的特征回放实现隐式增强。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心瓶颈验证：图像级重采样的“副作用”
 
@@ -241,11 +237,6 @@ RIO联合图像级重采样（RFS）与基于记忆库的物体级重采样（OC
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l27_https_arxiv_org_abs_2104_05702/figures/004_Figure_4.jpg]]
-*Figure 4: Image-level and object-level resampling analysis. Start from the leftmost to the rightmost figure: (a) The number of instances per category with image resampling (RFS). (b) Total number of instances per category type. (c) Memory bank update frequency for some rare classes. (d) The number of instances per category with image and object resampling (RIO)*
-
-![[assets/figures/papers/paper_list_l27_https_arxiv_org_abs_2104_05702/figures/010_Figure.jpg]]
-
 ![[assets/figures/papers/paper_list_l27_https_arxiv_org_abs_2104_05702/figures/005_Table_1.jpg]]
 *Table 1: Ablation study and comparison to resampling and reweighting baselines on LVIS v0.5, where † and ‡ indicate results from the paper and GitHub of (Tan et al., 2020), respectively*
 
@@ -261,7 +252,7 @@ RIO联合图像级重采样（RFS）与基于记忆库的物体级重采样（OC
 ![[assets/figures/papers/paper_list_l27_https_arxiv_org_abs_2104_05702/figures/012_Table_5.jpg]]
 *Table 5: Detection and segmentation results on LVIS v1.0*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 与长尾检测基线的谱系关系
 

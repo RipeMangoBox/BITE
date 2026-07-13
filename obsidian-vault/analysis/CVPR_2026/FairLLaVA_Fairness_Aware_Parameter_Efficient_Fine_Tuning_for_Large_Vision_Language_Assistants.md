@@ -43,7 +43,7 @@ claims:
 > - PadChest 上，ES-Acc (Gender) 2.53 (FairLLaVA-All) vs 0.40 (LLaVA-Rad) (+2.13)。
 > - HAM10000 上，ES-Acc (Age) 2.63 (FairLLaVA-All) vs 1.18 (LLaVA-Rad) (+1.45)。
 
-## 概述
+## 概要
 
 大型视觉语言模型（LVLMs）在医学影像报告生成中展现出巨大潜力，但其训练过程中往往利用图像中潜伏的人口统计信息（如种族、年龄、性别）作为捷径，导致不同群体间的性能产生显著差异。这一现象在安全关键的临床应用中构成严重风险——例如，**Figure 1** 揭示 LLaVA 的隐藏状态与人口属性之间存在非零互信息（MI），使得模型对“女性”群体的表现系统性偏低。
 
@@ -53,7 +53,7 @@ claims:
 
 与频率基础方法（重新加权、重新采样）和对抗性分类器方法相比，FairLLaVA 避免了灾难性遗忘和群体性能此消彼长的困境，实现了更优的公平‑效用权衡。消融实验进一步表明，联合训练人口属性分类器（DAC）与互信息最小化损失是获得稳健去偏效果的关键，而仅使用中间层隐藏状态进行互信息估计即可在大多数公平性间隙上取得显著缩小。
 
-## 背景与动机
+
 
 ### 多模态大语言模型在医学影像中的捷径学习
 
@@ -79,7 +79,9 @@ FairLLaVA 的提出基于一个关键洞察：**语言模型隐藏状态中编�
 
 该方法以轻量插件形式融入参数高效微调框架（LoRA），仅需在标准语言建模损失上附加互信息正则化项，无需改变基础模型架构，实现了公平性提升与总体性能保持的平衡。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题根因：隐藏状态中的人口统计捷径
 
@@ -125,7 +127,7 @@ FairLLaVA 与三类主流公平性方法形成鲜明对比：
 
 FairLLaVA 通过互信息正则化实现了更平衡的公平-效用取舍：在 MIMIC-CXR 上获得 12 项权益标度评分中的 7 项最优，涵盖 BLEU、RadGraph-F1 和 GREEN 多种评估指标（**Table 1**），同时总体临床性能与最优基线可比甚至更优。
 
-## 整体框架
+
 
 FairLLaVA 的整体流程围绕“冻结基础模型 + 轻量插件式去偏”展开，将公平性约束嵌入参数高效微调阶段，而非事后修正或数据重采样。其核心设计逻辑是：**多模态大语言模型（MLLM）的隐藏状态中编码了与人口统计属性（种族、年龄、性别）显著相关的互信息，这些信息被模型作为生成捷径利用，导致不同群体间的性能差距**（见 Figure 1）。FairLLaVA 通过在视觉指令微调阶段最小化隐藏状态与人口属性之间的互信息，迫使模型学习人口统计不变的表征，从而在保持总体生成质量的同时缩小群体间差距。
 
@@ -164,7 +166,7 @@ $$ \mathcal{L}_{total} = \lambda_1\mathcal{L}_{LM} + \lambda_2\mathcal{L}_{DIM} 
 - **参数高效**：仅训练 LoRA 适配器、投影仪 $\psi$ 和分类器 $\phi$，计算开销适度。
 - **多属性联合去偏**：支持同时对种族、年龄、性别三个属性进行互信息最小化（FairLLaVA-All），也可针对单一属性定向去偏（如 FairLLaVA-Race）。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化
 
@@ -237,7 +239,9 @@ FairLLaVA 以插件形式注入 LoRA 低秩适配器（Hu et al., ICLR 2022）�
 ![[assets/figures/papers/paper_list_l2677_https_arxiv_org_abs_2603_26008/figures/001_Figure_1.jpg]]
 *Figure 1: FairLLaVA reduces performance disparities. LLaVA hidden states contain demographic shortcuts (non-zero Mutual Information (MI) between hidden states and demographic attributes) that lead to lower performance for “Female”. FairLLaVA minimizes this MI promoting demographic-invariant representation learning, therefore reducing the performance gap*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -343,7 +347,9 @@ FairLLaVA 以插件形式注入 LoRA 低秩适配器（Hu et al., ICLR 2022）�
 ![[assets/figures/papers/paper_list_l2677_https_arxiv_org_abs_2603_26008/figures/020_Table_S.6.jpg]]
 *Table S.6: Fairness Gaps (First three main columns across Race, Age, Gender) and Overall performance (last column) on MIMIC CXR dataset. Highlights tradeoff between Overall-Performance and Fairness-Gaps. Fairness gaps lower the better, Overall performance higher the better*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -393,6 +399,8 @@ FairLLaVA 的设计决定了其适用边界存在以下约束：
 ### 4. 在知识库中的定位
 
 FairLLaVA 在 MLLM 公平性研究中的核心贡献在于：**将互信息最小化从传统表示学习领域引入多模态指令微调场景，并以参数高效的方式实现**。与现有的数据重平衡方法和对抗性去偏方法相比，它提供了一条更稳定、更轻量的技术路径。其“插件式”设计使其可以作为通用模块嵌入到各类 MLLM 的微调流程中，为后续研究提供了一个可扩展的公平性正则化框架。
+
+
 
 ## 原文 PDF
 

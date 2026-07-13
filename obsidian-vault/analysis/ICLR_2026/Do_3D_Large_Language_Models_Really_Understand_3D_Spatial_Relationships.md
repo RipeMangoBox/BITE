@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Do_3D_Large_Language_Models_Really_Understand_3D_Spatial_Relationships.pdf
+project_link: https://real-3dqa.github.io/
+code_link: null
 openreview_forum_id: 3vlMiJwo8b
 aliases:
 - R3B3RF3F
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 3D大语言模型真的理解3D空间关系吗？ |
 | 英文题名 | Do 3D Large Language Models Really Understand 3D Spatial Relationships? |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=3vlMiJwo8b); [Project](https://real-3dqa.github.io/) |
+| Links | [paper](https://openreview.net/forum?id=3vlMiJwo8b) · [Project](https://real-3dqa.github.io/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Real-3DQA Benchmark and 3D Reweighted Finetuning (3DR-FT) |
 | Dataset | Real-3DQA (LEO), Real-3DQA (Chat-Scene), Real-ScanQA (LEO), SQA3D vs Real-3DQA (LEO) |
@@ -42,7 +44,7 @@ claims:
 > - Real-3DQA (Chat-Scene) 上，EM_R 为 33.9，对比 22.1 (SFT)，变化 +11.8。
 > - Real-ScanQA (LEO) 上，EM_R 为 13.9，对比 6.1 (SFT)，变化 +7.8。
 
-## 概述
+## 概要
 
 现有3D大语言模型（3D-LLM）在3D问答基准测试上的高表现，很大程度上源于语言捷径而非真正的空间推理能力。核心瓶颈在于：当前基准（如SQA3D）中存在大量仅凭文本线索即可回答的问题，使得盲文本微调模型也能达到甚至超越完整3D-LLM的性能（**Figure 2**），这严重削弱了基准评估真实3D理解的有效性。
 
@@ -52,7 +54,7 @@ claims:
 
 在方法谱系上，Real-3DQA与3DR-FT定位于3D-LLM评估与训练的公平性改进：相较于仅依赖点云编码的**3D-LLM**（Hong et al., NeurIPS 2023）、结合多视图图像的**LEO**（Huang et al., ICML 2024）以及基于2D VLM的**GPT4Scene**（Qi et al., ICLR 2026）等基线模型，本工作通过系统性地剥离语言捷径并强化3D依赖性，为3D空间推理提供了更严格的评估基准和更有效的训练范式。
 
-## 背景与动机
+
 
 3D大语言模型（3D-LLM）旨在将点云等三维表示与语言模型结合，以执行三维场景问答（3D-QA）、视觉定位等空间推理任务。近年来，**3D-LLM**（Hong et al., NeurIPS 2023）、**Chat-3D v2**（Huang et al., ArXiv 2024）、**LEO**（Huang et al., ICML 2024）、**Chat-Scene**（Huang et al., NeurIPS 2024）以及基于2D VLM的**GPT4Scene**（Qi et al., ICLR 2026）等模型在SQA3D等主流基准上取得了持续的性能提升。然而，一个根本性问题始终悬而未决：这些模型的高分究竟源于真实的3D空间推理能力，还是依赖语言先验中的捷径？
 
@@ -70,7 +72,9 @@ claims:
 
 上述分析表明，现有3D-QA基准存在两个关键缺陷：（1）**3D无关问题泛滥**，大量问题可通过语言捷径回答，无法有效衡量真实的3D理解；（2）**缺乏视角鲁棒性评估**，无法检验模型是否真正内化了三维空间关系。因此，亟需一个经过严格去偏的基准，以及一种能够迫使模型真正依赖3D信息进行推理的训练策略。本文正是围绕这两个目标展开——构建Real-3DQA基准以过滤语言捷径，并提出3D重加权微调策略以增强模型的3D依赖性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于对3D大语言模型（3D-LLM）评估范式的根本性反思：**现有基准无法衡量真实的3D空间推理，因为它们充斥着语言捷径**。基于这一诊断，工作从评估和训练两个维度提出了系统性的解决方案。
 
@@ -100,7 +104,7 @@ claims:
 
 3DR-FT在Real-3DQA上带来显著提升：LEO的EM_R从SFT的19.1提升至29.3（+10.2），Chat-Scene从22.1提升至33.9（+11.8）（Table 4）。注意力分析进一步验证了机制的有效性——3DR-FT后模型对3D token的平均注意力得分显著提高（Figure 5），证实了3D依赖性的实质性增强。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_3vlMiJwo8b/figures/005_Figure_3.jpg]]
 *Figure 3: Overview of Real-3DQA Construction Process. Real-3DQA provides a fair and rigorous evaluation framework for 3D spatial reasoning in 3D-LLMs. The construction process begins with Filtering 3D-independent Questions, which removes questions that can be correctly answered by both the 3D-LLM model M _ { x } and its text-only M _ { x } ^ { b l i n d } counterpart, as well as those answerable by the GPT model without 3D input. The remaining high-quality questions Q _ { F i n a l } are then augmented using GPT, generating spatially consistent variations through viewpoint rotations while preserving the underlying 3D relationships. Finally, expert reviews eliminate redundancy and invalid data, ensuri...*
@@ -183,7 +187,7 @@ SQA3D训练集
 
 该框架的一个显著特征是**评估与训练的闭环设计**：过滤阶段利用盲模型诊断语言捷径，训练阶段则利用盲模型的惊喜比指导权重分配，两者共享“盲模型作为3D依赖度探针”这一核心思想。Table 1将Real-3DQA与现有基准进行了系统对比，突出其在去偏、视角鲁棒性评估和问题多样性方面的优势。
 
-## 核心模块与公式推导
+
 
 ### 3D独立问题过滤模块
 
@@ -231,7 +235,9 @@ $$\delta_{j} := \frac{p_{\theta}(\pmb{y}_{j} \mid \pmb{y}_{<j}, \pmb{x}_{\text{t
 
 $\delta_j > 0$ 表明引入3D上下文后该词元的预测概率相对提升，即模型确实利用了3D信息。该指标在附录E中用于分析模型行为，而非训练或评估的核心组件。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：现有基准的语言捷径与崩溃
 
@@ -286,7 +292,9 @@ Table 6对LEO在SQA3D上的推理过程进行了组件消融，以追溯其性�
 
 Table 5和Figure 7展示了各模型在Real-3DQA十种问题类型上的能力分布。雷达图（Figure 7）显示GPT4Scene在所有类别上均表现最优，但各模型在空间关系、形状识别和推理任务上普遍存在一致的缺陷。这一细粒度分析不仅揭示了当前3D-LLM的能力边界，也为未来的定向改进提供了明确的靶点。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题诊断：语言捷径主导的虚假评估
 
@@ -345,6 +353,8 @@ $$w_{j}(\pmb{y}, \pmb{x}_{\mathrm{text}}) := \frac{S_{\phi}(\pmb{y}, \pmb{x}_{\m
 4. **替代性去偏方法**：除过滤和重加权外，对抗训练、因果干预等方法是否也能有效移除语言捷径？这些方法在样本效率和泛化性上可能各有优劣。
 
 5. **动态场景扩展**：在包含物体运动、场景变化的动态3D环境中，语言捷径和3D依赖的边界可能更加模糊，该方法是否仍能有效提升3D理解？
+
+
 
 ## 原文 PDF
 

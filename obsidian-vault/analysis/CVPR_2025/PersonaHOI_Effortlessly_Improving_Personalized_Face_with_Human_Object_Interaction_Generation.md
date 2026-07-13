@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/PersonaHOI_Effortlessly_Improving_Personalized_Face_with_Human_Object_Interaction_Generation.pdf
+project_link: null
 code_link: https://github.com/JoyHuYY1412/PersonaHOI
 aliases:
 - PersonaHOI
@@ -42,7 +43,7 @@ claims:
 > - HOI-Specific Personalized Face Generation (PhotoMaker) 上，Interaction Alignment (%) 76.01 vs 56.77 (+19.24)。
 > - HOI-Specific Personalized Face Generation (IP-Adapter) 上，Interaction Alignment (%) 68.30 vs 49.83 (+18.47)。
 
-## 概述
+## 概要
 
 个性化人脸生成（Personalized Face Generation）旨在从单张参考图像中提取身份特征，并在多样化场景中保持身份一致性。然而，现有个性化人脸扩散模型（PFD）在面向人脸数据集的微调后，丧失了遵循复杂人物-物体交互（Human-Object Interaction, HOI）文本提示的能力，导致生成的肖像缺乏全身连贯性和交互性。预训练的 StableDiffusion 虽具备该能力，但无法保持身份一致性。这一瓶颈的根本原因在于：PFD 模型的身份特征被注入到整个图像空间，挤占了身体和物体的生成容量，而延迟注入身份虽能释放空间，却导致身份漂移（Figure 2b）。
 
@@ -50,7 +51,7 @@ PersonaHOI 提出了一种训练自由、即插即用的框架，将通用 Stabl
 
 实验表明，PersonaHOI 在 HOI 特定生成任务上显著提升交互对齐：FastComposer 提升 20.69%，PhotoMaker 提升 19.24%，IP-Adapter 提升 18.47%（Table 1）。在通用个性化生成任务上，身份保存和图像质量也获得一致改善。消融实验证实 CAC、LM、RM 三个组件缺一不可（Table 3），且低通-高通（Low-High）滤波器配置和递减核策略（2.5 → 0.5）达到最佳平衡（Figure 7, Table 6）。
 
-## 背景与动机
+
 
 ### 个性化人脸生成与人物-物体交互的冲突
 
@@ -68,7 +69,9 @@ PersonaHOI 的核心洞见来源于对 SD 和 PFD 模型各自优势的重新审
 
 基于此，PersonaHOI 提出了一种**无训练、即插即用**的融合策略：利用 SD 分支生成HOI布局，并通过空间掩模引导的方式，将 PFD 分支的身份特征**仅作用于面部区域**，而非面部区域则直接采用 SD 分支生成的交互内容。这一策略从根本上解耦了身份保持和交互生成两个任务，使得 PFD 模型无需牺牲其身份保持能力，即可获得 SD 模型的HOI生成能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题诊断：PFD 模型的身份–交互两难
 
@@ -133,7 +136,7 @@ $$R_{merged}^l = M_R^l \odot HP(R_{PFD}^l) + (1 - M_R^l) \odot LP(R_{SD}^l)$$
 
 与需要针对特定身份或交互类别进行微调的现有方法不同，PersonaHOI 是一种**训练自由、调优自由**的即插即用框架。其创新不在于提出新的扩散架构或损失函数，而在于发现并利用了两个现有模型（PFD 和 SD）之间的空间互补性，通过三个轻量级的掩模引导融合策略，在不修改任何预训练权重的前提下，将 SD 的交互布局能力“嫁接”到 PFD 的身份保持能力之上。这一范式使得 PersonaHOI 可以无缝兼容 FastComposer、IP-Adapter、PhotoMaker 等多种 PFD 模型及其对应的 SD 架构，展现出极强的通用性。
 
-## 整体框架
+
 
 PersonaHOI 的整体设计围绕一个核心矛盾展开：个性化人脸扩散模型（PFD）在微调后丧失了遵循复杂人物-物体交互（HOI）文本提示的能力，而预训练的 Stable Diffusion（SD）虽具备该能力，却无法保持身份一致性。为解决这一问题，PersonaHOI 提出了一种**训练自由、即插即用**的双分支并行去噪框架，将 PFD 模型的身份保持能力与 SD 分支的交互布局生成能力进行结构化融合。
 
@@ -176,7 +179,7 @@ PersonaHOI 的整体设计围绕一个核心矛盾展开：个性化人脸扩散
 
 三个核心模块之间存在明确的依赖与互补关系。CAC 是基础约束层，在注意力层面限制身份特征的作用范围；LM 是潜空间融合层，在全局层面完成面部与非面部区域的合并；RM 是细节增强层，在跳跃连接中补充高频身份细节。消融实验（Table 3）表明，三个组件缺一不可：移除任一组件都会导致身份保存或交互对齐的显著下降。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化
 
@@ -242,7 +245,9 @@ $$R_{merged}^l = M_R^l \odot HP(R_{PFD}^l) + (1 - M_R^l) \odot LP(R_{SD}^l)$$
 ![[assets/figures/papers/paper_list_l1743_PersonaHOI_Effortlessly_Improving_Personalized_Face_with_Human_Object_In/figures/002_Figure_2.jpg]]
 *Figure 2: (a) The spatial layout of StableDiffusion guides PersonaHOI to generate personalized content with coherent human-object interactions (HOI). (b) Analysis of identity injection timing in PFD models. We use FastComposer [34] for diffusion model generation. Injecting face representation at the start of image generation preserves facial details but lacks coherent HOI, while delayed injection continuously deviates from the original identity, resulting in random human features and meaningless human-object interactions*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 评估设置与基准
 
@@ -305,7 +310,9 @@ Table 5 报告了图像质量指标。以 FastComposer 为骨干时，PersonaHOI
 
 尽管 PersonaHOI 在 HOI 交互对齐上取得了显著提升，但存在以下已知局限：其一，方法依赖预训练 SD 的 HOI 生成能力，当交互极其复杂或物体罕见时，SD 分支自身无法生成合理的布局，导致融合结果失败；其二，IP-Adapter 集成后身份保存从 62.86% 下降至 55.74%（Table 1），尽管交互对齐大幅提升，但存在身份-交互的 trade-off，这与 IP-Adapter 的注意力机制特性有关；其三，头部掩模分割依赖 DensePose，在极端角度或遮挡下可能出现分割错误，进而影响融合质量；其四，双分支并行去噪增加了约一倍的推理计算开销，虽然免训练，但部署成本较高。这些局限指向了未来工作的方向：更鲁棒的掩模分割、更轻量的分支设计，以及在身份保存与交互对齐之间更精细的平衡策略。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位与瓶颈分析
 
@@ -345,6 +352,8 @@ PersonaHOI 的有效性建立在以下前提之上，超出这些边界时性能
 2. **计算效率优化**：双分支并行去噪的开销能否通过权重共享、模型蒸馏或异步去噪策略降低，是实际部署的关键瓶颈。
 3. **视频 HOI 生成**：当前框架仅处理单帧图像，扩展到视频需解决时序一致的身份保存和交互连贯性问题。
 4. **身份-文本一致性 trade-off 的缓解**：在 IP-Adapter 等弱身份注入模型上，如何在提升交互对齐的同时不牺牲身份保存，可能需要更精细的注意力约束策略或自适应掩模权重。
+
+
 
 ## 原文 PDF
 

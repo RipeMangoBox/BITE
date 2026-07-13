@@ -5,6 +5,7 @@ paper_level: A
 venue: NeurIPS
 year: 2021
 pdf_ref: paperPDFs/NEURIPS_2021/Ultrahyperbolic_Neural_Networks.pdf
+code_link: null
 project_link: "https://openreview.net/forum?id=sf2BxJNXC3K"
 aliases:
 - UNN
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | 超双曲神经网络 |
 | 英文题名 | Ultrahyperbolic Neural Networks |
 | 会议/期刊 | NeurIPS 2021 |
-| Links | [paper](https://openreview.net/attachment?id=sf2BxJNXC3K&name=supplementary_material); [Project](https://openreview.net/forum?id=sf2BxJNXC3K) |
+| Links | [paper](https://openreview.net/attachment?id=sf2BxJNXC3K&name=supplementary_material) · [Project](https://openreview.net/forum?id=sf2BxJNXC3K) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | Ultrahyperbolic Neural Networks |
 | Dataset | Citeseer (node classification, d=4), Cora (node classification, Pubmed (node classification, Collab (graph classification, d=64) |
@@ -41,7 +42,7 @@ claims:
 > - Cora (node classification, d=4) 上，Test accuracy (%) 为 64.7±5.3 (P_1^{3,1})，对比 53.5±4.3 (Euclidean R^4)，变化 +11.2。
 > - Pubmed (node classification, d=4) 上，Test accuracy (%) 为 73.1±0.6 (P_1^{1,3})，对比 66.9±2.3 (Euclidean R^4)，变化 +6.2。
 
-## 概述
+## 概要
 
 **问题瓶颈**：在原始的伪球面（pseudo-sphere）$S_r^{p,q}$ 上，存在无法由完整测地线连接的点对，导致梯度不能平行传输，从而无法有效地优化参数化模型（如神经网络）。这一几何缺陷直接阻碍了将双曲神经网络的成功经验推广到更一般的超双曲空间。
 
@@ -51,7 +52,7 @@ claims:
 
 **主要结果**：在引文网络节点分类任务上，4 维超双曲表示显著优于欧几里得基线——Cora 提升 +11.2%（64.7±5.3 vs 53.5±4.3），Citeseer 提升 +7.3%（51.8±2.6 vs 44.5±5.9），Pubmed 提升 +6.2%（73.1±0.6 vs 66.9±2.3）。在带环的层次图分类任务上优势更为突出：蛋白质数据集 D&D 达到 81.97±3.41（欧氏基线 76.93±7.21），Enzymes 达到 50.50±6.71（欧氏基线 43.83±10.3）。不同签名 $(p,q)$ 的消融实验表明，混合签名（如 $\mathcal{P}_1^{1,3}$、$\mathcal{P}_1^{3,1}$）通常优于纯双曲或纯椭圆退化情形。训练时间较欧几里得方法慢约 25%，在高维（$d=600$）过参数化时各流形性能趋同。
 
-## 背景与动机
+
 
 ### 1. 图表示学习的几何化趋势
 
@@ -73,7 +74,9 @@ claims:
 
 这一构造使得在商流形上定义完整的黎曼优化框架成为可能：前向传播将数据映射到商流形上的表示，反向传播通过水平提升算子和平行传输在切空间中计算并回传梯度。由此，本文首次实现了在超双曲空间中端到端学习的深度神经网络，为同时编码层次、循环和混合拓扑模式的图表示学习开辟了新路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于**通过对跖点商空间构造，首次将伪黎曼几何引入可端到端学习的深度神经网络**。此前的超双曲表示工作（如 Law & Stam, 2020）仅能进行非参数化的嵌入，无法在伪球面 $S_r^{p,q}$ 上优化参数化模型。其根本瓶颈在于：在原始伪球面上，存在无法由完整测地线连接的点对，导致黎曼梯度下降所需的平行传输与梯度流断裂。
 
@@ -115,7 +118,7 @@ claims:
 
 本工作的核心洞察在于：**通过对跖点商空间消除测地线断裂，将伪黎曼几何的灵活表示能力（可同时编码类空、类时和类光关系）与可导性协调**，从而首次实现了在超双曲空间中端到端学习的深度神经网络。这一创新在层次图分类任务上得到了验证——例如在 D&D 数据集上，超双曲 GCN 达到 81.97% 准确率，显著优于欧氏 GCN 的 76.93%（Table 5, confidence 0.95）。
 
-## 整体框架
+
 
 超双曲神经网络（Ultrahyperbolic Neural Networks）的整体框架围绕一个核心几何构造展开：将对跖点等价的**商流形** `$\mathcal{P}_r^{p,q} = \mathcal{S}_r^{p,q} / \{\pm 1\}$` 作为表示空间，以解决原始伪球面 `$\mathcal{S}_r^{p,q}$` 上测地线断裂导致梯度无法平行传输的根本瓶颈。该框架将伪黎曼几何的灵活表示能力与端到端可导性协调，形成四个紧密耦合的模块。
 
@@ -145,7 +148,7 @@ claims:
 
 该框架的**核心洞察**在于：通过对跖点商空间消除测地线断裂，使得任意两点间至少存在一条测地线，从而将伪黎曼几何的表示能力与基于梯度的优化统一起来。训练时间比欧几里得方法慢约 25%，主要开销来自伪黎曼梯度中的正交投影和平行传输计算。
 
-## 核心模块与公式推导
+
 
 ### 3.1 商流形的构造与测地线完备性
 
@@ -243,7 +246,9 @@ $$\omega_\varepsilon^{-1}(\mathbf{a}) = \frac{1}{1 + \langle\mathbf{a},\mathbf{a
 
 > **训练开销**：由于需要计算伪黎曼梯度（含正交投影）和平行传输，超双曲模型的训练时间比欧几里得模型慢约 25%（Section 5.1, Table 1）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -314,7 +319,9 @@ Figure 2（右）展示了在 Zachary 空手道俱乐部上学得的 $\mathcal{P
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_attachment_id_sf2BxJNXC3K_name_supplementary_materi/figures/004_Table_2.jpg]]
 *Table 2: Statistics of the citation network datasets*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -361,6 +368,8 @@ Law & Stam (2020) 在超双曲空间上学习了非参数嵌入，但由于原�
 3. **大规模可扩展性：** 在百万级节点图上，超双曲 GCN 的扩展性如何？是否可以通过近似平行传输或随机梯度下降的变体来降低计算开销？
 4. **签名自动推断：** 能否设计一种元学习或神经架构搜索方法，从数据中自动推断最优签名 $(p,q)$，而非依赖昂贵的网格搜索？
 5. **社会影响的双面性：** 论文指出该方法改进的图表示能力可能被用于社交网络分析，具有正反两面社会影响。如何在技术部署中建立负责任的审计机制，防止对特定群体的歧视性推断，是一个值得关注的伦理问题。
+
+
 
 ## 原文 PDF
 

@@ -42,7 +42,7 @@ claims:
 > - Replica (1.0m baseline) 上，WS-PSNR / SSIM / LPIPS 28.89 / 0.937 / 0.081 vs 28.83 / 0.935 / 0.091 (PanSplat) (+0.06 / +0.002 / -0.010)。
 > - Residential (0.3m baseline) 上，WS-PSNR / SSIM / LPIPS 28.17 / 0.866 / 0.156 vs 27.61 / 0.857 / 0.195 (OmniScene) (+0.56 / +0.009 / -0.039)。
 
-## 概述
+## 概要
 
 全景新视角合成旨在从一幅或稀疏几幅全景图像出发，生成任意新视角下的360°视图。现有前馈方法大多将针孔3D高斯喷溅（3DGS）架构直接迁移至全景域，沿用**笛卡尔三平面**或**成本体积**来表示场景几何。然而，全景图像固有的环绕结构与曼哈顿世界假设使得笛卡尔表示难以有效刻画几何扭曲与遮挡区域，导致重建中出现伪影、孔洞和几何不一致——这是当前方法的**核心瓶颈**。
 
@@ -50,7 +50,7 @@ claims:
 
 实验表明，CylinderSplat在多个基准上取得领先性能。在Matterport3D两视图重建中，WS-PSNR达到23.76，较此前最优方法OmniScene（Wei et al., 2025）提升+1.01 dB；在更具挑战性的单视图设定下，领先幅度扩大至+1.63 dB。消融研究进一步验证了圆柱Triplane相对于笛卡尔和球面三平面的显著优势，以及RGB检索机制、课程训练策略等设计的关键作用。在宽基线真实场景（20–30m）中，CylinderSplat比OmniScene领先+3.95 dB WS-PSNR，展现出在极端稀疏视角下的鲁棒性。
 
-## 背景与动机
+
 
 ### 全景新视角合成的挑战
 
@@ -74,7 +74,9 @@ claims:
 
 这种设计使得方法在单视图和稀疏多视图输入下，均能实现高几何一致性的全景新视角合成。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CylinderSplat 的核心创新在于**将前馈3D高斯喷溅（3DGS）的几何表示从笛卡尔坐标系迁移至圆柱坐标系**，并围绕这一表示设计了**双分支协同架构**与**RGB检索机制**，系统性地解决了全景新视角合成中几何扭曲、遮挡补全和颜色细节恢复三大瓶颈。
 
@@ -111,7 +113,7 @@ CylinderSplat 采用 **UniK3D** 作为深度先验，替代 PanSplat 和 Splatte
 
 上述创新并非孤立存在，而是形成了系统性的协同：圆柱三平面为体积分支提供了高效的几何表示空间，使得遮挡补全成为可能；双分支架构将可见区域的高精度重建与遮挡区域的几何推理解耦，避免相互干扰；RGB检索机制弥补了体积分支在颜色细节上的不足；课程训练策略确保了两个分支的平稳融合。这一协同在宽基线真实场景（Kansas 数据集，20-30m基线）中得到最极致的体现：CylinderSplat 相比 OmniScene 领先 +3.95 dB WS-PSNR（Table 13），性能差距随基线增大而扩大，验证了圆柱三平面在极端稀疏视角下的结构性优势。
 
-## 整体框架
+
 
 CylinderSplat 提出了一种**双分支前馈架构**，用于从单张或稀疏全景图像中重建3D高斯场景表示并合成新视角。整个框架围绕一个核心洞察构建：**圆柱坐标系天然契合全景图像的环绕几何特性**，能够更高效地编码曼哈顿世界中的扭曲和遮挡区域。
 
@@ -177,7 +179,7 @@ $$\mathcal{L}_{\text{render}} = \|\hat{I} - I_{\text{gt}}\|_1 + 0.05 \cdot \math
 ![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_lEzkct87Uy/figures/001_Figure_1.jpg]]
 *Figure 1: This paper introduces CylinderSplat, a feed-forward panoramic 3D Gaussian Splatting (3DGS) framework for panoramic novel view synthesis from single (left) or sparse (right) input views*
 
-## 核心模块与公式推导
+
 
 ### 3.1 双分支架构总览
 
@@ -243,7 +245,9 @@ $$\mathcal{L}_{\text{render}} = \|\hat{I} - I_{\text{gt}}\|_1 + 0.05 \cdot \math
 ![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_lEzkct87Uy/figures/020_Figure_10.jpg]]
 *Figure 10: Visualizing the advantages of the cylindrical Triplane. (a) The shape of the sampling volumes for each coordinate system when fitting a typical synthetic scene, highlighting their geometric alignment. (b) Feature distribution during Triplane initialization. At this stage, panoramic feature point clouds are projected onto the Triplane surfaces. The Cartesian system suffers from heavy point overlap, where many distinct 3D feature points are projected to the same grid cells. In contrast, the spherical and cylindrical systems achieve a much more even distribution of features. (c) Projection patterns for Triplane-to-Image Attention. We visualize how sample points from each Triplane’s volume proj...*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 
@@ -317,7 +321,9 @@ Table 7 在 Matterport3D 上使用真实深度进行几何精度评估。Cylinde
 ![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_lEzkct87Uy/figures/013_Figure_7.jpg]]
 *Figure 7: Ablation study visualizations on Matterport3D (leftmost column is ground truth). Among the different coordinate systems for the Triplane, the Cartesian version shows significant distortion, and the spherical version struggles with distant rooms. Our cylindrical Triplane performs best. While the pixel branch is highquality in visible areas, combining it with the Triplane branch improves reconstruction of distant regions*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 全景新视角合成的方法演化
 
@@ -353,6 +359,8 @@ CylinderSplat 与现有方法的核心差异体现在三个层面：
 - 能否将方法扩展为显式处理动态场景，例如引入运动掩码或时序建模来抑制瞬态物体的影响？
 - 在非曼哈顿弯曲结构（如森林、圆顶建筑）中，是否存在比圆柱Triplane更通用的表示形式？自适应坐标系选择是否可行？
 - 极宽基线场景下的细节恢复瓶颈是否可以通过引入生成式先验或超分辨率模块来缓解？
+
+
 
 ## 原文 PDF
 

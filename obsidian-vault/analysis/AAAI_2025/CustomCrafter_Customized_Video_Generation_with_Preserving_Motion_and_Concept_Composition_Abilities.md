@@ -5,6 +5,8 @@ paper_level: A
 venue: AAAI
 year: 2025
 pdf_ref: paperPDFs/arxiv_2024/CustomCrafter_Customized_Video_Generation_with_Preserving_Motion_and_Concept_Composition_Abilities.pdf
+project_link: null
+code_link: https://github.com/WuTao-CS/CustomCrafter
 aliases:
 - CustomCrafter
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名    | CustomCrafter：保留运动与概念组合能力的定制视频生成                                                                                  |
 | 英文题名    | CustomCrafter: Customized Video Generation with Preserving Motion and Concept Composition Abilities               |
 | 会议/期刊   | AAAI 2025                                                                                                         |
-| Links   | [paper](https://arxiv.org/abs/2408.13239); [GitHub](https://github.com/WuTao-CS/CustomCrafter)                    |
+| Links   | [paper](https://arxiv.org/abs/2408.13239) · [GitHub](https://github.com/WuTao-CS/CustomCrafter)                    |
 | Topic   | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method  | CustomCrafter                                                                                                     |
 | Dataset | 20个定制主题的文本驱动视频生成（跨10个相关prompt），基模型VideoCrafter2, 同上                                                       |
@@ -40,7 +42,7 @@ claims:
 > - 同上 上，CLIP-I (图像相似度↑) 为 0.786，对比 0.748 (DreamVideo*)，变化 +0.038。
 > - 同上 上，DINO-I (特征相似度↑) 为 0.627，对比 0.536 (DreamVideo*)，变化 +0.091。
 
-## 概述
+## 概要
 
 **核心瓶颈**：在仅使用静态图像对视频扩散模型（VDM）进行主题定制微调时，模型会严重遗忘其固有的运动生成能力与概念组合能力。现有方法（如 **DreamVideo**，Wei et al., CVPR 2024）试图通过额外引入目标运动视频作为引导或进行二次微调来恢复这些能力，但这对普通用户而言极为不便——获取高质量运动视频本身就是一个高门槛需求。
 
@@ -55,7 +57,7 @@ claims:
 
 **主要结果**：在 20 个定制主题、跨 10 个相关提示的文本驱动视频生成基准上，CustomCrafter 在四项自动指标上全面超越对比方法——CLIP-T（文本对齐）达 0.318（+0.023 vs DreamVideo*），CLIP-I（图像相似度）达 0.786（+0.038），DINO-I（特征相似度）达 0.627（+0.091），时间一致性达 0.994。用户研究（38 名参与者评估 40 个视频）进一步证实，该方法在文本对齐、主题保真度和运动流畅性上均获得最高人类偏好（Figure 6）。消融实验验证了 SSLM 对主题外观捕获的关键作用（CLIP-I 提升 0.038），以及 DWVSS 在几乎不损失主题保真度的情况下显著改善文本对齐与运动质量的能力（CLIP-T 从 0.310 提升至 0.318）。
 
-## 背景与动机
+
 
 **核心瓶颈**：现有的视频定制生成方法在仅使用静态图像对视频扩散模型（VDM）进行主题微调时，会遭遇一个关键矛盾——模型虽然学会了新主题的外观，却遗忘了其固有的**运动生成能力**与**概念组合能力**。部分工作（如DreamVideo）试图通过引入额外视频来分别学习运动与外观，但这要求用户提供视频引导或进行多次重新微调，极大增加了使用门槛。
 
@@ -63,7 +65,9 @@ claims:
 
 **核心动机**：基于上述发现，本文试图回答一个关键问题：**能否在不引入任何额外视频、仅通过单阶段训练的前提下，同时保留VDM的运动生成与概念组合能力，并实现高保真的主题定制？** 这要求设计一种机制，在推理时动态调节主题学习模块的影响强度，使其仅在需要修复外观的后期阶段发挥作用，而在早期运动布局阶段“静默”，从而避免干扰模型原有的运动先验。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CustomCrafter 的核心创新在于**首次揭示并利用视频扩散模型（VDM）去噪过程的阶段性特征**，将运动生成与外观修复解耦，从而在不引入额外视频或多次微调的前提下，同时保留模型的固有运动生成能力和概念组合能力。
 
@@ -104,7 +108,7 @@ SSLM 和 DWVSS 并非孤立工作，而是形成了完整的协同机制：SSLM 
 - 去噪过程的运动-外观解耦现象仅在 VideoCrafter2 一种基模型上得到验证，其在不同 VDM 架构（如基于 Unet 或 DiT 的模型）上的普适性尚需进一步证明；
 - 对于极端运动幅度或长时间生成场景，运动生成能力的保持效果尚未评估。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l6_CustomCrafter_Customized_Video_Generation_with_Preserving_Motion_and_Con/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of our approach with previous work. Our method can better learn the appearance of the subject while preserving the concept combination ability and motion generation ability, only requires one stage of training without additional videos. DWV Sampling Strategy is our Dynamic Weighted Video Sampling Strategy*
@@ -125,7 +129,7 @@ CustomCrafter 的完整流程围绕一个核心观察展开：视频扩散模型
 
 **输入输出流**：系统接收一张目标主题的静态图像和一段描述目标动作与场景的文本提示。训练阶段，仅通过静态图像学习 SSLM 的 LoRA 参数和文本反转嵌入。推理阶段，用户提供包含 $V^*$ 的文本提示，DWVSS 策略自动调度 LoRA 权重，最终输出一段既保持主题高保真外观、又具备流畅运动且能正确组合文本概念的视频。整个流程无需任何额外视频引导或多次微调。
 
-## 核心模块与公式推导
+
 
 CustomCrafter 的核心由三个相互配合的模块构成：**空间主题学习模块（SSLM）** 负责从单张静态图像中学习新主题的外观；**动态加权视频采样策略（DWVSS）** 在推理阶段解耦运动生成与外观修复；**类特定先验保持损失** 则作为正则化手段防止过拟合。三个模块协同工作，使得模型仅需单阶段训练、无需额外视频引导，即可同时保留运动生成能力与概念组合能力。
 
@@ -172,7 +176,9 @@ $$\mathcal{L}_{pr} = \mathbb{E}_{z^{pr}, c^{pr}, \epsilon \sim \mathcal{N}(0, \m
 
 三个模块的协同逻辑可概括为：SSLM 在训练阶段通过扩展微调范围（同时覆盖交叉注意力和自注意力）增强了模型对新主题外观和形状的捕捉能力；先验保持损失防止训练过程中的灾难性遗忘；DWVSS 则在推理阶段通过时间维度的权重调控，将运动生成与外观修复解耦到去噪过程的不同阶段，从而在不牺牲主题保真度的前提下恢复模型的运动生成能力。消融实验（Table 2）定量验证了这一协同的有效性：加入 SSLM 后 CLIP-I 提升至 0.790，DINO-I 提升至 0.631；进一步加入 DWVSS 后 CLIP-T 从 0.310 提升至 0.318，同时保持了较高的外观相似度。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与验证
 
@@ -223,7 +229,9 @@ CustomCrafter在四项指标上全面超越所有基线。其中CLIP-T（文本�
 3. **数据规模与多样性**：测试集包含20个主题和10个相关prompt，对于极端主体外形（如高度变形的卡通角色）或复杂交互场景（如多主体物理交互）的泛化能力未充分评估。
 4. **长视频与大幅运动**：对于分钟级长视频或非常大运动幅度的场景，去噪过程的阶段性特征是否依然保持、动态加权策略是否需要调整，论文未给出实验证据。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：定制微调中的能力遗忘
 
@@ -263,6 +271,8 @@ CustomCrafter 在方法谱系中的独特贡献可归纳为两个层面的创新
 3. **多主体与交互一致性**：当扩展到多主体定制时，各主体的 LoRA 模块之间如何协调？不同主体的 λ 调度是否需要独立控制？主体间的遮挡、交互等空间关系如何保证一致性？
 4. **长时序生成的稳定性**：在生成长达数分钟的视频时，去噪过程的阶段性特征是否依然保持？DWVSS 的固定 K 值是否需要随视频长度动态缩放？运动生成能力在长时序下是否会逐渐退化？
 5. **与运动定制方法的融合**：当前方法聚焦于保留模型的通用运动生成能力。若用户希望同时定制特定的运动模式（如“特定人跳舞的方式”），SSLM+DWVSS 框架能否与 DreamVideo 的运动学习模块兼容，形成统一的主题-运动联合定制方案？
+
+
 
 ## 原文 PDF
 

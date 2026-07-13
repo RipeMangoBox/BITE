@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Time_to_Move_Training_Free_Motion_Controlled_Video_Generation_via_Dual_Clock_Denoising.pdf
+project_link: https://time-to-move.github.io/
+code_link: null
 aliases:
 - TMT
 - Time-to-Move
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | Time-to-Move：基于双时钟去噪的无训练运动控制视频生成 |
 | 英文题名 | Time-to-Move: Training-Free Motion Controlled Video Generation via Dual-Clock Denoising |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://arxiv.org/abs/2511.08633); [Project](https://time-to-move.github.io/) |
+| Links | [paper](https://arxiv.org/abs/2511.08633) · [Project](https://time-to-move.github.io/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/robotics |
 | Method | Time-to-Move (TTM) |
 | Dataset | MC-Bench (object motion control, SVD backbone), DL3DV (camera motion control), DL3DV |
@@ -41,7 +43,7 @@ claims:
 > - DL3DV (camera motion control) 上，Pixel MSE ↓ 为 0.022，对比 GWTF γ=0.5 0.033，变化 33% 降低。
 > - DL3DV 上，FID ↓ 为 21.966，对比 GWTF γ=0.7 24.691，变化 15.5% 降低。
 
-## 概述
+## 概要
 
 **Time-to-Move (TTM)** 是一个无训练、即插即用的运动控制视频生成框架，旨在解决现有基于扩散的视频生成模型在精确运动控制上的瓶颈：文本或单帧条件无法提供精确的运动控制，而现有运动控制方法通常需要模型特定的微调，计算昂贵且缺乏灵活性，且多数方法难以在控制运动的同时保持外观一致性。
 
@@ -49,7 +51,7 @@ TTM 的核心洞察是：将用户通过简单操作（如剪切拖拽或深度�
 
 实验表明，TTM 在物体运动控制和相机运动控制两个任务上均达到或超越了现有训练型基线方法。在 MC-Bench 物体运动控制基准上，TTM（SVD 骨干）取得最低的 CoTracker 距离（7.967），优于训练型方法 MotionPro（8.685）和 GWTF；在 DL3DV 相机运动控制上，TTM 相比 GWTF 将像素 MSE 降低 33%，FID 降低 15.5%。消融实验进一步验证了双时钟设置在运动依附性、动态度和成像质量之间的最优权衡。此外，TTM 无需训练即可即插即用于多个 I2V 骨干（SVD、CogVideoX、WAN 2.2），表现出架构无关性。
 
-## 背景与动机
+
 
 视频生成领域近年来取得了显著进展，以扩散模型为核心的图像到视频（I2V）模型能够从单张图像和文本提示中生成具有丰富动态的视频。然而，一个核心瓶颈始终存在：**现有模型依赖文本或单帧条件，无法提供精确的运动控制**。文本提示天然具有模糊性，难以精确指定物体的移动轨迹、速度或相机的运动路径，这导致生成结果往往与用户的运动意图存在偏差。
 
@@ -59,7 +61,9 @@ TTM 的核心洞察是：将用户通过简单操作（如剪切拖拽或深度�
 
 本文的核心动机正是突破上述限制：**能否在不训练的情况下，实现区域自适应的精确运动控制，同时保持全局外观的真实性？** 作者的关键洞察是将粗糙的用户动画（如剪切拖拽或深度重投影）作为粗粒度运动提示，通过 SDEdit 式的噪声注入嵌入到预训练的 I2V 扩散模型中，并引入**双时钟去噪**机制——对运动区域施加强约束，对非运动区域施加弱约束——从而在运动保真度和视觉真实感之间取得灵活平衡。这一思路使 TTM 成为一个即插即用的框架，无需任何额外训练即可适配多种 I2V 骨干模型。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈与因果杠杆
 
@@ -106,7 +110,7 @@ TTM 的核心洞察是将粗糙的用户动画（如剪切拖拽或深度重投�
 - 目前主要展示刚体平移和简单的缩放/旋转，尚未扩展到铰接运动和非刚性变形。
 - 联合外观控制仅限于扭曲参考中编码的简单外观变化，尚不支持复杂的风格变换。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2511_08633/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of Time-to-Move. Given an input image and a motion instruction, a mask marks the region under strong control. A motion signal is then generated automatically and, together with the image, conditions an image-to-video (I2V) diffusion model. During sampling, denoising starts at different noise levels—lower inside the mask to enforce the specified motion, and higher outside to allow natural deviations in the background. Joint sampling then yields a realistic video that preserves input details while accurately following the motion control*
@@ -138,7 +142,7 @@ $$x_{t-1} \gets (1 - M) \odot \hat{x}_{t-1}(x_t, t, I) + M \odot x_{t-1}^w$$
 
 TTM 无需任何模型微调，可即插即用于多种 I2V 骨干网络。论文验证了该框架在 **SVD**、**CogVideoX** 和 **WAN 2.2** 上的有效性，表明双时钟去噪策略具有架构无关的泛化能力。
 
-## 核心模块与公式推导
+
 
 ### 3.1 运动信号生成
 
@@ -175,7 +179,9 @@ $$x_{t-1} \gets (1 - M) \odot \hat{x}_{t-1}(x_t, t, I) + M \odot x_{t-1}^w$$
 
 Figure 3 对比了三种区域去噪策略的效果：单时钟 SDEdit 在低噪声下过度约束背景动态，高噪声下则偏离指定运动；RePaint 式前景覆盖虽能强制执行运动，但非约束区域出现伪影（如重影）；双时钟方案在掩码区域保持强运动保真度的同时，允许背景自由去噪，产生无伪影的真实动态。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 物体运动控制：MC-Bench 基准
 
@@ -234,7 +240,9 @@ TTM 无需任何训练，即可即插即用于多个 I2V 骨干网络。实验�
 
 这些限制指明了未来的研究方向：将双时钟方案推广到多区域软掩码、处理延迟出现的对象、整合铰接运动与风格变换、以及学习最优的双时钟参数而非手动设置。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心贡献与因果机制
 
@@ -296,6 +304,8 @@ TTM 的即插即用特性使其可适配于多种 I2V 骨干模型，表现出�
 TTM 在视频生成研究谱系中定位为**训练自由的运动控制推理框架**。其核心创新——双时钟去噪——提供了一种通用的区域相关噪声调度策略，可视为对 SDEdit 在视频域的空间自适应扩展。与需要模型特定微调的方法（如 DragAnything、MotionPro、GWTF）相比，TTM 的即插即用特性显著降低了运动控制视频生成的使用门槛。与同为训练自由的 SG-I2V 相比，TTM 在运动精度和视觉质量的平衡上展现了互补优势。
 
 该方法为后续研究提供了两个关键启示：(1) 粗粒度的用户动画足以作为有效的运动控制信号，无需精确的运动轨迹或光流标注；(2) 区域相关的噪声调度是平衡运动保真度与视觉真实性的有效机制，可推广至其他条件生成任务。
+
+
 
 ## 原文 PDF
 

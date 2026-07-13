@@ -43,7 +43,7 @@ claims:
 > - DrealSR 上，NIQE↓ FRAMERU: 5.386 vs PiSA-SR: 6.136 (-12.2%)；NIQE↓ FRAMERD: 5.959 vs DiT4SR: 6.780 (-12.1%)。
 > - RealLR200 上，MUSIQ↑ FRAMERU: 73.38 vs PiSA-SR: 71.95 (+2.0%)。
 
-## 概述
+## 概要
 
 真实世界图像超分辨率（Real-ISR）的核心挑战在于从严重退化的低分辨率输入中恢复可信的高频细节。当前基于扩散模型的方法虽在感知质量上表现突出，却普遍受困于**低频偏差（LF bias）**——标准噪声预测损失天然偏向幅值占优的低频成分，而网络内部又呈现“先低频后高频”的层次结构，导致负责高频细化的深层长期欠优化。这直接造成恢复结果缺乏锐利纹理，边缘模糊或产生伪影。
 
@@ -51,7 +51,7 @@ claims:
 
 实验表明，FRAMER 在多个真实世界基准上显著且一致地提升感知与失真指标：在 RealSR 上，FRAMER_U 相较基线 PiSA-SR 的 MANIQA 提升 17.5%，NIQE 在 DrealSR 上降低 12.2%；FRAMER_D 相较 DiT4SR 的 MANIQA 提升 22.9%，LPIPS 降低 10.4%。消融研究进一步证实了频率特定对比损失设计和自适应调制模块各自的有效性，且额外训练成本极低（约 3% 内存、7% 时间）。
 
-## 背景与动机
+
 
 真实世界图像超分辨率（Real-ISR）旨在从包含未知复杂退化的低分辨率图像中恢复高分辨率细节，其核心挑战在于高频纹理的忠实重建。近年来，基于扩散模型的方法——如基于U-Net的**SeeSR**（Ren et al., CVPR 2024）、**PiSA-SR**（Lu et al., CVPR 2025）和基于DiT的**DreamClear**（Cao et al., NeurIPS 2024）、**DiT4SR**（Xie et al., ICCV 2025）——凭借强大的生成先验在感知质量上取得了显著突破。然而，这些方法在标准噪声预测损失的训练下，普遍存在一个深层瓶颈：**低频偏差（LF bias）**，即模型倾向于重建低频全局结构，而对高频细节的恢复不足。
 
@@ -63,7 +63,9 @@ claims:
 
 FRAMER正是基于这一动机，提出了一种即插即用的频率对齐自蒸馏训练框架，利用扩散模型内部最终层特征图作为教师，通过频带分解和对比学习，将优化信号与网络内部的频率层次对齐，从而有效释放扩散先验在高频细节重建上的潜力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FRAMER的核心创新在于**首次揭示并系统性地解决了扩散模型在真实图像超分辨率中的“低频偏差”（LF bias）问题**，并据此设计了一套完全即插即用的训练框架。该框架无需修改模型架构或推理过程，仅通过在训练时引入频率感知的层自适应自蒸馏机制，即可显著提升细节保真度和感知质量。
 
@@ -127,7 +129,7 @@ FRAMER相对于现有方法的changed slots清晰体现了其创新本质：
 
 这些差异使得FRAMER在不改变推理过程的前提下，仅引入约3%的内存和7%的训练时间开销（Figure 6），即可在多个真实世界基准上显著超越基线方法——例如FRAMERD在RealSR上将MANIQA提升22.9%，FRAMERU在DrealSR上将NIQE降低12.2%（Table 1）。
 
-## 整体框架
+
 
 FRAMER 是一种即插即用的训练框架，在不修改扩散骨干网络架构和推理过程的前提下，通过频率对齐的自蒸馏机制来缓解扩散模型在真实图像超分辨率中的低频偏差问题。其整体 pipeline 如图 4(a) 所示，核心思想可概括为：**以最终层特征图为教师，将中间层特征图按频率分解后，分别施加低频对比损失和高频对比损失，并通过自适应调制模块动态调节各层各频带的蒸馏强度**。
 
@@ -173,7 +175,7 @@ $$
 ![[assets/figures/papers/paper_list_l875_https_arxiv_org_abs_2512_01390/figures/020_Figure_11.jpg]]
 *Figure 11: Visual illustration of fidelity limitations. We compare the restoration of challenging rope textures. While FRAMERD produces results that are perceptually far superior and sharper than baselines (SwinIR, DiT4SR, DreamClear), the generated fine details may exhibit slight structural deviations from the Ground Truth (HR). This illustrates the inherent trade-off between perceptual realism and pixel-wise fidelity in generative super-resolution*
 
-## 核心模块与公式推导
+
 
 FRAMER 的核心设计围绕一个关键洞察展开：扩散模型内部存在“先低频后高频”的深度层次结构，而标准的噪声预测损失无法为负责高频细化的后期层提供足够的优化信号。为此，FRAMER 构建了一套频率感知的层自适应自蒸馏机制，包含四个紧密协作的模块。
 
@@ -236,7 +238,9 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{noise}} + \sum_{i=1}^{N} \
 ![[assets/figures/papers/paper_list_l875_https_arxiv_org_abs_2512_01390/figures/002_Figure_2.jpg]]
 *Figure 2: Band-wise magnitude densities with shared bins. For each feature map, we compute the 2D FFT and collect magnitudes |F | within LF and HF rings. We plot mean ± σ densities over samples for log(1+|F |) using common bin edges (HF: red or yellow, LF: blues). LF magnitudes span a broader and heavier range, whereas HF magnitudes concentrate narrowly near small values, indicating LF dominance that biases unified training toward LF and undertrains HF details. All statistics are computed on the 100- image DIV2K [1] test set. Densities integrate to 1; any right-edge spike is due to percentile clipping used only for visualization*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -309,7 +313,9 @@ Table 8的用户研究结果显示，在同架构组内比较中，FRAMERU和FRA
 ![[assets/figures/papers/paper_list_l875_https_arxiv_org_abs_2512_01390/figures/014_Figure_8.jpg]]
 *Figure 8: Visual analysis of training stability during the initial phase. We compare the reconstruction quality from 1k to 5k iterations. While the baseline and single-module variants show signs of instability or incoherent structures, our full method (Distill + FAW, FAM) demonstrates a stable optimization trajectory, effectively preventing early-stage model collapse. Red arrows indicate artifacts within each generated image. Best viewed in Zoom*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：扩散模型在真实图像超分中的低频偏差
 
@@ -373,6 +379,8 @@ FRAMER 为后续研究开辟了若干方向：
 3.  **更大规模模型的适配**：在更大型的扩散模型（如 Stable Diffusion XL、Flux）上应用 FRAMER 的效果如何？FAW/FAM 模块是否需要针对不同深度的网络进行调节？
 4.  **频率阈值的自适应学习**：当前 FAW 的频率掩码阈值是预定义的，是否可以设计可学习的频率分解策略，使模型自适应地确定最优的 LF/HF 分界？
 5.  **与提示工程的协同**：FRAMER 使用 LLaVA 生成文本提示，频率对齐训练是否可以通过更精细的提示工程（如引入频率相关的文本描述）获得进一步提升？
+
+
 
 ## 原文 PDF
 

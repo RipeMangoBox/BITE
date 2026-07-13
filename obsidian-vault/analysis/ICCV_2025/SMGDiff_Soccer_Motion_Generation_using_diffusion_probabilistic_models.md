@@ -5,6 +5,8 @@ paper_level: A
 venue: ICCV
 year: 2025
 pdf_ref: paperPDFs/ICCV_2025/SMGDiff_Soccer_Motion_Generation_using_diffusion_probabilistic_models.pdf
+project_link: null
+code_link: null
 aliases:
 - SSMGUDPM
 tags:
@@ -39,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - Soccer-X 上，FID ↓ 0.1813 vs LMP / MANN-DP / CM (具体值参见原文表1) (显著降低)；Foot Sliding ↓ 0.8543 vs 同上 (显著降低)；Skill Accuracy ↑ 93.3% vs 同上 (显著提升)。
 
-## 概述
+## 概要
 
 **核心问题**：现有足球运动生成方法（如基于运动匹配或特定技能控制器）难以在实时交互条件下同时满足高运动质量、多样化技能覆盖和精确的球-脚交互，且缺乏大规模高质量足球运动数据集。
 
@@ -52,8 +54,6 @@ claims:
 - 去噪步数设为 8 时达到推理速度（12 ms）与生成质量的最佳平衡（Table 3），仅在最后两步应用接触引导获得最低 FID（Table 4）。
 
 **局限与展望**：当前方法仅处理球-脚交互，未涉及多球员场景，且生成结果未经物理引擎精炼。未来可探索与物理模拟器整合、扩展至多人协作/对抗场景，以及将启发式接触引导替换为可学习的自适应机制。
-
-## 背景与动机
 
 ### 问题背景
 
@@ -73,7 +73,7 @@ claims:
 
 针对上述瓶颈，本文提出 **SMGDiff**，核心动机在于将运动生成的控制规划与精细合成解耦，通过两阶段级联框架实现实时、可控且逼真的足球运动生成。第一阶段利用单步扩散模型将用户粗粒度控制转化为平滑的全局轨迹，为后续合成提供强条件；第二阶段基于自回归扩散模型在轨迹条件驱动下生成运动序列，并在推理时引入基于物理启发式损失的接触引导模块，在不依赖物理模拟的条件下优化球-脚接触细节。这一设计旨在同时突破运动质量、技能覆盖和交互精度的上限。
 
-## 核心创新
+## 核心方法与创新机理
 
 SMGDiff 的核心创新在于将**用户粗粒度控制与高质量运动生成解耦为两阶段级联框架**，并引入**基于物理启发式损失的接触引导机制**，在无需物理模拟的条件下实现实时、可控且逼真的足球动作生成。
 
@@ -117,8 +117,6 @@ $$b_p^{\prime} = w_b \cdot (b_p - h_p)$$
 
 **需注意的局限**：该框架目前仅处理球与脚的交互，未涉及身体其他部位的触球；未支持多球员对抗场景；生成结果未经物理引擎精炼。这些构成了后续创新的潜在 changed slots。
 
-## 整体框架
-
 SMGDiff 采用**两阶段级联框架**，将用户粗粒度控制信号转化为高质量、多样化的足球运动序列。其核心设计理念是**将控制规划与运动生成解耦**：第一阶段负责将稀疏的用户指令转换为平滑的全局轨迹作为强条件，第二阶段则在该轨迹条件的引导下生成精细的人体运动与球运动，并在推理时通过接触引导优化球-脚交互细节。
 
 ### 输入输出流
@@ -160,13 +158,6 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{simple}} + \lambda_{\mathrm{pos}} \mathcal{
 ### 推理效率
 
 通过将去噪步数设为 8 步，模型在保持生成质量（FID 0.3704）的同时实现了约 12ms 的单步推理速度，满足实时交互需求。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1775_SMGDiff_Soccer_Motion_Generation_using_diffusion_probabilistic_models/figures/001_Figure_1.jpg]]
-*Figure 1: Our method, SMGDiff, enables users to control soccer motions based on character displacement and soccer skill, simulating an interactive gameplay experience. It can generate a diverse range of high-quality soccer motions while ensuring real-time performance*
-
-## 核心模块与公式推导
 
 ### 2.1 两阶段级联框架
 
@@ -234,7 +225,7 @@ $$L = \sum_{i=1}^{F} d^i \cdot \frac{\mathbb{I}(d^i > \tau_d) \cdot \hat{c}_b^i}
 ![[assets/figures/papers/paper_list_l1775_SMGDiff_Soccer_Motion_Generation_using_diffusion_probabilistic_models/figures/007_Figure_5.jpg]]
 *Figure 5: Qualitative evaluation of the Trajectory Generation Model (TGM). Given identical conditions, TGM enhances motion diversity. The dashed line represents the generated trajectory*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -283,18 +274,7 @@ SMGDiff 在自建数据集 **Soccer-X** 上与三类代表性基线方法进行�
 
 需注意以下评估公平性因素：Soccer-X 为自行采集数据集，主要对比方法集中在非扩散的运动合成模型，缺少与同期扩散运动模型（如 CAMDM）在足球领域的直接比较；FID、Foot Sliding、Skill Accuracy 等定量指标可能无法完全反映足球运动的主观感知质量。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1775_SMGDiff_Soccer_Motion_Generation_using_diffusion_probabilistic_models/figures/009_Table_3.jpg]]
-*Table 3: Evaluation of different denoise steps*
-
-![[assets/figures/papers/paper_list_l1775_SMGDiff_Soccer_Motion_Generation_using_diffusion_probabilistic_models/figures/010_Table_4.jpg]]
-*Table 4: Evaluation of contact guidance employment strategy*
-
-![[assets/figures/papers/paper_list_l1775_SMGDiff_Soccer_Motion_Generation_using_diffusion_probabilistic_models/figures/003_Figure_3.jpg]]
-*Figure 3: The top section exhibits selected highlights of our dataset. The bottom section features a proportion of different soccer motions. In total, our dataset comprises 2398 sequences and captures approximately 1.08 million frames of data*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 问题定位与核心瓶颈
 

@@ -41,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - Think360° (test-mini) 上，Overall pass@1 Accuracy 46.0 (Gemini-2.5-pro) vs 16.0 (GPT-4o) (+30.0)；Overall pass@1 Accuracy 35.5 (Claude-3.7-Sonnet-Thinking) vs 16.0 (GPT-4o) (+19.5)；ToT-Width Accuracy 50.2 (Claude-3.7-Sonnet-Thinking) vs 28.6 (Llama-3.2-Vision-11B) (+21.6)。
 
-## 概述
+## 概要
 
 当前多模态大语言模型（MLLM）在推理能力上取得了显著进展，但现有基准和评估几乎完全聚焦于**推理深度**——即沿单一链式路径逐步推导的能力。然而，大量复杂问题求解不仅需要深度，更依赖于**推理宽度**：同时探索多条并行推理路径、系统性剪枝无效分支、进行回溯与多约束满足的能力。这一维度与推理深度正交，却长期被忽视，构成当前 MLLM 的核心性能瓶颈。
 
@@ -55,8 +55,6 @@ claims:
 - **提示工程的局限**：Chain-of-Thought 提示对部分模型可带来 1-5 个百分点的温和提升，但远无法从根本上解决宽度推理的困难。
 
 Think360° 不仅揭示了当前 MLLM 在广度搜索方面的系统性缺陷，也为未来面向宽度增强的训练算法（如多路径强化学习、过程奖励模型）提供了标准化的评估平台。
-
-## 背景与动机
 
 ### 推理深度的单向演进与宽度维度的系统性缺失
 
@@ -84,7 +82,7 @@ Think360° 不仅揭示了当前 MLLM 在广度搜索方面的系统性缺陷，
 
 后续实验将揭示当前模型的严峻现状：最佳闭源模型 **Gemini‑2.5‑pro** 在 Think360° 上的 pass@1 仅 **46.0%**，远低于其在常规 VQA 任务上的表现；而 **GPT‑4o** 仅取得 **16.0%** 的总体准确率。更值得关注的是，**宽度门槛效应**表明准确率 ≥20% 的模型其推理宽度均 ≥45%，宽度与最终正确率高度正相关——这直接验证了宽度维度是制约当前 MLLM 性能的关键因果变量。
 
-## 核心创新
+## 核心方法与创新机理
 
 ### 问题诊断：从推理深度到推理宽度的范式转移
 
@@ -116,8 +114,6 @@ Think360° 不仅揭示了当前 MLLM 在广度搜索方面的系统性缺陷，
 Think360° 基准与 ToT-Eval 协议之间存在深层的设计耦合：基准本身的问题设计天然要求宽度推理（如需要同时验证多个约束条件的逻辑谜题），而 ToT-Eval 的思维树结构恰好能够捕捉模型在解决这些问题时的并行探索行为。这种“问题设计-评估方法”的闭环使得本文的贡献超越了简单的“新基准+新指标”组合，而是构建了一套完整的宽度推理诊断框架。
 
 值得注意的是，ToT-Eval 本身依赖 GPT-4o 作为评判器进行思维树构建与节点正确性判定，这一设计在实现自动化的同时引入了潜在的系统性偏差——评判模型自身的推理能力可能影响评估结果的可靠性。本文对此局限性进行了明确讨论，但未提供多评判器投票或人工验证的消融实验，这一点需要读者在解读 ToT-Eval 结果时保持审慎。
-
-## 整体框架
 
 Think360° 基准的构建遵循一条三阶段流水线，其核心目标是从多模态原始数据中系统性地提取、过滤并精炼出以宽度为中心的推理问题。该流水线的设计直接服务于论文的核心洞察：推理深度与推理宽度是正交的认知维度，而现有基准普遍忽视了后者。因此，流水线的每个阶段都旨在确保最终数据集能够有效衡量模型在并行探索、约束满足与回溯等宽度推理能力上的表现。
 
@@ -151,8 +147,6 @@ Think360° 基准的构建遵循一条三阶段流水线，其核心目标是从
 
 ![[assets/figures/papers/paper_list_l829_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Think_360deg_Beyo/figures/002_Figure_2.jpg]]
 *Figure 2: Three-stage pipeline for constructing Think360◦—beginning with diverse seed data collection, progressing through a two-step quality filter (rule-based heuristics and human double-check), and finalized through targeted annotation & refinement (as demonstrated by proof- and game-based problems)*
-
-## 核心模块与公式推导
 
 ### 3.1 Think360° 基准构建管道
 
@@ -214,7 +208,7 @@ Think360° 的构建遵循三阶段管道（见 Figure 2），旨在从异质来
 ![[assets/figures/papers/paper_list_l829_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Think_360deg_Beyo/figures/001_Figure_1.jpg]]
 *Figure 1: The concepts illustration for the width and depth in the information propagation process of neural network and reasoning. Drawing insights from the classical designs in neutral network: shortcut skipping or dropout, pyramid feature, layer stacking and gradient back propagation, we analogize these to the strategies: pruning, divide-and-conquer, trial-and-error and backtracking to distinguish depth versus width in inference processes*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 评估设置
 
@@ -257,16 +251,13 @@ ToT-Eval 协议（Figure 4）从思维树中量化两个正交维度：ToT-Depth
 ![[assets/figures/papers/paper_list_l829_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Think_360deg_Beyo/figures/007_Table_2.jpg]]
 *Table 2: Comparison with existing multimodal math benchmarks. Level: K =K-12, U=University, C =Competition. Source: S =Self-sourced, P =Collected from Public Dataset*
 
-![[assets/figures/papers/paper_list_l829_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Think_360deg_Beyo/figures/003_Table_1.jpg]]
-*Table 1: Key statistics of Think360 . We construct a fine-grained taxonomy across the dimensions of Difficulty Tier, and Answer Type, and additionally provide detailed statistics on question and answer lengths (unit of length: words). With regard to the non-exclusive categories marked with , we provide details in the following sections*
-
 ![[assets/figures/papers/paper_list_l829_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Think_360deg_Beyo/figures/006_Figure_5.jpg]]
 *Figure 5: Frequency distribution and co-occurrence patterns of cognitive skills required for solving problems in Think360 . The left panel shows the frequency distribution of individual cognitive capabilities across our benchmark, while the right panel presents a chord diagram illustrating the co-occurrence relationships between different cognitive skills. Please zoom in for a better view*
 
 ![[assets/figures/papers/paper_list_l829_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Think_360deg_Beyo/figures/004_Figure_3.jpg]]
 *Figure 3: Demonstration of the Think360 data cases. The figure offers paired examples of three width-oriented reasoning patterns: Inductive Reasoning, Deductive Reasoning, and Probabilistic Reasoning, and tightly linked cognitive skills: Branchand-Bound, Hypothesize-and-Test, and Divide-and-Conquer*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 与现有推理基准的关系
 

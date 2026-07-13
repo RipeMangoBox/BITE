@@ -45,7 +45,7 @@ claims:
 > - Cartoon 上，FVD↓ 403.47 (One-to-All-14B) vs 485.92 (Wan-Animate) (-82.45)。
 > - DeepFashion (512×352) 上，LPIPS↓ 0.249 (One-to-All-1.3B) vs 0.275 (MCLD) (-0.026)。
 
-## 概述
+## 概要
 
 **One-to-All Animation** 提出了一种统一的姿态驱动个性化生成框架，旨在解决现有角色动画方法对空间对齐与骨骼匹配的刚性依赖。传统方法（如 **MimicMotion**、**StableAnimator**、**UniAnimate-DiT**、**Wan-Animate**）在参考图像与驱动视频之间出现空间布局错位或面部骨骼不一致时，生成质量急剧下降——身份信息丢失、出现严重伪影或肢体扭曲（Figure 2）。
 
@@ -64,7 +64,7 @@ claims:
 
 **局限性与开放问题**：14B 模型推理需 65 GB 显存且单次推理超过 7 分钟，限制了消费级部署；图像与视频训练数据的最佳混合比例尚未充分探索；当前仅依赖 2D 姿态序列，无法独立控制摄像机运动。这些方向为后续工作留下了明确的改进空间。
 
-## 背景与动机
+
 
 ### 问题定义与核心瓶颈
 
@@ -98,7 +98,9 @@ claims:
 
 这一设计使得 One-to-All Animation 在空间错位场景下，相比现有 SOTA 方法展现出显著鲁棒性，为对齐自由的角色动画开辟了新路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 One-to-All Animation 的核心创新在于将角色动画问题从根本上重新定义为**无对齐的个性化生成任务**，通过三个紧密耦合的设计突破现有方法对空间对齐和骨骼匹配的刚性依赖。
 
@@ -135,7 +137,7 @@ One-to-All Animation 的核心创新在于将角色动画问题从根本上重�
 
 上述四个创新点并非孤立设计，而是形成了一条因果链路：**Outpainting 训练创造了对遮挡鲁棒的学习需求 → 专用参考提取器和 HRFA 满足了这一需求 → 身份鲁棒姿态控制防止了模型走“捷径”过拟合骨骼 → Token Replace 将鲁棒性扩展到长视频场景**。分阶段训练策略（先训练参考提取，再联合训练姿态控制，Table 6 证实 Ref → Ref+Pose 策略 SSIM 最优）进一步验证了这一协同设计的必要性。
 
-## 整体框架
+
 
 One-to-All Animation 将角色动画与图像姿态迁移统一为**对齐自由的个性化视频生成**问题。其核心设计哲学是：将训练重构为自我监督的 outpainting 任务，使模型学会从任意空间布局的参考图像中恢复被遮挡区域并保留身份信息，从而在推理时无需参考-驱动帧之间的空间对齐或骨骼匹配。
 
@@ -196,7 +198,7 @@ $$\mathcal{L}_{\mathrm{RF}} = \|v_{t} - u_{t}\|^{2}, \quad u_{t} = \varepsilon -
 ![[assets/figures/papers/paper_list_l1075_https_arxiv_org_abs_2511_22940/figures/001_Figure_1.jpg]]
 *Figure 1: We introduce One-to-All Animation, a unified framework for pose-driven personalized generation. Unlike prior methods that require both spatially-aligned references and pose retargeting, our framework supports: (1) cross-scale video animation with either retargeted or original driving motion, (2) cross-scale image pose transfer, and (3) temporally coherent long video generation*
 
-## 核心模块与公式推导
+
 
 ### 3.1 Outpainting 预处理：从空间对齐到统一遮挡输入
 
@@ -268,7 +270,9 @@ $$\mathcal{L}_{\mathrm{RF}} = \|v_{t} - u_{t}\|^{2} \tag{11-12}$$
 ![[assets/figures/papers/paper_list_l1075_https_arxiv_org_abs_2511_22940/figures/014_Figure_9.jpg]]
 *Figure 9: Qualitative ablation of Identity-Robust Pose Control*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -344,7 +348,9 @@ Figure 13 展示了一个关键失败模式：在 HRFA 的交叉注意力中保�
 
 4. **摄像机运动控制缺失**：本方法仅依赖 2D 姿态序列作为运动信号，无法独立控制摄像机轨迹，相机运动只能通过角色位置隐式表达。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题域与基线方法
 
@@ -390,6 +396,8 @@ Figure 13 展示了一个关键失败模式：在 HRFA 的交叉注意力中保�
 ### 知识库贡献总结
 
 本方法对角色动画领域的核心贡献在于**证明了通过训练范式重构（自监督 outpainting + 身份鲁棒姿态控制）可以消除对齐依赖**，而非仅仅在现有框架上做增量改进。这一洞察具有方法论的迁移价值：对于其他需要从“参考-目标”对中学习外观迁移的任务（如虚拟试衣、面部重演），类似的遮挡预训练和身份-结构解耦策略可能同样有效。
+
+
 
 ## 原文 PDF
 

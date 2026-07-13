@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/A_Bayesian_Nonparametric_Framework_for_Private_Fair_and_Balanced_Tabular_Data_Synthesis.pdf
+project_link: null
+code_link: null
 aliases:
 - CVCBNV
 - BNFPFBTDS
@@ -41,7 +43,7 @@ claims:
 > - Adult 上，SP (Statistical Parity) 为 ≈0.0 (λ_F=1)，对比 0.198 (True)，变化 降至接近0。
 > - COMPAS 上，MI 为 ≈0.0 (λ_F=1)，对比 0.0259 (True)，变化 降至接近0。
 
-## 概述
+## 概要
 
 该论文（CBNP-VAECGAN，ICLR 2026）针对表格数据合成中隐私保护、公平性与类别平衡三个相互冲突的目标，提出一个统一的贝叶斯非参数框架。核心瓶颈在于：在数据稀缺环境下，差分隐私噪声会扭曲少数群体的统计估计，而公平性约束又进一步限制了受噪声影响的优化过程，两者相互加剧，导致现有方法无法同时满足三个约束。
 
@@ -55,7 +57,7 @@ claims:
 
 **局限性**：公平性定义仅限于统计均等（Statistical Parity），不支持基于分类器的公平性概念（如均等化赔率、机会均等）或条件统计均等；理论保证依赖于“良好设定”假设（所有目标差异为零），实际中可能不严格成立；实验仅在表格数据上进行，未验证在图像或文本等非结构化数据上的适用性。
 
-## 背景与动机
+
 
 合成表格数据生成在隐私保护、公平性与类别平衡三个维度上面临着相互加剧的瓶颈。现有方法通常仅解决其中一两个约束，且当三者同时施加时，隐私噪声会扭曲少数群体的统计估计，而公平性约束又进一步限制了受噪声影响的优化过程，导致两者相互恶化。具体而言：
 
@@ -69,7 +71,9 @@ claims:
 
 **证据强度**：定理2在温和正则条件下证明了效用、公平性和类别平衡的联合一致性（置信度0.95），但该保证依赖于“良好设定”假设（所有目标差异为零），实际中可能不严格成立。消融实验（Figures 9-10）和成员推断攻击（Figure 6）提供了实证支持，但隐私与公平性之间的精确权衡关系仍需进一步理论刻画。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CBNP-VAECGAN 的核心创新在于将隐私、公平和类别平衡三个相互冲突的目标统一在一个贝叶斯非参数框架中，通过 **Dirichlet 过程 (DirP)** 作为连接三者的因果旋钮。与现有方法（如 DECAF、TabFairGAN、PF-WGAN）相比，该方法在四个关键槽位（changed slots）上做出了根本性改变：
 
@@ -95,7 +99,7 @@ CBNP-VAECGAN 的核心创新在于将隐私、公平和类别平衡三个相互�
 
 **值得注意的局限**：公平性定义仅限于统计均等（Statistical Parity），不支持均等化赔率或机会均等等需要真实标签条件的公平性概念。理论保证（Theorem 2）依赖于“良好设定”假设，实际中可能不严格成立。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0001_j0czDrEnFc_A_Bayesian_Nonparametric_Framework_for_Private_F/figures/075_Figure_20.jpg]]
 *Figure 20: Overview of the triple policies (Fair–Private–Balanced) enforced by our proposed approach to address potential attacks*
@@ -108,7 +112,7 @@ CBNP-VAECGAN 是一个在贝叶斯非参数学习（BNPL）框架下，通过单
 
 **约束优化层** 通过 DirPDV 网络 T_ν 同时估计两个正则化项：DirPMINE 用于估计生成结果与敏感属性之间的互信息（Section 4.4.2, Definition 1），DirPKL 用于估计非敏感分类属性的 KL 散度（Section 4.4.3）。总损失函数为 `L_Utility + λ_F L_Fair + Σ λ_B L_Balance`（Eq. 9），其中 L_Utility 包含生成器-编码器、判别器和代码生成器的对抗损失，λ_F 和 λ_B 分别控制公平性和类别平衡的强度。该方法的核心洞察在于：通过 Dirichlet 过程的后验权重将隐私噪声结构化地注入到重采样过程中，使得隐私机制与后续的公平性/平衡性优化在同一个概率框架下协同工作，避免了传统方法中隐私噪声与公平性约束相互加剧的问题。
 
-## 核心模块与公式推导
+
 
 CBNP-VAECGAN框架的核心在于通过贝叶斯非参数学习（BNPL）中的Dirichlet过程（DirP）将隐私、公平和类别平衡三个约束统一在一个生成器-解码器架构中。其关键模块和公式如下。
 
@@ -160,7 +164,9 @@ $$\mathcal{L}_{\mathrm{Utility}}(G_\omega, E_\eta, D_\theta, CG_\tau) + \lambda_
 | $T_v$ | DirPDV网络 | 估计互信息和KL散度的神经网络 |
 | $H^{\mathrm{Pert}}$ | 基于copula的扰动基测度 | 注入局部隐私并保持属性间依赖结构 |
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：公平性与保真度
 
@@ -224,7 +230,9 @@ CBNP-VAECGAN 在三个基准数据集（Adult、COMPAS、Bank Marketing）上同
 ![[assets/figures/papers/iclr26_0001_j0czDrEnFc_A_Bayesian_Nonparametric_Framework_for_Private_F/figures/013_Table_5.jpg]]
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的对比
 
@@ -257,6 +265,8 @@ CBNP-VAECGAN在现有表格数据生成方法的基础上，通过贝叶斯非�
 2. **隐私-公平性权衡机制**：高隐私预算下公平性优化收敛变慢的精确机制是什么？是隐私噪声增加了互信息估计的方差，还是Dirichlet过程权重限制了优化步长？当前工作仅观测到现象（Figure 9），未给出理论解释。
 3. **架构迁移**：如何将Dirichlet过程整合到自回归架构（如LLM）中？这需要解决序列生成中隐私预算分配和公平性约束的时序依赖问题。
 4. **连续敏感属性**：该方法能否扩展到连续敏感属性（如年龄、收入）？需要构造连续版本的互信息估计器，同时保持差分隐私保证。
+
+
 
 ## 原文 PDF
 

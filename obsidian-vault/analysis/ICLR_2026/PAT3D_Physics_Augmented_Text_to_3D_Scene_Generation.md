@@ -33,7 +33,7 @@ claims:
 | 中文题名 | PAT3D：物理增强的文本到3D场景生成 |
 | 英文题名 | PAT3D: Physics-Augmented Text-to-3D Scene Generation |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=iIRxFkeCuY) · [Code](https://github.com/Simulation-Intelligence/PAT3D) · [arXiv](https://arxiv.org/) |
+| Links | [paper](https://openreview.net/forum?id=iIRxFkeCuY) · [Code](https://github.com/Simulation-Intelligence/PAT3D) · [paper](https://arxiv.org/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction #topic/generative_models_diffusion |
 | Method | PAT3D |
 | Dataset | 自建数据集（18个文本提示） |
@@ -41,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - 自建数据集（18个文本提示） 上，CLIP Score ↑ 31.79 vs 29.68 (MIDI) (+2.11)；VQA Score ↑ 0.68 vs 0.63 (MIDI) (+0.05)；Displacement ↓ 0 vs 0.25 (GraphDreamer) (-0.25)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：当前文本到3D场景生成方法仅关注几何布局，缺乏对物理交互（如重力、碰撞、支撑关系）的显式建模，导致生成的场景存在物体穿插、浮空或不稳定堆叠，无法用于需要物理真实感的下游应用（如仿真、机器人操作）。
 
@@ -51,7 +51,7 @@ claims:
 
 **主要结果**：在自建数据集（18个文本提示）上，PAT3D 在语义一致性（CLIP Score 31.79）和物理合理性评分（88.5）上均显著优于所有基线方法，且是唯一实现完美物理稳定性（位移 Displacement=0）和无穿插（穿透率 Penetration Ratio=0）的方法。
 
-## 背景与动机
+
 
 文本到3D场景生成旨在从自然语言描述中直接创建可交互的三维环境，这一能力对于游戏开发、虚拟现实、具身智能仿真等应用至关重要。近年来，扩散模型和大规模视觉语言模型的突破极大地推动了单物体3D资产生成的质量与效率，但将这些独立物体组合成完整场景时，现有方法普遍暴露出一个核心瓶颈：**它们仅关注几何布局的视觉合理性，却完全忽略了场景中物体间的物理交互**。
 
@@ -63,7 +63,9 @@ claims:
 
 针对上述问题，本文提出 **PAT3D（Physics-Augmented Text-to-3D）**，这是首个将视觉语言模型与物理仿真深度融合的文本到3D场景生成框架。其核心动机在于：**通过显式建模物体间的物理依赖关系，并利用可微分仿真在环优化，使生成的场景同时满足物理稳定性、无穿插性和语义一致性三个目标**。PAT3D不仅生成“看起来合理”的场景，更生成“在重力下能站稳”的仿真就绪场景，从而打通从文本描述到可交互物理环境的直接通道。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PAT3D 的核心创新在于首次将**可微分刚体仿真**引入文本到3D场景生成管线，解决了现有方法仅关注几何布局而忽略物理交互的瓶颈。其关键创新点体现在三个相互耦合的层面。
 
@@ -100,7 +102,7 @@ $$ \operatorname*{min}_{q_0} L(q_{n+1}(q_0)) \quad \mathrm{s.t.} \quad f(q_{n+1}
 
 消融实验进一步验证了各组件的必要性：仅使用场景树初始化可消除穿透但导致静态位移增大（2.91）；加入仿真在环优化后，位移降为 0，且语义和物理评分全面提升（Figure 6, 7）。去掉仿真在环优化时，仿真结果可能偏离预期语义（如堆叠块不稳或分离），而添加优化后实现了稳定的堆叠和语义对齐（Figure 7）。
 
-## 整体框架
+
 
 PAT3D 的整体管线由三大阶段串联构成：**（a）参考图像生成与物体提取**、**（b）场景树驱动的布局初始化**、以及**（c）可微分仿真在环布局优化**。三个阶段依次将文本描述转化为具有物理稳定性和语义一致性的仿真就绪 3D 场景，其完整数据流如 Figure 2 所示。
 
@@ -118,7 +120,7 @@ PAT3D 的整体管线由三大阶段串联构成：**（a）参考图像生成�
 ![[assets/figures/papers/paper_list_l56_https_openreview_net_forum_id_iIRxFkeCuY/figures/001_Figure_1.jpg]]
 *Figure 1: PAT3D is the first text-to-3D scene generation framework that produces simulation-ready and intersection-free results. The left column shows results from direct depth-based arrangements, which suffer from object interpenetrations (top) and collapse under simulation due to inconsistent layouts (bottom). The middle column presents PAT3D results, where physically valid layouts remain stable under simulation. These high-quality scenes are immediately usable for downstream applications, including scene editing and robotic manipulation (right)*
 
-## 核心模块与公式推导
+
 
 PAT3D 的物理增强管线由三大核心模块串联构成：**物理感知的场景初始化**、**可微分刚体仿真**以及**仿真在环的布局优化**。其核心思想在于，通过显式建模物体间的物理依赖关系，将语义布局转化为仿真就绪的初始状态，再利用可微仿真闭环修正语义偏差。
 
@@ -188,7 +190,9 @@ $$R = \frac{(T_p - \sum_{i=1}^{\tilde{N}^{-}} T_{p,i}) l_e}{l}$$
 
 其中 $T_p$ 为检测到的穿透三角形对总数，$\tilde{N}^{-}$ 为自交三角形对数量，$l_e$ 为穿透边的平均长度。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 1. 评估设置
 
@@ -250,7 +254,9 @@ PAT3D生成的物理合理场景可直接用于两类下游任务：
 ![[assets/figures/papers/paper_list_l56_https_openreview_net_forum_id_iIRxFkeCuY/figures/012_Figure_9.jpg]]
 *Figure 9: Failure case 2. “A brown leather sofa decorated with plush toys, ...”*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心问题定位与关键差异
 
@@ -289,6 +295,8 @@ PAT3D 的适用边界受限于以下三个核心局限：
 2. **全局优化策略**：如何整合全局优化策略以避免仿真在环优化中的局部最优问题？这可能涉及更先进的优化算法或更好的初始化策略。
 
 此外，从方法谱系的角度看，PAT3D 作为首个将物理仿真深度集成到文本到3D场景生成管线中的工作，为后续研究开辟了物理感知生成的新方向。未来的工作可能包括：将柔性体动力学纳入仿真框架、探索更鲁棒的场景树推断机制、以及开发更高效的仿真在环优化算法以支持实时应用场景。
+
+
 
 ## 原文 PDF
 

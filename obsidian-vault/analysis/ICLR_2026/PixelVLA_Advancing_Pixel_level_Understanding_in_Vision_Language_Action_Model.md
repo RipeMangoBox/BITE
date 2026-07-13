@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/PixelVLA_Advancing_Pixel_level_Understanding_in_Vision_Language_Action_Model.pdf
+project_link: https://wenqiliang.github.io/PixelVLA/
+code_link: null
 openreview_forum_id: 7M6ryCABIc
 aliases:
 - PixelVLA
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | PixelVLA：推进视觉-语言-动作模型中的像素级理解 |
 | 英文题名 | PixelVLA: Advancing Pixel-level Understanding in Vision-Language-Action Model |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=7M6ryCABIc); [Project](https://wenqiliang.github.io/PixelVLA/) |
+| Links | [paper](https://openreview.net/forum?id=7M6ryCABIc) · [Project](https://wenqiliang.github.io/PixelVLA/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/robotics |
 | Method | PixelVLA |
 | Dataset | SimplerEnv - Google Robot (VM), SimplerEnv - Google Robot (VA), LIBERO (平均), SimplerEnv - WidowX |
@@ -41,7 +43,7 @@ claims:
 > - SimplerEnv - Google Robot (VA) 上，平均成功率 为 52.6，对比 39.8 (OpenVLA)，变化 +12.8。
 > - LIBERO (平均) 上，成功率 为 86.7，对比 77.3 (SpatialVLA) / 79.5 (OpenVLA fine-tuned)，变化 +9.4 / +7.2。
 
-## 概述
+## 概要
 
 当前视觉-语言-动作模型（VLAs）在机器人操控中面临一个关键瓶颈：它们仅依赖图像级视觉理解，缺乏对像素级细节的精确感知与空间推理能力，且指令形式局限于纯文本，无法利用更丰富的视觉提示。这严重制约了模型在复杂环境中的泛化性和操控精度。
 
@@ -51,7 +53,7 @@ PixelVLA 针对上述瓶颈提出了一个系统性的解决方案。其核心�
 
 当前方法的局限在于仅支持 2D 视觉提示，尚未引入 3D 感知或深度信息，视觉提示类型也限于点、线、区域、掩膜等基本形式。所有验证均在仿真环境中完成，真实机器人部署的效果有待进一步检验。
 
-## 背景与动机
+
 
 视觉-语言-动作模型（Vision-Language-Action, VLA）已成为机器人操控策略学习的主流范式。这类模型将视觉观测与语言指令映射为机器人动作，在多种任务中展现出令人瞩目的泛化能力。然而，现有VLA方法存在一个根本性瓶颈：**它们仅依赖图像级（image-level）的全局视觉理解，缺乏对像素级细节的精确感知与空间推理能力**。具体而言，当前VLA模型将整幅图像编码为统一的特征表示，无法区分场景中关键物体、机械臂末端执行器与背景区域的细粒度空间关系。这导致两个直接后果：其一，在需要精密操控的场景中（如抓取特定位置的小物体、避开障碍物），模型的空间定位精度不足；其二，当环境发生视觉扰动（光照变化、背景替换、干扰物引入）时，图像级特征容易受到全局偏移的影响，策略鲁棒性显著下降。
 
@@ -63,7 +65,9 @@ PixelVLA 针对上述瓶颈提出了一个系统性的解决方案。其核心�
 
 综上，PixelVLA的动机根植于一个清晰的因果洞察：**当前VLA模型的性能瓶颈不在于视觉编码器的容量或语言理解的深度，而在于空间感知粒度的缺失与交互模态的单一化**。通过系统性地解决这两个问题，PixelVLA为VLA模型向像素级精确操控的演进提供了可行路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PixelVLA 相对于现有 VLA 模型的核心创新在于**三个关键架构槽位的改变**，以及支撑这些改变的**专用数据集与训练框架**。这些改变共同解决了当前 VLA 模型“仅有图像级理解、仅支持文本指令”的根本瓶颈。
 
@@ -101,7 +105,7 @@ $$\mathcal{L}_{\text{PixelVLA}} = \sum_{i=1}^{B} \|\mathbf{a}^i - \mathcal{C}(\m
 
 消融实验（Table 4）直接验证了这些创新的因果贡献：仅增加连续动作训练（+CAT）相比基线提升 3.8%（VA），而引入像素级理解增强（+PUE）带来 8.0% 的提升，表明像素级模块是性能增益的主要来源。最终 PixelVLA 全集（CAT+PUE）在 VA 评估中达到 50.1 的平均分，验证了各组件的协同效应。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0009_7M6ryCABIc_PixelVLA_Advancing_Pixel-level_Understanding_in/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the PixelVLA architecture. The model integrates three novel components: (1) a visual prompt-aware encoder for processing input diverse visual prompts; (2) a multiscale pixelaware encoder that injects pixel-level information into token embeddings; and (3) a continuous action decoder to predict 7D robot actions. PixelVLA enhances fine-grained pixel-level spatial understanding and multimodal prompt responsiveness, enabling more precise manipulation policies in visually complex scenarios*
@@ -154,7 +158,7 @@ Pixel-160K 通过两阶段自动标注流水线从现有机架数据生成：
 
 最终数据集包含 160K 个操作片段、6.5M 个图像-文本-动作三元组，每个三元组均带有像素掩膜和视觉提示标注。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化
 
@@ -202,7 +206,9 @@ $$\mathcal{L}_{PixelVLA} = \sum_{i=1}^{B} \| \mathbf{a}^{i} - \mathcal{C}( \math
 
 PixelVLA的训练分为两个阶段：（1）**连续动作训练阶段**（CAT），在Fractal和Bridge v2等真实机器人数据集上使用L1回归学习连续动作映射；（2）**像素级理解增强阶段**（PUE），在Pixel-160K数据集上通过LoRA高效微调LLM骨干，同时联合训练视觉提示感知编码器和多尺度像素感知编码器。消融实验表明，PUE阶段贡献了8.0%的VA平均分提升（相较仅CAT的3.8%提升），验证了像素级模块的主导作用。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 瓶颈与核心验证
 
@@ -257,7 +263,9 @@ Table 4 的消融设计揭示了清晰的因果链路：基线（Baseline）→ 
 ![[assets/figures/papers/iclr26_0009_7M6ryCABIc_PixelVLA_Advancing_Pixel-level_Understanding_in/figures/013_Figure_6.jpg]]
 *Figure 6: The proposed automated annotation pipeline for generating visual prompts and mask annotations at scale for a given robot dataset, consisting of a gripper-aware region proposal stage and a multimodal object segmentation stage*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从图像级VLA到像素级VLA的演进
 
@@ -310,6 +318,8 @@ PixelVLA的性能增益建立在一系列前提条件之上，脱离这些条件
 **大规模预训练的潜力。** PixelVLA目前仅在相对小规模的Pixel-160K上进行微调。若能构建更大规模（百万级episodes）的像素标注机器人数据集，并在多机器人、多任务设定下进行预训练，像素级VLA可能享受到类似于VLM领域的规模化增益。这需要解决跨具身数据对齐和高效标注流水线的工程挑战。
 
 **与基础模型的深度整合。** 当前PixelVLA将像素感知作为“外挂”模块注入冻结的VLM骨干。未来可探索在VLM预训练阶段即引入像素级理解目标（如联合训练掩膜预测与指令跟随），使像素级空间推理成为VLA的原生能力而非微调附加。
+
+
 
 ## 原文 PDF
 

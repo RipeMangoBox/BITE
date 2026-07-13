@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2022
 pdf_ref: paperPDFs/CVPR_2022/Opening_up_Open_World_Tracking.pdf
+code_link: null
 project_link: https://openworldtracking.github.io/
 aliases:
 - OOWTB
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 开启开放世界跟踪 |
 | 英文题名 | Opening up Open-World Tracking |
 | 会议/期刊 | CVPR 2022 |
-| Links | [paper](https://arxiv.org/abs/2104.11221); [Project](https://openworldtracking.github.io/) |
+| Links | [paper](https://arxiv.org/abs/2104.11221) · [Project](https://openworldtracking.github.io/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | OWTB (Open-World Tracking Baseline) |
 | Dataset | TAO-OW val, TAO-OW test, DAVIS Unsupervised |
@@ -42,7 +43,7 @@ claims:
 > - TAO-OW val 上，OWTA (Unknown) 为 39.2，对比 33.9 (SORT)，变化 +5.3。
 > - TAO-OW test 上，OWTA (Unknown-Unknown) 为 41.5，对比 38.5 (Unknown val)，变化 comparable。
 
-## 概述
+## 概要
 
 **开放世界跟踪**（Open-World Tracking）要求同时跟踪预定义语义类别的已知对象，以及训练集中从未出现的未知对象。传统闭世界跟踪器仅依赖类别置信度进行检测与关联，导致未知目标的召回率和跨帧关联准确率显著不足——尤其在小目标场景下，未知小目标召回率仅66.1%，远低于已知大目标的99.7%（Table 1）。
 
@@ -57,7 +58,7 @@ claims:
 
 **主要局限**：未知小目标的检测召回仍是瓶颈；快速运动、大幅度变形及完全遮挡后的重识别几乎无法正确跟踪；长时关联在召回与精度之间难以取得更好平衡。未来方向包括利用多帧时序上下文改进检测、构建未知对象的鲁棒外观模型，以及利用大规模未标注视频数据。
 
-## 背景与动机
+
 
 ### 闭世界跟踪的范式局限
 
@@ -79,7 +80,9 @@ claims:
 
 基于此洞察，本文提出 **OWTB（Open-World Tracking Baseline）**，将跟踪-检测范式分解为四个可控阶段（Figure 6）：(1) 提议生成、(2) 跨帧相似度估计、(3) 轨迹管理与关联、(4) 重叠消除。在每个阶段，OWTB 通过简单的设计选择——结合目标性与背景分数的提议排序、融合光流与外观特征的关联相似度——显著提升了未知目标的跟踪性能，同时保持了已知目标的竞争力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 OWTB 的核心创新并非提出全新的跟踪范式，而是**系统性地揭示了闭世界检测器向开放世界泛化的关键控制因素**，并通过三个“changed slots”将这一洞察工程化为一个高性能基线。
 
@@ -105,7 +108,7 @@ OWTB 的核心操作是将提议评分从单一的“类别置信度”替换为
 
 OWTB 的三个 changed slots 均非全新算法模块——objectness/background 评分、光流 ReID 融合、离线轨迹合并皆为现有技术的重新组合。其真正的创新在于：**通过受控消融实验，首次量化了每个设计选择对未知目标跟踪性能的边际贡献**，从而将“闭世界检测器能否用于开放世界跟踪”这一模糊问题转化为“如何排序提议、如何计算相似度、如何管理轨迹”这三个可操作的工程决策。这一方法论贡献使得 OWTB 在 TAO-OW 验证集上以已知 OWTA 60.2、未知 OWTA 39.2 的成绩，分别超出 SORT 基线 13.6 和 5.3 个百分点（Table 3），同时保持了流水线的简洁性与可复现性。
 
-## 整体框架
+
 
 OWTB（Open-World Tracking Baseline）遵循经典的“检测-跟踪”（tracking-by-detection, TBD）范式，并将其分解为四个独立且可替换的阶段，如图6所示。该流水线以逐帧方式处理视频，最终输出每个目标在整个时间轴上的非重叠分割掩膜与身份标识。
 
@@ -132,7 +135,7 @@ OWTB（Open-World Tracking Baseline）遵循经典的“检测-跟踪”（track
 ![[assets/figures/papers/paper_list_l36_https_arxiv_org_abs_2104_11221/figures/006_Figure_6.jpg]]
 *Figure 6: Open-world tracking baseline (OWTB) is inspired by tracking-by-detection pipeline: we (1) obtain object proposals, (2) compute cross-frame association scores, that are used to (3) form and manage tracks, and finally, (4) ensure that conflicts with tracks occupying same space-time volume are resolved*
 
-## 核心模块与公式推导
+
 
 ### 开放世界跟踪精度（OWTA）
 
@@ -170,7 +173,9 @@ OWTB 遵循经典的检测-跟踪（tracking-by-detection）范式，将开放�
 - **关联相似度**：光流提供运动线索，ReID 提供外观线索，二者互补。中间帧传播虽提升已知目标准确率（88.2），但损害未知目标准确率（65.9），故最终方案不使用中间帧。
 - **轨迹管理**：离线合并（Hung.+OffTM）在已知 OWTA 60.5 和未知 OWTA 40.2 上均优于纯在线匈牙利匹配（Table 4）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 基准与评估协议
 
@@ -234,7 +239,9 @@ $$\mathrm{OWTA}_{\alpha} = \sqrt{\mathrm{DetRe}_{\alpha} \cdot \mathrm{AssA}_{\a
 ![[assets/figures/papers/paper_list_l36_https_arxiv_org_abs_2104_11221/figures/005_Figure_5.jpg]]
 *Figure 5: TAO-OW classes. Word cloud showing known (left) and unknown (right) classes in our TAO-OW benchmark, with wordsize proportional to frequency*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 追踪范式定位
 
@@ -272,6 +279,8 @@ OWTB的有效性建立在以下前提之上：
 2. **未知对象的长期外观模型**：现有ReID特征在已知类别上训练，对未知对象的判别力有限且随时间退化。能否为从未见过的对象在线构建鲁棒的长期外观表征，是长时关联突破的关键。
 3. **大规模未标注视频的利用**：开放世界场景下存在海量未标注视频数据，如何通过自监督预训练或半监督微调提升检测和关联的泛化能力，是缩小已知-未知性能差距的潜在路径。
 4. **端到端开放世界跟踪**：当前TBD范式将检测与跟踪分离，限制了联合优化的可能性。设计端到端的开放世界跟踪器，使提议生成和关联学习能够协同适应未知对象，是一个架构层面的开放挑战。
+
+
 
 ## 原文 PDF
 

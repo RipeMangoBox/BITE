@@ -44,7 +44,7 @@ claims:
 > - GenColorBench - Numerical Color Understanding (ISCC-NBS L1) 上，准确率 (%) BLIP3o: 43.20 vs （其他模型远低于此） (N/A)。
 > - GenColorBench - Implicit Color Association (ISCC-NBS L1) 上，准确率 (%) BLIP3o: 28.22 vs （整体低，显示任务极难） (N/A)。
 
-## 概述
+## 概要
 
 文本到图像（T2I）生成模型在语义理解与图像质量上取得了显著进展，但在**精确色彩生成**方面仍存在系统性缺陷——模型难以忠实匹配文本中指定的颜色，尤其面对细粒度色彩名称、数值色彩规格以及微妙修饰词（如“-ish”）时表现尤为薄弱。这一瓶颈的根源在于：**缺乏一个专门、量化且感知一致的颜色评估基准**，导致无法客观衡量并改进模型的色彩控制能力。
 
@@ -62,7 +62,7 @@ claims:
 
 **方法谱系与知识库定位**：GenColorBench 在评估范式上区别于现有基准。传统基准如 **T2I-CompBench**（Huang et al., CVPR 2024）和 **GenEval**（Ghosh et al., ECCV 2024）主要依赖 VQA 准确率衡量组合性与提示遵循，仅部分覆盖色彩命名或组合任务，且未采用标准色彩体系。**ColorPeel**（AbdAlmageed et al., CVPR 2024）虽关注色彩生成，但任务覆盖面与提示规模有限。GenColorBench 首次将**像素级感知色彩度量**引入大规模 T2I 评估，填补了从粗粒度 VQA 到细粒度色彩控制的评估鸿沟。其评估对象涵盖扩散模型（**Stable Diffusion** 系列，Rombach et al., CVPR 2022；**FLUX**，Black Forest Labs, 2024）和统一多模态模型（**OmniGen2**，Wu et al., arXiv 2025），为后续模型训练与优化提供了明确的量化方向。
 
-## 背景与动机
+
 
 文本到图像（T2I）生成模型近年来取得了长足进步，但在精确控制生成图像中对象的颜色方面仍面临显著挑战。现有的T2I评估基准（如GenEval、T2I-CompBench等）虽然广泛用于评估组合性、提示遵循度和推理能力，但在色彩评估方面存在系统性缺口——它们或完全不覆盖色彩任务，或仅部分覆盖色彩命名或组合任务，缺乏对数值色彩规格、隐式色彩关联和细粒度色彩修饰等关键维度的全面考量（Table 1）。
 
@@ -74,7 +74,9 @@ claims:
 
 为填补上述缺口，GenColorBench提出了一个系统性的解决方案：基于ISCC-NBS（三层级）和CSS3/X11等标准色彩体系，构建覆盖400+种颜色、超过44,464条提示的大规模基准，并采用CIELuv色彩空间的像素级主成分分析和感知色彩距离指标，取代不稳定的VLM问答式评估。这一设计使得我们能够首次从色彩名称准确度、多对象色彩组合、色彩-对象关联、数值色彩理解和隐式色彩关联五个维度，定量诊断T2I模型的色彩生成能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GenColorBench的核心创新在于：它不再依赖视觉语言模型（VLM）的问答式评估，而是构建了一套**基于CIELuv色彩空间的像素级客观评价体系**，并首次将**标准色彩命名体系**与**多维度色彩理解任务**系统性地引入T2I模型的评估。
 
@@ -100,7 +102,7 @@ GenColorBench全面采用了**ISCC-NBS三层级色彩命名系统**（L1基础�
 
 GenColorBench包含**超过44,464个精心设计的提示**，覆盖**400+种颜色**，规模远超GenEval（553个提示）和T2I-CompBench（约6,000个提示）。这一规模优势使得细粒度的语义类别消融和颜色修饰分析成为可能——例如Figure 3揭示了模型在水果蔬菜类别上的准确率显著低于服装家具类别，Figure 6则量化了模型对“-ish”等微妙修饰的处理能力不足35%。这些发现直接指向了模型受先验色彩知识干扰和缺乏细微色彩变体理解的核心缺陷，为后续模型优化提供了明确的改进方向。
 
-## 整体框架
+
 
 GenColorBench 的评估框架遵循一个五阶段的感知色彩评估流水线，其设计目标是用客观的像素级色彩分析取代传统 VLM 问答式的评估范式。Figure 1 展示了该流水线的完整架构：**VQA-based Object Localization → Object Segmentation → Pixel Extraction → Color Grounding → Score Mechanism**。
 
@@ -138,7 +140,7 @@ GenColorBench 的评估框架遵循一个五阶段的感知色彩评估流水线
 
 Table 1 的系统对比揭示了 GenColorBench 的核心定位：现有基准（如 GenEval、T2I-CompBench、DSG 等）仅部分覆盖色彩相关任务，且普遍依赖 VLM 进行问答式评估。Table 2 的实验证据表明这一范式存在根本缺陷——BLIP3o 在 ISCC-NBS Level 2 的 MCQ 准确率仅为 73.81%，MCQ 稳定性低至 64.22%，说明 VLM 依赖语言启发式而非真实的色彩感知。GenColorBench 通过基于 CIELuv 空间的像素级主成分分析和感知色彩距离指标，绕过了这一瓶颈，实现了更稳定、更感知一致的色彩准确度评测。
 
-## 核心模块与公式推导
+
 
 GenColorBench 的评估框架由五个顺序模块构成（Figure 1），形成从图像生成到色彩评分的完整闭环。整体设计目标是以感知一致的方式量化生成图像中对象的色彩准确度，替代依赖视觉语言模型（VLM）问答的传统评估范式。
 
@@ -189,7 +191,9 @@ $$(\overline{u_{\mathrm{proj}}^*}, \overline{v_{\mathrm{proj}}^*})$$
 
 三项指标共同构成色彩准确度的综合评定，取代了传统 VQA 准确率单一维度的评估方式。Table 2 的实验证据表明，VLM 在色彩评估任务上的表现极不稳定——BLIP3o 在 ISCC-NBS Level 2 的 MCQ 准确率仅 73.81%，MCQ 稳定性仅 64.22%——这从反面验证了基于像素级感知距离的客观评估方法的必要性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -241,7 +245,9 @@ Table 3 展示了各模型在五项色彩任务上的整体表现。核心发现
 ![[assets/figures/papers/paper_list_l2207_https_openaccess_thecvf_com_content_CVPR2026_html_Butt_GenColorBench_A_C/figures/009_Figure_5.jpg]]
 *Figure 5: Color representation in LAION-2B text prompts, analyzed across four semantic categories: (i) Numeric Colors, (ii) ISCC-NBS L2 colors, (iii) CSS3/X11 named colors (Top-10), and (iv) Color Modifiers (Top-10). The data reveals the dominant representation of ISCC-NBS L2 colors and their modifiers. Whereas, the numeric colors are significantly under-represented*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 评估范式演进中的定位
 
@@ -294,6 +300,8 @@ GenColorBench 的适用边界由以下约束定义：
 3. 基准测试是否应扩展到多语言色彩命名体系？不同语言对色彩的切分方式不同（如俄语的浅蓝/深蓝区分），这既是文化公平性问题，也是测试模型色彩理解深度的潜在探针。
 
 4. 当对象分割本身存在错误时，如何提升色彩评分的鲁棒性？可能的路径包括多尺度掩码融合、基于不确定性的像素加权，或直接跳过对象检测的全图色彩分布分析。
+
+
 
 ## 原文 PDF
 

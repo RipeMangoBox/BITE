@@ -5,6 +5,8 @@ paper_level: A
 venue: ICCV
 year: 2023
 pdf_ref: paperPDFs/ICCV_2023/NFL_Neural_LiDAR_Fields_for_Novel_View_Synthesis.pdf
+project_link: https://research.nvidia.com/labs/toronto-ai/nfl/
+code_link: null
 aliases:
 - NNLF
 - NFL
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | NFL: 用于新视角合成的神经LiDAR场 |
 | 英文题名 | NFL: Neural LiDAR Fields for Novel View Synthesis |
 | 会议/期刊 | ICCV 2023 |
-| Links | [paper](https://arxiv.org/abs/2305.01643); [Project](https://research.nvidia.com/labs/toronto-ai/nfl/) |
+| Links | [paper](https://arxiv.org/abs/2305.01643) · [Project](https://research.nvidia.com/labs/toronto-ai/nfl/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | NFL (Neural LiDAR Fields) |
 | Dataset | TownClean, TownReal, Waymo Interp., Waymo NVS |
@@ -41,7 +43,7 @@ claims:
 > - TownReal 上，MAE (cm) 为 39.2，对比 162.8 (LiDARsim)，变化 -123.6。
 > - Waymo Interp. 上，MAE (cm) 为 30.8，对比 116.3 (LiDARsim)，变化 -85.5。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -69,7 +71,7 @@ LiDAR新视角合成（Novel View Synthesis, NVS）旨在从一组已采集的Li
 
 NFL位于**神经渲染与物理传感器建模的交叉点**。它继承了NeRF的隐式场景表征和可微渲染范式，但通过引入LiDAR主动传感的物理方程，将神经场从“被动色彩场”扩展为“主动物理场”。与LiDARsim等“先重建后模拟”的显式管线不同，NFL通过端到端优化直接匹配传感物理过程，避免了中间几何重建的误差累积。该方法为自动驾驶和机器人领域的LiDAR仿真提供了一条高保真、数据驱动的新路径。
 
-## 背景与动机
+
 
 ### LiDAR新视角合成的核心挑战
 
@@ -99,7 +101,9 @@ LiDAR传感器的测量过程受多种物理效应影响，这些效应在合成
 
 基于上述分析，本文提出**NFL（Neural LiDAR Fields）**，核心动机是：**将物理启发的LiDAR传感模型直接集成到可微神经体渲染框架中，通过端到端优化神经场来匹配LiDAR的主动传感物理过程**。与“先重建后模拟”的范式相比，这种“直接优化”策略避免了显式几何重建的中间误差累积，能够更逼真地再现LiDAR扫描的物理特性——尤其是光束发散引起的范围偏差、二次回波和射线丢弃现象。通过缩小合成扫描与真实扫描之间的域差距，NFL有望提升下游任务（如点云配准和语义分割）的性能。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 NFL 的核心创新在于**将物理启发的 LiDAR 主动传感模型直接嵌入可微神经体渲染框架**，从而跳过了传统“先重建后模拟”管线中引入的离散化误差和物理近似不足。具体而言，NFL 在以下五个关键维度上对基线方法进行了系统性改造：
 
@@ -143,7 +147,7 @@ LiDAR 射线在未命中任何表面时不会产生回波（射线丢弃）。NF
 
 这些创新共同构成了 NFL 相对于 LiDARsim、i-NGP、DS-NeRF 和 URF 等基线的**系统性优势**：NFL 不再将 LiDAR 视为“有深度的相机”，而是从传感器物理第一性原理出发，直接优化神经场以匹配主动传感的完整物理过程。
 
-## 整体框架
+
 
 NFL（Neural LiDAR Fields）的整体pipeline围绕一个核心设计展开：**将物理启发的LiDAR主动传感模型直接嵌入可微神经体渲染框架**，从而端到端地学习场景的几何与辐射属性，并合成逼真的新视角LiDAR扫描。其输入为多帧LiDAR扫描数据（包含射线原点、方向、回波范围和反射率），输出为新视角下的第一回波范围、反射率、射线丢弃概率及二次回波范围。
 
@@ -175,7 +179,7 @@ NFL（Neural LiDAR Fields）的整体pipeline围绕一个核心设计展开：**
 
 这些模块协同工作，使得NFL能够从稀疏的LiDAR扫描中学习连续的场景表征，并从任意新视角合成包含第一回波、二次回波、反射率和射线丢弃掩码的完整LiDAR扫描——这是传统“先重建后模拟”方法（如LiDARsim）难以实现的。
 
-## 核心模块与公式推导
+
 
 ### 3.1 神经场景表征
 
@@ -249,7 +253,9 @@ $$\mathcal{L} = \mathcal{L}_{\text{range}} + \lambda_e \mathcal{L}_e + \lambda_d
 
 该多任务损失设计使NFL在优化几何精度的同时，保持对LiDAR特有物理现象（射线丢弃、二次回波）的建模能力。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -359,7 +365,9 @@ Table 4和Table 5分别报告了点云配准和语义分割的结果：
 ![[assets/figures/papers/paper_list_l40_https_arxiv_org_abs_2305_01643/figures/014_Figure_11.jpg]]
 *Figure 11: Waymo dataset We use the following 4 scenes (cf . Fig. 11) that are mostly static from Waymo [48] dataset*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位与核心瓶颈
 
@@ -424,6 +432,8 @@ NFL的设计假设和实验设置定义了其当前适用边界：
 ### 6. 知识库定位总结
 
 NFL在方法谱系中的定位可概括为：**将主动传感物理模型嵌入神经体渲染框架的开创性工作**。它既不是对NeRF的简单适配（如DS-NeRF、URF），也不是对传统LiDAR模拟的增量改进（如LiDARsim）。其核心贡献在于识别并形式化了LiDAR体渲染与被动传感器体渲染的本质差异——双向透射率——并在此基础上系统性地集成了光束发散、多次回波和射线丢弃等物理效应。这一方法论框架为后续工作提供了两个可扩展的维度：（1）更精细的物理模型（如大气散射、目标表面BRDF）的集成；（2）更高效的神经渲染架构（如基于哈希网格的快速推理）的应用。
+
+
 
 ## 原文 PDF
 

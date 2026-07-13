@@ -43,7 +43,7 @@ claims:
 > [!tip] 效果简介
 > - HumanML3D 上，FID↓ 0.040 (MLA-Gen-B) vs 0.083 (ACMDM-B) (-0.043)；R-Precision Top-1↑ 0.527 (MLA-Gen-B) vs 0.522 (ACMDM-B) (+0.005)；Matching Score↓ 3.108 (MLA-Gen-B) vs 3.178 (ACMDM-B) (-0.070)。
 
-## 概述
+## 概要
 
 文本驱动动作生成任务的目标是根据自然语言描述生成与之语义一致的人体动作序列。现有方法（如基于CLIP特征的扩散或流模型）普遍依赖全局文本表示进行条件控制，能够捕捉整体运动模式，但存在一个关键瓶颈：**缺乏帧级运动与文本token之间的细粒度时序对齐**，导致生成的动作虽然整体语义正确，却频繁遗漏关键细节（如图1所示，人物“整理”物品时手部动作模糊或缺失）。更隐蔽的问题是，在跨模态注意力计算中，注意力权重不成比例地集中在无信息量的起始token上——这一现象被本文定义为**注意力沉没（Attention Sink）**，进一步加剧了语义利用不充分的问题。
 
@@ -55,7 +55,7 @@ claims:
 
 在HumanML3D基准上的实验表明，MLA-Gen-B的FID达到 **0.040**，显著优于基线ACMDM-B的0.083，同时在R-Precision、Matching Score和CLIP-score等指标上均取得最优或次优结果。消融实验进一步验证：记忆槽位与局部对齐模块的组合使FID从0.120降至0.076；sink-mask机制将SinkRatio从0.9-1.0降至0.4-0.6，强掩码配置（$t_{\text{thresh}}=0.2$）将FID从0.099降至0.056，证实了注意力分布均衡化对生成质量的关键作用。
 
-## 背景与动机
+
 
 文本驱动的人体动作生成旨在根据自然语言描述合成逼真的三维人体运动序列，在动画制作、虚拟现实和人机交互等领域具有广泛应用。近年来，扩散模型和流匹配等生成范式在该任务上取得了显著进展，代表性工作包括 **MDM**（Tevet et al., 2022）、**MotionDiffuse**（Zhang et al., 2024）、**ReMoDiffuse**（Zhang et al., 2023）以及 **MLD++** 等。这些方法通常将文本条件以全局特征的形式注入生成过程，能够捕捉动作的整体语义，生成与描述大致相符的运动序列。
 
@@ -65,7 +65,9 @@ claims:
 
 针对上述问题，本文提出 **MLA-Gen**，一个系统性地探索运动-语言对齐的文本驱动动作生成框架。MLA-Gen的核心动机是：**通过引入全局运动先验与局部细粒度条件，并显式建模和缓解注意力沉没问题，从根本上提升运动生成中文本语义的利用效率与对齐精度**。具体而言，MLA-Gen通过可学习的记忆槽位（Memory Slots）提供全局运动原型，利用局部交叉注意力建立帧级运动与文本token的对齐，并基于提出的SinkRatio指标设计sink-mask和sink-ctrl机制来抑制注意力沉没，从而在多个层面协同提升生成质量。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MLA-Gen 的核心创新在于系统性地解决了文本驱动动作生成中“粗粒度语义利用”与“跨模态注意力失效”两个相互耦合的问题。与仅依赖全局文本特征（如CLIP特征）的基线方法（如 **ACMDM** (Meng et al., 2025)、**MDM** (Tevet et al., 2022)）不同，MLA-Gen 引入了三个紧密协作的机制，构成了从全局先验注入、局部细粒度对齐到注意力动态调控的完整创新链路。
 
@@ -101,7 +103,7 @@ Figure 5 的可视化提供了直接证据：未掩码模型的注意力几乎�
 
 三个创新点形成了因果闭环：记忆槽位提供全局运动骨架，局部对齐注入帧级语义细节，而 SinkRatio 机制确保这些语义信息在注意力计算中被有效利用而非被沉没效应淹没。这种“注入-对齐-保障”的三层架构使得 MLA-Gen 在 HumanML3D 数据集上实现了 FID 0.040（MLA-Gen-B），远超 ACMDM-B 的 0.083（Table 1），同时 R-Precision、CLIP-score 等语义指标也达到最优。
 
-## 整体框架
+
 
 MLA-Gen 的整体 pipeline 围绕一个核心矛盾展开：现有文本驱动动作生成方法依赖全局文本表示（如 CLIP 特征），虽能捕获整体语义，却因缺乏帧级运动与文本 token 之间的细粒度时序对齐而遗漏关键细节。更隐蔽的问题是，跨模态注意力中出现的“注意力沉没”（Attention Sink）现象使注意力过度集中在无信息的起始 token 上，进一步加剧了语义利用不充分。
 
@@ -162,7 +164,7 @@ $$\mathrm{SinkRatio} = \frac{1}{L} \sum_{i=1}^{L} s_i, \quad s_i = \sum_{k \in \
 ![[assets/figures/papers/paper_list_l3311_https_arxiv_org_abs_2604_02973/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of our MLA-Gen framework. It comprises three complementary components: Memory Slots for capturing global motion priors, Motion-Language Alignment for providing fine-grained textual semantics, and a SinkRatio-based mechanism that models and mitigates the attention sink phenomenon during both attention computation (sink-mask) and sampling (sink-ctrl)*
 
-## 核心模块与公式推导
+
 
 MLA-Gen 以条件流匹配（Conditional Flow Matching）为生成骨干，在潜在运动空间中建模条件分布 $p(X|y)$。其核心设计围绕三个递进式模块展开：全局运动先验注入、局部运动-语言对齐，以及注意力沉没（Attention Sink）度量与缓解。
 
@@ -235,7 +237,9 @@ $$k_{eff} = k_{base} (1 + \alpha \cdot \mathrm{SinkRatio}) \tag{9}$$
 ![[assets/figures/papers/paper_list_l3311_https_arxiv_org_abs_2604_02973/figures/005_Figure_5.jpg]]
 *Figure 5: Heatmaps comparison of alignment on the masked model (left) and the unmasked model (right). The textual descriptions and timesteps are kept consistent*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -298,7 +302,9 @@ $$k_{eff} = k_{base} (1 + \alpha \cdot \mathrm{SinkRatio}) \tag{9}$$
 ![[assets/figures/papers/paper_list_l3311_https_arxiv_org_abs_2604_02973/figures/011_Figure_8.jpg]]
 *Figure 8: A failure case of MLA-Gen with a very long textual description*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 基线关系与差异化定位
 
@@ -341,6 +347,8 @@ MLA-Gen 建立在条件流匹配（Conditional Flow Matching）框架之上，�
 4. **注意力沉没的尺度特性**：注意力沉没问题在更大规模模型或自回归框架中是否表现出不同特性？sink-mask 的阈值 $t_{\text{thresh}}$ 和 sink-ctrl 的自适应系数 $\alpha$ 是否需要随模型规模动态调节？这些问题的回答将决定该机制的通用性。
 
 5. **与检索增强方法的融合**：ReMoDiffuse 的检索增强思路与 MLA-Gen 的记忆槽位在功能上互补——前者提供实例级参考，后者提供类别级原型。两者的融合可能进一步提升生成多样性（Diversity）与语义对齐的协同优化。
+
+
 
 ## 原文 PDF
 

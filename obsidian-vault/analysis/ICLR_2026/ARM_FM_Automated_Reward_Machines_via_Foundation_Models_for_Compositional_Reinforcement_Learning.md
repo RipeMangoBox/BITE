@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/ARM_FM_Automated_Reward_Machines_via_Foundation_Models_for_Compositional_Reinforcement_Learning.pdf
+project_link: null
+code_link: null
 aliases:
 - AFARMFM
 - ARM-FM
@@ -41,13 +43,13 @@ claims:
 > - MiniGrid-DoorKey (程序生成地图) 上，累积奖励 为 持续高于基线，对比 DQN, DQN+ICM, ReAct均显著较低，变化 显著提升。
 > - MiniGrid-UnlockToUnlock 上，累积奖励 为 近乎完美奖励，对比 DQN, DQN+ICM, ReAct均无学习，变化 从0到近乎完美。
 
-## 概述
+## 概要
 
 本文提出 **ARM-FM (Automated Reward Machines via Foundation Models)**，一个利用基础模型（FM）自动生成**语言对齐奖励机构（Language-Aligned Reward Machines, LARM）** 的框架，用于组合强化学习中的自动化奖励设计。核心思想是将基础模型的高层推理能力与奖励机构（Reward Machine, RM）的形式化结构相结合：FM自动将自然语言任务描述分解为有限状态自动机，每个状态关联一个语言嵌入，使得策略可以基于当前子目标的语义嵌入进行条件化，从而在共享的语义技能空间中实现经验复用和零样本泛化。
 
 ARM-FM在多个基准上取得了显著成果：在MiniGrid的DoorKey任务中持续优于所有基线方法；在UnlockToUnlock、BlockedUnlockPickup和KeyCorridor三个复杂长时域任务中，是唯一能解决所有任务并达到近乎完美奖励的方法；在Craftium的3D钻石采集任务中，PPO+LARM持续完成整个任务序列；在XLand-MiniGrid的多任务设置中，完整方法在同时训练10个任务时仍保持高成功率，并展示了零样本泛化能力。
 
-## 背景与动机
+
 
 强化学习中的奖励函数设计高度敏感：稀疏奖励无法提供足够的学习信号，而手工设计的稠密奖励又容易产生奖励破解（reward hacking）问题。将复杂目标转化为结构化的、可操作的奖励信号是核心瓶颈。
 
@@ -55,7 +57,9 @@ ARM-FM在多个基准上取得了显著成果：在MiniGrid的DoorKey任务中�
 
 ARM-FM旨在解决这一瓶颈：利用基础模型自动生成完整的、可执行的奖励机构，包括自动机结构、标签函数和每个子目标的自然语言描述，从而消除对手工设计的依赖。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ARM-FM的核心创新在于将基础模型的高层推理能力与奖励机构的形式化结构相结合，具体体现在：
 
@@ -65,7 +69,7 @@ ARM-FM的核心创新在于将基础模型的高层推理能力与奖励机构�
 
 3. **语义技能空间**：通过语言嵌入构建语义技能空间，使策略能够在相关子目标间共享知识，实现迁移、组合和零样本泛化。策略以环境状态s_t和当前RM状态的语言嵌入z_{u_t}为条件：π(s_t, z_{u_t})。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_reinforcement_learning_planning_agents__deep_rl__b001_OBpQdCWLfd_ARM-FM_Automated_Reward_/figures/001_Figure_1.jpg]]
 *Figure 1: An overview of our framework (left) and results in a complex sparse-reward environment (right). Reward Machine Generation (top-left): Given a high-level natural language prompt and a visual observation of the environment, a FM automatically generates the formal specification of the Reward Machine, the executable Python code for the labeling functions, and the natural language descriptions for each RM state. RL training (bottom-left): During the RL training loop, the labeling functions evaluate environment observations to update the Reward Machine’s state, which provides a dense reward signal $R _ { t } ^ { \mathrm { R M } }$ . The RL agent’s policy receives the environment observati...*
@@ -78,7 +82,7 @@ ARM-FM的整体框架如Figure 1所示，包含两个主要阶段：
 
 Figure 2展示了ARM-FM如何利用FM自动从MiniGrid的UnlockToUnlock任务描述构建RM。Figure 4展示了生成的三个核心组件：RM规范、标签函数和状态指令与嵌入。
 
-## 核心模块与公式推导
+
 
 ### 5.1 奖励机构（RM）形式化定义
 
@@ -119,7 +123,9 @@ R_j^{total} + \gamma \max_{a'} \hat{Q}(s_{j+1}, \phi(u_{j+1}), a'; \theta^-) & \
 在LARM无正奖励循环且最终奖励严格大于任何非终止轨迹累积奖励的假设下，对LARM增强MDP最优的策略也对原始稀疏MDP最优：
 π^* optimal for M_LARM ⟹ π^* optimal for M
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 6.1 主要实验结果
 
@@ -191,7 +197,9 @@ R_j^{total} + \gamma \max_{a'} \hat{Q}(s_{j+1}, \phi(u_{j+1}), a'; \theta^-) & \
 *Table 5: DQN hyperparameters used for all MiniGrid and BabyAI experiments.*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ARM-FM在方法谱系中占据独特位置，如**Table 4**所示：
 
@@ -220,6 +228,8 @@ ARM-FM的核心优势在于：直接生成完整的、语义化的自动机，�
 - 如何进一步减少或消除对人类验证的依赖？论文提到可以利用RM的自动机结构进行形式化验证实现自动自我修正。
 - ARM-FM在更复杂、更开放的环境（如完整的Minecraft或真实机器人）中的表现如何？
 - 对于基础模型不熟悉的领域，如何保证生成RM的质量？是否需要领域特定的微调或提示工程？
+
+
 
 ## 原文 PDF
 

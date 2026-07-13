@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Interleave_VLA_Enhancing_Robot_Manipulation_with_Image_Text_Interleaved_Instructions.pdf
+project_link: null
+code_link: null
 openreview_forum_id: ULTWUuGhC3
 aliases:
 - IV
@@ -42,7 +44,7 @@ claims:
 > - SimplerEnv Novel Category 上，Success Rate (%) 为 57.3 ± 2.8 (Interleave-VLA Full)，对比 19.3 ± 1.5 (π0 Text-VLA)，变化 +38.0。
 > - Real-robot Out-of-Domain Food Lift (Avg.) 上，Success Rate (%) 为 71% (Interleave-VLA w/ PT)，对比 13% (Text-VLA w/ PT)，变化 +58%。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -67,7 +69,7 @@ Interleave‑VLA 作为一种**骨干无关的即插即用范式**，区别于�
 - **注意力幻觉缓解**：定量失败分析表明，Interleave‑VLA 显著降低了高层意图错误（Jitter、Wrong Intention），残余失败主要来自底层动作执行，而 Text‑VLA 在分布外场景中表现出更多的高层幻觉。
 - **骨干可扩展性**：将 Interleave‑VLA 应用于 OpenVLA 后，在 VIMA‑Bench 的 L1‑L3 泛化层级上均实现 **2 倍以上**提升（L3: 64.00 vs 23.86），验证了范式的通用性。
 
-## 背景与动机
+
 
 ### 语言指令的歧义与注意力幻觉
 
@@ -91,7 +93,9 @@ Interleave-VLA的出发点是：**如果人类在描述一个陌生物体时，�
 
 该范式的关键设计原则是**轻量适配**：不改变VLA模型的核心架构，仅在tokenizer中引入特殊分隔符（`<BOI>`/`<EOI>`）来区分图像与文本token，使现有VLA能够原生处理图文交错输入（Figure 2）。这一设计使Interleave-VLA成为一个骨干无关的插件式方案，可适配π0、OpenVLA等多种VLA架构（Table 1）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Interleave-VLA 的核心创新在于**将图文交错指令（interleaved image-text instructions）引入视觉‑语言‑动作（VLA）模型**，在不改变模型架构的前提下，通过上下文视觉线索缓解文本指令VLA在未见物体和场景上的注意力幻觉，从而大幅提升泛化能力。其关键设计围绕四个 changed slots 展开。
 
@@ -128,7 +132,7 @@ $$a_t \sim \pi_{\theta}( \cdot \mid s_t ), \quad s_t = ( I_t, \mathbf{q}_t, \mat
 
 上述四个 changed slots 构成了 Interleave-VLA 的核心创新闭环：**通过 tokenizer 层的轻量适配，使现有 VLA 原生处理图文交错输入，从而在保持架构和训练目标不变的前提下，利用上下文视觉线索消除注意力幻觉，实现 2‑3 倍的 Out‑of‑Domain 泛化提升**。这一范式在 SimplerEnv 语义泛化任务（Table 2: +21.1%）、真实机器人实验（Table 3: +58% 食物提升）和 VIMA‑Bench（Table 14: +40.14% L3）上均得到强证据支持。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l41_https_openreview_net_forum_id_ULTWUuGhC3/figures/004_Table_1.jpg]]
 
@@ -186,7 +190,7 @@ $$\mathcal{T} = ( u_1, \dotsc, u_M ), \quad u_j \in \mathcal{V}_{\mathrm{text}} 
 
 尽管输入中增加了图像 token，推断延迟的增长高度可控。在输入图像数量 $n < 10$ 时，延迟近似为 $t = 1.2 n^{2} + 1.5 n + 221$ 秒（Figure 9），二次项系数极小，实际使用中额外开销几乎可忽略。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化
 
@@ -248,7 +252,9 @@ $$t = 1.2 n^{2} + 1.5 n + 221$$
 
 三个模块形成闭环：适配模块提供模态区分能力（分隔符）→ 训练流水线提供大规模多模态监督信号（交错数据）→ 推理接口将训练获得的跨模态对齐能力泛化到未见指令形式。这一链路的核心因果机制是：**通过分隔符在 token 空间显式标记图像边界，使注意力机制在推理时能够将指令中的视觉线索与观测中的目标物体对齐，从而消除纯文本条件下的注意力幻觉**——这是 Interleave-VLA 在 OOD 任务上实现 2-3 倍泛化提升的根本原因。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈验证：注意力幻觉的定量解构
 
@@ -318,7 +324,9 @@ Figure 9给出了推理延迟与输入图像数量的关系：$t \approx 1.2n^
 3. **纯文本评估的提升有限**：Interleave-VLA Partial在Out-of-Domain上仅比Text-VLA提升约4个百分点（Table 2），说明交错视觉线索的**测试时提供**是泛化增益的必要条件，而非充分条件。
 4. **数据生成流水线的边界**：尽管OWLv2与Qwen-VL协同检测的综合错误率低至4.4%，极端视角、光照或遮挡场景下的检测失败仍可能引入噪声训练样本，影响模型对特定物体类别的学习质量。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位与核心瓶颈
 
@@ -397,6 +405,8 @@ Interleave-VLA 的核心洞察在于：通过在 VLA 模型的 tokenizer 中引�
 4. **因果量化**：如何量化注意力幻觉的减少与泛化性能提升之间的因果关系？Figure 11 提供了定性证据，但缺乏严格的因果中介分析。不同模态分布偏移下的泛化极限也尚未被理论刻画。
 
 5. **缩放规律**：在更大规模、更多样化的机器人和任务中，交错图文指令的多模态缩放规律是什么？Table 17 的协同训练实验表明跨数据集扩展能进一步提升性能，但数据规模、模态多样性与性能之间的定量关系尚未建立。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/AutoLibra_Agent_Metric_Induction_from_Open_Ended_Human_Feedback.pdf
+project_link: https://huggingface.co/datasets/ProKil/autolibra
+code_link: https://github.com/ProKil/autolibra
 aliases:
 - AutoLibra
 tags:
@@ -29,7 +31,7 @@ claims:
 | 中文题名 | AutoLibra：从开放式人类反馈中归纳智能体评估指标 |
 | 英文题名 | AutoLibra: Agent Metric Induction from Open-Ended Human Feedback |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=4BjGVZ7Bxn); [GitHub](https://github.com/ProKil/autolibra); [Project](https://huggingface.co/datasets/ProKil/autolibra) |
+| Links | [paper](https://openreview.net/forum?id=4BjGVZ7Bxn) · [GitHub](https://github.com/ProKil/autolibra) · [Project](https://huggingface.co/datasets/ProKil/autolibra) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/language_speech_and_dialog |
 | Method | AutoLibra |
 | Dataset | Sotopia, WebArena, WebVoyager, Baba-Is-AI (GPT-4o) |
@@ -39,15 +41,17 @@ claims:
 > - WebArena 上，覆盖率 (Coverage) 为 88%，对比 N/A，变化 N/A。
 > - WebVoyager 上，覆盖率 (Coverage) 为 88%，对比 N/A，变化 N/A。
 
-## 概述
+## 概要
 
 AutoLibra 是一种从开放式人类反馈中自动归纳可解释、细粒度评估指标的方法，用于评估和优化 AI 智能体。该方法受社会科学主题分析（thematic analysis）的编码-主题归纳步骤启发，通过两个核心步骤——反馈锚定（Feedback Grounding）和行为聚类（Behavior Clustering）——将人类反馈转化为结构化的评估指标。AutoLibra 在多个智能体领域（协作、社交、网页、文本游戏）中展现出高覆盖率和低冗余度，并能通过迭代优化过程显著提升前沿 LLM 在复杂任务中的性能。
 
-## 背景与动机
+
 
 现有智能体评估主要依赖任务成功率等粗粒度指标，这些指标需要专家手动设计，无法奖励中间涌现行为，也难以捕捉用户关心的细粒度行为维度。例如，在协作、社交、网页导航和文本游戏等多样化场景中，专家设计的评估维度往往遗漏了用户实际关注的关键行为方面。AutoLibra 的核心动机是：能否像人类从开放式指令和反馈中学习技能一样，让评估系统自动从开放式人类反馈中归纳出细粒度、可解释的评估指标？
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 AutoLibra 的核心创新在于：
 
@@ -59,7 +63,7 @@ AutoLibra 的核心创新在于：
 
 4. **细粒度可解释性**：归纳出的指标包含正面和负面行为示例，比专家设计的指标更具体，并能发现专家遗漏的指标。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__language_speech_and_dialog__b001_4BjGVZ7Bxn_AutoLibra_Age/figures/001_Figure_1.jpg]]
 *Figure 1: AutoLibra induces agent evaluation metrics from human feedback, and uses these metrics to evaluate agents, which can be meta-evaluated via evaluating the coverage on unseen human feedback. Here we show real examples of agent trajectories, human feedback, aspects, induced metrics, evaluation results on WebVoyager (He et al., 2024).*
@@ -82,7 +86,7 @@ Figure 1 展示了 AutoLibra 的整体流程：从人类反馈到指标归纳，
 
 Figure 2 展示了指标优化过程：通过最大化覆盖率、最小化冗余度来优化归纳过程。
 
-## 核心模块与公式推导
+
 
 ### 5.1 反馈锚定 (Feedback Grounding)
 
@@ -118,7 +122,9 @@ $$\text{Redundancy} = \frac{\text{未与任何方面匹配的特质数}}{\text{�
 
 在智能体优化过程中，修改行为聚类步骤：向 LLM 提供现有指标和定义，要求不改变现有指标的定义，仅向现有指标添加新行为，必要时添加新指标。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 6.1 人类验证一致率
 
@@ -215,7 +221,9 @@ Table 6 展示了 MiniHack 各迭代的指标性能：
 - 对于 §5 中的实验，每个数据集每次迭代注释 18 条轨迹。
 - 在 §4 中，随机保留 20% 的轨迹用于验证。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 AutoLibra 在智能体评估方法谱系中占据独特位置：
 
@@ -242,6 +250,8 @@ AutoLibra 在智能体评估方法谱系中占据独特位置：
 - AutoLibra 是否能够扩展到更复杂的多模态智能体环境？
 - 如何自动生成用于评估归纳指标的程序化评估器，以减少对 LLM-as-a-Judge 的依赖？
 - AutoLibra 的迭代优化过程是否可能引入过拟合，如何缓解？
+
+
 
 ## 原文 PDF
 

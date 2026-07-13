@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/Hunyuan3D_2_0_Scaling_Diffusion_Models_for_High_Resolution_Textured_3D_Assets_Generation.pdf
+project_link: null
+code_link: https://github.com/Tencent/Hunyuan3D-2
 aliases:
 - H20
 - H20SDMHRT3AG
@@ -43,8 +45,7 @@ claims:
 > - Shape Generation (Image Conditional) 上，Uni3D-I 0.3151 vs 0.3116 (Trellis) (+0.0035)；Uni3D-T 0.2519 vs 0.2516 (Shape Model 3) (+0.0003)。
 > - Texture Map Synthesis 上，CMMD 2.318 vs 2.651 (Paint3D) (-0.333)。
 
-## 概述
-
+## 概要
 从单张图像生成高分辨率、带纹理的3D资产是计算机图形学与视觉领域的一项核心挑战。现有方法在形状生成阶段难以精准捕捉表面边缘与角落的复杂几何细节，而在纹理合成阶段，由于缺乏有效的几何先验与光照解耦，常出现多视图不一致和条件对齐差的问题，导致生成质量受限。
 
 针对上述瓶颈，**Hunyuan3D 2.0** 提出了一套两阶段生成管线：首先通过 **Hunyuan3D-ShapeVAE + Hunyuan3D-DiT** 从输入图像生成无纹理的裸网格（bare mesh），再通过 **Hunyuan3D-Paint** 为该网格合成高保真纹理贴图。其核心洞察在于：在形状端，利用基于边缘/角落重要性采样的点云编码变分自编码器保留高频几何细节，并借助双流/单流混合 Transformer 与流匹配训练实现条件对齐的形状扩散生成；在纹理端，引入冻结权重的零噪声双流参考网络保持图像细节，并通过并行多任务注意力模块同时达成多视图一致性与条件遵循。
@@ -55,19 +56,6 @@ claims:
 - **纹理合成**：Hunyuan3D-Paint 的 CMMD 低至 2.318，显著优于 Paint3D 等基线（Table 3）。
 - **用户研究**：在视觉质量、条件依从性和整体满意度上均获得最高偏好（Figure 10）。
 
-## 方法谱系与知识库定位
-
-Hunyuan3D 2.0 的贡献可置于以下技术谱系中理解：
-
-| 技术维度 | 代表性基线工作 | Hunyuan3D 2.0 的关键改进 |
-|---------|---------------|------------------------|
-| 3D形状压缩与重建 | **3DShape2VecSet** (Zhang et al., TOG 2023)、**Michelangelo** (Zhao et al., NeurIPS 2023)、**Direct3D** (Wu et al., arXiv 2024) | 引入边缘/角落重要性采样策略，在相同 token 序列长度下显著提升 V-IoU 与 S-IoU |
-| 图像到3D形状生成 | **Craftsman 1.5** (Li et al., 2024)、**Trellis** (Xiang et al., arXiv 2024) | 采用流匹配替代 DDPM/DDIM，设计双流/单流混合 Transformer 并省略位置编码，增强条件对齐 |
-| 多视图纹理合成 | **Zero-1-to-3** (Liu et al., ICCV 2023)、**Wonder3D** (Long et al., CVPR 2024)、**Era3D** (Li et al., arXiv 2024)、**Dense-Texture** (Liu et al., SIGGRAPH Asia 2024)、**Paint3D** (Zeng et al., CVPR 2024) | 冻结权重的 SD2.1 双流 ReferenceNet + 并行多任务注意力，配合图像去光照预处理与基于贪婪覆盖的视角选择 |
-
-该方法并非孤立改进某一模块，而是系统性地重塑了从形状表示、扩散训练目标、网络结构到纹理条件注入与多视图一致性约束的全链路设计。其技术路线代表了“大规模扩散模型 + 专用表示增强 + 多阶段解耦生成”方向在3D资产生成领域的一次重要推进。
-
-## 背景与动机
 
 ### 3D 资产生成的核心挑战
 
@@ -94,8 +82,9 @@ Hunyuan3D 2.0 的贡献可置于以下技术谱系中理解：
 
 这一设计思路旨在端到端地解决“几何细节丢失”与“纹理不一致/不对齐”两大核心问题，实现高分辨率、高保真的 3D 纹理资产生成。
 
-## 核心创新
 
+
+## 核心方法与创新机理
 Hunyuan3D 2.0 的核心创新围绕“形状生成”与“纹理合成”两个阶段展开，通过一系列针对性的表示增强、网络结构改进与一致性约束，系统性地解决了现有方法在几何细节捕捉、条件对齐和多视图一致性方面的瓶颈。
 
 **1. 面向高频几何细节的重要性采样 ShapeVAE**
@@ -135,7 +124,6 @@ $$Z_{MVA} = Z_{SA} + \lambda_{ref} \cdot \mathrm{Softmax}\left( \frac{Q_{ref} K_
 
 这些创新并非孤立存在，而是形成了完整的因果链条：重要性采样保留几何高频信息 → 流匹配与双流 Transformer 实现精准条件跟随 → 去光照与零噪声参考网络保持纹理细节 → 并行多任务注意力同时达成条件对齐与多视图一致性。最终，Hunyuan3D 2.0 在形状重建、条件生成和纹理合成三个核心维度上均取得了显著超越现有方法的性能。
 
-## 整体框架
 
 Hunyuan3D 2.0 采用**两阶段生成管线**：第一阶段从单张输入图像生成无纹理的裸网格（bare mesh），第二阶段为该网格合成高保真纹理贴图。两个阶段分别由 **Hunyuan3D-DiT** 和 **Hunyuan3D-Paint** 两大组件承担，整体架构如图 2 所示。
 
@@ -180,7 +168,6 @@ Hunyuan3D 2.0 采用**两阶段生成管线**：第一阶段从单张输入图�
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2501_12202/figures/003_Figure_2.jpg]]
 *Figure 2: An overall of Hunyuan3D 2.0 architecture for 3D generation. It consists of two main components: Hunyuan3D-DiT for generating bare mesh from a given input image and Hunyuan3D-Paint for generating a textured map for the generated bare mesh. Hunyuan3D-Paint takes geometry conditions – normal maps and position maps of generated mesh as inputs and generates multi-view images for texture baking*
 
-## 核心模块与公式推导
 
 Hunyuan3D 2.0 的核心生成能力建立在三个紧密协作的模块之上，它们分别解决了形状重建/生成与纹理合成中的关键瓶颈。
 
@@ -228,8 +215,9 @@ $$ Z_{MVA} = Z_{SA} + \lambda_{ref} \cdot \mathrm{Softmax}\left( \frac{Q_{ref} K
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2501_12202/figures/006_Figure_5.jpg]]
 *Figure 5: Overview of Hunyuan3D-Paint. We leverage an image delighting module to convert the input image to an unlit state to produce light-invariant texture maps. The system features a doublestream image conditioning reference-net, which provides faithfully conditional image features to the model. Furthermore, it facilitates the production of texture maps that conform closely to the input image. The multi-task attention module ensures that the model synthesizes multi-view consistent images. This module maintains the coherence of all generated images while adhering to the input*
 
-## 实验与分析
 
+
+## 实验与关键发现
 ### 形状重建与生成评估
 
 **形状VAE重建精度。** Hunyuan3D-ShapeVAE 在体积交并比（V-IoU）和表面交并比（S-IoU）两项指标上全面超越所有基线方法。如 Table 1 所示，其 V-IoU 达到 93.6%，比最强基线 **Direct3D**（Wu et al., arXiv 2024）的 88.43% 高出 5.17 个百分点；S-IoU 达到 89.16%，比 Direct3D 的 81.55% 高出 7.61 个百分点。这一显著提升的核心驱动力在于重要性采样策略——通过在高频细节密集的边缘与角落区域增加采样密度，ShapeVAE 的编码器得以保留传统均匀采样所丢失的精细几何信息。视觉对比（Figure 6）进一步印证了数值结论：只有 Hunyuan3D-ShapeVAE 重建的网格呈现出清晰的表面凹凸与规整的空间拓扑，而基线方法在尖锐边缘和复杂曲面处普遍出现模糊或塌陷。
@@ -279,7 +267,19 @@ Figure 10 所示的用户研究结果从主观感知维度验证了数值评估�
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2501_12202/figures/014_Figure_9.jpg]]
 *Figure 9: Visual results. We generate different texture maps for two meshes, and the results validate the performance of Hunyuan3D-Paint on texture reskinning. (Better viewed by zooming in.)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
+Hunyuan3D 2.0 的贡献可置于以下技术谱系中理解：
+
+| 技术维度 | 代表性基线工作 | Hunyuan3D 2.0 的关键改进 |
+|---------|---------------|------------------------|
+| 3D形状压缩与重建 | **3DShape2VecSet** (Zhang et al., TOG 2023)、**Michelangelo** (Zhao et al., NeurIPS 2023)、**Direct3D** (Wu et al., arXiv 2024) | 引入边缘/角落重要性采样策略，在相同 token 序列长度下显著提升 V-IoU 与 S-IoU |
+| 图像到3D形状生成 | **Craftsman 1.5** (Li et al., 2024)、**Trellis** (Xiang et al., arXiv 2024) | 采用流匹配替代 DDPM/DDIM，设计双流/单流混合 Transformer 并省略位置编码，增强条件对齐 |
+| 多视图纹理合成 | **Zero-1-to-3** (Liu et al., ICCV 2023)、**Wonder3D** (Long et al., CVPR 2024)、**Era3D** (Li et al., arXiv 2024)、**Dense-Texture** (Liu et al., SIGGRAPH Asia 2024)、**Paint3D** (Zeng et al., CVPR 2024) | 冻结权重的 SD2.1 双流 ReferenceNet + 并行多任务注意力，配合图像去光照预处理与基于贪婪覆盖的视角选择 |
+
+该方法并非孤立改进某一模块，而是系统性地重塑了从形状表示、扩散训练目标、网络结构到纹理条件注入与多视图一致性约束的全链路设计。其技术路线代表了“大规模扩散模型 + 专用表示增强 + 多阶段解耦生成”方向在3D资产生成领域的一次重要推进。
+
 
 ### 1. 形状生成谱系：从 VAE 压缩到流匹配扩散
 
@@ -342,6 +342,7 @@ Hunyuan3D-Paint 通过三个关键设计突破这一瓶颈：
 
 4. **纹理重绘能力的上限**：Figure 9 展示了纹理重绘（reskinning）的结果，但在保持几何细节与纹理风格迁移之间的权衡关系缺乏系统分析。
 
-## 原文 PDF
 
+
+## 原文 PDF
 ![[paperPDFs/arxiv_2025/Hunyuan3D_2_0_Scaling_Diffusion_Models_for_High_Resolution_Textured_3D_Assets_Generation.pdf]]

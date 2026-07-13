@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/MATCHA_Towards_Matching_Anything.pdf
+code_link: null
 project_link: https://feixue94.github.io/matcha-project/
 aliases:
 - MATCHA
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | MATCHA：迈向万事匹配 |
 | 英文题名 | MATCHA: Towards Matching Anything |
 | 会议/期刊 | CVPR 2025 |
-| Links | [paper](https://arxiv.org/abs/2501.14945); [Project](https://feixue94.github.io/matcha-project/) |
+| Links | [paper](https://arxiv.org/abs/2501.14945) · [Project](https://feixue94.github.io/matcha-project/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | MATCHA |
 | Dataset | SPair-71k (语义匹配), MegaDepth (相对位姿估计), TAP-Vid (时间匹配), 综合平均排名 |
@@ -41,7 +42,7 @@ claims:
 > - MegaDepth (相对位姿估计) 上，AUC@5° 为 55.8 (MATCHA + SP)，对比 49.7 (DIFT + SP)，变化 +6.1。
 > - TAP-Vid (时间匹配) 上，PCK@0.1 为 91.3 (MATCHA)，对比 82.9 (DIFT.Uni + DINOv2)，变化 +8.4。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -69,7 +70,7 @@ MATCHA 在跨任务综合评测中展现出显著优势。如 Table 4 所示，M
 
 在方法谱系中，MATCHA 处于**预训练基础模型特征增强**与**统一描述子学习**的交叉点。与 DIFT 等直接使用冻结扩散特征的方法不同，MATCHA 引入了可训练的注意力融合层和显式对应监督；与 MASt3R 等专用几何基础模型不同，MATCHA 追求单一特征的多任务泛化；与 SD4Match、DHF 等需要数据集特化模型或额外掩码的语义匹配方法不同，MATCHA 以统一的轻量训练范式覆盖三类任务。其核心贡献在于证明了：通过恰当的动态融合与知识整合策略，从现成基础模型中蒸馏出的统一特征，可以同时超越各领域的专用特征。
 
-## 背景与动机
+
 
 ### 视觉对应的任务割裂现状
 
@@ -109,7 +110,9 @@ MATCHA 的核心洞察在于：利用预训练基础模型（稳定扩散与 DIN
 
 如 Figure 1 所示，MATCHA 使用单一特征描述子即可建立几何、语义和时间对应，无需任何任务切换或手工特征选择。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈
 
@@ -175,7 +178,7 @@ MATCHA 处于**预训练基础模型特征适配**与**多任务统一表示学�
 
 **关键限制与待验证点：** 动态融合模块目前仅在下采样 8× 的特征图上运行，导致在 HPatches 小像素误差阈值（<7 px）下匹配精度不及原始分辨率特征（如 DISK, Tyszkiewicz et al., NeurIPS 2020）。此外，DINOv2 在无明显单一物体的重复结构场景中的弱点仍会传递至 MATCHA。静态串联策略虽保护了语义泛化性，但也意味着几何与语义特征之间的协同潜力尚未被完全挖掘——如何设计端到端的联合训练策略而不损害语义能力，是未来研究的重要方向。
 
-## 整体框架
+
 
 MATCHA 的设计围绕一个核心目标展开：**用单一特征描述子同时胜任几何匹配、语义匹配和时间匹配**，从而消除传统方法中需要为不同任务分别设计或选择特征的复杂性。其整体流水线由四个紧密衔接的模块构成，如 Figure 3 所示。
 
@@ -243,7 +246,7 @@ $$L_{total} = L_{geo} + w_{sem} L_{sem}$$
 - **输入**：单张 RGB 图像（训练时使用图像对，推理时单张提取特征后跨图匹配）。
 - **输出**：统一特征图 $F_m$，空间分辨率固定为输入的 1/8（8× 下采样），适用于几何、语义和时间三类匹配任务，无需任务区分或手工特征选择。
 
-## 核心模块与公式推导
+
 
 MATCHA 的核心由四个模块串联构成：基础特征提取、动态特征融合、特征合并与监督训练。整体流程如 Figure 3 所示。
 
@@ -313,7 +316,9 @@ $$L_{total} = L_{geo} + w_{sem} L_{sem} \tag{12}$$
 
 推理时，使用最近邻搜索加互检（mutual check）在 $F_m$ 的描述子空间建立对应，无需任务区分。几何匹配实验中统一使用 **SuperPoint**（DeTone et al., CVPR 2018）提取关键点，位姿估计采用 Poselib + LO-RANSAC 方案，保证与基线方法的公平对比。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 瓶颈验证与核心实验结论
 
@@ -374,7 +379,9 @@ Table 3 在 Aachen（几何）和 PF-Willow（语义）上进行了系统的组�
 ![[assets/figures/papers/paper_list_l46_https_arxiv_org_abs_2501_14945/figures/011_Table_6.jpg]]
 *Table 6: Ablationstudyonobtainingaunifiedfeature.Wecomparediferent waysofobtainingaunifiedfeature.Weshowthatsimple concatenationleads tobeterwaytokeeptheleaed geometricandsemanticrepresentationwhileaddingaditionaljoint trainingonthe concatenated feature pushes the feature tofocus more on geometric matching,leading to significantly degraded semantic matching*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：从专用描述子到统一特征
 
@@ -437,6 +444,8 @@ MASt3R.E 作为几何基础模型编码器，在几何匹配上表现强劲，�
 - **推理效率优化**：如何优化动态融合模块与大规模基础特征的推理效率，使其适用于实时或资源受限的应用？
 
 - **更多基础模型的整合**：除 DINOv2 外，其他预训练基础模型（如 CLIP、SAM）的语义或结构特征是否也能通过类似融合策略进一步增强统一匹配能力？这为方法谱系的进一步扩展提供了想象空间。
+
+
 
 ## 原文 PDF
 

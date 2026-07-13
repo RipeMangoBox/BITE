@@ -43,7 +43,7 @@ claims:
 > - MP3D ObjectNav 上，SR(%) 42.5 vs N/A (N/A)。
 > - HM3D InstNav 上，SR(%) 22.5 vs N/A (N/A)。
 
-## 概述
+## 概要
 
 具身机器人要在真实室内环境中执行物体导航、实例导航和场景问答等复杂任务，需要构建能够同时支撑空间定位与语义理解的场景地图。现有语义地图方法在几何精确性、多尺度语义表示和大型模型接口之间存在根本性权衡：栅格或点云地图语义单一，缺乏实例边界；拓扑地图缺少精确定位能力；基于隐式特征向量的地图则需要额外的特征投影训练才能与 LLM/VLM/MLLM 对齐，无法实现真正的零样本使用。
 
@@ -51,7 +51,7 @@ claims:
 
 实验表明，GLMap 在 HM3D 和 MP3D 上的零样本物体导航任务中取得 62.7% 和 42.5% 的成功率，在实例导航和场景问答任务上也表现出色。消融实验（Table 1）证实，逐步引入实例单元和区域单元能够一致提升导航成功率与路径效率；将 GLMap 集成到基于 LLM 的 **ESC**（Zhou et al., ICML 2023）、基于 VLM 的 **VLFM**（Yokoyama et al., ICRA 2024）和基于 MLLM 的 **GPT4Scene**（Qi et al., arXiv 2025）等零样本方法中，所有任务上均获得一致的性能提升（Table 2），验证了其作为通用零样本语义地图的兼容能力。
 
-## 背景与动机
+
 
 ### 具身导航与语义地图的演进
 
@@ -79,7 +79,9 @@ GLMap的核心洞察是：**为每个语义单元同时存储自然语言描述�
 
 在空间组织上，GLMap引入**2D索引网格**实现精确定位，并在此基础上叠加**实例单元**（instance unit）和**区域单元**（region unit）两个多尺度语义层级。实例单元对应单个物体（如“一张木质餐桌”），存储其文本描述和3D高斯参数集；区域单元对应功能空间（如“厨房”），聚合其包含的实例集合和整体描述。这种层级结构使得地图既能回答“某个物体在哪里”，也能回答“某个区域包含什么”，为导航和问答提供了丰富的空间语义先验。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GLMap 的核心创新在于重新定义了语义地图的表示范式，使其原生兼容大语言模型（LLM）、视觉-语言模型（VLM）和多模态大模型（MLLM），从而在无需任何额外对齐训练的条件下，统一支撑物体导航、实例导航和场景问答等零样本具身任务。
 
@@ -111,7 +113,7 @@ $$G_{\mathrm{new}} = G_i \oplus G_j, \quad \mathrm{if } D(G_i, G_j) < (1 + \tau 
 
 GLMap 的零样本兼容能力在跨模型集成实验（Table 2）中得到系统性验证：将 GLMap 分别集成到基于 LLM 的 **ESC**（Zhou et al., ICML 2023）、基于 VLM 的 **VLFM**（Yokoyama et al., ICRA 2024）和基于 MLLM 的 **GPT4Scene**（Qi et al., arXiv 2025）中，在 ObjectNav 和 SQA 任务上均取得一致的性能提升，且无需任何微调或特征对齐训练。这一结果证明 GLMap 的显式文本-视觉双模态表示具有跨模型架构的泛化能力，是真正意义上的零样本语义地图基础设施。
 
-## 整体框架
+
 
 GLMap 的构建与使用遵循一个从感知到结构化地图、再到任务推理的闭环流程。整个系统以**增量式建图**为核心，从第一人称 RGB-D 视频流出发，逐步构建并维护一个多尺度高斯-语言地图，最终为下游的零样本导航与场景问答任务提供可直接消费的语义接口。
 
@@ -168,7 +170,7 @@ $$\mathscr{T}_{r_j} \gets \mathscr{T}_{r_j} \cup \mathscr{T}_{r_i}, \quad T_{r_j
 ![[assets/figures/papers/paper_list_l2642_https_arxiv_org_abs_2605_01736/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of semantic map structure: (a) Grid map, (b) Topological map, (c) Dense geometric map, and (d) Our GLMap. GLMap integrates a 2D indexing grid with multi-scale semantics through instance units and region units, each providing explicit text and visual representations, enabling zero-shot compatibility with current large pretrained models*
 
-## 核心模块与公式推导
+
 
 GLMap 的构建围绕一个核心设计：将第一人称 RGB‑D 视频流增量式地组织为 **多尺度语义单元**，每个单元同时携带自然语言描述和显式 3D 高斯表示，从而为大型预训练模型提供零样本可消费的双模态接口。其关键模块可归纳为以下四个环节。
 
@@ -250,7 +252,9 @@ $$
 ![[assets/figures/papers/paper_list_l2642_https_arxiv_org_abs_2605_01736/figures/005_Figure_4.jpg]]
 *Figure 4: ObjectNav with GLMap. Although the goal (television) is initially unseen, the value map (computed from semantic units in GLMap) indicates the predicted likelihood of the target’s location, spatially aligned with real-world coordinates*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 多尺度语义消融实验
 
@@ -298,7 +302,9 @@ $$H(l) = \frac{1}{Z} \sum_{v \in m_t} \big( \sum_{u \in \mathcal{S}_o \cup \math
 
 该公式将实例单元和区域单元的语义相似度 $s_u$ 通过空间位置 $p_u$ 投影到 2D 网格上，再经高斯核 $\mathcal{K}_\sigma$ 平滑，生成连续的空间价值分布。这种基于显式语义单元的价值推理机制，使得导航策略能够利用场景中的语义关联（如“电视机通常在客厅”）进行零样本目标搜索。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心瓶颈与动机：语义地图的三重权衡
 
@@ -382,6 +388,8 @@ GLMap 的核心知识贡献在于提出了一种**双模态（文本+3D 高斯�
 3. **层次化语义组织**：实例单元与区域单元分别捕获物体级和场景级语义，通过 2D 索引网格实现空间查询
 
 这一设计范式为具身 AI 中的语义地图构建提供了新的基准思路——地图不仅是几何参考，更应成为连接感知与大型模型推理的**原生接口**。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,7 @@ paper_level: A
 venue: "SIGGRAPH Asia"
 year: 2023
 pdf_ref: paperPDFs/SIGGRAPH_ASIA_2023/Subspace_Mixed_Finite_Elements_for_Real_Time_Heterogeneous_Elastodynamics.pdf
+code_link: null
 project_link: https://www.dgp.toronto.edu/projects/subspace-mfem/
 aliases:
 - SMFEMM
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 面向实时异构弹性力学的子空间混合有限元方法 |
 | 英文题名 | Subspace Mixed Finite Elements for Real-Time Heterogeneous Elastodynamics |
 | 会议/期刊 | SIGGRAPH Asia 2023 |
-| Links | [paper](https://arxiv.org/abs/2405.13730); [Project](https://www.dgp.toronto.edu/projects/subspace-mfem/) |
+| Links | [paper](https://arxiv.org/abs/2405.13730) · [Project](https://www.dgp.toronto.edu/projects/subspace-mfem/) |
 | Topic | #topic/optimization_theory_probabilistic #topic/optimization_theory_probabilistic/optimization_methods |
 | Method | Subspace Mixed Finite Element Method (MFEM) |
 | Dataset | Mammoth (98K vertices, 531K tets, heterogeneous bone/muscle/joints), Crab (heterogeneous shell/joints), Sword (angular motion over 25 timesteps) |
@@ -42,7 +43,7 @@ claims:
 > - Crab (heterogeneous shell/joints) 上，Qualitative rotation preservation at low iterations 为 Correct rotational behavior at 2 iterations，对比 Visible damping at 4 iterations (subspace FEM)，变化 Half the frame rate, worse behavior。
 > - Sword (angular motion over 25 timesteps) 上，Angular motion reproduction 为 Almost perfectly reproduces target angular motion，对比 Consistently underestimates angular motion (subspace FEM)，变化 MFEM recovers rotational motion within ~1 iteration。
 
-## 概述
+## 概要
 
 实时模拟具有剧烈材料异质性的弹性体变形是计算机图形学中的一项长期挑战。传统子空间方法通过将高维网格位移投影到低维基上来换取速度，但在刚度差异悬殊的场景下收敛缓慢——过早截断求解迭代会导致可见的阻尼伪影和旋转运动失真。其根本瓶颈在于：标准有限元（FEM）格式将位置自由度与应变能耦合在同一优化变量中，低迭代时旋转分量无法被充分解析。
 
@@ -52,7 +53,7 @@ claims:
 
 方法在谱系中的定位清晰：在子空间仿真这一支线上，本文以 Skinning Eigenmodes（Benchekroun et al. 2023）替代传统的模态导数（Barbič and James, 2005）作为降阶基，因为后者无法准确重建旋转运动（Figure 5）；在求解器层面，将全空间 MFEM（Trusty et al., SIGGRAPH Asia 2022）的混合格式完整迁移至子空间，并通过 Schur 补缩并实现高效求解；在积分近似层面，以基于 k-means 聚类的 cubature 方案替代传统的 NNLS 贪心训练策略（An et al. 2008），无需训练阶段且自然感知材料与几何异质性——柔软薄壁区域采样密集，刚硬厚实区域采样稀疏（Figure 6, Figure 16）。
 
-## 背景与动机
+
 
 ### 实时异构弹性模拟的核心瓶颈
 
@@ -85,7 +86,9 @@ claims:
 
 本文的动机正是系统性地解决这三个挑战，构建一个在极低迭代次数下既能保持正确旋转运动、又能实现实时性能的异构弹性模拟框架。其核心洞察在于：**将材料感知的 Skinning Eigenmode 子空间与 MFEM 格式相结合，并辅以异质性敏感的 cubature 积分近似，可使模拟性能完全与网格分辨率脱钩。**
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于将**混合有限元法（MFEM）**的旋转保持能力与**Skinning Eigenmode 子空间**的降维表达能力深度耦合，并通过**异质性感知的 cubature 近似**实现非线性弹性积分的加速，从而构建了一个性能与网格分辨率完全脱钩的实时异构弹性力学求解器。
 
@@ -138,7 +141,7 @@ $$(H_{u} + K) du = -f_{u} + G_{u}^{T} G_{z}^{-1} (f_{z} - H_{z} G_{z}^{-1} f_{\m
 
 上述三个创新的协同效应使得求解器性能**完全与网格分辨率脱钩**：子空间变量 $(u, z, \mu)$ 的维度仅取决于 skinning modes 数量 $m$ 和 cubature 点数 $|C|$，与原始网格顶点数 $|\mathcal{V}|$ 无关。在哺乳象示例（98K 顶点，531K 四面体）上，子空间 MFEM 达到 120 FPS，相对于全空间 MFEM 的 0.003 FPS 实现了超过三个数量级的加速（Table 1, Figure 1）。计时分解显示，MFEM 仿真时间主要由 $O(m^2 k)$ 的稠密矩阵组装主导，而额外的局部拉伸和乘子求解仅增加可忽略的计算开销（Figure 10）。
 
-## 整体框架
+
 
 本文提出的**子空间混合有限元法（Subspace MFEM）**通过三个核心设计将异构弹性力学模拟推至实时：**材料感知的 Skinning Eigenmode 子空间**、**异质性自适应的 cubature 积分近似**，以及**混合有限元格式**本身。三者协同使得求解代价与网格分辨率完全脱钩，同时在全空间 MFEM 的基础上实现超过三个数量级的加速（猛犸象示例：从 263 秒/迭代降至 120 FPS，见 Table 1 与 Figure 1）。
 
@@ -187,7 +190,7 @@ MFEM 通过**引入辅助拉伸自由度并施加显式一致性约束**，将�
 - **消融实验中 cubature 点数启发式规则**（20× skinning modes）来自 Figure 14 的经验观察，置信度中等（0.85），实际应用中可能需要根据场景调整。
 - **全局子空间远端伪影**（Figure 12）是已知局限，需手动验证增加模式数在特定场景下的缓解效果。
 
-## 核心模块与公式推导
+
 
 ### 模块一：Skinning Eigenmode 子空间构建
 
@@ -263,7 +266,9 @@ $$(\mathbf{H}_u + \mathbf{K}) \, d\mathbf{u} = -\mathbf{f}_u + \mathbf{G}_u^T \m
 
 每步 SQP 迭代完成后，更新后的子空间系数通过 $\mathbf{x} = \mathbf{B} \mathbf{u}$ 投影回全空间网格。该步骤在 GPU 上完成，其时间在性能分解（Figure 10）中被单独列出，不影响 MFEM 与 FEM 求解器核心的相对比较。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能与加速比
 
@@ -315,7 +320,9 @@ Figure 10 给出了 Octobot、Gatorman、Crab 和 Mammoth 四个场景的单步�
 ![[assets/figures/papers/paper_list_l46_https_arxiv_org_abs_2405_13730/figures/013_Figure_13.jpg]]
 *Figure 13: We pin the pendulum from the top, twist the bottom end, and simulate the unwinding. We compare results from FEM and MFEM with one solver iteration per timestep against a converged subspace FEM solution. Even at low iterations our MFEM solvers show much better agreement, which is reflected on the plot on the right where total angular momentum for each pendulum block is plotted over time*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 方法沿革与基线关系
 
@@ -348,6 +355,8 @@ Figure 10 给出了 Octobot、Gatorman、Crab 和 Mammoth 四个场景的单步�
 4. **Cubature的自适应选择**：能否根据仿真过程中的变形状态动态调整cubature点分布，以在保持精度的同时进一步降低计算成本？当前静态聚类方案未利用仿真的时间相干性。
 
 5. **多材料模型的理论分析**：本文验证了方法对多种超弹性材料模型（ARAP、FCR、Neo-Hookean）的兼容性（Figure 15），但不同材料模型在混合格式下的收敛行为差异缺乏系统性的理论刻画。
+
+
 
 ## 原文 PDF
 

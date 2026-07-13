@@ -5,6 +5,8 @@ paper_level: A
 venue: IEEE TRANSACTIONS ON VISUALIZATION AND COMPUTER GRAPHICS
 year: 2026
 pdf_ref: paperPDFs/IEEE_TRANSACTIONS_ON_VISUALIZATION_AND_COMPUTER_GRAPHICS_2026/AnchorCrafter_Animate_CyberAnchors_Saling_Your_Products_via_Human_Object_Interacting_Video_Generation.pdf
+project_link: null
+code_link: https://github.com/cangcz/AnchorCrafter
 aliases:
 - AACSYPHOIVG
 tags:
@@ -42,7 +44,7 @@ claims:
 > - Object Appearance Preservation 上，Obj-CLIP 0.921 vs previous best ~0.856 (estimated) (+7.5%)。
 > - Face Similarity 上，Face-Cos 0.70 vs comparable to UniAnimate-DiT (on par with state-of-the-art)。
 
-## 概述
+## 概要
 
 现有姿势引导的人体视频生成方法（如 **MimicMotion**、**StableAnimator**（Tu et al., CVPR 2025）、**Make-Your-Anchor**（Huang et al., CVPR 2024））虽能准确跟随人体骨架姿势，但在人物交互（HOI）场景中面临根本性瓶颈：**物体被处理为人体纹理的静态部分，无法实现自然的动态交互**，导致物体外观扭曲、运动不协调，严重限制了在虚拟主播产品带货等实际场景中的应用。
 
@@ -55,7 +57,7 @@ claims:
 
 **决定性证据表明**：在物体外观保持性上，AnchorCrafter相比现有最先进方法提升**7.5%**，物体定位精度（Obj-IoU）达到**0.906**，约为竞争方法的两倍；物体CLIP相似度达到**0.921**，在所有评估方法中最高（Table 1）。用户研究在所有五个评价维度（外观质量、运动准确性等）均排名第一，综合评分达**4.64/5**（Table 2）。同时，人脸相似度和VBench视频质量指标与现有最优方法持平或更优。消融实验证实，多视角特征融合、3D手部网格注入、重加权损失以及微调阶段各自对物体外观保持和交互精度有显著贡献。
 
-## 背景与动机
+
 
 ### 虚拟主播带货：从姿势驱动到交互驱动的范式缺口
 
@@ -99,7 +101,9 @@ claims:
 
 这种设计使得AnchorCrafter在物体外观保持性上相比现有最优方法提升7.5%，物体定位精度（Obj-IoU）翻倍，在用户研究中所有评价维度均排名第一，综合评分达到4.64/5。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 AnchorCrafter 的核心创新在于首次将**人-物体交互（HOI）显式建模**引入姿势驱动的人体视频生成框架，解决了现有方法将物体视为人体静态纹理附庸的根本缺陷。其创新路径可归纳为三个相互协同的**changed slots**：
 
@@ -154,7 +158,7 @@ $$L_{final} = (1 - M_{inter}) \odot L_{diff} + L_{object}$$
 
 三个 changed slots 并非孤立运作：外观解耦确保物体“长什么样”不受人体干扰，运动控制决定物体“怎么动”，重加权损失则强制模型在训练中优先学习交互区域的生成质量。消融实验（Table 1, Fig. 7）表明，移除任一模块均导致性能显著下降——多视角融合缺失降低 Obj-CLIP，手部网格缺失增大手部关键点误差（LMD），重加权损失缺失损害交互区域细节。三者的协同构成了 AnchorCrafter 在物体外观保持（+7.5%）和定位精度（翻倍）上超越现有方法的因果基础。
 
-## 整体框架
+
 
 AnchorCrafter 是一个基于扩散模型的视频生成系统，其核心目标是给定一张主播参考图像、一个目标商品的多视角图像以及一系列运动控制条件，生成一段该主播与商品自然交互的高保真带货视频。系统通过两阶段学习范式实现这一目标：**大规模 HOI 视频分布预训练**与**目标商品微调**。
 
@@ -217,7 +221,7 @@ $$L_{final} = (1 - M_{inter}) \odot L_{diff} + L_{object}$$
 ![[assets/figures/papers/paper_list_l1912_AnchorCrafter_Animate_CyberAnchors_Saling_Your_Products_via_Human_Object/figures/002_Figure_2.jpg]]
 *Figure 2: We propose AnchorCrafter, a diffusion-based human video generation framework for creating high-fidelity anchorstyle product promotion videos by animating reference human images with specific products and motion controls. By incorporating human-object interaction into the generation process, AnchorCrafter achieves high preservation of object appearance and enhanced interaction awareness*
 
-## 核心模块与公式推导
+
 
 AnchorCrafter 的核心架构建立在视频扩散模型之上，围绕三个关键模块解决人-物交互视频生成中的外观解耦与运动控制难题。
 
@@ -266,7 +270,9 @@ $$L_{final} = (1 - M_{inter}) \odot L_{diff} + L_{object}$$
 
 该设计使得模型在训练时对交互区域施加更大的优化力度，从而显著提升物体外观保持和手部交互的生成质量。消融实验证实，移除该损失会导致交互区域物体细节明显退化（见 Table 1 和 Fig. 7 的 "w/o reweight" 行）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 1. 实验设置
 
@@ -360,7 +366,9 @@ AnchorCrafter采用两阶段训练策略。第一阶段在多样化的HOI视频�
 ![[assets/figures/papers/paper_list_l1912_AnchorCrafter_Animate_CyberAnchors_Saling_Your_Products_via_Human_Object/figures/013_Figure_11.jpg]]
 *Figure 11: Limitations. Handling transparent objects remains challenging, and erroneous conditions introduce interference*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 任务定位与核心瓶颈
 
@@ -425,6 +433,8 @@ AnchorCrafter 适用于以下条件：
 3. **少样本/零样本定制**：是否可以进一步减少微调所需数据，甚至通过物体类别先验实现零样本或少量样本的产品定制？
 4. **多主体扩展**：在多主体交互或多人协作场景下（如两人共同展示产品），方法应如何扩展控制条件和解耦机制？
 5. **实时性优化**：当前基于扩散模型的生成范式在推理速度上可能难以满足实时直播需求，模型蒸馏或高效采样策略是潜在方向。
+
+
 
 ## 原文 PDF
 

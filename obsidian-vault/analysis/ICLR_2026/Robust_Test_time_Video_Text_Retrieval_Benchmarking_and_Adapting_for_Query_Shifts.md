@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Robust_Test_time_Video_Text_Retrieval_Benchmarking_and_Adapting_for_Query_Shifts.pdf
+project_link: null
+code_link: https://github.com/bingqingzhang/vtr_tta.git
 openreview_forum_id: FRkJ3ehpNN
 aliases:
 - HVHATTVTR
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 鲁棒的测试时视频-文本检索：面向查询偏移的基准测试与自适应 |
 | 英文题名 | Robust Test-time Video-Text Retrieval: Benchmarking and Adapting for Query Shifts |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=FRkJ3ehpNN); [GitHub](https://github.com/bingqingzhang/vtr_tta.git) |
+| Links | [paper](https://openreview.net/forum?id=FRkJ3ehpNN) · [GitHub](https://github.com/bingqingzhang/vtr_tta.git) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | HAT-VTR (Hubness Alleviation for Test-time Video-Text Retrieval) |
 | Dataset | MSRVTT-1kA (视频扰动, severity=5), ActivityNet (视频扰动, MSRVTT-1kA (文本扰动, severity=mean), 跨数据集适应 (QGS: MSRVTT→ActivityNet) |
@@ -42,7 +44,7 @@ claims:
 > - ActivityNet (视频扰动, severity=5) 上，v2t R@1 (平均%) 为 22.28 (CLIP4Clip) / 20.35 (X-Pool)，对比 TCR: 12.86 (CLIP4Clip) / 14.50 (X-Pool)，变化 +9.42 / +5.85。
 > - MSRVTT-1kA (文本扰动, severity=mean) 上，t2v R@1 (平均%) 为 33.5 (CLIP4Clip) / 36.5 (X-Pool)，对比 TCR: 31.4 (CLIP4Clip) / 35.0 (X-Pool)，变化 +2.1 / +1.5。
 
-## 概述
+## 概要
 
 视频-文本检索（VTR）模型在标准测试集上表现优异，但在真实场景中面临严峻的测试时查询偏移（query shift）挑战——测试查询因视频退化或文本扰动而与训练分布产生偏差。本文揭示，查询偏移会显著放大检索中的**hubness现象**：少数gallery项成为支配性的“hub”，导致k-occurrence分布从平衡状态变为重尾分布（Fig. 2(b-c)），检索排名严重偏向这些热门项，最终引发性能崩溃（Fig. 2(a)）。
 
@@ -50,7 +52,7 @@ claims:
 
 实验表明，HAT-VTR能有效恢复平衡的k-occurrence分布（Fig. 2(f)），并在多个基准上显著超越现有方法。在MSRVTT-1kA severity 5的v2t任务上，HAT-VTR平均Recall@1达到26.2%（CLIP4Clip骨干），比最强基线TCR的21.4%高出4.8个百分点；在ActivityNet上优势更为显著（+9.42个百分点）。该方法在文本扰动、跨数据集适应和零样本适应场景下同样表现稳健。
 
-## 背景与动机
+
 
 视频-文本检索（VTR）在视频理解、跨模态搜索等任务中扮演着核心角色。现有VTR模型在标准基准上已取得显著进展，但其鲁棒性评估长期局限于训练-测试数据同分布的理想假设。真实世界的视频和文本查询不可避免地受到采集噪声、压缩伪影、光照变化、语言表达偏移等因素的影响，形成**测试时查询分布偏移（query shift）**。当预训练VTR模型直接部署到此类偏移场景时，检索性能会发生严重退化，甚至完全崩溃（Figure 2(a)），这暴露了当前VTR系统在实际应用中的脆弱性。
 
@@ -73,7 +75,9 @@ claims:
 
 > **注意**：关于查询偏移如何引起不同程度hubness放大的深层理论机制，目前仍缺乏统一的分析框架，这限制了针对性自适应策略的进一步设计。该问题留待后续研究探索。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 HAT-VTR的核心创新在于直接瞄准测试时查询偏移引发的**hubness放大**这一根本瓶颈，而非像现有方法那样仅依赖熵最小化或表示均匀性。其关键changed slots体现在三个层面：
 
@@ -103,7 +107,7 @@ $$\hat{S} = m (\bar{S} \odot W_{\mathrm{gallery}}) + (1-m)(\bar{S} \odot W_{\mat
 
 这三个changed slots形成闭环：**HSM在相似度空间直接抑制hubness** → 基于去偏相似度选择可靠样本填充RM → RM为多粒度损失提供稳定目标 → 多粒度损失更新查询编码器 → 更新后的编码器产生更好的表示，进一步降低hubness。这一机制从根本上切断了“查询偏移→hubness放大→检索崩溃”的因果链，实验证据表明HAT-VTR能显著降低hubness指标——在Gaussian噪声场景下，skewness从9.09（无TTA）降至0.97（HAT-VTR），恢复了平衡的k-occurrence分布（Table 39, Fig. 2(f)）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0012_FRkJ3ehpNN_Robust_Test-time_Video-Text_Retrieval_Benchmarki/figures/011_Figure_4.jpg]]
 *Figure 4: The pipeline of HAT-VTR. It operates via two parallel components: Hubness Suppression Memory (HSM) refines similarity scores to counteract hubness, while the query encoder is continuously updated using multi-granular losses to adapt to the target domain*
@@ -128,7 +132,7 @@ Reliable Memory 存储通过 HSM 筛选的高可靠 query-gallery 对及其特�
 
 **模块间协作关系。** HSM 和自适应训练并非独立运行，而是通过“hubness 感知目标选择”形成闭环：HSM 输出的 $\hat{S}$ 用于选择可靠的伪正例对，填充 Reliable Memory；Reliable Memory 反过来为自适应损失提供稳定的监督信号。消融实验表明，HSM 同时参与目标选择和最终重排时效果最优（平均 30.1 R@1），单独使用任一角色均会导致约 2 个百分点的下降（Table 6）。三项损失组件同时使用时达到最优性能，移除任一项均造成明显退化（Table 7）。
 
-## 核心模块与公式推导
+
 
 ### 4.1 问题形式化与预备知识
 
@@ -204,7 +208,9 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{MGUNI}} + \mathcal{L}_{\ma
 
 Reliable Memory 存储通过 HSM 筛选的高可靠 query-gallery 对及其特征，为跨模态对齐损失和熵正则提供稳定的历史目标。其核心作用是缓解在线自适应中的灾难性遗忘——当新批次数据分布剧烈变化时，RM 中的稳定锚点防止模型过度偏离已学到的有效表示。RM 的更新依赖于 HSM 抑制后的相似度矩阵 $\hat{S}$ 进行 hubness 感知的目标选择，确保存入记忆的样本对不受 hubness 偏差影响。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈验证：查询偏移放大Hubness导致检索崩溃
 
@@ -272,7 +278,9 @@ HAT-VTR在不同随机种子下表现稳定（Table 11）。HSM的超参数α和
 
 > **注意**：部分扰动（如Elastic Distortion）存在非单调的严重度表现（Figure 13），需要更精确的跨数据集严重度参数校准。部分扰动类型（Main Object Occlusion依赖Qwen2.5-VL、Style Transfer依赖AdaIN）严重依赖辅助模型，可能影响基准仿真真实世界视频退化的能力，相关结论需结合具体应用场景审慎解读。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有TTA方法的关系
 
@@ -322,6 +330,8 @@ HAT-VTR 建立在测试时自适应（Test-Time Adaptation, TTA）的通用范�
 5. **减少辅助模型依赖**：如何设计更贴近真实应用场景的视频检验扰动，减少对 Qwen2.5-VL、AdaIN 等辅助大模型的依赖？这直接影响基准的生态效度和可复现性。
 
 6. **多骨干泛化验证**：虽然论文覆盖了 CLIP4Clip、X-Pool、CLIP-ViT-B/32、BLIP、LanguageBind 五个骨干，但在更近期的大规模视频-语言模型（如 Video-LLaMA、InternVideo2）上的表现尚待验证。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/MCP_Bench_Benchmarking_Tool_Using_LLM_Agents_with_Complex_Real_World_Tasks_via_MCP_Servers.pdf
+project_link: null
+code_link: https://github.com/Accenture/mcp-bench
 aliases:
 - MB
 - MCP-Bench
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | MCP-Bench：利用MCP服务器对复杂真实世界工具使用的大语言模型代理进行基准评测 |
 | 英文题名 | MCP-Bench: Benchmarking Tool-Using LLM Agents with Complex Real-World Tasks via MCP Servers |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=fe8mzHwMxN); [GitHub](https://github.com/Accenture/mcp-bench) |
+| Links | [paper](https://openreview.net/forum?id=fe8mzHwMxN) · [GitHub](https://github.com/Accenture/mcp-bench) |
 | Topic | #topic/benchmarks_datasets_evaluation #topic/benchmarks_datasets_evaluation/benchmark_eval |
 | Method | MCP-Bench |
 | Dataset | MCP-BENCH (综合平均), MCP-BENCH (单服务器), MCP-BENCH (多服务器) |
@@ -41,7 +43,7 @@ claims:
 > - MCP-BENCH (单服务器) 上，Overall Score 为 0.749 (gpt-5)，对比 0.438 (llama-3-1-8b-instruct)，变化 +0.311。
 > - MCP-BENCH (多服务器) 上，Overall Score 为 0.750 (gpt-5)，对比 0.415 (llama-3-1-8b-instruct)，变化 +0.335。
 
-## 概述
+## 概要
 
 大语言模型（LLM）的工具使用能力已从简单的API调用走向复杂的真实世界任务自动化，但现有基准大多停留在独立工具、显式指令和少步线性流程的层面，难以揭示代理在长程规划、跨工具依赖推理和模糊目标下的真正瓶颈。MCP-Bench 应运而生：它将 LLM 代理接入由 28 个生产级 MCP 服务器构成的统一生态，这些服务器覆盖金融、科学计算、旅行、学术搜索等领域，共暴露 250 个互补工具，原生支持跨服务器依赖。在此基础上，MCP-Bench 通过一个结构化的任务合成管道，自动发现工具间的依赖链并生成多步、多目标的复合任务，最后将详细指令模糊化为高度抽象的自然语言请求，刻意隐藏工具名称和执行细节，迫使代理自主推断策略。评估体系结合了基于规则的工具调用正确性检查（工具名称有效性、模式合规、执行成功）与基于评分细则的 LLM 裁判框架，从任务完成度、工具使用策略和规划效率三个轴向进行细粒度打分，并通过提示洗牌和多次评分平均提升可靠性与人类一致性。
 
@@ -49,7 +51,7 @@ claims:
 
 相比 ToolBench、BFCL v3、τ-Bench 等已有基准，MCP-Bench 通过 MCP 协议的标准化工具连接、刻意模糊的任务指令、多跳多目标的复杂目标设计以及规则与 LLM 裁判结合的稳健评估，首次系统地将评测重心从浅层执行转移到了深层战略推理与真实世界适应性。这一设计使基准能够有效暴露那些在传统评测中被掩盖的规划与接地赤字，为未来工具使用代理的研发提供了更严苛且更具生态效度的检验场。
 
-## 背景与动机
+
 
 大语言模型（LLM）通过调用外部工具执行复杂任务的能力正成为智能代理的核心。然而，现有工具使用基准大多聚焦于简单的“指令-调用-结果”模式，未能充分考察代理在真实场景中所必需的**多步规划、跨工具依赖推理以及从模糊指令中推断执行策略**等高阶能力。当前评测的主要缺口体现在三个层面：
 
@@ -67,7 +69,9 @@ claims:
 
 这些设计的直接目标是暴露并量化模型在长程规划、跨工具依赖推理和模糊到具体的映射能力上的真实差距，为下一代工具使用代理的发展提供更可信的试金石。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MCP-Bench 的关键创新并非提出新的代理架构，而是通过**三个系统性的基准设计转变**，将评估焦点从低层的工具调用准确性推至代理的高层规划与推理能力。这些转变共同解决了现有基准中普遍忽视的瓶颈：长程多步规划、跨工具依赖推理以及从模糊指令中自主推断策略。
 
@@ -85,7 +89,7 @@ MCP-Bench 的关键创新并非提出新的代理架构，而是通过**三个�
 
 三者协同，使 MCP-Bench 得以有效暴露并量化现有 LLM 代理在真实复杂工具使用场景中的关键规划短板，从而为未来的能力改进提供明确的因果性衡量标尺。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0014_fe8mzHwMxN_MCP-Bench_Benchmarking_Tool-Using_LLM_Agents_wit/figures/001_Figure_1.jpg]]
 *Figure 1: MCP-Bench connects LLM agents to real-world MCP servers exposing 250 structured tools across domains such as finance, science, and research. Tasks are generated via LLM-based synthesis, then executed by the agent through multi-turn tool invocations. Each execution trajectory is evaluated using a combination of rule-based checks and LLM-as-a-Judge scoring, assessing agent performance in tool schema understanding, multi-hop planning, and real-world adaptability*
@@ -120,7 +124,7 @@ MCP-Bench 整体的评估管线围绕“真实工具生态—复杂任务合成�
 
 整个管线中，“依赖链发现—任务生成—模糊化—多轮执行—双阶段评估”构成闭环：模糊指令和干扰服务器放大代理在规划、信息接地与跨域协调上的差距，而规则评估捕捉模式理解的饱和与否，LLM 裁判评估则深入量化高层推理质量。这种组合使 MCP-Bench 能够有效暴露即使强模型在长程规划、冗余调用和依赖感知等方面的不足（如 GPT-5 的并行性与效率得分仅为 0.339，Table 3），从而将评估焦点从基础 API 调用转移到复杂推理与协调能力。
 
-## 核心模块与公式推导
+
 
 ### 任务生成流水线
 
@@ -177,7 +181,9 @@ $$a_{\mathrm{tool}} = \langle \sigma_i, \text{tool\_name}, \text{parameters} \ra
 
 各轴得分经归一化后未加权平均得到单任务整体分，再对所有104个任务取均值，输出基准总分。此设计使得总分能同时反映表层执行熟练度和深层规划协调能力。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 基本工具调用趋于饱和，但复杂推理瓶颈显著
 
@@ -213,7 +219,9 @@ MCP-Bench 通过系统集成 28 个生产级 MCP 服务器和 250 个工具，�
 
 综合而言，MCP-Bench 的各项分析结果表明，基本的工具调用执行已不是前沿模型的短板；真正的挑战在于长程多步规划、跨域依赖推理以及从高噪声工具集中获取执行线索。这些能力在现有基准中未被充分衡量，正是 MCP-Bench 通过模糊指令、跨服务器依赖和干扰工具设计所暴露出的核心缺口。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有基准的关系
 MCP‑Bench 在工具使用能力评估的演进中定位明确。早期的 **ToolBench** 构建了大规模 API 基准，但因依赖独立异构 API 而缺乏跨工具依赖链；**BFCL v3** 侧重于多领域函数调用，却依赖人工拼凑任务且缺少模糊指令和复杂多目标支持；**τ‑Bench** 虽尝试解决依赖链，但领域和工具数量有限；**MCP‑RADER** 与 **MCPEval** 作为较早的 MCP 基准，同样未系统测试模糊指令和复杂跨域协调。  
@@ -239,6 +247,8 @@ MCP‑Bench 的评估范式适用于以下场景：
 - **规划脆弱性**：人工失败分析显示，排序/依赖错误（25.8%）、冗余规划（22.6%）和错误任务分解（21.5%）是三大主要规划失败模式（Section A.10）。当前模型在高度模糊且含大量干扰工具的指令下，如何实现鲁棒的多步依赖执行仍是开放难题。
 - **裁判可靠性**：尽管已通过消融优化，LLM 裁判的主观偏差问题尚未根本解决。能否通过对抗性测试或增加更多客观执行信号来进一步提升评估可信度，是值得探索的方向。
 - **场景扩展**：当 MCP 生态从当前财经、旅行、学术等领域扩展到 IoT 设备控制、企业系统等新场景时，可能会涌现出新的跨域协调挑战。同时，多代理协作场景下的任务分配、信息传递和共识达成等能力也尚未被纳入评估视野，这构成未来工具使用基准演进的重要方向。
+
+
 
 ## 原文 PDF
 

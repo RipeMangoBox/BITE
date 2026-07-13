@@ -5,6 +5,8 @@ paper_level: A
 venue: SIGGRAPH
 year: 2024
 pdf_ref: paperPDFs/SIGGRAPH_2024/CAMDM_Taming_Diffusion_Probabilistic_Models_for_Character_Control.pdf
+project_link: null
+code_link: https://github.com/onnx/onnx
 aliases:
 - CAMDMC
 - CTDPMCC
@@ -43,7 +45,7 @@ claims:
 > - 单风格控制 上，风格准确率 (Style Accuracy) 89.5% vs 所有基线方法（成绩优于它们） (最优)。
 > - 多风格控制 上，风格过渡成功率 (Success Rate) 94.2% vs 所有基线方法（成绩优于它们） (最优)。
 
-## 概述
+## 概要
 
 本报告对 **CAMDM：驯服扩散概率模型实现角色控制**（ACM Trans. Graph., 2023）进行结构化解读。报告聚焦于该工作如何解决确定性运动生成模型在角色控制中长期存在的核心瓶颈，梳理其因果机制、方法定位与关键实证结果。
 
@@ -79,7 +81,7 @@ CAMDM 属于**条件自回归运动扩散模型**，其方法定位可通过与�
 
 **消融实验**：完整模型在 FID、脚滑动和轨迹误差三个指标上均优于所有消融版本，验证了独立条件 Token 化、CFG-PM 和 HFTE 三个组件的不可或缺性（Table 3）。
 
-## 背景与动机
+
 
 ### 问题背景：确定性生成模型的多样性困境
 
@@ -111,7 +113,9 @@ CAMDM 属于**条件自回归运动扩散模型**，其方法定位可通过与�
 
 这些设计使得 CAMDM 仅需 8 个扩散步骤即可在实时条件下生成高质量、多样化且可控的角色动画，从根本上突破了确定性模型在运动多样性上的瓶颈。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CAMDM 的核心创新并非简单地“将扩散模型用于运动生成”，而是系统性地解决了将扩散模型**自回归部署**到实时角色控制时暴露出的三个深层瓶颈：条件歧义、轨迹不一致与风格过渡失能。为此，该方法在条件表示、引导策略、轨迹对齐和扩散加速四个维度上进行了针对性改造。
 
@@ -154,7 +158,7 @@ $$\mathcal{G}_{\gamma}(\mathbf{x}_{t}, t; \mathbf{p}, \mathbf{c}) = \mathcal{G}(
 
 这些创新相互协同：SCT 提供稳定的条件融合基础，CFG-PM 赋予风格切换能力，HFTE 保障自回归轨迹平滑，8 步扩散使整个系统满足实时部署要求。消融实验（Table 3）证实，完整模型在 FID、脚滑动和轨迹误差三项指标上全面优于任一组件被移除的变体，验证了每个创新的不可或缺性。
 
-## 整体框架
+
 
 CAMDM 是一个条件自回归运动扩散模型，其核心 pipeline 由五个紧密协作的模块构成，形成“条件编码 → 扩散去噪 → 引导调节 → 轨迹对齐 → 自回归控制”的闭环。
 
@@ -179,7 +183,7 @@ $$\mathcal{G}_{\gamma}(\mathbf{x}_{t}, t; \mathbf{p}, \mathbf{c}) = \mathcal{G}(
 ![[assets/figures/papers/paper_list_l1922_CAMDM_Taming_Diffusion_Probabilistic_Models_for_Character_Control/figures/002_Figure_2.jpg]]
 *Figure 2: Conditional Autoregressive Motion Diffusion Model (CAMDM). At each denoising step, the model takes as input a noisy motion sample*
 
-## 核心模块与公式推导
+
 
 CAMDM 以条件自回归方式工作：给定角色过去 10 帧的运动 $\mathbf{p}$ 和用户控制参数 $\mathbf{c}$（包括风格标签 $\mathbf{c}_l$、未来根位移 $\mathbf{c}_{rv}$ 和根朝向 $\mathbf{c}_{ro}$），模型学习未来 45 帧运动 $\mathbf{x}$ 的条件分布。运行时，每帧收集历史姿态和控制信号，加入随机高斯噪声，通过扩散模型生成未来运动并部分应用到角色上，实现自回归控制。
 
@@ -226,7 +230,9 @@ $$\mathcal{L} = \lambda_{\mathrm{samp.}} \mathcal{L}_{\mathrm{samp.}} + \lambda_
 ![[assets/figures/papers/paper_list_l1922_CAMDM_Taming_Diffusion_Probabilistic_Models_for_Character_Control/figures/003_Figure_3.jpg]]
 *Figure 3: Illustration of heuristic future trajectory extension. Top*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -289,7 +295,9 @@ Table 3 系统消融了 CAMDM 的三个核心组件：分离式条件标记化�
 
 这些局限为后续研究指明了方向：引入一致性模型等加速技术以降低延迟，融合环境感知数据以扩展适用场景，以及开发多模态控制接口以提升表达力。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题瓶颈：确定性模型下的多模态运动生成困境
 
@@ -330,6 +338,8 @@ CAMDM 与后续工作的潜在连接点包括：一致性模型（Consistency Mo
 - 模型能否有效理解来自环境的更复杂感知数据（如点云、深度图），并实时生成适应场景变化的自然运动？
 - 如何开发融合文本、音频、脑电等多模态信号的新控制接口，从而生成更丰富的复杂动作？
 - 当前 8 步扩散的设计是否在更高质量要求的应用（如影视级动画）中仍然足够？是否存在步数-质量-延迟的更优帕累托前沿？
+
+
 
 ## 原文 PDF
 

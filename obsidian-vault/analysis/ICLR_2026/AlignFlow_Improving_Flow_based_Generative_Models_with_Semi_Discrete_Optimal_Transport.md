@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/AlignFlow_Improving_Flow_based_Generative_Models_with_Semi_Discrete_Optimal_Transport.pdf
+project_link: null
+code_link: https://github.com/konglk1203/AlignFlow
 aliases:
 - AlignFlow
 tags:
@@ -29,7 +31,7 @@ claims:
 | 中文题名 | AlignFlow：利用半离散最优传输改进基于流的生成模型 |
 | 英文题名 | AlignFlow: Improving Flow-based Generative Models with Semi-Discrete Optimal Transport |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=nTCF3QNsIN); [GitHub](https://github.com/konglk1203/AlignFlow) |
+| Links | [paper](https://openreview.net/forum?id=nTCF3QNsIN) · [GitHub](https://github.com/konglk1203/AlignFlow) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/generative_models_and_autoencoders |
 | Method | AlignFlow |
 | Dataset | CIFAR-10 (U-Net), ImageNet256 (DiT-B/2, Shortcut Model) |
@@ -39,11 +41,11 @@ claims:
 > - CIFAR-10 (U-Net) 上，FID-50k (Euler 1000步) 为 3.79，对比 3.92 (Minibatch OT)，变化 -0.13。
 > - CIFAR-10 (U-Net) 上，FID-50k (DOPRI5) 为 3.71，对比 3.82 (Minibatch OT)，变化 -0.11。
 
-## 概述
+## 概要
 
 AlignFlow 是一种即插即用的噪声-数据对齐（Noise-Data Alignment, NDA）方法，旨在提升基于流的生成模型（Flow-based Generative Models, FGM）的性能。其核心思想是利用半离散最优传输（Semi-Discrete Optimal Transport, SDOT）在连续的噪声分布与离散的经验数据分布之间显式构造一个确定性的、最优的传输映射。该映射将噪声空间划分为 Laguerre 单元，每个单元对应一个数据点，从而为 FGM 训练提供固定的、最优的噪声-数据配对。AlignFlow 以极低的计算开销（<1%额外训练时间）实现了对现有 FGM 的即插即用改进，在 CIFAR-10 和 ImageNet256 等多个基准上取得了一致的性能提升。
 
-## 背景与动机
+
 
 基于流的生成模型通过学习从噪声分布到数据分布的连续可逆变换来生成数据。训练 FGM 时，噪声与数据的配对方式对生成质量有显著影响。现有方法主要分为三类：
 
@@ -53,7 +55,9 @@ AlignFlow 是一种即插即用的噪声-数据对齐（Noise-Data Alignment, ND
 
 现有 OT 方法在扩展到大规模模型和高维数据时面临严峻挑战。离散 OT 方法需要从两个分布中采样，其估计误差随维度指数增长；连续 OT 方法则难以保证收敛到全局最优解。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 AlignFlow 的核心创新在于利用半离散最优传输（SDOT）解决上述瓶颈。其关键洞察在于：训练数据是有限的离散经验分布，而噪声分布是连续的，因此 SDOT 天然适用于此场景。SDOT 映射具有以下关键特性：
 
@@ -62,7 +66,7 @@ AlignFlow 的核心创新在于利用半离散最优传输（SDOT）解决上述
 3. **可证明收敛性**：SDOT 目标函数是凸的，优化过程具有收敛保证。
 4. **极低计算开销**：SDOT 映射的计算开销不到总训练时间的 1%（CIFAR-10），在 ImageNet 上每类少于 10 秒。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_generative_models_diffusion__generative_models_and_autoencoders__b001_nTCF3QNsIN_AlignFlo/figures/002_Figure_1.jpg]]
 
@@ -78,7 +82,7 @@ AlignFlow 采用两阶段训练流程：
 - 训练任意 FGM（如 Flow Matching, Shortcut Model, MeanFlow）
 - 可选：当 SDOT 映射未完全收敛时，执行 Rebalance 操作消除偏差
 
-## 核心模块与公式推导
+
 
 ### 5.1 标准 FGM 损失函数
 
@@ -132,7 +136,9 @@ $$\mathrm{L}_1(\mathbf{g}) = \sum_{i\in I} |p_i - b_i| \quad \text{(Section B.1)
 
 $$\mathrm{rebalance}\left(\{m_j\}_{j=1}^M\right) := \arg\max_{\{\tilde{m}_j\}} \left\{ \sum_j \mathbb{1}(\tilde{m}_j = m_j) : \left| \max_{i\in\mathcal{X}} \sum_{j=1}^M \mathbb{1}_i(\tilde{m}_j) - \min_{i\in\mathcal{X}} \sum_{j=1}^M \mathbb{1}_i(\tilde{m}_j) \right| \leq 1 \right\} \quad \text{(Eq. 12)}$$
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 6.1 主要结果
 
@@ -196,7 +202,9 @@ $$\mathrm{rebalance}\left(\{m_j\}_{j=1}^M\right) := \arg\max_{\{\tilde{m}_j\}} \
 
 ![[assets/figures/papers/iclr26_generative_models_diffusion__generative_models_and_autoencoders__b001_nTCF3QNsIN_AlignFlo/figures/010_Table_5.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 AlignFlow 属于基于最优传输的流生成模型改进方法，其方法谱系定位如下：
 
@@ -216,6 +224,8 @@ AlignFlow 属于基于最优传输的流生成模型改进方法，其方法谱�
 3. 对于超大规模数据集（如 LAION-5B），SDOT 映射的计算能否通过近似方法（如聚类或分层 SDOT）实现可扩展？
 4. AlignFlow 与蒸馏方法的结合是否能进一步降低 NFE 至 1 以下，同时保持高质量？
 5. SDOT 映射的几何结构（Laguerre 单元）能否用于解释或控制生成模型的潜在表示？
+
+
 
 ## 原文 PDF
 

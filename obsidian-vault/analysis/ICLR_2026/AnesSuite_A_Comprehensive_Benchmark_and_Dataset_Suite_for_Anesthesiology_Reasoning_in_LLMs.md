@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/AnesSuite_A_Comprehensive_Benchmark_and_Dataset_Suite_for_Anesthesiology_Reasoning_in_LLMs.pdf
+project_link: null
+code_link: https://github.com/MiliLab/AnesSuite
 openreview_forum_id: iKRQMeC7yO
 aliases:
 - AnesSuite
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | AnesSuite：面向LLMs麻醉学推理的综合基准与数据集套件 |
 | 英文题名 | AnesSuite: A Comprehensive Benchmark and Dataset Suite for Anesthesiology Reasoning in LLMs |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=iKRQMeC7yO); [GitHub](https://github.com/MiliLab/AnesSuite) |
+| Links | [paper](https://openreview.net/forum?id=iKRQMeC7yO) · [GitHub](https://github.com/MiliLab/AnesSuite) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/health |
 | Method | Morpheus |
 | Dataset | AnesBench-English (Overall), AnesBench-English System2, MedQA (US) |
@@ -41,7 +43,7 @@ claims:
 > - AnesBench-English System2 上，Accuracy 为 Morpheus-14B: 0.47，对比 Qwen2.5-14B-Inst: 0.41，变化 +0.06。
 > - MedQA (US) 上，Accuracy 为 Morpheus-7B: 0.656，对比 Qwen2.5-7B-Inst: 0.505，变化 +0.151。
 
-## 概述
+## 概要
 
 当前大语言模型（LLMs）在麻醉学领域面临一个核心瓶颈：**高阶推理能力（System 2）严重不足**。多数开源模型在需要多步逻辑推演的麻醉学问题上准确率低于 0.5，且普遍出现非逻辑推理（Non‑Sequitur）与过度推断（Over‑extrapolation）等逻辑幻觉（Table 3）。这意味着通用模型即使具备一定医学知识，也难以胜任麻醉临床中复杂的决策推理。
 
@@ -54,7 +56,7 @@ claims:
 
 此外，推理能力还展现出向通用医学领域泛化的潜力：Morpheus‑7B 在 MedQA（US）上准确率达 0.656，较基线的 0.505 提升 +0.151（Table 20）。消融实验同时揭示，继续预训练（CPT）虽能增强英文基准性能，却会损害中文基准表现（Table 5），提示多语言知识对齐仍是待解决问题。
 
-## 背景与动机
+
 
 麻醉学是围术期医学的核心，涉及从术前评估、术中管理到术后监护的全链条复杂决策。临床决策不仅依赖大量事实性知识的即时回忆（System 1 认知），更需要在不确定、信息不完全的条件下进行多步骤逻辑推理（System 2 认知）。然而，当前大语言模型（LLMs）在麻醉学领域的表现存在一个关键瓶颈：**多数开源模型的高阶推理能力严重不足，在需要复杂推理的 System 2 问题上准确率普遍低于 0.5**（Table 3）。具体而言，模型频繁出现非逻辑推理（Non-Sequitur）和过度推断（Over-extrapolation）等逻辑幻觉，无法可靠地支撑临床决策。
 
@@ -64,7 +66,9 @@ claims:
 
 在模型层面，本文提出 Morpheus 系列模型，以 Qwen2.5 系列为基础，在 AnesR1 上采用监督微调（SFT）冷启动与分组相对策略优化（GRPO）的组合训练范式。SFT 阶段使模型获得麻醉学 CoT 推理的格式与领域知识，GRPO 阶段则通过基于结果的二元奖励机制进一步强化推理能力。通过这一套件与训练范式的协同，Morpheus 不仅在麻醉学推理上显著超越同规模基线，还展现出向通用医学和通用领域泛化的潜力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：LLMs 在麻醉学高阶推理上的系统性失败
 
@@ -94,7 +98,7 @@ Table 4 的结果直接验证了上述创新的有效性。以 Morpheus-7B 为�
 
 Figure 7 从机制层面解释了性能提升的来源：对于 System 2 问题，模型输出长度与得分呈正相关，说明 **CoT 推理链的长度直接贡献于复杂决策质量**。这一发现与 AnesR1 提供详细推理链的设计初衷高度一致，构成了“数据设计→训练范式→推理行为→性能提升”的完整因果链条。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0011_iKRQMeC7yO_AnesSuite_A_Comprehensive_Benchmark_and_Dataset/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of AnesSuite. AnesSuite is composed of four components: AnesBench, a crosslingual structured benchmark; AnesCorpus, a collection of anesthesiology documents; AnesQA, a question-answering dataset derived from domain literature; and AnesR1, a dataset featuring verifiable anesthesiology questions with chain-of-thought annotations. Leveraging this suite, we developed Morpheus, the first collection of reasoning LLMs for anesthesiology. Subsequent ablation and experiments identified key factors influencing reasoning performance in this specialized domain*
@@ -132,7 +136,7 @@ Morpheus 系列的开发遵循三阶段流水线：
 
 该架构的核心设计思想在于：通过构建与评估基准认知层次对齐的训练数据，结合监督微调与强化学习的组合范式，系统性地提升 LLM 在麻醉学复杂推理上的表现。Figure 1 以信息图形式完整呈现了从数据构建到模型开发的闭环流程。
 
-## 核心模块与公式推导
+
 
 ### 关键模块
 
@@ -184,7 +188,9 @@ $$y = \beta_0 + \beta_1 x + \beta_2 \cdot \mathrm{group} + \beta_3 (x \times \ma
 
 > **注意**：以上公式均来自论文附录 A.1 和 F.1 节，变量含义严格依据原文定义。论文未给出 GRPO 奖励函数或 SFT 损失函数的具体数学形式，因此本节不予推导。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要评估结果
 
@@ -238,7 +244,9 @@ Figure 6 和 Table 15 揭示了显著的跨语言性能差异。Llama-3.1-8B 系
 
 采用基于置信度分数的数据泄露检测方法（Figure 8），多数模型显示出约 0.10 的潜在泄露比例，高于随机基线假设的 0.04。这一结果提示在基准构建中需持续关注数据污染问题，但当前泄露水平尚不足以显著影响主要结论的有效性。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系与基线关系
 
@@ -282,6 +290,8 @@ Morpheus 的有效性依赖于以下前提：
 3. **多模态推理扩展**：如何将检索系统扩展至多模态临床数据（影像、波形、时序监测数据），以增强推理的连贯性和准确性？这一方向将直接影响模型在真实临床场景中的实用性。
 
 4. **跨语言知识对齐机制**：多语言模型中语言专属知识系统的建立过程如何影响跨语言推理性能？CPT 实验揭示的语言偏向性提示，需要更精细的双语知识对齐策略，而非简单的语料混合训练。
+
+
 
 ## 原文 PDF
 

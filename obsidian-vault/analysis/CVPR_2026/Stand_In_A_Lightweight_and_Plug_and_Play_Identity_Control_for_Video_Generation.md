@@ -43,7 +43,7 @@ claims:
 > - Custom identity-preserving video generation test set 上，Face Similarity 0.724 vs 0.647 (VACE-14B) (+0.077)；Naturalness 3.922 vs 3.828 (Phantom-14B) (+0.094)；Prompt Following 20.594 vs 20.591 (VACE-P1.3B) (+0.003)。
 > - User Study 上，Face Similarity (subjective) 4.10 vs 3.87 (best competitor in Table 2) (+0.23)；Video Quality (subjective) 4.08 vs 3.84 (best competitor in Table 2) (+0.24)。
 
-## 概述
+## 概要
 
 身份保持的视频生成旨在根据给定的参考图像，生成在动态场景中保持人物身份一致性的视频。现有方法通常依赖全量微调（full fine-tuning）引入大量可训练参数，不仅计算开销大，还缺乏与其他AIGC工具（如风格化LoRA、姿态引导模块）的兼容性，难以在轻量级条件下实现高保真身份保持。
 
@@ -52,8 +52,6 @@ claims:
 在定量评估中，Stand-In的人脸相似度达到0.724，超越所有对比方法（最佳次优VACE-14B为0.647），同时自然度和提示遵循指标也名列前茅（Table 1）。用户主观评估进一步验证了其在人脸相似度（4.10）和视频质量（4.08）上的优势（Table 2）。消融实验表明，RSA和CPM是性能的关键保障：移除RSA导致人脸相似度从0.724骤降至0.422，替换CPM则降至0.536（Table 3）。
 
 在方法谱系与知识库定位上，Stand-In属于**基于预训练视频扩散模型的身份注入方法**，与以下代表性工作形成对比：**ID-Animator**（He et al., arXiv 2024）和**ConsistID**（Yuan et al., CVPR 2025）采用全量微调策略；**VACE**（Jiang et al., arXiv 2025）和**Phantom**（Liu et al., arXiv 2025）探索了参考网络或适配器方案；**Hunyuan-Custom**（Hu et al., arXiv 2025）则面向定制化生成。Stand-In的独特之处在于以极少参数实现即插即用的身份控制，同时保持与现有AIGC生态的兼容性。
-
-## 背景与动机
 
 ### 身份保持视频生成的现状与瓶颈
 
@@ -79,7 +77,7 @@ claims:
 
 这种即插即用的设计使得Stand-In能够无缝集成到视频人脸交换、风格化LoRA扩展、姿态引导生成等多种下游应用中（如Figure 1、Figure 11-13所示），填补了现有方法在**轻量级、高兼容性身份控制**方面的缺口。
 
-## 核心创新
+## 核心方法与创新机理
 
 Stand-In 的核心创新在于**以极低的参数代价（约1%额外参数）实现高保真身份保持**，其关键在于对预训练视频生成模型中自注意力机制与位置编码策略的**双重重构**，而非依赖全量微调或引入繁重的身份编码器。
 
@@ -110,8 +108,6 @@ RSA 与 CPM 并非孤立运作，二者协同实现了身份信息的精准注�
 - **CPM** 从几何层面消除位置编码带来的虚假关联，为注意力计算提供正确的空间先验。
 
 二者的共同基础是一个轻量级的**条件图像分支**：利用预训练 VAE 将参考图像映射到与视频相同的潜在空间，并通过冻结时间步长 $s_{ref} = 0$ 维持其时间不变性。该分支仅需为图像令牌的 QKV 投影添加 LoRA 模块（秩 128），参数量极小。这种设计使得 Stand-In 能够以即插即用的方式集成到多种应用中（如视频人脸交换、风格化生成等），同时保持与现有 DiT 模型的兼容性。
-
-## 整体框架
 
 Stand-In 的整体 pipeline 围绕一个核心设计展开：**在不修改预训练视频生成模型主体结构的前提下，引入一个极轻量的条件图像分支，通过专门的注意力机制实现高保真身份控制**。其输入为一张参考身份图像和一段文本提示，输出为保持该身份一致的视频。
 
@@ -151,8 +147,6 @@ CPM 与 RSA 的协同关系可概括为：RSA 控制**注意力流向**（图像
 
 ![[assets/figures/papers/paper_list_l936_https_arxiv_org_abs_2508_07901/figures/003_Figure_3.jpg]]
 *Figure 3: The overview of our identity-preserving text-to-video generation framework. We introduce a conditional image branch alongside the original video branch. Given the conditional image, the VAE encoder maps it into tokens, which are concatenated with the video latent tokens and then sent to the DiT. Within the DiT blocks, identity information is incorporated into the video features through restricted self-attention*
-
-## 核心模块与公式推导
 
 Stand-In 的身份控制能力由三个紧密协作的核心模块实现：**条件图像分支与 LoRA 适配**、**受限自注意力（Restricted Self-Attention, RSA）** 以及 **条件位置映射（Conditional Position Mapping, CPM）**。这些模块共同解决了“如何以极少的可训练参数将静态参考图像的身份信息精准注入动态视频生成过程”这一核心挑战。
 
@@ -214,7 +208,7 @@ $$Q_{V}' = Q_{V} \cdot p_{V}, \quad K_{V}' = K_{V} \cdot p_{V}$$
 
 由于图像令牌的 Key 和 Value 矩阵在生成过程中保持不变（得益于 RSA 的静态约束），Stand-In 在推理时对图像分支的 K、V 矩阵进行缓存，避免重复计算。这使得推理时间仅增加约 2.3%，FLOPs 仅增加约 0.07%，在保持高保真身份控制的同时实现了极低的推理开销。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 定量评估与SOTA对比
 
@@ -266,16 +260,10 @@ Stand‑In的轻量级设计在推理效率上具有显著优势。通过KV缓�
 ![[assets/figures/papers/paper_list_l936_https_arxiv_org_abs_2508_07901/figures/002_Figure_2.jpg]]
 *Figure 2: Comparison with SOTA identity-preserving video generation methods. The size of bubbles represents the number of need-to-train parameters for identity preservation. Our approach achieves the highest performance in both face similarity and naturalness, while utilizing the fewest parameters*
 
-![[assets/figures/papers/paper_list_l936_https_arxiv_org_abs_2508_07901/figures/010_Figure_9.jpg]]
-*Figure 9: Our model generalizes to unseen ordinary individuals across diverse ethnicities and age groups, despite being trained with only ∼1% additional parameters and just 2000 training pairs*
-
-![[assets/figures/papers/paper_list_l936_https_arxiv_org_abs_2508_07901/figures/013_Figure_10.jpg]]
-*Figure 10: Our results on subjects other than real-person. Please refer to the supplementary material for full prompts*
-
 ![[assets/figures/papers/paper_list_l936_https_arxiv_org_abs_2508_07901/figures/001_Figure_1.jpg]]
 *Figure 1: Given a reference image, our method generates videos with strong identity preservation. Furthermore, the framework’s plug-andplay design enables seamless integration into diverse applications for enhanced identity consistency*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 任务定位与核心瓶颈
 

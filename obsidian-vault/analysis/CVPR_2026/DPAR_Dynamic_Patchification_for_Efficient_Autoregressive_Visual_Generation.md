@@ -43,7 +43,7 @@ claims:
 > - ImageNet 384×384 (resized to 256) 上，FID↓ 4.29 (DPAR-384-B), 2.79 (DPAR-384-L), 2.60 (DPAR-384-XL) vs 6.09 (LlamaGen-384-B), 3.07 (LlamaGen-384-L), 2.62 (LlamaGen-384-XL) (所有模型均取得更低 FID)。
 > - 训练效率 (384×384) 上，Training FLOPs 258.5 GFLOPs (DPAR-XL) vs 433.6 GFLOPs (LlamaGen-XL) (减少 40%)。
 
-## 概述
+## 概要
 
 ### 1. 问题与瓶颈
 
@@ -70,8 +70,6 @@ DPAR 属于**自适应令牌压缩**路线，区别于以下两类工作：
 
 DPAR 的核心贡献在于首次将**下一令牌预测熵**确立为自回归图像生成中指导自适应令牌合并的可靠准则，为高效视觉生成提供了一种轻量、即插即用的范式。
 
-## 背景与动机
-
 ### 自回归视觉生成的效率瓶颈
 
 自回归（Autoregressive, AR）模型在语言建模领域取得了巨大成功，近年来被广泛迁移至视觉生成任务。解码器仅（decoder-only）架构将图像量化为离散令牌序列，通过逐令牌预测实现高保真图像生成。然而，这一范式面临一个根本性的效率瓶颈：**令牌数量随图像分辨率呈二次增长**。对于一张分辨率为 $H \times W$ 的图像，经 VQ-VAE 下采样后产生的令牌数 $T$ 与像素数成正比，导致 Transformer 自注意力的计算开销与内存占用急剧膨胀。以 **LlamaGen**（Sun et al., arXiv 2024）为代表的基线方法在固定长度的一维令牌序列上执行全局自注意力，其计算复杂度为 $O(T^2)$，使得高分辨率生成在训练和推理阶段都面临严重的资源约束。
@@ -89,7 +87,7 @@ DPAR 的核心洞察在于：**下一令牌预测熵（next-token prediction ent
 
 基于此，DPAR 提出了一种**动态补丁化（Dynamic Patchification）**策略：通过轻量级无条件熵模型实时计算每个位置的下一令牌预测熵，据此将固定长度令牌序列动态聚合为可变长度补丁序列。补丁级 Transformer 仅在压缩后的 $M$ 个补丁（$M < T$）上执行自注意力，从而在保持生成质量的同时显著降低计算成本。该方法对标准解码器架构的修改极小，确保了与现有多模态生成框架的兼容性。
 
-## 核心创新
+## 核心方法与创新机理
 
 DPAR 的核心创新在于将**下一令牌预测熵**作为信息量的代理信号，驱动自回归图像生成中的**动态令牌聚合**，从而在保持生成质量的前提下大幅降低序列长度与计算开销。其设计围绕四个关键“变更槽”（changed slots）展开，每个槽位相对于基线 **LlamaGen**（Sun et al., arXiv 2024）的固定长度令牌序列生成范式进行了针对性重构。
 
@@ -112,8 +110,6 @@ DPAR 的核心创新在于将**下一令牌预测熵**作为信息量的代理�
 ### 因果机制总结
 
 核心因果链条可概括为：**下一令牌预测熵 → 动态补丁边界 → 可变长度序列 → 补丁级注意力 → 计算开销降低**。熵作为信息量的可靠准则（Figure 2 直观展示了熵图与补丁边界的一致性），使得模型能够在低信息区域“粗读”、高信息区域“精读”，从而在 FID 提升最高 27.1% 的同时将训练 FLOPs 降低 40%。消融实验进一步证实，同时启用熵门控、最大补丁长度限制和行边界重置三种策略时 FID 最优（3.32），且 DPAR 学到的表示对推理时的补丁长度变化具有鲁棒性（FID 在 3.31–3.39 之间稳定），而静态固定长度补丁模型在相同变化下 FID 从 3.58 崩溃至 25.59。
-
-## 整体框架
 
 DPAR 的整体管线围绕“先度量信息，再动态聚合，最后在压缩空间自回归”这一思路展开。其核心目标是在保持生成质量的前提下，大幅降低自回归图像生成中因令牌数量二次增长带来的计算与内存开销。
 
@@ -156,8 +152,6 @@ $$\mathcal { L } _ { C E } = - \sum _ { t = 0 } ^ { T - 1 } \log \hat { p } _ { 
 
 ![[assets/figures/papers/paper_list_l861_https_arxiv_org_abs_2512_21867/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of DPAR. (a) Conventional AR image generation employs decoder-only transformers operating on a fixed number of tokens per image, where the token count increases quadratically with image resolution. (b) DPAR dynamically aggregates image tokens based on information content, generating a variable number of patches per image. Decoder-only transformers then operate on a smaller number of patches, reducing computational and memory overhead. DPAR makes minimal modifications to the standard decoder architecture, ensuring compatibility with multimodal generation frameworks*
-
-## 核心模块与公式推导
 
 ### 3.1 问题形式化
 
@@ -250,7 +244,7 @@ DPAR 保持与同量级 LlamaGen 相同的总层数，仅将部分令牌级层�
 ![[assets/figures/papers/paper_list_l861_https_arxiv_org_abs_2512_21867/figures/002_Figure_2.jpg]]
 *Figure 2: Images (first row) and their corresponding next-token prediction entropy maps (second row) with increasing information content. Images with lower information content produce fewer high-entropy tokens, allowing the model to merge them into larger patches for efficient AR generation. Entropy heatmaps are computed over 256 tokens for 256×256 images, with black outlines indicating the final patch boundaries*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 瓶颈与调控机制回顾
 
@@ -324,10 +318,7 @@ DPAR 保持与同量级 LlamaGen 相同的总层数，仅将部分令牌级层�
 ![[assets/figures/papers/paper_list_l861_https_arxiv_org_abs_2512_21867/figures/014_Table_10.jpg]]
 *Table 10: Ablation on encoder–decoder depth*
 
-![[assets/figures/papers/paper_list_l861_https_arxiv_org_abs_2512_21867/figures/010_Table_7.jpg]]
-*Table 7: Linear probing results on ImageNet classification. We report top-1 and top-5 accuracy (%) on ImageNet validation set using linear probes trained on features extracted from the penultimate layer of our DPAR-L patch transformer and the Llamagen-L*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 与基线工作的关系
 

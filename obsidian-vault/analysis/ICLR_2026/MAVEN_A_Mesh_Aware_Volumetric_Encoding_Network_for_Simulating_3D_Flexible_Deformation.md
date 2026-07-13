@@ -42,7 +42,7 @@ claims:
 > - Cavity Grasping 上，Position RMSE (full rollouts) 15.41 vs 17.08 (Model C, equivalent to node-based GNNs) (-9.8%)。
 > - Metal Bending 上，Position RMSE (full rollouts) 810.42 vs 1680.20 (Model C) (-51.8%)；Inference time (ms/step) 23.57 vs 712.44 (Abaqus simulator) (2922.66% faster)。
 
-## 概述
+## 概要
 
 物理模拟的连续介质在数值求解时通常被离散为结构化网格，而现有基于图神经网络（GNN）的模拟器仅将网格抽象为顶点和边构成的点-边图。这种简化忽视了网格中天然存在的高维几何元素——2D面片和3D单元，导致在稀疏网格下接触检测不准确、物理量沿边界和体积的传播误差增大。**MAVEN**（Mesh-Aware Volumetric Encoding Network）针对这一瓶颈，首次将网格的完整三层拓扑结构（顶点、面片、单元）显式引入图网络架构，通过位置感知的几何聚合器与两阶段单元-面片消息传递机制，实现了高维几何特征与物理状态的深度融合。
 
@@ -53,7 +53,7 @@ claims:
 
 在方法谱系中，MAVEN位于**网格感知图网络模拟器**这一新兴方向，相较于仅建模面片接触的**FIGNet**（Allen et al., 2023）和基于层次化图结构的**HOOD**（Grigorev et al., 2023），其核心差异在于同时引入3D单元和2D面片作为独立图节点，并设计了对称的几何聚合-分解机制，使体积内场演化与接触边界处理统一在同一框架下。
 
-## 背景与动机
+
 
 物理仿真中，连续材料域上的物理状态通常通过结构化网格进行离散化表示。传统的基于图神经网络（GNN）的物理模拟器，如**MGN**（Pfaff et al., 2020）和**GT**（Yun et al., 2019），将网格抽象为仅包含顶点和边的点-边图，并在其上执行消息传递以预测系统演化。这种抽象虽然简洁，却存在一个根本性的瓶颈：**它忽略了网格中固有的高维几何元素——2D面片和3D单元**。在稀疏网格条件下，这一缺陷导致接触检测不准确、物理量传播误差增大，使模型难以精确模拟边界效应和体积内场的演化。
 
@@ -61,7 +61,9 @@ claims:
 
 MAVEN的核心动机正是弥合这一鸿沟：**将网格视为包含顶点、面片和单元的三层拓扑结构**，显式地引入高维几何元素作为独立的图节点，并设计对称的聚合-分解机制，使体积、面积、周长等几何特征与物理状态深度融合。通过这种网格感知的体积编码方式，模型能够在粗网格下依然保持数值稳定性和几何保真度，同时大幅降低对隐式几何学习的依赖。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MAVEN的核心创新在于**将传统图网络模拟器对网格的“顶点-边”抽象，升级为“顶点-面片-单元”三层拓扑建模**，从而显式捕获3D体积和2D接触面的几何与物理信息。这一设计通过三个紧密耦合的机制实现：
 
@@ -104,7 +106,7 @@ $$a _ { c _ { i } , v _ { 0 } , \ . \ . \ , \ a _ { c _ { i } , v _ { K - 1 } } 
 
 这三个机制并非孤立创新，而是形成因果链条：高维节点化提供了几何载体，位置感知聚合器保证了顶点到高维元素的保真映射，两阶段消息传递则在高维空间完成接触与体积效应的解耦传播。三者共同使MAVEN在稀疏网格下仍能实现比传统Abaqus仿真器快近30倍的推理速度（23.57ms vs 712.44ms/步），同时保持更高的预测精度。
 
-## 整体框架
+
 
 MAVEN 遵循经典的编码器-处理器-解码器（encoder-processor-decoder）流水线架构，其核心创新在于将网格显式建模为包含顶点（vertex）、面片（facet）和单元（cell）的三层拓扑结构，并在这一扩展的图结构上执行几何感知的消息传递。
 
@@ -144,7 +146,7 @@ MAVEN 将传统 GNN 模拟器中仅包含顶点和边的图结构（图1b）替�
 ![[assets/figures/papers/paper_list_l74_https_openreview_net_forum_id_XmULVr15E0/figures/003_Figure_1.jpg]]
 *Figure 1: The physical state on the continuous material domain is discretized using structured meshes. Node-based methods construct point-edge graphs from the mesh and apply GNNs for computation. However, such abstraction may overlook contact interactions. A more effective approach should incorporate higher-dimensional geometric structures in the mesh, such as 3D cells and 2D facets, which retain accurate geometric information after discretization*
 
-## 核心模块与公式推导
+
 
 ### 3.1 图结构构建
 
@@ -217,7 +219,9 @@ $$\mathcal{L} = \frac{1}{|\mathcal{V}|} \| x^{t+1} - \hat{x}^{t+1} \|^2 + \frac{
 
 MAVEN 的模块设计遵循一条清晰的因果链：**显式几何编码**提供粗网格下的几何先验 → **位置感知聚合**保留网格拓扑信息 → **面片级接触检测**提升边界交互精度 → **两阶段消息传递**实现接触-体积信息融合。消融实验（Table 2, Model C）表明，完全移除高维几何元素建模后，模型性能退化至传统节点型方法水平（Cavity Grasping 位置 RMSE 17.08 vs MAVEN 15.41），证明了面片-单元结构的必要性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -280,7 +284,9 @@ Table 5 展示了各模型在三数据集上的每步推理时间。MAVEN 在 DP
 ![[assets/figures/papers/paper_list_l74_https_openreview_net_forum_id_XmULVr15E0/figures/013_Figure_7.jpg]]
 *Figure 7: Description of Metal Bending*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 从节点图到网格感知编码：方法演进脉络
 
@@ -311,6 +317,8 @@ MAVEN的适用场景存在明确的边界约束：
 3. **几何与物理范式扩展**：尚未适配薄壳、曲面几何或欧拉描述体系。将面片-单元编码思想推广至表面系统（如布料模拟）或固定网格下的欧拉仿真，需要重新定义几何元素类型及其聚合逻辑，这构成方法泛化的核心挑战。
 
 此外，从实验证据的覆盖范围来看，Metal Bending数据集作为本文新提出的弹塑性弯曲任务，虽展示了MAVEN相对于Abaqus仿真器2922.66%的加速比（Table 5, 23.57ms vs 712.44ms），但该数据集的泛化基准尚不充分——缺少与FIGNet等面片方法在该任务上的直接比较，且材料参数（铝合金应力-应变曲线，Figure 8a）的单一性限制了结论的普适性。这一缺口值得在后续工作中通过多材料、多几何参数的基准测试加以填补。
+
+
 
 ## 原文 PDF
 

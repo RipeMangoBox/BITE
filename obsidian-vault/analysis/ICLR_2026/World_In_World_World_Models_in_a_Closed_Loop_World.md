@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/World_In_World_World_Models_in_a_Closed_Loop_World.pdf
+project_link: https://world-in-world.github.io/
+code_link: null
 openreview_forum_id: yDmb7xAfeb
 aliases:
 - WWA
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 闭环世界中的世界模型：基准测试与分析 |
 | 英文题名 | World-In-World: World Models in a Closed-Loop World |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=yDmb7xAfeb); [Project](https://world-in-world.github.io/) |
+| Links | [paper](https://openreview.net/forum?id=yDmb7xAfeb) · [Project](https://world-in-world.github.io/) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | World-In-World（统一闭环在线规划与标准化动作API） |
 | Dataset | Active Recognition (AR), Image-Goal Navigation (ImageNav), Active Embodied Question Answering (A-EQA), Robotic Manipulation |
@@ -42,7 +44,7 @@ claims:
 > - Image-Goal Navigation (ImageNav) 上，SR% 为 46.53 (Wan2.2† A14B)，对比 35.42 (VLM w/o WM)，变化 +11.11。
 > - Active Embodied Question Answering (A-EQA) 上，Ans. Score 为 48.2 (Wan2.1†)，对比 45.7 (VLM w/o WM)，变化 +2.5。
 
-## 概述
+## 概要
 
 **瓶颈**：当前生成式世界模型普遍以开放环视觉质量为优化目标，但缺乏对行动条件的精确响应能力，导致其生成的“未来”在具身决策任务中无法被有效利用。这一可控制性鸿沟是阻碍世界模型从图像/视频生成器进化为具身智能体“内部模拟器”的关键瓶颈。
 
@@ -57,7 +59,7 @@ claims:
 
 **主要结果**：在主动识别（AR）、图像目标导航（ImageNav）、主动具身问答（A-EQA）和机器人操纵四项任务上，引入视觉世界模型一致提升了基础策略的性能。例如，AR 任务中 **Runway Gen4** 达到 64.79% 成功率（VLM 基线 50.27%），ImageNav 任务中 **Wan2.2† A14B** 达到 46.53%（基线 35.42%）。消融实验进一步确认：后训练数据扩展和推理时计算扩展均能持续提升任务成功率（Figure 6, Figure 7），而细粒度可控制性比视觉质量对成功率的预测力更强（Figure 5）。
 
-## 背景与动机
+
 
 ### 世界模型的角色错位：从视觉生成到行动决策
 
@@ -93,7 +95,9 @@ claims:
 
 此外，本文提出轻量级后训练协议，使用少量行动-观察数据微调预训练视频生成器，使其对齐目标领域的分布和动作空间，从而在不重新训练的情况下显著提升可控制性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新不在于提出一个新的世界模型架构，而在于**重新定义了世界模型的评估范式与使用方式**，并据此构建了一套完整的闭环基准与适配框架。其关键创新通过以下四个“changed slots”得以体现：
 
@@ -117,7 +121,7 @@ claims:
 
 通过对比分析，Figure 5 进一步量化了上述创新背后的因果机制：任务成功率与生成视觉质量（美学评分+图像质量评分）之间缺乏明确的正相关（Figure 5a），而与可控制性（以 $1 - \mathrm{LPIPS}$ 量化预测观测与真实观测的差异）之间呈现清晰的正相关（Figure 5b）。这直接验证了论文的核心洞察——世界模型在具身任务中的价值取决于其对行动的精确响应能力，而非生成图像的视觉完美程度。这一发现为后续世界模型研究指明了优化方向：应将资源投向提升行动条件的细粒度可控性，而非单纯追求视觉生成质量。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_yDmb7xAfeb/figures/017_Figure_9.jpg]]
 *Figure 9: Overview of our embodied closed-loop evaluation for A-EQA. For each question, the high-level planner proposes multiple candidate action plans and queries the world model to generate the corresponding future observations. The agent then evaluates each plan together with its predicted observations and selects the plan that maximizes the expected reward before executing it in the environment*
@@ -160,7 +164,7 @@ World-In-World 提出了一套统一的**闭环在线规划框架**，将视觉�
 
 四个核心模块形成端到端的数据流：**提议策略**产生候选动作 → **统一动作 API** 进行格式转换 → **世界模型**执行前向推演 → **修订策略**综合评估并输出最终决策。其中，世界模型是整个框架的瓶颈所在——其预测精度直接决定了模拟推演的可靠性，进而影响修订策略的决策质量。框架的设计使得任何符合统一动作 API 的世界模型均可即插即用，支持从零样本视频生成器到后训练专用模型的公平对比。
 
-## 核心模块与公式推导
+
 
 World-In-World 框架的核心是一个统一的闭环在线规划策略，其运转由三个关键模块构成：提议策略（Proposal Policy）、统一动作API（Unified Action API）和修订策略（Revision Policy），三者围绕视觉世界模型形成“提议—模拟—修订”的决策循环（Figure 3）。
 
@@ -214,7 +218,9 @@ $$
 
 除了上述在线规划模块，框架还包含一个离线后训练协议（Section 2.4），使用少量动作-观测数据对预训练视频生成器进行微调。后训练的核心目的是将通用视频生成器对齐到目标环境的领域分布和动作空间，从而提升世界模型对控制输入的响应精度（即可控制性）。后训练数据与评估场景不相交，确保泛化性评估的公平性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 
@@ -291,7 +297,9 @@ Figure 5 进一步将这一现象归因于**可控制性**（controllability）�
 
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_yDmb7xAfeb/figures/024_Table_11.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 在生成式世界模型谱系中的位置
 
@@ -349,6 +357,8 @@ World-In-World 在四个关键方法槽位上与基线方案形成系统性差�
 4. **长程依赖编码**：如何有效编码和利用长期依赖性进行长程规划，避免推演误差的累积放大，是提升复杂任务性能的上限因素。
 
 5. **提议与修订策略的上限**：当前框架的性能受限于提议策略的多样性和修订策略的判别能力。Table 5 显示世界模型增强和修订策略对 ImageNav 的影响显著，但如何设计更强的规划策略以充分释放世界模型的潜力，仍是开放方向。
+
+
 
 ## 原文 PDF
 

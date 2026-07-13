@@ -5,6 +5,8 @@ paper_level: A
 venue: SIGGRAPH
 year: 2024
 pdf_ref: paperPDFs/SIGGRAPH_2024/WalkTheDog_Cross_Morphology_Motion_Alignment_via_Phase_Manifolds.pdf
+project_link: https://peizhuoli.github.io/walkthedog/
+code_link: https://github.com/PeizhuoLi/walk-the-dog/
 aliases:
 - WalkTheDog
 tags:
@@ -33,12 +35,15 @@ claims:
 | 中文题名    | WalkTheDog：通过相位流形实现跨形态运动对齐                                                                                                                                                                           |
 | 英文题名    | WalkTheDog: Cross-Morphology Motion Alignment via Phase Manifolds                                                                                                                                    |
 | 会议/期刊   | SIGGRAPH 2024                                                                                                                                                                                        |
-| Links   | [paper](https://peizhuoli.github.io/walkthedog/papers/walk-the-dog-camera-ready-with-supp.pdf) [project](https://peizhuoli.github.io/walkthedog/) [code](https://github.com/PeizhuoLi/walk-the-dog/) |
+| Links   | [paper](https://peizhuoli.github.io/walkthedog/papers/walk-the-dog-camera-ready-with-supp.pdf) · [project](https://peizhuoli.github.io/walkthedog/) · [code](https://github.com/PeizhuoLi/walk-the-dog/) |
 | Topic | #topic/motion_alignment #topic/phase_manifold #topic/vector_quantization #topic/character_animation #topic/motion_alignment/general |
 | Method  | VQ-PAE, shared amplitude codebook, phase manifold, frequency-scaled motion matching                                                                                                                  |
 | Dataset | Dog, Human-Locomotion, MOCHA-Clown, MOCHA-Ogre                                                                                                                                                       |
 
-## 概述
+> [!tip] 效果简介
+> 结果与证据沿用下文“实验与关键发现”中的现有记录；本轮不新增或外推论文事实。
+
+## 概要
 
 **问题背景**：不同形态角色（如人与四足动物）的运动数据在骨骼结构上存在根本差异，使得跨形态运动对齐成为长期难题。传统方法依赖骨骼对应关系、人工标注或对抗训练来实现语义迁移，但这些策略往往不稳定，且难以泛化到结构差异悬殊的数据集之间。
 
@@ -48,7 +53,7 @@ claims:
 
 **主要结果**：在 Dog 与 Human-Locomotion 两个骨骼结构截然不同的数据集上，当振幅码本大小设为 32 并采用重新初始化训练时，流形重叠率达到 **100%**；而不使用重新初始化的基线方法在码本大小 2048 时重叠率仅为 0.00%，完全崩溃。这一结果表明，极窄瓶颈下的共享码本训练能够实现近乎完美的跨形态语义对齐。
 
-## 背景与动机
+
 
 跨形态运动对齐是计算机动画与机器人学习中的基础性难题。现实世界中，运动数据往往来自骨骼结构截然不同的角色——例如人类、四足动物或风格化虚拟角色——它们拥有的关节数量、拓扑连接和运动频率各不相同。传统运动合成与重定向方法通常依赖手工指定的骨骼对应关系或成对数据来建立不同形态间的映射，这不仅需要大量专家知识，而且难以泛化到未见过的角色组合。
 
@@ -56,7 +61,9 @@ claims:
 
 WalkTheDog 的核心动机源于一个关键观察：尽管运动在关节空间中的表示差异巨大，但其内在的周期性与语义结构是共通的。论文提出，如果能够学习到一个紧凑、结构化且解耦的相位流形，将运动的时间相位与语义幅度分离，那么不同形态的运动就有可能在这个共享流形上自动对齐——无需任何监督信号、无需骨骼对应关系、也无需自监督损失。这一思路的核心假设是：**浅层网络的有限表达能力与极窄的瓶颈设计**，会迫使模型捕捉运动最本质的周期性结构，而非过拟合到特定骨骼的细节，从而在异构数据集之间产生自然的对齐效果。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 WalkTheDog 的核心突破在于，它仅通过一个极窄的、结构化的相位流形（Phase Manifold）瓶颈，就实现了跨形态（不同骨骼结构）运动数据的无监督对齐。这一设计直接改变了传统跨形态对齐任务中对显式骨骼对应、配对数据或自监督损失函数的依赖，其关键创新点体现在以下三个紧密耦合的层面。
 
@@ -93,7 +100,7 @@ $$ c(i, k) = D(P_{i:i+t(i)}, Q_{k:k+t(k)}) + w_1 \|J_{\text{start}} - J_k\|_2^2 
 
 这三个改变共同构成了一个极简但高度有效的无监督跨形态对齐框架，其有效性在跨物种（人-狗）设定下达到了 100% 的流形重叠率（|A|=32，Table 2），而基线方法在此设定下完全失效（重叠率 0.00%）。
 
-## 整体框架
+
 
 WalkTheDog 的核心目标是在一个统一的紧凑流形上，对齐来自不同骨骼形态的运动数据，同时保留时序与语义信息。整个系统由两条主线构成：**VQ-PAE 流形学习**与**频率缩放运动匹配**。
 
@@ -136,7 +143,7 @@ $$\mathcal { L } _ { \mathrm { p o s e } } = \mathbb { E } _ { ( \boldsymbol { p
 ![[assets/figures/papers/paper_list_l5_https_peizhuoli_github_io_walkthedog_papers_walk_the_dog_camera_ready_wi/figures/002_Figure_2.jpg]]
 *Figure 2: Architecture of VQ-PAE. Starting with a short motion sequence $\mathbf { X } \in \mathbb { R } ^ { J \times T }$ , the encoder learns an intermediate representation using convolution. The representation is fed into the timing and the amplitude branch for predicting the phase ??, the frequency ?? and the amplitude A of the pivot frame (rendered with mesh). A vector quantization (i.e. nearest neighbor search) is used in the amplitude branch to ensure the structure of the phase manifold. Note the codebook A is shared among multiple VQ-PAEs. We calculate the embedding P of the sequence assuming the frequency and amplitude stay constant in the sequence. The predicted phase manifold sequence is the...
 
-## 核心模块与公式推导
+
 
 ### 3.1 相位流形（Phase Manifold）
 
@@ -207,7 +214,9 @@ $$c(i, k) = D(P_{i:i+t(i)}, Q_{k:k+t(k)}) + w_1 \|J_{\text{start}} - J_k\|_2^2 +
 
 该代价函数同时考虑了**相位流形距离**（语义一致性）、**姿态差异**（空间连续性）和**周期差异**（频率一致性），从而在跨形态匹配中既能对齐语义，又能自适应不同频率的运动节奏。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：跨形态运动对齐
 
@@ -261,7 +270,9 @@ Figure 6 进一步揭示了相位流形的内部结构：在同一连通分量�
 2. **MOCHA 数据集的高误差原因**：分析指出风格化角色误差较高，但未提供误差是否集中于特定运动类型或特定关节的细粒度分析。
 3. **流形重叠率的计算方式**：Table 2 报告了 100% 与 0.00% 的极端值，但其统计方式（基于码字分配还是流形采样点）需要确认，以确保指标本身不会因码本容量变化而产生偏差。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心机制与理论锚点
 
@@ -302,6 +313,8 @@ $$c(i, k) = D(P_{i:i+t(i)}, Q_{k:k+t(k)}) + w_1 \|J_{\text{start}} - J_k\|_2^2 +
 3. **周期检测的鲁棒性**：频率缩放运动匹配依赖准确的逐帧频率预测 $f_k$，但论文未讨论在非周期性运动（如跌倒、转向过渡）上的频率预测稳定性，这可能是实际应用中的潜在失效模式。
 
 4. **与大规模运动生成模型的集成**：VQ-PAE 的离散码本天然适合作为运动 GPT 类模型的 tokenizer，但论文未探索将学习到的流形作为条件信号注入扩散模型或自回归模型的可能性，这可能是将该方法扩展到开放域运动生成的关键方向。
+
+
 
 ## 原文 PDF
 

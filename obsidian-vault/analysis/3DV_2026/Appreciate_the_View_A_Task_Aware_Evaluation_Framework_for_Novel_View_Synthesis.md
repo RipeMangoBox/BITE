@@ -5,6 +5,8 @@ paper_level: A
 venue: 3DV
 year: 2026
 pdf_ref: paperPDFs/3DV_2026/Appreciate_the_View_A_Task_Aware_Evaluation_Framework_for_Novel_View_Synthesis.pdf
+project_link: https://saarst.github.io/appreciate-the-view-website/
+code_link: null
 aliases:
 - PMDM
 - AVTAEFNVS
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 欣赏视角：一种面向新视角合成的任务感知评估框架 |
 | 英文题名 | Appreciate the View: A Task-Aware Evaluation Framework for Novel View Synthesis |
 | 会议/期刊 | 3DV 2026 |
-| Links | [paper](https://arxiv.org/abs/2511.12675); [Project](https://saarst.github.io/appreciate-the-view-website/) |
+| Links | [paper](https://arxiv.org/abs/2511.12675) · [Project](https://saarst.github.io/appreciate-the-view-website/) |
 | Topic | #topic/benchmarks_datasets_evaluation #topic/benchmarks_datasets_evaluation/benchmark_eval |
 | Method | PRISM (Metrics: DPRISM / MMDPRISM) |
 | Dataset | VIEWMATCH, GSO (User Study), Toys4K |
@@ -41,7 +43,7 @@ claims:
 > - VIEWMATCH 上，MMDPRISM (Positive vs Negative) 为 0.691 / 0.984，对比 FID 102.360 / 107.240 (no separation)，变化 clear separation vs. flat。
 > - GSO (User Study) 上，Pearson correlation (Image Quality) 为 0.394 (DPRISM)，对比 -0.323 (PSNR)，变化 +0.717。
 
-## 概述
+## 概要
 
 新视角合成（Novel View Synthesis, NVS）旨在从有限观测中重建三维场景的任意视角图像。随着扩散模型等生成式方法的快速发展，NVS 模型生成的图像在视觉质量上已相当逼真，但**如何可靠地评估这些生成结果**仍是一个悬而未决的瓶颈。
 
@@ -67,7 +69,7 @@ claims:
 
 **方法定位**：PRISM 并非提出新的 NVS 生成模型，而是为 NVS 领域提供一套通用的评估基础设施。其设计具有模块化特征——特征提取骨干可替换为其他 NVS 基础模型，投影头可针对不同骨干重新训练。当前局限在于仅验证于物体级单视角设定，且依赖 Zero123-XL 作为特征提取器；向场景级、多视角及真实拍摄场景的扩展是重要的开放问题。
 
-## 背景与动机
+
 
 新视角合成（Novel View Synthesis, NVS）旨在从有限观测中重建三维场景的任意视角图像，其评估长期以来依赖于PSNR、SSIM、LPIPS等通用图像质量指标。然而，这些指标的设计初衷并非面向NVS这一特定任务，其根本性缺陷在于：它们仅度量生成图像与单一参考图像之间的像素级或特征级差异，完全忽略了NVS任务中**源图像、目标视角与生成结果之间不可分割的三元关系**。
 
@@ -81,7 +83,9 @@ claims:
 
 为填补上述缺口，本文提出PRISM（Perceptual Reference-based Image Synthesis Metric）评估框架。该框架的核心洞察在于：**扩散式NVS基础模型（如Zero123）的中间层特征天然编码了与视角相关的几何和外观信息**，通过对比学习将这些特征精炼为紧凑的L2归一化嵌入，可同时支持全参考（DPRISM）和无参考（MMDPRISM）两种评估模式。这一设计使得评估指标能够感知源-目标-姿态三元组的内在一致性，从而在模型排名、人类判断对齐和退化敏感性等关键维度上显著超越现有基线。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 1. 从通用视觉特征到NVS扩散模型特征：重新定义评估骨干
 
@@ -136,7 +140,7 @@ $$\mathcal{L}(a,p,n) = \max\left(\|a - p\|_2 - \|a - n\|_2 + m, 0\right)$$
 - **锚定集开销**：无参考MMDPRISM需要预构建锚定集，其大小和存储开销在大规模部署时可能成为瓶颈。如何进一步压缩锚定集而不损失评估可靠性是实用化方向。
 - **真实数据泛化**：VIEWMATCH基于合成渲染数据构建，用户研究虽独立于训练集，但整体评估仍限于渲染域。在真实拍摄图像上的泛化能力未经检验。
 
-## 整体框架
+
 
 PRISM 框架的核心设计理念是：将新视角合成（NVS）的评估建模为对**三元组（源视图、目标视图、相机姿态）**的语义理解问题，而非简单的像素级或分布级比较。如图 Figure 2 所示，整个框架由两个阶段构成：**特征提取流水线**和**双模式评估**。
 
@@ -181,7 +185,7 @@ $$\mathcal{L}(a,p,n) = \max(\lVert a - p \rVert_2 - \lVert a - n \rVert_2 + m, 0
 
 两种模式共享同一嵌入空间，形成了从逐样本精确评估到集合级分布评估的完整能力谱系。
 
-## 核心模块与公式推导
+
 
 ### 整体流水线
 
@@ -251,14 +255,14 @@ $$d_{\mathrm{MMD}}^2(P,Q) = \mathbb{E}_{x,x'\sim P}[k(x,x')] + \mathbb{E}_{y,y'\
 
 特征提取骨干的选择是整个框架的**核心因果旋钮**：原始扩散特征在 VIEWMATCH 上的线性分类 AUC 达到 0.90，远优于 CLIP（0.73）和 DINOv2（0.68），这表明扩散模型的中间特征天然编码了视角相关的几何和外观信息。对比微调投影头进一步将这些特征精炼为紧凑嵌入，使 DPRISM 和 MMDPRISM 均能有效捕捉标准指标（PSNR、SSIM、LPIPS）无法区分的视角一致性问题。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
 PRISM框架的评估围绕三个层次展开：**(1) 点级区分能力**——在VIEWMATCH数据集上验证指标能否区分合理与不合理的生成三元组；**(2) 分布级无参考验证**——检验MMDPRISM在无真值条件下能否分离正负样本集；**(3) 人类判断对齐**——通过用户研究衡量指标与人类偏好的相关性。评估涵盖多类NVS模型，包括基于扩散的Zero123-XL、回归式OpenLRM、多视图聚合SyncDreamer等（Table 8），确保排名实验覆盖不同技术范式。
 
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2511_12675/figures/019_Table_8.jpg]]
-*Table 8: Evaluated models grouped by paradigm*
 
 ---
 
@@ -327,8 +331,6 @@ Table 4和Table 5展示了MMDPRISM在Toys4K、GSO、OmniObject3D三个数据集�
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2511_12675/figures/018_Figure_12.jpg]]
 *Figure 12: Full-reference evaluation on misaligned-views*
 
-![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2511_12675/figures/023_Figure_14.jpg]]
-*Figure 14: Illustrative questions from the user study interface. (a) Source and target views share only a small overlap, so the task emphasizes evaluating plausibility of new regions. (b) Source and target views share a large overlap, so the task emphasizes evaluating shared region consistency. In both cases, participants rated all four aspects, and the blurred hint provides a uniformly faded reference for geometry without revealing fine detail. Examples were selected with correct viewing angles and good visual quality to represent typical tasks*
 
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2511_12675/figures/006_Table_2.jpg]]
 *Table 2: No-reference validation on VIEWMATCH. Lower is better*
@@ -348,7 +350,9 @@ Table 4和Table 5展示了MMDPRISM在Toys4K、GSO、OmniObject3D三个数据集�
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2511_12675/figures/021_Table_10.jpg]]
 *Table 10: Ranking on OmniObject3D dataset. Comparison of erence-free metrics for NVS models. Lower is better*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 基线谱系与核心差异
 
@@ -401,6 +405,8 @@ PRISM 的适用边界由以下约束定义：
 4. **训练过程集成**：PRISM 嵌入是否可作为 NVS 模型训练中的可微分损失或自适应学习信号？这需要验证嵌入空间在训练动态中的稳定性。
 
 5. **锚定集效率**：MMDPRISM 的无参考评估依赖锚定真实图像集的 PRISM 嵌入。如何最小化锚定集的大小和存储开销，同时保持排名可靠性？当前实验中锚定集的规模与选择策略需进一步优化。
+
+
 
 ## 原文 PDF
 

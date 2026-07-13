@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/A2Search_Ambiguity_Aware_Question_Answering_with_Reinforcement_Learning.pdf
+project_link: null
+code_link: https://github.com/zfj1998/A2Search
 aliases:
 - 2SAAQARL
 - A2SEARCH
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | A²Search：模糊感知的强化学习问答系统 |
 | 英文题名 | A$^2$Search: Ambiguity-Aware Question Answering with Reinforcement Learning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=3CPzUWIoNf); [GitHub](https://github.com/zfj1998/A2Search) |
+| Links | [paper](https://openreview.net/forum?id=3CPzUWIoNf) · [GitHub](https://github.com/zfj1998/A2Search) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/language_speech_and_dialog |
 | Method | A2SEARCH |
 | Dataset | Macro Avg (4 multi-hop benchmarks: HotpotQA, 2Wiki, MuSiQue, Bamboogle), HotpotQA, NQ (single-hop), AmbigQA (human-annotated ambiguity) |
@@ -41,7 +43,7 @@ claims:
 > - HotpotQA 上，AnsF1@1 (Exact Match) 为 49.5 (A2SEARCH-7B)，对比 39.3 (ReSearch-7B)，变化 +10.2。
 > - NQ (single-hop) 上，AnsF1@1 (Exact Match) 为 51.4 (A2SEARCH-7B)，对比 – (best baseline in Table 2)，变化 –。
 
-## 概述
+## 概要
 
 开放域问答（QA）系统的训练长期隐含一个假设：每个问题只对应唯一的标准答案。然而，真实世界的提问常常存在歧义——同一问题可由多个不同的答案有效回答，而现有方法难以感知并合理处理这类多答案场景。研究表明，仅在 MuSiQue 这一多跳QA基准的训练集中，就有 27.6% 的样本存在不止一个有效答案。当强化学**（RL）训练的奖励信号仍然基于单一参考答案的精确匹配时，模型无法从歧义中学习，反而会因奖励误导而性能受限。
 
@@ -51,7 +53,7 @@ claims:
 
 综上，A²Search 提供了一种系统化的模糊感知问答方案：将歧义从训练障碍转化为可学习的信号，在多个搜索增强的 QA 场景下有效提升模型的鲁棒性与答案覆盖能力。
 
-## 背景与动机
+
 
 开放域多跳问答要求模型在多个文档间进行推理并定位答案，近年来基于搜索的强化学习范式（如 ReSearch）通过让智能体自主调用检索工具，显著提升了多步推理能力。然而，这类方法的训练普遍隐含一个关键假设：每个问题只存在唯一正确答案，奖励信号完全以模型输出与单一参考答案的精确匹配（Exact Match）为依据。现实世界中的信息需求往往具有内在歧义，同一问题在不同证据下可能存在多个合理的答案，而这一假设导致奖励信号在歧义场景下发生系统性失真——即使模型输出的是由证据充分支持的答案，只要与预设参考答案不一致，就会被判定为错误。
 
@@ -59,7 +61,9 @@ claims:
 
 因此，一个关键缺口浮现：现有基于 RL 的问答系统缺乏对问题歧义的感知与适应机制，无法在单次推理中输出多个证据支持的答案以匹配真实的答案分布。这促使本文提出 A²SEARCH，其核心动机在于通过全自动管道发现歧义问题中的替代答案，并引入基于答案级 F1（AnsF1）的奖励函数，使模型能在搜索过程中自主判断是否有歧义、并生成全部有依据的答案，从而纠正奖励信号的系统偏差，使 RL 训练与多答案的真实场景对齐。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 现有搜索增强强化学习QA方法（如ReSearch、Search-R1）的核心假设是**每个问题仅存在唯一正确答案**，训练奖励和评估均基于单一参考答案的精确匹配（EM）。然而，该假设与真实世界中大量存在的含歧义、多答案问题严重不符——论文分析显示 **MuSiQue 训练集中 27.6% 的样本实际上允许不止一个有效答案**（`our analysis finds that 27.6% of MuSiQue’s training examples admit more than one valid answer`）。这一瓶颈导致传统方法在面对歧义问题时 RL 奖励信号错误，模型无法学习分辨并输出多个证据支持的答案。
 
@@ -91,7 +95,7 @@ A²SEARCH 的核心创新在于**将歧义感知注入搜索强化学习的两�
 
 这三个插槽的创新相互耦合、缺一不可：多答案训练数据如果没有 AnsF1 奖励，则模型无法获得有效反馈；AnsF1 奖励若无多答案数据，模型虽能部分“挤出”歧义，但性能远低于完整框架（消融变体 A²SINSearch 与 RECALLSearch 的结果，Table 18）。最终，A²SEARCH‑7B 在四个多跳 QA 基准上比同等规模的 ReSearch 基线 AnsF1@1 平均提升 **+2.2 个百分点**（48.4 vs 46.2），并在歧义密集的 HotpotQA 上实现 **+10.2 的巨大跃升**，证实了相对基线的关键创新价值。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0004_3CPzUWIoNf_A2Search_Ambiguity-Aware_Question_Answering_with/figures/002_Figure_2.jpg]]
 *Figure 2: Our pipeline for automatically identifying alternative answers in ambiguous questions*
@@ -141,7 +145,7 @@ A²Search 通过两条相互协同的机制打破这一瓶颈：**自动构建�
 
 训练阶段以扩展后的多答案数据集为输入，输出一个歧义感知的搜索型策略模型。推理阶段，对于输入问题，模型在单次 rollout 中即可通过检索、推理并最终输出一个或多个答案，答案数量完全由模型自主决定。相比基线（如 ReSearch）需多次采样才能覆盖多个有效答案且各次轨迹答案可能相左，A²Search 在单次 rollout 内即能显式解决歧义，直接给出所有证据支持的答案（Figure 1）。这一端到端的歧义感知设计使 A²Search-7B 在四个多跳基准上平均 AnsF1@1 达到 48.4%（超过 ReSearch-32B 的 46.2%），并在 HotpotQA 上提升达 +10.2 个百分点，展现出对真实世界问答歧义的有效适应能力。
 
-## 核心模块与公式推导
+
 
 A²SEARCH 框架的核心由两大模块构成：自动替代答案构建管道（数据层面）与基于答案级奖励的强化学习训练（训练层面）。两者协同解决开放域 QA 中的多答案歧义瓶颈——传统训练假设每个问题仅有唯一正确答案，导致奖励信号与真实世界不符。替代答案管道通过轨迹采样与证据验证识别歧义问题并收集有效替代答案；训练则采用 GRPO 与 AnsF1 奖励，使模型在一次 rollout 中自主决定是否输出多个答案。
 
@@ -227,7 +231,9 @@ $$
 
 以上模块构成 A²SEARCH 从数据到训练、从证据到奖励的完整模糊感知强化学习机制。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 本节首先说明评估协议与基准选择，然后报告 A²SEARCH 在多跳与通用 QA 场景中的**主结果**，接着通过若干**消融实验**揭示奖励设计、熵正则化、采样配置以及多答案数据的关键作用，最后讨论方法当前的**局限与失败模式**。
 
@@ -297,7 +303,9 @@ $$
 
 综上，A²SEARCH 框架通过多答案数据与 AnsF1 奖励的双重创新，显著提升了开放域 QA 模型对歧义问题的感知与适应能力；同时消融与定量分析也指出了当前方案在降低验证成本、强化鲁棒性等方面的改进空间。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 A²Search 处于开放域多证据问答（QA）与搜索增强强化学习（RL）的交叉点，其核心定位是**首个全自动、无需人工标注的歧义感知 RL 框架**。现有强基线（如 ReSearch、Search‑R1、SinSearch 等）默认训练时每个问题仅有一个正确答案，并通过精确匹配（EM）奖励牵引模型在搜索过程中逼近该唯一答案。然而，A²Search 的分析证实 MuSiQue 训练集中 **27.6% 的样本存在多个有效答案**（our analysis finds that 27.6% of MuSiQue’s training examples admit more than one valid answer），揭示出单答案假设的系统性缺陷：RL 奖励信号在歧义样本上错误惩罚证据支持的答案，模型被迫忽略已检索到的合理信息。
 
@@ -347,6 +355,8 @@ A²Search 的验证建立在明确的实验边界内，适用场景和条件如�
 - **多语言与跨语料迁移**：A²Search 的整个思路假定知识来源固定且语言单一。当面对多语言 Wikipedia 或完全不同结构的知识库时，自动歧义检测与答案聚类的语义等价判定机制是否仍然可靠，需要结构化的负样本验证。
 - **生成式长答案的歧义建模**：当前 AnsF1 奖励仅在短实体答案上定义了自然的重叠度量。如何将类似思路迁移到需生成描述性文本的问答中，答案多样性的捕捉尚为空白。
 - **多源工具链下的歧义归因**：当搜索工具超越纯文本检索（如表格查询、代码执行）时，工具自身可能引入新的歧义（例如不同引擎返回冲突结果），此时需要区分“问题固有歧义”与“工具引入歧义”，目前框架未涉及该层次。
+
+
 
 ## 原文 PDF
 

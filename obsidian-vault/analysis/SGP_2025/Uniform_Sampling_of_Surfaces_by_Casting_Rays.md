@@ -5,6 +5,7 @@ paper_level: A
 venue: SGP
 year: 2025
 pdf_ref: paperPDFs/SGP_2025/Uniform_Sampling_of_Surfaces_by_Casting_Rays.pdf
+code_link: https://github.com/iszihan/implicit-uniform-sampler
 project_link: https://github.com/iszihan/implicit-uniform-sampler
 aliases:
 - USSRC
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 通过射线投射实现曲面均匀采样 |
 | 英文题名 | Uniform Sampling of Surfaces by Casting Rays |
 | 会议/期刊 | SGP 2025 |
-| Links | [paper](https://arxiv.org/abs/2506.05268); [GitHub](https://github.com/iszihan/implicit-uniform-sampler) |
+| Links | [paper](https://arxiv.org/abs/2506.05268) · [GitHub](https://github.com/iszihan/implicit-uniform-sampler) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Uniform Surface Sampling via Ray Casting |
 | Dataset | MPZ14 mesh dataset (114 shapes) |
@@ -41,7 +42,7 @@ claims:
 > - MPZ14 mesh dataset (114 shapes) 上，Total Variation (TV) 为 0.372，对比 0.373 (Rejection Sampling)，变化 -0.001。
 > - MPZ14 mesh dataset (114 shapes) 上，Number of Function Evaluations 为 1.92×10^7，对比 3.98×10^8 (Rejection Sampling)，变化 -3.79×10^8。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -76,7 +77,7 @@ claims:
 
 方法的局限性包括：对极薄稀疏特征效率下降；依赖已知的Lipschitz常数；对二值占用场等硬表面表示难以高效追踪。
 
-## 背景与动机
+
 
 ### 隐式曲面的兴起与基本操作的缺失
 
@@ -106,7 +107,9 @@ claims:
 
 基于此洞察，本文提出了一套完整的均匀曲面采样框架，其核心创新在于：(1) 保证射线在包围盒内均匀分布的原点采样策略（Figure 5, Figure 6）；(2) 保留每条射线所有交点（而非仅保留一个）的“全交点”策略，这是保证均匀性的关键设计选择（Figure 7）；(3) 可选的稀疏体素分层采样加速机制（Figure 9）。实验表明，该方法在均匀性上可与拒绝采样媲美（TV分数0.372 vs. 0.373），而函数评估次数仅为拒绝采样的4.8%（Table 1）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本方法的核心创新在于将**基于积分几何的连续均匀采样理论**转化为一个**纯射线投射的实用算法**，从根本上绕开了隐式曲面采样中长期存在的效率-均匀性困境。其关键设计体现在三个紧密耦合的“变更槽”（changed slots）上。
 
@@ -137,7 +140,7 @@ claims:
 
 这一协同设计使得方法在114个网格隐式函数数据集上，以**仅拒绝采样4.8%的函数评估次数**（$1.92\times 10^7$ vs $3.98\times 10^8$），达到了**与真实网格采样相当的均匀性**（TV 0.372 vs 0.373，Table 1）。
 
-## 整体框架
+
 
 本方法的核心流水线由三个关键模块串联构成，将“在隐式曲面上生成均匀白噪声样本”这一目标转化为一个无需显式网格表示、无需投影步骤的纯射线求交过程。
 
@@ -178,7 +181,7 @@ claims:
 ![[assets/figures/papers/paper_list_l35_https_arxiv_org_abs_2506_05268/figures/017_Figure_14.jpg]]
 *Figure 14: White noise sampling can be straightforward with mesh surfaces, but offset surface sampling is often non-trivial unless converted to an implicit surface. Our method can easily sample offset surfaces, along both positive and negative directions, in addition to the surface defined at the zero level set*
 
-## 核心模块与公式推导
+
 
 ### 均匀射线生成（Uniform Ray Generation）
 
@@ -227,7 +230,9 @@ $$\mathbf{c}_{\mathrm{solid}} = \frac{1}{V} \int \mathbf{x} d\mathbf{x} = \frac{
 
 **收敛性改进**：使用低差异序列（low-discrepancy sequence）替代均匀随机采样射线，可使表面积估计误差的收敛速度从 $O(N^{-1/2})$ 提升至 $O(N^{-2/3})$（Figure 16）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -292,7 +297,9 @@ $$V = \operatorname* { l i m } _ { M \to \infty } \frac { 6 } { M } \sum _ { i =
 ![[assets/figures/papers/paper_list_l35_https_arxiv_org_abs_2506_05268/figures/020_Figure_16.jpg]]
 *Figure 16: We plot the absolute surface area estimation error with samples acquired from sampled rays using a low-discrepancy sequence as proposed in [LYZ∗06, LYZ∗10], as well as uniformly sampled rays, as described in Section 4.1. We also plot asymptotes O ( $N ^ { \frac { 2 } { 3 } }$ ) and O ( $N ^ { \frac { 1 } { 2 } }$ ) , and observe that using the low-discrepancy sequence results in faster convergence, as pointed out in [LYZ∗06]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从拒绝采样到积分几何
 
@@ -360,6 +367,8 @@ $$V = \operatorname* { l i m } _ { M \to \infty } \frac { 6 } { M } \sum _ { i =
 - **重建正则化**：采样点可作为基于采样的正则化项。
 
 与现有方法相比，本文方法在**均匀性-效率 Pareto 前沿**上实现了显著推进：在 MPZ14 数据集上，TV 分数（0.372）与拒绝采样（0.373）相当，但函数评估次数仅为后者的 4.8%（$1.92 \times 10^7$ vs $3.98 \times 10^8$），为 Marching Cubes 的 1.8%（Table 1）。这一效率优势在神经隐式等评估昂贵的场景中尤为关键。
+
+
 
 ## 原文 PDF
 

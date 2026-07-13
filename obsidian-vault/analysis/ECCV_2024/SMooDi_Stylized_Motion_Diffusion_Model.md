@@ -5,6 +5,8 @@ paper_level: A
 venue: ECCV
 year: 2024
 pdf_ref: paperPDFs/ECCV_2024/SMooDi_Stylized_Motion_Diffusion_Model.pdf
+project_link: https://neu-vi.github.io/SMooDi/
+code_link: null
 aliases:
 - SMooDi
 tags:
@@ -42,7 +44,7 @@ claims:
 > - HumanML3D + 100STYLE (motion style transfer) 上，FID↓ 0.095 vs Aberman et al.: 0.338 / Motion Puzzle: 0.197 (-71.9% / -51.8%)。
 > - Xia dataset (unseen, motion style transfer) 上，CRA↑ (%) 45.555 vs Aberman et al.: 34.444 / Motion Puzzle: 25.556 (+32.26% / +78.26%)。
 
-## 概述
+## 概要
 
 **瓶颈与动机** 现有文本驱动的人体运动生成方法（如 MLD）缺乏对运动*风格*的控制能力；而独立的运动风格迁移方法（如 Motion Puzzle、Aberman et al.）依赖有限风格数据集训练，与文本到运动模型串行使用时会产生误差累积。这种“内容—风格”分离的流水线无法同时满足多样内容与多种风格的需求。
 
@@ -52,7 +54,7 @@ claims:
 
 **方法定位** SMooDi 属于**基于扩散模型的运动风格化方法**，在方法谱系中位于“文本到运动生成”与“运动风格迁移”的交汇点。与为每种风格单独训练模型或依赖有限风格迁移流水线的方案不同，它通过微调预训练文本到运动模型来注入风格条件，在保留广泛内容生成能力的同时学习多种运动风格。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -78,7 +80,9 @@ claims:
 
 SMooDi 是首个将预训练文本到运动模型适配为风格化生成模型的工作，为风格可控的运动生成开辟了新的技术路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SMooDi 的核心创新在于将风格条件注入冻结的文本到运动扩散模型，从而在保留广泛内容生成能力的同时，赋予单一模型对多种运动风格的控制力。这一思路通过三个紧密耦合的“changed slots”实现。
 
@@ -128,7 +132,7 @@ $$
 
 SMooDi 的创新链条可概括为：**风格适配器提供结构基础 → 双重风格引导实现从粗到细的风格控制 → 先验保留损失防止内容能力退化**。三者缺一不可：去除适配器使 FID 恶化约 80.46%（Table 3），去除分类器基础引导使 SRA 崩溃，去除先验保留损失则导致内容生成能力瓦解。这一设计使 SMooDi 成为首个在单一模型中同时实现多样化内容生成与多种风格控制的文本到运动框架。
 
-## 整体框架
+
 
 SMooDi 的整体 pipeline 建立在对预训练文本到运动潜在扩散模型（MLD）的定制化微调之上。其核心设计思想是：**冻结基础生成骨架，通过外部风格条件模块注入风格控制信号**，从而在保留广泛内容生成能力的同时学习多种运动风格。
 
@@ -170,7 +174,7 @@ $$\mathcal{L}_{all} = \mathcal{L}_{std} + \lambda_{pr} \mathcal{L}_{pr} + \lambd
 
 消融实验证实，同时去除 $\mathcal{L}_{pr}$ 和 $\mathcal{L}_{cyc}$ 会导致 FID 从 1.609 恶化至 5.996（降幅超过 229%），出现严重的“内容遗忘”现象，验证了先验保留策略的必要性。
 
-## 核心模块与公式推导
+
 
 SMooDi 的核心架构由两个关键模块构成：**风格适配器**（Style Adaptor）和**双通路风格引导机制**。前者负责将参考风格序列的条件信息注入预训练的文本到运动扩散模型，后者则在推理阶段通过互补的引导策略精确控制生成运动的风格表现力。
 
@@ -254,7 +258,9 @@ $$
 ![[assets/figures/papers/paper_list_l1879_SMooDi_Stylized_Motion_Diffusion_Model/figures/013_Figure_8.jpg]]
 *Figure 8: Visual pipeline of the cycle prior-preservation loss*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 SMooDi 在风格化文本生成运动（stylized text2motion）和运动风格迁移（motion style transfer）两个核心任务上进行了系统评估。实验以 HumanML3D 提供内容文本、100STYLE 提供参考风格序列，并与三类基线方法对比：**MLD + Motion Puzzle**（文本到运动生成与运动风格迁移的串行流水线）、**MLD + Aberman et al.**（另一串行风格迁移基线）以及 **ChatGPT + MLD**（通过文本融合风格标签的直接文本驱动方法）。为保证公平性，所有基线均使用相同的 6-D 旋转表示重新训练，且训练迭代次数为 SMooDi 的 5 倍。评估风格识别准确率（SRA）时，排除了 100STYLE 中具有内容含义的 ACT 组，仅使用与内容无关的风格标签（CHAR、PER、EMO、MOT、OBJ），以避免内容与风格的语义冲突。
 
@@ -310,7 +316,9 @@ Table 5 报告了推理时间对比。SMooDi 全模型的平均每句推理时�
 ![[assets/figures/papers/paper_list_l1879_SMooDi_Stylized_Motion_Diffusion_Model/figures/017_Figure_11.jpg]]
 *Figure 11: A visual example showing conflicts between content text and style motion in a specific body part*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 基线关系与创新定位
 
@@ -353,6 +361,8 @@ SMooDi 的技术骨架继承自 **MLD（Motion Latent Diffusion Model）**，后
 3. **物理约束集成**：引入物理约束或真感引导（realism guidance）是否能进一步消除脚部滑动并提升运动质量？这将使 SMooDi 更适用于游戏、动画等对物理真实感要求较高的应用场景。
 
 4. **条件域泛化**：风格适配器的设计是否可推广到其他条件域（如骨骼结构、环境约束、交互物体）以实现更通用的条件运动生成？这涉及将“风格”概念从运动特征拓展到更广泛的条件表征空间。
+
+
 
 ## 原文 PDF
 

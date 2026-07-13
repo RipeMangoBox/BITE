@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/3D_aware_Disentangled_Representation_for_Compositional_Reinforcement_Learning.pdf
+project_link: null
+code_link: null
 aliases:
 - 3BSRBTP
 - 3ADRCRL
@@ -41,7 +43,7 @@ claims:
 > - Clevr3D 上，D (Disentanglement) 为 0.867，对比 0.140 (OSRT)，变化 +0.727。
 > - Clevr3D 上，PSNR 为 31.11，对比 31.57 (OSRT)，变化 -0.46。
 
-## 概述
+## 概要
 
 本文针对现有基于2D图像的对象中心表示缺乏3D感知能力，且对象属性与相机位姿之间存在纠缠的问题，提出了一种面向组合强化学习（Compositional Reinforcement Learning, GCRL）的3D感知解耦表示方法。核心瓶颈在于：当面对遮挡、视角变化和多对象操作任务时，传统表示方法（如OSRT）因无法有效解耦对象属性，导致泛化能力差。
 
@@ -49,7 +51,7 @@ claims:
 
 主要结果验证了该方法的有效性：在Clevr3D数据集上，方法在FG-ARI（0.942 vs 0.365）、解耦性D（0.867 vs 0.140）等指标上显著优于OSRT，同时PSNR相当（31.11 vs 31.57）。在IsaacGym3D的GCRL任务中，结合BT策略的方法在分布内（ID）设置下成功率达0.967 ± 0.017，组合泛化（CG）设置下为0.895 ± 0.011，分布外（OOD）设置下为0.828 ± 0.099，均大幅超越基线。在视角泛化实验中，方法在OOD单视图设置下仍保持0.758 ± 0.021的成功率，证明了其视角无关的3D感知能力。消融实验进一步表明，块级解耦质量（DCI指标）直接正向影响GCRL性能，且方法可使用次优掩码（如DINO背景掩码+运动学智能体掩码）进行训练，性能与使用GT掩码相当，增强了实际部署的可行性。
 
-## 背景与动机
+
 
 现有基于2D图像的对象中心表示（如DLPv2、SNeRL）在机器人操作任务中面临两个根本瓶颈：一是缺乏3D感知能力，无法处理视角变化和遮挡；二是对象属性与相机位姿之间存在纠缠，导致在组合泛化和分布外场景中性能严重退化。尽管OSRT等3D对象中心表示方法通过光场解码器实现了新视角合成，但其每个对象仅由一个单一槽向量表示，未对属性进行显式分解，因此解耦性能极差（FG-ARI仅0.365，解耦度D仅0.140），这从根本上限制了其在目标条件强化学习中的泛化能力——当场景中出现训练时未见过的属性组合时，策略无法准确匹配当前状态与目标状态中的对象。
 
@@ -57,7 +59,9 @@ claims:
 
 该方法的因果机制在于：属性块的显式分解使得模型能够独立编码和操作每个对象的形状、颜色、大小和位置信息，而块级交叉注意力则允许策略在对象匹配时直接关注具体属性的差异，而非模糊的对象整体。这一设计直接解决了现有方法中“对象属性纠缠导致组合泛化失败”的核心问题——当训练集中红色方块和蓝色球体已出现，但红色球体是未见组合时，模型可以通过独立匹配颜色块和形状块来正确识别目标对象，而非依赖整体对象表示的相似度。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于提出了一种**3D感知的对象级解耦表示**及其配套的策略架构，从根本上解决了现有2D对象中心表示在遮挡、视角变化和多对象操作任务中泛化能力差的问题。其瓶颈在于，现有基于2D图像的对象中心表示（如OSRT、DLPv2）缺乏3D感知能力，且对象属性与相机位姿之间存在纠缠，导致模型无法在视角变化和属性组合变化时稳定工作。
 
@@ -73,7 +77,7 @@ claims:
 
 **核心洞察**在于：通过将对象表示分解为可解释的属性块，并利用块级交叉注意力策略，可以稳定地匹配当前状态与目标状态之间的对象属性，从而实现高效的组合泛化和视角无关的强化学习。消融实验（Table 13）直接验证了这一因果链：高DCI（解耦性、完整性、信息性）模型在所有泛化设置（ID、CG、CG同色、OOD）中的成功率均显著优于低DCI模型，证明**块级解耦质量是GCRL性能的直接瓶颈**。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0001_GE0IFoDx8a_3D-aware_Disentangled_Representation_for_Composi/figures/001_Figure_1.jpg]]
 *Figure 1: Overall structure of our method: Our proposed pipeline consists of two steps: representation learning and policy training. (a) Pre-training 3D block-slot encoder: The object slots are further decomposed into blocks of attributes. Then, the slot-mixer decoder mixes the object-centric representation to generate images at a query view. (b) Policy training with block transformer policy: We utilize the 3D block-slot encoder to extract a structured representation for the current observation and the goal image. The decomposed latent embedding serves as the input and the goal tokens, respectively, for our block transformer of the policy architecture*
@@ -92,7 +96,7 @@ claims:
 
 **模块关系与数据流**：SRT Encoder → 3D Block-Slot注意力（混合架构）→ Slot Mixer解码器（训练时重建损失）→ 预训练编码器冻结 → 块变换器策略（块级交叉注意力）。输入为多视图图像（表示学习阶段）或单/多视图（策略推理阶段），输出为对象级解耦表示（表示学习）或动作（策略）。
 
-## 核心模块与公式推导
+
 
 ### 3D Block-Slot 表示学习
 
@@ -184,7 +188,9 @@ $$
 - **块数量**（Table 11）：从4增加到16可提高解耦性能（D从0.322升至0.447），但FG-ARI略有下降，表明需要平衡分解粒度与对象分割质量。
 - **原型数量**（Table 12）：从8增加到32可显著提高解耦性能（D从0.023升至0.480）和PSNR（从22.43升至25.33），说明更多的概念记忆有助于更精细的属性编码。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 3D感知与解耦表示质量
 
@@ -238,7 +244,9 @@ $$
 *Table 5: Hyperparameters of DLPv2 used in our experiments*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 本文提出的3D block-slot表示与块变换器策略，定位在**对象中心强化学习**与**3D感知解耦表示**两个社区的交汇点。其核心瓶颈识别为：现有2D对象中心表示（如DLPv2）缺乏3D感知，且3D对象中心表示（如OSRT, SNeRL）中对象属性与相机位姿纠缠，导致在遮挡、视角变化和多对象组合操作任务中泛化能力不足。因果干预手段是：将对象槽进一步分解为多个属性块（形状、颜色、大小、位置），并设计混合槽注意力架构——对前景对象槽使用块-槽注意力，对背景和智能体槽保留标准槽注意力。
 
@@ -249,6 +257,8 @@ $$
 **局限与开放问题**有三。第一，当前方法不支持动态或一对多的匹配场景，限制了在更复杂环境中的适用性。第二，3D block-slot表示编码了类似语言标记的语义，如何将其与视觉-语言-动作（VLA）框架结合，实现更高级的推理和规划，是重要的未来方向。第三，方法依赖多视图输入进行表示学习，且解耦质量受块数量和原型数量等超参数影响（Table 11和Table 12显示，增加块数量从4到16可提高D从0.322至0.447，但FG-ARI略有下降；增加原型数量从8到32可显著提高D从0.023至0.480和PSNR从22.43至25.33），需要仔细调优。次优掩码实验（Table 15）表明，使用DINO背景掩码和运动学智能体掩码训练的模型，其GCRL性能与使用GT掩码的模型相当，这为减少对仿真GT掩码的依赖提供了可行路径，但在真实世界场景中如何更鲁棒地获取次优掩码仍需进一步研究。
 
 **证据强度评估**：主要性能比较（Table 1, 2, 3）基于3个随机种子、每种子400个随机采样目标，统计量充分。消融实验（Table 11-15）覆盖了块数量、原型数量、解耦质量、掩码损失权重、次优掩码等关键设计维度，证据链完整。但部分定性分析（如K-means聚类和特征重要性矩阵）的量化支撑较弱，需要手动验证其在不同数据集上的可重复性。
+
+
 
 ## 原文 PDF
 

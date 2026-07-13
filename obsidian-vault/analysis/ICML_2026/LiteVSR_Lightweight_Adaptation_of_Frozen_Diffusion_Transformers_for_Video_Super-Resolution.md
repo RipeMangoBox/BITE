@@ -43,7 +43,7 @@ claims:
 > - UDM10 (synthetic) 上，DOVER↑ 0.515 vs 0.4618 (FlashVSR) (+0.0532)。
 > - SPMCS (synthetic) 上，MUSIQ↑ 70.42 vs 70.33 (FlashVSR) (+0.09)。
 
-## 概述
+## 概要
 
 视频超分辨率（VSR）旨在从低质量视频中恢复高保真细节。近年来，大规模预训练视频生成模型为VSR带来了显著的纹理生成能力，但其适配成本极高：现有方案要么对扩散变换器（DiT）进行全量微调，需要数十块GPU和数百万训练样本；要么采用ControlNet风格的适配器，在DiT架构下被迫复制整个骨干网络，导致参数量翻倍。这些方法均未能在保持预训练先验的同时实现轻量级高效适配。
 
@@ -53,7 +53,7 @@ LiteVSR的核心洞察在于，流匹配（Flow Matching）学习的是恒定速
 
 **方法定位**：LiteVSR属于基于预训练视频扩散模型的VSR方法，与**Upscale-A-Video**（Zhou et al., CVPR 2024）、**DiffVSR**（Li et al., 2025）、**FlashVSR**（Zhuang et al., 2025）等处于同一技术脉络，但其独特的冻结骨干+轻量适配器范式显著区别于全量微调或骨干复制方案。
 
-## 背景与动机
+
 
 视频超分辨率（VSR）旨在从低质、退化的视频输入中恢复高保真细节。近年来，大规模预训练视频生成模型凭借其强大的先验知识，在生成式 VSR 中展现出卓越的重建能力。然而，如何高效地适配这些大模型到 VSR 任务，已成为制约其实际应用的核心瓶颈。
 
@@ -85,7 +85,9 @@ $$\mathcal{L}_{FM} = \mathbb{E}_{t, x_0, x_1} \left[ \| v_\theta(x_t, t, c) - (x
 
 这一设计使得 LiteVSR 能够以仅 11.25% 的可训练参数和单张 A100 GPU 上约 12 小时的训练代价，获得有竞争力的恢复质量（Table 1），将大规模视频生成模型在 VSR 中的适配效率推向了新的边界。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 LiteVSR 的核心创新在于利用**流匹配（Flow Matching）的恒定速度场特性**，将视频超分辨率（VSR）的条件适配任务从根本上简化，从而实现了对预训练扩散变换器（DiT）的**完全冻结式轻量级适配**。这一设计打破了现有方案在计算效率与生成质量之间的权衡。
 
@@ -125,7 +127,7 @@ $$M(t) = \left\lfloor 1 + \frac{s \cdot (1 - t)}{1 + (s - 1) \cdot (1 - t)} \cdo
 
 综上，LiteVSR 通过“冻结骨干 + 流匹配恒定速度场 + 双流状态感知适配器”的组合，实现了仅 **11.25% 可训练参数**、单张 A100 GPU 约 12 小时训练即可获得有竞争力恢复质量的轻量级 VSR 方案（Table 1）。
 
-## 整体框架
+
 
 LiteVSR 的整体架构围绕一个核心设计原则展开：**完全冻结预训练视频生成器的骨干网络，仅通过轻量级适配器注入条件信号**。这一设计根植于流匹配（flow matching）的一个关键性质——目标速度场 $v = x_1 - x_0$ 在整个时间步上保持恒定，使得条件注入不再需要学习时变的变换，适配器只需学习一个固定的引导模式（见 Eq.3—Eq.4）。
 
@@ -161,7 +163,7 @@ LiteVSR 采用**单阶段纯潜在空间流匹配训练**，无需像素域监�
 ![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2606_09250/figures/004_Figure_3.jpg]]
 *Figure 3: LiteVSR. Left: The overall framework keeps all DiT blocks frozen and injects control signals via zero-initialized linear layers. The State-Aware Adapter processes both the LR latent and the current noisy state to produce conditioning features. Right: The adapter employs dual-stream patch embeddings to extract features from the LR input and the denoising state, which are concatenated as keys and values. A learnable query attends to these features via cross-attention to produce the output. Bottom: Resolution-agnostic query tiling enables inference at arbitrary resolutions by repeating and cropping the learned query prototypes to match the target spatial dimensions*
 
-## 核心模块与公式推导
+
 
 ### 3.1 流匹配与条件注入简化
 
@@ -235,7 +237,9 @@ $$\mathcal{L} = \mathbb{E}_{t, z_0, z_1} \left[ \lambda(t) \left\| v_\theta(z_t,
 ![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2606_09250/figures/003_Figure_2.jpg]]
 *Figure 2: ControlNet paradigms for DiT. (A) Standard Control-Net duplicates the backbone for condition processing. (B) Our approach shares frozen DiT blocks via batch processing, requiring only a lightweight adapter*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 训练效率对比
 
@@ -306,7 +310,9 @@ Table 6 汇总了实现细节和关键超参数。LiteVSR 采用单阶段纯潜�
 ![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2606_09250/figures/001_Figure_1.jpg]]
 *Figure 1: Visual comparisons of LiteVSR with SOTA methods (Zoom-in for best view)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 
@@ -336,6 +342,8 @@ LiteVSR 与现有方法存在三个结构性差异：
 2. **数据规模与泛化**：当前训练仅使用 REDS 的 266 个片段，评估主要依赖合成退化，模型在更广泛真实世界退化分布下的泛化能力尚待验证。
 3. **骨干替换的灵活性**：该方法对 Wan2.2-5B 的冻结策略是否可平滑迁移到其他 DiT 架构（如 Sora 类模型），仍需实验验证。
 4. **推理效率**：虽然训练成本极低，但推理仍需多步采样，能否与蒸馏策略（如 FlashVSR 的一步蒸馏）结合以进一步降低推理延迟，是实用化部署的关键问题。
+
+
 
 ## 原文 PDF
 

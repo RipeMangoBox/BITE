@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/SkillMimic_Learning_Reusable_Basketball_Skills_from_Demonstrations.pdf
+project_link: https://ingrid789.github.io/SkillMimic/
+code_link: null
 aliases:
 - SLRBSFD
 tags:
@@ -40,7 +42,7 @@ claims:
 > - BallPlay-M Circling task 上，Success Rate (%) 79.92 vs PPO: 11.14, ASE: 4.37 (+68.78 to +75.55)。
 > - BallPlay-M Throwing task 上，Success Rate (%) 93.40 vs PPO: 0.00, ASE: 0.00 (+93.40)。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -69,7 +71,7 @@ SkillMimic 针对上述瓶颈提出了一个统一的数据驱动框架。其核
 
 SkillMimic 属于**基于强化学习的物理角色动画**与**人-物交互模仿**的交叉领域。与依赖技能特定奖励的传统方法（如 DeepMimic）不同，SkillMimic 通过统一的乘积奖励设计实现了技能无关（skill-agnostic）的学习。与基于对抗性模仿的 AMP 系列方法相比，SkillMimic 显式引入了接触图监督，有效避免了运动学局部最优问题。在高层任务层面，SkillMimic 提供的交互技能先验相较于 ASE 的运动先验具有更强的任务相关性，使复杂交互任务的策略学习成为可能。
 
-## 背景与动机
+
 
 ### 人-物交互技能学习的核心挑战
 
@@ -101,7 +103,9 @@ SkillMimic 的提出正是为了填补上述缺口。其核心动机是：**如�
 
 通过这两个机制，SkillMimic 首次实现了在统一框架下学习多种篮球交互技能——包括运球、投篮、上篮和捡球——并支持技能间的灵活切换与组合，为后续的高层任务学习提供了可重用的技能先验。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈突破：从技能特定奖励到统一 HOI 模仿框架
 
@@ -149,7 +153,7 @@ SkillMimic 采用单一交互技能（IS）策略，通过输入技能标签（o
 
 上述三项创新共同构成了 SkillMimic 的方法论核心：乘积奖励提供全局优化约束，接触图奖励提供局部接触精度，技能条件化实现多技能的规模化学习。三者缺一不可，消融实验已充分证明了每一项的独立贡献。
 
-## 整体框架
+
 
 SkillMimic 的系统设计遵循**数据驱动、技能无关、可扩展**的核心原则，旨在通过统一的模仿学习框架，使物理仿真人形机器人从 HOI 运动数据中学习多样化的篮球交互技能。整个 pipeline 由三个紧密衔接的模块构成，如图 Figure 3 所示。
 
@@ -183,7 +187,7 @@ IS 策略是 SkillMimic 的核心低层控制器，其训练流程如下：
 ![[assets/figures/papers/paper_list_l1749_SkillMimic_Learning_Reusable_Basketball_Skills_from_Demonstrations/figures/001_Figure_1.jpg]]
 *Figure 1: We propose a novel approach that for the first time enables physically simulated humanoids to learn a variety of basketball interaction skills from Human-Object Interaction (HOI) data, including but not limited to shooting (blue), retrieving (red), and turnaround layup (yellow). Once acquired, these interaction skills can be composed to accomplish complex tasks, such as consecutive scoring (green)*
 
-## 核心模块与公式推导
+
 
 SkillMimic 的系统框架由三个核心模块构成：HOI 数据收集与预处理、交互技能策略训练、以及高层控制器。其中，交互技能策略训练是整个方法的核心，其关键在于一个统一的 HOI 模仿奖励设计与接触图建模。
 
@@ -248,7 +252,9 @@ $$E_{\mathrm{cg}} = \frac{1}{N} \sum_{t=1}^{N} \mathrm{MSE}(s_t^{cg}, \hat{s}_t^
 ![[assets/figures/papers/paper_list_l1749_SkillMimic_Learning_Reusable_Basketball_Skills_from_Demonstrations/figures/002_Figure_2.jpg]]
 *Figure 2: Concept of SkillMimic. We define an interaction skill as a set of Human-Object Interaction (HOI) state transitions that align with the intended skill semantics. These state transitions can be derived from captured HOI motion clips. If a simulated humanoid can manipulate objects such that the resulting HOI state transitions closely match those of the reference, we consider the humanoid to have successfully learned the interaction skill*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 统一 HOI 模仿奖励的消融实验
 
@@ -321,7 +327,9 @@ PPO（从零开始训练）和 ASE（使用运动先验，Peng et al., TOG 2022�
 
 ![[assets/figures/papers/paper_list_l1749_SkillMimic_Learning_Reusable_Basketball_Skills_from_Demonstrations/figures/007_Figure.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心瓶颈与因果机制
 
@@ -375,6 +383,8 @@ SkillMimic 在 HOI 模仿学习的方法谱系中占据“统一数据驱动 HOI
 3. **数据效率提升：** 在有限 HOI 数据下如何提升技能鲁棒性？数据增强、运动生成模型或 few-shot 适应是否可行？
 4. **语言/语义条件控制：** 如何融合更细粒度的控制条件（如自然语言指令“用左手运球绕过障碍物”），实现更灵活的人机交互控制？
 5. **多智能体扩展：** 如何将框架扩展至多人协作/对抗场景（如传球、防守），同时保持接触监督的有效性？
+
+
 
 ## 原文 PDF
 

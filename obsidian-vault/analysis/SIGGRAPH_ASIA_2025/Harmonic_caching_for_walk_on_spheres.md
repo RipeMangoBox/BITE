@@ -5,6 +5,7 @@ paper_level: A
 venue: "SIGGRAPH Asia"
 year: 2025
 pdf_ref: paperPDFs/SIGGRAPH_ASIA_2025/Harmonic_caching_for_walk_on_spheres.pdf
+code_link: null
 project_link: "https://cs.dartmouth.edu/~wjarosz/publications/zhou25harmonic.html"
 aliases:
 - HCH
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | Walk on Spheres的调和缓存方法 |
 | 英文题名 | Harmonic caching for walk on spheres |
 | 会议/期刊 | SIGGRAPH Asia 2025 |
-| Links | [paper](https://cs.dartmouth.edu/~wjarosz/publications/zhou25harmonic.pdf); [Project](https://cs.dartmouth.edu/~wjarosz/publications/zhou25harmonic.html) |
+| Links | [paper](https://cs.dartmouth.edu/~wjarosz/publications/zhou25harmonic.pdf) · [Project](https://cs.dartmouth.edu/~wjarosz/publications/zhou25harmonic.html) |
 | Topic | #topic/optimization_theory_probabilistic #topic/optimization_theory_probabilistic/optimization_methods |
 | Method | Harmonic Caching (HC) |
 | Dataset | 2D Laplace/Dirichlet/Neumann/Robin 场景集 (Fig.9), Poisson方程（稀疏源项，Fig.11）, 3D Screened Laplace（火鸡腿模型，Fig.14）, 收敛性分析（2D场景，~30分钟运行，Fig.10） |
@@ -42,7 +43,7 @@ claims:
 > - Poisson方程（稀疏源项，Fig.11） 上，Relative MSE 为 最低误差，对比 RWoS（在有利场景下），变化 HC在源项为狄拉克脉冲的场景下仍获得更低误差。
 > - 3D Screened Laplace（火鸡腿模型，Fig.14） 上，Relative MSE (~1500秒等时预算，1%异常值剔除) 为 最低误差，对比 WoSt, BVC, MVC等，变化 显著降低噪声，重建平滑度最优。
 
-## 概述
+## 概要
 
 求解椭圆型偏微分方程（PDE）是计算机图形学与物理仿真中的核心任务。无网格蒙特卡洛方法——尤其是**Walk on Spheres（WoS）**及其衍生方法——因其对复杂几何的天然适应性和逐点求解能力而备受关注。然而，传统WoS方法存在根本性的效率瓶颈：每次随机游走仅估计单个点的解，导致逐点估计方差大，在要求密集或高精度解场的场景下计算成本极高。
 
@@ -60,7 +61,7 @@ HC同时提供有偏（固定截断$L=10$）和无偏（随机截断前缀和估
 
 **方法局限**：HC仅能在域内部降低误差，无法直接改善边界上的解质量（所有WoS缓存方法的共性）；在非光滑诺伊曼边界附近可能产生较强相关伪影（Fig. 15）；有偏版本在球边界附近存在截断偏差。当前方法依赖Walk on Stars（WoSt）作为底层估计器，向变系数PDE的扩展仍有待探索。
 
-## 背景与动机
+
 
 ### 问题背景：椭圆型偏微分方程的蒙特卡罗求解
 
@@ -94,7 +95,9 @@ $$a_l = \frac{1}{2\pi} \int_0^{2\pi} u(R,\Theta) \cos(l\Theta) \mathrm{d}\Theta,
 
 本文提出的**调和缓存（Harmonic Caching, HC）**正是基于这一原理：从球边界发射WoSt随机游走估计傅里叶系数，再利用调和级数一次性重建球内任意点的解，并通过自适应重叠球的加权混合实现全局求解。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 调和缓存（Harmonic Caching, HC）的核心创新在于将**边界信息的压缩传播**与**局部解析重建的全局混合**相结合，从根本上改变了椭圆型偏微分方程蒙特卡洛求解的方差结构。其关键创新点可归纳为三个层面。
 
@@ -150,7 +153,7 @@ $$\widehat{u}(\mathbf{x}) = \frac{\sum_{i \in S(\mathbf{x})} w(d_i) \widehat{u}_
 
 **需要手动验证的点**：BVC和MVC的具体引用信息在分析数据中缺失，建议核实其原始出处以确保谱系定位的准确性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l2_https_cs_dartmouth_edu_wjarosz_publications_zhou25harmonic_pdf/figures/004_Figure_4.jpg]]
 *Figure 4: Overview of our harmonic caching algorithm for solving elliptic PDEs. We leverage the generalized mean value property of harmonic functions (Fig. 2) to reconstruct solutions from local boundary estimates. Within userspecified regions of interest (lef), we adaptively place overlapping spherical cache records (middle), each storing a compact set of Fourier coeficients. Blending local reconstructions from each record yields a smooth, low-error approximation across the region (right)*
@@ -220,7 +223,7 @@ $$\widehat{u}_f(r,\theta) = \widehat{u}(r,\theta) + \frac{1}{M} \sum_{j=1}^M \fr
 - **中间表示**：自适应放置的重叠球形缓存记录，每个存储截断的傅里叶系数 $\{\widehat{a}_l, \widehat{b}_l\}_{l=0}^L$
 - **输出**：感兴趣区域内任意点的解估计 $\widehat{u}(\mathbf{x})$，通过加权混合局部调和重建得到
 
-## 核心模块与公式推导
+
 
 ### 问题模型与调和展开基础
 
@@ -319,7 +322,9 @@ $i_l(\cdot)$ 为修正球贝塞尔函数。系数估计与二维流程一致，�
 
 固定截断 $L=10$ 的调和缓存是有偏的——截断丢弃了 $l>10$ 的高频分量。HC 同时提供了无偏版本：采用随机截断前缀和估计器（stochastic truncation prefix-sum estimator），使期望截断阶数 $\langle L \rangle = 10$。Fig. 5 的偏差-方差分析表明，无偏版本虽消除了截断偏差，但方差更高，单次运行中相关伪影更明显。因此**推荐使用有偏方案**，因其方差更低且伪影更少，而截断偏差在 $r<0.9R$ 范围内可忽略。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ![[assets/figures/papers/paper_list_l2_https_cs_dartmouth_edu_wjarosz_publications_zhou25harmonic_pdf/figures/010_Figure_7.jpg]]
 *Figure 7: Computation time depends on both the number of cache records and the walks per record used for coeficient estimation. For equal runtime, it is generally beter to use fewer records with more walks (lef) than more records with fewer walks (right)*
@@ -362,7 +367,9 @@ $i_l(\cdot)$ 为修正球贝塞尔函数。系数估计与二维流程一致，�
 
 所有对比在同等时间预算下进行，使用相同的底层WoSt求解器和共用的多引用八叉树实现。参考解通过极高样本数（600万行走/点）的WoSt获得，并进行1%异常值剔除。部分方法（如MVC）使用了论文推荐的递归复用设置。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题背景与现有方法瓶颈
 
@@ -450,6 +457,8 @@ HC的完整管道包含四个模块：
 ### 7. 在知识库中的定位
 
 调和缓存处于**无网格蒙特卡洛PDE求解器**与**调和分析**的交叉点。它继承了WoS/WoSt的几何灵活性，但通过引入调和级数的解析结构，将方差缩减问题转化为系数估计问题。与BVC/MVC等纯缓存方法相比，HC的独特贡献在于**利用PDE解的解析结构进行降维**，而非仅仅复用已有的点估计。这一思路与近年来图形学中“将物理先验融入蒙特卡洛估计”的趋势一致，但HC在调和函数这一经典领域找到了一个简洁而高效的切入点。
+
+
 
 ## 原文 PDF
 

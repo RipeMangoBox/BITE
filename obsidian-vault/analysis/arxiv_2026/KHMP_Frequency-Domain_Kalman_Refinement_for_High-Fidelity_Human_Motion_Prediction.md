@@ -41,7 +41,7 @@ claims:
 > - HumanEva-I 上，ADE 0.188 vs 0.196 (-0.008)；FDE 0.204 vs 0.211 (-0.007)；APD 7.481 vs 6.516 (+0.965)。
 > - Human3.6M 上，ADE 0.349 vs 0.357 (-0.008)；FDE 0.441 vs 0.445 (-0.004)；APD 9.235 vs 8.217 (+1.018)。
 
-## 概述
+## 概要
 
 现有随机人体运动预测方法普遍缺乏频率感知的自适应抑制机制，导致生成的运动序列常伴有高频抖动与时间不连续性。针对这一瓶颈，KHMP 提出在离散余弦变换（DCT）频域对预测序列的高频系数施加递归卡尔曼滤波，并通过估计的信噪比（SNR）动态调节滤波噪声参数，从而在抑制抖动的同时保留运动细节。
 
@@ -49,7 +49,7 @@ claims:
 
 在 HumanEva-I 和 Human3.6M 两个基准数据集上，KHMP 取得了领先的准确率（HumanEva-I 上 ADE 0.188、FDE 0.204），同时保持了较高的运动多样性（APD 7.481）。消融实验表明，物理约束训练与自适应卡尔曼修正互补，二者组合使基线 ADE 从 0.196 降至 0.188，且关节抖动平均降低 28.0%。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -77,7 +77,9 @@ claims:
 
 这种“物理先验训练 + 频域自适应修正”的组合策略，使 KHMP 能够在保持高运动多样性的同时，显著提升预测的时序平滑性和物理合理性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 KHMP 的核心创新在于将**频域自适应卡尔曼滤波**引入随机人体运动预测管线，形成“生成—精修”两阶段框架。其关键洞察是：现有随机生成方法（如 VAE）虽能产生多样化预测，但缺乏频率感知的抑制机制，导致高频抖动和时序不连续性。KHMP 通过三个紧密耦合的 changed slots 系统性解决了这一问题。
 
@@ -113,7 +115,7 @@ KHMP 的核心创新在于将**频域自适应卡尔曼滤波**引入随机人�
 
 物理约束训练与频域卡尔曼修正形成互补：前者在训练阶段注入生物力学先验，从分布层面减少不合理生成；后者在推理阶段作为后处理模块，针对性地抑制残余高频抖动。完整框架（Full KHMP）在 HumanEva-I 上取得 ADE 0.188，相较基线（ADE 0.196）降低 4.1%，同时平均抖动降低 28.0%（Table 2a, 2e）。值得注意的是，KHMP 在提升准确度的同时保持了高多样性（APD 7.481 vs 基线 6.516），表明自适应滤波并未过度平滑运动细节。
 
-## 整体框架
+
 
 KHMP 的整体设计遵循“训练时注入物理先验、推理时频域自适应精修”的双阶段范式，其 pipeline 如图 Figure 2 所示。
 
@@ -132,7 +134,7 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{base}} + \lambda_{\mathrm{
 
 这一设计将生成多样性（由 VAE 主干保证）与时序保真度（由频域卡尔曼修正保证）解耦，使得两个阶段可以独立优化。消融实验证实，物理约束训练与频域卡尔曼修正互补——完整框架（Full KHMP）在 HumanEva-I 上取得最优 ADE 0.188，相较仅使用 VAE 主干的基线（ADE 0.196）有显著提升（Table 2a）。
 
-## 核心模块与公式推导
+
 
 KHMP 框架由三个核心模块构成：VAE 主干生成网络、训练时物理约束模块，以及推理时自适应频域卡尔曼修正模块。
 
@@ -203,7 +205,9 @@ $$R = \frac{R_0}{1 + \lambda_R \cdot \mathrm{SNR}_{\mathrm{est}}}$$
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2603_21327/figures/008_Figure_6.jpg]]
 *Figure 6: Behavior of adaptive Kalman filter parameters versus estimated SNR*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -270,7 +274,9 @@ Fig. 6 揭示了自适应卡尔曼滤波参数随估计 SNR 的动态行为：�
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2603_21327/figures/011_Figure_7.jpg]]
 *Figure 7: Additional qualitative comparison between Baseline and KHMP predictions for selected frames from Jogging and Gesturing actions. Red arrows highlight implausible poses in the baseline, while blue boxes show the refined and more realistic results from KHMP*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 基线关系与继承
 
@@ -317,6 +323,8 @@ KHMP 的设计建立在一组明确的前提假设之上，这些假设同时界
 在人体运动预测的方法谱系中，KHMP 占据了一个独特的位置：它不属于端到端生成模型的创新（如新的网络架构或训练范式），也不属于纯后处理平滑方法（如高斯滤波或样条插值），而是在**生成模型与信号处理之间建立了自适应接口**。其核心贡献——将 DCT 高频系数建模为频率索引的一阶高斯-马尔可夫过程，并用估计 SNR 驱动卡尔曼滤波参数——在现有文献中未见先例。
 
 从更广的视角看，KHMP 代表了一类“生成-精修”混合范式：生成模型负责多样性和全局结构，信号处理方法负责局部时序一致性。这一范式与扩散模型中的“去噪-引导”策略有概念上的亲缘性，但 KHMP 在频域操作的递归滤波机制提供了不同的精度-效率权衡点。
+
+
 
 ## 原文 PDF
 

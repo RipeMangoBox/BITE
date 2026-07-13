@@ -43,7 +43,7 @@ claims:
 > - HICO-DET (Open-Vocabulary) 上，mAP % (Full) 42.49 vs 40.99 (BC-HOI, with detection pretraining) / 27.22 (SGC-Net, without detection... (+1.50 / +15.27)。
 > - HICO-DET (Closed) 上，mAP % (Full) 45.05 vs 43.01 (BC-HOI) (+2.04)。
 
-## 概述
+## 概要
 
 开放词汇人-物交互（HOI）检测旨在识别图像中任意人与物体之间的交互关系，其核心挑战在于对未见过的交互类别进行泛化。现有方法大致分为两类：**VLM 协作式**方法依赖独立训练的检测器与视觉语言模型（VLM）协作，导致结构复杂且跨模型特征表示差异大、融合困难；**纯 VLM 式**方法使用单一 VLM 但缺乏细粒度空间特征，定位能力弱。根本瓶颈在于如何在一个统一框架内同时获得精确的实例定位与泛化交互分类所需的互补特征，并消除两者之间的表示鸿沟。
 
@@ -51,7 +51,7 @@ claims:
 
 在 SWiG-HOI 数据集上，SL-HOI 在所有指标上均取得最优，其中 Unseen 类别超过之前最佳方法 **SGC-Net**（Lin et al., CVPR 2025）**6.58%**，Full 类别提升 **7.47%**。在 HICO-DET 开放词汇设定下，无目标检测预训练的方法中，SL-HOI 在 Unseen/Seen/Full 上分别超过次优方法 **17.26%/14.65%/15.27%**。消融实验证实，Semantic Bootstrapping 和 Hierarchical Refinement 各自带来显著且稳定的增益，且冻结全部 DINOv3 参数的训练策略优于部分微调或 LoRA。
 
-## 背景与动机
+
 
 ### 开放词汇人-物交互检测的核心挑战
 
@@ -79,7 +79,9 @@ claims:
 
 这一观察揭示了一个被先前工作忽视的可能性：**无需引入额外的 VLM，仅凭 DINOv3 自身组件的互补特性，即可在一个冻结的统一框架内同时满足定位与分类的需求**。基于此，本文提出 SL-HOI——一个完全基于冻结 DINOv3 的精简开放词汇 HOI 检测框架，通过语义引导（Semantic Bootstrapping）与层次细化（Hierarchical Refinement）两个轻量级机制，无缝衔接骨干的定位能力与视觉头的语义理解能力，从根本上消除了多模型协作带来的表示鸿沟与结构冗余。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SL-HOI 的核心创新在于**用单一冻结的 DINOv3 模型同时承担精确定位与开放词汇交互分类**，通过挖掘其内部组件的天然分工，以极简的架构消除现有方法中的表示鸿沟。以下从方法谱系定位和关键改变槽位两个维度展开。
 
@@ -119,7 +121,7 @@ SL-HOI 相对于强基线（Late Fusion 架构，类似 HOICLIP 的交互分类�
 
 SL-HOI 的创新不在于引入新的模块类型，而在于**对现有 DINOv3 组件能力的重新编排与衔接**。其核心洞察是：骨干与视觉头之间天然存在“局部-全局”的注意力分工，仅需通过 Semantic Bootstrapping 将交互查询插入视觉头的自注意力流，再以极轻量的可学习交叉注意力进行层次细化，即可无缝桥接两种能力。整个框架仅添加检测适配器、交互查询投影和单层交叉注意力解码器等少量可学习参数，在保持结构精简的同时达到最优的开放词汇 HOI 检测性能——这本质上是一种**表示鸿沟消除机制**，而非简单的特征增强。
 
-## 整体框架
+
 
 SL-HOI 的整体设计遵循一个核心原则：**在单一冻结的 DINOv3 模型内，利用其不同组件的天然互补性，以极简的架构实现开放词汇人-物交互检测**。整个框架仅包含极少量的可学习参数，无需额外的独立 VLM 或检测器，形成端到端的精简流程。
 
@@ -163,7 +165,7 @@ SL-HOI 通过冻结整个 DINOv3，完整保留这两种互补能力，并仅通
 ![[assets/figures/papers/paper_list_l1080_https_arxiv_org_abs_2603_27500/figures/001_Figure_1.jpg]]
 *Figure 1: An illustration of the dominant architectural paradigms for open-vocabulary HOI detection. (a) VLM-collaborated methods that adopt both a VLM and a conventional HOI detector. (b) VLM-only methods that employ a single VLM for open-vocabulary HOI detection. (c) Our SL-HOI leverages the complementary strengths of DINOv3’s backbone and vision head*
 
-## 核心模块与公式推导
+
 
 SL-HOI 的核心创新在于将交互查询与冻结的文本对齐视觉头协同工作，通过两阶段细化机制消除检测与分类之间的表示鸿沟。整个框架围绕冻结的 DINOv3 ViT-L/16 构建，仅引入极少可学习参数，形成三个关键模块。
 
@@ -221,7 +223,9 @@ $$p_{ij} = \frac{\exp(\tau \cdot \cos(\mathbf{e}_r'^{(i)}, \mathbf{e}_t^{(j)}))}
 ![[assets/figures/papers/paper_list_l1080_https_arxiv_org_abs_2603_27500/figures/009_Figure_5.jpg]]
 *Figure 5: Visualization of attention maps across the interaction classification stage. The left two are in the self-attention blocks of the frozen head during Semantic Bootstrapping, and the right one is from the cross-attention block in Hierarchical Refinement, illustrating a Local-Global-Local interaction reasoning process*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -279,7 +283,9 @@ Figure 8 展示了两个典型失败场景。在拥挤场景（如多人围坐�
 ![[assets/figures/papers/paper_list_l1080_https_arxiv_org_abs_2603_27500/figures/008_Figure_4.jpg]]
 *Figure 4: Ablation studies on the number of encoder layers in the detection adapter on the SWiG-HOI dataset (mAP %)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题脉络与前置工作
 
@@ -329,6 +335,8 @@ SL-HOI 的核心突破在于**在同一冻结模型内部完成表示对齐**，
 3. **小目标鲁棒性**：能否通过引入多尺度特征金字塔或可学习的位置编码增强小目标定位，而不显著增加复杂度？
 4. **文本编码器的影响**：当前使用 dino.txt 的文本编码器，若替换为更强的文本编码器或优化提示模板，交互分类性能的提升空间有多大？
 5. **扩展到其他任务**：该“骨干定位 + 视觉头语义引导”的架构范式能否推广到其他需要细粒度定位与开放词汇语义理解的视觉任务？
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/HUME_Measuring_the_Human_Model_Performance_Gap_in_Text_Embedding_Tasks.pdf
+project_link: null
+code_link: https://github.com/embeddings-benchmark/mteb
 openreview_forum_id: rcmfu1ydAf
 aliases:
 - HHEFTE
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | HUME：测量文本嵌入任务中的人机性能差距 |
 | 英文题名 | HUME: Measuring the Human-Model Performance Gap in Text Embedding Tasks |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=rcmfu1ydAf); [GitHub](https://github.com/embeddings-benchmark/mteb) |
+| Links | [paper](https://openreview.net/forum?id=rcmfu1ydAf) · [GitHub](https://github.com/embeddings-benchmark/mteb) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/diffusion_image_video |
 | Method | HUME (Human Evaluation Framework for Text Embeddings) |
 | Dataset | Overall (16 tasks), Multilingual Sentiment (Arabic), Multilingual Sentiment (Russian), Emotion Classification (English) |
@@ -42,7 +44,7 @@ claims:
 > - Multilingual Sentiment (Arabic) 上，Accuracy 为 95.0%，对比 77.5% (SFR-Embedding-Mistral)，变化 +17.5。
 > - Multilingual Sentiment (Russian) 上，Accuracy 为 92.5%，对比 81.2% (multilingual-e5-small)，变化 +11.3。
 
-## 概述
+## 概要
 
 文本嵌入模型在信息检索、语义搜索等任务中应用广泛，但现有基准测试（如MTEB）缺乏可靠的人类性能基线，导致模型得分难以解读：一个模型在某任务上达到85%的准确率，究竟意味着接近人类水平还是仍有巨大差距，此前并无系统答案。HUME正是在此背景下提出的一个面向文本嵌入任务的可重复人类评估框架。
 
@@ -54,7 +56,7 @@ claims:
 
 **关键洞察**：任务质量对评估可靠性的影响大于模型能力差异。高人类共识任务（如STS12，ρ=0.77）提供可靠的评估基准，人类与模型表现接近；低共识任务则暴露了基准本身的设计缺陷，而非模型能力的真实边界。
 
-## 背景与动机
+
 
 文本嵌入模型已成为现代自然语言处理的基础组件，支撑着信息检索、语义相似度计算、文本聚类等广泛应用。MTEB等标准化基准测试通过统一的任务定义和评估指标，为模型能力的横向比较提供了平台。然而，一个关键瓶颈长期被忽视：**这些基准测试缺乏可靠的人类性能基线**。
 
@@ -66,7 +68,9 @@ HUME框架正是在这一缺口上展开工作。其核心设计思路直接而�
 
 这一视角转换意味着：在嵌入模型的评估中，追问“人类能得多少分”比追问“哪个模型得分最高”更能揭示基准测试的真实信息量。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 HUME的核心创新在于为文本嵌入基准测试引入**可重复的人类评估基线**，将人类表现从缺失的参照系转变为诊断基准质量的校准工具。其关键设计变更体现在三个维度。
 
@@ -86,7 +90,7 @@ HUME进一步评估了LLM能否替代人类判断，在相同的19个任务-语�
 
 这三项创新共同指向一个深层发现：**任务质量对评估可靠性的影响大于模型能力差异**。低共识任务上模型的“超人类”表现反映的是标注伪影拟合而非语义理解；高共识任务才能提供可靠的评估基准。HUME将人类表现重新定位为诊断信号而非性能上限，为基准构建提供了质量过滤的新范式。
 
-## 整体框架
+
 
 HUME（Human Evaluation Framework for Text Embeddings）是一个在MTEB基础上构建的可重复人类评估框架，其核心目标是为文本嵌入基准测试提供可靠的人类性能基线，从而校准模型得分并诊断数据集质量问题。
 
@@ -112,7 +116,7 @@ HUME的pipeline由五个核心模块组成：
 
 框架的输入为MTEB中的标准数据集和任务定义，输出为三个层次的结果：（1）人类性能基线（含95%置信区间和标注者间一致性指标）；（2）人类与模型性能的逐任务对比；（3）LLM作为标注者的性能评估。这些输出共同支持对基准质量的诊断——高人类共识的任务提供可靠的评估基准，而低共识任务上的"超人类"模型表现则揭示标注伪影拟合问题。
 
-## 核心模块与公式推导
+
 
 HUME框架的核心设计思路是在MTEB基准上叠加可重复的人类评估层，而非重新定义任务或指标。其关键模块如下：
 
@@ -174,7 +178,9 @@ $$ \kappa = \frac{\bar{P} - \bar{P}_e}{1 - \bar{P}_e} $$
 
 > **注意**：以上公式均为HUME框架中使用的标准评估指标，非论文原创推导。论文的核心贡献在于将这些指标与人类基线系统性地对齐，而非提出新的数学形式化。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 整体人机性能对比
 
@@ -267,7 +273,9 @@ HUME揭示了当前评估范式的三个系统性失败模式：
 
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 在基准评估谱系中的位置
 
@@ -322,6 +330,8 @@ HUME的适用性受以下因素制约：
 **自动化质量预测**：能否开发自动化指标来预测数据集的人类共识水平？如果可以在基准构建早期识别低共识任务（如通过标注者模拟或文本特征分析），就能在资源投入前过滤或重新设计问题。这一能力的建立将显著降低大规模基准构建的成本。
 
 **人类分歧的信息价值**：当前框架将标注者分歧视为“噪声”，但人类分歧本身可能包含有价值的语义信息（如情绪分类中的混合情绪、论文聚类中的跨学科性）。如何设计评估框架以**利用而非消除**人类判断的多样性，是一个值得探索的方向。
+
+
 
 ## 原文 PDF
 

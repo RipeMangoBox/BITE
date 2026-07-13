@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/Let_Humanoids_Hike_Integrative_Skill_Development_on_Complex_Trails.pdf
+project_link: null
+code_link: null
 aliases:
 - LH
 - LHHISDCT
@@ -41,7 +43,7 @@ claims:
 > - Hiking Benchmark (H1) 上，Trail Completion (%) 为 52.78 ± 1.30，对比 52.51 ± 1.41 (RMA-H)，变化 +0.27。
 > - Hiking Benchmark (H1) 上，Time-to-Reach (s) 为 4.95 ± 0.12，对比 4.98 ± 0.11 (RMA-H)，变化 -0.03。
 
-## 概述
+## 概要
 
 **核心瓶颈**：当前人形机器人研究长期将底层运动控制与高层视觉导航割裂处理——低层运动策略缺乏长期目标和情境感知，高层导航规划则忽视真实的物理约束和时变地形，导致机器人在需要感知-决策-运动紧密耦合的复杂徒步任务中表现不佳。
 
@@ -55,7 +57,7 @@ claims:
 
 **局限性**：当前工作仅考虑下肢运动，尚未在真实平台上验证，且依赖 GPS 与前置深度摄像头，模拟-现实迁移能力有待检验。
 
-## 背景与动机
+
 
 人形机器人在复杂户外环境中自主导航与运动是通往通用具身智能的关键一步。然而，当前研究面临一个根本性的瓶颈：运动控制与视觉导航长期处于割裂状态。低层运动策略缺乏对长期目标和情境的感知，仅能对局部地形做出反应；而高层导航规划则忽视真实的物理约束和时变地形，将机器人简化为一个质点。这种“感知-决策-运动”链条的断裂，使得现有系统在面对需要紧密耦合的复杂徒步任务时捉襟见肘——机器人既无法理解“为何要走这条路”，也无法在执行运动时顾及“前方有什么”。
 
@@ -63,7 +65,9 @@ claims:
 
 本文提出 **LEGO-H**（Let Humanoids Hike），旨在弥合上述缺口。核心动机在于：将视觉导航重新定义为基于时序视觉的序列预测任务，而非简单的目标定位；同时，通过从教师策略中蒸馏结构化的运动先验，使导航感知与运动执行能够在时间尺度不一致的硬件上协同工作。这一思路的独特之处在于，它不依赖预定义的运动模式或人类运动数据，而是让机器人从自身结构的特权学习（privileged learning）中涌现出适应复杂地形的自主行为。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 LEGO-H 的核心创新在于将人形机器人的视觉导航与运动控制从传统的“分层独立”范式重构为“时序感知-软引导-结构化蒸馏”的统一框架。其关键创新点可归结为三个紧密耦合的**changed slots**：
 
@@ -99,7 +103,7 @@ RMA-H 等方法缺乏专门机制处理导航（低频）与运动（高频）�
 
 上述三个 changed slots 构成了清晰的因果链：**TC-ViTs 的时序预测能力**使导航感知具备目标校准和地形适应能力 → **最近目标转发与潜状态拼接**确保这一感知以稳定的方式传递到运动模块 → **HLM 的结构化约束**保证运动执行不仅有效，而且安全、协调。移除任一环节（如 Table 1 的 Vanilla 版本仅有 42.97% 成功率，或 Table 2 中移除视觉/使用非目标导向视觉导致成功率大幅下降）都会导致系统性能的显著退化，验证了这三个创新的**联合必要性**。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l35_https_openaccess_thecvf_com_content_CVPR2025_papers_Lin_Let_Humanoids_Hi/figures/003_Figure_4.jpg]]
 *Figure 4: Architecture of TC-ViTs. Three key components: (a) a goal-orientated temporal transformer encoder for robots cognizing surroundings with the final goal; (2) a dual process on the current depth frame for integrating spatially precise information to reflect the current state (c) a recurrent goal adaptation mechanism that integrates visual awareness, goal information, and proprioception*
@@ -141,7 +145,7 @@ $$\mathcal{L}_{rec} = w_4 \mathcal{L}_{KL} + w_5 \mathcal{L}_{self} + w_6 \mathc
 
 > **注意**：该框架目前仅控制下肢关节，上肢保持冻结，尚未利用手部接触提供额外支撑。所有训练与评估均在 Isaac Gym 仿真环境中完成，真实机器人部署尚未验证。
 
-## 核心模块与公式推导
+
 
 LEGO-H 的核心架构由两个异步协作的模块构成：**TC-ViTs 视觉导航模块**（H）与**运动执行模块**（E），二者通过潜状态拼接和最近目标转发机制实现跨时间尺度的稳定交互（Fig 3(b)）。
 
@@ -197,7 +201,9 @@ $$\tau = K_{p} (\hat{q} - q) + K_{d} (\dot{\hat{q}} - \dot{q})$$
 
 其中 $\hat{q}$ 为目标关节位置，$q$ 为当前关节位置，$K_p$ 和 $K_d$ 为固定增益系数。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能与基准对比
 
@@ -247,7 +253,9 @@ Fig 7 展示了跨机器人形态的行为差异：较高较重的 H1 选择“�
 
 4. **上肢冻结**：当前策略仅控制下肢，未利用手部提供额外支撑或操作，在极端地形上的稳定性和可通行性仍有提升空间。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有方法的概念差异
 
@@ -294,6 +302,8 @@ LEGO-H 的设计隐含以下适用条件，超出这些边界时性能可能退�
 - **分层度量损失的通用性**：HLM 通过 VAE 遮罩重构约束关节间依赖关系，这一范式能否作为通用技能蒸馏方法应用于其他高自由度机器人（如灵巧手、全身人形）？其在不同动作空间和形态上的可迁移性值得探索。
 
 > **注意**：上述局限性与开放问题均来自论文自身讨论（Sec. 5 及附录），但部分推断（如 sim‑to‑real 迁移的具体挑战）基于分析综合，建议在最终版本中对照原文确认。
+
+
 
 ## 原文 PDF
 

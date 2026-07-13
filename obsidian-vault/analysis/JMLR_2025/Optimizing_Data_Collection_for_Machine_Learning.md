@@ -5,6 +5,8 @@ paper_level: A
 venue: JMLR
 year: 2025
 pdf_ref: paperPDFs/JMLR_2025/Optimizing_Data_Collection_for_Machine_Learning.pdf
+project_link: null
+code_link: null
 aliases:
 - LOCL
 - ODCML
@@ -41,7 +43,7 @@ claims:
 > - 同上 上，平均成本比（Cost Ratio） 为 LOC: 12/18设置中<0.5（额外成本<50%），对比 Power Law Regression: 未明确给出，但LOC保持较低，变化 在保持低失败率的同时，成本比几乎始终低于1。
 > - CIFAR-100 (K=2, 半监督) 上，失败率 为 LOC: 显著低于回归，对比 Power Law Regression: 较高，变化 尤其在T=5时差距明显。
 
-## 概述
+## 概要
 
 现代机器学习系统的性能高度依赖于训练数据的规模与质量，但实际数据收集往往面临成本高昂、来源多样且目标性能不确定等挑战。传统做法——收集“尽可能多”的数据——缺乏对成本效益的量化考量，而基于标度律（scaling law）外推的方法虽然试图估算达到目标性能所需的最小数据量，却对估计误差极度敏感：即使很小的曲线拟合偏差，也会在平坦的标度律曲线上被急剧放大，导致严重的数据过采或欠采（Figure 1）。
 
@@ -55,7 +57,7 @@ claims:
 
 尽管 LOC 在实验中展现出显著优势，该方法仍存在若干边界条件：它假设学习曲线单调非递减（在主动学习或半监督场景下可能不成立）；对于超过两个数据源的高维场景，ground truth 构建的计算成本呈指数增长；惩罚参数 $P$ 的选择仍需领域知识，极端设置下可能产生不切实际的收集建议。这些限制指出了未来工作中纳入隐私与公平约束、处理非平稳数据分布等开放方向。
 
-## 背景与动机
+
 
 ### 数据收集的现实困境
 
@@ -79,7 +81,9 @@ claims:
 
 这一思想被形式化为一个**随机最优控制问题**：将所需最小数据量 $D^*$ 视为随机变量，目标是最小化期望收集成本与失败惩罚的加权和。通过调节惩罚参数 $P$，决策者可以在“激进收集”（低成本但高失败风险）与“保守收集”（高成本但低失败风险）之间连续调控，实现与业务需求匹配的风险偏好。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 从“估计-收集”到“学习-优化-收集”
 
@@ -125,7 +129,7 @@ $$d_1^* = \max\{\hat{\mu} + \sqrt{2}\hat{\sigma}\sqrt{\log\frac{P}{c\hat{\sigma}
 
 这一解析形式揭示了 LOC 的核心机制：最优收集量在估计均值 $\hat{\mu}$ 的基础上增加了一个与不确定性 $\hat{\sigma}$ 和惩罚-成本比 $P/c$ 成正比的安全边际项。当 $P$ 足够小（$P < c\hat{\sigma}\sqrt{2\pi}$）时，惩罚不足以抵消收集成本，最优策略是不收集任何数据（$d_1^* = 0$）；当 $P$ 增大时，安全边际随之扩大，体现了风险规避程度的可调性。
 
-## 整体框架
+
 
 LOC（Learn-Optimize-Collect）将数据收集建模为一个多轮序贯决策问题，其核心pipeline由三个交替执行的模块构成：**学习曲线统计收集**、**最小数据需求分布估计**和**随机优化**，并通过模型预测控制（MPC）循环串联（Algorithm 3）。整体输入为用户指定的性能目标 $V^*$、数据源单位成本向量 $\mathbf{c}$、未达标惩罚 $P$、时间轮次 $T$ 以及初始数据量 $\mathbf{q}_0$；输出为每轮应收集的数据量决策 $\mathbf{q}_t^*$。
 
@@ -165,7 +169,7 @@ LOC的有效性建立在两个核心假设之上：
 
 传统方法（如**Power Law Regression**, Rosenfeld et al., ICLR 2020）直接估计 $D^*$ 的点值并收集该数量，完全忽略了估计不确定性。Figure 1（右）揭示了这种方法的脆弱性：在ImageNet上，标度律仅 $\le 6\%$ 的外推误差就导致估计值从真实的90万张偏离至58万张（欠采）或300万张（过采）。LOC通过将决策从“估计后收集”转变为“优化期望成本”，在分布层面权衡收集不足的风险与过度收集的成本，从根本上解决了这一瓶颈。
 
-## 核心模块与公式推导
+
 
 ### 3.1 最优数据收集问题的形式化
 
@@ -207,7 +211,9 @@ $$d_1^* = \max\{\hat{\mu} + \sqrt{2}\hat{\sigma}\sqrt{\log\frac{P}{c\hat{\sigma}
 
 该公式揭示了 LOC 的核心机制：最优收集量等于估计均值 $\hat{\mu}$ 加上一个与罚金 $P$、成本 $c$ 和估计不确定性 $\hat{\sigma}$ 相关的**安全边际**。当 $P$ 增大或 $\hat{\sigma}$ 增大时，安全边际增加，收集量趋于保守；当 $P$ 足够小时，最优策略可能是不收集任何数据（$d_1^* = 0$）。更一般地，Theorem 3 证明单轮 LOC 等价于收集数据需求分布的 $(1-\varepsilon)$ 分位数，其中 $\varepsilon$ 由成本与罚金的比值决定。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与实验动机
 
@@ -289,7 +295,9 @@ Figure 4以数据收集量与最小需求比值（$q_T^*/D^*$）的形式展示�
 ![[assets/figures/papers/paper_list_l7_https_www_jmlr_org_papers_v26_23_0292_html/figures/018_Table_8.jpg]]
 *Table 8: Comparing against the correction factor-based Power Law Regression of Mahmood et al. (2022b) with the same setup as in Table 2. The best performing cost ratio is underlined and the best performing failure rate for each setting is bolded. Although the baseline achieves low failure rates, LOC often can achieve competitive failure rates while reducing the cost ratios by an order of magnitude*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：从标度律估计到数据收集优化
 
@@ -339,6 +347,8 @@ LOC 涉及两个关键超参数：单位成本 $\mathbf{c}$ 和惩罚 $P$。消�
 3. **高维数据源扩展**：将 LOC 扩展到 $K>2$ 的高维数据收集场景，同时保持分布估计和随机优化的可计算性，需要更高效的采样或变分推断方法。
 
 4. **标度律估计器的改进**：LOC 的性能上限受限于 $F(\mathbf{q})$ 的估计质量。是否存在更准确的标度律估计器（如基于贝叶斯神经过程的方法），可以进一步提升 LOC 的性能而不显著增加计算开销，是一个开放问题。
+
+
 
 ## 原文 PDF
 

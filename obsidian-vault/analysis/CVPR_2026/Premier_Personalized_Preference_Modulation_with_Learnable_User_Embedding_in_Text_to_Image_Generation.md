@@ -44,7 +44,7 @@ claims:
 > - PIP 数据集偏好对齐 上，ViPer Score↑ 0.7204 vs 0.6125 (次优方法) (+0.1079)。
 > - 与 LoRA 个性化方案对比 (用户偏好对齐与文图一致性) 上，CLIP T2I↑ / LPIPS↓ / 存储/训练效率 CLIP T2I 0.3183, LPIPS 0.5986, 61KB/用户, 30分钟/用户 vs CLIP T2I 0.3033 (LoRA), LPIPS 0.5788 (LoRA), 10.7MB/用户, 1.2小时/用户 (在几乎相同的偏好对齐下，文图一致性更高，存储减小175倍，训练快2.4倍)。
 
-## 概述
+## 概要
 
 文本到图像生成模型在遵循用户文本指令方面已取得显著进展，但如何使生成结果忠实反映用户的**视觉偏好**仍是一个开放挑战。用户的偏好往往是隐性的——例如对特定色调、构图风格或光影氛围的倾向——难以用自然语言精确描述。现有方法通常借助多模态语言模型从用户历史图像中提取偏好表征，然而，这种间接传递路径存在结构性瓶颈：语言模型的隐状态或生成的文本描述在注入生成模型时，不可避免地丢失细粒度视觉信息，导致偏好对齐失败或指令跟随能力下降。此外，当用户历史数据量有限且样本间相关性较弱时，多模态模型更难以捕捉个体间的微妙差异。
 
@@ -52,7 +52,7 @@ claims:
 
 在 ViPer 代理模型评估下，Premier 取得了 **0.6889 的 ViPer Score** 和 **0.876 的 ViPer Rate**，分别超出次优方法 0.1730 和 0.200。专家用户研究同样证实，人类评估者显著更偏好 Premier 生成的图像。消融实验揭示了两个关键发现：其一，移除 dispersion loss 后 ViPer Score 骤降至 0.4498，生成图像在不同用户间几乎无差异；其二，共享适配器与独立适配器缺一不可，单独移除任一项均导致性能大幅下降。与针对每个用户微调 LoRA 的方案相比，Premier 在保持同等偏好对齐水平的同时，将单用户存储开销从 10.7 MB 压缩至 61 KB（约 175 倍），训练时间缩短 2.4 倍，且文本-图像一致性更高。在 PIP 数据集上的泛化实验（ViPer Score 0.7204，LPIPS 0.5982）进一步验证了方法的鲁棒性。
 
-## 背景与动机
+
 
 ### 问题背景：文本到图像生成中的个性化需求
 
@@ -82,7 +82,9 @@ claims:
 
 通过上述设计，Premier 旨在实现从“描述偏好”到“编码偏好”的范式转变，使文本到图像生成模型能够更直接、更准确地响应个体用户的视觉偏好。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Premier 的核心创新在于将用户偏好编码从间接的多模态语言模型隐状态或文本描述，转变为**可学习的用户嵌入**，并通过流匹配损失端到端地训练这些嵌入，使其直接捕获用户的视觉偏好信息。这一转变解决了先前方法中偏好信息在传递至文本到图像模型时发生丢失或指令跟随失败的根本瓶颈。
 
@@ -100,7 +102,7 @@ $$\mathcal{L}_{\mathrm{disp}} = \log \sum_{j} \exp(-\mathcal{D}(\Delta_\theta(e_
 
 针对新用户冷启动问题，Premier 提出将新用户嵌入表示为训练集用户嵌入的**线性组合**，仅优化组合系数而非直接训练嵌入。在历史数据少于 8 张时，该策略在 ViPer Score 和 LPIPS 上均显著优于直接训练嵌入（Figure 6、Figure 7），实现了极少样本下的稳定个性化。
 
-## 整体框架
+
 
 Premier 的核心设计目标是将用户视觉偏好直接编码为可学习的向量表示，并通过与文本提示的细粒度交互，在 MM-DiT 架构的调制空间中实现逐 token 的偏好注入。整个 pipeline 分为两个训练阶段和一个新用户适配阶段，其模块关系与数据流如 Figure 2 所示。
 
@@ -137,7 +139,7 @@ $$\mathcal{L}_{\mathrm{disp}} = \log \sum_{j} \exp(-\mathcal{D}(\Delta_\theta(e_
 ![[assets/figures/papers/paper_list_l2334_https_arxiv_org_abs_2603_20725/figures/001_Figure_1.jpg]]
 *Figure 1: In our approach, user preference descriptions are not required and only user-provided preference images are needed. A learnable user embedding is obtained by training on these images, and this embedding accurately captures the user’s preference information*
 
-## 核心模块与公式推导
+
 
 ### 1. 问题形式化与流匹配基础
 
@@ -223,7 +225,9 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{flow}} + \lambda_{\mathrm{shared}} \mathcal
 ![[assets/figures/papers/paper_list_l2334_https_arxiv_org_abs_2603_20725/figures/010_Figure_8.jpg]]
 *Figure 8: Qualitative dispersion loss ablation comparison of our method. After ablating the dispersion loss, the generated preference images across different users exhibit substantially reduced variation*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果：偏好对齐与文图一致性
 
@@ -292,7 +296,9 @@ Table 2 的消融实验揭示了三个关键组件的决定性作用：
 ![[assets/figures/papers/paper_list_l2334_https_arxiv_org_abs_2603_20725/figures/013_Table.jpg]]
 *Table: B. Quantitative comparisons on the PIP-dataset*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的对比定位
 
@@ -337,6 +343,8 @@ Premier 在方法设计上有三个区别于所有基线的独立创新锚点，
 4. **偏好嵌入的可解释性。** 可学习用户嵌入是一个黑箱向量，其各维度对应的视觉语义尚不明确。是否可以通过分析嵌入空间的几何结构（如主成分方向对应的生成图像变化）来赋予嵌入维度可解释的语义，从而支持用户主动编辑自己的偏好表示？
 
 5. **隐私与去中心化部署。** 当前方法需要集中训练用户嵌入，涉及用户偏好数据的收集。是否可以通过联邦学习或个性化扩散模型的去中心化训练，在保护用户隐私的前提下实现类似的个性化效果？
+
+
 
 ## 原文 PDF
 

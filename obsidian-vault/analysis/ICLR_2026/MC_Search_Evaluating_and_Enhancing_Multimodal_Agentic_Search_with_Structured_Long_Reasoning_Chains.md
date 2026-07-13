@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/MC_Search_Evaluating_and_Enhancing_Multimodal_Agentic_Search_with_Structured_Long_Reasoning_Chains.pdf
+project_link: https://mc-search-project.github.io
+code_link: null
 openreview_forum_id: JEGDp1E4OH
 aliases:
 - SA
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | MC-Search：用结构化长推理链评估和增强多模态代理搜索 |
 | 英文题名 | MC-Search: Evaluating and Enhancing Multimodal Agentic Search with Structured Long Reasoning Chains |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=JEGDp1E4OH); [Project](https://mc-search-project.github.io) |
+| Links | [paper](https://openreview.net/forum?id=JEGDp1E4OH) · [Project](https://mc-search-project.github.io) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/planning_control |
 | Method | SEARCH-ALIGN |
 | Dataset | MC-SEARCH (Image-Initiated Chain), MC-SEARCH (Parallel Image-Text Fork) |
@@ -42,7 +44,7 @@ claims:
 > - MC-SEARCH (Image-Initiated Chain) 上，HPS 为 33.59 (Qwen2.5-VL-7B + SEARCH-ALIGN)，对比 16.51 (Qwen2.5-VL-7B)，变化 +17.08。
 > - MC-SEARCH (Parallel Image-Text Fork) 上，F1 为 32.73 (Qwen2.5-VL-7B + SEARCH-ALIGN)，对比 22.94 (Qwen2.5-VL-7B)，变化 +9.79。
 
-## 概述
+## 概要
 
 ### 问题背景与瓶颈
 
@@ -68,7 +70,7 @@ MC-Search 从基准构建和模型训练两个维度系统性地回应了上述�
 
 MC-Search 的方法论贡献可归结为“**以过程级标注驱动过程级评估与过程级训练**”。它不改变底层MLLM架构或检索器，而是在统一的代理式MM-RAG管道中，通过引入高质量推理链作为监督信号，实现从最终答案对齐到推理轨迹对齐的范式升级。这一思路为多模态代理搜索领域提供了可复现的评估标准和可迁移的训练策略。
 
-## 背景与动机
+
 
 多模态大语言模型（MLLM）在视觉问答、文档理解等任务上取得了显著进展，但其在需要主动搜索、整合外部多模态知识的长程推理场景中仍面临根本性挑战。现实世界中的复杂查询——例如“这张照片中的建筑所在城市，其市花在哪个国家被定为国花？”——要求模型跨越文本与图像模态，执行多跳检索与推理，而非仅依赖参数化知识或单次检索。
 
@@ -78,7 +80,9 @@ MC-Search 的方法论贡献可归结为“**以过程级标注驱动过程级�
 
 针对这些问题，本文提出 **MC-Search**——首个面向多模态代理搜索的基准，提供包含多样化推理拓扑的长程、逐步标注推理链。该基准不仅支持最终答案评估，还引入了过程级指标（命中步数 HPS、展开偏差 RD），使得对模型规划与检索行为的细粒度诊断成为可能。在此基础上，本文进一步提出 **SEARCH-ALIGN** 过程级微调框架，利用验证后的推理轨迹对开源模型进行监督训练，旨在缩小其与闭源模型的差距。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MC-Search 的核心创新在于将多模态代理搜索的评估与训练从**最终答案正确性**推进到**过程级推理质量**，并为此构建了完整的基准-评估-微调闭环。
 
@@ -143,7 +147,7 @@ SEARCH-ALIGN 的过程级监督在开源模型上取得了显著增益：
 
 值得注意的是，在最具挑战性的 **Parallel Image-Text Fork** 拓扑上，所有模型均达到最低 F1 和 HPS，凸显跨模态并行规划仍是当前多模态代理搜索的核心瓶颈，也是 SEARCH-ALIGN 未来优化的重点方向。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_JEGDp1E4OH/figures/004_Figure_2.jpg]]
 *Figure 2: Overview of MC-SEARCH benchmark and evaluation. Left: Benchmark covering five reasoning topologies, filtered via the hop-wise attribution and verification of evidence (HAVE) process. Right: Multimodal agentic RAG pipeline, where an MLLM iteratively generates sub-queries and actions, retrieves multimodal evidence, reasons over the retrieved information, and integrates it to produce the final answer. Our framework further aligns predicted reasoning chains with golden trajectories to assess chain-level retrieval and planning*
@@ -186,7 +190,7 @@ MC-SEARCH 基准的核心目标是提供长程、逐步标注的多模态推理�
 
 **SEARCH-ALIGN** 利用这些逐步标注轨迹提供过程级监督：将每个推理图扩展为由 Gemini-2.5-Flash 生成的显式推理思路（解释如何将推理建立在证据之上并连接相邻跳跃），从而在子问题、检索动作、证据和中间答案四个维度上对齐预测轨迹与黄金轨迹。这种过程级监督与仅使用最终答案的传统监督形成鲜明对比，是开源模型性能大幅提升的关键机制。
 
-## 核心模块与公式推导
+
 
 ### 代理式多模态RAG管道
 
@@ -236,7 +240,9 @@ $$\mathrm { R D } ( \hat { \mathcal { G } } , \mathcal { G } ) = | | \hat { \mat
 
 RD越小表示模型生成的推理步数与黄金步数越接近，过大正值表明过检索，负值表明欠检索。SEARCH-ALIGN训练后，Qwen2.5-VL-7B的RD下降3.1，表明过程级监督有效抑制了冗余检索行为。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 
@@ -290,7 +296,9 @@ Figure 9 展示了成功案例：代理生成的推理链与黄金推理链对�
 ![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_JEGDp1E4OH/figures/002_Table_1.jpg]]
 *Table 1: Left: Comparison of existing multimodal retrieval-augmented QA datasets. Right: Distribution of the five reasoning topologies in MC-SEARCH, with outer rings illustrating hop diversity (2–5 hops)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有基准的关系
 
@@ -329,6 +337,8 @@ SEARCH-ALIGN 的有效性建立在以下前提之上：
 ### 5. 错误模式与改进方向
 
 错误分析（Figure 5）揭示了三个最主要的失败模式：**检索失败**（84.7%）、**幻觉实体/属性**（75.8%）和**步骤遗漏**（74.3%）。SEARCH-ALIGN 通过过程级监督有效降低了这些错误的比例（Figure 7），但检索失败的高发生率暗示，单纯优化规划能力而不改进检索器本身，可能触及性能上限。此外，模态覆盖分析（Table 4）表明，图像检索覆盖率远弱于文本，且高度依赖显式图像输入——即使最强的 Gemini-2.5-Pro，在无图像输入时图像覆盖率仅29.50%，这指向多模态检索器能力的结构性短板。
+
+
 
 ## 原文 PDF
 

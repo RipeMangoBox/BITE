@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/InteractMove_Text_Controlled_Human_Object_Interaction_Generation_in_3D_Scenes_with_Movable_Objects.pdf
+project_link: null
+code_link: https://github.com/Cxhcmhhh/InteractMove
 aliases:
 - AGCAIGA
 - InteractMove
@@ -33,7 +35,7 @@ claims:
 | 中文题名 | InteractMove：文本控制的三维场景可移动物体人-物交互生成 |
 | 英文题名 | InteractMove: Text-Controlled Human-Object Interaction Generation in 3D Scenes with Movable Objects |
 | 会议/期刊 | arXiv 2025 |
-| Links | [Code](https://github.com/Cxhcmhhh/InteractMove) · [arXiv](https://arxiv.org/abs/2404.00562) · [paper](https://doi.org/10.1145/3746027.3754910) |
+| Links | [Code](https://github.com/Cxhcmhhh/InteractMove) · [paper](https://arxiv.org/abs/2404.00562) · [paper](https://doi.org/10.1145/3746027.3754910) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction #topic/generative_models_diffusion #topic/benchmarks_datasets_evaluation |
 | Method | Affordance-Guided Collision-Aware Interaction Generation (AGCA) |
 | Dataset | InteractMove Dataset, TRUMANS Dataset |
@@ -42,7 +44,7 @@ claims:
 > - InteractMove Dataset 上，Goal Distance (↓) 0.791；Multi-modality (↑) 1.58；Physical Realism (↑) 0.813。
 > - TRUMANS Dataset (movable subset) 上，Physical Realism 0.754 vs 0.707 (TRUMANS) (+0.047)；Non-collision Score 99.03 vs 98.73 (TRUMANS) (+0.30)；Multi-modality 1.33 vs 1.29 (TRUMANS) (+0.04)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有的人-场景交互数据集通常仅包含静态、不可移动的物体，且交互类别有限；收集具有可移动物体的大规模真实数据集成本高、难度大。这导致模型难以在复杂三维场景中根据自然语言指令生成与可移动物体的物理合理交互。
 
@@ -52,7 +54,7 @@ claims:
 
 **主要结果**：在自建的 InteractMove 数据集上，AGCA 在 Goal Distance、Multi-modality、Physical Realism 和 Non-collision Score 四项指标上均取得最优结果，其中 Non-collision Score 达到 98.36。在 TRUMANS 数据集的可移动物体子集上，Physical Realism 从 0.707 提升至 0.754，Non-collision Score 从 98.73 提升至 99.03。消融实验表明，移除 3D 物体定位模块导致 Goal Distance 急剧下降，移除 hand-object joint affordance 模块使 Physical Realism 大幅降低，验证了各模块的核心作用。
 
-## 背景与动机
+
 
 三维场景中的人-物交互（Human-Object Interaction, HOI）生成是计算机视觉与图形学中的核心问题，其目标是根据自然语言指令合成人与场景中物体进行物理合理交互的运动序列。这一能力在具身智能、虚拟现实和数字人动画等领域具有广泛的应用前景。然而，现有方法在该任务上存在两个根本性瓶颈。
 
@@ -64,7 +66,9 @@ claims:
 
 基于上述洞察，本文提出了 **Affordance-Guided Collision-Aware Interaction Generation（AGCA）** 框架，并构建了大规模合成数据集 **InteractMove**——包含 618 个室内三维场景、71 种可移动物体类别、30.5k 条交互序列，每条序列均配有自由文本注释，为文本控制的可移动物体交互生成提供了数据基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 InteractMove 的核心创新在于提出了一套 **Affordance-Guided Collision-Aware Interaction Generation（AGCA）** 框架，首次实现了在复杂三维场景中根据自然语言指令生成与可移动物体的物理合理交互。相较于现有方法，AGCA 在三个关键维度上引入了根本性的改变。
 
@@ -90,7 +94,7 @@ InteractMove 的核心创新在于提出了一套 **Affordance-Guided Collision-
 
 上述三个 changed slots 构成了一个从“定位交互目标 → 引导交互方式 → 约束交互物理合理性”的完整因果链条。AGCA 通过显式 grounding 解决“与谁交互”，通过细粒度 affordance 解决“如何交互”，通过碰撞感知损失和测试时约束解决“在何处安全交互”，从而在文本控制的复杂场景可移动物体交互生成任务上取得突破性进展。
 
-## 整体框架
+
 
 InteractMove 提出了 **Affordance-Guided Collision-Aware Interaction Generation (AGCA)** 框架，旨在根据自然语言指令，在包含可移动物体的三维场景中生成物理合理的人-物交互运动序列。整体流水线由三个核心阶段串联构成，形成从语义理解到运动生成的端到端链路。
 
@@ -125,7 +129,7 @@ $$\mathcal{L}_{total} = \mathcal{L}_{diff} + \lambda_1 \mathcal{L}_{cont} + \lam
 ![[assets/figures/papers/paper_list_l1686_InteractMove_Text_Controlled_Human_Object_Interaction_Generation_in_3D_S/figures/006_Figure_4.jpg]]
 *Figure 4: Overview of the proposed framework. (a) Given a text instruction, we first locate the interactive object via a pre-trained grounding model. Then, conditioned on the object point cloud and textual instruction, we generate hand-object affordances. Finally, a collision-aware motion generation module synthesizes human motion and object trajectory, incorporating local scene geometry and learned affordances. (b) Hand-object affordance diffusion module. (c) Collision-Aware motion diffusion module*
 
-## 核心模块与公式推导
+
 
 ### 4.1 框架总览
 
@@ -229,7 +233,9 @@ $$\mathcal{L}_{total} = \mathcal{L}_{diff} + \lambda_1 \mathcal{L}_{cont} + \lam
 ![[assets/figures/papers/paper_list_l1686_InteractMove_Text_Controlled_Human_Object_Interaction_Generation_in_3D_S/figures/002_Figure_2.jpg]]
 *Figure 2: Method of our motion alignment*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 数据集构建与统计
 
@@ -292,7 +298,9 @@ $$\mathcal{L}_{total} = \mathcal{L}_{diff} + \lambda_1 \mathcal{L}_{cont} + \lam
 
 ![[assets/figures/papers/paper_list_l1686_InteractMove_Text_Controlled_Human_Object_Interaction_Generation_in_3D_S/figures/003_Figure.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有基线的继承与突破
 
@@ -337,6 +345,8 @@ InteractMove 的核心贡献建立在人-场景交互（HSI）生成领域的两
 5. **真实场景部署。** 方法依赖完整的场景点云和物体网格作为输入。在真实应用中，如何从 RGB-D 传感器或单目视频中获取足够质量的场景与物体表示，是一个从仿真到现实的关键工程挑战。
 
 6. **安全性与多样性的平衡。** 消融实验表明，碰撞约束（$L_{cont}$、$L_{pene}$、$L_{ttp}$）在提升物理安全性的同时略微降低了 Multi-modality。如何设计更智能的约束机制，在保证无碰撞的前提下最大化运动多样性，是一个值得深入的方向。
+
+
 
 ## 原文 PDF
 

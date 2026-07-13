@@ -41,7 +41,7 @@ claims:
 > - DyCheck 上，mPSNR 19.63 (MoSca base) vs 19.32 (MoSca) (+0.31)；mSSIM 0.716 (MoSca base) vs 0.706 (MoSca) (+0.010)；mLPIPS 0.25 (MoSca base) vs 0.26 (MoSca) (-0.01)。
 > - Objaverse 上，PSNR (120°-180°) 17.03 (SoM base) vs 16.45 (SoM) (+0.58)；LPIPS (120°-180°) 0.26 (SoM base) vs 0.31 (SoM) (-0.05)。
 
-## 概述
+## 概要
 
 单目动态场景的4D重建（即从一段视频中恢复随时间变化的3D几何与外观）是计算机视觉中的核心挑战。现有基于**3D高斯泼溅（3D Gaussian Splatting）** 的动态重建方法——如**SoM**（Shape-of-Motion, Wang et al., 2025a）、**MoSca**（Lei et al., 2025）、**SC-GS**（Huang et al., 2024）和**4DGS**（Wu et al., 2024）——在优化过程中对所有高斯点一视同仁，忽略了不同高斯点在不同时刻由于遮挡、视角偏移等因素导致的**观测可靠性差异**。这一“均匀对待”的策略在极端新视角下容易产生运动漂移和合成质量退化（见图1）。
 
@@ -56,7 +56,7 @@ claims:
 
 该方法在无纹理区域、快速运动场景及高度可变形对象上仍存在局限性，但其“不确定性引导运动传播”的范式为动态高斯泼溅的鲁棒优化提供了新的思路。
 
-## 背景与动机
+
 
 ### 单目动态场景重建的挑战
 
@@ -78,7 +78,9 @@ claims:
 
 基于这一动机，我们提出**USPLAT4D**（Uncertainty-aware dynamic Gaussian Splatting for 4D reconstruction），一个不确定性感知的动态高斯泼溅框架。该方法首次为每个高斯显式估计时间变化的各向异性不确定性，并以此为核心构建不确定性编码的时空图，通过可靠高斯引导整体优化，显著改善了遮挡区域和极端视角下的重建质量。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 USPLAT4D 的核心创新在于将**时间变化的高斯不确定性估计**引入动态高斯泼溅（Dynamic Gaussian Splatting）框架，并以此构建**不确定性感知的时空运动图**，从根本上改变了现有方法对场景中所有高斯均匀优化的范式。这一设计直接回应了单目 4D 重建中观测可靠性差异的核心瓶颈：在遮挡、极端视角和稀疏观测区域，缺乏可靠性区分会导致运动漂移与合成质量退化。
 
@@ -130,7 +132,7 @@ $$\mathcal{L}^{\mathrm{key}} = \sum_{t=0}^{T-1} \sum_{i \in \mathcal{V}_k} \| \m
 
 三个 changed slots 并非孤立改进，而是形成了正向协同：不确定性估计为图构建提供了节点可靠性依据，图构建将可靠性信息编码为空间拓扑结构，优化策略则利用这一结构实现差异化的运动约束。这种协同在极端视角下尤为显著——Objaverse 数据集 (120°, 180°] 视角范围内，USPLAT4D 相较 SoM 的 PSNR 提升 0.58、LPIPS 降低 0.05（Table 2），而小视角偏移下的提升幅度较小，直接印证了不确定性引导的运动传播在观测稀疏区域的核心价值。
 
-## 整体框架
+
 
 USPLAT4D 的整体流程围绕一个核心思想构建：在动态高斯泼溅中，并非所有高斯点具备同等的观测可靠性——经常被稳定观测到的高斯应作为可靠锚点，其运动信息可传播至观测不足的区域，从而约束整体 4D 重建的时空一致性。基于此，方法将动态高斯泼溅的优化过程重构为三个阶段：**动态不确定性估计**、**不确定性编码图构建** 与 **不确定性感知优化**（Figure 2）。
 
@@ -149,7 +151,7 @@ USPLAT4D 的整体流程围绕一个核心思想构建：在动态高斯泼溅�
 
 **设计瓶颈与因果机制**：现有动态高斯泼溅方法（如 SoM、MoSca）对所有高斯均匀优化，忽略了因遮挡、视角偏移等因素导致的观测可靠性差异，这是造成运动漂移与极端视角合成退化的核心瓶颈。USPLAT4D 通过引入时间变化的不确定性估计，将“经常被观测到的高斯”识别为可靠锚点，利用其运动信息通过图结构传播至观测稀疏区域，从而在因果层面改善了时空一致性与极端视角鲁棒性。消融实验证实了这一因果链：移除关键节点的不确定性估计导致 PSNR 从 19.63 降至 18.86（Table 3），移除不确定性感知 kNN 则降至 19.50，验证了不确定性在节点选择与图构建中的关键作用。
 
-## 核心模块与公式推导
+
 
 USPLAT4D 的核心设计围绕一个中心命题展开：并非所有高斯对 4D 重建的贡献是等价的。经常被多帧观测到的区域应作为“可靠锚点”，其运动信息通过图结构传播至观测稀疏的区域。这一思想通过三个紧密耦合的模块实现：动态不确定性估计、不确定性编码图构建、以及不确定性感知优化。
 
@@ -226,7 +228,9 @@ $$\mathcal{L}^{\mathrm{total}} = \mathcal{L}^{\mathrm{rgb}} + \mathcal{L}^{\math
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_m3rZ7Fdlst/figures/009_Figure_7.jpg]]
 *Figure 7: Key node weight matrix and Gaussian segmentation. The weight matrix visualizes edge connections among key nodes. Nodes belonging to different diagonal blocks do not share weights, indicating the no connections across those blocks. The images further illustrate the corresponding Gaussian segmentation, where colors represent the block assignment of each key and non-key node*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计逻辑
 
@@ -323,7 +327,9 @@ Figure 6在Objaverse上的对比进一步验证：在大视角偏移（红色视
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_m3rZ7Fdlst/figures/008_Figure_6.jpg]]
 *Figure 6: Qualitative results on Objaverse. Each case shows a 3D rendering from an input view and a comparison between the baseline (SoM (Wang et al., 2025a) or MoSca (Lei et al., 2025)) and our USPLAT4D at an extreme novel view (red). Please see the supplementary video for clearer visualization*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有动态高斯泼溅方法的关系
 
@@ -366,6 +372,8 @@ USPLAT4D 的核心贡献不在于提出全新的表示或运动建模范式，�
 3. **极端可变形区域的先验增强**：当先验轨迹极度稀疏或不可靠时，是否可以通过引入语义先验或物理约束来补充不确定性引导的优化？
 
 4. **不确定性估计的理论紧致性**：闭式方差估计基于局部最小值假设，该假设在遮挡边界和深度不连续区域的紧致性如何？是否存在更精确且计算可行的替代方案？
+
+
 
 ## 原文 PDF
 

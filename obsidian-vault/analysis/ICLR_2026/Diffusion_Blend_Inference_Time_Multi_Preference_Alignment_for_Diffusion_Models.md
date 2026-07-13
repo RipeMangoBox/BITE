@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Diffusion_Blend_Inference_Time_Multi_Preference_Alignment_for_Diffusion_Models.pdf
+project_link: null
+code_link: https://github.com/bluewoods127/DB-2025
 openreview_forum_id: M2DXbwO8le
 aliases:
 - DBDMDKDML
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 扩散混合：推理时的多偏好对齐扩散模型 |
 | 英文题名 | Diffusion Blend: Inference-Time Multi-Preference Alignment for Diffusion Models |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=M2DXbwO8le); [GitHub](https://github.com/bluewoods127/DB-2025) |
+| Links | [paper](https://openreview.net/forum?id=M2DXbwO8le) · [GitHub](https://github.com/bluewoods127/DB-2025) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | Diffusion Blend（包含DB-MPA、DB-KLA、DB-MPA-LS三个算法） |
 | Dataset | Short-DrawBench (1k test prompts), GenEval (test prompts), 推理时间 (sec/img), SDXL 单提示评估 |
@@ -42,7 +44,7 @@ claims:
 > - GenEval (test prompts) 上，图像对齐奖励 r1, 美学奖励 r2 (w=0.5) 为 DB-MPA: r1=0.13, r2=0.47，对比 Stable Diffusion: r1=-0.2, r2=-0.04，变化 r1:+0.33, r2:+0.51。
 > - 推理时间 (sec/img) 上，平均单张图像生成时间 为 DB-MPA: 11.11, DB-MPA-LS: 5.64，对比 Stable Diffusion: 5.46，变化 DB-MPA ~2×, DB-MPA-LS 接近基线。
 
-## 概述
+## 概要
 
 扩散模型在文本到图像生成中取得了显著成功，但将其输出与人类偏好对齐仍是一个核心挑战。现有基于强化学习（RL）的微调方法通常针对固定的单一奖励函数和固定的KL正则化强度进行优化。当用户需要同时平衡多个相互冲突的目标（如文本对齐度与美学质量），或希望调整生成结果与预训练模型的偏离程度时，这些方法暴露出根本性瓶颈：**每个新的偏好配置都需要重新训练模型**，计算成本高昂且缺乏灵活性。
 
@@ -56,7 +58,7 @@ claims:
 
 **方法定位**：Diffusion Blend属于**推理时对齐**范式，区别于需要重新训练的参数融合方法（如Rewarded Soup）和免训练的梯度引导方法（如RGG、CoDe）。其理论基础是将精确控制项的Jensen间隙近似与线性标量化结合，使多偏好对齐问题转化为基础漂移项的线性组合。该方法已在Stable Diffusion v1.5和SDXL上验证，推理时间与计算开销可控，为扩散模型的灵活部署提供了实用方案。
 
-## 背景与动机
+
 
 扩散模型在文本到图像生成中取得了显著进展，但预训练模型生成的图像往往无法很好地对齐用户多样化的偏好，例如文本-图像对齐度、美学质量、JPEG可压缩性等。为了将扩散模型与奖励函数对齐，现有方法通常采用强化学习微调（RL fine-tuning），其核心目标是在KL散度正则化约束下最大化期望奖励：
 
@@ -68,7 +70,9 @@ $$\max_{p_0} \mathbb{E}_{x_0 \sim p_0}[r(x_0)] - \alpha \mathrm{KL}(p_0 \| p_0^{
 
 核心挑战在于：**能否设计一种方法，使得在推理时（inference-time）即可生成对齐任意用户指定偏好组合的图像，而无需额外的微调？** 这要求模型能够动态地平衡多个可能相互冲突的奖励目标，同时允许用户灵活控制KL正则化强度。本文正是在这一动机下，提出了扩散混合（Diffusion Blend）框架，通过在推理时混合不同基础奖励对应的后向扩散过程，实现零额外微调的多偏好对齐。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于将扩散模型的多偏好对齐从**训练时固定组合**迁移到**推理时动态混合**，通过三个算法（DB-MPA、DB-KLA、DB-MPA-LS）分别解决偏好权重调整、KL正则化强度控制和推理成本问题。
 
@@ -126,7 +130,7 @@ DB-MPA的推理成本约为标准扩散模型的2倍（11.11 sec/img vs 5.46 sec
 
 方法的理论近似依赖Jensen间隙假设，对于高度非线性或非平滑的奖励函数，近似误差可能更显著。当α非常小时，误差项 $L_{t,2}$ 和 $L_{t,3}$ 可能增大（Remark 2）。此外，实验主要在Stable Diffusion v1.5和SDXL上验证，尚未在其他扩散模型架构上检验。如何在不显式访问预训练模型密度的前提下更精确地计算控制项期望，以及如何扩展到非线性标量化的多目标偏好，是值得进一步探索的开放问题。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_M2DXbwO8le/figures/001_Figure_1.jpg]]
 *Figure 1: (a). Overview of our Diffusion Blend - Multi Preference Alignment (DB-MPA) Algorithm. Given basis reward functions and any user preference weights w = ( w _ { 1 } , w _ { 2 } ) , DB-MPA generates images aligned with combined reward r ( w ) = w _ { 1 } r _ { 1 } + w _ { 2 } r _ { 2 } (b) During the fine-tuning stage, DB-MPA gets an RL fine-tuned model corresponding to each reward function. (c) During the inference time, DB-MPA blends (mixes) the backward diffusion corresponding to each fine-tuned model according to the user-specified preference w*
@@ -164,7 +168,7 @@ Diffusion Blend 框架的核心思想是将**推理时多偏好对齐**拆解为
 
 **输出**：对齐于用户指定偏好配置的生成图像。用户可通过连续调节 $w$ 或 $\lambda$ 实现平滑的偏好控制，无需重新微调或切换模型。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化
 
@@ -244,7 +248,9 @@ $$
 
 DB-MPA需要同时运行多个微调模型，推理成本约为标准扩散模型的2倍。DB-MPA-LS通过随机采样机制降低计算开销：在每个去噪步骤，以与权重 $w_i$ 成比例的概率随机选择一个基础奖励对应的LoRA适配器。**Proposition 2** 保证该随机采样SDE与确定性混合SDE具有相同的边际分布 $p_{X_t}$，从而在维持等价生成分布的前提下，将推理时间降至接近标准扩散模型水平。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -331,7 +337,9 @@ DB-MPA需要同时运行多个微调模型，推理成本约为标准扩散模�
 ![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_M2DXbwO8le/figures/011_Table_3.jpg]]
 *Table 3: GenEval train results: reward improvements (∆r) relative to Stable Diffusion*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：推理时多偏好对齐的空白
 
@@ -379,6 +387,8 @@ DB-MPA 的推理时间约为标准扩散模型的 2 倍（Table 1: 11.11 sec/img
 3. **非线性标量化扩展**：该方法能否扩展到非线性标量化的多目标偏好（例如，基于偏好向量的权重动态调整）？
 4. **跨模态和跨架构泛化**：扩散混合框架是否可以直接应用于文本到视频、文本到 3D 或其他生成模型？在 DiT、Imagen 等架构上的表现如何？
 5. **交互式偏好确定**：在推理时如何自动或交互式地确定满足用户意图的最优偏好向量 $w$？这涉及将 Diffusion Blend 与人类反馈或自动偏好学习相结合的可能性。
+
+
 
 ## 原文 PDF
 

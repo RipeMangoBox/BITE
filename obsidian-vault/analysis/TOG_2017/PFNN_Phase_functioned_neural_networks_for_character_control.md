@@ -5,6 +5,7 @@ paper_level: A
 venue: TOG
 year: 2017
 pdf_ref: paperPDFs/TOG_2017/Phase_functioned_neural_networks_for_character_control.pdf
+code_link: https://github.com/sebastianstarke/AI4Animation/tree/master/AI4Animation/SIGGRAPH_2017
 project_link: https://github.com/sebastianstarke/AI4Animation/tree/master/AI4Animation/SIGGRAPH_2017
 aliases:
 - PFNN
@@ -33,7 +34,7 @@ claims:
 | 中文题名 | 基于相位函数神经网络的角色控制 |
 | 英文题名 | Phase-functioned neural networks for character control |
 | 会议/期刊 | TOG 2017 |
-| Links | [paper](https://doi.org/10.1145/3072959.3073663); [GitHub](https://github.com/sebastianstarke/AI4Animation/tree/master/AI4Animation/SIGGRAPH_2017) |
+| Links | [paper](https://doi.org/10.1145/3072959.3073663) · [GitHub](https://github.com/sebastianstarke/AI4Animation/tree/master/AI4Animation/SIGGRAPH_2017) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/robotics |
 | Method | Phase-Functioned Neural Network (PFNN) |
 | Dataset | Locomotion Dataset (1h mocap + terrain fitting), Character Responsiveness (trajectory following) |
@@ -42,7 +43,7 @@ claims:
 > - Locomotion Dataset (1h mocap + terrain fitting) 上，Runtime / Memory 为 0.0008s (PFNN constant), 125MB，对比 0.0004s (NN w/o phase, 9MB) ; 0.0007s (ERD, 9MB) ; ∼0.1s (GP, >1GB)，变化 PFNN constant 比标准 NN 慢约2倍但质量显著更高；比 GP 快两个数量级。内存消耗约125MB，在可接受范围。。
 > - Character Responsiveness (trajectory following) 上，Average Trajectory Error (cm) 为 5.82 cm (Circle, τ_v=5.0, τ_d=10.0)，对比 17.29 cm (Wave, τ_v=0.5, τ_d=2.0)，变化 通过调节未来轨迹混合偏置，响应性显著提升，平均误差降低约3倍，代价极小的动画质量损失。。
 
-## 概述
+## 概要
 
 在实时角色动画中，如何根据用户输入和环境几何自动生成自然、富有表现力的运动，是一个长期存在的挑战。传统自回归模型（如基于LSTM的**ERD**（Fragkiadaki et al., ICCV 2015）和**条件受限玻尔兹曼机**（Taylor and Hinton, ICML 2009））在长时间运动生成中因误差累积导致动作逐渐漂移甚至崩溃；而卷积模型（如**Holden et al., ACM Trans. Graph. 2016**）需要完整控制信号作为输入，不适用于在线实时应用。一个直观的改进方向是将运动周期的时间信息——**相位**（phase）——作为额外输入提供给神经网络，但实验表明，由于dropout等因素，相位的影响力容易被网络稀释，导致动作僵硬、不自然。
 
@@ -52,7 +53,7 @@ claims:
 
 实验结果表明，PFNN在崎岖地形穿越、跳跃、蹲伏等复杂场景中能够自动生成适当且富有表现力的运动，并通过调节未来轨迹混合偏置实现响应性与平滑性的灵活权衡——在圆形路径跟随任务中，平均轨迹误差可降至5.82 cm。消融实验进一步证实，移除相位或将其降级为普通输入均会导致运动质量显著退化，验证了相位函数化设计的决定性作用。
 
-## 背景与动机
+
 
 实时角色动画是游戏与交互式虚拟环境的核心技术挑战。高质量的角色运动要求系统能同时响应三方面的约束：用户的实时操控指令、角色自身的物理状态、以及复杂的三维场景几何。传统方法在这三个维度的交汇点上始终存在难以调和的矛盾。
 
@@ -66,7 +67,9 @@ claims:
 
 本文的核心动机正是突破这一结构局限：**能否让相位成为网络的全局控制变量，使其能够强有力地、周期性地调节整个网络的权重**，从而从根本上避免不同相位数据的混合，消除运动漂移，同时保持模型结构的简洁与实时推理的高效？这一思路引出了 Phase-Functioned Neural Network（PFNN）的核心设计——将网络权重定义为相位的函数，而非将相位作为输入。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：相位混合导致的运动退化
 
@@ -104,7 +107,7 @@ $$\operatorname{Cost}(\mathbf{X}, \mathbf{Y}, \mathbf{P}; {\boldsymbol{\beta}}) 
 
 值得注意的是，同期提出的启发式动画拼接方法 **Motion Matching** (Clavet, GDC 2016) 采用了与 PFNN 相似的参数化方式（轨迹、步态、地形高度等），但其本质是通过在大规模动画数据库中搜索最匹配片段来合成运动，不具备学习泛化能力。PFNN 可视为 Motion Matching 的**可学习、可微分版本**——通过相位函数网络隐式地学习从控制参数到姿态的映射，避免了运行时昂贵的搜索开销。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l47_https_doi_org_10_1145_3072959_3073663/figures/001_Figure_1.jpg]]
 *Figure 1: A selection of results using our method of character control to traverse rough terrain: the character automatically produces appropriate and expressive locomotion according to the real-time user control and the geometry of the environment*
@@ -155,7 +158,7 @@ $$TrajectoryBlend(a_0, a_1, t, \tau) = (1 - t^\tau) a_0 + t^\tau a_1$$
 
 PFNN 通过让相位直接参数化整个网络的权重矩阵，实现了**约50倍于标准NN的相位影响力**（输出相对于相位的变化幅度从约0.001提升至约0.05），从根本上避免了不同相位数据的混合，消除了漂移问题。这一设计使得系统在复杂地形交互中能够自动生成适当且富有表现力的运动（Fig. 1, Fig. 9），同时保持极低的推理延迟（PFNN constant 模式约 0.0008s/帧）。
 
-## 核心模块与公式推导
+
 
 ### 相位函数神经网络（PFNN）总体结构
 
@@ -219,7 +222,9 @@ $$TrajectoryBlend(a_0, a_1, t, \tau) = (1 - t^\tau) a_0 + t^\tau a_1$$
 
 其中 $a_0$ 为游戏手柄控制的期望轨迹，$a_1$ 为上一帧 PFNN 预测的轨迹，$t \in [0,1]$ 为轨迹窗口内的归一化时间，$\tau$ 为偏置参数。当 $\tau$ 较小时混合偏向 $a_0$（响应更快），较大时偏向 $a_1$（更平滑）。实验表明，调节 $\tau_v=5.0, \tau_d=10.0$ 可将平均轨迹误差从 17.29 cm 降至 5.82 cm，代价极小的动画质量损失（Table 2, Fig. 14）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈验证：相位缺失与相位稀释的代价
 
@@ -276,7 +281,9 @@ Fig. 15 展示了系统的主要失败模式：当用户提供的输入轨迹在
 *Figure 9: Result of the character where the future trajectory has been collided with walls, pits and other objects in the environment. By colliding the future trajectory with non-traversable objects the character will slow down or avoid such obstacles. When walking along the beam, since the measured heights on either side of the character are significantly lower than in the center, a balancing motion is naturally produced*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心问题与因果机制
 
@@ -313,6 +320,8 @@ PFNN处于**数据驱动运动合成**与**实时角色控制**的交汇点，�
 - 能否提供可控性和可编辑性工具，让动画师可以干预或修正PFNN的行为？
 - 将该框架应用于物理仿真，结合相位索引的反馈控制器是否能实现更稳定的崎岖地形行走？
 - 相位函数网络思想能否推广到其他周期性模态数据（如心跳fMRI、周期视频），以提升学习效率？
+
+
 
 ## 原文 PDF
 

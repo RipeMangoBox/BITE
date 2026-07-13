@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/Improving_Motion_in_Image_to_Video_Models_via_Adaptive_Low_Pass_Guidance.pdf
+code_link: null
 project_link: https://choi403.github.io/ALG
 aliases:
 - ALPGA
@@ -44,7 +45,7 @@ claims:
 > - PVD 上，Dynamic Degree 69.0 vs 65.0 (+4.0 (+6.2%))。
 > - VidProM 上，Dynamic Degree 30.5 vs 27.3 (+3.2 (+11.7%))。
 
-## 概述
+## 概要
 
 图像到视频（I2V）生成模型在保持输入图像高保真度的同时，普遍存在**运动动态性被抑制**的问题：与文本到视频（T2V）模型相比，I2V 模型的动态程度（Dynamic Degree）平均下降 18.6%，而其他质量指标基本持平（Table 1）。这一瓶颈的根源在于，去噪过程的早期阶段，模型过度暴露于参考图像的高频细节（精细纹理与边缘），导致生成轨迹过早锁定到静态外观的“捷径”，从而抑制了大尺度运动结构的形成（Figure 2）。
 
@@ -52,7 +53,7 @@ claims:
 
 在方法谱系上，ALG 属于**推理时条件调制**技术，与标准的分类器自由引导（CFG）相比，仅改变了条件图像在采样过程中的频率内容，不引入额外模型参数或训练开销。其设计区别于直接对输入图像进行全局低通滤波的朴素方案——后者虽能增强运动，但会显著牺牲逐帧图像保真度（Figure 3）。ALG 通过将滤波限定在早期步骤、并在无条件项中保留原始图像，实现了运动增强与画质保持之间的有效权衡。
 
-## 背景与动机
+
 
 ### 图像到视频生成的“运动抑制”瓶颈
 
@@ -76,7 +77,9 @@ claims:
 
 上述分析指向一个核心问题：**能否仅在运动结构形成的关键阶段抑制高频信息，而在细节重建阶段恢复原始图像质量？** 论文的动机正是基于这一时间解耦的思想——在扩散采样的早期步骤中，通过低通滤波阻止模型陷入高频捷径，允许粗粒度运动结构充分形成；在后期步骤中，切换回原始参考图像以恢复精细细节。这种**自适应低通引导（Adaptive Low-Pass Guidance, ALG）**策略旨在在不牺牲图像质量的前提下，显著增强 I2V 模型的运动动态性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈发现：I2V 模型的“高频捷径”抑制运动
 
@@ -113,7 +116,7 @@ $$\kappa(t) = \begin{cases} \kappa_* & \text{if } t < t_{\mathrm{trans}} \\ 0 & 
 
 ALG 的方法学定位值得强调：它**不修改模型权重、不增加推理计算量、不改变训练流程**，仅在采样循环中对条件输入进行轻量级频率调制。这使得 ALG 可即插即用于任何已部署的 I2V 模型（论文验证了 Wan 2.1/2.2 和 LTX-Video 三个不同架构），避免了微调带来的分布偏移和公平性争议。从方法论谱系看，ALG 属于**推理时引导技术的扩展**——将 CFG 中固定条件拓展为时间自适应条件，开辟了通过控制条件信号频率来调控生成行为的新维度。
 
-## 整体框架
+
 
 **Adaptive Low-Pass Guidance (ALG)** 是一种无需训练、即插即用的推理时引导策略，旨在解决图像到视频（I2V）生成中运动动态性被抑制的问题。其核心思想源于一个关键诊断：I2V 模型在去噪早期阶段过度暴露于参考图像的高频细节（精细纹理与边缘），导致生成过程过早锁定到静态外观的“捷径”，从而抑制了大尺度运动结构的形成（Figure 2）。ALG 通过在采样过程中自适应地调制条件图像输入的频率成分，在早期步骤中抑制高频信息以促进粗粒度运动结构演化，在后期步骤中恢复原始高频信息以重建精细细节，从而在不牺牲每帧图像质量的前提下显著提升视频动态性。
 
@@ -145,7 +148,7 @@ ALG 的整体流程嵌入在标准的流匹配（Flow Matching）采样框架中
 ![[assets/figures/papers/paper_list_l8_https_openaccess_thecvf_com_content_CVPR2026_html_Choi_Improving_Motion/figures/001_Figure_1.jpg]]
 *Figure 1: Overcoming suppressed motion dynamics of I2V models with ALG. I2V models achieve high image fidelity to the conditioning image, but they often fail to generate dynamic videos (first row). We refer to this issue as suppressed motion dynamics, which is due to the high-frequency details present in the reference image. As a simple fix, applying low-pass filter to the input image improves the motion dynamics, yet degrades the per-frame image quality and fidelity (second row). Our method, ALG, applies low-pass filter to the conditioning image only at earlier steps, significantly enhancing the dynamic degree while preserving the image quality (third row)*
 
-## 核心模块与公式推导
+
 
 ### 问题形式化与基线
 
@@ -210,7 +213,9 @@ $$\mathbf{v}_{\mathrm{ALG}}(\mathbf{x}_t, t) = \mathbf{v}_{\theta}(\mathbf{x}_t,
 
 这种非对称设计避免了论文在消融中发现的问题：若对三项均使用低通滤波图像，会导致生成不稳定；若仅对无条件项保留原始图像，则可在运动增强与保真度之间取得最佳平衡。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：I2V 模型的运动抑制现象
 
@@ -266,7 +271,9 @@ ALG 仅有两个关键超参数：过渡时间 $t_{\mathrm{trans}}$ 和初始滤
 ![[assets/figures/papers/paper_list_l8_https_openaccess_thecvf_com_content_CVPR2026_html_Choi_Improving_Motion/figures/012_Figure_5.jpg]]
 *Figure 5: Component analysis with VBench-I2V. (a) As*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：I2V 模型的“运动抑制”瓶颈
 
@@ -321,6 +328,8 @@ ALG 在方法谱系中占据了一个独特位置——**无需训练的推理�
 3. **捷径形成的精确机制**：高频信号在早期扩散步骤中锁定生成轨迹的精确动力学机制是什么？这一理解可能催生更精细的频率调控策略。
 
 4. **训练阶段的频率控制**：是否可以在训练阶段就融入自适应频率控制，使模型从根本上学习更鲁棒的粗到细生成过程，从而避免推理时的权衡？这可能是下一代 I2V 模型训练范式的重要方向。
+
+
 
 ## 原文 PDF
 

@@ -1,7 +1,7 @@
 # BITE v06.1 分析资产全量复查计划
 
 - created: 2026-07-13
-- status: proposed
+- status: executed-with-documented-exceptions
 - baseline: `_private/BITE_versions/v06/latest_analysis_chain_2026-07-03.md`
 - target: `obsidian-vault/analysis/*/*.md`
 - source policy: 不读取原 PDF，仅使用 v06 分析链、优秀范例和现有分析笔记
@@ -86,6 +86,15 @@
 
 ## 执行分级与批次
 
+### 运行声明（2026-07-13）
+
+- goal: 将目标分析笔记迁移到 v06.1 结构，修复链接/embed，并按语义角色清理冗余图片。
+- source: v06 分析链、两篇 canonical 范例、现有 analysis note；禁止读取原 PDF。
+- selection rule: 非 canonical 主集合；canonical 笔记仅在存在 P0/P1 检测项时参与。
+- budget: 校准批次 20 篇；通过后每批 50 篇，最多 3 个互斥 batch 并行。
+- output target: `obsidian-vault/analysis/*/*.md`；manifest 与批次报告写入 `_private/BITE_versions/v06.1/runs/2026-07-13/`。
+- state rule: 单篇 deterministic validation 与批次复查均通过后，才允许 `analysised → checked`。
+
 每篇先分类，再修改：
 
 - P0：断 PDF/图片 embed、frontmatter 无法解析、缺 PDF 章节。
@@ -129,3 +138,17 @@ Wait → Downloaded → analysised → checked
 1. 是否接受“结构版本 + 可证实创建日期”的联合选择器，而不是仅依赖不可靠的文件日期。
 2. 是否接受默认 3–6 张、允许有理由超过 6 张的图片规则。
 3. 校准批次确认后，是全量自动推进，还是每个 50 篇批次抽查后继续。
+
+## 执行结果（2026-07-13）
+
+- 全库扫描：5,345 篇顶层 paper notes。
+- 校准：20 篇，拆为 7/6/7 三个并行批次并逐篇验证。
+- 确定性全量 pass：3,466 篇候选，拆为 1,131/1,147/1,188 三个 shard。
+- 结构结果：5,341 篇满足严格 v06 canonical；剩余 4 篇均为运行启动前已有用户修改，未覆盖。
+- 图片语义复查：2,906 篇，59 个 50 篇以内批次，多 agent 轮转完成。
+- 最终图片数：41,414；仅删除高置信冗余图及配套 caption，超过 6 张但承担独立证据角色的图片予以保留。
+- 本地 embed：剩余 1 个缺失 PDF，且无唯一候选，保守保留为 blocker。
+- 状态：4,232 条 `analysised` 提升为 `checked`；82 条因无唯一映射、冲突映射或启动前 dirty 保持 `analysised`。
+- 未读取原 PDF；未覆盖 5 篇启动前 dirty analysis notes。
+
+详细 manifest、批次报告、备份和状态映射位于 `_private/BITE_versions/v06.1/runs/2026-07-13/`。

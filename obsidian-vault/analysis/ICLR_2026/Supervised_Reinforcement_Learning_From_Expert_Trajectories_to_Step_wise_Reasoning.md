@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Supervised_Reinforcement_Learning_From_Expert_Trajectories_to_Step_wise_Reasoning.pdf
+project_link: null
+code_link: null
 openreview_forum_id: Uro84w2xz5
 aliases:
 - SRLS
@@ -42,7 +44,7 @@ claims:
 > - Minerva Math 上，Greedy Accuracy (%) 为 36.4 (SRL)，对比 33.8 (RL(VR))，变化 +2.6。
 > - Overall Average (AMC23, AIME24, AIME25, Minerva Math) 上，Average Greedy Accuracy (%) 为 27.6 (SRL)，对比 24.5 (RL(VR))，变化 +3.1。
 
-## 概述
+## 概要
 
 **核心问题**：在竞赛级数学推理等复杂多步任务中，小模型难以采样到正确解（pass@k 接近零），导致基于可验证奖励的强化学习（RLVR）面临奖励信号极度稀疏的困境，而直接进行监督微调（SFT）则容易在长推理链上过拟合，甚至造成性能退化。
 
@@ -59,7 +61,7 @@ claims:
 
 **局限与开放问题**：SRL 依赖高质量的结构化专家动作分解，在动作边界模糊或任务难以结构化的领域适用性尚待验证；序列相似度作为奖励可能无法完全捕捉步骤的正确性，尤其在专家动作存在多种合理形式时。此外，能否减少对教师模型的依赖、探索语义相似度等更灵活的奖励函数，以及在大规模模型上的增益幅度，仍是值得进一步研究的方向。
 
-## 背景与动机
+
 
 ### 大语言模型推理能力的训练范式
 
@@ -80,7 +82,9 @@ claims:
 
 这一思路将问题求解重新定义为**序列决策过程**：模型在每个步骤接收部分轨迹作为上下文，生成内部推理独白后输出下一步行动，并通过与专家行动的相似度获得即时反馈。这种方式在保留模型内部推理灵活性的同时，克服了 SFT 和 RLVR 各自的局限——既不需要最终答案的正确性，也不强制逐 token 复制专家轨迹。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心贡献在于提出**监督强化学习（Supervised Reinforcement Learning，SRL）**，一种将复杂推理任务重构为序列决策过程，并利用专家轨迹提供逐步密集奖励的训练框架。其关键创新围绕以下四个维度展开：
 
@@ -118,7 +122,7 @@ $$\sqrt{\frac{\sum_{i=1}^{G}(r(\mathbf{o}_i, \mathbf{y}) - \bar{r})^2}{G}} > \ep
 
 SRL 处于 SFT 与 RLVR 的交叉地带：它继承了 SFT 利用专家数据提供结构化引导的优势，又保留了 RL 通过探索和奖励塑造策略的灵活性。与 **R³**（Xi et al., ICML 2024）的逆课程强化学习不同，SRL 不依赖逐步后退寻找稀疏奖励，而是通过序列匹配直接提供密集信号。与 s1K-7B 等蒸馏方法相比，SRL 不要求模型直接拟合完整推理链，而是学习在局部上下文中做出与专家对齐的决策。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_Uro84w2xz5/figures/002_Figure_2.jpg]]
 *Figure 2: Illustration of SRL as compared to RL(VR) and SFT. (a) RL(VR) takes a query as input and performs k rollouts. The final answer correctness is used as the reward. (b) SFT uses both a query x and a complete teacher response y as input, training with a per-token loss to maximize the probability p ( $\mathbf { y } \vert \mathbf { x }$ ) . (c) SRL also uses a query and a teacher response. It breaks the response into step actions and, at each step, uses the previous steps as context. The model generates a next step action along with its step-wise inner thoughts, and the reward $r _ { k }$ is based on the similarity between the model’s and the teacher’s action
@@ -158,7 +162,7 @@ SRL 的输入是一组“问题—完整专家解答”对，输出是一个经�
 
 SRL 的关键创新在于将“专家轨迹”同时作为监督信号的来源和奖励函数的参照系：它既不像 SFT 那样强制模型复制专家的每一步推理，也不像 RLVR 那样仅依赖最终答案的正确性——后者在复杂多步推理任务中因 pass@k 接近零而几乎无法提供有效学习信号。通过将解答分解为顺序行动并在每一步给予基于序列匹配的连续奖励，SRL 在保留模型推理自主性的同时，提供了持续且平滑的优化梯度。
 
-## 核心模块与公式推导
+
 
 ### 4.1 瓶颈与设计动机
 
@@ -210,7 +214,9 @@ $$\mathcal{L}_{\text{GRPO}} = \mathbb{E}\left[ \frac{1}{G} \sum_{i=1}^{G} \frac{
 
 序列相似性奖励基于字符串匹配，当专家行动存在多种合理表达形式时，可能低估模型生成的质量。此外，方法依赖高质量专家轨迹的结构化分解，在动作边界模糊的领域（如开放域创作）适用性尚未验证。不同相似度函数（如语义嵌入匹配 vs. 字符串匹配）的影响也是待探索的开放问题。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 4.1 数学推理主实验
 
@@ -285,7 +291,9 @@ $$\mathcal{L}_{\text{GRPO}} = \mathbb{E}\left[ \frac{1}{G} \sum_{i=1}^{G} \frac{
 - **Table 3**：多步分解优于单步序列相似性奖励，后者又优于最终答案奖励，验证了逐步密集反馈的因果作用。
 - **Table 5**：SRL 在 SWE-Bench-Verified 上显著超越专用基线 SWE-Gym-7B，证明方法的跨领域泛化能力。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：小模型在困难推理任务中的学习信号瓶颈
 
@@ -344,6 +352,8 @@ SRL 的有效性依赖于以下前提条件，这些条件同时界定了其适�
 4. **奖励函数的选择空间**：不同相似度函数（编辑距离、BLEU、语义嵌入余弦相似度）对性能的影响尚未系统研究。Table 3 仅比较了“最终答案奖励 vs 单步序列相似度 vs 多步序列相似度”，未涉及相似度计算方式本身的变体。
 
 5. **与推理长度扩展的交互**：Figure 5 显示 SRL 训练改变了模型的推理长度分布，但 SRL 是否能在推理时通过增加 rollout 步数持续提升性能（即 test-time scaling），仍需进一步验证。
+
+
 
 ## 原文 PDF
 

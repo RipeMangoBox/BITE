@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/GIQ_Benchmarking_3D_Geometric_Reasoning_of_Vision_Foundation_Models_with_Simulated_and_Real_Polyhedra.pdf
+project_link: null
+code_link: null
 openreview_forum_id: Uf8X57bQIr
 aliases:
 - GGIT
@@ -40,7 +42,7 @@ claims:
 > [!tip] 效果简介
 > - GIQ Mental Rotation Test (hard split, synthetic→wild) 上，准确率 为 SigLIP (非线性探针)：69%，对比 人类平均准确率：68.05%，变化 +0.95个百分点（达到人类平均水平）。
 
-## 概述
+## 概要
 
 当前视觉基础模型与单目三维重建方法在对象内在几何属性的显式理解上存在根本性缺口——它们缺乏对对称性、凸性、面结构等核心几何概念的深层推理能力，导致在训练分布外的复杂多面体上泛化严重不足，甚至连最基本的柏拉图立体也难以准确重建或分类。
 
@@ -50,7 +52,7 @@ GIQ（Geometric IQ Test）基准数据集针对这一瓶颈，构造了涵盖224
 
 GIQ的方法定位在于：它不是提出新的模型架构，而是构建了一个精确可控的几何推理探针集，通过四项核心任务——单目三维重建、三维对称检测、心理旋转测试和零样本形状分类——系统诊断视觉基础模型的几何理解边界。这一基准填补了现有三维理解评估中缺乏精确几何属性标注的关键空白。
 
-## 背景与动机
+
 
 三维几何理解是视觉智能的核心支柱之一。人类能够毫不费力地从单一二维图像中推断物体的三维结构、对称性和空间关系——这种能力在数学、工程、建筑乃至日常物体操作中至关重要。然而，当前视觉基础模型是否真正具备这种几何推理能力，仍然是一个悬而未决的问题。
 
@@ -60,7 +62,9 @@ GIQ的方法定位在于：它不是提出新的模型架构，而是构建了�
 
 本文的动机由此明确：**构造一个精确标注几何属性的多面体基准，以系统性地诊断视觉基础模型中的几何推理缺口**。通过控制形状复杂度（从简单柏拉图立体到复杂非凸星形和复合体）和图像呈现条件（合成渲染与真实纸质模型在不同环境中的拍摄），GIQ基准旨在回答一个根本问题：当代视觉模型究竟在多大程度上“理解”三维几何，而非仅仅从统计关联中隐式编码表面特征？
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GIQ 的核心创新不在于提出新的模型架构或训练范式，而在于**构建了一个精确可控的几何推理探针**，系统性地揭示了当前视觉基础模型中“隐式编码”与“显式推理”之间的断裂。具体体现在三个层面：
 
@@ -93,7 +97,7 @@ GIQ 的核心洞察在于：**视觉编码器（如 DINOv2）的嵌入空间中�
 
 不同于 Objaverse-XL 等追求规模扩张的三维数据集，或 BLINK 等多任务视觉基准，GIQ 的独特价值在于其**诊断性而非竞赛性**定位：通过严格控制的几何复杂度梯度，精确定位模型在“理解形状本身”这一基础能力上的断裂点，而非衡量其在分布内物体上的综合表现。这一设计使其成为研究几何智能缺口的有效探针，而非又一个排行榜。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_Uf8X57bQIr/figures/002_Figure_2.jpg]]
 *Figure 2: Summary of polyhedral groups in GIQ, highlighting group names, counts of distinct 3D shapes (in parentheses), and representative examples. Platonic, Archimedean, and Catalan solids are convex, while Kepler-Poinsot polyhedra and compounds represent special cases of stellations; consequently, the sum of group counts (238) exceeds the 224 unique shapes in the dataset. The categorization presented here is arbitrary: polyhedra possess numerous properties allowing various groupings; we selected this set as a representative example*
@@ -128,7 +132,7 @@ GIQ基准的设计遵循一条从**形状定义→数据生成→任务评估**�
 
 整个流水线的输出是一组多维度的性能剖面，揭示了从隐式对称编码（如DINOv2在四重旋转对称检测上达93%准确率）到显式几何推理（如前沿VLM在加泰兰和约翰逊固体上分类准确率低于20%）之间的能力断层，从而指向核心瓶颈：**当前模型缺乏对内在几何属性的深层显式理解**。
 
-## 核心模块与公式推导
+
 
 GIQ 基准的评估体系围绕四个核心几何推理任务构建，每个任务均通过标准化的数据处理与评估协议确保可比性。
 
@@ -160,7 +164,9 @@ $$0.5 \cdot \frac{\mathrm{TP}}{P} + 0.5 \cdot \frac{\mathrm{TN}}{N}$$
 
 其中 TP/TN 分别为真阳性/真阴性数量，P/N 分别为正/负样本总数。该指标等价于灵敏度和特异度的算术平均。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 4.1 单目三维重建：基础几何形状的普遍失败
 
@@ -215,7 +221,9 @@ $$\mathcal{L} = -\frac{1}{N} \sum_{i=1}^{N} \sum_{c=1}^{C} \left[ w_c y_{i,c} \l
 *Figure 1: Samples of synthetic and real 3D solids from our GIQ dataset. A subset of the 224 real polyhedra included in our dataset, illustrating their variety in complexity, class, and colors. (bottom left) Simulated solids from Mitsuba Physically Based Renderer. (bottom right) Real polyhedra constructed from paper, placed in different realistic backgrounds*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 基准设计的知识定位
 
@@ -264,6 +272,8 @@ GIQ 的发现引出若干待解决的关键问题：
 3. **显式几何表示的设计空间**：存在哪些有效的显式几何表示（如面-边图、对称群标签、组合结构描述）或辅助训练策略，可以显著提升模型对复杂结构（如复合体、非凸形状）的识别和推理能力？
 
 4. **基准的域扩展路径**：未来如何扩展此类基准以涵盖更广泛的视觉域，如真实世界自然场景中的物体，同时保持精确的几何标注？这需要在受控性与生态效度之间寻找新的平衡点。
+
+
 
 ## 原文 PDF
 

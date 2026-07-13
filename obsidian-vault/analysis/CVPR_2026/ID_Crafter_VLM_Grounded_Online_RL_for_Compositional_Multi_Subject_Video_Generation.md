@@ -43,7 +43,7 @@ claims:
 > - OpenS2V-Nexus (180 subject-text pairs) 上，Total Score 55.16% (Ours-1.3B Base + RL) vs 50.71% (Phantom-1.3B) (+4.45%)。
 > - OpenS2V-Nexus 上，FaceSim 66.10% (Ours-1.3B Base + RL) vs 48.55% (Phantom-1.3B) (+17.55%)；Total Score 57.05% (Ours-14B) vs 52.32% (Phantom-14B) (+4.73%)。
 
-## 概述
+## 概要
 
 多主体视频生成面临一个核心瓶颈：在同时保持多个独立身份的一致性与整体时序连贯性之间存在固有矛盾，导致不同主体间出现语义冲突和身份退化。现有方法——无论是基于注意力特征注入的**Phantom**、基于注意力编辑的**VACE**，还是商业系统如**Sora**（OpenAI, 2023）和**Kling**（2024）——通常将多主体特征与文本令牌拼接后注入标准交叉注意力，难以解耦主体内细节、主体间交互与跨模态语义对齐，使得身份漂移和“复制粘贴”伪影成为普遍问题。
 
@@ -59,7 +59,7 @@ ID-CRAFTER 针对这一瓶颈提出了三个因果性设计，形成协同效应
 
 **方法定位**：ID-CRAFTER 基于 Rectified Flow 视频扩散 Transformer 骨干（Wan-Video, 2024），在注意力机制、文本编码器和后训练优化三个关键维度进行了系统性改进。其核心贡献在于证明了层次化解耦注意力 + VLM 语义引导 + 在线 RL 的组合能够有效缓解身份保持与运动流畅性之间的张力，为多主体视频生成建立了新的技术范式。
 
-## 背景与动机
+
 
 扩散模型驱动的内容生成已在图像和视频领域取得显著进展，然而**多主体视频生成**仍面临一个根本性瓶颈：在同时保持多个独立主体的身份一致性与整体时序连贯性之间，存在着固有的矛盾。现有方法在处理单主体场景时尚可维持身份保真度，但当场景涉及两个或以上交互主体时，不同主体间的语义特征容易发生冲突，导致身份退化、主体混淆或“复制-粘贴”式的生硬拼接效果。
 
@@ -69,7 +69,9 @@ ID-CRAFTER 针对这一瓶颈提出了三个因果性设计，形成协同效应
 
 本文提出 **ID-CRAFTER**，通过三项关键设计协同应对上述挑战：（1）**三阶段层次化身份保持注意力**，逐步分离主体内特征聚合、主体间门控交互和跨模态语义对齐；（2）引入预训练视觉语言模型（VLM）**Qwen2.5-VL-7B-Instruct** 作为语义编码器，将多模态输入转化为空间布局与关系信号；（3）首次将**在线GRPO（群组相对策略优化）**应用于多主体视频生成，利用复合身份-质量奖励直接优化生成策略。三者协同，从注意力结构、语义理解和策略优化三个层面缓解身份与运动的冲突。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ID-CRAFTER 针对多主体视频生成中身份一致性与运动流畅性之间的固有矛盾，提出了三项系统级创新，构成“架构解耦—语义注入—策略优化”的协同管线。
 
@@ -103,7 +105,7 @@ Table 3 显示，在线 GRPO 相比 SFT 基线，FaceSim 从 58.12% 提升至 66
 
 三项创新并非孤立存在，而是形成因果闭环：层次化注意力在架构层面解耦主体特征，为 VLM 语义令牌提供清晰的注入接口；VLM 则将多模态输入转化为可被各注意力阶段消费的空间-语义信号；在线 GRPO 利用复合奖励直接优化端到端生成策略，使架构设计与语义注入的优势在感知层面充分释放。三者协同，从根本上缓解了多主体视频生成中身份保持与运动质量之间的长期冲突。
 
-## 整体框架
+
 
 ID-CRAFTER 的整体 pipeline 围绕一个核心矛盾展开：**在同时保持多个主体的身份一致性与视频时序连贯性时，不同主体间的语义冲突和身份退化**。为解决这一问题，系统将生成过程分解为三个协同阶段：层次化身份保持注意力、VLM 语义编码、以及在线强化学习微调。Figure 2 给出了架构总览。
 
@@ -139,7 +141,7 @@ $$\mathcal{R}_{\mathrm{total}}(\mathbf{V}) = w_{\mathrm{fid}} \mathcal{R}_{\math
 
 训练数据方面，系统采用**策划数据集**替代原始视频-主体配对数据，通过合成跨主体组合与融合示例（Figure 3）增强模型对复杂多主体场景的泛化能力。整个 pipeline 最终输出身份一致、时序连贯且文本对齐的多主体视频。
 
-## 核心模块与公式推导
+
 
 ### 3.1 视频扩散Transformer与Rectified Flow基础
 
@@ -194,7 +196,9 @@ $\mathcal{R}_{\mathrm{aes}}$ 评估美学质量，$\mathcal{R}_{\mathrm{nat}}$ �
 ![[assets/figures/papers/paper_list_l2192_https_arxiv_org_abs_2511_00511/figures/003_Figure_3.jpg]]
 *Figure 3: Data curation pipeline of ID-CRAFTER*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验：OpenS2V-Nexus 基准量化对比
 
@@ -270,7 +274,9 @@ Figure S.13 的人类偏好研究为自动指标提供了主观验证。在身�
 ![[assets/figures/papers/paper_list_l2192_https_arxiv_org_abs_2511_00511/figures/007_Figure_5.jpg]]
 *Figure 5: Qualitative Ablation Study. The left panel highlights the importance of our curated dataset, demonstrating improved coherence and realism in subject integration (e.g., mitigating ‘copy-paste’ artifacts) compared to a model trained without it. Meanwhile, the right panel illustrates the effectiveness of our online reinforcement learning stage, which significantly enhances visual quality and subject consistency*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：多主体视频生成的身份-运动冲突
 
@@ -342,6 +348,8 @@ ID-CRAFTER 在以下场景中展现出显著优势：
 4. **跨域泛化**：ID-CRAFTER 在人物主体上表现突出，但在非人物主体（如动物、物体）上的身份保持能力是否同样有效？层次注意力的设计是否需要对不同主体类型进行调整？
 
 5. **评估体系的完善**：当前评估依赖自动指标和有限的人类偏好研究。建立更全面、独立的多主体视频生成评估基准，涵盖更多维度的质量指标（如主体交互合理性、长期时序一致性），仍是领域内的共同挑战。
+
+
 
 ## 原文 PDF
 

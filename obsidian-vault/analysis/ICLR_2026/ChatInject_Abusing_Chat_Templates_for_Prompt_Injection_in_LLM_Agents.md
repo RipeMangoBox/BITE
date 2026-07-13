@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/ChatInject_Abusing_Chat_Templates_for_Prompt_Injection_in_LLM_Agents.pdf
+project_link: https://hwanchang00.github.io/chatinject_project_page
+code_link: null
 openreview_forum_id: WVhgFSKniL
 aliases:
 - ChatInject
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | ChatInject：利用聊天模板进行LLM代理中的提示注入攻击 |
 | 英文题名 | ChatInject: Abusing Chat Templates for Prompt Injection in LLM Agents |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=WVhgFSKniL); [Project](https://hwanchang00.github.io/chatinject_project_page) |
+| Links | [paper](https://openreview.net/forum?id=WVhgFSKniL) · [Project](https://hwanchang00.github.io/chatinject_project_page) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/planning_control |
 | Method | ChatInject |
 | Dataset | AgentDojo, InjecAgent |
@@ -41,7 +43,7 @@ claims:
 > - InjecAgent 上，平均 ASR（6个开源模型） 为 45.90% (ChatInject)，对比 15.13% (Default InjecPrompt)，变化 +30.77 pp。
 > - InjecAgent 上，ASR on Qwen-3 为 39.4% (InjecPrompt + ChatInject)，对比 8.5% (Default InjecPrompt)，变化 +30.9 pp。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -68,7 +70,7 @@ ChatInject 属于**基于格式的提示注入攻击**，其区别于现有工�
 
 该方法在攻击管道上包含四个模块：恶意载荷生成（使用 GPT-4.1 合成指令或多轮对话）、模板格式化、可选的推理钩子（`<think>` 令牌引导模型肯定性推理）和工具调用钩子（`<tool>` 令牌强制模型执行恶意工具调用）。
 
-## 背景与动机
+
 
 ### LLM代理的安全困境
 
@@ -99,7 +101,9 @@ ChatInject 属于**基于格式的提示注入攻击**，其区别于现有工�
 
 这一攻击范式揭示了LLM代理安全设计中的一个根本性矛盾：模型依赖文本格式来判断指令来源的权威性，但文本格式本身是可被任意伪造的。当攻击者掌握了目标模型的聊天模板结构，基于角色标签的安全隔离便失去了其设计意义上的保护作用。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ChatInject 的核心创新在于**将攻击有效载荷格式化为目标模型的原生聊天模板**，从而将恶意指令伪装为高优先级角色（如系统或用户），绕过 LLM 代理中基于特殊令牌的角色分层安全机制。这一思路源于对瓶颈的精准把握：LLM 代理在训练中习得了对 `<system>`、`<user>` 等角色标签的指令层级服从倾向，而攻击者恰好可以在低优先级的工具返回内容中伪造这些标签，使模型误将注入内容视为权威指令。
 
@@ -130,7 +134,7 @@ ChatInject 的核心创新在于**将攻击有效载荷格式化为目标模型�
 
 现有提示注入攻击多聚焦于语义层面的操纵（如角色扮演、目标劫持），或对特殊令牌进行有限扰动。ChatInject 的独特之处在于**系统性地滥用聊天模板的结构化角色标签作为攻击向量**，将注入攻击从“说服模型”升级为“欺骗模型的对话解析器”。这一思路不仅显著提升了攻击成功率，还揭示了 LLM 代理在架构层面——而非仅在安全对齐层面——存在的根本性漏洞。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_WVhgFSKniL/figures/002_Figure_2.jpg]]
 *Figure 2: Four attack payload variants embedded in the tool response R _ { T _ { u } } , categorized by injection method—plain text (left) vs. forged chat templates with ChatInject (right)—and by content: a pure attacker instruction (top) or multi-turn conversation (bottom). ⊕ denotes line-wise concatenation*
@@ -185,7 +189,7 @@ ChatInject 的攻击流程围绕一个核心因果开关展开：**是否将注�
 
 > **证据强度说明**：上述 pipeline 描述基于论文 Section 3.1–3.3 的明确阐述，所有模块均经过实验验证。四种攻击变体的有效性在 Table 1 中有系统对比，推理钩子和工具调用钩子的增益效果在 Section 4.2 中得到验证。
 
-## 核心模块与公式推导
+
 
 ### 攻击形式化
 
@@ -229,7 +233,9 @@ $$\text{Similarity}(T_M, T_{M'}) = \langle E_M(T_M), E_M(T_{M'}) \rangle$$
 
 其中 $E_M(\cdot)$ 表示通过平均池化并归一化的隐藏状态提取的嵌入向量。由于资源限制，该相似度计算使用轻量级代理模型，可能影响度量的精确性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：聊天模板注入的破坏性效果
 
@@ -315,7 +321,9 @@ ChatInject 的威胁不仅限于已知目标模板的场景。图 3 和表 2 揭
 ![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_WVhgFSKniL/figures/019_Table_8.jpg]]
 *Table 8: ASR and relative change for adopting Claude sytem prompt*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 攻击方法谱系中的定位
 
@@ -354,6 +362,8 @@ ChatInject 的有效性受到以下边界条件的约束：
 3. **更隐蔽的攻击变体**：在真实世界工具交互的开放式场景中，攻击者能否利用更隐蔽的模板伪造技术（如 Unicode 变形、编码混淆）绕过基于模式匹配的检测？同形字编码的失败表明表征层面的检测可能更鲁棒，但攻击者也可能针对性地优化嵌入相似度。
 
 4. **根本性修复**：能否通过强化指令层级训练（instruction hierarchy training）或模板感知的安全微调，从根本上消除模型对伪造角色标签的脆弱性？这需要模型在训练阶段就学会区分真实角色标签和工具返回内容中的伪造标签，而非仅依赖提示级防护。
+
+
 
 ## 原文 PDF
 

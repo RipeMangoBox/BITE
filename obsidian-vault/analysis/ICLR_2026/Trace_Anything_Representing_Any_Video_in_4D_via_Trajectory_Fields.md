@@ -34,7 +34,7 @@ claims:
 | 中文题名 | Trace Anything：通过轨迹场对任意视频进行四维表示 |
 | 英文题名 | Trace Anything: Representing Any Video in 4D via Trajectory Fields |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=BqaChqppVh) · [arXiv](https://arxiv.org/abs/2507.13347) |
+| Links | [paper](https://openreview.net/forum?id=BqaChqppVh) · [paper](https://arxiv.org/abs/2507.13347) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction #topic/benchmarks_datasets_evaluation |
 | Method | Trace Anything |
 | Dataset | Trace Anything benchmark, TAPVid-3D |
@@ -44,7 +44,7 @@ claims:
 > - Trace Anything benchmark (image-pair) 上，EPE_mix 0.135 vs 0.175 (POMATO*) (-22.9%)。
 > - TAPVid-3D (3D tracking) 上，APD_3D (ADT subset) 20.5 vs 18.3 (SpaTracker) (+12.0%)。
 
-## 概述
+## 概要
 
 动态场景理解是计算机视觉的核心难题，其关键挑战在于**如何高效、统一地表示视频中每个像素在三维空间中的运动轨迹**。现有主流方法普遍采用“逐帧重建 + 后验对应”的范式：先估计每帧的深度图或三维点云，再借助光流或二维点跟踪器建立跨帧对应关系，最后通过全局优化将各帧对齐到统一坐标系。这一流程不仅步骤繁琐、误差累积严重，而且依赖多个独立模块（深度估计器、光流网络、全局对齐求解器），导致推理效率低下，泛化能力受限。
 
@@ -57,7 +57,7 @@ claims:
 
 **方法定位：** Trace Anything 处于动态三维重建、点跟踪与运动表示的交叉点。与 **CoTracker3+VGGT**（先二维跟踪再提升至三维）和 **SpaTrackerV2**（前馈式稀疏三维点跟踪）不同，Trace Anything 直接预测密集的、参数化的连续三维轨迹，不依赖外部深度估计或二维跟踪器。相较于 **MonsT3R**、**St4RTrack** 和 **POMATO** 等动态重建方法，它以轨迹场替代逐帧点云加后验对应，从根本上简化了动态场景的表示与推理流程。
 
-## 背景与动机
+
 
 ### 动态场景建模的核心瓶颈
 
@@ -94,7 +94,9 @@ Trace Anything 处于动态三维重建、点跟踪和视频深度估计三个�
 
 这一设计使得 Trace Anything 在自建轨迹场基准上以 **EPE_mix 0.234** 超越最佳基线 **St4RTrack***（0.264），同时推理时间仅需 **2.3 秒**，比后者的 21.7 秒快近 10 倍（Table 1）。在图像对输入场景下，该方法同样以 **EPE_mix 0.135** 显著优于 **POMATO*** 的 0.175（Table 2），展示了从稀疏观测重建稠密运动的能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈与因果杠杆
 
@@ -138,7 +140,7 @@ $$\mathbf{x}_{i,u,v}(t) = \sum_{k=0}^{D-1} \mathbf{P}_{i,u,v}^{(k)} \phi_k(t)$$
 
 上述创新点的核心证据（Table 1 的精度与速度对比、Table 3 的消融实验）置信度较高（0.95–0.98），但需注意：Trace Anything 使用自建的合成数据集（10K+ 视频）进行训练，而部分基线使用了额外的 Kubric、ScanNet 或真实标注数据，这可能影响性能对比的公平性。此外，参数曲线受限于控制点数量，对于高频往复运动或极长序列，表达能力可能下降，这是该表示的内在局限。
 
-## 整体框架
+
 
 Trace Anything 的整体流水线遵循“一次前馈，全局推理”的设计原则，将任意长度的视频帧序列直接映射为密集的轨迹场，无需额外的深度估计器、光流计算或迭代式全局对齐。其核心架构由四个级联模块构成：**图像编码器（Image Encoder）**、**融合 Transformer（Fusion Transformer）**、**控制点预测头（Control Point Head）** 以及 **曲线求值模块（Curve Evaluation）**，整体结构见 Figure 3。
 
@@ -161,7 +163,7 @@ $$\mathbf{x}_{i,u,v}(t) = \sum_{k=0}^{D-1} \mathbf{P}_{i,u,v}^{(k)} \phi_k(t)$$
 
 > **需注意**：论文未详细披露融合 Transformer 的具体层数、注意力头数及 token 维度等架构超参数，上述描述基于 Section 3.2 和 Figure 3 的公开信息。如需完整的网络规格，建议查阅补充材料或代码仓库。
 
-## 核心模块与公式推导
+
 
 Trace Anything 的核心思想是将视频建模为一个**轨迹场（Trajectory Field）**——一种从帧索引与像素坐标到连续三维轨迹的密集映射。该映射由四个关键模块串联实现：图像编码器、融合 Transformer、控制点预测头以及 B 样条曲线求值器。以下逐一展开其设计逻辑与关键公式。
 
@@ -210,7 +212,9 @@ $$\mathcal { L } _ { \mathrm { t r a j - c o n f } } = \frac { 1 } { | \Omega | 
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_BqaChqppVh/figures/011_Figure.jpg]]
 *Figure: A: 2D Example illustrating D control points and N frame evaluations. A parametric curve (blue) defined by D = 4 control points (black squares) is evaluated at N = 6 timestamps corresponding to video frames (red dots)*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能：视频轨迹场估计
 
@@ -286,7 +290,9 @@ Trace Anything 在自建轨迹场基准上全面超越现有方法。**Table 1**
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_BqaChqppVh/figures/010_Figure_8.jpg]]
 *Figure 8: Spatio-temporal fusion. The trajectory field can be leveraged to fuse observations of the dynamic entity across different frames into a canonical frame*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 
@@ -321,6 +327,8 @@ Trace Anything 的适用边界由其设计选择和技术特性共同决定。
 ### 4. 知识库定位
 
 Trace Anything 在知识库中的定位可概括为：**首次将密集轨迹场确立为视频的四维表示原语**。它连接了三个原本相对独立的研究方向——动态三维重建、三维点跟踪和参数曲线建模——并在交叉点上提出了统一的解决方案。其核心贡献不在于单项技术的突破，而在于表示范式的转换：将“重建后跟踪”的多阶段流水线压缩为“轨迹即表示”的单阶段前馈推理。这一转换使 Trace Anything 成为后续研究（如轨迹场驱动的神经渲染、机器人操作规划）的基础设施级工作，其自建基准和开源代码（如有）将为该方向的标准化评估提供支撑。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/AC_Foley_Reference_Audio_Guided_Video_to_Audio_Synthesis_with_Acoustic_Transfer.pdf
+project_link: null
+code_link: null
 aliases:
 - AF
 - AC-Foley
@@ -41,7 +43,7 @@ claims:
 > - VGGSound test set 上，MCD (↓) 为 11.37，对比 14.63 (MMAudio+CLAP)，变化 -3.26 (-22.3%)。
 > - VGGSound test set 上，DeSync (↓) 为 0.465，对比 0.558 (MMAudio+CLAP)，变化 -0.093 (-16.7%)。
 
-## 概述
+## 概要
 
 现有视频到音频生成方法大多依赖文本提示控制音效语义，但文本无法精确描述冲击瞬态、共振衰减等微声学特征，加之训练数据的粗粒度标注（如将所有狗叫声统一标为"barking"），导致生成结果难以体现创作者要求的细粒度音色变体。针对这一瓶颈，本文提出 **AC‑Foley**，一种以参考音频为直接控制信号的条件视频到音频合成框架，通过保留完整频谱/音色签名和两阶段课程训练，实现声学迁移：既忠于参考音频的音色、音质，又与画面事件严格同步。
 
@@ -49,7 +51,7 @@ claims:
 
 在 VGGSound 测试集上，AC‑Foley 与同架构的音频条件基线 MMAudio+CLAP 相比，分布匹配指标 FD_PaSST 从 64.90 降至 **56.00**（↓13.7%），声学失真 MCD 从 14.63 降至 **11.37**（↓22.3%）；用户研究显示，其对纯视觉‑文本方法 MMAudio‑L‑V2 的声学保真度赢率达 **83.5%**。消融实验进一步证实，两阶段训练是实现非复制式声学迁移的关键（FD_PaSST 从仅重叠条件的 80.07 骤降 30.1%），而同步条件与音频条件分别负责时序对齐和音质控制，二者不可偏废。该方法还支持跨音源音色迁移和零样本生成，展现了灵活的音效创作能力。
 
-## 背景与动机
+
 
 自动生成与无声视频时空同步、听觉逼真的音效（Foley）是影视制作、游戏开发和虚拟现实等领域的关键需求。近期的视频到音频合成方法主要依赖文本提示作为语义控制信号，将视频帧与自然语言描述联合送入生成模型。然而，文本作为控制接口存在根本性的粒度限制：它几乎无法刻画声音的微声学特征，例如冲击瞬态的尖锐程度、材质共振的衰减模式、或音色的细微差别。训练数据的标注粗糙化进一步加剧了这一问题——在常用数据集中，所有犬吠声通常被统一归类为"barking"，这使得模型没有能力区分吉娃娃尖细的叫声与大型犬低沉的咆哮，更无法根据创作者的意图生成指定变体。因此，现有工作本质上难以实现对输出声音细粒度、可定制的声学控制，产生了"语义正确但听觉偏离目标"的严重缺口。
 
@@ -57,7 +59,9 @@ claims:
 
 综上，本文的动机在于打破文本控制的上限，构建一个能够跟随音频样例进行声学迁移的视频到音频生成框架。其技术核心在于通过保留完整声学特征的编码方式与两阶段课程设计，使模型既能精确提取参考音频中的声学细节，又能灵活适配到新的视觉时序中，最终生成既忠于参考音色又与画面严格同步的声音。该框架同时兼容文本描述和同步信号，通过多模态条件融合（Equation 3）共同引导生成过程，为可控的细粒度音效合成提供了新的范式。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 现有视频到音频生成方法的核心瓶颈在于：文本提示无法刻画微声学特征（如冲击瞬态、衰减共振），且训练数据将不同犬种叫声统统标为"barking"，导致生成结果差异性不足。AC‑Foley 的解决方案是 **以参考音频自身作为直接控制条件**，并通过 **两阶段训练策略** 与 **多模态同步融合** 两个关键设计解耦"声学复制"与"场景泛化"的矛盾。
 
@@ -93,7 +97,7 @@ $$\operatorname{adaLN}(f, c) = \mathrm{LayerNorm}(f) \cdot \mathbf{W}_{\gamma}(c
 
 上述三个模块的协同作用在综合评估中体现为显著优势：在 VGGSound 测试集上，AC‑Foley 面向音频条件的基线 MMAudio+CLAP 取得 **FD_PaSST 降低 13.7%、MCD 降低 22.3%**（Table 1）；且以 83.5% 的赢率在人工声学保真度判断中碾压最强视觉‑文本基线 MMAudio‑L‑V2（Table 3）。即使在未参与训练的 Greatest Hits 数据集上进行跨域音色迁移，仍以 **Onset Acc 0.3948 vs. 0.3906** 超越专门训练于该数据集的 CondFoley（Table 2），显示出两阶段训练赋予的强泛化性。这些证据共同证实：以音频自身为条件、结合渐进式课程训练与多模态同步融合，是当前视频到音频生成中实现细粒度可控、时序高对齐的核心创新路径。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0005_URPXhnWdBF_AC-Foley_Reference-Audio-Guided_Video-to-Audio_S/figures/004_Figure_2.jpg]]
 *Figure 2: Overview of our method. Different modalities (video, text, and audio) jointly interact in the multimodal transformer network. Multimodal conditioning with audio injects semantic, temporal and acoustic information for more precise control*
@@ -124,7 +128,7 @@ $$
 
 训练时，AC‑Foley 采用两阶段课程学习策略来解决"复制粘贴"与泛化的矛盾：**第一阶段**从与目标音频重叠的片段中随机抽取 2 秒作为参考条件，强制模型提取细粒度声学特征；**第二阶段**切换为非重叠的尾部 2 秒作为条件，迫使模型利用视频内的声学自相似性进行泛化，从而在不牺牲时序同步的前提下实现可控的音色迁移与细粒度声音生成。
 
-## 核心模块与公式推导
+
 
 ### 核心机制
 
@@ -179,7 +183,9 @@ $$
 
 消融实验显示，移除同步条件（w/o sync）使 DeSync 从 0.465 升至 1.240，严重破坏时间对齐；而去掉音频条件虽略微改善时序，却使 FD_PaSST 从 56.00 升至 64.90。这表明**同步条件负责时序对齐，音频条件负责音质与声学保真度，二者不可相互替代**。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 AC‑Foley 以参考音频自身作为声学控制信号，绕过了文本语义模糊性对微声学特征（冲击瞬态、共振衰减等）的描述局限。以下实验系统验证了该设计对生成声音的音色保真度、时序同步性及跨场景泛化能力的提升，并进一步通过消融实验揭示各组件间的因果分工。
 
@@ -246,7 +252,9 @@ AC‑Foley **未使用** Greatest Hits 参与训练，仅在 VGGSound 上训练�
 *Figure 3: Illustration of the two-stage training process for audio generation. (a) Stage I: Overlapping Conditioning. The random 2 seconds of the 8-second target audio are used as the conditional audio, allowing the model to learn the utilization of acoustic features from overlapping audio segments. (b) Stage II: Non-overlapping Conditioning. The non-overlapping last 2 seconds of the 10-second video clip are used as the conditional audio, leveraging inherent audio self-similarity within the video to enhance model generalization*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 在视频到音频生成谱系中的定位
 
@@ -282,6 +290,8 @@ AC‑Foley 的核心创新在于将控制信号从**语义层级**下推至**声
 **跨域泛化的上限。** AC‑Foley 在 Greatest Hits（敲击类声音）上的成功是否可推广至持续音（如引擎轰鸣、风声）和非刚性材质交互（如布料摩擦、液体倾倒）？敲击类声音具有明确的瞬态起始点，易于检测和建模；持续音和柔性材质交互的声学特征更依赖长期频谱演化，对当前基于单样本参考的编码方式提出了不同挑战——该方向需要在更广泛的数据集（如 AudioSet 的细分类别或专业音效库）上进行系统性评估。
 
 **多声道空间音频扩展。** 当前方法生成单声道音频，如何将参考音频控制扩展至空间音频（如环绕声、双耳音频）是一个自然延伸。这需要额外的空间条件（如声源方位角、房间脉冲响应），且参考音频本身需携带空间信息，架构复杂度将显著增加。
+
+
 
 ## 原文 PDF
 

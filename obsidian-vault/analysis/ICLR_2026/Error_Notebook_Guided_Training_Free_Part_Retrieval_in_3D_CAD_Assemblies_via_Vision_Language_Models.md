@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Error_Notebook_Guided_Training_Free_Part_Retrieval_in_3D_CAD_Assemblies_via_Vision_Language_Models.pdf
+project_link: null
+code_link: null
 openreview_forum_id: JMweItBmbx
 aliases:
 - ENRFPR
@@ -41,7 +43,7 @@ claims:
 > - Self-generated dataset 上，Accuracy (%) 为 48.3 (w/ E-Notebook)，对比 28.5 (w/o E-Notebook)，变化 +19.8。
 > - Human preference dataset 上，Accuracy (%) 为 35.4 (w/ E-Notebook)，对比 19.3 (w/o E-Notebook)，变化 +16.1。
 
-## 概述
+## 概要
 
 在三维CAD装配体中，基于自然语言规范检索特定部件是一项实用但极具挑战的任务。其核心瓶颈在于：装配体的结构化元数据序列极长（常超出通用视觉语言模型的token限制），且采用非自然语言格式，导致模型难以捕捉部件间细粒度的空间与功能关系，尤其在多部件复杂装配体中表现不佳。
 
@@ -53,7 +55,7 @@ claims:
 
 值得注意的是，该方法仍存在局限性：构建错误笔记本需依赖高性能专有VLM并进行多次调用，带来一次性计算开销；对于超过50个部件的高复杂装配体，绝对准确率仍然较低（最高约21%）；此外，其在不同CAD格式或领域的泛化性尚待验证。
 
-## 背景与动机
+
 
 ### 问题背景：CAD 装配体中的部件检索
 
@@ -73,7 +75,9 @@ claims:
 
 基于这一动机，本文提出了 **Error Notebook（错误笔记本）+ RAG 框架**。该方法通过构建一个由 VLM 自我修正生成的正确推理轨迹库（即错误笔记本），并在推理阶段利用检索增强生成（RAG）动态检索与当前查询最相关的修正案例作为少样本示例，引导模型逐步反思与修正错误。实验表明，该方法使 GPT-4o 在人类偏好数据集上的准确率从 41.7% 提升至 65.1%（+23.4 个绝对百分点），验证了“从错误中学习、无需训练”这一范式的有效性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作提出 **Error Notebook + RAG** 框架，核心创新在于将 VLM 的错误推理转化为可复用的修正知识，通过检索增强生成实现训练自由（training-free）的推理能力跃升。以下从三个关键“变更槽”（changed slots）展开分析。
 
@@ -103,7 +107,7 @@ Error Notebook 的质量直接影响 RAG 检索的有效性。本方法引入 **
 
 **创新本质总结**：Error Notebook + RAG 框架将 VLM 的“犯错—反思—修正”过程系统化为可检索、可迁移的推理知识，配合语法约束验证和二阶段描述流水线，在不进行任何模型微调的前提下，实现了对训练自由基线（标准少样本 26.6%、自一致性 38.9%）的显著超越（48.3%）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_JMweItBmbx/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the (a) dataset construction pipeline and (b) Error Notebook + RAGbased inference process. (a) For each assembly, a VLM is used to generate concise and discriminative natural language descriptions for every part. Subsequently, the model generates assembly-level specification sentences describing the required relationship. To support human annotation, the specified parts are merged and visualized as a CAD model image. (b) Following the 1st VLM, at the 2nd stage, given the assembly specification, the system retrieves the most relevant examples from the Error Notebook according to the assembly specification, incorporates these as few-shot exemplars, and then performs step-by-step r...*
@@ -153,7 +157,7 @@ $$R = f_{\mathrm{rag}}(F, \mathcal{T}_{\mathrm{assembly}}, \mathcal{D}, S, \math
 
 消融实验揭示了两个关键设计因素。首先，**二阶段流水线本身**已显著优于直接基于图像推理的基线：在总体准确率上，二阶段流水线达到 33.6%，而仅图像推理仅为 15.0%（图 A.2），验证了部件描述作为中间语义表示的有效性。其次，**错误笔记本中 CoT 推理轨迹的存在**比示例数量更为关键：对于复杂装配体（10-50 部件），包含 CoT 推理的示例始终优于仅含最终答案的示例（图 A.1），而将示例数量从 1 增加至 50 仅带来约 3 个百分点的边际增益（表 2）。这表明框架的性能瓶颈在于修正推理轨迹的质量（由 GC 验证器确保）和检索相关性，而非示例规模。
 
-## 核心模块与公式推导
+
 
 ### 两阶段 VLM 推理流水线
 
@@ -221,7 +225,9 @@ $$R = f_{\mathrm{rag}}(F, \mathcal{T}_{\mathrm{assembly}}, \mathcal{D}, S, \math
 
 默认检索示例数 $k=2$。消融实验揭示了一个关键发现：增加检索示例数量对最终准确率影响较小（Non-CoT 组：1 示例 49.4% vs 50 示例 52.7%），真正驱动性能提升的核心因素是错误笔记本本身的存在（Table 2）。对于高部件数量的复杂装配体（10-50 部件），包含 CoT 推理的示例始终优于仅含最终答案的示例（Figure A.1），表明逐步推理轨迹对困难案例尤为关键。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现
 
@@ -294,7 +300,9 @@ Token 级别 Jaccard 相似度检索器在自生成数据集上比字符级别�
 ![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_JMweItBmbx/figures/013_Figure_6.jpg]]
 *Figure 6: Figure A.2: Accuracy comparison between proposed pipeline and image-only reasoning. Performance is shown for the proposed pipeline, which leverages part descriptions as intermediate references, versus the one that directly reasons over images*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位与核心瓶颈
 
@@ -352,6 +360,8 @@ Token 级别 Jaccard 相似度检索器在自生成数据集上比字符级别�
 - **跨领域迁移潜力**：Error Notebook 的核心思想——记录并检索修正后的推理轨迹作为少样本示例——理论上可迁移至任何需要逐步推理的 VLM 任务。其在 CAD 装配体之外的表现是一个值得探索的方向。
 
 - **提示长度与推理质量的平衡**：如何在检索更多相关示例与保持提示简洁之间取得最优平衡，是一个尚未被系统解决的工程问题。
+
+
 
 ## 原文 PDF
 

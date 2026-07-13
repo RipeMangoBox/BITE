@@ -5,6 +5,7 @@ paper_level: A
 venue: SGP
 year: 2025
 pdf_ref: paperPDFs/SGP_2025/The_Affine_Heat_Method.pdf
+code_link: null
 project_link: https://www.yousufsoliman.com/projects/the-affine-heat-method.html
 aliases:
 - AHMAAA
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 仿射热方法 |
 | 英文题名 | The Affine Heat Method |
 | 会议/期刊 | SGP 2025 |
-| Links | [paper](https://www.yousufsoliman.com/projects/download/AffineHeatMethod.pdf); [Project](https://www.yousufsoliman.com/projects/the-affine-heat-method.html) |
+| Links | [paper](https://www.yousufsoliman.com/projects/download/AffineHeatMethod.pdf) · [Project](https://www.yousufsoliman.com/projects/the-affine-heat-method.html) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | Affine Heat Method (AHM, 局部变体 AHM_ℓ 与自适应变体 AHM_a) |
 | Dataset | 多个三维模型 (Fig. 2), S^2 球面序列网格, 网格数据集 (Fig. 22), 复杂网格 (Fig. 20) |
@@ -42,7 +43,7 @@ claims:
 > - S^2 球面序列网格 上，对数映射 L^2 误差 为 线性收敛速率 O(h)，变化 O(h)。
 > - 网格数据集 (Fig. 22) 上，单次求解耗时 为 AHM_ℓ 比 VHM_log 慢 27%；AHM_a 慢 70%，对比 VHM_log，变化 +27% / +70%。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -78,7 +79,7 @@ claims:
 
 仿射热方法属于基于热扩散的几何处理方法的谱系，是对向量热方法（VHM）的直接推广。其核心创新在于将连接从仅含旋转的 Levi-Civita 连接扩展为包含平移的仿射连接，从而将原本需要多步分离计算的对数映射任务统一为单次扩散求解。该方法在概念上与离散指数映射（DEM）和平滑指数映射（SEM）等显式追踪方法形成对比——后者依赖沿网格边或面的逐步传播，容易累积误差。
 
-## 背景与动机
+
 
 ### 对数映射：测地距离与方向的统一编码
 
@@ -122,7 +123,9 @@ $$\overline{\nabla} := d - \begin{pmatrix} 0 & \mathrm{id} \\ 0 & 0 \end{pmatrix
 
 在平面域上，AHM 可精确恢复恒等参数化至浮点精度（Lemma 3），这一性质是现有热扩散方法所不具备的。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈与突破：从纯旋转连接到仿射连接
 
@@ -173,7 +176,7 @@ $$\overline{\nabla}^{\Phi} := d - \begin{pmatrix} 0 & \Phi \\ \Phi \circ \mathrm
 - **向量热方法谱系**：直接回应 **VHM_log**（Sharp et al., ACM Trans. Graph. 2019）的局限——VHM_log 仅用向量扩散近似平行传输，再通过数值微分提取距离；AHM 通过在连接中编码平移，将两步合并为一步，消除了数值微分引入的误差。
 - **指数映射方法谱系**：相对于 **DEM**（Schmidt et al., ACM Trans. Graph. 2006）的显式径向追踪和 **SEM**（Herholz and Alexa, Comp. Graph. Forum 2019）的分离角度扩散，AHM 提供了统一的 PDE 框架，在切割轨迹附近保持角度坐标的平滑性。
 
-## 整体框架
+
 
 仿射热方法（Affine Heat Method, AHM）从一个核心洞察出发：在齐次坐标下，欧几里得运动（旋转+平移）可统一表示为线性变换。将这一思想注入连接拉普拉斯算子的构造中，使得短时热扩散能够**直接同时编码从源点出发的测地线方向与距离**，从而绕过了现有方法（如 VHM_log、SEM）中分离计算角度分量或不精确数值微分带来的精度损失。
 
@@ -242,7 +245,7 @@ $$(\mathsf{M} + \tau \mathsf{L}^{\nabla}) \binom{\mathsf{Y}}{\lambda} = \binom{0
 ![[assets/figures/papers/paper_list_l34_https_www_yousufsoliman_com_projects_download_AffineHeatMethod_pdf/figures/002_Figure_2.jpg]]
 *Figure 2: Metric Distortion. Compared with prior methods V H M _ { l o g } \ : l S S C I 9 \ : l , , SEM [HA19], and DEM [SGW06] (bottom row), both variants of our affine heat method produce parameterizations with dramatically less metric distortion (D) (Eqn. 18). We remark that our parameterizations are isometric at the source, just as the logarithmic map is in the smooth setting*
 
-## 核心模块与公式推导
+
 
 ### 核心思想：从向量热到仿射热
 
@@ -321,7 +324,9 @@ $$\Phi_{\nu} := \mathbf{x}_{\nu} / \lambda_{\nu}$$
 
 **边界行为**：由于热核的短时渐近展开不受边界强烈影响，AHM 在边界处自然实现正确的测地距离行为（Figure 4），与 Signed Heat Method（FC24）一致。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能对比：度量畸变
 
@@ -391,7 +396,9 @@ AHM 的有效性在多个应用中得到了验证：
 
 所有对比实验均采用相同的内在 Delaunay 三角剖分和相同的扩散时间步长 $\tau = h^2$（$h$ 为平均边长），确保了比较的公平性。VHM_log 和 SEM 也采用了内在 Delaunay 三角剖分以提升其基线性能。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题瓶颈与现有方法
 
@@ -436,6 +443,8 @@ AHM 的有效性在多个应用中得到了验证：
 3. 能否将仿射热方法推广到计算任意仿射连接（非仅度量定义的最短测地线）对应的对数映射？
 4. 如何开发直观的控制器，使得测地线概念可超出共形等价度量进行修改？
 5. 如何自动确定用于分片 UV 平面化的源点最优配置？
+
+
 
 ## 原文 PDF
 

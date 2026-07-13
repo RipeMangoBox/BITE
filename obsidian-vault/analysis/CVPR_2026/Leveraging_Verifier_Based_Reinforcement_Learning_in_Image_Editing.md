@@ -43,7 +43,7 @@ claims:
 > - EditRewardBench (public) 上，Accuracy 78.2% (RL-RRM 7B) vs 65.9% (EditScore 7B) (+12.3%)。
 > - GEdit-Bench-EN (FLUX.Kontext family) 上，Overall Score (O) 6.24 (RL w. RL-RRM 7B) vs 5.77 (FLUX.Kontext) (+0.47)。
 
-## 概述
+## 概要
 
 图像编辑任务要求模型精确理解并执行复杂的编辑指令，然而，现有的奖励模型（Reward Model）普遍采用整体打分范式，仅输出一个标量分数，无法解释模型在哪些具体指令要求上成功或失败。这种粗粒度反馈不仅容易产生有偏甚至幻觉性的奖励信号，也严重阻碍了基于人类反馈的强化学习（RLHF）在图像编辑领域的有效应用。
 
@@ -58,7 +58,7 @@ claims:
 
 消融实验进一步揭示：SFT 阶段同时保留“思考”（Think）与“验证”（Verify）模块可获得最优性能；GCPO 在仅使用约 1 万人类偏好对（不到 SFT 数据的 1%）的情况下，仍能稳定提升约 4.9 个百分点，说明增益主要来源于人类对齐质量而非数据量；模型从 3B 扩展至 7B 时呈现出良好的可扩展趋势。此外，RL-RRM 作为奖励信号比仅 SFT 的 RRM 更为严格和鲁棒，能有效纠正编辑模型在微调中产生的幻觉问题（如错误修改未指定的属性）。
 
-## 背景与动机
+
 
 图像编辑任务要求模型在保留源图像无关区域的同时，精确执行用户指令所描述的局部修改。近年来，随着扩散模型和流匹配模型的快速发展，图像编辑的生成质量取得了显著进步。然而，**编辑结果与人类意图之间的精确对齐**仍然是一个核心挑战——模型常常出现属性泄露（如修改衬衫颜色时意外改变帽子颜色）、指令遵循不完整，或生成不符合物理规律的视觉伪影。
 
@@ -80,7 +80,9 @@ Edit-R1 的提出源于一个关键洞察：**编辑指令天然可分解为一�
 
 基于这一洞察，Edit-R1 将奖励模型从“整体打分器”重构为“推理验证器”：它首先将编辑指令分解为可验证的原则集合，然后对每条原则逐一进行链式思维推理和核验，最终聚合为结构化、可解释的细粒度奖励。这一范式转变使得奖励信号不仅更准确地对齐人类偏好，还能为下游编辑模型的优化提供可操作的反馈。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Edit-R1 的核心创新在于对图像编辑奖励模型进行了**范式级重构**，将奖励信号从不可解释的整体打分器升级为可推理、可验证的细粒度评估器，并以此为基础构建了完整的编辑模型强化学习优化闭环。具体而言，该方法在以下三个关键维度上实现了突破。
 
@@ -105,7 +107,7 @@ Edit-R1 为推理奖励模型设计了独特的两阶段训练流程，以同时
 
 从奖励模型的设计谱系来看，Edit-R1 的 RRM 是目前唯一同时具备以下三项推理增强特性的图像编辑奖励模型：**显式使用可验证原则（as verifier）**、**链式思维推理（thinks）**、**强化学习对齐（RL）**。相较于仅依赖 VLM 整体评分的 Seed-1.5-VL、Seed-1.6-VL，以及编辑专用的 EditScore，Edit-RRM 在建模范式上实现了从“评分”到“验证”的跨越。在训练策略上，相较于传统的单一阶段 SFT，Edit-R1 引入的 GCPO 算法通过组间对比机制有效利用了人类偏好数据，为奖励模型的 RL 训练提供了新的范式参考。
 
-## 整体框架
+
 
 Edit-R1 的整体框架围绕一个核心组件——**基于验证器的推理奖励模型（Verifier-based Reasoning Reward Model, RRM）**——构建，并将其作为下游图像编辑模型强化学习的训练信号。该框架包含三个逻辑阶段：（1）将编辑指令分解为可独立验证的原则集合；（2）通过冷启动监督微调（SFT）与群体对比偏好优化（GCPO）两阶段训练，得到一个能生成可解释、细粒度奖励的 RRM；（3）利用训练好的 RRM 作为非可微奖励信号，通过 GRPO 算法优化下游编辑模型。
 
@@ -163,7 +165,7 @@ $$A_i = \frac{\tau_i - \mathrm{mean}(\{\tau_i\})}{\mathrm{std}(\{\tau_i\}) + \ep
 ![[assets/figures/papers/paper_list_l2690_https_arxiv_org_abs_2604_27505/figures/001_Figure_1.jpg]]
 *Figure 1: Our framework: from verifier-based reasoning reward model (RRM) to downstream. (a) Verifier as a reasoning reward model. The RRM decomposes an instruction into verifiable principles and scores an edited image against them in a single pass. (b) Reward benchmark performance. Our final 7B model, trained with SFT and GCPO (RL-RRM), reaches 82.22% accuracy, surpassing the Seed-VLM baseline. Each training component contributes to the performance gain. (c) Downstream application. Using our 7B RL-RRM as a reward signal significantly improves the performance of FLUX.Kontext [5] across multiple editing categories during post-training*
 
-## 核心模块与公式推导
+
 
 ### 两阶段奖励模型训练管线
 
@@ -215,7 +217,9 @@ $$A_i = \frac{\tau_i - \mathrm{mean}(\{\tau_i\})}{\mathrm{std}(\{\tau_i\}) + \ep
 ![[assets/figures/papers/paper_list_l2690_https_arxiv_org_abs_2604_27505/figures/010_Figure_5.jpg]]
 *Figure 5: Illustration of the Verifier-based Reasoning Reward Model (RRM) inference process. (a) shows the input quadruple, which includes the source image, the edit instruction, and the decomposed principles for evaluation. (b) shows the final summary output from the RRM, containing the score for each principle and the final comprehensive score for the edited image*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 奖励模型评估
 
@@ -276,7 +280,9 @@ $$A_i = \frac{\tau_i - \mathrm{mean}(\{\tau_i\})}{\mathrm{std}(\{\tau_i\}) + \ep
 ![[assets/figures/papers/paper_list_l2690_https_arxiv_org_abs_2604_27505/figures/016_Figure.jpg]]
 *Figure: Source Winner Loser*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与奖励模型基线的对比定位
 
@@ -329,6 +335,8 @@ Edit-R1 开辟了基于验证器的推理奖励模型新范式，以下开放问
 - **推理效率与准确率的权衡**：RRM 的 CoT 推理长度与评估准确率之间存在何种量化关系？是否存在更高效的推理格式（如结构化 JSON 输出）或推理压缩策略，在保持可解释性的同时降低推理成本？
 
 - **从验证到生成的可解释性传递**：RRM 内部已具备对编辑结果逐原则验证的能力，如何将这种结构化验证信号反馈到编辑模型的生成过程中，使编辑模型本身具备可解释、可控的编辑能力，是提升系统整体透明度的关键方向。
+
+
 
 ## 原文 PDF
 

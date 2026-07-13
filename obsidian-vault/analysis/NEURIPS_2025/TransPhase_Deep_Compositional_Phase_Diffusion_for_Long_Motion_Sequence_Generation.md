@@ -5,6 +5,8 @@ paper_level: A
 venue: NEURIPS
 year: 2025
 pdf_ref: paperPDFs/NEURIPS_2025/TransPhase_Deep_Compositional_Phase_Diffusion_for_Long_Motion_Sequence_Generation.pdf
+project_link: null
+code_link: https://github.com/asdryau/TransPhase
 aliases:
 - CPDT
 - TransPhase
@@ -42,7 +44,7 @@ claims:
 > - Compositional Motion Pair Generation 上，Overall MMD 4.711 vs best baseline: MDM-30 4.923; TEACH 4.821; PCMDM 5.423; priorMDM 5.025 (优于所有基线)。
 > - Long-term Motion Generation (3164 texts, 168 min) 上，Overall FID 0.847 vs best baseline: TEACH 1.780; PCMDM 0.876; priorMDM 1.536 (优于所有基线)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -75,7 +77,7 @@ TransPhase 首次将周期性相位表征与扩散模型结合，在统一的相
 
 当前框架依赖两片段对的训练监督，对三个以上连续语义片段的组合或非相邻片段间的相位传播尚未充分验证。相位混合权重 $r$ 由启发式三次曲线定义，缺乏数据驱动的自适应机制。此外，模型在更大规模运动数据集（如 AMASS）上的泛化能力仍需检验。未来工作可探索基于分数或势能的扩散变体、可学习的相位混合参数，以及与物理约束（如 PhysDiff）的结合。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -101,7 +103,9 @@ TransPhase 首次将周期性相位表征与扩散模型结合，在统一的相
 
 这一设计的关键洞察在于：**在周期性相位潜空间内进行双条件并行扩散，可以同步实现语义对齐和相位平滑过渡**，从根本上解决原始空间中过渡建模的局限性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 1. 瓶颈洞察：从原始空间组合到相位动态断裂
 
@@ -150,7 +154,7 @@ TransPhase 的模块化设计使其可**线性扩展**：每增加一个运动�
 - **混合权重的启发式设计**：$r = (k/K)^3$ 虽经消融验证有效，但缺乏数据驱动或任务感知的自适应机制，可能非全局最优。
 - **数据集泛化性**：所有实验基于 BABEL-TEACH 数据集，在 AMASS 等更大规模运动数据集上的表现需进一步检验。
 
-## 整体框架
+
 
 TransPhase 框架的核心设计动机源于一个关键瓶颈：现有运动生成模型在组合多个语义片段时，直接在原始运动空间建模，忽略了运动内在相位的动态连续性，导致过渡区域频繁出现脚滑动、突然转向等突兀伪影。为解决这一问题，框架将可变长运动片段统一编码到**周期性相位潜空间**中，并通过双条件并行扩散机制，在去噪过程中同步实现语义对齐与相位平滑过渡。
 
@@ -189,7 +193,7 @@ TransPhase 的模块化设计支持线性扩展至多种任务场景（如图 Fi
 
 所有 SPDM 和 TPDM 均以 $\epsilon$-模型实现，训练过程遵循标准扩散框架的 L1 损失。这种统一的相位潜空间表征与双条件扩散机制的协同，构成了 TransPhase 在组合运动生成、运动内插和长时生成三大任务上取得一致优越性能的架构基础。
 
-## 核心模块与公式推导
+
 
 TransPhase 框架由三个核心模块构成：**动作中心周期性自编码器（ACT-PAE）**、**语义相位扩散模块（SPDM）** 和 **过渡相位扩散模块（TPDM）**。三者协同工作，在统一的相位潜空间内完成语义对齐与过渡平滑的双重目标。
 
@@ -254,7 +258,9 @@ $$
 ![[assets/figures/papers/paper_list_l1920_TransPhase_Deep_Compositional_Phase_Diffusion_for_Long_Motion_Sequence_G/figures/004_Figure_4.jpg]]
 *Figure 4: The phase diffusion pipeline for the motion inbetweening tasks. The inbetweening motion*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -346,7 +352,9 @@ Table 4 的结果表明，在引入文本条件（如“bend arms up”）后，
 ![[assets/figures/papers/paper_list_l1920_TransPhase_Deep_Compositional_Phase_Diffusion_for_Long_Motion_Sequence_G/figures/010_Figure_7.jpg]]
 *Figure 7: Visualization of the CMIB with 120 transition boundary frames conditioned with bend arms up: preceding motion in blue, transitioning motion in green, and succeeding motion in yellow*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 任务定位与基线谱系
 
@@ -399,6 +407,8 @@ TransPhase 的方法论创新在于完成了一次**表征空间的范式转换*
 3. **非周期性动作的扩展**：ACT-PAE 的正弦参数化天然适用于周期性或准周期性动作（如行走、跑步），但对于非周期性动作（如跳跃、投掷）的相位表征质量如何？是否需要在相位潜空间中引入非周期性的补充编码通道？
 
 4. **物理约束集成**：在保留相位平滑优势的前提下，如何将物理约束（如 PhysDiff 的物理引导机制）嵌入相位扩散过程？物理约束可能在相位潜空间中有其对应的表达形式，而非仅在解码后的原始运动空间施加。
+
+
 
 ## 原文 PDF
 

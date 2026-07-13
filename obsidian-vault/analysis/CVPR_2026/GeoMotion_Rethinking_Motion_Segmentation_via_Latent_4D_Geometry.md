@@ -43,7 +43,7 @@ claims:
 > - DAVIS2016 上，J&F 84.7 vs 78.5 (RCF-Stage1) (+6.2)。
 > - DAVIS2017 上，J 81.1 vs 74.6 (ABR) (+6.5)。
 
-## 概述
+## 概要
 
 运动分割旨在从视频中分离出独立运动的物体区域，是视频理解、自动驾驶与机器人导航的基础任务。传统方法依赖显式运动估计（光流、点对应匹配或长程轨迹提取）与多阶段迭代优化，在动态场景中易受噪声干扰，导致误差累积与高昂的计算成本，难以实现高效泛化。
 
@@ -53,7 +53,7 @@ GeoMotion 提出了一种范式转换：**绕开显式对应估计与逐场景�
 
 该方法在方法谱系中位于**前馈几何感知运动分割**这一新兴范式，区别于基于2D光流的前馈方法（如 OCLR-flow、ABR）和基于重建的迭代方法（如 Easi3R、VGGT4D）。其知识库定位融合了4D重建（π³的交替注意力主干与相机姿态解码器）、2D运动估计（RAFT光流）与视觉基础模型（DINOv2 图像编码器、SAM2 掩码细化），通过冻结预训练模块与轻量运动解码器的组合，在保持泛化性的同时实现高效推理。
 
-## 背景与动机
+
 
 ### 运动分割的核心瓶颈：显式对应估计的困境
 
@@ -79,7 +79,9 @@ GeoMotion的核心动机由此产生：**能否绕开显式运动估计和迭代
 
 这一动机驱动了GeoMotion框架的设计——通过融合预训练4D几何特征、光流特征与相机姿态信息，以端到端前馈方式完成运动分割，在保持高精度的同时将推理速度提升至0.31秒/帧，为运动分割的实用化部署开辟了新路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GeoMotion的核心创新在于**将运动分割从显式运动估计与迭代优化的范式，重新定义为基于潜在4D几何先验的前馈解码任务**。这一转变由四个关键的changed slots支撑，共同构成了方法的技术骨架。
 
@@ -105,7 +107,7 @@ $$
 
 GeoMotion的运动解码器并未随机初始化，而是复用了π³置信度解码器的预训练权重。π³的置信度解码器原本训练用于基于重建残差预测逐像素可靠性，这一任务与运动分割在“识别不可靠/异常区域”上存在语义关联。Figure 5的消融实验表明，该初始化策略相比随机初始化收敛更快、IoU更高，验证了大规模几何预训练的迁移价值。这一设计使运动解码器在训练初期即具备对几何异常区域的感知能力，加速了向运动掩码解码的适配。
 
-## 整体框架
+
 
 GeoMotion 提出了一种**端到端前馈运动分割框架**，其核心设计理念是绕开显式运动估计与迭代优化，直接从预训练4D重建模型中提取的潜在几何先验中解码运动掩码。整个流水线由三个主要阶段构成：多模态特征提取、时空特征聚合和前馈运动解码。
 
@@ -143,7 +145,7 @@ $$\mathbf{F}_{\mathrm{fuse}} = \mathrm{MLP}([\mathbf{F}_{\mathrm{geo}}; \mathbf{
 ![[assets/figures/papers/paper_list_l2507_https_arxiv_org_abs_2602_21810/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of GeoMotion. Given an input video, our framework integrates 4D geometric priors from a pretrained reconstruction model (π3) and local pixel-level motion from optical flow to infer dynamic object masks. By leveraging 4D geometric priors, the proposed GeoMotion disentangles object motion from camera motion in a single feed-forward manner*
 
-## 核心模块与公式推导
+
 
 GeoMotion 的核心架构由**特征聚合模块**和**运动解码器**两大组件构成，其设计目标是将运动分割转化为从潜在4D几何表示中直接解码的前馈任务，从而绕开传统方法中显式运动估计与迭代优化的瓶颈。
 
@@ -188,7 +190,9 @@ $$\mathcal{L} = \sum_{t=1}^{N} \left( \lambda_{1} \mathcal{L}_{\mathrm{focal}}(M
 ![[assets/figures/papers/paper_list_l2507_https_arxiv_org_abs_2602_21810/figures/003_Figure_3.jpg]]
 *Figure 3: Visualization of*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -251,7 +255,9 @@ GeoMotion在多个运动分割基准上取得了最优性能，同时保持了�
 ![[assets/figures/papers/paper_list_l2507_https_arxiv_org_abs_2602_21810/figures/012_Figure_8.jpg]]
 *Figure 8: More visual examples of dynamic masks predicted by GeoMotion on the DAVIS benchmark. Odd rows show the RGB input frames, while even rows present the corresponding predicted dynamic masks*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 技术范式定位
 
@@ -311,6 +317,8 @@ GeoMotion 的知识继承链清晰：
 - **极端场景鲁棒性**：当前方法在多目标密集遮挡、快速相机运动和非刚性物体形变场景下的鲁棒性如何？需要构建更具挑战性的测试基准来系统评估这些边界情形。
 - **运动模式识别**：潜在4D几何特征中是否编码了足够的运动模式信息（刚体 vs. 非刚体 vs. 流体），以支持更细粒度的运动分类？这可能需要引入物理先验或运动基元分解。
 - **跨任务迁移**：GeoMotion 验证了4D几何先验对运动分割的有效性，这一范式能否迁移到其他下游任务？潜在方向包括：动态3D重建（用运动掩码引导动态区域建模）、运动预测（从几何特征中预测未来帧的运动场）、视频插帧（利用几何一致性约束中间帧生成）。这指向一个更宏大的目标——构建统一的4D场景理解基础模型。
+
+
 
 ## 原文 PDF
 

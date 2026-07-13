@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/SK2Decompile_LLM_based_Two_Phase_Binary_Decompilation_from_Skeleton_to_Skin.pdf
+project_link: null
+code_link: null
 openreview_forum_id: jSQPqdoidy
 aliases:
 - SK2Decompile
@@ -41,7 +43,7 @@ claims:
 > - MBPP 上，Re-executability rate (AVG) 为 59.63%，对比 47.23% (GPT-5-mini)，变化 +26.3%。
 > - GitHub2025 上，R2I (AVG) 为 71.62，对比 61.63 (Idioms)，变化 +29.4%。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -73,7 +75,7 @@ SK2Decompile 在两个核心维度上取得了显著提升：
 
 消融实验进一步证实：Structure Recovery 阶段单独输出的 GPT-judge 得分极低（HumanEval AVG 仅 2.67），说明其严格专注于结构而不过早泄露命名信息，验证了阶段隔离的有效性。完整的 SK2Decompile（两阶段 + RL）在所有变体中取得最高重执行率，确认了分解与强化学习的组合优势。
 
-## 背景与动机
+
 
 ### 二进制反编译的核心挑战
 
@@ -110,7 +112,9 @@ $$P(s|u) \approx \sum_i P(s|i) \cdot P(i|u)$$
 
 两阶段分解使得每个阶段能够通过**专门的强化学习奖励**独立优化：Structure Recovery 使用编译器验证奖励（编译成功即得 1.0）和占位符恢复奖励（Jaccard 相似度），确保生成既可编译又结构准确的 IR；Identifier Naming 使用嵌入余弦相似度奖励，捕捉语义等价的命名而非精确字符串匹配。这种“骨架先行、皮肤后补”的策略，从原理上解耦了功能正确性与可读性的优化路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SK2Decompile 的核心创新在于将二进制反编译任务从传统的单阶段范式重构为**两阶段分解架构**，并通过**信息瓶颈驱动的中间表示设计**和**阶段特化的强化学习奖励**实现功能正确性与可读性的协同优化。
 
@@ -159,7 +163,7 @@ $$r_{\mathrm{identifier}} = \cos(\mathbf{e}_{\mathrm{gen}}, \mathbf{e}_{\mathrm{
 
 SK2Decompile 的三个 changed slots——任务分解、中间表示设计和训练方法——构成了一个协同的创新体系：两阶段分解使得结构正确性和语义可读性可以分别优化，信息瓶颈驱动的混淆 IR 为阶段隔离提供了表示基础，而阶段特化的 RL 奖励则为每个阶段提供了精确的优化信号。这一体系在 HumanEval 上实现了 69.00% 的平均重执行率，相对 **GPT-5-mini** (OpenAI, 2025) 提升 21.6%，在 GitHub2025 上 R2I 得分 71.62，相对 **Idioms** 提升 29.4%。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l30_https_openreview_net_forum_id_jSQPqdoidy/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the SK2Decompile framework. (a) Data preparation: We obfuscate identifiers to produce an Intermediate Representation (IR). Headers are inferred using psychec to serve as ground truth for checking compilability during the RL stage of Structure Recovery (b). We also compile the code and use IDA to generate initial pseudo code. SK2Decompile employs a two-phase decompilation process comprising (b) Structure Recovery and (c) Identifier Naming, where obfuscated source code serves as the IR connecting the two phases. Each model undergoes Supervised Fine-Tuning (SFT) followed by Reinforcement Learning (RL) with phase-specific rewards*
@@ -201,7 +205,7 @@ $$\operatorname* { m i n } _ { P ( i \mid u ) } \mathcal { L } _ { \mathrm { I B
 - **Stage 2 输出**：最终反编译的 C 源代码，具备语义有意义的标识符。
 - **训练信号**：Stage 1 使用编译器反馈（可编译性）+ 占位符恢复精度；Stage 2 使用语义相似度（嵌入余弦距离）。
 
-## 核心模块与公式推导
+
 
 ### 两阶段分解的概率模型
 
@@ -244,7 +248,9 @@ $$r_{\mathrm{identifier}} = \cos(\mathbf{e}_{\mathrm{gen}}, \mathbf{e}_{\mathrm{
 
 其中，$\mathbf{e}_{\mathrm{gen}}$ 和 $\mathbf{e}_{\mathrm{src}}$ 分别为生成代码与参考源代码的嵌入向量。使用语义相似度而非精确匹配，使得模型能够学习到功能等价但命名风格不同的合理标识符，而非机械地复制训练数据中的命名。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与实验动机
 
@@ -371,7 +377,9 @@ Figure 3展示了一个内存分配函数（`dtoa_alloc`）的反编译案例，
 ### 实验结论
 
 实验系统性地验证了SK2Decompile的核心假设：**两阶段分解+阶段专属RL训练**是实现高质量反编译的有效范式。混淆IR作为信息瓶颈，有效分离了结构恢复与标识符命名两个子任务；编译器引导的RL训练显著提升了结构正确性；语义相似度奖励使小模型也能达到商业大模型的命名质量。SK2Decompile在功能正确性（重执行率）、结构可读性（R2I）和语义可读性（GPT-judge）三个维度上实现了综合最优，且每个维度的提升均可通过消融实验归因到具体的设计选择。
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从单阶段到两阶段分解
 
@@ -416,6 +424,8 @@ SK2Decompile 的方法论基础建立在两个理论支柱上，使其在反编�
 4. **真实世界部署。** 在完全 stripped 二进制、大规模代码库、跨编译链场景下的性能退化程度如何？BringUpBench 上的初步结果（Table 7，42.3% 平均重编译率）表明仍有较大提升空间。
 
 5. **与程序分析技术的融合。** 当前方法完全依赖 LLM 进行结构恢复，是否可以将传统的程序分析技术（如值集分析、类型推断）作为先验或约束融入 RL 奖励中，以进一步提升结构恢复的准确性？
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2023
 pdf_ref: paperPDFs/CVPR_2023/T2M_GPT_Generating_Human_Motion_from_Textual_Descriptions_with_Discrete_Representations.pdf
+project_link: https://mael-zys.github.io/T2M-GPT/
+code_link: null
 aliases:
 - TG
 - T2M-GPT
@@ -41,7 +43,7 @@ claims:
 > - HumanML3D 上，R-Precision Top-3 为 0.775，对比 0.772 (MLD)，变化 +0.003。
 > - HumanML3D 上，MM-Dist 为 3.118，对比 3.347 (Guo et al.)，变化 -0.229。
 
-## 概述
+## 概要
 
 文本到人体动作生成的核心挑战在于：如何从自然语言描述中合成语义一致、视觉逼真且多样化的三维人体动作序列。现有方法多依赖扩散模型，在生成质量（FID）上仍有较大提升空间。T2M-GPT 提出了一种简洁的两阶段框架，将动作生成建模为离散空间中的自回归序列生成问题，绕开了扩散模型的复杂设计。
 
@@ -58,7 +60,7 @@ claims:
 - EMA 与 Code Reset 联合使用是 VQ-VAE 成功的关键——仅使用 naive VQ-VAE 时，重建和生成 FID 极差（Table 3）。
 - 数据集规模是当前方法的瓶颈：使用 10% 训练数据时文本-动作一致性较差，随着数据增加性能持续提升（Figure 5），暗示更大规模数据可进一步释放方法潜力。
 
-## 背景与动机
+
 
 人体动作生成是计算机视觉与图形学中的核心任务，在游戏、影视、虚拟现实和机器人仿真等领域具有广泛的应用需求。近年来，基于文本描述驱动动作生成（Text-to-Motion）逐渐成为研究热点，其目标是根据自然语言描述合成与之语义一致且物理合理的三维人体动作序列。
 
@@ -68,7 +70,9 @@ claims:
 
 T2M-GPT的核心动机正是直面上述两个瓶颈。作者观察到，VQ-VAE在图像生成领域已有成熟的训练策略（EMA参数更新和Code Reset机制）来对抗码本坍缩，但在动作生成任务中尚未被系统性地验证和应用。同时，通过一种轻量级的序列破坏策略（在训练时随机替换部分真实码本索引为随机索引），可以有效缩小自回归模型的训练-推理差距。基于这些观察，T2M-GPT提出了一种极简的两阶段框架：先使用VQ-VAE学习动作的离散码本表示，再以冻结的CLIP文本编码器为条件，用因果自回归Transformer生成码本索引序列。该框架无需复杂的多阶段设计或扩散过程，在HumanML3D数据集上取得了FID 0.116的生成质量，显著优于同期扩散方法MotionDiffuse的0.630，同时保持了相当的文本-动作一致性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 T2M-GPT的核心创新在于**以极简的VQ-VAE+GPT框架，配合三项关键训练策略，在文本到动作生成任务上超越同期扩散模型**。该方法并未引入复杂的多阶段设计或扩散过程，而是通过解决离散表示学习中的两个根本性瓶颈——**码本坍缩**与**训练-推理不一致**——实现了生成质量的大幅提升。
 
@@ -101,7 +105,7 @@ VQ-VAE在动作序列建模中的核心痛点是码本坍缩：大量连续帧�
 
 核心启示在于：**在文本到动作生成任务中，离散表示的质量是性能上限的关键决定因素**。通过EMA+Code Reset保障VQ-VAE的码本利用率，通过corruption策略弥合自回归模型的训练-推理差距，即可在不引入复杂架构的前提下取得领先性能。
 
-## 整体框架
+
 
 T2M-GPT 采用两阶段生成范式，将文本到动作的映射问题分解为离散表示学习与条件序列生成两个子任务。整体流程如 Figure 2 所示，包含两个核心模块：**Motion VQ-VAE** 与 **T2M-GPT**（因果自回归 Transformer）。
 
@@ -144,7 +148,7 @@ T2M-GPT 引入一个可学习的 **End token** 作为特殊标记，拼接在码
 
 推理时，首先使用 CLIP 编码输入文本描述获得条件嵌入，随后 T2M-GPT 自回归生成码本索引序列直至遇到 End token，最后将生成的索引序列送入 Motion VQ-VAE 的解码器重建为连续运动序列。整个流程无需真实运动长度作为先验，实现了端到端的文本到运动生成。
 
-## 核心模块与公式推导
+
 
 T2M-GPT 采用两阶段框架：**Motion VQ-VAE** 负责学习动作的离散表示，**T2M-GPT** 负责以文本为条件自回归生成离散码本序列（Figure 2）。
 
@@ -188,7 +192,9 @@ $$\mathrm{Attention} = \mathrm{Softmax} \left( \frac{ Q K^{T} \times mask }{ \sq
 
 **运动长度控制**：不同于需要额外模块预测运动长度的方法（如 Guo et al., CVPR 2022），T2M-GPT 在码本序列末尾插入一个可学习的 **End token**，自回归生成至该标记时自动停止，隐式决定运动长度，简化了框架设计。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验性能对比
 
@@ -247,7 +253,9 @@ Figure 1和Figure 4展示了T2M-GPT在HumanML3D上的生成实例及与基线方
 ![[assets/figures/papers/paper_list_l8_T2M_GPT_Generating_Human_Motion_from_Textual_Descriptions_with_Discrete/figures/007_Table_3.jpg]]
 *Table 3: Analysis of VQ-VAE quantizers on HumanML3D [22] test set. For all the quantizers, we set τ = 0.5 and use the same architectures (VQ-VAE and GPT) described in Section 4.1. We report FID and Top-1 for both reconstruction and generation. For each metric, we repeat the evaluation 20 times and report the average with 95% confidence interval*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 T2M-GPT 的提出背景是文本到动作生成领域在 2022 年前后经历了一轮快速的方法迭代：从早期的多阶段流水线方法，到基于 VAE 的生成框架，再到扩散模型的引入。理解 T2M-GPT 在这一谱系中的位置，有助于把握其设计动机与适用边界。
 
@@ -298,6 +306,8 @@ T2M-GPT 的适用边界受以下因素制约：
 4. **长序列生成效率**：对于长运动序列（如舞蹈编排、体育动作序列），自回归框架在效率与连贯性方面还有哪些改进空间？非自回归解码或层次化生成是否可行？
 
 5. **精细运动控制与编辑**：如何在保持简单框架的同时实现更精细的运动控制，如局部关节编辑、时序组合、风格迁移等？End token 机制虽然优雅，但缺乏对运动长度的显式控制能力，这在某些应用场景中可能是缺陷而非优势。
+
+
 
 ## 原文 PDF
 

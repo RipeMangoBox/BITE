@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/Soul_Breathe_Life_into_Digital_Human_for_High_fidelity_Long_term_Multimodal_Animation.pdf
+project_link: null
 code_link: null
 aliases:
 - Soul
@@ -40,7 +41,7 @@ claims:
 > - Soul-Bench 上，Video-Text Consistence↑ 4.85 vs 4.77 (StableAvatar) (+0.08)；LSE-D↓ 0.130 vs 0.663 (Sonic) (-0.533)；LSE-C↑ 6.82 vs 8.48 (InfiniteTalk) (-1.66)。
 > - Efficiency (109×1088×1920, 单 GPU) 上，推理加速比 11.4× （89.4 s） vs 1.0× （无优化，约 1020 s） (+10.4×)。
 
-## 概述
+## 概要
 
 Soul 是一个面向高保真、长时多模态数字人动画的生成框架，旨在解决现有方法在**长时推理中因潜在特征分布漂移导致的身份漂移与语义质量退化**问题。其核心创新在于提出了一种**基于聚类码本的阈值感知替换策略**：利用训练数据构建离散潜在特征码本，在生成过程中将偏离分布的离群特征柔性约束回训练分布附近，从而在保持身份与场景一致性的同时抑制颜色偏移与细节丢失。
 
@@ -48,7 +49,7 @@ Soul 是一个面向高保真、长时多模态数字人动画的生成框架，
 
 实验方面，Soul 在自建基准 **Soul-Bench** 上全面超越现有开源方案（如 Sonic、StableAvatar、EchoMimicV3 等）与商用产品（HeyGen、Kling-Avatar），在视频文本一致性、唇同步精度、身份保持与视频质量等指标上均取得最优结果，同时支持最长 **4 分钟**的身份一致视频生成。
 
-## 背景与动机
+
 
 数字人动画旨在根据多模态驱动信号（文本、音频等）生成语义一致、身份保持的人类视频，其应用涵盖虚拟主播、数字分身、交互式助手等场景。然而，现有方法在实现**高保真长时生成**方面仍面临显著瓶颈。
 
@@ -77,7 +78,9 @@ Figure 7 直观展示了这一问题：即使片段间存在帧重叠，生成�
 
 Soul 的目标是在**身份一致性、语义保真度、长时稳定性**三个维度上同时取得突破，使数字人动画从“短时可用”迈向“长时可信”。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Soul 的核心创新并非单一算法突破，而是针对**长时多模态数字人动画**场景，在现有 Wan2.2-5B 视频生成基座上系统性重构了三个关键环节：音频注入方式、长时生成策略与推理效率。这三项改造直指当前数字人动画的瓶颈——**长时推理中因潜在特征分布漂移导致的身份漂移与语义质量退化**，以及由此带来的生成效率低下问题。
 
@@ -119,7 +122,7 @@ Soul 处于**音频驱动数字人动画**与**长时视频生成**的交叉点�
 3. **阈值自适应**：当前码本替换阈值需预设，能否在无训练条件下自适应调节以适应不同生成场景，仍为开放问题。
 4. **评估偏差**：Soul-Bench 为 AI 生成数据，其统计分布可能与真实视频存在偏差，导致某些指标的绝对数值（如 LSE-C、Audio-Video Alignment）超出真实视频上限，跨方法对比时需注意这一偏差。
 
-## 整体框架
+
 
 Soul 的整体框架围绕一个核心瓶颈构建：**长时多模态数字人动画中的潜在特征分布漂移（latent feature shift）**，这会导致身份漂移、颜色偏移和细节丢失。为此，Soul 设计了一条从数据构建、模型注入到高效推理的完整流水线，其因果调节旋钮是**基于聚类码本的阈值感知替换策略（threshold-aware codebook replacement）**，在生成过程中将偏离分布的潜在特征约束回训练分布附近，从而抑制时序退化。
 
@@ -162,7 +165,7 @@ Soul 通过两项关键优化实现 **11.4× 推理加速**：
 ![[assets/figures/papers/paper_list_l1079_https_arxiv_org_abs_2512_13495/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of Soul for semantic-consistent and long-term multimodal-driven human video animation*
 
-## 核心模块与公式推导
+
 
 Soul 系统围绕“长时多模态人类视频动画”这一目标，在 Wan2.2-5B 基座模型上引入了四个关键模块，分别解决音频注入、长时一致性、推理效率三个核心问题。
 
@@ -207,7 +210,9 @@ $$
 ![[assets/figures/papers/paper_list_l1079_https_arxiv_org_abs_2512_13495/figures/010_Figure_7.jpg]]
 *Figure 7: Over time, the approach without using the threshold-aware codebook is prone to color deviation and loss of details. The data is derived from the AI-generated Soul-Bench*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心指标与多维度对比
 
@@ -276,7 +281,9 @@ Soul 通过三个递进层次的优化实现 11.4× 推理加速（Table 3），
 ![[assets/figures/papers/paper_list_l1079_https_arxiv_org_abs_2512_13495/figures/005_Figure_4.jpg]]
 *Figure 4: Statistical distributions of Soul-Bench*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有方法的谱系关系
 
@@ -317,6 +324,8 @@ Soul 处于**音频驱动数字人动画**这一快速演进的技术脉络中�
 3. **自适应阈值机制**：当前码本替换的阈值是预设的固定值。能否设计无训练的自适应阈值调节策略，使模型根据生成场景的复杂度（如静态背景 vs. 动态背景）动态调整替换强度？这将提升方法在不同场景下的鲁棒性。
 
 4. **与商用产品的差距**：Table 4 的人审结果显示 Soul 在整体自然度（4.17 vs. HeyGen 4.25）和身份一致性（4.00 vs. HeyGen 4.20）上仍略逊于商用产品 **HeyGen**，表明在极致真实感和细节保真度上仍有提升空间。
+
+
 
 ## 原文 PDF
 

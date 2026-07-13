@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Risk_Sensitive_Reinforcement_Learning_for_Alleviating_Exploration_Dilemmas_in_Large_Language_Models.pdf
+project_link: null
+code_link: null
 openreview_forum_id: 7kC8ORye4l
 aliases:
 - RSGRG
@@ -42,7 +44,7 @@ claims:
 > - Average over 6 mathematical reasoning benchmarks (Qwen2.5-Math-7B trained on de... 上，pass@32 为 48.3%，对比 45.3% (GRPO)，变化 +3.0%。
 > - AIME24 (Qwen2.5-Math-7B trained on deepmath103k) 上，pass@1 为 30.2%，对比 25.7% (GRPO)，变化 +4.5%。
 
-## 概述
+## 概要
 
 大语言模型（LLM）的强化学习微调面临一个根本性的探索困境：预训练策略的概率分布高度集中，标准强化学习优化倾向于进一步坍缩到已有的高概率区域，仅利用现有能力而无法有效探索新的推理路径，导致多解性能（pass@k）停滞甚至下降。本文提出**风险敏感强化学习框架**（Risk-Sensitive RL），通过引入指数效用目标，在均值奖励与最大奖励之间进行平滑插值，从根本上调节探索强度。
 
@@ -50,7 +52,7 @@ claims:
 
 方法层面，本文将该框架实例化为**RS-GRPO**（Risk-Sensitive GRPO），仅需替换标准 GRPO 中的优势估计函数即可实现，改动极小。在数学推理基准上的实验表明，RS-GRPO 相比标准 GRPO 在 pass@32 上平均提升约 4%，同时 pass@1 保持或略有提升（平均约 +2%）。老虎机实验进一步证明，当标准策略梯度被困于局部最优时，风险敏感策略梯度（β ≥ 4）能够成功逃逸并收敛至全局最优。
 
-## 背景与动机
+
 
 ### 大语言模型推理训练中的探索困境
 
@@ -78,7 +80,9 @@ $$A_{\beta}^{\pi_{\theta}}(y) = \frac{1}{\beta} \left( \frac{e^{\beta r(y)}}{\ma
 
 该优势函数具有两个关键性质：（1）通过指数变换放大高奖励样本的权重、惩罚低奖励样本，驱动策略向高奖励区域探索；（2）即使对于准确率较高的提示，仍保持非零梯度信号，避免了现有方法中优势消失的问题。这使得模型能够在维持 pass@1 性能的同时，持续提升 pass@k 表现，实现探索与利用的有效平衡。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 1. 探索困境的形式化与因果瓶颈定位
 
@@ -131,7 +135,7 @@ RS-GRPO 通过指数效用函数统一解决了这两个问题：稠密的非零
 
 RS-GRPO 的工程实现极其简洁：仅需替换 GRPO 中的优势计算模块，无需修改采样策略、奖励模型或优化器架构。经验优势估计公式（式 8）可直接作为现有 GRPO 实现的 drop-in replacement，计算开销与标准 GRPO 相当（仅增加 $N$ 次指数运算）。这一设计使得该方法可无缝集成到主流 RL 微调框架（如 VeRL）中，且所有实验均在统一的超参数设置下进行公平比较。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_7kC8ORye4l/figures/002_Table_1.jpg]]
 *Table 1: Comparison of Pass@k optimization methods with Risk-Sensitive RL*
@@ -169,7 +173,7 @@ Table 1 系统比较了 RS-GRPO 与现有 pass@k 优化方法的特性差异。R
 - **Mahdavi et al. (2025)** 和 **Chen et al. (2025)** 分别通过重新加权和子集估计优化 pass@k，但在高准确率提示上优势信号消失。
 - RS-GRPO 通过指数效用函数自然处理连续奖励，并在所有准确率水平上维持非零梯度，实现了更优的探索-利用权衡。
 
-## 核心模块与公式推导
+
 
 ### 风险敏感目标函数
 
@@ -222,7 +226,9 @@ RS-GRPO 由三个核心模块构成，均基于现有 GRPO 框架（Shao et al.,
 
 实验超参数方面，典型配置为 $\beta=2$（在 pass@1 和 pass@k 间取得最佳平衡），响应数 $N=16$，训练使用 VeRL 框架统一管理。训练中采用动态采样技术，排除全对或全错的 rollout 以保持非零梯度。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -309,7 +315,9 @@ Figure 6 展示了 RS-GRPO 与三类现有 pass@k 优化方法的训练动态对
 ![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_7kC8ORye4l/figures/057_Table_5.jpg]]
 *Table 5: Hyperparameters used in our experiments During RL Training*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与设计动机
 
@@ -359,6 +367,8 @@ $$\hat{A}_{\beta}^{\pi_{\theta}}(y_i) = \frac{1}{\beta} \left( \frac{e^{\beta r(
 - **与内在奖励的结合**：风险敏感 RL 能否与基于模型不确定性的探索奖励或好奇心驱动机制结合，进一步提升对未知区域的探索效率？
 - **完整 RL 场景扩展**：如何将风险敏感框架从 bandit 设置扩展到具有状态转移的序列决策问题，以支持更复杂的推理链优化？
 - **理论收敛性分析**：在 LLM 的非凸策略空间中，风险敏感策略梯度的收敛性理论尚不完整，特别是 β 与收敛速度之间的定量关系需要进一步刻画。
+
+
 
 ## 原文 PDF
 

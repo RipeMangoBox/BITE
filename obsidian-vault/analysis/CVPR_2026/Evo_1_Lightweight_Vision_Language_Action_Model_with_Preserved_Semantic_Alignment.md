@@ -44,7 +44,7 @@ claims:
 > - LIBERO 上，Average Success Rate (%) 94.8 vs 94.2 (π0) (+0.6)。
 > - RoboTwin 上，Average Success Rate (%) 37.8 vs 30.9 (π0) (+6.9)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：当前视觉-语言-动作（VLA）模型参数规模普遍在数十亿级别，推理计算开销高昂，难以在消费级GPU上实现实时部署。更关键的是，常规端到端训练会严重破坏视觉-语言骨干网络原有的预训练语义表征，导致模型过拟合且泛化能力显著下降。此外，现有高性能VLA模型通常依赖大规模机器人数据预训练，数据收集成本极高。
 
@@ -58,7 +58,7 @@ claims:
 
 **方法定位**：Evo-1属于轻量级模块化VLA架构，其核心贡献在于证明了通过保留预训练语义对齐，可以在完全不使用机器人预训练数据的前提下，以极小的模型体量达到甚至超越大型模型的操控性能。
 
-## 背景与动机
+
 
 ### 视觉-语言-动作模型的规模化困境
 
@@ -86,7 +86,9 @@ Figure 2 的对比直观呈现了这一现象：**OpenVLA**（Prismatic-7B骨干
 
 这一设计哲学的核心洞察在于：**通过轻量级原生多模态VLM和语义保持训练策略，可以在不依赖大规模机器人预训练数据的前提下，大幅降低计算开销，并达到甚至超越大型模型的操控性能**。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Evo-1的核心创新围绕一个中心命题展开：**轻量级VLA模型能否在不依赖大规模机器人预训练数据的前提下，达到甚至超越大型模型的操控性能？** 回答这一命题的关键，在于同时解决“计算效率”与“语义保持”两个相互制约的瓶颈。Evo-1通过三个紧密耦合的设计变更（changed slots）和一种新的训练范式，构建了从感知到动作的高效通路。
 
@@ -135,7 +137,7 @@ Figure 7的注意力图对比直观地展示了这一范式的效果：单阶段
 
 上述四个创新并非孤立存在，而是形成了正向协同：轻量级原生多模态VLM提供了高效的语义基础，交叉调制DiT以精简结构承接条件信息，中层集成模块在最优位置完成信息传递，而两阶段训练范式则确保整个过程中语义空间不被破坏。这一协同使得Evo-1在仅0.77B参数、不使用任何机器人预训练数据的条件下，在Meta-World上达到80.6%的平均成功率（超越2.25B的SmolVLA达12.4个百分点），同时保持16.4 Hz的推理频率和2.3 GB的GPU内存占用，在性能与效率之间取得了当前最优的平衡点。
 
-## 整体框架
+
 
 Evo-1 采用模块化视觉-语言-动作（VLA）架构，将感知、推理与控制统一在一个计算高效的框架内。整个系统由三个核心模块级联构成：**视觉-语言骨干（Vision-Language Backbone）**、**集成模块（Integration Module）** 和 **交叉调制扩散Transformer（Cross-modulated Diffusion Transformer）**，形成从多模态感知到连续动作生成的端到端映射。
 
@@ -177,7 +179,7 @@ Evo-1 的训练分为两个阶段，这是保留 VLM 语义空间的关键设计
 ![[assets/figures/papers/paper_list_l2234_https_arxiv_org_abs_2511_04555/figures/001_Figure_1.jpg]]
 *Figure 1: Architecture of Evo-1. The input RGB observations and language instructions are first encoded by a compact vision-language backbone. Their fused representations are aligned with the robot state through an optimized integration module and then processed by a cross-modulated diffusion transformer to generate actions. The right side shows results across three simulation benchmarks*
 
-## 核心模块与公式推导
+
 
 Evo-1 的端到端映射遵循统一的函数形式：
 
@@ -227,7 +229,9 @@ $$\mathcal{L}^{\tau}(\theta) = \mathbb{E}_{p(A_{t}\mid z_{t}, s_{t}), q(A_{t}^{\
 ![[assets/figures/papers/paper_list_l2234_https_arxiv_org_abs_2511_04555/figures/009_Figure.jpg]]
 *Figure: (a) Attention maps using single-stage training paradigm (b) Attention maps using two-stage training paradigm (ours)*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能：仿真基准与真实世界
 
@@ -282,7 +286,9 @@ Table 3 报告了真实世界泛化实验的成功率，在四种扰动条件下
 - 模型设计针对短时序操控（动作预测长度 H ≤ 50），在长期规划或多阶段任务上的表现未经测试。
 - 轻量级 VLM 的视觉语言理解能力在极端视觉变化或复杂指令下可能不足，泛化实验中的性能下降（如目标高度变化下仅 65%）暗示了这一瓶颈。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 在VLA模型谱系中的位置
 
@@ -333,6 +339,8 @@ Evo-1的性能与InternVL3-1B的原生多模态设计深度绑定。Figure 2显�
 ### 4. 知识库定位总结
 
 Evo-1在VLA知识库中的核心贡献是**证明"轻量级原生多模态VLM + 两阶段语义保留训练"可以替代大规模机器人预训练，在消费级硬件上实现超越大型模型的操控性能**。其可迁移的知识点包括：中层交叉注意力集成设计、纯交叉注意力DiT的可行性、以及两阶段训练对语义空间的保护作用。主要知识空白在于：长时序任务扩展、跨形态泛化、以及骨干VLM选择的鲁棒性。
+
+
 
 ## 原文 PDF
 

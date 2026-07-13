@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2024
 pdf_ref: paperPDFs/CVPR_2024/AAMDM_Accelerated_Auto_regressive_Motion_Diffusion_Model.pdf
+project_link: null
+code_link: null
 aliases:
 - AAARMDM
 - AAMDM
@@ -40,7 +42,7 @@ claims:
 > [!tip] 效果简介
 > - LaFAN1 (Random Motion Synthesis) 上，FID (越低越好) 14.051 (AAMDM) vs 12.132 (AMDM200) (+1.919 (质量略低，但速度快约40倍))；DIV (多样性，越高越好) 11.574 (AAMDM) vs 11.165 (AMDM200) (+0.409 (多样性略高))；FPS (帧率) 173 (AAMDM) vs 4.72 (AMDM200) (快约40倍)。
 
-## 概述
+## 概要
 
 交互式角色运动合成面临一个核心瓶颈：标准扩散模型虽能生成高质量、多样化的运动，但其数百步的反向扩散过程导致推理极慢（例如 AMDM200 仅约 4.72 FPS），无法满足实时交互需求；同时，在全姿态空间学习多对多的过渡映射本身具有高难度，使得现有方法难以同时兼顾质量、多样性与实时性。
 
@@ -48,7 +50,7 @@ claims:
 
 在 LaFAN1 数据集上的实验表明，AAMDM 的运动质量（FID 14.051）接近 AMDM200（FID 12.132），但推理速度提升约 40 倍（173 FPS vs. 4.72 FPS），且多样性（DIV）略优于 AMDM200。与基于学习的运动匹配方法 LMM 相比，AAMDM 在 FID 上显著改善（14.051 vs. 49.706）；与基于 VAE 的 MotionVAE 相比，脚滑动率（FFR）大幅降低（0.131 vs. 0.312）。消融实验进一步证实，嵌入空间是维持多样性与质量的关键——移除后 DIV 骤降至 56.341、FID 飙升至 128.412；精炼模块的引入对运动质量有显著正向贡献，而 DD-GAN 步数取 3 可在质量与效率间取得最佳平衡。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -72,7 +74,9 @@ claims:
 
 同时，AAMDM 将过渡建模从高维的全姿态空间迁移到**低维嵌入空间**，通过自编码器学习紧凑表示，使模型能够在更易处理的流形上学习多对多映射，从而同时改善训练效率和生成多样性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 AAMDM 的核心创新在于通过**生成空间降维**与**扩散过程分解**两个维度的协同设计，系统性地解决了标准扩散模型在交互式运动合成中“质量‑多样性‑速度”的不可能三角。
 
@@ -115,7 +119,7 @@ $$\hat{\mathbf{xz}}_n^{0,*} = \hat{\mathbf{xz}}_n^0 - \epsilon \alpha^t \nabla_{
 
 这些 changed slots 并非孤立改进，而是形成了因果链条：**嵌入空间降维**降低了过渡建模的难度，使得**少步扩散**成为可能；**DD‑GAN 的多模态生成能力**在嵌入空间中得以充分发挥，捕获多对多过渡分布；**ADM 精炼**弥补了少步生成的精度损失；**梯度引导**则在不破坏生成质量的前提下实现了灵活控制。这一系统性设计是 AAMDM 能够在 LaFAN1 数据集上同时取得高质量（FID 14.051）、高多样性（DIV 11.574）和实时帧率（173 FPS）的根本原因。
 
-## 整体框架
+
 
 AAMDM（Accelerated Auto-regressive Motion Diffusion Model）是一个面向交互式角色运动合成的生成框架，其核心设计目标是同时实现高运动质量、强多样性与实时推理速度。框架通过三个关键组件的协同工作，将标准扩散模型数百步的反向过程压缩至仅需5步，实现了约40倍的推理加速。
 
@@ -174,7 +178,7 @@ $$\hat{\mathbf{xz}}_n^{0,*} = \hat{\mathbf{xz}}_n^0 - \epsilon \alpha^t \nabla_{
 ![[assets/figures/papers/paper_list_l1843_AAMDM_Accelerated_Auto_regressive_Motion_Diffusion_Model/figures/001_Figure_1.jpg]]
 *Figure 1: We introduce the Accelerated Auto-regressive Motion Diffusion Model (AAMDM), a novel framework designed to synthesize diverse and high-quality character motions at interactive rates*
 
-## 核心模块与公式推导
+
 
 AAMDM 的核心架构由三个关键模块构成，其设计动机源于对标准扩散模型瓶颈的因果分析：在全姿态空间学习多对多过渡映射困难，且多步反向扩散导致推理速度过慢。为解决这一问题，AAMDM 将反向扩散过程分解为“快速起草”与“精炼”两个子步骤，并将过渡建模空间从全姿态空间迁移到低维嵌入空间。
 
@@ -234,7 +238,9 @@ $$\hat{\mathbf{xz}}_n^{0,*} = \hat{\mathbf{xz}}_n^0 - \epsilon \alpha^t \nabla_{
 
 完整推理流程中，DD-GANs 以 3 步反向扩散快速生成下一步嵌入向量的草案，随后 ADM 以 2 步自回归扩散进行精炼，总计 5 步即可完成单帧生成。最终通过解码器 $D^{AE}$ 将嵌入向量 $\mathbf{xz}_n$ 重建为全姿态向量 $\mathbf{y}_n$。这一分解策略利用了扩散过程早期从噪声生成样本、后期做微小调整的特性，使得 DD-GANs 步负责捕获多模态结构，ADM 步负责提升时序一致性和运动学精度。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能权衡：质量与速度的突破
 
@@ -282,7 +288,9 @@ Table 2的消融实验揭示了三个关键设计选择的因果效应：
 ![[assets/figures/papers/paper_list_l1843_AAMDM_Accelerated_Auto_regressive_Motion_Diffusion_Model/figures/006_Table_2.jpg]]
 *Table 2: Ablation study results. ∗The default parameters*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -327,6 +335,8 @@ AAMDM 为交互式运动合成开辟了“扩散模型实时化”的技术路�
 **时序信息的并行化利用**：当前自回归生成逐帧进行，虽已通过 DD-GAN 加速每帧生成，但帧间仍为串行。引入时序并行计算（如同时预测多帧草案）可能进一步突破速度瓶颈。
 
 **更大规模数据集的验证**：当前实验仅基于 LaFAN1 数据集，其在运动多样性、角色拓扑等方面的覆盖范围有限。在更大规模、更多样化的运动数据集上验证 AAMDM 的泛化能力，是方法走向实用的必要步骤。
+
+
 
 ## 原文 PDF
 

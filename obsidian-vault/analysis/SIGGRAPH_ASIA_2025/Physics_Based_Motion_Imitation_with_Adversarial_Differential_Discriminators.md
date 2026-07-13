@@ -5,6 +5,7 @@ paper_level: A
 venue: "SIGGRAPH Asia"
 year: 2025
 pdf_ref: paperPDFs/SIGGRAPH_ASIA_2025/Physics_Based_Motion_Imitation_with_Adversarial_Differential_Discriminators.pdf
+code_link: null
 project_link: https://add-moo.github.io/
 aliases:
 - ADDA
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 基于对抗差分判别器的物理运动模仿 |
 | 英文题名 | Physics-Based Motion Imitation with Adversarial Differential Discriminators |
 | 会议/期刊 | SIGGRAPH Asia 2025 |
-| Links | [paper](https://arxiv.org/abs/2505.04961); [Project](https://add-moo.github.io/) |
+| Links | [paper](https://arxiv.org/abs/2505.04961) · [Project](https://add-moo.github.io/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/robotics |
 | Method | Adversarial Differential Discriminator (ADD) |
 | Dataset | Humanoid - Double Kong, Humanoid - Dance A (LaFAN1 子集), EVAL 机器人 - Walk, 复合任务 (Run) |
@@ -42,7 +43,7 @@ claims:
 > - Humanoid - Dance A (LaFAN1 子集) 上，DoF Velocity Tracking Error [rad/s] 为 0.428 ± 0.014，对比 较高 (DeepMimic 表现出明显抖动)，变化 更低（更平滑）。
 > - EVAL 机器人 - Walk 上，Position Tracking Error [m] 为 0.036 ± 0.002，对比 与 DeepMimic 相当，变化 相当。
 
-## 概述
+## 概要
 
 物理仿真角色的运动模仿是计算机图形学与机器人学中的长期挑战。现有方法，如 **DeepMimic**（Peng et al., SIGGRAPH 2018），依赖手工设计的多目标奖励函数——将姿态误差、关节速度误差、末端效应器误差等子项通过固定权重线性组合。这种手工奖励工程不仅需要大量领域知识与反复调参，且固定的线性加权无法捕捉目标间复杂的非线性关系，导致方法难以泛化到多样化的运动技能。
 
@@ -56,7 +57,7 @@ claims:
 
 ADD 为物理运动模仿提供了一条摆脱手工奖励工程的可行路径，同时为更广泛的多目标优化问题提供了新的对抗式聚合范式。
 
-## 背景与动机
+
 
 ### 物理运动模仿的核心挑战
 
@@ -86,7 +87,9 @@ $$r_{t}^{\mathrm{DM}} = w^{p} r_{t}^{p} + w^{jv} r_{t}^{jv} + w^{rv} r_{t}^{rv} 
 - **动态权重调整**：判别器在训练过程中能够根据当前策略的弱点，动态地将优化压力聚焦于更难满足的目标，实现自适应的多目标平衡。
 - **保持精确跟踪能力**：通过将帧级别运动差异构造为差分向量输入判别器，ADD 在消除手工奖励的同时，仍能实现与 DeepMimic 相当甚至更优的精确运动跟踪性能。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ADD 的核心创新在于将运动模仿中的多目标奖励设计问题重新建模为一种**对抗差分判别**任务，从根本上消除了对手工奖励函数工程的依赖。其关键突破体现在以下三个层面。
 
@@ -116,7 +119,7 @@ $$\mathcal{L}^{GP}(D) = \left\| \nabla_{\phi} D(\phi) \big|_{\phi = \Delta} \rig
 
 ADD 处于**对抗模仿学习**与**多目标优化**的交叉点。与 **AMP**（Peng et al., SIGGRAPH 2021）的分布匹配范式不同，ADD 保留了帧级别的精确跟踪能力；与 DeepMimic 的手工奖励工程范式不同，ADD 实现了奖励函数的完全自动化学习。其核心贡献在于证明了：在适当的正则化（负样本梯度惩罚）下，仅以零向量为正样本的对抗判别器能够有效引导复杂的多目标物理运动模仿任务，为物理角色动画的奖励设计提供了一种全新的、无需手工调参的解决方案。
 
-## 整体框架
+
 
 ADD 方法的核心思想是将运动模仿重新表述为一个对抗式多目标优化问题，从而完全替代手工设计的加权奖励函数。其整体 pipeline 由五个关键模块串联构成，形成“状态观测 → 差分构建 → 判别评分 → 策略决策 → 价值估计”的闭环。
 
@@ -164,7 +167,7 @@ $$r_t^{\text{DM}} = w^p r_t^p + w^{jv} r_t^{jv} + w^{rv} r_t^{rv} + w^e r_t^e + 
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2505_04961/figures/013_Figure_8.jpg]]
 *Figure 8: Learning curves comparing ADD to the manually tuned reward function from Rudin et al. [2022] on training a Go1 quadruped to move. Results are shown across 5 random seeds per method. While ADD performs slightly worse in following linear velocity commands, it achieves lower roll and pitch angular velocities–indicating a more stable robot base–and lower DoF accelerations, which means smoother control over time*
 
-## 核心模块与公式推导
+
 
 ### 问题形式化：从线性加权到对抗差分判别
 
@@ -265,7 +268,9 @@ $$
 
 自由度速度跟踪误差则衡量关节角速度的匹配程度，二者共同构成运动模仿质量的核心度量（Table 1, Table 2）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -331,7 +336,9 @@ ADD 在运动跟踪质量上达到了与手工设计奖励函数相当甚至更�
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2505_04961/figures/019_Table_6.jpg]]
 *Table 6: ADD humanoid character motion imitation experiment hyperparameters*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从手工奖励工程到对抗多目标聚合
 
@@ -395,6 +402,8 @@ ADD 有效训练的一个关键设计选择是将梯度惩罚**专门施加于�
 3. **通用控制器**：能否利用 ADD 训练完全不依赖手工设计奖励函数的通用运动控制器？当前 ADD 仍需要参考运动作为输入，但若将差分向量的构建方式泛化到高层任务描述（如“向前移动”），可能实现零手工奖励的通用策略学习。
 
 4. **局部最优缓解**：对于极易陷入局部最优的高动态运动，是否可以引入额外的正则化（如熵奖励、好奇心驱动探索）或课程学习策略来缓解？判别器在局部最优处的梯度行为值得进一步理论分析。
+
+
 
 ## 原文 PDF
 

@@ -44,7 +44,7 @@ claims:
 > - SPIn-NeRF (NVS) 上，FID↓ (20分钟训练) 34.84 vs 37.97 (MVInpainter-F) (-3.13)。
 > - 360-USID 上，训练时间（分钟） 27 vs 85 (AuraFusion360) (~3× faster)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -68,7 +68,7 @@ LaRP 在方法谱系中处于**单视图扩散修复**与**多视图后优化**�
 
 ![Figure 3]()
 
-## 背景与动机
+
 
 ### 问题背景：多视图修复中的一致性与效率困境
 
@@ -95,7 +95,9 @@ LaRP 在方法谱系中处于**单视图扩散修复**与**多视图后优化**�
 
 这种设计使得LaRP在多视图一致性和新视图合成质量上达到或超越现有最优方法，同时将逐场景处理速度提升约50倍（见图1），显著推进了质量-效率的帕累托前沿。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 LaRP 的核心创新在于**将预训练扩散修复模型的生成先验与 3D 基础模型的显式几何对应深度融合**，通过潜在空间重投影机制实现高效的多视图一致性修复。与现有方法相比，LaRP 在以下关键维度实现了突破：
 
@@ -133,7 +135,7 @@ LaRP 的关键架构创新在于**克隆 UNet 编码器提取参考视图的多�
 
 LaRP 的创新本质在于**将 3D 几何显式建模与 2D 生成先验在潜在空间深度融合**，通过“克隆编码器—几何重投影—零初始化特征注入”的架构设计，实现了多视图修复在一致性、效率和质量三个维度的同步突破。这一设计使 LaRP 在帕累托前沿上显著推进了质量-效率的平衡边界（Figure 1），在 SPIn-NeRF 数据集上结合 NeRF 仅需 20 分钟训练即可达到 FID 34.84，优于 MVInpainter-F 的 37.97，且速度快约 50 倍。
 
-## 整体框架
+
 
 LaRP 的整体设计围绕一个核心洞察展开：**将预训练扩散修复模型的生成先验与 3D 基础模型的显式几何对应相结合**，通过潜在空间重投影机制实现高效的多视图一致性修复，从而消除对后优化的依赖。其 pipeline 由两条并行的信息流构成，最终在去噪 UNet 的解码器中汇合。
 
@@ -167,7 +169,7 @@ Fig. 3 明确对比了 LaRP 与朴素 ControlNet 在跨视图条件化上的概�
 ![[assets/figures/papers/paper_list_l891_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_LaRP_Efficient_M/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of our contributions. (a) LaRP effectively combines priors from both a cross-view reference and a diffusion-based inpainting model by feeding the inpainting model with multi-scale appearance latents reprojected according to the 3D attributes estimated by a 3D foundation model. (b) Training LaRP requires a corpus of two-view image pairs that current datasets lack, we propose a scalable data pipeline to provide such image pairs by repurposing an existing video 3D object detection dataset. We use a FPS-based view selection heuristic with a 3D-aware mask generation process to prepare two-view image pairs with reasonable baselines and plausible masks*
 
-## 核心模块与公式推导
+
 
 LaRP 的核心架构由四个紧密协作的模块构成，其设计哲学在于**最大化复用预训练扩散模型的生成先验**，同时通过显式几何对应实现跨视图信息的高效注入。
 
@@ -233,7 +235,9 @@ Fig. 3 揭示了 LaRP 与朴素 ControlNet 在跨视图条件化上的两个根�
 
 这种设计使 LaRP 的训练收敛速度比 ControlNet 基线快约 3.5 倍（2,000 步 vs 7,000 步，Tab. 4），同时取得了更优的修复质量。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 多视图一致性评估
 
@@ -288,7 +292,9 @@ LaRP的训练效率优势显著（表4）。在单个NVIDIA RTX 4090 GPU上，La
 ![[assets/figures/papers/paper_list_l891_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_LaRP_Efficient_M/figures/009_Figure_6.jpg]]
 *Figure 6: Qualitative results on scenes with wider baselines. LaRP remains competitive to SOTA [74], while being 3× faster*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 多视图修复方法谱系
 
@@ -327,6 +333,8 @@ LaRP 的有效性依赖于以下前提条件，这些条件界定了其适用边
 3. **开放域场景泛化**。如何将 LaRP 推广到更广泛的开放域场景，减少对特定物体类别数据集的依赖？数据流水线的可扩展性（Sec. 3.2）提供了基础，但需要更大规模、更多样化的视频数据源。
 
 4. **不确定区域的自适应处理**。重投影过程中存在几何不确定区域（如遮挡边界、深度不连续处），是否可以通过在线优化或自适应机制动态调整这些区域的特征融合权重？当前方法对所有重投影特征等同对待，缺乏不确定性感知能力。
+
+
 
 ## 原文 PDF
 

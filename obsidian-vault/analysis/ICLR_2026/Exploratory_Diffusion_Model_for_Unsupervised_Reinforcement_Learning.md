@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Exploratory_Diffusion_Model_for_Unsupervised_Reinforcement_Learning.pdf
+project_link: null
+code_link: https://github.com/yingchengyang/ExDM
 openreview_forum_id: k0Kb1ynFbt
 aliases:
 - EDME
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 探索性扩散模型用于无监督强化学习 |
 | 英文题名 | Exploratory Diffusion Model for Unsupervised Reinforcement Learning |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=k0Kb1ynFbt); [GitHub](https://github.com/yingchengyang/ExDM) |
+| Links | [paper](https://openreview.net/forum?id=k0Kb1ynFbt) · [GitHub](https://github.com/yingchengyang/ExDM) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | Exploratory Diffusion Model (ExDM) |
 | Dataset | Maze2d, URLB Single-Embodiment, URLB Cross-Embodiment |
@@ -42,7 +44,7 @@ claims:
 > - Maze2d 上，State Coverage (均值 ± 标准差) 为 ExDM: 0.71±0.07，对比 MEPOL: 0.59±0.04 (Square-large)，变化 ↓ 0.12 绝对提升。
 > - URLB Single-Embodiment 上，Aggregate IQM (置信区间) 为 ExDM: 0.80 [0.76, 0.84]，对比 CeSD: 0.71 [0.67, 0.76]，变化 提升 13%。
 
-## 概述
+## 概要
 
 无监督强化学习（URL）的核心瓶颈在于：预训练探索产生的回放数据高度异构且非平稳，现有策略（如单一高斯策略或离散技能策略）的表达能力不足以准确建模状态分布，导致内在奖励信号失真，并严重限制了下游任务微调的泛化能力。
 
@@ -52,7 +54,7 @@ claims:
 
 ExDM 的局限性在于扩散策略在极低交互量下的采样效率仍不及高斯策略，且在线训练扩散模型带来额外计算开销（Maze2d 约 0.5 天/种子，URLB 约 2 天/种子）。当前方法面向完全可观测的单任务连续控制，其在部分观测、多智能体或图像输入场景下的有效性仍有待验证。
 
-## 背景与动机
+
 
 ### 无监督强化学习的核心挑战
 
@@ -84,7 +86,9 @@ ExDM 的局限性在于扩散策略在极低交互量下的采样效率仍不及
 
 这一设计将扩散模型从单纯的“生成器”角色提升为“探索信号源”与“微调先验”的双重枢纽，为无监督 RL 提供了新的技术范式。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ExDM 针对无监督强化学习（URL）中“探索回放数据高度异构、传统策略表达能力不足”这一瓶颈，提出了三个层面的关键创新，其核心机制可概括为**扩散建模驱动探索、解耦架构保障效率、扩散先验赋能微调**。
 
@@ -138,7 +142,7 @@ ExDM 在 URL 方法谱系中占据独特位置，其设计融合了多个研究�
 
 **需人工验证**：ExDM 在极低数据量下扩散策略微调性能仍低于高斯策略微调（Figure 3(c)），表明扩散采样效率仍是瓶颈，论文将此列为开放问题。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_k0Kb1ynFbt/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of Exploratory Diffusion Model (ExDM). Different from standard RL, URL aims to explore in reward-free environments, requiring expressive policies and models to fit heterogeneous data (Theorem 4.1). During pre-training, ExDM employs the diffusion model to model the heterogeneous exploration data and calculate score-based intrinsic rewards to encourage exploration. Moreover, we adopt a Gaussian behavior policy to collect data that avoids the inefficiency caused by the multi-step sampling of the diffusion policy*
@@ -182,7 +186,7 @@ ExDM 的六个核心模块及其数据流关系如下：
 
 该流水线的关键设计决策在于**预训练阶段建模与行动的彻底解耦**：扩散模型专注于精确密度估计，高斯策略专注于高效采样，二者各司其职，避免了扩散采样效率低与高斯策略表达弱的两难困境。这一解耦范式也为将其他生成模型（如流模型、变分自编码器）引入无监督 RL 提供了可复用的架构模板。
 
-## 核心模块与公式推导
+
 
 ExDM 的核心架构由三个解耦模块构成，分别负责分布建模、探索采样与下游微调。其公式体系围绕扩散模型的噪声预测误差展开，将密度估计能力转化为探索信号与策略先验。
 
@@ -244,7 +248,9 @@ $$
 
 这一蒸馏过程将交替优化的理论收敛保证（定理 4.2）转化为可高效采样的单一扩散策略，实现少样本微调下的单调改进。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现
 
@@ -315,7 +321,9 @@ ExDM 的预训练需在线训练扩散模型，Maze2d 约需 0.5 天/种子，UR
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_k0Kb1ynFbt/figures/014_Table_6.jpg]]
 *Table 6: Aggregate metrics (Agarwal et al., 2021) with confidence interval in cross-embodiment URLB. For every algorithm, there are 2 domains, each trained with 10 seeds and fine-tuned under 4 downstream tasks; thus, each statistic for every method has 80 runs*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法定位与核心贡献
 
@@ -362,6 +370,8 @@ ExDM 的设计适用于以下场景：
 3. **非平稳数据流上的扩散模型稳定性**：当回放分布与真实环境分布差距较大时，扩散模型在非平稳数据流上的学习稳定性理论有待深入研究。
 4. **定向探索合成**：是否可以利用扩散模型的生成能力直接合成“困难”状态，以进一步引导定向探索？
 5. **通用生成模型范式**：ExDM 的模块化解耦是否可作为一种通用范式，将其他生成模型（如流模型、一致性模型）引入无监督 RL？
+
+
 
 ## 原文 PDF
 

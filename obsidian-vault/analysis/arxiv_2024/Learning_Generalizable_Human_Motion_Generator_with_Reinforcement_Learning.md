@@ -43,7 +43,7 @@ claims:
 > - KIT-ML 上，R-Precision Top-1 0.505 (可能为误标，见分析) vs T2M-GPT (提升)。
 > - Human Evaluation (Novel Prompts) 上，Normalized Score 0.37 (Unpaired Train) / 0.43 (Unpaired Test) vs MoMask / T2M-GPT (lower) (大幅领先)。
 
-## 概述
+## 概要
 
 文本驱动的人体运动生成在实际应用中面临一个关键瓶颈：现有方法因配对训练数据稀缺，往往过度拟合训练集中特定的运动表达，难以泛化到未见过的动作组合描述。针对这一问题，本文提出 **InstructMotion**，将文本到运动生成形式化为马尔可夫决策过程（MDP），并借鉴 RLHF 的思想，利用基于对比预训练文本与运动编码器的奖励函数，通过强化学习（PPO）对预训练的自回归运动生成器进行微调，从而在无需真实运动序列的情况下，显著提升模型对新文本描述的泛化能力。
 
@@ -53,7 +53,7 @@ claims:
 
 该方法的主要局限在于其泛化能力受限于奖励模型——后者仅在有限配对数据上训练，可能无法捕捉细粒度运动细节，且优先关注语义对齐而非精确控制。未来的方向包括利用合成配对数据训练更强的奖励模型，以及探索该框架在扩散模型等其他生成范式上的扩展。
 
-## 背景与动机
+
 
 文本驱动的人体运动生成旨在根据自然语言描述合成逼真的三维人体动作序列，在动画制作、虚拟现实和人机交互等领域具有广泛应用。近年来，基于自回归变换器（如 **T2M-GPT**，Zhang et al., CVPR 2023）和扩散模型（如 **MDM**，Tevet et al., arXiv 2022；**MotionDiffuse**，Zhang et al., TPAMI 2024）的方法在标准基准上取得了显著进展。
 
@@ -61,7 +61,9 @@ claims:
 
 本文的核心动机正是解决这一泛化难题。受大语言模型对齐中 RLHF（基于人类反馈的强化学习）范式的启发，作者提出将文本到运动生成重新形式化为马尔可夫决策过程（MDP），并引入强化学习的试错机制来突破配对数据的限制。其核心洞见在于：**通过设计基于对比预训练文本与运动编码器的奖励函数，可以在仅有合成文本描述或少量配对数据的情况下，利用 PPO 算法有效地将运动生成与文本语义对齐**，从而在不依赖真实运动序列的条件下提升模型对新描述的泛化能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 InstructMotion 的核心创新在于将**文本驱动运动生成重新形式化为强化学习问题**，从而绕过传统监督学习对大规模配对数据的强依赖。具体而言，该方法在三个关键维度上改变了基线模型 T2M-GPT（Zhang et al., CVPR 2023）的设计逻辑：
 
@@ -107,7 +109,7 @@ InstructMotion 处于**文本驱动人体运动生成**与**基于人类反馈�
 
 奖励模型本身仅在有限的配对数据上训练，其语义判别能力受限于训练数据的覆盖范围。这意味着对于奖励模型无法准确评估的细粒度运动细节，强化学习优化可能无法提供有效引导。此外，奖励函数优先考虑全局语义对齐，可能导致生成的运动在局部细节上不够精确。
 
-## 整体框架
+
 
 InstructMotion 将文本到运动生成形式化为一个马尔可夫决策过程（MDP），并在此基础上构建强化学习微调框架。其核心流程由四个关键模块串联而成：**文本编码器**、**运动生成器（演员网络）**、**奖励模型**和**PPO 优化器**，如 Figure 2 所示。
 
@@ -138,7 +140,7 @@ $$\mathcal{T}_r(\pi_\theta) = \mathbb{E}_{\mathbf{t}\sim p_{data}, \mathbf{m}\si
 
 整个框架的模块依赖关系清晰：文本编码器和运动 VQ-VAE 提供嵌入空间基础，奖励模型定义优化方向，PPO 算法执行策略搜索，合成数据注入打破训练分布边界。这一闭环使得生成器无需真实运动序列即可通过试错学习对齐文本语义，是实现泛化能力的结构保障。
 
-## 核心模块与公式推导
+
 
 InstructMotion 将文本驱动运动生成形式化为马尔可夫决策过程（MDP），并围绕三个核心模块构建强化学习微调框架：**奖励模型**、**演员网络**与**评论家网络**、**PPO 优化器**。各模块协同完成“生成-评估-优化”的闭环。
 
@@ -194,7 +196,9 @@ $$\mathcal{L}^{VF}(\phi) = \mathbb{E}_t \left[ (V_\phi(s_t) - G_t)^2 \right]$$
 ![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2405_15541/figures/003_Figure_3.jpg]]
 *Figure 3: An illustration of the LLM-assisted novel motion description generation pipeline*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 瓶颈与核心发现
 
@@ -254,7 +258,9 @@ $$\mathcal{L}^{VF}(\phi) = \mathbb{E}_t \left[ (V_\phi(s_t) - G_t)^2 \right]$$
 ![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2405_15541/figures/007_Figure_5.jpg]]
 *Figure 5: Human evaluation. (a) Comparison with the state-of-the-art method MoMask [15] and the baseline approach T2M-GPT [48]. Three different prompt sets are used. (b) Experiment of data scaling. Prompts are sampled from the unpaired test set. (c) Ablative experiment of reward design. Prompts are sampled from the unpaired test set*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -296,6 +302,8 @@ InstructMotion 处于**文本驱动运动生成**与**基于人类反馈的强�
 在方法谱系上，它属于“预训练 + RL 微调”范式，与语言模型领域的 InstructGPT 共享概念框架，但针对连续-离散混合的动作空间做了适配（运动 token 化 + PPO 裁剪损失）。其独特之处在于利用了**合成文本数据**（LLM 生成的无配对描述）来扩展 RL 的训练分布，这在现有运动生成方法中尚无先例。
 
 对于后续工作，该框架提示了两个可拓展方向：一是用更强的 reward model（如基于大规模运动-文本对比预训练的编码器）替换当前的奖励函数；二是将 MDP 形式化推广到其他条件生成任务中，只要能够定义合理的状态、动作和奖励空间。
+
+
 
 ## 原文 PDF
 

@@ -43,7 +43,7 @@ claims:
 > - AbdomenCTCT 上，Dice↑ ~81.4 (SGDIR DiT λ=10⁴, from Table 3) vs ~76.5 (best competitor, see Table 3) (+~4.9 pp)；|J|<0%↓ 0.0 ± 0.0 (SGDIR UNet λ=10⁵) vs 0.043 ± 0.015 (TransMorph-diff, from Table 3) (−0.043 pp)。
 > - LungCT (TRE) 上，TRE↓ 2.23 ± 0.14 (SGDIR UNet λ=10⁴) vs 2.50 ± 0.18 (best competing deformable, from Table 4) (−0.27 mm)。
 
-## 概述
+## 概要
 
 医学图像配准的核心挑战在于，如何在保证变形场拓扑结构的前提下，实现高精度的解剖对齐。现有基于学习的微分同胚方法普遍依赖**缩放-平方（scaling-and-squaring）积分方案**与多种**辅助正则项**（如雅可比行列式惩罚、平滑约束、逆一致性损失）来维持拓扑保持性。这些显式约束与离散积分近似不仅增加了训练复杂度，还限制了模型的泛化能力和推理效率。
 
@@ -58,7 +58,7 @@ claims:
 
 这些结果表明，通过时间一致性的内在约束替代显式拓扑正则化，SGDIR 在精度、拓扑保证和计算效率三个维度上同时实现了突破。
 
-## 背景与动机
+
 
 医学图像配准的核心任务是为图像对建立空间对应关系，其输出通常是一个变形场 $\phi$。在临床应用中，变形场不仅需要高精度的解剖对齐，还必须满足**拓扑保持**——即形变应当是平滑、可逆且无折叠的。数学上，这类理想形变由**微分同胚**（diffeomorphism）来刻画：一个光滑、可逆且逆映射同样光滑的映射。违反拓扑保持会导致网格折叠（表现为雅可比行列式 $|J| < 0$），这在手术导航、脑图谱映射等场景中是不可接受的。
 
@@ -89,7 +89,9 @@ $$\phi_0 = \mathrm{Id}, \qquad \phi_t \circ \phi_s = \phi_{t+s}, \quad \forall t
 - **仅用单一正则项保证微分同胚**：用部分半群正则化 $\mathcal{L}_{\mathrm{sg}}$ 替代所有辅助约束，并数学证明该弱条件足以诱导 ODE 流。
 - **统一微分同胚与非微分同胚配准**：通过单一超参数 $\lambda$ 控制正则化强度，$\lambda=10^5$ 时强制严格微分同胚流，$\lambda=10^4$ 或更小时允许非微分同胚形变，从而在同一框架下兼顾拓扑保持与形变灵活性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：显式积分与多重正则项的代价
 
@@ -131,7 +133,7 @@ $$\phi_t(x; \theta) = x + t \,\mathbf{F}(x, t; I_f, I_m, \theta)$$
 
 值得注意的是，$\lambda = 10^5$ 的 SGDIR 在整个时间轴上保持 $|J|<0\% = 0\%$，而 $\lambda = 10^4$ 的版本仅在 $t \to 1$ 时出现少量折叠（Figure 7），表明半群正则化强度与拓扑保持程度之间存在精确的单调关系，这为实际部署中的参数选择提供了清晰的指导原则。
 
-## 整体框架
+
 
 SGDIR 的整体设计围绕一个核心思想展开：**仅用一个部分半群约束，无需显式积分方案或任何辅助正则项，即可迫使网络学习一个常微分方程（ODE）的流**，从而内生地保证变形的可逆性、循环一致性与拓扑保持。整个框架由三个关键模块构成，分别对应架构设计、训练流程与推理流程（Figure 2）。
 
@@ -179,7 +181,7 @@ $$\mathcal{L} = \mathbb{E}_{(I_f, I_m) \sim \mathcal{D}, t \sim \mathrm{Uni}(0,1
 
 传统微分同胚配准方法依赖两条路径保证拓扑保持：**缩放-平方积分方案**（Eq. 2–3）将速度场逐步合成为最终变形，以及**多种辅助正则项**（雅可比惩罚、平滑约束、逆一致性损失等）。SGDIR 通过部分半群正则化将这两条路径一并消除——网络在训练中被迫满足流的合成一致性，从而在推理时天然输出满足 ODE 性质的变形场，无需任何显式积分或辅助约束。这是 SGDIR 在方法学上最根本的差异点。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化：连续时间变形场
 
@@ -238,7 +240,9 @@ $$\mathcal{L} = \mathbb{E}_{(I_f, I_m) \sim \mathcal{D}, t \sim \mathrm{Uni}(0, 
 
 **证据强度说明**：定理 1 的数学证明在论文第 4 节给出，声称部分半群条件足以保证 ODE 流的学习；消融实验（Table 6）证实 $\lambda$ 从 $10^5$ 降至 0 时，$\vert J \vert < 0\%$ 从 0\% 逐渐上升至 1.3\%，Dice 从 85.90 降至 79.80，直接验证了半群正则化对拓扑保持的因果控制作用。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 5.1 实验设置与基线方法
 
@@ -317,7 +321,9 @@ SGDIR 评估四个变体：两个微分同胚模型（λ = 10⁵）使用时间�
 ![[assets/figures/papers/paper_list_l2126_https_openaccess_thecvf_com_content_CVPR2026_html_Matinkia_Learning_Diff/figures/001_Figure_1.jpg]]
 *Figure 1: A performance summary of SGDIR in diffeomorphic and non-diffeomorphic settings comparing with best performing (non)diffeomorphic methods in the experiments. SGDIR shows on-par performance with top deformable models in diffeomorphic setting and outperforms them in non-diffeomorphic setting*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心瓶颈与因果调控
 
@@ -382,6 +388,8 @@ SGDIR 在微分同胚设定下（λ = 10⁵）与现有微分同胚方法的对�
 3. **自适应 λ 调度**：如何设计自适应的 λ 调度机制，在训练过程中动态平衡相似度与拓扑保持？当前手动调参的方式限制了方法的易用性，自适应策略可能进一步提升不同数据集上的性能鲁棒性。
 
 4. **理论边界的实证验证**：部分半群约束仅在连续区间内施加，其在大变形极限下的理论保证是否在极端临床场景中仍能成立，需要进一步的实证验证。
+
+
 
 ## 原文 PDF
 

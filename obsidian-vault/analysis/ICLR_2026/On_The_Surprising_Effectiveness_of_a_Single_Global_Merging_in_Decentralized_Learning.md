@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/On_The_Surprising_Effectiveness_of_a_Single_Global_Merging_in_Decentralized_Learning.pdf
+project_link: https://paper-list.notion.site/ICLR-26-Oral-The-Grokking-Moment-in-Decentralized-Learning-On-The-Surprising-Effectiveness-of-A--2f43218102c0805d99d6e56d2934fac4
+code_link: https://github.com/Raiden-Zhu/ICLR-2026-Grokking-in-Decentralized-Learning
 openreview_forum_id: zrFnwRHuQo
 aliases:
 - DSSGFGM
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 关于去中心化学习中单次全局合并令人惊讶的有效性 |
 | 英文题名 | On The Surprising Effectiveness of a Single Global Merging in Decentralized Learning |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=zrFnwRHuQo); [GitHub](https://github.com/Raiden-Zhu/ICLR-2026-Grokking-in-Decentralized-Learning); [Project](https://paper-list.notion.site/ICLR-26-Oral-The-Grokking-Moment-in-Decentralized-Learning-On-The-Surprising-Effectiveness-of-A--2f43218102c0805d99d6e56d2934fac4) |
+| Links | [paper](https://openreview.net/forum?id=zrFnwRHuQo) · [GitHub](https://github.com/Raiden-Zhu/ICLR-2026-Grokking-in-Decentralized-Learning) · [Project](https://paper-list.notion.site/ICLR-26-Oral-The-Grokking-Moment-in-Decentralized-Learning-On-The-Surprising-Effectiveness-of-A--2f43218102c0805d99d6e56d2934fac4) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/planning_control |
 | Method | Decentralized SGD with Sparse Gossip and Final Global Merging |
 | Dataset | Tiny ImageNet, CIFAR-100 |
@@ -42,7 +44,7 @@ claims:
 > - Tiny ImageNet 上，Global test accuracy 为 Decentralized AdamW + final merge，对比 FedAdamW，变化 性能相当。
 > - CIFAR-100 上，Global test accuracy 为 后期通信窗口（窗口 15-18），对比 早期通信窗口（窗口 0-3），变化 后期窗口的最终准确率更高。
 
-## 概述
+## 概要
 
 ### 问题背景与核心瓶颈
 
@@ -76,7 +78,7 @@ claims:
 
 当前验证主要限于视觉分类任务（CIFAR-100, Tiny ImageNet），在其他领域（如 NLP）及更复杂任务上的有效性尚待检验。理论分析依赖高阶平滑性和全局渐进锐化假设，实践中可能不完全满足。最终全局合并需要全连接通信，虽可通过多轮 gossip 近似（Figure C.6），但仍需额外开销。未来方向包括：设计自适应通信调度算法以自动维持关键共识边缘条件、将渐进锐化机制推广至异步及联邦学习场景、以及在实际地理分布式环境中的部署验证。
 
-## 背景与动机
+
 
 ### 去中心化学习中的通信瓶颈
 
@@ -102,7 +104,9 @@ claims:
 
 这些问题的回答不仅关乎对去中心化学习动力学的理解，更直接影响实际部署中的通信调度策略设计。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作的核心创新在于对去中心化学习中模型差异（model discrepancy）角色的重新定位，以及由此衍生的极简通信范式。传统方法将异构数据下有限通信产生的模型差异视为阻碍收敛的有害噪声，而本文通过理论分析和实验揭示了**该差异中蕴含的建设性成分**，并据此提出了一种“稀疏通信维持可合并性 + 单次全局合并释放泛化潜能”的框架。
 
@@ -136,7 +140,7 @@ $$U^{(t)} \triangleq \frac{1}{2}(\eta L_2 - 1)\nabla\mathcal{L}(\bar{\theta}^{(t
 
 **证据强度说明**：Theorem 1和Proposition 2的理论结果依赖于高阶平滑性假设（Assumption 2）和渐进锐化假设（Assumption 4），后者在一般非凸景观中的普遍性尚需更广泛的实证验证。实验证据主要来自视觉分类任务（CIFAR-100, Tiny ImageNet），在其他领域和更大规模任务上的泛化性有待进一步确认。
 
-## 整体框架
+
 
 本文提出的去中心化训练范式建立在**稀疏对等通信 + 单次全局合并**的极简流水线之上。其核心操作流程由四个顺序模块构成，模块间的输入输出关系直接体现了“以极小通信代价维持可合并性，最终一次性释放全局性能”的设计哲学。
 
@@ -182,7 +186,7 @@ $$\mathcal{L}\left(\sum_{k\in V} w_k\theta_k\right) \leq \sum_{k\in V} w_k\mathc
 
 这一流水线在 Tiny ImageNet 上使用 CLIP ViT-B/32 和 ResNet-18 的实验中，以远低于联邦学习的通信代价，取得了与之相当的全局测试精度（Figure C.1, C.2），验证了“稀疏通信维持可合并性 + 单次全局合并释放性能”这一极简范式的有效性。
 
-## 核心模块与公式推导
+
 
 ### 关键模块设计
 
@@ -250,7 +254,9 @@ $$\frac{24(1-p)\eta^2}{p^2}(\phi^2+\sigma^2) < \min\{\frac{(\eta L_2-1)\gamma^*\
 
 > **证据强度说明**：Theorem 1 和 Proposition 2 的推导依赖高阶平滑性（Assumption 2，导数有界至 4 阶）和全局渐进锐化（Assumption 4），这些假设在深度网络实践中可能不完全满足，其经验验证目前仅限于视觉分类任务。$U^{(t)}$ 的负性在真实非凸景观中的行为仍需进一步实证检验。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 4.1 通信调度的时间分配效应
 
@@ -330,7 +336,9 @@ Table 1比较了并行SGD与去中心化SGD（DSGD）在非凸设定下的收敛
 ![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_zrFnwRHuQo/figures/012_Figure.jpg]]
 *Figure: C.5: Global test accuracy (see Definition 1) for ResNet-18 trained with decentralized AdamW across 32 agents under different levels of data heterogeneity (Dirichlet α = 0.1 (a, c) vs. α = 1.0 (b, d); see Appendix C.1). Results are reported on both CIFAR-100 (a, b) and Tiny ImageNet (c, d). (a) 1 Round Final Gossip Merging (b) 5 Rounds Final Gossip Merging (c) 1 Round Final Global Merging*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有范式的边界关系
 
@@ -375,6 +383,8 @@ Table 1比较了并行SGD与去中心化SGD（DSGD）在非凸设定下的收敛
 3. **局部更新步数与混合速率的联合优化**。在实际大规模深度学习任务中，如何最优地权衡局部更新步数 $H$ 与通信图的混合属性 $p$？式 (11) 提供了理论指导，但将其转化为可操作的超参数选择策略仍需工程探索。
 
 4. **跨领域与真实部署验证**。将实验从视觉分类扩展到更广泛任务，并在真实地理分布式环境中验证方法的实用性，是推动该方向落地的关键步骤。
+
+
 
 ## 原文 PDF
 

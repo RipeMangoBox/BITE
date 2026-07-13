@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/ReasoningBank_Scaling_Agent_Self_Evolving_with_Reasoning_Memory.pdf
+project_link: null
+code_link: https://github.com/google-research/reasoning-bank
 openreview_forum_id: jL7fwchScm
 aliases:
 - RM
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | REASONINGBANK：通过推理记忆实现智能体自我进化 |
 | 英文题名 | ReasoningBank: Scaling Agent Self-Evolving with Reasoning Memory |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=jL7fwchScm); [GitHub](https://github.com/google-research/reasoning-bank) |
+| Links | [paper](https://openreview.net/forum?id=jL7fwchScm) · [GitHub](https://github.com/google-research/reasoning-bank) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/planning_control |
 | Method | REASONINGBANK + MATTS |
 | Dataset | WebArena Overall, WebArena Overall with MATTS, SWE-Bench-Verified, Mind2Web Cross-Domain |
@@ -42,7 +44,7 @@ claims:
 > - WebArena Overall with MATTS 上，Success Rate (SR) 为 51.8，对比 40.5 (No Memory)，变化 +11.3。
 > - SWE-Bench-Verified 上，Resolve Rate 为 57.4，对比 54.0 (No Memory, Gemini-2.5-pro)，变化 +3.4。
 
-## 概述
+## 概要
 
 当前LLM智能体在执行连续任务流时面临一个核心瓶颈：它们无法有效利用积累的交互历史进行学习，导致重复犯错、丢弃有价值的洞察，缺乏自我进化能力。REASONINGBANK 针对这一问题，提出了一个以结构化推理记忆为核心的闭环框架。其核心洞察在于，将原始交互轨迹抽象为由标题、描述、内容构成的推理记忆项，使智能体不仅能复用成功策略，还能从失败中提取预防性教训，从而实现持续进化。
 
@@ -50,7 +52,7 @@ claims:
 
 实验结果表明，REASONINGBANK 在 WebArena 基准上整体成功率较无记忆基线提升 **+8.3%**（Gemini-2.5-flash），结合 MATTS 并行扩展（k=5）后进一步提升至 **51.8%**（+11.3%）。在 SWE-Bench-Verified 上，解决率达到 **57.4%**（+3.4%），且平均交互步数减少 14.4%。消融实验证实，纳入失败轨迹是性能提升的关键因素（成功率从 46.5% 提升至 49.7%），而现有基线方法（Synapse、AWM）在加入失败经验后未见明显提升甚至下降。在 Mind2Web 跨域泛化测试中，REASONINGBANK 取得了最高的任务成功率，验证了其记忆项的鲁棒性和可迁移性。
 
-## 背景与动机
+
 
 ### 问题背景：LLM智能体的“失忆症”
 
@@ -76,7 +78,9 @@ claims:
 
 更进一步，本文引入 **MATTS**（Memory-Aware Test-Time Scaling），在测试时通过并行自对比和顺序自精炼生成丰富的对比信号，用于提炼更高质量的记忆。更好的记忆反过来又引导更有效的扩展，形成**记忆与扩展之间的强大协同**，共同推动智能体性能的持续提升。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 REASONINGBANK 的核心创新在于**记忆内容的抽象层级跃迁**与**测试时扩展-记忆的正向协同机制**，二者共同解决了当前 LLM 智能体“交互-遗忘-重复犯错”的瓶颈。
 
@@ -110,7 +114,7 @@ REASONINGBANK 将记忆内容的抽象级别从“轨迹/工作流”提升至�
 
 值得关注的是，REASONINGBANK 的创新并未以显著的计算开销为代价。Table 5 显示，其总 token 消耗相比无记忆方法仅增加约 4.3%，但整体性能提升 20.5%，成本效益远优于 Synapse 和 AWM。这种“轻量记忆、显著增益”的特性，源于结构化推理策略的高信息密度——少量高质量记忆项即可提供有效的决策引导，而无需堆砌冗长的原始轨迹。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l29_https_openreview_net_forum_id_jL7fwchScm/figures/003_Figure_2.jpg]]
 *Figure 2: Overview of REASONINGBANK. Experiences are distilled into structured memory items with a title, description, and content. For each new task, the agent retrieves relevant items to interact with the environment, and constructs new ones from both successful and failed trajectories. These items are then consolidated into REASONINGBANK, forming a closed-loop memory process*
@@ -142,7 +146,7 @@ MATTS 在 REASONINGBANK 的基础上引入两种测试时扩展策略，与记�
 
 整个框架的数据流可概括为：**检索 → 行动 → 评判 → 提取 → 巩固**的闭环。智能体策略 $\pi_{\mathcal{L}}(\cdot|\mathcal{M},\mathcal{A})$ 以骨干 LLM $\mathcal{L}$ 参数化，受记忆模块 $\mathcal{M}$ 和动作空间 $\mathcal{A}$ 条件约束。在每一步，智能体基于历史观察 $o_{0:t}$、历史动作 $a_{0:t}$、检索到的记忆和可用动作空间生成下一动作 $a_{t+1}$。任务完成后，环境转移函数 $\bar{\mathcal{T}}(s_{t+1}|s_t, a_t)$ 给出的轨迹状态被送入提取模块，完成记忆的蒸馏与巩固。
 
-## 核心模块与公式推导
+
 
 ### 智能体策略的形式化定义
 
@@ -192,7 +196,9 @@ MATTS 引入了两种测试时扩展策略，将记忆与扩展深度耦合（Se
 
 其中 $\text{isSuccess}(q_i)$ 为任务 $q_i$ 的二元成功判定结果，$\text{Steps}(q_i)$ 为该任务执行的总交互步数。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -247,7 +253,9 @@ MATTS 的并行扩展（Figure 4a）在 k=1 到 k=5 区间内，成功率从 49.
 
 然而，方法存在以下已知局限：（1）简单的嵌入检索可能召回不相关的记忆，引入噪声；（2）LLM-as-a-Judge 在模糊任务上的误判可能传播错误信号；（3）当前记忆巩固策略为直接添加，缺乏去重和冲突消解机制，长期运行可能导致记忆库膨胀。这些问题在实验中的表现为：增加检索数量后性能下降（Figure 13），以及评判准确率低于 70% 时性能退化（Figure 7）。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有记忆方法的谱系关系
 
@@ -294,6 +302,8 @@ REASONINGBANK 的设计存在以下明确的适用边界：
 - **推理密集型记忆检索**：如何超越简单的嵌入相似度检索，引入推理密集型控制器进行记忆查找？例如，基于当前任务状态主动推理需要何种类型的记忆，而非被动依赖语义相似度。
 - **正确性信号增强**：如何减少 LLM-as-a-Judge 的噪声？可能的方向包括引入环境自带的验证信号、多评判器集成、或人机协作反馈机制。
 - **成本-性能的帕累托优化**：Table 5 显示 REASONINGBANK 总 token 消耗仅增加约 4.3%，但整体性能提升 20.5%，成本效益优于 Synapse 和 AWM。然而，当扩展到更大规模任务流时，记忆库的存储和检索成本如何增长，以及是否存在更优的记忆压缩策略，仍需进一步研究。
+
+
 
 ## 原文 PDF
 

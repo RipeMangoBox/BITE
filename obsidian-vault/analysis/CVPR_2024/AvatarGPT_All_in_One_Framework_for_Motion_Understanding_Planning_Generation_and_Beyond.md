@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2024
 pdf_ref: paperPDFs/CVPR_2024/AvatarGPT_All_in_One_Framework_for_Motion_Understanding_Planning_Generation_and_Beyond.pdf
+project_link: null
+code_link: null
 aliases:
 - AvatarGPT
 tags:
@@ -40,13 +42,11 @@ claims:
 > - 低层任务 - 运动理解 (Low-level Tasks) 上，BertScore↑ 为 53.58，对比 32.40 (MotionGPT [10])，变化 +21.18。
 > - 高层任务 - 任务规划一致性 (High-level Tasks) 上，逻辑连贯性分数 LCS (CT2T) 为 0.843 (T5-Large)，对比 0.751 (GPT2-Large)，变化 +0.092。
 
-## 概述
+## 概要
 
 AvatarGPT 提出了一个面向人体运动的全能一体化框架，旨在打破现有方法中运动理解、规划与生成任务彼此孤立、缺乏高层任务规划与长期运动合成能力的瓶颈。核心思路是以语言为统一接口，将连续运动序列离散化为扩展词汇，通过轻量适配器与独立预测头无缝融入通用大语言模型，并借助自动标注流水线生成多粒度指令数据，实现多任务联合指令微调。这一设计使得框架能够利用 LLM 的推理能力进行任务规划与分解，再结合运动生成与理解形成闭环，通过模块间的迭代遍历实现符合高层指令的长序列运动合成。
 
 在低层任务上，AvatarGPT 在运动生成（FID 0.168）、运动理解（BertScore 53.58）等指标上达到 SOTA，显著优于 MotionGPT 等基线；在高层任务上，T5-Large 架构在逻辑连贯性分数等多项指标上明显优于 GPT2-Large，用户研究也证实其在规划、分解、生成等方面的更强能力。此外，从粗粒度场景描述出发，该方法可生成长达 2K+ 帧的连续运动序列，远超 MotionGPT 的 0.2K+ 帧，展现出在长序列合成上的突出优势。
-
-## 背景与动机
 
 人体运动生成与理解是计算机视觉与图形学领域的核心问题，在虚拟数字人、影视制作、游戏开发和具身智能等应用中具有广泛需求。近年来，基于文本驱动的运动合成取得了显著进展，涌现出**MDM**（Tevet et al., 2022）、**MLD**（Chen et al., CVPR 2023）、**T2M-GPT**（Zhang et al., 2023）等一系列方法，它们分别从扩散模型、潜在空间建模和离散token化等角度推动了运动生成质量的提升。然而，现有方法普遍存在一个根本性瓶颈：**各任务孤立处理，缺乏高级任务规划与长期运动合成能力**。
 
@@ -60,7 +60,7 @@ AvatarGPT 提出了一个面向人体运动的全能一体化框架，旨在打�
 
 基于此，**AvatarGPT**（CVPR 2024）提出了一个All-in-One框架，将运动理解、规划、生成及其它任务统一于共享的LLM架构之下。其核心动机在于：通过指令微调的方式，使LLM能够同时处理文本和运动两种模态，并在高层任务规划与低层运动合成之间建立迭代式的闭环通路，从而实现对任意粒度语言指令的端到端运动序列生成。
 
-## 核心创新
+## 核心方法与创新机理
 
 AvatarGPT 的核心创新在于将**连续运动序列离散化为扩展词汇**，并通过三项关键设计将运动模态无缝融入通用大语言模型（LLM），从而构建出首个覆盖运动理解、规划、生成与补间等七项任务的全能一体化框架。
 
@@ -85,8 +85,6 @@ AvatarGPT 的核心创新在于将**连续运动序列离散化为扩展词汇**
 ### 核心洞察
 
 AvatarGPT 的深层洞察在于：**以语言为统一接口，利用 LLM 的推理能力进行运动任务规划与分解，再结合运动生成与理解形成闭环**。通过迭代式的模块遍历，框架实现了符合高层指令的长序列运动合成，突破了现有方法在长期运动合成与高级任务规划上的瓶颈。
-
-## 整体框架
 
 ![[assets/figures/papers/paper_list_l14_https_openaccess_thecvf_com_content_CVPR2024_papers_Zhou_AvatarGPT_All_i/figures/001_Figure_1.jpg]]
 *Figure 1: An example of long human motion generation based on high-level user instructions, powered by the traversal of a few key modules within our proposed framework, including motion task planning, decomposition, generation, and motion in-between synthesis*
@@ -135,8 +133,6 @@ AvatarGPT 以**语言作为统一接口**，将运动理解、规划、生成等
 | T5-Large 编码器-解码器 | 在高层规划与低层生成上均优于 GPT2-Large | Table 2：7/8 项高层任务领先；Table 5：FID 0.168 |
 | 自动标注流水线 | 从 in-the-wild 视频高效构建多粒度训练数据 | Section 3.5 方法描述 |
 
-## 核心模块与公式推导
-
 AvatarGPT 的核心架构由运动分词器、词汇适配器、独立运动预测头和多任务指令微调LLM四个关键模块构成，辅以自动标注流水线提供多粒度训练数据。
 
 ### 3.1 运动分词器（Motion Tokenizer）
@@ -178,7 +174,7 @@ AvatarGPT采用T5-Large编码器-解码器架构作为统一骨干，将运动�
 
 为高效构建多粒度训练数据，AvatarGPT提出基于视觉LLM的自动标注流水线。对于任意in-the-wild视频，首先将其裁剪为固定长度的片段，然后利用视觉LLM描述视频内容，生成场景（scene）、任务（task）、步骤（step）等多级文本描述。该流水线无需人工标注，可规模化产出粗粒度到细粒度的指令数据，支撑多任务联合训练。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 低层任务：运动生成、理解与补间
 
@@ -247,11 +243,7 @@ Table 5 的消融实验揭示了三个关键设计决策的因果效应：
 
 需要注意的是，高层任务的 LCS 指标依赖自动评估，其与人类判断的一致性未做深入校准；长序列生成的定量指标（如 FID 随帧数变化的趋势）未在论文中报告，该结论主要基于定性展示。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l14_https_openaccess_thecvf_com_content_CVPR2024_papers_Zhou_AvatarGPT_All_i/figures/010_Table.jpg]]
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 方法脉络与基线参照
 

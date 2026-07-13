@@ -5,6 +5,8 @@ paper_level: A
 venue: ICML
 year: 2025
 pdf_ref: paperPDFs/ICML_2025/Being_M0_Scaling_Motion_Generation_Models_with_Million_Level_Human_Motions.pdf
+project_link: null
+code_link: null
 aliases:
 - BM
 - BMSMGMMLHM
@@ -42,7 +44,7 @@ claims:
 > - Motion-X-eval 上，R@1 0.486 (LLaMA3-8B, 1.2M data) vs 0.472 (GPT-2 355M, 1.2M data) (+0.014)。
 > - MotionLib-eval 上，R@1 0.185 (LLaMA2-13B, 1.2M data) vs 0.166 (GPT-2 355M, 1.2M data) (+0.019)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有文本-动作生成模型长期受困于两个相互强化的短板——**训练数据规模极小**（最大仅约8万条）与**运动表征能力不足**。传统VQ（Vector Quantization）分词器信息损失严重且易发生码本崩溃，导致模型在多样化及分布外（OOD）动作上泛化性能骤降。当面对包含百万级运动概念的MotionLib时，现有方法几乎完全失效（Figure 1 TOP）。
 
@@ -59,7 +61,7 @@ claims:
 
 **局限与开放问题**：当前评估器仅在约2万条数据上训练，泛化性不足，可能无法可靠评估大规模模型；运动分词器表示容量仍有限（1024词元），导致大模型收敛较慢；静态/合成数据的辅助效果有限。未来方向包括设计更鲁棒的评估指标、扩展分词器至3D量化，以及探索缩放定律的极限。
 
-## 背景与动机
+
 
 ### 运动生成的数据与表征瓶颈
 
@@ -90,7 +92,9 @@ claims:
 
 这一设计使得 Being-M0 首次在运动模态上展现出清晰的缩放定律：随着数据量从 0.02M 增至 1.2M、模型从 355M 扩展至 13B，生成质量（R@1、FID）持续提升（Table 2），并在分布外评测集 UNSEEN-90K 上取得显著增益（R@1 从 0.034 提升至 0.098，Table 4）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Being-M0 的核心创新并非单一算法改进，而是一套系统性的“数据—表征—量化—训练”协同扩展方案，旨在突破现有文本-动作生成模型在数据规模和运动表征能力上的双重瓶颈。
 
@@ -139,7 +143,7 @@ Being-M0 首次在运动生成领域展示了清晰的缩放定律：以 LLaMA2-
 
 > **注意**：2D-LFQ 在小规模数据集（如 HumanML3D）上可能略逊于 RQ-VAE，其优势主要体现在大规模数据场景（Section C.2.1）。这一局限性提示该方法的设计哲学是“为规模而生”。
 
-## 整体框架
+
 
 Being-M0 将运动生成建模为一种“外语”翻译任务，其整体框架由**运动分词器（Motion Tokenizer）**、**大语言模型（LLM）骨干**与**运动解码器（Motion Decoder）**三大模块串联构成，并通过**两阶段训练**实现百万级运动-文本对齐与指令跟随生成（Figure 3）。
 
@@ -193,7 +197,7 @@ $$\mathcal{L}(\Theta) = - \sum_{j=1}^{L} \log P_{\Theta}(y_j \mid desc, \hat{y}_
 
 该框架的模块化解耦设计使得运动分词器与 LLM 骨干可独立扩展——2D-LFQ 的码本利用率随码本增大持续提升（Figure 11 RIGHT），而 LLM 的生成质量随模型参数量与数据规模同步增长（Table 2）。
 
-## 核心模块与公式推导
+
 
 ### 整体框架：运动作为外语
 
@@ -282,7 +286,9 @@ $$\mathcal{L}(\Theta) = - \sum_{j=1}^{L} \log P_{\Theta}(y_j \mid desc, \hat{y}_
 ![[assets/figures/papers/paper_list_l1911_Being_M0_Scaling_Motion_Generation_Models_with_Million_Level_Human_Motio/figures/023_Table_13.jpg]]
 *Table 13: Ablation results of Encoder-Decoder vs. Decoder-only architecture*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：运动生成的缩放定律
 
@@ -358,7 +364,9 @@ Table 3在HumanML3D上使用HM3D-Format特征进行公平对比。Being-M0-LFQ�
 ![[assets/figures/papers/paper_list_l1911_Being_M0_Scaling_Motion_Generation_Models_with_Million_Level_Human_Motio/figures/019_Table_10.jpg]]
 *Table 10: Ablation results of LoRA tuning vs. full-parameter fine-tuning*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法沿革与基线对比
 
@@ -408,6 +416,8 @@ $$Q(z_i) = \arg\min_{c_{ik}} ||z_i - c_{ik}|| = -\mathbf{1}\{z_i \leq 0\} + \mat
 4. **部件级可控生成**：当前分层描述仅提供上下肢的粗略区分，如何实现更精细的部件级控制（如仅控制左臂动作）？
 5. **多模态条件的融合**：如何有效利用静态图像、音频、场景上下文等辅助模态，突破纯文本条件的性能上限？
 6. **合成数据的价值挖掘**：论文初步探索了合成数据（Section C.3），但效果有限。更高质量的合成运动数据能否成为规模化训练的可行路径？
+
+
 
 ## 原文 PDF
 

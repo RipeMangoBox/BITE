@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Beyond_Entity_Correlations_Disentangling_Event_Causal_Puzzles_in_Temporal_Knowledge_Graphs.pdf
+project_link: null
+code_link: null
 aliases:
 - HHECDRLA
 - BECDECPTKG
@@ -42,17 +44,17 @@ claims:
 > - ICEWS14 上，Hits@1 为 35.28，对比 30.49 (DECRL)，变化 +15.71%。
 > - ICEWS14 上，Hits@3 为 53.32，对比 48.07 (DECRL)，变化 +10.92%。
 
-## 概述
+## 概要
 
 本文提出**HEDRA (Heterogeneous Event causality Disentangling Representation learning Approach)**，一种面向时序知识图谱（Temporal Knowledge Graph, TKG）事件预测的异质因果解耦表示学习方法。现有TKG方法仅关注实体或关系层面的相关性，忽略了事件层面固有的异质因果性——包括非因果性、虚假因果性、静态因果性和动态因果性。HEDRA首次在事件层面构建TKG结构因果模型（SCM），通过反事实检测器、工具变量（IV）引导解耦模块和进化正交模块，逐步解耦这四类因果性，从而获得鲁棒的事件表示用于事件预测。在五个真实数据集（ICEWS14、ICEWS18、WIKI、YAGO、GDELT）上，HEDRA在MRR、Hits@1、Hits@3、Hits@10上平均超过第二名5.70%、7.51%、7.21%、2.30%。
 
-## 背景与动机
 
-## 1 问题定义
+
+### 1 问题定义
 
 TKG $\mathcal{G} = \{ (s, r, o, t) | s \in \mathcal{E}, r \in \mathcal{R}, o \in \mathcal{E}, t \in \mathcal{T} \}$ 是由带时间戳的事件组成的序列，每个事件表示为（主体，关系，客体，时间戳）。事件预测任务定义为：给定历史事件序列 $\mathcal{G}^{1:T-1}$，预测主体 $s$ 和客体 $o$ 之间候选关系的概率分布 $p(\hat{r} | s, o, \mathcal{G}^{1:T-1})$。
 
-## 2 现有方法的瓶颈
+### 2 现有方法的瓶颈
 
 现有TKG表示学习方法仅关注实体或关系层面的相关性，忽略了事件层面固有的异质因果性（非因果性、虚假因果性、静态因果性、动态因果性），且缺乏显式监督信号来区分这些因果性。具体而言：
 
@@ -61,11 +63,13 @@ TKG $\mathcal{G} = \{ (s, r, o, t) | s \in \mathcal{E}, r \in \mathcal{R}, o \in
 - **静态因果性**：事件之间长期稳定、不随时间变化的因果关系。
 - **动态因果性**：事件之间随时间演变的因果关系。
 
-## 3 核心洞察
+### 3 核心洞察
 
 在TKG中构建事件级结构因果模型，利用事件重要性和分布差异解耦非因果性，利用工具变量解耦虚假因果性，利用正交约束分离静态与动态因果性，从而获得鲁棒的事件表示用于事件预测。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 1. **首次在事件层面解耦TKG中的异质因果性**：提出事件级TKG结构因果模型（SCM），形式化定义非因果性、虚假因果性、静态因果性和动态因果性，并通过后门调整公式 $P(\mathcal{Y}|\operatorname{do}(\mathcal{D})) = \sum P(\mathcal{S}) \sum P(\mathcal{T}) \sum P(\mathcal{P}) \sum P(\mathcal{Y}|\mathcal{G})$ 估计动态因果性对预测的因果效应。
 
@@ -75,7 +79,7 @@ TKG $\mathcal{G} = \{ (s, r, o, t) | s \in \mathcal{E}, r \in \mathcal{R}, o \in
 
 4. **进化正交模块**：通过Gram-Schmidt正交化分离动态与静态因果性，通过进化损失保持动态分量的时序依赖性和静态分量的时序独立性。
 
-## 整体框架
+
 
 HEDRA的整体框架如Figure 3所示，以时间戳 $T-1$ 为例，包含以下流水线模块：
 
@@ -87,14 +91,14 @@ HEDRA的整体框架如Figure 3所示，以时间戳 $T-1$ 为例，包含以下
 6. **进化正交模块**：分离动态因果性与静态因果性。
 7. **事件预测解码器**：使用ConvTransE进行事件预测。
 
-## 核心模块与公式推导
 
-## 1 事件表示构建
+
+### 1 事件表示构建
 
 事件表示通过MLP融合主体、关系、客体的表示：
 $$\boldsymbol{h}_{event}^t = f_{MLP}([\boldsymbol{h}_s^t; \boldsymbol{h}_r^t; \boldsymbol{h}_o^t])$$
 
-## 2 反事实检测器
+### 2 反事实检测器
 
 **事件重要性权重**：基于事件表示计算候选边 $i \rightarrow j$ 的归一化注意力权重：
 $$e_{ij} = \mathrm{LeakyReLU}\left( a^{\top} [W_3 \boldsymbol{h}_{\mathrm{event},i}^t; W_4 \boldsymbol{h}_{\mathrm{event},j}^t] \right), \quad A_{ij} = \frac{\exp(e_{ij})}{\sum_{k \in \mathcal{N}^{\mathrm{in}}(j)} \exp(e_{kj})}$$
@@ -108,7 +112,7 @@ $$\boldsymbol{S} = (\alpha_{\mathrm{attn}} \cdot \mathrm{logit}(\boldsymbol{A} +
 **对比损失**：根据非因果性掩码鼓励低非因果性对靠近、高非因果性对远离：
 $$\mathcal{L}_{\mathrm{con}} = \frac{1}{|\mathcal{P}|} \sum_{(i,j) \in \mathcal{P}} \left[ (1 - M_{ij}^{\mathrm{NC}})(-\log \sigma(s_{ij}/\tau)) + M_{ij}^{\mathrm{NC}}(-\log(1 - \sigma(s_{ij}/\tau))) \right]$$
 
-## 3 IV引导解耦模块
+### 3 IV引导解耦模块
 
 **IV分数**：为每条边计算工具变量分数：
 $$\Pi_{ij} = f_{\mathrm{IV}}(\boldsymbol{h}_{\mathrm{event},i}^t, \boldsymbol{h}_{\mathrm{event},j}^t, \mathrm{logit}(A_{ij} + \varepsilon), -D_{ij})$$
@@ -119,7 +123,7 @@ $$\theta_\alpha = \mathrm{Quantile}_\alpha(\{ \widetilde{\Pi}_{ij} : M_{ij}^{\ma
 **鲁棒性损失**：对齐全视图与真实视图表示，分离虚假视图与真实视图表示：
 $$\mathcal{L}_{\mathrm{rob}} = \lambda_{\mathrm{align}} \frac{1}{E} \sum_{i=1}^E [-\log \sigma(s(\boldsymbol{h}_{\mathrm{all},i}^t, \boldsymbol{h}_{\mathrm{gen},i}^t)/\tau)] + \lambda_{\mathrm{sep}} \frac{1}{E} \sum_{i=1}^E [-\log(1 - \sigma(s(\boldsymbol{h}_{\mathrm{spur},i}^t, \boldsymbol{h}_{\mathrm{gen},i}^t)/\tau))]$$
 
-## 4 进化正交模块
+### 4 进化正交模块
 
 **静态与动态分量投影**：通过MLP将真实视图事件表示投影为静态和原始动态分量：
 $$\boldsymbol{h}_{\mathrm{event},i}^{S,t} = f_{stat}(\boldsymbol{h}_{\mathrm{gen},i}^t), \quad \boldsymbol{h}_{\mathrm{event},i}^{\mathrm{raw},D,t} = f_{dyn}(\boldsymbol{h}_{\mathrm{gen},i}^t)$$
@@ -136,7 +140,7 @@ $$\mathcal{L}_{evo} = \lambda_{dyn} \frac{1}{|\mathcal{G}|} \sum_{g \in \mathcal
 **融合进化表示**：融合静态视图和动态视图的异质卷积结果并归一化：
 $$\boldsymbol{H}_{evo}^t = \mathrm{Norm}(W_5[\mathrm{HConv}(G_{dyn}, \boldsymbol{H}_{gen}^t); \mathrm{HConv}(G_{stat}, \boldsymbol{H}_{gen}^t)])$$
 
-## 5 总体训练目标
+### 5 总体训练目标
 
 加权组合TKG损失、对比损失、鲁棒性损失和进化损失：
 $$\mathcal{L} = (1-\lambda_{con}-\lambda_{rob}-\lambda_{evo}) \mathcal{L}_{TKG} + \lambda_{con} \mathcal{L}_{con} + \lambda_{rob} \mathcal{L}_{rob} + \lambda_{evo} \mathcal{L}_{evo}$$
@@ -144,9 +148,11 @@ $$\mathcal{L} = (1-\lambda_{con}-\lambda_{rob}-\lambda_{evo}) \mathcal{L}_{TKG} 
 其中 $\mathcal{L}_{TKG}$ 为事件预测的交叉熵损失：
 $$\mathcal{L}_{TKG} = -\frac{1}{N_S} \sum_{i=1}^{N_S} \sum_{j=1}^{N_r} (y_{i,j} \log p_{i,j} + (1-y_{i,j}) \log(1-p_{i,j}))$$
 
-## 实验与分析
 
-## 1 主要结果
+
+## 实验与关键发现
+
+### 1 主要结果
 
 HEDRA在五个真实数据集上达到最先进性能。以下为关键结果：
 
@@ -174,7 +180,7 @@ HEDRA在五个真实数据集上达到最先进性能。以下为关键结果：
 | DECRL (第二名) | 22.74 | 12.56 | 22.57 | 45.89 |
 | 提升 | +8.36% | +10.91% | +13.11% | +6.82% |
 
-## 2 消融实验
+### 2 消融实验
 
 **Table 4: 消融实验结果（ICEWS14）**
 
@@ -190,7 +196,7 @@ HEDRA在五个真实数据集上达到最先进性能。以下为关键结果：
 - 移除IV引导解耦模块（HEDRA-w/o-IVDM）导致性能显著下降（MRR从47.86降至46.47），表明该模块在消除虚假因果性中起关键作用。
 - 移除进化正交模块（HEDRA-w/o-EOM）导致性能下降（MRR从47.86降至46.24），表明分离动态与静态因果性对事件预测有益。
 
-## 3 案例研究
+### 3 案例研究
 
 **Table 5: 案例研究——ICEWS14上的Top-5预测关系对比**
 
@@ -201,13 +207,13 @@ HEDRA在五个真实数据集上达到最先进性能。以下为关键结果：
 
 HEDRA在第一个样本中正确预测了“Make a visit”，在第二个样本中仅预测负面关系，与香港抗议事件的真实情况一致，而DECRL错误地预测了正面关系“Return, release person(s)”。
 
-## 4 超参数敏感性分析
+### 4 超参数敏感性分析
 
 - 历史窗口长度 $N_{window}$ 对性能影响较小。
 - 邻居数 $k$ 对性能影响显著，$k > 7$ 时性能趋于稳定（Figure 5）。
 - HEDRA对损失权重系数 $\alpha_{attn}$ 和 $\lambda_{align}$ 在合理范围内变化具有鲁棒性，默认对称设置（约0.5）接近最优（Figure 6）。
 
-## 5 资源与效率
+### 5 资源与效率
 
 | 数据集 | 参数量 | 峰值CUDA内存 | 训练时间 | 推理时间 |
 |--------|--------|-------------|---------|---------|
@@ -216,11 +222,11 @@ HEDRA在第一个样本中正确预测了“Make a visit”，在第二个样本
 
 与DHyper和DECRL相比，HEDRA在ICEWS14上MRR提升约15%和12%，但训练延迟分别增加约2倍和1.3倍，形成清晰的Pareto前沿（Figure 4）。
 
-## 6 少样本关系性能
+### 6 少样本关系性能
 
 在少样本关系设置下（20%关系保留20%四元组），HEDRA在ICEWS14上MRR为26.68，在ICEWS18上MRR为17.44，表明对有限监督数据具有一定鲁棒性（Table 11）。
 
-## 7 训练动态与虚假质量诊断
+### 7 训练动态与虚假质量诊断
 
 **Table 10: ICEWS14上的训练动态与虚假质量诊断**
 
@@ -234,13 +240,15 @@ HEDRA在第一个样本中正确预测了“Make a visit”，在第二个样本
 
 诊断统计量 $\bar{p}_s = \frac{1}{|\mathcal{E}_s|} \sum_{e \in \mathcal{E}_s} p_s(e)$ 从0.817增加到约0.852并饱和，表明IV引导模块逐渐对虚假因果边更加自信，性能提升与模型识别和抑制虚假因果性的能力提高相一致。
 
-## 8 动态与静态分量分析
+### 8 动态与静态分量分析
 
 Figure 7展示了中国和日本实体的动态与静态分量步长变化。对于中国和日本，动态分量变化幅度更大，表明短期冲击被动态分量吸收，而静态分量保持相对稳定。
 
-## 方法谱系与知识库定位
 
-## 1 与现有方法的关系
+
+## 定位与知识库关联
+
+### 1 与现有方法的关系
 
 HEDRA属于**结构派生方法**，与以下基线方法形成对比：
 
@@ -250,7 +258,7 @@ HEDRA属于**结构派生方法**，与以下基线方法形成对比：
 
 HEDRA是首个在事件层面解耦TKG中异质因果性的工作，与静态图因果学习方法（如PGExplainer (Luo et al., 2020)）和动态图因果学习方法（如DyGNNExplainer (Zhao & Zhang, 2024)）在问题设定和方法论上均有本质区别。
 
-## 2 局限性
+### 2 局限性
 
 1. HEDRA的计算复杂度为 $O(E^2 D + (N_e + N_r + E) D^2)$，在大规模数据集（如GDELT）上训练时间较长（约3.97 GPU小时）。
 2. 在GDELT上，HEDRA的MRR仅为24.64，Hits@1为13.93，表明在事件数量极大、关系稀疏的场景下性能仍有提升空间。
@@ -258,7 +266,7 @@ HEDRA是首个在事件层面解耦TKG中异质因果性的工作，与静态图
 4. 方法依赖于多个超参数（如 $k$、$\alpha_{attn}$、$\lambda_{align}$ 等），虽然敏感性分析表明在一定范围内鲁棒，但最优值仍需通过NNI搜索确定。
 5. 当前方法仅在TKG事件预测任务上验证，未在更广泛的动态图因果学习任务上测试其泛化性。
 
-## 3 开放问题
+### 3 开放问题
 
 1. 如何进一步降低HEDRA在大规模TKG上的计算开销，例如通过近似最近邻或采样策略？
 2. IV引导解耦模块中 $\alpha$ 分位数的选择是否可以在不同数据集上自适应调整？
@@ -267,12 +275,12 @@ HEDRA是首个在事件层面解耦TKG中异质因果性的工作，与静态图
 5. 如何为解耦后的静态和动态因果性提供更直观的可视化或可解释性分析？
 6. 在少样本场景下，是否可以引入元学习或外部知识来增强HEDRA的鲁棒性？
 
-## 整体框架
+### 整体框架
 
 ![[assets/figures/papers/iclr26_0002_RdoXks7VmJ_Beyond_Entity_Correlations_Disentangling_Event_C/figures/001_Figure_1.jpg]]
 *Figure 1: An example of heterogeneous causalities at the event level. IAEA denotes the International Atomic Energy Agency.*
 
-## 实验与分析
+### 实验与分析
 
 ### 补充图表
 
@@ -290,6 +298,8 @@ HEDRA是首个在事件层面解耦TKG中异质因果性的工作，与静态图
 
 ![[assets/figures/papers/iclr26_0002_RdoXks7VmJ_Beyond_Entity_Correlations_Disentangling_Event_C/figures/008_Table_5.jpg]]
 *Table 5: Top-5 predicted relations for two representative test samples on ICEWS14. Correctly predicted relations are indicated by a leading check mark (✓) and highlighted in bold.*
+
+
 
 ## 原文 PDF
 

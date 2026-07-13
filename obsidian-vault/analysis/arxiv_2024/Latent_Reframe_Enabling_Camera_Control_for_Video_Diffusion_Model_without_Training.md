@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2024
 pdf_ref: paperPDFs/arxiv_2024/Latent_Reframe_Enabling_Camera_Control_for_Video_Diffusion_Model_without_Training.pdf
+project_link: null
+code_link: null
 aliases:
 - LR
 - Latent-Reframe
@@ -41,7 +43,7 @@ claims:
 > [!tip] 效果简介
 > - 10 prompts + 80 RealEstate10K poses 上，FID 60.18 vs CameraCtrl (数值未直接提供，但论文称本文方法更优)；MotionCtrl 结果相当 (显著低于 CameraCtrl)；FVD 509.11 vs CameraCtrl (更高，即更差)；MotionCtrl 结果相当 (显著低于 CameraCtrl)；TransErr 5.52 vs CameraCtrl (更高)；MotionCtrl 稍高或相当 (最低的平移误差)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有的基于微调的摄像机控制方法（如 **MotionCtrl** (Wang et al., SIGGRAPH 2024) 和 **CameraCtrl**）需要额外的配对视频-姿态数据集进行训练，数据采集成本高且训练计算昂贵；更关键的是，微调过程会破坏预训练视频扩散模型的生成分布，导致视频质量下降。
 
@@ -51,7 +53,7 @@ claims:
 
 **主要结果**：在 10 个提示词与 80 个 RealEstate10K 姿态的基准测试中，Latent-Reframe 在 FID（60.18）和 FVD（509.11）指标上均显著优于 CameraCtrl，平移误差（5.52）为所有方法中最低，旋转误差（2.29）与 MotionCtrl 接近且优于 CameraCtrl（Table 1）。消融实验证实，时间感知点云相比静态点云能更好地捕捉动态变化（Figure 4），在 25 个去噪步骤中选择第 8 步执行重帧可在点云精度与修复效果之间取得最佳平衡（Figure 5）。
 
-## 背景与动机
+
 
 视频扩散模型在文本到视频生成领域已取得显著进展，但生成过程中的摄像机视角仍难以精确控制。用户往往希望生成的视频不仅能忠实于文本描述，还能沿着指定的摄像机轨迹（如平移、旋转或复杂组合运动）展开画面，这在电影预览、虚拟场景漫游等应用中至关重要。
 
@@ -65,7 +67,9 @@ claims:
 
 Latent-Reframe 正是基于这一动机提出的。其核心洞察是：预训练视频扩散模型在去噪过程的中间阶段，其潜在表示已编码了足够的场景三维结构与外观信息。如果能在此时将部分去噪的潜在代码“重新取景”（reframe），使其对齐目标摄像机姿态，就能在不触碰模型参数的前提下实现视角控制。这一思路将摄像机控制从**训练时注入**转变为**采样时操作**，从根本上规避了数据依赖与分布破坏问题。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Latent-Reframe 的核心创新在于将摄像机控制从**训练时微调**迁移到**采样时潜在空间操作**，彻底消除了对配对视频-姿态数据集和额外训练计算的需求。这一转变通过两个关键的 changed slots 实现：
 
@@ -87,7 +91,7 @@ Latent-Reframe 的核心洞察在于：**预训练视频扩散模型的中间潜
 
 综上，Latent-Reframe 的创新本质在于：**将摄像机控制从“学习条件映射”重新定义为“潜在空间中的 3D 几何操作 + 修复”**，从而在无需训练的前提下，实现了与训练型方法相当甚至更优的控制精度与生成质量。
 
-## 整体框架
+
 
 Latent-Reframe 的整体 pipeline 围绕一个核心思想展开：**在预训练视频扩散模型的去噪过程中途，对部分去噪的潜在表示进行“重帧”（reframing），从而实现无需训练的摄像机控制**。整个框架由四个串行模块构成，形成一条从潜在代码到视角可控视频的完整推理链路。
 
@@ -130,7 +134,7 @@ Latent-Reframe 的整体 pipeline 围绕一个核心思想展开：**在预训�
 
 在定量对比中（**Table 1**），Latent-Reframe 在 FID（60.18）和 FVD（509.11）上均显著优于 CameraCtrl，在平移误差（TransErr 5.52）上达到最优，旋转误差（RotErr 2.29）与 MotionCtrl 接近，验证了无需训练方案的有效性。
 
-## 核心模块与公式推导
+
 
 Latent-Reframe 的核心操作发生在预训练视频扩散模型的去噪过程中途，由三个紧密耦合的模块构成：近似干净视频估计、时间感知点云提取与重帧、以及潜在空间修复。以下逐一展开其机理与关键公式。
 
@@ -187,7 +191,9 @@ $$z_{t-1}' = m \odot z_{t-1}^{\mathrm{known}} + (1 - m) \odot z_{t-1}^{\mathrm{u
 ![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2412_06029/figures/009_Figure_8.jpg]]
 *Figure 8: Denoising time line of Latent-Reframe. Here, the diffusion step for latent reframing is set to 8, and the noise reduction step is set to 3*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -239,7 +245,9 @@ Latent-Reframe 在去噪过程的中途执行潜在重帧，步数的选择直�
 ![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2412_06029/figures/010_Table_2.jpg]]
 *Table 2: Detail hyperparameter settings*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题脉络与训练型方法的瓶颈
 
@@ -285,6 +293,8 @@ Latent-Reframe 的完整管线由四个模块串联而成，每个模块在知�
 1.  **更强的几何重建基座**：能否通过更先进的点云或三维重建模型（如 DUSt3R、MASt3R 等）进一步提高控制精度和生成质量？这是对管线中几何提取模块的直接升级。
 2.  **跨架构泛化**：该方法的核心思想——在去噪中途对潜在表示进行结构化操纵——是否可以推广到其他潜在扩散模型架构（如 DiT）或其他生成任务（如图像编辑、多视角合成）？
 3.  **大范围遮挡的修复策略**：如何处理大范围摄像机运动或极端遮挡带来的大面积未知区域，是该方法走向实际应用需要解决的关键工程问题。
+
+
 
 ## 原文 PDF
 

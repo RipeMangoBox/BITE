@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2024
 pdf_ref: paperPDFs/CVPR_2024/VMC_Video_Motion_Customization_using_Temporal_Attention_Adaption_for_Text_to_Video_Diffusion_Models.pdf
+project_link: https://video-motion-customization.github.io/
+code_link: null
 aliases:
 - VVMC
 - VMC
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | VMC：基于时序注意力自适应的文本视频扩散模型运动定制 |
 | 英文题名 | VMC: Video Motion Customization using Temporal Attention Adaption for Text-to-Video Diffusion Models |
 | 会议/期刊 | CVPR 2024 |
-| Links | [paper](https://arxiv.org/abs/2312.00845); [Project](https://video-motion-customization.github.io/) |
+| Links | [paper](https://arxiv.org/abs/2312.00845) · [Project](https://video-motion-customization.github.io/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | VMC (Video Motion Customization) |
 | Dataset | 用户研究及 CLIP 自动化指标, 训练效率 |
@@ -40,7 +42,7 @@ claims:
 > - 用户研究及 CLIP 自动化指标 上，Motion Preservation / Appearance Diversity / Text Alignment / Temporal Consistency 为 最优（运动保留 4.42, 外观多样性 4.54, 文本对齐 0.801, 时序一致性 0.959），对比 其他基线方法（分数更低），变化 显著优于所有基线。
 > - 训练效率 上，GPU 显存占用 / 训练时间 为 15GB VRAM，< 5 分钟，对比 常规全模型微调（更高），变化 资源消耗显著降低。
 
-## 概述
+## 概要
 
 **核心问题**：现有的文本到视频（T2V）扩散模型难以从单段视频中精确学习并再现特定的运动模式，同时生成外观多样的新视频。直接沿用静态图像定制方法（如 DreamBooth 式微调）会导致运动信息与外观信息高度纠缠，无法实现独立的运动迁移。
 
@@ -53,7 +55,7 @@ claims:
 
 **主要结果**：在用户研究和 CLIP 自动化指标上，VMC 在运动保留（4.42）、外观多样性（4.54）、文本对齐（0.801）和时序一致性（0.959）等维度均显著优于现有基线方法。消融实验证实，移除时序注意力自适应会导致运动蒸馏完全失败，而仅微调时序注意力层相比微调空间注意力层能产生更平滑的帧间过渡。
 
-## 背景与动机
+
 
 文本到视频（T2V）扩散模型近年来取得了显著进展，能够根据文本描述生成高质量的视频内容。然而，这些模型在**运动定制**（motion customization）方面仍面临核心瓶颈：用户希望从一段参考视频中提取特定的运动模式（如“猫在咆哮”时的头部动作），并将其迁移到全新的外观场景中（如“一只鸡在城市里做出相同的咆哮动作”），同时保持生成视频的视觉多样性。
 
@@ -63,7 +65,9 @@ VMC 的核心动机源于一个关键洞察：**连续帧之间的残差向量�
 
 基于上述洞察，VMC 提出了一种**单样本（one-shot）运动定制框架**，其设计目标明确：仅需一段参考视频和 5 分钟训练（15GB 显存），即可将目标运动模式迁移到任意新场景中，生成高时空分辨率的定制视频。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：运动与外观的纠缠
 
@@ -111,7 +115,7 @@ $$\ell_{\mathrm{align}} \big( \delta \mathbf{v}_0^n, \delta \hat{\mathbf{v}}_0^n
 
 VMC 的三个 changed slots 构成了一个**协同解耦机制**：时序注意力层的选择性微调从架构层面隔离运动信息，运动蒸馏目标从优化层面引导模型关注帧间变化而非帧内内容，外观不变提示词从条件层面阻断背景和外观信号的注入。三者共同作用，使得 VMC 能够从单段视频中高效提取运动模式，并迁移到任意新场景中，同时保持极低的训练开销（15GB 显存，5 分钟内完成）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l51_VMC_Video_Motion_Customization_using_Temporal_Attention_Adaption_for_Tex/figures/001_Figure_1.jpg]]
 *Figure 1: Using only a single video portraying any type of motion, our Video Motion Customization framework allows for generating a wide variety of videos characterized by the same motion but in entirely distinct contexts and better spatial/temporal resolution. 8-frame input videos are translated to 29-frame videos in different contexts while closely following the target motion. The visualized frames for the first video are at indexes 1, 9, and 17. A comprehensive view of these motions in the form of videos can be explored at our project page*
@@ -147,7 +151,7 @@ VMC 的整体框架围绕一个核心思想构建：**仅通过微调关键帧�
 
 VMC 的训练效率显著优于需要微调大量参数的方法：基于 Show-1 骨架实现时，混合精度训练仅需约 15GB 显存，单次训练在 5 分钟内完成。推理阶段生成 29 帧 576×320 分辨率的视频约需 12 分钟，占用 18GB 显存。这种轻量级设计使得 VMC 具有较高的实用价值。
 
-## 核心模块与公式推导
+
 
 ### 关键帧生成模块与运动向量定义
 
@@ -192,7 +196,9 @@ $$\min_{\theta} \mathbb{E}_{t,n,\epsilon_t^n,\epsilon_t^{n+c}} \big[ \ell_{\cos}
 | $\ell_{\text{align}} = \frac{1 - \bar{\alpha}_t}{\bar{\alpha}_t} \| \delta \epsilon_t^n - \delta \epsilon_{\theta,t}^n \|^2$ | $\delta \epsilon_t^n$：真实噪声残差 | 证明运动向量对齐等价于 epsilon 残差匹配 |
 | $\min_\theta \mathbb{E} [ \ell_{\cos} ( \delta \epsilon_t^n, \delta \epsilon_{\theta,t}^n ) ]$ | $\ell_{\cos}$：余弦距离 | 最终运动蒸馏损失，多尺度对齐运动信息 |
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -255,7 +261,9 @@ VMC 在所有六项指标上均显著优于基线方法。其中运动保留（4
 2. **多尺度运动蒸馏**：$\delta\epsilon$ 对齐目标在不同噪声水平下均能工作，利用了扩散潜在空间中的多尺度运动描述，无需显式的光流或轨迹标注。
 3. **资源效率**：15 GB 显存、5 分钟训练的设置，使得 VMC 在消费级 GPU 上即可运行，显著降低了运动定制的门槛。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 VMC 处于**文本到视频扩散模型运动定制**这一新兴子领域，其核心贡献在于提出了一套低侵入性的运动解耦学习方案。与现有工作相比，VMC 的方法定位可从以下几个维度理解。
 
@@ -290,6 +298,8 @@ VMC 在以下条件下表现出可靠性能：
 4. **DDIM 反演加速**：推理过程依赖 DDIM 反演将输入视频映射至噪声空间，该步骤的计算开销是否有优化空间，论文未深入探讨。
 
 5. **跨架构泛化**：VMC 的时序注意力自适应策略在基于 U-Net 的级联 VDM（Show-1）上验证。其是否适用于基于 Transformer 的扩散模型（如 Sora 类架构），需要进一步研究。
+
+
 
 ## 原文 PDF
 

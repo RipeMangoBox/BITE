@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/SafeDPO_A_Simple_Approach_to_Direct_Preference_Optimization_with_Enhanced_Safety.pdf
+project_link: null
+code_link: null
 openreview_forum_id: PJdw4VBsXD
 aliases:
 - SafeDPO
@@ -41,7 +43,7 @@ claims:
 > - PKU-SafeRLHF-30K (模型评测) 上，无害性 (平均负成本) 为 5.92，对比 -2.24 (DPO-HELPFUL)，变化 +8.16。
 > - PKU-SafeRLHF-30K (模型评测) 上，有用性 (归一化奖励) 为 4.86，对比 10.0 (DPO-HELPFUL, 锚定值)，变化 -5.14。
 
-## 概述
+## 概要
 
 大语言模型的安全对齐是部署前的关键步骤，但主流方法存在明显瓶颈。以 **SafeRLHF**（Dai et al., 2023）为代表的现有方案依赖辅助奖励模型、成本模型和多阶段在线采样训练，计算与概念复杂度高；同时，它们通常采用松弛的期望约束而非严格硬约束，无法从原理上杜绝不安全输出。SafeDPO 针对这两个瓶颈，提出了一条极简路径：**在温和假设下，原始硬约束安全对齐目标存在封闭形式的最优策略，该策略天然排除不安全响应**；基于此，SafeDPO 将难处理的约束优化目标转化为标准 DPO 风格的损失函数，仅需对偏好数据对进行安全感知的重排序/过滤，并引入一个额外的安全边际超参数 $\Delta$，即可实现单阶段、无需辅助模型的直接策略优化。
 
@@ -49,7 +51,7 @@ claims:
 
 在 PKU-SafeRLHF-30K 基准上，SafeDPO 将无害率从 DPO-HELPFUL 的 38.6% 提升至约 97%（模型评测）和 100%（GPT-4 评测），同时保持有竞争力的有用性。方法在不同模型规模（1.5B–13B）和随机种子上表现稳健，训练效率约为 SafeRLHF 的 24 倍，且所需网络组件和标注信号大幅减少。主要局限在于：仅在一个安全对齐数据集上验证，模型规模限于 13B，高安全边际下有用性可能受损，GPT-4 自动评估存在安全性与有用性评分耦合问题，且在 XSTest 上展现出 12.4% 的过度拒绝率。
 
-## 背景与动机
+
 
 大型语言模型（LLM）的安全对齐是确保其在真实部署中不产生有害输出的核心挑战。当前主流的安全对齐范式，如基于人类反馈的强化学习（RLHF），通常依赖辅助奖励模型和成本模型，并通过多阶段在线策略优化（如PPO-λ）来平衡有用性与无害性。然而，这类方法存在两个根本性瓶颈：
 
@@ -59,7 +61,9 @@ claims:
 
 针对上述缺口，本文的核心动机在于探索一条更简洁、更彻底的路径：**能否在直接偏好优化（DPO）框架内，以硬约束的形式实现安全对齐，同时避免引入辅助模型和在线采样？** 这一问题的关键在于，标准DPO仅优化有用性偏好，缺乏对安全性的显式建模；而简单地将安全偏好与有用性偏好混合训练（如DPO-HARMLESS）或过滤不安全样本（如DPO-SAFEBETTER）均无法达到令人满意的安全水平。因此，需要一种理论上严谨、实践中轻量的方法，将硬约束安全对齐目标转化为可直接优化的DPO风格损失函数。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SafeDPO 的核心创新在于将带硬约束的安全对齐问题转化为**无需辅助模型的直接偏好优化**，其关键洞察可归结为两点：**安全感知的数据变换**与**安全边际机制**。
 
@@ -96,7 +100,7 @@ SafeDPO 相对于各基线的 changed slots 可归纳为：
 
 值得注意的是，向其他 DPO 变体（DPO-HELPFUL、DPO-HARMLESS、DPO-SAFEBETTER）简单添加边际 Δ 仅产生有限的安全改进，无法达到 SafeDPO 的安全水平（Appendix C.1, Tables 5-7），进一步验证了安全感知变换是不可或缺的创新组件。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_PJdw4VBsXD/figures/003_Figure_3.jpg]]
 *Figure 3: Harmlessness and Helpfulness Variations with Changing ∆. The dashed horizontal line indicates the harmless ratio and helpfulness of each baseline method*
@@ -128,7 +132,7 @@ SafeDPO 的核心理论贡献在于证明了硬约束安全对齐目标（Equati
 
 消融实验表明，安全感知转换 T 是 SafeDPO 安全性能的关键驱动因素。仅靠数据集过滤（如 DPO-SAFEBETTER，仅移除首选响应不安全的样本）无法达到同等的无害率水平。安全边际 Δ 则在此基础上进一步增强安全性，但 Δ 过大（如 50）会损害有用性（Figure 3）。向其他 DPO 变体（如 DPO-HELPFUL、DPO-HARMLESS）添加边际仅产生有限改进，无法达到 SafeDPO 的安全水平，进一步验证了安全感知转换的核心作用。
 
-## 核心模块与公式推导
+
 
 ### 3.1 硬约束安全对齐的闭式解
 
@@ -206,7 +210,9 @@ SafeDPO 的训练流水线由三个模块串联构成：
 | $\beta$ | KL 惩罚系数，控制策略偏离参考策略的程度 |
 | $\tilde{h}_w, \tilde{h}_l$ | 变换后的安全标签（0=安全，1=不安全） |
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 安全性与有用性的核心权衡
 
@@ -283,7 +289,9 @@ SafeDPO 在不同模型规模上表现出一致的有效性（Table 1 / Table 9�
 
 ![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_PJdw4VBsXD/figures/013_Table.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法定位：从SafeRLHF到SafeDPO的简化路径
 
@@ -328,6 +336,8 @@ SafeDPO的核心贡献在于将安全对齐从多阶段、多模型的复杂流�
 3. **评估框架改进**：如何构建更公正的自动评估框架以解耦安全性与有用性，避免GPT-4评估中的耦合偏差？
 4. **推理时集成**：SafeDPO与推理时安全干预（如System Prompt、安全分类器）的集成效果如何？能否形成训练-推理协同的安全保障体系？
 5. **跨域泛化**：在PKU-SafeRLHF之外的安全领域（如生物安全、网络安全）上，安全感知变换的泛化能力如何？
+
+
 
 ## 原文 PDF
 

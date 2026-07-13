@@ -42,7 +42,7 @@ claims:
 > - PAI-Bench-G (Robotics I2V) 上，Grasp Success Rate↑ (Cosmos-Predict-2.5 base) 89.6 vs 79.2 (Cosmos-Predict-2.5) (+11.0)；Grasp Success Rate↑ (Wan2.2-I2V base) 85.7 vs 77.3 (Wan2.2-I2V) (+8.4)；Robot-QA Accuracy↑ (Wan2.2-I2V) 80.3 vs 77.4 (Wan2.2-I2V) (+2.9)。
 > - VideoPhy2 (Physics Alignment) 上，Human Eval (preference rate for Ours) 84.29% (physical commonsense preference) vs Wan2.2 T2V default sampler (大幅领先，84% 偏好率)。
 
-## 概述
+## 概要
 
 现代视频生成模型在复杂物理动态和运动连贯性方面仍存在明显不足。现有改进方案通常依赖外部验证器（如基于大语言模型的视频评分器）或需要额外训练，不仅计算成本高昂，而且域适应能力有限，难以捕捉细粒度的运动因果和物理合理性。
 
@@ -57,7 +57,7 @@ claims:
 
 本方法在流匹配和扩散模型上均展现出通用性，且仅引入约 40% 的额外推理时间开销。但需注意，P&P 本质上是局部搜索策略，对于需要全局规划的视觉推理任务（如迷宫求解）提升有限，且过度增加迭代次数可能导致模式坍塌。
 
-## 背景与动机
+
 
 ### 视频生成的核心瓶颈：物理动态与运动连贯性
 
@@ -95,7 +95,9 @@ $$\mathcal{L}_{\mathrm{FM}}(\theta) = \mathbb{E}_{t, z_0, z_1} \left[ \frac{1}{(
 
 这两个设计动机直接塑造了后续的方法架构：**不确定性感知的预测-扰动（Uncertainty-aware P&P）** 采样算法，其技术细节将在方法章节中展开。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作的核心创新在于将**推理时的自精炼能力内建于预训练视频生成器**，无需外部验证器、无需额外训练，也无需修改模型权重。其关键洞察在于：流匹配（Flow Matching）生成器可以被重新解释为时间条件去噪自编码器（time-conditioned DAE），从而在推理阶段激活一个伪吉布斯采样链，将视频隐变量逐步拉向数据流形的高密度区域。
 
@@ -156,7 +158,7 @@ $$z_{t_{i+1}} = z_{t_i}^* + \Delta t \cdot u_\theta(z_{t_i}^*, t_i)$$
 
 **需要手动验证的点**：论文声称 P&P 可迁移至扩散模型（在 CogVideoX 上的初步验证见 Figure 23），但该验证仅为定性展示，其在各类扩散架构上的最优超参数设置和鲁棒性尚缺乏系统性研究。此外，论文未报告与公平性（如不同群体、场景下的表现差异）相关的实验或讨论。
 
-## 整体框架
+
 
 自精炼视频采样（Self-Refining Video Sampling）将预训练的流匹配视频生成器重新解释为一个时间条件去噪自编码器（DAE），在推理阶段通过**预测-扰动（Predict-and-Perturb, P&P）**迭代循环，利用模型内部的运动与结构先验实现自我精炼，无需外部验证器或额外训练。
 
@@ -237,7 +239,7 @@ $$z_{t_{i+1}}^{(k)} \gets M_{t_i}^{(k)} \odot z_{t_{i+1}}^{(k)} + (1 - M_{t_i}^{
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2601_18577/figures/001_Figure_1.jpg]]
 *Figure 1: Concept of the self-refining video sampling. Within the same noise level, the video latent zt is refined as the predicted endpoint zˆ1 is pulled toward the data manifold*
 
-## 核心模块与公式推导
+
 
 ### 4.1 流匹配作为时间条件去噪自编码器
 
@@ -338,7 +340,9 @@ P&P 的独特优势在于**完全利用生成器自身的内部先验**，无需
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2601_18577/figures/030_Figure_23.jpg]]
 *Figure 23: P&P is also applicable to diffusion-based video generation models (e.g., CogVideoX (Yang et al., 2025b)), where it corrects video artifacts, such as a truncated lightsaber and distortions around the teddy bear’s mouth. (Image credit: MuDI (Jang et al., 2024))*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心评估设计
 
@@ -415,7 +419,9 @@ P&P 的独特优势在于**完全利用生成器自身的内部先验**，无需
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2601_18577/figures/002_Figure_2.jpg]]
 *Figure 2: Sampling comparison on a 2D synthetic dataset. (ab) P&P generates samples closer to the data manifold than the Euler solver. (c-d) With a fixed timestep, iterative P&P pulls the prediction*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心突破：将生成器重新解释为自精炼器
 
@@ -469,6 +475,8 @@ P&P 的适用边界涵盖多个视频生成基座模型：
 - P&P 在**更长视频、更高分辨率以及多模态条件**（如音频-视频联合生成）下的性能和鲁棒性如何？
 - 是否可以通过分析 P&P 的**能量景观**来解释其收敛特性，并为超参数选择提供理论指导？
 - 能否采用**异构模型或专门微调的模型**来承担精炼角色，以进一步提高跨域泛化能力？
+
+
 
 ## 原文 PDF
 

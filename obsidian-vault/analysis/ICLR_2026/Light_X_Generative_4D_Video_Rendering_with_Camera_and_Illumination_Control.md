@@ -44,7 +44,7 @@ claims:
 > - Joint Camera-Illumination Control (Real Videos) 上，PSNR ↑ 13.96 vs 13.49 (TL-Free) (+0.47)。
 > - Video Relighting (Text-conditioned) 上，FID ↓ 83.65 vs 112.45 (LAV) (-28.80)。
 
-## 概述
+## 概要
 
 **Light-X** 是首个从单目视频中实现对相机轨迹与光照进行联合控制的生成式框架。其核心动机源于现有视频重光照方法面临的根本性瓶颈：**光照保真度与时间一致性之间存在难以调和的权衡**，且缺乏对相机运动的联合操控能力。更深层的障碍在于，配对的多视角、多光照视频数据极度匮乏，严重制约了学习解纠缠表征的可能性。
 
@@ -54,7 +54,7 @@ Light-X 的关键洞察在于**显式解耦几何/运动信号与光照信号**�
 
 在联合相机-光照控制任务上，Light-X 显著优于所有组合基线方法，FID 降至 **101.06**，运动保持性（Motion Pres.）降至 **2.007**，用户研究中各项指标均获得超过 85% 的偏好率。在文本条件和背景图像驱动的视频重光照任务中，该方法同样以明显优势超越了专用重光照方法（如 **Light-A-Video** 和 **RelightVid**），并在真实野外视频上展现出更强的泛化能力。消融实验系统性地验证了 Light-Syn 三类训练数据、细粒度光照线索、全局照明控制模块以及软掩码域指示器等设计的关键贡献。
 
-## 背景与动机
+
 
 ### 问题背景：可控制视频生成的新挑战
 
@@ -90,7 +90,9 @@ Light-X 的核心洞察是：**分别构建动态点云与重光照点云，沿�
 
 这一解耦设计使得 Light-X 能够独立或联合调控相机运动与照明条件，突破了现有方法在光照保真度与时间一致性之间的根本性权衡，为可控制4D视频生成开辟了新路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Light-X 的核心创新在于对几何/运动信号与光照信号进行**显式解耦**，从而首次实现联合相机轨迹与照明的可控视频生成。与现有方法将相机参数嵌入或光照特征简单拼接不同，Light-X 通过以下关键设计突破瓶颈。
 
@@ -134,7 +136,7 @@ $$(\hat{V}^p, \hat{V}^m) = (V_k, \alpha_k \mathbf{1}), \quad k \in \{\mathrm{ref
 
 这些创新共同构成了 Light-X 在联合相机-光照控制任务中显著优于所有基线方法（FID 101.06 vs. 122.73，Table 1）的技术基础。
 
-## 整体框架
+
 
 Light-X 的核心设计理念是**显式解耦几何/运动信号与光照信号**，从而实现对相机轨迹和光照条件的独立或联合控制。整个框架以单目视频为输入，通过动态点云构建、几何对齐投影、条件注入与扩散模型去噪四个关键阶段，生成符合目标相机轨迹和光照条件的 4D 视频。
 
@@ -211,7 +213,7 @@ $$(\hat{V}^p, \hat{V}^m) = (V_k, \alpha_k \mathbf{1}), \quad k \in \{\text{ref},
 ![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_VBew6vESGL/figures/014_Figure.jpg]]
 *Figure: A: Overview of background-conditioned video relighting. A foreground video is fused with a background video to form the source video, while IC-Light generates a sparse relit video. Both are fed into our model to produce the final relit video with consistent illumination and motion. Figure C: Detailed Data curation pipeline Light-Syn. Given an original in-the-wild video $V ^ { t }$ . , we synthesize a degraded counterpart $\hat { V ^ { s } }$ V using different strategies for static, dynamic, and AI-generated scenes. From $\check { V }$ ^ { s } , we obtain geometry-aligned renders and masks $( V ^ { p } , \dot { V }$ ^ { m } ) and relit counterparts $( \hat { V }$ ^ { p } $, \hat { V }$ ^ { m } ) via inv...*
 
-## 核心模块与公式推导
+
 
 Light-X 的核心设计围绕一个根本性洞察展开：**将几何/运动信号与光照信号显式解耦**，分别通过动态点云投影提供细粒度几何线索，通过重光照点云投影提供对齐的照明线索，从而实现相机运动与光照的独立或联合调控。以下按模块拆解其关键机制。
 
@@ -269,7 +271,9 @@ $$(\hat{V}^p, \hat{V}^m) = (V_k, \alpha_k \mathbf{1}), \quad k \in \{\text{ref},
 ![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_VBew6vESGL/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of Light-Syn. From an in-the-wild video*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -350,7 +354,9 @@ Table 6 系统消融了训练数据、架构设计和训练策略的影响：
 ![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_VBew6vESGL/figures/009_Figure_6.jpg]]
 *Figure 6: Qualitative comparison for video relighting with light prompts “neon light” (left) and “sunlight” (right). Our method outperforms baseline methods in both relighting quality and temporal consistency. Please refer to the supplementary video for clearer comparisons*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 
@@ -403,6 +409,8 @@ Light-X 的适用边界由其设计中的几个关键依赖所定义：
 5. **物理条件的全面解耦**：Light-X 成功解耦了相机与光照，但场景的其他物理属性——材质反射率、表面粗糙度、环境遮挡——仍然耦合在源视频的内容表示中。能否将解耦的思路推广到这些维度，实现更全面的 4D 视频编辑？
 
 6. **无深度估计的几何先验**：在深度估计不可靠的动态场景（如快速运动、复杂遮挡）中，是否可以通过光流一致性或可微渲染来隐式地提供几何约束，而不依赖显式的深度估计？这将从根本上消除方法对深度精度的依赖。
+
+
 
 ## 原文 PDF
 

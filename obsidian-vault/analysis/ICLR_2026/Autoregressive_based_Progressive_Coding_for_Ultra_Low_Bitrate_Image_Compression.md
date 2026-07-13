@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Autoregressive_based_Progressive_Coding_for_Ultra_Low_Bitrate_Image_Compression.pdf
+project_link: null
+code_link: https://github.com/Joanna-0421/ARPC
 aliases:
 - ABPCA
 - ABPCULBIC
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 基于自回归的渐进式超低比特率图像压缩编码 |
 | 英文题名 | Autoregressive-based Progressive Coding for Ultra-Low Bitrate Image Compression |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=FXu4G5T5QZ); [GitHub](https://github.com/Joanna-0421/ARPC) |
+| Links | [paper](https://openreview.net/forum?id=FXu4G5T5QZ) · [GitHub](https://github.com/Joanna-0421/ARPC) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/generative_models_and_autoencoders |
 | Method | AutoRegressive-based Progressive Coding (ARPC) |
 | Dataset | CLIC2020 (1024×1024) |
@@ -41,11 +43,11 @@ claims:
 > - CLIC2020 (1024×1024) 上，BD-rate (DISTS) 为 0，对比 ARPC作为基线，变化 N/A。
 > - CLIC2020 (1024×1024) 上，BD-rate (PIEAPP) 为 0，对比 ARPC作为基线，变化 N/A。
 
-## 概述
+## 概要
 
 本文提出了一种基于自回归的渐进式图像压缩编码方法（AutoRegressive-based Progressive Coding, ARPC），旨在解决超低比特率（ultra-low bitrate）下图像压缩的感知保真度与解码效率问题。ARPC 利用视觉自回归模型（Visual AutoRegressive model, VAR）的下一尺度预测（next-scale prediction）范式，通过多尺度残差向量量化器将图像编码为离散的分层视觉token，并仅选择前k个尺度进行传输，利用VAR的自回归生成能力预测未接收的尺度，从而实现渐进式编码。实验表明，ARPC在超低比特率下实现了最先进的感知保真度，且解压效率比现有基于扩散模型的方法高2-6倍。
 
-## 背景与动机
+
 
 现有基于扩散模型的超低比特率图像压缩方法面临三大瓶颈：
 
@@ -55,7 +57,9 @@ claims:
 
 核心洞察是：VAR的从粗到细（coarse-to-fine）生成范式天然契合渐进式压缩——先传输包含布局等关键信息的粗尺度，再逐步添加细粒度纹理细节以提升图像质量。同时，VAR相比扩散模型具有更快的生成速度，且无需发送端和接收端共享随机性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ARPC 的核心创新在于将视觉自回归模型（VAR）的下一尺度预测范式引入图像压缩领域，具体包括：
 
@@ -64,7 +68,7 @@ ARPC 的核心创新在于将视觉自回归模型（VAR）的下一尺度预测
 3.  **基于VAR概率估计的无损熵重编码（LRE）**：将VAR作为概率估计器，利用其c个二元分类器预测每个token的分布，用于算术编码，实现约30%的比特率降低。
 4.  **分组掩码bitwise多尺度残差量化器（GM-BMSRQ）**：对前几个尺度的通道进行掩码（第一组掩码后c/2通道，第二组掩码后c/4通道），实现更紧凑的表示。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_generative_models_diffusion__generative_models_and_autoencoders__b001_FXu4G5T5QZ_Autoregr/figures/001_Figure_1.jpg]]
 *Figure 1: Qualitative comparison between ARPC and diffusion-based methods. ARPC effectively reconstructs fine-grained textural details, while other methods exhibit noticeable texture loss.*
@@ -78,7 +82,7 @@ ARPC的整体框架如Figure 2所示，包含以下主要模块：
 5.  **视觉自回归模型（VAR）**：作为概率估计器用于熵编码，并作为生成器预测未接收的尺度token。
 6.  **图像解码器（Image Decoder D）**：将完整的K个尺度token上采样并拼接后重建为图像。
 
-## 核心模块与公式推导
+
 
 ### 5.1 尺度token概率的自回归分解
 
@@ -122,7 +126,9 @@ $$\mathcal{L}_{VAR} = -\sum_{i=1}^{K} \log p_\theta(R_i | R_{<i})$$
 
 $$y_k(i,j) = \sum_{n=0}^{c-1} \mathbb{1}_{R_k(i,j,n) > 0} 2^n$$
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 6.1 主要结果
 
@@ -222,7 +228,9 @@ ARPC在CLIC2020和DIV2K两个标准测试集上进行了评估，与13个最先�
 | BLIP + w/ LRE | 0.12 | 0.08 |
 | BLIP + w/o LRE | 25.93 | 25.56 |
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ARPC 属于生成式图像压缩（generative image compression）领域，具体位于以下方法谱系中：
 
@@ -232,6 +240,8 @@ ARPC 属于生成式图像压缩（generative image compression）领域，具�
 4.  **ARPC**：首次将视觉自回归模型（VAR）的下一尺度预测范式引入图像压缩，实现了渐进式编码、高感知保真度和高效解码的平衡。
 
 ARPC 的核心贡献在于证明了视觉自回归模型不仅可以用于图像生成，还可以作为高效的图像压缩框架，为超低比特率图像压缩提供了新的技术路径。
+
+
 
 ## 原文 PDF
 

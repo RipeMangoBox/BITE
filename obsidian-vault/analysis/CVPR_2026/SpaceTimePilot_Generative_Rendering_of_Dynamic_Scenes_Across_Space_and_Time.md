@@ -44,7 +44,7 @@ claims:
 > - VBench 上，ImgQ（图像质量） 0.6486 vs 0.6389 (TrajectoryCrafter) (+0.0097)。
 > - OpenVideoHD 相机控制评估 上，RelRot（相对旋转误差） 2.71 vs 3.34 (ReCamM+Aug+csrc) (-0.63)。
 
-## 概述
+## 概要
 
 现有的视频生成方法在空间与时间控制上存在根本性割裂：相机视点变换模型（如 ReCamMaster、TrajectoryCrafter）仅能沿单调时间轴进行相机运动，而四维多视图模型（如 4DGS 类方法）虽可生成离散时空采样点，却无法输出连续视频序列。这种局限使得“子弹时间”“慢动作回放”与自由相机轨迹的组合效果难以在单一模型中实现——这正是 **SpaceTimePilot** 要解决的核心瓶颈。
 
@@ -54,7 +54,7 @@ SpaceTimePilot 的核心思想是在视频扩散模型中引入一个可显式�
 
 在方法谱系上，SpaceTimePilot 属于**条件视频扩散模型**的延伸，其相机条件机制沿袭了 ReCamMaster 的轨迹投影思路，但首次将时间控制提升为与相机对等的独立维度。与 TrajectoryCrafter 的“先重排后控相机”策略不同，SpaceTimePilot 在扩散去噪过程中同时注入相机与时间信号，避免了相机运动被时间重排干扰的问题。在知识库定位上，该方法填补了“连续时空导航式生成渲染”的空白，为后续研究提供了时空解耦控制的基础框架与数据集基准。
 
-## 背景与动机
+
 
 **核心瓶颈：空间与时间控制的耦合困境**
 
@@ -72,7 +72,9 @@ SpaceTimePilot 旨在打破这一耦合壁垒，在单一视频扩散模型中�
 
 Figure 2 清晰地刻画了方法谱系中的缺口：相机控制 V2V 方法仅在时间单调的约束下改变相机；4D 多视图方法仅在离散时空点上生成稀疏视图；而 SpaceTimePilot 首次实现了在相机轴和时间轴上的自由连续移动，支持方向、速度的完全控制，以及混合时空轨迹。这一能力填补了“连续时空导航”的方法空白，为动态场景的生成式渲染提供了新的控制维度。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SpaceTimePilot 的核心创新在于将视频扩散模型中的**空间（相机运动）与时间（场景动态）显式解耦**，使单一模型能够沿任意时空轨迹生成连续、连贯的视频。现有方法要么只能控制相机轨迹而保持时间单调推进（如 **ReCamMaster**），要么只能生成离散的稀疏视角而无法产出连续视频序列（如 4D 多视图模型），无法实现子弹时间、慢动作与自由相机路径的任意组合。SpaceTimePilot 通过以下三个关键机制突破这一瓶颈。
 
@@ -100,7 +102,7 @@ $$x_{\mathrm{src}}' = x_{\mathrm{src}} + \mathcal{E}_{\mathrm{cam}}(\mathbf{c}_{
 
 为提供密集的时空监督，方法构建了 **Cam×Time 数据集**——对每个场景沿多条相机轨迹进行 120 帧的完整时间覆盖渲染，形成全时空网格。Table 1 对比显示，现有数据集（如 ReCamMaster、SynCamMaster）仅提供稀疏的时间采样，而 Cam×Time 支持在 0–120 帧范围内任意采样时间变化。联合训练 Cam×Time 能够消除基线方法中的明显伪影（Figure 15 Top），验证了密集时空监督对解耦质量的决定性作用。
 
-## 整体框架
+
 
 SpaceTimePilot 的整体框架围绕一个核心设计展开：在视频扩散模型中同时注入**相机轨迹**（空间控制）和**动画时间**（时间控制）两路独立的控制信号，从而实现对动态场景的跨时空生成式渲染。其输入为一个源视频 $V_{\mathrm{src}} \in \mathbb{R}^{F \times C \times H \times W}$，输出为一个目标视频 $V_{\mathrm{trg}}$，该目标视频遵循用户指定的相机轨迹 $\mathbf{c}_{\mathrm{trg}}$ 和动画时间序列 $\mathbf{t}_{\mathrm{trg}}$，可产生子弹时间、慢动作、倒放等非单调时间效果，同时保持相机运动的精确可控。
 
@@ -152,7 +154,7 @@ Figure 8 给出了 SpaceTimePilot 的完整架构图。模型通过时空注意�
 ![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2512_25075/figures/013_Figure_8.jpg]]
 *Figure 8: Architecture of SpaceTimePilot. Our model jointly conditions on camera trajectories and temporal control signals via space–time attention, enabling non-monotonic motion generation such as reversals, repeats, accelerations, and zigzag time*
 
-## 核心模块与公式推导
+
 
 ### 3.1 基础架构：视频扩散模型
 
@@ -227,7 +229,9 @@ SpaceTimePilot 通过三个关键设计实现时空解耦：
 ![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2512_25075/figures/009_Table_5.jpg]]
 *Table 5: Time-embedding compressor ablation. The proposed time-embedding method, trained with temporal warping on the proposed dataset, yields sharper results overall*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -296,7 +300,9 @@ Figure 5 和 Figure 13 展示了更多时空控制组合的定性结果，包括
 ![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2512_25075/figures/005_Figure_4.jpg]]
 *Figure 4: Cam×Time dataset visualization. (Top) A space-time grid defined by a camera trajectory*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与突破路径
 
@@ -349,6 +355,8 @@ SpaceTimePilot 的核心突破在于将时间线概念从隐式的帧序关系�
 4. **真实世界视频的泛化**：Cam×Time 数据集基于合成或受控采集的多视图数据构建，模型在真实用户拍摄的单目视频上的时空控制能力尚需验证。域迁移（domain adaptation）或少量样本微调策略可能是实用的补充方案。
 
 5. **计算效率**：全 3D 注意力机制（Full-3D Attention）虽然有效捕捉长程时空依赖，但计算开销较大。如何在保持控制精度的前提下降低推理成本，是推动实际应用落地的关键挑战。
+
+
 
 ## 原文 PDF
 

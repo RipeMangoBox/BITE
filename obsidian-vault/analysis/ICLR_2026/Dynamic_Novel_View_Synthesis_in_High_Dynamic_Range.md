@@ -42,7 +42,7 @@ claims:
 > - HDR-4D-Syn 上，HDR PSNR↑ 30.40 vs 29.30 (HDR-HexPlane†) (+1.10)；HDR SSIM↑ 0.914 vs 0.844 (HDR-HexPlane†) (+0.070)；HDR LPIPS↓ 0.097 vs 0.223 (HDR-HexPlane†) (-0.126)。
 > - HDR-4D-Real 上，LDR PSNR↑ 30.69 vs 28.12 (HDR-HexPlane†) (+2.57)；LDR SSIM↑ 0.927 vs 0.767 (HDR-HexPlane†) (+0.160)；LDR LPIPS↓ 0.097 vs 0.307 (HDR-HexPlane†) (-0.210)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -70,7 +70,7 @@ HDR-4DGS处于动态场景新视角合成与高动态范围重建的交叉点。
 
 HDR-4DGS仍存在三方面局限：（1）底层4DGS表示未针对HDR内容专门设计，极端光照变化下的建模能力受限；（2）DTM使用固定时间上下文窗口，无法自适应调整感受野；（3）在前后景外观相似的动态边界处可能出现颜色再现不佳或空间模糊。未来工作可围绕HDR 4D场景的定制化表示、自适应上下文窗口机制、以及显式语义/运动边界建模等方向展开。
 
-## 背景与动机
+
 
 高动态范围（HDR）新视角合成旨在从一组多曝光或单一曝光的低动态范围（LDR）图像中，重建任意视角下具有完整亮度范围的高保真HDR视图。该技术对于计算摄影、虚拟现实和电影后期制作等应用至关重要，因为这些场景中同时存在极亮和极暗区域，LDR成像无法同时保留高光和阴影细节。
 
@@ -86,7 +86,9 @@ HDR-4DGS仍存在三方面局限：（1）底层4DGS表示未针对HDR内容专�
 
 本文的核心动机在于：**借鉴人类视觉系统的适应性机制**——人眼能够根据场景整体亮度分布动态调整感知灵敏度，从而在不同光照条件下保持对细节和色彩的稳定感知。受此启发，我们提出HDR-4DGS，通过构建**动态色调映射模块（DTM）**，利用过去时间戳的辐射度统计信息生成时间自适应的逐通道色调映射曲线，显式桥接HDR与LDR域，从而在统一的4D高斯溅射框架下实现动态几何与HDR辐射度的联合重建。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 HDR-4DGS 的核心创新在于将**动态色调映射**显式嵌入 4D 高斯溅射框架，从而在统一优化中同时解决动态几何重建与高动态范围（HDR）辐射度恢复两个耦合难题。与现有工作相比，其关键 changed slots 体现在三个层面。
 
@@ -123,7 +125,7 @@ HDR-4DGS 解决的**真实瓶颈**是：现有 HDR 新视角合成方法（如 *
 
 **注意**：HDR-4D-Real 数据集上的 HDR 评价受真实 HDR 标签噪声影响，且 PSNR 倾向于过度平滑的图像（Figure 9），因此 HDR-HexPlane 的 HDR PSNR 较高并不反映真实感知质量；定性对比（Figure 3）显示 HDR-4DGS 保留更多细节和准确色彩。
 
-## 整体框架
+
 
 HDR-4DGS的整体pipeline围绕一个核心矛盾展开：如何在动态场景中同时保持几何-辐射度的时空一致性与高动态范围重建精度。如图1所示，框架由三个协同模块构成流水线：
 
@@ -142,7 +144,7 @@ HDR-4DGS的整体pipeline围绕一个核心矛盾展开：如何在动态场景�
 ![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_10iBNwPtl2/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of HDR-4DGS. (a) Input data and scene representation; (b) Our proposed Dynamic Tone Mapper (DTM) for temporally adaptive HDR–LDR translation; (c) Loss formulation for joint optimization of geometry, radiance, and tone mapping. ⊗ : Dot product. ©: Concatenation*
 
-## 核心模块与公式推导
+
 
 ### 3.1 总体框架
 
@@ -220,7 +222,9 @@ $$\hat{\mathbf{I}}^h = \frac{\log(1 + \mu \cdot \operatorname{norm}(\mathbf{I}^h
 ![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_10iBNwPtl2/figures/006_Figure_4.jpg]]
 *Figure 4: Temporal variation with learned tone mapping patterns by DTM in two scenes*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -300,7 +304,9 @@ Figure 5定量展示了不同方法在HDR渲染中的时间辐射度变化。HDR
 ![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_10iBNwPtl2/figures/017_Figure_9.jpg]]
 *Figure 9: PSNR prefers over-smooth or blurry images. HDR images are tone-mapped by Photomatix Pro (HDRsoft Team, 2025)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位与问题瓶颈
 
@@ -355,6 +361,8 @@ HDR-4DGS 的能力边界受限于其基础表示的选择和 DTM 的设计假设
 3. **语义/运动边界的显式建模**：如何显式建模语义或运动边界来消除动态内容的歧义并提升边界处的辐射一致性？当前方法的边界模糊问题指向了将运动分割或光流估计融入辐射度建模的可能性。
 
 4. **HDR 评价指标的改进**：真实 HDR 标签噪声和 PSNR 对平滑图像的偏好暴露了现有评价体系的不足。开发更鲁棒的 HDR 感知质量指标，对于推动该领域的公平比较和技术进步具有重要意义。
+
+
 
 ## 原文 PDF
 

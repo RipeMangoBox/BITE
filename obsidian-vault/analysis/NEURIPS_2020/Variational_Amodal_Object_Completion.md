@@ -5,6 +5,7 @@ paper_level: A
 venue: NeurIPS
 year: 2020
 pdf_ref: paperPDFs/NEURIPS_2020/Variational_Amodal_Object_Completion.pdf
+code_link: null
 project_link: "https://www.cs.toronto.edu/~linghuan/vae_mask/"
 aliases:
 - AV
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 变分去模态物体补全 |
 | 英文题名 | Variational Amodal Object Completion |
 | 会议/期刊 | NeurIPS 2020 |
-| Links | [paper](https://papers.nips.cc/paper/2020/hash/bacadc62d6e67d7897cef027fa2d416c-Abstract.html); [Project](https://www.cs.toronto.edu/~linghuan/vae_mask/) |
+| Links | [paper](https://papers.nips.cc/paper/2020/hash/bacadc62d6e67d7897cef027fa2d416c-Abstract.html) · [Project](https://www.cs.toronto.edu/~linghuan/vae_mask/) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/generative_models_and_autoencoders |
 | Method | Amodal-VAE |
 | Dataset | KINS, Cityscapes → KINS (cross‑domain), User Study |
@@ -42,7 +43,7 @@ claims:
 > - KINS 上，Full mIOU 为 94.68，对比 94.04 (De-occlusion)，变化 +0.64。
 > - Cityscapes → KINS (cross‑domain) 上，Invisible mIOU 为 56.18，对比 48.23 (De-occlusion)，变化 +7.95。
 
-## 概述
+## 概要
 
 ### 问题背景与核心瓶颈
 
@@ -68,7 +69,7 @@ claims:
 
 当前方法主要在刚性物体为主的驾驶场景上验证，向非刚性物体或数据稀缺场景的推广仍需探索。输入掩码的自动裁剪策略与基于真实去模态边界框的裁剪之间存在显著性能差距，设计更鲁棒的裁剪方法是一个重要的改进方向。此外，如何更有效地融合 RGB 图像信息、以及在完全无完整掩码标注的条件下扩展方法适用范围，仍是值得深入研究的开放问题。
 
-## 背景与动机
+
 
 ### 问题定义：去模态物体补全
 
@@ -93,7 +94,9 @@ claims:
 
 具体而言，本文提出 **Amodal-VAE**，一种基于变分自编码器（VAE）的生成框架。其核心设计思想是：先学习完整掩码的低维生成流形（解码器），再固定该流形学习从部分掩码到完整掩码的**概率映射**（编码器）。这种分离训练策略使得模型能够在弱监督条件下，捕获去模态补全的多种可能性，同时保持生成质量。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Amodal-VAE 的核心创新在于将**去模态物体补全从确定性映射重新定义为概率生成问题**，并通过**三阶段解耦训练策略**，在完全无需去模态标注的条件下，首次实现了对遮挡区域不确定性的显式建模与多模态采样。相较于确定性基线 **De-occlusion**（Zhan et al., ECCV 2020），本工作在下述关键维度上实现了方法论的根本转变。
 
@@ -121,7 +124,7 @@ De-occlusion 等先前方法依赖去模态标注或合成标签进行监督训�
 
 为提升补全的语义合理性，Amodal-VAE 将物体类别 $c$ 作为条件同时输入编码器与解码器，使隐空间按类别组织。移除类别条件导致不可见区域 mIOU 下降 9.82 个百分点（62.85 → 53.03），验证了语义先验对形状推断的引导作用。此外，引入的**空间变换器**预测 2D 仿射变换参数，将解码器输出的完整掩码自动对齐至输入部分掩码的尺度与位置，解决了部分掩码裁剪区域与完整掩码范围不匹配的问题。
 
-## 整体框架
+
 
 Amodal-VAE 的整体流程围绕一个概率编码器‑解码器架构展开，其核心思想是**将完整物体掩码的生成先验与部分‑完整掩码的概率映射分离学习**，从而在不依赖任何去模态标注的情况下，捕获遮挡区域补全的多种可能性。
 
@@ -156,7 +159,7 @@ Amodal-VAE 的整体流程围绕一个概率编码器‑解码器架构展开，
 ![[assets/figures/papers/paper_list_l39_https_papers_nips_cc_paper_2020_hash_bacadc62d6e67d7897cef027fa2d416c_Ab/figures/001_Figure_1.jpg]]
 *Figure 1: We present a new method for amodal object completion (top), and showcase our work on scene editing (bottom). User is presented with interactive tools to complete, erase, and manipulate objects in an image*
 
-## 核心模块与公式推导
+
 
 Amodal‑VAE 的核心架构由三个功能模块构成，分别负责部分掩码编码、完整掩码解码以及输出掩码的空间对齐。整个训练过程通过精心设计的损失函数将这三个模块有机耦合，实现了从可见部分到完整形状的概率映射。
 
@@ -212,7 +215,9 @@ $$\mathcal{L}_{\mathrm{Finetuning}}(w_3) = \mathbb{E}_{\hat{y}, c \sim \hat{\mat
 
 其中 $\hat{y}^{\mathrm{vis}}$ 表示仅保留可见区域像素的部分掩码。这一阶段使编码器适应真实场景中复杂多样的遮挡模式，而无需任何去模态标注。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -274,7 +279,9 @@ Amodal-VAE 的概率本质使其能够从近似后验分布中采样多个隐变
 
 ![[assets/figures/papers/paper_list_l39_https_papers_nips_cc_paper_2020_hash_bacadc62d6e67d7897cef027fa2d416c_Ab/figures/008_Table.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位与核心瓶颈
 
@@ -333,6 +340,8 @@ Amodal-VAE 的核心技术贡献在于**分离式三阶段训练**，这一设�
 - **跨域泛化与数据效率**：在少量标注或完全无完整掩码的数据情景下，能否扩展该方法以处理更通用的场景和更丰富的物体类别？Table 5 的跨域实验（Cityscapes→KINS）显示不可见 mIOU 从 62.85 降至 56.18，提示域偏移仍是挑战。
 - **不确定性输出的下游利用**：概率框架生成的多模态补全如何用于下游任务（如运动规划、目标跟踪）的不确定性估计与融合？Table 4 显示通过 GT 区域搜索最优样本可将不可见 mIOU 提升至 69.96，但实际应用中缺乏 GT 指导，如何自动选择或融合多样本输出仍需探索。
 - **非刚性物体的扩展**：当前方法隐式假设物体形状在遮挡前后保持刚性，对于可变形物体（如动物、衣物）的补全需要引入形变建模能力。
+
+
 
 ## 原文 PDF
 

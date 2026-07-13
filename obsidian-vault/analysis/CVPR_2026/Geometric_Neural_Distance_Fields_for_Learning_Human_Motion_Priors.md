@@ -42,7 +42,7 @@ claims:
 > [!tip] 效果简介
 > - AMASS (noisy 3D) 上，MPJPE All (mm) 16.4 (NRMF) vs 20.9 (RoHM) (-4.5)；Acc Err 2.25 (NRMF) vs 2.61 (RoHM) (-0.36)；MPJPE All (mm) 16.4 (NRMF) vs 16.7 (NRDF+T-NRDF) (-0.3)。
 
-## 概述
+## 概要
 
 **研究问题**：现有的人体运动先验（如VAE、扩散模型等）主要建模姿态的静态分布或一阶过渡，普遍忽略二阶动力学（角加速度），导致运动估计中出现过平滑、时间不一致和漂移等问题；同时，它们缺乏在乘积流形上对关节间相互依赖性的联合建模。
 
@@ -57,7 +57,7 @@ claims:
 
 **方法定位**：NRMF在神经距离场先验（如NRDF）的基础上，首次将二阶动力学显式纳入乘积流形表示，填补了现有先验（VPoser、HuMoR、RoHM、MDM等）在加速度建模上的空白。其投影和积分算法为在黎曼流形上处理时序运动数据提供了新范式。
 
-## 背景与动机
+
 
 ### 人体运动先验的核心挑战
 
@@ -89,7 +89,9 @@ claims:
 
 这一设计使得NRMF能够从根本上解决过平滑和物理漂移问题：加速度先验直接约束运动的二阶行为，而几何投影算法确保优化轨迹始终保持在合理流形上。后续章节将详细展开这一方法的技术实现与实验验证。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 NRMF 的核心创新在于将人体运动先验从静态姿态或一阶过渡建模，**系统性地提升至包含加速度的二阶动力学联合建模**，并在乘积黎曼流形上设计了配套的几何投影与积分算法，确保物理可行性。以下从三个 changed slots 展开其相对于现有方法的本质差异。
 
@@ -136,7 +138,7 @@ $$\theta_{t+1} = \Pi^{R}(\theta_t) = \mathrm{Exp}_{\theta_t}\left(-\alpha_\theta
 
 NRMF 的 changed slots 构成了一条完整的因果链：**更高维的表示**（0–2 阶联合）提供了约束运动动力学的可能性，**条件 NDF 先验**将这种可能性转化为可微的距离度量，**几何投影/积分算法**则确保优化和生成过程始终尊重 $\mathrm{SO}(3)$ 的流形结构。三者缺一不可，共同解释了 NRMF 在运动去噪（MPJPE 16.4 mm vs. RoHM 20.9 mm）、部分观测恢复（All MPJPE 46.3 mm）和运动生成（FIDm 5.317）等任务上的系统性提升。
 
-## 整体框架
+
 
 NRMF 将人体运动先验构建为三个条件神经距离场（NDF）的零水平集，分别对应运动的第零阶（姿态）、第一阶（角速度过渡）和第二阶（角加速度）动力学，并在 SO(3) 的乘积流形上显式建模这些量的联合分布。
 
@@ -168,7 +170,7 @@ NRMF 将人体运动先验构建为三个条件神经距离场（NDF）的零水
 ![[assets/figures/papers/paper_list_l1026_https_arxiv_org_abs_2509_09667/figures/002_Figure_2.jpg]]
 *Figure 2: Neural Riemannian Motion Fields (NRMF) models the motion in the zero-level-set of three disjoint distance fields*
 
-## 核心模块与公式推导
+
 
 NRMF 将人体运动先验建模为乘积流形上的三个条件神经距离场，并设计几何投影与积分算法确保物理可行性。本节聚焦其核心组件与关键公式。
 
@@ -269,7 +271,9 @@ $$
 ![[assets/figures/papers/paper_list_l1026_https_arxiv_org_abs_2509_09667/figures/014_Figure_7.jpg]]
 *Figure 7: Illustration of angular velocity and accelaration for two points on a manifold. Given two points on the manifold (pi), the velocities are vectors in the tangent planes at those points. In practice, to compute an angular acceleration, they are parallel transported to the tangent space of the identity and then compared. If the points are close enough, the variation of the tangent spaces are ignored, and the computation is carried out by directly comparing vectors. Sphere is chosen for illustration purposes whereas the manifold or articulated bodies is higher dimensional*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -334,7 +338,9 @@ Table 4 报告了姿态与运动生成任务的定量分析。NRMF 取得最低 
 ![[assets/figures/papers/paper_list_l1026_https_arxiv_org_abs_2509_09667/figures/013_Table_7.jpg]]
 *Table 7: Motion estimation results on EgoBody dataset*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系与基线对比
 
@@ -409,6 +415,8 @@ NRMF 处于**数据驱动人体运动先验**与**黎曼几何深度学习**的�
 3. **条件 NDF 架构**：三个条件神经距离场 $f_\Phi^R$, $f_\Psi^\omega$, $f_\Xi^{\dot{\omega}}$ 实现了对姿态、速度和加速度相互依赖性的解耦建模。
 
 NRMF 的下游应用覆盖运动去噪、部分观测修复、2D 观测拟合、运动生成和稀疏关键帧插值，形成了一个以乘积流形 NDF 为核心的通用运动先验框架。
+
+
 
 ## 原文 PDF
 

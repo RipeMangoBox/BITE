@@ -42,7 +42,7 @@ claims:
 > - LIBERO (四合一平均) 上，平均成功率 ↑ 80.1 (CoMo) vs 70.4 (DP w/o videos) (+9.7)；平均成功率 ↑ 80.1 (CoMo) vs 75.9 (Dis. / GR00T style) (+4.2)；Action Prediction MSE ↓ 1.2588 (CoMo) vs 5.6743 (Dis.) (-4.4155)。
 > - CALVIN (ABC→D) 上，平均成功序列长度 ↑ 3.070 (CoMo) vs 1.878 (w/o Motion) (+1.192)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：从互联网视频中无监督学习连续潜在运动面临严重的shortcut learning——模型倾向于捕获静态背景信息而非前景运动，导致潜在运动包含大量动作无关噪声，无法为机器人策略提供有效的伪动作标签。
 
@@ -52,7 +52,7 @@ claims:
 
 **方法定位**：CoMo属于基于逆动力学-前向动力学（IDM-FDM）范式的自监督潜在运动学习方法，去除向量量化以输出连续潜在运动，并引入Td与Tcl协同缓解shortcut learning。该方法与**ATM**（Wen et al., RSS 2024）的任意点轨迹建模、**Dynamo**（Cui et al., NeurIPS 2024）的协方差正则化等方案形成互补，在连续潜在运动质量与下游策略性能上展现出系统性优势。
 
-## 背景与动机
+
 
 ### 机器人学习的数据瓶颈与互联网视频的潜力
 
@@ -77,7 +77,9 @@ claims:
 
 二者的协同作用使得CoMo能够在无向量量化的前提下，学得既连续又动作相关的潜在运动，从而突破离散方法的性能上限。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CoMo 的核心创新在于**彻底移除向量量化（VQ）**，转而通过**早期时序差分（Td）**与**时序对比学习（Tcl）**的协同设计，使模型能够从无动作标注的互联网视频中学习到既连续又与动作相关的潜在运动表征。这一设计直接回应了连续潜在运动学习中普遍存在的 shortcut learning 瓶颈——朴素连续模型倾向于捕获静态背景信息而非前景运动，导致潜在运动包含大量动作无关噪声。
 
@@ -106,7 +108,7 @@ Td 与 Tcl 的协同是 CoMo 有效性的核心。单独使用 Td 时，随潜�
 
 **证据强度评估**：上述三项变更均有明确的消融实验支撑（Table 1, Figure 2, Figure 3），证据置信度达 0.95。跨形态泛化性在双机械臂和灵巧手等复杂肢体上也得到初步验证（Table 4），置信度 0.9，但需注意这些实验中绝对动作空间的 MSE 改善幅度相对有限，需结合更多平台进行交叉验证。
 
-## 整体框架
+
 
 CoMo 的整体框架建立在标准的逆动力学编码器—前向动力学解码器（IDM-FDM）范式之上，核心目标是从无动作标注的视频中学习**连续、无向量量化（VQ-free）的潜在运动表征**，并将其转化为伪动作标签，赋能机器人策略的联合训练。整个 pipeline 由两大阶段构成：**潜在运动学习阶段**和**统一策略联合训练阶段**。
 
@@ -133,7 +135,7 @@ Td 和 Tcl 在框架中并非孤立运作，而是形成互补的协同效应。
 ![[assets/figures/papers/paper_list_l848_https_arxiv_org_abs_2505_17006/figures/001_Figure_1.jpg]]
 *Figure 1: The CoMo framework. (Left) CoMo model architecture. (Right) Temporal contrastive learning scheme. Built upon the standard IDM-FDM architecture, CoMo learn VQ-free, continuous and more precise inter-frame latent motion. CoMo introduces early temporal difference mechanism and temporal contrastive learning method to collaboratively ensure that the continuous latent motion focuses more on meaningful foreground regions and enhances action-relevant motion cues*
 
-## 核心模块与公式推导
+
 
 CoMo 围绕“逆动力学编码器–前向动力学解码器”（IDM–FDM）范式构建，核心目标是**无向量量化地学习连续潜在运动表征**，使其既保留细粒度动态信息，又与机器人动作空间保持一致的连续分布。为此，CoMo 引入两项关键设计：**早期时序差分机制（Td）** 和**时序对比学习（Tcl）**，二者协同作用以抑制 shortcut learning 并增强运动线索。
 
@@ -175,7 +177,9 @@ Tcl 的核心机制在于：正对共享相似的“未来变化模式”，而�
 
 在下游策略联合训练阶段，CoMo 将视频数据集 $\mathcal{D}_V$ 中的潜在运动作为**伪动作标签**，与机器人数据集 $\mathcal{D}_R$ 的真实动作标签合并，在统一生成式策略（扩散策略或自回归策略）中进行联合模仿学习。策略网络仅需为两类数据分配独立的轻量预测头，即可无缝利用互联网视频中的运动先验。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：连续潜在运动与联合训练的有效性
 
@@ -236,7 +240,9 @@ CoMo在复杂机器人形态上同样展现优势。Table 4显示，在双机械
 ![[assets/figures/papers/paper_list_l848_https_arxiv_org_abs_2505_17006/figures/012_Table_6.jpg]]
 *Table 6: The training and architectural hyperparameters for our CoMo learning*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：从离散到连续的潜在运动学习
 
@@ -288,6 +294,8 @@ CoMo 在以下条件下表现出色，但也存在明确的适用边界：
 3. **评估指标的鲁棒性**：MSE 和 S-PCFC 的组合指标在 LIBERO 上与策略成功率高度相关，但这种相关性是否在不同任务和机器人平台上保持鲁棒，尚需更多验证。
 
 4. **联合训练的负迁移风险**：在大规模异构机器人数据下，统一连续策略的联合训练是否会遭遇负迁移？如何自动平衡机器人动作数据和视频伪标签数据的贡献权重？
+
+
 
 ## 原文 PDF
 

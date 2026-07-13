@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/A2ASecBench_A_Protocol_Aware_Security_Benchmark_for_Agent_to_Agent_Multi_Agent_Systems.pdf
+project_link: https://safo-lab.github.io/A2ASecBench/
+code_link: null
 aliases:
 - A2ASecBench
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | A2ASecBench：面向智能体间多智能体系统的协议感知安全基准 |
 | 英文题名 | A2ASecBench: A Protocol-Aware Security Benchmark for Agent-to-Agent Multi-Agent Systems |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=LfdFnakqGJ); [Project](https://safo-lab.github.io/A2ASecBench/) |
+| Links | [paper](https://openreview.net/forum?id=LfdFnakqGJ) · [Project](https://safo-lab.github.io/A2ASecBench/) |
 | Topic | #topic/safety_alignment_fairness_privacy #topic/safety_alignment_fairness_privacy/safety_security |
 | Method | A2ASecBench |
 | Dataset | A2A-MAS (Travel) |
@@ -40,7 +42,7 @@ claims:
 > - A2A-MAS (Travel) 上，ASR (Capability Cloaking) 为 1.00，对比 0.00，变化 +1.00。
 > - A2A-MAS (Travel) 上，ASR (Cycle Overflow) 为 1.00，对比 0.00，变化 +1.00。
 
-## 概述
+## 概要
 
 当前智能体间（Agent-to-Agent, A2A）多智能体系统在协议层面普遍缺乏对智能体身份真实性和能力一致性的验证机制，任务编排也未对循环依赖和资源过度占用进行检测，导致攻击者能够通过构造恶意代理卡片、隐藏能力声明、诱导循环任务流等手段实现欺骗、隐蔽执行和拒绝服务等攻击。本文提出 **A2ASecBench**，一个面向 A2A 多智能体系统的协议感知安全基准框架，其核心定位在于：安全风险不仅来自提示词输入，更根植于协议语义——必须在智能体的发现、编排和执行全生命周期引入可验证的身份、声明能力约束与资源管理。
 
@@ -55,7 +57,7 @@ claims:
 
 上述发现表明，现有单一提示词防御范式无法有效应对协议层面的系统性威胁，A2A 多智能体系统亟需在协议核心中嵌入轻量级身份校验、能力签名验证及任务图环检测等机制——这正是 A2ASecBench 作为安全评估基础设施所揭示的核心瓶颈与改进方向。
 
-## 背景与动机
+
 
 随着大语言模型（LLM）驱动的智能体被广泛应用于复杂任务，智能体间（Agent-to-Agent，A2A）协议通过标准化的发现、编排与执行流程，使异构智能体能够动态协作，成为下一代智能体应用的核心支撑。Figure 1 描绘了 A2A 协议生态系统的完整供应链、交互流与智能体应用架构；截至 2025 年 11 月，已有多家企业的商业产品采用 A2A 协议（Table 9），表明其正迅速从实验走向大规模部署。
 
@@ -70,7 +72,9 @@ claims:
 
 因此，构建一个**协议感知的、可伸缩的综合评估基准**，系统量化攻击成功率与效用代价，并驱动防御机制设计，成为紧迫需求。本文首次提出 A2ASecBench——一个面向 A2A 生态的安全基准框架，通过形式化六种具体攻击向量、引入动态场景适配器，并在旅行、医疗、金融三个高风险领域实施大规模安全‑效用联合评估，旨在填补这一关键空白，并为下一代安全 A2A 协议设计提供实证基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 当前针对智能体的安全研究几乎全部聚焦于提示注入与单代理边界内的越权行为，默认多智能体通信是安全可信的。但 A2ASecBench 系统性地揭示了一个更深层的瓶颈：Agent-to-Agent (A2A) 多智能体系统的脆弱性**本质上是协议语义问题**，而非孤立的提示安全问题。若不在发现、编排与执行全生命周期引入可验证的身份绑定、声明的能力证明及资源消耗管理，所有基于提示词的防御都将被绕开。基于这一洞察，工作相对于现有安全评估基线做出了三个核心改变。
 
@@ -85,7 +89,7 @@ claims:
 
 这三个改变将 A2A 多智能体系统的安全从提示词层面推到协议语义层面，并提供了自动化、可扩展且带有效用权衡的评估框架，构成 A2ASecBench 对当前基线最本质的提升。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0016_LfdFnakqGJ_A2ASecBench_A_Protocol-Aware_Security_Benchmark/figures/001_Figure_1.jpg]]
 *Figure 1: A2A Protocol Ecosystem: Supply Chain, Interaction Flow, and Agentic Application*
@@ -107,7 +111,7 @@ A2ASecBench 是一种协议感知的安全基准框架，旨在系统性地暴�
 **评估引擎**  
 评估引擎在目标 A2A‑MAS（基于官方 A2A 示例，搭载 Gemini 2.5 Flash）上批量执行适配器生成的测试用例，并采用联合安全‑效用评估方法论：每项攻击试验旁均配对对应的良性任务，同时记录攻击成功率 $\mathrm{ASR} = \frac{\sum_{i=1}^{N} \mathbb{I}_i}{N}$ 和良性任务效用下降，最终输出安全‑效用权衡报告。该引擎还能兼容不同的多智能体框架（LangGraph、ANP），验证攻击模式的可转移性（Table 3），并可用于评估现有防御措施（如 NVIDIA NeMo Guardrails）的缓解效果（Table 4）。通过此闭环，框架不仅揭示了当前 A2A 系统在发现、编排与执行阶段的协议级弱点（如 AgentCard Spoofing 在仅 10 个伪卡注入下 Top‑1 选择攻击成功率高达 99%），还为领域提供了统一、可量化的安全基准。
 
-## 核心模块与公式推导
+
 
 ### 1. 框架核心模块
 A2ASecBench 的自动化评估管道由四个功能互补的核心模块构成，分别覆盖威胁建模、形式化判据、测试样例生成与定量评估。
@@ -173,7 +177,9 @@ $$\mathrm{Adapter}: \mathcal{A} \times \mathcal{S} \longrightarrow \mathcal{T} \
 - $\mathcal{T}$：可执行测试用例（JSON 格式）的空间。  
 该映射由 LLM 实例化，使基准能够从抽象攻击原语自动扩展到不同领域，无需逐例手工编写。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：六类攻击的跨领域高成功率
 
@@ -223,7 +229,9 @@ Capability Cloaking 通过良性任务的效用下降间接度量，虽避免了
 
 综上，实验系统地表明，A2A 多智能体系统的安全风险是协议层面固有的结构性问题。仅靠提示工程或内容网关无法解决身份伪造、循环依赖和资源滥用等攻击。后续防御必须引入可验证身份、声明能力加密签名，以及任务图环检测与并发限制等协议级机制。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 A2ASecBench 的核心贡献在于将多智能体系统的安全分析从传统的提示词注入与单代理安全（baseline 的主流关注点）推向协议语义层面。已有安全措施（如 NVIDIA NeMo Guardrails 增强的 A2A‑MAS）主要工作在应用‑模型边界，试图通过输入/输出内容审查拦截恶意行为，但这类防御在面对协议级威胁时暴露了本质瓶颈：它不理解智能体身份的真实性、声明的能力与实际行为的差异，也不掌握任务图的拓扑结构。因此，作为生产级安全网关代表的 NeMo Guardrails 对半开任务洪水（HOTF）的 ASR 仍高达 0.85–0.91，对 Cycle Overflow 仅降至 0.66–0.73，对工件触发脚本注入（ATSI）的抑制几乎无效（ASR 0.91–0.94，Table 4）。这一结果并非防御强度的不足，而是防御假设的错位——协议层的语义欺骗在内容层往往合法且无明显恶意特征。
 
@@ -250,6 +258,8 @@ A2ASecBench 的适用性建立在一组明确的系统假设之上：
 - **自我保护宿主**：是否可能在宿主端实现最小权限资源限制和任务图验证，从而从根本上消除半开任务洪水和循环溢出攻击的生存空间？
 
 这些问题的回答将决定 A2A 多智能体系统从“功能可用”走向“安全可靠”的路径。
+
+
 
 ## 原文 PDF
 

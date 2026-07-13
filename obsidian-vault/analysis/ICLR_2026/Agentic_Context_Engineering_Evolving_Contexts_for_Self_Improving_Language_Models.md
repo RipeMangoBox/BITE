@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Agentic_Context_Engineering_Evolving_Contexts_for_Self_Improving_Language_Models.pdf
+project_link: https://ace-agent.github.io
+code_link: https://github.com/ace-agent/ace
 openreview_forum_id: eC4ygDs02R
 aliases:
 - AACE
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 智能体上下文工程：为自我改进的语言模型演化上下文 |
 | 英文题名 | Agentic Context Engineering: Evolving Contexts for Self-Improving Language Models |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=eC4ygDs02R); [GitHub](https://github.com/ace-agent/ace); [Project](https://ace-agent.github.io) |
+| Links | [paper](https://openreview.net/forum?id=eC4ygDs02R) · [GitHub](https://github.com/ace-agent/ace) · [Project](https://ace-agent.github.io) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | ACE (Agentic Context Engineering) |
 | Dataset | AppWorld (Agent), Financial Analysis (FiNER + Formula), Financial Analysis (在线, GT 标签) |
@@ -42,7 +44,7 @@ claims:
 > - AppWorld (Agent) 上，Average Score (在线, 无 GT 标签) 为 59.5，对比 42.4 (ReAct)，变化 +17.1。
 > - Financial Analysis (FiNER + Formula) 上，Average Accuracy 为 81.9 (离线 + GT 标签)，对比 69.1 (Base LLM)，变化 +12.8。
 
-## 概述
+## 概要
 
 **核心问题**：现有上下文自适应方法（如整体提示重写或进化搜索）普遍存在**简洁性偏差**与**上下文坍缩**——LLM 倾向于将上下文压缩为简短但信息贫瘠的摘要，导致领域知识丢失，在长期任务中性能急剧下降（Figure 2 展示了一个极端案例：上下文从 18,282 tokens 坍缩至 122 tokens，准确率从 66.7 跌至 57.1）。
 
@@ -58,7 +60,7 @@ claims:
 
 **局限与开放问题**：ACE 在缺乏可靠反馈信号（如无真实标签或明确执行结果）时性能可能下降，且对持续对抗性噪声敏感。如何进一步增强无监督环境下的自我校正能力，以及如何将演化上下文与参数高效微调或检索增强生成结合，是值得探索的方向。
 
-## 背景与动机
+
 
 ### 上下文自适应的两难：简洁性偏差与上下文坍缩
 
@@ -84,7 +86,9 @@ claims:
 
 简言之，ACE 的动机不是发明更强的推理模型，而是**在不修改模型权重的前提下，通过工程化上下文演化，让任意 LLM 在长期任务中实现自我改进**。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ACE 的核心创新在于将上下文从“静态提示文本”重构为一种**结构化、可演化的战术手册**，并通过模块化的生成-反思-策展流程与增量式更新机制，系统性地解决了现有上下文自适应方法中普遍存在的**简洁性偏差**与**上下文坍缩**问题。
 
@@ -124,7 +128,7 @@ ACE 的增长-精炼机制解决了长期自适应中的冗余累积问题。新
 
 ACE 的另一个关键创新在于其**不修改模型权重**即可实现智能体的自我改进。通过将上下文作为可演化的外部记忆载体，ACE 使 LLM 在推理时能够访问不断丰富的策略库，从而在不进行任何微调的情况下持续提升任务表现。这一特性使得 ACE 天然适用于模型即服务的场景，无需访问模型内部参数即可部署。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l29_https_openreview_net_forum_id_eC4ygDs02R/figures/006_Figure_4.jpg]]
 *Figure 4: The ACE Framework. Inspired by Dynamic Cheatsheet, ACE adopts an agentic architecture with three specialized components: a Generator, a Reflector, and a Curator*
@@ -172,7 +176,7 @@ ACE 支持两种上下文自适应模式：
 
 两种模式共享相同的生成器-反射器-策展器流水线，区别仅在于自适应发生的阶段和数据来源。
 
-## 核心模块与公式推导
+
 
 ACE 框架将上下文自适应过程分解为三个专门化角色的协作：**生成器 (Generator)**、**反射器 (Reflector)** 和**策展器 (Curator)**，并通过**增量式增量更新 (Incremental Delta Updates)** 和**增长-精炼 (Grow-and-Refine)** 机制来防止上下文坍缩（Figure 4, §3.0）。
 
@@ -207,7 +211,9 @@ ACE 框架将上下文自适应过程分解为三个专门化角色的协作：*
 
 本文未引入新的数学公式或推导。ACE 的核心贡献在于架构设计（模块化角色分工）和上下文更新策略（增量式增量更新 + 增长-精炼），而非新的数学建模。所有模块的实现均基于 LLM 的提示词工程和确定性规则逻辑，不涉及可导出的闭式公式。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈验证：上下文坍缩与简洁性偏差
 
@@ -287,7 +293,9 @@ Table 4 报告了 ACE 与 GEPA（离线）和 DC（在线）的成本对比。�
 ![[assets/figures/papers/paper_list_l29_https_openreview_net_forum_id_eC4ygDs02R/figures/015_Table_8.jpg]]
 *Table 8: Results on Financial Analysis Benchmark (GPT-5.1 as the Base LLM). “GT labels” indicates whether ground-truth labels are available to the Reflector during adaptation*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有上下文自适应方法的关系
 
@@ -330,6 +338,8 @@ ACE 的有效性高度依赖**反馈信号的质量**，这构成了其最关键
 **持续演化中的灾难性遗忘**。在跨领域、持续变化的开放世界场景中，ACE 的增量式知识累积是否会覆盖或遗忘早期学到的有效策略？当前的实验在固定任务分布上进行，未评估任务分布漂移下的长期稳定性。
 
 **更大教师模型与对比反思**。当前 ACE 使用与生成器相同的模型作为反射器。引入更强的教师模型进行对比反思（例如，比较生成器与教师模型的推理差异来提取改进方向）可能进一步提升策略结晶的质量，但需权衡额外的计算成本。
+
+
 
 ## 原文 PDF
 

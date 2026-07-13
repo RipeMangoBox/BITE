@@ -40,15 +40,13 @@ claims:
 > [!tip] 效果简介
 > - SMG 上，Accuracy (%) 63.47 vs 50.49 (无UAAI模块的基线) (+12.98)；Accuracy (%) 63.47 vs 59.51 (TRN, 最佳RGB基线) (+3.96)。
 
-## 概述
+## 概要
 
 微手势识别面临一个根本困境：现有深度模型被动处理全部时空信息，对瞬态、低幅度的局部运动缺乏敏感性，且无法量化预测不确定性，导致在低样本、噪声和跨个体场景下性能严重退化。本文提出**UAAI（Uncertainty-Aware Active Inference）**框架，将微手势识别形式化为部分可观测马尔可夫决策过程下的主动推理问题，通过最小化变分自由能联合优化感知（特征提取）与行动（关键帧/区域选择），并引入不确定性驱动的数据增强以稳定噪声条件下的训练。
 
 核心思路围绕三个关键机制展开：**预期自由能（EFE）引导的时序选择**动态定位最具判别力的关键帧；**EFE引导的空间注意力**聚焦于降低不确定性的显著区域；**基于MC Dropout的不确定性感知混合增强（UMIX）**根据认知不确定性自适应重加权训练样本。三者统一在变分自由能最小化目标下协同工作。
 
 在SMG数据集上，UAAI以**63.47%**的RGB模态准确率超越所有对比的RGB基线方法（如TRN 59.51%、TSM 58.69%），并将与最佳骨架方法MS-G3D（64.75%）的差距缩小至仅1.28个百分点。消融实验证实，三个模块各自独立均能带来显著增益（不确定性感知+7.05%、时序选择+5.91%、空间选择+4.91%），组合后达到+12.98%的累积提升。方法目前仅在单一数据集上验证，MC Dropout多次前向传递带来的计算开销也构成实时部署的潜在瓶颈，但其将主动推理引入微手势识别的技术路径为后续研究开辟了明确方向。
-
-## 背景与动机
 
 微手势（Micro-Gesture）是一种持续时间短、运动幅度低、空间范围局限的手部动作，在情感计算、人机交互和心理健康评估中具有重要应用价值。然而，微手势的瞬态性与低幅运动特性使其在视频流中极易被淹没在无关背景和冗余帧中，形成**时空稀疏性**瓶颈——有效判别信号仅存在于极少数关键帧的局部区域，其余大部分时空信息对识别贡献微弱甚至引入噪声。
 
@@ -68,7 +66,7 @@ claims:
 
 通过将感知、选择和不确定性建模统一在变分自由能最小化框架下，UAAI实现了从“被动处理”到“主动观测”的范式转变，为低样本、高噪声的微手势识别场景提供了原理性解决方案。
 
-## 核心创新
+## 核心方法与创新机理
 
 本工作将微手势识别重新定义为部分可观测马尔可夫决策过程下的**主动推理**问题，核心创新在于将感知（特征提取）与行动（关键帧/区域选择）统一在**变分自由能最小化**的框架下联合优化，并引入**不确定性驱动的自适应学习**机制以应对噪声与低质量样本。相对于现有被动处理所有时空信息的方法，UAAI 框架通过三个关键 **changed slots** 实现了从“被动接收”到“主动选择”的范式转换。
 
@@ -128,8 +126,6 @@ $$\mathcal{L} = \mathbb{E}_{(x_i,y_i),(x_j,y_j)}[ w_i \lambda \mathcal{L}_{ce}(\
 
 这一范式转换使 UAAI 在仅使用 RGB 模态的情况下达到 63.47% 的准确率，超越所有对比的 RGB 基线方法（如 TRN 59.51%、TSM 58.69%），并将与最佳骨架方法 MS-G3D（64.75%）的差距缩小至仅 1.28 个百分点（Table 1）——而骨架方法使用了额外的深度与关节坐标信息。
 
-## 整体框架
-
 UAAI 将微手势识别形式化为**部分可观测马尔可夫决策过程下的主动推理问题**，在一个统一的变分自由能最小化目标下联合优化感知（特征提取与分类）与行动（关键帧/关键区域的选择）。其核心洞察是：现有深度模型被动处理所有时空信息，对微手势的瞬态低幅运动与局部特征不敏感，且缺乏预测不确定性，导致在低样本、噪声和跨个体条件下性能严重退化。UAAI 通过引入**预期自由能（EFE）引导的主动选择策略**与**不确定性感知的自适应样本加权机制**，从两个层面打破这一瓶颈。
 
 整体 pipeline 由四个核心模块串联构成，如图 Figure 2 所示：
@@ -151,8 +147,6 @@ UAAI 将微手势识别形式化为**部分可观测马尔可夫决策过程下�
 
 ![[assets/figures/papers/paper_list_l1052_https_arxiv_org_abs_2603_07559/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of existing methods and UAAI*
-
-## 核心模块与公式推导
 
 UAAI 框架将微手势识别形式化为部分可观测马尔可夫决策过程（POMDP）下的主动推理问题，其核心思想是在统一的变分自由能（VFE）最小化原则下联合优化感知（特征学习）与行动（观测选择）。框架包含三个关键模块：EFE 引导的时序选择、EFE 引导的空间选择，以及基于 MC Dropout 的不确定性感知增强（UMIX）。
 
@@ -210,7 +204,7 @@ $$\mathcal{L} = \mathbb{E}_{(x_i,y_i),(x_j,y_j)}[ w_i \lambda \mathcal{L}_{ce}(\
 
 该机制充当隐式正则化器，在不稳定样本上平滑损失景观。消融实验（Table 2）表明，单独添加 UMIX 将准确率从 50.49% 提升至 57.54%（+7.05%），是三个模块中增益最大的组件。蒙特卡洛采样数 $M=5$ 在验证准确率、收敛速度与计算开销之间取得最优平衡（Figure 6, Table 4）。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -265,19 +259,7 @@ UAAI 在 SMG 数据集上与 12 个基线方法进行了对比，涵盖 RGB 模�
 ![[assets/figures/papers/paper_list_l1052_https_arxiv_org_abs_2603_07559/figures/006_Figure_3.jpg]]
 *Figure 3: Active Observation Visualization*
 
-![[assets/figures/papers/paper_list_l1052_https_arxiv_org_abs_2603_07559/figures/007_Figure_4.jpg]]
-*Figure 4: Convergence curves of UAAI under different training epochs. The upper row shows accuracy curves, and the lower row shows corresponding loss curves. The model converges stably after around 40 epochs*
-
-![[assets/figures/papers/paper_list_l1052_https_arxiv_org_abs_2603_07559/figures/008_Figure_5.jpg]]
-*Figure 5: Convergence curves with and without the UMIX*
-
-![[assets/figures/papers/paper_list_l1052_https_arxiv_org_abs_2603_07559/figures/009_Figure_6.jpg]]
-*Figure 6: Accuracy and loss Curves under different Monte Carlo sampling numbers M*
-
-![[assets/figures/papers/paper_list_l1052_https_arxiv_org_abs_2603_07559/figures/010_Table_4.jpg]]
-*Table 4: Training cost under different M*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 **主动推理与微手势识别的交叉定位。** 现有微手势识别方法可大致分为两类：基于骨架的方法（如 **ST-GCN**、**2S-GCN**、**Shift-GCN**、**MS-G3D**、**GCN-NAS**）和基于RGB视频的方法（如 **C3D**、**TSN**、**TSM**、**TRN**、**MA-Net**、**MSTCN-VAE**、**Video Mamba**）。这两类方法的共同假设是模型被动接收全部时空信息，通过增大感受野或图拓扑来捕获微手势的细微运动。UAAI的方法论突破在于将微手势识别从“被动感知”范式迁移到“主动推理”范式——将识别过程形式化为部分可观测马尔可夫决策过程（POMDP）下的变分自由能最小化问题。这一框架的理论根源来自Karl Friston的主动推理理论，但在计算机视觉的动作识别领域尚属罕见的系统性应用。
 

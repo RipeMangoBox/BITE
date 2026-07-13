@@ -43,15 +43,13 @@ claims:
 > - MMMU 上，准确率 51.5 vs 50.5 (PACR) (+1.0)。
 > - HallusionBench 上，准确率 68.4 vs 67.6 (PACR) (+0.8)。
 
-## 概述
+## 概要
 
 视觉-语言（V-L）推理要求模型同时完成两类异构行为：**视觉感知**（从图像中提取证据）与**文本推理**（基于证据进行逻辑推导）。现有密集奖励方法（如PACR）对所有推理步骤施加全局统一的置信度归一化，忽视了这两类技能在统计分布上的本质差异。经实证统计，视觉感知步骤仅占全部推理步骤的31.4%，而文本推理步骤占68.6%——这种严重的不平衡导致全局归一化压缩并扭曲了视觉步骤的优势信号，产生**混合诱导的信号退化**问题。
 
 本文提出 **PDCR（Perception-Decomposed Confidence Reward）**，一种感知解耦的置信度奖励框架。其核心思路是：首先通过无监督技能分解，引入模型内部的**视觉依赖评分（Visual Dependence Score）**量化每个推理步骤对视觉输入的依赖程度，并采用Otsu动态阈值将步骤自动聚类为视觉感知组与文本推理组；随后在各自技能簇内独立进行min-max优势归一化，生成标度稳定、语义正确的步级训练信号。
 
 在Qwen2.5-VL-7B骨干上，PDCR在七个V-L推理基准上取得**52.9的平均准确率**，超过PACR（52.2）和GRPO（51.5）。消融实验表明，有意义的技能分解（而非随机分配）是性能提升的关键；Otsu动态阈值化达到76.2%的分解准确率，显著优于最佳Top-K基线（67.5%）且无需超参数。PDCR的训练额外开销约为GRPO的1.5倍，但推理阶段模型生成更简洁的推理轨迹，实现了训练成本与推理效率的有利权衡。
-
-## 背景与动机
 
 ### 多模态推理中的异质技能混合
 
@@ -73,7 +71,7 @@ $$A_{P,k}^{(i)} = \frac{G_k^{(i)} - \min_{(j,k')} G_{k'}^{(j)}}{\max_{(j,k')} G_
 
 上述观察指向一个清晰的问题瓶颈：**视觉感知和文本推理是功能不同、统计异质的两种技能，必须通过分解的奖励结构进行独立评估**。本文的核心动机是设计一种能够自动识别并解耦这两种技能的过程奖励机制，使得每种技能都能在其自身的统计分布内获得稳定、正确标度的训练信号，从而真正解决多模态推理中的信用分配问题。这一思路将过程奖励的设计从“更密集的信号”推进到“结构正确的信号”。
 
-## 核心创新
+## 核心方法与创新机理
 
 PDCR 的核心创新在于将视觉-语言推理中的**信用分配问题**重新表述为**异质技能的独立评估问题**，并通过无监督技能分解与分簇优势归一化两个关键机制予以解决。与现有密集奖励方法（如 PACR）将所有推理步骤视为同质序列进行全局归一化不同，PDCR 识别出视觉感知与文本推理是两种统计分布截然不同的技能，必须在其各自的簇内进行独立的奖励标度。
 
@@ -130,8 +128,6 @@ $$A_{total,k}^{(i)} = \lambda_O A_O^{(i)} + \lambda_P A_{decomposed,k}^{(i)}$$
 
 综上，PDCR 的创新本质在于将多模态推理的信用分配从“同质序列评估”升级为“异质技能独立评估”，通过无监督分解和分簇归一化两个 changed slots 解决了视觉感知信号在文本推理占优的环境中被压缩和扭曲的核心瓶颈。
 
-## 整体框架
-
 PDCR 的核心动机源于对视觉-语言推理中**混合诱导信号退化**问题的观察：视觉感知步骤仅占总推理步骤的 31.4%，而文本推理步骤占 68.6%（Figure 3-c），这种统计不平衡导致朴素的全局置信度归一化会压缩视觉步骤的优势信号，产生扭曲的训练反馈（Figure 3-d）。为此，PDCR 提出将推理过程分解为两种异质技能，并在各自技能簇内独立评估，从而为每种技能提供稳定、正确标度的训练信号。
 
 ### 框架总览
@@ -170,11 +166,6 @@ PDCR 的整体流程如 Figure 4 所示，包含四个核心模块，形成两�
 *Table 6: Key hyperparameters standard to the RLVR framework in EasyR1 library [? ] used for training and evaluation*
 
 ### 补充图表
-
-![[assets/figures/papers/paper_list_l2661_https_arxiv_org_abs_2605_13467/figures/001_Figure_1.jpg]]
-*Figure 1: Multimodal reasoning mixes two distinct behaviors: seeing (visual perception, extracting evidence from the image) and thinking (textual reasoning over that evidence). Our work argues that these heterogeneous skills must be rewarded independently, as a naive, global reward signal fails to properly assign credit to each*
-
-## 核心模块与公式推导
 
 PDCR 框架由三个关键模块构成：**置信度计算模块**、**无监督技能分解模块**和**感知解耦优势计算模块**，最后通过**总优势融合模块**将稀疏结果信号与分解过程信号整合为统一的步级训练信号（Figure 4）。
 
@@ -249,7 +240,7 @@ $$A_{total,k}^{(i)} = \lambda_O A_O^{(i)} + \lambda_P A_{decomposed,k}^{(i)}$$
 ![[assets/figures/papers/paper_list_l2661_https_arxiv_org_abs_2605_13467/figures/002_Figure_2.jpg]]
 *Figure 2: The baseline dense reward pipeline. For N rollouts, a sparse Outcome Reward*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主要实验结果
 
@@ -311,7 +302,7 @@ Table 5提供了技能分解的定性示例。被标注为视觉感知的步骤�
 ![[assets/figures/papers/paper_list_l2661_https_arxiv_org_abs_2605_13467/figures/017_Figure_7.jpg]]
 *Figure 7: Visual Perturbation Strategies Evaluated for Skill Decomposition. To calculate the Visual Dependence Score (V (i)k , Eq. 7) , we compare the model’s probability on the (a) Original image against four baselines: (b) White (Strategy adopted in main text), (c) Gaussian Blur, (d) Gaussian Noise, and (e) Rotate. Our analysis confirms that strategies which effectively destroy semantic information (b, c, d) yield high decomposition accuracy, whereas simple spatial transformation (e) preserves the visual content, leading to poor separation*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 方法定位：从稀疏奖励到感知解耦的密集奖励
 

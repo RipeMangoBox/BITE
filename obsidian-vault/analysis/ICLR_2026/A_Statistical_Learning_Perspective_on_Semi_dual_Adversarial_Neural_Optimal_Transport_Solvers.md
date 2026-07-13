@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/A_Statistical_Learning_Perspective_on_Semi_dual_Adversarial_Neural_Optimal_Transport_Solvers.pdf
+project_link: null
+code_link: https://github.com/milenagazdieva/StatOT
 aliases:
 - MQOS
 - SLPSDANOTS
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 半对偶对抗神经最优传输求解器的统计学习视角 |
 | 英文题名 | A Statistical Learning Perspective on Semi-dual Adversarial Neural Optimal Transport Solvers |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=FJTdyG8jeJ); [GitHub](https://github.com/milenagazdieva/StatOT) |
+| Links | [paper](https://openreview.net/forum?id=FJTdyG8jeJ) · [GitHub](https://github.com/milenagazdieva/StatOT) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/generative_models_and_autoencoders |
 | Method | Minimax Quadratic OT Solver (半对偶对抗神经最优传输求解器) |
 | Dataset | 合成高斯分布 (D=2, 4, 8, 16, 32, 64, 128) |
@@ -40,7 +42,7 @@ claims:
 > - 合成高斯分布 (D=2,4,8,16,32,64,128) 上，||T̂ - T*||_{L^2(P)}^2 为 Minimax OT solver，对比 Constant, Barycenter translation, Linear estimators，变化 OT solver 的估计误差显著低于所有基线。
 > - 合成高斯分布 (D=2,4,8,16,32,64,128) 上，log10(||T̂ - T*||_{L^2(P)}^2) vs log10(N,M) 为 Minimax OT solver，对比 理论斜率 -0.5，变化 实际收敛斜率约 -0.5 或更陡。
 
-## 概述
+## 概要
 
 该研究为基于 minimax 半对偶形式的对抗神经最优传输求解器建立了首个统计学习理论框架。其核心瓶颈在于，现有方法虽在实践中有效，但缺乏对泛化误差——即真实最优传输映射 $T^*$ 与基于有限样本学习的映射 $\widehat{T}^R$ 之间 $L^2(p)$ 距离的期望上界——的定量刻画。针对二次代价（Wasserstein-2）的 minimax 求解器，本文的核心洞见在于，该误差可被分解为**估计误差**（由经验分布替代真实分布引起）与**近似误差**（由受限的神经网络函数类引起）之和，并分别受控于神经网络类的 Rademacher 复杂度与网络的逼近能力。
 
@@ -54,7 +56,7 @@ $$
 
 其中 $\mathcal{R}_{p,N}(\mathcal{H})$ 和 $\mathcal{R}_{q,M}(\mathcal{F})$ 分别为传输映射与势函数函数类的 Rademacher 复杂度。对于特定的神经网络类，该上界可达到 $O(1/\sqrt{N}) + O(1/\sqrt{M})$ 的收敛率。实验在合成高斯分布上验证了该理论：估计误差的收敛斜率接近理论预测的 -0.5，且近似误差随网络宽度增加而减小。然而，该分析严格限于二次代价与 $\beta$-强凸势函数假设，且实验仅在低维合成数据上进行，未在高维真实数据上验证。
 
-## 背景与动机
+
 
 最优传输（Optimal Transport, OT）问题的核心是寻找一个映射 $T$，在最小化传输代价 $c(x, T(x))$ 的同时，将源分布 $p$ 推送到目标分布 $q$。对于二次代价 $c(x, y) = \frac{1}{2}\|x - y\|_2^2$，该问题等价于求解 Wasserstein-2 距离，并可通过半对偶形式转化为一个关于 Kantorovich 势函数 $\varphi$ 的优化问题。近年来，基于神经网络的对抗式求解器通过引入一个额外的传输映射 $T$，将问题重写为 minimax 形式 $\min_{\varphi} \max_{T} \mathcal{L}(\varphi, T)$，从而同时学习势函数和传输映射。这类方法在实践中取得了成功，但其理论基础——特别是统计学习保证——却严重滞后。
 
@@ -66,7 +68,9 @@ $$
 
 这一理论框架的核心洞见在于：**minimax OT 求解器的统计行为完全由神经网络函数类的容量（Rademacher 复杂度）和逼近能力（通用逼近定理）决定**，而 minimax 结构本身并不带来额外的统计困难。这为理解对抗式 OT 求解器的样本效率和网络设计提供了第一个严格的理论基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于为基于神经网络的 minimax 半对偶最优传输求解器提供了首个统计学习理论保证，填补了该领域缺乏泛化误差分析的空白。其关键突破在于将泛化误差（真实 OT 映射与近似映射之间的 L2 距离）系统地分解为可分别控制的估计误差与近似误差，并利用 Rademacher 复杂度和神经网络逼近理论给出了具体上界。
 
@@ -83,7 +87,7 @@ $$
 
 **实验验证**：在合成高斯分布上的实验表明：（1）估计误差的收敛率与理论预测的 $O(1/\sqrt{N})$ 吻合；（2）随着神经网络宽度增加，近似误差减小，当势函数架构与基准构造一致时（max H_φ=64），近似误差接近零（Figure 4）；（3）极浅网络（max H_φ=4,16）会导致近似误差崩溃，产生不良解（Figure 7）。这些结果验证了理论分析的合理性，但需注意实验仅在合成数据上进行。
 
-## 整体框架
+
 
 该论文提出的 Minimax Quadratic OT Solver 是一个端到端的对抗式神经最优传输求解器，其整体 pipeline 围绕一个 **minimax 半对偶优化问题**构建。核心思想是同时学习两个神经网络：一个作为 **Kantorovich 势函数** $\varphi_\theta$，另一个作为 **传输映射** $T_\omega$，通过对抗训练逼近真实的 Monge 最优传输映射。
 
@@ -110,7 +114,7 @@ $$
 
 **整体流程**：源数据 $x$ 和目标数据 $y$ 输入系统，通过 minimax 对抗训练，最终输出一个训练好的传输映射 $T_\omega$，该映射的泛化误差被理论控制在 $O(1/\sqrt{N}) + O(1/\sqrt{M})$ 的收敛率内。实验在合成高斯分布上验证了该框架的有效性，但需注意其理论假设（如 $\beta$-强凸性）在实际应用中可能不成立，且实验未在真实高维数据集上验证。
 
-## 核心模块与公式推导
+
 
 ### 问题设定与核心目标
 
@@ -195,7 +199,9 @@ $$
 
 上述理论框架依赖两个关键假设：二次代价函数和势函数类的 $\beta$-强凸性。势函数采用 ICNN + $\beta\|\cdot\|_2^2/2$ 的参数化形式以保证强凸性。该分析未考虑优化误差（非凸优化、鞍点问题）的影响，也未提供泛化误差的下界。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：合成高斯分布上的估计误差与收敛率
 
@@ -231,7 +237,9 @@ $$
 3. **统计量有限：** 每个实验仅运行 3 次随机种子，统计量有限，无法精确刻画误差的方差。
 4. **代价函数局限：** 实验仅针对二次代价（Wasserstein-2）进行，理论结果和实验验证均未推广到一般代价函数。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -265,6 +273,8 @@ $$
 3. **下界与紧性**：能否建立泛化误差的下界，以刻画所提上界的紧性，从而指导实际中的样本量选择？
 4. **架构选择指南**：如何为 minimax OT 求解器提供实用的神经网络架构选择指南（如宽度、深度的推荐范围）？当前理论仅给出存在性保证，缺乏可操作的指导。
 5. **扩展到其他 OT 变体**：本文的统计学习分析能否扩展到熵正则化 OT、非平衡 OT、动态 OT 等变体？这些变体在生成建模和计算生物学中具有更广泛的应用。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: NEURIPS
 year: 2024
 pdf_ref: paperPDFs/NEURIPS_2024/CigTime_Corrective_Instruction_Generation_Through_Inverse_Motion_Editing.pdf
+project_link: null
+code_link: null
 aliases:
 - CigTime
 tags:
@@ -39,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - HumanML3D 上，BLEU-4 0.24 vs 0.15 (Llama-3-8B) (+0.09)；ROUGE-2 0.35 vs 0.30 (Mistral-7B) (+0.05)；METEOR 0.52 vs 0.46 (Mistral-7B) (+0.06)。
 
-## 概述
+## 概要
 
 **问题瓶颈** 在人体运动分析与教学场景中，自动生成精准的纠正性文本指令面临双重困难：其一，缺乏大规模、通用的（源运动，目标运动，纠正指令）三元组训练数据；其二，现有语言模型难以直接理解动态运动序列之间的空间与时间差异，无法可靠地输出“哪里错了、如何改正”的细粒度文本。
 
@@ -49,7 +51,7 @@ claims:
 
 **主要结果** 在 HumanML3D 基准上，CigTime 在指令质量与重建准确性上均显著优于已有方法：BLEU-4 达 0.24，ROUGE-2 达 0.35，METEOR 达 0.52，CLIPScore 达 0.82；同时，重建误差 MPJPE 低至 0.13，FID 降至 1.44，相比 Llama-3-8B 分别降低 0.08 和 1.60（Table 1）。消融实验进一步证实，全参数微调结合锚定损失是性能提升的关键设计选择（Table 2），且方法在三种不同运动编辑器上均保持最低的 MPJPE 和 FID，展现出良好的泛化鲁棒性（Table 3）。
 
-## 背景与动机
+
 
 近年来，随着计算机视觉与自然语言处理技术的深度融合，人类运动理解取得了显著进展。然而，现有研究主要聚焦于运动生成与运动描述，即从文本生成运动或从运动生成文本。一个关键但尚未被充分探索的问题是**纠正指令生成（corrective instruction generation）**：给定一段源运动与一段目标运动，自动生成自然语言形式的纠正性反馈，以指导用户如何从源运动改进到目标运动。
 
@@ -57,7 +59,9 @@ claims:
 
 针对上述瓶颈，本文提出了 **CigTime**，其核心洞察在于：**纠正指令生成可以视为运动编辑的逆任务**。现有的运动编辑模型已经能够根据源运动与纠正指令生成目标运动，那么反过来，我们可以利用运动编辑管道自动构建大规模三元组训练数据，进而通过针对性微调赋予大语言模型“从运动对推断纠正指令”的能力。这一思路绕过了人工标注的困境，同时使模型能够从数据中隐式学习运动差异与语言指令之间的映射关系。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CigTime 的核心创新在于将**纠正指令生成**形式化为**运动编辑的逆过程**，从而绕过了该任务最根本的数据瓶颈：缺乏大规模、高质量的（源运动，目标运动，纠正指令）三元组。传统方法依赖人工标注或少量样本提示，成本高昂且难以规模化。CigTime 则利用成熟的运动编辑管道，以“源运动 + 纠正指令 → 目标运动”的正向编辑能力为基础，反向自动构建训练数据，使大语言模型能够从运动对中推断出精确的纠正文本。
 
@@ -89,7 +93,7 @@ $$\mathcal{L}^{Anch} = \lambda \cdot \| W - W_0 \|_2^2$$
 
 综上，CigTime 的创新并非单一技术点的改进，而是通过“逆运动编辑”这一统一视角，系统性地重构了数据生成、运动表征和模型微调三个环节，使通用大语言模型首次具备了从运动对差异中推断精确纠正指令的能力。
 
-## 整体框架
+
 
 CigTime 的核心思路是将纠正指令生成任务建模为运动编辑的逆过程。给定源运动序列 $x^I \in \mathbb{R}^{T \times D}$ 和目标运动序列 $x^O \in \mathbb{R}^{T \times D}$，模型学习一个映射函数 $\tau$，使得 $\tau(x^I, x^O) = L$，其中 $L$ 为纠正性文本指令。整个 pipeline 由三个关键模块串联构成，形成“数据生成—运动标记化—指令推理”的端到端流程。
 
@@ -106,7 +110,7 @@ CigTime 的核心思路是将纠正指令生成任务建模为运动编辑的逆
 ![[assets/figures/papers/paper_list_l5_CigTime_Corrective_Instruction_Generation_Through_Inverse_Motion_Editing_motion20v/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of CigTime. Left: We leverage source motion tokens and corrective instructions as input to a motion editor to produce target motion tokens. Right: We then employ a language model to generate precise corrective instructions based on a given source and target motion. We demonstrate in the example generating corrective instructions for lifting weights with the upper body*
 
-## 核心模块与公式推导
+
 
 CigTime 的核心架构由三个紧密协作的模块构成：运动编辑器、VQ‑VAE 标记化器以及经过锚定损失微调的大语言模型。整个流程将纠正指令生成视为运动编辑的逆过程，从而复用成熟的运动编辑管道自动构建训练三元组，再通过离散运动标记与全参数微调赋予 LLM“从运动对推断纠正指令”的能力。
 
@@ -165,7 +169,9 @@ $$\mathcal{L}^{Anch} = \lambda \cdot \| W - W_0 \|_2^2$$
 
 消融实验（Table 2）表明，引入锚定损失的全参数微调策略在重建准确性上显著优于仅扩展词汇表（Ours‑Extended）、连续表示（Ours‑Continuous）或使用 T5 骨干（Ours‑T5）的变体，其中 MPJPE 从 0.16 ~ 0.33 降至 0.13，验证了该模块在保持嵌入语义稳定性方面的关键作用。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -250,7 +256,9 @@ Figure 6 展示了从真实参与者视频中提取运动并生成纠正指令�
 ![[assets/figures/papers/paper_list_l5_CigTime_Corrective_Instruction_Generation_Through_Inverse_Motion_Editing_motion20v/figures/007_Figure_4.jpg]]
 *Figure 4: In-context learning for corrective instruction generation. The prompt for the LLMs in in-context learning includes a task description and several examples. This information is given to the LLMs, instructing them to generate correctional instructions for new motion pairs*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定义与基线谱系
 
@@ -302,6 +310,8 @@ CigTime 的核心洞察是将纠正指令生成视为**运动编辑的逆过程*
 ### 在知识库中的位置
 
 CigTime 在运动‑语言研究谱系中占据一个独特位置：它既不同于传统的运动描述生成（单向映射），也不同于运动编辑（文本到运动），而是开创了“运动对到差异文本”这一新任务方向。其方法论贡献——利用运动编辑的逆过程构建训练数据、VQ-VAE 离散化配合锚定损失微调 LLM——为运动理解与语言生成的交叉领域提供了可复用的技术范式。后续工作可沿着专业化适配、实时交互、安全对齐等方向展开。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Escaping_the_Homophily_Trap_A_Threshold_free_Graph_Outlier_Detection_Framework_via_Clustering_guided_Edge_Reweighting.pdf
+project_link: null
+code_link: null
 aliases:
 - CG
 tags:
@@ -40,7 +42,7 @@ claims:
 > - Amazon 上，AUC 为 86.24±3.56，对比 Best baseline (e.g., TAM)，变化 排名第一。
 > - Disney 上，AUC 为 72.13±3.01，对比 Best baseline，变化 排名第一。
 
-## 概述
+## 概要
 
 图异常检测任务中，图卷积操作容易陷入“同质性陷阱”：异常节点会通过邻域聚合污染邻近正常节点的表示，导致正常与异常节点的嵌入高度重叠，严重损害检测区分度。针对这一核心瓶颈，本文提出一个无阈值图异常检测框架**CER-GOD**，其核心思想是通过**聚类引导的边重加权**机制，自适应地削弱异质性邻居的影响，从而扩大正常与异常节点在潜空间中的分布差异。
 
@@ -54,7 +56,7 @@ CER-GOD 框架由四个关键组件构成：
 
 实验表明，CER-GOD 在 8 个公开基准数据集上取得了最优或次优性能。在 **Email** 数据集上 AUC 达到 **96.98%**，比先前最优秀的 AS-GAE 方法提升超过 12 个百分点；在 **Amazon**、**Disney**、**OGB-Proteins** 等数据集上同样名列第一。消融研究证实，移除 SD-MS 模块后 Email 的 AUC 骤降至约 50.80%，而多样性损失对防止聚类坍缩不可或缺。定性分析进一步显示，SD-MS 能够显著拉开正常与异常节点嵌入的距离分布，缓解嵌入重叠问题。总体而言，CER-GOD 为解决图异常检测中的同质性污染提供了一种有效且无阈值的新范式。
 
-## 背景与动机
+
 
 图异常检测旨在识别图中显著偏离多数正常模式的节点、边或子结构，在恶意用户检测、系统故障诊断、金融欺诈等多个领域具有关键应用价值。近年来，基于图神经网络（GNN）的方法因能同时利用节点属性与图拓扑信息而成为主流。然而，GNN 的图卷积操作暗含一个严重缺陷——**同质性陷阱（Homophily Trap）**：异常节点的属性通过邻域聚合“污染”其正常邻居的表示，导致正常节点与异常节点在潜空间中嵌入分布高度重叠，使后者难以被检测器有效分离（Figure 2）。具体而言，多层图卷积下节点属性沿着路径传播的影响上界 $|\frac{\partial \mathbf{z}_j^{(r+1)}}{\partial \mathbf{x}_i}| \leq (\alpha\beta)^{r+1} (\mathbf{A}^{r+1})_{ji}$（Eq. 3）表明，异常节点能直接影响位于短距离内的正常节点，使其嵌入被“拖拽”向异常区域。在 Email 数据集上，仅经一层图卷积后，异常节点的 1‑hop 正常邻居与异常节点自身相对于参考高斯分布的 MMD 距离分布已高度纠缠，无法有效区分（Figure 2）；相比之下，远离异常的节点则保持显著差异。这一现象充分暴露了传统图卷积在同质性假设被违反时脆弱性。
 
@@ -64,7 +66,9 @@ CER-GOD 框架由四个关键组件构成：
 
 本文的核心动机正是针对这两大痛点：① 提出可学习的边权重掩码（Self‑Discriminative Masking Spoiler），通过哈达玛积 $\tilde{\mathbf{A}} = \tilde{\mathbf{M}} \odot \mathbf{A}$（Eq. 5）自适应地重新加权图拓扑，从而主动抑制异常邻居对正常节点的干扰；② 引入聚类引导的无阈值异常评分机制，利用聚类伪标签指导掩码学习，实现完全无监督下的端到端联合优化，彻底脱离手工阈值设定的限制。辅以防止聚类坍缩的多样性损失，该范式有望从根源上打破同质性陷阱，大幅提升图异常检测在复杂真实场景下的区分能力与稳定性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CER‑GOD 围绕图异常检测的同质性陷阱（Homophily Trap）展开：图卷积操作会将异常节点的特征扩散到正常邻域，导致两类节点在潜空间的嵌入高度重叠，严重削弱区分度（Figure 2）。与其依赖外部规则或硬阈值来绕过该陷阱，该方法引入了一个可端到端学习的**因果操控变量**——通过可训练边权重掩码，选择性抑制异质性邻居的聚合强度，从而增大正常与异常候选集的可分性。
 
@@ -85,7 +89,7 @@ CER‑GOD 围绕图异常检测的同质性陷阱（Homophily Trap）展开：�
 
 与采用 GAT 注意力或者标准聚类的变体（如 GAT+ClusterAD）相比，CER‑GOD 的 SD‑MS 模块带来了**定性可观测的分布分离**：t‑SNE 可视化（Figure 5）和嵌入距离直方图（Figure 7）显示，两类节点的重叠区域显著缩小，分布中心彼此错开。定量上，在 Email 数据集上，CER‑GOD 的 AUC 达到 96.98%，超越先前最优方法 AS‑GAE 超过 12 个百分点（Table 1）；在 OGB‑Proteins 等大规模图上，亦以 74.81% AUC 位列第一（Table 4）。这些结果表明，**基于聚类伪标签的边重加权机制**是实现高区分度无监督图异常检测的关键因果操作，而多样性损失则保证了该机制的优化稳定性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0015_Z8f0whjttd_Escaping_the_Homophily_Trap_A_Threshold-free_Gra/figures/001_Figure_1.jpg]]
 *Figure 1: The architecture of the proposed CER-GOD framework for graph outlier detection. The model takes an input graph with its topology, applies a learnable mask to suppress noisy or irrelevant connections, and encodes the refined structure using graph convolutional layers. The latent embeddings are then used for graph reconstruction and clustering-based anomaly prediction. Based on these predictions, normal and anomalous candidate groups are generated and optimized through distribution repulsion loss. The framework is jointly optimized with three objectives: reconstruction loss, clustering loss (with a diversity regularization term), and a distribution repulsion loss*
@@ -114,7 +118,7 @@ CER-GOD 是一个端到端的无监督图异常检测框架，其核心目标是
 $$\ell = \ell_{\mathrm{r}} + \alpha \ell_c + \beta \ell_{\mathrm{dr}} + \gamma \ell_{\mathrm{diversity}}$$
 超参数 $\alpha, \beta, \gamma$ 在较宽范围内保持性能稳定（Figure 3）。整个流水线无需任何标签或预定阈值，在完全无监督的条件下实现了鲁棒的图异常检测。框架的直观结构如 Figure 1 所示。
 
-## 核心模块与公式推导
+
 
 CER‑GOD 由四个关键组件协同构成：**图自编码器 (GAE)** 负责生成基础节点嵌入，**自判别掩码破坏器 (SD‑MS)** 自适应削弱异质性边，**基于聚类的异常检测器** 提供无阈值异常评分，**多样性损失** 防止聚类坍缩。各模块的核心公式及变量含义梳理如下。
 
@@ -174,7 +178,9 @@ $$
 最终，CER‑GOD 以权重 $\alpha,\beta,\gamma$ 联合最小化以上四项损失：  
 $\ell_{\mathrm{total}} = \ell_{\mathrm{r}} + \alpha \ell_c + \beta \ell_{\mathrm{dr}} + \gamma \ell_{\mathrm{diversity}}$，使掩码学习与异常检测在统一无监督框架下协同进化。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -238,7 +244,9 @@ t-SNE可视化（图Figure 5）直观揭示了基线方法的同质性陷阱：D
 5. **固定多样性阈值**：ε固定为1，在某些数据集上可能不是最理想的样本比例约束，未来可设计自适应阈值或动态合并机制来增强对不同异常模式的覆盖。
 6. **动态图与流式数据**：当前模型假定静态拓扑，难以直接适用于随时间演化的图，如何增量式学习边掩码和聚类结构是一个待解决问题。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -260,6 +268,8 @@ CER-GOD 的设计建立在 **正常节点占多数的假设** 之上（聚类分
 4. **聚类组件的自适应性**：当前聚类数目固定为 2，且难以自动合并不同异常模式对应的簇；自动化确定聚类数目或开发自适应合并策略可提升对复杂异常模式的捕获能力。
 5. **多样性损失的通用性**：ε 的固定值在某些数据集上可能过强或过弱，学习自适应的 ε 或设计新的防坍缩机制可能进一步稳定训练。
 6. **超参数调节的自动化**：α、β 仍需人工设定，如何在无验证集的情况下自动平衡重建、聚类和推斥损失，是提升易用性的关键方向。
+
+
 
 ## 原文 PDF
 

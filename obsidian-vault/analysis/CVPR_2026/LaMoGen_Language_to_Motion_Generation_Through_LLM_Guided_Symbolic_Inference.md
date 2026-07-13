@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/LaMoGen_Language_to_Motion_Generation_Through_LLM_Guided_Symbolic_Inference.pdf
+project_link: https://jjkislele.github.io/LaMoGen/
+code_link: null
 aliases:
 - LaMoGen
 tags:
@@ -40,15 +42,13 @@ claims:
 > - Laban Benchmark (HumanML3D-Laban) 上，FID 为 1.859 (DeepSeekV3)，对比 2.072 (MotionGPT)，变化 -0.213。
 > - HumanML3D 上，R-precision Top-3 为 0.796 (GPT4.1)，对比 0.740 (Guo et al.)，变化 +0.056。
 
-## 概述
+## 概要
 
 现有文本到运动生成方法普遍依赖文本-运动联合嵌入，难以精确捕捉指令中的细粒度时间结构（如步数、顺序、持续时间）与多身体部位的协调性，导致在复杂文本上语义与时间对齐不佳，且生成过程缺乏可解释性。LaMoGen 的核心洞察在于：人体运动本质上可抽象为离散、可解释的符号序列——每个符号对应标准化的概念描述，从而使大语言模型能够像处理自然语言一样进行符号推理、组合与编辑，无需直接处理原始运动数据。
 
 该方法的关键突破体现在两个层面。在表示层面，LaMoGen 引入 **LabanLite**——一种基于拉班记谱法的帧级、身体部位感知的符号化运动表示，将运动分解为由概念符号与细节符号组成的序列，并赋予每个概念符号以标准化文本描述。在生成层面，LaMoGen 采用 **LLM 引导的符号推理** 替代传统端到端黑盒映射：首先由 LLM 通过检索增强提示生成高层次概念符号序列（运动规划），再由 Kinematic Detail Augmentor 自回归地补充细节符号，最终由运动解码器重构为 SMPL 姿态序列。这种双层次设计实现了对运动类型、时序与协调性的精细控制，同时使符号序列本身具备人类可读性与 LLM 可编辑性。
 
 实验结果表明，在专门构建的 Laban Benchmark 上，LaMoGen（GPT4.1）在所有拉班指标上大幅超越现有方法——SMT supL 达到 0.583，而最优基线 MoDiff 仅为 0.491（Table 1）。在 HumanML3D 标准测试上，LaMoGen 在 R@3（0.796）上与最优方法竞争，同时在拉班指标上保持显著优势（Table 2）。消融实验确认，LLM 符号规划组件对拉班对齐指标贡献巨大，且更强的 LLM 持续带来性能提升。定性结果进一步显示，LaMoGen 能准确执行“前进 5 步后退 3 步”等含精确步数和时序的指令，而 MDM 等方法仅生成通用行走循环（Figure 3）。
-
-## 背景与动机
 
 文本驱动的人体运动生成旨在根据自然语言描述合成逼真的三维人体动作序列，在动画制作、虚拟人交互、游戏开发等领域具有广泛的应用前景。近年来，基于扩散模型和离散动作标记的生成方法取得了显著进展，在标准基准（如HumanML3D、KIT-ML）上的FID和R-Precision指标不断刷新。然而，现有方法存在一个关键的瓶颈：**它们主要依赖文本-运动联合嵌入进行端到端的黑盒映射，难以精确捕捉指令中的细粒度时间结构**。
 
@@ -63,7 +63,7 @@ claims:
 
 正是在这一背景下，LaMoGen提出了一种根本性的思路转变：**将运动生成从连续的端到端映射，转变为基于离散符号的推理与组合过程**。其核心动机是引入**LabanLite**——一种基于拉班记谱法（Labanotation）的帧级、身体部位感知的符号化运动表示，将运动分解为可解释的符号序列；并利用大语言模型（LLM）的推理能力，通过检索增强提示实现高层次的符号运动规划，从而实现对运动类型、时序和身体部位协调性的精细控制。这一设计不仅解决了细粒度时间结构的建模难题，还赋予了系统人类可读的符号中间表示，使得运动编辑和对话式交互成为可能。
 
-## 核心创新
+## 核心方法与创新机理
 
 ### 1. 瓶颈突破：从黑盒嵌入到可解释符号推理
 
@@ -124,8 +124,6 @@ LaMoGen 的创新在多个维度上得到了实验验证：
 
 4. **动作覆盖范围**：当前系统主要建模四肢的主要运动，尚未扩展到手部、手指精细动作和面部表情。
 
-## 整体框架
-
 LaMoGen 提出了一种**双层次语言到运动生成框架**，其核心思路是将运动生成分解为高层符号规划与低层运动合成两个阶段，从而实现对复杂文本指令中细粒度时间结构与身体部位协调性的精确控制。
 
 ### 框架总览
@@ -162,8 +160,6 @@ LaMoGen 提出了一种**双层次语言到运动生成框架**，其核心思�
 ### 证据强度说明
 
 上述框架描述基于论文 Section 3 的完整方法论阐述，各模块的功能与连接关系在 Figure 2 中有明确可视化呈现。自动符号检测工作流的准确性在专家标注数据集上得到验证（SMT 0.871, TMP 0.852, HMN 0.786），为整个流水线的符号提取环节提供了可靠基础。消融实验进一步证实，LLM 符号规划组件对 Laban 对齐指标贡献巨大，移除 LLM 将导致 SMT 和 TMP 显著下降，验证了双层次设计的必要性。
-
-## 核心模块与公式推导
 
 ### 3.1 LabanLite 符号化运动表示
 
@@ -224,7 +220,7 @@ $$\mathcal{L}_{gen} = -\sum_{t,n} \left[v_t^n \log p_t^n + (1 - v_t^n) \log(1 - 
 
 最终，完整的 Laban 码序列经码本嵌入求和后输入运动解码器 D（基于 Transformer），重构为 SMPL 姿态序列，完成从符号到运动的转换。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -307,9 +303,6 @@ Supplementary Table 4 的消融显示：将检索示例数量从 1 增加到 3 �
 ![[assets/figures/papers/paper_list_l16_LaMoGen_Language_to_Motion_Generation_Through_LLM_Guided_Symbolic_Infere/figures/008_Figure_2.jpg]]
 *Figure 2: Illustration of a partial Laban score. This figure provides a visual explanation of the annotation process for a forward walk movement*
 
-![[assets/figures/papers/paper_list_l16_LaMoGen_Language_to_Motion_Generation_Through_LLM_Guided_Symbolic_Infere/figures/011_Figure_5.jpg]]
-*Figure 5: Illustration of extracting lower-body conceptual symbols: (a) Given a motion sequence; (b) we segment the sequence into dynamic and hold intervals by computing foot velocity; (c) in parallel, frame-wise Laban symbols are identified; (d) for each interval, aggregated frame-wise symbols yield the most representative symbol for the interval*
-
 ![[assets/figures/papers/paper_list_l16_LaMoGen_Language_to_Motion_Generation_Through_LLM_Guided_Symbolic_Infere/figures/022_Figure_12.jpg]]
 *Figure 12: Qualitative comparison on fine-grained temporal structure modification. Left: the baseline motion, condition on “walk forward”. Middle: the motion conditioned on “walk forward slow”. Right: the motion conditioned on “walk forward in 5 seconds”. We highlight the step number and the corresponding duration. We calculate the average step duration to assess the degree of the speed change*
 
@@ -318,7 +311,7 @@ Supplementary Table 4 的消融显示：将检索示例数量从 1 增加到 3 �
 ![[assets/figures/papers/paper_list_l16_LaMoGen_Language_to_Motion_Generation_Through_LLM_Guided_Symbolic_Infere/figures/019_Figure_10.jpg]]
 *Figure 10: Illustration of the user study form*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 与现有文本-运动生成方法的谱系关系
 

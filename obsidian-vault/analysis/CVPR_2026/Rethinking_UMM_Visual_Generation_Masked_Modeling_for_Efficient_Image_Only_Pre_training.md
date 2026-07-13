@@ -44,7 +44,7 @@ claims:
 > - WISE 上，Overall (↑) 0.55 vs MetaQuery-XL: 0.55; BAGEL-7B: 0.52 (持平 / +0.03)。
 > - DPGBench 上，Overall (↑) 82.95 vs BLIP3-o-8B*: 81.60; Janus-Pro-7B: 84.19 (+1.35 / -1.24)。
 
-## 概述
+## 概要
 
 当前统一多模态模型（UMM）的视觉生成预训练面临一个根本性瓶颈：严重依赖高质量文本-图像配对数据，而此类数据稀缺且获取成本高昂。同时，现有训练范式效率低下，导致模型在有限数据条件下难以生成与文本指令忠实对齐的图像。
 
@@ -54,7 +54,7 @@ claims:
 
 消融实验进一步证实，残差查询适配器（RQA）、掩码图像建模以及混合数据微调三个关键设计均对生成质量有显著正向贡献。此外，纯图像预训练模型在零样本图像编辑基准 ImgEdit-Bench 上超过图文对预训练模型（整体 2.82 vs. 2.61），展现出更强的视觉先验迁移能力。
 
-## 背景与动机
+
 
 ### 统一多模态视觉生成的瓶颈
 
@@ -77,7 +77,9 @@ claims:
 
 这一范式的核心优势在于：**将昂贵的文本监督推迟到微调阶段，使预训练的数据瓶颈被彻底打破**，同时通过掩码建模确保纯图像预训练的质量不降级。后续章节将详细展开各模块的设计与实验验证。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 IOMM 的核心创新在于**彻底解耦视觉生成预训练与文本-图像配对数据的依赖**，通过三条相互咬合的设计线，将统一多模态模型的生成训练从高成本的数据瓶颈中解放出来。
 
@@ -113,7 +115,7 @@ $$\mathbf{c} \gets \mathrm{concat}(\mathbf{c}, \mathbf{q}_{\theta}(\mathbf{c}))$
 
 上述四条设计线形成协同闭环：自条件信号使预训练摆脱配对数据依赖 → 掩码建模迫使模型学习组合式视觉表示 → RQA 高效桥接冻结 MLLM 与生成任务 → 混合微调以最小代价恢复指令对齐。最终，仅使用公开数据集的 IOMM-B (512) 在 GenEval 上达到 0.89，超越使用额外 30M 专有数据的 BLIP3-o-8B\* (0.84) 和 BAGEL-7B (0.88)（Table 1），同时总训练成本仅约 1050 H800 GPU 小时。
 
-## 整体框架
+
 
 IOMM 提出了一种**数据高效的两阶段训练范式**，旨在解决统一多模态模型（UMM）视觉生成预训练对昂贵图文配对数据的重度依赖。其核心思路是：将文本条件替换为“辅助提示 + 图像 patch”的自条件信号，并引入掩码图像建模，使模型在纯图像数据上即可习得强大的视觉生成先验。
 
@@ -151,7 +153,7 @@ $$L(\theta) = \mathbb{E}_{x,z,c,t} \left[ \| F_\theta(x_t, t, c) - (z - x) \|_2^
 ![[assets/figures/papers/paper_list_l924_https_arxiv_org_abs_2603_16139/figures/001_Figure_1.jpg]]
 *Figure 1: An overview and validation of our proposed training paradigm. (a) Visual results of our IOMM-XL, demonstrating high-quality, multi-resolution image synthesis. Corresponding prompts are provided in App. C.7. (b) An illustration of the six training recipes we investigate. (c) Quantitative results of six training recipes on the GenEval benchmark*
 
-## 核心模块与公式推导
+
 
 ### 流匹配生成框架
 
@@ -218,7 +220,9 @@ IOMM 的完整训练分为两个阶段，其核心逻辑由上述模块串联实
 
 2. **第二阶段（混合数据微调）**：在纯图像数据中混入少量高质量文本-图像配对数据，以极低成本恢复并提升模型的指令对齐能力。微调时，文本条件替代辅助提示，与图像 patch 共同构成条件序列，其余模块保持不变。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心训练配方对比
 
@@ -284,7 +288,9 @@ Table 4 和 Table 5 分别列出了预训练和微调阶段的超参数设置。
 ![[assets/figures/papers/paper_list_l924_https_arxiv_org_abs_2603_16139/figures/009_Table_5.jpg]]
 *Table 5: Finetuning settings*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 训练范式：从图文对依赖到纯图像自条件
 
@@ -322,6 +328,8 @@ IOMM 将这一范式彻底翻转：**第一阶段采用纯图像自条件预训�
 2. **混合比例最优化**：混合微调阶段最优的图像与文本配对数据比例是什么？不同下游任务（生成、编辑、多模态理解）是否需要不同的混合策略？
 3. **跨模态迁移**：纯图像预训练学到的视觉先验能否迁移到其他生成任务（如视频生成、3D 合成）？自条件范式在这些模态中是否同样有效？
 4. **适配器技术对比**：RQA 与其他参数高效微调技术（如 LoRA、Adapter、Prefix Tuning）在 UMM 生成场景下的系统对比尚未进行，各自的适用边界有待厘清。
+
+
 
 ## 原文 PDF
 

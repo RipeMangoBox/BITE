@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/A_Two_Phase_Deep_Learning_Framework_for_Adaptive_Time_Stepping_in_High_Speed_Flow_Modeling.pdf
+project_link: https://huggingface.co/divelab
+code_link: https://github.com/divelab/AIRS
 aliases:
 - TPDLFATSHSFM
 - ShockCast
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 高速流建模中自适应时间步进的两阶段深度学习框架 |
 | 英文题名 | A Two-Phase Deep Learning Framework for Adaptive Time-Stepping in High-Speed Flow Modeling |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=d4gzLgGl7I); [GitHub](https://github.com/divelab/AIRS); [Project](https://huggingface.co/divelab) |
+| Links | [paper](https://openreview.net/forum?id=d4gzLgGl7I) · [GitHub](https://github.com/divelab/AIRS) · [Project](https://huggingface.co/divelab) |
 | Topic | #topic/other_unclear #topic/other_unclear/general |
 | Method | ShockCast |
 | Dataset | Circular Blast (evaluation split), Coal Dust Explosion (evaluation split) |
@@ -41,7 +43,7 @@ claims:
 > - Coal Dust Explosion (evaluation split) 上，Solution time (s) on GPU 为 2.15 ± 0.07 (CNO Affine, GPU)，对比 67,441 (mean, classical solver on 16 CPU cores)，变化 超过四个数量级的加速。
 > - Coal Dust Explosion (evaluation split) 上，Turbulence Kinetic Energy Relative Error ×10⁻² (↓) 为 8.91 ± 0.16 (U-Net MoE)，对比 9.85 ± 0.24 (U-Net Affine)，变化 -0.94。
 
-## 概述
+## 概要
 
 高速流模拟中，激波等局部梯度极陡的区域要求使用极小的时间步长以保证数值稳定性。传统方法采用均匀时间步时，必须全程依赖由最严酷区域决定的最小步长，导致巨大的计算代价。基于神经算子的替代求解器虽然能够降低计算开销，但其通常使用粗化时空网格和部分物理变量，经典 Courant‑Friedrichs‑Lewy (CFL) 条件无法直接为其确定合适的步长，从而限制了一阶训练目标的均匀性和模型的泛化能力。
 
@@ -49,7 +51,7 @@ claims:
 
 实验表明，ShockCast 在圆形爆炸和煤尘爆炸等高速流基准上显著加速：在 GPU 上的推理时间较经典 16 核 CPU 求解器加快逾四个数量级，同时保持高质量预测，湍流动能相对误差和平均流相对误差较纯 Affine 条件基线均有明显下降，质量守恒误差控制在初始质量的 0.2% 以内。神经 CFL 模型预测的 $\Delta_t$ 与真实时间步的关联时间比例与使用真实步长的 Oracle 上限极为接近，验证了自适应步长预测的有效性。这些结果说明，通过将时间步预测与状态演化解耦且互为条件，ShockCast 能够在保证精度的前提下大幅降低高速流神经模拟的计算成本，并提升模型在不同尖锐度梯度区域上的泛化性能。
 
-## 背景与动机
+
 
 高速流动（如激波、爆轰波）在空间上形成局部极陡的梯度，经典数值方法必须在该区域使时间步长大幅收缩以满足 CFL 稳定性条件  
 $$\Delta t \leq \frac{C}{\lambda_{\max}} \min_{x,y}(\Delta x, \Delta y), \quad \lambda_{\max} := \max_{x,y} \lambda(x,y), \quad \lambda(x,y) := \max\left( |u(x,y)| + a(x,y), |v(x,y)| + a(x,y) \right).$$  
@@ -57,7 +59,9 @@ $$\Delta t \leq \frac{C}{\lambda_{\max}} \min_{x,y}(\Delta x, \Delta y), \quad \
 
 ShockCast 的动机源于一个简单的观察：若让 $\Delta t$ 按流场变化的速率反比例缩放，就能使相邻时刻的差异 $\| \dot{\mathbf{u}}(t) - \mathbf{u}(t+\Delta t) \|$ 在不同激波强度下趋于均匀，从而降低训练损失的方差。这实质上是让神经求解器“看清”每个样本的时间演进步长，并将步长转化为一个可控的条件变量。为此，ShockCast 设计了一个两阶段框架：第一阶段训练一个神经 CFL 模型 $\psi$，输入当前流场状态 $\mathbf{u}_j$ 及其空间梯度 $\nabla \mathbf{u}$、局部波速和声速等物理 CFL 特征，输出预测的时间步大小 $\Delta_j$；第二阶段将预测的 $\Delta_j$ 作为时步条件注入神经求解器 $\phi$，使其从 $\mathbf{u}_j$ 推进到 $\mathbf{u}_{j+1}$。这一构思不要求神经求解器本身计算 CFL 约束，而是让一个独立的预测器学习从粗网格数据中推断步长，使整体框架在数据驱动条件下复现了物理自适应步进的核心逻辑，从而在保持推理效率的同时显著提升对高速瞬变流动的建模能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ShockCast 的核心创新在于将自适应时间步进机制**可微分地嵌入**深度学习框架，解决高速流神经模拟中由激波等尖梯度结构导致的训练与推断瓶颈。相对于固定步长基线，其关键贡献体现在以下五个「插槽」的替换或新增：
 
@@ -110,7 +114,7 @@ $$
 
 在煤尘爆炸和圆形爆炸基准上，Euler 与 MoE 条件化在湍流动能（TKE）误差和长时关联时间比例上均优于纯 Affine 基线，且 MoE 条件化在增高推理成本的同时换取了更低的 TKE 误差（如 U-Net MoE 相比 Affine 的 TKE 相对误差降低 0.94×10⁻²）。值得注意的是，当使用真实 Δₜ（Oracle）时，ShockCast 与固定步长的性能差距极小（关联时间比例仅差 −0.04×10⁻²，Table 7），表明神经 CFL 模型的预测已逼近最优自适应步长。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0004_d4gzLgGl7I_A_Two-Phase_Deep_Learning_Framework_for_Adaptive/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the ShockCast framework for time-adaptive modeling of high-speed flows. Left: Training pipeline. The neural CFL model and time-conditioned neural solver are conditioned on the current flow state and predict the corresponding timestep size $\Delta$ t and flow state $\Delta$ t ahead, respectively. Right: Inference pipeline. ShockCast autoregressively alternates between predicting the timestep size given the current flow state using the neural CFL model and evolving the flow state forward in time by the predicted timestep size using the neural solver model. Note that the example data are from the circular blast dataset we generated in this work
@@ -133,7 +137,7 @@ ShockCast 是一个面向高速可压缩流建模的两阶段深度学习框架�
 **框架动机与优势**  
 高速流中激波等结构要求步长随局部梯度剧烈变化而急剧减小，均匀步长迫使整个模拟采用最严格的最小步长，计算代价极高。ShockCast 通过学习“流场状态 → 步长”的映射，使神经求解器获得的训练对的难度分布更加均匀——尖锐梯度区域对应的步长小、缓变区域步长大，从而**降低训练目标的方差**，提升模型在强非线性和大梯度条件下的稳定性和泛化能力。同时，步长预测与流场推进的分离设计也降低了两任务的耦合复杂度，便于针对性地改进各模块。
 
-## 核心模块与公式推导
+
 
 ### 两阶段自适应时间步进框架
 
@@ -188,7 +192,9 @@ $$
 
 ShockCast 不再显式使用该条件，而是通过神经 CFL 模型从流场状态中隐式学习这一关系，从而在粗网格、部分变量的条件下仍然能够输出有效的自适应 Δₜ。直觉上，按流场变化的速率反比例缩放Δₜ可以使训练目标的难度分布更加均匀，大幅降低因梯度尖锐程度差异造成的方差，进而提升神经求解器的稳定性和泛化能力。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -245,7 +251,9 @@ ShockCast 在自回归推演中保持相对质量偏差在初始质量的 0.2% �
 
 当前报告未涉及本框架在多物种反应流或考虑黏性与热传导的全 Navier‑Stokes 设置下的表现。此外，虽然关联时间比例接近 Oracle，但在极端激波间断处和极高初始压力比的配置中，ShockCast 的自回归误差传播模式尚未有公开失效分析，这一点需要进一步实验确认。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线神经算子的关系
 
@@ -270,6 +278,8 @@ ShockCast 设计的前提条件来自高速流计算的三个约束耦合：① 
 神经 CFL 模型的预测能力在单步 MAE 上表现优异，且与 Oracle 的关联时间比例差距极小，但当前消融仅覆盖了 Circular Blast 上的特征组合效果——加入 ∇u 与 CFL 特征的组合在 Base 模型上取得最低单步归一化 MAE，而单独使用 ∇u 或 ∇u+CFL 无组合效果时误差显著升高。这一现象暗示预测精度对特征组合方式的敏感度，但未给出在不同流况之间的泛化转移性证据。
 
 开放问题集中在以下方向：① 神经 CFL 模型对训练分布外激波构型的泛化能力——当前验证仅限于与训练同分布条件下的泛化，尚未评估跨初始条件、跨流体模型的迁移；② 多尺度耦合问题——当激波、湍流和其他流态场景共存时，单一的标量 Δₜ 预测机制能否充分捕捉局部步长需求的异质性；③ 与经典自适应步长控制策略（如 PID 控制器）的理论等价关系——若神经 CFL 模型本质上是在学习某种近似误差估计与步长缩放，其与经典控制理论的桥接将有助于解释其泛化边界。这些方向需在更宽范围内进行体系化验证。
+
+
 
 ## 原文 PDF
 

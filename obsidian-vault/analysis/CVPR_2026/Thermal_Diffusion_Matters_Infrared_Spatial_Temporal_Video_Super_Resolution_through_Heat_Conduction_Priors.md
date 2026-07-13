@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/Thermal_Diffusion_Matters_Infrared_Spatial_Temporal_Video_Super_Resolution_through_Heat_Conduction_Priors.pdf
+project_link: null
 code_link: "https://github.com/ultralytics/ultralytics"
 aliases:
 - Thermal_Diffusio
@@ -42,7 +43,7 @@ claims:
 > - LLVIP 上，PSNR 28.05；SSIM 0.9177。
 > - SGMP 上，PSNR 37.83。
 
-## 概述
+## 概要
 
 红外视频时空超分辨率（Infrared Spatial-Temporal Video Super-Resolution, STVSR）面临一个双重瓶颈：红外成像系统同时受限于低空间分辨率和低帧率，而现有方法（如基于光流或可变形卷积的插值方案）缺乏热物理一致性约束，导致生成的时空细节在物理上不合理。本文的核心洞察在于：红外像素强度与温度辐射之间存在直接映射关系，因此可以将热传导方程作为物理先验嵌入深度网络，从而指导时空超分辨率过程，实现物理一致且时间连续的帧生成。
 
@@ -52,7 +53,7 @@ claims:
 
 在方法谱系上，THERIS 区别于现有的 STVSR 方法（如 **ZoomingSlowMo**（Xiang et al., CVPR 2020）、**TMNet**（Xu et al., CVPR 2021）、**VideoINR**（Chen et al., CVPR 2022）、**MoTIF**（Chen et al., CVPR 2023）和 **BF-STVSR**（Kim et al., CVPR 2025）），首次将热传导偏微分方程引入神经网络架构设计与损失函数，为红外视频增强提供了物理可解释的新范式。
 
-## 背景与动机
+
 
 ### 红外视频超分辨率的双重瓶颈
 
@@ -82,7 +83,9 @@ $$\frac{\partial u(x,t)}{\partial t} = D \frac{\partial^2 u(x,t)}{\partial x^2},
 
 通过将热传导方程从物理定律转化为网络设计中的结构化先验，THERIS旨在弥合现有STVSR方法在红外场景中的“物理-数据”鸿沟，实现时序连续且物理一致的红外视频重建。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 1. 问题瓶颈与因果调控
 
@@ -146,7 +149,7 @@ THERIS在STVSR方法谱系中占据独特位置：
 - 热扩散系数 $\kappa$ 的学习是否可基于场景材料属性自动确定，仍为开放问题
 - 该物理先验框架是否适用于可见光等其他成像模态，需进一步验证
 
-## 整体框架
+
 
 THERIS 是一个统一的热物理驱动框架，旨在解决红外视频时空超分辨率问题。其核心设计目标是从低帧率、低空间分辨率的红外视频中重建出高帧率、高空间分辨率且物理一致的视频序列。
 
@@ -175,7 +178,7 @@ THERIS 是一个统一的热物理驱动框架，旨在解决红外视频时空�
 ![[assets/figures/papers/paper_list_l2609_https_openaccess_thecvf_com_content_CVPR2026_html_Zhou_Thermal_Diffusion/figures/002_Figure_2.jpg]]
 *Figure 2: An overview of our proposed THERIS framework*
 
-## 核心模块与公式推导
+
 
 ### 3.1 整体框架与问题定义
 
@@ -249,7 +252,9 @@ $$r(x,y,t) = \frac{\tilde{I}_{t+1}^H - \tilde{I}_{t-1}^H}{2\Delta t} - D \nabla^
 ![[assets/figures/papers/paper_list_l2609_https_openaccess_thecvf_com_content_CVPR2026_html_Zhou_Thermal_Diffusion/figures/007_Figure_5.jpg]]
 *Figure 5: Given LR frames at t = 0 and t = 1, TDIM alone is able to generate initially interpolated HR frames at t = 0.5, preserving both spatial details and temporal coherence*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -317,7 +322,9 @@ $$r(x,y,t) = \frac{\tilde{I}_{t+1}^H - \tilde{I}_{t-1}^H}{2\Delta t} - D \nabla^
 ![[assets/figures/papers/paper_list_l2609_https_openaccess_thecvf_com_content_CVPR2026_html_Zhou_Thermal_Diffusion/figures/004_Figure_3.jpg]]
 *Figure 3: Qualitative comparisons of different STVSR methods. Overlap refers to the averaged image of two input frames (t = 0, 1). Our method produces favorable results with desirable visual details. Please zoom in for a better view*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 红外STVSR的问题独特性
 
@@ -352,6 +359,8 @@ THERIS 在方法谱系中占据一个独特的位置——它将物理先验驱�
 3. **实时部署效率。** 尽管 Figure 4 展示了 THERIS 在性能-效率权衡上的优势，但 TSSM 中 FFT/IFFT 操作和多扫描顺序的 Mamba 块引入了额外的计算开销。模型在资源受限的嵌入式红外系统（如无人机载红外、车载夜视）上的部署效率尚未评估，这对其实际应用至关重要。
 
 4. **物理先验与数据驱动的理论平衡。** TFM Loss 强制输出帧满足热传导方程，但该方程本身是对真实热力学过程的简化（忽略了对流、辐射等效应）。在何种条件下物理约束会过度正则化、反而损害重建质量，缺乏理论分析。
+
+
 
 ## 原文 PDF
 

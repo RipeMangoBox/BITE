@@ -5,6 +5,8 @@ paper_level: A
 venue: ECCV
 year: 2024
 pdf_ref: paperPDFs/ECCV_2024/Motion_Mamba_Efficient_and_Long_Sequence_Motion_Generation.pdf
+project_link: https://steve-zeyu-zhang.github.io/MotionMamba
+code_link: null
 aliases:
 - MM
 - MMELSMG
@@ -41,7 +43,7 @@ claims:
 > - HumanML3D 上，R Precision Top‑1 ↑ 为 0.502，对比 0.481 (MLD)，变化 +4.4%。
 > - HumanML3D 上，Average Inference Time (seconds) ↓ 为 0.058，对比 0.217 (MLD)，变化 −73.3% (4× faster)。
 
-## 概述
+## 概要
 
 **核心问题**：现有基于Transformer的扩散运动生成模型（如MLD、MDM）在处理长时序人体运动时，自注意力机制带来二次计算复杂度，导致推理速度慢且难以有效捕获长距离帧间依赖，成为制约运动生成质量与效率的关键瓶颈。
 
@@ -60,7 +62,7 @@ claims:
 - **核心创新**：将**Mamba**（Gu & Dao, 2023）选择性状态空间模型首次引入运动生成领域，并通过HTM的层次化扫描分配策略与BSM的双向潜在空间扫描实现时序与空间建模的协同优化。
 - **下游影响**：为长序列运动生成、实时人机交互等场景提供了高效且高质量的基线，其“状态空间+扩散”的组合范式可推广至其他时序生成任务（如手势、舞蹈、动作预测）。
 
-## 背景与动机
+
 
 ### 问题背景：文本驱动的人体运动生成
 
@@ -91,7 +93,9 @@ Mamba模型（选择性SSM）具有两个关键优势使其天然适合长序列
 
 然而，直接将标准Mamba应用于运动生成的潜在扩散框架面临两个挑战：其一，如何在不同抽象层级有效捕获多尺度时序依赖；其二，如何在潜在空间内部增强不同通道（对应不同运动维度）之间的信息交互。Motion Mamba通过**层次化时序扫描（Hierarchical Temporal Mamba, HTM）**和**双向空间扫描（Bidirectional Spatial Mamba, BSM）**两个专用模块来应对这些挑战，在保持线性复杂度的同时实现了生成质量与推理速度的双重突破。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Motion Mamba 的核心创新在于**用选择性状态空间模型（Mamba）彻底替换扩散去噪器中的 Transformer 骨架**，从根本上解决了现有方法在处理长序列运动生成时面临的二次计算复杂度瓶颈。围绕这一骨架替换，论文设计了两个高度特化的模块——层次化时序扫描（HTM）与双向空间扫描（BSM）——分别在时序依赖建模和空间细节刻画两个维度上释放 Mamba 的线性复杂度优势。
 
@@ -137,7 +141,7 @@ Motion Mamba 的创新可归纳为三个 **changed slots**：
 
 三者协同作用使 Motion Mamba 在 HumanML3D 上以 0.281 的 FID 刷新 SOTA，同时推理速度达到 MLD 的 4 倍（0.058s vs 0.217s，Figure 4），在长序列数据集 HumanML3D-LS 上亦取得 0.668 的 FID（Table 3），验证了线性复杂度骨架在长序列运动生成场景中的决定性优势。
 
-## 整体框架
+
 
 Motion Mamba 的整体 pipeline 延续了潜在扩散模型（Latent Diffusion）的基本范式，但在去噪骨干网络上进行了根本性的替换。其核心流程如下：给定一条文本描述，首先通过冻结的 **CLIP 文本编码器**（ViT‑B/32）提取文本嵌入；同时，一段运动序列经由复用的 **Motion VAE** 编码器压缩到低维潜在空间，得到潜在表示 $z_0$。扩散过程在该潜在空间中对 $z_0$ 逐步加噪，生成噪声潜在变量 $z_t$；随后，**去噪 U‑Net** 以 $z_t$、时间步 $t$ 和文本嵌入为条件，预测所添加的噪声，从而逐步恢复出干净的潜在运动表示。最后，Motion VAE 解码器将该潜在表示重建为完整的运动序列。
 
@@ -154,7 +158,7 @@ $$\epsilon_{\theta}(x) \equiv \{E_{1\ldots N}, M, D_{1\ldots N}\}$$
 ![[assets/figures/papers/paper_list_l12_Motion_Mamba_Efficient_and_Long_Sequence_Motion_Generation/figures/002_Figure_2.jpg]]
 *Figure 2: This figure illustrates the architecture of the proposed Motion Mamba model. Each of encoder and decoder blocks consists of a Hierarchical Temporal Mamba block (HTM) and a Bidirectional Spatial Mamba (BSM) block, which possess hierarchical scan and bidirectional scan within SSM layers respectively. This symmetric distribution of scans ensure a balanced and coherence framework across the encoder-decoder architecture*
 
-## 核心模块与公式推导
+
 
 ### 状态空间模型预备
 
@@ -200,7 +204,9 @@ BSM 块旨在增强潜在空间中的通道信息流动。其关键操作是维�
 
 HTM 与 BSM 在编码器/解码器的每个层级中串联工作：HTM 首先处理时序一致性，BSM 随后精炼空间细节。注意力混合器 $M$ 位于瓶颈层，采用标准 Transformer 注意力实现跨模态信息融合。整个潜在扩散模型的训练目标是最小化潜在空间中真实噪声与预测噪声之间的均方误差（MSE），与 MLD（Chen et al., CVPR 2023）的训练范式保持一致。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -250,7 +256,9 @@ Table 4系统评估了HTM与BSM的设计选择、潜在维度及网络层数的�
 ![[assets/figures/papers/paper_list_l12_Motion_Mamba_Efficient_and_Long_Sequence_Motion_Generation/figures/001_Figure_1.jpg]]
 *Figure 1: Motion Mamba has achieved significantly superior performance on long squence modeling and motion generation efficiency compared with other well-designed state-of-the-art methods such as MLD [6], MotionDiffuse [54], and MDM [49]*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与因果杠杆
 
@@ -302,6 +310,8 @@ Motion Mamba 的完整流水线由四个功能模块构成：
 ### 知识库定位总结
 
 Motion Mamba 在方法谱系中处于**潜在扩散运动生成**与**状态空间序列建模**的交叉点。它从 MLD 继承了完整的潜在扩散框架，但将核心去噪网络从 Transformer 替换为 Mamba 变体，实质上开创了“SSM 驱动的运动扩散”这一子方向。其层次化扫描和双向扫描的设计策略为后续工作提供了两个可独立改进的模块化组件——HTM 可被其他时序扫描策略替代，BSM 可被其他空间信息交换机制替换。论文未讨论局限性章节，上述开放问题需后续研究或手动验证加以填补。
+
+
 
 ## 原文 PDF
 

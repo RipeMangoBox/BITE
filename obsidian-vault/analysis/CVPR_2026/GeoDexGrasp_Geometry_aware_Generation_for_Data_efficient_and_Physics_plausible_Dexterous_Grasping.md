@@ -42,7 +42,7 @@ claims:
 > - 5个基准数据集 上，平均抓取成功率 (Success Rate, %) 60.1 vs DexGraspAnything (约60) (持平)；参数量 (M) 28.7 vs DexGraspAnything (约150M) (减少 >80%)。
 > - 尺寸泛化 (OOD) - 小立方体 上，成功率 (%) 84.4 vs 所有基线 (显著优于基线)。
 
-## 概述
+## 概要
 
 灵巧抓取生成是机器人操作中的核心难题，其目标是为任意物体生成物理合理且可执行的手部姿态。现有数据驱动方法（如 **DexGraspAnything** (Zhong et al., CVPR 2025)、**UniDexGrasp** (Xu et al., CVPR 2023) 等）虽取得显著进展，但普遍忽视物体内在的几何先验，依赖海量数据进行统计学习，导致三个突出问题：**数据效率低下**、**物理合理性差**（严重的手-物体穿透与过抓取），以及**对未见尺寸的泛化能力不足**。
 
@@ -52,7 +52,7 @@ GeoDexGrasp 的核心洞察在于：物体的几何属性（形状、尺寸、�
 
 尽管成果显著，GeoDexGrasp 仍存在局限性：尺寸表示到灵巧手运动的映射高度非线性，全局尺度因子的显式提取带来的改进有限；在复杂拓扑形状（如玩具马）上，所有方法的成功率均很低；方法依赖外部 PointSO 模型提供交互方向，系统整体效果受上游模块制约。这些瓶颈为未来的细粒度几何建模与跨尺度抓取策略迁移指明了方向。
 
-## 背景与动机
+
 
 灵巧抓取是机器人操作领域的核心挑战，其目标是为任意物体生成物理合理且功能有效的多指手抓取姿态。近年来，数据驱动方法在该领域取得了显著进展，代表性工作包括 **DexGraspNet**（Wang et al., arXiv 2022）、**UniDexGrasp**（Xu et al., CVPR 2023）、**GenDexGrasp**（Li et al., arXiv 2022）、**D(R,O) Grasp**（Wei et al., arXiv 2024）、**UGG**（Lu et al., ECCV 2024）以及当前的SOTA方法 **DexGraspAnything**（Zhong et al., CVPR 2025）。这些方法通常将物体点云直接编码为隐式特征，随后通过生成模型在欧氏空间中联合预测手部根旋转、平移和手指关节角。
 
@@ -62,7 +62,9 @@ GeoDexGrasp 的核心洞察在于：物体的几何属性（形状、尺寸、�
 
 GeoDexGrasp 正是围绕这一核心问题展开。该方法的核心洞察是：利用 SIM(3) 等变编码与自监督解耦预训练，将低层等变/不变特征与高层姿态/形状语义对齐，进而在 SO(3) 流形与欧氏空间中解耦根旋转和手指关节的生成。通过这种几何感知的生成范式，模型能够以 DexGraspAnything 不足 1/5 的参数（28.7M），在五个基准数据集上将平均穿透深度降低约 40%，同时取得与之可比甚至更优的抓取成功率，并在仅 25% 训练数据的条件下仍保持较高的数据效率。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GeoDexGrasp 的核心创新在于**将灵巧抓取生成从“数据驱动的统计学习”范式转向“几何感知的语义生成”范式**。现有数据驱动方法（如 **DexGraspAnything** (Zhong et al., CVPR 2025)）将物体视为原始点云编码，依赖海量数据隐式学习手-物交互模式，导致数据效率低、物理合理性差（严重穿透与过抓取），且对物体姿态、形状和尺寸变化缺乏显式建模能力。
 
@@ -110,7 +112,7 @@ GeoDexGrasp 引入 **PointSO 基础模型**，根据语言提示（如“杯子�
 - **尺寸泛化**：SIM(3) 等变框架使模型能适应物体尺寸变化，在分布外（OOD）尺寸上的成功率均超过对比方法（Table 2）。
 - **参数效率**：仅使用 **DexGraspAnything** 1/5 以下的参数（28.7M vs. ~150M），取得与之可比甚至更优的平均抓取成功率（60.1%，Table 1）。
 
-## 整体框架
+
 
 GeoDexGrasp 将灵巧抓取生成建模为一个**几何感知的三阶段流水线**，其核心设计哲学是：当物体发生姿态、形状或尺寸变化时，模型应能根据内在几何语义自适应调整抓取，而非将每个变体视为全新案例。为此，整个框架将生成过程解耦为**几何表示学习与提取**、**姿态引导旋转生成**和**形状引导抓取生成**三个递进阶段（Figure 2）。
 
@@ -142,7 +144,7 @@ $$\mathcal{L}_{\mathrm{grasp}} = \eta_1 \mathcal{L}_{\mathrm{MSE}} + \eta_2 \mat
 ![[assets/figures/papers/paper_list_l2256_https_openaccess_thecvf_com_content_CVPR2026_html_Han_GeoDexGrasp_Geomet/figures/001_Figure_1.jpg]]
 *Figure 1: We propose a data-efficient, size-generalizable and physics-plausible method for dexterous grasp generation, which achieves State-Of-The-Art (SOTA) physical plausibility and competitive grasping performance with a relatively small number of parameters compared to previous SOTA methods*
 
-## 核心模块与公式推导
+
 
 GeoDexGrasp 的核心架构由三个解耦阶段构成：**几何表示学习与提取**、**姿态引导旋转生成**和**形状引导抓取生成**。其设计根植于一个关键洞察——将灵巧抓取的概率分布按几何语义分解，使旋转在 SO(3) 流形上独立建模，而手指关节与平移在欧氏空间中条件生成。
 
@@ -196,7 +198,9 @@ $$\mathcal{L}_{\mathrm{grasp}} = \eta_1 \mathcal{L}_{\mathrm{MSE}} + \eta_2 \mat
 
 三个模块的解耦设计使模型在各自合适的几何空间中学习：SO(3) 流形上的 IPDF 处理旋转的非欧结构，欧氏空间中的扩散模型处理平移和关节角的连续变化。SIM(3) 等变编码器与自监督预训练为这一解耦提供了语义对齐的几何条件，使得模型能以 28.7M 参数（不足 DexGraspAnything 的 1/5）实现可比的抓取成功率和显著更优的物理合理性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果：物理合理性与参数效率的双重突破
 
@@ -256,7 +260,9 @@ GeoDexGrasp 在五个基准数据集上进行了系统评估，与 **DexGraspAny
 ![[assets/figures/papers/paper_list_l2256_https_openaccess_thecvf_com_content_CVPR2026_html_Han_GeoDexGrasp_Geomet/figures/009_Figure_6.jpg]]
 *Figure 6: Real-world Validation*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 在灵巧抓取生成谱系中的位置
 
@@ -322,6 +328,8 @@ $$p(g \mid X, \hat{\Theta}) = p(R \mid \xi) \cdot p(t, \theta \mid X, R, \zeta)$
 4. **少样本/零样本扩展**：在仅依赖少量标注数据时，如何进一步利用 VLM 或基础模型提供更丰富的几何先验以引导未见物体的抓取？
 
 5. **多指操作泛化**：当前的解耦设计是否可扩展到其他灵巧手架构或更复杂的多指操作任务？
+
+
 
 ## 原文 PDF
 

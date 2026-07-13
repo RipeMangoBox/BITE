@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/VideoRealBench_A_Chain_of_Thought_Realism_Evaluation_Benchmark_for_Generated_Human_Centric_Videos.pdf
+project_link: null
 code_link: "https://github.com/MCG-NJU/VideoRealBench"
 aliases:
 - VVV
@@ -43,7 +44,7 @@ claims:
 > - 偏好一致性实验 上，Preference Consistency Ratio (PCR) 0.925 vs 0.754 (VideoPhy-2) (+0.171)。
 > - Video-Bench (泛化测试) 上，SROCC (Temporal Consistency) 0.474 vs 0.402 (GPT-4o) (+0.072)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -81,8 +82,6 @@ VideoRealBench属于**视频质量评估**与**多模态大模型对齐**的交�
 
 在知识库中，该工作可作为**可解释视频真实性评估**的基准方法，为后续研究提供高质量标注数据和评估模型。
 
-## 背景与动机
-
 ### 问题背景：生成人本视频的真实性评估困境
 
 随着文本到视频（T2V）生成模型的快速发展，生成视频的视觉质量已大幅提升，但**真实性（realism）**——即视频内容是否符合物理规律与人类视觉经验——仍是制约其实际应用的核心瓶颈。人本视频（human-centric videos）因涉及复杂的人体运动、物体交互与物理约束，其真实性缺陷尤为突出，典型错误包括肢体畸变、物体穿模、违背重力等。然而，当前缺乏能够可靠、可解释地评估此类视频真实性的基准与工具，导致模型迭代缺乏有效的反馈信号。
@@ -107,7 +106,7 @@ VideoRealBench属于**视频质量评估**与**多模态大模型对齐**的交�
 
 通过将人类直观的定性错误描述与严格定量的时空错误比例评分相结合，并训练多模态大语言模型（MLLM）执行多步CoT推理，VideoRealBench旨在弥合机器评估与人类偏好之间的鸿沟，为生成人本视频的真实性评估提供一个更可靠、更透明的基准平台。
 
-## 核心创新
+## 核心方法与创新机理
 
 VideoRealBench 的核心创新在于系统性地重构了生成人本视频的真实度评估范式，通过三个紧密耦合的“changed slots”解决了现有基准与人类偏好严重不对齐的根本瓶颈。
 
@@ -124,8 +123,6 @@ VideoRealBench 的核心创新在于系统性地重构了生成人本视频的�
 现有基准大量依赖 LLM 生成标注，导致描述幻觉、不完整或缺失（Figure 4）。VideoRealBench 构建了严格的多人标注质量控制闭环：**每位视频由三位标注员独立标注，采用多数投票或平均取整确定最终分数**；随后利用 DeepSeek 润色 CoT 推理文本，再经人工审核确保一致性与准确性。这一流程使得重新标注后的评分在偏好一致性比率（PCR）上达到 0.925，远高于 VideoPhy-2 的 0.754（Table 8），直接证明了标注质量对评估有效性的决定性作用。
 
 三个创新点形成因果闭环：严格量化的评分标准为推理提供了客观依据，三步 CoT 使评分过程可解释且可纠错，多人标注质量控制则确保了训练数据的可靠性。三者共同作用，使得基于 Qwen2.5-VL-7B 微调的 VideoRealEval 在 VideoRealDataset 测试集上达到 57.07% PLCC 和 56.78% SROCC，显著优于所有对比模型（Table 4）。
-
-## 整体框架
 
 VideoRealBench 的整体框架围绕一个核心目标构建：**弥合机器评估与人类偏好之间的鸿沟**。现有基准（如 **VideoPhy-2**、**VideoScore**、**VMBench**）普遍存在标注质量低下、评分标准模糊、缺乏可解释推理等瓶颈，导致其评分与人类对视频真实性的直觉判断严重不对齐。VideoRealBench 通过重新设计从数据标注到模型推理的完整链路，系统性地解决了这些问题。
 
@@ -175,8 +172,6 @@ VideoRealBench 的整体框架围绕一个核心目标构建：**弥合机器评
 ### 框架优势总结
 该框架的核心洞察在于：**将人类直观的定性错误描述与严格定量的时空错误比例评分相结合，并训练 MLLM 执行多步 CoT 推理，是弥合机器评估与人类偏好差距、提升可解释性的关键**。消融实验证实，同时进行评分重对齐和推理重对齐（即完整的 CoT）将 PLCC 从 53.89% 提升至 57.07%，而 VideoRealBench 的 PCR 达到 0.925，远高于 VideoPhy-2 的 0.754，直接验证了框架设计的有效性。
 
-## 核心模块与公式推导
-
 VideoRealBench 的核心工作流由三个紧密耦合的模块构成：**视频收集与筛选**、**人工标注与提示生成**、以及 **VideoRealEval 训练**。整个流水线如图 Figure 2 所示，其设计目标是将人类直观的定性错误描述转化为严格定量的时空错误比例评分，并强制评估器输出可验证的三步思维链。
 
 ### 视频收集与筛选
@@ -209,18 +204,7 @@ $$\mathrm{PCR} = \frac{1}{|\mathcal{P}|} \sum_{(i,j) \in \mathcal{P}} \mathbf{1}
 
 三个模块形成了一条清晰的因果链：**视频筛选**保证了评估对象的针对性（人本视频）；**定量评分标准与多人标注机制**解决了评分模糊和标注噪声问题，这是 PCR 从 0.754 跃升至 0.925 的直接原因；**CoT 推理训练**则赋予了评估器可解释性，消融实验证实完整 CoT 将 PLCC 从 53.89% 提升至 57.07%（Table 6），而同时进行评分重对齐和推理重对齐是达到最优性能的关键（Table 7）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2752_https_openaccess_thecvf_com_content_CVPR2026_html_Yang_VideoRealBench_A/figures/003_Table_1.jpg]]
-*Table 1: Human annotation guidelines. Annotators are required to categorize any realism errors in the videos into the three predefined error types listed in the table, and to answer the corresponding questions following the prescribed example format. We only provide some examples due to space limitation*
-
-![[assets/figures/papers/paper_list_l2752_https_openaccess_thecvf_com_content_CVPR2026_html_Yang_VideoRealBench_A/figures/006_Table_2.jpg]]
-*Table 2: Instructions for scoring. We have established specific evaluation criteria based on human intuitive judgment of errors*
-
-![[assets/figures/papers/paper_list_l2752_https_openaccess_thecvf_com_content_CVPR2026_html_Yang_VideoRealBench_A/figures/004_Figure_4.jpg]]
-*Figure 4: Examples of realism errors provided by VideoPhy-2. These examples reveal that existing LLM-generated descriptions suffer from various issues, necessitating fine-grained annotation*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -252,14 +236,8 @@ $$\mathrm{PCR} = \frac{1}{|\mathcal{P}|} \sum_{(i,j) \in \mathcal{P}} \mathbf{1}
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l2752_https_openaccess_thecvf_com_content_CVPR2026_html_Yang_VideoRealBench_A/figures/009_Table_4.jpg]]
-*Table 4: Correlation and similarity between model answer and human annotation. We present the results of mainstream models, including open-source models and closed-source models. VideoPhy-2-AutoEval* means we train it based on our own VideoReaDataset*
-
 ![[assets/figures/papers/paper_list_l2752_https_openaccess_thecvf_com_content_CVPR2026_html_Yang_VideoRealBench_A/figures/010_Table_6.jpg]]
 *Table 6: Ablations for CoT. Rationales are beneficial for evaluator to obtain scores more aligned with human preferences*
-
-![[assets/figures/papers/paper_list_l2752_https_openaccess_thecvf_com_content_CVPR2026_html_Yang_VideoRealBench_A/figures/011_Table_8.jpg]]
-*Table 8: PCR results for VideoPhy-2 and VideoRealBench*
 
 ![[assets/figures/papers/paper_list_l2752_https_openaccess_thecvf_com_content_CVPR2026_html_Yang_VideoRealBench_A/figures/007_Table_5.jpg]]
 *Table 5: Comparison of different score form. Verbal descriptions are slightly lower than integer-based scores*
@@ -273,10 +251,7 @@ $$\mathrm{PCR} = \frac{1}{|\mathcal{P}|} \sum_{(i,j) \in \mathcal{P}} \mathbf{1}
 ![[assets/figures/papers/paper_list_l2752_https_openaccess_thecvf_com_content_CVPR2026_html_Yang_VideoRealBench_A/figures/008_Table_3.jpg]]
 *Table 3: Comparison between VideoRealBench with prior works. ”Partially” indicates that the dataset only fulfills this feature to some extent*
 
-![[assets/figures/papers/paper_list_l2752_https_openaccess_thecvf_com_content_CVPR2026_html_Yang_VideoRealBench_A/figures/014_Table_9.jpg]]
-*Table 9: Measurements for robustness*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 与先前基准的关系：填补“可解释真实性评估”的空白
 

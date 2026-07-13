@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2025
 pdf_ref: paperPDFs/ICLR_2025/InterMask_3D_Human_Interaction_Generation_via_Collaborative_Masked_Modelling.pdf
+project_link: null
+code_link: null
 aliases:
 - I3HIGCMM
 tags:
@@ -40,7 +42,7 @@ claims:
 > - InterHuman 上，FID 5.154 vs 5.535 (in2IN) (↓0.381)；Top-1 R-Precision 0.449 vs 0.449 (MoMat-MoGen) / 0.425 (in2IN) (持平/↑0.024)；MMDist 3.790 vs 3.790 (MoMat-MoGen) (持平)。
 > - InterX 上，FID 0.399 vs 5.207 (InterGen) (↓4.808)；Top-1 R-Precision 0.403 vs 0.371 (InterGen) (↑0.032)。
 
-## 概述
+## 概要
 
 生成逼真且协调的3D双人交互是计算机视觉与图形学中长期存在的挑战。现有方法多基于扩散模型，逐步去噪生成运动序列，但此类框架难以精确捕捉两人之间精细的时空依赖关系，导致生成结果的真实感和交互协调性不足。针对这一瓶颈，本文提出**InterMask**——一种基于协同掩码建模（Collaborative Masked Modelling）的3D人体交互生成框架。
 
@@ -48,7 +50,7 @@ InterMask的核心思想是将双人交互建模为离散2D运动Token的协同�
 
 在**InterHuman**和**InterX**两个基准数据集上，InterMask均取得了最优的生成保真度（FID分别为5.154和0.399），显著优于InterGen、in2IN等现有方法。消融实验进一步证实：2D Token图表示、时空注意力模块以及协同掩蔽建模策略，是性能提升的关键因素。此外，该方法在文本对齐、反应生成等任务上也展现出良好的能力。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -79,7 +81,9 @@ InterMask的核心思想是将双人交互建模为离散2D运动Token的协同�
 
 此外，为增强模型对时空结构的感知能力，InterMask引入**2D离散运动Token图**替代传统的1D序列Token，在保留时间维度的同时显式编码身体关节的空间布局，为协同掩蔽建模提供更丰富的结构先验。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 InterMask 的核心创新在于将双人交互生成从“逐步去噪的扩散范式”重构为“协同掩蔽建模的离散Token预测范式”，并通过**2D运动Token表示**与**协同Transformer架构**两个关键设计，系统性地解决了现有方法在精细时空依赖建模上的瓶颈。
 
@@ -116,7 +120,7 @@ Inter-M Transformer的架构设计直接服务于“人内-人际”双重依赖
 
 这些创新并非孤立存在，而是形成了完整的因果链条：2D Token图提供了保留时空结构的高保真离散表示，协同掩蔽建模迫使模型学习联合分布，而三层注意力架构为捕获人内演化与人际协调提供了结构化的信息通道。三者的协同作用使InterMask在InterHuman（FID 5.154）和InterX（FID 0.399）两个数据集上均取得了最优的交互生成质量。
 
-## 整体框架
+
 
 InterMask 采用两阶段生成范式，将双人 3D 交互建模为离散 Token 的协同掩蔽与预测任务。整个 pipeline 由四个核心模块串联构成：**2D Motion VQ-VAE Encoder**、**Learnable Codebook C**、**Inter-M Transformer** 和 **2D Motion VQ-VAE Decoder**，辅以冻结的 CLIP 文本编码器提供条件信号。
 
@@ -164,7 +168,7 @@ $$\mathcal{L}_{mask} = \sum_{\tilde{t}_k = [\mathrm{MASK}]} -\log p_{\theta}(t_k
 
 为验证协同建模的必要性，作者设计了替代建模方案（Figure 10）：训练时仅更新一个体的嵌入而条件于另一个体，推理时交替预测和重掩蔽每个个体的 Token。该方案 FID 为 **7.637**，显著劣于协同建模的 **5.154**（Table 3），证实了同时预测双方 Token 对于生成协调交互的不可替代性。
 
-## 核心模块与公式推导
+
 
 InterMask 的核心架构由两个阶段级联构成：**2D 运动 VQ-VAE** 负责将个体运动压缩为离散 Token 图，**Inter-M Transformer** 在此基础上以协同掩码建模方式生成双人交互序列。以下逐一展开关键模块及其公式。
 
@@ -234,7 +238,9 @@ $$
 ![[assets/figures/papers/paper_list_l1782_InterMask_3D_Human_Interaction_Generation_via_Collaborative_Masked_Model/figures/017_Figure_10.jpg]]
 *Figure 10: Overview of the Alternative Modeling approach, where we predict the tokens of one person at a time. (a) During training, only the embeddings of one individual*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -295,7 +301,9 @@ InterMask 在两个主流双人交互数据集上均取得了最优的生成质�
 ![[assets/figures/papers/paper_list_l1782_InterMask_3D_Human_Interaction_Generation_via_Collaborative_Masked_Model/figures/019_Figure_12.jpg]]
 *Figure 12: Qualitative results for the ablation study on Inter-M Transformer to verify contributions of the proposed Attention modules*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：从单人扩散到协同掩蔽建模
 
@@ -359,6 +367,8 @@ InterMask 在以下场景中展现出显著优势：
 4. **推理效率的保持**：随着数据集规模增大（如 InterX 比 InterHuman 更大更多样），掩蔽生成模型在推理速度（20 次迭代）和内存消耗上相对扩散模型（通常需要更多去噪步骤）已具有优势。但如何在模型容量扩展时保持这一优势，仍需进一步研究。
 
 5. **多人与物体交互的泛化**：当前方法聚焦于两人交互。将协同掩蔽建模框架扩展到多人（>2）或人-物交互场景，需要重新设计 Token 组织方式和注意力机制，以应对指数级增长的交互依赖关系。
+
+
 
 ## 原文 PDF
 

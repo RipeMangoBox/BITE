@@ -43,7 +43,7 @@ claims:
 > - Long 360 上，DSSIM1 0.079 vs 0.085 (2DGS static, best static) (-0.006)。
 > - VRU (GZ) 上，PSNR / SSIM / LPIPS 30.67 / 0.946 / 0.137 vs Best competitor (see Table 2) (显著提升)。
 
-## 概述
+## 概要
 
 多视角动态场景重建面临两大核心挑战：**长序列建模**与**大规模运动捕捉**。现有方法可分为两类——帧流式（Frame-Stream）方法（如 **3DGStream**，Sun et al., CVPR 2024）可逐帧扩展但存在帧间抖动与累积误差；剪辑式（Clip）方法（如 **4DGaussian**, Wu et al., CVPR 2024；**SpaceTimeGS**, Li et al., CVPR 2024）具有局部时间一致性，但内存开销随序列长度线性增长，难以处理超长序列。两类方法均未同时解决可扩展性与大规模运动建模的冲突。
 
@@ -51,7 +51,7 @@ ClipGStream 提出首个 **Clip-Stream 动态重建框架**，核心思路是将
 
 在包含 1400 帧的 Long 360 数据集上，ClipGStream 的 PSNR 达到 **24.54**，较帧流式最优方法 3DGStream（21.94）提升 **+2.60 dB**，且在所有指标上均优于对比方法。在 N3DV flame salmon 场景（1200 帧）上，PSNR 达 **29.40**，超越先前最优方法 Grid4D 和 LocalDyGS。消融实验进一步验证：移除残差锚点补偿模块（RAC）或锚点继承模块（AI）会导致跨剪辑静态区域出现强烈残差响应（闪烁），同时启用两者则显著抑制闪烁，证明了两组件在维持跨剪辑稳定性中的关键作用。
 
-## 背景与动机
+
 
 多视角动态场景重建的目标是从同步拍摄的多个视频流中恢复出随时间变化的三维几何与外观，这一任务在自由视点视频、VR/AR、体育转播等应用中具有核心地位。近年来，基于三维高斯泼溅（3D Gaussian Splatting, 3DGS）的方法在静态场景重建中取得了显著成功，其显式点云表示与高效可微光栅化管线使得实时渲染成为可能。然而，将3DGS扩展到动态场景——尤其是**任意长度、任意运动幅度**的长序列——仍面临根本性挑战。
 
@@ -71,7 +71,9 @@ ClipGStream 提出首个 **Clip-Stream 动态重建框架**，核心思路是将
 
 本文提出**ClipGStream**，旨在打破上述僵局。核心洞察是：将视频分割为**一个参考剪辑（Reference Clip）和多个源剪辑（Source Clip）**，在剪辑内部采用独立时空场和残差锚点补偿以灵活建模局部运动，在剪辑间通过继承并冻结参考剪辑的静态组件（锚点、静态特征、解码器）来维持全局时间一致性。这一“Clip-Stream”框架首次实现了可扩展、无闪烁的长序列动态重建，同时具备处理任意运动幅度的能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ClipGStream 提出首个 **Clip-Stream 动态重建框架**，通过将长视频分割为参考剪辑（Reference Clip）与多个源剪辑（Source Clip），在剪辑内部采用独立时空场与残差锚点补偿以建模局部运动，在剪辑间通过继承并冻结静态组件来维持全局时间一致性，从而同时解决大规模运动与长序列建模两大瓶颈。其核心创新体现在以下四个 changed slots 上。
 
@@ -107,7 +109,7 @@ $$f_{s,n} = [f_{s,0}; f_{s,n}^r]$$
 
 上述四个 changed slots 构成一个因果闭环：锚点继承与残差补偿确保了几何结构的跨剪辑连续性；静态特征冻结与残差学习保证了外观的时间一致性；剪辑专属时空场赋予各剪辑独立的运动建模能力；解码器继承则锁定了几何-外观的映射关系。这一设计使 ClipGStream 在 Long 360（1400 帧）上以 PSNR 24.54 显著超越帧流式最优方法 3DGStream（21.94，+2.60 dB）和剪辑式方法 4DGaussian（22.05），并在 N3DV flame salmon（1200 帧）上以 PSNR 29.40 超越先前 SOTA（Grid4D、LocalDyGS），验证了 Clip-Stream 范式的有效性。
 
-## 整体框架
+
 
 ClipGStream 提出了一种 Clip-Stream 范式，将任意长度的多视角动态视频序列分割为若干时间上连贯的短剪辑，并通过两阶段训练策略实现可扩展、无闪烁的长序列重建。其核心设计在于：**剪辑内部**采用独立时空场与残差锚点补偿以捕捉局部复杂运动；**剪辑之间**通过继承并冻结参考剪辑的静态组件来维持全局时间一致性。
 
@@ -158,7 +160,7 @@ ClipGStream 提出了一种 Clip-Stream 范式，将任意长度的多视角动�
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2604_13746/figures/001_Figure_1.jpg]]
 *Figure 1: ClipGStream enables scalable and temporally stable dynamic scene reconstruction for sequences of any length and any motion. (a) Unlike Frame-Stream methods that accumulate errors and Clip methods that produce clip-level flicker, ours Clip-Stream framework divides the video into a Reference Clip and subsequent Source Clips, where each Source Clip is trained on top of the trained representation of the Reference Clip to ensure robust large-motion handling and temporal consistency. (b) ClipGStream achieves higher reconstruction quality on the 1,400-frame Long 360 dataset. Cross-clip residual heatmaps show effective flicker suppression. (c) ClipGStream further surpasses prior SOTA methods on the...*
 
-## 核心模块与公式推导
+
 
 ### 3D 高斯泼溅基础
 
@@ -250,7 +252,9 @@ $$L_v = \sum_{i=1}^{M} \mathrm{Prod}(s_t^i)$$
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2604_13746/figures/004_Figure_4.jpg]]
 *Figure 4: Geometry-aware deduplication. (a) The points from the Reference Clip is converted into a spherical coverage field: for each point p, a sphere s is centered at p with radius set to the mean distance to its three nearest neighbors (computed via KNN). (b) Given the field and the Source Clip candidate anchors, residual anchors are selected based on their signed distance to the field surface. q1 (red box)*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 
@@ -308,7 +312,9 @@ ClipGStream在多个公开基准和长序列场景上均取得了最优或极具
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2604_13746/figures/007_Table_2.jpg]]
 *Table 2: Quantitative comparison on VRU (GZ) dataset [39]. Static methods are evaluated on frame 0 only, serving as an upperbound reference for dynamic reconstruction*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：帧流式与剪辑式方法的双重困境
 
@@ -360,6 +366,8 @@ ClipGStream 的训练流程由四个功能模块构成：
 5. **与基础模型的结合**：是否可以利用预训练视觉基础模型（如深度估计、光流、语义分割）来增强 COLMAP 初始化或指导残差锚点的选择？
 
 > **注意**：以上开放问题基于论文自身局限性的逻辑延伸，部分方向（如自由摄像机路径、自适应继承）尚未在论文中讨论，需结合后续研究进行验证。
+
+
 
 ## 原文 PDF
 

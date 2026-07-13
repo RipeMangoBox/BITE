@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Global_and_Local_Topology_Aware_Graph_Generation_via_Dual_Conditioning_Diffusion.pdf
+project_link: null
+code_link: null
 aliases:
 - GLTAGGDCD
 - DualDiff
@@ -40,17 +42,19 @@ claims:
 > - Planar 上，Clus. MMD 为 0.0275，对比 0.0291 (GDSS)，变化 -0.0016。
 > - Planar 上，Orbit MMD 为 0.0002，对比 0.0003 (GDSS)，变化 -0.0001。
 
-## 概述
+## 概要
 
 本文提出 **DualDiff**，一个统一的潜在扩散模型，旨在解决图生成中全局拓扑与局部结构联合建模的难题。DualDiff 通过双分支扩散过程（节点级与子图级）和双重条件机制（dual conditioning mechanism），交替利用全局信息指导局部生成、局部信息指导全局生成，从而有效捕捉图中从局部子结构到全局拓扑的多尺度依赖关系。在 Planar、SBM、ZINC250k、QM9 等多个基准数据集上，DualDiff 在度分布、聚类系数、轨道计数等 MMD 指标以及分子生成的 FCD、KL 分数上均达到或超越了现有最优方法。
 
-## 背景与动机
+
 
 传统节点级图生成模型（如 GraphRNN、GDSS、DiGress）在生成过程中独立处理每个节点，难以同时捕捉图中从局部子结构到全局拓扑的多尺度依赖关系，尤其是全局与局部信息的联合分布建模不足。尽管已有工作尝试引入全局信息（如 SubgDiff 通过子图预测、Graphusion 使用图级伪标签），但它们通常将全局信息作为静态条件，缺乏全局与局部之间的动态信息交换。
 
 DualDiff 的核心动机是：将联合分布 p(Z_l, Z_g) 分解为 p(Z_l|Z_g)p(Z_g) 和 p(Z_g|Z_l)p(Z_l) 两种互补形式，通过交替条件化实现全局与局部信息的动态交互，使模型同时具备全局和局部拓扑感知能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DualDiff 的核心创新可归纳为四个关键设计变更：
 
@@ -61,7 +65,7 @@ DualDiff 的核心创新可归纳为四个关键设计变更：
 | 全局信息提取 | 无显式全局建模或仅使用图级伪标签 | 基于聚类（K-means/谱聚类）的拓扑增强全局嵌入 | "To extract global topological information from a graph, we leverage graph clustering methods... for molecular graphs, we apply the K-means algorithm in the atom coordinate space... For generic graphs, we utilize spectral clustering" |
 | 采样策略 | 对称同步更新 | 非对称交替：m 步局部更新 + 1 步全局更新 | "we alternate m steps of process (i) with a single step of process (ii) to enhance the stability of the sampling process." |
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0001_IZV9k5BGxi_Global_and_Local_Topology-Aware_Graph_Generation/figures/001_Figure_1.jpg]]
 *Figure 1: The workflow of DualDiff (Left) and details of the dual conditioning mechanism (Right).*
@@ -76,7 +80,7 @@ DualDiff 的整体流程如下：
 
 ![Figure 1: The workflow of DualDiff (Left) and details of the dual conditioning mechanism (Right).]()
 
-## 核心模块与公式推导
+
 
 ### 5.1 图自编码器
 
@@ -143,7 +147,9 @@ $$ C = \mathrm{Linear}(\mathrm{Pool}(\mathrm{MP}(\hat{Z}_{l,0}))) \Rightarrow C 
 
 采用非对称交替策略：每执行 m 步局部更新后，执行 1 步全局更新。这种设计增强了采样过程的稳定性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 6.1 通用图生成结果
 
@@ -248,7 +254,9 @@ $$ C = \mathrm{Linear}(\mathrm{Pool}(\mathrm{MP}(\hat{Z}_{l,0}))) \Rightarrow C 
 ![[assets/figures/papers/iclr26_0001_IZV9k5BGxi_Global_and_Local_Topology-Aware_Graph_Generation/figures/007_Table_3.jpg]]
 *Table 3: Comparison between advanced hierarchical models.*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 DualDiff 属于**潜在扩散模型**在**图生成**领域的扩展，其方法谱系如下：
 
@@ -271,6 +279,8 @@ DualDiff 属于**潜在扩散模型**在**图生成**领域的扩展，其方法
 - 在条件生成任务中，DualDiff 是否能够扩展到其他类型的条件（如分子性质、图标签）
 - 非对称交替策略中 m 值（局部更新步数）如何选择
 - 模型在动态图或时序图生成任务上的适用性尚未探索
+
+
 
 ## 原文 PDF
 

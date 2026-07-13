@@ -5,6 +5,7 @@ paper_level: A
 venue: TOG
 year: 2021
 pdf_ref: paperPDFs/TOG_2021/Neural_animation_layering_for_synthesizing_martial_arts_movements.pdf
+code_link: https://github.com/sebastianstarke/AI4Animation
 project_link: https://github.com/sebastianstarke/AI4Animation
 aliases:
 - NAL
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 用于合成武术动作的神经动画分层 |
 | 英文题名 | Neural animation layering for synthesizing martial arts movements |
 | 会议/期刊 | TOG 2021 |
-| Links | [paper](https://doi.org/10.1145/3450626.3459881); [GitHub](https://github.com/sebastianstarke/AI4Animation) |
+| Links | [paper](https://doi.org/10.1145/3450626.3459881) · [GitHub](https://github.com/sebastianstarke/AI4Animation) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/robotics |
 | Method | Neural Animation Layering (模块化神经动画分层框架) |
 | Dataset | 内部武术运动捕捉数据集（~20h）, 内部武术运动捕捉数据集, 系统性能 |
@@ -42,7 +43,7 @@ claims:
 > - 内部武术运动捕捉数据集（~20h） 上，平均旋转误差 (deg) - 分布内运动追踪 为 11.1 (MoE)，对比 16.5 (LSTM)，变化 -5.4。
 > - 内部武术运动捕捉数据集 上，平均位置误差 (cm) - 未见运动组合（泛化） 为 6.7，对比 5.1 (in-distribution)，变化 +1.6。
 
-## 概述
+## 概要
 
 ### 1. 问题与瓶颈
 
@@ -70,7 +71,7 @@ claims:
 - 运动生成器训练耗时约一个月，但后续迭代仅需训练控制模块，大幅降低了重训成本。
 - 系统为纯运动学方法，物理接触依赖逆运动学求解器，不保证动力学约束。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -96,7 +97,9 @@ claims:
 
 这种设计使得动画师可以在关节轨迹层面进行直观编辑，同时利用运动生成器的流形约束保证输出动作的自然性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作提出**神经动画分层（Neural Animation Layering）**框架，其核心创新在于将运动生成与控制生成**解耦**，并引入**未来关节运动轨迹**作为统一的控制接口。这一设计直接针对端到端运动合成系统的三个瓶颈：抽象控制信号导致平均化伪影、任务特定控制信号需重新训练整个系统、以及缺乏面向动画师的透明分层控制。
 
@@ -140,7 +143,7 @@ claims:
 
 本工作的核心创新可归结为**控制与生成的解耦**以及**轨迹层次的可编辑控制接口**。运动生成器作为运动流形的投影算子，保证输出自然性；控制模块独立开发，通过分层操作组合；整个框架无需为不同任务重新训练生成器，同时赋予动画师透明的编辑能力。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l46_https_doi_org_10_1145_3450626_3459881/figures/002_Figure_2.jpg]]
 *Figure 2: Our deep learning framework imitates animation layering: It first learns the entire motion manifold from unstructured data from the character motion trajectories in the motion generator, which is in the form of a mixture-of-experts network. Several control modules then generate the future motion trajectories for different active behaviors. Those trajectories are then layered by additive, override or blending operations in the control interface, before given to the motion generator to generate a novel full-pose pose. Given the current character state, the motion is predicted from one frame into the next*
@@ -155,7 +158,7 @@ claims:
 
 此外，在紧密交互（如扭抱）场景中，控制模块还会输出一个学习到的空间约束矩阵，运行时通过逆运动学求解器维持角色间的精确接触。整个系统在推理时仅需约 8ms/帧，支持 30Hz 的实时交互式动画合成。
 
-## 核心模块与公式推导
+
 
 ### 框架总览
 
@@ -224,7 +227,9 @@ $$\mathcal{L}_B: \hat{\mathbf{C}}_{i+1} = (1 - t) \hat{\mathbf{C}}_i + t \hat{\m
 
 控制与生成的解耦使得新任务仅需开发或训练对应的控制模块，运动生成器训练完成后无需更新，训练时间从整体重训的一个月降至仅需重训控制模块。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -283,7 +288,9 @@ $$\mathcal{L}_B: \hat{\mathbf{C}}_{i+1} = (1 - t) \hat{\mathbf{C}}_i + t \hat{\m
 
 5. **训练成本极高**：运动生成器在约 20 小时数据上训练长达一个月，尽管控制模块可独立训练且重新训练仅需数天，但初始训练的时间成本仍限制了快速迭代。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心问题与设计哲学
 
@@ -330,6 +337,8 @@ MoE 的门控网络以未来关节速度大小 $g_i \in \mathbb{R}^{T N}$ 为输
 3. **跨角色形态泛化**：如何处理不同角色身体比例对运动轨迹的自动适配，实现形态无关的运动迁移？
 4. **物理仿真融合**：能否将系统与物理仿真结合，在保持运动质量的同时实现基于物理的动态响应（如接触力反馈、平衡控制）？
 5. **训练效率优化**：长达一个月的训练时间严重制约了生成器的迭代更新，如何在不损失运动质量的前提下大幅缩短训练周期？
+
+
 
 ## 原文 PDF
 

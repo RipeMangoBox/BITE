@@ -34,7 +34,7 @@ claims:
 | 中文题名 | 面向机器人操作的几何感知4D视频生成 |
 | 英文题名 | Geometry-aware 4D Video Generation for Robot Manipulation |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=18gC6pZVVc) · [Project](https://robot4dgen.github.io/) · [Code](https://github.com/ToyotaResearchInstitute/lbm_eval) · [arXiv](https://arxiv.org/abs/2408.00714) |
+| Links | [paper](https://openreview.net/forum?id=18gC6pZVVc) · [Project](https://robot4dgen.github.io/) · [Code](https://github.com/ToyotaResearchInstitute/lbm_eval) · [paper](https://arxiv.org/abs/2408.00714) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation #topic/generative_models_diffusion |
 | Method | Geometry-aware 4D Video Generation (Ours) |
 | Dataset | StoreCerealBoxUnderShelf |
@@ -43,7 +43,7 @@ claims:
 > - StoreCerealBoxUnderShelf (Task 1) 上，FVD-n（视频生成质量） 411.20 vs SVD: 977.06 (-565.86)；AbsRel-n（深度预测误差） 0.06 vs 4D Gaussian: 0.20 (-0.14)。
 > - 三个仿真任务平均 上，操作成功率 0.64 vs DP3: 0.25 (+0.39)。
 
-## 概述
+## 概要
 
 机器人操作任务要求模型同时理解场景的时间动态与三维空间结构。现有视频生成模型虽能产生时序连贯的像素序列，却缺乏对底层3D几何的显式建模，导致跨视角预测时出现严重的空间不一致；而3D感知方法多局限于静态场景或单物体重建，难以处理多物体交互的动态操作环境。
 
@@ -56,7 +56,7 @@ claims:
 
 本方法在方法谱系上属于**几何监督增强的视频扩散模型**，区别于纯像素级的视频生成基线（如SVD）和基于4D高斯重建的显式场景表示方法。其知识贡献在于将DUSt3R式的跨视图点云对齐策略融入时序扩散框架，实现了从“生成视频”到“生成4D场景流”的能力跃迁，为机器人操作提供了一种可提取6DoF末端执行器轨迹的视觉规划前端。
 
-## 背景与动机
+
 
 机器人操作任务要求智能体在动态三维环境中精确感知物体几何、推理空间关系并执行时序连贯的动作。视觉感知作为核心环节，其质量直接影响下游策略的成败。近年来，视频生成模型在视觉内容合成上取得了显著进展，为机器人领域提供了通过预测未来视觉观测来辅助决策的新范式。然而，将通用视频生成模型直接应用于机器人操作面临一个根本性瓶颈：**现有模型难以同时保证时间连贯性和跨视角三维几何一致性，尤其对于多物体的动态操作场景。**
 
@@ -64,7 +64,9 @@ claims:
 
 本工作的动机正是弥合这一缺口：**在保留预训练视频扩散模型时序建模能力的同时，引入三维几何约束，使模型能够生成跨视角几何一致的4D视频（RGB‑D序列）。** 这一动机源于一个关键观察——点云图（pointmap）作为一种显式的三维几何表示，可以直接从深度观测中获取，且天然支持跨视角坐标变换。通过将点云图作为几何监督信号融入扩散训练，模型有望在无需推理时相机外参的条件下，输出时空一致的未来观测，从而为下游机器人操作策略提供可靠的感知基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 从像素生成到几何感知的4D视频建模
 
@@ -108,7 +110,7 @@ $$
 
 本方法的核心贡献可归纳为三点：**(1)** 首次将点云图作为三维几何约束引入视频扩散模型，实现了从“像素生成”到“几何感知生成”的范式转变；**(2)** 通过跨视角点云投影对齐和多视角交叉注意力的协同设计，使模型在无需推理时相机外参的情况下生成几何一致的多视角视频；**(3)** 联合优化RGB时序损失和点云空间损失，在保留预训练视频先验的同时获得跨视角空间理解能力。这一创新路径直接解决了现有方法“时间连贯性”与“空间一致性”难以兼得的瓶颈问题。
 
-## 整体框架
+
 
 ### 问题形式化与输入输出
 
@@ -157,7 +159,7 @@ Pipeline的两个核心设计决策直接决定了跨视角几何一致性的实
 ![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_18gC6pZVVc/figures/002_Figure_2.jpg]]
 *Figure 2: 4D Video Generation for Robot Manipulation. Our model takes RGB-D observations from two camera views, and predicts future pointmaps and RGB videos. To ensure cross-view consistency, we apply cross-attention in the U-Net decoders for pointmap prediction. The resulting 4D video can be used to extract the 6DoF pose of the robot end-effector using pose tracking methods, enabling downstream manipulation tasks*
 
-## 核心模块与公式推导
+
 
 ### 方法概览
 
@@ -248,7 +250,9 @@ $$\mathcal{L} = \sum_{t'=t+1}^{t+h}\left[\underbrace{\mathcal{L}_{\mathrm{diff}}
 
 **消融证据**：移除多视角交叉注意力后，跨视角mIoU从0.70骤降至0.41（Task 1），深度指标 $\delta_1\text{-}m$ 从0.92降至0.66（Table 1），证实该模块对学习跨视角几何对应至关重要。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与验证目标
 
@@ -342,7 +346,9 @@ Table 4展示了将方法从双视图扩展到三视图的结果。在StoreCerea
 ![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_18gC6pZVVc/figures/008_Figure_6.jpg]]
 *Figure 6: Simulation Tasks for Evaluation*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 技术路线与基线关系
 
@@ -392,6 +398,8 @@ $$
 5. **跨具身泛化**：该方法在双臂操作、移动操作或不同末端执行器形态下的泛化能力如何？当前仅验证了单臂夹爪场景，扩展到更多样的机器人形态需要重新审视几何监督的普适性。
 
 6. **真实世界训练数据效率**：当前真实世界微调需要约15k步（Section 4.3），能否通过域随机化、数据增强或元学习策略降低对真实数据的依赖，加速从仿真到真实的迁移？
+
+
 
 ## 原文 PDF
 

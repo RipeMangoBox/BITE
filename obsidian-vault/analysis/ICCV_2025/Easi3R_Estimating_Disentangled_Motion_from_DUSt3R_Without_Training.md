@@ -5,6 +5,8 @@ paper_level: A
 venue: ICCV
 year: 2025
 pdf_ref: paperPDFs/ICCV_2025/Easi3R_Estimating_Disentangled_Motion_from_DUSt3R_Without_Training.pdf
+project_link: https://easi3r.github.io/
+code_link: null
 aliases:
 - Easi3R
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | Easi3R：无需训练从DUSt3R估计解耦运动 |
 | 英文题名 | Easi3R: Estimating Disentangled Motion from DUSt3R Without Training |
 | 会议/期刊 | ICCV 2025 |
-| Links | [paper](https://arxiv.org/abs/2503.24391); [Project](https://easi3r.github.io/) |
+| Links | [paper](https://arxiv.org/abs/2503.24391) · [Project](https://easi3r.github.io/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Easi3R |
 | Dataset | DAVIS-16, DyCheck |
@@ -40,7 +42,7 @@ claims:
 > - DyCheck 上，ATE↓ 为 0.021 (Easi3R_dust3r w/flow)，对比 0.029 (DUSt3R w/flow)，变化 -0.008。
 > - DyCheck 上，RTE↓ 为 0.014 (Easi3R_dust3r w/flow)，对比 0.021 (DUSt3R w/flow)，变化 -0.007。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -68,7 +70,7 @@ Easi3R是一种**训练无关、即插即用的推理时适配方法**。与需�
 
 Easi3R的改进主要集中在动态区域处理和全局对齐，**无法纠正静态部分的深度预测误差**，因此每视角深度精度仍存在差距。此外，重建结果在动态物体边界附近仍可能出现浮动体（floaters）伪影（Figure 9）。未来工作方向包括：纠正静态部分的逐视角深度预测以弥补深度精度差距，以及进一步减少边界附近的浮动体伪影。
 
-## 背景与动机
+
 
 ### 动态4D重建的核心瓶颈
 
@@ -91,7 +93,9 @@ Easi3R的核心动机源自一个关键发现：**预训练静态3D模型DUSt3R�
 
 这一训练无关的即插即用策略绕过了动态4D数据瓶颈，同时避免了对光流或分割标注的依赖，为静态模型向动态场景的泛化提供了新的思路。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Easi3R的核心创新在于**无需任何训练**，仅通过解耦预训练静态模型DUSt3R内部的交叉注意力图，即可将静态3D重建模型适配到动态4D场景。这一范式转变源自一个关键发现：**DUSt3R的交叉注意力层已隐含编码了丰富的相机与物体运动信息**，只需在推理时采用简单的聚合与分解策略即可提取这些信息。
 
@@ -125,7 +129,7 @@ $$\mathcal{L}_{\mathrm{flow}} = \sum_{t \in T} \sum_{i \in \varepsilon^{t}} (1 -
 
 这三个changed slots共同构成了一条**因果链条**：注意力图分解（Slot 1）提供动态分割，分割掩码驱动注意力重新加权（Slot 2）以改善成对重建，分割感知的全局对齐（Slot 3）则确保多帧一致性。整个流程无需任何训练数据、微调或额外网络模块，仅通过推理时的注意力操控就实现了从静态3D到动态4D的无缝适配——这正是Easi3R与所有现有方法（MonST3R、DAS3R、CUT3R等）的根本区别。
 
-## 整体框架
+
 
 Easi3R 提出了一种无需训练的即插即用式4D重建框架，其核心思想是：**预训练静态3D模型DUSt3R的交叉注意力层已经隐含编码了丰富的相机与物体运动信息**，通过对这些注意力图进行解耦与聚合，可以在推理阶段直接实现动态分割与鲁棒的4D重建，无需任何微调或额外数据训练。
 
@@ -161,7 +165,7 @@ $$\mathrm{softmax}(\tilde{\mathbf{A}}_{l}^{ab}) = \begin{cases} 0 & \mathrm{if~}
 3. **双阶段推理**：第一次推理用于提取注意力图和分割掩码，第二次推理利用掩码进行注意力重新加权，实现运动解耦。
 4. **光流约束为可选模块**：光流损失仅用于全局对齐优化，可在无光流条件下运行，确保与不使用光流的基线公平比较。
 
-## 核心模块与公式推导
+
 
 Easi3R 的核心设计围绕一个发现展开：DUSt3R 解码器中的交叉注意力层已隐含编码了丰富的相机与物体运动信息。通过解耦这些注意力图，可以在推理时直接实现动态分割与鲁棒的 4D 重建，无需任何训练。整个流程包含四个关键模块。
 
@@ -219,7 +223,9 @@ $$\mathcal{L}_{\mathrm{flow}} = \sum_{t \in T} \sum_{i \in \varepsilon^{t}} (1 -
 
 其中 $\hat{\mathcal{F}}$ 为从点图投影得到的光流，$\mathcal{F}$ 为真实光流。该损失仅在静态区域 $(1 - \mathbf{M})$ 上约束投影点流与光流一致，确保动态物体不影响全局对齐优化。注意光流约束为可选模块，以保证与不使用光流的基线公平比较。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -307,7 +313,9 @@ Figure 6 的定性比较展示了跨帧全局对齐的静态场景与动态点�
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2503_24391/figures/021_Table_11.jpg]]
 *Table 11: More ablations on segmentation quality using DAVIS. * denotes the value used in the submission*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -361,6 +369,8 @@ Easi3R 的适用性受以下条件约束：
 2. **如何进一步减少动态物体边界的浮动体伪影？** 当前二值掩码策略可被替换为软注意力重加权（连续值掩码），但需要研究如何从注意力图中可靠地估计边界过渡区域的权重。
 
 3. **注意力解耦策略能否泛化到其他视觉 backbone？** 当前设计紧密耦合于 DUSt3R 的双分支交叉注意力架构。探索该策略在更通用的 ViT 或多模态模型中的适用性是一个有价值的方向。
+
+
 
 ## 原文 PDF
 

@@ -31,7 +31,7 @@ claims:
 | 中文题名 | 生成式步态网络 |
 | 英文题名 | Generative GaitNet |
 | 会议/期刊 | SIGGRAPH 2022 |
-| Links | [paper](https://arxiv.org/abs/2201.12044) · [arXiv](https://arxiv.org/abs/2201.12044") |
+| Links | [paper](https://arxiv.org/abs/2201.12044) · [paper](https://arxiv.org/abs/2201.12044") |
 | Topic | #topic/generative_models_diffusion |
 | Method | Generative GaitNet |
 | Dataset | Leg length discrepancy (LLD) simulation, Trendelenburg gait simulation, Crouch gait simulation |

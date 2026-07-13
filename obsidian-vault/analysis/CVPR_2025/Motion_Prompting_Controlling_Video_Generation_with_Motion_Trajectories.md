@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/Motion_Prompting_Controlling_Video_Generation_with_Motion_Trajectories.pdf
+project_link: https://motion-prompting.github.io/
+code_link: null
 aliases:
 - MPCVGMT
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | 运动提示：利用运动轨迹控制视频生成 |
 | 英文题名 | Motion Prompting: Controlling Video Generation with Motion Trajectories |
 | 会议/期刊 | CVPR 2025 |
-| Links | [paper](https://arxiv.org/abs/2412.02700); [Project](https://motion-prompting.github.io/) |
+| Links | [paper](https://arxiv.org/abs/2412.02700) · [Project](https://motion-prompting.github.io/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/robotics |
 | Method | Motion Prompting |
 | Dataset | DAVIS Validation (N=2048), DAVIS Validation (N=512), Human Study (2AFC) |
@@ -40,7 +42,7 @@ claims:
 > - DAVIS Validation (N=2048) 上，EPE↓ 为 3.887，对比 33.561 (Image Conductor), 12.485 (DragAnything)，变化 -29.674 / -8.598。
 > - DAVIS Validation (N=512) 上，LPIPS↓ 为 0.229，对比 0.524 (Image Conductor), 0.381 (DragAnything)，变化 -0.295 / -0.152。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -80,7 +82,7 @@ Motion Prompting 属于**轨迹条件视频生成**这一新兴方向。与基�
 - 生成速度慢（单视频约 12 分钟），不支持实时交互或因果生成。
 - 极端相机运动下组合运动提示可能不准确。
 
-## 背景与动机
+
 
 视频生成模型近年来取得了显著进展，但精确的运动控制仍然是一个核心瓶颈。现有方法主要依赖文本提示（text prompts）来引导视频中的运动，然而自然语言在表达运动的细微动态、时序关系和空间细节方面存在固有局限。例如，文本难以精确描述“加速旋转”、“同步动作”或“部分遮挡下的运动轨迹”等复杂运动模式。这种文本与运动之间的语义鸿沟，使得用户无法对生成视频中的物体运动、相机运动及其组合进行细粒度的、可预期的控制。
 
@@ -90,7 +92,9 @@ Motion Prompting 属于**轨迹条件视频生成**这一新兴方向。与基�
 
 为此，本文提出 **Motion Prompting** 方法，其核心洞察是采用**点轨迹（point trajectories）**作为统一的运动表示。点轨迹天然具备以下优势：（1）可编码空间和时间上稀疏或密集的运动；（2）可描述单个物体或整个场景的运动；（3）通过可见性标志（visibility flag）可处理遮挡和出屏情况。基于这一表示，本文在预训练视频扩散模型 Lumiere 之上训练一个 ControlNet 适配器，以单阶段方式注入运动轨迹条件，无需复杂的工程技巧。在推理阶段，通过**运动提示扩展（motion prompt expansion）**机制，将用户的高级意图（如鼠标拖拽、几何图元操作、深度估计等）自动转化为详细的运动轨迹，从而在单一训练模型上实现物体控制、相机控制、运动传递、模型探测等多种能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作的核心创新在于提出**运动提示（Motion Prompting）**——一种以点轨迹为统一运动表示的视频生成控制范式。相较于现有方法，其关键改变体现在三个维度：
 
@@ -127,7 +131,7 @@ $$\mathbf{c}[t, x_{t}^{n}, y_{t}^{n}] = \mathbf{v}[n, t] \phi_{n}$$
 
 这一设计使得单一训练模型能够支持物体控制、相机控制、运动传递、模型探测等多种应用，构成统一的运动控制框架。
 
-## 整体框架
+
 
 Motion Prompting 的整体管线由两个阶段构成：**训练阶段**构建一个通用的轨迹条件视频生成模型；**推理阶段**则通过运动提示扩展（motion prompt expansion）将用户的高级意图转化为详细的运动轨迹，驱动该模型生成视频。
 
@@ -164,7 +168,7 @@ Motion Prompting 的整体管线由两个阶段构成：**训练阶段**构建�
 
 该框架的统一性在于：单一训练模型无需针对不同控制任务进行微调，仅通过改变推理阶段的运动提示扩展方式，即可覆盖物体控制、相机控制、运动传递等多种应用场景。
 
-## 核心模块与公式推导
+
 
 ### 运动提示：点轨迹与可见性
 
@@ -215,7 +219,9 @@ $$\mathbf{c}[t, x_t^n, y_t^n] = \mathbf{v}[n, t] \cdot \phi_n$$
 | $\mathbf{v} \in \mathbb{R}^{N \times T}$ | 轨迹可见性数组，$\{0,1\}$ 取值 |
 | $\mathbf{c}[t, x_t^n, y_t^n] = \mathbf{v}[n, t] \phi_n$ | 时空条件体积赋值规则，可见位置写入轨迹嵌入，否则置零 |
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 定量评估
 
@@ -288,7 +294,9 @@ $$\mathbf{c}[t, x_t^n, y_t^n] = \mathbf{v}[n, t] \cdot \phi_n$$
 ![[assets/figures/papers/paper_list_l16_Motion_Prompting_Controlling_Video_Generation_with_Motion_Trajectories/figures/016_Figure.jpg]]
 *Figure: A3. Pose Conditioning. We estimate human pose, animate it, translate it to tracks, and then feed it to our model. In each row, we show frames from generated videos with input tracks overlaid on top*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心问题与现有方法瓶颈
 
@@ -342,6 +350,8 @@ $$\mathbf{c}[t, x_t^n, y_t^n] = \mathbf{v}[n, t] \phi_n$$
 5. **长视频与多物体交互**：模型是否能够泛化到更长的视频生成或更复杂的多物体交互场景？
 
 **注意**：本文与基线方法（Image Conductor、DragAnything）基于不同的基础模型（Lumiere vs AnimateDiff vs Stable Video Diffusion），这可能影响生成视频视觉质量的直接比较。此外，DAVIS 评估中 DragAnything 需要额外的分割掩码输入（本文方法不需要），但评估时使用了数据集提供的真实掩码，可能有利于 DragAnything——这些因素在解读定量结果时需加以考虑。
+
+
 
 ## 原文 PDF
 

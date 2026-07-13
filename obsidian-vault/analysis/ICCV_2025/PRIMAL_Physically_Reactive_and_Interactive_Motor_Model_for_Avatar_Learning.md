@@ -5,6 +5,7 @@ paper_level: A
 venue: ICCV
 year: 2025
 pdf_ref: paperPDFs/ICCV_2025/PRIMAL_Physically_Reactive_and_Interactive_Motor_Model_for_Avatar_Learning.pdf
+code_link: null
 project_link: https://yz-cnsdqz.github.io/eigenmotion/PRIMAL
 aliases:
 - PPRIMMAL
@@ -42,7 +43,7 @@ claims:
 > - Reaction to Induced Impulses 上，ASR↓ 0.088；ANCR↑ 1.0；ARD x10^-3↓ 0.511。
 > - Semantic Action Generation (few-shot) 上，R-precision↑ 0.96。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有动作生成方法面临一个根本性矛盾——离线生成系统（如扩散模型或VAE）能产出高质量运动，但缺乏实时交互能力；基于物理模拟的方法虽可响应外力，却难以产生自然流畅的动作且技能覆盖有限。核心瓶颈在于，如何在**不依赖显式物理模拟**的前提下，使虚拟角色具备实时、逼真的物理反应能力。
 
@@ -62,7 +63,7 @@ claims:
 
 **方法谱系与知识库定位**：PRIMAL 属于**自回归扩散运动生成**范式，但区别于 **AMDM**（Shi et al., TOG 2024）、**CAMDM**、**DART**（Zhao et al., ICLR 2025）等需要多帧历史条件的方法，其单帧条件设计使其天然支持流式交互。与 **InsActor**（Ren et al., NeurIPS 2023）等扩散规划+物理模拟的混合方案不同，PRIMAL 完全数据驱动，避免了物理模拟带来的不自然感。在适应机制上，借鉴了 **OmniControl-Net**（Xie et al., ICLR 2024）的 ControlNet 范式，但应用于运动生成领域。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -91,7 +92,9 @@ PRIMAL的核心洞察在于重新审视人类运动的**时间尺度特性**：�
 
 这种将“物理反应”从“语义生成”中解耦的设计，使得PRIMAL能够在保持数据驱动运动自然度的同时，获得物理模拟方法才具备的实时响应能力，填补了两类方法之间的关键空白。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PRIMAL的核心创新在于**重新定义了运动生成的条件范式**：将传统依赖多帧历史语义的自回归运动模型，彻底转变为仅依赖单帧物理初始状态（关节位置与速度）的短时物理反应模型。这一范式转变使角色首次在不使用显式物理模拟的情况下，获得了实时、逼真的物理交互能力。
 
@@ -138,7 +141,7 @@ PRIMAL提出基于分类器的引导（Classifier-Based Guidance, CBG）来实�
 
 这些创新共同构成了PRIMAL的核心能力：**在不使用物理模拟的前提下，使角色具备实时、逼真的物理反应能力**——包括对外部冲量的自然响应、连续速度/方向控制、以及任意长度运动的自稳定生成。
 
-## 整体框架
+
 
 PRIMAL 采用**两阶段“预训练-适应”**学习范式，构建了一个完全数据驱动、无需物理模拟的实时角色动画系统。其核心流程如下：
 
@@ -170,7 +173,7 @@ PRIMAL 采用**两阶段“预训练-适应”**学习范式，构建了一个�
 ![[assets/figures/papers/paper_list_l4_PRIMAL_Physically_Reactive_and_Interactive_Motor_Model_for_Avatar_Learni/figures/002_Figure_2.jpg]]
 *Figure 2: Illustration of our network*
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题形式化与扩散基础
 
@@ -235,7 +238,9 @@ $$\mathcal{L}_{facing} = \| \mathbf{z} - \mathbf{r}_{goal} \|^2 \tag{8}$$
 ![[assets/figures/papers/paper_list_l4_PRIMAL_Physically_Reactive_and_Interactive_Motor_Model_for_Avatar_Learni/figures/003_Figure_3.jpg]]
 *Figure 3: Illustration of our adaptation method. Given a base model, we introduce a ControlNet-like adaptor at each individual transformer block. The control signal y is a generic notation. We adapt the base model for semantic action generation and spatial target reaching. The scale operation manipulates the impact of the control signal, corresponding to γ in Eq. (3) of CFG*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 PRIMAL 的实验评估围绕三个核心能力展开：**无界运动生成的真实度**、**对外部冲量扰动的物理反应**，以及**通过适应实现的下游任务性能**。所有实验均基于 AMASS 数据集，使用 SMPL-X 表示，评估协议与先前工作保持一致，确保公平性。
 
@@ -295,7 +300,9 @@ Table 3 报告了基于 ControlNet 风格适配器的少样本语义动作生成
 ![[assets/figures/papers/paper_list_l4_PRIMAL_Physically_Reactive_and_Interactive_Motor_Model_for_Avatar_Learni/figures/001_Figure_1.jpg]]
 *Figure 1: PRIMAL is a novel generative real-time 3D character animation system that works in Unreal Engine. The avatar reacts to induced impulses promptly and naturally (top). After efficient adaptation, the avatar can be pulled to chase a “magnet” (middle). We also personalize the avatar’s movements based on a tiny mocap dataset, captured by Mocapade3.0 [19] from cellphone videos (bottom). As a result, we can control the avatar with discrete commands and continuous signals. Without any control signal, or external perturbations, the avatar moves autonomously in the 3D space without end. PRIMAL is purely data driven; no physical simulation is used*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 
@@ -344,6 +351,8 @@ PRIMAL 在以下条件下表现最佳：
 2. **场景感知集成**：如何将环境感知（障碍物、地形、物理约束）集成到运动模型中，实现场景感知的实时交互？
 3. **端到端高层控制**：能否通过更大的基础模型（如 LLM）实现从文本、语音到连续动作的端到端控制，将 PRIMAL 作为可调用的“物理运动引擎”？
 4. **模型轻量化**：如何优化模型效率，使其在资源受限平台上也能流畅运行，以支持更广泛的实时应用（如移动游戏、VR/AR）？
+
+
 
 ## 原文 PDF
 

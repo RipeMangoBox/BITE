@@ -42,7 +42,7 @@ claims:
 > - HumanML3D 上，R-Precision Top-1↑ 52.6% vs 52.2% (BAMM) (+0.4%)；MM-Dist↓ 2.884 vs 2.936 (BAMM) (-0.052)。
 > - KIT-ML++ 上，FID↓ 0.230 vs 0.425 (MoMask) (-45.9%)。
 
-## 概述
+## 概要
 
 文本到动作生成的核心瓶颈在于**运动标记化的粒度困境**：细粒度标记使语言模型过度关注局部帧间连贯性，忽略长程语义对齐（局部依赖问题）；粗粒度标记虽利于全局规划，却丢失运动细节。PlanMoGPT 通过两个联动机制突破这一困境：
 
@@ -53,7 +53,7 @@ claims:
 
 方法定位上，PlanMoGPT 属于**基于标记的自回归生成范式**，与 T2M-GPT（Zhang et al., CVPR 2023）、MoMask 等同属 LLM-based 路线，但通过流匹配与分层规划区别于扩散方法（MDM, Tevet et al., ICLR 2023; ReMoDiffuse, Zhang et al., ICCV 2023）和双向自回归方法（BAMM, Pinyoanuntapong et al., ECCV 2024）。在 KIT-ML 等低帧率数据集上表现相对受限，渐进规划的优势未能完全发挥。
 
-## 背景与动机
+
 
 ### 文本到动作生成的核心挑战
 
@@ -78,7 +78,9 @@ claims:
 
 实验表明，PlanMoGPT在长序列数据集HumanML3D++上将FID从0.380（MoMask）降至0.141，改善63.8%；多样性指标MModality从1.693提升至2.538，提高49.9%，显著突破了现有方法的性能上限。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PlanMoGPT 的核心创新并非单一技术的堆砌，而是针对“运动标记化粒度-生成策略”这一对矛盾的协同重构。其设计围绕两条相互耦合的主线展开：**流增强细粒度运动标记器**与**基于多间隔计划的渐进式LLM生成**，二者共同解决了现有方法中全局语义对齐与局部细节保真不可兼得的瓶颈。
 
@@ -126,7 +128,7 @@ $$U = [\mathbf{S}_4] \oplus M_{b;4} \oplus [\mathbf{S}_2] \oplus M_{b;2} \oplus 
 
 两项创新的协同效应体现在：细粒度标记器提供了足够的细节容量，但若直接交由LLM逐令牌生成，仍会陷入局部依赖；渐进规划恰好将LLM的注意力引导至不同粒度的结构层次，使粗粒度令牌承载全局语义，细粒度令牌专注局部连贯。流匹配解码器则作为最后一道保障，将量化后的粗输出进一步精炼。这一“编码-规划-解码”三级协同设计，是PlanMoGPT在长序列生成上将FID从0.380（MoMask）降至0.141（改善63.8%）、同时将多样性指标提升49.9%的根本原因。
 
-## 整体框架
+
 
 PlanMoGPT 采用两阶段流水线：**流增强运动标记器**与**集成渐进规划的 LLM**，前者将连续运动序列转换为细粒度离散令牌，后者以从粗到精的方式逐层生成令牌序列，最终由流匹配解码器恢复完整运动。
 
@@ -169,7 +171,7 @@ PlanMoGPT 采用两阶段流水线：**流增强运动标记器**与**集成渐�
 ![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2506_17912/figures/002_Figure_2.jpg]]
 *Figure 2: PlanMoGPT consists of two components: (a). A flow-enhanced motion tokenizer converts motion into fine-grained tokens with minimal loss; (b). An LLM integrates with progressive planning, which progressively generates from a larger interval motion tokens to the full motion token sequence*
 
-## 核心模块与公式推导
+
 
 PlanMoGPT 由两个协同模块构成：**流增强运动标记器**（Flow-Enhanced Motion Tokenizer）负责将连续运动序列压缩为细粒度离散令牌并高质量重建；**带渐进规划的 LLM**（LLM with Progressive Planning）则从粗到细地生成这些令牌序列，以同时保证全局语义对齐和局部细节保真。
 
@@ -213,7 +215,9 @@ $$U = [\mathbf{S}_4] \oplus M_{b;4} \oplus [\mathbf{S}_2] \oplus M_{b;2} \oplus 
 
 消融实验（Table 4）证实，单独使用 4 帧或 2 帧计划均不如组合方案——组合计划同时改善了 FID 和 R-Precision Top-1，验证了多粒度分层生成的协同效应。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -303,7 +307,9 @@ Table 5(a) 展示了标记化粒度对 PlanMoGPT (base) 性能的影响。将码
 ![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2506_17912/figures/001_Figure_1.jpg]]
 *Figure 1: Generating complex and long-sequence motion by our PlanMoGPT, T2M-GPT [56]. The bounding box of each motion clip is color-coded to match its corresponding text*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 
@@ -342,6 +348,8 @@ PlanMoGPT 的设计假设和实验覆盖范围定义了其适用边界：
 PlanMoGPT 的核心贡献在于揭示了**运动标记化粒度与生成策略之间的耦合关系**：细粒度令牌需要分层生成策略来维持全局语义，而分层生成又需要流匹配来补偿细粒度令牌的量化损失。这一“粒度-规划-补偿”三角关系为离散令牌方法线提供了新的设计框架。
 
 在更广的视野中，PlanMoGPT 代表了**离散令牌方法与连续生成方法的融合趋势**——用VQ-VAE的离散令牌保证LLM兼容性和可控性，用流匹配的连续细化保证生成质量。这一范式可迁移到其他需要“全局结构+局部细节”的序列生成任务（如音乐、语音手势）。
+
+
 
 ## 原文 PDF
 

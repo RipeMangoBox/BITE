@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2026
 pdf_ref: paperPDFs/arxiv_2026/MaxSim_Fine_grained_Motion_Retrieval_via_Joint_Angle_Motion_Images_and_Token_Patch_Late_Interaction.pdf
+project_link: null
+code_link: null
 aliases:
 - MJAMIMLIM
 - MaxSim
@@ -39,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - HumanML3D 上，T2M R@10 43.80 vs 40.78 (MoPatch global) (+3.02)；M2T R@10 41.45 vs 38.73 (MoPatch global) (+2.72)。
 
-## 概述
+## 概要
 
 文本-运动检索旨在根据自然语言描述从大规模运动数据库中匹配最相关的运动序列。现有方法普遍采用**双编码器架构**，将运动序列和文本描述分别压缩为单一的全局嵌入向量，通过余弦相似度进行匹配。这种全局池化策略不可避免地丢失了细粒度的局部对应信息——例如“右手画圈同时左脚前踏”这样的复合描述中，不同身体部位与时间段的运动细节在全局向量中被混叠，导致检索精度受限且缺乏可解释性。
 
@@ -47,7 +49,7 @@ claims:
 
 在 HumanML3D 和 KIT-ML 两个标准基准上，MaxSim 在文本到运动（T2M）和运动到文本（M2T）两个方向的检索任务中均超越了现有最优方法。消融实验证实，关节角度表示与 MaxSim 延迟交互的结合是性能提升的关键驱动因素，而 MLM 正则化在 M2T 方向带来尤为显著的增益。
 
-## 背景与动机
+
 
 ### 问题背景：文本-运动检索的挑战
 
@@ -75,7 +77,9 @@ claims:
 
 这两条动机共同指向一个目标：**构建一个既能保持检索效率，又能提供细粒度、可解释对齐的文本-运动检索框架**。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈洞察：全局嵌入的细粒度信息丢失
 
@@ -122,7 +126,7 @@ $$\mathcal{L}_{mlm} = - \sum_{i \in \operatorname{mask}} \log P(w_i | \mathcal{T
 
 三项创新并非孤立生效，而是形成正向协同：关节角度表示提供了关节级别的结构化 patch 分区，使 MaxSim 的 token-patch 匹配具有明确的物理语义；MLM 正则化则确保了参与匹配的文本 token 携带充分的上下文信息。三者共同实现了从“全局压缩匹配”到“局部可解释对齐”的范式转变。
 
-## 整体框架
+
 
 MaxSim 提出了一套三阶段的文本-运动检索框架，其核心设计围绕**细粒度跨模态对齐**展开。整个 pipeline 由五个关键模块串联而成，形成从原始运动数据到最终检索分数的完整流。
 
@@ -160,7 +164,7 @@ $$\mathrm{Sim}(\mathcal{T}, \mathcal{M}) = \frac{1}{M} \sum_{i=1}^{M} \max_{j=1}
 ![[assets/figures/papers/paper_list_l54_https_arxiv_org_pdf_2603_09930v1/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the three-stage training pipeline*
 
-## 核心模块与公式推导
+
 
 MaxSim 的检索框架由四个核心模块构成，分别负责运动表示、双塔编码、延迟交互对齐与文本正则化。以下逐一展开其设计逻辑与关键公式。
 
@@ -242,7 +246,9 @@ $\mathcal{L}_{ret}$ 为对称的批内对比损失（in-batch symmetric contrast
 ![[assets/figures/papers/paper_list_l54_https_arxiv_org_pdf_2603_09930v1/figures/003_Figure_2.jpg]]
 *Figure 2: Joint-angle vs. joint-position-based representations for “a person walks slowly forward”. (a) Skeletal structure and body-centric axes. (b) Right hip angles. (c) Right knee positions. (d) Our 29-dimension joint angle Motion Image: each band encodes a distinct joint.(e) MoPatch [28] position image*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -293,7 +299,9 @@ MaxSim 延迟交互机制天然产生可解释的 token-patch 对齐热力图。
 ![[assets/figures/papers/paper_list_l54_https_arxiv_org_pdf_2603_09930v1/figures/002_Table_1.jpg]]
 *Table 1: Summary of joint angle features. We compute 29 kinematic dimensions corresponding to 14 joints*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 技术路线定位
 
@@ -332,6 +340,8 @@ MaxSim 的设计隐含了若干适用前提：
 - **关节角度表示的可迁移性**：该表示的核心优势在于解耦局部与全局运动，这一特性理论上可惠及运动生成中的局部控制、运动修复中的缺失关节补全等任务，但需要针对性的适配和验证。
 
 - **更丰富运动拓扑的泛化**：对于包含手部关节、面部表情或非人体骨架（如四足动物）的运动数据，关节角度表示能否保持其结构化和可解释性优势，需要进一步探索。
+
+
 
 ## 原文 PDF
 

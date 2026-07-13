@@ -42,7 +42,7 @@ claims:
 > - LLaVA-1.5-7B MME^P 上，MME^P TransPrune-High: 1540 vs SparseVLM: 1484 (高出56分，TFLOPs更低)。
 > - LLaVA-NeXT-7B (综合相对准确率) 上，Acc. (%) TransPrune-High: 99.8 (-0.2) vs PDrop: 99.3 (-0.7) (保留率提升0.5个百分点，TFLOPs从45.4%降至40.0%)。
 
-## 概述
+## 概要
 
 当前大视觉语言模型（LVLM）在推理时需要处理大量视觉token，导致计算开销极高。已有的token剪枝方法——无论是基于注意力分数还是token间相似度——普遍存在**固有的位置偏差与任务无关性**，难以可靠地识别与当前指令语义真正相关的视觉token，使得剪枝效率与多模态性能难以兼顾。
 
@@ -50,7 +50,7 @@ claims:
 
 实验表明，TransPrune在多个主流LVLM架构上均实现了**性能几乎无损、推理FLOPs减半以上**的效果。在LLaVA-1.5-7B上，TransPrune-High以40.8%的TFLOPs预算达到100.0%的综合相对准确率保留，MME^P得分1540，显著优于SparseVLM（1484）等同类方法（Table 1）；在LLaVA-NeXT-7B和Qwen2.5-VL-7B上同样取得最优的性能-效率权衡（Table 2、Table 3）。此外，TransPrune可与投影端剪枝方法（如VisionZip）正交结合，在进一步压缩至仅保留36个token时仍几乎无损（Table 4）。消融研究系统验证了中间层TTV累积、IGA融合以及幅度-方向双分量的各自贡献（Table 10–12），确认了所提信号和累积策略的有效性。
 
-## 背景与动机
+
 
 ### 大视觉语言模型的推理效率瓶颈
 
@@ -76,7 +76,9 @@ TransPrune的提出源于一个关键观察：**视觉token在LLM各层传播过
 
 此外，TransPrune进一步引入了**Instruction-Guided Attention（IGA）**，通过计算指令token对视觉token的注意力权重，显式建模任务引导的语义相关性。TTV与IGA的互补融合——前者关注token自身的表示动态，后者关注指令对token的选择性关注——使剪枝决策同时具备语义敏感性和任务相关性，从而在更低的TFLOPs预算下保持甚至提升多模态性能。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 TransPrune 的核心创新在于对视觉 token 重要性评估准则的根本性重构。现有 LLM 内部 token 剪枝方法（如 **FastV** (Chen et al., ECCV 2024)、**PDrop** (Xing et al., CVPR 2025)、**SparseVLM** (Zhang et al., ICML 2025) 等）普遍依赖注意力分数或 token 间相似度作为剪枝依据。这类静态指标存在两个结构性缺陷：一是固有的位置偏差——token 在序列中的位置会系统性影响其注意力权重，而非真实的语义贡献；二是任务无关性——注意力分布无法感知当前指令的具体需求，导致剪枝决策与多模态问答的目标产生错位。
 
@@ -98,7 +100,7 @@ $$\mathrm{TTV}_{p_i}(T_I) = \sum_{l \in A, l \le p_i} \mathrm{TTV}_l(T_I)$$
 
 综上，TransPrune 通过“语义转换信号 + 指令引导 + 多层累积”三位一体的设计，将 token 重要性评估从静态、任务无关的注意力范式，推进到动态、语义感知、历史一致的转换度量范式，在显著降低计算开销的同时保持了多模态性能。
 
-## 整体框架
+
 
 TransPrune 提出一种基于 token 表示动态转换的逐步剪枝框架，其核心思想是将视觉 token 在 LLM 各层传播中的**幅度变化**和**方向变化**作为重要性信号，并结合指令引导的注意力，在多个中间层分阶段剪除低分 token。
 
@@ -147,7 +149,7 @@ TransPrune 提出一种基于 token 表示动态转换的逐步剪枝框架，�
 - **渐进式剪枝**：不同于依赖单层统计量的一次性剪枝，TransPrune 在多个层分阶段剪枝，每次剪枝都利用累积至今的 TTV 历史，使重要性评估随层加深而愈发稳健。
 - **双信号融合**：TTV 从 token 自身表示的动态变化中捕捉语义重要性，IGA 从指令-视觉交互中捕捉任务相关性，二者互补。仅使用 TTV 时 GQA 降至 58.4（完整方法为 61.4，Table 7），仅使用 IGA 时 MME$^P$ 为 1514（完整方法为 1540，Table 12），验证了双信号融合的必要性。
 
-## 核心模块与公式推导
+
 
 TransPrune的核心由四个紧密协作的模块构成，它们共同将“token表示转换”这一新信号转化为可操作的剪枝决策。
 
@@ -194,7 +196,9 @@ $$\mathrm{Score}_{p_i}(T_I) = \alpha \cdot \mathrm{TTV}_{p_i}(T_I) + (1 - \alpha
 ![[assets/figures/papers/paper_list_l793_https_arxiv_org_abs_2507_20630/figures/002_Figure_2.jpg]]
 *Figure 2: Token Transition Visualization in LLaVA-v1.5-7B. We visualize the magnitude and direction changes of token representations within both the self-attention and FFN modules for each layer (excluding residual connections). To measure the magnitude change, we use the ratio of output to input L2 norm; to measure the directional change, we use cosine similarity. Token transitions that reflect semantic importance can be observed across shallow, middle, and deep layers, and they are most concentrated and pronounced in the middle layers (around layers 6–14), where tokens with larger ratios and smaller absolute cosine similarities tend to be more semantically important. We provide more visualization e...*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：多模型、多基准下的高效剪枝
 
@@ -268,7 +272,9 @@ Table 8 报告了在 MME 基准上的实测延迟与内存占用。TransPrune �
 
 Figure 4 统计了 IGA 和 TTV 在 MME 基准上保留 token 的位置频率分布。IGA 倾向于保留与指令语义直接相关的 token，TTV 则更关注表示转换剧烈的 token，二者在位置偏好上形成互补，共同覆盖了指令相关性与语义重要性的双重维度。Figure 5 的可视化示例进一步展示了 TransPrune 在不同 VQA 提示下能自适应地保留与问题相关的视觉区域，验证了方法的任务感知能力。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心创新与差异化定位
 
@@ -313,6 +319,8 @@ TransPrune作为within-LLM方法，与投影端（projector-based）剪枝方法
 - **剪枝层选择的自动化**：当前剪枝层组合（如7,9,12）通过网格搜索确定（Table 9），缺乏自适应的层选择机制，可能限制在不同深度LLM上的即插即用性。
 - **极端压缩场景的鲁棒性**：在与投影端方法结合至24 token的极端场景下，性能开始出现轻微下降（Table 4, Table 5中97.2%–98.0% vs 原始98.4%），更极端的压缩边界尚不明确。
 - **长文本/多轮对话场景**：当前实验主要基于单轮VQA基准，TTV信号在多轮交互中是否保持一致性需要进一步验证。
+
+
 
 ## 原文 PDF
 

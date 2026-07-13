@@ -43,7 +43,7 @@ claims:
 > - CINIC-10 (∥δ∥∞ ≤ 4.0/255) 上，AUC 0.8504 (AR-RMIA λ=20) vs 0.7219 (RMIA Baseline) (+0.1285)。
 > - CIFAR-100 (∥δ∥∞ ≤ 4.0/255) 上，AUC 0.7881 (AR-Attack R λ=35) vs 0.6881 (Attack R Baseline) (+0.1000)。
 
-## 概述
+## 概要
 
 ### 问题背景与核心瓶颈
 
@@ -85,7 +85,7 @@ claims:
 
 值得进一步探索的开放问题包括：梯度范数塌缩特征能否被完全自适应的MFA（同时优化置信度和梯度范数）彻底绕过；MFD和AR-MIA在Vision Transformer等新架构及大规模预训练模型上的泛化性如何；以及成员伪造攻击与模型提取、数据投毒等其他威胁结合时会产生怎样的复合隐私风险。
 
-## 背景与动机
+
 
 ### 成员推理攻击的隐私审计困境
 
@@ -123,7 +123,9 @@ $$\|\nabla_{x'} \ell(f(x'), y)\| < \|\nabla_x \ell(f(x), y)\|$$
 
 这一框架首次将成员伪造的攻击、检测与鲁棒推理纳入统一分析，为隐私审计的安全性研究提供了新的理论基础和实用工具。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题发现：语义信号不可靠，梯度几何信号才是关键
 
@@ -165,7 +167,7 @@ tanh函数将权重限制在合理范围内，防止非成员的异常大梯度�
 
 这一统一视角的核心贡献在于：**揭示了成员伪造与检测之间的几何博弈本质**，并证明梯度范数塌缩是可利用的可靠信号——它既是伪造过程的必然副产物，也是检测和鲁棒推理的天然锚点。
 
-## 整体框架
+
 
 本文提出的统一框架围绕“对抗性成员操作”这一核心威胁构建，将攻击、检测与鲁棒推理三个环节纳入同一个形式化体系。框架的起点是一个已被观察到但未被系统化研究的瓶颈：现有成员推理攻击（MIA）——如 **Loss Attack**、**Attack R**、**LiRA**（Carlini et al., S&P 2022）和 **RMIA**——依赖损失值、置信度或似然比等语义统计量进行成员/非成员判别。这些统计量对输入空间的微小扰动缺乏结构鲁棒性，攻击者只需将非成员样本推入高置信度区域，即可伪造其成员身份，从而破坏隐私审计的完整性。
 
@@ -212,7 +214,7 @@ $$I(x,y) = \mathbf{1}\left[ w(x,y) \cdot S(x,y) > \tau \right]$$
 ![[assets/figures/papers/paper_list_l2246_https_arxiv_org_abs_2604_02780/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the Background and Our Proposed Research Problems*
 
-## 核心模块与公式推导
+
 
 本节围绕“对抗性成员操作”这一核心问题，依次构建三个关键模块：**成员伪造攻击（MFA）**、**成员伪造检测（MFD）** 与**对抗鲁棒成员推理攻击（AR-MIA）**。三者构成一个完整的攻防-推理闭环：MFA 揭示了现有成员推理攻击的结构性脆弱性，MFD 利用梯度几何特征检测伪造行为，AR-MIA 则将检测信号融入推理统计量以恢复攻击鲁棒性。
 
@@ -290,7 +292,9 @@ $$I(x,y) = \mathbf{1}\left[ w(x,y) \cdot S(x,y) > \tau \right] \quad \text{(Equa
 ![[assets/figures/papers/paper_list_l2246_https_arxiv_org_abs_2604_02780/figures/006_Figure_6.jpg]]
 *Figure 6: Distribution of fabricated and true members across different detection strategies. The first plot (left) shows the Mahalanobis distance, the second plot (middle) shows the Local Intrinsic Dimensionality (LID) values, and the third plot (right) presents the gradient norm with respect to the input. We use the relative frequency within each membership class as the vertical axis. The gradient norm in the third plot demonstrates superior distinguishability between fabricated and true members, where the other two show limited differentiation. The perturbation is constrained to*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：梯度几何信号揭示伪造与真实成员的分离
 
@@ -379,7 +383,9 @@ Appendix F 探索了自适应 MFA 场景：攻击者在优化目标中显式加�
 ![[assets/figures/papers/paper_list_l2246_https_arxiv_org_abs_2604_02780/figures/002_Figure_2.jpg]]
 *Figure 2: Imperceptible Adversarial Perturbations on ImageNet-100. The first row are the original non-members, and the second row are the corresponding perturbed fabricated members. We used*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：成员推理的操纵脆弱性
 
@@ -466,6 +472,8 @@ AR-MIA中的权重参数λ需要根据数据集和MIA类型进行离线校准（
 - **上游**：继承了对抗攻击的优化框架（PGD、CW、APGD）和成员推理的统计检验框架（LiRA、RMIA），但通过目标函数的反转和梯度几何信号的引入，开辟了新的问题空间。
 - **平行**：与基于差分隐私的防御方法（降低MIA准确率但无法检测伪造）和基于语义特征的异常检测方法（Mahalanobis、LID，在伪造检测上效果有限）形成互补。
 - **下游**：为成员推理的鲁棒性评估提供了基准工具（MFA作为攻击基准，MFD作为检测基准），并为更广义的“对抗性隐私操纵”研究（如属性推理伪造、数据来源伪造）提供了方法论模板。
+
+
 
 ## 原文 PDF
 

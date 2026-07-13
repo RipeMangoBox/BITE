@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/The_Intricate_Dance_of_Prompt_Complexity_Quality_Diversity_and_Consistency_in_T2I_Models.pdf
+project_link: null
+code_link: https://github.com/facebookresearch/synthetic_data_utility_prompt_complexity
 openreview_forum_id: RBIBMCdw7y
 aliases:
 - TPCEF
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 文本到图像模型中提示复杂度、质量、多样性与一致性的复杂交互 |
 | 英文题名 | The Intricate Dance of Prompt Complexity, Quality, Diversity and Consistency in T2I Models |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=RBIBMCdw7y); [GitHub](https://github.com/facebookresearch/synthetic_data_utility_prompt_complexity) |
+| Links | [paper](https://openreview.net/forum?id=RBIBMCdw7y) · [GitHub](https://github.com/facebookresearch/synthetic_data_utility_prompt_complexity) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/diffusion_image_video |
 | Method | T2I合成数据提示复杂度评估框架 (Prompt Complexity Evaluation Framework) |
 | Dataset | CC12M, ImageNet-1k |
@@ -42,7 +44,7 @@ claims:
 > - CC12M 上，Aesthetic quality 为 Prompt expansion + CFG (LDMv3.5L)，对比 Vanilla CFG (LDMv3.5L)，变化 提升约 +0.2 点（复杂度4：4.98 -> 5.18，估算）。
 > - CC12M 上，DSG consistency 为 Vanilla CFG，对比 Prompt expansion or advanced guidance，变化 提示扩展和高级引导均导致一致性下降（-0.05~0.1）。
 
-## 概述
+## 概要
 
 文本到图像（T2I）生成模型在合成数据增强、创意设计等领域展现出巨大潜力，但**提示（prompt）的复杂度如何系统性影响合成数据的效用**——包括质量、多样性和一致性——仍是一个未被充分探索的核心问题。本文揭示了扩散模型的一个根本性瓶颈：**模型无法直接估计条件似然**，导致在向更一般（即更简单、更宽泛）的提示泛化时，生成样本出现严重的分布偏移和模式坍缩；而现有的推理干预方法在试图提升多样性时，往往以牺牲提示一致性和分布保真度为代价。
 
@@ -58,7 +60,7 @@ claims:
 
 这些发现为T2I模型的提示设计、推理干预选择以及合成数据的下游应用提供了重要的指导原则。
 
-## 背景与动机
+
 
 文本到图像（T2I）生成模型近年来取得了显著进展，以 Stable Diffusion（LDM 系列）为代表的扩散模型能够根据自然语言描述合成高质量、高保真度的图像。然而，随着这些模型被广泛应用于大规模合成数据生成以训练下游视觉模型，一个根本性问题逐渐浮现：**提示（prompt）的复杂度如何影响合成数据的效用？**
 
@@ -90,7 +92,9 @@ $$s_{\theta}(x_t | c_{\mathbf{g}}) = \sum_{i \in \{1, 2, \dots, K\}} \left( \und
 
 该框架通过在已有图像-文本数据集上构建多复杂度提示并进行配对对齐，使跨复杂度的公平比较成为可能，为理解 T2I 模型的泛化行为提供了新的分析视角。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新并非提出一种新的生成模型或采样算法，而是构建了一个**面向提示复杂度的系统性评估框架**，并基于此框架揭示了文本到图像扩散模型中一个此前未被充分量化的根本性瓶颈：**向更一般（低复杂度）提示的泛化困难**。
 
@@ -124,7 +128,7 @@ $$s_{\theta}(x_t | c_{\mathrm{f}}) = s_{\theta}(x_t) + \sum_{i \in \{1, 2, \ldot
 
 在框架评估的基础上，论文进一步发现：**提示扩展与高级引导方法的组合**——尤其是提示扩展与 APG 的结合——可以在不牺牲质量和分布保真度（FDD）的前提下，显著提升多样性。这一发现超越了单独使用任一干预方法的效果，为实际合成数据生成提供了可操作的策略选择。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_RBIBMCdw7y/figures/003_Figure_1.jpg]]
 *Figure 1: Generalization to prompts of different complexities during inference. 1a shows the training data distribution. 1b presents the generated samples using the general prompt cat with the model trained with fine-grained prompts. 1c shows the generated samples using the fine-grained prompt black dog with the model trained with general prompts. ω is the classifier-free guidance scale. With $\omega$ > 1 , generalization towards more general prompts is harder in this synthetic setting*
@@ -178,7 +182,7 @@ $$N_{\mathrm{gen}} = \min_{i \in \mathcal{N}_k^{\mathrm{s}}, k \in \{1,2,\ldots,
 
 框架揭示了提示复杂度与合成数据效用之间的复杂交互：增加提示复杂度会降低条件多样性并削弱提示一致性，但有助于缩小合成数据与真实数据之间的分布差距（FDD 改善）；提示扩展和高级引导（尤其是 APG 与提示扩展的组合）可在提升多样性的同时维持可比的质量和 FDD，但会牺牲精确度和密度，表明生成样本偏离了真实数据支撑集。
 
-## 核心模块与公式推导
+
 
 ### 提示复杂度评估框架
 
@@ -212,7 +216,9 @@ $$s_{\theta}(x_t | c_{\mathrm{f}}) = s_{\theta}(x_t) + \sum_{i \in \{1, 2, \ldot
 
 **因果机制总结**：提示复杂度通过上述OR/AND算子的不对称性影响合成数据效用——增加复杂度（向细粒度方向）缩小了与真实数据的分布差距，但降低了条件多样性和提示一致性；向更简单提示泛化则因缺少条件似然而产生严重分布偏移和模式坍缩。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：提示复杂度对合成数据效用的三重影响
 
@@ -273,7 +279,9 @@ $$s_{\theta}(x_t | c_{\mathrm{f}}) = s_{\theta}(x_t) + \sum_{i \in \{1, 2, \ldot
 *Table 1: Statistics on word lengths of different prompt complexities*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心问题的理论刻画
 
@@ -331,6 +339,8 @@ $$s_{\theta}(x_t | c_{\mathrm{f}}) = s_{\theta}(x_t) + \sum_{i \in \{1, 2, \ldot
 - 是否能在扩散模型中引入对条件似然的近似，从而改善向更一般提示的泛化？
 - 不同的文本编码器（如CLIP vs. T5）如何影响提示复杂度的泛化行为？
 - 在实际下游任务（如医学图像合成）中，如何在不牺牲安全性和公平性的前提下利用高级引导和提示扩展带来的多样性提升？
+
+
 
 ## 原文 PDF
 

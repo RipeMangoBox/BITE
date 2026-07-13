@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2026
 pdf_ref: paperPDFs/arxiv_2026/MoCapAnything_V2_End_to_End_Motion_Capture_for_Arbitrary_Skeletons.pdf
+project_link: https://animotionlab.github.io/MoCapAnythingV2/
+code_link: null
 aliases:
 - MV
 - MVEEMCAS
@@ -41,7 +43,7 @@ claims:
 > - Truebones Zoo-Rare 上，Ang. Err (°) 14.38 vs 24.72 (HRNet) (-10.34)。
 > - Truebones Zoo-Unseen 上，Ang. Err (°) 6.54 vs 24.46 (ViTPose) (-17.92)。
 
-## 概述
+## 概要
 
 从单目视频中恢复任意骨骼结构的运动捕捉，面临一个根本性的病态问题：相同的3D关节位置，在不同骨骼的静止姿态和局部坐标轴约定下，可以对应完全不同的关节旋转值。现有方法——包括因子化管线 **MoCapAnything V1**（Gong et al., arXiv 2025）——将问题拆解为“视频→姿态（V→P）”和“姿态→旋转（P→R）”两个阶段，但P→R阶段依赖不可微的解析逆运动学（IK），既无法解决骨骼轴向扭转等欠约束自由度，也切断了梯度回传，使V→P阶段无法针对最终旋转目标进行优化。
 
@@ -51,7 +53,7 @@ claims:
 
 实验结果表明，该方法在 Truebones Zoo 和 Objaverse 基准上实现了显著提升：平均旋转角度误差从因子化管线的约17°降至约10°，在未见骨骼（Zoo-Unseen）上进一步降至6.54°；同时，去除网格中间表示带来了约20倍的推理加速。消融实验系统性地验证了参考条件化、端到端联合训练和显式关节位置瓶颈各自的贡献：无参考对时Zoo-Unseen误差骤升至24.05°，梯度截断变体升至7.82°，直接V→R变体仅23.73°，分别证明了坐标轴锚定、梯度耦合和显式中间表示的必要性。
 
-## 背景与动机
+
 
 ### 问题背景：从单目视频到任意骨骼动作捕捉
 
@@ -87,7 +89,9 @@ claims:
 
 同时，本文直接预测3D关节位置作为中间表示，消除了V1中的网格瓶颈，在保持旋转精度的同时实现约20倍推理加速。通过GL-GMHA（全局-局部图引导多头注意力）作为共享结构骨干，模型天然适应多样化的骨骼拓扑，无需针对不同骨骼重新设计网络架构。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MoCapAnything V2 的核心创新在于将面向任意骨骼的动作捕捉管线从**因子化、不可微的两阶段设计**重构为**端到端可学习的统一架构**，并引入**参考条件化旋转建模**以解决从关节位置恢复旋转这一根本性病态问题。以下从三个 changed slots 展开分析。
 
@@ -132,7 +136,7 @@ V2 坚持保留显式的关节位置中间表示（而非直接从视频回归�
 
 **总结**：MoCapAnything V2 的创新链条呈现清晰的因果逻辑——参考条件化解决了 P→R 的病态性（必要条件），端到端联合优化释放了 V→P 与 P→R 的协同潜力（充分条件），而 GL-GMHA 和显式姿态瓶颈则为这一框架提供了跨骨骼泛化的结构基础。三者缺一不可，共同构成了从“因子化不可微”到“端到端可学习”的范式转变。
 
-## 整体框架
+
 
 MoCapAnything V2 将任意骨骼的动作捕捉问题分解为一个端到端可学习的**两阶段管线**：
 
@@ -203,7 +207,7 @@ $$
 ![[assets/figures/papers/paper_list_l56_https_arxiv_org_abs_2604_28130v1/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of MoCapAnything V2. Given an input video of a human or an animal, our method infers a topology-agnostic skeleton sequence across diverse skeleton topologies. Conditioned on a reference asset, the model predicts animation-ready rotations via an end-to-end framework, enabling the reference asset to perform the input motion*
 
-## 核心模块与公式推导
+
 
 ### 问题形式化与两阶段分解
 
@@ -260,7 +264,9 @@ $$p_{\mathrm{pred}}(e) = p_{\mathrm{start}} + (p_{\mathrm{end}} - p_{\mathrm{sta
 ![[assets/figures/papers/paper_list_l56_https_arxiv_org_abs_2604_28130v1/figures/003_Figure_3.jpg]]
 *Figure 3: Framework of MoCapAnything V2. Our method unifies video-to-pose and pose-to-rotation within a single end-to-end trainable architecture. The video-to-pose stage consists of a reference-conditioned pose prompt encoder (A), which encodes skeleton and image cues into joint prompt, and a unified pose decoder (B), which predicts temporally coherent joint positions via cross-attention with video features. The pose-to-rotation stage is formulated as a learnable inverse kinematics module, composed of a rotation prompt encoder (C) that maps predicted poses into rot prompt, an anchor encoder (D) that encodes reference pose–rotation pairs to establish a consistent rotation coordinate space, and a unifi...*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -341,7 +347,9 @@ Table 1 展示了全面对比结果。MoCapAnything V2 在所有评估集上均�
 ![[assets/figures/papers/paper_list_l56_https_arxiv_org_abs_2604_28130v1/figures/011_Table_8.jpg]]
 *Table 8: Effect of reference cross-attention depth*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：从因子化管线到端到端可学习框架
 
@@ -432,6 +440,8 @@ Table 7 显示 8 层模型深度达到最优（Zoo-Unseen 6.54°），12 层反�
 4. **物种覆盖度扩展**：Truebones Zoo 的物种覆盖有限，如何高效采集或生成更多物种的运动数据以提升稀有骨骼的旋转质量？
 
 5. **参考对选择策略**：当前参考姿态-旋转对从同一资产中采样，其对模型性能的敏感性尚未系统研究。参考对的选择策略（如运动范围最大化）是否影响旋转恢复质量？
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/SceMoS_Scene_Aware_3D_Human_Motion_Synthesis_by_Planning_with_Geometry_Grounded_Tokens.pdf
+project_link: https://anindita127.github.io/SceMoS/
+code_link: null
 aliases:
 - SceMoS
 tags:
@@ -38,7 +40,7 @@ claims:
 > [!tip] 效果简介
 > - TRUMANS 上，FID↓ 0.31 vs 0.34 (TRUMANS) (-0.03)；Penetration mean↓ 1.81 vs 1.83 (TRUMANS) (-0.02)；Contact↑ 0.98 vs 0.98 (TRUMANS) (0.00)。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -72,7 +74,7 @@ SceMoS在场景感知运动合成的方法谱系中占据了一个独特的位�
 - **架构层面**：建立了“全局规划-局部执行”解耦范式，并通过离散运动标记桥接两个阶段。
 - **物理扎根层面**：展示了以人为中心的局部高度图作为接触条件，能够显著提升运动的物理合理性（穿透、接触指标）。
 
-## 背景与动机
+
 
 **场景感知三维人体运动合成**（Scene-aware 3D Human Motion Synthesis）旨在生成与给定三维环境几何一致且语义合理的人体动作序列，是具身人工智能、虚拟角色动画和人机交互领域的核心任务。其核心挑战在于：模型必须同时完成三项相互纠缠的子任务——感知复杂的场景几何、规划空间导航意图、以及执行精细的物理接触与过渡动作。
 
@@ -85,7 +87,9 @@ SceMoS在场景感知运动合成的方法谱系中占据了一个独特的位�
 
 基于此，SceMoS 提出了一种**两阶段解耦框架**：第一阶段由文本条件和 BEV 场景特征驱动的自回归全局运动规划器，负责预测离散的运动标记序列；第二阶段由几何扎根的运动标记器（Geometry-Grounded Motion Tokenizer）将离散标记解码为连续运动，并通过局部高度图条件实现精细的物理接触推理。这一设计从根本上改变了场景表示与运动合成之间的交互方式，使得场景编码参数量降低一个数量级以上（约 4M），同时保持甚至提升了运动质量。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SceMoS 的核心创新在于将场景感知的人体运动合成问题从“单一纠缠的动画过程”解耦为**全局规划**与**局部执行**两个阶段，并通过轻量级 2D 几何表示替代昂贵的 3D 场景编码。这一设计直接回应了现有方法的根本瓶颈：在单阶段模型中同时感知复杂几何、规划空间意图和执行精细运动，导致对密集 3D 监督（如体素网格、点云）的强依赖，带来高计算成本和冗余表示。
 
@@ -121,7 +125,7 @@ SceMoS 引入轻量级 1D CNN 回归器，从局部关节运动特征预测平�
 
 上述三个 changed slots 并非孤立改进，而是形成因果链：2D 轻量表示使解耦成为可能（全局规划无需承载精细几何），解耦又为轨迹细化提供了清晰的介入点（在解码后修正根运动）。**Table 1** 的完整结果显示，SceMoS 在 TRUMANS 数据集上达到 FID 0.31，优于所有基线（最佳基线 TRUMANS 为 0.34），同时将场景编码参数削减一个数量级。用户研究（**Table A.1**）进一步验证了生成运动的真实感（3.41±0.2）和语义对齐度（4.20±0.6）均显著优于其他生成方法。
 
-## 整体框架
+
 
 SceMoS 将文本条件的场景感知人体运动合成解耦为两个阶段：**全局运动规划**与**几何扎根的局部执行**。该设计的核心动机在于，现有方法在单一纠缠的动画过程中同时感知复杂几何、规划空间意图并执行精细运动，这不仅需要昂贵的 3D 场景编码器（如体素网格或点云），还导致了高计算成本和冗余表示。SceMoS 通过显式分解规划与执行，以轻量级 2D 场景线索替代密集 3D 监督，从根本上改变了这一范式。
 
@@ -165,7 +169,7 @@ $$\mathcal{L}_{\mathrm{traj}} = \lambda_{\mathrm{r}} \left|\left| t_{\delta} - \
 ![[assets/figures/papers/paper_list_l1753_SceMoS_Scene_Aware_3D_Human_Motion_Synthesis_by_Planning_with_Geometry_G/figures/001_Figure_1.jpg]]
 *Figure 1: The introduced scene-aware 3D human motion synthesis framework, SceMoS, uses 2D scene cues and text instructions to generate physically consistent and realistic 3D motions. We use a bird’s-eye-view (BEV) image rendered from an elevated corner of the input scene, and extract DINOv2 features for high-level semantic planning. For fine-grained contact reasoning, we use the local 2D heightmap of the scene around the root of the person’s initial pose*
 
-## 核心模块与公式推导
+
 
 ### 问题形式化
 
@@ -216,7 +220,9 @@ $$\mathcal{L}_{\mathrm{traj}} = \lambda_{\mathrm{r}} \left|\left| t_{\delta} - \
 ![[assets/figures/papers/paper_list_l1753_SceMoS_Scene_Aware_3D_Human_Motion_Synthesis_by_Planning_with_Geometry_G/figures/003_Figure_3.jpg]]
 *Figure 3: Visualization of long-range motion synthesis in a cluttered indoor environment. SceMoS performs geometry-grounded planning by recalculating heightmaps every t frames, enabling globally coherent yet locally feasible motion planning that respects scene geometry. The BEV image input is shown in the inset*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -281,7 +287,9 @@ SceMoS 在 TRUMANS 数据集上与主流场景感知人体运动合成方法进�
 ![[assets/figures/papers/paper_list_l1753_SceMoS_Scene_Aware_3D_Human_Motion_Synthesis_by_Planning_with_Geometry_G/figures/010_Figure.jpg]]
 *Figure: A.1. Interface of our user study where we ask participants to rank the motion clips based on ‘realism’ and ‘semantics’, in a 5-point Likert scale. Figure A.2. User rating distribution across score categories. SceMoS receives the fewest “Poor / Bad” ratings and over 60% of its ratings fall into the “Good / Excellent” categories*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心定位：从3D密集编码到2D解耦规划
 
@@ -335,6 +343,8 @@ SceMoS通过**显式分解全局规划与局部执行**来打破这一瓶颈：
 5. **视觉骨干的进化**：使用DINOv3或其他更强视觉骨干是否进一步提升语义理解，尤其是在未见过复杂场景下的泛化能力？A6消融已初步验证视觉特征质量对规划器性能的关键影响。
 
 6. **多模态融合的深度**：当前BEV和高度图是独立提取的，是否可以通过跨模态注意力或联合学习来增强全局规划与局部执行之间的信息流动？
+
+
 
 ## 原文 PDF
 

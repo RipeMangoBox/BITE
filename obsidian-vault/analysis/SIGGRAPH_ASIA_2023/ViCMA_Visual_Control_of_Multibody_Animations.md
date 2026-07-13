@@ -5,6 +5,7 @@ paper_level: A
 venue: "SIGGRAPH Asia"
 year: 2023
 pdf_ref: paperPDFs/SIGGRAPH_ASIA_2023/ViCMA_Visual_Control_of_Multibody_Animations.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/prl/vicma/
 aliases:
 - VVCMA
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | ViCMA：多体动画的视觉控制 |
 | 英文题名 | ViCMA: Visual Control of Multibody Animations |
 | 会议/期刊 | SIGGRAPH Asia 2023 |
-| Links | [paper](https://research.nvidia.com/labs/prl/james2023vicma/vicma2023.pdf); [Project](https://research.nvidia.com/labs/prl/vicma/) |
+| Links | [paper](https://research.nvidia.com/labs/prl/james2023vicma/vicma2023.pdf) · [Project](https://research.nvidia.com/labs/prl/vicma/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | ViCMA (Visual Control of Multibody Animations) |
 | Dataset | SIGGRAPH Card Trick (5376 cards), Pachinko-style machine (621 balls), Bunchinko (621 deformable bunnies), Dice Pyramid (5456 dice) |
@@ -42,7 +43,7 @@ claims:
 > - Pachinko-style machine (621 balls) 上，ViCMA Score / transition ratio 为 ViCMA Score 0.0372 (Padrinko), 543/621 transitions; overall cost comparable to...，对比 previous methods required hours of optimization or sampling，变化 order-of-magnitude improvement in computation。
 > - Bunchinko (621 deformable bunnies) 上，ViCMA Score 为 0.570, 445 transitions，对比 N/A，变化 N/A。
 
-## 概述
+## 概要
 
 **问题瓶颈**：传统多体动画控制方法——无论是基于时空优化的轨迹搜索（Popović et al., ACM TOG 2003），还是基于马尔可夫链蒙特卡洛的采样浏览（Chenney and Forsyth, SIGGRAPH 2000; Twigg and James, ACM TOG 2007）——都试图在固定物体外观的前提下，寻找满足关键帧约束的物理合理运动轨迹。这类“运动控制”范式的计算代价随物体数量和接触复杂度急剧增长，难以扩展到大规模、接触丰富的场景，且通常无法同时满足初始和最终的外观约束。
 
@@ -54,7 +55,7 @@ claims:
 
 **证据强度**：上述核心结论均有论文中的定量结果和图示支撑（Figure 1, Figure 2, Figure 3），置信度较高。但需注意，论文未进行正式的用户研究来定量评估外观切换的可察觉性，所有结果依赖补充视频中的主观观察。
 
-## 背景与动机
+
 
 ### 多体动画控制的根本挑战
 
@@ -103,7 +104,9 @@ ViCMA 在 SIGGRAPH Asia 2023 上首次系统性地探索了这种“外观控制
 - **验证感知可行性**：通过 Pachinko 彩虹球（621 个球同时满足初始和最终彩虹排列）、SIGGRAPH 卡牌魔术（5376 张卡片拼写“2023”）等多个大规模场景，证明了外观切换在视觉上的隐蔽性。
 - **建立新的性能基准**：与以往方法相比，在场景复杂度和计算性能上实现了一个数量级的提升——从数十到数百个物体、数小时计算，跨越到数千个物体、数分钟完成。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ViCMA 的核心创新在于**将多体动画的控制对象从“运动轨迹”切换为“物体外观”**，从而从根本上绕开了传统方法面临的计算瓶颈。这一范式转换建立在对人类视觉感知局限性的深刻利用之上。
 
@@ -140,7 +143,7 @@ ViCMA 的洞察恰恰相反：**与其控制运动来匹配固定外观，不如
 
 值得强调的是，ViCMA 并非要取代传统的运动控制方法，而是提供了一条**互补的技术路径**。当场景中存在大量物体且运动足够混乱时，外观控制能以极低成本实现令人信服的视觉效果；而对于需要精确控制单个物体运动轨迹的场景，传统运动控制方法仍然不可替代。这种“外观控制”与“运动控制”的互补关系，为多体动画创作提供了更灵活的工具组合。
 
-## 整体框架
+
 
 ViCMA 的整体流程围绕一个核心洞察展开：**与其控制运动来匹配固定外观，不如控制外观来匹配固定运动**。传统多体动画控制方法（如时空优化、MCMC 采样）试图寻找满足关键帧约束的物理合理轨迹，计算量随物体数量和接触复杂度急剧增长。ViCMA 反其道而行之——保持物理模拟的原始轨迹完全不变，仅在不易被人类视觉察觉的时刻切换物体的颜色或纹理属性，从而以极低成本创造出符合初始和最终外观约束的动画。
 
@@ -182,7 +185,7 @@ ViCMA 的计算效率源于两个设计选择：
 
 这种“单次模拟 + 局部后处理”的架构，使得 ViCMA 能够控制 5376 张卡片通过 2045 次纹理翻转拼写出“2023”（Figure 2），主要运行成本仅为约两分钟的 Houdini 正向模拟，相比此前最优方法（Twigg and James 2008，约 3037 个物体、约 1 小时计算）实现了超过一个数量级的场景复杂度和性能提升。
 
-## 核心模块与公式推导
+
 
 ViCMA 的核心是一个逐帧、逐物体的局部代价函数，用于评估在某一帧切换某物体外观时被观察者察觉的风险。代价越低，切换越隐蔽。整个管线由三个相互耦合的模块构成：可见性代价、运动代价（进一步分解为速度级代价、移动牵制代价和邻域混合代价），以及最终的综合代价。
 
@@ -288,7 +291,9 @@ $$
 
 Figure 6 完整展示了代价函数的逐层升级效果：单物体速度代价（首行）噪声极大；多体速度代价（第二行）能识别邻居速度差异，但仍在冲击波附近产生低代价；加入混合代价后（第三至五行），代价在起始/结束帧附近保持高位，切换被推迟到邻域充分混合的时刻。这一消融分析证实了从简单速度代价到完整 ViCMA 代价的每一步升级都是必要的。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 
@@ -351,7 +356,9 @@ Figure 6 展示了代价函数从简单到复杂的逐步演进过程，验证�
 ![[assets/figures/papers/paper_list_l45_https_research_nvidia_com_labs_prl_james2023vicma_vicma2023_pdf/figures/012_Figure_11.jpg]]
 *Figure 11: Dice Pyramid: After exploding, the 5456 dice constituting this pyramid all start and stop 6-side up. (“It could happen,” they said.)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心范式转换：从运动控制到外观控制
 
@@ -413,6 +420,8 @@ ViCMA 的当前版本存在以下结构性局限，这些局限同时指向未�
 - 如何将 ViCMA 泛化到具有不同物理大小和纹理的异质物体？这可能需要引入物体特异性的代价权重或自适应参数调整机制。
 - 如何耦合物体优化过程以考虑邻近颜色信息或孤立突出颜色，避免“独色”切换——即某个物体在周围物体颜色不变的背景下单独切换颜色，从而暴露变化？这需要引入颜色上下文感知的代价修正项。
 - 如何将 ViCMA 与运动控制方法有机耦合，实现外观与运动的联合优化？这将是突破当前“外观-运动”二元分离的关键方向。
+
+
 
 ## 原文 PDF
 

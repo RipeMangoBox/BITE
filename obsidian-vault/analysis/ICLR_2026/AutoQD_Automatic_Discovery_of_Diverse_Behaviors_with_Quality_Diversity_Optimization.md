@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/AutoQD_Automatic_Discovery_of_Diverse_Behaviors_with_Quality_Diversity_Optimization.pdf
+project_link: null
+code_link: https://github.com/conflictednerd/autoqd-code
 openreview_forum_id: FNnJIf4ymV
 aliases:
 - AutoQD
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | AutoQD：质量多样性优化的自动多样化行为发现 |
 | 英文题名 | AutoQD: Automatic Discovery of Diverse Behaviors with Quality-Diversity Optimization |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=FNnJIf4ymV); [GitHub](https://github.com/conflictednerd/autoqd-code) |
+| Links | [paper](https://openreview.net/forum?id=FNnJIf4ymV) · [GitHub](https://github.com/conflictednerd/autoqd-code) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | AutoQD |
 | Dataset | Ant, Swimmer, BipedalWalker |
@@ -41,7 +43,7 @@ claims:
 > - Ant 上，qVS 为 60.23 ± 9.4，对比 39.35 ± 3.99 (RegularQD)，变化 +20.88。
 > - Swimmer 上，GT QD Score (×10^4) 为 21.31 ± 4.57，对比 11.09 ± 0.08 (RegularQD)，变化 +10.22。
 
-## 概述
+## 概要
 
 质量多样性（Quality-Diversity, QD）优化旨在发现一组既高性能又行为多样的策略集合。然而，现有QD算法的核心瓶颈在于**行为描述符（Behavioral Descriptors, BDs）必须由人工手工设计**——这要求研究者对任务有深入的领域知识，且预先定义的行为空间往往限制了探索范围，难以发现未预见的行为模式。
 
@@ -51,7 +53,7 @@ AutoQD 提出了一种**基于理论保证的自动行为描述符生成方法**
 
 值得注意的是，该方法也存在局限性：在HalfCheetah等环境中发现的策略多样性虽高但平均质量较低，出现了“滑动”等低效行为；学习到的描述符不一定对应人类可解释的简单维度，而是捕捉复杂的混合行为因素。这些现象揭示了自动描述符与QD优化器之间更深层的交互机制，值得进一步研究。
 
-## 背景与动机
+
 
 ### 质量多样性优化与行为描述符瓶颈
 
@@ -73,7 +75,9 @@ AutoQD 提出了一种**基于理论保证的自动行为描述符生成方法**
 
 基于此，AutoQD提出了一种无需领域知识的自动行为描述符生成方法：利用随机傅里叶特征（Random Fourier Features, RFF）将策略的占用度量嵌入到有限维向量空间，使得嵌入向量间的欧氏距离近似最大均值差异（Maximum Mean Discrepancy, MMD），从而捕捉有意义的行为差异。这一嵌入随后通过校准加权PCA（cwPCA）降维，直接作为CMA-MAE等QD优化器的行为描述符，实现端到端的自动多样化行为发现。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 AutoQD 的核心创新在于**将手工设计的行为描述符替换为基于占用度量的自动生成嵌入**，从而消除了 QD 算法对领域知识的依赖。这一创新通过三个紧密耦合的模块实现：
 
@@ -117,7 +121,7 @@ AutoQD 不采用固定描述符，而是**交替进行 QD 优化与描述符精�
 
 与 Aurora 等基于自编码器的方法相比，AutoQD 的嵌入具有理论支撑（MMD 近似保证），且无需训练神经网络，计算开销更低。与 RegularQD 相比，AutoQD 完全消除了手工设计描述符的需求，能够发现未预见的行为模式。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0011_FNnJIf4ymV_AutoQD_Automatic_Discovery_of_Diverse_Behaviors/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of AutoQD. Left: Policy parameters are sampled from a CMA-ES instance and evaluated in the environment. The collected trajectories are embedded via a random Fourier features map ϕ to produce the policy embedding ψπ, which is then projected to a low-dimensional descriptor using the affine map Aψπ + b. The policy is added to the archive based on its return J(π) and descriptors desc(π), and CMA-ES updates its distribution based on the improvement made to the archive. Right: Periodically, embeddings from the archive are used to update A and b via cwPCA*
@@ -161,7 +165,7 @@ AutoQD 并非一次性生成描述符后固定使用，而是采用**交替优�
 
 > **注意**：上述流程中，RFF 嵌入的随机权重在初始化时采样一次后保持不变，不参与后续更新，这是保证嵌入空间稳定性和 MMD 近似理论成立的前提。
 
-## 核心模块与公式推导
+
 
 AutoQD 由三个核心模块构成：**策略嵌入（Policy Embedding）**、**行为描述符投影（cwPCA）** 和 **QD优化（CMA-MAE）**，三者交替迭代，逐步精炼行为空间。
 
@@ -204,7 +208,9 @@ $$\text{desc}(\pi) = A \psi^{\pi} + b$$
 
 使用 CMA-MAE 多实例进化策略，基于当前描述符 $\text{desc}(\pi)$ 搜索多样性高质量策略集合，并更新存档。所有方法统一使用 Toeplitz 矩阵参数化策略以降低参数量。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -256,7 +262,9 @@ AutoQD 在六个标准连续控制任务上与五种基线方法进行了系统�
 
 4. **可解释性缺失**：学习到的描述符不一定对应人类可解释的简单维度（如步态类型），而是捕捉复杂的混合行为因素。这限制了用户对行为空间的理解和控制。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的差异根源
 
@@ -299,6 +307,8 @@ AutoQD 的有效性建立在两个核心假设之上：
 4. **扩展到部分可观测与动态观察空间**。当前方法假设完全可观测的固定维度状态-动作空间。在视觉观察或部分可观测环境中，如何定义有意义的占用度量等价物？
 
 5. **缓解行为模式的过早收敛**。能否引入类似 Novelty Search 的显式新颖性奖励，或通过灭绝机制定期清除行为空间中的低质量“孤岛”，防止它们固化描述符方向？
+
+
 
 ## 原文 PDF
 

@@ -42,7 +42,7 @@ claims:
 > - Real-world public benchmarks (SPA-Data, GT-Rain, LHP-Rain, etc.) 上，PSNR 29.42 vs URIR (27.69) (+1.73)。
 > - WeatherBench (all-in-one weather restoration) 上，PSNR 26.01 vs TransWeather (数值未显式给出) (N/A)。
 
-## 概述
+## 概要
 
 图像去雨是低层视觉恢复中的核心任务之一，但现有方法大多针对单一雨型（如白天的雨线或雨滴）设计，难以泛化到包含白天/夜晚、雨线/雨滴等多种组合的真实复杂场景。直接合并所有公开数据集看似能扩大数据规模，却因数据质量参差不齐反而导致模型性能下降（见 Figure 1b）；同时，不同雨型在联合训练中的损失收敛速度存在显著差异，简单加权会造成严重的不平衡，使模型偏向简单退化而忽略复杂退化（见 Figure 1c–d）。
 
@@ -56,7 +56,7 @@ claims:
 
 实验表明，UniRain 在提出的 RainRAG 数据集上取得平均 PSNR 28.93 dB，在多个真实世界公开基准上达到 29.42 dB，相比 URIR 提升 1.73 dB（Table 1 & Table 2）。消融实验进一步验证了 RAG 蒸馏流水线、多目标重加权策略和非对称 MoE 架构各自对性能的显著贡献（Table 4–6）。此外，该方法在驾驶、无人机、海事等场景下展现出良好的泛化能力，并可扩展到全天候恢复任务（雨、雪、雾），在 WeatherBench 上取得 26.01 dB 的平均 PSNR（Table 7）。
 
-## 背景与动机
+
 
 图像去雨是低层视觉领域的重要任务，旨在从受雨况退化的图像中恢复干净背景。近年来，深度学习方法在该任务上取得了显著进展，涌现出多种专门化架构。然而，现有方法大多针对单一雨型设计——例如仅处理白天的雨线（rain streaks）或雨滴（raindrops），难以泛化到包含多种真实雨况的场景。这一局限性的根源在于真实世界中的雨况退化具有高度多样性：白天与夜晚的光照条件迥异，雨线与雨滴的物理形态和遮挡效应也截然不同。直接训练一个统一模型面临两个核心瓶颈：
 
@@ -66,7 +66,9 @@ claims:
 
 上述两个瓶颈相互耦合：数据质量的干扰加剧了优化过程中的不平衡，而优化策略的缺陷又放大了数据筛选不当的负面影响。因此，实现统一的图像去雨需要同时从数据层面和训练动态层面进行系统性改进。UniRain正是基于这一认知，通过基于检索增强生成（RAG）的数据集蒸馏从海量公开数据中筛选高质量混合训练样本，并引入多目标重加权优化策略动态平衡不同雨型的收敛速度，从而在数据质量和训练动态两个维度上协同解决统一去雨的核心挑战。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 UniRain 的核心创新围绕“统一图像去雨”的三个关键矛盾展开，分别从数据、优化和架构三个维度引入 changed slots，形成系统性解决方案。
 
@@ -110,7 +112,7 @@ UniRain 的核心创新围绕“统一图像去雨”的三个关键矛盾展开
 
 三个 changed slots 形成闭环：RAG 蒸馏从源头保证训练数据质量，多目标重加权优化在训练过程中动态平衡不同退化的学习难度，非对称 MoE 架构为多退化特征建模提供结构支撑。三者协同使得 UniRain 在统一去雨任务上取得一致且显著的性能增益。
 
-## 整体框架
+
 
 UniRain 的整体设计围绕一个核心矛盾展开：现有去雨方法大多针对单一雨型（如白天雨线或白天雨滴）设计，而真实场景中雨况复杂多样，直接合并所有公开数据集反而因数据质量参差不齐导致模型性能下降（Figure 1b）。同时，不同雨型的损失收敛速度存在显著差异，简单联合训练会使模型偏向简单退化而忽略复杂退化（Figure 1c–d）。为系统性地解决这两个瓶颈，UniRain 将**数据质量筛选**与**训练动态平衡**统一到一个端到端框架中。
 
@@ -159,7 +161,7 @@ Figure 2 给出了完整的流水线架构，由三大模块级联构成：
 
 整个框架的数据流可以概括为：**公开多源雨图 → RAG 蒸馏流水线 → RainRAG 高质量混合训练集 → 非对称 MoE（Soft-MoE 编码 → Hard-MoE 解码）→ 多目标重加权损失优化 → 统一去雨输出**。三个模块协同工作，分别从数据质量、架构容量和优化动态三个维度解决统一图像去雨的核心挑战。
 
-## 核心模块与公式推导
+
 
 UniRain 围绕三个核心模块构建：**基于RAG的数据集蒸馏流水线**、**多目标重加权优化策略**以及**非对称MoE架构**。三者分别从数据质量筛选、训练动态平衡和异构特征建模三个层面，协同解决统一图像去雨中数据质量参差与多退化收敛不平衡的瓶颈。
 
@@ -238,7 +240,9 @@ $$\mathcal{R}_{hard} = \mathcal{T}_k(\sigma(\mathcal{W}(\varphi(x_{de} + \epsilo
 ![[assets/figures/papers/paper_list_l2710_https_arxiv_org_abs_2603_03967/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of motivation. (a) Rainy image samples from public datasets, illustrating the noticeable differences in data quality. (b) Directly merging existing synthetic and real datasets enlarges data volume, yet quality disparity hinders performance, as shown by PSNR results. (c) The loss curves of DRS, DRD, NRS, and NRD (denoting daytime/nighttime rain streaks and raindrops) show different convergence rates, leading to imbalance in unified training. (d) The PSNR curves indicate that the model tends to favor simpler degradations but struggles with complex ones*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -324,7 +328,9 @@ UniRain 在 WeatherBench 多天气退化基准（雨、雪、雾）上取得平�
 ![[assets/figures/papers/paper_list_l2710_https_arxiv_org_abs_2603_03967/figures/015_Figure_8.jpg]]
 *Figure 8: Visual comparison of all-in-one weather restoration results (e.g., hazy input (first row) and snowy input (second row))*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有方法的关系
 
@@ -379,6 +385,8 @@ UniRain 的非对称 MoE 架构——编码器采用 soft-MoE（连续路由，�
 **（4）蒸馏数据集的质量上限**
 
 RainRAG 数据集从原始数据中保留了约 2.6% 的样本（52,869 对）。虽然消融实验证明了蒸馏策略优于直接合并，但蒸馏过程本身的质量上限受限于 VLM 的判断能力和参考数据库的覆盖度。如果参考数据库本身存在偏差（例如主要包含某种光照条件下的雨天图像），蒸馏结果可能继承这种偏差。
+
+
 
 ## 原文 PDF
 

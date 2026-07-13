@@ -5,6 +5,7 @@ paper_level: A
 venue: SIGGRAPH
 year: 2023
 pdf_ref: paperPDFs/SIGGRAPH_2023/Interactive_Hair_Simulation_on_the_GPU_using_ADMM.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/prl/admm_hair/files/editing.mp4
 aliases:
 - ABGHSDERCF
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 基于 ADMM 的 GPU 交互式头发模拟 |
 | 英文题名 | Interactive Hair Simulation on the GPU using ADMM |
 | 会议/期刊 | SIGGRAPH 2023 |
-| Links | [paper](https://research.nvidia.com/labs/prl/daviet23/interactivehair2023.pdf); [Project](https://research.nvidia.com/labs/prl/admm_hair/files/editing.mp4) |
+| Links | [paper](https://research.nvidia.com/labs/prl/daviet23/interactivehair2023.pdf) · [Project](https://research.nvidia.com/labs/prl/admm_hair/files/editing.mp4) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | ADMM-based GPU Hair Simulation for Discrete Elastic Rods with Coulomb Friction |
 | Dataset | Hairball 16k (proximity-only), Hairball 128k (proximity-only), Long 47k (realistic groom) |
@@ -42,7 +43,7 @@ claims:
 > - Hairball 128k (proximity-only) 上，平均帧时间 (s) 为 3.14，对比 传统 CPU 求解器 (约半周)，变化 无定量比较。
 > - Long 47k (realistic groom) 上，平均帧时间 (s) 为 2.28。
 
-## 概述
+## 概要
 
 本文提出了一种基于交替方向乘子法（ADMM）的 GPU 大规模并行求解器，用于交互式模拟离散弹性棒（Discrete Elastic Rods, DER）模型下的头发动力学，并支持库仑摩擦接触。核心瓶颈在于：传统 CPU 全局求解器（如 Newton 法）因带状矩阵条件数差和内存访问模式无法充分利用 GPU 并行性，而纯局部求解器（如 XPBD）收敛缓慢，导致高分辨率头发仿真难以满足交互式编辑的实时性需求。
 
@@ -52,7 +53,7 @@ claims:
 
 **方法定位**：该方法属于基于物理的头发模拟中“局部-全局混合求解器”这一技术路线，是对 Projective Dynamics 的 ADMM 推广（Narain 等, 2016）在 DER 模型上的系统化延伸。其关键改进包括：采用 Korner 等（2021）的非发散弯曲应变度量以加速收敛；将全局矩阵从带宽约 10 的带状结构简化为三对角结构；以及设计了混合 Gauss-Seidel/Jacobi 并行策略的摩擦接触可行投影。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -89,7 +90,9 @@ claims:
 - 设计了一种混合 Gauss-Seidel/Jacobi 的碰撞求解策略，在保持并行性的同时改善了接触求解的收敛性。
 - 实现了完整的实时交互式头发编辑系统，支持选择、拖拽、修剪等操作，性能较传统 CPU 求解器提升数个数量级。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心贡献在于**将 ADMM（交替方向乘子法）分解策略系统性地应用于带库仑摩擦的离散弹性棒（DER）模型**，从而将原本难以在 GPU 上高效并行求解的全局隐式时间积分问题，转化为一系列高度并行友好的子问题。这一分解直接回应了传统方法的根本瓶颈：**CPU 全局求解器（如 Newton 法）因带状矩阵条件数差和内存访问模式无法充分利用 GPU 并行性，而纯局部求解器（如 XPBD）收敛速度慢，导致高分辨率头发仿真无法满足交互式编辑需求**。
 
@@ -127,7 +130,7 @@ $$ \hat{M}_{|k} \Delta \mathbf{x}_{|k} = \hat{\mathbf{f}}_{|k}, \quad k = 1, 2, 
 - 碰撞处理基于接触点位于中心线的假设，忽略扭转产生的接触扭矩，可能不适用于极粗发丝或大扭转场景
 - 无法提供严格的穿透保证，与基于障碍函数的方法（如 IPC）相比安全性较低
 
-## 整体框架
+
 
 本文提出了一种基于交替方向乘子法（ADMM）的 GPU 头发模拟框架，其核心思想是将离散弹性棒（DER）模型与库仑摩擦的隐式时间积分增量问题分解为一系列可在 GPU 上大规模并行的子问题。整个时间步的求解流程如 **Algorithm 1** 所示，形成了一条清晰的“检测-局部求解-全局求解-更新”的流水线。
 
@@ -168,7 +171,7 @@ ADMM 分解的关键在于引入辅助变量 $\mathbf{y}$ 和 $\mathbf{z}$，将
 
 ADMM 迭代在每个时间步内执行固定次数（文中典型设置为 10-20 次），无需检测收敛条件。约束权重 $W_y$ 和 $W_z$ 的选择基于启发式规则（如弹性约束权重取接近约束有效刚度的值，碰撞约束权重 $w^0=25$），这些权重直接影响收敛速度，但目前缺乏自动调优机制。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化：增量能量最小化
 
@@ -298,7 +301,9 @@ $$
 
 弹性约束权重 $W_y$ 选取为接近约束的有效刚度，以保证数值稳定性。碰撞约束权重 $W_z$ 依赖启发式选择（如 $w^0=25$），目前缺乏自动调优机制，这也是论文指出的局限性之一。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 数值验证
 
@@ -353,7 +358,9 @@ $$
 ![[assets/figures/papers/paper_list_l50_https_research_nvidia_com_labs_prl_daviet23_interactivehair2023_pdf/figures/002_Table_1.jpg]]
 *Table 1: Performance statistics*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 方法溯源与谱系定位
 
@@ -387,6 +394,8 @@ $$
 3. **复杂物理效应的GPU化**：如何高效地将头发产品、空气动力学或双向耦合等效果纳入这种GPU求解框架，同时不破坏三对角全局步的结构优势？
 4. **交互设计的系统化**：交互式物理发型设计的用户界面和交互范式的关键挑战是什么？如何将美术师的直觉操作映射到物理参数空间？
 5. **数据驱动的加速**：能否利用深度学习（如神经插值或潜空间模拟）进一步加速模拟或辅助美术编辑，例如从少量模拟导丝插值出完整发型？
+
+
 
 ## 原文 PDF
 

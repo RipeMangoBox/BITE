@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Bee_A_High_Quality_Corpus_and_Full_Stack_Suite_to_Unlock_Advanced_Fully_Open_MLLMs.pdf
+project_link: https://open-bee.github.io/Bee
+code_link: null
 aliases:
 - HD
 - Bee
@@ -33,7 +35,7 @@ claims:
 | 中文题名 | Bee：高质量语料库与全栈套件，解锁先进的全开放多模态大语言模型 |
 | 英文题名 | Bee: A High-Quality Corpus and Full-Stack Suite to Unlock Advanced Fully Open MLLMs |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=IVluwK8q9q); [Project](https://open-bee.github.io/Bee) |
+| Links | [paper](https://openreview.net/forum?id=IVluwK8q9q) · [Project](https://open-bee.github.io/Bee) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | HoneyPipe (数据流水线) 和 DataStudio (数据策展框架) |
 | Dataset | MMMU, MMStar, MMMU-Pro, CountBench |
@@ -43,15 +45,17 @@ claims:
 > - MMStar 上，Score 为 71.4，对比 InternVL3.5-8B: 67.7，变化 +3.7。
 > - MMMU-Pro 上，Score 为 50.7，对比 InternVL3.5-8B: 49.5，变化 +1.2。
 
-## 概述
+## 概要
 
 本文提出了一套全栈开放多模态大语言模型（MLLM）解决方案，包括高质量监督微调（SFT）数据集 **Honey-Data-15M**、数据策展流水线 **HoneyPipe** 及其底层框架 **DataStudio**，以及基于此训练的8B参数模型 **Bee-8B**。核心贡献在于通过系统性的数据清洗和双层级思维链（CoT）增强策略，构建了一个约1500万问答对的高质量SFT数据集，使全开放模型Bee-8B在多个基准上达到与半开放模型（如InternVL3.5-8B）竞争甚至超越的性能，建立了全开放MLLM的新最优水平（SOTA）。
 
-## 背景与动机
+
 
 现有开源SFT数据集普遍存在两大根本性质量问题：一是广泛的数据噪声，包括事实错误、图文不匹配和格式缺陷；二是复杂推理数据的严重不足，特别是缺乏链式思维（Chain-of-Thought, CoT）数据。这些问题导致全开放MLLM与半开放或闭源模型之间存在显著的性能差距。论文指出，数据质量是核心可调节变量，通过系统性的数据清洗和双层级CoT增强，可以显著提升模型性能。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 1. **Honey-Data-15M数据集**：约1500万问答对的高质量SFT数据集，通过系统清洗和双层级CoT增强构建。
 2. **HoneyPipe数据策展流水线**：开源、模型驱动的自动化数据策展流程，从清洗到增强完全自动化，作为昂贵人工标注的可扩展且经济的替代方案。
@@ -59,7 +63,7 @@ claims:
 4. **五阶段训练策略**：MLP预热、视觉-语言对齐、大规模SFT（15M）、高效精炼SFT（1M）、GRPO强化学习（50K）。
 5. **Bee-8B模型**：基于Qwen3-8B和SigLIP2视觉编码器，在Honey-Data-15M上训练，建立全开放MLLM新SOTA。
 
-## 整体框架
+
 
 整体框架由数据策展流水线（HoneyPipe）和模型训练流水线两部分组成。
 
@@ -76,7 +80,7 @@ claims:
 - **Stage 4: 高效精炼SFT**：在Honey-Data-1M（100万高质量子集）上精炼。
 - **Stage 5: GRPO强化学习**：在50K项上使用GRPO算法优化。
 
-## 核心模块与公式推导
+
 
 ### 1 数据清洗模块
 
@@ -114,7 +118,9 @@ $$MA = MB, NA = NC$$
 $$s = \frac{\theta}{360^\circ} \times 2\pi r$$
 给定圆心角（度）和半径的弧长。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 1 主要结果
 
@@ -166,7 +172,9 @@ Tables 3-6展示了Stage 3、4、5在通用VQA、表格/图表/文档理解、�
 - 5次独立推理运行的评估结果标准差极低。
 - 论文详细列出了所有使用数据集的许可条款（附录G），部分数据集许可信息缺失。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1 方法谱系
 
@@ -200,12 +208,12 @@ Tables 3-6展示了Stage 3、4、5在通用VQA、表格/图表/文档理解、�
 - Honey-Data-15M数据集是否会导致模型在特定领域（如STEM）过拟合，而牺牲通用能力？
 - 数据策展流程中使用的模型（如Qwen2.5-VL-72B）本身是否引入了数据偏差，如何量化？
 
-## 整体框架
+### 整体框架
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_IVluwK8q9q_Bee_A_High-Qual/figures/001_Figure_1.jpg]]
 
 
-## 实验与分析
+### 实验与分析
 
 ### 补充图表
 
@@ -223,6 +231,8 @@ Tables 3-6展示了Stage 3、4、5在通用VQA、表格/图表/文档理解、�
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_IVluwK8q9q_Bee_A_High-Qual/figures/010_Table_4.jpg]]
 *Table 4: Performance comparison of our model after Stage 3, Stage 4, and Stage 5 on general VQA benchmarks (Part 2). The top and second-best scores for each benchmark are highlighted*
+
+
 
 ## 原文 PDF
 

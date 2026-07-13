@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/A_Study_on_PAVE_Specification_for_Learnware.pdf
+project_link: null
+code_link: null
 aliases:
 - PVPS
 - SPSL
@@ -41,7 +43,7 @@ claims:
 > - Computer Vision Datasets (with corrupted learnwares) 上，Avg. Accuracy 为 0.887，对比 PAVE* 0.745，变化 +0.142。
 > - Medical LLM Benchmarks (PubMedQA) 上，Accuracy 为 76.50，对比 Oracle 76.50，变化 0.00 (matches Oracle)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：在开放、异构的学件市场中，任务语义多样、输出空间不可比，且开发者提交的模型质量参差不齐，使得在不访问原始训练数据的前提下，精准识别对用户任务“有帮助”的模型成为一个核心难题。
 
@@ -58,7 +60,7 @@ claims:
 
 **需注意的局限**：低秩理论界依赖于各层范数均匀假设（未经验证）；实验规模有限（最大 17 任务），大规模异构库下的鲁棒性待检验；隐私保护仅靠低秩压缩的难逆性，缺乏形式化差分隐私保证。
 
-## 背景与动机
+
 
 学件（learnware）生态旨在构建一个开放、协同的模型复用体系：开发者将训练好的模型提交至学件坞（learnware dock system），用户无需接触原始训练数据即可检索并适配适合自身任务的模型。然而，这一范式的核心瓶颈在于——在异构、语义多样的任务空间中，模型输出结构互不相同，且模型质量参差不齐，**在不访问原始训练数据的条件下，精准识别对用户任务真正有帮助的模型极为困难**。具体而言，存在两个相互交织的关键难题：1）任务的语义类型与输出空间差异巨大（如文本分类、图像分割、回归），导致传统基于分布距离的模型规范（如 RKME）难以有效捕获模型能力与任务需求的对齐关系；2）模型开发者提交的学件质量并无保障，识别机制必须能够区分高能力模型与低质量甚至损坏的模型，而不能仅凭数据分布的相似性做判断。
 
@@ -66,7 +68,9 @@ claims:
 
 为填补这一缺口，本研究提出 **参数向量规范（PAVE）**，其核心动机是通过共享预训练骨的参数变化量，同时编码**任务语义**与**模型质量**。具体思路为：开发者利用本地训练数据，通过微调预训练模型 $f$ 以拟合模型预测的条件概率 $p(\hat{y}|x)$，得到表示模型能力的参数向量 $\tau_h$；用户则基于少量样本和任务损失，通过类似过程生成代表任务需求的参数向量 $\tau_u$。二者间的余弦相似度 $\cos(\tau_h, \tau_u)$ 被用来定量衡量模型能力与用户需求的对齐程度（**式 (2)**）。这一设计统一解决了输出空间不可比与模型质量无保证两大障碍：参数向量中蕴含了任务语义（来自预训练模型特征空间的梯度）和模型预测能力（来自拟合目标 $h(x)$），因而能够同时区分任务类型差异和模型优劣。在理论上，这一机制在神经正切核（NTK）假设下与基于最大均值差异（MMD）的规范保持顺序一致性，为通过参数向量识别学件提供了严格保证。此外，通过低秩近似进一步将存储与计算开销降低至原先 1% 以下，为大规模学件检索铺平了道路。由此，PAVE 从设计上克服了传统规范在异构任务与质量不确定性下的固有弱点，为学件坞的实用化提供了核心驱动。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PAVE（Parameter Vector Specification）的核心创新在于将学件识别问题转化为**统一参数向量空间中的相似度匹配问题**，从根本上解决了异构输出空间下模型能力描述与质量评估两大瓶颈。
 
@@ -96,7 +100,7 @@ PAVE用**余弦相似度取代MMD**作为对齐度量（changed slot: similarity
 
 **需注意的理论局限**：Theorem 4的推导依赖于各层B矩阵范数近乎均匀的假设（Eq. 36），该假设在异构网络层中的普适性未经验证。若层间范数差异过大，近似误差可能超出理论界，需要在实际部署中加以监控。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0004_JkKkquv5lw_A_Study_on_PAVE_Specification_for_Learnware/figures/001_Figure_1.jpg]]
 *Figure 1: Identifying helpful learnwares based on parameter vector similarity. 1. The developer trains the model with a large amount of data in $\mathcal { D } _ { t }$ and generates the model vector $\tau _ { h }$ based on the model prediction ${ \hat { y } }$ , then submits them to the system as a learnware. 2. The user generates the task vector $\tau _ { u }$ from a few samples in $\mathcal { D } _ { u }$ . ~ 3 . . The larger the cosine similarity between the model and task vectors means that the more likely the model capability is to fulfill the user task requirements
@@ -126,7 +130,7 @@ $$
 
 这一流程在 NTK 假设下等价于在分布间执行 MMD 比较，从而无需访问原始数据即可可靠筛选。为应对大规模学件库的存储和计算压力，PAVE 进一步引入**低秩近似**：将参数向量分解为固定随机矩阵 $\mathbf{A}$ 与可学习矩阵 $\mathbf{B}$ 的乘积 $\tilde{\tau} = \mathbf{B}\mathbf{A}$，仅保留 $\mathbf{B}$ 参与相似度计算。近似关系 $\cos(\tilde{\tau}_1, \tilde{\tau}_2) \approx \cos(\mathbf{B}_1, \mathbf{B}_2)$ 在形式化误差界保证下，将存储和计算开销降低到完整方案的 1% 以下，同时几乎不损失识别精度。
 
-## 核心模块与公式推导
+
 
 ### 设计动机与核心机制
 在开放、异构的学件生态中，任务的语义多样且输出空间不可直接比较，加之模型质量参差不齐，使得在不访问原始训练数据的前提下精准识别有用模型极为困难。PAVE（参数向量规范）通过**同时拟合模型能力 p(ŷ|x) 和任务需求 p(y|x)** 来构建统一的表征，并利用向量余弦相似度度量对齐程度，一举解决语义异构与质量无保证两大难题。在神经正切核（NTK）条件下，该相似度与基于最大均值差异（MMD）的 RKME 排序一致，等价于在隐含核空间中进行分布匹配。
@@ -190,7 +194,9 @@ $$
 
 从而在仅需存储 $\mathbf{B}$ 的条件下（参数量降至原来的 0.1%–1%）仍能可靠保持相似度排序，支撑学件库的大规模高效检索。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 PAVE 在跨任务、跨模态的学件识别场景中展现出一致的优势，其核心在于通过拟合模型预测分布 $p(\hat{y}|\mathbf{x})$ 构建参数向量，同时编码任务语义与模型能力，解决了输出空间不可比和模型质量无保证两个根本瓶颈。以下围绕主结果、关键消融、效率分析和失效边界展开。
 
@@ -244,7 +250,9 @@ PAVE 在跨任务、跨模态的学件识别场景中展现出一致的优势，
 ![[assets/figures/papers/iclr26_0004_JkKkquv5lw_A_Study_on_PAVE_Specification_for_Learnware/figures/030_Table_12.jpg]]
 *Table 12: Table A12: The statistical significance of our method: p-values*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与直接微调基线的关系：从单模型适配到学件复用
 
@@ -303,6 +311,8 @@ $$\cos(\tilde{\tau}_1, \tilde{\tau}_2) \approx \cos(\mathbf{B}_1, \mathbf{B}_2)$
 4. **结构化低秩近似**：低秩近似是否可进一步按模块或层分配不同秩，在Transformer的注意力层和MLP层之间平衡效率与表征精度？
 
 5. **联邦场景下的隐私增强**：在分布式协作构建学件库时，如何在不暴露原始梯度的情况下生成和匹配任务向量？这需要将低秩近似与安全多方计算或联邦学习技术结合。
+
+
 
 ## 原文 PDF
 

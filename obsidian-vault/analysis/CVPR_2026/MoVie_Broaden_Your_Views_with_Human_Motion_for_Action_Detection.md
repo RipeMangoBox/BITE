@@ -42,7 +42,7 @@ claims:
 > - Multi-THUMOS 上，frame-level mAP (%) 48.3 (ViCLIP) vs 先前最优视觉方法 (+3.7%)。
 > - Charades 上，frame-level mAP (%) 33.5 (ViCLIP) vs 先前最优视觉方法 (N/A)。
 
-## 概述
+## 概要
 
 现有基于RGB的动作检测方法在处理复杂、组合性动作时面临根本瓶颈：视觉模型天然缺乏对物理运动动力学的理解，难以捕捉精细的时序动态。直接引入骨架模态的朴素方案——使用全局动作标签训练粗粒度特征（如AGCN）并与视觉特征简单拼接——不仅未能解决这一问题，反而因异构特征空间的相互干扰而引入噪声。MoVie的核心洞察在于：**骨架运动应被视为结构化的物理先验，而非简单的辅助模态**。通过将运动分解为可学习的物理基元，并以正交投影的方式将这些基元作为正则化器注入视觉特征空间，MoVie实现了运动与视觉的结构化融合，使视觉表示在保持语义丰富性的同时获得几何与运动一致性。
 
@@ -50,7 +50,7 @@ claims:
 
 实验证据直接验证了方法的核心主张。在TSU-CS数据集上，MoVie以I3D视觉特征超越先前最优纯视觉方法**+15.9% mAP**，这一决定性提升表明结构化运动信号的引入是性能飞跃的根本原因。消融实验中，移除MGFR的正交性约束导致性能下降**2.8%**，证明正交投影对齐是实现有效正则化的必要条件。逐类分析进一步揭示，运动密集型活动（如起身+46.9%、搅拌+32.8%）获得巨大增益，而缺乏显著运动的动作提升微小，表明框架精准捕获了动作的运动本质。然而，框架对细粒度手物交互（如从瓶子喝水-4.1%）仍存在性能下降，揭示了当前方法在手部和物体显式建模方面的局限性。
 
-## 背景与动机
+
 
 ### 动作检测的核心瓶颈：视觉模型缺乏物理运动理解
 
@@ -76,7 +76,9 @@ MoVie的核心洞察在于：**骨架运动不应被视为辅助模态，而应�
 
 Figure 1(b)-(d) 展示了这一框架的整体逻辑：从骨架序列中学习结构化运动基元，通过运动引导特征正则化（MGFR）将其对齐并注入视觉空间，最终送入历史感知的跨模态时序编码器进行精确的动作检测。这一设计从根本上解决了“视觉模型忽视物理运动”的瓶颈，为动作检测提供了新的范式。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MoVie的核心突破在于**将骨架运动重新定义为结构化的物理先验，而非单纯的辅助模态**，并通过两个关键机制实现运动与视觉特征的深度融合：**结构化运动投影（SMP）** 和 **运动引导特征正则化（MGFR）**。这一设计从根本上改变了运动信号与视觉表征的交互方式，使模型能够捕捉复杂、组合性动作的精细动态。
 
@@ -111,7 +113,7 @@ $$\mathbf{F_{mv}'} = \mathrm{TM}(\mathrm{concat}[\mathbf{F_{mv}}, \mathbf{F_h}])
 
 运动密集型活动的巨大增益直接验证了框架的核心价值。在TSU-CS数据集上，“起身”动作提升+46.9%，“搅拌”提升+32.8%，而缺乏全身运动的动作（如“从瓶子喝水”-4.1%）提升微小甚至下降（Table 4）。这表明MoVie精准捕获了动作的运动本质，而非简单地从多模态数据中获益。整体上，MoVie以I3D特征在TSU-CS上超越先前最优视觉方法**+15.9% mAP**（Table 1），在Multi-THUMOS上提升**+3.7% mAP**，为运动-视觉结构化融合的有效性提供了强有力的实证支撑。
 
-## 整体框架
+
 
 MoVie 将人体运动视为结构化的物理先验，而非简单的辅助模态。其核心流程由两条并行的编码通路与一个跨模态正则化模块构成，最终通过时序编码器输出帧级多标签动作预测。
 
@@ -132,7 +134,7 @@ $$\mathbf{F}_{\mathbf{mv}} = \epsilon(\mathbf{F}_{\mathbf{v}}) + \lambda (\mathb
 ![[assets/figures/papers/paper_list_l1072_https_openaccess_thecvf_com_content_CVPR2026_html_Yang_MoVie_Broaden_You/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the MoVie framework. (a) Conventional RGB-based methods struggle to capture complex and compositional motions. (b) MoVie introduces motion as a structured physical prior to complement visual representation. (c) Structured motion primitives are learned from skeleton sequences through a motion decomposition model. (d) The Motion-guided Feature Regularization (MGFR) aligns these primitives to inject geometric and physical cues into the visual space, and the learned features are sent to a history-aware Multi-modal Temporal Processing for more accurate action detection*
 
-## 核心模块与公式推导
+
 
 MoVie 的核心设计逻辑是将骨架运动视为结构化的物理先验，通过“分解-对齐-注入”三阶段将其有机地融入视觉特征空间，而非简单地拼接或晚期融合。以下按模块阐述其关键机制与公式。
 
@@ -208,7 +210,9 @@ $$\mathcal{L}_{det} = -\frac{1}{T}\sum_{t,c} [ y_{t,c}\log P_{t,c} + (1-y_{t,c})
 ![[assets/figures/papers/paper_list_l1072_https_openaccess_thecvf_com_content_CVPR2026_html_Yang_MoVie_Broaden_You/figures/009_Figure_4.jpg]]
 *Figure 4: Example of the SMP (“Get up”). Primitives in (a) that correspond to torso bending and leg extension are strongly activated. Primitives in (b) with almost no activation change mostly correspond to arm rotation or minor upper-body motion*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果：结构化运动先验的决定性作用
 
@@ -270,7 +274,9 @@ Table 4 的逐类分析揭示了 MoVie 增益的分布规律，这一规律直�
 - **Table 4**：运动密集型活动（起身 +46.9%、搅拌 +32.8%）大幅受益，手物交互动作（从瓶子喝水 -4.1%）下降，暴露手部建模缺失的局限。
 - **Figure 3**：定性示例展示 MoVie 在光照恶劣、背景混乱场景下的鲁棒性，以及骨架质量退化时的性能边界。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有方法的谱系关系
 
@@ -303,6 +309,8 @@ MoVie 的核心贡献在于将人体骨架运动重新定位为**结构化的物
 3. **运动字典的自适应优化。** 运动字典的规模 K 与基元的物理可解释性是否可以进一步自动化或由下游任务驱动优化？当前的固定字典设计限制了模型对未知运动模式的适应能力。
 
 4. **跨域泛化能力。** MoVie 在三个数据集上展示了有效性，但其运动字典和正则化策略在更广泛的域偏移（如不同相机视角、不同运动风格）下的泛化能力尚未得到系统验证。
+
+
 
 ## 原文 PDF
 

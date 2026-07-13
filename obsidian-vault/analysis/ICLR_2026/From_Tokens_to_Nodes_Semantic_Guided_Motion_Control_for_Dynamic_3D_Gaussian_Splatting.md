@@ -33,7 +33,7 @@ claims:
 | 中文题名 | 从标记到节点：基于语义引导的动态3D高斯溅射运动控制 |
 | 英文题名 | From Tokens to Nodes: Semantic-Guided Motion Control for Dynamic 3D Gaussian Splatting |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=ginzNWATI1) · [arXiv](https://arxiv.org/abs/2411.17044) · [Code](https://github.com/YvanYin/Metric3D) |
+| Links | [paper](https://openreview.net/forum?id=ginzNWATI1) · [paper](https://arxiv.org/abs/2411.17044) · [Code](https://github.com/YvanYin/Metric3D) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Ours (MANI + Spline trajectories) |
 | Dataset | Hyper-NeRF, N3DV |
@@ -43,7 +43,7 @@ claims:
 > - N3DV 上，PSNR↑ 23.31 vs Grid4D 22.51 (+0.80)；SSIM↑ 0.821 vs Grid4D 0.805 (+0.016)。
 > - Hyper-NeRF 上，FPS↑ 70 vs 4DGS 34 (+36)。
 
-## 概述
+## 概要
 
 动态3D高斯溅射（3DGS）通过显式点云表示在静态场景重建中取得了显著成功，但将其扩展到动态场景时面临一个核心瓶颈：**控制点分配密度与运动复杂度不匹配**。现有稀疏控制点方法（如SC-GS、MoSca）普遍采用最远点采样（FPS）或体素化等几何均匀策略初始化控制节点，导致静态背景区域存在大量冗余节点，而动态前景区域控制点密度不足，限制了重建质量和计算效率。
 
@@ -54,7 +54,7 @@ claims:
 
 在Hyper-NeRF和N3DV两个主流动态场景数据集上，所提方法在PSNR、SSIM和LPIPS指标上均超越现有SOTA方法（包括Grid4D、4DGS、SC-GS等），同时在渲染速度（70 FPS vs. 4DGS的34 FPS）和存储开销（25 MB vs. 4DGS的61 MB）方面展现出显著优势。消融实验进一步验证了MANI和样条轨迹各自的关键贡献，以及VFM先验对框架的稳定支撑作用。
 
-## 背景与动机
+
 
 ### 动态场景重建的核心挑战
 
@@ -82,7 +82,9 @@ claims:
 
 这一方法在Hyper-NeRF和N3DV数据集上均取得了最优的重建质量（PSNR分别达到25.78和23.31），同时保持了显著的计算效率优势——渲染速度达70 FPS，存储仅需25 MB，相比4DGS分别提升约2倍和压缩约2.4倍。消融实验进一步证实，运动自适应节点初始化（MANI）和样条轨迹参数化各自贡献显著，组合后达到最佳效果。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作针对现有动态3DGS稀疏控制方法中“控制点密度与运动复杂度失配”这一瓶颈，提出了两项关键创新，分别对应控制点初始化与运动轨迹建模两个核心槽位。
 
@@ -148,7 +150,7 @@ $$\operatorname* { m i n } _ { \{ P _ { k } \} _ { k = 1 } ^ { K } } \ \sum _ { 
 
 **因果杠杆**：控制点分配密度与运动复杂度的匹配程度是核心杠杆——MANI通过语义和运动先验重新平衡静态与动态区域的资源分配，样条轨迹提供平滑紧凑的运动表示，两者协同实现了在高效计算下显著提升动态细节重建质量的目标。
 
-## 整体框架
+
 
 本文提出的动态3D高斯溅射运动控制框架，以“从标记到节点”为核心设计理念，通过引入视觉基础模型（VFM）的语义与运动先验，将控制点密度与场景运动复杂度自适应对齐。整个pipeline由五个紧密耦合的模块构成，其输入为单目视频，输出为可动态渲染的规范空间3D高斯表示。
 
@@ -171,7 +173,7 @@ $$\operatorname* { m i n } _ { \{ P _ { k } \} _ { k = 1 } ^ { K } } \ \sum _ { 
 ![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_ginzNWATI1/figures/001_Figure_1.jpg]]
 *Figure 1: The overview of our method. (A) Given a monocular video, we extract semantic and motion priors from pre-trained vision foundation models. (B) These priors guide motion-adaptive node initialization, yielding compact distributions aligned with dynamic regions. (C) The initialized nodes are assigned splineparameterized trajectories to provide a motion basis. (D) Node motions are propagated to Gaussians through deformation, transforming the canonical representation. (E) The deformed model is rendered and optimized for consistent reconstruction*
 
-## 核心模块与公式推导
+
 
 ### 3DGS 渲染基础
 
@@ -256,7 +258,9 @@ $$\mathcal { L } _ { \mathrm { a r a p } } = \displaystyle \sum _ { t = 1 } ^ { 
 ![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_ginzNWATI1/figures/009_Figure_4.jpg]]
 *Figure 4: Visualization of different Node init. meth. on Chicken scene of Hyper-NeRF data (Park et al. (2021b))*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -331,7 +335,9 @@ $$\mathcal { L } _ { \mathrm { a r a p } } = \displaystyle \sum _ { t = 1 } ^ { 
 ![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_ginzNWATI1/figures/016_Table_8.jpg]]
 *Table 8: Ablation study on η*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与动态场景表示方法的谱系关系
 
@@ -393,6 +399,8 @@ $$\mathcal { L } _ { \mathrm { a r a p } } = \displaystyle \sum _ { t = 1 } ^ { 
 4. **扩展到多目和长视频**：当前方法针对单目视频设计，扩展到多目设置或长视频（需处理循环运动、场景进出等）时，节点管理和样条参数化策略需要相应调整。
 
 5. **实时训练**：训练时间39分钟仍远未达到实时，探索更高效的节点初始化策略、简化优化流程或引入预训练先验加速收敛，是走向实际应用的关键一步。
+
+
 
 ## 原文 PDF
 

@@ -42,7 +42,7 @@ claims:
 > - TextSeg 上，fgIOU / F-score 89.52 / 94.33。
 > - STS-SynthV 上，fgIOU 93.25 vs 91.67 (Hi-SAM) (+1.58)。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -71,7 +71,7 @@ SAM2Text处于**视频分割基础模型域适应**与**场景文本分割**的�
 
 > **注意**：SAM2Text的消融基线（如+SAM2.1、+LoRA）在评估时使用了oracle提示（GT边界框），而完整模型在无提示设定下运行，因此报告的增益可能部分来自基线评估条件更严苛这一因素。合成数据训练的模型在真实复杂场景下的泛化边界、以及极长视频或严重运动模糊条件下的稳定性，仍需进一步验证。
 
-## 背景与动机
+
 
 ### 视频场景文本分割的独特挑战
 
@@ -104,7 +104,9 @@ SAM2Text处于**视频分割基础模型域适应**与**场景文本分割**的�
 
 此外，为填补数据空白，本文构建了首个大规模视频场景文本分割数据集，包含合成数据集 **STS-SynthV**（1,410 段视频，147,852 帧）和真实场景数据集 **STS-RealV**（660 段视频，69,000 帧），为该方向的系统评估提供了基准。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SAM2Text 的核心创新在于将通用视频分割模型 SAM2 改造为专用的视频场景文本分割器，同时完整保留其流式处理能力。这一改造围绕四个关键维度展开，分别对应 SAM2 在文本域暴露的结构性缺陷。
 
@@ -160,7 +162,7 @@ $$r_j = \cos(q_t, k_j) + \lambda \cdot \mathrm{qual}_j$$
 
 四个 changed slots 构成一条因果链路：LoRA 适配解决特征域不匹配 → 自提示模块消除外部提示依赖 → 多分辨率解码器恢复笔划细节 → 增强记忆机制保障时间一致性。各组件增益在消融实验中呈累加效应，从 SAM2.1 基线（fgIOU 77.45%）逐级提升至完整 SAM2Text（fgIOU 80.71%），验证了每项改造的独立贡献与协同作用。
 
-## 整体框架
+
 
 SAM2Text 在 SAM2 的流式视频分割架构之上，围绕四个核心瓶颈进行改造：**文本域适应性不足**、**对外部提示的依赖**、**掩码分辨率受限**以及**长序列时间一致性退化**。框架整体保持 SAM2 的逐帧流式处理范式，通过 LoRA‑adapted 图像编码器、自提示模块、多分辨率掩码解码器和增强记忆模块四个组件串联，实现从原始视频帧到高保真文本掩码的端到端映射。
 
@@ -212,7 +214,7 @@ SAM2Text 在 SAM2 的流式视频分割架构之上，围绕四个核心瓶颈�
 ![[assets/figures/papers/paper_list_l2414_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_SAM2Text_Towards/figures/002_Figure_2.jpg]]
 *Figure 2: The overview of our proposed SAM2Text*
 
-## 核心模块与公式推导
+
 
 SAM2Text 在 SAM2 基座上引入四个关键改造模块，协同解决视频场景文本分割中的域适应、免提示、精细掩码和时间一致性难题。
 
@@ -283,7 +285,9 @@ $$r_j = \cos(q_t, k_j) + \lambda \cdot \mathrm{qual}_j$$
 ![[assets/figures/papers/paper_list_l2414_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_SAM2Text_Towards/figures/003_Figure_3.jpg]]
 *Figure 3: Two-tier memory: Top-K retrieval from the bounded long-term memory pool*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -336,7 +340,9 @@ Table 3 展示了在 STS-RealV 上的逐组件消融结果，以 SAM2.1 基线�
 ![[assets/figures/papers/paper_list_l2414_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_SAM2Text_Towards/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of existing datasets [1–11] for text detection and segmentation: rich for image/video detection and image segmentation, but missing for video segmentation*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有方法的关系
 
@@ -375,6 +381,8 @@ SAM2Text 的设计前提是视频中存在可辨识的场景文本实例，其�
 - 两层记忆机制中的 Top‑K 检索质量分数 $\mathrm{qual}_j$ 的具体计算方式及其对检索鲁棒性的影响，论文未充分展开。
 - 多分辨率分支之间是否存在互补或冗余，能否通过尺度自适应融合进一步压缩计算开销？
 - 在实时视频流场景下，1024×1024 分支的推理延迟是否满足部署要求，论文未提供推理速度的基准测试。
+
+
 
 ## 原文 PDF
 

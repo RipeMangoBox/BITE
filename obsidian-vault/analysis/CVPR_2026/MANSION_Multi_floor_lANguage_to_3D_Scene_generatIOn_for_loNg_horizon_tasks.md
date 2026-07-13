@@ -43,7 +43,7 @@ claims:
 > - ResPlan-1k (complex residential) 上，Micro-IoU (manual annotation setting) 76.74 vs 33.49 (CHD MA, zero-shot) (+43.25)。
 > - Object Placement (Classroom, 8x8 m) 上，Floor-object reachability (#Rch, %) 100.0 vs 80.0 (Holodeck) / 98.6 (LayoutGPT) (+20.0 / +1.4)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -68,7 +68,7 @@ claims:
 
 在方法谱系中，MANSION区别于纯数据驱动的扩散方法（如ChatHouseDiffusion）、基于LLM的单层布局方法（如Holodeck、LayoutGPT）以及基于图的平面图生成方法（如Graph2Plan）。其训练无关的混合架构和垂直结构支持使其成为当前唯一能够从自然语言直接生成建筑尺度多楼层3D场景的框架，同时也为跨楼层具身智能研究提供了首个大规模的标准化测试平台。
 
-## 背景与动机
+
 
 ### 具身智能的场景瓶颈：从单层走向建筑尺度
 
@@ -97,7 +97,9 @@ MANSION 的核心洞察在于：**通过将多模态大语言模型（MLLM）用
 
 这种**语义与几何解耦的混合架构**是 MANSION 区别于纯数据驱动方法和纯规则方法的关键设计选择。数据驱动方法（如扩散模型）虽然在已知分布上表现优异，但缺乏对垂直约束的显式建模能力，且在分布外场景（如医院）上泛化能力不足；纯规则方法则无法处理开放词汇的语义多样性。MANSION 的混合路径在语义灵活性和几何可靠性之间取得了平衡，为建筑尺度的具身智能研究提供了首个系统性的场景生成基础设施。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MANSION 的核心创新并非单一算法突破，而是一套面向建筑尺度场景生成的**系统性设计范式转移**。其关键创新可归纳为以下五个相互耦合的 **changed slots**，它们共同解决了现有方法从“单层房间”跨越到“多楼层建筑”时面临的根本性瓶颈。
 
@@ -148,7 +150,7 @@ MANSION 设计了 **任务语义场景编辑代理**（Task-Semantic Scene Editi
 
 **关键证据强度总结**：垂直结构支持（Table 1，置信度 0.98）、开放词汇房间类型（Table 1，置信度 0.95）、混合架构有效性（Table 3 消融实验，置信度 0.95）、可达性提升（Table 4，置信度 0.95）、场景编辑代理（Figure 4，置信度 0.95）。所有核心创新均有实验验证支撑，无推测性声明。
 
-## 整体框架
+
 
 MANSION 采用一种**多智能体驱动的混合架构**，将高层语义规划与底层几何求解解耦，从自然语言描述直接生成建筑尺度的多楼层交互式 3D 场景。其核心 pipeline 由四个顺序模块和一个可选的场景编辑代理组成，如 Figure 2 所示。
 
@@ -214,7 +216,7 @@ MANSION 采用一种**多智能体驱动的混合架构**，将高层语义规�
 ![[assets/figures/papers/paper_list_l2540_https_arxiv_org_abs_2603_11554/figures/019_Figure_12.jpg]]
 *Figure 12: Illustration of the single-floor, topology-driven pipeline. (a) Input room topology graph. (b) Cut-round construction and hierarchical splitting over the free region. (c) Final 3D scene instantiation in AI2-THOR after applying structure, objects, and lighting*
 
-## 核心模块与公式推导
+
 
 ### 整体架构：混合MLLM-几何流水线
 
@@ -289,7 +291,9 @@ $$R_r^{(0)} = r_{base} + k \cdot a_r / |\Omega_f(p_t)|$$
 ![[assets/figures/papers/paper_list_l2540_https_arxiv_org_abs_2603_11554/figures/012_Figure_7.jpg]]
 *Figure 7: Qualitative comparison between Holodeck and MANSION under high-level semantic building prompts*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 MANSION的实验评估围绕四个维度展开：平面图生成质量、对象放置合理性、跨楼层具身任务可执行性，以及消融分析对关键设计选择的验证。以下逐一报告主结果与关键发现。
 
@@ -360,7 +364,9 @@ MANSION在可达性上达到100%，显著优于Holodeck的80.0%和LayoutGPT的98
 ![[assets/figures/papers/paper_list_l2540_https_arxiv_org_abs_2603_11554/figures/027_Figure_19.jpg]]
 *Figure 19: Failure case 1*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法类别与核心差异
 
@@ -437,6 +443,8 @@ Holodeck和LayoutGPT在对象放置中采用数量优先策略，忽略了物体
 5. **端到端的任务驱动生成**：场景编辑代理与生成过程的耦合仍较松散。能否实现从任务描述直接端到端优化建筑结构、房间布局和物体放置，是一个值得探索的方向。
 
 6. **非住宅环境的结构合理性**：医院、工厂等非住宅建筑具有更严格的安全规范和结构约束（如消防通道、洁净区隔离）。在保持生成多样性的同时确保这些约束的满足，需要领域知识的显式注入。
+
+
 
 ## 原文 PDF
 

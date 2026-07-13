@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Fast_Escape_Slow_Convergence_Learning_Dynamics_of_Phase_Retrieval_under_Power_Law_Data.pdf
+project_link: null
+code_link: null
 openreview_forum_id: Ae4eZpkXBX
 aliases:
 - TPGFAAPR
@@ -42,7 +44,7 @@ claims:
 > - Synthetic Data (Population GD, d=10^4) 上，Summary statistics (u, s) evolution 为 Three-phase trajectory with plateau，对比 Two-phase decay (isotropic)，变化 Extended plateau phase and slow convergence。
 > - Synthetic Data (Population GD, d=1000) 上，Correlation u(t) growth rate 为 Faster escape for larger a，对比 Uniform growth (isotropic)，变化 Larger a leads to faster initial growth。
 
-## 概述
+## 概要
 
 相位检索（Phase Retrieval）是一类典型的非凸逆问题：从无相位测量 $y = \langle x, w^\star \rangle^2 + \xi$ 中恢复未知信号 $w^\star$，其中输入 $x \sim \mathcal{N}(0, Q)$ 服从各向异性高斯分布。当输入协方差 $Q$ 具有幂律谱 $\lambda_i \propto i^{-a}$（$a > 1$）时，学习动力学呈现出与各向同性情形（$Q = I$）截然不同的行为。
 
@@ -63,7 +65,7 @@ claims:
 
 **局限与开放问题**：当前分析建立在总体梯度流（连续时间、无噪声）和精确幂律谱假设之上。如何将 Duhamel-Volterra 框架推广到离散时间 SGD 和有限样本设置，以及如何拓展到更一般的非线性模型（如多指数族或神经网络），是尚待解决的关键问题。
 
-## 背景与动机
+
 
 相位检索（Phase Retrieval）是一类典型的非线性逆问题：给定无相位量测 $y = \langle x, w^\star \rangle^2 + \xi$，其中 $x \sim \mathcal{N}(0, Q)$ 为各向异性高斯输入，目标是从观测中恢复未知信号 $w^\star$。该问题广泛存在于光学成像、X射线晶体学和无线通信等领域，其学习动力学在高维非凸优化中具有重要的理论标杆意义。
 
@@ -81,7 +83,9 @@ $$\lambda_i = \frac{i^{-a}}{\sum_{j=1}^d j^{-a}}, \quad a > 1$$
 
 核心动机在于回答一个根本性问题：**输入谱的衰减如何定量地支配非线性回归的有限时间收敛行为？** 初步实验证据已揭示了令人意外的现象：如 Figure 1 所示，当 $a > 1$ 时，在线 SGD 下的 MSE 衰减远慢于各向同性情形的指数收敛，且 $a$ 越大收敛越慢。与此同时，Figure 3 却表明，较大的 $a$ 反而加速了初始阶段相关性 $u(t)$ 的增长——这暗示着一种“快速逃离、缓慢收敛”的内在权衡。这一矛盾现象无法被现有各向同性理论解释，迫切需要新的分析框架来揭示各向异性谱与学习轨迹之间的因果机制。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作的核心创新在于将各向异性相位检索的梯度流动力学分解为三个可分析的阶段，并在此基础上导出了显式的MSE缩放定律。这一分解突破了传统各向同性假设下动力学可有限维闭合的限制，揭示了输入协方差谱对收敛速度的定量控制机制。
 
@@ -131,7 +135,7 @@ $$\dot{U}(t) = \big(4(1-3s(t))B + 8S\big) U(t)$$
 
 三阶段分解的核心主张得到了多层次的实验验证：Figure 2在总体梯度流下清晰展示了MSE、$u(t)$ 和 $s(t)$ 的三阶段演化轨迹；Figure 1证实在线SGD下各向异性收敛显著慢于各向同性指数衰减；Figure 3验证了Phase I中 $a$ 越大逃离越快的反直觉预测；Figure 4证实了Phase III近似的有效性。理论方面，Proposition 3和Lemma 1严格建立了无限维系统的Duhamel表示，Theorem 2和Corollary 3导出了显式的MSE缩放律。所有关键主张的证据置信度均在0.9以上。
 
-## 整体框架
+
 
 本文提出了一套**三阶段梯度流分析框架**（Three-phase Gradient Flow Analysis），用于解析各向异性输入协方差下相位检索问题的学习动力学。该框架的核心思想是：将原本无法有限维闭合的无限维耦合常微分方程系统，通过**升维-求解-投影**的策略，分解为三个具有不同主导机制的连续阶段，从而在每个阶段内应用有针对性的近似，最终导出均方误差（MSE）的显式缩放定律。
 
@@ -191,7 +195,7 @@ $$\text{MSE}(T_2+\tau) = (1+O(\varepsilon))\,\text{MSE}(T_2)\,\widehat{S}_d(\tau
 
 框架当前建立在**总体梯度流**（连续时间、无噪声）假设之上，对离散时间 SGD 和有限样本效应的量化推广仍是开放问题。此外，分析严格依赖高斯输入和精确幂律谱假设；实际数据谱的偏离可能导致缩放定律的定量差异。Figure 5 的在线 SGD 实验表明三阶段定性结构对随机扰动具有鲁棒性，但 $a$ 增大会放大波动幅度，暗示有限样本下的理论推广需要新的分析工具。
 
-## 核心模块与公式推导
+
 
 ### 问题设定与损失几何
 
@@ -269,7 +273,9 @@ $$S_d(\tau) = \begin{cases} 1-\frac{16}{d}\tau + O(\frac{\tau^2}{d}), & \beta_d\
 
 这一缩放律直接揭示了**逃离-收敛权衡**：$a$ 越大，Phase I逃离越快，但Phase II/III中小特征值方向的谱尾学习越慢，整体MSE衰减从指数退化为幂律。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -310,7 +316,9 @@ Table 1 总结了各阶段停止时间的符号与量级：Phase I 逃离时间 
 
 4. **初始化依赖**：理论对初始化条件提供了高概率保证，但极端初始化（如初始 $u(0)$ 恰好为零或 $s(0)$ 过大）可能导致 Phase I 逃离失败或时间延长。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题设定与理论定位
 
@@ -361,6 +369,8 @@ Table 1 总结了各阶段停止时间的符号与量级：Phase I 逃离时间 
 4. **过渡区的精确刻画**：Phase II 和 Phase III 之间的过渡能否在更宽松的条件（如非高斯数据）下维持？显式常数是否可以被精确计算，而非仅给出渐近量级？
 
 5. **逃离—收敛权衡的实践利用**：各向异性是否在网络训练中天然引发“逃离—收敛”权衡？实践中能否通过调整优化器或数据预处理策略来利用这一权衡——例如，在训练早期利用大特征值方向快速逃离，后期通过谱自适应学习率加速小特征值方向的收敛？
+
+
 
 ## 原文 PDF
 

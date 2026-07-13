@@ -42,7 +42,7 @@ claims:
 > - BEHAVE 上，ContRate-h ↑ 0.89 vs 0.52 (VisTracker) (+0.37)；ObjFloat ↓ 0.10 vs 0.30 (VisTracker) (-0.20)；ObjJerk ↓ 188.5 vs 524.9 (VisTracker) (-336.4)。
 > - InterCap 上，SR-B ↑ / SR-F ↑ 52.6 / 57.1 vs InterMimic (finetuned) 较低 (显著提升)。
 
-## 概述
+## 概要
 
 从单目视频中恢复人与物体交互（HOI）是理解人类行为的关键技术，但现有运动学重建方法（如 **VisTracker**，Xie et al., CVPR 2023）产生的估计往往包含严重噪声——人体漂浮、物体穿模、关节抖动等物理不合理现象普遍存在。直接将这些噪声运动学作为强化学习（RL）的模仿目标，会导致策略训练不稳定甚至完全失败：朴素RL训练在BEHAVE数据集上的成功率（SR-B）仅为11.4（Table 3）。
 
@@ -54,7 +54,7 @@ claims:
 
 在方法谱系上，本工作位于**单目HOI重建**与**物理仿真引导的人体运动生成**的交叉点。与纯运动学方法（如VisTracker）相比，它引入了物理约束以消除穿透与浮动；与通用物理模仿方法（如InterMimic）相比，它通过自适应采样和双重传播机制专门解决了噪声运动学下的策略学习难题。该框架目前仍受限于初始运动学重建质量，且仅支持单物体、接触动态相对简单的场景，向多物体、多人及场景感知交互的扩展是未来的重要方向。
 
-## 背景与动机
+
 
 ### 单目视频人-物交互重建的物理合理性鸿沟
 
@@ -84,7 +84,9 @@ claims:
 
 通过这一机制，物理合理的状态如同“涟漪”一般从可靠帧向两侧扩散，最终覆盖整个序列（Figure 3）。实验表明，该方法在BEHAVE和InterCap两个标准HOI基准上，相比运动学基线VisTracker在接触率、物体漂浮、物体抖动等物理合理性指标上取得了显著提升（Table 1），同时大幅超越了物理基线InterMimic的成功率（Table 2）。消融实验进一步验证了自适应采样、双重传播和运动学更新每个组件的关键作用（Table 3, Figure 6）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文提出 **Physics-Guided HOI Refinement via RL with Adaptive Sampling and Dual Propagation**，核心创新围绕一个关键瓶颈展开：单目视频的运动学重建（如 **VisTracker**，Xie et al., CVPR 2023）包含严重噪声与物理不合理性（浮动、穿模、抖动），直接用于强化学习训练会导致策略不稳定或失败。针对此，方法在三个维度上引入创新机制。
 
@@ -120,7 +122,7 @@ claims:
 
 三者形成闭环：自适应采样识别可靠帧 → 双重传播从可靠帧向全序列扩散 → 运动学更新将扩散结果固化为新的跟踪目标，使策略在噪声严重的视觉重建中逐步“自举”出完整的物理合理交互序列。
 
-## 整体框架
+
 
 本文提出一种两阶段流水线，目标是从单目视频中恢复物理上合理的人-物交互（HOI）序列。核心思想是：将现成的运动学重建作为含噪声的初始化，然后在物理仿真器中通过强化学习（RL）训练跟踪策略，利用自适应采样与双重传播机制逐步纠正噪声，最终输出物理一致的交互序列。
 
@@ -155,7 +157,7 @@ claims:
 ![[assets/figures/papers/paper_list_l1078_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_Recovering_Physi/figures/001_Figure_1.jpg]]
 *Figure 1: Physically plausible reconstruction of human-object interactions from monocular video. Given an input video, we start from a noisy kinematic reconstruction (e.g., incorrect contact, floating objects, etc). Then, we optimize a policy for this sequence that can rollout a physically plausible version of the observed interaction*
 
-## 核心模块与公式推导
+
 
 ### 两阶段流水线概览
 
@@ -203,7 +205,9 @@ $$\mathbf{r}_t = \mathbf{r}_t^{\mathrm{h}} * \mathbf{r}_t^{\mathrm{o}} * \mathbf
 
 **运动学更新**的关键在于：更新后的运动学不仅用作下一轮回滚的初始化，还**同时作为跟踪目标**。消融实验证实，若仅用于初始化而不更新跟踪目标，策略仍试图模仿原始噪声运动学，性能显著下降（Table 3, Figure 6）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：与运动学基线的定量比较
 
@@ -269,7 +273,9 @@ Table 3 在 BEHAVE 数据集上系统消融了本方法的三个核心设计组�
 ![[assets/figures/papers/paper_list_l1078_https_openaccess_thecvf_com_content_CVPR2026_html_Huang_Recovering_Physi/figures/009_Figure_6.jpg]]
 *Figure 6: Qualitative results from the ablation study. Without using the kinematic update as the tracking target, the policy attempts to imitate the noisy kinematic states, making it difficult to learn how to pick up the box, since there is no human-object contact during the pickup phase (second frame). In contrast, when the kinematic update from the backward rollouts is used as the tracking target, the policy successfully learns to grasp the box and complete the subsequent actions*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与运动学重建基线的关系
 
@@ -318,6 +324,8 @@ Table 3 在 BEHAVE 数据集上系统消融了本方法的三个核心设计组�
 
 1. **端到端视频到动力学系统**：能否直接从像素联合推断几何与物理约束，替代当前的两阶段流水线？这需要解决视觉特征与物理状态表示的对齐问题，以及端到端训练中仿真器不可微的挑战。
 2. **泛化到复杂交互场景**：如何将自适应采样与双重传播机制推广到多物体、多人交互，以及更动态的接触模式（如传递、抛接）？这涉及状态空间扩展、多智能体策略协调以及接触图建模等子问题。
+
+
 
 ## 原文 PDF
 

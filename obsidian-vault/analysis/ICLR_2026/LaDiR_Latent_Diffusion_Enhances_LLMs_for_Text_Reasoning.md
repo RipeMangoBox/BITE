@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/LaDiR_Latent_Diffusion_Enhances_LLMs_for_Text_Reasoning.pdf
+project_link: null
+code_link: null
 openreview_forum_id: z5cPEZ4n6i
 aliases:
 - LaDiR
@@ -41,7 +43,7 @@ claims:
 > - Math (7 benchmarks avg.) 上，Pass@100 为 52.0，对比 45.4 (CoT SFT α=0.7)，变化 +6.6。
 > - Code (4 benchmarks avg.) 上，Pass@1 为 74.5，对比 69.3 (AR SFT)，变化 +5.2。
 
-## 概述
+## 概要
 
 大语言模型在数学推理、代码生成等任务中展现出强大能力，但其主导的自回归解码范式存在一个根本瓶颈：token一旦生成便无法从全局角度进行修正，导致推理过程的自我修正效率低下，且难以系统性地探索多种可能解。现有潜在推理方法（如Coconut、TaH+）虽尝试在连续空间中进行推理，但仍沿用逐token的顺序生成模式，未能充分利用扩散模型的迭代优化能力。
 
@@ -51,7 +53,7 @@ LaDiR针对上述瓶颈，提出了一种新的推理范式：**将文本推理�
 
 在方法谱系中，LaDiR区别于三类主流基线：**自回归思维链**（LLaMA 3.1 8B CoT SFT, Dubey et al., 2024）受限于单向解码；**遮蔽扩散模型**（LLaDA 8B, Nie et al., 2025）在离散token空间操作，缺乏语义级迭代能力；**潜在推理方法**（Coconut, Hao et al., 2024; TaH+, Fu et al., 2025; CODI, Shen et al., 2025a）虽引入连续表示，但未采用扩散去噪机制进行块级修正。LaDiR首次将流匹配扩散与块级潜在推理相结合，在表示形式、推理过程、多样性机制和训练策略四个维度上实现了系统性改进。
 
-## 背景与动机
+
 
 大语言模型在复杂推理任务上的突破，很大程度上得益于思维链（Chain-of-Thought, CoT）的引入——模型将推理过程分解为一系列离散文本步骤，以自回归方式逐token生成。然而，这种自回归解码范式存在一个结构性瓶颈：模型一旦生成某个token，便无法从全局角度对其进行修正。这导致推理过程的自我修正效率低下，且模型难以探索多种可能的解路径，限制了推理的鲁棒性与多样性。
 
@@ -61,7 +63,9 @@ LaDiR针对上述瓶颈，提出了一种新的推理范式：**将文本推理�
 
 针对这些缺口，本文提出**LaDiR**（Latent Diffusion Enhances LLMs for Text Reasoning），核心动机在于：将推理步骤编码为由变分自编码器（VAE）构建的连续潜在思维token块，并利用潜在扩散模型进行块级迭代去噪，从而在语义层面实现推理的自我修正与多样性探索。该方法通过两阶段训练缓解训练-推理不一致，并引入基于排斥力场的多样性引导机制，使模型能够进行可解释、可迭代修正且多样化的潜在推理。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 LaDiR的核心创新在于将大语言模型的推理过程从**离散token空间迁移至连续潜在空间**，通过潜在扩散模型的迭代去噪能力实现语义层面的推理自我修正与多样性探索。相较于传统自回归思维链（CoT）和现有潜在推理方法，LaDiR在三个关键维度上实现了系统性突破。
 
@@ -91,7 +95,7 @@ $$\mathbf{F}(z_i) = \sum_{j \neq i} 2 \left(1 - \frac{\|z_i - z_j\|_2^2}{\sigma^
 
 相较于Coconut（Hao et al., 2024）和TaH+（Fu et al., 2025）等现有潜在推理方法，LaDiR的核心差异在于：前者仍采用**自回归方式**逐块生成连续潜在token，缺乏对已生成潜在表示的全局修正能力；而LaDiR在每个推理块内部使用**双向注意力的扩散去噪**，使得模型能够迭代精炼语义表示。此外，LaDiR通过VAE构建了显式的潜在-文本映射，使得推理过程可解码为可读文本（Table 10展示了GSM8K上的语义级自我修正示例），相较于Coconut等方法的隐式潜在状态具有更强的可解释性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l49_https_openreview_net_forum_id_z5cPEZ4n6i/figures/002_Figure_2.jpg]]
 *Figure 2: Illustration of our block-wise latent reasoning framework. A question Q is first input as condition to generate latent blocks, each delimited by <BOT> and <EOT>. For each block, the model iteratively denoises latent tokens $\hat { \mathbf { Z } } ^ { ( b ) }$ across timesteps, with bidirectional attention inside a block and causal attention across blocks. The reasoning process terminates when the model emits the <SOA> token, after which the model generates the answer text autoregressively
@@ -161,7 +165,7 @@ LaDiR 面临的核心挑战是**训练-推理分布偏移**：第一阶段教师
 
 该框架的核心优势在于：潜在块内的双向注意力使模型能够在语义层面进行全局一致的迭代修正，而块间的因果注意力保留了推理步骤的逻辑递进关系，从而在保持推理可解释性的同时，赋予模型超越传统自回归解码的自我修正与多样性探索能力。
 
-## 核心模块与公式推导
+
 
 LaDiR 的核心架构由三个功能组件构成：**变分自编码器（VAE）** 负责构建连续潜在推理空间，**推理扩散模型** 在潜在空间中执行块级迭代去噪，**答案生成与特殊token预测头** 将去噪后的潜在表示转化为最终答案并控制推理块数量。
 
@@ -217,7 +221,9 @@ $$\hat{z}_{t-1} = f_{\psi}(z_t, t, x) + \gamma_t \mathbf{F}(z)$$
 
 其中 $\gamma_t$ 为随时间步衰减的引导强度。配合**增大初始噪声尺度**（将初始方差从 1 提升至 2），该机制在不损害收敛性的前提下显著提升了解决方案的多样性。实验表明，适中的多样性引导值（0.3–0.5）在 Countdown-4 任务上取得了多样性与准确率的最佳权衡。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：数学推理
 
@@ -298,7 +304,9 @@ LaDiR 在 7 个数学推理基准上取得 43.5% 的平均 Pass@1，超越此前
 ![[assets/figures/papers/paper_list_l49_https_openreview_net_forum_id_z5cPEZ4n6i/figures/014_Figure_6.jpg]]
 *Figure 6: Results for pass@k performance on Countdown-4 with k $\in \{$ 1 , 1 0 , 2 5 , 5 0 , 1 0 0 $\}$*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心基线对比与谱系定位
 
@@ -351,6 +359,8 @@ LaDiR 相较于上述潜在推理基线的关键突破在于：用**块级扩散
 4. **流匹配目标的大规模扩展性**：流匹配（u-prediction）目标在 Countdown-4 上达到 73.5%，显著优于其他扩散目标（Table 5），但在更大规模模型和数据集上的训练稳定性和扩展性如何，仍需验证。
 
 5. **块化策略的自适应选择**：当前每块 1 句子、4 个潜在 token 的块化策略在 GSM8K 上取得最佳平衡（84.2% 准确率，Table 7），但不同任务的最优块大小和潜在 token 数可能不同，如何实现任务自适应的块化策略？
+
+
 
 ## 原文 PDF
 

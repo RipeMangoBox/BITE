@@ -40,13 +40,13 @@ claims:
 > [!tip] 效果简介
 > - NeRSemble 上，PSNR / LPIPS 33.48 / 0.039 (Novel-View); 32.07 / 0.045 (Self-Reenactment) vs GaussianAvatars, MeGA, HERA等先前最优 (在所有指标上全面领先，PSNR明显高于次优方法)。
 
-## 概述
+## 概要
 
 头部化身重建的核心瓶颈在于：逐视图光度监督缺乏跨视图的几何对应，导致训练早期出现伪高频锐化伪影和视图间漂移，细节一致性差。**Fresco** 提出一种频空一致优化范式，在不改变底层表示（FLAME网格 + 高斯毛发场）的前提下，通过**联合频率课程调度与UV空间跨视图纹素对齐**来解耦并稳定优化过程。
 
 具体而言，Fresco 在图像域采用局部拉普拉斯分解，以低频优先、渐进激活高频的策略指导学习；同时在共享UV空间强化多视图纹素一致性，压制伪影、提升视图连贯性。在 NeRSemble 数据集上，Fresco 在新视角合成与自重现任务上全面优于 **PointAvatar** (Zheng et al., CVPR 2023)、**GaussianAvatar** (Qian et al., CVPR 2024)、**MeGA** (Wang et al., CVPR 2025)、**HERA** (Cai et al., arXiv 2024) 等先前最优方法，PSNR 与 LPIPS 均取得最佳结果（表1）。消融实验证实，移除高频分支或UV一致性均导致指标显著下降（表2），验证了频空联合优化的关键作用。
 
-## 背景与动机
+
 
 ### 任务背景
 
@@ -74,7 +74,9 @@ claims:
 
 通过上述频域课程调度与空间 UV 对齐的联合设计，Fresco 在不显著增加训练开销的前提下，实现了结构保真度与视图一致性的双重提升。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Fresco 的核心创新在于**将训练动态而非底层表示作为优化对象**，通过联合调度两个互补的机制——频率课程学习与 UV 空间跨视图一致性——来解决头部化身重建中的根本瓶颈。
 
@@ -117,7 +119,7 @@ $$L_{total}^{(t)} = \begin{cases} \alpha L_{freq}^{low}(t), & t < T_1 \\ \alpha 
 
 这种分阶段调度策略确保了每个组件的引入时机与模型的学习状态相匹配，避免了多目标优化中的冲突和震荡。消融实验证实，移除高频分支会导致所有任务指标下降，移除 UV 一致性会使跨视图合成质量显著退化，而移除缝正则化则在耳朵、发际等区域产生明显的裂纹和颜色不连续。
 
-## 整体框架
+
 
 Fresco 的优化对象是一个**混合显式头部化身**：人脸区域由参数化网格（FLAME）驱动，头发及外围区域由各向异性 3D 高斯集合表示。两套表示共享同一组形状、表情与姿态参数，通过深度排序的 alpha 混合（Eq. 1）渲染为多视图 RGB 图像。与传统方法直接对渲染图像施加逐像素光度损失不同，Fresco 在训练动态层面引入两个相互配合的调控机制——**频率课程调度**与**UV 空间跨视图一致性**——以压制早期伪高频锐化伪影和视图间漂移。
 
@@ -142,7 +144,7 @@ Fresco 的优化对象是一个**混合显式头部化身**：人脸区域由参
 ![[assets/figures/papers/paper_list_l1024_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_Fresco_Frequency/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the proposed Fresco. Multi-view images drive a CNN to estimate 3DMM and an MLP to refine Gaussian hair parameters*
 
-## 核心模块与公式推导
+
 
 Fresco 的核心在于**不改变底层表示**，而是通过联合调度两个互补的优化信号——频率课程与 UV 空间监督——重塑训练动力学，从而压制早期伪高频锐化伪影和视图间漂移。
 
@@ -212,7 +214,9 @@ $$C(\mathbf{x}) = \sum_i c_i \alpha'_i \prod_{j < i} (1 - \alpha'_j) \tag{1}$$
 
 其中 $c_i$ 为基元颜色，$\alpha'_i$ 为考虑不透明度的有效权重。人脸区域由 FLAME 参数化网格建模（形状 $\beta$、表情 $\psi$、姿态 $\varphi$），头发与外围区域由各向异性 3D 高斯集合表示，两者共享姿态驱动以实现动画化。Fresco 的频率课程和 UV 监督独立于具体表示，作用于渲染输出层面。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与设计动机
 
@@ -273,7 +277,9 @@ Table 2系统拆解了各模块的贡献，Figure 4-6提供了对应的定性证
 ![[assets/figures/papers/paper_list_l1024_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_Fresco_Frequency/figures/002_Figure_2.jpg]]
 *Figure 2: Qualitative comparison on self-reenactment of head avatars. Our method reproduces expressions more faithfully, with accurate mouth opening and eye blinking and clearer tooth details*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有头部化身方法的继承与差异
 
@@ -323,6 +329,8 @@ Fresco 的两个关键机制在现有文献中有清晰的知识谱系：
 3. **几何约束的融合潜力**：能否结合深度或法向几何约束，进一步提升跨视图几何一致性？当前纯图像域监督在纹理稀疏区域（如皮肤平滑区）可能缺乏足够信号，几何线索可提供互补的正则化。
 
 4. **自适应频率课程**：能否根据场景内容或训练状态自动调整频率课程参数（如 σ、T_i），从而减少人工调参负担并提升跨场景迁移能力？元学习或基于梯度的超参数优化是可能的探索方向。
+
+
 
 ## 原文 PDF
 

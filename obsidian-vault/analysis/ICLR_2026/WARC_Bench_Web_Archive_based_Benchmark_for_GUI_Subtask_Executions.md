@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/WARC_Bench_Web_Archive_based_Benchmark_for_GUI_Subtask_Executions.pdf
+project_link: https://sanjari-orb.github.io/warc-bench/
+code_link: null
 openreview_forum_id: Hgw56DUFzD
 aliases:
 - WBSVASSR
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | WARC-Bench：基于Web Archive的GUI子任务执行基准 |
 | 英文题名 | WARC-Bench: Web Archive based Benchmark for GUI Subtask Executions |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=Hgw56DUFzD); [Project](https://sanjari-orb.github.io/warc-bench/) |
+| Links | [paper](https://openreview.net/forum?id=Hgw56DUFzD) · [Project](https://sanjari-orb.github.io/warc-bench/) |
 | Topic | #topic/optimization_theory_probabilistic #topic/optimization_theory_probabilistic/reinforcement_learning_and_planning |
 | Method | WARC-Bench + Subtask Vision Agent (SVA) with SFT+RLVR |
 | Dataset | WARC-Bench (Test), WARC-Bench (Dev[TOTAL]), ScreenSpot V2 (OOD, Desktop/Mobile only), WebArena-Lite (WA-Lite) |
@@ -42,7 +44,7 @@ claims:
 > - WARC-Bench (Dev[TOTAL]) 上，Success Rate (%) 为 Ours-72B-RLVR: 84.31，对比 Claude Sonnet 4.0: 83.61; Qwen2.5-VL 72B: 61.06，变化 +0.70 vs Claude; +23.25 vs Qwen。
 > - ScreenSpot V2 (OOD, Desktop/Mobile only) 上，Success Rate (%) 为 Ours-72B-RLVR: 82.74，对比 Qwen2.5-VL 72B: 87.42; GPT-5: 29.67，变化 -4.68 vs Qwen; +53.07 vs GPT-5。
 
-## 概述
+## 概要
 
 现有前沿多模态模型在真实网页 GUI 子任务执行上表现远未饱和：Claude Sonnet 4.0 在 WARC-Bench 测试集上仅达 64.8% 成功率（Table 2），瓶颈集中于复杂 UI 控件交互失误（如日期选择器格式误判、预填充文本字段未清除）与网页探索策略不足。然而，当前基准普遍缺乏对这种短时程、组合式交互能力的系统评估。
 
@@ -58,7 +60,7 @@ claims:
 
 主要局限包括：WARC 无法录制依赖反爬机制的动态网站；合成任务仍需人工验证；子任务执行器在长程代理中的最优集成方式尚未系统探索。
 
-## 背景与动机
+
 
 ### 网页智能体的能力瓶颈：长程导航与短程子任务
 
@@ -89,7 +91,9 @@ Table 1 对比了WARC-Bench与现有基准在交互环境、任务隔离、确�
 2. **设计面向子任务的专用智能体架构**：提出Subtask Vision Agent（SVA），采用纯截图观察、最小化动作空间（8种原子操作）、5步历史窗口与结构化思维链推理，专注于短时程子任务的高效执行。
 3. **通过监督微调与在线强化学习缩小能力差距**：利用前沿模型（教师）生成的蒸馏数据进行监督微调，再通过可验证奖励的在线强化学习（RLVR）进一步优化模型的视觉定位、探索效率与格式遵循能力，显著提升开源模型在子任务执行上的竞争力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 WARC-Bench 的核心创新围绕三个紧密耦合的“变更槽”（changed slots）展开，形成一条从评估环境构建到智能体设计，再到训练范式升级的完整技术链路。
 
@@ -121,7 +125,7 @@ $$ \mathcal{L}^{\mathrm{PPO}}(\theta) = \mathbb{E}_t \Big[ \min \big( r_t(\theta
 
 值得注意的是，**离线 RL 方法（GRPO、PPO）在此任务上表现不稳定**：7B 模型上离线 RL 反而劣于 SFT（GRPO_offline 63.86% vs SFT 66.54%），仅在 72B 上 GRPO_offline 略微超过 SFT（76.89% vs 75.88%），而在线 RLVR 是唯一在两个规模上均稳定提升的方案（Table 5）。这一对比强化了在线交互与可验证奖励对于子任务执行能力训练的必要性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0012_Hgw56DUFzD_WARC-Bench_Web_Archive_based_Benchmark_for_GUI_S/figures/004_Table_1.jpg]]
 *Table 1: Comparison of Multimodal Benchmarks for Web Task Performance of GUI Agents. (—) templates indicate that all benchmark tasks are unique*
@@ -202,7 +206,7 @@ Table 1 将 WARC-Bench 与现有多模态 GUI 基准进行了系统对比，其�
 3. SVA 的纯截图观察可能丢失可访问性树中的结构化信息，在需要精确文本定位的场景中可能处于劣势。
 4. RLVR 的训练目前仅针对短时程子任务，其在长程工作流中的泛化效果仅通过分层规划器设计进行了初步验证（证据锚点：Table 4，+8.46% 提升）。
 
-## 核心模块与公式推导
+
 
 WARC-Bench 的系统管线由四个核心模块串联构成，支撑从网页状态感知到动作执行的闭环。
 
@@ -242,7 +246,9 @@ $$ \mathcal{L}^{\mathrm{PPO}}(\theta) = \mathbb{E}_t \Big[ \min \big( r_t(\theta
 
 奖励信号完全来自 WARC-Bench 内置的程序化验证函数，无需人工标注或判别模型评分，这使得 RLVR 训练可在线、大规模地自动进行。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：前沿模型在子任务执行上仍有显著瓶颈
 
@@ -307,7 +313,9 @@ Figure 5 的准确率-延迟权衡分析显示，Ours-RLVR 变体处于帕累托
 
 这些失败模式指向一个核心问题：**纯截图观察在缺乏显式 UI 结构信息（如可访问性树、DOM 状态）时，难以可靠地传递控件的约束规则和当前状态**。这是 SVA 设计的固有权衡——简化观察空间以降低 token 消耗和延迟，但牺牲了部分关键的结构化信息。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 在现有基准与智能体谱系中的位置
 
@@ -344,6 +352,8 @@ WARC-Bench 所解决的问题位于 GUI 智能体评测的三个断层交汇处�
 3. **离线 RL 为何在小模型上失败。** 离线 GRPO/PPO 在 7B 模型上的退化现象尚未得到充分解释。是否可以通过改进奖励建模（如学习奖励模型而非规则奖励）、增加策略约束或数据增强来弥合这一差距，是一个值得深入的方向。
 
 4. **纯截图观察的信息损失。** SVA 仅使用截图作为观察，在可访问性树（A11y tree）信息丰富的场景中可能丢失了关键的结构化线索。如何在不显著增加上下文长度的前提下融合多模态观察，是提升子任务执行上限的潜在路径。
+
+
 
 ## 原文 PDF
 

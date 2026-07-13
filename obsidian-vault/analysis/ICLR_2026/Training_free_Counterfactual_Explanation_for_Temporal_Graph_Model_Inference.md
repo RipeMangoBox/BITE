@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Training_free_Counterfactual_Explanation_for_Temporal_Graph_Model_Inference.pdf
+project_link: null
+code_link: null
 aliases:
 - TTGE
 - TFCETGMI
@@ -41,13 +43,13 @@ claims:
 > - UCIM (Link Prediction) 上，AUFSC 为 0.475 (TemGX+TGN)，对比 0.218 (TempME+TGN)，变化 +0.257。
 > - UCIM (Link Prediction) 上，Runtime (s) 为 8.2 (TemGX+TGN)，对比 88.4 (TempME+TGN)，变化 −80.2s (约 10.8× 加速)。
 
-## 概述
+## 概要
 
 时序图神经网络（TGNN）已被广泛用于动态图中的链接预测、节点分类和时空回归等任务，但其推理过程难以解释，制约了模型在高风险场景中的可信部署。现有解释方法主要在静态或离散快照上生成子图，无法有效建模时间依赖性，缺乏严格的反事实验证，并且不能提供灵活的结构化查询与“what‑if”分析。针对这些瓶颈，本文提出 **TemGX（TEMporal Graph eXplainer）**，一种训练无关的反事实解释框架。TemGX 在滑动时间窗口内，通过独立级联模型（ICM）量化移除历史边造成的模型输出变化，结合时间电阻距离（TRD）和指数衰减捕捉时空影响力，并采用具有近似保证的贪心验证算法，生成包含解释节点和连接节点的 δ‑可达时间子图。该子图在移除后必须改变 TGNN 对目标节点的预测，从而满足严格的反事实要求，同时保持时间连贯性。方法还支持时序模式匹配查询和动态贝叶斯网络推理，提升了交互分析能力。
 
 实验覆盖六个真实动态图数据集和三种主流任务（链接预测、时空回归、节点分类），与 TempME、TGVex、TGNNExplainer、CoDy 等基线进行全面比较。在 UCIM 链接预测任务上，TemGX 的保真度达到 0.468（TGN 主干），较最佳基线 TempME 提升 113%；AUFSC 达到 0.475，同时解释生成速度提升约 10.8 倍（8.2 s vs 88.4 s）。在 METR‑LA 时空回归任务上，保真度亦达 0.471（STGCN 主干）。消融实验表明，ICM 组件对性能贡献最大（去除后保真度下降 34.2%），时间衰减和 TRD 同样不可或缺。翻转率分析进一步确认，移除解释子图后模型预测改变的比例稳定在 81%–87%，说明 TemGX 解释具有高反事实有效性。整体而言，TemGX 无需额外训练，具备理论近似保证和实用效率，为时序图模型的可解释性提供了新的基础方案。
 
-## 背景与动机
+
 
 动态网络（如金融交易、网络安全、交通预测等）的建模越来越依赖时序图神经网络（Temporal Graph Neural Networks, TGNN）。TGNN 通过编码器‑解码器结构（$f_{E}, f_{D}$）将历史交互序列映射为节点嵌入，并对未来链路概率、节点属性等进行预测（Section 2）。然而，TGNN 的决策过程高度不透明，在金融欺诈检测（Figure 1 中的 Peel Chain 与 Spindle 洗钱模式）、多阶段攻击链溯源等安全关键应用中，模型预测的“黑箱”属性严重制约了其可信部署与人工审核。因此，如何为 TGNN 预测提供可解释、可验证的解释成为迫切需求。
 
@@ -71,7 +73,9 @@ claims:
 
 实验表明，TemGX 在保真度与效率上显著超越现有基线：在 UCIM 数据集上相对 TempME 保真度提升 113%（0.468 vs. 0.219，Table 1），且消融实验确认 ICM、TRD 与时间衰减等都是保障性能的关键组件（Table 3）。至此，TemGX 填补了时序图模型解释中训练无关的反事实方案与时间感知互动能力的空白。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 相较于现有的 TGNN 解释方法，TemGX 在三个层面形成了关键突破：**解释结构的时序化、影响力建模的体系化、验证与优化的严格化**，并将训练依赖转化为训练无关的实用框架。以下根据相对基线的 changed slots 逐一展开。
 
@@ -96,7 +100,7 @@ claims:
 
 上述 changed slots 共同支撑了 TemGX 在核心指标上的大幅提升：在 UCIM+TGN 上，相较于最强的基线 TempME（保真度 0.219），TemGX 达到 0.468（提升 113%），同时 AUFSC 达到 0.475，验证了时序反事实解释框架的有效性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0013_NqtYz3A8tQ_Training-free_Counterfactual_Explanation_for_Tem/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of TemGX framework. Given a target node vt and temporal graph $G _ { t }$ , it constructs a $\delta \mathrm { - }$ reachable candidate pool and estimate influence as the probability of changes when removing each candidate. TRD back-propagation captures temporal resistance, and a temporal influence score $\phi$ combines influence, TRD, and temporal decay. Top-scoring nodes form the explanatory set $V _ { s }$ , induced connectors $V _ { c }$ ensure temporal connectivity, and counterfactual verification confirms that removing $V _ { s } \cup V _ { c }$ changes the TGNN prediction M ( $G _ { t } , v _ { t }$ ) , which in turn contribute to temporal explanations
@@ -144,7 +148,7 @@ TemGX 提出一种训练无关的时序图神经网络解释框架，其核心�
 
 框架集中解决了现有 TGNN 解释方法在时间依赖性捕捉、反事实验证和可查询性三方面的缺失，但结构级子图尚未包含节点特征重要性分析，且其通用性目前绑定于编码器‑解码器架构的 TGNN 模型。
 
-## 核心模块与公式推导
+
 
 ### 关键模块
 
@@ -235,7 +239,9 @@ $$
   $$
   直接度量移除解释子图后预测发生改变的节点比例。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果
 TemGX 在链接预测、时空回归与分类三类任务上均表现出显著优势，在保持高解释保真度的同时大幅缩减运行时间。  
@@ -291,7 +297,9 @@ TemGX 在链接预测、时空回归与分类三类任务上均表现出显著�
 ![[assets/figures/papers/iclr26_0013_NqtYz3A8tQ_Training-free_Counterfactual_Explanation_for_Tem/figures/013_Table_4.jpg]]
 *Table 4: Ablation study on METR-LA+STGCN. Fidelity is reported at the highest sparsity level*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 在时序图解释生态中的定位  
 现有方法可按设计倾向分为三条线路：① **静态解释器的时序拼接**（TGVex）将每个快照视为独立静态图，丢失跨时间传播信号；② **基于信息瓶颈或局部时间模式的解释**（TGNNExplainer 采用导航者-探索者框架，TempME 利用时间模体）虽开始关注时间因素，但缺乏严格反事实约束，无法保证移除解释结构必然改变模型输出；③ **可训练的反事实解释**（CoDy）通过蒙特卡洛树搜索寻找最小反事实边集，却依赖额外训练且可扩展性受限。TemGX 首次将**无训练、反事实强制、多机制时间影响力建模与交互查询**统一于一个框架，填补了“训练无关的严格反事实时序解释”这一空白。其在解释结构与粒度、时间依赖性建模、反事实验证需求、训练开销和查询能力五个维度上对现有基线形成系统改进（见表 1、Table 3-4 的消融验证）。
@@ -320,6 +328,8 @@ TemGX 设计适用于**已训练的 TGNN 编码器‑解码器架构**（如 TGN
 2. **跨模型与跨图类型扩展**：框架能否推广到异构图、时序知识图谱或其他非 TGNN 的时序预测模型（如时序随机游走模型），是拓宽其解释覆盖面的关键。  
 3. **超参数自适应机制**：研发基于数据特性（如图密度、时间相关性）的自动窗口大小和衰减率选择策略，降低对专家经验的依赖。  
 4. **特征级解释的融合**：在现有反事实子图解释之上，是否可自然地嵌入节点特征重要性（如通过特征掩码的反事实操作），以提供更完整的归因视图。
+
+
 
 ## 原文 PDF
 

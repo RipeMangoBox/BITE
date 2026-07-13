@@ -44,7 +44,7 @@ claims:
 > - Toys4K (reconstruction) 上，Hausdorff Distance (HD) 0.067 vs 0.091 (EdgeRunner) (-26.4%)。
 > - Famous (reconstruction) 上，Hausdorff Distance (HD) 0.077 vs Best baseline (优于所有基线)。
 
-## 概述
+## 概要
 
 ### 1. 问题背景
 
@@ -88,7 +88,7 @@ FACE 的核心洞见在于：**在面语义级别而非顶点级别进行生成*
 - **极细结构的挑战**：依赖输入点云意味着极其精细或薄的结构（如自行车辐条）可能无法充分采样，导致在具有挑战性的区域重建不完整。
 - **分辨率扩展性**：分辨率能否在不引入量化误差的情况下扩展到1024以上，仍是待探索的开放问题。
 
-## 背景与动机
+
 
 ### 3D网格生成的核心挑战
 
@@ -116,7 +116,9 @@ FACE 的核心洞见在于：**在面语义级别而非顶点级别进行生成*
 
 同时，FACE在解码端引入**CausalMLP头**作为面内坐标级自回归解码器，在保持“一面一令牌”的宏观效率的同时，精确恢复每个面内的9个量化坐标，实现了效率与精度的统一。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈诊断：序列长度灾难
 
@@ -160,7 +162,7 @@ FACE 采用基于最小坐标顶点的字典序 ZYX 空间排序对面进行序�
 
 这一系列设计选择共同构成了FACE的核心创新：**在面语义级别而非顶点级别进行生成，从根本上降低序列长度，避免复杂的无损压缩方案，同时利用面嵌入层和CausalMLP头实现端到端的高保真网格重建。**
 
-## 整体框架
+
 
 FACE 的整体架构是一个非对称的自回归自编码器（ARAE），其设计核心在于用**面级令牌**替代传统顶点级序列，从根本上压缩自注意力所需的序列长度。如 Figure 2 所示，pipeline 由三个关键模块串联而成：**Shape Encoder**、**Autoregressive Face Decoder** 和 **CausalMLP Head**。
 
@@ -204,7 +206,7 @@ $$\mathcal{L} = \frac{1}{N} \sum_{i=1}^{N} \sum_{j=1}^{9} \text{CrossEntropy}(L_
 ![[assets/figures/papers/paper_list_l2253_https_arxiv_org_abs_2603_01515/figures/004_Figure_3.jpg]]
 *Figure 3: Overview of our image-to-mesh generation pipeline. We first use the input image to condition a DiT model. The resulting latent VecSet is then fed into the Autoregressive Face Decoder to produce the final mesh*
 
-## 核心模块与公式推导
+
 
 FACE 的端到端管线（Figure 2）由三个核心模块串联构成：**形状编码器（Shape Encoder）**、**自回归面解码器（Autoregressive Face Decoder）** 和 **CausalMLP 头**。其中，面解码器内部嵌入了实现“一面一令牌”策略的面嵌入层。
 
@@ -256,7 +258,9 @@ $$\mathcal{L} = \frac{1}{N} \sum_{i=1}^{N} \sum_{j=1}^{9} \mathrm{CrossEntropy}(
 
 其中 $N$ 为面数，$L_{i,j}$ 为第 $i$ 个面第 $j$ 个坐标的预测 logits，$c_{i,j}$ 为对应的真实量化坐标标签。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -326,7 +330,9 @@ Figure 5展示了图像条件网格生成的定性结果。FACE生成的网格�
 ![[assets/figures/papers/paper_list_l2253_https_arxiv_org_abs_2603_01515/figures/011_Figure_6.jpg]]
 *Figure 6: Qualitative comparisons between the base and large model*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 自回归网格生成的方法谱系
 
@@ -383,6 +389,8 @@ FACE 的核心能力边界由其架构选择决定：
 2. **点云采样的信息瓶颈。** FACE 的编码器依赖点云输入，当目标网格包含极其精细的结构时，点云可能无法充分采样这些区域，导致重建不完整。一个开放问题是：能否引入额外的几何先验（如边缘感知采样或自适应查询）来弥补这一信息缺口？
 
 此外，从方法谱系的角度看，FACE 的“一面一令牌”策略与 TreeMeshGPT 的层次化树结构、EdgeRunner 的边级表示之间存在潜在的互补性——将面级 token 与层次化组织相结合，或可进一步压缩序列长度并捕获多尺度几何结构。这一方向尚未被探索。
+
+
 
 ## 原文 PDF
 

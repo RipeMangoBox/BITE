@@ -43,15 +43,13 @@ claims:
 > - HumanML3D 上，FID 0.041 ± .002 vs previous SOTA (new SOTA)；R Precision Top-1 0.528 ± .002 vs previous SOTA (new SOTA)。
 > - KIT-ML 上，FID 0.148 ± .008 vs previous SOTA (new SOTA)；R Precision Top-1 0.442 ± .005 vs previous SOTA (new SOTA)。
 
-## 概述
+## 概要
 
 人体运动生成的核心瓶颈在于**语义理解与物理细节的同质化建模**。现有方法或采用纯连续扩散模型（如 **MLD** (Chen et al., CVPR 2023)、**MDM** (Tevet et al., arXiv 2022)），虽能保留关节平滑性等高频动态，却在复杂组合语义推理上受限；或采用纯离散自回归模型（如 **T2M-GPT** (Zhang et al., CVPR 2023)、**MoMask** (Guo et al., CVPR 2024)），虽擅长高层语义规划，却因向量量化造成细粒度物理细节丢失。这一矛盾使得单一表示空间难以同时兼顾运动真实感与文本对齐精度。
 
 DC-Motion 提出**离散-连续解耦生成框架**，将运动显式分解为语义结构与物理细节两个层次，分别用不同机制处理。其核心思路是：首先通过 DC-VAE 将运动编码为离散语义令牌与连续残差，前者捕获高层语义和时间布局，后者保留量化损失的高频动态；随后采用两阶段生成——MaskGIT 以双向注意力迭代掩码预测生成全局语义令牌序列，残差扩散模型在固定结构先验上恢复物理细节。这种解耦设计使语义规划与细节精修各司其职，从根本上缓解了单一空间的信息折衷。
 
 在 HumanML3D 和 KIT-ML 两个基准上，DC-Motion 取得了当时最优的 FID（0.041 和 0.148）与 R-Precision，验证了运动真实感和文本对齐能力的双重提升。消融实验进一步证实：移除连续残差分支使重建 MPJPE 从 25.8 升至 41.7，移除离散分支使生成 FID 从 0.041 升至 0.081，表明两个分支对最终性能均有不可替代的贡献。
-
-## 背景与动机
 
 人体运动生成旨在根据文本描述合成逼真的三维人体动作序列，是计算机视觉与图形学交叉领域的研究热点。近年来，扩散模型和自回归模型在该任务上取得了显著进展，代表性工作包括基于连续潜在扩散的 **MLD**（Chen et al., CVPR 2023）、基于运动扩散的 **MDM**（Tevet et al., arXiv 2022），以及基于离散令牌建模的 **T2M-GPT**（Zhang et al., CVPR 2023）和 **MoMask**（Guo et al., CVPR 2024）。然而，现有方法在表示空间的选择上存在一个根本性的两难困境。
 
@@ -76,7 +74,7 @@ DC-Motion 提出**离散-连续解耦生成框架**，将运动显式分解为�
 
 实现上述解耦需要解决两个关键技术挑战：（1）如何设计一个统一的运动表示框架，将运动序列分解为离散语义令牌与连续残差，且两者能够无缝融合重建；（2）如何设计对应的生成流水线，使语义规划与细节精修各司其职、协同工作。DC-Motion 通过 DC-VAE 分词器与 MaskGIT + 残差扩散的两阶段生成框架系统性地回应了这些挑战。
 
-## 核心创新
+## 核心方法与创新机理
 
 DC-Motion 的核心创新在于**将人体运动生成显式解耦为语义结构规划与物理细节精修两个子问题**，并通过离散-连续混合令牌（DC-VAE）和分阶段生成框架实现这一解耦。与现有方法使用同质表示空间（纯连续扩散或纯离散自回归）不同，DC-Motion 识别出单一表示空间的根本瓶颈：连续扩散模型难以进行复杂的组合语义推理，而离散自回归模型因向量量化导致细粒度物理细节丢失。
 
@@ -111,8 +109,6 @@ DC-Motion 的核心创新在于**将人体运动生成显式解耦为语义结�
 
 DC-Motion 在 HumanML3D 上取得 FID 0.041、R Precision Top-1 0.528，在 KIT-ML 上取得 FID 0.148、R Precision Top-1 0.442（Table 1-2），均达到当时最优水平，验证了解耦设计在运动真实感和文本对齐之间取得最优平衡的核心主张。
 
-## 整体框架
-
 DC-Motion 提出了一种**分解式生成框架**，其核心思想是将人体运动生成显式解耦为两个层次：高层语义结构规划与低层物理细节精修。这一设计的直接动机是解决现有方法因使用同质表示空间而无法同时兼顾语义推理与运动保真度的瓶颈——连续扩散模型难以进行复杂的组合语义推理，而离散自回归模型则因向量量化导致细粒度关节动态丢失。
 
 ### 三阶段训练与推理流水线
@@ -132,11 +128,6 @@ DC-Motion 提出了一种**分解式生成框架**，其核心思想是将人体
 消融实验从因果层面验证了这一设计的必要性：若移除连续残差分支，DC-VAE 的重建 MPJPE 从 25.8 急剧上升至 41.7，表明残差是保留细粒度物理细节的关键通路；若移除离散分支，生成 FID 从 0.041 恶化至 0.081，证明离散语义令牌对全局结构和文本对齐具有不可替代的作用。
 
 ### 补充图表
-
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2606_14721/figures/002_Figure_2.jpg]]
-*Figure 2: DC-Motion consists of a DC-VAE tokenizer (Sec. 3.1), a masked autoregressive generator*
-
-## 核心模块与公式推导
 
 DC-Motion 的核心架构由三个关键模块构成：DC-VAE 分词器、MaskGIT 语义生成器和残差扩散模型。其设计原则是将运动生成显式解耦为语义结构规划与物理细节精修两个阶段。
 
@@ -205,7 +196,7 @@ $$\hat{x} = D_{\theta}(\hat{z}_q + \hat{r})$$
 
 三个模块的分阶段训练策略是方法成功的关键：先训练 DC-VAE 分词器建立解耦表示空间，再冻结分词器训练 MaskGIT 语义生成器，最后冻结前两者训练轻量级残差扩散模型。这种解耦训练范式确保各模块专注于各自的任务——语义规划与物理精修，避免优化冲突。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心性能验证
 
@@ -262,10 +253,7 @@ Table 4对比了MaskGIT与标准自回归（Standard AR）在离散语义令牌�
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2606_14721/figures/008_Table_4.jpg]]
 *Table 4: Ablation on discrete token generation paradigms. MaskGIT effectively mitigates the exposure bias inherent in standard AR models, significantly improving global semantic alignment, particularly for long sequences and complex instructions*
 
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2606_14721/figures/001_Figure_1.jpg]]
-*Figure 1: Our DC-Motion model generates high-quality and accurate motions from text prompts, effectively eliminating motion jitter while maintaining strong fidelity and stability. Darker colors indicate later time step*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 核心问题定位
 

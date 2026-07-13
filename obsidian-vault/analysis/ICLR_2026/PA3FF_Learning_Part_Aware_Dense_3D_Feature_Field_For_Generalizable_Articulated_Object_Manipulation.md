@@ -35,7 +35,7 @@ claims:
 | 中文题名 | PA3FF：学习部件感知的稠密3D特征场以实现可泛化的铰接物体操控 |
 | 英文题名 | PA3FF:Learning Part-Aware Dense 3D Feature Field For Generalizable Articulated Object Manipulation |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=qXfRXfAHOK) · [Project](https://pa3ff.github.io/) · [arXiv](https://arxiv.org/abs/2410) |
+| Links | [paper](https://openreview.net/forum?id=qXfRXfAHOK) · [Project](https://pa3ff.github.io/) · [paper](https://arxiv.org/abs/2410) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction #topic/generative_models_diffusion #topic/representation_self_supervised_transfer |
 | Method | Part-Aware 3D Feature Field (PA3FF) with Part-Aware Diffusion Policy (PADP) |
 | Dataset | PartInstruct, 8 real-world tasks, Real-world Open Bottle test, RLBench |
@@ -45,7 +45,7 @@ claims:
 > - PartInstruct (as reported in paper) 上，Absolute gain over SOTA PADP vs previous SOTA (+9.4% absolute)。
 > - 8 real-world tasks (unseen objects, mean) 上，Success Rate (%) 58.75 vs 35 (GenDP, highest baseline) (+23.75 (23.75 percentage points, 18.75% relative improvement reported))。
 
-## 概述
+## 概要
 
 铰接物体的通用操控是机器人学习中的核心挑战。其瓶颈在于：现有方法大多依赖2D基础视觉特征（如CLIP、DINOv2）并将其提升到3D空间，但这些特征面临**多视图不一致、空间分辨率低、难以捕捉细小功能部件**等问题，导致在未见物体上的泛化能力严重不足。
 
@@ -55,7 +55,7 @@ claims:
 
 **方法定位**：PA3FF属于3D原生特征表征学习范式，与依赖2D基础模型提升的方法（如GenDP）形成对比。其核心创新在于将3D几何预训练（Sonata骨干）与部件级对比学习相结合，在特征空间中显式编码了功能部件的归属关系，而非仅依赖语义相似性。PADP则将该特征场与扩散策略（Diffusion Policy, DP3）无缝集成，形成从感知到动作的端到端可泛化操控框架。
 
-## 背景与动机
+
 
 ### 铰接物体操控的泛化困境
 
@@ -89,7 +89,9 @@ claims:
 
 基于此，本文提出PA3FF（Part-Aware 3D Feature Field），一种前馈式部件感知3D特征场，通过对比学习在大规模标注数据集上训练，使特征场具备上述四个属性。在此基础上构建的PADP（Part-Aware Diffusion Policy）策略，将PA3FF作为感知基础，实现对新物体的高效泛化操控。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PA3FF 的核心创新在于将**部件感知的对比学习**引入到**3D原生特征场**中，从而系统性地解决了2D基础模型（如CLIP、DINOv2）在提升到3D空间时面临的多视图不一致、低空间分辨率、难以捕捉细小功能部件等瓶颈。与现有方法直接使用通用2D/3D特征作为感知输入不同，PA3FF通过两个关键的**changed slots**实现了突破。
 
@@ -104,7 +106,7 @@ PA3FF 的核心创新在于将**部件感知的对比学习**引入到**3D原生
 
 **因果机制：** 这一创新设计形成了一条清晰的因果链：3D原生骨干提供几何先验 → 对比学习引入部件级语义一致性 → 特征场能够区分和定位功能部件（如把手、旋钮）→ 扩散策略获得强泛化性的感知基础 → 在新物体和新场景上实现高效操控。与GenDP等基于密集语义场的方法相比，PA3FF的部件感知是**3D原生的、连续的、功能导向的**，而非对2D特征的简单提升，这解释了其在PartInstruct上9.4%的绝对性能提升和在8个真实世界任务上相对GenDP 18.75%的提升。
 
-## 整体框架
+
 
 PA3FF 的整体框架围绕一个核心问题展开：**如何为铰接物体操控提供一个部件感知的、可泛化的 3D 表示**。其瓶颈在于，现有 2D 基础模型（如 CLIP、DINOv2）在提升到 3D 空间时面临多视图不一致、空间分辨率低、难以捕捉细小功能部件（如把手、旋钮）等挑战。PA3FF 的因果调节变量是**部件感知的 3D 特征场**——通过在大规模标注数据集上使用对比学习直接为点云生成稠密、连续、功能部件敏感的 3D 特征，使得特征距离直接反映部件归属关系。
 
@@ -143,7 +145,7 @@ Sonata 输出的原始 3D 特征尚不具备明确的部件语义。细化阶段
 ![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_qXfRXfAHOK/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of our Learning Framework. (1) Pretraining the PTv3 backbone to extract part-aware 3D features. (2) Feature refinement via contrastive learning across objects to enhance part-level consistency and distinctiveness. (3) Downstream usage by integrating the refined features into a diffusion policy for action generation*
 
-## 核心模块与公式推导
+
 
 PA3FF 的核心设计围绕一个关键瓶颈展开：**2D 基础视觉特征（如 CLIP、DINOv2）在提升到 3D 空间时，面临多视图不一致、低空间分辨率、难以捕捉细小功能部件等挑战**，导致铰接物体操控的泛化能力不足。为此，PA3FF 构建了一个**部件感知的稠密 3D 特征场**，通过对比学习直接为点云生成功能部件敏感的连续特征，使特征距离直接反映部件归属关系。
 
@@ -244,7 +246,9 @@ $$
 ![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_qXfRXfAHOK/figures/011_Figure_7.jpg]]
 *Figure 7: Flaws of lifting up method*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能：仿真与真实世界
 
@@ -303,7 +307,9 @@ Table 6 的消融实验揭示了各模块的贡献权重。最关键的发现是
 ![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_qXfRXfAHOK/figures/008_Figure_5.jpg]]
 *Figure 5: Generalization test set of the Open Bottle task*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心思路的继承与突破
 
@@ -341,6 +347,8 @@ PA3FF的性能优势可归因于两个相互耦合的设计选择：
 3. **数据效率与标注需求**：PA3FF的训练是否可以通过自监督或弱监督方式减少对精细部件标注的依赖，以覆盖更多物体类别和更广泛的操控场景？
 
 4. **与基础模型的深度整合**：PA3FF目前独立于2D基础模型，未来是否可以通过与CLIP、DINOv2等2D模型的跨模态对齐，进一步提升对未见物体的零样本泛化能力？
+
+
 
 ## 原文 PDF
 

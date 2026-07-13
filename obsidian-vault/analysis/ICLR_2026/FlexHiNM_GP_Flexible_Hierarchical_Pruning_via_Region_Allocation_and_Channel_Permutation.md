@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/FlexHiNM_GP_Flexible_Hierarchical_Pruning_via_Region_Allocation_and_Channel_Permutation.pdf
+project_link: null
+code_link: null
 openreview_forum_id: YaZraqRsbB
 aliases:
 - FG
@@ -42,7 +44,7 @@ claims:
 > - SST‑2 上，Accuracy 为 91.65，对比 90.60，变化 +1.05。
 > - SQuAD v1.1 上，F1 为 88.55，对比 88.04，变化 +0.51。
 
-## 概述
+## 概要
 
 固定 N:M 稀疏模式（如 2:4）虽然能够利用硬件加速单元，但其“一刀切”的粒度缺乏灵活性：不同层内权重的重要性分布差异显著，向量级剪枝后保留的向量仍不均匀，导致重要权重在后续 N:M 剪枝中被强制移除。FlexHiNM‑GP 针对这一瓶颈，提出了一种灵活的分层剪枝框架。
 
@@ -50,7 +52,7 @@ claims:
 
 主要实验结果验证了该框架的有效性：在 Deit‑Small 和 Deit‑Base 上 95% 稀疏度时，FlexHiNM‑GP 分别比 HiNM‑GP 高出 2.19% 和 3.16%（Figure G.1）；在 LLaMA2‑7B 下游任务上，75% 稀疏度时平均准确率提升 1.39%（Table 1）；Gyro‑Permutation 的独立贡献使 QQP F1 从 84.78 提升至 85.35，SST‑2 准确率从 90.60% 提升至 91.65%（Table 4）。该方法在保持 NVIDIA Ampere Sparse Tensor Core 硬件兼容性的同时，实现了接近无结构剪枝的精度水平。
 
-## 背景与动机
+
 
 深度神经网络剪枝是模型压缩与加速的核心技术之一。传统无结构剪枝（Unstructured Pruning）虽能实现高压缩比且精度损失小，但其不规则稀疏模式难以在通用硬件上获得实际加速。为兼顾硬件效率与模型精度，结构化剪枝方案应运而生，其中 N:M 稀疏性（如 2:4 稀疏）因其与 NVIDIA Ampere Sparse Tensor Core 的原生兼容性而备受关注。
 
@@ -66,7 +68,9 @@ Gyro-Permutation 通道置换算法进一步强化了这一机制：在向量剪
 
 综上，FlexHiNM-GP 的动机源于对固定 N:M 稀疏比刚性约束的突破需求，其核心贡献在于将层次化剪枝从“一刀切”的全局稀疏分配推进到“因层制宜”的自适应区域稀疏控制，从而在结构化稀疏的硬件效率与无结构剪枝的精度上限之间架起了一座桥梁。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FlexHiNM‑GP 的核心创新在于突破固定 N:M 稀疏比（如 2:4）的刚性约束，将每一层的权重矩阵自适应地划分为三个不同稀疏级别的区域，并通过通道置换与可微掩码学习实现端到端优化。以下从三个关键 changed slot 展开分析。
 
@@ -106,7 +110,7 @@ HiNM‑GP 使用静态贪婪选择的 N:M 掩码，在逐步剪枝过程中缺�
 
 需要注意的是，当前方法仅在 NVIDIA Ampere Sparse Tensor Core 的 2:4 模式下验证，对其他 N:M 模式（如 3:4）的泛化性尚未探索。Gyro‑Permutation 仅在边界搜索阶段执行，训练过程中通道顺序固定，无法适应微调后的重要性变化，这一点在评估其实际部署效果时需加以考虑。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0010_YaZraqRsbB_FlexHiNM-GP_Flexible_Hierarchical_Pruning_via_Re/figures/003_Figure_2.jpg]]
 *Figure 2: Pruning pipeline*
@@ -152,7 +156,7 @@ FlexHiNM‑GP 的核心流水线由三个逻辑阶段构成：**通道置换 →
 
 > **证据强度说明**：流水线的整体结构在 Section 3.1 和 Algorithm 1 中有明确定义；各模块的消融证据（Table 4 验证 Gyro‑Permutation 贡献，Table 2 验证可微掩码收益，Table 3 验证自适应边界搜索优势）均来自论文实验，置信度≥0.9。关于 Gyro‑Permutation 仅在边界搜索阶段执行这一细节，需注意原文 Section 4.1 明确声明“Channel permutation is performed only during the boundary search stage and is kept fixed throughout training”，这构成方法的一个已知局限。
 
-## 核心模块与公式推导
+
 
 ### 三区域分层剪枝框架
 
@@ -227,7 +231,9 @@ Gyro‑Permutation 通过采样、聚类、分配三步迭代求解（Figure 6�
 
 为保证逐步剪枝的稳定性，边界参数需满足单调性约束：向量剪枝比例 `vs` 随目标稀疏度 `ts` 非递减（即 `d(vs)/d(ts) ≥ 0`），且剩余密集权重数 `M = N(1 + vs - 2ts)` 随 `ts` 平滑递减（`dM/dts < 0`）。这些约束确保了剪枝过程的渐进性和不可逆性，避免训练过程中的剧烈结构变化。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 
@@ -289,7 +295,9 @@ FlexHiNM‑GP 在视觉 Transformer、文本编码器和大语言模型三类架
 *Figure 12: Figure G.1: Gradual pruning for Deit family (V=128)*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -332,6 +340,8 @@ FlexHiNM‑GP 处于层次化 N:M 剪枝方法的演进脉络上，其直接前�
 - **端到端可微置换**：是否可以将 Gyro‑Permutation 的采样-聚类-分配流程替换为可微的通道重排机制，实现与掩码学习的联合端到端优化？
 
 - **跨架构泛化**：该方法在视觉 Transformer（ViT）、多模态模型或混合专家（MoE）架构上的表现如何？区域分配策略是否需要针对不同架构的权重分布特性进行调整？
+
+
 
 ## 原文 PDF
 

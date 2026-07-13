@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Incentivizing_Consistent_Effective_and_Scalable_Reasoning_Capability_in_Audio_LLMs_via_Reasoning_Process_Rewards.pdf
+project_link: null
+code_link: null
 openreview_forum_id: DUr48hxO2h
 aliases:
 - ICESRCALRPR
@@ -41,7 +43,7 @@ claims:
 > - MMSU 上，Overall Accuracy (%) 为 64.24，对比 62.08 (Ke-Omni-R)，变化 +2.16。
 > - MMAU-Pro 上，Average Accuracy (%) 为 56.4，对比 54.5 (Ke-Omni-R)，变化 +1.9。
 
-## 概述
+## 概要
 
 音频大语言模型（Audio LLM）在推理时面临一个根本性瓶颈：当模型被要求生成显式推理链时，性能不升反降——推理链越长，准确率越差。这一现象被称为**测试时逆规模**（test-time inverse scaling）。在 **Qwen2.5-Omni-7B**（Xu et al., 2025）基础模型上，启用推理后准确率从 68.60% 降至 65.20%，规模斜率 β = −0.51，表明模型学习的推理模式存在幻觉、推理-答案不一致和逻辑混乱等系统性问题。其根本原因在于，现有基于结果奖励的强化学习（RLVR）仅以最终答案正确性为监督信号，无法塑造推理过程的质量。
 
@@ -60,7 +62,7 @@ claims:
 
 方法的局限性包括：GRPO 在线训练计算开销大（8×H200 GPU 上需 61.44 小时）；感知能力仍是瓶颈（MMSU 感知任务平均 48.45%，远低于人类的 91.24%）；以及多面过程奖励框架的跨模态泛化性尚未验证。
 
-## 背景与动机
+
 
 音频大语言模型（Audio LLM）在声音理解、音乐分析和语音交互等任务上取得了显著进展，但其推理能力仍停留在基础水平。一个核心矛盾在于：当模型被要求显式地“思考”——即生成推理链后再作答时，其性能不仅没有提升，反而出现系统性的退化。这种**测试时逆规模现象**（test-time inverse scaling）表明，推理链越长，模型的准确率越低：基础模型 Qwen2.5-Omni-7B 在不启用推理时准确率为 68.60%，而启用推理后骤降至 65.20%（Table 1 / Table 18）。换言之，推理过程本身成为了性能的拖累，而非助力。
 
@@ -72,7 +74,9 @@ $$R_{\mathrm{RLVR}}(s_i) = \mathbb{I}[\hat{y}_i = y_i] + \mathbb{I}[\mathrm{Vali
 
 因此，问题的瓶颈不在于模型是否“能够”推理，而在于**缺乏对推理过程本身的显式监督与塑造**。仅靠结果奖励，真正的推理能力无法自发涌现。这构成了本文的核心动机：能否设计一种训练机制，将推理从一个不可靠的副产品转变为一个可控、可测、可优化的技能？
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题诊断：从结果奖励到过程奖励的范式转移
 
@@ -121,7 +125,7 @@ CESAR 将推理从不可靠的副产品转变为可控技能。通过测试时�
 
 消融实验的渐进式验证（Table 6 / Table 21）确认了各组件的必要性：移除 RL 后训练导致准确率骤降 11.9 点（74.60% → 65.20%），移除一致性奖励降 0.9 点，移除关键词奖励再降 1.0 点，移除过度思考惩罚使推理优势缩水。这一因果链证实了过程奖励是逆转逆规模、实现可控推理规模化的关键控制变量。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_DUr48hxO2h/figures/001_Figure_1.jpg]]
 *Figure 1: General Framework of Different Training Methods for Audio Reasoning Models*
@@ -152,7 +156,7 @@ $$R_{\mathrm{total}}(s_i) = \alpha_1 R_{\mathrm{acc}}(s_i) + \alpha_2 R_{\mathrm
 
 这三个模块协同运作：数据增强提供多样化的训练样本，GRPO 在线采样多个回复并计算相对优势，多面奖励计算器为每个回复提供细粒度的过程信号。这一闭环设计使得模型不仅被训练为给出正确答案，更被显式塑造为具备一致、结构化、深度可控的推理能力。
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题形式化与训练范式
 
@@ -239,7 +243,9 @@ $$L_{\mathrm{sweet}} = \arg\max_L P(L)$$
 
 线性回归模型 $P(L) = P(0) + \beta \cdot L$ 量化推理对性能的影响方向与程度。基础模型呈现 $\beta = -0.51$ 的负斜率（测试时逆规模），而 CESAR 实现 $\beta = +0.038$ 的正斜率，完成从负向到正向的完全逆转（Figure 8/Appendix D.12）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈：测试时逆规模现象
 
@@ -325,7 +331,9 @@ Table 5展示了CESAR与基线模型在推理过程上的定性对比。基础�
 ![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_DUr48hxO2h/figures/027_Figure_6.jpg]]
 *Figure 6: Test-Time Scaling Curves of Reasoning. Accuracy is plotted against the average length of the reasoning chain (in used tokens). (Top Row) The full comparison reveals a catastrophic performance collapse of the base Qwen2.5-Omni-7B model as it generates longer reasoning chains, empirically demonstrating the test-time inverse scaling problem. In contrast, all RL-trained models remain robust. (Bottom Row) A zoomed-in view of the RL models highlights the performance peak of our full method (i.e., CESAR (Ours)), which discovers a “reasoning sweet spot”. It consistently outperforms both the version without the Overthinking Penalty reward (i.e., CESAR (Ours w/o Overthinking Penalty)) and the Ke-Omni...*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -369,6 +377,8 @@ GRPO在线训练需为每个样本采样 $K=8$ 个回复，在8×H200 GPU上训�
 - 本文的多面过程奖励框架能否迁移至视觉、文本等领域的推理训练？跨模态的奖励设计空间有何异同？
 - 能否通过理论分析预测最优推理深度，而非依赖经验性的测试时规模扫描？
 - 模型在真实开放场景（如长对话、实时交互）中的推理鲁棒性如何？过程奖励训练是否会引入新的失败模式？
+
+
 
 ## 原文 PDF
 

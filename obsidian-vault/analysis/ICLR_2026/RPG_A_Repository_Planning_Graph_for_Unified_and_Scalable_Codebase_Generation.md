@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/RPG_A_Repository_Planning_Graph_for_Unified_and_Scalable_Codebase_Generation.pdf
+project_link: null
+code_link: https://github.com/microsoft/RPG-ZeroRepo
 aliases:
 - RPG
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | RPG：面向统一与可扩展代码库生成的仓库规划图 |
 | 英文题名 | RPG: A Repository Planning Graph for Unified and Scalable Codebase Generation |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=VAQq3Y8tIF); [GitHub](https://github.com/microsoft/RPG-ZeroRepo) |
+| Links | [paper](https://openreview.net/forum?id=VAQq3Y8tIF) · [GitHub](https://github.com/microsoft/RPG-ZeroRepo) |
 | Topic | #topic/other_unclear #topic/other_unclear/general |
 | Method | ZeroRepo |
 | Dataset | RepoCraft |
@@ -40,7 +42,7 @@ claims:
 > - RepoCraft 上，Pass Rate (%) 为 69.7 (o3-mini) / 57.3 (Qwen3-Coder)，对比 33.9 (Claude Code CLI)，变化 +35.8 / +23.4。
 > - RepoCraft 上，LOC (generated) 为 36,941 (Qwen3-Coder) / 23,977 (o3-mini)，对比 10,586.7 (Claude Code CLI)，变化 ~3.9× / ~3.5×。
 
-## 概述
+## 概要
 
 仓库级代码生成面临的核心瓶颈在于：自然语言规划缺乏显式结构，难以准确追踪长期依赖关系，导致模块划分混乱、数据流断裂以及生成代码的可扩展性受限。为了解决这一问题，本文提出了一种统一的、机器可解析的**仓库规划图**（Repository Planning Graph, RPG），将功能分解与实现级设计编码为一张层次化、可追溯的图结构，并基于该图构建了零样本仓库生成框架 **ZeroRepo**。
 
@@ -50,7 +52,7 @@ ZeroRepo 通过三个阶段将自然语言意图转化为可执行仓库：1) **
 
 综上所述，ZeroRepo 通过将规划介质从自然语言转变为结构化 RPG，突破了仓库生成的任务复杂度与规模瓶颈，为统一、可扩展的代码库自动生成提供了新的范式。
 
-## 背景与动机
+
 
 ### 仓库级代码生成的规划瓶颈
 自动化代码生成正从单函数、单文件向完整仓库级系统演进。在仓库级生成中，系统不仅需要准确实现各模块功能，还必须维护跨文件、跨模块的依赖关系、数据流与接口契约。然而，当前主流的代码生成代理（如 MetaGPT、ChatDev、OpenHands、Claude Code CLI 等）几乎全部依赖**自然语言**进行规划——需求被表示为自由形式的 Markdown 或规格文档，并由代理在迭代中逐步扩展。这种基于自然语言的规划存在根本性缺陷：
@@ -77,7 +79,9 @@ RPG 的核心洞见在于：将仓库的**提案级规划**（功能分解与模
 
 基于这一动机，本文设计了 ZeroRepo 框架，以 RPG 为统一规划基础，将仓库生成解耦为三个阶段：提案级构建、实现级构建和图引导的代码生成。后续章节将详细阐述其设计与实验验证。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 痛点与动机：自然语言规划的扩展天花板
 
@@ -112,7 +116,7 @@ RPG 的核心洞见在于：将仓库的**提案级规划**（功能分解与模
 
 综言之，RPG 用一种图灵完备的结构替换了模糊的自然语言规划，使仓库级生成首次摆脱了扩展崩溃，为统一且可扩展的代码智能体提供了新的范式基础。该创新亦可解读为“思考实体化”——将代理的长期规划外化为显式图，赋予其人类工程的分层设计与迭代可控性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0013_VAQq3Y8tIF_RPG_A_Repository_Planning_Graph_for_Unified_and/figures/001_Figure_1.jpg]]
 *Figure 1: The ZeroRepo pipeline for repository generation. (A) Proposal-Level Construction maps query to a functionality graph. (B) Implementation-Level Construction refines via (B1) File Structure Encoding into a file-augmented graph and (B2) Data-Flow/Function Encoding into the Repository Planning Graph (RPG). (C) Graph-Guided Code Generation traverses RPG to generate the repository*
@@ -144,7 +148,7 @@ ZeroRepo 的核心设计在于用结构化的 **仓库规划图（Repository Pla
 
 三个阶段通过 RPG 紧密耦合：提案级图提供功能的骨架范围，实现级图赋予其可执行的工程细节，而代码生成器则以图遍历的方式有序地将其“实例化”为真实代码。这一设计使得 ZeroRepo 的功能覆盖率与代码行数（LOC）能够随迭代轮次呈近线性增长（拟合斜率约 980 LOC/迭代，R² = 0.97），而自然语言规划基线往往在 3–4K LOC 停滞（Figure 6, §7.1）。消融实验进一步表明，即使移除全局特征树知识库，RPG 的结构本身仍支撑 87.2% 的覆盖率，验证了结构化图是驱动可扩展仓库生成的核心因素（Table 6, Figure 7‑8）。
 
-## 核心模块与公式推导
+
 
 ### 1. 仓库规划图（RPG）结构
 
@@ -213,7 +217,9 @@ $$
 
 > 注：线性拟合公式为实验后的经验规律，非理论推导；其余指标公式均来自论文附录的正式定义。若需复现，请以原文表述为准。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 我们在 RepoCraft 基准（Table 1）上评测了 ZeroRepo 与多种现有 Agent 框架。该基准包含六个匿名化的 Python 仓库，覆盖不同规模与领域，并通过统一自动管线进行评估；该管线的覆盖率与正确率判断与人类标注高度一致（Pearson’s r > 0.87）。
@@ -256,7 +262,9 @@ Table 3 揭示了 RPG 在覆盖率与新颖性上的迭代演化规律：在 M
 4. **语言与领域泛化未验证**：当前仅在六个 Python 开源项目上验证，对多语言、企业级或跨平台仓库的适用性尚属未知。
 5. **正确性落差**：生成仓库的最高通过率（69.7%）仍明显低于人类编写仓库的参照水平（81.0%，Table 2 中 Gold Projects），在复杂接口实现、边界条件与异常处理等方面仍有较大提升空间。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 自然语言规划驱动的代码生成近年来涌现出两类代表性基线：一类以 **MetaGPT、ChatDev** 为代表的多智能体框架，依赖自然语言规约进行任务分解与协作；另一类以 **Claude Code CLI、OpenHands、Gemini CLI、Codex CLI** 为代表的“vibe-coding”终端代理，通过自由文本指令迭代编写代码。这些系统在仓库级生成时普遍暴露出一致性瓶颈——自然语言规约的模糊性导致模块划分失准、数据流断裂，且无法追踪长期依赖关系，使生成代码规模在 3–4K LOC 即停滞（Figure 6；Figure 5）。固定工作流系统 **Paper2Code** 虽引入了模板化流水线，但缺乏动态规划能力，同样难以应对跨模块的复杂依赖。
 
@@ -269,6 +277,8 @@ Table 3 揭示了 RPG 在覆盖率与新颖性上的迭代演化规律：在 M
 
 **开放问题**  
 RPG 范式的推广面临若干关键挑战：首先，如何改进测试生成与修复策略，在更大规模代码中维持高覆盖率与正确性；其次，能否将 RPG 扩展至多语言、跨平台的仓库生成，以检验图表示的表达力边界；再者，图构建过程的计算开销较高，研究更高效的规划算法以减少对 LLM 的重复调用是一项工程需求；最后，在长周期迭代或分布式开发中，RPG 的增量更新、合并与一致性维护策略仍有待定义——这些方向为后续工作提供了明确的接口。
+
+
 
 ## 原文 PDF
 

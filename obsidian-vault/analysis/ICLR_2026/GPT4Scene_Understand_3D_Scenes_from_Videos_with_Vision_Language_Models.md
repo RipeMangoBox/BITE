@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/GPT4Scene_Understand_3D_Scenes_from_Videos_with_Vision_Language_Models.pdf
+project_link: null
+code_link: null
 openreview_forum_id: 0fib2BYc0L
 aliases:
 - GPT4Scene
@@ -41,7 +43,7 @@ claims:
 > - SQA3D 上，EM-1 为 60.6，对比 54.6，变化 +6.0。
 > - ScanRefer 上，Acc@0.25 为 62.6，对比 55.5，变化 +7.1。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -75,7 +77,7 @@ GPT4Scene在方法谱系中占据独特位置：它不同于需要3D点云编码
 
 消融实验证实了BEV图像和STO-markers的协同效应，以及GPT4Scene微调范式的关键作用。
 
-## 背景与动机
+
 
 3D场景理解是具身智能、增强现实和人机交互等领域的核心能力。传统方法通常依赖3D点云作为输入模态，结合专门设计的3D编码器来提取空间特征。然而，这类基于点云的方法面临两个根本性约束：其一，点云数据的获取成本高昂，需要专业扫描设备；其二，点云编码器与当前快速演进的大语言模型（LLM）生态耦合松散，难以共享基础模型的规模化红利。
 
@@ -101,7 +103,9 @@ GPT4Scene的出发点是一个关键洞察：**仅通过视觉提示（visual pr
 
 这一范式的核心假设是：预训练VLM已经具备处理视觉信号和文本指令的基础能力，真正缺失的是将碎片化的局部观察组织为连贯空间认知的“脚手架”。通过BEV图像和STO标记提供这种脚手架，GPT4Scene旨在让VLM在不改变架构的前提下，发展出对3D场景的内在理解。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈诊断：全局-局部对应缺失
 
@@ -132,7 +136,7 @@ GPT4Scene最具启发性的发现是：**经过该范式微调的VLM能够将空
 
 当前STO-markers的生成依赖3D点云标注和实例分割，这限制了方法向无标注视频的扩展。此外，GPT4Scene对大物体的理解最有效，对小物体的理解较弱（Table 8），且BEV重建质量对性能影响微小（Table 7），表明BEV主要提供粗略的全局上下文而非精确几何信息。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l41_https_openreview_net_forum_id_0fib2BYc0L/figures/002_Figure_2.jpg]]
 *Figure 2: The framework of GPT4Scene. A scene video is processed by sampling frames, reconstructing a point cloud, and generating a BEV image. Object locations are detected from the point cloud and projected onto the video frames. The resulting frames and BEV image, enhanced with STO-markers, are inputs for Large Language Model (VLM) training and inference*
@@ -171,7 +175,7 @@ $$\mathcal{V}^{*\prime} = \left\{ \mathcal{F} \left( I_i, \mathbf{\Phi} C_i^{uv}
 
 框架的核心因果链路可概括为：**BEV 提供全局布局 → STO-markers 绑定时空一致的目标身份 → VLM 在微调中内化 3D 空间认知**。这一范式的决定性证据来自 Table 6 的消融：经过 GPT4Scene 范式微调的模型，即使在推理时不提供 BEV 图像和 STO-markers，仍能保持强大性能（ScanQA CIDEr 95.4 vs 完整输入下的 96.3），表明微调过程已帮助 VLM 发展出对 3D 场景的内在理解能力。
 
-## 核心模块与公式推导
+
 
 GPT4Scene框架通过四个顺序模块将纯视频输入转化为VLM可理解的视觉提示，其核心在于显式建立场景全局布局与局部帧观察之间的对应关系。
 
@@ -205,7 +209,9 @@ $$\mathcal{V}^{*\prime} = \left\{ \mathcal{F} \left( I_i, \mathbf{\Phi} C_i^{uv}
 
 消融实验揭示了三个关键发现：(1) BEV图像与STO标记具有协同效应——同时移除两者导致所有关键指标大幅下降；(2) STO标记存在最优尺寸（size=40），过小或过大均导致性能衰减；(3) 经过GPT4Scene范式微调的模型即使在推理时不提供BEV和标记，仍能保持强劲性能（ScanQA CIDEr仅从96.3降至95.4），表明该范式帮助VLM内化了3D空间认知能力。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -272,7 +278,9 @@ Table 6揭示了GPT4Scene范式中各组件的贡献权重。最关键的发现�
 3. **精确空间推理未显著超越点云方法**：在需要精确空间关系推理的子任务上，GPT4Scene相对于原生3D点云LLM的优势不明显。
 4. **STO-markers依赖3D标注**：当前标记生成需要3D实例分割标注，限制了向无标注视频的扩展。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与范式定位
 
@@ -323,6 +331,8 @@ GPT4Scene的能力演进呈现清晰的**两阶段路径**：
 2. **内化机制的可解释性**：微调后模型在无标记情况下仍保持高性能，其内部表征究竟发生了何种变化？这种空间认知能否进一步蒸馏到更轻量的模型中？
 
 3. **动态与室外扩展**：当前框架在静态室内场景上验证，如何扩展到包含动态物体的室外大规模场景（如自动驾驶、AR导航）仍是一个开放挑战。
+
+
 
 ## 原文 PDF
 

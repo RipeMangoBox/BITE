@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Stabilizing_Policy_Gradients_for_Sample_Efficient_Reinforcement_Learning_in_LLM_Reasoning.pdf
+project_link: null
+code_link: null
 openreview_forum_id: iIvPuXoDs1
 aliases:
 - CAPOC
@@ -42,7 +44,7 @@ claims:
 > - TEST (8个基准平均) 上，样本效率 为 CAPO，对比 GRPO (保守体制)，变化 9× fewer completions。
 > - MATH & TEST 上，训练稳定性（策略崩溃情况） 为 CAPO (无崩溃)，对比 GRPO, Dr.GRPO, REINFORCE (激进体制下均崩溃)，变化 CAPO 在基线崩溃后仍稳定学习。
 
-## 概述
+## 概要
 
 在大语言模型（LLM）的推理任务中，使用策略梯度方法进行强化学习微调已成为提升模型能力的核心技术路径。然而，这一范式面临一个根本性瓶颈：优化的非平稳性与梯度估计的高方差导致训练极易失稳。尤其在采用激进学习率和更小批量的高效训练体制下，包括 **GRPO**（Shao et al., 2024）、**Dr.GRPO**（Liu et al., 2025a）和 **REINFORCE**（Williams, 1992）在内的主流基线方法均会发生灾难性的策略崩溃，严重制约了样本效率的进一步提升。
 
@@ -52,7 +54,7 @@ claims:
 
 CAPO将自身定位于策略梯度方法的稳定化改进，与TRPO等经典信任域方法共享约束更新幅度的思想，但通过轻量级的曲率近似避免了全参数二阶矩阵的物化，使其能够高效应用于大规模语言模型的RL微调场景。
 
-## 背景与动机
+
 
 ### 大语言模型推理中的强化学习微调
 
@@ -102,7 +104,9 @@ $$m_F(\Delta\pmb\theta) = \frac{1}{2} \Delta\pmb\theta^\top \boldsymbol{F}(\pmb\
 
 基于这一动机，本文提出**Curvature-Aware Policy Optimization (CAPO)**，其核心思路是：构建一个计算高效的二阶曲率近似框架，在每次更新前评估候选样本引起的目标和策略偏移，仅接受满足信任域约束的子集进行梯度累积。这使得CAPO能够在激进的学习体制下保持稳定学习，同时仅屏蔽极少量的token（峰值约8%，随后降至2%以下），以最小的干预代价实现显著的样本效率提升。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CAPO（Curvature‑Aware Policy Optimization）的核心创新在于将**二阶曲率信息**引入策略梯度的样本筛选过程，从而在不改变底层RL目标函数的前提下，实现对策略更新的隐式信任域约束。与现有方法相比，其关键改变体现在以下方面：
 
@@ -134,7 +138,7 @@ CAPO在生成候选更新方向时，模拟了底层LLM优化器（Adam）的实
 
 **需要人工验证的点**：CAPO的理论保证（Theorem 5.1）声称，当满足信任域约束时，聚合更新保证单调改进 $J(\pi_{\theta+\Delta\theta}) - J(\pi_\theta) \ge \omega - C\sqrt{\delta_F}$，其中 $C = \frac{2\gamma}{(1-\gamma)^2}\epsilon\sqrt{2}$。该定理的推导依赖于last‑layer模型假设和若干近似，其在完整LLM参数空间中的严格成立性需进一步验证。
 
-## 整体框架
+
 
 CAPO (Curvature‑Aware Policy Optimization) 是一个面向 LLM 推理任务、以策略梯度 RL 微调为核心的样本高效训练框架。其设计目标是在激进训练体制（高学习率、小批次）下阻止策略崩溃，从而大幅提升样本效率。框架的整体管线由五个核心模块串联而成，形成“生成–估计–建模–筛选–更新”的闭环。
 
@@ -168,7 +172,7 @@ $$
 
 整个框架的关键因果机制在于：通过轻量级二阶曲率近似实时监测每次更新的局部几何风险，主动拒绝那些会导致目标或策略分布剧烈偏移的样本，从而在激进训练体制下充当隐式的信任域约束。这一设计使得 CAPO 在 MATH 上仅需 GRPO（保守体制）1/30 的样本完成数即可达到同等准确度，在 TEST 基准上则仅需 1/9 的样本（Section 6.1, Figure 2）。
 
-## 核心模块与公式推导
+
 
 CAPO的核心思想是将二阶曲率信息引入策略梯度更新的样本筛选过程，从而在不牺牲性能的前提下实现激进训练体制下的稳定学习。整个方法围绕一个计算高效的曲率近似框架展开，包含以下关键模块。
 
@@ -234,7 +238,9 @@ $$J(\pi_{\theta+\Delta\theta}) - J(\pi_{\theta}) \ge \omega - C \sqrt{\delta_F},
 
 其中 $\omega$ 为接受子集的目标改进下界，$C$ 为与折扣因子 $\gamma$ 和策略变化上界 $\epsilon$ 相关的常数。该定理表明，当聚合更新的期望改进 $\omega$ 超过惩罚项 $C\sqrt{\delta_F}$ 时，CAPO保证策略性能的单调改进。这为信任域筛选提供了理论保障：通过控制策略偏移 $m_F \leq \delta_F$，CAPO在每次更新中维持了可证明的改进下界。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：样本效率与训练稳定性的双重突破
 
@@ -309,7 +315,9 @@ Table 5报告了Fisher方向曲率估计（$\hat{m}_F$）与估计策略变化�
 ![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_iIvPuXoDs1/figures/018_Table_3.jpg]]
 *Table 3: Hyperparameters for the standard (conservative) and aggressive regimes. Table 4: Curvature-aware masking thresholds for CAPO, Dr.CAPO and ReinCAPO*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有RL微调方法的关系
 
@@ -349,6 +357,8 @@ CAPO通过**直接作用于样本层面**的曲率过滤，在稳定性和性能
 4. **与自然梯度的融合**：CAPO的信任域方法是否可与自然梯度或K‑FAC等已有近似二阶方法结合？自然梯度直接利用Fisher信息矩阵进行参数更新，而CAPO利用Fisher和Hessian的定向曲率进行样本筛选，二者在理论上互补。
 
 5. **跨任务泛化**：CAPO在非数学推理任务（如代码生成、长文本问答）上的表现如何？不同任务的奖励信号特性和策略分布差异可能影响曲率估计的准确性和筛选机制的有效性。
+
+
 
 ## 原文 PDF
 

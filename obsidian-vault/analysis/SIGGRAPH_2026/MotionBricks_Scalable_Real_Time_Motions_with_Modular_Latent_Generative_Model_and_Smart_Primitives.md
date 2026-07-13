@@ -5,6 +5,7 @@ paper_level: A
 venue: SIGGRAPH
 year: 2026
 pdf_ref: paperPDFs/SIGGRAPH_2026/MotionBricks_Scalable_Real_Time_Motions_with_Modular_Latent_Generative_Model_and_Smart_Primitives.pdf
+code_link: null
 project_link: https://nvlabs.github.io/motionbricks
 aliases:
 - MotionBricks
@@ -34,7 +35,7 @@ claims:
 | 中文题名 | MotionBricks：基于模块化潜在生成模型与智能基元的大规模实时动作合成 |
 | 英文题名 | MotionBricks: Scalable Real-Time Motions with Modular Latent Generative Model and Smart Primitives |
 | 会议/期刊 | SIGGRAPH 2026 |
-| Links | [paper](https://doi.org/10.1145/3811334); [Project](https://nvlabs.github.io/motionbricks) |
+| Links | [paper](https://doi.org/10.1145/3811334) · [Project](https://nvlabs.github.io/motionbricks) |
 | Topic | #topic/real_time_motion_synthesis #topic/latent_motion_generation #topic/vector_quantization #topic/character_animation #topic/real_time_motion_synthesis/general |
 | Method | Modular latent generative model, multi-head motion tokenizer, root-pose decoupling, smart primitives |
 | Dataset | 350k proprietary motion dataset, LaFAN1-G1, Bones-70k |
@@ -44,7 +45,7 @@ claims:
 > - LaFAN1-G1 上，FID 为 0.891，对比 ClosdDiP (0.903, second best)，变化 0.012 improvement。
 > - 350k dataset 上，Latency / Throughput 为 2ms per generation, 15,000 FPS，对比 other generative methods (seconds to minutes)，变化 orders of magnitude faster。
 
-## 概述
+## 概要
 
 **核心问题。** 现有生成式动作合成模型在实时应用中面临双重瓶颈：在严格实时计算约束下，模型质量和可扩展性显著下降，无法以单个模型处理超35万段动作的大规模数据集；同时缺乏统一的精细多模态控制接口，难以同时满足速度命令、风格选择和关键帧等生产级需求。
 
@@ -56,7 +57,7 @@ claims:
 
 **证据强度。** 上述结论由七大类指标（速度、分布、人体评估、多样性、平滑度、物理合理性、精确度）的全面评估支持，人体评估邀请了40名不同背景参与者，所有方法在同一训练集和评估协议下比较。需注意，数据集缺少手指和物体运动数据，稀有动作类别泛化仍有困难，且离散潜在表示在较高重规划频率下会导致 FID 和关键帧误差轻微增加。
 
-## 背景与动机
+
 
 ### 实时动作合成的规模化困境
 
@@ -77,7 +78,9 @@ MotionBricks的核心动机源于一个关键洞察：**将动作生成分解为
 
 这种从“碎片化控制”到“统一基元接口”的转变，以及从“单体生成”到“模块化潜在生成”的架构演进，构成了MotionBricks区别于现有工作的核心动机，也为后续在2ms延迟、15,000 FPS吞吐量下实现大规模高质量动作合成奠定了基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MotionBricks 的核心创新在于通过**三个结构性改变**（changed slots），系统性解决了实时动作生成中模型容量、控制精度与计算效率的三角矛盾。这些改变并非孤立的技术点，而是围绕“根-姿态解耦”与“多头部离散潜在空间”两条主线形成协同效应。
 
@@ -125,7 +128,7 @@ $$\boldsymbol{r}(t) = e^{-\gamma t} \left( (\boldsymbol{r}_0 - \boldsymbol{r}_{g
 
 上述三个改变形成正向反馈循环：多头部标记器提供了足够的容量来表征 350k+ 动作片段中的多样化运动模式；根-姿态解耦使得解码器能够独立处理轨迹精度和姿态质量；模块化流程降低了每个子模块的学习难度；智能基元则将生产级控制需求统一为关键帧约束，使模型无需针对每类任务重新训练。最终，这套设计在保持 2ms 延迟和 15,000 FPS 吞吐量的实时效率下，在 FID 指标上显著优于所有基线方法（350k 数据集上 FID=1.054，对比最佳基线 MMM 的 1.153；LaFAN1-G1 上 FID=0.891，对比 ClosdDiP 的 0.903）。
 
-## 整体框架
+
 
 MotionBricks 的整体推理流程由四个阶段构成（图2），其设计核心是将动作生成分解为**高层规划**与**低层合成**两个层次，并通过模块化的粗到细流程实现实时高效的动作控制。
 
@@ -187,7 +190,7 @@ $$\{r_l^t, \boldsymbol{p}^t, \boldsymbol{q}^t, \boldsymbol{v}^t, \boldsymbol{c}^
 ![[assets/figures/papers/paper_list_l2_https_doi_org_10_1145_3811334/figures/002_Figure_2.jpg]]
 *Figure 2: MotionBricks’s inference pipeline consists of four stages. Given user commands or game events, smart primitives generate target keyframes. The root module first predicts timing and root trajectory, followed by the pose module that models the distribution of multi-head latent pose tokens. Finally, the decoder produces continuous motion conditioned on pose tokens, root trajectories, and keyframes*
 
-## 核心模块与公式推导
+
 
 MotionBricks 的推理流程由四个核心模块构成（Fig. 2）：**Smart Primitives** 将用户指令或游戏事件转化为目标关键帧约束；**Root Module** 预测过渡帧数与全局根轨迹；**Pose Module** 通过掩码令牌建模生成多头部潜在姿态令牌；**Token Decoder** 从姿态令牌、根轨迹与关键帧约束中解码出连续全身运动。
 
@@ -241,7 +244,9 @@ $$\boldsymbol{r}(t) = e^{-\gamma t} \left( (\boldsymbol{r}_0 - \boldsymbol{r}_{g
 
 其中 $\gamma$ 为阻尼系数，$\boldsymbol{r}_0$ 和 $\boldsymbol{v}_0$ 为当前根位置与速度，$\boldsymbol{r}_{g,1}$ 为目标根位置。该模型保证了轨迹的平滑性与物理合理性，并通过神经根细化进一步根据运动风格自动调整（Fig. 5, Table 1）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能：大规模实时生成的质量与效率
 
@@ -310,7 +315,9 @@ Figure 13 展示了 MotionBricks 随训练数据规模增加的性能变化趋�
 ![[assets/figures/papers/paper_list_l2_https_doi_org_10_1145_3811334/figures/010_Table_2.jpg]]
 *Table 2: Overview of datasets used in our experiments*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心瓶颈与因果调节变量
 
@@ -355,6 +362,8 @@ MotionBricks以**动作中间帧生成（motion in-betweening）**为基础范�
 **跨形态动作重定向**：如何在多样化的机器人形态之间进行高质量的运行时动作重定向？当前系统在Unitree G1机器人上展示了初步能力（Fig. 1, Fig. 6），但通用跨形态迁移仍是一个开放挑战。
 
 **极端稀疏数据下的学习**：如何处理极端稀疏数据下的动作学习，例如仅有一段样例如何泛化到新的交互场景？这对稀有动作类别和个性化动作风格的学习至关重要。
+
+
 
 ## 原文 PDF
 

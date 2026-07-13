@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/MergeTune_Continued_Fine_Tuning_of_Vision_Language_Models.pdf
+project_link: null
+code_link: https://github.com/Surrey-UP-Lab/MERGETUNE
 aliases:
 - MergeTune
 tags:
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | MergeTune：视觉语言模型的持续微调 |
 | 英文题名 | MergeTune: Continued Fine-Tuning of Vision-Language Models |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=MAApSY32Z6); [GitHub](https://github.com/Surrey-UP-Lab/MERGETUNE) |
+| Links | [paper](https://openreview.net/forum?id=MAApSY32Z6) · [GitHub](https://github.com/Surrey-UP-Lab/MERGETUNE) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | MERGETUNE |
 | Dataset | 基类-新类泛化 (11个数据集平均) |
@@ -42,11 +44,11 @@ claims:
 > - 基类-新类泛化 (11个数据集平均) 上，调和平均数 (HM) 为 77.98 (KgCoOp + MERGETUNE)，对比 77.01 (KgCoOp)，变化 +0.97。
 > - 基类-新类泛化 (11个数据集平均) 上，调和平均数 (HM) 为 80.44 (MMA + MERGETUNE)，对比 79.87 (MMA)，变化 +0.57。
 
-## 概述
+## 概要
 
 本文提出 **MERGETUNE**，一种新颖的**持续微调（Continued Fine-Tuning, CFT）** 策略，旨在解决视觉语言模型（VLM）在下游任务微调后出现的**灾难性遗忘**问题。与现有在微调过程中缓解遗忘的方法不同，MERGETUNE 将知识恢复作为微调完成后的后置步骤，通过**线性模式连通性（Linear Mode Connectivity, LMC）** 作为学习目标，隐式地合并零样本模型（如 CLIP）与已微调模型的知识。该方法无需修改模型架构，可即插即用地应用于任何已微调的 VLM。实验表明，MERGETUNE 在基类-新类泛化任务中将 CoOp 的调和平均数（HM）提升了 +5.6%，在鲁棒微调评估中超越了集成基线，且推理成本更低。
 
-## 背景与动机
+
 
 现有的视觉语言模型（VLM）微调方法（如 CoOp、KgCoOp、MMA 等）在适应下游任务时，不可避免地会遗忘预训练知识（灾难性遗忘）。即使采用参数高效微调（PEFT）或集成方法，也无法完全保留预训练知识，导致模型在基类-新类泛化、跨数据集泛化和分布外泛化等场景下性能受限。例如，没有任何一种 PEFT 方法能在所有 11 个数据集上一致地优于 CLIP 零样本模型（Figure 1）。
 
@@ -54,7 +56,9 @@ claims:
 
 此外，现有的无训练模型合并方法（如 TIES-Merging、DARE）在应用于 CLIP 微调方法时通常会降低性能（例如，CoOp + TIES 的 HM 下降 5.3%）。这是因为零样本模型与微调模型在权重空间中可能相距甚远，破坏了模式连通性，使得模型合并失效。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MERGETUNE 的核心创新在于：
 
@@ -63,7 +67,7 @@ MERGETUNE 的核心创新在于：
 3. **无需数据回放的代理正则项**：利用二阶泰勒展开推导出一个代理正则项（L2 距离），近似零样本任务损失，解决了 LMC 约束需要预训练数据回放的实际难题。
 4. **模型无关性**：该方法与模型无关，可以即插即用地应用于任何已微调的 VLM，无需修改架构。
 
-## 整体框架
+
 
 MERGETUNE 的整体框架如 Figure 2 所示。给定一个零样本检查点 ŵ₁（如 CLIP）和一个下游微调检查点 ŵ₂（如 CoOp），MERGETUNE 通过持续微调搜索一个持续模型 w，使其与两个端点之间都存在低损失的线性插值路径。
 
@@ -74,7 +78,7 @@ MERGETUNE 的整体框架如 Figure 2 所示。给定一个零样本检查点 ŵ
 - **微调模型 (ŵ₂)**：提供下游任务知识，作为 LMC 损失的目标。
 - **持续微调目标函数**：包含下游任务损失、L2 代理正则项和 LMC 损失，用于优化持续模型 w。
 
-## 核心模块与公式推导
+
 
 ### 1 线性模式连通性（LMC）
 
@@ -124,7 +128,9 @@ $$\mathcal{L}(w) = \mathcal{L}_2(w) + \lambda \|w - \hat{w}_1\|^2 + \beta \mathb
 
 其中，期望项通过评估少量均匀间隔的 α 值（如 5 个）来近似。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 1 基类-新类泛化
 
@@ -189,7 +195,9 @@ Table 6 展示了在不同视觉语言模型（CLIP-L/14, Siglip2-B/16, Siglip2-
 
 ![Table 6](Table 6)
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 MERGETUNE 定位于**模型合并**与**持续学习**的交叉领域。与现有方法相比，其核心差异在于：
 
@@ -212,12 +220,12 @@ MERGETUNE 定位于**模型合并**与**持续学习**的交叉领域。与现�
 - MERGETUNE 的持续微调过程是否可能引入新的过拟合风险，尤其是在小样本场景下？
 - MERGETUNE 与更先进的模型合并方法（如 AdaMerging, Fisher Merging）相比性能如何？
 
-## 整体框架
+### 整体框架
 
 ![[assets/figures/papers/iclr26_0001_MAApSY32Z6_MergeTune_Continued_Fine-Tuning_of_Vision-Langua/figures/001_Figure_1.jpg]]
 *Figure 1: Cross-dataset generalisation shows no single PEFT method consistently outperforms CLIP across all 11 datasets, implying incomplete preservation of pretrained knowledge. Numbers in brackets (X/11) indicate X times a method underperforms CLIP.*
 
-## 实验与分析
+### 实验与分析
 
 
 ### 补充图表
@@ -236,6 +244,8 @@ MERGETUNE 定位于**模型合并**与**持续学习**的交叉领域。与现�
 
 ![[assets/figures/papers/iclr26_0001_MAApSY32Z6_MergeTune_Continued_Fine-Tuning_of_Vision-Langua/figures/009_Table_5.jpg]]
 *Table 5: ID-OOD generaisation accuracy of various methods on ImageNet and distribution shifts for CLIP ViT-B/32 in the robust fine-tuning evaluation. Avg-D = average over domain-shifted datasets.*
+
+
 
 ## 原文 PDF
 

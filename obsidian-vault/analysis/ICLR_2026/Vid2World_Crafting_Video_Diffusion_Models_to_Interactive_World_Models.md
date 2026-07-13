@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Vid2World_Crafting_Video_Diffusion_Models_to_Interactive_World_Models.pdf
+project_link: https://knightnemo.github.io/vid2world/
+code_link: null
 openreview_forum_id: pFyzqbUiF9
 aliases:
 - Vid2World
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | Vid2World：将视频扩散模型打造为交互式世界模型 |
 | 英文题名 | Vid2World: Crafting Video Diffusion Models to Interactive World Models |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=pFyzqbUiF9); [Project](https://knightnemo.github.io/vid2world/) |
+| Links | [paper](https://openreview.net/forum?id=pFyzqbUiF9) · [Project](https://knightnemo.github.io/vid2world/) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | Vid2World |
 | Dataset | Robot Manipulation (RT-1), 3D Game Simulation (CS:GO), Open-World Navigation (RECON) |
@@ -41,7 +43,7 @@ claims:
 > - 3D Game Simulation (CS:GO) 上，FVD 为 106.6，对比 368.5 (DIAMOND-HQ)，变化 -71.1%。
 > - 3D Game Simulation (CS:GO) 上，FID 为 17.5，对比 87.2 (DIAMOND-HQ)，变化 -79.9%。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -75,7 +77,7 @@ Vid2World 通过两个关键操作实现突破：
 
 推理速度较慢（每帧约 20 秒），训练成本高（100k 步需 7 天 × 4 A100 GPU），长时域 rollout 存在错误累积，且交互性评估指标可能被模型“利用”——这些问题构成了后续优化的关键方向。
 
-## 背景与动机
+
 
 ### 世界模型的根本瓶颈：交互数据稀缺与预测真实感不足
 
@@ -113,7 +115,9 @@ Vid2World的核心洞察在于：**互联网规模的无动作视频数据已经
 
 这一设计使得Vid2World在机器人操作（RT-1）、3D游戏仿真（CS:GO）和开放世界导航（RECON）三个领域，均以显著优势超越现有转换方法和先进世界模型，验证了“预训练先验+因果化改造”路线的有效性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Vid2World的核心创新在于通过**架构因果化**与**因果动作引导**两大模块，将预训练的非因果视频扩散模型重铸为可自回归生成、帧级动作可控的交互式世界模型。其本质是对模型的时间建模机制和条件化范式进行根本性改造，而非简单的微调适配。
 
@@ -162,7 +166,7 @@ $$\tilde{p}(\mathbf{x}_t \mid \mathbf{a}_{t-1}, \mathcal{H}_t) \propto p(\mathbf
 
 消融实验揭示了两个创新模块的互补增益（Table 2）：外推权重转移将FVD从1768.8（从头训练）降至28.6，而动作引导进一步降至22.4；FID从6.93降至6.16。**完全从头训练相同架构的世界模型FVD高达1768.8（vs 22.4），实证预训练视觉先验是不可或缺的**（Table 5）。这表明Vid2World的创新本质在于：以极低的域内交互数据成本（RT-1上仅100k梯度步），通过架构因果化和动作引导机制，将互联网规模无动作视频数据中蕴含的丰富物理先验重铸为高保真、动作响应的通用世界模型。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_pFyzqbUiF9/figures/004_Figure_4.jpg]]
 *Figure 4: Training and sampling of Vid2World, initialized by architecture causalization. (a) During training, we add independently sampled noise levels to each frame, as well as randomly drop out each action with a fixed probability. (b) For autoregressive rollout, we denoise the latest frame while setting history clean. Action guidance is added for the current action. See Appendix B for details*
@@ -203,7 +207,7 @@ Vid2World 的整体 pipeline 围绕一个核心范式转换展开：将互联网
 - **预训练先验保留**：完全从随机初始化训练相同架构的世界模型，FVD 高达 1768.8（vs Vid2World 的 22.4），实证互联网视频预训练的视觉先验是不可或缺的核心要素。
 - **外推权重转移 vs 其他策略**：相比简单的 Shift WT（直接平移权重）和 Masked WT（直接丢弃未来权重），外推方法通过线性外推系数 $\gamma_{i,-j}$ 将未来权重信息精确重分配到过去位置，在所有权重转移策略中取得最佳 FVD/FID，且动作引导一致带来额外增益（如 Extrapolative WT: FVD 28.6 → 22.4）。
 
-## 核心模块与公式推导
+
 
 Vid2World 将预训练视频扩散模型转化为交互式世界模型，依赖四个关键模块协同工作。以下逐一阐述其设计原理与核心公式。
 
@@ -255,7 +259,9 @@ $$\tilde { p } ( \mathbf { x } _ { t } \mid \mathbf { a } _ { t - 1 } , \mathcal
 
 四个模块形成清晰的因果链：架构因果化（模块一）消除未来信息泄露，为自回归生成奠定基础；Diffusion Forcing 训练目标使模型适应因果生成范式；动作注入（模块二）建立动作到观测的映射通道；动作引导（模块三）进一步强化该映射的响应灵敏度。消融实验（Table 2）证实，外推权重转移与动作引导的组合取得最佳 FVD (22.4) 和 FID (6.16)，且两者贡献互补——移除任一组件均导致性能显著下降。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -311,7 +317,9 @@ Figure 5 展示了 Vid2World 在真实机器人策略评估中的应用价值：
 
 当前 Vid2World 的推理速度为每帧约 20 秒（50 步 DDIM），训练需 7 天 × 4 A100 GPUs，尚无法满足实时交互需求。作者指出减少采样步数、KV 缓存、模型蒸馏等加速方向，但尚未实现。这构成了从研究原型到实际部署的关键工程瓶颈。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 基线谱系与差异化定位
 
@@ -394,6 +402,8 @@ Vid2World 的设计在以下条件下表现最优：
 **因果动作引导的理论推广**：Theorem 4.1 将 Causal Action Guidance 解释为后验概率调控，这一贝叶斯框架能否推广到更复杂的干预（do-calculus）和反事实推理场景？这将是 Vid2World 从“动作响应”迈向“因果推理”的理论基石。
 
 **少步微调的可行性**：在从零训练完全不可行（FVD 1768.8）的前提下，能否以远少于 100k 步的梯度更新达到同等性能？这涉及预训练表示的可迁移性边界问题。
+
+
 
 ## 原文 PDF
 

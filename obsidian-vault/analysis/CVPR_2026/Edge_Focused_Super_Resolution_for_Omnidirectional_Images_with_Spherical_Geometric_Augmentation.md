@@ -42,7 +42,7 @@ claims:
 > [!tip] 效果简介
 > - ODI-SR 上，WS-PSNR (×8) 25.69 vs 24.54 (FATO) (+1.15 dB)；WS-PSNR (×16) 23.86 vs 22.73 (FATO) (+1.13 dB)。
 
-## 概述
+## 概要
 
 全向图像（Omnidirectional Images, ODIs）以等距柱状投影（Equirectangular Projection, ERP）记录360°全景场景，广泛应用于虚拟现实、自动驾驶等领域。然而，在极大放大倍数（×8、×16）的超分辨率任务中，现有方法面临两个核心瓶颈：其一，公开数据集样本极为稀缺（仅约1200张），传统二维平移/旋转增强会破坏球面投影的环形拓扑连续性；其二，通用超分辨率网络缺乏显式的边缘建模机制，导致重建图像边缘模糊、细节丢失。
 
@@ -50,7 +50,7 @@ claims:
 
 实验表明，在ODI-SR数据集上，EAM在×8和×16任务中分别取得**25.69 dB**和**23.86 dB**的WS-PSNR，相较此前最优方法FATO（An et al., MM Asia 2024）分别提升**1.15 dB**和**1.13 dB**。消融研究证实，球面坐标增强、EFB各子模块及多目标联合损失（L1 + 感知损失 + SSIM损失）均对性能有显著贡献。
 
-## 背景与动机
+
 
 全向图像（Omnidirectional Image, ODI）因其360°沉浸式视觉体验，在虚拟现实、自动驾驶和机器人导航等领域应用日益广泛。然而，受限于采集设备分辨率和传输带宽，全向图像常需进行高倍率超分辨率重建。现有方法在该任务上面临两大核心瓶颈：**数据稀缺**与**边缘退化**。
 
@@ -60,7 +60,9 @@ claims:
 
 针对上述缺口，本文的动机在于：**通过球面几何一致的数据增强模拟真实视角变化，同时构建边缘感知的多尺度注意力网络，从根本上提升高倍率全向图像超分辨率的边缘恢复质量和结构保真度。** 具体而言，本文提出基于球面坐标变换的数据增强策略，将二维旋转/平移转化为三维球面旋转，从而保持场景的几何完整性；同时设计边缘聚焦模块（EFB）和全局整合模块（GIB），分别负责多尺度边缘特征的增强与细化，以及长程上下文依赖的捕获。这一“数据-模型”协同设计的思路，构成了本文方法的核心出发点。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新围绕全向图像（ODI）超分辨率的两大瓶颈展开：**高倍率下边缘保持能力差**与**传统数据增强破坏球面几何连续性**。对应地，方法在数据增强策略、边缘特征建模、多尺度特征整合和损失函数四个维度上提出了针对性改进。
 
@@ -115,7 +117,7 @@ $$L_{\mathrm{Total}} = L_{\mathrm{L1}} + 0.01 \times L_{\mathrm{Perceptual}} + 0
 
 综上，本工作的核心创新可归纳为四个 **changed slots**：**(1)** 将数据增强从二维平面变换升级为球面坐标变换，保持场景几何连续性；**(2)** 设计 EFB（EEB+ERB）实现显式的多尺度边缘注意力建模；**(3)** 引入 GIB 捕获全局长程依赖；**(4)** 采用 $L_1$+感知+SSIM 的多目标联合损失。这些创新相互协同——球面增强提供几何一致的训练数据，EFB 强化局部边缘，GIB 补充全局上下文，联合损失从多个维度约束重建质量——共同驱动了在 $\times8$ 和 $\times16$ 任务上相比当时最优方法 FATO 分别提升 1.15 dB 和 1.13 dB WS-PSNR 的显著增益。
 
-## 整体框架
+
 
 EAM（Edge-Aware Multi-Scale）超分辨率网络的设计核心围绕“边界保持与精细化”展开。整体流程为：低分辨率全向图像（$I_{\mathrm{LR}}$）首先经过MeanShift去除亮度偏差，再由一个$3\times3$卷积提取浅层特征 $F_{\mathrm{p}}$（Eq. 7）。这些特征随后进入级联的**边缘聚焦模块（EFB, Edge Focused Block）**，该模块由**边缘增强模块（EEB, Edge Enhanced Block）**和**边缘细化模块（ERB, Edge Refined Block）**组成，负责多尺度边缘特征的增强与优化，输出 $F_{r}$（Eq. 8）。之后，特征通过**全局整合模块（GIB, Global Integration Block）**，利用大核深度可分离卷积和注意力融合捕获长程依赖，扩展感受野。最终，网络采用渐进式上采样重建策略：将目标放大倍数分解为多个$2\times$步骤，每一步使用PixelShuffle提高分辨率并结合$3\times3$卷积恢复高频细节，生成高分辨率输出。
 
@@ -131,7 +133,7 @@ EAM（Edge-Aware Multi-Scale）超分辨率网络的设计核心围绕“边界�
 ![[assets/figures/papers/paper_list_l2251_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Edge_Focused_Supe/figures/001_Figure_1.jpg]]
 *Figure 1: Challenges of ODISR and our proposed solutions*
 
-## 核心模块与公式推导
+
 
 ### 球面几何增强的数学基础
 
@@ -227,7 +229,9 @@ $$L_{\mathrm{Total}} = L_{\mathrm{L1}} + 0.01 \times L_{\mathrm{Perceptual}} + 0
 ![[assets/figures/papers/paper_list_l2251_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Edge_Focused_Supe/figures/002_Figure_2.jpg]]
 *Figure 2: Mathematical calculation of data augmentation based on spherical model*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -284,7 +288,9 @@ EAM在ODI-SR数据集上进行了×8和×16超分辨率任务的定量评估，�
 ![[assets/figures/papers/paper_list_l2251_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Edge_Focused_Supe/figures/009_Figure_6.jpg]]
 *Figure 6: Visual effects of data augmentation. For ODI-SR(×8): 022 and ODI-SR(×16): 027, (a) shows the effect of the augmented ODI-SR dataset, and (b) shows the effect of the original ODI-SR dataset*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位与基线关系
 
@@ -332,6 +338,8 @@ EAM在ODI-SR数据集上进行了×8和×16超分辨率任务的定量评估，�
 4. **真实退化场景的鲁棒性**：当前实验采用理想的下采样退化（直接 resize），而真实全向图像可能面临运动模糊、压缩伪影、传感器噪声等复合退化。EAM 在盲超分辨率设定下的表现需要进一步研究。
 
 5. **与最新 ODISR 方法的对比时效性**：文中对比的最优方法 FATO 发表于 MM Asia 2024，若后续有更强基线（如基于扩散模型或更先进 Transformer 的方法）出现，EAM 的性能优势需要重新评估。此点需手动确认论文投稿时间线与同期工作的关系。
+
+
 
 ## 原文 PDF
 

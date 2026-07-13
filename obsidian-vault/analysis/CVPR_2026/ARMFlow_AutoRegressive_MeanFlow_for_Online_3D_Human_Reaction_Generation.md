@@ -43,7 +43,7 @@ claims:
 > - InterX (online) 上，FID↓ 0.042±.003 vs 0.093±.005 (ReGenNet) (-0.051)。
 > - InterHuman (offline, ReMFlow) 上，FID↓ 2.433±.042 vs 2.930±.033 (ReGenNet) (-0.497)。
 
-## 概述
+## 概要
 
 **核心问题**：在线3D人体反应生成需要在实时交互中，根据演员动作即时生成反应者的运动序列。现有方法面临一个根本性瓶颈——难以同时满足高保真度、低延迟和长程上下文一致性。固定窗口上下文编码（如**ReGenNet**，Xu et al., CVPR 2024）导致历史信息丢失和语义漂移；而多步扩散或流匹配模型（如**CAMDM**，Chen et al., ACM SIGGRAPH 2024；**HumanX**，Ji et al., arXiv 2025）的计算成本高昂，限制了实时性能。
 
@@ -53,7 +53,7 @@ claims:
 
 **主要结果**：在InterHuman和InterX数据集上，ARMFlow的在线单步生成在FID指标上比现有在线方法提升约30%，且性能与离线SOTA相当。具体而言，在InterHuman在线设定下FID达到2.178，对比ReGenNet的3.029（相对提升28%）；在InterX上FID为0.042，对比ReGenNet的0.093。BSCE训练策略在消融实验中显著优于GTE和HumanX的渐进滚动策略，验证了其对自回归误差累积的抑制效果。
 
-## 背景与动机
+
 
 ### 问题背景：在线3D人体反应生成
 
@@ -71,7 +71,9 @@ claims:
 
 上述瓶颈的根源在于：**现有方法将“长程上下文建模”与“单步高效生成”视为不可兼得的对立目标**。本文的核心动机是打破这一假设——通过引入**MeanFlow**的单步生成特性，结合**因果上下文编码器**保留全局语义，并设计**BSCE训练策略**抑制自回归误差累积，从而在实时在线环境下实现高保真、高一致的反应生成。具体而言，ARMFlow在InterHuman和InterX数据集上的在线单步生成FID指标比现有在线方法提升约30%，且与离线SOTA性能相当（见Table 2），验证了该技术路线的可行性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ARMFlow 的核心创新围绕一个关键矛盾展开：**在线人体反应生成需同时满足高保真、低延迟与长程语义一致性，而现有方法在这三者之间难以兼得**。固定窗口上下文导致信息丢失和语义漂移，多步扩散/流模型则带来高昂的计算成本，限制了实时性能。ARMFlow 通过三个相互耦合的“changed slots”系统性地解决了这一瓶颈，其因果链条可概括为：**以 MeanFlow 的单步生成特性为效率基础，以全局因果上下文编码器为语义保障，以 BSCE 训练策略为自回归鲁棒性支撑**。
 
@@ -105,7 +107,7 @@ ARMFlow 的 **BSCE（Bootstrap Contextual Encoding）** 策略采取了更激进
 
 值得注意的是，这一设计也存在固有局限：由于 MeanFlow 的单步特性，模型不支持事后分类器引导（post-hoc classifier guidance），无法在生成后对结果进行基于优化的细化修正；此外，当前实现未提供弹性延迟处理机制，在多代理交互场景下可能产生轻微异步行为。这些限制指向了未来工作的潜在方向，但并不削弱 ARMFlow 在“效率-保真度-一致性”三角矛盾中所取得的突破。
 
-## 整体框架
+
 
 ARMFlow的整体架构围绕“单步生成 + 全局因果上下文”这一核心思想构建，通过三个关键模块的协同，实现在线3D人体反应生成的高保真度与低延迟。图2展示了完整的pipeline。
 
@@ -152,7 +154,7 @@ ARMFlow的在线生成模块包含两个子组件，遵循MAR的架构精神：
 ![[assets/figures/papers/paper_list_l962_https_arxiv_org_abs_2512_16234/figures/003_Figure_2.jpg]]
 *Figure 2: Overview of the proposed architecture for online and offline reaction generation. The framework consists of a CNN-based encoder to learn a compact latent space for the actor and the reactor. The ReMFlow is for offline generation based on the DiT architecture, and ARMFlow is the autoregressive online model consisting of a DiT context encoder and an MLP velocity predictor. A BSCE strategy is employed during online training progressively to reduce accumulated error in the autoregression*
 
-## 核心模块与公式推导
+
 
 ARMFlow 的整体架构由四个核心模块构成，围绕 MeanFlow 单步生成范式组织，如图 Figure 2 所示。
 
@@ -208,7 +210,9 @@ ARMFlow 采用基于 DiT 的**因果上下文编码器**，通过因果掩码（
 
 BSCE（Bootstrap Contextual Encoding）策略从训练初期就用模型生成的历史替换真实历史，并逐步增加自回归迭代次数。这与 HumanX 的渐进滚动（Rollout）策略形成对比——BSCE 在训练起始阶段即引入生成历史，使模型更早适应自回归推理的分布偏移。消融实验（Table 6）证实 BSCE 在 FID 等指标上显著优于 GTE 和 Rollout 策略。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置与评估协议
 
@@ -268,7 +272,9 @@ ARMFlow 的核心效率优势源于 MeanFlow 的单步生成特性。如 Figure 
 ![[assets/figures/papers/paper_list_l962_https_arxiv_org_abs_2512_16234/figures/009_Table_6.jpg]]
 *Table 6: Ablation on the training strategies for online autoregressive diffusion. GTE stands for ground-truth encoding, Rollout is the strategy used in HumanX[17], and BSCE is our strategy*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从离线扩散到在线单步生成
 
@@ -321,6 +327,8 @@ ARMFlow 的核心贡献在于将 **MeanFlow 的单步生成能力**与**自回�
 - **多代理扩展**：如何将因果上下文编码和 BSCE 策略扩展到三人及以上的交互场景，同时保持线性计算复杂度？
 - **条件控制的灵活性**：在无法使用事后分类器引导的约束下，如何增强模型对细粒度条件（如情感强度、交互风格）的响应能力？
 - **长序列稳定性**：BSCE 策略在极长序列（如数分钟连续交互）下的自回归稳定性尚未验证，误差累积的上界和衰减特性值得进一步分析。
+
+
 
 ## 原文 PDF
 

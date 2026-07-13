@@ -43,7 +43,7 @@ claims:
 > - 4096×2048 (2:1) 上，FID ↓ 147.53 vs 150.35 (Sana) (-2.82)。
 > - 2048×4096 (1:2) 上，FID ↓ 143.71 vs 149.41 (Sana) (-5.70)。
 
-## 概述
+## 概要
 
 UltraFlux 是一个面向原生 4K 分辨率、多宽高比文本到图像生成的统一模型。其核心挑战在于：位置编码、VAE 压缩和优化目标在 4K 分辨率及多宽高比下形成**耦合失败模式**——2D RoPE 无法适应训练窗口外的分辨率与宽高比变化，高倍率 VAE 压缩丢失高频细节，标准 L2 损失对高频误差梯度过低，三者相互放大，导致生成图像出现几何漂移、细节模糊和纹理丢失。
 
@@ -58,7 +58,7 @@ UltraFlux 是一个面向原生 4K 分辨率、多宽高比文本到图像生成
 
 在 Aesthetic-Eval@4096 基准上，UltraFlux 在 FID、HPSv3 和 ArtiMuse 等指标上全面优于 Sana 等开源方法，并在 2:1、1:2、16:9、2.39:1 等多种宽高比下保持领先。Gemini-2.5-Flash 偏好评估中，UltraFlux 在视觉吸引力上被偏好比例为 70–82%，在提示对齐上为 60–89%。消融实验和 2×2 数据-模型协同消融进一步证实了各组件的非加性增益。
 
-## 背景与动机
+
 
 ### 原生 4K 多宽高比生成的核心瓶颈
 
@@ -91,7 +91,9 @@ UltraFlux 的核心洞察在于：**原生 4K 多宽高比生成需要从数据�
 
 通过这一协同设计范式，UltraFlux 在开源 4K 生成模型中取得了领先性能，并在与闭源商业系统的对比中展现出竞争力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 UltraFlux 的核心创新在于一次**数据–模型协同设计**，同时重塑了 4K 多宽高比生成的四个关键环节：训练数据、位置编码、VAE 压缩保真度与优化目标。这四个“changed slots”并非孤立改进，而是围绕一个共同瓶颈——位置编码、VAE 压缩和优化目标在 4K 分辨率及多宽高比下的耦合失败——进行联合调控，从而在单一 DiT 骨干上实现原生 4K 合成。
 
@@ -138,7 +140,7 @@ Flux 原生 F16 VAE 在 4K 分辨率下会丢失高频细节，限制了 DiT 的
 
 这一协同效应源于四个槽位的耦合关系：高质量多宽高比数据为位置编码外推提供了训练窗口感知的基础；高保真 VAE 重构使 DiT 的优化目标能有效作用于高频细节；而 SNR-Aware Huber Wavelet 损失则确保这些细节在训练中不被 L2 损失的梯度偏向所平滑。单独改进任一槽位都会因其他槽位的瓶颈而无法充分发挥潜力。
 
-## 整体框架
+
 
 UltraFlux 采用**数据–模型协同设计（data–model co-design）**范式，将大规模高质量多宽高比 4K 数据集构建与模型侧的位置编码、VAE 后训练、优化目标及训练策略进行联合优化，以解决原生 4K 多宽高比文本到图像生成中的耦合失败模式。其核心洞察在于：单独改进位置编码、VAE 或损失函数均无法充分发挥数据潜力，只有将各组件协同设计才能实现稳定且细节丰富的原生 4K 合成。
 
@@ -166,7 +168,7 @@ UltraFlux 采用**数据–模型协同设计（data–model co-design）**范�
 
 2×2 数据–模型协同消融（Table 7）证实了该 pipeline 的非加性增益：仅更换数据（B）或仅使用模型/损失改进（C）均无法达到全协同配置（D）的性能（FID 从 152.09 降至 145.81），验证了数据与模型联合设计的必要性。
 
-## 核心模块与公式推导
+
 
 UltraFlux 的核心技术方案围绕四个关键模块展开，它们共同构成了数据–模型协同设计的骨架：① 非对抗式 VAE 后训练，提升 4K 潜变量重建保真度；② Resonance 2D RoPE + YaRN 位置编码，消除多宽高比外推时的相位错位；③ SNR-Aware Huber Wavelet 训练目标，在频域和噪声水平两个维度上平衡梯度；④ 阶段性美学课程学习（SACL），将高美学监督集中于模型先验主导的高噪声步。
 
@@ -247,7 +249,9 @@ SACL 将训练分为两个阶段。第一阶段在全量 MultiAspect-4K-1M 数�
 ![[assets/figures/papers/paper_list_l2352_https_arxiv_org_abs_2511_18050/figures/019_Figure_10.jpg]]
 *Figure 10: Qualitative effect of Resonance 2D RoPE with YaRN. We compare three positional encodings at native 4K resolution for the same prompts. (a) Flux.1 2D RoPE baseline without any scaling at inference time, which tends to exhibit geometric drift and mild striping or warping artifacts in both foreground objects and backgrounds. (b) 2D RoPE with YaRN scaling, which stabilizes the overall layout but still shows subtle distortions along long contours and in extreme regions of the image. (c) Our proposed Resonance 2D RoPE with YaRN, which yields the most coherent global geometry and sharper, more regular fine structures (e.g., ring edges and tree trunks)*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与协同设计验证
 
@@ -339,7 +343,9 @@ Table 10 报告了 4K 生成的推理时间。尽管 UltraFlux 使用 F16 VAE �
 ![[assets/figures/papers/paper_list_l2352_https_arxiv_org_abs_2511_18050/figures/003_Figure_4.jpg]]
 *Figure 4: Dataset aspect and resolution analysis. All datasets use 10k samples. MultiAspect-4K-1M has a broader aspect ratio distribution*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有方法的关系
 
@@ -374,6 +380,8 @@ UltraFlux 处于原生高分辨率文本-图像生成这一新兴赛道的交叉
 4. **动态任务的耦合挑战。** 将舞蹈生成、视频生成等动态任务引入类似的多宽高比-高分辨率协同设计框架是否存在额外的耦合挑战？时间维度的引入将使位置编码、VAE 压缩和优化目标三者的相互作用更加复杂。
 
 5. **数据质量与模型能力的协同上限。** 当前 MultiAspect-4K-1M 数据集规模为 100 万张，进一步扩大数据规模或提升数据质量是否能持续带来模型能力的线性增长？还是存在一个由模型架构决定的协同上限？
+
+
 
 ## 原文 PDF
 

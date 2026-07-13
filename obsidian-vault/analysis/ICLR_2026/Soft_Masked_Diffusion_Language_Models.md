@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Soft_Masked_Diffusion_Language_Models.pdf
+project_link: null
+code_link: https://github.com/IBM/soft-masked-diffusion-language-models
 openreview_forum_id: Gba02UMvrG
 aliases:
 - SMS
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 软掩码扩散语言模型 |
 | 英文题名 | Soft-Masked Diffusion Language Models |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=Gba02UMvrG); [GitHub](https://github.com/IBM/soft-masked-diffusion-language-models) |
+| Links | [paper](https://openreview.net/forum?id=Gba02UMvrG) · [GitHub](https://github.com/IBM/soft-masked-diffusion-language-models) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/generative_models_and_autoencoders |
 | Method | Soft-masking (SM) |
 | Dataset | OpenWebText unconstrained generation (L=1024), HumanEval (Dream-7B fine-tuned) |
@@ -42,7 +44,7 @@ claims:
 > - OpenWebText unconstrained generation (L=1024) 上，Generative perplexity ↓ 为 24.63，对比 50.46，变化 ‑25.83。
 > - OpenWebText unconstrained generation (L=1024) 上，MAUVE ↑ (ReMDM)  为 0.766，对比 0.411，变化 +0.355。
 
-## 概述
+## 概要
 
 掩码扩散语言模型（MDLMs）在迭代解码过程中存在一个关键瓶颈：对于每个被保留的掩码位置，模型只能执行二元决策——要么保持[MASK]嵌入，要么替换为预测的离散token。这种硬反馈机制丢弃了前序去噪步骤中产生的丰富分布信息，严重制约了低解码预算下的生成质量与多样性。
 
@@ -58,7 +60,7 @@ claims:
 - 在Dream-7B上微调33.5k步后，HumanEval准确率从18.9%提升至25.6%（+6.7%），MBPP从26.6%提升至32.8%（+6.2%）。
 - 消融实验表明，SM在去噪过程的前80%步骤中应用效果远优于后80%，top-k值取3在语言建模中效果最佳，取1在代码生成中性价比最高。
 
-## 背景与动机
+
 
 ### 扩散语言模型的迭代解码瓶颈
 
@@ -80,7 +82,9 @@ claims:
 
 基于此，本文提出**软掩码（Soft-Masking, SM）**机制：对于每一步中保留的`[MASK]`位置，将其嵌入与上一轮预测的top-k个token的加权嵌入做凸组合，权重由模型对当前预测的置信度（以负熵度量）动态决定。这一设计仅引入三个可学习参数（缩放因子$\omega_s$、陡峭度$\omega_a$、偏移$\omega_b$），训练过程完全可并行，且不改变MDLM的扩散调度或模型架构，仅需在预训练或微调阶段以一定概率替换二元掩码为软掩码即可融入现有流程。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 1. 问题瓶颈：二元掩码的信息丢弃
 
@@ -139,7 +143,7 @@ $$
 - **SM在去噪早期阶段至关重要**：将SM步骤放在前80%的去噪步比放在后80%效果显著更好（Table 11），表明早期阶段的连续反馈对引导后续解码方向具有决定性作用；
 - **训练概率 $p_{sm}=0.8$ 最优**：训练时以80%概率使用SM、20%概率使用二元掩码，可让模型同时适应两种反馈模式；设为1.0则完全丧失处理二元掩码的能力（Figure 5a）。
 
-## 整体框架
+
 
 Soft-masking (SM) 作为一种即插即用的反馈增强模块，被嵌入到掩码扩散语言模型（MDLM）的标准迭代去噪管线中。该框架的核心是一个双向 Transformer 主干网络 $g_\theta$，负责在每一步预测所有位置的 token 分布。SM 并不改变主干的架构或扩散调度，而是在**去噪步骤之间的反馈回路**上施加影响，将原本的二元硬掩码松弛为信息丰富的软掩码。
 
@@ -179,7 +183,7 @@ SM 的训练采用**双前向传播（two-pass）** 流程（Algorithm 1）：
 
 SM 的三个可学习参数 $(\omega_s, \omega_a, \omega_b)$ 是框架中**唯一额外引入的参数量**，可通过与主干网络并行的梯度反向传播高效学习。SM 与解掩码策略、扩散调度完全解耦，可独立应用于标准 MDLM 或 ReMDM 等更先进的变体，也可通过继续预训练或参数高效微调（DoRA）快速适配到预训练模型上。
 
-## 核心模块与公式推导
+
 
 ### 3.1 软掩码反馈机制
 
@@ -222,7 +226,9 @@ SM 的训练需要两次前向传播（two‑pass），如 Algorithm 1 所述：
 
 当 $\lambda=1, k=1$ 时，SM 退化为将 argmax 预测 token 的嵌入反馈给掩码位置，与均匀扩散语言模型（uniform DLM）的反馈机制等价。这一退化情形揭示了 SM 的本质优势：通过 $k>1$ 和可学习的 $\lambda \in [0, \omega_s)$，SM 保留了预测分布中的不确定性信息，而非仅传递单点估计。消融实验表明，$k=3$ 在语言建模中效果最佳，$k=1$ 在代码生成中性价比最高，且所有 $k$ 值均优于二元基线（Table 10）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制验证
 
@@ -358,7 +364,9 @@ Table 12 进一步探索了时间依赖的 SM→Binary 切换策略（线性衰�
 *Table 9: Accuracy (%) on coding tasks. SM has been finetuned in the iso-compute training setting. Evaluations are tabulated by varying NFE budgets. We finetune the models with 5 seeds and report the mean accuracy (± standard deviation). SM is configured with k=1. Gain shows the comparison between the SM model and the finetuned baseline. The best performing model is marked in bold*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位与核心瓶颈
 
@@ -444,6 +452,8 @@ SM与CANDI、CADD等并行工作的本质区别在于：SM在反馈表示层面�
 ---
 
 **证据强度说明**：上述核心结论均有Table 1/3/5/7/10/11及Figure 3/5的量化数据支撑，置信度≥0.95。规模局限性和开放问题来自论文自身的讨论与未覆盖的实验设置，需后续工作验证。
+
+
 
 ## 原文 PDF
 

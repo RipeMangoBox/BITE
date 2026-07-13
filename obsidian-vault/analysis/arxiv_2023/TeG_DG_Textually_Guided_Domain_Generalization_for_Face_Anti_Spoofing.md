@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2023
 pdf_ref: paperPDFs/arxiv_2023/TeG_DG_Textually_Guided_Domain_Generalization_for_Face_Anti_Spoofing.pdf
+project_link: null
+code_link: null
 aliases:
 - TD
 - TeG-DG
@@ -43,7 +45,7 @@ claims:
 > - O&C&M to I (Replay-Attack as target) 上，HTER 3.21 vs 3.71 (DiVT-M) (-0.50)。
 > - O&C&I to M (MSU-MFSD as target) 上，HTER 1.88 vs 2.86 (DiVT-M) (-0.98)。
 
-## 概述
+## 概要
 
 人脸反欺骗（Face Anti-Spoofing, FAS）的域泛化（Domain Generalization, DG）面临一个核心瓶颈：现有方法提取的视觉特征仍残留与任务无关的风格偏差（如光照、采集设备、环境背景），导致模型在未知目标域上的泛化性能显著下降。根本原因在于，仅依靠视觉模态的域对齐或特征白化难以彻底剥离这些域特定噪声。
 
@@ -64,7 +66,7 @@ TeG-DG属于**文本引导的域泛化FAS方法**，与现有工作的关键区�
 
 **方法适用边界**：TeG-DG在标准Leave-One-Out协议和有限源域场景下均表现优异，但训练依赖攻击类型标签以构建匹配/不匹配提示对，获取细粒度标签可能增加标注成本。提示库由GPT-4自动生成，虽减少人工偏差，但可能受限于语言模型的内部知识覆盖范围。推理阶段丢弃文本模态虽降低部署复杂度，但也意味着无法利用测试时的附加文本信息（如设备描述、场景上下文）进一步提升性能。
 
-## 背景与动机
+
 
 ### 人脸反欺骗中的域泛化困境
 
@@ -101,7 +103,9 @@ TeG-DG属于**文本引导的域泛化FAS方法**，与现有工作的关键区�
 
 这些场景更贴近真实部署条件，能够充分检验文本引导泛化的实际价值。初步实验表明，TeG-DG在极其有限源域场景下，HTER相对降低约14%，AUC提升约12%，验证了文本监督在数据稀缺条件下的独特优势。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 TeG-DG的核心创新在于**将文本描述作为跨域通用监督信号引入人脸反欺骗（FAS）的域泛化任务**，从根本上改变了模型学习域不变特征的方式。与现有方法依赖域标签进行对抗对齐或实例白化不同，TeG-DG利用文本的抽象性和跨域稳定性来过滤图像中的域特定噪声（如光照、采集设备差异），从而弥合不同图像域之间的差距。
 
@@ -121,7 +125,7 @@ TeG-DG的核心创新在于**将文本描述作为跨域通用监督信号引入
 
 总体训练目标为$\mathcal{L}_{\mathrm{TeG-DG}} = \mathcal{L}_{\mathrm{CLS}} + \lambda \mathcal{L}_{\mathrm{TRI}}$（Equation 8），其中文本提示由**文本提示器（Text Prompter, TP）**从GPT-4生成的提示库中动态采样匹配和非匹配描述对（Section 3.1）。
 
-## 整体框架
+
 
 TeG-DG 的核心设计动机在于：传统域泛化方法从视觉特征中提取的表示仍残留着光照、采集设备等风格偏差，导致在未见域上的性能退化。TeG-DG 的解决方案是引入文本描述作为一种跨域通用的抽象监督信号，通过将视觉特征与文本特征对齐，过滤域特定噪声，学习域不变表示。文本之所以能弥合域间差距，在于它能够捕捉不同攻击类型（打印、重放、面具等）的共性本质，而非特定采集条件下的表面纹理。
 
@@ -144,7 +148,7 @@ $$\mathcal{L}_{\text{TeG-DG}} = \mathcal{L}_{\text{CLS}} + \lambda \mathcal{L}_{
 
 **关键设计要点**：文本模态仅在训练阶段作为正则化器参与，推理阶段完全丢弃，视觉分支独立完成前向推理。这使得 TeG-DG 在不增加部署复杂度的前提下，利用文本的跨域抽象能力显著提升了域泛化性能。消融实验（Table 4）证实，移除 TEVD 的文本对齐组件对性能的损害大于移除三元组损失，验证了文本监督在整个框架中的核心地位。
 
-## 核心模块与公式推导
+
 
 TeG-DG 的核心架构围绕一个关键洞察展开：**文本描述作为一种跨域通用的抽象表达，能够为视觉特征学习提供域不变的监督信号**，从而过滤掉光照、采集设备等残余风格偏差。整个框架由三个紧密协作的模块构成：Text Prompter（TP）负责动态生成配对文本，Hierarchical Attention Fusion（HAF）提取多粒度视觉特征，Textual-Enhanced Visual Discriminator（TEVD）通过跨模态对齐实现域泛化。
 
@@ -225,7 +229,9 @@ $$\mathcal{L}_{\mathrm{TeG-DG}} = \mathcal{L}_{\mathrm{CLS}} + \lambda \mathcal{
 ![[assets/figures/papers/paper_list_l1502_https_arxiv_org_abs_2311_18420/figures/005_Figure_5.jpg]]
 *Figure 5: The proposed textual-enhanced visual discriminator (TEVD). TEVD consists of a vision-language triplet loss and a multi-modal classifier*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -304,7 +310,9 @@ $$\mathcal{L}_{\mathrm{TeG-DG}} = \mathcal{L}_{\mathrm{CLS}} + \lambda \mathcal{
 ![[assets/figures/papers/paper_list_l1502_https_arxiv_org_abs_2311_18420/figures/014_Table_6.jpg]]
 *Table 6: Comparison to Baseline Method. ‘(Linear)’ means only using a linear classification head*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有域泛化FAS方法的关系
 
@@ -351,6 +359,8 @@ TeG‑DG 的设计在以下条件下展现出显著优势：
 - 能否将文本监督与传统的**域对齐或对抗训练方法结合**，形成互补——文本提供语义级不变性，对抗训练提供统计级不变性？
 - 在攻击类型标签不可用的场景下，是否可以利用**弱监督或半监督方式**（如聚类伪标签、多模态大模型的零样本推理）自动生成文本描述？
 - 如何在**推理阶段保留文本模态的优势**，例如通过测试域的无标签文本描述（设备信息、场景元数据）进行测试时自适应？
+
+
 
 ## 原文 PDF
 

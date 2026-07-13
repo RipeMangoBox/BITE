@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/SafeFlowMatcher_Safe_and_Fast_Planning_using_Flow_Matching_with_Control_Barrier_Functions.pdf
+project_link: https://takahashi-seiryu.github.io/SafeFlowMatcher/
+code_link: null
 openreview_forum_id: refcXHU1Nh
 aliases:
 - SafeFlowMatcher
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | SafeFlowMatcher：基于流匹配与控制屏障函数的安全快速规划 |
 | 英文题名 | SafeFlowMatcher: Safe and Fast Planning using Flow Matching with Control Barrier Functions |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=refcXHU1Nh); [Project](https://takahashi-seiryu.github.io/SafeFlowMatcher/) |
+| Links | [paper](https://openreview.net/forum?id=refcXHU1Nh) · [Project](https://takahashi-seiryu.github.io/SafeFlowMatcher/) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/planning_control |
 | Method | SafeFlowMatcher |
 | Dataset | Maze2D (maze-large-v1), Maze2D, Maze2D (Closed-Form CBF, T^c=4), Hopper (locomotion) |
@@ -41,7 +43,7 @@ claims:
 > - Maze2D 上，Trap Rate (↓) 为 0%，对比 RES-SafeDiffuser: 72%，变化 -72%。
 > - Maze2D (Closed-Form CBF, T^c=4) 上，T-Time (s) (↓) 为 0.023，对比 RES-SafeDiffuser: 1.208，变化 -1.185 (~50× faster)。
 
-## 概述
+## 概要
 
 **核心瓶颈**：现有基于生成模型的规划器（扩散模型、流匹配）在采样过程中缺乏形式化安全保证。直接将控制屏障函数（CBF）施加于中间潜在状态的认证方法会引起语义错位——安全认证应作用于最终执行的路径，而对未执行的潜变量施加干预会扭曲学习到的流，导致分布漂移和局部陷阱（路径不完整）。
 
@@ -57,7 +59,7 @@ claims:
 
 **局限与开放问题**：方法假设预测误差服从对称零均值分布，在复杂环境中可能不成立；屏障函数和松弛权重的选择依赖特定环境；当前依赖预定义 CBF，未涉及从数据学习屏障函数；实验集中在仿真任务，尚未在真实机器人上验证。开放问题包括动态障碍物环境下的表现、CBF 与流匹配的端到端联合优化、极度非凸安全集中的松弛机制鲁棒性等。
 
-## 背景与动机
+
 
 ### 生成式规划中的安全困境
 
@@ -92,7 +94,9 @@ SafeFlowMatcher 的设计动机源于一个实际需求：**在安全至上的�
 - **高效采样**：预测阶段仅需极少的积分步数（T^p=1 即可），校正阶段的 QP 求解可采用封闭解，总时间可比 SafeDiffuser 快约 50 倍（0.023s vs. 1.208s）。
 - **路径质量保持**：安全约束以最小扰动方式注入，避免扭曲流匹配学习到的路径分布。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SafeFlowMatcher 的核心创新在于通过**预测-校正（Prediction-Correction, PC）积分器**将路径生成与安全认证在时序上解耦，从根本上解决了现有安全感知生成式规划器的分布漂移与局部陷阱问题。该框架在三个关键维度上改变了 baseline 的设计范式。
 
@@ -143,7 +147,7 @@ $$T \leq t_w + \frac{(\delta - b(\pmb{\tau}_{t_w}^{c,k}))^{1-\rho}}{\epsilon (1-
 
 上述三个 changed slots 形成完整的因果链：**时序解耦**（slot 1）使得安全约束不干扰生成动力学，消除分布漂移的结构性根源；**VTFD**（slot 2）保证校正阶段的路径质量不因预测误差而退化；**带松弛的 CBF-QP**（slot 3）在维持安全认证的同时提供数值稳定性。三者共同作用，使 SafeFlowMatcher 在 Maze2D 上取得 0% 陷阱率（对比 SafeDiffuser 的 72%），评分 1.632 的 SOTA 性能，以及在封闭解配置下比 SafeDiffuser 快 50 倍的推理速度（0.023s vs. 1.208s）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_refcXHU1Nh/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of SafeFlowMatcher Versus Existing Certification-Based Methods. Directly constraining intermediate samples during generation (top) can cause paths to be distorted or trapped, whereas Safe-FlowMatcher (bottom) decouples generation and certification, producing a complete and certified-safe path*
@@ -188,7 +192,7 @@ SafeFlowMatcher 的整体 pipeline 围绕一个核心设计原则展开：**将�
 - **输出**：满足 $b(\tau_1^{c,k}) \geq \delta$（鲁棒安全边界）的完整路径 $\tau_1^c$，其中每个路径点均通过有限时间收敛 CBF 认证。
 - **可配置项**：预测步数 $T^p$（默认 1）、校正步数 $T^c$（默认 256）、缩放常数 $\alpha$（默认 2.0）、松弛消失时间 $t_w$。
 
-## 核心模块与公式推导
+
 
 SafeFlowMatcher 的核心架构是一个**预测-校正（Prediction-Correction, PC）积分器**，它将路径生成与安全认证在时序上完全解耦。该方法包含四个关键模块：预测阶段、校正阶段（含消失时间缩放流动力学）、CBF-QP 求解器，以及松弛项与权重机制。
 
@@ -236,7 +240,9 @@ $$ T \leq t_w + \frac{(\delta - b(\pmb{\tau}_{t_w}^{c,k}))^{1-\rho}}{\epsilon (1
 
 为增强数值稳定性，CBF-QP 在校正早期引入松弛变量 $ r_t^k $ 和递减权重 $ w_t^k $。当 $ t < t_w $ 时，松弛项允许路径点暂时偏离安全集，防止在高度非凸安全集（如 Maze2D）中出现不可行或振荡；当 $ t \geq t_w $ 时，$ w_t^k $ 消失，松弛项失效，确保最终路径严格满足 $ b(\tau) \geq \delta $（$ \delta=0.01 $ 为鲁棒性边界）。该机制在非凸环境中尤为关键（Remark 2）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制验证
 
@@ -338,7 +344,9 @@ Figure 7 的消融显示，当关闭消失时间缩放（α = 0，直接使用�
 ![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_refcXHU1Nh/figures/034_Table_8.jpg]]
 *Table 8: Robot manipulation task (block stacking) hyperparameters*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与设计动机
 
@@ -394,6 +402,8 @@ SafeFlowMatcher 的有效性依赖于以下边界条件：
 4. **重尾误差分布的鲁棒性**：VTFD 的误差衰减分析基于对称零均值假设，当预测误差呈现重尾分布时，是否需要自适应调整收缩参数 $\alpha$ 或引入鲁棒估计？
 
 5. **多智能体与交互场景**：SafeFlowMatcher 的 CBF-QP 框架是否可扩展到多智能体安全规划，其中每个智能体的安全集依赖于其他智能体的行为？
+
+
 
 ## 原文 PDF
 

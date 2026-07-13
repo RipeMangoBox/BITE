@@ -43,7 +43,7 @@ claims:
 > - nuScenes (zero-shot) 上，PSNR / SSIM / LPIPS 25.31 / 0.794 / 0.152 vs STORM: 17.77 / 0.669 / 0.394 (+7.54 / +0.125 / -0.242)。
 > - Argoverse2 (zero-shot) 上，PSNR / SSIM / LPIPS 26.34 / 0.812 / 0.155 vs STORM: 20.83 / 0.542 / 0.326 (+5.51 / +0.270 / -0.171)。
 
-## 概述
+## 概要
 
 动态驾驶场景的4D重建是自动驾驶感知与仿真的核心任务，但现有方法面临根本性瓶颈：逐场景优化方案（如**EmerNeRF**，Yang et al., arXiv 2023）速度慢、难以规模化；前馈方法则普遍依赖已知相机姿态或固定短时间窗口，无法直接处理大规模驾驶日志中常见的无标定图像序列。**DGGT** 提出了一种统一的前馈框架，将相机姿态从必需输入转变为模型同步预测的输出，并一次性生成像素对齐的3D高斯图，配合动态-静态分解与3D运动轨迹插值，在0.39秒内从稀疏无姿态图像完成高质量4D重建。
 
@@ -53,7 +53,7 @@ claims:
 
 尽管如此，DGGT仍存在局限：当动态掩膜不准确或运动遮挡严重时，跟踪与重建会出现失败案例；扩散精细化模块增加了计算开销，尚未针对实时应用深度优化；模型主要在驾驶场景训练，在非结构化或极端动态环境中的泛化性有待验证。未来工作可探索自监督动态掩膜学习、更轻量的精细化模块，以及向更长时序序列的扩展。
 
-## 背景与动机
+
 
 自动驾驶系统依赖大规模时序传感器数据来感知、预测和规划。从这些数据中高效重建4D动态场景（3D空间+时间）是下游任务的基础能力，它需要同时恢复场景几何、外观、运动以及相机姿态。然而，现有方法在这一目标上存在根本性的效率与可扩展性瓶颈。
 
@@ -65,7 +65,9 @@ claims:
 
 上述缺口共同指向一个核心瓶颈：**现有动态场景重建方法依赖逐场景优化、已知相机姿态或固定短窗口，导致速度慢、可扩展性差，难以作为大规模驾驶日志的预处理步骤。** 本文的动机正是打破这些依赖——将相机姿态从必需输入变为模型同步预测的输出，并一次性生成像素对齐的3D高斯图以及动态-静态分解，使前馈重建能够摆脱对姿态校准和固定序列长度的限制，从而在0.4秒内从无姿态图像完成高质量的4D动态场景重建。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DGGT的核心创新在于将动态场景重建从一个依赖逐场景优化与已知姿态的慢速流程，转变为一个**完全前馈、免姿态、可泛化的单次推理框架**。其关键设计围绕五个“changed slots”展开，每个都针对现有方法的根本瓶颈。
 
@@ -109,7 +111,7 @@ $$\tilde{I}^{t_i} = f_{\text{diffusion}}( \hat{I}^{t_i}, I_{\text{ref}} )$$
 
 该模块通过重建损失、感知损失和风格（Gram）损失的组合进行训练。消融实验（Table 4）表明，扩散精细化虽未大幅提升PSNR（27.41→27.32），但在视觉质量上显著减少了伪影，尤其在场景编辑中可修复空洞。
 
-## 整体框架
+
 
 DGGT 提出了一种**免姿态的前馈式动态场景重建框架**，其核心设计理念是将相机姿态从必需的输入条件转变为模型同步预测的输出，从而摆脱对离线标定或固定序列长度的依赖。整个 pipeline 以多视图无姿态图像序列为输入，在单次前向传播中完成相机参数估计、像素对齐高斯图生成、动静态分解、3D 运动跟踪以及扩散精细化渲染，最终输出高质量的 4D 动态场景表示。
 
@@ -170,7 +172,7 @@ DGGT 提出了一种**免姿态的前馈式动态场景重建框架**，其核�
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2512_03004/figures/001_Figure_1.jpg]]
 *Figure 1: Left: Our feedforward framework reconstructs dynamic driving scenes directly from unposed images within 0.4 seconds, producing outputs such as camera pose, 3D Gaussian tracking, depth, and dynamic maps, which further enable instance-level scene editing. Right: Quantitative comparison shows that our method achieves state-of-the-art reconstruction quality with competitive inference speed, outperforming prior feedforward approaches in both accuracy and efficiency.(using single-view input as an example)*
 
-## 核心模块与公式推导
+
 
 DGGT 的前馈流水线由八个核心模块串联构成，其设计逻辑是将动态场景重建分解为**姿态估计、逐帧高斯生成、动静分离、运动预测与插值、组合渲染、扩散后处理**六个可微阶段，从而将相机姿态从输入约束转变为模型输出。
 
@@ -240,7 +242,9 @@ $$\mathcal{L}_{\mathrm{diffusion}} = \mathcal{L}_{\mathrm{Recon}} + \mathcal{L}_
 
 消融实验（Table 4）表明，移除扩散精细化后 PSNR 从 27.41 降至 27.32，SSIM 和 LPIPS 也有下降，尤其在减少伪影方面效果显著。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验：Waymo 数据集新视角合成
 
@@ -308,7 +312,9 @@ DGGT 取得了 **27.41 PSNR**、**0.846 SSIM** 和 **3.47 D-RMSE**，在所有�
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2512_03004/figures/012_Figure_8.jpg]]
 *Figure 8: More Qualitative Results*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -373,6 +379,8 @@ Motion Head 基于 Transformer 预测像素对之间的 3D 位移，但当物体
 3. **遮挡鲁棒性**：在高度遮挡和非线性动态下，运动跟踪的鲁棒性如何进一步提升？多假设跟踪或概率建模是否是可行方向？
 4. **轻量级精细化**：扩散模块能否被轻量级模型（如轻量 U-Net 或对抗训练）替代，以降低延迟？
 5. **非驾驶场景泛化**：模型在室内动态场景、运动捕捉等非结构化环境中的表现如何？需要什么样的适配策略？
+
+
 
 ## 原文 PDF
 

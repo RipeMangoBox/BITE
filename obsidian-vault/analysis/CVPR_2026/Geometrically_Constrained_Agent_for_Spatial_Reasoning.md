@@ -34,7 +34,11 @@ claims:
 | Topic | #topic/benchmarks_datasets_evaluation #topic/benchmarks_datasets_evaluation/benchmarking |
 | Method |  |
 | Dataset | MMSI-Bench, MindCube, SpatialBench, CV-Bench |
-## 概述
+
+> [!tip] 效果简介
+> 本笔记的既有实验指标、对比结果与适用边界见“实验与关键发现”；本轮仅统一结构，不改写证据。
+
+## 概要
 
 视觉语言模型（VLM）在空间推理任务中长期面临一个根本性瓶颈：**语义-几何鸿沟（Semantic-Geometric Gap）**。当视觉信息被转换为文本空间时，精确的几何细节——如方向、距离、物体朝向——不可避免地丢失，导致VLM产生错误的推理或无约束的规划幻觉（Figure 1a）。
 
@@ -42,7 +46,7 @@ claims:
 
 在多个空间推理基准上的实验表明，GCA取得了显著的性能提升：以 **Gemini-2.5-Pro** 为基座时，平均准确率达到 **65.1%**，较基线的58.5%提升 **+6.6个百分点**（Table 1, Avg列）。更广泛地，GCA在多个基础VLM上平均带来约 **37%** 的相对性能增益，验证了该范式的通用性与有效性。
 
-## 背景与动机
+
 
 ### 语义-几何鸿沟：VLM 空间推理的根本瓶颈
 
@@ -68,7 +72,9 @@ claims:
 
 这一解耦策略的本质在于：**通过形式化约束将几何推理从 VLM 的损失语义空间中剥离出来，交给精确的几何工具完成，同时保留 VLM 在语义理解上的优势**。$\mathcal{C}_{\mathrm{task}}$ 作为语义与几何之间的确定性桥梁，需要满足三个条件：语法足够丰富以定义视点等复杂空间概念、语义足够清晰以消除歧义、几何足够完备以支持精确计算。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GCA 的核心创新在于通过一个形式化任务约束 $\mathcal{C}_{\mathrm{task}}$ 将空间推理中语义与几何之间的鸿沟进行了解耦与桥接。这一设计并非简单地增加推理步骤或工具调用，而是从根本上改变了 VLM 在推理过程中的角色定位与信息流动方式。
 
@@ -80,7 +86,7 @@ GCA 的核心创新在于通过一个形式化任务约束 $\mathcal{C}_{\mathrm
 
 **与现有方法的本质差异。** 与 ReAct 等通用智能体框架不同，GCA 并非简单地让 VLM 在思考-行动-观察循环中自由探索，而是通过 $\mathcal{C}_{\mathrm{task}}$ 对探索空间进行了刚性约束。与依赖微调或大量示例的方法相比，GCA 是一种免训练范式，其泛化能力来源于形式化约束本身的几何完备性，而非模型对特定数据分布的拟合。Figure 5 显示，GCA 在不同基础 VLM 上平均带来约 37% 的相对性能提升，验证了这一范式的模型无关性。
 
-## 整体框架
+
 
 GCA 是一个**免训练的智能体范式**，专为几何约束下的空间推理设计。其核心思想是通过引入一个形式化任务约束 $\mathcal{C}_{\mathrm{task}}$，将视觉语言模型（VLM）的推理过程解耦为两个阶段，从而弥合语义理解与几何计算之间的鸿沟（Figure 1）。
 
@@ -119,7 +125,7 @@ $$r_t = \mathcal{F}_{\mathrm{compute}}(\mathcal{C}_{\mathrm{task}}, v, \mathcal{
 
 与传统的 ReAct 策略 $r_t = \mathcal{A}(q, v, \mathcal{T}, r_{t-1})$ 相比，GCA 的关键区别在于强制 VLM 先确定“求解什么”（通过 $\mathcal{C}_{\mathrm{task}}$ 形式化），再决定“如何求解”（通过受约束的几何计算），从而避免了纯文本推理中的几何信息丢失问题。
 
-## 核心模块与公式推导
+
 
 GCA 的核心在于引入一个形式化的任务约束 $\mathcal{C}_{\mathrm{task}}$，作为语义理解与几何计算之间的确定性桥梁。整个推理过程被解耦为两个阶段，VLM 在其中的角色随之发生转变。
 
@@ -167,7 +173,9 @@ $$r_t = \mathcal{F}_{\mathrm{compute}}(\mathcal{C}_{\mathrm{task}}, \mathcal{T},
 ![[assets/figures/papers/paper_list_l2638_https_arxiv_org_abs_2511_22659/figures/003_Figure_3.jpg]]
 *Figure 3: Reference Frame. Here*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 整体性能：GCA 在空间推理基准上的主结果
 
@@ -234,7 +242,9 @@ Figure 5 展示了 GCA 在不同基础 VLM 上的泛化能力。在所有测试�
 ![[assets/figures/papers/paper_list_l2638_https_arxiv_org_abs_2511_22659/figures/007_Figure_6.jpg]]
 *Figure 6: Error Attribution and Failure Cases. We provide a detailed error attribution analysis to identify the main failure modes within the VLM’s reasoning trajectory*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -277,6 +287,8 @@ GCA 的设计依赖于以下前提条件，这些条件同时定义了其适用�
 2. **动态场景与时间维度的扩展**：GCA 当前处理的是静态空间关系。对于涉及动态物体运动、视角连续变化的场景，参考系约束（$\mathcal{C}_{\mathcal{R}}$）需要引入时间维度，这超出了现有框架的覆盖范围。
 3. **公式库的自动扩展**：知识增强代码生成依赖预置公式库。是否可以通过从成功推理轨迹中自动挖掘新的几何关系模式来动态扩展公式库，从而提升系统的覆盖面和鲁棒性？
 4. **与训练方法的协同**：GCA 是训练无关范式，但其形式化-计算两阶段结构是否可以作为训练信号，用于微调 VLM 以提升其空间语义分析能力？这可能是连接 agentic 方法与模型能力提升的潜在方向。
+
+
 
 ## 原文 PDF
 

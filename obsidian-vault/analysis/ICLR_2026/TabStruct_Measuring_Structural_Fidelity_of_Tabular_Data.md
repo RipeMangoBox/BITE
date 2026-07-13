@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/TabStruct_Measuring_Structural_Fidelity_of_Tabular_Data.pdf
+project_link: null
+code_link: https://github.com/SilenceX12138/TabStruct
 openreview_forum_id: XOPH34Extq
 aliases:
 - TabStruct
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | TabStruct：测量表格数据的结构保真度 |
 | 英文题名 | TabStruct: Measuring Structural Fidelity of Tabular Data |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=XOPH34Extq); [GitHub](https://github.com/SilenceX12138/TabStruct) |
+| Links | [paper](https://openreview.net/forum?id=XOPH34Extq) · [GitHub](https://github.com/SilenceX12138/TabStruct) |
 | Topic | #topic/benchmarks_datasets_evaluation #topic/benchmarks_datasets_evaluation/benchmark_eval |
 | Method | TabStruct（包含全局效用指标的结构保真度评估框架） |
 | Dataset | Six SCM datasets, 23 real-world datasets |
@@ -40,7 +42,7 @@ claims:
 > - Six SCM datasets 上，Spearman's rank correlation with Global CI 为 0.84 (global utility)，对比 0.14 (local utility)，变化 +0.70。
 > - 23 real-world datasets 上，Evaluation time per 1000 samples (s) 为 0.64 (global utility Tiny-default)，对比 1.21 (local utility Full-tuned)，变化 -0.57。
 
-## 概述
+## 概要
 
 表格数据生成模型近年来迅速发展，但现有评估范式主要关注密度估计、机器学习效能和隐私保护等维度，忽略了生成数据与真实数据在**因果结构**上的一致性——即结构保真度（structural fidelity）。这一盲区导致评估结果可能产生误导：某些生成器虽在传统指标上表现优异，却无法复现变量间的条件依赖关系，从而在需要因果推理的下游应用中引发系统性风险。
 
@@ -61,7 +63,7 @@ claims:
 
 **方法定位**：TabStruct不依赖真实因果图即可评估结构保真度，填补了现有基准在真实世界场景下的评估空白，为表格生成模型的全面诊断提供了实用工具。
 
-## 背景与动机
+
 
 表格数据是医疗、金融、工业等领域最普遍的数据形态，表格生成模型近年来取得了显著进展，涵盖变分自编码器、扩散模型、自回归Transformer等多个技术路线。然而，评估这些生成模型的保真度（fidelity）仍然是一个悬而未决的挑战。
 
@@ -79,7 +81,9 @@ claims:
 
 正是在这一背景下，TabStruct 提出了一个统一的评估框架，将结构保真度确立为表格生成模型的核心评估维度。其核心创新在于引入**全局效用（global utility）**指标——通过将每个特征作为预测目标并聚合预测性能，在无需真实因果图的前提下可靠地评估生成数据的全局结构保真度。这一设计消除了对先验因果知识的依赖，使得结构保真度评估首次可推广至真实世界数据集。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 TabStruct 的核心创新在于将**结构保真度（structural fidelity）**系统性地引入表格生成模型的评估框架，并解决了现有评估范式中一个关键瓶颈：**真实世界数据缺乏可用的因果结构图（SCM），导致结构保真度评估无法落地**。
 
@@ -122,7 +126,7 @@ TabStruct 的突破在于引入了一个**无需真实因果图的代理指标�
 
 TabStruct 并非提出新的生成模型，而是提供了一个**统一的评估框架**，将结构保真度与密度估计、ML 效能、隐私保护等传统维度并列，形成对表格生成模型的多维评价体系。其核心贡献在于让结构保真度评估从“有 SCM 才能做”的奢侈品，变成“任意真实数据都能做”的标配工具。
 
-## 整体框架
+
 
 TabStruct 提出了一套统一的表格生成模型评估框架，其核心创新在于将**结构保真度**（structural fidelity）作为与传统评估维度并列的核心评价轴。框架的整体设计围绕一个关键瓶颈展开：现有评估体系缺乏对生成数据因果结构保真度的有效度量，且需要真实因果结构图（SCM）才能进行评估，而这在真实世界数据中几乎不可得。
 
@@ -162,7 +166,7 @@ TabStruct 提出了一套统一的表格生成模型评估框架，其核心创�
 - **CPDAG 级别的评估**：不要求恢复完整的 DAG 或仅检查骨架（skeleton），而是在 CPDAG（完备部分有向无环图）层面评估，这平衡了语义丰富性和计算可行性。
 - **归一化效用的必要性**：消融实验表明，若使用绝对预测性能而非归一化效用计算全局效用，其与全局 CI 的相关性会从 rₛ = 0.84 大幅下降至 rₛ = 0.57，验证了归一化设计的必要性。
 
-## 核心模块与公式推导
+
 
 ### 结构保真度的形式化定义
 
@@ -211,7 +215,9 @@ $$\mathrm{Global\ Utility}(\mathcal{D}) := \frac{1}{D+1} \sum_{j=1}^{D+1} \mathr
 - **预测器鲁棒性**：即使使用轻量级“Tiny-default”配置，全局效用仍能产生与“Full-tuned”一致的生成器排名，表明指标对下游预测器选择不敏感。
 - **样本量要求**：当合成样本量达到或超过参考数据规模时，全局效用趋于饱和，提示足够的样本量是可靠评估的前提。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 基准有效性验证
 
@@ -293,7 +299,9 @@ Table 2 和 Figure 3（right）揭示了不同生成器在结构保真度上的�
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_XOPH34Extq/figures/020_Table_12.jpg]]
 *Table 12: Hyperparameter search space of GOGGLE*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：表格生成评估中的结构盲区
 
@@ -356,6 +364,8 @@ TabStruct 开辟了若干值得深入探索的方向：
 3. **因果结构指导的生成模型设计**：全局效用揭示的列顺序效应暗示，表格数据中固有的因果结构信息可以被更有效地利用来指导生成模型的设计和训练。
 
 4. **向动态与多模态数据的扩展**：全局效用的核心思想——以每个变量为预测目标评估整体依赖结构的保留——是否可以推广至动态表格数据、多模态表格数据或多表关联场景？
+
+
 
 ## 原文 PDF
 

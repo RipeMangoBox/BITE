@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/SALAD_Skeleton_aware_Latent_Diffusion_for_Text_driven_Motion_Generation_and_Editing.pdf
+project_link: https://seokhyeonhong.github.io/projects/salad/
+code_link: null
 aliases:
 - SALAD
 tags:
@@ -40,15 +42,13 @@ claims:
 > - HumanML3D 上，FID ↓ 为 0.076 ± 0.002，对比 0.103 ± 0.004 (ReMoDiffuse)，变化 -0.027。
 > - HumanML3D 上，MM-Dist ↓ 为 2.649 ± 0.009，对比 2.974 ± 0.016 (ReMoDiffuse)，变化 -0.325。
 
-## 概述
+## 概要
 
 文本驱动的三维人体运动生成旨在根据自然语言描述合成逼真的运动序列，在动画、游戏、虚拟现实等领域具有广泛应用。然而，现有方法普遍存在一个关键瓶颈：它们将运动姿态视为单一向量，并将文本压缩为单一特征向量，忽视了骨骼关节、时间帧和文本词之间的复杂交互关系。这种粗粒度的建模方式导致生成细节丢失，且无法利用预训练模型直接进行零样本编辑。
 
 针对上述问题，本文提出 **SALAD**（Skeleton-aware Latent Diffusion），一种骨骼感知的潜扩散模型。其核心思路是将运动数据分解为骨骼维度和时间维度，并在潜扩散过程中通过独立的注意力机制分别处理这些维度及其与文本的细粒度交互。具体而言，SALAD 首先训练一个骨骼-时间变分自编码器（VAE），将运动序列映射到结构化的潜空间；随后在该潜空间上训练一个由时间注意力、骨骼注意力和交叉注意力组成的 Transformer 去噪器，显式建模关节-帧-词三元交互。这一设计不仅提升了生成质量和文本对齐，还自然地产生了可调制的交叉注意力图，从而支持零样本文本驱动运动编辑。
 
 在 HumanML3D 和 KIT-ML 两个标准基准上的实验表明，SALAD 在文本-运动对齐和生成质量上均达到最优水平。在 HumanML3D 上，其 R-Precision Top-3 达到 0.857，FID 降至 0.076，显著优于 ReMoDiffuse 和 MoMask 等先前最佳方法。消融实验验证了骨骼-时间潜变量和交叉注意力机制对性能的关键贡献。用户研究进一步表明，SALAD 的零样本编辑结果在保持原作、语义对齐和整体质量上均显著优于 MDM 和 MotionFix 等基线方法。
-
-## 背景与动机
 
 文本驱动的三维人体运动生成旨在根据自然语言描述合成逼真的人体运动序列，在动画制作、游戏开发和人机交互等领域具有广泛应用。近年来，基于扩散模型的运动生成方法取得了显著进展，代表性工作包括**MDM**（Tevet et al.）将扩散模型引入运动生成、**MLD**（Chen et al.）提出潜扩散框架以提升效率、**MotionDiffuse**（Zhang et al.）实现细粒度文本控制，以及**ReMoDiffuse**（Zhang et al.）通过检索增强机制进一步提升了生成质量。然而，这些方法在运动表示和文本条件机制上存在一个共同的结构性缺陷。
 
@@ -72,7 +72,7 @@ claims:
 - **三元交互建模**：在去噪Transformer中引入独立的时间注意力（TempAttn）、骨骼注意力（SkelAttn）和交叉注意力（CrossAttn）模块，分别建模帧间依赖、关节间依赖以及词-关节-帧的细粒度对齐。
 - **零样本编辑能力**：训练完成后，交叉注意力图自然地编码了文本词与身体部位及时间帧的对应关系。通过调制这些注意力图（如词交换、注意力重加权、注意力镜像），无需任何额外训练即可实现文本驱动的运动编辑。
 
-## 核心创新
+## 核心方法与创新机理
 
 SALAD 的核心创新在于将运动生成从“整体姿态-全局文本”的粗粒度建模，推进到“关节-帧-词”三元交互的细粒度建模。这一转变通过三个相互协同的 **changed slots** 实现，共同构成了方法的因果开关（causal knob）。
 
@@ -129,8 +129,6 @@ $$
 
 这一参数化结合了噪声和干净样本的信息，在高噪声阶段具有更好的稳定性。消融实验（Appendix Table 2）表明，v-预测在 HumanML3D 上取得了更低的 FID（0.076）和更好的 MM-Dist，验证了其在运动扩散模型中的优势。
 
-## 整体框架
-
 SALAD 的整体 pipeline 由三个核心阶段构成：**骨骼感知的变分自编码器（VAE）构建结构化潜空间**、**骨架-时间感知的潜扩散模型进行条件生成**、以及**基于交叉注意力调制的零样本运动编辑**。
 
 ### 阶段一：骨骼感知的潜空间构建
@@ -158,8 +156,6 @@ SALAD 的交叉注意力机制自然地产生了文本词与运动关节/时间�
 
 ![[assets/figures/papers/paper_list_l20_SALAD_Skeleton_aware_Latent_Diffusion_for_Text_driven_Motion_Generation/figures/001_Figure_1.jpg]]
 *Figure 1: Architecture of the skeleto-temporal VAE network. The encoder maps motion features into a skeleto-temporal latent space, and the decoder restores the skeleto-temporal latent variables into motion features*
-
-## 核心模块与公式推导
 
 ### 骨架-时间变分自编码器（VAE）
 
@@ -229,7 +225,7 @@ $$
 
 该操作无需额外训练或优化，仅通过修改生成过程中的交叉注意力图即可实现编辑，是SALAD区别于MDM、MotionFix等需要手动掩码或微调的编辑方法的核心优势。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -325,15 +321,12 @@ SALAD 在所有维度上均显著优于基线方法，整体质量评分 4.596�
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l20_SALAD_Skeleton_aware_Latent_Diffusion_for_Text_driven_Motion_Generation/figures/014_Figure_3.jpg]]
-*Figure 3: Additional visualizations of cross-attention maps between text and motion. Each row corresponds to a specific body part, and each column represents temporal frames*
-
 ![[assets/figures/papers/paper_list_l20_SALAD_Skeleton_aware_Latent_Diffusion_for_Text_driven_Motion_Generation/figures/007_Table.jpg]]
 
 ![[assets/figures/papers/paper_list_l20_SALAD_Skeleton_aware_Latent_Diffusion_for_Text_driven_Motion_Generation/figures/016_Table_2.jpg]]
 *Table 2: Quantitative results on different diffusion parametrizations*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 与既有方法的谱系关系
 

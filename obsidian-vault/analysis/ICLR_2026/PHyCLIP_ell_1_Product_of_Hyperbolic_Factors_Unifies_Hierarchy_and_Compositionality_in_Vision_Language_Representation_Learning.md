@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/PHyCLIP_ell_1_Product_of_Hyperbolic_Factors_Unifies_Hierarchy_and_Compositionality_in_Vision_Language_Representation_Learning.pdf
+project_link: null
+code_link: null
 aliases:
 - PHyCLIP
 tags:
@@ -40,7 +42,7 @@ claims:
 > - WordNet Hierarchical Classification 上，Jaccard (↑) 为 0.8059，对比 0.8043 (HyCoCLIP)，变化 +0.0016。
 > - COCO Text→Image Retrieval 上，R@5 为 58.03，对比 57.11 (HyCoCLIP)，变化 +0.92。
 
-## 概述
+## 概要
 
 现代视觉‑语言模型（VLM）需要同时处理两种根本不同的语义结构：概念族内部的层次隶属关系（树形分类）与跨概念族的组合关系（布尔代数式组合）。现有的对比学习框架通常将图像和文本编码至单一欧氏空间或单一双曲空间，然而前者难以编码树状的层次结构，后者则难以表达跨族的组合性，这一瓶颈限制了模型在细粒度分类、组合理解等任务上的性能。
 
@@ -50,7 +52,7 @@ PHyCLIP 针对上述瓶颈提出了一个简洁而有效的解决方案：将嵌
 
 实验结果表明，PHyCLIP 在零样本分类、检索、层次分类与组合理解四个维度上均取得一致提升：零样本层次分类的 TIE 指标降至 3.294（HyCoCLIP 为 3.319）；在 SugarCrepe 组合理解总体准确率上达到 78.32（基线为 77.99）；消融实验进一步验证了 ℓ₁‑乘积度量显著优于 ℓ∞ 乘积或混合曲率设定，且因子数量 $k=64$、维度 $d=8$ 的配置表现最优。可视化分析显示，不同因子自发地专门化至不同概念族（如动物与交通工具），且复合文本提示会同时激活对应因子，呈现出类似布尔组合的激活模式。这些证据共同支撑了 PHyCLIP 在统一层次性与组合性方面的有效性。
 
-## 背景与动机
+
 
 当前主流的视觉–语言模型（如 CLIP）通过对比学习在欧几里得空间中对齐图像与文本的嵌入。然而，语言概念天然承载着两种截然不同却并存的语义结构：**概念族内部的树状层次分类**（例如“金毛犬→犬科→哺乳动物→动物”）与**跨概念族的组合性**（例如“一只狗坐在车里”由“狗”和“车”组合而成）。前者要求表示空间能够编码严格的部分‑整体或种属包含关系，后者则要求空间能够支持类似布尔代数的概念合取/析取操作。欧氏空间虽然简单易用，但其全局平坦的几何特性难以同时为这两种结构提供自然的归纳偏置——层次关系在欧氏距离下缺少内在的包含方向感，而组合语义也很难通过余弦距离的简单运算得到体现。
 
@@ -60,7 +62,9 @@ PHyCLIP 针对上述瓶颈提出了一个简洁而有效的解决方案：将嵌
 
 本文的动机正是填补这一空白。PHyCLIP 提出将表示空间重新设计为 **k 个独立双曲因子的 ℓ₁‑乘积度量空间（$(\mathbb{H}^d)^k$，其中 k = 64，d = 8，总维数 512）**。其核心洞察是：族内层次关系可被每个双曲因子内的包含锥独立捕获，而跨族组合则等价于布尔代数的 ℓ₁‑等距嵌入，因此 ℓ₁‑乘积度量天然统一了两种结构。后续实验表明，这种架构上的“因果开关”能够自发引导模型在不同的双曲因子中沉淀不同的概念族（如哺乳动物因子 vs. 交通工具因子，见 Figure 4、Figure 5），并通过各因子距离之和（ℓ₁‑距离）实现稳定的组合相似度计算，从而在零样本分类、层次分类与组合理解任务上对纯双曲或欧氏基线取得一致提升（见 Table 1–3；所有提升均有消融实验支撑，置信度 ≥ 0.9）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 现有视觉–语言模型（CLIP、MERU、HyCoCLIP）仅在单一欧氏或单一双曲空间中表征语义，无法同时容纳“树状层次”与“布尔组合”两种并存的语义结构：同一概念族内的传递性包含关系（如“贵宾犬 ≺ 犬科 ≺ 哺乳动物”）天然适合嵌入双曲空间，而跨概念族的组合（如“男孩 与 自行车”）则需满足布尔代数的组合规则，后者与 ℓ₁ 乘积度量自然同构，与单一双曲空间却不兼容。这一结构失配导致模型在层次分类与组合理解之间难以兼顾。
 
@@ -95,7 +99,7 @@ PHyCLIP 将图像与文本分别编码为 ℓ₁ 乘积空间中的元组，对�
 
 这些局限为下一步将关系代数结构显式纳入因子化乘积空间，以及设计自适应因子数量机制提供了明确路径。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0016_I3Ct1eDmVI_PHyCLIP_ell_1-Product_of_Hyperbolic_Factors_Unif/figures/002_Figure_1.jpg]]
 *Figure 1: Conceptual diagram of hierarchical and compositional structures. While all arrows represent entailments (⪯), they differ in nature. (upper) Linguistic concepts organize tree-like taxonomic hierarchies of concept families, each of which can be embedded into a hyperbolic space (Sarkar, 2011). (middle) Images and texts exhibit compositionality across distinct concept families, which can be captured by a Boolean algebra or an $\ell _ { 1 }$ -product metric. (lower) Images are instances of their corresponding captions. Figure 2: Overview of PHyCLIP. Images and texts are encoded as points X in an $\ell _ { 1 } \cdot$ -product metric space of hyperbolic factors, ( $\mathbb { H } ^ { d } ) ^ { k }$ , tha...
@@ -130,7 +134,7 @@ $$\mathcal{L}_{\mathrm{overall}} = \mathcal{L}_{\mathrm{cont}} + \gamma \mathcal
 
 该框架将族内层次结构（由各因子内部的双曲树形结构承载）与跨族组合性（由因子间的 ℓ₁ 和逻辑“或”风格的最大激活操作体现）自然地统一在统一度量空间中，并通过消融实验验证了 ℓ₁ 乘积在多个指标上的显著优越性（表 4）。
 
-## 核心模块与公式推导
+
 
 PHyCLIP 的核心设计是将视觉与文本嵌入表达为 **k 个双曲因子的元组**，并在因子的 ℓ1‑乘积空间上定义对比损失与包含损失，从而在统一的度量下同时捕获**族内层次结构**与**跨族组合语义**。以下按模块组织关键公式并解释变量含义。
 
@@ -186,7 +190,9 @@ L_{\mathrm{ent}, i}(X, \mathbf{Y}) = \max\!\big(0, \phi(\mathbf{x}^{(i)},\mathbf
 
 在零样本组合推理中，对于同时要求多个概念（如“狗和车”）的提示，PHyCLIP 可通过**因子最大值操作**近似组合嵌入：对每个单概念提示的嵌入元组，逐因子取 max（与双曲锥的“或”逻辑兼容）。该操作无需额外训练，即可同时激活对应概念族的因子，从而在 ℓ1‑乘积距离下实现类似于布尔组合的检索行为。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 所有对比模型均在 **GRIT** 数据集上从头训练，使用相同的图像编码器（ViT‑B/16）、文本编码器（12 层 Transformer，输出维度 512）及统一的训练协议和超参数设定（Pal et al., 2025）。PHyCLIP 设定超椭圆因子数 $k=64$，每个因子的维度 $d=8$，总嵌入维度保持 $512$。唯一引入的额外参数为每个因子的负曲率 $\alpha_i$，总计 64 个标量，相对 ViT‑B/16 的 86M 参数量可忽略不计。所有实验报告三次随机种子运行的平均结果，保证比较的公平性。
@@ -247,7 +253,9 @@ PHyCLIP 在 17 个跨域基准中的 11 个上取得最优，尤其在一般类�
 ![[assets/figures/papers/iclr26_0016_I3Ct1eDmVI_PHyCLIP_ell_1-Product_of_Hyperbolic_Factors_Unif/figures/027_Figure_6.jpg]]
 *Figure 6: (a2) Embedding norms of single-concept and conjunctive prompts. (c2) Images retrieved by the conjunctive prompt. Figure 6: Factor-wise embeddings and retrievals. (a1)(a2) Single-concept prompts activate distinct factors, and their textual composition activates the corresponding factors simultaneously. (b1)–(c1), (b2)–(c2) “max” of the single-concept prompts retrieves images similarly to the textual compositions. See also Fig. 4*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -300,6 +308,8 @@ PHyCLIP 作为统一层次和组合表征的早期尝试，遗留了若干核心
 - **理论嵌入的紧致性**  虽然证明了 $\ell_1$-乘积双曲空间可准等距嵌入有限度量树（Theorem 2），但实际学习到的嵌入质量是否逼近理论边界、如何在有限维度下平衡曲率与因子数，仍需要更深入的理论分析。
 
 综上，PHyCLIP 构成了从单一双曲空间到多因子 $\ell_1$ 乘积空间的谱系跃迁，其定位为视觉–语言模型中层次与组合联合表征的原理性验证。在走向更鲁棒的组合性人工智能时，其因子化结构为未来的关系推理和自动概念发现提供了可切入的几何基础。
+
+
 
 ## 原文 PDF
 

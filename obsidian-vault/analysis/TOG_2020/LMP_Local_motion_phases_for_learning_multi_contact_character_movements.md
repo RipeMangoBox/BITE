@@ -5,6 +5,7 @@ paper_level: A
 venue: TOG
 year: 2020
 pdf_ref: paperPDFs/TOG_2020/Local_motion_phases_for_learning_multi_contact_character_movements.pdf
+code_link: https://github.com/sebastianstarke/AI4Animation/tree/master/AI4Animation/SIGGRAPH_2020
 project_link: https://github.com/sebastianstarke/AI4Animation/tree/master/AI4Animation/SIGGRAPH_2020
 aliases:
 - LMP
@@ -33,7 +34,7 @@ claims:
 | 中文题名 | 用于学习多接触角色运动的局部运动相位 |
 | 英文题名 | Local motion phases for learning multi-contact character movements |
 | 会议/期刊 | TOG 2020 |
-| Links | [paper](https://doi.org/10.1145/3386569.3392450); [GitHub](https://github.com/sebastianstarke/AI4Animation/tree/master/AI4Animation/SIGGRAPH_2020) |
+| Links | [paper](https://doi.org/10.1145/3386569.3392450) · [GitHub](https://github.com/sebastianstarke/AI4Animation/tree/master/AI4Animation/SIGGRAPH_2020) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/robotics |
 | Method | Local Motion Phase (LMP) framework |
 | Dataset | Basketball motion varieties (Forward/Backward/Sidestep, Turn, Switching, Spin, Stop), Basketball motion (including 360° Spin), Dribbling, Stopping from running |
@@ -43,7 +44,7 @@ claims:
 > - Basketball motion (including 360° Spin) 上，Foot skating (horizontal displacement during contact, cm) 为 Lowest foot skating，对比 Higher skating for other methods，变化 Reduced sliding。
 > - Dribbling 上，Minimum hand-ball distance during bouncing (cm) 为 0 at every bounce，对比 Non-zero (others fail to bounce back to hand)，变化 Perfect contact。
 
-## 概述
+## 概要
 
 **问题瓶颈**：合成包含多个异步接触的快速动态角色运动——例如篮球运球中脚触地和手触球的交替——是运动生成领域的核心难题。现有方法依赖单一的全局时序对齐参数（如**PFNN**的全局相位，Holden et al., ACM Trans. Graph. 2017），无法统一对齐身体各部分的异步运动；同时，低维用户控制信号难以驱动丰富、多变的复杂动作。
 
@@ -53,7 +54,7 @@ claims:
 
 **主要结果**：在篮球运动的多个指标上，本方法一致优于PFNN、MANN和LSTM基线。具体而言：关节角度变化量最大，表明运动敏捷性最高；脚步滑动最少；运球时手球距离在每次弹跳时精确归零，而其他方法偶尔无法将球弹回手中；对停止指令的响应时间最短。消融实验表明，移除所有局部运动相位会导致身体各部位运动量减少约95%（例如脚部从约400°/帧降至21°/帧），证实了相位对生成动态运动的决定性作用。
 
-## 背景与动机
+
 
 在计算机动画领域，合成具有丰富接触交互的角色运动一直是一项核心挑战。篮球运球、与对手的攻防互动、搬运物体等场景要求角色在多个身体部位之间协调异步的接触事件——例如，运球时双脚交替触地的同时，手部需要周期性地拍击篮球。这类运动的特点是**快速、动态且多接触点异步发生**，对运动合成方法提出了极高的要求。
 
@@ -61,7 +62,9 @@ claims:
 
 本文的核心动机正是针对上述两个瓶颈。作者观察到，接触事件本身蕴含了丰富的时序信息：每块骨骼何时接触外部物体，天然地定义了一个与该骨骼运动周期绑定的局部时序参考。如果能为每块关键骨骼（双脚、双手、球）独立地提取其接触驱动的**局部运动相位**（local motion phase），神经网络就有可能学习到各肢体异步运动的模式。同时，为了从低维用户指令中产生丰富多变的运动，还需要一种机制将抽象控制信号“锐化”并注入可控的变化。这构成了本文方法设计的出发点：**用局部相位解决异步对齐，用生成式控制模型解决控制信号的多样性与尖锐性**。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作的核心创新在于引入**局部运动相位（Local Motion Phase, LMP）** 来替代传统的全局时序对齐信号，并结合**生成式控制模型**实现从稀疏用户指令到丰富运动变化的映射。这两个模块分别解决了多接触交互中的异步对齐难题和控制信号的多样性不足问题。
 
@@ -108,7 +111,7 @@ $$\Theta_{i+1}' = \lambda \Theta_{i+1} + (1 - \lambda) (\Theta_i + \Delta\Theta_
 
 **证据强度说明：** 局部运动相位的有效性有强消融实验支撑（Table 2，置信度 0.95）；生成式控制模型的多样性效果有定性展示（Fig. 15）和噪声尺度分析（Fig. 8）支撑；与 baseline 的定量对比见 Fig. 11–14 和 Fig. 17。相位提取中进化策略优于梯度优化的结论来自 Fig. 5 的定性对比，缺乏定量统计检验，需注意其证据强度。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l36_https_doi_org_10_1145_3386569_3392450/figures/001_Figure_1.jpg]]
 *Figure 1: A selection of results using our method to generate ball-dribbling movements and interaction behaviours with other characters*
@@ -151,7 +154,7 @@ $$\Omega(\mathbf{F}_i, t) = a_i \cdot \sin(f_i \cdot t - s_i) + b_i \quad \text{
 
 该框架的核心设计动机在于：传统方法依赖单一全局相位对齐多接触运动，无法统一处理脚触地和手触球等异步事件。通过为每块骨骼独立提取局部相位，门控网络获得了区分异步肢体运动模式的能力；生成式控制模型则解决了低维用户输入难以驱动丰富动作变化的问题。消融实验证实，移除所有局部相位后，身体各部位的运动量从最高约 400°/帧 骤降至约 21°/帧（Table 2），表明相位信号是生成动态运动的关键驱动因素。
 
-## 核心模块与公式推导
+
 
 ### 局部运动相位提取器
 
@@ -229,7 +232,9 @@ $$L_{all} = L_{adv} + \lambda_{\ell_1} L_{\ell_1}, \quad \lambda_{\ell_1}=5.0$$
 
 噪声尺度是控制运动多样性的关键参数：实验表明 0.25–0.75 范围内可产生良好变化并保持可控性，过高的噪声尺度会导致角色偏离用户控制意图（Fig. 8）。训练时采用教师强制（teacher forcing），以 0.5 的均匀概率决定是否用前一帧的相位输出更新下一帧的相位输入，使用 AdamWR 优化器（初始学习率 $1.0 \times 10^{-4}$，初始权重衰减 $2.5 \times 10^{-3}$）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 数据集与训练配置
 
@@ -276,7 +281,9 @@ Fig. 18 展示了搬运箱子和从椅子坐/站等物体交互场景的结果�
 3. **高噪声下的可控性下降。** 生成式控制模型中噪声尺度过大（>0.75）会导致运动偏离用户控制意图，限制了极端多样性场景的应用。
 4. **缺乏物理合理性。** 本方法为运动学控制器，未与物理仿真结合，生成的运动不保证满足动力学约束，可能出现不合理的足部滑动或接触力分布。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位与核心瓶颈
 
@@ -330,6 +337,8 @@ LMP 框架的工作链路可归纳为以下因果链条：
 - **快速适应机制**：能否在保持运动多样性的同时，让模型对控制参数变化具有快速适应性（如元学习或微调策略），避免完全重新训练？
 - **物理仿真集成**：如何将本框架与基于物理的角色动画方法（如 DeepMimic）结合，使生成的运动既具有多接触异步协调能力，又满足物理合理性约束？
 - **高层规划与空间交互**：对于角色间的复杂空间交互（如篮球中的攻防对抗），高层规划器如何进一步提升路径生成的真实性和策略多样性？
+
+
 
 ## 原文 PDF
 

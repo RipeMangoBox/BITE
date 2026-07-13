@@ -42,7 +42,7 @@ claims:
 > - 多模态风格理解 上，准确率 (%) 71.14 vs 68.0 (GPT-4o) (+3.14)。
 > - 文本控制风格生成 (OmniGen2) 上，风格准确率 (StyleDoctor / GPT-4o) 69.58 / 67.60 vs — (—)。
 
-## 概述
+## 概要
 
 **核心问题**：现有的人类偏好奖励模型（如 **HPSv2**，Wu et al., arXiv 2023）和仅基于图像特征的风格编码器（如 **CSD**，Somepali et al., arXiv 2024；**StyleTokenizer**，Li et al., ECCV 2024）无法有效感知图像风格。前者缺乏对风格维度的细粒度建模能力，后者缺少跨模态监督信号，导致在风格生成任务中评估不准、引导乏力。
 
@@ -55,7 +55,7 @@ claims:
 - **风格生成对齐**：将 StyleDoctor 作为奖励模型集成到 OmniStyle 和 OmniGen2 后，风格一致性指标（CSD）分别提升至 0.78 和 0.72。
 - **关键验证**：消融实验表明，去除全局风格特征学习（GSF）和统一偏好学习（UPL）会导致性能显著下降，证实这两部分是方法的核心有效设计。
 
-## 背景与动机
+
 
 ### 风格生成任务的兴起与核心瓶颈
 
@@ -89,7 +89,9 @@ StyleDoctor 的设计围绕三个关键创新展开：
 
 通过这一设计，StyleDoctor 能够提供多维度的风格奖励信号（包括全局风格一致性、色彩和谐度、笔触纹理等），为扩散模型的风格对齐优化提供精确的反馈指导。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 StyleDoctor 的核心创新在于将风格感知从“通用美学评分”或“纯视觉编码”的单一范式，升级为**联合图像全局风格特征与多模态语言理解的专家奖励模型**。这一转变解决了现有方法在风格生成任务中的根本瓶颈：人类偏好奖励模型（如 **HPSv2**，Wu et al., arXiv 2023）无法有效感知图像风格，而仅基于图像特征的风格编码器（如 **CSD**，Somepali et al., arXiv 2024；**StyleTokenizer**，Li et al., ECCV 2024）又缺乏跨模态监督，导致评估信号与人类对风格一致性的判断存在偏差。
 
@@ -109,7 +111,7 @@ StyleDoctor 的核心创新在于将风格感知从“通用美学评分”或�
 
 这些创新共同构成了一个从“风格感知”到“风格引导”的闭环：StyleDoctor 不仅能准确判断风格一致性，还能作为奖励模型或正则化项直接介入生成过程，显著提升扩散模型在风格迁移、风格定制化等任务中的表现。
 
-## 整体框架
+
 
 StyleDoctor 的整体设计围绕一个核心命题展开：**如何构建一个能够同时感知图像全局风格特征与文本风格语义的专家奖励模型，从而为风格中心生成任务提供细粒度的监督信号**。其 pipeline 由三个关键阶段串联而成，分别解决风格表征学习、跨模态风格理解、以及统一偏好建模三个子问题。
 
@@ -154,7 +156,7 @@ $$\mathcal { L } _ { c o n } = - \frac { 1 } { N } \sum _ { i = 1 } ^ { N } \log
 ![[assets/figures/papers/paper_list_l2704_https_openaccess_thecvf_com_content_CVPR2026_html_He_StyleDoctor_Towards/figures/001_Figure.jpg]]
 *Figure: l.StyleDoctorprovidesamulti-dimensionalevaluationofstyleconsistencybetweentheinputimagesandthestyleconditions. Buildingupontis,StylDoctoreablesaadageofstyleatedgerationtasks,cludingtextontrodstylegeeratioeee image-guided style generation,instruction-guided style transfer and reference image-guided style transfer*
 
-## 核心模块与公式推导
+
 
 StyleDoctor 的核心架构由三个紧密耦合的模块构成，分别负责全局风格特征提取、跨模态风格语义融合以及统一偏好学习。以下逐一拆解各模块的设计动机、输入输出与关键公式。
 
@@ -201,7 +203,9 @@ StyleDoctor 采用 **Qwen2.5-VL-3B** 作为基座多模态大语言模型（MLLM
 ![[assets/figures/papers/paper_list_l2704_https_openaccess_thecvf_com_content_CVPR2026_html_He_StyleDoctor_Towards/figures/002_Figure.jpg]]
 *Figure: Reward Modeling*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 风格感知能力评估
 
@@ -257,7 +261,9 @@ StyleDoctor 首先在风格感知任务上接受检验，包括风格图像检�
 ![[assets/figures/papers/paper_list_l2704_https_openaccess_thecvf_com_content_CVPR2026_html_He_StyleDoctor_Towards/figures/005_Table_1.jpg]]
 *Table 1: Comparisons between diferent style-related datasets and SPRData. # indicates 'the number of'*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有奖励模型的关系
 
@@ -302,6 +308,8 @@ StyleDoctor 在生成管线中扮演的是**即插即用的风格评估器与优
 3. **从奖励模型到风格感知组件**：StyleDoctor 能否直接作为 VLM 的风格感知模块嵌入生成模型，而非仅在训练阶段提供奖励信号，这关系到其应用范式的根本性扩展。
 
 4. **视频风格迁移的跨帧评估**：将 StyleDoctor 的风格一致性判别能力扩展到时间维度，是通往视频风格化质量评估的自然延伸。
+
+
 
 ## 原文 PDF
 

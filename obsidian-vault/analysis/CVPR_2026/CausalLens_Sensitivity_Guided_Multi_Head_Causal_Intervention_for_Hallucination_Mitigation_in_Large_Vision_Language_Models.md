@@ -42,7 +42,7 @@ claims:
 > - CHAIR (Max Token 64) 上，CHAIRs 18.7 vs N/A (N/A)；CHAIRi 6.2 vs N/A (N/A)。
 > - MME Existence 上，Existence 195.00 vs N/A (N/A)。
 
-## 概述
+## 概要
 
 大视觉语言模型（LVLM）在自回归解码过程中存在一个核心瓶颈：视觉信息在模型的早期层之后迅速衰减，而系统提示与文本先验在中后期层逐渐占据主导地位。**Figure 2** 的注意力分布热力图清晰地展示了这一现象——在 LLaVA-v1.5-7B 中，图像令牌的注意力仅在 L0–L2 层较强，进入 L10–L30 层后，多数注意力头将超过 60%–80% 的注意力权重分配给系统提示令牌。这种注意力的结构性失衡导致视觉因果路径被系统性压缩，模型生成内容过度依赖语言先验，从而产生对象幻觉。
 
@@ -54,7 +54,7 @@ claims:
 
 作为对比解码（如 **VCD**, Leng et al., CVPR 2024）和生成反馈自校正（如 **DeGF**, Zhang et al., ICLR 2025）之外的第三条技术路径，CausalLens 的核心差异在于：它不依赖扰动输入或外部反馈，而是直接在模型内部通过注意力头的敏感性引导调制来恢复视觉因果链，在保持单次前向推理效率的同时实现幻觉缓解。
 
-## 背景与动机
+
 
 ### LVLM幻觉问题的因果根源
 
@@ -74,7 +74,9 @@ claims:
 
 基于以上分析，本文提出核心动机：**通过精确定位和增强LVLM中层注意力头中的视觉因果路径，可以在不重训练、不增加推理次数的情况下，有效缓解幻觉**。这需要解决三个关键问题：（1）如何量化每个注意力头的视觉可靠性？（2）如何在保持语义空间一致性的前提下增强视觉信号？（3）如何补偿多头部融合投影引入的视觉信息稀释？CausalLens通过视觉敏感性度量、混合因果干预和投影对齐残差校正三个模块系统性地回应了这些挑战。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CausalLens 的核心创新在于**将 LVLM 幻觉缓解从“外部对比解码”或“重训练”范式，转向了模型内部注意力头的因果路径干预**。其关键 changed slots 可归纳为三个层面：
 
@@ -122,7 +124,7 @@ $$\widetilde{H}_{\ell} = H_{\ell}^{\mathrm{fusion}} + \lambda \Delta_{\ell}^{\ma
 
 整个方法**无需训练**，在单次前向传播中完成干预（Algorithm 1），与需要多次前向的对比解码方法相比，在 GPU 内存和推理延迟上具有明显效率优势（Table 4）。
 
-## 整体框架
+
 
 CausalLens 是一种训练无关（training-free）的因果干预方法，直接嵌入 LVLM 解码器内部，通过单次前向传播即可重建从视觉令牌到输出令牌的因果链路。其整体 pipeline 由四个核心模块串联构成，如图 Figure 5 所示。
 
@@ -157,7 +159,7 @@ $$\widetilde{H}_{\ell} = H_{\ell}^{\mathrm{fusion}} + \lambda \Delta_{\ell}^{\ma
 
 **输入输出流**。给定输入图像 $v$、系统提示和文本上下文，CausalLens 在标准自回归解码的每一生成步执行：首先计算所有注意力头的注意力分布和路径分量，然后对中层头施加 HCI 得到修正头输出 $H_{\ell,i}^{*}$，经多头部融合后再通过 PRC 得到最终层表示 $\widetilde{H}_{\ell}$。该表示继续向上层传递，最终从顶层隐状态 $\mathcal{H}_t^L$ 经 softmax 预测下一个令牌。整个过程无需额外训练、无需修改模型权重，仅通过单次前向传播中的隐状态调制即可实现幻觉缓解。
 
-## 核心模块与公式推导
+
 
 CausalLens 的核心由四个顺序模块构成，它们共同实现在 LVLM 解码器内部对视觉因果路径的无训练干预。
 
@@ -234,7 +236,9 @@ $$\widetilde{H}_{\ell} = H_{\ell}^{\mathrm{fusion}} + \lambda \Delta_{\ell}^{\ma
 ![[assets/figures/papers/paper_list_l741_https_openaccess_thecvf_com_content_CVPR2026_html_Ji_CausalLens_Sensitiv/figures/004_Figure_4.jpg]]
 *Figure 4: Top-k head ablation on POPE. Removing high-s heads (red) causes a steep drop in accuracy, whereas removing low-s heads (blue) leaves performance unchanged. This demonstrates that visually sensitive heads are causally necessary for grounded reasoning*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -304,7 +308,9 @@ LLaVA-Bench 上的案例对比（Figure 7）展示了 CausalLens 在实际场景
 ![[assets/figures/papers/paper_list_l741_https_openaccess_thecvf_com_content_CVPR2026_html_Ji_CausalLens_Sensitiv/figures/011_Table_4.jpg]]
 *Table 4: Efficiency comparison. For each method, we present the average inference latency per instance and peak GPU memory in LLaVA-v1.5-7B. Experiments are conducted on a single NVIDIA L40 GPU*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有幻觉缓解范式的对比
 
@@ -352,6 +358,8 @@ CausalLens 的有效性建立在以下假设之上：
 - **多模态扩展**：视觉敏感性得分的定义基于图像标记的注意力集中度，该度量是否适用于视频、3D 点云等多模态输入，尚需探索。
 - **与训练方法的协同**：能否将 CausalLens 的干预思想与提示工程或微调方法结合，在训练和推理两个阶段协同提升 LVLM 的可信度？
 - **实际部署的安全性**：在医疗图像描述、自动驾驶视觉问答等高风险应用中，该方法的幻觉缓解效果和安全边界尚未评估，需要在实际部署前进行充分的受控实验。
+
+
 
 ## 原文 PDF
 

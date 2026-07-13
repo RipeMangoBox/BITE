@@ -43,7 +43,7 @@ claims:
 > - Pendulum (Interpolation) 上，PSNR ↑ 17.057 vs 13.906 (D-NeRF) (+3.151)。
 > - Pendulum (Extrapolation) 上，PSNR ↑ 15.920 vs 15.804 (SimVP) (+0.116)。
 
-## 概述
+## 概要
 
 动态场景的3D重建与重渲染是计算机视觉的核心挑战之一，其关键瓶颈在于**时间维度的连续建模能力**。现有动态NeRF方法（如**D-NeRF**（Pumarola et al., CVPR 2021）、**HexPlane**、**TiNeuVox**等）以及基于3D高斯泼溅的方法（如**4D-GS**、**Motion-GS**）虽然在离散训练帧上表现出色，但它们仅学习离散时间索引对应的场景状态，缺乏对连续时间动态的内在理解。这导致两个根本性缺陷：一是**长期外推能力不足**——模型无法预测训练时间窗口之外的场景状态；二是**无法泛化到新的初始条件**——每个动态序列需要独立训练一个模型，无法将学到的物理规律迁移到同一系统下不同初始状态的轨迹上。
 
@@ -63,7 +63,7 @@ claims:
 
 **方法定位**：Node-RF处于动态NeRF、神经ODE和物理启发式表示学习的交叉点。与现有动态NeRF方法相比，它首次将ODE驱动的连续时间演化直接嵌入体积渲染框架，实现了从“离散帧拟合”到“连续动力学学习”的范式转变。与**SimVP**、**Vid-ODE**等2D视频预测方法相比，Node-RF在3D场景中保持多视图一致性，且不依赖固定时间间隔假设。该方法为确定性物理系统的3D动力学建模提供了新的基准思路，但在随机动力学、非刚性变形以及大规模真实场景中的适用性仍有待探索。
 
-## 背景与动机
+
 
 ### 动态场景建模的核心挑战
 
@@ -93,7 +93,9 @@ $$\frac{d h(t)}{d t} = f_{\theta}(h(t), t), \quad \text{with} \quad h(t_0) = h_0
 
 实现上述目标面临多重挑战。首先，NeRF的体积渲染本身计算开销巨大，在其之上叠加ODE求解器的迭代积分将进一步增加训练负担。其次，如何将不同初始条件下的多序列信息压缩到一个共享的潜在动力学空间中，同时保持足够的表达能力来区分不同轨迹，是一个非平凡的表示学习问题。最后，若无适当的正则化，神经ODE学到的潜在空间可能缺乏结构，导致动力学行为不可解释且泛化能力受限。本文提出的Node-RF框架正是围绕这些挑战展开设计，其核心架构与实验验证将在后续章节中详述。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Node-RF 的核心创新在于将**神经常微分方程（Neural ODE）**与**动态神经辐射场（NeRF）**深度融合，从而将离散的帧序列转化为连续时间上的平滑动力学轨迹。现有动态 NeRF 方法（如 **D-NeRF**（Pumarola et al., CVPR 2021））在每个训练时间步上学习独立的潜在码或变形场，缺乏对时间连续性的显式建模，导致长期外推能力不足，且无法泛化到未见过的初始条件。Node-RF 通过以下三个关键设计突破这一瓶颈。
 
@@ -123,7 +125,7 @@ $$W_i \gets \mathrm{normalization}(W_i, \mathrm{softplus}(c_i))$$
 
 **总结**：Node-RF 的创新并非单一技术点的替换，而是通过“神经 ODE 连续演化 + 初始条件编码 + Lipschitz 结构化正则化”的组合，将动态 NeRF 从“离散帧拟合”提升为“连续动力学学习”，从而同时获得长期外推和跨序列泛化能力。
 
-## 整体框架
+
 
 Node-RF 的核心设计思路是将动态场景的时空演化建模为神经ODE驱动的连续潜在轨迹，再通过NeRF体积渲染实现新视角合成。整个框架围绕一个关键因果机制展开：**用微分方程替代离散帧索引，使场景状态在时间维度上具有连续性和可外推性**。
 
@@ -171,7 +173,7 @@ $$\mathcal{L} = \lambda_1 \mathcal{L}_{NeRF} + \lambda_2 \mathcal{L}_{p} + \lamb
 ![[assets/figures/papers/paper_list_l36_https_arxiv_org_abs_2603_12078/figures/001_Figure_1.jpg]]
 *Figure 1: Node-RF Overview. Multiple observations of the red ball being dropped onto the dual ramp end in damped oscillations towards the two valleys. Node-RF learns to encodes generalized dynamics of deterministic motions from sequences such as A (pink), C (yellow) into an implicit space-time latent representation using NeRF and nODE. Embedded sequence states depicted as scene latent points zt on the embedding space are propagated through time t using an implicit neural ODE. Intermediate and future states (centre to right encodings) can be extrapolated and rendered (top, bottom) given initial frame conditions (on the left). Latent divergence ∇zt (colour coded) characterizes behaviour of the learnt s...*
 
-## 核心模块与公式推导
+
 
 ### 整体架构
 
@@ -240,7 +242,9 @@ Node-RF 支持两种训练模式（见 Figure 2）：
 ![[assets/figures/papers/paper_list_l36_https_arxiv_org_abs_2603_12078/figures/011_Figure_8.jpg]]
 *Figure 8: Latent Space Comparison of models w/o and w/ Lipschitz regularization. The green and red dots represent the starting and ending points of the trajectories respectively*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置与评估协议
 
@@ -328,7 +332,9 @@ Figure 8 揭示了 Lipschitz 正则化对潜在空间结构的塑造作用。未
 ![[assets/figures/papers/paper_list_l36_https_arxiv_org_abs_2603_12078/figures/017_Table_8.jpg]]
 *Table 8: Training time per dataset*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从离散帧到连续动力学
 
@@ -393,6 +399,8 @@ $$\mathcal{L}_{lipschitz} = \prod_i \mathrm{softplus}(c_i)$$
 3. **真实世界部署**：在真实世界光照变化、遮挡、传感器噪声条件下的鲁棒性尚未评估。
 4. **训练效率优化**：72 小时的训练时间限制了快速迭代，能否通过更高效的 ODE 求解器或混合表示（如结合 3D 高斯泼溅）加速？
 5. **动力学解耦**：当前框架将静态背景和动态前景分离处理，但未显式建模多物体之间的相互作用动力学。
+
+
 
 ## 原文 PDF
 

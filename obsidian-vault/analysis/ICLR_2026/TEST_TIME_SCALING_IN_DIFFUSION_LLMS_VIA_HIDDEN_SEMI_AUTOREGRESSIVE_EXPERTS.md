@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/TEST_TIME_SCALING_IN_DIFFUSION_LLMS_VIA_HIDDEN_SEMI_AUTOREGRESSIVE_EXPERTS.pdf
+project_link: null
+code_link: https://github.com/junos-ai-org/Test-Time-Scaling
 openreview_forum_id: L5y7in91vd
 aliases:
 - HHSAE
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 通过隐藏半自回归专家实现扩散大语言模型的测试时扩展 |
 | 英文题名 | TEST-TIME SCALING IN DIFFUSION LLMS VIA HIDDEN SEMI-AUTOREGRESSIVE EXPERTS |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=L5y7in91vd); [GitHub](https://github.com/junos-ai-org/Test-Time-Scaling) |
+| Links | [paper](https://openreview.net/forum?id=L5y7in91vd) · [GitHub](https://github.com/junos-ai-org/Test-Time-Scaling) |
 | Topic | #topic/optimization_theory_probabilistic #topic/optimization_theory_probabilistic/probabilistic_methods |
 | Method | HEX (Hidden semi-autoregressive EXperts) |
 | Dataset | GSM8K, MATH, ARC-C |
@@ -42,7 +44,7 @@ claims:
 > - GSM8K 上，Accuracy 为 88.10%，对比 79.80% (d1 GRPO)，变化 +8.30%。
 > - MATH 上，Accuracy 为 40.00%，对比 16.40% (top-k margin)，变化 +23.60%。
 
-## 概述
+## 概要
 
 扩散大语言模型（dLLM）在推理任务上展现出潜力，但其测试时解码策略长期受困于一个关键瓶颈：**基于置信度的固定掩码调度极易触发灾难性退化**。例如，广泛使用的 top-K margin 方法在 GSM8K 上准确率仅 24.72%，且超过 55.5% 的生成序列完全退化为 `[AfterEoT]` 标记（Figure 2）。这一现象表明，单纯依赖逐 token 置信度进行解码决策，会系统性地将模型引入过信心的错误路径。
 
@@ -50,7 +52,7 @@ claims:
 
 HEX 的效果是显著的：在 GSM8K 上，准确率从 24.72% 提升至 88.10%（**3.56 倍**），在 MATH、ARC-C、TruthfulQA 上同样大幅超越现有推理方法，甚至超过了需要 GRPO 微调的基线模型（Figure 5）。消融实验进一步证实，性能增益源于**块调度的结构性多样性**而非单纯的采样增加——多块调度集成显著优于单一调度下的多样本采样（Table 7）。
 
-## 背景与动机
+
 
 ### 扩散语言模型的推理瓶颈
 
@@ -76,7 +78,9 @@ $$
 
 基于上述发现，本文的核心洞察是：**dLLMs 在训练中隐式学习了一个半自回归专家的混合，通过测试时聚合多个不同块调度的输出，可以充分激发模型的推理能力，无需针对特定启发式进行微调。** 这一思路将测试时扩展（test-time scaling）从传统的增加采样次数提升到结构化多样性聚合的层面——不仅增加样本数量，更重要的是通过异构的块调度引入推理路径的结构性差异。由此，扩散语言模型的推理不再依赖单一的、可能崩溃的解码策略，而是通过多数投票机制在多个隐藏专家的输出中寻找共识，从而稳定且显著地提升推理性能。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈洞察：置信度驱动的扩散解码为何崩溃
 
@@ -113,7 +117,7 @@ $$p_{\text{mix}}(x_i = a \mid x_{\text{prompt}}) \approx \mathbb{E}_{b \sim B}\l
 
 HEX 的核心贡献在于开辟了扩散大语言模型的**测试时扩展（test-time scaling）**新维度。与需要 GRPO 微调的 d1 等方法不同，HEX 完全无需训练，仅通过推理时的调度集成即可将 GSM8K 准确率从 24.72% 提升至 88.10%（3.56×），甚至超过 GRPO 微调模型（79.80%）。这一结果确立了测试时计算扩展作为扩散语言模型推理能力提升的有效范式。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_L5y7in91vd/figures/002_Figure_1.jpg]]
 *Figure 1: Overview of our proposed HEX framework. Left: HEX leverages multiple semiautoregressive hidden experts, guided by different masking schedules, to produce concatenated outputs and a final answer. Right: HEX outperforms Top-K, Top-K margin (Kim et al., 2025) and Random expert selection strategies (Nie et al., 2025b) on reasoning tasks (GSM8K, MATH, ARC-C), surpassing the training-based GRPO baseline (d1) (Zhao et al., 2025)*
@@ -148,7 +152,7 @@ HEX 的设计根植于一个核心洞察：dLLM 在任意掩码训练中隐式�
 
 相比单一解码策略，HEX 的计算开销约增加 5 倍（使用 5 种块大小各采样 1 个种子）。该开销源于多轨迹生成的并行需求，但换取了无需训练的显著性能提升，且在实际部署中可通过并行化部分缓解。
 
-## 核心模块与公式推导
+
 
 ### 关键模块
 
@@ -192,7 +196,9 @@ $$p_{\text{mix}}(x_i = a \mid x_{\text{prompt}}) \approx \mathbb{E}_{b \sim B}\l
 
 其中 $U_b$ 表示按块大小 $b$ 进行半自回归解码时已揭示的 token 集合。最终答案通过多数投票从该近似分布中得出。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：半自回归解码消除灾难性崩溃
 
@@ -278,7 +284,9 @@ Table 8 的消融表明，HEX 在输出长度 128 和 256 的设置下均保持�
 
 ![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_L5y7in91vd/figures/026_Table_9.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有推理方法的定位关系
 
@@ -340,6 +348,8 @@ HEX 通过多数投票聚合多个块调度生成的答案，其效果源于结�
 4. **超越确定性答案的任务扩展**：对于故事生成、对话等开放式任务，多数投票不适用。是否可以通过聚合不同专家的生成分布（而非离散答案）来实现测试时扩展，例如使用 Equation 4 中的概率混合而非硬投票？
 
 5. **与其他测试时扩展方法的协同**：HEX 与自回归模型中的 chain-of-thought、self-consistency 等方法在哲学上相似（均通过聚合多条推理路径提升性能），但实现机制迥异。探索这两类方法的交叉融合可能产生更强的推理系统。
+
+
 
 ## 原文 PDF
 

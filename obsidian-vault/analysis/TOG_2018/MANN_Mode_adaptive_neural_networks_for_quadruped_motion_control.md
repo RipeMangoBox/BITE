@@ -5,6 +5,7 @@ paper_level: A
 venue: TOG
 year: 2018
 pdf_ref: paperPDFs/TOG_2018/Mode_adaptive_neural_networks_for_quadruped_motion_control.pdf
+code_link: https://github.com/sebastianstarke/AI4Animation/tree/master/AI4Animation/SIGGRAPH_2018
 project_link: https://github.com/sebastianstarke/AI4Animation/tree/master/AI4Animation/SIGGRAPH_2018
 aliases:
 - MANN
@@ -33,7 +34,7 @@ claims:
 | 中文题名 | 用于四足动物运动控制的模式自适应神经网络 |
 | 英文题名 | Mode-adaptive neural networks for quadruped motion control |
 | 会议/期刊 | TOG 2018 |
-| Links | [paper](https://doi.org/10.1145/3197517.3201366); [GitHub](https://github.com/sebastianstarke/AI4Animation/tree/master/AI4Animation/SIGGRAPH_2018) |
+| Links | [paper](https://doi.org/10.1145/3197517.3201366) · [GitHub](https://github.com/sebastianstarke/AI4Animation/tree/master/AI4Animation/SIGGRAPH_2018) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/robotics |
 | Method | Mode-Adaptive Neural Networks (MANN) |
 | Dataset | Quadruped locomotion (walk, pace, trot, canter), Trajectory following (circle, square, star, custom paths) |
@@ -43,7 +44,7 @@ claims:
 > - Quadruped locomotion (walk, pace, trot, canter) 上，Average angular update per joint (°/frame) 为 MANN4: 3.43 (all legs), 2.82 (back legs); MANN8: 3.69 (all legs), 3.05 (back legs)，对比 PFNN and Vanilla NN: lower values (see Table 3)，变化 MANN 产生更大的关节角变化，避免运动僵硬。
 > - Trajectory following (circle, square, star, custom paths) 上，Position deviation (cm) / Angle deviation (°) 为 MANN: circle 2.98/3.21, square 4.65/7.21, star 6.61/8.76, custom 5.31/6.75，对比 Vanilla NN and PFNN: higher deviations (see Table 4)，变化 MANN 在所有路径形状上获得最低的位置和角度偏差。
 
-## 概述
+## 概要
 
 四足动物的运动控制是计算机动画中的经典难题，其核心瓶颈在于运动模式的高度多模态性——行走（walk）、踱步（pace）、小跑（trot）、慢跑（canter）等步态拥有截然不同的脚着地时序，且步态间的转换涉及复杂的相位协调。传统方法如 **Phase-Functioned Neural Networks (PFNN)**（Holden et al., SIGGRAPH 2017）依赖显式的手工标注相位参数，在单一全局相位下对不同步态进行插值，当步态转换时极易因相位失配产生混合伪影。此外，非结构化的四足动作捕捉数据缺乏天然的结构化标签，手工标注步态和相位既耗时又容易引入错误。
 
@@ -53,7 +54,7 @@ claims:
 
 在方法谱系上，MANN 属于数据驱动的运动合成方法，与物理仿真（如轨迹优化、力矩控制）和运动匹配（Motion Matching）等思路并行，但其“特征级专家混合”的架构设计为处理高度多模态的运动数据提供了一条独特的技术路径，有望推广至其他多模态学习任务。
 
-## 背景与动机
+
 
 四足动物运动控制是计算机动画领域的核心难题之一。与人类角色不同，四足动物展现出高度多模态的运动特性——行走、踱步、小跑、慢跑等步态的脚着地模式各异（Fig. 2），且步态之间的转换涉及复杂的时序协调。这种多模态性对数据驱动的角色动画方法构成了根本性挑战。
 
@@ -73,7 +74,9 @@ claims:
 
 简言之，本文的目标是构建一个无需手工相位标注、能够从非结构化数据中自动学习多模态四足运动的神经网络架构，从根本上解决现有方法在步态转换时的伪影问题，并显著降低数据预处理的门槛。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MANN 的核心创新在于将**混合专家（Mixture of Experts）思想从输出层混合提升到特征级权重混合**，从而在完全无监督的条件下解决四足运动控制中的高度多模态问题。
 
@@ -101,7 +104,7 @@ $$\alpha = \sum_{i=1}^{K} \omega_i \alpha_i$$
 
 消融实验（Table 5）提供了最直接的因果证据：选择性屏蔽特定专家权重会导致相应运动能力丧失——α₁ 禁用则跳跃失败，α₂ 禁用则左转失败，α₅ 禁用则慢跑和小跑失败。这证实了专家权重在无监督训练中自发分化出了对不同运动模式的专门控制能力。Fig. 9 的激活曲线进一步展示：低速步行时多个权重呈周期性交替，高速运动和跳跃时特定权重持续高激活，验证了专家对时序和模式的自适应专门化。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l41_https_doi_org_10_1145_3197517_3201366/figures/001_Figure_1.jpg]]
 *Figure 1: A selection of results using our method for quadruped animation. We show some different modes for sitting, turning trot, pace, canter, jumping and standing from left to right. The locomotion gaits are not labeled individually, but naturally produced by the movement velocity control*
@@ -116,7 +119,7 @@ MANN 由两个核心模块构成：**运动预测网络（Motion Prediction Netw
 
 后处理阶段，系统采用 CCD 全身逆运动学（Full-body Inverse Kinematics）根据地形高度调整足端和脊柱关节，使合成运动能够适应轻微起伏的地面，同时保持脚部接触的物理合理性（Fig. 7）。
 
-## 核心模块与公式推导
+
 
 ### 整体架构
 
@@ -168,7 +171,9 @@ $$
 
 合成运动后，系统通过 CCD 全身逆运动学（Cyclic Coordinate Descent）对足端和脊柱关节进行后处理，根据地形高度偏移调整关节位置，使角色能够适应轻微起伏的地面（Section 8, Fig. 7）。此外，轨迹控制中引入插值公式 $T = \tau T^{*} + (1 - \tau) T^{+}$，将用户期望轨迹 $T^*$ 与网络预测修正轨迹 $T^+$ 按系数 $\tau$ 混合，以平衡控制响应速度与运动自然度（Section 8: Responsiveness）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -239,7 +244,9 @@ MANN 的实验验证围绕三个核心维度展开：**运动质量**（足部�
 
 MANN 在无任何步态/相位标签的条件下，通过特征级专家混合机制实现了对四足多模态运动的端到端学习。定量实验一致表明其在足部滑动抑制、关节动态性保持和路径跟随精度上均优于 Vanilla NN 和 PFNN；消融研究则从机制层面验证了专家权重的功能专门化。主要局限在于地形泛化能力和对稀缺数据的敏感性，这为后续结合物理模拟或域迁移方法留下了明确的研究空间。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与设计动机
 
@@ -286,6 +293,8 @@ MANN 在方法谱系中处于**数据驱动运动合成**与**混合专家架构
 2. **生成质量提升**：能否结合对抗性损失（adversarial loss）来进一步减少运动模糊和避免平均姿态问题，提升合成运动的锐度和真实感？
 3. **物理交互扩展**：能否利用强化学习（RL）自动生成控制信号，使 MANN 驱动的 NPC 在复杂动态环境中实现物理级交互控制？
 4. **架构普适性**：MANN 的“特征级专家混合”架构是否对其他高度多模态的机器学习任务（如多风格语音合成、多模态轨迹预测）也具有普适性？
+
+
 
 ## 原文 PDF
 

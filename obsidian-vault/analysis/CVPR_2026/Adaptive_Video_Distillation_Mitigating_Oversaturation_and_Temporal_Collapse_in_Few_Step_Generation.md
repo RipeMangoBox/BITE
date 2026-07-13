@@ -45,7 +45,7 @@ claims:
 > - VBench1 上，Total Score 81.35 (1.3B) / 82.57 (14B) vs DMD* 80.66 (1.3B) / 79.63 (14B) (+0.69 (1.3B) / +2.94 (14B))。
 > - User Study 上，Human Preference Ours preferred over Teacher and all baselines vs Teacher Wan2.1 (N/A)。
 
-## 概述
+## 概要
 
 **核心问题**：视频扩散模型的分布匹配蒸馏（DMD）在迁移至视频生成时，会出现严重的颜色过饱和与运动模式坍塌（时序模式崩溃）。在自回归生成中，过饱和现象会逐帧累积，进一步恶化视频质量（见图1）。
 
@@ -60,7 +60,7 @@ claims:
 - 消融实验证实：加入时序正则化后，运动动态得分从72.22恢复至100.00；加入自适应回归损失后，实例保存得分从88.88提升至92.39，接近教师模型水平（见表2）。
 - 用户研究表明，蒸馏后的学生模型在视觉质量和语义对齐上甚至优于教师模型（见图7）。
 
-## 背景与动机
+
 
 视频扩散模型近年来在生成质量上取得了显著进展，但其推理过程通常需要数十甚至上百个去噪步骤，导致极高的计算开销和生成延迟。分布匹配蒸馏（Distribution Matching Distillation, **DMD**）作为一种高效的少步蒸馏范式，通过最小化学生生成分布与教师模型分布之间的KL散度，成功将图像扩散模型的推理步数压缩至4步以内。然而，当DMD被直接迁移到视频生成任务时，出现了两个严重且相互关联的退化现象。
 
@@ -72,7 +72,9 @@ claims:
 
 **核心动机。** 上述分析表明，视频扩散蒸馏面临一个关键瓶颈：如何在纠正分布偏向的同时，避免因过度回归导致的伪影，并有效保持时序运动动态？现有蒸馏方法（DMD、LCM、PCM、DCM、rCM）均未同时解决过饱和与时序坍塌问题。本文的核心动机在于设计一种**自适应机制**——在训练过程中动态感知分布偏移程度并据此调节监督强度，同时引入显式的时序约束来对抗运动模式崩溃，从而实现稳定、高质量的少步视频生成。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文提出的**自适应视频蒸馏（Adaptive Video Distillation）**方法，针对分布匹配蒸馏（DMD）在视频生成中暴露的**颜色过饱和**与**时序模式坍塌**两大瓶颈，引入了三个关键改进槽位（changed slots），构成一个协同的蒸馏训练框架。
 
@@ -130,7 +132,7 @@ $$\mathcal{L}_{G} = \mathcal{L}_{\mathrm{KL}} + \omega_{\mathrm{reg}} \omega_{t,
 | 回归损失权重 | 固定权重或无 | EMA 缓存 + Sigmoid 自适应权重 $\omega_{t,s}$ | 动态抑制偏差样本 |
 | 推理帧策略 | 全帧率推理 | 高噪声步半帧率 + U-Net 插值恢复 | 降低推理开销 |
 
-## 整体框架
+
 
 Adaptive Video Distillation 的目标是将预训练的视频扩散教师模型压缩为少步学生生成器，同时解决蒸馏过程中出现的**颜色过饱和**与**时序模式坍塌**两大瓶颈。整体框架围绕一个核心洞察构建：教师模型的分布偏向会通过分布匹配蒸馏（DMD）传递给学生，导致生成视频的颜色偏差与运动衰减；通过引入真实视频数据的自适应监督和时序方差约束，可以有效纠正这一偏差。
 
@@ -181,7 +183,7 @@ DMD 蒸馏后的视频出现运动显著减少（图 1 右），Dynamic Degree �
 ![[assets/figures/papers/paper_list_l835_https_arxiv_org_abs_2603_21864/figures/002_Figure_2.jpg]]
 *Figure 2: Our method distills a pre-trained teacher model, denoted as*
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题分析：DMD蒸馏中的过饱和与运动坍塌
 
@@ -251,7 +253,9 @@ $$\mathcal{L}_{G} = \mathcal{L}_{\text{KL}} + \omega_{\text{reg}} \omega_{t,s} \
 ![[assets/figures/papers/paper_list_l835_https_arxiv_org_abs_2603_21864/figures/015_Figure_13.jpg]]
 *Figure 13: Visualization of the adaptive weight function in Eq. (7) for different values of k. The x-axis represents the deviation*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈验证：过饱和与时序坍塌的量化表现
 
@@ -336,7 +340,9 @@ $$\mathcal{L}_{G} = \mathcal{L}_{\text{KL}} + \omega_{\text{reg}} \omega_{t,s} \
 ![[assets/figures/papers/paper_list_l835_https_arxiv_org_abs_2603_21864/figures/016_Figure_14.jpg]]
 *Figure 14: Failure cases resulting from unclipped temporal regularization. Without clipping, the student generator produces severe artifacts late in training. (Top) After the first second, a drastic content shift occurs, accompanied by a noticeable distortion of the building (highlighted by the red box). (Bottom) The scene content abruptly vanishes at the two-second mark and is replaced by another major content shift at the three-second mark (highlighted by the red box). These phenomena, inconsistent with plausible camera motion, are clear manifestations of hallucinations. This highlights the necessity of clipping the temporal loss to prevent it from excessively amplifying inter-frame variance*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法继承与基线关系
 
@@ -394,6 +400,8 @@ $$\nabla_{\phi} \mathcal{L}_{\mathrm{DMD}} \triangleq \mathbb{E}_{t} [ \nabla_{\
 - 该方法在更长视频（>30秒）或更高分辨率（1080p）下的可扩展性如何？
 
 **知识库定位总结：** Adaptive Video Distillation 处于视频扩散模型蒸馏与分布匹配方法的交叉点，其核心贡献在于揭示了DMD在视频域的两个系统性失效模式（过饱和、时序坍塌），并提出了两个低耦合、高收益的解决方案。该方法在Wan2.1上验证有效，但其泛化性和极限场景鲁棒性仍需跨架构、跨尺度的进一步检验。
+
+
 
 ## 原文 PDF
 

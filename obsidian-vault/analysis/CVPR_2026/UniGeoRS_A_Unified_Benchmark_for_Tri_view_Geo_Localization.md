@@ -43,13 +43,13 @@ claims:
 > - UniGeoRS (Drone→Satellite) 上，AP LPN + CAME: 72.19 vs LPN baseline: 71.69 (+0.50)。
 > - UniGeoRS (Satellite→Ground) 上，AP LPN + CAME: 23.73 vs LPN baseline: 13.47 (+10.26)。
 
-## 概述
+## 概要
 
 跨视角地理定位（CVGL）旨在将不同平台（卫星、无人机、地面）获取的图像匹配至同一地理位置。现有CVGL数据集普遍缺乏同时覆盖三视角的统一基准，且地面和无人机视角的图像多样性与数量严重不足，导致多视角匹配模型的泛化能力受限（Figure 2）。针对这一瓶颈，本文构建了**UniGeoRS**——首个同时包含真实与合成图像的三视角CVGL基准，涵盖1,154个目标位置，平均每目标提供32.39张地面图像和90.17张无人机图像，规模显著超越现有数据集（Table 1）。在此基础上，本文提出**CAME**（Cross-Attention-based Matching Enhancement），一个即插即用的两阶段重排序增强框架，通过显式建模平台内与平台间的特征关联，动态聚合上下文信息以提升跨视角检索精度。
 
 核心结论如下：UniGeoRS基准的引入一致地提升了多种CVGL模型在跨视角任务上的泛化性能；CAME模块在多个基线模型（如LPN、FSRA）上均带来显著增益，尤其在Ground→Drone和Satellite→Ground等困难任务上，AP提升分别达+6.45和+10.26（Table 2）。消融实验进一步证实，CAME中的Rank Distance（RD）与Cross-Attention Matching（CAM）组件各自独立有效，联合使用取得最优结果，验证了平台内邻域聚合与跨平台注意力对齐的互补性。方法上，CAME属于后处理阶段的特征增强范式，可与现有CVGL特征提取器无缝集成，为跨视角地理定位提供了一种通用且高效的匹配增强方案。
 
-## 背景与动机
+
 
 ### 跨视角地理定位的核心挑战
 
@@ -80,7 +80,9 @@ Figure 2（数据集局限性示意）系统总结了上述视角特异的缺陷
 - **数据层面**：构建UniGeoRS——首个同时包含真实与合成图像的三视角CVGL基准，平均每目标提供32.39张地面图像和90.17张无人机图像（Table 1），从规模和多视角覆盖上系统性地超越现有数据集。
 - **方法层面**：设计CAME（Cross-Attention-based Matching Enhancement）模块，作为可插拔的第二阶段重排序框架，显式建模平台内与平台间特征关联，在不改变原有特征提取器的情况下一致提升检索精度。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：三视角地理定位的数据与匹配鸿沟
 
@@ -130,7 +132,7 @@ RD 模块通过图库-图库相似度的邻域聚合，隐式地利用了“同�
 - UniGeoRS 数据集的地点和环境多样性有限，未来需扩展至更多城市、季节和天气条件。
 - CAME 的超参数（$k_1=90$, $k_2=10$）需在具体任务上手动调优以取得平衡性能，缺乏自适应机制。
 
-## 整体框架
+
 
 UniGeoRS 提出了一种即插即用的两阶段跨视角地理定位增强框架 **CAME (Cross-Attention-based Matching Enhancement)**。该框架不改变前端特征提取器的结构，而是在后处理阶段显式建模平台内与平台间特征关联，从而提升检索精度。
 
@@ -175,7 +177,7 @@ RD 与 CAM 之间存在明确的依赖关系：RD 模块输出的初始排序列
 ![[assets/figures/papers/paper_list_l799_https_openaccess_thecvf_com_content_CVPR2026_html_Liang_UniGeoRS_A_Unifi/figures/006_Figure_5.jpg]]
 *Figure 5: Overview of CAME. (a) A pretrained CVGL model is employed as the feature extractor. (b) The Rank Distance module (RD) generates the initial ranking list*
 
-## 核心模块与公式推导
+
 
 CAME 是一个两阶段后处理重排序框架，可无缝接入任意预训练的 CVGL 特征提取器。其核心由 **Rank Distance (RD) 模块** 和 **Cross-Attention Matching (CAM) 模块** 串联构成，分别负责平台内邻域聚合与跨平台特征对齐。
 
@@ -245,7 +247,9 @@ $$\mathcal{L}_{\mathrm{sum}} = \lambda_1 \mathcal{L}_{\mathrm{Rank}} + \lambda_2
 
 训练配置采用 AdamW 优化器，学习率 $1 \times 10^{-4}$，批大小 16，超参数 $\lambda_1=1, \lambda_2=0.5$，在单卡上训练 30 个 epoch（Section 5.1）。消融实验证实，RD 与 CAM 各自独立贡献增益，二者组合（即完整 CAME）在所有任务上取得综合最优性能（Table 4）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 关键结果：CAME 在 UniGeoRS 六项任务上的提升
 
@@ -305,7 +309,9 @@ RD 的超参数设置为 $k_1=90$、$k_2=10$，是在所有任务上取得平衡
 ![[assets/figures/papers/paper_list_l799_https_openaccess_thecvf_com_content_CVPR2026_html_Liang_UniGeoRS_A_Unifi/figures/003_Figure_2.jpg]]
 *Figure 2: View-specifc limitations in existing datasets: insuffcient diversity in ground views, geo-tagging issues insatellite views, and domain or cost challenges in drone views*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位与核心瓶颈
 
@@ -351,6 +357,8 @@ CAME的核心创新在于将重排序过程从简单的邻域扩展（k-reciproc
 3. UniGeoRS虽然引入了合成数据（Google Earth/Street View），但合成-真实域差异对模型性能的影响尚未被系统评估，这在实际应用中可能成为关键瓶颈。
 
 > **注意**：关于“如何在训练过程中同时学习三平台特征表示”的开放问题，论文仅在讨论部分提及方向性展望，未提供具体方案或实验验证，需读者自行追踪后续工作。
+
+
 
 ## 原文 PDF
 

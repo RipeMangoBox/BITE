@@ -5,6 +5,8 @@ paper_level: A
 venue: AAAI
 year: 2026
 pdf_ref: paperPDFs/AAAI_2026/MotionCharacter_Identity_Preserving_and_Motion_Controllable_Human_Video_Generation.pdf
+project_link: https://motioncharacter.github.io/
+code_link: null
 aliases:
 - MotionCharacter
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | MotionCharacter：身份保持与运动可控的人物视频生成 |
 | 英文题名 | MotionCharacter: Identity-Preserving and Motion Controllable Human Video Generation |
 | 会议/期刊 | AAAI 2026 |
-| Links | [paper](https://arxiv.org/abs/2411.18281); [Project](https://motioncharacter.github.io/) |
+| Links | [paper](https://arxiv.org/abs/2411.18281) · [Project](https://motioncharacter.github.io/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/robotics |
 | Method | MotionCharacter |
 | Dataset | Unsplash-50 test set |
@@ -40,7 +42,7 @@ claims:
 > - Unsplash-50 test set 上，Dynamic Degree 为 0.449，对比 0.085 (IPA-FaceID-PlusV2)，变化 +0.364。
 > - Unsplash-50 test set 上，Dover Score (Overall Quality) 为 0.869，对比 N/A (最佳基线未报告具体数值)，变化 N/A。
 
-## 概述
+## 概要
 
 **核心问题**：现有主体驱动的文本到视频（T2V）生成方法在运动控制上存在根本性瓶颈——文本描述中动作语义（“做什么”）与运动幅度（“做多大”）天然纠缠，导致无法对运动强度进行细粒度、连续调节。例如，提示词“slightly open mouth”与“widely open mouth”之间的微妙差异难以被模型可靠解析。
 
@@ -50,7 +52,7 @@ claims:
 
 **主要结果**：在Unsplash-50测试集上，MotionCharacter 在面容相似度（0.609）与基线方法接近的前提下，将动态程度大幅提升至0.449，远超身份保持基线 **IPA-FaceID-PlusV2** 的0.085。消融实验表明，运动控制模块使动态程度提升83.3%（从0.245到0.449），区域感知损失和ID一致性损失分别贡献了Dover分数+0.059和面容相似度+0.104的增益，验证了各模块的独立有效性。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -74,7 +76,9 @@ claims:
 
 通过这种“语义-强度”分离的控制范式，MotionCharacter 旨在打破身份保持与运动表现力之间的固有权衡，实现可预测的、细粒度的人物视频生成。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MotionCharacter 的核心创新在于将人物视频生成中的**运动控制显式解耦为两个独立可调的维度**——动作类型与运动强度，从而解决了现有主体驱动文本到视频（T2V）方法中动作语义与运动幅度固有纠缠的瓶颈问题。
 
@@ -110,7 +114,7 @@ MotionCharacter 通过两个协同组件重构了身份保持机制：
 
 需要指出，MotionCharacter 的运动强度控制依赖于光流作为中间表示，其细粒度上限受限于 RAFT 光流模型的精度。论文明确承认框架性能本质上受底层 T2V 基模型能力约束，且尚未在更强大的视频基础模型（如 Wan 系列）上验证泛化性。此外，Table 1 中 Dover 分数（0.869）的最佳基线数值未明确报告，该优势幅度的精确性需对照原始数据进一步确认。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l15_MotionCharacter_Identity_Preserving_and_Motion_Controllable_Human_Video/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of subject-driven T2V methods and our proposed MotionCharacter framework. Existing approaches specify coarse actions (e.g., “open mouth”) but struggle to capture nuanced motion magnitude (e.g., “slightly” vs. “widely”). In contrast, MotionCharacter decouples action type and motion intensity, enabling finegrained, continuous control over human motion while preserving subject fidelity*
@@ -131,7 +135,7 @@ $$\mathcal{V} = \mathcal{F}(\mathcal{I}, \mathcal{P}, \mathcal{A}, \mathcal{M})$
 
 训练阶段，运动强度 $\mathcal{M}$ 通过 RAFT 模型从训练视频中提取前景光流并取帧间均值得到；推理阶段，用户可直接指定动作短语和运动强度值，实现细粒度、连续的运动幅度调节。训练策略采用图像-视频混合范式，引入约 17,619 张静态风格人像复制为 16 帧零运动序列，提供“零强度校准”信号以稳定训练。
 
-## 核心模块与公式推导
+
 
 MotionCharacter 的核心架构由三个关键模块协同构成：**ID内容插入模块**负责身份保持，**运动控制模块**实现解耦的运动类型与强度调节，**复合损失函数**则通过区域感知损失和身份一致性损失联合优化生成质量。
 
@@ -187,7 +191,9 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{R} + \lambda_{id} \cdot \mathcal{L
 
 消融实验证实了两者的协同效应：单独使用 $\mathcal{L}_{R}$ 使动态程度提升+0.064、Dover分数提升+0.059；单独使用 $\mathcal{L}_{id}$ 使面容相似度提升+0.104；完整模型达到面容相似度0.609和动态程度0.449的最优平衡。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -232,7 +238,9 @@ Figure 3 展示了不同身份（男性、女性、名人、非名人）和多�
 2. **基模型能力依赖**：框架性能本质上受限于底层 T2V 基模型的能力上限，生成视频的整体保真度无法超越基模型的固有局限。
 3. **泛化性未验证**：尚未在更强大的视频基础模型（如 Wan 系列）上验证适配性和泛化能力，跨基模型的迁移效果需要进一步研究。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位与核心瓶颈
 
@@ -265,6 +273,8 @@ MotionCharacter的有效性建立在以下前提之上：
 1. 如何在保持身份一致性的同时增强对复杂、精细运动动态的捕捉？可能的路径包括引入更高阶的运动表示（如场景流、关键点轨迹）或设计自适应强度调制机制。
 2. 如何将MotionCharacter的运动解耦范式适配到更先进的视频基础模型（如Wan系列），以提升生成保真度和泛化能力？这需要重新设计身份注入和运动条件模块的接口。
 3. 当前的运动强度信号依赖于预训练的RAFT光流提取器，其误差传播对最终生成质量的影响尚未量化分析。是否可以通过端到端学习或自监督信号替代外部光流估计器，是一个值得探索的方向。
+
+
 
 ## 原文 PDF
 

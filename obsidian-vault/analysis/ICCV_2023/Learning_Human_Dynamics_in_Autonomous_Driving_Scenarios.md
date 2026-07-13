@@ -5,6 +5,8 @@ paper_level: A
 venue: ICCV
 year: 2023
 pdf_ref: paperPDFs/ICCV_2023/Learning_Human_Dynamics_in_Autonomous_Driving_Scenarios.pdf
+project_link: null
+code_link: null
 aliases:
 - PAMTFHD
 - LHDADS
@@ -40,7 +42,7 @@ claims:
 > - Waymo Open Dataset 上，FID (All frames) 为 1.96，变化 显著优于 GLAMR 等基线。
 > - Waymo Open Dataset 上，Ground Penetration GP (All frames) 为 12.62，变化 显著降低。
 
-## 概述
+## 概要
 
 **核心问题**：从快速移动的车辆摄像头拍摄的单目视频中恢复完整、物理合理的人体三维运动序列。现有最先进方法（如 **GLAMR**，Yuan et al., CVPR 2022）虽然在遮挡感知的全局人体运动恢复上表现突出，但忽略了环境物理约束，导致在遮挡、移动摄像机及复杂地形下产生漂浮、滑动、地面穿透等严重运动伪影，无法恢复物理可信的完整人体动态。
 
@@ -50,7 +52,7 @@ claims:
 
 **方法定位**：该方法属于物理感知的人体运动捕捉与轨迹填补交叉领域，其核心创新在于将条件变分自编码器（cVAE）运动先验、强化学习控制策略与物理模拟器深度耦合，填补了从纯运动学估计到物理合理动态生成的空白。
 
-## 背景与动机
+
 
 自动驾驶场景中的人体动力学恢复是理解行人行为、保障安全决策的关键任务。从车载摄像机序列中重建全局一致的人体运动序列，面临移动摄像机视角、严重遮挡和复杂地形等多重挑战。现有最先进的方法，如 **GLAMR**（Yuan et al., CVPR 2022），虽然在遮挡感知的全局人体运动恢复方面取得了显著进展，但其输出普遍存在**物理不合理性**——包括漂浮（floating）、滑动（sliding）和地面穿透（terrain penetration）等伪影（Figure 1）。
 
@@ -58,7 +60,9 @@ claims:
 
 本文的核心动机正是填补这一**物理空白**：在自动驾驶场景中，仅恢复视觉上一致的运动是不够的，必须保证人体运动在物理世界中是合理且可执行的。为此，本文提出一个物理感知的运动跟踪框架，通过引入强化学习训练的分层运动控制器、物理模拟器中的模仿执行，以及对真实地形的显式建模，系统性地解决上述问题。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于将**物理感知的分层运动控制**引入自动驾驶场景下的人体动态恢复，从根本上解决了现有方法（如 **GLAMR** (Yuan et al., CVPR 2022)）因忽略环境物理约束而产生的漂浮、滑动和地面穿透等伪影。这一创新的因果机制体现在以下四个关键维度：
 
@@ -80,7 +84,7 @@ claims:
 
 **证据强度**：上述创新点的有效性由 Table 1 的 FID 指标（1.96，显著优于基线）、Table 2 的物理指标消融实验（地面穿透、脚滑动、漂浮度均显著降低）以及 Table 3 的后优化消融实验（遮挡帧 PA-MPJPE 和 2D-LE 进一步改善）共同支撑，证据置信度均高于 0.95。
 
-## 整体框架
+
 
 本文提出一个三阶段物理感知运动跟踪框架，从快速移动车载摄像机拍摄的单目视频中恢复行人的物理合理人体动力学。输入为包含 $M$ 帧的单目视频序列 $\boldsymbol{I} = (I_1, ..., I_M)$，输出为目标行人 $N$ 个完整运动序列在世界坐标系下的物理合理运动 $\{Q^i\}_{i=1}^N$，其中每个运动序列 $Q = (T, R, \Theta)$ 由根平移 $T$、根旋转 $R$ 和身体姿态 $\Theta$ 组成（Figure 2）。
 
@@ -136,7 +140,7 @@ $$r_{proj} = \exp(-\alpha_p \sum(\|\Pi(\overline{j}_t) - \widetilde{j}_t^{2D}\| 
 ![[assets/figures/papers/paper_list_l37_https_openaccess_thecvf_com_content_ICCV2023_papers_Wang_Learning_Human/figures/001_Figure_1.jpg]]
 *Figure 1: We compare our method against GLAMR [67], the state-of-the-art method for global human motion mesh recovery. The output of GLAMR (left) suffers from various physical implausibilities, such as floating, sliding, or terrain penetration. Our method (right) yields a clear improvement*
 
-## 核心模块与公式推导
+
 
 ### 人体运动表示
 
@@ -184,7 +188,9 @@ $$r_{proj} = \exp(-\alpha_p \sum(\|\Pi(\overline{j}_t) - \widetilde{j}_t^{2D}\| 
 
 为将室内训练的运动先验迁移到户外场景，框架在合成多样化地形上预训练高层次控制器，再在 Waymo Open Dataset 的真实数据上微调。这一策略显著加快了收敛速度并提升了最终奖励（Figure 6），验证了合成数据预训练对真实场景泛化的有效性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -250,7 +256,9 @@ Figure 6 展示了高层次控制器在合成数据上预训练对收敛速度�
 ![[assets/figures/papers/paper_list_l37_https_openaccess_thecvf_com_content_ICCV2023_papers_Wang_Learning_Human/figures/002_Figure_2.jpg]]
 *Figure 2: System Overview. Our approach processes each pedestrian mesh sequence in a stage-wise fashion. We first estimate motions for visible frames $\widetilde { Q }$ using an off-the-shelf motion capture method. We also reconstruct the ground terrain G in preparation for the physicsbased stages (Details in Section 3.1). The physics-aware motion tracking (Section 3.2) infills the motion Q for the occluded frames, as well as adapts the previously reconstructed motion to the reconstructed ground. In the last stage (Section 3.3), we optimize the entire motion $\widehat { Q }$ to closely match the evidence from a 2D keypoint-based system to produce the final motion Q
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -284,6 +292,8 @@ Figure 6 展示了高层次控制器在合成数据上预训练对收敛速度�
 -   **端到端可微分性**：当前框架为模块化级联设计，身体形状优化与物理模拟分离。能否将身体形状优化集成到物理感知框架中，实现端到端的可微分动态，是提升整体一致性的潜在路径。
 -   **泛化能力验证**：论文仅在 Waymo Open Dataset 上进行了验证。在更多样化的真实驾驶场景（如不同城市、天气条件、交通密度）中，该框架的泛化能力尚待检验。
 -   **感知一致性**：定性指标（如 FID）的改进是否与人类感知的物理真实性完全一致，仍是一个值得追问的问题。物理指标的降低不一定线性对应感知质量的提升，需要用户研究等进一步验证。
+
+
 
 ## 原文 PDF
 

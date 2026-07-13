@@ -42,15 +42,13 @@ claims:
 > [!tip] 效果简介
 > - Concept Learning Dataset (自定义) 上，Prompt Fidelity (用户研究) 0.815 vs TokenVerse 0.573 / ProSpect 0.820 (+0.242 vs TokenVerse, -0.005 vs ProSpect)；Concept Similarity (CS) & Concept Exclusivity (CE) 最高综合得分 vs 低于本文方法 (定性及定量上均显著优于大部分基线)。
 
-## 概述
+## 概要
 
 文本到图像生成模型在将自然语言描述转换为视觉内容方面已取得显著进展，但用户若希望从一张参考图像中提取特定的视觉属性（如形状、材质、姿态或镜头角度），并将其灵活注入到新的生成场景中，仍面临根本性困难。这一瓶颈的根源在于，参考图像中的多个视觉属性高度纠缠——一张照片同时包含了物体的颜色、形状、材质、光照和构图等信息，现有方法在学习可迁移的概念表示时，往往无法将目标属性与非目标属性精确分离，导致生成的嵌入不必要地复制了参考图像的布局、视角等无关特征。
 
 针对这一核心问题，本文提出了一种**选择性视觉属性提取与注入方法**。其关键洞察在于：将占位符标记与类别词（如“`[*] color`”）一起送入文本编码器的Transformer时，类别词对应的嵌入能够通过自注意力机制选择性地关注并蒸馏出该类别相关的视觉特征，而不会混入其他非目标属性。基于这一发现，方法构建了三个协同工作的核心组件：（1）利用视觉语言模型（VLM）生成明确排除目标属性的定制训练提示，从输入端粗略过滤非目标信息；（2）引入**蒸馏嵌入**（distilled embedding），在结构层面阻止非目标属性的学习，仅保留目标概念特征；（3）引入**残差嵌入**（residual embedding）捕获剩余属性，并通过余弦相似度损失强制其与蒸馏嵌入正交，从而稳定训练过程并防止目标概念泄露。
 
 实验结果表明，该方法在概念相似性和概念排他性两个维度上总体优于现有基线方法。用户研究进一步证实，本文方法在提示保真度方面取得最高分（0.815），显著超越**TokenVerse**（Garibi et al., TOG 2025）等属性级概念学习方法。消融实验验证了蒸馏嵌入与残差嵌入的必要性：移除残差嵌入会导致训练不稳定，而仅使用定制提示而不采用蒸馏嵌入，则非目标属性仍会混入标记嵌入。该方法在方法谱系上属于**基于文本反转的属性解耦学习**范式，与**Textual Inversion**（Gal et al., arXiv 2022）等整体对象学习方法形成互补，为解决细粒度视觉属性迁移问题提供了新的技术路径。
-
-## 背景与动机
 
 文本到图像生成模型近年取得了长足进步，用户只需提供自然语言描述即可生成高质量的视觉内容。然而，当用户希望从单张参考图像中精确提取某个特定视觉属性（如形状、材质、姿态或镜头角度），并将其注入到全新的场景中时，现有方法面临根本性困难。
 
@@ -62,7 +60,7 @@ claims:
 
 **本文的动机。** 上述困境催生了一个核心研究问题：能否设计一种方法，从单张充满纠缠特征的参考图像中，**选择性地**提取用户指定的目标视觉属性，并将其**独立地**注入到任意新场景中，同时保持非目标属性的完全灵活？本文的答案是通过构建一种新的概念注入范式——在训练阶段利用视觉语言模型（VLM）显式排除非目标属性，并引入蒸馏嵌入和残差嵌入的联合优化机制，从根本上阻断非目标特征进入所学表示。这一设计使得方法能够在形状、材质、姿态、镜头角度等多个属性维度上实现干净、可控的概念迁移（见 Figure 1 的示例结果）。
 
-## 核心创新
+## 核心方法与创新机理
 
 本文的核心创新在于提出了一套**选择性属性提取与注入**机制，通过三个紧密协作的“changed slots”系统性地解决了现有方法中视觉属性高度纠缠的瓶颈。
 
@@ -94,8 +92,6 @@ $$\mathcal{L}_{\text{cosine}} = \max\left(0, \frac{\mathbf{h}_{\text{residual}} 
 
 三个创新形成了完整的**因果链条**：定制提示提供粗粒度的属性排除 → 蒸馏嵌入利用Transformer的自注意力实现结构性的类别特征选择 → 残差嵌入与余弦损失提供训练稳定性和精细的属性隔离。这一组合使模型能够在保持背景灵活性的同时，仅从单张参考图像中精确迁移目标属性，而不会复制布局、相机焦点等非目标特征（Figure 4 直接对比证实）。
 
-## 整体框架
-
 本文提出的选择性属性提取与注入方法，旨在从单张参考图像中解耦并学习特定的视觉属性概念（如形状、材质、姿态、镜头角度），随后将该概念灵活注入到任意新场景中。整个框架围绕一个核心矛盾展开：参考图像中多个视觉属性高度纠缠，传统的可学习标记嵌入会不可避免地吸收非目标属性，导致概念迁移时背景灵活性丧失。为解决这一问题，方法构建了一个四阶段协同优化的pipeline，其输入输出流与模块关系如Figure 3所示。
 
 **输入与输出流**：系统的输入包括一张参考图像 $\mathbf{x}_0$ 和一个用户指定的目标概念 $c$（如“颜色”、“形状”）。输出为一个经过优化的、仅编码目标概念特征的文本嵌入，该嵌入可像普通文本标记一样被插入到任意扩散模型的提示中，用于生成保留目标属性但背景完全不同的图像。
@@ -122,8 +118,6 @@ $$\mathcal{L}_{\text{cosine}} = \max\left(0, \frac{\mathbf{h}_{\text{residual}} 
 
 ![[assets/figures/papers/paper_list_l2343_https_openaccess_thecvf_com_content_CVPR2026_html_Choi_Selectively_Extra/figures/003_Figure_2.jpg]]
 *Figure 2: Two image generation scenarios. (a) A user attempts to reconstruct the target attribute with a detailed prompt, but the generated attribute deviates. (b) Our method successfully reconstructs the attribute by extracting it directly from the reference image*
-
-## 核心模块与公式推导
 
 本方法的核心由四个功能模块构成，围绕“选择性属性提取与注入”这一目标协同工作。以下逐一阐述各模块的设计逻辑与关键公式。
 
@@ -174,10 +168,7 @@ $$\mathcal{L}_{\text{total}} = \mathcal{L}_{\text{recon}} + \lambda \mathcal{L}_
 ![[assets/figures/papers/paper_list_l2343_https_openaccess_thecvf_com_content_CVPR2026_html_Choi_Selectively_Extra/figures/005_Figure_4.jpg]]
 *Figure 4: Comparison of the token and distilled embeddings. (a) When a standard token embedding e∗ is optimized using x0 from Fig. 3a, it naturally absorbs untargeted attributes from the reference image, such as the layout or camera focus. (b) By using our distilled embedding h[category]←∗ (e.g., hcolor←∗), the model structurally isolates the target features, successfully representing only the targeted concept while excluding undesired visual elements*
 
-![[assets/figures/papers/paper_list_l2343_https_openaccess_thecvf_com_content_CVPR2026_html_Choi_Selectively_Extra/figures/006_Figure_5.jpg]]
-*Figure 5: Visualization of token embeddings and distilled embeddings. When the phrase “[*] color” is passed through the text transformer, the*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 定量评估与用户研究
 
@@ -225,7 +216,7 @@ $$\mathcal{L}_{\text{total}} = \mathcal{L}_{\text{recon}} + \lambda \mathcal{L}_
 ![[assets/figures/papers/paper_list_l2343_https_openaccess_thecvf_com_content_CVPR2026_html_Choi_Selectively_Extra/figures/008_Figure_7.jpg]]
 *Figure 7: Qualitative comparison with TokenVerse [15], U-VAP [45], ProSpect [48], OmniGen2 [44], and Textual Inversion (TI) [13]. We highlight the regions copied from the reference images with red rectangles*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系定位
 

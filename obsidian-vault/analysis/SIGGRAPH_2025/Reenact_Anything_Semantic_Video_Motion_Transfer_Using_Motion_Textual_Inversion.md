@@ -5,6 +5,8 @@ paper_level: A
 venue: SIGGRAPH
 year: 2025
 pdf_ref: paperPDFs/SIGGRAPH_2025/Reenact_Anything_Semantic_Video_Motion_Transfer_Using_Motion_Textual_Inversion.pdf
+project_link: https://mkansy.github.io/reenact-anything/
+code_link: null
 aliases:
 - MTI
 - RASVMTUMTI
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | Reenact Anything：基于运动文本反演的语义视频运动迁移 |
 | 英文题名 | Reenact Anything: Semantic Video Motion Transfer Using Motion-Textual Inversion |
 | 会议/期刊 | SIGGRAPH 2025 |
-| Links | [paper](https://arxiv.org/abs/2408.00458); [Project](https://mkansy.github.io/reenact-anything/) |
+| Links | [paper](https://arxiv.org/abs/2408.00458) · [Project](https://mkansy.github.io/reenact-anything/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | motion-textual inversion |
 | Dataset | Something-Something V2 subset (10 classes, 100 videos), Something-Something V2 subset |
@@ -41,7 +43,7 @@ claims:
 > - Something-Something V2 subset 上，User overall rank (lower is better) 为 1.367，对比 2.822 (SVD)，变化 -1.455。
 > - Something-Something V2 subset 上，Cos-Sim 为 0.696，对比 0.370 (SVD)，变化 +0.326。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有视频运动控制方法依赖稀疏信号（文本、轨迹、边界框）或空间特征对齐，难以表达复杂运动语义。文本难以精确描述运动，而基于空间特征的运动迁移方法要求源视频与目标图像空间对齐，容易注入参考视频的结构信息，造成外观泄漏。
 
@@ -52,8 +54,6 @@ claims:
 **主要结果**：在 Something-Something V2 子集（10 类，100 视频）上，运动保真度 Acc-Top-1 达 **54%**，显著优于所有对比方法（最高 44%），相较无运动输入的 SVD 基线（3%）提升 51 个百分点；用户总体排名第一（1.367 vs. 基线 2.822）。定性上，方法支持全身、面部、相机、手工等多种运动类型的跨域迁移，即使物体不对齐也能产生语义匹配的运动。
 
 **局限性**：方法受限于预训练模型的先验，无法迁移模型未见过的复杂运动；对空间精细运动（如手指打字）效果不佳；每个运动需约 1 小时优化时间（A100 GPU）；在复杂运动或大域差距场景中失败率较高，对象运动的 Acc-Top-1 仅 36%。
-
-## 背景与动机
 
 ### 视频运动迁移的核心挑战
 
@@ -83,7 +83,7 @@ claims:
 
 这种设计从根本上解决了外观泄漏问题（模型权重冻结，无法存储参考视频外观），同时利用预训练模型的强大先验实现了跨域、跨物体的语义运动迁移。
 
-## 核心创新
+## 核心方法与创新机理
 
 本文的核心创新在于提出 **motion-textual inversion**：一种在冻结的图像到视频扩散模型中，仅通过优化一组文本/图像嵌入 tokens 来编码并迁移参考视频运动语义的方法。相较于现有方法，其关键改变体现在以下三个层面。
 
@@ -123,8 +123,6 @@ SVD 的空间交叉注意力使用同一个 token 广播至所有帧，导致时
 | 权重学习 | 预训练权重，无运动适配 | 模型完全冻结，仅优化嵌入 | 避免外观泄漏，保留泛化能力 |
 
 > **证据强度说明**：上述三个 changed slots 均有 Fig. 4（框架图）、Fig. 7/Table 4（消融实验）和 Section 3.2.1/3.4.2（方法描述）的直接支撑，置信度均为 0.95。定量评估（Table 1）显示本文方法在运动保真度 Acc-Top-1 上达到 54%，显著优于最佳对比方法（44%），为上述创新提供了实证验证。
-
-## 整体框架
 
 ![[assets/figures/papers/paper_list_l26_Reenact_Anything_Semantic_Video_Motion_Transfer_Using_Motion_Textual_Inv/figures/004_Figure_4.jpg]]
 *Figure 4: Method overview. The baseline image-to-video difusion model, Stable Video Difusion [Bla mann et al. 2023a] in our case, inputs the first frame in two places: as image (latent) concatenated with the noisy video and as image embedding (some other image-to-video difusion models may input text embeddings here instead). We propose to replace the image embedding e (shown in red in the inference block) with a learned motion-text embedding m∗ (green). The motion-text embedding is optimized directly with a regular difusion model loss on one given motion reference video $\mathbf { x } _ { 0 }$ while keeping the difusion model frozen. For best results, the motion-text embedding is inflated prior to opti...*
@@ -170,8 +168,6 @@ Reenact Anything 的核心 pipeline 围绕“运动文本嵌入”（motion-text
 - 仅增加 token 数 $N$ 已有一定改善，但最大的性能提升来自**每帧使用不同 tokens**（$F'=F+1=15$）。
 - 在 $F'=15$ 的设置下，token 维度 $N$ 的具体取值对结果影响不大，表明帧级独立 token 是核心因果因素。
 
-## 核心模块与公式推导
-
 ### 3.1 扩散模型基础
 
 方法建立在连续时间扩散框架之上。给定数据分布 $p_{\mathrm{data}}(\mathbf{x}_0, \mathbf{c})$，其中 $\mathbf{x}_0$ 为干净视频，$\mathbf{c}$ 为条件信号，去噪器 $D_\theta$ 的训练目标为去噪得分匹配损失：
@@ -207,7 +203,7 @@ $$\mathrm{Attention}(Q,K,V)=MV=\mathrm{softmax}\left(\frac{QK^T}{\sqrt{d_a}}\rig
 
 最终运动文本嵌入的总 token 数为 $(F+1) \times N = 75$（额外 $+1$ 来自 CLIP 图像嵌入的全局 token）。消融实验（Fig. 7, Table 4）表明，每帧独立 token 是运动迁移质量提升的最关键因素——仅增加 $N$ 已有改善，但跨帧区分带来的增益远大于此。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -278,13 +274,7 @@ $$\mathrm{Attention}(Q,K,V)=MV=\mathrm{softmax}\left(\frac{QK^T}{\sqrt{d_a}}\rig
 ![[assets/figures/papers/paper_list_l26_Reenact_Anything_Semantic_Video_Motion_Transfer_Using_Motion_Textual_Inv/figures/005_Figure_5.jpg]]
 *Figure 5: (b) Inflated SVD (Ours): By introducing more tokens in the token dimension (𝑁 ), every spatial and temporal location can dynamically a end to diferent tokens, e.g., diferent tokens for the foreground vs. background. For the spatial cross-a ention, we use diferent tokens per frame, resulting in diferent keys and values per frame. This enables a higher temporal granularity of the motion. Fig. 5. High-level visualization of our motion-text embedding and cross-a ention inflation. The SVD [Bla mann et al. 2023a] UNet is composed of several levels of blocks, shown in gray, that have similar structure. We visualize the sub-blocks of level 𝑖 and their cross-a ention maps in more detail. Our inflate...*
 
-![[assets/figures/papers/paper_list_l26_Reenact_Anything_Semantic_Video_Motion_Transfer_Using_Motion_Textual_Inv/figures/011_Figure_10.jpg]]
-*Figure 10: (b) Inflated SVD [Bla mann et al. 2023a] (Ours): We use 𝑁 tokens instead of 1, so the model now dynamically a ends to diferent tokens depending on the spatial and temporal location. Additionally, we use diferent sets of tokens per frame for the spatial cross-a ention instead of broadcasting the same tokens to all frames. Fig. 10. Technical diagrams of the motion-text embedding and cross-a ention inflation showing the dimensions of the features of the spatial and temporal cross-a ention blocks. The changes between the default SVD [Bla mann et al. 2023a] and our inflated version are shown in red font. B = ${ \mathrm { b a t c h } }$ size, 𝐹 = number of frames, 𝐶 = number of channels, 𝐻 = height...*
-
-![[assets/figures/papers/paper_list_l26_Reenact_Anything_Semantic_Video_Motion_Transfer_Using_Motion_Textual_Inv/figures/016_Table_2.jpg]]
-*Table 2: antitative evaluation data. List of video IDs from the Something-Something V2 data set [Goyal et al. 2017] used in our quantitative evaluation*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 核心问题与现有方法的瓶颈
 

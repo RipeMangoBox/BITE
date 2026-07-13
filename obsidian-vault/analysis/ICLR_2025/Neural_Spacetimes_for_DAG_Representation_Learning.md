@@ -5,6 +5,7 @@ paper_level: A
 venue: ICLR
 year: 2025
 pdf_ref: paperPDFs/ICLR_2025/Neural_Spacetimes_for_DAG_Representation_Learning.pdf
+code_link: https://github.com/haitzsaezdeocariz/NeuralSpaceTimesICLR2025
 project_link: https://github.com/haitzsaezdeocariz/NeuralSpaceTimesICLR2025
 aliases:
 - NSN
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 面向DAG表示学习的神经时空模型 |
 | 英文题名 | Neural Spacetimes for DAG Representation Learning |
 | 会议/期刊 | ICLR 2025 |
-| Links | [paper](https://arxiv.org/abs/2408.13885); [GitHub](https://github.com/haitzsaezdeocariz/NeuralSpaceTimesICLR2025) |
+| Links | [paper](https://arxiv.org/abs/2408.13885) · [GitHub](https://github.com/haitzsaezdeocariz/NeuralSpaceTimesICLR2025) |
 | Topic | #topic/representation_self_supervised_transfer #topic/representation_self_supervised_transfer/representation_learning |
 | Method | Neural Spacetime (NST) |
 | Dataset | Cornell (WebKB) dim 2, In silico DAG dim 2, metric 1, Wisconsin (WebKB) dim 4 |
@@ -42,7 +43,7 @@ claims:
 > - In silico DAG dim 2, metric 1 上，平均失真 (Avg Distortion ± sdev) 为 1.13 ± 0.37 (NST)，对比 2.86 ± 5.22 (Minkowski)，变化 −1.73。
 > - Wisconsin (WebKB) dim 4 上，方向性 (Directionality) 为 0.89 (NST)，对比 0.90 (Minkowski), 0.90 (De Sitter)，变化 与基线相当（均为高方向性）。
 
-## 概述
+## 概要
 
 有向无环图（DAG）广泛存在于网页超链接、引文网络、基因调控等真实场景中，其边不仅携带权重信息，还编码了节点间的因果方向。将这类图嵌入连续几何空间，核心挑战在于**同时保持距离度量与因果顺序**。现有方法多采用固定时空几何（如闵可夫斯基空间或德西特空间），但这些几何的度量与因果结构不可学习，难以灵活适配具有复杂拓扑的DAG，导致嵌入失真大或因果方向性丢失。
 
@@ -52,7 +53,7 @@ claims:
 
 综上，NST通过将几何参数化，实现了对任意DAG的低失真、因果一致的连续嵌入，为图表示学习提供了一种几何可塑的新范式。
 
-## 背景与动机
+
 
 ### 有向无环图的表示学习困境
 
@@ -81,7 +82,9 @@ claims:
 
 从实证角度看，初步证据表明神经时空在合成DAG和真实世界网络（网页超链接、基因调控网络）上均能显著降低嵌入失真，同时保持与固定几何基线相当的方向性捕获能力。这种“低失真 + 高保序”的组合优势，正是DAG表示学习领域长期追求的目标。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：固定几何的刚性约束
 
@@ -144,7 +147,7 @@ Theorem 1为上述创新提供了理论支撑：**任意 $k$ 点DAG可嵌入到�
 
 神经时空的核心创新不在于引入新的网络架构，而在于**将几何本身参数化为可学习的神经网络，使空间度量和时间偏序能够根据数据自适应优化**。这种"学习几何"而非"在固定几何中学习嵌入"的范式转换，从根本上解决了固定时空几何的刚性问题，实现了DAG表示学习中距离保真度与因果一致性的统一优化。
 
-## 整体框架
+
 
 神经时空（Neural Spacetime, NST）将DAG嵌入问题形式化为一个可学习的三元组 $\boldsymbol{S} = (\mathcal{E}, \mathcal{D}, \mathcal{T})$，通过**乘积流形**将空间结构与因果结构解耦，并联合端到端优化。其核心设计逻辑是：用可学习的神经准度量 $\mathcal{D}$ 捕捉节点间的加权距离，用可学习的神经偏序 $\mathcal{T}$ 捕捉因果方向性，而特征编码器 $\mathcal{E}$ 则为二者提供共享的中间表示。这一分离使得模型能够灵活适配任意DAG的复杂度量与因果结构，避免了固定时空几何（如Minkowski、De Sitter空间）因度量不可学习而导致的嵌入失真或方向性丢失问题。
 
@@ -171,7 +174,7 @@ Theorem 1为上述创新提供了理论支撑：**任意 $k$ 点DAG可嵌入到�
 
 **Theorem 1（通用时空嵌入）** 为上述框架提供了理论支撑：任意 $k$ 点DAG可以嵌入到神经时空中，失真上界为 $1 + \mathcal{O}(\log k)$，同时精确保留因果结构。该定理表明，NST仅需 $\mathcal{O}(k^2)$ 参数即可实现全局嵌入，从原理上解释了可学习几何相较于固定几何的优势来源。
 
-## 核心模块与公式推导
+
 
 神经时空（**Neural Spacetime, NST**）的核心架构是一个可学习的三元组 $\mathcal{S} = (\mathcal{E}, \mathcal{D}, \mathcal{T})$，如 **Figure 1** 所示。给定一个有向无环图（DAG），编码器 $\mathcal{E}$ 将节点特征映射为时空流形中的事件坐标，而神经准度量 $\mathcal{D}$ 和神经偏序 $\mathcal{T}$ 则并行地学习空间几何与时间因果结构。
 
@@ -252,7 +255,9 @@ $$
 
 值得注意的是，该嵌入所需的参数量仅为 $\mathcal{O}(k^2)$，远小于理论上的最坏情况边界。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -349,7 +354,9 @@ NST相较Minkowski基线的最大失真减少 **86%**（−8.12），相较De Si
 ![[assets/figures/papers/paper_list_l52_https_arxiv_org_abs_2408_13885/figures/021_Table_8.jpg]]
 *Table 8: Embedding results for arxiv citation network*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与固定时空几何基线的对比
 
@@ -402,6 +409,8 @@ NST的理论根基可追溯至以下方向：
 2. **全局优化策略**：如何在大图场景下实现高效的全局嵌入优化，避免仅依赖局部邻域导致的失真累积？
 3. **下游任务泛化**：除节点分类外，神经时空特征能否用于链接预测、因果推断、反事实推理等更多下游任务？
 4. **时间维度压缩**：能否通过更精巧的偏序编码（如基于序维度的自适应分配）实现 $T=1$ 时仍能处理复杂反链结构，从而降低嵌入总维度？
+
+
 
 ## 原文 PDF
 

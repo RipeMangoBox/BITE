@@ -32,7 +32,7 @@ claims:
 | 中文题名 | OccDriver：面向自动驾驶的未来占用引导双分支轨迹规划器 |
 | 英文题名 | OccDriver: Future Occupancy Guided Dual-branch Trajectory Planner in Autonomous Driving |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=abJCjkIwi5) · [arXiv](https://arxiv.org/abs/2502.13144) |
+| Links | [paper](https://openreview.net/forum?id=abJCjkIwi5) · [paper](https://arxiv.org/abs/2502.13144) |
 | Topic | #topic/other_unclear #topic/other_unclear/general |
 | Method | OccDriver |
 | Dataset | nuPlan Val14, nuPlan Test14-Hard |
@@ -41,7 +41,7 @@ claims:
 > - nuPlan Val14 上，NR-S 0.896 vs 0.890 (PLUTO) (+0.006)；R-S 0.838 vs 0.828 (DiffusionPlanner) (+0.010)。
 > - nuPlan Test14-Hard 上，NR-S 0.794 vs 0.787 (PLUTO) (+0.007)；R-S 0.759 vs 0.753 (PLUTO) (+0.006)。
 
-## 概述
+## 概要
 
 自动驾驶轨迹规划的核心瓶颈在于多智能体交互建模的表示能力不足：纯向量化方法以个体为中心，忽略了密集的未来占用场景演化信息，导致交互预测不准；纯栅格化方法虽能建模场景级联合动态，却丢失了个体精确语义。针对这一矛盾，OccDriver 提出了一种**栅格-向量双分支架构**，其核心洞察是：利用未来占用作为条件世界模型，通过粗到细的迭代解码将未来场景演化信息注入轨迹规划，从而在保持个体语义的同时获得场景级交互感知。
 
@@ -49,7 +49,7 @@ claims:
 
 在 nuPlan Val14 闭环基准上，OccDriver 达到 **0.896 NR-S** 和 **0.838 R-S**，显著优于 PlanTF、PLUTO 等主流方法，且在安全指标（Collisions 0.971, TTC 0.938）上表现最佳。消融实验进一步证实，逐步加入占用干扰损失、碰撞损失、对齐损失以及应急规划策略，能够持续提升安全性和驾驶评分，验证了所提损失函数与规划策略的有效性。在更具挑战性的 nuPlan Test14-Hard 上，OccDriver 同样取得领先的 NR-S（0.794）和 R-S（0.759），证明了方法的鲁棒性。
 
-## 背景与动机
+
 
 自动驾驶中的轨迹规划本质上是一个高维交互决策问题：自车必须在动态场景中预测其他交通参与者的未来行为，并据此生成安全、高效且符合交通规则的行驶轨迹。这一问题的核心挑战在于**多智能体交互建模的表示能力不足**——现有方法在“场景级联合动态”与“个体级精确语义”之间存在根本性的张力。
 
@@ -61,7 +61,9 @@ claims:
 
 图 Figure 1 示意了三种表示范式的差异：栅格化框架在时空栅格中建模场景级联合动态，向量化框架执行个体级轨迹规划，而 OccDriver 的双分支框架则整合了场景级与个体级信息，并进一步将未来场景作为规划引导。这一设计使得模型既能感知密集的未来占用演化，又能保留个体代理的精确语义，从而在复杂交互场景中实现更优的规划质量。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 OccDriver 的核心创新在于通过**栅格-向量双分支迭代解码架构**，将未来占用预测显式地注入轨迹规划，从而突破现有方法在多智能体交互建模上的表示瓶颈。以下从架构范式、交互建模、损失函数和应急机制四个维度展开分析。
 
@@ -103,7 +105,7 @@ $$\tilde{\mathbf{O}}_{a}^{*} = \begin{cases} \max(O_{a}^{t*}, \max_{i=1}^{N_{m}}
 
 需要指出，OccDriver 的创新建立在占用预测的离散化栅格表示之上，可能引入离散化伪影，且长时间预测的累积不确定性会影响占用引导的一致性。此外，边际占用分布仅在训练阶段使用，推断时依赖代理剪枝，可能遗漏重要交互。双分支架构引入了约 7.9M 额外参数和约 23ms 推理延迟，虽可控但对于超低延迟部署场景仍需优化。
 
-## 整体框架
+
 
 OccDriver 的核心设计动机源于自动驾驶轨迹规划中两种主流表示范式的互补与局限：**栅格化方法**（如 **RasterModel**, Caesar et al., 2021）在时空栅格中建模场景级联合动态，能自然捕获密集的未来占用演化，但丢失了智能体的精确个体语义；**向量化方法**（如 **PLUTO**, Cheng et al., 2024a）在个体层面进行轨迹规划，保留了精细的智能体特征，却难以有效建模多智能体间的密集交互与场景级演化。OccDriver 提出**栅格-向量双分支架构**，通过在未来占用空间中预测场景演化，并以该预测作为条件先验指导轨迹生成，从而在个体精确性与场景交互完整性之间建立桥梁。
 
@@ -177,7 +179,7 @@ $$ \mathcal{L} = \mathcal{L}_{traj} + \mathcal{L}_{occ} + \mathcal{L}_{oi} + \ma
 ![[assets/figures/papers/paper_list_l71_https_openreview_net_forum_id_abJCjkIwi5/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of different representation paradigms: (a) rasterized framework models the scenelevel joint dynamics in spatiotemporal grids; (b) vectorized framework performs individual-level trajectory planning; (c) our proposed dual-branch framework integrates scene-level and individuallevel information, further leveraging future scene as planning guidance*
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题形式化
 
@@ -270,7 +272,9 @@ $$\mathcal{L}_{collision} = \frac{1}{T_{f}} \sum_{t=1}^{T_{f}} \sum_{i=1}^{N_{v}
 ![[assets/figures/papers/paper_list_l71_https_openreview_net_forum_id_abJCjkIwi5/figures/005_Table_2.jpg]]
 *Table 2: Performance comparison of closed-loop planning on nuPlan Test14 − Hard benchmark. All metrics are higher the better. Compared to vectorized-only, topology-guided and diffusion-based methods, OccDriver achieves top driving scores with desirable planning safety and progress*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果：闭环规划性能
 
@@ -350,7 +354,9 @@ OccDriver 在 nuPlan Val14 基准上取得了领先的闭环规划性能。**Tab
 ![[assets/figures/papers/paper_list_l71_https_openreview_net_forum_id_abJCjkIwi5/figures/011_Table_6.jpg]]
 *Table 6: Planning performance comparison between coarse and fine trajectories*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 表示范式的演进定位
 
@@ -405,6 +411,8 @@ OccDriver 的应急规划策略通过**边际占用分布预测**来处理多智
 3. **风险感知扩展**：如何将占用引导范式适配到带有风险感知目标（如 CVaR）的安全强化学习中？
 4. **大规模场景优化**：如何进一步减少大规模智能体场景下的边际占用计算开销？
 5. **意图交互建模**：如何将占用引导扩展到更复杂的交通参与者行为预测，如意向交互和博弈场景？
+
+
 
 ## 原文 PDF
 

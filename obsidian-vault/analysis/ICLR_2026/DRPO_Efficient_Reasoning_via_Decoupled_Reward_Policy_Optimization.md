@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/DRPO_Efficient_Reasoning_via_Decoupled_Reward_Policy_Optimization.pdf
+project_link: null
+code_link: https://github.com/Optimization-AI/DRPO
 openreview_forum_id: GP5RHZnEsw
 aliases:
 - DDRPO
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | DRPO：基于解耦奖励策略优化的高效推理 |
 | 英文题名 | DRPO: Efficient Reasoning via Decoupled Reward Policy Optimization |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=GP5RHZnEsw); [GitHub](https://github.com/Optimization-AI/DRPO) |
+| Links | [paper](https://openreview.net/forum?id=GP5RHZnEsw) · [GitHub](https://github.com/Optimization-AI/DRPO) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | DRPO (Decoupled Reward Policy Optimization) |
 | Dataset | GSM8K, AES (1.5B models), AES (7B models), AES (8B models) |
@@ -42,7 +44,7 @@ claims:
 > - AES (1.5B models) 上，AES 为 0.178 (DRPO λ=0.1)，对比 -0.129 (RLOO-LP α=0.2)，变化 +0.307。
 > - AES (7B models) 上，AES 为 0.249 (DRPO λ=0.1)，对比 -0.033 (RLOO-LP α=0.1)，变化 +0.282。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -66,7 +68,7 @@ DRPO 属于**推理效率优化**方法，通过奖励设计层面的解耦来�
 
 案例研究表明，DRPO 在简单提示上仅需 89 tokens 即可给出正确推理，相比 DisCO 的 526 tokens 实现 6 倍压缩；在困难提示上以 455 tokens 完成推理，约为 DisCO（4497 tokens）的十分之一。
 
-## 背景与动机
+
 
 ### 推理效率的困境
 
@@ -84,7 +86,9 @@ DRPO 属于**推理效率优化**方法，通过奖励设计层面的解耦来�
 
 本文的核心洞见是：**将正负样本的学习信号彻底解耦**。具体而言，长度奖励的归一化应该仅在正样本组内进行，完全隔绝负样本的干扰。这样，一个正确回答的长度惩罚只会影响它在其他正确回答中的相对权重，而永远不会将其推入“负样本”的领域。基于这一洞见，DRPO（Decoupled Reward Policy Optimization）将长度奖励转化为正样本分布上的重要性权重，并直接融入一个判别式优化目标中，从而从根本上消除了 GRPO 式方法的错误信号问题。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈发现：GRPO 组相对优势对冗长正确样本的误伤
 
@@ -121,7 +125,7 @@ DRPO 的闭式解使其具有显著的工程优势：**无需额外数据，仅�
 | 目标形式 | GRPO/DisCO 目标 + 显式长度惩罚 | 判别式目标 + 长度奖励作为正样本权重 |
 | 长度惩罚集成 | 直接修改奖励值，影响优势计算 | 转化为分布权重，不干扰负样本 |
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_GP5RHZnEsw/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of the limitation of GRPO with length penalty and the benefit of our approach. Suppose [1, 1, 1, 0, 0, 0] are the accuracy rewards for 6 responses, and [0.73, 0.6, 0.2, 0, 0, 0] are the rewards after applying the length penalty to correct answers. Using the group-relative advantage calculation of GRPO, the advantages for the third response shift from 1 (without length penalty) to -0.17 (with length penalty added), inadvertently penalizing the third correct response, which may substantially harm performance. In contrast, our proposed DRPO reduces the learning signal for lengthy and correct responses but never pushes them to the negative territory*
@@ -180,7 +184,7 @@ $$
 
 这一框架使得 DRPO 在 GSM8K 上以 1.5B 模型实现了 77% 的长度缩减，性能损失仅 1.1%，而最佳基线在牺牲 4.3% 性能的情况下仅实现 68% 的长度缩减。
 
-## 核心模块与公式推导
+
 
 ### 问题根源：GRPO 组相对优势的失效
 
@@ -245,7 +249,9 @@ DRPO 的训练流程由以下模块串联：
 5. **KL 散度正则化**：通过惩罚函数约束策略更新幅度。
 6. **模型更新**：使用 AdamW 优化器结合梯度估计更新 $\pi_\theta$。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈验证：GRPO 长度惩罚的误导性信号
 
@@ -321,7 +327,9 @@ Figure 6 对比了三种长度奖励函数：
 ![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_GP5RHZnEsw/figures/025_Table_5.jpg]]
 *Table 5: Detailed AES performance for 7B models*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈：GRPO 组相对优势的负向信号陷阱
 
@@ -389,6 +397,8 @@ DRPO 的方法贡献可以总结为三个关键槽位的变更：优势计算从
 2. **任务扩展**：DRPO 在代码生成、科学推理等需要更长推理链的任务上是否仍能保持高效权衡？
 3. **长度奖励函数设计**：能否设计基于推理步骤正确性的更精细的长度奖励，以进一步提升性能-效率权衡的上界？
 4. **更大规模验证**：当前最大实验规模为 8B 参数，DRPO 在更大模型上的行为尚不明确。
+
+
 
 ## 原文 PDF
 

@@ -42,7 +42,7 @@ claims:
 > - CV-Bench (Table C) 上，Overall 86.5 vs 72.7 (SpatialRGPT) (+13.8)。
 > - 跨基准综合 (VSI/SPAR/CV-Bench) 上，Overall average SpatialStack 最高 vs GVF-L23 / Qwen3.5 基线 (显著领先（具体数值因基准而异）)。
 
-## 概述
+## 概要
 
 **解决的问题。** 现有3D视觉语言模型（VLM）仅将几何编码器的单层（通常为最后一层）深度特征与视觉分支融合。该设计丢弃了编码器中间层蕴含的丰富层次化几何线索——浅层保留尖锐的局部结构与几何边界，深层编码全局空间关系——导致VLM在细粒度空间感知与高层空间推理两方面均存在性能瓶颈。
 
@@ -56,7 +56,7 @@ claims:
 
 **局限与开放问题。** 论文未明确讨论方法在计算开销、对VGGT预训练权重的依赖、极端动态场景泛化等方面的局限性。开放问题包括：层次化几何特征应如何以及在何处融合才能最大化VLM的空间推理能力？该多级融合策略能否推广到更复杂的动态场景（4D世界模型）与具身交互任务？
 
-## 背景与动机
+
 
 ### 3D空间推理的视觉语言模型现状
 
@@ -80,7 +80,9 @@ claims:
 
 基于此，SpatialStack提出了一种**分层几何-语言融合框架**：从VGGT的多个深度（第11、17、23层）提取patch级几何特征，经过层特定投影器对齐后，以加性残差方式**渐进式注入LLM解码器的前几层**（L11→LLM-L0, L17→LLM-L1, L23→LLM-L2）。这一设计将融合目标从传统的“几何→视觉”转向“几何→语言”，使得层次化几何线索能够直接参与语言模型的多层推理过程，同时避免了简单堆叠带来的特征干扰。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SpatialStack 的核心创新在于将几何编码器与语言解码器之间从“单层几何-视觉融合”重构为“分层几何-语言融合”，以层次化方式保留并利用几何编码器中间层蕴含的丰富空间线索。具体而言，其创新体现在以下四个关键维度。
 
@@ -111,7 +113,7 @@ SpatialStack 在以下维度与现有工作形成差异化：
 
 SpatialStack 的层级融合框架具有通用性——其核心思想（从编码器多层提取特征并渐进注入解码器）可推广至其他多模态架构，为 3D VLM 的空间推理能力提升提供了新的设计范式。
 
-## 整体框架
+
 
 SpatialStack 的核心设计是将多层级几何特征渐进式注入语言解码器，形成一条贯穿视觉、几何与语言表征的层次化融合通道。整个框架由五个关键模块构成，数据流沿“视觉编码→几何编码→几何对齐→加性注入→语言解码”方向单向推进，各模块分工如下：
 
@@ -153,7 +155,7 @@ SpatialStack 的核心设计是将多层级几何特征渐进式注入语言解�
 ![[assets/figures/papers/paper_list_l2420_https_arxiv_org_abs_2603_27437/figures/001_Figure_1.jpg]]
 *Figure 1: SpatialStack: Layered Geometry-Language Fusion. Conventional VLMs (a) fuse only a single deep geometry feature with vision tokens, which limits both fine-grained spatial understanding and high-level spatial reasoning. SpatialStack (b) instead stacks multilevel geometry features and injects them hierarchically into successive LLM decoder layers, yielding stronger 3D spatial understanding across benchmarks*
 
-## 核心模块与公式推导
+
 
 SpatialStack 的核心架构由五个模块串联构成：**Vision Encoder** 提取多视图视觉 token 并合并为统一视觉表示；**Geometry Encoder (VGGT)** 从多视图图像中提取多层级几何特征；**Geometry Token Merger** 通过层特定 MLP 将不同层的几何特征对齐到语言空间的维度和分辨率；**Masked Additive Fusion** 将投影后的几何特征以加性残差方式注入 LLM 解码器的对应层；**LLM Decoder** 接收融合后的多模态序列，执行空间推理与答案生成。
 
@@ -228,7 +230,9 @@ $$
 ![[assets/figures/papers/paper_list_l2420_https_arxiv_org_abs_2603_27437/figures/005_Figure_4.jpg]]
 *Figure 4: Effect of Geometry Injection Layers on Spatial Tasks. Deeper layers improve high-level tasks, while low-level tasks peak at layer 11 and decline at deeper layers, suggesting a trade-off between fine-grained perception and higher-level reasoning*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -308,7 +312,9 @@ SpatialStack通过分层几何-语言融合框架，系统性地解决了现有V
 ![[assets/figures/papers/paper_list_l2420_https_arxiv_org_abs_2603_27437/figures/018_Table.jpg]]
 *Table: C. Additional Baseline Comparison on CV-Bench*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 
@@ -366,6 +372,8 @@ SpatialStack 给出了一个有效的经验解（渐进式几何-语言对齐）
 3. **跨架构泛化**：SpatialStack 的渐进式对齐策略是否适用于其他几何编码器（非 VGGT）和其他 LLM 架构（非 Qwen 系列）？融合层数与 LLM 深度的最优比例关系是什么？
 
 4. **训练数据配比的敏感性**：训练混合数据约 200k 样本（Table A），其中 60% 来自 SPAR-234k。不同数据配比对层次化融合效果的影响尚未消融分析。
+
+
 
 ## 原文 PDF
 

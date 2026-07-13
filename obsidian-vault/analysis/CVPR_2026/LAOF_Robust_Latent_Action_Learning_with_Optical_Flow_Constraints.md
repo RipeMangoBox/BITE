@@ -43,7 +43,7 @@ claims:
 > - LIBERO (Average over 4 task suites) 上，Success Rate (%) improvement +4.2 (LAOF), +11.5 (LAOF-Action) vs LAPO (+4.2 / +11.5)。
 > - PROCGEN (BIGFISH) 上，Normalized Return 0.76 (LAOF), 0.80 (LAOF-Action) vs 0.72 (LAPO) (+0.04 / +0.08)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有基于视频的潜在动作学习方法（如 **LAPO**，Schmidt & Jiang, ICLR 2024）在预训练时仅依赖下一帧重建损失，缺乏显式的运动约束。这导致潜在动作容易与视觉外观纠缠，无法可靠地捕获物理动作——尤其在存在动态干扰物或动作标签极度稀缺时，模型容易过拟合到虚假相关性，训练不稳定。
 
@@ -58,8 +58,6 @@ claims:
 - 光流约束在高达 **10% 动作标签比例**下仍为基线方法提供持续增益，且专用光流解码器的架构变体（LAOF）在所有消融变体中取得最佳性能（Table 3）。
 
 **局限与展望**：方法目前基于第三人称固定视角视频，尚未验证在眼在手（eye-in-hand）及第一人称场景下的效果；物体中心光流提取依赖 **LangSAM** 的语义分割与文本提示，对复杂动态场景的泛化性有限。未来方向包括扩展到第一人称视角、自适应损失权重学习，以及探索光流约束在更大规模具身基础模型预训练中的应用。
-
-## 背景与动机
 
 ### 问题背景：从视频中学习可复用的潜在动作
 
@@ -87,7 +85,7 @@ claims:
 
 关键证据表明这一思路的有效性：在极端1%动作标签比例下，无任何动作监督的LAOF能够匹配甚至超越有监督的LAOM-Action（PROCGEN实验，Fig.4）；光流约束在高达10%的动作标签比例下仍能为基线方法提供持续增益。
 
-## 核心创新
+## 核心方法与创新机理
 
 LAOF 的核心创新在于引入**光流作为潜在动作学习的显式运动先验**，通过一个专用的光流解码器将潜在动作直接映射到像素级运动，从而将潜在动作锚定在物理有意义的运动空间中。这一设计从根本上改变了现有潜在动作学习方法的训练范式。
 
@@ -124,8 +122,6 @@ LAOF 的关键洞察是：**光流天然过滤静态背景、强调运动物体*
 ### 训练稳定性的质变
 
 光流约束带来的另一个关键创新是**训练稳定性的显著提升**。在 $\lambda$ 系数消融实验（Figure 9）中，**LAOF-Action** 在 $\lambda \in [0.001, 0.1]$ 范围内保持高度稳定，方差极小；而 **LAOM-Action**（Nikulin et al., ICML 2025）对 $\lambda$ 敏感且表现剧烈波动。这表明光流约束为潜在动作学习提供了稳定的优化景观，即使在稀疏动作监督下也能避免过拟合到噪声标签。
-
-## 整体框架
 
 LAOF 遵循三阶段训练流水线：**预训练（pre-training）→ 蒸馏（distillation）→ 微调（fine-tuning）**，各阶段对应不同的数据集与优化目标。核心创新集中在预训练阶段，通过引入帧间光流作为伪监督信号，为潜在动作学习提供物理运动约束。
 
@@ -175,8 +171,6 @@ $$m_{\text{norm}} = \min\left(1.0, \frac{m}{\sigma \cdot \sqrt{H^2 + W^2}}\right
 ![[assets/figures/papers/paper_list_l890_https_arxiv_org_abs_2511_16407/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of LAOF framework: Consecutive observations*
 
-## 核心模块与公式推导
-
 ### 三阶段训练流水线
 
 LAOF的训练过程遵循**预训练→蒸馏→微调**的三阶段流水线，各阶段对应不同的数据配置。核心创新集中在预训练阶段——通过引入光流伪标签为潜在动作学习提供物理运动约束。
@@ -223,12 +217,7 @@ $$
 
 **光流伪标签生成**：利用预训练RAFT模型生成帧间稠密光流，在存在动态干扰物的场景下，结合LangSAM的语义分割掩码提取物体中心光流，过滤背景运动噪声。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l890_https_arxiv_org_abs_2511_16407/figures/002_Figure_2.jpg]]
-*Figure 2: Visualization of optical flow on LIBERO and PROCGEN. Inter-frame optical flow, estimated using RAFT [40], is shown below each image, representing the motion from the current frame to the next. Colors indicate motion direction, with purple corresponding to upward movement. In tasks where all distractors are static, the agent’s optical flow can be directly extracted, as illustrated by the robotic arm motions in LIBERO. For scenarios involving dynamic distractors, LangSAM [19] is employed to isolate object-centric optical flow*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -368,7 +357,7 @@ Table 5 展示了不同光流模型在 LIBERO-Plus（含光照和背景干扰）
 ![[assets/figures/papers/paper_list_l890_https_arxiv_org_abs_2511_16407/figures/015_Table_6.jpg]]
 *Table 6: Hyperparameters, dataset sizes, and learning rates for tasks (action ratio = 1%)*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 

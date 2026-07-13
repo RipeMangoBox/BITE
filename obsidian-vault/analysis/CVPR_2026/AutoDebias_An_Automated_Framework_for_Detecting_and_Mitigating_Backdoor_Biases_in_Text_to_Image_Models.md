@@ -42,7 +42,7 @@ claims:
 > - Bias Detection (10-shot) 上，Accuracy (%) 91.6 vs 31.1 (+60.5)。
 > - COCO-30k (ImageReward-v1.0) 上，Aesthetic Score 0.6557 vs 0.4889 (Poisoned Model) (+0.1668)。
 
-## 概述
+## 概要
 
 文本到图像（T2I）生成模型在广泛部署的同时，暴露出严重的安全隐患：攻击者可通过极低成本的**后门注入**，在模型中植入隐秘的“触发器→偏见属性”因果关联。与自然数据分布导致的统计偏见不同，这类**B²后门偏见**具有持续性和隐蔽性——仅需在提示中加入自然语言触发器（如“president writing”），模型便会稳定生成特定偏见属性（如秃头、特定种族），而现有检测方法（如**OpenBias**, D'Inca et al., CVPR 2024）和缓解方法（如**UCE**, Gandikota et al., WACV 2024; **InterpretDiffusion**, Li et al., CVPR 2024）均无法有效应对。
 
@@ -52,7 +52,7 @@ claims:
 
 **方法定位**：AutoDebias在现有偏见缓解谱系中开辟了“检测-缓解联合自动化”的新路径。与依赖预设类别或LLM提议潜在偏见的OpenBias不同，其VLM驱动的开放集检测具有更强的未知后板发现能力；与编辑潜变量方向（InterpretDiffusion）或擦除概念（UCE）的缓解策略不同，其CLIP引导的分布对齐将偏见缓解形式化为偏好优化问题，通过加权BCE损失推动模型输出远离偏见属性、靠近反偏见属性。
 
-## 背景与动机
+
 
 ### 文本到图像生成中的偏见问题
 
@@ -94,7 +94,9 @@ $$\operatorname { B i a s } ( c , a ) = P ( a \in { \mathcal { G } } _ { \theta 
 
 AutoDebias正是基于上述动机提出的全自动化防御框架，其核心思路是利用视觉语言模型（VLM）的开放集理解能力，从少量生成样本中自动检测异常触发-属性关联，并通过CLIP引导的分布对齐训练逐步打破这些后门关联。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 AutoDebias 的核心创新在于将**后门偏见（Backdoor Bias）**的检测与缓解统一为一个完全自动化的闭环框架，从根本上区别于现有方法对自然统计偏见的假设。其关键突破体现在以下三个维度。
 
@@ -147,7 +149,7 @@ $$\mathcal{L}_{\mathrm{align}} = \alpha \cdot \log(1 + S_{\mathrm{CLIP}}) + \bet
 
 AutoDebias 的三个 changed slots——**VLM 开放集检测**替代预设类别检测、**偏好优化形式的分布对齐**替代概念编辑/潜变量操作、**完全自动化**替代需要先验知识——构成了一个因果闭环：检测发现异常关联，对照表定义去偏方向，CLIP 对齐损失逐步打破后门关联。这一设计使平均后门成功率从约 90% 降至可忽略水平（Table 2），同时保持生成质量（Table 3），验证了“检测-对照-对齐”这一统一范式的有效性。
 
-## 整体框架
+
 
 AutoDebias 提出了一套全自动的后门偏见检测与缓解流水线，核心思路是将“检测”与“去偏”统一为闭环流程，无需任何先验的后门类别或攻击模式知识。整个框架由三个顺序衔接的模块构成，如图 4 所示。
 
@@ -194,7 +196,7 @@ AutoDebias 的关键突破在于将检测与缓解统一为自动化闭环：VQA
 ![[assets/figures/papers/paper_list_l2294_https_openaccess_thecvf_com_content_CVPR2026_html_Cai_AutoDebias_An_Auto/figures/003_Figure_2.jpg]]
 *Figure 2: Overview of bias handling approaches for text-toimage models. (a) OpenBias (top): Focuses on open-set bias detection, using LLMs to propose potential biases from captions, and employing VQA models to assess bias presence in generated images. (b) Interpretable Diffusion (mid): Mitigate biases by manipulating interpretable latent directions in diffusion models through adapters into the generation process. (c) AutoDebias (bottom): Provides a unified approach combining automated detection and debiasing, using lookup tables to map biases to counter-biases, and implementing bias mitigation with CLIP models as alignment judge during the diffusion process*
 
-## 核心模块与公式推导
+
 
 ### 4.1 问题形式化：后门偏见的数学定义
 
@@ -253,7 +255,9 @@ $$\mathrm{BiasRate}(c, a) = \frac{\mathrm{Count}(c, a)}{|\mathcal{T}_c|}$$
 ![[assets/figures/papers/paper_list_l2294_https_openaccess_thecvf_com_content_CVPR2026_html_Cai_AutoDebias_An_Auto/figures/002_Figure_3.jpg]]
 *Figure 3: The shown illustration gives the example of removing biases “bald head” from trigger word “president writing”. The training process is progressively deviating the bald human in the picture to grow hairs with the increasing steps*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 检测性能评估
 
@@ -325,7 +329,9 @@ Figure 3通过“秃头总统”案例直观展示了去偏的渐进过程：随
 ![[assets/figures/papers/paper_list_l2294_https_openaccess_thecvf_com_content_CVPR2026_html_Cai_AutoDebias_An_Auto/figures/001_Figure_1.jpg]]
 *Figure 1: Qualitative examples of bias mitigation across diverse backdoor injection categories using AutoDebias. All inferences are done in Stable-Diffusion-V2. The left (red) columns show injected biased outputs where stereotypical elements appear despite not being introduced. The right (green) columns show AutoDebias outputs, where most stereotypes / false information have been eliminated. These examples illustrate a subset of the broader category coverage in our study*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题域定位：从统计偏见到后门偏见
 
@@ -389,6 +395,8 @@ AutoDebias 的有效性建立在以下假设之上，这些假设同时也划定
 2. 基于 CLIP 的对齐损失能否泛化到其他多模态模型（如更强大的 VLM）以提升鲁棒性？消融实验已表明 FG-CLIP 优于标准 CLIP，但更先进 VLM 的潜力尚未探索。
 3. 在极低样本条件下（few-shot 甚至 one-shot），自动检测和缓解的有效性如何？这直接关系到方法在实际部署中的快速响应能力。
 4. 当前方法假设后门偏见可以通过“引导替代”消除，但对于涉及多重触发条件或条件触发（如特定 prompt 模板组合）的复杂后门，对照表构建策略是否需要扩展？
+
+
 
 ## 原文 PDF
 

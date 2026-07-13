@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/The_Shape_of_Adversarial_Influence_Characterizing_LLM_Latent_Spaces_with_Persistent_Homology.pdf
+project_link: null
+code_link: null
 openreview_forum_id: v2PglvLLKT
 aliases:
 - PHPBTALLS
@@ -42,7 +44,7 @@ claims:
 > - Six LLMs (Phi3-mini, Mistral 7B, LLaMA3 8B, Mixtral-8x7B, Phi3-medium, LLaMA3 7... 上，Minimum cross-layer test accuracy of logistic regression on pruned barcode summaries 为 1.00，对比 N/A (no linear method achieves perfect minimum across layers)，变化 N/A。
 > - Mistral 7B neuron-level information flow (consecutive layers) 上，Precision@5 for detecting layers with largest class separation (Total Persistence 1-bars) 为 0.8 **，对比 empirical chance level，变化 significant (p < .01)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -77,7 +79,7 @@ claims:
 
 当前工作仅覆盖指令调优的解码器架构LLM，在其他模型类型上的泛化性尚待验证。条码摘要特征虽具有高判别力，但其本身并不直接关联语义内容，可解释性停留在形状层面。此外，PH计算虽通过GPU加速控制在可接受范围内（4×A100节点约5小时完成六个模型），但实时部署的延迟和资源需求仍构成挑战。未来方向包括：将PH技术与Transformer特有架构属性相结合以生成更具语义意义的特征，探索拓扑约束在模型训练中的正则化作用，以及构建轻量级拓扑监控器用于运行时安全检测。
 
-## 背景与动机
+
 
 ### 大语言模型的可解释性困境
 
@@ -108,7 +110,9 @@ PH已被成功应用于神经网络的权重空间分析、训练动态追踪等
 
 通过将持久同调引入LLM可解释性研究，本文旨在打开一扇新的窗口：从“形状”的视角理解对抗影响，而非仅从“方向”或“幅度”的视角。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作的核心创新在于将**持久同调（Persistent Homology, PH）**这一拓扑数据分析工具引入LLM潜在空间的可解释性研究，从而突破了现有方法仅能捕获线性方向或孤立特征的局限。具体而言，该方法体系在以下四个关键维度上实现了对基线方法的系统性超越。
 
@@ -142,7 +146,7 @@ SHAP分析揭示了驱动分类的最重要特征：**0维条码的平均消亡�
 
 为排除拓扑压缩签名仅是特定防御机制的人工痕迹，本工作在专门设计用于绕过TASKTRACKER激活防御的自适应攻击样本上进行了验证。结果显示，拓扑压缩签名依然显著：1维环数量从干净输入的12个降至4个，环的中位出生时间从约69升至约85（Table 9）。这一结果表明，拓扑压缩反映的是对抗影响在几何层面的**根本属性**，而非特定攻击模式或防御机制的副产品。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_v2PglvLLKT/figures/007_Figure_3.jpg]]
 *Figure 3: Pipeline for layer-wise topological analysis. Figure 4: Pipeline for local analysis*
@@ -167,7 +171,7 @@ SHAP分析揭示了驱动分类的最重要特征：**0维条码的平均消亡�
 
 该框架的关键设计优势在于：持久同调具有坐标自由和噪声稳健的特性，使得跨层、跨模型、跨攻击模式的拓扑比较成为可能，而无需依赖特定坐标系或线性假设。
 
-## 核心模块与公式推导
+
 
 ### 全局层间拓扑分析管道
 
@@ -221,7 +225,9 @@ $$
 
 其中 $d_{\mathrm{inter}}$ 为干净簇与对抗簇质心间的欧氏距离，$d_{\mathrm{intra}}$ 为各类内部样本到质心的平均距离。$r$ 越大表示两类在条码摘要空间中越可分离，该指标用于指导子采样超参数的选择与消融验证。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：拓扑压缩签名
 
@@ -302,7 +308,9 @@ $$
 ![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_v2PglvLLKT/figures/085_Table_7.jpg]]
 *Table 7: Peak analysis. Precision@k for k=1, 3, and 5 largest peaks in total variance, and their precision in detecting the largest peaks in absolute difference between the two classes. Spearman’s rank correlation (r) is reported in the last column. ∗, ∗∗ correspond to p-values \<.05 and .01, respectively*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 从线性探针到拓扑探针：表征形式的范式转换
 
@@ -355,6 +363,8 @@ SHAP分析揭示了最关键的拓扑签名：**0维条码的平均消亡时间�
 5. **与线性方法的协同**：PH分析提供全局形状感知，线性探针提供方向性读出——两者能否协同工作，构建既有“方向感”又有“形状感”的模型内部状态描述？例如，在条码摘要分离出的子空间内进一步训练线性探针以提取语义。
 
 6. **非相邻层的长程交互**：当前局部信息流分析仅检查相邻层对，但Transformer的残差连接使得非相邻层之间存在直接的信息传递。将这些长程交互纳入拓扑分析框架，可能揭示更深层的对抗影响机制。
+
+
 
 ## 原文 PDF
 

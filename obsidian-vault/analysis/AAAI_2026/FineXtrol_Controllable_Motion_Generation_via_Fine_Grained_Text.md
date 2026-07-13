@@ -5,6 +5,8 @@ paper_level: A
 venue: AAAI
 year: 2026
 pdf_ref: paperPDFs/AAAI_2026/FineXtrol_Controllable_Motion_Generation_via_Fine_Grained_Text.pdf
+project_link: null
+code_link: null
 aliases:
 - FineXtrol
 tags:
@@ -39,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - HumanML3D 上，FID↓ 0.245 vs 0.544 (-0.299)；R-Precision Top-3↑ 0.685 vs 0.611 (+0.074)；FID↓ 0.245 vs 0.209 (OmniControl Coordinate) (+0.036)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -70,7 +72,7 @@ claims:
 
 FineXtrol在可控运动生成的方法谱系中占据独特位置：它既不同于传统坐标控制方法（PriorMDM、GMD、OmniControl、InterControl）依赖空间轨迹输入，也不同于LLM扩展文本方法（CoMo）缺乏时间对齐和事实准确性。其核心洞察在于：**细粒度、时间感知的文本描述可以成为空间坐标的有效替代品**，在保持控制精度的同时大幅降低使用门槛和计算成本。这一思路为可控运动生成开辟了“文本即控制”的新路径，但也存在对预标注数据（FineMotion）的依赖，以及对更精细关节（如手指）控制尚未覆盖的局限。
 
-## 背景与动机
+
 
 ### 可控运动生成的需求与挑战
 
@@ -107,7 +109,9 @@ FineXtrol的答案是将**带有明确时间间隔的细粒度文本描述**作�
 - **层次对比学习**：针对现有文本编码器（如CLIP、T5）对细粒度动作语义区分能力不足的问题，设计句子级、片段级、序列级三层对比学习，增强文本编码器对细粒度控制信号的语义敏感性。
 - **双分支ControlNet式架构**：以冻结的MDM分支保持粗粒度文本生成能力，以可训练的控制分支处理细粒度信号，通过零初始化线性层以残差形式注入控制信息，实现生成质量与控制精度的解耦与协同。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FineXtrol 的核心创新在于用**带有明确时间间隔的细粒度文本描述**替代传统方法中不直观且计算昂贵的空间坐标序列，作为运动生成的控制信号。这一转变并非简单的信号替换，而是围绕该信号特性构建了一套完整的控制-生成-编码体系，具体体现在以下三个关键设计：
 
@@ -143,7 +147,7 @@ FineXtrol 采用**双分支 ControlNet 架构**：
 
 三项创新形成因果链条：**细粒度文本信号**降低了控制的门槛与计算成本；**双分支残差注入**解决了控制信号与生成主干的解耦融合问题；**层次对比学习**弥补了通用文本编码器对细粒度动作语义的感知缺陷。三者协同使得 FineXtrol 在仅 23.39M 可训练参数和 128.57s 推理时间下（Table 3），实现了 0.245 的 FID 和 0.685 的 R-Top3 精度，在控制精度与生成质量上达到或超越基于坐标的 SOTA 方法。
 
-## 整体框架
+
 
 FineXtrol 的整体框架围绕一个核心设计展开：将**细粒度、时间感知的文本控制信号**注入冻结的文本到运动扩散模型，以残差方式实现精确的身体部位运动控制，同时保持原有粗粒度文本的生成能力。
 
@@ -229,7 +233,7 @@ $$
 
 训练时，下分支冻结，仅更新上分支控制网络和零初始化投影层。细粒度控制信号以 50% 的概率随机 Mask 部分时间区间（Table 17 表明该概率最优），迫使模型学会在部分控制信息缺失时仍能合理生成。推理时，框架从随机噪声出发，通过 1000 步去噪迭代生成符合粗粒度文本语义且精确跟随细粒度控制约束的运动序列。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化
 
@@ -294,7 +298,9 @@ $$\mathcal{L}_i = -\log \frac{\exp(\text{sim}(z_i, z_j)/\tau)}{\sum_{k=1}^{2N} \
 
 细粒度控制信号 $\mathbf{c}$ 采用结构化模板，将人体划分为六大部位：头、身体、左臂、右臂、左腿、右腿。每个控制指令包含时间区间和动作描述，未指定的时间区间使用 `<Mask>` 标记。训练时采用50%的随机Masking概率，消融实验表明该设置在FID（0.245）上显著优于其他概率值（如变化概率的0.408，Table 17）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -360,11 +366,7 @@ FineXtrol在HumanML3D测试集上与多个基线方法进行了全面对比，�
 - **Masking概率**（Table 17）：50%的固定Masking概率训练效果最优（FID 0.245），全Mask或零Mask均导致性能下降（FID升至0.408）。
 - **对比学习超参**（Table 16）：温度τ=0.07和平均池化策略在正例对余弦距离上取得最优值。
 
-![[assets/figures/papers/paper_list_l1826_FineXtrol_Controllable_Motion_Generation_via_Fine_Grained_Text/figures/025_Table_17.jpg]]
-*Table 17: Ablation study on the masking probability in finegrained textual control signals during training*
 
-![[assets/figures/papers/paper_list_l1826_FineXtrol_Controllable_Motion_Generation_via_Fine_Grained_Text/figures/026_Table_16.jpg]]
-*Table 16: Ablation study on temperature τ and pooling methods in the proposed contrastive learning module. The results are the average cosine distance between textual embeddings of 10,000 randomly sampled sentence-level positive pairs, where lower values indicate better performance. The results suggest that average pooling yields more effective textual embeddings, and the optimal τ is 0.07*
 
 ### 失败模式与局限性
 
@@ -387,7 +389,9 @@ FineXtrol在HumanML3D测试集上与多个基线方法进行了全面对比，�
 ![[assets/figures/papers/paper_list_l1826_FineXtrol_Controllable_Motion_Generation_via_Fine_Grained_Text/figures/006_Table_2.jpg]]
 *Table 2: Detailed results of controlling specific body parts*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 一、可控运动生成的演进路径
 
@@ -425,6 +429,8 @@ FineXtrol 处于**可控人体运动生成**这一研究脉络的交叉点上。
 - **与 LLM 的深度整合。** CoMo 的失败源于 LLM 生成文本的事实不一致，而非 LLM 本身无用。能否将 FineXtrol 的层次对比编码器与 LLM 的生成能力结合，实现“用户自由描述 → LLM 生成时间对齐信号 → FineXtrol 精确执行”的完整链路？
 
 *注：以上开放问题基于论文自身讨论的局限性和方法设计空间推断，部分结论需待后续工作验证。*
+
+
 
 ## 原文 PDF
 

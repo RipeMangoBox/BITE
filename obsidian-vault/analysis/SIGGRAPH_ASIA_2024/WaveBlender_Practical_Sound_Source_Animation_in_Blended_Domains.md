@@ -5,6 +5,8 @@ paper_level: A
 venue: "SIGGRAPH Asia"
 year: 2024
 pdf_ref: paperPDFs/SIGGRAPH_ASIA_2024/WaveBlender_Practical_Sound_Source_Animation_in_Blended_Domains.pdf
+project_link: null
+code_link: null
 aliases:
 - WaveBlender
 tags:
@@ -39,7 +41,7 @@ claims:
 > - 2016 Pouring Faucet (single machine) 上，speedup 为 WaveBlender GPU (serial)，对比 Wang et al. 2018 CPU (serial)，变化 ~1000× faster。
 > - Cup Phone (low-res) 上，Real-time Factor (core-only) 为 0.73× (5.82 s for 8 s audio)，对比 Wang et al. 2018 (parallel-in-time, not real-time)，变化 real-time feasible on single GPU。
 
-## 概述
+## 概要
 
 动画声源仿真在视觉计算中长期面临一个瓶颈：当发声物体的几何界面随时间移动或变形时，传统时域有限差分（FDTD）声学求解器在离散化切换瞬间会产生严重的“popping”伪影，且稀疏矩阵求解结构不利于GPU并行化。现有方案要么牺牲声学质量，要么依赖多机CPU并行而难以实时。**WaveBlender**（SIGGRAPH Asia 2024）针对这一瓶颈，提出了一种β‑混合域离散方案：直接在FDTD速度更新方程中对两个连续键帧的离散化进行β加权混合，以三次平滑阶梯函数β(t)控制过渡，从而消除界面突变引起的不连续性。该方法将混合操作从连续方程层面移至离散方程层面，既保留了原始FDTD显式、GPU友好的结构，又实现了动态界面的鲁棒、低噪声声学仿真。
 
@@ -51,7 +53,7 @@ claims:
 
 方法上，WaveBlender在均匀交错网格上运行，支持多种声源着色器（刚体模态、薄壳、气泡水声、点源加速度噪声等），采用单向源耦合和阶梯近似边界处理，以精度换取统一的显式GPU并行结构。其流水线涵盖栅格化、β‑混合FDTD求解、声源着色、逐批次开销处理与CUDA并行化等模块。主要局限包括仅支持单向耦合、边界为阶梯近似、栅格化等部分仍在CPU执行，以及尚未包含壁面损耗与衍射等复杂边界效应。
 
-## 背景与动机
+
 
 计算机图形学中的声学仿真长期面临一个核心矛盾：高保真度的波动求解器需要精细的几何离散化，而动画场景中的物体却在持续移动和变形。当声源界面在离散网格上发生突变时——例如一个振动的薄壳从一个网格单元跳变到相邻单元——声场求解器会引入严重的不连续性，在可听频谱中表现为刺耳的“popping”伪影（Figure 2）。这一问题在粗网格、长时间仿真中尤为突出，严重制约了动画声音合成的实用化。
 
@@ -85,7 +87,9 @@ WaveBlender的动机源于一个关键洞察：**将混合操作从连续方程�
 
 Figure 1 以“糖果在手中摇动”的场景直观展示了这一混合域概念：给定两个60Hz动画帧的栅格化结果（“Begin”和“End”），WaveBlender在两者之间连续混合离散化状态，同时解析糖果碰撞产生的加速度噪声在变化的手部空腔中的散射和共振——这是传统逐帧切换方案无法实现的。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 WaveBlender 的核心创新在于将动态界面的离散化过渡从连续方程层面**下沉到离散方程层面**，从而在不破坏 FDTD 显式结构的前提下，消除了界面突变引起的声场不连续性。这一设计选择直接回应了现有方法的核心瓶颈，并形成了三个紧密耦合的关键创新点。
 
@@ -138,7 +142,7 @@ $$\rho_\beta = \frac{\rho_0}{1-\beta}, \quad c_\beta^2 = (1-\beta) c_0^2, \quad 
 
 这些创新共同构成了 WaveBlender 的核心贡献：**在保持显式 FDTD 的 GPU 并行优势的同时，通过离散层面的 β‑混合方案实现了动态界面的鲁棒、低噪声声学仿真**，在粗网格下消除了 Wang et al. 2018 反复出现的低频 popping 伪影（Figure 2），并在相同条件下实现了约 1000 倍的单机串行加速（Table 1）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l20_https_research_nvidia_com_labs_prl_xue2024waveblender_waveblender_pdf/figures/004_Figure_4.jpg]]
 *Figure 4: Velocity update weight ???? plotted against normalized blending time ?? shows that our method smoothly blends in the boundary conditions, whereas the original “Aerophones scheme” (FDTD step rate at 128 kHz, blending over 10 ms windows) suffers from rapid changes near the end*
@@ -174,7 +178,7 @@ WaveBlender 提出了一套面向动态动画声源的实用声学仿真管线�
 
 WaveBlender 的实用性建立在明确的取舍之上：采用阶梯近似边界和一阶精度换取均匀网格的简单性和完全显式时间步进；仅支持单向源耦合，放弃薄壳振动对声场的反馈，但大幅简化了声源集成和多物理场耦合的复杂度；栅格化和部分几何处理保留在 CPU 上执行，在快速界面运动时可能成为瓶颈（Figure 7），但避免了复杂的 GPU 几何算法开发。这些取舍使得 WaveBlender 在保持鲁棒性和低噪声输出的同时，首次将动态场景声学仿真推进到接近实时的性能水平。
 
-## 核心模块与公式推导
+
 
 ### 1. 问题瓶颈与核心洞察
 
@@ -276,7 +280,9 @@ WaveBlender将仿真划分为固定长度的批次，每个批次内执行以下
 
 - **PML吸收边界**：采用**Liu and Tao 1997**的分裂场PML公式，所有示例使用8个单元宽度的PML层。GPU实现中仅对穿透PML的线程束计算分裂场，以优化性能。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -326,7 +332,9 @@ WaveBlender将仿真划分为固定长度的批次，每个批次内执行以下
 ![[assets/figures/papers/paper_list_l20_https_research_nvidia_com_labs_prl_xue2024waveblender_waveblender_pdf/figures/011_Figure_8.jpg]]
 *Figure 8: Reference images for comparisons with [Wang et al. 2018]. See the supplementary video for other examples. Fig. 9. Fill’er Up! A rigid-body simulation of 264 hard candies falling into a tube-like concrete container (3cm × 3cm × 20cm) generates 366832 contact impulses that are approximated as point-like acceleration-noise sources. Our WaveBlender acoustic wave simulation framework approximates such scenes on uniform grids but represents the changing air-domain shape using an auxiliary ?? field, which can be used to model auxiliary scene geometry (in blue) in addition to the container. WaveBlender timesteps modified finite-difference time-domain (FDTD) equations and boundary conditions to appr...*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系
 
@@ -366,6 +374,8 @@ WaveBlender 的设计决策定义了其明确的适用边界：
 4. **自适应网格**：能否开发动态自适应网格技术，使模拟域随声源移动而自动调整形状和分辨率？
 5. **非均匀网格支持**：如何支持非均匀或自适应细化网格，在复杂几何附近获得更高精度，同时保持 β‑混合方案的简洁性？
 6. **实时交互系统**：未来能否将 WaveBlender 发展为实时的动画‑声音集成系统，用于游戏、VR 等交互式应用？
+
+
 
 ## 原文 PDF
 

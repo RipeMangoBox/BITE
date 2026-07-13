@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/CLONE_Closed_Loop_Whole_Body_Humanoid_Teleoperation_for_Long_Horizon_Tasks.pdf
+project_link: https://humanoid-clone.github.io/
+code_link: null
 aliases:
 - CLONE
 tags:
@@ -41,7 +43,7 @@ claims:
 > - Real-world straight-path tracking 上，Mean global position tracking error (cm) 5.1 vs 开环遥操作典型漂移无法完成长距离任务（未汇报具体数值） (开环无闭环修正的系统漂移严重，CLONE 保持厘米级精度)。
 > - Real-world curved-path tracking 上，Mean translational error / Mean rotational drift 20 cm / 2° vs 开环系统典型漂移更大 (闭环修正有效抑制转角和位移漂移)。
 
-## 概述
+## 概要
 
 人形机器人遥操作面临一个关键瓶颈：现有系统通常将上半身与下半身的控制解耦，以局部稳定性换取全局协调性，牺牲了自然的全身运动能力；同时，开环控制缺乏实时的位置反馈，导致长时间操作中累积显著的位置漂移，使复杂长时任务难以完成。CLONE 系统针对这一瓶颈，提出了两个核心控制变量：**混合专家（MoE）策略架构**与**闭环误差修正机制**。其核心洞察在于，通过 MoE 专家网络对行走、下蹲、跳跃等不同运动类型进行专业化处理，解决了单一策略难以协调多样性运动的难题；同时引入基于 LiDAR 里程计与空间锚点的闭环反馈，消除累积漂移，从而仅需 MR 头显的头部与手部追踪即可实现高保真全身遥操作。
 
@@ -51,7 +53,7 @@ claims:
 
 CLONE 仍存在若干局限：高动态动作（如跳跃）的局部关节精度有所折衷；稀疏输入缺乏足部触地等信息，限制了非结构地形下的极端稳定性；闭环修正依赖 LiDAR，在退化环境中精度可能下降；当前策略专为 Unitree G1 训练，跨形态迁移需重新适配。
 
-## 背景与动机
+
 
 人形机器人因其与人类环境的高度兼容性，被认为是执行复杂长时任务的理想载体。然而，实现高保真的全身遥操作仍面临两大核心瓶颈。
 
@@ -63,7 +65,9 @@ CLONE 仍存在若干局限：高动态动作（如跳跃）的局部关节精�
 
 上述挑战共同指向一个关键问题：**如何在仅依赖头部和手部稀疏输入的条件下，实现多种运动模式的自适应协调，并消除长时间操作中的累积位置漂移？** CLONE 通过混合专家（MoE）策略架构与闭环误差修正机制对此给出了系统性的回答。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CLONE 的核心创新在于通过**混合专家（MoE）策略架构**与**闭环误差修正机制**两个关键“changed slots”，系统性地解决了现有人形机器人遥操作中的根本瓶颈：上下半身控制解耦导致的不自然协调，以及开环控制下长期操作累积的显著位置漂移。
 
@@ -99,7 +103,7 @@ $$\mathrm{d} \vec{P}_{\mathrm{head}} = \dot{\vec{p}}_{\mathrm{head}} \mathrm{d} 
 
 MoE 架构与闭环误差修正并非孤立创新，二者形成协同：MoE 提供了多样运动模式下的稳定全身协调能力，闭环修正则确保长时间操作中全局位置与操作员保持精确对应。这一组合使得 CLONE 仅需 MR 头显的头部与手部追踪即可实现高保真全身遥操作，并成功完成如捡起地面物体等复杂长时任务（图 5、图 6）。
 
-## 整体框架
+
 
 CLONE 系统围绕一个核心矛盾展开：如何仅凭混合现实头显提供的稀疏头部与手部追踪信号，驱动人形机器人产生自然协调的全身运动，并在长时间操作中保持精确的全局位置对齐。为此，系统构建了一条从数据策展到策略蒸馏再到闭环部署的完整流水线，其整体架构如 Figure 3 所示。
 
@@ -131,7 +135,7 @@ CLONE 系统围绕一个核心矛盾展开：如何仅凭混合现实头显提�
 ![[assets/figures/papers/paper_list_l1676_CLONE_Closed_Loop_Whole_Body_Humanoid_Teleoperation_for_Long_Horizon_Tas/figures/001_Figure_1.jpg]]
 *Figure 1: CLONE employs an MoE-based policy with closed-loop error correction for humanoid teleoperation, enabling precise whole-body coordination and long-horizon task execution*
 
-## 核心模块与公式推导
+
 
 ### 3.1 教师-学生策略蒸馏框架
 
@@ -171,7 +175,9 @@ $$E_{\mathrm{hand}} = 1 - \langle \hat{\mathbf{q}}, \mathbf{q} \rangle^{2}$$
 
 该指标对四元数符号对称性具有不变性，能准确反映手部旋转跟踪的保真度。在 CLONED 数据集上，CLONE 的手朝向误差为 3.61，显著优于 MLP 架构变体 CLONE†（4.73）和使用 OmniH2O 数据训练的变体 CLONE∗（4.61）（Table 1）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -270,7 +276,9 @@ Figure 7 按不同姿态高度（从站立到深蹲）对比了 CLONE、CLONE∗
 ![[assets/figures/papers/paper_list_l1676_CLONE_Closed_Loop_Whole_Body_Humanoid_Teleoperation_for_Long_Horizon_Tas/figures/009_Table.jpg]]
 *Table: A1: Reward functions. The details of the primary reward function used in our training process. Table A2: Domain Randomization. The details of the primary domain randomization used in our training process*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心问题与因果杠杆
 
@@ -315,6 +323,8 @@ CLONE 直接对标的是基于大规模运动数据集训练的全身遥操作�
 2. 如何扩展 CLONED 数据集，以支持训练一次即可在多类型人形机器人上泛化的通用全身控制策略？这可能需要引入形态条件化的策略表示。
 3. 在强遮挡或低纹理环境中，如何提升 LiDAR 里程计的鲁棒性？多传感器融合（如视觉-惯性-激光联合优化）或基于学习的里程计去噪可能是可行的扩展路径。
 4. 基于 MoE 的策略是否能够自发涌现出更高级的全身协调行为（如上下楼梯、开门等），而无需显式设计奖励函数或运动先验？这涉及对 MoE 专家功能分化的深入理解与引导。
+
+
 
 ## 原文 PDF
 

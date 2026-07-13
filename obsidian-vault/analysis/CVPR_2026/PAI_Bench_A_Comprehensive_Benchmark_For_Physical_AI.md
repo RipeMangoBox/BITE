@@ -44,7 +44,7 @@ claims:
 > - PAI-Bench-U 上，Overall Accuracy Human vs GPT-5 (-31.4)；Overall Accuracy Human vs Qwen3-VL-235B-A22B (-28.5)。
 > - PAI-Bench-C 上，Quality Score (All Multi-Signal Condition) Cosmos-Transfer2.5-2B (All) vs Cosmos-Transfer2.5-2B (Blur) (+0.53)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：当前视频生成模型（VGMs）在视觉保真度上已逼近真实视频，但在物理一致性上表现极差；多模态大语言模型（MLLMs）在物理理解与预测任务中准确率远低于人类（GPT-5 仅 61.8% vs. 人类 93.2%），揭示模型缺乏对物理世界动态的深度建模与因果推理能力。
 
@@ -53,8 +53,6 @@ claims:
 **方法定位**：PAI-Bench 是首个专为 Physical AI 领域设计的全面基准（见 Table 1），包含三条评估轨道——PAI-Bench-G（文本条件视频生成）、PAI-Bench-C（条件视频生成）和 PAI-Bench-U（视频理解），覆盖自动驾驶、机器人、工业、人类活动、物理现象和常识推理六大领域（见 Figure 1）。评估体系引入 Domain Score（物理合规性评分）与 Quality Score（视觉质量评分）的双维度指标，并通过竞技场式人类研究验证了自动指标与人类偏好的高度对齐（Pearson r = 0.918）。
 
 **主要结果**：在 PAI-Bench-G 上，领先 VGMs 的 Quality Score 已接近源视频，但 Domain Score 存在显著差距（Veo3 整体分差 -1.7，Wan2.2-I2V-A14B 分差 -1.6）；在 PAI-Bench-U 上，最强 MLLM（GPT-5）仍落后人类超过 30 个百分点；在 PAI-Bench-C 上，多信号联合控制（All）相比单一控制信号可显著提升生成质量（Cosmos-Transfer2.5-2B 质量分提升 +0.53）。消融实验进一步表明，思维链推理模式对 GPT-5 有 +8.0 点的显著增益，但对 Qwen3-VL-32B 反而造成 -2.2 点的退化，且模型性能在 8 帧输入时即饱和。
-
-## 背景与动机
 
 ### 物理AI的评估困境
 
@@ -83,7 +81,7 @@ PAI-Bench遵循三条设计原则：
 
 PAI-Bench的发布，标志着Physical AI评估从“视觉质量竞赛”转向“物理合理性验证”的范式转变。
 
-## 核心创新
+## 核心方法与创新机理
 
 PAI-Bench 的核心创新不在于提出新的模型架构或训练范式，而在于**构建了首个专门面向 Physical AI 的统一评估基准**，通过一套系统化的评估框架，将物理世界理解和生成能力的评测从“视觉质量”这一单一维度中解放出来，直接暴露当前模型在物理一致性上的根本缺陷。
 
@@ -130,8 +128,6 @@ Table 1 的对比清晰展示了 PAI-Bench 的差异化定位：现有基准要�
 
 尽管 PAI-Bench 在评估维度上实现了突破，其自动评估仍依赖 MLLM 作为裁判，而 MLLM 本身在时序动态理解上存在固有局限。此外，当前基准未覆盖交互式行为评估，无法衡量模型在闭环决策中的物理推理能力。这些限制指向了未来工作的方向：**将评估信号转化为训练信号，直接指导模型提升物理合理性**。
 
-## 整体框架
-
 PAI‑Bench 围绕一个核心诊断命题展开：**当前视频生成模型（VGM）与多模态大语言模型（MLLM）在视觉保真度上已逼近真实视频，但在物理一致性、因果推理与动态建模上存在系统性缺陷**。为量化这一瓶颈，PAI‑Bench 设计为三条独立但互补的评估轨道，分别从**生成质量、控制保真度、视频理解**三个维度对物理 AI 能力进行细粒度解构。
 
 ### 三轨道架构与模块关系
@@ -165,11 +161,6 @@ PAI‑Bench 围绕一个核心诊断命题展开：**当前视频生成模型（
 
 ![[assets/figures/papers/paper_list_l2049_https_arxiv_org_abs_2512_01989/figures/002_Table_1.jpg]]
 *Table 1: | Comparison with existing benchmarks. Our PAI-Bench is designed with comprehensive domains in Physical AI. Specifically, we focus on scenarios involving practical applications, such as autonomous vehicles (AV), industry, embodied AI, and ego-centric views*
-
-![[assets/figures/papers/paper_list_l2049_https_arxiv_org_abs_2512_01989/figures/004_Figure_3.jpg]]
-*Figure 3: | Examples of PAI-Bench. PAI-Bench focuses on Physical AI application scenarios across six domains, where only the first frame of each video is shown for brevity. For PAI-Bench-C, we present the blurred, edge, segmentation, and depth videos that serve as control signals. For PAI-Bench-U, we show the questions used for video understanding. For PAI-Bench-G, we show the input captions used for generation and a derived prompt used for Domain Score evaluation*
-
-## 核心模块与公式推导
 
 ### 评估框架的三轨架构
 
@@ -239,12 +230,7 @@ $$Div_c \gets \frac{2}{K(K-1)} \sum_{i<j} LPIPS(\hat{X}^{(i)}, \hat{X}^{(j)})$$
 
 为验证自动指标的可靠性，PAI-Bench 进行了竞技场式人类研究：参与者对视频对进行质量和物理合理性两个维度的偏好判断，据此计算 ELO 分数。自动指标与人类 ELO 评分的 **Pearson 相关系数达到 0.918**（Figure 6），表明所提指标与人类判断高度一致，为大规模自动化评估提供了可信基础。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2049_https_arxiv_org_abs_2512_01989/figures/003_Figure_2.jpg]]
-*Figure 2: | Distribution of videos and QA pairs in PAI-Bench-G. These pairs facilitate Domain Score evaluation with an average density of 5-6 QA pairs per video*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 4.1 指标可靠性验证
 
@@ -299,28 +285,16 @@ $$Div_c \gets \frac{2}{K(K-1)} \sum_{i<j} LPIPS(\hat{X}^{(i)}, \hat{X}^{(j)})$$
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l2049_https_arxiv_org_abs_2512_01989/figures/008_Table_3.jpg]]
-*Table 3: | Evaluation results of 15 VGMs on PAI-Bench-G. Metrics in Domain Score: Common Sense (CS), Autonomous Vehicle (AV), Robot (RO), Industry (IN), Human (HU), Physics (PH); and Quality Score: Subject Consistency (SC), Background Consistency (BC), Motion Smoothness (MS), Aesthetic Quality (AQ), Imaging Quality (IQ), Overall Consistency (OC), I2V Subject (IS), I2V Background (IB). Blue means the best across open-source models*
-
-![[assets/figures/papers/paper_list_l2049_https_arxiv_org_abs_2512_01989/figures/010_Table_4.jpg]]
-*Table 4: | Evaluation results of 4 conditional VGMs on PAI-Bench-C. For each model, the control signal settings consist of either a single video or a combination of multiple signal videos. Green means the best across control signal settings for each model*
-
-![[assets/figures/papers/paper_list_l2049_https_arxiv_org_abs_2512_01989/figures/011_Table_5.jpg]]
-*Table 5: | Evaluation of 16 MLLMs on PAI-Bench-U. Embodied reasoning domains: BridgeData (BD), RoboVQA (RV), RoboFail (RF), Agibot (AB), HoloAssist (HA), Autonomous Vehicle (AV). Red denotes the best result across either proprietary or open-source models*
-
 ![[assets/figures/papers/paper_list_l2049_https_arxiv_org_abs_2512_01989/figures/012_Figure_7.jpg]]
 *Figure 7: | Performance comparison across different frame counts on PAI-Bench-U*
 
 ![[assets/figures/papers/paper_list_l2049_https_arxiv_org_abs_2512_01989/figures/013_Table_6.jpg]]
 *Table 6: | Ablation study on thinking mode across different MLLMs on PAI-Bench-U. Performance gains and degradations are highlighted*
 
-![[assets/figures/papers/paper_list_l2049_https_arxiv_org_abs_2512_01989/figures/017_Figure_9.jpg]]
-*Figure 9: | Accuracy versus number of input frames on PAI-Bench-U. The input frames are uniformly sampled from the video. The dashed horizontal lines denote the random-guess baselines*
-
 ![[assets/figures/papers/paper_list_l2049_https_arxiv_org_abs_2512_01989/figures/041_Figure_22.jpg]]
 *Figure 22: | Radar chart visualizations of model capabilities across PAI-Bench tracks*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 与现有基准的关系
 

@@ -42,7 +42,7 @@ claims:
 > - Dora-bench 上，PSNR, SSIM, LPIPS, CD, F-score 22.632；PSNR, SSIM, LPIPS, CD, F-score 0.911；PSNR, SSIM, LPIPS, CD, F-score 0.090。
 > - OmniObject3D 上，PSNR, SSIM, LPIPS, CD, F-score 19.767；PSNR, SSIM, LPIPS, CD, F-score 0.847；PSNR, SSIM, LPIPS, CD, F-score 0.141。
 
-## 概述
+## 概要
 
 从多视图图像重建高保真三维物体是计算机视觉的核心任务，但现有方法面临两难困境：纯重建方法受限于遮挡与稀疏视角，难以生成完整的物体背面或内部结构；基于扩散模型的生成方法虽能补全缺失区域，却因随机推理过程而无法与输入视图保持严格一致，尤其在局部几何与纹理细节上偏差明显。ReconViaGen 针对此瓶颈，提出将多视图立体重建先验与三维扩散生成先验融合于统一框架，在保证形状完整性的同时，实现与输入视图的像素级对齐。
 
@@ -50,7 +50,7 @@ claims:
 
 在 Dora-bench 与 OmniObject3D 数据集上的实验表明，ReconViaGen 在 PSNR、SSIM、LPIPS、倒角距离与 F-score 等指标上均显著超越现有方法，验证了其重建精度与泛化能力。消融实验进一步证实，全局几何条件、逐视图局部条件与 RVC 三者对最终性能均有独立且互补的贡献。
 
-## 背景与动机
+
 
 从多视图图像重建完整的三维物体是计算机视觉与图形学的核心任务，在虚拟现实、增强现实、机器人操作和数字内容创作等领域具有广泛需求。该任务的核心挑战在于：输入视图通常只能覆盖物体的部分表面，大量区域因遮挡或视角稀疏而不可见，重建算法必须在信息高度不完整的条件下推断出合理的完整几何与纹理。
 
@@ -60,7 +60,9 @@ claims:
 
 ReconViaGen 正是在这一动机下提出的。该方法的核心洞察在于：现代多视图立体模型（如 VGGT）不仅能输出深度图和点云，其内部特征还编码了丰富的相机姿态、全局三维结构和逐视图外观信息。如果将这些特征作为条件信号注入扩散模型的去噪过程，就有望在保持生成完整性的同时，实现对输入视图的像素级忠实。这一思路将“重建”与“生成”从对立关系转变为互补关系，为多视图三维重建开辟了新的技术路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ReconViaGen 的核心创新在于将**多视图立体重建先验**系统性地注入**基于扩散的生成框架**，从而在保证生成完整性的同时，实现与输入视图高度一致的三维重建。这一设计针对现有方法的根本矛盾——纯重建方法（因遮挡和稀疏视图导致不完整）与纯生成方法（随机推理导致局部几何和纹理不一致）——提供了统一的解决方案。
 
@@ -89,7 +91,7 @@ $$\Delta v_t = \frac{\partial \mathcal{L}}{\partial \hat{x}_0} \frac{\partial \h
 
 ReconViaGen 并非简单地将重建模型和生成模型串联，而是构建了**粗到细的两阶段协同框架**：SS Flow 利用全局几何条件生成稀疏体素结构，SLAT Flow 在此基础上结合逐视图条件生成结构化潜在表示。消融实验（Table 2）证实，三个核心设计——GGC、PVC、RVC——对性能均有显著贡献，组合使用时达到最优效果。随着输入视图数量从 1 增加到 8，重建指标持续提升（Table 3），表明该方法能有效利用多视图信息，边际增益逐渐减小，符合多视图几何的直觉。
 
-## 整体框架
+
 
 ReconViaGen 的核心设计思想是将**多视图立体重建先验**与**基于扩散的生成先验**融合为一个互补的三维重建流水线。其整体架构采用“粗到细”的两阶段生成范式，并在推理阶段引入像素级对齐机制，具体包含三个关键环节：
 
@@ -120,7 +122,7 @@ ReconViaGen 的核心设计思想是将**多视图立体重建先验**与**基�
 ![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_z0QLeooEEf/figures/002_Figure_2.jpg]]
 *Figure 2: An overview illustration of the proposed ReconViaGen framework, which integrates strong reconstruction priors with 3D diffusion-based generation priors for accurate reconstruction at both the global and local level*
 
-## 核心模块与公式推导
+
 
 ReconViaGen 的核心设计在于将多视图立体重建先验系统性地注入扩散生成框架，形成“重建条件约束生成”的互补范式。该方法包含四个关键模块，其因果链路为：**VGGT 重建先验提取 → 条件网络特征聚合 → 粗到细的流匹配生成 → 渲染感知速度补偿**。
 
@@ -198,7 +200,9 @@ $$
 
 其中 $\alpha$ 为补偿强度的缩放系数。这一机制在不改变训练流程的前提下，通过推理时的梯度引导使生成结果严格遵从输入视图的像素级信息，是 ReconViaGen 实现高精度重建的关键设计。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与实验动机
 
@@ -251,7 +255,9 @@ Figure 4展示了在开放场景（in-the-wild）样本上的重建结果。值�
 ![[assets/figures/papers/paper_list_l20_https_openreview_net_forum_id_z0QLeooEEf/figures/004_Figure_3.jpg]]
 *Figure 3: Reconstruction result comparisons between our ReconViaGen and other baseline methods on samples from the Dora-bench and OmniObject3D datasets. Zoom in for better visualization*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：重建与生成的交叉路口
 
@@ -288,6 +294,8 @@ ReconViaGen 的核心贡献在于将**多视图立体重建先验**系统性地�
 论文附录中提及但未充分展开的一个关键问题是：**全局条件（GGC）和局部条件（PVC）的具体结构形式如何影响 SS Flow 和 SLAT Flow 的性能？** 当前设计中，GGC 通过四个交叉注意力块聚合为固定长度的令牌列表，PVC 则为每个视图生成独立的令牌列表并在 SLAT 中进行加权融合。条件令牌的长度、注意力块的深度、视图间融合权重的计算方式等设计选择对最终重建精度和一致性的影响尚未被系统消融。这一问题的探索可能揭示重建先验与生成先验之间更优的信息传递机制。
 
 此外，RVC 中组合损失（SSIM + LPIPS + DreamSim）的各项权重选择依据、RVC 仅在 SLAT 阶段而非 SS 阶段施加的原因，以及 CFG 强度在不同去噪阶段的动态调整策略，均为值得进一步研究的工程维度。
+
+
 
 ## 原文 PDF
 

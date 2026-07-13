@@ -44,7 +44,7 @@ claims:
 > - Aggregate Easy Benchmarks 上，Average Accuracy 63.6 (8.6× FLOPs reduction)。
 > - Aggregate Hard Benchmarks 上，Average Accuracy 58.4 (8.6× FLOPs reduction)。
 
-## 概述
+## 概要
 
 视觉-语言大模型（VLLM）在推理时需同时处理图像和文本令牌，其标准架构的每一层都对拼接的视觉-文本序列执行全自注意力，导致计算开销随视觉令牌数量呈二次增长。现有加速方案几乎全部采用**令牌缩减（token reduction）**范式——通过剪枝或合并视觉令牌来降低序列长度，但这在需要细粒度视觉理解的任务上造成不可逆的信息瓶颈，性能显著下降。
 
@@ -58,7 +58,7 @@ claims:
 - VISOR可与现有令牌缩减方法正交结合，如VISOR-TR+VisionZip实现**37× FLOPs节省**，准确率仅小幅下降；
 - 方法在Qwen2-VL-2B和LLaVA-OV 1.5B等不同骨干上均验证有效，通用训练模型在所有计算预算下达到或超越独立训练模型的精度。
 
-## 背景与动机
+
 
 视觉-语言大模型（Vision-Language Large Models, VLLMs）在图像理解、文档分析、视觉问答等任务上取得了显著进展，但其推理效率受制于一个根本性的计算瓶颈：标准的Transformer层需同时处理视觉令牌与文本令牌的拼接序列，导致计算复杂度随视觉令牌数量呈二次增长。为缓解这一问题，现有方法普遍采用令牌缩减（token reduction）策略——通过剪枝、合并或渐进丢弃视觉令牌来降低序列长度。然而，这类方法在需要细粒度视觉理解的任务上暴露了关键缺陷：强制丢弃视觉令牌造成了不可逆的信息瓶颈，导致性能显著下降（Fig. 10）。
 
@@ -66,7 +66,9 @@ claims:
 
 上述分析揭示了一个被令牌缩减范式忽视的事实：统一地对所有任务施加相同的视觉处理策略并非最优选择。令牌缩减方法在困难任务上的性能塌缩，根源在于它们混淆了“减少视觉交互”与“丢弃视觉信息”这两个概念。VISOR的设计动机正是从这一区分出发：通过解耦视觉-语言交互层类型并动态控制其执行，在保留完整视觉信息的前提下大幅降低计算开销，从而在简单和困难任务上均取得最优的精度-效率权衡。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 VISOR 的核心创新在于**彻底跳出令牌缩减范式**：现有方法（如 VisionZip、SparseVLM、PyramidDrop 等）通过丢弃或合并视觉令牌来降低计算成本，但这在需要细粒度视觉理解的任务上造成了不可逆的信息瓶颈。VISOR 转而**稀疏化视觉令牌与文本令牌之间的交互频率**，在保持完整视觉信息的前提下大幅削减计算开销。
 
@@ -104,7 +106,7 @@ $$( \mathbf{V}^{(l)} , \mathbf{T}^{(l)} ) = \begin{cases} \mathrm{TL}_l ( [ \mat
 
 VISOR 的稀疏交互机制与令牌缩减方法正交可组合。VISOR-TR 结合 VisionZip 等令牌剪枝方法，可达到最高 37 倍 FLOP 节省，准确率仅小幅下降（Table 2, Table 3），在极端效率场景下仍保持竞争力。
 
-## 整体框架
+
 
 VISOR 的核心设计理念是**解耦文本与视觉令牌的处理流程**，而非像主流令牌缩减方法那样直接丢弃视觉令牌。在标准的大视觉语言模型中，每一层 Transformer 都同时对拼接后的视觉令牌和文本令牌执行全自注意力操作，计算复杂度随视觉序列长度呈二次增长。VISOR 则通过将标准 LVLM 层重构为三种功能层，在几乎不损失视觉信息的前提下大幅降低计算开销。
 
@@ -139,7 +141,7 @@ LLM 内部的每一层根据其所属的功能集合执行不同的操作（见 
 
 VISOR 的稀疏交互机制与令牌缩减方法是**正交且可叠加**的。VISOR-TR 变体将 VISOR 与 VisionZip 等令牌剪枝方法结合，在交叉注意力层之前进一步压缩视觉令牌数量，可实现高达 37 倍的 FLOPs 节省，同时准确率仅小幅下降（Table 2, Table 3）。这验证了“减少交互频率”与“压缩令牌数量”两条效率优化路径的互补性。
 
-## 核心模块与公式推导
+
 
 ### 标准LVLM层的计算瓶颈
 
@@ -194,7 +196,9 @@ VISOR可与令牌缩减方法结合形成VISOR-TR。在交叉注意力层前对�
 ![[assets/figures/papers/paper_list_l807_https_arxiv_org_abs_2603_23495/figures/008_Figure_4.jpg]]
 *Figure 4: Accuracy sensitivity by dropping all vision tokens for different subsets of LLM layers. Left: Accuracy distribution on a dataset-by-dataset basis. Certain datasets (e.g., DocVQA, ChartQA) are particularly sensitive to reduced vision-language interactions. Right: we show how the layer-drop config. & accuracy correlate among datasets. Two clusters emerge: vision-sensitive (“hard”) (e.g., InfoVQA, OCRBench, etc.) and coarse vision (“easy”) (e.g., POPE, SQA, GQA, etc.) datasets*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果：精度与效率的帕累托前沿
 
@@ -250,7 +254,9 @@ Table 8 的路由泛化性实验表明，即使训练时排除部分数据集（
 ![[assets/figures/papers/paper_list_l807_https_arxiv_org_abs_2603_23495/figures/021_Figure_10.jpg]]
 *Figure 10: Efficiency comparison - number of FLOPS vs. vision sequence length*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与令牌缩减范式的根本分歧
 
@@ -313,6 +319,8 @@ VISOR在以下几个维度上与现有工作形成根本差异：
 4. **交叉注意力层下界**：消融实验（Table 3）显示8层交叉注意力足以满足粗粒度任务，但这一数量能否进一步减少？是否存在理论下界？
 
 5. **训练数据效率**：Table 10显示使用50%训练数据时性能下降有限，但更极端的低数据场景（如10-20%）下VISOR的训练稳定性如何，尚待探索。
+
+
 
 ## 原文 PDF
 

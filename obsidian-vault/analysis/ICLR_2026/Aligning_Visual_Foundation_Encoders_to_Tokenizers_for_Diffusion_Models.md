@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Aligning_Visual_Foundation_Encoders_to_Tokenizers_for_Diffusion_Models.pdf
+project_link: https://aligntok.github.io
+code_link: null
 aliases:
 - AVFETDM
 - AlignTok
@@ -33,7 +35,7 @@ claims:
 | 中文题名 | 对齐视觉基础编码器与扩散模型分词器 |
 | 英文题名 | Aligning Visual Foundation Encoders to Tokenizers for Diffusion Models |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=ajnBafpqmE); [Project](https://aligntok.github.io) |
+| Links | [paper](https://openreview.net/forum?id=ajnBafpqmE) · [Project](https://aligntok.github.io) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/generative_models_and_autoencoders |
 | Method | AlignTok |
 | Dataset | ImageNet 256×256, COCO Prompt 6K (T2I) |
@@ -43,11 +45,11 @@ claims:
 > - ImageNet 256×256 上，gFID (w/ CFG, f16d64) 为 2.34，对比 3.19 (VA-VAE)，变化 -0.85。
 > - ImageNet 256×256 上，gFID (800 epochs, QKNorm) 为 1.37，对比 1.52 (VA-VAE w/ QKNorm)，变化 -0.15。
 
-## 概述
+## 概要
 
 本文提出 **AlignTok**，一种通过将预训练视觉基础编码器（如 DINOv2）对齐为扩散模型分词器的方法。传统 VAE 分词器从零学习语义结构，导致潜在空间被低层细节支配、扩散友好性差。AlignTok 采用三阶段渐进对齐策略（潜在对齐 → 感知对齐 → 解码器精炼），在保留预训练编码器丰富语义的同时，构建扩散友好的潜在空间。在 ImageNet 256×256 上，AlignTok 仅用 64 个 epoch 即达到 gFID 1.90，加速扩散模型收敛约 5 倍；在 LAION 文本到图像生成中，相同训练步数下持续优于 FLUX VAE 和 VA-VAE。
 
-## 背景与动机
+
 
 **潜在扩散模型（Latent Diffusion Models, LDMs）** 通过分词器将图像压缩到潜在空间，再在该空间训练扩散模型。传统 VAE 分词器（如 LDM 中的 VAE）的编码器从零训练，重建损失主导训练过程，导致潜在空间被低层细节支配，缺乏语义结构，扩散模型需要大量训练步数才能学习语义信息。
 
@@ -58,7 +60,9 @@ claims:
 
 **核心洞察**：利用预训练编码器（如 DINOv2）已有的丰富语义结构，通过渐进式对齐（冻结 → 联合微调 → 解码器精炼）构建语义丰富且扩散友好的潜在空间，避免从零学习语义的困难。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 1. **三阶段渐进对齐策略**：第一阶段冻结预训练编码器，仅训练适配器和解码器；第二阶段联合微调所有组件，引入语义保持损失防止语义灾难性遗忘；第三阶段仅微调解码器提升重建质量。
 
@@ -68,7 +72,7 @@ claims:
 
 4. **适配器设计**：两层 MLP 将 1024 维 DINOv2 特征投影到 32 维潜在空间，实现高效降维。
 
-## 整体框架
+
 
 AlignTok 的整体框架如 Figure 2 所示，包含三个渐进阶段：
 
@@ -85,7 +89,7 @@ AlignTok 的整体框架如 Figure 2 所示，包含三个渐进阶段：
 - **解码器 D**：CNN 网络（~42M 参数），与 VA-VAE 相同架构。
 - **扩散模型 v_θ**：ImageNet 实验使用 LightningDiT（~673M 参数），LAION 实验使用 FLUX 架构（2B 参数）。
 
-## 核心模块与公式推导
+
 
 ### 1 重建损失
 
@@ -131,7 +135,9 @@ $$\mathcal{L}_{\mathrm{pa}} = \mathcal{L}_{\mathrm{rec}} + w_{sp} \mathcal{L}_{\
 
 默认 $w_{sp} = 1$（ImageNet）或 $w_{sp} = 3$（LAION）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 1 主要结果
 
@@ -224,7 +230,9 @@ $$\mathcal{L}_{\mathrm{pa}} = \mathcal{L}_{\mathrm{rec}} + w_{sp} \mathcal{L}_{\
 - 系统级比较（Table 4）包含多种方法（VAR, MagViT-v2, MAR, DiT 等），使用相同训练设置。
 - 文本到图像实验中，所有模型训练相同步数（100K 或 50K 步），使用相同评估协议。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 AlignTok 属于 **视觉分词器（Visual Tokenizer）** 研究谱系，核心贡献在于将预训练视觉基础编码器对齐为扩散模型分词器。
 
@@ -252,12 +260,12 @@ AlignTok 属于 **视觉分词器（Visual Tokenizer）** 研究谱系，核心�
 - 在更大规模数据集（如 LAION-5B）和更高分辨率（如 1024×1024）上的表现如何？
 - 不同语义保持损失权重（如 w_sp=3）在 LAION 数据集上对生成质量的影响如何？
 
-## 整体框架
+### 整体框架
 
 ![[assets/figures/papers/iclr26_generative_models_diffusion__generative_models_and_autoencoders__b001_ajnBafpqmE_Aligning/figures/001_Figure_1.jpg]]
 *Figure 1: Regularization vs. Alignment.*
 
-## 实验与分析
+### 实验与分析
 
 ### 补充图表
 
@@ -275,6 +283,8 @@ AlignTok 属于 **视觉分词器（Visual Tokenizer）** 研究谱系，核心�
 
 ![[assets/figures/papers/iclr26_generative_models_diffusion__generative_models_and_autoencoders__b001_ajnBafpqmE_Aligning/figures/012_Table_5.jpg]]
 *Table 5: Quantitative Comparison on Text-to-Image (T2I) Generation with FLUX VAE. Compared on COCO Prompt 6K, which has 6K captions sampled from the COCO validation set. Each 2B-parameter T2I model is trained for 100K steps and evaluated at 256×256 resolution with CFG. rFID is computed using 200K randomly sampled images from the COYO-700M dataset (Minwoo et al., 2022).*
+
+
 
 ## 原文 PDF
 

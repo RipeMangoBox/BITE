@@ -42,7 +42,7 @@ claims:
 > - Latte (16 frames, 512×512) superfast mode 上，VBench (%) 76.03 (D2Cache-superfast) vs 75.61 (TeaCache-superfast) (+0.42%)。
 > - Latte (16 frames) fast mode 上，Speedup (×) 2.86× (D2Cache-fast) vs 2.88× (TeaCache-fast) (≈ same acceleration, better quality)。
 
-## 概述
+## 概要
 
 视频扩散模型在生成高质量视频方面取得了显著进展，但推理过程中的大量去噪步骤导致计算开销极大，严重制约了实时应用。缓存技术通过重用历史输出来跳过部分计算，成为加速推理的主流方案。然而，现有的一阶增量缓存方法（如 **TeaCache**，Liu et al., arXiv 2024）仅重用相邻时间步的预测残差 $\delta_1$，在动态非均匀缓存策略下，被忽略的高阶项会导致近似误差沿去噪步骤快速累积，使生成质量与加速比之间的权衡逼近理论极限——在更大加速倍率下视频质量急剧下降。
 
@@ -50,7 +50,7 @@ claims:
 
 在四种主流视频扩散模型（Latte、Open-Sora、Wan2.1 等）上的实验表明，D2Cache 在相同缓存调度和加速比下始终优于 TeaCache。在 Latte 超快模式下，D2Cache 的 VBench 得分达到 76.03%，比 TeaCache 的 75.61% 提升 0.42 个百分点（Table 1）；消融实验进一步证实，移除自适应缩放因子 $s$ 会导致性能大幅下降 1.72 个百分点（Table 2），验证了二阶校正机制的关键作用。在定性对比中，D2Cache 在超快加速下仍能保持接近无缓存的视频连贯性和清晰度，而一阶方法则出现严重伪影（Figure 6）。
 
-## 背景与动机
+
 
 ### 视频扩散模型的加速瓶颈
 
@@ -72,7 +72,9 @@ D2Cache 将扩散模型缓存重新建模为**离散导数问题**。关键观�
 
 实际缓存策略中，缓存步之间的间隔是动态变化的。直接将一阶增量复用于非连续时间步会引入额外的近似偏差，而现有方法缺乏针对间隔波动的自适应调节机制。D2Cache 通过利用时间步嵌入导出的误差代理 $e_t$ 对二阶累积和进行**自适应缩放**（因子 $s$），首次解决了任意间隔下的二阶校正问题，以训练无关的即插即用方式突破了一阶方法的质量瓶颈。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 D2Cache 的核心创新在于将视频扩散模型的缓存预测从一阶增量（δ₁）提升至二阶差分（δ₂）动态，并结合时间步嵌入驱动的自适应缩放机制，首次在训练无关的即插即用框架下突破了一阶缓存方法的质量瓶颈。其关键改动可归纳为以下四个 changed slots。
 
@@ -112,7 +114,7 @@ $$ \delta_2(t) = \delta_1(t) - \delta_1(t+1) $$
 
 上述四个 changed slots 共同指向一个核心洞察：将扩散模型缓存重新建模为离散导数问题。一阶缓存对应一阶后向差分近似，而 D2Cache 通过引入二阶差分实现了更高精度的预测。这一视角不仅为缓存方法提供了严格的理论框架（定理1），还使得方法天然具备训练无关、即插即用的特性——D2Cache 不改变缓存调度策略与超参数，仅作为预测修正模块嵌入现有管线，在保持相同加速比的前提下提升生成质量。在 Latte 超快模式下，D2Cache 以可忽略的延迟开销（<0.3s）将 VBench 得分从 TeaCache 的 75.61% 提升至 76.03%，并在 Wan2.1 等复杂模型上展现出更显著的伪影抑制能力（Figure 6）。
 
-## 整体框架
+
 
 D2Cache 的整体管线在已有的一阶增量缓存（如 **TeaCache**，Liu et al., arXiv 2024）之上，引入一个轻量的二阶校正分支，形成训练无关、即插即用的预测增强架构。其核心设计遵循“计算—缓存—预测—校正”四阶段流，所有额外模块均不改变去噪步的调度频率，因此加速比与基线完全可比。
 
@@ -154,7 +156,7 @@ D2Cache 的六个核心模块按执行时序组织如下：
 
 > **注意**：更高阶差分（如三阶）的缓存潜力、在非 DiT 架构上的适用性等问题尚未在本文中探索，属于开放问题。
 
-## 核心模块与公式推导
+
 
 D2Cache 将视频扩散模型中的缓存预测问题建模为离散导数问题，通过引入二阶差分动态突破一阶增量缓存的精度瓶颈。其核心由三个紧密协作的模块构成：二阶差分计算、时间步嵌入误差估计，以及自适应缩放因子计算。
 
@@ -213,7 +215,9 @@ $$\hat { f } ( t - y ) = f ( t - y + 1 ) + \delta _ { 1 } ( t - x ) + s \cdot \s
 ![[assets/figures/papers/paper_list_l851_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_D2Cache_Second_Ord/figures/005_Figure_5.jpg]]
 *Figure 5: L2 norm trajectories of generated outputs under superfast acceleration: default (no caching), first-order caching, and D2Cache using the same strategy. D2Cache’s trajectory aligns more closely with the default, demonstrating reduced cumulative errors and tighter adherence to the ground-truth denoising path*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -254,7 +258,9 @@ D2Cache 的二阶差分计算和缩放因子推导引入的开销可忽略（延
 ![[assets/figures/papers/paper_list_l851_https_openaccess_thecvf_com_content_CVPR2026_html_Liu_D2Cache_Second_Ord/figures/009_Table_3.jpg]]
 *Table 3: Sharpness metrics on 50 complex videos (Wan2.1, superfast: higher is better)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 一阶增量缓存谱系与瓶颈
 
@@ -313,6 +319,8 @@ D2Cache 的核心主张拥有较强的证据支撑：
 3. **叠加加速范式**：能否与稀疏注意力、模型量化、步长蒸馏等正交加速技术组合，获得叠加效益？
 4. **超长序列扩展**：在更长视频序列或更大规模模型上的可扩展性和效果如何？
 5. **实时交互适用性**：实时交互式视频生成场景下的实际用户体验与延迟是否满足需求？
+
+
 
 ## 原文 PDF
 

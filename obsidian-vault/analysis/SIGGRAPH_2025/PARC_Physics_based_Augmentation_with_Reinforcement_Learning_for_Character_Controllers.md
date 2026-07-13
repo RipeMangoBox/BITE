@@ -5,6 +5,7 @@ paper_level: A
 venue: SIGGRAPH
 year: 2025
 pdf_ref: paperPDFs/SIGGRAPH_2025/PARC_Physics_based_Augmentation_with_Reinforcement_Learning_for_Character_Controllers.pdf
+code_link: null
 project_link: https://michaelx.io/parc/index.html
 aliases:
 - PARC
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | PARC：基于物理增强的强化学习角色控制器 |
 | 英文题名 | PARC: Physics-based Augmentation with Reinforcement Learning for Character Controllers |
 | 会议/期刊 | SIGGRAPH 2025 |
-| Links | [paper](https://arxiv.org/abs/2505.04002); [Project](https://michaelx.io/parc/index.html) |
+| Links | [paper](https://arxiv.org/abs/2505.04002) · [Project](https://michaelx.io/parc/index.html) |
 | Topic | #topic/motion_animation #topic/motion_animation/character_control_physics |
 | Method | PARC |
 | Dataset | 100 procedurally generated test terrains |
@@ -40,7 +41,7 @@ claims:
 > - 100 procedurally generated test terrains 上，%HJF (percentage of high jerk frames) 为 2.73 (PARC Iteration 4)，对比 18.68 (self-consuming without physics correction)，变化 -85.4%。
 > - 100 procedurally generated test terrains 上，Tracker Success Rate 为 68% (Iteration 4)。
 
-## 概述
+## 概要
 
 高质量地形穿越动作捕捉数据稀缺，是小数据集训练运动生成器的根本瓶颈。当训练数据有限时，生成的运动在复杂地形上容易产生物理伪影（如滑步、穿透、抖动）；若直接采用自增强（self-augmentation）循环——即用模型自身生成的运动扩充数据集——则误差会在迭代中累积放大，导致模型退化甚至崩溃。PARC 的核心洞察在于：**物理仿真可以充当数据质量的过滤器**。通过让一个基于强化学习的物理跟踪控制器在仿真中模仿生成的运动，并将仿真中记录的物理合理运动反馈到数据集中，PARC 切断了自增强循环中的误差累积路径，使生成器与跟踪器在协同进化中持续提升能力。
 
@@ -50,7 +51,7 @@ claims:
 
 PARC 的方法定位介于运动生成与物理角色控制之间：它不依赖大规模动捕数据集，也不假设生成的运动天然物理合理，而是通过生成-跟踪-校正的闭环，从小数据集出发逐步掌握复杂地形穿越技能（如跳跃、攀爬、落地等）。其局限性包括生成器推理速度尚不足以支持实时闭环规划，以及训练计算开销较大（单张 A6000 GPU 上约一个月）。
 
-## 背景与动机
+
 
 ### 问题背景：复杂地形穿越的物理角色动画
 
@@ -72,7 +73,9 @@ PARC 的核心洞察在于：**物理仿真可以成为数据质量的过滤器*
 
 更重要的是，PARC 让生成器和跟踪器在迭代循环中**协同进化**：随着数据集不断扩展，生成器能产生更多样的运动，这些运动反过来训练出更强大的跟踪器，而更强大的跟踪器又能校正更复杂的运动，形成正向飞轮效应。这使得模型能够从仅 **14 分钟** 的初始动捕数据出发，逐步掌握跨越沟壑、攀爬高墙、组合跳跃与抓取等复杂地形穿越技能，最终生成长达数十秒的物理合理运动序列（Fig 4, Fig 7）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PARC 的核心创新在于构建了一个**生成器与跟踪器协同进化的自增强闭环**，从根本上解决了小规模动捕数据集在复杂地形穿越任务中面临的物理伪影与误差累积问题。
 
@@ -98,7 +101,7 @@ PARC 的根本洞察在于：**生成器与跟踪器的能力上限相互制约�
 
 具体而言，生成器为跟踪器提供日益多样化的训练数据，推动跟踪器掌握更复杂的物理技能；而能力提升后的跟踪器能够成功追踪更具挑战性的运动，从而为生成器提供更高质量的训练样本。经过 4 轮迭代，运动生成器在最终航点距离（FWD）、地形穿透损失（TPL）、地形接触损失（TCL）和 %HJF 等指标上持续优化，%HJF 从无校正方案的 18.68% 降至 2.73%，降幅达 85.4%，同时跟踪器成功率提升至 68%。这一结果表明，PARC 成功实现了从小数据集出发逐步掌握复杂地形穿越技能的突破。
 
-## 整体框架
+
 
 PARC 的核心思想是将运动生成与物理仿真嵌入一个**自我增强循环**（self-augmentation loop）中，使生成器与跟踪器协同进化。框架的输入是一个小规模的地形穿越运动捕捉数据集，输出是能够生成物理合理、长时域复杂地形穿越运动的生成器和控制器。
 
@@ -150,7 +153,7 @@ PARC 与现有方法的关键差异在于自增强循环中的物理校正方式
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2505_04002/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the PARC framework. PARC iteratively trains a motion generator and motion tracker with self-generated motion data. The motion generator produces kinematic motion sequences to train the motion tracker, while the motion tracker corrects physics-related artifacts in a simulator, enabling the motion generator to continue training on new physics-based motions*
 
-## 核心模块与公式推导
+
 
 ### 运动生成器：地形条件扩散模型
 
@@ -194,7 +197,9 @@ $$r_t = 0.5 r_t^{\mathrm{pose}} + 0.1 r_t^{\mathrm{pose\ velocity}} + 0.15 r_t^{
 
 PARC的核心机制在于生成器与跟踪器的协同进化：每轮迭代中，运动生成器产生运动序列，跟踪器在物理仿真中模仿这些运动并记录物理校正后的版本，校正后的运动被加入数据集用于下一轮训练。这一循环切断了单纯自增强（self-consuming）中误差累积导致模型退化的因果链——消融实验表明，去除物理校正后，高抖动帧比例（%HJF）从2.73飙升至18.68，模型实质上发生崩溃（Table 1, Figure 9）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 PARC 的核心实验围绕一个核心主张展开：**生成器与跟踪器的协同迭代训练能够持续提升运动质量，而缺少物理校正的自增强循环会导致模型退化。** 实验在 100 个程序化生成的测试地形上进行，评估指标覆盖运动学质量与物理合理性两个维度。
 
@@ -244,7 +249,9 @@ Figure 4 展示了最终模型生成的长程物理角色动画，角色在复�
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2505_04002/figures/011_Table_3.jpg]]
 *Table 3: Quantitative results of our 4th iteration motion generator using different blending coefficients ??. These metrics measure various aspects of motion quality, and include FWD (final waypoint distance), TPL (terrain penetration loss), TCL (terrain contact loss), and %HJF (percentage of high jerk frames). The motions with the best quality have a balance between terrain compliance (low FWD, TPL, TCL) and temporal continuity (low %HJF). We used ?? = 0.65 for automatically augmenting the dataset through PARC, and ?? = 0.5 for generating long horizon motions on complex terrain using the final motion generator*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心问题与瓶颈
 
@@ -292,6 +299,8 @@ PARC 为物理合理运动生成开辟了新路径，同时引出了若干待解
 3. **运动质量提升**：能否引入更高级的运动先验、风格约束或对抗性奖励，以进一步提高生成运动的自然度和表现力？
 4. **减少数据依赖**：是否可能减少对初始动捕数据的依赖，甚至通过纯强化学习从零开始发现运动技能，仅在后期引入少量演示进行精调？
 5. **多角色与交互**：当前框架仅处理单个角色，扩展到多角色交互场景（如协作、对抗）需要解决运动协调和物理交互的耦合问题。
+
+
 
 ## 原文 PDF
 

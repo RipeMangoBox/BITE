@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/SAFETY_GUIDED_FLOW_SGF_A_UNIFIED_FRAMEWORK_FOR_NEGATIVE_GUIDANCE_IN_SAFE_GENERATION.pdf
+project_link: null
+code_link: null
 openreview_forum_id: EA80Zib9UI
 aliases:
 - SGFS
@@ -42,7 +44,7 @@ claims:
 > - ImageNet 多样性 (class-of-image, 500类) 上，FID↓ / Vendi↑ 为 FID 31.95, Vendi 3.082 (Ours λ=0.03, 窗口[1.0,0.78])，对比 FID 32.77, Vendi 3.105 (SPELL λ=0.03, 窗口[1.0,0.78])，变化 FID -0.82; Vendi -0.023（更优质量，相近多样性）。
 > - ImageNette 记忆化缓解 上，@Sim 95%↓ / FID↓ 为 @Sim 95% 0.328, FID 32.44 (Memorized SDv2.1 + Ours 窗口[1.0,0.8])，对比 @Sim 95% 0.437, FID 41.19 (Memorized SDv2.1)，变化 @Sim 95% -0.109 (-24.7%); FID -8.75 (-21.2%)。
 
-## 概述
+## 概要
 
 现有扩散模型在生成不安全内容（如裸露图像、记忆化训练样本）时缺乏系统性的防御手段。推理时负引导方法虽能避免重训练，但存在两个根本瓶颈：**排斥力设计依赖启发式规则**——Shielded Diffusion 采用径向阈值排斥，Safe Denoiser 采用加权核排斥，二者未在统一概率框架下被理解；**负引导的施加时机缺乏理论依据**，现有方法要么全程引导导致图像质量退化，要么仅凭经验选择去噪步骤区间，安全性与生成质量的权衡未得到形式化分析。
 
@@ -62,7 +64,7 @@ claims:
 
 方法局限包括：控制屏障定理依赖边界层对齐假设，在非平滑数据流形上可能不成立；负数据集 $\mathcal{D}^-$ 的覆盖度直接影响防御效果；理论结论对扩散语言模型等非图像模态的适用性有待验证。
 
-## 背景与动机
+
 
 ### 扩散模型的安全生成困境
 
@@ -99,7 +101,9 @@ claims:
 
 3. **跨模型兼容**：SGF 的引导操作统一在预测的干净数据 $x_{0|t}$ 空间进行，兼容扩散模型（$\epsilon$-预测）和流匹配模型（速度场外推），覆盖 SDv1.4、SDv2.1 和 SDv3 等主流架构。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SGF 的核心创新在于将负引导从启发式排斥力提升为一个有理论支撑的、时间调度的统一框架。其关键突破体现在以下三个递进的层面。
 
@@ -150,7 +154,7 @@ $$e^{\int_0^{s_c} L(\tau) d\tau} h(x_0) + \mu \bar{\mathcal{Z}}_L(s_c) \geq \del
 
 > **注意**：控制屏障定理依赖边界层对齐假设（Assumption 1），即基漂移在安全边界附近足够小且 MMD 梯度与理想安全梯度方向一致。对于复杂数据流形或非平滑边界，该假设的成立性需要进一步验证。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_EA80Zib9UI/figures/001_Figure_1.jpg]]
 *Figure 1: (a) By incorporating SAFREE (Yoon et al., 2024) and SLD (Schramowski et al., 2023), our method avoids generating inappropriate images. (b) On artificially memorized SDv2.1 (Somepalli et al., 2023), it mitigates memorization, with early-stopped negative guidance preserving quality, enhancing diversity, and revealing a critical time window. All images are sampled at the top 5% most similar to the Imagenette training set*
@@ -187,7 +191,7 @@ SGF 将负引导统一为**能量基排斥场**，其核心 pipeline 由四个�
 
 > **注意**：控制屏障定理依赖边界层对齐假设（Assumption 1），即基漂移在 unsafe 边界附近很小且 MMD 梯度与安全梯度对齐。对于非平滑或复杂数据流形，该假设可能不成立，此时关键时间窗的存在性需要手动验证。
 
-## 核心模块与公式推导
+
 
 ### 3.1 安全引导流的统一ODE框架
 
@@ -272,7 +276,9 @@ SGF的完整推理管道包含四个核心模块：
 
 引导强度 $\lambda(t)$ 在关键时间窗 $[1.0, t_e]$ 内保持正值，在 $t < t_e$ 后置零；窗口长度和 $\lambda$ 幅值由具体任务通过消融实验确定（详见第5节实验分析）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 安全生成主结果：对抗性裸露提示
 
@@ -350,7 +356,9 @@ Table 4 报告了各方法的推理时间。SGF 在 N=515 负样本时，单张�
 ![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_EA80Zib9UI/figures/006_Table_3.jpg]]
 *Table 3: Memorization and quality metrics on ImageNette-memorized SD-v2.1. @Sim 95% denotes the 95th percentile of Gen–Train similarity. Lower number is better. Figure 3: Memorization under ImageNette fine-tuning*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 统一框架下的方法谱系
 
@@ -413,6 +421,8 @@ SGF 框架为负引导的研究打开了若干新方向：
 3. **跨模态推广。** 在扩散语言模型或视频生成中，关键窗口的形式如何调整？附录 E.1 仅给出了定性讨论，缺乏系统的理论和实验支撑。
 
 4. **负样本效率。** 如何在保持安全性的前提下减少对大规模负样本集的依赖？可能的路径包括负样本的选择性采样、核带宽的自适应调节，或将 MMD 引导与少量负样本的主动学习相结合。
+
+
 
 ## 原文 PDF
 

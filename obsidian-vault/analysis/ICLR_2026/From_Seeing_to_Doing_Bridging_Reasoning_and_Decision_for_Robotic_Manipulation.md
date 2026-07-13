@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/From_Seeing_to_Doing_Bridging_Reasoning_and_Decision_for_Robotic_Manipulation.pdf
+project_link: null
+code_link: null
 openreview_forum_id: yngvAamNQi
 aliases:
 - FFSD
@@ -42,7 +44,7 @@ claims:
 > - CRPE (4 subtasks avg.) 上，Accuracy 为 76.2，对比 71.4 (ASMv2‑13B)，变化 +4.8。
 > - BLINK (Spatial Rel. avg.) 上，Accuracy 为 63.8，对比 56.3 (ASMv2‑13B)，变化 +7.5。
 
-## 概述
+## 概要
 
 当前视觉‑语言‑动作（VLA）模型面临一个根本性瓶颈：机器人数据的稀缺性和高度异构性使得从视觉输入直接预测动作极为困难，而缺乏显式的空间推理能力进一步导致模型在零样本场景下的泛化能力严重不足。本文提出 **FSD (From Seeing to Doing)**，一种将视觉推理与决策解耦的新框架。其核心洞见在于：通过视觉‑语言模型（VLM）的通用空间推理能力，生成与具体机器人平台无关的视觉中间表征（visual aids），从而在下游操作任务中实现零样本泛化，无需针对特定硬件进行微调。
 
@@ -61,7 +63,7 @@ FSD 的方法定位围绕三个关键组件展开：
 
 消融实验进一步验证了各组件的因果作用：移除 SrCoT 使 VABench‑Point 准确率从 61.82% 骤降至 26.21%；移除自我一致性对齐则导致准确率下降至 55.92% 并出现空间偏移；跳过第一阶段空间基础训练同样显著损害下游性能。这些结果共同表明，FSD 通过将空间推理显式化为可解释的中间表征，成功桥接了“看见”与“执行”之间的鸿沟。
 
-## 背景与动机
+
 
 机器人操作正经历从传统示教编程向视觉-语言-动作（VLA）模型的范式转变。大语言模型（LLM）与视觉编码器的融合，使机器人能够理解自然语言指令并感知视觉场景，然而从“看见”到“执行”之间仍存在一道关键鸿沟：**当前 VLA 模型受限于机器人数据的稀缺性和异构性，难以从视觉输入直接预测精确的动作轨迹**。
 
@@ -77,7 +79,9 @@ FSD 的方法定位围绕三个关键组件展开：
 
 这一设计将操作任务转化为基于空间关系图的推理过程，使模型能够充分利用 VLM 在大规模视觉-语言预训练中习得的通用空间常识，而无需针对特定机器人平台进行微调。实验表明，FSD 在15个空间推理子任务上平均排名1.3，在 SimplerEnv 仿真环境中零样本成功率达40.6%，在真实世界8项任务中成功率达72%，比最强基线高出30个百分点。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FSD 的核心创新在于将机器人操作任务从“端到端预测动作”重构为“先推理空间关系，再生成视觉辅助”的两阶段范式。这一重构直击当前 VLA 模型的核心瓶颈：机器人数据的稀缺性和异构性导致模型难以从视觉直接预测动作，而缺乏显式空间推理又严重限制了零样本泛化能力。FSD 通过三个相互耦合的机制实现了这一范式转换。
 
@@ -115,7 +119,7 @@ $$(X_v, X_q) \to \tau \quad \text{and} \quad (X_v, \tau) \to X_q$$
 
 上述四个创新点构成了一个完整的因果链条：**层次化数据管线**提供从通用到专用的能力基础，**SrCoT** 引入显式空间推理以替代黑箱回归，**自我一致性对齐**确保坐标与语义的双向绑定，**对象中心参考框架**实现与具体执行平台的解耦。这一组合使得 FSD 在零样本条件下，于 SimplerEnv 达到 40.6% 成功率，在真实世界 8 项任务中达到 72% 成功率，比最强基线高出约 30 个百分点。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_yngvAamNQi/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of FSD. FSD unlocks visual aids reasoning and generation through Spatial Relationship-Focused CoT, demonstrating exceptional generalization capabilities that enable zero-shot robot manipulation and achieving remarkable performance across multiple benchmarks*
@@ -150,7 +154,7 @@ FSD 采用两阶段渐进式训练，与五级层次数据构建管道（**Figur
 
 消融实验（**Table 8**）证实，跳过第一阶段训练会显著损害下游性能：Where2Place 准确率从 45.8 降至 33.2，VABench-Point 准确率从 61.8 降至 42.3，验证了层次数据构建的必要性。
 
-## 核心模块与公式推导
+
 
 ### 3.1 视觉辅助的形式化定义
 
@@ -228,7 +232,9 @@ FSD 的模型架构由以下模块串联构成（Figure 1）：
 
 训练分两阶段进行：第一阶段使用 Level 1–3 数据进行通用空间推理增强，第二阶段使用 Level 4–5 数据结合自我一致性对齐进行视觉辅助生成与理解训练。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -319,7 +325,9 @@ FSD 生成的视觉辅助可作为其他策略模型的显式监督信号。在 
 | 与 Diffusion Policy 集成提升 9.2 个百分点 | Table 7 | 极高 (0.98) |
 | SimplerEnv 零样本成功率 40.6% | Table 4 | 较高 (0.85，受限于基线结果来源) |
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从端到端 VLA 到推理驱动的视觉辅助生成
 
@@ -377,6 +385,8 @@ FSD 当前的设计在以下条件下表现出色：
 3. **3D 视觉辅助扩展**：如何从 2D 扩展到 3D 视觉辅助，以应对更复杂的操作任务和遮挡场景？
 4. **推理速度优化**：如何优化 SrCoT 的推理速度，使 FSD 能在动态环境中实现快速闭环适应？
 5. **人机交互界面**：如何利用视觉辅助作为人机交互界面，提升基于人类反馈的样本效率和安全对齐？
+
+
 
 ## 原文 PDF
 

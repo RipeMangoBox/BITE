@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: "paperPDFs/ICLR_2026/GGBall_Graph_Generative_Model_on_Poincaré_Ball.pdf"
+project_link: null
+code_link: https://github.com/AI4Science-WestlakeU/GGBall
 openreview_forum_id: 4zRRnDscqn
 aliases:
 - GHVQAPFM
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | GGBall: 基于庞加莱球的图生成模型 |
 | 英文题名 | GGBall: Graph Generative Model on Poincaré Ball |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=4zRRnDscqn); [GitHub](https://github.com/AI4Science-WestlakeU/GGBall) |
+| Links | [paper](https://openreview.net/forum?id=4zRRnDscqn) · [GitHub](https://github.com/AI4Science-WestlakeU/GGBall) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/generative_models_and_autoencoders |
 | Method | GGBall (Hyperbolic Vector-Quantized Autoencoder + Poincaré Flow Matching) |
 | Dataset | Community-small, Ego-small, QM9 |
@@ -42,7 +44,7 @@ claims:
 > - Ego-small 上，平均MMD 为 0.0112，对比 0.0137 (HGDM)，变化 -0.0025。
 > - QM9 上，V.U.N.分数 为 85.34%，对比 81.31% (GDSS)，变化 +4.03%。
 
-## 概述
+## 概要
 
 图生成模型旨在学习图数据的分布并从中采样，但现有方法大多在欧氏空间中操作，难以捕捉真实世界图中普遍存在的指数级层次复杂性和幂律度分布。欧氏潜在空间的体积仅随半径多项式增长，无法自然容纳树状或层次化拓扑的长程依赖，导致生成图的结构保真度严重失真。
 
@@ -52,7 +54,7 @@ claims:
 
 实验表明，GGBall 在层次图数据集上将平均生成误差最高降低 **18%**，在 QM9 分子生成上实现 **93.77%** 的新颖度与 **85.34%** 的 V.U.N. 综合分数，均为最优水平。消融实验进一步证实，性能增益源于双曲几何的归纳偏置而非架构本身——欧氏 VQVAE 在 Community-20 上的轨道 MMD 高达 0.7555，而双曲 HVQVAE 仅为 0.0005，差距超过三个数量级。
 
-## 背景与动机
+
 
 图生成模型在分子设计、社交网络建模等任务中扮演着关键角色。然而，现有方法面临一个根本性瓶颈：**欧氏潜在空间无法捕捉图数据中普遍存在的指数级层次复杂性**。真实世界的图——从社交网络到分子结构——通常呈现幂律度分布、长程依赖和深层树状层次，这些模式在欧氏空间中需要极高维度才能嵌入，否则会导致严重的结构失真。
 
@@ -71,7 +73,9 @@ GGBall的动机源于一个核心洞察：**双曲几何因其指数增长的体
 
 这一设计使得模型在层次图数据集上平均生成误差最高降低18%，在树结构数据集上实现近乎完美的重建（度MMD仅7.9×10⁻⁴），并在QM9分子生成任务上同时实现最高新颖度（93.77%）和最优V.U.N.分数（85.34%），突破了现有方法在有效性与新颖性之间的权衡困境。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈：欧氏空间的层次坍塌
 
@@ -111,7 +115,7 @@ GGBall 的核心创新并非在现有欧氏框架上修补，而是将整个生�
 
 需要注意的是，当前验证集中在中小规模图（Community-Small 12-20 节点、Ego-small 4-18 节点、QM9 最多 9 个重原子），扩展到万级节点社交网络或引文图的可行性尚未验证。此外，码本坍缩风险在高维庞加莱空间中的鲁棒性仍需进一步研究。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0010_4zRRnDscqn_GGBall_Graph_Generative_Model_on_Poincaré_Ball/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of our hyperbolic graph generation framework. We encode graphs into a hyperbolic latent space using a Poincaré GNN and geodesic-attention Transformer. The latent representations are quantized via a Poincaré codebook and modeled with a Poincaré flow prior. A hyperbolic Transformer then decodes the latent code to reconstruct or generate graphs, enabling structure-aware generation in non-Euclidean geometry*
@@ -179,7 +183,7 @@ $$f_{ij} = \left[ \log_0^c(h_i),\; \log_0^c(h_j),\; \log_{h_i}^c(h_j),\; d_c(h_i
 - **生成**：从基础分布采样 $z_0$，经流匹配 ODE 推演至 $z_1$，量化后送入解码器。
 - **输出**：重建/生成的节点属性 $\hat{X}$ 与邻接矩阵 $\hat{E}$。
 
-## 核心模块与公式推导
+
 
 ### 整体架构与设计理念
 
@@ -239,7 +243,9 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{recon}} + \lambda_{\mathrm{degree}} \mathca
 
 其中 $\mathcal{L}_{\mathrm{degree}}$ 约束预测边数与节点度一致性，$\mathcal{L}_{\mathrm{reg}}$ 为正则化项。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈验证
 
@@ -290,7 +296,9 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{recon}} + \lambda_{\mathrm{degree}} \mathca
 
 > **注意：** 部分消融实验（如带宽损失与双曲正则器的交互影响、高维码本坍缩鲁棒性）在提供的证据中未充分覆盖，相关结论需查阅原文附录或进行手动验证。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 生成范式定位
 
@@ -330,6 +338,8 @@ GGBall 在现有图生成方法谱系中占据了一个独特的交叉点：它�
 4. **码本坍缩的几何根源**：在高维庞加莱球中，EMA 更新和死码元复活策略是否能完全避免码本坍缩？坍缩风险是否与曲率、码本大小和潜在维度存在系统性关系？
 
 5. **带宽损失与双曲正则器的交互**：HVQVAE 中使用的带宽损失（bandwidth loss）与其他双曲特定正则器（如保持距离的映射约束）在高深度架构中的交互影响尚不清楚。
+
+
 
 ## 原文 PDF
 

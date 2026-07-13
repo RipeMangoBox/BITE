@@ -42,7 +42,7 @@ claims:
 > - Kubric-4D 上，PSNR↑ 22.15 vs 15.82 (TrajectoryCrafter) (+6.33)。
 > - Quantitative comparison (Tab.2) 上，FID↓ 58.26 vs 61.57 (TrajectoryCrafter) (-3.31)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有4D视频生成方法难以在保持多视图一致性的同时，实现灵活的相机轨迹控制和内容编辑。其根本瓶颈在于预训练视频修复基础模型（如Wan2.1）无法直接处理由点云渲染产生的遮挡掩码（分布外），且在大角度相机运动下缺乏三维感知能力，导致时序不一致、伪影及多视图不一致。
 
@@ -52,7 +52,7 @@ claims:
 
 **主要结果**：在VBench基准上，EasyCreator的总体一致性指标达到0.2915，超越TrajectoryCrafter的0.2463；在Kubric-4D上PSNR达到22.15（对比最佳基线15.82）；在真实场景视频、长视频（>30帧）及挑战性相机运动下均取得SOTA性能。用户研究排名第一。消融实验证实，组合掩码微调是任务可行性的基础（去掉后FID从58.26升至78.27），自迭代调优保障大角度时序一致性（FVD从145.71升至197.24），时间打包推理增强多视图一致性（FVD-V从119.52升至137.64）。
 
-## 背景与动机
+
 
 4D视频创作——即给定一段单目视频，在任意新相机轨迹下生成时空一致且支持内容编辑的新视频——是视觉生成领域的前沿挑战。该任务要求模型同时具备**新视角合成**的几何准确性、**时序一致性**的保持能力，以及**多视图一致性**的全局协调能力。现有方法在这三个维度上存在系统性缺口。
 
@@ -62,7 +62,9 @@ claims:
 
 **本文动机**。基于上述分析，本文提出**EasyCreator**，核心动机是将4D视频创作重新定义为**视频修复任务**，通过三个关键设计解锁预训练视频修复模型的4D生成潜力：（1）构建组合掩码数据集，使模型学会处理点云可见性掩码的分布外特性；（2）设计自迭代调优策略，从小视角逐步扩展到大视角，渐进式增强模型的大角度生成能力；（3）提出时间打包推理机制，利用已生成视图的信息引导后续视图生成，显式增强多视图一致性。这一框架在极少量额外训练（约2000步LoRA微调）下，即可实现高质量、多视图一致的4D视频生成与灵活的提示编辑。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 EasyCreator 的核心创新在于将 4D 视频生成重新定义为**视频修复任务**，并围绕这一范式重构了从数据构造、模型调优到推理策略的完整技术链路。与现有方法相比，其关键 changed slots 体现在三个层面：
 
@@ -108,7 +110,7 @@ EasyCreator 的核心创新在于将 4D 视频生成重新定义为**视频修�
 
 三个 changed slots 并非孤立存在，而是形成了一条完整的因果链：**组合掩码**为模型提供了理解 3D 遮挡的基础能力；**自迭代调优**在此基础上逐步扩展视角处理范围；**时间打包推理**则利用已解锁的多视图生成能力进一步提升一致性。这一“数据构造→能力扩展→推理增强”的递进设计，使得 EasyCreator 在仅需约 2 小时单视频优化的条件下，即可实现高质量、多视图一致的 4D 视频生成与灵活的内容编辑。
 
-## 整体框架
+
 
 EasyCreator 将 4D 视频生成重新定义为**视频修复（video inpainting）**任务，其核心 pipeline 包含四个紧密耦合的模块：**动态点云生成**、**组合掩码构建**、**视频修复基础模型微调**、以及**自迭代调优与时间打包推理**。整体流程如图 Figure 2 所示。
 
@@ -128,7 +130,7 @@ EasyCreator 将 4D 视频生成重新定义为**视频修复（video inpainting�
 ![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_mU8Ubd8aNK/figures/003_Figure_4.jpg]]
 *Figure 4: Gallery of our proposed method. Our EasyCreator enables achieving flexible and highquality 4D video creation using the given camera trajectory and the edited first frame (2nd row). Additionally, it also supports the 4D video creation using various prompts in frozen camera (“exhibition” in 4th row and “robot” in 6th row)*
 
-## 核心模块与公式推导
+
 
 EasyCreator将4D视频生成重新定义为视频修复任务，其核心由四个关键模块构成，通过组合掩码、自迭代调优与时间打包推理三大策略解锁预训练视频修复基础模型的4D生成能力。
 
@@ -195,7 +197,9 @@ $$x_{input} = [\mathrm{patchify}(\mathcal{E}(\mathbf{F})), \mathrm{patchify}(\ma
 ![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_mU8Ubd8aNK/figures/011_Figure_7.jpg]]
 *Figure 7: Ablation study of temporal-packing inference*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 
@@ -246,7 +250,9 @@ EasyCreator 的失败模式主要源于其依赖链中的上游组件。首先�
 
 第三，方法**无法处理自由风格的输入视频**（如缺乏相机参数的视频），受限于预训练基础模型对相机参数等结构化输入的需求。深度估计误差在极端遮挡或高度动态场景下仍可能影响点云质量，进而降低生成结果的几何一致性。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有工作的关系
 
@@ -297,6 +303,8 @@ EasyCreator 的适用性受以下条件约束：
 5. **多模态编辑融合**：文本提示与首帧编辑的最佳融合策略是什么？消融实验（Figure 4）表明两者结合优于单独使用，但其协同机制尚缺乏深入分析。
 
 6. **评估基准完善**：当前评估依赖 VBench、Kubric-4D 等合成或半合成数据集。真实场景下的 4D 生成质量评估缺乏统一的基准和指标，特别是对于多视图一致性的感知评价。
+
+
 
 ## 原文 PDF
 

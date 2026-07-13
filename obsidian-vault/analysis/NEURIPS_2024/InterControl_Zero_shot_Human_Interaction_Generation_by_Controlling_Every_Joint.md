@@ -5,6 +5,8 @@ paper_level: A
 venue: NEURIPS
 year: 2024
 pdf_ref: paperPDFs/NEURIPS_2024/InterControl_Zero_shot_Human_Interaction_Generation_by_Controlling_Every_Joint.pdf
+project_link: null
+code_link: https://github.com/zhenzhiwang/intercontrol
 aliases:
 - IZSHIGBCEJ
 tags:
@@ -42,7 +44,7 @@ claims:
 > - Interaction Settings 上，Avg. Error (m) ↓ 0.0084 vs 0.6723 (PriorMDM) (-0.6639)。
 > - User Study 上，Preference Rate ↑ 81.2% vs 18.8% (PriorMDM) (+62.4%)。
 
-## 概述
+## 概要
 
 **核心问题**：现有多人交互运动生成方法依赖多人训练数据，难以泛化至任意人数；同时，基于相对运动表示的运动扩散模型缺乏全局空间中的精确关节控制能力，阻碍了仅用单人数据实现零样本交互生成。
 
@@ -53,7 +55,7 @@ claims:
 - **全关节精确控制**：在 HumanML3D 数据集上，随机关节控制 FID 为 0.178，显著优于并发工作 OmniControl 的 0.310；消融实验证实 Motion ControlNet 对保持运动质量至关重要，移除后 FID 恶化至 0.965。
 - **方法定位**：InterControl 构建了“单人扩散先验 + 轻量空间控制模块 + 自动规划”的统一框架，为利用大规模单人运动数据实现可控多人交互生成提供了新范式。
 
-## 背景与动机
+
 
 ### 人类运动生成：从单人控制到多人交互
 
@@ -75,7 +77,9 @@ InterControl 的核心洞察在于：**人类交互的语义本质可以简化�
 
 基于这一转化，InterControl 提出了一个统一框架：通过 **Motion ControlNet** 将全局空间条件注入预训练的单人运动扩散模型以维持运动质量，同时利用**逆运动学（IK）引导**在去噪过程中对关节位置进行精确优化。配合 **LLM 规划器**自动将多人交互描述分解为单人文本提示和关节接触对计划，InterControl 首次实现了无需任何多人训练数据的零样本交互生成。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 InterControl 的核心创新在于将多人交互生成问题**解耦为两个正交的维度**：利用预训练单人运动扩散模型作为运动先验，同时通过显式的空间控制模块实现任意关节的精确全局定位。这一设计使其成为首个仅需单人数据即可零样本生成任意人数交互的方法。
 
@@ -114,7 +118,7 @@ InterControl 在训练 Motion ControlNet 时同样施加 IK Guidance，使 Contr
 
 需要注意的是，该方法依赖 LLM 规划器生成接触对计划，LLM 的错误推理可能影响交互质量；同时 IK 引导的优化无法保证全局最优解，对 L-BFGS 迭代次数等超参数敏感。这些局限在消融实验中有所体现，但未进行统计显著性检验，结果的可靠性需进一步验证。
 
-## 整体框架
+
 
 InterControl 将多人交互生成转化为可控的单人运动生成问题，其核心思路是：**人类交互的语义本质可简化为关节间可量化的空间关系**，因此只需单人数据训练的运动扩散模型，配合精确的全局空间控制，即可零样本合成任意人数的逼真交互。
 
@@ -141,7 +145,7 @@ InterControl 将多人交互生成转化为可控的单人运动生成问题，�
 ![[assets/figures/papers/paper_list_l1794_InterControl_Zero_shot_Human_Interaction_Generation_by_Controlling_Every/figures/002_Figure_2.jpg]]
 *Figure 2: Overview. Our model could precisely control human joints in the global space via the Motion ControlNet and IK guidance module. By leveraging LLM to adapt interaction descriptions to joint contact pairs, it could generate multi-person interactions via a single-person motion generation model in a zero-shot manner*
 
-## 核心模块与公式推导
+
 
 InterControl 的核心架构由两个互补的空间控制模块构成：**Motion ControlNet** 提供全局空间条件下的运动先验，**Inverse Kinematics (IK) Guidance** 在去噪过程中对关节位置进行精确优化。两者协同工作，使得仅用单人数据训练的模型即可实现对任意关节的精确空间控制。
 
@@ -186,7 +190,9 @@ Forward Kinematics 模块将模型内部的相对运动表示（基于骨骼父�
 ![[assets/figures/papers/paper_list_l1794_InterControl_Zero_shot_Human_Interaction_Generation_by_Controlling_Every/figures/009_Figure_5.jpg]]
 *Figure 5: Architecture of Motion ControlNet*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -293,7 +299,9 @@ Table 4 报告了在 NVIDIA A100 GPU 上的推理时间。完整流程（含 LLM
 ![[assets/figures/papers/paper_list_l1794_InterControl_Zero_shot_Human_Interaction_Generation_by_Controlling_Every/figures/012_Figure_6.jpg]]
 *Figure 6: Example of the questionnaire of user-study*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 InterControl 处于**可控运动生成**与**多人交互生成**的交叉地带，其核心贡献在于将多人交互问题重新形式化为“单人运动扩散模型 + 显式空间控制信号”的组合，从而绕过了对多人训练数据的依赖。以下从基线关系、适用边界、局限与开放问题四个维度展开。
 
@@ -342,6 +350,8 @@ InterControl 的适用场景由以下三个条件共同界定：
 4. **物理-运动联合生成**：能否将物理仿真直接嵌入扩散去噪循环，实现“生成即物理合理”的交互动作？这需要解决可微物理仿真与扩散模型的梯度传导问题。
 
 5. **计算效率优化**：在控制更多关节或更长序列时，能否通过并行化 L‑BFGS、蒸馏 IK 引导策略或设计更高效的优化目标来降低推理时间？
+
+
 
 ## 原文 PDF
 

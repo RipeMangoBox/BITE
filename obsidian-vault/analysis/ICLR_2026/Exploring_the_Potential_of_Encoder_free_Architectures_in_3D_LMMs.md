@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Exploring_the_Potential_of_Encoder_free_Architectures_in_3D_LMMs.pdf
+project_link: null
+code_link: https://github.com/Ivan-Tang-3D/ENEL
 openreview_forum_id: 22Hh0Vj5Dd
 aliases:
 - EPEFA3L
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 探索无编码器架构在三维大语言模型中的潜力 |
 | 英文题名 | Exploring the Potential of Encoder-free Architectures in 3D LMMs |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=22Hh0Vj5Dd); [GitHub](https://github.com/Ivan-Tang-3D/ENEL) |
+| Links | [paper](https://openreview.net/forum?id=22Hh0Vj5Dd) · [GitHub](https://github.com/Ivan-Tang-3D/ENEL) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | ENEL |
 | Dataset | Objaverse, 3D-VQA (3D MM-Vet) |
@@ -41,7 +43,7 @@ claims:
 > - Objaverse 上，GPT-4 score (Classification) 为 ENEL-7B: 55.55，对比 PointLLM-7B: 53.00，变化 +2.55。
 > - 3D-VQA (3D MM-Vet) 上，GPT-4 score 为 ENEL-7B: 43.80，对比 PointLLM-7B: 41.20，变化 +2.60。
 
-## 概述
+## 概要
 
 基于预训练编码器的3D大语言模型（3D LMMs）存在两个根本性瓶颈：**点云分辨率限制**（训练与推理分辨率不匹配导致空间信息丢失）和**嵌入语义差异**（编码器预训练目标与LLM语义需求不对齐）。本文提出首个无编码器3D大模型 **ENEL**，将3D编码功能直接迁移至LLM内部，通过两大策略实现该目标：预训练阶段的 **LLM内嵌语义编码**（Hybrid Semantic Loss）和指令微调阶段的 **层次化几何聚合**（Hierarchical Geometry Aggregation）。
 
@@ -51,7 +53,7 @@ claims:
 
 本方法在物体级3D理解上验证了有效性，尚未扩展到场景级任务，且多模态训练中仍存在轻微的语言能力遗忘（MMLU 47.1% → 46.4%），需通过混合纯文本数据缓解。
 
-## 背景与动机
+
 
 三维大语言模型（3D LMMs）旨在赋予大语言模型（LLM）理解三维世界的能力，其典型架构由三个组件构成：3D 编码器、投影层和 LLM。当前主流方法普遍依赖预训练的 3D 编码器（如 Point-BERT）将点云转化为固定数量的 token，再通过投影层送入 LLM 进行多模态推理。然而，这一范式存在两个根本性瓶颈，制约了模型性能的进一步提升。
 
@@ -65,7 +67,9 @@ claims:
 
 针对这一挑战，本文提出 **ENEL（Encoder-free 3D LMM）**，这是首个无编码器的三维大语言模型。ENEL 的核心思路是将原属于 3D 编码器的功能迁移到 LLM 内部，通过两个阶段的训练策略实现：在预训练阶段，采用 **LLM 内嵌语义编码**（LLM-embedded Semantic Encoding）和混合语义损失，使 LLM 的前几层直接从点云 token 中学习高层语义；在指令微调阶段，引入 **层次化几何聚合**（Hierarchical Geometry Aggregation）策略，使 LLM 能够捕捉点云的局部结构细节。这一设计从根本上规避了编码器带来的分辨率依赖和语义偏差问题，为 3D LMM 提供了一条新的技术路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题根源：编码器带来的双重瓶颈
 
@@ -124,7 +128,7 @@ Table 12 和 Table 13 表明，混合分辨率训练不仅提升了模型对推�
 - **决定性证据**：Figure 5 的注意力可视化显示，ENEL 的点 token 与文本 token 的语义关联显著强于编码器基线，直接验证了 LLM 内嵌语义编码的有效性。
 - **性能验证**：ENEL-7B 在 Objaverse 分类（55.55）、描述（51.03）和 VQA（43.8）上，性能与 13B 编码器基线 PointLLM-PiSA 相当（Table 5），证明无编码器架构可以超越更大规模的编码器模型。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0011_22Hh0Vj5Dd_Exploring_the_Potential_of_Encoder-free_Architec/figures/005_Figure_2.jpg]]
 *Figure 2: Overall Pipeline of ENEL. The training is divided into two stages: the pre-training stage and the instruction tuning stage. In the first stage, we set the first K layers to be learnable and apply the proposed Hybrid Semantic Loss to embed high-level semantics into the LLM. In the second stage, we adopt the Hierarchical Geometric Aggregation strategy to capture local structures of point clouds*
@@ -151,7 +155,7 @@ Table 4 的消融表明，使用 3 层聚合操作（$l=3$）、2 个 LLM 层间
 
 整体数据流可概括为：**原始点云 → Token Embedding（FPS + k-NN + 线性层，128 tokens）→ LLM 前 4 层（可学习，全局交互）→ 层级几何聚合（局部结构捕获）→ LLM 后续层（多模态推理）→ 文本输出**。预训练阶段仅优化前 4 层 LLM 和 Token Embedding，指令微调阶段则额外引入几何聚合模块，两者协同使 ENEL-7B 在 Objaverse 分类（55.55）、描述（51.03）和 3D VQA（43.8）任务上达到甚至超越 13B 编码器基线的性能（Table 5）。
 
-## 核心模块与公式推导
+
 
 ### 3.1 点云Token嵌入模块（Token Embedding Module）
 
@@ -201,7 +205,9 @@ $$F_{\mathrm{agg}}^{i} = \text{MeanPooling}(F_{\mathrm{input}}^{n}{}')$$
 
 **关键消融发现（Table 4）：** 使用3次聚合操作（$l=3$）、聚合与传播操作间间隔2个LLM层（$H=2$）并加入门控自注意力，取得最佳性能（分类55.55，描述51.03）。移除门控机制后描述降至49.61、分类降至53.60（Table 6），验证了门控自注意力对局部几何建模的关键作用。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈验证：编码器移除的影响
 
@@ -292,7 +298,9 @@ Table 10 显示，直接进行多模态指令微调会导致 MMLU 从原始 Vicu
 
 3. **LLM 层数的可学习性权衡**：Table 2 表明，可学习层数从 4 层增加到 8 层或 12 层时性能反而下降（分类从 47.50 降至 46.75），说明过多的可学习层可能破坏 LLM 原有的语言能力。这一权衡在大规模 LLM 上可能更为显著。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与编码器基线的根本差异
 
@@ -328,6 +336,8 @@ ENEL 的训练分为预训练和指令微调两个阶段，每个阶段解决编
 2. **更大规模验证**：当前实验基于 7B/13B 的 LLaMA/Vicuna 和 Objaverse 数据集。在更大规模 LLM（如 70B+）和更大规模 3D 数据集上的可扩展性尚未验证。
 3. **损失函数统一**：Hybrid Semantic Loss 本质上是两个独立损失的线性组合。是否存在更统一的点云-语言对齐目标，能同时捕获语义和几何信息？
 4. **多表示泛化**：无编码器框架目前仅针对点云设计。能否将相同的“LLM 内嵌编码”思路应用于体素、网格或神经场等其他 3D 表示？Token Embedding 模块需要如何适配？
+
+
 
 ## 原文 PDF
 

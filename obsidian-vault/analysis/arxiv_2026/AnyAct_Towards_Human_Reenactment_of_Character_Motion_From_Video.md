@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2026
 pdf_ref: paperPDFs/arxiv_2026/AnyAct_Towards_Human_Reenactment_of_Character_Motion_From_Video.pdf
+project_link: null
+code_link: null
 aliases:
 - AnyAct
 tags:
@@ -41,7 +43,7 @@ claims:
 > [!tip] 效果简介
 > - AnyAct benchmark (non-human character videos) 上，MSC 6.619 vs N/A (N/A)；MRC 6.763 vs N/A (N/A)；PA 6.700 vs N/A (N/A)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有方法依赖人体中心的结构空间或已知源3D拓扑，无法直接从非人角色视频生成可编辑的人类动作。AnyAct 将这一任务重新定义为**从可迁移的局部稀疏2D关节运动进行条件人体运动生成**，从而绕开了对源角色完整结构的依赖。
 
@@ -56,7 +58,7 @@ claims:
 
 **方法谱系与知识库定位**：AnyAct 处于**跨结构运动重定向**与**条件运动生成**的交汇点。与依赖3D骨骼重建或文本描述的传统方法不同，AnyAct 以稀疏2D关节轨迹作为统一条件信号，使其能够泛化到任意非人角色视频。在技术路线上，它继承并扩展了 ControlNet 式的适配器注入范式，将其应用于运动生成器 MoMask++，同时引入了渐进式知识蒸馏与全局-局部解耦训练策略。相较于 **VLM+HY-Motion**（Wen et al., arXiv 2025）的文本中介方案和 **EchoMotion**（Yang et al., arXiv 2025）的隐式运动迁移，AnyAct 直接利用视觉运动线索，避免了语义损失和结构假设。
 
-## 背景与动机
+
 
 ### 问题背景：从非人角色视频生成可编辑的人体动作
 
@@ -79,7 +81,9 @@ AnyAct 的核心洞察在于：**尽管源角色与人体在完整结构上差�
 
 AnyAct 通过三个核心设计填补这些缺口：**仅用人体运动数据的增强3D到2D投影监督**、**渐进式3D到2D训练**以消除条件歧义、以及**全局-局部运动解耦**以抑制不可靠的全局根轨迹对局部运动控制的干扰。这使得系统无需任何配对的非人视频-运动数据，即可从单目非人角色视频生成合理的人体重演结果。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 AnyAct 的核心创新在于将“从非人角色视频生成可编辑人类动作”这一任务重新定义为**基于可迁移稀疏局部运动线索的条件人体运动生成**问题。与传统依赖人体中心结构空间或已知3D拓扑的方法不同，AnyAct 通过三个关键设计实现了跨结构运动迁移，其相对于基线方法的本质改变体现在以下四个维度。
 
@@ -103,7 +107,7 @@ AnyAct 的核心创新在于将“从非人角色视频生成可编辑人类动�
 
 AnyAct 的四项 changed slots 构成了一个完整的创新链条：**拓扑无关的稀疏2D表征**解决了“从任意角色提取运动”的问题，**纯人体运动自监督**解决了“无配对数据训练”的问题，**渐进式3D-to-2D蒸馏**解决了“2D条件歧义”的问题，**全局-局部解耦**解决了“运动纠缠”的问题。这些设计共同使得 AnyAct 成为首个无需已知3D拓扑、无需配对非人视频数据即可从任意角色视频生成可编辑人类动作的框架。
 
-## 整体框架
+
 
 AnyAct 将“从非人角色视频驱动人类运动复现”建模为一个条件运动生成问题。其核心流程如 Fig. 3 所示，由三个关键阶段构成：**运动线索提取**、**运动条件学习**（仅发生在训练阶段）和**条件运动生成**。
 
@@ -147,7 +151,7 @@ VFE 从输入视频中提取**局部稀疏 2D 关节轨迹**作为可迁移的�
 ![[assets/figures/papers/paper_list_l89_https_arxiv_org_abs_2605_15497/figures/001_Figure_1.jpg]]
 *Figure 1: Human reenactment from reference videos. Given monocular videos of non-human characters with diverse topologies, AnyAct reinterprets their characteristic motion patterns as plausible human performances rather than reproducing their source structures literally. Shown here are reenactments of (a) kangaroo-like jumping, (b) butterfly-like wing flapping, and (c) the periodic paw motion of a beckoning cat*
 
-## 核心模块与公式推导
+
 
 AnyAct 的核心设计围绕一个中心命题展开：**稀疏局部2D关节轨迹可作为跨结构运动迁移的统一桥接**。尽管源角色（如袋鼠、蝴蝶、企鹅）与人体在全局骨骼拓扑上差异巨大，但其局部肢体的运动模式仍保留了相似的动态趋势（Fig. 2）。基于这一洞察，AnyAct 将“从非人角色视频生成可编辑的人类动作”这一任务，形式化为**以可迁移稀疏局部运动线索为条件的条件人体运动生成**。
 
@@ -205,7 +209,9 @@ $$
 ![[assets/figures/papers/paper_list_l89_https_arxiv_org_abs_2605_15497/figures/004_Figure_4.jpg]]
 *Figure 4: Motion Condition Learning. We learn reliable motion control for our AnyAct using only human motion data. This is achieved by our proposed augmented 3D-to-2D projection for providing paired supervision, progressive 3D-to-2D training to alleviate conditioning ambiguity, and global-local motion decoupling for suppressing unreliable global root motion*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：跨结构重演能力
 
@@ -261,7 +267,9 @@ AnyAct 在以下两类场景中表现受限（Fig. 12）：
 ![[assets/figures/papers/paper_list_l89_https_arxiv_org_abs_2605_15497/figures/012_Figure_10.jpg]]
 *Figure 10: Results of DancingBox. Reference videos are obtained from the DancingBox project page, where the source captures and results are concatenated together. Our results (in the right part) confirms that AnyAct can effectively recovers the essential dynamics of physical proxies as DancingBox*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心贡献与因果机制
 
@@ -308,6 +316,8 @@ AnyAct 的适用边界由以下因素共同决定：
 2. **如何提高运动线索提取的鲁棒性？** CoTracker3 在快速运动和局部视觉相似性场景下的失效是当前管线的薄弱环节。可能的改进方向包括：引入多帧时序一致性约束、融合多模态特征（如光流、深度估计）增强跟踪稳定性，或设计针对跟踪失败的检测与回退机制。
 
 3. **如何实现可控的精确对齐？** 当前方法定位为“动态印象迁移”，但某些应用场景可能需要更强的帧级对齐能力。是否可以在保持跨结构泛化优势的前提下，引入可选的时序对齐约束或后处理优化步骤，使用户可以在“印象迁移”和“精确对齐”之间按需调节？
+
+
 
 ## 原文 PDF
 

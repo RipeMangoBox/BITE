@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Adaptive_Collaboration_with_Humans_Metacognitive_Policy_Optimization_for_Multi_Agent_LLMs_with_Continual_Learning.pdf
+project_link: null
+code_link: https://github.com/USC-Melady/HILA.git
 openreview_forum_id: IKVUB9Exuc
 aliases:
 - HLMACHDLPOD
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 与人自适应协作：多智能体LLM的元认知策略优化与持续学习 |
 | 英文题名 | Adaptive Collaboration with Humans: Metacognitive Policy Optimization for Multi-Agent LLMs with Continual Learning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=IKVUB9Exuc); [GitHub](https://github.com/USC-Melady/HILA.git) |
+| Links | [paper](https://openreview.net/forum?id=IKVUB9Exuc) · [GitHub](https://github.com/USC-Melady/HILA.git) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | Human-In-the-Loop Multi-Agent Collaboration (HILA) with Dual-Loop Policy Optimization (DLPO) |
 | Dataset | GSM8K, AMC, AIME, HumanEval |
@@ -42,7 +44,7 @@ claims:
 > - AMC 上，Solve Rate (%) 为 35.83，对比 G-Debate (20.48)，变化 +15.35。
 > - AIME 上，Solve Rate (%) 为 9.37，对比 G-Swarm (5.78)，变化 +3.59。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -84,7 +86,7 @@ HILA区别于现有工作的三个关键设计维度：
 
 当前方法依赖高质量领域专家，真实部署中专家可用性可能受限；使用GPT-4o-mini作为人类代理虽经济，但与真实人类直觉存在差异；双环训练增加了计算与工程复杂度。开放问题包括：如何引入更精细的元认知评估（如贝叶斯不确定估计）取代规则启发式？能否设计完全自监督机制使智能体在无外部专家时自主判断何时放弃并学习？长期持续学习下如何避免灾难性遗忘？
 
-## 背景与动机
+
 
 ### 自主多智能体系统的知识边界
 
@@ -106,7 +108,9 @@ HILA区别于现有工作的三个关键设计维度：
 
 上述两个转变对应着不同时间尺度的优化目标：内环的求助决策需要快速适应任务上下文，外环的能力增长需要累积大量专家反馈。因此，我们提出**双环策略优化**（Dual-Loop Policy Optimization, DLPO）来解耦这两个过程——内环通过组相对策略优化（GRPO）训练元认知策略的即时决策能力，外环通过专家演示的监督微调实现基础模型的持续进化。这种解耦使得系统既能灵活应对当前任务的认知挑战，又能将人类智慧沉淀为持久的模型能力，而非仅作一次性修复。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 HILA 的根本创新在于将人机协作从被动求助升级为**策略性元认知框架**，使多智能体系统学会权衡自主求解的风险与求助的成本，而非依赖固定的工作流或启发式阈值。这一转变通过三个关键设计槽位的重新定义实现，并由 Dual-Loop Policy Optimization (DLPO) 统一驱动。
 
@@ -135,7 +139,7 @@ HILA 的根本创新在于将人机协作从被动求助升级为**策略性元�
 
 最终目标函数 $\mathcal{L}_{\text{total}}(\theta)$ 将两者统一，通过 $\lambda_{\text{sft}}$ 平衡策略优化与知识获取。消融实验（Table 3）直接验证了这一设计的必要性：从 Init Policy 到 GRPO 再到 DLPO，性能逐步提升，且外环带来的第二阶段增益远超内环单独作用。Table 5 进一步显示，完整 DLPO 训练后 DEFER 比例从初始的 29% 降至 17%（GSM8K），同时 EVAL 升至 55%，表明**模型在吸收专家知识后自主能力增强，对外部干预的依赖同步降低**——这正是元认知策略优化与持续学习协同作用的核心证据。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l28_https_openreview_net_forum_id_IKVUB9Exuc/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the proposed HILA framework and its Dual-Loop Policy Optimization (DLPO) training paradigm. Left: HILA coordinates multi-agent collaboration with both proactive human guidance and reactive expert feedback via metacognitive states and strategic actions (EVAL, CREATE, DEFER). Right: DLPO optimizes the meta-policy in an inner RL loop with cost-aware rewards, and expands the model’s knowledge boundary in an outer continual-learning loop by storing DEFER-triggered human feedback as offline supervision*
@@ -169,7 +173,7 @@ HILA由三个关键组件构成，形成一条从感知到决策再到持续学�
 - **输出**：系统最终产生一个解答，同时DEFER触发的专家演示被存储为结构化监督数据，供外环持续学习使用。
 - **持续更新**：经过DLPO训练后，基础模型的能力边界得到扩展——消融实验表明，用DLPO更新后的骨干替换原始骨干，即使在其他推理框架（如Vanilla、DyLAN、Debate）上也一致提升性能（Table 4），证明外环学习增强了模型本身而非仅优化了特定协作协议。
 
-## 核心模块与公式推导
+
 
 ### 元认知策略状态表示
 
@@ -231,7 +235,9 @@ $$\mathcal{L}_{\mathrm{total}}(\theta) = \mathbb{E}_{(s_t, a_t)} \left[ \mathcal
 
 其中 $\mathbb{I}(a_t = a^{\mathrm{defer}})$ 为指示函数，仅在动作为 DEFER 时激活外环SFT损失。$\lambda_{\mathrm{sft}}$ 为平衡系数，控制策略学习与知识获取的相对强度。该设计的核心机制在于：内环决定“何时求助”，外环决定“从求助中学到什么”，两者解耦但协同——内环优化的求助策略为外环筛选高质量学习信号，外环的能力增长又反过来减少未来对求助的依赖。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心结果：LLaMA3-8B 主干上的全面领先
 
@@ -303,7 +309,9 @@ Figure 7 展示了推迟成本 $C_{\text{defer}}$ 对策略行为的调控作用
 4. **任务覆盖有限**：当前评测集中在数学推理和程序合成等结构化任务，元认知策略在开放域对话、知识密集型问答等场景的有效性未经检验。
 5. **启发式认知信号的精度瓶颈**：元认知状态中的社会共识、监测信号等依赖规则启发式，可能在复杂推理场景中给出误导性评估，进一步学习型的认知评估有望提升策略质量。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心创新与差异化
 
@@ -346,6 +354,8 @@ HILA处于**自主MAS**与**人机协作系统**的交汇点，其方法谱系�
 4. **灾难性遗忘**：长期持续学习下，外环SFT可能覆盖内环GRPO学到的策略行为，或导致模型在先前擅长的任务上性能退化。如何保持既有能力的同时整合新知识，需要引入更精细的记忆管理机制。
 
 5. **延迟成本建模**：当前成本感知奖励仅考虑静态的动作成本常数。真实人机协作中，人类专家的响应延迟是一个关键变量，需要动态的时间感知成本模型。
+
+
 
 ## 原文 PDF
 

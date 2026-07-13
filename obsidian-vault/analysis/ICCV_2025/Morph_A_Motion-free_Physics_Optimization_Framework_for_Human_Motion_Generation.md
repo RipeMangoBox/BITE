@@ -44,7 +44,7 @@ claims:
 > - HumanML3D 上，Penetrate↓ 0.000 vs 23.152 (-100%)；Float↓ 2.141 vs 10.660 (-79.9%)；Skate↓ 0.010 vs 5.262 (-99.8%)。
 > - AIST++ 上，Penetrate↓ 0.000 vs N/A (EDGE alone) (completely eliminated)。
 
-## 概述
+## 概要
 
 现有动作生成模型普遍忽略物理约束，导致生成的动作为现漂浮、脚滑、穿透等物理伪影（Figure 1）。如何在不依赖昂贵真实运动数据的条件下训练有效的物理优化器，是该领域尚未解决的瓶颈。
 
@@ -54,7 +54,7 @@ Morph 提出了一种无需真实运动数据的物理优化框架。其核心�
 
 在方法谱系上，Morph 区别于 **PhysDiff**（Yu et al., 2023）等将物理优化嵌入扩散过程的方法，提出了两阶段协同训练范式：先训练 MPR 精炼噪声运动，再用精炼数据微调生成器。其先验奖励机制采用轻量运动 VAE 提供平滑稳定的分布约束，避免了对抗性奖励的不稳定性。该方法可即插即用地与多种生成器（扩散、自回归、掩码建模）结合，展现出良好的通用性。
 
-## 背景与动机
+
 
 ### 物理伪影：动作生成中被忽视的瓶颈
 
@@ -77,7 +77,9 @@ Figure 1 展示了典型的问题模式：生成的人物动作出现漂浮（�
 
 这一“生成-精炼-反哺”的闭环机制，使得系统可以在**无需任何真实运动数据**的条件下，实现物理合理性与生成质量的同步提升。这正是 Morph 框架的核心动机：构建一个运动无关（Motion-Free）的物理优化框架，让物理约束的施加不再受制于昂贵的数据获取成本。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Morph 的核心创新在于构建了一个**无需真实运动数据的闭环物理优化框架**，通过三个关键机制改变了现有动作生成中物理约束的施加方式。
 
@@ -103,7 +105,7 @@ Morph 的核心创新在于构建了一个**无需真实运动数据的闭环物
 
 需要指出的是，当前框架仅适用于地面接触动作（如行走、跑步），对于涉及环境交互的动作（如坐椅子、游泳），MPR 模块无法在仿真器中复现，需借助模仿选择操作过滤。此外，框架的有效性依赖于生成器产生的合成数据质量，且物理仿真与强化学习训练需要较高计算资源（8 块 Tesla V100 GPU）。这些限制为后续研究指明了方向。
 
-## 整体框架
+
 
 Morph 框架的核心思想是**在无需真实运动数据的前提下，通过生成器与物理精炼模块的协同训练，实现物理合理性与生成质量的双向提升**。其整体架构由两个关键模块构成，并通过两阶段训练流程形成闭环。
 
@@ -149,7 +151,7 @@ $$\mathcal{L}_{\mathrm{MG}}(\xi) = \mathbb{E}\left[\|\pmb{x}^{1:L} - f_{\xi}(\pm
 ![[assets/figures/papers/arxiv_2024_morph_2411_14951/figures/001_Figure_1.jpg]]
 *Figure 1: Examples of physical inconsistencies in generations*
 
-## 核心模块与公式推导
+
 
 Morph 框架由两个核心模块构成：**运动生成器（Motion Generator, MG）** 与 **运动物理精炼模块（Motion Physics Refinement, MPR）**。二者通过两阶段训练形成闭环，无需真实运动数据即可实现物理合理性的持续提升。
 
@@ -210,7 +212,9 @@ $$\mathcal{L}_{\mathrm{MG}}(\boldsymbol{\xi}) = \mathbb{E}\left[ \left\| \boldsy
 ![[assets/figures/papers/arxiv_2024_morph_2411_14951/figures/008_Figure_4.jpg]]
 *Figure 4: A flowchart illustrating the data preprocessing process. The parameters are calculated from the first frame and then applied to all generated motion sequences before they are fed into the MPR module*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：物理指标的跨越式改善
 
@@ -287,7 +291,9 @@ Table 8 的用户研究提供了感知层面的验证：Morph-MoMask 在物理�
 ![[assets/figures/papers/arxiv_2024_morph_2411_14951/figures/015_Table_9.jpg]]
 *Table 9: Cross-Task generalization results on Music2Dance and Text2Motion*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 
@@ -318,6 +324,8 @@ Morph 的核心贡献在于提出了一种**无需真实运动数据的物理优
 **多轮优化的收敛策略。** Morph 的多轮交替训练（MG 与 MPR 互相优化）在三轮时达到最佳性能（Table 7：FID 0.034，PFC 0.618），但论文未给出自动判断收敛的机制。多轮优化的最佳停止策略，以及生成器微调阶段是否可能引入灾难性遗忘、如何保持原有生成多样性，仍是未充分探索的问题。
 
 **泛化到更多角色模型。** 当前验证基于单一的人体角色模型。在不同仿真器或更复杂的角色模型（如不同体型、非人形角色）上，该方法的有效性仍需验证。
+
+
 
 ## 原文 PDF
 

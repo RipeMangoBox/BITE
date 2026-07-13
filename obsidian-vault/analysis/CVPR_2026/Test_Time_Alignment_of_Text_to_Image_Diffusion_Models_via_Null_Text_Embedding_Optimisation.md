@@ -45,7 +45,7 @@ claims:
 > - HPSv2 目标对齐（SD-v1.5, 100 步） 上，HPSv2↑ 0.428 (n_max=115) vs 0.279 (SD-v1.5 vanilla) (+0.149)。
 > - PickScore 目标对齐（SDXL, 100 步） 上，PickScore↑ / HPSv2↑ / Aesthetic↑ / ImageReward↑ 0.282 / 0.293 / 5.613 / 1.276 (n_max=45) vs 0.218 / 0.279 / 5.236 / 0.338 (SDXL vanilla) (+0.064 / +0.014 / +0.377 / +0.938)。
 
-## 概述
+## 概要
 
 文本到图像扩散模型在测试时对齐（Test-Time Alignment, TTA）中面临一个核心瓶颈：现有的对齐方法多在非结构化的潜在变量或噪声空间中优化，容易导致欠优化或过度优化（奖励黑客），难以在语义一致的方向上移动生成分布，从而无法有效平衡目标奖励与跨奖励泛化能力。
 
@@ -54,8 +54,6 @@ claims:
 方法上，Null-TTA 构建了一个正则化的奖励最大化目标，联合优化目标奖励项、基于 KL 散度的去噪轨迹一致性正则项以及嵌入先验项，并辅以轻量级贪婪粒子滤波机制以进一步提升生成质量。对于非可微奖励函数，该方法支持零阶梯度估计，保持了方法的通用性。
 
 实验结果表明，Null-TTA 在多个奖励目标（PickScore、HPSv2、Aesthetic）上均实现了最优的测试时对齐性能，同时在跨奖励泛化方面显著优于现有基线方法，持续将帕累托前沿向外推移。该方法在 SD-v1.5 和 SDXL 上均验证了有效性，并展现出对非可微目标（如 JPEG 压缩性）的适应能力。
-
-## 背景与动机
 
 文本到图像扩散模型（如 Stable Diffusion）已展现出强大的生成能力，但其输出与人类偏好之间仍存在显著偏差。测试时对齐（Test-Time Alignment, TTA）旨在无需重新训练的情况下，在推理阶段引导模型生成更符合特定奖励函数（如美学评分、图文匹配度）的图像，因而成为灵活且低成本的偏好注入手段。
 
@@ -76,7 +74,7 @@ $$\tilde{\epsilon}_\theta(x_t, t, c, \phi) = \epsilon_\theta(x_t, t, \phi) + s \
 
 基于上述洞察，本文提出 **Null-Text Test-Time Alignment (Null-TTA)**，将测试时对齐的优化变量从非结构化的潜在/噪声空间转移到语义结构化的空文本嵌入空间，通过正则化的奖励最大化，在语义流形内引导生成分布向目标奖励移动，从根本上解决奖励黑客和泛化崩溃问题。
 
-## 核心创新
+## 核心方法与创新机理
 
 ### 优化变量的范式转移：从非结构化噪声到语义嵌入
 
@@ -122,8 +120,6 @@ $$\hat{\nabla}_\phi J(\phi) \approx \frac{1}{K\mu} \sum_{k=1}^{K} \big[ J(\phi +
 
 **需要手动验证的点**：空文本嵌入优化的理论保证（如收敛到目标分布 $p_{\text{tar}}(x) \propto p_{\text{pre}}(x) \exp(r(x)/α)$ 的证明）在提供的分析材料中未充分展开，建议查阅原文 Section 3.3 的推导细节以确认其严格性。
 
-## 整体框架
-
 Null-TTA 的核心思想是将测试时对齐（Test-Time Alignment, TTA）的优化变量从非结构化的潜在/噪声空间迁移到语义结构化的文本嵌入空间。整个 pipeline 围绕**分类器自由引导（CFG）中的无条件（空文本）嵌入 φ** 展开，将其作为操纵模型生成分布的“锚点”。框架由四个关键模块串联构成，形成“嵌入优化→去噪引导→粒子筛选→解码输出”的闭环。
 
 ### 输入输出流
@@ -168,8 +164,6 @@ Null-TTA 的核心思想是将测试时对齐（Test-Time Alignment, TTA）的�
 
 ![[assets/figures/papers/paper_list_l2345_https_arxiv_org_abs_2511_20889/figures/001_Figure_1.jpg]]
 *Figure 1: Evaluation of reward-optimisation (x-axes) vs over-optimisation (generalisation to held-out rewards on y-axes). Top/Bottom rows correspond to aligning with Aesthetic and HPSv2 target rewards respectively. Each ★ point corresponds to a particular baseline method, which together define the state-of-the-art pareto front (dashed line). For Null-TTA, each ○ point indicates the optimisation intensity (maximum inner steps*
-
-## 核心模块与公式推导
 
 ### 问题形式化
 
@@ -229,7 +223,7 @@ $$\hat{\nabla}_\phi J(\phi) \approx \frac{1}{K\mu} \sum_{k=1}^{K} \big[ J(\phi +
 
 Null-TTA 的高效性源于其设计选择：仅更新空文本嵌入意味着反向传播只需通过 U-Net 的交叉注意力层，而非整个网络。在 HPSv2 目标下的计算开销对比（Table 2）显示，Null-TTA 在 GPU 内存占用和推理时间上均优于 **DNO**（Tang et al., ICML 2025）等基于噪声优化的方法，同时获得更高的目标奖励得分。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验结果
 
@@ -271,28 +265,16 @@ Figure 3 展示了多目标优化（PickScore 与 HPSv2 的加权组合）的折
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l2345_https_arxiv_org_abs_2511_20889/figures/002_Table_1.jpg]]
-*Table 1: Target reward optimisation versus cross-reward generalisation for PickScore target. Null-TTA*
-
 ![[assets/figures/papers/paper_list_l2345_https_arxiv_org_abs_2511_20889/figures/004_Table_2.jpg]]
 *Table 2: Computational comparison of Null-TTA and baseline TTA methods under the HPSv2 target. For each method, we report GPU memory usage, wall-clock time per generated image, and the resulting HPSv2 score. Null-TTA achieves stronger target-reward performance than baselines under similar inference budgets, while also exhibiting the lowest memory consumption*
-
-![[assets/figures/papers/paper_list_l2345_https_arxiv_org_abs_2511_20889/figures/006_Table_5.jpg]]
-*Table 5: Effect of the reward/regularisation ratio on the target reward (HPSv2) and the cross reward (ImageReward). All rows except SD-v1.5 share the same target weight*
-
-![[assets/figures/papers/paper_list_l2345_https_arxiv_org_abs_2511_20889/figures/007_Table_3.jpg]]
-*Table 3: Influence of particle number on Null-TTA rewards*
 
 ![[assets/figures/papers/paper_list_l2345_https_arxiv_org_abs_2511_20889/figures/008_Table_4.jpg]]
 *Table 4: Comparison of optimised scores for different values of annealing coefficient (γ)*
 
-![[assets/figures/papers/paper_list_l2345_https_arxiv_org_abs_2511_20889/figures/009_Table_6.jpg]]
-*Table 6: Target reward optimization versus cross-reward generalization for PickScore target on SDXL. We compare our method with different optimization steps*
-
 ![[assets/figures/papers/paper_list_l2345_https_arxiv_org_abs_2511_20889/figures/010_Table_7.jpg]]
 *Table 7: Quantitative comparison on the non-differentiable JPEG Compressibility target. We report the JPEG Reward (defined as negative file size in kB) as the target metric, alongside crossreward generalization metrics. Higher JPEG Reward indicates smaller file size. Null-TTA*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 测试时对齐的方法谱系
 

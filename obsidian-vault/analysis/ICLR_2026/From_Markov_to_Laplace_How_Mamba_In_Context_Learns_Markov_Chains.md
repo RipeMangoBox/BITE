@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/From_Markov_to_Laplace_How_Mamba_In_Context_Learns_Markov_Chains.pdf
+project_link: null
+code_link: https://github.com/Bond1995/Markov-Mamba
 openreview_forum_id: kmK3WSCOCT
 aliases:
 - FMLHMCLMC
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 从马尔可夫到拉普拉斯：Mamba如何通过上下文学习马尔可夫链 |
 | 英文题名 | From Markov to Laplace: How Mamba In-Context Learns Markov Chains |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=kmK3WSCOCT); [GitHub](https://github.com/Bond1995/Markov-Mamba) |
+| Links | [paper](https://openreview.net/forum?id=kmK3WSCOCT) · [GitHub](https://github.com/Bond1995/Markov-Mamba) |
 | Topic | #topic/optimization_theory_probabilistic #topic/optimization_theory_probabilistic/probabilistic_methods |
 | Method | MambaZero |
 | Dataset | Random first-order Markov chains, WikiText-103 (14.5M parameters), WikiText-103 (110M parameters), PG-19 (200M parameters) |
@@ -41,7 +43,7 @@ claims:
 > - WikiText-103 (14.5M parameters) 上，Perplexity 为 27.55 (Mamba-2 full)，对比 30.68 (Mamba-2 w/o convolution)，变化 -3.13。
 > - WikiText-103 (110M parameters) 上，Perplexity 为 21.38 (Mamba-2 full)，对比 21.46 (Mamba-2 w/o convolution)，变化 -0.08。
 
-## 概述
+## 概要
 
 本文研究选择性状态空间模型 Mamba 在上下文学习（ICL）中的表征能力，核心问题是：**Mamba 能否通过上下文学习马尔可夫链的最优统计估计器？其背后的机制是什么？**
 
@@ -59,7 +61,7 @@ claims:
 
 在语言建模的附加实验中，卷积的贡献在 WikiText-103 上带来约 3.13 的困惑度降低（14.5M 参数），但在更大规模模型上差距缩小，表明在自然语言任务中门控等其他组件的影响更为显著。
 
-## 背景与动机
+
 
 ### 上下文学习中的统计估计问题
 
@@ -87,7 +89,9 @@ Transformer架构在ICL任务上的理论理解已取得显著进展：已有工
 
 通过将Mamba置于马尔可夫-ICL框架下进行严格分析，本文不仅为选择性SSM的ICL能力提供了首个完整的理论解释，也为理解卷积、选择性与递归在现代序列模型中的协同机制提供了新的视角。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于首次从表示能力的角度，系统性地揭示了选择性状态空间模型（Mamba）在上下文学习（ICL）中学习最优统计估计器的理论机制。此前的理解主要停留在经验层面，而本文通过理论构造与实验验证，明确了Mamba实现马尔可夫链上下文学习的关键驱动因素。
 
@@ -124,7 +128,7 @@ Transformer架构在ICL任务上的理论理解已取得显著进展：已有工
 
 值得关注的是，卷积的关键作用并非Mamba独有。实验表明，对标准Transformer的K、Q、V矩阵添加卷积后，单层Transformer也能成功学习马尔可夫任务（Fig. 11），而无卷积的Mamba则需要两层才能解决同一任务（Fig. 12）。这表明**卷积所提供的局部时序上下文提取能力，是实现此类上下文学习任务的通用关键机制**，而非特定于SSM架构。
 
-## 整体框架
+
 
 本文构建了一个从理论构造到经验验证的完整研究管线，旨在揭示Mamba架构在上下文学习（ICL）中学习马尔可夫链最优估计器的内在机制。整体框架围绕三个层次展开：**问题形式化**、**模型解剖与简化**、**表征能力证明与验证**。
 
@@ -198,7 +202,7 @@ $$x_t = e_{x_t}, \quad u_t = x_t + \text{MambaZero}(x_1^t), \quad \text{logit}_t
 
 这一框架将Mamba的ICL能力归结为一个可证明的构造：单层Mamba通过上述机制的精密协作，可以精确实现转移计数及加性平滑，从而匹配最优贝叶斯/极小极大估计器。同时，定理2揭示了这一能力的基本限制——对于 $k$ 阶马尔可夫链，任何循环架构实现拉普拉斯平滑所需的隐藏维度必须满足 $d \cdot \mathsf{p} \geq 2^k (1-3\varepsilon) \log(1/\varepsilon)$，即随阶数指数增长。
 
-## 核心模块与公式推导
+
 
 ### 关键架构模块
 
@@ -266,7 +270,9 @@ $$L(\theta) = -\frac{1}{T}\sum_t \mathbb{E}_{P} \mathbb{E}_{x \sim P} \log f_\th
 - **状态转移因子 $a_t$**：控制历史信息的累积与重置。在标准马尔可夫任务中，收敛时 $a_t \approx 1$（图4），允许累积全部历史计数；在切换马尔可夫过程中，模型学习在切换token处设 $a_t = 0$ 以重置计数（图13）。
 - **隐藏维度 $d$**：对于 $k$ 阶马尔可夫链，任何循环架构实现 $\varepsilon$ 近似的拉普拉斯平滑所需隐藏维度与精度的乘积下界为 $d \cdot p \ge 2^k (1-3\varepsilon) \log(1/\varepsilon)$（定理2），揭示了维度随阶数指数增长的基本限制。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：单层Mamba学习最优拉普拉斯估计器
 
@@ -351,7 +357,9 @@ $$L(\theta) = -\frac{1}{T}\sum_t \mathbb{E}_{P} \mathbb{E}_{x \sim P} \log f_\th
 ![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_kmK3WSCOCT/figures/013_Table_2.jpg]]
 *Table 2: Results for the hold-out experiment*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -398,6 +406,8 @@ $$L(\theta) = -\frac{1}{T}\sum_t \mathbb{E}_{P} \mathbb{E}_{x \sim P} \log f_\th
 - **学习动力学**：Mamba收敛到拉普拉斯平滑估计器的具体动力学是什么？是否存在从计数到平滑的阶段性转变？
 - **门控与选择性的协同**：在语言任务中，门控（$a_t$）和选择性机制如何与卷积协同工作？切换马尔可夫实验（Fig. 13）已初步展示了$a_t$在重置计数中的作用，但其在自然文本中的功能仍待探索。
 - **架构设计的可迁移性**：向Transformer添加卷积即可使其获得类似Mamba的马尔可夫ICL能力（Fig. 11），这是否意味着卷积可以作为通用的“计数归纳偏置”模块嵌入各类序列架构？
+
+
 
 ## 原文 PDF
 

@@ -42,7 +42,7 @@ claims:
 > - OMOMO 上，F1 0.80 vs 0.71 (OMOMO) (+0.09)。
 > - TRUMANS 上，F1 0.69 vs 0.59 (+0.10)；HandJPE (cm) 38.00 vs 47.85 (-9.85)；MPJPE (cm) 31.28 vs 36.20 (-4.92)。
 
-## 概述
+## 概要
 
 动态场景中的人体运动合成要求生成的运动不仅自然，还必须符合物理规律——例如，人推动箱子时，脚与地面的接触、手与箱子的交互力必须同时满足牛顿第三定律。现有方法面临一个核心瓶颈：**缺乏准确的连续接触力模型，无法处理任意表面和动态物体，导致生成的运动出现浮空、滑动等物理不一致现象**（见 Figure 1）。
 
@@ -54,7 +54,7 @@ InterPhys 针对这一瓶颈提出了三个关键创新：
 
 在 OMOMO 和 TRUMANS 两个数据集上，InterPhys 均取得最优性能。以 OMOMO 为例，F1 分数达到 **0.80**，显著优于 OMOMO（0.71）和 InterDiff（0.72）等基线；在 TRUMANS 上，手部关节误差（HandJPE）从 47.85 cm 降至 **38.00 cm**，平均关节误差（MPJPE）从 36.20 cm 降至 **31.28 cm**。消融实验进一步证实，移除动态一致性损失会导致 F1 分数下降约 7%，验证了物理约束的核心作用。
 
-## 背景与动机
+
 
 ### 问题背景：动态场景中的人-物交互运动合成
 
@@ -84,7 +84,9 @@ InterPhys 针对这一瓶颈提出了三个关键创新：
 
 通过上述设计，InterPhys 在 OMOMO 和 TRUMANS 两个数据集上均取得了最优性能，并在消融实验中验证了动态一致性损失的因果作用——去除该损失后，物体接触 F1 分数下降 7%（Table 3），直接证明了物理约束对生成质量的关键影响。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 InterPhys 的核心创新在于通过**物理机理层面的三个关键设计**，解决了现有方法在动态场景中生成物理一致人体运动的根本瓶颈。
 
@@ -123,7 +125,7 @@ InterPhys 的核心创新在于通过**物理机理层面的三个关键设计**
 
 消融实验证实了该设计的有效性：去除动态一致性损失后，物体接触 F1 分数下降 7%（Table 3），验证了物理约束对生成质量的关键作用。
 
-## 整体框架
+
 
 InterPhys 采用**两阶段扩散流水线**，将物理先验嵌入生成过程，实现从动态场景输入到物理一致人体运动的端到端合成。系统输入包含两部分：静态场景的三维体素占用表示 $\mathbf{S} \in \{0,1\}^{N_x \times N_y \times N_z}$，以及动态物体在 $T$ 帧内的运动 $\mathbf{O} \in \mathbb{R}^{T \times B}$（含平移与基元表示）。输出为与场景和物体交互的全身人体运动序列。
 
@@ -147,7 +149,7 @@ InterPhys 采用**两阶段扩散流水线**，将物理先验嵌入生成过程
 ![[assets/figures/papers/paper_list_l24_https_openaccess_thecvf_com_content_CVPR2026_html_Xing_InterPhys_Physics/figures/001_Figure_1.jpg]]
 *Figure 1: Our Task. Our method takes 3D object motion and a 3D scene as input (a), to synthesize physically consistent 3D human motion interacting with both the moving object and the static background scene (b)*
 
-## 核心模块与公式推导
+
 
 InterPhys 的核心在于将物理先验显式地注入生成过程，其技术路线围绕三个关键模块展开：人体与物体的耦合动力学建模、可微的连续接触力模型，以及两阶段扩散生成流水线。
 
@@ -232,7 +234,9 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{reco}} + \lambda_{\mathrm{dyn}} \mathcal{L}
 ![[assets/figures/papers/paper_list_l24_https_openaccess_thecvf_com_content_CVPR2026_html_Xing_InterPhys_Physics/figures/002_Figure_2.jpg]]
 *Figure 2: Continous contact force model. a) The PhysPT model assumes a static ground plane and represents contact force with two independent orthogonal springs, b) Our model generalizes to arbitrary 3D surfaces by incorporating local surface normals for the normal force and explicitly modeling tangential static and kinetic friction that are dependent to the normal force, enabling physically consistent interactions in dynamic scenes*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 评估设置
 
@@ -292,7 +296,9 @@ Table 3 和 Figure 6 报告了关键设计选择的消融结果。最核心的�
 
 论文未提供失败案例的系统性统计分析，上述观察基于 Figure 4/5 的定性样本和消融趋势推断，部分结论需要更多定量验证。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与前驱工作的关系
 
@@ -329,6 +335,8 @@ InterPhys 的适用边界由其核心假设定义：
 ### 4. 知识库定位
 
 InterPhys 位于**物理信息人物运动合成**和**人-物交互生成**的交叉点。其核心知识贡献——基于表面法向的连续接触力模型和牛顿第三定律耦合的物体动力学——为后续工作提供了可复用的物理先验模块。该框架可被视为连接纯数据驱动生成（如 InterDiff, InterAct）和全物理仿真（如强化学习中的接触动力学）的中间层，通过可微物理损失在生成质量与物理一致性之间取得平衡。
+
+
 
 ## 原文 PDF
 

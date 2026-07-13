@@ -45,7 +45,7 @@ claims:
 > - CO3Dv2 (scene-level) 上，Success Rate @30° 0.567 vs 0.237 (iFusion) / 0.050 (ID-Pose) (+0.330 over iFusion)。
 > - HOPEv2 (real-world) 上，Success Rate @30° 0.786 vs 0.382 (iFusion) (+0.404)。
 
-## 概述
+## 概要
 
 从单张或少量图像估计物体三维姿态是视觉理解的核心问题。近年来，基于扩散模型先验的姿态反求方法——如**ID-Pose**和**iFusion**——将姿态估计转化为在Zero123扩散噪声空间中最小化均方误差（MSE）的优化问题，取得了显著进展。然而，这一范式的根本瓶颈在于**优化景观的几何性质**：Zero123 MSE损失函数构成的优化曲面普遍存在大量局部极小值和平台区域（Figure 1），导致梯度下降对初始化高度敏感。从不同起点出发的优化轨迹中，仅部分能收敛到真实姿态，其余则陷入局部极小（Figure 2）。因此，现有方法必须依赖4-8个随机初始化点的多起点采样策略来提升成功率，计算效率低且收敛稳定性不足。
 
@@ -57,7 +57,7 @@ claims:
 
 **主要局限**：Zero123模型对某些物体的生成能力有限，多视图不一致性可能导致精炼阶段劣化；球坐标相对姿态表示对对称物体存在固有歧义（Figure 9）。未来方向包括探索更强的姿态条件扩散模型（如Zero123-XL）与得分引导框架的深度融合，以及引入显式物体坐标系以缓解对称性歧义。
 
-## 背景与动机
+
 
 ### 问题背景：从扩散先验反求相机姿态
 
@@ -95,7 +95,9 @@ $$\hat { T } _ { r \to q } = \mathop { \mathrm { a r g m i n } } _ { T \in S E (
 
 本文的核心动机在于：**能否主动重塑优化景观，使梯度下降能够更可靠地收敛到全局最优？** 具体而言，论文提出引入一个显式学习数据分布得分的**分数网络（Score Network）**，利用其提供的梯度场引导姿态更新向高概率区域移动，从而有效避开 MSE 景观中的局部极小值陷阱。在此基础上，再结合 Zero123 的 MSE 损失进行局部精炼，形成两阶段优化框架，在显著减少初始化点需求的同时提升收敛稳定性和成功率。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题诊断：Zero123 MSE 损失景观的结构性缺陷
 
@@ -141,7 +143,7 @@ Table 8 的对比数据极具说服力：在仅使用 2 个初始化点时，本
 
 相较于直接竞争的 **iFusion** 和 **ID-Pose**，本文方法的本质差异不在于优化目标的形式（均使用 Zero123 的 MSE 损失），而在于**优化过程的引导机制**。iFusion/ID-Pose 完全依赖 MSE 损失的隐式梯度，其优化轨迹受限于损失景观的几何结构；本文方法通过显式学习的得分函数注入数据分布的先验知识，使优化过程具备“景观感知”能力——在远离真实解时由得分引导方向，在接近真实解时由 MSE 梯度精细调整。Table 5 的消融实验直接验证了这一差异：在相同 GSO 10 对象子集上，得分建模的 R@15 达到 0.963，显著优于能量建模的 0.850。
 
-## 整体框架
+
 
 本文提出**Landscape-Awareness Score-Guided Two-Stage Optimization**框架，其核心动机源于对Zero123 MSE损失景观的系统分析：该景观中普遍存在单一最小值、平台区域和多个局部极小值（Figure 1），导致iFusion等基于纯梯度下降的方法极易陷入局部最优，必须依赖多起点随机初始化才能收敛到全局最优。
 
@@ -171,13 +173,11 @@ $$\hat { \mathcal { T } } = \underset { \{ T _ { 1 } , \ldots , T _ { n } \} \su
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l2531_https_arxiv_org_abs_2605_19865/figures/003_Figure_3.jpg]]
-*Figure 3: Framework Overview. (a) The first part shows our proposed score network, which uses a ResNet encoder to extract image features. The conditioned pose is encoded via a sinusoidal embedding, and these features are concatenated and fed into a MLP to predict score. The trained score function guides optimization trajectory toward the ground-truth pose, helping avoid local minima in the Zero123 MSE landscape. (b) The second stage uses Zero123 to refine via energy-based optimization. Given a pair of reference-query images and a conditioned pose, the frozen Zero123 model estimates the noise. The MSE between predicted and actual noise defines energy, which is minimized via gradient-based optimization...*
 
 ![[assets/figures/papers/paper_list_l2531_https_arxiv_org_abs_2605_19865/figures/013_Figure_7.jpg]]
 *Figure 7: Spherical Coordinate System. CCS denotes camera coordinate system and OCS denotes object coordinate system*
 
-## 核心模块与公式推导
+
 
 ### 问题形式化与基线瓶颈
 
@@ -242,7 +242,9 @@ $$\hat { \mathcal { T } } = \underset { \{ T _ { 1 } , \ldots , T _ { n } \} \su
 ![[assets/figures/papers/paper_list_l2531_https_arxiv_org_abs_2605_19865/figures/004_Figure_4.jpg]]
 *Figure 4: Toy Example. (a) Reference and query images; (b) Oracle score field; (c) Score field from our score-based model; (d) Score field from Zero123 MSE; (e) Score field from our energy-based model; (f) Probability landscape from Zero123 MSE loss; (g) Probability landscape from our energy-based model. The landscapes in (f) and (g) represent the probability distribution and are plotted as exp(−Eθ(x))*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -305,7 +307,9 @@ Table 3 评估了在 GSO 数据集中未参与训练的 10 个新物体上的泛
 ![[assets/figures/papers/paper_list_l2531_https_arxiv_org_abs_2605_19865/figures/011_Table_5.jpg]]
 *Table 5: Ablation on different modeling approaches. We compares score-based modeling and energy-based modeling on the GSO dataset with 10 objects*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：扩散先验反推姿态的优化瓶颈
 
@@ -359,6 +363,8 @@ $$\tilde { \mathbf { x } } _ { t } = \tilde { \mathbf { x } } _ { t - 1 } + \alp
 2. **姿态参数化的重新思考**：球坐标表示虽然简洁，但对对称物体的歧义问题表明，可能需要引入显式的物体坐标系或等变表示来从根本上减少姿态空间的多义性。这需要权衡表示的完备性与优化的难易程度。
 
 3. **场景级扩展的深化**：CO3Dv2上的结果（Table 7）展示了向场景级应用的初步潜力，但成功率（0.567）仍显著低于物体级（0.836），说明场景中的遮挡、多物体交互等因素对当前框架构成额外挑战。
+
+
 
 ## 原文 PDF
 

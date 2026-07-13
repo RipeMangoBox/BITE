@@ -43,7 +43,7 @@ claims:
 > - Her2ST 上，PCC-50 0.566 ± 0.017 vs 0.543 ± 0.027 (STFlow) (+0.023)。
 > - Kidney 上，PCC-50 0.428 ± 0.008 vs 0.391 ± 0.004 (STFlow) (+0.037)。
 
-## 概述
+## 概要
 
 空间转录组学（ST）能够在组织原位同时测量基因表达与组织形态，但其高昂的成本限制了大规模应用。从常规H&E染色组织学图像预测基因表达提供了一条经济可行的替代路径。现有方法大致分为两类：确定性回归方法（如**ST-Net**, He et al., Nature Biomedical Engineering 2020; **BLEEP**, Xie et al., NeurIPS 2023; **TRIPLEX**, Chung et al., CVPR 2024; **MERGE**, Ganguly et al., CVPR 2025）直接学习图像到表达的映射，以及基于扩散或流匹配的生成方法（如**Stem**, Zhu et al., ICLR 2025; **STFlow**, Huang et al., ICML 2025）建模表达分布。然而，这些方法均未显式利用基因间的依赖关系，导致预测的生物学一致性不足。
 
@@ -54,8 +54,6 @@ HINGE（HIstology-coNditioned GEneration）通过三项关键设计解决了上�
 在cSCC、Her2ST和Kidney三个数据集上，HINGE在PCC-50指标上分别达到0.705、0.566和0.428，一致优于包括STFlow在内的所有基线方法。消融研究证实，冻结预训练权重、掩码扩散目标以及身份初始化的SoftAdaLN调制是性能提升的关键因素。空间标记基因可视化和共表达相关性分析进一步表明，HINGE生成的表达谱在空间模式和基因间关系上均更接近真实数据。
 
 **方法定位**：HINGE属于参数高效微调（parameter-efficient fine-tuning）范式，通过在冻结的预训练骨干上添加可学习的条件路径，将单细胞基础模型适配为组织学条件生成器。其核心创新在于将扩散生成过程重新表述为与掩码自编码预训练一致的形式，从而在有限ST数据上实现有效的知识迁移。
-
-## 背景与动机
 
 空间转录组学（Spatial Transcriptomics, ST）技术能够在组织切片的原始空间位置上同时测量数千个基因的表达，为理解组织微环境、细胞间通讯和疾病进展提供了前所未有的分辨率。然而，当前主流的基于测序的ST平台（如10x Visium）仍面临一个关键瓶颈：**基因表达测量与组织学图像采集通常在同一组织切片上交替进行，无法在同一物理切片上同时获得两种模态**。这意味着，对于仅保留H&E染色图像但缺乏配对表达数据的临床存档切片，研究者无法回溯其分子图谱。因此，**从组织学图像计算生成空间基因表达**成为一个具有重要临床和科研价值的前沿任务。
 
@@ -82,7 +80,7 @@ HINGE（HIstology-coNditioned GEneration）通过三项关键设计解决了上�
 
 针对上述瓶颈，本文提出**HINGE（HIstology-coNditioned GEneration）**，核心思路是：**将预训练的sc-FM改造为组织学条件生成器，同时最大限度地保留其预训练习得的基因间依赖关系**。具体而言，HINGE通过在冻结的sc-FM骨干网络中插入轻量级的身份初始化条件调制模块，以最小的参数开销注入组织学和时间步信息；同时设计掩码扩散过程和预热训练课程，使生成任务的训练目标与掩码自编码预训练体制完全对齐。这一设计使得HINGE能够在仅数千个ST测量点的有限监督下，成功迁移来自数千万单细胞的基因关系知识，实现高生物学一致性的空间基因表达生成。
 
-## 核心创新
+## 核心方法与创新机理
 
 HINGE的核心创新并非提出全新的生成范式，而是通过**轻量级条件路径与预训练目标对齐**，将冻结的单细胞基础模型（sc-FM）成功迁移到组织学条件生成任务。其关键设计围绕一个因果关系展开：在有限的空间转录组（ST）数据上微调大规模预训练模型时，必须同时解决**模态鸿沟**（组织学图像→基因表达）、**目标失配**（掩码自编码→条件生成）和**灾难性遗忘**（覆盖预训练的基因依赖关系）三重挑战。
 
@@ -136,8 +134,6 @@ $$ \mathcal{L}(\boldsymbol{\theta}) = \mathbb{E} \Big[ w_t \big\| \big( \mathbf{
 
 **证据强度评估**：上述三项创新的有效性均通过消融实验获得直接验证（Table 2-4），证据链完整且置信度高。但需注意，目前仅在CellFM这一单一sc-FM上进行了验证，该方法在其他预训练模型（如scGPT、scFoundation）上的泛化性尚需进一步实验确认。
 
-## 整体框架
-
 HINGE 的整体设计遵循“冻结预训练知识 + 轻量条件注入”的适配范式，将大规模单细胞 RNA-seq 上预训练的掩码自编码基础模型 **CellFM** 改造为组织学图像条件下的空间基因表达生成器。图 1 给出了框架概览：图 1(a) 展示 CellFM 的原始架构，图 1(b) 则呈现 HINGE 如何在该骨干网络上叠加条件通路。
 
 ### 输入输出流
@@ -181,8 +177,6 @@ $$\mathcal{L}(\boldsymbol{\theta}) = \mathbb{E} \Big[ w_t \big\| (\mathbf{1} - \
 ![[assets/figures/papers/paper_list_l2436_https_arxiv_org_abs_2603_19766/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of HINGE. (a) Depicts the CellFM architecture, which is a single-cell foundation model (sc-FM) pre-trained on scRNA-seq with masked autoencoding. (b) In HINGE, the conditional denoising model is instantiated from CellFM and augmented with identity-initialized SoftAdaLN that injects histology and timestep context into each transformer layer within a stochastic masked diffusion process. This design keeps the training objective aligned with CellFM’s masked autoencoding for coherence in ST, thereby largely preserving the gene relationships learned from scRNA-seq*
 
-## 核心模块与公式推导
-
 HINGE 在冻结的 CellFM 骨干网络上叠加轻量级条件路径，将预训练的单细胞基础模型改造为组织学条件生成器。其核心由三个紧密协作的模块构成：掩码扩散过程、冻结的 Transformer 骨干，以及身份初始化的 SoftAdaLN 条件注入机制。
 
 **掩码扩散过程**是弥合预训练与生成任务之间目标鸿沟的关键。前向过程对基因表达分量执行随机掩码，而非传统的高斯噪声注入。给定初始干净表达 $\mathbf{X}_0$ 和全可见掩码 $\mathbf{M}_0 = \mathbf{1}$，在时刻 $t$ 的联合分布定义为：
@@ -217,7 +211,7 @@ $$\mathbf{h}_{\mathrm{out}} = \mathrm{LN}\big(\tau(\mathbf{c}_t) \odot \mathbf{u
 
 **预热课程**进一步稳定早期训练。在初始阶段，扩散时间步 $t$ 仅从低掩码区间采样（即 $\bar{\alpha}_t \geq 1 - \rho$），使模型先学习在少量基因被掩码的条件下进行预测，与预训练时的低掩码率场景相匹配。完成预热后，$t$ 转为全区间均匀采样，逐步过渡到完整的生成任务。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -258,29 +252,11 @@ Figure 4进一步从基因间共表达角度评估生物学一致性。在Kidney
 ![[assets/figures/papers/paper_list_l2436_https_arxiv_org_abs_2603_19766/figures/002_Table_1.jpg]]
 *Table 1: Comparison on cSCC, Her2ST, and Kidney datasets using PCC-50, PCC-200, MSE, and MAE. Scores are averaged over test slices and three random seeds, reported as mean ± standard deviation. Best results are in bold, and second-best are underlined*
 
-![[assets/figures/papers/paper_list_l2436_https_arxiv_org_abs_2603_19766/figures/003_Figure_2.jpg]]
-*Figure 2: Boxplots of per-slice PCC-50 (left) and PCC-200 (right) with a common random seed for (a) cSCC, (b) Her2ST, and (c) Kidney. Each point represents one test slice. Paired Wilcoxon signed-rank tests assess pairwise differences against baselines. * p-value\<0.05, ***
-
-![[assets/figures/papers/paper_list_l2436_https_arxiv_org_abs_2603_19766/figures/005_Figure_3.jpg]]
-*Figure 3: Expression of KRT6A on the P2 ST rep3 slice from cSCC (a) and GNAS on the H1 slice from Her2ST (b). Each panel shows the ground truth and predictions from representative methods. Both genes are known markers with localized expression*
-
-![[assets/figures/papers/paper_list_l2436_https_arxiv_org_abs_2603_19766/figures/004_Figure_4.jpg]]
-*Figure 4: Gene–gene correlation matrices computed on the DKD Kidney slice 31-10042. Each matrix is derived from the predicted expression values of the HMHVG gene set. The ground truth and representative method outputs are shown*
-
-![[assets/figures/papers/paper_list_l2436_https_arxiv_org_abs_2603_19766/figures/007_Table_2.jpg]]
-*Table 2: Effect of reusing a pre-trained sc-FM under different adaptation schemes*
-
 ![[assets/figures/papers/paper_list_l2436_https_arxiv_org_abs_2603_19766/figures/009_Table_3.jpg]]
 *Table 3: Comparison of Gaussian diffusion, masked diffusion variants, and the full HINGE objective*
 
 ![[assets/figures/papers/paper_list_l2436_https_arxiv_org_abs_2603_19766/figures/006_Table_4.jpg]]
 *Table 4: Comparison of alternative conditioning mechanisms*
-
-![[assets/figures/papers/paper_list_l2436_https_arxiv_org_abs_2603_19766/figures/008_Table_5.jpg]]
-*Table 5: Impact of different histology encoders*
-
-![[assets/figures/papers/paper_list_l2436_https_arxiv_org_abs_2603_19766/figures/010_Table_S.1.jpg]]
-*Table S.1: Summary of spatial transcriptomics datasets aggregated by patient. Each patient entry reports spot- and gene-level ranges across multiple slices, together with the corresponding platform*
 
 ![[assets/figures/papers/paper_list_l2436_https_arxiv_org_abs_2603_19766/figures/011_Table_S.2.jpg]]
 *Table S.2: Ablations on Her2ST. Component-wise analysis of HINGE variants on the Her2ST (A1) dataset*
@@ -288,7 +264,7 @@ Figure 4进一步从基因间共表达角度评估生物学一致性。在Kidney
 ![[assets/figures/papers/paper_list_l2436_https_arxiv_org_abs_2603_19766/figures/012_Table_S.3.jpg]]
 *Table S.3: Ablations on Kidney. Component-wise analysis of HINGE variants on the Kidney (IU-F52) dataset*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 基线方法与差异化定位
 

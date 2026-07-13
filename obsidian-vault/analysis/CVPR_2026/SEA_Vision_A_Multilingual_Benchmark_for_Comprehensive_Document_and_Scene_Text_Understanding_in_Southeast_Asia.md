@@ -44,7 +44,7 @@ claims:
 > - TEC-VQA (11 languages) 上，Accuracy (avg) Qwen3-VL-32B 40.14% vs GPT4o 35.49% (+4.65%)。
 > - TEC-VQA language groups 上，Accuracy High-resource 45.78% vs Low-resource 17.45% (-28.33%)。
 
-## 概述
+## 概要
 
 多模态大模型在文档解析与文本中心视觉问答（TEC-VQA）上的能力近年来快速提升，但现有基准几乎全部聚焦于英语、中文等高资源语言。东南亚地区拥有超过十种广泛使用的语言和多种独特书写系统，却长期缺乏系统性的评估基准。这导致两个突出问题：一是模型在这些低资源语言上的真实能力未知，二是缺乏统一的评估框架来同时衡量文档结构理解和场景文本语义推理。
 
@@ -54,7 +54,7 @@ SEA-Vision 正是针对这一空白而构建的多语言基准。它覆盖 11 �
 
 这一基准的贡献不在于提出新模型，而在于系统性地暴露了当前多模态系统在低资源语言上的能力边界，为后续的跨语言迁移和公平性研究提供了量化锚点。
 
-## 背景与动机
+
 
 多模态大模型（MLLM）的快速发展显著提升了文档解析和文本中心视觉问答（TEC-VQA）的能力。然而，这一进步主要集中在英语、中文等高资源语言上，现有基准也大多围绕这些语言构建。东南亚地区拥有超过 11 种官方语言和多种书写系统，包括拉丁字母（越南语、印尼语、马来语）、婆罗米系文字（泰语、老挝语、缅甸语、高棉语）以及汉字衍生文字（中文、日文），语言生态极为复杂。这些语言中的大多数属于低资源语言，缺乏大规模、高质量的标注数据，导致模型在真实应用场景中的表现严重退化。
 
@@ -64,7 +64,9 @@ SEA-Vision 正是针对这一空白而构建的多语言基准。它覆盖 11 �
 
 SEA-Vision 正是在这一背景下提出的。它旨在填补多语言文档理解评测的空白，通过统一的文档解析与 TEC-VQA 联合评估框架，系统性地诊断模型在 11 种语言（含 7 种低资源东南亚语言）上的能力边界。同时，为了确保视觉-语义对齐，SEA-Vision 设计了混合式自动标注与母语验证流水线，将重绘文本重新嵌入图像，并通过跨语言一致性检查保证标注质量。这一基准不仅为模型诊断提供了工具，也为低资源语言文档理解的研究指明了方向。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SEA-Vision 的核心创新并非提出新的模型架构，而是构建了一套**面向低资源东南亚语言的多语言、多任务统一评估基准**，并通过**混合式自动标注与母语验证流水线**确保了视觉-语义对齐的标注质量。其相对于现有基准的关键 changed slots 体现在以下三个维度。
 
@@ -84,7 +86,7 @@ TEC-VQA 基准构建的核心难点在于：简单地将文本翻译后附加到
 
 从方法谱系来看，SEA-Vision 属于**基准构建工作**，其贡献在于评估框架和数据资源，而非模型创新。在文档解析评估线上，它沿袭了从 SROIE（2019）到 M6Doc（He et al., CVPR 2023）的多语言版面分析评估思路，但将语言范围大幅扩展至东南亚低资源语系。在 TEC-VQA 评估线上，它与 TextVQA、ST-VQA 等场景文本问答基准一脉相承，但通过重绘机制解决了多语言扩展中的视觉-语义对齐难题。SEA-Vision 的独特定位在于：它是目前唯一同时覆盖文档解析和场景文本问答、且以东南亚低资源语言为核心评估对象的统一基准。
 
-## 整体框架
+
 
 SEA-Vision 基准的构建围绕一个统一的评估框架展开，该框架首次将 **文档解析（Document Parsing, DP）** 与 **文本中心视觉问答（Text-Centric VQA, TEC-VQA）** 两大任务纳入同一体系，覆盖 11 种东南亚语言（含 7 种低资源语言）。其核心设计逻辑是：通过一套混合式自动标注与母语验证流水线，确保视觉-语义对齐，从而为多语言文档与场景文本理解提供可靠的评测基础。
 
@@ -133,7 +135,7 @@ $$\mathrm{Score} = a_1 S_1 + a_2 S_2 + a_3 S_3 + a_4 S_4 + a_5 S_5$$
 ![[assets/figures/papers/paper_list_l825_https_arxiv_org_abs_2603_15409/figures/004_Figure_3.jpg]]
 *Figure 3: Overview of the data annotation pipelines. (a) Document Parsing Annotation Pipeline: Internet-sourced document pages are first collected using domain-specific keywords and filtered for quality. Metadata annotation includes layout detection and MLLM–based analysis for language and page type identification. Candidate pages are ranked by a rule-based scoring function considering block count, type diversity, text area ratio, and presence of figures or tables. Selected samples undergo region-level correction via specialized models for text, formulas, and tables, followed by final human verification. (b) TEC-VQA Annotation Pipeline: Scene images from diverse environments (e.g., public spaces, con...*
 
-## 核心模块与公式推导
+
 
 ### 文档解析标注流水线
 
@@ -168,7 +170,9 @@ $$\mathrm{Score} = a_1 S_1 + a_2 S_2 + a_3 S_3 + a_4 S_4 + a_5 S_5$$
 
 文档解析数据采集阶段采用三阶段过滤（Section 3.2.1）：（1）基于感知哈希的自动去重与分辨率检查；（2）通过 OCR 检测字符数和文本面积比评估文本覆盖度；（3）按语言和页面类型强制平衡采样。TEC-VQA 数据则额外经过母语者轻量验证，以控制重绘和生成环节可能引入的噪声。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 文档解析：语言间性能鸿沟
 
@@ -236,7 +240,9 @@ Table 1 将 SEA-Vision 与现有文本相关基准进行了系统对比。SEA-Vi
 ![[assets/figures/papers/paper_list_l825_https_arxiv_org_abs_2603_15409/figures/010_Table.jpg]]
 *Table: A4. Distribution of TEC-VQA capability categories in SEA-Vision, reported as the number and proportion of QA pairs attributed to each capability. Category Co-occurrence Matrix Figure A1. Heatmap of the TEC-VQA capability category cooccurrence matrix. Color intensity indicates the frequency of QA pairs annotated with each capability combination*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 基准定位：填补低资源语言与统一评估的空白
 
@@ -279,6 +285,8 @@ SEA-Vision 的评估范围存在明确的边界约束：
 2. **跨文档推理扩展**：能否将基准扩展至多页文档问答、跨文档信息检索等更贴近实际应用的场景？
 3. **跨语言迁移机制**：低资源语言的性能差距根源在于训练数据的语言覆盖不足，未来能否设计更有效的跨语言迁移学习方法（如基于文字形状的零样本迁移），而非单纯依赖更多标注数据？
 4. **失败模式归因**：当前评估将 OCR 错误与理解错误混为一谈，需要更细粒度的诊断工具来区分“看到了但读错了”与“读对了但不理解”两种失败路径。
+
+
 
 ## 原文 PDF
 

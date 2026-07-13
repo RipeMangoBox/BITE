@@ -5,6 +5,8 @@ paper_level: A
 venue: SIGGRAPH ASIA
 year: 2024
 pdf_ref: paperPDFs/SIGGRAPH_ASIA_2024/DiffH2O_Diffusion_Based_Synthesis_of_Hand_Object_Interactions_from_Textual_Descriptions.pdf
+project_link: null
+code_link: null
 aliases:
 - DiffH2O
 tags:
@@ -39,7 +41,7 @@ claims:
 > - GRAB (unseen subject split, interaction stage) 上，动作识别准确率 (Action Recognition Accuracy, AR) ↑ 0.810 (DiffH2O Transformer) vs 0.588 (IMoS) (+0.222)。
 > - GRAB (unseen object split, full sequence) 上，抓取误差 (Grasp Error, GE) ↓ [m] 0.12 (Ours) vs 0.38 (MDM adapted) (-0.26)。
 
-## 概述
+## 概要
 
 从文本描述生成逼真的手物交互运动，是计算机图形学与具身智能交叉领域的一个关键挑战。其核心瓶颈在于：手物交互数据采集成本极高，现有动作捕捉数据集规模有限，且手与物体之间的紧密耦合导致模型难以泛化到训练时未见过的物体——在保持物理合理性（如无穿透、稳定接触）和语义对齐的前提下，这一问题尤为突出。
 
@@ -51,7 +53,7 @@ claims:
 
 在方法谱系上，DiffH2O属于**时间两阶段扩散生成**范式，区别于单阶段扩散基线（如适配后的MDM、GMD）和基于后优化的方法（如IMoS）。其知识库定位在于：将手物交互生成从“端到端黑箱映射”推进到“结构化分解+条件引导”的框架，为后续集成物理约束和提升推理效率的研究提供了明确的切入点。
 
-## 背景与动机
+
 
 ### 问题背景：手物交互合成的核心挑战
 
@@ -79,7 +81,9 @@ claims:
 
 > 注：DiffH2O 是首个从文本描述合成未见物体手物交互的方法（Section 1 声明，置信度 0.95），其在 GRAB 数据集上的两阶段设计、抓取引导和详细文本条件均通过消融实验和对比实验得到了充分验证。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DiffH2O 的核心创新在于通过**时间两阶段扩散生成**与**手‑物体弱耦合表示**，首次实现了从文本描述到未见物体手物交互的合成。其关键设计围绕以下几个维度的范式转变展开：
 
@@ -132,7 +136,7 @@ $$\tilde{\mathbf{x}}_{0,\theta}^{i} = (1 - M_g^{i}) \odot \mathbf{x}_{0,\theta}^
 
 DiffH2O 的方法论贡献可归纳为四个 **changed slots** 的协同作用：两阶段扩散解耦了运动模式的复杂性，弱耦合表示降低了对物体几何的敏感度，子序列补全保障了阶段过渡的平滑性，抓取引导与详细文本描述则赋予生成过程精细的可控性。这些设计共同使得在小规模 GRAB 数据集上训练的模型能够泛化到未见物体，并生成物理合理、语义对齐的手物交互运动。
 
-## 整体框架
+
 
 ### 问题定义与生成目标
 
@@ -177,7 +181,7 @@ DiffH2O 支持两种粒度的文本控制：简单模板文本（如“The perso
 ![[assets/figures/papers/paper_list_l1807_DiffH2O_Diffusion_Based_Synthesis_of_Hand_Object_Interactions_from_Textu/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of DiffH2O. We couple hands and objects by representing hands relative to the object position in the initial frame and encoding hand-object distances (Sec. 4.1). We observe that objects are static until they have been grasped, and propose to decouple grasping and interaction stages and modelling them with two different diffusion processes (Sec. 4.2). Finally, we make use of grasp guidance and subsequence imputation to ensure a smooth transition between these two stages (Sec. 4.2.3). We further show fine-grained synthesis controllability through our detailed textual descriptions (Sec. 4.4)*
 
-## 核心模块与公式推导
+
 
 ### 3.1 运动表示与手物耦合
 
@@ -237,7 +241,9 @@ $$\nabla_{\mathbf{x}_t^{g}} \log \phi(\mathbf{c} | \mathbf{x}_t^{g}) \approx - \
 
 该架构设计使模型能够同时感知文本语义、物体几何和扩散进度，为两阶段生成提供统一的条件框架。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -310,7 +316,9 @@ Figure 5 展示了三类典型失败案例：
 ![[assets/figures/papers/paper_list_l1807_DiffH2O_Diffusion_Based_Synthesis_of_Hand_Object_Interactions_from_Textu/figures/004_Figure_3.jpg]]
 *Figure 3: Qualitative Comparison. Post-optimizing object motion as in IMoS [Ghosh et al. 2023] (bottom row) exhibits artifacts with fine-grained manipulations, e.g., when an object switches hands. In contrast, our approach (top row) seamlessly handles such cases. Best seen in supplemental video*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位与核心突破
 
@@ -385,6 +393,8 @@ DiffH2O 将运动生成分解为抓取阶段（ε-预测扩散模型）和交互
 3. **引导冲突消解**：如何自动对齐目标抓取与文本提示，避免两者冲突导致的控制失效？
 4. **极端尺度泛化**：如何改进模型对训练分布外物体尺寸和形状的鲁棒性？
 5. **弱监督文本控制**：在不依赖大规模人工标注的前提下，如何自动生成或利用弱监督文本描述来增强运动控制？
+
+
 
 ## 原文 PDF
 

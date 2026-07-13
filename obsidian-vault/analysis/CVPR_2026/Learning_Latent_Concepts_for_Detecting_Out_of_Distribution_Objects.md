@@ -45,7 +45,7 @@ claims:
 > - BDD-100K (OpenImages as OOD) 上，AUROC 99.04。
 > - ImageNet-200 (Near OOD) 上，AUROC / FPR95 87.90 / 50.42。
 
-## 概述
+## 概要
 
 ### 问题背景与瓶颈
 
@@ -75,7 +75,7 @@ UNO-Adapter 在多个基准上取得了显著提升：
 
 性能对超参数（如槽数量 $S$ 和分位数阈值 $\tau$）存在一定敏感性，实际部署时需根据具体场景进行调优。
 
-## 背景与动机
+
 
 ### 问题定义：分布外物体检测
 
@@ -109,7 +109,9 @@ UNO-Adapter 在多个基准上取得了显著提升：
 
 这一范式的核心优势在于：检测器权重冻结，仅训练轻量的UCD模块；推理时通过绑定机制将全局概念注入实例特征，再结合图像引导的OOD评分确保全局一致性。这种“即插即用”的设计使得UNO-Adapter能够无缝适配任何预训练检测器，同时显著提升OOD检测性能——在BDD-100K上，UNO-Adapter相比之前的最佳方法WFS在FPR95指标上降低了11.96%（MS-COCO作为OOD）和4.03%（OpenImages作为OOD）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 UNO-Adapter 的核心创新在于：**在不修改检测器架构和权重的前提下，通过无监督概念发现与神经概念绑定，向实例级检测器注入全局场景中的“未知”概念**。这与现有方法形成根本性差异——**VOS**（Du et al., ICLR 2022）、**SIREN**（Du et al., NeurIPS 2022）、**SAFE**（Wilson et al., ICCV 2023）和 **WFS**（Wu & Deng, CVPR 2025）等方法均在实例层面引入任务特定的正则化目标来增强 ID/OOD 判别能力，而 UNO-Adapter 将 OOD 检测的核心问题从“特征塑形”转向“概念注入”。
 
@@ -137,7 +139,7 @@ UNO-Adapter 性能提升的因果链条可概括为：UCD 通过信息瓶颈原�
 
 与需要修改检测器损失、进行任务特定微调的基线方法不同，UNO-Adapter 仅训练 UCD 模块（微调时间仅 0.1 小时），检测器权重完全冻结。推理时通过 NCB 进行零训练绑定，总推理时间 11.54 秒，显著低于 SIREN（36.31 秒/2.2 小时微调）和 SAFE（14.37 秒/3.6 小时微调）。这种“外挂式”设计使得 UNO-Adapter 具有极强的部署灵活性，可适配任意预训练检测器。
 
-## 整体框架
+
 
 UNO-Adapter 的整体设计遵循“概念发现—概念绑定—评分决策”三阶段流水线，其核心思想是**在不修改检测器架构与权重的前提下，向检测器注入场景级的“未知”概念**，从而提升分布外（OOD）目标的判别能力。如图2所示，框架由三个关键模块串联构成：
 
@@ -154,7 +156,7 @@ UNO-Adapter 的整体设计遵循“概念发现—概念绑定—评分决策�
 ![[assets/figures/papers/paper_list_l2052_https_openaccess_thecvf_com_content_CVPR2026_html_Peng_Learning_Latent_C/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the proposed UNO-Adapter, which consists of three components: unsupervised concept discovery (UCD), neural concept binder (NCB), and an OOD object score. During training, UCD extracts sparse, high-level concepts from dense pixels, enhances the correlations among these concepts, and reduces redundant information. During inference, the refined slots are integrated with instance-level features via NCB. SA denotes “slot attention”, BG indicates “background”, and Obj is “object”*
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题形式化
 
@@ -213,7 +215,9 @@ $$\operatorname{score}(o_i, \pmb{b_i}) = \gamma \cdot \cos(\hat{\pmb{f_t}}, \pmb
 
 该评分机制的核心逻辑：若图像整体重建质量差（低余弦相似度），且目标 logit 低于分位数阈值，则更可能为 OOD。图像级与实例级信息的协同有效强化了 ID/OOD 决策边界。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能：OOD 目标检测
 
@@ -281,7 +285,9 @@ UNO-Adapter 在 OOD-OD 任务上展现出显著优势，尤其在更具挑战性
 ![[assets/figures/papers/paper_list_l2052_https_openaccess_thecvf_com_content_CVPR2026_html_Peng_Learning_Latent_C/figures/011_Table_6.jpg]]
 *Table 6: Analysis on time complexity*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法角色：不修改检测器的“未知”概念注入适配器
 
@@ -323,6 +329,8 @@ UNO-Adapter 的技术基因可追溯至两个关键来源：
 2. **动态场景下的概念演化**：在 OWOD 场景中，ID 类别会逐步增加，当前 UCD 需要在新数据上重新训练。能否实现概念的增量学习，使槽表示随 ID 知识扩展而动态演化？
 3. **与多模态模型的融合**：人类视觉过程融合了语言、先验知识等多模态信息。UNO-Adapter 目前仅依赖视觉信号，能否与视觉-语言模型（如 CLIP）结合，利用文本描述增强“未知”概念的建模？
 4. **理论保证的缺失**：信息瓶颈原理在 UCD 中的应用缺乏严格的理论分析，例如 KL 散度正则化与 OOD 检测性能之间的定量关系、槽数量 $S$ 的下界等，均有待形式化研究。
+
+
 
 ## 原文 PDF
 

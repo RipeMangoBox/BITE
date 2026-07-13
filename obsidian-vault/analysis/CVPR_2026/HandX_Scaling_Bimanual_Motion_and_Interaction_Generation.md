@@ -44,7 +44,7 @@ claims:
 > - HandX text-to-motion (Diffusion) 上，Intra-hand contact F1 (C_F1) 0.641 (12 layers, 100% data) vs 0.531 (4 layers, 100% data) or lower at smaller data (+0.110 over weaker model)。
 > - HandX text-to-motion (Autoregressive) 上，FID 1.721 (215.31M params, codebook 4096) vs 3.050 (92.27M params, codebook 4096) (-1.329 improvement)。
 
-## 概述
+## 概要
 
 双手运动生成的核心瓶颈在于缺乏高质量、细粒度的双手交互数据与统一的评估协议，导致现有方法难以生成具有精细手指动作、接触时序和双手协调的真实运动。**HandX** 针对这一问题，构建了一个大规模、多层级细粒度文本标注的双手运动数据集（54.2 小时，5.9M 帧，485.7K 条标注），并建立了标准化评估基准。
 
@@ -56,7 +56,7 @@ claims:
 
 本工作的局限性在于：自动标注依赖 LLM 语义理解能力，可能无法完全捕捉极细腻的手指接触语义；数据集虽扩展了双手交互覆盖，但仍限于日常室内活动，对极端姿态或专业技能的泛化性未经验证。开放问题包括如何将手部运动生成无缝扩展至全身运动、缩放规律在更大规模下是否持续有效，以及多模态条件融合的可能性。
 
-## 背景与动机
+
 
 双手灵巧运动生成是具身智能与数字人领域的核心难题。从机器人遥操作、虚拟角色动画到人机交互，系统需要理解并合成高度协调的双手动作——不仅包含腕部轨迹，更涉及每根手指的精细姿态、指尖接触的精确时序以及左右手的空间协调关系。然而，现有方法在这一目标上仍面临根本性瓶颈。
 
@@ -66,7 +66,9 @@ claims:
 
 **HandX 的动机正是填补这一系统性缺口。** 该工作认识到，突破双手运动生成瓶颈需要三个关键要素的协同：大规模、高质量且带有细粒度文本标注的双手交互数据；标准化、可复现的评估基准；以及能够充分利用数据规模和模型容量的生成架构。为此，HandX 构建了统一的数据集与基准平台，整合多源开源数据并采集高保真光学动作捕捉数据，同时提出解耦的运动特征提取与大型语言模型推理相结合的自动标注策略，为双手运动生成模型的训练和评价提供了关键支撑。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 HandX 的核心创新并非提出一个全新的模型架构，而是系统性地解决了双手运动生成中长期存在的**数据瓶颈**与**评估缺失**问题，并在此基础上揭示了**可预测的缩放规律**。其创新点可归纳为三个紧密耦合的“changed slots”。
 
@@ -113,7 +115,7 @@ $$
 
 这些发现为未来双手运动生成模型的资源分配提供了明确的指导原则。
 
-## 整体框架
+
 
 HandX 围绕一个核心瓶颈展开：现有双手运动生成缺乏高质量、细粒度的交互数据与统一的评估协议，导致模型难以捕捉精细手指动作、接触时序和双手协调。为此，HandX 构建了一条从数据到生成再到评估的完整流水线，其因果调节点在于**大规模、多层级细粒度标注的 HandX 数据集**与**标准化的评估基准**。
 
@@ -161,7 +163,7 @@ $$\hat{\pmb{y}} = \text{round}(\sigma(\pmb{y}) \cdot (L - 1)),$$
 ![[assets/figures/papers/paper_list_l31_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_HandX_Scaling_Bi/figures/001_Figure_1.jpg]]
 *Figure 1: (a) We introduce HandX, a large-scale dataset of bimanual and dexterous motions paired with fine-grained textual descriptions. The examples highlight the high-fidelity captures produced by our motion capture system (Figure A), and demonstrate instantiation on a real-world humanoid with dexterous hands. (b) We benchmark two generative paradigms: diffusion-based and autoregressive (AR) models. (c) Our models support flexible conditioning and synthesize highly dynamic, expressive hand motions. (d) We observe clear scaling trends: increasing dataset size and model capacity yields substantial performance gains*
 
-## 核心模块与公式推导
+
 
 ### 问题形式化
 
@@ -234,7 +236,9 @@ $$\text{Rprec} = 0.4391 \times \log_{10}(\text{FLOPs}) - 3.8707$$
 
 扩散模型支持推理时的局部去噪策略：在每一步去噪时，将已知约束条件（如关键帧姿态、腕部轨迹）与当前采样结果混合，实现运动补全、关键帧引导生成、长序列扩展等多种条件生成任务，无需额外训练（Figure 3, Sec. 5.1）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与评估基准
 
@@ -306,7 +310,9 @@ $$\text{Rprec} = 0.4391 \times \log_{10}(\text{FLOPs}) - 3.8707$$
 ![[assets/figures/papers/paper_list_l31_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_HandX_Scaling_Bi/figures/007_Figure_5.jpg]]
 *Figure 5: Qualitative comparison of diffusion models trained with different data scales. The model trained on the full dataset generates more expressive motion with better text alignment*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位与核心贡献边界
 
@@ -376,6 +382,8 @@ HandX 在双手运动生成领域的知识库中占据**基础设施层**的位�
 3. **评估协议的标准化**：特别是接触精度指标的引入，推动领域从"看起来像"向"物理上正确"的评估范式转变。
 
 后续研究可能沿着以下方向展开：（a）在 HandX 基准上探索更高效的模型架构以突破当前缩放饱和点；（b）将 HandX 的自动标注策略迁移至全身运动或物体交互场景；（c）融合多模态条件以提升生成的可控性和真实感；（d）验证缩放规律在更大规模下的持续性和潜在的结构性转变。
+
+
 
 ## 原文 PDF
 

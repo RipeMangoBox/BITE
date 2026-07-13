@@ -5,6 +5,8 @@ paper_level: A
 venue: TOG
 year: 2024
 pdf_ref: paperPDFs/TOG_2024/MoConVQ_Unified_Physics_Based_Motion_Control_via_Scalable_Discrete_Representations.pdf
+project_link: null
+code_link: null
 aliases:
 - MoConVQ
 tags:
@@ -40,7 +42,7 @@ claims:
 > - Human3.6M 上，PA-MPJPE, MPJPE 为 125.6 mm。
 > - Human3.6M (motion quality) 上，运动平滑度 e_smooth 为 3.4。
 
-## 概述
+## 概要
 
 物理仿真角色的运动控制是计算机图形学中的一项长期挑战。传统方法通常需要为每一类运动手工设计奖励函数，并针对特定技能单独训练强化学习（RL）策略，难以扩展到大规模、多样化的运动数据集上。其根本瓶颈在于：**现有的连续潜在表示缺乏语义可解释性，且训练过程依赖不可微的物理模拟器，导致模型容量受限、训练效率低下。**
 
@@ -50,7 +52,7 @@ MoConVQ 针对上述瓶颈，提出了一个统一的、基于物理的运动控
 
 **方法谱系与知识库定位：** MoConVQ 建立在 VAE（Kingma & Welling, 2014）和 VQ-VAE（van den Oord et al., 2017）的基础之上，与同样采用世界模型作为可微模拟器的物理运动生成工作（Won et al., 2022; Yao et al., 2022）最为接近。其关键区别在于用离散码本替代连续潜在空间，并通过残差量化扩展容量，使得运动表示天然具备语义聚类特性，便于后续与 GPT 类自回归模型及大语言模型（LLM）集成。在下游任务中，它与运动学方法 **HybrIK**（Li et al., 2021）、**SimPoE**（Yuan et al., 2021）形成互补，与文本到动作方法 **MDM**（Tevet et al., 2023）、**T2MGPT**（Zhang et al., 2023b）等形成对比。
 
-## 背景与动机
+
 
 在计算机图形学与机器人学中，让物理仿真角色从大规模运动数据中学习多样化的运动技能是一个长期挑战。传统基于物理的角色控制方法通常需要为每一类运动手工设计奖励函数，并额外进行强化学习（RL）训练。这种“一类运动、一套奖励、一次训练”的范式使得系统难以扩展到大规模、非结构化的运动数据集上，也阻碍了统一运动控制框架的构建。
 
@@ -66,7 +68,9 @@ MoConVQ的核心动机是：**能否设计一种统一的运动表示与训练�
 
 这种设计使得MoConVQ能够在统一的框架下覆盖四大应用场景（Figure 1）：运动跟踪、交互控制、文本到动作生成，以及与大语言模型（LLM）的集成。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MoConVQ 的核心突破在于用**离散向量量化（VQ）**替代传统的连续潜在变量，从根本上改变了物理运动控制的表示与训练范式。这一创新并非孤立的技术替换，而是围绕“离散表示”这一因果旋钮，在模型容量、训练策略和下游任务接口三个维度上形成的系统性重构。
 
@@ -99,7 +103,7 @@ $$\hat{\mathbf{a}}^t = \pi(\hat{\mathbf{s}}^t, \mathbf{u}^t), \quad \hat{\mathbf
 
 这种统一范式的关键在于：所有任务共享同一个预训练的物理解码器，运动技能被封装在离散码本中，任务策略只需学习“何时调用哪个运动技能”的组合逻辑，而非从头学习物理控制。这从根本上消除了手工奖励设计的依赖，使得框架能够以统一的方式支持运动跟踪、交互控制、文本到动作生成和 LLM 集成等四种截然不同的应用场景。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l40_https_arxiv_org_abs_2310_10198/figures/001_Figure_1.jpg]]
 *Figure 1: (d) LLM Integration Fig. 1. We present a method for learning discrete motion representation from a large-scale unstructured motion dataset for physics-based characters. The framework allows various applications, including those shown in this figure, to be accomplished in a unified fashion*
@@ -137,7 +141,7 @@ MoConVQ 的统一接口支持两类下游任务配置：
 
 这种设计使得 MoConVQ 成为一个通用运动生成平台：相同的预训练编解码器可服务于多种应用，避免了传统方法中为每类运动手工设计奖励函数并重新训练 RL 策略的繁琐流程。
 
-## 核心模块与公式推导
+
 
 ### 整体流水线
 
@@ -211,7 +215,9 @@ $$ \mathcal{L}_{\mathrm{reg}} = \sum_t w_1 \| \hat{\mathbf{a}}^t - \bar{\mathbf{
 
 与硬性 EMA 后处理不同，此软约束将平滑性纳入优化目标，在保持运动自然度的同时避免过度平滑。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -289,7 +295,9 @@ MoConVQ在超过20小时的大规模无结构运动数据集上进行训练，�
 
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从连续潜在空间到离散运动表征
 
@@ -347,6 +355,8 @@ MoConVQ 的核心贡献在于将物理运动控制统一为**“编码-解码”
 - **LLM 闭环控制：** 如何将环境交互反馈纳入大语言模型的推理循环，使 LLM 能根据仿真结果动态调整动作序列？这涉及将物理仿真状态转化为 LLM 可理解的文本或 token 表示。
 
 - **多模态与多智能体扩展：** 框架能否扩展至多智能体协作场景，以及更丰富的多模态输入（如音乐、语音）驱动？离散码的紧凑性可能使其成为连接不同模态的自然接口。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Multiplayer_Nash_Preference_Optimization.pdf
+project_link: null
+code_link: https://github.com/smiles724/MNPO
 openreview_forum_id: x7aLhLMVn1
 aliases:
 - MMNPO
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 多人纳什偏好优化 |
 | 英文题名 | Multiplayer Nash Preference Optimization |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=x7aLhLMVn1); [GitHub](https://github.com/smiles724/MNPO) |
+| Links | [paper](https://openreview.net/forum?id=x7aLhLMVn1) · [GitHub](https://github.com/smiles724/MNPO) |
 | Topic | #topic/optimization_theory_probabilistic #topic/optimization_theory_probabilistic/optimization_methods |
 | Method | MNPO (Multiplayer Nash Preference Optimization) |
 | Dataset | Arena-Hard, AlpacaEval 2.0 (Llama-3-8B-it) |
@@ -41,7 +43,7 @@ claims:
 > - Arena-Hard 上，Win Rate (WR, %) 为 52.26 (TD-MNPO)，对比 48.03 (INPO)，变化 +4.23。
 > - AlpacaEval 2.0 (Llama-3-8B-it) 上，Length-Controlled Win Rate (LC, %) 为 42.94 (TD-MNPO)，对比 41.48 (INPO)，变化 +1.46。
 
-## 概述
+## 概要
 
 现有基于纳什均衡的偏好优化方法（NLHF）将对齐建模为两人零和博弈，每轮仅在当前策略与单一对手之间进行偏好比较。然而，现实世界中的人类偏好天然具有**多源、异质和非传递性**——不同人群的价值排序可能相互冲突，单一对手的反馈不足以刻画完整的偏好结构。这导致现有方法在优化过程中出现梯度振荡、探索不足，策略难以覆盖多样化的偏好群体。
 
@@ -53,7 +55,7 @@ MNPO包含两种实例化方案：**时间依赖MNPO**（TD-MNPO）将历史策�
 
 **方法定位**：MNPO属于在线偏好优化方法，其核心创新在于将博弈论中的多人博弈框架引入对齐训练。与依赖单一奖励模型的RLHF不同，MNPO直接利用偏好预言（可为LLM法官或奖励模型）进行策略间的比较优化，无需显式奖励建模。其优势在于多人博弈带来的梯度方差降低和偏好覆盖增强，代价是计算开销随玩家数量线性增长。当前局限包括：偏好预言在高性能策略上的区分能力下降、二进制偏好信号在高质量区域的收益递减，以及异质扩展缺乏正式收敛保证。
 
-## 背景与动机
+
 
 ### 从奖励模型到偏好博弈：RLHF 的基本框架
 
@@ -103,7 +105,9 @@ $$J(\pi_i, \{\pi_j\}_{j \neq i}) = \mathbb{E}_{x \sim d_0} [ \mathbb{E}_{y^i \si
 
 通过乘性权重更新，策略迭代收敛至多人博弈的纳什均衡，从而获得更强的鲁棒性和泛化能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MNPO的核心创新在于将偏好优化从**两人零和/一般和博弈**扩展为**多人博弈**，由此引入两个关键的结构性改变，直接回应了现有方法的瓶颈。
 
@@ -149,7 +153,7 @@ $$\pi_i^{(t+1)}(\boldsymbol{y} \mid \boldsymbol{x}) \propto \left( \prod_{j \neq
 
 这些改变的共同效果是：**策略不再针对单一对手过拟合，而是在多样化对手压力下学习更具泛化性的偏好表征**。稳定性实验（Table 7）佐证了这一点——在不同LLM法官下，MNPO的均值最高且标准差较小，表明其对评估方差的鲁棒性优于SFT、DPO和INPO。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_x7aLhLMVn1/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the two-player baseline and our multiplayer MNPO training paradigm*
@@ -186,7 +190,7 @@ MNPO 的训练流程由四个核心模块串联构成：
 
 MNPO 的一个重要性质是其统一性：通过调整玩家数量 $n$、对手集合 $O_\pi$ 和混合权重 $\lambda_j$，可将 DPO、INPO、SPIN 等现有方法恢复为其特例（Table 1）。例如，DPO 对应 $n=2$、$O_\pi=\pi_{\text{ref}}$、$\lambda_j=1$ 的配置，而 INPO 则对应 $n=2$、在线对手的配置。这种统一性揭示了多人框架的通用性，也为理解不同偏好优化方法之间的关系提供了统一视角。
 
-## 核心模块与公式推导
+
 
 ### 3.1 同质多人偏好优化
 
@@ -226,7 +230,9 @@ $$\mathcal{L}_{\mathrm{HT}}^{i,\mathrm{D}}(\pi_i \mid \beta, \{\lambda_j\}, \eta
 
 关键差异在于 $\delta_i^\star$ 是玩家 $i$ 专属奖励模型下的奖励差距，$\mathbb{P}_i$ 为其专属偏好预言。这使得 MNPO 能同时对齐异质甚至冲突的评估维度，趋向一种平衡多维度质量的人口均衡。需要注意的是，异质设定下乘性权重更新的收敛性缺乏形式化保证（见局限性讨论）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -283,7 +289,9 @@ Table 1 展示了 TD-MNPO 如何通过调整玩家数量 $n$、对手集合 $O_\
 ![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_x7aLhLMVn1/figures/010_Table_9.jpg]]
 *Table 9: Various preference optimization objectives given preference data $\mathcal { D }$ = ( x , $y ^ { + } , y ^ { - }$ ) , where x is an input, and $y ^ { + }$ and $y ^ { - }$ are the winning and losing responses. f is a class of divergence functions. $\Gamma$ ( x , y ) is the uncertainty estimator. l is a convex decreasing loss function. $\widehat { P } \left$( y $\succ \pi _ { t } \mid$ x $\right$) is the win rate over the distribution estimated by the average win rate over all the sampled responses $y _ { 1 : K } \sim \pi _ { t } ( \cdot \mid$ x )
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 从两人博弈到多人博弈：统一框架的构建
 
@@ -320,6 +328,8 @@ HT-MNPO 将多人博弈进一步推广至异质偏好预言场景，每个玩家
 3. **对手混合权重的动态调整**：当前 TD-MNPO 使用固定的指数衰减权重混合历史策略，能否设计自适应权重机制，根据近期策略的改进幅度或对手的“挑战性”动态调整，以实现最优收敛速度？
 
 4. **多目标对齐的博弈设计**：在多任务或多维度偏好对齐场景中，如何设计异质对手的配比和交互机制，使得博弈均衡能够同时优化多个相互冲突的目标，而非简单折衷？
+
+
 
 ## 原文 PDF
 

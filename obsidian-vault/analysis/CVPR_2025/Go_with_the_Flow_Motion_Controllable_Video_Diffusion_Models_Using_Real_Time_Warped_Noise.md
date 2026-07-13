@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/Go_with_the_Flow_Motion_Controllable_Video_Diffusion_Models_Using_Real_Time_Warped_Noise.pdf
+project_link: https://eyeline-labs.github.io/Go-with-the-Flow/
+code_link: null
 aliases:
 - GF
 - Go-with-the-Flow
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 随流而动：基于实时变形噪声的运动可控视频扩散模型 |
 | 英文题名 | Go-with-the-Flow: Motion-Controllable Video Diffusion Models Using Real-Time Warped Noise |
 | 会议/期刊 | CVPR 2025 |
-| Links | [paper](https://arxiv.org/abs/2501.08331); [Project](https://eyeline-labs.github.io/Go-with-the-Flow/) |
+| Links | [paper](https://arxiv.org/abs/2501.08331) · [Project](https://eyeline-labs.github.io/Go-with-the-Flow/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | Go-with-the-Flow |
 | Dataset | DAVIS Motion Transfer (I2V, γ=0.5), DAVIS Motion Transfer (T2V), DeepFloyd IF 超分辨率 (图像扩散编辑), DifFRelight 人像重打光 (图像扩散编辑) |
@@ -41,7 +43,7 @@ claims:
 > - DAVIS Motion Transfer (T2V) 上，mIoU ↑ / Optical flow error ↓ 为 0.70 / 0.41，对比 优于所有基线（具体值见表2），变化 N/A。
 > - DeepFloyd IF 超分辨率 (图像扩散编辑) 上，LPIPS ↓ / SSIM ↑ / PSNR ↑ / Warping error ↓ 为 0.29 / 0.88 / 29.39 / 152.04，对比 HIWYN: 0.29 / 0.87 / 29.31 / 164.35，变化 LPIPS: -0.00; SSIM: +0.01; PSNR: +0.08; WE: -12.31。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -68,7 +70,7 @@ Go-with-the-Flow 将预训练视频扩散模型（如 CogVideoX）视为黑箱�
 
 方法需要微调预训练模型，并非完全训练无关的方案。运动控制精度高度依赖光流估计质量，在严重遮挡场景下可能失效。合成光流的用户交互方式难以处理高度复杂的非刚性形变。此外，如何将多种控制信号（文本、音频、人体骨架等）在噪声空间中进行最优解耦与组合，仍是一个开放问题。
 
-## 背景与动机
+
 
 视频扩散模型在生成高质量、多样化的视频内容方面取得了显著进展，但对其运动行为的精确控制仍然是一个开放挑战。现有方法试图通过不同的技术路径解决这一问题，但普遍存在三个结构性瓶颈。
 
@@ -80,7 +82,9 @@ Go-with-the-Flow 将预训练视频扩散模型（如 CogVideoX）视为黑箱�
 
 上述瓶颈的共同症结在于：运动控制信号被注入到了扩散模型的“错误位置”。本文的核心动机正是将运动控制从模型架构层面彻底剥离，将其下沉到扩散过程的初始噪声空间中——通过光流引导的噪声变形，使运动条件完全在噪声层面完成编码，从而将视频扩散模型视为一个无需任何修改的黑箱。这一思路不仅统一了局部物体运动、全局相机运动和运动迁移三类控制场景，还天然保持了与任意扩散模型架构的兼容性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：运动控制的架构侵入性与碎片化
 
@@ -119,7 +123,7 @@ $$\frac{ (1 - \gamma) \mathbf{Q} + \zeta \gamma }{ \sqrt{ (1 - \gamma)^2 + \gamm
 
 消融实验揭示了一个重要的方法论差异（Fig. 14）：**MotionClone** 等基于外观信息传递的方法可能从驱动视频中继承不希望的结构性信息（如多余的风车臂），而 Go-with-the-Flow 仅通过光流变形噪声传递运动信息，避免了外观污染。同时，未微调的 CogVideoX 基础模型直接使用变形噪声初始化时，虽能部分捕捉运动轨迹，但会产生严重视觉伪影，验证了微调对于适应变形噪声分布的必要性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l30_Go_with_the_Flow_Motion_Controllable_Video_Diffusion_Models_Using_Real_T/figures/001_Figure_1.jpg]]
 *Figure 1: Go-with-the-Flow presents a simple, robust, and easy-to-implement method for motion-controllable video diffusion models based on optical flow and noise warping. It only requires fine-tuning video diffusion models as a black box using warped noise patterns. Leveraging our models, we can (1) control the motion of individual objects or parts of those objects, (2) direct the camera movement by providing global flow fields corresponding to the desired movements, and (3) transfer the motion from input videos to target contexts*
@@ -164,7 +168,7 @@ $$\frac{ (1 - \gamma) \mathbf{Q} + \zeta \gamma }{ \sqrt{ (1 - \gamma)^2 + \gamm
 - 扩散模型被视为黑箱，因此该方法与任何视频扩散架构兼容，理论上可即插即用地适配不同的基础模型。
 - 噪声变形算法本身独立于扩散模型的训练过程，仅在数据准备阶段运行一次即可。
 
-## 核心模块与公式推导
+
 
 Go-with-the-Flow 的核心由两个解耦的部分构成：**实时噪声变形算法**与**视频扩散模型微调**。噪声变形算法独立于扩散模型训练过程运行——它仅负责生成具有时间相关性的变形噪声模式，随后这些噪声被用于训练扩散模型。运动控制完全基于噪声初始化实现，不向视频扩散模型引入任何额外参数。
 
@@ -190,7 +194,9 @@ $$\frac{ (1 - \gamma) \mathbf{Q} + \zeta \gamma }{ \sqrt{ (1 - \gamma)^2 + \gamm
 
 变形噪声在图像空间计算，随后通过下采样映射至潜在空间（针对 CogVideoX 为空间 8×8、时间 4 倍下采样）。下采样在时间轴采用最近邻插值，空间轴采用均值池化后乘以 8 以保持单位方差。微调阶段将 CogVideoX 视为黑箱，不改变其架构，仅在变形噪声模式上进行训练。推理时，使用变形噪声初始化确定性采样过程（如 DDIM），由微调后的模型生成运动可控视频。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 噪声变形算法的基准测试
 
@@ -240,7 +246,9 @@ Table 2 在 DAVIS 数据集上对运动迁移任务进行了全面的定量比�
 3. **交互精度**：基于多边形拖拽的用户交互方式在处理高度复杂的非刚性形变时可能不够精细，合成光流的表达能力存在上限。
 4. **控制信号融合**：尚未探索将光流运动控制与其他控制信号（如文本、人体骨架）在噪声空间进行统一复合控制的框架，这仍是一个开放问题。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法定位：噪声空间的运动控制范式
 
@@ -290,6 +298,8 @@ Go-with-the-Flow 的噪声变形算法并非孤立工作，而是处于一条从
 **（3）长序列生成的数值稳定性。** 当前实验主要涉及短视频片段（CogVideoX 的默认帧数）。在大规模视频生成任务中，当序列长度达到数百帧时，噪声变形算法的误差累积效应（每帧的密度追踪和重归一化引入的微小偏差）是否会导致后期帧的噪声分布显著偏离高斯分布，需要进一步的理论分析和实证验证。
 
 **（4）自主运动条件生成。** 当前方法依赖参考视频或用户输入来获取光流。能否设计一种从文本描述直接生成光流场的前置模块，实现完全自主的运动条件生成（类似于文本到光流的翻译），将使方法的应用范围大幅扩展。
+
+
 
 ## 原文 PDF
 

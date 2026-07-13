@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/Training_free_Guidance_in_Text_to_Video_Generation_via_Multimodal_Planning_and_Structured_Noise_Initialization.pdf
+project_link: null
+code_link: null
 aliases:
 - VMMSG
 - TFGTVGMPSNI
@@ -41,7 +43,7 @@ claims:
 > [!tip] 效果简介
 > - T2VCompBench 上，Motion Binding (VideoCrafter2) 0.3732 vs 0.2233 (+0.1499)；Spatial Relationships (VideoCrafter2) 0.5866 vs 0.4891 (+0.0975)；Numeracy (VideoCrafter2) 0.3138 vs 0.2041 (+0.1097)。
 
-## 概述
+## 概要
 
 文本到视频（T2V）扩散模型在生成高质量视频方面取得了显著进展，但在精确控制空间布局与物体轨迹方面仍面临根本性瓶颈。现有基于布局引导的方法通常需要模型微调或在去噪过程中迭代操纵注意力图，这不仅带来高昂的内存开销，还限制了其在大规模模型上的可扩展性。
 
@@ -51,7 +53,7 @@ claims:
 
 在方法谱系上，VIDEO-MSG位于**训练无关的布局引导T2V生成**路径，与基于注意力操纵的方法（如LVD）和基于微调的方法形成对比。其知识贡献在于：将多模态大语言模型（MLLM）的空间推理能力与视觉感知工具（RAM、Grounding-DINO、SAM）的接地能力相结合，通过噪声反转机制将高层布局规划转化为低层噪声先验，实现了无需修改模型内部表示的即插即用式引导。
 
-## 背景与动机
+
 
 文本到视频（T2V）扩散模型近年来取得了显著进展，大规模模型如 **VideoCrafter2** 和 **CogVideoX-5B**（Yang et al., arXiv 2024）已能生成视觉质量较高的视频。然而，仅依赖文本提示的生成方式在精确控制空间布局与物体运动轨迹方面存在根本性瓶颈——模型往往难以忠实地将“左侧的红色气球向右移动”这类空间-运动复合指令转化为准确的像素级表现。
 
@@ -61,7 +63,9 @@ claims:
 
 这一思路将问题从“在生成过程中约束模型”转化为“在生成开始前为模型提供正确的初始化”，其关键控制旋钮是噪声反转比 α——由 LLM 根据文本描述动态推断，决定了初始噪声中保留多少来自视频草图的结构信息。该设计使大规模T2V模型可在推理时无需额外内存即获得训练无关的布局引导，从而突破了现有方法在可扩展性上的瓶颈。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 VIDEO-MSG 的核心创新在于将**布局与运动先验编码为结构化初始噪声**，而非像现有方法那样在去噪过程中迭代修改注意力图。这一设计转变直接回应了当前文本到视频（T2V）生成的核心瓶颈：扩散模型难以精确控制空间布局与物体轨迹，而基于注意力操纵的布局引导方法（如 **LVD**）需要微调或在线迭代计算，导致高内存开销与可扩展性差。
 
@@ -99,7 +103,7 @@ VIDEO-MSG 的布局规划并非凭空生成。它引入了一个关键的**视�
 
 需要指出的是，VIDEO-MSG 的创新集中于**空间布局与运动轨迹的绑定**，在动态属性绑定（Dynamic-attr）、物体动作（Action）和交互（Interaction）类别上提升有限。这是因为边界框引导本质上只能约束物体的空间位置，无法表达物体的状态变化（如“变红”）或物体间的动态交互（如“拿起”）。如何将引导形式从边界框扩展至更丰富的运动表示，是该方法当前未解决的核心问题。此外，$\alpha$ 的 LLM 推断基于启发式提示，缺乏严格优化，在特定文本上可能无法达到最佳平衡——这一点的实验证据尚不充分，需要进一步验证。
 
-## 整体框架
+
 
 VIDEO-MSG 提出一种训练无关的文本到视频（T2V）布局引导范式，其核心思想是将布局与运动先验编码为**结构化初始噪声**，而非在去噪过程中修改注意力图。如图1所示，与单模型生成（a）和基于注意力的布局引导（b）不同，VIDEO-MSG（c）无需微调或推理时额外的注意力操作内存，因此可轻松适配大规模T2V模型。
 
@@ -123,7 +127,7 @@ VIDEO-MSG 提出一种训练无关的文本到视频（T2V）布局引导范式�
 ![[assets/figures/papers/paper_list_l42_https_arxiv_org_abs_2504_08641/figures/002_Figure_2.jpg]]
 *Figure 2: ThrestagesofVDE-MSG.Ithefrststage,theMLMplansspecific globalandlocalcontextsthatfitheprovidedtext-to video prompt.Thetext-to-image(T2)modeluses the MLLMplaedcontexttorender the necessarycomponentsofthevideo.Inthe third stage,we generate video with VIDEO SKETCH via noise inversion*
 
-## 核心模块与公式推导
+
 
 VIDEO-MSG 的核心由三个串行模块构成：**Background Planner**、**Foreground Layout & Trajectory Planner** 和 **Structured Noise Initialization Generator**。前两个模块负责将文本提示转化为包含空间布局与运动轨迹的“视频草图”（VIDEO SKETCH），第三个模块则通过噪声反转将该草图的先验信息注入扩散模型的初始噪声，从而在无需微调或注意力操纵的条件下实现布局引导。
 
@@ -164,7 +168,9 @@ $$z_{t-1} = z_t + \lambda_1 \hat{F}(z_t, t) + \lambda_2 \hat{F}(z_t + \lambda_3 
 ![[assets/figures/papers/paper_list_l42_https_arxiv_org_abs_2504_08641/figures/011_Figure_8.jpg]]
 *Figure 8: Prompt template used to determine how much noise to inject during inversion*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果：T2V-CompBench 主实验
 
@@ -235,7 +241,9 @@ Figure 4 和 Figure 5 的定性示例验证了两个感知模块的关键作用�
 ![[assets/figures/papers/paper_list_l42_https_arxiv_org_abs_2504_08641/figures/004_Figure_3.jpg]]
 *Figure 3: Videos generated with CogVideoX-5Band VIDEO-MSG with CogVideoX-5Bbackbone.The videos generated with VIDEO-MSG are more accurate regarding object motions, numeracy,and spatial relationships*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 训练无关引导：推理时布局控制的范式转移
 
@@ -299,6 +307,8 @@ VIDEO-MSG 在 T2V 生成控制的知识谱系中占据**训练无关、推理时
 - **多模态规划方法**：VIDEO-MSG 将 MLLM 的空间推理能力与视觉感知工具（RAM、Grounding-DINO）结合，形成“接地”（grounding）的规划范式——这与纯文本规划形成对比。
 
 未来工作的核心挑战在于：如何在保持训练无关和内存高效的前提下，将控制表示从边界框扩展到更丰富的运动语义，并降低对重型感知模型的依赖。
+
+
 
 ## 原文 PDF
 

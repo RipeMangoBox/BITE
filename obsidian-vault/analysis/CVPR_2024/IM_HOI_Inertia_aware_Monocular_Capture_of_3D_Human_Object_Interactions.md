@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2024
 pdf_ref: paperPDFs/CVPR_2024/IM_HOI_Inertia_aware_Monocular_Capture_of_3D_Human_Object_Interactions.pdf
+project_link: null
+code_link: null
 aliases:
 - IMH
 - IMHIAMC3HOI
@@ -40,7 +42,7 @@ claims:
 > - IMHD2 (快速交互序列) 上，CD per-frame (人体/物体) [cm] 6.50 / 6.93 vs CHORE 14.20 / 16.81 (-7.70 / -9.88)。
 > - Runtime (推理速度) 上，每帧推理时间 (s) ~0.5 vs VisTracker ~20 (快约40倍)。
 
-## 概述
+## 概要
 
 **核心问题**：现有单目人体-物体交互（HOI）捕捉方法在遮挡、深度模糊及快速运动条件下，对物体位姿的鲁棒估计能力严重不足，成为制约复杂交互场景整体捕捉精度的瓶颈。
 
@@ -51,8 +53,6 @@ claims:
 - 全流水线（含网格对齐反馈、轻量优化及扩散滤波）相比朴素实现性能提升约4倍（Section 5.3）。
 - 推理速度约0.5秒/帧，显著优于 **VisTracker**（Xie et al., CVPR 2023）的约20秒/帧及CHORE的约1分钟/帧（Runtime Cost 段落）。
 - 输入模态消融实验表明，引入IMU信号后各基线方法跟踪精度均有提升，而本文的多模态深度融合方法在此基础上达到最优（Table 4）。
-
-## 背景与动机
 
 ### 问题背景：单目三维人物-物体交互捕捉
 
@@ -80,7 +80,7 @@ claims:
 
 该范式将“鲁棒跟踪”与“运动细化”解耦，使第一阶段专注于利用多模态信号实现遮挡鲁棒的位姿估计，第二阶段则利用数据驱动的交互先验校正残差并补全细节，从而在最小化传感器配置下实现高精度、高效率的交互运动捕捉。
 
-## 核心创新
+## 核心方法与创新机理
 
 I’m-HOI 的核心创新在于将单目三维人物-物体交互（HOI）捕捉问题重新定义为一个**惯性感知的多模态融合问题**，并通过“通用推断-类别细化”的两阶段范式加以解决。相较于现有纯视觉方法，该方法在三个关键维度上实现了根本性改变：传感器模态、人体-物体跟踪范式，以及运动细化策略。
 
@@ -106,8 +106,6 @@ I’m-HOI 引入**类别特定的交互扩散滤波器**，将运动细化建模
 
 上述三个创新点并非孤立存在，而是形成了一条完整的因果链路：IMU模态的引入解决了遮挡下的鲁棒性问题（传感器层），整体联合跟踪实现了人体与物体运动的协同推断（范式层），扩散滤波器则利用学习到的交互先验对结果进行精细化校正（后处理层）。消融实验证实，完整的I’m-HOI流水线（包含网格对齐反馈、优化模块和扩散滤波）相比朴素的直接回归实现，性能提升约4倍（Section 5.3）。
 
-## 整体框架
-
 I’m-HOI 采用 **两阶段解耦范式**，将单目 RGB 视频与物体端单 IMU 信号的多模态融合问题，分解为通用交互运动推断与类别特定运动细化两个串行阶段。该设计的核心动机在于：IMU 为物体运动提供遮挡鲁棒的位姿先验，而 RGB 流则承载丰富的视觉上下文；两阶段分工使得第一阶段专注于从原始传感器数据中端到端地恢复粗糙但全局一致的人-物运动，第二阶段则利用学习到的交互流形对粗糙结果进行去噪、校正与手部补全，从而在最小化传感器配置下实现高精度、生动的交互运动捕捉。
 
 **输入与预处理**：系统输入为一段单目 RGB 视频 $I_{1:T}$ 及同步的物体端 IMU 信号（加速度与角速度）。预处理阶段利用 SAM 生成人体与物体掩码，并通过预训练 ResNet-34 提取图像特征，为后续模块提供结构化的视觉先验。
@@ -122,11 +120,6 @@ I’m-HOI 采用 **两阶段解耦范式**，将单目 RGB 视频与物体端单
 
 ![[assets/figures/papers/paper_list_l1721_I_M_HOI_Inertia_aware_Monocular_Capture_of_3D_Human_Object_Interactions/figures/002_Figure_2.jpg]]
 *Figure 2: The pipeline of I’m-HOI. Assuming video and inertial measurements input, our approach consists of a general interaction motion inference module (Sec. 3.1) and a category-specific interaction diffusion filter (Sec. 3.2) to capture challenging interaction motions*
-
-![[assets/figures/papers/paper_list_l1721_I_M_HOI_Inertia_aware_Monocular_Capture_of_3D_Human_Object_Interactions/figures/001_Figure_1.jpg]]
-*Figure 1: Taking a monocular RGB video and a single inertial measurement unit (IMU) sensor recording, our approach, I’m-HOI, efficiently and robustly captures challenging and dynamic human-object interactions (HOI), such as skateboarding*
-
-## 核心模块与公式推导
 
 I’m-HOI 将单目三维人物-物体交互捕捉解耦为两个核心阶段：**通用交互运动推断**（General Interaction Motion Inference）与**类别特定交互扩散滤波**（Category-specific Interaction Diffusion Filter）。前者以端到端方式联合恢复人体-物体的空间排布，后者在学习的交互流形上对粗糙结果进行去噪与手部动作补全。
 
@@ -206,7 +199,7 @@ $$
 ![[assets/figures/papers/paper_list_l1721_I_M_HOI_Inertia_aware_Monocular_Capture_of_3D_Human_Object_Interactions/figures/008_Table_4.jpg]]
 *Table 4: Quantitative evaluations on input modality configurations*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -254,12 +247,7 @@ I’m-HOI 在自建数据集 IMHD2 上与多个代表性基线方法进行了定
 ![[assets/figures/papers/paper_list_l1721_I_M_HOI_Inertia_aware_Monocular_Capture_of_3D_Human_Object_Interactions/figures/005_Figure_4.jpg]]
 *Figure 4: Qualitative 3D capturing results of I’m-HOI on IMHD2 dataset. Each sample includes an RGB image input, captured motion from camera view, and side-view visualization*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1721_I_M_HOI_Inertia_aware_Monocular_Capture_of_3D_Human_Object_Interactions/figures/003_Figure_3.jpg]]
-*Figure 3: We exhibit selected highlights of*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 传感器融合范式的演进定位
 

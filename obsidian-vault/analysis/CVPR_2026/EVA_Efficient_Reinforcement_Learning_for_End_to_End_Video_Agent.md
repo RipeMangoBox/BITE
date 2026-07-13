@@ -42,7 +42,7 @@ claims:
 > - LongVideoBench 上，Acc (%) 55.0 vs 52.9 (FrameThinker) (+2.1)。
 > - MLVU 上，Acc (%) 68.3 vs 60.2 (Video-R1) (+8.1)。
 
-## 概述
+## 概要
 
 长视频理解面临一个根本瓶颈：主流多模态大模型（MLLM）将视频视为被动识别对象，采用统一帧采样策略，导致计算冗余严重且推理效率有限，无法自适应地聚焦于与查询相关的关键片段。**EVA** 针对这一瓶颈，提出从“先感知后推理”到**先规划后感知**的范式转变——智能体在仅接收文本查询的阶段就决定“看什么、何时看、如何看”，通过迭代的**总结–规划–行动–反思**循环和灵活的多参数帧选择工具，自主分配视觉Token预算，在保持高精度的同时大幅削减计算开销。
 
@@ -57,7 +57,7 @@ claims:
 
 **方法定位**：EVA 属于端到端视频智能体方法，与 **VideoAgent**（依赖手工设计流程）和 **FrameThinker**（固定工作流、有限帧选择灵活性）等早期智能体方法相比，其核心差异在于将主动视频理解形式化为马尔可夫决策过程（MDP），并通过强化学习端到端优化策略，而非依赖硬编码规则。与统一采样框架（如 Qwen2.5-VL、LongVA）相比，EVA 从“被动识别”转向“主动规划感知”，实现了视觉Token的动态分配。
 
-## 背景与动机
+
 
 视频理解正从静态图像分析向长视频推理快速演进。当视频时长从数十秒扩展到数千秒时，传统多模态大语言模型（MLLM）面临一个根本性瓶颈：**统一帧采样导致的冗余计算与有限推理效率**。现有方法将模型视为被动识别器——先对视频进行均匀采样，再将所有帧编码为视觉Token后输入模型进行推理。这种“先感知后推理”的范式在长视频场景下暴露了两个致命缺陷：
 
@@ -83,7 +83,9 @@ claims:
 
 这一框架将视频理解重新定义为**主动信息获取问题**，而非被动的内容识别任务，为长视频推理开辟了新的效率-精度平衡空间。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 EVA 的核心创新在于将视频理解从**被动识别范式**扭转为**主动感知范式**，并通过强化学习赋予智能体自主分配视觉 Token 预算的能力。其关键变化槽位（changed slots）体现在三个层面：
 
@@ -116,7 +118,7 @@ EVA 提出了**先规划后感知**范式（Figure 1, Section 1）。智能体�
 
 消融实验（Table 2, Figure 4）证实了这一三阶段序列的有效性：SFT→KTO→GRPO 逐步提升性能，GRPO 模型学会了更精打细算的多轮推理，在保持甚至提升准确率的同时显著降低帧消耗。此外，GRPO 训练中混合多项选择题和开放式问题的数据比单一类型数据更有效，有效防止了奖励黑客行为（Figure 5）。
 
-## 整体框架
+
 
 EVA 将主动视频理解问题形式化为一个**马尔可夫决策过程（MDP）**，并在此基础上构建了一个**先规划后感知**的端到端智能体框架。其核心工作流由四个模块构成的迭代循环驱动：**总结 → 规划 → 行动 → 反思**。
 
@@ -159,7 +161,7 @@ EVA 的训练并非一步到位，而是通过三个递进阶段逐步塑造智�
 ![[assets/figures/papers/paper_list_l2310_https_arxiv_org_abs_2603_22918/figures/012_Figure_8.jpg]]
 *Figure 8: Cold Start Data Pipeline*
 
-## 核心模块与公式推导
+
 
 ### 2.1 先规划后感知的MDP形式化
 
@@ -220,7 +222,9 @@ $$r _ { \mathrm { r o u g e } } = \frac { 1 } { 3 } \big ( R _ { 1 } + R _ { 2 }
 
 ![[assets/figures/papers/paper_list_l2310_https_arxiv_org_abs_2603_22918/figures/002_Table.jpg]]
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -292,10 +296,10 @@ EVA以**Qwen2.5-VL-7B-Instruct**为基础模型，采用三阶段训练策略：
 ![[assets/figures/papers/paper_list_l2310_https_arxiv_org_abs_2603_22918/figures/014_Figure_9.jpg]]
 *Figure 9: EVA statistics across rounds*
 
-![[assets/figures/papers/paper_list_l2310_https_arxiv_org_abs_2603_22918/figures/001_Figure_1.jpg]]
-*Figure 1: Given a question that requires the MLLM to figure out action sequences from an extremely long video (over 6600 seconds), the traditional uniformed sampling method is limited by the content length of the MLLM, and it is extremely hard for it to sample all the keyframes to answer the question correctly. As for the Traditional Agentic Method, the agent will also be given the uniformly sampled frames along with the video, which already occupy a lot of context. Although the agent can call tools to extract frames from a specific time range, the tool is rigid and the agent cannot adjust the fps and resolution, which leads to potential information loss. However, in EVA, the agent can arrange the to...*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 范式转变：从“先感知后推理”到“先规划后感知”
 
@@ -334,6 +338,8 @@ EVA 开辟了若干值得深入探索的方向：
 - **跨模态记忆与迁移**：如何将一次视频理解任务中积累的视觉知识迁移到相关任务，实现跨查询的记忆共享？
 
 这些问题的解决将推动视频理解智能体从“单次查询–单次响应”走向“持续学习–累积理解”的新阶段。
+
+
 
 ## 原文 PDF
 

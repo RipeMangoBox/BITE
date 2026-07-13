@@ -42,7 +42,7 @@ claims:
 > - SemanticKITTI 上，FRD↓ 245.73 vs 262.85 (R2DM) (-6.5%)；FPD↓ 10.92 vs 12.06 (R2DM) (-9.5%)。
 > - nuScenes (Temporal) 上，TTCE↓ (interval 3) 2.63 vs 2.65 (LiDARCrafter) (-0.02)。
 
-## 概述
+## 概要
 
 现有LiDAR场景生成方法（如**LiDARGen** (Zyrianov et al., ECCV 2022)、**R2DM** (Nakashima & Kurazume, ICRA 2024)、**LiDM** (Ran et al., CVPR 2024)等）在生成过程中对所有空间区域同等处理，忽视了真实场景中不同位置的不确定度差异——远距离点、遮挡边界、小物体和语义模糊区域天然具有更高的感知难度和几何歧义性。这种“均匀生成”假设导致高不确定度区域出现几何伪影和时间不稳定性，限制了生成数据的可靠性与下游感知任务的泛化能力。
 
@@ -50,7 +50,7 @@ U4D的核心洞察在于：**将不确定度建模显式嵌入生成框架，以
 
 实验结果表明，U4D在多个基准上显著优于现有方法：在nuScenes数据集上，FRD达到223.96，相较R2DM的253.80相对提升约11.8%；在SemanticKITTI上，FPD为10.92，优于R2DM的12.06；时间一致性指标TTCE在所有帧间隔上均取得最优。更重要的是，U4D生成的数据能有效提升下游语义分割性能（1%标签设定下mIoU达65.3%，超过R2DM的64.1%），并显著降低分割模型的预期校准误差（ECE），提升预测置信度的可靠性。消融实验进一步证实了香农熵不确定度选择策略和MoST自适应融合设计的有效性。
 
-## 背景与动机
+
 
 自动驾驶系统对环境的精确感知依赖于高质量的LiDAR点云数据。然而，真实世界的数据采集不仅成本高昂，还面临长尾场景覆盖不足、标注稀缺等瓶颈。近年来，基于扩散模型的LiDAR场景生成方法（如**LiDARGen** (Zyrianov et al., ECCV 2022)、**R2DM** (Nakashima & Kurazume, ICRA 2024)、**LiDM** (Ran et al., CVPR 2024) 等）在合成静态场景方面取得了显著进展，但它们普遍存在一个根本性缺陷：**对所有空间区域同等处理，忽略了真实场景中不同位置的不确定度差异**。
 
@@ -63,7 +63,9 @@ U4D的核心洞察在于：**将不确定度建模显式嵌入生成框架，以
 
 U4D的动机正是源于这一观察：**将不确定度建模显式嵌入生成框架，以“由难到易”的策略重建场景**。其核心直觉在于，如果能让模型优先处理最不确定的区域，并将这些区域的精细几何作为结构锚点，再以此为先验补全整个场景，就能在提升局部保真度的同时增强全局一致性。这一思路将不确定度从需要回避的噪声转化为驱动生成的结构先验，从根本上改变了LiDAR场景生成的范式。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 U4D 的核心创新在于将**空间不确定度显式建模**引入 LiDAR 序列生成框架，通过“由难到易”的两阶段扩散策略和混合时空特征融合，系统性地解决了现有方法对全场景同等处理所带来的几何伪影与时间不稳定问题。以下从三个 changed slots 展开其创新机制。
 
@@ -113,7 +115,7 @@ $$\mathcal{L}_{\mathrm{reg}, i} = \frac{\mathrm{Var}(\alpha_i^s)}{(\mathbb{E}[\a
 
 三个 changed slots 形成递进式协同：不确定度估计为生成提供“难易”先验，两阶段扩散利用该先验优化容量分配，MoST 模块则将这种优化从空间维度扩展到时序维度。Table 4 显示，U4D 生成的数据在 1% 标签的 nuScenes 分割任务上使 MinkUNet 的 mIoU 达到 65.3%，超过 R2DM 的 64.1%；Table 5 表明其使分割模型的预期校准误差（ECE）从 4.57% 降至 2.72%，证明不确定度感知的生成能够有效提升下游模型的置信度校准。
 
-## 整体框架
+
 
 U4D 的整体设计围绕一个核心洞察展开：**真实 LiDAR 场景中不同空间位置的不确定度天然存在差异**——远距离点、遮挡边界、小物体和语义模糊区域对感知系统构成更大挑战，而现有生成框架（如 **R2DM** (Nakashima & Kurazume, ICRA 2024)、**LiDARGen** (Zyrianov et al., ECCV 2022) 等）对所有区域同等对待，导致高不确定度区域出现几何伪影和时间不稳定。
 
@@ -153,7 +155,7 @@ U4D 的整体设计围绕一个核心洞察展开：**真实 LiDAR 场景中不�
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2512_02982/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of the proposed U4D framework for uncertainty-aware LiDAR scene generation. (a) U4D first estimates the spatial uncertainty maps, highlighting regions that are challenging for perception, such as distant or partially occluded objects, smallscale instances, and semantically ambiguous areas. (b) Conditioned on these uncertainty regions, U4D performs scene completion in a “hard-to-easy” manner, progressively reconstructing the entire scene with enhanced fidelity in uncertain regions. (c) The generated uncertainty-aware scenes can further benefit downstream perception tasks by improving robustness and recognition performance*
 
-## 核心模块与公式推导
+
 
 U4D 的核心设计围绕三个关键模块展开：空间不确定度估计、由难到易的两阶段扩散生成、以及混合时空（MoST）特征融合。以下逐一拆解其公式与变量含义。
 
@@ -214,7 +216,9 @@ $$\mathcal{L}_{\mathrm{reg}, i} = \frac{\mathrm{Var}(\alpha_i^s)}{(\mathbb{E}[\a
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2512_02982/figures/003_Figure_3.jpg]]
 *Figure 3: Illustration of the Mixture of Spatio-Temporal (MoST) block. It decomposes features along spatial and temporal dimensions and adaptively fuses them to maintain both spatial fidelity and temporal coherence. Near the network input and output, MoST emphasizes spatial cues, while in intermediate layers it focuses more on temporal dynamics*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能：场景级生成质量
 
@@ -291,7 +295,9 @@ U4D生成的数据对下游语义分割任务具有显著的增强效果。
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2512_02982/figures/011_Table_8.jpg]]
 *Table 8: Ablation study on the efficiency of generative models. The table reports the average inference time per frame (I.T., in seconds). “DM” refers to the diffusion model*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题谱系：从2D/3D生成到4D世界建模
 
@@ -332,6 +338,8 @@ U4D的有效性依赖于以下前提条件，这些条件也划定了其适用�
 - **长序列生成的稳定性。** 如何将生成跨度扩展至数十帧甚至更长，同时保持物体运动轨迹的物理合理性和场景演化的时间一致性？这可能需要在MoST模块中引入更显式的运动建模或循环一致性约束。
 
 - **域外泛化与稀有事件生成。** 如何提升对训练分布尾部的覆盖能力？可考虑引入检索增强生成（从训练集中检索相似稀有事件作为条件）或物理仿真先验来补充数据驱动建模的不足。
+
+
 
 ## 原文 PDF
 

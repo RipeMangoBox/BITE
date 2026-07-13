@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/PALC_Preference_Alignment_via_Logit_Calibration.pdf
+project_link: null
+code_link: https://github.com/s4n9hyun/PALC
 openreview_forum_id: 0cmuYj3WeG
 aliases:
 - PALC
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | PALC：基于Logit校准的偏好对齐 |
 | 英文题名 | PALC: Preference Alignment via Logit Calibration |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=0cmuYj3WeG); [GitHub](https://github.com/s4n9hyun/PALC) |
+| Links | [paper](https://openreview.net/forum?id=0cmuYj3WeG) · [GitHub](https://github.com/s4n9hyun/PALC) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/diffusion_image_video |
 | Method | PALC |
 | Dataset | HH-RLHF |
@@ -41,7 +43,7 @@ claims:
 > - HH-RLHF 上，Win+1/2 Tie (%) vs. DPO 为 41.17%，对比 DPO，变化 -8.83%。
 > - HH-RLHF 上，Win+1/2 Tie (%) vs. CAA 为 77.17%，对比 CAA，变化 +27.17%。
 
-## 概述
+## 概要
 
 当前大语言模型的对齐方法主要分为两类：训练时对齐（如基于人类反馈的强化学习）和测试时对齐（如表征工程与引导解码）。测试时对齐因其无需重训、可即插即用的灵活性而备受关注，但现有方法面临两个核心瓶颈：**隐藏状态中的特征叠加**使得直接操纵隐藏空间会引发非预期的级联副作用；**外部奖励模型**的高计算开销则阻碍了高效部署。
 
@@ -53,7 +55,7 @@ PALC 提出了一种范式转换——将干预点从纠缠的隐藏空间转移
 
 实验表明，PALC 在 HH-RLHF 有益/无害偏好基准上对基础模型的综合胜率达到 58.17%（+8.17%），显著优于表征工程方法 CAA（77.17% 胜率）和 RE-Control（61.67% 胜率），与训练时对齐方法 DPO 的差距仅为 -8.83%。在外部基准 MT-Bench 上，PALC 的长度控制胜率（61.9%）超越了计算开销更高的 GenARM（58.7%）。消融实验进一步揭示：瓶颈维度 B=256 为最优，扩展至 B=4096 会导致胜率崩溃至 18.3%——谱分析验证了此时奇异值衰减指数 α=0.73<1，违反了稀疏学习的理论条件，从而解释了超宽瓶颈的性能退化机制。
 
-## 背景与动机
+
 
 大型语言模型（LLM）的对齐是确保其输出符合人类偏好的核心挑战。现有对齐范式大致分为两类：训练时对齐（如基于人类反馈的强化学习 RLHF 和直接偏好优化 DPO）通过微调模型参数来内化偏好，但计算成本高昂且对齐目标固化于模型权重中，无法在推理时灵活调整。测试时对齐方法试图解决这一灵活性缺口，通过在推理阶段干预模型行为来实现可控生成，但其有效性受制于两个根本性瓶颈。
 
@@ -63,7 +65,9 @@ PALC 提出了一种范式转换——将干预点从纠缠的隐藏空间转移
 
 **核心动机：寻找解纠缠的干预接口。** 上述瓶颈指向一个关键问题：是否存在一个天然解纠缠的空间，使得偏好干预既能避免隐藏空间操纵的副作用，又能以极低的计算开销实现灵活可控的对齐？PALC 的回答是将干预点从纠缠的隐藏空间转移到词汇空间（logit space）。词汇空间的每个维度唯一对应一个token，提供了天然解纠缠的接口——修改第 $i$ 个logit对第 $j$ 个token概率的影响由梯度关系 $\frac{\partial p_i}{\partial l_j} = p_i (\delta_{ij} - p_j)$ 精确刻画，使得干预效果可控且可解释。基于这一洞察，PALC 通过一个轻量级瓶颈架构从冻结的隐藏状态中提取低维偏好信号，在词汇空间生成校准向量，以仅 0.13% 的额外参数和近乎无开销的推理延迟，实现了运行时可调的偏好对齐。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PALC 的核心创新在于将偏好对齐的干预点从**纠缠的隐藏空间**迁移到**天然解纠缠的词汇空间**，并通过瓶颈架构实现参数高效、运行时可调的测试时对齐。
 
@@ -105,7 +109,7 @@ $$\mathcal{L} = -\mathbb{E}_{(x, y_w, y_l) \sim \mathcal{D}} \left[ \log \sigma 
 
 谱分析揭示了瓶颈架构的必要性：校准矩阵 $M = W_{\mathrm{up}} W_{\mathrm{down}}$ 的奇异值呈幂律衰减 $\sigma_i \sim i^{-\alpha}$。最优配置 $B=256$ 满足稀疏学习条件 $\alpha = 1.02 \pm 0.01 > 1$，而失败配置 $B=4096$ 违反此条件（$\alpha = 0.73 \pm 0.01$），导致胜率崩溃至 18.3%、响应质量降至 2.15/10.0。这表明瓶颈不仅是参数效率的手段，更是**架构层面的必要正则化器**，强制偏好信号集中在低维流形上。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0011_0cmuYj3WeG_PALC_Preference_Alignment_via_Logit_Calibration/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the PALC framework. Unlike conventional representation steering methods that intervene in entangled hidden spaces, PALC treats the base model’s hidden states ht strictly as a read-only context. A lightweight Calibration Module (θ) extracts essential preference signals through a bottleneck architecture ( $\bar { W } _ { \mathrm { d o w n } } , W _ { \mathrm { u p } }$ ) to generate calibration vectors mt in the disentangled logit space. This decoupling ensures precise preference alignment with minimal computational overhead and preserves the base model’s general capabilities
@@ -123,7 +127,7 @@ PALC 的设计动机源于现有测试时对齐方法的两大瓶颈：**隐藏�
 
 瓶颈维度 $B=256$ 是关键设计选择——仅引入 9.2M 额外参数（占 7B 模型的 0.13%），推理延迟仅为基线的 1.08 倍。单个缩放因子 $\gamma$ 可在推理时连续调节对齐强度，无需重新训练：$\gamma=1.0$ 时性能最优，$\gamma$ 取负值则可将模型推向反对齐方向。
 
-## 核心模块与公式推导
+
 
 ### 3.1 词汇空间干预：从纠缠到解纠缠
 
@@ -175,7 +179,9 @@ $$d_{\mathrm{eff}} = \frac{(\sum_{i=1}^B \sigma_i)^2}{\sum_{i=1}^B \sigma_i^2}$$
 
 该指标验证了偏好信号确实集中在极低维流形上，为瓶颈架构提供了谱分析层面的理论支撑[Section A.1.1]。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果：HH-RLHF 上的成对比较
 
@@ -254,7 +260,9 @@ Figure 4 展示了 PALC 在 MT-Bench 上的泛化性能。在长度控制（LC�
 3. **规模泛化未验证**：所有实验基于 7B 模型，PALC 的瓶颈稀疏性假设在大规模模型（如 70B）上是否依然成立尚待验证。
 4. **$\gamma$ 的最优值依赖任务**：$\gamma = 1.0$ 的最优性是在 HH-RLHF 上确定的，不同任务可能需要不同的缩放强度，当前缺乏自适应调节机制。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有方法的本质差异
 
@@ -287,6 +295,8 @@ PALC在测试时对齐方法谱系中的核心定位在于**干预点的转移**
 3. **大规模验证与稀疏性假设的普适性**。在大规模模型（如70B）和更丰富的偏好数据集（如Anthropic HH、Red-Teaming prompts）上，瓶颈稀疏性假设（α>1）是否依然成立？如果成立，最优瓶颈维度B是否随模型规模变化？
 
 4. **词汇空间校准的泛化能力**。词汇空间校准方法能否泛化到其他对齐范式（如针对事实性的校准、减少幻觉）？其可解释性优势——每个logit修改对应一个明确token——如何被进一步利用于对齐审计和调试？
+
+
 
 ## 原文 PDF
 

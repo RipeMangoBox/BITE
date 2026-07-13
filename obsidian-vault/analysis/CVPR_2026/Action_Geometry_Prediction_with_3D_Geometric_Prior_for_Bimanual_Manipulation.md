@@ -44,15 +44,13 @@ claims:
 > - RoboTwin 2.0 Sync-bimanual Tasks (8 tasks) 上，平均成功率 (%) 51.3 vs 47.6 (Xu et al.) (+3.7)。
 > - RoboTwin 2.0 Seq-coordinate Tasks (8 tasks) 上，平均成功率 (%) 50.4 vs (最佳基线未摘录) (N/A)。
 
-## 概述
+## 概要
 
 双臂协同操作是机器人学习中的核心挑战。现有模仿学习策略主要分为两条技术路线：基于二维视觉的方法（如**ACT** (Zhao et al., arXiv 2023)、**Diffusion Policy** (Chi et al., IJRR 2023)）从多视角RGB中隐式学习三维表征，但缺乏显式的空间推理能力；基于三维点云的方法（如**DP3** (Ze et al., RSS 2024)、**G3Flow** (Chen et al., CVPR 2025)）虽具备几何感知，却依赖相机标定和预设工作空间裁剪点云，泛化性与可扩展性受限。两条路线的共同瓶颈在于：策略无法在动作生成过程中主动预测场景几何的演变，导致空间感知薄弱、双臂协调性差。
 
 本文提出**GAP（Action-Geometry Prediction）**，一种基于预训练三维几何先验的双臂操作动作-几何联合预测框架。其核心洞察是：利用预训练的三维几何基础模型作为感知骨干，将几何潜变量、二维语义特征与本体感知状态融合为统一的条件上下文，通过扩散模型同时输出未来动作块和未来三维点图潜变量。这一设计迫使策略在生成动作的过程中“想象”场景几何的未来状态，从而获得物理一致的空间感知和动作协同，且仅需RGB输入，彻底避免显式点云或复杂标定。
 
 在RoboTwin 2.0仿真基准上，GAP在优势手选择任务（16项）上平均成功率达63.2%，优于DP3（61.2%）和G3Flow（60.7%）；在同步双臂任务（8项）上达51.3%，超过**Xu et al.** (CVPR 2025) 的47.6%和G3Flow的45.8%，尤其在悬挂杯子等需要精细三维推理的任务上大幅领先。消融实验证实，移除未来三维点图预测后成功率从25.1%降至23.6%，验证了联合几何预测是性能的主要驱动力。在真实机器人实验中，GAP以40.0%的平均成功率远超ACT（23.8%）、Diffusion Policy（25.0%）和Xu et al.（32.5%），展现出较强的泛化能力。
-
-## 背景与动机
 
 双臂操作是机器人灵巧作业的核心能力，其本质挑战在于：机器人必须同时理解三维空间几何关系、语义对象属性以及双臂间的协调约束，才能生成物理一致的动作序列。然而，当前主流的双臂模仿学习策略在三维感知能力上存在根本性瓶颈。
 
@@ -68,7 +66,7 @@ claims:
 
 本文的核心动机在于提出一个根本性的问题：**能否在仅使用RGB输入、无需显式点云或复杂标定的条件下，赋予策略真正的三维感知能力？** 这要求策略不仅感知当前场景的三维几何，还能预测未来几何状态的演变，从而在动作生成过程中获得物理一致的空间感知和动作协同。实现这一目标的关键在于利用预训练的三维几何基础模型作为感知先验，将几何推理能力注入模仿学习框架，彻底避免对显式三维传感器或标定流程的依赖。
 
-## 核心创新
+## 核心方法与创新机理
 
 本文的核心洞察在于：**将未来三维几何预测显式地嵌入双臂模仿学习的扩散策略中**，使模型在生成动作的同时“想象”场景几何的演变，从而获得物理一致的空间感知与双臂协同能力。这一设计直接回应了现有方法的根本瓶颈——二维策略缺乏三维推理，而三维策略依赖昂贵且不可靠的标定点云。
 
@@ -91,8 +89,6 @@ $$x_0 = \{ a_{t:t+N}, \mathbf{f}_{t+N}, P_{t+N} \}$$
 ### 数据效率的结构性优势
 
 预训练基础模型的引入带来了显著的数据效率提升。Figure 4显示，本文方法在低数据量下即超越二维方法，且随着数据增加持续优于DP3。这一优势源于预训练模型已编码丰富的几何与语义先验，使策略学习无需从零构建空间理解。
-
-## 整体框架
 
 GAP 是一个多模态条件生成模型，其核心设计目标是在不依赖显式点云或复杂标定的条件下，赋予双臂操作策略显式的三维几何推理能力。如图2所示，系统以时序RGB图像和本体感知状态为输入，通过三条并行的感知通路提取互补特征，经Transformer融合后，由一个联合扩散解码器同时预测未来动作块和未来三维几何潜变量。
 
@@ -134,8 +130,6 @@ GAP 是一个多模态条件生成模型，其核心设计目标是在不依赖�
 
 ![[assets/figures/papers/paper_list_l2633_https_arxiv_org_abs_2602_23814/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of our method. Given a sequence of past RGB frames, the current image, and proprioceptive state, our model extracts 3D geometric features, 2D semantic features, and robot state embeddings through three parallel encoders. These signals are fused by a Transformer into a unified semantic and geometric context that conditions a joint denoising process. A conditional diffusion decoder then predicts both a future action chunk and a future 3D latent, which is further decoded into a dense pointmap*
-
-## 核心模块与公式推导
 
 ### 问题形式化
 
@@ -195,7 +189,7 @@ $$\hat{x}_0 = \{ \hat{a}_{t:t+N}, \hat{\mathbf{f}}_{t+N}, P_{t+N} \} \tag{8}$$
 2. **联合预测的规约效应**：未来点图预测并非用于在线规划，而是作为辅助任务迫使感知编码器学习几何一致的表征。消融实验证实，移除该预测目标后平均成功率从25.1%降至23.6%，验证了联合三维预测是性能的核心驱动力。
 3. **伪真值离线提取**：训练所需的 $\mathbf{f}_{t+N}$ 和 $P_{t+N}$ 由预训练的π3模型离线预提取，这增加了训练流程的复杂性，且对预训练模型的稳定性敏感——这是方法的一个已知局限。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心发现与定量结果
 
@@ -237,19 +231,7 @@ $$\hat{x}_0 = \{ \hat{a}_{t:t+N}, \hat{\mathbf{f}}_{t+N}, P_{t+N} \} \tag{8}$$
 ![[assets/figures/papers/paper_list_l2633_https_arxiv_org_abs_2602_23814/figures/006_Table_3.jpg]]
 *Table 3: Comparison on Seq-coordinate Tasks (8 tasks). Sequential coordination tasks requiring multi-step bimanual cooperation. We report the mean and standard deviation of success rates averaged over 3 random seeds. Best score in bold, second-best underlined*
 
-![[assets/figures/papers/paper_list_l2633_https_arxiv_org_abs_2602_23814/figures/007_Figure_4.jpg]]
-*Figure 4: Data Efficiency. Leveraging pre-trained features, our method achieves high data efficiency, outperforming 2D methods in low-data regimes and surpassing the performance of DP3 as more data becomes available*
-
-![[assets/figures/papers/paper_list_l2633_https_arxiv_org_abs_2602_23814/figures/009_Table_5.jpg]]
-*Table 5: Real-world experiments. Success rates (%) of different methods on four bimanual manipulation tasks*
-
-![[assets/figures/papers/paper_list_l2633_https_arxiv_org_abs_2602_23814/figures/010_Figure_5.jpg]]
-*Figure 5: Real-World Setting. Our real-world platform featuring the AgileX Cobot Magic bimanual system, equipped with three RealSense D435i cameras to evaluate four challenging tasks*
-
-![[assets/figures/papers/paper_list_l2633_https_arxiv_org_abs_2602_23814/figures/003_Figure_3.jpg]]
-*Figure 3: Bimanual tasks in the RoboTwin 2.0 [25] benchmark*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 **GAP** 处于双臂模仿学习中“二维隐式几何”与“三维显式点云”两条技术路线的交叉地带，其核心贡献在于用预训练三维几何基础模型替代昂贵且不可靠的标定点云，同时保留三维空间感知能力。
 

@@ -42,7 +42,7 @@ claims:
 > - EMDB-1 (camera-coord) 上，Accel↓ 9.0 vs 4.9 (TRAM, offline) (+4.1)。
 > - EMDB-2 (world) 上，WA-MPJPE100↓ 93.5 vs 112.2 (Human3R, online) (-18.7)。
 
-## 概述
+## 概要
 
 从单目视频中恢复世界坐标系下的人体运动，是AR/VR、具身智能和人机交互等领域的核心需求。现有方法大多采用离线处理范式，依赖未来帧或全局优化来保证重建质量，无法满足实时交互场景的因果推理约束；少数在线方法则面临保真度不足、时间一致性差或效率低下的困境。核心瓶颈在于：如何在仅使用过去和当前信息的因果约束下，同时保证相机坐标系人体估计的准确性与时序平滑性，并消除SLAM中人体区域导致的动态干扰。
 
@@ -51,8 +51,6 @@ claims:
 实验表明，OnlineHMR在相机坐标精度上与离线方法可比——3DPW上PA-MPJPE达43.7 mm（离线TRAM为35.6 mm），同时显著优于其他在线方法；在世界坐标评估中，EMDB-2上的WA-MPJPE为93.5 mm，优于在线方法Human3R（112.2 mm），且平均延迟仅0.30秒/帧，远低于离线方法SLAHMR的2435秒。速度正则化损失和软掩码策略被消融实验证实为关键设计：前者将3DPW加速度误差从8.6降至6.4，Jitter从28.1降至19.5；后者使世界坐标WA-MPJPE从119.6（无掩码）降至93.5。
 
 方法仍存在局限：对重复纹理和动态环境敏感，SLAM易引入漂移；假设连续相机视角，无法处理突变或多相机切换；当前约3.3 FPS的运行速度尚不足以满足实时交互需求。
-
-## 背景与动机
 
 从单目视频中恢复三维人体运动是计算机视觉领域的核心任务之一，在虚拟现实、人机交互、运动分析等场景中具有广泛的应用需求。近年来，基于参数化人体模型（如SMPL）的人体网格恢复（Human Mesh Recovery, HMR）取得了显著进展，能够在相机坐标系下估计出较为准确的人体姿态和形状。然而，仅获得相机坐标系下的局部人体运动远不足以支撑真实世界的交互应用——要将虚拟角色或分析结果锚定于物理空间，必须同时恢复人体在世界坐标系下的全局轨迹。
 
@@ -76,7 +74,7 @@ claims:
 
 为此，本文提出**OnlineHMR**，一个完全在线的世界坐标系人体网格恢复框架。其设计思想是：将相机坐标HMR与增量SLAM构建为两个因果推理分支——前者通过滑动窗口训练与键值缓存（KV Cache）机制实现短期时序融合下的高精度人体估计，后者通过软人体掩码与EMA轨迹校正抑制动态干扰和相机抖动，最终在仅依赖历史信息的条件下实现与离线方法可比的全局重建质量。
 
-## 核心创新
+## 核心方法与创新机理
 
 OnlineHMR 的核心创新在于将**在线因果推理**引入世界坐标系人体网格恢复，通过解耦的双分支架构与三项关键设计，在仅使用过去与当前帧的严格因果约束下，实现了与离线方法可比的精度和显著优于现有在线方法的时间一致性。
 
@@ -106,8 +104,6 @@ OnlineHMR 的核心创新在于将**在线因果推理**引入世界坐标系人
 ### 方法谱系与知识库定位
 
 OnlineHMR 继承并改造了 **TRAM** 的框架，将其从离线 chunk-based 扩展为在线因果推理。在 SLAM 侧，它用增量式 MASt3R-SLAM 替代了全局优化 SLAM（如 DPVO、DROID-SLAM），并通过人本掩码策略解耦动态人体与静态场景。与现有在线世界坐标方法 **Human3R** 相比，OnlineHMR 在 EMDB-2 上的 WA-MPJPE 降低 18.7 mm（93.5 vs 112.2），且平均延迟仅 0.30 秒/帧，远低于离线方法（如 **SLAHMR** (Ye et al., CVPR 2023) 的 2435 秒、TRAM 的 115.95 秒），确立了在线世界坐标系 HMR 的新基准（Table 2, Table 3）。
-
-## 整体框架
 
 OnlineHMR 采用**双分支在线推理架构**，将局部人体运动估计与全局相机轨迹恢复解耦为两个并行专家分支，最终通过世界坐标对齐实现流式单目视频中的人体网格重建。
 
@@ -155,12 +151,9 @@ OnlineHMR 采用**双分支在线推理架构**，将局部人体运动估计与
 
 训练阶段采用**滑动窗口学习**（Figure 3），将完整序列切分为重叠窗口进行监督，同时在窗口内施加**速度正则化损失** $\mathcal{L}_v$ 以惩罚相邻帧关节位置的剧烈变化，缓解推理时的时序抖动。模型在 BEDLAM、3DPW 和 H3.6M 数据集上联合训练，约 52K 迭代收敛，使用单张 Nvidia 80GB H100 GPU 完成。
 
-### 补充图表
 
 ![[assets/figures/papers/paper_list_l1032_https_arxiv_org_abs_2603_17355/figures/001_Figure_1.jpg]]
 *Figure 1: An in-the-wild example of our framework. Given a streaming monocular RGB video, our method leverages a two-branch inference to recover the world-grounded human motion in an online manner*
-
-## 核心模块与公式推导
 
 OnlineHMR 的核心架构由两个在线专家分支构成：**相机坐标系人体网格恢复（Camera-coordinate HMR）** 与 **以人为中心的增量式 SLAM（Human-centric Incremental SLAM）**。前者负责从流式视频中因果性地估计 SMPL 参数，后者负责在剔除人体动态干扰后增量恢复相机轨迹。两者解耦并行，最终通过世界坐标变换实现全局人体运动恢复。
 
@@ -229,7 +222,7 @@ $$\mathbf{S}(i, f) = \left| \sum_{k=0}^{L-1} \mathbf{y}(k) w(k-i) e^{-j 2\pi f k
 ![[assets/figures/papers/paper_list_l1032_https_arxiv_org_abs_2603_17355/figures/003_Figure_3.jpg]]
 *Figure 3: Sliding window learning pipeline. The input sequence is sliced to overlapping windows, learning spatial and temporal information fusion inside each window, and alleviate jitter effect through velocity regularization*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 实验设置
 
@@ -332,10 +325,7 @@ Figure 11 展示了典型失败案例，主要集中于以下场景：
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l1032_https_arxiv_org_abs_2603_17355/figures/009_Figure_6.jpg]]
-*Figure 6: Visualization of multi-individual, diverse scene cases. More examples are in Suppl*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 

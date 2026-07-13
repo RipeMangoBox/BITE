@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2024
 pdf_ref: paperPDFs/CVPR_2024/GEARS_Local_Geometry_aware_Hand_object_Interaction_Synthesis.pdf
+project_link: null
+code_link: null
 aliases:
 - GEARS
 tags:
@@ -39,7 +41,7 @@ claims:
 > - GRAB 上，MPJPE (mm) 7.24 vs 优于ManipNet, GRIP等 (–)；PD (mm) 4.36 vs 优于ManipNet, GRIP等 (–)；IV (cm³) 2.24 vs 优于ManipNet, GRIP等 (–)。
 > - InterCap 上，PD (mm) 7.44 vs 优于其他方法 (–)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -57,7 +59,7 @@ claims:
 
 GEARS 属于**感知驱动的轨迹条件手部姿态生成**方法。其方法谱系可追溯至基于虚拟传感器的手-物交互建模，但通过将感知粒度从全局/半全局推进到关节局部几何，并引入规范帧对齐机制，实现了从“记住物体形状”到“理解局部表面”的范式转变。在知识库中的定位介于手部姿态估计、抓取合成与神经运动先验之间，为需要精确接触建模的交互生成任务提供了新的技术路径。
 
-## 背景与动机
+
 
 ### 任务定义：手-物交互姿态合成
 
@@ -78,7 +80,9 @@ GEARS 属于**感知驱动的轨迹条件手部姿态生成**方法。其方法�
 
 本文的核心观察是：**局部几何感知是泛化到任意物体表面的关键**。人类在抓取陌生物体时，并非依赖全局的物体形状记忆，而是根据手指接触点附近的局部表面几何来调整手部姿态。受此启发，GEARS 提出了一种**关节中心的局部几何传感器**——在每个关节周围采样物体表面点云，并将其变换到手部模板的规范坐标系下，再用共享的 PointNet 提取关节无关的局部几何特征。这一设计使得网络能够学习到可迁移的手-物交互特征，从而大幅提升对未见物体的泛化能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GEARS 的核心创新在于用**关节中心的局部几何传感器**替代了传统方法中表达能力有限的全局虚拟传感器，从而实现了对不同类别、不同尺寸物体的强泛化能力。
 
@@ -119,7 +123,7 @@ $$\tilde{X}_S = \mathrm{softmax}\left( \frac{Q_S K_S^T}{\sqrt{l}} \right) V_S$$
 
 这三个设计改变背后贯穿着同一个核心洞察：**局部几何感知是泛化到任意物体表面的关键**。通过将物体点云对齐到关节规范帧，GEARS 使网络学到的不是“某个特定物体上的抓取位置”，而是“某种局部表面几何对应的接触模式”。这种可迁移的表征使得模型在面对训练中未见过的物体时，依然能够生成合理的手部姿态——定性结果（Figure 1, Figure 6）显示 GEARS 对小型工具和大型物体均能产生有效接触且避免穿透。
 
-## 整体框架
+
 
 GEARS 的整体 pipeline 由四个串联模块构成，以手部轨迹与物体轨迹为输入，逐帧合成手部姿态序列。其核心设计在于**关节中心的局部几何传感器**：在每个关节周围采样物体表面点云，转换到关节规范帧后，用共享的 PointNet 提取关节无关的局部几何特征，从而将“手如何接触物体表面”这一关键信息与具体关节身份解耦，大幅提升对未见物体类别与尺寸的泛化能力。
 
@@ -143,7 +147,7 @@ GEARS 的整体 pipeline 由四个串联模块构成，以手部轨迹与物体�
 ![[assets/figures/papers/paper_list_l1712_GEARS_Local_Geometry_aware_Hand_object_Interaction_Synthesis/figures/006_Figure_5.jpg]]
 *Figure 5: A sample training sequence synthesized by our heuristic rule. At the rightmost side of the time axis is a static grasping pose from ObMan [12]. We synthesize intermediate poses by interpolating joint angles from the mean MANO pose*
 
-## 核心模块与公式推导
+
 
 GEARS 由四个核心模块构成：关节初始化网络、局部几何传感器、关节位移网络和手部拟合。以下逐一解析关键模块及其核心公式。
 
@@ -221,7 +225,9 @@ $$P^t = \mathrm{SLERP}(P^0, P^T, t)$$
 ![[assets/figures/papers/paper_list_l1712_GEARS_Local_Geometry_aware_Hand_object_Interaction_Synthesis/figures/004_Figure_4.jpg]]
 *Figure 4: An illustration of spatial and temporal attention networks. We first process the features of each joint by PointNet. For spatial attention, every joint attends to every other joint of the same hand. While for temporal attention, a joint in one frame attends to the same joint in every other frame*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -261,7 +267,9 @@ GEARS 在两个公开数据集上均展现出对现有方法的显著优势。
 ![[assets/figures/papers/paper_list_l1712_GEARS_Local_Geometry_aware_Hand_object_Interaction_Synthesis/figures/001_Figure_1.jpg]]
 *Figure 1: We propose GEARS, a method to synthesize sequence of hand poses during interaction with an object. GEARS takes hand and object trajectory as input. It generates realistic hand poses that are well-adapted to object surface, irrespective of object category and size. We show sample results on different datasets. Hands colored in blue are inputs while hands colored in cyan are our predictions*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心问题与现有方法的瓶颈
 
@@ -329,6 +337,8 @@ GEARS 可被定位为**从全局粗粒度感知到局部精细感知的范式转
 3. **在线自适应与闭环控制**：当前方法为离线生成，无法根据实时传感器反馈调整手部姿态。在机器人灵巧操作等应用中，需要具备在线推理和闭环调整能力。
 
 4. **更大规模与多样性的数据**：尽管数据增强缓解了数据稀缺问题，但合成数据的分布偏差可能限制模型在真实场景中的表现。构建更大规模、覆盖更多物体类别和交互模式的真实数据集仍是该领域的基础性需求。
+
+
 
 ## 原文 PDF
 

@@ -41,7 +41,7 @@ claims:
 > - ImageNet 256×256 上，FID (↓) 2.05 vs 1.95 (+0.10)；FID (↓) 2.12 vs 1.95 (+0.17)；FID (↓) 2.97 vs 1.95 (+1.02)。
 > - ImageNet 256×256 (推荐配置) 上，FID (↓) 2.00 vs 1.95 (+0.05)；显存占用 (Memory) 18.4GB vs 28.7GB (-36%)。
 
-## 概述
+## 概要
 
 视觉自回归（Visual Autoregressive, VAR）模型通过下一尺度预测范式实现了高质量图像生成，但其多尺度自回归解码过程中累积的KV缓存导致严重的内存开销，限制了实际部署。本文提出**VARiant**，一种基于渐进式超网训练的高效视觉自回归建模方法，核心洞察在于揭示并利用**尺度-深度非对称依赖**：早期低分辨率尺度对网络深度极为敏感，需要完整深度建立全局语义；后期高分辨率尺度对深度鲁棒，可用浅层子网进行纹理细化。
 
@@ -49,7 +49,7 @@ VARiant通过等距采样子网与全网络共享权重，在单一模型中实�
 
 在ImageNet 256×256基准上，VARiant-d16以仅0.10的FID损失换取1.7倍推理加速和44%显存削减；推荐配置（d=16, N=7）达到FID 2.00，内存占用从28.7GB降至18.4GB（-36%）。该方法为视觉自回归模型的效率-质量权衡提供了灵活且可扩展的解决方案。
 
-## 背景与动机
+
 
 ### 视觉自回归建模的兴起与效率瓶颈
 
@@ -89,7 +89,9 @@ $$p ( r _ { 1 } , r _ { 2 } , \ldots , r _ { K } ) = \prod _ { k = 1 } ^ { K } p
 2. 如何设计训练策略，突破固定比例训练的帕累托前沿，同时优化全网络和子网？
 3. 如何确定深度分配方案，最大化效率提升的同时最小化质量损失？
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 VARiant 的核心创新在于**将视觉自回归（VAR）模型中固有的尺度-深度非对称依赖转化为一种可调的计算-质量杠杆**。与所有尺度均使用完整 30 层 Transformer 的基线 VAR-d30（Tian et al., NeurIPS 2024）不同，VARiant 通过三个紧密耦合的 changed slots 实现了灵活的深度分配与训练优化。
 
@@ -135,7 +137,7 @@ $$p(\mathbf{ep}) = 0.2 + 0.8 \cdot \frac{\mathbf{ep} - E_1}{E_2 - E_1}$$
 
 Table 4 的结果进一步验证了渐进训练的有效性：训练前，极浅子网（$d=2, 4$）直接使用预训练 VAR-d30 权重时 FID 超过 130，几乎完全崩溃；经过联合训练自适应后，这些子网被恢复至 FID 2.28–2.97，深度子网（$d=16$）恢复至 2.05。这表明渐进训练不仅协调了全网络与子网的优化，还能“教会”浅层子网利用桥接区提供的丰富条件信息进行有效生成。
 
-## 整体框架
+
 
 VARiant 将原始 VAR 模型的**固定深度推理**改造为**多深度超网 + 尺度自适应深度分配 + 渐进训练**的统一框架，在保持生成质量的前提下大幅削减计算与内存开销。
 
@@ -191,7 +193,7 @@ $$\mathcal{T}_k = \begin{cases} \{0,1,\ldots,D-1\}, & \text{if } k \leq N \text{
 
 **训练阶段**：输入为完整的 10 尺度令牌序列。调度器按当前阶段的采样比率决定每个 batch 中灵活区使用的网络深度，梯度通过共享权重同时优化全网络和子网。训练在 8 块 NVIDIA H100 上使用 AdamW 优化器（lr=1e-6，batch size=1024）进行。
 
-## 核心模块与公式推导
+
 
 ### 3.1 视觉自回归的尺度分解
 
@@ -249,7 +251,9 @@ $$p(\mathbf{ep}) = 0.2 + 0.8 \cdot \frac{\mathbf{ep} - E_1}{E_2 - E_1}$$
 ![[assets/figures/papers/paper_list_l914_https_arxiv_org_abs_2511_16546/figures/004_Figure_3.jpg]]
 *Figure 3: Progressive training strategy. (a) Dynamic sampling ratio schedule across three training phases. (b) Gradient source analysis showing the transition from joint optimization to subnetfocused refinement through a stable gradient bridge*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈验证：尺度-深度非对称依赖
 
@@ -323,7 +327,9 @@ Figure 7展示了子网生成质量在渐进训练过程中的演进：阶段一
 ![[assets/figures/papers/paper_list_l914_https_arxiv_org_abs_2511_16546/figures/014_Figure_7.jpg]]
 *Figure 7: Subnet generation quality evolution during progressive training (d = 16). Top row: Cat; Bottom row: Fish. Results demonstrate subnet-only inference across three training phase endpoints*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有工作的关系
 
@@ -359,6 +365,8 @@ Figure 7展示了子网生成质量在渐进训练过程中的演进：阶段一
 4. **动态深度推理**：能否在推理时根据输入复杂度动态选择每尺度的深度，而非固定 N 和 d？这需要开发轻量级的深度决策模块。
 
 > **注意**：以上局限和开放问题均来自原文明确陈述或从实验设计间隙中合理推断。关于跨架构迁移的讨论属于原文未覆盖的推测性延伸，需后续工作验证。
+
+
 
 ## 原文 PDF
 

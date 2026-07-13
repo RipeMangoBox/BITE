@@ -44,7 +44,7 @@ claims:
 > - Sketchfab28 上，CLIP-O(img) 0.8884 vs 0.8812 (+0.0072)。
 > - Animate3D 上，CLIP-C 0.9819 vs 0.9783 (+0.0036)。
 
-## 概述
+## 概要
 
 **核心问题**：现有的多视图视频扩散模型在生成动态三维内容时，缺乏显式的特征级时序跟踪监督，导致生成结果出现外观漂移和时空不一致性，限制了高质量4D资产生成的可靠性。
 
@@ -58,7 +58,7 @@ claims:
 **方法谱系与知识库定位**：
 Track4DGen 建立在多视图视频扩散与4D重建的基线之上，直接对比的方法包括：多视图视频扩散基线 **4Diffusion**（Zhang et al., NeurIPS 2024）和 **Animate3D**（Jiang et al., NeurIPS 2024）；单图像到4D生成基线 **DreamGaussian4D (DG4D)**（Ren et al., arXiv 2023）和 **EG4D**（Sun et al., ICLR 2025）；以及单目视频到4D生成基线 **SV4D**（Xie et al., arXiv 2024）和 **SC4D**（Wu et al., ECCV 2024）。Track4DGen 区别于这些工作的关键改动在于：(1) 在扩散U-Net解码器的第二个上采样块特征上增加了基于CoTracker3密集跟踪的对应损失 $\mathcal{L}_{\mathrm{corr}}$ 和位置损失 $\mathcal{L}_{\mathrm{pos}}$，实现了特征级的显式时序对应监督；(2) 在4D-GS阶段引入混合运动表示，将携带跟踪先验的扩散特征与Hex-plane特征拼接，并引入4D球谐函数（4D SH）建模颜色随时间的变化。
 
-## 背景与动机
+
 
 动态三维内容生成是计算机视觉与图形学交叉领域的前沿课题。随着扩散模型在图像和视频生成领域的突破性进展，研究者开始探索将二维生成能力拓展至四维时空域——即从静态三维资产或文本描述出发，生成具有时序运动的三维模型动画。这一能力对于影视制作、游戏开发、虚拟现实等应用场景具有重要价值。
 
@@ -70,7 +70,9 @@ Track4DGen 建立在多视图视频扩散与4D重建的基线之上，直接对�
 
 基于这一洞察，本文提出 **Track4DGen**，一个将基础跟踪器运动先验注入多视图视频扩散生成的两阶段框架。第一阶段在扩散生成器中引入基于CoTracker3密集跟踪的对应损失和位置损失，在特征层面显式强制时序一致性；第二阶段将携带跟踪先验的扩散特征与Hex-plane特征融合，构建混合运动表示，并引入4D球谐函数建模颜色随时间的变化，从而在4D-GS重建中充分利用第一阶段积累的时序信息。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Track4DGen的核心创新在于将**基础跟踪器的运动先验**显式注入多视图视频扩散模型的**特征空间**，从而解决现有方法因缺乏显式时序监督导致的外观漂移与时空不一致问题。具体而言，该方法在以下两个关键环节引入了差异化设计：
 
@@ -99,7 +101,7 @@ Track4DGen的核心创新在于将**基础跟踪器的运动先验**显式注入
 
 消融实验（Table 4、Figure 6、Figure 7）证实：移除对应损失会降低视频生成的时域一致性和动态质量；移除扩散特征或4D SH均会导致4D生成的外观保真度下降和伪影增加，验证了上述创新设计的有效性。
 
-## 整体框架
+
 
 Track4DGen 采用**两阶段级联架构**，将多视图视频生成与 4D 重建解耦为顺序流水线，如图 1 所示。第一阶段以静态 3D 模型的多视图渲染作为条件输入，通过集成多视图 3D 注意力与时空注意力的视频扩散生成器（基于 MV-VDM 架构）产生时序一致的多视图视频；第二阶段则从生成视频出发，利用 4D 高斯泼溅（4D-GS）重建动态 4D 资产。
 
@@ -130,7 +132,7 @@ Track4DGen 采用**两阶段级联架构**，将多视图视频生成与 4D 重�
 ![[assets/figures/papers/paper_list_l17_https_openaccess_thecvf_com_content_CVPR2026_html_Sun_Tracking_Guided_4D/figures/001_Figure_1.jpg]]
 *Figure 1: The Track4DGen pipeline comprises two stages: 1) multi-view video generation and 2) 4D-GS reconstruction*
 
-## 核心模块与公式推导
+
 
 Track4DGen 的核心架构由两个解耦阶段构成：**跟踪感知的多视图视频扩散生成器**与**混合特征驱动的4D高斯泼溅重建器**。两条管线通过扩散特征空间中的密集点对应监督实现耦合——第一阶段将基础跟踪器的运动先验注入扩散特征，第二阶段则直接复用这些携带跟踪先验的特征来增强动态重建质量。
 
@@ -235,7 +237,9 @@ $$\mathcal{L}_{2} = \lambda_{4} \mathcal{L}_{\mathrm{rec}} + \lambda_{5} \mathca
 ![[assets/figures/papers/paper_list_l17_https_openaccess_thecvf_com_content_CVPR2026_html_Sun_Tracking_Guided_4D/figures/003_Figure_3.jpg]]
 *Figure 3: Left: points tracking in multi-view images; Right: tacked points in similarity heatmap of U-Net’s second Upsample Block. Brighter color indicates higher feature similarity*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 Track4DGen 的实验验证围绕两个核心阶段展开：多视图视频生成质量与 4D 动态资产重建质量。以下分别报告主结果、消融实验及关键图表发现。
 
@@ -296,7 +300,9 @@ Track4DGen 在两个数据集上均取得最高的 CLIP 分数。在 Sketchfab28
 ![[assets/figures/papers/paper_list_l17_https_openaccess_thecvf_com_content_CVPR2026_html_Sun_Tracking_Guided_4D/figures/010_Figure_7.jpg]]
 *Figure 7: 4D Generation Ablation. Best viewed by zooming in*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 Track4DGen 的核心技术路线属于**“多视图视频扩散 + 4D 高斯泼溅重建”**的两阶段 4D 生成范式。其方法谱系可沿两条轴线展开：一是多视图视频扩散模型的演进，二是动态 3D/4D 表征与重建技术的发展。
 
@@ -337,6 +343,8 @@ Track4DGen 的关键突破在于：**在扩散 U-Net 解码器的第二个时空
 - **特征层级的选择**：论文通过实验确定 U-Net 解码器第二个上采样块的特征最优，但该结论是否跨模型架构、跨数据集泛化仍待验证。是否存在更优的特征组合策略（如多尺度特征融合）？
 
 - **单阶段联合优化的可能性**：当前两阶段设计虽然模块化清晰，但扩散特征到 4D-GS 的传递是单向的。是否可以通过可微跟踪或端到端训练实现视频生成与 4D 重建的联合优化，从而进一步提升一致性？
+
+
 
 ## 原文 PDF
 

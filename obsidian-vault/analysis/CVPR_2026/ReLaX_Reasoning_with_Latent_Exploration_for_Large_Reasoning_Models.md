@@ -42,7 +42,7 @@ claims:
 > - 7 Multimodal benchmarks (avg) 上，mean@1 accuracy 53.2 (ReLaX-VL-7B) vs 47.9 (Qwen2.5-VL-7B base) (+5.3)。
 > - 6 Text-only Math benchmarks (avg) 上，mean@1 / mean@32 average 49.1 (ReLaX-7B-Math) vs 37.6 (SimpleRL-7B-Math) (+11.5)。
 
-## 概述
+## 概要
 
 大型推理模型在强化学习与可验证奖励（RLVR）训练中普遍面临**性能饱和**问题：随着训练推进，策略的标记级熵（token entropy）迅速下降，而奖励提升随之停滞。本文通过实证揭示，奖励 $R$ 与标记熵 $H$ 之间呈指数关系 $R = -a \cdot \exp(H) + b$（Figure 1），表明**熵崩溃是限制RLVR性能的关键瓶颈**。
 
@@ -62,7 +62,7 @@ claims:
 
 **方法定位**：ReLaX 属于**潜空间探索正则化**范式，区别于传统的标记级探索方法。其关键创新在于将动力学系统理论（Koopman谱分析）引入RLVR训练，从内部计算灵活性角度解决探索不足问题，为推理模型的强化学习训练提供了新的理论视角与实用工具。
 
-## 背景与动机
+
 
 ### 推理模型训练中的探索困境
 
@@ -90,7 +90,9 @@ ReLaX的提出基于一个关键认知：**要实现真正的探索-利用平衡
 
 这一框架的独特之处在于：它首次将RLVR中的探索问题从token空间提升到潜空间层面，利用动力系统理论为探索-利用平衡提供了更根本的调控手段。如后续实验所示，ReLaX在7个多模态推理基准和6个纯文本数学推理基准上均取得最优结果，验证了潜空间探索范式的有效性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈诊断：从token级熵崩溃到潜空间动力学僵化
 
@@ -140,7 +142,7 @@ ReLaX的完整管线包含四个模块：
 
 消融实验（Figure 5）证实，移除自适应KL正则化会导致性能持续下降，移除优势塑形则直接引发训练崩溃，表明这两个设计是ReLaX维持稳定高效探索的必要组件。
 
-## 整体框架
+
 
 ReLaX 的整体 pipeline 围绕一个核心洞察构建：**RLVR 训练中策略性能饱和的根本原因不在于 token 级熵的崩溃，而在于隐状态动力学的僵化**。因此，ReLaX 将探索机制从 token 空间下沉到潜空间，通过量化并调控隐状态动态的多样性，从根本上改善探索-利用平衡。
 
@@ -180,7 +182,7 @@ ReLaX 的完整框架如 **Figure 2** 所示，由四个紧密耦合的模块组
 
 > **注意**：Koopman 字典在训练前一次性拟合后冻结，可能无法适应训练后期动力学分布的变化，这是框架的一个已知局限。此外，DSD 计算引入约 10-12% 的额外训练时间开销，主要来自 actor 更新阶段。
 
-## 核心模块与公式推导
+
 
 ReLaX 的核心创新在于将 **Koopman 算子理论**引入策略优化的内部循环，通过量化并调控隐状态的动力学多样性，从根本上解决 RLVR 训练中的探索不足问题。其方法体系由四个紧密耦合的模块构成。
 
@@ -237,7 +239,9 @@ $$\mathcal{I}(\theta) = \mathcal{I}_{\mathrm{GRPO}}(\theta) + \alpha \tilde{\mat
 ![[assets/figures/papers/paper_list_l2579_https_arxiv_org_abs_2512_07558/figures/001_Figure_1.jpg]]
 *Figure 1: Empirical relationship between policy performance R and token-level entropy H during RLVR training with (a) textonly LLMs and (b) vision-language models (VLMs). Each scatter denotes a single training step, the solid curve fitted by R = −a · exp(H) + b [10]*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈验证：熵崩溃与性能饱和
 
@@ -327,7 +331,9 @@ Table 6给出了每训练步的耗时分解。ReLaX相较Vanilla GRPO的额外�
 ![[assets/figures/papers/paper_list_l2579_https_arxiv_org_abs_2512_07558/figures/015_Figure_11.jpg]]
 *Figure 11: Sensitivity analysis for Koopman operator dimension m and DSD threshold ξ on Qwen2.5-3B*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：RLVR中的“动力学僵化”瓶颈
 
@@ -372,6 +378,8 @@ ReLaX的方法设计建立在Koopman算子理论之上。该理论允许将非�
 2. **与先进RL算法的结合**：当前ReLaX基于GRPO框架设计。能否将潜空间探索方法与更先进的RL算法（如PPO变体）或离线RL结合，进一步提升样本效率？
 3. **字典架构优化**：是否可以通过更复杂的Koopman字典（如深层网络或自适应更新的字典）进一步提升性能，同时降低额外计算成本？这涉及在动态建模精度和计算效率之间的权衡。
 4. **扩展性验证**：当前实验主要在3B和7B规模模型上进行。在更大规模模型（如30B、70B）上，ReLaX的扩展性如何？潜空间动力学的特性是否随模型规模发生质变？
+
+
 
 ## 原文 PDF
 

@@ -43,7 +43,7 @@ claims:
 > - mmBody → MM-Fi (out‑of‑domain) 上，平均误差降低 EMDUL (整体框架) vs 未扩展的原始数据集训练 (18.9% 误差降低)。
 > - MM-Fi → MM-Fi (F→F) 上，MPJPE (cm) 10.06 (EMDUL + P4T) vs 12.23 (P4T, 10% 标记数据) (-2.17)。
 
-## 概述
+## 概要
 
 毫米波雷达人体姿态估计（HPE）面临一个根本瓶颈：**现有毫米波HPE数据集不仅规模小，而且在点云属性（检测噪声、密度、运动灵敏度）和人体姿态多样性上均严重不足**，导致模型在未见场景下的泛化能力极差。
 
@@ -64,7 +64,7 @@ EMDUL定位于**毫米波人体姿态估计的数据增强与半监督学习交�
 
 **LiDAR到毫米波的域迁移**：直接使用LiDAR数据集训练毫米波HPE模型效果有限，因为两种传感器的点云分布差异巨大（密度、噪声模式、运动敏感度均不同）。EMDUL的闭环转换流水线（NPA→FPF→RS→NI）通过一系列可解释的几何增强操作，在不依赖可学习参数的情况下缩小这一域差距，为跨传感器数据利用提供了一种轻量且有效的方案。
 
-## 背景与动机
+
 
 ### 毫米波人体姿态估计的瓶颈
 
@@ -94,7 +94,9 @@ EMDUL定位于**毫米波人体姿态估计的数据增强与半监督学习交�
 
 这种设计使得 EMDUL 能够从两个互补方向大幅扩充训练数据的体量和多样性，从而在域内和跨域场景下均显著提升HPE模型的泛化能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 EMDUL 的核心创新在于**同时从两个维度系统性地扩充毫米波人体姿态估计（HPE）训练数据**：一是利用无标签毫米波数据，二是将标注完备的 LiDAR 数据集转换为毫米波风格点云。这两个维度分别由两个独立模块驱动——伪标签估计器与闭环点云转换器，二者相互正交、可叠加使用，共同缓解毫米波 HPE 领域数据稀缺与多样性不足的瓶颈。
 
@@ -138,7 +140,7 @@ $$\mathcal{P}(P_t[i] \in P_t^{\mathrm{conv}}) = \min\Big(\frac{\lVert F_t^P[i] \
 
 EMDUL 的两个模块设计为相互独立、可叠加使用。实验表明，同时使用伪标签扩展（无标签毫米波数据）和点云转换扩展（LiDAR 数据集）可获得最佳性能——在仅 10% 标记数据的极端设定下，EMDUL + P4T 在 MM-Fi 域内测试中 MPJPE 达 10.06 cm（基线 12.23 cm），跨域测试（mmBody→MM-Fi）中 MPJPE 达 24.01 cm（基线 33.62 cm），分别降低 17.7% 和 28.6% 的误差。这一协同增益源于两个维度分别从**数据体量**（无标签数据利用）和**姿态多样性**（LiDAR 数据集转换）两个互补方向扩充了训练分布。
 
-## 整体框架
+
 
 **EMDUL** 的整体设计围绕一个核心目标展开：在毫米波人体姿态估计（HPE）任务中，以极低的标注成本，同时利用**无标签毫米波数据**和**带标注的LiDAR数据集**，大幅度扩充训练数据的体量与多样性，从而提升模型的域内与跨域泛化能力。其系统架构由两个相互独立的模块构成：
 
@@ -195,7 +197,7 @@ NPA → FPF → RS → NI
 ![[assets/figures/papers/paper_list_l1018_https_arxiv_org_abs_2603_14507/figures/002_Figure_2.jpg]]
 *Figure 2: The overview of EMDUL integrating both PC conversion and pseudo-labeling modules*
 
-## 核心模块与公式推导
+
 
 ### 伪标签估计器与无监督时间一致性损失
 
@@ -265,7 +267,9 @@ $$\mathcal{P}(P_t[i] \in P_t^{\mathrm{conv}}) = \min\Big(\frac{\lVert F_t^P[i] \
 ![[assets/figures/papers/paper_list_l1018_https_arxiv_org_abs_2603_14507/figures/011_Figure_6.jpg]]
 *Figure 6: Comparison of pseudo-labels generated with and without UTCL. (a) Two consecutive ground-truth skeletons in*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设定
 
@@ -359,7 +363,9 @@ $$\mathcal{P}(P_t[i] \in P_t^{\mathrm{conv}}) = \min\Big(\frac{\lVert F_t^P[i] \
 ![[assets/figures/papers/paper_list_l1018_https_arxiv_org_abs_2603_14507/figures/003_Figure_3.jpg]]
 *Figure 3: Illustration of the motion-detection mechanism in mmWave radar using an MM-Fi sample. Joints with high flow (yellow) lie close to detected points, while low-flow joints (dark blue) have no nearby points*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系
 
@@ -420,6 +426,8 @@ EMDUL 的核心知识贡献在于：
 3. **数据扩展的骨干无关性验证**：在多个HPE骨干（P4T、SPiKE）上一致取得显著增益，证明了数据层面的改进比模型层面的改进更具通用价值。
 
 在更广泛的半监督学习和跨模态学习领域，EMDUL 属于**物理先验增强的半监督跨模态数据扩展**方法，与纯数据驱动的域自适应（如对抗域适应）和纯半监督方法（如FixMatch）形成互补。其关键区别在于对源模态和目标模态之间**物理成像机制的显式建模**，而非仅依赖统计分布对齐。
+
+
 
 ## 原文 PDF
 

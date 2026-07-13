@@ -43,7 +43,7 @@ claims:
 > - Walking Time (turn-required scenarios) 上，Average walking time (min) 2.08 vs 3.28 (TBT) (-36.5%)。
 > - Walking Time (directly visible scenarios) 上，Average walking time (min) 1.07 vs 3.36 (TBT) (-68.1%)。
 
-## 概述
+## 概要
 
 现有地图应用在交互范式上存在根本性断裂：它们能提供全局路径规划，却无法理解用户当前所见的视口内容，更无法将摄像头捕捉的自我中心场景与真实地理位置接地。这导致在“最后100米”导航和实地探索中，用户不得不频繁在多个应用间切换，依靠自身判断完成从地图信息到现实场景的映射。IMAIA 正是针对这一瓶颈而设计——它是一个由轻量级多智能体编排器协调的交互式地图 AI 助手，统一了地图探索、摄像头场景理解和以人为本的导航三大能力。
 
@@ -53,7 +53,7 @@ IMAIA 的核心洞察在于：将地图视口转化为可被 LLM 理解的视觉
 
 实验结果验证了这一设计路线的有效性：Maps Plus 将地点检测准确度从传统方法的不足 43% 提升至接近 90%（Table 1）；蒸馏后的空间推理模型准确度达到 84%，远超 Florence-VL 8B 的 27%，且推理速度比基于智能体的流程快 7.3 倍（1.7s vs. 12.4s）；融合多模态特征的 XGBoost 排序器在 Top-1 精度达到 80.4%，Top-3 召回达到 92.8%（Table 2）；在以人为本的导航模式下，需要转弯的场景平均步行时间从 3.28 分钟降至 2.08 分钟，直接可见场景则从 3.36 分钟降至 1.07 分钟。这些结果表明，通过模块化编排和任务对齐蒸馏，可以在不依赖超大规模模型的前提下，显著提升地理空间 AI 助手的精度与效率。
 
-## 背景与动机
+
 
 ### 地图交互中的“最后一公里”困境
 
@@ -71,7 +71,9 @@ IMAIA 的核心洞察在于：将地图视口转化为可被 LLM 理解的视觉
 
 上述瓶颈指向一个核心洞察：地图探索、摄像头场景理解和以人为本的导航不应被视为三个独立问题，而应统一到一个模块化框架中。本文提出 **IMAIA（Interactive Maps AI Assistant）**，通过两个可互操作的组件——**Maps Plus** 和 **PAISA**——在轻量级多智能体编排下协同工作。Maps Plus 将地图视口转化为四叉树索引的结构化视觉提示，使 LLM 能够“看懂”地图；PAISA 则融合摄像头图像、地理位置、朝向和距离等多模态信号，实现自我中心场景与地理位置的精确接地。这一设计旨在以可替换的视觉语言后端，显著提升地点检测精度和空间推理效率，同时将导航从“跟随路径”转变为“指向目标”。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 IMAIA 的核心创新在于将地图探索、摄像头场景理解和以人为本的导航统一到一个模块化框架中，通过两个互补组件——**Maps Plus** 和 **PAISA**——在轻量级多智能体编排下协同工作，解决了现有地图应用在视图条件空间推理和摄像头到地点接地方面的根本性瓶颈。
 
@@ -97,7 +99,7 @@ IMAIA 的核心创新在于将地图探索、摄像头场景理解和以人为�
 
 PAISA 采用 Orchestrator Agent 对用户查询进行语义解析和任务分解，协调 Location Intelligence Agent、Interactive Navigation Agent 和 Spatial Understanding Agent 三个专门代理协同工作（Figure 4, Figure 8）。这种模块化设计使得各组件可独立替换视觉语言后端，同时保持端到端的推理连贯性——从地点识别、候选排序、方向指引到场景确认的全链路闭环。
 
-## 整体框架
+
 
 IMAIA 由两个可互操作的组件构成——**Maps Plus** 和 **PAISA**——并通过一个轻量级多智能体编排器协调两者的工作流。Maps Plus 负责以地图为中心的空间理解，将地图视口转换为四叉树索引的视觉提示，使大语言模型能够理解地图视图中的地理实体并执行视口条件化查询。PAISA 则面向自我中心场景，融合摄像头图像、地理位置、朝向和距离等多模态信号，实现场景到地点的接地、以人为本的导航以及空间推理。两者协同，覆盖了从地图探索、实地导航到复杂地理空间查询的完整链路。
 
@@ -133,7 +135,7 @@ IMAIA 由两个可互操作的组件构成——**Maps Plus** 和 **PAISA**—�
 ![[assets/figures/papers/paper_list_l2639_https_arxiv_org_abs_2507_06993/figures/001_Figure_1.jpg]]
 *Figure 1: User interface of Maps Plus showing handling a query “What is the name of the flower-shaped building next to the park on the map” from the user*
 
-## 核心模块与公式推导
+
 
 IMAIA 由两个互补组件构成——**Maps Plus**（地图中心的空间理解）和 **PAISA**（自我中心的场景理解与地理空间接地），两者通过轻量级多智能体编排器协同工作。
 
@@ -223,7 +225,9 @@ $$
 ![[assets/figures/papers/paper_list_l2639_https_arxiv_org_abs_2507_06993/figures/003_Figure_2.jpg]]
 *Figure 2: Workflow comparison of four settings: a standalone MLLM, an MLLM with coordinates, an MLLM with verbose place context, and our Maps Plus approach*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 地点检测准确度：四叉树视觉提示的关键作用
 
@@ -295,7 +299,9 @@ XGBoost排序器融合了CLIP视觉-文本嵌入的余弦相似度、地理距�
 ![[assets/figures/papers/paper_list_l2639_https_arxiv_org_abs_2507_06993/figures/008_Figure_7.jpg]]
 *Figure 7: Example of reasoning with the PAISA. The system answers user queries by reasoning over geospatial information: (top) providing directions to the nearest boba tea shop, (middle) justifying the choice based on shortest distance and comparative options, and (bottom) ranking alternatives by distance*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -340,6 +346,8 @@ IMAIA 处于**多模态LLM、地理信息系统（GIS）和具身导航**的交�
 3. **多用户协同导航**：在群体出行场景中，如何协调多个用户的相对方向和空间参考系？
 
 4. **隐私与计算卸载**：摄像头实时场景理解涉及隐私敏感数据，如何在端侧推理与云端查询之间取得平衡？
+
+
 
 ## 原文 PDF
 

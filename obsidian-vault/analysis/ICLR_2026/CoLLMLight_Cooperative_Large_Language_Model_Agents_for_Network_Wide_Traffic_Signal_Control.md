@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/CoLLMLight_Cooperative_Large_Language_Model_Agents_for_Network_Wide_Traffic_Signal_Control.pdf
+project_link: null
+code_link: null
 openreview_forum_id: KeJqoEVOeY
 aliases:
 - CoLLMLight
@@ -41,7 +43,7 @@ claims:
 > - New York 1 (零样本) 上，AQL 为 1816.8，对比 2297.9 (LLMLight-8B)，变化 -481.1。
 > - Hangzhou (零样本) 上，ATT (秒) 为 308.5，对比 312.0 (LLMLight-8B)，变化 -3.5。
 
-## 概述
+## 概要
 
 城市路网交通信号控制的核心挑战在于：各路口信号决策相互耦合，局部最优的独立控制极易引发上游拥堵转移，导致网络整体通行效率恶化。现有基于大语言模型（LLM）的交通信号控制方法——如 **LLMLight**（Lai et al., 2025）——将每个路口视为独立智能体，虽具备零样本泛化能力，却因缺乏路口间协同机制，在网络级拥堵场景下性能受限。
 
@@ -52,7 +54,7 @@ claims:
 
 在四个真实路网数据集上的零样本评估表明，CoLLMLight在所有指标上一致超越传统方法、强化学习基线及独立LLM智能体。以New York 1数据集为例，CoLLMLight-8B相较LLMLight-8B将平均行程时间（ATT）从1289.2秒降至1000.4秒（降幅22.4%），平均排队长度（AQL）从2297.9降至1816.8（降幅20.9%）。消融实验进一步验证：移除协作推理模块后ATT显著上升（New York 1: 1000.4→1155.1），移除自适应推理优化后推理token数增加约52%，同时控制效果恶化。这些结果表明，异步协作架构与成本感知优化是CoLLMLight取得性能突破的关键因素。
 
-## 背景与动机
+
 
 城市交通信号控制（Traffic Signal Control, TSC）是缓解拥堵、提升通行效率的关键手段。传统方法如 **FixedTime**（Koonce et al., 2008）依赖预设配时方案，缺乏对动态交通流的适应能力；**MaxPressure**（Varaiya, 2013）虽能响应实时压力，但仅考虑局部路口状态，难以实现网络级优化。
 
@@ -64,7 +66,9 @@ claims:
 
 CoLLMLight正是在此背景下提出的首个面向网络级交通信号控制的协作LLM智能体框架。其核心动机是：**在保持LLM零样本泛化优势的同时，引入异步时空协作推理，使各路口智能体能够“预判”相邻路口的交通动态，从而实现兼顾全局优化的实时控制。**
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CoLLMLight 的核心创新在于重新设计了 LLM 智能体在交通信号控制中的协作范式，将“慢思考”与“快决策”解耦，并通过自适应推理优化实现成本可控的网络级协同。具体而言，其创新体现在以下三个关键维度的改变：
 
@@ -96,7 +100,7 @@ CoLLMLight 的核心创新在于重新设计了 LLM 智能体在交通信号控�
 
 **证据支撑**：移除 AR 后，推理 token 数在纽约 1 数据集上从 484.2 激增至 738.5（约 52%），在济南数据集上增加约 55%（Table 3），同时 ATT 也显著恶化。同时移除 AR 与 PR 导致性能大幅下降，验证两阶段优化的协同作用。此外，Figure 4 展示了 CoLLMLight 在低车流量下产生更短推理链、在高车流量下增加推理深度的自适应行为，直观证明了自适应机制的有效性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_KeJqoEVOeY/figures/003_Figure_2.jpg]]
 *Figure 2: The overview of CoLLMLight framework*
@@ -129,7 +133,7 @@ CoLLMLight 提出一种异步协作决策架构，将网络级交通信号控制
 
 消融实验验证了架构设计的有效性：移除 SR 模块后，平均行程时间在 New York 1 数据集上从 1000.4 秒升至 1155.1 秒（Table 2），表明协作推理对复杂路网尤为关键；移除 AR 后，SR 推理 token 数在 New York 1 上增加约 52%（484.2 → 738.5），且 ATT 恶化至 1066.3 秒（Table 3），证实自适应推理深度在效率与效果上的双重收益。
 
-## 核心模块与公式推导
+
 
 CoLLMLight 的核心架构围绕“异步协作决策”与“成本感知优化”两条主线展开，包含五个关键模块。
 
@@ -193,7 +197,9 @@ $$J^{\mathrm{PPO}}(\theta) = \hat{\mathbb{E}}_{k} \left[ \min \left( r_{k}(\thet
 
 上述模块形成“慢思考—快决策”的异步流水线：SR 模块异步执行多步协作推理并缓存结果；RD 模块基于最新观测和缓存协作指导实时选择信号。AR 与 PR 两阶段优化分别从监督微调和强化学习角度，确保推理深度与交通复杂度相匹配，同时保障协作质量与推理效率的平衡。消融实验验证了这一设计的有效性：移除 SR 模块导致平均行程时间显著增加（New York 1 从 1000.4 升至 1155.1 秒）；移除 AR 则使推理 token 数增加约 52%（New York 1 从 484.2 升至 738.5），同时恶化控制效果。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 零样本性能对比
 
@@ -259,7 +265,9 @@ Table 4评估了CoLLMLight在两类退化场景下的鲁棒性：SR缓存陈旧�
 ![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_KeJqoEVOeY/figures/021_Table_8.jpg]]
 *Table 8: Zero-shot performance comparison across different datasets (lower is better). Best results are shown in bold. The lower block shows LLMs evaluated with the CoLLMLight agent framework*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有基线的谱系关系
 
@@ -292,6 +300,8 @@ CoLLMLight存在三个明确的局限性，每个局限性都指向未来的研�
 **LLM推理的部署成本**。尽管异步架构将RD延迟控制在典型黄灯时长（3-5秒）以内（图3），但LLM推理仍引入了额外的算力需求和硬件成本。在资源受限的边缘计算环境下，部署8B规模的LLM可能不切实际。探索更小规模模型的协作能力、或设计模型蒸馏方案，是推动该方法实际落地的关键。此外，成本感知优化中的$\beta$参数目前为固定值，能否根据实时交通压力或系统负载自适应调整，也是一个值得研究的问题。
 
 **多模态信息融合的缺失**。当前CoLLMLight仅依赖结构化的车道级交通特征（排队数、等待时间等），未能利用视觉信息（如交叉口摄像头画面）或语义信息（如事故报告、天气状况）。这些多模态信息可能显著提升LLM对异常交通场景的理解和泛化能力，但如何有效融合异构信息并控制提示长度，仍是一个开放挑战。
+
+
 
 ## 原文 PDF
 

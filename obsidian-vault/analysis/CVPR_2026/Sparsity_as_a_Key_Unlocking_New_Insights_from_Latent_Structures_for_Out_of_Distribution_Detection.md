@@ -44,7 +44,7 @@ claims:
 > - ImageNet‑1K (Swin‑T) 上，Average FPR95 43.59 vs 41.37 (RMDS) (+2.22)。
 > - ImageNet‑1K (DINOv2) 上，Average FPR95 40.50 vs N/A (no published baselines)。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -68,7 +68,7 @@ claims:
 
 在 ImageNet‑1K 基准上，EPD 在 ViT‑B/16 主干网络下取得了 **40.96% 的平均 FPR95**，优于所有对比方法（Table 1），包括 RMDS（43.40%）、ViM、ReAct 等强基线。在 DINOv2 主干上，EPD 进一步达到 **40.50% 的整体最优 FPR95**（Table 7），验证了该方法对自监督预训练表示的泛化能力。在 Swin‑T 上的竞争性结果（43.59% FPR95，Table 3）也表明，尽管窗口注意力机制削弱了全局特征一致性，稀疏结构检测机制仍保持有效。消融实验确认，EPD 所用的 KL 散度在稀疏 CAP 框架下显著优于欧氏距离和余弦距离（Table 4），而硬稀疏瓶颈（而非软稀疏惩罚）是放大结构偏差、实现有效 OOD 检测的关键设计选择。
 
-## 背景与动机
+
 
 ### 分布外检测的核心挑战
 
@@ -89,7 +89,9 @@ claims:
 
 这一框架的核心洞察在于：ID样本在稀疏潜在空间中维持尖锐、高能量的激活头部，而OOD样本尽管被路由到某个ID类，其激活却呈现平坦、扩散的形状——这种结构性破坏构成了鲁棒的OOD检测信号。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 从密集表示到结构化稀疏空间：Top‑k SAE 的硬瓶颈
 
@@ -115,7 +117,7 @@ $$ \mathrm{EPD~Score} = D_{\mathrm{KL}}(\mathbf{P} \parallel \mathbf{Q}) = \sum_
 
 尽管创新点清晰且证据充分，仍有几点值得关注：硬稀疏的 k 值目前通过网格搜索固定为 128，是否可设计为类别或样本自适应的动态机制以进一步提升近 OOD 检测性能，尚待探索；此外，Top‑k SAE 学到的稀疏基中每个活跃神经元对应的高层视觉语义尚未被细粒度可视化，这限制了创新机制的可解释性边界。
 
-## 整体框架
+
 
 EPD 方法将 OOD 检测重新表述为一个**结构匹配问题**，而非传统的幅度或距离比较。其核心 pipeline 由两个阶段构成：**设置阶段**与**推理阶段**（参见 Figure 1）。
 
@@ -145,7 +147,7 @@ EPD 方法将 OOD 检测重新表述为一个**结构匹配问题**，而非传�
     $$ \mathrm{EPD~Score} = D_{\mathrm{KL}}(\mathbf{P} \parallel \mathbf{Q}) = \sum_{i=1}^L \mathbf{P}_i \log\left(\frac{\mathbf{P}_i}{\mathbf{Q}_i}\right) $$
     该分数直接度量了测试样本的能量分布形态与 ID 类基准的**结构性偏离**：ID 样本的 $\mathbf{P}$ 与 $\mathbf{Q}$ 形状高度一致（低 EPD），而 OOD 样本即使能激活部分核心特征，其能量分布也呈现平坦、扩散的形态，无法复制 CAP 的尖锐头部，从而产生高 EPD 分数。
 
-## 核心模块与公式推导
+
 
 ### 整体框架
 
@@ -208,7 +210,9 @@ $$\mathrm{EPD~Score} = D_{\mathrm{KL}}(\mathbf{P} \parallel \mathbf{Q}) = \sum_{
 ![[assets/figures/papers/paper_list_l931_https_arxiv_org_abs_2604_26409/figures/006_Figure_6.jpg]]
 *Figure 6: Structural differences in ID and OOD activation. We compare the mean activation profiles of ID samples (Blue) and misclassified OOD samples (Red) sorted by the ID CAP. Top: iNaturalist vs. ID (Class 986). Bottom: OpenImage-O vs. ID (Class 309). In both cases, ID samples maintain a sharp, concentrated head, whereas OOD samples exhibit a flattened, diffused profile. Shaded regions indicate variance*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -270,7 +274,9 @@ $$\mathrm{EPD~Score} = D_{\mathrm{KL}}(\mathbf{P} \parallel \mathbf{Q}) = \sum_{
 ![[assets/figures/papers/paper_list_l931_https_arxiv_org_abs_2604_26409/figures/005_Figure_5.jpg]]
 *Figure 5: Global statistics of activation intensity. We aggregate mean activations on core indices across all classes for two OOD datasets: iNaturalist (Left) and OpenImage-O (Right). ID Ground Truth (Blue, Left): Strong activation on ground-truth core features. OOD Matched (Red, Middle): OOD samples activate the core features of their predicted class, but with lower intensity than ID. OOD Other Classes (Red, Right): OOD samples show minimal activation on unrelated classes*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有 OOD 检测范式的关键分歧
 
@@ -327,6 +333,8 @@ $$\mathrm{EPD~Score} = D_{\mathrm{KL}}(\mathbf{P} \parallel \mathbf{Q}) = \sum_{
 4. **CAP 的在线更新**：在持续学习或分布逐渐漂移的场景下，CAP 是否需要在线更新以维持其作为不变参考的有效性？静态 CAP 在非平稳环境中的退化行为尚未被研究。
 
 5. **更优的发散度量**：除了 KL 散度，是否存在更适合高维稀疏单纯形的几何发散度量（如 Wasserstein 距离或 Hellinger 距离），可进一步放大结构性差异？当前消融仅比较了欧氏距离和余弦距离，更广泛的度量空间探索仍属空白。
+
+
 
 ## 原文 PDF
 

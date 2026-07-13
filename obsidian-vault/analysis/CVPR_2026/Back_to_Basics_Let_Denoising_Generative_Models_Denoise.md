@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/Back_to_Basics_Let_Denoising_Generative_Models_Denoise.pdf
+project_link: null
+code_link: null
 aliases:
 - JJIT
 - BBLDGMD
@@ -41,7 +43,7 @@ claims:
 > - ImageNet 256×256 上，FID-50K ↓ 1.82 (JiT-G/16) vs 2.27 (DiT-XL/2) (-0.45)。
 > - ImageNet 512×512 上，FID-50K ↓ 1.78 (JiT-G/32) vs various models (see Table 8) (competitive)。
 
-## 概述
+## 概要
 
 本文直面扩散模型在高维像素空间中生成质量灾难性下降的根本瓶颈：基于流形假设，干净图像仅占据高维空间中的低维流形，而噪声（ϵ）或流速度（v）则分布在高维空间中。当网络被迫预测ϵ或v时，容量有限的模型必须保留完整的高维信息，导致生成失败。本文的核心洞见是**让扩散模型回归“去噪”本意——直接预测干净图像（x-prediction）**，使网络只需关注低维流形信息，从而摆脱高维信息瓶颈。
 
@@ -51,7 +53,7 @@ claims:
 
 该方法将扩散生成简化为“ViT + x-prediction”的自包含范式，揭示了预测目标选择对高维生成的决定性作用，为未来生成模型的设计提供了新的方法论视角。
 
-## 背景与动机
+
 
 ### 扩散模型的预测范式
 
@@ -109,7 +111,9 @@ $$\mathcal{L} = \mathbb{E}_{t,\mathbf{x},\mathbf{\epsilon}} \| \mathbf{v}_{\thet
 2. **架构可以极简**：纯ViT + 低秩瓶颈嵌入即可胜任，无需复杂的多尺度U-Net或潜在空间映射。
 3. **流形假设是理论根基**：这一设计选择有深刻的几何直觉支撑，而非经验性的技巧堆砌。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 1. 预测目标的根本转变：从噪声/速度回归到干净图像直接预测
 
@@ -157,7 +161,7 @@ $$\mathcal{L} = \mathbb{E}_{t,\mathbf{x},\boldsymbol{\epsilon}} \| \mathbf{v}_{\
 
 这些创新共同构成了一个**极简但高效的生成范式**：通过回归“去噪”本意（x-prediction）并配合低秩瓶颈设计，使普通 ViT 能够在大块高维像素上有效生成，无需潜在空间、预训练或辅助损失，在 ImageNet 256×256 上以 JiT-G/16 取得 FID 1.82，优于 DiT-XL/2 的 2.27（Table 7）。
 
-## 整体框架
+
 
 JiT（Just image Transformers）的整体设计遵循一个核心原则：**让扩散模型回归“去噪”本意**，即网络直接预测干净图像（x-prediction），而非噪声或速度。基于流形假设——自然图像仅占据高维像素空间中的一个低维流形——该方法使网络只需关注低维流形上的信息，从而摆脱高维信息瓶颈的束缚。
 
@@ -192,7 +196,7 @@ JiT 的生成 pipeline 由五个核心模块串联而成，形成从原始像素
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2511_13720/figures/004_Figure_3.jpg]]
 *Figure 3: The “Just image Transformer” (JiT) architecture: simply a plain ViT [13] on patches of pixels for x-prediction*
 
-## 核心模块与公式推导
+
 
 ### 预测空间与损失空间的解耦
 
@@ -258,7 +262,9 @@ JiT 的完整生成流水线由以下模块串联构成：
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2511_13720/figures/003_Figure_2.jpg]]
 *Figure 2: Toy Experiment: d-dimensional (d = 2) underlying data is “buried” in a D-dimensional space, by a fixed, random, column-orthogonal projection matrix. In the D-dim space, we train a simple generative model (5-layer ReLU MLP with 256-dim hidden units). The projection matrix is unknown to the model, and we only use it for visualizing the output. In this toy experiment, with the observed dimension D increasing, only x-prediction can produce reasonable results*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：预测目标决定高维生成的成败
 
@@ -321,7 +327,9 @@ JiT 的对比遵循严格的自包含原则：不使用 VAE tokenizer、分类�
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2511_13720/figures/013_Table_8.jpg]]
 *Table 8: Reference results on ImageNet 512×512. JiT has an aggressive patch size and can use small compute to achieve strong results. Notations are similar to Tab. 7*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 
@@ -357,6 +365,8 @@ JiT 的核心主张——在高维像素空间直接预测干净图像（x-predi
 3. **扩展到其他数据模态。** 流形假设的普适性意味着 x-prediction 的范式可能适用于文本、音频、蛋白质结构等“自然数据”。但不同模态的流形结构差异巨大，ViT 架构也需要相应调整。
 4. **计算效率的进一步优化。** 虽然 JiT 避免了 VAE tokenizer 的额外开销，但纯 ViT 在原始像素上的自注意力计算仍随序列长度二次增长。结合稀疏注意力或线性注意力机制能否在保持质量的前提下降低计算成本？
 5. **预条件器的失效原因。** Table 10 显示 EDM 和线性预条件器在 x-prediction 下导致严重质量下降。论文将此归因于预条件器混合了不同噪声水平的信息，破坏了 x-prediction 的“去噪”本质。但这一解释尚停留在直觉层面，更深入的理论分析——例如从优化景观或梯度方差的角度——仍有待展开。
+
+
 
 ## 原文 PDF
 

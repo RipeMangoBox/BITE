@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Empowering_LLM_Tool_Invocation_with_Tool_call_Reward_Model.pdf
+project_link: null
+code_link: https://github.com/OpenDFM/TRM
 openreview_forum_id: LnBEASInVr
 aliases:
 - TCRMTTLCA
@@ -32,12 +34,15 @@ claims:
 | 中文题名 | 赋能大语言模型工具调用的工具调用奖励模型 |
 | 英文题名 | Empowering LLM Tool Invocation with Tool-call Reward Model |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=LnBEASInVr); [GitHub](https://github.com/OpenDFM/TRM) |
+| Links | [paper](https://openreview.net/forum?id=LnBEASInVr) · [GitHub](https://github.com/OpenDFM/TRM) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | Tool-call Reward Model (TRM) with Turn-level Credit Assignment |
 | Dataset |  |
 
-## 概述
+> [!tip] 效果简介
+> 本笔记的既有实验指标、对比结果与适用边界见“实验与关键发现”；本轮仅统一结构，不改写证据。
+
+## 概要
 
 大语言模型在调用外部工具时，现有强化学习方法普遍采用**仅基于最终答案正确性的结果奖励**。这一信号粒度过于粗糙：一个正确的工具调用可能因为最终答案错误而被惩罚，反之亦然，从而在优化过程中引发**梯度冲突**，限制了模型学习有效工具调用策略的能力。
 
@@ -45,7 +50,7 @@ claims:
 
 实验覆盖搜索问答和代码数学两类工具调用场景，在1.5B、3B、7B三种模型规模上，TRM集成后的PPO/GRPO均一致优于仅使用结果奖励的基线方法。例如，在Qwen2.5-3B-Instruct上，Search-R1-GRPO-TRM在多个问答基准上取得最优平均性能（43.49）；在代码数学任务上，ToRL-GRPO-TRM较ToRL-GRPO提升约4.6个百分点。消融分析表明，中等规模的TRM（1.5B/3B）配合1万条训练样本即可达到稳健性能，且回合级优势估计在工具调用数量和最终效果上均优于组级估计。
 
-## 背景与动机
+
 
 ### 大语言模型的工具调用困境
 
@@ -70,7 +75,9 @@ claims:
 
 图 1 概括了这一动机：子图 (a) 展示了仅用结果奖励时，正确工具调用因最终答案错误而被错误惩罚的失败案例；子图 (b) 展示了引入工具调用奖励后，每个工具调用都能获得独立的效用评估；子图 (c) 则预示了集成 TRM 后模型性能的一致提升。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作的核心创新在于引入**工具调用奖励模型 (Tool-call Reward Model, TRM)**，将强化学习中工具调用的奖励信号从“最终答案正确性”这一粗粒度结果奖励，升级为**回合级细粒度效用评估**。这一转变直接解决了现有基于结果奖励的RL方法（如 Search-R1、ToRL）中存在的**梯度冲突**问题。
 
@@ -106,7 +113,7 @@ $$\tilde{r}^{i} = \begin{cases} \tilde{s}^{i}, & 1 \leq i \leq n_{\tau} \\ \math
 2. **适度规模的 TRM 即可生效**：实验表明，1.5B/3B 规模的 TRM 在仅 10K 训练样本下即可达到稳健性能，无需与策略模型同等规模。
 3. **与 RL 算法的解耦集成**：TRM 作为独立奖励模型，可无缝集成到 PPO 和 GRPO 中，在搜索场景和代码数学场景下均一致提升模型表现，且对 1.5B、3B、7B 不同规模的策略模型均有效。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l28_https_openreview_net_forum_id_LnBEASInVr/figures/002_Figure_2.jpg]]
 *Figure 2: TRM-guided LLM tool invocation. (a) Generation of tool invocation trajectories and turnlevel utility labels for TRM training. (b) Turn-level credit assignment and GRPO adaptation via turn-level advantage estimation*
@@ -142,7 +149,7 @@ TRM框架通过两个阶段解决上述瓶颈：**TRM训练（Exploration）** �
 
 整个框架的因果链路为：**TRM提供逐工具调用的效用信号 → 回合级信用分配将TRM评分与结果奖励结合 → PPO/GRPO利用细粒度奖励直接优化工具调用策略 → 解决结果奖励引发的梯度冲突，提升工具使用效果与泛化能力**。实验证据表明，该框架在1.5B/3B/7B不同模型规模以及PPO/GRPO不同算法下均一致提升搜索和代码场景的表现，且仅需10K训练样本即可训练出鲁棒的3B TRM。
 
-## 核心模块与公式推导
+
 
 ### 轨迹定义
 
@@ -202,7 +209,9 @@ $$A_g^j = r_g^{L_g} + \sum_{m=j}^{L_g-1} \gamma^{m-j} r_g^m$$
 
 回合级优势估计将优势计算按工具调用回合进行归一化，相比组级估计避免了奖励黑客行为，实验表明其性能更优。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验结果
 
@@ -266,7 +275,9 @@ TRM 在不同模型规模（1.5B/3B/7B）和强化学习算法（PPO/GRPO）的�
 | Figure 6-b | 轨迹级 ORM 失效，TRM 作为纯验证器提升有限 |
 | Figure 7 | 组级估计导致奖励黑客，回合级估计有效缓解 |
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与设计动机
 
@@ -327,6 +338,8 @@ TRM 的设计存在以下明确边界：
 4. **超参数敏感性**：PPO 中工具调用 token 的奖励权重 $\alpha$ 对性能有显著影响，其最优值可能依赖具体任务和模型规模，需要额外调参成本。
 
 5. **开放域工具的泛化**：TRM 在搜索和代码两类场景中展现了跨场景泛化能力，但向更广泛的工具生态（如 API 调用、数据库操作）的泛化能力尚待验证。
+
+
 
 ## 原文 PDF
 

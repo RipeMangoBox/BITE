@@ -5,6 +5,7 @@ paper_level: A
 venue: NeurIPS
 year: 2025
 pdf_ref: paperPDFs/NEURIPS_2025/Native_Segmentation_Vision_Transformers.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/dvl/projects/native-segmentation/
 aliases:
 - SNSVT
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 原生分割视觉Transformer |
 | 英文题名 | Native Segmentation Vision Transformers |
 | 会议/期刊 | NeurIPS 2025 |
-| Links | [paper](https://arxiv.org/abs/2505.16993); [Project](https://research.nvidia.com/labs/dvl/projects/native-segmentation); [Project](https://research.nvidia.com/labs/dvl/projects/native-segmentation/) |
+| Links | [paper](https://arxiv.org/abs/2505.16993) · [Project](https://research.nvidia.com/labs/dvl/projects/native-segmentation) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/segmentation |
 | Method | SeNaTra (Native Segmentation Vision Transformer) |
 | Dataset | Pascal VOC (zero-shot semantic segmentation), ADE20k (semantic segmentation with mask supervision), ADE20k (semantic segmentation with M2F head), COCO val2017 (panoptic segmentation) |
@@ -42,7 +43,7 @@ claims:
 > - ADE20k (semantic segmentation with mask supervision) 上，mIoU 为 49.7 (SeNaTra-T native)，对比 47.1 (NAT-T w/ UperNet)，变化 +2.6。
 > - ADE20k (semantic segmentation with M2F head) 上，mIoU 为 51.3 (SeNaTra-T + M2F)，对比 49.1 (NAT-T* w/ M2F)，变化 +2.2。
 
-## 概述
+## 概要
 
 现代视觉骨干网络（如 Swin Transformer、NAT）普遍采用均匀网格下采样（池化或跨步卷积），对所有空间位置一视同仁，不感知图像内容。这导致在下游分割任务中出现特征错位，迫使解码器头承担额外的补偿负担，限制了骨干网络本身的分割能力。
 
@@ -54,7 +55,7 @@ claims:
 
 **方法定位**：SeNaTra 属于基于分组的分层视觉骨干方法，在架构层面将分割能力内嵌到骨干网络中，区别于依赖专用分割头（如 UperNet、Mask2Former）的传统范式。它继承了标准分层 Transformer 的四阶段结构，但将下采样操作从“均匀网格”替换为“内容感知分组”，将上采样操作从“双线性插值”替换为“分组分配矩阵的组合”。这一设计使其既能原生输出分割掩码，又能无缝集成到现有分割框架中。
 
-## 背景与动机
+
 
 ### 视觉骨干网络中的均匀下采样困境
 
@@ -82,7 +83,9 @@ Figure 1 清晰地展示了这一困境：传统骨干网络（上图）通过�
 
 这种“原生分割”范式从根本上重新思考了视觉骨干网络的设计：骨干网络不应仅仅是特征提取器，而应成为分割任务的一等公民。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SeNaTra 的核心创新在于**将视觉骨干网络中的均匀下采样替换为内容感知的空间分组层**，从而将分割能力内化到骨干网络本身，而非依赖外部的专用解码器头。这一转变涉及三个关键组件的重新设计。
 
@@ -125,7 +128,7 @@ $$A_{l\to l-k}^{\mathsf{ups}} := A_{l-k+1}^{\mathsf{ups}} \times \cdots \times A
 
 这一设计使分割能力从“解码器补偿”转变为“骨干内建”，在零样本分割、有监督语义分割和全景分割三个场景下均实现了对标准骨干的显著超越，同时保持了端到端的可微性和可扩展性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2505_16993/figures/002_Figure_2.jpg]]
 *Figure 2: Overall model design. Visualization of our hierarchical architecture and its key components. (a) Our backbone architecture consists of four processing stages interconnected by content-aware grouping layers for downsampling. (b) Core operations of our Spatial Grouping Layer, which computes soft token assignments and updates group features iteratively (detailed in Algorithm 1). (c) The composition of learned assignment matrices across grouping layers in consecutive backbone stages enables principled feature upsampling*
@@ -162,7 +165,7 @@ SeNaTra 的 pipeline 由以下关键模块构成，其整体架构如 **Figure 2
 
 传统分割流程（如 **Swin Transformer** 或 **NAT** 搭配 **UperNet**/**Mask2Former**）依赖均匀下采样提取特征，再通过专用的分割头（像素解码器 + Transformer 解码器）进行上采样和掩码预测。SeNaTra 将分割能力内化到骨干网络中：分组层在下采样时已学习对齐语义边界，上采样则直接复用分组分配矩阵的转置乘积，无需额外的双线性插值或可学习的上采样模块。这种设计使分割掩码从骨干网络中自然涌现，而非依赖外部分割头的补偿。
 
-## 核心模块与公式推导
+
 
 ### 整体架构：四阶段层次化骨干网络
 
@@ -199,7 +202,9 @@ $$
 
 每个阶段内部使用标准 Transformer 编码器块进行特征处理。SeNaTra 将自注意力层中的相对位置偏置替换为 **RoPE**（旋转位置编码），并使用局部自注意力机制。不同模型变体（Tiny/Base/Large）的阶段层数、输出维度和 MLP 比率详见 Table 5，输出嵌入维度分别为 512、1024 和 1536。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -289,7 +294,9 @@ Figure 3 提供了最具说服力的定性证据：即使在**完全没有掩码
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2505_16993/figures/012_Table_6.jpg]]
 *Table 6: Image classification on ImageNet-1k and -22k. We compare various standard and grouping-based backbones both trained from scratch on 1k and pre-trained on 22k*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心问题与因果杠杆
 
@@ -355,6 +362,8 @@ SeNaTra 提出了三种分割范式（Table 2c 概念图）：
 | 分割头独立性 | 像素解码器对 SeNaTra 影响极小，证明分组层已提供丰富空间信息（Table 4） | 高 |
 | 效率权衡 | 分组层引入 20-40% 延迟开销，但在端到端分割中被性能提升摊销（Table 8, 9） | 中（需更多硬件环境验证） |
 | 全景分割 | 原生全景分割存在过度分割，需额外细化步骤 | 中（需更系统的错误分析） |
+
+
 
 ## 原文 PDF
 

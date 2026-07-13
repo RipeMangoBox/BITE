@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Learning_to_Interpret_Weight_Differences_in_Language_Models.pdf
+project_link: null
+code_link: https://github.com/Aviously/diff-interpretation-tuning
 openreview_forum_id: 6As4wfTB77
 aliases:
 - DITD
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 学习解释语言模型中的权重差异 |
 | 英文题名 | Learning to Interpret Weight Differences in Language Models |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=6As4wfTB77); [GitHub](https://github.com/Aviously/diff-interpretation-tuning) |
+| Links | [paper](https://openreview.net/forum?id=6As4wfTB77) · [GitHub](https://github.com/Aviously/diff-interpretation-tuning) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/molecular_generation |
 | Method | Diff Interpretation Tuning (DIT) |
 | Dataset | Hidden Topic Reporting (synthetic rank-1 LoRA weight diffs, 100 held-out topics), News Summarization (rank-8 LoRA weight diffs, 100 test set) |
@@ -41,7 +43,7 @@ claims:
 > - Hidden Topic Reporting (synthetic rank-1 LoRA weight diffs, 100 held-out topics) 上，LLM-judge similarity score (1–5) 为 4.76 (Qwen3-4B DIT)，对比 1.21 (Base Question), 1.38 (20 Questions), 4.73 (20 Questions w/ Trigger)，变化 +3.55 over Base Question, +3.38 over 20 Questions。
 > - News Summarization (rank-8 LoRA weight diffs, 100 test set) 上，LLM-judge summary similarity score (1–5) 为 4.22 (Qwen3-4B DIT)，对比 1.00 (Base Question), 1.98 (20 Questions), 3.65 (Generated Story)，变化 +3.22 over Base Question, +0.57 over Generated Story。
 
-## 概述
+## 概要
 
 微调会改变语言模型的行为，但如何系统性地解释这些行为变化仍是一个开放问题。现有方法要么依赖黑盒探测（通过直接提问或多轮对话推断模型行为），要么进行电路级别的细粒度分析，两者均难以全面、可验证地描述权重差异引入的行为变化。
 
@@ -58,7 +60,7 @@ $$\mathcal{L}_{\mathrm{train}}(A_M) = \frac{1}{n} \sum_{i=1}^{n} \mathcal{L}_{\m
 
 关键发现包括：DIT 性能随训练数据量增加而提升，约 1000 样本后趋于饱和；在 rank-1 上训练的适配器可泛化至更高秩甚至全参数微调；对未见过的触发形式（如零宽空格）仍保持高性能。但 DIT-adapter 在不同行为类型之间几乎无泛化能力（Table 6.1），且无法有效发现隐藏行为的触发词，表明当前方法在任务多样性和内省任务范围上仍存在显著局限。
 
-## 背景与动机
+
 
 语言模型微调（fine-tuning）已成为定制模型行为的标准范式——从指令遵循到领域适配，微调产生的权重差异（weight diff）编码了模型行为的核心变化。然而，**理解这些权重差异究竟引入了何种行为变化，目前缺乏系统性的方法**。当开发者微调一个模型后，他们通常只能通过黑盒探测（black-box probing）来猜测模型学到了什么：向微调后的模型提问，观察输出，再人工推断行为变化。这种方式的根本局限在于，模型本身并不具备“自省”能力——它无法用自然语言描述自身相对于基础模型发生了哪些改变。
 
@@ -68,7 +70,9 @@ $$\mathcal{L}_{\mathrm{train}}(A_M) = \frac{1}{n} \sum_{i=1}^{n} \mathcal{L}_{\m
 
 具体而言，本文聚焦于一个可操作的问题设定：给定一个基础模型 $M$ 和一个经过微调的模型 $M'$，我们希望构建一个解释器 $I$，使得 $I$ 能够回答关于 $M$ 与 $M'$ 之间行为差异的自然语言问题。这一设定的挑战在于，**权重差异本身是高维连续的张量空间，而行为描述是离散的自然语言空间，两者之间存在巨大的语义鸿沟**。如何桥接这一鸿沟，是本文方法设计的核心要义。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DIT 的核心创新在于将“解释权重差异”这一问题从黑盒探测范式转变为**可学习的自省机制**。传统方法依赖直接提问或多轮对话来猜测微调模型的行为变化（如 Base Question、20 Questions），本质上是将模型视为黑盒进行外部探测，缺乏对权重差异内部结构的直接利用。DIT 的关键突破体现在两个 changed slots 上：
 
@@ -90,7 +94,7 @@ DIT 的优势在两个任务上得到一致验证。在隐藏主题报告任务�
 
 需要指出的是，DIT 的跨行为泛化能力目前极弱——在隐藏主题上训练的适配器用于新闻摘要任务时得分仅 1.25，反之亦然（Table 6.1），这意味着当前方法学到的解释能力高度绑定于训练时所见的行为类型，通用性仍是待解决的核心瓶颈。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0011_6As4wfTB77_Learning_to_Interpret_Weight_Differences_in_Lang/figures/001_Figure_3.jpg]]
 *Figure 3: 1: A diagrammatic overview of Diff Interpretation Tuning (DIT)*
@@ -131,7 +135,7 @@ $$I \oplus \delta = (M \oplus A_M) \oplus \delta = (M \oplus \delta) \oplus A_M 
 - **适配器秩**：DIT-adapter 的秩（1–128）对性能影响有限，全参数微调下仅微弱提升后饱和，表明性能瓶颈不在于适配器容量（Figure I.1）。
 - **跨秩泛化**：在 rank-1 权重差异上训练的 DIT-adapter 可泛化至更高秩（rank-64）甚至全参数微调，说明其学到的解释机制不依赖特定秩结构（Figure 4.3）。
 
-## 核心模块与公式推导
+
 
 ### DIT 训练目标
 
@@ -186,7 +190,9 @@ $$
 
 其中类型权重设置为 $(\lambda_{\mathrm{trigger}}, \lambda_{\mathrm{incorrect}}, \lambda_{\mathrm{base}}) = (1, 1, 5)$，每完成三次前向传播（每种类型各一次）执行一次梯度更新。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 隐藏主题报告任务
 
@@ -235,7 +241,9 @@ Table 6.1（Table G.6）揭示了 DIT 的关键局限：在隐藏主题任务上
 
 DIT 在两个受控任务上建立了权重差异自省的新范式，性能接近 oracle 水平且具有跨秩泛化能力。但其跨行为泛化的彻底失败和触发词反转的零成功率表明，当前方法学到的是任务特定的行为表征，距离通用的权重差异解释器仍有显著差距。这些失败模式为后续研究指明了方向：扩大合成数据的多样性、探索更优的适配器架构，以及理解不同内省任务的根本难度差异。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -280,6 +288,8 @@ DIT 在以下维度展现出明确的泛化边界：
 - **训练数据工程**：如何构建更大规模、更多样化的合成权重差异数据，以打破跨行为泛化的瓶颈？
 - **适配器架构改进**：是否存在能同时访问微调前后模型信息的适配器架构（如双塔设计），从而提升解释的准确性和泛化性？
 - **下游应用集成**：DIT 的输出能否作为自动化可解释性代理的组件，嵌入模型审计、安全检测或对齐验证流程？
+
+
 
 ## 原文 PDF
 

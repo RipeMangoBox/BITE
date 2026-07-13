@@ -5,6 +5,8 @@ paper_level: A
 venue: ICCV
 year: 2025
 pdf_ref: paperPDFs/ICCV_2025/TriDi_Trilateral_Diffusion_of_3D_Humans_Objects_and_Interactions.pdf
+project_link: null
+code_link: null
 aliases:
 - TTD3HOI
 tags:
@@ -33,7 +35,10 @@ claims:
 | Method |  |
 | Dataset |  |
 
-## 概述
+> [!tip] 效果简介
+> 本笔记的既有实验指标、对比结果与适用边界见“实验与关键发现”；本轮仅统一结构，不改写证据。
+
+## 概要
 
 **问题背景** 三维人体-物体交互（HOI）建模是计算机视觉与图形学中的核心挑战，涉及人体姿态、物体位姿以及两者之间交互关系的联合推理。现有方法大多采用单向生成范式，即给定部分条件生成另一部分，无法同时捕捉人体（H）、物体（O）与交互（I）三者的联合分布，导致生成结果在物理一致性和多样性方面存在局限。
 
@@ -43,7 +48,7 @@ claims:
 
 **方法定位** TriDi 属于**三维生成式 HOI 建模**这一新兴方向，区别于传统的回归式或检索式方法。其核心创新在于将扩散模型从单变量或双变量生成拓展至三变量联合分布学习，为下游应用（如场景填充、交互重建、文本驱动的交互编辑）提供了统一的概率框架。
 
-## 背景与动机
+
 
 三维人体-物体交互（Human-Object Interaction, HOI）建模是计算机视觉与图形学的核心挑战，其目标在于理解并生成人与物体在三维空间中的联合行为。该问题涉及三个相互耦合的模态：**人体 H**（包含姿态、体型与全局位姿）、**物体 O**（全局 6-DoF 位姿）以及**交互 I**（接触模式与语义描述）。现有方法通常沿两个方向展开：一类方法以人体为中心，在给定物体条件下预测人体姿态；另一类则以物体为中心，根据人体动作推断物体位姿。然而，这些方法普遍存在一个根本性局限——它们仅建模单向或双向的条件分布（如 $p(\mathcal{H}|\mathcal{O})$ 或 $p(\mathcal{O}|\mathcal{H})$），而非三者之间的联合分布 $p(\mathcal{H}, \mathcal{O}, \mathcal{I})$。
 
@@ -53,7 +58,9 @@ claims:
 
 本文提出的 **TriDi**（Trilateral Diffusion）正是针对上述缺口而设计。TriDi 的核心动机在于：通过三边扩散框架直接建模 $p(\mathcal{H}, \mathcal{O}, \mathcal{I})$ 的联合分布，使模型能够在任意条件组合下进行推理与生成。同时，TriDi 将接触图与文本描述映射到共享的潜在空间作为交互表示，继承了接触几何的精确性与自然语言的灵活性。这一设计使得 TriDi 成为首个能够在全部七种条件模式下运行（即 $p(\mathcal{H},\mathcal{I}|\mathcal{O})$、$p(\mathcal{O},\mathcal{I}|\mathcal{H})$、$p(\mathcal{H},\mathcal{O}|\mathcal{I})$ 及其边际分布）的统一 HOI 生成模型，显著突破了现有单向专用模型的适用范围。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 TriDi 的核心创新在于将人-物交互（HOI）建模从传统的单向条件生成提升为**三边联合扩散（Trilateral Diffusion）**，直接建模人（H）、物（O）与交互（I）三者的联合分布 $p(\mathcal{H}, \mathcal{O}, \mathcal{I})$。这一设计使得模型天然具备双向/多向条件推理能力，可在七种不同模式下运行（见 Fig. 1），而现有基线方法通常仅针对单一条件方向进行专门化设计。
 
@@ -65,7 +72,7 @@ TriDi 的核心创新在于将人-物交互（HOI）建模从传统的单向条�
 
 综合来看，TriDi 通过将生成建模从“单向条件”升级为“三边联合”、将交互表示从单一模态扩展为 Contact-Text 融合、以及引入重建引导，构成了其在 BEHAVE 基准上 COV 指标提升 +7.10（47.81 vs. GNet 40.71）的核心技术动因。
 
-## 整体框架
+
 
 TriDi 构建了一个**三边扩散（Trilateral Diffusion）**框架，统一建模人体（Human H）、物体（Object O）与交互（Interaction I）的联合分布 $p(\mathcal{H}, \mathcal{O}, \mathcal{I})$。其核心架构是一个基于 Transformer 的扩散模型，对三个模态的 token 化表征进行联合去噪，通过 token-wise attention 实现三向信息流动。
 
@@ -102,7 +109,7 @@ $$(\hat{\mathcal{H}}, \hat{\mathcal{O}}, \hat{\mathcal{I}}) := (\hat{\mathcal{H}
 ![[assets/figures/papers/paper_list_l1778_TriDi_Trilateral_Diffusion_of_3D_Humans_Objects_and_Interactions/figures/002_Figure_2.jpg]]
 *Figure 2: TriDi Overview. TriDi is a Trilateral Diffusion for Human H (pose*
 
-## 核心模块与公式推导
+
 
 ### 三变量联合分布建模
 
@@ -158,7 +165,9 @@ $$
 ![[assets/figures/papers/paper_list_l1778_TriDi_Trilateral_Diffusion_of_3D_Humans_Objects_and_Interactions/figures/003_Figure_3.jpg]]
 *Figure 3: Architecture of Contact-Text Interactions model. We train a mapping from the contact map*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 生成分布质量
 
@@ -238,7 +247,9 @@ TriDi 是唯一能够覆盖全部 7 种操作模态的方法，而基线方法�
 ![[assets/figures/papers/paper_list_l1778_TriDi_Trilateral_Diffusion_of_3D_Humans_Objects_and_Interactions/figures/004_Figure_4.jpg]]
 *Figure 4: Comparison with baselines. In the two left-most columns, we show three samples for p(H, I|O) and p(O, I|H) from BEHAVE and GRAB test sets. TriDi’s generations are better aligned with the condition, causing less interpenetration (e.g., for basketball), respecting fine-grained details (e.g., for smaller objects), and demonstrating more diversity for limbs not restricted by contacts (e.g., for yoga ball). On the right, TriDi is the only model that can sample from p(H, O, I)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系
 
@@ -290,6 +301,8 @@ TriDi 的适用边界由其设计选择决定：
 4. **计算效率**：三向扩散相较于单向或双向扩散的计算开销增加幅度，以及在实际部署中的可行性，论文未提供相关分析。
 
 **证据强度说明**：上述方法定位与关系分析主要基于论文自身陈述（confidence 0.85–0.98）。基线方法 GNet 的技术细节及外部对比的公平性需结合原始文献手动核实。
+
+
 
 ## 原文 PDF
 

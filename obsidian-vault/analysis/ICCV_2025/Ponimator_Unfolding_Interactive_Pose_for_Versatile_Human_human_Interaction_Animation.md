@@ -5,6 +5,8 @@ paper_level: A
 venue: ICCV
 year: 2025
 pdf_ref: paperPDFs/ICCV_2025/Ponimator_Unfolding_Interactive_Pose_for_Versatile_Human_human_Interaction_Animation.pdf
+project_link: https://stevenlsw.github.io/ponimator/
+code_link: null
 aliases:
 - PUIPVHHIA
 tags:
@@ -41,7 +43,7 @@ claims:
 > - Inter-X (pose animation) 上，FID↓ 5.0 vs 7.1 (w/o anchor) (-2.1)。
 > - Dual-Human (pose animation) 上，FID↓ 24.2 vs 36.9 (w/o anchor) (-12.7)。
 
-## 概述
+## 概要
 
 **核心问题**：生成逼真的双人交互动态存在一个关键瓶颈——现有方法难以在保证运动自然感的同时维持物理接触，并且无法将高质量动作捕捉数据中的交互先验有效迁移到开放域图像或文本输入中。直接端到端生成往往导致穿透、滑动和接触缺失。
 
@@ -53,7 +55,7 @@ claims:
 
 **局限与展望**：当前方法聚焦短时交互片段，长序列生成时交互姿态先验作用减弱；未显式建模人际穿透，在亲密接触场景中可能出现穿透；缺乏场景上下文意识，可能与环境碰撞；交互姿态估计误差会传播至动画阶段。未来方向包括显式穿透建模、场景上下文整合、文本引入动画阶段以解决语义歧义，以及向多人交互扩展。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -73,7 +75,9 @@ claims:
 
 基于这一洞察，Ponimator 提出将任务解耦为两个阶段：先利用**空间先验**生成交互姿态，再利用**时间先验**从交互姿态展开为完整运动序列。这种解耦使得模型只需少量条件（单姿态、文本或两者组合）即可在各种输入下生成逼真的双人交互动态，同时通过交互姿态这一中间锚点，自然保证了物理接触和运动真实感。训练数据则来自动作捕捉交互数据集中检测到的近距离双人姿态及其前后文运动片段，从而将高质量 MoCap 数据中的交互先验有效迁移到开放域应用中。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Ponimator 的核心创新在于**将交互姿态（Interactive Pose）作为连接静态姿态生成与动态运动动画的中间锚点**，从而将复杂的双人交互生成任务解耦为两个可控的子问题。这一设计直接回应了现有方法的瓶颈：在生成近距离双人交互时，难以同时保证运动真实感与物理接触，且无法有效将高质量动作捕捉数据中的交互先验迁移到开放域图像中。
 
@@ -107,7 +111,7 @@ Ponimator 在扩散模型框架内引入了一系列针对交互姿态锚定的�
 
 这些结果一致表明：**交互姿态锚定及其配套的条件编码机制是 Ponimator 性能优势的核心来源**，而非模型容量或训练策略的简单提升。
 
-## 整体框架
+
 
 Ponimator 的核心设计是将双人交互运动生成解耦为两个阶段，以**交互姿态**作为中间桥梁。整体 pipeline 由两个条件扩散模型串联构成：**交互姿态生成器** 和 **交互姿态动画器**，分别利用空间先验和时间先验来完成从条件输入到动态运动的生成。
 
@@ -151,7 +155,7 @@ $$p(\mathcal{X}, \beta) = p(\mathcal{X}; \mathbf{x}_I, \beta) \cdot p(\mathbf{x}
 ![[assets/figures/papers/paper_list_l1771_Ponimator_Unfolding_Interactive_Pose_for_Versatile_Human_human_Interacti/figures/014_Figure_10.jpg]]
 *Figure 10: Diverse interactive motion generation. From a single pose,our framework generates varied interactive poses (magenta box)and motions (lst,2nd rows) and text-driven ones (3rd row)*
 
-## 核心模块与公式推导
+
 
 ### 3.1 交互姿态的定义与概率分解
 
@@ -206,7 +210,9 @@ $$\tilde{\mathbf{z}}_t = \big( (1 - \mathbf{m}_a) \odot \mathbf{z}_t^a + \mathbf
 
 通过灵活组合 $\mathbf{m}_a$ 和 $\mathbf{m}_c$，单一模型即可覆盖三种条件模式：纯文本（$\mathbf{m}_a = 0, \mathbf{m}_c = 1$）、纯单姿态（$\mathbf{m}_a = 1, \mathbf{m}_c = 0$）、以及文本+单姿态（$\mathbf{m}_a = 1, \mathbf{m}_c = 1$），实现了统一的交互姿态生成。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -277,7 +283,9 @@ Figure 12 系统性揭示了方法的四类典型失败模式：
 ![[assets/figures/papers/paper_list_l1771_Ponimator_Unfolding_Interactive_Pose_for_Versatile_Human_human_Interacti/figures/017_Figure_13.jpg]]
 *Figure 13: Longer motion generation bychaining interactive poses.Wereuse the last generated pose as the next input,reseting interactive time to zero,enabling sliding-window synthesis of longer motions (key-frame in magenta box)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与设计动机
 
@@ -326,6 +334,8 @@ Ponimator 的方法栈包含五个关键设计槽位，每个均经过消融验�
 3. **长程语义控制**：如何将文本条件引入姿态动画阶段，以解决语义歧义并生成更符合文本描述的长程交互？这涉及对现有框架中条件流的重新设计。
 4. **上游精度提升**：如何进一步提升交互姿态估计和生成的准确性，以减轻动画阶段的误差传播？这可能涉及更强的姿态先验或迭代优化策略。
 5. **多人扩展**：框架是否可以在不重新训练的情况下扩展到三人或多人交互？Figure 7 第 6 行展示了初步的多人组合实验，但系统性验证和性能评估仍是开放问题。
+
+
 
 ## 原文 PDF
 

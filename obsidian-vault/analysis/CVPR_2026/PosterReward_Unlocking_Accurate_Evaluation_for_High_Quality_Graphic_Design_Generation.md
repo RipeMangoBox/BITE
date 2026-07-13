@@ -45,7 +45,7 @@ claims:
 > - PosterRewardBench-Advanced 上，Accuracy (%) 86.0 vs HPSv3 (41.2) (+44.8)。
 > - PosterRewardBench-Advanced (pairwise) 上，Avg. Accuracy (%) PosterReward-Pairwise (83.8) vs GPT-5 (82.9) (+0.9)。
 
-## 概述
+## 概要
 
 图形设计生成（尤其是海报生成）近年来受益于扩散模型的快速发展，但其质量评估仍严重滞后。现有奖励模型主要关注全局图像美学，忽视了海报评估中至关重要的**排版（typography）** 和**布局（layout）** 维度，导致评估结果与人类判断存在显著偏差。与此同时，图形设计领域缺乏专门的偏好数据集，进一步限制了评估和生成模型的优化。
 
@@ -55,7 +55,7 @@ claims:
 
 实验结果表明，PosterReward 在多项基准上显著超越现有方法。在 **PosterRewardBench-Advanced** 上达到 **86.0%** 的准确率，而此前最优基线 HPSv3 仅为 41.2%，提升幅度达 44.8 个百分点。其成对变体 PosterReward-Pairwise 的平均准确率（83.8%）甚至超过 GPT-5（82.9%），且表现出最小的位置偏差。消融实验证实，分析模块、多阶段训练和数据规模均对性能有持续正向贡献。此外，PosterReward 可作为强化学习的可靠奖励信号，有效优化生成模型的海报生成质量。
 
-## 背景与动机
+
 
 ### 图形设计生成与评估的鸿沟
 
@@ -79,7 +79,9 @@ claims:
 
 3. **级联多阶段训练策略**：将奖励模型设计为“分析模块 + 评分模块”的两阶段架构，通过联合监督微调（Joint SFT）、联合拒绝采样微调（Joint RSFT）和 GRPO 强化学习三个阶段逐步提升评估精度，使模型不仅能输出分数，还能生成可解释的多维度分析文本。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PosterReward 的核心创新在于**系统性地重构了图形设计生成领域的奖励信号**，将评估从单一的全局美学评分提升为**五维结构化分析驱动的精确偏好建模**。这一重构通过三个紧密耦合的“changed slots”实现，分别解决了“评什么”、“数据从哪来”、“怎么评”三个根本问题。
 
@@ -127,7 +129,7 @@ PosterReward 的训练并非简单的单阶段微调，而是设计了**四个�
 
 这种模型族设计使 PosterReward 既能作为高精度评估工具，也能作为强化学习中的可靠奖励信号，直接优化生成模型的海报输出质量。
 
-## 整体框架
+
 
 PosterReward 的整体框架围绕一个核心洞察展开：现有奖励模型仅关注全局图像美学，忽视了海报评估中关键的排版和布局维度。为此，该工作设计了一条**数据构建—模型训练—评估应用**的级联流水线，其因果链条清晰：通过多 MLLM 共识自动构建大规模偏好数据，再以多阶段训练策略将多维分析能力注入奖励模型，最终实现对图形设计质量的精确评估。
 
@@ -170,7 +172,7 @@ PosterReward 的整体框架围绕一个核心洞察展开：现有奖励模型�
 ![[assets/figures/papers/paper_list_l773_https_arxiv_org_abs_2603_29855/figures/004_Figure_4.jpg]]
 *Figure 4: PosterReward training pipeline and model structure diagram. The top shows three reward models with different structures, and the bottom shows the training pipeline. Our training pipeline consists of four cascaded stages: Joint Supervised Fine-Tuning, Joint Rejection Sampling, Score-Module Training, and Reinforcement Learning*
 
-## 核心模块与公式推导
+
 
 PosterReward 的核心架构采用**两阶段判别式奖励模型**设计，将图像分析与标量评分解耦为两个级联模块，并通过多阶段训练策略实现协同优化。整体结构如 Figure 4 所示。
 
@@ -217,7 +219,9 @@ $$\mathcal{L}_{\mathrm{GRPO}}(\boldsymbol{\theta}) = \mathbb{E} \Big[ \min \big(
 ![[assets/figures/papers/paper_list_l773_https_arxiv_org_abs_2603_29855/figures/002_Figure_2.jpg]]
 *Figure 2: Schematic diagram of AI preference data collection. The raw data was generated using Seedream 3.0, Seedream 4.0, and Qwen-Image-Lightning. The models used included four open-source models: CLIP, DINOv3, HPSv3, and GLM-4.5v, and three closed-source models: Gemini-2.5-Flash-Lite, Gemini-2.5-Pro, and GPT-5*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -282,7 +286,9 @@ PosterReward在专门构建的海报评估基准上展现出对现有奖励模�
 ![[assets/figures/papers/paper_list_l773_https_arxiv_org_abs_2603_29855/figures/014_Table_7.jpg]]
 *Table 7: Ablation study on dataset components. We compare the impact of using partial (33K) vs. full (70K) PosterPreference (PP) data, both independently and in combination with HPDv3. All values represent accuracy (↑)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有奖励模型的谱系关系
 
@@ -343,6 +349,8 @@ PosterReward 的训练流水线由四个级联阶段构成（Figure 4），其�
 2. **效率与精度的权衡**：如何通过模型蒸馏、推测解码或架构优化降低两阶段模型的计算成本，使其适用于实时或大规模推理场景，值得进一步探索。
 3. **模型规模效应**：当前 PosterReward 基于 Qwen3-VL-8B，模型规模扩展如何影响多模态偏好学习中的性能与效率权衡，尚缺乏系统研究。
 4. **跨子领域迁移**：如何将 PosterReward 的评估能力迁移至其他平面设计子领域（广告横幅、社交媒体图形等），同时保持评估准确性，需要领域适配策略的进一步设计。
+
+
 
 ## 原文 PDF
 

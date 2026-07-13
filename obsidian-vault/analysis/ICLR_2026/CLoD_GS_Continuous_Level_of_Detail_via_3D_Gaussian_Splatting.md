@@ -43,7 +43,7 @@ claims:
 > - BungeeNeRF 上，#GS 4.185M (CLoD-GS scale=1) vs 6.733M (3DGS) (-37.9%)。
 > - Deep Blending (2 scenes) 上，PSNR 29.93 (CLoD-GS scale=1) vs 29.84 (3DGS) (+0.09)。
 
-## 概述
+## 概要
 
 **核心问题**：传统离散细节层次（DLoD）方法需为同一场景存储多个独立分辨率模型，导致内存开销倍增，且在模型切换边界产生明显的视觉跳变（popping artifacts），严重破坏沉浸式体验的连续性。
 
@@ -57,7 +57,7 @@ claims:
 
 **方法谱系与知识库定位**：CLoD-GS 属于 3DGS 后处理/训练期压缩与连续 LOD 交叉方向。与基于静态重要性排序的连续 LOD 方法（**Fast Rendering**, Milef et al., 2025）、基于八叉树的离散 LOD 方法（**Octree-GS**, Ren et al., 2025）、基于分层数据结构的离散 LOD 方法（**H-3DGS**, Kerbl et al., 2024）以及使用概率掩码进行静态剪枝的压缩方法（**MaskGaussian**, Liu et al., 2025）不同，CLoD-GS 首次将 LOD 控制建模为**距离自适应的可学习连续衰减**，在单一模型内实现无缝过渡，且训练策略可迁移至压缩模型（如 MaskGaussian）赋予其连续 LOD 能力。
 
-## 背景与动机
+
 
 ### 3D高斯泼溅与细节层次控制的困境
 
@@ -84,7 +84,9 @@ $$C = \sum_{i \in N} c_i \alpha_i' \prod_{j=1}^{i-1} (1 - \alpha_j')$$
 
 3DGS的连续体积特性和可微渲染管线为实现这一目标提供了天然基础。CLoD-GS的核心洞察在于：**将LoD控制建模为距离自适应的基元不透明度衰减**。通过为每个高斯基元引入一个可学习的距离衰减因子，并配合虚拟距离缩放训练策略，模型能够在单次训练中学会在不同观察距离下合理分配基元，实现从高质量近景到稀疏远景的无缝过渡。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CLoD-GS的核心创新在于将传统离散LOD（DLoD）中“存储多模型、切换时跳变”的瓶颈，转化为单一模型内的**连续距离自适应基元衰减**机制。其关键洞察是：3D高斯泼溅（3DGS）基元的连续体积特性天然适合建模平滑的细节过渡，只需为每个基元赋予一个可学习的“生命周期”参数，即可在渲染时根据视距动态决定其可见性贡献。
 
@@ -116,7 +118,7 @@ $$\alpha_i'' = \alpha_i \cdot \exp\left( - \frac{(d_i' \cdot s_v)^2}{2 \cdot (\m
 
 传统DLoD方法（如H-3DGS、Octree-GS）需为同一场景训练多个分辨率模型，切换时产生视觉跳变（popping artifacts）。CLoD-GS通过连续衰减机制，在单一模型内实现**无缝的细节过渡**：基元不会突然出现或消失，而是随距离逐渐“淡出”，从根本上消除了跳变问题。消融实验证实，正则化损失、自适应权重和多尺度训练三个组件缺一不可，完整模型在BungeeNeRF数据集上以比3DGS少38%的基元数量（4.185M vs 6.733M）实现了更高的PSNR（28.05 vs 27.85），验证了连续LOD策略的有效性。
 
-## 整体框架
+
 
 CLoD-GS 的整体流水线建立在标准 3DGS 可微渲染管线之上，通过两个核心改造实现单一模型内的连续细节层次控制：**距离自适应不透明度衰减**和**虚拟距离缩放训练策略**。整个框架的输入为多视角图像及其对应的相机位姿，输出为一个增强的 3DGS 模型，其中每个高斯基元除了原有的位置、协方差、颜色和不透明度参数外，额外携带一个可学习的距离衰减因子 $\sigma_{d,i}$。
 
@@ -139,7 +141,7 @@ CLoD-GS 的整体流水线建立在标准 3DGS 可微渲染管线之上，通过
 ![[assets/figures/papers/paper_list_l78_https_openreview_net_forum_id_zgs0L72R4c/figures/001_Figure_1.jpg]]
 *Figure 1: Framework of the proposed methodology*
 
-## 核心模块与公式推导
+
 
 ### 3DGS渲染基础
 
@@ -198,7 +200,9 @@ $$L_{\mathrm{total}} = w_s (L_{\mathrm{render}} + \lambda_{\mathrm{reg}} L_{\mat
 
 三个核心模块形成闭环：**距离自适应不透明度衰减**提供了连续LOD的数学基础，**动态掩码过滤**将理论衰减转化为实际的计算节省，**虚拟距离缩放训练**通过多尺度暴露和显式正则化引导模型学习合理的 $\sigma_{d,i}$ 分布。三者缺一不可——消融实验（Table 3）证实，移除任意组件均会导致性能下降。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -290,7 +294,9 @@ Figure 5和Figure 6直观对比了离散LOD（DLoD）与连续LOD（CLoD）策�
 ![[assets/figures/papers/paper_list_l78_https_openreview_net_forum_id_zgs0L72R4c/figures/009_Figure_6.jpg]]
 *Figure 6: Metric curves for the DLoD vs. CLoD comparison. The DLoD strategy exhibits a sharp, discontinuous jump in quality, whereas our CLoD strategy shows a smooth progression*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与因果机制
 
@@ -330,6 +336,8 @@ $$\alpha_i'' = \alpha_i \cdot \exp\left( - \frac{(d_i' \cdot s_v)^2}{2 \cdot (\m
 - 能否将 σ_d,i 与基于梯度的基元重要性联合优化，在训练中实现更彻底的基元复用与剪枝？
 - 在超大规模场景中，如何结合 octree 等空间层级结构减少视锥体内基元总数，同时保持连续 LOD 的灵活性？
 - 连续衰减机制是否可以反向用于近视野超分辨（提升近处基元的细节表现），实现双向连续 LOD？
+
+
 
 ## 原文 PDF
 

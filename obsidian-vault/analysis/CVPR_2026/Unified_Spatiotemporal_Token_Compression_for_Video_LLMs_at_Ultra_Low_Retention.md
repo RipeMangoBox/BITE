@@ -43,7 +43,7 @@ claims:
 > - LLaVA-OneVision-7B 上，FLOPs 约2.6% of original FLOPs (2% retention) vs 41.4T FLOPs (减少约97.4%)。
 > - LLaVA-Video-7B 上，Average Score % 80.6% (1% retention with merging) vs 58.8 avg score (性能保留80.6%)。
 
-## 概述
+## 概要
 
 视频大语言模型（Video-LLMs）通过处理大量视觉令牌来理解视频内容，但随之而来的计算开销严重制约了其实际部署。现有令牌压缩方法普遍采用**两阶段时空分离压缩**策略——先进行空间压缩，再进行时间压缩。这一假设在令牌保留率较高时尚可维持，但当保留率降至极低水平（≤5%）时，时空冗余的耦合性导致关键视觉信息被系统性丢弃，资源分配失衡，模型性能急剧退化。
 
@@ -51,7 +51,7 @@ claims:
 
 实验表明，该方法在极端压缩条件下展现出显著优势：在仅保留约**2%**视觉令牌的情况下，USTC在多个基准上保持了原始模型约**90.1%**的性能，同时将FLOPs降低至原始模型的约**2.6%**；在5%保留率下，性能保留率达到**95.4%**。该方法在LLaVA-OneVision-7B、LLaVA-Video-7B和Qwen2.5-VL-7B等多个骨干模型上均表现出一致的有效性。
 
-## 背景与动机
+
 
 视频大语言模型（Video-LLMs）在复杂视频理解任务上展现出强大能力，但其推理成本随输入视频帧数和每帧视觉令牌数呈二次增长。以 **LLaVA-OneVision-7B** 为例，处理一个典型视频时，LLM 前向过程的 FLOPs 高达 41.4T，其中视觉令牌的计算开销占据主导。因此，视觉令牌压缩成为降低推理成本、推动 Video-LLMs 实际部署的关键技术路径。
 
@@ -64,7 +64,9 @@ claims:
 
 本文的核心动机正是回应这一需求：**通过构建全局时空令牌保留池，联合注意力权重与语义相似度进行统一筛选，并在 LLM 内部引入文本感知的二次压缩，实现在 2% 极端保留率下仍能维持约 90% 的原始性能**。这一目标不仅要求压缩策略本身的高效性，更要求压缩后的令牌集合能够最大程度保留对查询响应至关重要的视觉语义信息。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文提出**统一时空令牌压缩（Unified Spatiotemporal Token Compression, USTC）**，其核心创新在于打破现有方法“先空间后时间”或“先时间后空间”的两阶段分离范式，将令牌压缩重新定义为**全局时空保留池中的统一分配任务**。围绕这一范式转移，方法在四个关键维度上引入了 changed slots：
 
@@ -88,7 +90,7 @@ claims:
 
 整个 USTC 模块无需任何训练或微调，可作为即插即用组件直接集成到现有 Video-LLMs（如 LLaVA-OneVision、LLaVA-Video、Qwen2.5-VL）中，具备跨 backbone 的强迁移性。
 
-## 整体框架
+
 
 该方法将视频令牌压缩重新表述为一个在**全局时空保留池**中进行的统一分配任务，而非传统的“先空间后时间”两阶段流水线。其整体架构由两个协同工作的模块组成：一个位于 LLM 外部的**统一时空压缩模块（Unified Spatiotemporal Compression Module）**，以及一个嵌入 LLM 内部层的**文本感知合并模块（Text-Aware Merging Module）**。两个模块均无需训练，以即插即用的方式兼容现有 Video-LLMs。
 
@@ -109,7 +111,7 @@ claims:
 ![[assets/figures/papers/paper_list_l951_https_arxiv_org_abs_2603_21957/figures/003_Figure_2.jpg]]
 *Figure 2: Overview of our method. 1) The Unified Spatiotemporal Compression module filters tokens with high contribution and low semantic redundancy, incorporating them into the retention pool. At the same time, it performs clustering and merging on tokens in the recycle pool to preserve the integrity of visual semantic information. 2) The Text-Aware Merging mechanism further enhances answer accuracy by guiding the LLM to focus on visual tokens that are most relevant to the input query*
 
-## 核心模块与公式推导
+
 
 ### 方法总览：两阶段统一压缩框架
 
@@ -163,7 +165,9 @@ claims:
 ![[assets/figures/papers/paper_list_l951_https_arxiv_org_abs_2603_21957/figures/006_Figure_4.jpg]]
 *Figure 4: Comparative Analysis of Attention Distribution and Semantic Similarity Distribution. Compared to the HoliTom, our approach more effectively preserves visual tokens with high attention scores but low semantic relevance, thereby eliminating semantic redundancy while retaining visually informative tokens*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果：极端压缩下的性能保持
 
@@ -219,7 +223,9 @@ USTC 在多个 Video-LLM 基准上展现出显著的压缩-性能权衡优势。
 ![[assets/figures/papers/paper_list_l951_https_arxiv_org_abs_2603_21957/figures/009_Table_4.jpg]]
 *Table 4: Performance comparison of LLaVA-OneVision-7B with different methods at high token retention ratios*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：极低保留率下的瓶颈突破
 
@@ -277,6 +283,8 @@ $$I(v_i) = (1-\lambda) \cdot A_m^{\mathrm{norm}}(v_i) + \lambda \cdot S_m^{\math
 2. **帧-令牌联合优化**：能否设计端到端的可学习策略，联合优化帧采样率和令牌保留率，进一步提升极端低保留率下的信息密度？
 3. **跨模态泛化**：统一时空压缩的思想是否可推广至图像-文本多模态模型（如图像集合理解、多图对话），以应对多图像场景下的令牌爆炸问题？
 4. **动态保留率**：当前保留率为固定预设值，能否根据视频内容复杂度自适应调整保留率，实现更智能的资源分配？
+
+
 
 ## 原文 PDF
 

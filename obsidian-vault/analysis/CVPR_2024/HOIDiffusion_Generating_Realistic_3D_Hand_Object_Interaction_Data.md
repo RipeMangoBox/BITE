@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2024
 pdf_ref: paperPDFs/CVPR_2024/HOIDiffusion_Generating_Realistic_3D_Hand_Object_Interaction_Data.pdf
+project_link: https://mq-zhang1.github.io/HOIDiffusion
+code_link: null
 aliases:
 - HGR3HOID
 tags:
@@ -41,7 +43,7 @@ claims:
 > - DexYCB (手-物体交互生成) 上，sFID ↓ 91.28 vs DreamBooth 92.82 (-1.54)。
 > - DexYCB (生成多样性) 上，IS ↑ 7.73 vs DreamBooth 7.99 (-0.26)。
 
-## 概述
+## 概要
 
 **核心问题**：现有文本到图像扩散模型（如Stable Diffusion）在生成手—物体交互场景时存在严重缺陷——手指数量错误、抓取姿态不自然、物体与手部空间关系混乱。根本原因在于，纯文本条件无法为扩散模型提供精确的3D几何约束，导致生成结果在物理和几何上不可靠。
 
@@ -58,8 +60,6 @@ claims:
 **方法谱系与知识库定位**：HOIDiffusion建立在Stable Diffusion（Rombach et al., CVPR 2022）的预训练权重之上，与DreamBooth（Ruiz et al., CVPR 2023）和ControlNet（Zhang et al., ICCV 2023）同属可控文本到图像生成范式，但区别于二者的是：DreamBooth面向个性化主体保留，ControlNet提供通用多条件控制，而HOIDiffusion专攻手—物体交互这一细粒度物理场景，通过3D几何条件注入实现结构精确可控的交互数据合成。
 
 **局限与开放问题**：训练数据仅使用DexYCB，物体类别有限，极端未见物体形状下的几何一致性未经充分验证。当前框架依赖精确的3D条件输入，若法线或分割存在噪声，生成质量可能下降。如何扩展至双手交互、全身人体—物体交互，以及结合更强视频扩散模型生成长序列，是值得探索的方向。生成数据在真实机器人操作任务中的有效性仍需实验验证。
-
-## 背景与动机
 
 ### 问题背景
 
@@ -85,7 +85,7 @@ claims:
 
 这一设计使得HOIDiffusion能够生成高保真度、几何准确的HOI图像，并可直接用于下游任务（如物体6D姿态估计）的性能提升。
 
-## 核心创新
+## 核心方法与创新机理
 
 HOIDiffusion 的核心创新在于**将3D几何结构控制与预训练扩散模型的视觉先验深度融合**，解决了文本到图像扩散模型在手-物体交互（HOI）场景下的两大瓶颈：（1）物理几何不合理（手指数量错误、抓取姿态不自然）；（2）几何与外观耦合导致无法独立控制。以下从三个关键维度剖析其相对于基线的创新点。
 
@@ -133,8 +133,6 @@ HOIDiffusion 采用**两阶段框架**（Figure 2），将几何生成与外观�
 
 **局限性提示**：该方法依赖精确的3D几何条件输入，若提供的法线、分割或骨架有噪声，生成质量可能下降；训练数据仅使用 DexYCB，物体类别有限，极端未见物体形状下的几何一致性未经充分验证。
 
-## 整体框架
-
 HOIDiffusion 采用**两阶段流水线**，核心思路是“先构造3D几何条件，再以几何条件驱动图像生成”，从而实现几何结构与外观纹理的解耦控制。
 
 ### 阶段一：手部抓取轨迹生成
@@ -164,8 +162,6 @@ $$
 ![[assets/figures/papers/paper_list_l1716_HOIDiffusion_Generating_Realistic_3D_Hand_Object_Interaction_Data/figures/002_Figure_2.jpg]]
 *Figure 2: Pipeline. We propose a two-stage pipeline to synthesize hand-object-interaction data. During the first stage, we utilize a pretrained GrabNet to output 3D hand poses given by a single object model. Then in the second stage, we use those 3D hand poses along with segmentation maps, normal maps and skeletons to conditionally generate high-quality HOI data*
 
-## 核心模块与公式推导
-
 HOIDiffusion 的核心架构建立在预训练 Stable Diffusion 之上，通过注入三个并行的条件编码器实现几何与外观的解耦控制，并引入背景缓冲正则化以保持文本编辑能力。
 
 ### 扩散模型基础
@@ -183,9 +179,6 @@ $$x_{t-1} = \frac{1}{\sqrt{\alpha_t}} (x_t - \frac{1-\alpha_t}{\sqrt{1-\overline
 ### 三路条件编码器注入
 
 HOIDiffusion 的核心创新在于将三类几何结构条件通过 Adapter 方式注入 Stable Diffusion 的 U-Net 编码器（Figure 3）。三个条件编码器分别处理：
-
-![[assets/figures/papers/paper_list_l1716_HOIDiffusion_Generating_Realistic_3D_Hand_Object_Interaction_Data/figures/003_Figure_3.jpg]]
-*Figure 3: Model Figure. We inject three conditional encoders into the stable diffusion model. We utilize both the HOI datasets and high-quality background images to train HOIDiffusion. The background images are synthesized using the scenery prompts. The texts sent to the model are output by LLaVA for detailed description*
 
 1. **法线图（Normal Map）**：从 3D 手-物体模型中渲染的表面法线，引导模型感知表面纹理与光照关系。
 2. **手-物体分割图（Hand-Object Segmentation）**：提供手部与物体的清晰边界，帮助模型区分交互区域。
@@ -209,7 +202,7 @@ $$\mathcal{L} = E_{x_0, x_r, \epsilon, \epsilon_r} [||\epsilon - f_{\theta}(\sqr
 
 **第二阶段：条件扩散图像合成。** 以上述几何条件与 LLaVA 生成的详细文本描述共同作为输入，通过三路条件编码器注入微调的 Stable Diffusion，生成逼真的手-物体交互图像。训练时结合背景缓冲正则化，推理时支持分类器自由引导（Classifier-Free Guidance）以增强条件遵循度。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -233,9 +226,6 @@ HOIDiffusion 在 DexYCB 数据集上对所有基线方法展现出显著的图�
 #### 下游任务验证
 
 为验证生成数据的实用价值，论文将 HOIDiffusion 生成的图像用于训练 NOCS 物体 6D 姿态估计模型。如 Table 3 所示，以 DualPoseNet 为基准，使用 HOIDiffusion 生成的训练数据后，IoU@25 从原始水平提升至 90.9，5°2cm 指标提升至 29.2，在所有指标上均有改善。这证明生成的 HOI 图像不仅视觉质量高，而且包含足够的几何信息来增强下游感知任务。
-
-![[assets/figures/papers/paper_list_l1716_HOIDiffusion_Generating_Realistic_3D_Hand_Object_Interaction_Data/figures/009_Table_3.jpg]]
-*Table 3: Quantitative evaluation on NOCS. We use SPD and DualPoseNet and change the synthesized images in the dataset with our generated images for training. Our performance improve on all metrics with DualPoseNet and all cm metrics with SPD which demonstrates the good quality of our images and can be utilized for downstream tasks*
 
 ### 消融实验
 
@@ -276,12 +266,6 @@ Figure 4 展示了 HOIDiffusion 的几何-外观解耦能力：固定背景文�
 ![[assets/figures/papers/paper_list_l1716_HOIDiffusion_Generating_Realistic_3D_Hand_Object_Interaction_Data/figures/006_Figure_4.jpg]]
 *Figure 4: Qualitative results on different structures. Generated images with the same background description but different physical conditions (object shape, poses, and hand skeletons). With plain prompts, HOIDiffusion could generate more realistic images similar to the style in training datasets*
 
-![[assets/figures/papers/paper_list_l1716_HOIDiffusion_Generating_Realistic_3D_Hand_Object_Interaction_Data/figures/013_Figure_8.jpg]]
-*Figure 8: Generated images using different style texts to control object appearance*
-
-![[assets/figures/papers/paper_list_l1716_HOIDiffusion_Generating_Realistic_3D_Hand_Object_Interaction_Data/figures/016_Figure_9.jpg]]
-*Figure 9: Generated images with more text prompts ranging from daily landscape to virtual scene*
-
 ### 失败模式与局限性
 
 尽管整体性能优异，HOIDiffusion 仍存在以下已知局限：
@@ -291,15 +275,7 @@ Figure 4 展示了 HOIDiffusion 的几何-外观解耦能力：固定背景文�
 3. **手部外观多样性受限**：手部形状风格受限于训练数据（LAION 和 DexYCB），可能无法灵活生成特定肤色或手型，公平性影响未讨论。
 4. **对输入条件质量敏感**：方法依赖精确的 3D 几何条件输入（法线、分割、骨架）。若这些条件存在噪声或估计误差，生成质量可能下降，但论文未对此进行鲁棒性分析。
 
-![[assets/figures/papers/paper_list_l1716_HOIDiffusion_Generating_Realistic_3D_Hand_Object_Interaction_Data/figures/008_Figure_6.jpg]]
-*Figure 6: Zero-shot video generation of hand grasping trajectory. Images along the same line represent the sequential motion of reaching an object. By leveraging temporal-level cross-attention, the frame flickering problem is mitigated*
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1716_HOIDiffusion_Generating_Realistic_3D_Hand_Object_Interaction_Data/figures/001_Figure_1.jpg]]
-*Figure 1: (i) Left: Hand-object synthesis with Stable Diffusion model; (ii) Right: HOIDiffusion generates high-quality hand-object interaction images conditioned on physical structures and detailed text description. The model disentangles the geometry from appearance, exhibiting high generation diversity. Each row: We can fix the structure and control the style based on text inputs; Each column: We can fix the style and control the structure based on 3D structural inputs*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 方法溯源与基线关系
 

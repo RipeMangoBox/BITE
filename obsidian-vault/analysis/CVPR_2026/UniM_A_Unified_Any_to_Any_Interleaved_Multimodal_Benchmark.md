@@ -41,7 +41,7 @@ claims:
 > - UNIM (General Area) 上，SQCS (Semantic Correctness & Generation Quality) 62.2 vs 21.2 (MIO), 4.4 (NExT-GPT), 17.9 (AnyGPT) (+41.0 over MIO)。
 > - UNIM (Overall) 上，StS (Strict Structure Score) 71.3 (General Area) vs 12.5 (AnyGPT), 2.2 (NExT-GPT), 3.3 (MIO) (+58.8 over AnyGPT)；LeS (Lenient Structure Score) 84.3 (General Area) vs 16.4 (AnyGPT), 2.5 (NExT-GPT), 3.8 (MIO) (+67.9 over AnyGPT)；ICS (Interleaved Coherence Score) 69.8 (General Area) vs 43.6 (AnyGPT), 28.1 (NExT-GPT), 60.0 (MIO) (+9.8 over MIO)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -74,7 +74,7 @@ UNIMA的方法定位处于“智能体框架下的多模态推理与生成”这
 
 这一设计将多模态推理从“黑箱生成”转变为“可验证的规划执行”范式，在交织多模态任务上实现了结构完整性和语义一致性的质变式提升。
 
-## 背景与动机
+
 
 ### 交织多模态：从单模态到任意模态组合的范式跃迁
 
@@ -103,7 +103,9 @@ Table 1 将 UNIM 与现有交织多模态基准进行了系统对比。现有基
 - **UNIM 基准**：首个统一任意到任意交织多模态基准，包含 31K 高质量实例，覆盖 30 个领域和 7 种模态（文本、图像、音频、视频、文档、代码、3D），并设计三维度评估套件（语义正确性与生成质量、响应结构完整性、交织连贯性），系统衡量模型的综合交织能力。
 - **UNIMA 基线模型**：基于智能体框架的任意到任意交织多模态基线，其核心创新是**可追溯证据推理模块（Traceable Evidence Reasoning, TER）**——将隐式思维链转化为显式、可验证、可回溯修正的结构化推理链，强制模型在生成前构建可靠的逻辑基础，从而大幅提升交织输出的结构完整性和语义一致性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 UNIMA 的核心创新在于将隐式思维链重构为**显式、可验证、可回溯的结构化推理链**，并通过**任务条件稠密描述**统一异构模态的语义表征，从而系统性地解决了现有任意到任意多模态模型在交织输出中结构混乱、语义断裂的根本问题。以下从三个关键变更槽位展开分析。
 
@@ -133,7 +135,7 @@ UNIMA 的 **Generating Module** 将生成控制权交给了 TER 模块产出的*
 
 上述三个变更槽位并非孤立创新，而是形成了紧密的因果链条：TCDC 提供任务感知的统一语义基础 → SERC 在此基础上进行可验证的结构化推理并生成最终报告 → 生成模块严格按报告执行输出。这一链条解释了为何 UNIMA 在三个评估维度上均大幅领先基线：语义正确性（SQCS 62.2 vs. 基线最高 21.2）、结构完整性（StS/LeS 领先 2–40 倍）、交织连贯性（ICS 69.8 vs. 基线最高 60.0）同时获得显著提升。
 
-## 整体框架
+
 
 UNIMA 是一个面向任意到任意交织多模态任务的智能体框架，其核心设计目标是将隐式的多模态推理过程转化为显式、可验证的结构化推理链。整个框架由三个功能模块串联构成，形成“感知—推理—生成”的闭环流水线。
 
@@ -176,7 +178,7 @@ TER 模块是 UNIMA 的核心创新，其内部包含一个四步结构化证据
 ![[assets/figures/papers/paper_list_l800_https_arxiv_org_abs_2603_05075/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of the any-to-any interleaved multimodal paradigm with different real-world application scenarios. Solving any-to-any interleaved multimodal learning requires complex and combined capabilities*
 
-## 核心模块与公式推导
+
 
 ### UNIMA 三大核心模块
 
@@ -251,7 +253,9 @@ $$\mathcal{X}^{rel} = \tau \cdot \mathcal{X}^{abs}$$
 ![[assets/figures/papers/paper_list_l800_https_arxiv_org_abs_2603_05075/figures/003_Figure_3.jpg]]
 *Figure 3: Illustration of the UNIM evaluation suite. ① refers to the calculation process of the StS and LeS (§4.2). ② represents the calculation process of the ICS in Eq. (2). ③ refers to the calculation process of the SQCS; please refer to Eq. (1)*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 1. 基准数据集概览
 
@@ -326,7 +330,9 @@ Figure 5 验证了 SQCS 和 ICS 与人工评分的相关性：SQCS 的 Pearson �
 
 尽管 UNIMA 在所有维度上大幅领先，但在极端复杂任务中仍存在退化现象。结构指标（StS/LeS）在高阶模态交织场景下会出现下降，表明当前方法对复杂交织结构的建模能力仍有提升空间。此外，评估套件依赖外部描述工具和 LLM-as-a-Judge，可能引入一定偏差，且对高度开放式生成任务的评估敏感性有待进一步验证。UNIM 当前仅覆盖 7 种模态，未来扩展至更多模态将有助于更全面地模拟真实世界交互。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位与基准空白
 
@@ -373,6 +379,8 @@ UNIMA 的核心方法论贡献在于将 **智能体式推理框架** 引入任�
 6. **认知式交织建模**：如何构建模拟人类多模态推理策略（如选择性注意、跨模态联想、层级化规划）的认知式方法？
 
 这些问题共同指向一个核心挑战：**从“工具拼接式”的任意到任意生成迈向“原生统一”的任意到任意理解与生成**。UNIM 和 UNIMA 为这一方向提供了首个系统性的评估基准和方法论基线，但其方法本质上是智能体框架对现有专用模型的编排，距离真正的统一多模态大模型仍有显著差距。
+
+
 
 ## 原文 PDF
 

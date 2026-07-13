@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Through_the_Lens_of_Contrast_Self_Improving_Visual_Reasoning_in_VLMs.pdf
+project_link: null
+code_link: https://github.com/zhiyupan42/VC-STaR
 openreview_forum_id: ZymCPON45y
 aliases:
 - VSVCSTR
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 透过对比之镜：视觉语言模型的自我改进视觉推理 |
 | 英文题名 | Through the Lens of Contrast: Self-Improving Visual Reasoning in VLMs |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=ZymCPON45y); [GitHub](https://github.com/zhiyupan42/VC-STaR) |
+| Links | [paper](https://openreview.net/forum?id=ZymCPON45y) · [GitHub](https://github.com/zhiyupan42/VC-STaR) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | VC-STaR (Visual Contrastive Self-Taught Reasoner) |
 | Dataset | MMVP, Hallusion, MathVista, MathVision |
@@ -42,7 +44,7 @@ claims:
 > - Hallusion 上，Acc. 为 56.3，对比 53.1，变化 +3.2。
 > - MathVista 上，Acc. 为 69.7，对比 68.4，变化 +1.3。
 
-## 概述
+## 概要
 
 视觉语言模型（VLM）在视觉推理任务中常因**视觉幻觉**而产生错误推理——模型可能“看到”图像中并不存在的物体或属性，并将这些虚假信息编织进推理链中。现有的自改进推理方法（如 **STaR**，Zelikman et al., NeurIPS 2022）在文本域中通过正确答案提示来提升推理质量，但在视觉域中面临根本性瓶颈：**正确答案提示无法有效验证和修复推理路径中的视觉幻觉**，导致错误推理或虚假视觉依据被保留甚至放大。
 
@@ -55,7 +57,7 @@ VC-STaR 的核心机制包含三个关键设计：
 
 在六个具有挑战性的基准上，VC-STaR 平均提升 **2.6 个百分点**，尤其在幻觉基准 MMVP 和 Hallusion 上分别提升 **5.7%** 和 **3.2%**，超过所有自改进基线。该方法在 Qwen2.5VL-3B 和 InternVL2.5-8B 上也表现出显著增益，具有良好的模型架构泛化性。
 
-## 背景与动机
+
 
 视觉语言模型（VLMs）在视觉问答、数学推理、图表理解等多模态任务中展现出令人瞩目的能力，但其推理过程常受**视觉幻觉**困扰——模型生成的推理路径中掺杂与图像事实不符的描述或判断，导致最终答案错误。这种幻觉现象在需要细粒度视觉辨别的场景中尤为突出，例如区分两张外观高度相似但细节不同的图像，或准确定位图中的微小文字与符号。
 
@@ -65,7 +67,9 @@ VC-STaR 的核心机制包含三个关键设计：
 
 基于上述动机，本文提出**VC-STaR**（Visual Contrastive Self-Taught Reasoner），通过构造对比VQA对激发模型的细粒度对比分析能力，并将多图对比的精确视觉辨别迁移到单图推理中，系统性地纠正推理路径中的视觉幻觉。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 VC-STaR 的核心创新在于**将VLM内在的跨图像对比辨别能力重新定向为单图推理的自我纠错机制**，从而在不依赖外部奖励模型或人工分解步骤的前提下，系统性地抑制视觉幻觉。这一设计直接回应了现有文本域自改进方法（如STaR, Zelikman et al., NeurIPS 2022）的根本瓶颈：仅凭正确答案提示（hints）重新生成推理路径，无法有效验证和修复推理中出现的视觉幻觉，导致错误推理或不准确的视觉依据被保留甚至放大。
 
@@ -100,7 +104,7 @@ VC-STaR 进一步揭示了对比类型对推理改进的差异化影响（Table 
 
 值得注意的是，VC-STaR 的对比管道仅在**数据构造阶段**使用，微调后的模型在推理时遵循标准VLM推理范式，无需额外的对比流水线。这一设计保证了方法在推理效率上与基线方法公平可比，同时将对比能力内化到模型参数中。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l28_https_openreview_net_forum_id_ZymCPON45y/figures/005_Figure_4.jpg]]
 *Figure 4: Faithful rationale generation pipeline. A contrastive analysis can be obtained based on the curated contrastive VQA pair. Leveraging the property of VLMs illustrated in Fig. 1, the contrastive analysis is then used to trigger a rethinking procedure, which refines the naive rationale into a more faithful one. This pipeline is designed to generate rationales for supervised finetuning*
@@ -138,7 +142,7 @@ VC-STaR 的完整流程由两大阶段、五个核心模块构成：
 - **难度采样**：仅保留中等难度对比对生成推理路径是最优策略（Table 3），暗示过于简单的样本无法提供有效的对比学习信号，反而引入噪声。
 - **对比对构造策略**：基于相似度搜索的策略优于编辑式（HQ-Edit）或描述式（DOCCI）策略（Figure 6），说明精心选择视觉相似的同义问答对是激发VLM对比能力的关键。
 
-## 核心模块与公式推导
+
 
 VC-STaR 的核心流程围绕两个关键挑战展开：(1) 如何构造有意义的对比VQA对；(2) 如何将双图对比中的细粒度辨别能力迁移到单图推理的修正中。整个方法包含三个关键模块：对比VQA对构建、忠实推理路径生成、以及后处理过滤。
 
@@ -182,7 +186,9 @@ $$\tilde{r}_i = f(r_i, c_i \vert \psi, \delta^r)$$
 
 值得注意的是，对比流水线仅在数据构造阶段使用。微调后的模型在推理时遵循标准VLM推理范式，无需执行对比流水线，保证了推理效率与基线方法公平可比。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：VC-STaR 在幻觉与推理基准上全面超越自改进基线
 
@@ -238,7 +244,9 @@ VC-STaR 在六个具有挑战性的基准上取得了 **58.1** 的平均准确�
 
 尽管 VC-STaR 在整体上表现优异，但其有效性高度依赖对比VQA对的质量。对比对的构建依赖嵌入空间和相似性阈值的选择，贪婪首次匹配策略可能遗漏更优的对比样本。此外，难度采样的分类依赖于 VLM 本身的表现，可能引入模态偏置，使得采样策略在不同模型上的适应性存在差异。推理生成的两阶段过程（对比与反思）也增加了数据构造的计算成本。当前仅在 Qwen2.5-VL 和 InternVL2.5 家族上验证，对 LLaVA 系列等其他架构的泛化性有待进一步检验。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 自改进推理范式的演进
 
@@ -275,6 +283,8 @@ VC-STaR 的关键突破在于识别出 VLM 的一种内在能力：当面对两�
 4. **显式视觉差异信号**：是否可以利用图像差异图作为显式的学习信号，指导模型生成更忠实于视觉证据的解释？当前方法依赖文本形式的对比分析，直接利用视觉差异可能提供更强的监督。
 
 5. **难度定义的自动化**：对比采样中的难度定义能否实现自动化，以达成完全任务无关的自我改进？当前难度分类依赖 VLM 的初始表现，一个自适应的难度估计器可能提升方法的通用性。
+
+
 
 ## 原文 PDF
 

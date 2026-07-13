@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/MCP_Security_Bench_MSB_Benchmarking_Attacks_Against_Model_Context_Protocol_in_LLM_Agents.pdf
+project_link: null
+code_link: https://github.com/dongsenzhang/MSB
 openreview_forum_id: irxxkFMrry
 aliases:
 - MMSB
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | MCP安全基准（MSB）：针对LLM智能体中模型上下文协议的攻击基准测试 |
 | 英文题名 | MCP Security Bench (MSB): Benchmarking Attacks Against Model Context Protocol in LLM Agents |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=irxxkFMrry); [GitHub](https://github.com/dongsenzhang/MSB) |
+| Links | [paper](https://openreview.net/forum?id=irxxkFMrry) · [GitHub](https://github.com/dongsenzhang/MSB) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/planning_control |
 | Method | MSB (MCP Security Bench) |
 | Dataset | MSB全攻击类型（12种）, 防御实验（MCIP）, Qwen3 8B 思维链模式影响 |
@@ -42,7 +44,7 @@ claims:
 > - 防御实验（MCIP） 上，平均ASR 为 28.69%，对比 40.35%，变化 -11.66%。
 > - 防御实验（MCIP） 上，平均NRP 为 34.88%，对比 33.70%，变化 +1.18%。
 
-## 概述
+## 概要
 
 随着大语言模型（LLM）智能体在工具调用场景中的广泛部署，**模型上下文协议（MCP）** 作为标准化的工具交互接口，在提升互操作性的同时，也显著扩展了攻击面。现有安全基准（如 **ASB**、**AgentDojo**、**InjecAgent**）局限于传统的函数调用范式，仅覆盖部分攻击阶段，且多依赖仿真环境，无法真实反映 MCP 生态下全流水线的安全风险。**MSB（MCP Security Bench）** 针对这一瓶颈，构建了覆盖任务规划、工具调用、响应处理三个阶段的 **12 种攻击分类体系**，并在真实 MCP 服务器上执行攻击，系统性地暴露了 MCP 特有的脆弱性。
 
@@ -52,7 +54,7 @@ claims:
 
 实验覆盖 10 种主流 LLM 骨干，基于 2,000 个攻击实例的评估显示：所有攻击方法的平均 ASR 达 **40.35%**，其中越界参数攻击（OP）效果最强（平均 ASR **76.5%**），名称碰撞-虚假错误（NC-FE）最弱（14.62%）。混合攻击展现出协同增强效应（PI-UI 平均 ASR 56.07%，高于单一攻击）。防御方案 MCIP 可将平均 ASR 降至 28.69%，但 NRP 仅微增 1.18%，且伴随 PUA 下降 7.59%，表明现有防御在安全-性能平衡上仍有显著不足。
 
-## 背景与动机
+
 
 ### 模型上下文协议（MCP）与新兴攻击面
 
@@ -82,7 +84,9 @@ claims:
 
 通过MSB，本文旨在回答一个核心问题：**在标准化的MCP协议下，当前主流LLM智能体究竟有多脆弱，以及安全性与性能之间存在怎样的根本性权衡？**
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MSB的核心创新在于将LLM智能体安全评估从传统的函数调用范式迁移至**MCP真实协议栈**，并围绕MCP全流水线暴露的攻击面构建了系统性的攻击分类、执行与度量体系。其关键创新点体现在以下四个维度。
 
@@ -116,7 +120,7 @@ MSB首次系统性地评估了跨阶段混合攻击的协同增强效应。实�
 
 **总结**：MSB的创新本质在于将安全评估从“函数调用范式下的攻击模拟”升级为“MCP真实协议栈下的全流水线攻击执行与弹性度量”，从而暴露了传统基准无法覆盖的MCP特有脆弱性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_irxxkFMrry/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the MCP-specific attacking framework, including Tool Signature Attack, Tool Parameters Attack, Tool Response Attack, and Retrieval Injection Attack, which cover the full tool-use pipeline stages: task planning, tool calling and response handling*
@@ -178,7 +182,7 @@ MSB的构建包含五个核心模块：
 
 这些差异使得MSB能够暴露MCP特有的全流水线脆弱性——尤其是工具调用阶段（该阶段平均ASR超过70%，见Figure 3）和MCP新增的攻击类型（UI和FE），这些在传统函数调用范式的基准中无法被覆盖。
 
-## 核心模块与公式推导
+
 
 ### 攻击形式化框架
 
@@ -242,7 +246,9 @@ $$\mathrm{NRP} = \mathrm{PUA} \cdot (1 - \mathrm{ASR})$$
 
 NRP基于对抗环境中的PUA计算（而非良性环境性能），因为模型在对抗与良性环境下的行为差异显著且无法简单外推。该指标直接揭示了安全性与性能之间的反向关系——提升模型易用性可能同时增加安全风险。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：MCP全流水线攻击的有效性与脆弱性分布
 
@@ -328,7 +334,9 @@ NC-FE的低ASR（14.62%）揭示了攻击链断裂的典型失败模式：当名
 ![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_irxxkFMrry/figures/028_Table_10.jpg]]
 *Table 10: Quantitative comparisons of different aspects among MSB, MCPTox (Wang et al., 2025a), ASB (Zhang et al., 2025a), AgentDojo (Debenedetti et al., 2025) and InjecAgent (Zhan et al., 2024) “Environment” refers to whether the agent actually invokes the tool. Numbers indicate the respective quantities for each aspect, while $\therefore X ^ { , }$ indicates that the aspect is not included in the respective system*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有基准的关系
 
@@ -376,6 +384,8 @@ MSB揭示的瓶颈指向以下开放方向：
 3. **自动化攻击生成**：能否利用LLM自动生成新的MCP攻击向量，使基准能够持续更新以覆盖新兴威胁？
 
 4. **安全-性能权衡的深层机制**：实验揭示了一个矛盾现象——启用思维链模式使Qwen3 8B的PUA从51.15%升至64.97%，但ASR也从47.23%升至57.08%，NRP仅微增0.87%（Tab. 13, Sec. E.4）。这表明更强的指令遵循能力可能同时放大攻击面。如何在模型层面解耦这一反向关系，是MCP安全研究的核心挑战。
+
+
 
 ## 原文 PDF
 

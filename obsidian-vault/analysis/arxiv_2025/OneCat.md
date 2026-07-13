@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/OneCat.pdf
+project_link: https://onecat-ai.github.io/
+code_link: https://github.com/kakaobrain/coyo-dataset
 aliases:
 - OneCat
 tags:
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | OneCAT：统一的纯解码器自回归多模态理解与生成模型 |
 | 英文题名 | OneCat |
 | 会议/期刊 | arXiv 2025 |
-| Links | [paper](https://arxiv.org/abs/2509.03498) · [Project](https://onecat-ai.github.io/) · [Code](https://github.com/kakaobrain/coyo-dataset) · [arXiv](https://arxiv.org/abs/2509.07295) |
+| Links | [paper](https://arxiv.org/abs/2509.03498) · [Project](https://onecat-ai.github.io/) · [Code](https://github.com/kakaobrain/coyo-dataset) · [paper](https://arxiv.org/abs/2509.07295) |
 | Topic | #topic/other_unclear |
 | Method | OneCAT |
 | Dataset | TextVQA, ChartQA, GQA, AI2D |
@@ -41,7 +43,7 @@ claims:
 > - ChartQA 上，准确率↑ 81.2 (OneCAT-3B) vs 68.6 (Emu3) (+12.6)。
 > - GQA 上，准确率↑ 63.1 (OneCAT-3B) vs 60.3 (Emu3) (+2.8)。
 
-## 概述
+## 概要
 
 多模态大模型在理解和生成任务上取得了显著进展，但主流系统通常依赖于外部视觉编码器（如 ViT）和视觉分词器。这种分离式设计带来了两个核心瓶颈：一是额外的编码器/分词器显著增加了推理延迟和参数开销；二是跨模态信息只能在晚期融合，限制了模型在单一架构内高效统一理解、生成与编辑的能力。
 
@@ -53,7 +55,7 @@ claims:
 
 **方法定位**：OneCAT 属于编码器自由的统一多模态自回归模型，其核心创新在于将模态路由、多尺度生成和知识蒸馏深度融合进单一解码器，为高效统一的多模态智能提供了新的范式。
 
-## 背景与动机
+
 
 ### 多模态大模型的架构分化与统一困境
 
@@ -79,7 +81,9 @@ OneCAT 的核心动机在于回答一个根本性问题：**能否在不依赖�
 
 此外，OneCAT 将视觉生成建模为“下一尺度预测”（Next-Scale Prediction），与文本的“下一 token 预测”统一在同一个自回归框架内，并通过 Scale-Aware Adapter（SAA）增强多尺度特征提取能力。这一设计使得模型能够在一个纯解码器架构内无缝切换于理解、生成与编辑三种模态任务之间，为统一多模态智能提供了新的架构范式。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 OneCAT 的核心创新在于**彻底移除了传统多模态系统对外部视觉编码器和视觉分词器的依赖**，将多模态理解、生成与编辑统一到一个纯解码器自回归 Transformer 中。这一设计通过三个关键机制实现：
 
@@ -120,7 +124,7 @@ $$\mathcal{L}_{\mathrm{Und}} = \mathcal{L}_{\mathrm{NTP}} + \lambda \mathcal{L}_
 
 这些设计使 OneCAT-3B 在推理效率上获得数量级优势：理解任务首 token 延迟较 Qwen2.5-VL-3B 降低 61%（0.225s vs 0.583s），文生图推理时间较 BAGEL 降低 89%（2.85s vs 26.29s），图像编辑推理时间降低 90%（4.61s vs 46.44s）（Table 8）。
 
-## 整体框架
+
 
 OneCAT 采用纯解码器（decoder-only）自回归架构，在单一 Transformer 内统一多模态理解、图像生成与图像编辑，**推理时无需任何外部视觉编码器或视觉分词器**。其核心设计围绕三个关键模块展开：模态特定的混合专家（Modality-MoE）、多尺度自回归生成机制（Scale-Aware Adapter, SAA），以及定制教师驱动的全层隐藏状态蒸馏。
 
@@ -157,7 +161,7 @@ Figure 3 展示了 OneCAT 的统一推理流水线。原始图像通过 **Patch 
 
 4. **推理效率优势**：由于消除了外部视觉编码器和分词器，OneCAT-3B 在理解任务的首 token 延迟（TTFT）上比 Qwen2.5-VL-3B 降低 61%（0.225s vs 0.583s），在文生图推理速度上比混合架构 BAGEL 快约 10 倍（2.85s vs 26.29s），在图像编辑上快约 10 倍（4.61s vs 46.44s）（Table 8）。
 
-## 核心模块与公式推导
+
 
 ### 推理流水线架构
 
@@ -218,7 +222,9 @@ $$\mathsf{L}_c = \frac{\mathsf{L}_{t,i} + \lambda_i \cdot \mathsf{L}_t}{1+\lambd
 ![[assets/figures/papers/OneCat_2509.03498_092170b29c9d/figures/023_Figure_10.jpg]]
 *Figure 10: Performance comparison of different methods for multimodal understanding across varying training scales*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验结果
 
@@ -283,7 +289,9 @@ OneCAT-3B 在多个理解基准上显著超越同属统一模型的 **Emu3**（T
 ![[assets/figures/papers/OneCat_2509.03498_092170b29c9d/figures/006_Table_1.jpg]]
 *Table 1: Detailed hyperparameter and configuration of the training recipe across different stages*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线工作的关系
 
@@ -338,6 +346,8 @@ $$\mathcal{L}_{\mathrm{Distill}} = \sum_{n=1}^{N} \mathrm{MSE}(\mathbf{h}_S^{(n)
 4. **蒸馏策略的极限**：全层隐藏状态蒸馏被证明是关键有效的，但 Table 15 显示仅蒸馏视觉 token 的效果有限（平均分 34.8 vs 35.3 的完整蒸馏）。这是否意味着视觉理解和语言能力之间存在深层耦合，仅靠视觉侧的蒸馏无法完全弥补？更大规模蒸馏数据能否进一步缩小与编码器基模型的差距？这些问题有待后续工作回答。
 
 5. **生成质量与推理速度的进一步权衡**：当前 CFG 策略和固定的尺度调度是生成质量的重要保障，但也构成了推理开销的下限。如何在不依赖 CFG 或减少尺度数量的前提下保持生成质量，是实现更高效推理的关键挑战。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Embodied_Navigation_Foundation_Model.pdf
+project_link: https://pku-epic.github.io/NavFoM-Web/
+code_link: null
 openreview_forum_id: kkBOIsrCXh
 aliases:
 - ENFM
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 具身导航基础模型 |
 | 英文题名 | Embodied Navigation Foundation Model |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=kkBOIsrCXh); [Project](https://pku-epic.github.io/NavFoM-Web/) |
+| Links | [paper](https://openreview.net/forum?id=kkBOIsrCXh) · [Project](https://pku-epic.github.io/NavFoM-Web/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/robotics |
 | Method | NavFoM |
 | Dataset | VLN-CE RxR (Multi-camera), VLN-CE RxR (Single-camera), HM3D-OVON (Zero-shot, Val Unseen, Four views), EVT-Bench Single Target (Four views) |
@@ -41,7 +43,7 @@ claims:
 > - VLN-CE RxR (Single-camera) 上，SR 为 57.4，对比 51.8 (best single-view baseline)，变化 +5.6。
 > - HM3D-OVON (Zero-shot, Val Unseen, Four views) 上，SR 为 45.2，对比 43.6 (fine-tuned SOTA)，变化 +1.6。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -71,7 +73,7 @@ NavFoM采用双分支架构（导航与问答），在大规模多样化导航�
 
 NavFoM仍面临若干挑战：小物体远距离识别困难、运动模糊导致感知失败；六相机以上配置下视点令牌增多会压缩历史帧编码容量，导致性能下降；在OpenUAV Unseen-Map等要求大规模探索的任务上表现不佳。未来方向包括自适应多视图令牌编码、更高效的探索策略，以及将更多运动自由度纳入统一框架。
 
-## 背景与动机
+
 
 具身导航是机器人学与计算机视觉交叉的核心问题，其目标是让智能体根据语言指令在未知环境中自主移动并完成任务。近年来，视觉-语言导航（VLN）、目标导航、主动视觉跟踪、无人机导航和自动驾驶等子领域各自取得了显著进展，但这些进展背后隐藏着一个深层瓶颈：**现有导航方法几乎全部受限于狭窄的任务设定和单一具身形态的专用架构**。
 
@@ -89,7 +91,9 @@ NavFoM仍面临若干挑战：小物体远距离识别困难、运动模糊导�
 
 本文正是围绕这一核心动机展开。我们提出**NavFoM（Embodied Navigation Foundation Model）**，旨在通过两个关键设计突破上述瓶颈：（1）**时间-视角指示令牌（TVI tokens）**，统一编码不同相机配置和可变时间跨度的观测信息；（2）**预算感知的时间采样策略（BATS）**，基于遗忘曲线在有限令牌预算内动态选择历史帧。在大规模多样化导航数据（12.7M样本，涵盖VLN、目标导航、视觉跟踪、无人机导航和自动驾驶）上联合训练后，NavFoM在多个基准上以零样本方式达到或超越此前微调的最佳方法，初步验证了通用导航基础模型的可行性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 NavFoM 的核心创新在于将具身导航从“单任务专用模型”推进到“跨任务、跨形态通用模型”，其关键突破可归结为三个相互耦合的 **changed slots**：
 
@@ -136,7 +140,7 @@ NavFoM 对最新观测帧使用精细令牌（64 patches），对历史帧使用
 - **损失权重固定**：导航损失权重 $\beta = 10$ 为固定值，在数据规模差异较大的任务间可能需要自适应调整（论文将此列为开放问题）。
 - **训练成本高**：联合训练需 56 块 H100 GPU 运行 72 小时，对复现和扩展构成资源门槛。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_kkBOIsrCXh/figures/002_Figure_2.jpg]]
 *Figure 2: Pipeline of NavFoM. Our method provides a unified framework for handling multiple tasks, including Image QA, Video QA, and Navigation. We organize text tokens and visual tokens using temporal-viewpoint indicator tokens (Sec. 2.1.1)*
@@ -194,7 +198,7 @@ $$ L = \beta L_{\mathrm{nav}} + L_{\mathrm{QA}} $$
 
 其中 $\beta = 10$ 为固定缩放因子。模型在约1270万样本（802万导航、315万图像QA、161万视频QA）上联合训练，视觉编码器和LLM均从预训练权重初始化，使用56块H100 GPU训练72小时。多任务联合训练的消融实验（Figure 7）显示，从50%到100%数据混合比例，所有导航子任务均获得一致的性能提升，其中低资源任务（如搜索）获益最为显著——搜索成功率从10.3%跃升至45.2%。
 
-## 核心模块与公式推导
+
 
 NavFoM 采用双分支架构，统一处理导航与问答任务。其核心设计围绕三个关键模块展开：视觉令牌组织、时间-视角指示嵌入，以及预算感知的时间采样。
 
@@ -240,7 +244,9 @@ $$ \tau_T = \{\mathbf{a}_1, ..., \mathbf{a}_M\}_T = \alpha_{\mathrm{task}} \cdot
 
 每个路径点包含 $(x, y, z, \theta)$，$\alpha_{\mathrm{task}}$ 为任务相关的缩放因子，用于将归一化预测反归一化到不同具身形态的实际运动空间（如地面机器人、无人机、自动驾驶车辆）。不同具身形态的缩放因子配置见 Table 5。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果
 
@@ -308,7 +314,9 @@ NavFoM在视觉语言导航（VLN）、目标导航、主动跟踪、自动驾�
 ![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_kkBOIsrCXh/figures/015_Table_5.jpg]]
 *Table 5: Scaling factors of different dimesiong of predicted tracjtort of different embodiements*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有方法的谱系关系
 
@@ -359,6 +367,8 @@ NavFoM 的核心贡献在于将导航从“单一任务专用模型”推进到�
 5. **感知鲁棒性提升**：针对小物体和运动模糊，是否可以通过多尺度视觉特征、时序融合或引入深度估计来增强感知？这需要在通用性和任务专用性之间寻找新的平衡点。
 
 6. **运动自由度的扩展**：当前框架假设相机配置为固定视角，能否将无人机俯仰角等额外自由度纳入统一的相机配置框架，使模型适应更广泛的具身形态？
+
+
 
 ## 原文 PDF
 

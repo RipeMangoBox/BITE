@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Enhancing_Generative_Auto_bidding_with_Offline_Reward_Evaluation_and_Policy_Search.pdf
+project_link: null
+code_link: null
 openreview_forum_id: kMuQBgPIdg
 aliases:
 - AP
@@ -42,7 +44,7 @@ claims:
 > - Real-world A/B test (6k advertisers, 19 days) 上，GMV 为 78,676,009，对比 76,390,174 (DiffBid)，变化 +3.00%。
 > - Real-world TargetROAS A/B test (300k advertisers, 22 days) 上，GMV 为 819,550,812，对比 779,642,891 (DiffBid)，变化 +5.1%。
 
-## 概述
+## 概要
 
 自动竞价是计算广告的核心决策问题，广告主需在预算约束下动态调整出价以最大化累计价值。现有生成式自动竞价方法（AIGB）通过条件生成模型从离线轨迹数据中学习规划策略，但其核心瓶颈在于**仅依赖行为克隆而缺乏对生成轨迹质量的显式反馈**——当目标条件超出离线数据分布时，模型无法进行有导向的探索，生成轨迹的可靠性急剧下降。
 
@@ -55,7 +57,7 @@ claims:
 
 **方法定位：** AIGB-Pearl位于生成式自动竞价与离线强化学习的交叉点。与DiffBid等纯生成式方法相比，它引入了评估器驱动的策略搜索机制；与CQL、IQL等离线RL方法相比，它保留了生成式规划的条件采样能力，并通过同步耦合技术实现更紧的Lipschitz约束估计。
 
-## 背景与动机
+
 
 ### 自动竞价与生成式规划
 
@@ -97,7 +99,9 @@ $$
 
 这些问题的解决，将使得生成式自动竞价方法从“被动模仿”走向“主动改进”，在保持离线学习安全性的同时获得持续的性能提升。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 现有生成式自动竞价方法（AIGB）的核心瓶颈在于：规划器仅通过最大化离线数据集中轨迹的条件似然进行训练（Eq.3），缺乏对生成轨迹质量的显式反馈机制。这意味着模型只能在离线数据分布内进行模仿，无法在条件外推时有导向地探索更优策略——当目标条件 $y^*$ 超出数据集覆盖范围时，生成轨迹的可靠性急剧下降，甚至产生高风险行为。
 
@@ -146,7 +150,7 @@ $$\hat{W}_1(y_1, y_2; \theta) = \sum_t \|\mu_\theta(s_{1:t}^1, y_1, t) - \mu_\th
 
 消融实验（Table 4）量化了各创新的贡献：KL 约束单独贡献约 +1.1% GMV，Lipschitz 约束贡献约 +1.8% GMV，二者联合使用使 AIGB-Pearl 在真实世界 A/B 测试中相比最强基线 DiffBid 实现 +3.00% GMV 提升（Table 2）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l49_https_openreview_net_forum_id_kMuQBgPIdg/figures/021_Figure_10.jpg]]
 *Figure 10: Learning curves of cumulative rewards between offline RL with bootstrapping method and AIGB-Peral under 10 seeds*
@@ -180,7 +184,7 @@ AIGB-Pearl 的整体 pipeline 围绕“生成式规划器 + 轨迹评估器”�
 
 这两个约束共同定义了离线数据集附近的一个“认证邻域”（certified neighborhood），在此区域内评估器保持高准确度，规划器可以安全地进行评分最大化探索，且理论上有次优性差距上界保证（Theorem 3, Eq.9）。图 1 给出了该约束评分最大化机制的原理示意，图 2 展示了评估器与规划器的完整交互架构。
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题形式化：从行为克隆到评分最大化
 
@@ -258,7 +262,9 @@ $$
 
 即仅需计算两条件下生成均值序列的逐步差异之和。该技术是满足Lipschitz约束的关键工程实现，代价是限制了模型方差的灵活性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验结论
 
@@ -335,7 +341,9 @@ KL约束强度$\delta_K$的调优结果显示存在明显的**探索-安全权�
 ![[assets/figures/papers/paper_list_l49_https_openreview_net_forum_id_kMuQBgPIdg/figures/017_Table_7.jpg]]
 *Table 7: Settings of the real-world experiments*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与生成式自动竞价（AIGB）的关系
 
@@ -388,6 +396,8 @@ AIGB-Pearl 提供了形式化的次优性差距上界（Theorem 3），这在生
 - 评估器在非平稳环境下的鲁棒性如何维持？是否需要在线更新机制？
 - 能否将 AIGB-Pearl 的保守探索框架应用于其他生成式序列决策问题（如推荐系统、库存管理）？
 - 是否存在更紧的理论界，能够更精确地刻画评分最大化与真实性能改进之间的关系？
+
+
 
 ## 原文 PDF
 

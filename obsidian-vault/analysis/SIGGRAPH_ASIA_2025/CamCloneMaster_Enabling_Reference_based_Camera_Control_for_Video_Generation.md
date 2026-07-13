@@ -5,6 +5,7 @@ paper_level: A
 venue: "SIGGRAPH Asia"
 year: 2025
 pdf_ref: paperPDFs/SIGGRAPH_ASIA_2025/CamCloneMaster_Enabling_Reference_based_Camera_Control_for_Video_Generation.pdf
+code_link: null
 project_link: https://camclonemaster.github.io/
 aliases:
 - CamCloneMaster
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | CamCloneMaster：基于参考视频的相机运动克隆 |
 | 英文题名 | CamCloneMaster: Enabling Reference-based Camera Control for Video Generation |
 | 会议/期刊 | SIGGRAPH Asia 2025 |
-| Links | [paper](https://arxiv.org/abs/2506.03140); [Project](https://camclonemaster.github.io/) |
+| Links | [paper](https://arxiv.org/abs/2506.03140) · [Project](https://camclonemaster.github.io/) |
 | Topic | #topic/motion_animation #topic/motion_animation/human_motion_generation |
 | Method | CamCloneMaster |
 | Dataset | RealEstate10K |
@@ -41,7 +42,7 @@ claims:
 > - RealEstate10K 上，Rot Err↓ 为 1.49，对比 2.82 (CameraCtrl)，变化 -1.33。
 > - RealEstate10K 上，Trans Err↓ 为 2.37，对比 4.52 (CameraCtrl)，变化 -2.15。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -84,7 +85,7 @@ CamCloneMaster 的**关键差异化改动**体现在四个维度：
 
 当前方案的主要局限在于**令牌序列拼接增加了计算开销**，限制了生成效率。未来方向包括：探索稀疏注意力或潜在丢弃策略以缓解计算负担；处理更复杂的相机轨迹和动态场景；以及将方法扩展到更长视频或更高分辨率。
 
-## 背景与动机
+
 
 ### 视频生成中的相机控制：一个未闭合的可用性缺口
 
@@ -118,7 +119,9 @@ CamCloneMaster 的出发点是：**相机运动信息天然蕴含在参考视频
 
 CamCloneMaster 处于**参考视频驱动**与**隐式相机表征学习**的交叉点。与参数依赖方法（CameraCtrl、ReCamMaster 等）相比，它消除了参数估计的中间环节；与注意力图逆推方法（MotionClone）相比，它避免了测试时微调的计算开销。其帧维度令牌拼接机制在概念上类似于视频编辑中的条件注入策略，但首次将其系统性地应用于相机运动克隆任务，并通过选择性微调策略实现了相机运动与内容的有效解耦。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CamCloneMaster 的核心创新在于**将相机控制从显式参数依赖中解放出来**，转而采用“参考视频即控制信号”的范式。这一转变通过三个紧密耦合的 changed slots 实现，形成了一条从输入类型、注入机制到训练策略的完整创新链。
 
@@ -162,7 +165,7 @@ $$x_{\mathrm{input}} = \mathrm{Frame.Concat}(x_{t}, x_{\mathrm{cam}}, x_{\mathrm
 
 CamCloneMaster 的创新链可以概括为：**参考视频输入 → 帧维度令牌拼接 → 3D 时空注意力隐式学习相机运动 → 选择性微调保护生成先验**。这一设计绕过了相机参数估计的精度瓶颈，以极简的架构修改（仅改变输入拼接方式和微调范围）实现了相机运动克隆，在 RealEstate10K 测试集上将旋转误差从 CameraCtrl 的 2.82 降至 1.49，同时将动态程度从 30.62 提升至 50.11。
 
-## 整体框架
+
 
 CamCloneMaster 的整体 pipeline 围绕“以参考视频替代显式相机参数”这一核心设计展开，通过将相机运动参考视频的潜在表示直接注入扩散变换器（DiT）的去噪过程，实现无需测试时微调的相机运动克隆。框架由五个关键模块串联构成：**3D VAE 编码器**、**Patchify 令牌化**、**帧维度拼接（Frame Concatenation）**、**DiT 变换器块**以及 **T5 文本编码器**，其输入输出流如图 Figure 2 所示。
 
@@ -179,7 +182,7 @@ CamCloneMaster 的整体 pipeline 围绕“以参考视频替代显式相机参�
 
 **数据支撑**方面，CamCloneMaster 使用基于 Unreal Engine 5 渲染的 Camera Clone Dataset 进行训练，包含 391K 视频和 1,155K 三元组，采用 50% I2V 与 50% V2V 的平衡训练策略，使单一模型同时支持相机控制的图像到视频生成和视频到视频重生成任务。
 
-## 核心模块与公式推导
+
 
 CamCloneMaster 以基于 Transformer 的潜在扩散架构为基础，包含 3D 变分自编码器（3D VAE）用于潜空间映射，以及一系列 Transformer 块用于视频生成。每个基础 Transformer 块由四个核心组件构成：2D 空间自注意力、3D 时空注意力、交叉注意力和前馈网络（FFN）。文本提示嵌入通过 T5 编码器获得，并经由交叉注意力注入模型。
 
@@ -225,7 +228,9 @@ $$\mathcal{L}_{RF}(\theta) = \mathbb{E}_{t,x,z}\left\| v_\theta(\pmb{x}_t, t, c_
 
 为在相机克隆精度与训练效率之间取得平衡，CamCloneMaster 采用选择性微调策略：仅优化 DiT 块内的 3D 时空注意力层，冻结其余所有参数（包括 2D 空间注意力、交叉注意力、FFN 以及 3D VAE）。消融实验证实，相比微调整个 DiT Block，仅微调 3D 时空注意力层能获得更优的相机克隆精度（Rot Err 1.58 vs 3.64）和视觉质量，同时显著降低训练开销。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -296,7 +301,9 @@ $$\mathcal{L}_{RF}(\theta) = \mathbb{E}_{t,x,z}\left\| v_\theta(\pmb{x}_t, t, c_
 ![[assets/figures/papers/paper_list_l1496_https_arxiv_org_abs_2506_03140/figures/011_Table_6.jpg]]
 *Table 6: Ablation Study on Training Strategy*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心创新与基线关系
 
@@ -341,6 +348,8 @@ CamCloneMaster 的适用边界由其设计选择直接决定：
 3. **与参数化方法的融合**：CamCloneMaster 的无参数克隆与参数驱动方法并非互斥——将参考视频的隐式运动表征与显式参数（如用户指定的相机路径编辑）结合，可能实现更精细的相机控制，这一方向尚未被探索。
 
 4. **评估协议的标准化**：当前所有方法的相机精度指标均依赖 MegaSaM 估计参数，而估计误差本身可能混淆方法间的真实差异。建立基于真实相机参数（如合成数据中的 GT）的标准化基准，对于公平比较参数驱动与无参数方法至关重要。
+
+
 
 ## 原文 PDF
 

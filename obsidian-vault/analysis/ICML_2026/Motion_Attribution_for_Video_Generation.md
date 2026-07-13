@@ -5,6 +5,8 @@ paper_level: A
 venue: ICML
 year: 2026
 pdf_ref: paperPDFs/ICML_2026/Motion_Attribution_for_Video_Generation.pdf
+project_link: https://research.nvidia.com/labs/sil/projects/MOTIVE/
+code_link: null
 aliases:
 - MMAVG
 - MAVG
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 视频生成中的运动归因 |
 | 英文题名 | Motion Attribution for Video Generation |
 | 会议/期刊 | ICML 2026 |
-| Links | [paper](https://arxiv.org/abs/2601.08828); [Project](https://research.nvidia.com/labs/sil/projects/MOTIVE/) |
+| Links | [paper](https://arxiv.org/abs/2601.08828) · [Project](https://research.nvidia.com/labs/sil/projects/MOTIVE/) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/generative_models_and_autoencoders |
 | Method | Motive (MOTIon attribution for Video gEneration) |
 | Dataset | VBench, Human Evaluation, Wan2.2-TI2V-5B (VBench) |
@@ -41,7 +43,7 @@ claims:
 > - Human Evaluation 上，Win rate vs Base 为 74.1%，对比 25.9%，变化 +48.2 pp。
 > - Human Evaluation 上，Win rate vs Full FT 为 53.1%，对比 46.9%，变化 +6.2 pp。
 
-## 概述
+## 概要
 
 **核心问题**：现有扩散模型的数据归因方法仅适用于图像，无法区分视频中的动态运动与静态外观，且无法高效扩展到大规模视频生成模型，导致难以识别和选择对运动质量有积极影响的训练样本。
 
@@ -52,8 +54,6 @@ claims:
 - 人类评估显示，Motive 引导选择的数据微调模型相对于预训练基模型获得 74.1% 的胜率，相对于全量微调模型获得 53.1% 的胜率（Table 2）。
 - 方法在更大规模的模型 Wan2.2-TI2V-5B 上也验证了泛化性，运动平滑度等指标维持或超越基模型（Table 5）。
 - 帧长度归一化消除了视频长度偏差，使排名与视频长度的相关性下降 54.0%（Figure 5）；投影维度 D'=512 时与完整梯度的 Spearman 相关系数达 74.7%，在牺牲极小的排名质量前提下实现存储和计算可行（Figure 4）。
-
-## 背景与动机
 
 视频生成模型在近年来取得了显著进展，能够根据文本描述合成逼真且时序连贯的视频内容。然而，一个关键问题尚未得到充分解答：**究竟是训练数据中的哪些视频片段影响了生成视频中的特定运动模式？** 这一问题不仅关乎模型行为的可解释性，更直接影响数据策展的效率——如果能识别出对目标运动质量有积极贡献的训练样本，就可以用极少的数据进行针对性微调，从而提升生成视频的运动平滑性和物理合理性。
 
@@ -67,7 +67,7 @@ claims:
 
 针对上述缺口，本文提出了 **Motive（MOTIon attribution for Video gEneration）**，一个运动感知的视频数据归因框架。其核心动机在于：**通过将归因信号聚焦于动态区域，分离运动影响与外观影响，从而以可扩展的方式识别出对特定运动模式最具影响力的训练片段。** 这一方法使得仅用 10% 的数据进行微调即可显著提升生成视频的运动质量，在 VBench 动态度指标上达到 47.6%，并在人类评估中获得相对于预训练基模型 74.1% 的胜率。
 
-## 核心创新
+## 核心方法与创新机理
 
 Motive的核心创新在于将扩散模型的数据归因从静态图像域系统性地迁移到动态视频域，通过三个关键机制解决了视频生成中运动质量的可归因性问题。
 
@@ -103,8 +103,6 @@ $$\nabla_\theta \mathcal{L}_{\mathrm{diff}} \gets \frac{1}{F} \nabla_\theta \mat
 针对实际应用中需要同时优化多种运动模式的需求，Motive引入**多数投票聚合**机制（Eq. 18）：对每个候选训练视频，统计其跨 $Q$ 个查询的影响分数超过阈值 $\tau$ 的次数，选择得票最多的Top-K样本。这一设计使得选出的子集能够同时覆盖多种运动模式，避免单查询选择的过拟合风险。
 
 综上，Motive的创新本质在于：**通过运动掩码将梯度信号从“全图均匀”重构为“动态加权”，通过帧长度归一化消除视频域特有的时长偏差，并通过投影和方差控制使该方法在十亿参数规模上可行**。这三项changed slots共同构成了从“图像归因”到“视频运动归因”的方法论跨越。
-
-## 整体框架
 
 ![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2601_08828/figures/001_Figure_1.jpg]]
 *Figure 1: Motive. Top. Motion-gradient computation (§3.4) has three steps: (1) detect motion with AllTracker; (2) compute motion-magnitude patches; (3) apply loss-space motion masks to focus gradients on dynamic regions. Bottom. Our method (§3.2) is made scalable via a single-sample variant with common randomness and a projection, computed for each pair of training and query data, aggregated (§3.5) for a final ranking, and eventually used to select fine-tuning subsets*
@@ -150,8 +148,6 @@ $$I_{\mathrm{mot}}(\mathbf{v}_n, \hat{\mathbf{v}}) = \tilde{\mathbf{g}}_{\mathrm
 6. **下游应用**：使用选出的子集对预训练视频生成模型进行微调。
 
 整个管道中，梯度计算成本（约 150 GPU 小时 / 10k 样本）可一次性摊销于后续任意数量的查询，且通过多 GPU 并行可进一步缩短墙钟时间。这种设计使得 Motive 在保持归因精度的同时，具备了面向大规模视频数据集的实用可扩展性。
-
-## 核心模块与公式推导
 
 Motive 的核心架构由三个紧密耦合的模块构成：**运动掩码生成**、**运动感知梯度计算**，以及支撑大规模部署的**高效梯度投影与归一化**。以下逐一展开其关键公式与设计机理。
 
@@ -219,7 +215,7 @@ $$\mathrm{MajVote}_n = \sum_{q=1}^{Q} \mathbb{I}\big[ \mathcal{I}_{\mathrm{mot}}
 
 其中 $\tau$ 为影响阈值，$Q$ 为查询数量。最终按 $\mathrm{MajVote}_n$ 降序排列，选取 Top-K 样本用于微调。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主结果：VBench 量化评估
 
@@ -299,26 +295,10 @@ Figure 7 的跨运动类别影响重叠热力图揭示了不同运动之间的�
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2601_08828/figures/003_Figure.jpg]]
-*Figure: Prompt: A rubber ball being compressed under a flat press, filmed with a stationary camera. Bright,shadow-free lighting and a clean background emphasize the deformation as it flattens. Prompt: A single coin spins quickly on a polished glass surface, close-up fixed camera,bright even lighting, plain backdrop; capture its precession and slow wobble as it settles*
-
-![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2601_08828/figures/004_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2601_08828/figures/012_Figure_6.jpg]]
-*Figure 6: Motive is not simply selecting “motion-rich" clips. Our influence scores are computed via gradients, and training videos are considered influential only when they directly improve the model’s ability to generate the target motion dynamics, not because they contain more motion overall*
-
-![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2601_08828/figures/009_Table_3.jpg]]
-*Table 3: Glossary and notation*
-
-![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2601_08828/figures/010_Table_4.jpg]]
-*Table 4: Glossary and notation (continued)*
-
 ![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2601_08828/figures/015_Figure_8.jpg]]
 *Figure 8: Illustration of motion query set. We generate near-realistic video queries with Veo-3 across ten motion categories. Each category contains five query videos synthesized with controlled prompts and manually screened for clarity and physical plausibility. Table 6: Runtime Breakdown. Detailed computational complexity and runtime for each component of our motion attribution framework on 10k training samples with Wan2.1-T2V-1.3B model*
 
-![[assets/figures/papers/paper_list_l20_https_arxiv_org_abs_2601_08828/figures/016_Table.jpg]]
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 问题定位：从图像归因到视频运动归因的跨越
 

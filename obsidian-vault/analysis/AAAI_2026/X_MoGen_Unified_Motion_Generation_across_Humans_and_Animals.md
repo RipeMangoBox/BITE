@@ -5,6 +5,8 @@ paper_level: A
 venue: AAAI
 year: 2026
 pdf_ref: paperPDFs/AAAI_2026/X_MoGen_Unified_Motion_Generation_across_Humans_and_Animals.pdf
+project_link: null
+code_link: null
 aliases:
 - XM
 - X-MoGen
@@ -41,7 +43,7 @@ claims:
 > - UniMo4D test set (seen species) 上，R-Precision Top-1 ↑ 为 0.848 ± .001，对比 0.823 ± .001 (MARDM)，变化 +0.025。
 > - UniMo4D test set (seen species) 上，MM-Dist↓ 为 0.742 ± .002，对比 0.874 ± .001 (MARDM)，变化 -0.132。
 
-## 概述
+## 概要
 
 **问题与瓶颈。** 文本驱动的人体运动生成近年来取得了显著进展，但现有方法普遍将人类与动物动作分开建模，难以应对跨物种场景。其根本瓶颈在于，不同物种的骨骼拓扑与形态参数——尤其是骨骼长度与身体比例——差异极大，导致在统一框架下生成形态合理、动作真实的跨物种运动极具挑战。
 
@@ -51,7 +53,7 @@ claims:
 
 **方法定位。** 相较于MDM（Tevet et al., ICLR 2023）、T2M-GPT（Zhang et al., CVPR 2023）、MoMask（Guo et al., CVPR 2024）等仅支持单物种的方法，以及MARDM（Meng et al., CVPR 2025）和AniMo（Wang et al., CVPR 2025）等动物专用方法，X-MoGen首次实现了覆盖115个物种的统一生成，其关键在于将物种特定的形态学先验与连续潜在空间建模相结合，突破了固定骨骼长度的限制。
 
-## 背景与动机
+
 
 文本驱动的三维人体运动生成近年来取得了显著进展，涌现出**MDM**（Tevet et al., ICLR 2023）、**T2M-GPT**（Zhang et al., CVPR 2023）、**MoMask**（Guo et al., CVPR 2024）等一系列代表性工作。这些方法在人体运动生成上展现出令人印象深刻的文本-运动对齐能力和运动自然度。然而，当视线转向动物运动生成时，现有范式面临根本性挑战。
 
@@ -59,7 +61,9 @@ claims:
 
 X-MoGen的提出正是为了填补这一空白：**构建一个统一的跨物种文本驱动运动生成框架**，使其能够同时处理人类和动物运动，并在未见物种上保持形态一致性与动作连贯性。这一目标的实现需要解决两个关键问题：其一，如何让模型感知并适应不同物种的骨骼形态差异；其二，如何在生成过程中显式约束骨骼长度的合理性，避免产生形态扭曲的运动伪影。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 X-MoGen 的核心创新在于首次将**物种特定的形态学先验**显式注入文本驱动的运动生成流程，从而突破现有方法只能分别建模人类与动物运动的根本局限。这一突破通过以下三个关键机制实现：
 
@@ -105,7 +109,7 @@ $$\mathbf{v}_{\mathrm{guided}, i}^{(n)} = \mathbf{v}_{\mathrm{uncond}, i}^{(n)} 
 
 上述四个机制形成闭环：CGAE提供物种级形态先验 → 连续AE在形态损失监督下压缩运动 → M-Trans融合先验与文本生成上下文 → 扩散头在流匹配与形态引导下预测运动。这一设计使X-MoGen成为首个在统一框架下支持115个物种运动生成的模型，在UniMo4D已见物种测试集上将FID从MARDM的 0.189 降至 0.050，并在未见物种上展现出显著的泛化能力（Table 2）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2508_05162/figures/001_Figure_1.jpg]]
 *Figure 1: X-MoGen achieves a wide range of capabilities within a single unified framework, including generating both human and animal motions from text descriptions and enabling smooth cross-species motion transitions*
@@ -140,7 +144,7 @@ $$
 
 **关键设计意图。** 整个框架的核心在于将物种形态学先验显式地注入生成过程：CGAE 提供骨骼长度基准，AE 在压缩阶段施加形态正则化，MCM 在生成阶段持续约束骨骼合理性。三者协同，使模型在统一的骨骼拓扑下，能够自适应地生成形态合理、动作真实的跨物种运动。
 
-## 核心模块与公式推导
+
 
 X-MoGen 采用两阶段框架解决跨物种运动生成问题。第一阶段负责运动特征建模，第二阶段完成文本条件生成。
 
@@ -206,7 +210,9 @@ $$
 
 其中 $\omega$ 为引导尺度，$n$ 为去噪步索引。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 数据集与评估协议
 
@@ -278,7 +284,9 @@ FID从0.189降至0.050的幅差尤其显著，表明X-MoGen生成的跨物种运
 
 X-MoGen支持**跨物种运动变换**：利用CGAE为不同物种生成各自的T-pose先验，可在保持运动语义的前提下，将一种物种的运动迁移至另一种物种的骨骼上，实现平滑的跨物种运动过渡（见Figure 1示意）。这一能力无需额外训练，仅通过替换CGAE的物种条件即可完成。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 **问题定位与现有范式**
 
@@ -301,6 +309,8 @@ X-MoGen 的核心突破在于将物种特定的形态学先验（T-pose 骨骼�
 **知识库定位**
 
 X-MoGen 在文本驱动运动生成领域填补了“跨物种统一建模”这一空白。其贡献不在于提出全新的生成范式，而在于识别并解决了形态学差异这一阻碍统一建模的关键瓶颈。CGAE + MCM 的组合设计为后续研究提供了一个可复用的技术方案：当需要处理多形态、多尺度的运动数据时，显式建模形态学先验并施加一致性约束是一条经过验证的有效路径。该工作也为运动生成与生物力学、物理模拟的交叉研究打开了接口。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Dual_Path_Condition_Alignment_for_Diffusion_Transformers.pdf
+project_link: https://openi.pcl.ac.cn/OpenAIDriving/DUPA
+code_link: https://github.com/PCH-gg/DUPA
 openreview_forum_id: ALpn1nQj5R
 aliases:
 - DPCAD
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 扩散Transformer的双路径条件对齐 |
 | 英文题名 | Dual-Path Condition Alignment for Diffusion Transformers |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=ALpn1nQj5R); [GitHub](https://github.com/PCH-gg/DUPA); [Project](https://openi.pcl.ac.cn/OpenAIDriving/DUPA) |
+| Links | [paper](https://openreview.net/forum?id=ALpn1nQj5R) · [GitHub](https://github.com/PCH-gg/DUPA) · [Project](https://openi.pcl.ac.cn/OpenAIDriving/DUPA) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/generative_models_and_autoencoders |
 | Method | DUal-Path condition Alignment (DUPA) |
 | Dataset | ImageNet 256×256 |
@@ -42,7 +44,7 @@ claims:
 > - ImageNet 256×256 上，FID↓ (without CFG) 为 5.92，对比 8.57 (DDT-XL/2, 400 epochs)，变化 -2.65。
 > - ImageNet 256×256 上，IS↑ (with CFG) 为 296.2，对比 229.8 (DDT-XL/2, 400 epochs)，变化 +66.4。
 
-## 概述
+## 概要
 
 扩散Transformer在训练过程中面临一个关键瓶颈：早期层缺乏准确的低频语义引导，导致收敛缓慢且生成质量受限。现有方法（如REPA）虽能借助外部视觉编码器（如DINOv2）提供高质量表示引导，但存在分布偏移和高计算成本的问题。
 
@@ -50,7 +52,7 @@ claims:
 
 DUPA在ImageNet 256×256上取得了显著效果：仅需400个训练epoch，FID即达到1.46（with CFG），不仅优于所有不依赖外部监督的方法，且收敛速度比同类方法快约3倍以上。与基线DDT-XL/2相比，DUPA在无CFG条件下FID从8.57降至5.92，IS从229.8提升至296.2，同时实现了约5倍训练加速和10倍推理加速。消融实验表明，双路径采样与条件对齐的联合引入是性能提升的关键，且独立重采样噪声ε比仅重采样时间戳t对条件对齐更为关键。
 
-## 背景与动机
+
 
 扩散Transformer（Diffusion Transformer, DiT）已成为视觉生成领域的主流架构，但其训练过程面临一个关键瓶颈：**早期层缺乏准确的低频语义引导，导致收敛缓慢且生成质量受限**。这一问题在无辅助任务的标准训练范式下尤为突出——模型仅依赖速度场预测损失（Equation 3），缺乏对高层语义结构的显式监督信号。
 
@@ -62,7 +64,9 @@ DUPA在ImageNet 256×256上取得了显著效果：仅需400个训练epoch，FID
 
 关键洞察在于：**同一真实图像的不同噪声版本所携带的低频语义信息在理想情况下应该是不变的**。若对一张干净图像进行多次独立加噪，得到的多个噪声隐变量虽然在高频细节上各不相同，但其底层语义结构（如物体类别、空间布局）应当保持一致。因此，从这些不同噪声路径中提取的条件特征应当彼此对齐。基于这一观察，本文提出DUPA（DUal-Path condition Alignment），通过对齐内部条件替代外部编码器，实现无监督的高效表示引导，显著加速训练并提升生成质量。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：扩散Transformer训练缺乏低频语义引导
 
@@ -104,7 +108,7 @@ DUPA的pipeline由四个核心模块构成（图2）：**Condition Encoder**从�
 
 DUPA以无外部视觉编码器的设定，在ImageNet 256×256上取得了FID 1.46（with CFG）和FID 5.92（without CFG）的优异性能，不仅超越了所有不使用外部监督的方法，甚至与依赖大规模预训练编码器的REPA性能相当。更重要的是，DUPA仅需约400个训练epoch即可达到REPA约800个epoch的性能水平，实现了**约5倍训练加速和10倍推理加速**（Figure 3b），同时完全消除了对外部视觉编码器和额外图像数据的依赖。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0011_ALpn1nQj5R_Dual-Path_Condition_Alignment_for_Diffusion_Tran/figures/004_Figure_2.jpg]]
 *Figure 2: Comparison between REPA and DUPA. REPA needs an external visual encoder to generate effective representations, whereas DUPA can get effective representations through internal alignment*
@@ -132,7 +136,7 @@ $$\mathcal{L}_{\mathrm{velocity}}(\theta) = \mathbb{E}_{\mathbf{x}_*, \epsilon, 
 
 **因果机制。** 同一真实图像的不同噪声版本所携带的低频语义信息在理想情况下应保持不变——这是 DUPA 有效性的核心假设。通过对齐这些内部条件，模型在早期层即可获得稳定的语义引导，从而显著加速收敛并提升生成质量。消融实验（Table 4）证实：在 DDT-L/2 基线上，单独添加双路径采样将 FID 从 14.9 降至 12.5，进一步添加条件对齐损失将 FID 降至 11.1，IS 提升至 104.8，验证了两个模块的增量贡献。
 
-## 核心模块与公式推导
+
 
 ### 3.1 预备知识：流匹配与速度场
 
@@ -190,7 +194,9 @@ $$\mathcal{L} := \mathcal{L}_{\mathrm{velocity}} + \lambda \mathcal{L}_{\mathrm{
 
 **关键实现细节**：投影器 $z_\phi$ 的初始化至关重要——必须避免将权重和偏置同时设为零，否则会导致捷径学习，使对齐损失迅速归零而无法提供有效的表示引导。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈验证
 
@@ -274,7 +280,9 @@ Table 6 展示了DUPA-XL/2在2M迭代时不同CFG scale w的性能变化。w=1.6
 
 DUPA目前仅在类别条件图像生成（ImageNet 256×256）上进行了系统验证，尚未扩展到文本到图像、视频生成等更复杂的多模态任务。双路径对齐机制是否可推广至非DDT架构的其他扩散模型（如标准DiT），以及条件对齐深度和最优K值在不同规模模型和任务下的自适应选择策略，仍是待探索的开放问题。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -314,6 +322,8 @@ DUPA 的架构设计（双路径采样 + 条件对齐）在原理上不依赖于
 4. **对齐机制的理论理解**：训练过程中条件对齐余弦相似度的变化曲线（Figure 5）展示了从噪声到语义一致性的转变过程，但这一现象背后的动力学机制及其与生成质量提升的因果关联尚未被充分阐释。
 
 5. **与外部监督方法的公平比较**：DUPA 完全无需外部视觉编码器及外部图像数据，与依赖大规模预训练编码器（如 DINOv2）的 REPA 等方法在资源约束上不平等。在相近计算预算下 DUPA 以更少的资源达到了极具竞争力的性能，但若允许 REPA 使用同等计算资源进行更长时间的训练，性能差距是否会缩小尚不明确。
+
+
 
 ## 原文 PDF
 

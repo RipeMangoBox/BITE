@@ -41,13 +41,13 @@ claims:
 > [!tip] 效果简介
 > - InterHuman 测试集 上，R-precision Top-1 ↑ 0.375±0.006 vs 0.287±0.007 (InterGen++) (+0.088)；R-precision Top-3 ↑ 0.615±0.007 vs 0.542±0.006 (InterGen++) (+0.073)；FID ↓ 0.582±0.018 vs 0.943±0.012 (InterGen++) (-0.361)。
 
-## 概述
+## 概要
 
 现有物理驱动的人形控制方法局限于单智能体，难以建模多智能体交互所需的精细关节间依赖与异质模态（本体感知、外部感知、动作）的协同，导致生成行为物理不一致或交互细节缺失。针对这一瓶颈，InterAgent 提出首个端到端的文本驱动物理多智能体控制框架，其核心思路是将本体感知、外部感知和动作分解为独立流，并在交互图上施加稀疏注意力，使扩散 Transformer 能够高效捕捉多智能体间关键空间关系，生成物理合理且语义一致的交互行为。
 
 在方法定位上，InterAgent 引入交互图外部感知表示、多流 DiT 解耦异质模态、以及基于 Gumbel-Softmax 的边缘稀疏注意力机制，形成端到端的自回归扩散框架。与物理化文本到交互基线（如 InterGen++、InterMask++）和端到端物理控制基线（如 PDP、CLoSD）相比，InterAgent 在 InterHuman 测试集上取得 SOTA 性能：R-precision Top-3 达到 0.615，FID 降至 0.582，显著优于最强基线 InterGen++（0.542 和 0.943）。消融实验进一步验证了交互图外部感知、三流解耦架构和边缘稀疏注意力各自对交互建模鲁棒性的关键贡献。
 
-## 背景与动机
+
 
 ### 问题背景：从单智能体控制到多智能体交互
 
@@ -94,7 +94,9 @@ claims:
 
 通过这些设计，InterAgent 旨在实现一个端到端框架，能够从纯文本指令生成物理合理、语义一致的多智能体交互行为，并在公开基准上达到最优性能。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 InterAgent 的核心创新在于首次将**端到端的物理仿真多智能体控制**与**文本条件生成**统一在一个框架下，其关键突破并非单一技术点，而是通过三个紧密耦合的“changed slot”系统性地解决了现有多智能体交互建模中的瓶颈。
 
@@ -139,7 +141,7 @@ $$\pmb{f}' = (M \circ A)V$$
 
 需要指出，InterAgent 的创新聚焦于**固定双智能体**场景下的物理交互生成。其对高度动态行为（如跳跃）表现不佳（Figure 9），因为自回归扩散模型倾向平滑过渡，难以处理爆发性瞬间动力学。此外，交互图的边数量随智能体数量呈二次增长，当前框架无法直接扩展至可变数量智能体——这属于**未解决的扩展性问题**，而非方法内部的缺陷。
 
-## 整体框架
+
 
 InterAgent 的端到端物理多智能体控制框架围绕一个核心设计展开：**将文本条件直接映射为物理仿真器中两个合作人形角色的交互行为**，无需中间运动生成与跟踪策略的分阶段衔接。框架由三个紧密耦合的模块构成闭环（Figure 2）。
 
@@ -188,7 +190,7 @@ Inter-DiT 预测的未来状态-动作序列通过物理仿真器执行：预测
 
 框架进一步支持反应式控制：推理时通过修复机制（inpainting）固定一个智能体的运动轨迹，让另一个智能体生成文本条件的反应行为，无需额外训练（Figure 7）。这展示了 InterAgent 对交互上下文的灵活适应能力。
 
-## 核心模块与公式推导
+
 
 InterAgent 的核心架构围绕三个关键设计展开：**三流解耦的扩散Transformer (Inter-DiT)**、**交互图外部感知表示**以及**稀疏边缘注意力机制**。以下逐一剖析各模块的结构与作用。
 
@@ -278,7 +280,9 @@ $$
 ![[assets/figures/papers/paper_list_l2522_https_arxiv_org_abs_2512_07410/figures/004_Figure_4.jpg]]
 *Figure 4: Sparse Interaction Graph. Each joint of one character connects to all joints of the other via directed edges (dark green), where each edge vector encodes the spatial interaction between the corresponding joints. The thickness of each edge encodes the magnitude of its contribution to the interactive dynamics. Light purple arrows on the ground indicate temporal progression*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果：文本驱动的物理多智能体控制
 
@@ -341,7 +345,9 @@ InterAgent 展示了无需重新训练的反应式控制能力（图 7）。通�
 
 ![[assets/figures/papers/paper_list_l2522_https_arxiv_org_abs_2512_07410/figures/013_Figure.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -378,6 +384,8 @@ InterAgent 的方法设计可追溯至三条技术脉络的融合：
 3. **动态行为的物理约束注入。** 解决跳跃等动态行为失效的一个可能路径是在扩散采样过程中加入物理约束引导（如足部离地高度、质心加速度阈值），类似于 classifier-guided diffusion 但约束来自物理规则而非分类器。这需要设计可微的物理约束函数，并平衡约束强度与生成多样性。
 
 4. **真实世界部署的域适应。** 从仿真到真实的迁移可通过域随机化（在训练中引入传感器噪声、质量扰动、地面摩擦变化）和在线自适应（利用真实机器人数据微调跟踪策略或扩散模型）两步走。但多智能体场景下的在线数据采集成本极高，可能需要探索基于离线 RL 或模仿学习的 sim-to-real 策略。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/SO_Bench_A_Structural_Output_Evaluation_of_Multimodal_LLM.pdf
+project_link: null
 code_link: "https://github.com/apple/ml-sobench"
 aliases:
 - SB
@@ -41,7 +42,7 @@ claims:
 > - SO-Bench 上，Schema Validation Accuracy (最高) 98.70 (GPT-5-mini) vs 16.28 (Qwen3-VL 2B) (大幅领先)；Field Match (Fuzzy, 最高) 73.14 (Gemini-2.5-Pro) vs 39.53 (Qwen3-VL 2B) (+33.61)；Full Match (Fuzzy, 最高) 18.91 (Gemini-2.5-Pro) vs 6.36 (Qwen3-VL 2B) (+12.55)。
 > - SO-Bench (训练后) 上，Schema Validation Accuracy (3B 基座) 85.8 (SFT 50K) / 72.0 (RLVR) vs 65.1 (未训练基线) (+20.7 / +6.9)；Field Match Fuzzy (3B 基座) 56.5 (SFT 114K) / 52.7 (RLVR) vs 45.6 (未训练基线) (+10.9 / +7.1)。
 
-## 概述
+## 概要
 
 多模态大语言模型（MLLM）在通用视觉理解上取得了显著进展，但在面向下游应用的结构化输出任务中仍面临根本性瓶颈。当给定一张图像和一个由应用程序预先定义的自定义 JSON 模式（Schema），模型需要同时完成两项要求：**（1）生成的输出必须严格符合该模式的语法约束；（2）输出的字段内容必须准确反映图像中的信息**。这一“视觉结构化输出”问题对模型的模式遵循能力与细粒度视觉信息提取能力提出了双重挑战。
 
@@ -52,8 +53,6 @@ SO-Bench 的核心洞察是：**通过大规模多源训练数据的有监督微
 在方法定位上，SO-Bench 并非提出新的模型架构，而是构建了一套完整的数据生成与评估框架：基于 6.5K+ 多样化 JSON 模式和 1.8K 人工验证的图像-模式对，通过多模态嵌入检索、多图像模式生成、用户意图多样化、渐进式响应生成与 Critic 优化等多阶段流水线，自动生成了 114K 高质量训练样本。评估采用基于抽象语法树（AST）的递归比较策略，支持精确匹配、模糊匹配（归一化编辑距离/相对误差）和字段忽略三种粒度。
 
 主要结果揭示了该领域的巨大提升空间：**最强模型 Gemini-2.5-Pro 在 SO-Bench 上的 Full Match (Fuzzy) 仅为 18.91%，所有模型均低于 20%**；GPT-5 相比 GPT-4o 在模式验证准确率上提升超过 15 个百分点，但字段级内容质量仍有显著差距。训练实验进一步证实，增加训练数据量可单调提升性能，且训练数据的 Schema 深度分布与评估领域对齐至关重要——仅在浅层级 UI 数据上训练的模型在深层 Schema 的图表领域表现极差。
-
-## 背景与动机
 
 ### 多模态大模型的结构化输出需求
 
@@ -87,7 +86,7 @@ SO-Bench 的主要贡献包括：
 
 初步实验揭示了一个关键发现：即使是当前最强的前沿模型（如 Gemini-2.5-Pro），其**全结构模糊匹配准确率也仅为 18.91%**，所有模型均低于 20%。这表明视觉结构化输出能力存在巨大的提升空间，亟需研究社区的关注。
 
-## 核心创新
+## 核心方法与创新机理
 
 ### 问题形式化与评估框架的系统性定义
 
@@ -128,8 +127,6 @@ $$R(O,G) = \begin{cases} -0.1 & \text{if } O \text{ is invalid JSON} \\ \alpha \
 ### 与现有工作的本质差异
 
 相较于传统的 OCR 基准（仅关注文本识别）或指令遵循基准（仅关注格式合规），SO-Bench 的独特贡献在于将两者耦合到一个统一的视觉结构化输出框架中，并揭示了二者之间的深层张力：使用结构化输出 API 可提升模式合规率，但可能牺牲字段级内容质量（Table 3）；反之，指令遵循提示在强模型上效果更佳，但对弱模型收效甚微。这一发现为后续的模型设计与训练策略选择提供了关键指引。
-
-## 整体框架
 
 SO-Bench 的构建与评估围绕一个统一的形式化问题展开：给定输入图像 $I$、预定义的 JSON 模式 $S$ 和用户指令 $X$，多模态大模型需自回归地生成结构化输出 $Y$，使其同时满足对 $S$ 的语法合规性，并准确反映 $I$ 中的视觉信息。整个工作流可划分为两大核心阶段——**大规模数据生成流水线**与**多层次评估体系**，二者通过 CLIP 嵌入空间中的图像-模式关联紧密耦合。
 
@@ -182,11 +179,6 @@ SO-Bench 的构建与评估围绕一个统一的形式化问题展开：给定�
 整个框架的模块间关系清晰：模式检索与生成为响应生成提供约束空间，评估体系为训练提供反馈信号，训练模块则通过 SFT 和 RLVR 闭合优化回路。
 
 ### 补充图表
-
-![[assets/figures/papers/paper_list_l2748_https_arxiv_org_abs_2511_21750/figures/001_Figure_1.jpg]]
-*Figure 1: An example of visual structured output task. Given a customized JSON schema often specified by the downstream applications, e.g. MenuReader, a model is tasked to extract information from input image, following the schema definition and user instruction*
-
-## 核心模块与公式推导
 
 SO-Bench 的评估与训练框架围绕“视觉结构化输出”的形式化定义展开：给定输入图像 $I$、预定义 JSON 模式 $S$ 和用户指令 $X$，模型需自回归生成结构化输出 $Y$，使其同时满足对 $S$ 的语法合规性和对 $I$ 的语义忠实性。其概率形式为 $p(Y|I, X, S)$。
 
@@ -265,7 +257,7 @@ $$
 
 该设计通过负惩罚抑制非法 JSON 输出，同时以字段匹配率的平方作为正向激励，并引入轻微的模式违规折扣（0.8），引导模型在维持结构合规性的同时提升内容准确性。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 基准评估设置
 
@@ -353,9 +345,6 @@ Table 3 对比了使用原生结构化输出 API 与指令遵循提示两种策�
 ![[assets/figures/papers/paper_list_l2748_https_arxiv_org_abs_2511_21750/figures/013_Figure_9.jpg]]
 *Figure 9: The results breakdown by the data categories for the model trained with 20K randomly sampled data and model trained with Aria-UI subset of the data. In the left figure, we show the schema validation accuracy and in the right figure, we show the field match accuracy (fuzzy)*
 
-![[assets/figures/papers/paper_list_l2748_https_arxiv_org_abs_2511_21750/figures/015_Figure_12.jpg]]
-*Figure 12: An example error (Chart image) from the model trained on AriaUI subset of data. Although the extracted values themselves are correct, the output does not follow the schema structure at all, leading to 0 scores on all metrics in this case*
-
 ![[assets/figures/papers/paper_list_l2748_https_arxiv_org_abs_2511_21750/figures/016_Figure_13.jpg]]
 *Figure 13: An example error (Natural image) from the SFT model trained on full data. This example gets partial score on field match but is invalid w.r.t. the schema*
 
@@ -365,7 +354,7 @@ Table 3 对比了使用原生结构化输出 API 与指令遵循提示两种策�
 ![[assets/figures/papers/paper_list_l2748_https_arxiv_org_abs_2511_21750/figures/018_Figure_15.jpg]]
 *Figure 15: An example error (UI image) from the SFT model trained on full data. This example gets partial score on field match while also being valid w.r.t the schema*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 问题定位：视觉结构化输出的新基准
 

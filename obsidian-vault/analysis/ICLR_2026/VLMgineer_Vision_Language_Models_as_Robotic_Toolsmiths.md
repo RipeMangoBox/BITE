@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/VLMgineer_Vision_Language_Models_as_Robotic_Toolsmiths.pdf
+project_link: https://vlmgineer.github.io/
+code_link: null
 openreview_forum_id: nESyz4PvJL
 aliases:
 - VLMgineer
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | VLMgineer：视觉语言模型作为机器人工具创造者 |
 | 英文题名 | VLMgineer: Vision-Language Models as Robotic Toolsmiths |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=nESyz4PvJL); [Project](https://vlmgineer.github.io/) |
+| Links | [paper](https://openreview.net/forum?id=nESyz4PvJL) · [Project](https://vlmgineer.github.io/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | VLMGINEER |
 | Dataset | ROBOTOOLBENCH (所有12个任务), ROBOTOOLBENCH (4个RLBench相关任务) |
@@ -40,7 +42,7 @@ claims:
 > - ROBOTOOLBENCH (所有12个任务) 上，平均归一化改进率 为 +64.7% (相比Human Prompts)，对比 Human Prompts，变化 +64.7%。
 > - ROBOTOOLBENCH (4个RLBench相关任务) 上，平均归一化改进率 为 +24.3% (相比RLBench原有工具)，对比 RLBench Tools，变化 +24.3%。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -73,7 +75,7 @@ VLMGINEER 位于**VLM 驱动的机器人工具设计**与**进化算法**的交�
 
 > **注意**：部分基线方法的具体作者/年份/会议信息在已有分析中缺失（如 Human Prompts 的具体参与者背景仅描述为“机器人专家、LLM专家、外行”），建议手动核实后补充完整引用。
 
-## 背景与动机
+
 
 机器人操作任务通常面临一个根本性矛盾：通用机械臂和夹爪的形态固定，而现实世界中的多样化任务往往需要高度特化的工具才能有效完成。从日常场景（如用勺子舀汤、用铲子翻煎饼）到工业应用（如精密装配、物料分拣），工具几何结构对任务成功起着决定性作用。然而，传统机器人工具设计流程存在显著瓶颈。
 
@@ -85,7 +87,9 @@ VLMGINEER 位于**VLM 驱动的机器人工具设计**与**进化算法**的交�
 
 该方法填补了现有研究中的关键空白：首次提出了一个完全自动化的框架，无需任何人工预定义参数模板或工具规范，即可从零开始同时设计工具几何和机器人动作策略，并通过仿真中的进化搜索持续优化两者。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 VLMGINEER的核心创新在于将视觉语言模型的零样本创造力与进化搜索相结合，构建了首个无需人工干预即可同时优化工具几何与动作策略的自动化框架。这一设计直接针对传统方法的瓶颈：以往的工具设计要么依赖人类专家手工指定几何参数，要么使用预定义的固定工具，无法根据任务需求进行自动化的工具-动作协同优化。
 
@@ -123,7 +127,7 @@ VLMGINEER的核心创新在于将视觉语言模型的零样本创造力与进�
 
 这一方法谱系定位表明，VLMGINEER并非简单地将VLM应用于工具设计，而是通过进化框架构建了一个完整的自动化设计-评估-优化闭环，实现了零人工规范下的工具-动作协同优化。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_nESyz4PvJL/figures/002_Figure_2.jpg]]
 *Figure 2: VLMGINEER takes unmodified environment source code, environment image, environmental description, and task description as context to zero-shot generate tool and action designs from a VLM. It then iteratively refines its tool and action designs through a loop of candidate sampling, simulation-based evaluation, and evolution improvement*
@@ -162,7 +166,7 @@ VLMGINEER 是一个完全自动化的工具-动作协同设计框架，其核心
 - **动作表示**：动作策略以离散末端执行器位姿序列表示，降低了控制复杂度，但同时也限制了框架对需要连续力控或动态交互的任务的适用性。
 - **进化框架的角色**：消融实验（Table 1）表明，在相同样本预算下，进化搜索相比暴力 VLM 采样的平均归一化奖励提升 119.2%（0.938 vs 0.428），验证了迭代精炼是框架性能的核心机制。
 
-## 核心模块与公式推导
+
 
 ### 框架总览
 
@@ -212,7 +216,9 @@ $$\max\left(0, 1 - \frac{\text{current\_distance}}{\text{initial\_distance}}\rig
 
 在相同样本预算（8000 次评估）下，VLMGINEER 的进化搜索平均归一化奖励达到 0.938，而暴力 VLM 采样仅为 0.428，提升 **+119.2%**（Table 1）。这表明进化框架通过迭代精炼的定向搜索，显著优于无引导的随机采样——后者不仅平均性能低，且方差大，而进化方法一致地改进初始设计。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -287,7 +293,9 @@ Table 4和Table 5显示，选择更强大的VLM模型对性能至关重要。Gem
 
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心范式定位
 
@@ -332,6 +340,8 @@ VLMgineer 处于**机器人工具自动设计**与**视觉语言模型物理推�
 6. **VLM物理创造力的上限**：当前VLM在复杂物理推理上的局限如何限制工具创新？是否存在方法（如链式思维推理、物理仿真反馈增强）可进一步激发VLM的物理创造力？
 
 7. **计算效率**：每轮进化需要大量仿真评估（8000次），虽可并行化但总计算成本高。能否通过代理模型、主动学习或VLM自评估减少仿真调用次数？
+
+
 
 ## 原文 PDF
 

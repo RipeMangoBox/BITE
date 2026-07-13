@@ -42,7 +42,7 @@ claims:
 > - H3.6M 上，MPJPE (mm) @1000ms 97.4 vs 101.4 (HoCoTTA) (-4.0)；MPJPE (mm) @400ms 49.7 vs 52.8 (HoCoTTA) (-3.1)。
 > - GRAB 上，MPJPE (mm) @1000ms 127.5 vs 131.8 (HoCoTTA) (-4.3)。
 
-## 概述
+## 概要
 
 **核心问题**：现有人体姿态预测（Human Pose Prediction, HPP）的持续测试时自适应（continual test-time adaptation, TTA）方法将人体视为均质整体，忽略了解剖段之间固有的运动异质性。这导致模型对域偏移稳定的身体部位（如躯干）产生过适应，而对偏移频发的关节（如手臂、腿）则适应不足，最终限制了跨域预测的鲁棒性。
 
@@ -57,7 +57,7 @@ claims:
 
 **方法谱系与知识库定位**：TT-HA 处于**测试时自适应**与**三维人体姿态预测**的交汇点。其基线谱系涵盖时空图卷积方法 **LTD**、渐进猜测优化方法 **PGBIG**、纯 MLP 方法 **siMLPe**，以及测试时自适应方法 **H/P-TTP** 和 **HoCoTTA**。相较于 HoCoTTA 的全局域敏感/不变参数划分，TT-HA 首次将解剖异质性引入持续 TTA 框架，通过部位级 IN 统计与 EMD 驱动的选择性参数恢复，实现了更精细的域偏移应对策略。这一思路与参数隔离、模块化持续学习等方向存在潜在关联，但其解剖分解的粒度依赖手工定义，向更一般运动数据的泛化仍需验证。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -92,7 +92,9 @@ claims:
 
 本文提出的 **TT-HA（Test-Time Heterogeneous Adaptation）** 框架正是围绕上述需求构建的：它通过解剖参数分解、基于实例归一化与 Earth Mover's Distance 的部位级域偏移检测、以及选择性的知识恢复与微调机制，首次在 HPP 的测试时自适应中实现了对解剖异质性的显式建模与利用。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：解剖段域偏移的异质性
 
@@ -120,7 +122,7 @@ TT-HA 的核心创新在于将“域偏移”的观测与干预粒度从**全身
 -   **概念验证**：Figure 1 通过 t-SNE 可视化直接证明了“域偏移在解剖段层级存在异质性”这一核心假设，为整个方法提供了动机。
 -   **性能验证**：在 H3.6M、CMU Mocap、GRAB、RICH 四个数据集上的主实验结果（Table 1）表明，TT-HA 在所有评估指标（MPJPE, P-MPJPE, PCK@150）上均一致优于 HoCoTTA 等基线。例如，在 H3.6M 的 1000ms 预测上，MPJPE 从 101.4mm 降至 **97.4mm**，相对提升 3.9%。定性结果（Figure 3）也直观显示，TT-HA 对手臂和腿部等偏移频发部位的预测精度提升尤为明显，而躯干等稳定部位的性能得以保持，印证了异构自适应的有效性。
 
-## 整体框架
+
 
 TT-HA 的核心思想是将人体姿态预测的测试时自适应从“全身统一处理”升级为“解剖段异构自适应”。其整体 pipeline 由五个功能模块串联而成，形成“检测—恢复—微调”的闭环，如 Figure 2 所示。
 
@@ -145,7 +147,7 @@ TT-HA 的核心思想是将人体姿态预测的测试时自适应从“全身�
 
 **数据流总结**：测试批次进入模型 → IN 统计更新并计算 EMD → 滑动窗口检测峰值 → 对每个解剖段独立判定：峰值则恢复源参数，否则用自监督损失微调该段参数 → 输出预测姿态。这种“检测—恢复—微调”的闭环使得 TT-HA 能对域偏移频发的部位（如手臂）进行快速知识重置，同时对稳定部位（如躯干）保持渐进适应，避免了全局统一策略下的过适应与欠适应矛盾。
 
-## 核心模块与公式推导
+
 
 ### 3.1 解剖参数分解
 
@@ -220,7 +222,9 @@ $$\mathcal{L}_p^{\text{spatial}} = \frac{1}{T(N-1)} \sum_{i=1}^{T} \sum_{n=1}^{N
 ![[assets/figures/papers/paper_list_l1006_https_openaccess_thecvf_com_content_CVPR2026_html_Cui_Anatomical_Domain/figures/001_Figure_1.jpg]]
 *Figure 1: Proof of Concept: Anatomical Domain Shift. t-SNE embedding of human segments based on anatomical separation, i.e., left/right legs, left/right arms, and torso, and full body under the challenging domain shift setup for TTA-based HPP [11]. This plot shows the feature topology of the source domain—H3.6M [24] (upper), and the target domain—GRAB [48] (bottom). The diagram exhibits that while full-body embedding differ between source and target domains, such matter is not present on all segments, and as a contrast, the distribution of certain segments (i.e., right leg and torso) is very close. This provides the proof of concept of our central hypothesis: for human motion, domain shift manifests...*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计与评估协议
 
@@ -298,7 +302,9 @@ Figure 3 提供了 TT-HA 与 HoCoTTA 的定性对比。以灰色网格表示真�
 ![[assets/figures/papers/paper_list_l1006_https_openaccess_thecvf_com_content_CVPR2026_html_Cui_Anatomical_Domain/figures/008_Table_5.jpg]]
 *Table 5: Impact of threshold*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与持续测试时自适应方法的关系
 
@@ -347,6 +353,8 @@ TT-HA 揭示的解剖异质性自适应范式为未来研究开辟了若干方�
 - **鲁棒域偏移检测**：在低质量数据条件下，如何增强基于 IN 统计的域偏移检测鲁棒性？是否可融合运动学约束（如关节角度范围、速度上限）作为辅助信号？
 - **架构协同设计**：TT-HA 目前与 GCN/MLP 骨干结合，与 Transformer 等具备自注意力机制的架构结合时，解剖段参数划分是否能与注意力头形成更精细的对应关系？
 - **无源域自适应**：能否通过预训练扩散模型或运动先验来替代源域预训练模型，使 TT-HA 在完全无源域条件下也能启动？
+
+
 
 ## 原文 PDF
 

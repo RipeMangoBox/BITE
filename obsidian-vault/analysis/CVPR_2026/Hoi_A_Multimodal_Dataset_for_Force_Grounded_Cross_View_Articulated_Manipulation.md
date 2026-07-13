@@ -44,7 +44,7 @@ claims:
 > - Hoi! Tactile Force Prediction 上，Combined RMSE (N) 3.86 (Sparsh w/DINO)。
 > - Hoi! Visual Force Estimation (projected) 上，RMSE (N) kitchen_7: 3.531, office_1: 2.325 (ForceSight) vs 0.404 on original ForceSight dataset (substantial degradation (up to ~8.7× higher error))。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -72,7 +72,7 @@ claims:
 
 这些结果表明，**Hoi!** 所引入的力觉、多视角与跨执行器复杂性，对当前感知模型构成了实质性的泛化考验，同时也为构建视觉-力觉联合表征和跨实体技能迁移开辟了新的研究路径。
 
-## 背景与动机
+
 
 ### 关节操纵中力觉与跨视角理解的缺失
 
@@ -96,7 +96,9 @@ claims:
 
 Hoi! 的挑战性在现有模型的性能退化中得到了印证。以视觉力预测模型 **ForceSight**（Collins et al., 2023）为例，该模型在其原始数据集上取得了 0.404 N 的 RMSE，但在 Hoi! 的 kitchen_7 场景中误差飙升至 3.531 N，退化幅度高达约 8.7 倍（Table 6）。这一显著的性能下降揭示了域适应和力-视觉对齐的深层挑战，也印证了 Hoi! 作为新基准的独特价值。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Hoi! 数据集的根本创新在于**首次将同步的多模态力触觉信号、多视角对齐与跨执行器记录统一纳入一个面向关节物体操纵的数据集**，从而填补了现有基准中长期存在的三个结构性空白（表1）。其核心设计围绕一个因果调控变量展开：通过在同一任务上联合捕获视觉外观与物理力模式，并使其在人类与机器人执行器之间对齐，研究者得以直接探究视觉感知与触觉动作之间的关联，进而推动操作技能的跨实体迁移。
 
@@ -118,7 +120,7 @@ Hoi! 数据集的根本创新在于**首次将同步的多模态力触觉信号�
 
 上述设计选择的有效性在实验中得到了间接但有力的验证。当现有视觉力预测模型 **ForceSight**（Collins et al., 2023）直接在 Hoi! 上评估时，其 RMSE 从原数据集的 0.404 N 急剧恶化至 kitchen_7 场景的 3.531 N（约 8.7 倍）和 office_1 的 2.325 N（表6）。这一显著退化并非模型本身的问题，而是揭示了 Hoi! 所引入的**域差异**——野外环境、多视角条件和跨执行器力模式——正是此前数据集所系统性回避的挑战。换言之，Hoi! 的“难度增量”恰恰构成了其核心研究价值：它为力-视觉对齐、域适应和跨执行器泛化等开放问题提供了迄今最严苛的测试平台。
 
-## 整体框架
+
 
 Hoi! 数据集的构建围绕一个核心目标展开：在野外室内环境中，同步捕获人类对关节物体的操作过程，并记录多视角视觉、末端执行器力/扭矩和触觉信号，最终实现跨执行器（人手、手持夹爪）的对齐。为此，作者设计了一套完整的采集与标注流水线，其整体架构可分为四个关键模块：**多执行器数据采集**、**时间对齐**、**空间对齐**以及**标注与真值生成**。
 
@@ -157,7 +159,7 @@ Hoi! 数据集的构建围绕一个核心目标展开：在野外室内环境中
 
 整体流水线以“场景 + 操作者 + 执行器”为输入，经过多执行器同步采集，产出 RGB-D 视频流、力/扭矩序列、触觉图像序列以及场景激光扫描点云。这些原始数据随后依次通过时间对齐（基于 QR 码）和空间对齐（基于 3D 扫描定位）模块，形成时空一致的多模态数据体。最后，标注模块在此基础上添加关节参数、语义掩码和分解后的力分量，最终构成可供**关节参数估计**、**触觉力预测**和**视觉力估计**等基准任务直接使用的完整数据集。
 
-## 核心模块与公式推导
+
 
 Hoi!数据集的核心技术贡献在于其多模态采集管线与时空对齐机制，而非提出新的学习算法。本节聚焦于构成该管线关键能力的三个模块：**多执行器同步采集**、**时间对齐**与**空间对齐**，以及**力分解与真值生成**。
 
@@ -189,7 +191,9 @@ $$\mathbf{T}_{\mathrm{world}}^{\mathrm{query}}$$
 ![[assets/figures/papers/paper_list_l821_https_openaccess_thecvf_com_content_CVPR2026_html_Engelbracht_Hoi_A_Mult/figures/006_Figure_4.jpg]]
 *Figure 4: Example of the measured interaction forces for several articulated elements. Each curve corresponds to a different component (highlighted in matching colors below), illustrating how force magnitudes vary across types of articulated parts*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -258,7 +262,9 @@ $$\mathbf{T}_{\mathrm{world}}^{\mathrm{query}}$$
 ![[assets/figures/papers/paper_list_l821_https_openaccess_thecvf_com_content_CVPR2026_html_Engelbracht_Hoi_A_Mult/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the Hoi! Dataset: A multimodal dataset for force-grounded, cross-view articulated manipulation in wild indoor environments. The dataset captures human interactions with common articulated objects (drawers, doors, fridges, dishwashers) with synchronized RGB, depth, force, tactile sensing, and multi-view videos from egocentric and exocentric perspectives. Each interaction is annotated with articulation parameters (e.g. axis, type), supporting research on multimodal perception, manipulation learning, and embodied reasoning*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 现有数据集的瓶颈与Hoi!的填补
 
@@ -300,6 +306,8 @@ Hoi!在知识库中的独特价值体现在三个层面：
 - 能否利用Hoi!的跨执行器对齐数据训练视觉-力觉联合表征，实现从人类操作视频到机器人策略的零样本迁移？
 - 如何将当前以物体为中心的感知任务（关节估计、力预测）扩展至端到端策略学习，实现感知与动作的联合优化？
 - 数据集未提供预训练模型，直接用于下游策略学习需要额外的特征工程和架构设计，这一工程化路径仍有待探索。
+
+
 
 ## 原文 PDF
 

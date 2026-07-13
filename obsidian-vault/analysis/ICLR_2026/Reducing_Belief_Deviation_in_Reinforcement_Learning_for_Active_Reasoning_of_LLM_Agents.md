@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Reducing_Belief_Deviation_in_Reinforcement_Learning_for_Active_Reasoning_of_LLM_Agents.pdf
+project_link: null
+code_link: https://github.com/unimpor/T3
 openreview_forum_id: r8hzDA3pUY
 aliases:
 - TTBTT
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 降低LLM智能体主动推理强化学习中的信念偏差 |
 | 英文题名 | Reducing Belief Deviation in Reinforcement Learning for Active Reasoning of LLM Agents |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=r8hzDA3pUY); [GitHub](https://github.com/unimpor/T3) |
+| Links | [paper](https://openreview.net/forum?id=r8hzDA3pUY) · [GitHub](https://github.com/unimpor/T3) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | T3 (Truncating Belief-Trapped Trajectories) |
 | Dataset | CircuitDecoding (CD), SituationPuzzles (SP), GuessNumbers (GN) |
@@ -42,7 +44,7 @@ claims:
 > - SituationPuzzles (SP) 上，F1-word 为 36.85 (PPO+T3)，对比 28.77 (PPO)，变化 +8.1。
 > - SituationPuzzles (SP) 上，F1-char 为 81.50 (PPO+T3)，对比 74.56 (PPO)，变化 +6.9。
 
-## 概述
+## 概要
 
 LLM智能体在主动推理任务中需要与环境进行多轮交互，通过提问或查询逐步缩小关于隐藏状态的信念空间。然而，由于LLM的信念更新机制并非完美的贝叶斯推理，智能体在多轮交互后会逐渐进入**信念陷阱区域（Belief-Trap Region, BTR）**——一个信念不再收缩、动作丧失信息增益的认知停滞区。此时，轨迹尾部产生的动作不再提供有效信息，却仍参与强化学习的信用分配，导致优势估计产生系统性负向漂移，策略梯度被污染，优化陷入不稳定。
 
@@ -50,7 +52,7 @@ LLM智能体在主动推理任务中需要与环境进行多轮交互，通过�
 
 T³作为一个轻量级包装器，可无缝集成到PPO、GRPO、GSPO等主流策略优化算法中。在CircuitDecoding、SituationPuzzles、GuessNumbers、PreferenceEstimation、MovieRecommendation五个主动推理任务上，T³带来最高**41点**的绝对性能提升（GSPO+T³在MovieRecommendation上），同时将令牌消耗降低**高达34%**。方法在分布外场景下仍持续有效，且在不同模型规模（3B/7B/14B）和架构（Qwen/Llama/DeepSeek-distilled）上均表现稳健。
 
-## 背景与动机
+
 
 ### 主动推理中的信念陷阱：核心瓶颈
 
@@ -86,7 +88,9 @@ $$\mathbb{E}[\widehat{A}_t^{\mathrm{pre}}] \geq \mathbb{E}[\widehat{A}_t] + \gam
 
 即早期截断能够消除尾部负向漂移，使优势估计更准确地反映前缀动作的真实贡献。基于此，论文提出T³方法，通过可观测的代理信号（如假设空间不再收缩、冗余查询等）检测BTR入口并触发截断，从而在不修改底层RL优化器的前提下，为PPO/GRPO/GSPO提供更可靠的信用分配信号。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题定位：信念陷阱与信用分配逆转
 
@@ -127,7 +131,7 @@ T³作为包装器（wrapper）集成于现有RL优化器之上，其管线由�
 - **消融确认**：Table 3验证了窗口大小 $k$ 的截断策略优于随机截断和基于语义相似性的截断，排除了“截断本身即有益”的替代解释。
 - **分布外泛化**：Table 2显示T³在OOD场景下仍持续提升性能，表明方法的鲁棒性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_r8hzDA3pUY/figures/001_Figure_1.jpg]]
 *Figure 1: Overall framework of $\mathbf { T } ^ { 3 }$ , where $\left( b _ { t } , a _ { t } , o _ { t } \right$) denote the agent’s internal belief, its chosen action, and the resulting feedback at turn t , respectively. By truncating belief-trapped trajectories, we prevent the agent from entering the belief-trap region (BTR) where credit assignment is contaminated in RL training, allowing learning signals to concentrate on genuinely informative actions. As a result, policy optimization becomes more stable and effective under complex active reasoning
@@ -156,7 +160,7 @@ T³（Truncating Belief-Trapped Trajectories）作为一个轻量级包装器，
 
 Figure 1 直观对比了标准 RL 方法与 T³ 的差异：左侧的标准方法中，智能体在进入 BTR 后继续执行无信息动作（如重复猜测同一思路），导致尾部优势漂移和错误累积；右侧的 T³ 在检测到 $b_{t_S}$ 进入 BTR 时即行截断，赋予截断奖励 $R_{\text{cut}}$，使策略优化保持稳定有效。
 
-## 核心模块与公式推导
+
 
 ### 关键模块
 
@@ -227,7 +231,9 @@ $$
 
 其中 $\kappa_V$ 为值函数 Lipschitz 常数，$\rho_b$ 为 BTR 吸收概率，$S_{\mathrm{tail}}^{\ominus}(t)$ 为尾部负向贡献。该式表明早期截断可降低优势估计的负向偏差，从而改善梯度信号质量。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈：信念陷阱如何污染信用分配
 
@@ -305,7 +311,9 @@ Figure 6展示T³在3B/7B/14B三种规模及Qwen/Llama/DeepSeek-distilled三种�
 ![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_r8hzDA3pUY/figures/030_Figure_8.jpg]]
 *Figure 8: Empirical verification of Theorem 2 and Corollary 1. (a-b) Without truncation, early-token advantages exhibit a clear negative drift, while $\mathbf { T } ^ { 3 }$ consistently elevates them across PE and CD tasks. (c) Longer uninformative tails (higher maximum interaction turns, from 6 to 15) cause stronger suppression of early advantages. (d) Stronger $\mathbf { T } ^ { 3 }$ truncation (smaller k) yields cleaner, less-biased early advantages
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：LLM智能体的信念陷阱与信用分配失效
 
@@ -385,6 +393,8 @@ T³的截断检测器依赖于任务特定的代理信号（proxy signals）：
 4. **截断策略的自适应优化**：能否将截断决策本身纳入元学习或在线自适应框架，使窗口大小 $k$ 和阈值 $\Delta_{\min}$ 随训练进程和任务特性自动调整？
 
 5. **与推理时方法的协同**：T³关注训练阶段的信用分配修正，如何与推理时的搜索策略（如树搜索、自我验证）协同，形成"训练截断+推理扩展"的互补机制？
+
+
 
 ## 原文 PDF
 

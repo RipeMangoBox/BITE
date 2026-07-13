@@ -44,7 +44,7 @@ claims:
 > - CO3Dv2 + ETH3D (平均) 上，AUC30↑ 89.9 vs 89.5 (+0.4)。
 > - Sintel 上，ATE↓ 0.099 vs 0.108 (-0.009)。
 
-## 概述
+## 概要
 
 当前视频数据集在几何标注的全面性、动态场景覆盖以及数据规模三个维度上存在结构性短板：大多数数据集仅提供单一几何模态（如相机姿态或深度图），且主要面向静态场景，难以同时支撑大规模3D感知与可控视频生成对时空语义及几何信息的联合需求。**SceneScribe-1M** 以超过100万个动态场景、超过4,000小时的视频规模，首次在一个数据集中同时提供**深度图、相机姿态、一致3D点轨迹和结构化语义描述**，填补了这一空白。
 
@@ -56,7 +56,7 @@ claims:
 
 需要指出的是，该数据集的标注质量受限于所采用现成模型（Qwen2.5-VL-72B、MegaSaM、TAPIP3D）的固有精度，这些模型自身的系统误差可能传播至数据集标注中；整个标注流水线消耗约15万GPU小时，构建成本较高；数据来源主要为公开网络视频，对极端环境或长尾场景的覆盖可能不足，且未进行地理或文化偏见的公平性评估。
 
-## 背景与动机
+
 
 ### 问题的核心瓶颈
 
@@ -82,7 +82,9 @@ SceneScribe-1M的设计目标不仅是填补数据集空白，更是要同时推
 
 需要注意的是，该数据集来源于公开网络视频，标注模型本身的系统性偏差可能传播至数据集，且对极端环境和长尾场景的覆盖仍有局限——这些限制需要在后续使用中加以注意和缓解。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SceneScribe-1M 的核心创新并非提出新的模型架构，而是通过**大规模多模型协同标注流水线**，系统性弥补了现有视频数据集在几何与语义标注上的结构性缺陷。其关键突破体现在三个“changed slots”上：
 
@@ -106,7 +108,7 @@ SceneScribe-1M 的核心创新并非提出新的模型架构，而是通过**大
 
 从因果机制看，SceneScribe-1M 的贡献可概括为：**以大规模算力（超过1000块 NVIDIA H20 GPU）为杠杆，撬动多个专有模型的知识蒸馏到统一数据载体中**，从而弥补了单模态数据集的根本缺陷。其真正的“causal knob”不在于模型设计，而在于流水线的并行化部署策略和几何-语义联合标注的组织方式。这一思路为后续构建更大规模、更多模态的世界模型数据集提供了可复用的范式。
 
-## 整体框架
+
 
 SceneScribe-1M 的数据构建流水线遵循“收集—预处理—联合标注—多视图子集采样”四阶段范式，其核心设计目标是在大规模开放世界视频上实现几何与语义信息的全面、一致标注。图2展示了该流水线的整体架构。
 
@@ -131,7 +133,7 @@ SceneScribe-1M 的数据构建流水线遵循“收集—预处理—联合标�
 ![[assets/figures/papers/paper_list_l824_https_arxiv_org_abs_2604_07990/figures/001_Figure_1.jpg]]
 *Figure 1: SceneScribe-1M offers more than one million dynamic scenes spanning over 4,000 hours, featuring comprehensive semantic and geometric annotations (i.e., detailed description, motion masks, camera poses, continuous video depths, and dynamic tracks). It supports diverse downstream tasks (i.e., modular depth estimation, scene reconstruction, dynamic point tracking, and pose/text-to-video generation)*
 
-## 核心模块与公式推导
+
 
 ### 数据构建流水线概览
 
@@ -190,7 +192,9 @@ $$M_{motion} = (e_{2d} < \tau_1) \wedge (e_{3d} < \tau_2) \wedge (e_{rgb} < \tau
 ![[assets/figures/papers/paper_list_l824_https_arxiv_org_abs_2604_07990/figures/010_Figure_7.jpg]]
 *Figure 7: Statistics of Camera Motion Metrics. The similar distributions of camera motion metrics in SceneScribe-1M and SceneScribe-MVS indicate that we disentangle camera and object motion, enabling control over object dynamics while preserving camera diversity*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 评估设计
 
@@ -253,7 +257,9 @@ SceneScribe-MVS 子集的核心设计目标是在过滤动态物体的同时保�
 ![[assets/figures/papers/paper_list_l824_https_arxiv_org_abs_2604_07990/figures/009_Figure.jpg]]
 *Figure: (a) s1 score (b) s2 score*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 数据构建范式定位
 
@@ -323,6 +329,8 @@ SceneScribe-MVS 子集的构建引入了一个具有方法论价值的操作—�
 | **SceneScribe-1M** | **4191** | **✓** | **✓** | **✓** | **✓** | **✓** |
 
 SceneScribe-1M 在几何标注的全面性（同时覆盖深度、姿态、轨迹）和规模上均处于领先位置，但其标注精度未经人工验证，在这一维度上弱于人工标注数据集。实际使用中，建议将其作为预训练或辅助训练数据，而非精调的唯一监督来源。
+
+
 
 ## 原文 PDF
 

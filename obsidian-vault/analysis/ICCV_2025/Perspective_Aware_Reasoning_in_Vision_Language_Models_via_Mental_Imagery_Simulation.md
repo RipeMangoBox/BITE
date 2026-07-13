@@ -5,6 +5,8 @@ paper_level: A
 venue: ICCV
 year: 2025
 pdf_ref: paperPDFs/ICCV_2025/Perspective_Aware_Reasoning_in_Vision_Language_Models_via_Mental_Imagery_Simulation.pdf
+project_link: https://apc-vlm.github.io/
+code_link: null
 aliases:
 - APCA
 - PARVLMMIS
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 基于心理意象模拟的视觉语言模型视角感知推理 |
 | 英文题名 | Perspective-Aware Reasoning in Vision-Language Models via Mental Imagery Simulation |
 | 会议/期刊 | ICCV 2025 |
-| Links | [paper](https://arxiv.org/abs/2504.17207); [Project](https://apc-vlm.github.io/) |
+| Links | [paper](https://arxiv.org/abs/2504.17207) · [Project](https://apc-vlm.github.io/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | Abstract Perspective Change (APC) |
 | Dataset | COMFORT++ left/right, COMFORT++ closer, COMFORT++ visibility, COMFORT++ facing |
@@ -41,7 +43,7 @@ claims:
 > - COMFORT++ closer 上，Accuracy (%) 为 96.00 (APC-Num)，对比 79.00 (LLaVA-OneVision/Cambrian-1)，变化 +17.00。
 > - COMFORT++ visibility 上，Accuracy (%) 为 90.00 (APC-Vis)，对比 50.00 (Random)，变化 +40.00。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -70,7 +72,7 @@ APC在多个空间推理基准上取得了显著提升：
 
 APC属于**视觉基础模型增强的VLM推理框架**，区别于纯VLM（如LLaVA-OneVision、GPT-4o、Qwen2.5-VL）、空间调优VLM（如SpatialVLM、SpatialRGPT）和密集重建方法（如ViewCrafter）。其关键创新在于以轻量级场景抽象替代密集重建，以坐标变换替代新视图合成，在精度和效率之间取得了有利的折衷。
 
-## 背景与动机
+
 
 ### 视觉语言模型的空间推理偏差
 
@@ -93,7 +95,9 @@ APC属于**视觉基础模型增强的VLM推理框架**，区别于纯VLM（如L
 
 这一思路的关键洞见在于：**VLM 并非缺乏空间推理能力，而是缺乏将问题转换到其擅长视角的手段**。APC 通过“场景抽象—视角变换—提示生成”三阶段流水线（Figure 4），在不修改 VLM 本身的前提下，显著提升了视角感知推理能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 APC框架的核心创新在于**绕过VLM的自我中心偏差**，而非试图消除它。现有VLM在空间推理中表现出强烈的自我中心偏差（egocentric bias）——当问题从相机视角提出时表现良好，但一旦要求从场景中其他物体的视角（allocentric perspective）进行推理，准确率便急剧下降（Figure 2）。APC的策略是**将分配中心问题转化为自我中心问题**：通过构建场景的3D抽象表示，执行坐标变换，使VLM始终在其擅长的自我中心坐标系下进行推理。
 
@@ -123,7 +127,7 @@ APC提供两种将变换后场景抽象传递给VLM的方式：
 | 场景表示 | 原始RGB图像或密集重建 | 3D坐标（数值提示）或彩色立方体渲染（视觉提示） |
 | 问题表达 | 包含视角描述的原问题 | 去除视角描述的视角无关重述 |
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2504_17207/figures/004_Figure_4.jpg]]
 *Figure 4: Pipeline Overview of APC. Our proposed framework consists of three stages. 1) Scene Abstraction (Sec. 3.1): APC first detects the objects of interest and build a coarse 3D abstraction of the scene using off-the-shelf vision foundation models. 2) Perspective Change (Sec. 3.2): Then, a reference perspective is set and the abstraction is transformed into the reference viewer’s egocentric coordinate frame. 3) Perspective Prompting (Sec. 3.3): Finally, APC passes the transformed scene to the VLM by producing (1) a numerical (textual) prompt or (2) an abstract visual prompt, and poses the question of interest from the reference perspective*
@@ -170,7 +174,7 @@ $$S_E := \{O_i\}_{i=1}^n, \quad O_i = (t_i, c_i, p_i)$$
 - **粗粒度抽象 vs. 密集重建**：APC 仅提取物体的3D中心和朝向，而非进行密集的3D重建或新视图合成。实验表明，这一选择使推理时间缩短超过14倍（17.47s vs. >260s），同时避免了密集重建中的噪声和失真问题（见 Table 2, Figure 9）。
 - **双提示模式**：数值提示和视觉提示在不同任务上各有优势——数值提示在距离判断（closer）任务上达到96%准确率，而视觉提示在可见性（visibility）和朝向（facing）任务上分别高出18.75%和26.33%，表明 VLM 对数值坐标的逻辑推理能力存在局限，而抽象视觉表示能有效弥补这一不足。
 
-## 核心模块与公式推导
+
 
 APC 框架由三个核心模块串行构成：**场景抽象**、**视角变换**和**视角提示生成**，其设计目标是将分配中心（allocentric）的空间推理问题转化为 VLM 擅长的自我中心（egocentric）问题，从而绕过 VLM 固有的视角偏差。
 
@@ -215,7 +219,9 @@ $$O_i' = (t_i, c_i', p_i')$$
 
 APC 的公式体系极为精简，核心仅包含场景抽象集合 $S_E$ 的定义和物体元组 $(t_i, c_i, p_i)$ 及变换后元组 $(t_i, c_i', p_i')$ 的表示。框架的推理能力不依赖于复杂的数学推导，而是通过模块化的视觉基础模型调用和坐标系变换，将视角推理问题转化为 VLM 原生擅长的自我中心推理任务。这一设计使得 APC 在保持高精度的同时，推理时间仅为密集重建基线的 1/14 以下。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -259,7 +265,9 @@ APC 在两个空间推理基准 COMFORT++ 和 3DSRBench 上均展现出对纯 VL
 *Figure 6: Benchmark Visualization. Example image-question pairs from 3DSRBench [54] and COMFORT++ [90] benchmarks. The tasks probe spatial reasoning across left-right relations, object visibility, closenss, and the facing direction of objects*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：自我中心偏差与分配中心推理的鸿沟
 
@@ -324,6 +332,8 @@ Figure 8 展示了不同视角偏移角度 $\theta$ 下的准确率变化。基�
 4. **多物体与动态场景**：当前方法能否扩展到包含更多物体或动态场景？场景抽象的复杂度如何随物体数量增长？
 
 5. **跨模型泛化性**：APC 框架当前基于 Cambrian-1 实现，其核心机制（场景抽象 + 视角变换 + 提示生成）是否与其他 VLM 骨干模型（如 GPT-4o、Gemini）兼容？不同模型对数值提示和视觉提示的响应是否存在差异？
+
+
 
 ## 原文 PDF
 

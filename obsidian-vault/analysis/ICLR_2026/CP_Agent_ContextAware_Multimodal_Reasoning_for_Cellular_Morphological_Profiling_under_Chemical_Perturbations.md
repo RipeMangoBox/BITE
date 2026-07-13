@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/CP_Agent_ContextAware_Multimodal_Reasoning_for_Cellular_Morphological_Profiling_under_Chemical_Perturbations.pdf
+project_link: null
+code_link: https://github.com/letitia-zhang/CP-Agent
 openreview_forum_id: 7BLnSeWuei
 aliases:
 - CP-Agent
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | CP-Agent：化学扰动下细胞形态学分析的上下文感知多模态推理 |
 | 英文题名 | CP-Agent: Context‑Aware Multimodal Reasoning for Cellular Morphological Profiling under Chemical Perturbations |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=7BLnSeWuei); [GitHub](https://github.com/letitia-zhang/CP-Agent) |
+| Links | [paper](https://openreview.net/forum?id=7BLnSeWuei) · [GitHub](https://github.com/letitia-zhang/CP-Agent) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/planning_control |
 | Method | CP-Agent |
 | Dataset | 化合物分类（10类已知药物）, 未见药物匹配（零样本）, 上下文到图像检索 |
@@ -41,7 +43,7 @@ claims:
 > - 未见药物匹配（零样本） 上，平均余弦相似度 为 0.432 (CP-CLIP ViT-B/16 descriptor)，对比 0.286 (CLIP ViT-B/16)，变化 +0.146。
 > - 上下文到图像检索 上，R@1 为 77.09 (CP-CLIP ViT-B/16 descriptor)，对比 66.80 (CLIP ViT-B/16)，变化 +10.29。
 
-## 概述
+## 概要
 
 细胞形态学分析（Cell Painting）是药物发现中评估化合物生物活性的关键工具，但现有方法普遍忽略实验上下文（细胞系、剂量、时间等），导致形态学响应建模不准确、泛化能力差，且缺乏语义可解释性，限制了假设生成与决策支持。
 
@@ -51,7 +53,7 @@ claims:
 
 **主要结果速览**：在化合物分类（10 类已知药物）上，CP-CLIP 的 Macro-avg F1 达到 0.896，较最佳通用 MLLM（Grok-4，0.102）提升 0.794；在零样本未见药物匹配上，平均余弦相似度 0.432，较 CLIP 基线（0.286）提升 0.146；在上下文到图像检索上，R@1 达到 77.09，较 CLIP（66.80）提升 10.29 个点。消融实验进一步表明，连续描述符编码优于二进制指纹编码，浓度信息具有中等重要性，而时间信息贡献较小。CP-Agent 生成的报告能够识别清晰（Taxol）、细微（Sorbinil）和复杂（BGT226）的形态学响应，并将其与合理的生物学机制关联。
 
-## 背景与动机
+
 
 ### 细胞形态学分析在药物发现中的核心地位
 
@@ -79,7 +81,9 @@ claims:
 
 CP-Agent的动机正是填补这一空白。其核心思路是双重的：首先，通过CP-CLIP将实验上下文（化合物分子描述符、浓度、时间）编码为连续嵌入，并与细胞图像在统一对比学习框架中对齐，使模型学会上下文感知的表征；其次，基于该表征构建模块化多智能体系统，依次执行上下文检索、细胞分割、特征提取、统计推断和报告生成，最终输出包含机制推断与后续实验建议的结构化假设报告。这一设计旨在将细胞形态学分析从“盲目的模式匹配”提升为“上下文引导的机制推理”。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈与因果机制
 
@@ -125,7 +129,7 @@ $$X = [\text{CLS}, t_1, t_2, \dotsc, \underbrace{e_{\text{cmpt}}}_{<\text{CMPD}>
 
 上述创新点在化合物分类、零样本匹配和消融实验中均有高置信度证据支撑（confidence ≥ 0.95）。但需注意：当前验证仅限于三组公开 Cell Painting 数据集（BBBC021、CPJUMP1、RxRx3），更大规模的跨机构验证尚需进行；CP-Agent 的报告质量高度依赖底层 LLM 的推理能力，复杂机制下仍可能出现幻觉。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_7BLnSeWuei/figures/002_Figure_1.jpg]]
 *Figure 1: Illustration of the CP-agent (top) and CP-CLIP (bottom). CP-Agent connects perception, memory retrieval, and modular analysis into a unified pipeline for generating reports for Cell Painting experiments. CP-CLIP forms the backbone of the CP-Agent’s perception module, providing joint embeddings of Cell Painting images and structured experimental context*
@@ -164,7 +168,7 @@ CP-CLIP 在 184.6 万对图像-上下文对上预训练，采用对称 InfoNCE �
 
 MLLM 作为策略层，动态将任务路由至可互换的工具智能体，并整合其输出。CP-CLIP 的嵌入表示作为感知层的统一接口，同时为记忆检索提供语义锚点——CPContext Agent 通过检索最相似的实验上下文来初始化整个分析流水线。这种“感知-检索-分析-报告”的模块化设计使得各组件可独立升级（如替换分割算法或特征提取器），而无需改变整体架构。
 
-## 核心模块与公式推导
+
 
 ### CP-CLIP：上下文感知的多模态对齐核心
 
@@ -228,7 +232,9 @@ CP-Agent 采用模块化、记忆增强的架构，将感知、检索、分析�
 
 消融实验揭示了各上下文组件的相对重要性。掩码化合物名称和 MoA 导致文本到图像 R@1 从 98.70 暴跌至 3.50（相对下降 96.45%），证明模型高度依赖化合物特异性信息而非元数据相关性。掩码浓度导致 R@1 下降约 42%，掩码时间仅下降约 6%，表明浓度信息具有中等重要性，时间信息贡献较小（Table 17）。在反事实提示下，CP-CLIP 的浓度分类 F1 较 CLIP 提升 50.55%，时间分类 F1 提升 35.23%，进一步证实模型学到了鲁棒的多模态关联（Table 20, Table 21）。连续描述符编码在化合物分类（F1: 0.896 vs 0.887）和未见药物匹配（相似度: 0.432 vs 0.360）上均优于二进制指纹编码（Table 2, Table 3）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：CP-CLIP 在化合物识别上远超通用 MLLM
 
@@ -287,7 +293,9 @@ Table 23 的检索实验显示，CP-CLIP ViT-B/16 (descriptor) 的上下文到�
 3. **特征提取的覆盖盲区**：当前 CellFeat Agent 基于传统 CellProfiler 管道，可能遗漏深度视觉特征（如纹理的层次化模式），这限制了可解释特征的完备性。
 4. **时间维度利用不足**：消融实验显示时间信息贡献仅约 6%，说明当前编码策略未能充分捕捉时间序列中的形态学动态变化，这可能是未来改进方向。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心创新与因果机制
 
@@ -352,6 +360,8 @@ CP-CLIP 与 CLOOME 等分子-图像对比学习方法同属一个谱系，但关
 4. **自动化验证闭环**：对于 CP-Agent 生成的机制假设，如何设计自动化的后续实验验证闭环（如推荐验证性染色或剂量-响应实验）？
 
 5. **小样本统计推断**：在统计效力不足时（如罕见扰动仅有少量重复），如何避免 FeatRank 和 StatSynth 产生错误的机制归因？
+
+
 
 ## 原文 PDF
 

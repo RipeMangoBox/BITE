@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Instilling_an_Active_Mind_in_Avatars_via_Cognitive_Simulation.pdf
+project_link: https://omnihuman-lab.github.io/v1_5/
+code_link: null
 openreview_forum_id: 80JylHgQn1
 aliases:
 - DSCSFP
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 基于认知模拟的虚拟化身主动思维赋予方法 |
 | 英文题名 | Instilling an Active Mind in Avatars via Cognitive Simulation |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=80JylHgQn1); [Project](https://omnihuman-lab.github.io/v1_5/) |
+| Links | [paper](https://openreview.net/forum?id=80JylHgQn1) · [Project](https://omnihuman-lab.github.io/v1_5/) |
 | Topic | #topic/benchmarks_datasets_evaluation #topic/benchmarks_datasets_evaluation/benchmark_eval |
 | Method | Dual-System Cognitive Simulation Framework (Proposed) |
 | Dataset | CyberHost test set (full‑body animation), Multi‑person interaction benchmark, Subjective evaluation vs. commercial baselines |
@@ -42,7 +44,7 @@ claims:
 > - Multi‑person interaction benchmark 上，GSB (Good/Same/Bad user preference score) 为 +0.26，对比 -0.26 (Ours w/o Reasoning)，变化 +0.52。
 > - Subjective evaluation vs. commercial baselines 上，Top‑1 user preference 为 33%，对比 22% (OmniHuman‑1)，变化 +11%。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有视频化身模型本质上仅捕捉音频‑运动间的低层相关性，缺乏对情感、意图等高层次语义的理解与规划能力，导致生成的行为在语境合理性、逻辑连贯性和表达丰富性上存在显著不足。
 
@@ -58,7 +60,7 @@ claims:
 
 **局限性**：合成层面存在快速运动下的手部伪影和大角度转头时的身份退化；推理层面MLLM代理偶尔产生过度夸张的动作，且推理过程引入约20‑30秒额外延迟。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -85,7 +87,9 @@ claims:
 
 这一双系统设计的关键优势在于：通过显式解耦“规划”与“合成”，使得模型既能保持语境感知的语义一致性（系统2的贡献），又能继承扩散模型在视觉质量和唇音同步方面的优势（系统1的贡献）。同时，针对参考图像条件困境和多模态融合冲突，本文提出了**伪最后一帧策略**（Pseudo Last Frame）和**对称音频分支设计**作为配套解决方案，从架构层面解除静态约束并实现模态间的平等交互。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心贡献在于首次将认知科学中的**双过程理论**（系统1/系统2）引入化身生成任务，将传统“音频→运动”的单一反应式映射重构为**“审慎规划→反应式合成”的双系统协同框架**。这一范式转变从根本上改变了模型对语义语境的理解和响应方式，其关键创新体现在以下四个紧密耦合的“changed slots”上。
 
@@ -129,7 +133,7 @@ claims:
 
 上述四个创新并非孤立存在，而是形成了紧密的因果链条：**MLLM推理模块**提供语义规划的上层建筑，**对称MMDiT融合**确保高层语义与低层信号的有效整合，**伪最后一帧策略**解除静态约束以释放运动自由度，**MM‑Warmup**则保障了多模态训练的稳定性。这一协同效应在主观评估中得到了充分验证：与当前领先方法OmniHuman‑1相比，本文方法在唇音不一致（LSI 0.21→0.03）、运动不自然感（MU 0.39→0.25）和整体偏好（GSB ‑0.23→+0.23）上均实现了大幅超越（Table 2b）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_80JylHgQn1/figures/002_Figure_2.jpg]]
 *Figure 2: The Dual-System Simulation Framework. Our framework models avatar behavior by integrating a deliberative System 2 for planning with a reactive System 1 for synthesis. Left: Overall Pipeline. An MLLM-based System 2 reasons over multimodal inputs (audio, image, text) to generate a high-level “schedule”. This schedule guides the System 1 MMDiT, which synthesizes the final video by fusing information through dedicated text, audio and video branches. Right: Key Components. (a) The System 2 reasoning pipeline, comprising an MLLM Analyser and Planner. (b, c) Our proposed MM-Branch Warm-up and Pseudo Last Frame strategies, designed to mitigate modal conflicts*
@@ -157,7 +161,7 @@ claims:
 
 > **需要手动验证的点**：关于MMDiT骨干的具体预训练细节（如基础模型版本、预训练数据规模）在已有分析材料中未明确给出，建议查阅原文Section 3.1获取精确信息。
 
-## 核心模块与公式推导
+
 
 本文提出的双系统认知模拟框架在方法层面引入了四个关键模块，分别对应高层语义规划与低层视听合成中的瓶颈突破。以下逐一阐述各模块的设计逻辑与技术细节。
 
@@ -199,7 +203,9 @@ claims:
 
 本文未引入新的数学公式。模型核心基于扩散变换器（DiT）的标准去噪范式，其训练目标为常规的噪声预测损失。各模块的创新集中在架构设计、条件策略与训练流程层面，不涉及公式层面的推导或修改。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 消融实验：推理模块与条件化设计的因果验证
 
@@ -264,7 +270,9 @@ Figure 13 系统展示了方法的局限性，分为合成层面和推理层面�
 ![[assets/figures/papers/paper_list_l10_https_openreview_net_forum_id_80JylHgQn1/figures/017_Table_6.jpg]]
 *Table 6: Subjective Evaluation vs. Wan2.2-S2V. Subjective evaluation against Wan2.2-S2V, including a GSB preference score (Which is better?) and a pairwise comparison of artifacts (Which is less bad?)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：从反应式映射到认知驱动
 
@@ -325,6 +333,8 @@ Figure 13 系统展示了方法的局限性，分为合成层面和推理层面�
 3. **反射重规划集成**：当前推理过程为一次性前向规划，能否以低开销方式集成反射重规划（reflection）机制，进一步提升长视频的逻辑连贯性？
 4. **合成伪影消除**：如何通过更大规模、更高质量的数据训练进一步消除快速运动和大角度旋转场景下的合成伪影？
 5. **泛化边界探索**：当前方法在非人物角色和复杂交互场景下的泛化边界尚未被充分探索，是否存在更多未知的失效模式？
+
+
 
 ## 原文 PDF
 

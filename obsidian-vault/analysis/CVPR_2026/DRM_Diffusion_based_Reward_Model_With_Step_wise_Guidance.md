@@ -42,7 +42,7 @@ claims:
 > - SD3.5-Medium 测试集（生成质量） 上，PickScore ↑ 17.04 (DRM + Step-GRPO) vs 16.95 (DRM + Standard GRPO) (+0.09)；HPSv3 ↑ 10.28 (DRM + Step-GRPO) vs 10.07 (DRM + Standard GRPO) (+0.21)。
 > - SD3.5-Medium 测试集（Step-wise 采样效果） 上，ImageReward ↑ 1.15 (k=6) vs 1.01 (k=1, 无分支) (+0.14)；HPSv3 ↑ 9.49 (k=6) vs 8.95 (k=1, 无分支) (+0.54)。
 
-## 概述
+## 概要
 
 现有文本到图像扩散模型的对齐方法普遍依赖基于视觉-语言模型（VLM）或CLIP的奖励模型，这些模型以语义对齐为主要训练目标，难以有效捕捉美学、构图与视觉和谐等人类偏好的核心感知维度。更关键的是，标准GRPO等强化学习对齐算法将终端奖励均匀分配到所有去噪步骤，导致信用分配不精确，无法区分各步骤对最终生成质量的差异化贡献。
 
@@ -52,7 +52,7 @@ claims:
 
 实验结果表明，在SD3.5-Medium上，DRM配合Step-GRPO取得了最优生成质量：PickScore达到17.04，HPSv3达到10.28，优于基于VLM/CLIP的奖励模型（如**HPSv3**、**ImageReward**、**PickScore**）及标准GRPO基线。消融研究证实，预训练扩散权重初始化对DRM至关重要，且DRM即使在高噪声水平下仍能保持稳健的偏好预测能力。Step-wise Sampling在推理时进一步带来显著的性能增益（HPSv3提升+0.54，k=6），而Step-GRPO相比标准GRPO收敛速度提升约2.5倍（按训练步数计）。
 
-## 背景与动机
+
 
 文本到图像生成模型近年来取得了显著进展，但如何使生成的图像与复杂的人类偏好对齐仍然是一个核心挑战。人类对图像的偏好不仅涉及语义准确性，更包含美学、构图、视觉和谐等感知质量维度，这些维度难以通过简单的规则或提示词工程来精确描述。
 
@@ -62,7 +62,9 @@ claims:
 
 DRM的提出源于一个核心洞察：**高保真图像生成能力必然要求模型深刻理解视觉美学、构图等属性，因此可以将预训练扩散模型转化为强大的视觉质量评估器**。这一“生成即理解”的范式打破了传统奖励模型仅评估最终图像的局限——扩散模型在生成过程中天然地处理不同噪声水平下的中间潜变量，这意味着将其作为评估骨干时，DRM能够对任意去噪时间步的中间状态给出即时奖励，为奖励建模提供更丰富、更细粒度的感知信号。基于这一能力，作者进一步设计了Step-GRPO和Step-wise Sampling，将密集的步骤级奖励引入策略优化和推理采样，从根本上解决了信用分配不精确的问题。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DRM 工作的核心创新在于彻底重构了生成式奖励模型的两个关键维度：**评估主干的语义范式**和**奖励信号的时空粒度**。传统方法将扩散模型的去噪过程视为黑盒，仅以最终图像作为评估对象，且依赖语义对齐的视觉编码器（如 CLIP、VLM）作为奖励模型的基础。DRM 则提出“生成即理解”的范式，将预训练扩散模型本身转化为感知质量评估器，并据此构建了从训练到推理的全链路细粒度优化机制。
 
@@ -96,7 +98,7 @@ $$\mathbf{x}_{t-1} = \operatorname{argmax}_{\mathbf{x}_{t-1}^i} (R(\mathbf{x}_{t
 
 DRM 的三个核心创新构成了一条完整的逻辑链：**扩散模型作为评估器**赋予了步进评估的能力，**Step-GRPO** 将这一能力用于训练阶段的细粒度信用分配，**Step-wise Sampling** 则将同一能力用于推理阶段的动态路径优化。三者共同实现了从“黑盒终端奖励”到“白盒步进引导”的范式转变。
 
-## 整体框架
+
 
 DRM 方法体系由三个核心模块构成，围绕“生成即理解”这一范式展开，形成训练–对齐–推理的完整闭环。
 
@@ -136,7 +138,7 @@ $$\mathbf{x}_{t-1} = \operatorname{argmax}_{\mathbf{x}_{t-1}^i} \big(R(\mathbf{x
 ![[assets/figures/papers/paper_list_l2673_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_DRM_Diffusion_ba/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison between preview reward models and DRM. Existing reward models treat the generation process as a black box, providing only a single, terminal reward based on the final output. Our DRM offers fine-grained reward for any noisy latent along the entire denoising trajectory*
 
-## 核心模块与公式推导
+
 
 ### 扩散奖励模型（DRM）架构
 
@@ -186,7 +188,9 @@ $$\mathbf{x}_{t-1} = \operatorname{argmax}_{\mathbf{x}_{t-1}^i} (R(\mathbf{x}_{t
 ![[assets/figures/papers/paper_list_l2673_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_DRM_Diffusion_ba/figures/004_Figure_4.jpg]]
 *Figure 4: GRPO vs. Step-wise GRPO. (Left) Naive GRPO relies on a terminal reward. It samples multiple full trajectories, calculates a single reward at the final step (t=0), and applies this coarse reward uniformly to all preceding steps, leading to imprecise credit assignment. (Right) Step-wise GRPO introduces a dense, per-step reward signal. From a single initial point, it explores k candidate samples via SDE at each timestep, using the DRM to assign a precise, step-specific reward and advantage for more effective policy optimization*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与评估动机
 
@@ -261,7 +265,9 @@ DRM存在以下已知局限，在解读实验结果时需注意：
 ![[assets/figures/papers/paper_list_l2673_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_DRM_Diffusion_ba/figures/016_Figure_8.jpg]]
 *Figure 8: Step-wise Sampling enhances both the fidelity to the prompt and the aesthetic quality of the generated images*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有奖励模型的范式差异
 
@@ -298,6 +304,8 @@ DRM 的步进评估能力不仅优化了训练过程，还催生了新的推理�
 *   **任务边界拓展**：DRM 的逐步评估能力能否直接用于噪声级别条件生成、可控图像编辑等更复杂的任务？
 *   **与离线对齐方法的结合**：能否将 DRM 的密集评估信号与直接偏好优化（DPO）等离线方法结合，进一步降低对齐训练的成本？
 *   **跨模态迁移**：在视频、3D 等多模态生成任务中，扩散模型作为评估器的有效性如何？
+
+
 
 ## 原文 PDF
 

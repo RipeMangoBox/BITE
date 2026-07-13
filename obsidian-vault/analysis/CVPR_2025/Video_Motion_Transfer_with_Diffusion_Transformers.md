@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/Video_Motion_Transfer_with_Diffusion_Transformers.pdf
+project_link: null
+code_link: null
 aliases:
 - VMTDT
 tags:
@@ -39,7 +41,7 @@ claims:
 > - DAVIS (50 videos) 上，MF（所有提示的平均运动保真度） 为 0.785 (DiTFlow-5B)，对比 0.766 (SMM-5B)，变化 +0.019。
 > - DAVIS (50 videos) 上，MF（所有提示的平均运动保真度） 为 0.726 (DiTFlow-2B)，对比 0.688 (SMM-2B)，变化 +0.038。
 
-## 概述
+## 概要
 
 视频运动迁移旨在将参考视频的运动模式迁移到新生成的视频内容中，同时保持对文本提示的语义忠实度。现有方法（如 **SMM** (Yatim et al., CVPR 2024)、**MOFT** (Xiao et al., CVPR 2025)、**MotionClone** (Zhang et al., CVPR 2025)）主要基于U-Net架构，依赖空间平均或局部偏差来提取运动线索，难以有效利用扩散变换器（DiT）的全局时空注意力，导致运动模式提取与内容解耦困难。
 
@@ -55,7 +57,7 @@ claims:
 
 **局限性**：生成质量受限于预训练模型能力，难以处理分布外复杂动作；运动迁移存在语义歧义性，可能将错误元素的运动映射到目标；AMF的成对计算导致内存消耗略高，但可通过分段长视频生成缓解。
 
-## 背景与动机
+
 
 ### 视频运动迁移的核心挑战
 
@@ -86,7 +88,9 @@ claims:
 
 通过解决这两个问题，本文提出的DiTFlow方法旨在让DiT用户在享受更高生成质量的同时，获得不低于甚至超越U-Net方法的运动迁移能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DiTFlow 的核心创新在于将运动迁移从 U‑Net 架构迁移至视频扩散变换器（DiT），并围绕 DiT 的全局时空注意力机制重新设计了运动提取与引导范式。这一转变解决了两个关键瓶颈：**运动模式提取**与**内容‑运动解耦**。
 
@@ -122,7 +126,7 @@ DiTFlow 在优化目标上引入了两个可调节旋钮：
 - **中置信度**：零样本迁移的泛化边界尚未在极端分布外场景下充分验证；位置嵌入优化的解耦程度依赖于预训练模型的质量。
 - **需注意**：AMF 的成对计算导致内存消耗略高于先前方法，这是精度提升的代价。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l28_Video_Motion_Transfer_with_Diffusion_Transformers/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of DiTFlow. We propose a motion transfer method tailored for video Diffusion Transformers (DiT). We exploit a training-free strategy to transfer the motion of a reference video (top) to newly synthesized video content with arbitrary prompts (bottom). By optimizing DiT-specific positional embeddings, we can also synthesize new videos in a zero-shot manner*
@@ -153,7 +157,7 @@ $$\mathcal{L}_{\text{AMF}} = \| \mathrm{AMF}(z_{\text{ref}}) - \mathrm{AMF}(z_t)
 
 **输入输出流总结**：参考视频 → 潜空间编码 → DiT 块特征提取 → AMF 运动模板（离线计算一次）；文本提示 + 噪声潜变量（或预优化位置嵌入）→ 去噪过程 + AMF 引导优化 → 运动迁移后的生成视频。整个流程无需任何模型训练或微调，完全基于推理阶段的优化驱动。
 
-## 核心模块与公式推导
+
 
 DiTFlow 的核心流程由三个关键模块串联构成：注意力运动流（AMF）提取、运动引导优化、以及可选的零样本迁移。以下逐模块展开其公式化定义与变量含义。
 
@@ -197,7 +201,9 @@ $$\mathcal{L}_{\mathrm{AMF}}(z_{\mathrm{ref}}, z_t) = ||\mathrm{AMF}(z_{\mathrm{
 
 当优化对象为位置嵌入 $\rho_t$ 时，由于位置嵌入不参与语义内容的编码，预优化的 $\rho_t$ 可与任意新提示组合，实现一次优化、多次生成的零样本迁移。Figure 7a 的定量结果表明，$\rho$ 优化的提示保真度下降仅为 -0.3%，远低于 $z_t$ 优化的 -4.4%，验证了运动与内容的有效解耦。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -277,7 +283,9 @@ DiTFlow的生成质量受限于预训练模型的能力边界。当参考视频�
 ![[assets/figures/papers/paper_list_l28_Video_Motion_Transfer_with_Diffusion_Transformers/figures/016_Table_4.jpg]]
 *Table 4: Dataset snippet. Sample of DAVIS videos chosen with associated prompts from each category described in Section 5*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -314,6 +322,8 @@ DiTFlow 的有效性受以下边界条件约束：
 3. **长视频生成扩展**：论文提及分段生成可缓解内存压力，但未验证分段间的运动一致性能否保持。长视频场景下的运动连续性是一个需要进一步探索的工程问题。
 
 4. **多对象运动解耦**：当参考视频包含多个独立运动对象时，AMF 将所有运动编码为统一流场。如何解耦并选择性迁移特定对象的运动，是提升方法实用性的重要方向。
+
+
 
 ## 原文 PDF
 

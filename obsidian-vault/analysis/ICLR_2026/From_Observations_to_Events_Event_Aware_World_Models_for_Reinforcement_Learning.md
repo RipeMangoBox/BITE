@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/From_Observations_to_Events_Event_Aware_World_Models_for_Reinforcement_Learning.pdf
+project_link: null
+code_link: https://github.com/MarquisDarwin/EAWM
 openreview_forum_id: OWkkFaq1IZ
 aliases:
 - EAWME
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 从观测到事件：面向强化学习的事件感知世界模型 |
 | 英文题名 | From Observations to Events: Event-Aware World Models for Reinforcement Learning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=OWkkFaq1IZ); [GitHub](https://github.com/MarquisDarwin/EAWM) |
+| Links | [paper](https://openreview.net/forum?id=OWkkFaq1IZ) · [GitHub](https://github.com/MarquisDarwin/EAWM) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | Event-Aware World Model (EAWM) |
 | Dataset | Atari 100K (26 games), DeepMind Control Suite 500K (10 hard tasks), DMC-GB2 Color Hard (6 tasks), DMC-GB2 Video Hard (6 tasks) |
@@ -42,7 +44,7 @@ claims:
 > - DeepMind Control Suite 500K (10 hard tasks) 上，Mean Score 为 EADream 723.8，对比 DreamerV3 606.3，变化 +117.5 (19.4%)。
 > - DMC-GB2 Color Hard (6 tasks) 上，Mean Score 为 EADream 750，对比 DreamerV3 456，变化 +294 (64.5%)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -67,7 +69,7 @@ EAWM在**55个测试任务**上全面超越现有无模型和基于模型的强�
 
 消融实验确认，移除事件预测器导致Atari 100K平均HNS下降约0.4，移除观测预测使DMC任务平均分数从737.2降至519.5，验证了事件感知机制的关键作用。方法额外训练开销仅11%–17%，在可控范围内。
 
-## 背景与动机
+
 
 基于模型的强化学习（MBRL）通过构建环境的世界模型，使智能体能够在想象的轨迹中学习行为，从而大幅提升样本效率。然而，当前最先进的MBRL方法——如 **DreamerV3**（Hafner et al., 2025）和 **Simulus**（Cohen et al., 2025）——在训练世界模型时，普遍以精确重建原始观测为核心目标。这种设计带来了三个深层瓶颈：
 
@@ -81,7 +83,9 @@ EAWM在**55个测试任务**上全面超越现有无模型和基于模型的强�
 
 本文提出的 **Event-Aware World Model（EAWM）** 框架正是针对这一因果缺口：将世界模型的训练目标从重建原始观测转向预测自动生成的事件流。通过引入事件预测器与通用事件分割器（GES），EAWM 在表示空间中施加信息瓶颈优化，使模型天然地聚焦于有意义的时空转变，从而在长时预测、视觉泛化和样本效率三个维度上实现一致且显著的提升。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 现有基于模型强化学习（MBRL）方法的核心瓶颈在于：世界模型的训练目标过度依赖原始观测重建，导致表示空间被纹理、颜色等与决策无关的虚假变化所主导，长时预测不准确，且缺乏对关键动态事件的感知能力。EAWM 的核心创新在于**将世界模型的训练目标从重建原始观测转向预测自动生成的事件流**，通过信息瓶颈优化将表示空间约束到有意义的时空转变上，从而学习鲁棒、泛化且对关键动态敏感的紧凑表示。
 
@@ -136,7 +140,7 @@ $$
 
 EAWM 并非独立的模型架构，而是一个**通用框架**，可赋予不同世界模型对抽象事件的通用理解能力。论文通过统一公式将 DreamerV3（RSSM 架构）和 Simulus（Transformer 架构）纳入同一框架，分别实现为 EADream 和 EASimulus，验证了方法的广泛适用性。相比 **DreamerV3**（Hafner et al., 2025）和 **Simulus**（Cohen et al., 2025），EAWM 仅增加了约 11-17% 的训练时间开销，却在 55 个测试任务上实现了 10%-45% 的性能提升，在 Atari 100K 上首次使 MBRL 方法达到超人级 IQM 分数。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l32_https_openreview_net_forum_id_OWkkFaq1IZ/figures/006_Figure_3.jpg]]
 *Figure 3: EAWM architecture that predicts the next observations and events. Given the length of the trajectory segment k , , the sequence model outputs $\mathbf { y } _ { t }$ , which summarizes the embeddings $\mathbf { Z } _ { t - 1 } = \left[ \mathbf { z } _ { t - k }$ , . . . , $\mathbf { z } _ { t - 1 } \right$] and $\mathbf { A } _ { t - 1 }$ = [ $\mathbf { a } _ { t - k }$ , . . . , $\mathbf { a } _ { t - 1 }$ ] . The observation predictor predicts the next observation $\hat { \mathbf { o } } _ { t }$ via the outputs of the sequence model $\mathbf { y } _ { t }$ and the outputs of the dynamics predictor $\hat { \mathbf { z } } _ { t }$ The representation model combines observation encodings with hidden states \...
@@ -193,7 +197,7 @@ EAWM 的通用性体现在其对不同世界模型架构的统一适配：
 
 两种实例化均在各自基准上取得显著提升，验证了框架的广泛适用性。训练开销方面，EADream 仅比 DreamerV3 增加约 11–13%，EASimulus 比 Simulus 增加约 14–17%，在可接受范围内。
 
-## 核心模块与公式推导
+
 
 ### 3.1 事件感知世界模型（EAWM）框架
 
@@ -248,7 +252,9 @@ $$\mathcal{L}_{\mathrm{e}}'(\theta) \doteq \sum_{m=1}^{M} \beta_{\mathrm{e}}^{(m
 $$\mathcal{L}(\theta) \doteq \mathcal{L}_{\mathrm{WM}}(\theta) + \beta_o \mathcal{L}_o(\theta) + \beta_e \mathcal{L}_e(\theta)$$
 其中 $\mathcal{L}_o$ 为经GES调整的事件感知观测损失，$\mathcal{L}_e$ 为经GES门控的事件预测损失，$\beta_o$ 和 $\beta_e$ 为权重系数。智能体的行为完全从世界模型生成的想象轨迹中学习，无需额外的环境交互。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能验证
 
@@ -297,7 +303,9 @@ Figure 1展示了EAWM在想象步第9步的预测效果：尽管想象帧在物�
 *Figure 4: Ablation studies on key components of EAWMs with 5 random seeds over 6 Atari games: Assault, Breakout, Gopher, Krull, and Ms Pacman, Up N Down. The results show Simulus with the solid lines and EADream with the dashed lines*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 方法定位与核心创新
 
@@ -342,6 +350,8 @@ EAWM的适用性已在以下维度得到验证：
 5. **神经科学机制待探索**：论文指出上丘（SC）神经元如何处理动力学特征的具体机制仍待研究，这暗示事件感知的生物学基础尚未完全映射到计算模型。
 
 6. **与大规模预训练模型的结合**：将EAWM的事件感知机制与大型预训练视觉-语言模型结合，以增强跨模态泛化与基础能力，是一个有前景但尚未探索的方向。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/RadarGen_Automotive_Radar_Point_Cloud_Generation_from_Cameras.pdf
+project_link: https://radargen.github.io/
+code_link: null
 aliases:
 - RadarGen
 tags:
@@ -41,7 +43,7 @@ claims:
 > - MAN TruckScenes (Foreground) 上，Foreground: CD Loc. (↓) / Hit Rate (↑) 0.95±0.65 / 0.66 vs 1.32±0.79 / 0.37 (-0.37 / +0.29)。
 > - MAN TruckScenes (Detection) 上，Detection: mAP / NDS 0.11 / 0.30 vs 0.00 / 0.00 (Baseline 生成数据) (+0.11 / +0.30)。
 
-## 概述
+## 概要
 
 自动驾驶感知系统对高质量雷达数据的需求日益增长，但真实雷达点云的采集成本高昂且覆盖场景有限。直接从视觉生成雷达点云面临三重挑战：雷达点云固有的稀疏性与非均匀采样使其难以用传统密集预测建模；雷达反射截面（RCS）与多普勒速度等传感器特有属性的高度随机性；以及缺乏原始射频（RF）数据来约束生成过程。
 
@@ -50,8 +52,6 @@ RadarGen 提出了一条概率生成路径：将稀疏雷达点云编码为三�
 在 MAN TruckScenes 数据集上，RadarGen 在几何保真度（CD Loc. 1.68 vs 基线 1.84，IoU@1m 0.31 vs 0.23）和雷达属性保真度（DA F1 0.24 vs 0.14）上均显著优于前馈基线。消融实验证实，BEV 语义条件对 RCS 分布建模至关重要（移除后 MMD RCS 从 0.09 升至 0.12），而外观与运动条件则主要影响多普勒速度的生成质量。更为关键的是，在 RadarGen 生成的点云上训练的目标检测器达到了 NDS 0.30（真实数据为 0.48），而基线生成的点云几乎无法用于检测（NDS ≈ 0），验证了生成数据的下游可用性。
 
 RadarGen 的核心贡献在于：将雷达生成问题转化为 BEV 图像域的潜扩散建模，借助预训练图像扩散模型的强大先验与视觉基础模型的几何语义理解，以概率方式生成与场景一致且具有正确物理属性的雷达点云，为可扩展的多模态生成式仿真提供了新范式。
-
-## 背景与动机
 
 ### 问题背景：雷达点云的独特挑战
 
@@ -77,7 +77,7 @@ RadarGen 的核心动机源于一个关键洞察：**将稀疏雷达点云编码
 
 这一设计实现了三个层面的突破：在**表示层面**，BEV 图像化编码保留了雷达数据的空间结构与属性信息；在**生成层面**，潜扩散模型捕捉雷达测量的随机性，支持多样本生成；在**条件层面**，深度估计、语义分割和光流网络提供的 BEV 条件图直接调节生成雷达点的空间分布、RCS 和多普勒，实现了从视觉到雷达的可控合成。
 
-## 核心创新
+## 核心方法与创新机理
 
 RadarGen 的核心创新在于将**稀疏、非均匀采样的雷达点云生成问题**重新表述为**条件 BEV 图像扩散 + 反卷积恢复**的两阶段范式，从而在表示、生成模型和条件注入三个关键维度实现了对前馈基线（RGB2Point）的系统性突破。
 
@@ -104,8 +104,6 @@ $$\operatorname*{min}_{\mathcal{P}_{xy} \geq 0} \frac{1}{2} \| K_{\sigma} * \mat
 ### 方法优势的结构性来源
 
 上述四个创新形成了因果链条：BEV 图像化表示使雷达数据与成熟图像扩散架构兼容 → 扩散模型提供概率生成能力 → 基础模型条件注入提供几何与语义对齐 → 反卷积恢复保证稀疏性。这一链条的端到端效果在 Table 1 中得到验证：RadarGen 在几何保真度（CD Loc. 1.68 vs 1.84）、空间覆盖（IoU@1m 0.31 vs 0.23）和雷达属性保真度（DA F1 0.24 vs 0.14）上全面超越基线，且 BEV 条件模型相比直接多视图条件在几何指标（CD Loc. 0.95 vs 1.00）和训练效率（2 天 vs 9 天）上均有优势（Table 2）。
-
-## 整体框架
 
 RadarGen 的整体 pipeline 围绕一个核心设计展开：**将稀疏、非均匀的雷达点云转换为多通道 BEV 图像，借助预训练图像扩散模型的强大先验进行生成，再通过反卷积恢复稀疏点云**。这一设计直接回应了雷达数据的两大瓶颈——固有的稀疏性与随机性，以及 RCS/多普勒等传感器特异性属性的建模需求。
 
@@ -149,8 +147,6 @@ $$\operatorname*{min}_{\mathcal{P}_{xy} \geq 0} \frac{1}{2} \| K_{\sigma} * \mat
 
 ![[assets/figures/papers/paper_list_l72_https_arxiv_org_abs_2512_17897/figures/001_Figure_1.jpg]]
 *Figure 1: Controllable radar synthesis from vision. (Top) Given multi-view camera images, RadarGen generates realistic radar point clouds that align with real-world radar statistics and can be consumed by downstream perception models. (Bottom) The generation is semantically consistent: modifying the input scene with an off-the-shelf image editing tool (e.g., replacing a distant car with a closer truck) updates the radar response, removing returns from newly occluded regions and reflecting the new object geometry*
-
-## 核心模块与公式推导
 
 RadarGen 的核心设计围绕一个关键矛盾展开：雷达点云本质上是稀疏、非均匀采样的点集，而现代扩散模型擅长生成结构化的密集图像。为解决这一矛盾，RadarGen 将整个生成流程分解为四个紧密协作的模块。
 
@@ -207,7 +203,7 @@ $$\operatorname*{min}_{\mathcal{P}_{xy} \geq 0} \frac{1}{2} \| K_{\sigma} * \mat
 ![[assets/figures/papers/paper_list_l72_https_arxiv_org_abs_2512_17897/figures/013_Figure_10.jpg]]
 *Figure 10: Recovery methods. Comparison of Random, Peak, and Deconvolution sparse point cloud recovery methods. Random sampling exhibits inconsistent density characterized by clustering and empty regions. Peak recovery fills the space uniformly but suffers from low density. Our Deconvolution method achieves coverage while maintaining density where necessary. RadarGen uses inputs t and t + ∆t. Ground truth bounding boxes are highlighted in color*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验结果
 
@@ -265,10 +261,7 @@ $$\operatorname*{min}_{\mathcal{P}_{xy} \geq 0} \frac{1}{2} \| K_{\sigma} * \mat
 ![[assets/figures/papers/paper_list_l72_https_arxiv_org_abs_2512_17897/figures/006_Figure_5.jpg]]
 *Figure 5: Scene editing. Modifying the input images using an offthe-shelf image editing tool updates the radar response, demonstrating object removal (left) and insertion (right)*
 
-![[assets/figures/papers/paper_list_l72_https_arxiv_org_abs_2512_17897/figures/012_Figure_9.jpg]]
-*Figure 9: Additional seeds. Our model can generate multiple sets of point clouds for a single scene by replacing the diffusion process seed. RadarGen uses inputs t and t + ∆t. Ground truth bounding boxes are highlighted in color*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 与基线方法的关系
 

@@ -44,7 +44,7 @@ claims:
 > - Same as above 上，Top-2 accuracy 96.14 ± 1.71% vs 67.00% (Image classifier) (+29%)；Top-3 accuracy 97.86 ± 1.17% vs 72.86% (Image classifier) (+25%)。
 > - One-vs-Rest setting (Case 1: access to all models) 上，Average Top-1 accuracy 99.16 ± 0.21% vs N/A (not directly compared) (N/A)。
 
-## 概述
+## 概要
 
 基于投票的文生图（T2I）排行榜依赖模型匿名性来保证公平评价——投票者不应知晓生成图像的模型来源。然而，本文揭示了一个根本性安全漏洞：**不同T2I模型在相同提示下生成的图像，在预训练图像编码器的嵌入空间中形成显著可区分的聚类**。这一发现意味着，攻击者无需训练模型、无需控制提示内容，仅需少量黑盒API查询即可高精度地识别排行榜图像背后的模型身份，使匿名性形同虚设。
 
@@ -54,7 +54,7 @@ claims:
 
 这一方法的方法论定位值得关注：它并非依赖复杂的模型指纹提取或有监督训练，而是利用了现代预训练图像编码器（如ViT/CLIP）天然具备的表征能力——不同模型因训练数据、架构和规模的差异，在生成图像中表现出稳定且独特的风格、构图、色彩等高级特征，这些特征在嵌入空间中自然形成低类内方差、高类间分离的聚类结构。攻击的成本极低，每个模型仅需10张参考图像即可达到与30张几乎相同的准确率，单次去匿名化的API调用成本约$1.08，具有极强的实用性。这一发现对当前T2I排行榜的匿名机制提出了严峻挑战，也为设计更健壮的匿名化防御指明了方向。
 
-## 背景与动机
+
 
 ### 文生图排行榜的匿名性困境
 
@@ -79,7 +79,9 @@ claims:
 
 这一结果暴露了当前T2I排行榜匿名机制的根本性安全漏洞：匿名性在嵌入空间聚类面前形同虚设。本文由此出发，系统性地研究攻击的有效性边界、影响因素（特别是提示级别的可区分性）以及可能的防御策略。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作的核心创新在于**重新定义了T2I排行榜去匿名化问题的本质**：传统方法将模型识别视为指纹匹配或有监督分类任务，而本文发现不同模型在相同提示下生成的图像天然地在预训练嵌入空间中形成可区分的聚类，从而将问题转化为一个**无需训练的最近质心分类问题**。这一视角转换带来了四个关键的技术变革。
 
@@ -107,7 +109,7 @@ claims:
 
 这一机制的巧妙之处在于，它仅依赖目标模型自身的统计特性，无需访问任何其他模型即可实现高精度的一对多检测。在α=0.80的设置下，该方法达到了0.926的准确率和0.977的AUC（Table 2），证明了模型嵌入空间的类内紧致性足以支撑仅基于单侧信息的可靠检测。
 
-## 整体框架
+
 
 本文提出的去匿名化攻击框架建立在一个核心观察之上：**不同T2I模型在相同提示下生成的图像，在预训练图像编码器的嵌入空间中会形成高度可区分的聚类**。这一观察构成了整个攻击管道的理论基础——攻击者无需控制提示内容、无需收集训练数据，仅需利用模型间天然的“风格指纹”即可实现高精度模型识别。
 
@@ -166,7 +168,7 @@ $D(i)$ 越高，表示该提示下各模型生成图像的嵌入聚类越分离�
 ![[assets/figures/papers/paper_list_l2360_https_openaccess_thecvf_com_content_CVPR2026_html_Naseh_When_Anonymity_B/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of our setting: (a) voting-based leaderboard and (b) adversarial deanonymization pipeline leveraging model-specific clustering in embedding space*
 
-## 核心模块与公式推导
+
 
 ### 攻击管道总览
 
@@ -226,7 +228,9 @@ $$\lambda_{\alpha} = \mathrm{quantile}_{\alpha}(\| x_i - c \|_2)$$
 ![[assets/figures/papers/paper_list_l2360_https_openaccess_thecvf_com_content_CVPR2026_html_Naseh_When_Anonymity_B/figures/006_Figure_4.jpg]]
 *Figure 4: Embeddings for two prompts with high (left, D(i) = 1.00) and low (right, D(i) = 0.19) distinguishability, showing clear separation versus overlap among model generations*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -291,7 +295,9 @@ Table 3展示了对抗性后处理防御在不同扰动预算ε下的效果。�
 ![[assets/figures/papers/paper_list_l2360_https_openaccess_thecvf_com_content_CVPR2026_html_Naseh_When_Anonymity_B/figures/008_Table_3.jpg]]
 *Table 3: Attack accuracy before and after adversarial postprocessing under different perturbation budgets ✏*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：排行榜匿名性的根本缺陷
 
@@ -336,6 +342,8 @@ $$D(i) = \frac{1}{|\mathcal{C}|} \sum_{M_j \in \mathcal{C}} \mathbb{I}[\mathrm{f
 4. **攻击与策略性投票的结合**：在多轮投票和实时排行榜环境中，攻击者如何将去匿名化能力与策略性投票结合，以最大化排名操纵效果？这涉及博弈论层面的分析，超出了单纯的技术攻防范畴。
 
 5. **防御的对抗鲁棒性**：当前的对抗性后处理防御假设防御者知道攻击者的编码器选择。如果攻击者使用不同的编码器或自适应攻击策略，防御的有效性是否会显著下降？这需要更系统的对抗鲁棒性评估。
+
+
 
 ## 原文 PDF
 

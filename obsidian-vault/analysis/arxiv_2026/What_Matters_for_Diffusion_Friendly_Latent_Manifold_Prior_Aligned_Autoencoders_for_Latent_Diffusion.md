@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2026
 pdf_ref: paperPDFs/arxiv_2026/What_Matters_for_Diffusion_Friendly_Latent_Manifold_Prior_Aligned_Autoencoders_for_Latent_Diffusion.pdf
+project_link: null
+code_link: https://github.com/black-forest-labs/flux
 aliases:
 - PAAP
 - WMDFLMPAALD
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 扩散友好的潜在流形关键何在？面向潜在扩散的先验对齐自编码器 |
 | 英文题名 | What Matters for Diffusion-Friendly Latent Manifold? Prior-Aligned Autoencoders for Latent Diffusion |
 | 会议/期刊 | arXiv 2026 |
-| Links | [paper](https://arxiv.org/abs/2605.07915) · [arXiv](https://arxiv.org/abs/2602.11401) · [Code](https://github.com/black-forest-labs/flux) |
+| Links | [paper](https://arxiv.org/abs/2605.07915) · [paper](https://arxiv.org/abs/2602.11401) · [Code](https://github.com/black-forest-labs/flux) |
 | Topic | #topic/vision_multimodal_applications #topic/generative_models_diffusion #topic/generative_models_diffusion/diffusion_image_video |
 | Method | Prior-Aligned AutoEncoder (PAE) |
 | Dataset | ImageNet 256×256 class-conditional generation |
@@ -41,7 +43,7 @@ claims:
 > - ImageNet 256×256 class-conditional generation (80 epochs) 上，gFID (with guidance)↓ 1.27 (PAE DINOv2) vs 1.44 (VTP), 1.48 (GAE) (↓0.17-0.21)。
 > - ImageNet 256×256 class-conditional generation (800 epochs) 上，gFID (with guidance)↓ 1.03 (PAE DINOv2) vs 1.13 (RAE DiTDH-XL), 1.21 (Send-VAE w. REPA) (↓0.10-0.18)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -83,7 +85,7 @@ PAE 的核心理念是：**利用精炼的 VFM 先验，将 SSC、LPC 和 GSQ �
 
 消融实验（Table 2）证实，SSR、MCR 和 SCR 三个正则化目标各自主要提升其对应的几何指标（SSC、LPC、GSQ），组合三者可获得最佳生成性能，验证了流形组织作为显式设计目标的有效性。
 
-## 背景与动机
+
 
 ### 潜在扩散模型的范式与瓶颈
 
@@ -118,7 +120,9 @@ PAE 的设计围绕三个关键改变展开：
 
 这一设计将潜在流形的组织从“重建的副产品”提升为“训练的一等公民”，在保持竞争性重建质量（rFID 0.26）的同时，显著提升了扩散模型的训练效率和生成质量：在 ImageNet 256×256 上，PAE 仅需 80 个训练轮次即达到 gFID 1.27，在 800 轮次达到新的 SOTA gFID 1.03，收敛速度较 RAE 快约 13 倍（Table 1）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈发现：重建质量不等于扩散友好
 
@@ -176,7 +180,7 @@ PAE 进一步发现，原始 VFM 特征并非最优的对齐目标。通过轻�
 
 在 ImageNet 256×256 类别条件生成任务上，PAE 在 80 个训练轮次即达到 gFID 1.27，在 800 轮次达到新的 SOTA gFID 1.03（Table 1）。更关键的是，**PAE 达到与 RAE 相当的生成质量所需的训练轮次减少了 13 倍**，直接验证了扩散友好流形对扩散模型学习效率的根本性提升。
 
-## 整体框架
+
 
 PAE 的整体设计围绕一个核心目标展开：**显式塑造扩散友好的潜在流形**，而非像现有 tokenizer 那样仅依赖重建损失间接产生流形属性。其 pipeline 由四个功能模块构成，形成“冻结 VFM 编码 → 细节注入 → 先验对齐正则化 → 重建解码”的端到端流程。
 
@@ -228,7 +232,7 @@ $$\mathcal{L}_{\text{recon}} = \mathcal{L}_{\ell_1} + \lambda_{\text{lpips}} \ma
 ![[assets/figures/papers/paper_list_l83_https_arxiv_org_abs_2605_07915/figures/012_Figure_9.jpg]]
 *Figure 9: Illustration of Spatial Structure Coherence (SSC). For each image, we construct a latent-token affinity graph from the tokenizer output, perform spectral clustering on the token graph, and compare the resulting token partition with object-aware panoptic labels projected to latent resolution. Higher SSC indicates better alignment between latent token grouping and object-level spatial structure*
 
-## 核心模块与公式推导
+
 
 PAE 的架构围绕一个核心原则构建：**显式塑造潜在流形的扩散友好属性**，而非依赖重建目标间接产生。整体框架由冻结的视觉基础模型编码器、细节感知调制器、投影器与解码器，以及三个先验对齐正则化目标组成（Figure 3）。
 
@@ -286,7 +290,9 @@ $$\mathcal{L}_p = \lambda_{ssr} \mathcal{L}_{\text{SSR}} + \lambda_{mcr} \mathca
 ![[assets/figures/papers/paper_list_l83_https_arxiv_org_abs_2605_07915/figures/002_Figure_2.jpg]]
 *Figure 2: Pilot experiments on diffusion-friendly latent manifold properties. (a) Better reconstruction alone (rFID) does not guarantee better generation quality (gFID). (b–d) In contrast, improvements in instance-level structure, local manifold continuity, and global manifold semantics consistently correlate with better generation across controlled tokenizer variants. Together, these motivate latent-manifold organization as an explicit objective for designing tokenizers. Full settings and metric definitions are provided in Appendix B*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 先导实验：重建质量不能保证生成质量
 
@@ -376,7 +382,9 @@ $$\mathcal{L}_p = \lambda_{ssr} \mathcal{L}_{\text{SSR}} + \lambda_{mcr} \mathca
 ![[assets/figures/papers/paper_list_l83_https_arxiv_org_abs_2605_07915/figures/021_Table_8.jpg]]
 *Table 8: Encoder generalization across frozen teachers. PAE consistently improves over the corresponding tokenizer scaffold without*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 从重建导向到流形组织导向的范式转换
 
@@ -413,6 +421,8 @@ PAE将潜在扩散tokenizer的设计从“间接涌现”推向“显式塑造�
 3. **与扩散架构的深度协同**：当前PAE与扩散模型（LightningDiT-XL/1）的训练是分离的。能否将流形组织原则与DiT变体的架构改进（如REPA的表示引导）更深度地结合，实现tokenizer与扩散模型的联合优化？
 
 4. **跨模态与高分辨率扩展**：PAE的流形组织原则能否迁移到文本到图像生成、视频生成等场景？在高分辨率下，空间结构正则化（SSR）的计算开销（Gram矩阵的Frobenius范数）可能成为瓶颈，需要更高效的近似方法。
+
+
 
 ## 原文 PDF
 

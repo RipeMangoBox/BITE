@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/Retrieve_and_Segment_Are_a_Few_Examples_Enough_to_Bridge_the_Supervision_Gap_in_Open_Vocabulary_Segmentation.pdf
+project_link: null
+code_link: null
 aliases:
 - RSR
 - RSAFEEBSGOVS
@@ -42,7 +44,7 @@ claims:
 > - 同上（OpenCLIP ViT-B/16 + SAM 2.1） 上，mIoU 51.6 (RNS B=20) vs 31.7 (zero-shot) (+19.9)。
 > - 同上（DINOv3.txt + SAM） 上，mIoU 61.9 (RNS B=20) vs 47.8 (CAT-Seg, trained on COCO 118k annotations) (+14.1)。
 
-## 概述
+## 概要
 
 开放词汇分割（Open-Vocabulary Segmentation, OVS）旨在将图像划分为具有任意语义类别的区域，其核心挑战在于视觉-语言模型（VLMs）的图像级粗粒度监督与像素级细粒度预测之间的监督差距。纯文本驱动的零样本方法受限于自然语言类别描述的语义模糊性，难以精确区分外观相似但语义不同的类别（如将树枝误判为鸟，或将沙发与椅子混淆）。
 
@@ -50,7 +52,7 @@ claims:
 
 在六个主流 OVS 基准上的实验表明，RNS 在每类仅有一张支持图像时，即可相对于零样本基线实现显著提升（OpenCLIP 上 +7.3%，DINOv3 上 +18.4% mIoU）。当每类支持图像增至 20 张时，RNS（DINOv3.txt + SAM）达到 61.9 的平均 mIoU，将零样本与全监督之间的差距缩小至 11.5，并超过基于大规模训练的 CAT-Seg（47.8）达 14.1 个百分点。
 
-## 背景与动机
+
 
 ### 开放词汇分割的核心瓶颈
 
@@ -83,7 +85,9 @@ claims:
 
 RNS的关键优势在于：它并非简单地进行后期融合或离线微调，而是将检索、融合和测试时训练统一为一个整体目标，使得模型能够在仅有**每类别一张支持图像**的条件下，相对于零样本基线实现显著提升（OpenCLIP上+7.3%，DINOv3上+18.4% mIoU），并在B=20时将零样本与全监督之间的差距缩小至11.5 mIoU，超越了基于大规模训练的CAT-Seg（47.8）达14.1个点（Table 2）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 RNS 的核心创新在于将**检索增强的测试时适配**引入开放词汇分割，通过三个相互耦合的机制设计，系统性地弥合了零样本预测与像素级监督之间的鸿沟。
 
@@ -119,7 +123,7 @@ $$L_f = \sum_{c \in \mathcal{C}_r} w_c \sum_{\lambda \in \Lambda} \mathrm{CE}(g_
 
 这种“优雅退化”的设计哲学使 RNS 在从零样本到全监督的整个支持谱系上都能稳定工作，是其区别于以往方法的核心架构优势。
 
-## 整体框架
+
 
 RNS 的整体 pipeline 围绕一个核心思想展开：**将检索增强的测试时适配器引入开放词汇分割**，通过可学习的多模态融合，在少量像素标注支持图像的条件下弥合粗粒度视觉-语言模型（VLM）与细粒度像素预测之间的监督鸿沟。其流程可概括为四个阶段：支持特征提取 → 多模态融合 → 基于相似度的检索 → 测试时线性分类器训练与推理，并可选择性地接入区域提议模块以生成掩膜级分割结果。
 
@@ -201,7 +205,7 @@ RNS 的一个显著优势是对部分支持缺失场景的自然处理能力，�
 
 这种设计使 RNS 在支持信息不完整时仍能保持稳健性能，避免了传统方法在类似场景下的灾难性退化。
 
-## 核心模块与公式推导
+
 
 RNS 的核心工作流由五个模块串联构成：支持特征提取、多模态融合、检索、测试时线性分类器训练，以及可选的区域提议池化。以下按模块逐一展开关键公式与变量含义。
 
@@ -305,7 +309,9 @@ $$
 
 其中 $\bar{S}_{jr}$ 是经下采样并 L1 归一化的区域掩膜在 patch $j$ 上的权重。后续的训练和预测过程与 patch 级完全一致，仅将操作对象从 patch 特征替换为区域特征。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -395,7 +401,9 @@ Figure 13展示了精度-推理时间的权衡（DINOv3.txt, patch-level, B=5, �
 ![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2602_23339/figures/018_Figure_13.jpg]]
 *Figure 13: Average performance (mIoU) vs. inference time (s). DINOv3.txt, patch-level; B=5. Avg. on VOC, ADE, Stuff. A single NVIDIA A100 GPU is used*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心洞见与因果瓶颈
 
@@ -449,6 +457,8 @@ RNS位于**测试时适配（test-time adaptation）** 与**检索增强生成�
 4. **任务泛化**：该方法能否扩展到全景分割、视频目标分割等更复杂的像素级任务？当前验证限于静态图像的语义分割，时序一致性和实例区分能力尚未探索。
 
 5. **与大规模训练方法的融合**：Table 2 显示RNS（B=20）在六个OVS基准上平均mIoU达61.9，超过基于大规模训练的CAT-Seg（47.8）14.1个点。这提示**少量高质量支持示例可能比大规模弱标注更有效**——如何将RNS的检索-适配范式与大规模预训练结合，是一个值得探索的方向。
+
+
 
 ## 原文 PDF
 

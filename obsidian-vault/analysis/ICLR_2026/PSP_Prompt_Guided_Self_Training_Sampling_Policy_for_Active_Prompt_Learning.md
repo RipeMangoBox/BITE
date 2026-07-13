@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/PSP_Prompt_Guided_Self_Training_Sampling_Policy_for_Active_Prompt_Learning.pdf
+project_link: null
+code_link: null
 openreview_forum_id: 7D7VLU9227
 aliases:
 - PPGSTSP
@@ -42,7 +44,7 @@ claims:
 > - Oxford Pets (ViT-B/32) 上，Final Accuracy 为 86.57，对比 83.16，变化 +3.41%。
 > - Aircraft (ViT-B/32) 上，Final Accuracy 为 36.42，对比 32.27，变化 +4.15%。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有主动提示学习（APL）方法，如 **PCB**（Bang et al., CVPR 2024），将样本选择与提示学习过程解耦——先按固定标准（如Entropy、Coreset）选出样本，再训练提示模板。这导致两个后果：所选样本无法有效促进提示模板优化，且未被选中的样本中的互补信息被完全丢弃，限制了性能上限。
 
@@ -52,7 +54,7 @@ claims:
 
 **主要结果**：在ViT-B/32主干下，PSP在7个数据集上的平均准确率达76.87%，较最强PCB基线（PCB+AS）提升显著——DTD上+3.33%，Oxford Pets上+3.41%，Aircraft上+4.15%。消融实验表明，移除VSSP导致平均性能下降1.26%，移除UST下降2.10%，验证了两个模块各自的关键贡献。
 
-## 背景与动机
+
 
 ### 视觉-语言模型的提示学习范式
 
@@ -78,7 +80,9 @@ $$\pmb { p } _ { c } = [ \pmb { c } ] _ { 1 } [ \pmb { c } ] _ { 2 } \ldots [ \p
 
 基于上述动机，本文提出PSP（Prompt-Guided Self-Training Sampling Policy），将主动提示学习建模为马尔可夫决策过程，通过向量化的Soft Actor-Critic策略实现提示引导的端到端采样，并辅以不确定性增强的自训练机制，桥接样本选择与提示学习两个阶段。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PSP 的核心创新在于将主动提示学习（APL）中原本被解耦的**样本选择**与**提示学习**两个阶段进行了端到端的桥接，并引入了对未选样本中互补信息的利用。具体而言，PSP 通过两个关键模块——**向量化软演员-评论家采样策略 (VSSP)** 和**不确定性增强的自训练机制 (UST)**——实现了以下两个 changed slots：
 
@@ -104,7 +108,7 @@ PSP 的核心创新在于将主动提示学习（APL）中原本被解耦的**�
 
 PSP 通过 VSSP 的提示引导采样和 UST 的互补信息挖掘，解决了现有方法“采样与学习脱节”与“信息利用不充分”两个核心瓶颈。在 DTD 数据集上，PSP 较最强 PCB 基线（PCB+AS）提升 **3.33%** 准确率；在 Aircraft 上提升 **4.15%**（Table 1）。这一性能增益来自于采样策略能够动态适应提示模板的优化需求，同时充分利用了标注与未标注数据的协同作用。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_7D7VLU9227/figures/002_Figure_2.jpg]]
 *Figure 2: The overall structure of our PSP. The CLIP collaborative learning framework for PSP consists of two core components: the Vectorized Soft Actor-Critic Sampling Policy (VSSP) and the Uncertainty Augmented Self-Training (UST) mechanism*
@@ -119,7 +123,7 @@ PSP将主动提示学习建模为一个马尔可夫决策过程，通过两个�
 
 **与PCB的关键差异**：PCB框架中，采样算法（如Entropy、BADGE）独立于提示学习运行；PSP用VSSP替换了该采样模块，使采样策略能够动态适应提示模板的优化状态（Figure 1）。消融实验证实了这一设计的必要性：移除VSSP（保留UST）导致平均准确率下降1.26%，移除UST（保留VSSP）导致下降2.10%（Table 2），验证了两组件互补协同的机制。
 
-## 核心模块与公式推导
+
 
 ### 3.1 整体框架
 
@@ -179,7 +183,9 @@ $$J _ { \pi } ( \phi ) = \mathbb { E } _ { s _ { t } \sim \mathcal { D } , \epsi
 
 UST 利用上一轮的教师 CLIP 模型对未标注数据生成伪标签。通过对 $L$ 次增强的 logits 取平均获得稳定预测，BPLS（Balanced Pseudo-Label Selective）模块联合评估预测不确定性和置信度，过滤出可靠伪标签样本。对于过滤后缺失的类别，UST 从高置信度样本中补充，确保各类别伪标签数量均衡。这些伪标注数据与真实标注数据合并，用于学生模型的提示学习交叉熵损失优化。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 
@@ -270,7 +276,9 @@ Figure 4展示了各方法在七个数据集上的平均学习曲线。PSP在所
 
 PSP的经验回放缓冲区存储了历史状态和梯度嵌入信息，在数据高度敏感的场景下可能引发隐私泄露风险。此外，当前实验设置固定为8轮查询，超出此范围的采样策略自适应行为尚待探索。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 主动提示学习的位置
 
@@ -301,6 +309,8 @@ PSP 的性能增益在细粒度任务上尤为显著——在 Aircraft 上较 PC
 3. **大规模扩展**：ImageNet 上的初步结果（Figure 6a）显示 PSP 有效，但在完整 ImageNet-21K 或更大规模数据集上的性能尚不明确。
 4. **安全机制设计**：如何在保证采样策略有效更新的同时，确保经验回放缓冲区的隐私安全，是一个工程上需要进一步探索的问题。
 5. **任务泛化**：PSP 当前聚焦于图像分类，向更复杂任务（如人物交互检测、语义分割）的适配路径尚未被探索。
+
+
 
 ## 原文 PDF
 

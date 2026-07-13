@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/InterActHuman_Multi_Concept_Human_Animation_with_Layout_Aligned_Audio_Conditions.pdf
+project_link: https://zhenzhiwang.github.io/interacthuman/
+code_link: null
 openreview_forum_id: rJilRU8D3c
 aliases:
 - InterActHuman
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | InterActHuman：基于布局对齐音频条件的多概念人体动画 |
 | 英文题名 | InterActHuman: Multi-Concept Human Animation with Layout-Aligned Audio Conditions |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=rJilRU8D3c); [Project](https://zhenzhiwang.github.io/interacthuman/) |
+| Links | [paper](https://openreview.net/forum?id=rJilRU8D3c) · [Project](https://zhenzhiwang.github.io/interacthuman/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | InterActHuman |
 | Dataset | Multi-Person Audio-Driven Test Set, Multi-Concept Video Customization Test Set |
@@ -41,7 +43,7 @@ claims:
 > - Multi-Person Audio-Driven Test Set 上，Sync-D (↓) 为 6.670，对比 7.068 (OmniHuman w/ fixed mask)，变化 -0.398。
 > - Multi-Concept Video Customization Test Set 上，CLIP-I (↑) 为 0.744，对比 0.703 (Phantom*)，变化 +0.041。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -67,7 +69,7 @@ InterActHuman 在方法谱系中处于**扩散Transformer + 显式布局引导**
 
 当前方法的掩码预测在多人物严重重叠时可能不准确，且掩码质量受限于 VAE 的低分辨率潜在空间。训练数据以 2-3 人对话场景为主，向更多人数扩展时虽性能稳定，但尚未充分优化。此外，模型依赖于 T2V 先验，当文本提示与训练分布偏差较大时可能产生不自然内容。开放问题包括：如何改进掩码预测以处理高重叠区域、如何缓解低分辨率潜在空间带来的边界精度损失，以及能否将布局条件绑定扩展到文本等其他模态。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -98,7 +100,9 @@ InterActHuman的动机在于打破上述困局：**在扩散Transformer中引入
 
 通过这一设计，InterActHuman不仅能够处理多说话人对话场景，还支持多概念定制（如人物换装、人-物交互、动漫风格等），实现了统一的音频驱动多概念生成框架。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 InterActHuman 的核心创新在于**为扩散Transformer引入了显式的布局感知音频注入机制**，从根本上解决了现有多概念人体动画方法中音频条件全局注入导致的身份绑定错误问题。
 
@@ -137,7 +141,7 @@ InterActHuman 在三个关键维度上对基线方法进行了根本性改造：
 
 当多人物重叠严重时，掩码预测可能不准确，导致音频分配错误（Figure 5）。此外，掩码质量受限于预训练 VAE 的低分辨率潜在空间，可能影响边界精度。当前训练数据主要为 2-3 人的对话场景，扩展到更多人数时虽性能稳定（Table 13），但尚未针对更大规模进行优化。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_rJilRU8D3c/figures/002_Figure_2.jpg]]
 *Figure 2: Illustration of our framework, which adaptively predicts masks as the spatial guidance of audio condition injection. In training, we train the mask predictor (cross-attn w/ MLP) with mask loss; in inference, we collect mask predictions to cache and leverage masks predicted from the last denoising step (t − 1) to guide the audio cross-attn in the current denoising step (t)*
@@ -182,7 +186,7 @@ pipeline 由五个关键模块串联构成，数据流遵循“压缩→去噪�
 
 这种设计使得模型在无需真实布局标注的情况下，能够自动推断各身份的空间位置，并据此精确分配音频条件。消融实验（Table 4）表明，预测动态掩码在 Sync-D（6.670）和 FVD（22.881）上均显著优于全局音频注入（Sync-D 9.482, FVD 33.895）和固定掩码（Sync-D 7.068, FVD 40.239），验证了显式布局对齐对唇同步和视频质量的关键作用。掩码预测器的开销极小（仅增加 56M 参数，每额外参考图像增加约 0.4 秒推理时间），但带来了显著的性能提升。
 
-## 核心模块与公式推导
+
 
 ### 整体架构
 
@@ -224,7 +228,9 @@ $$\mathbf{h}^v \gets \mathbf{h}^v + m_i \odot \mathbf{p}_i + (1 - m_i) \odot \ma
 
 掩码预测器仅增加约56M参数（相对于7B的DiT主干），每个额外参考图像在每DiT块上仅增加约0.013秒推理时间。完整模型在3个参考图像下的总推理时间为8.9秒（Table 5），表明该模块在几乎不牺牲效率的前提下实现了显著的性能增益。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 
@@ -302,7 +308,9 @@ InterActHuman 在音频驱动的多人物动画和多概念视频定制两项核
 *Table 8: Qualitative capability comparison. ✓: supported; x: not supported*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位与核心瓶颈
 
@@ -369,6 +377,8 @@ InterActHuman 直接对标的是**OmniHuman**（Lin et al., 2025a），后者代
 - **隐式方法的潜在超越**：当前显式掩码方案在可控性上占优，但隐式匹配方案（如更强的注意力机制或可学习的空间绑定）是否可能在未来以更低的计算开销达到同等或更优的性能？
 
 - **跨模态布局绑定**：布局条件机制是否可以扩展到其他模态？例如将文本描述绑定到特定空间区域，实现更精细的文本引导视频生成。
+
+
 
 ## 原文 PDF
 

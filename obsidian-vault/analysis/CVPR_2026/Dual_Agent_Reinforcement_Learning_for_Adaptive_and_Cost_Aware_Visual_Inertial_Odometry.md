@@ -43,7 +43,7 @@ claims:
 > - TUM-VI (avg) 上，RMSE ATE (m) 0.80 vs DM-VIO 0.77 (+0.03)。
 > - EuRoC MAV (GPU methods) 上，Throughput (FPS) 39 vs DPVO ~22 (1.77× speedup) (+17)。
 
-## 概述
+## 概要
 
 视觉-惯性里程计（VIO）是机器人自主导航的核心技术，但其精度与计算效率之间长期存在难以调和的矛盾。传统紧耦合VIO系统依赖计算密集的视觉-惯性束调整（VIBA），在资源受限平台上难以实时运行，构成了本文的核心瓶颈。
 
@@ -55,7 +55,7 @@ claims:
 
 **方法定位**：该方法在方法谱系上属于**学习型调度与融合**范式，区别于传统filter-based（如MSCKF、ROVIO）、optimization-based（如OKVIS、VINS-MONO、DM-VIO、ORB-SLAM3）以及纯学习型VO/VIO（如DPVO、DROID-VO、iSLAM）方法。其独特之处在于将RL引入VIO的计算调度与自适应融合环节，而非替代核心状态估计器，从而在保持精度的同时显著降低计算开销。
 
-## 背景与动机
+
 
 视觉-惯性里程计（VIO）是机器人导航与增强现实的核心模块，通过融合相机与惯性测量单元（IMU）数据实现高精度位姿估计。然而，现代VIO系统面临一个根本性瓶颈：**视觉-惯性束调整（VIBA）的高计算开销**。传统框架中，视觉前端与惯性融合被紧密耦合为单一的VIBA优化块（Figure 1a），这导致在资源受限平台上难以实时运行，迫使系统在精度与效率之间做出艰难取舍。
 
@@ -65,7 +65,9 @@ claims:
 
 为此，本文提出**双智能体强化学习VIO框架**（Figure 1b）：一个**选择智能体**基于高频IMU信号预先决定是否激活VO流水线，从源头规避冗余计算；一个**融合智能体**学习上下文依赖的融合策略，自适应地权衡IMU预测与VO观测。通过轻量级RL策略，系统能够在精度、吞吐量与显存之间实现更优的帕累托前沿——在统一评估中达到最佳平均ATE，同时速度提升最高1.77倍且GPU显存占用更低。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈与因果抓手
 
@@ -126,7 +128,7 @@ $$r_k = -\|\mathbf{p}_k - \mathbf{p}_{gt}\|_2^2 - \lambda \mathrm{Tr}(\boldsymbo
 - **精度-效率-内存的全面权衡优势**：在统一GPU评估中，所提方法达到最佳平均ATE，速度比DPVO快1.77倍（39 FPS vs ~22 FPS），且GPU显存占用比DROID-VO降低45.2%（4.37 GB vs 7.98 GB）（Table 4），置信度0.98。
 - **组件互补性验证**：消融实验（Table 9）表明，移除IMU偏差编码器导致ATE大幅上升（EuRoC: 0.092→0.279），移除选择智能体则主要降低效率（FPS从39降至21），验证了各组件的互补作用，置信度0.98。
 
-## 整体框架
+
 
 本文提出的双智能体强化学习VIO框架将传统紧耦合的视觉-惯性束调整（VIBA）解耦为四个独立模块，从根本上缓解了VIBA在资源受限平台上难以实时运行的瓶颈。如 **Figure 1** 所示，传统框架依赖单一、计算昂贵的VIBA块，而本框架通过引入两个轻量级RL智能体——选择智能体和融合智能体——实现了计算资源与精度的灵活权衡。
 
@@ -149,7 +151,7 @@ $$r_k = -\|\mathbf{p}_k - \mathbf{p}_{gt}\|_2^2 - \lambda \mathrm{Tr}(\boldsymbo
 
 **输入输出流**：系统以原始IMU测量（角速度、加速度）和相机图像为输入。IMU数据经偏差校正和预积分后，同时供给选择智能体（用于调度决策）和融合智能体（用于状态传播）。当选择智能体激活VO模块时，图像帧经视觉前端处理后输出VO位姿和置信度，送入融合智能体与IMU预测进行自适应融合，最终输出全局一致的位姿估计。这一解耦设计使视觉前端的计算开销与融合策略相互独立，实现了精度-效率-内存的灵活权衡。
 
-## 核心模块与公式推导
+
 
 ### 系统架构总览
 
@@ -248,7 +250,9 @@ $$\mathbf{R}_{c_k}^w \mathbf{p}_{vo}^{(k,k+1)} s - \Delta t_k \mathbf{I} \mathbf
 ![[assets/figures/papers/paper_list_l2715_https_arxiv_org_abs_2511_21083/figures/010_Figure_6.jpg]]
 *Figure 6: Ablation study for the Select Agent (a) ATE vs. skip ratio comparing our IMU-only prior scheduling, fixed skipping, heuristic gating, and the RL-gating(KF) baseline (b) Throughput under a 50% skip target: IMU-only prior scheduling attains higher FPS than RL-gating(KF) with only a marginal ATE increase*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与实验设计逻辑
 
@@ -363,7 +367,9 @@ RL融合策略显著优于传统融合方法，验证了学习自适应权重的
 ![[assets/figures/papers/paper_list_l2715_https_arxiv_org_abs_2511_21083/figures/012_Table_6.jpg]]
 *Table 6: Robustness to visual degradations on EuRoC MH 04. 5% / 10% of images are replaced by blurred, noise-corrupted versions*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从紧耦合优化到解耦智能调度
 
@@ -407,6 +413,8 @@ RL融合策略显著优于传统融合方法，验证了学习自适应权重的
 4. **主动失效恢复**：能否设计能够检测VO退化（如模糊、弱纹理）并主动触发重初始化或回退到纯惯性模式的智能体？
 5. **长时序上下文建模**：引入更长时序的上下文信息到置信度估计中，以进一步减少漂移的潜力。
 6. **IMU驱动的VO重初始化**：建立反馈机制，在长时间缺失视觉时利用累积的IMU状态重新初始化VO后端，形成闭环恢复。
+
+
 
 ## 原文 PDF
 

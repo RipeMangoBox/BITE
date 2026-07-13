@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/MAD_Logic_Multi_Agent_Debate_Enhances_Symbolic_Translation_and_Reasoning.pdf
+project_link: null
+code_link: null
 openreview_forum_id: rdE9qxGfIv
 aliases:
 - ML
@@ -42,7 +44,7 @@ claims:
 > - ProofWriter (GPT-4) 上，Accuracy (%) 为 92.00，对比 90.83 (CortexDebate)，变化 +1.17。
 > - LogicalDeduction (GPT-4) 上，Accuracy (%) 为 94.33，对比 92.33 (CortexDebate)，变化 +2.00。
 
-## 概述
+## 概要
 
 逻辑推理要求将自然语言（NL）问题翻译为符号语言（SL）并执行严格推理，但单一符号语言的翻译过程存在信息损失与错误，符号求解器对翻译误差高度敏感，而纯自然语言推理又易产生幻觉。单智能体方法难以同时兼顾强逻辑推理与鲁棒性。
 
@@ -52,7 +54,7 @@ claims:
 
 在方法谱系上，MAD‑Logic 区别于仅依赖单一符号翻译或纯 LLM 推理的基线（如 LogicLM、SymbCOT），也不同于全连接固定通信的多智能体辩论（如 CortexDebate），其关键改进在于：多 SL 并行翻译与辩论修正、符号求解器与 NL 推理的跨范式协作，以及基于偏好分数的动态通信剪枝。
 
-## 背景与动机
+
 
 逻辑推理是大型语言模型（LLM）的核心能力之一，涉及从给定前提中推导出有效结论。当前主流方法可大致分为两类：一类依赖自然语言（NL）推理，如思维链（Chain-of-Thought, CoT）和规划求解（Plan-and-Solve），其优势在于灵活性和语义理解，但容易产生幻觉，难以保证推理的严谨性；另一类则借助符号语言（Symbolic Language, SL），如逻辑编程（LP）、一阶逻辑（FOL）和可满足性模理论（SAT），将问题翻译为形式化表达后交由符号求解器（如Pyke、Prover9、Z3）进行精确推导。然而，符号方法面临一个关键瓶颈：**单一符号语言的翻译过程存在信息损失与错误，且符号求解器对翻译误差极为敏感**，一旦翻译有误，求解器可能返回错误结果或根本无法执行。
 
@@ -60,7 +62,9 @@ claims:
 
 针对上述问题，MAD-Logic提出了一个**多智能体辩论框架**，其核心动机在于：通过融合多种符号语言与自然语言推理的互补优势，实现翻译与推理的相互修正，从而突破单一方法的性能上限。具体而言，该框架在翻译阶段将自然语言问题并行翻译为LP、FOL和SAT三种符号表达，并通过多智能体辩论相互纠错；在推理阶段，同时引入符号求解器与自然语言推理智能体（CoT、Plan-and-Solve），使其在辩论中协作达成共识。此外，为了缓解多智能体交互带来的计算开销，框架还引入了一种基于置信度与信息增益的**自适应稀疏通信策略**，在降低令牌消耗的同时滤除冗余交互噪声，进一步提升推理准确率。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MAD‑Logic 的核心创新在于通过**多智能体辩论**与**自适应稀疏通信**两个机制，系统性地解决了逻辑推理任务中“单一符号语言翻译的信息损失”与“自然语言推理的幻觉风险”之间的根本矛盾。与现有工作相比，该方法在三个关键维度上实现了突破。
 
@@ -90,7 +94,7 @@ $$O_{ij}^{d} = \begin{cases} 1, & \mathrm{Pre}_{ij}^{d} \geq \alpha \cdot \overl
 
 综上，MAD‑Logic 的三个创新点构成了一条完整的因果链：多符号翻译降低翻译错误率 → 跨范式推理提供互补的推理能力 → 稀疏通信在控制成本的同时滤除交互噪声，三者协同实现了逻辑推理准确率的显著提升。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l34_https_openreview_net_forum_id_rdE9qxGfIv/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of our sparse multi-agent debate framework for logical reasoning*
@@ -131,7 +135,7 @@ MAD-Logic 将逻辑推理分解为两个顺序辩论阶段，并在阶段间引�
 
 管线中两个辩论阶段共享相同的稀疏通信机制，但独立执行——翻译辩论先收敛，其输出再作为符号求解器的输入进入推理辩论。这种解耦设计使得翻译质量与推理质量的提升可分别归因与优化。
 
-## 核心模块与公式推导
+
 
 ### 方法总览
 
@@ -209,7 +213,9 @@ $$
 
 该指标度量所有智能体在子集 $S$ 中犯相同错误的比例。在 ProofWriter 上，三个符号翻译智能体的 $\mathrm{T\text{-}CER}_3$ 仅为 0.33%（GPT‑4），说明三者极少同时出错，验证了翻译多样性的互补优势（Table 8）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -280,7 +286,9 @@ MAD-Logic 瞄准的逻辑推理瓶颈在于：单一符号语言（SL）翻译�
 *Figure 3: Effect of communication gating threshold on accuracy and token saving rate on GPT-4*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与设计动机
 
@@ -317,6 +325,8 @@ MAD-Logic 处于神经符号推理与多智能体协作的交叉地带。其方�
 4. **符号语言扩展。** 能否将更多种类的符号语言（如时序逻辑、描述逻辑）或神经符号方法集成到辩论框架中？当前仅覆盖 LP、FOL、SAT 三种范式，更丰富的符号表示可能捕获不同类型的推理结构。
 
 5. **开源部署可行性。** 在保持推理质量的前提下，如何进一步降低对闭源 LLM（如 GPT-4）的依赖？Table 3 显示，使用 Qwen2.5-7B-Instruct 时性能显著低于 GPT-4，但稀疏通信仍带来增益，提示小模型部署是可行但需进一步优化的方向。
+
+
 
 ## 原文 PDF
 

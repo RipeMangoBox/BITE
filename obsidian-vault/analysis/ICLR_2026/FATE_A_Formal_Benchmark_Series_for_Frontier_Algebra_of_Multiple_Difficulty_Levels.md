@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/FATE_A_Formal_Benchmark_Series_for_Frontier_Algebra_of_Multiple_Difficulty_Levels.pdf
+project_link: null
+code_link: https://github.com/frenzymath/FATE-Eval
 aliases:
 - FATE
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | FATE：面向前沿代数的多重难度形式化定理评估基准系列 |
 | 英文题名 | FATE: A Formal Benchmark Series for Frontier Algebra of Multiple Difficulty Levels |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=3bD19r4jqh); [GitHub](https://github.com/frenzymath/FATE-Eval) |
+| Links | [paper](https://openreview.net/forum?id=3bD19r4jqh) · [GitHub](https://github.com/frenzymath/FATE-Eval) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/language_speech_dialog |
 | Method | FATE基准系列及双阶段解耦评估框架 |
 | Dataset | FATE系列（FATE-M, H, X）, FATE-H 和 FATE-X, FATE-H |
@@ -40,7 +42,7 @@ claims:
 > - FATE-H 和 FATE-X 上，自然语言通过率(pass@1) vs 形式化通过率(pass@64) 为 DeepSeek-R1: FATE-H NL 71.0%, FL 0.0%; FATE-X NL 33.0%, FL 0.0%，对比 专用证明器（如DeepSeek-Prover-V2）: FATE-H NL 39.0%, FL 3.0%，变化 自然语言远优于形式化，差距超过70个百分点。
 > - FATE-H 上，形式化错误频率 为 Mathlib幻觉 (35/39, 70/71) 和Lean熟练度问题 (36/39, 70/71) 最为常见；逻辑失配极低 (3/39, 0/71)，对比 通用能力问题（头文件、其他）频率中等，变化 N/A（分类对比）。
 
-## 概述
+## 概要
 
 随着大语言模型在数学推理领域的快速进步，形式化定理证明成为衡量其严格推理能力的关键标尺。现有基准（如 miniF2F）多集中于本科难度及单一领域，缺乏对高阶抽象代数推理的覆盖，且仅评估最终形式化证明的正确性，无法揭示从自然语言推理到形式化代码的转换瓶颈。为此，本文提出 **FATE（Frontier Algebra Theorem Evaluation）** 基准系列，包含三个难度递增的子集：**FATE‑M**（中等本科水平）、**FATE‑H**（荣誉课程/研究生水平）和 **FATE‑X**（博士资格考试/研究前沿水平），覆盖抽象代数与交换代数，旨在系统评估前沿大模型的代数推理与形式化证明能力。
 
@@ -52,7 +54,7 @@ claims:
 
 主要实验结果显示，所有模型在 **FATE‑M** 上可取得可观性能（最高 pass@64 准确率 62.7%），但在 **FATE‑H** 上骤降至 3%，在 **FATE‑X** 上全面归零，呈现出清晰的“性能悬崖”。消融实验进一步证实，当隐去形式化要求、仅测试纯数学提示下的自然语言能力时，模型准确率明显回升（FATE‑X 上从 33% 升至 43%），确证了“形式化负担”对推理性能的干扰。总体而言，FATE 基准不仅为代数领域的机械化定理证明提供了严峻的测试平台，更通过解耦评估指明了未来的关键突破口：如何在利用形式化验证精确奖励的同时，培育有效反思的元推理能力，实现从自然语言到形式代码的精准对齐。
 
-## 背景与动机
+
 
 大型语言模型在数学推理任务上取得了显著进展，推动自动定理证明（ATP）向更深层次的数学领域渗透。主流范式要求模型生成形式化证明代码（如Lean），由交互式定理证明器对代码的正确性进行内核级验证，从而杜绝“看似合理但实际错误”的证明。然而，从自然语言数学推理到形式化代码的翻译过程构成了核心瓶颈：即使自然语言证明逻辑正确，模型仍普遍无法将其准确转化为Lean代码。错误模式高度集中于两类——**Mathlib幻觉**（对标准数学库中已有定理、引理的名称或类型签名产生错误记忆）与**Lean熟练度不足**（对语言语法、类型系统的掌握不够），而逻辑失配（即形式化证明偏离了自然语言推理的语义）却极为罕见（Table 3）。这表明，当前模型的形式化能力远落后于其自然语言数学推理能力，且该脱节并未因模型规模的扩大而被弥合。
 
@@ -62,7 +64,9 @@ claims:
 
 进一步的模型对比则引出了另一深层动机——**有效反思**（effective reflection）的重要性。专用证明器（如DeepSeek-Prover-V2）虽具备丰富的形式化知识，在简单任务上的形式化成功率较高，但其自然语言推理能力远不及通用推理模型：在FATE-H上，DeepSeek-Prover-V2的自然语言准确率为39%，而DeepSeek-R1高达71%（Table 8），差距超过32个百分点。这说明专用模型缺失了在复杂推理过程中定位、诊断、评估并修复内部缺陷的元能力，即“有效反思”。因此，FATE基准不仅在问题难度上拓展了边界，更在评估粒度上为研究“如何培养懂得有效反思的形式化证明智能体”提供了重要工具。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 现有形式化定理证明评估将**自然语言数学推理**与**形式化代码生成**不加区分地混合，导致无法定位真正的性能瓶颈。FATE 系列的核心创新在于通过**双阶段解耦评估**揭示这一隐藏瓶颈，并在此基础上训练社区关注一种新的能力缺口：“有效反思”（effective reflection）。
 
@@ -82,7 +86,7 @@ claims:
 
 FATE 的创新不在于提供一个更大的数据集，而在于通过**诊断性指标设计**将形式化定理证明的难题重新表达为：如何在一个能够可靠验证的外部环境下，让模型同时保有高质量的元推理？这将研究议程从过去的“如何生成正确的 Lean 代码”拉向“**如何弥合从人类思维到形式化语言的鸿沟**”，并指出了两条可能的进路——训练中解耦自然语言与形式化任务、培养有效反思能力——尽管这些方向尚待严格检验。
 
-## 整体框架
+
 
 FATE基准系列由三个难度递进的子基准构成：FATE‑M（中级，本科层次代数习题）、FATE‑H（高级，荣誉课程/研究生水平）和FATE‑X（极限，博士资格考试/研究前沿内容）。FATE‑M沿用已有代数题目作为对照组；FATE‑H与FATE‑X则通过系统化流程从零构建，二者均聚焦于抽象代数与交换代数，强调基于抽象性质的证明而非方程求解或数值计算。整体工作可划分为**基准构建管线**与**双阶段解耦评估框架**两大部分，其核心思路是将自然语言数学推理与形式化Lean翻译显式分离，从而定位当前模型的形式化瓶颈并量化各环节的能力落差。
 
@@ -108,7 +112,7 @@ FATE基准系列由三个难度递进的子基准构成：FATE‑M（中级，�
 
 该管线与框架为FATE提供了严格的代数证明基准，并首次实现了自然语言推理与形式化翻译的细粒度解耦分析。后续关键实验结果——包括形式化准确率随难度断崖式下跌（表 1）、自然语言通过率远高于形式化通过率（表 2）、以及形式化错误主因并非逻辑失配而是Mathlib幻觉与Lean熟练度不足（表 3）——均直接建立在上述整体框架之上。
 
-## 核心模块与公式推导
+
 
 ### 基准构建流程
 
@@ -155,7 +159,9 @@ $$
 
 该估计量源自文献中经典的 Pass@k 无偏估计，在 FATE 附录（Section F.1.3）中予以明确定义。实验主体部分统一采用 $\mathrm{Pass@}64$ 报告形式化证明的最终成功率，以衡量模型在 64 次常规采样预算下的正确概率上限。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 1. 主结果：形式化性能悬崖
 
@@ -240,7 +246,9 @@ $$
 *Figure 1: (b) Intermediate natural language (Pass@1) vs. formal language (Pass@64) accuracy on FATE-H/X. Figure 1: Main experimental results. (a) Formalization accuracy drops sharply along the difficulty progression of FATE-M, FATE-H (≤ 3%), and FATE-X (0%). (b) A significant gap exists between intermediate natural language reasoning and final formal proof generation. Model abbreviations: ds-r1 (DeepSeek-R1), ds-p-v2 (DeepSeek-Prover-V2)*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 FATE基准系列填补了形式化定理证明评估中两个关键缺口：**难度跨度过窄**与**评估粒度过粗**。已有的主流基准（如miniF2F、ProofNet）大多将问题限制在本科水平，并且仅以最终的形式化证明正确性（如pass@k）作为唯一判据。这种做法无法揭示模型在“从自然语言推理到形式化代码翻译”这一核心环节上的能力断裂。FATE通过以下两个维度重新定义了评估格局：
 
@@ -280,6 +288,8 @@ FATE的结论适用域严格限制在以下范围：
 - **反思机制的可迁移性**：通用推理模型中的有效反思能力是否可通过跨域迁移或强化学习复现到专用证明器中？这直接决定了下一代证明器是以“大而全”通用模型为基础，还是继续深钻专用范畴。
 
 以上问题构成了FATE所开辟的评估空间中最具挑战性的部分，也指示了从本科习题到博士研究前沿之间尚待架设的方法桥梁。
+
+
 
 ## 原文 PDF
 

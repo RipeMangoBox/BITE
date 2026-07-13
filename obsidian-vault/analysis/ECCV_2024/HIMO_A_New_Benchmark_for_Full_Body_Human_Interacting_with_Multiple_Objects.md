@@ -5,6 +5,8 @@ paper_level: A
 venue: ECCV
 year: 2024
 pdf_ref: paperPDFs/ECCV_2024/HIMO_A_New_Benchmark_for_Full_Body_Human_Interacting_with_Multiple_Objects.pdf
+project_link: https://lvxintao.github.io/himo
+code_link: null
 aliases:
 - HGHS
 - HNBFBHIMO
@@ -41,7 +43,7 @@ claims:
 > - HIMO 2-objects partition 上，FID ↓ 1.4811 (HIMO-Gen) vs 6.8457 (MDM) (-5.3646)；R-Precision Top 3 ↑ 0.6404 (HIMO-SegGen) vs 0.6052 (MDM) (+0.0352)。
 > - HIMO 3-objects partition 上，R-Precision Top 3 ↑ 0.5350 (HIMO-Gen) vs 0.5025 (MDM) (+0.0325)；MM-Dist ↓ 5.0866 (HIMO-Gen) vs 6.3144 (MDM) (-1.2278)。
 
-## 概述
+## 概要
 
 现有的人-物交互（HOI）数据集与生成方法长期受限于单物体交互场景，缺乏面向多物体、多步骤协同操作的精细标注数据，导致模型难以合成时空协调的复杂交互序列。为此，本文提出了 **HIMO**，一个面向全身人体与多物体交互的大规模基准数据集，并基于此设计了双分支扩散生成框架 **HIMO-Gen** 及其自回归扩展 **HIMO-SegGen**。
 
@@ -49,7 +51,7 @@ HIMO 数据集包含 3,376 条 4D HOI 序列、9.44 小时与 4.08M 帧数据，
 
 实验表明，在 2 物体分区上，HIMO-Gen 的 FID 降至 1.4811，显著优于 MDM 的 6.8457；在 3 物体分区上，R-Precision Top 3 达到 0.5350，MM-Dist 降至 5.0866。消融研究证实，互注意模块与物体对损失对生成质量至关重要——移除互注意模块后，2 物体分区的 R-Precision Top 3 从 0.6369 骤降至 0.4710。该工作为多物体 HOI 合成建立了数据基础与生成范式，但当前仍局限于 MoCap 模态，对未见物体几何的泛化存在接触缺陷，且自回归过渡机制缺乏自适应策略。
 
-## 背景与动机
+
 
 ### 人-物交互生成：从单物体到多物体的范式跃迁
 
@@ -79,7 +81,9 @@ HIMO 数据集包含 3,376 条 4D HOI 序列、9.44 小时与 4.08M 帧数据，
 
 通过数据与方法的协同设计，HIMO基准为多物体HOI生成提供了标准化的评估平台，而HIMO-Gen/HIMO-SegGen框架则为这一新任务提供了具有竞争力的基线方案。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 HIMO 的核心创新围绕“多物体、长序列、全身交互”这一未被现有基准覆盖的生成难题展开，可归纳为三个相互耦合的 changed slots。
 
@@ -117,7 +121,7 @@ $$\mathcal{L} = \lambda_{vel} \mathcal{L}_{vel} + \lambda_{pos} \mathcal{L}_{pos
 
 上述三个 changed slots 并非孤立设计，而是形成了一条因果链：**双分支架构**提供了人-物解耦的表示空间，**互注意模块**保证了该空间中的信息对齐，**物体对损失**约束了多物体间的空间一致性，而**自回归流水线**则将这一框架从单步交互扩展到多步长序列。任一环节的缺失都会导致性能显著下降，这从消融实验中各模块独立移除后的指标退化幅度可以得到印证。
 
-## 整体框架
+
 
 HIMO-Gen 的整体生成框架围绕“解耦-融合-组合”三条主线构建，旨在从文本描述和初始状态出发，合成全身人体与多物体协调交互的 4D 运动序列。其核心设计动机源于一个关键瓶颈：单分支扩散模型难以同时捕捉人体运动与多物体运动的时空耦合关系，尤其在物体间存在功能关联（如“拿起杯子-倒水”）时，缺乏显式的物体间空间约束。
 
@@ -182,7 +186,7 @@ $$ \mathcal{L} = \lambda_{vel} \mathcal{L}_{vel} + \lambda_{pos} \mathcal{L}_{po
 
 **数据流**：文本经 CLIP 编码后作为全局条件注入两个分支；初始状态作为扩散模型的起点；双分支在去噪的每一步通过互注意模块交换信息；最终生成的参数序列可通过 SMPL-X 模型和物体网格渲染为可视化的 4D 交互序列（Fig. 6）。
 
-## 核心模块与公式推导
+
 
 ### 双分支扩散生成架构
 
@@ -253,7 +257,9 @@ $$
 ![[assets/figures/papers/paper_list_l1760_HIMO_A_New_Benchmark_for_Full_Body_Human_Interacting_with_Multiple_Objec/figures/006_Figure_5.jpg]]
 *Figure 5: The auto-regressive generation pipeline. The auto-regressive pipeline to iteratively generate the HOI synthesis results. We obtain the subsequent motion conditioned on the last few frames of the previously generated motion*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -320,7 +326,9 @@ $$
 ![[assets/figures/papers/paper_list_l1760_HIMO_A_New_Benchmark_for_Full_Body_Human_Interacting_with_Multiple_Objec/figures/017_Figure.jpg]]
 *Figure: Fig. F: Visualization results of HIMO-SegGen*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -363,6 +371,8 @@ HIMO-Gen 在 HOI 生成领域的知识谱系中占据以下位置：
 - **并行工作**：与同期关注 HOI 生成的工作（如 IMoS）相比，HIMO-Gen 的核心区分点在于**多物体协调**和**时序分割生成**，这两个维度在现有基准中均未被系统探索。
 
 - **下游推动**：HIMO 数据集本身填补了多物体交互标注数据的空白（3.3K 序列，含 2-3 物体，细粒度文本和时域分割），为后续研究提供了基准。HIMO-Gen 的双分支架构和自回归流水线可作为未来多体交互生成任务的基线框架。
+
+
 
 ## 原文 PDF
 

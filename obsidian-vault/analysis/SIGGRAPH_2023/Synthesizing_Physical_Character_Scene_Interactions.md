@@ -5,6 +5,7 @@ paper_level: A
 venue: SIGGRAPH
 year: 2023
 pdf_ref: paperPDFs/SIGGRAPH_2023/Synthesizing_Physical_Character_Scene_Interactions.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/toronto-ai/InterPhys/
 aliases:
 - SCA
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 合成物理角色-场景交互 |
 | 英文题名 | Synthesizing Physical Character-Scene Interactions |
 | 会议/期刊 | SIGGRAPH 2023 |
-| Links | [paper](https://arxiv.org/abs/2302.00883); [Project](https://research.nvidia.com/labs/toronto-ai/InterPhys/) |
+| Links | [paper](https://arxiv.org/abs/2302.00883) · [Project](https://research.nvidia.com/labs/toronto-ai/InterPhys/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Scene-Conditioned AMP |
 | Dataset | Sit (unseen objects, random init), Lie down (unseen objects, Carry (random object scales 0.5-1.5), Physical perturbations (projectiles and dynamic object movement) |
@@ -42,7 +43,7 @@ claims:
 > - Lie down (unseen objects, random init) 上，Success Rate (%) 为 80.0，对比 50.0 (SAMP)，变化 +30.0。
 > - Carry (random object scales 0.5-1.5) 上，Success Rate (%) 为 94.3，对比 -，变化 -。
 
-## 概述
+## 概要
 
 ### 问题背景与瓶颈
 
@@ -70,7 +71,7 @@ claims:
 
 此外，在面对物理扰动（如抛射物撞击和物体动态移动）时，三个任务的鲁棒性测试成功率分别达到 87.5%、82.0% 和 89.4%，展现了基于物理模拟方法的固有优势。消融实验进一步揭示，物体包围盒信息对动态交互任务（如搬运）至关重要，移除后搬运成功率直接降至 **0%**。
 
-## 背景与动机
+
 
 物理角色动画的核心挑战之一是让模拟角色在复杂场景中与物体产生自然、逼真的交互。近年来，基于物理的角色控制取得了显著进展，但现有方法主要侧重于在简单、同构环境中控制运动，难以处理需要角色与物体进行复杂交互的场景任务。
 
@@ -78,7 +79,9 @@ claims:
 
 本文的动机正是填补这一缺口：将场景上下文（物体位置、方向、尺寸）同时注入判别器和策略网络，使得判别器能够结合场景判断运动的逼真度，从而驱动策略学习对物体属性敏感的适应性交互行为。通过这种场景条件化的对抗模仿学习，方法能够从少量非结构化动捕数据中训练物理角色的场景交互策略，无需人工标注或动作规划；配合训练时的物体物理属性随机化，策略能够泛化到全新的物体形状、大小和场景配置。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心贡献在于提出了一种**场景条件化的对抗运动先验（Scene-Conditioned AMP）**框架，将物理角色动画从孤立运动控制推进到角色-场景交互的层次。其关键创新并非引入全新的学习范式，而是通过**因果性地改造标准AMP框架中的信息流**，使策略网络和判别器网络同时感知场景上下文，从而驱动角色产生对物体属性敏感的适应性交互行为。
 
@@ -122,7 +125,7 @@ claims:
 
 需要注意的是，方法目前**按任务独立训练**，尚未实现多任务统一策略，这是当前方法边界的一个明确限制。
 
-## 整体框架
+
 
 本文提出的方法在**对抗运动先验（AMP）** 框架的基础上，将其扩展至角色-场景交互任务。整体系统由两个核心组件构成：**策略网络**与**判别器网络**，二者协同工作，使物理模拟角色能够在场景上下文中生成自然且任务有效的运动。
 
@@ -150,7 +153,7 @@ claims:
 ![[assets/figures/papers/paper_list_l43_https_arxiv_org_abs_2302_00883/figures/001_Figure_1.jpg]]
 *Figure 1: Our framework enables physically simulated characters to perform scene interaction tasks in a natural and life-like manner. We demonstrate the effectiveness of our approach through three challenging scene interaction tasks: carrying, sitting, and lying down, which require coordination of a character’s movements in relation to objects in the environment*
 
-## 核心模块与公式推导
+
 
 ### 框架总览
 
@@ -192,7 +195,9 @@ $$J(\pi) = \mathbb{E}_{\hat{p}(\tau \mid \pi)} \left[ \sum_{t=0}^{T-1} \gamma^t 
 
 其中 $\gamma$ 为折扣因子，$\hat{p}(\tau \mid \pi)$ 为策略 $\pi$ 诱导的轨迹分布。训练时通过 PPO 算法优化该目标，同时每回合对物体位置、方向、缩放以及物理属性（如重量）进行随机化，使策略能够泛化到训练数据中未出现的物体和场景配置。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 本文在三个具有代表性的物理角色-场景交互任务上系统评估了所提出的 **Scene-Conditioned AMP** 方法：**坐（Sit）**、**躺下（Lie down）** 和 **携带箱子（Carry）**。评估围绕基本性能、泛化能力、物理鲁棒性、与先前方法的对比以及消融实验展开。
 
@@ -292,7 +297,9 @@ Table 1 汇总了三个任务在标准条件下的性能统计（每任务 4096 
 ![[assets/figures/papers/paper_list_l43_https_arxiv_org_abs_2302_00883/figures/014_Table.jpg]]
 *Table: S.1. Bounding box ablation. Success rate, average execution time, and average precision for all tasks*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 **核心继承与关键改造。** 本方法（Scene-Conditioned AMP）直接构建在对抗运动先验（Adversarial Motion Prior, AMP）框架之上，但针对“物理角色-场景交互”这一特定瓶颈进行了系统性改造。传统AMP的判别器仅以角色运动状态 $(s_t, s_{t+1})$ 为输入，评估运动本身的逼真度，这使其天然局限于简单、同构的环境。本文的核心改造在于将场景上下文同时注入判别器与策略网络：判别器联合考察角色运动与物体特征（位置、方向等），从而评估“在给定场景下运动的逼真度”；策略网络的状态表示则显式包含物体在角色局部坐标系下的相对位置与方向。这一改造使得对抗模仿学习从“学一个好看的动作”升级为“学一个在场景中合理且有效的交互动作”，是方法能够从少量非结构化动捕数据中涌现场景适应性的因果开关。
 
@@ -303,6 +310,8 @@ Table 1 汇总了三个任务在标准条件下的性能统计（每任务 4096 
 **适用边界与局限。** 本方法的有效边界由以下几个因素共同界定：（1）**任务独立性**——当前为每个任务（坐、躺下、携带）单独训练策略，尚未实现多任务统一。这意味着策略之间无法共享运动基元，扩展到新任务需要从头训练并设计新的任务奖励函数 $r^G$。（2）**数据依赖性**——策略的表现受限于参考运动数据的多样性。对于数据中未出现的交互风格（如将箱子举过头顶），策略无法自然生成，因为判别器缺乏相应的“真实”参考来引导风格奖励。（3）**物理建模精度**——模拟环境未考虑手部抓握动力学，物体通过接触力操控可能不够稳定，这与真实世界中精细操作行为存在差距。此外，包围盒信息的消融实验（Table S.1）显示，移除物体包围盒尺寸后携带任务成功率骤降至0%，表明策略对物体几何信息的依赖极为敏感，在遮挡或感知噪声较大的实际部署场景中可能成为脆弱点。
 
 **开放问题与前沿连接。** 本文留出的开放问题指向以下几个活跃研究方向：（1）**多任务统一策略**——如何使单一策略执行多种场景交互任务，这需要解决不同任务奖励之间的冲突与运动基元的共享机制。（2）**视觉感知集成**——当前框架依赖物体状态的精确观测，如何结合视觉输入使角色在复杂3D环境中自主感知并交互，是通向真实世界部署的关键一步。（3）**无标注视频学习**——能否摆脱对动捕数据的依赖，直接从无标注视频中学习场景交互策略，这涉及从视觉观测中同时推断运动、物理属性与任务意图的挑战。（4）**精细操作**——更自然的抓握和操控行为需要更精细的手部模型与力控策略，这要求模拟器精度与策略学习算法的同步升级。这些问题共同构成了从“受控场景中的物理交互”走向“开放环境中的通用物理交互”的技术阶梯。
+
+
 
 ## 原文 PDF
 

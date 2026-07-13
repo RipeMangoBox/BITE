@@ -41,7 +41,7 @@ claims:
 > - KITTI (monocular, Mean) 上，Accuracy ↓ 0.901 vs 1.489 (VGGT) (-0.588)。
 > - Waymo (Mean) 上，Accuracy ↓ 4.021 vs 4.635 (VGGT) (-0.614)。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -71,7 +71,7 @@ DynamicVGGT 针对上述瓶颈，提出了一套统一的前馈四维重建框�
 
 DynamicVGGT 依赖冻结的 VGGT 骨干，可能限制端到端适应新场景的能力；常速度运动假设仅适用于短时序片段；真实数据中的稀疏 LiDAR 噪声虽经深度蒸馏缓解，仍会导致一定的性能退化。这些局限为后续研究指明了方向：更灵活的动态运动模型、更鲁棒的真实数据训练策略，以及骨干网络的自适应解冻机制。
 
-## 背景与动机
+
 
 自动驾驶系统对环境的精确感知是安全决策的基础。近年来，前馈3D重建方法取得了显著进展，其中**VGGT**（Wang et al., CVPR 2025）通过交替注意力机制在静态场景中实现了高质量的多视图几何重建。然而，真实驾驶场景本质上是动态的——车辆、行人等运动物体持续改变其空间位置，形成了静态几何向动态4D理解的关键缺口。
 
@@ -79,7 +79,9 @@ DynamicVGGT 依赖冻结的 VGGT 骨干，可能限制端到端适应新场景�
 
 DynamicVGGT正是针对这一瓶颈而提出。其核心动机在于回答一个关键问题：**能否在不依赖显式相机外参对齐的前提下，让前馈模型直接学习动态场景的几何与运动？** 为此，该方法引入统一的动态点图（Dynamic Point Maps, DPM）表示，在共享规范坐标系中联合预测当前与未来点图，使模型通过时序对应隐式学习动态表征。同时，通过运动感知时间注意力（MTA）模块和动态3D高斯泼溅头（DGSHead），模型得以显式建模帧间运动信息，从而突破从静态几何到动态运动的因果屏障。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DynamicVGGT 的核心创新在于将前馈式静态 3D 重建模型 **VGGT**（Wang et al., CVPR 2025）扩展为面向自动驾驶场景的动态 4D 重建框架，其关键突破体现在以下四个“changed slots”上。
 
@@ -131,7 +133,7 @@ $$\mathcal{L}_{\mathrm{distill}} = \|D_{g,v,t} - \mathrm{sg}(D_{v,t}^{\mathrm{pm
 
 上述四个 changed slots 形成了一条清晰的因果链：**MTA 模块**提供时序特征基础 → **FPH** 实现隐式运动学习 → **DGSHead** 细化显式动态几何 → **深度蒸馏** 保障真实数据训练稳定性。消融实验（Table 4）验证了这一链路：从 VGGT 基线出发，添加时序注意力和未来点预测头将 KITTI 精度从 1.489 降至 0.927，完整性从 0.690 降至 0.600；引入 DGSHead 后精度进一步提升至 0.901，法向一致性提升至 0.939。
 
-## 整体框架
+
 
 DynamicVGGT 的整体管线围绕**动态点图（Dynamic Point Map, DPM）** 这一统一几何表示展开，将静态多视图三维感知扩展为端到端的前馈四维重建，无需显式相机外参对齐或稠密场景标注。其核心设计遵循一条清晰的因果链：**共享坐标系的点图对 → 运动感知时间注意力 → 隐式/显式运动联合建模 → 动态高斯渲染**。
 
@@ -171,7 +173,7 @@ DynamicVGGT 的整体管线围绕**动态点图（Dynamic Point Map, DPM）** �
 ![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2603_08254/figures/001_Figure_1.jpg]]
 *Figure 1: DynamicVGGT extends static multi-view 3D perception to dynamic 4D reconstruction by enabling 3D Gaussian rendering and adaptively modeling motion across multiple temporal scales without explicit camera extrinsic alignment*
 
-## 核心模块与公式推导
+
 
 DynamicVGGT 的核心架构由四个关键模块构成，其设计围绕一个统一的动态点图（Dynamic Point Map, DPM）表示展开。整体框架如图 Figure 2 所示：给定多视图图像序列，模型首先通过冻结的 DINOv2 骨干网络提取各视图的 Patch Token 和 Camera Token，同时初始化可学习的 Motion Token 以编码时序先验。随后，空间交替注意力（AA）模块与运动感知时间注意力（MTA）模块并行处理这些 Token，分别建模帧内几何与帧间运动。最后，时序增强特征 $TA$ 分别送入未来点预测头（FPH）和动态 3D 高斯泼溅头（DGSHead），完成隐式与显式的动态建模。
 
@@ -248,7 +250,9 @@ $$\mathcal{L}_{\mathrm{distill}} = \|D_{g,v,t} - \mathrm{sg}(D_{v,t}^{\mathrm{pm
 ![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2603_08254/figures/003_Figure_3.jpg]]
 *Figure 3: Dynamic task formulation. We formulate dynamic point maps by designing two complementary tasks that model point-wise motion over time. The Future Point Head learns implicit motion through inter-frame point consistency, while the Dynamic 3D Gaussian Splatting Head provides explicit motion supervision via scene flow to refine dynamic geometry*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 点图重建主结果
 
@@ -299,7 +303,9 @@ Table 4的系统消融揭示了各组件的因果贡献。以VGGT为起点，�
 ![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2603_08254/figures/008_Table_3.jpg]]
 *Table 3: Monocular and MVS depth estimation*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 基线关系与差异化定位
 
@@ -336,6 +342,8 @@ DynamicVGGT 的设计假设和训练策略决定了其适用范围存在明确�
 **动态与静态的联合优化平衡。** DynamicVGGT 通过未来点预测头学习隐式运动，通过 DGSHead 学习显式运动，两者共享时间增强特征 $TA_{v,t}$。然而，静态区域和动态区域对时间注意力的需求可能存在冲突——静态区域需要抑制时间扰动以保持几何一致性，动态区域则需要增强时间敏感度以捕捉运动细节。当前设计未显式区分动静区域，如何在特征层面实现动静解耦是值得深入研究的开放问题。
 
 **计算效率与实时性。** 论文未报告推理延迟或计算开销数据。考虑到方法在 VGGT 基础上增加了 MTA 模块、DGSHead 和未来点预测头，且涉及两阶段训练流程，其实时部署的可行性需要进一步验证。对于自动驾驶等对延迟敏感的应用，模型轻量化或推理加速是必要的后续工作。
+
+
 
 ## 原文 PDF
 

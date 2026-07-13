@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/All_Code_No_Thought_Language_Models_Struggle_to_Reason_in_Ciphered_Language.pdf
+project_link: null
+code_link: https://github.com/safety-research/ciphered-reasoning-llms
 openreview_forum_id: yjFkeQ2ynQ
 aliases:
 - ACNT
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 全是代码，没有思考：语言模型在加密语言中推理困难 |
 | 英文题名 | All Code, No Thought: Language Models Struggle to Reason in Ciphered Language |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=yjFkeQ2ynQ); [GitHub](https://github.com/safety-research/ciphered-reasoning-llms) |
+| Links | [paper](https://openreview.net/forum?id=yjFkeQ2ynQ) · [GitHub](https://github.com/safety-research/ciphered-reasoning-llms) |
 | Topic | #topic/representation_self_supervised_transfer #topic/representation_self_supervised_transfer/transfer_multitask_and_meta_learning |
 | Method |  |
 | Dataset | MATH 500 |
@@ -42,7 +44,7 @@ claims:
 > - MATH 500 上，relative accuracy (proportion of identity) 为 ~0.28，对比 1.0，变化 -0.72。
 > - MATH 500 上，relative accuracy (proportion of identity) 为 >0.90，对比 1.0，变化 < -0.10。
 
-## 概述
+## 概要
 
 本文研究了一个对AI安全监控具有潜在威胁的现象：语言模型在加密语言中的推理能力。核心发现是，尽管模型能够准确地将加密文本翻译回英语，但在加密文本上进行数学推理时，其准确率会大幅下降——这一“理解”与“推理”之间的不对称性，揭示了当前模型推理能力对训练数据分布的深度依赖，而非真正的抽象推理能力。
 
@@ -60,7 +62,7 @@ claims:
 
 **局限性**：研究未探索故意最小化可读性的专用对抗加密，也未在RL训练中观察可能自然涌现的加密行为。对加密推理能力下降的内部机制理解仍不充分，缺乏量化加密文本与自然英语偏离程度的统一指标。
 
-## 背景与动机
+
 
 ### 问题背景：加密思维链与AI监管的潜在冲突
 
@@ -92,7 +94,9 @@ claims:
 
 通过回答这些问题，本研究旨在为AI安全社区提供一个关于加密思维链威胁的实证基础，并揭示当前模型推理能力的根本局限。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心贡献不在于提出新的模型架构或训练算法，而在于通过系统性的实验设计，揭示并量化了当前大语言模型在推理能力上的一个根本性局限：**模型在加密语言中执行数学推理的能力严重依赖于预训练数据中该加密模式的显式出现频率，而非一种通用的、可迁移的抽象推理能力。**
 
@@ -122,7 +126,7 @@ claims:
 
 与传统的数学推理或对抗鲁棒性研究不同，本文并未试图提升模型的推理性能，而是将加密作为一种可控的“探针”，来测试模型推理能力的本质。其基线方法（Identity和Direct Answering）仅作为明文和无推理链的对照，核心贡献在于揭示了**推理能力对数据分布的表层依赖性**，而非提出新的改进方法。这一发现对AI安全监控具有直接启示：当前模型尚无法通过自发形成对抗性加密来规避监控，但其能力瓶颈的根源——预训练数据分布——也为未来可能的风险指明了方向。
 
-## 整体框架
+
 
 本工作构建了一套系统性的加密推理能力评估流水线，旨在量化语言模型在加密文本上进行数学推理时的能力衰减。流水线的核心逻辑是：将标准数学推理问题转换为加密形式，要求模型在加密语言中完成推理并给出答案，同时测量其推理准确率与翻译能力之间的不对称性。
 
@@ -140,7 +144,7 @@ claims:
 
 该流水线的核心设计意图在于揭示一个关键不对称性：模型能够准确翻译加密文本（高BLEU分数），但在同一加密文本上的推理准确率却大幅下降。这一发现贯穿所有实验设置，构成了本文的核心论点——模型的理解能力与推理执行能力之间存在显著鸿沟。
 
-## 核心模块与公式推导
+
 
 ### 实验流程模块
 
@@ -194,7 +198,9 @@ $$
   - $1_{\text{BoxedAnswerFormat}}$：指示最终答案是否以正确格式（如 `\boxed{}`）给出的函数。
   - 奖励机制：当模型输出遵循加密时，给予正确答案和格式的正奖励；当模型未遵循加密时，则给予等额的负奖励，以此惩罚“投机取巧”行为。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：加密推理能力的系统性崩溃
 
@@ -275,7 +281,9 @@ Figure 4展示了零样本通用提示下监控模型解密加密文本的能力
 *Table 7: See Table 7 for a detailed breakdown of accuracy & adherence for every fine-tuned model and cipher we evaluate*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 研究定位与基线关系
 
@@ -340,6 +348,8 @@ Figure 4展示了零样本通用提示下监控模型解密加密文本的能力
 ### 在知识库中的定位
 
 本文处于**AI安全监控脆弱性**与**语言模型推理鲁棒性**的交叉节点。与此前关于思维链监控（CoT monitoring）的工作不同，本文首次系统性地量化了加密思维链对监控的潜在威胁程度，同时揭示了当前模型在这一威胁面前的“意外脆弱性”——它们无法在加密语言中有效推理，但这一能力可以通过数据注入被“解锁”。这一发现对AI安全策略设计具有直接的政策含义：依赖思维链透明度的监控方案，必须考虑加密推理能力的潜在风险与数据管控策略。
+
+
 
 ## 原文 PDF
 

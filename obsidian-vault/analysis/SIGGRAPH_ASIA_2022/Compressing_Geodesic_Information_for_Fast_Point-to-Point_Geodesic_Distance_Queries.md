@@ -33,7 +33,7 @@ claims:
 | 中文题名 | 实时共形映射与参数化 |
 | 英文题名 | Compressing Geodesic Information for Fast Point-to-Point Geodesic Distance Queries |
 | 会议/期刊 | SIGGRAPH ASIA 2022 |
-| Links | [paper](https://www.inf.usi.ch/hormann/pub_topic.html) · [Code](https://github.com/) · [arXiv](http://arxiv.org/abs/2210.09125) |
+| Links | [paper](https://www.inf.usi.ch/hormann/pub_topic.html) · [Code](https://github.com/) · [paper](http://arxiv.org/abs/2210.09125) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Harmonic Measure Matching (Proposed method) |
 | Dataset | V-shape domain to blob domain, Cow head mesh to disk, Maple leaf to cinquefoil |

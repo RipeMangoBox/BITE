@@ -32,7 +32,7 @@ claims:
 | 中文题名 | Mesh4D：从单目视频进行4D网格重建与跟踪 |
 | 英文题名 | Mesh4D: 4D Mesh Reconstruction and Tracking from Monocular Video |
 | 会议/期刊 | CVPR 2026 |
-| Links | [paper](https://arxiv.org/abs/2601.05251) · [Project](https://mesh-4d.github.io) · [arXiv](https://arxiv.org/abs/2601.05251) |
+| Links | [paper](https://arxiv.org/abs/2601.05251) · [Project](https://mesh-4d.github.io) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Mesh4D |
 | Dataset | Objaverse子集基准 |
@@ -40,7 +40,7 @@ claims:
 > [!tip] 效果简介
 > - Objaverse子集基准 上，IoU↑ 0.3949 vs 0.3071 (HY3D 2.1) (+0.0878)；P2S↓ 0.0261 vs 0.0345 (GVFD) (-0.0084)；Chamfer↓ 0.0243 vs 0.0378 (GVFD) (-0.0135)。
 
-## 概述
+## 概要
 
 从单目视频中恢复动态物体的完整三维形状与运动，是计算机视觉中长期存在的挑战。核心瓶颈在于，单目输入天然存在遮挡和视角限制，使得大量表面不可见；同时，整个视频序列的变形信息需要被一次性编码，才能保证时序一致性。现有方法要么逐帧独立重建导致姿态抖动，要么将运动建模为高斯泼溅（3D‑GS）而缺乏显式几何约束，无法同时获得高质量几何与精确的对应关系。
 
@@ -52,7 +52,7 @@ Mesh4D 提出了一条前馈式单目4D网格重建路径。其核心洞察是�
 
 当前方法仍存在明确局限：假设网格拓扑在动画过程中保持不变，无法处理拓扑变化场景；规范网格重建的错误会传播到后续帧；泛化能力受限于预训练3D重建模型的训练数据分布。此外，训练依赖每帧对应的顶点数据，对于非合成视频难以获取。
 
-## 背景与动机
+
 
 从单目视频重建动态物体的完整三维形状与运动，是计算机视觉与图形学中长期存在的核心挑战。该任务要求模型同时恢复物体的几何外观和时序变形，而输入仅为一个视角的RGB图像序列。这种极端的欠定问题使得传统多视图几何方法难以适用，因为遮挡、视角限制和运动模糊会严重破坏观测信息的一致性。
 
@@ -64,7 +64,9 @@ Mesh4D 提出了一条前馈式单目4D网格重建路径。其核心洞察是�
 
 Mesh4D的提出正是为了弥合这一缺口。其核心动机在于：通过将整个动画序列的变形编码到单个紧凑的潜在空间，并利用骨架信息作为训练时的特权先验，模型可以从单目视频中一次性预测出完整且时序一致的4D网格变形。这一思路将静态重建的精度优势与动态建模的时序一致性相结合，为单目4D重建开辟了新的技术路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Mesh4D 的核心创新在于将**整个视频序列的变形信息一次性编码到紧凑的潜在空间**，并利用**骨架信息作为训练时的特权先验**，从而从单目视频中直接预测完整且时序一致的 4D 网格变形。这一设计解决了现有方法的两大瓶颈：逐帧独立重建导致时序断裂，以及缺乏 3D 先验导致不可见表面补全失败。
 
@@ -107,7 +109,7 @@ $$\min_\theta \mathbb{E}_{(z^s, I), t, \epsilon^s \sim \mathcal{N}(0, 1)} \left\
 
 这些 changed slots 共同构成了 Mesh4D 相对于前馈 4D 重建基线的核心优势：通过序列级编码和骨架引导的变形 VAE 学习强运动先验，再通过双条件扩散模型将该先验与单目视频观测对齐，实现一次性、时序一致的完整 4D 网格重建。
 
-## 整体框架
+
 
 Mesh4D 是一个前馈式单目 4D 网格重建模型。给定一段动态物体的单目 RGB 视频，模型一次性输出完整的动画 3D 网格及其变形场。其核心架构由三个关键模块串联构成：**规范网格重建模块**、**变形 VAE** 和**变形扩散模型**。
 
@@ -146,7 +148,7 @@ $$\Phi : \mathcal{T} \mapsto \mathcal{M}_1, \{\mathcal{T}_{1t}\}_{t=1}^T$$
 ![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2601_05251/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of Mesh4D. Given a monocular RGB video as input, Mesh4D generates a complete animated 3D mesh and its deformation. Each 4D reconstruction is shown at several time steps, the top layer displaying normals and the bottom one textured meshes*
 
-## 核心模块与公式推导
+
 
 Mesh4D 的核心架构由三个紧密耦合的模块组成：规范网格重建模块、变形 VAE 模块和变形扩散模型模块。整个系统的任务定义为将输入单目视频映射到第一帧网格和变形场序列：
 
@@ -190,7 +192,9 @@ $$\min_{\pmb{\theta}} \mathbb{E}_{(\pmb{z}^s, \pmb{I}), t, \epsilon^s \sim \math
 ![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2601_05251/figures/004_Figure_3.jpg]]
 *Figure 3: Overall deformation diffusion model pipeline. We build it based on HY3D 2.1 [45] shape diffusion model with additional spatial and temporal embedding as well as cross attention layer to condition the deformation field generation on the canonical mesh and input video*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 4D重建与跟踪主结果
 
@@ -260,7 +264,9 @@ Mesh4D存在以下几类典型失败场景（Figure 8）：
 ![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2601_05251/figures/002_Figure_2.jpg]]
 *Figure 2: Overall Deformation VAE pipeline. (Left) Given a sequence of 3D meshes as input, we first uniformly sample a sequence of corresponding points. We inject the skeleton information by using masked self- and cross-attention. Then, a Farthest Point Sampling (FPS) at spatial dimension is performed to compress the latent, followed by 8 layers of spatio-temporal attention. The deformation field is decoded by layers of spatio-temporal attention, followed by a cross attention where canonical vertices serve as query points. (Right) Each of our spatio-temporal attention layers sequentially performs temporal attention, global attention, and spatial attention. For temporal and global attention, we additi...*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 **Mesh4D** 处于单目视频到4D重建这一前沿线上，其设计思路与现有工作形成了清晰的对比与继承关系。
 
@@ -291,6 +297,8 @@ Mesh4D存在以下几类典型失败场景（Figure 8）：
 3. **长序列与多物体扩展。** 变形VAE的潜码维度固定，对视频长度的扩展性有限。同时，当前方法仅处理单个物体，多物体场景的交互建模需要全新的架构设计。
 
 4. **减少对骨架标注的依赖。** 能否通过自监督或弱监督学习（如利用光流、深度估计等辅助信号）替代昂贵的骨架标注，是降低训练成本、提升方法实用性的关键方向。消融实验已证明骨架信息对性能至关重要（去除后指标大幅下降，Figure 6），但这是否意味着骨架是唯一有效的运动先验，仍需进一步研究。
+
+
 
 ## 原文 PDF
 

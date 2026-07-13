@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Characterizing_the_Discrete_Geometry_of_ReLU_Networks.pdf
+project_link: null
+code_link: https://github.com/bl-ake/ICLR-2026
 openreview_forum_id: TgLW2DiRDG
 aliases:
 - A1CCGBL
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 刻画ReLU网络的离散几何结构 |
 | 英文题名 | Characterizing the Discrete Geometry of ReLU Networks |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=TgLW2DiRDG); [GitHub](https://github.com/bl-ake/ICLR-2026) |
+| Links | [paper](https://openreview.net/forum?id=TgLW2DiRDG) · [GitHub](https://github.com/bl-ake/ICLR-2026) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Algorithm 1: Construction of the Connectivity Graph (基于BFS与LP冗余检测的多面体连通图构建) |
 | Dataset | Synthetic clustering data with varying d, depth, and width, Synthetic data (d=4,5), MNIST |
@@ -42,7 +44,7 @@ claims:
 > - Synthetic data (d=4,5) 上，Connectivity graph diameter vs theoretical upper bound 为 Estimated actual diameters (midpoint of lower/upper bounds from Magnien et al. 2009)，对比 O(m^ℓ) upper bound，变化 Diameter grows logarithmically with theoretical bound; nearly identical across different input dimensions for fixed architecture。
 > - MNIST 上，Classification test accuracy / AUC 为 0.90 / 0.99，对比 N/A (not compared to other methods)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -76,7 +78,7 @@ claims:
 
 **开放问题**：训练为何倾向于将数据点置入高邻居数区域？连通图直径等拓扑特性是否与泛化性能、鲁棒性或不确定性量化存在定量关联？能否利用这些几何性质指导架构搜索或数据增强？对于大规模网络，是否存在高效的近似估计算法？
 
-## 背景与动机
+
 
 深度神经网络的表达能力与其在输入空间上诱导的几何分割密切相关。对于以ReLU为激活函数的全连接网络，每个神经元对应一个超平面（更准确地说，是弯曲超平面），这些超平面将输入空间 $\mathbb{R}^d$ 划分成若干个凸多面体区域，整体构成一个**多面体复形**（polyhedral complex）。每个区域内的所有点共享相同的激活模式（sign sequence），因此对应一个线性函数。理解这些区域的数目、形状和拓扑连接方式，对于揭示网络的表示能力、优化景观和泛化行为具有根本意义。
 
@@ -109,7 +111,9 @@ claims:
 
 这些发现为理解ReLU网络的几何正则性提供了新的视角，也为后续研究几何特性与泛化性能之间的定量关联奠定了基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作对全连接ReLU网络所诱导的输入空间多面体剖分进行了拓扑视角下的系统刻画，其核心创新在于将研究焦点从传统的“区域总数上界”转移到**区域之间的连接关系**——即连通图的拓扑特性。这一视角转换揭示了三个此前未被充分理解的几何规律。
 
@@ -133,7 +137,7 @@ claims:
 
 现有关于ReLU网络多面体剖分的研究（如区域计数上界的推导）大多停留在“有多少区域”这一静态问题上。本工作的本质突破在于追问“区域之间如何连接”，并将答案提炼为与架构参数直接关联的紧致理论界。这一转变使得连通图的平均度数和直径成为可预测、可验证的几何量，而非仅仅是组合爆炸的副产品。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_TgLW2DiRDG/figures/004_Figure_1.jpg]]
 *Figure 1: (a) An example ReLU network with a 2-dimensional input. (b) The corresponding polyhedral complex where region A has neighbors B, C, D, and E. (c) The connectivity graph where nodes represent regions and edges link neighboring regions (so region A has degree 4). (d) A histogram of the number of neighbors for each region, or equivalently the degrees of the connectivity graph*
@@ -156,7 +160,7 @@ claims:
 
 三个模块形成递进依赖：Algorithm 1 为实验提供可计算的连通图实例；理论结果（第3节）为实验观测提供上界与渐近行为预测；实验（第5节）在合成数据与真实数据上验证理论边界，并揭示训练数据分布与几何特性之间的关联（如含数据的区域平均邻居数更高）。管线中的关键计算瓶颈在于 SOLVELP 子程序——每个候选邻居都需求解一次线性规划，且总多面体数随网络规模指数增长，这直接限制了可处理网络的宽度与深度（实验中宽度 ≤ 16，深度 ≤ 4，输入维度 ≤ 5）。
 
-## 核心模块与公式推导
+
 
 ### 多面体连通图的构建算法
 
@@ -217,7 +221,9 @@ $$
 
 该递推关系是证明平均度数上界（Theorem 3.4）和单调收敛性（Theorem 3.6, 3.7）的基石。通过逐层移除神经元并追踪各类细胞的消长，可以导出连通图平均度数的严格上界 $2d$，并证明随着神经元数量增加，平均度数单调趋近该上界。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 5.1 理论边界的实证验证
 
@@ -317,7 +323,9 @@ Figure 12和Table 3提供了更全面的架构扫描结果（$d \in \{2,3,4,5\}$
 ![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_TgLW2DiRDG/figures/027_Table_2.jpg]]
 *Table 2: Architecture, training hyperparameters, and performance of networks trained on real-world data. For the regression task, we report coeffcient of determination R ^ { 2 } and Mean Squared Error (MSE), while for the classifcation tasks, we report accuracy and Receiver Operating Characteristic Area Under the Curve (AUC) on the test set*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题背景与核心瓶颈
 
@@ -374,6 +382,8 @@ Figure 12和Table 3提供了更全面的架构扫描结果（$d \in \{2,3,4,5\}$
 5. **架构设计指导**：能否利用平均度数的$2d$上界和直径的$O(m^\ell)$上界来指导神经架构搜索、网络剪枝或数据增强策略？例如，直径上界与深度$\ell$的指数依赖关系是否暗示深层网络在表示拓扑上存在根本性约束？
 
 6. **有界性与任务类型的关系**：Figure 7显示分类任务中含数据区域的无界比例更高，而回归任务中更低——这一差异是否反映了不同任务类型对决策边界几何的根本性不同需求？
+
+
 
 ## 原文 PDF
 

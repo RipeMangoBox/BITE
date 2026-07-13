@@ -35,7 +35,7 @@ claims:
 | 中文题名 | 高效4D人体视频生成的跨空间注意力机制 |
 | 英文题名 | Interspatial Attention for Efficient 4D Human Video Generation |
 | 会议/期刊 | SIGGRAPH 2025 |
-| Links | [paper](http://arxiv.org/abs/2505.15800v2) · [Project](https://dsaurus.github.io/isa4d/) · [arXiv](https://arxiv.org/abs/2412.03603) · [Code](https://github.com/Mochi-Team/mochi) |
+| Links | [paper](http://arxiv.org/abs/2505.15800v2) · [Project](https://dsaurus.github.io/isa4d/) · [paper](https://arxiv.org/abs/2412.03603) · [Code](https://github.com/Mochi-Team/mochi) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation #topic/vision_multimodal_applications/3d_rendering_reconstruction #topic/generative_models_diffusion |
 | Method | ISA-DiT (Interspatial Attention Diffusion Transformer) |
 | Dataset | Human4DiT Dataset, VBench |

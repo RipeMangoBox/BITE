@@ -33,7 +33,11 @@ claims:
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method |  |
 | Dataset | GQA, MMBench, MMBench-CN, POPE, VQAv2, VizWiz |
-## 概述
+
+> [!tip] 效果简介
+> 本笔记的既有实验指标、对比结果与适用边界见“实验与关键发现”；本轮仅统一结构，不改写证据。
+
+## 概要
 
 多模态大语言模型（MLLM）在视觉-语言理解任务上表现优异，但高分辨率图像或视频带来的大量视觉 token 严重推高了推理延迟和显存开销，限制了其在资源受限设备上的部署。现有视觉 token 压缩方法多依赖启发式规则或冻结的轻量模块，其保留决策与 MLLM 的任务损失缺乏直接对齐，导致压缩后性能退化显著。
 
@@ -41,7 +45,7 @@ EvoComp 提出了一种**语义引导的进化标注**框架来解决这一问�
 
 在 LLaVA-1.5-7B 上，EvoComp 在 3 倍压缩（192 tokens）下保留了原始精度的 **99.3%**，在 9 倍压缩（64 tokens）下仍保留 **94.9%**，同时端侧推理实现最高 **1.6×** 加速。该方法在六个视觉-语言理解基准（GQA、MMB、MMB-CN、POPE、TextVQA、VizWiz）上验证了有效性，并展现出跨模型（LLaVA-1.5-13B、Qwen2.5-VL-7B）和跨架构（LLaVA-NeXT-7B 高分辨率场景）的迁移能力。
 
-## 背景与动机
+
 
 多模态大语言模型（MLLM）在视觉-语言理解任务上取得了显著进展，但其推理效率受到视觉标记数量过大的严重制约。以 LLaVA-1.5-7B 为例，每张输入图像经视觉编码器（如 CLIP ViT）处理后会产生 576 个视觉标记，这些标记与文本标记一同送入大语言模型（LLM）进行自回归生成。视觉标记的数量直接决定了 LLM 预填充阶段的计算量和 KV 缓存的内存占用，成为端侧部署和实时应用的核心瓶颈。
 
@@ -49,7 +53,9 @@ EvoComp 提出了一种**语义引导的进化标注**框架来解决这一问�
 
 针对上述困境，本文提出 EvoComp，其核心动机是**直接以 MLLM 的任务损失为优化目标，通过进化搜索为视觉标记压缩提供语义感知的高质量真值标签**。具体而言，EvoComp 在视觉-语言对齐模块与 LLM 之间插入一个基于 Transformer 的轻量级压缩器，该压缩器接收对齐后的视觉和文本嵌入，输出每个视觉标记的保留概率。压缩器的训练监督信号并非来自人工标注或启发式规则，而是通过进化算法在语义分组约束下搜索最优二元掩码——该掩码最小化 MLLM 在保留标记子集上的任务损失，同时通过语义分组策略消除冗余标记。这一设计使得压缩器能够学习到与任务目标直接对齐的标记选择策略，从而在高压缩比下仍保持优异的性能保留。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 EvoComp 的核心创新在于**将视觉 Token 压缩从启发式规则或静态剪枝，转变为一个与 MLLM 任务损失直接对齐的进化搜索驱动学习范式**。该方法围绕两个紧密耦合的 changed slots 展开：**监督标签的生成方式**与**压缩器的训练目标**。
 
@@ -82,7 +88,7 @@ $$\mathcal{L}(\varphi, \psi) = \mathcal{L}_{\mathrm{GHM-C}}(\varphi, \psi) + \al
 
 这一设计使得 EvoComp 在 3× 压缩（192 tokens）下，于 LLaVA-1.5-7B 的多基准平均准确率保留率达到 99.3%，仅比无压缩的 Vanilla（576 tokens）低 0.7 个百分点（Table 1）。值得注意的是，压缩器训练完成后，推理时的 Token 选择仅需一次前向传播，引入的计算开销可忽略不计。
 
-## 整体框架
+
 
 EvoComp 的整体 pipeline 围绕一个核心设计展开：在 MLLM 的视觉对齐模块与大语言模型之间，插入一个可训练的轻量级压缩器（compressor），由该压缩器对视觉 token 进行“保留/丢弃”的二值选择，从而在进入 LLM 之前削减视觉 token 的数量。
 
@@ -122,7 +128,7 @@ $$
 ![[assets/figures/papers/paper_list_l750_https_arxiv_org_abs_2604_17087/figures/001_Figure_1.jpg]]
 *Figure 1: An overview of the EvoComp framework. Evolutionary Labeling (Right) searches for informative visual tokens that minimize the MLLM task loss, while ensuring non-redundancy by the semantic grouping strategy. Training Phase (Left Bottom) trains a lightweight compressor using the searched labels, optimized with a combination of GHM and cosine similarity loss. Inference Phase (Left Top) applies the trained compressor to filter tokens for efficient and accurate multimodal inference*
 
-## 核心模块与公式推导
+
 
 ### 3.1 语义分组策略（Semantic Grouping）
 
@@ -177,7 +183,9 @@ $$\mathcal{L}(\varphi, \psi) = \mathcal{L}_{\mathrm{GHM-C}}(\varphi, \psi) + \al
 
 训练完成后，压缩器仅需一次前向传播即可完成 token 选择，引入的计算开销可忽略不计。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：视觉 Token 压缩下的性能保持
 
@@ -228,7 +236,9 @@ EvoComp 的推理加速收益体现在端到端延迟的显著降低。在移动
 ![[assets/figures/papers/paper_list_l750_https_arxiv_org_abs_2604_17087/figures/009_Table_5.jpg]]
 *Table 5: Ablation study on vision-language understanding using LLaVA-1.5-7B*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 EvoComp 处于视觉 Token 压缩与多模态大模型效率优化的交叉地带。其核心定位是**训练一个轻量级压缩器，以进化搜索生成的二值掩码作为监督信号，在保留任务精度的前提下大幅削减视觉 Token 数量**。与现有工作的关系、适用边界及开放问题如下。
 
@@ -259,6 +269,8 @@ EvoComp 处于视觉 Token 压缩与多模态大模型效率优化的交叉地�
    - 进化标签是否可以跨数据集预计算并复用，从而摊薄训练成本？
    - 压缩器能否与 MLLM 联合微调，进一步提升压缩比上限？
    - 在视频理解等多帧场景中，时序维度的 Token 压缩是否可复用该框架？
+
+
 
 ## 原文 PDF
 

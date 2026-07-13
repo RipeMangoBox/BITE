@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/PAMotion_Physics_Aware_Motion_Generation_for_Full_Body_Interaction_with_Multiple_Objects.pdf
+project_link: null
+code_link: null
 aliases:
 - PAMotion
 tags:
@@ -41,7 +43,7 @@ claims:
 > - HIMO (三物体) 上，FID 1.3763 vs 4.7712 (HIMO-Gen) (-3.3949)；R-Precision 0.6750 vs 0.5350 (HIMO-Gen) (+14.0%)；MM-Dist 3.7707 vs 5.0866 (HIMO-Gen) (-1.3159)。
 > - ParaHome 上，FID 0.7962 vs 3.2398 (HIMO-Gen) (-2.4436)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有扩散方法在生成多物体全身交互运动时，难以捕获复杂的物理约束，尤其是手与物体之间的接触关系，导致生成结果普遍存在物体漂浮、手部穿透等物理不一致问题。
 
@@ -51,7 +53,7 @@ claims:
 
 **主要结果**：在 HIMO 数据集上，PAMotion 在两物体和三物体设置下均全面超越现有方法。三物体场景的 FID 从 4.7712 降至 1.3763，R-Precision 提升 14.0%；在 ParaHome 数据集上，FID 从 3.2398 降至 0.7962。消融实验证实，移除物理感知交互损失后所有指标一致下降，验证了该模块对生成质量与物理一致性的关键作用。
 
-## 背景与动机
+
 
 ### 多物体全身交互生成的物理瓶颈
 
@@ -79,7 +81,9 @@ claims:
 
 这一观察揭示了将**物理先验**注入扩散生成过程的可行路径：通过监测生成过程中物体的加速度，动态判断接触状态，并对违背物理合理性的手-物距离施加惩罚。基于此，我们提出 **PAMotion**，一个物理感知的粗到细扩散框架，其核心创新在于将上述观察形式化为一个**动态激活的物理感知交互损失** $\mathcal{L}_{\mathrm{phy}}$，在生成过程中自动纠正漂浮和穿透，从而系统性地提升多物体交互运动的物理合理性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PAMotion 的核心创新在于将**物理感知交互建模**引入条件扩散框架，以解决现有多物体全身交互生成中普遍存在的漂浮、穿透等物理不一致问题。相较于以 **HIMO-Gen**（HIMO ）为代表的单阶段联合生成方法，PAMotion 在两个关键维度上进行了系统性改进。
 
@@ -116,7 +120,7 @@ $$
 
 可视化结果进一步证实，$L_{phy}$ 的移除导致生成结果中漂浮和穿透伪影的明显回归，从而确立了物理感知损失作为 PAMotion 性能增益的核心因果杠杆。
 
-## 整体框架
+
 
 PAMotion 采用 **粗到细两阶段条件扩散框架**，将多物体全身交互生成分解为全局运动合成与局部物理细化两个级联阶段。该设计的核心动机在于：单阶段联合生成所有变量（如 **HIMO‑Gen** 的范式）难以同时捕获躯干‑物体的大范围位移与手‑物接触的精细物理约束，容易导致漂浮、穿透等物理不一致。
 
@@ -172,7 +176,7 @@ PAMotion 采用 **粗到细两阶段条件扩散框架**，将多物体全身交
 ![[assets/figures/papers/paper_list_l11_https_openaccess_thecvf_com_content_CVPR2026_html_Di_PAMotion_Physics_Aw/figures/002_Figure_2.jpg]]
 *Figure 2: Illustration of PAMotion. PAMotion is a two-stage coarse-to-fine conditional diffusion framework. In the Coarse Motion Generation stage, the model predicts coarse, text-aligned global motion by generating global human body translation*
 
-## 核心模块与公式推导
+
 
 PAMotion 的核心设计围绕一个关键因果机制展开：**物体加速度是手-物接触状态的天然探针**。在日常生活慢动作交互中，若物体仅受重力作用（加速度与重力对齐），则手与物体无接触；一旦加速度偏离重力方向，必然存在直接或间接的手-物接触。PAMotion 将这一物理先验形式化为**物理感知交互损失（Physics-Aware Interaction Loss）**，并将其嵌入到**粗到细两阶段条件扩散框架**中，在生成过程中动态纠正漂浮和穿透伪影。
 
@@ -246,7 +250,9 @@ PAMotion 使用两个编码器将多模态条件映射到扩散模型的潜在�
 
 这两个编码器的输出与初始状态 $x_0$ 共同构成扩散模型的条件输入，贯穿粗阶段和细阶段的全过程。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -301,7 +307,9 @@ PAMotion在HIMO和ParaHome两个数据集上均进行了系统评估，并与当
 ![[assets/figures/papers/paper_list_l11_https_openaccess_thecvf_com_content_CVPR2026_html_Di_PAMotion_Physics_Aw/figures/001_Figure_1.jpg]]
 *Figure 1: Qualitative Comparison on HIMO dataset [53]. Our method PAMotion produces physically plausible human–object interactions, while the baseline method HIMO-Gen [53] often exhibits floating or penetration artifacts*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -337,6 +345,8 @@ PAMotion 的物理感知损失建立在以下核心假设之上，这些假设�
 ### 知识库定位
 
 PAMotion 处于**物理感知人体运动生成**与**多物体交互建模**的交叉点。相较于纯运动学驱动的扩散生成方法（如 MDM、priorMDM），它首次将牛顿力学层面的物体加速度约束引入生成过程；相较于基于强化学习或轨迹优化的物理仿真方法，它保留了扩散模型的表达力和数据驱动优势，同时以软约束形式嵌入物理知识，避免了刚性物理引擎的收敛困难。这一“物理软约束 + 扩散生成”的范式为后续研究提供了一个可扩展的框架：物理知识不再需要作为硬性仿真步骤，而是可以通过可微损失灵活注入生成过程。
+
+
 
 ## 原文 PDF
 

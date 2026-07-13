@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2024
 pdf_ref: paperPDFs/ICLR_2024/GenMoStyle_Generative_Human_Motion_Stylization_in_Latent_Space.pdf
+project_link: null
+code_link: null
 aliases:
 - GGHMSLS
 tags:
@@ -41,7 +43,7 @@ claims:
 > - CMU Mocap 测试集 上，Style FID (↓) 0.028±003 (Ours V) vs 0.136±011 (Park et al., 2021) (-0.108)。
 > - (Xia et al., 2015) 测试集 上，Style Accuracy (↑) 0.934±006 (Ours V) vs 0.527±006 (Park et al., 2021) (+0.407)。
 
-## 概述
+## 概要
 
 人体运动风格化旨在将参考风格赋予输入运动，同时保留其原始动作内容。现有方法大多直接在原始姿态空间操作，面临表示冗余、对噪声敏感、泛化能力有限等瓶颈；同时，多数工作仅支持确定性的风格迁移，缺乏灵活的概率风格建模，难以生成多样化的风格化结果。
 
@@ -61,7 +63,7 @@ GenMoStyle 处于**运动风格迁移**与**生成式潜在空间建模**的交�
 
 相较于上述工作，GenMoStyle 的关键贡献在于**将风格迁移的操作空间从姿态空间提升至潜在空间**，并在此基础上构建了**概率风格空间**与**同风格对齐**机制，从而在统一的生成式框架下实现了多模式、多样化的运动风格化。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -81,7 +83,9 @@ GenMoStyle 处于**运动风格迁移**与**生成式潜在空间建模**的交�
 
 针对上述缺口，本文提出将运动风格迁移的核心流程从原始姿态空间迁移到预训练自编码器的紧凑潜在空间（latent space）中。潜在空间经重建任务预训练后，具备更强的表达力和鲁棒性，能够为风格解耦提供更优的表示基础。在此基础上，引入概率风格空间与自适应实例归一化（AdaIN）注入机制，将运动代码分解为确定性时序内容代码和服从高斯先验的概率风格代码，从而在单一框架内统一支持有监督、无监督、基于运动、基于标签以及基于先验采样的多种风格化模式。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GenMoStyle 的核心创新在于将运动风格迁移的完整流程从原始姿态空间迁移至预训练自编码器的紧凑潜在空间，并在此空间中构建概率风格建模与解耦机制，从而在单一框架内统一支持有监督、无监督、基于运动、基于标签以及基于先验的多种风格化模式。以下从三个关键“changed slots”展开分析。
 
@@ -103,7 +107,7 @@ GenMoStyle 的核心创新在于将运动风格迁移的完整流程从原始姿
 
 此外，同风格对齐损失 $\mathcal{L}_{hsa} = D_{\mathrm{KL}}(\mathcal{N}_s^1(\mu_s^1, \sigma_s^1) \| \mathcal{N}_s^2(\mu_s^2, \sigma_s^2))$ 鼓励同一序列中不同子片段的风格空间对齐，在有监督设置下将内容准确率提升 13%，无监督下提升 6%，成为解耦质量的关键保障。
 
-## 整体框架
+
 
 GenMoStyle 的整体设计遵循“先压缩、再解耦、后重组”的两阶段范式，将运动风格迁移的核心流程从原始姿态空间迁移至预训练自编码器的紧凑潜在空间，从而获得更富表达力且对噪声更鲁棒的表示。
 
@@ -134,7 +138,7 @@ Table 1 对比了 GenMoStyle 与代表性基线方法在训练和推理灵活性
 ![[assets/figures/papers/paper_list_l4_GenMoStyle_Generative_Human_Motion_Stylization_in_Latent_Space_motion20v2/figures/003_Figure_2.jpg]]
 *Figure 2: Approach overview. (a) A pre-trained autoencoder E and D (Sec. 3.1) builds the mappings between motion and latent spaces. Motion (latent) code z is further encoded into two parts: content code*
 
-## 核心模块与公式推导
+
 
 GenMoStyle 的核心架构由五个模块构成，围绕“潜在空间编码—内容/风格解耦—条件生成”这一主线展开。
 
@@ -185,7 +189,9 @@ $$\hat{P} = \mathcal{D}(z) = \mathcal{D}(\mathcal{E}(P))$$
 ![[assets/figures/papers/paper_list_l4_GenMoStyle_Generative_Human_Motion_Stylization_in_Latent_Space_motion20v2/figures/022_Figure_10.jpg]]
 *Figure 10: Detailed architecture of our motion latent stylization model in supervised setting. In unsupervised setting, the style label input is dropped. All convolutions, except the last layer of encoders and generator, use kernel size of 3*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -240,7 +246,9 @@ GenMoStyle 在三个基准数据集上进行了系统评估，涵盖有监督和
 ![[assets/figures/papers/paper_list_l4_GenMoStyle_Generative_Human_Motion_Stylization_in_Latent_Space_motion20v2/figures/025_Figure_13.jpg]]
 *Figure 13: Failure cases. Top row shows content motion; bottom row shows our corresponding results. Stylization results of breaking dance motion (left) and push-up motion (right) using happy style label are displayed*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 技术脉络与关键突破
 
@@ -285,6 +293,8 @@ GenMoStyle 在上述工作的基础上实现了三个关键“槽位”的变更
 4. **正则化策略的统一**：VAE 的 KL 正则化与 AE 的 L1/平滑正则化为何导致风格化行为的差异？是否可以在未来设计统一的潜在空间正则化策略，兼顾重建质量与风格化多样性？
 
 **注意**：以上开放问题中的部分推测（如数据增强的具体策略）基于领域常识，原文未提供直接证据，需在实际研究中验证。
+
+
 
 ## 原文 PDF
 

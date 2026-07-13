@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/FunPhase_A_Periodic_Functional_Autoencoder_for_Motion_Generation_via_Phase_Manifolds.pdf
+project_link: null
+code_link: null
 aliases:
 - FunPhase
 tags:
@@ -40,7 +42,7 @@ claims:
 > - DOG 上，Position (cm)↓ 61.4 (FunPhase-16C) vs 144 (DeepPhase-16C) (-57.4%)。
 > - 100STYLE 上，Position (cm)↓ 0.36 (FunPhase-256C) vs 92.9 (DeepPhase-32C) (-99.6%)；FID↓ 0.51±0.16 (FunPhase) vs 0.91±0.62 (CAMDM) (-44.0%)；Foot Sliding↓ 0.52 (FunPhase) vs 0.69 (CAMDM) (-24.6%)。
 
-## 概述
+## 概要
 
 **核心问题**：现有基于相位的运动表示方法（如DeepPhase）依赖固定骨架的离散帧卷积编解码，难以扩展到不同骨架拓扑和任意时间分辨率，且无法融入概率生成框架。
 
@@ -53,7 +55,7 @@ claims:
 
 **方法定位**：FunPhase在保持相位流形可解释性的前提下，统一了运动重建、预测与生成任务，为骨架无关的连续运动建模提供了新的基线。
 
-## 背景与动机
+
 
 ### 运动生成中的相位表示与函数空间
 
@@ -77,7 +79,9 @@ $$\hat{l_c} = a_c \cdot \sin(2\pi(f_c \cdot \mathcal{T} - s_c)) + b_c$$
 
 **FunPhase** 正是基于这一动机设计：它将相位周期性先验嵌入函数自编码器，在潜在空间中显式进行周期分解，同时将解码器替换为基于 Perceiver 交叉注意力的连续函数求值模块。这一设计使得模型既能学习结构化、可解释的相位流形，又能实现平滑连续的时空重建，并统一运动预测与生成任务。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FunPhase 的核心创新在于将**显式相位周期性先验**嵌入**连续函数自编码器**框架，从而同时解决了两个长期瓶颈：① 传统相位方法（如 DeepPhase）依赖固定骨架的离散帧卷积编解码，无法处理不同骨架拓扑或任意时间分辨率；② 纯函数生成框架缺乏可解释的周期结构，难以捕捉运动的节律性本质。通过将解码器从离散帧重建替换为**连续时空函数求值**，并在潜在空间中保留**FFT 周期分解**，FunPhase 在保持相位流形可解释性的前提下，获得了骨架无关的任意分辨率重建能力，且其周期性潜在码可直接适配标准扩散模型进行生成。
 
@@ -107,7 +111,7 @@ DeepPhase 不具备概率生成能力，仅用于确定性重建或控制。FunP
 
 这些改进槽位的协同效应体现在：**函数空间解码**赋予了模型连续时空重建与超分辨率能力；**骨架无关编码**使其可泛化至不同拓扑；**Perceiver 架构**提供了灵活的序列编码；而**FFT 周期分解**则在潜在空间中嵌入了运动的节律性归纳偏置。最终，这些设计使得 FunPhase 能够统一运动重建、预测与生成任务——这是此前方法无法实现的。
 
-## 整体框架
+
 
 FunPhase 是一个**周期性函数自编码器**，其核心设计理念是将运动的相位流形可解释性与连续函数空间的重建能力统一在同一个框架内。整个 pipeline 由两条并行的编码-解码通路、一个共享的频域分解模块、以及一个可选的扩散生成模块构成。
 
@@ -183,7 +187,7 @@ $$\pmb{\\theta}_c^{diff} = [\\mathbf{a}_c^{\\cos},\\, \\mathbf{a}_c^{\\sin},\\, 
 ![[assets/figures/papers/paper_list_l1832_FunPhase_A_Periodic_Functional_Autoencoder_for_Motion_Generation_via_Pha/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the Periodic Function Autoencoder (FunPhase) architecture. The figure illustrates the separated processing of joint rotations and root positions through Perceiver-based encoder–decoder modules. The latent space is decomposed by a Fast Fourier Transform (FFT) layer in its periodic components (Phase shift, Amplitude, Frequency, Bias) to achieve an even more compact representation and enforce periodicity. The latent space is then reconstructed with the inverse FFT, and the functions are evaluated at the coordinates given as input to the decoder*
 
-## 核心模块与公式推导
+
 
 FunPhase 的核心设计围绕一个关键洞察展开：将周期性先验嵌入函数自编码器，使潜在空间同时具备可解释的相位结构与连续时空求值能力。其架构由以下模块构成。
 
@@ -272,7 +276,9 @@ $$\operatorname{AdaLN}(\mathbf{h}, \mathbf{c}) = \gamma(\mathbf{c}) \odot \opera
 ![[assets/figures/papers/paper_list_l1832_FunPhase_A_Periodic_Functional_Autoencoder_for_Motion_Generation_via_Pha/figures/015_Figure_7.jpg]]
 *Figure 7: Phase Transformation. We plot the distribution of the latent periodic parameterization before and after the phase transformation applied in the latent diffusion model*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与设计动因
 
@@ -344,7 +350,9 @@ FunPhase的函数空间解码天然支持任意时间分辨率采样，使其具
 ![[assets/figures/papers/paper_list_l1832_FunPhase_A_Periodic_Functional_Autoencoder_for_Motion_Generation_via_Pha/figures/010_Figure_6.jpg]]
 *Figure 6: Motion controller generation. The top row shows the motion controller trained on FunPhase’s phase space, and the bottom row shows the controller trained on DeepPhase’s phase space. FunPhase enables the generation of smooth and realistic movements comparable to those produced by DeepPhase, highlighting the advantages of the phase manifold*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 
@@ -390,6 +398,8 @@ FunPhase 的扩散生成在 100STYLE 数据集上取得了领先的 FID 和物�
 3. **长时序建模**：如何突破固定窗口限制，实现任意时长运动的连续生成？可能的方向包括循环式潜在编码、层次化时序抽象或基于状态空间模型的外推策略。
 4. **生成多样性的提升**：Table 2 中 FunPhase 的多样性指标略低于 CAMDM。是否可以通过改进采样策略（如引导尺度调节、温度退火）或引入对抗训练组件，在保持相位结构优势的同时提升生成多样性？
 5. **跨形态迁移**：FunPhase 的骨架无关设计使其具备跨形态运动迁移的潜力，但当前尚未在人体到机器人、真实动物到虚拟角色等跨具身场景中进行验证。
+
+
 
 ## 原文 PDF
 

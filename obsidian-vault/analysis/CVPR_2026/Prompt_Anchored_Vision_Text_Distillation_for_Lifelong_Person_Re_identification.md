@@ -42,7 +42,7 @@ claims:
 > - AKA-order1 (Market→CUHK-SYSU→Duke→MSMT17→CUHK03) 上，Seen-Avg mAP 70.7 vs 65.6 (DAFC) (+5.1)。
 > - AKA-order1 上，Seen-Avg R1 81.0 vs 75.9 (DAFC) (+5.1)；Unseen-Avg mAP 78.6 vs 65.7 (DKP++) (+12.9)。
 
-## 概述
+## 概要
 
 终身行人重识别（Lifelong Person Re-identification, LReID）要求模型在顺序到达的多个监控域上持续学习，同时保持对已见身份的判别力，并泛化至未见域。现有免样本（exemplar-free）方法仅依赖视觉知识蒸馏来抑制遗忘，但在域累积过程中，视觉特征空间缺乏跨域稳定的参照系，导致已学习的身份语义逐渐漂移，这一**语义漂移**构成了当前范式的核心瓶颈。
 
@@ -50,7 +50,7 @@ claims:
 
 **主要结果**：在AKA-order1（Market→CUHK-SYSU→Duke→MSMT17→CUHK03）上，PAD的已见域平均mAP达到70.7，相比此前最优方法DAFC（65.6）提升5.1个百分点；未见域平均mAP达到78.6，相比DKP++（65.7）提升12.9个百分点。消融实验证实，完整的双蒸馏组合相比仅使用VA-Prompt在已见域mAP上从65.3提升至70.7，弱文本蒸馏策略优于强蒸馏，选择性解冻最后4个Transformer块在性能与效率间取得最佳平衡。
 
-## 背景与动机
+
 
 终身行人重识别（Lifelong Person Re-identification, LReID）要求模型在连续到达的监控域流上逐步学习，同时保持对已见身份的判别能力并泛化至未见域。与标准ReID不同，LReID面临**稳定性-可塑性困境**：模型必须在不访问旧数据的前提下，既吸收新域知识，又防止已学语义被覆盖。
 
@@ -58,7 +58,9 @@ claims:
 
 本文提出**PAD（Prompt-Anchored vision–text Distillation）**，核心动机在于将**文本模态的语义稳定性**引入终身学习。关键洞察是：预训练视觉-语言模型（如CLIP-ReID）中的**冻结文本编码器**天然构成一个跨域不变的语义坐标系统——无论视觉域如何变化，“穿着红色上衣的行人”这一文本描述对应的语义锚点始终固定。PAD利用这一属性，将文本空间作为全局锚点，配合非对称蒸馏机制（弱文本蒸馏 + 强EMA视觉蒸馏），解耦**语义保持**与**域适应**两个子问题，从而在无样本回放约束下实现更稳定的终身学习。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PAD 的核心创新在于**将文本模态的语义稳定性引入终身行人重识别**，通过“冻结文本锚点 + 非对称双重蒸馏”机制，从根本上改变了免样本终身学习的语义保持方式。
 
@@ -97,7 +99,7 @@ PAD 的视觉侧采用**自适应提示池**机制，灵感来源于 **DualPromp
 
 冻结文本编码器 → 建立跨域稳定语义坐标 → TA-Prompt 弱蒸馏提供语义锚定 → 抑制语义漂移；VA-Prompt + 选择性解冻骨干 → 保留增量可塑性；EMA 视觉蒸馏 → 平滑视觉知识传递。两条路径协同，实现了**语义保持与域适应的解耦**——这是 PAD 相比纯视觉蒸馏方法的核心优势所在。
 
-## 整体框架
+
 
 PAD的整体架构由**非对称的双分支设计**构成：左侧为冻结的文本分支，提供跨域稳定的语义锚点；右侧为部分可训练的视觉分支，负责域自适应增量学习。两个分支通过**对称监督对比损失**和**多层次知识蒸馏**实现隐式与显式的语义对齐。图2展示了完整的框架结构。
 
@@ -150,7 +152,7 @@ $$\mathcal{L}_{\mathrm{KD}} = \lambda_{\mathrm{text}} \mathcal{L}_{\mathrm{TEXKD
 ![[assets/figures/papers/paper_list_l776_https_arxiv_org_abs_2605_05027/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the proposed PAD framework. The framework consists of a textual branch (left) and a visual branch (right) that evolve across domains. On the textual side, we use a frozen text encoder and distill the learnable textual prompts (TA-Prompt). On the visual side, we construct a visual prompt (VA-Prompt) pool and train last layers of the image encoder with a two-term visual distillation loss. The textual branch provides semantic guidance during training, while only the image encoder is kept for inference*
 
-## 核心模块与公式推导
+
 
 PAD 的整体框架由两条非对称路径构成：**冻结的文本分支**提供跨域稳定的语义锚点，**部分可训练的视觉分支**负责域自适应学习。两条路径通过 TA-Prompt 和 VA-Prompt 两个提示机制协同工作。
 
@@ -216,7 +218,9 @@ $$\mathcal{L}_{\mathrm{supcon}} = \mathrm{SupCon}(\mathbf{v} \to \mathbf{t}) + \
 ![[assets/figures/papers/paper_list_l776_https_arxiv_org_abs_2605_05027/figures/008_Figure_5.jpg]]
 *Figure 5: Trainable parameter composition across domains. The textual side (a) updates only the TA-Prompt, while the visual side (b) trains the VA-Prompt, classifier head, and a small portion of the backbone. Ratios are normalized within trainable modules, excluding the frozen text encoder*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -286,7 +290,9 @@ VA-Prompt的激活相似度与域间特征相似度呈强正相关（ρ=0.77）�
 ![[assets/figures/papers/paper_list_l776_https_arxiv_org_abs_2605_05027/figures/015_Table_S.6.jpg]]
 *Table S.6: Effect of the number of unfrozen blocks. We report the final-stage seen-domain average, Market1501 performance, and trainable parameters. 4 blocks corresponds to the configuration used in the main paper*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 在终身行人重识别中的定位
 
@@ -341,6 +347,8 @@ PAD的有效性依赖于以下前提：
 4. **文本锚点的质量依赖性**：当预训练视觉-语言模型的行人语义理解有限时（如对细粒度衣着、姿态属性的区分能力不足），文本锚点的稳定性是否会退化？如何量化并补偿这种退化？
 
 5. **与基于回放方法的混合策略**：在允许少量样本回放的宽松设定下，PAD的非对称蒸馏机制能否与回放策略互补，进一步压缩遗忘？
+
+
 
 ## 原文 PDF
 

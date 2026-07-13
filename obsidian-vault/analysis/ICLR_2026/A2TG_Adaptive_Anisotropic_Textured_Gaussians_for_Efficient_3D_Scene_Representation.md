@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/A2TG_Adaptive_Anisotropic_Textured_Gaussians_for_Efficient_3D_Scene_Representation.pdf
+project_link: null
+code_link: null
 aliases:
 - 2AATG
 - 2AATGE3SR
@@ -42,7 +44,7 @@ paradigm: 通过梯度驱动的高斯筛选与各向异性上采样，纹理分�
 > - DeepBlending (#GS=1M, fixed Gaussians) 上，Memory overhead relative to 2DGS 为 19% (277 MB)，对比 1764% (724 MB, Textured Gaussians*)，变化 -1645pp / -447 MB。
 > - Mip-NeRF360 (60MB fixed memory budget) 上，PSNR (dB) / Memory (MB) 为 27.47 / 58.02，对比 26.72 / 60.00 (2DGS*-MCMC) | 28.37 / 200.00 (upper budget, Textured Gaussians*)，变化 PSNR +0.75 over 2DGS*-MCMC; memory -1.98 under 60MB budget。
 
-## 概述
+## 概要
 
 现有**纹理高斯**（Textured Gaussians）方法为每个 2D 高斯基元分配**固定大小的正方形纹理**，忽略了高斯基元在尺度、不透明度与可见性上的巨大差异。这导致大量对渲染贡献极低的基元依然携带冗余的纹理参数，不仅造成严重的内存浪费，也无法灵活匹配真实场景中高频细节对各向异性足迹的需求。因此，如何在保持渲染质量的同时，**按需分配纹理内存**，成为实现高效 3D 场景表示的核心瓶颈。
 
@@ -56,7 +58,7 @@ paradigm: 通过梯度驱动的高斯筛选与各向异性上采样，纹理分�
 
 综上，A²TG 通过对基元的精细化梯度感知与各向异性纹理扩展，在 **3D 高斯泼溅框架中实现了纹理内存的适应性按需分配**，在多个标准数据集上均能以更低的内存代价取得与高开销方法相当甚至更优的渲染质量，为高效 3D 场景表示提供了一种高性价比的新范式。
 
-## 背景与动机
+### 背景与动机
 
 显式基元表示因其渲染高效、编辑友好而成为新一代视图合成的主流范式，其中基于二维高斯溅射（2DGS）的方法凭借结构感知的优势在多个基准上取得了领先结果。然而，2DGS的每个基元仅携带球谐基色，缺乏对高频表面细节的直接刻画能力。为弥补这一不足，研究者开始为高斯注入可学习的局部纹理，通过将纹理映射到基元的局部 UV 空间来增强表现力。
 
@@ -66,7 +68,7 @@ paradigm: 通过梯度驱动的高斯筛选与各向异性上采样，纹理分�
 
 该动机的可行性被以下关键观察所支持：在 Mip-NeRF360 的 Garden 场景中，最终有 62.4% 的高斯仅保留 1×1 纹理（Figure 4），而视觉质量未受损害；在固定 200MB 内存预算的 DeepBlending 场景下，本文提出的 A²TG 以 189.42MB（最低内存）取得 PSNR 29.86，优于同等预算下的 Textured Gaussians*（29.51 PSNR，Table 1）；当固定高斯数量时，A²TG 在 DeepBlending 上的内存开销仅为 19%，而视觉质量与 Textured Gaussians* 持平（Table 2）。进一步的消融实验表明，去除梯度引导的上采样会显著拉低质量，而保留上采样但取消各向异性则推高内存，这确认了"梯度驱动选择 + 各向异性形状"是实现质量-内存高效平衡的必要组合（Table 3）。这些数据为本文方法的合理性与有效性提供了坚实的实证基础。
 
-## 核心创新
+## 核心方法与创新机理
 
 A²TG 的核心创新在于**打破了现有纹理高斯方法"所有基元一刀切分配固定正方形纹理"的范式**，转而提出一种**梯度引导的自适应各向异性纹理分配策略**，使得纹理分辨率能够按需集中在场景的高频、高可见区域，从而在保持渲染质量的同时显著降低内存开销。
 
@@ -119,9 +121,9 @@ A²TG 的解决方案由三个紧密耦合的模块构成，形成了"筛选—�
 
 **消融验证**：去除纹理上采样模块后，内存最小但渲染质量大幅下降（PSNR 降低 0.5–1.0 dB）；去除各向异性限制（仅保留正方形上采样）后，质量接近完整方法但内存明显增加（例如 #GS=500k 时从 29.67MB 增至 31.10MB），验证了上采样与各向异性两个组件共同支撑高效的质量-内存权衡（Table 3）。可视化消融进一步表明，自适应纹理主要捕获高频残差外观（如植物纹理、织物图案），而球谐基色提供低频光照，两者互补（Figure 5）。
 
-## 整体框架
+### 整体框架
 
-![[obsidian-vault/assets/figures/papers/iclr26_0005_EPN5MU4liR_A2TG_Adaptive_Anisotropic_Textured_Gaussians_for/figures/001_Figure_1.jpg]]
+![[assets/figures/papers/iclr26_0005_EPN5MU4liR_A2TG_Adaptive_Anisotropic_Textured_Gaussians_for/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of gradient-based adaptive texture control. Given an initial 2DGS model, (a) our system first optimizes the parameters of the 2D Gaussians and their textures. (b) Next, we compute the positional gradient of the textured 2D Gaussians (as depicted in gray blocks) and select the 2D Gaussians that need to increase the resolution of the texture to capture more details. (c) Finally, we adaptively upscale the textures according to the anisotropy of the Gaussians*
 
 A²TG 的整体流程围绕一个核心机制展开：**基于梯度引导的自适应纹理控制策略**。其根本动机在于，现有纹理高斯方法为每个基元分配固定分辨率的正方形纹理，忽略了高斯基元在尺度、不透明度和可见性上的巨大差异，导致大量对最终渲染贡献甚微的背景或低细节高斯也携带冗余的纹理参数，既浪费存储，也无法灵活匹配场景中局部细节的变化程度和基元本身的各向异性足迹。
@@ -148,7 +150,7 @@ A²TG 的整体流程围绕一个核心机制展开：**基于梯度引导的自
 
 整个 pipeline 的可视化流程如 **Figure 1** 所示：从初始 2DGS 模型开始，经过基元与纹理的联合优化、基于位置梯度的候选高斯筛选，到最终的各向异性纹理解析度提升。这一套机制的证据链是坚实的：消融实验显示，移除纹理上采样（w/o Upscaling）会导致渲染质量急剧下降；而移除各向异性（w/o Anisotropy）则会在质量接近的情况下显著增加内存使用，证明二者缺一不可（Table 3）。最终，该框架使得在 DeepBlending 数据集上，超过 62.4% 的高斯保留 $1 \times 1$ 纹理，在固定 100 万高斯时，其内存开销仅为 Textured Gaussians* 的 11%（277MB vs 724MB），PSNR 却达到 29.82 dB 的相当水平，从宏观上验证了"将纹理分辨率按需集中于高贡献区域"这一核心洞察。
 
-## 核心模块与公式推导
+### 核心模块与公式推导
 
 A²TG 的整个管线可分解为四个关键模块，它们共同实现了从固定纹理到自适应各向异性纹理的转变，并严格控制了参数增长。
 
@@ -168,7 +170,7 @@ A²TG 的整个管线可分解为四个关键模块，它们共同实现了从�
 4. **纹理图集打包与渲染**  
 所有非均匀尺寸的 per‑Gaussian 纹理被打包进单个全局 GPU 纹理图集。每个高斯额外存储纹理维度和在图集中的偏移量作为元数据。渲染时通过双线性插值采样纹理，产生额外的访存开销，但依然保持超过 30 FPS 的实时性能。
 
-## 关键公式
+### 关键公式
 
 1. **局部坐标到屏幕映射**  
    $$\mathbf{x} = \mathbf{W} \mathbf{H} (u, v, 1, 1)^{\top}$$
@@ -201,21 +203,21 @@ A²TG 的整个管线可分解为四个关键模块，它们共同实现了从�
    - $\mu_{i,x}$: 第 $i$ 个高斯在 $x$ 方向的位置  
    - 第一项反映像素重建误差，后两项包含遮挡、可见性以及不透明度/纹理调制信息，由此累积的梯度幅值直接驱动"梯度驱动高斯选择"模块。
 
-## 实验与分析
+## 实验与关键发现
 
-![[obsidian-vault/assets/figures/papers/iclr26_0005_EPN5MU4liR_A2TG_Adaptive_Anisotropic_Textured_Gaussians_for/figures/002_Table_1.jpg]]
+![[assets/figures/papers/iclr26_0005_EPN5MU4liR_A2TG_Adaptive_Anisotropic_Textured_Gaussians_for/figures/002_Table_1.jpg]]
 *Table 1: Quantitative comparison under a fixed memory budget. We report PSNR ↑, SSIM ↑, LPIPS ↓, number of Gaussians (#GS), and memory (Mem, MB). The top three results are highlighted in red , orange , and yellow , and the least memory sizes are in bold*
 
-![[obsidian-vault/assets/figures/papers/iclr26_0005_EPN5MU4liR_A2TG_Adaptive_Anisotropic_Textured_Gaussians_for/figures/003_Table_2.jpg]]
+![[assets/figures/papers/iclr26_0005_EPN5MU4liR_A2TG_Adaptive_Anisotropic_Textured_Gaussians_for/figures/003_Table_2.jpg]]
 *Table 2: Quantitative comparison under a fixed number of Gaussians. We report PSNR ↑, SSIM ↑, LPIPS ↓, #GS, and memory (MB). The parameters increase for texture parameters relative to the size of 2DGS is added as percentage after memory (MB). The top three results are highlighted in red , orange , and yellow , and the least parameter increases are in bold*
 
-![[obsidian-vault/assets/figures/papers/iclr26_0005_EPN5MU4liR_A2TG_Adaptive_Anisotropic_Textured_Gaussians_for/figures/012_Figure_4.jpg]]
+![[assets/figures/papers/iclr26_0005_EPN5MU4liR_A2TG_Adaptive_Anisotropic_Textured_Gaussians_for/figures/012_Figure_4.jpg]]
 *Figure 4: The percentage and distribution. This figure shows the percentage and distribution of texture resolution produced by the adaptive texture upscaling on the scene Garden from Mip-Nerf360 dataset. Gaussians highlighted in blue have square texture of 2 \times 2 and 4 \times 4 . , and those highlighted in red have non-square texture resolution*
 
-![[obsidian-vault/assets/figures/papers/iclr26_0005_EPN5MU4liR_A2TG_Adaptive_Anisotropic_Textured_Gaussians_for/figures/019_Table_3.jpg]]
+![[assets/figures/papers/iclr26_0005_EPN5MU4liR_A2TG_Adaptive_Anisotropic_Textured_Gaussians_for/figures/019_Table_3.jpg]]
 *Table 3: Ablation study with varying numbers of Gaussians. We report PSNR (↑), SSIM (↑), LPIPS (↓), and memory usage in MB (↓), averaged across Mip-NeRF 360, Tanks&Temples, and DeepBlending. The top three results in each column are highlighted in red , orange , and yellow*
 
-![[obsidian-vault/assets/figures/papers/iclr26_0005_EPN5MU4liR_A2TG_Adaptive_Anisotropic_Textured_Gaussians_for/figures/017_Figure_5.jpg]]
+![[assets/figures/papers/iclr26_0005_EPN5MU4liR_A2TG_Adaptive_Anisotropic_Textured_Gaussians_for/figures/017_Figure_5.jpg]]
 *Figure 5: Qualitative visualization of what the adaptive textures learn. Left: full rendering from \mathsf { A } ^ { \mathrm { 2 } } \mathrm { T } \mathsf { G } . Middle: rendering without textures (RGB textures set to zero, alpha textures set to one). Right: rendering without SH base color. The comparison, visualized on two scenes shows that textures capture high-frequency residual appearance such as foliage structure and fabric detail, while SH color provides smooth, low-frequency shading. Together, they produce the final photorealistic result*
 
 ### 主结果：固定预算下的质量–内存权衡
@@ -249,7 +251,7 @@ Table 5 显示 A²TG 在 DeepBlending 500k 高斯下渲染速度为 140 FPS，�
 
 论文中未报告具体导致严重伪影或崩溃的失败案例。结构上，**当梯度阈值设定不当或场景整体偏高频时，可能存在少数低贡献高斯被错误上采样，使内存收益收窄**，但这些属于参数敏感性范畴而非系统性失败。从消融亦可反推：如果禁用上采样（即所有纹理固化为 $1 \times 1$），则高频区域将永久模糊，这实质上是任何纹理化表示在分辨率不足时的普适退化模式。进一步讨论中提到将纹理下采样或扩展到可变形基元是未来方向，当前工作并未覆盖动态场景或极端带宽受限情况。
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 A²TG的核心突破在于重新定义了"纹理高斯"中**纹理资源的分配逻辑**。传统的纹理高斯方法（如Textured Gaussians*、Super Gaussians）为每个基元分配固定大小的正方形纹理，其根本缺陷在于忽略了高斯基元自身的尺度、可见性以及各向异性足迹的巨大差异。这导致大量处于平滑区域或小幅贡献的高斯被强制绑定了冗余的纹理参数，造成系统性的内存浪费，而场景真正需要高频细节的区域（如复杂纹理边界）反而无法获得足够的参数分辨率。A²TG的因果调节旋钮是**梯度引导的自适应纹理控制策略**：它不再将纹理分辨率视为静态属性，而是根据位置梯度筛选出"需要高频细节"的高斯，并基于高斯两轴的比例关系，各向异性地决定上采样的分辨率与宽高比，从而实现了从"均匀分配"到"按需分配"的范式转换。
 
@@ -265,12 +267,13 @@ A²TG的核心突破在于重新定义了"纹理高斯"中**纹理资源的分�
 
 **开放问题**包括：（1）是否可以引入纹理下采样机制，对低贡献高斯反向回收纹理资源，实现闭环的纹理容量管理？（2）如何将自适应纹理控制扩展到可变形基元或4DGS框架，以覆盖动态场景重建？（3）当前梯度选择仅依赖位置梯度，是否可以通过多模态信号（如纹理梯度、辐射度梯度）进行更精准的高斯筛选？（4）能否设计更智能的纹理图集打包策略，减少metadata查询和碎片化带来的开销，以适配资源极度受限的下游应用？这些方向指向一个更深层的核心问题：在3D基元表示中，如何为每个基元找到最优的"表达能力-存储效率"平衡点。A²TG基于梯度和各向异性给出了一个有效的初步解，但该解只覆盖了纹理维度的自适应，尚未触及几何维度的类似逻辑——未来的研究可能拓展为更一般的"自适应基元容量分配"框架，将纹理、高斯阶数、致密化策略纳入统一的资源分配优化。
 
+### 相关样本
+
+- [[analysis/ICLR_2026/3DGEER_3D_Gaussian_Rendering_Made_Exact_and_Efficient_for_Generic_Cameras.md|3DGEER]]：同属 3D Gaussian / scene representation 样本，可对照纹理高斯表示与解析渲染效率的不同设计取向。
+
+
 ## 原文 PDF
 
 PDF 文件：paperPDFs/ICLR_2026/A2TG_Adaptive_Anisotropic_Textured_Gaussians_for_Efficient_3D_Scene_Representation.pdf
 
-## 相关样本
-
-- [[obsidian-vault/analysis/ICLR_2026/3DGEER_3D_Gaussian_Rendering_Made_Exact_and_Efficient_for_Generic_Cameras.md|3DGEER]]：同属 3D Gaussian / scene representation 样本，可对照纹理高斯表示与解析渲染效率的不同设计取向。
-
-![[obsidian-vault/paperPDFs/ICLR_2026/A2TG_Adaptive_Anisotropic_Textured_Gaussians_for_Efficient_3D_Scene_Representation.pdf]]
+![[paperPDFs/ICLR_2026/A2TG_Adaptive_Anisotropic_Textured_Gaussians_for_Efficient_3D_Scene_Representation.pdf]]

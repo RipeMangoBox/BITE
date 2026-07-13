@@ -34,7 +34,11 @@ claims:
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/diffusion_image_video |
 | Method |  |
 | Dataset | ImageNet |
-## 概述
+
+> [!tip] 效果简介
+> 本笔记的既有实验指标、对比结果与适用边界见“实验与关键发现”；本轮仅统一结构，不改写证据。
+
+## 概要
 
 本文提出 **MPDiT (Multi-Patch Diffusion Transformer)**，一种面向图像生成的分层扩散 Transformer 架构，旨在解决标准 DiT 中高分辨率生成的计算瓶颈。核心思路是采用**从全局到局部（Global-to-Local）的多尺度 patch 策略**：早期 Transformer 块使用大 patch（如 p=4）捕捉全局上下文，后期通过上采样模块扩展为小 patch（p=2）细化局部细节，从而在不牺牲生成质量的前提下显著降低计算量。
 
@@ -42,7 +46,7 @@ claims:
 
 在 ImageNet 256×256 上，MPDiT-XL 以 59.3 GFLOPs 达到 FID 2.05，计算量仅为 DiT/SiT 的约 8.8%；在 ImageNet 512×512 上，以 228.4 GFLOPs 达到 FID 2.47，计算量约为 DiT/SiT 的 8.7%。消融实验表明，多 patch 设计可降低最多 50% 的 GFLOPs，FNO 时间嵌入带来约 4 个点的 FID 提升。
 
-## 背景与动机
+
 
 扩散模型已在图像生成领域取得显著进展，其中基于 Transformer 的扩散主干网络（如 DiT）凭借可扩展性和灵活性展现出强大潜力。然而，现有 DiT 架构在计算效率与生成质量之间仍存在明显张力。
 
@@ -54,7 +58,9 @@ claims:
 
 **本文动机**正是针对上述缺口，提出一种从粗到细的层次化 Transformer 架构，使模型能够在早期块中使用大补丁高效捕获全局上下文，在后期块中通过上采样模块将大补丁标记扩展为更多的小补丁标记以细化局部细节。同时，引入基于傅里叶神经算子（FNO）的时间嵌入模块，以更平滑地建模时间步之间的过渡关系。这一设计在保持生成质量的同时，显著降低了计算成本。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MPDiT 的核心创新在于将传统 DiT 的**各向同性全分辨率架构**重构为**全局到局部的层次化多尺度架构**，并通过三个关键模块的协同设计，在显著降低计算开销的同时保持甚至提升生成质量。
 
@@ -99,7 +105,7 @@ MPDiT 还引入了两个辅助创新：
 
 整体而言，MPDiT 通过**层次化多尺度架构**这一主线创新，配合 FNO 时间嵌入、多 token 条件注入等辅助改进，在 ImageNet 256×256 上以 **50% 的 GFLOPs 削减**实现了 **cfg FID 2.05** 的优异性能，验证了“全局-局部”解耦设计的有效性。
 
-## 整体框架
+
 
 MPDiT 的整体架构遵循一种**由粗到细的全局-局部处理范式**，其核心思想是将标准各向同性 DiT 的单一分辨率 patch 序列替换为两级层次化 token 流。整个 pipeline 由三个主要功能阶段串联而成：**大 patch 嵌入与全局编码**、**上采样模块**、以及**小 patch 精细解码**。
 
@@ -116,7 +122,7 @@ MPDiT 的整体架构遵循一种**由粗到细的全局-局部处理范式**，
 ![[assets/figures/papers/paper_list_l900_https_arxiv_org_abs_2603_26357/figures/002_Figure_2.jpg]]
 *Figure 2: Architecture of MPDiT, which consists of (a) the Global-Local MultiPatch Diffusion Transformer, (b) DiT Block with shared time embedding, (c) The Upsample Module and (d) The FNO Time Embedding*
 
-## 核心模块与公式推导
+
 
 ### 3.1 训练框架：流匹配目标
 
@@ -150,7 +156,9 @@ $$T_{cls} = \text{reshape}(E_{cls}[c], (m, D))$$
 
 标准 DiT 在每个 Transformer Block 中独立使用自适应实例归一化（AdaIN）注入条件和时间信息。MPDiT 将 AdaIN 操作前置为共享模块：先将类别嵌入与时间嵌入合并，统一施加 AdaIN，再将结果分发至各 Block。此设计使参数量从 130M 降至约 90M，减少约 30%，同时保持了生成质量。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -221,7 +229,9 @@ ImageNet 512×512 的结果见 Table 8 和 Table 9，MPDiT 在该分辨率下同
 ![[assets/figures/papers/paper_list_l900_https_arxiv_org_abs_2603_26357/figures/001_Figure_1.jpg]]
 *Figure 1: The generated samples from MPDiT-XL with the cfg-scale w = 3 at epoch 160*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -262,6 +272,8 @@ MPDiT 的架构建立在 **DiT**（Peebles & Xie, ICCV 2023）的基础之上，
 4. **视频生成的适用性**：全局到局部的多 patch 设计天然适合视频的时空层次结构。在视频扩散 Transformer 中，时空 patch 的层次化策略如何设计？时间维度和空间维度的 patch 粒度是否需要独立控制？
 
 5. **FNO 时间嵌入的理论解释**：消融实验表明 FNO 时间嵌入带来约 4 个 FID 点的提升，但其工作机制尚缺乏深入的理论分析。频域操作是否有助于解耦不同频率的时间动态？这种优势在更长的采样步数或不同的噪声调度下是否保持？
+
+
 
 ## 原文 PDF
 

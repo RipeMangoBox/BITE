@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/GUIDE_Gated_Uncertainty_Informed_Disentangled_Experts_for_Long_tailed_Recognition.pdf
+project_link: null
+code_link: null
 openreview_forum_id: jY21fwcrjr
 aliases:
 - GUIDE
@@ -41,7 +43,7 @@ claims:
 > - ImageNet-LT 上，Top-1 Accuracy 为 62.5，对比 60.8 (PRL)，变化 +1.7。
 > - iNaturalist 2018 上，Top-1 Accuracy 为 76.1，对比 75.1 (PRL)，变化 +1.0。
 
-## 概述
+## 概要
 
 长尾识别（Long‑tailed Recognition, LTR）的核心挑战在于模型在少样本类别上的性能崩溃。现有主流方法——尤其是多专家架构——虽然通过多个专家分支试图弥补尾部类别的学习不足，却普遍陷入一个深层的结构性陷阱：**表示‑决策纠缠导致的专家同质化崩溃**。当多个专家共享高度相似的表示空间时，预测分歧退化为噪声，系统无法真正形成“专家委员会”应有的功能分工。在此基础上，“原因‑症状纠缠”（将数据固有歧义与模型知识不足混为一谈）和“元学习‑主任务优化纠缠”（自适应策略与主网络同步更新导致训练震荡）进一步破坏了自适应机制的可靠性与稳定性。
 
@@ -53,7 +55,7 @@ GUIDE（Gated Uncertainty‑Informed Disentangled Experts）针对上述瓶颈�
 
 在三个主流长尾基准上的实验验证了这一设计的有效性：GUIDE 在 CIFAR‑100‑LT（IR=100）达到 56.4%（+1.5% vs. LOS），在 ImageNet‑LT 达到 62.5%（+1.7% vs. PRL），在 iNaturalist 2018 达到 76.1%（+1.0% vs. PRL），均刷新了当前最优结果。消融实验进一步表明，**三个解耦层次各自带来可累积的性能提升**，且组合特征去相关与预测分歧损失相比单一多样性损失带来 +4.6% 的显著增益，基于分解不确定性的门控策略显著优于仅用总不确定性的不可知门控（56.4% vs. 54.9%），验证了各层次设计的必要性。
 
-## 背景与动机
+
 
 ### 长尾识别的核心挑战
 
@@ -82,7 +84,9 @@ GUIDE 通过三个层次化解耦来实现这一目标：
 
 通过这一层次化解耦设计，GUIDE 将多专家系统从被动应对长尾分布的模式，转变为主动诊断并自我组织资源分配的鲁棒学习框架。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GUIDE 的核心创新在于对多专家长尾学习系统进行了**层次化解耦**，从根本上解决了传统多专家架构中因表示‑决策纠缠导致的专家同质化崩溃问题。该框架通过三个递进层次的解耦设计，将专家多样性构建、不确定性自适应策略和元学习优化分离为相互独立又协同增强的子系统。
 
@@ -117,7 +121,7 @@ GUIDE 的核心创新在于对多专家长尾学习系统进行了**层次化解
 
 三个解耦层次并非孤立设计，而是形成递进依赖关系：只有 Level ❶ 构建了真正多样的专家委员会，Level ❷ 才能将专家分歧转化为可靠的不确定性分解信号；只有 Level ❷ 提供了稳定的自适应策略，Level ❸ 的元学习才能在无灾难性干扰的条件下收敛。消融实验（Table 4）证实，各层依次引入可累积提升性能，完整 GUIDE 在 CIFAR‑100‑LT（IR=100）达到 **56.4%**，远超基线方法。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0010_jY21fwcrjr_GUIDE_Gated_Uncertainty-Informed_Disentangled_Ex/figures/002_Figure_2.jpg]]
 *Figure 2: The Hierarchical Disentanglement architecture of GUIDE. An input is processed via a shared backbone and a committee of experts. Level ❶ enforces diversity by penalizing feature and decision overlap. This enables Level ❷, where expert disagreement is decomposed into epistemic (model) and aleatoric (data) uncertainty. These signals drive a gate controller to modulate the Dynamic Expert Refinement Module (DERM). Finally, Level ❸ decouples optimization into a fast inner loop for task parameters (θ) and a slow outer loop for the meta-policy (ϕ), which closes the meta-learning loop by updating the gate controller*
@@ -146,7 +150,7 @@ GUIDE 采用两步推理策略：首先执行单次前向传播获取初步预�
 
 需要指出的是，GUIDE 的核心新颖性不在于单个组件（如特征去相关、不确定性分解或元学习本身），而在于**层次化解耦这一顶层设计原则**——它将已有技术按因果逻辑重新组织，使多样性强制、不确定性诊断和稳定优化三者形成闭环，从而实现各层依次累积的性能增益（Table 4 消融实验证实，逐层引入三个解耦机制后性能从基线 45.8% 持续提升至完整 GUIDE 的 56.4%）。
 
-## 核心模块与公式推导
+
 
 GUIDE 的核心创新在于**层次化解耦**——通过三个递进层级，分别解决多专家架构中的表示‑决策纠缠、原因‑症状纠缠、以及元学习‑主任务优化纠缠。以下逐一展开各层级的关键模块与公式。
 
@@ -258,7 +262,9 @@ $$
 
 三层解耦形成**因果链**：第一层构建的多样化专家委员会（式 2–3）是第二层不确定性分解（式 4–5）的前提——若专家同质化，认知不确定性将退化为零，门控策略失效；第二层产生的稳定不确定性信号为第三层元策略优化（式 9–10）提供可靠的优化目标。Table 4 的逐层消融证实：每引入一层解耦，性能持续累积提升，完整 GUIDE 达到最优 56.4%。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 
@@ -320,7 +326,9 @@ Table 14 报告了成本-收益权衡。GUIDE 的参数量和推理延迟高于�
 3. **损坏鲁棒性未验证**：尽管分布偏移实验（Table 3）展示了良好的先验偏移鲁棒性，GUIDE 尚未在基于损坏的基准（如 CIFAR-100-C）上进行系统性评估，其对图像损坏的泛化边界仍是开放问题。
 4. **计算开销**：相比 RIDE、SADE 等轻量级多专家方法，GUIDE 的计算和内存开销更高，在资源严重受限的场景下需权衡取舍。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 长尾识别方法谱系中的定位
 
@@ -353,6 +361,8 @@ GUIDE 框架揭示了两条值得深入探索的研究路径：
 - **推理时策略的增强**：当前两步推理策略可视为一种朴素的测试时自适应形式。未来可探索更先进的推理时策略，如基于 Top‑k 预测的自一致性机制或多轮迭代细化，以进一步增强对初始预测错误的鲁棒性。
 
 - **解耦原则的泛化验证**：GUIDE 的层次化解耦原则在长尾识别任务上取得了显著成功，但其在更广泛的分布外泛化场景（如领域自适应、开集识别）中的有效性尚未得到验证。在 CIFAR‑100‑C 等损坏基准上的系统性评估将是重要的下一步工作。
+
+
 
 ## 原文 PDF
 

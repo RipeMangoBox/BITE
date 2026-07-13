@@ -5,6 +5,7 @@ paper_level: A
 venue: SIGGRAPH
 year: 2026
 pdf_ref: paperPDFs/SIGGRAPH_2026/Prox_E_Fine_Grained_3D_Shape_Editing_via_Primitive_Based_Abstractions.pdf
+code_link: null
 project_link: https://etaisella.github.io/Prox-E/
 aliases:
 - Prox-E
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | Prox·E：基于基元抽象的细粒度三维形状编辑 |
 | 英文题名 | Prox-E: Fine-Grained 3D Shape Editing via Primitive-Based Abstractions |
 | 会议/期刊 | SIGGRAPH 2026 |
-| Links | [paper](https://arxiv.org/abs/2604.23774); [Project](https://etaisella.github.io/Prox-E/) |
+| Links | [paper](https://arxiv.org/abs/2604.23774) · [Project](https://etaisella.github.io/Prox-E/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Prox·E |
 | Dataset | ShapeTalk (Chair, Table, Lamp - hard split) |
@@ -40,7 +41,7 @@ claims:
 > - ShapeTalk (Chair, Table, Lamp - hard split) 上，VQA↑ 为 0.71，对比 0.65 (TRELLIS)，变化 +0.06。
 > - ShapeTalk (Chair, Table, Lamp - hard split) 上，FID↓ 为 32.60，对比 36.64 (TRELLIS)，变化 -4.04。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -68,7 +69,7 @@ Prox·E 属于**免训练的、基于代理表示引导的三维编辑方法**�
 
 **证据强度**：上述定量结果均来自论文报告的 Table 1、Table 2 和 Table 4，置信度 ≥ 0.95。用户研究的样本量和评估协议详见附录，赢率数据具有统计显著性。
 
-## 背景与动机
+
 
 ### 问题背景：三维形状编辑中的细粒度控制困境
 
@@ -88,7 +89,9 @@ Prox·E 属于**免训练的、基于代理表示引导的三维编辑方法**�
 
 Prox·E 是一个无需训练的（training-free）三维编辑框架，其核心创新在于将编辑过程分解为三个解耦的阶段：（1）基于基元抽象的VLM结构编辑；（2）代理诱导的去噪混合策略，将编辑约束注入三维扩散模型的潜空间；（3）基于二维图像编辑器的外观精修。这一设计使得Prox·E能够支持从全局/局部几何变换、参数化编辑、部件增删到风格化外观修改在内的广泛编辑类型（如 Figure 1 所示），同时在与现有基线的定量和定性比较中展现出显著的编辑保真度和身份保持能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Prox·E的核心创新在于构建了一条从“几何抽象”到“符号化编辑”再到“约束引导生成”的完整链路，以此解决现有3D编辑方法在细粒度几何控制上的根本性瓶颈。
 
@@ -112,7 +115,7 @@ Prox·E引入基于超二次曲面（superquadrics）的基元抽象作为中间
 
 在ShapeTalk hard split上，Prox·E的VQA得分达到0.71，比最强基线TRELLIS（0.65）高出0.06（Table 1），这一差距在细粒度编辑任务中具有实质意义。用户研究进一步确认，人类评估者在编辑质量（86.6% win rate vs EditP23）和身份保持（86.3% win rate）两个维度上一致偏好Prox·E（Table 4）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2604_23774/figures/001_Figure_1.jpg]]
 *Figure 1: We introduce Prox·E, a training-free 3D editing framework that operates on a primitive-based geometric abstraction. By editing this proxy representation (second and bottom rows; edited primitives shown in blue, added ones shown in purple) and using it to guide 3D generation, Prox·E enables precise, fine-grained edits while preserving the object’s identity. As illustrated above, our method supports a wide range of text-guided edits, spanning global and localized geometric transformations (edits 1 and 2) including parametric edits (edits involving a numeric parameter, i.e. edit 2), addition and removal of object parts (edit 3), and stylistic appearance-based modifications (edit 4)*
@@ -153,7 +156,7 @@ Prox·E 是一个无需训练的 3D 编辑框架，其输入为一个三维形�
 - **结构引导策略**：不直接使用编辑后的图像条件化生成过程，而是通过代理诱导的混合策略将编辑约束注入扩散模型的潜变量空间，在保持身份与实现编辑之间取得平衡；
 - **结构-外观解耦**：将结构编辑与外观精修分离为两个阶段，使各自可以采用最优的工具（VLM 做几何推理，2D 编辑器做外观修改），避免了耦合方案中常见的几何-外观相互干扰问题。
 
-## 核心模块与公式推导
+
 
 ### 基元抽象与VLM编辑
 
@@ -193,7 +196,9 @@ $$v' = (M_{rel}^{(i)})^{-1} v$$
 
 上述三个模块形成严格的因果链条：基元抽象的粒度直接决定VLM可操作的编辑空间——若SuperDec将语义不同的部件合并为单一基元（如将椅腿与椅座合并），则后续编辑无法对其分别操作。代理编辑的准确性影响去噪混合的质量——错误的基元分类或变换参数会导致变形形状失真，进而使注入的潜变量携带错误的几何先验。外观精修则依赖于结构生成阶段产生的准确遮罩和变形映射，若结构编辑失败，外观混合将无法正确对齐特征。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与机制验证
 
@@ -266,7 +271,9 @@ Fig. 5展示了方法的主要局限性——编辑质量受限于初始基元�
 
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2604_23774/figures/067_Figure.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心瓶颈与因果机制
 
@@ -324,6 +331,8 @@ Prox·E的因果调控旋钮是**基元抽象**（primitive-based abstraction）
 4. **运行效率优化**：能否通过加速SLAT反向过程或减少VLM迭代次数来缩短运行时间？是否可能用更高效的潜变量编辑方法替代完整的扩散反向过程？
 
 5. **动态与交互式编辑**：如何将方法扩展到支持实时交互式编辑和动态场景编辑？
+
+
 
 ## 原文 PDF
 

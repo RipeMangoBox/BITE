@@ -43,7 +43,7 @@ claims:
 > - UltraVideo 1080p (Wan2.2 4×16×16 潜空间) 上，PSNR / FPS / GPU内存 41.55 / 32.7 / 6.1 GB (FlashDecoder-XL) vs 41.49 / 7.0 / 65.8 GB (Wan2.2 Decoder) (PSNR +0.06, FPS提升4.7×, 内存降低10.8×)。
 > - UltraVideo 720p (Wan2.1 4×8×8 潜空间) 上，PSNR / FPS / GPU内存 37.46 / 76.1 / 2.4 GB (FlashDecoder-XL) vs 37.43 / 15.9 / 16.4 GB (Wan2.1 Decoder) (PSNR +0.03, FPS提升4.8×, 内存降低6.8×)。
 
-## 概述
+## 概要
 
 ### 问题：潜空间解码成为实时视频生成的瓶颈
 
@@ -75,7 +75,7 @@ claims:
 
 FlashDecoder在方法谱系中处于**流式Transformer解码器**的交叉点：它继承了Transformer解码器的高表达能力和灵活的上采样设计，同时通过流式训练协议和滚动KV缓存解决了因果Transformer的训练困难与内存增长问题。与卷积解码器相比，FlashDecoder以更低的计算和内存代价实现了相当的重建质量；与现有的Transformer解码器相比，它是首个同时支持高质量重建、高分辨率训练和流式推理的方案。
 
-## 背景与动机
+
 
 ### 潜空间视频扩散模型的解码瓶颈
 
@@ -105,7 +105,9 @@ FlashDecoder旨在从根本上解决上述矛盾。其核心洞察是：**时间
 
 通过这一统一的流式协议，FlashDecoder在保持与卷积解码器匹敌的重建质量（1080p下PSNR 41.55 vs. 41.49 dB）的同时，实现了3.6×–4.7×的吞吐量提升和最高11×的内存降低，将VAE解码从实时视频生成的瓶颈转变为高效可扩展的组件。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FlashDecoder 的核心创新在于**通过处理顺序而非显式注意力掩码来强制执行时间因果性**，从而在纯 Transformer 解码器中同时实现高质量重建与高效流式推理。这一设计围绕三个相互耦合的 changed slots 展开。
 
@@ -135,7 +137,7 @@ FlashDecoder 最关键的 changed slot 是**训练与推理使用完全相同的
 
 上述 changed slots 并非孤立存在，而是形成紧密的因果链条：**SW-CA + 流式训练**消除了因果掩码依赖，使训练与推理协议统一；**GQA + 滚动 KV 缓存**将统一协议下的内存开销控制在有界范围内；**时序优先上采样**则进一步缓解了空间注意力二次复杂度对高分辨率场景的制约。三者共同实现了论文的核心主张——在匹敌卷积解码器重建质量（1080p 下 PSNR 41.55 vs. 41.49 dB）的同时，吞吐量提升 3.6×–4.7×，内存降低最高 11×。
 
-## 整体框架
+
 
 FlashDecoder 是一个纯 Transformer 的视频解码器，将潜空间视频帧逐帧转换为像素。其设计核心是**训练与推理使用完全相同的流式协议**——模型在任何阶段一次最多只能看到 $W_{\text{frm}}$ 帧，通过处理顺序而非显式注意力掩码来强制执行时间因果性。
 
@@ -178,7 +180,7 @@ FlashDecoder 的推理管线由五个模块串联构成，数据流严格遵循�
 ![[assets/figures/papers/paper_list_l871_https_openaccess_thecvf_com_content_CVPR2026_html_Kang_FlashDecoder_Real/figures/003_Figure_3.jpg]]
 *Figure 3: FlashDecoder pipeline. FlashDecoder is a pure-Transformer decoder that converts video latents to pixels in a frame-by-frame manner. Each latent frame*
 
-## 核心模块与公式推导
+
 
 ### 3.1 潜变量投影
 
@@ -236,7 +238,9 @@ $$
 
 其中 $\mathcal{L}_{\mathrm{L1}}$ 为逐像素 L1 损失，$\mathcal{L}_{\mathrm{LPIPS}}$ 为感知相似度损失，$\mathcal{L}_{\mathrm{adv}}$ 为 3D 块判别器的对抗损失。三者协同优化重建保真度与视觉质量——对抗损失以小幅 PSNR 下降换取更低的 rFVD 和更清晰的输出。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈验证
 
@@ -324,7 +328,9 @@ W_frm=2在质量与内存之间取得最佳平衡点。增大窗口可略微提�
 ![[assets/figures/papers/paper_list_l871_https_openaccess_thecvf_com_content_CVPR2026_html_Kang_FlashDecoder_Real/figures/009_Figure_4.jpg]]
 *Figure 4: Per-frame PSNR on long videos at 720p. Averaged over 40 videos (>400 frames each) from UltraVideo. FlashDecoder maintains stable quality with constant memory regardless of video length*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：VAE解码作为实时视频生成的瓶颈
 
@@ -400,6 +406,8 @@ FlashDecoder的设计假设和适用边界包括：
 6. **跨任务泛化**：FlashDecoder的流式解码范式（逐帧处理+滚动KV缓存）是否可以推广到其他需要因果时序建模的视觉任务，如视频预测、动作识别、视频插帧等？
 
 7. **单阶段训练简化**：能否将多阶段训练流程简化为混合分辨率单阶段训练，同时保持甚至提升当前的重建质量？这需要解决不同分辨率下模型容量分配和损失平衡的问题。
+
+
 
 ## 原文 PDF
 

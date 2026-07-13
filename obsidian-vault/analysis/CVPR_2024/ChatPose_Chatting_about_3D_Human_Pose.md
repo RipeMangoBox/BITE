@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2024
 pdf_ref: paperPDFs/CVPR_2024/ChatPose_Chatting_about_3D_Human_Pose.pdf
+project_link: https://yfeng95.github.io/ChatPose
+code_link: null
 aliases:
 - CCA3HP
 tags:
@@ -41,7 +43,7 @@ claims:
 > - RPE Benchmark 上，PA-MPJPE (mm, averaged over descriptions) 101.8 vs 107.3 (SPIN) (-5.5)。
 > - 3DPW (classical pose estimation) 上，PA-MPJPE (mm) 81.9 vs 58.4 (HMR 2.0) (+23.5)。
 
-## 概述
+## 概要
 
 3D人体姿态估计与生成长期依赖专用视觉回归网络，这些方法在孤立任务中表现优异，但缺乏语义理解、世界知识与高层推理能力，无法处理需要常识或场景上下文的复杂查询。ChatPose的核心洞察在于：将3D人体姿态视为一种新的模态融入多模态大型语言模型（LLM），通过微调使LLM将其预训练的世界知识与SMPL姿态表示相连接，从而解锁基于复杂推理的姿态生成与估计能力。
 
@@ -51,8 +53,6 @@ claims:
 
 **方法定位**：ChatPose属于将结构化感知信号嵌入LLM的新范式，与PoseScript（Delmas et al., ECCV 2022）等文本到姿态的专用方法、HMR 2.0（Goel et al., ICCV 2023）和SPIN（Kolotouros et al., ICCV 2019）等图像到姿态的专用回归器，以及LLaVA（Liu et al., NeurIPS 2023）等多模态LLM形成互补与对比关系。其主要局限在于全局人体方向估计经常出错，且新引入的SPG和RPE基准规模较小，可能限制结论的泛化性。
 
-## 背景与动机
-
 3D人体姿态估计与生成是计算机视觉领域的核心问题，在虚拟现实、人机交互、运动分析等场景中具有广泛应用。近年来，以**HMR 2.0**（Goel et al., ICCV 2023）和**SPIN**（Kolotouros et al., ICCV 2019）为代表的专用回归网络在经典姿态估计基准上取得了显著进展。这些方法通常以裁剪后的人体图像为输入，通过视觉编码器直接预测SMPL姿态参数，其训练范式依赖于单任务监督学习和手动数据增强。在文本到姿态生成方向，**PoseScript**（Delmas et al., ECCV 2022）等方法尝试从自然语言描述中合成3D姿态，但其理解能力局限于字面描述，难以处理需要常识推理的复杂查询。
 
 然而，上述方法共享一个根本性瓶颈：它们在孤立的任务设定中运行，缺乏语义理解、世界知识与高层推理能力。当面对“在沙发下寻找遥控器时应采取什么姿势”或“根据图像中人物的情绪推断其身体姿态”这类需要常识或场景上下文的查询时，专用模型束手无策。这是因为这些模型从未被训练去建立语言概念与身体姿态之间的因果关联，也无法利用大规模预训练中积累的世界知识。
@@ -61,7 +61,7 @@ claims:
 
 本文的核心动机由此产生：**能否将3D人体姿态视为一种新的模态融入多模态LLM，使其借助预训练的世界知识直接生成并推理人体姿态？** 这一思路的吸引力在于，LLM已经通过海量文本和图像数据习得了关于人类行为、物理常识和场景理解的丰富知识——关键在于设计一种机制，将这些知识与SMPL姿态表示连接起来，而无需为每一种新场景收集大量标注数据。
 
-## 核心创新
+## 核心方法与创新机理
 
 ChatPose的核心创新在于将**3D人体姿态视为多模态大语言模型的一种新模态**，而非沿用专用视觉回归网络的孤立预测范式。这一根本性的视角转换催生了三个紧密耦合的技术变革，共同构成了方法的核心壁垒。
 
@@ -105,8 +105,6 @@ $$\mathcal{L} = \lambda_t \mathbf{CE}(\hat{Y}_t, Y_t) + \lambda_\theta |\hat{\th
 
 值得注意的是，即使在无遮挡数据增强的训练下，ChatPose对严重遮挡展现出意外的鲁棒性（Figure 10），暗示模型利用了LLM的通用视觉知识进行补全推理——这是传统专用方法难以复现的涌现行为。
 
-## 整体框架
-
 ChatPose 将 3D 人体姿态视为一种新的模态融入多模态大语言模型（MLLM），其核心思路是：让 LLM 在文本输出中生成一个专用的 `<POSE>` token，再通过一个 MLP 投影层将该 token 的语言嵌入映射为 SMPL 姿态参数，从而直接生成 3D 人体网格。整个框架由三个关键组件串联而成：**多模态 LLM**、**SMPL 投影层**和 **SMPL 参数化人体模型**（图 2）。
 
 **输入输出流**。模型接收文本查询 $X_q$，并可选择性地接收图像 $X_v$。多模态 LLM $f_{\phi}$ 处理这些输入后生成文本响应 $Y_t$：
@@ -131,11 +129,6 @@ $$\mathcal{L} = \lambda_t \mathbf{CE}(\hat{Y}_t, Y_t) + \lambda_\theta |\hat{\th
 
 ![[assets/figures/papers/paper_list_l1845_ChatPose_Chatting_about_3D_Human_Pose/figures/002_Figure_2.jpg]]
 *Figure 2: Method and Training Overview. Our model is composed of a multi-modal LLM (with vision encoder, vision projection layer and LLM), a SMPL projection layer, and the parametric human body model, i.e. SMPL [32]. The multi-modal LLM processes text and image inputs (if provided) to generate textual responses. In the training phase, we focus on training the SMPL projection layer and fine-tuning the LLM, while keeping the other components frozen. The three data types used for the end-to-end training are: text-to-3D pose generation, image-to-pose estimation, and multi-modal instruction-following data. When an image is available, its information is used by the LLM to deduce an answer. If the user inqu...*
-
-![[assets/figures/papers/paper_list_l1845_ChatPose_Chatting_about_3D_Human_Pose/figures/011_Figure_7.jpg]]
-*Figure 7: Illustration of our method to generate person descriptions for the RPE benchmark. We use ViTPose [55] to detect the body keypoints and mark the left-body and right-body joints with different colors as visual prompts, and then query GPT4V for descriptions*
-
-## 核心模块与公式推导
 
 ### 关键模块
 
@@ -171,7 +164,7 @@ $$\mathcal{L} = \lambda_t \mathbf{CE}(\hat{Y}_t, Y_t) + \lambda_{\theta} |\hat{\
 
 ChatPose 采用选择性冻结的混合训练策略：视觉编码器（CLIP）和视觉投影层完全冻结，SMPL 投影层从头训练，LLM 通过 LoRA 进行参数高效微调。训练数据包含三种类型：文本到姿态生成对、图像到姿态估计对、以及多模态指令遵循数据。消融实验（Table 10）证实，同时包含图像-姿态和文本-姿态对的训练数据可显著降低 PA-MPJPE，表明两类数据具有互补性。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -215,15 +208,9 @@ RPE 基准要求模型根据不同类型的文本描述（如动作描述、空�
 
 在传统基准上，ChatPose 作为概念验证，精度仍落后于专用回归器。**Table 3** 显示：
 
-![[assets/figures/papers/paper_list_l1845_ChatPose_Chatting_about_3D_Human_Pose/figures/007_Table_3.jpg]]
-*Table 3: Comparison on Human Pose Estimation. MPJPE (mm), PA-MPJPE (mm), and MPJRE (×100) are reported*
-
 - 在 3DPW 上，ChatPose 的 PA-MPJPE 为 **81.9 mm**，而 **HMR 2.0**（Goel et al., ICCV 2023）为 **58.4 mm**，差距约 23.5 mm。
 - 在 Human3.6M 上趋势一致，ChatPose 的 PA-MPJPE（66.3 mm）落后于 HMR 2.0（44.2 mm）。
 - **Figure 4** 的定性对比清晰展示了这一差距的视觉表现：ChatPose 能捕捉身体局部姿态，但整体定位和方向常出现偏差。
-
-![[assets/figures/papers/paper_list_l1845_ChatPose_Chatting_about_3D_Human_Pose/figures/005_Figure_4.jpg]]
-*Figure 4: We compare multi-modal LLMs (LLaVA [30], GPT-4 [36]) and traditional HMR-style methods (HMR2.0 [12], SPIN [22]) for classical human pose estimation. LLaVA* is LLaVA fine-tuned with keypoint data*
 
 ### 通用对话能力保持
 
@@ -245,9 +232,6 @@ RPE 基准要求模型根据不同类型的文本描述（如动作描述、空�
 
 此外，**Figure 10** 展示了意外发现：尽管训练中未使用任何遮挡数据增强，ChatPose 对严重遮挡场景展现出令人惊讶的鲁棒性。这暗示 LLM 预训练阶段习得的通用视觉知识（如物体遮挡的常识）在姿态推理时被有效迁移利用，但这种鲁棒性的边界和机制仍需进一步研究（置信度 0.9，需人工验证）。
 
-![[assets/figures/papers/paper_list_l1845_ChatPose_Chatting_about_3D_Human_Pose/figures/019_Figure_10.jpg]]
-*Figure 10: Pose estimation on images with significant occlusion. Without training for occlusion cases, ChatPose is surprisingly robust*
-
 ### 基准构建与评估细节
 
 SPG 基准包含 780 对隐式文本查询-姿态对，通过 GPT-4V 辅助的标注管线生成（Figure 6）：从 PoseScript 的显式姿态描述出发，利用 LLM 生成需要常识推理的隐式查询。RPE 基准包含 250 对，通过 ViTPose 检测关键点并以彩色标记作为视觉提示，再查询 GPT-4V 生成不同类型的文本描述（Figure 7）。两个基准规模较小，可能限制结论的泛化性。
@@ -261,16 +245,10 @@ SPG 基准包含 780 对隐式文本查询-姿态对，通过 GPT-4V 辅助的�
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l1845_ChatPose_Chatting_about_3D_Human_Pose/figures/009_Table_4.jpg]]
-*Table 4: GPT4-Assisted Evaluation. “Conv,” “Details,” and “Complex” signify three categories of questions produced by the LLaVA data generation pipeline, covering conversation, detailed description, and complex reasoning*
-
 ![[assets/figures/papers/paper_list_l1845_ChatPose_Chatting_about_3D_Human_Pose/figures/014_Table_10.jpg]]
 *Table 10: Ablation study: effect of different training data. PA-MPJPE (in mm) is reported. Lower is better*
 
-![[assets/figures/papers/paper_list_l1845_ChatPose_Chatting_about_3D_Human_Pose/figures/015_Table_11.jpg]]
-*Table 11: Ablation study: effect of multimodal LLM backbones. PA-MPJPE (in mm) is reported. Lower is better*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 核心范式转移：从专用回归到LLM驱动的姿态模态
 

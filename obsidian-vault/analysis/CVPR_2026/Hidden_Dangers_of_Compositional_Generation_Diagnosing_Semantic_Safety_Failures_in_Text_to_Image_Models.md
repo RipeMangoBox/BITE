@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/Hidden_Dangers_of_Compositional_Generation_Diagnosing_Semantic_Safety_Failures_in_Text_to_Image_Models.pdf
+project_link: null
 code_link: null
 aliases:
 - CCRA
@@ -43,7 +44,7 @@ claims:
 > - DALL·E 3 上，ASR 0.644 vs 0.407 (DACA) (+0.237)。
 > - SDXL 上，ASR 0.593 vs 0.585 (Ring-a-Bell) (+0.008)。
 
-## 概述
+## 概要
 
 当前文本到图像（T2I）模型普遍部署了安全过滤机制，以防止生成有害内容。然而，这些机制在**语义组合层面存在系统性盲点**：当攻击者将恶意意图拆解为一组表面上无害的子场景，并借助模型自身的组合生成能力将其重新融合时，单一子场景不会触发报警，而组合后的整体语义却隐含危险。本文揭示了这一“组合生成中的隐形危险”，并提出了一种名为 **CoRA（Composable Reassembly Attack，可组合重组攻击）** 的黑盒攻击方法，用于系统性地诊断该安全漏洞。
 
@@ -58,7 +59,7 @@ CoRA 的核心洞见在于**逆向利用组合生成模型的天然倾向**—�
 
 CoRA 的威胁模型为纯黑盒设定，仅需文本输入即可完成攻击，不依赖梯度、潜在变量或采样过程修改。这一特性使其对当前商用 T2I 系统构成现实威胁，同时也为防御方指明了方向：未来的安全机制必须从单一的提示级过滤，升级为能够感知语义组合风险的**分解-检测**范式。
 
-## 背景与动机
+
 
 ### 文本到图像生成的安全困境
 
@@ -84,7 +85,9 @@ CoRA 的威胁模型为纯黑盒设定，仅需文本输入即可完成攻击，
 
 具体而言，CoRA将攻击建模为一个约束优化问题：在保证各子场景单独通过安全检查的前提下，通过迭代选择与重组，最大化生成图像与原始恶意意图的语义对齐度。这一范式在完全黑盒条件下即可实施，仅需目标模型的文本输入接口，无需任何内部信息。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 1. 攻击范式的根本转变：从采样空间侵入到纯文本语义操控
 
@@ -128,7 +131,7 @@ CoRA的另一重要创新特性是其**对辅助模型选择的低敏感性**。
 
 **Table 6 的消融实验给出了明确答案**：更换不同规模与来源的辅助模型（Qwen3-8B、Qwen2-7B、Qwen3-235B）对ASR和SC的影响极小，最大差异仅 **0.03/0.01**。这一结果表明，CoRA的攻击逻辑根植于语义分解与重组的结构性原理，而非特定LLM的涌现能力——只要辅助模型具备基本的场景解析与语义补全能力，攻击即可有效执行。该特性显著降低了攻击者的资源门槛，也意味着防御方不能寄希望于通过限制特定模型来阻断此类攻击。
 
-## 整体框架
+
 
 CoRA（Composable Reassembly Attack）的整体设计遵循“分解—筛选—重组—迭代”的四阶段流水线，全程在纯文本空间中操作，不修改目标T2I模型的采样过程，从而在黑盒条件下实现语义安全绕行。其核心逻辑是：将有害意图拆解为表面上无害的细粒度视觉元素，利用T2I模型自身的组合生成能力，通过迭代选择与重组逐步恢复原始恶意语义，同时规避安全过滤器。
 
@@ -149,7 +152,7 @@ CoRA（Composable Reassembly Attack）的整体设计遵循“分解—筛选—
 ![[assets/figures/papers/paper_list_l2316_https_openaccess_thecvf_com_content_CVPR2026_html_Yang_Hidden_Dangers_of/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the CoRA (Composable Reassembly Attack) method: the potentially harmful intent is first decomposed into a set of fine-grained visual elements, which are then iteratively selected, refined, and reassembled into coherent prompts that guide the target T2I model to reconstruct the original malicious scene while avoiding safety checks by operating purely in the text space instead of modifying the model’s sampling process*
 
-## 核心模块与公式推导
+
 
 CoRA 的核心设计理念是**将有害意图的语义重构过程完全限定在文本空间内**，不触碰目标 T2I 模型的采样过程，从而在黑盒条件下实现高效攻击。整个流水线由四个关键模块串联构成，对应两组核心公式体系。
 
@@ -218,7 +221,9 @@ $$\underset{S^*}{\arg\max}\ \mathcal{E}(I(S^*), G)\ \mathrm{s.t.}\ I(S^*) = \mat
 ![[assets/figures/papers/paper_list_l2316_https_openaccess_thecvf_com_content_CVPR2026_html_Yang_Hidden_Dangers_of/figures/001_Figure_1.jpg]]
 *Figure 1: The left part shows that when individual concepts are input separately, the model can generate images; however, when these concepts are combined into a complete scene, the generation is blocked by the safety filter due to the presence of high-risk semantics. To address this, we decompose the original scene into multiple sub-scenes, which can be generated but lead to semantic inconsistency as a whole. In contrast, compositional generation with modified sampling can maintain semantic consistency, while our fine-grained semantic completion achieves a similar effect without modifying the sampling process*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：跨模型攻击成功率与语义一致性
 
@@ -317,7 +322,9 @@ CoRA 不仅攻击效果最强，而且效率极高，如 **Table 2** 所示。
 ![[assets/figures/papers/paper_list_l2316_https_openaccess_thecvf_com_content_CVPR2026_html_Yang_Hidden_Dangers_of/figures/007_Table_3.jpg]]
 *Table 3: Comparison of IS and PPL between our method and baselines across multiple T2I Models, with darker shading indicating better performance*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 攻击范式谱系中的坐标
 
@@ -357,6 +364,8 @@ CoRA 的工作位于三个研究方向的交汇处：
 | **黑盒对抗攻击** | 提供一种仅需文本访问的高效攻击范式，不依赖梯度、潜在空间或采样过程修改 |
 
 从防御视角看，CoRA 提出的真正挑战并非具体攻击方法本身，而是其揭示的**结构性脆弱性**：只要安全过滤在语义组合层面存在盲点，攻击者就可以通过分解-重组策略绕过。这指向一个更深层的研究问题——如何设计能够感知语义组合风险的防御机制，在不损害模型创意生成能力的前提下有效阻断此类攻击。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Watermarking_Diffusion_Language_Models.pdf
+project_link: null
+code_link: https://github.com/eth-sri/diffusion-lm-watermark
 openreview_forum_id: 3aBWTYGcaT
 aliases:
 - DW
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 扩散语言模型的水印方法 |
 | 英文题名 | Watermarking Diffusion Language Models |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=3aBWTYGcaT); [GitHub](https://github.com/eth-sri/diffusion-lm-watermark) |
+| Links | [paper](https://openreview.net/forum?id=3aBWTYGcaT) · [GitHub](https://github.com/eth-sri/diffusion-lm-watermark) |
 | Topic | #topic/safety_alignment_fairness_privacy #topic/safety_alignment_fairness_privacy/trustworthy_machine_learning |
 | Method | DLM Watermark（基于优化框架的期望增强与预测偏置） |
 | Dataset | LLADA‑8B (WATERBENCH prompts, 275 tokens avg), DREAM‑7B (WATERBENCH prompts, 213 tokens avg), LLADA‑8B vs Order‑Agnostic Watermarks (Unigram, PatternMark) |
@@ -42,7 +44,7 @@ claims:
 > - DREAM‑7B (WATERBENCH prompts, 213 tokens avg) 上，TPR@1%FPR 为 0.99，对比 0.49 (for C={-1}, δ=4)，变化 +0.50。
 > - LLADA‑8B (WATERBENCH prompts, 275 tokens avg) 上，log PPL (quality) 为 1.90 (C={-1},δ=4) / 1.80 (C={-1,1},δ=5)，对比 1.93 (C={-1},δ=4) / 1.86 (C={-1,1},δ=5)，变化 similar or slightly better。
 
-## 概述
+## 概要
 
 **核心问题**：现有自回归语言模型（ARLM）的水印方法依赖已生成的上下文token进行哈希计算，但扩散语言模型（DLM）允许以任意顺序生成token，导致上下文在生成时往往尚不完整。直接将ARLM水印适配到DLM场景，检测率极弱（TPR@1%FPR仅为0.49–0.83），无法实用。
 
@@ -55,7 +57,7 @@ claims:
 
 **方法定位**：该方法在方法谱系上属于**优化驱动的扩散语言模型水印**，将Red‑Green水印框架（Kirchenbauer et al., 2023）从自回归场景推广到非自回归的扩散生成场景，通过概率哈希分布上的期望操作解决了上下文不完整带来的核心瓶颈。与顺序无关水印（如Unigram、PatternMark）相比，本文方法在低失真区间的检测率-质量权衡上具有显著优势（Fig. 5）。
 
-## 背景与动机
+
 
 ### 扩散语言模型的兴起与生成范式的转变
 
@@ -75,7 +77,9 @@ claims:
 
 该优化框架的解自然导出两个关键分量——**期望增强（Red‑Green in expectation）** 与**预测偏置（predictive bias）**——且可直接复用现有的Red‑Green检测器，无需修改检测端。这一设计使得本文方法在保持与现有水印生态兼容的同时，从根本上解决了DLM场景下的水印失效问题。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：扩散生成中上下文哈希的缺失
 
@@ -120,7 +124,7 @@ $$q_t^* \propto p_t \underbrace{\exp(\delta G^\top p_{t-1})}_{\text{期望增强
 
 值得注意的是，当限制到自回归生成场景时，本文的优化框架**精确退化为标准 Red‑Green ARLM 水印**（Sec. 3.3）。这表明本文方法并非另起炉灶，而是将 ARLM 水印从“确定性上下文”推广到“概率性上下文”的自然扩展，实现了两种生成范式下水印方案的统一。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_3aBWTYGcaT/figures/001_Figure_1.jpg]]
 *Figure 1: An overview of why current watermarks for ARLMs fall short in the diffusion setting (left), how our watermark operates in this setting (middle) and how our watermark detector works (right)*
@@ -179,7 +183,7 @@ $$q_t^* \propto p_t \exp(\delta G^\top p_{t-1}) \exp(\delta G p_{t+1})$$
 
 该pipeline的关键创新在于**将水印施加从“确定性上下文”推广到“上下文哈希的概率分布”**，从而解决了扩散语言模型因任意顺序生成导致上下文不完整、直接应用ARLM水印效果极弱的瓶颈问题。
 
-## 核心模块与公式推导
+
 
 ### 优化框架
 
@@ -258,7 +262,9 @@ $$S = \sum_{i=1}^L G_{s_i, t_i}$$
 
 其中 $s_i$ 为位置 $i$ 的哈希值，$t_i$ 为 token id。由于本文使用独立同分布的绿色列表（而非原 Red‑Green 的相关列表），检测统计量 $S$ 在零假设下服从二项分布，可直接计算 $p$ 值。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：检测率-质量权衡
 
@@ -334,7 +340,9 @@ $$S = \sum_{i=1}^L G_{s_i, t_i}$$
 ![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_3aBWTYGcaT/figures/051_Figure_23.jpg]]
 *Figure 23: Watermark Performance ROC curves (log scaled) of KGW and our watermark for both LLADA-8B (top) and DREAM-7B (bottom), and different values of δ using ${ \mathcal { C } } = \{$ - 1 $\}$ (left) or $\mathcal { C } = \{$ - 1 , 1 $\}$ (right)
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法继承与核心突破
 
@@ -404,6 +412,8 @@ $$S = \sum_{i=1}^L G_{s_i, t_i}$$
 4. **鲁棒性边界：** 对基于 LLM 的智能改写、摘要等更强的对抗性编辑，水印的鲁棒性边界在哪里？
 5. **采样策略交互：** 不同采样策略（如 top‑p、典型采样）对水印强度的影响尚未系统研究。
 6. **安全性分析：** 水印在扩散环境中的安全性（抵抗伪造、密钥泄露、移除攻击等）需要进一步研究。
+
+
 
 ## 原文 PDF
 

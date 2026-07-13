@@ -43,7 +43,7 @@ claims:
 > - All 10 unified tracking benchmarks (RGB, RGB-D, RGB-T, RGB-E, RGB-Lang) 上，Average relative performance 99.8% (UTPTrack-S224, 25.6% tokens pruned) vs 100% (SUTrack224, no pruning) (-0.2%)。
 > - All 10 unified tracking benchmarks 上，Average relative performance 99.5% (UTPTrack-S224, 48.0% tokens pruned) vs 100% (SUTrack224) (-0.5%)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -74,7 +74,7 @@ UTPTrack 属于**视觉跟踪中的令牌剪枝方法**，与现有方法（如 
 
 该方法基于单流跟踪器 **OSTrack**（RGB）和 **SUTrack**（统一）构建，在 12 层 ViT 和 24 层 HiViT 主干上验证，支持 224/256/384 分辨率输入，覆盖 4 个 RGB 基准和 10 个统一跟踪基准。
 
-## 背景与动机
+
 
 视觉目标跟踪是计算机视觉的基础任务，旨在根据初始帧给定的目标模板，在后续帧中持续定位目标位置。近年来，基于单流 Transformer 的跟踪器——如 **OSTrack** 和 **SUTrack**——将搜索区域、动态模板和静态模板的令牌拼接后送入统一的自注意力模块，实现了优异的跟踪精度。然而，这种全令牌交互范式带来了显著的计算开销：视觉令牌数量随模板数量和搜索区域分辨率线性增长，导致自注意力复杂度呈二次方膨胀，严重制约了跟踪器的实时部署能力。
 
@@ -100,7 +100,9 @@ UTPTrack 属于**视觉跟踪中的令牌剪枝方法**，与现有方法（如 
 
 通过上述设计，UTPTrack 在几乎不损失精度的前提下，大幅削减视觉令牌数量——在 RGB 跟踪中剪枝 65.4% 的视觉令牌且保持基线 99.7% 的性能，在统一跟踪中剪枝 67.5% 的令牌且保持基线 100.5% 的性能，为高效视觉跟踪提供了简洁而统一的解决方案。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 UTPTrack 的核心创新在于首次提出面向一流（one-stream）Transformer 跟踪器的**跨组件统一令牌剪枝框架**，其关键思想是：搜索区域（SR）、动态模板（DT）和静态模板（ST）之间存在深层冗余依赖，孤立剪枝会破坏这种跨组件信息流，导致次优的精度-效率权衡。UTPTrack 通过三个相互协同的机制突破这一瓶颈。
 
@@ -130,7 +132,7 @@ UTPTrack 的剪枝模块以**轻量级 CTEM（Candidate or Template Elimination 
 
 总体而言，UTPTrack 的创新本质在于**将令牌剪枝从单组件的孤立操作提升为跨组件的统一冗余建模**，并通过注意力复用和空间先验注入，在不牺牲跟踪精度的前提下实现显著的效率增益。
 
-## 整体框架
+
 
 UTPTrack 构建在一流 Transformer 跟踪器之上，其核心设计思想是**联合压缩搜索区域（Search Region, SR）、动态模板（Dynamic Template, DT）和静态模板（Static Template, ST）三类视觉令牌**，而非像现有方法那样孤立地处理各组件。整体 pipeline 如图 2 所示，包含两条并行的跟踪管线：
 
@@ -173,7 +175,7 @@ $$\mathcal{L}_{\mathrm{Unified}} = \mathcal{L}_{\mathrm{RGB}} + \lambda_{\mathrm
 ![[assets/figures/papers/paper_list_l953_https_arxiv_org_abs_2602_23734/figures/002_Figure_2.jpg]]
 *Figure 2: Architecture of the proposed UTPTrack. UTPTrack supports both RGB-based and unified tracking. It adopts a one-stream transformer that jointly processes tokens from the search region (SR), dynamic template (DT), and static template (ST). A lightweight Candidate or Template Elimination Module (CTEM) is inserted into encoder layers to prune redundant tokens from all three sources. In the figure, D/T/E denote depth, thermal, and event modalities, respectively*
 
-## 核心模块与公式推导
+
 
 ### 3.1 一流 Transformer 注意力基础
 
@@ -246,7 +248,9 @@ CTEM 模块并非在所有编码器层执行，而是按照预设的调度插入
 ![[assets/figures/papers/paper_list_l953_https_arxiv_org_abs_2602_23734/figures/018_Table_14.jpg]]
 *Table 14: Effect of spatial priors in attention-guided pruning*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能与效率权衡
 
@@ -317,7 +321,9 @@ Table 8 报告了 GPU（NVIDIA 1080Ti）和 CPU（Intel Xeon Gold 6226R）上的
 ![[assets/figures/papers/paper_list_l953_https_arxiv_org_abs_2602_23734/figures/009_Table_5.jpg]]
 *Table 5: Ablation Study on Unified Trackers. ∆ denotes the average performance change from the row above*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -358,6 +364,8 @@ UTPTrack 的适用边界由以下几个维度定义：
 2. 是否可以利用元学习或强化学习动态选择剪枝层和保留率，以替代当前的人工固定配置？这可以显著降低部署调参成本。
 3. 在更高压缩率（>80%）下，是否可以通过引入令牌重建损失或知识蒸馏来进一步稳定精度？
 4. 对于 RGB-Lang 跟踪，是否可以探索更轻量的文本编码器替代 CLIP-L，以降低统一跟踪变体的参数量开销？
+
+
 
 ## 原文 PDF
 

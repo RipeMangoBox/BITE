@@ -42,7 +42,7 @@ claims:
 > - CIFAR100-to-CIFAR100C 上，Mean Error Rate (%) 29.8 vs 44.0 (Source) (-14.2)。
 > - CIFAR10-to-CIFAR10C 上，Mean Error Rate (%) 9.1 vs 19.2 (Source) (-10.1)。
 
-## 概述
+## 概要
 
 **问题与瓶颈**：持续测试时自适应（CTTA）要求模型在推理阶段持续适应不断变化的分布偏移，而无需访问源域数据。现有方法普遍遵循“后向对齐”范式——依赖目标域噪声伪标签的自训练损失（如 **TENT**，Wang et al., ICLR 2021；**CoTTA**，Wang et al., CVPR 2022）或静态源域代理作为对齐锚点（如 **EATA**，Niu et al., ICML 2022；**RMT**，Döbler et al., CVPR 2023）。在连续分布偏移下，这些监督替代品无法提供可靠信号，导致错误累积与灾难性遗忘，构成该领域的核心瓶颈。
 
@@ -52,7 +52,7 @@ claims:
 
 **主要结果**：在标准CTTA基准上，DAS将ImageNet-to-ImageNetC的平均分类错误率从Source的60.3%降至44.1%，显著优于所有基线方法（**Table 1**）。在CIFAR100-to-CIFAR100C和CIFAR10-to-CIFAR10C上分别降至29.8%和9.1%（**Table 2**）。消融实验证实多级桥接各组件的递进贡献（**Table 3**），且在不同生成模型（BigGAN、SD 1.5、SD 3.0）下性能稳定，验证了桥接机制对生成偏差的解耦能力（**Table 5**）。在混合域、类不平衡及小批量等挑战性场景下，方法保持鲁棒性并优于DPCore等SOTA方法（**Table 12, Table 13**）。代码已开源：https://github.com/z1358/DAS。
 
-## 背景与动机
+
 
 ### 持续测试时自适应的核心挑战
 
@@ -90,7 +90,9 @@ claims:
 
 这一设计使得模型能够在测试时无需访问生成模型（知识库离线构建），仅通过轻量的风格注入操作即可持续获得与当前分布匹配的真实标签监督，从根本上缓解了CTTA中的错误累积问题。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 范式转换：从后向对齐到前向促进
 
@@ -138,7 +140,7 @@ DAS 将合成知识库 $\mathcal{M}$ 视为可动态变换的“语义种子”�
 
 消融实验（Table 3）为这一因果逻辑提供了直接证据：逐步激活知识库、输入级注入、统计级归一化和对比学习，错误率从 50.0% 单调下降至 44.1%，验证了每级桥接的独立贡献。跨生成模型实验（Table 5）进一步表明，即使使用 BigGAN、SD 1.5、SD 3.0 等不同生成器，性能波动仅约 1.2%，证明桥接机制有效解耦了生成偏差——这是后向对齐范式无法实现的关键能力。
 
-## 整体框架
+
 
 DAS 提出了一种与现有 CTTA 方法根本不同的**前向促进（forward-facilitation）范式**。传统方法普遍遵循后向对齐（backward-alignment）思路——要么依赖目标域噪声伪标签的自训练（如 **TENT**, Wang et al., ICLR 2021；**CoTTA**, Wang et al., CVPR 2022），要么使用静态源域代理作为对齐锚点（如 **EATA**, Niu et al., ICML 2022；**RMT**, Döbler et al., CVPR 2023）。这些策略在连续分布偏移下，监督信号的可靠性会持续衰减，导致错误累积与灾难性遗忘。
 
@@ -173,7 +175,7 @@ DAS 的核心洞察是：**由扩散模型预生成的语义纯净合成样本�
 ![[assets/figures/papers/paper_list_l1057_https_arxiv_org_abs_2605_18608/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of the considered CTTA problem and comparison of different frameworks. (a) The pipeline and the central challenge of CTTA. (b)-(c) Existing methods primarily focus on the backward-alignment paradigm. (d) Our approach explores a completely different forward-facilitation paradigm. By co-evolving with the distribution, we continually transform static synthetic knowledge to the current target domain, directly addressing the central challenge*
 
-## 核心模块与公式推导
+
 
 DAS 框架的核心由三个紧密协作的模块构成：**合成知识库构建**（离线完成）、**多级风格桥接机制**（在线执行）和**优化目标**。以下逐一展开其关键设计与公式。
 
@@ -225,7 +227,9 @@ $$\mathcal{L}_{ST} = -\sum_{c=1}^{C} q_c \log p_c - \sum_{c=1}^{C} p_c \log q_c$
 
 其中 $p_c$ 和 $q_c$ 分别为学生模型和教师模型对目标样本的预测概率。教师模型通过指数移动平均更新，提供稳定的自训练目标。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心范式对比：从后向对齐到前向促进
 
@@ -319,7 +323,9 @@ Table 7验证了DAS对自训练目标的通用性：无论采用熵最小化还�
 ![[assets/figures/papers/paper_list_l1057_https_arxiv_org_abs_2605_18608/figures/015_Table_10.jpg]]
 *Table 10: Semantic segmentation results (mIoU in %) on the Cityscapes-to-ACDC CTTA task. The four test conditions are repeated three times. All results are evaluated based on the Segformer-B5 architecture. Bold text indicates the best performance*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 范式转换：从后向对齐到前向促进
 
@@ -364,6 +370,8 @@ DAS 与上述方法的**本质区别**在于：扩散模型仅在**离线阶段*
 2. **像素级扩展**：如何将动态风格桥接扩展到像素级半监督或自监督场景，直接利用文本到图像模型生成分割掩码？这需要解决生成模型的空间对齐和像素级标注问题。
 3. **无终止长时适应**：在无终止的长时持续适应中，合成知识库或桥接机制是否会累积偏差并导致灾难性遗忘？当前方法在标准 CTTA 基准（15 种损坏类型循环）上表现稳定，但更长时间尺度的行为尚待研究。
 4. **跨任务泛化**：前向促进范式能否推广到目标检测、实例分割等更复杂的视觉任务？这需要重新设计知识库构建和桥接机制的粒度。
+
+
 
 ## 原文 PDF
 

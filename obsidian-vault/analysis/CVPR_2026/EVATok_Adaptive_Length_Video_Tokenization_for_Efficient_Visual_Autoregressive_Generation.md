@@ -44,7 +44,7 @@ claims:
 > - UCF-101 reconstruction 上，rFVD ↓ 9.7 (EVATok 145M) vs 20 (LARP-L-Long 173M) (-51.5%)。
 > - UCF-101 class-to-video generation 上，gFVD ↓ 48 (EVATok 633M AR) vs 57 (LARP-L-Long 632M AR) (-15.8%)。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -76,7 +76,7 @@ EVATok 构建了一个四阶段框架（Figure 2）：
 
 质量-成本权衡曲线（Figure 4）表明，最大代理奖励策略在所有预算水平上均优于固定均匀分配，且路由器分配紧贴最优曲线，在未见过的 UCF-101 数据集上同样有效。消融实验（Table 5）证实 V-JEPA2 表示对齐和 VideoMAE 语义鉴别器对重建与生成质量均有显著贡献。
 
-## 背景与动机
+
 
 ### 视频标记化的效率瓶颈
 
@@ -105,7 +105,9 @@ EVATok 构建了一个四阶段框架（Figure 2）：
 
 EVATok正是围绕这三个问题展开，通过**代理奖励最大化**定义最优分配、**轻量级路由器**实现快速预测、以及**四阶段训练框架**消除训练-推理差距，构建了首个端到端的内容自适应视频标记化系统。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 EVATok 的核心创新在于将视频标记化从“固定长度均匀分配”范式转变为**内容自适应的可变长度标记化**，并通过一套四阶段框架高效实现该目标。其关键设计围绕以下四个 changed slots 展开。
 
@@ -159,7 +161,7 @@ $$\mathcal{L}_{\mathrm{align}} = -\frac{1}{N}\sum_{n=1}^{N} \sin \bigl( f_n^{\ma
 
 EVATok 的四项核心创新形成一个完整的因果链条：**代理奖励**定义了“什么是最优分配”，**路由器**高效预测最优分配，**最终标记器重训练**消除训练-推理差距，**视频语义增强**提升重建的感知质量。这一组合使 EVATok 在 WebVid 上以 29.6% 令牌节省实现 rFVD 33（vs 均匀分配的 63），在 UCF-101 上以 24.4% 令牌节省达到 rFVD 9.7，并在下游 AR 生成中以更少令牌超越先前 SOTA（LARP: gFVD 57 vs EVATok: gFVD 48, -26.2% 令牌）。
 
-## 整体框架
+
 
 EVATok 采用四阶段训练框架，核心思路是**用代理奖励（proxy reward）量化每个视频在各候选令牌分配下的质量-成本权衡，并训练一个轻量路由器来预测最优分配，最终用该路由器引导的分配从头训练一个自适应长度标记器**。图 2 给出了四个阶段的整体流程。
 
@@ -202,7 +204,7 @@ $$ a^* = \operatorname{argmax}_{a \in A} R_{\mathrm{proxy}} \tag{4} $$
 ![[assets/figures/papers/paper_list_l868_https_arxiv_org_abs_2603_12267/figures/002_Figure_2.jpg]]
 *Figure 2: Four-stage framework for adaptive video tokenizer training. Stage 1 trains a proxy tokenizer to reconstruct videos under all candidate assignments. Stage 2 applies the proxy tokenizer to compute proxy rewards for all candidate assignments across videos (Videos, Optimal Assignments)from a dataset. It identifies the assignments with maximum proxy rewards to curate a classification dataset of videos and their optimal Max-proxy-reward Block4assignments. Stage 3 trains a router on the curated dataset to predict the optimal assignments for videos. Stage 4 trains the final tokenizer Block1from scratch, with the router determining the assignment for each input video during training*
 
-## 核心模块与公式推导
+
 
 EVATok 的核心架构围绕**内容自适应的可变长度视频标记化**展开，由四个关键模块协同工作：1D可变长度标记器、代理奖励机制、轻量级路由器以及训练-推理差距消除策略。以下逐一剖析其设计逻辑与关键公式。
 
@@ -303,7 +305,9 @@ $$
 
 此外，最终标记器的训练可选择性地引入 **VideoMAE 语义鉴别器**，以冻结的 VideoMAE-B 提供多层级感知反馈。虽然这会降低 PSNR/LPIPS 等像素级指标，但显著减轻了模糊和伪影，提升了感知质量（Figure 8）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心结果：重建与生成效率的全面提升
 
@@ -401,7 +405,9 @@ Table 9 和 Figure 12 显示，在 ImageNet 256×256 图像重建上，自适应
 ![[assets/figures/papers/paper_list_l868_https_arxiv_org_abs_2603_12267/figures/008_Table_4.jpg]]
 *Table 4: K600 frame prediction comparison. In similar settings, EVATok performs the best with 15.8% less generated tokens*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：从固定长度到内容自适应的视频标记化
 
@@ -465,6 +471,8 @@ EVATok的方法论突破体现在三个层面：
 5. **高帧率与高分辨率场景。** 当时间块数量大幅增加（如高帧率视频）或空间分辨率显著提升时，现有路由器架构（ViT-S）是否依然高效？可能需要层次化或级联的路由器设计。
 
 6. **语义编码器的正交性。** 不同预训练语义编码器（V-JEPA2、VideoMAE等）的搭配对最终性能的影响是否正交？当前消融仅验证了各组件的必要性，但未探索不同语义特征的最优组合策略。
+
+
 
 ## 原文 PDF
 

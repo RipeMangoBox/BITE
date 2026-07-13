@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2026
 pdf_ref: paperPDFs/arxiv_2026/HINT_Hierarchical_Interaction_Modeling_for_Autoregressive_Multi_Human_Motion_Generation.pdf
+project_link: null
+code_link: null
 aliases:
 - HINT
 tags:
@@ -40,7 +42,7 @@ claims:
 > - InterHuman 上，FID↓ 3.100 ± .035 vs 5.154 (InterMask) (-2.054)；R@Top3↑ 0.672 ± .004 vs 0.683 (InterMask) (-0.011)；MMDist↓ 4.979 ± .053 vs 3.790 (InterMask) (+1.189)。
 > - InterX 上，FID↓ 0.278 ± .012 vs 0.399 (InterMask) (-0.121)；R@Top3↑ 0.682 ± .003 vs 0.705 (InterMask) (-0.023)；MMDist↓ 4.007 ± .016 vs 3.705 (InterMask) (+0.302)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有多人运动生成方法（如InterGen、in2IN、InterMask）以离线方式一次性生成固定长度、固定人数的运动序列，无法处理变长文本描述和动态人数变化的交互场景，且难以捕捉长程依赖性。
 
@@ -55,8 +57,6 @@ claims:
 - 用户研究（Figure 4）和定性对比（Figure 5）表明HINT在复杂交互区域表现更优。
 
 **局限与开放问题**：HINT在文本-运动对齐（R@Top3、MMDist）上略逊于离线方法；目前仅在两人数据集上训练，多人场景为零样本扩展；推理速度约1.1秒/16帧，尚未达到实时。未来可探索结合场景与物体交互、在超长序列上的误差累积控制，以及多人数据微调策略。
-
-## 背景与动机
 
 ### 多人运动生成的任务演进
 
@@ -88,7 +88,7 @@ Figure 2 直观对比了传统离线方法与 HINT 自回归框架的架构差�
 
 通过上述设计，HINT 在 InterHuman 数据集上取得了 **FID 3.100** 的指标，相较于此前最优的离线方法 InterMask（FID 5.154）实现了约 40% 的相对提升，同时在 InterX 数据集上也展现出一致的性能优势（FID 0.278 vs 0.399）。值得指出的是，HINT 在文本-运动对齐指标（R@Top3、MMDist）上略逊于离线方法，这是自回归范式缺乏全局优化的固有代价，也是后续研究可改进的方向。
 
-## 核心创新
+## 核心方法与创新机理
 
 HINT 针对现有多人运动生成方法“单次生成固定长度、固定人数序列”的根本瓶颈，提出了三项紧密耦合的创新，构成一个支持**在线、变长、变人数**的自回归生成框架。
 
@@ -120,8 +120,6 @@ $$\hat{\mathbf{M}}^{t:t+K} \sim p_\theta(\mathbf{M}^{t:t+K} \mid \hat{\mathbf{M}
 - **全局条件**：包括序列位置索引与总帧数嵌入（通过 AdaLN 注入），以及组合命令嵌入（通过 Text Cross-Attention 注入）。这些条件提供长程时序定位和整体语义指导。
 
 消融实验（Table 2）表明，移除任一条件均导致 FID 显著升高：历史运动嵌入（+1.497）、相对历史嵌入（+1.474）、序列索引与总帧数嵌入（+0.443）、组合命令嵌入（+0.241）、词级文本嵌入（+0.195）、步索引（+0.124）。这验证了**层次化条件对于自回归交互生成不可或缺**，其中历史与相对历史嵌入的贡献最为突出，说明交互上下文的时空对齐是多人运动连贯性的关键瓶颈。
-
-## 整体框架
 
 HINT 将多人运动生成建模为一个**滑动窗口自回归扩散过程**，其核心设计目标是在支持变长文本和动态人数变化的条件下，实现连贯的长序列交互生成。整体 pipeline 由三个关键模块串联构成：**Motion VAE（运动变分自编码器）**、**Interaction-Aware Diffusion（交互感知扩散模型）** 和 **Sliding-Window Autoregressive Process（滑动窗口自回归过程）**，三者协同工作，形成“编码-条件生成-流式拼接”的完整链路。
 
@@ -173,8 +171,6 @@ Figure 2 清晰展示了 HINT 与传统单次生成方法的架构差异。现�
 
 ![[assets/figures/papers/paper_list_l1701_HINT_Hierarchical_Interaction_Modeling_for_Autoregressive_Multi_Human_Mo/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of HINT in two-human interaction generation. (a) Canonicalized latent space. (b) Within this latent space, motion is generated in a sliding-window autoregressive manner, where the Interaction-Aware Diffusion predicts the next K frames. (c) The detailed architecture of the Interaction-Aware Diffusion, in which hierarchical conditions guide the generation process*
-
-## 核心模块与公式推导
 
 ### 3.1 自回归多人运动生成框架
 
@@ -256,7 +252,7 @@ $$
 
 推理阶段，HINT 将长序列切分为重叠的滑动窗口，逐窗口调用交互感知扩散生成 $K$ 帧未来运动，并与已生成序列拼接。该策略支持流式、变长生成，同时通过窗口重叠保持序列连贯性。所有参与者共享同一组去噪网络权重，条件输入采用对称设计，使框架可零样本扩展到任意人数。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验与定量结果
 
@@ -329,9 +325,6 @@ Figure 5 展示了 InterMask、InterMask*、DART† 和 HINT 在复杂交互场�
 ![[assets/figures/papers/paper_list_l1701_HINT_Hierarchical_Interaction_Modeling_for_Autoregressive_Multi_Human_Mo/figures/001_Figure_1.jpg]]
 *Figure 1: Visualization of three-human motion generation results of HINT. By continuously updating the text guidance, HINT can autoregressively generate coherent, plausible human motions*
 
-![[assets/figures/papers/paper_list_l1701_HINT_Hierarchical_Interaction_Modeling_for_Autoregressive_Multi_Human_Mo/figures/009_Figure.jpg]]
-*Figure: A-1: Additional examples of three-human motion generation result*
-
 ![[assets/figures/papers/paper_list_l1701_HINT_Hierarchical_Interaction_Modeling_for_Autoregressive_Multi_Human_Mo/figures/010_Table.jpg]]
 *Table: B-1: Parameters of Motion VAE and Interaction-Aware Diffusion. Table B-2: Training hyperparameters for Motion VAE and Interaction-Aware Diffusion*
 
@@ -341,7 +334,7 @@ Figure 5 展示了 InterMask、InterMask*、DART† 和 HINT 在复杂交互场�
 ![[assets/figures/papers/paper_list_l1701_HINT_Hierarchical_Interaction_Modeling_for_Autoregressive_Multi_Human_Mo/figures/012_Table.jpg]]
 *Table: C-4: Detailed R-precision results of ablation studies on InterHuman. L and G indicate local and global conditions, respectively*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 方法谱系：从离线生成到在线自回归交互建模
 

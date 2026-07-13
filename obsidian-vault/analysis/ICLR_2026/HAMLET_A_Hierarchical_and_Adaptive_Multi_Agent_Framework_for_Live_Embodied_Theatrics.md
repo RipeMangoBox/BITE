@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/HAMLET_A_Hierarchical_and_Adaptive_Multi_Agent_Framework_for_Live_Embodied_Theatrics.pdf
+project_link: null
+code_link: null
 openreview_forum_id: MKwW04UHW1
 aliases:
 - HAMLET
@@ -41,7 +43,7 @@ claims:
 > - 响应策略综合评估（含延迟惩罚） 上，最终得分 为 0.756 (PAD)，对比 0.478 (GPT-4o)，变化 +0.278。
 > - 人类评估一致性 上，平均Pearson相关系数 为 0.791 (HAMLETJudge)，对比 0.630 (GPT-4.1)，变化 +0.161。
 
-## 概述
+## 概要
 
 ### 研究问题与瓶颈
 
@@ -59,7 +61,7 @@ HAMLET将戏剧生成与表演解耦为**离线规划**与**在线表演**两个
 
 HAMLET处于**多智能体协作叙事**与**具身交互**的交叉地带。与单模型基线（如原始提示的GPT-4o）相比，HAMLET的核心差异在于：（1）将剧情生成从“输入完整故事”简化为“仅需主题”，通过离线四代理协作自动构建蓝图；（2）演员决策不再由LLM直接生成，而是先经PAD模块进行策略决策再指导输出；（3）表演控制从被动回合制升级为三层控制代理主动推进；（4）首次引入专用评论模型实现完整戏剧表演的自动化评估。这些设计使HAMLET在实时性、叙事连贯性和角色一致性上形成了系统性的改进路径。
 
-## 背景与动机
+
 
 ### 1. 问题背景：从被动对话到具身戏剧的鸿沟
 
@@ -88,7 +90,9 @@ HAMLET处于**多智能体协作叙事**与**具身交互**的交叉地带。与
 - **引入拟人化决策模块**：受双过程认知理论启发，为每个演员代理配备PAD（Perceive And Decide）模块，使其能够根据外部刺激与内部状态自主选择FAST/SLOW/SILENCE响应策略，生成结构化动作三元组，实现更自然、更拟人的实时交互。
 - **建立分层控制与评估体系**：通过Planner、Transfer、Advancer三层控制代理与Narrator协同，主动推进剧情并实时管理环境交互；同时构建专用评论模型HAMLETJudge，从角色表现、叙事质量、交互体验三个维度实现自动化评估，填补了该领域的评估空白。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 HAMLET 的核心创新在于将离线规划与在线表演解耦，并通过分层多智能体协作与双过程认知启发的决策模块，首次实现了仅需简单主题即可自动生成并实时表演完整具身戏剧的框架。其关键创新点体现在以下四个维度。
 
@@ -119,7 +123,7 @@ Advancer 的设计是这一创新中最具决定性的组件。消融实验显�
 
 现有工作缺乏针对完整戏剧表演的自动评估方法，人工评估成本高昂且难以规模化。HAMLET 提出了专用评论模型 HAMLETJudge，从角色表现（Character Performance）、叙事质量（Narrative Quality）、交互体验（Interaction Experience）三个维度进行配对比较自动评估。HAMLETJudge 与人类评估者的平均 Pearson 相关系数达到 0.791，显著优于 GPT-4.1（0.630）、Claude-4-Sonnet（0.762）和 Gemini-2.5-Pro（0.702）等通用 LLM 评委基线。这一创新不仅为 HAMLET 自身的性能评估提供了可靠工具，也为 AI 戏剧领域的标准化自动评估建立了基准。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_MKwW04UHW1/figures/001_Figure_1.jpg]]
 *Figure 1: HAMLET creates AI drama in two main stages. First, during offline planning, a collaborative workflow of agents including the actor designer, plot designer, and reviewer creates initial materials, which are then integrated by a director agent into a structured narrative blueprint. The blueprint then guides the subsequent online performance, where a control system composed of a planner, transfer, and advancer directs a dynamic and improvisational theatrical experience*
@@ -143,7 +147,7 @@ HAMLET 是一个面向实时具身戏剧的分层自适应多智能体框架，�
 
 整个流水线的信息流可概括为：主题 → 离线四代理协作（角色设计师→情节设计师→审阅者→导演）→ 叙事蓝图 → 在线三层控制（Planner→Transfer→Advancer）+ Narrator 裁决 + 演员 PAD 决策 → 实时戏剧输出。消融实验表明，移除 Advancer 会使任务完成率从 100% 锐减至 68.1%，停滞率升至 31.9%，印证了该组件在防止剧情死锁中的关键作用；移除 PAD 模块则导致所有 10 个戏剧主题下的在线表演性能显著下降，证明其对自然、连贯交互的必要性。
 
-## 核心模块与公式推导
+
 
 ### 离线规划：叙事蓝图的自动生成
 
@@ -206,7 +210,9 @@ HAMLETJudge是专用的评论模型，从三个维度对戏剧表演进行配对
 
 评估采用5点李克特量表，比较测试模型与基线模型在各维度上的优劣。HAMLETJudge基于Qwen3-8B微调，其评分与人类评估者的平均Pearson相关系数达到0.791，优于GPT-4.1（0.630）和Claude-4-Sonnet（0.762）等基线（Table 2），为戏剧自动化评估提供了可靠工具。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 评估体系设计
 
@@ -316,7 +322,9 @@ Table 6呈现了六个在线表演案例，展示了HAMLET各代理的协作机�
 - 逆向规划策略是否足以应对高度非线性、多分支的互动叙事，是否需要引入更灵活的图规划机制？
 - 如何在不牺牲决策质量的前提下进一步压缩系统延迟，以支持更多用户并行参与的现场表演？
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有LLM戏剧系统的关系
 
@@ -359,6 +367,8 @@ HAMLET的有效性建立在以下关键假设之上，这些假设界定了其�
 ### 知识库定位
 
 HAMLET在知识库中的定位是**面向实时具身戏剧的分层自适应多智能体框架**。其核心贡献不在于提出新的语言模型架构，而在于构建了一套完整的**系统级解决方案**：从离线叙事蓝图的自动生成，到在线表演的分层控制，再到表演质量的自动化评估，形成了一个闭环的戏剧AI生产流水线。对于后续研究，HAMLET提供了可复用的组件（PAD模块、HAMLETJudge）和可参照的架构设计模式（解耦规划-表演、分层控制代理协作），其消融实验（如移除Advancer导致任务完成率从100%降至68.1%）为框架各组件的必要性提供了清晰的因果证据。
+
+
 
 ## 原文 PDF
 

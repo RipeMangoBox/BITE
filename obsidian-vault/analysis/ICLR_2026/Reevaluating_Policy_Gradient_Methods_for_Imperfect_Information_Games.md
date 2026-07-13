@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Reevaluating_Policy_Gradient_Methods_for_Imperfect_Information_Games.pdf
+project_link: null
+code_link: https://github.com/nathanlct/IIG-RL-Benchmark
 openreview_forum_id: vClBDezZUo
 aliases:
 - PPM
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 重新评估非完全信息博弈的策略梯度方法 |
 | 英文题名 | Reevaluating Policy Gradient Methods for Imperfect-Information Games |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=vClBDezZUo); [GitHub](https://github.com/nathanlct/IIG-RL-Benchmark) |
+| Links | [paper](https://openreview.net/forum?id=vClBDezZUo) · [GitHub](https://github.com/nathanlct/IIG-RL-Benchmark) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | 通用策略梯度方法（PPO、PPG、MMD）配以适当调优 |
 | Dataset | LD2D5F, DH3, ADH3, PTTT, APTTT（全部五个游戏）, APTTT |
@@ -41,7 +43,7 @@ claims:
 > - LD2D5F, DH3, ADH3, PTTT, APTTT（全部五个游戏） 上，exploitability 为 通用PG方法（MMD, PPO, PPG）可剥削性更低，对比 NFSP, PSRO, ESCHER, R-NaD 可剥削性更高，变化 通用PG方法在所有游戏中一致优于专门方法。
 > - LD2D5F, DH3, ADH3, PTTT, APTTT 上，expected return 为 通用PG方法对阵专门方法获得正期望收益，对比 专门方法对阵通用PG方法获得负期望收益，变化 通用PG方法在头对头评估中全面占优。
 
-## 概述
+## 概要
 
 在非完全信息博弈（Imperfect-Information Games, IIGs）中，如何高效逼近纳什均衡策略是深度强化学习的核心挑战。现有方法主要基于三类博弈论算法：虚次对局（Fictitious Play, FP）、双神谕（Double Oracle, DO）和反事实遗憾最小化（Counterfactual Regret Minimization, CFR）。然而，这些方法在深度强化学习框架下存在结构性瓶颈——FP和DO需要在每一轮求解完整的强化学习问题，计算开销极大；基于CFR的方法则因重要性采样而引入高方差，且普遍缺乏last-iterate收敛保证。与此同时，通用策略梯度（Policy Gradient, PG）方法——如PPO、PPG——因历史偏见和优化不当，长期被认为不适用于非完全信息博弈。
 
@@ -51,7 +53,7 @@ claims:
 
 需要指出，当前实验仅覆盖五款同类型棋盘游戏，结论能否推广到大型扑克、多人博弈等更复杂场景仍待验证；此外，固定1000万步的训练时长可能不足以让收敛较慢的FP/DO类方法展现其渐进优势。
 
-## 背景与动机
+
 
 ### 非完全信息博弈中的策略学习困境
 
@@ -93,7 +95,9 @@ $$\boldsymbol { \pi } _ { t + 1 } = \mathop { \operatorname { a r g m a x } } _ 
 
 上述观察引出了一个自然的问题：如果给予适当的超参数调优（特别是熵正则化系数），通用策略梯度方法能否在IIGs中超越那些专门设计的复杂博弈论方法？这一问题触及了IIGs深度学习方法论的根本：我们是否真的需要FP、DO、CFR这些复杂框架，还是说，被长期忽视的通用PG方法本身就足以胜任？
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本研究的核心创新并非提出一个新的算法，而是揭示了一个被忽视的事实：**通用策略梯度方法（PPO、PPG、MMD）在非完全信息博弈中，通过适当的超参数调优，能够一致性地超越专门设计的博弈论深度强化学习方法（NFSP、PSRO、ESCHER、R-NaD）**。这一发现颠覆了该领域长期以来的方法论偏好——即认为必须依赖虚次对局（FP）、双神谕（DO）或反事实遗憾最小化（CFR）等专门机制才能在大型博弈中逼近纳什均衡。
 
@@ -132,7 +136,7 @@ $$\boldsymbol{\pi}_{t+1} = \mathop{\operatorname{argmax}}_{\boldsymbol{\pi}} \un
 - 训练步数固定为1000万步，可能不足以让收敛慢的专门方法（如FP、DO）展现渐进优势。
 - 超参数搜索虽尽力公平，但仍可能未覆盖专门方法的最优配置区域。
 
-## 整体框架
+
 
 本文的整体实验框架围绕一个核心问题展开：**在非完全信息博弈（IIG）中，通用策略梯度（PG）方法是否能在公平比较下超越专门设计的博弈论深度强化学习方法？** 为此，框架被设计为一条标准化的“自博弈训练—可剥削性评估—头对头验证”流水线，确保所有算法在相同的环境、网络架构和评估协议下进行对比。
 
@@ -176,7 +180,7 @@ flowchart TD
 
 该框架的核心优势在于**通过严格的标准化与充分的超参数搜索，剥离了实现细节和调优偏差对算法比较的干扰**，从而使得“通用PG方法优于专门方法”这一结论具有较高的内部效度。但其外部效度受限于五款同质化的棋盘游戏，向更复杂的扑克或多人游戏的推广仍需验证。
 
-## 核心模块与公式推导
+
 
 ### 通用策略梯度方法的三个核心要素
 
@@ -234,7 +238,9 @@ $$
 
 > **注意**：具体损失函数形式（如PPO的剪辑比率 $\epsilon$、GAE参数 $\lambda$ 等）在给定材料中未完整给出，建议查阅原文Section 3和Appendix D获取完整实现细节。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：通用策略梯度方法全面超越专门方法
 
@@ -282,7 +288,9 @@ $$
 *Table 1: Game quantities. Positive Nash values (i.e., expected values for player 1 at Nash equilibria) mean that player 1 has a structural advantage*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -317,6 +325,8 @@ $$
 3. **熵正则化的自适应调度**：熵系数的最优值是否随训练阶段变化？能否通过自适应调度（如训练初期高熵探索、后期降低以精细调优）进一步改善最终策略质量？
 4. **前向与反向 KL 的差异**：PPO/PPG 使用前向 KL（通过剪辑隐式约束），MMD 使用反向 KL 显式约束。在更大规模环境中，这两种约束方式的差异是否会变得显著？目前五款游戏上三者表现大致持平，但规模增大后可能出现分化。
 5. **与其他博弈论方法的整合**：通用 PG 方法能否与 CFR 的变体（如 DCFR、PCFR+）在深度强化学习框架中有效结合，取长补短？例如，用 CFR 类方法生成多样化的对手池来辅助 PG 训练。
+
+
 
 ## 原文 PDF
 

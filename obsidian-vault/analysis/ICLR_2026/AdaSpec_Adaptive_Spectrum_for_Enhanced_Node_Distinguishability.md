@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/AdaSpec_Adaptive_Spectrum_for_Enhanced_Node_Distinguishability.pdf
+project_link: null
+code_link: https://github.com/Mia-321/AdaSpec
 openreview_forum_id: eHhUYoZwWs
 aliases:
 - AASEND
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | AdaSpec：增强节点区分性的自适应频谱 |
 | 英文题名 | AdaSpec: Adaptive Spectrum for Enhanced Node Distinguishability |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=eHhUYoZwWs); [GitHub](https://github.com/Mia-321/AdaSpec) |
+| Links | [paper](https://openreview.net/forum?id=eHhUYoZwWs) · [GitHub](https://github.com/Mia-321/AdaSpec) |
 | Topic | #topic/benchmarks_datasets_evaluation #topic/benchmarks_datasets_evaluation/benchmark_eval |
 | Method | AdaSpec |
 | Dataset | Texas, Minesweeper, Roman_Empire, Cora |
@@ -41,7 +43,7 @@ claims:
 > - Minesweeper 上，ROC AUC (%) 为 89.13±0.1 (JacobiConv(M))，对比 87.34±0.12 (JacobiConv(O))，变化 +1.79。
 > - Roman_Empire 上，Accuracy (%) 为 54.55±0.3 (ChebNet(M))，对比 47.15±0.42 (ChebNet(O))，变化 +7.4。
 
-## 概述
+## 概要
 
 谱图神经网络（Spectral GNNs）遵循统一范式 $\Psi(M,X) = g_{\Theta}(M) f_W(X)$，其中图矩阵 $M$ 通常固定为归一化邻接矩阵 $\tilde{A}$。这种固定设计存在一个根本性瓶颈：**特征值重数高**（eigenvalue multiplicity）和**节点特征在特征基上非零频率分量缺失**（missing frequency components），导致模型无法为非同构节点产生不同的嵌入，直接限制了谱 GNN 的表达能力和分类性能。
 
@@ -56,7 +58,7 @@ claims:
 
 AdaSpec 保持了置换等变性，可与图重连（如 GDC）正交叠加，进一步获得增益（Table 10）。当前验证限于节点分类任务，$\Omega_F(X)$ 的预计算在极高维特征或超大规模图上可能引入一次性开销，且超参数 $\alpha_1$、$\alpha_2$ 需手动调节。
 
-## 背景与动机
+
 
 ### 谱图神经网络的核心范式
 
@@ -90,7 +92,9 @@ $$\operatorname{rank}(\Psi(M, X)) \geq \min\left(d_M, \|\tilde{X}^{(M)}\|_0\righ
 
 AdaSpec 的核心动机正是打破上述僵局：**不再将图矩阵视为固定输入，而是将其设计为一个可学习的、同时适应图结构与节点特征的模块**，通过直接优化 $d_M$ 和 $\|\tilde{X}^{(M)}\|_0$ 来提升节点区分度的理论上界。该模块以即插即用的方式嵌入任意谱 GNN，保持置换等变性，且不改变原模型的时间复杂度阶数。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 AdaSpec 的核心创新在于将谱图神经网络（Spectral GNN）中**固定的图矩阵替换为一个自适应生成的图矩阵**，从而突破现有方法在节点区分能力上的理论上限。这一创新的因果机制可归结为以下三个关键层面的改变。
 
@@ -148,7 +152,7 @@ $$\Omega_F(X) = \sum_{i=1}^{h} \frac{X_{:i} X_{:i}^{\top}}{\|X_{:i}\|_F^2} \circ
 
 AdaSpec 的设计并非启发式拼接，而是有严格理论支撑：Theorem 4.3 给出了节点区分度的下界公式，三个组件分别针对下界公式中的两个因子（$d_M$ 和 $\|\tilde{X}^{(M)}\|_0$）进行优化。此外，Theorem 5.4 和 Proposition 5.5 保证了自适应图矩阵 $\Omega(A, X)$ 与图的自同构群可交换，且增强后的谱 GNN 保持置换等变性——这意味着 AdaSpec 在不破坏谱方法基本对称性的前提下实现了表达能力的提升。
 
-## 整体框架
+
 
 AdaSpec 是一种即插即用的谱增强模块，其设计目标不是替代现有的谱图神经网络，而是通过优化图矩阵来提升节点区分度的理论上界。该模块可无缝嵌入任意遵循通用形式 $`\Psi(M,X) = g_{\Theta}(M) f_W(X)`$ 的谱 GNN 中，其中 $`M`$ 为图矩阵（通常为归一化邻接矩阵 $`\tilde{A}`$ 或归一化拉普拉斯矩阵），$`g_{\Theta}`$ 为多项式谱滤波器，$`f_W`$ 为节点特征变换。
 
@@ -188,7 +192,7 @@ AdaSpec 增强的谱 GNN 保持置换等变性：Theorem 5.4 证明 $`\Omega(A,X
 
 当前框架仅在节点分类任务上验证有效，尚未拓展至图分类或链接预测。$`\alpha_1`$、$`\alpha_2`$ 缺乏自动选择机制，需手动调参。当训练与测试的特征分布不一致时，特征自适应的 $`\Omega_F(X)`$ 可能引入过拟合风险。
 
-## 核心模块与公式推导
+
 
 ### 谱图神经网络的一般形式
 
@@ -248,7 +252,9 @@ $$\text{rank}(\Psi(M, X)) \geq \min(d_M, \|\tilde{X}^{(M)}\|_0)$$
 
 **置换等变性**（Proposition 5.5）：当 $f_W$ 满足置换等变性时，使用 AdaSpec 增强的谱 GNN $\Psi^+(A, X)$ 保持置换等变性，即图节点的重排会导致节点嵌入的相应重排，保证了模型对图同构的不变性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 整体性能提升
 
@@ -319,7 +325,9 @@ Table 10 展示了 AdaSpec 与图扩散卷积（GDC）的组合效果。在 9 �
 
 4. **任务范围有限。** 目前仅在节点分类任务上验证，尚未在图分类、链接预测等任务上评估 AdaSpec 的迁移能力。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 谱图神经网络中的图矩阵优化路径
 
@@ -356,6 +364,8 @@ AdaSpec 的增益在不同图类型上呈现显著分化。在异配图（hetero
 4. **边际效用的自适应判断。** 当图矩阵的特征值分布已经接近满秩时，AdaSpec 是否还能带来显著增益？能否设计一个轻量级的预检机制，在训练前判断 AdaSpec 的预期边际效用，从而避免不必要的计算开销？
 
 5. **与图同配性度量的理论关联。** AdaSpec 在异配图上的显著增益暗示其机制与图的同配性/异配性存在深层关联。建立 $\Omega(A,X)$ 的优化效果与同配性度量（如边同配率）之间的定量关系，可为超参数 $\alpha_1, \alpha_2$ 的自动选择提供理论依据。
+
+
 
 ## 原文 PDF
 

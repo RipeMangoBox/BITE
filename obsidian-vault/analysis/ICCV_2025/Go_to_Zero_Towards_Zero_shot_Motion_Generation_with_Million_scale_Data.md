@@ -5,6 +5,8 @@ paper_level: A
 venue: ICCV
 year: 2025
 pdf_ref: paperPDFs/ICCV_2025/Go_to_Zero_Towards_Zero_shot_Motion_Generation_with_Million_scale_Data.pdf
+project_link: null
+code_link: https://github.com/VankouF/
 aliases:
 - GZTZSMGMSD
 tags:
@@ -41,7 +43,7 @@ claims:
 > - MotionMillion-Eval 上，文本对齐 (Human Eval) 261 (7B) vs 226.6 (ScaMo-3B) (+34.4)。
 > - HumanML3D (FSQ重建) 上，MPJPE 41.9 vs 63.3 (ScaMo) (-21.4)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有文本驱动的人体动作生成方法严重受限于训练数据规模——主流基准如 HumanML3D、MotionX 仅包含数百小时的动作数据，导致模型过拟合于有限的动作分布，缺乏零样本泛化能力，难以处理分布外（out-of-domain）和复杂组合动作。
 
@@ -56,7 +58,7 @@ claims:
 
 **局限性提示**：自动评估指标在模型从 3B 扩展到 7B 时提升趋缓，可能无法全面反映生成质量；人类评估仅与 ScaMo-3B 进行了详细对比，评分者间信度未充分披露；论文未涉及手部和面部动作。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -88,7 +90,9 @@ claims:
 
 如 **Figure 1** 所示，本文方法旨在处理分布外和复杂组合动作，实现“走向零样本”的动作生成目标。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新围绕“数据—表示—架构”三轴联动展开，旨在突破现有文本驱动动作生成模型因训练数据规模受限而导致的零样本泛化瓶颈。其关键创新点可凝练为以下四个维度：
 
@@ -156,7 +160,7 @@ $$\mathcal{L} = -\sum_{i=1}^{n} \log p(\hat{m}_i | \mathbf{m}_{<i}, T_1, ..., T_
 - 模型规模增大对物理合理性和动作平滑性提升不显著，是否需要引入显式物理约束模块？
 - 自动指标（FID、R-precision）在模型规模增大时趋于饱和，如何设计更灵敏的零样本动作生成评估指标？
 
-## 整体框架
+
 
 MotionMillion 的整体框架围绕“数据驱动 + 规模扩展”两条主线构建，旨在通过百万级高质量动作-文本数据与可扩展的自回归 Transformer，解锁零样本文本到动作生成的涌现能力。系统由两大核心阶段串联而成：**大规模数据构建管线** 与 **可扩展动作生成模型**。
 
@@ -201,7 +205,7 @@ MotionMillion 的整体框架围绕“数据驱动 + 规模扩展”两条主线
 
 模型规模可从 1B 参数扩展至 7B 参数。在 MotionMillion 测试集上，7B 模型的 FID 达到 10.3（ScaMo 为 89.0），R@1 达到 0.79（ScaMo 为 0.67），展现出显著的性能优势（Table 4）。定性结果显示，模型能够生成长时间、复杂组合动作（如武术、日常交互），具备强大的零样本指令遵循能力（Figure 6）。
 
-## 核心模块与公式推导
+
 
 ### 动作表示
 
@@ -279,7 +283,9 @@ $$\mathrm{jerk} = \ddot{J}_i^*$$
 ![[assets/figures/papers/paper_list_l1882_Go_to_Zero_Towards_Zero_shot_Motion_Generation_with_Million_scale_Data/figures/008_Table_2.jpg]]
 *Table 2: MPJPE of reconstruction comparison across different datasets, where ScaMo’s FSQ model and ours are trained on MotionUnion and MotionMillion, respectively*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验结果
 
@@ -325,7 +331,9 @@ MotionMillion 模型在 MotionMillion 测试集上的自动指标评估结果（
 
 ![[assets/figures/papers/paper_list_l1882_Go_to_Zero_Towards_Zero_shot_Motion_Generation_with_Million_scale_Data/figures/014_Table.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 基线对比与谱系定位
 
@@ -377,6 +385,8 @@ MotionMillion 的核心定位是**面向零样本泛化的可扩展自回归动�
 4. **数据质量的下游影响**：MotionMillion 数据集虽经过六阶段过滤，但源自网络视频，可能存在未被检测的噪声、标注偏差或文化偏见，这些因素在多大程度上会影响下游任务的公平性和泛化性？
 
 5. **全人体运动生成的扩展**：如何处理手部和面部动作以实现完全的人体运动生成？这可能需要额外的数据来源、更精细的动作表示以及多尺度编码策略。
+
+
 
 ## 原文 PDF
 

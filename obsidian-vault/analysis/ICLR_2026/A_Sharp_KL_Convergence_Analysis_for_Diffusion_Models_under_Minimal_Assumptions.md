@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/A_Sharp_KL_Convergence_Analysis_for_Diffusion_Models_under_Minimal_Assumptions.pdf
+project_link: null
+code_link: null
 aliases:
 - OSNSA1
 - SKCADMUMA
@@ -40,15 +42,17 @@ claims:
 > - 理论分析（无特定数据集） 上，KL散度 为 Õ(d log^{3/2}(1/δ)/ε)，对比 Õ(d log^2(1/δ)/ε²) (Benton et al., 2024)，变化 ε依赖从二次改进为线性。
 > - 理论分析（无特定数据集） 上，迭代步数K 为 Θ(d (log(1/δ))^{3/2} / ε_score)，对比 Θ(d log^2(1/δ) / ε_score^2) (Benton et al., 2024)，变化 改进因子1/ε。
 
-## 概述
+## 概要
 
 本文针对扩散模型的KL散度收敛分析，提出了一种新的生成算法和证明技术。在仅需得分估计精度和有限二阶矩的最小假设下，本文将KL散度收敛的迭代复杂度从先前最优的 $\tilde{O}(d \log^2(1/\delta)/\varepsilon^2)$ 步（Benton et al., 2024）改进为 $\tilde{O}(d \log^{3/2}(1/\delta)/\varepsilon)$ 步（Corollary 3.2）。核心创新在于将生成过程建模为反向ODE步后接一个较小的前向加噪步的组合，并发展新的证明技术来界定得分函数的二阶空间导数（拉普拉斯项），从而实现了KL散度收敛在维度 $d$ 上的线性依赖，同时将精度 $\varepsilon$ 的依赖从二次改进为线性。
 
-## 背景与动机
+
 
 扩散模型的生成过程通常基于反向随机微分方程（SDE）或概率流常微分方程（ODE）。先前基于最小假设的KL散度收敛分析（Benton et al., 2024）在精度 $\varepsilon$ 上呈二次依赖（$O(1/\varepsilon^2)$），且需要处理SDE离散化中出现的二阶空间导数项，这些项在之前的扩散模型分析中未出现且无法用现有技术处理。同时，直接适配Li & Cai (2024) 的分析虽然改进了 $\varepsilon$ 依赖，但导致维度依赖变差为 $\tilde{O}(d^{3/2}/\varepsilon)$。因此，在最小假设下同时实现KL散度的线性 $\varepsilon$ 依赖和线性 $d$ 依赖是一个非平凡的问题。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新包括：
 
@@ -58,7 +62,7 @@ claims:
 
 3. **离散化方案创新**：使用指数积分器（Exponential Integrator）离散化经验概率流ODE，步长选择 $h_k = c \min\{1, t_k\}$，实现了 $O(h_k^3)$ 的误差依赖，优于先前SDE方法的 $O(h_k^2)$ 依赖。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0004_c8Ft3246KD_A_Sharp_KL_Convergence_Analysis_for_Diffusion_Mo/figures/001_Figure_1.jpg]]
 *Figure 1: Demonstrating the two updates: (a) along the generation process using sˆ(·) and (b) the forward noising process ( $\mathcal { N } ( \cdot$ ) ) ), of our proposed scheme.
@@ -72,7 +76,7 @@ claims:
 
 **Figure 1**: Demonstrating the two updates: (a) along the generation process using sˆ(·) and (b) the forward noising process ( $\mathcal { N } ( \cdot ) ) ), of our proposed scheme.
 
-## 核心模块与公式推导
+
 
 ### 5.1 前向过程与反向过程
 
@@ -148,7 +152,9 @@ $$
 \mathrm{KL}(p_{t_1} \| \hat{p}_{t_1}) \lesssim (d + m_2) e^{-T} + d^2 c^3 K + T \varepsilon_{\mathrm{score}}^2
 $$
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 6.1 主要理论结果
 
@@ -169,7 +175,9 @@ $$
 - 结果依赖于得分估计精度假设（Assumption 2.1），实际应用中得分估计误差可能影响收敛性。
 - 分析针对高斯扰动后的目标分布，而非原始数据分布。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 本文的方法谱系定位如下：
 
@@ -191,6 +199,8 @@ $$
   3. 能否进一步改进 $\log(1/\delta)$ 项的指数（当前为 $3/2$）？
   4. 本文的证明技术是否能用于分析其他ODE-based采样器（如DPM-Solver）？
   5. 在有限样本情况下，得分估计误差对实际KL散度的影响如何量化？
+
+
 
 ## 原文 PDF
 

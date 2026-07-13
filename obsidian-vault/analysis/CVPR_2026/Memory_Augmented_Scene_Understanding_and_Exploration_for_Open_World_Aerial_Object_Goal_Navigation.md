@@ -42,7 +42,7 @@ claims:
 > - UAV-ON (Seen) 上，SR 22.72% vs 显著高于所有基线 (显著)。
 > - UAV-ON (Unseen) 上，SR 17.57% vs 显著高于所有基线 (显著)。
 
-## 概述
+## 概要
 
 ### 问题背景与瓶颈
 
@@ -60,8 +60,6 @@ claims:
 ### 主要结果概要
 
 在 UAV-ON 基准上，OctMem-Agent 相较最强基线 **OpenFly** 实现成功率（SR）**7.5%** 的绝对提升（19.50% vs 12.00%），Oracle 成功率（OSR）提升 **3.4%**（29.30% vs 25.90%），且在已见和未见场景子集上均保持显著领先。消融实验证实，自适应八叉树记忆和指令引导查询各自独立贡献了可观的性能增益，二者协同作用构成了方法有效性的关键支撑。
-
-## 背景与动机
 
 ### 任务定义与挑战
 
@@ -94,7 +92,7 @@ claims:
 
 实验表明，OctMem-Agent在UAV-ON基准上相比最强基线OpenFly实现了7.5%的成功率绝对提升（19.50% vs 12.00%），并在已见和未见环境上均一致优于所有基线方法。
 
-## 核心创新
+## 核心方法与创新机理
 
 OctMem-Agent 的核心创新在于将空中目标导航从“短视的局部感知”升级为“基于全局记忆的推理”，通过两个关键机制解决现有方法的瓶颈：**自适应八叉树记忆（Adaptive Octree Memory）** 和 **指令引导记忆查询（Instruction-Guided Memory Query）**。
 
@@ -131,8 +129,6 @@ $$\mathbf{Q}_{\text{task}} = \text{FiLM}(\mathbf{Q}, \mathbf{e}_I) = (1 + \gamma
 
 综合来看，OctMem-Agent 的创新链条清晰：**自适应八叉树记忆**解决了“记不住”的问题，**指令引导记忆查询**解决了“查不准”的问题，二者协同实现了从局部反应式导航到全局记忆推理式导航的范式转变。
 
-## 整体框架
-
 OctMem-Agent 是一个面向开放世界空中目标导航的记忆增强框架，其核心设计思想是将历史观测积累为可扩展的层次化3D场景记忆，并通过指令引导的查询机制从记忆中提取互补的场景理解与探索信息，最终驱动视觉-语言模型（VLM）生成导航动作。
 
 ### 整体流程
@@ -163,11 +159,6 @@ OctMem-Agent 是一个面向开放世界空中目标导航的记忆增强框架�
 OctMem-Agent 基于OpenVLA框架构建，并使用与OpenFly相同的预训练权重进行初始化，确保了与基线方法的公平比较。
 
 ### 补充图表
-
-![[assets/figures/papers/paper_list_l2042_https_openaccess_thecvf_com_content_CVPR2026_html_Zhou_Memory_Augmented/figures/001_Figure_1.jpg]]
-*Figure 1: Overview of our work. As shown on the left, aerial object-goal navigation requires an Unmanned Aerial Vehicle (UAV) to navigate to target objects in large-scale outdoor environments using only visual observations and high-level object descriptions. In this work, we propose OctMem-Agent, an octree memory-augmented framework illustrated on the right. OctMem-Agent constructs an Adaptive Octree Memory from RGB-D observations and employs a Memory Extraction Module to extract compact information that facilitates navigation decision-making*
-
-## 核心模块与公式推导
 
 OctMem-Agent 围绕三个关键模块构建：**自适应八叉树记忆**、**指令引导记忆查询**和**动作生成与记忆集成**。下面依次剖析各模块的机制及其核心公式。
 
@@ -219,7 +210,7 @@ $$\mathbf{H}_{\mathrm{input}} = [ \mathbf{H}_{\mathrm{lang}}, \mathbf{H}_{\mathr
 
 该序列输入预训练 VLM 骨干网络（基于 OpenVLA，视觉编码器融合 DINOv2 和 SigLIP 特征，LLM 骨干为 LLaMA-2 7B），通过 Transformer 层处理后预测离散动作令牌，完成从感知到决策的端到端推理。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 实验设置
 
@@ -271,7 +262,7 @@ OctMem-Agent 通过自适应八叉树记忆与指令引导查询的协同设计�
 ![[assets/figures/papers/paper_list_l2042_https_openaccess_thecvf_com_content_CVPR2026_html_Zhou_Memory_Augmented/figures/006_Table_5.jpg]]
 *Table 5: Ablation study on Instruction-Guided Memory Query. We compare performance with and without Instruction-Modulated Query (IMQ)*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 任务定位与基线谱系
 

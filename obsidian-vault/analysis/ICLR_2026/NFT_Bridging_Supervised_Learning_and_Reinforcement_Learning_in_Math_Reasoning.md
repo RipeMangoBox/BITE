@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/NFT_Bridging_Supervised_Learning_and_Reinforcement_Learning_in_Math_Reasoning.pdf
+project_link: https://research.nvidia.com/labs/dir/Negative-aware-Fine-Tuning
+code_link: null
 openreview_forum_id: ujBrsQm6Zu
 aliases:
 - NAFTN
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | NFT：在数学推理中桥接监督学习与强化学习 |
 | 英文题名 | NFT: Bridging Supervised Learning and Reinforcement Learning in Math Reasoning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=ujBrsQm6Zu); [Project](https://research.nvidia.com/labs/dir/Negative-aware-Fine-Tuning) |
+| Links | [paper](https://openreview.net/forum?id=ujBrsQm6Zu) · [Project](https://research.nvidia.com/labs/dir/Negative-aware-Fine-Tuning) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | Negative-aware Fine-Tuning (NFT) |
 | Dataset | Average over 6 benchmarks (Qwen2.5-Math-7B), AMC23 (Qwen2.5-Math-7B), Average over 6 benchmarks (Qwen2.5-32B) |
@@ -42,7 +44,7 @@ claims:
 > - AMC23 (Qwen2.5-Math-7B) 上，Accuracy 为 88.5，对比 DAPO: 85.0, RFT: 79.7，变化 +3.5 vs DAPO, +8.8 vs RFT。
 > - Average over 6 benchmarks (Qwen2.5-32B) 上，Average Accuracy 为 59.2，对比 DAPO: 59.9, RFT: 52.8，变化 -0.7 vs DAPO, +6.4 vs RFT。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -68,7 +70,7 @@ Figure 1 将 NFT 定位为在线微调算法谱系中的桥梁：它一端连接
 
 此外，分析显示负反馈的使用显著提升了模型的探索能力（熵增加），且这一收益在大模型上更为明显。消融实验验证了困难问题加权和负似然比裁剪等设计选择的有效性。
 
-## 背景与动机
+
 
 ### 数学推理中的在线微调范式
 
@@ -114,7 +116,9 @@ $$\pi^{-}(a|q) := \frac{\pi_{\mathrm{old}}(a|q)[1-p(r=1|q,a)]}{\sum_{A} \pi_{\ma
 
 Figure 1 展示了这一方法谱系：NFT 通过监督信号利用负反馈，桥接了强化学习与监督学习两大范式。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：监督学习为何在验证驱动训练中落后
 
@@ -179,7 +183,7 @@ NFT 的理论贡献不仅在于提出新算法，更在于**揭示了 SL 与 RL 
 
 **需注意的局限**：当前实现主要依赖二进制奖励验证器，连续奖励场景的理论扩展（Appendix B）尚未经大规模实验验证。此外，RFT 在 32B 模型中贡献了总增益的 80%，负反馈仅贡献 20%，这是否意味着负样本的作用被高估，仍需进一步研究。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_ujBrsQm6Zu/figures/002_Figure_2.jpg]]
 *Figure 2: Illustration of the NFT algorithm. Data Collection: An LLM π generates answers to a set of math questions. Generation results are split into two sub-datasets based on their answer correctness. Policy Optimization: By constructing an implicit policy for modeling negative data, NFT enables direct policy optimization on both positive and negative answers via maximum-likelihood*
@@ -217,7 +221,7 @@ NFT 的核心创新在于通过**隐式负策略**（implicit negative policy）
 
 NFT 在在线微调算法谱系中占据独特位置（Figure 1）：它使用监督学习（最大似然）的形式，却通过隐式负策略的构造实现了对负样本的策略优化，从而桥接了监督学习（如 RFT）与强化学习（如 GRPO）之间的鸿沟。Theorem 3.1 证明，仅使用负样本进行 NFT 训练，其最优解收敛于真实正分布 $\pi^+$；Proposition 4.2 进一步揭示，在严格 on-policy 条件下，NFT 与 GRPO 的梯度等价，尽管理论根基完全不同。
 
-## 核心模块与公式推导
+
 
 ### 3.1 策略分裂：从生成策略到正/负策略
 
@@ -272,7 +276,9 @@ NFT 的在线训练循环（Algorithm 1）包含以下关键步骤：
 
 整个流程不依赖奖励模型的标量输出，仅需二元验证信号，且无需维护额外的价值网络或负策略模型，保持了监督学习的简洁性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -313,7 +319,9 @@ NFT 在 7B 和 32B 规模的数学推理基准上进行了系统评估，与监�
 - **Figure 8**：熵曲线揭示 NFT 和 DAPO 鼓励探索，RFT 则导致熵衰减——这解释了 SL 基线在在线自改进场景中的根本劣势。
 - **Figure 9/10**：困难问题加权和适度的负似然比裁剪是 NFT 有效性的关键设计选择。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：SL 与 RL 之间的第三条路径
 
@@ -375,6 +383,8 @@ NFT 引入了两个对 SL 范式而言非传统的设计选择，其有效性已
 3. **连续奖励下的实际表现**：在连续奖励或更细粒度的反馈信号（如部分正确性评分、过程奖励）下，NFT 的实际表现如何？隐式负策略的参数化是否需要调整？
 
 4. **RFT 基线的强势表现**：为何 RFT 在 32B 模型中能够提供总增益的 80%？这是否意味着在大规模模型中，简单的正样本复用已经捕获了大部分改进空间，负样本的边际价值被高估？
+
+
 
 ## 原文 PDF
 

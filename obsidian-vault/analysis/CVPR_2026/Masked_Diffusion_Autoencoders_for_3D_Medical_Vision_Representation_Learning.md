@@ -45,7 +45,7 @@ claims:
 > - Cross-modal generalization (6 OOD tasks) 上，平均AUROC 78.6% vs 最佳基线（详见Table 2） (全面超越基线)。
 > - BraTS18 tumor grading 上，AUROC 92.1% vs 最佳基线（详见Table 3） (最高)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -84,8 +84,6 @@ MDAE处于**掩码自编码器**与**扩散去噪**两大范式的交叉点，�
 
 MDAE的核心贡献在于**将两种损坏机制统一于像素空间**，通过时间条件架构实现自适应重建，为3D医学视觉表征学习提供了新的基准框架。其开源预训练模型可作为下游任务的通用编码器初始化。
 
-## 背景与动机
-
 ### 3D医学影像自监督学习的现实需求
 
 标注3D医学影像（如脑部MRI）需要放射科专家逐层勾画，成本极高。自监督表征学习（SSL）通过在海量无标注数据上预训练编码器，使下游任务仅需少量标注即可取得强泛化能力，已成为医学影像分析的核心范式。然而，3D医学影像具备两个并行的诊断信息维度——**全局解剖结构**（如肿瘤位置与占位效应）和**细粒度组织纹理**（如水肿边界、坏死核心的异质性），这对SSL方法的设计提出了双重挑战。
@@ -110,7 +108,7 @@ MDAE的核心贡献在于**将两种损坏机制统一于像素空间**，通过
 
 基于上述分析，本文提出**掩码扩散自编码器（Masked-Diffusion Autoencoders, MDAE）**，核心思想是：在像素空间对3D医学影像同时施加空间掩码与扩散噪声，通过时间条件架构将两个目标统一到一个框架中。MDAE旨在解决一个瓶颈问题——**如何在单一预训练过程中同时捕获全局解剖结构与细粒度组织纹理**，从而提升下游任务在分布内、跨模态及多模态场景下的泛化性能。
 
-## 核心创新
+## 核心方法与创新机理
 
 ### 问题诊断：3D医学影像表征的双重困境
 
@@ -164,8 +162,6 @@ $$\mathcal{L}_{\mathrm{MDAE}} \to \begin{cases} \mathcal{L}_{\mathrm{MAE}}, & \t
 
 这意味着MDAE并非简单的技术叠加，而是将掩码自编码器和扩散去噪模型统一在一个连续的损坏参数空间内。这一统一性使得MDAE能够根据下游任务需求灵活调整损坏策略，同时也为理解不同自监督学习目标之间的关系提供了新的视角。
 
-## 整体框架
-
 MDAE 的整体 pipeline 围绕一个核心设计展开：**在像素空间对 3D 医学影像同时施加两种互补的损坏——空间掩码与扩散噪声**，迫使模型在统一的时间条件架构下联合学习全局解剖结构与细粒度组织纹理。图 2 展示了完整的框架流程。
 
 ### 输入损坏阶段
@@ -217,8 +213,6 @@ $$\mathcal{L}_{\mathrm{MDAE}} \to \begin{cases} \mathcal{L}_{\mathrm{MAE}}, & \t
 ![[assets/figures/papers/paper_list_l2541_https_openaccess_thecvf_com_content_CVPR2026_html_Tu_Masked_Diffusion_Au/figures/002_Figure_2.jpg]]
 *Figure 2: MDAE Framework. A 3D volume is jointly corrupted by patch-based masking (blocky*
 
-## 核心模块与公式推导
-
 ### 4.1 双重损坏机制
 
 MDAE的核心创新在于像素空间同时施加**空间掩码**与**扩散噪声**两种损坏，形成互补的学习目标。与MAE仅掩码或DSM仅加噪不同，双重损坏迫使模型在掩码区域重建（学习全局解剖结构）和可见区域去噪（学习细粒度组织纹理）之间建立联合表征。
@@ -266,7 +260,7 @@ $$\mathcal{L}_{\text{MDAE}} \to \begin{cases} \mathcal{L}_{\text{MAE}}, & \text{
 ![[assets/figures/papers/paper_list_l2541_https_openaccess_thecvf_com_content_CVPR2026_html_Tu_Masked_Diffusion_Au/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of corruption schemes. Left: MAE applies fixed masking corruption. Middle: DSM applies diffusion noise. Right: MDAE combines spatial masking with diffusion noising, creating dual objectives for holistic reconstruction and fine-grained denoising*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主结果：分布内与跨模态泛化性能
 
@@ -303,12 +297,6 @@ MDAE在三个评测场景中均取得最优性能，验证了双重损坏机制�
 ![[assets/figures/papers/paper_list_l2541_https_openaccess_thecvf_com_content_CVPR2026_html_Tu_Masked_Diffusion_Au/figures/003_Table_1.jpg]]
 *Table 1: Performance comparison on T1 and T2 modalities. All methods are evaluated on three brain tumor classification tasks: BraTS23 glioma vs metastasis (Tumor Type), RSNA-MICCAI MGMT methylation status (MGMT Methylation), and UPenn-GBM IDH1 mutation detection (IDH1 Status). Values represent AUROC and average precision (AP) in %. Best results per row in bold, second-best underlined*
 
-![[assets/figures/papers/paper_list_l2541_https_openaccess_thecvf_com_content_CVPR2026_html_Tu_Masked_Diffusion_Au/figures/004_Table_2.jpg]]
-*Table 2: Generalization performance on diverse MRI modalities. Tasks include UCSF-PDGM IDH classification using arterial spin labeling (ASL) and susceptibility-weighted imaging (SWI), UPenn-GBM age group classification using FLAIR, UPenn-GBM gross total resection (GTR) status using T1-gadolinium (T1GD), and TCGA-GBM 1-year disease-specific survival (DSS) and progression-free interval (PFI) using mixed-contrast protocols. Values represent AUROC and AP in %. Best results per row in bold, second-best underlined. Some foundation models did not provide predictions for TCGA tasks*
-
-![[assets/figures/papers/paper_list_l2541_https_openaccess_thecvf_com_content_CVPR2026_html_Tu_Masked_Diffusion_Au/figures/007_Table_3.jpg]]
-*Table 3: Multi-modality brain tumor evaluation on BraTS18 (4 modalities) and UCSF-PDGM (6 modalities). Classification reports AUROC; segmentation reports mean Dice and NSD. Best results in bold, second-best underlined*
-
 ![[assets/figures/papers/paper_list_l2541_https_openaccess_thecvf_com_content_CVPR2026_html_Tu_Masked_Diffusion_Au/figures/005_Figure_3.jpg]]
 *Figure 3: Ablation study overview. (a) AUROC landscape over masking ratio and noise level, showing synergistic interaction between masking and noise (see §5.2 for analysis). (b) Pixel-space vs. embedding-space (EMDAE) corruption across encoder depths. (c) Convolutional (ResNet), ResNet with time conditioning, and transformer (EVA) encoder architectures*
 
@@ -318,7 +306,7 @@ MDAE在三个评测场景中均取得最优性能，验证了双重损坏机制�
 ![[assets/figures/papers/paper_list_l2541_https_openaccess_thecvf_com_content_CVPR2026_html_Tu_Masked_Diffusion_Au/figures/006_Table_5.jpg]]
 *Table 5: Loss weight ablation on UCSF-PDGM. Validation performance for segmentation (Dice %) and classification (AU-ROC/AP %) with varying loss weights*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 方法定位：双重损坏机制的统一框架
 

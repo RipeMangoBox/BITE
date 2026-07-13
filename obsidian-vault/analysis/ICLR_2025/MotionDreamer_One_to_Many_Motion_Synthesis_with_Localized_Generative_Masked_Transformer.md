@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2025
 pdf_ref: paperPDFs/ICLR_2025/MotionDreamer_One_to_Many_Motion_Synthesis_with_Localized_Generative_Masked_Transformer.pdf
+project_link: https://motiondreamer.github.io/
+code_link: null
 aliases:
 - MotionDreamer
 tags:
@@ -39,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - SinMotion 上，Harmonic Mean 0.43 vs 0.36 (SinMDM) (+0.07)；Coverage (%) 93.47 vs 91.82 (SinMDM) (+1.65)；Global Diversity 1.33 vs 1.31 (SinMDM) (+0.02)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：在单参考运动（one-to-many motion synthesis）设定下，标准生成掩码Transformer因采用全局自注意力，倾向于过拟合整个序列的全局模式，无法有效学习运动内部局部模式的分布，导致生成多样性严重不足甚至模型坍塌。
 
@@ -51,7 +53,7 @@ claims:
 
 **证据强度**：上述结论由多项消融实验强力支撑——移除$\mathcal{L}_{\mathrm{token}}$后谐波均值从0.43骤降至0.34（Table 2）；将SlidAttn替换为标准全局自注意力导致模型严重过拟合，谐波均值仅0.07（Table 3）。这些结果表明，感受野约束与码本正则化是该方法有效性的必要条件。
 
-## 背景与动机
+
 
 ### 问题背景：单参考运动的一对多合成
 
@@ -80,7 +82,9 @@ MotionDreamer的核心动机源于一个关键的观察：**运动序列的多�
 
 这一设计哲学可以概括为：**在量化离散隐空间中，对运动局部模式进行显式分类分布建模，结合滑动窗口局部注意力以限制感受野，既能忠实保留参考运动的局部模式，又能生成多样化且新颖的运动序列**。后续的实验系统性地验证了这一假设：当使用标准Transformer块（无SlidAttn）时，模型严重过拟合，谐波均值（Harmonic Mean）仅0.07；引入SlidAttn并配合可微反量化后，谐波均值跃升至0.43，充分证明了感受野约束在单实例运动生成中的关键作用。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MotionDreamer 的核心创新在于将标准生成掩码 Transformer 的**全局自注意力**替换为**滑动窗口局部注意力（SlidAttn）**，并辅以**码本分布正则化**与**可微反量化**，从而在单参考运动合成中同时实现高保真局部模式保留与高多样性生成。
 
@@ -110,7 +114,7 @@ MotionDreamer 的核心创新在于将标准生成掩码 Transformer 的**全局
 
 MotionDreamer 的核心洞察在于：在量化离散隐空间中对运动局部模式进行显式分类分布建模，结合滑动窗口局部注意力以限制感受野，既能忠实保留参考运动的局部模式，又能生成多样化且新颖的运动序列。这一设计使得模型在 SinMotion 数据集上取得了 0.43 的谐波均值，相比最佳基线 SinMDM 的 0.36 提升 19%。
 
-## 整体框架
+
 
 MotionDreamer 的整体 pipeline 围绕“在量化离散隐空间中显式建模运动内部模式的分类分布”这一核心思想构建，由两个阶段组成：**运动Token化（VQ阶段）** 与 **局部掩码生成建模（Local-M Transformer阶段）**。
 
@@ -161,7 +165,7 @@ $$\mathcal{L}_{\mathrm{M}} = \mathcal{L}_{\mathrm{mask}} + \lambda_{\mathrm{rec}
 ![[assets/figures/papers/paper_list_l1902_MotionDreamer_One_to_Many_Motion_Synthesis_with_Localized_Generative_Mas/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the one-to-many motion synthesis. A single reference motion with arbitrary skeletons can be applied to generate natural and diverse novel motions while preserving the reference local motion patterns. Above shows the diverse generations from MotionDreamer of a girl doing breakdance (upper); a jaguar attacking (bottom)*
 
-## 核心模块与公式推导
+
 
 ### 3.1 运动Token化与码本学习
 
@@ -227,7 +231,9 @@ $$\mathbf{Attn}_t = \mathrm{softmax}\left(\frac{\mathbf{q}_t \mathbf{K}_W + \mat
 ![[assets/figures/papers/paper_list_l1902_MotionDreamer_One_to_Many_Motion_Synthesis_with_Localized_Generative_Mas/figures/009_Figure_6.jpg]]
 *Figure 6: Ablation study on overlap attention fusion (AttnFuse). “Ours w/o. AttnFuse” refers to applying standard average pooling aggregation as the alternative baseline to AttnFuse. “backflip”, “handstand” pattern and transition between two patterns are marked. For generated motions, color closer to the pattern colors indicates higher per-frame similarity with the corresponding pattern, while color closer to orange indicates lower similarity*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -284,7 +290,9 @@ Table 1 展示了 MotionDreamer 与现有单实例运动合成方法的定量对
 ![[assets/figures/papers/paper_list_l1902_MotionDreamer_One_to_Many_Motion_Synthesis_with_Localized_Generative_Mas/figures/015_Table_7.jpg]]
 *Table 7: Impact of codebook regularization loss on other VQ methods for motion representation. Bold text marks the best result*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题域与核心瓶颈
 
@@ -328,6 +336,8 @@ MotionDreamer的方法定位可从以下四个关键维度与基线方法进行�
 2. 是否可以引入熵正则化或随机采样策略进一步优化码本利用率？
 3. 如何设计更鲁棒的注意力机制，以同时捕获局部模式与长程依赖？
 4. 滑动窗口局部注意力在处理极长运动序列时的效率与效果如何？
+
+
 
 ## 原文 PDF
 

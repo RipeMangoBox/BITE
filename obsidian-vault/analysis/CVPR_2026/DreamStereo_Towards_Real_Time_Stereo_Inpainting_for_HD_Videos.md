@@ -42,7 +42,7 @@ claims:
 > - HD-100 (576×1024) 上，DiT Latency (ms/frame) 58.4 (SASI, r=36.1%) vs ~245 ms (dense estimation) (~4.2× speedup (10.7× in paper for 768×1280))。
 > - Dynamic Replica (720×1280) 上，PSNR (dB) 29.12 (Ours)。
 
-## 概述
+## 概要
 
 立体视频修复（stereo video inpainting）面临一个根本性的效率瓶颈：现有方法对所有像素进行等量计算，导致大量冗余，难以满足高清视频的实时处理需求。同时，常用的前向扭曲（forward warping）在生成遮挡掩码时易产生散点（fly-point artifacts）和粗糙边界，进一步损害数据质量与推理速度。
 
@@ -50,7 +50,7 @@ DreamStereo 的核心思路是通过**梯度感知后向扭曲**（Gradient-Awar
 
 在 HD-100 基准上，DreamStereo 以单步推理（NFE=1）取得 **30.48 dB PSNR**，延迟仅为 **40.1 ms/frame**，显著优于 ProPainter（28.30 dB, 668.1 ms/frame）等对比方法。该方法同时支持从单目视频出发的二维转三维任务，在 Dynamic Replica 和 SVD AVP 等多个基准上展现出竞争力的修复质量与几何一致性。
 
-## 背景与动机
+
 
 立体视频修复（stereo video inpainting）要求同时恢复左右眼视图中被遮挡或移除的区域，并保持严格的几何一致性与时序连贯性。随着高清（HD）立体内容在影视后期、虚拟现实和 3D 媒体中的普及，对该任务的实时处理需求日益迫切。然而，现有方法在质量与效率之间存在显著鸿沟。
 
@@ -77,7 +77,9 @@ $$I'(x', y') \leftarrow I(x, y)$$
 
 DreamStereo 围绕这一思路，提出梯度感知视差扭曲（GAPW）替代前向扭曲，从坐标映射函数的梯度场中推导遮挡边界，获得边缘清晰的平滑掩码。在此基础上，稀疏感知立体修复策略（SASI）仅保留遮挡区域及其膨胀带内的令牌（默认保留率约 35%），将 DiT 推理加速 10.7 倍，使 768×1280 高清立体视频修复首次达到实时（25 FPS），同时 PSNR 达到 30.48 dB，显著超越现有扩散与非扩散方法。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DreamStereo 的核心创新围绕一个关键瓶颈展开：**现有立体修复方法对所有像素等量处理，导致大量冗余计算；同时，常用的前向扭曲（forward warping）产生散点和不够平滑的遮挡掩码，损害数据质量和推断速度**。针对这一瓶颈，论文通过三个相互协同的技术槽位（changed slots）实现了从数据构造到推理加速的系统性突破。
 
@@ -113,7 +115,7 @@ DreamStereo 的核心创新围绕一个关键瓶颈展开：**现有立体修复
 
 上述四个槽位形成了一条完整的效率-质量协同链路：**GAPW** 提供高质量掩码 → **PBDP** 利用 GAPW 构造高保真训练数据 → **SASI** 基于掩码选择关键令牌加速 DiT → **蒸馏 VAE** 进一步压缩编解码开销。这一链路使得 DreamStereo 在 HD-100 基准（768×1280）上以单步推理（NFE=1）取得 30.48 dB PSNR，同时将延迟降至 40.1 ms/frame（约 25 FPS），在几乎不影响修复效果的前提下首次实现高清立体视频修复的实时处理（Table 1, Figure 1）。
 
-## 整体框架
+
 
 DreamStereo 的核心管线围绕“从单目视频出发，高效生成几何一致的高清立体修复结果”这一目标构建，其整体架构由三个关键阶段串联而成：**数据构造**（PBDP）、**潜在空间压缩**（蒸馏3D VAE）与**稀疏感知修复**（SASI + DiT 流匹配），最终通过掩码感知混合输出修复视频。
 
@@ -151,7 +153,7 @@ Figure 8 展示了完整的 2D 转 3D 推理管线：单目左视点视频输入
 ![[assets/figures/papers/paper_list_l2250_https_arxiv_org_abs_2604_12270/figures/003_Figure_3.jpg]]
 *Figure 3: (a) Illustration of the Parallax-Based Dual Projection, which utilizes Gradient-Aware Parallax Warping for reprojection to obtain the occlusion mask under input view. (b) Our proposed Sparsity-Aware Stereo Inpainting utilizes Mask-Based Token Selection to reduce the redundancy of visual tokens*
 
-## 核心模块与公式推导
+
 
 DreamStereo 的实时立体修复能力建立在三个紧密协作的核心模块之上：**梯度感知视差扭曲（GAPW）** 解决高质量视图投影与遮挡掩码生成问题；**视差驱动的双重投影（PBDP）** 利用 GAPW 从单目视频构建几何一致的训练数据；**稀疏感知立体修复（SASI）** 则通过掩码驱动的令牌选择大幅削减扩散 Transformer 的计算冗余。三个模块形成一条从数据构造到高效推理的完整因果链。
 
@@ -233,7 +235,9 @@ $$\mathbf{V} = \mathcal{B}( \mathcal{D}( \mathcal{B}( \hat{\mathbf{z}}_0, \mathb
 ![[assets/figures/papers/paper_list_l2250_https_arxiv_org_abs_2604_12270/figures/002_Figure_2.jpg]]
 *Figure 2: Comparison of forward warping and our GAPW in pixel mapping and occlusion mask generation*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -288,7 +292,9 @@ PBDP 管道生成的伪立体数据质量显著优于基于前向扭曲的构造
 
 以上失败模式揭示了当前“深度估计+扭曲+修复”范式在几何模糊和视角依赖效果上的根本局限，需引入更强的视觉先验或物理感知约束来突破。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有方法的关联与区别
 
@@ -321,6 +327,8 @@ DreamStereo 的核心能力边界由三个组件共同决定：
 3. **端到端优化空间：** 蒸馏 VAE 与稀疏令牌选择目前独立优化。联合训练是否能在保持加速比的同时进一步提升修复质量，是一个值得验证的方向。
 
 4. **高频纹理的保真度提升：** 当前方法在细节丰富区域的合成仍显不足。引入更强的视觉先验（如大规模预训练模型）或改进去噪模型的结构设计，可能是突破这一上限的关键。
+
+
 
 ## 原文 PDF
 

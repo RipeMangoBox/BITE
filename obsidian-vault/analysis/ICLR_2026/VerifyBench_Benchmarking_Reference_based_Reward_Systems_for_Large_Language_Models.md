@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/VerifyBench_Benchmarking_Reference_based_Reward_Systems_for_Large_Language_Models.pdf
+project_link: https://zju-real.github.io/VerifyBench/
+code_link: https://github.com/ZJU-REAL/VerifyBench
 openreview_forum_id: JfsjGmuFxz
 aliases:
 - VVH
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | VerifyBench：面向大语言模型的基于参考答案的奖励系统基准测试 |
 | 英文题名 | VerifyBench: Benchmarking Reference-based Reward Systems for Large Language Models |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=JfsjGmuFxz); [GitHub](https://github.com/ZJU-REAL/VerifyBench); [Project](https://zju-real.github.io/VerifyBench/) |
+| Links | [paper](https://openreview.net/forum?id=JfsjGmuFxz) · [GitHub](https://github.com/ZJU-REAL/VerifyBench) · [Project](https://zju-real.github.io/VerifyBench/) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | VerifyBench / VerifyBench-Hard |
 | Dataset | VerifyBench, VerifyBench-Hard, VerifyBench (小模型对比) |
@@ -42,7 +44,7 @@ claims:
 > - VerifyBench-Hard 上，Accuracy (AVG %) 为 gpt-oss-120b 87.90，对比 math-verify 76.00，变化 +11.90。
 > - VerifyBench (小模型对比) 上，Accuracy (%) 为 Qwen3-1.7B 81.10，对比 Llama-3.2-3B-Instruct 60.95，变化 +20.15。
 
-## 概述
+## 概要
 
 当前大语言模型奖励系统的评测主要依赖于成对偏好比较（pairwise preference ranking），即判断同一问题的两个回答中哪一个更好。然而，在推理模型（Large Reasoning Models, LRMs）的强化学习训练中，奖励信号通常来源于基于参考答案的单一回答正确性验证：给定问题、参考答案和模型生成的回答，判断该回答是否正确。现有的偏好基准（如 **Reward Bench**，Lambert et al., 2025）无法有效评估这种参考验证场景下的奖励质量。
 
@@ -57,7 +59,7 @@ claims:
 
 本基准聚焦于答案级别的二值正确性判断，不评估推理过程质量或部分正确回答，且排除了证明题和开放式问题，这些限制为后续扩展留下了明确方向。
 
-## 背景与动机
+
 
 大语言模型（LLM）的强化学习（RL）训练依赖于可靠的奖励信号来引导模型行为。当前，奖励系统的评测主要建立在**成对偏好比较**（pairwise preference ranking）范式之上：给定一个查询和两个回答，奖励模型需要判断哪个回答更好，评测指标是正确赋予高分给更佳回答的准确率。这一范式在 **Reward Bench**（Lambert et al., 2025）和 **RM-Bench** 等基准中得到了广泛应用，其核心公式为：
 
@@ -83,7 +85,9 @@ $$\mathrm{Accuracy} = \frac{1}{|D|} \sum_{(q, r_w, r_l) \in D} \mathbb{I}[R_{\va
 
 为解决上述问题，本文提出 **VerifyBench** 和 **VerifyBench-Hard** 两个基准数据集，将评测范式从偏好排序转变为基于参考答案的单一回答正确性判断。VerifyBench 提供平衡的难度分布，而 VerifyBench-Hard 则通过筛选顶尖模型判断高度冲突的样本，构建更具挑战性的测试集。这一设计使得研究者能够量化分析不同验证方法在绝对正确性判断上的能力差异，并建立起验证器质量与RL训练效果之间的因果关联。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 VerifyBench 的核心创新在于将大语言模型奖励系统的评测范式从**成对偏好排序**（pairwise preference ranking）切换为**基于参考答案的单一回答正确性验证**（single-response correctness verification）。这一转变并非简单的评测形式变化，而是直接对应推理模型（LRM）强化学习训练中实际使用的奖励信号形式，因此能更真实地反映训练中验证系统的质量。
 
@@ -113,7 +117,7 @@ VerifyBench-Hard 是另一个关键创新。其构建过程利用 **5 个在 Ver
 
 四个 changed slots——评测范式、输入组成、评价指标和难度设计——并非孤立存在，而是形成了一条完整的创新链条：**因为**输入中加入了参考答案，**所以**评测可以聚焦于单一回答的正确性判断；**因为**目标是绝对正确性，**所以**指标从排序准确率变为二值分类准确率；**因为**标准样本上大模型已接近天花板（>90%），**所以**需要 VerifyBench-Hard 来区分顶尖方法。这一链条使得 VerifyBench 能够捕捉到现有基准无法反映的验证能力差异，尤其是为推理模型 RL 训练中验证器的选择提供了直接相关的评测信号。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_JfsjGmuFxz/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the benchmark construction process. The upper section outlines the pipeline used to construct VerifyBench, whereas the lower section details the pipeline for VerifyBench-Hard. The components highlighted by black boxes denote the final entries included in the benchmark*
@@ -154,7 +158,7 @@ $$\operatorname{Accuracy} = \frac{1}{|D|} \sum_{(q, gt, r, y) \in D} \mathbb{I}[
 
 整个框架的输入输出关系清晰：输入为 $(q, gt, r)$ 三元组，输出为二值正确性判断。两条基准的区别在于样本难度分布——VerifyBench 保持自然分布下的类别平衡，VerifyBench-Hard 则聚焦于高冲突样本，提供更具挑战性的测试场景。实验表明，顶尖模型在 VerifyBench 上可达 95% 以上的准确率，但在 VerifyBench-Hard 上下降约 8-10 个百分点，验证了困难集的设计有效性。
 
-## 核心模块与公式推导
+
 
 ### 奖励模型的形式化定义
 
@@ -200,7 +204,9 @@ VerifyBench与现有奖励基准（如Reward Bench、RM-Bench）的本质区别�
 - **评价指标**：从“正确赋予高分给更佳回答的准确率”转变为“预测二值正确性标签的准确率”，直接衡量验证系统的绝对判断能力。
 - **难度设计**：在自然分布样本（VerifyBench）之外，引入基于多模型分歧筛选的困难子集（VerifyBench-Hard），提供更具区分度的评测层次。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 评估设置与基准统计
 
@@ -302,7 +308,9 @@ $$\operatorname{Accuracy} = \frac{1}{|D|} \sum_{(q, gt, r, y) \in D} \mathbb{I}[
 *Table 9: Full taxonomy and their description of VerifyBench and VerifyBench-Hard*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 评测范式转变：从偏好排序到参考答案验证
 
@@ -343,6 +351,8 @@ VerifyBench 的设计包含若干明确的适用边界：
 **细粒度评价方案设计**：从二值答案正确性扩展到步骤级正确性判断，可能为推理模型训练提供更精细的奖励信号。论文在细粒度答案类型分析（Table 5）中已初步展示了不同子类型上的性能差异，但尚未构建步骤级的评价体系。
 
 **奖励欺骗的防御机制**：基于参考答案的奖励系统如何有效防止奖励欺骗，是 RL 训练安全性的核心问题。论文未对此展开研究，但 RL 训练实验中弱验证器导致性能下降的现象（Figure 3 中 Llama-3.2-3B-Instruct 作为验证器时的表现）间接暗示了这一风险的存在。
+
+
 
 ## 原文 PDF
 

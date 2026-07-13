@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/MotionV2V_Editing_Motion_in_a_Video.pdf
+project_link: null
+code_link: null
 aliases:
 - MotionV2V
 tags:
@@ -40,15 +42,13 @@ claims:
 > - 定制测试集 上，SSIM 0.098 vs 0.094 (ATI) (+0.004 (+4.3%))；LPIPS 0.031 vs 0.072 (ATI) (-0.041 (-56.9%))。
 > - 用户研究（41人，20个视频） 上，整体编辑胜率 69% vs ~25% (ATI), <5% (ReVideo, Go-with-the-Flow) (+44/64个百分点)。
 
-## 概述
+## 概要
 
 视频编辑在过去一年取得了显著进展，但现有方法几乎全部聚焦于**外观编辑**——改变视觉风格、替换纹理或添加特效，而保持视频的运动结构不变。一旦尝试改变运动本身（例如让一只猫从走近碗边改为走远、让相机推近变为拉远），基于DDIM反演的外观编辑方法和图像到视频（I2V）运动控制方法都会暴露出根本性的局限：前者无法处理运动编辑中结构对应被打破的难题，后者仅从首帧生成新视频，无法保留输入视频的完整内容，尤其在相机移动或物体在中间帧出现时完全失效（Figure 3）。
 
 **MotionV2V** 针对这一瓶颈提出了一个全新的范式：将运动变化显式定义为“运动编辑”——输入视频中稀疏点轨迹与用户指定目标轨迹之间的偏差。其核心洞察在于，利用视频扩散模型在保留场景外观的前提下，生成符合目标轨迹的输出视频。这一范式的实现依赖两个关键设计：（1）通过“运动反事实”视频对（内容相同但运动不同的视频对）训练模型，使其学习从轨迹偏差到运动变化的映射；（2）采用冻结主分支、训练控制分支的架构，将目标轨迹作为条件注入预训练的文生视频扩散模型。
 
 在包含首帧不可见内容的定制测试集上，MotionV2V 在重建误差指标上全面超越基于点的 I2V 基线 **ATI**：L2 误差从 0.038 降至 0.024（降低 36.8%），LPIPS 从 0.072 降至 0.031（降低 56.9%）（Table 2）。在 41 人参与、20 个视频的用户研究中，MotionV2V 以约 69% 的整体胜率显著优于 ATI（约 25%）、ReVideo（低于 5%）和 Go-with-the-Flow（低于 5%）（Table 1）。该方法无需掩膜、支持任意帧的物体控制，并支持迭代编辑以完成复杂的序列运动变化。
-
-## 背景与动机
 
 视频编辑是视觉内容创作的核心需求，但现有方法在**运动编辑**这一维度上存在根本性局限。当前主流范式可分为两类：一类是基于DDIM反演的外观编辑方法，它们仅修改视觉风格（如纹理、色调）而完整保留输入视频的运动结构；另一类是图像到视频（Image-to-Video, I2V）生成方法，它们从单帧静态图像出发合成新视频，天然无法利用输入视频中除首帧以外的任何信息。这两条技术路线都无法解决运动编辑的核心挑战——**结构对应被打破**：当用户希望改变物体的运动轨迹、相机路径或事件时序时，输入与输出之间的像素级对应关系不复存在，传统的外观编辑范式完全失效。
 
@@ -58,7 +58,7 @@ MotionV2V正是在这一背景下提出。其核心动机是将运动编辑形�
 
 为实现这一目标，MotionV2V引入了一个关键创新：**运动反事实（motion counterfactuals）视频对**——内容完全相同但运动不同的视频对。通过从长视频中系统性地生成此类数据，模型得以学习“给定内容，改变运动”这一映射，而非简单记忆视频。这解决了训练数据缺乏配对真值的核心瓶颈。
 
-## 核心创新
+## 核心方法与创新机理
 
 ### 1. 问题定位：运动编辑的“结构对应断裂”
 
@@ -111,8 +111,6 @@ MotionV2V的模型架构（Figure 5）在预训练T2V DiT模型基础上引入�
 - **迭代编辑的漂移问题**：虽然支持将输出作为新输入进行迭代编辑（Figure 6），但多次迭代后主体可能逐渐漂移。当前通过重新采样缓解，但漂移的定量规律和上限未明确。
 - **复杂遮挡与重光照**：动态相机与物体交互产生的复杂遮挡效果，当前模型的处理能力缺乏系统评估。
 
-## 整体框架
-
 MotionV2V 提出了一种全新的视频运动编辑范式：**直接编辑从输入视频中提取的稀疏点轨迹（source tracks），将其变换为目标轨迹（target tracks），并由条件视频扩散模型生成符合目标运动、同时保留场景外观的输出视频**。该框架的核心创新在于将运动变化显式定义为输入轨迹与目标轨迹之间的“运动编辑”偏差，从而绕开了传统视频编辑方法（如基于 DDIM 反演的外观编辑或图像到视频生成）中运动结构与外观耦合的难题。
 
 ### 输入输出流
@@ -158,8 +156,6 @@ $$F_{\text{latent}} = \left(\frac{F-1}{4}+1\right), \quad W_{\text{latent}} = \f
 ![[assets/figures/papers/paper_list_l34_https_arxiv_org_abs_2511_20640/figures/001_Figure_1.jpg]]
 *Figure 1: Motion Edits Framework: Users provide an input video along with source motion tracks (colored dots connected by lines, extracted from the input) and target motion tracks (user-specified desired motion). Lines indicate point trajectories while dot presence/absence indicates visibility. Our diffusion model generates an output video matching the target motion. Applications: Our method can edit videos in a true sense, where content is preserved but motion is changed*
 
-## 核心模块与公式推导
-
 MotionV2V的核心架构围绕一个关键洞察展开：将运动变化显式建模为“源轨迹”与“目标轨迹”之间的偏差，并训练一个视频扩散模型在保留场景外观的前提下生成符合目标运动轨迹的输出视频。整个pipeline由四个紧密耦合的模块构成。
 
 ### 运动反事实数据生成
@@ -203,13 +199,10 @@ $$\epsilon \sim \mathcal{U}(-2, 2)$$
 ![[assets/figures/papers/paper_list_l34_https_arxiv_org_abs_2511_20640/figures/005_Figure_5.jpg]]
 *Figure 5: Our motion-conditioned video diffusion architecture. We extend a T2V DiT model with a control branch that processes three additional video conditioning channels: the counterfactual video, counterfactual motion tracks, and target motion tracks. The control branch duplicates the first 18 transformer blocks and integrates with the main branch through zero-initialized MLPs, similar to ControlNet*
 
-![[assets/figures/papers/paper_list_l34_https_arxiv_org_abs_2511_20640/figures/003_Figure_4.jpg]]
-*Figure 4: Counterfactual data generation process. In order to generate a real / counterfactual video pair and its corresponding trajectories, we take a full real video, extract a video clip, then create a counterfactual video. The counterfactual has new motion from the video generator, as well as temporal and spatial augmentations. In order to ensure we have two corresponding set of tracks, we specifically use the first and last frames, which directly match the original video, to anchor the tracks for the counterfactual*
-
 ![[assets/figures/papers/paper_list_l34_https_arxiv_org_abs_2511_20640/figures/004_Figure_3.jpg]]
 *Figure 3: Controlling Content on Any Frame. By conditioning on the full video, we can move and preserve content appearing on any frame. Methods like ATI rely on the first frame, failing to control objects, like the sign, that emerge mid-sequence*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 整体实验设计
 
@@ -292,7 +285,7 @@ Section 10报告了一项重要的推理阶段消融实验。作者发现，模�
 ![[assets/figures/papers/paper_list_l34_https_arxiv_org_abs_2511_20640/figures/013_Figure_11.jpg]]
 *Figure 11: Test Data Generation. A video is separated at the middle, and then one half is reversed. This results in two videos with a common starting frame*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 

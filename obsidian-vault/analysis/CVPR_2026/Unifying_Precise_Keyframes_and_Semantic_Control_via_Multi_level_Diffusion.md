@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/Unifying_Precise_Keyframes_and_Semantic_Control_via_Multi_level_Diffusion.pdf
+project_link: null
+code_link: null
 aliases:
 - MLDFTCMBK
 - UPKSCMLD
@@ -41,7 +43,7 @@ claims:
 > - HumanML3D 关键帧插补（7个关键帧） 上，关键帧误差 (cm) 0.000 vs 其它方法存在不可忽略的空间偏差 (N/A)；R-Precision (Top 3) 0.803 vs 次优方法 ≤ 0.797 (+0.006)；FID 0.023 vs 次优方法 ≈ 0.028 (-0.005)。
 > - HumanML3D 部分关节控制（根+末端效应器） 上，关键帧误差 (cm) 0.000 vs 其它方法存在偏差 (N/A)；R-Precision (Top 3) 0.813 vs 次优方法 ≈ 0.805 (+0.008)。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -70,7 +72,7 @@ claims:
 
 当前方法在文本语义与关键帧约束严重冲突时可能难以生成满意过渡，需人工调整条件；推理阶段的 DDIM 反演增加了计算开销，限制了实时交互应用；模型仅在 HumanML3D 数据集上验证，对高动态动作（如杂技）的泛化能力尚待检验。未来方向包括自动冲突检测与调解、引入物理模拟约束，以及扩展至多人交互和物体操作场景。
 
-## 背景与动机
+
 
 ### 问题背景：文本条件运动插补的双重困境
 
@@ -102,7 +104,9 @@ claims:
 
 这一框架在 HumanML3D 测试集上实现了关键帧误差为 0.000 的严格遵循（Table 1），同时在语义一致性指标（R-Precision Top 3 达 0.803）上超越现有最优方法，证明了语义表达与空间控制可以兼得。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作的核心创新在于提出了一套**多层级扩散框架**，通过训练时的结构化引导与推理时的硬约束精炼，首次在文本条件运动插补任务中同时实现了**零关键帧误差**与**高层语义对齐**，解决了现有方法普遍存在的“关键帧偏差”与“低层语义控制不足”的双重瓶颈（Figure 2）。
 
@@ -128,7 +132,7 @@ claims:
 
 上述三个changed slots并非孤立改进，而是存在深层因果关联：**多层级引导**为语义-空间对齐提供了结构化训练信号，使模型在生成阶段就能产出接近约束的运动；**轨迹-姿态精炼**则在推理阶段将“接近”提升为“精确”，通过硬约束操作消除了剩余偏差。这种“训练期软引导 + 推理期硬满足”的协同设计，是本方法在HumanML3D测试集上实现零关键帧误差（Table 1）与最优语义一致性（R-Precision Top 3 = 0.803, FID = 0.023）的根本原因。
 
-## 整体框架
+
 
 本文提出的**多层扩散框架（Multi-level Diffusion Framework）**旨在解决文本条件运动插补中一个核心瓶颈：如何将文本语义与关键帧的时空约束有效对齐，从而同时满足语义准确性和精确空间控制。框架将这一复杂任务解耦为四个协同模块，形成从条件编码、多层引导到推断精炼的完整管线（Figure 3）。
 
@@ -170,7 +174,7 @@ claims:
 
 这种“训练时多层软引导 + 推断时硬约束精炼”的设计，是本方法在关键帧误差上实现 0.000 cm（Table 1）的根本原因，同时也保证了语义一致性指标（R-Precision Top 3 达 0.803）处于最优水平。
 
-## 核心模块与公式推导
+
 
 本方法的核心是一个**多层级扩散框架**，其设计围绕一个瓶颈：如何将文本高层语义与关键帧的精确时空约束有效对齐。框架通过四个协同模块实现这一目标：条件编码、局部引导、全局引导和推断精炼。
 
@@ -244,7 +248,9 @@ $$\bar{\mathbf{x}}_0 = \mathbf{K} \odot \mathbf{m}_{\mathbf{K}} + \tilde{\mathbf
 ![[assets/figures/papers/paper_list_l2_https_cvpr_thecvf_com_virtual_2026_poster_38659/figures/006_Figure_5.jpg]]
 *Figure 5: Qualitative results of text-conditioned motion in-betweening. We visualize the keyframe constraints as orange frames, the corresponding generated keyframes in pink, and the generated transitions as blue frames. Our method strictly adheres to the constraints, exhibiting perfect overlap between the targets (orange) and generations (pink), whereas other methods display non-negligible spatial deviations (orange boxes) and semantic inconsistencies (blue boxes). Please refer to the supplementary video for the complete motion sequences*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 关键帧插补主实验
 
@@ -305,7 +311,9 @@ Table 5 评估了基于关键帧的运动编辑性能，包括局部姿态编辑
 ![[assets/figures/papers/paper_list_l2_https_cvpr_thecvf_com_virtual_2026_poster_38659/figures/002_Figure_2.jpg]]
 *Figure 2: Limitations of previous text-conditioned motion inbetweening methods. The artist specifies the intended motion semantics through text and keyframes (orange), with keyframes 2–4 (from right) indicating three distinct stages: “picking up”, “carrying overhead”, and “walking to the target”. However, existing approaches [9] exhibit two critical limitations: (a) Lacking lowlevel semantic control, as the generated transition (blue) redundantly performs the “picking up” action after the timing set by the keyframe, and fails to maintain the keyframe-specified “carrying overhead” pose while walking. (b) Lacking precise keyframe adherence, demonstrated by the generated motion at the constrained frame...*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与因果机制
 
@@ -352,6 +360,8 @@ Table 5 评估了基于关键帧的运动编辑性能，包括局部姿态编辑
 3. **多人交互与物体操作**：在更复杂的多人交互或物体操作场景中，本方法的严格关键帧遵循策略是否依然适用？多人场景涉及角色间相对约束，物体操作涉及手-物接触约束，这些对轨迹精炼和姿态填补提出了新的挑战。
 
 4. **实时性能优化**：能否通过蒸馏、一步生成或缓存策略将推断精炼过程加速至实时，以支持交互式创作工具？这需要在精度与速度之间寻找新的平衡点。
+
+
 
 ## 原文 PDF
 

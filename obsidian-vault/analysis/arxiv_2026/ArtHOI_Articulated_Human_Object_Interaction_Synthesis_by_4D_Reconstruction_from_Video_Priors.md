@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2026
 pdf_ref: paperPDFs/arxiv_2026/ArtHOI_Articulated_Human_Object_Interaction_Synthesis_by_4D_Reconstruction_from_Video_Priors.pdf
+project_link: https://arthoi.github.io/
+code_link: null
 aliases:
 - ArtHOI
 tags:
@@ -40,7 +42,7 @@ claims:
 > - Articulated Object Dynamics (Table 3) 上，Rotation Error Mean (°) 6.71 vs N/A (other methods cannot model articulation) (N/A)。
 > - Rigid Object Scenes (Table 4) 上，Contact% 76.18 vs (outperforms previous methods) (N/A)。
 
-## 概述
+## 概要
 
 从单目视频中合成人与铰接物体的自然交互，是构建沉浸式虚拟世界的关键技术。现有方法面临一个根本瓶颈：**零样本方法将物体视为单一刚体，无法建模铰接部件的独立运动**（如开门时门板的旋转与门框的静止），而联合优化人体与物体动态则因单目歧义和梯度冲突，难以生成物理一致的4D场景。
 
@@ -52,7 +54,7 @@ claims:
 
 方法目前局限于单自由度铰接与静态相机场景，对低纹理表面的光流跟踪失败是主要失效模式。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -74,7 +76,9 @@ ArtHOI 的核心洞察在于：**将铰接式人物交互合成重新定义为�
 
 这一思路的关键在于**分解优化策略**：与其让人体和物体在歧义中相互干扰，不如先利用视频中的几何证据恢复物体的铰接结构，再在固定的物体骨架下优化人体运动。这种两阶段解耦从根本上消除了联合优化的歧义源，使得2D监督能够被有效提升为几何一致、物理逼真的4D场景。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ArtHOI 的核心创新在于将**铰接式人物交互（Articulated HOI）合成**重新定义为**从单目视频先验中进行4D重建的逆渲染问题**，并通过**解耦的两阶段优化管道**解决了零样本场景下铰接建模与物理一致性两大瓶颈。
 
@@ -139,7 +143,7 @@ ArtHOI 最关键的架构创新是**解耦的两阶段重建管道**（Figure 2�
 
 ArtHOI 是首个同时实现RGB渲染、铰接对象建模、物理约束和零样本泛化四个能力的方法。其根本差异在于：**将物体运动建模从单一刚体变换升级为基于光流分割的铰接变换**，并通过解耦优化与显式接触约束，将2D视频先验提升为几何与物理一致的4D表示。
 
-## 整体框架
+
 
 ArtHOI 将铰接式人物交互（HOI）合成重新定义为一个**从单目视频先验进行4D重建的逆渲染问题**：给定一段由扩散模型生成的视频，在没有三维监督的情况下，重建出完整的铰接式4D场景 [Abstract]。这一范式转换的核心动机在于，现有零样本方法（如 **ZeroHSI**，Li et al., arXiv 2024）将物体视为单一刚体，无法建模铰接部件的运动，且人体与物体动态的联合优化在单目歧义下极易导致梯度冲突，难以生成物理一致的交互 [analysis_truth]。
 
@@ -162,7 +166,7 @@ ArtHOI 将铰接式人物交互（HOI）合成重新定义为一个**从单目�
 ![[assets/figures/papers/paper_list_l1699_ArtHOI_Articulated_Human_Object_Interaction_Synthesis_by_4D_Reconstructi/figures/001_Figure_1.jpg]]
 *Figure 1: ArtHOI recovers zero-shot articulated human-object scene geometry and dynamics from monocular video priors without 3D supervision. Unlike prior works (e.g., TRUMANS, ZeroHSI), our method achieves all four capabilities simultaneously: RGB rendering, articulated object modeling, physical constraint modeling, and zero-shot generalization, notably without using 3D supervision*
 
-## 核心模块与公式推导
+
 
 ArtHOI 将铰接式人物交互合成形式化为一个从单目视频先验中进行 4D 重建的逆渲染问题。其核心架构围绕**解耦的两阶段重建管道**展开，通过将物体铰接恢复与人体运动优化分离，消除单目歧义与梯度冲突。以下逐一剖析关键模块及其数学基础。
 
@@ -264,7 +268,9 @@ $$\mathcal{L}_c = \sum_{t=1}^T \sum_{v \in \mathcal{V}_h} \sum_{q \in \mathcal{Q
 
 ![[assets/figures/papers/paper_list_l1699_ArtHOI_Articulated_Human_Object_Interaction_Synthesis_by_4D_Reconstructi/figures/006_Figure.jpg]]
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -324,7 +330,9 @@ Fig. 6 展示了典型失败案例。ArtHOI 的核心瓶颈在于其对光流点
 
 ![[assets/figures/papers/paper_list_l1699_ArtHOI_Articulated_Human_Object_Interaction_Synthesis_by_4D_Reconstructi/figures/002_Table_1.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位与核心瓶颈
 
@@ -366,6 +374,8 @@ ArtHOI 的适用边界由以下假设和依赖条件界定：
 4. **光流跟踪失败的鲁棒替代**：当 Co-tracker 在低纹理区域失效时，是否存在更鲁棒的几何线索（如深度估计、法线预测）可以补充或替代光流信号？这直接关系到方法在真实场景中的可用性。
 
 5. **与生成模型的深度整合**：ArtHOI 目前将扩散模型生成的视频作为“先验”输入，但两阶段管道与生成过程本身是解耦的。是否可以将物理约束（如接触损失、碰撞损失）直接嵌入扩散模型的去噪过程，实现“生成即物理一致”的端到端范式，是一个值得探索的方向。
+
+
 
 ## 原文 PDF
 

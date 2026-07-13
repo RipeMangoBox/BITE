@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Bridging_Degradation_Discrimination_and_Generation_for_Universal_Image_Restoration.pdf
+project_link: null
+code_link: null
 aliases:
 - BBDDG
 - BDDGUIR
@@ -40,11 +42,11 @@ claims:
 > - 5D All-in-One (Low-light Enhancement) 上，PSNR 为 27.42，对比 25.12 (DiffUIR)，变化 +2.30。
 > - 5D All-in-One (Desnowing) 上，PSNR 为 32.86，对比 32.86 (DiffUIR)，变化 0.00。
 
-## 概述
+## 概要
 
 本文提出BDG（Bridging Degradation discrimination and Generation）框架，旨在解决通用图像复原中退化判别能力与生成先验难以兼得的根本矛盾。核心创新包括：（1）提出多角度多尺度灰度共生矩阵（MAS-GLCM）实现细粒度退化判别；（2）设计三阶段扩散训练范式（生成预训练→桥接阶段→复原微调），通过双向特征对齐将退化判别信息注入扩散模型。实验表明，BDG在5D全合一复原任务中全面超越DiffUIR，在去雨任务上PSNR提升3.72 dB；在真实世界超分辨率任务中，在DIV2K-Val上PSNR达到24.1977，比第二好的扩散方法高出2.45 dB。
 
-## 背景与动机
+
 
 现有通用图像复原方法可分为两类：
 
@@ -53,7 +55,9 @@ claims:
 
 核心瓶颈在于：退化判别与生成先验在单一模型中难以兼顾。基于判别的方法依赖显式退化表征（梯度、频率、可学习参数、文本指令），但这些表征的细粒度判别能力有限；基于生成先验的方法虽能利用扩散模型的强大生成能力，但缺乏对退化类型和级别的精确感知。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 1. **MAS-GLCM退化表征**：提出多角度多尺度灰度共生矩阵（Multi-Angle and multi-Scale Gray Level Co-occurrence Matrix），通过计算多个角度和尺度下GLCM的平均值，实现对退化类型和级别的细粒度判别。在退化类型分类上达到97.13%准确率，在退化级别分类上达到74.17%准确率，远超梯度、频率等传统表征方法（Table 1）。
 
@@ -61,7 +65,7 @@ claims:
 
 3. **双向特征对齐**：在桥接阶段通过双向交叉熵损失（Eq.6）将MAS-GLCM特征与扩散模型中间特征对齐，使模型获得退化感知能力。
 
-## 整体框架
+
 
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__image_and_video_generation__b001_hVFoiCDiMB_Bridging_Degr/figures/001_Figure_1.jpg]]
@@ -74,7 +78,7 @@ BDG的整体框架如Figure 2所示，包含三个训练阶段：
 
 在全合一和混合退化任务中，使用36M参数的UNet（预训练于ImageNet）；在真实世界超分辨率任务中，使用Stable Diffusion 2作为基础模型，不引入交叉注意力或ControlNet等额外架构。
 
-## 核心模块与公式推导
+
 
 ### 5.1 MAS-GLCM退化表征
 
@@ -121,7 +125,9 @@ $$\mathcal{L}_{rft} = ||x_{gt}^\theta - x_{gt}||_1 + \lambda \mathcal{L}_{bridge
 全负对比损失（Eq.10，仅在RFT阶段使用）：
 $$\mathcal{L}_{fcnl} = \sum_{i \in \mathcal{B}_1} \sum_{j \in \mathcal{B}_2} (1 - \cos(F_{mas}^i, F_{mas}^j))$$
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 
 ### 6.1 全合一图像复原
@@ -177,7 +183,9 @@ $$\mathcal{L}_{fcnl} = \sum_{i \in \mathcal{B}_1} \sum_{j \in \mathcal{B}_2} (1 
 *Table 3: Table 3: Real-world restoration results in four real-world degradation types under the zero-shot setting. The best and second results are shown in red and blue respectively.*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 BDG属于**通用图像复原**领域，具体位于**基于扩散模型的通用复原方法**子方向。与现有方法的关系如下：
 
@@ -198,6 +206,8 @@ BDG属于**通用图像复原**领域，具体位于**基于扩散模型的通�
 - MAS-GLCM能否与更强大的基础模型（如更大的扩散模型或视觉语言模型）结合？
 - 如何解决MAS-GLCM对颜色偏差和全局几何变换不敏感的问题？
 - 能否将BDG的桥接思想应用于其他条件生成任务？
+
+
 
 ## 原文 PDF
 

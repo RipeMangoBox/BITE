@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Taming_Hierarchical_Image_Coding_Optimization_A_Spectral_Regularization_Perspective.pdf
+project_link: null
+code_link: null
 aliases:
 - DRESRHC
 - THICOSRP
@@ -41,13 +43,13 @@ claims:
 > - CLIC Pro 上，BD-Rate (相对于VTM-22.0) 为 -18.13%，对比 VTM-22.0，变化 -18.13%。
 > - Tecnick 上，BD-Rate (相对于VTM-22.0) 为 -24.09%，对比 VTM-22.0，变化 -24.09%。
 
-## 概述
+## 概要
 
 现有分层图像编码（Hierarchical Image Coding）通过多尺度潜在变量联合优化率失真目标，但朴素端到端训练**忽略了跨尺度信息分配的固有结构**，导致**光谱能量散射（spectral dispersion）与光谱混叠（spectral aliasing）**——不同尺度之间产生冗余频率分量，造成训练不稳定、收敛缓慢且压缩性能受限。本文从**光谱正则化（Spectral Regularization）**视角提出显式训练约束方案 **DHIC-Regu**，包含两个互补组件：（1）**尺度内频率正则化**，基于DCT的渐进频谱截断，强制各尺度专注其目标频带，引导自然的低‑高频率学习顺序；（2）**尺度间潜在正则化**，利用DWT＋1×1卷积对齐相邻尺度潜变量并施加L2惩罚，抑制跨尺度光谱混叠。两种正则化**仅在训练时使用**，推理阶段无任何额外计算或参数开销，保持与无正则化基线完全相同的复杂度。
 
 **核心结论**：光谱分析揭示朴素训练违反频率原则；正则化训练使各尺度解耦，形成清晰的粗到细层次结构（图1），**显著加速收敛并提升率失真性能**。实验表明，引入全量正则化后，模型**训练加速2.30倍**，在Kodak、CLIC Pro、Tecnick三个标准数据集上相对VTM‑22.0的**平均BD‑Rate达到‑20.65%**，较无正则化基线额外降低10.11%码率（表1、表2）。消融实验确认：尺度内正则化主导收敛加速（1.84倍），尺度间正则化主导码率节省（BD‑Rate ‑7.66%）。该方法**专为显式多尺度层次架构设计**，对单尺度VAE的直接迁移效果有限，且尺度内正则化对最终率失真的增益较弱，整体提升主要依赖尺度间正则化。
 
-## 背景与动机
+
 
 深度学习驱动的图像压缩近年来取得了长足进步，以 ELIC、MLIC++ 为代表的单尺度自编码器架构通过端到端率失真优化已显著超越传统编码标准 VTM-22.0。然而，这类方法在潜在空间中缺乏对图像多尺度特性的显式分解，未能充分利用自然图像从粗到细的结构先验。分层图像编码（Hierarchical Image Coding）通过多个尺度的潜在变量 $\mathbf{z}_1,\dots,\mathbf{z}_L$ 分别建模不同分辨率的信息，理论上能够实现更优的频率解耦与压缩效率。代表性的分层架构如 DHIC 和 QARV 试图构建这类显式尺度层级，但实际训练中却面临着严峻的频谱失控问题。
 
@@ -55,7 +57,9 @@ claims:
 
 针对上述缺口，本文通过追踪训练过程中的光谱能量动态，首次提出从**光谱正则化**视角驯服分层编码优化。核心动机在于：若能在训练早期强制各尺度专注各自的目标频带，并在后期抑制跨尺度的冗余频率分量，则有望引导模型自然形成从低频到高频的解耦层次。为此，本文设计了双阶段显式正则化策略——**尺度内频率正则化**（基于 DCT 的渐进频谱截断，稳定早期频带收敛）与**尺度间潜在正则化**（基于 DWT 与 $\mathrm{L}_2$ 惩罚，缓解后期频谱混叠），二者仅在训练阶段使用，不增加推理开销。实验表明，该方案可使相同分层架构下的训练收敛速度提升 2.3 倍，并将相对于 VTM-22.0 的平均 BD-Rate 从 $-11.16\%$ 大幅推至 $-20.65\%$，验证了显式光谱引导对于释放分层编码潜力的必要性与有效性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DHIC-Regu 的核心创新在于**通过显式光谱正则化明确引导分层模型的跨尺度信息分配**，解决朴素端到端训练中因忽略频率原则而导致的频谱能量散射与混叠问题，从而在训练加速和率失真性能上大幅超越无正则化的基线 DHIC-Base。该方案包括两个互补的正则化器以及配套的训练阶段划分，**仅在训练时生效**，推理期间完全不引入额外开销。
 
@@ -92,7 +96,7 @@ DHIC-Regu 的核心创新在于**通过显式光谱正则化明确引导分层�
 - 尺度内正则化主要用于加速收敛，单独使用时最终压缩性能提升有限（约 -1% BD-Rate）；整体增益高度依赖尺度间正则化。
 - 关键超参数（$\delta=0.1$、阶段切换 epoch、频率截断调度）依赖**手动网格搜索**，尚未探索自适应调度或自动优化策略。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0014_lO6I66lweK_Taming_Hierarchical_Image_Coding_Optimization_A/figures/021_Figure_9.jpg]]
 *Figure 9: Our proposed lightweight hierarchical image codec architecture. The above is the overall network framework, where the three rows from top to bottom are the encoding pathway, entropy model pathway, and decoding pathway. And the shaded area represents the FSP module, which has been proven to be unnecessary in Appendix A.4. The lower left corner shows the network structure of the latent block in the entropy model, while the bottom right corner shows the structure of the basic model employed in our whole architecture*
@@ -139,7 +143,7 @@ $$
 
 > ⚠️ **需人工核实处**：尺度间正则化中 DWT 与 $1\!\times\!1$ 卷积的具体实现组合（Haar 小波、通道数映射等）以及训练阶段切换边界（100 epochs）的证据分散在不同章节，建议在正式报告中对配置细节加以注释；此外，$L_2$ 惩罚前的负号与损失函数符号需对照原文 Eq.(6) 确认。
 
-## 核心模块与公式推导
+
 
 ### 1. 关键模块设计
 
@@ -181,7 +185,9 @@ $$-\log p(\mathbf{z}_l \mid \mathbf{z}_{l-1}) = \frac{1}{2\tau^2}\|\mathbf{z}_l 
 
 综合来看，DCT截断（式 3‑5）在训练前期引导频率分配，DWT对齐+ $L_2$ 惩罚（式 6）在训练后期消除频谱混叠；二者分别在输入域和隐空间实现光谱正则化，构成该方法的核心优化机制。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果：率‑失真与训练加速
 
@@ -244,7 +250,9 @@ $$-\log p(\mathbf{z}_l \mid \mathbf{z}_{l-1}) = \frac{1}{2\tau^2}\|\mathbf{z}_l 
 *Table 4: (b) Inter-scale regularization (Remaining epochs). More ablation studies on regularization setups and modules design, are detailed in Appendix A.4*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 DHIC‑Regu（Explicit Spectral Regularization for Hierarchical Coding）并非独立的新型架构，而是面向显式多尺度分层图像编码器的一套训练时正则化方案。其核心贡献在于，通过分析分层模型在朴素端到端优化中暴露的频谱散射与跨尺度混叠现象，设计了两类即插即用的正则化项：**尺度内频率正则化**（基于 DCT 的渐进频谱截断）与**尺度间潜在正则化**（基于 DWT+Conv 的相似性惩罚）。这些正则化项仅作用于训练阶段，不增加推理开销，却使同一网络架构（DHIC‑Base）在收敛速度和压缩性能上获得显著提升（Table 2）。因此，该工作在分层编码方法谱系中处于“训练范式改进”的位置，与单尺度模型、传统编码标准及其他分层架构形成清晰的阶梯关系。
 
@@ -289,6 +297,8 @@ DHIC‑Regu（Explicit Spectral Regularization for Hierarchical Coding）并非�
 5. **理论深化**：如何将启发式的频谱重叠量度量（Figure 1 中的能量分析）与率失真函数的泛化界相连，从而为分层编码提供紧密的理论指导？
 
 上述问题若得到解决，有望将频谱正则化从一个有效的经验技巧发展为学习型分层编码的基础理论组件。
+
+
 
 ## 原文 PDF
 

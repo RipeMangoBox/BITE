@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/ConsisDrive_Identity_Preserving_Driving_World_Models_for_Video_Generation_by_Instance_Mask.pdf
+project_link: https://shanpoyang654.github.io/ConsisDrive/page.html
+code_link: null
 aliases:
 - ConsisDrive
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | ConsisDrive：基于实例掩码的身份保持驾驶世界模型 |
 | 英文题名 | ConsisDrive: Identity-Preserving Driving World Models for Video Generation by Instance Mask |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=zgqFQM8VNe); [Project](https://shanpoyang654.github.io/ConsisDrive/page.html) |
+| Links | [paper](https://openreview.net/forum?id=zgqFQM8VNe) · [Project](https://shanpoyang654.github.io/ConsisDrive/page.html) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | ConsisDrive |
 | Dataset | nuScenes (T+I)2V validation set, 3D Detection on generated data (StreamPETR, Gen. only), 3D Perception on generated nuScenes validation (StreamPETR) |
@@ -40,7 +42,7 @@ claims:
 > - nuScenes (T+I)2V validation set 上，FID↓ 为 3.88，对比 3.96 (InstaDrive)，变化 -0.08。
 > - 3D Detection on generated data (StreamPETR, Gen. only) 上，mAP↑ 为 31.5%，对比 34.5% (Oracle on real data)，变化 -3.0% (91.3% of Oracle)。
 
-## 概述
+## 概要
 
 自动驾驶世界模型为端到端规划与仿真提供可控视频生成能力，但现有方法普遍存在**身份漂移**问题：同一目标在连续帧中的类别、颜色或形状发生不可控变化。其根源在于：（1）缺乏显式的实例身份条件；（2）扩散Transformer中的标准3D全注意力不加区分地混合所有实例token，造成跨实例信息泄露；（3）全帧均匀重建损失使背景像素主导梯度，稀释对前景对象身份一致性的监督。
 
@@ -51,7 +53,7 @@ claims:
 
 在nuScenes验证集上，ConsisDrive取得最佳视频生成质量（FVD 37.23，FID 3.88），显著优于所有对比基线，并有效消除了类别漂移与颜色漂移（Figure 1）。仅使用生成数据训练3D检测器StreamPETR，mAP达31.5%（相当于真实数据Oracle性能的91.3%），多目标跟踪中的身份切换（IDS）从687降至525。消融实验证实，移除轨迹掩码使FVD恶化16.43、IDS增加549，移除身份掩码或损失掩码也显著降低视频及下游任务表现，验证了各模块通过*实例级硬约束*抑制身份漂移的因果作用。ConsisDrive未改变主干生成架构，而是以实例掩码统一范式将身份、轨迹与前景约束显式注入，为实例感知的驾驶世界模型提供了一种轻量而高效的路径。
 
-## 背景与动机
+
 
 自动驾驶世界模型通过生成多视角视频，为感知模型提供低成本、可控的合成数据，正成为数据驱动闭环仿真的重要基础。然而，现有方法在生成可控布局视频时普遍面临**实例身份漂移**问题：同一目标在连续帧中，其颜色、形状乃至语义类别发生不受控的变化。如 **Figure 1** 所示，DriveDreamer2 (Zhao et al., 2024) 生成的公交在时间轴上逐渐演变为卡车（类别漂移），MagicDrive‑V2 (Gao et al., 2024b) 则出现车辆颜色不一致与前景目标稀释等现象。这些缺陷严重制约了生成数据在下游感知与跟踪任务中的可用性。
 
@@ -62,7 +64,9 @@ claims:
 
 上述缺口直接催生了本文的核心动机：**将场景级一致性约束提升为实例级一致性约束**。具体而言，ConsisDrive 从标注的3D边界框与跟踪ID中构造结构化**实例掩码**（身份掩码、轨迹掩码、损失掩码），并将其作为硬性先验注入两个关键环节：**实例掩码注意力（IMA）** 通过掩码自注意力显式阻断跨实例交互，同时强化同实例跨帧注意力；**实例掩码损失（IML）** 通过前景掩码将监督信号集中到实例区域，并采用概率动态策略平衡前景一致性与背景生成质量。这一设计旨在以最小结构侵入性，将身份保持能力内化到世界模型的生成过程中，从而在保持场景真实感的同时，大幅抑制身份漂移。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 自动驾驶世界模型在视频生成时普遍遭遇**身份漂移**：同一目标在连续帧中可出现类别（公交车→卡车）或外观（车色）变化，其根本原因并非模型容量不足，而是在三个设计层面缺失实例级约束——  
 - 扩散 Transformer 的稠密注意力不区分实例，导致跨实例信息泄露（泄漏源）；  
@@ -90,7 +94,7 @@ $$\tilde{\mathcal{L}}_{\mathrm{mask}} = \begin{cases} \mathcal{L}_{\mathrm{mask}
 
 **综合效果**：上述两个 changed slots 协同作用，使 ConsisDrive 在 nuScenes 验证集上取得当时最佳的视频生成保真度（FVD 37.23，FID 3.88），并在单纯用生成数据训练的 3D 感知与多目标跟踪任务中大幅降低身份切换（IDS 从 687 降至 525），实现了实例级的时间一致性闭环。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0014_zgqFQM8VNe_ConsisDrive_Identity-Preserving_Driving_World_Mo/figures/004_Figure_2.jpg]]
 *Figure 2: Overview. (a) Instance-Masked Attention, which explicitly directs the model’s attention to each individual instance by incorporating both an instance identity mask and trajectory mask. (b) Instance-Masked Loss Supervision, a probabilistic instance-focused training objective that employs instance loss masks to emphasize supervision on foreground regions. (c) Instance Mask Construction. Illustration of how the Instance Identity Mask, Instance Trajectory Mask, and Instance Loss Mask are constructed from 3D box projections*
@@ -149,7 +153,7 @@ $$
 
 这些设计共同将身份一致性约束从场景级提升至实例级，从而在可控性与生成质量之间取得了显著平衡。
 
-## 核心模块与公式推导
+
 
 ConsisDrive 在 MM-Diffusion Transformer (MMDiT) 骨干上引入两个核心模块，从根本上解决身份漂移：**Instance‑Masked Attention (IMA)** 模块显式约束自注意力的交互范围，阻止不同实例间的信息泄漏；**Instance‑Masked Loss (IML)** 模块将重建损失集中到前景实例区域，避免背景像素主导梯度。两个模块均依赖从 3D 边界框与跟踪 ID 导出的结构化掩码，构造过程如图 2(c) 所示。
 
@@ -218,7 +222,9 @@ $$
 
 上述模块协同工作，将对象一致性约束从场景级提升到实例级：IMA 从注意力层面阻止语义与颜色信息的跨实例混淆，IML 从监督层面将梯度聚焦于关键前景区域。消融实验证实，移除身份掩码导致类别漂移（交通锥变为行人），移除轨迹掩码则引起颜色漂移和 FVD 恶化 16.43，证实两个组件的独立作用与互补性 (Table 5, Figure 3)。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：视频生成质量与下游任务增益
 
@@ -259,7 +265,9 @@ ConsisDrive 在 nuScenes 验证集上取得了领先的视频生成质量，并�
 
 论文未提供 ConsisDrive 自身的失败案例，但提出的开放问题暗示了潜在局限：拥挤场景中严格禁止跨实例注意力可能丢失有益的上文关联；概率掩码损失的超参数 α 需要手工调节，自动选择机制尚未探索；可学习门控参数 ω 的优化特性对极端场景的适应性有待验证。这些点建议手动验证，当前结论均基于 nuScenes 干净标注场景，复杂多遮挡场景的性能需结合实际测试评估。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 自动驾驶世界模型的视频生成研究沿着“布局可控 → 场景多样性 → 实例级一致性”的脉络演进。早期工作 BEVControl、DriveDiffusion 将鸟瞰图或中心线布局作为控制条件，实现了多视图画面的空间对齐，但对时间维度的保真度关注有限。随后，DriveDreamer2 引入大语言模型增强轨迹多样性，Panacea 与 UniMLVG 支持全景或统一多视图长视频生成，MagicDrive‑V2 通过自适应控制进一步提升了分辨率与时长。然而，这些方法普遍依赖**场景级均匀训练信号**，在视频扩散过程中缺乏对目标个体身份的显式约束，导致同一物体在连续帧中出现类别混淆（例如公交车渐变为卡车）、颜色漂移或前景目标“稀释”等身份漂移现象（Figure 1）。ConsisDrive 正是在这一瓶颈处切入，将研究方向从场景级保真推向**实例感知的身份保持**，与同期工作 InstaDrive 共同属于该分支。其核心差异在于：ConsisDrive 不单借助实例条件注入，更将 3D 边界框与跟踪 ID 转化为三种结构化的实例掩码，作为硬性先验重写扩散 Transformer 的注意力交互与损失空间，从而使身份一致性约束由场景级精细化至实例级。
 
@@ -288,6 +296,8 @@ ConsisDrive 的有效性建立在精确的 **3D 边界框与跟踪 ID 标注**�
 5. **长序列与大规模实例的可扩展性**。论文中视频帧数和实例数受限于现有计算资源，随着序列增长，掩码注意力的计算复杂度上升，且身份保持的难度可能非线性增加，需要进一步分析并优化架构。
 
 上述局限和问题表明，ConsisDrive 在实例级身份保持的自动驾驶世界模型方向上迈出了重要一步，但其设计假设与通用性仍有广阔的探索空间，为后续工作给出了清晰的研究脉络。
+
+
 
 ## 原文 PDF
 

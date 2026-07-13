@@ -42,7 +42,7 @@ claims:
 > [!tip] 效果简介
 > - LIBERO-LONG (Avg. Success Rate) 上，成功率 (%) 94.7 vs 93.8 (OpenVLA, 7B) (+0.9)；成功率 (%) 94.7 vs 93.2 (π0.5, 3.3B) (+1.5)；成功率 (%) 94.7 vs 88.6 (LBP, 0.19B) (+6.1)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -74,7 +74,7 @@ CLaD 是一种两阶段的**潜在空间规划框架**：
 
 CLaD 在短视距泛化任务（如 LIBERO-Spatial、Object、Goal）上表现落后于大规模 VLA 模型，且训练依赖动作标注，尚未在大规模异质数据上验证动态预训练的摊销能力。此外，所有实验均在仿真环境中进行，真实机器人部署有待探索。
 
-## 背景与动机
+
 
 ### 具身规划中的远见困境
 
@@ -109,7 +109,9 @@ CLaD 的核心直觉是：**一致性约束应从静态状态对齐转向动态�
 
 在此基础上，CLaD 通过自监督目标预测“有基础的潜在远见”——既包含对未来潜在状态的预测，又通过辅助重构损失将这些预测锚定到可观测的物理量上。这种设计避免了显式语义生成的计算开销，同时为下游扩散策略提供了富含跨模态上下文的条件信号，使动作生成既具有远见性，又扎根于物理现实。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CLaD 的核心创新在于将具身规划中的一致性约束从**静态状态对齐**转向**动态转移一致性**。现有方法（如 SuSIE、Seer、LBP）或生成显式语义子目标，或在单一模态的潜在空间中进行规划，未能显式建模本体感觉与语义状态在动作作用下的联合演化，导致潜在表示在 rollout 过程中逐渐解耦，生成物理或逻辑不一致的轨迹。
 
@@ -144,7 +146,7 @@ CLaD 不直接将远见嵌入传入策略，而是通过 **FiLM 调制**（Equat
 
 CLaD 的方法论贡献可概括为：**通过建模本体感觉和语义状态在动作下的联合演化，以非对称交叉注意力提取跨模态动态，并利用 EMA 目标编码器和辅助重构损失预测“有基础的潜在远见”，避免显式语义生成的计算开销，同时为扩散策略提供富含任务上下文的条件信号。** 该设计以 0.66B 参数在 LIBERO-LONG 上达到 94.7% 成功率，与 7B 的 OpenVLA（93.8%）和 3.3B 的 π0.5（93.2%）竞争，同时推理速度达 25 Hz、显存仅 4 GB（Table 2），在参数效率与计算效率上均展现出显著优势。
 
-## 整体框架
+
 
 CLaD 采用**两阶段解耦架构**，将跨模态动态学习与动作生成分离，从而在不生成显式语义中间产物（如子目标图像或文本）的前提下获得有基础的潜在远见。
 
@@ -196,7 +198,7 @@ CLaD 采用**两阶段解耦架构**，将跨模态动态学习与动作生成�
 ![[assets/figures/papers/paper_list_l2452_https_arxiv_org_abs_2603_29409/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of CLaD. (a) Conventional approaches either generate semantic artifacts (e.g., subgoal images or texts), or plan in unimodal latent spaces that lack cross-modal understanding. (b) CLaD learns cross-modal latent dynamics to predict grounded latent foresights, which condition a diffusion policy for action generation. CLaD achieves 94.7% with only 0.66B parameters, competitive with OpenVLA (7B) and π0.5 (3.3B)*
 
-## 核心模块与公式推导
+
 
 CLaD 是一个两阶段框架：Stage 1 学习跨模态潜在动态并预测“有基础的潜在远见”（grounded latent foresight），Stage 2 以当前观察和预测远见为条件，通过扩散策略生成动作序列。以下按管道模块拆解其关键设计与公式。
 
@@ -273,7 +275,9 @@ $$ \mathcal{L}_{\mathrm{policy}} = \mathbb{E}_{\mathbf{a}_0, k, \epsilon} \left[
 ![[assets/figures/papers/paper_list_l2452_https_arxiv_org_abs_2603_29409/figures/002_Figure_2.jpg]]
 *Figure 2: Detailed architecture of CLaD’s two-stage framework. Stage 1 (Left) - Semantic state*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：LIBERO-LONG 性能对比
 
@@ -345,7 +349,9 @@ Table 6 展示了 CLaD 在所有 LIBERO 套件上的 50 次 rollout 平均成功
 ![[assets/figures/papers/paper_list_l2452_https_arxiv_org_abs_2603_29409/figures/012_Table_7.jpg]]
 *Table 7: Ablation with action-free training variants*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从静态对齐到动态转移一致性
 
@@ -395,6 +401,8 @@ CLaD 的性能优势来自三个相互耦合的设计选择，消融实验给出
 4. **评估一致性**：Table 1 与正文关于 Task 9 性能的矛盾需澄清——是不同检查点、不同评估协议还是笔误？这影响对 CLaD 在精细操作任务上表现的准确判断。
 
 5. **语言增强**：能否结合外部记忆或更大规模语言模型来增强任务理解和重规划能力，同时保持 CLaD 的参数效率优势？
+
+
 
 ## 原文 PDF
 

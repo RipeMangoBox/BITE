@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2022
 pdf_ref: paperPDFs/CVPR_2022/Panoptic_SegFormer_Delving_Deeper_into_Panoptic_Segmentation_with_Transformers.pdf
+project_link: null
+code_link: https://github.com/zhiqi-li/Panoptic-SegFormer
 aliases:
 - PS
 - PSDDIPST
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | Panoptic SegFormer：深入探究全景分割的Transformer方法 |
 | 英文题名 | Panoptic SegFormer: Delving Deeper into Panoptic Segmentation with Transformers |
 | 会议/期刊 | CVPR 2022 |
-| Links | [paper](https://arxiv.org/abs/2109.03814); [GitHub](https://github.com/zhiqi-li/Panoptic-SegFormer) |
+| Links | [paper](https://arxiv.org/abs/2109.03814) · [GitHub](https://github.com/zhiqi-li/Panoptic-SegFormer) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/segmentation |
 | Method | Panoptic SegFormer |
 | Dataset | COCO val2017, COCO test-dev, ADE20K val |
@@ -41,7 +43,7 @@ claims:
 > - COCO val2017 上，PQ 为 49.6 (R50)，对比 46.5 (MaskFormer R50)，变化 +3.1。
 > - COCO test-dev 上，PQ 为 56.2 (Swin-L)，对比 53.3 (MaskFormer Swin-L)，变化 +2.9。
 
-## 概述
+## 概要
 
 全景分割要求对图像中的每个像素同时赋予语义类别和实例ID，既识别可数的“物体”（things，如人、车），也识别不可数的“背景”（stuff，如天空、草地）。基于Transformer的端到端方法（以**DETR**（Carion et al., ECCV 2020）为代表）虽然简化了流水线，却面临三个核心瓶颈：（1）训练收敛极慢，需300+轮次；（2）自注意力的计算复杂度限制了特征分辨率，导致掩码边界模糊；（3）用同一组查询同时处理things和stuff，并为stuff预测边界框，造成两类目标相互干扰，尤其损害stuff的分割质量，且后处理的像素级argmax策略容易产生假阳性。
 
@@ -53,7 +55,7 @@ Panoptic SegFormer针对上述瓶颈提出了三个关键改进，构成了一�
 
 该方法仍存在若干局限：在高度拥挤、同类别小目标密集的场景下召回率较低；当大面积stuff区域具有高置信度分数时，可能覆盖空间上重叠的things实例；掩码级合并依赖固定的二值化阈值和置信度阈值，当置信度估计不准确时可能产生低质量全景掩码。
 
-## 背景与动机
+
 
 全景分割（panoptic segmentation）要求对图像中的每个像素同时完成语义和实例标签的统一预测，是视觉感知的核心任务之一。近年来，以 **DETR**（Carion et al., ECCV 2020）为代表的端到端Transformer方法将目标检测的查询（query）机制引入分割领域，试图用统一的架构同时处理可数物体（things）和不可数区域（stuff）。然而，这类方法在落地全景分割时暴露出三个系统性的瓶颈。
 
@@ -65,7 +67,9 @@ Panoptic SegFormer针对上述瓶颈提出了三个关键改进，构成了一�
 
 上述瓶颈共同制约了Transformer全景分割方法的精度上限和训练效率。**Panoptic SegFormer** 的提出正是为了系统性地解决这三个问题：通过掩码解码器的深度监督实现快速收敛，通过查询解耦消除things与stuff的相互干扰，并通过掩码级合并（mask-wise merging）替代像素级argmax，利用融合分类概率与分割质量的置信度分数解决重叠冲突，从而在更少的训练轮次内达到更高的全景分割质量。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Panoptic SegFormer 围绕 DETR 全景分割的三个瓶颈——训练收敛慢、特征分辨率受限导致掩码边界模糊、thing/stuff 共用查询集产生相互干扰——提出了四个相互耦合的关键创新。
 
@@ -106,7 +110,7 @@ DETR 仅使用 C5 级低分辨率特征，限制了小目标和边界细节的�
 
 上述四个创新并非孤立存在。从 DETR 到 Panoptic SegFormer 的逐步消融（Table 5）揭示了其累积效应：多尺度编码器奠定特征基础，查询解耦消除类别间干扰，位置解码器为 thing 查询注入空间信息，深度监督加速收敛并提升掩码质量，掩码级合并优化最终输出。最终以 ResNet-50 骨干网在 COCO val 上达到 49.6% PQ，较 DETR 基线提升 6.2 个百分点，同时训练轮次从 300+ 降至 24。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2109_03814/figures/027_Figure.jpg]]
 *Figure: B.8. Comparing visualization results of Panoptic SegFormer with other methods on the COCO val set. For a fair comparison, all results are generated with ResNet-101 [23] backbone. The second and fourth row results show that our method still performs well in highly crowded or occluded scenes. Benefits from our mask-wise inference strategy, our results have few artifacts, which often appear in the results of DETR [1] (e.g., dining table of the third row). Figure B.9. Failure case of Panoptic SegFormer*
@@ -139,7 +143,7 @@ Panoptic SegFormer 的整体 pipeline 由三个核心模块串联构成：**Tran
 - **特征分辨率受限** → 可变形注意力编码器处理多尺度高分辨率特征；
 - **thing/stuff 相互干扰** → 查询解耦，消除两类查询在同一集合中的竞争与干扰，使 stuff 的 PQ 从 39.5 提升至 42.4（Table 8）。
 
-## 核心模块与公式推导
+
 
 Panoptic SegFormer 的核心架构由 Transformer 编码器、位置解码器和掩码解码器三个模块构成，并通过查询解耦策略和掩码级合并实现高效的全景分割。
 
@@ -212,7 +216,9 @@ $$\mathcal{L}_{stuff} = \sum_{i}^{D_m} (\lambda_{cls} \mathcal{L}_{cls}^i + \lam
 
 该策略相比像素级 argmax 在 Panoptic SegFormer (R50) 上将 PQ 从 48.4 提升至 49.6（Table B.2），且在所有对比模型上均表现更优（Table 7）。Figure 4 展示了掩码级合并能利用分类概率线索解决重叠冲突（如笔记本电脑与键盘），避免像素级 argmax 的假阳性问题。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能对比
 
@@ -291,9 +297,10 @@ Table 11 报告了 COCO-C 数据集上的鲁棒性结果。Panoptic SegFormer (S
 ![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2109_03814/figures/008_Figure_4.jpg]]
 *Figure 4: While using pixel-wise argmax, the keyboard is covered on the laptop (noted by the red circle in (e). However, the laptop has a higher classification probability than the keyboard. The pixel-wise argmax strategy fails to use this important clue. Masks logits were generated through DETR-R50 [1].40*
 
-![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2109_03814/figures/009_Table.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有方法的继承与差异
 
@@ -333,6 +340,8 @@ Panoptic SegFormer 的设计使其在以下场景中具有明显优势：
 3. **统一查询管道的泛化性**：统一查询管道是否适用于所有分割任务仍然是个开放问题。如何自适应地为不同任务（如全景分割、实例分割、语义分割、视频全景分割）设计查询和匹配策略，避免为每个任务重新设计查询集？
 4. **掩码级合并的自适应阈值**：掩码级合并的阈值选择能否通过自学习或动态调整进一步提升鲁棒性？例如，根据图像的复杂度或掩码的重叠程度动态调整置信度阈值，可能减少 void 标签的产生。
 5. **深度监督的泛化机制**：深度监督在掩码解码器中展示了显著的收敛加速效果，但其泛化机制尚不完全清楚——深度监督是否对所有 Transformer 解码器结构都有效？在其他视觉任务（如视频分割、3D 分割）中，类似的注意力图监督策略是否同样有效？
+
+
 
 ## 原文 PDF
 

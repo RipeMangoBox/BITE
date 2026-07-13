@@ -43,7 +43,7 @@ claims:
 > - 3D Static Scenes 上，CLIP_sim 0.948 vs 0.941 (See3D) (+0.007)；ATE 0.077 vs 0.091 (See3D) (-0.014)；RPE-T 0.086 vs 0.089 (See3D) (-0.003)。
 > - 4D Dynamic Scenes (DAVIS, movie clips, VDM generations) 上，FVD 93.17 vs N/A。
 
-## 概述
+## 概要
 
 现有视频扩散模型（Video Diffusion Models, VDMs）在生成动态内容方面展现出强大的时空先验，但当任务转向精确的三维场景重建与四维动态重渲染时，一个根本性瓶颈浮现：**模型缺乏对6-DoF相机轨迹的精确控制能力**。场景运动与相机运动高度纠缠，导致生成结果出现时空不一致、几何破碎和视觉伪影。已有的训练依赖方法（如**See3D**、**ViewCrafter**、**TrajectoryCrafter**）需要针对特定任务进行微调，代价高昂且泛化能力有限；而基于扭曲-修补（warp-and-inpaint）的训练自由方法（如**NVS-Solver**、**ViewExtrapolator**）对分布外输入敏感，容易引入噪声和结构失真。
 
@@ -56,7 +56,7 @@ WorldForge 由三个关键模块构成：
 
 实验结果表明，WorldForge 在多个基准上显著超越现有方法。在静态3D场景生成任务上，FID 降至 **96.08**（See3D 为 123.26），CLIP相似度达到 **0.948**，轨迹精度指标 ATE 降至 **0.077**。在动态4D场景重渲染任务上，FVD 达到 **93.17**，CLIP-V相似度为 **0.938**。消融实验验证了三个组件的互补性：移除 IRR 导致模型退化为无约束生成；移除 FLF 使运动噪声污染所有通道；移除 DSG 或用标准 CFG 替代则因大角度差异产生严重伪影。该框架具有良好的模型无关性，可无缝迁移至 **SVD**、**Wan 2.1**、**LongCat** 等不同架构的视频扩散模型。
 
-## 背景与动机
+
 
 ### 问题域：视频扩散模型在空间任务中的相机控制困境
 
@@ -88,7 +88,9 @@ WorldForge的提出正是为了系统性解决上述三个子问题。其核心�
 
 具体而言，WorldForge引入三个协同组件：**Intra-Step Recursive Refinement (IRR)** 在每个去噪步内嵌入微预测-校正循环，将观测区域的预测内容替换为轨迹对应区域，实现细粒度轨迹注入；**Flow-Gated Latent Fusion (FLF)** 通过光流相似性得分动态识别并选择性更新高运动相关性通道，保留外观通道不受污染；**Dual-Path Self-Corrective Guidance (DSG)** 利用引导路径与非引导路径之间的正交差异（通常50°–70°大角度差）进行自适应校正，消除因轨迹扭曲引入的伪影。三者协同，使WorldForge成为一个完全训练自由、模型无关的框架，可适配SVD、Wan 2.1、LongCat等多种视频扩散模型骨干网络。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 WorldForge 的核心创新在于**无需任何重新训练或微调**，仅通过对预训练视频扩散模型去噪过程的三个关键“插槽”进行改造，便实现了对任意用户指定 6-DoF 相机轨迹的精确控制。这三个改造点分别解决了轨迹注入、运动-外观解耦以及引导伪影抑制三个递进瓶颈，共同构成了一个完整的零样本控制范式。
 
@@ -120,7 +122,7 @@ $$\mathbf{v}_t^{\mathrm{corr}} = \mathbf{v}_t^{\mathrm{traj}} + \rho \cdot \beta
 
 三个改造点形成递进依赖关系：IRR 提供轨迹注入的基础设施，FLF 在注入过程中实现运动-外观解耦以保护视觉质量，DSG 则在采样层面进一步矫正因轨迹变形引入的伪影。这种“注入-解耦-矫正”的三阶段设计使得 WorldForge 成为**完全训练自由且模型无关**的框架——它不需要任何相机标注数据进行微调，可直接适配 SVD、Wan 2.1、LongCat 等多种视频扩散骨干网络（Fig. 6, Table 4 supplementary），在 3D 静态场景生成（FID 96.08 vs. See3D 123.26）和 4D 动态场景重渲染（FVD 93.17）上均取得最优结果。
 
-## 整体框架
+
 
 WorldForge 是一个完全无需训练的框架，其核心思想是将预训练视频扩散模型（VDM）的丰富时空先验“驯服”为精确的相机轨迹控制，从而实现高质量的 3D 场景生成与 4D 动态场景重渲染。整个 pipeline 由三个关键模块串联构成：**Intra-Step Recursive Refinement (IRR)**、**Flow-Gated Latent Fusion (FLF)** 和 **Dual-Path Self-Corrective Guidance (DSG)**。它们共同解决了一个核心瓶颈——如何在保留预训练模型视觉质量的前提下，将精确的 6-DoF 相机轨迹约束注入到生成过程中，同时抑制因深度估计误差和扭曲操作引入的视觉伪影。
 
@@ -162,7 +164,7 @@ WorldForge 是一个完全无需训练的框架，其核心思想是将预训练
 ![[assets/figures/papers/paper_list_l2607_https_arxiv_org_abs_2509_15130/figures/019_Figure_7.jpg]]
 *Figure 7: Robustness in challenging scenarios. Our framework maintains structural integrity even under fast motion and complex occlusions*
 
-## 核心模块与公式推导
+
 
 WorldForge 在预训练视频扩散模型的去噪过程中嵌入三个训练自由的轨迹控制模块，构成一个从粗到精的注入–解耦–校正管线。
 
@@ -220,7 +222,9 @@ $$\mathbf{v}_t^{\mathrm{corr}} = \mathbf{v}_t^{\mathrm{traj}} + \rho \cdot \beta
 ![[assets/figures/papers/paper_list_l2607_https_arxiv_org_abs_2509_15130/figures/016_Figure_5.jpg]]
 *Figure 5: Large camera movements (e.g., 180◦). Single-pass generation of large angles often suffers from poor quality. Our method effectively resolves this problem via iterative generation*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 评估设置与公平性说明
 
@@ -294,7 +298,9 @@ Table 3给出了单步计算代价分解。以NVIDIA A100生成832×480分辨率
 ![[assets/figures/papers/paper_list_l2607_https_arxiv_org_abs_2509_15130/figures/009_Table_1.jpg]]
 *Table 1: Default coefficient settings used in our experiments (taking Wan 2.1 implementation as an example). While these values serve as a robust baseline, users can fine-tune them for specific scenes to maximize generation quality*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -333,6 +339,8 @@ WorldForge 的适用边界由以下因素决定：
 3. **架构迁移性**：论文已在 U-Net 架构（SVD）和 DiT 架构（Wan 2.1、LongCat）上验证了迁移性（Figure 6, supplementary Table 4），但在其他视频扩散架构（如 CogVideoX）上的潜力仍需进一步探索。
 
 4. **多模态条件扩展**：当前框架的输入为单图或视频帧加轨迹。能否扩展至多模态条件（如文本+轨迹联合控制）或更复杂的物理世界模拟（如刚体运动、流体动力学），是值得探索的方向。
+
+
 
 ## 原文 PDF
 

@@ -42,7 +42,7 @@ claims:
 > - EGOPOINTVQA (Reference task) 上，Accuracy (%) 73.8 vs 63.1 (InternVL3-14B) (+10.7)。
 > - EGOPOINTVQA (Reference task, 8B backbone) 上，Accuracy (%) 75.0 vs 66.1 (InternVL3-8B) (+8.9)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有MLLM在训练数据中缺乏丰富的指示手势视频，且架构未显式编码手势信息，导致无法理解指向手势并解析指示代词引用（如“this one”）。在EGOPOINTVQA上，最强基线InternVL3-14B平均准确率仅62.7%，而人类可达95.9%，差距显著。
 
@@ -57,7 +57,7 @@ claims:
 
 **关键局限**：HINT依赖WiLoR的关键点估计，在运动模糊、遮挡或手部不可见时可靠性下降；快速视角移动可导致目标跟踪失败；合成数据与真实场景间仍存领域差距。
 
-## 背景与动机
+
 
 ### 自我中心视频理解中的指示性瓶颈
 
@@ -86,7 +86,9 @@ claims:
 
 本文的核心动机由此明确：**在现有MLLM架构中引入一条轻量级的手势意图编码通路，以极小的计算开销赋予模型解析指向手势的能力**。这一思路不要求重新训练庞大的视觉编码器或语言模型，而是通过一个即插即用的适配器模块，将现成的3D手部关键点估计结果转化为模型可理解的手势令牌，从而实现手势语义与视觉语义的协同推理。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：MLLM 缺乏手势理解能力
 
@@ -132,7 +134,7 @@ Table 4 比较了多种手势编码方式：视觉提示（在帧上画箭头）
 
 HINT 的性能受限于 WiLoR 的 3D 手部关键点估计质量。在运动模糊、遮挡或手部不在视野内时，关键点不可靠，导致手势令牌缺失或编码错误。快速视角移动也可能导致目标物体跟踪失败。此外，方法目前仅利用单手关键点信息，未显式建模物体边界框或分割，可能限制了更精确的指向意图解析。
 
-## 整体框架
+
 
 HINT 的整体设计遵循**双流并行处理、序列交错融合**的范式，旨在以极低的令牌开销为现有多模态大语言模型（MLLM）注入显式的指向手势理解能力。其核心思想是：不从零训练一个专用模型，而是在冻结的视觉编码器和语言模型之间，插入一条轻量级的手势意图通路，将每帧的 3D 手部关键点转化为单个“手势意图令牌”（Hand Intent Token），并与视觉令牌交错排列，使 LLM 在自回归解码时能够同时关注视觉外观与手势的时空动态。
 
@@ -185,7 +187,7 @@ $$p(X_{\mathfrak{a}} \mid V, X_{\mathfrak{q}}, H) = \prod_{i=1}^{L} p(x_i \mid V
 ![[assets/figures/papers/paper_list_l1059_https_arxiv_org_abs_2603_12533/figures/006_Figure_6.jpg]]
 *Figure 6: HINT overall architecture. HINT uses an additional adapter to model the 3D location and movement of the hand directly*
 
-## 核心模块与公式推导
+
 
 HINT 的整体架构（Figure 6）由两条并行流组成：标准视觉流和新增的手势意图流。视觉流沿用现有 MLLM 的视觉编码器与投影器，从均匀采样的 32 帧视频中提取视觉令牌 $V_t$。手势意图流是 HINT 的核心创新，包含三个关键模块。
 
@@ -217,7 +219,9 @@ $$p(X_{\mathfrak{a}} \mid V, X_{\mathfrak{q}}, H) = \prod_{i=1}^{L} p(x_i \mid V
 ![[assets/figures/papers/paper_list_l1059_https_arxiv_org_abs_2603_12533/figures/002_Figure_2.jpg]]
 *Figure 2: Task taxonomy and examples from EGOPOINTVQA. EGOPOINTVQA includes six subsets of questions regarding the properties of a pointed object. Each example shows egocentric video frames and a question using deictic references. Tasks include reference (object identification), counting (number of same objects), spatial (location and relative depth), temporal (order of multiple gestures), attribute (object properties), and feedback (object function). All questions require resolving deictic references through visual grounding of pointing gestures. The pointed objects are highlighted with red circles for visualization purposes*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -288,7 +292,9 @@ $$p(X_{\mathfrak{a}} \mid V, X_{\mathfrak{q}}, H) = \prod_{i=1}^{L} p(x_i \mid V
 ![[assets/figures/papers/paper_list_l1059_https_arxiv_org_abs_2603_12533/figures/015_Figure_7.jpg]]
 *Figure 7: Representative failure cases on EGOPOINTVQA. (a)- (b): baseline MLLM failures due to saliency bias and temporal confusion, respectively. (c)-(d): remaining HINT failures caused by unreliable hand keypoints and rapid viewpoint drift*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位：什么是指示性自我中心视频问答
 
@@ -331,6 +337,8 @@ HINT 的有效性受以下条件约束：
 - **显式物体关联**：结合物体检测或跟踪模块，在架构层面显式建模“哪只手在指哪个物体”，可能进一步提升精细指向任务的表现。
 - **领域自适应**：如何进一步缩小合成到真实的领域差距，例如通过更逼真的仿真渲染或域随机化策略，是实用化部署的关键。
 - **人类水平差距**：Table 9 显示人类在该数据集上的平均准确率达到 95.9%，而当前最佳 HINT-14B 仅 68.1%，存在约 28 个百分点的显著差距，表明指示性自我中心视频问答仍是一个远未解决的开放挑战。
+
+
 
 ## 原文 PDF
 

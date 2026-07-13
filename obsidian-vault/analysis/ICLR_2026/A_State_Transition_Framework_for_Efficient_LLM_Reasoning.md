@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/A_State_Transition_Framework_for_Efficient_LLM_Reasoning.pdf
+project_link: null
+code_link: null
 aliases:
 - STFMAMM
 - STFELR
@@ -41,7 +43,7 @@ claims:
 > - AIME24 上，Accuracy 为 43.3 (7B)，对比 36.7 (Qwen2.5-7B-Instruct)，变化 +6.6。
 > - AIME24 上，Relative Speed (ReL) 为 440.13 (1.5B)，对比 100 (Qwen2.5-1.5B-Instruct)，变化 +340.13。
 
-## 概述
+## 概要
 
 本文针对长链思维（Long CoT）推理中Transformer注意力机制计算复杂度随上下文长度二次增长、KV缓存内存开销线性增长的核心瓶颈，提出了一种状态转移推理框架。核心思路是将推理过程建模为状态转移过程：利用线性注意力机制将历史推理信息压缩为状态矩阵，使当前推理步的每个token可直接从状态矩阵检索历史信息，从而在不缩短或简化CoT序列的前提下，将注意力计算复杂度从O(C²)降为O(C)、KV缓存内存开销从O(C)降为O(1)。
 
@@ -49,7 +51,7 @@ claims:
 
 在数学推理基准（AIME24、MATH500等）上的主实验结果显示，所提框架在1.5B和7B模型上均取得了平均准确率优于所有基线（包括Qwen2.5基模型、TAMM、SBT-D、L1-Max、AR等对比方法）的结果：1.5B模型平均准确率56.2%，7B模型68.3%。在AIME24上，推理速度相比基模型提升16-18%（相对速度440.13和434.8）。当CoT长度达到32K时，推理速度比基模型快40%以上。消融实验证实，移除模型推理状态（替换为64大小的滑动窗口）导致性能下降最大（平均准确率从56.2降至46.8），移除蒸馏损失和基于状态的推理策略也导致显著性能下降。该方法在科学推理（GPQA Diamond）和代码生成（HumanEval）基准上也优于所有基线，表明其泛化能力。
 
-## 背景与动机
+
 
 大语言模型（LLM）的长链思维（Long Chain-of-Thought, Long CoT）推理在提升复杂任务准确率的同时，暴露了严重的效率瓶颈。其根本原因在于Transformer注意力机制的计算复杂度随上下文长度呈二次增长，而KV缓存的内存开销呈线性增长。当推理链长度达到数万token时，这种复杂度增长导致推理延迟显著增加，成为实际部署中的关键障碍。
 
@@ -59,7 +61,9 @@ claims:
 
 该动机在实验证据中得到支撑：在AIME24上，所提模型推理速度相比基模型提升16-18%（相对速度440.13和434.8）；当CoT长度达到32K时，推理速度比基模型快40%以上。这些数据表明，状态转移框架在保持完整推理链的前提下，实现了显著的效率提升。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 该工作的核心瓶颈在于长链推理（Long CoT）中 Transformer 注意力机制的二次复杂度与线性 KV 缓存内存开销。其因果旋钮在于将推理过程重新建模为状态转移过程，用线性注意力机制将历史推理信息压缩为状态矩阵，使得当前推理步的每个 token 可直接从该矩阵检索信息，无需显式关注先前推理步中的所有 token。核心洞察在于：推理步中的语言信息主要用于保证流畅性，而推理信息（如中间结论）才是支持后续推理的关键；通过线性注意力将推理信息压缩为状态矩阵，可在不缩短或简化 CoT 序列的前提下，将注意力计算复杂度从二次降为线性，同时保持推理能力和可解释性。
 
@@ -79,7 +83,7 @@ claims:
 
 需注意，实验仅在 Qwen2.5 系列（1.5B 和 7B）上验证，未在更大规模模型或不同架构上测试；训练数据来自特定长 CoT 数据集，可能引入领域偏差；推理速度比较基于相对速度（ReL），未报告绝对时间或硬件配置细节。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0004_Zz8ikW4uWG_A_State-Transition_Framework_for_Efficient_LLM_R/figures/002_Figure_2.jpg]]
 *Figure 2: In our framework, the original softmax attention module in LLMs is replaced with our mixed attention module (MAM), thus improving reasoning efficiency and reducing memory cost*
@@ -108,7 +112,7 @@ claims:
 
 **效率与性能的权衡**：通过将注意力复杂度从 $O(C^2)$ 降至 $O(C)$，KV缓存从 $O(C)$ 降至 $O(1)$，框架实现了显著的效率提升。当CoT长度达到32K时，推理速度比基模型快40%以上（Figure 4(a)）。同时，在AIME24基准上，1.5B和7B模型的相对推理速度分别达到440.13和434.8（基模型为100），提升约16-18%（Table 1）。在性能方面，该框架在数学推理（AIME24, MATH500）、科学（GPQA Diamond）和代码（HumanEval）基准上均优于所有基线方法，1.5B和7B模型的平均准确率分别达到56.2%和68.3%（Table 1）。消融实验（Table 2）进一步揭示，模型推理状态（状态矩阵）是最关键的组件，其移除（替换为滑动窗口）导致性能下降最大（平均准确率从56.2降至46.8）。
 
-## 核心模块与公式推导
+
 
 该框架的核心瓶颈在于长链思维（Long CoT）推理中，Transformer注意力机制的计算复杂度随上下文长度呈二次增长，KV缓存的内存开销呈线性增长。其因果杠杆在于将推理过程建模为状态转移过程，用线性注意力机制压缩历史推理信息为状态矩阵，使当前推理步的每个token可直接从状态矩阵检索历史信息，无需显式关注之前推理步的token。
 
@@ -149,7 +153,9 @@ $$\mathcal{L}_{\mathrm{AR}} = -\log \mathbf{\bar{P}}(A, \bar{T} | Q)$$
 $$\mathcal{L}_{\mathrm{KD}} = \mathrm{KL}(\hat{P}(A, T | Q) || P(A, T | Q))$$
 蒸馏损失的权重 $\beta$ 在实验中设为0.2时性能最佳。该损失项使LA子模块能够学习全局推理信息——仅靠自回归损失难以训练LA子模块捕获长程相关性，因为线性注意力无法直接建模token间的精确相关性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -214,7 +220,9 @@ Figure 5(b)展示了推理步内不同位置token的平均门控分数。结果�
 ![[assets/figures/papers/iclr26_0004_Zz8ikW4uWG_A_State-Transition_Framework_for_Efficient_LLM_R/figures/018_Table_5.jpg]]
 *Table 5: The results of our model and baselines on mathematical reasoning benchmarks*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线的对比定位
 
@@ -257,6 +265,8 @@ Figure 5(b)展示了推理步内不同位置token的平均门控分数。结果�
 4. **理论理解的深化**：线性注意力的测试时训练（TTT）视角能否进一步解释或提升模型的推理能力？门控机制和状态校正策略的理论分析尚不深入，其有效性主要依赖实验验证。
 
 5. **效率-性能的帕累托前沿**：是否存在更优的推理步移除策略，以在保持性能的同时最大化效率提升？当前框架在效率提升（16-40%）和性能提升（平均准确率提升约4-7个百分点）之间取得了平衡，但帕累托前沿尚未系统探索。
+
+
 
 ## 原文 PDF
 

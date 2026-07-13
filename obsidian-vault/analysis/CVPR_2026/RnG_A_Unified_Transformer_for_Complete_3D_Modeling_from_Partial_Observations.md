@@ -42,15 +42,13 @@ claims:
 > [!tip] 效果简介
 > - GSO 上，Camera Pose RA@5 (%) 85.146 vs 43.770 (Matrix3D unposed) (+41.376)；Source View Depth Rel 0.584 vs 5.960 (VGGT) (-5.376)；Novel View Depth Rel 0.717 vs 9.964 (Matrix3D unposed) (-9.247)。
 
-## 概述
+## 概要
 
 从稀疏、无位姿的二维图像观测中恢复完整的三维物体，是计算机视觉长期面临的挑战。现有的前馈三维重建基础模型——如 **VGGT**（Wang et al., CVPR 2025）和 **DUSt3R**（Wang et al., CVPR 2024）——虽然能高效恢复输入视角下可见区域的几何与外观，却无法建模被遮挡或未观测的部分，导致三维表示不完整，难以支撑需要完整物体的下游应用。另一方面，基于扩散模型的方法（如 **Matrix3D**，Lu et al., CVPR 2025）试图统一重建与生成，但推理速度慢、几何一致性弱。
 
 **RnG**（Reconstruction and Generation）以单一前馈Transformer统一了三维重建与新视角生成两项任务。其核心设计是一条**重建引导的因果注意力掩码**：在全局注意力块中，阻止源视图的Query关注目标视图的Key/Value，从而在注意力层面解耦重建与生成。这一设计使Transformer的KV-Cache被重新解释为**隐式完整三维表示**——重建阶段缓存源视图特征，生成阶段通过查询缓存高效渲染新视角的RGBD，实现了从三维重建先验向生成任务的高效迁移。
 
 在GSO数据集上，RnG展现出显著优势：**完整三维Chamfer距离**降至0.0067（VGGT为0.0260），**新视角合成PSNR**达26.276 dB，大幅超越同为无位姿方法的Matrix3D（18.736 dB），且与需要真实位姿的LVSM（27.522 dB）接近。更关键的是，**新视角深度误差**（Rel=0.717）比Matrix3D（Rel=9.964）低一个数量级以上，表明生成的几何高度一致。通过KV-Cache机制，单次新视角推理时间从213 ms降至85 ms（A800 GPU），效率提升约2.5倍且性能无损。RnG在方法谱系中定位为**无位姿、前馈式、统一重建与生成的Transformer模型**，其因果注意力设计填补了现有方法在效率与完整性之间的空白。
-
-## 背景与动机
 
 ### 问题背景：从部分观测到完整三维理解
 
@@ -76,7 +74,7 @@ claims:
 
 图1（Figure 1）以Teaser图的形式展示了RnG的核心能力：给定4张无位姿的物体图像，VGGT仅能恢复可见区域的结构，而RnG能在单个A800 GPU上于1秒内估计完整的三维几何，并像“虚拟三维扫描仪”一样将渲染结果累积为完整的物体模型。
 
-## 核心创新
+## 核心方法与创新机理
 
 RnG的核心创新在于通过**重建引导的因果注意力**（Reconstruction-guided Causal Attention）将三维重建与新视角生成统一于单个前馈Transformer之中，并由此衍生出两项关键突破：注意力层面的任务解耦，以及KV-Cache作为隐式完整三维表示的推理机制。
 
@@ -126,8 +124,6 @@ $$\mathrm{Out}_t = \mathrm{softmax}\left( \frac{Q_t \cdot [K_s'; K_t]^\mathsf{T}
 
 与**LGM**（Tang et al., ECCV 2024）等基于3D高斯的多视角生成方法相比，RnG不依赖显式三维表示（如高斯点云），而是通过注意力机制隐式编码完整三维信息，避免了显式表示带来的几何不一致风险。与Matrix3D等扩散模型相比，RnG的前馈特性使其推理速度提升超过100倍，同时保持可比的生成质量。
 
-## 整体框架
-
 RnG是一个统一的前馈Transformer，旨在从少量无位姿的二维图像中同时完成三维重建与新视角生成。其核心设计理念在于：**将Transformer的注意力缓存（KV-Cache）重新解释为一种隐式的完整三维表示**，从而在单一网络中实现从“重建先验”到“生成任务”的高效迁移。
 
 ### 输入与输出定义
@@ -170,13 +166,6 @@ RnG的整体架构（Figure 2）由以下核心模块串联构成：
 2. **阶段二：生成与查询**——目标射线令牌作为Query，同时关注缓存的源视图KV和自身的Key/Value，高效生成新视角的几何与外观。
 
 这种两阶段设计使得单次新视角推理时间从213 ms降至85 ms（A800 GPU），效率提升约2.5倍且性能无损，为实时应用提供了可能。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2585_https_arxiv_org_abs_2603_01194/figures/001_Figure_1.jpg]]
-*Figure 1: What can RnG do? Given a few unposed images of an object, 3D reconstruction foundation models like VGGT can recover the structure of observed regions, but leaves the unseen part un-modeled. RnG can estimate its complete 3D geometry within a second on an A800 GPU, using a single feed-forward transformer. RnG implicitly reconstructs 3D and render onto new viewpoints with appearance and geometry. By accumulating these rendered point maps , RnG can generate a complete 3D object, working like a virtual 3D scanner*
-
-## 核心模块与公式推导
 
 ### 3.1 网络架构总览
 
@@ -232,12 +221,7 @@ $$\mathcal{L} = \mathcal{L}_{RGB} + \lambda_{pmap} \mathcal{L}_{pmap} + \lambda_
 
 其中 $\mathcal{L}_{RGB}$ 为新视角RGB重建损失，$\mathcal{L}_{pmap}$ 为点云地图损失（通过DPT点云头从目标视图令牌解码，见公式(6)），$\mathcal{L}_{cam}$ 为相机位姿回归损失。$\lambda_{pmap}$ 和 $\lambda_{c}$ 为平衡权重。该多任务设计使网络同时学习几何一致性（点云地图与位姿）和外观生成能力。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2585_https_arxiv_org_abs_2603_01194/figures/004_Figure_3.jpg]]
-*Figure 3: The reconstruction-guided causal attention. (a) During training, we decouple reconstruction and generation at the attention level inside global attention blocks. At inference time, the attention process is split into two steps: (b) source-view key value tokens are cached as an implicit 3D representation; (c) the KVcache is queried by target view poses to generate novel views*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 核心瓶颈与评估逻辑
 
@@ -306,20 +290,7 @@ RnG 虽仅在 4 视图输入下训练，但在 2 至 8 视图的测试中均展�
 ![[assets/figures/papers/paper_list_l2585_https_arxiv_org_abs_2603_01194/figures/007_Figure_5.jpg]]
 *Figure 5: Camera pose and point cloud visualization. Reconstructions are normalized to match GT’s scale and are aligned to first frame’s position (dark blue). The estimated camera pose from RnG highly aligns with the ground truth. Our back-projected point cloud from source views does not suffer from layering artifacts, presenting accurate object structures*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2585_https_arxiv_org_abs_2603_01194/figures/008_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l2585_https_arxiv_org_abs_2603_01194/figures/002_Table_1.jpg]]
-*Table 1: Comparison between representative 3D reconstruction and novel view synthesis methods*
-
-![[assets/figures/papers/paper_list_l2585_https_arxiv_org_abs_2603_01194/figures/014_Table_5.jpg]]
-*Table 5: Generalize to other number of input views. Although our model is not trained to handle other number of input views, it still shows strong generalization ability to other number of source images*
-
-![[assets/figures/papers/paper_list_l2585_https_arxiv_org_abs_2603_01194/figures/016_Figure_10.jpg]]
-*Figure 10: Qualitative results on CO3D*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 任务定位：无位姿统一重建与生成
 

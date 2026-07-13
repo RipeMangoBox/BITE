@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Attention_Is_All_You_Need_for_KV_Cache_in_Diffusion_LLMs.pdf
+project_link: https://vila-lab.github.io/elastic-cache-webpage/
+code_link: null
 aliases:
 - EC
 - AIAYNKCDL
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 扩散大语言模型中KV缓存的注意力机制 |
 | 英文题名 | Attention Is All You Need for KV Cache in Diffusion LLMs |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=zkUbhdAiFJ); [Project](https://vila-lab.github.io/elastic-cache-webpage/) |
+| Links | [paper](https://openreview.net/forum?id=zkUbhdAiFJ) · [Project](https://vila-lab.github.io/elastic-cache-webpage/) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/generative_models_and_autoencoders |
 | Method | Elastic-Cache |
 | Dataset | GSM8K, GSM8K (512 tokens, LLaDA-1.5), GSM8K (Dream-7B) |
@@ -41,11 +43,11 @@ claims:
 > - GSM8K (512 tokens, LLaDA-1.5) 上，speedup and accuracy 为 45.1× speedup, 81.35% accuracy，对比 LLaDA baseline: 1×, 81.35% accuracy，变化 45.1× speedup, same accuracy。
 > - GSM8K (512 tokens, LLaDA-1.5) 上，throughput and accuracy 为 139.4 t/s, 83.7% acc，对比 dLLM-Cache: 16.84 t/s, 80.97% acc，变化 8.28× throughput, +2.73% accuracy。
 
-## 概述
+## 概要
 
 本文提出**Elastic-Cache**，一种无需训练、架构无关的自适应KV缓存更新策略，旨在加速扩散大语言模型（Diffusion LLMs, DLMs）的推理过程。DLM在每一步去噪时对所有token和所有层重新计算QKV，导致大量冗余计算和延迟。Elastic-Cache通过三个关键观察——远距离MASK token可被块缓存、KV漂移随深度增加、最受关注token的漂移最小——设计出联合决定**何时**（通过注意力感知的漂移测试）以及**何处**（通过深度感知的调度）重新计算KV缓存的机制。实验表明，Elastic-Cache在GSM8K（256 tokens）上实现8.7倍加速，在更长序列上实现45.1倍加速，并在GSM8K上比现有基于置信度的方法实现6.8倍更高的吞吐量。
 
-## 背景与动机
+
 
 ### 2.1 扩散大语言模型（DLM）的推理瓶颈
 
@@ -68,7 +70,9 @@ claims:
 2. **KV漂移随深度增加**：浅层表示稳定较快，深层表示持续演化，因此缓存更新应从深层开始。
 3. **最受关注token的漂移最小**：每步中最受关注的已解码token的KV变化最小，可作为缓存陈旧度的保守指标。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Elastic-Cache的核心创新在于联合决策**何时**以及**何处**更新KV缓存：
 
@@ -76,7 +80,7 @@ Elastic-Cache的核心创新在于联合决策**何时**以及**何处**更新KV
 2. **深度感知的调度**：当检测到漂移时，从发生显著变化的层开始，仅重新计算后续层的KV缓存，浅层重用缓存。
 3. **滑动窗口解码**：仅对滑动窗口内的token计算注意力，窗口外的token（包括远距离MASK token）被块缓存。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_generative_models_diffusion__generative_models_and_autoencoders__b001_zkUbhdAiFJ_Attentio/figures/001_Figure_1.jpg]]
 
@@ -86,7 +90,7 @@ Elastic-Cache的整体框架如Figure 2所示，包含三个主要模块：
 2. **注意力感知的KV缓存更新**：通过最受关注token的注意力权重余弦相似度检测漂移，决定是否触发缓存更新。
 3. **层感知的KV缓存更新**：当检测到漂移时，从层l+1到最后一层重新计算KV缓存，浅层重用缓存。
 
-## 核心模块与公式推导
+
 
 ### 5.1 前向过程与训练损失
 
@@ -138,7 +142,9 @@ $$\mathbb{E}_t[\Delta^{t,\ell}] \leq \mathbb{E}_t[\Delta^{t,\ell'}], \quad \fora
 
 $$\Delta_{\mathcal{T}^{t,\ell}}^{t,\ell} \leq \bar{\Delta}^{t,\ell} + O\left(\frac{\sqrt{d_k}}{R_\ell \sqrt{N}}\right)$$
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 6.1 主要结果
 
@@ -186,7 +192,9 @@ $$\Delta_{\mathcal{T}^{t,\ell}}^{t,\ell} \leq \bar{\Delta}^{t,\ell} + O\left(\fr
 
 **Table 20**展示了与基于一致性的加速方法的比较：Elastic-Cache保持79.2%准确率和109.6 t/s吞吐量，优于一致性LLM的56.5%准确率和35.5 t/s。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 7.1 方法谱系
 
@@ -219,6 +227,8 @@ Elastic-Cache的核心贡献在于：
 3. 理论分析中的常数c和过渡层ℓ*的具体值是多少？
 4. 该方法在更大规模模型（如70B参数）上的性能如何？
 5. 是否可以结合其他加速技术（如模型剪枝、量化）以进一步减少延迟？
+
+
 
 ## 原文 PDF
 

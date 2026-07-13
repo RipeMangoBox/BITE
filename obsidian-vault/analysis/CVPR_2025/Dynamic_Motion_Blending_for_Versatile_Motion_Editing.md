@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/Dynamic_Motion_Blending_for_Versatile_Motion_Editing.pdf
+project_link: https://awfuact.github.io/motionrefit/
+code_link: null
 aliases:
 - DMBVME
 tags:
@@ -40,7 +42,7 @@ claims:
 > - STANCE Body Part Replacement 上，FID 0.20 (Ours full) vs TMED：更高（质量更差） (显著下降，达到更优自然度)。
 > - STANCE Style Transfer 上，FID 0.14 (Ours full) vs TMED：更高（质量更差） (显著下降，风格迁移更接近真实数据分布)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有文本引导的运动编辑方法高度依赖预收集的少量三元组（原始运动、编辑后运动、编辑指令），这导致它们在风格迁移、未见组合等多样化编辑场景中泛化能力严重不足。训练数据的有限分布成为制约通用性的核心瓶颈。
 
@@ -52,7 +54,7 @@ claims:
 
 **局限性提示**：该方法对极长序列的长期时间依赖处理能力仍有限，对位置相关指令的空间敏感度不足，且在极端身体部位组合下协调器仍可能出现罕见的协调误差。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -79,7 +81,9 @@ claims:
 
 这一组合策略旨在突破标注数据规模的限制，实现通用且鲁棒的运动编辑。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MotionReFit 的核心创新围绕一个因果性瓶颈展开：**现有文本引导运动编辑方法严重依赖固定的预收集三元组（原始运动、编辑后运动、编辑指令），导致训练分布狭窄，难以泛化到风格迁移、细粒度调整等多样化编辑场景**。为突破这一瓶颈，本文从数据增强策略和模型架构两个维度进行了系统性改造。
 
@@ -113,7 +117,7 @@ $$
 
 与需要额外指定编辑部位掩码或行为标签的基线方法不同，MotionReFit **仅需原始运动序列和文本编辑指令作为输入**，无需任何额外的部位指定信息。这一简化降低了使用门槛，同时模型通过多模态条件编码器将关键点运动和文本指令统一编码为条件特征，使编辑过程完全由自然语言驱动。
 
-## 整体框架
+
 
 MotionReFit 的整体设计围绕一个核心矛盾展开：如何仅凭文本指令和原始运动，生成既满足编辑要求又保持身体协调性的高质量运动。为此，框架将任务拆解为三个协同模块，形成一条“条件编码→自回归生成→协调修正”的流水线，如 Figure 4 所示。
 
@@ -149,7 +153,7 @@ $$\tilde{\mathcal{M}}_0 = \hat{\mathcal{M}}_0 + \lambda \nabla_{\hat{\mathcal{M}
 ![[assets/figures/papers/paper_list_l7_https_openaccess_thecvf_com_content_CVPR2025_html_Jiang_Dynamic_Motion_B/figures/001_Figure_1.jpg]]
 *Figure 1: MotionReFit, a universal framework for motion editing that handles various scenarios simply from textual guidance, offering both spatial and temporal editing capabilities. MotionReFit is supercharged with our proposed MotionCutMix training strategy, which leverages large-scale unannotated motion databases to augment the scarce motion editing triplets, enabling robust and generalizable editing*
 
-## 核心模块与公式推导
+
 
 ### 运动表示与空间混合
 
@@ -207,7 +211,9 @@ $$
 ![[assets/figures/papers/paper_list_l7_https_openaccess_thecvf_com_content_CVPR2025_html_Jiang_Dynamic_Motion_B/figures/004_Figure_4.jpg]]
 *Figure 4: Overview of MotionReFit. Our auto-regressive approach processes the original motion through sliding windows, where body keypoints are encoded for input to a transformer-based motion diffusion model. To ensure motion continuity, noise is applied starting from the third frame while preserving the first two frames. The model incorporates an additional token integrating the editing instruction, diffusion step, and progress indicator. The generated keypoints undergo SMPL-X optimization and merging to create the final edited motion. To enhance body part coordination, we employ a discriminator trained to identify motion segments composed of multiple source motions, which guides the denoising proce...*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -263,7 +269,9 @@ MotionReFit 在 STANCE 基准测试的两个核心任务——身体部位替换
 ![[assets/figures/papers/paper_list_l7_https_openaccess_thecvf_com_content_CVPR2025_html_Jiang_Dynamic_Motion_B/figures/010_Figure_6.jpg]]
 *Figure 6: Ablation analyses for body part replacement (a-d) and style transfer (e-h), reporting AvgR metrics. Edited-to-Target AvgR shown only for (d) and (h), with blue dotted lines indicating real data Edited-to-Source AvgR. Parameters studied: (a,e) MotionCutMix ratio, (b,f) annotated data volume, (c,g) temporal window size, and (d,h) convergence patterns at varying MotionCutMix ratios. All training converges within 800k steps. (a) Without body part coordinator*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -300,6 +308,8 @@ MotionReFit 的核心贡献在于**数据增强驱动的运动编辑泛化**，�
 - **扩散模型在运动生成中的应用**：继承 MDM 等工作的扩散范式，但通过自回归分解和判别器引导扩展了扩散模型在运动编辑中的适用性。
 - **数据增强与合成训练**：MotionCutMix 借鉴了图像领域 CutMix 的思想，将其适配到结构化人体运动的空间混合场景，利用 SMPL-X 参数表示和球面线性插值（SLERP）实现软掩码混合，保证了合成运动的物理合理性。
 - **人体运动先验与协调性**：运动协调器的引入将人体运动学先验（身体部位间的自然协调模式）以判别器形式注入生成过程，为运动生成中的物理合理性约束提供了可扩展的实现路径。
+
+
 
 ## 原文 PDF
 

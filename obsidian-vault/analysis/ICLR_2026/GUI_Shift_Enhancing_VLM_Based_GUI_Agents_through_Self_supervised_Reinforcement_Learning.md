@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/GUI_Shift_Enhancing_VLM_Based_GUI_Agents_through_Self_supervised_Reinforcement_Learning.pdf
+project_link: null
+code_link: https://github.com/UbiquitousLearning/GUI-Shift
 openreview_forum_id: NakMHPljT7
 aliases:
 - GS
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | GUI-Shift：通过自监督强化学习增强VLM GUI代理 |
 | 英文题名 | GUI-Shift: Enhancing VLM-Based GUI Agents through Self-supervised Reinforcement Learning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=NakMHPljT7); [GitHub](https://github.com/UbiquitousLearning/GUI-Shift) |
+| Links | [paper](https://openreview.net/forum?id=NakMHPljT7) · [GitHub](https://github.com/UbiquitousLearning/GUI-Shift) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | GUI-Shift |
 | Dataset | AndroidControl-High, AndroidControl-Low, ScreenSpot-v2, ScreenSpot-Pro |
@@ -42,7 +44,7 @@ claims:
 > - AndroidControl-Low 上，EM 为 93.2 (GUI-Shift-Mimo-SFT, k=3, filtered)，对比 85.7 (Mimo-VL-7B-SFT)，变化 +7.5%。
 > - ScreenSpot-v2 上，Avg. 为 90.1 (GUI-Shift-Mimo-SFT, k=1)，对比 87.6 (Mimo-VL-7B-SFT)，变化 +2.5%。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -77,7 +79,7 @@ GUI-Shift在方法谱系中处于自监督强化学习与GUI代理训练的交�
 
 当前方法存在以下主要局限：训练数据仅来源于AndroidControl，可能引入移动端GUI偏差，对平板、桌面等平台的泛化有限；实验仅在7-8B参数规模VLM上进行；奖励函数依赖坐标和格式匹配，无法捕获语义正确性。开放问题包括：如何自动化收集大规模多样化无标注GUI轨迹、能否引入更细粒度的语义奖励、以及该方法在更大模型上的扩展性如何。
 
-## 背景与动机
+
 
 视觉语言模型（VLM）驱动的GUI代理旨在根据屏幕截图和用户指令，预测可执行的界面操作。这类代理的泛化能力高度依赖大规模、高质量的训练数据。然而，当前主流的数据构建范式存在一个根本性瓶颈：**训练VLM GUI代理通常依赖大规模人工标注的数据集，收集过程劳动密集且易出错，限制了可扩展性**。
 
@@ -87,7 +89,9 @@ GUI-Shift在方法谱系中处于自监督强化学习与GUI代理训练的交�
 
 本文的核心动机在于：**能否设计一种完全不依赖文本指令的自监督训练范式，使VLM从无标注的GUI轨迹中学习界面动态？** 这一思路的关键洞察是：GUI操作的本质是引起界面状态转移的动作序列，而两个截图之间的状态差异本身就蕴含了“该做什么”的丰富信息——模型只需学会回答“是什么动作导致了从状态S_t到状态S_{t+k}的变化”，即可习得GUI动态知识，无需任何人工文本标注。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GUI-Shift 的核心创新在于将 VLM GUI 代理的训练从**依赖文本指令的监督学习范式**转变为**基于状态转移的自监督强化学习范式**。这一转变通过三个相互耦合的机制实现，共同解决了大规模人工标注数据稀缺与训练效率低下的瓶颈。
 
@@ -140,7 +144,7 @@ GUI-Shift 提出基于模型自身能力的数据过滤策略：使用当前策�
 | 推理需求 | 显式推理链 | 仅输出动作 | 训练时间减半，性能不降 |
 | 数据选择 | 全量使用 | 模型特定过滤 | 保留有区分度样本，一致提升性能 |
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_NakMHPljT7/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the GUI-Shift framework. Left: K-step GUI Transition replaces annotated instructions with the target state S _ { t + k } , enabling scalable data construction through automated offline exploration. Middle: The model learns GUI dynamics by predicting the action that causes the transition. Right: GUI-Shift achieves self-supervised training by applying GRPO to GUI Transition*
@@ -168,7 +172,7 @@ GUI-Shift是一个自监督强化学习框架，其核心设计围绕一个关�
 - **以视觉目标替代文本指令**：传统方法将任务描述文本作为输入，GUI-Shift则直接用未来状态 $S_{t+k}$ 作为视觉目标。实验表明，即使文本指令包含更明确的目标信息，视觉目标仍能带来更优性能（Table 4）。
 - **移除显式推理链**：GUI-Shift不要求模型输出推理过程，仅输出最终动作。这不仅将训练时间减半（Qwen2.5-VL-7B从17小时降至9小时），还维持甚至提升了性能（Table 4）。
 
-## 核心模块与公式推导
+
 
 ### 3.1 组相对策略优化（GRPO）
 
@@ -206,7 +210,9 @@ K步GUI转移是GUI-Shift的核心自监督任务。给定一个GUI状态对 $(S
 
 **训练效率**：由于K步转移任务仅要求模型输出最终动作，无需生成显式推理链，训练过程中避免了大量推理token的解码开销。以Qwen2.5-VL-7B为例，在2K样本上训练时间从含推理链的17小时降至9小时，且下游性能保持不变或略有提升（Table 4）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -304,7 +310,9 @@ GUI-Shift默认不要求模型输出显式推理过程，仅输出最终动作�
 ![[assets/figures/papers/paper_list_l33_https_openreview_net_forum_id_NakMHPljT7/figures/003_Table_2.jpg]]
 *Table 2: Performance comparison on GUI grounding benchmarks: ScreenSpot-v2 and ScreenSpot-Pro. GUI-Shift exhibits strong generalization and achieves the second best result on ScreenSpot-Pro. Bold: the best result; underlined: the second best result*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线工作的关系
 
@@ -355,6 +363,8 @@ GUI-Shift 处于 VLM GUI 代理训练方法的一个关键转折点：**从依�
 5. **更大模型的扩展性**：该方法在 13B、70B 或专有 VLM（如 GPT-4o）上的效果如何？更大模型可能从自监督 GUI 动态学习中获益更多，也可能因更强的先验而减少对 K 步转移任务的依赖。
 
 6. **在线交互式扩展**：能否将 GUI-Shift 的自监督预训练与在线 RL 的交互式微调结合，在 AndroidWorld 等复杂环境中实现更显著的端到端性能提升？
+
+
 
 ## 原文 PDF
 

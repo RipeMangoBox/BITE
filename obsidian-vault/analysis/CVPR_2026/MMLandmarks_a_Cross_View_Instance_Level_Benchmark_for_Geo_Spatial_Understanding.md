@@ -42,7 +42,7 @@ claims:
 > - MMLANDMARKS 跨视角检索（Ground→Satellite） 上，R@1 20.5 (MMCLIP) vs 14.6 (SigLIP2 ViT-L/512) (+5.9)。
 > - MMLANDMARKS 地面图像定位（Ground-to-Sat-to-GPS） 上，Distance(% @ 1 km) 18.41 (MMCLIP) vs 8.04 (OAI-CLIP ViT-L/336) (+10.37)。
 
-## 概述
+## 概要
 
 现有地理空间理解数据集长期受限于两个瓶颈：其一，缺乏跨视角、实例级的细粒度对应关系，地面图像、航拍图像、文本描述和GPS坐标往往孤立存在，难以支撑统一的多模态学习；其二，主流跨视角基准（如CVUSA、CVACT）已趋于饱和，场景多样性不足，无法反映真实世界中的视角变化、时间演化和自然复杂性。**MMLandmarks**（CVPR 2026）针对上述瓶颈，构建了一个覆盖美国本土18,557个地标的大规模多模态数据集，首次在实例级别将地面图像、航拍图像、文本描述和GPS坐标四种模态完全对齐，为地理空间理解提供了更具挑战性和现实意义的评测平台。
 
@@ -66,7 +66,7 @@ MMLandmarks在方法谱系上处于**多模态地理空间基准构建**与**跨
 
 尽管结果令人鼓舞，MMLandmarks目前仍存在若干限制：数据集仅覆盖美国本土，地标分布偏向大城市和旅游热点区域，对全球其他地区及乡村场景的泛化能力尚待验证；地面图像中约17%为室内照片，虽经VLM过滤仍可能引入噪声；跨视角域间隙依然存在，基线模型未利用高级几何对齐或时序信息。这些限制也指向了未来的研究方向——如何将框架扩展至全球范围、如何利用多时相航拍图像实现变化检测、以及如何与更大规模的基础模型结合以突破精细定位的瓶颈。
 
-## 背景与动机
+
 
 ### 地理空间理解的跨视角瓶颈
 
@@ -102,7 +102,9 @@ Figure 1 展示了这一多模态对应关系的直观示例：同一地标在�
 
 尽管 MMLANDMARKS 在数据规模与模态完整性上迈出了重要一步，但其覆盖范围目前仅限于美国本土，地标分布偏向大城市及旅游聚集区，对全球其他地区及乡村场景的泛化能力尚未验证。此外，地面图像中约 17% 为室内照片，可能引入空间对齐的噪声；跨视角域间隙依然存在，航拍图像的俯视特征与地面图像的透视变形之间的对应关系仍具挑战。这些问题为未来的数据集扩展与方法改进指明了方向。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MMLANDMARKS 的核心创新并非提出一个复杂的模型架构，而是通过**构建一个实例级对齐的多模态数据集**，改变了地理空间理解任务的学习范式。其关键洞察在于：以地标实例为纽带，将四种天然异构的模态（地面图像、航拍图像、文本描述、GPS坐标）在实例层面完全对应起来，从而使得一个简单的 CLIP 风格基线模型也能在多个地理空间任务上展现出强大的跨模态泛化能力。
 
@@ -141,7 +143,7 @@ $$\mathcal { L } = \frac { 1 } { K ( K - 1 ) } \sum _ { i = 1 } ^ { K } \sum _ {
 
 这些结果表明，MMLANDMARKS 的创新价值不仅在于其规模，更在于其精心设计的数据筛选策略，使得即使使用冻结的 CLIP 编码器和简单的投影头，也能在跨视角检索（Satellite→Ground R@1 达 18.8%，而最佳基础模型 SigLIP2 仅为 4.1%）和精细定位（1 km 内 Satellite-to-GPS 达 36.9%）等任务上大幅超越现有方法。
 
-## 整体框架
+
 
 MMLANDMARKS的整体框架由两个核心阶段构成：**数据集构建流水线**与**多模态联合训练基线模型（MMCLIP）**。前者以地标实例为中心，从多源异构数据中提取并对齐四种模态；后者通过一个轻量的成对对比学习框架，将所有模态映射到共享嵌入空间，支撑下游的跨模态检索与定位任务。
 
@@ -186,7 +188,7 @@ $$\mathcal { L } = \frac { 1 } { K ( K - 1 ) } \sum _ { i = 1 } ^ { K } \sum _ {
 ![[assets/figures/papers/paper_list_l822_https_openaccess_thecvf_com_content_CVPR2026_html_Kristoffersen_MMLandma/figures/003_Figure_2.jpg]]
 *Figure 2: Pipeline for collecting the landmarks with the required criteria. Tags from OpenStreetMaps are used to collect Wikiidentifiers, ensuring that landmarks have a Wikipedia and Wikimedia Commons page. If both are available, we check that the longest edge of the landmark’s bounding box is smaller than 400 meters to keep an even size distribution across the dataset. Every resulting landmark has a Wikimedia Commons page (ground), a Wikipedia page (text), a box size and center (coordinates), and associated aerial imagery (satellite)*
 
-## 核心模块与公式推导
+
 
 MMCLIP 基线模型的核心设计思想是：将四种异构模态（地面图像、航拍图像、文本描述、GPS 坐标）映射到一个共享的 512 维嵌入空间，使得同一地标实例的不同模态表示相互靠近，不同实例的表示相互远离。模型由四个编码器与一个成对对比损失函数构成。
 
@@ -229,7 +231,9 @@ $$
 
 训练时，四种模态的嵌入通过各自的编码器和投影头提取后，直接输入成对对比损失进行端到端优化（仅投影头和 GPS 编码器可训练）。推理时，模型根据任务需求选择相应的模态编码器提取特征，通过余弦相似度在嵌入空间中进行最近邻检索，或通过 GPS 编码器直接回归坐标。对于 Ground-to-Sat-to-GPS 定位任务，模型先通过地面图像检索最相似的卫星图像，再利用检索到的卫星图像的 GPS 坐标进行定位——这种级联策略有效结合了跨视角检索的判别能力和坐标编码器的空间精度。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -311,7 +315,9 @@ Table 6 的消融实验揭示了影响模型性能的几个关键因素：
 ![[assets/figures/papers/paper_list_l822_https_openaccess_thecvf_com_content_CVPR2026_html_Kristoffersen_MMLandma/figures/005_Figure_3.jpg]]
 *Figure 3: Text-to-GPS (top 1000), Text-to-Ground and Text-to-Satellite retrieval from the index set with the baseline model. The model accurately locates regions and images that are semantically relevant to the prompt, illustrating strong feature alignment across modalities*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位与基线谱系
 
@@ -364,6 +370,8 @@ $$\mathcal { L } = \frac { 1 } { K ( K - 1 ) } \sum _ { i = 1 } ^ { K } \sum _ {
 - **数据可持续扩展**：在确保图像许可证持续开放的前提下，如何系统性地扩展数据集的地理覆盖和模态多样性（如增加夜间图像、红外影像、街景视频等），同时维持实例级对齐的质量标准？
 
 - **边缘部署优化**：面向真实地理空间应用，如何在资源受限设备上降低跨模态检索的推理延迟，同时保持检索精度？模型蒸馏、特征量化或异步索引策略值得探索。
+
+
 
 ## 原文 PDF
 

@@ -45,7 +45,7 @@ claims:
 > - LIBERO-Plus (with augmented data) 上，Total Success Rate (%) 82.1 (Online SRPO) vs 30.7 (OpenVLA*-One) (+51.4)。
 > - Progress Reward Benchmark 上，Spearman Correlation (SC) 0.998 (SRPO) vs 0.125 (Pixel-level) / 0.957 (ImageBind) (substantially higher)。
 
-## 概述
+## 概要
 
 视觉-语言-动作（VLA）模型的强化学习（RL）微调是提升机器人策略性能的关键路径，但现有方法面临一个根本瓶颈：**奖励稀疏**。主流框架如GRPO仅依赖二值结果信号——成功得1、失败得0——完全浪费了失败轨迹中蕴含的丰富行为进展信息，导致训练效率低下、样本利用率极低。
 
@@ -59,7 +59,7 @@ SRPO（Self-Referential Policy Optimization）提出了一种**自参照范式**
 - SRPO的进展奖励在Spearman相关性（0.998）、单调性（0.992）、分布分离度等五项指标上全面优于像素级和ImageBind方法（Table 3），验证了潜在世界表示用于进展度量的有效性。
 - 消融实验证实，去除自参照机制（改用固定专家轨迹）导致性能平台化且需1.4倍训练步数；去除聚类组件则后期性能增益显著降低（Figure 10），表明批次内动态参照和聚类表示是方法的关键设计要素。
 
-## 背景与动机
+
 
 ### 1. VLA 策略强化学习的奖励稀疏瓶颈
 
@@ -87,7 +87,9 @@ SRPO（Self-Referential Policy Optimization）提出了一种**自参照范式**
 
 基于上述动机，本文提出了 **SRPO（Self-Referential Policy Optimization）**——一个面向 VLA 模型的自参照策略优化框架，通过在预训练世界模型的潜在空间中度量行为进展，为失败轨迹分配密集的进展感知奖励，从而高效利用所有采样轨迹进行策略优化。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：稀疏奖励导致失败轨迹信息浪费
 
@@ -138,7 +140,7 @@ $$g_i = \begin{cases} 1.0 & \text{成功轨迹} \\ \phi\left(\frac{d_i - \bar{d}
 
 消融实验验证了自参照设计的必要性。当移除自参照机制、改用固定专家轨迹作为参照标准时，训练出现性能平台化，最终成功率显著低于完整SRPO，且需要约1.4倍的训练步数才能达到收敛（Figure 10）。进一步移除聚类组件、仅使用单条最近成功轨迹作为参照时，初期收敛速度相似，但后期性能增益显著降低。这表明，DBSCAN聚类通过捕获成功轨迹的多模态分布，为失败轨迹提供了更鲁棒的进展估计，是SRPO性能优势的重要来源。
 
-## 整体框架
+
 
 SRPO（Self-Referential Policy Optimization）的整体设计围绕一个核心瓶颈展开：**现有VLA强化学习方法仅依赖稀疏的二值成功信号，浪费了失败轨迹中丰富的进展信息**。SRPO通过引入“自参照”范式，将当前训练批次中策略自身生成的成功轨迹作为参照标准，利用预训练世界模型的潜在表示度量失败轨迹的行为进展，从而为失败尝试分配密集的进展奖励。
 
@@ -181,7 +183,7 @@ SRPO的完整管道包含五个核心模块，数据流从策略推演到参数�
 ![[assets/figures/papers/paper_list_l2421_https_arxiv_org_abs_2511_15605/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of Self-Referential Policy Optimization (SRPO). Existing approaches for Vision-Language-Sparse Reward Dense RewardExpert Trajectory Action (VLA) reinforcement learning face significant limitations: (a) methods like GRPO rely solely on sparse External-Referential outcome rewards, providing limited learning signal, while (b) hand-crafted process reward modeling (PRM) r=0requires costly external demonstrations and task-specific engineering. In contrast, our SRPO framework Self-Referential introduces a self-referential paradigm that leverages (i) in-batch successful trajectories and (ii) latent world representations to construct progress-wise rewards, enabling efficient utilization of...*
 
-## 核心模块与公式推导
+
 
 SRPO 的核心架构由四个功能模块串联构成，形成“轨迹收集 → 世界表征提取 → 自参照进展奖励计算 → 策略优化”的闭环。以下按数据流顺序展开各模块及其关键公式。
 
@@ -246,7 +248,9 @@ $$\mathcal{L}_{\mathrm{SRPO}}(\boldsymbol{\theta}) = \mathbb{E}_{t,i} \left[ \mi
 ![[assets/figures/papers/paper_list_l2421_https_arxiv_org_abs_2511_15605/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the SRPO method. During policy rollout, both successful and failed trajectories are collected in the Rollout Reference Set. For each trajectory, we employ a world model pre-trained on large-scale robotics video data (Assran et al., 2025) as an encoder to extract latent world representations. Behavioral Optimizationsimilarity is modeled as the L2 distance between trajectory embeddings in this space to yield progress-wise rewards. These rewards are subsequently used for advantage estimation and policy optimization under KL regularization*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心结果：LIBERO基准性能突破
 
@@ -346,7 +350,9 @@ Figure 11展示了奖励函数中进展项权重α的敏感性分析。α控制�
 ![[assets/figures/papers/paper_list_l2421_https_arxiv_org_abs_2511_15605/figures/014_Figure_11.jpg]]
 *Figure 11: Performance comparison with different α values in the reward function. The results demonstrate that α = 0.8 achieves the best performance, followed by*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 在VLA强化学习谱系中的位置
 
@@ -394,6 +400,8 @@ SRPO在三个层面继承了现有工作并做出关键改变：
 3. **更细粒度的子任务奖励分解。** 当前进展奖励是轨迹级别的标量，未能区分不同子任务阶段的进展。潜在世界表示是否能支持子任务级别的自动分解和分层奖励塑造，是一个开放问题。
 
 4. **安全约束下的在线训练。** 如何在不牺牲探索效率的前提下，将SRPO扩展到带安全约束的在线真实机器人训练，是实际部署的关键挑战。
+
+
 
 ## 原文 PDF
 

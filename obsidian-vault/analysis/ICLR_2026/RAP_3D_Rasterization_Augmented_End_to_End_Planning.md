@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/RAP_3D_Rasterization_Augmented_End_to_End_Planning.pdf
+project_link: https://alan-lanfeng.github.io/RAP/
+code_link: null
 openreview_forum_id: a9bOgeqbdB
 aliases:
 - RRAP
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | RAP：3D光栅化增强的端到端规划 |
 | 英文题名 | RAP: 3D Rasterization Augmented End-to-End Planning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=a9bOgeqbdB); [Project](https://alan-lanfeng.github.io/RAP/) |
+| Links | [paper](https://openreview.net/forum?id=a9bOgeqbdB) · [Project](https://alan-lanfeng.github.io/RAP/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | RAP (Rasterization Augmented Planning) |
 | Dataset | NAVSIM v1 (navtest), NAVSIM v2 (navhard), WOD Vision-based E2E Driving |
@@ -42,7 +44,7 @@ claims:
 > - NAVSIM v2 (navhard) 上，two-stage EPDMS↑ 为 36.93，对比 23.12 (LTF)，变化 +13.81。
 > - WOD Vision-based E2E Driving 上，ADE@5s↓ 为 2.65，对比 2.74 (Poutine)，变化 -0.09。
 
-## 概述
+## 概要
 
 端到端自动驾驶系统长期受困于一个根本矛盾：模仿学习训练的规划器缺乏对分布外状态的恢复能力，在闭环测试中因协变量漂移导致误差快速累积；而现有基于神经渲染或物理引擎的真实感数据增强方案速度慢、成本高，难以大规模生成反事实训练数据。RAP（Rasterization Augmented Planning）针对这一瓶颈提出了一条差异化路径——**端到端驾驶规划训练不需要照片级真实感，语义准确性与可扩展性远比像素级逼真更重要**。
 
@@ -52,7 +54,7 @@ claims:
 
 在方法谱系中，RAP区别于**Centaur**（Sima et al., arXiv 2025）的测试时训练范式、**DiffusionDrive**（Liao et al., CVPR 2025）的截断扩散策略以及**UniAD**（Hu et al., CVPR 2023）的规划导向架构，其独特贡献在于将数据增强从像素空间迁移至特征空间，并以光栅化基元替代昂贵的渲染引擎。该方法依赖高质量的场景标注（车道线、3D目标框），在标注稀疏或噪声场景中有效性可能下降，但定性分析表明模型仍能从真实图像中学习未标注的视觉线索（Figure 7）。当前验证限于仿真与日志基准，实际路测尚未开展。
 
-## 背景与动机
+
 
 端到端自动驾驶旨在直接从传感器输入映射到驾驶动作或轨迹，省去传统模块化流水线中的中间表示。近年来，模仿学习（imitation learning）驱动的端到端规划器在开环评测中取得了显著进展，但在闭环测试中仍面临一个根本性瓶颈：**协变量漂移（covariate shift）**。由于训练数据仅包含专家演示，模型从未见过偏离专家轨迹后的状态，一旦测试中出现微小误差，便会迅速累积并导致灾难性失败。本质上，模仿学习训练的端到端策略缺乏恢复数据——它不知道如何从不安全状态回到安全状态。
 
@@ -72,7 +74,9 @@ claims:
 2. 现有真实感渲染方法速度慢、成本高，无法满足大规模增强的需求；
 3. 驾驶规划不需要照片级真实感——保留几何与动态信息的光栅化基元已足够，配合特征空间对齐即可实现有效的sim-to-real迁移。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 RAP框架针对模仿学习在端到端驾驶中的核心瓶颈——**协变量漂移导致闭环误差累积**与**现有数据增强方法速度慢、成本高**——提出了三个关键创新，构成一条完整的“合成-对齐-增强”技术链路。
 
@@ -124,7 +128,7 @@ RAP属于**数据驱动端到端规划**范式，与以下工作形成对比：
 
 RAP的核心贡献不在于规划器架构创新，而在于**提出了一种可扩展、与规划器解耦的数据增强与域适应框架**，通过“语义精确的合成+特征空间对齐”解决了端到端驾驶中长期存在的数据稀缺与闭环鲁棒性瓶颈。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_a9bOgeqbdB/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the proposed RAP. (a) Data Augmentations via 3D Rasterization: annotated driving logs are converted into large-scale synthetic samples through cross-agent view synthesis and recovery-oriented perturbation. (b) Raster-to-Real Alignment: paired real and rasterized inputs are processed by a frozen image encoder and a learnable feature projector. Spatial-level alignment uses MSE loss against detached raster features, while global-level alignment employs a gradient reversal layer and domain classifier to enforce domain confusion*
@@ -155,7 +159,7 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{task}} + \lambda_{s} \mathcal{L}_{\mathrm{s
 
 该框架的核心设计选择——在特征空间而非像素空间对齐——源于一个关键观察：冻结DINOv3提取的光栅化与真实图像特征具有相似的PCA结构（图4），说明光栅化基元作为感知替代是有效的。特征空间对齐比像素级对齐更稳定、更高效地迁移语义知识，使得RAP能够以极低的计算成本实现大规模反事实数据增强。
 
-## 核心模块与公式推导
+
 
 RAP框架的核心由三个模块构成：3D光栅化管线、数据增强策略、以及Raster-to-Real（R2R）特征对齐模块。以下逐一阐述其关键设计与数学表达。
 
@@ -222,7 +226,9 @@ $$\mathcal{L} = \mathcal{L}_{\text{task}} + \lambda_{s} \mathcal{L}_{\text{spati
 
 消融实验（Figure 5）表明，空间+全局对齐在所有真实数据比例下均显著优于无对齐，且在50%合成数据时性能已超过100%真实数据训练。对齐方向消融（Table 7）进一步显示，**Real-to-Raster**对齐（将真实特征向冻结的光栅特征对齐）优于Raster-to-Real和对称对齐，在50%真实数据下MinADE降至1.02。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -289,7 +295,9 @@ Figure 8 展示了 WOD-E2E 数据集上的定性规划结果，RAP-DINO 成功�
 4. **对抗训练不稳定性**：全局对齐依赖梯度反转层的对抗训练，可能引入训练不稳定。论文使用平滑退火策略 $\lambda(p) = 0.1 * \left( \frac{2}{1 + \exp(-\gamma p)} - 1 \right)$ 缓解此问题，但在更大规模训练中仍需关注。
 5. **视角选择策略未优化**：跨代理视角合成目前采用随机采样，尚未探索基于交互密度或不确定性的智能选择策略，可能未充分利用日志数据的潜力。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心洞察与瓶颈突破
 
@@ -326,6 +334,8 @@ RAP并非重新发明端到端规划架构，而是在现有规划器之上叠�
 4. **复杂场景的表示充分性**。在更复杂的动态场景（如行人密集区、非常规道路、恶劣天气）中，简化的几何基元（多段线+有向立方体）是否仍能提供足够丰富的表示？可能需要引入额外的语义基元（如行人姿态骨架、临时障碍物轮廓）来扩展表示能力。
 
 5. **因果混淆的缓解**。RAP仍基于模仿学习范式，继承其因果混淆问题（如对自车历史轨迹的过度依赖）。恢复性扰动在一定程度上缓解了协变量漂移，但并未从根本上解决模仿学习中的分布外泛化问题。
+
+
 
 ## 原文 PDF
 

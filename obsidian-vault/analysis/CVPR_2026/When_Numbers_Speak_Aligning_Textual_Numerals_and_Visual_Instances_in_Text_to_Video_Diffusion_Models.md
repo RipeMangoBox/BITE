@@ -43,7 +43,7 @@ claims:
 > - CountBench 上，CountAcc (%) 49.7 vs 42.3 (+7.4)；CountAcc (%) 52.7 vs 47.8 (+4.9)；CountAcc (%) 59.1 vs 53.6 (+5.5)。
 > - CountBench (CogVideoX) 上，CountAcc (%) 44.4 vs 40.2 (+4.2)。
 
-## 概述
+## 概要
 
 文本到视频（T2V）扩散模型在近年取得显著进展，但在精确数字对齐方面仍存在根本性瓶颈：当提示中包含具体数量词（如“三只狗”）时，生成视频中实际出现的对象数量往往与文本不一致。NUMINA 论文将这一问题归因于两个关键机制——**数字标记的语义弱化**与**潜在空间实例可分离性差**。具体而言，扩散Transformer中数字对应的交叉注意力响应呈现弥散性（图2），无法像名词、动词那样形成强局部激活；同时，高度下采样的时空潜在空间难以稳定编码对象数量，导致计数错误频发。
 
@@ -51,7 +51,7 @@ claims:
 
 在 CountBench 基准上的实验表明，NUMINA 在不同规模的 Wan 系列模型上均稳定提升计数准确率：Wan2.1-1.3B 上从 42.3% 提升至 49.7%（+7.4%），Wan2.2-5B 上从 47.8% 提升至 52.7%（+4.9%），Wan2.1-14B 上从 53.6% 提升至 59.1%（+5.5%），同时在语义对齐（CLIP Score）和时序一致性（TC）指标上也获得提升或维持（表1）。跨架构验证（CogVideoX-5B）和用户偏好研究进一步支持了方法的有效性与实用性。
 
-## 背景与动机
+
 
 ### 文本到视频生成中的数字-视觉错位
 
@@ -75,7 +75,9 @@ claims:
 
 基于这一洞察，本文提出**NUMINA**，一个无需训练的“识别-引导”框架，直接从注意力图中提取显式的实例布局，并通过布局精炼和引导生成实现精确的数量控制。该方法的动机在于：与其依赖外部信号纠正生成结果，不如从扩散模型自身的内部表征中挖掘计数线索，从而在保持生成质量和时序一致性的前提下，显著提升数字-视觉对齐精度。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 NUMINA的核心创新在于揭示并系统性地利用了扩散Transformer内部注意力机制中天然存在的实例级空间结构，构建了一个无需训练、无需外部模型的“识别-引导”两阶段范式，将文本到视频生成中的数字对齐问题从隐式语义约束转化为显式的可计数布局控制。
 
@@ -105,7 +107,7 @@ NUMINA的核心创新在于揭示并系统性地利用了扩散Transformer内部
 
 值得注意的是，NUMINA的布局构建完全基于模型内部的注意力信号，而非依赖外部检测器。消融实验证实，基于注意力的布局构建方法优于使用**GroundingDINO**等外部检测器的方案（CountAcc 49.7% vs 47.5%，见Table 2），表明模型内部表征比外部视觉模型更适配扩散潜在空间中的实例结构。此外，整个框架是训练无关的，不需要输入视频、空间掩码或辅助重布局网络，可直接应用于现成的预训练模型。
 
-## 整体框架
+
 
 NUMINA 采用一种免训练的“识别—引导”两阶段范式（identify-then-guide），在不修改扩散模型权重的前提下，将文本中的精确数字约束转化为可执行的视觉布局信号，进而引导生成过程产生正确数量的对象实例。图3给出了完整的流水线概览。
 
@@ -124,7 +126,7 @@ NUMINA 采用一种免训练的“识别—引导”两阶段范式（identify-t
 ![[assets/figures/papers/paper_list_l2362_https_arxiv_org_abs_2604_08546/figures/003_Figure_3.jpg]]
 *Figure 3: The pipeline of our NUMINA follows a two-phase paradigm. Given a text prompt containing numerals, we first perform the numerical misalignment identification to extract explicitly countable layouts from attention maps. Based on the layout, we further conduct a refinement and a layout-guided generation for the numerically aligned video generation*
 
-## 核心模块与公式推导
+
 
 NUMINA 遵循“识别-引导”两阶段范式，无需训练、无需外部模型，完全基于扩散Transformer内部注意力图实现数字-视觉对齐。其核心由五个模块串联构成。
 
@@ -200,7 +202,9 @@ $$\mathcal{C}(c) = \mathcal{C}_o + \mathcal{C}_c + \lambda \mathcal{C}_t$$
 ![[assets/figures/papers/paper_list_l2362_https_arxiv_org_abs_2604_08546/figures/004_Figure_4.jpg]]
 *Figure 4: The PCA visualization of self-attention maps for Wan2.1-1.3B. (a) Different attention heads naturally capture diverse spatial patterns. (b) We select the head with the highest instance separability for countable layout construction*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -261,7 +265,9 @@ Figure 9揭示了一个典型失败模式：当自注意力头过度聚焦于对
 ![[assets/figures/papers/paper_list_l2362_https_arxiv_org_abs_2604_08546/figures/019_Table_11.jpg]]
 *Table 11: Ablation on object addition or removal*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：文本到视频扩散模型的计数瓶颈
 
@@ -347,6 +353,8 @@ NUMINA 的核心贡献在于**发现并系统利用扩散 Transformer 中注意�
 - **方法类**：训练无关的注意力引导方法
 - **技术贡献**：注意力头选择机制、可计数布局构建、保守布局精炼、布局引导生成
 - **关键发现**：扩散 Transformer 的自注意力和交叉注意力头自然包含可提取的实例级空间结构信息
+
+
 
 ## 原文 PDF
 

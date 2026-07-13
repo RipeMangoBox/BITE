@@ -5,6 +5,8 @@ paper_level: A
 venue: SIGGRAPH
 year: 2025
 pdf_ref: paperPDFs/SIGGRAPH_2025/Chang_et_al_Large_Scale_Multi_Character_Interaction_Synthesis.pdf
+project_link: null
+code_link: null
 aliases:
 - CGPCMCI
 - LSMCIS
@@ -43,7 +45,7 @@ claims:
 > - Adding New Characters 上，TS↓ 0.026 vs N/A。
 > - Generating Large Scenes (12 characters) 上，TS↓ 0.075 vs N/A。
 
-## 概述
+## 概要
 
 多角色交互合成是计算机动画与具身智能领域的核心挑战，其根本瓶颈在于两个方面：**缺乏多角色密集交互的训练数据**，以及**如何在时空上下文中为多个角色规划接近且密集的交互过渡**。现有方法（如 InterGen）仅支持两角色交互合成，当扩展到多角色场景时，角色间会出现严重重叠，且无法协调交互过渡。
 
@@ -53,7 +55,7 @@ claims:
 
 本工作的核心贡献在于：**首次实现了无需多角色数据的大规模多角色交互合成**，通过“分解-组合”范式将两角色交互模型与强化学习规划相结合，为多智能体运动生成提供了新的方法论视角。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -80,7 +82,9 @@ claims:
 
 这一思路的核心洞见在于：**多角色协调交互的本质不在于同时生成所有角色的运动，而在于在合适的时机让合适的角色组成交互对，并确保组间运动的一致性**。通过将协调问题转化为规划问题，该方法在不依赖多角色训练数据的前提下，实现了从4角色到12角色的可扩展交互合成，并支持向拳击等新运动类型的迁移。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈与因果调控
 
@@ -118,7 +122,7 @@ $$M_{1:N}^{t} = \mathcal{F}_\theta ( M_{1:N}^{t-1}, \epsilon_{1:N}^{t}, C^{t} )$
 
 这一分解-组合范式使得系统能够从仅有的两角色交互数据中泛化到任意数量角色的协调场景，同时避免了直接生成多角色运动所需的海量标注数据。
 
-## 整体框架
+
 
 本文提出的多角色交互合成框架是一个自回归条件生成模型，其核心设计思想是将复杂的多角色协调交互分解为两个可组合的子问题：**交互合成**与**过渡规划**。如图 2 所示，整个 pipeline 由两个关键模块串联构成。
 
@@ -148,7 +152,7 @@ $$C^{t} = f_\theta ( M_{i,j,i',j'}^{t} ) \tag{7}$$
 ![[assets/figures/papers/paper_list_l1926_Chang_et_al_Large_Scale_Multi_Character_Interaction_Synthesis/figures/001_Figure_1.jpg]]
 *Figure 1: Multi-character interactions coordinated with transition planning. (Left) We highlight the three currently interacting characters with blue, purple, and green, while others are grey. The more saturated the color, the more recent the frame. (Upper right) The key frame of the transition where the blue and purple characters proceed to have a coordinated interaction. (Lower right) The key frame of the transition where the blue and green characters proceed to have a coordinated interaction*
 
-## 核心模块与公式推导
+
 
 ### 多角色交互表示
 
@@ -216,7 +220,9 @@ $$HD = \frac{2}{N(N-1)F} \sum_{f=1}^{F} \sum_{i,j \in N} \| h_i^f - h_j^f \|_2^2
 ![[assets/figures/papers/paper_list_l1926_Chang_et_al_Large_Scale_Multi_Character_Interaction_Synthesis/figures/004_Figure_4.jpg]]
 *Figure 4: The planning network is learned as a policy network via deep reinforcement learning. The action is a transition plan that contains a high-level grouping choice*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：多角色交互合成的定量与定性评估
 
@@ -266,7 +272,9 @@ Table 5 展示了社交距离约束中的阈值 τ 从 0.5 增大到 3.0 的影�
 
 尽管方法在定量和定性评估中表现优异，仍存在若干已知局限。首先，**分组策略基于简单的贪婪距离度量**，可能不是最优的分组方式，在复杂场景下可能导致不自然的角色配对。其次，**当角色总数不能被 4 整除时需引入虚拟角色**，虚拟角色的运动由扩散模型自由生成，可能引入不协调的运动模式，影响整体交互质量。第三，**扩散模型在无条件数据集时的控制精度下降**——本方法依赖两角色扩散模型进行组内交互生成，但该模型仅在两角色数据上训练，当通过分类器引导施加组间约束时，生成质量可能受损。这些失败模式提示，在极端场景（如奇数角色数、高度非结构化的交互类型）下，方法的表现需要手动验证。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有工作的关系
 
@@ -317,6 +325,8 @@ Table 5 展示了社交距离约束中的阈值 τ 从 0.5 增大到 3.0 的影�
 本文的核心声明均有较强的实验支撑：主实验（Table 1）在 InterHuman 舞蹈子集上对比了三种方法，完整方法在 TS 和 HD 上均取得最优或接近最优结果；消融实验（Table 4）系统验证了两个组件的独立贡献；用户研究提供了主观质量背书。扩展实验（Table 2）验证了方法的可扩展性和跨类型迁移能力。
 
 需要注意的是，HD 指标的解读存在微妙之处：InterGen 的 HD 极低（0.567），看似“更好”，实则是角色严重重叠的负面表现（Figure 5b 和 Figure 6 提供了视觉证据）。完整方法的 HD 为 1.963，反映了角色维持了合理的社交距离。这一指标的“好坏”方向依赖于具体上下文，读者需结合定性结果综合判断。
+
+
 
 ## 原文 PDF
 

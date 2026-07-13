@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/nabla_Reasoner_LLM_Reasoning_via_Test_Time_Gradient_Descent_in_Latent_Space.pdf
+project_link: null
+code_link: https://github.com/VITA-Group/Nabla-Reasoner
 aliases:
 - NRLRTTGDLS
 - "∇-Reasoner"
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | ∇-Reasoner：通过测试时潜在空间梯度下降实现大语言模型推理 |
 | 英文题名 | $\nabla$-Reasoner: LLM Reasoning via Test-Time Gradient Descent in Latent Space |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=pEJAja73dk); [GitHub](https://github.com/VITA-Group/Nabla-Reasoner) |
+| Links | [paper](https://openreview.net/forum?id=pEJAja73dk) · [GitHub](https://github.com/VITA-Group/Nabla-Reasoner) |
 | Topic | #topic/other_unclear #topic/other_unclear/general |
 | Method | ∇-Reasoner |
 | Dataset | MATH-500, AMC |
@@ -41,7 +43,7 @@ claims:
 > - MATH-500 上，Accuracy (%) 为 80.4，对比 N/A (Qwen-2.5-7B-Instruct, best test-time baseline comparison in Table 1)，变化 N/A。
 > - MATH-500 上，Accuracy (%) 为 55.8，对比 N/A (Llama-3.1-8B-Instruct, best test-time baseline comparison in Table 1)，变化 N/A。
 
-## 概述
+## 概要
 
 本文提出 **∇-Reasoner**，一种将推理时扩展从零阶搜索范式转变为一阶优化范式的新方法。现有方法（如 Best-of-N、Tree-of-Thoughts、Reasoning-as-Planning）在离散 token 空间进行采样和评估，仅依赖标量奖励值，在高维空间中搜索效率低且易饱和。∇-Reasoner 的核心洞察在于：**测试时对样本空间进行梯度下降以最大化奖励，与通过 KL 正则化强化学习对齐 LLM 策略在数学上是对偶的**（定理 4.1）。因此，无需额外训练，即可在解码循环中通过可微文本优化（DTO）模拟策略优化过程，实现策略的即时改进。
 
@@ -49,7 +51,7 @@ claims:
 
 在数学推理基准（MATH-500、AMC、AIME-24、AIME-25）上的实验表明，∇-Reasoner 相比强基线实现了超过 20% 的准确率提升，同时将模型调用次数减少了约 10-40%。在 Qwen-2.5-7B-Instruct 上，MATH-500 准确率达到 80.4%，AMC 达 56.8%，AIME-24 达 26.7%，AIME-25 达 20.0%，超越了所有测试时基线方法，甚至与基于训练的方法（SFT、GRPO）性能相当。消融研究显示，使用较小的 4B 奖励模型不会导致显著性能下降（差距低于 1 个百分点），DTO 显著降低了拒绝采样中的拒绝率（降低高达 30% 以上），加速策略分别绕过了 63.8% 的模型调用、消除了 74.1% 的自回归调用并避免了 89.2% 的 token 优化步骤。
 
-## 背景与动机
+
 
 大语言模型（LLM）在推理任务上的性能提升，正从单纯扩大模型规模转向“推理时扩展”（inference-time scaling）——即在测试阶段分配更多计算资源以换取更优输出。然而，当前主流的推理时扩展方法，如 Best-of-N (BoN)、Self-Consistency (SC)、Tree-of-Thoughts (ToT) 和 Reasoning-as-Planning (RAP)，本质上都是**零阶搜索算法**。它们的行为模式高度一致：从基础策略采样大量候选响应，仅依赖最终的标量奖励值对其进行评估和筛选。这种范式的根本瓶颈在于，高维离散的token序列空间随着推理链长度呈指数级膨胀，而零阶方法缺乏方向性引导，只能依靠暴力采样来“碰运气”。奖励信号在这一过程中变得稀疏且噪声大，导致搜索效率低下，性能容易过早饱和。
 
@@ -59,7 +61,9 @@ claims:
 
 实验证据有力地支撑了这一动机的合理性。在具有挑战性的数学推理基准上，∇-Reasoner 相比强基线实现了超过20%的准确率提升，同时将模型调用次数减少了约10-40%。在MATH-500基准上，使用Qwen-2.5-7B-Instruct模型时，∇-Reasoner达到了80.4%的准确率，甚至与基于训练的方法（如SFT和GRPO）性能相当。这些结果共同表明，将推理时扩展从零阶提升到一阶，不仅可行，而且能同时带来性能提升和计算效率改善。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ∇-Reasoner的核心贡献在于将推理时计算扩展从**零阶搜索范式**根本性地转向**一阶优化范式**。现有方法（如Best-of-N、Tree-of-Thoughts、Reasoning-as-Planning）在高维离散token空间中仅依赖标量奖励值进行探索，随着推理链增长，搜索空间指数级扩大，奖励信号稀疏且噪声大，性能容易饱和。∇-Reasoner通过利用奖励模型和语言模型自身的可微性，在解码循环中对token logits进行梯度下降优化，从而获得方向性的搜索引导。
 
@@ -72,7 +76,7 @@ claims:
 
 **理论核心洞察**：定理4.1建立了推理时梯度下降与强化学习的对偶关系——对Eq.2进行Wasserstein梯度流采样等价于最小化KL正则化PPO目标Eq.3的最优分布。这意味着∇-Reasoner在测试时通过可微文本优化模拟了策略优化过程，实现了无需额外训练的即时策略改进。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0001_pEJAja73dk_nabla-Reasoner_LLM_Reasoning_via_Test-Time_Gradi/figures/005_Figure_3.jpg]]
 *Figure 3: A comparison of computational cost, measured by the number of model calls. Our method reduces costs by up to 40.2% compared to baselines*
@@ -94,7 +98,7 @@ claims:
 
 论文的核心理论洞见在于，推理时对样本空间进行梯度下降以最大化奖励，与通过 KL 正则化强化学习（如 PPO）对齐 LLM 策略是**对偶的**。定理 4.1 严格证明了，对 DTO 目标函数进行 Wasserstein 梯度流采样，等价于最小化 KL 正则化 PPO 目标的最优分布。这意味着，无需额外训练，即可在测试时通过 DTO 模拟策略优化过程，实现策略的即时改进。
 
-## 核心模块与公式推导
+
 
 ### 核心模块：可微文本优化（DTO）
 
@@ -151,7 +155,9 @@ $$\frac{\partial \mathcal{L}}{\partial z_i} = \pmb{x}_i \left( \left[ \frac{\par
 -   $z_i$：第 $i$ 个 token 的 logit。
 -   $\frac{\partial \mathcal{L}}{\partial z_i}$：损失关于 logit $z_i$ 的导数。其大小与 Softmax 后概率 $\pmb{x}_i$ 成正比，这为**置信度引导的 token 选择**提供了理论依据：梯度幅度较小的 token（即高置信度 token）可以被跳过优化，从而加速解码。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：数学推理准确率显著提升
 
@@ -196,7 +202,9 @@ $$\frac{\partial \mathcal{L}}{\partial z_i} = \pmb{x}_i \left( \left[ \frac{\par
 *Table 5: Comparison of wall-clock execution time for 83 prompts on the AMC dataset*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系：从零阶搜索到一阶优化的范式跃迁
 
@@ -234,6 +242,8 @@ $$\frac{\partial \mathcal{L}}{\partial z_i} = \pmb{x}_i \left( \left[ \frac{\par
 2. **系统集成**：需要怎样的系统协同设计才能将 ∇-Reasoner 高效集成到 LLM 服务管线中？当前加速策略虽有效，但实际部署仍需进一步优化。
 3. **扩展规律**：在超出当前测试的计算预算下，∇-Reasoner 的性能扩展规律如何？是否会遇到新的饱和点？
 4. **与提示优化的协同**：∇-Reasoner 与提示优化方法之间是否存在协同效应？梯度引导的 token 优化是否能与提示工程互补？
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2025
 pdf_ref: paperPDFs/ICLR_2025/Motion_Agent_A_Conversational_Framework_for_Human_Motion_Generation_with_LLMs.pdf
+project_link: https://knoxzhao.github.io/Motion-Agent
+code_link: null
 aliases:
 - Motion-Agent
 tags:
@@ -39,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - HumanML3D 上，R Precision Top1 (generation) 0.515±.004 vs MotionGPT 0.492±.003 (+0.023)；FID (generation, lower better) 0.230±.009 vs MotionGPT 0.232±.008 (-0.002 (略微降低))；Bert Score (captioning) 42.63 vs MotionChain 36.9 (先前最佳) (+5.73)。
 
-## 概述
+## 概要
 
 **Motion-Agent** 是一个旨在解决3D人体运动生成领域两个核心瓶颈的对话式框架：**通用性不足**与**交互能力缺失**。现有方法通常需要大量任务特定训练，难以处理长序列、复杂组合提示及多轮编辑。Motion-Agent的因果机制在于将连续运动序列离散化为语言模型可理解的token，并通过轻量级LoRA适配器微调预训练LLM，实现文本与运动之间的双向翻译。在此基础上，利用GPT-4等对话LLM作为无训练的协调器，驱动翻译代理完成生成、编辑、理解与推理，从而解锁高效、灵活的多任务运动生成能力。
 
@@ -49,7 +51,7 @@ claims:
 
 **主要结果**：在HumanML3D基准上，MotionLLM在生成质量和文本对齐方面达到或超越现有方法，同时在captioning任务上建立了新的最优水平。定性分析表明，Motion-Agent能准确生成包含系列动作的复杂运动，而其他模型在类似复杂描述下输出短而模糊的动作。消融实验证实，精心设计的翻译代理对框架性能至关重要——替换为MotionGPT后运动过渡不平滑；较小的开源LLM（如Llama-3-7B）作为协调器时无法可靠遵循JSON格式，影响可用性。
 
-## 背景与动机
+
 
 ### 问题背景：3D人体运动生成的现状与瓶颈
 
@@ -74,7 +76,9 @@ claims:
 
 基于此动机，**Motion-Agent** 框架应运而生。它通过三个组件——对话协调器（GPT-4）、运动翻译代理（MotionLLM）和运动分词器/解分词器——实现了无需额外训练的对话式运动生成、编辑、理解和推理，从根本上突破了传统方法的任务隔离和交互限制。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Motion-Agent 的核心创新在于将“运动视为语言”，通过离散化运动表示与轻量级大语言模型适配，构建了一个无需额外对话训练的统一框架，实现了从单次生成到多轮对话式交互的跨越。
 
@@ -94,7 +98,7 @@ Motion-Agent 的核心创新在于将“运动视为语言”，通过离散化�
 
 Table 1 对比了近期运动生成模型的功能覆盖。Motion-Agent 是首个同时支持文本到运动生成、运动 captioning、多轮对话编辑、长序列合成与运动过渡组合的框架，且所有这些能力均通过同一套未做任务特定微调的组件实现。这种统一性源于“运动 token 化 + LLM 翻译 + GPT-4 协调”的模块化设计，而非为每个任务单独训练专用模型。
 
-## 整体框架
+
 
 Motion-Agent 是一个由大语言模型驱动的对话式人体运动生成与理解框架，其核心设计理念是将运动视为一种语言，从而直接复用预训练语言模型的泛化与对话能力。整个系统由三个关键模块构成：**对话协调器（GPT-4）**、**翻译代理（MotionLLM）** 以及 **运动分词器/解分词器（Motion Tokenizer/Detokenizer）**。三者的协作流程如 Figure 2 所示。
 
@@ -142,7 +146,7 @@ $$\mathcal{L}_{vq} = \underbrace{\|\mathbf{m} - \hat{\mathbf{m}}\|_1}_{\mathcal{
 
 这种模块化设计使得 Motion-Agent 天然支持可变长度运动生成（自回归直到终止符），避免了非自回归模型中因长度估计错误导致的严重漂移问题。同时，通过 GPT-4 的分解-拼接策略，框架理论上可以生成任意长度的复杂运动序列。
 
-## 核心模块与公式推导
+
 
 ### 3.1 Motion-Agent 整体框架
 
@@ -194,7 +198,9 @@ $$\mathcal{L}_{LLM} = -\sum_{t} \log p_{\theta}(x_t | x_{<t}, c)$$
 ![[assets/figures/papers/paper_list_l1903_Motion_Agent_A_Conversational_Framework_for_Human_Motion_Generation_with/figures/007_Figure_5.jpg]]
 *Figure 5: Motion-Agent can compose motions with smooth transitions. In this example, the two motions “a person falls down on the back” and “a person is walking” are provided to Motion-Agent in two turns. The system then generates a “stand up” motion to facilitate a seamless composition of the two motions*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果：MotionLLM的双向翻译性能
 
@@ -271,7 +277,9 @@ Figure 5进一步展示了运动组合（motion composition）能力：给定“
 ![[assets/figures/papers/paper_list_l1903_Motion_Agent_A_Conversational_Framework_for_Human_Motion_Generation_with/figures/011_Figure_7.jpg]]
 *Figure 7: More examples of Motion-Agent*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法与基线的关系
 
@@ -312,6 +320,8 @@ Figure 5进一步展示了运动组合（motion composition）能力：给定“
 4. **降低对闭源大模型的依赖**：能否通过改进协调机制的鲁棒性（如引入约束解码或格式校验模块），或利用能力更强的开源 LLM，使整个框架在完全离线的环境中也能稳定运行？
 
 5. **长序列生成的端到端优化**：当前分解-拼接策略的长运动生成是否可以通过端到端的训练（如引入跨片段的注意力机制或全局运动先验）来提升连贯性，是一个值得探索的方向。
+
+
 
 ## 原文 PDF
 

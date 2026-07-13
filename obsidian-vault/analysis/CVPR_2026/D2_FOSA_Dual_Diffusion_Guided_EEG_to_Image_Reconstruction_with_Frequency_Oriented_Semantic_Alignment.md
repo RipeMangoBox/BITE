@@ -44,7 +44,7 @@ claims:
 > - THINGS-MEG 上，200-way zero-shot retrieval Top-1 (intra-subject avg) 27.5 vs 26.7 (UBP) (+0.8)。
 > - EEGImageNet 上，Top-1 retrieval accuracy 31.05 vs 19.15 (NICE) (+11.9)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：传统脑电图（EEG）到图像的重建方法存在两个关键缺陷。其一，标准EEG编码器（如Mamba或Transformer）忽略频率特定的神经振荡动态，无法有效捕捉Beta（13–30 Hz）和Gamma（30–60 Hz）等与视觉感知密切相关的节律信息。其二，跨模态对齐通常仅依赖对比损失（如InfoNCE），缺乏生成式约束，导致语义一致性弱、重建保真度差。
 
@@ -59,7 +59,7 @@ claims:
 - 在THINGS-MEG和EEGImageNet上，检索Top-1分别达**27.5%**和**31.05%**，较最强基线分别提升0.8和11.9个百分点（Table 2）。
 - 消融实验表明，FOMamba单独使用即达31.18% Top-1，显著优于标准Mamba（27.75%）和Transformer（25.35%）；完整DDLG进一步将Top-1推升至**37.96%**，相对提升约6.8个百分点（Table 4, Section 4.7）。
 
-## 背景与动机
+
 
 ### 问题背景：从脑信号中解码视觉感知
 
@@ -83,7 +83,9 @@ claims:
 
 消融实验（Table 4）验证了这两项设计的有效性：FOMamba单独使用即达到31.18%的Top-1检索准确率，显著优于标准Mamba的27.75%；完整的双向DDLG进一步将FOMamba的性能提升至37.96%，相对提升约6.8个百分点，充分证明了生成式循环一致性对齐对跨模态检索的关键作用。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 D²-FOSA 的创新核心在于对 EEG 到图像跨模态对齐中两个根本瓶颈的系统性突破：**频率盲区的时序建模**与**纯判别式对齐的语义脆弱性**。传统方法将 EEG 视为通用时序信号，使用标准 Transformer 或 Mamba 编码，忽略了神经振荡中 Beta (13–30 Hz) 和 Gamma (30–60 Hz) 等频段承载的丰富语义信息；同时仅依赖对比损失（InfoNCE）拉近跨模态嵌入，缺乏生成式约束，导致语义一致性弱、重建保真度差。
 
@@ -143,7 +145,7 @@ FOMamba 中阻尼因子 $\rho_k$ 的上下界对性能有显著影响。敏感�
 
 这一发现揭示了神经振荡建模中“衰减速率”作为关键控制旋钮的作用——过快衰减丢失长程信息，过慢衰减则引入噪声。
 
-## 整体框架
+
 
 D²-FOSA 提出了一套**双扩散引导的 EEG‑到‑图像重建框架**，其核心设计思想是将 EEG 信号编码、跨模态语义对齐与图像生成统一在一个**双向循环一致性**的潜空间中。整个框架在训练与推理阶段呈现不同的信息流，但共享相同的编码器与对齐模块。
 
@@ -187,7 +189,7 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{align}} + \lambda_{\mathrm
 ![[assets/figures/papers/paper_list_l2459_https_openaccess_thecvf_com_content_CVPR2026_html_Yu_D2_FOSA_Dual_Diffus/figures/001_Figure_1.jpg]]
 *Figure 1: The D2-FOSA framework. (a) Training: Our FSTDE extracts robust EEG features, aligned with image features under the supervision of a generative cycle-consistency constraint facilitated by the designed DDLG module. (b) Inference: Aligned EEG features guide a generative pipeline to reconstruct the image*
 
-## 核心模块与公式推导
+
 
 ### 3.1 频率导向状态空间模型（FOMamba）
 
@@ -262,7 +264,9 @@ $$
 ![[assets/figures/papers/paper_list_l2459_https_openaccess_thecvf_com_content_CVPR2026_html_Yu_D2_FOSA_Dual_Diffus/figures/005_Figure_5.jpg]]
 *Figure 5: Time-frequency analysis of EEG signals. The top row (a-c) displays the time-frequency maps for the raw EEG, the Mamba output, and our FOMamba output, respectively. The bottom row (d-f) shows the corresponding difference maps*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 零样本检索主结果
 
@@ -326,7 +330,9 @@ t-SNE（Figure 7）和 UMAP（Figure 8）可视化显示，D²-FOSA 的 EEG 嵌�
 ![[assets/figures/papers/paper_list_l2459_https_openaccess_thecvf_com_content_CVPR2026_html_Yu_D2_FOSA_Dual_Diffus/figures/007_Figure_6.jpg]]
 *Figure 6: Overview of the EEG-to-image retrieval pipeline. (a) The FSTDE aligns temporal EEG features with CLIP image embeddings. (b) Top-5 retrieval results on the ThingsEEG dataset, showing successful semantic mapping from EEG*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -359,6 +365,8 @@ D²-FOSA 在多个基准上展现了跨数据集、跨模态的泛化潜力，�
 **重建质量的语义保真度。** 尽管 FID 指标显著优于 MB2C，但 146.33 的绝对值仍偏高，表明重建图像与真实图像在低级纹理和细节上存在较大差距。定性结果（Figure 10）显示模型能捕获语义类别和大致视觉属性，但精细结构和背景细节的还原能力有限。这与 SDXL 管线以语义条件而非像素级监督的方式生成图像有关，本质上是一种语义重建而非像素重建。
 
 **对比基线的公平性。** 论文声明所有对比方法均按统一条件重新实现和训练（Section 4.2），且遵循标准交叉验证协议，这在一定程度上保证了实验公平性。但部分基线（如 MB2C 的 FID 值标注为“estimated”）的具体复现细节需要手动核实原始论文以确认比较的严格对等性。
+
+
 
 ## 原文 PDF
 

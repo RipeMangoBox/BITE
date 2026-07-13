@@ -5,6 +5,7 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Lyra_Generative_3D_Scene_Reconstruction_via_Video_Diffusion_Model_Self_Distillation.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/toronto-ai/lyra/
 aliases:
 - Lyra
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | Lyra：通过视频扩散模型自蒸馏的生成式3D场景重建 |
 | 英文题名 | Lyra: Generative 3D Scene Reconstruction via Video Diffusion Model Self-Distillation |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://arxiv.org/abs/2509.19296); [Project](https://research.nvidia.com/labs/toronto-ai/lyra); [Project](https://research.nvidia.com/labs/toronto-ai/lyra/) |
+| Links | [paper](https://arxiv.org/abs/2509.19296) · [Project](https://research.nvidia.com/labs/toronto-ai/lyra) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Lyra |
 | Dataset | RealEstate10K, DL3DV, Tanks-and-Temples |
@@ -41,7 +42,7 @@ claims:
 > - DL3DV 上，PSNR 为 20.09，对比 16.64 (Wonderland)，变化 +3.45。
 > - Tanks-and-Temples 上，PSNR 为 19.24，对比 15.90 (Wonderland)，变化 +3.34。
 
-## 概述
+## 概要
 
 从单张图像或一段单目视频中重建可交互的3D/4D场景是计算机视觉与图形学的核心难题。现有前馈式3D重建方法依赖稀缺且场景多样性有限的真实多视图数据集进行监督训练，导致泛化能力受限；而大规模预训练的视频扩散模型虽蕴含丰富的2D生成先验，却缺乏显式的3D表示，难以直接用于仿真与交互。
 
@@ -51,7 +52,7 @@ Lyra 提出了一种**自蒸馏框架**来解决这一瓶颈。其核心思路�
 
 该方法也面临若干限制：性能高度依赖教师视频扩散模型的3D一致性质量；训练计算成本较高（8张A100训练6天）；动态场景目前仅支持单目视频输入；评估主要依赖教师模型生成的伪真值，缺乏大规模真实动态场景基准。尽管如此，Lyra开创了以视频扩散模型自蒸馏替代真实多视图监督的新范式，为生成式3D重建开辟了数据高效、泛化性强的技术路径。
 
-## 背景与动机
+
 
 ### 3D场景重建的范式转换与数据瓶颈
 
@@ -75,7 +76,9 @@ Lyra 提出了一种**自蒸馏框架**来解决这一瓶颈。其核心思路�
 
 Lyra的核心动机正是填补这一空白：**如何将视频扩散模型中隐式编码的3D世界知识，高效地提炼为显式的、可实时渲染的3D表示，同时摆脱对稀缺真实多视图数据的依赖？** 这一问题的解决将使得从单张图像或单目视频直接生成可交互的3D/4D场景成为可能，从而打通从生成式模型到物理仿真应用的关键链路。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Lyra 的核心贡献在于提出了一种**自蒸馏框架**，将预训练视频扩散模型中隐式编码的3D世界知识提炼为显式的3D高斯溅射（3DGS）表示，从而彻底绕过了传统前馈重建方法对稀缺真实多视图数据的依赖。以下从几个关键维度剖析其创新点。
 
@@ -119,7 +122,7 @@ $$\mathcal{L} = \lambda_{mse} \mathcal{L}_{mse} + \lambda_{lpips} \mathcal{L}_{l
 
 其中深度损失（基于 ViPE 估计）对几何正则化至关重要——移除后 PSNR 降至 24.31 并出现平坦几何伪影（Figure 11）；LPIPS 损失维持高频细节（移除后 PSNR 降至 23.86）；不透明度 L1 正则化与修剪则提升了表示的紧凑性与渲染效率（Table 2）。
 
-## 整体框架
+
 
 Lyra 是一个将视频扩散模型的隐式 3D 知识蒸馏为显式 3D 高斯溅射（3DGS）的前馈式生成重建框架。其核心架构由两个关键分支构成一个教师-学生自蒸馏回路（Figure 2, Figure 4）：**冻结的相机条件视频扩散模型作为教师**，通过其 RGB 解码器输出多视角视频帧作为监督信号；**可训练的 3DGS 解码器作为学生**，直接从扩散模型生成的视频潜变量中前馈式推断出显式 3D 高斯场，并通过可微渲染与教师输出对齐。
 
@@ -156,7 +159,7 @@ $$\mathcal{L} = \lambda_{mse} \mathcal{L}_{mse} + \lambda_{lpips} \mathcal{L}_{l
 
 框架最终输出紧凑的 3D/4D 高斯场表示，可通过 gsplat 从任意视角实时渲染。生成的 3DGS 场景可转换为 .usdz 格式导入 Isaac Sim 5.0 等仿真平台，支持机器人模拟等下游交互任务（Figure 12）。
 
-## 核心模块与公式推导
+
 
 ### 自蒸馏框架：教师-学生双分支架构
 
@@ -209,7 +212,9 @@ $$ \mathbf{M}^{t,v}(u,v) = \begin{cases} 0 & \text{if } \mathbf{D}_{\mathcal{M}}
 
 通过比较网格插值深度与点云深度，屏蔽前景遮挡区域，防止背景信息泄露到被遮挡区域（图 8）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -261,7 +266,9 @@ Lyra在三个标准基准上全面超越先前方法。如**Table 1**所示，�
 ![[assets/figures/papers/paper_list_l40_https_arxiv_org_abs_2509_19296/figures/009_Table_2.jpg]]
 *Table 2: Ablation study on Lyra dataset*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：从数据稀缺到先验迁移
 
@@ -310,6 +317,8 @@ Lyra的效能提升可归因于三个相互关联的技术决策：
 **闭环物理仿真**：将生成的3D高斯场直接集成到实时物理引擎中，需要解决高斯表示的碰撞检测效率问题。探索更紧凑的高斯剪枝策略或混合表示（高斯+网格），可能使Lyra的输出直接适用于机器人操作的闭环仿真。
 
 **自蒸馏范式的泛化**：自蒸馏框架的核心思想——用生成模型监督重建模型——是否可推广至其他生成模型架构？例如，用3D原生扩散模型替代视频扩散模型作为教师，可能进一步消除2D-3D领域差异，提升重建精度。
+
+
 
 ## 原文 PDF
 

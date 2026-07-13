@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Vision_Zero_Scalable_VLM_Self_Evolution_via_Multi_Agent_Self_Play.pdf
+project_link: null
+code_link: https://github.com/wangqinsi1/Vision-Zero
 openreview_forum_id: s00SNXREV6
 aliases:
 - VZISPPOIS
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | Vision-Zero：通过多智能体自我博弈实现可扩展视觉语言模型自进化 |
 | 英文题名 | Vision-Zero: Scalable VLM Self-Evolution via Multi-Agent Self-Play |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=s00SNXREV6); [GitHub](https://github.com/wangqinsi1/Vision-Zero) |
+| Links | [paper](https://openreview.net/forum?id=s00SNXREV6) · [GitHub](https://github.com/wangqinsi1/Vision-Zero) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | Vision-Zero with Iterative Self-Play Policy Optimization (Iterative-SPO) |
 | Dataset | MathVista, BLINK, ChartXiv_RQ |
@@ -42,7 +44,7 @@ claims:
 > - BLINK 上，Accuracy 为 57.2 (VisionZero-Qwen-7B Real-World)，对比 55.2 (Qwen2.5-VL-7B)，变化 +2.0。
 > - ChartXiv_RQ 上，Accuracy 为 45.8 (VisionZero-Qwen-7B Chart)，对比 42.5 (Qwen2.5-VL-7B)，变化 +3.3。
 
-## 概述
+## 概要
 
 当前视觉语言模型（VLM）的后训练范式高度依赖人工标注或专家整理的高质量问答对。无论是监督微调（SFT）还是基于可验证奖励的强化学习（RLVR），其性能上限都被固化为人类提供的监督信号水平，模型无法自主发现超越人类经验的推理策略。此外，昂贵的数据构建成本严重制约了训练数据的规模与多样性。
 
@@ -52,7 +54,7 @@ Vision-Zero 提出了一条根本不同的路径：**将 VLM 训练重构为一�
 
 在推理、图表问答和视觉中心理解等多项基准上，Vision-Zero 在完全不使用人工标注的条件下，超越了多个依赖昂贵标注数据的 SOTA 方法（Figure 2; Table 1; Table 2）。消融实验进一步揭示：增加平民玩家数量（2→4人）和多轮线索交互（1→3轮）均能显著提升推理能力，验证了更复杂的社交博弈环境对模型能力增长的驱动作用。
 
-## 背景与动机
+
 
 视觉语言模型（VLM）近年来在推理、图表理解和视觉中心任务上取得了显著进展，但其能力提升仍高度依赖人类专家标注的高质量训练数据。当前主流范式——无论是监督微调（SFT）结合人类反馈强化学习（RLHF），还是基于可验证奖励的强化学习（RLVR）——都面临一个根本性瓶颈：**模型的推理能力被固化在人类提供的监督信号水平上，无法自主发现超越人类经验的策略**。同时，大规模人工标注的成本高昂，严重制约了训练数据的规模与多样性。
 
@@ -60,7 +62,9 @@ Vision-Zero 提出了一条根本不同的路径：**将 VLM 训练重构为一�
 
 针对这一缺口，本文提出 **Vision-Zero**，一个完全无需人工标注的多智能体自我博弈框架。其核心动机在于：**将社交推理游戏的机制映射到 VLM 训练中，利用不对称视觉输入创造零和博弈环境，迫使模型在竞争互动中主动发展细粒度视觉比较、逻辑推理和策略性沟通能力**。具体而言，Vision-Zero 设计了一种基于“谁是间谍”规则的视觉游戏——平民观察真实图像，间谍接收空白图像——使模型在提供线索与识别间谍的过程中自主生成训练数据，并通过交替优化算法持续提升推理能力。这一范式转变使得 VLM 的训练首次完全摆脱了对人类经验的依赖，为可扩展的自进化视觉智能开辟了新路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Vision‑Zero 的核心创新在于**将 VLM 的训练从“依赖人类标注的静态监督”彻底转变为“多智能体自我博弈驱动的动态自进化”**，在三个相互耦合的维度上实现了系统性突破。
 
@@ -90,7 +94,7 @@ Vision‑Zero 通过引入**“谁是间谍”风格的多智能体视觉游戏*
 
 三个创新并非孤立存在，而是形成了一条因果闭环：**自我博弈游戏**创造了无需标注的数据生成环境与零和博弈结构 → **零和奖励与 RAE** 将博弈结果转化为有效的训练信号 → **Iterative‑SPO 交替优化**防止博弈陷入局部均衡，持续推动能力提升。这一闭环使得 VLM 能够在完全脱离人类经验的情况下，自主发展出细粒度视觉比较、逻辑推理和策略性沟通能力，最终在推理、图表问答和视觉中心任务上超越依赖昂贵人工标注的 SOTA 方法（Figure 2, Table 1‑2）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l41_https_openreview_net_forum_id_s00SNXREV6/figures/005_Figure_3.jpg]]
 *Figure 3: Overall Framework of Vision-Zero. Vision-Zero comprises three core components. Strategic Game Environment: Each role is required to exhibit strategic behavior tailored to diverse scenarios, thereby simultaneously necessitating multiple capabilities. Label-free and Domainagnostic Data Input: Vision-Zero accepts arbitrary inputs to promote diversity and generalization. To verify this, we train Qwen2.5-VL-7B for 100 iterations on Gobang and our environment and evaluate on MathVision; results show that Vision-Zero effective generalization. Iterative-SPO: We introduce a novel two-stage training algorithm. In the clue stage, models are trained via Self-Play using a zero-sum reward inversely propo...*
@@ -170,7 +174,7 @@ Figure 3 展示了 Vision-Zero 的完整 pipeline：
 
 这种设计使得模型在无需任何人工标注的情况下，通过竞争互动自主发展出细粒度视觉理解、逻辑推理和策略性沟通能力。
 
-## 核心模块与公式推导
+
 
 Vision-Zero 的训练框架围绕一个非对称视觉博弈环境构建，其核心由**线索阶段**与**决策阶段**两个策略模块、**角色优势估计（RAE）** 以及**迭代阶段控制器**组成。以下逐一解析各模块的机制与关键公式。
 
@@ -236,7 +240,9 @@ $$m_{t+1} = 0 \quad \text{if } m_t=1,\ (1-\overline{\text{acc}}_t \geq \tau_{\te
 
 与原始 GRPO 相比，Iterative-SPO 的交替训练策略大幅提升了数据效率。在相同硬件条件下，Vision-Zero 的训练效率较纯 GRPO 提升 **3.3× 至 6.4×**（Figure 7），且仅需 127 A100 小时即可完成训练（Table 3），远低于依赖人工标注数据的同类方法。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -307,7 +313,9 @@ Figure 2 以准确率变化量（$\Delta$ Accuracy）直观展示了这一优势
 ![[assets/figures/papers/paper_list_l41_https_openreview_net_forum_id_s00SNXREV6/figures/022_Table_7.jpg]]
 *Table 7: Performance comparison between Vision-Zero and other state-of-the-art models on Vision-Centric benchmarks. All models are evaluated using the open-source platform VLMEvalKit*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有VLM后训练范式的谱系关系
 
@@ -338,6 +346,8 @@ Vision-Zero的有效性建立在以下关键前提之上，这些前提同时也
 *   **向更丰富模态的扩展**：当前框架针对静态图像设计。如何重新设计游戏机制以支持**视频流、多图像上下文或三维场景**，是方法未来发展的关键方向。这需要定义新的观察空间、行动空间和奖励结构。
 
 *   **与对比式RLVR的关系**：**MiCo-7B** (Chen et al., 2025b) 等对比式RLVR方法通过对比学习增强视觉表示。Vision-Zero的博弈过程天然包含了细粒度的视觉比较，未来工作可探索将博弈中产生的对比信号显式化，以进一步提升视觉中心任务上的性能。
+
+
 
 ## 原文 PDF
 

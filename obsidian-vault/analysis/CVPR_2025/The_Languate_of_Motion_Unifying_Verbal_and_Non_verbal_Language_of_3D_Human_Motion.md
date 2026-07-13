@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/The_Languate_of_Motion_Unifying_Verbal_and_Non_verbal_Language_of_3D_Human_Motion.pdf
+project_link: null
+code_link: null
 aliases:
 - MLMMGU
 - LMUVNVL3HM
@@ -41,7 +43,7 @@ claims:
 > - BEATv2 上，FGD (↓), BC (↑), Diversity FGD 5.301, BC 7.780, Diversity 15.167 vs EMAGE (具体数值未在提取文本中出现，见Table 1) (优于所有现有方法，详见Table 1)。
 > - BEATv2 (Motion to Emotion) 上，Rouge Cider (↑), BertScore (↑) Rouge 26.67, BertScore 16.94 vs MotionGPT (Rouge 10.67, BertScore 2.31) (+16.00 (Rouge), +14.63 (BertScore))。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有3D人体运动生成模型多针对单一模态（语音、文本或运动）独立设计，难以利用多模态数据的互补性。这导致两个突出困境——在标注数据稀缺时性能急剧衰退，以及无法同时响应语音与文本的复合指令。该瓶颈的深层原因在于缺乏一个统一的表示框架，使口语（语音/文本）与非口语（身体运动）信号能在同一语义空间中交互。
 
@@ -59,7 +61,7 @@ claims:
 - 在数据极度稀缺场景下，完整模型始终优于无预训练消融方案和EMAGE，验证了预训练赋予的强运动先验（Figure 5）。
 - 模型解锁了从运动预测情绪等新任务，在此任务上远超MotionGPT（Rouge Cider 26.67 vs 10.67，BertScore 16.94 vs 2.31），而MotionGPT表现几乎与随机基线持平（Table 3）。
 
-## 背景与动机
+
 
 ### 3D人体运动生成中的模态割裂
 
@@ -83,7 +85,9 @@ claims:
 
 该框架以预训练Flan-T5 Base（220M参数）编码器-解码器Transformer为骨干，输入与输出均表示为统一多模态词汇表中的离散令牌，实现了“任意模态到任意模态”的灵活映射。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作将人体运动视为一种与口语和非口语信号共享统一词汇表的“语言”，并围绕这一理念构建了三个层次的关键创新，从根本上改变了多模态人体运动生成与理解的范式。
 
@@ -131,7 +135,7 @@ $$\mathcal{L}_{LM} = - \sum_{k=0}^{L_t-1} \log p_{\theta}(s_t^k | s_t^{<k}, s_i)
 
 三项创新构成一条清晰的因果链：**组合式分词**提供了细粒度的运动表示基础，**跨模态预训练**建立了空间、时间与语义的三维对齐，**预训练语言模型骨干**则赋予了系统语义推理与任务泛化的能力。这一设计使模型在BEATv2协同语音手势生成基准上显著超越现有最佳方法（包括EMAGE, Liu et al., CVPR 2024），并在数据稀缺和涌现任务上展现出传统方法无法比拟的鲁棒性。
 
-## 整体框架
+
 
 本文提出一种基于语言模型的多模态运动理解与生成框架，其核心思想是将3D人体运动视为一种“语言”，与语音和文本共享统一的多模态词汇表。框架整体遵循“分词—对齐—指令”三阶段流水线，如 Figure 2 所示。
 
@@ -162,7 +166,7 @@ $$\mathcal{L}_{LM} = - \sum_{k=0}^{L_t-1} \log p_{\theta}(s_t^k | s_t^{<k}, s_i)
 ![[assets/figures/papers/paper_list_l1867_The_Languate_of_Motion_Unifying_Verbal_and_Non_verbal_Language_of_3D_Hum/figures/001_Figure_1.jpg]]
 *Figure 1: We introduce a language-model-based motion understanding and generation framework that takes in any of the audio/motion/text modalities and outputs the desired target modality. Coupled with our generative pre-training strategy, our model demonstrates competitive performance on an array of tasks, showing promising signs toward unified verbal and non-verbal language of human motions*
 
-## 核心模块与公式推导
+
 
 ### 3.1 组合式身体运动 VQ-VAE 分词器
 
@@ -201,7 +205,9 @@ $$\mathcal{L}_{LM} = - \sum_{k=0}^{L_t-1} \log p_{\theta}(s_t^k | s_t^{<k}, s_i)
 ![[assets/figures/papers/paper_list_l1867_The_Languate_of_Motion_Unifying_Verbal_and_Non_verbal_Language_of_3D_Hum/figures/003_Figure_3.jpg]]
 *Figure 3: Illustration of pre-training. We pre-train our language model by translating one modality to another using paired data*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 4.1 协同语音手势生成主结果
 
@@ -261,7 +267,9 @@ $$\mathcal{L}_{LM} = - \sum_{k=0}^{L_t-1} \log p_{\theta}(s_t^k | s_t^{<k}, s_i)
 ![[assets/figures/papers/paper_list_l1867_The_Languate_of_Motion_Unifying_Verbal_and_Non_verbal_Language_of_3D_Hum/figures/005_Table_2.jpg]]
 *Table 2: Ablations of pre-training*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 
@@ -309,6 +317,8 @@ $$\mathcal{L}_{LM} = - \sum_{k=0}^{L_t-1} \log p_{\theta}(s_t^k | s_t^{<k}, s_i)
 
 **开放问题4：运动“语言”的语法结构**
 本文将运动视为语言，但未显式建模运动的“语法”（如手势的过渡规则、身体部位间的协调约束）。探索运动序列的层次化语法结构是否能进一步提升生成质量和可控性，是一个值得深入的方向。
+
+
 
 ## 原文 PDF
 

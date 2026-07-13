@@ -42,7 +42,7 @@ claims:
 > - Tanks & Temples (Truck scene) 上，Short-range RMSE↓ 0.021 (Stylos) vs 0.034 (StyleGaussian) (↓38.2%)。
 > - Tanks & Temples (all scenes avg.) 上，Long-range LPIPS↓ (relative) Stylos ranks 1st across all scenes vs Next best: StyleGaussian / G-Style (improves consistency by clear margin)。
 
-## 概述
+## 概要
 
 将任意艺术风格迁移至三维场景是视觉计算中的长期挑战。现有方法大多依赖**逐场景优化**或**预标定相机参数**，难以实现零样本泛化，且推理耗时通常在数十秒至分钟级，严重制约实时应用。Stylos 的核心主张是：**通过在预训练几何骨干之上解耦几何推理与风格注入，并引入三维体素风格损失，可以在单次前向传播中生成几何保真、多视图一致的风格化三维高斯场景**。
 
@@ -54,7 +54,7 @@ claims:
 
 Stylos 仍存在三类典型失效模式：对高频杂乱结构（浓密叶片、线状元素）的重建和风格化质量下降；强烈全局光照变化或极端调色板下出现过饱和或外观线索丢失；输入视图数显著增加时几何骨干不稳定导致风格化效果退化。这些局限性指向若干开放问题：如何增强对复杂几何结构的鲁棒性，视图数增加导致性能退化的根本机制，以及对素描、立体主义等极简风格类型的泛化能力。
 
-## 背景与动机
+
 
 三维场景风格化旨在将参考艺术图像的视觉特征（如笔触、色彩调性、纹理模式）迁移到三维内容表示上，生成可从任意新视角渲染的风格化结果。这一任务在数字艺术创作、虚拟现实内容生成和电影预可视化等领域具有广泛应用前景。近年来，以三维高斯泼溅（3D Gaussian Splatting, 3DGS）为代表的显式辐射场表示，凭借其高保真重建和实时渲染能力，已成为三维风格化的主流载体。
 
@@ -64,7 +64,9 @@ Stylos 仍存在三类典型失效模式：对高频杂乱结构（浓密叶片�
 
 Stylos正是在这一背景下提出的。其核心动机在于**打破"效率-一致性"的折衷**：通过将几何推理与风格注入解耦到共享Transformer骨干的不同路径中，并在三维体素空间施加跨视图一致的特征统计约束，实现在单次前向传播中同时达成实时推理速度与视图一致的风格化质量。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Stylos的核心创新在于将3D风格化从“逐场景优化”的范式转变为**单次前向、零样本泛化**的生成式框架，其关键在于两个相互协同的机制：**解耦的几何-风格注入架构**和**3D体素级风格损失**。
 
@@ -93,7 +95,7 @@ $$\mathcal{L}_{\mathrm{sty}}^{\mathrm{3D}} = \frac{1}{B} \sum_{b=1}^{B} \sum_{l=
 
 这一策略确保风格化过程不损害几何重建质量，是实现零样本泛化的关键工程支撑。
 
-## 整体框架
+
 
 Stylos 定义了一个条件映射，将多视图内容图像与一张风格参考图联合映射为风格化 3D 高斯场景与对应的相机参数：
 
@@ -144,7 +146,7 @@ $$\mathcal{L}_{\mathrm{stage2}} = \mathcal{L}_{\mathrm{rec}} + \lambda_{\mathrm{
 
 消融实验（Table 1, Figure 2）表明，Global CrossBlock 在重建质量上显著优于 Frame 和 Hybrid 变体——在 Pizza 场景上 PSNR 达到 20.57（Frame 为 19.72），且纹理边界更清晰。3D 体素风格损失（Table 2, Figure 3）在 ArtScore 上达到 9.15，远超图像级损失的 4.78，同时保持低短距 LPIPS（0.047），生成的纹理更干净且几何感更强。
 
-## 核心模块与公式推导
+
 
 Stylos 的核心设计围绕一个共享的 Transformer 骨干展开，通过两条路径分别处理几何推理与风格注入，最终在单次前向传播中输出风格化的 3D 高斯场景。其关键模块包括条件映射定义、风格聚合器（CrossBlock）以及 3D 体素风格损失。
 
@@ -196,7 +198,9 @@ Stylos 采用两阶段训练以保证结构感知的风格化：
 
   其中权重设置为 $\lambda_{\mathrm{style}}=1.0$、$\lambda_{\mathrm{cnt}}=0.1$、$\lambda_{\mathrm{clip}}=1.0$、$\lambda_{\mathrm{tv}}=10.0$，分别对应 3D 风格损失、内容损失、CLIP 损失和总变分正则项。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 消融实验：风格注入机制设计
 
@@ -293,7 +297,9 @@ Stylos的核心创新之一在于如何将风格信息注入几何推理骨干�
 ![[assets/figures/papers/paper_list_l34_https_openreview_net_forum_id_Ir0HMkRpYb/figures/007_Figure_3.jpg]]
 *Figure 3: Comparison of style losses on unseen donut, skateboard, and pizza scenes from the CO3D dataset. Both scene and 3D style losses yield cleaner stylized textures compared to image-level matching, while the 3D loss further conveys a stronger sense of 3D geometry. We encourage readers to Appendix Fig. 8-10 for more visual comparisons under varing scenes and styles*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 在3D风格化方法谱系中的位置
 
@@ -329,6 +335,8 @@ Table 2 显示，该损失将 ArtScore 从图像级损失的4.78提升至9.15，
 2. **视图扩展性**：输入视图数增加导致性能下降的根本机制是什么？能否通过增强几何骨干的训练视图多样性或适配训练策略来缓解？
 3. **风格泛化鲁棒性**：对完全不同的风格类型（如素描、立体主义、极简色彩）的泛化鲁棒性如何？当前评估主要基于 WikiArt 数据集的艺术风格，极端抽象风格的测试尚不充分。
 4. **动态场景扩展**：是否可以将该方法扩展到动态场景或视频输入，同时保持一致性和效率？这需要在时序维度上扩展当前的3D体素风格损失和 CrossBlock 设计。
+
+
 
 ## 原文 PDF
 

@@ -42,7 +42,7 @@ claims:
 > - GCG (Advbench) on LLaVA-7B 上，ASR (%) 0.00 vs 62.00 (Original) (-62.00)。
 > - AutoDAN (Advbench) on LLaVA-7B 上，ASR (%) 1.00 vs 89.00 (Original) (-88.00)。
 
-## 概述
+## 概要
 
 多模态大语言模型（MLLM）在安全对齐后仍面临严峻的越狱攻击威胁。如图 1 所示，现有安全微调方法（如 **VLGuard**，Zong et al., 2024）虽能抵御黑盒攻击（Fig-Step），却在白盒攻击下暴露出严重脆弱性：攻击者可通过同时注入图像对抗扰动（ImgJP）与文本对抗后缀（GCG），轻易绕过安全防线。这一瓶颈的根源在于，现有防御仅在像素或离散 token 层面做一次性微调，缺乏对跨模态联合对抗扰动的结构化抵抗能力。
 
@@ -50,7 +50,7 @@ SAFEMLLM 的核心洞察是**首次将对抗训练范式引入 MLLM 的安全防
 
 实验证据充分支撑了方法的有效性。在 LLaVA-7B 上，VLGuard 对 ImgJP 和 GCG 白盒攻击的攻击成功率（ASR）分别高达 88% 和 79%，而 SAFEMLLM 将二者分别压降至 6% 和 0%（Table 1）。综合六种攻击方法与六个 MLLM 的结果，SAFEMLLM 对 GCG 攻击的平均 ASR 为 0.00%，对 AutoDAN 攻击的平均 ASR 仅为 0.17%，在所有设定下均显著优于原始模型及现有基线。消融实验进一步揭示，对比损失是鲁棒性提升的关键组件——移除后平均 ASR 上升 13.67%——而效用损失则有效防止了模型在良性任务上的过拒答。
 
-## 背景与动机
+
 
 ### 多模态大语言模型的安全挑战
 
@@ -68,7 +68,9 @@ Figure 1 直观展示了这一脆弱性：**VLGuard** 经过安全微调后，�
 
 本文的核心动机在于：**首次将对抗训练框架引入 MLLM 的安全防御**，通过交替进行攻击生成与模型更新，使模型在训练过程中持续接触并学习抵抗最强的跨模态攻击，从根本上提升其对越狱攻击的免疫力。同时，防御过程必须兼顾良性任务的通用能力，避免模型因过度防御而出现“过拒答”问题。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SAFEMLLM 的核心创新在于首次将**对抗训练框架**系统性地引入多模态大语言模型的安全防御，并在**扰动层级**、**训练范式**和**攻击/防御目标函数**三个关键维度上实现了对现有方案的突破。
 
@@ -101,7 +103,7 @@ $$L_{\mathrm{adv}}^{\mathrm{contra}} = - \sum_{n=1}^{N} \log \sigma \bigg[ \log 
 - **移除效用损失**后，良性问答的 GPT 评分显著下降（最大降幅 5.37 分），表明效用约束有效防止了模型的过拒答行为。
 - **仅使用对比损失而缺少目标损失**时，模型在训练过程中会生成乱码，无法产生连贯的安全回复，说明目标损失与对比损失的协同是必要的。
 
-## 整体框架
+
 
 SAFEMLLM 的整体设计遵循**交替对抗训练**范式，在每一个训练迭代中依次执行两个核心步骤：**CoE-Attack（Step I）** 与 **Model Updating（Step II）**。如 Figure 2 所示，这一双步循环构成了模型安全防御能力持续增强的内在驱动力。
 
@@ -145,7 +147,7 @@ SAFEMLLM 的整体设计遵循**交替对抗训练**范式，在每一个训练�
 
 这一交替训练框架的核心优势在于：攻击步持续“发现”模型嵌入空间的脆弱区域，防御步则针对性地“修补”这些区域，形成动态博弈，使模型在面对白盒多模态越狱攻击时具备显著增强的鲁棒性。消融实验（Table 2）证实，移除对比损失将导致平均 ASR 上升 13.67%，而移除效用损失则使良性问答的 GPT 评分下降高达 5.37 分，验证了各模块在框架中的不可替代性。
 
-## 核心模块与公式推导
+
 
 SAFEMLLM 的核心由两个交替迭代的步骤构成：**对比嵌入攻击（CoE-Attack，Step I）** 与 **模型参数更新（Step II）**。前者在固定模型参数的条件下，于 token 嵌入层级生成跨模态对抗噪声；后者固定该噪声，通过防御损失与效用损失的联合优化来更新模型的 LoRA 参数，从而在抵御越狱攻击的同时保持良性任务的通用能力（Figure 2）。
 
@@ -204,7 +206,9 @@ $$L_{\mathrm{utility}} = - \sum_{j=1}^{H} \log \left[ p( \mathbf{y}_j | \mathbf{
 ![[assets/figures/papers/paper_list_l791_https_arxiv_org_abs_2502_00653/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of the vulnerability of existing safety-tuning methods compared with our model SAFEMLLM. The defender first fine-tunes the original MLLM in step 1. The attackers then attack the finetuned MLLMs in step 2 in different ways. In step 3, the fine-tuned MLLMs generate outputs. Details of the experiment settings can be found in Section 4*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 白盒越狱攻击下的防御有效性
 
@@ -278,7 +282,9 @@ SAFEMLLM 在六种具有代表性的越狱攻击方法和六个主流 MLLM 上�
 ![[assets/figures/papers/paper_list_l791_https_arxiv_org_abs_2502_00653/figures/020_Figure_12.jpg]]
 *Figure 12: Responses from LLaVA-13B after the AutoDAN attack. We skip the image input for a more efficient implementation. The attack injects adversarial text strings into toxic requests. It is a white-box attack method*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 防御范式定位：从静态微调到动态对抗训练
 
@@ -320,6 +326,8 @@ SAFEMLLM 的技术组件在以下维度上呈现出继承与创新的交织：
 3. **计算效率优化**：能否通过攻击步的早停策略、防御步的梯度累积或模型量化等手段，在保持防御性能的同时显著降低训练和推理开销？
 4. **自适应攻击的鲁棒性**：当攻击者也采用类似的对抗训练策略（如针对防御模型的梯度进行攻击优化）时，SAFEMLLM 的防御是否依然有效？这需要构建更强的威胁模型进行验证。
 5. **过拒答的精确控制**：消融实验（Table 2）已证实效用损失 $L_{utility}$ 对维持良性任务性能至关重要，但如何精确调控安全性与有用性之间的权衡，避免模型在边界模糊的查询上过度拒答，仍是一个开放的系统性问题。
+
+
 
 ## 原文 PDF
 

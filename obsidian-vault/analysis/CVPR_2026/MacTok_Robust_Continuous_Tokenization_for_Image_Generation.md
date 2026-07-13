@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/MacTok_Robust_Continuous_Tokenization_for_Image_Generation.pdf
+project_link: null
+code_link: null
 aliases:
 - MacTok
 tags:
@@ -41,7 +43,7 @@ claims:
 > - ImageNet 512×512 conditional generation 上，gFID (w/ CFG) 1.52 (MacTok-128 + SiT-XL) vs 2.62 (SiT-XL/2 with SD-VAE, 4096 tokens) (-1.10)。
 > - ImageNet 256×256 reconstruction 上，rFID 0.43 (MacTok-128) vs 0.62 (SiT-XL/2 tokenizer, 1024 tokens) (-0.19)。
 
-## 概述
+## 概要
 
 图像生成模型在追求极致压缩效率时面临一个根本性瓶颈：当连续分词器将图像压缩至极少量隐 token 时，KL-VAE 极易发生后验坍塌（posterior collapse）——编码器输出的隐变量退化为无信息的高斯先验，丧失对判别性特征的保留能力，导致重建和生成质量急剧下降。这一问题严重制约了高压缩比下生成模型的性能上限。
 
@@ -49,7 +51,7 @@ MacTok 针对上述瓶颈提出了一个简洁而有效的解决方案。其核�
 
 实验结果表明，MacTok 在极端压缩条件下取得了显著突破。在 ImageNet 256×256 条件生成任务上，MacTok-128 配合 SiT-XL 仅需 128 个 token 即达到 gFID 1.44（w/ CFG），优于使用 1024 token 的 SD-VAE 基线（gFID 2.06）；在 512×512 分辨率上，MacTok-128 以 128 token 实现 gFID 1.52（w/ CFG），较 SD-VAE 的 4096 token 方案（gFID 2.62）提升 1.10，同时 token 用量减少最高达 64 倍。消融实验进一步证实，仅图像 token 掩码（而非隐 token 掩码）能持久防止后验坍塌，且随机掩码与语义掩码的等概率混合在所有配置中取得最优生成质量。
 
-## 背景与动机
+
 
 ### 连续分词中的后验坍塌困境
 
@@ -77,7 +79,9 @@ MacTok的提出源于一个关键洞察：**后验坍塌的本质是信息瓶颈
 
 这两个机制协同作用：掩码重建创造了信息保留的“刚需”，而语义掩码和表示对齐则确保保留的信息是语义有意义的。最终，MacTok在仅使用128个token（相比SD-VAE的1024个token减少8倍）的情况下，在ImageNet 256×256上实现gFID 1.44（w/ CFG），在512×512上实现gFID 1.52（w/ CFG），达到当时最优水平。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MacTok 的核心创新在于通过**信息不对称的掩码重建**与**结构化表示对齐**双机制，从根本上解决了连续分词器在强压缩下的后验坍塌（posterior collapse）问题。与简单增大模型或调整损失权重的传统思路不同，MacTok 将解决路径重新定位在编码器输入端的信息约束和隐空间的结构化上。
 
@@ -103,7 +107,7 @@ MacTok 属于连续分词器（continuous tokenizer）家族，其基线包括 *
 
 **需要手动验证**：文中未提供 MacTok 在更大 token 数（如 256、512）下的性能表现，因此该方法在弱压缩场景下的优势尚不明确。此外，随机掩码与语义掩码的最优混合比例（50%）是否跨数据集泛化，仍需进一步实验确认。
 
-## 整体框架
+
 
 MacTok 的整体框架围绕一个核心矛盾展开：**如何让一个强压缩的连续分词器在仅有极少量隐 token 的情况下，仍然保留足够的判别性信息，从而避免后验坍塌。** 其解决方案由三条相互协同的技术路径构成——输入端的图像掩码、隐空间端的表示对齐，以及输出端的辅助监督——共同形成一个从“信息不对称”到“语义结构化”的完整闭环。
 
@@ -160,7 +164,7 @@ $$L = L_{\mathrm{recon}} + \lambda_{1} L_{\mathrm{percep}} + \lambda_{2} L_{\mat
 
 2. **表示对齐 → 隐空间结构化 → 压缩下的语义保真**：通过将隐空间与 DINOv2 的语义空间对齐，即使 token 数极少（如 64 或 128），隐变量仍能保留类别级别的判别性信息，这一点由线性探测准确率随训练持续提升所验证（Figure 6）。
 
-## 核心模块与公式推导
+
 
 MacTok 的核心架构由 **ViT 编码器-解码器**、**双重掩码策略**、**表示对齐模块**和**辅助监督**四大组件构成（Figure 4），其设计目标是在极低 token 数（64/128）下防止后验坍塌，同时保持隐空间的语义结构。
 
@@ -229,7 +233,9 @@ $$L = L_{\mathrm{recon}} + \lambda_{1} L_{\mathrm{percep}} + \lambda_{2} L_{\mat
 ![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2603_29634/figures/010_Figure_5.jpg]]
 *Figure 5: Visualization of latent space from (a) Collapsed; (b) MacTok-128 trained without representation alignment; (c) MacTok-128*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈：后验坍塌与压缩困境
 
@@ -306,7 +312,9 @@ Figure 5 的可视化表明，无表示对齐的 MacTok 隐空间结构较差，
 ![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2603_29634/figures/013_Figure_7.jpg]]
 *Figure 7: Comparison of different masking strategies of the KL loss curve*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -343,6 +351,8 @@ MacTok 的设计和验证主要集中在以下条件下：
 4. **更大规模验证**：在更高分辨率（如 1024×1024）和更大规模数据集（如 LAION-5B）上，MacTok 的掩码策略是否仍然有效？压缩率与语义保真度的权衡曲线如何变化？
 
 5. **表示对齐的替代方案**：除 DINOv2 外，CLIP、SigLIP 等多模态模型的特征空间是否更适合作为对齐目标？多模态对齐能否进一步提升生成多样性？
+
+
 
 ## 原文 PDF
 

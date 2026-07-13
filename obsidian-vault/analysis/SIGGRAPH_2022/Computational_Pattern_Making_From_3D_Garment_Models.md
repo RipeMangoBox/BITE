@@ -33,7 +33,7 @@ claims:
 | 中文题名 | 从三维服装模型自动生成计算缝纫纸样 |
 | 英文题名 | Computational Pattern Making From 3D Garment Models |
 | 会议/期刊 | SIGGRAPH 2022 |
-| Links | [paper](https://arxiv.org/abs/2202.10272) · [arXiv](https://arxiv.org/abs/2108.10842) · [Project](https://optitex.com) |
+| Links | [paper](https://arxiv.org/abs/2202.10272) · [paper](https://arxiv.org/abs/2108.10842) · [Project](https://optitex.com) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Computational Pattern Making Pipeline |
 | Dataset | Tight-fitting dress on scanned body, Example pattern, Shirt model |

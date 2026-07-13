@@ -42,7 +42,7 @@ claims:
 > - Real-world manipulation: Bowl stacking 上，Success Rate (%) 60 vs 20 (+40)。
 > - Real-world manipulation: Pivoting 上，Success Rate (%) 40 vs 0 (+40)。
 
-## 概述
+## 概要
 
 机器人操控任务中，视觉语言模型（VLM）虽展现出强大的语义理解与规划能力，却普遍缺乏对物理动力学的认知——它们无法预测动作执行后的物理结果，导致在需要精细物理推理的任务上频繁失败。这一瓶颈的本质在于：VLM 的推理仅建立在语言和图像的语义关联之上，缺少一个可交互的物理世界模型作为 grounding。
 
@@ -52,7 +52,7 @@ SIMPACT 的核心洞察是：**在测试时，通过从单张 RGB-D 图像自动
 
 方法的主要局限在于：单视图 3D 重建引入的感知误差、仿真与现实的动力学偏差、以及依赖商业 VLM 带来的高推理延迟（总计超过 5 分钟），限制了其在实时场景中的直接部署。尽管如此，SIMPACT 开创性地展示了“仿真赋能 VLM 测试时推理”这一范式的潜力，为零样本物理感知规划提供了可扩展的技术路径。
 
-## 背景与动机
+
 
 ### 机器人操控中的物理推理瓶颈
 
@@ -82,7 +82,9 @@ SIMPACT 的核心洞察是：**在测试时，通过从单张 RGB-D 图像自动
 
 这一“仿真赋能 VLM”的范式，将物理推理从模型内部不可学习的黑箱，转化为外部可操作、可观察的显式反馈循环，为解决精细操控任务中的物理推理瓶颈提供了新路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：VLM 缺乏物理动力学认知
 
@@ -135,7 +137,7 @@ Baseline 方法无迭代优化或仅进行内部验证。SIMPACT 的优化器具
 
 SIMPACT 的物理 grounding 依赖于仿真与真实世界的一致性。Figure 12 的分析表明，在所有 100 个测试样本中，仿真与真实世界的结果匹配率达到 **89%**（同为成功或同为失败），11% 的案例为仿真成功但真实失败（sim-success/real-fail），未出现仿真失败但真实成功的情况。这一结果表明仿真器在大多数情况下能够可靠地预测物理结果，为 VLM 的物理推理提供了可信的 grounding 基础。
 
-## 整体框架
+
 
 SIMPACT 是一个**零样本机器人操控动作规划框架**，其核心输入为单张 RGB‑D 图像 $I_0$ 与自然语言任务指令 $\ell_{\mathrm{task}}$，输出为一组机器人末端执行器动作序列 $\mathbf{a} = \{a_t\}_{1 \leq t \leq T}$，其中每个动作 $a_t \in \mathrm{SE}(3) \times \mathbb{R}$ 定义了末端执行器的 6‑DoF 位姿与夹爪开合宽度（见 Fig. 1 与 Fig. 3 总览）。
 
@@ -182,7 +184,7 @@ SIMPACT 是一个**零样本机器人操控动作规划框架**，其核心输�
 ![[assets/figures/papers/paper_list_l2417_https_arxiv_org_abs_2512_05955/figures/020_Figure_15.jpg]]
 *Figure 15: Replanning illustration. After initial failed execution, we perform re-planning after simulation update leading to successful completion*
 
-## 核心模块与公式推导
+
 
 SIMPACT 的核心由一个**仿真构建管线**和一个基于 VLM 的**迭代动作规划循环**构成。前者从单张 RGB-D 图像自动实例化物理世界模型，后者利用该模型进行测试时的物理推理与动作优化。
 
@@ -237,7 +239,9 @@ $$\mathrm{TASKSUCCESS}(\mathbf{s}^k) = \mathbf{VLM}(I_T^k, s_T^k, \ell_{\mathrm{
 ![[assets/figures/papers/paper_list_l2417_https_arxiv_org_abs_2512_05955/figures/002_Figure_2.jpg]]
 *Figure 2: Simulation construction from a single RGBD image. Given an RGB-D image and a language task description, our pipeline automatically generates either a mesh-based simulation (top) for rigid objects or a particle-based simulation (bottom) for deformables. After segmenting objects-of-interest via GroundedSAM2 [55], we reconstruct either the 3D shape, scale, and pose of the object for rigidbody simulation, or perform dense sampling of particles within the volumes between the object surface and the table for the particle-based simulation pipeline. In both cases, we prompt the VLM to infer the relevant physical parameters required for simulation*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：物理仿真的上下文反馈带来显著性能提升
 
@@ -303,7 +307,9 @@ VLM 估计的物理参数表现出低方差和合理范围（Table 6）：质量
 ![[assets/figures/papers/paper_list_l2417_https_arxiv_org_abs_2512_05955/figures/004_Figure_4.jpg]]
 *Figure 4: Action optimization process. We show a representative example from the non-toppling push task. The left three images show simulation rollouts from initial VLM-sampled action sequence proposals, all of which fail due to insufficient/overshooting push, or because the bottle topples. From these proposals, the VLM optimizer reasons a non-trivial action update that pushes the bottle for the correct distance without toppling in both simulation and real-world execution*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心差异点：物理推理的引入
 
@@ -356,6 +362,8 @@ SIMPACT 的仿真构建依赖从单张 RGB-D 图像进行分割、3D 重建和�
 5. **闭环重规划与学习**：Figure 15 展示了初步的重规划能力，但能否将真实世界的执行结果系统性地反馈到仿真模型和 VLM 优化器中，形成持续改进的闭环系统？
 
 6. **物理参数估计的主动校准**：当前 VLM 估计的物理参数具有低方差（质量 1.033±0.0015 kg，Table 6），但在极端参数下性能下降。能否通过主动探索和系统辨识来校准这些参数？
+
+
 
 ## 原文 PDF
 

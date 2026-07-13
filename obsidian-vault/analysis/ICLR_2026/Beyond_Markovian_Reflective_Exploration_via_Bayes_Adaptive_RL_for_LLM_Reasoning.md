@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Beyond_Markovian_Reflective_Exploration_via_Bayes_Adaptive_RL_for_LLM_Reasoning.pdf
+project_link: null
+code_link: https://github.com/shenao-zhang/BARL
 openreview_forum_id: vuyk1fSaE4
 aliases:
 - BBARLR
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 超越马尔可夫性：基于贝叶斯自适应强化学习的LLM推理反思探索 |
 | 英文题名 | Beyond Markovian: Reflective Exploration via Bayes-Adaptive RL for LLM Reasoning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=vuyk1fSaE4); [GitHub](https://github.com/shenao-zhang/BARL) |
+| Links | [paper](https://openreview.net/forum?id=vuyk1fSaE4) · [GitHub](https://github.com/shenao-zhang/BARL) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | BARL (Bayes-Adaptive RL for LLM Reasoning) |
 | Dataset | Average across GSM8K, MATH, CollegeMath, Olympiad, AIME 2024, AMC 2023 (Qwen2.5-Math-1.5B), Average across benchmarks (Qwen2.5-Math-7B), Average across benchmarks (R1-Distill-Llama-8B), Token Efficiency (Qwen2.5-Math-1.5B) |
@@ -42,7 +44,7 @@ claims:
 > - Average across benchmarks (Qwen2.5-Math-7B) 上，Accuracy (%) 为 59.4，对比 57.1 (GRPO)，变化 +2.3。
 > - Average across benchmarks (R1-Distill-Llama-8B) 上，Accuracy (%) 为 52.7，对比 52.1 (GRPO)，变化 +0.6。
 
-## 概述
+## 概要
 
 当前将强化学习（RL）应用于大语言模型（LLM）推理的主流范式存在一个根本性瓶颈：传统RL训练得到的马尔可夫策略无法产生**反思性探索**（reflective exploration）。这是因为策略仅通过当前状态依赖历史，一旦训练完成便缺乏在相同状态下主动收集额外上下文的动机——探索仅在训练期间以试错方式进行，部署时没有探索激励，因此无法保证反思行为的涌现，也无法从原理上解释其何时有益。
 
@@ -52,7 +54,7 @@ claims:
 
 实验上，BARL在多个数学推理基准（GSM8K、MATH、CollegeMath、Olympiad、AIME 2024、AMC 2023）和三种模型规模（Qwen2.5-Math-1.5B/7B、R1-Distill-Llama-8B）上一致优于GRPO和进度奖励基线（Table 1），同时使用显著更少的令牌——平均比GRPO少约2倍，比进度奖励基线少约1.63倍，比基础模型少10倍以上（Figure 5）。消融实验进一步表明，反思频率与模型性能并无强相关性；BARL的优势源于更有效的探索和利用，体现在其思维链具有更高的贝叶斯状态-动作值（Figure 6, Figure 7）。在合成的迁移任务中，传统RL记忆训练解但无法泛化，而BARL通过假设消除成功发现真实MDP（Figure 4），验证了贝叶斯框架的泛化能力。
 
-## 背景与动机
+
 
 ### 马尔可夫策略的反思盲区
 
@@ -82,7 +84,9 @@ BARL的核心洞察在于：当模型内部信念（对候选答案的概率估�
 
 BARL通过将优化目标替换为贝叶斯期望回报、将值函数替换为后验加权Q值、将奖励信号扩展为进度奖励加结果奖励，系统性地填补了上述缺口。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：马尔可夫策略为何无法产生反思
 
@@ -141,7 +145,7 @@ BARL的核心pipeline由三个模块构成：
 
 BARL的创新不在于引入反思机制本身，而在于**将反思探索嵌入贝叶斯RL框架，为"何时反思"和"如何切换策略"提供了原则性答案**。传统方法通过提示工程或奖励塑形鼓励反思，但缺乏理论保证；BARL通过维持MDP假设的后验分布，使反思行为作为信念更新的自然产物涌现——当累积奖励与当前假设的预测不一致时，奖励一致性惩罚自动降低该假设权重，驱动策略探索替代方案。Figure 7的消融实验证实，BARL模型的思维链具有一致更高的贝叶斯状态-动作值，表明其探索和利用均更有效。
 
-## 整体框架
+
 
 BARL 将 LLM 推理的反思探索重构为贝叶斯自适应强化学习问题。其核心 pipeline 由三个模块串联构成，形成一个从候选答案采样到后验加权值估计再到策略梯度更新的闭环。
 
@@ -162,7 +166,7 @@ $$\nabla_{\theta} \mathcal{I} = \mathbb{E}_{s_0, \pi_\theta} \left[ \sum_{t=0}^{
 
 **输入输出流**：整个流程以提示 $s_0$ 为输入，经过策略自回归生成思维链 $a_0, a_1, \dots, a_{T-1}$，每一步的生成由后验加权值引导。训练时，进度奖励 $r(s_t, a_t)$ 由冻结的奖励模型 $\pi_\phi$ 计算正确答案概率的增量得到（公式 3.2），结果奖励由最终答案验证器提供。输出为经过贝叶斯 RL 微调的 LLM 策略 $\pi_\theta$，其在推理时能根据观察到的中间结果动态调整策略，实现假设消除驱动的反思探索。
 
-## 核心模块与公式推导
+
 
 ### 3.1 贝叶斯自适应RL目标
 
@@ -217,7 +221,9 @@ BARL的训练循环（Algorithm 1）包含三个核心模块：
 
 3. **策略梯度更新**：以后验加权Q值为回归目标，通过策略梯度公式(5.1)更新LLM参数 $\theta$。这一更新机制使模型内化奖励预测和信念更新，从而在推理时自主进行策略拼接与切换。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 
@@ -280,7 +286,9 @@ BARL在多个数学推理基准和模型规模上一致优于GRPO和进度奖励
 
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题根源：马尔可夫策略的反思盲区
 
@@ -335,6 +343,8 @@ $$\mathcal{I}(\pi) = \mathbb{E}_{\mathcal{M} \sim p(\mathcal{M}|\mathcal{D})} \l
 4. **规模化挑战**：在更大规模的模型和数据集上，使用有限候选集（$|\mathcal{M}|=5$）近似贝叶斯后验是否仍然高效？后验坍塌或候选集代表性不足的风险如何量化？
 
 5. **与搜索方法的融合**：BARL通过信念更新实现策略切换，本质上是一种内化的搜索机制。它与显式搜索方法（如树搜索、束搜索）之间是否存在互补性或替代关系？论文未对此进行讨论。
+
+
 
 ## 原文 PDF
 

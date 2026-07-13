@@ -5,6 +5,8 @@ paper_level: A
 venue: SIGGRAPH
 year: 2024
 pdf_ref: paperPDFs/SIGGRAPH_2024/MotionCtrl_A_Unified_and_Flexible_Motion_Controller_for_Video_Generation.pdf
+project_link: https://wzhouxiff.github.io/projects/MotionCtrl/
+code_link: https://github.com/TencentARC/MotionCtrl
 aliases:
 - MotionCtrl
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名    | MotionCtrl：统一且灵活的视频生成运动控制器                                                                                                                             |
 | 英文题名    | MotionCtrl: A Unified and Flexible Motion Controller for Video Generation                                                                              |
 | 会议/期刊   | SIGGRAPH 2024                                                                                                                                          |
-| Links   | [paper](https://arxiv.org/abs/2312.03641) [project](https://wzhouxiff.github.io/projects/MotionCtrl/) [code](https://github.com/TencentARC/MotionCtrl) |
+| Links   | [paper](https://arxiv.org/abs/2312.03641) · [project](https://wzhouxiff.github.io/projects/MotionCtrl/) · [code](https://github.com/TencentARC/MotionCtrl) |
 | Topic   | #SIGGRAPH_2024 #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl                                     |
 | Method  | MotionCtrl                                                                                                                                             |
 | Dataset | Camera Motion Control (Basic Poses), Camera Motion Control (Complex Poses), Object Motion Control, Video Quality (FVD)                                 |
@@ -40,7 +42,7 @@ claims:
 > - Camera Motion Control (Complex Poses) 上，CamMC ↓ 为 0.0735，对比 0.0950 (VideoComposer)，变化 -0.0215。
 > - Object Motion Control 上，ObjMC ↓ 为 28.877，对比 36.8351 (VideoComposer)，变化 -7.9581。
 
-## 概述
+## 概要
 
 视频生成领域长期面临一个核心瓶颈：**现有方法无法明确区分并独立控制全局相机运动与局部物体运动**。相机运动表现为跨帧的整体场景变换，而物体运动则是局部区域的空间位移，二者的物理本质截然不同，但以往工作（如 **AnimateDiff** (Guo et al., 2023) 使用多个独立 LoRA 控制基本相机运动，**VideoComposer** (Wang et al., 2023) 使用密集运动向量统一处理）均未实现有效的解耦控制，导致运动控制的粒度不足，难以灵活组合。
 
@@ -49,8 +51,6 @@ claims:
 - **Object Motion Control Module (OMCM)**：将物体稀疏轨迹的多尺度特征集成到 LVDM 的卷积层中，控制局部物体运动。
 
 为克服单一数据集缺乏完整标注（文本描述、相机姿态、物体轨迹）的困难，MotionCtrl 采用多步训练策略：在 RealEstate10K 上训练 CMCM，在 WebVid 上以密集轨迹预训练、稀疏轨迹微调 OMCM。实验表明，MotionCtrl 在相机运动控制（CamMC 误差从 0.9010 降至 0.0289）和物体运动控制（ObjMC 误差 28.877，优于 VideoComposer 的 36.8351）上均显著优于现有方法，同时保持与原始 LVDM 相当的视频生成质量（FVD 852.15 vs. 1004.99）。用户研究进一步确认，超过 90% 的参与者在质量、文本相似度和运动相似度上偏好 MotionCtrl。
-
-## 背景与动机
 
 视频生成领域近年来取得了显著进展，以扩散模型为基础的生成框架（如 LVDM/VideoCrafter1，He et al., 2022）已能产出时序连贯的视频内容。然而，对生成视频的运动进行精细控制仍然是一个核心瓶颈。现有工作要么将运动控制视为一个整体问题，要么仅关注某一种运动维度，导致控制粒度不足。
 
@@ -66,7 +66,7 @@ claims:
 
 上述缺口共同构成了一个清晰的研究动机：**设计一个统一且灵活的运动控制器，能够在一个模型中解耦并独立控制相机运动与物体运动，同时克服数据缺失带来的训练挑战。** 这正是 MotionCtrl 的核心目标。
 
-## 核心创新
+## 核心方法与创新机理
 
 MotionCtrl 的核心创新在于将视频生成中的运动控制解耦为两个正交维度——**全局相机运动**与**局部物体运动**——并针对各自运动属性的本质差异，设计了结构上相互独立、功能上可灵活组合的控制模块。
 
@@ -99,8 +99,6 @@ OMCM 的另一关键创新在于**训练策略**：先使用 **ParticleSfM** 从
 ### 创新总结
 
 MotionCtrl 的三项核心 changed slots 构成一个完整的创新体系：**CMCM 的时序集成位置**解决了相机运动的全局控制问题，**OMCM 的空间集成位置与稀疏轨迹训练策略**解决了物体运动的局部控制问题，**多步解耦训练策略**解决了数据缺失下的模型训练问题。三者共同实现了统一模型内相机运动与物体运动的独立、灵活、精准控制。
-
-## 整体框架
 
 ![[assets/figures/papers/paper_list_l28_MotionCtrl_A_Unified_and_Flexible_Motion_Controller_for_Video_Generation/figures/002_Figure_2.jpg]]
 *Figure 2: MotionCtrl Framework. MotionCtrl extends the Denoising U-Net structure of LVDM with a Camera Motion Control Module (CMCM) and an Object Motion Control Module (OMCM). As illustrated in (b), the CMCM integrates camera pose sequences 𝑅𝑇 with LVDM’s temporal transformers by appending 𝑅𝑇 to the input of the second self-attention module and applying a tailored and lightweight fully connected layer to extract the camera pose feature for subsequent processing. The OMCM utilizes convolutional layers and downsamplings to derive multi-scale features from T r a j s , which are spatially incorporated into LVDM’s convolutional layers to direct object motion. Further given a text prompt, LVDM generates vi...*
@@ -145,8 +143,6 @@ MotionCtrl 的整体 pipeline 如 Figure 2 所示，两个控制模块以“即�
 - **CMCM 集成位置**：消融实验（Table 2）证实，将 CMCM 集成到 LVDM 的时序 Transformer 中，相机运动控制误差 CamMC 从 0.9010 降至 0.0289，显著优于集成到时间嵌入、空间交叉注意力或空间自注意力模块的方案。
 - **OMCM 训练方式**：先密集轨迹预训练、再稀疏轨迹微调的策略，使得物体运动控制误差 ObjMC 达到 25.1198，优于仅使用密集或稀疏轨迹训练（Table 3），且能泛化至推理时仅提供稀疏轨迹的场景。
 - **轨迹表示**：采用帧间相对位移而非绝对坐标，使 OMCM 能够显式感知运动速度，提升对稀疏轨迹的跟随精度。
-
-## 核心模块与公式推导
 
 MotionCtrl 的核心设计在于将相机运动与物体运动解耦，并通过两个独立模块分别作用于视频扩散模型的不同组件。其底层生成模型为 **LVDM**（He et al., 2022），MotionCtrl 在冻结的 LVDM 降噪 U-Net 上插入适配模块，仅训练新增参数。
 
@@ -204,7 +200,7 @@ MotionCtrl 采用**多步训练策略**：
 
 消融实验表明，先 CMCM 后 OMCM 的顺序训练比同时训练或反向顺序训练更能保持生成质量和运动控制精度（Section 4.3.3）。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心瓶颈与评估逻辑
 
@@ -264,27 +260,10 @@ MotionCtrl 在相机运动控制和物体运动控制上均显著优于现有方
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l28_MotionCtrl_A_Unified_and_Flexible_Motion_Controller_for_Video_Generation/figures/001_Figure.jpg]]
-
 ![[assets/figures/papers/paper_list_l28_MotionCtrl_A_Unified_and_Flexible_Motion_Controller_for_Video_Generation/figures/004_Figure_4.jpg]]
 *Figure 4: Qualitative Comparisons on Camera Motion Control. (a) Basic Poses: MotionCtrl and AnimateDi [Guo et al. 2023] e ectively execute zooms, but MotionCtrl can adjust to varying camera moving speeds. (b) Relatively Complex Poses: Video-Composer[Wang et al. 2023] uses Realestate10K’s raw video for motion vectors, capturing unintended shapes like doors, leading to unnatural results (refer to frame 12). MotionCtrl, however, produces a relatively natural video with motion that closely matches the camera poses*
 
-![[assets/figures/papers/paper_list_l28_MotionCtrl_A_Unified_and_Flexible_Motion_Controller_for_Video_Generation/figures/011_Figure.jpg]]
-*Figure: Prompt: Two zebras*
-
-![[assets/figures/papers/paper_list_l28_MotionCtrl_A_Unified_and_Flexible_Motion_Controller_for_Video_Generation/figures/012_Figure_8.jpg]]
-*Figure 8: More results of MotionCtrl include those controlled by camera poses or object trajectories independently, as well as those controlled with camera poses and object trajectories simultaneously*
-
-![[assets/figures/papers/paper_list_l28_MotionCtrl_A_Unified_and_Flexible_Motion_Controller_for_Video_Generation/figures/013_Figure_9.jpg]]
-*Figure 9: Results of complex camera motion control deployed on AnimateDi [Guo et al. 2023]*
-
-![[assets/figures/papers/paper_list_l28_MotionCtrl_A_Unified_and_Flexible_Motion_Controller_for_Video_Generation/figures/020_Figure.jpg]]
-*Figure: Prompt: A cute cat lying on the floor. Prompt: A temple on the mountain*
-
-![[assets/figures/papers/paper_list_l28_MotionCtrl_A_Unified_and_Flexible_Motion_Controller_for_Video_Generation/figures/024_Figure.jpg]]
-*Figure: Prompt: A chime in the wind. Prompt: A sunflower in the wind. Prompt: A paper plane floating in the sky. Prompt: A leaf floating in the sky. Prompt: Two zebras*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 与基线方法的关系
 

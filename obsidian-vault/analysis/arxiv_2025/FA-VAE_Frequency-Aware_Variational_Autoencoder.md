@@ -41,7 +41,7 @@ claims:
 > - ImageNet 256×256 (reconstruction) 上，Reconstruction Loss (MSE) 0.0044 (FA-VAE) vs 0.0105 (VA-VAE) (-0.0061)；LPIPS 0.0940 (FA-VAE) vs 0.0975 (VA-VAE) (-0.0035)；rFID 0.4156 (FA-VAE) vs 0.4884 (VA-VAE) (-0.0728)。
 > - ImageNet 256×256 (generation w/ CFG) 上，gFID 1.32 (LightningDiT + FA-VAE) vs 1.55 (MAR with KL-VAE; no direct LightningDiT+VA-VAE reported) (-0.23)。
 
-## 概述
+## 概要
 
 现有潜变量生成模型（如潜在扩散模型）依赖VAE分词器将图像压缩至低维潜空间。然而，传统VAE的优化目标天然偏向低频信息重建，导致重建图像丢失高频纹理与锐利边缘，视觉上呈现过度平滑。这一瓶颈直接限制了后续生成模型的上限——无论扩散模型或自回归模型如何改进，若潜表示本身缺乏高频保真度，生成结果必然细节模糊。
 
@@ -51,7 +51,7 @@ claims:
 
 在方法谱系上，FA-VAE属于**频率感知潜变量分词器**，与标准VAE（**KL-VAE**, Rombach et al., CVPR 2022）、矢量量化VAE（**VQ-VAE**, Van Den Oord et al., NeurIPS 2017）以及视觉基础模型对齐的VAE（**VA-VAE**）形成对比。其关键差异在于显式的频率解耦与差异化的训练目标：低频分支沿用VA-VAE风格损失（含DINOv2对齐），高频分支仅使用L1重构、KL散度与对抗损失，避免预训练模型监督引入低频偏向。
 
-## 背景与动机
+
 
 ### 潜变量生成模型中的重建瓶颈
 
@@ -79,7 +79,9 @@ claims:
 
 这一设计从根本上改变了VAE分词器的优化格局——不再让高频细节在损失函数中"被平均掉"，而是赋予其独立的表示学习通道和定制化的训练目标。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FA-VAE 的核心创新在于**显式解耦并独立优化潜变量嵌入的低频与高频分量**，从而突破传统 VAE 分词器在重建中天然偏向低频信息、导致高频纹理丢失的瓶颈。这一目标通过三个紧密耦合的机制实现：频率分解、分频独立优化、以及潜变量融合。
 
@@ -132,7 +134,7 @@ $$\tilde{\mathbf{z}} = \mathcal{F}(\mathbf{z}_L, \mathbf{z}_H)$$
 
 这些变更共同构成了 FA-VAE 的“因果旋钮”：通过在小波域显式分离频率分量，并为高频学习设计不受低频偏向污染的训练目标，模型得以在保留全局结构的同时显著提升纹理和边缘的保真度。Table 1 的定量结果表明，FA-VAE 的重建损失（0.0044）几乎是 VA-VAE（0.0105）的一半，LPIPS 和 rFID 也全面领先，验证了频率感知解耦设计的有效性。
 
-## 整体框架
+
 
 FA-VAE 的整体设计遵循“频率解耦—独立编码—融合重建”的流水线。其核心动机来自一个被实验验证的观察：标准 VAE 的优化目标天然偏向低频分量，导致重建图像丢失高频纹理与锐利边缘。为解决这一问题，FA-VAE 显式地将输入图像的低频与高频子带分离，并分别为其分配独立的编码器-解码器对，从而阻断低频对高频学习的压制。
 
@@ -169,7 +171,7 @@ FA-VAE 的整体设计遵循“频率解耦—独立编码—融合重建”的�
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2509_05441/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of our proposed frequency-aware VAE framework (FA-VAE). An input image is decomposed into low- and highfrequency representations using a wavelet transform. Each frequency band is decoupled, encoded and decoded separately to learn dedicated latent embeddings, which are then coupled and passed through an inverse wavelet transform to reconstruct the image. These enriched embeddings are subsequently used in a latent diffusion model to improve generation fidelity, particularly preserving fine details*
 
-## 核心模块与公式推导
+
 
 ### 频率感知变分自编码器（FA-VAE）框架
 
@@ -222,7 +224,9 @@ $$\tilde{\mathbf{z}} = \mathcal{F}(\mathbf{z}_L, \mathbf{z}_H)$$
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2509_05441/figures/002_Figure_2.jpg]]
 *Figure 2: Residual power spectra averaged over 50k ImageNet validation images, comparing reconstruction errors (input minus reconstruction) of VAVAE and our method. The log-scaled spectra show that VAVAE exhibits higher residual energy across the frequency spectrum, particularly in high-frequency regions. In contrast, our method significantly reduces reconstruction residual energy, indicating better preservation of fine details and textures*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：频率感知解耦带来的重建质量跃升
 
@@ -286,7 +290,9 @@ FA-VAE 在 ImageNet 256×256 验证集上的重建性能全面超越现有最优
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2509_05441/figures/011_Figure_7.jpg]]
 *Figure 7: Qualitative reconstructions using VA-VAE on ImageNet 256×256*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -324,6 +330,8 @@ FA-VAE 的适用边界由以下几个设计选择所界定：
 2. **跨模态扩展**：频率感知的潜表示学习框架能否推广到视频生成（时空频率解耦）、3D 内容生成（几何与纹理频率解耦）等多模态任务？
 3. **融合策略改进**：拼接操作是否能被交叉注意力或频域门控机制所替代，以实现高低频潜变量之间更丰富的交互？
 4. **高频分支增强**：高频分支目前仅使用 L1 + 对抗损失，是否可以与边缘检测、纹理描述符等显式感知线索结合，进一步提升细节生成质量？
+
+
 
 ## 原文 PDF
 

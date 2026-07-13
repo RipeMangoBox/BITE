@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/HIS_GPT_Towards_3D_Human_In_Scene_Multimodal_Understanding.pdf
+project_link: null
+code_link: https://github.com/ZJHTerry18/HumanInScene
 aliases:
 - HG
 - HIS-GPT
@@ -39,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - HIS-Bench 上，Average score (across 16 sub-tasks) 48.7 vs GPT-4o: 31.3 (+17.4)；Average score 48.7 vs Chat-Scene: 8.2 (+40.5)。
 
-## 概述
+## 概要
 
 ### 问题定义
 
@@ -79,7 +81,7 @@ HIS-GPT 的独特定位在于：**首次将3D场景编码器（Uni3D）、人体
 
 即使在将基线模型在相同训练数据上进行微调后，HIS-GPT 仍保持显著领先（Table 8），表明其架构设计而非数据规模是性能差异的主因。此外，GPT-4 自动评估的可靠性经人工研究验证（Pearson 相关系数 0.54），并与 Qwen2.5-7B 评估器高度一致（相关系数 0.75），支撑了定量结论的可信度。
 
-## 背景与动机
+
 
 三维场景理解近年来取得了显著进展，大量工作聚焦于从点云数据中提取物体级特征并支持语言引导的问答与对话。然而，这些努力几乎完全忽略了场景中另一个关键要素——**人类**。现实世界中的三维空间往往与人类活动密不可分：人在沙发上坐下、在厨房操作台前准备食物、在办公室内穿行。理解这些“人-场景交互”（Human-Scene Interaction, HIS）对于具身智能、AR/VR、人机协作等应用至关重要。
 
@@ -89,7 +91,9 @@ HIS-GPT 的独特定位在于：**首次将3D场景编码器（Uni3D）、人体
 
 本文的动机由此明确：设计一个能够**联合编码三维场景与人体运动，并显式注入人-场景交互信息与时空位置编码**的模型，从而在 HIS-QA 任务上实现质的突破。这一思路直接催生了 **HIS-GPT**——一个集成场景编码器、运动编码器、辅助交互模块（AInt）和布局-轨迹位置编码（LTP）的多模态大语言模型。其核心洞察在于：通过辅助交互任务（活动分类、空间关系检测、接触检测）和基于傅里叶变换的时空位置编码，模型能够学习到丰富的上下文表征，从而在多种人-场景理解子任务上取得显著提升。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 HIS-GPT 的核心创新在于将**人-场景交互的显式建模**与**时空结构位置编码**引入多模态大语言模型，从而突破现有方法在 3D 人-场景联合理解上的瓶颈。相比独立编码场景和人体运动、缺乏交互感知的 baseline，HIS-GPT 通过两个关键模块（AInt 和 LTP）实现了因果性的性能提升：消融实验表明，二者联合贡献了 **5.7 分**的 HIS-Bench 平均得分增益（Table 3）。
 
@@ -130,7 +134,7 @@ HIS-GPT 采用两阶段训练策略，并在第一阶段引入多模态对齐数
 
 综上，HIS-GPT 通过 **AInt 的显式交互建模**和 **LTP 的结构化时空编码**，首次实现了对 3D 场景和人体运动的联合深度理解，在 HIS-Bench 上以 48.7 分大幅超越最强通用 VLM **GPT-4o**（31.3 分）达 17.4 分，验证了专用人-场景交互架构的必要性。
 
-## 整体框架
+
 
 HIS-GPT 的整体设计围绕一个核心命题展开：**联合理解 3D 场景与人体运动**，以支持开放式的、上下文感知的人-场景交互问答（HIS-QA）。其 pipeline 遵循“双编码器提取 → 交互增强 → 时空位置注入 → 大语言模型解码”的范式，将异构的视觉-运动信号转化为自然语言回答。
 
@@ -200,7 +204,7 @@ HIS-GPT 采用两阶段训练：
 ![[assets/figures/papers/paper_list_l1683_HIS_GPT_Towards_3D_Human_In_Scene_Multimodal_Understanding/figures/001_Figure_1.jpg]]
 *Figure 1: (a) Illustration of HIS-QA task, which understands human behaviors in scene context. HIS-QA tasks span from basic perception tasks, such as recognizing human activity, interaction, and position in scene, to higher order functions like prediction, reasoning, planning, and navigation, facilitating embodied intelligence in real world. (b) Illustration of HIS-GPT. Unlike previous models that focus solely on either scene or human understanding, HIS-GPT could jointly perceive scene and human modalities to tackle the challenges of HIS-QA*
 
-## 核心模块与公式推导
+
 
 ### 问题形式化
 
@@ -251,7 +255,9 @@ $$\mathcal{L} = \mathcal{L}_{llm} + \lambda_{act}\mathcal{L}_{act} + \lambda_{sp
 ![[assets/figures/papers/paper_list_l1683_HIS_GPT_Towards_3D_Human_In_Scene_Multimodal_Understanding/figures/010_Figure_6.jpg]]
 *Figure 6: Illustrations of the definition of human-object orientations. We define six types of orientations: ‘facing towards’, ‘on the left’, ‘on the right’, ‘facing away’, ‘at’, and ‘between’*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -310,7 +316,9 @@ Table 4考察了训练数据和策略的影响。在第一阶段对齐训练中�
 ![[assets/figures/papers/paper_list_l1683_HIS_GPT_Towards_3D_Human_In_Scene_Multimodal_Understanding/figures/004_Figure_3.jpg]]
 *Figure 3: Text annotation pipeline for HIS data. For scene annotations, we segment the 3D scene to derive instance-level labels, bounding boxes, and reference expressions. For motion annotations, we obtain motion-level activities from existing labels or video MLLMs. Additionally, expert models and rules are used to generate frame-level annotations, including pose, human-scene contact, and human position*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有方法的定位关系
 
@@ -355,6 +363,8 @@ HIS-GPT 处于 **3D 场景理解 LLM** 与 **人体运动分析** 的交叉地�
 4. **辅助任务组合**：AInt 模块的三个辅助任务（活动分类、空间关系检测、接触检测）联合贡献 1.1 点增益（Table 3），但它们的最优组合是否随下游任务变化？是否存在冗余或冲突的任务对？这一问题尚未被系统研究。
 
 5. **Scaling 行为**：HIS-GPT 使用 Vicuna-1.5 作为 LLM 骨干，冻结 LLM 的效果优于 LoRA 微调（48.7 vs 38.1, Table 9）。更强的 LLM 骨干是否能带来线性增益，还是交互编码的质量会成为新瓶颈？
+
+
 
 ## 原文 PDF
 

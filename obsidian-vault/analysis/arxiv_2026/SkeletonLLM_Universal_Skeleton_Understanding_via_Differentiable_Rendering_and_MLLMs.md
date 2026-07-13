@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2026
 pdf_ref: paperPDFs/arxiv_2026/SkeletonLLM_Universal_Skeleton_Understanding_via_Differentiable_Rendering_and_MLLMs.pdf
+project_link: null
+code_link: null
 aliases:
 - SkeletonLLM
 tags:
@@ -40,7 +42,7 @@ claims:
 > - NTU-120 (60/60 split) 上，Top-1 Accuracy (%) 34.94 vs 27.21 (TDSM) (+7.73)。
 > - NTU-60 → NW-UCLA (Cross-format) 上，Top-1 Accuracy (%) 27.33 vs 10.14 (SKI-LVLM) (+17.19)。
 
-## 概述
+## 概要
 
 多模态大语言模型（MLLM）在视觉理解与推理上展现了强大能力，却无法原生处理结构化骨架数据——这是动作识别、人机交互等领域的核心模态。现有方法试图通过特征-文本对齐或离散词元化将骨架“翻译”给语言模型，但这类方案存在两个根本性缺陷：**格式依赖**——每种骨架拓扑需要定制编码器；**表示瓶颈**——运动信息被压缩为单一向量或在离散化中丢失细粒度时空细节。更关键的是，它们绕开了MLLM最宝贵的资产——预训练视觉理解能力，未能真正弥合骨架与语言之间的模态鸿沟。
 
@@ -50,7 +52,7 @@ claims:
 
 **方法定位**：SkeletonLLM 区别于传统的特征-文本对齐路线（如PURLS, Zhu et al., CVPR 2024；TDSM；SCoPLe, Zhu et al., CVPR 2025）和基于离散词元的LLM方案（如MotionGPT, Jiang et al., NeurIPS 2023；MotionLLM, Chen et al., TPAMI 2025），首次将骨架理解重构为“渲染-推理-响应”的视觉理解问题，使MLLM的预训练视觉能力得以直接复用。
 
-## 背景与动机
+
 
 ### 骨架理解的核心瓶颈：格式孤岛与模态鸿沟
 
@@ -81,7 +83,9 @@ claims:
 
 正是基于这一动机，本文提出了 **SkeletonLLM** 框架，其核心组件 **DrAction**（Differentiable Rendering of Actions）——一个基于3D高斯泼溅与线性混合蒙皮的可微、格式无关的骨架渲染器——将骨架序列转化为运动感知的图像序列，使MLLM能够以原生视觉模态理解和推理人类动作。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SkeletonLLM 的核心创新在于**范式转换**：不再试图将结构化骨架数据强行适配进 MLLM 的文本通道，而是通过可微渲染将其“翻译”为 MLLM 原生理解的视觉语言。这一转换从三个关键维度（changed slots）打破了现有方案的瓶颈。
 
@@ -114,7 +118,7 @@ SkeletonLLM 引入四阶段渐进式训练策略，解决可微渲染器与 MLLM
 
 这一协同训练策略使模型同时具备**细粒度区分能力**（Disc-FT）和**结构化推理能力**（CR-Distill），在极端少样本场景下优势尤为显著——NTU-60 30/30 划分上，SkeletonLLM 以 37.84% Top-1 准确率超越最佳基线 TDSM 的 25.88%（+11.96%）。
 
-## 整体框架
+
 
 SkeletonLLM 遵循 **Render–Reason–Respond** 三阶段流水线（Figure 2），其核心设计原则是将任意骨架序列“翻译”为多模态大语言模型（MLLM）原生可消费的视觉模态——紧凑的图像序列，从而打破骨架格式孤岛与模态鸿沟。
 
@@ -158,7 +162,7 @@ SkeletonLLM 遵循 **Render–Reason–Respond** 三阶段流水线（Figure 2�
 ![[assets/figures/papers/paper_list_l1841_SkeletonLLM_Universal_Skeleton_Understanding_via_Differentiable_Renderin/figures/005_Table_4.jpg]]
 *Table 4: Single-model multi-task evaluation. All results use the same NTU-60 (55/5) checkpoint with no task-specific retraining*
 
-## 核心模块与公式推导
+
 
 ### 问题形式化与Render-Reason-Respond流水线
 
@@ -212,7 +216,9 @@ NFM基于局部运动学自适应调节每个高斯原语的色彩与不透明�
 
 整个架构——从骨架输入经渲染、视觉编码到语言生成——完全可微。设 $\Theta_{\mathrm{render}}$ 为DrAction渲染器参数，$\Theta_{\mathrm{proj}}$ 为投影层参数，MLLM的任务特定梯度可反向传播至渲染过程，端到端地学习出对下游任务最具区分力的视觉表征（Section 3.3）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果：开词汇动作识别
 
@@ -301,7 +307,9 @@ Table 10 对 NFM 内部组件和时序建模策略进行了精细消融。完整
 
 4. **外部闭源 MLLM 的零样本局限性**（Table 6）：将 DrAction 渲染结果直接输入外部闭源 MLLM（如 GPT-4V）进行零样本识别，性能远低于联合训练。这表明端到端梯度回传对学习任务最优视觉表征至关重要，单纯的“渲染-输入”管线无法替代联合优化。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题域定位与核心瓶颈
 
@@ -359,6 +367,8 @@ SkeletonLLM 在方法谱系中占据一个独特位置——它既不同于传�
 4. **长程时序建模**：如何有效建模包含多个子动作与长程时间依赖的复杂行为序列？是否需要引入层次化时间抽象或记忆模块？当前12帧的渲染策略对分钟级序列显然不足。
 
 5. **完全无监督/弱监督学习**：当前框架在CR-Distill阶段依赖GPT-4o教师模型生成推理链，在Disc-FT阶段需要标签信息挖掘易混淆动作对。能否通过自监督或弱监督方式进一步减少对人工标注和强教师模型的依赖，是走向真正通用骨架理解的关键一步。
+
+
 
 ## 原文 PDF
 

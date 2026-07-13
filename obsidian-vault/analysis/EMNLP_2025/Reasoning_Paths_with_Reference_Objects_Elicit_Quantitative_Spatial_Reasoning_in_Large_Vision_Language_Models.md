@@ -5,6 +5,7 @@ paper_level: A
 venue: EMNLP
 year: 2025
 pdf_ref: paperPDFs/EMNLP_2025/Reasoning_Paths_with_Reference_Objects_Elicit_Quantitative_Spatial_Reasoning_in_Large_Vision_Language_Models.pdf
+code_link: null
 project_link: https://andrewliao11.github.io/spatial_prompt/
 aliases:
 - RPROEQSRLVLM
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | 使用参考物体的推理路径激发大视觉语言模型中的量化空间推理 |
 | 英文题名 | Reasoning Paths with Reference Objects Elicit Quantitative Spatial Reasoning in Large Vision-Language Models |
 | 会议/期刊 | EMNLP 2025 |
-| Links | [paper](https://arxiv.org/abs/2409.09788); [Project](https://andrewliao11.github.io/spatial_prompt); [Project](https://andrewliao11.github.io/spatial_prompt/) |
+| Links | [paper](https://arxiv.org/abs/2409.09788) · [Project](https://andrewliao11.github.io/spatial_prompt) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | SpatialPrompt |
 | Dataset | Q-Spatial-ScanNet, Q-Spatial++ |
@@ -41,7 +42,7 @@ claims:
 > - Q-Spatial++ 上，δ≤2 success rate 为 53.47，对比 18.81，变化 +34.66。
 > - Q-Spatial-ScanNet 上，δ≤2 success rate 为 71.96，对比 69.41，变化 +2.55。
 
-## 概述
+## 概要
 
 当前大视觉语言模型（VLM）在缺乏外部工具和额外训练的条件下，从单张2D图像估计物体精确距离与尺寸的定量空间推理能力严重不足，尤其在水平距离问题上几乎失效。本文揭示了一个关键发现：性能最强的VLM（GPT-4o）在正确回答时，会自然涌现出利用场景中**参考物体**（其空间尺寸可通过常识推断）作为视觉锚点的推理路径。基于此，作者提出了**SpatialPrompt**——一种零样本提示技术，在不增加任何数据、不修改模型架构、不进行微调的前提下，显式引导VLM识别和使用参考物体进行相对比较与估计。
 
@@ -54,7 +55,7 @@ claims:
 
 实验基于自建的Q-Spatial Bench（271道人工标注题目，含Q-Spatial-ScanNet与Q-Spatial++两个子集），以最大比值度量δ = max(ˆd/d*, d*/ˆd) ≤ 2为成功标准。尽管SpatialPrompt大幅缩小了VLM与人类（平均成功率90）的差距，GPT-4o最佳成绩仍落后人类约30个点，表明该基准对人类简单但对VLM极具挑战，仍有巨大提升空间。
 
-## 背景与动机
+
 
 ### 定量空间推理：视觉语言模型的盲区
 
@@ -78,7 +79,9 @@ claims:
 
 基于此，本文提出一个核心假设：如果能够显式地引导VLM在推理过程中识别和使用参考物体，是否可以在不修改模型架构、不增加训练数据、不依赖外部工具的前提下，大幅提升其定量空间推理性能？这一假设将研究焦点从模型能力的“有无”问题转向了能力的“激发”问题，为高效提升VLMs的空间推理能力开辟了一条零样本提示工程的新路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈的因果定位
 
@@ -117,7 +120,7 @@ SpatialPrompt定位于**零样本提示工程**范式，区别于以下两类相
 
 在提示技术谱系中，SpatialPrompt可视为对零样本CoT的定向增强——后者提供通用推理框架，前者则针对定量空间推理这一特定任务注入了领域特异性的推理策略（参考物体识别与相对比较）。这种“任务感知提示设计”的思路为提示工程提供了新的方法论参考：通过观察模型在成功案例中自然涌现的有效推理模式，将其显式编码为提示指令，从而系统性地激发模型的潜在能力。
 
-## 整体框架
+
 
 本文提出了一套“基准构建→能力诊断→机制分析→提示干预”的完整研究管线，用于激发和评估大视觉语言模型（VLM）在单张2D图像上的量化空间推理能力。整个框架围绕一个核心发现展开：当VLM在推理中显式利用场景中的**参考物体**（其空间尺寸可通过常识推断）作为视觉锚点时，距离估计的准确性会显著提升。
 
@@ -152,7 +155,7 @@ SpatialPrompt定位于**零样本提示工程**范式，区别于以下两类相
 
 该框架的有效性受限于以下条件：（1）场景中需存在可被常识推理的参考物体，缺乏明确参照物时SpatialPrompt的增益有限；（2）VLM需具备基本的常识推理能力，模型规模过小（如LLaVA-7B）时提示干预效果不稳定；（3）评估指标 $\delta \leq 2$ 相对宽松（允许0.5×到2×误差），无法精细区分高精度估计能力；（4）仅限单张2D图像输入，未涉及多视角或深度传感器信息。这些边界条件在管线设计中已被显式识别，但尚未被系统性解决。
 
-## 核心模块与公式推导
+
 
 ### 关键模块：SpatialPrompt 提示策略
 
@@ -195,7 +198,9 @@ $$p(\delta_{\leq 2}) \sim \beta_{0} + \beta_{r} X_{r} + \beta_{d} X_{d} + \beta_
 - **SpatialPrompt 的触发效果**：SpatialPrompt 使 Gemini 1.5 Pro 的参考物体使用频率从 7.64% 飙升至 99.17%，GPT-4V 从 18.12% 升至 99.8%（Q-Spatial-ScanNet），成功率随之大幅提升（置信度 0.95，见 Table 11）。
 - **相关性验证**：在所有 VLM 和提示技术中，参考对象使用频率与成功率之间的 Spearman 相关系数在 Q-Spatial-ScanNet 上为 0.69，在 Q-Spatial++ 上高达 0.91，强有力地支持了“通过参考物体推理直接提升准确性”的核心假设（置信度 0.95，见 Figure 4）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与关键发现
 
@@ -289,7 +294,9 @@ $$p(\delta_{\leq 2}) \sim \beta_{0} + \beta_{r} X_{r} + \beta_{d} X_{d} + \beta_
 
 ![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2409_09788/figures/014_Table.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心定位：零样本提示工程驱动隐藏空间推理能力
 
@@ -338,6 +345,8 @@ Q-Spatial Bench的两个分割揭示了关键的泛化问题：
 4. **与微调的协同**：SpatialPrompt与SpatialVLM等微调方法是否可取得叠加收益，尚待探索。
 
 5. **真实应用验证**：研究仅限单张2D图像，未涉及多视角或深度传感器信息。SpatialPrompt在机器人操控、AR等真实应用中的实用性需要进一步验证。
+
+
 
 ## 原文 PDF
 

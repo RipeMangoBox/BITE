@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2026
 pdf_ref: paperPDFs/arxiv_2026/HALO_Closing_Sim_to_Real_Gap_for_Heavy_loaded_Humanoid_Agile_Motion_Skills_via_Differentiable_Simulation.pdf
+project_link: null
+code_link: null
 aliases:
 - HHLHMC
 - HALO
@@ -41,7 +43,7 @@ claims:
 > - High-agility motion tracking (sim) 上，E_g-mpjpe (mm) 78.83 ± 2.55 vs WDR 132.89 ± 2.89, CM 92.82 ± 3.21 (↓40.7% vs WDR, ↓15.1% vs CM)。
 > - Walking forward/backward (real, heavy load) 上，E_fpos (m) 0.12 ± 0.03 vs WDR 0.45 ± 0.13, CM 0.22 ± 0.09 (↓73.33% vs WDR, ↓45.45% vs CM)。
 
-## 概述
+## 概要
 
 人形机器人在执行物流搬运、灾难救援等任务时，常需携带未知重载，而有效载荷会大幅改变系统的质量、质心与惯量分布，导致仿真与真实之间出现**结构化的动力学失配**（structured sim-to-real gap）。传统域随机化（domain randomization）策略虽能提升鲁棒性，但在重载条件下往往产生保守行为，运动精度急剧下降；而单阶段系统识别方法无法解耦标称模型误差与有效载荷误差，参数估计存在归因偏差，策略迁移后性能显著退化。
 
@@ -54,7 +56,7 @@ claims:
 
 **方法定位：** HALO 属于基于可微仿真的系统识别与 sim-to-real 迁移范式，其两阶段解耦策略区别于传统的单阶段参数估计或纯域随机化方法，为重载人形机器人的零样本敏捷运动部署提供了新的技术路线。
 
-## 背景与动机
+
 
 人形机器人在物流、制造与家庭服务等场景中，常需在携带未知重载的条件下执行敏捷运动任务。有效载荷的引入会显著改变系统的质量分布、质心位置与惯性张量，导致仿真环境与真实物理之间出现**结构化、大尺度的动力学失配**（structured sim-to-real gap）。这种失配并非随机扰动，而是由载荷引起的系统性偏移，使得在标称仿真中训练的控制策略直接迁移至真实重载场景时性能急剧退化，甚至完全失效。
 
@@ -64,7 +66,9 @@ claims:
 
 HALO的动机正是针对这一瓶颈：通过**两阶段可微系统识别**，先利用无载荷轨迹校准基座模型以消除固有仿真-真实偏差，再利用有载轨迹仅优化有效载荷相关的质量与质心参数，从根本上避免误差归因混乱。借助MuJoCo XLA可微仿真的解析梯度，该框架能以轨迹级优化高效收敛至准确的物理参数，为RL策略提供高保真仿真环境，从而在真实重载任务中同时保持敏捷性与鲁棒性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 HALO 的核心创新在于**将重载人形机器人的仿真-真实迁移问题重新表述为一种分阶段、可微的系统识别范式**，通过解耦标称模型误差与有效载荷动力学偏移，从根本上解决了传统方法在面对大尺度、结构化动力学失配时的保守行为与参数估计偏差。
 
@@ -100,7 +104,7 @@ HALO 的第三个重要创新是**摆脱了对运动捕捉系统或关节扭矩�
 
 **证据支撑**：真实重载实验中，HALO 相比 WDR 将前向行走最大位置误差降低 $73.33\%$，相比 CMA-ES 降低 $45.45\%$；在 $90^\circ$ 原地跳跃任务中将角度跟踪误差降低 $72.97\%$；在三项高敏捷挑战动作（燕式平衡、侧踢、回旋踢）中达到 $100\%$ 成功率，而基线方法均出现任务失败。
 
-## 整体框架
+
 
 HALO 面向重载人形机器人的仿真-真实迁移，构建了一条从数据采集到零样本部署的完整管线。其核心思路是将有效载荷引起的结构化动力学失配建模为可解耦的参数识别问题，而非单纯依靠域随机化进行保守的鲁棒训练。
 
@@ -127,7 +131,7 @@ HALO 面向重载人形机器人的仿真-真实迁移，构建了一条从数�
 ![[assets/figures/papers/paper_list_l50_https_arxiv_org_abs_2603_15084/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of HALO. (a) Data Collection: Trajectories are collected under both loaded and unloaded conditions using exploration policy trained with wide DR, followed by real-world deployment with a fixed foot constraint. (b) Data Processing: Full-body trajectories reconstruction from joint-state measurements via forward kinematics and foot-height alignment. (c) Two-stage Payload-related Parameter Identification: Stage 1 optimize the full set of model parameters to yield a calibrated base model using trajectories without payload. Based on the calibrated model, stage 2 optimize only the payload-related parameters, using trajectories collected under loaded conditions. (d) Heavy-loaded Motion Ski...*
 
-## 核心模块与公式推导
+
 
 HALO 的核心管线由四个模块串联构成（对应 Figure 2），其理论根基是将系统识别形式化为可微仿真中的**轨迹级优化问题**，并通过两阶段解耦策略实现重载参数的精准估计。
 
@@ -185,7 +189,9 @@ $$\pmb{\theta}_{k+1} = \pmb{\theta}_k - \eta \nabla_{\theta} \mathcal{L}_{\mathr
 ![[assets/figures/papers/paper_list_l50_https_arxiv_org_abs_2603_15084/figures/007_Figure_4.jpg]]
 *Figure 4: Comparison of convergence performance between two-stage and one-stage methods. The proposed Two-Stage method HALO (orange) demonstrates superior accuracy, converging significantly closer to the estimated reference values (red dashed lines) compared to the One-Stage baseline (blue)*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计逻辑
 
@@ -259,7 +265,9 @@ $$\pmb{\theta}_{k+1} = \pmb{\theta}_k - \eta \nabla_{\theta} \mathcal{L}_{\mathr
 ![[assets/figures/papers/paper_list_l50_https_arxiv_org_abs_2603_15084/figures/004_Table.jpg]]
 *Table: I: Domain Randomization Settings*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：重载人形机器人的结构化仿真-真实差距
 
@@ -322,6 +330,8 @@ HALO框架留下了若干值得后续探索的方向：
 - **初始误差敏感性**：当前框架对不同初始标称参数误差的敏感性如何？若标称模型与真实模型相差过大（如使用完全不同的机器人平台），两阶段策略是否仍然有效？
 
 - **鲁棒性与安全边界**：所生成的敏捷运动策略在承受突发外部冲击（如碰撞、推力干扰）时的安全边界和泛化能力如何？这涉及从参数识别到策略鲁棒性的完整闭环验证。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICCV
 year: 2025
 pdf_ref: paperPDFs/ICCV_2025/Stable_Virtual_Camera_Generative_View_Synthesis_with_Diffusion_Models.pdf
+project_link: null
+code_link: null
 aliases:
 - SSVC
 - SVCGVSDM
@@ -43,7 +45,7 @@ claims:
 > - LLFF (小视角集合 NVS, P=3) 上，PSNR SEVA (提升显著) vs 先前方法 (+6.0 dB)。
 > - Mip-NeRF 360 (大视角集合 NVS, P=3) 上，PSNR SEVA vs CAT3D (+0.6 dB)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -72,7 +74,7 @@ SEVA在涵盖10个公开数据集的综合基准上表现出一致的性能优�
 
 SEVA属于**基于扩散模型的生成式NVS**，与现有方法的关键区别在于：无需NeRF蒸馏、无需显式3D表示、训练数据同时覆盖物体级和场景级数据、支持灵活的输入条件化和强生成能力。在方法谱系中，它介于纯回归式方法（如 **MVSplat**、**DepthSplat**）和需要3D蒸馏的扩散方法（如 **CAT3D**、**ReconFusion**）之间，以纯2D扩散先验实现了3D一致的视图生成。
 
-## 背景与动机
+
 
 ### 视角合成任务的演化与瓶颈
 
@@ -98,7 +100,9 @@ SEVA属于**基于扩散模型的生成式NVS**，与现有方法的关键区别
 
 这一设计使得SEVA在综合性能上显著超越现有方法，在CAT3D自身设置下PSNR提升+1.5 dB，在小视角集NVS的LLFF数据集上（P=3）PSNR提高+6.0 dB，在大视角集NVS的Mip360数据集上（P=3）PSNR超过CAT3D 0.6 dB。更重要的是，SEVA首次在单一模型中实现了从单视图到半稠密视图、从无序目标集合到有序视频轨迹的灵活覆盖，为生成式视角合成提供了统一的解决方案。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SEVA 的核心创新在于**避免在网络内部引入显式 3D 表示**，转而通过一套精心设计的训练与推理策略，使单个通用模型同时具备大视角变化下的强生成能力与时序平滑的插值能力。这与现有主流方法形成根本性差异——**ReconFusion** 和 **CAT3D** 等基于扩散的 NVS 模型依赖 NeRF 蒸馏来融合不一致的采样结果，导致流程复杂且灵活性受限（仅支持固定数量的输入/目标视图）；而 SEVA 直接继承预训练 2D 扩散模型（SD 2.1）的强大先验，无需任何 3D 表示蒸馏即可输出时空一致的新视图。
 
@@ -141,7 +145,7 @@ SEVA 的网络架构基于预训练 SD 2.1 的自编码器与潜在去噪 U-Net�
 
 上述创新点构成一条完整的因果链：**联合训练策略**赋予模型同时处理小视角和大视角变化的能力 → **两遍程序化采样**将这一能力解耦为结构锚定与细节填充两个阶段 → **记忆库机制**确保在超长序列生成中锚点间的一致性 → **无 3D 表示的架构**使整个过程无需额外的 3D 蒸馏步骤。这一链条最终使 SEVA 成为一个通用模型，能够同时解决集合式 NVS 和轨迹式 NVS，支持从稀疏到半稠密的任意视图数量，并在 CAT3D 自身设置下实现 +1.5 dB PSNR 的综合性能提升。
 
-## 整体框架
+
 
 SEVA 的整体设计遵循一个核心原则：**不在网络内部引入显式三维表示**，从而最大程度继承预训练 2D 扩散模型的强大先验。如图 4 所示，系统以 Stable Diffusion 2.1 的自编码器与潜在去噪 U‑Net 为骨架，将 2D 自注意力膨胀为 **3D 自注意力**，并额外插入 **1D 视图轴自注意力** 以实现跨视图信息交互。当输入帧具有明确时序关系时，可进一步在每个残差块后通过跳跃连接引入 **3D 卷积时序通路**，将模型驯化为视频模型（总参数量约 1.5B）。相机姿态通过 **Plücker 嵌入** 以拼接和自适应层归一化的方式注入，同时利用 **CLIP 图像嵌入** 提供高层语义条件。
 
@@ -156,7 +160,7 @@ SEVA 的整体设计遵循一个核心原则：**不在网络内部引入显式�
 ![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2503_14489/figures/005_Figure_4.jpg]]
 *Figure 4: Method. SEVA is trained with fixed sequence length as a “M-in N-out” multi-view diffusion model with standard architecture. It conditions on CLIP embeddings, VAE latents of the input views, and their corresponding camera poses. During sampling, SEVA can be cast as a generative “P -in Q-out” renderer that works with variable sequence length, where P and Q need not be equal to M and N. To enhance temporal and 3D consistency across generated views, especially when generating along a trajectory, we present procedural two-pass sampling as a general strategy*
 
-## 核心模块与公式推导
+
 
 SEVA 的核心架构建立在预训练 Stable Diffusion 2.1 的自编码器与潜在去噪 U-Net 之上，通过三个关键改造将其转化为一个通用的“M-in N-out”多视图扩散模型。
 
@@ -216,7 +220,9 @@ $$\mathrm{interp}: \{ \mathbf{I}_{i}^{\mathrm{acr}}, \mathbf{I}_{i\cdot\Delta+1}
 
 当实际帧数 $P+Q < T$ 时，SEVA 通过重复第一个输入视图将前向传播填充至恰好 $T$ 帧，而非动态改变上下文窗口长度。消融实验（Fig. 14）表明，这种填充策略有效避免了改变 $T$ 带来的注意力分布偏移伪影。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -295,7 +301,9 @@ SEVA生成的样本与3DGS渲染结果在感知上极为接近（Figure 13），
 ![[assets/figures/papers/paper_list_l12_https_arxiv_org_abs_2503_14489/figures/015_Figure_8.jpg]]
 *Figure 8: Long-range 3D consistency. We visualize samples following a camera path looping three times around the TELEPHONE-BOOTH scene. Lookup using spatial neighbors from the memory bank (ours) notably improves view consistency and reduces artifacts in recurring locations across different loops, compared to lookup using temporal neighbors (baseline)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心定位：生成式NVS的范式转移
 
@@ -353,6 +361,8 @@ SEVA 的核心创新可归结为三个相互耦合的因果旋钮：
 5. **动态场景与4D视图合成：** SEVA 当前仅处理静态场景，能否扩展到时变内容（动态场景、4D NVS）是自然的延伸方向。
 
 6. **预训练模型偏见的继承：** SEVA 依赖SD 2.1先验，可能继承其数据偏见和生成伪影，如何缓解这一问题值得进一步研究。
+
+
 
 ## 原文 PDF
 

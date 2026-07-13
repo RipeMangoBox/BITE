@@ -5,6 +5,7 @@ paper_level: A
 venue: "SIGGRAPH Asia"
 year: 2022
 pdf_ref: paperPDFs/SIGGRAPH_ASIA_2022/PADL_Language_Directed_Physics_Based_Character_Control.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/toronto-ai/PADL/
 aliases:
 - PADL
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | PADL：语言引导的基于物理的角色控制 |
 | 英文题名 | PADL: Language-Directed Physics-Based Character Control |
 | 会议/期刊 | SIGGRAPH Asia 2022 |
-| Links | [paper](https://arxiv.org/abs/2301.13868); [Project](https://research.nvidia.com/labs/toronto-ai/PADL/) |
+| Links | [paper](https://arxiv.org/abs/2301.13868) · [Project](https://research.nvidia.com/labs/toronto-ai/PADL/) |
 | Topic | #topic/representation_self_supervised_transfer #topic/representation_self_supervised_transfer/representation_learning |
 | Method | PADL |
 | Dataset | Custom motion dataset (131 clips, 265 captions), PADL language‑command test set (Table 1) |
@@ -40,7 +41,7 @@ claims:
 > - Custom motion dataset (131 clips, 265 captions) 上，Dataset Coverage (Figure 5) 为 Learned Skill Embedding (128D) 在不同阈值下均获得最高的覆盖率，对比 CLIP Text Encodings (512D) / PCA CLIP Text Encodings (128D)，变化 qualitative improvement, curves consistently higher。
 > - PADL language‑command test set (Table 1) 上，Task & Object Identification Accuracy 为 approximately 81% (estimated 17/21 correct)，对比 N/A，变化 N/A。
 
-## 概述
+## 概要
 
 **核心问题**：在基于物理的角色动画中，用户难以通过自然语言同时指定高层任务目标与底层运动技能。传统对抗模仿学习方法（如 AMP）虽然能生成高质量动作，但普遍存在模式坍塌问题——策略倾向于只复现参考动作集中的少数技能，无法覆盖数据集的全部运动多样性。
 
@@ -55,7 +56,7 @@ claims:
 
 **局限性**：当前系统受限于小规模手工标注数据集，对未见语言风格的泛化能力有限；多任务聚合控制器一次仅能处理单一目标物体的单一任务，无法应对多物体、多步骤的复杂组合指令。
 
-## 背景与动机
+
 
 基于物理的角色动画旨在生成符合物理定律的运动，使虚拟角色能够与环境进行逼真的交互。然而，如何让用户以直观的方式同时指定**高层任务目标**（如“攻击那个敌人”）和**底层运动技能**（如“跳跃攻击”），一直是该领域的核心瓶颈。传统方法通常将任务控制与技能模仿割裂处理：用户要么通过离散指令选择预定义的运动片段，要么依赖复杂的奖励函数设计来间接引导行为，缺乏统一的自然语言接口。
 
@@ -63,7 +64,9 @@ claims:
 
 本文的核心动机在于：**利用自然语言作为统一的控制接口，使物理角色能够同时理解“做什么任务”和“用什么技能做”**。这要求系统具备三个关键能力：将语言描述与运动技能对齐、在对抗训练中可靠复现全部参考技能、以及将多个单任务策略聚合成可响应自由形式语言命令的多任务控制器。PADL 正是围绕这三个目标设计的。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PADL 的核心创新在于通过**联合判别器**与**确定性技能潜变量**的协同设计，解决了物理角色动画中长期存在的模式坍塌（mode collapse）问题，使策略能够可靠地复现参考动作集中的全部技能，同时将高层任务目标与底层运动技能统一在自然语言指令之下。
 
@@ -100,7 +103,7 @@ $$\mathcal{L}_{\mathrm{align}} = 1 - d_{\mathrm{cos}}(\mathrm{Enc}_m(\hat{\mathb
 
 这三个 changed slots 之间形成了因果链条：确定性潜变量为联合判别器提供了稳定的条件信号，联合判别器迫使策略覆盖全部技能，而多策略聚合机制则将单任务策略的能力扩展为面向自然语言的多任务控制器。这一设计使得 PADL 成为首个能够通过自然语言同时指定高层任务与底层运动技能的物理角色控制系统。
 
-## 整体框架
+
 
 PADL 的整体设计围绕一个核心瓶颈展开：物理角色动画中，用户难以通过自然语言同时指定高层任务目标与底层运动技能，而传统的对抗模仿学习（如 AMP）又存在严重的模式坍塌问题，导致参考动作集中的多样技能无法被策略完整复现。为解决这一问题，PADL 采用三阶段流水线架构，将语言理解、技能控制与多任务调度解耦为可独立优化的模块。
 
@@ -129,7 +132,7 @@ PADL 在架构上有两个区别于先前工作的关键决策。其一，技能
 ![[assets/figures/papers/paper_list_l40_https_arxiv_org_abs_2301_13868/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of the language-based selection model used to select a target object based on the user’s task command. The task command is used to generate a collection of candidate sentences, each corresponding to a particular object in the environment. A multiple-choice QA model is then used to predict the most likely candidate sentence, based on the task command. The model’s prediction is used to identify the target object the user referenced*
 
-## 核心模块与公式推导
+
 
 PADL 框架由三个关键模块构成：**技能嵌入模块**（Skill Embedding）、**对抗强化学习策略训练模块**（Adversarial RL Policy Training）和**多任务问答聚合模块**（Multi-Task QA Aggregation）。以下逐一展开其核心设计与关键公式。
 
@@ -197,7 +200,9 @@ $$
 
 该模块负责将多个单任务策略聚合为一个可由自然语言驱动的多任务控制器。核心是一个基于预训练 BERT 的多选题问答（QA）模型，在 SWAG 数据集上微调而成。给定用户的自然语言任务命令，系统为环境中的每个候选物体生成一条候选后续句（Sentence B），与初始提示句（Sentence A）拼接后输入 QA 模型，模型输出最可能的候选句，从而同时识别目标任务类型和用户所指的目标物体。该模块使得 PADL 能够通过一次语言命令完成“对哪个物体执行何种技能”的联合推理。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -252,7 +257,9 @@ Figure 6 展示了技能嵌入空间的一个重要性质：在潜空间中对�
 3. **单任务单目标限制**：聚合控制器每次仅能执行一个面向单一物体的高层任务，无法处理组合指令。
 4. **技能嵌入的分布外风险**：对训练集中未出现的新型动作，编码器可能输出无意义的潜变量，导致策略产生不可控行为。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 沿袭与突破：从 AMP 到语言引导的物理角色控制
 
@@ -297,6 +304,8 @@ PADL 最关键的消融实验体现在技能编码方式的选择上（Figure 5�
 3. **细粒度技能解耦**：能否对技能嵌入空间施加更精细的解耦约束，使用户能独立控制动作的不同属性（如“用更快的速度、更大的步幅走过去”）？这可能需要引入结构化潜变量模型或对比学习目标，将运动的不同语义维度显式分离。
 
 4. **开放世界物理交互**：如何将框架扩展至未知物体和未见过的交互类型？这可能需要将物体理解模块（如基于视觉或语言描述的场景图）与物理推理能力纳入控制管线，使角色能根据语言指令推断出与任意物体的合理交互方式。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICCV
 year: 2025
 pdf_ref: paperPDFs/ICCV_2025/MotionAgent_Fine_grained_Controllable_Video_Generation_via_Motion_Field_Agent.pdf
+project_link: null
+code_link: https://github.com/leoisufa/MotionAgent
 aliases:
 - MotionAgent
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | MotionAgent：基于运动场智能体的细粒度可控视频生成 |
 | 英文题名 | MotionAgent: Fine-grained Controllable Video Generation via Motion Field Agent |
 | 会议/期刊 | ICCV 2025 |
-| Links | [paper](https://arxiv.org/abs/2502.03207); [GitHub](https://github.com/leoisufa/MotionAgent) |
+| Links | [paper](https://arxiv.org/abs/2502.03207) · [GitHub](https://github.com/leoisufa/MotionAgent) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/planning_control |
 | Method | MotionAgent |
 | Dataset | VBench, 自建运动控制基准（VBench子集）, 用户调研 |
@@ -40,7 +42,7 @@ claims:
 > - 自建运动控制基准（VBench子集） 上，Object Movement Q&A 为 45.69%，对比 30.96% (Pyramid Flow, 次优)，变化 +14.73%。
 > - 自建运动控制基准（VBench子集） 上，Complex Camera Motion 为 77.76%，对比 20.62% (CogVideoX, 次优)，变化 +57.14%。
 
-## 概述
+## 概要
 
 现有图像到视频（I2V）生成方法在运动控制上面临一个根本性瓶颈：文本编码器无法将自然语言中的运动描述精确映射为像素级的运动信号，而专用控制模块又依赖轨迹、相机外参等专业输入，且大多无法同时控制物体运动与相机运动。**MotionAgent** 针对这一问题，提出以**运动场智能体（Motion Field Agent）** 为核心，将文本中的运动信息显式转化为可解释的中间表示——物体轨迹与相机外参，再通过几何投影将其组合为统一的光流控制信号，从而在不依赖专门训练数据的前提下，实现文本驱动的细粒度运动生成。
 
@@ -50,7 +52,7 @@ claims:
 
 在方法谱系上，MotionAgent 区别于传统的文本编码器控制范式（如 DynamiCrafter、CogVideoX）和专用模块控制范式（如 Motion-I2V），开创性地将大语言模型作为运动信息解析器，以显式光流作为统一的中间控制表示，实现了对物体和相机运动的同步、精确控制。其局限性主要在于：动态度指标偏低（因未提及的物体被有意保持静止以实现精确控制）、依赖 GPT-4o 等大模型的推理能力、以及需要额外微调光流适配器来弥合域差异。
 
-## 背景与动机
+
 
 图像到视频（I2V）生成旨在根据单张静态图像和文本描述生成一段动态视频，其核心挑战在于如何精确地控制视频中的运动。现有I2V方法大致可分为两类：一类将运动控制完全交由文本编码器处理，通过文本嵌入隐式地驱动视频生成；另一类则引入专用控制模块，依赖用户手动提供轨迹、相机外参等专业输入来实现运动引导。
 
@@ -60,7 +62,9 @@ claims:
 
 针对这一缺口，本文提出MotionAgent，核心思路是引入**运动场智能体（Motion Field Agent）** 作为文本与视频生成之间的桥梁。该智能体将视频运动解耦为物体运动和相机运动两个分量，利用大语言模型（LLM）将文本中的运动描述显式转化为物体轨迹和相机外参这两种可解释的中间表示；随后通过分析光流组合模块在3D空间中将二者整合为统一光流图，作为扩散模型的控制条件。这一设计使得用户仅需自然语言即可实现对物体运动和相机运动的同步、细粒度控制，无需任何专业输入，且无需针对特定控制信号训练专用生成模型。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MotionAgent 的核心创新在于将视频运动控制从“黑箱文本嵌入”或“手工专业输入”的范式，迁移到一个**文本→显式运动参数→统一光流→扩散模型**的级联解耦框架。其关键改变体现在以下三个层面：
 
@@ -94,7 +98,7 @@ MotionAgent 引入**运动场智能体（Motion Field Agent）**，利用大语�
 
 MotionAgent 还引入了一个可选的**重思考（Rethinking）机制**：智能体在生成视频后，根据结果评估运动执行质量，并自动修正之前的轨迹或外参。这一闭环设计使模型具备了自我纠错能力——在 VBench 上，重思考将 Video-Text Camera Motion 从 81.91% 进一步提升至 87.02%，复杂相机运动从 77.76% 提升至 89.04%。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l21_MotionAgent_Fine_grained_Controllable_Video_Generation_via_Motion_Field/figures/001_Figure_1.jpg]]
 *Figure 1: Different frameworks of I2V generation models. (a) Controllable I2V generation via text encoder. (b) Controllable I2V generation via special control module. (c) Our method, controllable I2V generation via motion field agent*
@@ -121,7 +125,7 @@ $$F = I^{1} - I^{0}$$
 
 统一光流图作为控制条件输入光流适配器。适配器在合成光流上进行了微调，以弥合统一光流与真实光流之间的域差异——训练数据通过 Unimatch 估计真实光流、DROID-SLAM 计算相机外参，并分离出物体运动光流 $\hat{F}_{obj}$ 作为伪标签。基础扩散模型采用冻结的 Stable Video Diffusion（SVD），适配器的控制信号注入其中，最终生成精确受控的视频帧序列。
 
-## 核心模块与公式推导
+
 
 ### 运动场智能体（Motion Field Agent）
 
@@ -172,7 +176,9 @@ $$\hat{F}_{obj} = I_{obj}^{1} - I^{0}$$
 
 MotionAgent 采用冻结的预训练 **Stable Video Diffusion（SVD）** 作为基础图像到视频扩散模型。光流适配器接收统一光流图作为控制条件，将其注入扩散模型的去噪过程，最终生成精确受控的视频帧序列。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验结果
 
@@ -249,7 +255,9 @@ Figure 7 展示了一个典型案例：智能体在观察到初始生成视频�
 ![[assets/figures/papers/paper_list_l21_MotionAgent_Fine_grained_Controllable_Video_Generation_via_Motion_Field/figures/020_Figure_14.jpg]]
 *Figure 14: User study interface. Each participant is required to evaluate 30 groups of videos and respond to two corresponding subquestions for each group. Only one group of videos and two sub-questions are shown here due to the page limit*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心问题与解决路径
 
@@ -310,6 +318,8 @@ Figure 7 展示了一个典型案例：智能体在观察到初始生成视频�
 6. **子模块误差的量化分析**：深度估计和光流估计模型的误差对最终视频质量的影响有多大？目前缺乏系统的误差传播分析。
 
 7. **基准覆盖范围**：自建基准的规模有限，对运动控制精度的评估可能无法覆盖所有场景，需要更大规模和更多样化的评测基准。
+
+
 
 ## 原文 PDF
 

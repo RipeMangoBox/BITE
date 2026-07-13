@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2024
 pdf_ref: paperPDFs/arxiv_2024/It_Takes_Two_Real_time_Co_Speech_Two_persons_Interaction_Generation_via_Reactive_Auto_regressive_Diffusion_Model.pdf
+project_link: null
+code_link: null
 aliases:
 - RARDM
 tags:
@@ -40,7 +42,7 @@ claims:
 > - InterACT++ (双人语音到运动) 上，FPD↓ 47.74 vs 89.42 (LDA) (41.68)；FDD↓ 117.88 vs 563.27 (Audio2Photoreal) (445.39)。
 > - InterACT++ (交互运动生成) 上，FPD↓ 103.19 vs N/A (其他方法未提供音频条件，不直接可比) (N/A)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有协同语音动作生成方法聚焦单人场景，无法建模对话双方的实时互动关系；且多为离线序列模型，需完整语音输入，不具备对伙伴动作与语音变化的在线反应能力。同时，已有数据集缺乏握手、拥抱等动态双人交互行为，进一步限制了模型学习。
 
@@ -52,7 +54,7 @@ claims:
 
 **局限与开放问题**：模型缺乏对近距离身体交互的显式物理约束，可能导致穿透或不自然接触；现有数据集无法覆盖所有交互场景；系统假设已知伙伴的未来语音特征，实际应用需额外预测模块；当前未集成面部表情。未来方向包括：不依赖未来信息的在线反应预测、融入显式物理约束、扩展至多方对话、面部与身体协同生成。
 
-## 背景与动机
+
 
 **任务背景** 语音驱动的虚拟人动作生成旨在根据语音输入合成自然的人体姿态与手势。该技术是构建沉浸式虚拟现实、数字人助手和社交交互代理的核心环节。现有方法主要聚焦于**单人协同语音动作生成**，即在给定单段语音的条件下，生成对应的上半身或全身动作。然而，真实的人类交流场景多为**多人对话**，对话者的动作不仅受自身语音驱动，还持续受到对方动作与语音的实时影响——例如点头回应、手势交替、身体朝向调整等。这种动态的、双向的交互关系，是单人模型无法捕捉的。
 
@@ -60,7 +62,9 @@ claims:
 
 **本文动机** 针对上述缺口，本文提出**反应式自回归扩散模型**，旨在实现从双人语音到全身交互运动的**实时在线生成**。核心思路是将伙伴的过去动作与未来语音作为条件，并引入独立预测的地面轨迹作为空间引导，通过自回归滑动窗口机制，使系统能够在仅依赖历史帧的条件下，持续产出协调、动态的双人互动。同时，为弥补数据多样性的不足，本文还构建了**InterAct++数据集**，新增402段涵盖日常对话与动态交互的双人动作序列，为模型训练与评估提供更丰富的场景覆盖。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作针对现有语音驱动动作生成的两大瓶颈——**无法建模对话互动关系**与**离线序列生成无法实时响应**——提出了一套从数据到模型再到推理范式的系统性创新方案。
 
@@ -100,7 +104,7 @@ $$\mathcal{G}(\mathbf{x}_t, t; c) = \mathcal{G}_m(...\emptyset...) + \gamma( \ma
 
 现有数据集（如 BEAT）仅包含单人站立讲话动作，**Inter-Act** 虽含双人动作但缺乏动态交互行为（如握手、拥抱）。本工作采集了 **InterACT++** 数据集（402 个片段，1.7 小时，平均 15 秒/片段），覆盖多种日常对话场景中的动态双人交互，为模型学习互动行为提供了必要的数据基础（Table 1）。
 
-## 整体框架
+
 
 本工作提出了**反应式自回归扩散模型（Reactive Auto-regressive Diffusion Model）**，首次实现了从双人语音到全身实时交互运动的在线生成。系统接收两个对话者的语音输入 $[\mathbf{S}^A, \mathbf{S}^B]$，实时输出两人的全身运动序列 $[\mathbf{M}^A, \mathbf{M}^B]$，其中运动表示包含 $N$ 帧、$J$ 个关节的旋转特征 $Q$、根节点全局位移 $\mathbb{R}^3$ 以及双脚接触标签 $\mathbb{R}^2$（Sec. 3）。
 
@@ -156,7 +160,7 @@ $$\mathcal{G}(\mathbf{x}_t, t; c) = \mathcal{G}_m(...\emptyset... ) + \gamma( \m
 ![[assets/figures/papers/paper_list_l1671_It_Takes_Two_Real_time_Co_Speech_Two_person_s_Interaction_Generation_via/figures/001_Figure_1.jpg]]
 *Figure 1: Our system addresses a novel task, that takes the speech of two persons as input to generate dynamic full-body interactions in real-time. To achieve this, we designed an audio-driven, auto-regressive diffusion model that generates two-person motion, with the guidance of motion trajectory to improve controllability. To enrich the diversity of these interactions, we captured a new dataset that includes a wide range of daily conversational scenarios, and short-order execution*
 
-## 核心模块与公式推导
+
 
 ### 3.1 运动表示与语音编码
 
@@ -222,7 +226,9 @@ $$\mathcal{L}_{traj} = \mathrm{mse}(\mathbf{P}^A, \hat{\mathbf{P}}^A) + \mathrm{
 
 系统采用自回归滑动窗口机制实现长时生成：每步预测一个运动片段，选取部分帧作为下一窗口的历史条件。轨迹混合与死区混合策略保证窗口边界处的运动平滑过渡。推理阶段使用 8 步扩散采样，运动预测模块为 4 层 Transformer（4 注意力头），单片段推理耗时约 4ms，帧率超过 100fps，满足实时交互需求。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 数据集与评估基准
 
@@ -306,7 +312,9 @@ $$\mathcal{L}_{traj} = \mathrm{mse}(\mathbf{P}^A, \hat{\mathbf{P}}^A) + \mathrm{
 - **Table 6**：用户研究，交互性偏好 82.5% 为关键优势。
 - **Figure 5**：定性对比，直观展示本方法在交互性与动态性上的优势。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从单人语音驱动到双人实时交互
 
@@ -342,6 +350,8 @@ $$\mathcal{L}_{traj} = \mathrm{mse}(\mathbf{P}^A, \hat{\mathbf{P}}^A) + \mathrm{
 2. **显式物理约束融合**：如何将接触点约束、穿透惩罚等物理先验融入扩散去噪过程，而不破坏生成多样性和实时性？
 3. **多方对话扩展**：当前双流架构能否自然扩展到三人以上的多方对话场景？分离式条件设计在超过两个主体时如何避免组合爆炸？
 4. **面部-身体协同生成**：如何将面部动画与身体运动在统一的扩散框架中协同生成，实现语义一致的全模态虚拟人交互？
+
+
 
 ## 原文 PDF
 

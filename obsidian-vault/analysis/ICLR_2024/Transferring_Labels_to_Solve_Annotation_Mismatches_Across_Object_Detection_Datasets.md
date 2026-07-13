@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2024
 pdf_ref: paperPDFs/ICLR_2024/Transferring_Labels_to_Solve_Annotation_Mismatches_Across_Object_Detection_Datasets.pdf
+project_link: https://andrewliao11.github.io/label-transfer
+code_link: null
 aliases:
 - LGPLL
 - TLSAMAODD
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 跨目标检测数据集的标签迁移解决标注失配 |
 | 英文题名 | Transferring Labels to Solve Annotation Mismatches Across Object Detection Datasets |
 | 会议/期刊 | ICLR 2024 |
-| Links | [paper](https://openreview.net/pdf?id=ChHx5ORqF0); [Project](https://andrewliao11.github.io/label-transfer) |
+| Links | [paper](https://openreview.net/pdf?id=ChHx5ORqF0) · [Project](https://andrewliao11.github.io/label-transfer) |
 | Topic | #topic/representation_self_supervised_transfer #topic/representation_self_supervised_transfer/transfer_multitask_and_meta_learning |
 | Method | Label‑Guided Pseudo‑Labeling (LGPL) |
 | Dataset | nuScenes → nuImages (10 classes), Synscapes → Cityscapes (7 classes), Internal‑Dataset → nuImagest (3 classes), MVD‑ + nuImages‑ → Waymo‑ (1 class, multi‑source) |
@@ -41,7 +43,7 @@ claims:
 > - Synscapes → Cityscapes (7 classes) 上，mAP 为 39.71 (Faster‑RCNN)，对比 38.74 (No transfer)，变化 +0.97。
 > - Internal‑Dataset → nuImagest (3 classes) 上，mAP 为 48.89 (Faster‑RCNN)，对比 47.91 (No transfer)，变化 +0.98。
 
-## 概述
+## 概要
 
 不同目标检测数据集之间存在普遍的标注协议差异，包括类语义分歧、标注指令不一致、人机偏差以及跨模态标签等因素，导致标注失配（annotation mismatch）。直接混合使用这些数据集的原始标签训练检测器，不仅无法提升下游性能，反而可能造成损害。
 
@@ -54,7 +56,7 @@ claims:
 
 方法定位：LGPL 属于数据驱动的标签迁移范式，与基于统计归一化、伪标签、通用分割模型（如 SAM）以及图像域适应等现有方案相比，LGPL 通过联合优化框生成器和标签迁移模型，更全面地捕捉了标注协议的差异。
 
-## 背景与动机
+
 
 ### 标注失配：目标检测中的隐性瓶颈
 
@@ -88,7 +90,9 @@ claims:
 
 这一思路将标注失配从一个隐性的数据问题转化为一个可显式优化的学习问题，为跨数据集的目标检测训练提供了新的范式。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈与因果调控变量
 
@@ -136,7 +140,7 @@ $$ \begin{array} { r l } { f _ { \mathrm { i m g } } ^ { * } , f _ { \mathrm { g
 
 LGPL 是唯一在四个标注失配场景（Table 1）、多源标签迁移（Table 2）、三种检测器架构（YOLOv3、Deformable DETR、Faster‑RCNN）上均一致超越“No transfer”的方法，平均提升 1.88 mAP 和 2.65 AP75（Abstract）。三个随机种子下的标准差不超过 0.33，表明提升稳健（Table 10）。
 
-## 整体框架
+
 
 LGPL 的整体设计围绕一个核心思路展开：**将标签迁移建模为一个数据驱动的转换过程，在不依赖配对监督的情况下，把源数据集的标注协议映射到目标数据集的标注协议**。为此，LGPL 复用了标准两阶段检测器的架构组件，将其重新组织为三个协同工作的模块。
 
@@ -178,7 +182,7 @@ $$
 - **随机类别输入**：在训练标签迁移模型时，为每个候选框随机分配类别标签，迫使模型学习从任意类别输入中提取有效的迁移映射，而非简单记忆类别对应关系。
 - **有效性分数与类别级阈值**：标签迁移模型不仅输出精修框，还输出有效性分数，用于判断源标签在目标协议下是否应当保留。类别级阈值的设计考虑了不同类别在标注协议上的差异程度可能不同。
 
-## 核心模块与公式推导
+
 
 ### 标签迁移模型的形式定义
 
@@ -233,7 +237,9 @@ $$\mathcal{D}_{\mathrm{transferred\text{-}src}} := \{ (x, \hat{b}, c) \mid \hat{
 
 其中 $\sigma_c$ 是类别相关的有效性阈值，通过分箱策略（Sturges, 1926）在验证集上选择。低于阈值的边界框被视为不符合目标协议而被丢弃，从而实现了**自动的标注清洗与对齐**。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -311,7 +317,9 @@ $$\mathcal{D}_{\mathrm{transferred\text{-}src}} := \{ (x, \hat{b}, c) \mid \hat{
 ![[assets/figures/papers/paper_list_l28_https_openreview_net_pdf_id_ChHx5ORqF0/figures/001_Figure_1.jpg]]
 *Figure 1: Left: Varying annotation protocols across datasets can result in annotation mismatches, leading to inconsistent labels. For example, MVD Neuhold et al. (2O17), nuImages Caesar et al. (2020),and Waymo Sun et al. (2020) disagree with what a cyclist represents. Yellow dashed bounding boxes are not annotated. Right: Label transfer is a data-centric approach that transfers the labels from one dataset to match another dataset's annotation protocol, which can be considered as a pre-processing step in the existing training workflow*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位与核心思路
 
@@ -376,6 +384,8 @@ LGPL假设源数据集的标注类别集合与目标数据集相同，且源数�
 4. **跨任务泛化**：标签迁移模型在实例分割、3D目标检测等任务上的适用性和迁移效果如何？
 
 5. **更好的代理评估指标**：Transfer-mAP与下游mAP之间的Spearman相关系数仅为0.6（p>0.1），相关性不显著（Table 4）。是否存在更好的代理指标来直接评估标签迁移质量，避免每次评估都需要训练完整下游检测器？
+
+
 
 ## 原文 PDF
 

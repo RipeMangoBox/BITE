@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/MoDec_GS_Global_to_Local_Motion_Decomposition_and_Temporal_Interval_Adjustment_for_Compact_Dynamic_3D_Gaussian_Splatting.pdf
+project_link: https://kaist-viclab.github.io/MoDecGS-site/
+code_link: null
 aliases:
 - MG
 - MoDec-GS
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | MoDec-GS：面向紧凑动态3D高斯泼溅的全局-局部分解运动与时间间隔调整 |
 | 英文题名 | MoDec-GS: Global-to-Local Motion Decomposition and Temporal Interval Adjustment for Compact Dynamic 3D Gaussian Splatting |
 | 会议/期刊 | CVPR 2025 |
-| Links | [paper](https://arxiv.org/abs/2501.03714); [Project](https://kaist-viclab.github.io/MoDecGS-site/) |
+| Links | [paper](https://arxiv.org/abs/2501.03714) · [Project](https://kaist-viclab.github.io/MoDecGS-site/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | MoDec-GS |
 | Dataset | Dycheck-iPhone [16], HyperNeRF interp - Cut-lemon [49], HyperNeRF Average (interp) [49] |
@@ -41,7 +43,7 @@ claims:
 > - Dycheck-iPhone [16] 上，Average Storage (MB)↓ 为 18.37，对比 232.4 (SC-GS)，变化 -214.03 (约-92%)。
 > - HyperNeRF interp - Cut-lemon [49] 上，PSNR↑ 为 31.08，对比 30.17 (4DGS)，变化 +0.91。
 
-## 概述
+## 概要
 
 真实世界视频中的动态场景同时包含**全局刚性运动**与**局部非刚性变形**，现有动态3D Gaussian Splatting（3DGS）方法——如**4DGS**、**Deformable 3DGS**、**SC-GS**——难以在模型存储开销与渲染质量之间取得平衡：单一变形场或固定时间分段策略无法有效同时捕捉两类运动，导致大运动或长序列中出现模糊，而增大模型则带来难以承受的存储代价。
 
@@ -55,7 +57,7 @@ claims:
 
 MoDec-GS 在**方法谱系**上继承并改进了锚点式 3DGS 表示（Scaffold-GS），将静态锚点扩展为动态规范骨架，并通过两级 hexplane 变形场与可学习锚点动态参数，实现了紧凑且表达力强的动态场景建模。其局限性在于，对单目视频中薄且高细节纹理的物体（如 HyperNeRF 的 broom 场景）表示能力仍有限，这是当前基于 3DGS 方法的共有挑战。
 
-## 背景与动机
+
 
 ### 动态场景重建的存储与质量困境
 
@@ -83,7 +85,9 @@ MoDec-GS的出发点在于一个关键洞察：**全局运动主要由物体的�
 
 通过上述设计，MoDec-GS旨在实现一个三赢目标：**在显著降低模型存储的同时保持或提升渲染质量，并维持实时渲染能力**。初步实验表明，在iPhone数据集上MoDec-GS相比质量第二好的SC-GS，PSNR提升0.7 dB，同时存储减少94%（从232.4 MB降至18.37 MB），验证了这一技术路线的可行性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MoDec-GS 的核心创新围绕一个关键瓶颈展开：现有动态 3DGS 方法在处理真实世界视频中全局刚性运动与局部非刚性变形的组合时，难以在模型存储容量与渲染质量之间取得平衡。单一变形场或固定分段策略无法有效同时捕捉两种尺度的动态，导致在大运动或长序列中出现模糊，而增大模型则带来难以承受的存储开销。MoDec-GS 通过三个相互协同的“changed slots”系统性地解决了这一问题。
 
@@ -121,7 +125,7 @@ MoDec-GS 采用 Scaffold-GS 的锚点表示替代典型 3DGS 的逐高斯属性�
 
 值得注意的是，两阶段变形仅带来微小的推理速度下降（约 0.9 FPS，从 24.7 降至 23.8），保持了实时渲染能力（Tab. 7），验证了该设计方案在实际部署中的可行性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l10_MoDec_GS_Global_to_Local_Motion_Decomposition_and_Temporal_Interval_Adju/figures/005_Figure_4.jpg]]
 *Figure 4: Qualitative results comparison on three datasets [16, 49, 64]. The yellow boxes highlight areas where the proposed method achieves notable visual quality improvements, and the storage for the corresponding sequence is displayed below each rendered patch*
@@ -148,7 +152,7 @@ MoDec-GS 的整体 pipeline 围绕“全局-局部分解运动”（Global-to-Lo
 
 **输入输出流总结**：输入为单目视频的时间戳和相机参数；Global CS 提供静态锚点表示，经 GAD 变形为 Local CS，再经 LGD 变形为目标时刻的 3D 高斯；最终通过可微光栅化渲染出对应视角的图像。TIA 在训练期间持续优化各 Local CS 的时间边界，无需外部运动数据。
 
-## 核心模块与公式推导
+
 
 MoDec-GS 的核心设计思想是将复杂动态场景的运动分解为全局与局部两个层级，并通过自适应的时间分段策略实现紧凑建模。其系统架构包含以下关键模块。
 
@@ -214,7 +218,9 @@ $$
 
 GAD 与 LGD 的分工具有明确的因果逻辑：全局刚性运动在锚点层面被高效吸收后，残存的局部运动幅度小且方向分散，恰好适合逐高斯的显式变形。消融实验证实了这一设计的有效性——单独使用 GAD 可将存储减少约 52% 而质量仅轻微下降；加入 LGD 后 PSNR 从 14.12 提升至 14.48；再叠加 TIA 后达到最终 14.60 PSNR，且未增加存储（Table 3）。两阶段变形仅带来约 0.9 FPS 的微小推理开销（Table 7）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心结果：质量与存储的双重突破
 
@@ -281,7 +287,9 @@ Figure 9 对 cut-lemon 场景的光流可视化直接揭示了 GLMD 的工作机
 ![[assets/figures/papers/paper_list_l10_MoDec_GS_Global_to_Local_Motion_Decomposition_and_Temporal_Interval_Adju/figures/016_Table_9.jpg]]
 *Table 9: Quantitative results comparison on (a) iPhone [16], (b) HyperNeRF [49], (c) Nvidia [64] datasets. Red and blue denote the best and second best performances, respectively. Each block element of 5-performance denotes (PSNR(dB)↑ / SSIM↑ [59] / LPIPS↓ [65] / tOF↓ [7] Storage(MB)↓). For iPhone dataset, the masked metrics are used. For Nvidia monocular dataset, tOF values are not computed since the test views are sparsely distributed along the temporal axis*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位与核心瓶颈
 
@@ -332,6 +340,8 @@ MoDec-GS 基于 **Scaffold-GS** [40] 的锚点-神经高斯架构，但将其从
 3. **TIA 超参数的自适应**：TIA 训练中使用的阈值 $\tau_{TIA}$ 和步长 $s_{TIA}$ 是否对数据敏感，能否实现完全自适应的调整，尚需进一步研究。
 
 4. **训练效率优化**：是否可以通过分阶段优化（如先冻结全局变形后精调局部变形）来压缩训练时间，是一个具有工程价值的开放方向。
+
+
 
 ## 原文 PDF
 

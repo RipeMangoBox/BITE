@@ -5,6 +5,8 @@ paper_level: A
 venue: SIGGRAPH
 year: 2023
 pdf_ref: paperPDFs/SIGGRAPH_2023/Learning_Physically_Simulated_Tennis_Skills_from_Broadcast_Videos.pdf
+project_link: null
+code_link: null
 aliases:
 - LPSTSFBV
 tags:
@@ -32,7 +34,10 @@ claims:
 | Method | Video-to-Player3D / hierarchical physics-based tennis skill control |
 | Dataset | 13 US Open broadcast tennis videos (Federer, Djokovic, Nadal) |
 
-## 概述
+> [!tip] 效果简介
+> 结果与证据沿用下文“实验与关键发现”中的现有记录；本轮不新增或外推论文事实。
+
+## 概要
 
 本文提出了一套从非结构化广播网球视频中学习物理仿真角色网球技能的系统。核心问题在于：真实运动员的运动数据虽然丰富，但直接从视频中提取的运动学动作包含感知误差，且缺乏物理合理性，导致仿真角色无法稳定完成击球任务。
 
@@ -42,7 +47,7 @@ claims:
 
 **主要结果**：学习到的控制器能以高命中率将球击向指定目标区域，并展现出反映各球员视频数据特征的多样化击球风格（如单手反拍、双手反拍、上旋等）。消融实验表明，物理修正与混合控制是任务成功的关键组件；增大视频数据库规模可同时提升任务性能和运动质量。
 
-## 背景与动机
+
 
 从视频中学习运动技能是计算机图形学与机器人学中长期存在的挑战。传统角色动画方法依赖昂贵的光学动作捕捉设备或手工设计的控制器，难以扩展到大规模、多样化的运动技能学习。近年来，基于物理的角色控制取得了显著进展，但现有方法仍面临两个关键瓶颈：
 
@@ -52,7 +57,9 @@ claims:
 
 本文的核心动机在于：**能否仅从海量广播视频中自动学习物理角色的多样化运动技能，而无需任何技能标注或高质量动捕数据？** 这一目标的实现需要同时解决两个技术难题——（1）如何从噪声视频估计中构建可用的运动表征；（2）如何设计一种控制架构，既能模仿视频中的运动风格，又能纠正运动估计中的物理不可行部分，使角色在物理仿真中稳定执行任务。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作的核心创新在于构建了一套**从无标注广播视频中学习多样化物理角色技能**的完整管线，并提出了**混合控制策略**来弥补感知误差与物理仿真之间的鸿沟。以下从 changed slots 的角度拆解其关键创新点。
 
@@ -76,7 +83,7 @@ claims:
 
 上述组件共同构成了一个**四阶段端到端系统**（Fig. 2）：视频标注 → 低层模仿 → VAE运动嵌入 → 高层运动规划。这一范式使得物理仿真角色能够直接从真实比赛视频中涌现出反映运动员风格特征的多样化技能（Fig. 4），并在定量指标上展现出高命中率和落点精度（Table 1）。系统还展现出良好的数据规模扩展性：更大的视频数据库持续提升任务性能和运动质量（Fig. 6）。
 
-## 整体框架
+
 
 该系统采用**四阶段流水线**，从广播视频中提取运动数据，最终生成能够在物理仿真中完成网球击球任务的控制器。四个阶段依次为：**运动学动作估计、低层模仿策略训练、条件变分自编码器（cVAE）运动嵌入构建、高层运动规划策略训练**。
 
@@ -104,7 +111,7 @@ claims:
 
 整个系统的输入输出流可概括为：**原始视频 → 运动学动作 $\mathbb{M}_{kin}$ → 物理修正运动 → 运动嵌入空间 → 高层策略输出（目标嵌入 + 关节修正）→ 低层策略执行 → 仿真角色运动**。消融实验（Table 2）证实，物理修正（PhysicsCorr）和混合控制（HybridCtr）两个组件对任务性能均有显著贡献，移除任一组件均导致击球命中率和落点准确率下降。
 
-## 核心模块与公式推导
+
 
 ### 系统总览：四阶段流水线
 
@@ -154,7 +161,9 @@ $$r_t^e = - \sum_j \left( || \dot{\mathbf{q}}_t^j \cdot \boldsymbol{\tau}_t^j ||
 
 > **注意**：高层策略的具体网络架构、训练超参数以及残差力/力矩 $\eta_t$ 的渐进衰减机制，原文未提供完整细节，需查阅原文补充材料确认。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：跨球员的通用任务性能
 
@@ -233,7 +242,9 @@ $$r_t^e = - \sum_j \left( || \dot{\mathbf{q}}_t^j \cdot \boldsymbol{\tau}_t^j ||
 ![[assets/figures/papers/paper_list_l53_https_research_nvidia_com_labs_toronto_ai_vid2player3d_data_tennis_skill/figures/002_Figure_2.jpg]]
 *Figure 2: Our video imitation system consists of four stages: First, we estimate kinematic motions from source video clips. Second, a low-level imitation policy is trained to imitate the kinematic motion for controlling the low-level behaviors of the simulated character and generate physically corrected motion. Next, we fit a conditional VAE to the corrected motion to learn a motion embedding that produces diverse and human-like tennis motions. Finally, a high-level motion planning policy is trained to generate target kinematic motion by predicting VAE latent codes and joint corrections for wrist motion. The target motion is then imitated by the low-level policy to control a physically simulated char...*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 方法谱系
 
@@ -264,6 +275,8 @@ $$r_t^e = - \sum_j \left( || \dot{\mathbf{q}}_t^j \cdot \boldsymbol{\tau}_t^j ||
 **跨领域泛化**：系统设计高度针对网球场景（依赖球场线检测进行相机标定、2D关键点奖励等），迁移至其他运动（如篮球、足球）需要重新设计场景特定的感知和奖励组件，方法论的通用性有限。
 
 **评估指标**：运动质量评估主要依赖物理合理性指标（如关节抖动、足部滑动等），缺乏与真实选手运动风格的定量相似性度量。Table 3中"Fed–full"与其他阶段的对比仅展示了物理修正的效果，未建立与原始视频运动的直接风格保真度评估。
+
+
 
 ## 原文 PDF
 

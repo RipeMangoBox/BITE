@@ -41,7 +41,7 @@ claims:
 > - 视频 (FSQ) 上，Token efficiency (满足给定 MSE 阈值的样本比例 vs token 使用百分比) 5x (较宽松) / 2.4x (较严格) 效率提升 vs 固定 100% token (相对基线 token 用量降低约 80% 和 58%)。
 > - 多模态 VQA (GQA, POPE, MSVD, MSRVTT) 上，Accuracy Ours: 54%, 82%, 52%, 37% vs Baseline (固定 100% token): 54%, 82%, 53%, 37% (持平或略低（差异在 1% 以内）)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -73,7 +73,7 @@ ElasticTok 属于**自适应视觉 tokenization** 这一新兴方向，其方法
 - 方法仅在视觉模态（图像/视频）上验证，向音频、决策轨迹等时序模态的扩展尚待探索。
 - 极低 token 数（$M_{min}$ 以下）训练不稳定，需设置下限保护。
 
-## 背景与动机
+
 
 ### 视觉标记化的效率瓶颈
 
@@ -103,7 +103,9 @@ ElasticTok 的出发点是一个直观但未被充分探索的问题：**能否�
 
 ElasticTok 的核心假设是：通过在前帧条件下随机掩盖 token 序列的后段，编码器将学会将关键信息压缩到剩余 token 中，并根据重建难度自动分配不同数量的 token。这一机制将 token 数量从架构约束转变为数据驱动的自适应变量，为长视频的高效建模开辟了新路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ElasticTok 的核心创新在于将传统视觉 tokenizer 的**固定长度编码**转变为**内容自适应的变长编码**，使 token 分配从“一刀切”转变为“按需分配”。这一转变通过三个相互配合的机制实现，每个机制对应一个关键的 changed slot。
 
@@ -135,7 +137,7 @@ ElasticTok 将掩码 $m$ 显式注入编码器，通过可学习的嵌入向量�
 
 三个 changed slot 共同实现了一个根本转变：**将 token 预算从训练时固定、推断时不可调，变为训练时随机化、推断时可搜索**。训练时的随机掩码让模型内化了“用更少 token 做更多事”的能力，推断时的搜索机制则让用户可以根据实际需求在质量和效率之间做出显式权衡。这种设计使 ElasticTok 在图像重建上以 1/3.5 到 1/1.3 的 token 用量达到固定 token 基线的同等重建满足率，在视频上更是达到 1/5 到 1/2.4 的 token 节省（Figure 4），同时在下游 VQA 任务中保持与基线持平的表现（Table 1）。
 
-## 整体框架
+
 
 ElasticTok 的核心设计理念是将固定长度的视觉 tokenizer 改造为内容自适应的变长编码器，其整体框架围绕一个统一的编码器-解码器流水线构建，并通过随机掩码训练策略赋予模型弹性分配 token 的能力。框架分为单块（Single Block）和多块（Multi Block）两种模式，分别处理短序列和长视频场景。
 
@@ -177,7 +179,7 @@ ElasticTok 的核心设计理念是将固定长度的视觉 tokenizer 改造为�
 ![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2410_08368/figures/002_Figure_2.jpg]]
 *Figure 2: ElasticTok adaptively encodes image and video to variable length outputs based on the complexity of the input data. Single block uses an Encoder-Decoder pipeline with a sampled latent mask. Multi-block extends this with a Block Causal Mask to handle longer video sequences*
 
-## 核心模块与公式推导
+
 
 ### 训练阶段：随机掩码策略
 
@@ -217,7 +219,9 @@ $$z_m = z \odot m$$
 | $z_m = z \odot m$ | 编码器输出与二进制掩码逐元素相乘，截断尾部 token | Section 3.1 |
 | $\text{softmax}(Q_i^T [K_1, \ldots, K_S]) [V_1, \ldots, V_S]$ | 块环形注意力中每个序列并行秩的部分注意力计算 | Section 2.1 |
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果：自适应标记化的效率优势
 
@@ -291,7 +295,9 @@ Figure 9 通过频率分析揭示了 token 分配的底层机制：token 使用�
 ![[assets/figures/papers/paper_list_l11_https_arxiv_org_abs_2410_08368/figures/003_Figure_3.jpg]]
 *Figure 3: ElasticTok adaptively encodes image and video to variable length outputs based on the complexity of the input data (using ElasticTok-VAE). The top rows shows examples of ElasticTok on images. Below shows a video example with: (Top) Ground-truth video frames. (Middle) Reconstructed frames with varying token usage. (Bottom) The bottom section depicts how ElasticTok dynamically adjusts token allocation over time, with the percentage of tokens used 0 60 192 293 349 420 480 511correlating to different content complexities in the video*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与固定长度 Tokenizer 的关系
 
@@ -334,6 +340,8 @@ ElasticTok 的适用性受以下边界约束：
 ### 知识库定位
 
 ElasticTok 在视觉 tokenizer 谱系中占据“自适应码长编码器”这一新兴位置。与固定 token 的 VAE/FSQ 基线相比，它以训练时的随机掩码策略换取推断时的灵活 token 分配，在保持下游任务性能（Table 1 显示 VQA 准确率持平或差异在 1% 以内）的同时大幅降低 token 消耗。该方法不依赖特定架构，论文声称可应用于“任何标准自编码器”，这为其在更大视觉生成系统中的集成提供了灵活性。
+
+
 
 ## 原文 PDF
 

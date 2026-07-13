@@ -5,6 +5,8 @@ paper_level: A
 venue: ICCV
 year: 2025
 pdf_ref: paperPDFs/ICCV_2025/A_Lesson_in_Splats_Teacher_Guided_Diffusion_for_3D_Gaussian_Splats_Generation_with_2D_Supervision.pdf
+project_link: https://lesson-in-splats.github.io/
+code_link: null
 aliases:
 - LSTGD3GSG2S
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | Splat一课：基于2D监督的教师引导扩散方法用于3D高斯泼溅生成 |
 | 英文题名 | A Lesson in Splats: Teacher-Guided Diffusion for 3D Gaussian Splats Generation with 2D Supervision |
 | 会议/期刊 | ICCV 2025 |
-| Links | [paper](https://arxiv.org/abs/2412.00623); [Project](https://lesson-in-splats.github.io/) |
+| Links | [paper](https://arxiv.org/abs/2412.00623) · [Project](https://lesson-in-splats.github.io/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | SplatDiffusion |
 | Dataset | ShapeNet-SRN Cars (single view), ShapeNet-SRN Chairs (single view), RealEstate10K (5 frames), RealEstate10K (10 frames) |
@@ -40,7 +42,7 @@ claims:
 > - ShapeNet-SRN Chairs (single view) 上，PSNR / SSIM / LPIPS 为 25.21 / 0.93 / 0.066，对比 Splatter Image (Large) 24.43 / 0.93 / 0.067，变化 +0.78 / 0.00 / -0.001。
 > - RealEstate10K (5 frames) 上，PSNR / SSIM / LPIPS 为 29.12 / 0.932 / 0.087，对比 Flash3D 28.46 / 0.899 / 0.100，变化 +0.66 / +0.033 / -0.013。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -93,8 +95,6 @@ SplatDiffusion 在方法谱系上位于**3D感知生成模型**与**2D监督3D�
 
 SplatDiffusion 仍存在若干局限：训练依赖预训练教师模型的质量；多步去噪训练（Stage II）显存和计算开销较大；在严重遮挡区域可能出现高斯分布不均匀导致过平滑。开放问题包括：如何自动确定最优临界时间步 t*、多步去噪策略能否推广至NeRF等其他3D表示、以及如何在更复杂的真实场景（动态、非朗伯表面）中保持有效性。
 
-## 背景与动机
-
 ### 3D生成的任务困境：模态耦合与数据瓶颈
 
 从单张或少量二维图像重建完整的三维场景，是计算机视觉中长期存在的核心挑战。近年来，3D高斯泼溅（3D Gaussian Splatting, 3DGS）作为一种兼具高质量渲染和实时性能的显式三维表示，迅速成为该领域的前沿方案。然而，如何为3DGS构建具有**多解性**（即同一输入图像可对应多个合理的三维解释）的生成模型，仍是一个悬而未决的问题。
@@ -119,7 +119,7 @@ SplatDiffusion 仍存在若干局限：训练依赖预训练教师模型的质�
 
 基于这一动机，本文提出了**SplatDiffusion**框架，利用预训练的确定性前馈模型作为“噪声教师”（Noisy Teacher）生成噪声化的三维样本，并通过多步去噪策略将二维渲染损失有效传播到扩散模型的各个噪声水平，从而在2D监督下训练出超越教师模型的3DGS扩散生成器。
 
-## 核心创新
+## 核心方法与创新机理
 
 SplatDiffusion 的核心创新在于打破标准扩散模型训练中“去噪信号与监督信号必须处于同一模态”的限制，提出了一套**教师引导的跨模态扩散训练框架**。其关键设计围绕以下五个 changed slots 展开。
 
@@ -158,8 +158,6 @@ $$\mathcal{L}_{\mathrm{cyc}} = \| x_{\mathrm{src}} - \mathcal{R}(\tilde{s}_0, v_
 ### 创新机制的内在逻辑
 
 上述五个 changed slots 构成一条连贯的创新链条：**模态解耦**使 2D 监督成为可能，**噪声教师引导**提供可行的初始化，**多步去噪**让渲染损失梯度覆盖全噪声水平以恢复细节，**循环一致性**进一步约束几何一致性，而**更小架构**则证明了方法的高效性——扩散模型的生成能力被成功“蒸馏”到紧凑网络中，同时超越教师。
-
-## 整体框架
 
 SplatDiffusion 的核心思想是将扩散训练中的**噪声样本来源**与**监督信号来源**解耦，从而突破标准扩散模型要求两者处于同一模态（通常为3D）的限制。该方法利用一个预训练的确定性3D重建模型作为“噪声教师”（Noisy Teacher），生成带有噪声的3D高斯泼溅（3DGS）样本，而监督信号则来自2D渲染图像，使模型能够在仅依赖2D数据的情况下进行有效的扩散训练。
 
@@ -212,8 +210,6 @@ $$\mathcal{L}_{\mathrm{cyc}} = \| x_{\mathrm{src}} - \mathcal{R}(\tilde{s}_0, v_
 | 视角引导模块（可选） | 在去噪过程中融入额外视图的通用引导（Universal Guidance） | 推理时 |
 
 数据流从单张源图像出发，经噪声教师生成初始3DGS，再经扩散去噪器迭代精炼，最终通过可微渲染器产生新视图图像。两阶段设计使模型先获得合理初始化，再通过模态解耦的多步去噪超越教师模型的上限。
-
-## 核心模块与公式推导
 
 SplatDiffusion 的训练流水线由五个核心模块构成，按两阶段策略组织：引导阶段（Bootstrapping）利用噪声教师进行初始监督，微调阶段（Fine-tuning）通过多步去噪和渲染损失实现模态解耦的精细化训练。
 
@@ -273,7 +269,7 @@ $$s_{t-1} = \sqrt{\alpha_{t-1}} \hat{s}_0 + \sqrt{1 - \alpha_{t-1}} \cdot \hat{\
 
 其中 $\hat{\epsilon}_t$ 为结合额外视图引导梯度修正后的噪声估计。实验表明，基于扩散的引导策略优于传统的逐样本3DGS优化方法（Table 5）。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -332,13 +328,10 @@ Table 4 系统剖析了各组件贡献（ShapeNet-SRN Cars 验证集）：
 ![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2412_00623/figures/005_Table_3.jpg]]
 *Table 3: Memory Footprint and Model Size*
 
-![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2412_00623/figures/007_Table_5.jpg]]
-*Table 5: Additional-view guidance. Evaluated on a subset of the car split, our diffusion-based model better utilizes an additional view through guidance compared to 3DGS optimization*
-
 ![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2412_00623/figures/017_Table_6.jpg]]
 *Table 6: Comparison on Co3D hydrant dataset*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 方法谱系
 

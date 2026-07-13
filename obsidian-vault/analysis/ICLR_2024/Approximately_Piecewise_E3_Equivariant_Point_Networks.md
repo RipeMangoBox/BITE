@@ -5,6 +5,7 @@ paper_level: A
 venue: ICLR
 year: 2024
 pdf_ref: paperPDFs/ICLR_2024/Approximately_Piecewise_E_3_Equivariant_Point_Networks.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/toronto-ai/apen/
 aliases:
 - APE3EPN
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | 近似分片E(3)等变点网络 |
 | 英文题名 | Approximately Piecewise E(3) Equivariant Point Networks |
 | 会议/期刊 | ICLR 2024 |
-| Links | [paper](https://arxiv.org/abs/2402.08529); [Project](https://research.nvidia.com/labs/toronto-ai/apen/) |
+| Links | [paper](https://arxiv.org/abs/2402.08529) · [Project](https://research.nvidia.com/labs/toronto-ai/apen/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/segmentation |
 | Method | APEN |
 | Dataset | Human body parts segmentation (Random split on SMPL/DFAUST), Human body parts segmentation (Unseen random seq. on DFAUST), Human body parts segmentation (Unseen seq. on DFAUST), One-shot generalization on DynLab real-world room scans |
@@ -41,7 +42,7 @@ claims:
 > - Human body parts segmentation (Unseen random seq. on DFAUST) 上，mean IoU (%) 为 92.2，对比 77.8 (EPN) / 78.5 (PointNet)，变化 +14.4 over EPN。
 > - Human body parts segmentation (Unseen seq. on DFAUST) 上，mean IoU (%) 为 93.5，对比 84.1 (EPN) / 80.1 (PointNet)，变化 +9.4 over EPN。
 
-## 概述
+## 概要
 
 **核心问题**：点网络在处理三维几何数据时，理想情况下应具备对刚体运动（旋转、平移、反射）的等变性。然而，真实世界的三维场景通常由多个独立运动的部件组成，全局的E(3)等变性无法刻画这种分片对称性。精确的分片E(3)等变建模要求事先知晓点云的真实分区——这一条件在实际中难以满足。分区预测的不完美会引入等变近似误差，而如何控制这一误差是此前方法未能解决的根本瓶颈。
 
@@ -50,8 +51,6 @@ claims:
 **方法定位**：APEN属于**近似分片等变点网络**。与全局等变方法（如EPN、VN）相比，APEN引入了可学习的逐层分区预测机制，实现了对局部运动对称性的自适应建模；与非等变基线（如PointNet、DGCNN）相比，APEN提供了理论可保证的等变近似误差边界。其核心架构由多层APEN层构成，每层包含三个关键模块：基于硬指派的近似分片等变变换 $\phi_{\text{III}}$、利用PCA帧平均的E(3)等变骨干 $\psi_b$、以及通过高斯混合模型能量最小化与KL散度正则化实现的分区预测模块。
 
 **主要结果**：在人体部位分割任务上，APEN在随机划分、未见随机序列和未见序列三种设定下分别达到94.2%、92.2%和93.5%的mIoU，较全局等变基线EPN提升4.6至14.4个百分点。在DynLab真实室内场景的一次性泛化分割中，APEN仅在单个训练扫描的条件下，在8个测试场景中的7个上超越在大规模合成数据上训练的PointNet、DGCNN和VN基线。在主体分类任务上，APEN以71.4%的准确率大幅领先最佳基线（DGCNN的32.1%），提升超过39个百分点。消融实验验证了通过逐层增大高斯核参数 $\sigma$ 可实现从细到粗的分区学习，以及增加分区数量 $k$ 可有效降低不良分区概率 $\lambda(Q)$，从而控制等变近似误差。
-
-## 背景与动机
 
 ### 点云学习的对称性先验
 
@@ -80,7 +79,7 @@ $$\psi ( X , Z ) = \sum _ { j = 1 } ^ { k } \psi _ { b } ( X \odot Z e _ { j } \
 
 本文的核心主张是：**分片 E(3) 等变的近似误差可以被 $\lambda(Q)$ 和 $\delta(Q)$ 联合控制**，从而将架构设计的焦点从“如何完美分区”转向“如何可控地预测分区并绑定误差”。这一视角将分片等变网络从启发式设计提升为具有理论保障的框架性方法。
 
-## 核心创新
+## 核心方法与创新机理
 
 APEN的核心创新在于将点网络的等变对称性从**全局E(3)**扩展至**近似分片E(3)**，并通过一种可控的误差边界机制来形式化地处理分区预测的不确定性。相较于全局等变网络（如EPN）或非等变基线（PointNet、DGCNN、VN），APEN在以下三个关键维度上实现了突破性改变。
 
@@ -122,8 +121,6 @@ $$\mathbb{E}_{Q_{Z|\mathbf{X}}} \left\| \phi \left( g \cdot \left( X, Z \right) 
 
 APEN的三项改变形成了一个完整的逻辑闭环：**可学习的逐层分区预测**提供了自适应发现局部结构的能力；**$(G,Q)$等变函数类与误差边界**为这种近似提供了理论保障；**自底向上的组合架构**则使网络能够从细到粗地逐步抽象场景结构。这一框架使得APEN在仅使用单个训练扫描的一次性泛化场景中，仍能显著优于在大规模合成数据上训练的全局等变网络和非等变基线（Table 2, Figure 3），验证了分片等变表示在数据高效学习中的关键优势。
 
-## 整体框架
-
 APEN采用一种自底向上的组合式网络架构，其核心思想是：**保持对较细（子）分区的等变性，即可保证对真实分区的等变性**。整个网络由一系列分片等变层串行堆叠而成，每层不仅输出该层的特征表示，还预测一个更粗化的分区供下一层使用，从而形成从细到粗的分区层次结构。
 
 ### 编码器-解码器流水线
@@ -151,8 +148,6 @@ APEN采用一种自底向上的组合式网络架构，其核心思想是：**�
 - **$\lambda(Q)$**：从 $Q$ 中采样得到非适当子分区的概率（Equation 2）。
 
 定理1保证：采用硬指派（$\arg\max$）的 $\phi_{\text{III}}$ 层属于 $(G,Q)$ 等变函数类，其等变近似误差被 $(\lambda(Q_{\text{simple}}) + \delta(Q)) M$ 所限制（Equation 7）。当 $\sigma \to 0$ 时，有 $\delta(Q_{\text{pred}}) \to 0$ 且 $\lambda(Q_{\text{pred}}) \leq \lambda(Q_{\text{simple}})$，从而实现对等变近似误差的可控边界。
-
-## 核心模块与公式推导
 
 APEN框架的核心由三个相互耦合的模块构成：**近似分片E(3)等变层**、**分区预测模型**以及**等变骨干网络**。这三个模块通过自底向上的组合架构串联，每层在输出特征的同时预测一个更粗化的分区，供下一层使用，从而实现对局部欧几里得运动对称性的逐步建模。
 
@@ -202,7 +197,7 @@ $$`\mathrm{loss}_A = \sum_{l=1}^{L} |\mathbf{Y}_l - \mathbf{Y}_{\mathrm{GT}}|`$$
 
 即要求每层预测的部分中心投票 $`\mathbf{Y}_l`$ 与真实部分中心 $`\mathbf{Y}_{\mathrm{GT}}`$ 的L1距离最小化。这种逐层监督确保了从细到粗的分区序列与真实几何结构保持一致，是APEN能够在仅使用单个训练扫描的一次性泛化任务中超越在大规模合成数据上训练的基线方法的关键机制。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -249,10 +244,7 @@ APEN 在多个任务上均表现出对全局等变网络及非等变基线的显
 ![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2402_08529/figures/011_Figure_7.jpg]]
 *Figure 7: APEN encoder’s learned partitions, $Q ^ { \mathrm { p r e d } }$ , extracted from two test-set examples in the human body segmentation experiment. In each group of 4 elements, the leftmost column shows $Q ^ { \mathrm { p r e d } }$ partitions, with subsequent layers’ partitions ordered left-to-right, culminating in the rightmost column that shows the encoder’s last layer partition
 
-![[assets/figures/papers/paper_list_l30_https_arxiv_org_abs_2402_08529/figures/012_Figure_8.jpg]]
-*Figure 8: APEN encoder’s learned partitions, $Q ^ { \mathrm { p r e d } }$ , extracted from the one shot segementation experiment. In the top row, layer partitions of a single training example are shown, while the bottom row shows layer partitions of an unseen test example. The leftmost column shows Qpred partitions, with subsequent layers’ partitions ordered left-to-right, culminating in the rightmost column that shows the encoder’s last layer partition*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. APEN 与现有方法的谱系关系
 

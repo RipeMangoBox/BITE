@@ -42,7 +42,7 @@ claims:
 > - MME-3DR 上，CLIP Score↑ 28.5 vs 22.7 (ShapeLLM-Omni) / 27.2 (Trellis) (+5.8 / +1.3)；KD_incep↓ 0.194 vs 0.249 (ShapeLLM-Omni) / 0.208 (Trellis) (-0.055 / -0.014)。
 > - Toys4K 上，CLIP Score↑ 29.3 vs 22.7 (ShapeLLM-Omni) / 28.1 (Trellis) (+6.6 / +1.2)；KD_incep↓ 0.156 vs 0.249 (ShapeLLM-Omni) / 0.168 (Trellis) (-0.093 / -0.012)。
 
-## 概述
+## 概要
 
 **研究问题**：强化学习（RL）已在文本和图像生成中展现出显著潜力，但其在文本到3D生成领域的适用性尚不明朗。核心瓶颈在于，3D生成任务具有更高的空间复杂度和全局一致性要求，现有的RL策略无法直接迁移，且缺乏能够评估模型内隐推理能力的基准。
 
@@ -54,7 +54,7 @@ claims:
 
 **局限与展望**：当前验证仅基于ShapeLLM-Omni单一架构，方法的通用性有待在其他3D表示（如网格、点云）上检验。奖励模型组合依赖特定模型，可能引入偏好偏差。未来方向包括将Hi-GRPO扩展至更大规模3D数据集，以及探索对抗性奖励以增强生成多样性与物理合理性。
 
-## 背景与动机
+
 
 ### 文本到3D生成中的强化学习困境
 
@@ -82,7 +82,9 @@ Figure 1 清晰展示了这一跨模态的差异：左侧对比了RL在文本、
 
 最终，基于这些策略构建的AR3D-R1成为首个RL增强的3D自回归模型，旨在回答一个根本性问题：**我们是否已经准备好将RL应用于文本到3D生成？**
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 AR3D-R1 的核心创新在于将强化学习（RL）首次系统性地引入文本到3D自回归生成，并围绕3D生成的层次化本质设计了分层RL范式 **Hi-GRPO**。与现有方法相比，其关键变化体现在以下五个维度：
 
@@ -122,7 +124,7 @@ AR3D-R1 系统对比了 GRPO、**DAPO**（Yu et al., 2025）和 **GSPO**（Yang 
 
 **证据强度**：上述创新点的核心证据（Table 4-6, Table 2-3）置信度在 0.9-0.95 之间，均来自论文内部消融实验和基准对比。需注意所有RL训练均基于 ShapeLLM-Omni 单一架构，扩展至其他3D生成模型（如扩散模型 Trellis）的通用性有待验证。
 
-## 整体框架
+
 
 AR3D-R1 的整体框架围绕一个核心洞察构建：**3D 自回归生成天然具有从全局几何到局部纹理的层次化进展**。基于此，方法将强化学习训练解耦为粗到细的分层过程，使策略优化与3D生成的固有结构对齐。
 
@@ -164,7 +166,7 @@ $$\mathbf{KL}_{i,t}^{(k)} = \frac{\pi_{\mathrm{ref}}(y_{i,t}^{(k)}|\mathbf{y}_{i
 ![[assets/figures/papers/paper_list_l2201_https_arxiv_org_abs_2512_10949/figures/009_Figure_6.jpg]]
 *Figure 6: Framework of Hi-GRPO. In Step 1, we instruct the model to generate high-level semantic reasoning based on the 3D prompt, and use it together with the prompt to produce a coarse 3D shape. In Step 2, conditioned on the 3D prompt and the high-level semantic CoT, the model generates low-level visual reasoning focused on local appearance details, which is used to produce the refined 3D object*
 
-## 核心模块与公式推导
+
 
 ### 分层生成范式与Hi-GRPO框架
 
@@ -224,7 +226,9 @@ Hi-GRPO相较于基础GRPO（Shao et al., 2024）引入了四项关键技术改�
 ![[assets/figures/papers/paper_list_l2201_https_arxiv_org_abs_2512_10949/figures/013_Figure_9.jpg]]
 *Figure 9: Results of Different Steps during Inference*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 4.1 实验设置与基准
 
@@ -301,7 +305,9 @@ Hi-GRPO相较于基础GRPO（Shao et al., 2024）引入了四项关键技术改�
 ![[assets/figures/papers/paper_list_l2201_https_arxiv_org_abs_2512_10949/figures/004_Figure_3.jpg]]
 *Figure 3: Effects of Scaling Strategies. We examine the effects of data scaling and training iteration scaling strategies on clip score*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -358,6 +364,8 @@ AR3D-R1的有效性建立在以下条件之上，超出这些边界时性能可�
 **λ权重的自适应**：Hi-GRPO中分层奖励权重λ的敏感性和自适应调整策略。当前λ是固定的，但不同提示对全局结构和局部纹理的侧重不同，自适应的λ可能进一步提升性能。
 
 **多模态一致性的评估**：如何将纹理-光照一致性、物理合理性等更全面的3D质量维度纳入RL奖励体系？这需要开发新的奖励模型或评估协议。
+
+
 
 ## 原文 PDF
 

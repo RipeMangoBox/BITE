@@ -5,6 +5,7 @@ paper_level: A
 venue: SIGGRAPH
 year: 2024
 pdf_ref: paperPDFs/SIGGRAPH_2024/TEDi_Temporally_Entangled_Diffusion_for_Long_Term_Motion_Synthesis.pdf
+code_link: null
 project_link: https://threedle.github.io/TEDi
 aliases:
 - TTED
@@ -41,7 +42,7 @@ claims:
 > [!tip] 效果简介
 > - Perceptual study (user preference survey, n=35 participants) 上，Diversity score (respondent count preferring each method) 34 vs 12 (MDM) (+22)；Quality score (respondent count preferring each method) 33 vs 17 (MDM) (+16)。
 
-## 概述
+## 概要
 
 **瓶颈**：现有的基于扩散的运动生成模型（如MDM）仅能一次性生成固定长度的短序列，无法直接合成长时间运动。将多个短序列进行拼接会产生明显的缝合伪影，而基于循环神经网络（RNN）的自回归方法（如ACRNN）在长时生成中容易出现遗忘和退化，导致输出质量随序列增长而急剧下降。
 
@@ -51,7 +52,7 @@ claims:
 
 **主要结果**：在包含35名参与者的感知研究中，TEDi在运动多样性（34票 vs MDM的12票）和运动质量（33票 vs MDM的17票）上均显著优于MDM、ACRNN和Motion VAE等基线方法。消融实验证实，随机噪声调度是避免运动生成崩溃和维持长期多样性的关键因素——若仅使用单调调度，生成运动的方差会大幅下降。TEDi还支持运动引导生成和轨迹控制等扩展应用，能够根据给定的关键姿态或路径约束合成自然的长时运动。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -77,7 +78,9 @@ claims:
 
 基于这一洞察，本文提出了**TEDi（Temporally-Entangled Diffusion）**框架，通过引入**时序变化的噪声调度**和**运动缓冲区递归生成机制**，从根本上突破了现有方法在生成长度、运动质量和多样性方面的瓶颈。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 TEDi 的核心创新在于将扩散过程的时间轴与运动序列的时间轴进行**时序纠缠（Temporally-Entangled Diffusion）**，从而突破了现有扩散运动生成模型只能生成固定长度短序列的根本限制。这一设计通过三个关键“changed slots”区别于 baseline 方法：
 
@@ -106,7 +109,7 @@ TEDi 提出**运动缓冲区递归生成**机制（Fig. 3）：维护一个噪�
 
 **因果枢纽总结**：时序纠缠的本质是通过让扩散模型适应帧级变化噪声水平，将扩散的逐步去噪机制转化为持续产生新干净帧的引擎。三个 changed slots 中，帧级噪声注入是**使能条件**，缓冲区递归生成是**推理机制**，物理感知损失是**质量保障**——三者协同实现了无限长、高质量、物理合理的运动合成。
 
-## 整体框架
+
 
 TEDi（Temporally-Entangled Diffusion）的核心思想是将扩散过程的去噪时间轴与运动序列的时间轴进行纠缠，从而突破传统扩散模型只能生成固定长度短序列的限制。其整体框架由训练和推理两条协同设计的流程构成，共享同一个去噪网络，但噪声调度策略和生成范式截然不同。
 
@@ -179,7 +182,7 @@ $$\mathcal{L}_{\mathrm{contact}} = \frac{1}{K C} \sum_{j} \sum_{t=1}^{K-1} \left
 ![[assets/figures/papers/paper_list_l26_TEDi_Temporally_Entangled_Diffusion_for_Long_Term_Motion_Synthesis/figures/001_Figure_1.jpg]]
 *Figure 1: Inspired by the gradual nature of the diffusion process along a diffusion time-axis (left), our approach (right) entangles the temporal-axis of motion with the time-axis of the diffusion process (right), enabling a new mechanism for synthesizing arbitrarily long motion sequences*
 
-## 核心模块与公式推导
+
 
 TEDi 的核心贡献在于将标准 DDPM 中全局统一的时间步噪声，替换为**沿运动时间轴逐帧变化的噪声调度**，从而将扩散过程的“去噪时间轴”与运动序列的“时序轴”纠缠在一起。这一设计使得模型能够学习从任意噪声水平组合中恢复干净运动，进而支撑自回归式的无限长序列生成。
 
@@ -265,7 +268,9 @@ $$
 ![[assets/figures/papers/paper_list_l26_TEDi_Temporally_Entangled_Diffusion_for_Long_Term_Motion_Synthesis/figures/002_Figure_2.jpg]]
 *Figure 2: TEDi Training. We train our diffusion-based model to remove temporally-varying noise that is applied to clean sequences during training. In each iteration we fetch a motion sequence of ?? frames*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 感知研究：主客观质量对比
 
@@ -334,7 +339,9 @@ TEDi 的主要局限在于推理延迟：从纯噪声生成干净帧需要经过
 ![[assets/figures/papers/paper_list_l26_TEDi_Temporally_Entangled_Diffusion_for_Long_Term_Motion_Synthesis/figures/011_Figure_12.jpg]]
 *Figure 12: Example motions from perceptual study. From top to bottom: Ours, ACRNN, MDM, and Motion VAE*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心机制与基线差异
 
@@ -385,6 +392,8 @@ TEDi 在标准扩散损失之外引入了两个辅助损失，以缓解旋转误
 4. **损失权重自动调优**：$\lambda_{\mathrm{diff}}, \lambda_{\mathrm{pos}}, \lambda_{\mathrm{contact}}$ 的最优选择可能依赖于运动类型和数据集特性，开发自适应权重策略可提升方法的鲁棒性。
 
 5. **感知评估的局限性**：当前主要评估依赖 Amazon Mechanical Turk 上的 35 人感知研究（Table 1），TEDi 在多样性（34 vs MDM 12）和质量（33 vs MDM 17）上均显著领先。但各基线模型的训练数据集、参数规模和计算资源可能不完全相同，这影响了结果的绝对公平性——需要更标准化的基准测试来验证结论的稳健性。
+
+
 
 ## 原文 PDF
 

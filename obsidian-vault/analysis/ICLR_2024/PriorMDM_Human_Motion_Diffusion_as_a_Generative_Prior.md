@@ -46,7 +46,7 @@ claims:
 > - BABEL (过渡质量, 70帧) 上，Transition FID (↓) DoubleTake 1.88 vs TEACH 3.86 (-1.98 (better))。
 > - 3DPW (两人前缀完成, 3秒) 上，Root Error (m ↓) ComMDM 0.30 vs MDM (no Com) 0.54 (-0.24 (better))。
 
-## 概述
+## 概要
 
 高质量人体运动数据的捕捉与标注成本极高，导致现有生成模型大多局限于单人、短时序（≤10秒）的运动合成，难以应对**长序列生成、多人交互协调以及关节级精细控制**等复杂任务。PriorMDM 提出一种系统性的“先验组合”范式：将预训练的**运动扩散模型（MDM）**固定为生成先验，通过设计三类推理时或轻量微调的组合策略，以零样本或少样本方式突破数据分布的限制。
 
@@ -65,7 +65,7 @@ claims:
 
 该工作的局限性在于：长序列中远距离区间可能出现语义不一致；两人交互对未见交互类型的泛化有限，且未保证真实物理接触；三种组合方法的跨领域适用性尚待验证。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -97,7 +97,9 @@ claims:
 
 这一思路的优越性在于其**经济性**与**通用性**：冻结或微调前置模型、引入轻量通信或混合机制，即可在多个任务上实现超出训练分布的运动合成，避免了为每个新任务从头收集数据和训练模型的高昂成本。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PriorMDM的核心创新不在于提出新的生成模型架构，而在于**将预训练的运动扩散模型（MDM）视为不可变动的生成先验**，通过三种推理时或轻量微调的**组合策略**，突破原始模型在数据规模与任务复杂度上的固有限制。这一范式的关键洞察是：预训练模型已编码丰富的动态先验，瓶颈并非收集更多数据，而是如何经济地组合利用已有先验。
 
@@ -137,7 +139,7 @@ $$G_s^{a,b}(X_t, t, c_a, c_b) = G^a(X_t, t, c_a) + s \cdot (G^b(X_t, t, c_b) - G
 
 三种方法的共同特征在于**对预训练先验的零侵入或微侵入利用**：DoubleTake完全冻结MDM，仅在推理时引入handshake与软遮罩；ComMDM冻结两个MDM，仅训练单层通信块；DiffusionBlending微调多个小型控制模型，在采样时混合。这一设计哲学使得PriorMDM能够以极低的额外成本，将单人短序列生成模型扩展至长序列、多人交互、精细关节控制等超出训练分布的下游任务。
 
-## 整体框架
+
 
 PriorMDM 并非重新训练一个通用模型，而是将预训练的运动扩散模型（MDM）固化为生成先验，在其上构建三种互补的组合策略，以零样本或少量样本的方式突破原始模型的分布边界。整体框架由三个独立但共享同一基座模型的模块构成：
 
@@ -184,7 +186,7 @@ $$G_s^{a,b}(X_t, t, c_a, c_b) = G^a(X_t, t, c_a) + s \cdot (G^b(X_t, t, c_b) - G
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2303_01418/figures/001_Figure_1.jpg]]
 *Figure 1: We suggest three novel motion composition methods, all based on the recent Motion Diffusion Model (MDM). (Left) Sequential composition generating an arbitrary long motion with text control over each time interval. (Middle) Parallel composition generating two-person motion from text. A different color represents a different person - both are generated simultaneously given the text prompt. (Right) Model composition achieving accurate and flexible control by blending models with different control signals - here writing “hello" in mid-air*
 
-## 核心模块与公式推导
+
 
 PriorMDM 的核心架构并非重新训练一个全新模型，而是将预训练的运动扩散模型 MDM（Tevet et al., ICLR 2023）固定为生成先验，在其上构建三种互补的组合策略。以下逐一剖析各模块的机制与关键公式。
 
@@ -237,7 +239,9 @@ $$G_s^{a,b}(X_t, t, c_a, c_b) = G^a(X_t, t, c_a) + s \cdot (G^b(X_t, t, c_b) - G
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2303_01418/figures/002_Figure_2.jpg]]
 *Figure 2: Soft blending overview. We allow b frames long linear masking between*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计逻辑
 
@@ -310,7 +314,9 @@ PriorMDM的实验体系围绕一个统一命题展开：**冻结的预训练运�
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2303_01418/figures/007_Figure_6.jpg]]
 *Figure 6: Two-Person Prefix Completion. MRT [Wang et al. 2021] tends to fixate on the prefix pose whereas our ComMDM provides lively and semantically correct completions. Blue figures are the input prefix frames, provided to both models. The red and orange figures are MRT and our completions correspondingly*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题瓶颈与核心思路
 
@@ -354,6 +360,8 @@ PriorMDM的三条技术路线分别针对长序列生成、多人交互和精细
 - **多模态先验融合**：当前仅利用文本作为条件，是否可引入图像、语音等模态的先验，进一步增强控制精度与数据效率？
 - **物理仿真耦合**：在两人交互生成中，是否可将轻量物理仿真作为后处理或训练约束，以弥补ComMDM对物理接触建模的不足？
 - **推理效率优化**：是否存在蒸馏或一步采样策略，将多次组合推理的计算开销压缩至接近单次生成的水平？
+
+
 
 ## 原文 PDF
 

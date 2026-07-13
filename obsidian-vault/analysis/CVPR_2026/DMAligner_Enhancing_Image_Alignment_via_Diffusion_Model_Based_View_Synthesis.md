@@ -44,7 +44,7 @@ claims:
 > - Sintel 上，Average LPIPS / DreamSim 0.211 / 0.108 (lower is better) vs DPFlow (0.xxx / 0.xxx) (N/A)。
 > - DAVIS 上，Average LPIPS / DreamSim 0.211 / 0.108 (lower is better) vs GenWarp (0.xxx / 0.xxx) (N/A)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：传统图像对齐方法依赖“光流估计 + 图像warping”的判别式范式。这一范式在遮挡、光照变化和复杂运动场景下存在根本性局限——显式warping无法处理多对一映射所导致的不可见区域，容易产生鬼影与背景失真（Fig. 1）。此外，部分基于深度或3D表示的方法（如COGS、AccidentalGS）需要额外的深度图、运动掩码或相机参数作为输入，限制了其在通用场景下的适用性。
 
@@ -54,7 +54,7 @@ claims:
 
 **主要结果**：在自建的DSIA数据集上，DMAligner 取得平均PSNR 26.67 / SSIM 0.81，全面超越所有对比方法（Table 2）。在Sintel和真实场景DAVIS数据集上，DMAligner 在LPIPS和DreamSim指标上也表现出色（Table 3）。定性结果显示，DMAligner 生成的图像在视觉上最接近真值，鬼影和背景失真显著减少（Fig. 4-7）。消融实验证实，DMP模块和预测x₀（而非噪声）的去噪目标对性能有决定性贡献（Table 4）。压力测试表明，DMAligner 在运动幅度增大时的性能退化速度明显慢于DPFlow和GenWarp（Fig. 8）。在下游HDR成像任务中，替换对齐模块为DMAligner后，鬼影和背景失真同样得到显著抑制（Fig. 7）。
 
-## 背景与动机
+
 
 图像对齐是计算机视觉中的一项基础任务，其目标是将不同时间或视角下捕获的同一场景图像在几何和语义上对齐，广泛应用于视频稳定、HDR重建、图像拼接等下游任务。传统对齐范式遵循“光流估计 + 图像warping”的两阶段流程：首先通过光流网络预测两帧之间的密集运动场，然后基于该运动场对源图像进行空间变换，使其与参考图像对齐。然而，这一范式存在根本性的瓶颈。
 
@@ -64,7 +64,9 @@ claims:
 
 **核心动机。** 本文的核心洞察在于：图像对齐的本质并非精确估计运动场，而是生成一张在参考视角下、目标时刻的完整场景图像。换言之，对齐任务可以被重新定义为一种**对齐导向的视图合成（alignment-oriented view synthesis）**问题。这一视角转换将任务从判别式的“估计-变换”范式转向生成式的“条件生成”范式，使得模型能够直接合成对齐后的完整图像，包括传统warping无法处理的遮挡和不可见区域。扩散模型在图像生成领域展现出的强大先验建模能力，为这一范式转换提供了技术基础。本文提出的**DMAligner**正是基于这一动机，旨在仅需两张连续RGB图像的前提下，利用扩散模型的生成能力实现高质量、无鬼影的图像对齐。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DMAligner 的核心创新在于**将对齐任务从“显式估计光流→图像warping”的判别式范式，重新定义为“以对齐为目标的扩散视图生成”的生成式范式**。这一转变直接回应了传统对齐范式的根本瓶颈：光流估计在遮挡、光照变化和复杂运动下不可靠，而 warp 操作无法处理多对一映射导致的不可见区域，最终产生鬼影与背景失真（Figure 1）。
 
@@ -106,7 +108,7 @@ $$L_{\mathrm{Total}} = \lambda_1 L_{\mathrm{Denoising}} + \lambda_2 L_{\mathrm{M
 
 其中 $L_{\mathrm{Denoising}}$ 利用 DMP 预测的掩码对前景和背景区域施加差异化权重（Eq. 10），引导模型聚焦于动态区域的对齐质量；$L_{\mathrm{Mask}}$ 为掩码预测的交叉熵损失。这种联合优化策略将动态感知与生成质量统一在一个端到端框架内。
 
-## 整体框架
+
 
 DMAligner 将图像对齐从一个“显式光流估计 + 图像 warping”的判别式任务，重构为一个以对齐为目标的扩散视图生成任务。其核心流水线由三个关键阶段串联而成：**潜在空间编码与条件构建**、**动态感知扩散训练**，以及**动态感知去噪推理**。
 
@@ -160,7 +162,7 @@ Figure 3 直观展示了这一范式转换：传统方法依赖光流网络显�
 ![[assets/figures/papers/paper_list_l2466_https_arxiv_org_abs_2602_23022/figures/001_Figure_1.jpg]]
 *Figure 1: (a) Conventional image alignment based on optical flow and image warping, resulting in ghosting artifacts and occlusion. (b) Our DMAligner directly generates the complete alignment image via diffusion-based view synthesis*
 
-## 核心模块与公式推导
+
 
 ### 问题建模与对齐目标
 
@@ -236,7 +238,9 @@ $$\{x_T \to \hat{x}_0^{(T)}\} \to \{x_{T-\Delta} \to \hat{x}_0^{(T-\Delta)}\} \t
 
 每一步利用上一步的预测结果作为下一轮的条件输入，实现增量式细化。最终 $\hat{x}_0^{(1)}$ 经解码器 $\mathcal{D}$ 还原为对齐后的RGB图像。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -294,7 +298,9 @@ Table 1 对比了各方法的输入需求。DMAligner 仅需两张连续 RGB 图
 ![[assets/figures/papers/paper_list_l2466_https_arxiv_org_abs_2602_23022/figures/008_Figure_6.jpg]]
 *Figure 6: Qualitative comparisons between DPFlow [34], GenWarp [41] and our DMAligner on the real-world DAVIS dataset*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与光流对齐范式的边界
 
@@ -351,6 +357,8 @@ DMAligner 在知识库中的定位可归纳为以下三个维度：
 | AccidentalGS | RGB + 相机参数 | 3D高斯喷洒对齐 | Mao et al., ICCV 2025 |
 | GenWarp | 单张RGB + 相机位姿 | 扩散新视图合成 | Seo et al., NeurIPS 2024 |
 | **DMAligner** | **两张RGB图像** | **扩散对齐视图合成 + DMP** | 本文 |
+
+
 
 ## 原文 PDF
 

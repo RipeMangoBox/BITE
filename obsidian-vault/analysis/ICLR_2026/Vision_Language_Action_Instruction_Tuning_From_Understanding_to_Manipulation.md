@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Vision_Language_Action_Instruction_Tuning_From_Understanding_to_Manipulation.pdf
+project_link: https://yangs03.github.io/InstructVLA_Home/
+code_link: null
 openreview_forum_id: tsxwloasw5
 aliases:
 - VLAITFUM
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 视觉-语言-动作指令微调：从理解到操控 |
 | 英文题名 | Vision-Language-Action Instruction Tuning: From Understanding to Manipulation |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=tsxwloasw5); [Project](https://yangs03.github.io/InstructVLA_Home/) |
+| Links | [paper](https://openreview.net/forum?id=tsxwloasw5) · [Project](https://yangs03.github.io/InstructVLA_Home/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | InstructVLA |
 | Dataset | SimplerEnv (Google Robot tasks, Expert), SimplerEnv-Instruct (任务聚合+情境推理), SimplerEnv-Instruct, LIBERO (四类任务平均) |
@@ -41,7 +43,7 @@ claims:
 > - SimplerEnv-Instruct (任务聚合+情境推理) 上，平均成功率 (Avg) 为 46.2 (Generalist)，对比 OpenVLA (FT): 23.9，变化 +96% (相对提升)。
 > - SimplerEnv-Instruct 上，平均成功率 (Avg) 为 46.2 (Generalist)，对比 OpenVLA (FT&GPT-4o): 35.6，变化 +29% (相对提升)。
 
-## 概述
+## 概要
 
 现有视觉-语言-动作（VLA）模型在将多模态推理能力转化为精确操控技能时面临根本性瓶颈：联合学习视觉理解、语言推理与动作生成极易引发灾难性遗忘，而富含多模态监督的操控数据又极为稀缺。如何在不侵蚀视觉-语言模型（VLM）通用推理能力的前提下习得操控技能，并反过来利用推理增强操控表现，是该领域的核心挑战。
 
@@ -59,7 +61,7 @@ InstructVLA 提出**视觉-语言-动作指令微调（VLA-IT）**这一训练�
 
 当前方法仍受限于基础操作原语和单目视觉输入，在深度估计不足和分布外场景下存在失败风险。如何扩展到更灵巧的技能、整合多模态感官信息，以及利用合成数据减少对真实世界采集的依赖，是未来值得探索的方向。
 
-## 背景与动机
+
 
 ### 视觉-语言-动作模型的兴起与困境
 
@@ -85,7 +87,9 @@ InstructVLA 提出**视觉-语言-动作指令微调（VLA-IT）**这一训练�
 
 InstructVLA正是围绕这一动机展开：通过潜在动作查询（Latent Action Queries）作为中间表征、混合专家（MoE）适应机制实现模态切换、以及两阶段的视觉-语言-动作指令微调（VLA-IT）范式，首次系统性地探索了从多模态理解到推理增强操控的完整路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 InstructVLA 的核心创新在于提出了一套系统性的**视觉-语言-动作指令微调（VLA-IT）范式**，通过架构创新与训练策略创新，在根本上解决了现有 VLA 模型在联合学习多模态推理与精确动作生成时面临的三大障碍：任务干扰导致的灾难性遗忘、缺乏丰富多模态监督的操纵数据、以及缺少有效机制将 VLM 的推理能力转化为动作生成。
 
@@ -139,7 +143,7 @@ InstructVLA 首次实现了推理与操控的紧密耦合。与缺乏或仅使�
 | 训练数据与范式 | 仅操作数据或简单混合 | 两阶段：语言运动监督 + 650K 多模态指令数据集 |
 | 推理与操控集成 | 缺乏或仅文本 CoT，未与动作模块耦合 | 异步自回归推理与潜在动作预测交替，支持双频推理 |
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_tsxwloasw5/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the InstructVLA. InstructVLA integrates the multimodal reasoning capabilities of a vision-language model with robotic manipulation. Generation consists of three steps: (1) asynchronous auto-regressive reasoning by the VLM, (2) latent action generation, and (3) action decoding. A MoE adaptation enables the VLM to alternate between reasoning and latent action prediction. The flow matching action expert decodes the final actions, conditioned on latent actions*
@@ -182,7 +186,7 @@ $$ \mathbf { \dot { \mathcal { L } } } = \mathcal { L } _ { L M } + \mathcal { L
 
 InstructVLA 支持异步推理：VLM 先进行自回归文本推理（thinking），生成任务相关的语义分析；随后切换到动作模式，基于推理结果生成潜在动作 C；最后由动作专家解码为连续控制信号。这种设计支持潜在动作缓存和双频推理——推理可在低频运行，而动作生成保持高频，实现推理增强的操控。消融实验表明，为通用模型启用推理相比直接执行指令带来 36.1% 的性能增益（Figure 7(b)）。
 
-## 核心模块与公式推导
+
 
 ### 整体架构与推理流程
 
@@ -242,7 +246,9 @@ $$
 
 **Stage-2（VLA 指令微调）** 仅微调 MoE 适应模块（约 220M 参数），冻结 VLM 主干和动作专家，在保持多模态能力的同时注入操控推理能力。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -337,7 +343,9 @@ Table 5的指令微调数据消融显示，仅在Bridge数据集上进行VLA-IT�
 ![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_tsxwloasw5/figures/022_Table_7.jpg]]
 *Table 7: VLA-IT captioning evaluation. “Sentence-BERT” and “SimCSE” represent learning-based evaluation methods, while the remaining metrics are traditional n-gram-based evaluations focused on word distribution*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：在VLA演进中的坐标
 
@@ -382,6 +390,8 @@ InstructVLA的设计决策划定了其有效性的边界：
 **泛化评估的系统化。** 当前评估以SimplerEnv和LIBERO为主，这些基准的任务多样性和环境复杂性远低于真实世界部署需求。构建覆盖更多具身形态、更多操作技能、更丰富语言指令的标准化评估体系，是推动VLA领域从“方法驱动”走向“问题驱动”的关键基础设施。SimplerEnv-Instruct基准的提出是朝这一方向迈出的第一步，但其30个情境推理任务的覆盖范围仍显有限。
 
 **合成数据与数字孪生的角色。** Table 6的数据量对比显示，InstructVLA使用的训练数据量（约650K多模态指令样本）远小于纯VLM训练所需的上亿级样本。利用大规模合成数据和数字孪生技术生成多样化的操作场景与语言标注，是突破数据瓶颈的潜在路径。但合成数据的真实感保真度与标注准确性之间的权衡，以及合成-真实域迁移的泛化保证，仍是开放挑战。
+
+
 
 ## 原文 PDF
 

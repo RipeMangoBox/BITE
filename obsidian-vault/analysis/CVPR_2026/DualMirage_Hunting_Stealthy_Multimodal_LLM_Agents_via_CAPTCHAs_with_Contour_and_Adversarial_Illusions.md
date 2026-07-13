@@ -42,7 +42,7 @@ claims:
 > - All configurations (Illusion-Selfie2Anime + Illusion-MNIST) 上，Average HSR (首次尝试 → 第四次尝试) 95.78% → 97.48%。
 > - All challenge configurations (white-box models) 上，Agent Blocking Rate (ABR) 100% (against LLaVA-v1.5-7b and Qwen2.5-vl-7b)。
 
-## 概述
+## 概要
 
 当前多模态大模型（MLLM）驱动的自主代理在视觉理解和决策能力上快速演进，使得传统依赖扭曲文本或图像分割的CAPTCHA机制日趋脆弱。现有防御范式本质上是被动门禁——仅测试用户是否具备人类水平的视觉能力，却无法识别和追溯机器代理的身份。**DualMirage** 将这一困境转化为主动猎捕机会，其核心思想是：**同时利用人类视觉系统与MLLM之间两种方向相反的感知分歧，构建“双重错觉”协同陷阱**。
 
@@ -54,7 +54,7 @@ claims:
 
 在五款主流MLLM上的实验表明，DualMirage 平均人类成功率达 **95.8%**，白盒场景下代理阻止率最高达 **100%**，身份诱导攻击成功率平均为 **58.8%**（白盒）和 **21.9%**（黑盒），在人类可用性与机器防御能力之间取得了现有方案中最佳的平衡。
 
-## 背景与动机
+
 
 随着多模态大模型（MLLM）在视觉理解、自主决策和工具调用能力上的飞速发展，基于此类模型的自主代理（agent）已能够模拟人类行为完成网页浏览、信息检索乃至社交互动等复杂任务。这一能力跃迁在提升自动化效率的同时，也对互联网安全基础设施构成了根本性威胁——传统验证码（CAPTCHA）机制正面临前所未有的失效危机。
 
@@ -82,7 +82,9 @@ DualMirage的核心动机在于将CAPTCHA从“被动门卫”重新定义为“
 
 与DualMirage最接近的前置工作是**IllusionCAPTCHA**（Ding et al., WWW 2025），该方法首次将轮廓错觉引入CAPTCHA设计，利用人类与机器对主观轮廓的感知差异构建认知障碍。然而，IllusionCAPTCHA仍停留在被动防御范式：其唯一目标是阻止代理通过验证，缺乏身份诱导机制，无法区分不同类型的攻击代理或追溯其来源。DualMirage在此基础上引入对抗错觉组件，将CAPTCHA的功能边界从“测试人类能力”拓展至“猎捕机器身份”，实现了从被动防御到主动猎捕的范式升级。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DualMirage 的核心创新在于将 CAPTCHA 从“被动门禁”范式彻底重构为“主动猎捕”范式。现有方法（如 **IllusionCAPTCHA**，Ding et al., WWW 2025）仅依赖轮廓错觉等单一认知障碍来测试人类能力，在具备强大视觉理解能力的多模态大模型（MLLM）代理面前日益脆弱。DualMirage 通过以下两个关键维度的范式跃迁解决了这一瓶颈。
 
@@ -104,7 +106,7 @@ DualMirage 的核心创新在于将 CAPTCHA 从“被动门禁”范式彻底重
 
 这一范式跃迁使 CAPTCHA 从单纯的“人类能力测试工具”转变为能够主动识别、追溯和暴露 MLLM 代理身份的智能陷阱系统。
 
-## 整体框架
+
 
 DualMirage 的生成管线由两个序贯模块构成，其核心设计理念是**将人类视觉系统与多模态大模型（MLLM）之间的感知分歧转化为可操作的防御与猎捕机制**。具体而言，该框架利用“轮廓错觉”对人类可见而对机器不可见，以及“对抗错觉”对机器可见而对人类不可见的双重特性，构建从被动阻止到主动身份诱导的完整攻击链。
 
@@ -158,7 +160,7 @@ $$\max_{\pmb{\delta}} \sum_{i=1}^{N} \frac{1}{N} \cos\left(E_{img}^{(i)}(\pmb{x}
 
 完整的生成流程由 Algorithm 1 统一描述，将两阶段操作封装为端到端的挑战生成过程。
 
-## 核心模块与公式推导
+
 
 DualMirage 的生成管线由两个关键模块串联构成，分别对应两种性质截然不同的“错觉”的注入，其整体流程如 Figure 2 所示。
 
@@ -212,7 +214,9 @@ $$
 ![[assets/figures/papers/paper_list_l745_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_DualMirage_Huntin/figures/001_Figure_1.jpg]]
 *Figure 1: Motivation of our proposed DualMirage. The first mirage (i.e., contour illusion) creates a perception of non-existent contours (such as the Mona Lisa) for the human visual system through colorful stripes, while the second mirage (i.e., adversarial illusion) hijacks the action of the multimodal agent, forcing it to reveal identity information (such as its model name)*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 人类可用性评估
 
@@ -263,7 +267,9 @@ DualMirage 的首要设计约束是保持对人类用户的友好性。如表 1 
 ![[assets/figures/papers/paper_list_l745_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_DualMirage_Huntin/figures/006_Figure_3.jpg]]
 *Figure 3: Multi-dimensional comparison of CAPTCHA schemes across key performance metrics. Pur DualMirage demonstrates a superior balance of high human usability, robust agent blocking, and adversarial attack capability*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有 CAPTCHA 范式的关系
 
@@ -311,6 +317,8 @@ DualMirage 的有效性高度依赖于两个前提条件，这界定了其适用
 DualMirage 处于 **CAPTCHA 安全 × 多模态对抗攻击 × 视觉认知科学** 的交叉地带。其核心贡献在于首次将心理物理学的轮廓错觉与机器学习的对抗攻击融合为统一的“感知陷阱”框架，实现了从被动防御到主动猎捕的范式跃迁。在 CAPTCHA 研究谱系中，它代表了对“基于认知差异的验证机制”这一路线的深化和武器化——不再满足于区分人类与机器，而是主动利用感知分歧来追溯机器代理的身份。
 
 该方法对后续研究的启示在于：在 MLLM 代理日益普及的时代，安全机制的设计不应停留在“提高任务难度”的线性思维，而应主动寻找并利用人类与机器感知系统中的根本性非对称性，并将其转化为可操作的攻防杠杆。DualMirage 所揭示的“双重错觉协同放大”效应（轮廓错觉提升阻止率，对抗错觉赋予身份诱导能力，组合后两者相互增强）为这一方向提供了有力的概念验证。
+
+
 
 ## 原文 PDF
 

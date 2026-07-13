@@ -5,6 +5,8 @@ paper_level: A
 venue: SIGGRAPH
 year: 2024
 pdf_ref: paperPDFs/SIGGRAPH_2024/SMEAR_Stylized_Motion_Exaggeration_with_ARt_direction.pdf
+project_link: null
+code_link: https://github.com/MoStyle/SMEAR
 aliases:
 - SMEAR
 tags:
@@ -40,7 +42,7 @@ claims:
 > - Memory usage per frame (Table 1) 上，Memory per frame (KB) 10 KB (482 verts), 27 KB (1344 verts), 280 KB (14267 verts, 65 bones) vs Not reported (Extremely low memory footprint, enabling interactive workflows)。
 > - Qualitative comparison: elongated in-betweens vs. swept volumes 上，Visual preservation of object details and concavities Elongated in-betweens maintain surface details and concavities vs Swept volumes (Sellan et al. 2021) lose high-frequency details and hide concavi... (Our method produces more recognizable objects with preserved details)。
 
-## 概述
+## 概要
 
 传统二维动画中，艺术家通过“涂抹帧”（smear frames）在快速动作中故意扭曲对象形状，以传达运动速度和方向感。然而，在三维动画领域，自动生成具有艺术控制力的涂抹帧效果——尤其是拉长中间帧（elongated in-betweens）、多重中间帧（multiple in-betweens）和运动线（motion lines）——一直是一个未充分解决的问题。现有方法要么依赖计算成本高昂的扫掠体积（如 **Sellán et al., 2021**），难以保留对象表面细节和凹面结构；要么缺乏对艺术风格的精细控制，无法无缝集成到标准动画工作流中。
 
@@ -52,7 +54,7 @@ SMEAR 方法（SIGGRAPH 2024）针对这一瓶颈提出了一个两阶段框架�
 
 **方法定位**：SMEAR 属于基于几何变形的非真实感渲染（NPR）方法，区别于基于物理模拟或后处理合成的方法。它通过一个轻量、可插拔的运动偏移量计算模块，将艺术控制权交给动画师，同时保持与现有动画工作流的兼容性。其主要局限性包括：对称旋转对象的自相交问题（需手动 UV 空间技巧解决）、细长肢体（如手指）的过度变形（需骨骼修剪），以及目前仅适用于关键帧动画输入。
 
-## 背景与动机
+
 
 ### 涂抹帧：从2D动画到3D的挑战
 
@@ -72,7 +74,9 @@ SMEAR 方法（SIGGRAPH 2024）针对这一瓶颈提出了一个两阶段框架�
 
 本文提出的SMEAR方法正是针对这一瓶颈，通过引入**运动偏移量（motion offsets）** 这一核心概念，将运动结构分析与风格化变形解耦，从而在计算效率、几何质量和艺术控制性三个维度上同时取得突破。运动偏移量定义为各顶点到分离结构的归一化符号距离，既编码了对象沿运动方向的前导/滞后关系，又保持了与输入网格拓扑的一致性，为后续的多样化风格化提供了统一的数学基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SMEAR 的核心创新在于将 3D 动画的涂抹帧（smear frame）生成从一个缺乏艺术控制的几何后处理问题，重新定义为**基于运动偏移量（motion offsets）的可微分风格化框架**。这一框架的根本突破体现在以下三个关键维度的改变上。
 
@@ -108,7 +112,7 @@ SMEAR 的关键改变在于**输出网格保持与输入相同的拓扑结构**�
 
 SMEAR 相对于 baselines 的创新可归纳为一次**表示层的范式转移**：用“运动偏移量 + 风格化函数”替代了“局部几何操作”或“体积重建”，在保持输入拓扑和细节的前提下，将涂抹帧生成从计算密集的几何处理转变为轻量、可控、可组合的艺术创作原语。这一转移的直接证据是：在性能上实现了三个数量级的加速（Table 1），在效果上保留了扫掠体积无法保留的凹面和细节（Figure 9），在控制上提供了从全局预设到逐顶点权重绘制的多层次艺术接口（Section 5.1, Figure 15）。
 
-## 整体框架
+
 
 SMEAR 的整体管线遵循“运动结构分析→风格化变形”的两阶段范式，其核心设计目标是**在不改变输入姿态和网格拓扑的前提下**，将艺术导向的涂抹帧效果自动注入到现有动画工作流中。
 
@@ -147,7 +151,7 @@ SMEAR 的整体管线遵循“运动结构分析→风格化变形”的两阶�
 
 相比于基于扫掠体积的方法（如 **Sellán et al., 2021**），SMEAR 不生成新的体积几何，而是直接变形输入网格，因此保持了原始拓扑和表面细节（如凹陷和高频纹理），同时计算速度快几个数量级（简单对象约 4 ms/帧 vs. 扫掠体积约 7000 ms/帧）。相比于简单的局部点积方法（如 **Jones and Keyser, 2005**），SMEAR 的分离平面/带方法提供了空间上更一致的领前/滞后划分，避免了局部法线方向导致的噪声偏移量。
 
-## 核心模块与公式推导
+
 
 SMEAR 方法的核心流水线由两个关键模块构成：**运动偏移量计算**（Motion Offset Computation）与**风格化引擎**（Stylization Engine）。前者为每个顶点分配一个标量值 $\bar{\delta}_i(f) \in [-1, 1]$，表示该顶点在运动方向上“领前”（正值）或“滞后”（负值）的程度；后者以运动偏移量为输入，通过可插拔的风格化函数驱动网格变形，生成拉长中间帧、多重中间帧和运动线三种涂抹帧效果。
 
@@ -234,7 +238,9 @@ $$
 ![[assets/figures/papers/paper_list_l7_SMEAR_Stylized_Motion_Exaggeration_with_ARt_direction_motion20v2/figures/022_Figure_16.jpg]]
 *Figure 16: The stylization effects achievable by our method may be combined to create complex motion stylizations*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：性能与视觉质量
 
@@ -307,7 +313,9 @@ SMEAR 在预处理性能和视觉保真度两个维度上均展现出对基线�
 ![[assets/figures/papers/paper_list_l7_SMEAR_Stylized_Motion_Exaggeration_with_ARt_direction_motion20v2/figures/012_Figure_15.jpg]]
 *Figure 15: Various stylization effects (c-e) of a sword slash motion using (a) motion offsets computed with a single bone to control the axis of separation, and (b) manually painted weights to control stylization intensity*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与设计动机
 
@@ -346,6 +354,8 @@ SMEAR的方法分为两步：首先计算时空连贯的运动偏移量（motion
 4. **统一风格化流水线。** 能否将涂抹帧与其他运动夸张效果（如压缩-拉伸、预备-跟随）结合，形成统一的动画风格化流水线？这需要处理不同效果之间的协调与冲突。
 
 5. **对称旋转的自动化处理。** 是否存在不依赖UV空间技巧的自动化方法，能够在不产生自相交的前提下处理对称旋转对象的运动风格化？这可能需要在运动偏移量计算中显式建模旋转分量。
+
+
 
 ## 原文 PDF
 

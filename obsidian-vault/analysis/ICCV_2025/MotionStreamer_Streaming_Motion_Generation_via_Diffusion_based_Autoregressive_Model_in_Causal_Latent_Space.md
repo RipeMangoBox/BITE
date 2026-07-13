@@ -5,6 +5,8 @@ paper_level: A
 venue: ICCV
 year: 2025
 pdf_ref: paperPDFs/ICCV_2025/MotionStreamer_Streaming_Motion_Generation_via_Diffusion_based_Autoregressive_Model_in_Causal_Latent_Space.pdf
+project_link: https://zju3dv.github.io/MotionStreamer/
+code_link: null
 aliases:
 - MotionStreamer
 tags:
@@ -40,7 +42,7 @@ claims:
 > - HumanML3D 上，R@3 ↑ 为 0.859，对比 0.846 (MoMask)，变化 +0.013。
 > - HumanML3D 上，MM-Dist ↓ 为 16.081，对比 16.138 (MoMask)，变化 -0.057。
 
-## 概述
+## 概要
 
 **核心问题**：现有运动生成方法无法同时实现流式生成与在线响应。基于扩散模型的方法受限于固定长度和非增量生成，无法处理动态变化的文本输入；基于GPT的自回归方法则依赖非因果VQ-VAE离散tokenization，导致解码延迟、误差累积以及离散化带来的运动细节信息损失，严重影响长序列生成质量。
 
@@ -50,7 +52,7 @@ claims:
 
 **主要结果**：在HumanML3D测试集上，MotionStreamer在FID（11.790 vs 12.232）、R-Precision（R@3: 0.859 vs 0.846）、MM-Dist（16.081 vs 16.138）等指标上全面超越MoMask（Table 1）。在BABEL长期运动生成任务上，子序列FID（15.743 vs 18.736）和过渡段FID（32.888 vs 34.721）均显著优于FlowMDM（Table 2）。消融实验证实，Causal TAE连续潜变量的生成FID（11.790）远优于VQ-VAE离散标记（13.226），证明了连续表示的信息保留优势（Table 3）。此外，Causal TAE实现了最低的首帧延迟，而传统非因果VAE必须等待整个序列生成完毕才能解码（Figure 4）。
 
-## 背景与动机
+
 
 ### 流式运动生成的核心瓶颈
 
@@ -80,7 +82,9 @@ claims:
 
 通过上述设计，MotionStreamer首次实现了真正意义上的流式运动生成：文本增量输入，运动帧即时输出，且生成质量在HumanML3D和BABEL基准上全面超越现有方法。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MotionStreamer 的核心创新在于将**连续因果潜空间**与**扩散自回归模型**深度耦合，从根本上重构了流式运动生成的范式。这一设计通过三个关键“changed slots”实现了对现有方法的突破。
 
@@ -134,7 +138,7 @@ $$x = \{ \dot{r}^x, \dot{r}^z, \dot{r}^a, \dot{\jmath}^p, \dot{\jmath}^v, \dot{\
 
 这一表示可直接驱动 SMPL 模型，避免了 IK 后处理引入的误差和不自然姿态（Figure 8 展示了 IK 导致的抖动问题）。
 
-## 整体框架
+
 
 MotionStreamer 的 pipeline 围绕**流式因果潜变量生成**这一核心思想构建，由四个关键模块串联形成端到端的在线推理流程（Figure 2）。
 
@@ -151,7 +155,7 @@ MotionStreamer 的 pipeline 围绕**流式因果潜变量生成**这一核心思
 
 **训练策略的协同设计**：为支撑上述推理流程，训练阶段引入了两项关键策略。**Two-Forward 训练**在第一轮前向中使用真实潜变量进行 teacher forcing，第二轮前向中按余弦调度器 $\gamma_t = \frac{1}{2}(1 - \cos(\frac{\pi t}{T}))$ 逐步替换部分真实潜变量为第一轮的预测值，有效缓解自回归模型的曝光偏差。**混合训练**统一处理原子文本-运动对和上下文三元组（文本，历史运动，当前运动），使模型同时学会从零开始生成和基于历史继续生成，为流式场景中的多轮文本输入提供支持。
 
-## 核心模块与公式推导
+
 
 ### 运动表示与问题形式化
 
@@ -215,7 +219,9 @@ $$\epsilon_g = \epsilon_u + s ( \epsilon_c - \epsilon_u )$$
 
 训练数据统一为两种模式：原子对 $(T_i, \emptyset, Z_i)$ 模拟文本到运动的冷启动生成；上下文三元组 $(T_i, C_i, Z_i)$ 模拟流式生成中的延续预测。混合训练使单一模型同时掌握从零开始生成和基于历史继续生成的能力，支持动态文本输入下的在线响应。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -288,7 +294,9 @@ Figure 8 展示了一个典型失败案例：当使用逆运动学从相对关�
 ![[assets/figures/papers/paper_list_l26_MotionStreamer_Streaming_Motion_Generation_via_Diffusion_based_Autoregre/figures/018_Table_8.jpg]]
 *Table 8: Detail architecture of the proposed Causal TAE*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：流式生成与在线响应的双重缺失
 
@@ -350,6 +358,8 @@ MotionStreamer 通过两个关键设计打破了上述权衡，建立起“连�
 3. **多模态条件扩展**：当前方法仅支持文本条件，能否将因果潜空间框架扩展至音频、场景上下文等多模态条件，同时保持流式生成的实时性？
 
 4. **更长序列的误差累积**：虽然连续潜空间缓解了离散量化的误差累积，但自回归生成在超长序列（数千帧）上的漂移问题仍需进一步研究，可能需要引入全局规划或周期性重锚定机制。
+
+
 
 ## 原文 PDF
 

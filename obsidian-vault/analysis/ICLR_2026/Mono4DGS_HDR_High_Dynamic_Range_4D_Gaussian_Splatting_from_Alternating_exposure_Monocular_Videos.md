@@ -43,7 +43,7 @@ claims:
 > - Syn-Exp-3 (test frames) 上，HDR TAE↓ 0.057 vs 0.059 (MoSca-HDR) (-0.002)。
 > - Real-Exp-2 (real, 2 exposures, train frames) 上，HDR-TAE↓ 0.046 vs 0.054 (MoSca-HDR) (-0.008)。
 
-## 概述
+## 概要
 
 从单目视频中重建动态场景（4D 重建）是计算机视觉的核心挑战之一。当输入视频由**交替曝光**的 LDR 帧组成时，问题进一步复杂化：帧间亮度不一致使得标准光度重投影误差无法用于相机位姿优化，同时缺乏直接的 HDR 监督导致恢复的 HDR 外观在时域上不稳定。Mono4DGS-HDR 针对这一瓶颈，提出了一种**两阶段高斯溅射优化框架**，无需已知相机位姿即可从交替曝光单目视频中重建高质量的 4D HDR 场景。
 
@@ -52,8 +52,6 @@ claims:
 **主要结果**：在合成数据集 Syn-Exp-3 上，HDR PSNR 达到 37.64 dB，较最优基线 MoSca-HDR 提升 0.75 dB；在真实数据集 Real-Exp-3 上，LDR 观测曝光 PSNR 达到 27.65 dB（+0.42 dB），HDR 时域一致性指标 HDR-TAE 在真实场景中降至 0.046（-0.008）。消融实验证实：去除视频高斯初始化使 PSNR 下降超过 1 dB，去除 TLR 导致 HDR-TAE 大幅恶化，去除 HDR 光度重投影损失同样造成性能显著下降。
 
 **方法定位**：Mono4DGS-HDR 属于无位姿单目 4D HDR 重建方法，区别于需要已知位姿的静态 HDR 方法 **GaussHDR**（Liu et al., 2025a）和多相机动态 HDR 方法 **HDR-HexPlane**（Wu et al., 2024a）。与 **MoSca-HDR**（Lei et al., 2025）、**SplineGS-HDR**（Park et al., 2025）、**GFlow-HDR**（Wang et al., 2025b）等无位姿方法的 HDR 扩展相比，其关键差异在于用视频高斯初始化替代传统的轨迹/深度提升初始化，并引入了 TLR 与 HDR 光度重投影损失来解决交替曝光带来的独特挑战。
-
-## 背景与动机
 
 ### 问题背景：从交替曝光单目视频重建 4D HDR 场景
 
@@ -81,7 +79,7 @@ claims:
 
 基于此，本文提出 **Mono4DGS-HDR**，一种基于高斯溅射（Gaussian Splatting）的两阶段优化方法，通过正交空间视频高斯表示解除对相机位姿的依赖，并引入时序亮度正则化（TLR）保证 HDR 时域一致性，最终实现从交替曝光单目视频的高质量 4D HDR 重建。
 
-## 核心创新
+## 核心方法与创新机理
 
 Mono4DGS-HDR 的核心创新在于通过**两阶段高斯优化**破解了交替曝光单目视频 4D HDR 重建的两个根本瓶颈：**帧间亮度不一致导致相机位姿无法估计**，以及**缺失直接 HDR 监督导致时域外观不稳定**。其关键洞察是：先在无位姿的正交相机空间学习动态 HDR 视频高斯，获得一致的 HDR 训练视频初始化，再将其转换为世界空间高斯，为位姿优化和场景重建提供稳定基础。
 
@@ -130,8 +128,6 @@ $$\mathcal{L}_{\mathrm{tlr}} = \Big| V_{t\,t-1} \odot \frac{\widetilde{H}_{t-1\,
 
 Mono4DGS-HDR 的四个改进槽位构成了一条完整的因果链：**视频高斯初始化**（槽位一）在无位姿空间中恢复一致的 HDR 视频 → **高斯变换与缩放重拟合**（槽位二）将其转换为高质量的世界空间初始化 → **HDR 光度重投影损失**（槽位四）使相机位姿得以在 HDR 域中优化 → **时序亮度正则化**（槽位三）保证 HDR 外观的时域稳定性。这一链条的核心驱动力在于：通过解耦位姿估计与 HDR 外观学习，将交替曝光的“障碍”转化为“约束”，实现了从单目交替曝光视频到 4D HDR 场景的端到端重建。
 
-## 整体框架
-
 Mono4DGS-HDR 采用**两阶段高斯优化范式**，核心思路是将相机位姿估计与 HDR 场景重建解耦，从而规避交替曝光视频中帧间亮度不一致对位姿优化的致命干扰。整体流程如图 2 所示，可概括为三个关键环节：
 
 **（1）2D 先验提取**  
@@ -152,11 +148,6 @@ Mono4DGS-HDR 采用**两阶段高斯优化范式**，核心思路是将相机位
 
 ![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_9ZrjgzlAuh/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of Mono4DGS-HDR. (a) We infer vision foundation models on the input alternating-exposure video to extract 2D priors, which provide scene initialization and regularization. (b) We propose a novel two-stage Gaussian optimization procedure, which includes video Gaussian training in the first stage, world Gaussian fine-tuning in the second stage, and a videoto-world Gaussian transformation strategy. The HDR Gaussians are optimized through 2D prior supervision, Gaussian motion regularization, temporal luminance regularization and HDR photometric reprojection loss*
-
-![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_9ZrjgzlAuh/figures/001_Figure_1.jpg]]
-*Figure 1: (a) Our Mono4DGS-HDR can reconstruct high-quality 4D HDR scenes from unposed monocular LDR videos with alternating exposures. (b) Compared to simply extending SplineGS (Park et al., 2025), MoSca (Lei et al., 2025) and GFlow (Wang et al., 2025b) to HDR mode, our approach achieves significantly better reconstruction quality*
-
-## 核心模块与公式推导
 
 Mono4DGS-HDR 的核心架构围绕两阶段高斯优化展开，包含五个关键模块：2D 先验提取、视频高斯训练（第一阶段）、视频-世界高斯变换、世界高斯精炼（第二阶段）以及时序亮度正则化。以下逐一剖析各模块的设计逻辑与关键公式。
 
@@ -231,15 +222,7 @@ $$\mathcal{L}_{\mathrm{tlr}} = \Big| V_{t, t-1} \odot \frac{\widetilde{H}_{t-1, 
 
 其中 `\widetilde{H}_t` 为时刻 `t` 的 HDR 渲染，`\widetilde{H}_{t-1, t}` 为时刻 `t-1` 的渲染经光流 `V_{t, t-1}` 扭曲到时刻 `t` 的结果。分母归一化消除了 HDR 辐照度绝对尺度的影响，使正则化聚焦于相对亮度一致性。这一设计使良好监督时刻的外观传播到弱监督时刻，确保 HDR 时域稳定性。消融实验表明，去除 TLR 使 HDR-TAE 大幅恶化（Table 3e，Figure 6），时域一致性显著降低。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_9ZrjgzlAuh/figures/003_Figure_3.jpg]]
-*Figure 3: (a) Our video-world Gaussian Transformation Strategy, including dynamic/static identification, attribute transformation and re-fitting. (b) Example of transformed dynamic/static world Gaussians. (c) Without occlusion handling, the dynamic/static separation is inaccurate. (d) Without 2D covariance invariance (directly inherit scaling), the world Gaussians have unreasonable scales*
-
-![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_9ZrjgzlAuh/figures/004_Figure_4.jpg]]
-*Figure 4: Temporal luminance regularization for temporally consistent HDR appearance*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -304,16 +287,7 @@ Mono4DGS-HDR 在合成与真实数据集上均取得最优性能。表 1 和表 
 ![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_9ZrjgzlAuh/figures/021_Table_8.jpg]]
 *Table 8: Ablation results about depth and flow/track losses on the test frames of Syn-Exp-3 scenes. Metrics are averaged over all scenes. LDR-OE and LDR-NE denote the LDR results with observed and novel exposures, respectively. HDR denotes the HDR results*
 
-![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_9ZrjgzlAuh/figures/018_Table_6.jpg]]
-*Table 6: Ablation results about other exposure schedules on the test frames of Syn-Exp-3 scenes. Metrics are averaged over all scenes. LDR-OE and LDR-NE denote the LDR results with observed and novel exposures, respectively. HDR denotes the HDR results*
-
-![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_9ZrjgzlAuh/figures/020_Table_7.jpg]]
-*Table 7: Ablation results about different random exposure perturbation ranges on the test frames of Syn-Exp-3 scenes. Metrics are averaged over all scenes. LDR-OE and LDR-NE denote the LDR results with observed and novel exposures, respectively. HDR denotes the HDR results*
-
-![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_9ZrjgzlAuh/figures/023_Figure_15.jpg]]
-*Figure 15: Several typical failure cases of Mono4DGS-HDR*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 任务定位与问题独特性
 

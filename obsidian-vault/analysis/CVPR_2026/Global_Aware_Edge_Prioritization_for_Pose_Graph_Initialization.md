@@ -43,7 +43,7 @@ claims:
 > - VisymScenes 上，AUC@5° (k=5 MSTs, COLMAP relative pose) 75.6 (all modulation components enabled) vs – (–)。
 > - MegaDepth 上，AUC@5° (COLMAP relative pose) consistently the best across all k MSTs vs MegaLoc, SALAD, DINOv2 (largest margin at k=1, k=2)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -86,7 +86,7 @@ claims:
 
 > ⚠️ 论文未标注具体发表年份与会议，部分基线方法的引用元数据需手动核实。
 
-## 背景与动机
+
 
 ### 位姿图初始化在增量SfM中的关键地位
 
@@ -110,7 +110,9 @@ claims:
 
 这一思路的关键洞察在于：**边的“可靠性”不应仅由两幅图像的视觉相似度定义，还应包含该边对全局重建的贡献度。** 两幅图像可能视觉上高度相似，但如果它们共享的3D点极少，则对多视图几何的贡献有限；反之，一条视觉相似度中等但能连接两个稀疏子图的边，对重建完整性的价值可能更高。通过从SfM重建结果中提取RANSAC内点数和3D点重叠度作为监督信号，我们的GNN能够隐式地学习这种全局价值判断。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于将**全局结构感知**系统性地引入位姿图初始化的两个关键阶段——边排序与图选择，从而突破了现有方法仅依赖成对局部相似性的根本局限。
 
@@ -146,7 +148,7 @@ $$\tilde{r}_{ij} = \frac{1}{2}(\mathrm{norm}(u_{ij}) + \mathrm{norm}(v_{ij}))$$
 
 **创新总结**：三个changed slots形成闭环——GNN提供全局感知的边排名，多MST将排名转化为连通且冗余的图结构，距离调制则在前两者基础上进一步降低图直径。这一“全局推理+全局选择”的范式在IMC23-PhotoTourism上相较MegaLoc提升6.6个AUC@5°百分点（k=5），且在稀疏设定下优势更为显著。
 
-## 整体框架
+
 
 本文提出 **Global Edge Prioritization**，将位姿图初始化从“逐图像独立检索”重构为“全局排序 + 结构化选择”两阶段流水线。整体流程如图 2 所示，包含四个核心模块：
 
@@ -176,7 +178,7 @@ $$\tilde{r}_{ij} = \frac{1}{2}(\mathrm{norm}(u_{ij}) + \mathrm{norm}(v_{ij}))$$
 ![[assets/figures/papers/paper_list_l2103_https_arxiv_org_abs_2602_21963/figures/001_Figure_1.jpg]]
 *Figure 1: Given a set of input image pairs (left), our method ranks all candidate edges by global matchability (middle) and constructs a compact, well-connected pose graph via multi-MST selection (right). The resulting initialization enables accurate and stable 3D reconstruction, even under sparse or ambiguous settings*
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题形式化与初始边选择
 
@@ -249,7 +251,9 @@ $$s_{ij}^{(m)} = (1-\lambda) \hat{r}_{ij} + \lambda \bar{d}^{(m-1)}(i,j) \tag{9}
 - 每棵MST构造后，仅更新每张图像的**top-5候选边**分数，并丢弃预测排名低于0.9的边
 - 已选入先前MST的边通过赋 $-\infty$ 分数进行掩码，避免重复选择
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果
 
@@ -313,7 +317,9 @@ $$s_{ij}^{(m)} = (1-\lambda) \hat{r}_{ij} + \lambda \bar{d}^{(m-1)}(i,j) \tag{9}
 
 ![[assets/figures/papers/paper_list_l2103_https_arxiv_org_abs_2602_21963/figures/011_Figure.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：位姿图初始化的全局盲区
 
@@ -378,6 +384,8 @@ $$s_{ij}^{(m)} = (1-\lambda) \hat{r}_{ij} + \lambda \bar{d}^{(m-1)}(i,j)$$
 3. **跨模态扩展**：该全局边优先级框架能否扩展到动态视频序列（需考虑时序一致性）或多模态数据（如 RGB-D、LiDAR 点云）的位姿图初始化？GNN 的边特征设计需要相应调整以融合多模态信息。
 4. **与学习的局部特征结合**：当前方法依赖全局图像描述子，若与学习的局部特征（如 SuperPoint、LoFTR）结合，能否进一步提升在极端视角变化下的边排名质量？
 5. **端到端训练**：当前 GNN 训练与下游 SfM 是分离的，是否可能将重建质量（如重投影误差、注册相机数）作为训练信号，实现端到端的位姿图初始化学习？
+
+
 
 ## 原文 PDF
 

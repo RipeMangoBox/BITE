@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/RankFlow_Property_aware_Transport_for_Protein_Optimization.pdf
+project_link: null
+code_link: null
 aliases:
 - RankFlow
 tags:
@@ -40,13 +42,13 @@ claims:
 > - ProteinGym Fitness 上，Spearman ρ 为 0.742，对比 0.690 (DePLM)，变化 +0.052。
 > - ProteinGym Expression 上，Spearman ρ 为 0.765，对比 0.730 (DePLM)，变化 +0.035。
 
-## 概述
+## 概要
 
 蛋白质适应度预测的核心瓶颈在于：主流方法依赖预训练语言模型（PLM）产生的属性无关表示，并普遍假设突变效应为独立位点加和，难以有效捕捉上位效应（epistasis）。这导致在少样本场景下排序能力弱、跨实验泛化差，无法准确刻画蛋白质的适应度景观。RankFlow 通过**属性感知的条件流**重塑 PLM 的突变表示，将其从野生态条件分布运输至与目标属性对齐的分布；同时引入**可微的秩一致性损失（Rank‑Consistent Conditional Flow Loss, RC²）**强制保持相对排序，从而端到端地优化排序精度。该方法利用多模态融合编码器（ESM‑2 + ESM‑IF）和属性引导门（Property‑guided Steering Gate）抑制无关进化偏差，仅引入 37.1M 可训练参数，推理成本较 DePLM 降低 94.4%。
 
 在 ProteinGym 随机划分下，RankFlow 取得整体 Spearman ρ=0.786，显著优于 Kermut（0.763）、DePLM（0.739）等方法；在稳定性、适应度、表达、结合、活性五个功能类别上均达到最优（ρ 分别为 0.911、0.742、0.765、0.781、0.722）。单蛋白基准（β‑内酰胺酶、GB1、荧光蛋白）的 ρ 分别达到 0.912、0.856 和 0.782，均为监督方法的最优水平。跨实验泛化测试中，RankFlow 较直接微调 ESM‑2/SaProt 回归头的 Spearman 相关系数高出约 0.05–0.10，分布外泛化优势明显。消融实验证实，移除 RC² 损失导致各功能类别 ρ 平均降低 0.02–0.06，且在高阶突变上退化尤为突出。总体而言，RankFlow 以条件流与秩一致性损失的协同，将无监督 PLM 表示转化为适应度对齐的嵌入，在排序精度与泛化能力上实现了全面突破。
 
-## 背景与动机
+
 
 蛋白质的适应度（fitness）预测——定量评估点突变或组合突变对稳定性、活性、结合等分子功能的影响——是定向进化与蛋白质工程中的核心计算任务。近年来，蛋白质语言模型（PLM）凭借在大规模序列/结构数据上的预训练，为突变效应建模提供了富有进化信息的嵌入表示，成为众多预测方法（如ProteinNPT、DePLM等）的骨干网络。然而，这类通用嵌入本身是无监督的、与具体功能属性无关的（property‑agnostic），主要编码进化保守性而非目标任务的适应度信号。当仅以少量实验标注数据对线性回归或MLP头进行微调时，极易陷入过拟合：在同一局部表示区域，高适应度突变可能被错误映射为低分，反之亦然（Figure 1a）；由此导致的泛化瓶颈在跨实验（cross‑assay）设定中尤为突出，直接限制了模型的实用价值（Figure 1b）。
 
@@ -54,7 +56,9 @@ claims:
 
 上述问题共同指向一个需求：需要一种学习范式，既能将原始的、属性无关的PLM表示重塑为与目标属性对齐的嵌入空间，又能显式捕获突变集合内的上位交互，并直接以排序一致性为目标进行优化。本文提出的RankFlow正是围绕这一动机，通过属性感知的条件流传输与可微秩一致性损失，试图突破现有方法的局限。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 现有的蛋白质适应度预测方法（如微调 PLM 后接回归头）受限于两个核心瓶颈：**(1)** PLM 在掩码语言建模目标下学到的表示与下游属性（稳定性、活性等）之间缺乏显式对齐，导致回归头在局部表示空间中容易过拟合，将真正高适应度的突变体映射到低分区域（Figure 1a）；**(2)** 独立位点加和假设无法捕获突变间的上位效应（epistasis），尤其在高突变深度下，组合爆炸使得可靠监督稀缺，排序能力急剧下降。  
 
@@ -84,7 +88,7 @@ PLM 嵌入天然携带进化保守性等与目标属性无关的信息，容易�
 
 **总结**：上述五个 changed slots 并非孤立改造，而是构成一条因果链——多模态编码器和 PSG 提供高质量的条件上下文；可学习突变集合嵌入和 U‑Net 流头捕获上位效应；能量函数和 RC² 损失将流匹配过程直接与排序目标对齐。整套设计使得 RankFlow 仅凭 37.1 M 可训练参数（远少于全参微调的 SaProt 650 M），在 ProteinGym 随机划分上取得 Spearman ρ=0.786，超越 SOTA 监督模型（Kermut 的 0.763），并在模数划分下将优势扩大至 +0.057（Table 2），充分验证了属性感知流与秩一致学习作为“causal knob”的有效性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0013_uS5rA4fDJp_RankFlow_Property-aware_Transport_for_Protein_Op/figures/002_Figure_1.jpg]]
 *Figure 1: Illustration of RankFlow. (a) In a local region of representation space, a regression head on PLM embeddings can overfit when fine-tuned on a single assay, mapping some truly high-fitness mutants to low scores and vice versa. RankFlow instead reshapes wild-type-conditioned mutant representations into a fitness-aligned distribution, enforcing a property-aware landscape. (b) In a crossassay generalization experiment, models are trained on 40 Deep Mutational Scanning (DMS) assays from the same category and evaluated on a held-out assay; RankFlow achieves higher Spearman correlation than fine-tuned ESM2/SaProt with regression heads, indicating stronger generalization*
@@ -110,7 +114,7 @@ RankFlow 的核心思想是将蛋白质语言模型（PLM）产出的无监督�
 
 **输入‑输出流**：管线输入为一条野生型蛋白序列及其结构（用于编码野生态上下文），以及一批由突变集合 $\boldsymbol{\mu}_i$ 定义的突变体。多模态编码器输出野生态特征作为流的起点 $h_0$；PSG 生成位点门控；条件流头以 Heun 求解器（20 步，从 $t=1$ 到 $0$）数值积分，将 $h_0$ 运输为属性对齐的表征 $h_0^{\text{tgt}}$；最后利用 PLM 头输出各突变体的 $\tilde{y}_i$，实现全排序预测。整个框架仅引入 37.1M 可训练参数（Table 4），在不微调大尺寸 PLM 的前提下，通过条件流重塑表征分布来捕获突变间的上位效应，显著提升排序精度与跨实验泛化能力。
 
-## 核心模块与公式推导
+
 
 RankFlow 的核心机制是通过一个属性感知的条件流，将突变体的 PLM 表示从无监督分布输送到与目标属性对齐的分布（Figure 2）。该框架由五个关键模块构成，下面逐一阐述其作用与对应的关键公式。
 
@@ -158,7 +162,9 @@ $$\mathcal{L}(\boldsymbol{\theta}) = \mathcal{L}_{\mathrm{PFM}}(\boldsymbol{\the
 
 联合训练使运输过程既保持局部预测精度，又强制保证全局的突变排序一致性，尤其在突变深度较高、可靠监督稀缺时作用显著（Figure 4）。通过上述模块，RankFlow 将无监督的 PLM 表示重塑为适应度对齐的嵌入，同时捕获突变间的非加性相互作用。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要性能对比
 
@@ -209,7 +215,9 @@ RankFlow 采用无侵入架构的 MC‑Dropout 与批次重采样混合策略来
 3. **静态结构信息**：融合的 ESM‑IF 仅提供静态三维上下文，无法反映突变导致的构象变化，可能遗漏影响功能的重要动态因素。
 4. **极端少样本场景**：在训练样本极为有限时，流匹配与 RC² 的组合仍可能产生过拟合，未来可引入元学习或贝叶斯推断以进一步增强鲁棒性。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有方法的对比与改进定位
 
@@ -252,6 +260,8 @@ RankFlow 在蛋白质适应度预测的方法谱系中，直接回应了当前�
   当前所引用的结构为静态 ESM‑IF 嵌入。若结合分子动力学模拟或最近发展的蛋白质状态预测模型（如 AlphaFold 系列的构象采样），有望捕捉突变引起的局部环境重排，从而进一步提升表达、活性等功能类别的预测精度。这一方向需要设计将动态结构表征与流匹配速度场对齐的新范式。
 
 这些开放问题既体现了 RankFlow 作为“排序引导的条件流”框架的灵活性，也揭示了其在更真实、更复杂的蛋白质工程场景中尚未覆盖的盲区。未来的跟进工作可据此在表征学习、排序目标与结构动态融合三个维度上继续深化。
+
+
 
 ## 原文 PDF
 

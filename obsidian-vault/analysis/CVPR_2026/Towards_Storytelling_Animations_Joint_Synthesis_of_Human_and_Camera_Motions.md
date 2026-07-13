@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/Towards_Storytelling_Animations_Joint_Synthesis_of_Human_and_Camera_Motions.pdf
+project_link: null
+code_link: null
 aliases:
 - JCCMDM
 - TSAJSHCM
@@ -42,7 +44,7 @@ claims:
 > - Our Dataset (Character Motion) 上，FID↓ 0.113 vs 0.156 (ComMDM) (-0.043)；Coverage↑ 0.264 vs 0.160 (ComMDM) (+0.104)。
 > - Our Dataset (Camera Motion) 上，SeqFID↓ 0.256 vs 0.417 (DC3D) (-0.161)；Density↑ 1.937 vs 0.538 (CDM) (+1.399)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -68,7 +70,7 @@ claims:
 
 本方法属于**多实体运动联合生成**范式，在扩散模型框架下首次将角色运动生成与相机运动生成统一建模。相较于**InterGen**（Liang et al., IJCV 2024）等仅建模角色间交互的工作，本方法将交互建模扩展至角色-相机维度，填补了叙事动画生成中协同建模的空白。
 
-## 背景与动机
+
 
 ### 叙事动画中的角色-相机协同困境
 
@@ -98,7 +100,9 @@ claims:
 
 这一框架的最终目标是：从随机噪声出发，一次性采样出角色运动、角色间交互以及与之协调的相机运动，三者共同构成一段具有叙事感的动画序列。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于首次将角色运动生成与相机运动生成从两个独立问题统一为一个**联合生成问题**，并提出了一套与之匹配的架构设计。其创新点可归纳为三个关键的“changed slots”：生成空间的扩展、交互建模机制的引入，以及相机表示空间的重新设计。
 
@@ -133,7 +137,7 @@ $$x_c^{1:N} = \{ p_A^i, p_B^i, \theta^i, \phi^i \}_{i=1}^N \in \mathbb{R}^{6N}$$
 
 综上，本文的创新并非单一的技术点，而是一套环环相扣的系统性设计：**Toric空间**提供了叙事感知的表示基础，**三实例联合空间**确立了协同生成的框架，而**双向成对交互模块**则是实现该框架内实体间因果建模的核心机制。三者共同构成了首个能够端到端联合生成叙事动画中角色与相机运动的统一框架。
 
-## 整体框架
+
 
 本文提出**Joint Character-Camera Motion Diffusion Model**，首次将双角色运动与动态相机运动纳入统一的扩散生成框架。核心思路是将两个角色与相机视为三个独立但相互影响的实体，在扩散模型内部显式建模它们之间的成对交互，从而实现协调的联合运动生成。
 
@@ -186,7 +190,7 @@ $$\hat{h}_t^c = h_t^c + \Delta h_t^{A \to c} + \Delta h_t^{B \to c}$$
 ![[assets/figures/papers/paper_list_l3_https_openaccess_thecvf_com_content_CVPR2026_papers_Cheng_Towards_Storyt/figures/001_Figure_1.jpg]]
 *Figure 1: Our framework jointly generates the motion of two interacting characters and the motion of a camera to visually tell a story. The central panel shows two instances of generated character-camera motions. For each pair of character and camera motions, we display rendered viewpoints at four sampled moments along each camera motion trajectory*
 
-## 核心模块与公式推导
+
 
 ### 运动表示
 
@@ -245,7 +249,9 @@ $$\hat{h}_t^c = h_t^c + \Delta h_t^{A \to c} + \Delta h_t^{B \to c}$$
 ![[assets/figures/papers/paper_list_l3_https_openaccess_thecvf_com_content_CVPR2026_papers_Cheng_Towards_Storyt/figures/002_Figure_2.jpg]]
 *Figure 2: We represent shot composition using the on-screen coordinates of the two principal characters’ heads, denoted as*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -304,7 +310,9 @@ $$\hat{h}_t^c = h_t^c + \Delta h_t^{A \to c} + \Delta h_t^{B \to c}$$
 ![[assets/figures/papers/paper_list_l3_https_openaccess_thecvf_com_content_CVPR2026_papers_Cheng_Towards_Storyt/figures/011_Figure_5.jpg]]
 *Figure 5: Qualitative comparison. While M2C-T and AutoVisNarr yield fragmented or static compositions, our method maintains expressive framing and cinematic flow, resulting in superior coordination between characters and camera motion*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位与核心瓶颈
 
@@ -357,6 +365,8 @@ $$\hat{h}_t^c = h_t^c + \Delta h_t^{A \to c} + \Delta h_t^{B \to c}$$
 ### 6. 知识库定位
 
 本文在叙事动画生成领域填补了“联合角色-相机运动生成”的空白。相较于分离式方法（ComMDM + DC3D 的简单拼接），本文首次证明了在扩散模型内部进行跨实体交互建模的可行性与优越性。其 Toric 空间表示与成对交互模块的设计为后续工作提供了可复用的技术组件，同时也暴露了多角色扩展和语义条件控制两个明确的研究缺口，为社区指明了后续攻关方向。
+
+
 
 ## 原文 PDF
 

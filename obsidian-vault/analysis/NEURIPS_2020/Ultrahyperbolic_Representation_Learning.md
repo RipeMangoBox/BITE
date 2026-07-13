@@ -5,6 +5,7 @@ paper_level: A
 venue: NeurIPS
 year: 2020
 pdf_ref: paperPDFs/NEURIPS_2020/Ultrahyperbolic_Representation_Learning.pdf
+code_link: https://github.com/MarcTLaw/UltrahyperbolicRepresentation
 project_link: https://github.com/MarcTLaw/UltrahyperbolicRepresentation
 aliases:
 - URL
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | 超双曲表示学习 |
 | 英文题名 | Ultrahyperbolic Representation Learning |
 | 会议/期刊 | NeurIPS 2020 |
-| Links | [paper](https://arxiv.org/abs/2007.00211); [GitHub](https://github.com/MarcTLaw/UltrahyperbolicRepresentation) |
+| Links | [paper](https://arxiv.org/abs/2007.00211) · [GitHub](https://github.com/MarcTLaw/UltrahyperbolicRepresentation) |
 | Topic | #topic/benchmarks_datasets_evaluation #topic/benchmarks_datasets_evaluation/benchmark_eval |
 | Method | Ultrahyperbolic Representation Learning |
 | Dataset | NIPS co-authorship dataset (4-dim), NIPS co-authorship dataset (6-dim) |
@@ -40,7 +41,7 @@ claims:
 > - NIPS co-authorship dataset (4-dim) 上，Spearman's ρ (whole dataset) 为 0.667 (Q_{-1}^{2,2})，对比 0.460 (hyperbolic Q_{-1}^{4,0})，变化 +0.207。
 > - NIPS co-authorship dataset (6-dim) 上，Spearman's ρ (whole dataset) 为 0.688 (Q_{-1}^{3,3})，对比 0.455 (hyperbolic Q_{-1}^{6,0})，变化 +0.233。
 
-## 概述
+## 概要
 
 现有主流表示学习范式（欧氏空间、双曲空间、球面流形）均建立在正定度量（黎曼）之上，每种空间只能刻画单一曲率类型的几何结构。然而，现实世界的图数据往往同时包含**层次性树状结构**和**循环结构**，单一正定度量无法统一表示这两种关系模式——这正是本文所识别的核心瓶颈。
 
@@ -55,7 +56,7 @@ claims:
 
 该方法的主要局限在于：对数映射在⟨x,y⟩_q ≥ |β|时未定义，论文采用连续线性近似作为替代；测地线预度量d_γ不满足三角不等式，可能影响需要严格度量性质的下游任务；训练时间较长（NIPS数据集4维表示需约10小时），难以直接扩展到大规模图。开放问题包括如何自动确定最优的时间/空间维度配比，以及该框架向度量学习、生成模型等任务的推广。
 
-## 背景与动机
+
 
 ### 表示学习中的几何空间选择困境
 
@@ -100,7 +101,9 @@ $$\gamma_{\mathbf{x}\to\pmb{\xi}}(t) = \begin{cases} \cosh(\dots)\mathbf{x} + \d
 
 在不定期量流形上进行表示学习面临一个根本性的优化难题：**由于度量张量不定，目标函数的梯度方向不能直接作为下降方向使用**。实验表明，直接使用伪黎曼梯度 -Df(x) 作为搜索方向会导致算法不收敛。为此，本文需要设计一种利用不定度量非正定性来**构造保证下降方向**的伪黎曼优化方法，这是实现超双曲表示学习的关键技术环节。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈与因果开关
 
@@ -153,7 +156,7 @@ $$D f(\mathbf{x}) = \Pi_{\mathbf{x}}(\mathbf{G} \nabla f(\mathbf{x})) = \mathbf{
 - 训练时间较长（NIPS 数据集 4 维表示约需 10 小时，12 GB NVIDIA TITAN V），难以直接扩展到大规模图。
 - 如何根据数据自动确定最优的时间/空间维度分配（$p, q$）仍是开放问题。
 
-## 整体框架
+
 
 超双曲表示学习（Ultrahyperbolic Representation Learning）的整体流程围绕一个核心范式展开：**将图节点嵌入到具有不定度量（伪黎曼）的常曲率伪双曲面 $\mathcal{Q}_{\beta}^{p,q}$ 上，并通过专门设计的伪黎曼优化算法学习嵌入，使该单一表示空间能够同时捕捉图中的层次性和循环性结构**。整个 pipeline 由三个关键模块串联而成：节点嵌入初始化、软最大化损失计算、伪黎曼优化步。
 
@@ -202,7 +205,7 @@ $$\mathbf{x} \leftarrow \exp_{\mathbf{x}}(-\eta \boldsymbol{\chi})$$
 
 **图 → 嵌入初始化（正极点附近投影）→ 相似性计算（测地线预度量/连续近似）→ 损失评估（软最大化排序损失）→ 伪黎曼梯度投影 → 指数映射更新 → 收敛后的超双曲嵌入**
 
-## 核心模块与公式推导
+
 
 ### 1. 度量基础：伪欧氏内积与伪双曲面
 
@@ -276,7 +279,9 @@ $$\min_{\mathbf{x}_i \in \mathcal{Q}_{\beta}^{p,q}} \sum_{e_k=(v_i,v_j)\in E} -\
 
 其中 d(·,·) 为所选相似性函数（D_γ 或 d_γ），τ 为温度参数，W(e_k) 为负采样边集合。该损失鼓励高权重边具有较小的相似性值（即节点在流形上更接近），是跨流形表示学习的统一优化目标。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -328,7 +333,9 @@ $$\min_{\mathbf{x}_i \in \mathcal{Q}_{\beta}^{p,q}} \sum_{e_k=(v_i,v_j)\in E} -\
 - **Figure 3（左）** 展示了 Zachary 空手道俱乐部的图结构，其包含天然的层次性（俱乐部分裂为两个社区）和循环性（成员间的多重交互），是验证超双曲表示能力的理想测试场景。
 - **Figure 3（右）** 的损失曲线显示，具有时间维度的超双曲流形（q ≥ 1）收敛到更低的损失值，且收敛稳定性优于纯双曲或纯球面流形，直接反映了不定度量对图结构建模的适配性。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 对现有表示空间的突破
 
@@ -388,6 +395,8 @@ NIPS 合著数据集上 4 维表示的训练时间约 10 小时（12 GB NVIDIA T
 4. **可扩展优化**：能否借鉴双曲表示学习中的加速技术（如黎曼 Adam、负采样）来降低超双曲优化的计算成本？伪黎曼流形上的自适应优化器设计是一个待探索的方向。
 
 5. **理论性质**：测地线预度量不满足三角不等式，这对表示学习的收敛性和泛化性有何理论影响？是否可以在伪双曲面上定义满足三角不等式的真度量？
+
+
 
 ## 原文 PDF
 

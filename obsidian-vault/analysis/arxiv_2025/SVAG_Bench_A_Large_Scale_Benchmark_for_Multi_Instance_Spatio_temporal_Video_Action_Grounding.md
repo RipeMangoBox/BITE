@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/SVAG_Bench_A_Large_Scale_Benchmark_for_Multi_Instance_Spatio_temporal_Video_Action_Grounding.pdf
+project_link: null
+code_link: null
 aliases:
 - SVAG-Bench
 tags:
@@ -41,7 +43,7 @@ claims:
 > - OVIS 上，HOTA 22.73 vs 11.63 (GPT-5.4) (+11.10)。
 > - MOT17 上，HOTA 0.60 vs 0.09 (GPT-5.4) (+0.51)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有视频理解模型在时空多实例动作定位上存在根本性推理鸿沟——空间定位与时间定位被孤立优化，无法在长时、密集、多行动者场景中联合推理。所有专有与开源大视觉语言模型（LVLM）在极长密集视频（MOT20）上的空间跟踪指标 HOTA 均为零（Table 28），直接暴露了当前视觉语言模型在组合时空推理上的系统性失败。
 
@@ -53,7 +55,7 @@ claims:
 
 **局限与挑战**：当前 SVAGFormer 采用模块化分离设计，缺乏端到端的联合推理；基准领域局限于城市、交通和动物监控，尚未覆盖具身交互场景；在 MOT20 等极端拥挤长时场景中，绝对性能仍接近零，距离实用水平存在根本性差距。
 
-## 背景与动机
+
 
 ### 视频动作定位的范式演进与根本瓶颈
 
@@ -76,7 +78,9 @@ Table 1 的系统对比揭示了当前基准数据集的结构性缺陷。尽管
 1. **SVAG-Bench**：首个大规模多实例时空视频动作定位基准，整合 OVIS、MOT17 和 MOT20 三个多目标跟踪数据集，覆盖从短时多样（OVIS，平均 67.7 秒）到极长密集（MOT20，平均 2232.8 秒）的难度谱系。
 2. **SVAGFormer**：采用**时间优先门控策略**的模块化基线——先执行时间定位确定动作区间，再将空间跟踪限定在该窗口内，从而避免无关帧产生虚假轨迹。这一设计选择直接回应了“孤立子任务优化无法组合为统一时空推理”的核心洞察。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作的核心创新在于**任务定义与方法设计两个层面的根本性重构**，共同指向一个此前未被充分建模的瓶颈：长时、密集、多行动者场景下的联合时空推理。
 
@@ -105,7 +109,7 @@ SVAGFormer 的核心设计选择是**时间优先门控策略**（temporal-first
 
 需要指出，SVAGFormer 的模块化设计（FlashVTG + TempRMOT + 时间门控）虽然有效，但**时空模块分离**意味着信息仅在门控信号处单向传递，缺乏端到端的联合推理。这可能是其在 MOT20 上 HOTA 仍仅 0.43 的结构性原因——在极端拥挤场景中，时间定位的错误会不可逆地传播至空间跟踪模块。此外，当前基准领域覆盖仅限于多目标跟踪数据集（OVIS、MOT17、MOT20），尚未扩展到更一般的具身场景，这一限制需在后续工作中突破。
 
-## 整体框架
+
 
 SVAGFormer 采用**时间优先门控（temporal-first gating）**策略，将多实例时空视频动作定位分解为两个级联阶段，以解决全视频空间跟踪带来的虚假轨迹问题。
 
@@ -133,7 +137,7 @@ SVAGFormer 采用**时间优先门控（temporal-first gating）**策略，将�
 ![[assets/figures/papers/paper_list_l75_https_arxiv_org_abs_2510_13016/figures/004_Figure_3.jpg]]
 *Figure 3: Overview of the SVAGFormer pipeline. Given a natural language query (e.g., “A person is dancing in the open area”), temporal grounding first narrows the full video (frames 1–2782) to two temporal candidates (2543–2782) and (2557–2772). Spatial grounding then operates exclusively within this window, returning bounding box tracks for all actors satisfying the query*
 
-## 核心模块与公式推导
+
 
 ### 任务统一形式
 
@@ -182,7 +186,9 @@ SVAGEval 评估框架针对多参考对象场景进行了专门设计：
 ![[assets/figures/papers/paper_list_l75_https_arxiv_org_abs_2510_13016/figures/005_Figure_4.jpg]]
 *Figure 4: Flowchart for processing evaluation. Spatial and temporal evaluations are conducted separately on the OVIS, MOT17, and MOT20. The results are averaged and combined to form the final result. Threshold α controls the relative importance of detection and association accuracy in HOTA*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 统一时空评估协议
 
@@ -253,7 +259,9 @@ Table 2 汇总了各方法在三个子数据集上的统一对比。核心发现
 ![[assets/figures/papers/paper_list_l75_https_arxiv_org_abs_2510_13016/figures/003_Figure_2.jpg]]
 *Figure 2: Statistics of SVAG-Bench. The majority of queries fall within the range of 6 to 10 words*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务谱系：从单维定位到时空联合多实例推理
 
@@ -318,6 +326,8 @@ SVAGFormer 在方法谱系中的独特位置源于其**时间优先门控策略�
 4. **当前 LVLM 的视觉表示是否丢失了细粒度的时空信息？** LVLM 在空间跟踪上的全面失败暗示，其视频编码器可能过度压缩了精确位置和身份信息。如何压缩视频表示同时保留多目标跟踪所需的时空精度，是一个核心架构问题。
 
 5. **评价体系是否需要更细粒度的组合性评估？** m-HIoU 作为单一标量可能掩盖模型在不同维度（时间精度、空间关联、多实例处理）上的能力差异，需要开发分解式评估协议来诊断具体失败模式。
+
+
 
 ## 原文 PDF
 

@@ -42,7 +42,7 @@ claims:
 > - User Study 上，Physical Plausibility (%) 98.5 vs 0 / 1.5 (+97.0%)；Structural Coherence (%) 88.5 vs 8.5 / 3.1 (+80.0%)。
 > - Ava-256 dynamics 上，Explained Variance PC1 (%) (lower = dynamic) 93.28 vs 95.42 / 96.16 (-2.14)。
 
-## 概述
+## 概要
 
 现有头部化身方法普遍假设头发与头部刚性绑定，无法解耦面部表情与头发运动，导致动态场景下头发运动不真实，且被头发遮挡的头部区域难以合理重建。**PhysHead** 的核心洞察在于：通过视觉语言模型（VLM）生成秃头图像并结合可微分渲染构建头部外观代理，实现头部与头发的彻底解耦；同时引入发丝间颜色一致性损失，使隐藏区域获得合理外观，从而让基于物理引擎的动态头发驱动成为可能。
 
@@ -50,7 +50,7 @@ claims:
 
 实验表明，PhysHead 在保持与 GaussianHaircut 可比的外观重建质量（PSNR 30.28 vs 30.55，SSIM 0.946 vs 0.915）的同时，大幅提升了动态真实感：用户研究中头发物理合理性达 98.5%（基线 0–1.5%），结构一致性达 88.5%（基线 3.1–8.5%）；动力学指标上，主成分解释方差降至 93.28%（基线 95.42–96.16%），时序平滑度降至 0.863（基线 2.13–6.23），验证了动态头发运动的有效性。消融实验进一步证实，颜色一致性损失和分层优化策略是实现仿真就绪化身的关键。
 
-## 背景与动机
+
 
 真实感头部化身是沉浸式远程呈现与数字人应用的核心技术。现有方法在静态场景下已能取得令人印象深刻的渲染质量，但一旦进入动态驱动，一个关键瓶颈便暴露出来：**头发运动的物理真实感严重缺失**。无论是基于 3D 高斯泼溅的 **Gaussian Avatars (GA)** 还是 **Gaussian Head Avatars (GHA)**，其头发表示均附着在参数化头部模型（如 FLAME）上，随头部做刚性运动。这种假设在头部转动或点头时会导致头发与头部同步旋转，完全忽略了惯性、重力与碰撞等基本物理效应，产生“头盔式”的僵硬动画。
 
@@ -64,7 +64,9 @@ claims:
 
 PhysHead 正是围绕这三个问题展开。其核心动机在于：通过视觉语言模型（VLM）构建秃头外观代理，实现头发的彻底剥离与头部的完整重建；采用基于发丝的结构化 3D 高斯表示，使头发几何天然兼容物理模拟管线；并引入发丝间颜色一致性损失，将外层可见发丝的颜色传播至内层隐藏区域。这一设计使得 PhysHead 首次实现了同时支持面部表情参数化控制与头发物理模拟的真实感头部化身，并在用户研究中取得了 98.5% 的物理真实感评分——相比之下，基线方法仅为 0–1.5%。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PhysHead 的核心创新在于通过**分层表示与物理耦合**，首次实现了仿真就绪的逼真动态头发头部化身。相较于现有方法将头发视为刚性附着或非结构化高斯的做法，PhysHead 在以下四个关键维度上实现了根本性突破。
 
@@ -100,7 +102,7 @@ PhysHead 采用**两阶段优化策略**：第一阶段仅优化附着在 FLAME 
 
 **创新总结**：PhysHead 通过“发丝结构化高斯 + VLM 秃头代理 + 颜色一致性正则 + 分层优化”的技术组合，首次将静态外观重建与动态物理模拟统一在单一框架内。用户研究表明，其头发物理真实性达 98.5%，结构一致性达 88.5%，远超基线方法（0-1.5% / 3.1-8.5%），验证了该创新路径的有效性。
 
-## 整体框架
+
 
 PhysHead 的整体设计遵循**分层解耦—代理重建—物理驱动**的流水线，将头部化身明确拆分为面部层与头发层，分别采用不同的表示与动力学机制，最终通过可微分渲染合成仿真就绪的动态头像。
 
@@ -149,7 +151,7 @@ $$\mathbf{x}(t+\Delta t) = \mathbf{x}(t) + \mathbf{v}(t+\Delta t) \Delta t$$
 ![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2604_06467/figures/010_Figure_10.jpg]]
 *Figure 10: The layered avatar representation allows for editing operations like hair-swapping*
 
-## 核心模块与公式推导
+
 
 PhysHead 的核心架构围绕“分层表示-物理模拟-外观约束”三条主线展开，通过五个关键模块协同实现仿真就绪的动态头发化身。
 
@@ -214,7 +216,9 @@ $$\mathcal{L}_{\mathrm{rgb}} = (1-\lambda) \cdot \mathcal{L}_1 + \lambda \cdot \
 ![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2604_06467/figures/011_Figure_8.jpg]]
 *Figure 8: The consistency loss helps to assign meaningful colors to hidden 3D gaussian primitives*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -293,7 +297,9 @@ PhysHead 存在以下已知局限：
 ![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2604_06467/figures/008_Figure_9.jpg]]
 *Figure 9: The strand-based hair layer can be edited by the user to change the geometry and appearance*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 一、工作定位与核心区分
 
@@ -349,6 +355,8 @@ PhysHead 在知识库中应定位于 **动态数字化身 → 头部化身 → �
 - **颜色一致性正则化**：相邻发丝色差惩罚，使隐藏区域获得可模拟外观
 
 这些资产为后续工作（如全身动态化身、端到端可微物理模拟）提供了可复用的技术模板。
+
+
 
 ## 原文 PDF
 

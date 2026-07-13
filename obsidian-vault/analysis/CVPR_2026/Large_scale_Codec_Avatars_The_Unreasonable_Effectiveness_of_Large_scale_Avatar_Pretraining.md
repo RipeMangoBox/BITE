@@ -43,7 +43,7 @@ claims:
 > - In-the-Wild (野外) 上，PSNR↑ 28.175 vs 27.998 (混合训练) (+0.2)。
 > - Capture-Studio, Multiview 上，PSNR↑ 27.483 vs 23.925 (ExAvatar) (+3.56)。
 
-## 概述
+## 概要
 
 现有3D头像方法面临一个根本性瓶颈：工作室捕捉数据保真度高但缺乏多样性，野外数据覆盖广但因单目稀疏导致3D几何模糊——两者无法同时提供足够的外观多样性与精确几何监督，使泛化能力与重建保真度长期处于不可兼得的矛盾之中。
 
@@ -59,7 +59,7 @@ claims:
 
 该方法仍存在若干局限：精细纹理（如刺绣、蕾丝）难以完美重建，严重遮挡与快速运动模糊下质量下降，次级运动（如头发飘动、配饰摆动）尚未支持，重光照模块依赖后训练灯光数据而未在野外光照下完全验证。
 
-## 背景与动机
+
 
 3D数字人化身在远程通信、游戏、影视和混合现实中具有广泛的应用前景。理想的化身系统需同时满足两个核心需求：**高保真度**（精确还原面部细节、手部姿态和身体几何）与**强泛化能力**（仅需少量日常照片即可快速创建，并适应多样的外貌、服饰和光照条件）。然而，现有方法在这两个目标之间长期面临不可兼得的困境。
 
@@ -80,7 +80,9 @@ claims:
 
 这一思路的关键在于：预训练所学的强泛化表征并非在后训练中被覆盖，而是作为基础被保留和精炼，最终使模型在工作室和野外测试场景下均能超越混合训练范式。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 LCA 的核心创新在于首次将**大规模预训练-高质量后训练**的两阶段范式引入3D头像建模，从根本上解耦了泛化能力与重建保真度这一长期矛盾。其关键设计围绕以下四个 changed slots 展开。
 
@@ -118,7 +120,7 @@ $$W' = W(n) + H_{skin}(T^{node})$$
 
 上述四个 changed slots 并非孤立改进，而是通过**对齐的潜在空间**形成协同：预训练使几何 token 特征空间对野外和工作室身份呈现均匀分布（Figure S1），后训练在此空间上通过注意力图展示出更干净的语义对应关系（Figure 6），最终实现前馈式通用高保真虚拟化身创建——在野外多视角设置中比优化方法 ExAvatar 高出 9.8 dB PSNR，在单视角设置中比 LHM 高出 9.3 dB PSNR（Table 2）。
 
-## 整体框架
+
 
 LCA 的整体 pipeline 遵循“图像/几何标记化 → 多模态 Transformer 编码 → 双分支高斯解码 → 蒙皮变形 → 可微渲染”的前馈流程，将稀疏输入图像转化为可驱动的高保真 3D 高斯头像。
 
@@ -182,7 +184,7 @@ $$L = L_{img}(I, \hat{I}_{cano}) + L_{img}(I, \hat{I}_{pose}) + \lambda L_{reg}(
 
 这一范式解耦了“泛化”与“保真度”两个冲突目标，使最终模型在前馈推理中同时达到通用性与高保真度。
 
-## 核心模块与公式推导
+
 
 LCA 的核心架构由 **图像/几何标记化**、**LCA Transformer 编码器**、**双分支高斯解码器**、**蒙皮与变形模块** 以及 **可微高斯渲染器** 五个关键模块串联构成。下面按数据流顺序逐一展开。
 
@@ -252,7 +254,9 @@ $$L = L_{img}(I, \hat{I}_{cano}) + L_{img}(I, \hat{I}_{pose}) + \lambda L_{reg}(
 ![[assets/figures/papers/paper_list_l1067_https_arxiv_org_abs_2604_02320/figures/010_Figure_6.jpg]]
 *Figure 6: Attention Map Visualization. Post-training yields cleaner semantic correspondences in last-layer attention maps between geometric and image tokens. The selected geometric tokens on the mesh are shown in red*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈验证：预训练-后训练范式解耦泛化与保真度
 
@@ -327,7 +331,9 @@ LCA的核心主张是：大规模野外预训练+高质量工作室后训练的�
 ![[assets/figures/papers/paper_list_l1067_https_arxiv_org_abs_2604_02320/figures/016_Figure_S.2.jpg]]
 *Figure S.2: Qualitative Comparison with Alternative Paradigms. Comparison with Wan-Animate (2D video diffusion) and GUAVA (upper-body 3D Gaussian avatar)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从单数据源混合训练到预训练-后训练范式
 
@@ -390,6 +396,8 @@ LCA框架打开了以下研究方向：
 4. **零样本风格化的内在机制**：LCA展现出对训练中未见过的眼镜、头饰、风格化角色的泛化能力（Figure 1/5/7），但这一零样本能力的来源尚不明确——是预训练数据的隐式覆盖，还是Transformer架构的归纳偏置？理解这一机制可能指导更高效的数据策展策略。
 
 5. **后训练学习率衰减的敏感性**：消融实验表明后训练学习率衰减系数γ至关重要——γ=0.00（无衰减）时工作室PSNR骤降至27.464，而γ=0.65平衡最佳（Table S1）。这一超参数的敏感性是否意味着当前范式对后训练策略有较强依赖，能否通过更鲁棒的持续学习方法缓解？
+
+
 
 ## 原文 PDF
 

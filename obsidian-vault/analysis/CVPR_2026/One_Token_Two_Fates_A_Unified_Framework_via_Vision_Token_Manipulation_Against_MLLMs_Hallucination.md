@@ -45,7 +45,7 @@ claims:
 > - Inference Efficiency 上，Inference latency overhead (relative to vanilla) 1.06x vs 1.00x (Vanilla) (+0.06x)。
 > - CHAIR (LLaVA-1.5, 64 tokens) 上，CHAIR_I 18.1 (最低幻觉实例得分) vs VCD, PAI, VISTA等 (数值未单独列出，文中指本文达到最优) (比最优基线更低)。
 
-## 概述
+## 概要
 
 多模态大模型（MLLM）在视觉-语言任务中展现出强大能力，却普遍受困于“幻觉”现象——生成与图像事实不符的内容。本文的核心诊断是：**视觉信号在逐词生成过程中持续衰减，而模型内部强大的语言先验逐渐占据主导，形成系统性的视觉-语言失衡**。这一失衡被实证为幻觉的直接原因（Figure 2, F1）：视觉注意力随生成步数急剧下降，而幻觉频率恰好在视觉基础最薄弱的区域飙升。
 
@@ -55,7 +55,7 @@ claims:
 
 在实验验证上，该框架在POPE基准上取得平均绝对**2%的准确率提升**（LLaVA-1.5），推理延迟仅增加**1.06倍**，并在CHAIR、MME、MMHal-Bench等多个基准上全面超越训练无关的基线方法（包括**VISTA**, Li et al., ICML；**ONLY**, Wan et al., arXiv 2025）。方法在四种不同架构的MLLM（LLaVA-1.5、Shikra、MiniGPT-4、InstructBLIP）上均验证有效，覆盖线性投影与Q-Former两类视觉-语言对齐方式，展现出良好的泛化性。
 
-## 背景与动机
+
 
 ### 多模态大模型的幻觉困境
 
@@ -86,7 +86,9 @@ claims:
 
 与碎片化的现有方法不同，该框架将增强与校准统一在中间表示层 $L_c=16$ 完成，无需触及最终解码器，从而避免了信号冲突。实验表明，该方法在 POPE 基准上平均绝对提升 2%，而推理延迟仅增加 1.06 倍，实现了性能与效率的优异平衡。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于将视觉令牌（vision tokens）从被动的信息载体重新定位为主动的校准枢纽，在统一的隐空间表示层上同时完成**视觉增强**与**偏差消除**，从而系统性修复多模态大模型（MLLM）的视觉-语言失衡。相较于以往分离式方法在不同层级（注意力层 vs. 输出 logits 层）各自为政、甚至相互冲突的局限，本工作实现了三个关键槽位的统一重构。
 
@@ -130,7 +132,7 @@ t-SNE 可视化（Figure 8）证实，剪枝令牌产生的负样本紧密聚类
 
 消融实验（Table 5）证实，SVC 和 CRC 各自独立均能带来性能提升，而融合两个模块后达到所有指标的最佳分数，验证了统一表示层级校准的协同效应。值得注意的是，CRC 探针最终捕获的是**纯视觉差异** $\mathbf{v}_{\mathrm{crc}}^{(l)} \approx \mathcal{E}(V - V_{\mathrm{neg}})$（Eq.14），在消除共享查询与偏差效应后，该方向精确对应视觉信息衰减所损失的真实信号，为反事实校准提供了理论依据。
 
-## 整体框架
+
 
 **核心诊断：视觉-语言失衡是幻觉的系统性瓶颈。** 多模态大模型在自回归生成过程中，视觉注意力随解码步数增加而急剧衰减，而模型内部强大的语言先验逐渐占据主导地位。这一失衡被本文的发现 **F1** 所证实：视觉注意力与幻觉频率呈显著负相关（Figure 2, F1）。基于此诊断，本文提出一个统一的隐空间校准框架，在单一表示层级上同时调节视觉信号的强度与文本惯性的抑制。
 
@@ -159,7 +161,7 @@ t-SNE 可视化（Figure 8）证实，剪枝令牌产生的负样本紧密聚类
 ![[assets/figures/papers/paper_list_l2263_https_arxiv_org_abs_2603_10360/figures/002_Figure_2.jpg]]
 *Figure 2: Our Three Core Findings. (F1) Diagnosing the Imbalance: Inverse Correlation. Visual attention decays sharply as generation proceeds, while hallucination frequency surges where visual grounding is weakest. (F2) Enabling Enhancement: Semantic Complementarity. Original and augmented image attentions show complementary focus (e.g., on ’Camera’); their synergy enables enhanced visual grounding. (F3) Enabling Calibration: Superiority of Information-Gap. Latent-space token removal (information-gap) generates stable, grounded hallucinations, proving more suitable for bias probing than unstable, noisy pixel-level masking (modality-gap)*
 
-## 核心模块与公式推导
+
 
 ### 2.1 问题形式化
 
@@ -235,7 +237,9 @@ CRC 在 $l=1$ 到 $L_c$ 的每一层独立执行，逐层净化隐状态。幻�
 ![[assets/figures/papers/paper_list_l2263_https_arxiv_org_abs_2603_10360/figures/004_Figure_4.jpg]]
 *Figure 4: Illustration of the Causal Representation Calibration (CRC) mechanism. By subtracting the hallucinated representation*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：幻觉抑制与通用能力
 
@@ -300,7 +304,9 @@ CRC 在 $l=1$ 到 $L_c$ 的每一层独立执行，逐层净化隐状态。幻�
 ![[assets/figures/papers/paper_list_l2263_https_arxiv_org_abs_2603_10360/figures/012_Figure_7.jpg]]
 *Figure 7: Visualizing SVC’s effect with TAM [22]. For the token ’bulldog’, Vanilla LLaVA shows diffuse attention*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与设计动机
 
@@ -354,6 +360,8 @@ CRC 在 $l=1$ 到 $L_c$ 的每一层独立执行，逐层净化隐状态。幻�
 2. **跨模态扩展**：该统一隐空间校准框架是否能够扩展到视频、语音等其他模态的幻觉抑制？
 3. **负样本构造的理论上限**：隐空间偏差消除的理论上限在何处？是否存在比随机剪枝更优的负样本构造方式？
 4. **单次前向传播**：能否在单个前向传播中同时完成增强与校准，从而进一步降低延迟开销？
+
+
 
 ## 原文 PDF
 

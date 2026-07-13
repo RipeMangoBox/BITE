@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Mixture_of_Experts_Can_Surpass_Dense_LLMs_Under_Strictly_Equal_Resource.pdf
+project_link: https://huggingface.co/kamanphoebe/moe_surpass_dense
+code_link: null
 openreview_forum_id: oIdzliJAeA
 aliases:
 - TSSERMF
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 严格等资源下MoE可超越稠密大语言模型 |
 | 英文题名 | Mixture-of-Experts Can Surpass Dense LLMs Under Strictly Equal Resource |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=oIdzliJAeA); [Project](https://huggingface.co/kamanphoebe/moe_surpass_dense) |
+| Links | [paper](https://openreview.net/forum?id=oIdzliJAeA) · [Project](https://huggingface.co/kamanphoebe/moe_surpass_dense) |
 | Topic | #topic/benchmarks_datasets_evaluation #topic/benchmarks_datasets_evaluation/benchmark_eval |
 | Method | Three-Step Strictly Equal-Resource MoE Framework |
 | Dataset | Validation BPC (2B models, fixed C=9.13e20–9.36e20), Validation BPC (7B models, fixed C=2.86e21), CMMLU (7B SFT, strict data reuse) |
@@ -42,7 +44,7 @@ claims:
 > - Validation BPC (7B models, fixed C=2.86e21) 上，BPC 为 0.4543 (MoE, r_a=20.07%)，对比 0.4736 (Dense, same C)，变化 -0.0193。
 > - CMMLU (7B SFT, strict data reuse) 上，Accuracy 为 32.11 (MoE, r_a=20.07%, strict reuse)，对比 31.23 (Dense)，变化 +0.88。
 
-## 概述
+## 概要
 
 当下混合专家（Mixture-of-Experts, MoE）与稠密大语言模型的对比研究存在一个根本性瓶颈：大多数对比是在资源不对等的条件下进行的——要么激活参数量不匹配，要么训练计算量不一致，导致无法确证MoE架构本身的纯性能增益。本工作提出一个核心问题：**当总参数量 N、训练计算量 C 和唯一数据量 D 三者同时严格相等时，MoE能否超越稠密LLM？**
 
@@ -57,7 +59,7 @@ claims:
 
 这些结果表明，MoE的性能增益源自架构本身的参数利用效率优势，而非资源倾斜。该结论为MoE架构在资源受限场景下的部署提供了有力的理论支撑。
 
-## 背景与动机
+
 
 大规模语言模型（LLM）的规模化定律表明，增加模型参数量、训练数据量和计算预算能持续提升模型性能。在这一背景下，**Mixture-of-Experts（MoE）** 架构因其稀疏激活特性——每个 token 仅激活部分参数——成为在固定推理计算预算下扩大模型容量的重要范式。然而，一个根本性的问题始终悬而未决：MoE 的性能增益究竟源于架构本身的归纳偏置，还是仅仅因为资源分配的不对等？
 
@@ -89,7 +91,9 @@ $$r_{\mathrm{a}} = N_{\mathrm{a}} / N$$
 
 为回答这一问题，本文构建了一套三步实验方法论：首先通过统一参数化框架建立稠密与 MoE 模型的可比基础，然后通过贪心架构搜索确保每个候选模型处于（近）最优配置，最后在严格控制 $N$、$C$、$D$ 的条件下扫描激活率，定位最优 $r_{\mathrm{a}}$ 并比较 MoE 与稠密基线的性能。实验覆盖 2B 至 7B 参数规模，累计训练近 200 个语言模型，处理约 50 万亿 token，旨在提供迄今最严格的公平对比证据。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 1. 问题重新定义：从“资源不对等”到“三方严格对齐”
 
@@ -129,7 +133,7 @@ $$r_{\mathrm{a}} = N_{\mathrm{a}} / N$$
 3. **建立了统一参数化与贪心搜索相结合的系统性公平比较方法论**，可复用于未来的架构对比研究。
 4. **提出数据复用策略作为实现三方对齐的关键技术手段**，解决了低 $r_a$ 带来的数据需求膨胀问题。
 
-## 整体框架
+
 
 为回答“严格等资源下 MoE 能否超越稠密 LLM”这一核心问题，本文提出了一套**三步严格等资源 MoE 框架**（Three-Step Strictly Equal-Resource MoE Framework）。该框架的核心设计原则是：在总参数量 $N$、训练计算量 $C$ 和唯一数据量 $D$ 三者同时匹配的条件下，系统性地比较 MoE 与稠密架构的性能差异，从而剥离资源倾斜带来的混淆效应，纯化出架构本身的增益。
 
@@ -172,7 +176,7 @@ $$r_a = N_a / N$$
 
 整个框架的信息流如下：统一参数化模块输出 $N$、$M$、$r_a$ 的显式关系，作为架构搜索和激活率扫描的约束条件；贪心搜索确定的最优架构（1dense+SE、特定 $\zeta$ 和 $\mu$、无门控归一化、中等 $K$）传递给激活率扫描模块；激活率扫描在固定 $N$ 和 $C$ 下定位 $r_a^{**}$，并将对应 MoE 模型与稠密基线对比；数据复用模块在引入唯一数据量 $D$ 约束后重新评估上述结论的稳定性；最终，最优配置的预训练模型进入 SFT 和下游评估环节。
 
-## 核心模块与公式推导
+
 
 ### 统一参数化框架
 
@@ -220,7 +224,9 @@ MoE层的输出为门控分数 $g_i(x)$ 对各专家输出 $E_i(x)$ 的加权求
 
 3. **数据复用策略**（§6）：针对MoE因低激活率而需处理更多token（但唯一数据量可能不足）的问题，提出严格复用（固定唯一数据量 $D$）和宽松复用（固定训练轮次）两种方案，确保在 $N$、$C$、$D$ 三者均等的终极约束下完成公平评估。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：最优激活率 ≈20%
 
@@ -334,7 +340,9 @@ MoE 模型因低激活率而具有更低的每 token 计算成本，在固定 $C
 *Table 9: Experimental settings and results of optimal ARs for MoE models with N = 2.15B and fixed ra. Hyperparameters shared by all experiments: L = 16, S = 2048, Dm = 1408, $D _ { \mathrm { f f n } }$ = 3904, H = 11, Dh = 128, ζ = 88*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与稠密基线的严格对比定位
 
@@ -388,6 +396,8 @@ MoE 模型与稠密基线的核心差异体现在五个架构槽位上：
 3. **能力增强机制**：最优激活率如何具体增强模型能力——是通过促进专家特化、改善负载均衡，还是其他机制？
 4. **数据效率优化**：能否设计更高效的数据复用策略，完全消除在严格等数据约束下对唯一 token 数的额外需求？
 5. **与推理效率的联合优化**：当前分析聚焦预训练损失和下游准确率，最优激活率在推理延迟/吞吐量约束下是否需要调整？
+
+
 
 ## 原文 PDF
 

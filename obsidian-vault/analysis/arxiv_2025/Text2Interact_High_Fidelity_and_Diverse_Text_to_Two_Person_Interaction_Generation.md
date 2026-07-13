@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/Text2Interact_High_Fidelity_and_Diverse_Text_to_Two_Person_Interaction_Generation.pdf
+project_link: null
+code_link: null
 aliases:
 - TII
 - TEXT2INTERACT
@@ -40,7 +42,7 @@ claims:
 > [!tip] 效果简介
 > - InterHuman test 上，R-Precision Top-1 0.483 vs 0.449 (InterMask) (+0.034)；R-Precision Top-2 0.638 vs 0.599 (InterMask) (+0.039)；R-Precision Top-3 0.717 vs 0.683 (InterMask) (+0.034)。
 
-## 概述
+## 概要
 
 从文本生成双人交互运动是计算机视觉与图形学中的核心挑战，其瓶颈在于**训练数据稀缺**与**文本条件化粗糙**。现有双人运动数据集（如 InterHuman）规模有限，难以覆盖真实世界中多样化的交互模式；同时，主流方法将长文本压缩为单个句嵌入，丢失了词级时空线索（如“先握手，再拥抱”的时序顺序），导致生成的运动与文本语义脱节。
 
@@ -51,7 +53,7 @@ claims:
 
 在 InterHuman 测试集上，InterActor 取得了最优的文本-运动匹配精度（R-Precision Top-1 达 0.483，较先前最佳 InterMask 提升 3.4 个百分点）。合成数据微调进一步将 FID 从 5.701 降至 5.191，51 人用户研究证实其在分布外文本上的泛化优势。消融实验表明，移除词级条件化、自适应交互损失或合成数据微调均导致性能显著退化，验证了各组件的独立贡献。
 
-## 背景与动机
+
 
 ### 问题定义与核心挑战
 
@@ -87,7 +89,9 @@ claims:
 
 这一“数据扩充 + 精细条件化”的组合策略，将双人交互生成从句子级语义匹配推进到词级时空对齐，同时通过合成数据微调显著提升了分布外泛化能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Text2Interact 的核心创新在于将双人交互生成分解为两个可控的因果杠杆：**数据侧**通过可扩展的合成-过滤管道（InterCompose）突破训练数据瓶颈，**模型侧**通过词级条件化与自适应交互损失实现精细的文本-运动对齐。以下从四个 changed slots 展开分析。
 
@@ -134,7 +138,7 @@ InterHuman 数据集虽为双人交互生成提供了重要基准，但其规模
 
 Text2Interact 的四项 changed slots 形成互补闭环：InterCompose 提供规模化的训练数据，词级条件化捕获细粒度文本语义，自适应交互损失强化物理合理性，交替架构实现角色间协调。三者协同使模型在 R-Precision 三项指标上全面超越 InterMask（Table 1），同时保持有竞争力的 FID（5.191 vs 5.154，差距在置信区间内）。
 
-## 整体框架
+
 
 Text2Interact 由两个协同工作的核心组件构成：**InterCompose**（可扩展的合成数据管道）与 **InterActor**（词级条件化的双人交互生成模型）。两者形成“数据增强—精细生成”的闭环——InterCompose 为 InterActor 提供高质量、多样化的合成训练样本，InterActor 则通过细粒度文本条件化和自适应交互损失实现语义忠实且物理合理的双人运动生成。
 
@@ -170,7 +174,7 @@ $$\mathcal{L}_{\mathrm{AdaInteract}} = \sum_{i=1}^{N} \sum_{j=1}^{N} \frac{1}{d_
 
 InterActor 首先在 InterHuman 数据集上从零训练（200,000 步，8 块 A100 GPU，学习率 $5\times10^{-5}$，批次大小 16，AdamW 优化器，余弦学习率调度，1,000 步预热，扩散步数 1,000，余弦噪声调度）。随后，使用经 InterCompose 合成并通过双阶段过滤的高质量样本进行微调，进一步降低 FID（从 5.701 降至 5.191）并保持 R-Precision，同时显著提升在分布外文本上的泛化能力（51 人用户研究验证）。
 
-## 核心模块与公式推导
+
 
 Text2Interact 框架由两个核心组件构成：**InterCompose**（可扩展的合成数据管道）与 **InterActor**（词级条件化的双人交互生成器）。以下重点拆解 InterActor 的关键模块与核心公式。
 
@@ -247,7 +251,9 @@ InterCompose 并非单一公式，而是一个多阶段管道，其核心模块�
 ![[assets/figures/papers/paper_list_l1696_Text2Interact_High_Fidelity_and_Diverse_Text_to_Two_Person_Interaction_G/figures/011_Figure_8.jpg]]
 *Figure 8: Illustration of the Self-Attention module in the Motion-Motion Interaction Block*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验：InterHuman 测试集上的文本-运动对齐与生成质量
 
@@ -301,7 +307,9 @@ Table 3 的消融实验量化了三个核心组件的独立贡献：
 ![[assets/figures/papers/paper_list_l1696_Text2Interact_High_Fidelity_and_Diverse_Text_to_Two_Person_Interaction_G/figures/007_Figure_6.jpg]]
 *Figure 6: Comparison of motion generation results using InterCompose and InterActor, (a) without filtering, and (b) with filtering. The motion quality and text-motion matching of InterCompose surpass InterActor only after filtering. s*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心瓶颈与因果杠杆
 
@@ -373,6 +381,8 @@ InterCompose 的数据合成策略在方法论上区别于简单的数据增强�
 3. **多人交互扩展**：将框架从双人推广到多人场景，需要解决角色数量可变、交互图结构建模等新挑战。
 4. **实时交互生成**：当前扩散模型需要 1000 步去噪，推理速度有限。如何结合蒸馏或一致性模型实现实时交互运动生成，是实际部署的关键问题。
 5. **细粒度交互控制**：词级条件化已提供了一定程度的细粒度控制，但如何实现关节级或接触点级的精确空间约束，仍是一个开放方向。
+
+
 
 ## 原文 PDF
 

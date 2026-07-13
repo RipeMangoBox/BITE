@@ -28,10 +28,13 @@ claims:
 | 中文题名 | Artemis：具有外观和运动合成的关节式神经宠物 |
 | 英文题名 | Artemis: Articulated Neural Pets With Appearance and Motion Synthesis |
 | 会议/期刊 | SIGGRAPH 2022 |
-| Links | [paper](https://haiminluo.github.io/publication/artemis/) · [Project](https://haiminluo.github.io/publication/artemis/](https://haiminluo.github.io/publication/artemis/)。论文标题为“Artemis) |
+| Links | [paper](https://haiminluo.github.io/publication/artemis/) · [Project](https://haiminluo.github.io/publication/artemis/](https://haiminluo.github.io/publication/artemis/) |
 | Topic | #topic/vision_multimodal_applications |
 | Method | Artemis |
 | Dataset |  |
+
+> [!tip] 效果简介
+> 结果与证据沿用下文“实验与关键发现”中的现有记录；本轮不新增或外推论文事实。
 
 ## 概要
 

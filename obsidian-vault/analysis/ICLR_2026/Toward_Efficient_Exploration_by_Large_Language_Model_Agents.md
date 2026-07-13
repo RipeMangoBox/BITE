@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Toward_Efficient_Exploration_by_Large_Language_Model_Agents.pdf
+project_link: null
+code_link: null
 openreview_forum_id: M3vwnscpL2
 aliases:
 - LBPSRLLP
@@ -42,7 +44,7 @@ claims:
 > - RiverSwim (3 states) 上，Cumulative Regret 为 LLM-PSRL (o1-mini)，对比 Vanilla PSRL (tabular)，变化 Comparable sub-linear regret。
 > - Combination Lock (H=3, K=8) 上，Turns to identify unlock code 为 LLM-PSRL (GPT-4o)，对比 ICRL (best baseline)，变化 Fewer turns needed。
 
-## 概述
+## 概要
 
 **核心瓶颈**：当前基于LLM的智能体设计（如Reflexion、ICRL、ICPI）在面对需要高效探索的决策任务时，缺乏结构化的探索机制。这些方法仅依赖LLM的随机性输出或上下文学习进行隐式探索，在稀疏奖励或需要深度探索的环境中表现不佳。
 
@@ -59,7 +61,7 @@ claims:
 
 **局限性**：方法在状态-动作空间较大且转移函数随机性较强的MDP中，LLM的规划能力不足会导致遗憾退化；依赖于手工设计的先验分布；计算成本较高；后验更新LLM存在信息遗忘或错误更新的风险。
 
-## 背景与动机
+
 
 ### 现有LLM智能体在探索任务中的瓶颈
 
@@ -77,7 +79,9 @@ claims:
 
 本文的核心贡献在于将PSRL分解为三个由LLM实现的子程序：**后验采样LLM**（根据当前后验生成关于真实MDP的合理假设）、**最优样本策略LLM**（在给定状态下按采样MDP执行最优动作）和**后验更新LLM**（根据完整轨迹更新智能体的知识与不确定性）。通过这种显式实现，LLM-PSRL在自然语言任务中复现了经典PSRL的探索优势，同时扩展了经典算法在非结构化环境中的应用范围。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于提出了一种全新的**LLM智能体设计范式**：将经典的高效探索算法——后验采样强化学习（PSRL）——显式地分解为三个由LLM实现的独立子程序，而非像现有方法那样依赖LLM的随机性或上下文学习进行隐式探索。
 
@@ -122,7 +126,7 @@ LLM-PSRL将PSRL的三个核心计算步骤分配给三个专门的LLM（Figure 2
 
 尽管创新显著，该方法仍存在明确局限：在状态-动作空间较大且转移随机性较强的MDP中，LLM的规划能力不足会导致遗憾退化（Figure 14）；方法依赖手工设计的先验分布；当前仅适用于有限视界的情节任务。这些边界条件需要在后续研究中进一步验证和突破。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_M3vwnscpL2/figures/001_Figure_1.jpg]]
 *Figure 1: Abstractly, an RL algorithm is an ordered sequence of steps. Existing approaches for LLM agent design (left) orchestrate some number of LLMs to implicitly induce a RL algorithm. In contrast, this paper advocates for a novel agent design principle (right) whereby an existing RL algorithm is explicitly implemented by outsourcing individual steps to distinct LLMs*
@@ -162,7 +166,7 @@ Figure 3 以 Wordle 游戏为例，展示了 LLM 生成的后验分布（上）�
 
 该设计的关键在于，后验采样 LLM 的温度参数 $\kappa_{\text{sampling}}$ 是控制探索行为的核心旋钮：$\kappa_{\text{sampling}} \leq 1$ 时趋向贪婪，$\kappa_{\text{sampling}} > 1$ 时更接近经典汤普森采样的探索分布。这一机制使得 LLM-PSRL 在 5 臂伯努利好赌中能以 $\kappa_{\text{sampling}}=1.2$ 取得低于经典汤普森采样的累计遗憾（Figure 4），验证了显式实现经典算法子程序的设计原则的有效性。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化与评估指标
 
@@ -212,7 +216,9 @@ $$\min_{\pi \in \Delta(\mathcal{A})} \frac{\mathbb{E}_{a\sim\pi}[\rho(a)]^2}{\ma
 
 其中 $\rho(a)$ 为选择动作 $a$ 的期望单步遗憾，$I(a)$ 为选择该动作获得的信息增益。该目标函数最小化期望遗憾平方与信息增益之比，使智能体优先选择那些以较小遗憾代价换取较大信息量的动作。在11臂信息动作好赌任务中，LLM-IDS展现出优于LLM-PSRL的指导性探索能力。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与探索机制验证
 
@@ -296,7 +302,9 @@ $$\min_{\pi \in \Delta(\mathcal{A})} \frac{\mathbb{E}_{a\sim\pi}[\rho(a)]^2}{\ma
 
 ![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_M3vwnscpL2/figures/025_Table_5.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 设计范式对比：隐式诱导 vs. 显式实现
 
@@ -352,6 +360,8 @@ LLM-PSRL保留了PSRL的算法骨架（Algorithm 1），但将三个核心子程
 5. **范式收敛性**：随着LLM能力的持续提升，是否会出现更简洁的隐式探索方法，还是显式实现经典算法的范式将持续受益于更强的LLM？实验已表明，将底层模型从GPT-4o升级为o1-mini对LLM-PSRL的改进远大于对基线方法的改进（Figure 6），暗示显式实现范式可能具有更好的能力扩展性。
 
 6. **不确定性量化验证**：如何系统地验证和改进LLM在实现算法子程序时的准确性和不确定性量化能力，是确保该方法在实际部署中可靠性的前提。
+
+
 
 ## 原文 PDF
 

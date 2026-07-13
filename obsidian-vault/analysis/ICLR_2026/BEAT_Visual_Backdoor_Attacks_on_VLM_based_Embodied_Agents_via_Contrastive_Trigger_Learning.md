@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/BEAT_Visual_Backdoor_Attacks_on_VLM_based_Embodied_Agents_via_Contrastive_Trigger_Learning.pdf
+project_link: https://zqs1943.github.io/BEAT
+code_link: null
 openreview_forum_id: OwinX7PI83
 aliases:
 - BEAT
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | BEAT：基于对比触发器学习的VLM具身代理视觉后门攻击 |
 | 英文题名 | BEAT: Visual Backdoor Attacks on VLM-based Embodied Agents via Contrastive Trigger Learning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=OwinX7PI83); [Project](https://zqs1943.github.io/BEAT) |
+| Links | [paper](https://openreview.net/forum?id=OwinX7PI83) · [Project](https://zqs1943.github.io/BEAT) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | BEAT |
 | Dataset | VAB-OmniGibson |
@@ -41,7 +43,7 @@ claims:
 > - VAB-OmniGibson 上，ASR↑ 为 77.9，对比 47.6 (BEAT w/o CTL)，变化 +30.3。
 > - VAB-OmniGibson 上，FTR↓ 为 0.0，对比 7.0 (BEAT w/o CTL)，变化 -7.0。
 
-## 概述
+## 概要
 
 具身智能体将视觉语言模型（VLM）作为核心决策组件，使其能够根据视觉输入与交互历史生成动作序列。然而，VLM的黑盒特性与对视觉输入的强依赖，为后门攻击打开了新的攻击面。现有针对纯语言模型或静态图像VLM的后门方案，难以应对具身场景中视觉触发器在视角、光照、遮挡下的高变异性——传统监督微调方法在此条件下往往无法可靠激活后门，且频繁产生误触发。
 
@@ -58,7 +60,7 @@ claims:
 
 BEAT在方法谱系中定位为**两阶段偏好学习驱动的视觉后门攻击**，区别于单阶段SFT混合训练（BEAT w/o CTL）和纯良性SFT（Benign SFT）。其对比数据集构造与CTL损失函数的设计，为具身场景下的精准后门植入提供了新的范式。
 
-## 背景与动机
+
 
 ### 具身智能体的视觉后门威胁
 
@@ -81,7 +83,9 @@ BEAT的核心洞察在于：**触发器判别本质上是一个偏好学习问�
 
 基于此，BEAT提出两阶段训练框架：先通过混合数据SFT赋予模型通用任务能力和基本后门行为，再通过**对比触发器学习（CTL）**——一种基于偏好损失的训练范式——显式强化模型对触发器存在与否的判别能力。CTL在仅有**10%后门数据**（k=0.1）时可将ASR提升超过**5倍**，并将后门触发F1分数（F1BT）最高提升**39%**，验证了偏好学习范式在解决触发器变异性问题上的有效性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 BEAT的核心创新在于将视觉后门植入重新定义为一个**偏好学习问题**，并据此设计了两阶段训练范式，从根本上解决了传统监督微调（SFT）方法在具身代理后门攻击中的关键瓶颈。
 
@@ -124,7 +128,7 @@ CTL带来的改进在多个维度上得到验证：
 - **低数据效率**：当k=0.1时，CTL将ASR提升超过5倍（§4.3），显示出在有限后门数据下的强鲁棒性。
 - **后门触发F1分数**：CTL将F1BT相比无CTL最高提升39%（§4.2），表明触发器判别精度显著提高。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_OwinX7PI83/figures/002_Figure_2.jpg]]
 *Figure 2: Two-stage backdoor fine-tuning scheme in BEAT. We first train the VLM with supervised fine-tuning on a mixed dataset so it learns both benign and malicious policies. We then apply contrastive trigger learning, using a preference-paired dataset to strengthen its ability to distinguish and switch between behaviors: given the same interaction history h, the model prefers the benign action $a _ { \mathrm { b e n i g n } }$ on trigger-free inputs (v−) and the backdoor action $a _ { \mathrm { a t t a c k } }$ on triggered inputs ( $v _ { + }$ )
@@ -163,7 +167,7 @@ $$\mathcal{L}(a^w, a^l \mid h, v) = -\log \sigma\Big(\beta \log\frac{\pi_{\theta
 
 **关键设计瓶颈**：传统单阶段 SFT 将触发器判别信号淹没在动作标签的间接监督中，导致高误触发率（FTR）和低攻击成功率（ASR）。BEAT 通过引入显式的对比偏好信号，将“是否触发”这一隐式决策显式化为偏好学习目标，从根本上解决了视觉触发器在高变异性场景下的可靠激活问题。
 
-## 核心模块与公式推导
+
 
 BEAT 的核心由两个训练阶段构成：监督微调（SFT）与对比触发器学习（CTL）。SFT 阶段赋予模型基本的任务执行能力和初步的后门行为；CTL 阶段则将触发器判别建模为偏好学习问题，通过对比信号锐化决策边界，从而实现精准的良性/恶意策略切换。
 
@@ -202,7 +206,9 @@ $$\mathcal{L}(a^w, a^l \mid h, v) = -\log \sigma\Big(\beta \log\frac{\pi_{\theta
 
 该损失函数的因果机制在于：偏好项 $\log\frac{\pi_{\theta}(a^w)}{\pi_{\mathrm{ref}}(a^w)} - \log\frac{\pi_{\theta}(a^l)}{\pi_{\mathrm{ref}}(a^l)}$ 迫使模型增大偏好动作与拒绝动作之间的概率差距，从而锐化触发器决策边界；NLL 正则项 $\log\pi_{\theta}(a^w)$ 则防止模型在偏好对齐过程中丧失生成能力。消融实验证实，移除 CTL 后，InternVL3-8B 在 EB-ALFRED 上的误触发率（FTR）高达 81.3%，而完整 BEAT 将其降至 0%（Table 1），验证了该损失函数对消除误触发的关键作用。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -291,7 +297,9 @@ CTL 在所有设置下将 FTR 压至接近 0%。相比之下，BEAT w/o CTL 在 
 
 5. **初步防御的抵抗能力：** 论文提及的初步防御尝试（提示约束、聚类检测、良性微调）均未能完全消除后门，但系统性的防御研究仍是开放问题。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的对比定位
 
@@ -340,6 +348,8 @@ BEAT 的两阶段设计（SFT → CTL）并非简单的流程堆叠，而是解�
 4. **有效防御机制**：论文初步尝试了提示约束、激活聚类和良性微调等防御手段，但均未完全奏效。针对基于偏好学习的后门攻击，设计有效防御仍是一个紧迫的开放问题。
 
 5. **更大规模模型的扩展性**：当前实验限于 7B-8B 参数规模，在更大规模的 VLM 和多模态模型上，BEAT 是否仍能保持高攻击成功率与低误触发，以及 CTL 的偏好学习范式是否需要调整，尚待研究。
+
+
 
 ## 原文 PDF
 

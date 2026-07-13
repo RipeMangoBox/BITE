@@ -44,7 +44,7 @@ claims:
 > - DreamBench++ 上，CLIP‑B‑I 0.801 vs 0.795 (DreamO) (+0.006)；DINO‑I 0.610 vs 0.589 (DreamO) (+0.021)。
 > - Human evaluation (100 cases) 上，Win rate vs. UNO 80% vs — (—)。
 
-## 概述
+## 概要
 
 **核心问题：相似性-可控性悖论。** 主体驱动文本生成图像（Subject-Driven Text-to-Image Generation）任务要求生成图像既忠实保留参考主体的视觉身份，又准确遵循文本提示语中的编辑指令。现有方法普遍面临一个根本性冲突：文本提示语同时承担了“描述主体”和“下达修改指令”的双重角色。当模型从文本中获取的主体先验与参考图像提供的视觉特征不一致时，二者发生对抗，导致主体保真度受损或编辑意图被削弱——这一现象被本文定义为相似性-可控性悖论（Similarity-Controllability Paradox）。
 
@@ -54,7 +54,7 @@ claims:
 
 **主要结果。** 在 DreamBench 基准上，DisCo 实现了最高的主体相似度（CLIP-I 0.928，DINO-I 0.903）和最高的文本对齐度（CLIP-T 0.329），综合质量指标 ImageReward 达到 1.339，全面超越包括 DreamO、UNO、FLUX Kontext 在内的所有基线方法。消融实验证实，移除 TVD 模块或 GRPO 阶段均导致相似度和/或文本对齐度显著下降，验证了两个组件的必要性。在 DreamBench++ 上的泛化测试和人类评估（100 组对比中胜率超 80%）进一步支撑了方法的有效性和鲁棒性。
 
-## 背景与动机
+
 
 ### 主体驱动生成中的相似性-可控性悖论
 
@@ -80,7 +80,9 @@ Figure 2 的注意力可视化揭示了这一机制：在未解耦时，文本�
 
 这一范式的核心优势在于从根源上消除了文本-视觉冲突，而非在冲突发生后进行妥协或折中。后续章节将详细阐述 DisCo 的方法设计、实验验证及其相对于现有基线的显著提升。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DisCo 的核心创新在于识别并解决主体驱动文本生成图像中长期存在的**相似性-可控性悖论**。在传统方法中，文本提示语同时承担描述主体身份和下达修改指令的双重功能，导致模型从文本中获得的主体先验与参考图像的视觉特征产生冲突，损害生成图像对参考主体的保真度（见 Figure 1）。DisCo 通过“解耦-重耦合”两阶段框架从根本上消除这一冲突，其关键创新体现在以下三个维度的设计转变上。
 
@@ -108,7 +110,7 @@ $$\hat{A}_t^i = \frac{R(x_0^i, c) - \mathrm{mean}(\{R(x_0^i, c)\}_{i=1}^G)}{\mat
 
 DisCo 的三个 changed slots——提示语功能纯指令化、主体身份纯视觉绑定、训练策略引入 GRPO 强化学习——构成了一个逻辑自洽的创新链条：解耦消除冲突来源，重耦合恢复合成自然度。这一范式转变使 DisCo 在 DreamBench 上同时实现了最高的主体相似度（CLIP‑I 0.928）和文本可控性（CLIP‑T 0.329），突破了传统方法在相似性与可控性之间的权衡困境。
 
-## 整体框架
+
 
 DisCo 框架的核心设计理念源于对主体驱动生成中**相似性-可控性悖论**的因果剖析：文本提示语同时承担“描述主体”和“下达修改指令”的双重角色，导致模型从文本获得的主体先验与参考图像的视觉特征发生冲突。DisCo 通过“先解耦、后重耦合”的两阶段策略从根本上消除这一冲突源。
 
@@ -143,7 +145,7 @@ $$\mathbf{MMA}([\mathbf{X}; \mathbf{C}_T; \mathbf{C}_I]) = \mathrm{softmax}\left
 ![[assets/figures/papers/paper_list_l2306_https_arxiv_org_abs_2604_00849/figures/003_Figure_3.jpg]]
 *Figure 3: The architecture of our proposed DisCo framework. DisCo first decouples subject identity (from the image) from textual control (from the prompt). We generate corrupted images to construct preference pairs with the ground truth images to train the Reward Model. Subsequently, it employs GRPO to re-couple textual and visual features, generating a coherent image that preserves subject details while adhering to the prompt*
 
-## 核心模块与公式推导
+
 
 DisCo 框架围绕“解耦—重耦合”这一核心思想，设计了三个关键模块：文本-视觉解耦（TVD）模块、奖励模型训练、以及群组相对策略优化（GRPO）重耦合阶段。整体架构如图 Figure 3 所示。
 
@@ -212,7 +214,9 @@ $$f(\cdot) = \frac{1}{G} \sum_{i=1}^G \frac{1}{T} \sum_{t=0}^{T-1} \left[ \min\l
 ![[assets/figures/papers/paper_list_l2306_https_arxiv_org_abs_2604_00849/figures/012_Figure_9.jpg]]
 *Figure 9: The prompt used to generate editing instructions*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果：DreamBench 上的全面领先
 
@@ -277,7 +281,9 @@ Table 2 的消融实验清晰揭示了文本-视觉解耦模块（TVD）和群�
 ![[assets/figures/papers/paper_list_l2306_https_arxiv_org_abs_2604_00849/figures/010_Figure_8.jpg]]
 *Figure 8: Qualitative results with leading general image editing candlemodels*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题谱系：从“编码器注入”到“统一序列”再到“解耦-重耦合”
 
@@ -339,6 +345,8 @@ GRPO 训练需要额外训练奖励模型（基于 Qwen3-VL-30B）并合成偏�
 3. **自监督反馈信号**：能否设计完全自监督的反馈信号替代人工设计的奖励模型，降低训练成本并提升泛化性？
 4. **人机偏好对齐**：在更大规模的用户交互场景中，人类对合成自然度的偏好与自动化指标（CLIP-I、CLIP-T、ImageReward）的一致性如何演变？当前人类评估（100 组）的规模有限，需要更大规模的研究验证。
 5. **与通用图像编辑的融合**：Figure 8 展示了 DisCo 与通用图像编辑模型的对比，但解耦-重耦合范式是否可以与 InstructPix2Pix 等编辑方法深度融合，形成统一的“主体保持+指令编辑”框架？
+
+
 
 ## 原文 PDF
 

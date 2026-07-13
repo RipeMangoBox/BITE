@@ -42,7 +42,7 @@ claims:
 > - Objaverse subset (single-view) 上，Albedo SSIM↑ 0.931 vs 0.901 (MaterialMVP) (+0.030)；Albedo PSNR↑ 29.89 vs 27.57 (MaterialMVP) (+2.32)；Metallic MSE↓ 0.017 vs 0.026 (MaterialMVP) (-0.009)。
 > - Objaverse subset (multi-view) 上，Albedo SSIM↑ 0.945 vs 0.902 (MaterialMVP) (+0.043)；Albedo PSNR↑ 32.10 vs 27.61 (MaterialMVP) (+4.49)；Metallic MSE↓ 0.015 vs 0.026 (MaterialMVP) (-0.011)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有3D材质重建方法普遍面临一个核心矛盾——难以在保持输入图像细节的同时灵活处理任意数量的高分辨率视图。主流方案往往依赖多个预训练模型级联（如**Material Anything**, Huang et al., CVPR 2025），导致训练部署复杂、稳定性不足；而基于全局交叉注意力的多视图一致性机制（如**MaterialMVP**, He et al., ICCV 2025）则面临空间复杂度$O(N^2)$的扩展性瓶颈。
 
@@ -52,8 +52,6 @@ claims:
 
 **主要结果**：在多视图设置下，MatMart（1024×1024）的Albedo SSIM达到0.945、PSNR达到32.10，较MaterialMVP分别提升0.043和4.49；渲染FID从38.00降至26.20，LPIPS从0.088降至0.052。消融实验证实，移除VMCA会导致视图间预测不一致，而去除材质先验则使生成结果跨视图差异显著增大，验证了各组件的关键作用。
 
-## 背景与动机
-
 高质量材质（反照率、金属度、粗糙度）是逼真3D物体渲染与重光照的核心要素。从单张或多张RGB图像中重建物理渲染（PBR）材质，始终面临着**输入信息不足与材质分解歧义**的双重挑战。近年来，基于深度学习的材质估计方法取得了显著进展，但现有工作仍存在若干关键瓶颈。
 
 **现有方法的局限。** 当前主流方案大致分为两类。一类方法依赖多个预训练模型的级联，如 **Material Anything**（Huang et al., CVPR 2025）将预训练RGB生成模型与材质预测模型串联，导致训练部署复杂、稳定性不足。另一类方法如 **MaterialMVP**（He et al., ICCV 2025）虽然实现了端到端训练，但其多视图一致性机制采用全局交叉注意力，需联合处理所有视图，空间复杂度达到 $O(N^2)$，严重限制了可处理的输入视图数量与分辨率。此外，**TexGEN**（Yu et al., TOG 2024）等生成式方法直接在UV空间进行材质生成，由于UV空间缺乏视图空间中的丰富语义信息，生成质量与纹理-几何对齐度均受到制约。
@@ -62,7 +60,7 @@ claims:
 
 **本文动机。** 针对上述问题，MatMart 提出了一种**两阶段渐进式推理框架**，将材质重建解耦为“基于输入的准确预测”与“基于先验的未观察区域生成”两个阶段，并将预测与生成统一于**单一扩散模型**中端到端优化。其核心创新在于：通过**视图-材质交叉注意力（VMCA）**将多视图一致性的空间复杂度从 $O(N^2)$ 降至 $O(1)$，使模型能够处理任意数量的高分辨率输入；同时将材质生成从UV空间迁移至语义信息更丰富的**视图空间**，并利用第一阶段预测的材质先验引导生成过程，从而在无需额外预训练模型的前提下实现高质量、高一致性的材质重建。
 
-## 核心创新
+## 核心方法与创新机理
 
 MatMart 的核心创新在于将材质重建任务解耦为**两阶段渐进式推理框架**，并通过**视图-材质交叉注意力（VMCA）** 与**视图空间生成**两个关键机制，系统性地解决了现有方法在多视图一致性、输入灵活性与模型复杂度上的瓶颈。
 
@@ -102,8 +100,6 @@ $$
 在第二阶段生成中，MatMart 将第一阶段预测的材质结果作为**材质先验**输入生成模型，为未观察区域提供强约束。消融实验表明，移除材质先验后仅靠几何先验生成的结果跨视图差异显著，导致材质混乱、渲染质量下降（Fig. 9, Tab. 2）。这一设计将生成任务从“无中生有”转化为“基于可靠先验的补全”，显著提升了多视图生成的一致性。
 
 **总结**：MatMart 通过 VMCA 实现 O(1) 复杂度的多视图一致预测，通过视图空间生成利用丰富语义信息，通过单一扩散模型简化架构，通过材质先验约束生成一致性，四个 changed slots 协同构成了其相对于 MaterialMVP、TexGEN 等基线方法的核心优势。
-
-## 整体框架
 
 MatMart 将材质重建任务解耦为两个渐进式阶段，并在单一扩散模型中统一完成预测与生成，避免了多模型级联带来的训练复杂性。
 
@@ -149,8 +145,6 @@ MatMart 将材质重建任务解耦为两个渐进式阶段，并在单一扩散
 ![[assets/figures/papers/paper_list_l2543_https_arxiv_org_abs_2511_18900/figures/002_Figure_2.jpg]]
 *Figure 2: Method overview. Our framework, MatMart, divides the material reconstruction task into two stages. In the first stage, progressive material prediction is performed on the input images, and the predicted results are baked into the UV space. In the second stage, prior-guided material generation and texture baking are alternately conducted for unobserved and occluded regions. Both prediction and generation tasks are unified within a single diffusion model and can be accomplished through end-to-end optimization*
 
-## 核心模块与公式推导
-
 MatMart 将材质重建任务分解为两个阶段，并通过一个统一的扩散模型完成端到端优化。其核心设计围绕三个关键模块展开：**渐进式材质估计**、**视图-材质交叉注意力（VMCA）** 以及**先验引导的材质生成**。
 
 ### 渐进式材质估计与视图-材质交叉注意力（VMCA）
@@ -173,15 +167,7 @@ $$\mathbf{T} = \frac{\mathbf{T}' \cdot \mathbf{W}' + \mathbf{T} \cdot \mathbf{W}
 
 其中 $\mathbf{T}'$ 为新生成的纹理，$\mathbf{T}$ 为现有纹理，权重 $\mathbf{W}'$ 基于该像素处法线与相机轴夹角的余弦相似度 $\mathbf{S}'$ 的 $\lambda$ 次幂计算，使得更正面朝向相机的区域获得更高权重。权重随后累积更新：$\mathbf{W} \gets \mathbf{W}' + \mathbf{W}$。这种“边生成边烘焙”的策略确保最新生成结果能即时融入全局纹理，指导后续视图的生成。消融实验表明，移除材质先验会导致跨视图生成结果混乱、渲染质量显著下降；而跳过第一阶段的烘焙直接生成，则会损失纹理细节，降低重建质量。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2543_https_arxiv_org_abs_2511_18900/figures/003_Figure_3.jpg]]
-*Figure 3: The effect of VMCA on predicted results. VMCA improves the consistency for progressive material estimation*
-
-![[assets/figures/papers/paper_list_l2543_https_arxiv_org_abs_2511_18900/figures/004_Figure_4.jpg]]
-*Figure 4: Generation with high resolution improves texturegeometry alignment. The top right displays the blended results of normal and generated albedo to visualize the alignment*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验：单视图与多视图材质重建
 
@@ -232,13 +218,7 @@ MatMart 完成单个物体的完整重建需要 9–23 分钟，这一推理时�
 ![[assets/figures/papers/paper_list_l2543_https_arxiv_org_abs_2511_18900/figures/005_Table_1.jpg]]
 *Table 1: Quantitative comparisons for single-view and multi-view settings. Best results are marked as 1st and 2nd*
 
-![[assets/figures/papers/paper_list_l2543_https_arxiv_org_abs_2511_18900/figures/011_Figure_8.jpg]]
-*Figure 8: The effect of VMCA on reconstructed results. VMCA improves the consistency of reconstructed results*
-
-![[assets/figures/papers/paper_list_l2543_https_arxiv_org_abs_2511_18900/figures/001_Figure_1.jpg]]
-*Figure 1: Reconstructed results in single-view input: Our method reconstructs high-quality materials across various types of objects*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 核心瓶颈与设计动机
 

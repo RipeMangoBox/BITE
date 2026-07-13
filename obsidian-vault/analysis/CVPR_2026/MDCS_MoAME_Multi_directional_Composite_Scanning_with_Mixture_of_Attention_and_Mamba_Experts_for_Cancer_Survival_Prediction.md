@@ -41,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - Five TCGA datasets (平均) 上，c-index improvement MDCS-MoAME vs PAM (Mamba-based WSI) (+14.61%)；c-index improvement MDCS-MoAME vs SurvMamba (+5.70%)；c-index improvement MDCS-MoAME vs MoME (+10.31%)。
 
-## 概述
+## 概要
 
 癌症生存预测的核心挑战在于如何从全切片病理图像（WSIs）和高维稀疏基因组数据中提取具有判别力的预后特征，并有效融合两种异构模态。现有方法存在三个关键瓶颈：**（1）感受野受限**——WSIs仅采用水平扫描、基因组仅采用正向序列化，难以捕获多方向长程依赖与稀疏基因间的远距离关联；**（2）融合策略僵化**——跨模态交互依赖单一注意力或Mamba机制，无法灵活建模复杂的异构关系；**（3）缺乏显式冗余抑制**——模态内与模态间特征冗余未被有效约束，限制了表征的判别力。
 
@@ -57,8 +57,6 @@ claims:
 
 **局限性**：当前仅在TCGA五个癌种上验证，泛化至其他癌种或真实临床队列的能力尚未可知；模型仅整合病理图像与基因组两个模态，未纳入放射影像、临床报告等数据；专家选择机制虽具动态性，但可能存在次优选择，且计算开销略高于简单融合方法（Table 5）；特征提取器固定为预训练ResNet-50和简单全连接层，可能限制表示能力的进一步提升。
 
-## 背景与动机
-
 癌症生存预测是计算病理学中的核心任务，其目标是根据全切片病理图像（Whole Slide Images, WSIs）和基因组等多模态数据，估计患者在给定时间点之前存活的条件概率。该任务面临两大根本性挑战：**模态内信息挖掘不充分**与**跨模态融合机制单一**。
 
 在模态内建模方面，现有方法存在明显的感受野局限。对于WSIs，主流方法仅采用水平方向扫描（Mamba默认的行扫描策略），无法捕获图像在垂直、对角等多方向上的长程依赖关系；对于基因组数据，现有方法仅采用正向序列化，难以发现远距离、稀疏分布的基因群之间的潜在关联。这种单一扫描范式导致模态内特征表示的信息量受限，成为制约生存预测性能的瓶颈。
@@ -73,7 +71,7 @@ claims:
 
 在五个TCGA数据集上的实验表明，MDCS-MoAME的c-index性能较PAM（Huang et al., IEEE TMI 2025）和SurvMamba（Chen et al., arXiv 2024）分别提升14.61%和5.70%，验证了多方向扫描与动态专家融合在癌症生存预测中的关键作用。
 
-## 核心创新
+## 核心方法与创新机理
 
 MDCS-MoAME 围绕“扩大感受野—动态融合—冗余抑制”三条主线，对现有癌症生存预测框架进行了系统性重构。其核心创新可归结为四个紧密耦合的 changed slots，分别针对图像扫描方向、基因组序列化方式、跨模态融合机制与特征冗余抑制。
 
@@ -110,8 +108,6 @@ MDCS-MoAME 围绕“扩大感受野—动态融合—冗余抑制”三条主线
 上述三个 changed slots 并非孤立改进，而是形成了一条因果链路：**MDCS 扩大感受野 → 提供更丰富的模态内表示 → MoAME 动态选择最优融合策略 → 对齐损失抑制冗余 → 最终生存预测性能显著提升**。在五个 TCGA 数据集上，MDCS-MoAME 的平均 c-index 较 PAM 提升 **14.61%**，较 SurvMamba 提升 **5.70%**，较 MoME 提升 **10.31%**（Table 1），以充分的实验证据支撑了这一创新链路的有效性。
 
 > **需手动验证**：论文未开源代码，部分对比方法（如 PAM、PAMoE）由作者依据原论文复现（Table 1 以 ⋆ 标记），复现保真度需结合原论文自行评估。
-
-## 整体框架
 
 MDCS-MoAME 的整体架构围绕一个核心瓶颈展开：现有方法对全切片病理图像（WSI）仅采用水平扫描、对基因组仅采用正向序列化，导致感受野单一，难以捕获多方向长程依赖和稀疏基因间关联；同时模态融合使用固定策略，无法有效建模异构跨模态关系，且缺乏显式冗余抑制。MDCS-MoAME 通过三个关键设计——多方向复合扫描（MDCS）、混合注意力与 Mamba 专家（MoAME）、以及跨模态与模态内对齐约束——系统性地解决了上述问题。
 
@@ -154,8 +150,6 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{sur}} + \alpha \mathcal{L}
 ### 设计动机与因果机制
 
 整个框架的设计逻辑遵循一条清晰的因果链：**扩大感受野 → 丰富模态内表征 → 动态融合异构信息 → 抑制冗余 → 提升生存预测判别力**。多方向扫描使模型能够从不同空间方向感知 WSI 的组织结构，间隔扫描则帮助发现基因组中远距离稀疏基因群之间的潜在关联。MoAME 的门控网络根据输入特征动态选择最适配的融合专家，避免了固定融合策略对异构跨模态关系建模的不足。而 $\mathcal{L}_{\mathrm{cro}}$ 和 $\mathcal{L}_{\mathrm{intra}}$ 则从跨模态和模态内两个层面校准表示空间，减少信息冗余，使最终拼接特征更具判别力。消融实验证实，移除 MDSFE 模块后 LUAD 和 UCEC 上 c-index 分别下降 5.42% 和 7.03%，移除 EDIMI 模块后分别下降 2.61% 和 4.60%，验证了各模块在因果链中的关键作用。
-
-## 核心模块与公式推导
 
 ### 3.1 问题形式化与特征提取
 
@@ -255,18 +249,7 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{sur}} + \alpha \mathcal{L}
 
 消融实验（Table 2）表明，添加 $\mathcal{L}_{\mathrm{cro}}$ 在 LUAD 和 UCEC 上分别提升 c-index 3.13% 和 1.68%，添加 $\mathcal{L}_{\mathrm{intra}}$ 分别提升 1.78% 和 4.04%，验证了对齐约束在抑制特征冗余方面的关键作用。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2131_https_openaccess_thecvf_com_content_CVPR2026_html_Qu_MDCS_MoAME_Multi_di/figures/001_Figure_1.jpg]]
-*Figure 1: (a) Hierarchical structure of WSIs; (b) Mamba’s original scanning strategy; (c) Our proposed five scanning strategies on WSIs; (d) Original genomic serialization sequence and (e) Our proposed genomic interval scanning sequence*
-
-![[assets/figures/papers/paper_list_l2131_https_openaccess_thecvf_com_content_CVPR2026_html_Qu_MDCS_MoAME_Multi_di/figures/003_Figure_3.jpg]]
-*Figure 3: Multi-directional composite scanning strategy*
-
-![[assets/figures/papers/paper_list_l2131_https_openaccess_thecvf_com_content_CVPR2026_html_Qu_MDCS_MoAME_Multi_di/figures/010_Figure_4.jpg]]
-*Figure 4: Effectiveness of different combinations of experts. + represents the combination of experts*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -319,10 +302,7 @@ MDCS-MoAME 在五个 TCGA 数据集（BLCA、BRCA、GBMLGG、LUAD、UCEC）上�
 ![[assets/figures/papers/paper_list_l2131_https_openaccess_thecvf_com_content_CVPR2026_html_Qu_MDCS_MoAME_Multi_di/figures/006_Table_5.jpg]]
 *Table 5: Computational complexity for MoE-based methods*
 
-![[assets/figures/papers/paper_list_l2131_https_openaccess_thecvf_com_content_CVPR2026_html_Qu_MDCS_MoAME_Multi_di/figures/011_Figure_6.jpg]]
-*Figure 6: Kaplan-Meier survival analysis of patient survival times based on risk scores across two datasets, with p-values from the Log-rank test provided in each sub-figure*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 多模态癌症生存预测的方法演进
 

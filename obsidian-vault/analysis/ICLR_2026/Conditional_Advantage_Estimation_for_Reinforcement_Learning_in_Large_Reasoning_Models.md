@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Conditional_Advantage_Estimation_for_Reinforcement_Learning_in_Large_Reasoning_Models.pdf
+project_link: null
+code_link: https://github.com/biuboomc/CANON
 openreview_forum_id: CTEXdHB1BB
 aliases:
 - CCAE
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 大型推理模型中强化学习的条件优势估计 |
 | 英文题名 | Conditional Advantage Estimation for Reinforcement Learning in Large Reasoning Models |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=CTEXdHB1BB); [GitHub](https://github.com/biuboomc/CANON) |
+| Links | [paper](https://openreview.net/forum?id=CTEXdHB1BB) · [GitHub](https://github.com/biuboomc/CANON) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | CANON (Conditional advANtage estimatiON) |
 | Dataset | AIME 24, Math Reasoning (Avg), High Complexity Reasoning (Avg), Math Reasoning (Token Cost) |
@@ -42,7 +44,7 @@ claims:
 > - Math Reasoning (Avg) 上，Accuracy 为 57.6，对比 55.7，变化 +1.9。
 > - High Complexity Reasoning (Avg) 上，Accuracy 为 29.5，对比 26.2，变化 +3.3。
 
-## 概述
+## 概要
 
 **问题瓶颈**：基于群组的优势估计方法（如 **DR.GRPO**，Liu et al., 2025a）在比较目标上存在模糊性——其优势信号混合了多种因素，无法有效放大特定训练指标（如生成熵、响应长度）对模型行为的积极影响。直接通过奖励塑形引入先验则容易导致过度偏差，需要精心调参。
 
@@ -57,7 +59,7 @@ claims:
 
 > **注意**：本文实验仅基于 Qwen 和 Llama 系列模型，在数学与逻辑推理任务上验证，对其他架构和任务类型的泛化性尚待确认。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -81,7 +83,9 @@ claims:
 
 基于上述动机，本文提出**CANON（Conditional advANtage estimatiON）**，通过条件重组与组间/组内优势计算的结合，为强化学习训练提供了更精细、更可控的优势估计框架。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CANON 的核心创新在于将**条件重组（Conditional Regrouping）** 引入优势估计，解决了现有基于群组的优势估计方法（如 DR.GRPO）在比较目标上的模糊性问题。
 
@@ -128,7 +132,7 @@ $$
 
 CANON 的核心洞察在于：**基于某一指标（如熵）进行条件分组后，组间优势仅放大该指标可归因的优势部分，不会放大其他独立因素（如响应长度）的影响**。这避免了直接奖励塑形（如 Numerical Scaling Entropy Adv）引入的过度偏差——后者虽能提升域内数学性能，却严重损害域外逻辑推理能力（18.5 vs 26.2，Table 4）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l8_https_openreview_net_forum_id_CTEXdHB1BB/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of CANON. CANON regroups all the sampled responses based on the value of a specific metric, and computes the advantages through inter-group and intra-group comparison*
@@ -158,7 +162,7 @@ CANON（Conditional advANtage estimatiON）的核心流程围绕一个关键操�
 
 与现有基于群组的优势估计方法（如 GRPO、DR.GRPO）相比，CANON 的增量在于**将无差别的群组比较拆解为条件化的跨组与组内比较**，从而能够针对特定指标（熵、长度等）进行选择性行为引导，避免了直接奖励塑形带来的过度偏差和繁琐调参。
 
-## 核心模块与公式推导
+
 
 ### 瓶颈与核心调控机制
 
@@ -224,7 +228,9 @@ $$
 
 CANON的核心洞察在于：基于某一条件（如熵）进行分组时，它仅放大与该条件相关的优势信号，**不会放大其他独立条件的影响**。定理1证明，当两组大小相等时，组间优势相比DR.GRPO能提供更清晰的信号（Theorem 1, Eq. 6）。这意味着CANON可以在不预设指标方向偏好的前提下，选择性放大特定指标的影响，以指导有利行为的习得。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -279,7 +285,9 @@ CANON通过**条件重组**这一因果旋钮解决了上述问题：将采样�
 
 实验仅基于Qwen和Llama系列模型，对其他架构的泛化性未经验证。动态调度策略需要根据模型能力和训练数据集特点进行定制，缺乏统一的自动调度方法。目前仅在数学和逻辑推理任务上评估，在代码、长文本生成等任务上的效果未知。论文主要关注二元指标和连续度量（熵、长度），对多分类或更复杂的奖励信号未作深入探讨。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -320,6 +328,8 @@ CANON 的因果调控能力体现在两个可调节的“旋钮”上：
 - CANON-Eff 的 α 调节与基线长度惩罚方法（如重复惩罚、长度归一化奖励）是否存在互补优势？
 - 条件分组框架能否集成到其他优势估计方法（如 RLOO、ReMax）中，形成更通用的条件优势估计范式？
 - 在更大规模模型（如 70B+）和更复杂任务（如多轮对话、工具调用）上的效果如何？
+
+
 
 ## 原文 PDF
 

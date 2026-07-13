@@ -5,6 +5,8 @@ paper_level: A
 venue: ECCV
 year: 2024
 pdf_ref: paperPDFs/ICLR_2026/EasyTune_Efficient_Step_Aware_Fine_Tuning_for_Diffusion_Based_Motion_Generation.pdf
+project_link: null
+code_link: https://github.com/black-forest-labs/flux
 aliases:
 - EMDMFHQHMG
 tags:
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 高效运动扩散模型用于快速高质量人体运动生成 |
 | 英文题名 | Efficient Motion Diffusion Model for Fast High Quality Human Motion Generation |
 | 会议/期刊 | ECCV 2024 |
-| Links | [Code](https://github.com/black-forest-labs/flux) · [arXiv](https://arxiv.org/abs/2511.18927) · [paper](https://arxiv.org/abs/2602.07967) |
+| Links | [Code](https://github.com/black-forest-labs/flux) · [paper](https://arxiv.org/abs/2511.18927) · [paper](https://arxiv.org/abs/2602.07967) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction #topic/generative_models_diffusion #topic/generative_models_diffusion/diffusion_image_video |
 | Method | EasyTune |
 | Dataset | HumanML3D, KIT-ML, Training Efficiency, Training Speed |
@@ -42,15 +44,13 @@ claims:
 > - KIT-ML 上，FID (↓) 0.284 (MDM + EasyTune) vs 0.497 (MDM) (-42.9%)。
 > - Training Efficiency (vs DRaFT-50) 上，Additional Memory Overhead 31.16% of DRaFT vs 100% (DRaFT-50) (-68.84%)。
 
-## 概述
+## 概要
 
 文本驱动的人体运动生成旨在根据自然语言描述合成逼真的三维人体动作序列。扩散模型在该领域取得了显著进展，但现有可微奖励微调方法面临三个根本性瓶颈：**高内存占用**（需存储完整去噪轨迹的计算图）、**稀疏粗粒度优化**（仅在轨迹末端更新一次）、以及**早期步骤梯度消失**（梯度中的乘积系数随步骤数增大而趋近于零）。这些问题严重制约了微调效率与最终生成质量。
 
 针对上述瓶颈，本文提出 **EasyTune**，一种高效的运动扩散模型微调框架。其核心思路是**逐步感知的微调策略**（Step-aware fine-tuning）：在每个去噪步骤独立计算奖励并优化，通过停止梯度（stop-gradient）操作切断步骤间的递归依赖，使内存复杂度从 $O(T)$ 降至 $O(1)$，同时实现密集细粒度优化。配合**自改进偏好学习**（Self-refinement Preference Learning, SPL）训练的噪声感知奖励模型，EasyTune 无需人工标注即可高效微调文本驱动运动生成扩散模型。
 
 在 HumanML3D 基准上，EasyTune 取得了 **FID 0.132**（较预训练 MLD 降低 72.1%）、**R-Precision Top-1 0.581**（提升 20.8%）、**MM-Dist 2.637**（降低 17.5%）的领先性能。同时，其额外内存开销仅为 DRaFT-50 的约 31%，训练速度提升 7.3 倍。该方法在六个不同的预训练扩散模型上均展现出良好的泛化能力，验证了逐步微调范式的普适性。
-
-## 背景与动机
 
 ### 任务背景：文本驱动的人体运动生成
 
@@ -85,7 +85,7 @@ $$\mathcal{L}(\theta) = -\mathbb{E}_{c\sim\mathcal{D}_{\mathrm{T}}, \mathbf{x}_0
 
 基于以上动机，本文提出 **EasyTune**，通过**逐步感知的微调策略（Step-aware Fine-tuning）** 和**自改进偏好学习（Self-refinement Preference Learning, SPL）** 两大核心设计，系统性地解决上述问题。
 
-## 核心创新
+## 核心方法与创新机理
 
 EasyTune 的核心创新在于**将扩散模型的奖励微调从轨迹级（trajectory-level）重构为步骤级（step-level）**，从根本上解除了现有方法中“递归梯度依赖”这一结构性瓶颈。这一重构在两个关键维度上改变了优化范式：
 
@@ -131,8 +131,6 @@ EasyTune 引入 **自改进偏好学习（Self-refinement Preference Learning, S
 ### 创新总结
 
 EasyTune 的三项 changed slots 构成一个**因果闭环**：步骤级优化（slot 1）提出需求 → stop-gradient 解除递归依赖（slot 2）提供实现基础 → SPL 噪声感知奖励（slot 3）为中间步骤提供有效评估信号。三者协同使得 EasyTune 在 HumanML3D 上以 **DRaFT-50 约 31% 的额外内存**实现 **FID 降低 72.1%**（0.132 vs 0.473），训练速度提升 **7.3 倍**。
-
-## 整体框架
 
 EasyTune 的整体框架围绕一个核心洞察展开：将扩散模型去噪轨迹的递归梯度依赖解耦为逐步独立的优化问题。图 Figure 2 对比了现有可微奖励微调方法与 EasyTune 的架构差异。
 
@@ -190,13 +188,6 @@ SPL 微调后的奖励模型能够更准确地捕捉隐式偏好，且具备处�
 ### 输入输出流
 
 整个框架的输入为文本描述 $c$ 和随机噪声，输出为与文本语义对齐的高质量运动序列。数据流如下：文本条件 $c$ 输入扩散去噪器，在逐步感知微调循环中，每一步的噪声运动 $\mathbf{x}_t^\theta$ 同时送入奖励模型评估对齐质量，梯度信号直接用于更新去噪器参数。SPL 偏好挖掘器在独立阶段训练奖励模型，为微调循环提供高质量的奖励信号。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1873_Efficient_Motion_Diffusion_Model_for_Fast_High_Quality_Human_Motion_Gene/figures/030_Figure.jpg]]
-*Figure: S9: Illustration of reward hacking in motion generation. Examples demonstrating that over-fitting to reward signals may lead to semantically aligned but physically unrealistic motions. For better visualization, corresponding videos are provided in the supplementary materials*
-
-## 核心模块与公式推导
 
 ### 模块一：扩散去噪器 ε_θ
 
@@ -266,7 +257,7 @@ $$
 
 其中 Q 为模型预测的偏好分布，P 为目标偏好分布。SPL 使奖励模型能够捕捉隐式偏好信号，在微调中的胜率显著高于未进行偏好学习的预训练模型（Figure 8），且文本-运动检索 R@1 提升 2.5%（HumanML3D，Table 4）。该模块的性能依赖于预训练检索模型质量——若初始检索模型较差，可能挖掘到错误偏好对，影响后续微调效果。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心性能验证
 
@@ -329,7 +320,7 @@ EasyTune 在 HumanML3D 和 KIT-ML 两个标准基准上均实现了显著的性�
 ![[assets/figures/papers/paper_list_l1873_Efficient_Motion_Diffusion_Model_for_Fast_High_Quality_Human_Motion_Gene/figures/014_Table.jpg]]
 *Table: S2: Performance comparison between EasyTune with and without KL-regularized*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 与现有微调范式的谱系关系
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/SimMotionEdit_Text_Based_Human_Motion_Editing_with_Motion_Similarity_Prediction.pdf
+project_link: null
+code_link: https://github.com/lzhyu/SimMotionEdit
 aliases:
 - SimMotionEdit
 tags:
@@ -40,7 +42,7 @@ claims:
 > - MotionFix 测试集 上，L2 距离 (m) ↓ 为 0.253，对比 0.278 (TMED)，变化 0.025。
 > - MotionFix 测试集 上，FID ↓ 为 0.110，对比 0.167 (TMED)，变化 0.057。
 
-## 概述
+## 概要
 
 **核心问题**：现有文本驱动的人体运动编辑方法在将源运动与文本指令对齐时缺乏精确控制，导致生成运动与语言指令之间出现语义错位——模型难以准确识别源运动中哪些帧需要修改、保留或删除。
 
@@ -50,7 +52,7 @@ claims:
 
 **主要结果**：在 MotionFix 测试集上，SimMotionEdit 在生成-目标检索（R@1）和 M-score 指标上显著优于所有基线方法（Table 1）。感知研究中，SimMotionEdit 的对齐度和合理性评分分别比主要基线 TMED（Athavale et al., ArXiv 2024）高出 0.47 和 0.38 分（3 分制，Table A.1）。消融实验证实：运动相似性量化分类优于回归（Table 3），滤除低 MotionSNR 的噪声训练样本可进一步提升性能，同时增强文本与运动特征可带来最佳运动真实感（Table 2）。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -68,7 +70,9 @@ claims:
 
 此外，为了有效融合文本与运动两种模态的信息并支持辅助任务的学习，SimMotionEdit 设计了**Motion Diffusion Transformer 架构**，将条件特征增强与扩散生成解耦为条件Transformer和扩散Transformer两个模块，使辅助任务与编辑任务各司其职、协同优化。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SimMotionEdit的核心创新在于将**运动相似性预测**作为辅助任务引入文本驱动的人体运动编辑框架，从而解决了现有方法中源运动与文本指令对齐不精确、语义错位的瓶颈问题。具体而言，该方法通过以下三个关键设计实现了突破：
 
@@ -102,7 +106,7 @@ SimMotionEdit采用**条件Transformer + 扩散Transformer**的解耦架构（Fi
 
 **证据强度总结**：上述创新点的有效性均通过MotionFix测试集上的定量实验（Table 1, 2, 3）、感知研究（Table A.1）和消融分析得到验证，置信度较高（0.95-0.98）。主要局限在于方法仅在单一数据集上验证，且相似性量化类数 $K$ 和MotionSNR阈值的选择目前依赖经验设定。
 
-## 整体框架
+
 
 SimMotionEdit 提出了一种双 Transformer 解耦架构——**Motion Diffusion Transformer**，将文本驱动的人体运动编辑任务与运动相似性预测辅助任务统一在一个多任务训练框架中。如 Figure 2 所示，该架构由两个核心模块构成：**条件 Transformer**（Condition Transformer）和**扩散 Transformer**（Diffusion Transformer），二者分别承担条件增强与运动生成的职责。
 
@@ -142,7 +146,7 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{aux}} + \mathcal{L}_{\mathrm{e}}$$
 ![[assets/figures/papers/paper_list_l23_SimMotionEdit_Text_Based_Human_Motion_Editing_with_Motion_Similarity_Pre/figures/001_Figure_1.jpg]]
 *Figure 1: Text-Based Motion Editing. Our method SimMotionEdit generates edited human motion sequences from text instructions and source motion sequences*
 
-## 核心模块与公式推导
+
 
 ### 扩散建模基础
 
@@ -209,7 +213,9 @@ SimMotionEdit 的网络架构由两个解耦的 Transformer 模块组成（Fig. 
 
 消融实验（Table 2）表明：同时增强文本与运动特征（而非仅其中一项）可带来最佳运动真实感。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -283,7 +289,9 @@ Table 1 最后一行报告了不使用 MotionSNR 滤波的变体性能。滤除�
 ![[assets/figures/papers/paper_list_l23_SimMotionEdit_Text_Based_Human_Motion_Editing_with_Motion_Similarity_Pre/figures/009_Table.jpg]]
 *Table: A.1. Perceptual Evaluation Mean Statistics. We report the mean scores achieved by all three candidates in the perceptual study, averaging the aggregated responses across all the participants and sample sets. SimMotionEdit achieves scores that are 0.3 to 0.5 points higher than TMED on a 3-point Likert Scale*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位与核心差异
 
@@ -334,6 +342,8 @@ SimMotionEdit 的几个关键设计选择均有消融实验支撑，构成了方
 - **双 Transformer 架构的通用性**：条件 Transformer 与扩散 Transformer 的解耦设计在其他多模态生成任务（如视频编辑、语音驱动手势生成）中是否同样有效？这种架构分离是否有利于模块化的预训练与微调？
 
 - **数据效率与弱监督扩展**：能否利用大规模文本-运动对数据（无编辑三元组）进行预训练，仅用少量编辑数据微调？运动相似性预测任务本身是否可以作为自监督信号，从无标注的运动对中自动挖掘编辑关系？
+
+
 
 ## 原文 PDF
 

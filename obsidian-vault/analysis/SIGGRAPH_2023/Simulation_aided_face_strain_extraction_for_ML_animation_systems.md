@@ -5,6 +5,8 @@ paper_level: A
 venue: SIGGRAPH
 year: 2023
 pdf_ref: paperPDFs/SIGGRAPH_2023/Simulation_aided_face_strain_extraction_for_ML_animation_systems.pdf
+project_link: null
+code_link: null
 aliases:
 - SAMSE
 - SAFSEMAS
@@ -40,7 +42,7 @@ claims:
 > - We employ simulation to extrapolate surface capture into the flesh volume, while respecting physical constraints (e.g. collisions) and filtering surface defects.
 > - Collision detection is disabled for roughly the first 80% of Newton iterations to allow vertices to settle, and accurate thin teeth models are replaced with bulked up proxies.
 
-## 概述
+## 概要
 
 **核心问题**：面部表演捕捉数据仅提供表面几何信息，无法直接获取与内部肌肉变形相关的、解剖学启发的应变特征，从而限制了机器学习动画系统的输入质量。
 
@@ -52,7 +54,7 @@ claims:
 
 **局限性**：顶点卡住仍可能发生；膨胀牙齿代理降低了碰撞几何精度；均匀材料模型忽略了组织力学差异；附着图和置信度图依赖手工设置，需逐演员调整。论文未提供与真实内部变形的定量精度验证，仅展示了生产中的定性应用。
 
-## 背景与动机
+
 
 面部表演捕捉是高质量数字角色动画的核心技术，但其原始数据仅提供演员面部的表面几何信息，无法直接获取驱动面部表情的内在肌肉变形特征。这一问题在基于机器学习的动画系统中尤为突出：ML模型需要低维、解剖学相关的输入特征来建立面部姿态到动画参数的映射，而表面捕捉数据本身缺乏对内部软组织力学状态的描述。
 
@@ -60,7 +62,9 @@ claims:
 
 本文的动机正是弥合这一鸿沟：**通过引入基于物理的体积弹性仿真，将表面捕捉数据外推到面部软组织内部，从而自动提取解剖学启发的肌肉应变特征**。该方法的核心思路是：在面部体积网格中嵌入肌肉曲线，利用准静态弹性求解器驱动体积变形以匹配捕捉表面，进而通过曲线伸长/收缩比率编码面部姿态。这一过程不仅恢复被遮挡的内部区域，还借助物理约束过滤捕捉噪声和解析碰撞，生成鲁棒、低维的应变描述符，为下游ML动画系统提供高质量输入。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于将传统上依赖手工定义或复杂肌肉激活动力学仿真的面部应变提取流程，替换为一种**仿真辅助的自动肌肉应变提取方法**。该方法通过体积弹性仿真，将表面捕捉数据外推到面部软组织内部，从而自动生成解剖学启发的高质量应变特征，为下游ML动画系统提供鲁棒的输入。以下从三个关键的“changed slots”展开分析。
 
@@ -81,7 +85,7 @@ claims:
 
 **总结**：本工作的创新并非提出全新的仿真算法，而是通过**组合体积仿真、延迟碰撞和均匀材料模型**这三个设计选择，系统性地解决了将表面捕捉数据自动、鲁棒地转化为解剖学相关应变特征的核心瓶颈，为ML动画系统构建了一条高质量的数据准备管线。
 
-## 整体框架
+
 
 该系统作为数据准备阶段的一个核心环节，旨在为下游机器学习动画系统提供高质量、低维度的面部姿态特征。其根本设计动机在于：面部表演捕捉仅能提供表面几何信息，无法直接获取与内部肌肉变形相关的解剖学特征，从而限制了ML动画系统的输入质量。为此，系统引入基于物理的体积仿真，将表面信息外推至软组织内部，并从中提取肌肉应变描述符。
 
@@ -99,7 +103,7 @@ claims:
 
 整个pipeline的输出是一组低维的肌肉应变值，而非高维的顶点位移或几何数据。这种设计通过物理仿真将表面信号转化为具有解剖学意义的内部变形度量，为后续的机器学习模型提供了更具泛化能力和物理一致性的特征表示。
 
-## 核心模块与公式推导
+
 
 ### 整体流程概述
 
@@ -136,7 +140,9 @@ $$
 
 论文原文未提供更详细的数学推导（如弹性力能的显式表达式或牛顿迭代的具体更新公式）。上述应变定义是基于原文描述“length elongation/contraction ratios of curves”的合理推断。如需完整的弹性力学公式推导，建议查阅论文引用的准静态牛顿求解器相关文献。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果与定性验证
 
@@ -169,7 +175,9 @@ $$
 ![[assets/figures/papers/paper_list_l49_https_research_nvidia_com_labs_prl_klar2023simulation_simulationstrain20/figures/001_Figure_1.jpg]]
 *Figure 1: We leverage simulation to extrapolate dynamic performance capture into volumetric tissue simulation, from which deformation of muscle curves and strain measurements are extracted, to be used as features in ML-based animation tools*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 方法继承与差异化
 
@@ -212,6 +220,8 @@ $$
 ### 知识库定位
 
 在更广泛的图形学与机器学习交叉领域中，本工作可定位为**面向ML系统的物理启发的特征工程方法**。其核心洞察——利用体积仿真从表面几何中恢复解剖学相关特征——与近年来利用物理先验提升学习系统鲁棒性的趋势一致。与纯数据驱动方法相比，该方法通过物理约束过滤捕捉噪声和解析碰撞，生成的应变描述符具有更低的维度和更强的解剖学可解释性。然而，其依赖准静态仿真和手工定义的边界条件，在实时性和全自动化方面仍落后于端到端学习方法，更适合作为离线数据预处理管线中的关键环节。
+
+
 
 ## 原文 PDF
 

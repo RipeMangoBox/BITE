@@ -42,7 +42,7 @@ claims:
 > - 50对多样的跨类别三维物体（真实数据集与Trellis生成） 上，FID 111.95 vs 164.68 (FreeMorph) (-52.73)。
 > - 50对多样的跨类别三维物体 上，PPL 2.47 vs 2.41 (MorphFlow) (+0.06)；PDV 0.0006 vs 0.0006 (3DInterp) (0)；AS 81.00% vs 11.00% (FreeMorph) (+70.00%)。
 
-## 概述
+## 概要
 
 三维变形（3D Morphing）旨在生成从源物体到目标物体的平滑、语义连贯的过渡序列。然而，跨类别变形面临一项核心瓶颈：**语义一致性与时间平滑性难以兼顾**。传统基于匹配的方法依赖显式对应关系，忽略纹理演进且泛化能力差；基于二维图像变形再升维的方法无法保证时序连续与结构合理性；直接插值噪声或条件特征的方法则产生语义模糊与视觉伪影。这些缺陷使得现有方案难以在任意三维物体之间生成真实且美观的变形。
 
@@ -50,7 +50,7 @@ claims:
 
 在50对跨类别源-目标物体上的实验表明，MorphAny3D 在多项指标上取得最优或接近最优结果：FID 达 111.95（较最优基线 FreeMorph 降低 52.73），感知路径长度（PPL）为 2.47（与最优的 MorphFlow 仅差 0.06），路径方向方差（PDV）为 0.0006，美学评分（AS）达 81%，用户偏好（UP）达 86.73%。消融实验进一步验证了各模块的贡献：MCA 使 FID 从 125.47 降至 112.18，TFSA 使 PPL 从 3.66 降至 2.87，方向校正则进一步将 PPL 降至 2.47。该方法无需任何训练或超参数调节，可直接嵌入现有三维生成管线，为跨类别三维变形提供了一种高效且通用的解决方案。
 
-## 背景与动机
+
 
 ### 问题背景：三维变形的核心瓶颈
 
@@ -83,7 +83,9 @@ claims:
 3. **方向稳定性**：通过方向校正策略缓解中间阶段的方向跳变问题；
 4. **零训练部署**：在现有 Trellis 模型基础上仅替换注意力模块，无需额外训练或超参数调节。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MorphAny3D的核心创新在于**将变形控制从条件/噪声空间迁移至注意力机制内部**，通过三个紧密协同的“changed slots”解决跨类别三维变形中语义一致性与时间平滑性难以兼顾的瓶颈。
 
@@ -133,7 +135,7 @@ MorphAny3D还引入了一个辅助性的changed slot——方向校正策略。�
 
 四个changed slots形成了从特征初始化、跨对象信息融合、时间一致性到方向稳定性的完整创新链路。MCA解决了“变形什么”（结构合理性），TFSA解决了“如何过渡”（时间平滑性），方向校正解决了“朝向哪里”（方向稳定性），而球面插值则为整个链路提供了几何上合理的起点。这种协同使得MorphAny3D在无需任何训练或超参数调节的前提下，在50对跨类别源-目标上取得了最优的FID（111.95）、PDV（0.0006）、AS（81%）和用户偏好（86.73%），PPL（2.47）也与最优方法接近（Table 1）。
 
-## 整体框架
+
 
 MorphAny3D 的整体流程围绕 **结构化隐变量（Structured Latent, SLAT）** 这一核心表示展开，无需任何训练或微调，即可在任意三维物体之间生成平滑、语义连贯的变形序列。给定一个源物体 $x^{\mathrm{src}}$ 和一个目标物体 $x^{\mathrm{tgt}}$，目标是生成一段从源逐渐过渡到目标的 $N$ 帧变形序列 $\{x^n\}_{n=0}^{N}$，其中 $x^0 = x^{\mathrm{src}}$，$x^N = x^{\mathrm{tgt}}$，变形进度由权重 $\alpha^n \in [0,1]$ 控制。
 
@@ -170,7 +172,7 @@ MorphAny3D 的整体流程围绕 **结构化隐变量（Structured Latent, SLAT�
 ![[assets/figures/papers/paper_list_l2548_https_arxiv_org_abs_2601_00204/figures/002_Figure_2.jpg]]
 *Figure 2: Comparison of different 3D morphing strategies. (a) Matching-Based 3D Morphing; (b) 2D Morphing + 3D Generation; (c) Direct Interpolation; (d) MorphAny3D. Our method leverages the powerful SLAT to achieve semantically plausible and temporally smooth 3D morphing without any training. α ∈ [0, 1] is the deformation weight controlling the morphing progress*
 
-## 核心模块与公式推导
+
 
 MorphAny3D 在预训练的 Trellis 三维生成框架上，仅替换注意力层而无需任何训练，实现了跨类别三维变形。其核心由四个关键模块构成：球面插值初始化、Morphing Cross-Attention（MCA）、Temporal-Fused Self-Attention（TFSA）和方向校正策略。
 
@@ -244,7 +246,9 @@ $$
 ![[assets/figures/papers/paper_list_l2548_https_arxiv_org_abs_2601_00204/figures/008_Figure_7.jpg]]
 *Figure 7: (a) Example of abrupt orientation change during morphing. (b) Distribution of α at orientation jumps, peaking near intermediate stages. (c) Adjacent-frame orientation changes*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 评估设置与基线
 
@@ -311,7 +315,9 @@ Figure 12 展示了两个典型失败案例。案例一涉及极精细几何结�
 ![[assets/figures/papers/paper_list_l2548_https_arxiv_org_abs_2601_00204/figures/013_Figure_10.jpg]]
 *Figure 10: Applications: (a) Disentangled 3D morphing, (b) Dual-Target 3D Morphing and (c) 3D Style Transfer*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 三维变形方法谱系
 
@@ -352,6 +358,8 @@ MorphAny3D 建立在两个关键知识基础之上：
 2. **推理加速**：能否通过 KV 缓存、帧间特征复用或蒸馏等方法将推理时间降低至实时交互水平（<1 秒/帧）？
 3. **形状-纹理解耦**：当前方法对形状与纹理进行联合变形，如何实现更精细的解耦控制以支持局部编辑？
 4. **表征泛化**：本框架能否推广至动态场景变形或其他三维表征（如 3D Gaussian Splatting）？这需要重新审视 SLAT 表征的适用范围。
+
+
 
 ## 原文 PDF
 

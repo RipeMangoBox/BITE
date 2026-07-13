@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Prosperity_before_Collapse_How_Far_Can_Off_Policy_RL_Reach_with_Stale_Data_on_LLMs.pdf
+project_link: null
+code_link: https://github.com/Infini-AI-Lab/M2PO/
 openreview_forum_id: IIgl5MWelz
 aliases:
 - PBC
@@ -28,12 +30,15 @@ claims:
 | 中文题名 | Prosperity before Collapse: How Far Can Off-Policy RL Reach with Stale Data on LLMs? |
 | 英文题名 | Prosperity before Collapse: How Far Can Off-Policy RL Reach with Stale Data on LLMs? |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=IIgl5MWelz); [GitHub](https://github.com/Infini-AI-Lab/M2PO/) |
+| Links | [paper](https://openreview.net/forum?id=IIgl5MWelz) · [GitHub](https://github.com/Infini-AI-Lab/M2PO/) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method |  |
 | Dataset | |
 
-## 概述
+> [!tip] 效果简介
+> 结果与证据沿用下文“实验与关键发现”中的现有记录；本轮不新增或外推论文事实。
+
+## 概要
 
 大语言模型（LLM）的强化学习训练（如 GRPO）通常要求使用当前策略模型实时生成的样本（on-policy），这导致训练效率受限于生成速度，形成“生成-训练”瓶颈。直接使用陈旧数据（stale data）进行 off-policy 训练会因策略分布偏移导致性能退化，但移除信任域约束后，陈旧数据训练反而展现出“先繁荣后崩溃”（prosperity-before-collapse）的现象——初期性能甚至超越 on-policy 基线，随后急剧恶化。
 
@@ -46,7 +51,7 @@ M2PO 的核心优势在于：
 
 在 1.7B 至 32B 参数规模的六组模型和八个数学推理基准上，M2PO 在 off-policy 设置（s=256）下平均准确率最高提升 11.2%，且在五组模型中取得最优平均准确率，验证了其在解耦生成与训练、提升 RL 训练吞吐量方面的实用价值。
 
-## 背景与动机
+
 
 ### 大语言模型推理能力的强化学习训练
 
@@ -78,7 +83,9 @@ $$A_{i,t} = \frac{r_i - \mathrm{mean}(\{R_i\}_{i=1}^G)}{\mathrm{std}(\{R_i\}_{i=
 
 这一动机直接导向 M2PO（Second-Moment Trust Policy Optimization）的设计：利用重要性权重的二阶矩统计量 $M_2$ 作为分布偏移的实时度量，在批次层面动态确定信任区域。$M_2$ 兼具方差敏感性（能捕获高熵 token 引入的不稳定性）和统计稳定性（避免了 KL 散度中正负项抵消的问题），使其成为离线 RL 训练中信任区域自适应的理想指标。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 M2PO 的核心创新在于**用重要性权重的二阶矩（$M_2$）替代传统 KL 散度作为分布偏移的度量**，并据此设计了一种**批量级自适应掩码策略**，在保留绝大多数信息性更新的同时，仅抑制极端离群 token。
 
@@ -121,7 +128,7 @@ M2PO 的掩码策略改变了这一逻辑：
 
 这一 changed slot 组合使得 M2PO 在极端离线策略条件下（staleness ≥ 256）仍能保持稳定训练，并在 6 个模型规模（1.7B–32B）上实现与在线策略 GRPO 相当甚至更优的精度（Table 1），其中 Qwen3-Base-1.7B 上 M2PO（$s=256$）以 36.6% 的平均准确率显著超越在线策略 GRPO 的 33.0%。
 
-## 整体框架
+
 
 M2PO 的整体 pipeline 围绕**批级二阶矩约束下的选择性掩码**展开，在标准 GRPO 的基础上仅改造策略更新的信任域机制，其余数据流保持不变。其核心逻辑可归纳为四个阶段：
 
@@ -167,7 +174,7 @@ Prompt → 当前模型采样 → 响应序列缓存（staleness 延迟）
 
 整个 pipeline 仅在“信任域约束”环节替换了 GRPO 的逐 token 裁剪机制，输入（prompt 集、采样响应、奖励信号）和输出（策略梯度更新）的接口与 GRPO 完全兼容。唯一的额外超参数 $\tau_{M_2}$ 经实验验证不敏感（见 Figure 7），使得该方法在实际部署中易于调参。
 
-## 核心模块与公式推导
+
 
 ### M2PO 的核心设计逻辑
 
@@ -218,7 +225,9 @@ $$\mathcal{L}_{M2PO}(\theta) = \frac{1}{\sum_{i=1}^G |o_i|} \sum_{i=1}^G \sum_{t
 
 M2PO 仅有一个超参数 $\tau_{M_2}$。实验表明该阈值不敏感（见 Figure 7），默认值 $\tau_{M_2}=0.04$ 在多个模型尺度和任务上均表现稳定，保证了方法的易用性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：M2PO 在极端陈旧数据下的稳定性与性能
 
@@ -298,7 +307,9 @@ M2PO 稳定性的直接证据来自对 token 裁剪率的分析。**Figure 6c �
 *Figure 6: (a) Methods comparison under staleness ( s = 2 5 6 ) on Llama3.2-Instruct-3B. (b) Performance comparison between M2PO and GRPO on coding tasks. (c) Clipping ratio dynamics during RL on the Qwen-3-Base-1.7B model. (d) Comparison of the average clipping ratio across models and methods*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有方法的谱系关系
 
@@ -341,6 +352,8 @@ M2PO 的有效性建立在以下前提之上：
 3. **自适应阈值机制**：当前 $\tau_{M_2}$ 为固定值。根据训练阶段的动态特征（如 $M_2$ 的历史分布、奖励信号的稳定性）自适应调整阈值，可能进一步提升 M2PO 在不同训练阶段的效率——在稳定阶段放松约束以加速学习，在波动阶段收紧约束以保证安全。
 
 4. **$M_2$ 约束与奖励塑形的交互**：GRPO 的组内归一化本身是一种隐式的奖励塑形。$M_2$ 约束改变了有效更新 token 的分布，这可能间接影响组内优势估计的统计性质。这种交互效应是否会影响模型探索-利用平衡，需要更系统的分析。
+
+
 
 ## 原文 PDF
 

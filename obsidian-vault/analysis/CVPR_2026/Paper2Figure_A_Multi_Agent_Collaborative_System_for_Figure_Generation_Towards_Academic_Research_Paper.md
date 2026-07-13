@@ -42,7 +42,7 @@ claims:
 > - Paper2Figure Bench 上，Overall Score 79.2 vs ~65.1 (strongest baseline) (+14.1%)；Accuracy — vs — (+12%)；Beauty — vs — (+13.5%)。
 > - Human correlation (Paper2Figure Bench) 上，Pearson r 0.7345 vs — (—)；Cosine similarity 0.8652 vs — (—)。
 
-## 概述
+## 概要
 
 学术论文中的图表是传递复杂研究思想的核心载体，但高质量图表的制作长期依赖人工绘制，耗时且专业门槛高。现有自动化方法陷入两难困境：基于代码生成的方式（如 SVG、Mermaid）虽能保证结构正确性，但输出布局杂乱、视觉僵硬；直接图像生成模型（如 **GPT-Image-1**，OpenAI 2025）虽视觉丰富，却普遍存在文本渲染错误、逻辑关系混乱且难以编辑的问题。**根本瓶颈在于，现有方法无法同时兼顾语义精度、视觉质量与灵活的结构控制。**
 
@@ -54,8 +54,6 @@ Paper2Figure 针对这一瓶颈，提出**双多智能体协作系统**，核心
 
 *图 1：Paper2Figure 框架概览，对比传统代码方法与本文双多智能体系统及交互式编辑器*
 
-## 背景与动机
-
 学术论文中的图表是传达复杂研究思想的核心媒介。高质量的图表能够将抽象的方法流程、模型架构和实验结果转化为直观的视觉表达，直接决定读者对论文的第一印象和理解效率。然而，对于大多数研究者而言，创建专业级图表是一项耗时且依赖设计经验的繁重任务。
 
 近年来，大语言模型（LLM）的快速发展为自动化图表生成带来了新的可能。现有方法大致可归为两条技术路线：**基于代码生成**的方法和**直接图像生成**的方法。基于代码生成的路线利用 LLM 输出 SVG 或 Mermaid 等标记语言来构建图表。SVG 类方法（如 **GPT-5**、**Claude Opus 4**、**Gemini 2.5 Pro**）能够保留详细的文本信息，但普遍存在元素重叠、布局松散等问题；Mermaid 类方法（如 **GPT-5 (Mermaid)**、**Claude 4.5 Sonnet (Mermaid)**）则受限于僵化的模板布局，美学表现力不足。直接图像生成路线（如 **GPT-Image-1**、**Gemini 2.5 Flash Image**）能够产生视觉丰富的光栅图像，但文本渲染错误频繁、逻辑关系错乱，且输出为不可编辑的位图格式。
@@ -64,7 +62,7 @@ Paper2Figure 针对这一瓶颈，提出**双多智能体协作系统**，核心
 
 正是这一矛盾催生了 **Paper2Figure** 的设计动机：通过引入中间结构化表示语言 **FigScript** 以及**双多智能体协作流水线**（生成代理与细化代理），将语义理解、布局规划、视觉细化和迭代修正分离为专门的代理角色。这种分解式架构使得系统能够结合代码生成的精确控制与迭代视觉优化，在不牺牲编辑灵活性的前提下实现学术图表的高保真度和美观性。
 
-## 核心创新
+## 核心方法与创新机理
 
 Paper2Figure 的核心创新在于**引入结构化中间表示语言 FigScript，并将图表生成分解为“生成—细化”双多智能体协作流水线**，从而在保留代码生成精确控制优势的同时，获得迭代视觉优化能力。这一设计直接回应了现有方法的根本瓶颈：基于代码的方法（SVG/Mermaid）虽能保证结构正确，却产生视觉杂乱或布局僵硬的输出；直接图像生成模型（如 GPT-Image-1）虽视觉丰富，但文本渲染不准确、逻辑关系错误且难以编辑。
 
@@ -92,8 +90,6 @@ Paper2Figure 的核心创新在于**引入结构化中间表示语言 FigScript�
 现有工具仅支持文本提示输入，生成结果不可直接操控。Paper2Figure 提供了一个集成对话面板、实时画布和 FigScript 检查器的 **Web 编辑器**（Section 2.3），用户既可以通过自然语言指令驱动代理进行生成和编辑，也可以直接操作画布上的任意视觉元素。这一设计将自动化生成与人工微调无缝衔接，使系统既能全自动产出高质量初稿，又保留了精确编辑的灵活性。
 
 > **注意**：上述关于 FigScript 语言定义、代理间通信协议以及 Web 编辑器交互细节的描述均来自论文方法部分（Section 2.1–2.3）和 Algorithm 1 的伪代码框架。由于分析材料中未提供 FigScript 的具体语法规范和代理提示词设计，这些实现层面的细节需要读者在阅读原文时进一步验证。
-
-## 整体框架
 
 Paper2Figure 提出了一种**双多智能体协作系统**，将学术图表生成任务分解为语义理解、布局规划、视觉细化和迭代修正四个阶段，并通过中间结构化表示语言 FigScript 实现代理间的精确通信与可编辑输出。系统整体采用“生成—渲染—批评—修订”闭环流水线，包含六个核心代理和一个交互式 Web 编辑器。
 
@@ -133,8 +129,6 @@ Paper2Figure 还提供了一个集成式 Web 编辑平台（见 Figure 2），�
 
 ![[assets/figures/papers/paper_list_l2561_https_openaccess_thecvf_com_content_CVPR2026_html_Han_Paper2Figure_A_Mul/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the Paper2Figure framework, comparing traditional code-based (SVG/Mermaid) and text-to-image methods with our dual multi-agent system and interactive web editor that collaboratively generate, refine, and edit scientific figures*
-
-## 核心模块与公式推导
 
 ### 1. 中间表示语言 FigScript
 
@@ -197,12 +191,7 @@ Paper2Figure 提供了一个集成化的 Web 编辑环境，将自动化代理�
 
 系统的核心贡献在于架构设计而非公式创新，因此本节未涉及需要推导的数学公式。所有技术细节均通过算法流程和代理角色定义进行描述。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2561_https_openaccess_thecvf_com_content_CVPR2026_html_Han_Paper2Figure_A_Mul/figures/002_Figure_2.jpg]]
-*Figure 2: Paper2Figure Web Editor supports text instructions to agents for generation and editing, and allows user to manually adjust on a live canvas*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -254,7 +243,7 @@ Paper2Figure 内置的布局和色彩模板进一步降低了生成的不确定�
 ![[assets/figures/papers/paper_list_l2561_https_openaccess_thecvf_com_content_CVPR2026_html_Han_Paper2Figure_A_Mul/figures/006_Table_2.jpg]]
 *Table 2: Comparison of different automatic scoring methods in terms of their agreement with human judgments*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 问题域与现有范式
 

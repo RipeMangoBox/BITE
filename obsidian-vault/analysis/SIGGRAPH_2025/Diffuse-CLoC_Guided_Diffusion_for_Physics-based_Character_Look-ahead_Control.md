@@ -34,7 +34,7 @@ claims:
 | 中文题名 | Diffuse-CLoC：基于物理的角色前瞻控制引导扩散框架 |
 | 英文题名 | Diffuse-CLoC: Guided Diffusion for Physics-based Character Look-ahead Control |
 | 会议/期刊 | SIGGRAPH 2025 |
-| Links | [paper](http://arxiv.org/abs/2503.11801v3) · [arXiv](https://arxiv.org/abs/2503.11801v3) · [Project](https://s2025.conference-schedule.org/presentation/?id=papers_1047&sess=sess156) |
+| Links | [paper](http://arxiv.org/abs/2503.11801v3) · [paper](https://arxiv.org/abs/2503.11801v3) · [Project](https://s2025.conference-schedule.org/presentation/?id=papers_1047&sess=sess156) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction #topic/generative_models_diffusion |
 | Method | Diffuse-CLoC |
 | Dataset | Walk+Perturb, Forest, Jump, Motion In-betweening |

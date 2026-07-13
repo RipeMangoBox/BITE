@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2024
 pdf_ref: paperPDFs/arxiv_2024/UniEdit_A_Unified_Tuning_Free_Framework_for_Video_Motion_and_Appearance_Editing.pdf
+project_link: https://jianhongbai.github.io/UniEdit/
+code_link: null
 aliases:
 - UniEdit
 tags:
@@ -40,7 +42,7 @@ claims:
 > - 视频文本对齐评估 上，Textual Alignment CLIP Score 36.29 vs 未提供具体基线值 (优于其他方法)。
 > - 用户偏好评估（帧一致性） 上，Frame Consistency User Preference 4.74 vs 未提供具体基线值 (优于其他方法)。
 
-## 概述
+## 概要
 
 **核心问题**：现有视频编辑方法主要面向外观编辑（如风格化、物体替换），却难以在时序维度上对运动进行编辑（例如将“弹吉他”变为“挥手”或“吃东西”）。其根本瓶颈在于这些方法缺乏运动先验，无法有效控制帧间依赖关系。
 
@@ -55,7 +57,7 @@ claims:
 
 **方法定位**：UniEdit 属于**免调优的视频扩散模型特征注入**范式，区别于需要微调的 Tune-A-Video、Dreamix 等方法，也不同于仅面向外观编辑的 FateZero、Video-P2P 等零样本方案。其在方法谱系中的独特之处在于首次将时序自注意力注入与空间自注意力注入统一在同一框架中，实现运动与外观的解耦编辑。
 
-## 背景与动机
+
 
 ### 视频编辑的现状与瓶颈
 
@@ -82,7 +84,9 @@ Figure 6 的可视化实验为这一假设提供了实证支撑：SA-S 层中的
 
 通过将运动注入与内容保持分别定位到 SA-T 和 SA-S 层，并引入辅助分支提供特征来源，UniEdit 实现了运动与内容的解耦操控，为视频编辑领域提供了一个新的范式。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 UniEdit 的核心创新在于**首次在免调优框架下统一实现视频的运动编辑与外观编辑**，其关键在于对预训练文本到视频（T2V）扩散模型中两类自注意力机制的功能解耦与定向注入。
 
@@ -140,7 +144,7 @@ $$\mathrm{SA}_{\mathrm{mask}} := \mathrm{m-attn}(Q, K, V; M^{f}) \odot M_{m} + \
 
 UniEdit 的核心创新可归纳为 **“洞察—解耦—注入”** 三部曲：洞察预训练 T2V 模型中 SA-T 与 SA-S 的功能分工，将运动控制与内容保持解耦到不同的注意力层，通过双辅助分支的特征注入实现免调优的统一编辑。这一设计使得 UniEdit 在帧一致性 CLIP 分数（98.37）和文本对齐 CLIP 分数（36.29）上均超越现有最先进方法（Table 1），尤其在运动编辑任务上展现出显著优势（Figure 5）。
 
-## 整体框架
+
 
 UniEdit 遵循“先逆向后生成”（inversion-then-generation）的免调优编辑范式，其整体架构由三条并行的去噪路径构成：**主编辑路径（Main Editing Path）**、**辅助重建分支（Auxiliary Reconstruction Branch）** 和 **辅助运动参考分支（Auxiliary Motion-Reference Branch）**，如 Figure 2 所示。
 
@@ -181,7 +185,7 @@ $$
 
 整个框架的设计根植于一个核心洞察：预训练文本到视频扩散模型中的**时序自注意力层编码了帧间依赖（运动）**，而**空间自注意力层编码了帧内依赖（内容与结构）**。基于这一解耦特性，UniEdit 通过在两类注意力层中分别注入来自不同辅助分支的特征，实现了运动编辑与内容保持的分离控制——这是其能够统一处理运动编辑和外观编辑的根本原因。
 
-## 核心模块与公式推导
+
 
 UniEdit 的核心操作围绕视频扩散模型中两类自注意力层展开：**空间自注意力（SA-S）** 编码帧内依赖（内容与结构），**时序自注意力（SA-T）** 编码帧间依赖（运动）。基于这一洞察，方法通过三条分支的协同与特征注入，实现解耦的运动编辑与内容保持。
 
@@ -271,7 +275,9 @@ $$
 ![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2402_13185/figures/007_Figure_6.jpg]]
 *Figure 6: Visualization of spatial query in SA-S (second row), cross-frame temporal attention maps in SA-T (third row), and the magnitude of optical flow (fourth row)*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -340,7 +346,9 @@ UniEdit 在视频编辑的两个核心维度——帧一致性（Frame Consisten
 ![[assets/figures/papers/paper_list_l18_https_arxiv_org_abs_2402_13185/figures/017_Figure_16.jpg]]
 *Figure 16: More motion editing results of UniEdit*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位与核心瓶颈
 
@@ -397,6 +405,8 @@ UniEdit 处于**免调优视频扩散模型编辑**的交叉点上，其方法�
 5. **更精细的运动控制**：当前运动注入以全时序注意力图替换的方式实现，能否引入更细粒度的运动控制（如运动幅度、速度、局部运动）？
 
 这些开放问题指向了视频编辑从“单一维度免调优”向“多维度联合可控”演进的关键路径，UniEdit 所建立的“注意力解耦‑注入”框架为后续研究提供了可扩展的基础架构。
+
+
 
 ## 原文 PDF
 

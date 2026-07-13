@@ -44,7 +44,7 @@ claims:
 > - RoboTwin2.0 Hard 上，average success rate 26.4 vs 22.8 (RDT) (+3.6)。
 > - LIBERO-Long 上，success rate 最高 vs - (优于所有对比方法)。
 
-## 概述
+## 概要
 
 具身智能体在真实环境中执行操作任务时，面临一个根本矛盾：**推理深度与决策速度之间的冲突**。以 **ThinkAct**（Huang et al., arXiv 2025）为代表的推理型视觉-语言-动作（VLA）模型，通过生成约250个tokens的显式文本思维链来提升任务理解与规划能力，但这一过程引入了数秒的推理延迟，难以满足具身任务对1–15 Hz快速决策的实时需求。
 
@@ -58,7 +58,7 @@ claims:
 
 该方法在方法谱系中定位为**高效推理型VLA**，区别于OpenVLA（Kim et al., arXiv 2024）等基础VLA的纯端到端映射、ThinkAct的显式文本CoT、以及CoT-VLA（Zhao et al., CVPR 2025）的视觉目标生成。其知识库贡献在于：首次将GRPO驱动的偏好信号与连续隐空间蒸馏相结合，在保持推理可解释性的同时实现数量级的推理加速。
 
-## 背景与动机
+
 
 ### 具身推理的实时性困境
 
@@ -87,7 +87,9 @@ claims:
 
 这一动机直接催生了 **Fast-ThinkAct** 框架：通过偏好引导蒸馏（Preference-guided Distillation）将教师模型的高质量推理模式传递给学生模型的紧凑隐式表示，并利用空间令牌并行预测视觉轨迹，最终通过KV cache将隐式视觉计划注入扩散动作模型，实现快速、可解释且高性能的具身决策。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Fast-ThinkAct 的核心创新在于将推理型 VLA 中冗长的显式文本思维链（约 250 tokens）压缩为**少量连续隐式向量**（默认 M=6），并通过**偏好引导蒸馏**（preference-guided distillation）将教师模型的高质量推理模式传递给学生，同时引入**并行空间令牌**高效预测视觉轨迹，最终将紧凑的隐式视觉计划注入扩散动作模型，实现推理效率与任务性能的双重突破。
 
@@ -139,7 +141,7 @@ $$\mathcal{L}_{\mathrm{IL}}(\phi) = \ell \left( \pi_{\phi}(o_t, l, c_t), \hat{a}
 
 需要指出，偏好蒸馏的质量高度依赖于教师模型 GRPO 训练的稳定性和探索能力——当教师未能生成多样化高质量推理时，学生可能收敛到次优解。此外，口头化器偶尔会产生幻觉或不忠实于隐式表示的文本，当前框架尚未显式引入防幻觉机制。隐式推理的紧凑性虽然带来了效率，但牺牲了完全的透明度，在安全关键应用中可能不如可审核的文本链。这些局限为后续研究指明了方向：引入 grounding-aware 或幻觉抑制目标、动态调整隐式令牌数量以适应不同复杂度场景。
 
-## 整体框架
+
 
 Fast-ThinkAct 的整体 pipeline 围绕一个核心矛盾展开：**推理型 VLA 的显式文本思维链（约250 tokens）提供了丰富的规划能力，但其自回归生成带来了数秒的推理延迟，使系统难以满足具身任务 1–15 Hz 的实时决策需求**。框架的设计目标是在保留推理质量的前提下，将推理过程从冗长的文本空间压缩到紧凑的连续隐空间，并通过可口头化约束保证其可解释性。
 
@@ -184,7 +186,7 @@ Fast-ThinkAct 的整体 pipeline 围绕一个核心矛盾展开：**推理型 VL
 ![[assets/figures/papers/paper_list_l2154_https_arxiv_org_abs_2601_09708/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of Fast-ThinkAct. Previous reasoning VLAs generate lengthy reasoning traces (∼250 tokens). Our approach learns compact continuous tokens (e.g., 6) (blue) and parallel spatial tokens (green) as internal reasoning. The bottom-right plot shows that we achieve 9.3× faster inference than ThinkAct-7B Huang et al. (2025), while delivering improved performance on the SimplerEnv-Google benchmark*
 
-## 核心模块与公式推导
+
 
 Fast-ThinkAct 的核心架构由四个关键模块构成，围绕“将冗长文本思维链压缩为可口头化隐式向量”这一中心目标协同工作。
 
@@ -259,7 +261,9 @@ $$
 ![[assets/figures/papers/paper_list_l2154_https_arxiv_org_abs_2601_09708/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of Fast-ThinkAct. (a) Given observation*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果：操作能力与推理效率
 
@@ -339,7 +343,9 @@ Fast-ThinkAct 在机器人操作和具身推理两大维度上均展现出显著
 ![[assets/figures/papers/paper_list_l2154_https_arxiv_org_abs_2601_09708/figures/009_Figure_7.jpg]]
 *Figure 7: Reasoning trace comparison on RoboVQA. (a) Teacher’s textual reasoning. (b) Student’s verbalized latent reasoning. Green: relevant content; orange: less relevant content*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从文本思维链到隐式推理的演进
 
@@ -391,6 +397,8 @@ Fast-ThinkAct 处于具身视觉-语言-动作模型从“慢思考”向“快�
 4. **自适应推理深度。** 能否动态调整隐式token数量以适应不同复杂度的场景？消融显示K=6为当前最优，但固定步数可能在简单任务上浪费计算、在极复杂任务上推理不足。自适应机制可进一步优化推理开销。
 
 5. **向更高安全要求的领域推广。** 如何将这一框架推广至自动驾驶或移动机器人等对延迟更敏感且安全要求更高的领域？这些领域对可解释性和故障可追溯性的要求可能超出当前口头化器能提供的保证。
+
+
 
 ## 原文 PDF
 

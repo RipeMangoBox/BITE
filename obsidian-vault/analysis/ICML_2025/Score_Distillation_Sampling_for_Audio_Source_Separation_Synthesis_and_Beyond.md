@@ -5,6 +5,8 @@ paper_level: A
 venue: ICML
 year: 2025
 pdf_ref: paperPDFs/ICML_2025/Score_Distillation_Sampling_for_Audio_Source_Separation_Synthesis_and_Beyond.pdf
+project_link: https://research.nvidia.com/labs/toronto-ai/Audio-SDS/
+code_link: null
 aliases:
 - AS
 - SDSASSSB
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 音频分数蒸馏采样：源分离、合成及其他 |
 | 英文题名 | Score Distillation Sampling for Audio: Source Separation, Synthesis, and Beyond |
 | 会议/期刊 | ICML 2025 |
-| Links | [paper](https://arxiv.org/abs/2505.04621); [Project](https://research.nvidia.com/labs/toronto-ai/Audio-SDS/) |
+| Links | [paper](https://arxiv.org/abs/2505.04621) · [Project](https://research.nvidia.com/labs/toronto-ai/Audio-SDS/) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/generative_models_and_autoencoders |
 | Method | Audio-SDS |
 | Dataset | Prompt-driven Source Separation (10s clips), Prompt-driven Source Separation (first half), Prompt-driven Source Separation, Impact Synthesis (e.g., kick drum, hitting pot) |
@@ -41,7 +43,7 @@ claims:
 > - Prompt-driven Source Separation (first half) 上，SDR (dB) 为 9.4 (mean)，对比 -2.3 (mean)，变化 +11.7。
 > - Prompt-driven Source Separation 上，Mean CLAP score 为 0.2，对比 0.18，变化 +0.02。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有文本到音频扩散模型主要关注从噪声中生成采样，缺乏对可解释结构化参数（如合成器旋钮、物理模拟系数）的直接优化能力，难以在结构化约束下生成语义一致且可控的音频。
 
@@ -57,8 +59,6 @@ claims:
 - **FM合成与冲击合成**：CLAP分数随优化持续上升（Fig. 7），冲击合成跨提示提升0.10–0.18，FM合成提升0.13（Fig. 6），验证了语义对齐的逐步增强。
 
 **局限性**：方法对分布外提示效果差，长音频（>10–15秒）可能出现过渡生硬或静音；简单参数模型（如FM合成器）难以表达超出其能力的声源；训练对超参数敏感，需针对不同提示仔细调节。
-
-## 背景与动机
 
 ### 文本到音频生成与结构化约束的鸿沟
 
@@ -76,7 +76,7 @@ SDS在文本到3D合成中的成功依赖于图像扩散模型对渲染图像的
 
 本文的**动机**正是填补这一空白：通过系统性地改造SDS的更新域、损失空间和去噪策略，使其适配音频扩散模型的特性，从而用**单一冻结模型**统一解决FM合成参数调优、物理冲击合成、提示驱动源分离等多种音频任务——所有这些任务共享同一扩散先验，无需任何任务特定数据集或微调。
 
-## 核心创新
+## 核心方法与创新机理
 
 Audio-SDS 的核心创新并非提出新的扩散模型架构，而是**将冻结的预训练文本到音频扩散模型重新定位为可微分评分函数**，通过分数蒸馏采样（SDS）将文本语义直接注入可解释的参数化音频表示中。这一范式转换的关键在于三个相互关联的设计选择（changed slots），它们共同解决了将 SDS 从图像/三维领域迁移至音频领域时面临的根本性不稳定问题。
 
@@ -119,8 +119,6 @@ $$\mathbf{u}_{\mathrm{SDS}}^{S,\mathrm{dec}}(\theta; p) = \sum_{m} \Bigl( \mathb
 ### 方法局限性
 
 尽管上述创新显著提升了音频 SDS 的可行性与质量，但方法仍存在若干根本性限制：对分布外提示（out-of-distribution prompts）效果急剧退化，输出可能退化为重复噪声；较长音频（超过 10-15 秒）的优化容易出现过渡生硬或末端静音伪影；简单参数模型（如 FM 合成器）的表达能力上限限制了复杂声景的生成质量（例如，FM 合成无法生成“木勺敲锅”的金属质感，见 Fig. 6）。此外，高分类器自由引导（CFG）尺度可能导致优化陷入病理局部最小值，训练过程对超参数选择敏感。
-
-## 整体框架
 
 ![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2505_04621/figures/003_Figure_2.jpg]]
 *Figure 2: Overview of our Audio-SDS method, marrying the Score Distillation Sampling (SDS) [66] with an audio diffusion model in a robust framework for various audio tasks. SDS (see Sec. 2.2) – originally developed for text-to-3D generation – computes an update for rendered data x in the diffusion models modality (e.g., image or audio), then propagates that update through a differentiable simulation g to update parameters θ. Intuitively, this nudges the render parameters to make it “more likely” under our conditioning, here the text prompt p. Adapting SDS to audio, we propose three modifications shown in red: (a) Decoder-SDS to circumvent differentiating through the encoder (Sec. 3.1.1), (b) a spectr...*
@@ -180,8 +178,6 @@ $$
 ### 证据强度
 
 Decoder-SDS 和频谱加权的有效性均有强消融证据支持（confidence ≥ 0.95）。多步去噪的定量提升（+0.14 CLAP）来自受控对比实验。整体框架在源分离任务中将平均 SDR 从 -2.5 dB 提升至 2.2 dB（+4.7 dB，Table 1），在冲击合成中 CLAP 分数随优化持续上升（Fig. 7），表明语义对齐逐步增强。
-
-## 核心模块与公式推导
 
 ### 3.1 可微音频渲染器 g_audio
 
@@ -249,12 +245,11 @@ $$ \mathbf{u}_{\mathrm{Sep}}(\pmb{\theta}; \{p_k\}_{k=1}^{K}) = \nabla_{\pmb{\th
 
 其中 $\gamma$ 控制语义对齐与重建保真度之间的权衡。该更新将平均 SDR 从 **-2.5 dB 提升至 2.2 dB**（+4.7 dB），表明 SDS 更新有效正则化了欠定分离问题（Table 1）。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心任务结果
 
 **提示驱动源分离**是Audio-SDS最具挑战性的验证场景。给定一段10秒混合音频，方法需在无监督条件下将混合信号分解为多个与文本提示语义一致的声源，同时满足重建约束——即分离源之和必须等于原始混合信号。Table 1报告了信号失真比（SDR）的定量结果。
-
 
 ![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2505_04621/figures/010_Table_1.jpg]]
 *Table 1: Source Separation Distance to Ground-truth. We show Signal-to-Distortion Ratio (SDR) in dB (higher is better) for each separated source of the full 10s clips. Our method improves significantly over the baseline, boosting mean SDR to the source prompts from - 2 . 5 $\to$ 2 . 2 ( + 4 . 7 ) Most recovery artifacts are at the audio’s end, which we hypothesize is due to the diffusion model preferring audio with silence at the end. Comparing recovery for only the first half, we see the mean SDR goes from −2.3 → 9.4(+11.7)*
@@ -263,14 +258,12 @@ $$ \mathbf{u}_{\mathrm{Sep}}(\pmb{\theta}; \{p_k\}_{k=1}^{K}) = \nabla_{\pmb{\th
 
 Table 2从语义对齐角度补充了评估。Audio-SDS在保持低重建损失的同时，将平均CLAP分数从0.18提升至0.20（+0.02），最大CLAP从0.27提升至0.34（+0.10）。这组数据揭示了方法的核心能力：在严格重建约束下，SDS更新仍能为每个分离源注入与提示一致的语义特征。
 
-
 ![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2505_04621/figures/009_Table_2.jpg]]
 *Table 2: Source Separation Prompt Alignment. We show CLAP scores (higher is better) for each source and reconstruction loss (lower is better) to the mixture m. We achieve better CLAP scores, maintaining low reconstruction loss, indicating better source separation than baselines, boosting mean/min/- max CLAP to the prompts from (0.18, 0.02, 0.27) → ( 0 . 2 ( + 0 . 0 2 ) , 0 . 0 5 ( + 0 . 0 3 ) , 0 . 3 4 ( + 0 . 1 0 ) )*
 
 **物理冲击合成**展现了方法对结构化参数空间的优化能力。Figure 7追踪了不同提示下CLAP分数随优化步数的变化曲线。对于“kick drum, bass, reverb”提示，CLAP从随机初始化持续上升约+0.10；对于“hitting pot with wooden spoon”提示，提升幅度达+0.18。曲线呈单调上升趋势，未出现明显的过拟合或退化迹象，验证了SDS更新在物理参数空间中的稳定收敛性。
 
 **FM合成**的结果则揭示了参数表达能力的瓶颈。对于域内提示“kick drum, bass, reverb”，FM合成器优化后CLAP提升+0.13；但对于更具挑战性的“hitting pot with wooden spoon”，CLAP仅提升+0.01（Figure 6）。这一对比表明，当目标声音超出FM合成器的表达能力时（如需要表现金属质感的木质锅敲击声），参数优化无法弥补模型容量的根本限制。
-
 
 ![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2505_04621/figures/007_Figure_6.jpg]]
 *Figure 6: FM and Impact Synthesis: Qualitative Results. Spectrograms of the initialization and final result after optimization for two prompts. Takeaway: Outputs separate into distinct results according to prompts, reflecting quantitative results (Fig. 7, end of caption). FM Synthesis fits the “kick drum. . . ”, but fails for more challenging “hitting $\mathrm { p o t . . . } ^ { \mathsf { 7 } }$ . However, the more complex impact synthesis fits both. Audio links: init. FM, init. impact, final FM “kick drum, bass, reverb” (+0.13 CLAP vs. init.), final FM “hitting pot with wooden spoon” (+0.01 CLAP vs. init.) final impact “kick drum,. . . ” (+0.10 CLAP vs. init., −0.01 CLAP vs. FM), final impact “hittin...
@@ -281,12 +274,10 @@ Table 2从语义对齐角度补充了评估。Audio-SDS在保持低重建损失�
 
 **多步去噪 vs. 单步去噪**（Figure 12）：使用10步DDIM部分去噪相比标准单步去噪在冲击合成中CLAP提升**+0.14**。多步去噪提供了更平滑的引导信号，减少了单步去噪中噪声预测误差对参数更新的扰动。
 
-
 ![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2505_04621/figures/015_Figure_12.jpg]]
 *Figure 12: Single-Step vs. Multi-Step Denoising We visualize spectrograms in dB of the audio initialization and the final result after optimization for our proposed multi-step denoising and the standard single-step denoising for impact synthesis with the prompt “hitting pot with wooden spoon”. Takeaway: The Decoder-SDS performs qualitatively and quantitatively better than the Encoder-SDS here. Audio links: single-step, 10-step (+0.14 CLAP vs. single-step)*
 
 **频谱加权 vs. 时域L2损失**（Figure 11）：在源分离重建中，多尺度STFT幅度残差相比时域L2损失定性地保留了更多瞬态和高频细节。频谱加权通过在不同窗口大小上平均频率差异，避免了单一窗口带来的时间-频率分辨率权衡，对冲击类声音的瞬态保留尤为关键。
-
 
 ![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2505_04621/figures/014_Figure_11.jpg]]
 *Figure 11: Spectrogram vs. $\ell _ { 2 }$ me Time (s) Emphasis: We visualize spectrograms (in dB) and waveforms of a target audio, and our reconstruction result using a spectrogram and $\ell _ { 2 }$ emphasis. Takeaway: The spectrogram emphasis is qualitatively better than the $\ell _ { 2 }$ emphasis. Audio links: target, $\ell _ { 2 }$ emphasis, spectrogram emphasis
@@ -303,14 +294,7 @@ Table 2从语义对齐角度补充了评估。Audio-SDS在保持低重建损失�
 
 5. **编码器压缩损失**：潜在编码器/解码器的压缩可能丢失精细瞬态信息，频谱加权虽部分缓解了这一问题，但无法完全恢复被编码器丢弃的高频细节。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2505_04621/figures/001_Figure.jpg]]
-*Figure: (b) Audio-SDS Update (c) Audio-SDS Tasks*
-
-![[assets/figures/papers/paper_list_l21_https_arxiv_org_abs_2505_04621/figures/002_Table.jpg]]
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 方法继承与谱系定位
 

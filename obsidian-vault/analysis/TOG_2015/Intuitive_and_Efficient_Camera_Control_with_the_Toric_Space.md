@@ -5,6 +5,8 @@ paper_level: A
 venue: TOG
 year: 2015
 pdf_ref: paperPDFs/TOG_2015/Intuitive_and_Efficient_Camera_Control_with_the_Toric_Space.pdf
+project_link: null
+code_link: null
 aliases:
 - TSCC
 - IECCTS
@@ -42,7 +44,7 @@ claims:
 > - Precise framing problem (two targets, tight on-screen regions) 上，Satisfaction mean (%) at 100ms / 200ms search budget 100% at both 100ms and 200ms vs Ranon & Urli cannot reach 100% (perfect satisfaction vs. suboptimal)。
 > - User study: reproduce a reference viewpoint 上，Mean manipulation time (seconds) lower for novices (blue bars, Figure 9) vs MotionBuilder classical interaction (red bars) (significant time reduction for novices)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：虚拟相机控制是三维交互中的基础任务，但传统方法面临两难困境——直接操纵相机自由度（如平移、旋转、变焦）虽然灵活，却要求用户将高层视觉意图（“让目标A在画面左侧，目标B在右侧，且保持特定视角”）手动翻译为低层变换序列；而自动视角计算方法通常在7自由度空间中进行随机优化（如**Ranon & Urli**，IEEE TVCG 2014），计算代价高且缺乏确定性保证。
 
@@ -59,7 +61,7 @@ claims:
 
 **局限性**：当前方法原生仅支持两个目标，未处理遮挡可见性约束，且插值路径无法保持线性推轨运动。这些构成了后续研究的主要开放问题。
 
-## 背景与动机
+
 
 在三维虚拟环境（如电影预演、游戏关卡编辑、建筑漫游）中，相机控制是创作者与场景交互的核心环节。一个理想的相机系统需要同时满足两类需求：**自动视角计算**——根据给定的视觉属性约束（如目标在屏幕上的位置、大小、视角角度）求解最优相机位姿；以及**交互式操纵**——让用户能直观、实时地调整画面构图。然而，这两类任务在传统方法中长期面临一个共同的瓶颈：**搜索空间的高维度与视觉属性表达之间的断层**。
 
@@ -75,7 +77,9 @@ claims:
 
 本文提出的**Toric空间（Toric Space）**正是对这一问题的系统回应。它将Lino & Christie的二维流形推广为一个三维搜索空间，用角度三元组 $(\alpha, \theta, \varphi)$ 参数化相机位置，并在此基础上代数推导出朝向的确定性计算方式。更重要的是，Toric空间使得**构图、距离、屏幕大小、视角角度**等视觉属性可以被表达为该空间中的角度区间或二维子集——这为后续的区间剪枝搜索和屏幕空间操纵器奠定了理论基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈转移：从7-DOF优化到4-DOF确定性求解
 
@@ -110,7 +114,7 @@ Toric空间是**Lino & Christie**（SCA 2012）提出的二维Toric流形的三�
 
 Toric空间目前原生仅支持两个目标，多目标场景需通过目标切换或两两组合间接处理。可见性约束（遮挡）未被整合到区间剪枝框架中。用户评估仅与MotionBuilder比较，未与**Gleicher & Witkin**（1992）的Through-The-Lens等经典屏幕空间技术进行定量对比。这些方向仍需进一步验证。
 
-## 整体框架
+
 
 Toric空间相机控制系统围绕一个核心降维表示构建，将涉及两个目标的虚拟相机问题从传统的7自由度优化空间压缩至4自由度搜索空间。整个pipeline由五个功能模块串联而成，形成“参数化—约束表达—自动求解—交互操纵—轨迹插值”的完整闭环。
 
@@ -139,7 +143,7 @@ Toric空间相机控制系统围绕一个核心降维表示构建，将涉及两
 ![[assets/figures/papers/paper_list_l10_https_doi_org_10_1145_2766965/figures/011_Figure_10.jpg]]
 *Figure 10: Composition-based interpolation of the camera position around a pair of targets ( A , B ) . For two key camera positions and a key framing to enforce on a pair of targets, we algebraically interpolate the camera position as a path which provides linear changes over their on-screen appearance. The path is defined through a function $F _ { ( A , B ) }$ ( x ) such that any intermediate position ( $\mathrm { i . e . }$ f o r \ x $\in$ ] 0 ; 1 [ ) is computed by relying on a linear interpolation of all visual properties of the pair of targets
 
-## 核心模块与公式推导
+
 
 ### Toric空间参数化
 
@@ -227,7 +231,9 @@ $$q(t) = q_{(A,B)} (1 - g_f(t)) + q_{(A',B')} g_f(t)$$
 
 该代数方法在45秒序列（7个关键视角）上总计算时间仅91ms，80秒序列（15个关键视角）上仅160ms，满足实时性能（约2ms/秒，30fps下）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 自动视角计算：与随机优化方法的定量对比
 
@@ -288,7 +294,9 @@ Toric空间的确定性区间剪枝算法在计算效率与属性满足度上均
 ![[assets/figures/papers/paper_list_l10_https_doi_org_10_1145_2766965/figures/010_Figure_8.jpg]]
 *Figure 8: Evolution of the distance from the user’s manipulated viewpoint to a reference viewpoint, for a novice user and an expert user of MotionBuilder (both displayed in red). The distance obtained using our tool is displayed in blue. The manipulation time is in seconds. Figure 9: Mean manipulation time (in seconds) required by the participants to reproduce a viewpoint using our manipulators (blue) compared to using the classical interaction of MotionBuilder (red)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法溯源与核心突破
 
@@ -350,6 +358,8 @@ $$d_{\varphi} = 2 \sqrt[3]{N/2}, \quad d_{\theta} = 4 \sqrt[3]{N/2}, \quad d_{\a
 5. **与其他屏幕空间技术的定量比较**：Toric 屏幕操作器与经典的 Through-The-Lens（Gleicher & Witkin 1992）等基于屏幕的相机控制技术在精度和易用性上的定量比较仍有待开展。
 
 6. **动态场景扩展**：区间剪枝算法能否扩展到包含动态目标（移动角色）的场景，以实现实时相机规划？这需要处理目标运动导致的 Toric 空间约束动态变化问题。
+
+
 
 ## 原文 PDF
 

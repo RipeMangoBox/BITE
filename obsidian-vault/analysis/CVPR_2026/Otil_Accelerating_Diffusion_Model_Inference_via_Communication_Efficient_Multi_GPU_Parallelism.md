@@ -42,7 +42,7 @@ claims:
 > - SDXL 1.0 (U-Net) 1024×1024, COCO Captions 2014 (2 GPUs) 上，Speedup↑ 1.88× vs 1.0× (Original) (+0.88×)。
 > - SDXL 1.0 (U-Net) 1024×1024, COCO Captions 2014 (4 GPUs) 上，Speedup↑ 2.23× vs 1.0× (Original) (+1.23×)。
 
-## 概述
+## 概要
 
 扩散模型在高质量图像生成领域取得了显著成功，但其迭代去噪过程计算量庞大，单GPU推理延迟居高不下。现有多GPU并行方案——如**DistriFusion**（Li et al., CVPR 2024）通过陈旧激活实现并行、**AsyncDiff**（Chen et al., NeurIPS 2024）采用异步去噪流水线——虽能加速推理，却均需在每个去噪步后交换完整的中间特征激活，导致严重的GPU间通信开销，成为制约加速比的关键瓶颈。
 
@@ -50,7 +50,7 @@ claims:
 
 实验表明，在SDXL 1.0上，Otil在2 GPU和4 GPU配置下分别实现1.88×和2.23×的加速，同时相比AsyncDiff减少87.5%至93.75%的通信量；与快速采样器和LoRA结合后，加速比可进一步提升至2.84×。该方法为扩散模型的高效多GPU部署提供了新的通信优化范式。
 
-## 背景与动机
+
 
 扩散模型已成为文本到图像生成领域的主流架构，但其迭代去噪过程计算密集，单GPU推理延迟居高不下。为加速推理，多GPU并行方案应运而生，然而现有方法面临一个核心瓶颈：**每步去噪后需在GPU间交换完整的中间特征激活，导致严重的通信开销**。
 
@@ -62,7 +62,9 @@ claims:
 
 这一设计使得Otil在保持生成质量的前提下，相比DistriFusion减少75%通信量，相比AsyncDiff减少最高93.75%的通信量（4 GPU场景），为扩散模型的多GPU高效推理开辟了新方向。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Otil 的核心创新在于将多 GPU 扩散推理的通信模式从“全量同步”转变为“信息引导的选择性同步”，从而在不牺牲生成保真度的前提下大幅降低通信开销。这一转变建立在两个关键的经验观察之上：**（1）相邻去噪步间潜在激活的变化极小**——平均相对 MAE 仅为 0.01（Figure 3(a)）；**（2）变化高度空间局部化**——当复用陈旧激活时，仅有少数空间区域产生显著更新（Figure 3(b)）。基于这些观察，Otil 引入了三个紧密耦合的 changed slots，构成其相对于现有并行方法（如 **DistriFusion** (Li et al., CVPR 2024) 和 **AsyncDiff** (Chen et al., NeurIPS 2024)）的本质差异。
 
@@ -96,7 +98,7 @@ $$C _ { \mathrm { O t i l } } = \frac { k } { K } ( p - 1 ) M$$
 
 **需注意的公平性限制**：所有评估均在 PCIe 互连的 A100 GPU 上进行，该环境可能放大通信瓶颈的影响。在更高带宽连接（如 NVLink）下，通信减少带来的加速比可能下降，此时计算瓶颈可能成为主要矛盾，这一点需要手动验证。
 
-## 整体框架
+
 
 Otil 的整体设计围绕一个核心观察展开：扩散模型相邻去噪步之间的潜在激活变化极小（平均相对 MAE 仅约 0.01），且变化集中在少数空间区域（Figure 3）。基于此，Otil 将传统的“全量激活交换”范式替换为“信息引导的部分子块传输”，在保持生成保真度的前提下大幅削减 GPU 间通信量。其 pipeline 由四个关键模块串联构成：
 
@@ -127,7 +129,7 @@ Otil 的整体设计围绕一个核心观察展开：扩散模型相邻去噪步
 ![[assets/figures/papers/paper_list_l907_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Otil_Accelerating_D/figures/001_Figure_1.jpg]]
 *Figure 1: (a) Patch method broadcasts full activations, causing heavy communication. (b) Pipeline method exchanges full intermediate activations, limiting efficiency. (c) Otil sends only variant sub-blocks, minimizing communication*
 
-## 核心模块与公式推导
+
 
 ### 两级空间划分
 
@@ -188,7 +190,9 @@ $$\boldsymbol { x } _ { t - 1 } = \alpha _ { t } \boldsymbol { x } _ { t } + \be
 ![[assets/figures/papers/paper_list_l907_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Otil_Accelerating_D/figures/011_Figure_7.jpg]]
 *Figure 7: Image Similarity Metrics*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -254,7 +258,9 @@ Otil的核心优势在于通信量的显著降低。根据Section 4.3的分析�
 ![[assets/figures/papers/paper_list_l907_https_openaccess_thecvf_com_content_CVPR2026_html_Li_Otil_Accelerating_D/figures/008_Figure_6.jpg]]
 *Figure 6: Visual results of combining the Otil with the fast fewstep samplers and LoRA acceleration*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -297,6 +303,8 @@ Otil 的适用边界由以下条件刻画：
 3. **视频扩散模型的时序并行**：Otil 的空间子块选择机制是否可扩展到视频扩散模型的时空并行？时序维度的相邻帧变化是否同样具有稀疏性？
 
 4. **与其他压缩技术的联合**：Otil 的通信削减与特征量化、低精度通信等技术是否可叠加？联合优化空间有多大？
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Multi_Domain_Riemannian_Graph_Gluing_for_Building_Graph_Foundation_Models.pdf
+project_link: null
+code_link: https://github.com/RiemannGraph/GraphGlue
 openreview_forum_id: G3uNHQpP7J
 aliases:
 - MDRGGBGFM
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 多域黎曼图胶合以构建图基础模型 |
 | 英文题名 | Multi-Domain Riemannian Graph Gluing for Building Graph Foundation Models |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=G3uNHQpP7J); [GitHub](https://github.com/RiemannGraph/GraphGlue) |
+| Links | [paper](https://openreview.net/forum?id=G3uNHQpP7J) · [GitHub](https://github.com/RiemannGraph/GraphGlue) |
 | Topic | #topic/benchmarks_datasets_evaluation #topic/benchmarks_datasets_evaluation/benchmark_eval |
 | Method | GRAPHGLUE |
 | Dataset | Arxiv (Node Classification, Intra-domain 5-shot), Reddit (Node Classification, Computers (Node Classification, Cross-domain 1-shot) |
@@ -41,7 +43,7 @@ claims:
 > - Reddit (Node Classification, Intra-domain 5-shot) 上，Accuracy 为 84.89 ± 0.68，对比 GCOPE 82.12 ± 0.53，变化 +2.77。
 > - Computers (Node Classification, Cross-domain 1-shot) 上，Accuracy 为 59.50 ± 7.05，对比 GCOPE 58.24 ± 7.48，变化 +1.26。
 
-## 概述
+## 概要
 
 图基础模型面临的核心瓶颈在于：**多域图预训练缺乏对知识跨域集成和迁移的一致性理论框架**，现有方法多依赖图码本、图元等离散结构进行知识表征，难以在预训练与领域适应之间建立可量化的迁移性评估。这一问题在少样本跨域迁移场景下尤为突出——当目标域图结构与预训练域差异显著时，模型无法有效判断迁移难度，也难以保证知识传递的几何一致性。
 
@@ -51,7 +53,7 @@ claims:
 
 **方法定位**：GRAPHGLUE 属于多域图预训练方法，区别于 PRODIGY、GCOPE 等基于离散结构的基线，它首次将黎曼几何的胶合理论引入图基础模型构建，为知识跨域集成提供了连续几何框架和可量化的迁移性度量。
 
-## 背景与动机
+
 
 ### 图基础模型的核心瓶颈
 
@@ -77,7 +79,9 @@ claims:
 
 基于上述动机，本文提出 **GRAPHGLUE** 框架，其核心是建立**神经流形胶合理论**，将任意图数据集统一到一个光滑的黎曼流形上。与传统方法相比，GRAPHGLUE 从几何层面重新定义了多域图预训练的三大关键环节：局部几何学习（自适应正交帧与稀疏扰动）、流形胶合与光滑化（边度规翻译、完整性损失、曲率损失）、以及领域适应（黎曼混合专家与提示微调）。这一框架不仅为图基础模型的构建提供了理论保证，还通过几何传递度量首次实现了迁移难度的直接量化，为后续的几何缩放律分析和预训练策略优化奠定了基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：多域图预训练缺乏一致的几何框架
 
@@ -109,7 +113,7 @@ GRAPHGLUE的理论贡献体现在两个核心定理上：**度量兼容性定理
 
 当前方法假设图中存在足够三角形以保证完整性损失有效，对于稀疏图或缺失三角形的图，近似胶合可能不稳定。几何缩放律的数学形式尚未推导，几何传递度量的泛化性有待在完全未见域上验证。这些开放问题指向未来方向：将GTM扩展为通用图复杂度指标，以及探索不依赖三角完整性的松弛胶合方法。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_G3uNHQpP7J/figures/002_Figure_2.jpg]]
 *Figure 2: An Illustration of GRAPHGLUE Framework*
@@ -145,7 +149,7 @@ GRAPHGLUE 的核心 pipeline 将多域图预训练与领域适应统一为一个
 
 Figure 2 展示了 GRAPHGLUE 的整体架构：从左至右依次为局部几何学习、EMA 原型更新、流形胶合与光滑化（预训练阶段），以及下游的提示适应与黎曼 MoE（适应阶段）。不同域的图数据以颜色区分，在胶合过程中逐步融合为统一光滑流形。
 
-## 核心模块与公式推导
+
 
 GRAPHGLUE 的核心由两个理论模块支撑：**局部几何学习**与**神经流形胶合**。前者为图中每个节点赋予一个局部黎曼度量，后者通过边和三角形将这些局部片断胶合成一个全局光滑流形。
 
@@ -188,7 +192,9 @@ $$\mathcal{L}_{\mathrm{Curv}}(\mathcal{G}) = \frac{1}{|A|} \sum_{A_{ijk}} |\log(
 
 该损失强制相邻边上对数行列式变化一致，等价于约束 Ricci 曲率在流形上连续变化，从而得到光滑的全局黎曼流形。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -268,7 +274,9 @@ Table 22的消融实验揭示了各几何约束的因果贡献：
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_G3uNHQpP7J/figures/012_Table_6.jpg]]
 *Table 6: Statistics of 12 datasets used in our experiment*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系与基线关系
 
@@ -306,6 +314,8 @@ GRAPHGLUE 的理论框架和实验验证界定了其适用边界：
 3. **松弛胶合方法**：在不满足三角完整性条件时，是否存在更有效的松弛胶合方法？例如，对于二部图或长程依赖图，能否通过路径完整性或谱方法近似胶合一致性？
 4. **几何缩放律的理论推导**：实验已观察到几何缩放律（Figure 5），即预训练域数量增加带来性能的稳定提升。其数学形式是否可推导，从而无需大量实验即可预测性能增长？这直接关系到图基础模型的规模化策略设计。
 5. **负迁移的几何解释**：实验显示 GCOPE 在加入某些域后出现负迁移（Figure 4），而 GRAPHGLUE 避免了这一问题。这是否可以从曲率分歧或完整性分歧的角度给出几何解释，从而建立负迁移的预警机制？
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Thinking_Free_Policy_Initialization_Makes_Distilled_Reasoning_Models_More_Effective_and_Efficient_Reasoners.pdf
+project_link: null
+code_link: https://github.com/Tencent-Hunyuan/Thinking-Free_Policy_Initialization
 openreview_forum_id: RKYO6R8Jgb
 aliases:
 - TTFPI
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 无思维策略初始化：提升蒸馏推理模型的效果与效率 |
 | 英文题名 | Thinking-Free Policy Initialization Makes Distilled Reasoning Models More Effective and Efficient Reasoners |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=RKYO6R8Jgb); [GitHub](https://github.com/Tencent-Hunyuan/Thinking-Free_Policy_Initialization) |
+| Links | [paper](https://openreview.net/forum?id=RKYO6R8Jgb) · [GitHub](https://github.com/Tencent-Hunyuan/Thinking-Free_Policy_Initialization) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | TFPI (Thinking-Free Policy Initialization) |
 | Dataset | Overall Average (6 benchmarks), AIME 25, AIME 24 (Thinking-Free mode), GPQA Diamond |
@@ -42,7 +44,7 @@ claims:
 > - AIME 25 上，avg@32 accuracy (%) 为 76.0 (TFPI+RL)，对比 71.5 (Direct RL)，变化 +4.5。
 > - AIME 24 (Thinking-Free mode) 上，avg@32 accuracy (%) and Tokens (K) 为 37.5%, 5.3K tokens (TFPI stage 3)，对比 29.6%, 16.7K tokens (DS-1.5B original Thinking mode)，变化 +7.9% accuracy, -11.4K tokens。
 
-## 概述
+## 概要
 
 在强化学习可验证奖励（RLVR）训练中，基于监督微调蒸馏的大推理模型（LRM）往往产生冗长的思考链响应，导致训练上下文长度需求过大、计算成本高昂，而直接缩短训练长度又会带来不可逆的性能下降。针对这一瓶颈，本文提出**TFPI（Thinking-Free Policy Initialization）**，一种低成本的多阶段策略初始化方法。其核心操作**ThinkingFree**在输入查询中显式丢弃思考内容，通过直接附加`</think>`标记来大幅减少推理时的token生成量，并在标准RLVR训练前应用此转换以降低rollout成本。
 
@@ -50,7 +52,7 @@ claims:
 
 TFPI定位为RLVR训练前的低成本初始化阶段，可与现有RLVR算法（如DAPO）无缝衔接，其多阶段渐进增加输出长度的训练策略（如2K→4K→8K）是实现短上下文高效训练的关键。当前验证主要基于数学推理数据集，在中小规模模型（最高7B）上展现出稳定的性能增益与token效率优势，向更大模型及更广泛领域的扩展仍有待探索。
 
-## 背景与动机
+
 
 大推理模型（Large Reasoning Models, LRMs）通过在最终答案前生成显式的“思考链”（chain-of-thought）来提升复杂推理能力。当前主流训练范式通常包含两个阶段：首先通过监督微调（SFT）从强教师模型蒸馏长思考链数据，随后采用基于可验证奖励的强化学习（RLVR）进一步优化推理策略。
 
@@ -60,7 +62,9 @@ TFPI定位为RLVR训练前的低成本初始化阶段，可与现有RLVR算法�
 
 本文的核心动机在于：**能否在RLVR训练前，通过一个低成本、无复杂奖励设计的初始化阶段，同时实现加速RL收敛、提升性能上限和降低推理token消耗？** 这一问题的关键在于如何打破“长思考链是RLVR训练的必要前提”这一隐含假设。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈：RLVR训练中的长思考链困境
 
@@ -99,7 +103,7 @@ TFPI与现有方法的根本差异在于**改变RLVR的rollout查询格式**，�
 
 与**Polaris**（An et al., 2025）的多阶段RLVR、**DeepScaleR**（Luo et al., 2025b）的迭代长度控制、**TLMRE**（Arora & Zanette, 2025）的token效率RL等方法不同，TFPI不需要复杂的奖励塑造、长度惩罚或动态思考控制机制。其核心洞察是：**通过在RLVR训练前引入一个低成本的ThinkingFree初始化阶段，可以同时实现加速收敛、提升性能上限和生成高效token推理模型的三重目标**（Figure 1）。多阶段直接RL（无TFPI）在相同长度计划下性能大幅下降（Qwen3-4B总体52.9% vs TFPI 63.8%，Table 4），进一步验证了ThinkingFree操作而非多阶段训练本身才是性能提升的关键因果因素。
 
-## 整体框架
+
 
 TFPI（Thinking-Free Policy Initialization）的整体框架围绕一个核心操作展开：**ThinkingFree查询变换**。该方法将标准RLVR训练流程重构为一个“低成本初始化 + 可选标准强化”的两阶段范式，其pipeline模块关系与输入输出流如下。
 
@@ -128,7 +132,7 @@ $$r_{i,t}(\theta) = \frac{\pi_{\theta}(y_{i,t} \mid x', y_{i,<t})}{\pi_{\theta_{
 
 整个框架的关键设计在于：**TFPI作为RLVR的前置初始化阶段，以极低的计算成本（三阶段总计不到标准32K RL训练的20%，Figure 1 Left）为后续RL收敛提供了更优的起点**，同时自身即可产出token效率极高的推理模型。
 
-## 核心模块与公式推导
+
 
 ### 3.1 ThinkingFree 查询转换模块
 
@@ -165,7 +169,9 @@ TFPI 采用渐进式多阶段训练策略，逐步放宽最大输出长度限制
 
 **与直接 RL 的关键区别**：若将相同的多阶段长度计划应用于标准 RLVR（即无 ThinkingFree 转换），Qwen3-4B 的总体准确率会从 63.8% 骤降至 52.9%（Table 4），降幅超过 10 个百分点。这说明 TFPI 并非简单的“短上下文训练技巧”，而是通过 ThinkingFree 查询格式从根本上改变了 RLVR 训练的优化景观，使短上下文下的策略更新与长上下文推理能力之间建立了正向迁移通道。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：TFPI在等计算预算下全面优于直接RL
 
@@ -225,7 +231,9 @@ TFPI最引人注目的特性之一是它自然地产出token效率极高的推�
 
 尽管TFPI效果显著，仍需注意以下几点限制。第一，ThinkingFree推理模式在准确率上略低于慢思维模式（如Stage 3总体63.9% vs 60.0%），本质上是**用轻微准确率换取大幅token效率**的策略，在精度敏感场景下需谨慎使用。第二，多阶段训练的阶段边界划分仍依赖启发式规则（截断比例和验证性能），缺乏自动化机制，可能在不同模型或数据分布上需要重新调参。第三，当前验证集中在1.5B至7B规模，更大模型（如14B以上）的扩展性虽在表4中有初步验证（Qwen3-14B上TFPI达到67.8% vs Direct RL 66.9%），但潜力尚未充分探索。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心方法定位
 
@@ -287,6 +295,8 @@ TFPI 采取根本不同的路径：它不引入任何长度惩罚或显式控制
 - **操作泛化**：ThinkingFree 操作是否可以推广到其他 RLVR 算法之外的应用，例如离线推理或测试时计算缩放？
 - **自适应阶段切换**：能否通过自适应阶段切换机制进一步优化 TFPI 训练效率？
 - **高质量数据的影响**：论文提出"使用更具挑战性、更高质量的数据，TFPI 能否进一步释放其在更大模型上的可扩展潜力？"
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Semantic_aware_Wasserstein_Policy_Regularization_for_Large_Language_Model_Alignment.pdf
+project_link: null
+code_link: https://github.com/aailab-kaist/WPR
 openreview_forum_id: sUac3QDbAs
 aliases:
 - WPRW
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 面向大语言模型对齐的语义感知Wasserstein策略正则化 |
 | 英文题名 | Semantic-aware Wasserstein Policy Regularization for Large Language Model Alignment |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=sUac3QDbAs); [GitHub](https://github.com/aailab-kaist/WPR) |
+| Links | [paper](https://openreview.net/forum?id=sUac3QDbAs) · [GitHub](https://github.com/aailab-kaist/WPR) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | Wasserstein Policy Regularization (WPR) |
 | Dataset | TL;DR (TL;DR dataset), HH-RLHF (dialogue dataset) |
@@ -42,7 +44,7 @@ claims:
 > - TL;DR (TL;DR dataset) 上，GPT-4 Win Rate (vs. RKL) 为 0.608 (WPR, Gemma-2B)，对比 0.5 (RKL vs. itself); other divergences: α 0.592, χ² 0.592, JS 0.584 etc.，变化 +0.108。
 > - HH-RLHF (dialogue dataset) 上，GPT-4 Win Rate (vs. SFT) 为 0.852 (WPR, Gemma-2B)，对比 0.812 (RKL, Gemma-2B)，变化 +0.040。
 
-## 概述
+## 概要
 
 现有基于人类反馈的强化学习（RLHF）已成为大语言模型对齐的主流范式，其标准做法是在最大化奖励的同时，通过KL散度或f-散度约束当前策略不偏离参考策略。然而，这些散度仅在相同索引处逐token比较概率值，完全忽略了token之间的语义相似性——语义相近的替代词与无关词被同等对待，限制了模型对齐的质量与生成多样性。
 
@@ -50,7 +52,7 @@ claims:
 
 在文本摘要（TL;DR）和对话生成（HH-RLHF）任务上，WPR在GPT-4评估的胜率上一致且显著优于所有基于KL和f-散度的基线方法：相较反向KL正则化（RKL），WPR在TL;DR上胜率达0.608，在HH-RLHF上达0.616。机制分析表明，WPR产生的token级惩罚与基于BERTScore的语义相似度相关性显著强于KL惩罚，且其生成决策的top-10候选token在嵌入空间中语义更紧凑。方法在Gemma-2B、Gemma-7B和Qwen1.5-1.8B-Chat等多模型家族上均表现稳健，并在代码生成任务（APPS）上展现出良好的泛化能力。
 
-## 背景与动机
+
 
 ### 大语言模型对齐中的策略正则化瓶颈
 
@@ -84,7 +86,9 @@ $$D_{\mathbb{W}}(\pi||\pi') = \min_{P \in U(\pi,\pi')} \langle P, C \rangle$$
 
 本文的核心动机即是将这一语义感知的距离度量引入RLHF的策略正则化框架，在保持与PPO兼容的前提下，使正则化惩罚能够反映token空间的真实语义几何，从而在约束策略偏离的同时保留合理的语义变体，最终提升对齐质量与生成多样性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈洞察：从逐点比较到语义感知的策略约束
 
@@ -128,7 +132,7 @@ $$\mathcal{T}_{\bar{W}}(\pi_\theta; \pi_{\mathrm{ref}}) = \mathbb{E}_{\mathbf{x}
 | 语义感知能力 | 无（语义盲） | 有（通过成本矩阵捕捉token间语义关系） |
 | 计算开销 | 基准 | 每步训练时间增加约2.5% |
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_sUac3QDbAs/figures/008_Figure_3.jpg]]
 *Figure 3: Overview of RLHF with Wasserstein Policy Regularization. (a) Standard RLHF with a policy regularization penalty. (b) Our proposed Wasserstein policy regularization, where the penalty is computed from the optimal dual variables obtained via the Sinkhorn-Knopp algorithm*
@@ -161,7 +165,7 @@ WPR 的整体管线在标准 RLHF 三阶段流程的基础上，将策略正则�
 
 > **手动验证提示**：关于显存增加的具体数值（15 GB）以及跨模型规模的显存缩放特性，原文仅在 Gemma-2B 上报告，更大模型上的显存开销需进一步确认。
 
-## 核心模块与公式推导
+
 
 ### 瓶颈与核心思想
 
@@ -234,7 +238,9 @@ WPR的计算瓶颈在于每步生成后需对每个token位置求解Sinkhorn距�
 
 消融实验（Table 6）验证了各截断参数的关键性：$k_2$ 从128降至64会导致性能下降，而Sinkhorn迭代次数从10降至5则严重损害性能（vs RKL胜率降至0.328），说明充分收敛的Sinkhorn迭代对获得有效惩罚至关重要。最终，整套WPR方案使每步训练时间仅比标准KL正则化增加约2.5%。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心结果：WPR在所有基准上一致超越KL及f-散度基线
 
@@ -313,7 +319,9 @@ Table 6的系统消融揭示了WPR各设计选择的贡献。
 ![[assets/figures/papers/paper_list_l43_https_openreview_net_forum_id_sUac3QDbAs/figures/024_Table_11.jpg]]
 *Table 11: Corresponding functions for each f-divergences*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1 核心瓶颈与因果机制
 
@@ -387,6 +395,8 @@ WPR在标准PPO训练循环中插入了一个**Wasserstein惩罚计算模块**�
 3. **跨tokenizer语义迁移**：如何支持不同tokenizer嵌入空间之间的最优传输，使WPR能利用来自更大或异构模型的语义知识？
 4. **可学习成本矩阵**：是否可以通过微调或轻量级网络动态学习成本矩阵 $C$，使其随模型训练适应性地捕捉语义？
 5. **更大规模验证**：WPR在7B+模型上的缩放特性，以及在RLHF不同阶段（如奖励建模期间）使用Wasserstein距离的潜力。
+
+
 
 ## 原文 PDF
 

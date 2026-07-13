@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/VLM4VLA_Revisiting_Vision_Language_Models_in_Vision_Language_Action_Models.pdf
+project_link: https://cladernyjorn.github.io/VLM4VLA.github.io/
+code_link: null
 aliases:
 - VLM4VLA
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | VLM4VLA：重新审视视觉-语言模型在视觉-语言-动作模型中的作用 |
 | 英文题名 | VLM4VLA: Revisiting Vision-Language-Models in Vision-Language-Action Models |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=tc2UsBeODW); [Project](https://cladernyjorn.github.io/VLM4VLA.github.io/) |
+| Links | [paper](https://openreview.net/forum?id=tc2UsBeODW) · [Project](https://cladernyjorn.github.io/VLM4VLA.github.io/) |
 | Topic | #topic/other_unclear #topic/other_unclear/general |
 | Method | VLM4VLA |
 | Dataset | Calvin ABC-D, SimplerEnv-Bridge, Libero‑10 (long) |
@@ -40,13 +42,13 @@ claims:
 > - SimplerEnv-Bridge 上，总体成功率 (%) 为 60.4 (KosMos-2 / InternVL3.5-4B)，对比 60.4 (OpenVLA*)，变化 持平。
 > - Libero‑10 (long) 上，成功率 (%) 为 62.8 (InternVL3.5-4B)，对比 59.2 (ThinkAct)，变化 +3.6。
 
-## 概述
+## 概要
 
 通用视觉‑语言模型（VLM）正被广泛用作视觉‑语言‑动作模型（VLA）的骨干，但其内部哪部分能力真正决定下游操控任务的表现仍不明确。本文发现，**VLM的视觉编码器（而非语言模块）是VLA性能的主要瓶颈**：冻结视觉编码器会导致成功率断崖式下降（PaliGemma‑1在SimplerBridge上从55.25降至13.25，Table 3），而通用VLM基准能力与SimplerEnv和Libero上的VLA性能呈弱甚至负相关（r=−0.321/0.381，Figure 3）。在辅助具身任务上微调VLM亦未能带来提升，多数略有下降（Table 8）。这表明当前VLM预训练目标与具身动作规划之间存在显著的域差距，提升视觉编码器的具身适应性远比追求通用榜单分数更为关键。
 
 针对这一问题，我们提出 **VLM4VLA**——一个将通用VLM转换为VLA策略的最小化适配框架。它仅引入不足1%的新参数（一个可学习的动作查询令牌及小尺寸MLP策略头），采用最大似然模仿学习直接输出动作块；同时刻意排除本体感觉输入，仅依赖单视图图像与语言指令，以隔离VLM自身能力对控制的影响。所有VLM参数（视觉编码器、词嵌入与LLM）均在下游任务上全参数微调。在Calvin ABC‑D、SimplerEnv‑Bridge和Libero‑10三个仿真基准上的实验表明，VLM4VLA使用多种VLM骨干（Qwen2.5VL、KosMos‑2、InternVL3.5等）即可达到或超越专家VLA（OpenVLA、pi0、ThinkAct）的性能，例如Qwen2.5VL‑7B在Calvin上平均完成任务数达4.057，超越OpenVLA*的3.801和pi0*的3.509（Table 1）。总体而言，本文系统揭示了视觉编码器是VLM→VLA迁移的关键调节变量，并为未来面向具身控制的VLM预训练指明了方向。
 
-## 背景与动机
+
 
 视觉-语言-动作（VLA）模型致力于将大规模视觉-语言模型（VLM）用于机器人操作策略，以期借助预训练的多模态知识提升少样本泛化与指令跟随能力。然而，现有工作在将通用VLM适配至具身控制任务时，存在以下关键缺口：
 
@@ -64,7 +66,9 @@ claims:
 
 基于以上观察，本文的动机在于**系统性地重新审视VLM在VLA中扮演的角色**，而非默认将性能瓶颈归于语言模块或动作解码器。我们提出 **VLM4VLA 轻量适配框架**：仅引入可学习的`⟨ActionQuery⟩`令牌和一个小型MLP策略头（新增参数<1%），便可将任意通用VLM转换为离散动作策略；该框架刻意排除本体感觉等额外模态，仅依赖单视图视觉输入与自然语言指令，从而在公平的设定下隔离VLM能力的影响（Section 1, Figure 1）。通过控制输入条件、训练步数和评估协议，我们能够可靠地研究三个关键问题：（i）不同VLM骨干对VLA表现的影响；（ii）视觉编码器微调相较于语言模块的重要性；（iii）辅助具身微调是否真正有益，从而为未来VLM向VLA的高效迁移提供经验性指导。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 VLM4VLA提出了一套参数增量极小的适配框架（新增参数<1%），将通用视觉‑语言模型（VLM）转换为视觉‑语言‑动作（VLA）策略。相较于现有专家VLA（如OpenVLA的离散动作空间、pi0的流匹配动作专家），其核心创新体现在以下若干受控设计槽（changed slots）上，背后由关于视觉编码器瓶颈的经验发现所驱动。
 
@@ -84,7 +88,7 @@ VLM4VLA刻意仅依赖单视图图像与语言指令，摒弃本体感觉输入�
 
 上述创新共同锚定于一项核心洞察：通用VLM基准能力不能有效预测其在下游具身控制任务上的表现（SimplerEnv: $r = -0.321$；Libero: $r = 0.381$，Figure 3），且辅助具身VQA式微调未能提升甚至轻微损害VLA性能（Table 8, Figure 4）。因此，增强视觉编码器的具身适应性——而非单纯追求通用VLM基准分数——是VLM4VLA设计哲学的根基。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0014_tc2UsBeODW_VLM4VLA_Revisiting_Vision-Language-Models_in_Vis/figures/002_Figure_2.jpg]]
 *Figure 2: VLA Network in VLM4VLA*
@@ -118,7 +122,7 @@ $$
 
 这种统一的设计使得在不同 VLM 骨干之间可以实现严格的公平比较，并能够系统性地考察**VLM 骨干选择**、**辅助具身任务微调**以及**视觉编码器训练策略**三个因素对 VLA 性能的独立影响。
 
-## 核心模块与公式推导
+
 
 VLM4VLA 通过最小化架构适配将通用视觉‑语言模型直接转换为视觉‑语言‑动作策略，其核心由三个模块与一个轻量训练范式构成。
 
@@ -153,7 +157,9 @@ $$ \mathcal{L} = \frac{1}{|\mathcal{B}|} \sum_{\mathcal{B}} \left( \| a^{\mathrm
 
 该公式将连续位置预测的均方误差与离散状态预测的交叉熵相结合，构成完整的模仿学习目标。以上公式均源自 Section 3.2，未引入任何额外假设。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主任务性能
 VLM4VLA 在三个具身操控基准上进行了系统评估，所有模型均采用统一超参数、统一单视图（224×224）视觉输入并排除本体感觉，以隔离 VLM 骨干的能力。在 Calvin ABC‑D 上，Qwen2.5VL‑7B 取得平均完成 4.057 个任务（Table 1），比 expert VLA 基线 OpenVLA\*（3.801）和 pi0\*（3.509）分别提升 +0.256 和 +0.548。值得注意的是，pi0\* 虽然带有额外的流匹配动作专家，但其性能与基础 PaliGemma‑1 几乎持平（3.509 vs 3.506），表明扩散动作头在此范式下未带来增益。在 SimplerEnv‑Bridge 上，KosMos‑2 与 InternVL3.5‑4B 均达到 60.4% 总体成功率，与 OpenVLA\* 持平（Table 2），但 VLM4VLA 模型只引入了 <1% 的新参数和简单的 MLP 策略头。在 Libero‑10 long‑horizon 任务上，InternVL3.5‑4B 达到 62.8% 成功率，比强基线 ThinkAct（59.2%）高 +3.6 个百分点（Table 2）。这些结果表明，通用 VLM 通过极简适配即可匹敌乃至超越专门设计的 VLA 模型。
@@ -186,7 +192,9 @@ Figure 3 将多个 VLM 在通用 VQA 基准上的分数与下游 VLA 性能进�
 ### 局限与待验证问题
 所有评估均在仿真器（Calvin、SimplerEnv、Libero）中完成，尚未在真实机器人上验证。受算力限制，所考察的 VLM 参数集中在 1B–10B，更大规模模型的行为未知。视觉编码器瓶颈的深层机制——例如到底是归因于感受野、频率偏置还是几何表征的缺失——仍待解剖。同时，当前结果表明，常规具身 VQA 微调无效，亟需设计新型辅助训练任务（如基于视点变换的预测、接触感知特征学习），以弥合视觉编码器的预训练分布与控制任务分布之间的鸿沟。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 VLM4VLA 属于一类将通用视觉-语言模型极简适配为视觉-语言-动作策略的方法。它与专门设计的专家 VLA（如 OpenVLA、pi0、ThinkAct）不同：后者通常为特定架构和训练目标构建，而 VLM4VLA 通过新增不足 1% 的可学习参数（一个可学习的动作查询令牌和一个小型 MLP 头）将现成的 VLM 转化为端到端控制策略，并在全参数微调下最大化预训练表征的利用（Section 1，Figure 2）。这种“最小适配”设计使得 VLM4VLA 能够对多种 VLM 骨干进行系统性横向比较，从而揭示 VLM 到 VLA 迁移中的关键瓶颈。
 
@@ -223,6 +231,8 @@ VLM4VLA 的框架有四个关键改变相较于常见专家 VLA（Section 3.2）
 - **针对性预训练设计**：如何设计视觉预训练或辅助任务，才能直接提升控制表现？当前具身 VQA 任务的失败（Figure 4，Table 8）要求未来工作探索更贴近动作规划的监督形式，如轨迹预测、操控点定位、物体交互图等。
 - **更复杂的动作解码器**：简单 MLP 头已展现出与扩散专家相匹配的性能，但在长序列、高精度或灵巧操作中，扩散模型或其他生成式头是否能够突破现有瓶颈，尚未在本文框架内验证。
 - **域差距的系统性缩小**：VLM 预训练数据以自然图像和文本为主，而具身环境在纹理、光照、动力学上显著不同。如何通过数据混合、对比学习或数据增强使视觉编码器更快适应具身域，是一个开放的工程与科学问题。
+
+
 
 ## 原文 PDF
 

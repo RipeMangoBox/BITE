@@ -43,7 +43,7 @@ claims:
 > - T2ICompBench++ 上，Average↑ 0.6618 vs 0.6556 (Flow-GRPO, previous best) (+0.0062)。
 > - User Study 上，Voting Rate (%) 70.4 vs 29.6 (ChatGen) (+40.8)。
 
-## 概述
+## 概要
 
 **核心问题**：现有智能体文本到图像（T2I）方法在工具知识获取、决策灵活性与推理效率之间存在三重瓶颈——依赖手工先验或昂贵人工标注构建工具知识、采用静态单轮路由策略、仅追求生成质量而忽略成本，导致系统难以在性能与效率之间取得平衡。
 
@@ -56,7 +56,7 @@ claims:
 
 **方法定位**：OctoT2I 属于智能体 T2I 路由方法，其核心区别于现有工作在于将知识获取从“人工定义”转变为“自进化探索”，将决策从“静态单轮”升级为“有状态多轮”，并将优化目标从“质量优先”拓展为“质量约束下的成本最小化”。该方法与单模型 T2I 系统（如 Flow-GRPO、FLUX.1-dev）和智能体 T2I 系统（如 GenArtist、ChatGen、Idea2Img）均构成正交或替代关系。
 
-## 背景与动机
+
 
 文本到图像（T2I）生成领域近年来涌现出大量功能各异的模型——从专精于特定风格的小型高效模型，到具备通用生成能力的大型基础模型。然而，面对一个具体的用户提示，如何从众多候选工具中选出“最合适”的那个，仍然是一个悬而未决的挑战。这个问题的本质在于：不同 T2I 模型在能力边界上存在显著差异，单一模型很难在所有类型的提示上同时做到高质量与低成本。
 
@@ -66,7 +66,9 @@ claims:
 
 OctoT2I 正是为回答这一问题而提出的。其核心动机在于将 T2I 工具选择形式化为一个约束优化问题——在满足质量阈值的工具集合中，选择推理成本最低者。这一形式化表述本身并不新鲜，但关键难点在于：每个工具的“质量-成本”画像并非先验已知，而是需要在实际使用中动态获取。OctoT2I 的核心洞察是：**这些画像可以通过智能体自主探索来构建，无需任何外部监督**。基于这一洞察，OctoT2I 设计了一个自进化机制，使智能体能够从零开始定义概念维度、探索工具能力边界，并将所学知识沉淀为可复用的知识库，最终支撑起一个有状态、多轮的自适应路由决策循环。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 OctoT2I 的核心创新在于将文本到图像（T2I）的模型选择问题重新定义为**约束优化问题**，并通过**自进化知识构建**与**有状态动态路由**两大机制联合求解，从而在生成质量与推理效率之间实现突破性平衡。相较于现有方法，OctoT2I 在三个关键维度上实现了范式转变：
 
@@ -105,7 +107,7 @@ $$ \mathrm { t } _ { r } = \pi ( p , { \mathcal K } , { \mathcal M } _ { r - 1 }
 
 OctoT2I 的三项核心创新构成了一个有机整体：约束优化目标为系统提供了明确的性能-效率权衡准则；自进化机制为决策提供了精确、可扩展的工具能力知识；有状态多轮路由则利用这些知识实现自适应工具选择。三者协同作用，使得 OctoT2I 在无需任何外部监督的条件下，同时实现了最优生成质量和最高推理效率。
 
-## 整体框架
+
 
 OctoT2I 将文本到图像（T2I）的模型选择形式化为一个**约束优化问题**：在满足预设质量阈值的前提下，最小化推理成本。其核心公式为：
 
@@ -166,7 +168,7 @@ $$
 ![[assets/figures/papers/paper_list_l2174_https_openaccess_thecvf_com_content_CVPR2026_html_Jiang_OctoT2I_A_Self_E/figures/002_Figure_1.jpg]]
 *Figure 1: The core advantages of OctoT2I in performance, decision-making, and knowledge acquisition. (a) OctoT2I (Ours) achieves an exceptional performance-efficiency balance on GenEval. (b) This superior performance stems from its intelligent, evidence-based decisions, which route each user prompt to the most suitable T2I model. For example, it selects the most efficient tool (sd-turbo) for “a photo of a snowboard” while allocating the most justifiable tool (flow-grpo) for “Generate an image containing 5 hamburgers”. (c, d, e) This intelligent decision-making capability is enabled by our novel (e) self-evolving mechanism, which overcomes the limitations of previous (c) handcrafted priors or (d) cost...*
 
-## 核心模块与公式推导
+
 
 ### 问题形式化：约束优化视角
 
@@ -223,7 +225,9 @@ $$
 
 3. **探索空间剪枝（ESP）**：遵循递归前提原则——只有当工具已掌握 $\tau$ 的所有真子集 $\tau' \subset \tau$（$\tau' \neq \varnothing$）时，才探索更复杂的维度组合 $\tau$。这一策略大幅缩减探索空间，消融实验表明 ESP 将探索提示数减少 70.9%，时间缩短 66.0%，同时保持 GenEval 总体得分 0.96 不变（Table 6）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能与效率权衡
 
@@ -294,7 +298,9 @@ OctoT2I 在 Wise 基准（Table 7）上展现了良好的泛化能力，表明�
 - **评估模块的校准度**：MLLM 的连续概率评分（从 yes/no logits 经 softmax 计算）与人类判断的一致性尚未充分验证，可能在某些提示类型上引入噪声。
 - **动态工具库适应性**：当前自进化机制假设工具库相对稳定，对于频繁迭代的模型生态，增量更新策略的有效性仍需进一步检验。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：智能体 T2I 路由的三大瓶颈
 
@@ -340,6 +346,8 @@ OctoT2I 在以下条件下表现最优：
 - **决策可解释性**：OctoT2I 的决策过程是否能为用户提供工具选择的理由，增强系统透明度？
 - **多模态输入**：自进化机制是否可以从纯文本提示拓展到草图、参考图像等多模态输入？
 - **探索-利用平衡**：在动态工具库中，如何平衡新工具的能力探索与已掌握工具的稳定利用？
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/Difix3D_Improving_3D_Reconstructions_with_Single_Step_Diffusion_Models.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/toronto-ai/difix3d/
 aliases:
 - DI3RSSDM
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | Difix3D+: 通过单步扩散模型改进3D重建 |
 | 英文题名 | Difix3D+: Improving 3D Reconstructions with Single-Step Diffusion Models |
 | 会议/期刊 | CVPR 2025 |
-| Links | [paper](https://arxiv.org/abs/2503.01774); [Project](https://research.nvidia.com/labs/toronto-ai/difix3d); [Project](https://research.nvidia.com/labs/toronto-ai/difix3d/) |
+| Links | [paper](https://arxiv.org/abs/2503.01774) · [Project](https://research.nvidia.com/labs/toronto-ai/difix3d) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | DIFIX3D+ |
 | Dataset | Nerfbusters, DL3DV |
@@ -41,7 +42,7 @@ claims:
 > - Nerfbusters 上，LPIPS 为 0.2789 (Nerfacto) / 0.2637 (3DGS)，对比 0.4021 (Nerfacto) / 0.3265 (3DGS)，变化 -0.1232 / -0.0628。
 > - Nerfbusters 上，FID 为 49.44 (Nerfacto) / 41.77 (3DGS)，对比 134.65 (Nerfacto) / 113.84 (3DGS)，变化 2.72× lower / 2.73× lower。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -59,7 +60,7 @@ DIFIX3D+ 位于**2D生成先验驱动3D重建增强**的方法谱系中。与每
 
 在Nerfbusters和DL3DV数据集上，DIFIX3D+ 相较基线方法平均PSNR提升超过1 dB，FID改善约2倍。具体而言：Nerfbusters上Nerfacto基线的PSNR从17.29提升至18.32，LPIPS从0.4021降至0.2789，FID从134.65降至49.44（2.72倍降低）；3DGS基线的PSNR从17.66提升至18.51，LPIPS从0.3265降至0.2637，FID从113.84降至41.77（2.73倍降低）。在内部自动驾驶数据集RDS上，PSNR从19.95提升至21.75，LPIPS从0.5300降至0.4016。消融实验证实，渐进式更新策略对多视图一致性至关重要——一次性注入所有伪视图会导致LPIPS和FID显著恶化；推理时后处理步骤进一步降低LPIPS并提升PSNR/SSIM，几乎不影响多视图一致性。
 
-## 背景与动机
+
 
 ### 3D重建与新视图合成的核心瓶颈
 
@@ -86,7 +87,9 @@ DIFIX3D+ 位于**2D生成先验驱动3D重建增强**的方法谱系中。与每
 2. **将增强视图蒸馏回3D表示**：通过渐进式3D更新策略，逐步将DIFIX增强的伪视图注入训练集，扩展3D表示的空间覆盖范围，避免一次性注入导致的多视图不一致退化。
 3. **推理时实时后处理**：将DIFIX作为神经增强器在推理阶段实时应用，以76毫秒的单帧延迟进一步去除残余伪影，形成完整的重建与渲染增强闭环。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DIFIX3D+ 的核心创新在于将**单步扩散模型的2D生成先验**系统性地注入3D重建管线，解决了NeRF和3DGS在欠约束区域产生严重伪影的根本瓶颈。其创新围绕三个紧密耦合的“changed slots”展开，形成了一条从伪影去除到3D一致性保持的闭环管线。
 
@@ -128,7 +131,7 @@ DIFIX3D+将DIFIX同时用作推理时的**实时神经增强器**，对已蒸馏
 
 这一创新组合使得DIFIX3D+在Nerfbusters和DL3DV数据集上实现了PSNR平均提升>1dB、FID改善约2倍的显著增益，同时保持了多视图几何一致性。
 
-## 整体框架
+
 
 DIFIX3D+ 的整体流程围绕一个核心观察展开：神经渲染方法（NeRF 与 3DGS）在远离训练视角的欠约束区域会产生严重的伪影，包括错误的几何结构和缺失的内容。这些伪影源于 3D 表示缺乏足够的数据先验来生成合理的外观。DIFIX3D+ 通过将单步扩散模型的强生成先验蒸馏到 3D 表示中，系统性地解决了这一问题。
 
@@ -164,7 +167,7 @@ DIFIX3D+ 的整体流程围绕一个核心观察展开：神经渲染方法（Ne
 ![[assets/figures/papers/paper_list_l50_https_arxiv_org_abs_2503_01774/figures/002_Figure_2.jpg]]
 *Figure 2: DIFIX3D+ pipeline. The overall pipeline of the DIFIX3D+ model involves the following stages: Step 1: Given a pretrained 3D representation, we render novel views and feed them to DIFIX which acts as a neural enhancer, removing the artifacts and improving the quality of the noisy rendered views (Sec. 4.1). The camera poses selected to render the novel views are obtained through pose interpolation, gradually approaching the target poses from the reference ones. Step 2: The cleaned novel views are distilled back to the 3D representation to improve its quality (Sec. 4.2). Steps 1 and 2 are applied in several iterations to progressively grow the spatial extent of the reconstruction and hence ensu...*
 
-## 核心模块与公式推导
+
 
 ### DIFIX 神经增强器
 
@@ -236,7 +239,9 @@ $$\alpha_i = \eta_i \exp\left[-\frac{1}{2}(\mathbf{p} - \pmb{\mu}_i)^{\top} \pmb
 
 其中 $\eta_i$ 为高斯的不透明度系数，$\pmb{\mu}_i$ 为中心位置，$\pmb{\Sigma}_i$ 为协方差矩阵。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与实验动机
 
@@ -330,7 +335,9 @@ DIFIX作为单步扩散模型，在NVIDIA A100上推理仅需**76毫秒**，比�
 ![[assets/figures/papers/paper_list_l50_https_arxiv_org_abs_2503_01774/figures/015_Table.jpg]]
 *Table: S1. Multi-view consistency evaluation on the DL3DV dataset. A higher TSED score indicates better multi-view consistency*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与设计动机
 
@@ -380,6 +387,8 @@ DIFIX3D+ 处于**2D先验增强3D重建**的方法谱系中，但其设计路径
 2. **能否将DIFIX扩展为单步视频扩散模型？** 视频扩散模型可以提供更强的时序一致性约束，若能实现单步推理，将有望从根本上解决长序列渲染中的多视图一致性问题。
 
 3. **如何降低对初始3D重建质量的依赖？** 当前方法的性能上限受限于基础重建方法（Nerfacto/3DGS）的质量。探索扩散先验与3D重建的更深层次融合（如在3D表示优化过程中直接引入扩散引导）可能是一个有价值的方向。
+
+
 
 ## 原文 PDF
 

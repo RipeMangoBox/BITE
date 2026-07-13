@@ -43,7 +43,7 @@ claims:
 > - AVT aorta (CT) 上，FID 36.9 vs Seg-Diff: 38.9 (-2.0)。
 > - Decathlon liver (CT) 上，FID 36.5 vs Seg-Diff: 34.8 (+1.7)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有医学图像生成方法在低数据条件下难以产生解剖学一致且可控的3D体积——2D方法缺乏层间连续性，纯3D方法计算代价高且多模态控制困难，数据稀缺与可控性不足构成核心矛盾。
 
@@ -55,7 +55,7 @@ claims:
 
 **局限与开放问题**：当前实现仅限于单器官合成，尚未扩展到多器官联合生成场景；文本描述依赖自动流程从参考分割中提取几何特征，可能无法覆盖复杂解剖变异。未来方向包括多器官联合建模、疾病感知的草图编辑，以及放射科医生盲审验证临床诊断价值。
 
-## 背景与动机
+
 
 ### 三维医学体积生成的核心瓶颈
 
@@ -77,7 +77,9 @@ Sketch2CT的提出旨在填补上述缺口，核心动机可归纳为三个层�
 2. **以两阶段潜在扩散实现低成本的结构感知生成**：首先生成三维分割掩模作为几何代理，再基于其合成CT体积。这种解耦设计使得掩模生成阶段可以专注于解剖结构的正确性，而体积合成阶段可以专注于纹理和外观的真实感，从而在低计算代价下实现解剖连贯的三维体积生成。
 3. **以鲁棒的多模态融合机制弥合模态鸿沟**：草图的稀疏几何特征与文本的密集语义特征在表示空间上存在本质差异。需要设计专门的编码与融合模块——文本增强草图特征提取器（TSFE）和跨模态全局融合模块（CGFM）——来建立局部轮廓与全局语义之间的对应关系，这是生成质量的关键因果杠杆。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Sketch2CT 的核心创新在于将**多模态条件生成**引入三维医学体积合成，通过**两阶段潜在扩散框架**和**因果性多模态融合机制**，解决了现有方法在低数据条件下解剖一致性与可控性不足的瓶颈。其相对于基线方法的关键创新可归纳为以下五个 changed slots。
 
@@ -121,7 +123,7 @@ Sketch2CT 采用**胶囊网络结合注意力机制**作为草图编码器骨干
 
 **总结**：Sketch2CT 的创新本质在于通过 TSFE（文本→草图的语义注入）与 CGFM（局部→全局的注意力对齐）构建了高质量的多模态融合表征，并将其作为两阶段潜在扩散的条件驱动，从而在数据稀缺条件下实现解剖一致且用户可控的三维医学体积生成。
 
-## 整体框架
+
 
 Sketch2CT 采用**两阶段级联潜在扩散**架构，将用户提供的草图和文本描述转化为解剖一致的三维医学体积。其核心设计理念在于：首先生成三维分割掩模作为几何代理，再以此为结构先验合成CT体积，从而在低数据条件下实现结构感知的生成。
 
@@ -162,7 +164,7 @@ Sketch2CT 采用**两阶段级联潜在扩散**架构，将用户提供的草图
 ![[assets/figures/papers/paper_list_l2595_https_arxiv_org_abs_2603_22509/figures/001_Figure_1.jpg]]
 *Figure 1: Multimodal sketch and text guided 3D medical image generation results from our Sketch2CT method. For each organ, a userprovided sketch and text description serve as structural and semantic conditions. Sketch2CT produces both a 3D segmentation mask and a synthesized medical volume that closely follows the geometry and anatomy implied by the input. S1-S7 denote seven consecutive axial slices from the synthesized 3D volume, illustrating spatial continuity*
 
-## 核心模块与公式推导
+
 
 Sketch2CT 的核心架构围绕**多模态条件融合**与**两阶段潜在扩散生成**两条主线展开。其关键模块包括文本增强草图特征提取器（TSFE）和跨模态全局融合模块（CGFM），二者共同将用户提供的草图和文本描述转化为解剖学一致的三维分割掩模，进而驱动后续的CT体积合成。
 
@@ -227,7 +229,9 @@ $$\mathbf{z}_{t-1} = \epsilon_\theta(\mathbf{z}_t \mid\mid \mathbf{z}_{\mathrm{s
 ![[assets/figures/papers/paper_list_l2595_https_arxiv_org_abs_2603_22509/figures/009_Figure.jpg]]
 *Figure: A3. Comparison of segmentation masks generated using sketch-only and text-only conditions. Sketch-only guidance fails to recover full 3D geometry due to single-view ambiguity. In contrast, text-only guidance yields incorrect global shape and spatial placement, underscoring the need to combine sketches and text*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -280,7 +284,9 @@ Sketch2CT在四个数据集上与Med-DDPM、MedGen3D、Seg-Diff三个基线进�
 ![[assets/figures/papers/paper_list_l2595_https_arxiv_org_abs_2603_22509/figures/008_Figure.jpg]]
 *Figure: A1. Examples of textual geometry descriptions used as the text-based conditioning input in Sketch2CT. For each organ, we show the input sketch, the generated mask, and the corresponding structured text description that captures the global shape, surface characteristics, symmetry, and topology. Figure A2. Effect of sketch granularity on segmentation mask generation. For each dataset, we vary the sketch detail in three levels, coarse, medium, and fine, and visualize the corresponding 3D masks produced by Sketch2CT. Increased sketch detail introduces more local structural variations, while the overall anatomical geometry remains consistent across granularity levels*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有基线的关系
 
@@ -318,6 +324,8 @@ Sketch2CT 的适用性受以下边界约束：
 3. **临床验证**：论文使用下游分割任务的 Dice 作为解剖真实感的代理指标，但缺乏放射科医生的盲审评估。生成数据在实际临床诊断任务（如病变检测、良恶性分类）中的价值需要更广泛的专家验证。
 
 4. **文本描述的自动化质量**：当前使用 GPT-4o-mini 从多视角快照和几何指标生成文本描述（Figure A1），但该流程的鲁棒性未经验证。不同LLM或不同提示策略对生成质量的影响尚不明确，且文本描述是否真正捕获了临床相关的解剖特征（而非仅几何属性）值得进一步探讨。
+
+
 
 ## 原文 PDF
 

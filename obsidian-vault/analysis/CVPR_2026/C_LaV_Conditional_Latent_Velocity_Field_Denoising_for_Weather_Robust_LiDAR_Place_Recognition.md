@@ -43,7 +43,7 @@ claims:
 > - NCLT (snow) 上，Recall@1 46.41% vs previous best (e.g., MinkLoc3D v2) ~28.91% (approx) (+17.5% absolute)。
 > - Boreas (overall adverse, rain+snow) 上，Recall@1 75.82% (average rain/snow) vs previous best (est. ~54.32%) (+21.5% absolute)。
 
-## 概述
+## 概要
 
 LiDAR地点识别是自动驾驶和移动机器人长期定位的关键技术，其目标是根据单帧点云在预先构建的晴天地图数据库中检索最相似的位置。然而，雨、雾、雪等恶劣天气会造成点云的几何畸变和强度衰减，使得传统方法在输入空间（点云或BEV）直接去噪难以保留检索所需的结构信息；若直接在腐蚀的特征空间中学习描述子，嵌入空间又会随天气条件显著偏移，导致跨天气检索性能急剧下降。
 
@@ -53,7 +53,7 @@ LiDAR地点识别是自动驾驶和移动机器人长期定位的关键技术，
 
 在方法谱系上，C-LaV位于LiDAR地点识别与生成式潜在空间建模的交叉点：它继承了**MinkLoc3D**（Komorowski, WACV 2021）和**BEVPlace**（Luo et al., ICCV 2023）将点云转换为结构化表示进行检索的思路，但通过引入冻结的DINOv2视觉基础模型编码器（与**ImLPR**（Jung et al., CoRL 2025）共享类似动机）获得了语义稳定的潜在空间；其去噪模块以条件流匹配DiT替代传统扩散模型，实现了更高效的确定性传输；描述子层面则用SALAD的Sinkhorn软聚类机制取代了**NetVLAD**（Arandjelovic et al., CVPR 2016）的硬分配，进一步提升了描述子的细粒度鉴别力。
 
-## 背景与动机
+
 
 ### 问题背景：恶劣天气下的LiDAR地点识别
 
@@ -79,7 +79,9 @@ C-LaV的核心动机源于一个关键洞察：**对基于检索的地点识别�
 
 基于上述动机，C-LaV的目标是构建一个统一的框架，将BEV投影、冻结的语义编码器、条件流匹配去噪器和可学习的描述子聚合头串联起来，实现跨天气的鲁棒LiDAR地点识别。该方法在NCLT雪天场景上将Recall@1绝对提升17.5%，在Boreas真实数据上提升21.5%（见**Figure 1**雷达图），验证了“潜在空间条件化修复”策略的有效性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 C-LaV 的核心创新在于将恶劣天气下的 LiDAR 地点识别问题重新定义为**语义稳定潜在空间中的条件传输问题**，而非传统的输入空间去噪或特征空间直接适配。其关键 changed slots 体现在三个层面：
 
@@ -137,7 +139,7 @@ $$
 
 三个 changed slots 的协同效应构成了 C-LaV 的核心优势：DINOv2 提供语义稳定的潜在空间，流匹配 ODE 在该空间中执行确定性的天气去噪传输，SALAD 软聚类则最大化去噪后特征的鉴别力。t-SNE 可视化（Figure 6）直观展示了去噪后查询嵌入与晴朗数据库嵌入分布的显著接近，PR 曲线亦大幅提升。
 
-## 整体框架
+
 
 C-LaV 的完整流水线将单帧 LiDAR 点云映射为一个紧凑的全局描述子，用于跨天气地点检索。整个映射过程由四个顺序模块组成：
 
@@ -177,7 +179,7 @@ $$
 
 > **注意**：Figure 3 为训练/推理流程示意图，Figure 2 为整体架构总览，两图互补说明流水线的模块关系与数据流向。
 
-## 核心模块与公式推导
+
 
 C-LaV 将单帧 LiDAR 点云到地点描述子的映射分解为四个顺序模块：BEV 投影、DINOv2 编码器、条件流匹配去噪器、SALAD 描述子头。整体流水线形式化为：
 
@@ -249,7 +251,9 @@ $$\mathcal{L} = \mathcal{L}_{\text{denoise}} + \lambda_{\text{desc}} \mathcal{L}
 ![[assets/figures/papers/paper_list_l843_https_openaccess_thecvf_com_content_CVPR2026_html_Cao_C_LaV_Conditional/figures/005_Figure_5.jpg]]
 *Figure 5: Three-channel BEV construction and pairing. From a clear-weather point cloud (top-left) and an adverse-weather BEV (bottom-left, fog), we derive three channels—Height, Intensity, and Density—and form a three-channel BEV for each condition*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 数据集与评估协议
 
@@ -310,7 +314,9 @@ Table 3 系统拆解了编码器、潜在去噪模块和描述子聚合三个�
 ![[assets/figures/papers/paper_list_l843_https_openaccess_thecvf_com_content_CVPR2026_html_Cao_C_LaV_Conditional/figures/001_Figure_1.jpg]]
 *Figure 1: (Left) Given LiDAR point clouds in adverse weather, our C-LaV encodes them into a weather-stable latent space to retrieve the nearest position from geo-tagged LiDAR sequences in sunny weather. (Right) The radar plot reports Recall@1 on KITTI, NCLT, and Boreas datasets under rain, fog, and snow weather, where C-LaV outperforms prior LiDAR place recognition methods*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有基线的关系
 
@@ -353,6 +359,8 @@ C-LaV 仅在LiDAR单一模态下测试。在LiDAR完全失效的场景（如浓�
 3. **极端天气泛化**：当前的条件流匹配去噪框架能否直接扩展到烟雾、沙尘暴等更复杂的散射介质，还是需要重新设计条件信号？
 4. **多模态融合**：在LiDAR严重退化的场景下，融合相机语义信息或雷达回波强度是否能为潜在去噪提供更强的条件引导？
 5. **动态物体处理**：BEV投影将动态物体（车辆、行人）的痕迹固化为静态栅格，这些“幽灵痕迹”在跨天气检索中是否被DINOv2的语义先验自动抑制，还是需要显式的动态掩膜？
+
+
 
 ## 原文 PDF
 

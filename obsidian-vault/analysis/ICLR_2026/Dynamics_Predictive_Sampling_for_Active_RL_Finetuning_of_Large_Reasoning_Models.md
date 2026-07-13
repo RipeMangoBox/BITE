@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Dynamics_Predictive_Sampling_for_Active_RL_Finetuning_of_Large_Reasoning_Models.pdf
+project_link: null
+code_link: https://github.com/maoyixiu/DPS
 openreview_forum_id: voeheZjd8p
 aliases:
 - DPSD
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 面向大型推理模型主动强化学习微调的动力学预测采样 |
 | 英文题名 | Dynamics-Predictive Sampling for Active RL Finetuning of Large Reasoning Models |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=voeheZjd8p); [GitHub](https://github.com/maoyixiu/DPS) |
+| Links | [paper](https://openreview.net/forum?id=voeheZjd8p) · [GitHub](https://github.com/maoyixiu/DPS) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | Dynamics-Predictive Sampling (DPS) |
 | Dataset | MATH (Average over AIME24, AMC23, MATH500, Minerva, Olympiad) — 1.5B model, Countdown CD-34 — 3B model, Geometry3k — 3B model, Rollout Efficiency (MATH 1.5B) |
@@ -42,7 +44,7 @@ claims:
 > - Countdown CD-34 — 3B model 上，Accuracy (%) 为 74.27，对比 US: 69.87; DS: 74.95，变化 DPS +4.40 over US, -0.68 vs DS。
 > - Geometry3k — 3B model 上，Pass@1 accuracy (%) 为 44.47，对比 US: 40.22; DS: 45.54，变化 DPS +4.25 over US, -1.07 vs DS。
 
-## 概述
+## 概要
 
 大型语言模型在强化学习微调中存在一个关键瓶颈：训练过程中大量提示由于模型已完全掌握或完全未掌握，无法提供有效的梯度信号，导致训练效率低下。现有的在线提示选择方法——如动态采样（DS, Yu et al., 2025）——虽能通过筛选奖励方差大于零的提示来缓解此问题，但需要在大规模候选批次上进行昂贵的模型推演，其额外计算开销经常超过微调本身。
 
@@ -50,7 +52,7 @@ claims:
 
 实验表明，DPS在多个推理任务上以极低的额外计算代价取得了与oracle动态采样相当甚至更优的性能。在MATH基准上，1.5B模型的DPS仅用73.7万次推演即达到52.13的平均准确率，与oracle DS（293.3万次推演，52.00）相当，且远优于均匀采样US（48.57）。在Countdown和Geometry3k任务上，DPS同样显著超越US，逼近DS的性能上限。消融实验验证了非平稳衰减机制、三状态划分等设计选择的关键作用，而DPS的推理与选择开销（全数据集更新仅需2.4秒/步，内存占用0.9 GiB）使其在实际部署中具有显著优势。
 
-## 背景与动机
+
 
 ### 大规模推理模型的强化学习微调瓶颈
 
@@ -74,7 +76,9 @@ $$\mathcal{B}_t = \left\{ \tau \in \hat{\mathcal{B}}_t \mid \mathrm{std}(\{r(\ta
 
 具体而言，本文将提示的求解程度建模为三类状态——完全未解（State 1）、部分解决（State 2）、完全解决（State 3）——并假设状态转移服从隐马尔可夫模型（HMM）。通过在每个训练步利用本轮观测到的二元奖励信号更新状态后验信念，并采用带指数衰减的 Dirichlet 更新机制适应非平稳的求解动态，DPS 能够以极小的计算代价（全数据集 $|\mathcal{D}|=10^7$ 时仅需 2.4 秒、0.9 GiB 内存）预测每个提示处于 State 2 的概率，进而通过 Top-B 贪婪选择直接构建高信息量的训练批次。这一设计将数据选择从“推演密集型”转变为“轻量推理密集型”，为大规模 RL 微调的高效数据采样开辟了新路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DPS 的核心创新在于将提示采样从**推演密集型**转变为**推理密集型**。传统的在线提示选择方法（如 DS）需要在大规模候选批次上进行昂贵的模型推演，其额外计算开销经常超过微调本身。DPS 通过以下关键机制突破这一瓶颈：
 
@@ -97,7 +101,7 @@ DPS 在每个训练步执行三阶段推理流水线：
 
 这一设计带来计算开销的**数量级差异**：DS 需对 3 倍以上批次规模进行 LLM 推演（7B 模型约增加 1500 秒/步），而 DPS 仅需低维矩阵运算，更新 $10^7$ 规模数据集仅需 2.4 秒/步、0.9 GiB 内存，无 GPU 内存占用。在 MATH 任务上，DPS 以 DS 25.1% 的推演量（737k vs 2933k）达到相当甚至更优的性能（52.13 vs 52.00），验证了从“推演-验证”到“推理-预测”范式转换的有效性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l29_https_openreview_net_forum_id_voeheZjd8p/figures/001_Figure_1.jpg]]
 *Figure 1: Dynamics-Predictive Sampling (DPS) framework. DPS models each prompt’s solving progress in RL finetuning as a dynamical system, treating solving extent as the state with transitions characterized by a hidden Markov model. By employing lightweight inference, it predicts and selects informative (partially solved) prompts online, without requiring rollout-intensive filtering*
@@ -126,7 +130,7 @@ DPS的观测模型采用退化发射模型：当提示被选中时，观测即�
 
 计算开销方面，DPS的推理与选择仅涉及低维矩阵运算：在 $|\mathcal{D}| = 10^7$ 的数据集上，全量状态更新仅需约2.4秒/步，内存占用约0.9 GiB，且不占用GPU内存。相比之下，DS（Yu et al., 2025）需对3倍以上批次规模进行LLM推演，7B模型下额外运行时增加约1500秒/步。这一根本性的架构差异使得DPS在保持与oracle DS相当性能的同时，将总推演次数压缩至后者的约25%（MATH 1.5B：DPS 737k vs DS 2933k），实现了数据效率与计算效率的双重提升。
 
-## 核心模块与公式推导
+
 
 DPS 的核心是将每个提示的求解进度建模为一个隐马尔可夫动力学系统，并通过轻量级的在线贝叶斯推理替代昂贵的候选批次推演。其推理管线由四个紧密耦合的模块构成，每个模块对应一个明确的数学操作。
 
@@ -188,7 +192,9 @@ $$\mathcal{I}_{\mathrm{GRPO}}(\theta) = \mathbb{E}\left[ \frac{1}{k} \sum_{i=1}^
 
 DPS 的计算开销与 Oracle 基线 DS 形成鲜明对比。DS 需要对 $3\times$ 以上批次规模进行 LLM 推演以过滤非部分求解提示（过滤规则为 $\mathrm{std}(\{r(\tau, y_i^{\tau})\}_{i=1}^k) > 0$），其额外推演开销经常超过微调本身。而 DPS 仅需低维矩阵运算：在全数据集（$|\mathcal{D}|=10^7$）上的状态更新与 Top-B 选择仅需约 2.4 秒/步，内存占用 0.9 GiB，且不占用 GPU 内存（Table 6, Table 7）。这使得 DPS 在 MATH 1.5B 任务上以 DS 25.1% 的推演总量（737k vs 2933k）达到了与之相当甚至略优的性能（52.13 vs 52.00, Table 1）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与实验动机
 
@@ -259,7 +265,9 @@ DPS的纯贪心Top-B选择策略在批内多样性方面缺乏显式控制，可
 ![[assets/figures/papers/paper_list_l29_https_openreview_net_forum_id_voeheZjd8p/figures/076_Table_5.jpg]]
 *Table 5: Evaluation across mathematics benchmarks under a maximum response length of 32k. ’+’ represents finetuning with the method. Evaluation is based on average Pass@1 accuracy over 16 responses per prompt*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的因果差异
 
@@ -312,6 +320,8 @@ DPS 的动力学建模框架开启了若干值得探索的方向：
 - **探索-利用的显式平衡**：能否设计更复杂的采样准则（如基于后验熵的汤普森采样或贝叶斯优化）来显式平衡探索与利用，从而在保持预测效率的同时进一步提升训练鲁棒性？当前依赖非平稳衰减的隐式探索可能不足以应对高度非平稳的训练初期。
 
 - **跨模态与跨任务泛化**：DPS 的动力学建模能否拓展至多模态推理、多轮对话或代码生成等场景？这些场景中的“求解状态”定义、状态转移特性以及观测稀疏性可能与数学推理有本质差异，特别是当状态演化呈现非马尔可夫特性时，当前的 HMM 假设可能不再适用。
+
+
 
 ## 原文 PDF
 

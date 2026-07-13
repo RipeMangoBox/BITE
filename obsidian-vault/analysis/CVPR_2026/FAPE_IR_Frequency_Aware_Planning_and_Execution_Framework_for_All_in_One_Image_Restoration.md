@@ -43,7 +43,7 @@ claims:
 > - Dehazing (aggregated) 上，PSNR (dB) 33.85 vs 19.89 (AdaIR) (+13.96)。
 > - Desnowing (aggregated) 上，PSNR (dB) 30.29 vs 24.19 (AdaIR) (+6.10)。
 
-## 概述
+## 概要
 
 图像复原任务（去雨、去雾、去雪、去模糊、去噪、低光增强、超分辨率等）长期以来被孤立建模，每种退化类型依赖专用的架构与先验。全合一图像复原（All-in-One Image Restoration, AIO-IR）试图用单一模型处理多种退化，但现有方法面临一个**根本瓶颈**：它们要么采用任务特定的多分支映射，要么依赖固定的手工路由规则，缺乏对不同退化语义的显式理解，更无法在频率维度上实现共享与隔离的自适应机制。这导致跨任务冲突严重，泛化能力不足。
 
@@ -56,7 +56,7 @@ FAPE-IR 的核心洞察在于，图像复原的本质是一个频率感知问题
 
 在涵盖六类退化任务的统一评估中，FAPE-IR 取得了**最优或次优性能**：在去雨、去雾、去雪等天气相关任务上，PSNR 提升约 6–8 dB（Table 1）；在超分辨率任务上，PSNR 从 26.87 dB 提升至 28.53 dB（Table 2）。消融实验证实，频率感知文本路由（Freq-U）与 FIR 频谱路由器（Freq-G）对性能至关重要——二者耦合后，URHI 基准上的 PSNR 从 25.03 dB 跃升至 29.71 dB（Table 4）。模型同时展现出对混合退化（雾+雨、低光混合等）的强零样本泛化能力。
 
-## 背景与动机
+
 
 ### 全合一图像复原的演进瓶颈
 
@@ -77,7 +77,9 @@ FAPE-IR 的核心洞察在于，图像复原的本质是一个频率感知问题
 
 这一设计从根本上解决了“盲路由”问题——模型不再猜测该用什么分支，而是通过语义理解做出可追溯的决策，同时通过频带专家分工实现参数高效的专业化。此外，通过引入对抗训练和频率正则化，FAPE-IR进一步抑制了扩散模型常见的伪影，并强制专家在各自频带内形成专长。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FAPE-IR 的核心创新在于将**多模态大语言模型的语义理解能力**与**扩散模型的频带专业化执行**相耦合，构建了一个“理解—规划—执行”的统一复原范式。与现有 AIO-IR 方法相比，其关键创新体现在三个维度的设计转变上。
 
@@ -103,7 +105,7 @@ FAPE-IR 摒弃了统一模型中常用的 flow-matching 微调目标，转而采
 
 总损失 $\mathcal{L}_{\mathrm{Total}} = \mathcal{L}_{\mathrm{adv}} + \gamma \mathcal{L}_{\mathrm{freq}}$ 将语义级保真度约束与频带专业化约束统一，既抑制了扩散模型常见的伪影，又促进了专家之间的功能分化。消融实验证实，去除任一损失项均导致性能下降（Figure 13），验证了四项损失相互补充的机制。
 
-## 整体框架
+
 
 FAPE-IR 采用**规划–执行**范式，将全合一图像复原分解为两个耦合阶段：**频率感知规划器**与**频带专业化执行器**，如图 2 所示。其核心思想是：先“理解”退化图像的语义与频谱特性，再“执行”针对性的频带复原，从而统一语义理解与像素级重建。
 
@@ -145,7 +147,7 @@ FAPE-IR 摒弃了统一模型中常用的 flow-matching 微调目标，转而采
 ![[assets/figures/papers/paper_list_l2485_https_arxiv_org_abs_2511_14099/figures/018_Figure_12.jpg]]
 *Figure 12: Qualitative results of training our framework with a standard flow-matching (FM) objective on real-world super-resolution. Although the FM-trained variant can sharpen some structures, it also introduces severe artifacts and unrealistic high-frequency details (e.g., distorted edges and hallucinated textures), which motivates our final design choices for FAPE-IR*
 
-## 核心模块与公式推导
+
 
 FAPE-IR 采用“规划—执行”范式，将图像复原分解为频率感知规划器（Frequency-aware Planner）与基于扩散的执行器（Diffusion-based Executor）两大核心模块（Figure 2）。规划器负责理解退化语义并生成结构化的频率感知复原计划，执行器则依据该计划动态调度频带专家完成像素级重建。
 
@@ -202,7 +204,9 @@ $$\mathcal{L}_{\mathrm{Total}} = \mathcal{L}_{\mathrm{adv}} + \gamma \mathcal{L}
 
 其中 $\gamma$ 为频率正则化权重。四项损失（MSE、LPIPS、对抗、频率正则化）相互补充：消融实验（Figure 13）表明，移除任一损失项均导致性能下降，验证了该组合设计的必要性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -250,7 +254,9 @@ FAPE-IR在六个经典退化任务系列上进行了统一评估，与多种AIO-
 ![[assets/figures/papers/paper_list_l2485_https_arxiv_org_abs_2511_14099/figures/012_Figure_9.jpg]]
 *Figure 9: Compound degradations (haze+rain/snow; low-light mixtures): FAPE-IR removes low-frequency artifacts, preserves details, and reduces cross-artifacts. Please zoom in for details*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位与范式演进
 
@@ -321,6 +327,8 @@ Table 3显示FAPE-IR推理内存占用为38.92G，推理时间1.57s（H200 GPU�
 4. **效率优化空间**：在保持性能的前提下，探索轻量级MLLM替代Qwen2.5-VL、更高效的MoE路由策略（如top-1稀疏化）、或知识蒸馏方案，以降低推理内存占用。
 
 5. **频带专家数量的可扩展性**：当前设计仅使用两个频带专家（高频/低频），是否可以通过引入更多中间频带专家（如中频纹理专家）进一步提升细粒度复原能力？这需要在专家专业化与路由稳定性之间寻找新的平衡。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/OmniWorld_A_Multi_Domain_and_Multi_Modal_Dataset_for_4D_World_Modeling.pdf
+project_link: https://yangzhou24.github.io/OmniWorld/
+code_link: null
 openreview_forum_id: 1y1YFKb9pp
 aliases:
 - OmniWorld
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | OmniWorld：面向4D世界建模的多领域多模态数据集 |
 | 英文题名 | OmniWorld: A Multi-Domain and Multi-Modal Dataset for 4D World Modeling |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=1y1YFKb9pp); [Project](https://yangzhou24.github.io/OmniWorld/) |
+| Links | [paper](https://openreview.net/forum?id=1y1YFKb9pp) · [Project](https://yangzhou24.github.io/OmniWorld/) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | OmniWorld多领域多模态数据集构建与标注流水线 |
 | Dataset | Sintel, OmniWorld-Game (Video Generation) |
@@ -41,7 +43,7 @@ claims:
 > - Sintel 上，Video Depth scale&shift Abs Rel 为 0.314 (CUT3R fine-tuned)，对比 0.537 (CUT3R original)，变化 -0.223 (41.5% 相对降低)。
 > - OmniWorld-Game (Video Generation) 上，TransErr 为 4.1428 (AC3D fine-tuned)，对比 6.2788 (AC3D original)，变化 -2.1360 (34.0% 相对降低)。
 
-## 概述
+## 概要
 
 4D世界建模旨在从视觉输入中重建动态3D场景的几何、外观与运动，是实现空间智能的关键技术。然而，现有公开数据集普遍存在**动态复杂性不足、领域单一、时空多模态注释匮乏**三大瓶颈，严重制约了通用世界模型的发展。例如，多数合成数据集缺少文本描述、光流或精确相机姿态，而真实场景数据又难以规模化获取高质量标注。
 
@@ -58,7 +60,7 @@ claims:
 
 **局限性**：自动标注流水线在极端遮挡或颜色混淆时可能失效；数据集以游戏渲染为主，存在仿真到真实迁移的潜在差异；基准目前仅覆盖3D几何与视频生成，尚未评估物理推理等更广义的世界建模能力。
 
-## 背景与动机
+
 
 4D世界建模旨在从多模态输入中重建和生成动态3D场景，其核心瓶颈在于高质量时空训练数据的极度稀缺。现有数据集普遍存在三重缺口：**动态复杂性不足**（缺少长序列、大范围运动与复杂交互）、**领域多样性单一**（局限于自动驾驶、室内或合成游戏等孤立领域）、以及**时空多模态注释缺失**（深度、相机姿态、文本描述、光流、前景掩码等关键模态不完整）。这些缺口直接制约了通用4D世界模型的发展，使得当前SOTA方法在面对复杂动态场景时频繁出现长序列一致性崩溃和几何伪影。
 
@@ -66,7 +68,9 @@ claims:
 
 本文的核心洞察在于：一个覆盖多领域、集成多种精确几何与语义标注的大规模数据集，不仅能够通过微调显著增强现有SOTA模型的3D重建与视频生成能力，还能作为更具挑战性的基准，有效暴露当前模型在长序列一致性和复杂动态场景中的根本缺陷。基准评估显示，VGGT在视频深度估计中表现最佳（scale&shift Abs Rel 0.194），但仍在高动态场景中出现伪影，没有单一模型能通吃所有任务（Table 3, Fig. 4）。这一发现进一步印证了构建更具挑战性和多样性的基准数据集的紧迫性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 OmniWorld 的核心创新并非提出新的模型架构，而是通过构建一个**多领域、多模态、大规模**的数据集，系统性地缓解了当前4D世界建模中高质量时空训练数据稀缺的瓶颈。其创新性集中体现在对现有数据集在三个关键维度上的根本性改进（changed slots），从而解锁了通过数据驱动方式显著增强现有SOTA模型能力的可能性。
 
@@ -90,7 +94,7 @@ OmniWorld 的核心创新并非提出新的模型架构，而是通过构建一�
 
 > **需手动验证**：论文未提供venue和year信息，若需在正式引用中标注发表来源，请自行查证补充。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_1y1YFKb9pp/figures/004_Figure_2.jpg]]
 *Figure 2: OmniWorld acquisition and annotation pipeline. We collect raw data from diverse domains and apply a video slicing filter to obtain high-quality RGB sequences. These sequences are then processed through a suite of specialized pipelines to generate multi-modal annotations, including text captions, depth maps, camera poses, foreground masks, and optical flow*
@@ -137,7 +141,7 @@ OmniWorld 的数据构建遵循一条统一的“采集—过滤—标注”流�
 
 这种模块化设计使得 OmniWorld 能够灵活扩展——当引入新的数据领域或新的标注模态时，只需替换或新增相应的模块，而不影响整体流水线的稳定性。
 
-## 核心模块与公式推导
+
 
 OmniWorld的核心贡献在于其大规模多模态标注流水线，而非提出新的算法模型。该流水线由六个关键模块构成，协同工作以从多领域原始视频中生成高质量的时空标注。
 
@@ -183,7 +187,9 @@ OmniWorld的核心贡献在于其大规模多模态标注流水线，而非提�
 
 本文作为数据集工作，未提出新的数学公式或算法推导。各模块所依赖的底层方法（如束调整、稠密光流估计、视觉语言模型推理等）均基于现有成熟技术，其数学原理可参见相应原始文献。流水线的核心创新在于将这些技术有机整合，形成一套可扩展、高质量的多模态标注体系，而非对单一算法的理论突破。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 基准评估：暴露当前模型的根本缺陷
 
@@ -257,7 +263,9 @@ OmniWorld的标注质量通过多项消融实验得到验证：
 ![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_1y1YFKb9pp/figures/003_Table_2.jpg]]
 *Table 2: OmniWorld structure. A smiling face ( ) indicates the modality is newly (re-)annotated by us, a green check (✔) denotes ground-truth data that already exists in the original dataset, and a red cross (✗) marks missing modalities*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与设计动机
 
@@ -318,6 +326,8 @@ OmniWorld的标注流水线本身构成独立的技术贡献：
 3. **向通用世界模型演进。** 如何利用OmniWorld的丰富标注推动更通用的世界模型发展（例如结合物理模拟与因果推理）？
 
 4. **微调稳定性。** 微调后部分指标（如相机姿态RPE rot）改善不稳定，是否因预训练与细调数据分布差异导致，如何进一步优化？
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/Learning_Video_Generation_for_Robotic_Manipulation_with_Collaborative_Trajectory_Control.pdf
+project_link: https://fuxiao0719.github.io/projects/robomaster/
+code_link: https://github.com/1x-technologies/1xgpt
 aliases:
 - LVGRMCTC
 tags:
@@ -40,7 +42,7 @@ claims:
 > [!tip] 效果简介
 > - Bridge Dataset 上，FVD↓ 147.31 vs 152.28 (Tora) (-4.97)；PSNR↑ 21.55 vs 21.24 (Tora) (+0.31)；SSIM↑ 0.803 vs 0.788 (Tora) (+0.015)。
 
-## 概述
+## 概要
 
 机器人操作视频生成的核心挑战在于同时控制机械臂与被操作物体的运动轨迹。现有方法（如 **Tora** (Zhang et al., CVPR 2025)）将多物体运动作为独立轨迹分别处理，但忽视了交互过程中物体间的耦合动力学——当机械臂与物体在空间上重叠时，独立轨迹会导致特征纠缠，造成视觉伪影（如物体缺失、形变）与轨迹精度下降。
 
@@ -50,7 +52,7 @@ claims:
 
 方法谱系上，RoboMaster 属于**轨迹条件视频生成**，以预训练视频扩散变换器（CogVideoX-5B）为骨干，通过掩码编码、协同轨迹分解与运动注入三个模块实现可控生成。相较于仅控制机械臂的 **IRASim**、使用点表示运动注入的 **MotionCtrl**、使用掩码但无交互分解的 **DragAnything**，以及 4D 世界模型 **TesserAct** (Zhen et al., ICCV 2025)，RoboMaster 首次在轨迹控制框架中显式建模交互阶段与物体身份一致性，填补了多物体交互视频生成的空白。
 
-## 背景与动机
+
 
 ### 机器人操作视频生成的需求与挑战
 
@@ -76,7 +78,9 @@ claims:
 
 本文提出的 **RoboMaster** 框架正是对这一问题的回答。它通过**协同轨迹**将多物体运动统一为单一表示，并在时间维度上分解为三个子阶段，每个阶段注入对应主导物体的掩码特征。这种设计使模型能够在重叠区域明确知道“当前该关注哪个物体”，从而在保证轨迹精度的同时，显著提升交互场景下的视觉保真度。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈诊断：重叠区域的特征纠缠
 
@@ -131,7 +135,7 @@ $$h = h + \text{norm}(\tilde{V}) + \tilde{V}, \quad \tilde{V} = \text{Conv1D}(\t
 
 三者共同作用，使 RoboMaster 在轨迹精度（TrajError_obj 24.16 vs Tora 26.43）与视觉质量（FVD 147.31 vs Tora 152.28）两个维度同时超越基线，并在用户偏好测试中以 45.16% 的胜率大幅领先 Tora 的 17.74%（Table 2）。
 
-## 整体框架
+
 
 RoboMaster 的整体 pipeline 围绕一个核心设计展开：将机器人操作视频生成建模为**以协同轨迹为条件的视频扩散过程**。给定初始帧 $\mathbf{I}$、文本提示 $\mathbf{c}$、用户指定的机械臂掩码 $\mathbf{M}_d$ 与被操作物体掩码 $\mathbf{M}_s$，以及一条协同轨迹 $\boldsymbol{\mathcal{C}}$，模型输出符合轨迹控制与语义约束的操作视频 $\mathbf{X}$。其形式化定义为：
 
@@ -163,7 +167,7 @@ $$\mathcal{L}(\pmb{\theta}) = \mathbb{E}_{\mathbf{x}, \mathbf{c}, \epsilon \sim 
 
 该损失同时优化 DiT 主干与运动注入器参数，使模型学会在协同轨迹引导下生成视觉连贯且运动精确的操作视频。
 
-## 核心模块与公式推导
+
 
 RoboMaster 的核心架构围绕三个关键设计展开：物体感知的掩码特征编码、协同轨迹分解，以及零初始化运动注入器。以下逐一剖析各模块的机理与关键公式。
 
@@ -218,7 +222,9 @@ $$\mathcal{L}(\pmb{\theta})=\mathbb{E}_{\mathbf{x},\mathbf{c},\epsilon\sim\mathc
 ![[assets/figures/papers/paper_list_l85_https_arxiv_org_abs_2506_01943/figures/002_Figure_2.jpg]]
 *Figure 2: Collaborative Trajectory (Ours) vs Separated Trajectories (Previous, e.g.Tora). Unlike Tora (Zhang et al., 2025) that decomposes objects and model the motion of robot arm and manipulated object separately, we decompose the interaction phase and unify their joint motions into a single collaborative trajectory with fine-grained object awareness. This integration alleviates the feature fusion issue in overlapping regions (see the missing apple in Tora), and improves visual quality*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -292,7 +298,9 @@ RoboMaster 对输入扰动表现出较强的鲁棒性：
 ![[assets/figures/papers/paper_list_l85_https_arxiv_org_abs_2506_01943/figures/010_Figure_6.jpg]]
 *Figure 6: Generalizable Comparison with Input Prompt: ‘Pick up the bee.’*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有轨迹控制方法的谱系关系
 
@@ -343,6 +351,8 @@ RoboMaster 在具身智能栈中占据**视觉生成层**的位置，向上可�
 ### 5. 方法谱系定位总结
 
 RoboMaster 的核心贡献在于**以因果结构驱动轨迹表示的重设计**：通过将交互过程分解为因果上有序的三个子阶段，并在各阶段注入对应主导物体的感知特征，从根本上解决了分离轨迹范式中重叠区域的特征纠缠问题。这一思路在方法学上可追溯至因果表示学习中的“解耦”（disentanglement）思想，但在轨迹控制视频生成领域是首次系统性应用。其技术方案（掩码池化 + 圆形体积 + 零初始化卷积注入）为后续研究提供了可复用的模块化设计范式。
+
+
 
 ## 原文 PDF
 

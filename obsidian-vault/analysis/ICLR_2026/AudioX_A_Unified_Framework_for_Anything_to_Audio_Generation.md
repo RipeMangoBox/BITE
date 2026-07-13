@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/AudioX_A_Unified_Framework_for_Anything_to_Audio_Generation.pdf
+project_link: https://zeyuet.github.io/AudioX/
+code_link: null
 aliases:
 - AudioX
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | AudioX：面向任意输入到音频生成的统一框架 |
 | 英文题名 | AudioX: A Unified Framework for Anything-to-Audio Generation |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=qjJWxK3yWo); [Project](https://zeyuet.github.io/AudioX/) |
+| Links | [paper](https://openreview.net/forum?id=qjJWxK3yWo) · [Project](https://zeyuet.github.io/AudioX/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | AudioX |
 | Dataset | AudioCaps |
@@ -40,22 +42,24 @@ claims:
 > - AudioCaps 上，IS↑ 为 10.22，对比 （见表1），变化 SOTA。
 > - AudioCaps 上，FD↓ 为 13.29，对比 （见表1），变化 SOTA。
 
-## 概述
+## 概要
 
 本文提出 **AudioX**，一个基于 Diffusion Transformer (DiT) 的统一框架，旨在解决“任意输入到音频生成”（Anything-to-Audio Generation）问题。该框架能够灵活处理文本、视频、音频等多种输入模态的任意组合，并统一生成音效与音乐。核心贡献包括：(1) 提出轻量级的多模态自适应融合模块（Multimodal Adaptive Fusion, MAF），用于自适应加权和对齐多模态条件嵌入；(2) 构建大规模、高质量的多模态数据集 **IF-caps**（Instruction-Following），包含超过700万样本，通过结构化标注和数据增强生成；(3) 在多个基准测试中达到或超越现有技术水平，尤其在指令跟随能力上大幅领先。
 
-## 背景与动机
+
 
 现有音频生成模型通常局限于单一条件模态（如仅文本或仅视频）和单一输出域（仅音效或仅音乐），缺乏统一的框架来灵活处理多种模态组合的输入。此外，高质量、大规模的多模态训练数据也相对匮乏。这种碎片化的现状限制了模型在复杂多模态场景下的泛化能力和实用性。AudioX 旨在通过统一的多模态训练框架和高质量数据集，克服这些瓶颈。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 1.  **统一框架**：基于 Diffusion Transformer (DiT) 构建，支持文本、视频、音频多种输入模态，统一生成音效和音乐。
 2.  **多模态自适应融合模块 (MAF)**：提出轻量级的 MAF 模块，通过门控滤波、可学习查询交叉注意力和自注意力残差更新，自适应地加权和对齐多模态条件嵌入，减少跨模态干扰。
 3.  **大规模多模态数据集 IF-caps**：通过结构化标注和数据增强管道构建，包含超过700万样本，支持细粒度的指令跟随。
 4.  **跨模态正则化效应**：通过统一的多模态训练，产生跨模态正则化效应：提高文本监督的质量和粒度可以减少对齐噪声，从而联合提升所有条件模态的性能。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_qjJWxK3yWo_AudioX_A_Unifie/figures/001_Figure_1.jpg]]
 *Figure 1: (a) Comprehensive performance comparison*
@@ -64,7 +68,7 @@ AudioX 的整体框架如 **Figure 4** 所示。其核心流程为：首先，�
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_qjJWxK3yWo_AudioX_A_Unifie/figures/005_Figure_4.jpg]]
 
-## 核心模块与公式推导
+
 
 ### 5.1 多模态自适应融合模块 (MAF)
 
@@ -109,7 +113,9 @@ $$
 - **模型规模**：总参数量 2.4B（可训练 1.1B），MAF 模块仅 60M 参数。
 - **训练配置**：使用 AdamW 优化器，基础学习率 1e-5，权重衰减 0.001，批次大小 48，推理步数 250，CFG 尺度 7.0。训练在三个 NVIDIA H800 GPU 集群上进行，约需 4k GPU 小时。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 6.1 主要结果
 
@@ -181,7 +187,9 @@ $$
 *Table 5: Table A.1: Comprehensive overview of training and test datasets, detailing the number of clips (# Clips), average duration per clip (Dur./Clip in seconds), and total duration (Dur. in hours) for each task and split. T2A: Text-to-Audio, V2A: Video-to-Audio, TV2A: Text-and-Video-to-Audio, T2M: Text-to-Music, V2M: Video-to-Music, TV2M: Text-and-Video-to-Music.*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 AudioX 属于多模态生成模型领域，特别是“任意输入到音频生成”这一新兴方向。它与以下工作密切相关：
 
@@ -190,6 +198,8 @@ AudioX 属于多模态生成模型领域，特别是“任意输入到音频生�
 - **多模态融合**：MMAUDIO (Cheng et al., 2025) 等。
 
 AudioX 的核心定位是提供一个统一的、可扩展的框架，通过创新的 MAF 模块和高质量数据集 IF-caps，在保持模态内任务高性能的同时，显著提升跨模态任务和指令跟随能力。其提出的跨模态正则化效应为多模态生成模型的训练提供了新的理论视角。
+
+
 
 ## 原文 PDF
 

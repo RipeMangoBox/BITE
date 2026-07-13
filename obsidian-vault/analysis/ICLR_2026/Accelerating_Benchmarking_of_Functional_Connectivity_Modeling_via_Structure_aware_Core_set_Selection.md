@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Accelerating_Benchmarking_of_Functional_Connectivity_Modeling_via_Structure_aware_Core_set_Selection.pdf
+project_link: null
+code_link: https://github.com/lzhan94swu/SCLCS
 aliases:
 - SSACLCSS
 - ABFCMSACSS
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 通过结构感知核心集选择加速功能连接建模基准测试 |
 | 英文题名 | Accelerating Benchmarking of Functional Connectivity Modeling via Structure-aware Core-set Selection |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=0RYazbfSzW); [GitHub](https://github.com/lzhan94swu/SCLCS) |
+| Links | [paper](https://openreview.net/forum?id=0RYazbfSzW) · [GitHub](https://github.com/lzhan94swu/SCLCS) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/neuroscience_cognitive_science |
 | Method | SCLCS (Structure-aware Contrastive Learning for Core-set Selection) |
 | Dataset | REST-meta-MDD (Brain Fingerprinting & MDD Diagnosis), 计算成本 (266 个 SPI 在 4520 个样本上的完整基准) |
@@ -40,7 +42,7 @@ claims:
 > - REST-meta-MDD (Brain Fingerprinting & MDD Diagnosis) 上，nDCG@k 排名一致性 为 SCLCS / SCLCS_Dense，对比 9 种 SOTA 核心集选择方法 (AUM, CCS, Forgetting 等)，变化 最高提升 23.2%（10% 采样比）；SCLCS 在脑指纹任务 0.1 比率的 nDCG@5 = 81.21，显著高于所有基线。
 > - 计算成本 (266 个 SPI 在 4520 个样本上的完整基准) 上，CPU 天 为 SCLCS 核心集 (10%) + 仅对选出的 SPI 进行全量验证，对比 穷举评估 (full dataset + all SPIs)，变化 从 >990 CPU 天降至约 100 CPU 天以内，同时保持排名高度一致。
 
-## 概述
+## 概要
 
 对大规模 fMRI 数据集（如 REST-meta-MDD）上的数百种功能连接（FC）建模候选方法（SPI）进行穷举评估时，模型‑数据配对的组合爆炸使计算开销高达数百 CPU 天，导致系统化的 SPI 基准测试无法成为常规预处理步骤。现有的核心集选择方法聚焦于单个分类模型的精度保持，难以迁移至需要保留整个方法集合相对性能排名的全新任务。
 
@@ -52,7 +54,7 @@ claims:
 
 在 REST-meta-MDD 数据集（904 名受试者，4 520 个滑动窗口段）上，SCLCS 仅需 **10%** 的样本，即在脑指纹识别和抑郁症诊断两项 SPI 排名任务中以 **nDCG@k** 指标保留完整排名，且最高优于当前最优基线方法 **23.2%**。同时，完整基准测试的计算成本从 **超过 990 CPU 天** 压缩至 **约 100 CPU 天以内**。消融实验证实，自适应注意力融合、SPS 稳定性度量和密度平衡策略对排名保持均不可或缺。这一工作将核心集选择从传统“保精度”范式拓展至“保排名”范式，为实现大规模 fMRI 连接组学方法的常态化基准评估提供了高效、可扩展的解决方案。
 
-## 背景与动机
+
 
 在功能连接（FC）分析中，研究社区往往会提出大量的信号处理与推断（SPI）算子，期望从中选出最优的建模管线。然而，对大规模 fMRI 数据集上数百种候选 SPI 进行穷举评估时，模型–数据配对的组合爆炸导致计算开销急剧膨胀——仅对一组代表性算子集在数千个样本上运行完整基准，耗时即可超过 990 CPU 天。这种极高的计算门槛使系统化的 SPI 基准测试难以成为常规的预处理步骤，研究者通常被迫依赖少量经验选定的算子而非全面比较，从而埋下了次优建模的风险。
 
@@ -66,7 +68,9 @@ $$
 
 基于上述缺口，本文提出**结构感知对比学习的核心集选择（SCLCS）框架**。其动机源自一个核心观察：通过自适应融合多头注意力的 Transformer 学习样本特定的 FC 同步结构，并以训练过程中结构图的稳定性——即**结构扰动评分（SPS）**——作为与任何特定 SPI 解耦的样本重要性指标，可以识别出代表基础连接原型的稳定样本。进一步，配合密度平衡采样策略，在稳定样本池中提升低密度区域的采样权重，能够在不牺牲排名保持能力的前提下大幅度增强核心集的结构多样性与分布代表性。在 REST‑meta‑MDD 数据集上，仅使用 **10%** 的样本，SCLCS 在排名一致性指标 nDCG@k 上较最强基线提升 **23.2%**，同时将整体基准计算开销从数百 CPU 天降至约 100 CPU 天以内，为大规模功能连接建模的加速自动化评估提供了可行路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SCLCS 针对功能连接（FC）建模基准测试中“模型-数据组合爆炸”的瓶颈，提出了三项关键变更，从根本上区别于仅面向单模型分类性能的现有核心集选择方法。这些创新聚焦于**样本重要性评分准则**、**样本表示学习**以及**采样策略**，协同实现了以极少样本保留全量 SPI（相似性处理接口）排名关系的目标。
 
@@ -107,7 +111,7 @@ $$
 
 通过上述三项创新的协同，SCLCS 在 REST‑meta‑MDD 数据集上仅使用 10% 的样本即可保留全套 266 个 SPI 方法的正确排名，其排名一致性（nDCG@k）比最强基线高出 23.2%，并将穷举基准测试的计算成本从超过 990 CPU 天压缩至约 100 CPU 天以内，使功能连接建模的系统化评估首次变得几乎实时可行（参见 ABSTRACT, Appendix H.1）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/repair_max_0RYazbfSzW_Functional_Connectivity/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the SCLCS framework for ranking-preserving core-set selection. Contrasting with selection for single-model classification (top left), our task is to preserve the performance ranking of SPIs (top right). Our method (bottom) achieves this using a Transformer to learn structures, our novel SPS metric to ensure stability, and a density-aware strategy to promote diversity*
@@ -130,7 +134,7 @@ SCLCS 的整体目标是在保持 SPI 性能排名一致性的前提下，通过
 
 上述模块构成一个端到端的核心集构建流程：输入原始 fMRI 时间序列，经 Transformer 得到注意力结构 → 训练过程中计算 SPS 作为样本重要性评分的替代 → 稳定池筛选 + 密度感知采样输出最终核心集。该核心集随后用于 SPI 的全量基准评估（即仅对核心集计算所有 SPI，再对选出的高性能 SPI 在全量数据上验证），由此将总计算量控制在约 100 CPU 天以内（原穷举评估需 >990 CPU 天），同时以最高 23.2% 的 nDCG@k 优势保留完整排名（Table 2, Table 3）。
 
-## 核心模块与公式推导
+
 
 SCLCS 通过四个顺序组件实现面向 SPI 排名保持的核心集选择：基于注意力融合的功能连接结构学习、结构扰动评分 (SPS)、结构感知的密度平衡采样，以及对比学习。整个流水线围绕一个根本目标：在给定核心集预算 $c$ 下，使完整数据集 $\mathcal{X}$ 与所选子集 $\mathcal{X}'$ 诱导的 SPI 性能排名差异最小化，即
 
@@ -188,7 +192,9 @@ $$
 
 **综合因果链**：自适应融合的 Transformer 作为通用 FC 结构探针 → 对比学习赋予其个体级判别能力 → SPS 区分“纯净/混合”样本 → 密度平衡采样在稳定池中提升低密度区域覆盖率 → 最终以仅 10% 的样本（如 REST‑meta‑MDD 中 452 个样本）高度忠实地保留 266 种 SPI 的排名关系，计算成本从 >990 CPU 天降低至约 100 CPU 天。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：排名保持能力与计算效率
 
@@ -249,7 +255,9 @@ SCLCS 的核心目标是**以极小比例的核心集完整保留 266 个 SPI（
 ![[assets/figures/papers/repair_max_0RYazbfSzW_Functional_Connectivity/figures/010_Table_5.jpg]]
 *Table 5: Table A2: Computational cost for core-set selection methods*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 SCLCS 瞄准的核心任务——在功能连接建模（FC）基准测试中保持全局的 SPI（功能连接计算算子）性能排名——与传统核心集选择方法所解决的问题有根本性差异。现有基线（包括 Random、k‑Means、Forgetting、Entropy、EL2N、AUM、CCS、EVA、BOSS 等）几乎全部源于面向单一分类模型训练的样本筛选框架，其评分机制（遗忘事件数、预测熵、早期误差 L2 范数、分类边际动态等）反映的是样本在特定分类边界上的信息量或难度，而非样本在多算子排名保持中的结构性价值（V/A analysis, “changed_slots” 第一条）。这一出发点决定了它们无法天然适配以“维持尽量多 SPI 的相对优劣顺序”为目标的评估加速场景：SCLCS 被置于一个与这些方法并列但任务定义不同的位置，它在谱系中属于**面向模型排名保持的结构感知核心集选择**，是此项任务的首个系统性解决方案。
 
@@ -287,6 +295,8 @@ SCLCS 的适用性受以下几个关键条件约束。
 - 不同类别的 SPI 算子（例如基于相关、偏相关、动态因果模型等）对结构扰动评分的敏感性差异是否可以提前表征，以设计针对性的选择器？
 - 密度加权与其他评分方法（如 Forgetting、AUM 等）结合时的交互规律——在什么条件下可产生正迁移，什么条件下会破坏原有评分的信息结构？这一规律对于将密度机制泛化为通用后处理模块至关重要。
 - 当数据包含多种扫描协议或条件（静息、任务）时，如何构建可以跨状态对齐的结构探针，使框架同时适用于更加符合实际的基准测试设置？
+
+
 
 ## 原文 PDF
 

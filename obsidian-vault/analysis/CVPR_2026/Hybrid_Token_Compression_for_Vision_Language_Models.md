@@ -43,7 +43,7 @@ claims:
 > - VQAv2 上，Accuracy 72.4 vs 71.8 (VoCo-LLaMA) (+0.6)。
 > - MMBench 上，Accuracy 60.0 vs 57.9 (VoCo-LLaMA) (+2.1)。
 
-## 概述
+## 概要
 
 视觉-语言模型（VLM）的推理效率受限于视觉 token 数量带来的二次注意力成本——典型配置下 576 个 patch token 与文本 token 的联合自注意力构成主要计算瓶颈。现有压缩策略可分为三类：**剪枝**（如 **FastV**, Chen et al., ECCV 2024; **PyramidDrop**, Xing et al., arXiv 2024）直接丢弃视觉 token，虽降低计算量却不可逆地丢失细粒度信息；**连续压缩**（如 **Q-Former**, Li et al., ICML 2023; **VoCo-LLaMA**, Ye et al., CVPR 2025）将 patch 序列压缩为少量连续潜在向量，但单 token 瓶颈无法同时编码离散语义（物体类别、空间布局）与连续视觉细节（纹理、姿态），导致语义稀释和粒度缺失；**离散量化**虽能保留高层语义，却牺牲了连续细节的保真度。
 
@@ -51,7 +51,7 @@ claims:
 
 在 7 个主流视觉理解基准（GQA、VQAv2、MMBench、MME、POPE、SEED-Bench、ScienceQA-Image）上，HTC-VLM 以 580-to-1 的极端压缩比取得 **87.2% 的平均性能保留率**，显著超过领先的连续压缩基线 VoCo-LLaMA（81.0%）。注意力热图进一步证实，压缩后的 `<voco>` token 将最大注意力权重分配给离散语义 token，表明其作为可解释语义载体的有效性。
 
-## 背景与动机
+
 
 ### 视觉-语言模型的 Token 效率困境
 
@@ -78,7 +78,9 @@ claims:
 
 两个通道的表示通过解耦注意力掩码在压缩瓶颈（单个 `<voco>` token）中融合，形成同时保留语义框架和视觉细节的混合潜在表示。这一设计使得 HTC-VLM 在保持单 token 推理效率的前提下，将 7 个基准上的平均性能保留率从 VoCo-LLaMA 的 81.0% 提升至 87.2%，显著突破了效率-保真度权衡。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：单 token 连续压缩的语义稀释与粒度缺失
 
@@ -117,7 +119,7 @@ $$V_{hy} = [v_d; V] \in \mathbb{R}^{580 \times 4096}$$
 
 HTC-VLM 在视觉压缩范式谱系中占据独特位置（Table 5）：不同于 **ToMe**（Bolya et al., arXiv 2022）的 token 合并、**FastV**（Chen et al., ECCV 2024）和 **PDrop**（Xing et al., arXiv 2024）的 token 剪枝、**SparseVLM**（Zhang et al., arXiv 2024）的视觉稀疏化，以及 VoCo-LLaMA 的纯连续压缩，HTC-VLM 首次将**离散量化**与**连续压缩**在单 token 瓶颈中融合，形成了“语义锚定 + 细节保留”的混合压缩范式。
 
-## 整体框架
+
 
 HTC-VLM 的核心设计动机源于对现有视觉 Token 压缩方法瓶颈的深入诊断：**单 Token 连续瓶颈无法同时编码离散语义（如物体类别）与连续视觉细节（如纹理、姿态），导致语义稀释和粒度缺失**。为解决这一问题，HTC-VLM 提出了一种**混合压缩架构**，在压缩前注入极少量（4 个）由 MGVQ 生成的离散语义锚点，恢复高层语义框架，并通过解耦注意力掩码强制信息经由混合潜在变量整合。
 
@@ -174,7 +176,7 @@ Figure 2 的对比直观地揭示了核心创新点：**视觉信息需在压缩
 ![[assets/figures/papers/paper_list_l755_https_arxiv_org_abs_2512_08240/figures/001_Figure_1.jpg]]
 *Figure 1: Vision-token compression. (a) VoCo-LLaMA collapses 576 patches into one \<voco> token, losing semantic structure. (b) HTC-VLM adds 4 discrete semantic tokens and compresses all into one \<voco> token, preserving semantics and visual detail*
 
-## 核心模块与公式推导
+
 
 HTC-VLM 的核心设计在于将视觉信息显式解耦为**离散语义通道**与**连续细节通道**，并通过一个配备解耦注意力掩码的单 token 瓶颈实现融合压缩。以下逐一阐述关键模块及其数学形式。
 
@@ -221,7 +223,9 @@ $$\mathcal{L}_{\mathrm{HTC}} = - \mathbb{E}_{p(I,T,Y)} \left[ \sum_{i=1}^{|Y|} \
 
 该损失在解耦掩码 $M_{hy}$ 约束下，迫使 `<voco>` token 学习同时编码离散语义与连续细节，从而突破单 token 连续瓶颈的效率-保真度权衡。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -325,7 +329,9 @@ Table 5 从信息保留、语义解耦等维度形式化对比了 HTC-VLM 与剪
 ![[assets/figures/papers/paper_list_l755_https_arxiv_org_abs_2512_08240/figures/008_Table_5.jpg]]
 *Table 5: Formal Comparison of Visual Compression Paradigms. We contrast HTC-VLM with Pruning, Continuous Compression, and Discrete Quantization. Notation: N is the original patch count (576), M is the pruned count*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 视觉压缩范式的谱系位置
 
@@ -388,6 +394,8 @@ VoCo-LLaMA 是 HTC-VLM 最直接的技术前身和对比对象。二者共享以
 3. **与 Token 剪枝/合并的协同**：HTC-VLM 的混合压缩策略与 FastV、ToMe 等方法并非互斥——在混合序列构造后，是否可对连续 patch 部分进行选择性剪枝以进一步降低计算开销，同时保留离散语义锚点，是实用的工程方向。
 
 4. **理论解释的深化**：论文通过注意力热图（Figure 3）和表征探测（Table 3）提供了语义解耦的经验证据，但对解耦注意力掩码为何能防止特征过平滑、离散锚点为何能产生“提示效应”的理论机制分析尚浅，有待形式化建模。
+
+
 
 ## 原文 PDF
 

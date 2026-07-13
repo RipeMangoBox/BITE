@@ -42,7 +42,7 @@ claims:
 > - Occ3D-nuScenes (1-3s) 上，Semantic mIoU Avg.（%） 26.42 vs 22.26（COME） (+4.16（+18.7%）)；Geometric IoU Avg.（%） 49.21 vs 44.07（COME） (+5.14（+11.7%）)。
 > - Occ3D-nuScenes（长期 1-8s） 上，Semantic mIoU Avg.（%） 22.33 vs 19.07（COME, Occ GT） (+3.26（+17.1%）)；Geometric IoU Avg.（%） 45.35 vs 29.96（COME, Occ GT） (+15.39（+51.4%）)。
 
-## 概述
+## 概要
 
 4D占用预测（4D occupancy forecasting）旨在从历史传感器观测中推断未来三维场景的几何与语义演变，是自动驾驶世界模型的核心能力之一。现有方法普遍依赖**VAE离散token化**或**BEV几何先验**来压缩占用表示，再通过自回归或扩散模型生成未来帧。这种设计虽然简化了时序建模，但限制了表示容量和时空特征交互，导致**长程预测性能衰减严重**——尤其是在纯相机输入条件下，几何与语义精度随预测时长增加急剧下降。
 
@@ -52,7 +52,7 @@ claims:
 
 从方法谱系看，SparseWorld-TC属于**稀疏查询+注意力融合**的占用世界模型分支，与基于VAE token的OccWorld（Zheng et al., ECCV 2024）、基于BEV的COME等形成鲜明对比。其稀疏锚点机制与3D视觉中的可变形注意力、点云学习中的集合预测方法存在概念关联，但通过将轨迹条件显式注入时空注意力，开辟了条件世界建模的新路径。
 
-## 背景与动机
+
 
 ### 4D占用预测：从静态重建到世界模型
 
@@ -77,7 +77,9 @@ claims:
 
 在Occ3D-nuScenes基准上，SparseWorld-TC-Large以相机输入获得1–3秒平均语义mIoU 26.42%（几何IoU 49.21%），比先前最佳相机方法COME分别提升18.7%和11.7%；在1–8秒长期预测中，语义mIoU 22.33%和几何IoU 45.35%的成绩远超使用地面真值占用的COME（分别提升17.1%和51.4%），证明该架构在长程预测中的性能衰减极小。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SparseWorld-TC 的核心创新在于用**纯注意力 Transformer + 稀疏锚点**彻底重构了 4D 占用世界模型的表示与交互范式，并引入**轨迹条件机制**实现可控的未来场景演化。
 
@@ -125,7 +127,7 @@ SparseWorld-TC 的核心创新在于用**纯注意力 Transformer + 稀疏锚点
 
 这四项创新协同作用，使 SparseWorld-TC 在 Occ3D-nuScenes 基准上以相机输入取得语义 mIoU 26.42%（超越此前最佳方法 COME 18.7%）和几何 IoU 49.21%（超越 11.7%），并在长达 8 秒的长期预测中保持显著领先优势。
 
-## 整体框架
+
 
 SparseWorld‑TC 将 4D 占用预测建模为一个**轨迹条件的稀疏世界模型**，其核心设计是抛弃现有方法中普遍使用的 VAE 离散 token 化和 BEV 几何投影，转而采用**纯注意力 Transformer 架构**，以一组稀疏 3D 锚点作为占用表示，直接从多视图图像特征中端到端地学习未来场景的时空演化。
 
@@ -186,7 +188,7 @@ $$\mathcal{L} = \mathcal{L}_{CD} + \mathcal{L}_{focal}$$
 
 这种设计使得 SparseWorld‑TC 在避免 VAE 信息瓶颈和 BEV 几何约束的同时，通过轨迹条件实现了对场景演化的精确控制，并在 Occ3D‑nuScenes 的 1–3 秒和 1–8 秒预测任务上均大幅超越先前最佳方法。
 
-## 核心模块与公式推导
+
 
 SparseWorld-TC 将未来占用预测建模为一个**纯注意力前馈 Transformer**，其核心由三个关键模块串联而成：稀疏锚点占用表示、轨迹时空嵌入、以及帧级-时间双重注意力融合。
 
@@ -250,7 +252,9 @@ $$
 ![[assets/figures/papers/paper_list_l2041_https_arxiv_org_abs_2511_22039/figures/002_Figure_2.jpg]]
 *Figure 2: Occupancy is modeled as a collection of anchors formed by a bundle of 3D points paired with an occupancy embedding. The embedding is decoded by two MLPs to yield per point offsets and semantic class logits, which denoise sampled points to a consistent occupancy field*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心结果：Occ3D-nuScenes 基准
 
@@ -320,7 +324,9 @@ Figure 10 展示了典型失败案例：
 ![[assets/figures/papers/paper_list_l2041_https_arxiv_org_abs_2511_22039/figures/014_Table_6.jpg]]
 *Table 6: Ablation study on embedding modules. Avg. denotes average performance of mIoU or IoU in 1s, 2s, and 3s*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有工作的关系
 
@@ -355,6 +361,8 @@ SparseWorld-TC 的适用边界由其设计选择决定，在以下场景中表�
 2. **世界模型与运动规划的融合。** 如何利用学习到的未来世界模型直接辅助运动规划与决策？当前框架仅输出未来占用预测，尚未与下游规划模块形成端到端的联合优化。将世界模型嵌入规划循环，是通往自动驾驶世界模型的关键一步。
 
 从知识库定位的角度，SparseWorld-TC 处于**稀疏表示学习**与**世界模型**的交叉点。它在方法上借鉴了 3D 视觉中的可变形注意力机制和点云处理中的倒角距离损失（$\mathcal{L}_{CD}$），在架构上呼应了 Transformer 在序列建模中的优势，在理念上延续了世界模型对"学习预测未来"的追求。其核心贡献在于证明了：**在 4D 占用预测中，稀疏锚点 + 纯注意力 + 轨迹条件的设计组合，可以在不依赖离散 token 和 BEV 投影的前提下，实现显著的性能提升和长时预测稳定性**。
+
+
 
 ## 原文 PDF
 

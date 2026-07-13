@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Avoid_Catastrophic_Forgetting_with_Rank_1_Fisher_from_Diffusion_Models.pdf
+project_link: null
+code_link: https://github.com/Teachable-AI-Lab/iclr2026-rank1-fisher
 aliases:
 - R1EGD
 - ACFR1FFDM
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | 利用扩散模型的秩一Fisher避免灾难性遗忘 |
 | 英文题名 | Avoid Catastrophic Forgetting with Rank-1 Fisher from Diffusion Models |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=zCZcbRsc4g); [GitHub](https://github.com/Teachable-AI-Lab/iclr2026-rank1-fisher) |
+| Links | [paper](https://openreview.net/forum?id=zCZcbRsc4g) · [GitHub](https://github.com/Teachable-AI-Lab/iclr2026-rank1-fisher) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/generative_models_and_autoencoders |
 | Method | Rank-1 EWC with Generative Distillation |
 | Dataset | MNIST, FashionMNIST |
@@ -40,11 +42,11 @@ claims:
 > - MNIST 上，Forgetting (F) 为 0.6 ± 0.1，对比 GD: 2.3 ± 0.8; Diag: 51.1 ± 4.2，变化 遗忘几乎消除。
 > - FashionMNIST 上，Average FID (AFID) 为 15.4 ± 0.6，对比 GD: 19.1 ± 0.9; Diag: 27.7 ± 2.2，变化 优于GD和Diag。
 
-## 概述
+## 概要
 
 本文提出了一种针对扩散模型的持续学习方法，核心思想是利用扩散模型在低信噪比（SNR）区域中经验Fisher信息矩阵的秩一结构，设计了一种计算成本与对角近似相同但能捕获主导曲率方向的秩一EWC（Elastic Weight Consolidation）惩罚项。该方法与生成式蒸馏（Generative Distillation）结合，在类增量图像生成任务中显著减少了灾难性遗忘。实验表明，在MNIST和FashionMNIST上遗忘几乎被消除，在ImageNet-1k上遗忘相比仅使用生成式蒸馏减少了一半以上。
 
-## 背景与动机
+
 
 持续学习（Continual Learning）的核心挑战是灾难性遗忘（Catastrophic Forgetting, McCloskey & Cohen, 1989），即模型在学习新任务时丢失先前任务的知识。现有方法存在根本性局限：
 
@@ -53,7 +55,9 @@ claims:
 
 扩散模型（Ho et al., 2020; Song et al., 2021a）本身具备生成高质量重放样本的能力，但其梯度结构尚未被充分研究。本文的出发点是：扩散模型在低SNR区域是否具有特殊的梯度结构，从而可以设计更有效的EWC惩罚项？
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心洞察是：扩散模型在低SNR区域，其经验Fisher信息矩阵近似为秩一结构，且主导特征方向与平均梯度对齐。基于此，本文提出：
 
@@ -61,7 +65,7 @@ claims:
 2. **秩一EWC惩罚项**：基于秩一Fisher近似设计EWC惩罚项，计算成本与对角近似相同，但能捕获主导曲率方向：$\mathcal{L}_{\mathrm{Rank-1}}(\theta) = \mathcal{L}_T(\theta) + \frac{\lambda}{2} \sum_{k=1}^{T-1} c_k^\star (\mu_k^\top (\theta - \theta_k^\star))^2$
 3. **生成式蒸馏与秩一EWC的互补结合**：生成式蒸馏促进跨任务参数共享，秩一EWC约束重放引起的分布漂移，两者互补。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_generative_models_diffusion__generative_models_and_autoencoders__b001_zCZcbRsc4g_Avoid_Ca/figures/001_Figure_1.jpg]]
 *Figure 1: MSE between model input $x _ { t }$ and the scaled prediction $\hat { x _ { t } }$ at each timestep.*
@@ -77,7 +81,7 @@ claims:
 
 整体训练流程为：在每个新任务上，使用生成式蒸馏损失和秩一EWC惩罚项联合优化模型参数。生成式蒸馏鼓励当前模型在重放样本上匹配教师模型的去噪行为，而秩一EWC则约束参数更新沿主导曲率方向。
 
-## 核心模块与公式推导
+
 
 ### 5.1 扩散模型基础
 
@@ -119,7 +123,9 @@ $$\mathcal{L}_{\mathrm{GD}}(\theta) = \mathbb{E}_{\tilde{x} \sim \tilde{\mathcal
 
 完整目标函数为：$\mathcal{L}_{\mathrm{total}}(\theta) = \mathcal{L}_{\mathrm{Rank-1}}(\theta) + \mathcal{L}_{\mathrm{GD}}(\theta)$
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 6.1 主要结果
 
@@ -187,7 +193,9 @@ Table 1展示了各方法在所有数据集上的最终平均FID（AFID）和平
 ![[assets/figures/papers/iclr26_generative_models_diffusion__generative_models_and_autoencoders__b001_zCZcbRsc4g_Avoid_Ca/figures/025_Table_4.jpg]]
 *Table 4: Detailed dataset configurations and task partitions used in our experiments.*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 本文方法属于持续学习中的正则化方法，具体定位如下：
 
@@ -208,6 +216,8 @@ Table 1展示了各方法在所有数据集上的最终平均FID（AFID）和平
 - 如何理论证明跳跃连接使U-Net更倾向于在PCA-like子空间中操作？
 - 是否可以将秩一Fisher近似与其他正则化方法（如SI、MAS）结合以获得更好效果？
 - 在非扩散模型（如GAN、VAE）中，是否也存在类似的低秩Fisher结构？
+
+
 
 ## 原文 PDF
 

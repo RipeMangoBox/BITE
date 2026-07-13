@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Planning_with_an_Embodied_Learnable_Memory.pdf
+project_link: null
+code_link: null
 openreview_forum_id: 79BOATBal9
 aliases:
 - EPME
@@ -42,7 +44,7 @@ claims:
 > - PARTNR (single-agent) 上，Success Rate 为 HD+DDAFT (learned perception) 0.58 ± 0.02，对比 PP (learned perception) 0.46，变化 +0.12。
 > - PARTNR (single-agent) 上，Success Rate 为 HD+DDAFT (GT perception) 0.68 ± 0.02，对比 PP (GT perception) 0.51，变化 +0.17。
 
-## 概述
+## 概要
 
 ### 问题背景与瓶颈
 
@@ -70,7 +72,7 @@ claims:
 
 EPM在记忆表示谱系中占据独特位置（Table 1）：它是首个同时满足开放词汇、对象关系编码、动态更新、无需显式查询、单一模型、错误校正六项能力的系统。在规划层面，DDAFT与人类演示重放的组合将规划器训练从零样本范式推向在线自适应微调，为具身规划中的感知-规划协同优化提供了新路径。
 
-## 背景与动机
+
 
 具身智能体在动态、大规模家庭环境中执行长期任务（如整理房间、取送物品）时，需要持续感知环境变化并据此调整规划。这一能力的核心瓶颈在于**记忆表示**——智能体如何从自我中心的流式观察中构建并维护对环境的理解。
 
@@ -80,7 +82,9 @@ EPM在记忆表示谱系中占据独特位置（Table 1）：它是首个同时�
 
 本文的核心动机在于：**能否将记忆更新建模为单一可学习 VLM 的序列预测任务，使记忆模块直接输出规划器可消费的文本化环境表示，并通过人类演示重放与难度感知强化学习联合训练，实现感知与规划的高效协同？** 这一思路旨在消除多模型集成的启发式依赖，让记忆的维护与校正成为可端到端学习的能力，同时让规划器在训练中主动适应感知噪声与任务难度。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作针对具身规划中记忆表示的核心瓶颈——动态环境跟踪困难、多模型流水线计算开销大、依赖启发式规则集成、以及规划器需要显式查询才能检索信息——提出了三个层次的关键创新，构成一个从感知到规划的完整闭环。
 
@@ -102,7 +106,7 @@ EPM输出的环境状态 $M^t$ 采用对象中心表示，每个物体由其3D�
 
 实验证据表明，HD（仅人类演示训练）在GT感知下使用8B参数的LLM即超越了70B参数的零样本PP（**PARTNR-Pretrained** (Chang et al., ICLR 2025)）模型，成功率提升0.12；DDAFT在此基础上进一步将PP和HD的成功率分别提升0.15和0.05。在learned perception设置下，HD+DDAFT相对于DynaMem和PP分别实现了55%和12%的绝对成功率提升，证明了从记忆表示到规划训练的端到端创新链条的有效性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_79BOATBal9/figures/001_Figure_1.jpg]]
 *Figure 1: We present a memory representation for embodied planing in large-scale environments. Our method includes Embodied Perception Memory (EPM), a VLM-based system that represents the environment from egocentric observations. Our novel LLM-based planner trained with human demonstrations and RL reason over EPM to plan agent actions*
@@ -142,7 +146,7 @@ EPM输出的环境状态 $M^t$ 采用对象中心表示，每个物体由其3D�
 
 表1从六个维度对比了EPM与主流具身记忆表示（ConceptFusion、ConceptGraphs、3D-Mem、DynaMem）的能力差异。EPM是唯一同时满足**单一模型（Single Model）**、**无需显式查询（No Query）**、**支持动态环境（Dynamics）**、**编码对象关系（Object Relationships）** 和**具备错误校正能力（Error Correction）** 的方法。这一架构统一性使得EPM在动态场景中避免了多模型流水线的累积误差和计算开销。
 
-## 核心模块与公式推导
+
 
 ### 环境状态的形式化定义
 
@@ -206,7 +210,9 @@ EPM作为独立的感知模块，与规划器之间通过**文本化的环境状
 - 规划器可以在GT感知或learned感知两种设置下运行，以分别衡量规划和感知的贡献（Table 3）；
 - 记忆表示本身不依赖特定的规划器架构——PP（零样本LLM）和HD（微调LLM）均可使用相同的EPM输出。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 感知评估：EPM 的独立记忆追踪能力
 
@@ -238,7 +244,9 @@ Table 3 展示了 PARTNR 单智能体基准上的完整规划结果，揭示了�
 
 尽管整体性能显著优于基线，EPM-规划器系统仍存在明确的失败模式。首先，在真实世界感知评估中，EPM 的节点 F1 仅为 0.24，物体分类错误和多实例重关联失败是主要问题。其次，纯文本记忆表示可能遗漏需要视觉推理的对象属性（如液体状态、精细几何形状），这在需要精确物理交互的任务中可能成为瓶颈。此外，当前规划器依赖特权技能策略执行低层动作，实际部署中替换为基于学习的技能模块可能引入额外的控制误差。最后，训练数据完全来自仿真环境，在真实世界动态场景中进行完整规划任务训练留待未来工作。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有记忆表示的关系
 
@@ -276,6 +284,8 @@ EPM 的定位可以从 **Table 1** 的系统对比中清晰看出。现有具身
 - 能否将 EPM 与视觉-语言-动作（VLA）模块结合，实现从高层规划到低层控制的端到端学习，消除对特权技能的依赖？
 - 在更长序列、更大规模的日常任务中，EPM 的记忆更新机制能否保持鲁棒？是否需要引入记忆压缩或选择性遗忘机制？
 - 如何进一步提升边缘 F1，以改善对象间关系建模，从而提升规划质量？
+
+
 
 ## 原文 PDF
 

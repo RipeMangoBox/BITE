@@ -43,7 +43,7 @@ claims:
 > - Multimodal Dialogue (BEAT v2) 上，FGD↓ 7.67 vs 17.87 (LLM+TTS+LOM) (-10.20)。
 > - Multimodal Dialogue 上，Diversity ↑ 11.18 vs 11.02 (LLM+TTS+LOM) (+0.16)；Relevance ↑ 8.23 vs 8.72 (LLM+TTS+LOM) (-0.49)；Naturalness ↑ 8.11 vs 5.62 (SOLAMI) (+2.49)。
 
-## 概述
+## 概要
 
 **U-Mind** 是一个面向实时多模态交互的音视频生成统一框架。其核心目标是解决现有系统在联合训练文本、语音和人体动作时面临的**跨模态对齐差**与**推理能力退化**两大瓶颈——系统往往在获得多模态生成能力的同时，丧失了基础语言模型的符号推理与规划能力。
 
@@ -53,7 +53,7 @@ claims:
 
 在方法谱系上，U-Mind 区别于传统的单阶段多模态微调范式，采用**两阶段训练**（排练驱动预训练 + 指令微调），并将文本、语音、动作统一编码到离散 token 空间，以自回归方式完成多模态生成。相较于 SOLAMI 等端到端系统以及 LLM+TTS+LOM 等管道组合，U-Mind 首次在统一框架内同时实现了高水平的推理能力保持与同步多模态生成。
 
-## 背景与动机
+
 
 ### 问题背景：实时多模态交互的智能鸿沟
 
@@ -85,7 +85,9 @@ claims:
 
 这一设计使得U-Mind能够在多模态对话（Table 1）中，FGD达到7.67，远超SOLAMI的18.43和LLM+TTS+LOM的17.87，同时自然度评分达到8.11（SOLAMI为5.62），验证了统一推理与生成框架的有效性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 U-Mind 的核心创新在于系统性地解决了多模态交互系统中“高智能推理”与“同步多模态生成”难以兼得的根本矛盾。其关键洞察是：**在多模态预训练中混合纯文本推理数据以保持LLM的规划能力，并通过文本首先生成思维链规划再指导同步生成其他模态**。围绕这一洞察，U-Mind 在预训练策略、跨模态对齐、推理保持机制和解码顺序四个维度上进行了针对性设计，形成了完整的创新链条。
 
@@ -118,7 +120,7 @@ U-Mind 的排练学习机制并非简单的数据混合，而是一种**结构�
 
 上述四个创新点构成了一个完整的因果链条：排练学习保护推理能力 → 分段对齐确保跨模态同步 → 文本优先解码将推理结果转化为同步生成指令。这一设计使 U-Mind 在多模态对话中 FGD 达到 7.67，远超 SOLAMI 的 18.43 和 LLM+TTS+LOM 的 17.87（Table 1），验证了“先规划再生成”范式的有效性。
 
-## 整体框架
+
 
 U-Mind 采用**两阶段训练范式**，将文本、语音与人体动作统一到共享的离散表示空间中，以自回归下一 token 预测的方式实现多模态生成。其核心 pipeline 由以下模块串联构成：
 
@@ -145,7 +147,7 @@ U-Mind 采用**两阶段训练范式**，将文本、语音与人体动作统一
 
 > **关键设计要点**：分段对齐与排练学习分别解决了跨模态时间同步和推理退化这两个瓶颈；文本优先解码则将规划与生成解耦，使模型在实时交互中仍能保持高智能。消融实验表明，去除任一组分均会导致相关性或运动质量的显著下降（Table 5、Table 6）。
 
-## 核心模块与公式推导
+
 
 U-Mind 的核心架构围绕“统一离散表示 + 两阶段训练 + 文本优先解码”三条主线展开，以下按模块拆解关键设计。
 
@@ -181,7 +183,9 @@ U-Mind 并非直接生成视频像素，而是将生成的 SMPL-X 姿态与语�
 
 论文未提供独立的数学公式推导。上述模块的核心机制——RVQ-VAE 的残差量化、自回归序列生成、扩散模型的条件去噪——均为已有工作的标准范式，U-Mind 的创新在于系统层面的统一与训练策略设计，而非提出新的数学形式化。若需要具体公式，需参考 RVQ-VAE、SpeechTokenizer、SMPL-X 等原始文献。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈的实证验证
 
@@ -237,7 +241,9 @@ U-Mind的消融实验系统性地验证了其三大设计要素——排练学�
 ![[assets/figures/papers/paper_list_l947_https_arxiv_org_abs_2602_23739/figures/001_Figure_1.jpg]]
 *Figure 1: Given a user query in text or speech, our system performs internal Chain-of-Thought (CoT) planning and produces synchronized responses across text, speech, and gesture. As shown, the model can handle both open-domain dialogue and various instruction-following, generating coherent language, natural prosody, and expressive body motion. The final output is rendered into photorealistic talking videos, showcasing our framework’s capability for high-level multimodal understanding and generation*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有工作的关系
 
@@ -281,6 +287,8 @@ U-Mind 的适用场景受以下边界约束：
 3. **模态扩展**：能否将统一框架扩展到触觉反馈、场景理解、物体交互等更多模态？这需要设计新的离散 tokenizer 并解决模态间的注意力分配问题。
 
 4. **真实场景鲁棒性**：在噪声环境、多说话人、实时对话打断等真实人机交互场景中，系统的鲁棒性和延迟表现如何？需要实际部署验证。
+
+
 
 ## 原文 PDF
 

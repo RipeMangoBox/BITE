@@ -44,7 +44,7 @@ claims:
 > - Wild Scenes 上，Image Quality 0.67 vs 0.65 (YUME) (+0.02)。
 > - Speed (H100 GPU) 上，FPS 25.15 vs N/A。
 
-## 概述
+## 概要
 
 交互世界模型旨在根据用户输入实时生成可交互的视频流，其核心挑战在于同时满足**实时性**与**长时一致性**。现有方法普遍依赖双向注意力机制与高步数扩散去噪，导致生成延迟过高；而自回归范式下的误差累积又严重制约了长序列的视觉质量。Matrix-Game 2.0 针对这一瓶颈，提出了一套从数据生产到模型推理的完整解决方案。
 
@@ -54,7 +54,7 @@ claims:
 
 **方法定位**：Matrix-Game 2.0 属于因果自回归扩散世界模型，其架构衍生自 Wan I2V 设计，移除了文本分支并嵌入帧级动作模块。与 Oasis（Decart, 2024）等实时交互基线相比，其关键差异在于通过蒸馏实现了少步因果生成；与 YUME（Mao et al., 2025）等交互世界生成模型相比，其优势在于实时流式能力与更精确的动作控制。该方法目前的主要局限包括：对训练分布外场景的泛化不足（可能产生过饱和或退化结果）、输出分辨率限制在 352×640、以及缺乏显式长期记忆机制。
 
-## 背景与动机
+
 
 交互世界模型旨在根据用户输入实时生成可控的视频流，为游戏模拟、具身智能和虚拟世界构建提供核心能力。近年来，视频生成模型取得了显著进展，但在构建真正可用的交互世界模型时，仍面临三个根本性瓶颈。
 
@@ -66,7 +66,9 @@ claims:
 
 针对上述问题，**Matrix-Game 2.0** 提出了系统性的解决方案。其核心洞察在于：通过因果架构、少步蒸馏与 KV 缓存机制，可以解耦实时性与长时一致性的矛盾；同时，利用高精度自动化数据生产管道，能够在复杂场景下首次实现 25 FPS 的流式交互世界模型。在 Minecraft 场景上，Matrix-Game 2.0 的图像质量与键盘控制准确率分别达到 0.61 和 0.91，远超同期实时基线 **Oasis**（Decart, 2024）的 0.27 和 0.73（Table 1）；在 Wild 场景上，图像质量以 0.67 超过 **YUME**（Mao et al., 2025）的 0.65，并展现出更强的泛化能力与实时性（Table 2）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Matrix-Game 2.0 的核心创新在于通过**因果架构、少步蒸馏与高精度交互数据**三个维度的协同设计，首次在复杂场景下实现了 25 FPS 的流式交互世界模型，解决了现有方法“实时性不足”与“长时一致性差”的双重瓶颈。
 
@@ -93,7 +95,7 @@ Matrix-Game 2.0 的核心创新在于通过**因果架构、少步蒸馏与高�
 
 这些 changed slots 共同构成了 Matrix-Game 2.0 相对于 Oasis（Decart, 2024）和 YUME（Mao et al., 2025）的核心优势：在 Minecraft 场景上，图像质量从 0.27 提升至 0.61，键盘控制准确率从 0.73 提升至 0.91（Table 1）；在 Wild 场景上，图像质量以 0.67 超越 YUME 的 0.65，并展现出更强的泛化能力与实时性（Table 2）。
 
-## 整体框架
+
 
 Matrix-Game 2.0 的整体框架围绕一个核心目标构建：**在保持高质量视觉生成与精确动作可控性的前提下，实现 25 FPS 的流式交互视频生成**。为此，框架将一条大规模高精度数据生产管道与一个因果自回归扩散模型深度耦合，形成从数据采集到实时推理的闭环系统。
 
@@ -168,7 +170,7 @@ $$\mathcal { L } _ { \mathrm { s t u d e n t } } = \mathbb { E } _ { x , t ^ { i
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2508_13009/figures/004_Figure_4.jpg]]
 *Figure 4: An example for Our Navigation System*
 
-## 核心模块与公式推导
+
 
 ### 3D Causal VAE：时空压缩瓶颈
 
@@ -213,7 +215,9 @@ $$\mathcal{L}_{\mathrm{student}} = \mathbb{E}_{x, t^i} \left\| G_{\phi} \left( \
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2508_13009/figures/010_Figure_10.jpg]]
 *Figure 10: Overview of Causal Diffusion Model Training via Self-Forcing. The distillation process aligns the student model’s distributions with the teacher model’s through self-conditioned generation. This approach effectively mitigates error accumulation while maintaining the generation quality*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验结果
 
@@ -260,7 +264,9 @@ Matrix-Game 2.0 在两个场景设置下进行了定量与定性评估：Minecra
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2508_13009/figures/020_Figure_17.jpg]]
 *Figure 17: Bad cases. Matrix-Game-V2 sometimes fails when handling out-of-domain scenes, like producing over-saturated (left) or degraded (right) results*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 基线比较与核心差异化
 
@@ -300,6 +306,8 @@ Matrix-Game 2.0 的定位是**实时、流式、帧级可控的交互世界模�
 - **物理真实性的提升**：在更复杂的真实世界物理模拟中，是否需要在蒸馏过程中引入物理约束损失或混合训练策略，以进一步降低分布偏移？
 - **多模态交互扩展**：Matrix-Game 2.0 的动作注入模块设计是否可泛化到手柄、语音、甚至自然语言指令？这需要验证交叉注意力机制对异构模态的兼容性。
 - **与现有世界模型的系统性比较**：当前仅在 Minecraft 和 Wild 场景上与 Oasis、YUME 进行了对比。与 Genie-2、Sora 等更大规模世界模型在可控交互维度上的公平比较，仍是开放问题——部分原因在于这些模型的交互能力未完全公开或 API 受限。
+
+
 
 ## 原文 PDF
 

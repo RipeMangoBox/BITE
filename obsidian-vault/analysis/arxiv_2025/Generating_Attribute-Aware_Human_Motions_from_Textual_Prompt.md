@@ -40,7 +40,7 @@ claims:
 > [!tip] 效果简介
 > - HumanAttr test set 上，R-Precision Top-1 ↑ 0.705±0.002 vs 0.685±0.003 (MoMask) (+0.020)；FID ↓ 0.089±0.003 vs 0.245±0.009 (MoMask) (−63.7%)；MM-Dist ↓ 2.266±0.012 vs 2.602±0.009 (MoMask) (−0.336)。
 
-## 概述
+## 概要
 
 现有的文本驱动人体运动生成方法通常仅关注动作语义本身，而忽略了**人的属性（如年龄、性别）对运动模式的系统性影响**。由于文本描述中语义与属性高度耦合，模型无法显式控制生成的运动的属性特征，导致不同属性受试者之间的运动差异被模糊化。
 
@@ -52,7 +52,7 @@ AttrMoGen 由两个核心模块构成：**语义-属性解耦 VQVAE（Decoup-VQV
 
 该方法的主要局限在于：当前仅利用了年龄和性别的离散分组，未能充分利用数据集中约 74% 样本包含的体重和身高信息；属性控制依赖离散分组，可能无法捕捉连续的体格差异。如何将连续属性融入该因果解耦框架，是后续研究的重要方向。
 
-## 背景与动机
+
 
 ### 文本驱动人体运动生成的现状与盲区
 
@@ -68,7 +68,9 @@ AttrMoGen 由两个核心模块构成：**语义-属性解耦 VQVAE（Decoup-VQV
 
 上述问题的根源在于，动作语义（S）与人的属性（A）在观测运动数据（X）中是统计关联的，但二者在因果上应当是可分离的：动作“是什么”不应依赖于“谁”在做。本文的核心动机正是基于这一因果直觉——利用**结构因果模型（SCM）**将运动显式分解为因果性的动作语义 S 和非因果性的人体属性 A，并通过**因果信息瓶颈（CIB）**强制编码器从原始运动中剥离属性信息，从而获得“无属性”的语义令牌。这一设计使得下游的文本-语义预测与属性控制可以独立进行，最终实现真正意义上的属性感知运动生成。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 AttrMoGen 的核心创新在于将**结构因果模型（SCM）**引入文本驱动的人体运动生成，首次显式解耦了动作语义与人的属性（如年龄、性别），从而实现对属性感知运动的可控生成。其关键突破集中在以下三个 **changed slots** 上：
 
@@ -96,7 +98,7 @@ $$\mathcal{L}_{overall} = \mathcal{L}_{vqvae} + \alpha \mathcal{L}_{entropy} + \
 
 **与朴素文本增强的本质区别**：消融实验（Table 6）表明，直接在文本提示中插入属性短语（如 “a man walks”）进行测试（w/ attr test）会严重损害生成质量；即使在训练中引入属性文本（w/ attr train），其性能仍显著低于 AttrMoGen 的显式解耦方案。这证明简单的文本级属性注入无法解开语义与属性在运动数据中的高度耦合，而 AttrMoGen 的因果解耦机制是实现属性感知生成的根本原因。
 
-## 整体框架
+
 
 AttrMoGen 的整体流程分为两个阶段：**语义-属性解耦 VQVAE（Decoup-VQVAE）** 和 **语义生成 Transformer（Semantics Generative Transformer）**。Decoup-VQVAE 负责从原始运动数据中提取与属性无关的动作语义令牌，并在推理时结合用户指定的属性标签重建运动；语义生成 Transformer 则从文本描述中预测这些语义令牌，使模型能够根据文本生成属性感知的运动。
 
@@ -152,7 +154,7 @@ $$\mathcal{L}_{overall} = \mathcal{L}_{vqvae} + \alpha \mathcal{L}_{entropy} + \
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2506_21912/figures/005_Figure_4.jpg]]
 *Figure 4: Overall architecture of our proposed AttrMoGen. The encoder of Decoup-VQVAE uses a causal information bottleneck to decouple action semantics from human attributes, producing attribute-free semantic tokens. The decoder then reconstructs motion from these semantic tokens and attribute labels. The Semantics Generative Transformer predicts semantic tokens from textual input, which are subsequently combined with attribute inputs to generate attribute-aware human motions during inference*
 
-## 核心模块与公式推导
+
 
 AttrMoGen 的核心由两个模块构成：**语义-属性解耦 VQVAE（Decoup-VQVAE）** 和 **语义生成 Transformer**。Decoup-VQVAE 负责从原始运动数据中提取无属性的语义令牌，语义生成 Transformer 则从文本输入预测这些语义令牌，推理时将预测的语义令牌与用户指定的属性标签结合，通过解码器生成属性感知的运动。
 
@@ -205,7 +207,9 @@ $$\mathcal{L}_{overall} = \mathcal{L}_{vqvae} + \alpha \mathcal{L}_{entropy} + \
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2506_21912/figures/004_Figure_3.jpg]]
 *Figure 3: Structural Causal Model for our Decoup-VQVAE. Our objective is to learn an encoder capable of decoupling the Y -causative action semantics S from raw motion X*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -263,7 +267,9 @@ AttrMoGen 的属性控制精度通过分类准确率量化（表 5）。当使�
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2506_21912/figures/014_Figure_7.jpg]]
 *Figure 7: Statistics of weight (in kg), height (in cm) of the HumanAttr dataset*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位与核心差异
 
@@ -313,6 +319,8 @@ $$CIB(X,Y,S,A) = I(X;S,A) + I(Y;S) - I(S;A) - \lambda I(X;S)$$
 2. **跨域泛化**：该因果解耦机制能否推广至真实视频数据中的运动生成？视频中的属性信息（如衣着、体型）可能与运动语义存在更复杂的混杂。
 3. **未见属性组合**：模型在训练时未见过的属性组合（如极端年龄 + 特定动作类型）下的生成质量和语义保持能力如何？
 4. **反事实生成的可靠性**：Figure 8 展示了反事实运动可视化，但缺乏系统的量化评估（如用户研究或属性分类一致性指标），该能力的鲁棒性需要进一步验证。
+
+
 
 ## 原文 PDF
 

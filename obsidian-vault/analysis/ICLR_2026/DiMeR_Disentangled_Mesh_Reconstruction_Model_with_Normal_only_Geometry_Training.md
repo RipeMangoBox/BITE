@@ -43,7 +43,7 @@ claims:
 > - OmniObject3D 上，CD (↓) 0.024 (DiMeR GT) vs 0.034 (PRM) (29.4% ↓)。
 > - GSO (single-image-to-3D) 上，CD (↓) 0.052 (DiMeR) vs 0.059 (PRM) (11.9% ↓)。
 
-## 概述
+## 概要
 
 从单张或多张 RGB 图像重建三维网格面临一个根本性瓶颈：**纹理与几何的耦合**。同一张 RGB 图像可能对应多种几何-纹理组合，导致训练目标冲突，网络倾向于收敛到模糊的平均解。此外，主流方法中常用的网格提取组件（如 FlexiCubes）存在冗余计算且缺乏三维监督，进一步限制了重建精度。
 
@@ -53,7 +53,7 @@ DiMeR 提出了一条解耦路径来解决上述问题。其核心洞察是：**
 
 DiMeR 在稀疏视图重建和单图像到三维任务上均取得了领先性能，但其重建质量依赖于外部法线预测模型的精度，且目前仅针对目标级重建，无法处理场景级输入。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -79,7 +79,9 @@ DiMeR 在稀疏视图重建和单图像到三维任务上均取得了领先性�
 
 通过上述设计，DiMeR旨在从根本上解决几何-纹理耦合导致的训练冲突问题，显著提升网格重建的几何精度与稳定性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DiMeR 的核心创新在于**将几何与纹理的学习过程彻底解耦**，以消除传统 RGB 图像输入带来的几何‑外观歧义。这一设计围绕三个关键“改变点”（changed slots）展开：几何分支的输入格式、网格提取组件的精简，以及几何监督信号的重构。
 
@@ -108,7 +110,7 @@ DiMeR 将几何分支的输入**替换为仅法线图**。法线图只编码表�
 
 **需要手动验证的内容**：PBR 期望损失中环境光和材质的随机采样策略的具体参数范围、以及其对真实世界多样性的覆盖程度，在现有分析证据中未充分展开，建议查阅原文 Sec 3.1 的补充细节。
 
-## 整体框架
+
 
 DiMeR 的核心设计是将网格重建任务**解耦为几何分支与纹理分支**，从根本上切断 RGB 外观与三维形状之间的模糊耦合。如图 3 所示，框架的上半部分为几何分支，**仅接收法线图作为输入**；下半部分为纹理分支，接收 RGB 图像作为输入。两个分支独立训练，分别由几何专用损失和外观专用损失监督，最终在网格顶点级别通过坐标投影实现纹理映射。
 
@@ -155,7 +157,7 @@ DiMeR 的核心设计是将网格重建任务**解耦为几何分支与纹理分
 ![[assets/figures/papers/paper_list_l72_https_openreview_net_forum_id_fK2pCgoavb/figures/004_Figure_4.jpg]]
 *Figure 4: Pipelines for sparse-views, single-image-, and text-to-3D*
 
-## 核心模块与公式推导
+
 
 DiMeR 的核心设计在于将几何重建与纹理生成解耦为两个独立分支，并通过精心设计的损失函数与精简的网格提取模块，消除外观歧义对几何学习的干扰。
 
@@ -221,7 +223,9 @@ $$\mathcal{L}_t = (\hat{\mathcal{T}} - \mathcal{T}_{\mathrm{GT}})^2 + \mathrm{LP
 ![[assets/figures/papers/paper_list_l72_https_openreview_net_forum_id_fK2pCgoavb/figures/002_Figure_2.jpg]]
 *Figure 2: (a) exhibits difficulty in distinguishing geometry from RGB images. (b) shows the conflict input-GT pairs in datasets due to problem (a), hindering the training. (c) illustrates our idea: disentangle the mixed solution space containing multiple feasible solutions into two separate spaces with unbiased input. Samples are from the Objavers dataset (Deitke et al., 2023)*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 一、核心定量结果
 
@@ -312,7 +316,9 @@ DiMeR 的性能增益来源于三个核心设计选择：仅法线几何输入�
 ![[assets/figures/papers/paper_list_l72_https_openreview_net_forum_id_fK2pCgoavb/figures/010_Figure_6.jpg]]
 *Figure 6: The qualitative comparison for single-image-to-3D. Please note that the results of Mesh-Former are obtained from their project page and do not use the same input as other methods*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位与核心瓶颈
 
@@ -385,6 +391,8 @@ DiMeR 的适用边界由以下因素界定：
 - **更少视图下的表现**：论文主要评估了 4-6 视图的重建质量，在 2-3 个视图的极端稀疏场景下，法线图的歧义性是否仍能保持低水平？这需要进一步实验验证。
 
 - **非刚性物体与动态场景**：DiMeR 假设物体几何是静态的，法线图与 SDF 的一一映射关系在非刚性变形下是否仍然成立？这关系到方法向可变形物体重建的推广可能性。
+
+
 
 ## 原文 PDF
 

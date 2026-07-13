@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/A_Noise_is_Worth_Diffusion_Guidance.pdf
+project_link: null
+code_link: null
 aliases:
 - NIWDG
 acceptance: accepted
@@ -41,7 +43,7 @@ paradigm: 通过学习将高斯噪声映射到富含结构化低频信息的“�
 > - MS-COCO 2014 validation 上，IS 为 34.90 (Refined, unguided)，对比 20.86 (Gaussian, unguided)，变化 +14.04。
 > - ImageNet (class-conditional, SiT-XL/2) 上，FID 为 10.80 (Refined, unguided)，对比 18.43 (Gaussian, unguided)，变化 -7.63。
 
-## 概述
+## 概要
 
 扩散模型在缺少采样引导（如无分类器引导 CFG）时，生成质量严重退化，常出现结构崩解和语义失配。现有引导蒸馏方案虽能提升无引导采样的质量，但需要修改去噪网络，容易导致灾难性遗忘、与 LoRA 等微调模块不兼容，且训练计算开销较大。因此，亟需一种既保持扩散管线完整、又能在无引导条件下获得接近引导采样质量的方案。
 
@@ -49,7 +51,7 @@ paradigm: 通过学习将高斯噪声映射到富含结构化低频信息的“�
 
 实验结果表明，提炼噪声在多个扩散骨干上均带来显著的质量跃升：在 MS‑COCO 30K 提示下，SD2.1 的 FID 从无引导高斯噪声的 42.71 降至 14.62，IS 从 20.86 升至 34.90；SDXL 的 FID 从 63.28 降至 26.22（Table 2）。用户研究中，无引导的提炼噪声在图像质量上的偏好率（53.96%）已略微超过有引导的高斯噪声（46.04%）（Table 3）。此外，提炼网络可直接泛化到未曾见过的微调模型（Table 4），并与 SD‑Turbo 等时间步蒸馏模型无缝协同，单步推理性能即超过两步高斯噪声（Table 5）。推理耗时与无引导高斯噪声相当，远低于有引导采样。当前方法的局限主要在于训练阶段仍需引导采样作为监督信号，且极端低步数下增益有限，但所开启的“噪声蒸馏”范式为扩散生成提供了一条不侵入模型、高兼容且低成本的高效路径。
 
-## 背景与动机
+### 背景与动机
 
 扩散模型（如 SD、SiT）在生成高质量图像时高度依赖采样引导（例如无分类器引导 CFG）。若不使用引导，模型往往生成结构崩坏、语义混乱的图像：在 MS-COCO 验证集上，SD2.1 的无引导 FID 高达 42.71，而 CFG 可将 FID 降至 14.62（表2）。然而 CFG 会导致推理计算量翻倍（图1），限制了实用场景的效率。另一条技术路线——引导蒸馏（Meng et al.）将引导信号直接蒸馏到学生去噪网络中，试图在单次前向传播中保留引导效果。但这类方法必须修改或微调原始去噪网络，引发三个连锁瓶颈：① 灾难性遗忘，损害已学到的泛化知识；② 与后续微调模块（如 LoRA）不兼容，破坏管线灵活性（图14）；③ 蒸馏训练本身计算开销大。因此，寻找一种既不修改扩散模型、又能大幅提升无引导生成质量的方案成为关键缺口。
 
@@ -57,7 +59,7 @@ paradigm: 通过学习将高斯噪声映射到富含结构化低频信息的“�
 
 基于此，我们提出 **NoiseRefine**：用一个轻量的噪声提炼网络 $g_\phi$（例如基于 LoRA 的适配器）将随机高斯噪声映射为富含低频结构的**提炼噪声** $\hat{x}_T$，在图像空间最小化无引导去噪结果与有引导目标图像之间的差异，且全程不修改预训练扩散模型。该设计使提炼噪声能够即插即用地泛化到各类微调模型（图8a, 表4）和时间步蒸馏模型（图8b, 表5），并在保持与 CoT 模块完全兼容的同时，将推理速度降至与无引导高斯噪声相当（表7）。
 
-## 核心创新
+## 核心方法与创新机理
 
 NoiseRefine 的核心创新在于**将扩散引导信号从“修改去噪模型”转移到“精炼初始噪声”**，从而在保持原始扩散管线完整性的前提下，实现无引导的高质量生成。相较于引导蒸馏（Guidance Distillation）等基线方法，NoiseRefine 主要改变了以下关键设计槽位（changed slots），每个改变均对性能提升形成决定性贡献。
 
@@ -92,12 +94,12 @@ NoiseRefine 的核心创新在于**将扩散引导信号从“修改去噪模型
 
 上述四个改变相互耦合，共同构成了 NoiseRefine 的核心机制：**通过图像空间损失训练，利用多步分数蒸馏学习一个不对原始模型产生任何修改的噪声提炼网络，从而将引导信息压缩至低频结构化噪声中，实现无引导高质量生成。**
 
-## 整体框架
+### 整体框架
 
-![[obsidian-vault/assets/figures/papers/repair_max_xEWooSOgaz_A_Noise/figures/003_Figure_2.jpg]]
+![[assets/figures/papers/repair_max_xEWooSOgaz_A_Noise/figures/003_Figure_2.jpg]]
 *Figure 2: Motivation and training framework of NoiseRefine. (a) Starting from an initial noise x _ { T } , unguided sampling often produces low-quality images, necessitating sampling guidance such as \mathrm { C F G } . In contrast, the inversion noise x _ { T } ^ { \mathrm { G u i d e } } , obtained by inverting guidance-generated images from the same x _ { T } , can yield high-quality results even without guidance. This raises our central question: can we learn to map x _ { T } into \hat { x } _ { T } ? (b) Learning with a reconstruction loss between x _ { T } and x _ { T } ^ { \mathrm { G u i d e } } may be suboptimal due to errors during inversion. Instead, our model learns to refine x _ { T } in...*
 
-![[obsidian-vault/assets/figures/papers/repair_max_xEWooSOgaz_A_Noise/figures/005_Figure_3.jpg]]
+![[assets/figures/papers/repair_max_xEWooSOgaz_A_Noise/figures/005_Figure_3.jpg]]
 *Figure 3: Analysis of the relationship between x _ { T } and x _ { T } ^ { \mathbf { G u i d e } } . (a) Histogram of pixel-wise absolute differences. Blue: pairs of Gaussian noise and corresponding inversion noise; Orange: pairs of random Gaussian noise. (b) Magnitude difference of Fourier components, showing that x _ { T } and x _ { T } ^ { \mathrm { G u i d e } } mainly differ in lowfrequency regions*
 
 NoiseRefine 的整体 pipeline 围绕一个核心思路构建：在保持扩散模型冻结的前提下，通过学习一个**噪声提炼网络** $g_\phi$，将标准高斯噪声转换为富含**低频结构信息**的“提炼噪声” $\hat{x}_T$，从而在无引导采样下直接生成高质量图像。该框架的动机源于现有引导蒸馏方法（如 Meng et al.）需要修改去噪网络而导致的**灾难性遗忘**与**微调模块不兼容**问题，以及无引导高斯噪声因缺乏结构化先验导致生成崩溃的瓶颈（Sec 1, Sec 4.3）。整体框架完全避免了对原始扩散模型的任何微调，确保了与 LoRA 适配器、微调模型和时间步蒸馏模型的原生兼容性（Fig. 14, Table 4, Table 5）。
@@ -132,7 +134,7 @@ NoiseRefine 的整体 pipeline 围绕一个核心思路构建：在保持扩散�
 
 综上，NoiseRefine 的框架将“引导信息”从传统的去噪网络修改方式转移到初始噪声空间，以**即插即用的噪声提炼器**实现了无引导高质量生成，同时继承了原扩散模型的所有下游兼容性。
 
-## 核心模块与公式推导
+### 核心模块与公式推导
 
 NoiseRefine 的核心思想是将随机高斯噪声映射到富含结构化低频成分的“提炼噪声”，从而在不使用采样引导的情况下提升生成质量。现有引导蒸馏方法需要修改去噪网络，导致灾难性遗忘、与微调模块（如 LoRA）不兼容，且训练计算开销大。NoiseRefine 完全冻结原始扩散模型，仅在初始噪声空间附加一个可训练的提炼网络，通过图像空间的重构损失进行优化，训练稳定且保持管线完整性。
 
@@ -181,16 +183,16 @@ $$
 
 综上，NoiseRefine 通过冻结去噪网络、仅训练轻量噪声提炼网络、采用图像空间 MSD 损失，实现了将计算昂贵的引导信号蒸馏进初始噪声，使无引导采样质量达到甚至超越有引导高斯噪声的水平。
 
-## 实验与分析
+## 实验与关键发现
 
-![[obsidian-vault/assets/figures/papers/repair_max_xEWooSOgaz_A_Noise/figures/007_Table_1.jpg]]
+![[assets/figures/papers/repair_max_xEWooSOgaz_A_Noise/figures/007_Table_1.jpg]]
 
-![[obsidian-vault/assets/figures/papers/repair_max_xEWooSOgaz_A_Noise/figures/014_Table_2.jpg]]
+![[assets/figures/papers/repair_max_xEWooSOgaz_A_Noise/figures/014_Table_2.jpg]]
 *Table 2: Quantitative comparison of image quality. 30K prompts from MS-COCO (Lin et al., 2014) validation dataset were used for evaluation. Guidance Distil. indicates guidance distillation (Meng et al., 2023). Table 3: User study on image quality and prompt adherence*
 
-![[obsidian-vault/assets/figures/papers/repair_max_xEWooSOgaz_A_Noise/figures/015_Table_3.jpg]]
+![[assets/figures/papers/repair_max_xEWooSOgaz_A_Noise/figures/015_Table_3.jpg]]
 
-![[obsidian-vault/assets/figures/papers/repair_max_xEWooSOgaz_A_Noise/figures/013_Figure_8.jpg]]
+![[assets/figures/papers/repair_max_xEWooSOgaz_A_Noise/figures/013_Figure_8.jpg]]
 *Figure 8: Generalizability and compatibility of refined noise. (a) Results on fine-tuned models (animation and clay object domains) comparing Gaussian vs. refined noise. (b) Results on timestepdistilled models (SD-Turbo), showing that refined noise improves structural coherence and quality over Gaussian noise*
 
 ### 主要结果：提炼噪声在无引导下实现质量飞跃
@@ -226,7 +228,7 @@ $$
 - **表 2、7、3**：贯穿定量质量、计算效率与人类偏好三个维度的核心指标，支撑“无引导可替代有引导”的结论。
 - **图 8、表 4–5**：验证提炼噪声作为独立模块的即插即用能力，这是其相较 Guidance Distillation 类方法的关键工程优势。
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 **范式定位**  
 NoiseRefine 并未遵循「将引导信号蒸馏进去噪网络」的主流路径（如 Meng et al. 的 guidance distillation），也不同于直接学习初始噪声到反转噪声映射的简单方案，而是通过一个可训练的噪声提炼网络 $g_\phi$，在高斯噪声空间与引导生成图像的隐式结构化噪声之间建立映射。该方法的核心干预点位于**生成管线的入口——初始噪声**，而非去噪过程本身。这一设计使其从根本上区别于：
@@ -270,10 +272,11 @@ NoiseRefine 在这幅谱系图中的独特之处在于：它**冻结原始扩散
 
 整体而言，NoiseRefine 在扩散生成方法谱系中开辟了一条「入口优化」的新路径，其核心洞察（将引导信息蒸馏到噪声空间而非模型权重）不仅解耦了质量与推理成本，也保留了预训练模型生态的全部兼容性。上述局限和开放问题指明了进一步降低训练依赖、增强可控性以及向多模态扩展的后续研究方向。
 
+### 相关样本
+
+- [[analysis/ICLR_2026/Adaptive_Moments_are_Surprisingly_Effective_for_Plug-and-Play_Diffusion_Sampling.md|Adaptive Moments]]：同属 diffusion guidance 样本，可对照噪声先验细化与显式引导梯度稳定化。
+
+
 ## 原文 PDF
 
-## 相关样本
-
-- [[obsidian-vault/analysis/ICLR_2026/Adaptive_Moments_are_Surprisingly_Effective_for_Plug-and-Play_Diffusion_Sampling.md|Adaptive Moments]]：同属 diffusion guidance 样本，可对照噪声先验细化与显式引导梯度稳定化。
-
-![[obsidian-vault/paperPDFs/ICLR_2026/A_Noise_is_Worth_Diffusion_Guidance.pdf]]
+![[paperPDFs/ICLR_2026/A_Noise_is_Worth_Diffusion_Guidance.pdf]]

@@ -5,6 +5,8 @@ paper_level: A
 venue: SIGGRAPH
 year: 2024
 pdf_ref: paperPDFs/SIGGRAPH_2024/Motion_I2V_Consistent_and_Controllable_Image_to_Video_Generation_with_Explicit_Motion_Modeling.pdf
+project_link: null
+code_link: null
 aliases:
 - MI
 - Motion-I2V
@@ -40,7 +42,7 @@ claims:
 > - UCF-101 / MSR-VTT 上，Frame Consistency 为 0.9871。
 > - UCF-101 / MSR-VTT 上，Prompt Consistency 为 34.86。
 
-## 概述
+## 概要
 
 图像到视频生成（I2V）的核心挑战在于，如何在仅给定单张静态参考图像的情况下，合成一段时序连贯且运动幅度可控的视频。现有主流方法——如 **DynamiCrafter**（Xing et al., 2023）、**I2VGen-XL**（Zhang et al., 2023）等——主要依赖视频扩散模型中的一维时序注意力机制来隐式地学习动态信息。这种设计的根本瓶颈在于：一维时序注意力的时间感受野有限，当目标运动幅度较大或涉及显著视角变化时，模型难以在长时序跨度上维持内容的一致性，往往导致生成视频的运动幅度偏小或出现内容失真。与此同时，这些方法普遍缺乏对生成运动的精细控制手段，用户无法指定特定区域的动作轨迹或动画范围。
 
@@ -52,7 +54,7 @@ Motion-I2V 针对上述瓶颈提出了一个显式运动建模框架，其核心
 
 该方法也存在一定局限：生成视频往往呈现中等亮度，可能与噪声调度未强制最后时间步达到零信噪比有关；此外，两阶段框架向任意长视频生成以及三维场景动态建模的扩展仍是待探索的开放问题。
 
-## 背景与动机
+
 
 图像到视频（Image-to-Video, I2V）生成的目标是从单张静态图像出发，合成一段时序连贯的视频。近年来，基于扩散模型（Diffusion Models）的视频生成方法取得了显著进展，但在I2V任务中仍面临两个核心瓶颈。
 
@@ -64,7 +66,9 @@ Motion-I2V 针对上述瓶颈提出了一个显式运动建模框架，其核心
 
 Motion-I2V 的核心动机正是打破这一隐式建模范式。其关键洞察在于：**将I2V生成解耦为“预测运动”与“传播内容”两个阶段**。第一阶段显式地推理出参考图像中每个像素在未来帧中的运动轨迹，形成稠密的运动场；第二阶段则利用这些预测的运动场，通过特征扭曲（warping）和运动增强的时序注意力，将参考图像的内容忠实地传播到所有生成帧中。这种解耦不仅通过扩大时序感受野缓解了大运动下的不一致问题，还天然地为运动控制提供了接口——用户只需在第一阶段输入稀疏轨迹或运动区域蒙版，即可精确操控生成视频中的运动。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Motion-I2V 的核心创新在于将图像到视频生成（I2V）**显式解耦为运动预测与内容传播两个阶段**，从而突破了现有方法的两大瓶颈：一维时序注意力有限的时间感受野，以及缺乏对生成运动的精细控制能力。
 
@@ -88,7 +92,7 @@ $$z'' = \mathrm{Attention}(Q, K, V) = \mathrm{Softmax}(QK^T)V$$
 
 这一可控性扩展源于框架的模块化设计：运动预测是独立的生成任务，因此可以像文生图中的 ControlNet 一样，通过注入额外条件来引导运动场的生成，而无需重新设计整个视频生成管线。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l3_Motion_I2V_Consistent_and_Controllable_Image_to_Video_Generation_with_Ex/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of trajectory ControlNet. We train a Trajectory ControlNet based on the pre-trained stage 1 of Motion-I2V. It takes sparse trajectories and corresponding binary mask as additional conditions, and output dense optical flow maps*
@@ -113,7 +117,7 @@ Motion-I2V 将图像到视频生成（I2V）解耦为两个显式阶段，核心
 
 **可控性扩展**：在第一阶段预训练模型的基础上，可训练一个轨迹 ControlNet（Figure 3），接收用户绘制的稀疏轨迹和对应二值蒙版作为额外条件，输出稠密光流场，从而支持精确的运动轨迹控制和区域特定动画（运动刷）。
 
-## 核心模块与公式推导
+
 
 Motion-I2V 将图像到视频生成分解为两个串联阶段，其核心模块围绕显式运动建模展开：第一阶段预测稠密运动场，第二阶段利用该运动场进行特征传播与帧合成。
 
@@ -149,7 +153,9 @@ $$z'' = \mathrm{Attention}(Q, K, V) = \mathrm{Softmax}(QK^T)V$$
 
 为实现精细的运动控制，Motion-I2V 在第一阶段预训练模型的基础上训练了一个轨迹 ControlNet。该模块接收用户绘制的稀疏轨迹和对应的二值蒙版作为额外条件，输出稠密光流图。对于区域特定动画（运动刷），输入稀疏光流 $f_{sparse}$ 设为零图，蒙版 $m$ 中用户指定区域置为 0、其余区域置为 1，使未蒙版区域保持静止。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -195,7 +201,9 @@ Motion‑I2V 在指令遵循能力与时序一致性两项核心指标上均优�
 *Figure 4: Examples of sparse trajectory guided I2V. Users can precisely control the synthesized motions by drawing one or multiple trajectories (red curved arrow)*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与已有方法的关系
 
@@ -222,6 +230,8 @@ Motion‑I2V 的两阶段设计在带来大运动一致性和精细控制能力�
 - 如何从噪声调度或后处理层面解决生成视频的亮度偏暗问题，是该方法的直接改进方向。
 - 两阶段框架能否扩展至任意长视频生成并保持时序一致性，需要进一步验证轨迹预测的长期稳定性和注意力机制的可扩展性。
 - 显式运动建模是否可以推广到三维场景表示（如 NeRF、3D Gaussian Splatting）或更复杂的物理动态生成，是该方法向三维生成领域延伸的关键问题。
+
+
 
 ## 原文 PDF
 

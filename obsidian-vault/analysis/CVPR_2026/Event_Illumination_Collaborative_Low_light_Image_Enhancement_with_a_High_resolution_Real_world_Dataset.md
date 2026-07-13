@@ -44,7 +44,7 @@ claims:
 > - SDE-outdoor 上，PSNR 24.22 vs 23.21 (EvLight) (+1.01 dB)。
 > - SDSD-indoor 上，PSNR 29.76 vs 28.52 (EvLight) (+1.24 dB)。
 
-## 概述
+## 概要
 
 低光图像增强（Low-light Image Enhancement, LIE）是计算机视觉中的基础任务，旨在从严重欠曝光的图像中恢复出正常光照下的清晰视觉内容。传统基于帧图像的增强方法在极端低光条件下往往面临纹理丢失和噪声放大的困境。事件相机（event camera）因其高动态范围（HDR）和微秒级时间分辨率，能够捕捉低光场景中帧图像丢失的边缘和运动信息，为低光增强提供了新的模态补充。
 
@@ -60,7 +60,7 @@ claims:
 
 在方法谱系中，EIC-LIE 处于事件-图像多模态增强与 Retinex 理论的交叉点。它既区别于纯图像域的 Retinex 方法（如 **MambaLLIE**），也不同于仅做单向选择性融合的事件-图像方法（如 **EvLight**），而是通过双向协同交互和光照感知滤波，构建了更完整的低光增强范式。此外，本文还贡献了高分辨率真实世界数据集 RLE，为事件-图像增强提供了更严格的对齐基准。
 
-## 背景与动机
+
 
 低光图像增强旨在从光照不足的观测中恢复出正常光照下的清晰图像，是计算摄影与底层视觉中的基础问题。传统方法依赖Retinex理论，将图像建模为反射分量与光照分量的逐元素乘积 $\mathbf{I} = \mathbf{R} \odot \mathbf{L}$，通过估计并调整光照分量来实现增强。然而，在极端低光条件下，帧式相机捕获的图像存在严重的噪声和细节丢失，使得单纯依靠图像先验的增强方法面临信息瓶颈。
 
@@ -70,7 +70,9 @@ claims:
 
 针对上述缺口，本文提出事件-光照协同低光图像增强框架 **EIC-LIE**。核心动机在于：将事件的高动态范围边缘细节与图像的光照先验进行**双向互补增强**——通过前向收集从事件和光照特征中汇聚信息，再通过反向注入将融合后的特征精炼回各模态；同时，利用**亮度引导的自适应滤波**机制，根据图像亮度统计动态调整事件特征的滤波权重，在提升纹理恢复的同时有效抑制低光噪声。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 EIC-LIE 的核心创新在于突破现有事件-图像融合方法中“简单特征拼接或选择性融合”的范式，转而构建**事件与光照信息的双向协同交互机制**，并引入**光照感知的动态事件去噪**，从而系统性地解决真实低光场景下纹理恢复与噪声抑制的矛盾。
 
@@ -135,7 +137,7 @@ EIC-LIE 通过两个核心模块——**事件-光照协同交互模块（EICI�
 
 综上，EIC-LIE 的核心创新在于将事件-图像增强从“信息筛选”范式升级为“双向协同 + 动态去噪”范式，通过因果性设计解决了真实低光场景下纹理恢复与噪声抑制的固有矛盾。
 
-## 整体框架
+
 
 EIC-LIE 的整体 pipeline 以“事件-光照协同”为核心设计理念，将事件相机的高动态范围（HDR）边缘细节与帧相机的光照先验进行双向互补增强。如图 2(a) 所示，框架由四个主要模块串联构成：光照先验估计、事件堆叠表示、EICI（事件-光照协同交互）模块、IAEF（光照感知事件滤波器），以及最终的图像重建解码器。
 
@@ -152,7 +154,7 @@ EIC-LIE 的整体 pipeline 以“事件-光照协同”为核心设计理念，�
 ![[assets/figures/papers/paper_list_l749_https_arxiv_org_abs_2605_22186/figures/003_Figure_2.jpg]]
 *Figure 2: An overview of (a) our EIC-LIE. The core modules of EIC-LIE are (b) Event-Illumination Collaborative Interaction (EICI) and (c) Illumination-aware Event Filter (IAEF). Details of each module can be found in supp*
 
-## 核心模块与公式推导
+
 
 EIC-LIE 的核心设计围绕两个关键模块展开：**事件-光照协同交互模块（EICI）** 与 **光照感知事件滤波器（IAEF）**。前者实现事件与光照特征的双向互补增强，后者利用光照先验对事件特征进行自适应去噪。以下逐一推导其数学机理。
 
@@ -243,7 +245,9 @@ $$\hat{\mathbf{F}}_e(m,n) = \sum \mathbf{W}(m,n) \cdot \mathbf{K}(m,n) \cdot \ma
 ![[assets/figures/papers/paper_list_l749_https_arxiv_org_abs_2605_22186/figures/004_Figure_3.jpg]]
 *Figure 3: (a) t-SNE analysis of features in EICI without attention reuse. Note that*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 数据集与实验设置
 
@@ -313,7 +317,9 @@ Figure 5 展示了 RLE 数据集上的视觉对比结果。EIC-LIE 在恢复暗�
 ![[assets/figures/papers/paper_list_l749_https_arxiv_org_abs_2605_22186/figures/005_Figure_4.jpg]]
 *Figure 4: The hardware implementation of our imaging system. In (d), from left to right, each represents low-light images, normal-light images, and aligned event streams, respectively. Refer to supp. to find more video samples of the RLE dataset*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题脉络与现有方法瓶颈
 
@@ -364,6 +370,8 @@ $$\hat{\mathbf{F}}_e(m,n) = \sum \mathbf{W}(m,n) \cdot \mathbf{K}(m,n) \cdot \ma
 3. **动态场景下的光照先验稳定性。** 光照先验从低光图像的通道最大值中提取，在动态光照变化场景下（如移动光源、闪烁），单帧光照估计可能失效。事件流本身包含光照变化信息，如何利用事件流辅助光照先验的动态更新是一个开放方向。
 
 4. **与最新基础模型的整合潜力。** 论文未讨论EIC-LIE与视觉基础模型（如扩散模型、视觉Transformer预训练模型）的整合可能性。事件-光照协同交互的框架是否可以作为即插即用的模块嵌入更大规模的增强系统中，值得探索。
+
+
 
 ## 原文 PDF
 

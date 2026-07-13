@@ -45,7 +45,7 @@ claims:
 > - Customized Video Generation (DiT-based, WAN2.1 backbone) 上，Motion Fidelity (运动保真度) 62.89 (SMRABooth) vs DualReal (次优) (Significantly outperforms DualReal and all other baselines)。
 > - User Study (DiT-based methods, 5-point Likert scale) 上，Prompt Alignment (提示对齐度) 4.228±0.041 (SMRABooth) vs 未明确给出各baseline精确值（所有方法中最高） (Highest among all compared methods)。
 
-## 概述
+## 概要
 
 **1. 问题背景与瓶颈**
 
@@ -75,8 +75,6 @@ SMRABooth在定制化视频生成领域的方法谱系中占据独特位置：
 
 在基于WAN2.1骨干的DiT架构定制视频生成任务上（30个主体 × 21种运动类型），SMRABooth在所有评估指标上均优于现有DiT方法：CLIP-T（文本-视频语义对齐）达到0.363，Motion Fidelity（运动保真度）达到62.89，显著超越次优方法DualReal。用户研究（5分Likert量表）中，SMRABooth的Prompt Alignment评分达到4.228±0.041，同样为所有对比方法中最高。该方法在U-Net架构上也展现出良好的可迁移性，能够有效保持主体身份和运动模式。消融实验证实，SuRA损失显著增强全局结构保持，MoRA损失有效捕获对象级运动信息，稀疏LoRA策略在达到全层微调效果的同时避免了特征干扰。
 
-## 背景与动机
-
 ### 任务背景：定制化视频生成的双重需求
 
 文本到视频（Text-to-Video, T2V）生成领域近年来取得了显著进展，大规模预训练视频扩散模型已能根据文本描述生成高质量、时序连贯的视频内容。然而，在实际应用中，用户往往不仅希望控制视频的语义内容，还期望对**特定主体外观**和**特定运动模式**进行精确定制——例如，让一只特定的宠物狗执行旋转跳跃动作，或让一辆特定设计的汽车沿曲线轨迹行驶。这种“主体+运动”联合定制的需求，构成了定制化视频生成（Customized Video Generation）任务的核心挑战。
@@ -103,7 +101,7 @@ SMRABooth在定制化视频生成领域的方法谱系中占据独特位置：
 
 基于上述动机，SMRABooth设计了两个对象级表征对齐模块（SuRA和MoRA）以及一个基于LoRA稀疏性的主体-运动关联解耦策略，系统性地解决了定制化视频生成中主体保真度不足、运动一致性差和DiT架构下特征纠缠三大问题。
 
-## 核心创新
+## 核心方法与创新机理
 
 SMRABooth 的核心创新可归结为**两个对象级表征对齐模块**和**一套基于 LoRA 稀疏性的主体-运动解耦策略**，共同解决了 DiT 架构下定制化视频生成中主体外观失真与运动趋势错误的瓶颈问题。
 
@@ -137,8 +135,6 @@ DiT 架构缺乏 U-Net 式的空间-时序层解耦，若将主体 LoRA 和运�
 | LoRA 时序权重 | 整个去噪过程权重保持不变 | T_point 前降低主体权重优先运动，T_point 后提高权重细化外观 |
 
 消融实验（Table 3）证实：完整 SMRABooth 在所有指标（CLIP-T、DINO-I、CLIP-I、Motion Fidelity、Temporal Consistency）上均取得最优，移除任一模块或采用全层注入均导致显著性能下降。
-
-## 整体框架
 
 SMRABooth 将定制化视频生成拆解为**主体学习**与**运动学习**两个阶段，并在推理阶段通过**主体-运动关联解耦**策略实现两者的协同控制。整个框架建立在冻结的 WAN2.1 视频扩散 Transformer（DiT 架构）之上，训练时仅更新低秩适配器（LoRA），推理时将 LoRA 权重合并至骨干网络。
 
@@ -180,11 +176,6 @@ Figure 3 直观展示了上述流程：主体学习阶段，参考图像经 DINO
 *Figure 3: Overview of SMRABooth. The framework splits customized video generation into two stages: subject learning and motion learning. Subject learning aligns global spatial features from the vision encoder to enhance fidelity, while motion learning utilizes temporal motion representations from the optical flow encoder to guide motion generation. The pretrained video diffusion model remains frozen during training, and LoRAs are merged at inference to generate customized videos. For simplicity, text input is omitted from the figure. V* and S* are specific tokens used to represent subject and motion without intrinsic meanings*
 
 ### 补充图表
-
-![[assets/figures/papers/paper_list_l2_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_SMRABooth_Subject_a/figures/002_Figure_2.jpg]]
-*Figure 2: Existing methods lack object-level information, leading to poor motion trends and incomplete subject preservation due to limited structural awareness*
-
-## 核心模块与公式推导
 
 SMRABooth 的核心架构围绕两个对象级表征对齐模块和一个基于 LoRA 稀疏性的主体-运动解耦策略构建，整体框架如图 Figure 3 所示。预训练视频扩散模型（WAN2.1，DiT 架构）在训练期间保持冻结，仅通过低秩适配（LoRA）注入可学习参数。
 
@@ -250,12 +241,7 @@ DiT 架构缺乏 U-Net 式的空间-时序层解耦，主体 LoRA 和运动 LoRA
 
 **注入时序稀疏性**（Figure 4b）：去噪过程分析显示，运动在早期（约前 10 步）先形成，主体外观在 10-25 步之间逐步细化。据此设计分时权重策略：在 $T_{point}$ 之前降低主体 LoRA 权重以优先恢复运动，$T_{point}$ 之后提高主体 LoRA 权重以细化外观细节。$T_{point}$ 通过经验分析在 10-25 步范围内选择。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_SMRABooth_Subject_a/figures/004_Figure_4.jpg]]
-*Figure 4: (a) The bar charts present the sparse experiment results, highlighting the effectiveness of different layers for subject and motion learning. In the yellow bar chart, we apply the subject LoRA during inference to test its effectiveness in preserving subject similarity. In the blue bar chart, we apply the motion LoRA to evaluate its ability to maintain motion coherence. (b) The left table shows changes in CLIP-I and DINO-I metrics, indicating that subject details are refined between 10 and 25 denoising steps. The right figure illustrates the denoising process, where motion develops early, and the subject’s appearance emerges later*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 核心性能验证
 
@@ -297,9 +283,6 @@ Table 3通过控制变量法逐一移除各组件，量化每个设计选择的�
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l2_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_SMRABooth_Subject_a/figures/007_Table_1.jpg]]
-*Table 1: Quantitative experimental results for different DiT-based methods under the numerical evaluation metrics*
-
 ![[assets/figures/papers/paper_list_l2_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_SMRABooth_Subject_a/figures/009_Table_3.jpg]]
 *Table 3: Quantitative ablation studies on each component*
 
@@ -309,7 +292,7 @@ Table 3通过控制变量法逐一移除各组件，量化每个设计选择的�
 ![[assets/figures/papers/paper_list_l2_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_SMRABooth_Subject_a/figures/010_Figure_7.jpg]]
 *Figure 7: Qualitative comparison for the ablation study. (a) shows the ablation results for*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 任务定位与基线谱系
 

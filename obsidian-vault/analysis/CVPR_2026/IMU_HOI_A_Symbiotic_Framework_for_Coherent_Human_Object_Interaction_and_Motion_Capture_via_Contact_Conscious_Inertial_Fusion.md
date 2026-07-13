@@ -43,7 +43,7 @@ claims:
 > - IMHD² 上，Obj Err 43.97 vs 83.96 (GlobalPose*) (-39.99 (68.5%))。
 > - BEHAVE 上，Obj Err 20.90 vs 25.81 (GlobalPose*) (-4.91 (30.6%))。
 
-## 概述
+## 概要
 
 **IMU-HOI**（CVPR 2026）面向一个此前被惯性运动捕捉社区忽视的关键瓶颈：现有基于IMU的人体姿态估计方法孤立地重建人体运动，完全抛弃了人与物体的交互状态与物体自身的运动轨迹；而基于视觉的人-物交互（HOI）捕捉方案又受限于遮挡和有限的采集空间，难以在自然环境中部署。该工作的核心洞察在于，当人体与物体同时佩戴稀疏IMU时，手-物接触本身可以作为一种可学习的概率先验，端到端地联合驱动人体全身姿态与物体6-DoF平移轨迹的恢复。
 
@@ -52,8 +52,6 @@ claims:
 实验证据表明，IMU-HOI在多个数据集上取得了显著且一致的增益。在OMOMO数据集上，物体误差（Obj Err）从GlobalPose\*的39.34降至14.15（降幅64.0%），人-物交互误差（HOI Err）从39.56降至14.94（降幅62.2%）；在IMHD²数据集上，Obj Err从83.96降至43.97（降幅68.5%）；在BEHAVE上Obj Err从25.81降至20.90（降幅30.6%）（Table 1, Table 2）。消融实验进一步验证了接触门控融合的有效性：在OMOMO上比纯IMU分支Obj Err降低0.21（1.8%），在IMHD²上比纯FK分支Obj Err降低17.61（28.6%）（Table 3）。此外，该接触门控融合模块具有良好的即插即用特性，可直接部署到DynaIP、TransPose等现有IMU人体姿态估计器上，在IMHD²上为GlobalPose\*带来Obj Err降低54.57（53.9%）的增益（Table 4）。
 
 在方法谱系中，IMU-HOI首次将稀疏IMU运动捕捉从纯人体域拓展至人-物交互域，填补了惯性HOI捕捉的空白。其接触门控融合机制提供了一种将物理接触信号显式注入学习的范式，区别于传统仅依赖足-地接触的全局平移估计方案。需要指出的是，当前模型基于准刚性、单接触假设，不显式处理滑动接触、多点同时接触或可变形物体的交互，这些构成了该方向后续研究的主要开放性挑战。
-
-## 背景与动机
 
 人体运动捕捉是计算机视觉与图形学领域的核心问题，其应用涵盖混合现实、具身智能与数字人动画。传统光学运动捕捉系统虽能提供高精度全身姿态与物体轨迹，却受限于受控采集体积、多相机标定成本和严重遮挡场景。基于单目或RGB-D的视觉方法近年来在姿态估计上取得显著进展，但在人-物交互场景中仍面临两大瓶颈：**遮挡**导致手-物接触区域不可见，以及**受限采集体积**使物体轨迹超出相机视野后无法追踪。
 
@@ -67,7 +65,7 @@ claims:
 
 本文提出的IMU-HOI框架正是针对上述挑战的系统性回应。其核心洞察在于：**将手-物接触建模为可学习的概率先验，并以此作为贝叶斯式门控变量，在运动学分支与惯性分支之间进行自适应融合**——有接触时，手部运动学分支锚定物体；无接触时，物体IMU分支提供互补运动信息。这一设计使得框架无需任何视觉输入，即可在三个基准数据集上实现物体平移误差的大幅降低（最高达68.5%），并展现出对现有IMU姿态估计器的强即插即用能力。
 
-## 核心创新
+## 核心方法与创新机理
 
 IMU-HOI 的核心创新在于将**概率性手‑物接触信号**显式建模为可学习的先验，并以此作为门控变量，在运动学（FK）推理与惯性（IMU）积分之间进行**贝叶斯式融合**，从而在不依赖视觉的条件下，端到端地联合恢复人体全身姿态与物体的 6‑DoF 平移轨迹。
 
@@ -118,8 +116,6 @@ $$\mathbf{w}_t = \mathrm{softmax}\Big( \frac{1}{\tau} \big[ \mathbf{z}_t + \beta
 
 这些限制意味着 IMU‑HOI 在抓握稳定、接触点固定的刚性物体交互场景中表现最佳，而在推、滑、抛接等动态接触模式下的泛化能力仍需进一步验证。
 
-## 整体框架
-
 IMU-HOI 提出了一种**三阶段、接触感知的惯性融合架构**，其核心目标是从稀疏分布在人体与物体表面的 IMU 信号中，联合恢复全身人体姿态与物体的 6-DoF 平移轨迹，全程不依赖任何视觉输入。图 2 给出了管线的整体概览。
 
 ### 问题形式化
@@ -154,11 +150,6 @@ $$\mathbf{w}_t = \mathrm{softmax}\Big( \frac{1}{\tau} \big[ \mathbf{z}_t + \beta
 
 ![[assets/figures/papers/paper_list_l1065_https_openaccess_thecvf_com_content_CVPR2026_html_Lin_IMU_HOI_A_Symbioti/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of our three-stage HOI pipeline from sparse human–object IMUs: Stage I (mid-bottom) predicts hand/foot contacts and object velocity, Stage II (mid-top) estimates part-based human pose and root translation, and Stage III (mid-right) contact-gates FK and IMU branches to recover object translation*
-
-![[assets/figures/papers/paper_list_l1065_https_openaccess_thecvf_com_content_CVPR2026_html_Lin_IMU_HOI_A_Symbioti/figures/001_Figure_1.jpg]]
-*Figure 1: IMU-HOI recovers full-body human motion and 6-DoF object trajectories from a sparse set of stick-on IMUs attached to both the body and the object, without using cameras*
-
-## 核心模块与公式推导
 
 IMU-HOI 的核心设计在于将手-物接触建模为可学习的概率先验，并以此作为门控变量，在运动学推理与惯性积分之间进行自适应路由。整个流水线按三阶段展开，其中接触估计模块与物体平移融合模块是区别于现有纯惯性人体姿态估计方法的关键增量。
 
@@ -206,7 +197,7 @@ $$\mathcal{L}^{(1)} = \mathcal{L}_{\mathrm{hands}} + \lambda_{\mathrm{vel}} \mat
 
 接触门控融合模块的设计与人体姿态估计主干解耦。消融实验表明，将该模块即插即用到 **DynaIP**（Zhang et al., CVPR 2024）、**TransPose**（Yi et al., ACM TOG 2021）等现有 IMU 人体姿态估计器上，可在 IMHD² 数据集上为 GlobalPose* 降低 Obj Err 54.57（53.9%）和 HOI Err 48.34（47.4%），验证了其作为通用物体运动捕捉插件的有效性。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -279,19 +270,13 @@ IMU-HOI 在三个公开的人-物交互（HOI）数据集上进行评估：**OMO
 ![[assets/figures/papers/paper_list_l1065_https_openaccess_thecvf_com_content_CVPR2026_html_Lin_IMU_HOI_A_Symbioti/figures/006_Table_3.jpg]]
 *Table 3: Ablation of our object-translation heads. Lower is better. Best in bold*
 
-![[assets/figures/papers/paper_list_l1065_https_openaccess_thecvf_com_content_CVPR2026_html_Lin_IMU_HOI_A_Symbioti/figures/009_Table_4.jpg]]
-*Table 4: Fusion on off-the-shelf IMU HPE backbones. Lower is better. Best in bold*
-
-![[assets/figures/papers/paper_list_l1065_https_openaccess_thecvf_com_content_CVPR2026_html_Lin_IMU_HOI_A_Symbioti/figures/005_Figure_3.jpg]]
-*Figure 3: Cumulative root-translation error vs. time for OMOMO (left) and BEHAVE (right)*
-
 ![[assets/figures/papers/paper_list_l1065_https_openaccess_thecvf_com_content_CVPR2026_html_Lin_IMU_HOI_A_Symbioti/figures/008_Figure_5.jpg]]
 *Figure 5: Visualization of error–time curves and reference frames (A–D) for the three object-translation heads*
 
 ![[assets/figures/papers/paper_list_l1065_https_openaccess_thecvf_com_content_CVPR2026_html_Lin_IMU_HOI_A_Symbioti/figures/007_Figure_4.jpg]]
 *Figure 4: Qualitative comparison of motion estimation on four sequences from the BEHAVE test set*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 基线关系与演进定位
 

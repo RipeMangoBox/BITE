@@ -5,6 +5,8 @@ paper_level: A
 venue: ICCV
 year: 2025
 pdf_ref: paperPDFs/ICCV_2025/GenDoP_Auto_regressive_Camera_Trajectory_Generation_as_a_Director_of_Photography.pdf
+project_link: https://kszpxxzmc.github.io/GenDoP/
+code_link: null
 aliases:
   - GenDoP
 tags:
@@ -42,7 +44,7 @@ claims:
 > - Directorial Caption (DataDoP test set) 上，CLaTr-CLIP Score 32.408 vs 23.505 (Director3D trained on DataDoP) (+8.903)。
 > - User Study (Motion & Directorial) 上，Average User Rating - Alignment 4.693 (Motion) / 4.617 (Directorial) vs 最高基线 3.753 (Motion) / 3.808 (Directorial) (significant improvement)。
 
-## 概述
+## 概要
 
 现有相机轨迹生成方法面临一个核心瓶颈：训练数据多来自跟踪主导或物体/场景中心的镜头，缺乏体现导演意图的自由移动轨迹和对应的详细文本描述；同时，基于扩散模型的生成范式容易产生抖动和不稳定的轨迹，且与文本指令的对齐能力有限。
 
@@ -51,8 +53,6 @@ claims:
 在方法谱系上，GenDoP 将生成范式从扩散模型（如 **Director3D** (Li et al., NeurIPS 2024)、**CCD** (Jiang et al., Comput. Graph. Forum 2024)、**E.T.** (Courant et al., ECCV 2024)）转向自回归 Transformer，将条件输入从纯文本或角色轨迹扩展为文本与初始帧几何/外观信息的融合，并依托 DataDoP 的大规模自由移动轨迹数据，突破了现有方法在运动复杂度和指令跟随方面的局限。
 
 实验结果验证了上述设计的有效性：在 Motion 字幕条件下，GenDoP 的 CLaTr-CLIP 得分达到 36.179，显著优于在 DataDoP 上重新训练的 Director3D（31.689），CLaTr-FID 低至 22.714（对比 31.979）；在 Directorial 字幕条件下，CLaTr-CLIP 以 32.408 领先 Director3D 的 23.505。用户研究进一步表明，GenDoP 在轨迹对齐度、质量和复杂度维度均获得最高评分。消融实验证实，典型归一化和可训练编码器是性能的关键支撑——移除归一化导致 CLaTr-CLIP 骤降约 21 分、CLaTr-FID 飙升约 46 分。
-
-## 背景与动机
 
 ### 问题背景：从文本到视频生成中的相机控制困境
 
@@ -76,7 +76,7 @@ claims:
 
 这一双重重构使得 GenDoP 在可控性、稳定性和运动复杂度三个维度上均超越了现有方法，为相机控制视频生成铺平了道路。
 
-## 核心创新
+## 核心方法与创新机理
 
 GenDoP 的核心创新在于将相机轨迹生成从传统的扩散范式转向**自回归序列建模**，并通过**数据集-表示-架构**三个层面的协同重构解决了现有方法的根本瓶颈。
 
@@ -123,8 +123,6 @@ GenDoP 构建了**多模态条件融合机制**（Sec. 4.3）：
 
 值得注意的是，大模型虽获得最低 CLaTr-FID（20.474），但文本对齐指标（CLaTr-CLIP 33.843）低于 base 模型，揭示了**轨迹质量与文本对齐之间的权衡**（Table S1），为后续研究指明了优化方向。
 
-## 整体框架
-
 GenDoP 的整体框架围绕“将相机轨迹生成形式化为离散 token 序列的自回归预测”这一核心洞察构建。其 pipeline 由数据预处理端的**典型归一化与轨迹标记化**、多模态条件端的**文本/视觉/深度编码器**、以及生成端的**自回归解码器**三大模块串联而成，形成从多模态输入到完整相机轨迹的端到端映射。
 
 ### 输入输出流
@@ -160,11 +158,6 @@ $$L = \mathrm{CrossEntropy}(S[1:], \hat{S}[:,-1]) + \lambda \|\mathbf{Z}\|_2^2$$
 将相机轨迹生成转化为离散 token 的自回归预测，使得模型能够天然捕捉相机运动的**时序依赖性**——每一帧的位姿预测都显式地以历史轨迹为条件，从而抑制扩散模型中常见的抖动和不稳定问题。同时，多模态条件（文本 + RGBD）的引入使模型在遵循语言指令的同时，能够感知初始帧的**几何与外观约束**，生成与场景内容相协调的自由移动轨迹。超参数消融（Table S1）进一步确定了最优配置：离散 bin 数 256、轨迹长度 30、模型规模 base（L=1024, 12 layers），在此设置下模型在文本对齐与轨迹质量之间取得最佳平衡。
 
 ### 补充图表
-
-![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2504_07083/figures/001_Figure_1.jpg]]
-*Figure 1: Overview. Top: DataDoP data construction. Given RGB video frames, we extract RGBD images and camera poses, then tag the pose sequence with different motion categories (in different colors). With LLM, we generate two types of captions from motion tags and RGBD inputs: Motion Caption describes the camera movements, while Directorial Caption describes the camera movements along with their interaction with the scene and directorial intent. Bottom: Our GenDoP method supports multi-modal inputs for trajectory creation. The generated camera sequence can be easily applied to various video generation tasks, including text-to-video (T2V) [13] and image-to-video (I2V) generation [15]. GenDoP paves the...*
-
-## 核心模块与公式推导
 
 GenDoP 将相机轨迹生成形式化为一个自回归的序列预测任务，其核心架构由轨迹标记器、多模态编码器和自回归解码器三个关键模块构成。
 
@@ -228,12 +221,7 @@ $$
 
 该自回归范式使模型能够显式捕捉相机运动的时序依赖性——每个新位姿的预测都受到历史相机状态和输入条件的共同约束，从而生成稳定且符合指令的轨迹。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2504_07083/figures/005_Figure_3.jpg]]
-*Figure 3: Our Auto-regressive Generation Model. Our model supports multi-modal inputs and generates trajectories based on these inputs. By treating the task as an auto-regressive next-token prediction problem, the model sequentially generates trajectories, with each new pose prediction influenced by previous camera states and input conditions*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -309,18 +297,7 @@ GenDoP 通过两个因果性设计解决上述问题：**数据层面**，构建
 ![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2504_07083/figures/007_Figure_4.jpg]]
 *Figure 4: Qualitative Results of Text-conditioned Trajectory Generation. We offer a comparative analysis of text-conditioned trajectory generation in the figure. Our model’s trajectories (color-coded to highlight text alignment) remain stable and closely follow the instructions, while other models exhibit significant jitter or fail to match the instructions well*
 
-![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2504_07083/figures/003_Figure.jpg]]
-*Figure: (a) Distribution of Translation and Rotation Motion Tags. (b) Diverse Trajectories*
-
-![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2504_07083/figures/013_Figure.jpg]]
-*Figure: R3. Tag Distribution. The distribution of Translation and Rotation combinations is shown in the figure. Different tag modes are represented by shades of yellow, ranging from deep to light: Static, Translation only, Rotation only, and both Translation and Rotation*
-
-![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2504_07083/figures/014_Figure.jpg]]
-*Figure: R4. Caption Generation. We structure the motion tags by incorporating context, instructions, constraints, and examples, and then leverage GPT-4o to generate Motion captions that describe the camera motion alone. Next, we extract 16 evenly spaced frames from the shots to create a 4 × 4 grid, prompting GPT-4o to consider both the previous caption and the image sequence. This enables GPT-4o to generate Directorial captions that describe the camera movement, the interaction between the camera and scene, and the directorial intent*
-
-![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2504_07083/figures/008_Figure.jpg]]
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 

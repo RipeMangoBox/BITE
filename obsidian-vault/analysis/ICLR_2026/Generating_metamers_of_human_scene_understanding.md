@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Generating_metamers_of_human_scene_understanding.pdf
+project_link: https://rainarit.github.io/metamergen/
+code_link: null
 openreview_forum_id: cSDXx8V6K9
 aliases:
 - GMHSU
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 生成人类场景理解的同质异构体 |
 | 英文题名 | Generating metamers of human scene understanding |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=cSDXx8V6K9); [Project](https://rainarit.github.io/metamergen/) |
+| Links | [paper](https://openreview.net/forum?id=cSDXx8V6K9) · [Project](https://rainarit.github.io/metamergen/) |
 | Topic | #topic/representation_self_supervised_transfer #topic/representation_self_supervised_transfer/transfer_multitask_and_meta_learning |
 | Method | MetamerGen |
 | Dataset | COCO-10k-test, Visual Genome Same-Different Task (300 images, 45 participants) |
@@ -40,7 +42,7 @@ claims:
 > - COCO-10k-test 上，FID 为 MetamerGen (0.25× blur, 1 fixation)，对比 Stable Diffusion 1.5 text-to-image，变化 lower (better)。
 > - Visual Genome Same-Different Task (300 images, 45 participants) 上，Metamer Rate (proportion 'same') 为 29.4% (own fixations)，对比 27.7% (random fixations)，变化 +1.7% (p=0.24, not significant)。
 
-## 概述
+## 概要
 
 人类在观看自然场景时，通过一系列注视点（fixations）逐步构建对场景的内部表征——中央凹区域捕获高分辨率细节，而周边视觉则提供低分辨率的场景gist信息。然而，现有场景理解模型无法同时结合这两种信息流，生成与人类动态注视行为对齐的复杂场景假设，更缺乏行为范式来验证这些生成场景的知觉等价性。
 
@@ -59,8 +61,6 @@ claims:
 行为实验采用实时同异判断范式：被试自由观看场景至预定注视次数后，模型在5秒内基于注视坐标实时生成图像，随后以200ms短暂呈现，被试判断生成图像与原始图像是否“相同”。总体metamer率约为29%（自身注视）vs 27.7%（随机注视），差异未达统计显著（p=0.24），但多层次特征分析一致表明，自身注视条件下生成图像的特征相似性与metamer判断的相关性更强、更可解释。
 
 **证据强度评估**：双流消融实验和行为-特征关联分析均具有高置信度（≥0.9），但总体metamer率较低（约29%）表明模型对复杂场景内部表征的重建仍不充分；行为实验排除了含人类、文本、时钟等元素的图像，且200ms的短暂呈现可能低估精细细节辨别能力，这些限制了结论的泛化性。
-
-## 背景与动机
 
 人类视觉系统在浏览复杂自然场景时，并非均匀地处理所有视觉信息。中央凹（fovea）仅覆盖约2°视角，提供高分辨率的细节感知；而周边视野虽然分辨率急剧下降，却持续传递着场景的全局结构和语义gist。这种**中央凹-周边信息的分工与融合**，使得人类能够在有限的注视次数下快速建立对场景的连贯理解——我们感知到的并非像素级的精确副本，而是一种在语义和结构上等价的内部表征。
 
@@ -84,7 +84,7 @@ claims:
 
 基于上述缺口，本文提出**MetamerGen**——一个双流条件扩散模型，旨在回答一个核心问题：**能否仅凭人类在自由观看场景时产生的注视行为，重建出与观察者内部场景表征知觉等价的图像？** 这一问题的解答不仅关乎对人类视觉理解的逆向工程，也为评估和解释视觉表征模型提供了新的行为学工具。
 
-## 核心创新
+## 核心方法与创新机理
 
 MetamerGen的核心创新在于将人类动态注视行为中的双流信息——中央凹的高分辨率细节与周边的低分辨率场景gist——首次统一到一个可控的扩散生成框架中，从而生成与人类内部场景表征知觉等价的同质异构体（metamer）。这一设计直接回应了现有模型的关键瓶颈：**无法结合注视与周边信息生成与人类动态注视对齐的复杂场景假设**，并缺乏行为范式来验证生成场景的知觉等价性。
 
@@ -116,8 +116,6 @@ MetamerGen的设计背后有一个关键的因果发现：**场景同质异构�
 ### 双流融合的必要性：来自行为实验的决定性证据
 
 行为消融实验（Section 5.3, Figure 13）为双流设计的必要性提供了最强证据：同时使用中央凹和周边信息的完整模型metamer率达到**54.5%**，仅周边信息为**45.8%**，而仅中央凹信息仅为**8.4%**。这一巨大差距表明，周边gist提供了场景理解的骨架，而中央凹细节则在此基础上进行精细化对齐，两者缺一不可。更重要的是，基于观察者自身注视生成的图像比随机注视生成的在语义上更对齐（Figure 5），说明注视位置携带了观察者特定的内部表征信息，MetamerGen成功捕获了这一动态过程。
-
-## 整体框架
 
 ![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_cSDXx8V6K9/figures/004_Figure_4.jpg]]
 *Figure 4: Multi-level feature analysis pipeline using neurally-grounded model: (Top) Early, mid, and late network layers serve as proxies for different stages of processing across the hierarchy of visual brain areas. (Bottom) Results show that as feature similarity increased at these different processing levels, the proportion of participants judging generated images as metameric also increased. These effects were clearer when metamers were generated based on a viewer’s own fixated locations (salmon) than on randomly-sampled locations (turquoise)*
@@ -156,8 +154,6 @@ $$\text{Attention}(Q,K,V) = \text{softmax}\left(\frac{Q K_{\text{text}}^T}{\sqrt
 ### 模块关系与数据流
 
 整体数据流可概括为：**原始图像 + 模糊图像 → DINOv2 双流特征提取 → 注视掩码/全保留 → Perceiver 压缩 → 加法交叉注意力注入 UNet → 扩散去噪生成**。Figure 1 展示了这一架构的全貌，其中双流信息的融合是产生场景同质异构体的关键——消融实验表明，仅中央凹信息的 metamer 率仅 8.4%，仅周边信息为 45.8%，而完整双流模型达到 54.5%（Section 5.3, Figure 13），证实了中央凹精细细节与周边场景 gist 协同作用的必要性。
-
-## 核心模块与公式推导
 
 ### 双流DINOv2特征编码
 
@@ -200,7 +196,7 @@ $$
 
 训练阶段采用随机注视掩码（1–10 个 token）和周边模糊级别采样，并施加条件丢弃（$p_{\mathrm{foveal}} = 0.05$，$p_{\mathrm{peripheral}} = 0.10$）以增强鲁棒性。推理阶段使用 CFG++ 采样器，扩散步数固定为 50 步以平衡实时生成需求与图像质量。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心行为范式与总体结果
 
@@ -275,18 +271,7 @@ DINOv2与CLIP作为视觉编码器的对比消融（Figure 15, Figure 16）揭�
 4. **实时生成约束：** 50步DDIM采样限制了图像质量，更多步数可能提升metamer率。
 5. **未探索任务驱动注视和动态场景：** 当前仅使用自由观看注视，不同任务目标下的注视策略可能产生不同的metamer特征。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_cSDXx8V6K9/figures/003_Figure_3.jpg]]
-*Figure 3: Metameric vs. non-metameric judgments. (Left) Original images with human fixations overlaid in red paired with generated images judged as the “same” by participants. (Right) Original images with fixations and generated images judged as “different” by participants. More examples, including generations from random fixations, can be found in Appendix A.6*
-
-![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_cSDXx8V6K9/figures/009_Figure_9.jpg]]
-*Figure 9: Additional metameric vs. non-metameric judgment example images based on human fixations. (Left) Original images with human fixations overlaid in red and corresponding generated images judged as “same” by participants. (Right) Original images with fixations and generated images judged as “different” by participants*
-
-![[assets/figures/papers/paper_list_l15_https_openreview_net_forum_id_cSDXx8V6K9/figures/010_Figure_10.jpg]]
-*Figure 10: Additional metameric vs. non-metameric judgment example images based on randomly-sampled fixations. (Left) Original images with randomly-sampled fixations overlaid in red and corresponding generated images judged as “same” by participants. (Right) Original images with fixations and generated images judged as “different” by participants*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 方法定位与基线关系
 

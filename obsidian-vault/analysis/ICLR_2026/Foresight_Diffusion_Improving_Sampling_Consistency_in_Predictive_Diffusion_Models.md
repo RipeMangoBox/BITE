@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Foresight_Diffusion_Improving_Sampling_Consistency_in_Predictive_Diffusion_Models.pdf
+project_link: null
+code_link: null
 aliases:
 - FDF
 - FDISCPDM
@@ -41,7 +43,7 @@ claims:
 > - RoboNet 上，LPIPS↓ 为 5.25，对比 5.65，变化 -0.40。
 > - RoboNet 上，STD_LPIPS↓ 为 0.35，对比 0.65，变化 -0.30。
 
-## 概述
+## 概要
 
 现有预测扩散模型在共享架构中联合处理条件输入与噪声目标，同质化的参数共享与单一的端到端训练使条件理解与目标去噪两个功能彼此纠缠。这一耦合造成两方面的代价：模型在纯噪声输入下的确定性预测能力远低于专用预测器，且跨多次采样的生成结果方差过大、最差情况下质量急剧退化，即存在**预测能力受限**与**采样不一致**的双重瓶颈（Figure 3, Section 3.2）。
 
@@ -51,7 +53,7 @@ Foresight Diffusion（ForeDiff）通过**架构与训练的双重解耦**应对�
 
 综上所述，ForeDiff以简洁的架构分离和两阶段训练，在保持生成多样性的同时显著改善了预测扩散模型的确定性与采样一致性，为后续预测生成任务提供了一种新的范式。其效果在多个规模和场景下均具有高置信度，但更大规模模型与跨架构泛化性仍待进一步验证。
 
-## 背景与动机
+
 
 扩散模型凭借出色的生成能力，在视频预测、科学计算等需要学习未来联合分布的预测任务中展现出巨大潜力。标准做法是将条件输入（如历史帧、环境信号）与带噪目标一同送入条件去噪网络，通过协同优化来学习条件分布。然而，这种耦合设计在预测场景下暴露出两个根本性缺陷：**采样不一致**与**预测能力受限**。
 
@@ -61,7 +63,9 @@ Foresight Diffusion（ForeDiff）通过**架构与训练的双重解耦**应对�
 
 因此，要使预测扩散模型同时具备高预测准确性与采样一致性，关键在于**将条件理解从去噪过程中解耦**。基于这一动机，本文提出 Foresight Diffusion (ForeDiff)：通过引入独立的确定性预测流，将条件建模移出噪声路径，并采用“先预测、后生成”的两阶段训练范式——先让预测流习得高质量确定性表示，再以其冻干表征引导生成流去噪。解耦后，条件表示不再受去噪扰动，生成流得以在稳定语义约束下采样，从而在保持生成多样性的同时，将采样一致性指标的方差大幅压缩（如 RoboNet 上 STD_LPIPS 从 0.65 降至 0.35），预测准确度亦明显提升（PSNR 从 30.4 升至 31.2）。该方案为预测扩散模型的架构设计提供了新的思考路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 **瓶颈与因果靶点**  
 标准条件扩散模型（Vanilla Diffusion）将条件理解与目标去噪置于共享架构中联合训练，导致两个子任务的目标相互纠缠：模型要么牺牲预测精度以维持生成多样性，要么在确定性预测与随机降噪之间折中而失效。这一纠缠直接表现为采样不一致——同一条件输入的不同样本之间误差方差过高（RoboNet 上 STD_LPIPS 达 0.65），且预测能力显著弱于独立训练的同规模确定性模型（Figure 3c）。Foresight Diffusion（ForeDiff）的因果靶点正是**解耦条件建模与去噪过程**，通过架构分离和两阶段训练消除两者的互扰，从而同时提升预测准确度和采样一致性。
@@ -89,7 +93,7 @@ $$
 
 综上，ForeDiff 的两个 changed slots——**架构分离**与**两阶段训练**——通过解耦条件理解与去噪的因果链路，系统性解决了预测扩散模型的核心缺陷，使模型在保持扩散生成灵活性的同时获得接近确定性预测器的精度与一致性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0013_9WJoD0iDig_Foresight_Diffusion_Improving_Sampling_Consisten/figures/006_Figure_4.jpg]]
 *Figure 4: Overview of Foresight Diffusion. (a) Vanilla diffusion jointly processes condition and noisy target, limiting its predictive ability. (b) A Deterministic model focuses solely on condition understanding and achieves better predictive performance. (c) ForeDiff-zero introduces a separate predictive stream to isolate condition understanding from noise. (d) ForeDiff further adopts a twostage scheme: it pre-trains the predictive stream, then freezes its representations to guide generation*
@@ -131,7 +135,7 @@ ForeDiff-zero 将模型分为两条独立的信息流（Figure 4(c), Eq. (6)）�
 
 推理阶段，条件 𝒚 首先经过冻结的预测流得到确定性表示 𝙜_M。然后，从纯噪声 𝒙₁ 开始，在每一时间步将 𝒙ₜ 与 𝙜_M 送入融合模块后，由生成流预测当前速度场，再通过反向积分得到下一时刻的潜在 𝒙_{t−Δt}（Eq. (3)）。最终，解码器 𝒟 将去噪后的潜在表示还原为预测的未来视频帧。由于条件建模完全被隔离在预测流中，生成流在去噪过程中不再需要对条件进行复杂理解，采样一致性由此得到根本保障。
 
-## 核心模块与公式推导
+
 
 ### 整体框架与模块拆解
 ForeDiff 围绕“条件理解与去噪解耦”这一核心洞察，构造了四个关键模块：
@@ -200,7 +204,9 @@ ForeDiff 围绕“条件理解与去噪解耦”这一核心洞察，构造了�
 - `G_θ`：以冻结的预测特征 `P_ξ'(y)` 和时间步 `t` 为条件的生成流。
 - 两阶段设计确保预测表征稳定，再去学习去噪映射，显著提升采样一致性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 本节在真实机器人视频预测（RoboNet、RT‑1）和科学预报（HeterNS）三个场景中评估Foresight Diffusion（ForeDiff），重点回答三个问题：(1) 主结果是否在准确性与采样一致性上显著优于扩散基线及确定性预测器；(2) 架构解耦与两阶段训练各自贡献多大；(3) 一致性收益是否以模式坍塌为代价。所有数据均源自原文的定量表与消融图，必要时标注需要手动验证的细节。
 
@@ -254,7 +260,9 @@ ForeDiff 围绕“条件理解与去噪解耦”这一核心洞察，构造了�
 
 以上局限性均需对照实际场景进行手动确认，尤其是当迁移到不同数据分布、规模或架构时，现有结论并非不经实验即可推广。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线工作的关系
 
@@ -289,6 +297,8 @@ ForeDiff 提出的“条件-去噪解耦”框架为预测生成模型带来新�
 - **校准与不确定性**：Table 13 和 Figure 9 展示了 ForeDiff 在覆盖校准上的优势，表明它避免了模式坍塌。进一步的研究可探索如何利用解耦框架显式建模认知不确定性与任意不确定性，使预测扩散模型更适合安全关键型应用。
 
 总而言之，ForeDiff 在预测扩散模型的方法谱系中确立了一个新的定位：通过架构与训练双解耦，提升采样一致性的同时保持生成质量，为后续预测生成模型的设计提供了清晰的改进路径和验证基准。
+
+
 
 ## 原文 PDF
 

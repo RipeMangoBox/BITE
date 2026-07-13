@@ -43,7 +43,7 @@ claims:
 > - ManiSkill2 上，平均成功率 (%) 94.3 vs 88.7 (OpenVLA-OFT) (+5.6%)。
 > - Real-World Long-Horizon (Galaxea R1 Lite) 上，平均任务完成率 (%) 70.0 vs 68.3 (OpenVLA-OFT) (+1.7%)。
 
-## 概述
+## 概要
 
 当前视觉-语言-动作（VLA）模型在机器人操作中面临一个核心瓶颈：3D空间理解依赖额外传感器（如点云、深度图）导致计算开销高企，且普遍缺乏与语言指令对齐的时空一致性推理能力，难以应对动态场景中的对象歧义和空间关系模糊。**ConsisVLA-4D** 针对这一问题，提出了一条从高效3D感知到4D推理的统一路径，其核心思路是受人类双目视觉与大脑预测维持时空一致性的启发，利用指令驱动的对象选择和跨视角几何聚合来学习隐式动态与深度知识，从而以极低的视觉冗余实现鲁棒的动作预测。
 
@@ -51,7 +51,7 @@ claims:
 
 在LIBERO基准上，ConsisVLA-4D取得了**98.1%**的平均成功率，较OpenVLA提升21.6%，推理速度提升2.3倍；在四个子套件（Spatial、Object、Goal、Long）上均取得领先，其中Object套件达到99.8%。消融实验证实，CV-Aligner和CO-Fuser对时空一致性至关重要：移除前者使模拟成功率下降7.0%、真实任务下降10.0%；移除后者分别下降8.2%和13.3%。这些结果表明，通过精简的视觉表征和隐式时空知识学习，ConsisVLA-4D在性能与效率之间取得了显著突破。
 
-## 背景与动机
+
 
 ### 机器人操作中的视觉-语言-动作模型
 
@@ -74,7 +74,9 @@ claims:
 
 受人类视觉系统的启发——人类通过双目视觉建立空间一致性，并利用大脑预测机制维持时间一致性——本文提出**ConsisVLA-4D**框架，旨在以极低的视觉冗余实现从3D感知到4D推理的时空一致性。具体而言，我们引入**跨视图对象语义对齐（CV-Aligner）**与**跨对象空间几何关系聚合（CO-Fuser）**来确保空间域的一致性，并通过**跨场景时空推理（CS-Thinker）**学习隐式动态与深度知识，在时间域上延续这种一致性，从而构建从3D到4D的完整一致性纽带。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ConsisVLA-4D 的核心创新在于首次将 VLA 模型从“3D 感知”推进到“4D 推理”，并在极低的视觉冗余（仅保留约 1/8 的原始视觉 token）下实现了时空一致的鲁棒操作。其关键突破体现在三个紧密耦合的 **changed slots** 上：
 
@@ -94,7 +96,7 @@ ConsisVLA-4D 的核心创新在于首次将 VLA 模型从“3D 感知”推进�
 
 三个 changed slots 形成了清晰的因果闭环：**CV-Aligner** 提供指令对齐的稀疏对象 token → **CO-Fuser** 在此基础上聚合跨对象空间几何关系 → **CS-Thinker** 利用前两者提供的语义与几何隐式知识进行时空推理。消融实验强有力地验证了这一链路：移除 CV-Aligner 使模拟任务成功率下降 7.0%、真实任务下降 10.0%；移除 CO-Fuser 分别下降 8.2% 和 13.3%；移除 CS-Thinker 中的动态对象和深度预测使模拟下降 2.7%–4.8%、真实下降 5.7%–11.6%。三者协同作用，最终在 LIBERO 基准上实现了 98.1% 的平均成功率，相较 OpenVLA 提升 21.6%，推理速度提升 2.3 倍。
 
-## 整体框架
+
 
 ConsisVLA-4D 提出了一条从 2D 观测到 3D 感知再到 4D 推理的统一流水线，其核心设计逻辑是：**先构建空间一致的 3D 表示，再将其延伸为时空一致的 4D 推理**。整个框架可概括为 `2D → 3D → 4D` 的两阶段递进结构——3D 感知阶段负责从多视角图像中提取指令相关的对象语义和几何关系，4D 推理阶段则在此基础上学习隐式的动态对象与全局深度知识，以支撑动作预测。
 
@@ -136,7 +138,7 @@ ConsisVLA-4D 提出了一条从 2D 观测到 3D 感知再到 4D 推理的统一�
 ![[assets/figures/papers/paper_list_l2277_https_arxiv_org_abs_2605_05126/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison with Existing Paradigms. Beyond conventional 2D visual inputs, Para. A employs explicit 3D/4D inputs (e.g., point clouds, depth maps, historical frames), Para. B projects 2D inputs into 3D space, and Para. C predicts 3D representations from 2D observations. In contrast, we extend the paradigm from 3D-Perception to 4D-Reasoning within a unified framework (Para. D): 1) CV-Aligner extracts instructionrelated and cross-correlated spatial objects; 2) CO-Fuser aggregates multi-view geometric relation; 3) CS-Thinker infers actions based on implicit knowledge of future dynamic objects and global depth. ConsisVLA-4D achieves spatiotemporal consistency using only about 1/8 of the original...*
 
-## 核心模块与公式推导
+
 
 ConsisVLA-4D 的核心设计围绕三个递进模块展开：**CV-Aligner**（跨视图对象语义对齐）、**CO-Fuser**（跨对象空间几何聚合）和 **CS-Thinker**（跨场景时空推理）。三者共同构建从 2D 观测到 3D 感知再到 4D 推理的一致性纽带，其信息流可概括为：
 
@@ -222,7 +224,9 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{action}} + \mathcal{L}_{\m
 ![[assets/figures/papers/paper_list_l2277_https_arxiv_org_abs_2605_05126/figures/003_Figure_3.jpg]]
 *Figure 3: The Mechanism from 3D-Perception to 4D-Reasoning. The Cross-View Aligner selects spatial objects with matching identities across different views, and through 4D-Reasoning, further predicts the dynamic object with the same identity from one view to another after an action occurs. The Cross-Object Fuser aggregates global geometric relations to eliminate spatial ambiguity across multiple views, and through 4D-Reasoning, further predicts global depth from the same geometric representation to different views. This progression not only enhances Spatiotemporal Consistency but also reduces visual input, significantly improving training and inference efficiency*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：LIBERO 基准
 
@@ -297,7 +301,9 @@ Table 8 对比了 Group-Fusion 中 $\alpha_l$ 的余弦衰减与线性衰减策�
 2. **长时域漂移**：Long 子套件 95.6% 的成功率虽为最高，但仍是四个子套件中最低的，表明 CS-Thinker 的隐式动态预测在超长序列中仍存在累积误差。
 3. **分布外泛化**：模型在单视角或单臂场景下的有效性未经验证，隐式动态与深度知识的跨场景迁移能力尚不明确。在完全非结构化的家庭杂乱场景中的鲁棒性需进一步评估。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线工作的关系
 
@@ -368,6 +374,8 @@ ConsisVLA-4D 在三个关键槽位上相对于基线实现了结构性改进：
 4. **单视角可行性**：能否将多视角输入缩减为仅单视角，同时通过更强的先验知识保持时空一致性？这将大幅降低硬件需求。
 5. **自监督替代方案**：训练阶段所需的 CoTracker 和 Depth-Anything 监督是否可被自我监督信号（如多视角一致性损失、时序预测损失）替代，从而减少对外部预训练模型的依赖？
 6. **实时闭环控制**：当前推理效率（72.7 Hz）已满足大多数操作任务，但在需要更高频率（>100 Hz）的精细操作任务中是否仍能保持性能？
+
+
 
 ## 原文 PDF
 

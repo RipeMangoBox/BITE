@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Jackpot_Align_Actor_Policy_Distribution_for_scalable_and_stable_RL_for_LLM.pdf
+project_link: https://infini-ai-lab.github.io/jpt_website/
+code_link: null
 openreview_forum_id: 5RATVAQGPx
 aliases:
 - Jackpot
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | Jackpot：对齐Actor-Policy分布以实现可扩展且稳定的LLM强化学习 |
 | 英文题名 | Jackpot: Align Actor-Policy Distribution for scalable and stable RL for LLM |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=5RATVAQGPx); [Project](https://infini-ai-lab.github.io/jpt_website/) |
+| Links | [paper](https://openreview.net/forum?id=5RATVAQGPx) · [Project](https://infini-ai-lab.github.io/jpt_website/) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | JACKPOT |
 | Dataset | GSM8K, MATH-500, AMC22 & AMC23 |
@@ -41,7 +43,7 @@ claims:
 > - MATH-500 上，Mean@4 为 80.05，对比 71.15，变化 +8.90。
 > - AMC22 & AMC23 上，Mean@4 为 53.916，对比 39.15，变化 +14.766。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -67,7 +69,7 @@ claims:
 
 - **超参数鲁棒性**：拒绝阈值$\lambda=1.0$为稳健默认值，在0.8-1.2范围内性能变化不大；$C_1$在2-10范围内均表现稳定；Top-K=20可在极小开销下提供准确的归一化常数估计。
 
-## 背景与动机
+
 
 ### 大语言模型强化学习的效率瓶颈
 
@@ -89,7 +91,9 @@ $$\mathcal{L}^{\mathrm{PPO}}(\theta) = \mathbb{E}_{x \sim P_{\mathrm{inf}}} \Big
 
 Jackpot的动机正是打破这一僵局：**能否在rollout阶段以极低的额外开销主动调整actor的采样分布，使其逼近目标策略分布，从而从根源上缓解off-policy训练的稳定性问题？** 这一思路要求设计一种轻量级的分布对齐机制，既能有效缩小KL散度，又不显著牺牲采样效率（接受率），同时还需将修正无缝集成到标准PPO优化框架中。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：Actor-Policy分布偏移导致的训练崩溃
 
@@ -152,7 +156,7 @@ $$\alpha_C(a) = \min\left(1, \frac{p_{\mathrm{target}}(a)}{\lambda \cdot p_{\mat
 
 4. **消融实验**（Table 6）：在BF16有更新延迟的训练中，完整的masking+reweighting方案（完整Jackpot）相比仅使用masking（OBRS rejection alone）在所有测试基准上均有显著提升，且避免了训练崩溃——例如AIME24从19.167提升至25.625，AMC从49.699提升至63.855。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_5RATVAQGPx/figures/006_Figure_3.jpg]]
 *Figure 3: Illustration of JACKPOT Pipeline focusing on Optimal Budgeted Rejection Sampling (OBRS) and Reweighting Procedures*
@@ -203,7 +207,7 @@ $$\mathcal{L}_{ours}^{\mathrm{PPO}}(\theta) = \Big[ \min( Z \cdot \max(\lambda, 
 
 整个 pipeline 无需额外采样轨迹，无需额外的 log-probability 计算，也无需修改 vLLM 等推理引擎。OBRS 掩码操作在 rollout 阶段以极低成本完成，top-k 收集和偏差校正均复用已有前向计算结果，额外计算开销控制在总计算量的 3% 以内。
 
-## 核心模块与公式推导
+
 
 ### 3.1 最优预算拒绝采样 (OBRS)
 
@@ -278,7 +282,9 @@ $$\kappa = \frac{\hat{\bar{\alpha}}}{\frac{1}{B} \sum_{i=1}^{B} Z_{\mathrm{appro
 
 **阶段二（PPO 更新与重加权）**：在训练 batch 上计算 $Z_{\mathrm{approx}}$ 和校正因子 $\kappa$；对每个 token 计算 Jackpot 重要性权重 $w_{\mathrm{OBRS}} = Z \cdot \max(\lambda, p_{\mathrm{new}}/p_{\mathrm{inf}})$；将 stop-gradient 后的权重乘以标准 PPO 截断损失，完成梯度更新。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果验证
 
@@ -347,7 +353,9 @@ LLM强化学习训练中，rollout阶段的计算开销使得提高actor-policy�
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_5RATVAQGPx/figures/005_Figure_2.jpg]]
 *Figure 2: OBRS calibration results across three views: (a) per-token probability-ratio clipping pulls the model distribution toward the target, (b) acceptance remains high (≈ 95%) even at large initial $\mathrm { K L }$ , , and (c) overall KL is reduced by roughly an order of magnitude*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：LLM强化学习的分布偏移瓶颈
 
@@ -400,6 +408,8 @@ $$\mathcal{L}_{\mathrm{ours}}^{\mathrm{PPO}}(\theta) = \mathbb{E}_{x \sim P_{\ma
 3. **多轮对话中的分布漂移**：在多轮交互场景中，分布偏移不仅来自模型更新延迟，还来自对话上下文的动态变化。Jackpot的OBRS机制是否能有效处理这种复合偏移，需要进一步研究。
 
 4. **与推测解码的协同**：推测解码（speculative decoding）同样涉及draft模型与target模型之间的分布匹配问题，Jackpot的OBRS框架是否能应用于此场景以提升推测解码的接受率，是一个有趣的技术交叉点。
+
+
 
 ## 原文 PDF
 

@@ -43,7 +43,7 @@ claims:
 > - MIMIC-CXR (macro-averaged over 14 labels) 上，Precision / Recall / F1 0.242 / 0.891 / 0.357 vs 0.275 / 0.248 / 0.260 (R2GenGPT, 223K samples) (Precision -0.033, Recall +0.643, F1 +0.097)。
 > - CheXpert validation set (gold labels) 上，Precision / Recall / F1 0.234 / 0.641 / 0.288 vs 0.375 / 0.305 / 0.253 (GPT-4.1 with prompt engineering) (Precision -0.141, Recall +0.336, F1 +0.035)。
 
-## 概述
+## 概要
 
 放射学报告生成（RRG）旨在自动从胸部X光片生成描述性临床报告，其核心瓶颈在于视觉-语言模型（VLM）缺乏领域知识，导致强化学习（RL）训练中大量采样组获得全零奖励——在训练早期约30%的批次无法产生有效梯度信号，造成计算资源浪费与收敛缓慢。
 
@@ -59,7 +59,7 @@ claims:
 
 **方法定位**：OraPO属于RL-based RRG方法，其核心贡献在于通过ZRR自适应混合机制将GRPO与DPO有机结合，配合事实级奖励设计，在数据高效与临床事实性两个维度上实现了突破。与依赖大规模监督微调（SFT）的传统方法（如R2GenGPT）和纯GRPO方法相比，OraPO在极低数据预算下展现出更强的探索效率与临床准确性。
 
-## 背景与动机
+
 
 ### 放射学报告生成的任务困境
 
@@ -89,7 +89,9 @@ claims:
 
 这一设计使得OraPO仅需1K训练样本即可在CheXpert Plus上达到F1=0.341，超越使用1.27M样本的先前SOTA，同时将召回率从0.319提升至0.832（+160.8%），展示了在严格数据和计算预算下的显著优势。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 OraPO 的核心创新在于识别并解决了原始 GRPO 在放射学报告生成（RRG）中的一个关键瓶颈：**基础 VLM 缺乏领域知识导致大量组奖励全为零，产生无效梯度，浪费计算资源且收敛缓慢**。针对此，OraPO 提出了三个紧密耦合的 changed slots，形成从“探索失败检测”到“失败信号转化”再到“事实级稠密奖励”的完整闭环。
 
@@ -133,7 +135,7 @@ $$r(x_i, \hat{y}_i) = F_{\beta, i} = \frac{ (1+\beta^2) P_i R_i }{ \beta^2 P_i +
 
 三个 changed slots 并非独立运作，而是形成因果链：FactS 提供细粒度奖励，使 ZRR 能更精确地反映探索质量；ZRR 驱动的自适应权重确保 DPO 在模型最需要指导时介入；DPO 的偏好学习则将 FactS 信号与失败经验共同转化为策略更新。这一协同使 OraPO 在仅 1K 训练样本下即达到 SOTA——CheXpert Plus 上 F1=0.341，超过使用 1.27M 样本的 **MambaXray-L**（Wang et al., CVPR 2025）的 0.335；MIMIC-CXR 上 F1=0.357，超过使用 223K 样本的多个基线。
 
-## 整体框架
+
 
 OraPO（Oracle-educated GRPO）提出了一种面向放射学报告生成（RRG）的数据高效强化学习范式。其核心动机源于一个关键瓶颈：**原始GRPO在基础视觉语言模型（VLM）缺乏领域知识时，会产生大量全零奖励的采样组**——在训练早期约30%的组内所有rollout奖励均为零（Fig. 2左），导致无效梯度，浪费计算资源且收敛缓慢。
 
@@ -219,7 +221,7 @@ $$\mathcal{L}_{\mathrm{OraPO}} = \frac{1}{B} \sum_{i=1}^{B} \Big[ \big(1 - w_i^{
 ![[assets/figures/papers/paper_list_l2289_https_arxiv_org_abs_2509_18600/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of mainstream data/compute-intensive pipelines (upper-left) versus our data-efficient pipeline (upper-right). Bottom: on CheXpert Plus [8], our method achieves the SOTA performance for RRG with less than 0.1% of the training samples (vs. 1.27 M) used by best-performing baselines and a much smaller model, demonstrating strong performance under tight data and compute budgets*
 
-## 核心模块与公式推导
+
 
 ### 3.1 基础GRPO：组归一化优势与策略优化
 
@@ -297,7 +299,9 @@ OraPO的完整训练流程由五个模块协同完成：
 
 **关键消融证据**：将DPO替换为SFT（即用真实报告做监督微调而非偏好优化）导致性能崩溃——召回率从0.832降至0.176，F1从0.341降至0.106（Table 4末行），证明DPO的对比偏好机制在OraPO中不可替代。SFT仅强化正例，无法有效利用失败生成的负向信号来“推开”策略远离低质量区域。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置与对比框架
 
@@ -382,7 +386,9 @@ Figure 2的中图和右图展示了两个临床困难且罕见的类别——**P
 ![[assets/figures/papers/paper_list_l2289_https_arxiv_org_abs_2509_18600/figures/010_Figure_3.jpg]]
 *Figure 3: X-ray image and its corresponding ground-truth, along with the output of our model generation report on the ChexPert Plus dataset. The mismatch sentence in the reports are highlighted using different colors*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -420,6 +426,8 @@ OraPO 处于放射学报告生成（RRG）的强化学习微调谱系中，其�
 3. OraPO 与更先进的长文本生成 RL 技术（如 DR.GRPO、LN-DPO）结合是否能进一步提升性能？
 4. 如何在保持高召回率的同时提升精确率，以完全消除假阳性？可能需要引入额外的精确率约束或负采样策略。
 5. OraPO 在其他医学影像报告生成任务（如 CT、MRI）上的适用性如何？不同模态的事实提取和蕴含验证逻辑可能需要适配。
+
+
 
 ## 原文 PDF
 

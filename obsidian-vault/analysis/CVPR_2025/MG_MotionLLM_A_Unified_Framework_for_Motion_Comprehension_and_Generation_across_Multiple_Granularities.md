@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/MG_MotionLLM_A_Unified_Framework_for_Motion_Comprehension_and_Generation_across_Multiple_Granularities.pdf
+project_link: null
+code_link: https://github.com/CVI-SZU/MG-MotionLLM
 aliases:
 - MM
 - MG-MotionLLM
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | MG-MotionLLM：面向多粒度运动理解与生成的统一框架 |
 | 英文题名 | MG-MotionLLM: A Unified Framework for Motion Comprehension and Generation across Multiple Granularities |
 | 会议/期刊 | CVPR 2025 |
-| Links | [paper](https://arxiv.org/abs/2504.02478)[GitHub](https://github.com/CVI-SZU/MG-MotionLLM)  |
+| Links | [paper](https://arxiv.org/abs/2504.02478) · [GitHub](https://github.com/CVI-SZU/MG-MotionLLM)  |
 | Topic | #topic/motion_animation #topic/motion_animation/human_motion_generation |
 | Method | MG-MotionLLM |
 | Dataset | HumanML3D (Text-to-Motion), HumanML3D (Motion-to-Text) |
@@ -41,7 +43,7 @@ claims:
 > - HumanML3D (Text-to-Motion) 上，Top-1 R-Precision ↑ 为 0.516，对比 0.492 (MotionGPT)，变化 +0.024。
 > - HumanML3D (Text-to-Motion) 上，Diversity ↑ 为 9.960，对比 9.528 (MotionGPT)，变化 +0.432。
 
-## 概述
+## 概要
 
 MG-MotionLLM 是一个面向多粒度运动理解与生成的统一框架。其核心动机源于一个关键瓶颈：**直接将人体运动序列与长篇幅的细粒度文本描述对齐存在根本性困难**。详细文本描述的长度常常超过 1000 个 token，而运动序列通常仅被压缩为约 50 个运动 token，信息密度差异巨大，导致模型难以捕捉运动的全局语义。实验证实，当直接将粗粒度和详细文本描述拼接用于指令微调时，运动生成的 Top-3 检索精度从仅使用粗粒度文本的 77.3% 下降至 75.0%，说明长文本反而干扰了全局语义学习。
 
@@ -49,7 +51,7 @@ MG-MotionLLM 是一个面向多粒度运动理解与生成的统一框架。其�
 
 在方法定位上，MG-MotionLLM 延续了将运动离散化为 token 并与语言模型统一建模的路线（如 **MotionGPT**, NeurIPS 2023），但其核心创新在于**多粒度协同训练策略**，使得单一模型能够同时胜任粗粒度任务（如文本驱动运动生成、运动描述生成）和首次提出的细粒度任务（如运动到详细文本生成、运动时间定位）。在 HumanML3D 基准上，MG-MotionLLM 在文本驱动运动生成任务中取得了 FID 0.303（MotionGPT 为 0.567）、Top-1 R-Precision 0.516 的结果，在运动描述生成任务中取得了 Top-1 R-Precision 0.592 的结果，均优于现有统一框架方法。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -65,7 +67,9 @@ MG-MotionLLM 是一个面向多粒度运动理解与生成的统一框架。其�
 
 具体而言，MG-MotionLLM采用两阶段训练策略：第一阶段为**Granularity-Synergy Pre-training**（多粒度协同预训练），引入时间边界定位、片段描述生成等28个跨粒度辅助任务，逐步建立运动与细粒度文本的映射关系；第二阶段为**Task-Specific Instruction Tuning**（任务特定指令微调），针对具体下游任务进一步优化。这一设计使得单一模型能够胜任从粗粒度运动生成到细粒度运动定位等多种新旧任务，突破了现有统一框架仅能处理粗粒度描述的局限。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MG-MotionLLM的核心创新在于**通过多粒度协同预训练（Granularity-Synergy Pre-training）解决运动与长详细文本直接对齐的瓶颈**，并构建了一个真正统一的、覆盖粗粒度与细粒度任务的运动语言模型框架。
 
@@ -99,7 +103,7 @@ MG-MotionLLM的核心洞察在于：**在统一语言模型框架中同时训练
 
 在HumanML3D测试集上，MG-MotionLLM在统一方法中取得了最优的Text-to-Motion FID（0.303 vs MotionGPT的0.567，Table 2）和Motion-to-Text Top-1 R-Precision（0.592 vs MotionGPT的0.543，Table 3），验证了多粒度协同预训练带来的实质性提升。
 
-## 整体框架
+
 
 MG-MotionLLM 的整体框架遵循“离散化-统一序列建模-两阶段训练”的流水线设计。其核心思路是将高维运动数据压缩为离散 token，与自然语言文本在同一序列空间中统一处理，再通过多粒度协同训练赋予模型跨任务的理解与生成能力。
 
@@ -141,7 +145,7 @@ MG-MotionLLM 的训练分为两个阶段，这是其区别于直接指令微调�
 
 直接使用粗粒度描述与长详细文本拼接进行指令调优时，模型性能反而下降——Top-3 检索精度从仅用粗粒度描述的 77.3% 降至 75.0%。根本原因在于详细描述长度常超 1000 个 token，而运动 token 至多约 50 个，信息密度极度不对称，导致模型难以捕捉运动的全局语义。两阶段训练通过先让模型在 28 个辅助任务中逐步建立细粒度映射，再在第二阶段聚焦特定任务，有效规避了这一瓶颈。消融实验证实，移除预训练阶段任意一个任务均会导致平均 Top-1 检索精度下降（Figure 6），且经过协同预训练的模型在所有四个测试任务上均优于直接指令微调的模型（Table 5）。
 
-## 核心模块与公式推导
+
 
 ### 3.1 运动离散化：Motion VQ-VAE
 
@@ -177,7 +181,9 @@ $$
 
 其中 $v_{out}^i$ 为输出序列中的第 $i$ 个 token，$\theta_{LLM}$ 为语言模型参数。该损失函数统一驱动所有多粒度任务的训练——无论是从文本生成运动 token、从运动 token 生成描述文本，还是执行时间边界定位等细粒度任务，均被形式化为同一自回归序列建模问题。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈验证：粗-细粒度直接对齐的失效
 
@@ -262,7 +268,9 @@ Table 6展示了不同T5模型尺寸（Small 60M、Base 220M、Large 770M）的�
 ![[assets/figures/papers/paper_list_l5_MG_MotionLLM_A_Unified_Framework_for_Motion_Comprehension_and_Generation/figures/012_Figure_6.jpg]]
 *Figure 6: Ablation of all the tasks in the Granularity-Synergy Pre-training stage on the HumanML3D dataset. To assess overall performance, we evaluate three representative tasks, i.e., Text-to-Motion, Motion-to-Text, and (Text, Detailed Text)-to-Motion, which cover both coarse- and fine-grained aspects, including generation and comprehension. Notably, for models ‘w/o Text-to-Motion’, ‘w/o Motion-to-Text’, and ‘w/o (Text, Detailed Text)-to-Motion’, we only evaluate the other two representative tasks. All these tasks use retrieval accuracy as the evaluation metric and we report their average Top-1 Retrieval Accuracy*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法脉络与基线关系
 
@@ -318,6 +326,8 @@ MG-MotionLLM 处于**统一运动理解与生成**这一研究脉络中，其直
 此外，从方法谱系角度看，以下问题值得进一步探索：
 - Granularity-Synergy Pre-training 中 28 个任务的必要性已在当前数据规模下验证，但任务间的冗余性和最优任务组合策略尚不明确。
 - 细粒度任务“Motion-to-Detailed Text”为本文首次提出的基准，缺乏外部独立验证和标准化评估协议，其评估体系（BERTScore）的可靠性需要在更广泛的社区共识中确认。
+
+
 
 ## 原文 PDF
 

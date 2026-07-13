@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/Grounded_3D_Aware_Spatial_Vision_Language_Modeling.pdf
+project_link: null
 code_link: null
 aliases:
 - GG3ASV
@@ -42,7 +43,7 @@ claims:
 > - Omni3D (ARKITSCENES) 上，AP_15 / mAP 67.49 / 52.52 vs Cube R-CNN: 41.73 / -- ; Qwen3-VL-8B: 63.97 / 46.33 (显著提升)。
 > - Omni3D (综合) 上，AP_15 / mAP (平均) 全面领先 vs 所有对比VLM和视觉专家 (SOTA)。
 
-## 概述
+## 概要
 
 ### 问题背景与核心瓶颈
 
@@ -62,8 +63,6 @@ GR3D（Grounded 3D-Aware Spatial VLM）将**接地作为核心机制**集成到V
 ### 方法定位
 
 GR3D基于**NVILA-8B-Lite**架构构建空间VLM基础，并在此基础上引入接地能力。与**Qwen3-VL-8B**（Bai et al., arXiv 2025）等最新VLM相比，GR3D的核心差异在于将接地从可选的辅助功能转变为核心推理机制，从而在保持通用VQA能力的同时，显著增强了空间接地和3D推理性能。
-
-## 背景与动机
 
 ### 空间理解：从2D到3D的鸿沟
 
@@ -91,7 +90,7 @@ GR3D基于**NVILA-8B-Lite**架构构建空间VLM基础，并在此基础上引�
 
 这一设计将接地从辅助功能提升为VLM的核心推理原语，使模型能够在统一的框架内完成从语言理解、2D定位到3D推断的完整空间推理链。
 
-## 核心创新
+## 核心方法与创新机理
 
 GR3D的核心创新在于将**接地（Grounding）**从VLM的附属能力提升为核心推理机制，并通过“2D感知→3D推理”的分解策略，解决了空间VLM在单目场景下的两个关键瓶颈：**隐性2D接地能力的缺失**，以及**深度-尺度-相机内参的耦合模糊性**。
 
@@ -139,8 +138,6 @@ $$W' = \frac{1000}{f_x} \cdot W, \quad H' = \frac{1000}{f_x} \cdot H$$
 
 这些创新使GR3D在Omni3D基准上全面超越现有VLM和部分视觉专家模型，尤其在室内场景（SUN-RGBD、ARKITSCENES）表现突出，验证了“接地作为核心推理机制”这一设计哲学的有效性。
 
-## 整体框架
-
 GR3D构建于区域视觉语言模型（Region-VLM）之上，核心创新在于引入**流式区域插入（Streaming Region Insertion）**机制，将2D接地与3D推理统一为端到端的生成式框架。整体pipeline遵循“2D感知→3D推理”的两步分解策略，如图2所示。
 
 **基础空间VLM**：模型以**NVILA-8B-Lite**为底座，集成深度感知与空间位置编码，形成具备几何感知能力的视觉token表示。该基础模型为后续所有接地能力提供统一的视觉语言表征。
@@ -159,8 +156,6 @@ $$W' = \frac{1000}{f_x} \cdot W, \quad H' = \frac{1000}{f_x} \cdot H$$
 
 ![[assets/figures/papers/paper_list_l2392_https_openaccess_thecvf_com_content_CVPR2026_html_Cheng_Grounded_3D_Awar/figures/003_Figure_2.jpg]]
 *Figure 2: Method overview. GR3D builds on Region-VLMs by adding streaming region insertion for visual Chain-of-Thought reasoning. During CoT, the model repeatedly predicts a region, extracts its visual embedding, and reinserts a region token into the text sequence, enabling step-by-step spatial reasoning with dynamically refreshed visual cues*
-
-## 核心模块与公式推导
 
 GR3D 的核心架构由三个递进模块构成：**基础空间 VLM** 提供几何感知的视觉表征，**2D 接地模块** 实现语言提及到图像区域的关联，**单目 3D 接地模块** 将 2D 区域提升为相机坐标系下的 3D 边界框。以下逐层解析各模块的设计逻辑与关键公式。
 
@@ -197,7 +192,7 @@ $$H' = \frac{1000}{f_x} \cdot H$$
 
 隐性接地训练依赖大规模自动标注数据。GR3D 使用 **Florence-2** 为文本中的每个实体提及生成候选 2D 边界框和类别标签，随后通过验证-重写管线确保标注质量：(i) 验证文本提及与检测区域的一一对应关系；(ii) 将通用类别名改写为简洁的实例级描述。这一管线为流式区域插入提供了必要的训练信号，但其质量受限于基础检测器的性能，在复杂开放场景中可能出现错位。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验设计与评估协议
 
@@ -256,22 +251,13 @@ Figure 5的点图预测数据量缩放实验进一步表明，增加稠密几何
 ![[assets/figures/papers/paper_list_l2392_https_openaccess_thecvf_com_content_CVPR2026_html_Cheng_Grounded_3D_Awar/figures/006_Figure_3.jpg]]
 *Figure 3: Results on the BLINK-Depth benchmark for point-level region spatial understanding. Left: comparison with VLM baselines. Right: visualization of one sample. Our method surpasses prior Region-VLMs (*), which require manual annotated masks*
 
-![[assets/figures/papers/paper_list_l2392_https_openaccess_thecvf_com_content_CVPR2026_html_Cheng_Grounded_3D_Awar/figures/007_Table_3.jpg]]
-*Table 3: Performance comparison on general visual question answering and spatial reasoning benchmarks*
-
 ![[assets/figures/papers/paper_list_l2392_https_openaccess_thecvf_com_content_CVPR2026_html_Cheng_Grounded_3D_Awar/figures/008_Figure_4.jpg]]
 *Figure 4: Qualitative results on 3D object detection. Our model produces accurate 3D bounding boxes on in-the-wild samples*
-
-![[assets/figures/papers/paper_list_l2392_https_openaccess_thecvf_com_content_CVPR2026_html_Cheng_Grounded_3D_Awar/figures/009_Table_4.jpg]]
-*Table 4: Results on the MM-GCoT benchmark*
 
 ![[assets/figures/papers/paper_list_l2392_https_openaccess_thecvf_com_content_CVPR2026_html_Cheng_Grounded_3D_Awar/figures/010_Table_5.jpg]]
 *Table 5: Ablation study on the key components of GR3D-8B. “PT” denotes pretraining*
 
-![[assets/figures/papers/paper_list_l2392_https_openaccess_thecvf_com_content_CVPR2026_html_Cheng_Grounded_3D_Awar/figures/011_Figure_5.jpg]]
-*Figure 5: Scaling behavior when increasing pointmap prediction data on SUN-RGBD. More pointmap supervision leads to better 3D detection performance*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 技术路线定位：从2D接地VLM到空间感知的3D推理
 

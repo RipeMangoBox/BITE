@@ -42,7 +42,7 @@ claims:
 > - ChartMimic 上，Low-Level score 86.5 (4 turns) vs 77.4 (ChartCoder, 1 turn) (+9.1)；High-Level score (GPT-4o) 84.9 (4 turns) vs 74.0 (ChartCoder, 1 turn) (+10.9)。
 > - Plot2Code 上，Text-Match score 63.2 (1 turn) vs 54.5 (ChartCoder, 1 turn) (+8.7)；Pass Rate 98.5 (4 turns) vs 87.9 (ChartCoder, 1 turn) (+10.6)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有的多模态大语言模型（MLLMs）在图表到代码生成（Chart2Code）任务中普遍缺乏有效的自纠正能力。实验表明，即使允许模型进行第二轮修正，其性能提升主要来自代码可执行率的提高，而非对已可执行代码的精细化改进——在首轮代码已可执行的情况下，第二轮的低级得分反而下降（Qwen3-VL-8B 下降1.03%，Qwen3-VL-235B 下降0.26%）。这说明现有模型无法有效纠正已可执行代码中的视觉细节错误。
 
@@ -51,8 +51,6 @@ claims:
 **主要结果**：MM-ReCoder 在 ChartMimic 基准上以 86.5% 的低级得分超越 ChartCoder 9.1 个百分点，同时超越 GPT-4o 和 Qwen3-VL-235B-A22B 等大模型；在 Plot2Code 的文本匹配得分上达到 63.2%，可执行率提升至 98.5%。消融实验证实，两阶段 RL 策略是实现有效自纠正的关键——共享首轮优化使 14.4% 的样本获得改进，而单用全轨迹优化则导致 46.9% 的第二轮输出仅为首轮代码的重复。
 
 **方法谱系与知识库定位**：MM-ReCoder 属于图表代码生成领域的 RL 增强方法，其直接对比基线包括基于 SFT 的 **ChartCoder** 以及通用多模态模型 **Qwen3-VL-8B** 和 **Qwen3-VL-235B-A22B**。与依赖单轮 SFT 预测的传统范式不同，MM-ReCoder 将多轮自纠正建模为强化学习问题，通过 GRPO 策略优化使模型学会利用执行反馈进行迭代代码修正。该方法在技术路径上与视觉推理的 RL 训练（如 DeepSeek-R1 的 GRPO 应用）共享优化思想，但将应用场景聚焦于图表渲染代码的结构化生成与视觉细节对齐。
-
-## 背景与动机
 
 ### 任务定义：图表到代码生成
 
@@ -68,7 +66,7 @@ claims:
 
 基于这一诊断，本文提出**MM-ReCoder**，其核心动机是：**通过强化学习（RL）显式地训练模型的自纠正能力**，使模型在多轮迭代中学会利用执行反馈进行有效的代码修正，而非仅仅提高可执行率。为此，MM-ReCoder引入了一种两阶段多轮自纠正RL策略（基于GRPO），并配合规则奖励与模型奖励的混合设计，从根本上重塑模型的代码生成与修正行为。
 
-## 核心创新
+## 核心方法与创新机理
 
 MM-ReCoder 的核心创新在于首次将**多轮自纠正能力显式地注入图表到代码生成（Chart2Code）模型**，通过一套精心设计的两阶段强化学习策略，解决了现有 MLLMs 在自我修正时的根本性缺陷。
 
@@ -114,8 +112,6 @@ $$R_{\text{combined}} = (1-\alpha-\beta) \cdot R_{\text{format}} + \alpha \cdot 
 
 需要注意的是，MM-ReCoder 的自纠正能力存在递减效应：第 4 轮后低级分提升趋于饱和（Table 4）。此外，模型有时在思考 trace 中提出多项修正，但在代码中并未全部实现（思维与代码不一致），且对训练数据中未覆盖的稀有图表类型泛化能力有限。这些限制指向了未来工作方向——如何扩展到更多轮次而不退化，以及如何将这一自纠正 RL 范式迁移到其他视觉编码任务。
 
-## 整体框架
-
 MM-ReCoder 的整体训练管道由两个宏观阶段构成：**冷启动（Cold Start）** 与 **多轮自纠正强化学习（Multi-Turn Self-Correction RL）**，如图2所示。冷启动赋予模型基础的图表到代码生成能力与多轮交互能力，RL阶段则通过精心设计的奖励信号和采样策略，显式地训练模型利用执行反馈进行有效的代码修正。
 
 ### 冷启动：从单轮编码到多轮自纠正的初始化
@@ -158,8 +154,6 @@ $$ \text{Total Reward} = (1-\alpha-\beta) \cdot \text{Format} + \alpha \cdot \te
 
 ![[assets/figures/papers/paper_list_l2695_https_arxiv_org_abs_2604_01600/figures/002_Figure_2.jpg]]
 *Figure 2: Training pipeline of MM-ReCoder. We first conduct two stages of cold start: (a) we first train the model on ground truth chartcode pairs with SFT, then (b) we construct self-correction data with Qwen3VL-235B [31], filter the successful ones, and train our model on the filtered data. After cold start, we conduct two stages of reinforcement learning: (c) we first enhance the model’s self-correction capability in the second turn via shared-first-turn optimization, then (d) we optimize the two turns jointly to improve the coding ability*
-
-## 核心模块与公式推导
 
 ### 问题形式化与多轮自纠正框架
 
@@ -218,15 +212,7 @@ Table 2 的对比实验揭示了策略设计的因果机制：
 - 引入共享首轮优化后，改进样本比例提升至 14.4%，平均低级别提升 0.72%，显式地赋予了模型自纠正能力。
 - 两阶段结合（共享首轮 + 全轨迹）使模型的首轮和次轮能力均衡提升，最终在 ChartMimic 上实现 86.5% 的低级分（4 轮），超越 ChartCoder 9.1 个百分点。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2695_https_arxiv_org_abs_2604_01600/figures/001_Figure_1.jpg]]
-*Figure 1: In multi-turn Chart2Code, the model takes the execution result from its first-turn code and revises the code accordingly. Although existing MLLMs improve evaluation scores between the two turns, the gains mainly come from increased code executability. When we restrict the analysis to cases where the first-turn code is already executable, existing models show a negative improvement, whereas our model demonstrates a positive one*
-
-![[assets/figures/papers/paper_list_l2695_https_arxiv_org_abs_2604_01600/figures/003_Figure_3.jpg]]
-*Figure 3: Result of a model trained solely with rule-based reward. The model receives a full rule-based reward though the texts are overlapped. But the model-based reward can penalize this chart*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 核心瓶颈的实证验证：现有MLLM的自纠正悖论
 
@@ -272,28 +258,16 @@ Table A6统计了自纠正的三种失败模式频率：（1）**诊断错误**�
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l2695_https_arxiv_org_abs_2604_01600/figures/004_Table_1.jpg]]
-*Table 1: Evaluation results on the Chart2Code task. MM-ReCoder achieves the best low-level score on ChartMimic and Text-match score on Plot2Code. On the other evaluation metrics, MM-ReCoder outperforms models of comparable size significantly*
-
 ![[assets/figures/papers/paper_list_l2695_https_arxiv_org_abs_2604_01600/figures/006_Table_2.jpg]]
 *Table 2: Comparison of RL strategies for self-correction. Our two-stage strategy enables self-correction capability while the others cannot*
-
-![[assets/figures/papers/paper_list_l2695_https_arxiv_org_abs_2604_01600/figures/007_Table_4.jpg]]
-*Table 4: MM-ReCoder iteratively self-corrects for multiple turns*
-
-![[assets/figures/papers/paper_list_l2695_https_arxiv_org_abs_2604_01600/figures/009_Table_5.jpg]]
-*Table 5: Performance after each stage. Cold start improves coding ability, but cannot directly enable self-correction. Multi-turn cold start recovers the model’s multi-turn ability but degrades the performance because the data in this stage is not ground truth*
 
 ![[assets/figures/papers/paper_list_l2695_https_arxiv_org_abs_2604_01600/figures/010_Table_6.jpg]]
 *Table 6: Ablation on RL reward weights. Model training and inference are single-turn without self-correction*
 
-![[assets/figures/papers/paper_list_l2695_https_arxiv_org_abs_2604_01600/figures/015_Table.jpg]]
-*Table: A5. Human evaluation between MM-ReCoder and baselines on ChartMimic. The results are in line with the high-level score. Table A6. Frequencies of self-correction failure modes*
-
 ![[assets/figures/papers/paper_list_l2695_https_arxiv_org_abs_2604_01600/figures/014_Table.jpg]]
 *Table: A4. Ablation on the reward model under the single-turn RL setting. Qwen2.5-VL-7B as the reward model is able to improve the high-level score on ChartMimic, but replacing Qwen2.5- VL-7B with Qwen2.5-VL-72B can further boost the model*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 方法沿革与基线关系
 

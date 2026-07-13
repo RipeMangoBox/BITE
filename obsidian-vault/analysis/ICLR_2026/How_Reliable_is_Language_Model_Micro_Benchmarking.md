@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/How_Reliable_is_Language_Model_Micro_Benchmarking.pdf
+project_link: null
+code_link: https://github.com/dill-lab/micro-benchmarking-reliability
 openreview_forum_id: cReExMQLiK
 aliases:
 - MDADMMEM
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 语言模型微基准测试的可靠性研究 |
 | 英文题名 | How Reliable is Language Model Micro-Benchmarking? |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=cReExMQLiK); [GitHub](https://github.com/dill-lab/micro-benchmarking-reliability) |
+| Links | [paper](https://openreview.net/forum?id=cReExMQLiK) · [GitHub](https://github.com/dill-lab/micro-benchmarking-reliability) |
 | Topic | #topic/benchmarks_datasets_evaluation #topic/benchmarks_datasets_evaluation/benchmark_eval |
 | Method | Minimum Detectable Ability Difference (MDAD) meta-evaluation measure |
 | Dataset | MMLU, MMLU-Pro, MMLU-Pro (8B instruct models) |
@@ -42,7 +44,7 @@ claims:
 > - MMLU-Pro 上，MDAD 为 Anchor Points (500 examples) ≈ 2，对比 Uniform random sampling (500 examples) ≈ 2，变化 ≈ 0 (competitive)。
 > - MMLU-Pro (8B instruct models) 上，pairwise comparison preservation 为 MDAD-based analysis，对比 Aggregate rank correlation，变化 identifies 51% comparisons not preserved vs. not revealed。
 
-## 概述
+## 概要
 
 语言模型评估正面临一个日益突出的矛盾：全量基准测试的计算成本持续攀升，而微基准测试（micro-benchmarking）——通过选取少量示例来近似完整基准——被寄予厚望。然而，一个根本性问题长期被忽视：**当样本量被极端压缩时，微基准测试究竟能在多大程度上可靠地区分模型性能差异？**
 
@@ -58,7 +60,7 @@ claims:
 
 这些发现表明，微基准测试的可靠性评估需要从“聚合排名是否相关”转向“哪些模型比较能被可靠保留”的细粒度视角，而 MDAD 正是为此设计的诊断工具。
 
-## 背景与动机
+
 
 语言模型评估正面临一个日益突出的效率困境：全量基准测试（如MMLU、MMLU-Pro、BBH等）动辄包含数千道题目，对单个模型进行一次完整评估就需要耗费大量计算资源与时间。为缓解这一压力，研究者提出了多种**微基准测试（micro-benchmarking）**方法——通过从全量基准中精心挑选一个小规模示例子集，以远低于全量评估的成本近似模型的全基准性能。
 
@@ -70,7 +72,9 @@ claims:
 
 正是基于这一认识，本文提出了一个全新的元评估视角：不再问“微基准测试的整体排名有多准”，而是问“**微基准测试能可靠区分多大的性能差异**”。这一视角的转变直接催生了MDAD（Minimum Detectable Ability Difference）指标，它精确刻画了给定样本量下微基准测试能够一致正确排序的最小模型性能差异，从而为效率与可靠性之间的权衡提供了可操作的量化依据。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于提出了一种全新的**元评估范式**，将微基准测试的可靠性评估从聚合统计量转向**细粒度的成对排序保真度**分析。这一范式转变通过一个名为 **MDAD（Minimum Detectable Ability Difference）** 的指标实现，其设计逻辑与现有元评估方法存在根本性差异。
 
@@ -111,7 +115,7 @@ MDAD 的范式转变还体现在其**解释性价值**上。传统指标只能�
 
 这种诊断能力直接解释了微基准测试中常见的“排名稳定”现象：当模型性能差异远大于 MDAD 时，排名自然稳定；而当模型性能差异接近或小于 MDAD 时，排名的波动并非方法缺陷，而是**信息论意义上的不可区分性**。
 
-## 整体框架
+
 
 本文的核心贡献并非提出一种新的微基准测试构建方法，而是引入了一套**元评估框架**，用于精确刻画微基准测试在极端样本缩减下的可靠性边界。该框架围绕一个核心指标——**最小可检测能力差异（Minimum Detectable Ability Difference, MDAD）**——展开，其设计逻辑如下：
 
@@ -150,7 +154,7 @@ MDAD 的直观含义是：在全量基准上，微基准测试能够以至少 80
 - **模型集依赖**：MDAD 的估计依赖于一组固定的源模型和目标模型划分。当目标模型集发生变化（如出现全新架构的模型）时，MDAD 可能需要重新校准。
 - **阈值选择**：一致性阈值 0.8 是预设参数，但消融实验表明，使用 0.7、0.9 或 0.95 等不同阈值时，MDAD 的结果在定性上保持一致（Figure 7）。
 
-## 核心模块与公式推导
+
 
 ### 一致性概率（Agreement Probability）
 
@@ -182,7 +186,9 @@ $$
 
 MDAD 通过**细粒度的成对排序一致性条件概率**克服了上述局限：它能够揭示微基准测试在哪些性能差异区间上可靠、哪些区间上不可靠，从而为评估者提供可操作的决策依据——例如，当目标模型集的全基准准确率差异普遍小于 MDAD 时，该微基准测试的排序结果不可信。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 微基准测试方法的整体表现
 
@@ -270,7 +276,9 @@ MDAD 的定义依赖于两个超参数：一致性概率阈值（默认 0.8）�
 ![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_cReExMQLiK/figures/014_Table_4.jpg]]
 *Table 4: Results for the BenTo micro-benchmarking method*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 微基准测试方法的谱系
 
@@ -329,6 +337,8 @@ Anchor Points 在极小样本量下具有最低的 MDAD，但在选择 1000 个�
 
 **鲁棒性验证：**
 本文通过多项消融实验验证了 MDAD 的稳健性：使用 0.7、0.8、0.9、0.95 等不同一致性阈值得到的 MDAD 结果在定性上相似（Figure 7）；不同的分桶分辨率（0.25, 0.5, 1.0）对 MDAD 的影响较小（Figure 8）；50 次试验已能提供稳定的置信区间（Table 3）。
+
+
 
 ## 原文 PDF
 

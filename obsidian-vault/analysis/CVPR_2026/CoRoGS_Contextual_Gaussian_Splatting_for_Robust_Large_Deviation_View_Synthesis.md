@@ -41,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - KITTI (0.5m lateral right-shift, supervised) 上，PSNR↑ 24.96；SSIM↑ 0.849；LPIPS↓ 0.180。
 
-## 概述
+## 概要
 
 ### 研究问题与瓶颈
 
@@ -69,7 +69,7 @@ claims:
 
 当前方法仍存在两个主要局限：**对动态对象的处理能力有限**，难以建模包含运动物体的场景；**在大角度旋转场景下几何一致性可能下降**，表明旋转感知的结构约束尚未充分融入。相应的开放问题包括：如何将上下文推理范式扩展到动态高斯场、如何融入旋转感知的结构先验，以及如何优化大规模城市场景中的图构建计算开销。
 
-## 背景与动机
+
 
 ### 大偏差视图合成：从独立基元到上下文感知表示
 
@@ -111,7 +111,9 @@ claims:
 
 通过这一上下文推理机制，CoRoGS使得每个高斯在大偏差视角下仍能保持与邻域的结构一致性，从而从根本上缓解几何不一致和外观退化问题。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CoRoGS 的核心创新在于将 3D 高斯泼溅（3DGS）从“独立基元”范式转向“上下文感知的图表示”范式，通过显式建模高斯间的空间与语义依赖关系，从根本上解决了大视角偏差下几何不一致与外观退化这一瓶颈。
 
@@ -160,7 +162,7 @@ CoRoGS 通过 PointNet++ 编码器从位置和法线提取语义属性 $\mathbf{
 
 CoRoGS 的创新并非孤立的模块堆叠，而是围绕“上下文感知高斯图”这一核心洞察的系统性重构：用图拓扑替代独立基元，用消息传递替代独立优化，用语义引导的平滑和扩张替代无差别的正则化与覆盖策略。这五个 changed slots 相互协同，共同实现了在大视角偏差下全局结构连贯、语义一致的高保真渲染。
 
-## 整体框架
+
 
 CoRoGS 的整体 pipeline 围绕“上下文感知的高斯泼溅”这一核心范式展开，将传统 3DGS 中相互独立的高斯基元转化为一个显式建模空间与语义依赖关系的**3D 高斯图结构**，并通过图神经网络的消息传递机制实现一致性高斯更新。整个框架由五个关键模块串联构成，形成从场景初始化到最终渲染的闭环。
 
@@ -186,7 +188,7 @@ CoRoGS 的整体 pipeline 围绕“上下文感知的高斯泼溅”这一核心
 ![[assets/figures/papers/paper_list_l2248_https_openaccess_thecvf_com_content_CVPR2026_html_Ma_CoRoGS_Contextual_G/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of our CoRoGS. (a) 3D Gaussian Graph Construction module builds a graph representation of Gaussians in Sec. 3.3. (b) Gaussian Graph Neural Network in Sec. 3.4 refines each Gaussian through three submodules: 1) attributes embedding, 2) geometric and semantic update, 3) cross-modal fusion. (c) Context-aware Gaussian decoder in Sec. 3.5. (d) Contextual smoothness loss in Sec. 3.6. (e) Graph Expansion module in Sec. 3.7 iteratively refines the graph by adding nodes in uncovered regions while pruning redundant ones to alleviate artifacts caused by incomplete topology*
 
-## 核心模块与公式推导
+
 
 CoRoGS 的核心在于将高斯表示从独立基元转化为上下文感知的图结构，并通过图神经网络实现高斯间的消息传递与协同更新。本节聚焦于支撑这一范式的关键模块与核心公式。
 
@@ -259,7 +261,9 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_1 + \lambda_D \mathcal{L}_{\mathrm{
 ![[assets/figures/papers/paper_list_l2248_https_openaccess_thecvf_com_content_CVPR2026_html_Ma_CoRoGS_Contextual_G/figures/010_Figure_6.jpg]]
 *Figure 6: Visualization of initial and optimized Gaussian graph*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -319,7 +323,9 @@ CoRoGS 在两种实验设置下均展现出显著优势：监督小偏差设置�
 ![[assets/figures/papers/paper_list_l2248_https_openaccess_thecvf_com_content_CVPR2026_html_Ma_CoRoGS_Contextual_G/figures/007_Figure.jpg]]
 *Figure: (n) Ours (Full Model)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位与核心瓶颈
 
@@ -384,6 +390,8 @@ CoRoGS的渐进式图扩张策略与NeRF中的自适应采样和3DGS中的克隆
 3. **大规模场景的高效图计算**：能否通过层次化图结构（如粗粒度场景图与细粒度局部图的嵌套）或稀疏注意力机制降低消息传递的计算复杂度？这关系到方法在自动驾驶等实际应用中的可行性。
 
 4. **跨场景的上下文先验迁移**：CoRoGS的语义属性编码器（PointNet++）在特定数据集上训练，能否通过预训练或元学习使上下文推理能力在不同场景间迁移，减少对新场景的适配成本？
+
+
 
 ## 原文 PDF
 

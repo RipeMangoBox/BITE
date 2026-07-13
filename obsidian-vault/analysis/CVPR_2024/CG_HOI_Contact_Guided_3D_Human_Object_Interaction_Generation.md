@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2024
 pdf_ref: paperPDFs/CVPR_2024/CG_HOI_Contact_Guided_3D_Human_Object_Interaction_Generation.pdf
+project_link: null
+code_link: null
 aliases:
 - CH
 - CG-HOI
@@ -41,7 +43,7 @@ claims:
 > - BEHAVE 上，FID (Text-Cond. HOI) 6.31 vs 8.70 (InterDiff) / 9.21 (MDM) (-2.39 / -2.90)；R-Prec. top-3 (Text-Cond. HOI) 0.62 vs 0.53 (InterDiff) / 0.49 (MDM) (+0.09 / +0.13)。
 > - CHAIRS 上，FID (Text-Cond. HOI) 6.45 vs 7.53 (InterDiff) / 9.23 (MDM) (-1.08 / -2.78)；R-Prec. top-3 (Text-Cond. HOI) 0.74 vs 0.69 (InterDiff) / 0.53 (MDM) (+0.05 / +0.21)。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -80,8 +82,6 @@ CG-HOI属于**条件运动扩散模型**，其方法谱系可定位于以下坐�
 
 消融实验（Table 2）进一步验证了各组件的关键贡献：移除交叉注意力导致FID从6.31升至10.44，完全移除接触预测使FID升至9.64，移除接触加权方案升至8.54，移除推理引导升至7.22。用户感知研究（Figure 5）也表明参与者显著偏好CG-HOI的生成真实感和文本一致性。此外，CG-HOI展现出良好的灵活性：无需重新训练即可在给定物体轨迹条件下生成对应人体运动，并可直接应用于静态3D场景扫描中的物体交互生成。
 
-## 背景与动机
-
 ### 问题背景：三维人-物交互生成的核心挑战
 
 生成逼真的三维人-物交互（Human-Object Interaction, HOI）序列是计算机视觉与图形学中的关键问题，其应用涵盖虚拟现实、机器人学习和动画制作等领域。给定一段文本描述（如“一个人拿起椅子并行走”）和目标物体的几何形状，系统需要同时生成人体运动序列和物体运动轨迹，且两者必须在物理上一致、语义上相关。
@@ -106,7 +106,7 @@ CG-HOI的提出正是为了填补这一缺口。其核心动机是：**将接触
 
 这一设计使得CG-HOI能够从根本上缓解物体悬浮和穿透等问题，同时无需重新训练即可适配物体轨迹条件生成和静态场景扫描等下游应用。
 
-## 核心创新
+## 核心方法与创新机理
 
 CG-HOI的核心创新在于首次将**接触（Contact）**显式建模为人-物交互生成中的桥接模态，并围绕接触设计了一套完整的联合生成、运动加权与推理优化机制，从而系统性地解决了现有方法中人体与物体运动相互孤立、生成结果物理不合理（如物体悬浮、穿透）的根本瓶颈。
 
@@ -138,8 +138,6 @@ $$\hat{\mu}_t = \mu_t + s \Sigma_t \nabla_{x_t} \mathcal{G}(x_t), \quad \mathcal
 
 CG-HOI在推理时可通过简单的**替换注入**策略，将给定的物体运动序列直接注入扩散过程，无需任何重新训练即可生成与之匹配的人体运动。这一能力源于联合扩散框架内在的模态间依赖——交叉注意力已学会从物体运动推断人体响应，使得模型天然支持物体轨迹条件生成（Figure 7），并可应用于静态3D场景扫描中的交互生成（Figure 8）。
 
-## 整体框架
-
 CG-HOI 的整体流程围绕一个核心设计展开：**将接触显式建模为连接人体运动与物体运动的桥接模态**，并在统一的扩散框架中对三者进行联合生成。图 Figure 2 给出了方法的两阶段总览——训练阶段通过跨模态交叉注意力学习人-物-接触的相互依赖，推理阶段则在接触引导下采样以增强物理合理性。
 
 ![[assets/figures/papers/paper_list_l1710_CG_HOI_Contact_Guided_3D_Human_Object_Interaction_Generation/figures/002_Figure_2.jpg]]
@@ -162,8 +160,6 @@ $$ o_i = \frac{1}{\sum_j \max(|c_i|) - |c_i^j|} \sum_{j=0}^{M-1} (\max(|c_i|) - 
 **推理阶段的接触引导。** 在推理采样时，方法引入基于接触距离的扩散引导：每步计算预测接触与从生成序列重算接触之间的 $L_2$ 损失，以其梯度修正均值估计，强制生成序列满足接触一致性。修正公式为 $\hat{\mu}_t = \mu_t + s \Sigma_t \nabla_{x_t} \mathcal{G}(x_t)$，引导尺度 $s=100.0$。同时采用分类器无关引导（scale=2.5）以平衡多样性与保真度。
 
 **无需重训练的灵活应用。** 该框架支持在推理时注入给定的物体轨迹 $O'$，通过替换式方法将外部物体运动嵌入扩散采样过程，从而生成与之匹配的人体运动，无需重新训练。这一能力可进一步拓展至从静态 3D 场景扫描中分割物体并生成相应的人-物交互序列（Figure 8）。
-
-## 核心模块与公式推导
 
 ### 4.1 概率去噪扩散框架
 
@@ -217,12 +213,7 @@ $$\hat{\mu}_t = \mu_t + s \sum_t \nabla_{\mathbf{x}_t} \mathcal{G}(\mathbf{x}_t)
 
 其中 $s=100.0$ 为引导尺度。该机制惩罚生成的接触距离偏离预测值，有效减少物体悬浮、穿透等伪影。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1710_CG_HOI_Contact_Guided_3D_Human_Object_Interaction_Generation/figures/003_Figure_3.jpg]]
-*Figure 3: An object’s trajectory is largely defined by the motion of the region of the body in close contact with the object, e.g. the hand(s) when carrying an object (left, middle) or the lower body when moving with an object while sitting (right). This informs our contact-based approach to generating object motion*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -280,15 +271,7 @@ CG-HOI在BEHAVE和CHAIRS两个公开数据集上进行了系统评估，并与�
 ![[assets/figures/papers/paper_list_l1710_CG_HOI_Contact_Guided_3D_Human_Object_Interaction_Generation/figures/004_Table_1.jpg]]
 *Table 1: Quantitative comparison with state-of-the-art approaches MDM [73] and InterDiff [88]. Human Only results are evaluated only on the human pose sequence, and motion-cond. denotes predictions additionally conditioned on past observations of both human and object behavior. For metrics with →, results closer to the real distribution are better. Our approach outperforms these baselines in all three settings, indicating a strong learned correlation between human and object motion*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1710_CG_HOI_Contact_Guided_3D_Human_Object_Interaction_Generation/figures/010_Figure_7.jpg]]
-*Figure 7: Given an object trajectory at inference time, our method can generate corresponding human motion without re-training*
-
-![[assets/figures/papers/paper_list_l1710_CG_HOI_Contact_Guided_3D_Human_Object_Interaction_Generation/figures/009_Figure_8.jpg]]
-*Figure 8: Application to static 3D scene scans. Our method can generate HOIs from segmented objects in such environments*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 

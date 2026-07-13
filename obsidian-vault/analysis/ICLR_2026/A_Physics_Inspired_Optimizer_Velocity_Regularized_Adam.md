@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/A_Physics_Inspired_Optimizer_Velocity_Regularized_Adam.pdf
+project_link: null
+code_link: null
 openreview_forum_id: 6BhduwrCp3
 aliases:
 - PIOVRA
@@ -41,7 +43,7 @@ claims:
 > - CIFAR-10 (图像分类) 上，Test Loss 为 0.469，对比 0.497 (AdamW)，变化 ↓0.028。
 > - GridWorld (流匹配) 上，Test Loss 为 1.33，对比 2.01 (AdamW)，变化 ↓0.68。
 
-## 概述
+## 概要
 
 自适应优化器（如AdamW）在训练深度网络时，常陷入**自适应稳定边界（Adaptive Edge of Stability, AEoS）**区域。该区域内，动量缓冲区的高速振荡导致损失函数非单调波动，最终收敛速度减慢。本文提出**VRAdam**（Velocity Regularized Adam），通过受物理学启发的速度正则化机制解决这一问题。
 
@@ -57,7 +59,7 @@ $$\eta_t = \frac{\alpha_0}{1 + \min(\beta_3 \|v_t\|^2, \alpha_1)}$$
 
 VRAdam额外引入两个超参数（$\beta_3$控制速度惩罚强度，$\alpha_1$控制最小学习率），虽增加调参负担，但实验表明通过标准网格搜索即可有效调优。
 
-## 背景与动机
+
 
 ### 自适应优化器的边缘稳定困境
 
@@ -84,7 +86,9 @@ VRAdam额外引入两个超参数（$\beta_3$控制速度惩罚强度，$\alpha_
 
 这一物理机制直接对应优化器中的一个可操作设计：将四次速度惩罚项的导数转化为动态学习率门控，使得学习率随动量缓冲区范数自适应缩放——高速时降低学习率以稳定训练，低速时恢复最大学习率以快速收敛。这正是VRAdam的核心动机：在不牺牲Adam逐参数自适应缩放能力的前提下，引入全局速度正则化，从物理层面抑制AEoS振荡。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 VRAdam 的核心创新在于将物理学中经典时间晶体和重夸克稳定性理论引入优化器设计，通过**改进动能函数**并由此衍生出**速度依赖的动态学习率门控**，在不牺牲 Adam 自适应逐参数缩放的条件下，全局抑制自适应稳定边界（AEoS）区域的动量振荡。
 
@@ -115,7 +119,7 @@ $$\frac{d}{dt}[(m + \beta_3 \|v\|^2)v] = -\nabla L_{\mathrm{Loss}}(x)$$
 
 VRAdam 的学习率门控是**全局标量**，对所有权重方向施加一致的缩放因子。这与 Adam 的逐参数二阶矩预处理 $1/\sqrt{m_t}$ 正交——前者负责全局稳定性调控，后者保留自适应梯度缩放的表达能力。Theorem 4.1 的 CQLF 构造保证了在任意标量门控切换下收缩性质仍然成立，避免了逐方向门控可能引入的切换各向异性不稳定性（Section 4.3）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0010_6BhduwrCp3_A_Physics-Inspired_Optimizer_Velocity_Regularize/figures/005_Figure_2.jpg]]
 *Figure 2: (a) Training loss curves for VRAdam, Adam, and SAM (Foret et al., 2021) of ResNet-32 on CIFAR-10 (b) training accuracy curves (c) plot of maximal eigenvalues of the loss Hessian (d) effective learning rate during training. Hyperparameters for these plots are provided in Appendix E.4*
@@ -159,7 +163,7 @@ VRAdam 在标准自适应优化器（AdamW）的动量框架之上，引入了�
 $$T_{\mathrm{VRAdam}}(v) = \frac{m}{2}\|v\|^2 + \frac{\beta_3}{4}\|v\|^4$$
 通过 Euler-Lagrange 方程导出连续时间动力学 $\frac{d}{dt}[(m + \beta_3\|v\|^2)v] = -\nabla L$，其离散化自然产生了速度依赖的学习率缩放。这一物理对应为门控设计提供了原则性依据，而非启发式技巧。
 
-## 核心模块与公式推导
+
 
 ### 核心模块
 
@@ -222,7 +226,9 @@ $$\theta_t = \theta_{t-1} - \eta_t \frac{\hat{v}_t}{\sqrt{\hat{m}_t} + \epsilon}
 
 其中 $\hat{v}_t$、$\hat{m}_t$ 为偏差校正后的估计，$\lambda$ 为解耦权重衰减系数。与 AdamW 相比，唯一的结构性差异在于 $\eta_t$ 从固定值变为速度依赖的动态值，其余组件完全兼容。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 
@@ -258,7 +264,9 @@ Table 4 的动能幂次消融实验验证了四次速度惩罚的最优性。在
 
 尽管 VRAdam 在各项基准上表现优异，仍存在若干限制。首先，引入 $\beta_3$ 和 $\alpha_1$ 两个额外超参数增加了调参负担，尽管搜索结果表明其最优值相对稳定。其次，速度正则化门控依赖全局动量缓冲区范数，无法对不同层或参数组进行差异化阻尼，在高度异构的架构上可能限制其适用性。此外，自适应稳定边界现象的完整理论理解仍有缺口，泛化保证尚未从速度阻尼机制严格导出。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 在自适应优化器谱系中的位置
 
@@ -302,6 +310,8 @@ VRAdam 在以下场景表现出显著优势：
 - **四次惩罚的推广**：消融实验（Table 4）显示二次（四次速度惩罚）在 CIFAR-10 上表现最优（测试损失 0.932），三次幂次表现最差（1.155）。四次结构是否可推广至高阶张量优化或二阶方法（如 K-FAC）？
 - **非平稳场景的行为**：在持续学习、分布偏移等极端非平稳目标中，速度门控的动态学习率是否会导致灾难性遗忘或不稳定阻尼？
 - **泛化理论**：能否从速度阻尼机制导出平坦极小值的偏好性，从而建立与泛化性能的形式化联系？
+
+
 
 ## 原文 PDF
 

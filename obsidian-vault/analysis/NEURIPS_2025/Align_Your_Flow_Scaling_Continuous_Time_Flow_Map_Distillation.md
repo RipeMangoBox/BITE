@@ -5,6 +5,8 @@ paper_level: A
 venue: NeurIPS
 year: 2025
 pdf_ref: paperPDFs/NEURIPS_2025/Align_Your_Flow_Scaling_Continuous_Time_Flow_Map_Distillation.pdf
+project_link: https://research.nvidia.com/labs/toronto-ai/AlignYourFlow/
+code_link: null
 aliases:
 - AYFAAEL
 - AYFSCTFMD
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 对齐你的流：扩展连续时间流映射蒸馏 |
 | 英文题名 | Align Your Flow: Scaling Continuous-Time Flow Map Distillation |
 | 会议/期刊 | NeurIPS 2025 |
-| Links | [paper](https://arxiv.org/abs/2506.14603); [Project](https://research.nvidia.com/labs/toronto-ai/AlignYourFlow/) |
+| Links | [paper](https://arxiv.org/abs/2506.14603) · [Project](https://research.nvidia.com/labs/toronto-ai/AlignYourFlow/) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/diffusion_image_video |
 | Method | Align Your Flow (AYF) with AYF-EMD loss |
 | Dataset | ImageNet 512x512, Text-to-image (User study, FLUX.1-based) |
@@ -41,7 +43,7 @@ claims:
 > - ImageNet 512x512 上，FID 为 1.64 (AYF-S + adversarial finetuning, 4-step)，对比 1.84 (sCD-S, 4-step, reproduced)，变化 -0.20。
 > - ImageNet 512x512 上，FID 为 1.92 (AYF-S + adversarial finetuning, 1-step)，对比 3.32 (AYF-S, 1-step)，变化 -1.40。
 
-## 概述
+## 概要
 
 扩散模型和流匹配模型在图像生成领域取得了显著成功，但其采样过程通常需要数十甚至上百次神经网络前向传播，计算成本高昂。一致性模型（Consistency Models, CM）通过将 PF-ODE 轨迹上的任意点直接映射到干净数据（s=0），实现了少步甚至单步生成。然而，**标准一致性模型在多步采样中存在根本性的缺陷：随着采样步数增加，误差会逐步累积，导致生成质量反而下降**（Theorem 3.1, Figure 5, Figure 8）。这一现象使得一致性模型无法通过增加计算预算来稳定提升生成质量，限制了其在高保真场景中的应用。
 
@@ -50,8 +52,6 @@ claims:
 配合流映射，本文提出了新的连续时间蒸馏损失 **AYF-EMD**（Eulerian Map Distillation），该损失在连续时间极限下自然归纳了标准一致性损失和流匹配损失，并通过停止梯度与切线归一化技术实现稳定训练（Theorem 3.2）。此外，AYF 引入了**教师自引导（autoguidance）**机制——利用弱教师模型在蒸馏过程中增强分布锐度，以及可选的短期**对抗微调**阶段，进一步提升生成质量。
 
 在 ImageNet 512×512 上，AYF 以 4 步采样达到 **FID 1.70**（AYF-S），经对抗微调后进一步降至 **FID 1.64**，显著优于所有非对抗蒸馏方法，且多步性能保持稳定而不恶化（Table 4, Table 5, Figure 8）。在基于 FLUX.1 的文本到图像任务中，AYF 在用户偏好研究中明显优于 LCM 和 TCD（Figure 7）。值得注意的是，AYF 的 4 步采样速度与先前工作的单步生成相当甚至更快（Figure 6），在效率与质量之间取得了优异的平衡。
-
-## 背景与动机
 
 ### 扩散模型与流匹配的少步生成困境
 
@@ -80,7 +80,7 @@ claims:
 
 基于上述分析，本文的核心动机是**从根本上解耦一致性条件，消除误差累积的病态特性**。具体而言，本文提出将一致性模型推广为真正的**流映射**（Flow Map），允许网络建模从任意噪声时间 $t$ 到任意目标时间 $s$ 的映射，并设计相应的连续时间蒸馏损失和训练稳定化技术。这一框架统一了一致性模型（$s=0$）和流匹配（$s \to t$）的特例，同时使蒸馏模型在所有采样步数下均能保持低 FID，从根本上解决了多步性能恶化的问题。
 
-## 核心创新
+## 核心方法与创新机理
 
 AYF 的核心创新在于将标准一致性模型（CM）推广为**流映射（Flow Map）**范式，从根本上解决了 CM 在多步采样中因误差累积导致性能恶化的瓶颈。Theorem 3.1 从理论上证明，对于非最优一致性模型，增加采样步数反而会增大生成样本与真实分布之间的 Wasserstein-2 距离——Figure 5 和 Figure 8 的实验结果直接验证了这一病理特性：CM 的 FID 随步数增加而上升，最佳性能仅出现在极少数步数（如两步）处。
 
@@ -123,8 +123,6 @@ AYF 在方法谱系中处于**一致性蒸馏与流匹配的交汇点**（Figure
 - **LCM**：基于 SDXL 的一致性模型，在文本到图像用户研究（Figure 7）中被 AYF（基于 FLUX.1）显著超越。
 
 > **需要人工验证**：sCM/sCD、CTM/TCD、LCM 等基线方法的具体作者/年份/会议信息未在分析数据中提供，建议在最终版本中补充完整引用。
-
-## 整体框架
 
 AYF（Align Your Flow）的整体框架围绕**流映射蒸馏**构建，其核心思想是将预训练的流匹配或扩散教师模型的能力压缩到一个学生网络中，该学生网络能够以任意步数（包括极少的步数）进行高质量采样，且性能不会因步数增加而退化。
 
@@ -173,8 +171,6 @@ AYF（Align Your Flow）的整体框架围绕**流映射蒸馏**构建，其核�
 
 ![[assets/figures/papers/paper_list_l36_https_arxiv_org_abs_2506_14603/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of Flow Maps. Flow maps generalize both consistency models and flow matching by connecting any two noise levels (s, t) in a single step. When s = 0, flow maps reduce to consistency models; when s → t they’re equivalent to standard flow matching models. Our proposed EMD objective (see Theorem 3.2) similarly generalizes the continuous-time consistency and flow matching losses. For detailed derivations, please see the Appendix*
-
-## 核心模块与公式推导
 
 ### 3.1 一致性模型的误差累积定理
 
@@ -260,7 +256,7 @@ $$
 | 切线预热 | 稳定训练 | $r_{\max}=0.99$ |
 | 对抗判别器 | 对抗微调提升锐度 | StyleGAN2 + RpGAN 损失 |
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心性能瓶颈：一致性模型的多步退化
 
@@ -333,16 +329,13 @@ $$
 ![[assets/figures/papers/paper_list_l36_https_arxiv_org_abs_2506_14603/figures/006_Table_1.jpg]]
 *Table 1: Sample quality on classconditional ImageNet 64x64. Recall metric is also included*
 
-![[assets/figures/papers/paper_list_l36_https_arxiv_org_abs_2506_14603/figures/007_Table_2.jpg]]
-*Table 2: Sample quality on class-conditional ImageNet 512x512. For additional baselines, which AYS all outperforms, please see the Appendix*
-
 ![[assets/figures/papers/paper_list_l36_https_arxiv_org_abs_2506_14603/figures/012_Table_3.jpg]]
 *Table 3: Optimal sampling hyperparameters*
 
 ![[assets/figures/papers/paper_list_l36_https_arxiv_org_abs_2506_14603/figures/013_Table_4.jpg]]
 *Table 4: Sample quality on class-conditional ImageNet 512×512. This is an extension of Tab. 2 with further baseline methods*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 核心瓶颈：一致性模型的多步误差积累
 

@@ -28,10 +28,13 @@ claims:
 | 中文题名 | A𝛿: Autodiff for Discontinuous Programs — Applied to Shaders |
 | 英文题名 | A𝛿: Autodiff for Discontinuous Programs — Applied to Shaders |
 | 会议/期刊 | SIGGRAPH 2022 |
-| Links | [paper](https://www.cs.princeton.edu/~yutingy/docs/siggraph_2022.html) · [Code](https://github.com/yyuting/Adelta) · [Project](https://thenounproject.com/icon/celtic-1975448/) · [arXiv](http://arxiv.org/abs/1604.06174) |
+| Links | [paper](https://www.cs.princeton.edu/~yutingy/docs/siggraph_2022.html) · [Code](https://github.com/yyuting/Adelta) · [Project](https://thenounproject.com/icon/celtic-1975448/) · [paper](http://arxiv.org/abs/1604.06174) |
 | Topic | #topic/other_unclear |
 | Method |  |
 | Dataset |  |
+
+> [!tip] 效果简介
+> 结果与证据沿用下文“实验与关键发现”中的现有记录；本轮不新增或外推论文事实。
 
 ## 概要
 

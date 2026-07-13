@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Principled_RL_for_Diffusion_LLMs_Emerges_from_a_Sequence_Level_Perspective.pdf
+project_link: null
+code_link: https://github.com/ML-GSAI/ESPO
 openreview_forum_id: S5YeC9llIL
 aliases:
 - EEBSLPO
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 从序列级视角看扩散大语言模型的原则性强化学习 |
 | 英文题名 | Principled RL for Diffusion LLMs Emerges from a Sequence-Level Perspective |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=S5YeC9llIL); [GitHub](https://github.com/ML-GSAI/ESPO) |
+| Links | [paper](https://openreview.net/forum?id=S5YeC9llIL) · [GitHub](https://github.com/ML-GSAI/ESPO) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | ESPO (ELBO-based Sequence-level Policy Optimization) |
 | Dataset | GSM8K, MATH, Countdown, Sudoku |
@@ -42,7 +44,7 @@ claims:
 > - MATH 上，平均准确率（128/256/512长度） 为 39.5 (ESPO)，对比 37.0 (LLaDA)，变化 +2.5。
 > - Countdown 上，平均成功率（128/256/512长度） 为 81.0 (ESPO)，对比 18.7 (LLaDA)，变化 +62.3。
 
-## 概述
+## 概要
 
 扩散大语言模型（dLLM）通过非自回归的迭代去噪过程生成序列，在推理灵活性和可控性上展现出独特优势。然而，将现有强化学习方法（如 GRPO）直接应用于 dLLM 时面临根本性障碍：这些方法依赖自回归模型提供的逐 token 条件概率来计算重要性比率，而 dLLM 的生成机制无法自然提供此类 token 级分解。现有工作采用平均场近似或 token 级 ELBO 分解等启发式代理，但这些方案存在根本性不一致，导致训练不稳定甚至学习失败。
 
@@ -52,7 +54,7 @@ claims:
 
 实验结果表明，ESPO 在规划密集型任务上效果尤为显著：在 Countdown 和 Sudoku 上分别相较基础模型 **LLaDA-8B-Instruct**（Nie et al., 2025）平均提升 62.3 和 70.3 个百分点，远超 token 级基线方法。消融实验证实，仅将 k2 估计器施加于 token 级基线无法带来实质提升，序列级框架本身才是性能增益的关键来源。在数学推理（GSM8K、MATH）和代码生成（HumanEval、MBPP）任务上，ESPO 同样取得一致提升，尽管幅度受预训练模型能力天花板制约。
 
-## 背景与动机
+
 
 ### 扩散大语言模型的生成范式
 
@@ -93,7 +95,9 @@ $$\mathcal{L}_{\theta}^{k}(y | x) \triangleq \mathbb{E}_{t \sim \mathcal{U}[0,1]
 
 该方法在需要整体一致性的规划任务上效果尤为显著——Countdown和Sudoku任务上分别相较基础模型平均提升62.3和70.3个百分点，远超所有token级基线（Table 1）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ESPO的核心贡献在于将扩散大语言模型（dLLM）的强化学习从token级动作空间提升至序列级动作空间，从根本上消除了现有方法中动作分解与模型生成机制之间的结构性错配。这一转变由四个相互耦合的**changed slots**构成，每个slot都针对dLLM的非自回归、全局去噪特性进行了专门设计。
 
@@ -135,7 +139,7 @@ k2估计器采用MSE形式，不含指数项，其梯度无偏且稳定。图2�
 
 上述四个changed slots并非独立改进，而是形成了一条完整的因果链：**序列级动作空间**消除了根本性的结构错配，使RL目标与dLLM生成机制对齐；**序列级ELBO**为这一框架提供了可处理的似然代理；**长度归一化**和**k2估计器**则分别解决了序列级框架引入的数值稳定性和KL约束稳定性问题。这四个组件缺一不可，共同构成了ESPO区别于所有token级基线的方法论壁垒。
 
-## 整体框架
+
 
 ESPO（ELBO-based Sequence-level Policy Optimization）是一个针对扩散大语言模型（dLLM）设计的序列级强化学习框架。其核心设计理念源于一个根本性观察：扩散模型通过迭代去噪生成整个序列，无法像自回归模型那样提供逐token的条件概率分解。因此，ESPO将**整个序列的生成视为单一原子动作**，从根本上消除了传统token级强化学习方法（如GRPO）与dLLM生成机制之间的结构性错配。
 
@@ -211,7 +215,7 @@ k2估计器采用MSE形式，不含指数项，梯度无偏且稳定。消融实
 
 消融实验（Figure 1）直接验证了这一因果链：在Sudoku任务上，仅序列级+ELBO的组合（蓝色曲线）实现了稳定收敛至高回报，而所有token级变体（包括token级ELBO和平均场近似）均失败。进一步地，Table 5显示将k2估计器简单替换到token级基线（d1+k2）并不能带来实质提升，证明性能增益的核心来源是**序列级框架本身**，而非孤立的稳定性技术。
 
-## 核心模块与公式推导
+
 
 ESPO 的核心设计围绕一个根本性转变展开：将强化学习的动作空间从 token 级提升到序列级。这一转变解决了扩散大语言模型（dLLM）与现有 RL 方法之间的结构性错配——dLLM 通过迭代去噪生成整个序列，无法像自回归模型那样提供逐 token 的条件概率分解。以下逐一拆解构成 ESPO 的关键模块及其数学基础。
 
@@ -264,7 +268,9 @@ ELBO 差异估计的方差直接影响策略梯度质量。ESPO 采用两项互�
 
 所有实验采用 2 个蒙特卡洛样本和策略更新值 $\mu = 8$，通过 LoRA（$r=128, \alpha=64$）进行参数高效微调。消融实验表明，增加 MC 样本数（$M=1 \to 4$）可提升 Sudoku 上的训练稳定性并加速收敛，但总 FLOPs 增长约 47%；$\mu$ 在 $[8, 12, 24, 48, 72]$ 范围内均能收敛至相似的高回报，方法对该超参数具有鲁棒性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：序列级框架的决定性作用
 
@@ -331,7 +337,9 @@ ESPO对关键超参数表现出良好的鲁棒性。蒙特卡洛样本数从1增
 | Figure 6 | k2提供稳定的梯度范数，k3产生剧烈尖峰 |
 | Figure 4 | 增加MC样本改善Sudoku稳定性，对Countdown影响较小 |
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈：自回归RL范式与扩散模型的根本性错配
 
@@ -380,6 +388,8 @@ ESPO（ELBO-based Sequence-level Policy Optimization）的核心策略是将动�
 5. **样本效率提升。** 当前方法使用2-4个MC样本进行策略评估，能否通过更好的信用分配策略（如对序列中不同位置赋予差异化权重）或更智能的重要性采样方案来进一步提升样本效率？
 
 6. **复杂奖励结构下的鲁棒性。** ESPO在具有多步依赖、稀疏奖励或组合奖励结构的任务上的表现如何？当前实验使用的奖励信号相对简单（Sudoku为完全正确与否的二元奖励），更复杂的奖励设计可能需要配套的信用分配机制。
+
+
 
 ## 原文 PDF
 

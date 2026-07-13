@@ -43,7 +43,7 @@ claims:
 > - Distribution-Conditional Generation (CangJie) 上，GPT-4o Aesthetics 9.9±0.1 vs SOTA T2I models (lower scores) (显著优于)。
 > - User study (creative generation) 上，user preference (votes DisTok vs. FLUX) 278 vs 222 (+56 votes)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -66,7 +66,7 @@ claims:
 
 DisTok 处于**创造性 T2I 生成**与**概念融合**的交汇点。与依赖文本提示的传统方法（Stable Diffusion 3, FLUX）不同，DisTok 将生成条件从离散的文本提示替换为**连续的类别分布**，通过 Distribution Encoder 编码后由 Creative Decoder 解码为概念令牌，再嵌入自然语言提示中指导扩散模型生成。这一设计使其既能进行有引导的条件探索（指定类别对融合），也能从高斯先验中随机采样进行无条件探索，并通过预训练 VLM 对生成结果进行分布估计以闭环监督。在概念融合方法中，DisTok 区别于 BASS 的交换采样机制和 ConceptLab 的相似度降低策略，首次实现了**多概念细粒度分布级别的可控融合**。
 
-## 背景与动机
+
 
 ### 文本到图像生成中的语义边界困境
 
@@ -96,7 +96,9 @@ DisTok 处于**创造性 T2I 生成**与**概念融合**的交汇点。与依赖
 
 基于上述动机，本文提出 **Distribution-Conditional Generation（分布条件生成）** 这一新范式，并设计 **DisTok** 框架作为其具体实现。DisTok 旨在统一条件性与无条件性的语义探索，通过编码器-解码器架构将类别分布映射为可嵌入自然语言提示的创造性概念令牌，从而在保持与现有 T2I 模型兼容性的同时，实现高效、灵活、细粒度可控的新颖视觉概念发现。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DisTok 的核心创新在于**将创造性生成的语义条件从离散的文本提示转换为连续可控的类别分布**，并围绕这一范式转移构建了统一的编码器-解码器框架，实现了细粒度、可量化的多概念融合与无条件语义探索。
 
@@ -126,7 +128,7 @@ BASS 和 ConceptLab 在生成每个新概念时需进行迭代优化（分别约
 
 **需要人工验证**：ConceptLab 的具体推理时间数据来自论文内部对比，其绝对数值可能因硬件环境差异而有所不同。
 
-## 整体框架
+
 
 DisTok 是一个编码器-解码器框架，统一了条件式与非条件式的创造性生成。其核心流程是：将概念条件（如类别分布）映射为低维潜在向量，再解码为可嵌入自然语言提示的“创造性令牌”（creative token），最终指导扩散模型生成图像。
 
@@ -169,7 +171,7 @@ $$
 ![[assets/figures/papers/paper_list_l2036_https_openaccess_thecvf_com_content_CVPR2026_html_Feng_Breaking_Semantic/figures/001_Figure_1.jpg]]
 *Figure 1: We introduce Distribution-Conditional Generation, a novel paradigm that breaks semantic boundaries through fine-grained, controllable concept fusion, and propose DisTok, an encoder–decoder framework unifying conditional and unconditional semantic exploration, enabling efficient and flexible discovery of novel visual concepts*
 
-## 核心模块与公式推导
+
 
 DisTok 的核心架构由三个紧密协作的模块构成：**Distribution Encoder**、**Creative Decoder** 和 **Concept Pool**，并围绕两个互补的训练目标——**Continuous Concept Fusion** 与 **Distribution Consistency Enforcement**——进行联合优化。
 
@@ -223,7 +225,9 @@ $$\mathcal{L}_{\mathrm{total}} = \frac{1}{n} \sum_{i=1}^{n} \left( \alpha \mathb
 
 其中 $\mathbb{I}_{\mathrm{mix}}^{(i)}$ 和 $\mathbb{I}_{\mathrm{cst}}^{(i)}$ 为指示变量，标记当前步执行的任务类型；$n=8$ 为梯度累积步数；$\alpha$、$\beta$、$\gamma$ 为各损失项的权重系数。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -285,7 +289,9 @@ Figure 6 展示了 DisTok 生成令牌的风格适应性：创造性令牌可以
 ![[assets/figures/papers/paper_list_l2036_https_openaccess_thecvf_com_content_CVPR2026_html_Feng_Breaking_Semantic/figures/008_Figure_8.jpg]]
 *Figure 8: Comparison with Prompt Engineering. For each DisTok-generated concept, a corresponding textual prompt for Kandinsky [29] is derived using GPT-4o. All detailed prompts are provided in Fig. 14*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系
 
@@ -353,6 +359,8 @@ DisTok 解决的核心问题是：**如何突破 T2I 模型的训练分布限制
 4. **自适应融合阈值**：连续概念融合损失中的阈值 θ₁、θ₂ 当前为固定超参数，自适应调整策略（如基于融合难度动态调节）是否可进一步提升创造力的质量与多样性？
 
 5. **分布空间的几何性质**：Distribution Encoder 学习到的潜在空间具有哪些几何性质？是否支持有意义的算术操作（如“概念 A + 概念 B - 概念 C”）？这需要进一步的理论分析和实证验证。
+
+
 
 ## 原文 PDF
 

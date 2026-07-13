@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2026
 pdf_ref: paperPDFs/arxiv_2026/Warp_as_History_Empowering_Video_Diffusion_Models_for_Camera_Controlled_Video_Generation.pdf
+project_link: https://yyfz.github.io/warp-as-history/
+code_link: https://github.com/yyfz/Warp-as-History
 aliases:
 - WAH
 - Warp-as-History
@@ -43,7 +45,7 @@ claims:
 > - DAVIS 上，FID↓ / FVD↓ 68.18 / 57.95 vs 72.71 / 64.98 (Gen3C) (-4.53 / -7.03)；PSNR↑ 15.21 vs 16.29 (Gen3C) (-1.08)。
 > - RE10K 上，PSNR↑ 17.15 vs 20.10 (Gen3C) (-2.95)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -80,7 +82,7 @@ Warp-as-History 本质上是一种**零样本激活预训练模型隐式能力�
 
 该方法在方法谱系中位于“基于预训练模型的零样本/少样本相机控制”这一新兴方向，与依赖大规模训练的 **Gen3C**（Ren et al., 2025）、**ViewCrafter**（Yu et al., 2024）、**Voyager**（Huang et al., 2025a）等方法形成互补——前者追求极低的训练成本和即插即用的接口设计，后者则在训练数据充足的条件下追求更高的重建精度。
 
-## 背景与动机
+
 
 ### 相机控制视频生成的现状
 
@@ -108,7 +110,9 @@ Warp-as-History 本质上是一种**零样本激活预训练模型隐式能力�
 
 Warp-as-History 通过目标帧位置对齐（target-frame positional alignment）和可见token筛选（visible-token selection）这两个关键设计，将相机扭曲转化为“伪历史”（pseudo-history），并通过原生历史通路输入，实现了对预训练模型相机跟随能力的零样本激活。在此基础上，仅需在单个分离视频上进行轻量级LoRA微调，即可稳定行为并显著提升视觉质量——这一“单视频微调”策略将训练数据需求从数万视频压缩至1个视频，降低了数个数量级。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Warp-as-History 的核心创新不在于设计新的控制模块或训练范式，而在于**重新定义了相机轨迹信息注入生成过程的位置与形式**。现有相机控制方法通常将相机条件作为额外的控制分支（如 **Gen3C** (Ren et al., 2025)、**ViewCrafter** (Yu et al., 2024)）或采样约束引入模型，这要么需要大规模相机标注视频进行训练，要么依赖测试时优化。Warp-as-History 的关键洞察是：预训练视频扩散模型本身已通过视觉历史条件机制隐式习得了相机跟随能力，问题在于缺乏一个直接暴露并稳定利用该能力的接口。
 
@@ -142,7 +146,7 @@ $$\tilde{H}_t^C = S_{M_C}(\mathcal{H}(W_C))$$
 
 为验证“原生历史通路注入”这一核心设计，方法对比了两种替代融合方案：串接融合（SeqConcat）和通道融合（ChFusion）。Table 5 显示，这两种替代方案在相机控制精度和视觉质量上均不及原生历史流插入，证明通过模型已有的历史条件机制注入扭曲信息是实现零样本相机控制的最优路径。
 
-## 整体框架
+
 
 Warp-as-History 的整体 pipeline 围绕一个核心洞察展开：**预训练视频扩散模型已有的视觉历史条件机制，本身就是暴露相机跟随行为的原生接口**。如图 Figure 3 所示，整个框架将相机轨迹信息转化为“伪历史”（pseudo-history），通过模型原生的历史通路注入生成过程，而非引入额外的控制分支或采样约束。
 
@@ -190,7 +194,7 @@ Figure 2 直观展示了从零样本历史条件到单视频微调的演变：�
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2605_15182/figures/001_Figure_1.jpg]]
 *Figure 1: Warp-as-History generalizes to unseen scenes and unseen trajectories after finetuning on one video and one camera trajectory*
 
-## 核心模块与公式推导
+
 
 Warp-as-History 的核心设计思想是将相机轨迹信息通过模型**原生的视觉历史通路**注入生成过程，而非引入额外的控制分支或采样约束。该方法由三个关键模块构成：相机扭曲伪历史构建、目标帧位置对齐、以及可见token筛选。
 
@@ -244,7 +248,9 @@ $$\hat{X}_{t:t+K} \sim p_{\theta}(\cdot \mid H_t, \tilde{H}_{t}^{C}, p) \tag{3}$
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2605_15182/figures/003_Figure_3.jpg]]
 *Figure 3: Conditioning a video diffusion model on camera motion. Warp-as-History packs camerawarped pseudo-history into the native history stream, aligns it to target-frame positions, and applies visible-token selection*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -325,7 +331,9 @@ Table 15 报告了在不同可见 token 比例下生成一个 33 帧块的时间
 
 4. **推理开销与可见 token 比例耦合**：历史 token 的额外开销随可见区域比例增长，在需要保留大量可见 token 的场景下（如小基线运动），推理效率下降明显。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心创新与差异化定位
 
@@ -385,6 +393,8 @@ Warp-as-History 的适用边界由三个因素共同决定：
 ### 5. 知识库定位总结
 
 Warp-as-History 在相机控制视频生成领域的方法谱系中占据了一个独特位置：它**不是一个新的控制范式，而是一个接口创新**——通过重新定义控制信号的注入位置（原生历史通路而非额外控制支路）和注入形式（伪历史而非采样约束），以极低的训练成本（仅需一个分离视频的 LoRA 微调）激活了预训练模型已有的相机跟随能力。这一思路与 Prompt Engineering 在语言模型中的作用类似：不改变模型本身，而是通过优化输入接口来引导模型行为。其核心贡献在于揭示了预训练视频扩散模型中隐式相机跟随能力的存在，并提供了一个简洁有效的接口来暴露和稳定利用这种能力。
+
+
 
 ## 原文 PDF
 

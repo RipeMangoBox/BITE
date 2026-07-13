@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Internal_Planning_in_Language_Models_Characterizing_Horizon_and_Branch_Awareness.pdf
+project_link: null
+code_link: null
 openreview_forum_id: dqGWQdFdTC
 aliases:
 - VV
@@ -42,7 +44,7 @@ claims:
 > - PF-Long (路径查找-长) 上，准确率 为 M_MTP 0.85 ± 0.02，对比 M_NTP 0.60 ± 0.01，变化 +0.25。
 > - PF-Long 上，分支意识比率 (T(Z_H;Z_alt) / T(Z_H;Z_decoy)) 为 M_MTP 1.82 ± 0.27，对比 M_NTP 1.45 ± 0.01，变化 +0.37。
 
-## 概述
+## 概要
 
 语言模型（LM）在生成文本时是否进行了“内部规划”——即前缀计算是否前瞻性地编码了未来决策所需的信息——是一个悬而未决的问题。现有分析方法主要依赖线性或非线性探针（probing），但这些探针存在严重混淆：探针本身可能学习到与模型内部计算无关的模式，且其预测性能受目标变量边际复杂度的干扰，无法可靠地揭示模型的前瞻计算和分支意识。因此，**该领域的核心瓶颈在于缺乏一种自动化、无监督且不受探针混淆因素影响的分析框架，来可靠地刻画 LM 内部计算的信息结构。**
 
@@ -57,7 +59,7 @@ claims:
 
 该框架的局限性在于：依赖离散压缩质量，码书大小有限可能导致信息丢失；MI 估计仅提供平均意义下的洞察，不能解释单个输入；分析限于相对比较，无法给出绝对规划分数；实验限于较小规模模型（GPT-3 Small 及 0.3B 参数）。待解决的问题包括如何将分析扩展到更大规模模型和思维链等提示策略下的规划动态。
 
-## 背景与动机
+
 
 语言模型在生成文本时是否进行了“内部规划”——即在输出当前词之前，提前计算未来多步的信息——是理解其推理能力的关键问题。然而，直接回答这一问题面临双重困难：一方面，模型的隐藏状态是高维连续向量，难以直接解读；另一方面，现有的分析方法存在严重的混淆因素。
 
@@ -73,7 +75,9 @@ claims:
 
 本文的动机正是针对这一瓶颈，提出一个基于信息论和离散表示的自动化分析框架，以绕过探针方法的混淆因素，系统性地回答上述三个问题。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于提出了一套**基于 VQ-VAE 离散压缩与互信息估计的自动化分析框架**，用以揭示语言模型内部规划的计算结构。相较于现有方法，该框架在两个关键维度上实现了突破。
 
@@ -109,7 +113,7 @@ $$I(Z_A; Z_B) = \sum_{z_a \in \mathcal{Z}_A} \sum_{z_b \in \mathcal{Z}_B} p(z_a,
 
 需要明确指出：框架的洞察力受限于 VQ-VAE 压缩质量——码书大小有限，必然导致信息丢失；互信息估计仅提供平均意义下的聚合洞察，无法解释单个输入；分析限于相对比较，不能给出绝对规划分数。此外，当前实验限于 GPT-3 Small 及 0.3B 参数规模，向更大模型的扩展需要额外的数据与计算资源投入。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l28_https_openreview_net_forum_id_dqGWQdFdTC/figures/001_Figure_1.jpg]]
 *Figure 1: The proposed method. Step 1 (training): For a frozen LM M, hidden states from selected transformer blocks $G _ { S }$ are passed through a VQ-VAE encoder, which maps each block to a latent vector and then to a discrete codebook index $Z _ { S }$ ~ $\in$ ~ [ K ] , providing coarse summaries of internal computations. Step 2 (analysis): For two sets of hidden-state blocks, $G _ { S _ { A } }$ and $G _ { S _ { B } }$ , we apply the trained encoder and codebook to the dataset to obtain discrete variables $Z _ { A }$ and $Z _ { B }$ and collect their empirical co-occurrence counts. Step 3: Using these statistics, we estimate joint and marginal distributions p ( $z _ { a } , z _ { b }$ ) , p ( $z _ { a }$ ) , and p...*
@@ -138,7 +142,7 @@ $$\mathrm{nMI}(Z_A; Z_B) = \frac{I(Z_A; Z_B)}{\mathcal{T}_{\max}}$$
 
 该框架的关键优势在于：对同一类表示的 VQ-VAE 只需训练一次，即可复用于所有后续的 MI 估计，避免了传统探针方法（probing）需要针对每对变量单独训练监督探针的繁琐流程，同时也消除了探针学习能力差异带来的混淆因素。
 
-## 核心模块与公式推导
+
 
 ### 方法流水线总览
 
@@ -208,7 +212,9 @@ $$\mathrm{nMI}(Z_A; Z_B) = \frac{I(Z_A; Z_B)}{\mathcal{T}_{\max}}$$
 
 探针方法存在两重混淆：探针自身的学习能力会放大或掩盖真实的信息量，且探针得分受目标变量边际复杂性的影响。$\nu$-information 虽可衡量以某函数族可提取的信息，但对尺度敏感，在简单验证实验中即失效（Figure 20）。本文的离散码 + Shannon MI 方案通过压缩消除表示维度的干扰，并通过归一化实现稳健的相对比较。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：规划视野由任务性质决定
 
@@ -294,7 +300,9 @@ Table 1 汇总了关键结果：
 ![[assets/figures/papers/paper_list_l28_https_openreview_net_forum_id_dqGWQdFdTC/figures/021_Figure_13.jpg]]
 *Figure 13: Heatmap of normalized mutual information over block and layer indices for $\tau$ = 3 , 4 , 5 . Please refer to the caption of 4*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与设计动机
 
@@ -343,6 +351,8 @@ Xu et al. 提出的 ν-information 是另一种信息度量，旨在衡量给定
 4. **思维链下的规划动态**：在 Chain-of-Thought 等逐步推理策略下，内部规划视野和分支意识如何动态变化？模型是否在生成中间步骤时重新规划？
 
 5. **从诊断到改进**：如何将发现的内部表征特征（如分支意识、规划视野）用于改进模型训练或解释性？例如，能否通过正则化鼓励更长的规划视野？
+
+
 
 ## 原文 PDF
 

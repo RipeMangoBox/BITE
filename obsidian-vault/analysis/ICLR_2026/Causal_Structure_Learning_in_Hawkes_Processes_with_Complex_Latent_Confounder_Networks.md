@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Causal_Structure_Learning_in_Hawkes_Processes_with_Complex_Latent_Confounder_Networks.pdf
+project_link: null
+code_link: null
 openreview_forum_id: mA78uXqcnl
 aliases:
 - TPIDA
@@ -41,7 +43,7 @@ claims:
 > - Metropolitan cellular network sub-dataset (Alarm ids=0–3,7; device id=8) 上，F1-score 为 0.76，对比 SHP: 0.49, THP: 0.48, NPHC: 0.42, Hier.Rank: 0.00, RLCD: 0.39, LPCMCI: 0.43，变化 +0.27 vs. SHP。
 > - Larger synthetic causal graph (14 subprocesses, Fig. 9) 上，F1-score (80k samples) 为 0.75，对比 N/A (only proposed method evaluated)，变化 N/A。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -82,7 +84,7 @@ claims:
 
 方法依赖于激励函数可分离假设和对称路径条件，当这些理论条件被违反时，性能虽有下降但仍保持一定鲁棒性（Table 5）。两阶段迭代算法的计算复杂度较高，在极大规模网络上可能面临可扩展性瓶颈。未来工作可探索放松假设条件、开发更低复杂度的发现算法，以及在更多实际应用领域（如社交媒体传播、金融级联）中验证方法的因果洞察力。
 
-## 背景与动机
+
 
 ### 连续时间事件序列中的因果发现
 
@@ -110,7 +112,9 @@ $$\lambda_i(t) = \mu_i + \sum_{j=1}^{l} \int_{0}^{t} \phi_{ij}(t-s) dN_j(s)$$
 
 本文针对上述挑战，提出**首个无需预先知晓潜在子过程存在性或数量的原则性框架**，能够在连续时间事件序列中同时发现潜在混淆变量并恢复因果结构。核心思路是：将Hawkes过程在极限细粒度时间离散化下表示为线性自回归模型，从而将因果发现问题转化为观测变量交叉协方差矩阵的**秩约束（rank constraints）**检验——潜在混淆变量的存在会在特定协方差块中产生可检测的低秩特征（rank deficiency）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于首次在连续时间事件序列的因果发现中，系统性地解决了**潜在混淆变量**（latent confounders）带来的可识别性挑战。传统基于Hawkes过程的方法（如SHP、THP、NPHC）均假设因果充分性，即所有子过程均可观测，无法处理未观测到的潜在混淆变量。本文通过三个紧密耦合的创新点突破了这一瓶颈。
 
@@ -161,7 +165,7 @@ $$N_i^{(n)} = \sum_{j=1}^{l} \sum_{k=1}^{n} \theta_{ij}^{(k)} N_j^{(n-k)} + \var
 - **因果发现准则**：从 Granger因果/似然拟合 → 交叉协方差矩阵的秩约束
 - **潜在混淆处理**：从无（假设因果充分性）→ 基于秩亏损的自动发现与迭代推断
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_mA78uXqcnl/figures/004_Figure_1.jpg]]
 *Figure 1: Illustration of multivariate Hawkes processes. (a) Point process representation with three subprocesses $N _ { 1 } , N _ { 2 } , N _ { 3 }$ , where the continuous timeline is partitioned into intervals of length ∆. (b) The corresponding summary causal graph, the central object of this paper, with causal relations $N _ { 1 } N _ { 2 } N _ { 3 }$ and self-loops on all nodes. (c) The window causal graph, showing the underlying time-lagged causal mechanism: each node denotes the count in one interval of length $\Delta$ modeled as a weighted sum of lagged parent nodes plus noise (Eq. 1). (d) A minimal example with a latent subprocess $L _ { 1 }$ confounding $O _ { 1 }$ and $O _ { 2 }$ , , highlighting the p...*
@@ -231,7 +235,7 @@ $$N_i^{(n)} = \sum_{j=1}^{l} \sum_{k=1}^{n} \theta_{ij}^{(k)} N_j^{(n-k)} + \var
 
 传统 Hawkes 因果发现方法（如 **NPHC** (Achab et al., 2018)、**SHP** (Qiao et al., 2023)、**THP** (Cai et al., 2022)）均假设所有子过程可观测，而基于 i.i.d. 数据的秩方法（如 **Hier.Rank** (Huang et al., 2022)、**RLCD** (Dong et al., 2023)）和时间序列方法（如 **LPCMCI** (Gerhardus & Runge, 2020)）未针对 Hawkes 过程的连续时间特性设计。本文方法首次在统一框架内同时解决这两个挑战。
 
-## 核心模块与公式推导
+
 
 ### 瓶颈与核心洞察
 
@@ -299,7 +303,9 @@ $$\mathrm{rank}( \Sigma_{\mathbf{A}_v, \mathbf{B}_v} ) = |\mathbf{A}_v| - 1$$
 
 整个方法的理论保证建立在以下依赖链上：Assumption 1（激励函数可分离）→ Theorem 4.1（线性自回归表示）→ Lemma 4.2（d-分离的秩条件）→ Proposition 4.3/4.5（观测/潜在父因集识别）→ Theorem 4.7/4.8（一般因果结构识别）。其中 **Definition 4.4 的对称无环路径条件**是 Proposition 4.5 可识别性的关键前提，实验表明该方法对该条件的轻度违反具有一定鲁棒性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 
@@ -378,7 +384,9 @@ Table 5 测试了违反 Definition 4.4 对称路径条件时的性能。当条�
 3. **对称路径条件违反**：虽然实验显示一定鲁棒性，但严重违反该条件时理论可识别性不保，可能导致漏检或误检潜在混淆变量。
 4. **计算复杂度瓶颈**：Phase I 的最坏情况复杂度接近 O(n!·...)，在极大规模网络上可能不可行，Table 7 的运行时间统计提供了参考量级。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题瓶颈与核心创新
 
@@ -427,6 +435,8 @@ Table 5 测试了违反 Definition 4.4 对称路径条件时的性能。当条�
 3. **更一般潜在混淆结构的可识别性**：进一步放宽对称路径条件，提高对非对称因果路径、多层级潜在混淆变量等更复杂结构的可识别性，是理论层面的重要挑战。
 
 4. **跨领域验证**：当前仅在合成数据和蜂窝网络数据集上验证，在社交媒体传播、金融级联、神经科学spike train等更多实际领域中，该方法能提供哪些深刻的因果洞见，有待系统探索。
+
+
 
 ## 原文 PDF
 

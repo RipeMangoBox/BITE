@@ -43,7 +43,7 @@ claims:
 > - Image-level OOD: ImageNet-1k (ID) vs iNaturalist (OOD) 上，AUROC / FPR95 99.16 / 4.92 vs NegPrompt (previous SOTA) ~98.74 / 6.24 (+0.42 AUROC / -1.32 FPR95)。
 > - Image-level OOD average (4 datasets: iNaturalist, SUN, TEXTURE, PLACES) 上，AUROC 96.83 ± 0.15 vs LoCoOp ~95.5 (approx) (consistently higher than all baselines)。
 
-## 概述
+## 概要
 
 分布外（OOD）检测是保障视觉系统在开放世界中安全部署的关键技术。现有方法长期将对象级与图像级OOD检测视为两个独立任务，且普遍假设每张图像仅包含单一对象，忽略了真实场景中多对象共存且每个对象需独立进行OOD评估的现实需求。对象级方法（如 **RUNA**，Zhang et al., AAAI 2025）依赖粗粒度的全局[CLS]表示，缺乏对目标对象与背景之间上下文依赖关系的精细建模，导致性能受限。
 
@@ -51,7 +51,7 @@ claims:
 
 实验结果表明，UNI-OOD在对象级和图像级OOD检测基准上均全面超越现有方法，建立了新的SOTA。具体而言，在BDD-100k（ID）vs OpenImages（OOD）的对象级评测中，AUROC达到98.52%（FPR95为3.68%），较前SOTA方法RUNA提升1.38个百分点；在ImageNet-1k（ID）vs iNaturalist（OOD）的图像级评测中，AUROC达到99.16%（FPR95为4.92%），较前SOTA方法NegPrompt提升0.42个百分点。消融实验进一步证实，任一跨上下文注意力模块的移除均会导致性能显著下降，验证了各模块的必要性。
 
-## 背景与动机
+
 
 分布外（Out-of-Distribution, OOD）检测是视觉系统安全部署的关键保障，旨在识别与训练分布不匹配的样本，防止模型在未知输入上产生不可靠的预测。现有OOD检测研究主要沿两条独立路径展开：**图像级OOD检测**将整幅图像作为整体判断其是否属于已知分布，而**对象级OOD检测**则需对图像中每个候选对象逐一评估，判断其是否为分布内（ID）类别。
 
@@ -73,7 +73,9 @@ claims:
 
 基于上述动机，UNI-OOD提出通过**两对对称的CLIP编码器**和**五种跨上下文注意力机制**，在无需预知任务类型的前提下，统一实现对象级和图像级OOD检测。该方法的核心洞察在于：融合目标对象的局部patch特征与全局语义，同时通过图像间注意力从背景中识别相关线索、利用文本间注意力聚合多对象语义，从而建立跨粒度的统一推理范式。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 UNI-OOD 的核心创新在于首次将对象级与图像级 OOD 检测统一到同一框架下，并通过**跨上下文注意力机制**解决现有方法在真实多对象场景中的根本缺陷。其关键创新可归纳为以下三个维度的 **changed slots**：
 
@@ -104,7 +106,7 @@ UNI-OOD 的核心创新在于首次将对象级与图像级 OOD 检测统一到�
 
 综上，UNI-OOD 通过 **intra-image attention + text-vision alignment** 实现细粒度对象语义捕获，通过 **inter-image attention + inter-text attention** 实现目标-背景上下文关系建模，最终在统一框架下建立了对象级与图像级 OOD 检测的新 SOTA（Figure 1, Table 1-2）。
 
-## 整体框架
+
 
 UNI-OOD 采用两对结构相同、参数冻结的 CLIP 图像与文本编码器，分别对**目标对象**和**背景**进行独立建模，并通过五种跨上下文注意力机制实现两者的联合推理。框架在训练时同时接收对象级和图像级样本，推理时无需预知任务类型，即可对任意输入图像输出统一的对象级与图像级 OOD 检测结果。
 
@@ -145,7 +147,7 @@ UNI-OOD 采用两对结构相同、参数冻结的 CLIP 图像与文本编码器
 
 对于任意输入，计算图像表示与目标类别文本嵌入 $M_{\text{text}}(t_x)$ 的余弦相似度 $\Omega(I_x, t_x)$（Eq (13)）。若该分数超过预设阈值 $\delta$，则判定为分布内（ID），否则为分布外（OOD）。该统一评分机制无需区分对象级或图像级任务，实现了真正的任务无关推理。
 
-## 核心模块与公式推导
+
 
 UNI-OOD 的核心由两对对称的 CLIP 编码器（图像编码器 1/2 与文本编码器 1/2）构成，分别建模目标对象与其背景，并通过五种跨上下文注意力机制实现细粒度视觉语义与上下文线索的联合捕获（Figure 2）。以下按模块逐一展开关键公式与变量含义。
 
@@ -247,7 +249,9 @@ $$\Omega(I_x, t_x) = \cos\big( M_{\mathrm{img}}(I_x, I_{(x)}),\; M_{\mathrm{text
 
 若 $\Omega(I_x, t_x) \geq \delta$（阈值），则判定为 ID；否则为 OOD（Section 3.5, Eq (15)）。该统一评分函数在推理时无需任务类型标签，可同时对任意图像进行对象级与图像级 OOD 检测。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能：统一SOTA的建立
 
@@ -300,7 +304,9 @@ UNI-OOD的贡献可从以下维度定位：
 ![[assets/figures/papers/paper_list_l2227_https_openaccess_thecvf_com_content_CVPR2026_html_Li_UNI_OOD_Unified_Obj/figures/001_Figure_1.jpg]]
 *Figure 1: AUROC (↑) score comparison on 4 object-level and 4 image-level OOD detection cases. “X (Y)”: X and Y are OOD and ID datasets, respectively. In both object- and image-level OOD detection, our method establishes new SOTA performance*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 基线关系与关键突破点
 
@@ -343,6 +349,8 @@ UNI-OOD 提出的跨上下文注意力机制为 OOD 检测领域开启了若干�
 **任务迁移潜力**：跨上下文建模策略本质上是学习目标与场景的联合表示，这一思想可迁移至其他需要上下文推理的视觉任务，如异常检测、开放词汇检测、视觉问答中的上下文理解等。论文未提供相关迁移实验，但架构设计本身具有任务无关性。
 
 **训练效率优化**：当前方法需对每个对象-背景对进行完整的双编码器前向传播，未来可探索共享特征提取或注意力缓存策略以降低训练成本，特别是在大规模多对象数据集上的扩展性。
+
+
 
 ## 原文 PDF
 

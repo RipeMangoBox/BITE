@@ -42,7 +42,7 @@ claims:
 > - Kubric (motion) 上，EPE↓ 3.40 vs 59.34 (ST4RTrack-S+VGGT) (-55.94)。
 > - Monkaa (geometry) 上，RelP↓ 25.88 vs 56.42 (VGGT) (-30.54)。
 
-## 概述
+## 概要
 
 从单目视频中同时恢复密集的三维几何与运动，是视觉感知领域的一项基础性挑战。现有方法通常将几何重建与运动估计分离处理，或仅在相机坐标系下进行成对预测，缺乏全局世界坐标下的统一表示，且依赖后优化步骤对齐跨帧预测，导致长序列运动一致性差、计算效率低。
 
@@ -52,7 +52,7 @@ claims:
 
 实验结果表明，在无需任何后优化的情况下，MotionCrafter在几何重建上平均相对提升 **38.64%**，在运动估计上平均相对提升 **25.0%**，在多个基准数据集上显著超越现有方法（如 **VGGT**、**MonST3R**、**Geo4D**、**Zero-MSF**、**ST4RTrack** 等）。消融研究进一步验证了均值归一化与全VAE微调策略对户外场景重建质量的决定性作用，以及确定性训练范式相比扩散范式在几何精度上的显著优势。
 
-## 背景与动机
+
 
 ### 从稀疏重建到密集4D理解
 
@@ -74,7 +74,9 @@ claims:
 
 这两个动机共同指向一个目标：在保持预训练先验优势的前提下，实现真正端到端的、无需后优化的高质量几何与运动联合重建。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MotionCrafter 的核心创新在于将**密集几何重建与运动估计统一到世界坐标系下的4D潜空间**中，并通过**放松对扩散模型RGB潜空间的对齐约束**，有效迁移预训练视频扩散模型的时空先验。以下从五个关键维度剖析其相对于 baseline 的方法论突破。
 
@@ -126,7 +128,7 @@ $$\mathcal{L}_{\mathrm{deterministic}} = \mathcal{L}_{\mathrm{latent}} + \lambda
 
 **方法论意义**：这提出了一个开放问题——确定性训练范式是否在所有密集预测任务中均优于扩散范式？MotionCrafter的实践表明，当输出空间具有明确的几何约束时，直接回归可能比迭代去噪更有效。
 
-## 整体框架
+
 
 MotionCrafter 的整体设计围绕一个核心目标展开：从单目视频序列中端到端地联合重建世界坐标系下的密集几何（点图）与密集运动（场景流）。其 pipeline 可概括为“4D VAE 编码-扩散 U-Net 预测-4D VAE 解码”的三阶段结构，如 Figure 2 所示。
 
@@ -163,7 +165,7 @@ $$\mathcal{L}_{\text{deterministic}} = \mathcal{L}_{\text{latent}} + \lambda_G \
 
 **与基线方法的根本差异。** 相较于 POMATO、ST4RTrack、DELTA、Zero-MSF 等联合几何-运动估计方法，以及 VGGT、Geo4D、MonST3R 等纯几何重建方法，MotionCrafter 的核心区分点在于：(1) 在世界坐标系而非相机坐标系下统一建模；(2) 无需任何后优化（如 Geo4D 的全局对齐），所有结果由模型直接端到端输出；(3) 通过放松对扩散模型 RGB 潜空间的对齐约束，有效迁移了视频扩散模型的时空先验，在训练规模远小于 VGGT 的情况下仍展现出对动态场景的良好鲁棒性（Figure 10）。
 
-## 核心模块与公式推导
+
 
 MotionCrafter 的核心架构围绕一个统一的 4D 世界坐标表示展开，由三个关键模块构成：几何 VAE、运动 VAE 和基于预训练视频扩散模型的 U-Net 预测器。其设计目标是将密集几何重建与运动估计联合建模，而非分离处理。
 
@@ -230,7 +232,9 @@ MotionCrafter 的一个重要设计选择是不强制 4D 潜在分布与预训�
 ![[assets/figures/papers/paper_list_l968_https_arxiv_org_abs_2602_08961/figures/004_Figure_4.jpg]]
 *Figure 4: Results of different normalization and VAE training strategies. For outdoor scenes with significant variations in depth (the second row), the original VAE fails to recover the scene structure. Even with decoder fine-tuning, the reconstruction quality remains poor. Our proposed mean normalization and VAE training strategy significantly improve reconstruction quality*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -335,7 +339,9 @@ Figure 8 展示了在 Davis 数据集上的零样本结果。尽管场景流估�
 - **Figure 9**：与 Zero-MSF 和 DELTA 的定性比较
 - **Figure 10**：与 VGGT、Geo4D、ST4RTrack 的定性几何比较
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位与核心瓶颈
 
@@ -397,6 +403,8 @@ MotionCrafter 在方法谱系中的独特贡献可概括为三个层次：
 5. **计算效率与实时性**：基于视频扩散模型的方法在推理速度上可能难以满足实时应用需求，是否存在轻量化路径（如蒸馏、一步生成）？
 
 6. **与3D基础模型的整合**：MotionCrafter 的4D输出（点图+场景流）可作为3D基础模型（如3D Gaussian Splatting、NeRF）的初始化或约束，这一方向尚未探索。
+
+
 
 ## 原文 PDF
 

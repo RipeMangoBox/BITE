@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2026
 pdf_ref: paperPDFs/arxiv_2026/CoMoVi_Co_Generation_of_3D_Human_Motions_and_Realistic_Videos.pdf
+project_link: https://igl-hkust.github.io/CoMoVi/
+code_link: null
 aliases:
 - CoMoVi
 tags:
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | CoMoVi: 三维人体运动与真实感视频的协同生成 |
 | 英文题名 | CoMoVi: Co-Generation of 3D Human Motions and Realistic Videos |
 | 会议/期刊 | arXiv 2026 |
-| Links | [paper](https://arxiv.org/abs/2601.10632v2) · [Project](https://igl-hkust.github.io/CoMoVi/) · [arXiv](https://arxiv.org/abs/2510.20888) |
+| Links | [paper](https://arxiv.org/abs/2601.10632v2) · [Project](https://igl-hkust.github.io/CoMoVi/) · [paper](https://arxiv.org/abs/2510.20888) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction #topic/generative_models_diffusion #topic/benchmarks_datasets_evaluation |
 | Method | CoMoVi |
 | Dataset | CoMoVi-Dataset, Motion-X++, VBench |
@@ -42,7 +44,7 @@ claims:
 > - Motion-X++ (运动生成，泛化) 上，FID 16.728 vs 19.365 (MoMask) (-2.637)。
 > - VBench (视频生成) 上，Subject Consistency 0.955 vs 0.948 (Wan2.2-I2V-5B) (+0.007)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：3D人体运动生成长期受限于高质量标注数据的匮乏，导致模型泛化能力薄弱；与此同时，视频生成模型缺乏对人体结构的显式约束，容易产生肢体扭曲、动作不合理的视频内容。现有的级联式方案（先生成运动再驱动视频，或反之）将两者割裂，无法利用运动与视频之间的内在耦合关系，导致上游误差向下游累积，且错失了相互增强的机会。
 
@@ -57,7 +59,7 @@ claims:
 
 **局限与展望**：当前框架仅支持单人原地运动生成，推理速度较慢（约15分钟生成5秒视频），且3D运动伪标签可能引入标注误差。未来工作将探索多人交互场景、推理加速以及更敏感的人体运动质量评估指标。
 
-## 背景与动机
+
 
 ### 3D人体运动与视频生成的耦合困境
 
@@ -86,7 +88,9 @@ claims:
 
 CoMoVi正是针对上述问题提出的协同生成框架，其核心思路是通过**融合法向与语义的2D运动表示**桥接模态差异，并采用**双分支扩散模型**实现特征交互，使运动生成与视频生成在单一去噪循环中同步进行、相互增强。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CoMoVi 的核心创新在于将 3D 人体运动生成与 2D 视频生成从传统的“级联式”或“无交互”范式，重构为**单一扩散去噪循环内的同步协同生成**。这一范式转变由三个紧密耦合的 changed slot 支撑。
 
@@ -134,7 +138,7 @@ $$\mathcal{L}^{\mathrm{smpl}} = \frac{1}{F-1} \sum_{i=1}^{F-1} \left\| \pmb{m}_{
 - CoMoVi 在自建数据集上运动 FID 达到 **0.349**，显著优于 Go-to-Zero-7B 的 1.641（Table 2）；
 - 在 VBench 视频评估中，CoMoVi 在所有指标上均优于 I2V 基线（Table 3），且无需任何外部运动参考。
 
-## 整体框架
+
 
 CoMoVi 的目标是从一张起始人物图像 $s_0$ 和一段运动文本描述 $\delta_p$ 出发，同步协同生成 3D 人体运动序列 $\{\mathbf{m}_i \in \mathbb{R}^{J \times 3}\}_{i=0}^{F}$ 和 RGB 视频序列 $\{\mathbf{s}_i \in \mathbb{R}^{H \times W \times 3}\}_{i=0}^{F}$。其整体 pipeline（Fig. 3）由两大核心模块串联而成：**2D 人体运动表示编码器**与**双分支视频扩散模型**。
 
@@ -177,7 +181,7 @@ $$
 ![[assets/figures/papers/paper_list_l47_https_arxiv_org_abs_2601_10632v2/figures/002_Figure_2.jpg]]
 *Figure 2: Different paradigms of motion video co-generation*
 
-## 核心模块与公式推导
+
 
 ### 2D人体运动表示：法向-语义融合编码
 
@@ -232,7 +236,9 @@ $$\mathcal{L}^{\mathrm{smpl}} = \frac{1}{F - 1} \sum_{i = 1}^{F - 1} \| \pmb{m}_
 ![[assets/figures/papers/paper_list_l47_https_arxiv_org_abs_2601_10632v2/figures/005_Figure_5.jpg]]
 *Figure 5: We observe that significant appearance shifts occur when directly applying pretrained VDM on our 2D motion representation*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -312,7 +318,9 @@ Table 4 系统消融了 2D 运动表示形式和模型架构的贡献，结论�
 ![[assets/figures/papers/paper_list_l47_https_arxiv_org_abs_2601_10632v2/figures/017_Figure_4.jpg]]
 *Figure 4: Prompt instruction for Gemini2.5-Pro to caption human motion in videos*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位与范式变革
 
@@ -374,6 +382,8 @@ CoMoVi 当前存在以下明确局限：
 ### 知识库定位总结
 
 CoMoVi 在知识库中的核心贡献在于：**首次证明了 3D 人体运动与 2D 视频可以在单一扩散去噪循环中相互增强**。其方法论桥梁——融合法向与语义的 2D 运动表示——有效对齐了两模态的特征空间，使视频预训练模型的泛化能力得以反哺运动生成，同时运动的结构一致性先验约束了视频生成。这一协同生成范式为后续的多模态人体生成研究提供了新的技术路线。
+
+
 
 ## 原文 PDF
 

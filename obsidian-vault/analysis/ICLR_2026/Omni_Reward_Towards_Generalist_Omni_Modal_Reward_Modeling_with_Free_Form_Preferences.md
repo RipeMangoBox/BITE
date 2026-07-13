@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Omni_Reward_Towards_Generalist_Omni_Modal_Reward_Modeling_with_Free_Form_Preferences.pdf
+project_link: https://hf.co/datasets/HongbangYuan/OmniRewardBench
+code_link: https://github.com/HongbangYuan/OmniReward
 openreview_forum_id: 9C4gVbPqSy
 aliases:
 - Omni-Reward
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | Omni-Reward：面向自由形式偏好的通用全模态奖励建模 |
 | 英文题名 | Omni-Reward: Towards Generalist Omni-Modal Reward Modeling with Free-Form Preferences |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=9C4gVbPqSy); [GitHub](https://github.com/HongbangYuan/OmniReward); [Project](https://hf.co/datasets/HongbangYuan/OmniRewardBench) |
+| Links | [paper](https://openreview.net/forum?id=9C4gVbPqSy) · [GitHub](https://github.com/HongbangYuan/OmniReward) · [Project](https://hf.co/datasets/HongbangYuan/OmniRewardBench) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | Omni-Reward |
 | Dataset | Omni-RewardBench, VL-RewardBench |
@@ -40,7 +42,7 @@ claims:
 > - Omni-RewardBench 上，Accuracy w/ Ties 为 65.36 (Omni-RewardModel-BT)，对比 66.54 (Claude 3.5 Sonnet)，变化 -1.18。
 > - VL-RewardBench 上，Overall Accuracy 为 76.3 (Omni-RewardModel-BT)，对比 73.1 (Skywork-VL-Reward)，变化 +3.2。
 
-## 概述
+## 概要
 
 **核心问题**：当前多模态奖励模型（Reward Model, RM）普遍存在两个结构性瓶颈——**模态不平衡**与**偏好刚性**。绝大多数RM仅覆盖文本和图像模态，对视频、音频、3D等模态支持严重不足；同时，训练范式依赖固定的二元偏好对，无法捕捉用户个性化、细粒度的评估需求。
 
@@ -50,7 +52,7 @@ claims:
 
 **主要局限**：音频生成（T2A准确率44.77%）与3D生成（T23D准确率39.40%）任务性能显著偏低，模态不平衡问题未完全解决；指令微调数据完全由GPT-4o生成，尽管经过多模型验证过滤，仍可能存在未被检测的偏差。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -73,7 +75,9 @@ claims:
 
 这一设计将奖励建模从“单一模态+固定标准”的封闭范式推向“全模态+动态标准”的开放范式，目标是实现一个通用全模态奖励模型（generalist omni-modal reward model），在不牺牲可解释性的前提下，使开源模型性能接近甚至匹敌商业闭源方案。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Omni-Reward 的核心创新在于从**模态覆盖**和**偏好表达**两个维度同时突破现有奖励模型的瓶颈，构建了一个面向全模态、支持自由形式偏好的通用奖励建模框架。
 
@@ -107,7 +111,7 @@ $$\mathcal{L}_{\mathrm{BT}} = -\log \frac{\exp(r_{\mathrm{BT}}(c, x, y_c))}{\exp
 
 尽管上述创新显著提升了全模态奖励建模的性能，但模态不平衡问题并未完全解决：音频生成任务（T2A）准确率仅 44.77%，3D 生成任务（T23D）仅 39.40%，与文本、图像任务之间存在高达 28.37% 的性能差距。此外，指令微调数据完全由 GPT-4o 生成，尽管经过多模型验证流程（GPT-4o-mini、Qwen2.5-VL 7B、Gemma-3-12B-it）筛除不一致样本，仍可能引入未被发现的偏差。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_9C4gVbPqSy/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the architecture of Omni-RewardModel*
@@ -143,7 +147,7 @@ $$\mathcal{L}_{\mathrm{BT}} = -\log \frac{\exp(r_{\mathrm{BT}}(c, x, y_c))}{\exp
 
 该框架的瓶颈在于弱势模态（音频、3D）的性能仍显著偏低——T2A 准确率仅 44.77%，T23D 为 39.40%，模态不平衡问题未完全解决。此外，指令微调数据完全由 GPT-4o 生成，尽管经过多模型验证，仍可能引入未被发现的偏差。
 
-## 核心模块与公式推导
+
 
 ### 架构总览
 
@@ -181,7 +185,9 @@ $$(x, y_1, y_2, c, p)$$
 
 这一表示将固定二元偏好对泛化为可动态适应的自由形式偏好条件，是模型实现偏好灵活性的结构基础。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -248,7 +254,9 @@ Figure 7 分析了思维链推理对生成式 RM 性能的影响。结果表明�
 ![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_9C4gVbPqSy/figures/019_Table_11.jpg]]
 *Table 11: Overall performance of generative RMs under different scoring strategies*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 
@@ -296,6 +304,8 @@ Omni-Reward 的核心贡献在于**将奖励建模从“固定模态+固定偏�
 - **下游启示**：为多模态对齐（如 RLHF、DPO）提供了更通用的奖励信号源，也为研究跨模态偏好迁移和个性化奖励建模提供了实验平台。
 
 对于后续工作，Omni-Reward 提供了两条可追踪的改进路径：（1）**提升弱势模态的性能**，通过数据增强或模态特定的架构设计缩小模态间差距；（2）**优化生成式 RM 的训练效率**，使可解释的奖励建模在低资源场景下更具竞争力。
+
+
 
 ## 原文 PDF
 

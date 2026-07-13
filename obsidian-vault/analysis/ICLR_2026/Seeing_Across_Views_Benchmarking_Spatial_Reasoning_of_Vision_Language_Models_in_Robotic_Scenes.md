@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Seeing_Across_Views_Benchmarking_Spatial_Reasoning_of_Vision_Language_Models_in_Robotic_Scenes.pdf
+project_link: https://aaronfengzy.github.io/MV-RoboBench-Webpage/
+code_link: https://github.com/microsoft/MV-RoboBench
 openreview_forum_id: jXDZJAfRZB
 aliases:
 - MR
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 跨视角观察：面向机器人场景的多视角空间推理基准测试 |
 | 英文题名 | Seeing Across Views: Benchmarking Spatial Reasoning of Vision-Language Models in Robotic Scenes |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=jXDZJAfRZB); [GitHub](https://github.com/microsoft/MV-RoboBench); [Project](https://aaronfengzy.github.io/MV-RoboBench-Webpage/) |
+| Links | [paper](https://openreview.net/forum?id=jXDZJAfRZB) · [GitHub](https://github.com/microsoft/MV-RoboBench) · [Project](https://aaronfengzy.github.io/MV-RoboBench-Webpage/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/robotics |
 | Method | MV-RoboBench |
 | Dataset | MV-RoboBench (Overall), MV-RoboBench (3D Spatial Consistency), MV-RoboBench (Action Planning) |
@@ -42,7 +44,7 @@ claims:
 > - MV-RoboBench (Overall) 上，Accuracy (%) 为 56.41 (GPT-5)，对比 91.04 (Human upper bound)，变化 -34.63 (gap to human)。
 > - MV-RoboBench (3D Spatial Consistency) 上，Accuracy (%) 为 82.35 (GPT-5)，对比 19.07 (Random Choice)，变化 +63.28。
 
-## 概述
+## 概要
 
 当前视觉–语言模型（VLMs）在融合多视角输入以构建统一三维表示方面能力薄弱，常依赖屏幕位置、表观尺寸等二维启发式进行判断，而非真正的三维推理。这导致模型在深度模糊、遮挡和跨视角一致性等任务上表现接近随机水平。通用单视图空间推理能力无法可靠地迁移至多视图机器人操作场景——在单视图基准上表现良好的模型，在多视图机器人任务中仍可能接近随机猜测。
 
@@ -50,7 +52,7 @@ MV-RoboBench 是首个面向具身机器人操作场景的多视角空间推理�
 
 最先进的 GPT-5 在 MV-RoboBench 上仅获得 56.41% 的平均准确率，而人类可达 91.04%，差距达 34.63 个百分点（Table 2）。非推理模型在 3D 空间一致性等任务中准确率低至 19.07%，接近随机猜测水平。多视图输入对强模型存在显著增益——GPT-5 在距离判断任务上提升 +18.90%——但对小模型几乎无正面影响，揭示多视图融合存在明显的模型容量门槛（Table 7）。显式引入几何先验（深度估计、新视角合成）的结构化思维链增强仅在具备足够容量的模型上带来提升，对小模型无效甚至有害（Table 3），表明浅层提示增强不能替代真正的几何推理能力。
 
-## 背景与动机
+
 
 ### 视觉–语言模型的空间推理困境
 
@@ -90,7 +92,9 @@ MV-RoboBench 是首个面向具身机器人操作场景的多视角空间推理�
 
 MV-RoboBench 不仅是评测工具，更是诊断平台：通过系统性的消融实验（CoT 增强、单/多视图对比、图像方向鲁棒性测试），揭示 VLM 在多视图空间推理中的能力边界与失败模式，为未来架构设计提供实证依据。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MV-RoboBench 的核心创新在于系统性地填补了现有空间推理基准的两个关键空白：**多视图输入支持**与**机器人执行场景覆盖**。此前的主流基准（如 EmbSpatial-Bench、Visual Spatial、RoboSpatial、ShareRobot）均局限于单视图空间理解或非具身的多视图感知，无法评估 VLMs 在真实机器人操作场景中融合多摄像头视角进行三维推理的能力（表 1）。MV-RoboBench 通过以下 changed slots 实现了范式转变：
 
@@ -100,7 +104,7 @@ MV-RoboBench 的核心创新在于系统性地填补了现有空间推理基准�
 
 **真实机器人场景与严格人工标注。** 基准构建于 AgiWorld 和 BridgeV2 真实机器人操作数据集之上，采用全人工专家标注配合多轮交叉验证，并对答案正确性与颜色索引进行显式均衡（表 1，Section F.9）。这与依赖模板或半自动标注的先前工作形成对比，确保了评测的公平性与难度真实性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l44_https_openreview_net_forum_id_jXDZJAfRZB/figures/012_Figure_2.jpg]]
 *Figure 2: Construction pipeline of MV-RoboBench, consisting of three stages: data collection, QA generation, and human-in-the-loop quality review*
@@ -152,7 +156,7 @@ Table 1 系统对比了 MV‑RoboBench 与 12 个现有空间推理基准。�
 
 这一设计使得 MV‑RoboBench 成为首个同时覆盖多视角感知与 embodied 操作的基准，直接暴露了当前 VLM 在跨视角融合与 3D 推理上的结构性短板。
 
-## 核心模块与公式推导
+
 
 MV-RoboBench 本身是一个基准测试而非算法模型，其核心模块体现在**数据构建流水线**与**探索性思维链增强**两个层面，而非传统的公式推导环节。以下分别阐述。
 
@@ -214,7 +218,9 @@ $$\hat{\mathbf{x}} = \hat{\mathbf{y}} \times \hat{\mathbf{z}}$$
 - **零-shot 统一提示：** 所有模型评估采用统一的多项选择提示格式，避免模型特异性的提示工程带来的不公平比较（Section 3.1）。
 - **“以上均非”拒绝机制：** 通过修改数据集使正确答案变为“以上均非”，测试模型识别无效选项的能力，揭示出 GPT-5 等强模型存在严重的过度服从问题——准确率从 56% 骤降至 13%（Table 9）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：模型表现与人类基准的巨大鸿沟
 
@@ -268,7 +274,9 @@ Figure 6 将模型在单视图空间推理基准 **OmniSpatial** 上的表现�
 
 Figure 5 展示了各模型在空间任务与机器人任务上的准确率分布。开源 VLM 普遍聚集在左下角随机猜测区域，而闭源推理模型沿对角线呈单调上升趋势。这一正相关关系表明，**在多视图条件下，空间感知能力是机器人执行能力的前提**，但仅当模型具备足够的跨视图融合能力时，这种耦合才会显现。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有基准的关系
 
@@ -309,6 +317,8 @@ MV‑RoboBench 的评估范式存在以下边界条件：
 - **数据层面**：如何构建更大规模、能反映真实操作复杂度的多摄像头数据集，以覆盖更丰富的视角配置和操作场景？
 - **效率层面**：小型模型如何在资源受限下有效融合多视图信息，避免退化为单视图偏见？当前 CoT 增强对小模型无效的事实表明，需要更根本的架构创新而非简单的信息注入。
 - **鲁棒性层面**：如何使模型在非规范视觉方向（倒置、倾斜）下仍保持稳健的 3D 空间推理能力？GPT‑5 在倒置条件下的显著退化暗示，当前模型的 3D 理解可能部分依赖于与训练分布一致的视觉统计，而非真正的几何推理。
+
+
 
 ## 原文 PDF
 

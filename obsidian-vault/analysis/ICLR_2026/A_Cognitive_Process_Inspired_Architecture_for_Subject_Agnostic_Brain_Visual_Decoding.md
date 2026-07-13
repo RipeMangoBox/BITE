@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/A_Cognitive_Process_Inspired_Architecture_for_Subject_Agnostic_Brain_Visual_Decoding.pdf
+project_link: null
+code_link: https://github.com/xmed-lab/VCFLOW
 aliases:
 - VCFAV
 - CPIASABVD
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 受认知过程启发的跨被试脑视觉解码架构 |
 | 英文题名 | A Cognitive Process-Inspired Architecture for Subject-Agnostic Brain Visual Decoding |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=H1GLFKk0xE); [GitHub](https://github.com/xmed-lab/VCFLOW) |
+| Links | [paper](https://openreview.net/forum?id=H1GLFKk0xE) · [GitHub](https://github.com/xmed-lab/VCFLOW) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/neuroscience_cognitive_science |
 | Method | Visual Cortex Flow Architecture (VCFLOW) |
 | Dataset | cc2017 |
@@ -41,7 +43,7 @@ claims:
 > - cc2017 上，2-way (frame-based semantic-level) 为 77.9%，对比 74.8% (GLFA∗)，变化 +4.1%。
 > - cc2017 上，SSIM (frame-based pixel-level) 为 0.396，对比 0.137 (GLFA∗)，变化 +189.1%。
 
-## 概述
+## 概要
 
 现有fMRI到视频解码方法严重依赖被试特定训练（每名被试需超过12小时），无法直接应用于未见过的被试，这严重限制了临床可扩展性。针对这一瓶颈，本文提出**Visual Cortex Flow Architecture (VCFLOW)**，一种受认知过程启发的跨被试（subject-agnostic）脑视觉解码框架，发表于ICLR 2026。
 
@@ -49,7 +51,7 @@ VCFLOW的核心洞察在于：通过显式建模腹侧-背侧双流视觉通路�
 
 在cc2017数据集上的实验表明，VCFLOW在跨被试设定下显著优于现有方法：在50-way分类任务上达到14.0%（相对GLFA\*提升46%），SSIM达到0.396（相对GLFA\*提升189%），视频50-way分类达18.2%（相对NEURONS\*提升13%）。与全被试特定方法NEURONS相比，平均性能仅下降7%，但推理时无需任何重训练，仅需约10秒即可生成一段重建视频。该方法首次实现了无需重训练即可泛化到新被试的fMRI到视频解码，为临床可扩展性提供了实质性优势。
 
-## 背景与动机
+
 
 现有fMRI到视频解码方法的核心瓶颈在于其严重的被试依赖性。以NEURONS为代表的典型方法，每名新被试需要超过12小时的个体化训练数据才能构建专用模型，这一要求极大地限制了该方法在临床场景中的可扩展性——面对新患者时，高昂的数据采集和模型训练成本使其难以落地。虽然GLFA等方法尝试通过数据级功能对齐（functional alignment）实现被试自适应，但其仍需要所有被试（包括测试被试）的fMRI数据进行预训练，并非严格的被试无关设定。更根本的问题在于，现有方法未能有效区分fMRI信号中被试特异性的神经活动模式与跨被试共享的语义表征，导致在未见被试上的泛化能力严重不足。
 
@@ -59,7 +61,9 @@ VCFLOW的核心洞察在于：通过显式建模腹侧-背侧双流视觉通路�
 
 这一设计的关键洞察在于：通过显式建模视觉皮层的功能分区结构，并利用CLIP预训练模型的多层级语义空间作为桥梁，可以将fMRI信号中跨被试共享的语义信息与被试个体的神经活动模式分离开来。实验结果表明，VCFLOW在50-way语义分类任务上达到14.0%，相比被试无关基线GLFA∗（9.6%）相对提升46%；在SSIM指标上达到0.396，相比GLFA∗（0.137）提升189%。更重要的是，VCFLOW在推理时仅需10秒即可生成一段重建视频，无需任何重训练，且相比全被试特定方法NEURONS，平均性能仅下降7%——这一代价在临床可扩展性的巨大收益面前是可接受的。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 VCFLOW 的核心创新在于将**脑认知通路的结构先验**与**跨被试特征解耦**相结合，从根本上改变了 fMRI 到视频解码的范式——从“为每个被试训练专用模型”转向“一个模型适用于所有未见过的被试”。这一转变的关键瓶颈在于：现有方法（如 NEURONS）严重依赖被试特定训练（每名被试需超过12小时），无法直接泛化到新被试，严重限制了临床可扩展性。
 
@@ -73,7 +77,7 @@ VCFLOW 的因果机制通过三个模块化的 changed slots 实现：
 
 **证据强度**：上述三个 changed slots 均有明确的实验支撑。Table 1 显示 VCFLOW 在 50-way 分类任务上达到 14.0%，相比 GLFA∗（9.6%）相对提升 46%；SSIM 达到 0.396，相比 GLFA∗（0.137）提升 189%。Table 2 的消融实验进一步验证了每个模块的贡献：移除 HCAM 后 50-way 从 14.2% 降至 10.7%；移除 SARA 后降至 7.52%；移除 HED 后降至 10.0%。**需要注意的是**，当前实验仅在 cc2017 数据集（3 名被试）上验证，更大规模被试上的泛化表现需要手动验证。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0002_H1GLFKk0xE_A_Cognitive_Process-Inspired_Architecture_for_Su/figures/003_Figure_3.jpg]]
 *Figure 3: The overall framework of VCFLOW consists of three core components: (1) Hierarchical Cognitive Alignment Module (HCAM), (2) Subject-Agnostic Redistribution Adapter (SARA), and (3) Hierarchical Explicit Decoder (HED). VCFLOW learns three types of semantic representations through HCAM, which are then fused with subject-agnostic common features extracted by SARA. These enriched representations are subsequently decoded by HED to explicitly reconstruct information across multiple semantic levels*
@@ -88,7 +92,7 @@ VCFLOW 是一个端到端的跨被试脑视觉解码架构，其核心设计受�
 
 **数据流总结**：fMRI 体素序列 → HCAM（ROI 划分 + CLIP 层次对齐）→ 三种语义嵌入 → SARA（重分配层解耦语义与被试特征）→ 被试不变语义 token → HED（四个显式解码任务融合）→ 重建视频。整个推理过程仅需约 10 秒（Figure 1），无需任何重训练，相比传统被试依赖方法（每名被试需超过 12 小时训练）实现了质的飞跃。在 cc2017 数据集（3 名被试）上的定量结果表明，VCFLOW 在 50-way 分类任务上达到 14.0%（相对 GLFA∗ 提升 46%），SSIM 达到 0.396（相对 GLFA∗ 提升 189%），视频 50-way 分类达到 18.2%（相对 NEURONS∗ 提升 13%），且与全被试特定方法 NEURONS 相比平均性能仅下降 7%（Table 1, Table 4）。
 
-## 核心模块与公式推导
+
 
 VCFLOW 的整体架构由三个核心模块组成：**层次化认知对齐模块 (HCAM)**、**跨被试重分配适配器 (SARA)** 和**层次化显式解码器 (HED)**。其设计动机源于对腹侧-背侧双流视觉通路的功能拆分：早期视觉区负责边缘、朝向、颜色等低层级特征，腹侧流处理高层级抽象语义，背侧流编码动态与空间表征（Figure 2）。通过将fMRI信号与CLIP不同层级的嵌入进行显式对齐，VCFLOW实现了跨被试的语义解耦。
 
@@ -149,7 +153,9 @@ HED 对HCAM输出的三种特征（$\mathbf{F}_{\mathrm{early}}, \mathbf{F}_{\ma
 
 此外，消融研究（Table 5, Table 6）表明，SARA中的三个损失项和HED中的四个显式任务均对最终性能有贡献。HCAM的移除导致50-way分类从14.2%降至10.7%（Table 2），证实了层次化认知对齐的必要性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：定量比较
 
@@ -200,7 +206,9 @@ Figure 8揭示了两种主要失败模式：（1）**罕见对象类别**：当�
 
 VCFLOW在严格被试无关设定下，以仅7%的性能代价换取了零重训练的跨被试泛化能力，在50-way分类上相对GLFA∗提升46%，SSIM提升189%。核心贡献来自三个模块的协同：HCAM的认知通路对齐、SARA的语义-被试特征解耦、HED的多层次显式解码。失败模式主要集中于数据稀有的边缘场景。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有方法的关系
 
@@ -243,6 +251,8 @@ VCFLOW 与 baseline 的差异可归因于三个核心改变：
 3. **规模扩展性**：在更多被试（如 >10）上的被试无关泛化表现如何？是否需要更复杂的被试对齐策略？
 4. **渐进式学习策略**：不同周期长度 T 对性能的影响如何？正弦权重调度是否最优，还是存在更有效的调度函数？
 5. **MixCo 参数敏感性**：不同 Beta 分布参数对 MixCo 数据增强效果的影响尚待系统分析，这可能影响跨被试对比学习的稳定性。
+
+
 
 ## 原文 PDF
 

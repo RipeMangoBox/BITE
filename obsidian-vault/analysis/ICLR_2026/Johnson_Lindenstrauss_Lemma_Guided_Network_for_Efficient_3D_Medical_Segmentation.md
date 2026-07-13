@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Johnson_Lindenstrauss_Lemma_Guided_Network_for_Efficient_3D_Medical_Segmentation.pdf
+project_link: null
+code_link: https://github.com/JinPLu/VeloxSeg
 openreview_forum_id: fmWlDfCFMR
 aliases:
 - JL
@@ -29,12 +31,15 @@ claims:
 | 中文题名 | Johnson-Lindenstrauss Lemma Guided Network for Efficient 3D Medical Segmentation |
 | 英文题名 | Johnson-Lindenstrauss Lemma Guided Network for Efficient 3D Medical Segmentation |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=fmWlDfCFMR); [GitHub](https://github.com/JinPLu/VeloxSeg) |
+| Links | [paper](https://openreview.net/forum?id=fmWlDfCFMR) · [GitHub](https://github.com/JinPLu/VeloxSeg) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/segmentation |
 | Method |  |
 | Dataset | |
 
-## 概述
+> [!tip] 效果简介
+> 本笔记的既有实验指标、对比结果与适用边界见“实验与关键发现”；本轮仅统一结构，不改写证据。
+
+## 概要
 
 本文针对三维医学图像分割中“精度–效率”的尖锐矛盾，提出了一种轻量级双流 CNN-Transformer 分割模型 **VeloxSeg**。其核心设计由三个组件驱动：**Paired Window Attention (PWA)** 构建并行多尺度特征流，协调短程与长程注意力以捕获全局 token 关系；**Johnson-Lindenstrauss 引理引导的卷积 (JLC)** 为分组卷积确定最小通道数下界，强制保留几何邻接性；**Spatially Decoupled Knowledge Transfer (SDKT)** 通过 Gram 矩阵匹配，将自监督纹理教师的知识蒸馏到分割网络。
 
@@ -44,7 +49,7 @@ claims:
 
 > **注意：** 本文所有数值均来自论文提供的 Table 1、Table 2 及 Figure 1，未发现矛盾或需要人工核验的弱证据点。
 
-## 背景与动机
+
 
 三维医学图像分割是肿瘤诊断与治疗规划中的关键步骤，PET/CT 等多模态成像能够同时提供代谢功能信息与解剖结构信息，对提高分割精度具有重要价值。然而，现有高性能分割方法普遍面临计算效率瓶颈：高精度模型参数量大、推理吞吐低、训练与推理阶段 GPU 内存占用高，难以在资源受限的临床环境中部署。
 
@@ -54,7 +59,9 @@ claims:
 
 针对这些问题，本文提出 VeloxSeg，一个以效率为导向的双流 CNN-Transformer 分割框架。其设计动机明确：通过理论指导的模块设计，在显著降低计算和内存开销的同时保持甚至提升分割精度。具体而言，Paired Window Attention（PWA）通过并行多尺度窗口注意力机制协调短程与长程信息，避免全注意力带来的平方复杂度；Johnson-Lindenstrauss 引理引导的卷积（JLC）从理论上确定每组的通道数下界，以最小计算代价保留 token 间的几何邻接关系。这一“理论约束 + 架构协同”的设计思路，使得 VeloxSeg 能够在 AutoPET-II 等数据集上以 1.66M 参数、1.79 GFLOPs 的极低成本取得 62.51% Dice 的竞争性精度，为高效医学图像分割提供了新的范式。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 VeloxSeg 的核心创新并非单一模块的堆砌，而是围绕**轻量高效**这一目标，对 3D 医学分割网络中的特征提取、跨模态交互和知识迁移三个环节进行了系统性重构。其关键 changed slots 体现在三个层面：
 
@@ -80,7 +87,7 @@ $$C_{\mathrm{group}} = d' \geq c_{\mathrm{JL}} \varepsilon^{-2} \log N(M, v)$$
 
 上述三个 changed slots 并非孤立运作。PWA 提供多尺度感受野，JLC 保证特征提取的几何保真，SDKT 补充纹理细节——三者在 VeloxSeg 的编码器-解码器框架中形成互补。Table 2 的最终配置（Conv.+Trans.+SDKT）以 1.66 M 参数量和 1.79 GFLOPs 的计算代价，在 AutoPET-II 上达到 62.51% Dice，相比参数量更大的 Swin UNETR（62.24%）和 Nestedformer（61.38%）均取得边际优势，同时 GPU 吞吐量提升至 599.06 Patches/s。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0010_fmWlDfCFMR_Johnson-Lindenstrauss_Lemma_Guided_Network_for_E/figures/003_Figure_2.jpg]]
 *Figure 2: Overview of VeloxSeg. VeloxSeg employs an encoder-decoder architecture with Paired Window Attention (PWA) and Johnson-Lindenstrauss lemma-guided convolution (JLC) on the left, using 1×1 convolution as modal mixer. GC: group convolution; GA: multimodal grouped attention*
@@ -104,7 +111,7 @@ VeloxSeg 采用**编码器-解码器**架构，核心由两条并行的特征流
 
 > **注意**：Figure 2 给出了整体架构概览，Figure 3 和 Figure 10 分别展示了 PWA 的模块结构与详细特征流，Algorithm 1 提供了 PWA 的 PyTorch 风格伪代码。
 
-## 核心模块与公式推导
+
 
 ### Paired Window Attention (PWA)
 
@@ -150,7 +157,9 @@ $$\operatorname{GM}(\mathbf{X}) = \frac{1}{C H W D} (\mathbf{X} \mathbf{X}^T) \i
 
 该矩阵编码了特征通道间的相关性，作为风格表示的代理。SDKT 是唯一展示正向知识迁移的方法（Table 4），为轻量模型补充了仅靠监督信号难以获取的纹理先验。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -209,7 +218,9 @@ Table 2 系统拆解了各模块的贡献（AutoPET-II）：
 *Figure 4: Intuitive difference between depth-wise (DW) convolution and Johnson-Lindenstrauss (JL) guided Convolution in the feature space*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -241,6 +252,8 @@ VeloxSeg 在四个公开数据集上进行了验证：AutoPET-II、Hecktor2022�
 - 在更大规模临床部署场景下，VeloxSeg 的 CPU 吞吐量（48× 相对基线）优势是否能在边缘设备上稳定复现，缺乏硬件多样性测试。
 
 > **注意**：上述局限与开放问题中，部分推断（如 PWA 对小目标的响应机制、Gram 矩阵的 3D 适用性）来自论文自身的开放问题声明或间接证据，具体结论需结合原文手动核实。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Cortical_Policy_A_Dual_Stream_View_Transformer_for_Robotic_Manipulation.pdf
+project_link: null
+code_link: null
 openreview_forum_id: eWe8zqGvs5
 aliases:
 - CP
@@ -37,7 +39,10 @@ claims:
 | Method |  |
 | Dataset | |
 
-## 概述
+> [!tip] 效果简介
+> 本笔记的既有实验指标、对比结果与适用边界见“实验与关键发现”；本轮仅统一结构，不改写证据。
+
+## 概要
 
 现有机器人操作中的视图变换器（view transformer）在多视角场景下存在明显短板：它们缺乏对**跨视角空间关系**的显式建模能力。例如，当任务要求理解两个瓶子之间的空间位置以决定放置点时，RVT-2 等先前方法因无法有效融合不同相机视角的信息而失败（Figure 1）。这一瓶颈的根源在于，传统方法将多视图特征视为孤立的信息源，缺少几何一致的3D表征与面向动作的精细定位能力。
 
@@ -50,7 +55,7 @@ claims:
 
 从方法谱系看，Cortical Policy 定位为 **RVT-2 架构的增强型变体**：它保留了 RVT-2 的两阶段处理、视图内自注意力和视觉-语言协同注意力机制，同时通过双流设计引入了此前视图变换器所缺失的3D几何感知与自我中心动作定位能力。这一改进使模型在不显著增加推理开销的前提下，显著提升了对空间关系敏感任务的泛化性与鲁棒性。
 
-## 背景与动机
+
 
 机器人操控任务要求智能体在三维空间中精确理解物体间的空间关系，并据此生成可执行的动作序列。近年来，基于视图变换器（View Transformer）的方法通过将多视角 RGB‑D 图像渲染为可学习的 token 序列，在语言条件操控基准上取得了显著进展。然而，现有方案存在一个共性的结构缺陷：它们将多个静态相机视图独立编码为 token，再通过自注意力机制进行融合，但**缺乏对跨视图几何关系的显式建模**。
 
@@ -58,7 +63,9 @@ claims:
 
 受视觉神经科学中背侧‑腹侧双通路理论的启发，本文提出 **Cortical Policy**，一种双流视图变换器架构。该架构包含两个互补的处理流：**静态视图流**（static‑view stream）负责从多视角静态图像中提取三维空间结构，通过跨视图几何一致性约束增强场景理解；**动态视图流**（dynamic‑view stream）则从腕部动态相机视角直接预测末端执行器位置，为动作推理提供以目标为导向的注意力线索。两条通路协同工作，旨在弥补现有视图变换器在空间推理和动态感知上的双重不足。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Cortical Policy 的核心创新在于将机器人操作策略构建为**双流视图 Transformer**，分别模拟生物视觉皮层中“腹侧通路”（what）与“背侧通路”（where）的功能分工。这一架构在 RVT-2 基线（Goyal et al., 2024）的基础上引入了两个关键 changed slots，直接针对现有多视图 Transformer 在空间推理与动态感知上的结构性瓶颈。
 
@@ -76,7 +83,7 @@ Cortical Policy 的核心创新在于将机器人操作策略构建为**双流�
 
 总体而言，Cortical Policy 的 changed slots 集中在**特征提取阶段的几何约束注入**（静态流）与**感知模态的扩展**（动态流），而保留了 RVT-2 的两阶段处理、视图内自注意力和视觉-语言协同注意力等核心机制，属于在成熟基线框架上的定向增强。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_eWe8zqGvs5/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the proposed cortical policy. Inspired by the dorsal-ventral pathways in visual neuroscience, this architecture implements dual processing streams: a static-view stream for 3D spatial understanding and a dynamic-view stream for end-effector position awareness*
@@ -122,7 +129,7 @@ $$\mathcal{L} = \mathcal{L}_{action} + \lambda \mathcal{L}_{cgc}$$
 - **位置感知预训练**优于端到端联合训练：消融实验表明，冻结预训练的注视模型比端到端训练高出 1.9% 的平均成功率（Table 2，变体 E vs. C），验证了预训练位置先验对动态视图流的关键作用。
 - **显著性热力图**是动态视图流不可或缺的组件：去除热力图后（Table 2，变体 D），双流模型性能甚至低于单流变体，确认了显式动作线索的核心地位。
 
-## 核心模块与公式推导
+
 
 ### 双流架构总览
 
@@ -178,7 +185,9 @@ $$\mathcal{L} = \mathcal{L}_{action} + \lambda \mathcal{L}_{cgc}$$
 
 其中 $\mathcal{L}_{action}$ 为各动作分量（抓取位姿、开合角度等）的交叉熵损失之和，$\lambda$ 为权衡系数，设置为 1。该设计使模型在优化行为克隆目标的同时，通过几何一致性约束学习更鲁棒的 3D 空间表征。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：RLBench 多任务性能
 
@@ -248,7 +257,9 @@ Figure 4a 给出了各模块的训练时间分解：双流训练总计约 3.76×
 
 论文提出的两个开放方向值得关注：一是如何增强组合抽象能力以实现零样本任务泛化；二是如何将动态流从跟踪末端执行器扩展到跟踪多样化的任务相关目标。这两个问题直接关系到 Cortical Policy 从“多任务熟练”走向“新任务泛化”的可行性。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有工作的关系
 
@@ -284,6 +295,8 @@ Cortical Policy 的设计依赖于以下前提条件，这些条件界定了其�
 - **训练数据需求**：动态视图流的预训练需要 3600 条位置标注视频，这在实际部署中可能构成数据采集瓶颈。虽然预训练后冻结了注视模型参数，但预训练阶段本身的数据成本不可忽视。
 - **计算开销**：Figure 4(a) 显示，双流架构的训练时间显著增加（动态视图流约 2.46×10³ 分钟，静态视图流约 1.30×10³ 分钟），相比 RVT-2 的单一动作头（约 0.74×10³ 分钟）有约 5 倍的总训练时间增长。不过，Table 7 的容量控制消融表明，Cortical Policy 在参数更少（144.7M vs. 更深基线）的情况下取得了更高成功率，说明效率与性能之间存在设计权衡空间。
 - **真实世界验证规模**：真实世界实验仅涉及 4 个任务，且未报告重复次数和统计显著性。文中声称在空间推理任务上比 RVT 和 RVT-2 高出 30% 成功率、在动态扰动下达到 80% 成功率，但这些数字需在更大规模的真实世界评测中进一步验证。
+
+
 
 ## 原文 PDF
 

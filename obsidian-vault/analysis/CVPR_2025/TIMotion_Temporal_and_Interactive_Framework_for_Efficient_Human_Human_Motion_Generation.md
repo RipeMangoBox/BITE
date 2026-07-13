@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/TIMotion_Temporal_and_Interactive_Framework_for_Efficient_Human_Human_Motion_Generation.pdf
+project_link: https://aigc-explorer.github.io/TIMotion-page/
+code_link: null
 aliases:
 - TIMotion
 tags:
@@ -40,7 +42,7 @@ claims:
 > - InterHuman 上，FID 4.702 (TIMotion+RWKV) vs 5.918 (InterGen) (-1.216)；R Precision Top1 0.501 (TIMotion+RWKV) vs 0.371 (InterGen) (+0.130)。
 > - InterX 上，FID 0.261 (TIMotion+RWKV) vs 0.475 (InterGen*) (-0.214)；R Precision Top1 0.414 (TIMotion+Mamba) vs 0.400 (InterGen*) (+0.014)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有的双人运动生成方法（如 InterGen, Liang et al., IJCV 2024）在交互混合（Interaction Mixing）阶段主要依赖自注意力和交叉注意力机制，侧重空间交互建模而忽视运动序列内在的**时序因果特性**。这一设计导致参数冗余、长序列生成质量下降，尤其在角色动态变化的复杂交互场景中表现不佳。
 
@@ -58,7 +60,7 @@ claims:
 - 在 InterX 数据集上，TIMotion+RWKV 的 **FID 为 0.261**，同样优于 InterGen* 的 0.475（Table 7），验证了方法的泛化能力。
 - 消融实验证实三个组件均有正向贡献：同时应用 CII、RES 和 LPA 后，FID 从 5.943 降至 4.702（Table 3）；LPA 将运动特征的高频分量平均比例从 0.9063 降至 0.3729（Figure 6），生成运动更加平滑自然。
 
-## 背景与动机
+
 
 双人运动生成（human-human motion generation）旨在根据文本描述或部分运动序列，合成两个交互角色的自然运动。这一任务在虚拟现实、游戏角色动画、人机交互等领域具有重要应用价值。然而，与单人运动生成相比，双人运动生成面临独特的挑战：它不仅需要刻画每个个体的运动质量，还必须精准建模两人之间的时空交互关系。
 
@@ -74,7 +76,9 @@ claims:
 
 TIMotion的设计遵循一个统一的抽象框架——**MetaMotion**，将双人运动生成过程解耦为时序建模和交互混合两个阶段。该框架不仅兼容多种交互混合架构（如Transformer、Mamba、RWKV），还显著降低了参数量和推理时间，展现出良好的通用性与效率。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 TIMotion 的核心创新在于将双人运动生成问题从“交互混合”主导的范式，重新定义为**时序因果建模**驱动的范式。其关键洞察是：双人交互运动具有内在的时序因果性——一个人的当前动作依赖于对方先前的动作。基于此，TIMotion 提出了一套系统性的创新方案，在三个关键维度上突破了现有方法的局限。
 
@@ -122,7 +126,7 @@ LPA 对每个单人序列独立操作：首先通过核大小为 3 的卷积捕�
 
 TIMotion 的三个创新组件形成了完整的解决方案链条：**CII** 从序列结构层面将双人运动建模为因果序列，**RES** 从角色语义层面适应交互中的主被动切换，**LPA** 从运动细节层面消除高频噪声、增强局部平滑性。三者协同作用，使得 TIMotion 在 InterHuman 数据集上取得了 FID 4.702 的最优性能，显著优于 InterGen 的 5.918（Table 1，置信度 0.98）。更重要的是，CII 的核心思想具有架构无关性，可适配 Transformer、Mamba、RWKV 等多种交互混合模块，展现出良好的通用性。
 
-## 整体框架
+
 
 TIMotion 的整体框架建立在作者提出的 **MetaMotion** 抽象之上，将双人运动生成过程解耦为两个核心阶段：**时序建模（Temporal Modeling）** 与 **交互混合（Interaction Mixing）**。基于这一抽象，TIMotion 设计了三个紧密协作的技术模块，形成一条从文本条件到双人运动序列的完整生成流水线。
 
@@ -168,7 +172,7 @@ TIMotion 的核心设计哲学在于：**将双人交互运动的内在时序因
 ![[assets/figures/papers/paper_list_l1750_TIMotion_Temporal_and_Interactive_Framework_for_Efficient_Human_Human_Mo/figures/001_Figure_1.jpg]]
 *Figure 1: MetaMotion and performance of MetaMotion-based models on InterHuman validation set. We abstract the MetaMotion concept that illustrates the intrinsic properties of human-human motion generation in the interaction process. (a) and (b) show the two types of methods currently, and (c) shows our method TIMotion, LPA refers to the Localized Pattern Amplification. In (d) we compare the performance of the different methods on the InterHuman dataset*
 
-## 核心模块与公式推导
+
 
 TIMotion 的核心技术架构建立在作者提出的 **MetaMotion** 抽象框架之上，该框架将双人运动生成过程拆解为两个阶段：时序建模（Temporal Modeling）与交互混合（Interaction Mixing）。基于这一抽象，TIMotion 引入了三个关键模块，分别针对现有方法的瓶颈进行设计。
 
@@ -235,7 +239,9 @@ $$\mathcal{L}_{motion} = \mathcal{L}_{simple} + \lambda_{vel}\mathcal{L}_{vel} +
 
 各正则化项分别为速度损失、脚部接触损失、骨骼长度损失、关节距离映射损失和相对朝向损失。所有超参数 $\lambda$ 与 InterGen 保持一致，确保公平比较。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与实验设计逻辑
 
@@ -314,7 +320,9 @@ $$\mathcal{L}_{motion} = \mathcal{L}_{simple} + \lambda_{vel}\mathcal{L}_{vel} +
 ![[assets/figures/papers/paper_list_l1750_TIMotion_Temporal_and_Interactive_Framework_for_Efficient_Human_Human_Mo/figures/011_Figure_5.jpg]]
 *Figure 5: Qualitative results on the motion in-betweening task. The first and last frames are fixed. Darker colors indicate later frames. Our method achieves smooth and natural transitions between the conditioned motions*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位与基线关系
 
@@ -375,6 +383,8 @@ TIMotion 的一个重要特性是其**架构无关性**：CII + RES 的因果交
 3. **物理合理性约束**：在现有扩散损失和几何正则化基础上，引入物理仿真或接触约束是否能进一步提升生成运动的真实性和合理性？
 
 4. **更大规模预训练**：TIMotion 的 CLIP 文本编码器是冻结的，若在大规模运动-文本数据上进行端到端或部分微调，是否能进一步提升文本-运动对齐精度？
+
+
 
 ## 原文 PDF
 

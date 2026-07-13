@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Training_Free_Determination_of_Network_Width_via_Neural_Tangent_Kernel.pdf
+project_link: null
+code_link: null
 openreview_forum_id: 0elvad3gEu
 aliases:
 - NCW
@@ -42,7 +44,7 @@ claims:
 > - CNN / ResNet on CIFAR-10 / MNIST 上，Test loss (cross-entropy) 为 cardinal width 预测值，对比 训练多宽度观察到的饱和宽度，变化 预测宽度与测试损失平坦趋势一致。
 > - DNN on MNIST / XOR (classification) 上，Test loss 为 cardinal width 预测值 (e.g., MNIST m*≈131.19)，对比 逐宽度训练观察到的饱和点，变化 在预测的 cardinal width 处测试损失不再下降; 验证分类扩展可行性。
 
-## 概述
+## 概要
 
 深度神经网络的泛化性能通常随宽度增加而提升，但这一趋势终会饱和。实践中，研究者往往通过反复训练不同宽度的网络来寻找饱和点，缺乏理论指导，导致试错成本高昂且饱和宽度难以预判。本文提出一种**无需训练**的网络宽度确定方法，核心思路是：利用初始化时的经验神经正切核（empirical NTK）的最小特征值 $\mu_{\min}$ 作为代理指标，监测其随宽度增长的饱和趋势，从而直接判定泛化性能饱和的“cardinal width”。
 
@@ -54,7 +56,7 @@ claims:
 
 **局限与开放问题**。理论严格证明目前仅针对回归任务；分类任务的延伸尚无理论保证。在极端超参数（如极大学习率）下 cardinal width 可能发生偏移。NTK 最小特征值估计仍涉及较大计算开销，但可通过子采样缓解。未来方向包括将理论推广到特征学习状态、建立分类问题的对应理论，以及将 cardinal width 概念扩展到网络深度、注意力头数等其他结构维度。
 
-## 背景与动机
+
 
 深度神经网络的宽度（即每层神经元数量）是决定模型容量与泛化性能的关键结构超参数。然而，在实践中，宽度的选择长期依赖经验法则或昂贵的试错过程：研究者通常需要针对多个候选宽度逐一完成完整训练，再根据验证集性能人工判断最优宽度。这种方式的根本瓶颈在于**缺乏理论指导的宽度选择准则**——我们无法在训练前预判泛化性能随宽度增长的饱和点，导致计算资源浪费与次优架构的隐性风险。
 
@@ -62,7 +64,9 @@ claims:
 
 本文正是从这一缺口出发，提出了一种基于 NTK 最小特征值的训练无关宽度选择方法。其核心洞察简洁而有力：NTK 的最小特征值 $\mu_{\min}$ 控制着泛化误差的上界，而 $\mu_{\min}$ 随宽度增加呈现先上升后饱和的趋势——这一饱和点恰好与测试损失的平坦区对齐。因此，只需在初始化时计算不同宽度下的 $\mu_{\min}$ 并监测其饱和趋势，即可在**不进行任何训练**的前提下定位“cardinal width”——即泛化性能不再显著提升的最小宽度。这一思路将宽度选择从“训练-评估-比较”的试错循环，转变为“构建 NTK-估计特征值-拟合饱和曲线”的单次分析流程，从根本上改变了网络宽度确定的范式。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于将网络宽度的选择问题从一个依赖反复训练的经验搜索过程，转化为一个仅需在初始化时计算神经正切核（NTK）最小特征值的训练无关判定问题。这一转变通过两个关键的 changed slots 实现。
 
@@ -98,7 +102,7 @@ Figure 2 展示了核心实证证据：$\mu_{\min}$ 的饱和点（绿色竖线�
 
 > **需注意**：理论严格证明仅针对回归任务给出，分类任务的延伸目前缺乏理论保证，但实验（Figure 7）显示了初步可行性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0012_0elvad3gEu_Training-Free_Determination_of_Network_Width_via/figures/004_Figure_2.jpg]]
 *Figure 2: The cardinal width identified using fitted $\mu _ { \mathrm { m i n } }$ . Green lines indicate where the growth of $\mu _ { \mathrm { { m i n } } }$ slows down, suggesting a saturation point. At these widths, the test loss also plateaus, validating the proposed criterion for determining the cardinal width
@@ -138,7 +142,7 @@ $$g(x) = -\frac{ax}{b+x} + c$$
 
 整个流程的突出优势在于：**只需在初始化时构建一次 NTK 并估计最小特征值，无需任何训练步骤**，即可给出与多轮完整训练搜索相一致的宽度推荐。消融实验进一步表明，该推荐对优化器选择、学习率、初始化方案均具有鲁棒性（Figure 5），验证了方法的实用可靠性。
 
-## 核心模块与公式推导
+
 
 ### 核心因果机制：μ_min 的饱和探测
 
@@ -206,7 +210,9 @@ $$g(x) = -\frac{ax}{b+x} + c$$
 
 整个流程仅需一次初始化前向传播和 NTK 计算，无需任何训练步骤，从根本上消除了传统交叉验证搜索的试错成本。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 一、核心发现：最小特征值饱和与测试损失平坦区的对齐
 
@@ -276,7 +282,9 @@ $$E_g^{(m)} \leq \frac{C_4}{\mu_{\min}(K_m^{(0)})^2} + C_5 \frac{\phi(m)}{\mu_{\
 
 以上局限在原文中均有明确讨论，用户在应用时需根据具体场景评估风险。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有宽度选择方法的对比
 
@@ -314,6 +322,8 @@ $$E_g^{(m)} \leq \frac{C_4}{\mu_{\min}(K_m^{(0)})^2} + C_5 \frac{\phi(m)}{\mu_{\
 2. **分类问题的理论奠基**：能否在分类问题中建立与回归问题类似的 μ_min 控制理论？这需要处理交叉熵损失下 NTK 谱与泛化误差之间的关系。
 3. **结构维度的拓展**：cardinal width 概念是否可推广到网络深度、注意力头数、token 维度等其他结构维度？这需要建立对应结构参数与 NTK 谱之间的联系。
 4. **高效特征值估计**：如何进一步降低大规模数据集上 NTK 最小特征值的估计成本，使其在实际应用中更具可操作性？
+
+
 
 ## 原文 PDF
 

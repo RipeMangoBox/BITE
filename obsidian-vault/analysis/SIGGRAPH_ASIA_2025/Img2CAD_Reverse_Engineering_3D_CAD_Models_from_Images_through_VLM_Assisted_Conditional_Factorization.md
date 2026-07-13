@@ -5,6 +5,7 @@ paper_level: A
 venue: "SIGGRAPH Asia"
 year: 2025
 pdf_ref: paperPDFs/SIGGRAPH_ASIA_2025/Img2CAD_Reverse_Engineering_3D_CAD_Models_from_Images_through_VLM_Assisted_Conditional_Factorization.pdf
+code_link: https://github.com/qq456cvb/Img2CAD
 project_link: https://qq456cvb.github.io/projects/img2cad
 aliases:
 - Img2CAD
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | Img2CAD：通过VLM辅助条件分解从图像逆向工程3D CAD模型 |
 | 英文题名 | Img2CAD: Reverse Engineering 3D CAD Models from Images through VLM-Assisted Conditional Factorization |
 | 会议/期刊 | SIGGRAPH Asia 2025 |
-| Links | [paper](https://arxiv.org/abs/2408.01437); [GitHub](https://github.com/qq456cvb/Img2CAD); [Project](https://qq456cvb.github.io/projects/img2cad) |
+| Links | [paper](https://arxiv.org/abs/2408.01437) · [GitHub](https://github.com/qq456cvb/Img2CAD) · [Project](https://qq456cvb.github.io/projects/img2cad) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Img2CAD |
 | Dataset | CAD-ified Chair, Table, Cabinet (average), Cabinet, 任意视角 (Arbitrary Views, average over categories) |
@@ -41,7 +42,7 @@ claims:
 > - CAD-ified Chair, Table, Cabinet 上，Segmentation Accuracy ↑ 为 relative improvement，对比 DeepCAD-End2End，变化 +17.94% (相对提升)。
 > - CAD-ified Chair, Table, Cabinet 上，Segmentation mIoU ↑ 为 relative improvement，对比 DeepCAD-End2End，变化 +19.03% (相对提升)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：从单张图像逆向重建3D CAD模型面临双重挑战——离散命令结构与连续属性参数的组合复杂性，以及从单一视角推断完整三维几何的固有歧义性。传统端到端方法（如DeepCAD-End2End）直接回归完整CAD命令序列，难以在有限数据下同时学习离散决策与精确连续参数，导致重建质量受限。
 
@@ -51,7 +52,7 @@ claims:
 
 **主要结果**：与端到端基线DeepCAD-End2End相比，Img2CAD将平均Chamfer距离从0.3108降至0.1174（降低62.2%），分割准确率相对提升17.94%，mIoU提升19.03%（Table 1）。消融实验证实，层次Transformer设计、语义部分嵌入、流匹配损失和对称引导各自带来显著增益，其中流匹配损失对Chamfer距离改善最为关键，对称引导则将强连通分量数（#SCC）从1.49降至1.11，对称Chamfer距离从0.1145降至0.0756（Table 2, Table 3）。在任意视角输入下，方法同样保持可比性能（Table 4），并展示了在Pix3D数据集和Google家具图片上的泛化能力。
 
-## 背景与动机
+
 
 从单张图像逆向重建三维CAD模型是计算机图形学与工业设计中的核心难题。与传统的网格或点云重建不同，CAD模型由离散的命令序列（如草图绘制、拉伸、切割）和连续的几何属性（如圆心坐标、半径、拉伸距离）构成，这带来了独特的组合复杂性：离散结构的微小错误会导致完全失效的几何输出，而连续属性的回归又高度依赖于离散结构的正确性。此外，单视角图像固有的信息缺失——遮挡、透视畸变、光照变化——进一步加剧了端到端学习的难度。
 
@@ -61,7 +62,9 @@ claims:
 
 基于此，Img2CAD提出**条件分解策略**：将图像到CAD的逆向工程分解为两个条件化的子问题——首先由微调的VLM（Llama3.2）预测带有语义部分标签的离散CAD基础结构，然后由专用的层次Transformer网络（TrAssembler）条件于该结构预测连续属性。这种分解使得属性预测网络可以跨不同对象共享对应部分的属性学习模式（类似层间纤维一致性），大幅降低数据需求并提高泛化性（Fig. 4）。此外，引入流匹配损失和推理时对称引导，进一步解决属性回归的多模态分布问题和输出结构的对称性约束。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Img2CAD 的核心创新在于将图像到 CAD 的逆向工程任务进行**条件分解**（conditional factorization），将原本端到端学习的组合复杂性拆解为两个子问题：首先由视觉语言模型（VLM）预测离散的 CAD 基础结构，然后由专用网络条件于该结构回归连续属性。这一策略从根本上改变了任务的学习范式，带来以下关键改进。
 
@@ -96,7 +99,7 @@ $$\mathbf{x}_t = \mathbf{x}_t - \lambda \frac{\partial \mathcal{L}_{\mathrm{sym}
 
 这一测试时优化将强连通分量数（#SCC）从 1.49 降至 1.11，对称 Chamfer 距离从 0.1145 降至 0.0756（Table 3），显著提升了输出结构的连接完整性和对称性。
 
-## 整体框架
+
 
 Img2CAD 将“单张图像→可编辑CAD程序”的逆向工程任务**条件分解**为两个子问题：首先预测全局离散基础结构，再以该结构为条件回归连续属性参数。这一分解策略的核心动机在于：离散命令序列（如草图类型、挤出操作类型）决定了CAD程序的拓扑骨架，而连续属性（如圆心坐标、半径、挤出距离、欧拉角）则决定了精确的几何形态——两者的组合复杂性是端到端学习的根本瓶颈。
 
@@ -125,7 +128,7 @@ Img2CAD 将“单张图像→可编辑CAD程序”的逆向工程任务**条件�
 ![[assets/figures/papers/paper_list_l43_https_arxiv_org_abs_2408_01437/figures/001_Figure_1.jpg]]
 *Figure 1: Img2CAD: a framework for reverse engineering 3D CAD models from single-view images. Our method leverages VLM to predict the discrete CAD program structure and then uses a semantic-conditioned transformer to predict the continuous attributes. This approach allows users to easily reconstruct and edit a CAD model from a single-view input image. We use OpenCasCade [Capgemini [n. d.]] to convert the CAD program back to a 3D mesh*
 
-## 核心模块与公式推导
+
 
 Img2CAD 将图像到 CAD 的逆向工程分解为两个条件化子任务：离散结构预测与连续属性回归。其核心模块包括 VLM 离散结构预测器、TrAssembler 条件属性回归网络，以及推理时对称引导模块。
 
@@ -165,7 +168,9 @@ $$\mathbf{x}_t = \mathbf{x}_t - \lambda \nabla \log \mathcal{p}_{\mathrm{sym}}(t
 
 消融实验（Table 2）系统验证了各模块的必要性：层次 Transformer 设计（行 i→ii）相比扁平结构显著提升连接性和对称性指标；语义部分嵌入（行 iii）进一步改善性能；以流匹配损失替换前馈回归头（行 v）带来最大的 CD 改善；直接使用 VLM 端到端预测连续属性（行 vii）性能显著劣化，证实了 VLM 不适合连续属性预测的结论（Fig. 6 亦定性展示了 VLM 在连续属性预测上的失败案例）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 Img2CAD 在 CAD-ified ShapeNet 数据集（椅子、桌子、柜子三类）上进行了系统评估。实验从重建精度、语义一致性、结构完整性和跨视角泛化四个维度展开，并与多个基线方法进行对比。
 
@@ -230,7 +235,9 @@ Fig. 8 对比了 Img2CAD 与各基线的重建可视化。Img2CAD 生成的 CAD 
 ![[assets/figures/papers/paper_list_l43_https_arxiv_org_abs_2408_01437/figures/014_Figure_12.jpg]]
 *Figure 12: Image to CAD results on Pix3D dataset*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定义与核心瓶颈
 
@@ -292,6 +299,8 @@ Img2CAD 的适用性受以下因素限制：
 3. **增强 VLM 的 3D 理解**：如何增强 VLM 的 3D 几何理解能力，以提高离散结构预测的准确性和完整性？
 4. **扩展 CAD 操作集**：如何将该方法扩展到更多日常对象类别和更复杂的 CAD 操作（如倒角、旋转、扫掠等）？
 5. **数据集质量**：如何量化并减少 GPT-4V 辅助数据集构建的标注噪声与偏差？
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/DoVer_Intervention_Driven_Auto_Debugging_for_LLM_Multi_Agent_Systems.pdf
+project_link: https://aka.ms/DoVer
+code_link: null
 openreview_forum_id: mrEK16Jy6h
 aliases:
 - DoVer
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | DoVer：面向LLM多智能体系统的干预驱动自动调试 |
 | 英文题名 | DoVer: Intervention-Driven Auto Debugging for LLM Multi-Agent Systems |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=mrEK16Jy6h); [Project](https://aka.ms/DoVer) |
+| Links | [paper](https://openreview.net/forum?id=mrEK16Jy6h) · [Project](https://aka.ms/DoVer) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/planning_control |
 | Method | DoVer |
 | Dataset | WW-AB (AssistantBench, Magentic-One), WW-GAIA (GAIA, GAIA-Level-1 (Magentic-One) |
@@ -41,7 +43,7 @@ claims:
 > - WW-GAIA (GAIA, Magentic-One) 上，Trial Success Rate 为 17.6%，对比 0% (no intervention)，变化 +17.6个百分点。
 > - GAIA-Level-1 (Magentic-One) 上，Trial Success Rate 为 27.5%，对比 0% (no intervention)，变化 +27.5个百分点。
 
-## 概述
+## 概要
 
 基于日志的LLM多智能体系统失败归因存在根本性瓶颈：归因假设缺乏执行验证，且多轮尝试、多智能体交互导致单步/单智能体标注高度不确定——在WW GAIA数据集的29个案例中，有14个存在真实标签不确定性，使得即使经过提示精调，GPT-4o的步骤归因准确率仍仅为20–24%，难以实用。
 
@@ -51,7 +53,7 @@ claims:
 
 DoVer 的方法定位介于纯日志分析与全自动修复之间：它不修改子智能体内部能力，而是通过编排器层的干预生成与执行验证，形成“假设→干预→重执行→评估”的闭环。这使其在方法谱系中区别于基于日志的单次归因方法（如 Zhang et al., WW, 2025c 的 All‑at‑Once），同时为更大调试循环中的子智能体能力改进提供了定位依据。
 
-## 背景与动机
+
 
 ### 多智能体系统的调试困境
 
@@ -71,7 +73,9 @@ DoVer 的方法定位介于纯日志分析与全自动修复之间：它不修�
 
 上述困境的根源在于：日志归因将"生成假设"等同于"完成调试"，缺乏对假设正确性的验证机制。DoVer的核心洞见是**将调试从不可靠的静态归因转向可检验的动态干预**——在假设的失败点施加针对性干预（编辑消息、修改计划），然后重执行系统以验证假设是否成立。通过以任务成功或里程碑进展作为硬性验证信号，DoVer绕开了标注歧义问题，同时支持多干预并行验证，使多智能体系统的故障修复变得更加可靠和可量化。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DoVer的核心创新在于将LLM多智能体系统的调试范式从**被动日志归因**转向**主动干预验证**。现有方法（如WW提出的All-at-Once归因）仅基于会话日志生成失败假设，却缺乏验证环节——论文通过重现实验揭示，即使在提示精调后，GPT-4o在标注不确定案例上的步骤归因准确率也仅为24%，而确定案例也仅达44%（Section 3）。这种归因不可靠性的根源在于多轮尝试（trial）和多智能体交互带来的标注歧义：WW数据集中14/29个GAIA案例存在真实标签不确定性（Table 6, Table 7）。
 
@@ -92,7 +96,7 @@ $$Prog(\tau, \tilde{\tau}_I) = \frac{A(\tilde{\tau}_I) - A(\tau)}{K} \in [-1, 1]
 
 综上，DoVer的本质创新在于**用可执行的干预替代不可靠的静态推断**，将调试从“猜测哪里出错”转变为“测试修复是否有效”，使多智能体系统的故障定位和修复变得可量化、可验证。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l36_https_openreview_net_forum_id_mrEK16Jy6h/figures/002_Figure_2.jpg]]
 *Figure 2: DoVer (Do–then–Verify) Debugging Pipeline. (1) Trial segmentation: split the failed session log into trials using re-plan steps as cut points. (2) Failure attribution: for each trial, propose a hypothesis h _ { i } that marks a faulty step or agent. (3) Intervention generation: turn h _ { i } into an actionable intervention that edits either the plan or the attributed message or step in the original log. (4) Intervention execution: replay the trajectory in place, i.e., preserve all steps before the intervened step, then execute the intervention and measure progress of the new log. Colors indicate plan/re-plan (blue), execution (green), attributed failure (red), terminal failure (dark red),...*
@@ -106,7 +110,7 @@ DoVer 将调试从基于日志的被动归因转变为**干预驱动的主动验
 
 这一管道的设计本质在于：**以结果为导向的可检验干预，替代了不可靠的静态归因**。通过“生成假设→施加干预→重执行→验证”的闭环，DoVer 绕开了多智能体交互中固有的标注歧义，使故障修复变得可量化和可操作。
 
-## 核心模块与公式推导
+
 
 ### 4.1 失败会话的形式化表示
 
@@ -174,7 +178,9 @@ DoVer 的管道设计体现了三个核心决策：
 
 3. **干预仅限于编排器层**：当前 DoVer 仅修改消息或计划，不触及子智能体的内部工具或代码。这一约束简化了干预生成，但也导致 30-67% 的案例因子智能体执行能力不足而陷入 Inconclusive 状态（详见 Section 5.2 和 Appendix E 的消融分析）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 3.1 实验设置与评估指标
 
@@ -257,7 +263,9 @@ Table 4 的消融实验在 WW‑GAIA 设置下考察了不同调试模型和少�
 ![[assets/figures/papers/paper_list_l36_https_openreview_net_forum_id_mrEK16Jy6h/figures/012_Table_7.jpg]]
 *Table 7: Tagging results for each GAIA case in WW. The table reports ground-truth annotations, uncertainty tags, possibility for multi-failure step attribution, presence of ambiguous attributions, potential API or flaky errors, and case-specific details such as number of trials and model outputs. Model predictions matching , d-truth failure step are highlighted i*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -314,6 +322,8 @@ DoVer 在方法谱系中占据**从被动日志分析到主动干预验证**的�
 4. **降低执行不忠实概率**：如何通过更精准的指令形式、更强制的执行机制或多模态验证，降低 Agent 不忠实执行干预的概率？
 5. **扩展修复空间**：DoVer 框架能否扩展到需要修改子智能体源代码或合成新工具的故障场景？
 6. **多智能体联合干预**：在更复杂的多智能体协调场景中，如何自动区分责任归属并生成针对多个 Agent 的联合干预？
+
+
 
 ## 原文 PDF
 

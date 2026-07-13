@@ -5,6 +5,7 @@ paper_level: A
 venue: "SGP Graduate School"
 year: 2024
 pdf_ref: paperPDFs/SGP_GRADUATE_SCHOOL_2024/Monte_Carlo_Geometry_Processing.pdf
+code_link: null
 project_link: https://rohan-sawhney.github.io/mcgp-resources/
 aliases:
 - WSWWSBVCDT
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 蒙特卡洛几何处理 |
 | 英文题名 | Monte Carlo Geometry Processing |
 | 会议/期刊 | SGP Graduate School 2024 |
-| Links | [paper](https://github.com/rohan-sawhney/mcgp-resources/raw/main/SGP-24-slides.pdf?download=); [Project](https://rohan-sawhney.github.io/mcgp-resources/) |
+| Links | [paper](https://github.com/rohan-sawhney/mcgp-resources/raw/main/SGP-24-slides.pdf?download=) · [Project](https://rohan-sawhney.github.io/mcgp-resources/) |
 | Topic | #topic/optimization_theory_probabilistic #topic/optimization_theory_probabilistic/optimization_methods |
 | Method | Walk on Spheres (WoS) 及其扩展 (Walk on Stars, Boundary Value Caching, Delta Tracking) |
 | Dataset | 复杂几何热传导问题, 高频边界条件 screened Poisson 方程 |
@@ -41,7 +42,7 @@ claims:
 > - 复杂几何热传导问题 上，计算时间 为 10 分钟，对比 FEM 1.5 小时，变化 加速约 9 倍。
 > - 高频边界条件 screened Poisson 方程 上，视觉质量 为 125 次游走即可获得无偏估计，对比 FEM 需 200k 顶点，变化 无网格 vs 密集离散化。
 
-## 概述
+## 概要
 
 传统偏微分方程（PDE）数值求解长期依赖有限元方法（FEM），其核心瓶颈在于**体网格划分**：对复杂或非流形几何生成高质量四面体网格耗时巨大、内存密集，且常因网格退化或划分失败导致求解无法进行。正如课程材料所强调的，“Meshing is always the bottleneck for simulation!”。即便采用最先进的网格划分工具（如 FastTetWild），对简单几何仍需超过一小时，而网格划分本身已成为模拟流程中不可逾越的障碍。
 
@@ -60,7 +61,7 @@ claims:
 
 当前方法的主要局限在于：主要适用于椭圆型方程，对强非线性 PDE（如 Navier-Stokes 方程）可能无法直接应用；纯 Neumann 问题需特殊处理；蒙特卡洛噪声仍需通过缓存和方差缩减技术加以抑制。未来方向包括向更广泛物理问题（热传导、亥姆霍兹方程、弹性力学）的扩展、高性能 GPU 实时求解器、与深度学习去噪的结合，以及多物理场耦合统一框架的构建。
 
-## 背景与动机
+
 
 ### 模拟的瓶颈：网格划分
 
@@ -92,7 +93,9 @@ $$u(x) = \frac{1}{|\partial B(x)|} \int_{\partial B(x)} u(y) dy$$
 
 本课程系统性地介绍了蒙特卡洛几何处理这一新兴范式。其核心动机在于：将 PDE 求解从网格划分的桎梏中解放出来，使模拟任务能够像现代路径追踪渲染那样，直接处理极端复杂的几何，天然支持并行计算和视点依赖评估，并在不牺牲物理精度的前提下大幅降低预处理开销。课程涵盖了从基础 WoS 到带源项 Poisson 方程、Neumann 边界条件处理、变系数问题扩展（Walk on Stars、Delta Tracking）以及边界值缓存（Boundary Value Caching）等一系列方法，构建了一个完整的蒙特卡洛 PDE 求解工具链。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本课程的核心创新在于将椭圆型偏微分方程的求解从传统的**域离散化**范式彻底转向**随机游走采样**范式。这一转变的关键洞察是：调和函数在球面上的均值性质允许我们在不划分任何体网格的情况下，通过递归的球面采样无偏地估计任意点的解。其核心因果机制在于将求解过程解耦为两个基本操作——**最近点查询**与**空球采样**——从而绕过了传统方法中最为耗时且脆弱的体网格生成环节。
 
@@ -134,7 +137,7 @@ $$\hat{u}(x_i) = \begin{cases} \hat{u}(x_{i+1}) & \text{if } x_{i+1} \notin \par
 
 在复杂几何热传导问题的基准测试中，WoS在**10分钟**内完成求解，而FEM需要**1.5小时**，FEM配合自适应网格细化甚至需要**2.5小时** (page_219_Figure_ea1279f12479)，实现了约9倍的加速。
 
-## 整体框架
+
 
 蒙特卡洛几何处理的核心流程围绕“以采样替代离散化”这一思想展开。其整体 pipeline 摒弃了传统有限元方法（FEM）必需的体网格划分步骤，转而通过随机游走在连续域上直接估计偏微分方程（PDE）的解。该框架的输入仅为域边界表示（如三角网格）与边界条件，输出为目标评测点上的无偏解估计值。
 
@@ -166,7 +169,7 @@ $$\hat{u}(x_i) = \begin{cases} \hat{u}(x_{i+1}) & \text{if } x_{i+1} \notin \par
 *   **输入**：域边界 $\partial\Omega$（通常为三角网格）、PDE 类型与参数（如拉普拉斯方程 $\Delta u = 0$ 或 screened Poisson 方程）、边界条件 $g$、源项 $f$（可选）、评测点集合 $\{x_{\text{eval}}\}$。
 *   **输出**：每个评测点上的解估计值 $\hat{u}(x_{\text{eval}})$，通过对该点发起的多条游走路径结果取平均获得，估计值无偏且方差随游走数 $n$ 以 $O(1/\sqrt{n})$ 速率收敛。
 
-## 核心模块与公式推导
+
 
 ### 关键公式与变量含义
 
@@ -210,7 +213,9 @@ WoS 求解器的流水线由以下四个关键模块串联构成：
 
 WoS 将这一范式彻底反转：**域离散化**从“划分体网格”变为“仅需边界表示和最近点查询”；**解的表达**从“有限维基函数逼近”变为“无偏随机游走估计”。这一转变使求解器天然绕过了网格生成的难题，且支持视点依赖评估——仅在用户关心的评测点进行计算，而非全局求解。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -268,7 +273,9 @@ WoS 将这一范式彻底反转：**域离散化**从“划分体网格”变为
 
 ![[assets/figures/papers/paper_list_l21_https_github_com_rohan_sawhney_mcgp_resources_raw_main_SGP_24_slides_pdf/figures/027_Figure.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的本质差异
 
@@ -301,6 +308,8 @@ WoS及其扩展方法（Walk on Stars, Boundary Value Caching, Delta Tracking）
 ### 4. 知识库定位
 
 在几何处理与物理模拟的知识谱系中，蒙特卡洛几何处理占据了一个独特的位置：它既非传统数值方法的简单替代，也非渲染领域蒙特卡洛光线追踪的直接移植。其核心贡献在于**将PDE求解重新表述为递归的几何查询问题**——这一视角转换使得几何处理的瓶颈从“网格生成”转移至“最近点查询”，从而天然继承了计算机图形学在空间加速结构（BVH、KD树）和并行计算方面的数十年积累。课程材料以一句精炼的对比概括了这一哲学：“Meshing is hard…finding closest point is easy!”
+
+
 
 ## 原文 PDF
 

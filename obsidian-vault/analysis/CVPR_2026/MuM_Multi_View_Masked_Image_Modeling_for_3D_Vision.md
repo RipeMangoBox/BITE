@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/MuM_Multi_View_Masked_Image_Modeling_for_3D_Vision.pdf
+project_link: null
+code_link: https://github.com/davnords/mum
 aliases:
 - MuM
 tags:
@@ -40,7 +42,7 @@ claims:
 > - Re10K 上，AUC@30 (↑) 50.8 vs 36.7 (DINOv3) (+14.1)。
 > - MegaDepth (pose) 上，AUC@30 (↑) 73.0 vs 59.3 (DINOv3) (+13.7)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有的自监督视觉预训练方法在3D感知任务中存在根本性局限。单视图掩码自编码器（如MAE）缺乏跨视图几何理解能力；而专为3D设计的跨视图方法（如CroCo v2）依赖严格的共视性采样和参考视图，难以推广到任意多视图场景。语义导向的DINO系列虽在识别任务上表现优异，但学习的特征在几何理解上不足。
 
@@ -55,7 +57,7 @@ claims:
 
 **方法定位**：MuM属于生成式自监督学习范式，以像素重建为核心目标。与语义导向的DINO系列形成互补——MuM在几何密集任务（位姿估计、点云重建、特征匹配）上优势显著，但在语义识别任务（图像分类、语义分割）上仍落后于DINOv3。该方法为3D视觉预训练提供了一条高效、可扩展的技术路径。
 
-## 背景与动机
+
 
 3D视觉感知——从多张图像中恢复场景的几何结构和相机位姿——是自动驾驶、机器人导航和增强现实等应用的核心能力。近年来，基于前馈神经网络的重建流水线（如VGGT、MapAnything）取得了显著进展，但这些系统的性能高度依赖于底层视觉编码器提取特征的质量。因此，自监督预训练一个能够理解多视图几何关系的通用视觉编码器，成为推动3D视觉发展的关键问题。
 
@@ -65,7 +67,9 @@ claims:
 
 MuM正是针对这一缺口提出的。其核心动机是：将掩码图像建模从单视图或双视图对称地推广到任意多视图，通过一个简洁的像素重建目标，强制模型在多视图解码过程中隐式学习跨视图的几何对应关系。与语义预训练路线相比，这一设计在计算效率上具有显著优势——据论文报告，MuM的训练计算量仅为DINOv3的约1/30，却在多项3D视觉任务上实现了超越。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MuM 的核心创新在于将掩码图像建模（Masked Image Modeling, MIM）从单视图或双视图对称地推广到任意多视图场景，从而在自监督预训练中隐式学习跨视图的几何一致性。其关键设计变更（changed slots）如下。
 
@@ -85,7 +89,7 @@ CroCo v2 的解码器以参考视图为条件进行交叉注意力，本质上�
 
 上述设计的综合效果是训练效率的大幅提升。MuM 的 MAE 风格目标相比 DINO 系列的自蒸馏框架在概念和计算上都更为简洁，训练速度提升超过 3 倍（Table 10 消融实验）。在 64 张 A100 GPU 上仅需约三天即可完成预训练，而下游 3D 视觉任务的性能全面超越计算开销大得多的 DINOv3（约 30 倍训练计算量差距）。这证明了在 3D 视觉领域，简单的像素重建目标配合适当的多视图架构设计，比语义导向的实例判别目标更为高效。
 
-## 整体框架
+
 
 MuM 的整体预训练流程围绕一个对称的多视图掩码自编码器展开，核心思路是将单视图 MAE 的“掩码-重建”范式对称地扩展到任意数量的视图中，通过解码器中的跨视图信息交互隐式学习几何一致性。图1给出了流程概览。
 
@@ -103,7 +107,7 @@ $$\mathcal{L}(\theta) = \sum_{i=1}^{n} \| M_i \odot (\phi_\theta(\tilde{I}_i) - 
 
 **与基线方法的关键差异。** 相比于 CroCo v2 以参考视图为条件的交叉注意力解码器，MuM 的交替帧/全局注意力架构消除了对参考视图的依赖，使其能够自然地处理任意数量的视图。相比于 DINOv3 的语义导向自蒸馏训练，MuM 的像素重建目标在概念和计算上都更简洁——消融实验表明，MAE 目标的训练速度比 DINO 系列快 3 倍以上，且在几何密集型下游任务上表现更优。
 
-## 核心模块与公式推导
+
 
 ### 整体架构
 
@@ -158,7 +162,9 @@ $$ \mathcal{L}(\theta) = \sum_{i}^{n} \|\mathcal{P}_t - \mathcal{P}_s\|^2 + \|\m
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2511_17309/figures/019_Figure_6.jpg]]
 *Figure 6: Attention map for query patch. We visualize the global attention map in the decoder for a query patch. We find that the attention score is highest for matching patches*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：MuM在多视角3D任务上全面超越语义预训练基线
 
@@ -229,7 +235,9 @@ Table 11系统性地消融了MuM的架构和训练设计选择：
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2511_17309/figures/009_Table_6.jpg]]
 *Table 6: Two-view relative pose estimation. Comparing AUC@ for different encoders through finetuning*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线的差异化定位
 
@@ -282,6 +290,8 @@ MuM 的**性能边界**同样清晰：
 3. **零样本跨视图匹配**：Figure 6 显示解码器的全局注意力图能够隐式定位匹配 patch，这是否意味着可以从注意力图中直接提取零样本匹配（类似 ZeroCo），从而避免复杂的后处理流程？这一方向有望将 MuM 从特征提取器升级为端到端的匹配器。
 
 4. **规模扩展的边际收益**：进一步增加训练视图数量和模型规模，能否缩小在单视图几何估计任务上与 DINOv3 的差距？当前 MuM 在单视图任务上的表现介于 DINOv3 和 CroCo v2 之间，更大规模的预训练是否能够突破这一瓶颈尚不明确。
+
+
 
 ## 原文 PDF
 

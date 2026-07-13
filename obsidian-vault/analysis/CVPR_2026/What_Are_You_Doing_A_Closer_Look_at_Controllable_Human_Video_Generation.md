@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/What_Are_You_Doing_A_Closer_Look_at_Controllable_Human_Video_Generation.pdf
+project_link: null
 code_link: "https://github.com/google-deepmind/wyd-benchmark"
 aliases:
 - WEPB
@@ -42,7 +43,7 @@ claims:
 > [!tip] 效果简介
 > - WYD16 上，pICD 1.8-4.6x higher error than TikTok/TED-Talks vs TikTok/TED-Talks (WYD significantly harder)；FVD vs human preference Spearman correlation 96.36% vs FID 22.24% (FVD far more reliable)；ICD vs pixel metrics 72.67% accuracy vs PSNR 59.04%, SSIM 62.65% (ICD matches human preferences best)。
 
-## 概述
+## 概要
 
 可控人类视频生成旨在根据给定的控制信号（如姿态、深度图或边缘图）驱动参考图像中的人物，使其执行特定动作。然而，现有基准（如TikTok、TED-Talks）在动作多样性、演员数量、交互类型、遮挡程度和场景变化等方面严重不足，导致无法全面评估和诊断模型在真实复杂场景下的精细化能力。
 
@@ -52,7 +53,7 @@ claims:
 
 该基准无意涵盖所有文化群体，可能延续训练数据中的偏见；pAPE依赖姿态检测器的鲁棒性；面部质量评估尚未纳入体系；当前评估局限于图像到视频的条件生成设置。
 
-## 背景与动机
+
 
 可控人类视频生成旨在根据结构条件（如姿态、深度图、边缘图）驱动参考图像中的人物运动，其在电影制作、虚拟现实、社交媒体等领域具有广阔应用前景。近年来，扩散模型的快速发展催生了大量可控视频生成模型，如 **MagicAnimate**、**MimicMotion**、**ControlNeXt** 等姿态条件模型，以及 **Control-A-Video**、**Ctrl-Adapter**、**TF-T2V** 等深度/边缘条件模型，在特定基准上展现出令人印象深刻的生成能力。
 
@@ -62,7 +63,9 @@ claims:
 
 上述双重缺口——基准的多样性不足和评估指标的粗粒度——构成了本文的核心动机：需要构建一个更具挑战性、更细粒度的基准，并配套经过人类验证的评估协议，以系统性地诊断当前 SOTA 模型的局限性，为未来模型改进提供明确方向。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心贡献并非提出新的视频生成模型，而是构建了一套系统性的**评估协议与基准**，用以诊断当前可控人类视频生成模型的真实能力边界。其创新性集中体现在三个相互耦合的“changed slots”上。
 
@@ -92,7 +95,7 @@ $$ \text{pAPE} = 1 - \text{AP} $$
 
 上述三个创新并非孤立存在。WYD的细粒度类别为pAPE等指标提供了差异化的测试场景，暴露了模型在特定条件下的系统性缺陷；而经过人类验证的指标组合则确保了诊断结论的可靠性。这一“**精细化基准 × 人类对齐指标 × 系统性诊断**”的闭环，构成了本文方法学上的核心贡献，为未来可控人类视频生成模型的改进提供了明确的靶向指引。
 
-## 整体框架
+
 
 WYD评估体系由两条并行且相互验证的主线构成：**精细化基准构建**与**人类对齐的评估协议**。前者解决“测什么”的问题，后者解决“怎么测”的问题，二者共同形成对可控人类视频生成模型的系统性诊断能力。
 
@@ -146,7 +149,7 @@ WYD基准的构建遵循一条严格的7步过滤流水线（Figure 27），从�
 ![[assets/figures/papers/paper_list_l1005_https_arxiv_org_abs_2503_04666/figures/004_Figure_3.jpg]]
 *Figure 3: | Overall performance (left: video-level, right: human-level) of SOTA controllable image-to-video models on wyd16. Pose models are shown in pink, depth ones in blue, and edge ones in orange. Human generation is multifaceted and no model prevails across all metrics*
 
-## 核心模块与公式推导
+
 
 ### WYD评估协议的核心架构
 
@@ -195,7 +198,9 @@ $$\text{pAPE} = 1 - \text{AP}$$
 ![[assets/figures/papers/paper_list_l1005_https_arxiv_org_abs_2503_04666/figures/012_Figure_10.jpg]]
 *Figure 10: | Example of pose re-scaling in MimicMotion. The pose detected in the generated video (bottom right) is re-scaled and re-centered compared to the pose from the reference video (top right). Humans are not sensitive to such changes but our pAPE metric is*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 基准难度验证：WYD 对现有模型构成显著挑战
 
@@ -298,7 +303,9 @@ Figure 41 展示了为深度/边缘条件模型添加文本引导的影响：
 
 WYD 数据集的构建经历了 7 步过滤流水线（详见 Figure 27），从 Kinetics、DiDeMo 和 Oops 三个公开许可数据集的 18,351 个视频中筛选出 1,544 个高质量视频。Table 4 记录了各过滤步骤后的数据量变化，Table 5 列出了从 StoryBench 标注中提取的独特人类演员。人工验证和细粒度标注累计耗时超过 250 小时，确保了基准的标注质量和类别覆盖度。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 可控视频生成的评估范式演进
 
@@ -350,6 +357,8 @@ WYD 协议的设计决策带来了以下适用边界：
 3.  **人机对齐**：如何进一步缩小自动评估指标与人类感知之间的差距，特别是在复杂人类动作和交互场景下？
 4.  **基准演进**：WYD 的 56 个子类别是否足够覆盖未来模型的所有能力？基准应建立何种机制以持续扩展，跟上模型发展的步伐？
 5.  **效率优化**：如何开发更高效的视频生成架构，在保持可控性的同时显著降低训练和推理成本？
+
+
 
 ## 原文 PDF
 

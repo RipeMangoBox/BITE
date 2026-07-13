@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2026
 pdf_ref: paperPDFs/arxiv_2026/LATENT_Learning_Athletic_Humanoid_Tennis_Skills_from_Imperfect_Human_Motion_Data.pdf
+project_link: https://zzk273.github.io/LATENT/
+code_link: https://github.com/GalaxyGeneralRobotics/LATENT
 aliases:
 - LATENT
 tags:
@@ -39,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - Real-world tennis rally (forehand) 上，Success Rate (%) 90.90 vs ours without dynamics randomization (DR) (+74.23)；Success Rate (%) 90.90 vs ours without observation noise (ON) (+40.90)。
 
-## 概述
+## 概要
 
 **核心问题**：如何从不完美的人体运动数据中学习人形机器人的竞技网球技能？真实人体运动捕捉数据通常包含不精确的手腕动作（持拍手）和不完整的技能组合，直接使用此类数据训练策略会导致击球精度低、动作不自然。LATENT 的核心瓶颈在于：**不完美的人体运动数据阻碍了人形机器人直接学习高质量网球技能，需要有效的修正与组合机制**。
 
@@ -52,7 +54,7 @@ claims:
 
 **方法定位**：LATENT 基于分层人形机器人控制框架，区别于端到端强化学习（vanilla PPO）、解耦运动生成与跟踪（MotionVAE）、对抗运动先验（AMP）、对抗技能嵌入（ASE）以及无校正机制的潜在动作空间方法（PULSE）。其核心创新在于将**在线蒸馏的条件变分瓶颈**、**状态条件可学习先验**、**手腕直接校正**与**自适应马氏距离约束**统一到同一框架中，实现了从不完美数据到竞技级技能的有效迁移。
 
-## 背景与动机
+
 
 ### 问题背景：人形机器人运动技能的获取瓶颈
 
@@ -78,7 +80,9 @@ claims:
 
 这一思路使得 LATENT 能够从仅包含不精确原始技能片段的业余球员数据出发，学习出兼具任务成功率（仿真正手 96.52%）和自然运动风格的网球技能，并在 Unitree G1 机器人上实现稳定的多回合真实世界对打。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 LATENT 的核心创新在于构建了一个**可校正的潜在动作空间**（correctable latent action space），使高层策略能够在约束下组合不完美人体数据中的原始技能，并直接校正关键末端执行器。其关键设计围绕以下四个 changed slots 展开。
 
@@ -102,7 +106,7 @@ $$\boldsymbol{a}_t^{\mathrm{full}} = [\mathcal{D}(\boldsymbol{s}_t, \boldsymbol{
 
 不同于 PULSE 的离线 VAE 蒸馏，LATENT 采用在线 DAgger 蒸馏结合条件变分瓶颈构建潜在空间（Section 3.2.2）。在运动跟踪器预训练阶段，刻意移除右手腕的控制信号并施加随机扰动（Section 3.2.1），使得后续蒸馏出的潜在空间对腕部扰动具有鲁棒性。这一设计确保了高层策略在输出手腕校正命令时，潜在空间生成的身体动作不会因手腕变化而失真，实现了校正与自然的解耦。
 
-## 整体框架
+
 
 LATENT 的完整流程遵循“数据收集—先验构建—策略训练—迁移部署”四阶段范式，核心目标是**从不完美的人体运动数据中提取可用的动作先验，并通过可校正的潜在动作空间与探索约束，使高层策略能够在网球任务中组合原始技能并精确控制末端执行器**。
 
@@ -155,7 +159,7 @@ $$\boldsymbol{a}_t^{\mathrm{full}} = [ \mathcal{D}(\boldsymbol{s}_t, \boldsymbol
 ![[assets/figures/papers/paper_list_l52_https_arxiv_org_abs_2603_12686/figures/003_Figure_2.jpg]]
 *Figure 2: Overview of LATENT. (a) We pre-train a motion tracker on collected imperfect human motion data. (b) We construct a correctable latent action space via online distillation. (c) We train a high-level policy to correct and compose latent actions for tennis task. (d) We transfer the policy to the real world via dynamics randomization and observation noise*
 
-## 核心模块与公式推导
+
 
 LATENT 的核心架构围绕一个 **可校正的潜在动作空间 (correctable latent action space)** 展开，通过三个关键模块将不完美的人体运动数据转化为可组合、可校正的网球技能。
 
@@ -224,7 +228,9 @@ LAB 基于 **马氏距离 (Mahalanobis distance)** 而非欧氏距离来定义�
 ![[assets/figures/papers/paper_list_l52_https_arxiv_org_abs_2603_12686/figures/005_Figure_4.jpg]]
 *Figure 4: The motivation of Latent Action Barrier (LAB)*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 仿真环境下的主实验结果
 
@@ -320,7 +326,9 @@ Figure 5 的热力图展示了机器人在连续回球过程中的场地覆盖�
 ![[assets/figures/papers/paper_list_l52_https_arxiv_org_abs_2603_12686/figures/004_Table_1.jpg]]
 *Table 1: Reward terms used in LATENT. The reward terms are divided into three types: Task, Regularization, and Termination*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 在具身技能学习谱系中的位置
 
@@ -372,6 +380,8 @@ LATENT 相对于最接近的前身 PULSE 做出了四项核心改动，每一项
 4. **专业数据融合**：如何结合专业运动员数据以提升动作质量和赛事级表现？这可能需要处理专业数据与业余数据之间的分布差异。
 
 5. **多平台泛化**：LAB 的马氏距离约束和 sim-to-real 随机化范围如何自动化适配不同的人形机器人平台，减少人工调校成本？
+
+
 
 ## 原文 PDF
 

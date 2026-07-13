@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2024
 pdf_ref: paperPDFs/arxiv_2024/Novel_View_Extrapolation_with_Video_Diffusion_Priors.pdf
+project_link: https://kunhaoliu.github.io/ViewExtrapolator/
+code_link: null
 aliases:
 - NVEVDP
 tags:
@@ -39,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - LLFF-Extra 上，SSIM ↑ 0.460 vs 0.416 (+0.044)；PSNR ↑ 15.46 vs 14.46 (+1.00)；LPIPS ↓ 0.378 vs 0.429 (-0.051)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有辐射场方法（如 **3DGS**，Kerbl et al., SIGGRAPH 2023）在新视角外推时，由于新视角远超出训练视图覆盖范围，渲染结果充斥着大量伪影与失真，严重制约了自由视角探索的沉浸感。这一瓶颈的根源在于辐射场对未观测区域的几何与外观缺乏有效约束。
 
@@ -48,8 +50,6 @@ claims:
 **方法定位**：ViewExtrapolator 是一种**训练无关的推理阶段精炼范式**，作用于辐射场或点云渲染的伪影视频之上。其核心机制包括两项协同的退火策略——**引导退火**在去噪早期施加伪影视频的引导以保持内容，随后逐步退火至无引导生成以释放 SVD 的自然先验；**重采样退火**在每个引导步内多次迭代去噪-扩散循环并逐步关闭引导，从而精细抑制累积伪影。
 
 **主要结果**：在 LLFF-Extra 基准上，ViewExtrapolator (3DGS) 取得最优 **SSIM 0.460**、**PSNR 15.46**、**LPIPS 0.378**，大幅优于基线 3DGS（0.416, 14.46, 0.429）和 DRGS（0.406, 14.68, 0.457）。消融实验表明，移除引导退火使 LPIPS 急升至 0.448，移除重采样退火使 LPIPS 升至 0.382，验证了两者对高保真外推的不可或缺性。该方法可直接应用于不同的 3D 渲染方式（3DGS、Instant-NGP、点云），体现了较强的通用性。
-
-## 背景与动机
 
 ### 新视角外推：辐射场的阿喀琉斯之踵
 
@@ -71,7 +71,7 @@ claims:
 
 本文提出 **ViewExtrapolator**——一种完全训练无关（training-free）的推理阶段精炼管线。它通过重新设计 SVD 的去噪过程，将伪影视频的引导信号巧妙地融入扩散去噪的 ODE 导数方向，并设计了**引导退火**与**重采样退火**两种机制来精细调控引导强度：在去噪早期施加较强引导以保留粗糙的场景几何与内容，随后逐步退火至无引导的自然视频生成，让 SVD 的先验接管不可见区域的细节生成。这一设计使得 ViewExtrapolator 无需任何微调即可直接应用于不同的 3D 渲染管线（辐射场、点云等），兼具通用性与数据/计算高效性。
 
-## 核心创新
+## 核心方法与创新机理
 
 ViewExtrapolator 的核心创新在于**将预训练视频扩散模型的生成先验转化为新视角外推的精炼器**，并通过两个协同的退火策略精细调控引导强度，从而在无需任何微调的条件下消除辐射场渲染的严重伪影。其关键创新点体现在以下四个“changed slots”上：
 
@@ -102,8 +102,6 @@ $$
 ### 4. 完全训练无关的 SVD 使用范式
 
 与通常需要针对特定场景微调或训练相机条件模型的做法不同，ViewExtrapolator **直接使用冻结的预训练 SVD 模型**，无需任何额外训练数据或参数更新。这一训练无关的设计使其成为一种通用的推理阶段精炼范式，可灵活应用于不同的 3D 渲染方式（辐射场、点云等），体现了数据与计算的高效性。
-
-## 整体框架
 
 ViewExtrapolator 构建了一条**训练无关**的精炼管线，其核心思想是将辐射场在新视角下渲染的伪影视频“融合”进冻结的 Stable Video Diffusion (SVD) 去噪过程，利用 SVD 内化的自然视频先验消除伪影并修补不可见区域，最终输出高保真的外推视图。整个框架由五个关键模块串联而成，形成“渲染—条件注入—引导去噪—退火调控—可选精炼”的闭环。
 
@@ -145,11 +143,6 @@ $$
 
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2411_14208/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of the proposed ViewExtrapolator. We render an artifact-prone video from the closest training view to an extrapolative novel view, and then refine it by guiding SVD to preserve the original scene content and eliminate the artifacts with guidance annealing and resampling annealing*
-
-![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2411_14208/figures/002_Figure_2.jpg]]
-*Figure 2: The setting differences between novel view interpolation and novel view extrapolation: Radiance fields excel at novel view interpolation but struggle at novel view extrapolation*
-
-## 核心模块与公式推导
 
 ViewExtrapolator 的核心创新在于将**冻结的 Stable Video Diffusion (SVD) 预训练模型**作为一个“视频先验修复器”，通过对去噪过程的精细调控，将辐射场渲染的伪影视频精炼为逼真外推视图。整个精炼管线围绕三个关键模块展开：**去噪方向重定向**、**引导退火**和**重采样退火**。
 
@@ -233,10 +226,7 @@ $e$ 越大，表示新视图离训练视图覆盖范围越远，外推难度越�
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2411_14208/figures/006_Figure_5.jpg]]
-*Figure 5: The definition of extrapolation degree e by the ratio between d and r (d stands for the distance between the novel view and the central point of training views, and r stands for the training view range as the maximum extent of the training views along the direction of d). A higher e means that the novel view is farther away from the training views*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 基准构建：LLFF-Extra
 
@@ -316,7 +306,7 @@ ViewExtrapolator 作为一种训练无关的推理阶段精炼范式，可无缝
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2411_14208/figures/008_Figure.jpg]]
 *Figure: (a) 3D Gaussian Splatting (b) Instant NGP (c) Point cloud from single view*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 

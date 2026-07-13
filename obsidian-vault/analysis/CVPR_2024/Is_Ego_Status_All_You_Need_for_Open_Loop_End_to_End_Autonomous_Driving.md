@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2024
 pdf_ref: paperPDFs/CVPR_2024/Is_Ego_Status_All_You_Need_for_Open_Loop_End_to_End_Autonomous_Driving.pdf
+project_link: null
+code_link: https://github.com/NVlabs/BEV-Planner
 aliases:
 - BPBPBPBPM
 - IESAYNOLEEAD
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 自车状态是否为开环端到端自动驾驶的全部所需？ |
 | 英文题名 | Is Ego Status All You Need for Open-Loop End-to-End Autonomous Driving? |
 | 会议/期刊 | CVPR 2024 |
-| Links | [paper](https://arxiv.org/abs/2312.03031); [GitHub](https://github.com/NVlabs/BEV-Planner) |
+| Links | [paper](https://arxiv.org/abs/2312.03031) · [GitHub](https://github.com/NVlabs/BEV-Planner) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | BEV-Planner (含变体 BEV-Planner+，BEV-Planner++, BEV-Planner+Map) |
 | Dataset | nuScenes val (开环规划) |
@@ -41,7 +43,7 @@ claims:
 > - nuScenes val (开环规划) 上，碰撞率 (%) ↓ 均值 为 BEV-Planner++ (0.34)，对比 UniAD (official, 0.62)，变化 -0.28。
 > - nuScenes val (开环规划) 上，路缘碰撞率 (%) ↓ 均值 为 BEV-Planner++ (3.16)，对比 UniAD (official, 1.72)，变化 +1.44。
 
-## 概述
+## 概要
 
 端到端自动驾驶旨在直接从传感器输入映射到规划轨迹，但当前开环评测体系存在一个被忽视的致命缺陷：**模型可以通过过度依赖自车状态（ego status）这一简单捷径来“刷榜”，而无需真正利用感知信息理解场景**。本文通过系统性分析揭示，在广泛使用的 nuScenes 数据集上，高达 73.9% 的场景为简单直行（Figure 2），且传统的 L2 距离与碰撞率指标无法有效惩罚偏离道路边界的危险行为，使得仅使用自车速度、加速度、偏航角和驾驶指令的 **Ego-MLP** 模型，在不使用任何感知模块的情况下，竟能达到与 UniAD、VAD 等复杂端到端方法相当甚至更优的开环规划性能（Table 1）。
 
@@ -53,7 +55,7 @@ claims:
 
 综上，本文的核心结论是：**在当前开环基准下，自车状态几乎就是规划性能的全部所需，但这恰恰反映了评测体系而非模型能力的缺陷**。这一发现对端到端自动驾驶领域的基准设计、公平比较和模型评估提出了根本性质疑。
 
-## 背景与动机
+
 
 端到端自动驾驶旨在将感知、预测与规划统一于一个可学习的框架中，从而避免传统模块化架构中的信息损失与误差累积。近年来，以 **UniAD** (Hu et al., CVPR 2023) 为代表的方法在 nuScenes 开环规划基准上取得了显著进展，通过引入检测、跟踪、建图与轨迹预测等多重辅助任务，逐步提升了规划性能。然而，这一研究范式的评估体系存在一个被长期忽视的致命缺陷：**开环评测中的规划性能究竟来自模型对场景的感知理解，还是仅仅来自对自车状态（ego status）的过拟合？**
 
@@ -67,7 +69,9 @@ claims:
 
 基于上述分析，本文提出核心洞察：**在现有基准下，端到端自动驾驶模型对自车状态存在过度依赖，感知信息并未有效贡献于规划决策。** 这一现象并非某个特定模型的缺陷，而是当前评测范式系统性失效的体现。为验证这一假设，本文设计了 Ego-MLP（仅使用自车速度、加速度、偏航角和驾驶指令的简单 MLP）和 BEV-Planner 系列基线，并通过引入路缘碰撞率（Curb Collision Rate, CCR）作为补充度量，试图揭示被传统指标掩盖的安全隐患，推动社区重新审视开环评测的可靠性与公平性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新并非提出一种性能更强的端到端自动驾驶模型，而是通过系统性的因果分析，揭示当前开环评测范式下模型对**自车状态（ego status）**的过度依赖，并据此设计极简基线以暴露基准缺陷。其关键“因果旋钮”在于**自车状态是否被引入模型，以及其在 BEV 编码器或规划器中的使用方式**。
 
@@ -119,7 +123,7 @@ claims:
 
 与现有方法的本质区别在于：**BEV-Planner 系列不依赖任何人类标注数据**，其设计目标不是追求 SOTA 性能，而是通过最小化感知依赖来暴露 ego status 捷径的严重性。这一方法论贡献对社区重新审视开环评测基准具有警示意义——在数据集分布偏斜和度量缺陷的双重作用下，复杂的感知-预测-规划流水线可能只是在学习一个精致的自车状态插值器。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2312_03031/figures/001_Figure_1.jpg]]
 *Figure 1: (a) AD-MLP uses both ego status and past trajectory GTs as input. Our reproduced version (Ego-MLP) drops the past trajectories. (b) The existing end-to-end autonomous driving pipeline consists of perception, prediction, and planning modules. Ego status can be integrated into the bird’s-eye view (BEV) generation module or within the planning module. (c) We design a simple baseline for comparison with existing methods. The simple baseline does not leverage the perception or prediction module and directly predicts the final trajectories based on BEV features*
@@ -159,7 +163,7 @@ BEV-Planner 的流水线刻意省略了传统端到端驾驶框架中的显式�
 
 值得注意的是，BEV-Planner 系列**不需要任何人工标注数据**（如 3D 检测框、跟踪 ID、高精地图），仅依赖自车轨迹的真值进行监督，这使其成为检验感知信息是否真正贡献于规划的“最小可行基线”。
 
-## 核心模块与公式推导
+
 
 ### 3.1 BEV-Planner 整体架构
 
@@ -212,7 +216,9 @@ $$CR(t) = \left(\sum_{i=0}^{N} \mathbb{I}_i\right) > 0, \quad N = t/0.5$$
 - **BEV-Planner++**：在规划器中引入自车状态，将其与 ego query 特征拼接后输入 MLP 预测头。
 - **BEV-Planner+Map**：在 BEV-Planner 基础上引入地图感知任务（主要遵循 UniAD 的设计），向 BEV 特征添加地图分割头，以引入道路边界等信息。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：自车状态对开环规划的支配性影响
 
@@ -331,7 +337,9 @@ UniAD 的后处理优化模块旨在通过非线性优化避免与占用网格�
 ![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2312_03031/figures/011_Table.jpg]]
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心因果旋钮：自车状态的引入方式
 
@@ -392,6 +400,8 @@ nuScenes 数据集中 **73.9% 的场景为直行**（Figure 2），自车状态�
 ### 5. 方法定位总结
 
 本文的方法贡献不在于提出新的 SOTA 模型，而在于**通过构造极简基线和引入新度量，系统性地揭示了当前开环端到端自动驾驶评测的危机**：现有基准下的“高性能”可能主要来自对自车状态的过拟合，而非感知能力的提升。这一发现对后续研究具有警示意义——任何未显式控制自车状态变量的性能声明，都可能是不公平比较的产物。
+
+
 
 ## 原文 PDF
 

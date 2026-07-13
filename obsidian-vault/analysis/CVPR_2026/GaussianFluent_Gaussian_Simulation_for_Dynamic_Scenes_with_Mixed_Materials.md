@@ -41,7 +41,7 @@ claims:
 > - Internal Texture Filling 上，CLIP Score 35.4 vs PhysGaussian 22.3 / 2D Inpainting 30.1 (+13.1 over PhysGaussian; +5.3 over 2D Inpainting)；User Study (Preference) 71.43% (60/84) vs PhysGaussian 3.57% / 2D Inpainting 25.00% (+67.86% over PhysGaussian; +46.43% over 2D Inpainting)。
 > - Dynamic Scene Simulation 上，CLIP Score 22.7 vs PhysGaussian 12.2 / OmniPhysGS 13.1 (+10.5 over PhysGaussian; +9.6 over OmniPhysGS)；User Study (Preference) 88.46% (23/26) vs PhysGaussian 3.84% / OmniPhysGS 7.69% (+84.62% over PhysGaussian; +80.77% over OmniPhysGS)。
 
-## 概述
+## 概要
 
 **问题背景** 3D Gaussian Splatting（3DGS）在静态场景新视图合成中取得了显著进展，但其在动态场景物理仿真中面临两个根本性瓶颈：（1）3DGS仅建模物体表面，内部为空心，缺乏体积表示和多视图一致的内部纹理；（2）现有基于GS的物理仿真方法（如PhysGaussian及OmniPhysGS）受限于纯弹性材料模型，无法处理脆性断裂、材料混合及拓扑变化。此外，原生连续损伤物质点法（CD-MPM）的回归映射在体积拉伸量 $p=p_0$ 处存在跳跃不连续性，导致数值不稳定，且CPU实现严重制约性能。
 
@@ -51,7 +51,7 @@ claims:
 
 **方法定位** GaussianFluent 在3DGS物理仿真方法谱系中首次实现了内部纹理合成与脆性断裂的统一建模：相较于PhysGaussian的纯弹性框架和OmniPhysGS的自动参数估计但无断裂支持，本方法通过改进CD-MPM的数值稳定性与GPU并行化，将GS物理仿真的适用范围从弹性变形拓展至断裂、切片等复杂动态，同时借助大模型先验解决了内部纹理的多视图一致性问题。
 
-## 背景与动机
+
 
 ### 3D高斯泼溅与动态场景仿真的交汇
 
@@ -83,7 +83,9 @@ claims:
 
 这一设计使得GaussianFluent能够在统一框架下，实现从弹性变形到脆性断裂、从固体到流体（通过 $p_0 \to 0$ 退化）的高保真动态场景仿真与渲染，并支持动态光照下的实时交互。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GaussianFluent 的核心突破在于将 **3D Gaussian Splatting（3DGS）从“表面壳”扩展为具有内部体积表示的物理实体**，并通过深度改进物理模型与计算后端，首次在统一框架下实现了从弹性变形到脆性断裂、从固体到流体的高保真动态场景仿真与渲染。其创新可归纳为三个紧密耦合的维度。
 
@@ -115,7 +117,7 @@ PhysGaussian 仅支持纯弹性 MPM，无法处理脆性断裂和拓扑变化。
 
 上述三个维度的创新形成闭环：内部体积表示为断裂提供物质基础，多视图纹理生成保证断裂面视觉真实，优化的 CD-MPM 提供数值稳定的物理驱动，GPU 并行化使实时交互成为可能，动态光照则增强场景表现力。定量证据表明，在动态场景仿真中，GaussianFluent 的 CLIP 分数（**22.7**）和用户偏好（**88.46%**）均大幅领先 PhysGaussian（12.2 / 3.84%）和 OmniPhysGS（13.1 / 7.69%）（表 2），验证了各创新模块的协同增益。
 
-## 整体框架
+
 
 GaussianFluent 构建了一条从静态表面高斯到可物理仿真的体积表示的完整流水线，其核心设计围绕一个关键瓶颈展开：原生 3DGS 缺乏内部体积表示与多视图一致的内部纹理，且现有 GS 物理仿真方法（如 **PhysGaussian**）仅支持弹性变形，无法处理脆性断裂、材料混合及拓扑变化。该框架通过将预训练图像生成模型与优化的连续损伤物质点法（CD-MPM）深度融合，在统一框架下实现了从弹性变形到脆性断裂、从固体到流体的高保真动态场景仿真与渲染。
 
@@ -147,10 +149,8 @@ GaussianFluent 构建了一条从静态表面高斯到可物理仿真的体积�
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l2082_https_arxiv_org_abs_2601_09265/figures/003_Figure_3.jpg]]
-*Figure 3: Overview of GaussianFluent. Our model first populates Gaussians in the internal volume and generates interior realistic texture with pretrained image generative models (Sec. 3.1). We then incorporate optimized CD-MPM simulation with mixed materials for Gaussian Splatting (Sec. 3.2) and introduce Blinn-Phong reflection in the rendering pipeline ( Supplementary Sec. C.1)*
 
-## 核心模块与公式推导
+
 
 GaussianFluent 的核心技术路线围绕两个瓶颈展开：**3DGS 缺乏内部体积表示与多视图一致内部纹理**，以及**现有 GS 物理仿真局限于弹性变形、数值不稳定且受限于 CPU 性能**。为此，方法在三个层面引入因果性改进——内部高斯体积与纹理生成、优化的连续损伤 MPM 仿真、以及 GPU 并行化与动态光照渲染。以下按模块拆解关键公式与变量含义。
 
@@ -260,7 +260,9 @@ $$
 
 原生 MPM 的 CPU 实现严重制约性能（单帧数分钟）。GaussianFluent 基于 NVIDIA Warp 框架将整个 P2G→网格更新→G2P 循环 GPU 并行化，将单帧模拟时间从约 4 分钟降至秒级（见 Table A1），使得交互式复杂动态场景的仿真与渲染成为可能。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 内部纹理填充评估
 
@@ -321,7 +323,9 @@ GPU 并行化是 GaussianFluent 实现交互式仿真的关键工程贡献。**T
 ![[assets/figures/papers/paper_list_l2082_https_arxiv_org_abs_2601_09265/figures/005_Figure_5.jpg]]
 *Figure 5: Comparison between our mixed material modeling and fixed β setting. Our approach assigns distinct β values, i.e., 2, 0.6, and*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线工作的关系
 
@@ -366,6 +370,8 @@ GaussianFluent 处于 **3D 高斯泼溅物理仿真** 与 **生成模型辅助�
 - **本构模型扩展**：能否将更广泛的本构模型（如粘塑性、超弹性-损伤耦合）融入统一框架，提升对真实材料行为的覆盖度？
 - **生成模型与仿真的深度耦合**：是否可以利用仿真结果反馈指导纹理生成，实现“仿真-渲染-生成”的闭环优化？
 - **超大规模场景**：如何在保持交互帧率的前提下，将方法扩展到包含上万颗粒子、多相流和复杂碰撞检测的场景？
+
+
 
 ## 原文 PDF
 

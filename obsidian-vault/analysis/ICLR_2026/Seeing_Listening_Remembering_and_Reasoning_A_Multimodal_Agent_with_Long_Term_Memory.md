@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Seeing_Listening_Remembering_and_Reasoning_A_Multimodal_Agent_with_Long_Term_Memory.pdf
+project_link: null
+code_link: https://github.com/ByteDance-Seed/m3-agent
 openreview_forum_id: PMz29A7Muq
 aliases:
 - MA
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 看、听、记与推理：一种具备长期记忆的多模态智能体 |
 | 英文题名 | Seeing, Listening, Remembering, and Reasoning: A Multimodal Agent with Long-Term Memory |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=PMz29A7Muq); [GitHub](https://github.com/ByteDance-Seed/m3-agent) |
+| Links | [paper](https://openreview.net/forum?id=PMz29A7Muq) · [GitHub](https://github.com/ByteDance-Seed/m3-agent) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/planning_control |
 | Method | M3-Agent |
 | Dataset | M3-Bench-robot (All), M3-Bench-web (All), VideoMME-long |
@@ -42,7 +44,7 @@ claims:
 > - M3-Bench-web (All) 上，准确率 (%) 为 48.9，对比 41.2 (Gemini-GPT4o-Hybrid)，变化 +7.7。
 > - VideoMME-long 上，准确率 (%) 为 61.8，对比 56.5 (Gemini-GPT4o-Hybrid)，变化 +5.3。
 
-## 概述
+## 概要
 
 **问题瓶颈**：传统长视频理解方法难以持续处理无限流式输入并构建一致的世界知识，导致长期记忆中的实体跟踪一致性差、跨片段推理困难。现有方案多依赖线性描述列表或无结构化记忆，缺乏对实体身份、属性、关系及情节的深层语义理解。
 
@@ -60,7 +62,7 @@ claims:
 
 消融实验进一步验证了各组件的关键作用：移除语义记忆导致 M3-Bench-robot 精度骤降 17.1 个百分点；移除实体等价映射（face-voice equivalence）下降 11.2 个百分点；DAPO 强化学习训练相比仅提示的基线提升 6.7 个百分点。
 
-## 背景与动机
+
 
 长视频理解正从“离线分析固定片段”转向“在线持续感知无限流式输入”的智能体场景。一个能看、能听、能记、能推理的多模态智能体，需要从连续的视频流中持续构建一致的世界知识，并在任意时刻回答关于过去事件的复杂问题。然而，现有方法在这一目标上存在根本性瓶颈。
 
@@ -79,7 +81,9 @@ claims:
 
 M3-Agent 的核心动机正是填补这一架构空白：通过以实体为中心的多模态记忆图构建，将视频流转化为具有身份等价、属性、关系和情节理解的语义记忆；同时，利用强化学习训练的控制模型，实现多轮迭代的 [Search]/[Answer] 动作循环，使智能体能够主动、策略性地利用自己的记忆来回答问题。这种设计从根本上解决了流式输入下长期记忆的一致性和跨片段推理问题。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 M3-Agent 的核心创新在于将长视频理解从“一次性描述-检索”范式转向**以实体为中心的记忆-控制双过程架构**，通过结构化语义记忆和强化学习驱动的多轮推理，系统性解决了长期流式输入中实体跟踪一致性差、跨片段推理困难的根本瓶颈。
 
@@ -105,7 +109,7 @@ M3-Agent 在记忆构建过程中利用人脸和声音特征建立跨模态实�
 
 M3-Agent 的创新链条可概括为：**实体中心图记忆（结构创新）→ 情景+语义双层记忆（内容创新）→ 跨模态等价绑定（一致性创新）→ RL 多轮检索推理（控制创新）**。这一“记忆-控制”双过程设计使模型在 M3-Bench-robot、M3-Bench-web 和 VideoMME-long 上分别以 6.7%、7.7% 和 5.3% 的优势超越最强基线 Gemini-GPT4o-Hybrid，尤其在人物理解（+15.5%）和跨模态推理（+6.7%）等需要深层记忆一致性的任务上表现突出。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_PMz29A7Muq/figures/006_Figure_1.jpg]]
 *Figure 1: Architecture of M3-Agent, comprising a multimodal large language model (MLLM) and a multimodal long-term memory. It supports two parallel processes: memorization and control. The entity-centric memory structure enables accumulate world knowledge and maintain consistent, context-rich memory over time*
@@ -151,7 +155,7 @@ M3-Agent 的整体架构围绕“记忆-控制”双过程展开，其核心设�
 
 > **需要人工核实**：论文中未明确说明记忆生成模块与控制模块是否共享同一个 MLLM 基座，以及两者是否在推理时完全独立部署。此外，记忆库的加权投票机制的具体实现细节（如权重衰减策略）在提供的片段中未充分展开。
 
-## 核心模块与公式推导
+
 
 ### 记忆生成与长期记忆库
 
@@ -190,7 +194,9 @@ $$\mathcal{J}_{\mathrm{DAPO}}(\theta) = \mathbb{E}_{(q,a) \sim \mathcal{D}, \{\t
 
 消融实验从记忆与控制两个维度验证了各模块的因果贡献。移除语义记忆模块后，M3-Bench-robot 精度从 30.7 骤降至 13.6，降幅达 17.1 个百分点，表明抽象世界知识对长视频问答至关重要。移除情景记忆中的实体等价映射（face-voice 关联）导致精度下降 11.2 个百分点，验证了跨模态身份对齐对记忆一致性的核心作用。控制端，移除多轮指令使精度降至 20.2，移除推理步骤导致精度下降 11.7%，二者共同证实了多轮推理与显式思维链对检索决策的支撑作用。DAPO 相比 GRPO 在 M3-Bench-robot 上取得 30.7 vs 30.0 的微弱优势，且 RL 收益随模型规模扩大而递增。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -245,7 +251,9 @@ M3-Agent 在三个长视频问答基准上全面超越所有基线方法。表 4
 
 这些错误模式指明了未来的改进方向：需要更丰富的视觉记忆表征以增强细节和空间推理能力，以及更智能的注意力机制来实现选择性记忆。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 
@@ -311,6 +319,8 @@ Table 19 的错误类型分析显示，**细粒度细节推理错误占 50%**，
 **终身学习与世界知识更新**：当前 M3-Agent 的记忆构建与任务执行是分离的过程——记忆在视频播放阶段预先构建，控制阶段仅进行检索。能否将二者耦合，使智能体在回答问题的过程中发现记忆的矛盾或缺失，并主动更新记忆？这将使系统从“离线记忆”进化为“在线学习”，更接近人类认知的持续更新特性。
 
 **语义记忆的自动类别发现**：如何使智能体在没有预定义提示的情况下，自主发现新的语义知识类别？这需要结合开放世界学习和概念抽象的前沿研究，可能的方向包括基于聚类的新概念发现或基于大语言模型的零样本知识模式识别。
+
+
 
 ## 原文 PDF
 

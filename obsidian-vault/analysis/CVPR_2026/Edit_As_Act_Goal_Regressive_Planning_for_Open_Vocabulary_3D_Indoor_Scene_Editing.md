@@ -42,7 +42,7 @@ claims:
 > - E2A-Bench (63 tasks, 9 scenes) 上，Instruction Fidelity (IF) 69.1 vs 57.6 (AnyHome) (+11.5)；Semantic Consistency (SC) 86.6 vs 60.5 (AnyHome) (+26.1)；Physical Plausibility (PP) 91.7 vs 90.3 (ArtiScene-E) (+1.4)。
 > - E2A-Bench (reasoning baselines) 上，IF 69.1 vs 49.6 (GPT-5 direct) (+19.5)；SC 86.6 vs 78.3 (SceneWeaver) (+8.3)；PP 91.7 vs 82.1 (SceneWeaver) (+9.6)。
 
-## 概述
+## 概要
 
 3D 室内场景编辑旨在根据自由形式的自然语言指令修改现有场景，同时保持未指定区域的完整性和物理合理性。现有方法将编辑视为生成任务——直接预测布局坐标、执行全局约束优化，或通过图像驱动编辑后提升至 3D——这些范式缺乏对目标状态的显式推理，导致三大系统性问题：**全局漂移**（修改非目标区域）、**布局一致性破坏**（无法维持场景原有的空间语义）和**物理不合理放置**（忽略支撑、碰撞等几何约束）。如 Table 1 所示，直接生成方法（LayoutGPT-E）和约束优化方法（AnyHome）在指令保真度与语义一致性上存在结构性缺陷，而图像驱动方法（ArtiScene-E）虽能保持一定物理合理性，却难以精确控制多步指令的执行。
 
@@ -50,7 +50,7 @@ Edit-As-Act 的核心洞察在于：**场景编辑不应被视为一次性生成
 
 在 E2A-Bench 的 63 个编辑任务上，Edit-As-Act 全面超越所有基线：平均指令保真度（IF）达 69.1（+11.5 vs 最强基线）、语义一致性（SC）达 86.6（+26.1）、物理合理性（PP）达 91.7（+1.4）。消融实验证实，验证器的移除导致 SC 下降 11.5，源感知回归的移除导致 IF 下降 10.9，表明显式验证与场景感知是方法有效性的关键支柱。用户研究进一步确认，参与者对 Edit-As-Act 编辑结果的评分显著高于基线（三项指标 5.49–5.92，7 分制）。
 
-## 背景与动机
+
 
 ### 3D 室内场景编辑的现状与瓶颈
 
@@ -78,7 +78,9 @@ Edit-As-Act 的核心洞察在于：**场景编辑不应被视为一次性生成
 
 这一思路借鉴了经典规划中的 STRIPS 形式化，但引入了**源感知回归**（source-aware regression）机制——仅传播在当前源场景中未满足的前提条件，避免对已存在的关系进行冗余规划。由此，Edit-As-Act 框架将场景编辑建模为可解释、可验证的符号规划过程，从根本上区别于现有生成式或优化式方法。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Edit-As-Act 的核心创新在于将开放词汇 3D 场景编辑从“生成”范式重新定义为“目标回归规划”范式。现有方法——无论是直接生成布局坐标的 **LayoutGPT-E**、基于约束优化的 **AnyHome**，还是图像驱动编辑后 3D 提升的 **ArtiScene-E**——均将编辑视为一次性或前向生成过程，缺乏对目标状态的显式推理。这导致三个系统性缺陷：(1) 编辑往往修改非目标区域，产生全局漂移；(2) 多步指令的语义一致性难以保证；(3) 物理合理性依赖隐式约束，不可靠。
 
@@ -96,7 +98,7 @@ $$G_{t-1} = (G_t \setminus \mathrm{add}(a_t)) \cup (\mathrm{pre}(a_t) \setminus 
 
 **4. 范式转换的本质。** 上述三个组件共同实现了一个根本性转变：场景编辑不再是“生成新布局”，而是“最小化动作序列以实现目标世界状态”。这种规划视角天然保证了编辑的局部性——只修改必要对象，维持场景整体稳定。在 E2A-Bench 的 63 个任务上，Edit-As-Act 的语义一致性达 86.6，比最强基线 **AnyHome** 高出 26.1 点；物理合理性达 91.7，比 **ArtiScene-E** 高出 1.4 点；指令保真度达 69.1，比 **AnyHome** 高出 11.5 点。用户研究进一步确认，参与者在三项指标上对 Edit-As-Act 的评分（5.49–5.92，7 分制）显著高于所有基线（Figure 4）。
 
-## 整体框架
+
 
 Edit-As-Act 将开放词汇 3D 室内场景编辑重新定义为**目标回归规划问题**，而非一次性生成或约束优化。其核心流程由三个阶段构成，形成从自然语言指令到可执行编辑动作序列的闭环。
 
@@ -141,7 +143,7 @@ Edit-As-Act 将开放词汇 3D 室内场景编辑重新定义为**目标回归�
 ![[assets/figures/papers/paper_list_l2636_https_arxiv_org_abs_2603_17583/figures/010_Figure_6.jpg]]
 *Figure 6: Overview of the object generation and stylization pipeline. We utilize Hyper3D Gen-2 [19] to synthesize high-fidelity 3D assets. The pipeline operates in two modes: (1) Text-to-3D for generating new objects from scratch, and (2) Point Cloud-Guided Stylization (highlighted in blue dashed boxes) where the input 3D object is converted into a point cloud to condition the generation, ensuring the geometric structure remains preserved while the texture is updated according to the text prompt*
 
-## 核心模块与公式推导
+
 
 Edit-As-Act 的核心创新在于将场景编辑重新定义为**目标回归规划问题**，而非一次性生成或全局优化。框架由五个关键模块构成，围绕一个中心公式——源感知目标回归算子——协同工作。
 
@@ -203,7 +205,9 @@ $$a_t = \langle \mathrm{pre}(a_t), \mathrm{add}(a_t), \mathrm{del}(a_t) \rangle$
 ![[assets/figures/papers/paper_list_l2636_https_arxiv_org_abs_2603_17583/figures/008_Figure_3.jpg]]
 *Figure 3: Effect of removing EditLang, which provides explicit preconditions that allow the chair to be rotated around the table*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：目标回归规划全面超越现有编辑范式
 
@@ -261,7 +265,9 @@ Figure 4的用户研究结果提供了感知层面的证据。十名参与者对
 ![[assets/figures/papers/paper_list_l2636_https_arxiv_org_abs_2603_17583/figures/017_Table_7.jpg]]
 *Table 7: Performance by editing operation type. Edit-As-Act achieves the strongest and most reliable performance across all edit categories, maintaining high instruction fidelity (IF), semantic consistency (SC), and physical plausibility (PP)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题瓶颈：从生成到规划的范式转换
 
@@ -317,6 +323,8 @@ Edit-As-Act 的当前设计存在以下适用边界：
 4. **概率化与模糊指令处理**：如何在不破坏解释性和终止保证的前提下，引入概率或学习组件以处理模糊指令？可能的方向包括将目标谓词表示为概率分布而非确定性集合，或允许规划器在多个可行计划中进行软选择。
 
 5. **与生成式方法的深度融合**：Edit-As-Act 目前将符号规划与3D资产生成解耦（通过Hyper3D Gen-2进行文本到3D生成）。是否存在端到端可微分的方式，使规划决策能够直接指导生成过程，从而在保持符号可解释性的同时提升生成质量？
+
+
 
 ## 原文 PDF
 

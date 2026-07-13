@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/RL_of_Thoughts_Navigating_LLM_Reasoning_with_Inference_time_Reinforcement_Learning.pdf
+project_link: null
+code_link: https://github.com/tsinghua-fib-lab/RL-LLM-Reasoning
 openreview_forum_id: Dw034qKrP5
 aliases:
 - RTR
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 思维强化学习：利用推理时强化学习导航大语言模型推理 |
 | 英文题名 | RL of Thoughts: Navigating LLM Reasoning with Inference-time Reinforcement Learning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=Dw034qKrP5); [GitHub](https://github.com/tsinghua-fib-lab/RL-LLM-Reasoning) |
+| Links | [paper](https://openreview.net/forum?id=Dw034qKrP5) · [GitHub](https://github.com/tsinghua-fib-lab/RL-LLM-Reasoning) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | RL-of-Thoughts (RLoT) |
 | Dataset | GPQA, Overall Average (7 tasks), Overall Average (5 tasks) |
@@ -42,7 +44,7 @@ claims:
 > - Overall Average (7 tasks) 上，Average Accuracy (%) 为 82.92 (DeepSeek-R1-Distill-Qwen-7B)，对比 76.34 (Few-shot CoT, best baseline)，变化 +6.58。
 > - Overall Average (5 tasks) 上，Average Accuracy (%) 为 71.70 (Llama3.1-8B)，对比 64.89 (CoT-SC, best baseline)，变化 +6.81。
 
-## 概述
+## 概要
 
 大语言模型（LLM）在复杂推理任务上的表现高度依赖推理时增强技术。现有方法（如链式思维 CoT、思维树 ToT）虽有效，但均依赖人工预定义的固定逻辑结构——线性链或两层五节点树——无法根据问题特征和推理过程的中间状态动态调整，导致在多样化任务上适应性不足。这一瓶颈在数学证明、STEM 问答等需要多步严谨推理的场景中尤为突出。
 
@@ -52,7 +54,7 @@ claims:
 
 方法层面，RLoT 处于**推理时增强**与**强化学习引导生成**的交汇点。与固定模式的 CoT/ToT 不同，它通过 RL 学习推理逻辑结构的生成策略；与基于最终答案的稀疏奖励训练不同，它引入 PRM 提供步骤级反馈。这一设计使 RLoT 在保持极低参数开销的前提下，实现了对推理过程的自适应控制。
 
-## 背景与动机
+
 
 大语言模型（LLM）在数学推理、代码生成、科学问答等复杂任务上的表现，高度依赖于推理过程中所采用的逻辑结构。自回归生成范式下，LLM 通过最大化条件概率 $\prod_{t=1}^{T} P(w_t | w_1, w_2, ..., w_{t-1})$ 逐 Token 生成文本，但这一过程本身并不包含对推理路径的显式规划。
 
@@ -62,7 +64,9 @@ RLoT（RL-of-Thoughts）的提出正是针对这一缺口。其核心动机在�
 
 这一设计的直接效果是：**仅用不到 3K 参数的导航器，便可使 7-8B 规模的小模型在多项推理基准上达到与数十亿参数大模型（如 Qwen2.5-72B）相当甚至更优的性能**，同时展现出跨模型、跨任务的强迁移能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 RLoT的核心创新在于将大语言模型的长序列推理过程**显式建模为马尔可夫决策过程（MDP）**，并引入一个极轻量的强化学习导航器来动态编排推理逻辑结构，从而突破了现有推理时增强方法依赖人工预定义固定模式的根本瓶颈。
 
@@ -94,7 +98,7 @@ RLoT在方法谱系中占据独特位置：它不同于训练时RLHF/DPO等方�
 
 然而，该创新存在明确边界：状态自评估模块在约82%的情况下准确，近20%的错误评估率可能引发动作选择的级联偏差（Figure 6, Figure 7）；训练依赖PRM质量，若PRM给出噪声较大的评分，可能误导策略学习；当前验证集中于数学、STEM和常识推理等文本任务，在多模态或需外部工具交互的场景下的表现尚待验证。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l12_https_openreview_net_forum_id_Dw034qKrP5/figures/001_Figure_1.jpg]]
 *Figure 1: Framework of RL-of-Thoughts (RLoT). We train an RL agent as the navigator, which dynamically selects and combines basic logic blocks along the reasoning process, constructing task-specific logical structures for each task and thereby enhancing the LLMs’ ability to handle complex reasoning tasks*
@@ -127,7 +131,7 @@ RLoT 的关键设计在于**训练与推理的角色分离**：
 
 该框架的根本创新在于将推理逻辑结构从**人工预定义的固定模式**（如 CoT 的线性链、ToT 的两层五节点树）转变为**由 RL 导航器根据问题特征和推理过程动态选择的自适应结构**。这使小模型（7-8B）在复杂推理任务上能够达到与数十倍参数量大模型（如 Qwen2.5-72B）相当甚至更优的性能。
 
-## 核心模块与公式推导
+
 
 ### 推理过程的形式化建模
 
@@ -161,7 +165,9 @@ $$\prod_{t=1}^{T} P(w_t | w_1, w_2, ..., w_{t-1})$$
 
 其中 $w_t$ 为第 $t$ 个Token，$T$ 为序列总长度。该公式描述了LLM逐Token生成的本质，RLoT通过在此生成过程中插入逻辑块选择动作，在不修改LLM参数的前提下改变推理路径。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -248,7 +254,9 @@ RLoT的主要失败来源有两类：
 
 这两类失败模式指向了RLoT的核心瓶颈：导航器的决策质量受限于状态表示的质量和PRM奖励信号的准确性。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有推理时增强方法的谱系关系
 
@@ -284,6 +292,8 @@ RLoT 的性能和适用性受限于其设计前提和组件质量，存在明确
 2.  **导航器与 LLM 的深度融合**：目前的导航器通过 Prompt 来控制 LLM，这是一种外部干预。更深度地融合方式，如让导航器直接调整 LLM 的解码 Logits 或控制其注意力头，是否能实现更精细、更高效的推理控制？
 3.  **策略的可解释性**：RL 导航器学到的策略是一个黑盒 MLP。如何解释其在不同状态下选择特定逻辑块的原因，并从中提炼出人类可理解的推理启发式，是一个重要的研究方向，有助于增强系统的可信度和可控性。
 4.  **规模定律的验证**：实验证明 RLoT 能极大提升小模型的性能，缩小与大模型的差距。但当基座模型本身达到数百亿甚至更大规模时，RLoT 带来的相对增益是否会趋于饱和，还是能持续解锁新的推理能力，这需要进一步的实验验证。
+
+
 
 ## 原文 PDF
 

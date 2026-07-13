@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/RetouchIQ_MLLM_Agents_for_Instruction_Based_Image_Retouching_with_Generalist_Reward.pdf
+project_link: null
 code_link: null
 aliases:
 - RetouchIQ
@@ -40,7 +41,7 @@ claims:
 > - RetouchEval (Quality Improving category) 上，Overall 7.51 (RetouchIQ-GRM) vs second-best (unspecified value) (outperforms all baselines)。
 > - MIT-Adobe5K 上，PSNR 23.14 (RetouchIQ-GRM) vs second-best (unspecified value) (improvement over baselines)。
 
-## 概述
+## 概要
 
 图像修饰任务的核心瓶颈在于其固有的主观性：同一用户指令可以对应多种合理的编辑结果，因此传统的基于像素相似度或参考图像对齐的规则化奖励信号并不可靠。同时，训练奖励模型时常用的合成扰动数据（如逆编辑扰动）与策略模型实际生成的编辑结果之间存在显著的分布偏移，进一步削弱了奖励反馈的精度。RetouchIQ 针对这两个问题提出了一套系统性的解决方案。
 
@@ -50,7 +51,7 @@ claims:
 
 从方法谱系来看，RetouchIQ 属于基于 MLLM 代理的图像编辑方法，但其关键创新在于将奖励建模从规则空间迁移到语义空间，并通过 PGRT 实现了奖励模型与策略模型的数据分布对齐，为指令驱动的图像修饰任务提供了一个更精准、更通用的反馈机制。
 
-## 背景与动机
+
 
 图像修饰（image retouching）旨在根据用户意图对照片的曝光、色彩、对比度等属性进行精细化调整，以提升视觉质量或实现风格转换。与传统图像增强任务不同，修饰任务的核心挑战在于其**高度主观性**：同一张输入图像可能对应多种同样合理的编辑结果，用户对“好”的修饰的评判标准随指令和场景动态变化。这一特性使得依赖像素级相似度（如与参考图像的 PSNR、SSIM、LPIPS）的传统可验证奖励（verifiable reward）信号变得不可靠——当多个有效编辑都能满足用户意图时，基于固定参考的度量无法准确区分编辑质量的优劣（Figure 3 左侧）。
 
@@ -58,7 +59,9 @@ claims:
 
 针对上述问题，RetouchIQ 提出两个核心改进方向。其一，引入**通用奖励模型（Generalist Reward Model, GRM）**，利用 RL 微调后的 MLLM 根据具体指令和图像内容动态生成评估指标并输出标量反馈，替代僵化的基于规则的奖励信号。其二，设计**策略引导的奖励训练（Policy-Guided Reward Training, PGRT）**，通过将奖励模型的训练数据分布从合成扰动转向策略模型实际生成的样本，消除训练偏差，使奖励模型能够为策略模型提供更精准的上下文反馈。这一思路的根本洞察在于：奖励模型的精度瓶颈并非模型容量不足，而是其训练分布与策略模型产出分布之间的错配；通过主动对齐这两个分布，可以显著提升指令一致性和最终修饰质量。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 RetouchIQ 的核心创新在于用**通用奖励模型 (Generalist Reward Model, GRM)** 替代传统的基于规则的奖励信号，并引入**策略引导的奖励训练 (Policy-Guided Reward Training, PGRT)** 来消除训练分布偏移，从而在主观性极强的图像修饰任务中实现更精准的反馈对齐。
 
@@ -91,7 +94,7 @@ PGRT 的核心思想是将奖励模型的训练分布**从合成扰动数据转�
 
 消融实验进一步验证：用 GRM 替换基于规则的奖励后，所有指标均持续提升；而 PGRT 相比仅使用扰动数据训练的奖励模型，在策略模型最终性能上带来额外增益。这表明 GRM 解决了“奖励信号不可靠”的瓶颈，PGRT 则解决了“奖励模型训练偏差”的瓶颈，两者协同构成了 RetouchIQ 的核心技术壁垒。
 
-## 整体框架
+
 
 RetouchIQ 采用**两阶段训练策略**构建一个 MLLM 代理系统：第一阶段为监督微调（SFT），第二阶段为强化学习（RL）。系统的核心由两个模块构成——**策略模型（Policy Model）** 和**通用奖励模型（Generalist Reward Model, GRM）**，二者在 RL 阶段形成“执行-评估”闭环。
 
@@ -130,7 +133,7 @@ $$\mathcal{I}(\theta) = \mathbb{E}_{q,s \sim \pi_{\theta}} \left[ r_{\phi}(g, I_
 
 奖励模型自身也经历 SFT 和 RL 两阶段训练。在 RL 阶段，引入了**策略引导奖励训练（Policy-Guided Reward Training, PGRT）**，将奖励模型的训练数据从合成扰动图像替换为策略模型的实际生成结果，从而消除训练分布偏移。这一设计是 RetouchIQ 实现指令一致性和美学质量显著提升的关键机制。
 
-## 核心模块与公式推导
+
 
 RetouchIQ 的核心架构由两个关键模块构成：**策略模型 (Policy Model)** 与**通用奖励模型 (Generalist Reward Model, GRM)**，二者通过两阶段训练（监督微调 SFT + 强化学习 RL）协同工作。
 
@@ -194,7 +197,9 @@ $$
 ![[assets/figures/papers/paper_list_l2664_https_arxiv_org_abs_2602_17558/figures/004_Figure_4.jpg]]
 *Figure 4: Overview of generalist reward model. Left: Given a before-edited image and a user-edited after image*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与评估逻辑
 
@@ -236,7 +241,9 @@ Figure 5 系统对比了不同奖励模型配置下的奖励准确率与策略�
 ![[assets/figures/papers/paper_list_l2664_https_arxiv_org_abs_2602_17558/figures/001_Figure_1.jpg]]
 *Figure 1: We present RETOUCHIQ, an MLLM agent that performs customized image retouching. Given an user instruction and an image input, RETOUCHIQ produces high-quality results across various quality enhancement and style transformation scenarios*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位：指令驱动的图像修饰
 
@@ -291,6 +298,8 @@ $$\mathcal{I}(\phi) = \mathbb{E}_{m, r, r_{w} \sim \pi\phi} \left[ \mathbb{I}[r 
 2. PGRT 在更复杂的多轮交互编辑场景中是否仍然有效？当策略模型持续进化时，奖励模型是否需要持续同步更新？
 3. 论文未讨论 GRM 本身的偏好对齐问题——GRM 的评估标准来源于训练数据中的偏好标注，这些标注可能存在文化偏见或美学偏好偏差，如何检测和缓解这种偏差？
 4. RetouchIQ 的推理轨迹是否可被用户干预或修正？人机协同编辑的交互范式值得探索。
+
+
 
 ## 原文 PDF
 

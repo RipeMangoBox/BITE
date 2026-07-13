@@ -40,7 +40,7 @@ claims:
 > [!tip] 效果简介
 > - LayeredDepth benchmark test set 上，四元组相对深度准确率 Q (All) 70.09% vs 61.34% (Multi-head DA v2) (+8.75%)；三元组相对深度准确率 T (Mixed) 76.94% vs 62.32% (Multi-head DA v2) (+14.62%)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -64,7 +64,7 @@ SeeGroup 属于**多层深度估计**方法，直接对标 Wen et al.（ICCV 202
 
 在合成数据上，SeeGroup 的逐层深度指标（AbsRel, RMS）略弱于 Multi-head (DA v2)，可能影响单纯追求逐层精度的应用场景。模型在某些模糊区域仍可能预测出多余的不存在层（过度预测），覆盖损失仅能部分缓解。此外，当前训练仅基于合成数据集，对真实世界复杂光照和材质的泛化性能仍有待验证。如何动态决定各像素的实际层数（而非固定最大层数）也是值得探索的方向。
 
-## 背景与动机
+
 
 ### 透明表面的多层深度歧义
 
@@ -90,7 +90,9 @@ SeeGroup 属于**多层深度估计**方法，直接对标 Wen et al.（ICCV 202
 
 通过消除预定义分组策略带来的归纳偏置，SeeGroup 能够学习到更连贯、更锐利的多层深度图，在真实场景基准上取得了显著的性能提升。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SeeGroup 的核心创新在于将透明表面多层深度估计从“强制排序回归”重构为“自确定分组下的强度函数学习”，通过三个关键槽位的改变，从根本上解耦了深度层分组与模型预测之间的刚性绑定。
 
@@ -134,7 +136,7 @@ $$\mathbf{C}_i = D(\mathbf{F}_{i-1}), \quad \mathbf{F}_i = \mathbf{F}_{i-1} - \b
 
 在 LayeredDepth 真实场景基准上，SeeGroup 将四元组相对深度准确率从 61.34% 提升至 70.09%（+14.26% 相对增益），且在 15 个评估指标中的 14 个上取得最优（Table 1），为多层深度估计建立了新的技术范式。
 
-## 整体框架
+
 
 SeeGroup 的整体流程围绕一个核心设计展开：**让模型自确定多层深度的分组方式**，而非依赖预定义的深度排序或固定分支结构。图 3 展示了该流程的三个主要阶段。
 
@@ -161,7 +163,7 @@ SeeGroup 的整体流程围绕一个核心设计展开：**让模型自确定多
 ![[assets/figures/papers/paper_list_l2093_https_openaccess_thecvf_com_content_CVPR2026_html_Wen_SeeGroup_Multi_Lay/figures/003_Figure_3.jpg]]
 *Figure 3: The overall pipeline of SeeGroup. Starting from a feature map extracted by a backbone encoder, a recurrent decomposition module generate a sequence of self-determined feature components. Then these components are mapped to an intensity function over depth, which is parameterized as a max mixture of Laplace functions*
 
-## 核心模块与公式推导
+
 
 SeeGroup 的核心由三个紧密协作的模块构成：**递归分解模块**将骨干特征迭代分离为自确定的特征组件；**强度函数预测器**将每个组件映射为深度轴上的 Laplace 强度贡献，并通过 max-mixture 形成整体深度强度分布；**置换不变训练目标**则在不强制层序的前提下优化该分布，使模型学会自确定分组。
 
@@ -237,7 +239,9 @@ $$
 ![[assets/figures/papers/paper_list_l2093_https_openaccess_thecvf_com_content_CVPR2026_html_Wen_SeeGroup_Multi_Lay/figures/001_Figure_1.jpg]]
 *Figure 1: Definition of multi-layer depth. Figure reproduced from [46]. (a) Each transition in medium along the camera ray defines a distinct layer. (b) Depth on i-th layer is the distance along the z-axis from the i-th layer to the camera*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 SeeGroup 在真实场景多层深度基准 LayeredDepth 上进行了系统评估，并从架构设计、强度参数化和损失函数三个维度展开了消融实验，以验证自确定分组策略的有效性。
 
@@ -283,7 +287,9 @@ SeeGroup 在真实场景多层深度基准 LayeredDepth 上进行了系统评估
 ![[assets/figures/papers/paper_list_l2093_https_openaccess_thecvf_com_content_CVPR2026_html_Wen_SeeGroup_Multi_Lay/figures/008_Table_4.jpg]]
 *Table 4: We report the total number of parameters (#Param), the number of parameters excluding the pretrained encoder (#Param w/o enc), CPU time and GPU time per forward pass, and FLOPs for all three architectures. Our Recurrent Decomposition Module (RD) uses the fewest parameters among them*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：从单层深度到多层深度的范式跃迁
 
@@ -339,6 +345,8 @@ $$\mathcal{L}_{\text{int}} = -\sum_{i=1}^{m} \log \max_j \mathbf{L}_j(d_i)$$
 2. **过度预测的根治**：覆盖损失仅能部分抑制虚假层，在高透明度或极端光照条件下仍可能失效。是否需要引入对抗训练或物理先验来更根本地约束组件数量？
 3. **真实场景泛化**：如何将自确定分组策略扩展到更多样的真实世界透明场景（弯曲玻璃、多层叠加），并降低对合成数据的依赖？域适应或自监督微调可能是可行路径。
 4. **与其他模态的融合**：偏振成像、ToF传感器等模态可提供额外的层分离线索，自确定分组框架是否能自然融合这些信号？
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,7 @@ paper_level: A
 venue: SIGGRAPH
 year: 2023
 pdf_ref: paperPDFs/SIGGRAPH_2023/Data_Free_Learning_of_Reduced_Order_Kinematic.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/toronto-ai/neural-physics-subspaces/
 aliases:
 - DFNSF
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 无数据学习的降阶运动学 |
 | 英文题名 | Data-Free Learning of Reduced-Order Kinematic |
 | 会议/期刊 | SIGGRAPH 2023 |
-| Links | [paper](https://arxiv.org/abs/2305.03846); [Project](https://research.nvidia.com/labs/toronto-ai/neural-physics-subspaces/) |
+| Links | [paper](https://arxiv.org/abs/2305.03846) · [Project](https://research.nvidia.com/labs/toronto-ai/neural-physics-subspaces/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Data-Free Neural Subspace Fitting (无数据神经子空间拟合) |
 | Dataset | Hanging cow (Neohookean, d=3) rigidity test, Heterogeneous 3D bar & rigid body chain (d=8), Elastic deformation scaling (变分辨率网格) |
@@ -42,7 +43,7 @@ claims:
 > - Heterogeneous 3D bar & rigid body chain (d=8) 上，外部载荷作用下的平衡响应准确性 为 高度匹配参考物理解，对比 线性模态/模态导数的子空间在链条上不含有效运动，变化 大幅定性改善。
 > - Elastic deformation scaling (变分辨率网格) 上，单次前向评估时间 & 拟合时间 为 前向评估 <1 ms (150k DOF)；拟合时间 1 min ~ 1 hour。
 
-## 概述
+## 概要
 
 物理系统的降阶运动学建模是图形学与计算力学中的核心挑战。传统方法依赖**线性模态分析**在平衡态附近展开，或通过**模态导数**（Barbič and James, 2005）引入二阶非线性修正，但这些方法本质上仍受限于局部线性子空间。数据驱动方法则需大量仿真快照来训练自编码器或执行 PCA，数据采集成本高昂且难以覆盖多样化的运动模式。
 
@@ -52,7 +53,7 @@ claims:
 
 在极低维度（$d=3$, $d=8$）条件下，神经子空间展现出远超线性/二次方法的表达能力，能够编码旋转等高度非线性运动（图 7），并在非均匀弹性杆和刚体链等系统上准确匹配外部载荷下的平衡响应（图 8）。与监督自编码器的消融实验表明，无数据方法在相同网络架构和潜在维度下可达到相当的子空间质量（图 11），同时完全省去数据收集。方法适用于弹性体、布料、连杆机构和带碰撞约束的刚体链等广泛物理系统，并可自然地通过连接条件参数实现跨材料和边界条件的条件子空间。
 
-## 背景与动机
+
 
 ### 问题背景：物理系统的降阶运动学建模
 
@@ -93,7 +94,9 @@ claims:
 
 这一方法框架在低维条件下（$d=3, d=8$）展现出显著优于线性/二次方法的非线性表达力，能编码旋转、屈曲、碰撞接触等复杂运动，同时完全省去了数据收集的负担。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作提出**无数据神经子空间拟合**（Data-Free Neural Subspace Fitting），其核心创新在于将降阶运动学的学习范式从“数据驱动”彻底转向“物理自监督”，从而绕过了传统方法对仿真快照或平衡态线性化假设的依赖。
 
@@ -136,7 +139,7 @@ $$
 
 此外，方法天然支持**条件子空间**（Section 3.5）：将条件参数 $c$（如材料刚度、边界条件位置）与隐变量 $z$ 拼接输入网络，$f_{\theta}: \mathbb{R}^d \times \mathbb{R}^m \to \mathbb{R}^n$，使单一训练的网络可泛化到物理系统的整个参数族（Fig. 5）。
 
-## 整体框架
+
 
 无数据神经子空间拟合方法的核心流程可概括为：**以解析势能函数为唯一监督信号，通过自监督学习训练一个从低维隐空间到高维构型空间的神经网络映射，从而自动发现物理系统的降阶运动子空间。** 整个 pipeline 由五个功能模块串联而成，无需任何仿真数据或预收集的运动快照。
 
@@ -182,7 +185,7 @@ $$
 ![[assets/figures/papers/paper_list_l52_https_arxiv_org_abs_2305_03846/figures/012_Figure_12.jpg]]
 *Figure 12: We evaluate the performance scaling of our method, fitting elastic deformation subspaces to the same object tetrahedralized at various resolutions. Each data point is a fitted subspace at a different mesh resolution; the left red axis gives the time for a single forward evaluation of the subspace map, while the right blue axis gives the fitting time*
 
-## 核心模块与公式推导
+
 
 ### 3.1 神经子空间映射
 
@@ -246,7 +249,9 @@ $$\hat{z} = \arg\min_z \left[ \frac{1}{2h^2} |f_{\theta}(z) - \bar{q}|_M^2 + E_{
 
 其中 $h$ 为时间步长，$\bar{q}$ 为惯性项决定的预测构型。该优化问题通过 L-BFGS 求解，自由度从 $n$ 维降至 $d$ 维，实现加速模拟。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现与对比实验
 
@@ -310,7 +315,9 @@ $\lambda$ 和 $\sigma$ 的选择对子空间特性有显著影响（详见附录
 | Table 1 | 各系统的最佳超参数 $\lambda$, $\sigma$ 和网络规模需根据 DOF 和目标运动范围调整 | 经验指南，置信度较高 |
 | Fig. 10 | 扭曲子空间是主要失败模式，需额外正则化或网络结构改进 | 定性展示，置信度中等 |
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从线性模态到无数据神经子空间
 
@@ -383,6 +390,8 @@ $\lambda$ 和 $\sigma$ 的选择对子空间特性有显著影响（详见附录
 5. **高维扩展**：更高维（$d > 10$）的子空间能否通过改进的训练技巧（如层次化子空间、流形上的正则化）变得可行？这是将方法推广到更复杂系统的关键。
 
 6. **端到端加速**：如何将本方法与快速能量评估方法（如自适应 cubature、hyper-reduction）结合，实现端到端的加速模拟？当前方法仅在降维层面加速，能量评估仍是全阶的。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/PARC_A_Quantitative_Framework_Uncovering_the_Symmetries_within_Vision_Language_Models.pdf
+project_link: null
+code_link: https://github.com/NVlabs/PARC
 aliases:
 - PPARC
 - PARC
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | PARC：揭示视觉语言模型对称性的定量框架 |
 | 英文题名 | PARC: A Quantitative Framework Uncovering the Symmetries within Vision Language Models |
 | 会议/期刊 | CVPR 2025 |
-| Links | [paper](https://arxiv.org/abs/2506.14808); [GitHub](https://github.com/NVlabs/PARC) |
+| Links | [paper](https://arxiv.org/abs/2506.14808) · [GitHub](https://github.com/NVlabs/PARC) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | PARC (Prompt Analysis via Reliability and Calibration) |
 | Dataset | MMBench, MIT-States, Average across 7 datasets |
@@ -41,7 +43,7 @@ claims:
 > - MIT-States 上，Calibrated Reliability 为 0.15 (LS-M)，对比 0.52 (Original)，变化 -0.37。
 > - Average across 7 datasets 上，Calibrated Reliability (model average vs. best) 为 0.65 (InternVL2-40B)，对比 0.29 (all models avg.)，变化 +0.36。
 
-## 概述
+## 概要
 
 视觉语言模型（VLM）对用户输入的 prompt 变化高度敏感，尤其是那些改变预期答案的语义变化（如否定、反义词、图像交换）会剧烈削弱模型的准确性与一致性。然而，现有评估指标缺乏跨数据集和 prompt 变体的可比性，难以公平地衡量模型的 prompt 鲁棒性。
 
@@ -55,15 +57,13 @@ PARC（Prompt Analysis via Reliability and Calibration）针对这一瓶颈，�
 
 PARC 的方法定位在 VLM 评估的可靠性量化与可比性校准层面，其可靠性评分和校准机制为公平比较不同模型在不同 prompt 条件下的表现提供了统一度量。当前框架的实验范围限定于多项选择视觉问答（MC-VQA），对开放式生成等任务的扩展仍是一个开放问题。
 
-## 背景与动机
-
 视觉语言模型（VLMs）在多项选择视觉问答（MC-VQA）等任务上展现了令人瞩目的能力，但其对用户输入prompt的敏感性始终是可靠部署的隐患。现实应用中，用户描述同一视觉问题的措辞可能不同，甚至可能无意中引入语义漂移——例如将“哪只动物毛发更长”改为“哪只动物毛发更短”。现有研究主要关注对抗性扰动或非系统的噪声注入，缺乏一套能够系统衡量模型对**现实prompt变化**敏感性的统一框架。更关键的是，当前评估指标（准确度、确定性、一致性）在不同数据集和prompt变体之间**不可直接比较**，因为它们的随机基线表现各不相同，导致无法公平地判断模型在何种扰动下真正退化。
 
 PARC正是在这一缺口上提出。其核心动机是：**VLM对改变预期答案的语义变化（如否定、反义词、图像交换）高度敏感，而现有评估体系无法跨数据集、跨prompt变体量化这种敏感性的真实程度**。例如，在MMBench上，否定提示的原始准确度看似高于原始提示，但这仅是因为随机猜测在否定提示下选中正确答案的概率更高——校准后，正确排序才得以恢复（Fig. 3）。这一现象揭示了**未校准指标会掩盖模型性能的真实退化模式**，使得“哪个模型更鲁棒”这一基本问题难以回答。
 
 此外，PARC旨在回答两个相互关联的问题：**哪些prompt变体对VLM最具破坏性，以及哪些模型族对prompt变化最不敏感**。初步观察表明，语义变化在语言和视觉模态中均同等破坏模型性能，且模型家族和训练数据质量比模型规模更能预测鲁棒性。这些发现为理解VLM的prompt敏感性提供了新的分析维度，也为后续的鲁棒性改进指明了方向。
 
-## 核心创新
+## 核心方法与创新机理
 
 PARC的核心创新在于构建了一个**可比较、可解释的VLM提示敏感性评估框架**，通过三个关键模块解决了现有评估中“分数不可比”与“鲁棒性无法公平排序”的根本瓶颈。
 
@@ -106,8 +106,6 @@ $$s_{\mathrm{calib}} = \begin{cases} \frac{s - s_{\mathrm{rand}}}{1 - s_{\mathrm
 
 PARC在VLM评估方法谱系中占据独特位置。与传统的单一提示评估（如标准基准测试）相比，PARC引入了系统的提示扰动空间；与现有的鲁棒性评估方法相比，PARC通过校准步骤解决了跨数据集不可比的核心问题。其可靠性评分的设计借鉴了共形预测的置信度量化思想，但将其与准确度融合为可解释的综合指标，并提供了显式的性能保证。在知识库中，PARC可定位为**VLM鲁棒性评估的基础设施框架**，为后续的提示敏感性分析、模型选择和数据质量诊断提供了标准化的量化工具。
 
-## 整体框架
-
 PARC 是一个系统性的 VLM prompt 敏感性分析框架，其设计目标是回答两个核心问题：(1) VLM 对哪些 prompt 变化最敏感？(2) 哪些 VLM 对 prompt 变化最不敏感（即最鲁棒）？为实现这一目标，PARC 构建了三个顺序耦合的模块，形成从 prompt 扰动生成到跨基准可比评分的完整分析流水线。
 
 ### 流水线模块与数据流
@@ -143,8 +141,6 @@ $$s_{\text{calib}} = \begin{cases} \frac{s - s_{\text{rand}}}{1 - s_{\text{rand}
 **输出**：每个模型在每个数据集上对每种 prompt 变体的校准可靠性、准确度、确定性和一致性评分，以及跨模型和跨变体的聚合分析结果（如 Table 2 和 Table 3 所示）。
 
 整个流水线的设计使得分析结果具有内在的可比性：校准步骤消除了随机基线差异带来的混淆效应，可靠性评分将多维度的模型行为压缩为可排序的单一数值，而系统化的变体分类则确保了对语言和视觉模态的对称覆盖。
-
-## 核心模块与公式推导
 
 PARC 框架由四个核心模块构成，分别对应 prompt 变体生成、模型评估、可靠性计算和分数校准，形成一条从扰动构建到可比评分的完整流水线（Fig. 1）。
 
@@ -192,7 +188,7 @@ $$cert \geq |rel|, \quad acc_{\mathrm{calib}} \begin{cases} \geq rel & \text{for
 
 当 $rel > 0$ 时，校准准确度至少比随机水平高出 $rel$，且确定度至少为 $rel$；当 $rel < 0$ 时，准确度至少比随机水平低 $|rel|$（Eq. 6）。这一性质使可靠性评分不仅是排序工具，还能直接读出模型性能的保证边界。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心发现：语义变化在语言与视觉模态中同等地破坏VLM性能
 
@@ -200,12 +196,10 @@ PARC在7个多模态基准（含MMBench、MIT-States、VAW、NYU-Depth V2、Fash
 
 从Table 2的平均校准可靠性来看，原始prompt（O）在所有模型和数据集上的平均可靠性为0.29，而最具破坏性的语言语义变体——反义词替换（LS-A）——将其拉低至0.10，视觉语义变体——图像交换（VS-E）——进一步降至0.13。更令人警醒的是一致性指标：LS-A的平均校准一致性仅为0.09，VS-E直接降至0.00（随机水平），意味着模型在这些扰动下几乎完全失去对正确答案的追踪能力。相比之下，重述类变体（如LR-V详细重述、VR-B模糊、VR-L光照变化）尽管也造成性能下降，但破坏程度显著低于语义变体，这一趋势在Figure 4中清晰呈现——蓝色（重述）与橙色（语义变化）之间存在显著且一致的差距，且该模式在6个比较式数据集和MMBench上高度对齐。
 
-
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2506_14808/figures/005_Table_2.jpg]]
 *Table 2: Most perturbing prompt variations in language and vision, averaged across models. All scores are calibrated, with 1.0 being ideal model performance and 0.0 is random performance. For reliability and consistency we report results on the individual datasets along with averages across datasets, and averages across datasets for accuracy and certainty. See Tab. A6 for all measures. The consistency is calculated between each varied and the original prompt. Most perturbing prompt per variation class is bold, and across variations underlined. High number indicates model robustness to a prompt variant. Prompt variation acronyms are from Tab. 1. MMBench’s noncomparative questions about single images...*
 
 **关键证据**：校准步骤在此扮演了决定性角色。以MMBench为例（Figure 3），未校准前否定prompt（LS-N）的准确度看似高于原始prompt（O），形成LS-N > O的误导性排序。校准后，由于MMBench具有3个选项（随机正确率约0.33），而否定prompt将选项缩减为2个（随机正确率0.5），校准纠正了随机基线差异，使排序恢复为O > LS-N，与平衡数据集NYU-Depth V2上的预期趋势一致。这一纠正机制确保了跨数据集和跨prompt变体的可比性，是PARC框架的核心贡献之一。
-
 
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2506_14808/figures/004_Figure_3.jpg]]
 *Figure 3: Calibration effect in PARC. On MMBench [37] before calibration, models appear more accurate on negated prompts LS-N [Orange, dashed] than on the original prompts O [Blue, solid], LS-N>O. After calibrating by measuring the improvement over the expected random performance, the order switches to O>LS-N. Why should we expect VLMs to be better on O than LS-N? We take a look at NYU-Depth V2 [57] – a balanced dataset with two potential answers, where VLMs have the same expected random performance on O and LS-N. Here, VLMs still perform worse on negations than on the original prompt, showing that O>LS-N is the expected trend. Because calibration uses the same random performance of 0.5 for O and LS-...*
@@ -218,7 +212,6 @@ PARC在7个多模态基准（含MMBench、MIT-States、VAW、NYU-Depth V2、Fash
 Table 3汇总了22个模型的综合鲁棒性表现。**InternVL2-40B以0.65的校准可靠性遥遥领先**，校准一致性达0.71，在所有指标上均居首位。InternVL2家族整体表现最优，其2B版本的可靠性（0.31）甚至与LLaVA-1.5 13B（0.31）持平，说明模型家族身份比参数规模更能预测鲁棒性。相比之下，Qwen-VL（可靠性0.06）和CogVLM GG（可靠性-0.12，低于随机水平）表现最差。
 
 Figure 5进一步揭示了规模与数据的作用机制：**在同一模型家族内部，更大参数规模确实带来更低的prompt敏感性**（Figure 5左），但跨家族比较时，训练数据质量成为主导因素——使用约1B数据训练的模型，其可靠性甚至低于Cambrian仅用约0.01B高质量数据训练的结果（Figure 5右）。这一发现暗示，当前VLM的prompt鲁棒性瓶颈可能更多源于训练数据的质量与多样性，而非单纯的模型容量不足。
-
 
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2506_14808/figures/009_Figure_5.jpg]]
 *Figure 5: [Left] Larger models within the same family are less prompt sensitive. [Right] More high-quality data yields more prompt-agnostic models. Comparison shows models with 7B or 8B LLMs per family; with Qwen-VL for Qwen, LLaVA-1.6 7B vic for LLava-1.6 and CogVLM Chat for CogVLM. Note the logscale, also see Fig. A9*
@@ -243,9 +236,6 @@ Figure 5进一步揭示了规模与数据的作用机制：**在同一模型家�
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2506_14808/figures/003_Figure_2.jpg]]
 *Figure 2: Reliability score in PARC. The plots visualize how accuracy and certainty are mapped to the reliability score. A reliability of 1 [blue] highlights a confidently correct model, while -1 [red] flags confidently incorrect models. [Left] Mapping for a balanced dataset like NYU-Depth V2 [57], where expected random accuracy is 0.5. [Right] Calibrated reliability scores for a c $c _ { \mathrm { r a n d } }$ = 0 . 2 7 , which represents MMBench [37]*
 
-![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2506_14808/figures/011_Table.jpg]]
-*Table: A5. Dataset statistics for the datasets MIT-States (M-S), MIT-Attributes (M-A), VAW-States (V-S), VAW-Attributes (V-A), NYU-Depth V2 (NYU) and Fashionpedia (Fas) [21, 24, 45, 57] as used in PARC. The Initial comparative prompts are as curated in CompBench [28], which uses 20% of the Initial data for evaluations. Our additional data annotation to enable Vision Semantic Changes by Exchanging images (VS-E) also retains about 20% of this data, on which we evaluate the prompt sensitivity with PARC. LLaVA-1.6 34B error rates on initial and filtered prompts*
-
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2506_14808/figures/012_Figure.jpg]]
 *Figure: A6. Mapping from certainty and accuracy to reliability score with \operatorname { a c c } _ { \mathrm { r a n d } } = 0 . 5 \ : / L e f t J vs. uncertainty-aware accuracy UAcc with | \mathcal { P } | = 4 ~ / M i d d l e J and | \mathcal { P } | = 1 6 ~ / R i g h t J . . Our reliability score provides two guarantees (one for accuracy and one for certainty) that can be directly seen from any score except 0. Uacc provides at most one guarantee for either accuracy or certainty. Further, its maximum changes with the number of answers per prompt | { \mathcal { P } } | . , generating scores that are incomparable across datasets*
 
@@ -260,8 +250,7 @@ Figure 5进一步揭示了规模与数据的作用机制：**在同一模型家�
 
 ![[assets/figures/papers/paper_list_l14_https_arxiv_org_abs_2506_14808/figures/015_Table.jpg]]
 
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 问题定位与核心瓶颈
 

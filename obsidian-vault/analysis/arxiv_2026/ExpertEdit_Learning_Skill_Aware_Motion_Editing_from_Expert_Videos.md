@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2026
 pdf_ref: paperPDFs/arxiv_2026/ExpertEdit_Learning_Skill_Aware_Motion_Editing_from_Expert_Videos.pdf
+project_link: https://vision.cs
+code_link: null
 aliases:
 - ExpertEdit
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | ExpertEdit：从专家视频中学习技能感知的运动编辑 |
 | 英文题名 | ExpertEdit: Learning Skill-Aware Motion Editing from Expert Videos |
 | 会议/期刊 | arXiv 2026 |
-| Links | [paper](https://arxiv.org/abs/2604.10466) · [Project](https://vision.cs) · [arXiv](https://arxiv.org/abs/2408) |
+| Links | [paper](https://arxiv.org/abs/2604.10466) · [Project](https://vision.cs) · [paper](https://arxiv.org/abs/2408) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | ExpertEdit |
 | Dataset | Penalty Kick, Front Kick |
@@ -39,7 +41,7 @@ claims:
 > - Penalty Kick (Ego-Exo4D) 上，FID Improvement (F) 9.14% vs 3.46% (FLAME) (+5.68 percentage points)。
 > - Front Kick (Kyokushin Karate) 上，FID Improvement (F) 9.73% vs 4.32% (TMED) (+5.41 percentage points)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有运动编辑方法依赖配对的新手–专家数据或显式的文本/参考编辑指导，无法在无配对监督下自动将新手运动精炼为专家级表现；同时，技能领域缺乏大规模配对的新手–专家运动数据和专家标注。
 
@@ -48,8 +50,6 @@ claims:
 **方法定位**：ExpertEdit 属于**无配对监督、无编辑指导的运动编辑方法**，与依赖文本条件或参考运动的监督基线（如 TMED、SimMotionEdit、FLAME）形成根本差异。其核心机制是双向 Transformer 的上下文运动填充，而非扩散去噪或文本条件生成。
 
 **主要结果**：在 Ego-Exo4D（篮球、足球）和 Kyokushin Karate 的 8 种运动技术上，ExpertEdit 在运动真实性和专家质量（P 和 F 指标）上显著优于所有监督基线。例如，点球（Penalty Kick）的 FID 改善达 9.14%，约为最佳基线 FLAME（3.46%）的 2.6 倍；前踢（Front Kick）的 FID 改善达 9.73%，而 TMED 和 SimMotionEdit 分别为 4.32% 和 6.11%。消融实验表明，编辑性能随无配对专家数据量增加而持续提升。
-
-## 背景与动机
 
 ### 问题背景：从新手到专家的运动技能鸿沟
 
@@ -69,7 +69,7 @@ ExpertEdit的提出基于一个关键观察：**人类通过观察专家示范�
 
 这一思路将运动技能编辑转化为一个**上下文运动填充（contextual motion infilling）**问题：训练阶段，模型在专家运动序列上学习重建被掩码的技能关键片段，从而隐式习得专家运动的先验分布；推理阶段，模型自动识别新手运动的技能关键时刻并将其掩码，然后利用学到的专家先验填充出专家化的关节旋转。整个过程无需配对监督、无需文本或参考运动指导，实现了从“被动接受编辑指令”到“主动发现并修复技能缺陷”的范式转变。
 
-## 核心创新
+## 核心方法与创新机理
 
 ExpertEdit 的核心创新在于将**运动技能精炼**重新定义为**上下文运动填充**任务，从而彻底绕过了现有方法对配对监督和显式编辑指导的依赖。这一范式转换通过三个相互耦合的机制实现，形成了从数据需求到推理方式的系统性改变。
 
@@ -98,8 +98,6 @@ $$\mathbf{X}_t^{\mathrm{edit}} = ( \mathbf{r}_t, \mathbf{o}_t, \hat{\mathbf{p}}_
 ### 创新点的协同效应
 
 上述三个 changed slots 并非孤立存在，而是形成了因果链条：无配对专家学习使得模型能够习得纯粹的专家运动先验；运动学掩码提供了无需外部指导的技能关键相位定位；MLM 填充机制则将技能精炼转化为上下文一致的流形投影问题。这一协同效应在实验中得到验证：ExpertEdit 在仅使用 30% 专家数据训练时仍保持正增益，且性能随无配对专家数据量增加持续提升，而基线方法即使获得额外的配对监督微调，在所有 8 种技术上的运动真实性和专家质量指标上仍被 ExpertEdit 显著超越（例如罚球技术上 FID 改善达 9.14%，约为最佳基线 FLAME 的 2-4 倍）。
-
-## 整体框架
 
 ExpertEdit 将技能驱动的运动编辑重新定义为一个**上下文运动填充（contextual motion infilling）**问题，其核心洞察是：专家与新手之间的技能差异主要集中在动作的特定关键时刻，而非整个运动序列。基于此，整个 pipeline 围绕“发现关键时刻 → 掩码 → 专家化填充”的范式构建。
 
@@ -154,8 +152,6 @@ $$\mathcal{L}_{\mathrm{MLM}} = -\sum_{i=t^*-h}^{t^*+h} \log p_\theta(k_i^{\exp} 
 
 整个过程**无需文本提示、参考运动或任何显式编辑指导**——模型自动决定“在哪里编辑”（运动学峰值检测）和“如何编辑”（上下文填充）。值得注意的是，系统为每种运动技术（如罚球、回环上篮、前踢等）**独立训练** Pose Tokenizer 和 MotionInfiller，以学习技术特定的专家运动先验，这是当前方法的一个结构性限制。
 
-## 核心模块与公式推导
-
 ExpertEdit 将技能驱动的运动编辑形式化为**上下文运动填充**任务，其核心架构由三个紧密协作的模块构成：姿态分词器、运动填充器与运动学相位选择器。图2展示了整体流程：训练时，专家运动序列经分词器离散化后，在运动学峰值周围进行掩码，由双向Transformer学习重建被掩码的专家令牌；推理时，新手运动的技能关键相位被自动掩码，同一模型填充专家化的关节旋转。
 
 ### 3.1 姿态分词器（Pose Tokenizer）
@@ -201,10 +197,7 @@ $$\mathcal{L}_{\mathrm{MLM}} = -\sum_{i=t^*-h}^{t^*+h} \log p_\theta(k_i^{\mathr
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l49_https_arxiv_org_abs_2604_10466/figures/001_Figure_1.jpg]]
-*Figure 1: Skill-driven motion editing. Given a 3D motion sequence extracted from a novice activity video, ExpertEdit produces personalized skill edits by refining poses within regions where skill differences are pronounced. They are tweaked to exhibit expert-like precision and form, while preserving the original execution’s motion path and body orientation, as well as its source poses at all non skill-critical moments. We learn to perform these edits solely from expert videos, without paired supervision or heavy edit guidance from text or reference motions—whether during inference or training. Preserved source poses are shown in blue; edited poses are shown in orange*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -270,7 +263,7 @@ ExpertEdit 在三个运动类别、八种技术动作上进行了系统评估，
 ![[assets/figures/papers/paper_list_l49_https_arxiv_org_abs_2604_10466/figures/007_Table_3.jpg]]
 *Table 3: Effect of different text-edit prompts on baseline motion editing performance. We train and evaluate a representative motion-editing baseline [29] with different text-edit prompts. P and F denote relative improvement in PA-MPJPE and alignment with the expert distribution, respectively, over the source motion. Prompts encouraging general improvements in smoothness and control led to better performance than explicitly requesting expert-like motion, and adding the technique name to the prompt led to further gains*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 技能编辑的范式转换：从配对监督到上下文运动填充
 

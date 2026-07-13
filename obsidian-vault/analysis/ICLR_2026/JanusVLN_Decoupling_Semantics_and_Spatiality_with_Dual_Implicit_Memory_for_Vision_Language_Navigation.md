@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/JanusVLN_Decoupling_Semantics_and_Spatiality_with_Dual_Implicit_Memory_for_Vision_Language_Navigation.pdf
+project_link: https://miv-xjtu.github.io/JanusVLN.github.io/
+code_link: null
 openreview_forum_id: RnuB0Nlbd5
 aliases:
 - JanusVLN
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | JanusVLN：基于双隐式记忆的语义与空间解耦视觉-语言导航 |
 | 英文题名 | JanusVLN: Decoupling Semantics and Spatiality with Dual Implicit Memory for Vision-Language Navigation |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=RnuB0Nlbd5); [Project](https://miv-xjtu.github.io/JanusVLN.github.io/) |
+| Links | [paper](https://openreview.net/forum?id=RnuB0Nlbd5) · [Project](https://miv-xjtu.github.io/JanusVLN.github.io/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | JanusVLN |
 | Dataset | R2R-CE Val-Unseen, RxR-CE Val-Unseen |
@@ -41,13 +43,13 @@ claims:
 > - R2R-CE Val-Unseen 上，SPL 为 56.8，对比 51.9 (StreamVLN)，变化 +4.9。
 > - RxR-CE Val-Unseen 上，SR 为 56.2，对比 52.9 (StreamVLN)，变化 +3.3。
 
-## 概述
+## 概要
 
 视觉-语言导航（VLN）的核心瓶颈在于：现有方法普遍依赖**显式语义记忆**（如文本认知地图或全量历史帧），导致空间几何信息严重丢失、计算随轨迹长度线性膨胀，且多模态大语言模型（MLLM）的视觉编码器缺乏3D空间推理能力。**JanusVLN** 受启发于人脑半球的功能分工，提出了一套**双隐式记忆范式**——将视觉语义与空间几何解耦为两个固定大小的神经记忆（KV缓存），通过增量更新机制实现高效的在线导航。
 
 该方法仅需单目RGB视频输入，无需全景图、里程计或深度数据，在R2R-CE Val-Unseen上以 **SR 60.5、SPL 56.8** 显著超越 NaVILA（Cheng et al., RSS 2025）、StreamVLN（Wei et al., arXiv 2025）等同期SOTA方法。消融实验表明，移除空间隐式记忆使SPL骤降8.3，而双记忆同时移除则导致性能近乎崩溃（SR从52.8降至24.8）。在推理效率上，缓存记忆机制使单帧处理时间相比原始VGGT降低**69-90%**，且在48帧序列长度下避免显存溢出。真实世界实验中，空间记忆的引入使空间理解任务成功率提升**23.6%**，验证了该范式从仿真到现实的迁移能力。
 
-## 背景与动机
+
 
 视觉-语言导航（Vision-Language Navigation, VLN）要求智能体根据自然语言指令在连续环境中执行一系列动作。近年来，多模态大语言模型（MLLM）的引入为VLN带来了更强的语义理解能力，但现有方法在记忆机制与空间推理两个维度上仍存在根本性瓶颈。
 
@@ -57,7 +59,9 @@ claims:
 
 **核心洞察：语义与空间的解耦。** JanusVLN的核心动机源于对人脑认知机制的借鉴：人类在导航时，大脑半球分别处理语义理解与空间几何信息，两者协同但不混淆。这一洞察指向了一个关键的设计选择——将视觉语义与空间几何解耦为两个独立但互补的记忆流，而非在单一表示中混合两者。具体而言，JanusVLN提出双隐式神经记忆范式：以固定大小的KV缓存替代显式历史帧，分别存储空间几何与视觉语义的隐式表示，通过增量更新机制实现高效在线导航。同时，引入前馈式3D视觉几何基础模型（VGGT）为MLLM注入空间几何先验，使智能体仅凭单目RGB视频即可获得3D空间理解能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 JanusVLN 的核心创新在于将视觉-语言导航中的语义理解与空间几何推理**显式解耦**，并为之构建了一套**双隐式记忆**（Dual Implicit Memory）机制。这一设计直接回应了现有 MLLM 导航方法的瓶颈：显式记忆（文本认知地图或全历史帧）随轨迹增长而膨胀，导致计算冗余、空间信息丢失，且纯 2D 语义编码器缺乏 3D 空间推理能力。
 
@@ -103,7 +107,7 @@ $$
 
 **因果机制总结**：JanusVLN 通过“解耦编码 → 隐式缓存 → 增量更新 → 加权融合”四步联动，在保持定长记忆窗口的同时，为 MLLM 注入了 3D 空间推理能力。消融实验提供了强因果证据：移除空间隐式记忆使 SPL 从 49.2 骤降至 40.9（Table 3），而替换 VGGT 为 2D 编码器（DINOv2、SigLIP 2）或随机初始化均无显著提升，证明 **3D 几何先验不可替代**（Table 4）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l38_https_openreview_net_forum_id_RnuB0Nlbd5/figures/002_Figure_2.jpg]]
 *Figure 2: The framework of JanusVLN. Given an RGB-only video stream and navigation instructions, JanusVLN utilizes a dual-encoder to separately extract visual-semantic and spatial-geometric features. It concurrently caches historical key-values from initial and recent sliding window into a dual implicit memory to facilitate feature reuse and prevent redundant computation. Finally, these two complementary features are fused and fed into LLM to predict the next action*
@@ -138,7 +142,7 @@ JanusVLN 提出了一种**双隐式记忆**范式，将视觉-语言导航解耦
 
 整个 pipeline 以**在线、流式**方式运行，无需全景图、里程计或深度传感器等额外输入，在仅使用单目 RGB 的条件下即可实现空间感知增强的导航决策。
 
-## 核心模块与公式推导
+
 
 ### 3.1 空间几何编码器：VGGT重建管道
 
@@ -178,7 +182,9 @@ $$
 
 其中 $\lambda = 0.2$ 为空间几何特征的融合权重（Table 7 消融实验证实该值最优）。融合后的视觉特征 $F_t$ 与导航指令一同输入 LLM 主干（Qwen2.5-VL），预测下一动作。该融合策略使语义理解与空间推理解耦互补，在复杂空间任务上较纯语义方法提升显著（Figure 7，空间任务 SR 提升 23.6%）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：R2R-CE 与 RxR-CE 基准
 
@@ -240,7 +246,9 @@ Figure 7 的空间理解任务分析进一步证实：在需要深度感知、3D
 
 Figure 9 揭示了主要的失败模式：当 agent 偏离最优轨迹时，模型难以有效纠错，错误会逐步累积。论文明确指出，有限的偏差轨迹数据不足以训练鲁棒的恢复策略。此外，空间记忆缺乏真实尺度信息，导致距离估计不准确，可能引发过早停止。这些失败模式指向两个开放问题：**如何在有限偏差数据下实现鲁棒纠错，以及如何将真实世界尺度融入隐式空间记忆**。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从显式语义记忆到双隐式神经记忆
 
@@ -303,6 +311,8 @@ JanusVLN*（无额外数据）在 R2R-CE Val-Unseen 上达到 52.8 SR，已超�
 4. **自适应窗口配置**：滑动窗口大小（当前 48 帧）和初始化帧数量（当前 8 帧）的最优配置是否应随场景复杂度或指令长度自适应调整？
 
 5. **更丰富的 3D 先验**：是否可以通过引入语义点云或 3D 场景图等更丰富的 3D 先验进一步提升空间理解？VGGT 的几何 token 是否已经饱和，还是存在信息瓶颈？
+
+
 
 ## 原文 PDF
 

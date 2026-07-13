@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2022
 pdf_ref: paperPDFs/CVPR_2022/DynamicEarthNet_Daily_Multi_Spectral_Satellite_Dataset_for_Semantic_Change_Segmentation.pdf
+code_link: null
 project_link: https://codalab.lisn.upsaclay.fr/competitions/2882
 aliases:
 - DS
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | DynamicEarthNet：面向语义变化分割的每日多光谱卫星数据集 |
 | 英文题名 | DynamicEarthNet: Daily Multi-Spectral Satellite Dataset for Semantic Change Segmentation |
 | 会议/期刊 | CVPR 2022 |
-| Links | [paper](https://arxiv.org/abs/2203.12560); [Project](https://codalab.lisn.upsaclay.fr/competitions/2882) |
+| Links | [paper](https://arxiv.org/abs/2203.12560) · [Project](https://codalab.lisn.upsaclay.fr/competitions/2882) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/segmentation |
 | Method | DynamicEarthNet 数据集 + SCS 语义变化分割评估指标 |
 | Dataset | DynamicEarthNet 测试集 (LULC 语义分割), DynamicEarthNet 测试集 (语义变化分割), DynamicEarthNet 测试集 (二进制变化检测) |
@@ -42,7 +43,7 @@ claims:
 > - DynamicEarthNet 测试集 (语义变化分割) 上，SCS (BC & SC average) 为 18.5 (CAC daily)，对比 17.3 (U-Net monthly)，变化 +1.2。
 > - DynamicEarthNet 测试集 (二进制变化检测) 上，BC (Binary Change IoU) 为 10.3 (CAC daily)，对比 10.1 (U-Net monthly)，变化 +0.2。
 
-## 概述
+## 概要
 
 **核心问题**：现有卫星变化检测数据集缺乏每日频率的像素级语义标注，导致模型无法捕捉地表覆盖的细粒度时序变化；同时，传统评估指标（如全图mIoU）无法有效解耦“是否变化”的二值检测与“变化成什么”的语义分割，掩盖了方法在变化场景下的真实能力。
 
@@ -51,8 +52,6 @@ claims:
 **方法定位**：本文主要贡献为DynamicEarthNet数据集（75个AOI、每日多光谱观测、月度语义标注）和SCS评估指标，而非提出新的分割模型。基线实验覆盖静态语义分割（U-Net）、时空融合（U-TAE、U-ConvLSTM、3D-Unet）和半监督学习（CAC + DeepLabv3+）三类范式，为后续研究提供基准。
 
 **关键结果**：所有方法在二值变化检测上表现极低（BC约10%，Table 5），表明检测变化本身是核心瓶颈；半监督方法在SCS上仅小幅领先（18.5 vs. 17.3），稀有类别（湿地、农业）的语义分割精度普遍低下，且当前方法未能有效改善。
-
-## 背景与动机
 
 地球表面处于持续变化之中，城市化、森林砍伐、农业轮作等过程每天都在发生。精确监测这些变化对于城市规划、灾害响应和生态保护至关重要。卫星遥感因其广覆盖、周期性的观测能力，成为地表变化监测的核心数据源。然而，当前卫星变化检测研究面临一个根本性瓶颈：**现有公开数据集普遍缺乏高频（每日）的像素级语义标注**，导致方法研究无法充分探索时序信息的潜力。
 
@@ -78,7 +77,7 @@ Table 1 系统对比了公开卫星数据集的关键特征，DynamicEarthNet �
 
 本文的关键洞察在于：**语义变化分割必须同时关注像素的二值变化检测和变化区域的语义类别识别**。解耦评估的 SCS 指标比全图 mIoU 更能真实反映方法在变化场景下的能力。实验表明，所有基线方法的 BC 指标仅约 10%（Table 5），说明变化检测本身极具挑战，也验证了新评估协议的必要性。此外，半监督方法利用每日未标注数据可将 mIoU 从 37.9% 提升至 43.6%（Table 4），证明未标注时序信息的有用性；但时空模型在使用每日全量输入时反而性能下降（U-TAE daily test mIoU 降至 36.1%，Table 3），揭示了高相关时序序列训练的稳定性难题。这些发现共同指向一个开放方向：需要专门设计能稳定利用高密度卫星时序数据的网络架构与训练策略。
 
-## 核心创新
+## 核心方法与创新机理
 
 ### 瓶颈与动机
 
@@ -147,8 +146,6 @@ SCS 协议的应用揭示了现有方法在变化分割上的根本性困境，�
 2. **稀有类别困境**：湿地、农业等类别在所有方法中精度低下，半监督和时空方法均未带来实质改善。
 3. **多时相评估未定**：当前 SCS 基于双时相设定，多时相变体虽能平滑分数（Table 6，最高 27.7 SCS），但会降低对精确变化时刻的惩罚力度，论文倾向保留双时相方案。
 4. **辅助数据质量问题**：额外提供的 Sentinel-2 数据存在约 26% 轻微和 5% 严重的质量问题，可能影响多模态融合实验的可靠性。
-
-## 整体框架
 
 DynamicEarthNet 工作并非提出一个端到端的黑盒模型，而是构建了一套“数据–任务–评估”闭环，其核心 pipeline 围绕**每日多光谱卫星序列 → 月度语义变化分割**这一目标展开。整体框架可解耦为三个逻辑层：**数据流与预处理**、**语义分割与变化检测方法族**、以及**解耦评估协议（SCS）**。
 
@@ -221,8 +218,6 @@ DynamicEarthNet 工作并非提出一个端到端的黑盒模型，而是构建�
 
 该框架的核心价值在于**模块化地解耦了数据利用策略、语义分割架构与变化评估协议**，使得研究者可以独立地改进任一层面的方法，并通过统一的 SCS 指标进行公平对比。当前框架的瓶颈在于：时空方法未能有效利用完整的每日序列（高相关性导致训练不稳定），且二值变化检测（BC）的性能极低，表明需要专门针对变化检测的架构设计，而非简单依赖语义分割图的差分。
 
-## 核心模块与公式推导
-
 ### 1. 任务形式化：从语义标签到二值变化图
 
 语义变化分割的核心操作是将两帧语义标签图的差异转化为二值变化图，再在变化区域上评估语义分割质量。给定时间 $t$ 的像素级语义标签 $\mathbf{y}_{t,i,j}$，二值变化图 $\mathbf{b}_t$ 定义为：
@@ -293,7 +288,7 @@ $$
 
 - **二值变化检测的极端困难性**：所有基线方法的 BC 指标均在 **10% 左右**（Table 5），说明即使语义分割能力提升，检测“是否发生变化”本身仍极具挑战。该结果的证据强度高（置信度 0.95），凸显了 SCS 解耦评估的必要性——mIoU 会掩盖变化检测的严重失效。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验设计与评估基准
 
@@ -428,10 +423,6 @@ Figure 5展示了U-TAE、U-ConvLSTM、3D-Unet在日输入下的定性预测对�
 ![[assets/figures/papers/paper_list_l34_https_arxiv_org_abs_2203_12560/figures/015_Figure_7.jpg]]
 *Figure 7: Confusion matrices. We show confusion matrices corresponding to the LULC segmentation results in Sec. 5.2 on the validation set. The goal is to provide a fine-grained analysis of which classes frequently get misclassified as certain other classes. Each column of an individual confusion matrix is normalized, meaning that it shows the relative distribution of predictions (in percent) for a given, true class. Results are shown for both spatio-temporal (left column) and semi-supervised baselines (right column) with three different settings each*
 
-![[assets/figures/papers/paper_list_l34_https_arxiv_org_abs_2203_12560/figures/002_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l34_https_arxiv_org_abs_2203_12560/figures/003_Table_2.jpg]]
-*Table 2: LULC class distribution. The distribution of LULC classes averaged over all 24 × 75 = 1800 semantic maps in the dataset. Additionally, we report the absolute number of AOIs with any occurrences of a given LULC class. We visualize the colors we use for each class throughout the paper*
 
 ![[assets/figures/papers/paper_list_l34_https_arxiv_org_abs_2203_12560/figures/007_Table_5.jpg]]
 *Table 5: Quantitative results of semantic change segmentation on our test set. This table shows semantic change segmentation results of all methods on our DynamicEarthNet dataset*
@@ -439,7 +430,7 @@ Figure 5展示了U-TAE、U-ConvLSTM、3D-Unet在日输入下的定性预测对�
 ![[assets/figures/papers/paper_list_l34_https_arxiv_org_abs_2203_12560/figures/010_Table_6.jpg]]
 *Table 6: Quantitative results of our metric variant on our test set. The first row shows the bi-temporal, and the second row shows the multi-temporal results on weekly data. The first row results are identical to the weekly results in Tab. 5*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 任务定位与核心贡献
 

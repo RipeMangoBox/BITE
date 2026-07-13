@@ -5,6 +5,7 @@ paper_level: A
 venue: "SIGGRAPH Asia"
 year: 2023
 pdf_ref: paperPDFs/SIGGRAPH_ASIA_2023/Compact_Neural_Graphics_Primitives_with_Learned_Hash_Probing.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/toronto-ai/compact-ngp/
 aliases:
 - CN
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 基于学习哈希探测的紧凑神经图形基元 |
 | 英文题名 | Compact Neural Graphics Primitives with Learned Hash Probing |
 | 会议/期刊 | SIGGRAPH Asia 2023 |
-| Links | [paper](https://arxiv.org/abs/2312.17241); [Project](https://research.nvidia.com/labs/toronto-ai/compact-ngp/) |
+| Links | [paper](https://arxiv.org/abs/2312.17241) · [Project](https://research.nvidia.com/labs/toronto-ai/compact-ngp/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Compact NGP |
 | Dataset | NeRF Synthetic Dataset (Mildenhall et al.), Kodak Image Dataset, Pluto 8000×8000 Image, Paving Stones Texture Set |
@@ -42,7 +43,7 @@ claims:
 > - Kodak Image Dataset 上，PSNR vs. file size 为 在小文件尺寸下接近 JPEG，大尺寸下略差，对比 JPEG, Instant NGP，变化 竞争水平。
 > - Pluto 8000×8000 Image 上，PSNR vs. file size 为 在多数实际尺寸下超越 JPEG，对比 JPEG, Instant NGP, ACORN，变化 更好。
 
-## 概述
+## 概要
 
 神经图形基元（neural graphics primitives）面临一个根本性矛盾：如何在保持快速随机访问推理的同时，将特征网格压缩到极小体积。密集网格与空间哈希表内存开销大，而可学习索引（如 **VQAD**，Takikawa et al., SIGGRAPH 2022）或矢量量化虽能压缩，却导致训练缓慢或推理延迟显著上升。
 
@@ -52,7 +53,7 @@ claims:
 
 该方法的局限性包括：在 Kodak 数据集上大文件尺寸下质量不及 JPEG，且未使用量化导致极小模型时浮点参数主导；在纹理压缩任务上性能低于专用架构 **NTC**（Vaidyanathan et al., SIGGRAPH 2023）。
 
-## 背景与动机
+
 
 神经隐式表示已在三维重建、视图合成和图像拟合等任务中展现出强大的表达能力。这类方法的核心组件之一是**神经图形基元**（neural graphics primitives），即一个将空间坐标映射为特征向量的可训练特征网格，其后接一个轻量级多层感知机（MLP）解码为颜色、密度等输出信号。特征网格的设计直接决定了模型的质量、存储开销和查询速度，因而成为神经场方法走向实际部署的关键瓶颈。
 
@@ -79,7 +80,9 @@ claims:
 
 综上，Compact NGP 在神经图形基元的压缩率-速度谱系中找到了一个帕累托最优平衡点，为需要紧凑存储与实时随机访问的应用（如游戏纹理压缩、实时光照缓存、细节层次流式传输）提供了新的基准方案。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Compact NGP 的核心创新在于将确定性空间哈希与可学习的索引探测（learned probing）按位组合，构建了一种统一的索引函数框架，从而在保持推理速度的前提下大幅压缩神经图形基元的存储体积。该方法的关键设计可归纳为以下三个层面的“变更槽位”（changed slots）：
 
@@ -98,7 +101,7 @@ Instant NGP 对单个特征进行标准梯度传播；Compact NGP 在反向传�
 **创新本质的统一视角**
 论文将所有特征网格统一为“索引函数”框架（Figure 3），指出密集网格、k-平面、稀疏树、空间哈希和可学习索引本质上是不同的索引映射方式，因而可以通过算术运算组合。Compact NGP 正是将确定性哈希（高位）与可学习索引（低位）按位拼接，在不引入解压缩步骤的前提下，实现了压缩率与速度的帕累托最优平衡。
 
-## 整体框架
+
 
 Compact NGP 的整体流水线继承自 **Instant NGP**（Müller et al., ACM Trans. Graph. 2022）的多分辨率哈希编码框架，并在其索引阶段引入可学习的探测（learned probing）机制，形成“确定性哈希 + 可学习索引”的混合索引方案。如图 4 所示，流水线由以下模块串联构成：
 
@@ -121,7 +124,7 @@ Compact NGP 的整体流水线继承自 **Instant NGP**（Müller et al., ACM Tr
 ![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2312_17241/figures/004_Figure_4.jpg]]
 *Figure 4: Overview of Compact NGP. For a given input coordinate x $\epsilon \mathbb { R } ^ { d }$ (far le ), we find its enclosing integer grid vertices v $\in \mathbb { Z } ^ { d }$ and apply our indexing function 𝑓 (v) to each one. The most significant bits of the index are computed by a spatial hash (hash) and the least significant bits by looking up a row of $N _ { p }$ confidence values from an indexing codebook $\widehat { D } _ { c }$ that is in turn indexed by an auxiliary spatial hash (hash2), and then picking the index with maximal confidence (green arrow). Bitwise concatenation of the two indices yields an index for looking up from the feature codebook $D _ { f }$ , which is subsequently 𝑑-linearly...
 
-## 核心模块与公式推导
+
 
 ### 统一索引函数框架
 
@@ -171,7 +174,9 @@ $$f(\mathbf{v}) = D_f\big[(N_p \cdot \mathsf{hash}(\mathbf{v})) \bmod N_f + D_c[
 5. **特征码本 $D_f$**：被最终组合索引查询，返回特征向量
 6. **线性插值与 MLP 解码**：对多顶点特征进行 $d$-线性插值后输入 MLP 解码为输出信号
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能对比
 
@@ -239,7 +244,9 @@ Compact NGP 在计算效率上实现了有利的权衡：训练开销可控，�
 
 ![[assets/figures/papers/paper_list_l32_https_arxiv_org_abs_2312_17241/figures/015_Table.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心瓶颈与设计动机
 
@@ -327,6 +334,8 @@ NTC 是专用纹理压缩的神经基线，采用量化与专用架构：
 5. **索引结构的泛化**：能否将学习探测思想扩展到其他索引结构（如八叉树、$k$-平面）以实现更优的压缩-速度平衡？Figure 3 展示的统一索引函数框架为此提供了理论基础。
 
 6. **多分辨率层级与 MLP 宽度的自适应选择**：Figure 9 和 Figure 10 表明，默认层级 $L=16$ 和 MLP 宽度 64 在几百 kB 的实用范围内表现良好，但更小尺寸下更低层级更优。如何根据目标文件大小自动选择这些超参数仍是一个开放问题。
+
+
 
 ## 原文 PDF
 

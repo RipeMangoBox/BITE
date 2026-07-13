@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2023
 pdf_ref: paperPDFs/arxiv_2023/VideoControlNet_A_Motion_Guided_Video_to_Video_Translation_Framework_by_Using_Diffusion_Model_with_ControlNet.pdf
+project_link: null
+code_link: null
 aliases:
 - VideoControlNet
 tags:
@@ -41,7 +43,7 @@ claims:
 > - User Study 上，Preference (%) 74.7% vs CCPL 15.8%, Text2Video-Zero 9.4% (+58.9% vs CCPL, +65.3% vs Text2Video-Zero)。
 > - DAVIS (运行效率) 上，平均每帧时间 3.4s vs N/A (未直接比较) (N/A)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -81,15 +83,13 @@ VideoControlNet 的关键区别在于引入了**显式的运动信息（光流�
 - 当前仅支持 canny edge 和 depth map 作为控制条件，未利用分割图、人体姿态等更丰富的条件。
 - 内容一致性仍有提升空间，未来可引入更多可学习网络模块。
 
-## 背景与动机
-
 扩散模型在图像生成领域取得了显著成功，但在视频生成任务中面临一个核心瓶颈：**逐帧独立生成时，扩散过程的随机性导致相邻帧之间内容不一致**，尤其在运动剧烈和遮挡区域，生成的视频会出现闪烁、抖动或纹理漂移等现象。这一问题的本质在于，扩散模型在去噪过程中缺乏对时间维度结构信息的显式建模。
 
 现有方法尝试从不同角度缓解这一问题。**Text2Video-Zero**（Khachatryan et al., 2023）采用零样本方式，利用文本到图像的扩散模型生成视频，但未充分挖掘输入视频中已有的运动信息，导致帧间连续性不足。**CCPL**（Wu et al., ECCV 2022）通过对比一致性保持损失实现视频风格迁移，但其范式仍倾向于全局约束，难以精细处理局部运动与遮挡场景。
 
 本文的核心动机来源于视频编码领域的一个经典观察：**视频序列中存在大量时间冗余，利用运动补偿可以有效减少冗余信息的重复编码**。受此启发，VideoControlNet 提出将视频编码中的 GOP（Group of Pictures）结构引入扩散生成过程——将视频帧分为 I 帧、P 帧和 B 帧，分别采用不同的生成策略。I 帧由 ControlNet 独立生成，P 帧通过运动补偿与局部修复仅生成新出现区域，B 帧则由相邻关键帧插值得到。这一设计使得生成过程能够“借用”输入视频的运动信息来引导扩散，从而在保留预训练扩散模型生成能力的同时，实现时间轴上连续且一致的视频转换。
 
-## 核心创新
+## 核心方法与创新机理
 
 ### 问题瓶颈与设计动机
 
@@ -154,8 +154,6 @@ MgBI 的设计使得大部分中间帧无需调用扩散模型，显著降低计
 
 上述三个模块的协同作用体现在：**I 帧提供内容锚点，P 帧在保持内容一致性的前提下推进叙事，B 帧以极低成本填充中间过渡**。这种分层策略使得 VideoControlNet 在用户偏好研究中获得了 **74.7%** 的偏好率，远超 Text2Video-Zero 的 9.4% 和 **CCPL**（Wu et al., ECCV 2022）的 15.8%（Table 1），验证了运动引导的 GOP 生成范式在视频到视频转换任务中的有效性。
 
-## 整体框架
-
 VideoControlNet 的整体生成范式借鉴了视频编码中 **I/P/B 帧结构** 的设计思想，将视频到视频的转换过程分解为三个层次化的生成阶段，从而在保留预训练扩散模型生成能力的同时，实现对时间轴上内容一致性的有效控制。
 
 ### 核心设计动机
@@ -200,8 +198,6 @@ $$I_{i,k} = \begin{cases} 1 & \text{if } O_{i,k} - \alpha R_{i,k} > threshold \\
 
 ![[assets/figures/papers/paper_list_l1061_https_arxiv_org_abs_2307_14073/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of our proposed motion-guided video-to-video translation framework. (a) The generation process of I-frame: Taking the first input frame*
-
-## 核心模块与公式推导
 
 VideoControlNet 的核心创新在于将视频编码中的运动补偿思想引入扩散模型的生成过程，构建了一个基于 GOP（Group of Pictures）结构的分级生成框架。整个流程围绕三个关键模块展开：I 帧生成、运动引导的 P 帧生成（MgPG）和运动引导的 B 帧插值（MgBI）。
 
@@ -258,18 +254,7 @@ $$\hat{X}_j = S_j^{front} \times \bar{X}_j^{front} + S_j^{back} \times \bar{X}_j
 
 三个模块的分工体现了“好钢用在刀刃上”的设计哲学：I 帧承担最重的全帧扩散生成（约 13.7 秒/帧），P 帧仅对遮挡区域进行局部修复（同样约 13.7 秒，但修复面积远小于全帧），B 帧则完全通过光流插值完成（仅需约 0.2 秒/帧）。当 GOP 大小设为 10 时，平均每帧生成时间约 3.4 秒（约 0.30 fps），其中扩散模型的采样步数为 20 步。此外，在将掩膜应用于潜在空间时，还引入了高斯模糊和最小池化操作以扩展修复区域，确保潜在空间中的修复边界平滑过渡。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1061_https_arxiv_org_abs_2307_14073/figures/003_Figure_3.jpg]]
-*Figure 3: Details of our Motion-guided P-frame Generation (MgPG) module. In the inpainting mask generation module*
-
-![[assets/figures/papers/paper_list_l1061_https_arxiv_org_abs_2307_14073/figures/004_Figure_4.jpg]]
-*Figure 4: Details of our Motion-guided B-frame Interpolation (MgBI) module. Given two reference I/P frames*
-
-![[assets/figures/papers/paper_list_l1061_https_arxiv_org_abs_2307_14073/figures/012_Figure_9.jpg]]
-*Figure 9: Illustration of our occlusion map generation by using forward warping operation. Taking a map full of values one and the optical flow*
-
-## 实验与分析
+## 实验与关键发现
 
 VideoControlNet 的实验评估围绕三个维度展开：用户偏好研究、DAVIS 数据集上的定量指标对比，以及各模块的运行效率分析。此外，消融实验揭示了修复掩膜生成策略的关键作用，定性结果展示了不同控制条件的生成效果。
 
@@ -318,16 +303,7 @@ Figure 6 展示了使用不同 ControlNet 条件（深度图与 canny 边缘图�
 ![[assets/figures/papers/paper_list_l1061_https_arxiv_org_abs_2307_14073/figures/010_Table_3.jpg]]
 *Table 3: Running Time of different modules in which we use 20 sampling steps for the StableDiffusion with ControlNet. “Pixel to Latent" denotes encoding the image to latent space for the diffusion networks. “Latent to Pixel" denotes decoding the image from latent space. We also provide the inference time of I-frame generation, P-frame generation and B-frame generation. The average time is calculated when the GoP size is set as 10*
 
-![[assets/figures/papers/paper_list_l1061_https_arxiv_org_abs_2307_14073/figures/005_Figure_5.jpg]]
-*Figure 5: Generation results of Text2LIVE [2] and our method when using the input video at the first row and the corresponding prompts*
-
-![[assets/figures/papers/paper_list_l1061_https_arxiv_org_abs_2307_14073/figures/001_Figure_1.jpg]]
-*Figure 1: Various generation results when using different input videos and different prompts. The first and the fourth rows are the input videos and the other rows contain the generation results when using the corresponding prompts*
-
-![[assets/figures/papers/paper_list_l1061_https_arxiv_org_abs_2307_14073/figures/011_Figure_8.jpg]]
-*Figure 8: Video style transfer results by using the prompts to control the style. The first row is the input video and the other rows are the generated videos based on the input video and given prompts*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 核心范式：从逐帧独立生成到运动补偿的GOP结构生成
 

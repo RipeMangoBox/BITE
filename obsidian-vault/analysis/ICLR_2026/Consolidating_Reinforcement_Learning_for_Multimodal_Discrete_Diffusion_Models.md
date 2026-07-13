@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Consolidating_Reinforcement_Learning_for_Multimodal_Discrete_Diffusion_Models.pdf
+project_link: null
+code_link: https://github.com/martian422/MaskGRPO
 openreview_forum_id: 9nxCJP4q0i
 aliases:
 - CRLMDDM
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 面向多模态离散扩散模型的强化学习整合方法 |
 | 英文题名 | Consolidating Reinforcement Learning for Multimodal Discrete Diffusion Models |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=9nxCJP4q0i); [GitHub](https://github.com/martian422/MaskGRPO) |
+| Links | [paper](https://openreview.net/forum?id=9nxCJP4q0i) · [GitHub](https://github.com/martian422/MaskGRPO) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | MaskGRPO |
 | Dataset | GSM8K (seq_len=256), MATH500 (seq_len=512), MBPP (seq_len=256), GenEval |
@@ -41,7 +43,7 @@ claims:
 > - MATH500 (seq_len=512) 上，Pass@1 为 41.5，对比 36.2 (LLaDA-8B-Instruct)，变化 +5.3。
 > - MBPP (seq_len=256) 上，Pass@1 为 45.4，对比 39.0 (LLaDA-8B-Instruct)，变化 +6.4。
 
-## 概述
+## 概要
 
 **核心问题**：将 GRPO（Group Relative Policy Optimization）等强化学习方法扩展到离散扩散模型（Discrete Diffusion Models, DDMs）面临根本性障碍。DDM 的非自回归生成特性导致两个关键挑战：（1）token 级别的重要性采样不可处理，因为 DDM 在去噪过程中同时生成所有 token，破坏了自回归模型中的条件依赖关系；（2）rollout 生成过程复杂，现有方法要么依赖高计算代价的蒙特卡洛估计，要么因近似不当导致训练不稳定。这严重限制了 RL 在离散扩散模型上的应用效果。
 
@@ -59,7 +61,7 @@ claims:
 
 **方法谱系与知识库定位**：MaskGRPO 建立在离散扩散模型（LLaDA-8B-Instruct, Nie et al., 2025；MMaDA）和 GRPO 策略优化算法的基础上，与现有 DDM-RL 方法形成对比：**diffu-GRPO**（Zhao et al., 2025）采用基于掩码的重要性估计但缺乏位置偏差；**UniGRPO**（Yang et al., 2025）使用迭代掩码策略但未利用模态特异性先验；**TraceRL**（Wang et al., 2025b）基于轨迹的重要性估计计算开销较大。MaskGRPO 的关键区分点在于通过模态特异性设计实现了更高效、更稳定的重要性估计，同时使用更少的全局训练步数（500 步 vs diffu-GRPO 的 7000+ 步）。
 
-## 背景与动机
+
 
 ### 离散扩散模型：自回归之外的生成范式
 
@@ -103,7 +105,9 @@ $$\max_{\theta} \mathbb{E}_{\mathbf{c}\sim\mathcal{D}, o_{1:G}\sim\pi_{\theta}(\
 
 基于这些洞察，MaskGRPO 提出了一套模态特异性的设计：语言采用 AR-like 渐弱掩码估计器，视觉采用高截断随机掩码；语言 rollout 使用半自回归采样器，视觉使用 Emerge 概率涌现采样器。这些设计使得 GRPO 策略优化在离散扩散模型上首次实现稳定有效的训练，并在数学推理（GSM8K +8.0）、代码生成（MBPP +6.4）和图像生成（GenEval +0.25）等任务上取得显著提升，几乎使强化学习收益翻倍（Figure 1）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MaskGRPO 的核心创新在于**针对离散扩散模型（DDM）的非自回归特性，为语言与视觉分别设计了模态特化的策略优化组件**，从而将 GRPO 强化学习首次稳定、高效地扩展到多模态离散扩散模型。其关键改进可归纳为以下三个 changed slots：
 
@@ -133,7 +137,7 @@ DDM 的反向过程在低时间步（高掩码率）时预测不确定性极高�
 
 在优化层面，MaskGRPO 采用**多次内部梯度更新**（$\mu=12$）配合**线性时间步调度** $t_j = \gamma + (1-\gamma)j/\mu$（Alg. 5），将重要性比率和 KL 估计在多个时间步上累积（Eq. 11），相比单步估计显著提升了策略梯度的信噪比。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_9nxCJP4q0i/figures/002_Figure_1.jpg]]
 *Figure 1: Left: MaskGRPO consistently improves the base model with significant RL income across text and image generation tasks. Right: an intuitive demonstration of our method, integrated with modality-specific innovations on importance estimation and sampling methods*
@@ -175,7 +179,7 @@ MaskGRPO 的整体框架围绕一个核心洞察展开：**离散扩散模型（
 - **策略评估：** 对每个序列在 $\mu$ 个时间步上构造掩码版本，计算重要性比率和 KL 散度。
 - **输出：** 更新后的策略参数 $\theta$，在语言任务上实现推理准确率提升（GSM8K +8.0，MATH500 +5.3，MBPP +6.4），在视觉任务上实现生成质量和文本-图像对齐的显著改善（GenEval +0.25，HPSv3 +0.59）。
 
-## 核心模块与公式推导
+
 
 ### 3.1 离散扩散模型基础
 
@@ -263,7 +267,9 @@ $$q_s \gets \frac{\alpha_s - \alpha_t}{1 - \alpha_t} \cdot \pi + \delta_{\mathbf
 
 **随机性管理**：逆向过程中通过为每个设备分配独立随机种子，确保重要性和 KL 估计的稳定性（Section 3.1）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与验证
 
@@ -379,7 +385,9 @@ Figure 5a 的消融表明，截断参数 γ 对训练稳定性有显著影响：
 - 图像生成中 UniGRPO 的 RL 结果直接引用其报告最终性能，因其未公布训练配置。
 - 所有模型使用可比较的资源和训练步数；MaskGRPO 使用更少的全局步数（500 步 vs diffu-GRPO 的 7000+ 步）。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心问题与突破点
 
@@ -431,6 +439,8 @@ MaskGRPO 处于三个技术方向的交汇点：
 4. **自适应截断**：能否自动调整截断参数 $\gamma$ 以适配不同任务和训练阶段？当前的手动调整策略限制了方法的即插即用性。
 
 5. **奖励模型集成**：MaskGRPO 当前使用 UnifiedReward、HPSv3 和 CLIP Score 的组合作为视觉奖励函数，能否与更先进的奖励模型（如 ImageReward-v2, PickScore）结合，进一步提升对齐质量？
+
+
 
 ## 原文 PDF
 

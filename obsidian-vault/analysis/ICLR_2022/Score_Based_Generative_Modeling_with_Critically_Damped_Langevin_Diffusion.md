@@ -5,6 +5,7 @@ paper_level: A
 venue: ICLR
 year: 2022
 pdf_ref: paperPDFs/ICLR_2022/Score_Based_Generative_Modeling_with_Critically_Damped_Langevin_Diffusion.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/toronto-ai/CLD-SGM/
 aliases:
 - CDLDCSSCSS
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 基于临界阻尼朗之万扩散的得分生成建模 |
 | 英文题名 | Score-Based Generative Modeling with Critically-Damped Langevin Diffusion |
 | 会议/期刊 | ICLR 2022 |
-| Links | [paper](https://arxiv.org/abs/2112.07068); [Project](https://nv-tlabs.github.io/CLD-SGM); [Project](https://research.nvidia.com/labs/toronto-ai/CLD-SGM/) |
+| Links | [paper](https://arxiv.org/abs/2112.07068) · [Project](https://nv-tlabs.github.io/CLD-SGM) · [Project](https://research.nvidia.com/labs/toronto-ai/CLD-SGM/) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/diffusion_image_video |
 | Method | Critically-Damped Langevin Diffusion (CLD) with Symmetric Splitting CLD Sampler (SSCS) |
 | Dataset | CIFAR-10 (unconditional) |
@@ -42,7 +43,7 @@ claims:
 > - CIFAR-10 (unconditional) 上，FID 为 2.23 (Generative SDE, EM-QS)，对比 2.20 (reported by Song et al., 2021c for VPSDE)，变化 +0.03。
 > - CIFAR-10 (unconditional) 上，FID 为 3.07 (SSCS-QS, n=150)，对比 7.00 (EM-QS, n=150)，变化 -3.93。
 
-## 概述
+## 概要
 
 **核心问题**：现有得分生成模型（Score-based Generative Models, SGMs）普遍采用过于简化的扩散过程（如 Variance-Preserving SDE, VPSDE），导致前向扩散与逆向去噪之间的任务复杂度不匹配——模型需要直接学习高维数据空间的得分函数，使得训练和采样均面临不必要的困难。
 
@@ -57,7 +58,7 @@ claims:
 
 **局限与展望**：当前验证限于图像生成任务；SSCS 仅支持固定步长；尚未与 DDIM 等非马尔可夫加速采样技术结合。未来方向包括引入其他统计力学恒温器方法、扩展自适应步长积分器，以及探索 CLD 在最大似然训练和跨模态生成中的应用。
 
-## 背景与动机
+
 
 ### 得分生成模型的范式与瓶颈
 
@@ -89,7 +90,9 @@ $$\nabla_{\mathbf{v}_t} \log p_t(\mathbf{u}_t) = \nabla_{\mathbf{v}_t} \log p_t(
 
 这一思路将统计力学中成熟的动力学理论引入深度生成模型，为扩散过程的设计空间提供了新的自由度——阻尼系数、质量参数、初始速度分布等均可作为可调节的归纳偏置，而非局限于传统过阻尼范式。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作针对得分生成模型（SGM）中扩散过程设计过于简单、导致去噪任务不必要的复杂化这一瓶颈，提出**临界阻尼朗之万扩散（Critically-Damped Langevin Diffusion, CLD）**作为新的前向扩散过程。核心创新体现在以下四个紧密耦合的维度：
 
@@ -149,7 +152,7 @@ $$
 
 上述四个创新形成闭环：**CLD 扩散过程**（创新 1）使学习目标退化为条件速度得分（创新 2），降低了得分函数的固有复杂度；**HSM 训练与混合得分参数化**（创新 3）解决了该目标在 $t \to 0$ 时的无界问题并进一步简化网络学习任务；**SSCS 采样器**（创新 4）利用 CLD 扩散的线性可解结构，实现了比通用 EM 方法更高效的逆向积分。这一设计链条最终使 CLD-SGM 在 CIFAR-10 上达到 FID 2.25（概率流 ODE）和 2.23（生成 SDE），优于同等参数量下的先前扩散模型。
 
-## 整体框架
+
 
 CLD-SGM 的整体框架围绕“在联合数据-速度空间中扩散”这一核心思想构建，由四个紧密耦合的模块构成：**临界阻尼朗之万扩散过程（CLD）**、**混合得分匹配训练（HSM）**、**混合得分参数化** 以及 **对称分裂 CLD 采样器（SSCS）**。
 
@@ -184,7 +187,7 @@ CLD-SGM 的整体框架围绕“在联合数据-速度空间中扩散”这一�
 
 与 VPSDE（Song et al., 2021c）相比，CLD-SGM 的框架差异体现在三个层面：**扩散空间** 从纯数据空间 $\mathbb{R}^d$ 扩展至联合空间 $\mathbb{R}^{2d}$；**学习目标** 从直接数据得分 $\nabla_{\mathbf{x}_t} \log p_t(\mathbf{x}_t)$ 简化为条件速度得分 $\nabla_{\mathbf{v}_t} \log p_t(\mathbf{v}_t|\mathbf{x}_t)$；**采样动力学** 从过阻尼朗之万方程升级为临界阻尼哈密顿动力学与 OU 过程的耦合。这些设计共同实现了更平滑的扩散轨迹和更高效的采样，使 CLD-SGM 在 CIFAR-10 上以概率流 ODE 达到 FID 2.25，优于参数量相近的 LSGM-100M（FID 4.60）。
 
-## 核心模块与公式推导
+
 
 ### 1. 临界阻尼朗之万扩散（CLD）前向过程
 
@@ -272,7 +275,9 @@ $$
 
 **优势**：相比 Euler-Maruyama（EM）方法，SSCS 通过解析处理线性部分，在有限 NFE（Number of Function Evaluations）预算下显著降低离散化误差。实验表明，在 NFE=150 时，SSCS-QS 的 FID 为 3.07，而 EM-QS 高达 7.00（Table 2），性能差距随 NFE 减少而急剧扩大。当前 SSCS 仅支持固定步长，自适应步长扩展留待未来工作。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要生成性能
 
@@ -334,7 +339,9 @@ SSCS（Symmetric Splitting CLD Sampler）在有限函数评估次数（NFE）预
 ![[assets/figures/papers/paper_list_l4_https_arxiv_org_abs_2112_07068/figures/018_Table_6.jpg]]
 *Table 6: Model architectures as well as SDE and training setups for our experiments on CIFAR-10 and CelebA-HQ-256*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从过阻尼到临界阻尼的范式迁移
 
@@ -367,6 +374,8 @@ SSCS（Symmetric Splitting CLD Sampler）在有限函数评估次数（NFE）预
 **似然界的改进**。当前CLD的NLL上界受限于速度编码器的设计。通过引入可学习的速度编码器网络，或探索CLD与归一化流的混合架构，有望进一步收紧似然界，缩小与自回归模型和潜在变量模型的差距。
 
 **跨模态与跨范式迁移**。CLD在图像生成上的成功引发了一个自然问题：该框架能否迁移至文本、蛋白质结构、分子构象等具有天然“位置-动量”耦合结构的数据模态？此外，CLD与GAN的对抗训练、与能量模型的MCMC采样之间的结合可能性，构成了生成模型统一框架探索的新维度。
+
+
 
 ## 原文 PDF
 

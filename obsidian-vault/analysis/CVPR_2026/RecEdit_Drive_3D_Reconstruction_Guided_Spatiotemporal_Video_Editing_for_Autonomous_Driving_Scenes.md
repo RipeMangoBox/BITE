@@ -43,7 +43,7 @@ claims:
 > - nuScenes (Replacement) 上，FVD 38.59；FID 9.88。
 > - nuScenes (Insertion) 上，FVD 42.01。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有视频编辑方法普遍依赖2D结构先验（如深度图、草图）或单视点3D重建，无法有效约束动态3D物体在空间变化中的几何结构，也难以保证跨帧的时空一致性，导致编辑结果出现几何不稳定与结构漂移。
 
@@ -53,7 +53,7 @@ claims:
 
 **主要结果**：在nuScenes数据集上的删除、替换、插入和重定位四项编辑任务中，RecEdit-Drive在图像质量（FID）和视频时间一致性（FVD）指标上均一致优于现有方法（如 **Tune-A-Video** (Wu et al., ICCV 2023)、**Text2Video-Zero** (Khachatryan et al., ICCV 2023)、**Fastvideoedit** (Zhang et al., WACV 2025)、**Rerender a Video** (Yang et al., SIGGRAPH Asia 2023) 等）。消融实验进一步验证了SFW、SCM和噪声替换三个模块各自对空间结构精度、时空一致性和背景保真度的关键贡献。
 
-## 背景与动机
+
 
 自动驾驶场景的视觉编辑正从感知工具向数据增强与闭环仿真基础设施演进。对采集到的真实驾驶视频进行可控编辑——例如删除、替换、插入或重新放置动态物体——能以极低成本扩展长尾场景覆盖，提升下游3D目标检测器的鲁棒性。然而，实现这一目标面临双重挑战：**编辑后的前景物体必须在任意视角下保持几何结构稳定，同时跨帧的背景与前景融合必须维持时空一致性**。
 
@@ -68,7 +68,9 @@ claims:
 
 此外，RecEdit-Drive还设计了一种**背景噪声替换策略**，在去噪早期阶段用前向扩散过程的背景噪声替换预测背景，从而为前景编辑提供正确的背景结构参考。该方法仅需一段视频序列、单张参考图像和每帧的3D边界框，即可实现高保真、时空一致的自动驾驶场景编辑。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 RecEdit-Drive 的核心创新在于将 **3D 重建先验（SV3D）** 与 **视频扩散模型** 深度融合，通过两个关键模块——**空间特征扭曲（SFW）** 与 **时空协同建模（SCM）**——以及一个**背景噪声替换（NR）** 推理策略，系统性地解决了现有视频编辑方法中“动态3D物体空间结构不可控”与“跨帧时空一致性不足”两大瓶颈。
 
@@ -98,7 +100,7 @@ RecEdit-Drive 的 **SCM 模块** 引入了**高斯交叉视图注意力机制**�
 
 三个模块的协同作用构成了完整的“3D重建引导”编辑范式：SFW 提供精确的空间结构，SCM 确保时空一致性，NR 保护背景完整性。消融实验（Table 2）证实，完整模型在所有指标（FID、FVD、PSNR、LPIPS 及下游 3D 检测指标 mRecall、mATE、mAOE）上均优于去除任一模块的配置。
 
-## 整体框架
+
 
 RecEdit-Drive 的整体编辑流程围绕“3D 重建先验注入扩散模型”这一核心思想构建，通过空间特征扭曲（Spatial Feature Warping, SFW）和时空协同建模（Spatiotemporal Collaborative Modeling, SCM）两个关键模块，实现对自动驾驶场景中动态物体的精确 3D 结构控制与跨帧时空一致性保持。其输入仅需一段视频序列、一张参考图像以及每帧对应的 3D 边界框，即可完成插入、删除、替换和重定位等多种编辑操作。
 
@@ -137,7 +139,7 @@ Figure 1 展示了 RecEdit-Drive 的完整架构，清晰呈现了深度编码�
 ![[assets/figures/papers/paper_list_l2578_https_openaccess_thecvf_com_content_CVPR2026_html_Wu_RecEdit_Drive_3D_Re/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of RecEdit-Drive. We utilize a depth encoder to extract positional information from depth maps obtained from 3D bounding boxes, and use a pretrained image encoder [42] to provide contextual features. These features are then fed into the ResBlock and attention modules within the diffusion-based video editing model. In spatial feature warping (SFW), multiple relevant novel viewpoints obtained from SV3D and masks*
 
-## 核心模块与公式推导
+
 
 RecEdit-Drive 围绕三个关键模块构建：**空间特征扭曲（SFW）**、**时空协同建模（SCM）** 和 **背景噪声替换（NR）**，三者协同解决自动驾驶场景编辑中动态物体的空间结构控制与跨帧一致性问题。
 
@@ -224,7 +226,9 @@ $$
 ![[assets/figures/papers/paper_list_l2578_https_openaccess_thecvf_com_content_CVPR2026_html_Wu_RecEdit_Drive_3D_Re/figures/004_Figure_4.jpg]]
 *Figure 4: The illustration of Noise Replace. During the early denoising stage(t*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -280,7 +284,9 @@ Table 4 报告了编辑数据用于下游 3D 目标检测任务的效果。在 R
 ![[assets/figures/papers/paper_list_l2578_https_openaccess_thecvf_com_content_CVPR2026_html_Wu_RecEdit_Drive_3D_Re/figures/005_Figure_5.jpg]]
 *Figure 5: Visual comparison of RecEdit-Drive and other methods for the Deletion, Replacement, Insertion, and Reposition tasks. Red contours indicate the bounding boxes in the Insertion and Reposition tasks*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 基线方法与差异化定位
 
@@ -335,6 +341,8 @@ RecEdit-Drive 位于**3D 感知引导的视频编辑**与**自动驾驶数据增
 - **自动驾驶数据增强**：将视频编辑作为数据增强工具，通过物体重定位和替换生成多样化训练样本，提升下游 3D 检测模型的性能。
 
 该方法为自动驾驶场景下的可控视频编辑提供了一个新的基线范式，其“3D 先验 + 扩散模型”的融合思路可启发后续工作在更多动态场景编辑任务中引入显式几何约束。
+
+
 
 ## 原文 PDF
 

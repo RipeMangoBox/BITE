@@ -44,7 +44,7 @@ claims:
 > - Light Stage数据 上，PSNR (Relighting) ↑ 25.87 vs 21.09 (DiffusionRenderer) (+4.78)。
 > - HumanOLAT 上，PSNR (Relighting) ↑ 21.17 vs 20.77 (NeuralGaffer) (+0.40)。
 
-## 概述
+## 概要
 
 单目图像的人物重光照与三维重建是视觉计算中的一对核心任务，但传统方法通常将二者解耦处理：先估计几何或内蕴属性，再执行重光照，导致误差累积，且缺乏显式几何约束，难以生成物理上逼真的阴影与高光。**GeoRelight** 将这一问题重新定义为联合的条件多模态生成任务，核心洞察在于——重光照与几何重建是互促的：精确几何为遮挡和局部着色提供线索，而外观中的明暗信息则通过 shape-from-shading 增强几何细节。
 
@@ -54,7 +54,7 @@ claims:
 
 **方法定位**：GeoRelight 属于基于扩散模型的几何感知重光照方法，区别于仅输出重光照图像的端到端像素映射方法（如 IC-Light、NeuralGaffer）和依赖辐射提示的 ControlNet 方法（如 **DiLightNet**, Zeng et al., SIGGRAPH 2024）。其核心创新在于将重光照、内蕴分解与三维重建统一于单一扩散框架，并以 iNOD 表示和混合数据策略支撑多任务联合学习。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -79,7 +79,9 @@ GeoRelight的出发点是打破上述分离范式，其核心洞察为：**重�
 
 此外，现有方法在训练数据策略上也存在局限：纯合成数据虽提供完美标签，但缺乏真实感；而真实光照舞台数据虽保真度高，却存在照明偏压（如LED阵列导致的暗偏压）。GeoRelight通过战略性混合训练数据弥合这一合成-真实域差距，使得模型在保持物理精度的同时生成自然均衡的光照效果。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GeoRelight 的核心创新在于将传统的“先估计几何，再进行重光照”的顺序管道重构为一个**统一的联合生成框架**，从根本上解决了误差累积与几何-外观割裂的瓶颈。其关键创新点体现在以下四个维度：
 
@@ -116,7 +118,7 @@ iNOD 的核心优势在于：作为密集的2D图像表示，天然兼容VAE的�
 
 训练采用两阶段策略：先在合成数据上训练 30K 步以建立物理先验，再进行 10K 步混合数据训练以弥合域差距。模态开关掩码使得模型可在不同数据源上灵活切换训练模式（如对 In-the-Wild 数据仅监督重光照和几何，不监督反射率），实现了多源数据的有效联合利用（Table 1）。
 
-## 整体框架
+
 
 GeoRelight 将单目人像的重光照与几何重建统一建模为一个**条件多模态生成任务**，其核心架构建立在视频潜扩散变换器（Video Latent Diffusion Transformer, DiT）之上。模型接收一幅在未知光照下拍摄的输入图像 $\tilde{\mathbf{I}}$ 和目标环境光照 $\mathbf{E}$，同时生成重光照图像 $\mathbf{I}$、内蕴反射率 $\mathbf{a}$、法线图 $\mathbf{n}$、语义分割掩码 $\mathbf{s}$ 以及 3D 几何表示——等距归一化正射深度图（iNOD）。框架的关键设计是将视频扩散模型中的时间维度重新赋予语义，改造为模态维度 $M$，使同一 DiT 骨干能够并行处理多种异质输出。
 
@@ -153,7 +155,7 @@ GeoRelight 采用两阶段训练，以弥合合成数据与真实场景之间的
 ![[assets/figures/papers/paper_list_l2508_https_arxiv_org_abs_2604_20715/figures/003_Figure_3.jpg]]
 *Figure 3: The GeoRelight Pipeline. GeoRelight processes up to five target modalities, using cswitch to signal which ones are targets and conditions (the figure shows one specific usecase). It is guided by a global image condition*
 
-## 核心模块与公式推导
+
 
 ### 3.1 多模态扩散Transformer框架
 
@@ -197,7 +199,9 @@ iNOD的核心优势在于：等距缩放保留了相对3D几何关系，正射�
 ![[assets/figures/papers/paper_list_l2508_https_arxiv_org_abs_2604_20715/figures/018_Figure_13.jpg]]
 *Figure 13: Limitation of Point Map in Latent Space. As a popular geometry representation [33, 36] in image sapce, point map shows strong limitation in latent space. Although visually the point map looks similar before and after VAE, the boundary lost huge precision (please zoom in) and it contains much noise after VAE*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -262,7 +266,9 @@ GeoRelight同时输出反射率（albedo）和法线（normal）等内蕴属性�
 ![[assets/figures/papers/paper_list_l2508_https_arxiv_org_abs_2604_20715/figures/014_Figure_9.jpg]]
 *Figure 9: Benefit of In-the-Wild Data. Using only Synth uncovers gaps in the data like the lack of mixed colored beards. Adding Dome data fixes that but produces unrealistic brightness (middle) due to the unnatural LED activation (either very sparse or fully lit) in light stage captures. Adding large-scale ITW data corrects this bias, yielding balanced and realistic lighting (right)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法定位：从顺序管道到联合多模态生成
 
@@ -317,6 +323,8 @@ GeoRelight 的框架设计为以下方向留下了探索空间：
 - **材质与物体类别的泛化**：当前框架聚焦于人物主体，能否扩展至包含非朗伯材料和复杂几何的广泛物体类别？这需要更大规模、更多样化的多模态标注数据。
 - **替代传感模态的融合**：能否利用事件相机等替代传感模式，在保持时域一致性的同时提升对快速运动和极端光照的鲁棒性？
 - **模态扩展的灵活性**：框架的模态开关掩码机制理论上支持任意模态的组合，未来可探索加入材质参数（如粗糙度、金属度）或语义分割等额外模态，进一步提升物理一致性。
+
+
 
 ## 原文 PDF
 

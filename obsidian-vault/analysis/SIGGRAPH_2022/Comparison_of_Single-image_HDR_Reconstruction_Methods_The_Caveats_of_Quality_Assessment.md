@@ -34,7 +34,7 @@ claims:
 | 中文题名 | 单图像HDR重建方法比较——质量评估的误区 |
 | 英文题名 | Comparison of Single-image HDR Reconstruction Methods — The Caveats of Quality Assessment |
 | 会议/期刊 | SIGGRAPH 2022 |
-| Links | [paper](https://www.cl.cam.ac.uk/research/rainbow/projects/sihdr_benchmark/) · [arXiv](http://arxiv.org/abs/1712.03686) · [Project](https://www.cl.cam.ac.uk/research/rainbow/projects/sihdr_benchmark/") |
+| Links | [paper](https://www.cl.cam.ac.uk/research/rainbow/projects/sihdr_benchmark/) · [paper](http://arxiv.org/abs/1712.03686) · [Project](https://www.cl.cam.ac.uk/research/rainbow/projects/sihdr_benchmark/") |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction #topic/benchmarks_datasets_evaluation |
 | Method | CRF校正评估协议（CRF Correction-based Evaluation Protocol） |
 | Dataset | 新构建的SI-HDR数据集（27张图像用于主观实验）, 主观实验与客观指标相关性（27张图像）, 全验证集（183张图像）方法排名可靠性 |

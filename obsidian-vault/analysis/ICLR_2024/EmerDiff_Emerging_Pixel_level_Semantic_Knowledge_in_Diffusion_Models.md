@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2024
 pdf_ref: paperPDFs/ICLR_2024/EmerDiff_Emerging_Pixel_level_Semantic_Knowledge_in_Diffusion_Models.pdf
+project_link: https://kmcode1.github.io/Projects/EmerDiff/
+code_link: null
 aliases:
 - EmerDiff
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | EmerDiff：扩散模型中涌现的像素级语义知识 |
 | 英文题名 | EmerDiff: Emerging Pixel-level Semantic Knowledge in Diffusion Models |
 | 会议/期刊 | ICLR 2024 |
-| Links | [paper](https://arxiv.org/abs/2401.11739); [Project](https://kmcode1.github.io/Projects/EmerDiff/) |
+| Links | [paper](https://arxiv.org/abs/2401.11739) · [Project](https://kmcode1.github.io/Projects/EmerDiff/) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/diffusion_image_video |
 | Method | EmerDiff |
 | Dataset | ADE20K (AD150), COCO-Stuff (CS171), COCO-Stuff-27 |
@@ -40,7 +42,7 @@ claims:
 > - COCO-Stuff (CS171) 上，mIoU 为 30.5，对比 27.6 (SD)，变化 +2.9。
 > - COCO-Stuff-27 上，mIoU (传统评估) 为 26.6，对比 26.8 (STEGO)，变化 -0.2。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -76,7 +78,7 @@ EmerDiff 的核心创新在于将**低分辨率到高分辨率的映射策略**�
 
 EmerDiff 存在以下局限：难以区分极小对象（如动物腿部、人脸细节），因为细节信息在低维层中被压缩；特征表示中可能混杂空间位置和颜色属性，导致天空、地面等同质区域被过度分割。未来方向包括将调制语义特征的思路推广至其他生成模型（如 GAN），以及利用生成的掩码作为伪标签进行弱监督语义分割以减少标注需求。
 
-## 背景与动机
+
 
 图像语义分割旨在为图像中的每一个像素分配一个语义类别标签，是计算机视觉领域的一项基础任务。传统的分割方法依赖大量像素级人工标注进行监督训练，成本高昂且难以扩展。近年来，自监督和无监督分割方法试图摆脱对密集标注的依赖，但它们通常需要在大规模无标注数据上进行额外的训练，或者依赖于专门设计的自监督代理任务。
 
@@ -86,7 +88,9 @@ EmerDiff 存在以下局限：难以区分极小对象（如动物腿部、人�
 
 本文正是从这一问题出发，探索扩散模型从低分辨率特征图生成高分辨率图像的内在机制。作者发现，当对低维特征图的一个子区域施加扰动时，生成图像中只有与该子区域语义相关的像素会发生显著变化，而其他像素几乎保持不变。这一观察揭示了扩散模型内部存在一种隐式的“语义对应”关系——低分辨率特征图上的每一个空间位置，都与高分辨率图像中一组语义相关的像素紧密关联。基于这一核心洞察，EmerDiff 提出了一种无需任何额外训练或标注的框架，利用这种语义对应关系将低分辨率分割掩码“上采样”为像素级的精细分割图，从而首次从预训练扩散模型中提取出高精度的像素级语义知识。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 EmerDiff 的核心创新在于**将扩散模型从低分辨率特征图生成高分辨率图像的机制，转化为一种天然的语义对应上采样器**，从而绕过了传统无监督分割中“低维语义特征图与高维像素空间难以对齐”的根本瓶颈。
 
@@ -117,7 +121,7 @@ $$f\left(\sigma\left(\frac{QK^T}{\sqrt{d}}\right) \cdot V\right) + cM \in \mathb
 
 EmerDiff 在无监督语义分割领域占据了一个独特位置：它**既不依赖自监督预训练的视觉编码器（如 DINO），也不依赖语言模型的文本监督（如 CLIP）**，而是纯粹从预训练扩散模型的生成机制中提取像素级语义知识。这使得它可以作为一种“即插即用”的细粒度分割前端，与现有的无标注开放词汇分割方法（如 **MaskCLIP** (Zhou et al., ECCV 2022)、**TCL** (Cha et al., 2023)、**CLIPpy** (Ranasinghe et al., 2023)）组合使用，为其粗糙的文本对齐像素嵌入提供精细的类别无关掩码（Table 3），从而产生文本对齐的细粒度分割结果。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2401_11739/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of our framework. green: we first construct low-resolution segmentation maps by applying k-means on semantically meaningful low-dimensional feature maps. orange: Next, we generate image-resolution segmentation maps by mapping each pixel to the most semantically corresponding low-resolution mask, where semantic correspondences are identified by the modulated denoising process*
@@ -151,7 +155,7 @@ EmerDiff 的整体 pipeline 围绕一个核心洞察展开：**预训练扩散�
 - **输出**：与输入图像分辨率相同的精细分割图，每个像素被分配到一个语义掩码标签
 - **可选扩展**：通过计算掩码嵌入（在掩码区域内平均 SD 特征图），可为每个掩码生成特征向量，用于后续的开放词汇分类或聚类评估
 
-## 核心模块与公式推导
+
 
 EmerDiff 的核心管线由两个阶段构成：**低分辨率语义掩码构建**与**像素级语义对应上采样**。第一阶段从扩散模型的低维特征图中提取语义分组；第二阶段通过调制去噪过程揭示低分辨率掩码与高分辨率像素之间的语义对应关系，从而将粗糙掩码上采样为精细分割图。
 
@@ -183,7 +187,9 @@ $$k = \mathrm{argmax}_i \, d_{x,y}^i$$
 
 在开放词汇分割场景中，需要为每个掩码生成语义嵌入。具体做法是：在掩码区域内对 Stable Diffusion 的低维特征图取平均，得到掩码嵌入 $e \in \mathbb{R}^c$，每个像素继承其所属掩码的嵌入向量。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -257,7 +263,9 @@ Figure 8 展示了典型失败案例：EmerDiff 偶尔无法区分**极小的对
 ![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2401_11739/figures/022_Figure_14.jpg]]
 *Figure 14: Effects of modulating different cross-attention layers vs different computation $\left$( f $\left( \sigma \cdot$ V $\right$) + c M , f $\left( \sigma \cdot$ V + c M $\right) \right$) vs different λ. For cross-attention layers, we experiment with the three different layers in 16 × 16 upward modular blocks. Note that we abbreviate $\sigma \left( { \textstyle { \frac { Q K ^ { T } } { \sqrt { d } } } } \right$) to σ for convenience
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位与核心瓶颈
 
@@ -321,6 +329,8 @@ EmerDiff 的方法论创新在于**改变了低分辨率到高分辨率的映射
 3. **弱监督下游应用**：生成的掩码能否直接作为伪掩码用于弱监督语义分割，从而减少人工标注需求？论文在结论中将其列为未来方向，但尚未提供实验验证。
 
 4. **小物体分割增强**：在高分辨率特征图稀缺的约束下，是否可以通过多尺度调制或分层对应发现策略提升对小物体的分割能力？
+
+
 
 ## 原文 PDF
 

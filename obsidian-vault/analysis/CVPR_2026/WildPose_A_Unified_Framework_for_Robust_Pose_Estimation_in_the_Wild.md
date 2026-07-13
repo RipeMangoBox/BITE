@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/WildPose_A_Unified_Framework_for_Robust_Pose_Estimation_in_the_Wild.pdf
+project_link: null
 code_link: null
 aliases:
 - WildPose
@@ -41,7 +42,7 @@ claims:
 > - Bonn RGB-D Dynamic 上，ATE RMSE (cm) 2.36 (avg) vs WildGS-SLAM 2.31; DROID-SLAM 4.91 (接近最优，优于动态学习方法)。
 > - TUM RGB-D (dynamic) 上，ATE RMSE (cm) 1.57 (avg) vs ViPE 1.58; DROID-SLAM 2.25 (↓ 0.01 cm (略优))。
 
-## 概述
+## 概要
 
 **问题背景与瓶颈**：在动态场景中进行鲁棒的相机姿态估计，核心瓶颈在于现有方法难以准确识别动态区域——基于语义分割的方法依赖预定义类别，无法覆盖所有运动物体；基于运动预测的方法容量不足，难以建模复杂运动模式。动态像素的误匹配直接导致光束平差法（Bundle Adjustment, BA）优化失败，而引入动态处理机制的方法又常在静态场景中性能退化。因此，如何统一处理动态与静态环境，成为该领域的核心挑战。
 
@@ -51,7 +52,7 @@ claims:
 
 **主要结果概览**：在动态基准 Wild-SLAM MoCap 上，WildPose 平均 ATE RMSE 为 0.39 cm，显著优于 MegaSaM（2.40 cm）和 WildGS-SLAM（0.46 cm）；在 Bonn RGB-D Dynamic 和 TUM 动态数据集上同样取得最优或次优结果（平均 ATE 分别为 2.36 cm 和 1.57 cm）。更重要的是，在静态 TUM 和 7-Scenes 数据集上，WildPose 保持领先（全轨迹 ATE 分别为 0.027 m 和 0.049 m），优于 DROID-SLAM 等静态方法，验证了其“动态鲁棒、静态不退步”的统一能力。消融实验证实，混合微调、运动掩码检测器和全局 BA 深度正则化关闭三个组件均为有效设计。
 
-## 背景与动机
+
 
 单目视觉姿态估计是三维视觉与机器人导航的核心任务。近年来，基于学习的SLAM方法在静态场景中取得了显著进展，然而，当场景中出现动态物体时，这些方法的性能会急剧退化。根本原因在于，动态区域产生的光流违反了静态场景假设，导致可微BA（Bundle Adjustment）中的重投影误差被异常值污染，最终使优化陷入局部极小或发散。
 
@@ -61,7 +62,9 @@ claims:
 
 本文的动机正是弥合这一鸿沟：**将前馈模型的丰富感知前端与可微BA的端到端优化后端融合，构建一个在动态与静态环境中统一鲁棒的单目姿态估计框架**。核心思想是利用冻结的预训练MASt3R编码器提供3D感知特征，并设计专用的高容量运动掩码检测器来识别动态区域，通过逐边运动掩码在BA中动态降权动态像素的残差，从而消除时间歧义，实现动态与静态环境的统一处理。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 WildPose 的核心创新在于将现代三维视觉中两个强大范式——前馈模型的丰富感知前端与可微BA的端到端优化后端——进行深度融合，从而构建一个在动态与静态环境下均能鲁棒工作的统一单目姿态估计框架。这一融合并非简单拼接，而是通过三个关键“changed slots”实现系统性的能力跃升。
 
@@ -81,7 +84,7 @@ WildPose 采用三阶段课程训练策略，将训练数据从纯静态扩展�
 
 DROID-SLAM 作为单目方法缺乏度量尺度，而 WildPose 利用 Moge2 度量深度初始化视差，并将其作为局部 BA 的正则化项。在推理阶段，BA 目标函数中的权重矩阵由流置信度与运动掩码的乘积构成 $\text{diag}(\hat{\mathbf{w}} \odot \mathbf{M})$，从而动态降低动态像素残差的权重。在最终全局 BA 中，深度正则化项被显式移除，以避免 Moge2 深度先验中的噪声对全局一致性造成干扰。这一“先用后弃”的策略在消融实验中得到了验证：关闭全局 BA 深度正则化（GBA Dep. Off）可进一步提升精度。
 
-## 整体框架
+
 
 WildPose 是一个面向单目 RGB 视频的鲁棒姿态估计统一框架，其核心设计哲学在于融合**前馈模型的丰富感知前端**与**可微 BA 的端到端优化后端**。如 Figure 2 所示，系统以一段标定好的单目视频序列为输入，输出全局一致的相机轨迹。整个流水线由四个关键模块串联而成：冻结的 MASt3R 编码器提取 3D 感知特征，更新算子（ConvGRU + 轻量适配器）迭代预测光流与置信度，运动掩码检测器生成逐边运动掩码，可微 BA 层联合优化所有关键帧的姿态与视差。
 
@@ -98,7 +101,7 @@ $$E(\\hat{\\omega}, \\hat{d}) = \\sum_{(i,j)\\in G} \\left\\| \\hat{\\mathbf{f}}
 
 其中第一项为运动掩码加权的重投影误差，第二项为度量深度正则化项。值得注意的是，在最终的全局 BA 中，深度正则化项被移除，以减少深度先验噪声对全局一致性的干扰。这一设计使 WildPose 在动态与静态场景间无需切换策略，实现了统一的鲁棒估计。
 
-## 核心模块与公式推导
+
 
 ### 3.1 可微束调整与更新算子
 
@@ -165,7 +168,9 @@ $$E(\hat{\omega}, \hat{d}) = \sum_{(i,j)\in G} \left\| \hat{\mathbf{f}}_{ij} - \
 ![[assets/figures/papers/paper_list_l2275_https_arxiv_org_abs_2605_12774/figures/003_Figure_3.jpg]]
 *Figure 3: Visualization of Motion Masks. Top: Our per-edge masks (Frame i → j and i → k) resolve temporal ambiguity by capturing motion relative to a second frame, enabling fine-grained detection of inconsistencies along each frame-graph edge. Bottom: Per-frame masks from prior methods (WildGS-SLAM [60] and Vipe [17]) are shown for comparison; these approaches produce frame-level predictions that are unable to identify transient motion*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 动态场景跟踪性能
 
@@ -233,7 +238,9 @@ Table 6的系统消融验证了三个核心组件的必要性：
 ![[assets/figures/papers/paper_list_l2275_https_arxiv_org_abs_2605_12774/figures/009_Table_6.jpg]]
 *Table 6: WildPose Ablation Study (ATE RMSE ↓ [cm]). We report the average tracking error for each dataset. Mix. Ft. denotes finetuning the update operator with the mix of static and dynamic datasets, Mot. Mask denotes the motion mask detector, and GBA Dep. Off denotes removing the depth regularization term during the final global BA*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 在动态SLAM谱系中的位置
 
@@ -270,6 +277,8 @@ WildPose 的有效性建立在以下假设之上，这些假设也构成了其�
 1. **域自适应与在线内参标定。** 能否通过测试时自适应（test-time adaptation）或在线内参估计，缩小合成数据到真实场景的域差距，同时将方法拓展到未标定视频？这需要在不破坏冻结MASt3R特征稳定性的前提下，设计轻量的自适应机制。
 2. **基础模型轻量化。** MASt3R和Moge2是计算瓶颈的主要来源。能否通过知识蒸馏或架构搜索，在保持3D感知质量的同时显著降低推理开销？这直接关系到方法的实际可部署性。
 3. **运动掩码检测器的泛化边界。** 当前运动检测器在Kubric生成的刚体运动模式上训练，其对非刚体运动（如人体关节运动、流体）的泛化能力尚未被系统评估。这需要在更丰富的运动模式数据上进行验证和可能的架构调整。
+
+
 
 ## 原文 PDF
 

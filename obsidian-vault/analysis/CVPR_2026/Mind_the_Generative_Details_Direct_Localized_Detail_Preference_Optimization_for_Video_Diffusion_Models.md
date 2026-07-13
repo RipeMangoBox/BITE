@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/Mind_the_Generative_Details_Direct_Localized_Detail_Preference_Optimization_for_Video_Diffusion_Models.pdf
+project_link: null
 code_link: "https://github.com/1170300714/Local-DPO"
 aliases:
 - MGDDLDPOVDM
@@ -43,7 +44,7 @@ claims:
 > - VideoJAM 上，Aesthetic Quality / Imaging Quality / VideoAlign Overall 0.5604 / 0.7001 / 7.5397 (CogVideoX-2B); 0.5782 / 0.6727 / 7.6424 (CogVideoX-5B... vs 参见 Table 2 (例如 Imaging Quality 相比 Baseline 提升 0.0674 (CogVideoX-2B))。
 > - Human Evaluation 上，Win rate against Vanilla DPO (General) 88.86% average win rate (Fig.4); Fig.7 shows LocalDPO wins on all dimensions vs... vs Vanilla DPO (约 33.4% direct wins + 58.7% ties in Fig.4 General dimension)。
 
-## 概述
+## 概要
 
 **核心问题**：现有的视频扩散模型偏好优化方法（如 Vanilla DPO）依赖对同一提示多次采样、再借助评判模型或人工进行全局排序来构造偏好对。这一范式存在三重瓶颈：① 多轮采样与标注成本高昂；② 全局偏好信号可能模糊甚至自相矛盾；③ 最关键的是，它完全忽略了视频中局部区域的细粒度质量差异——同一视频的不同空间位置、不同帧之间，其生成质量往往存在显著波动（图 2），而全局评分无法捕捉这些局部退化。
 
@@ -53,7 +54,7 @@ claims:
 
 **主要结果**：在 CogVideoX-2B、CogVideoX-5B 和 Wan2.1-1.3B 三个基座模型上，LocalDPO 在 VBench 和 VideoJAM 基准的审美质量、成像质量及 VideoAlign 总分上一致超越 Baseline、SFT、Vanilla DPO 和 DenseDPO（表 1、表 2）。消融实验证实，区域感知 DPO 损失是性能提升的关键驱动因素（表 3），而“真实视频 + 区域感知破坏”的偏好对构造策略显著优于其他替代方案（表 4）。人类评估中，LocalDPO 在所有维度上均取得最高胜率（图 4、图 7）。
 
-## 背景与动机
+
 
 ### 视频扩散模型的后训练瓶颈
 
@@ -71,7 +72,9 @@ Figure 2 揭示了问题的本质：同一提示生成的两个视频，在全�
 
 本文提出一个关键洞察：**以真实视频为锚点，利用模型自身生成能力构造局部退化的对比对，可在零标注成本下获得高置信度、区域级的偏好信号**。具体而言，真实视频天然具备高质量的局部细节，只需在其上引入可控的局部破坏，即可自动生成“正样本（原始真实视频）vs. 负样本（局部退化版本）”的偏好对，无需任何外部评判模型或人工干预。基于此，本文设计了 **LocalDPO** 框架，通过掩码引导的区域感知 DPO 损失，将偏好优化严格限制在损坏区域，从而直接驱动模型学习局部细节偏好，同时避免全局结构漂移。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 LocalDPO 的核心创新在于**以真实视频为锚点，将视频扩散模型的偏好优化从全局、模糊的信号精确地聚焦到局部、细粒度的生成细节上**。这一转变通过两个紧密耦合的“changed slots”实现，直击现有方法的瓶颈。
 
@@ -114,7 +117,7 @@ LocalDPO 彻底改变了偏好对的构造范式，从“多采样-全局排序�
 
 消融实验（Table 3）有力地证明了上述两个创新的关键作用。当在训练中加入 $\mathcal{L}_{\mathrm{RA-DPO}}$ 后，模型在审美质量、成像质量等几乎所有指标上均获得显著提升。此外，Table 4 的消融研究表明，采用“真实视频 + 区域感知破坏”的偏好对构造策略，其效果远超使用Vanilla DPO的全局win/lose样本或以生成视频作为正样本的策略，证实了以真实视频为锚点的局部退化构造是获得高质量偏好信号的核心。
 
-## 整体框架
+
 
 LocalDPO 的整体框架围绕一个核心洞察展开：**以真实视频为锚点，利用模型自身的生成能力构造局部退化的对比对，从而在零标注成本下获得高置信度、区域级的偏好信号**。该框架包含三个紧密耦合的模块，形成一条从偏好数据构造到区域感知优化的完整链路。
 
@@ -159,7 +162,7 @@ $$\mathcal{L}_{\mathrm{total}} = \lambda_{\mathrm{RA-DPO}} \mathcal{L}_{\mathrm{
 -   **偏好对构造**：基线方法依赖对同一提示生成多个视频并进行全局排序，标注成本高且偏好信号粗糙；LocalDPO 以真实视频为正样本，通过局部破坏生成负样本，单次推理即可完成构造，且偏好信号天然定位于局部区域。
 -   **优化目标**：基线方法使用全局 DPO 损失，可能因全局信号的模糊性（如不同区域质量此消彼长）导致优化矛盾；LocalDPO 的掩码引导区域感知损失将优化严格限制在损坏区域，避免了全局结构漂移，实现了对局部生成细节的精准驱动。
 
-## 核心模块与公式推导
+
 
 LocalDPO 的核心设计围绕三个递进模块展开：**偏好对构造**、**区域感知优化目标** 和 **混合训练策略**。其根本逻辑是：以真实视频为锚点，利用预训练模型自身的生成能力在局部区域制造退化，进而通过掩码引导的 DPO 损失将偏好信号精确注入退化区域。
 
@@ -212,7 +215,9 @@ $$ \mathcal{L}_{\mathrm{total}} = \lambda_{\mathrm{RA-DPO}} \mathcal{L}_{\mathrm
 ![[assets/figures/papers/paper_list_l2693_https_arxiv_org_abs_2601_04068/figures/014_Figure_9.jpg]]
 *Figure 9: Visualization of generated locally corrupted videos*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验设置
 
@@ -287,7 +292,9 @@ Table 5 展示了训练数据的关键属性统计，Figure 8 给出了视频类
 ![[assets/figures/papers/paper_list_l2693_https_arxiv_org_abs_2601_04068/figures/011_Figure_7.jpg]]
 *Figure 7: Human evaluation of LocalDPO vs. Baseline, SFT and Vanilla DPO on CogvideoX-2B [71], CogvideoX-5B [71] and Wan2.1- 1.3B [55]. LocalDPO achieves the best results on all dimensions of human evaluation*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有方法的谱系关系
 
@@ -331,6 +338,8 @@ LocalDPO 以“真实视频为锚点 + 局部破坏生成负样本”的策略�
 **跨模态与跨任务的扩展性。** LocalDPO 的核心思想——“以真实数据为锚点，通过局部破坏构造区域级偏好对”——在原理上可迁移至图像生成、3D 场景生成甚至文本生成任务。但不同模态的“局部破坏”定义和掩码生成策略需要重新设计，目前尚无相关验证。
 
 **评估维度的覆盖缺口。** 现有评估集中在审美质量、成像质量和人类偏好分数，对运动一致性（motion coherence）、物理合理性（physical plausibility）等视频特有关注维度覆盖不足。局部细节的改善是否以牺牲运动平滑性为代价，需要更全面的评估体系来回答。
+
+
 
 ## 原文 PDF
 

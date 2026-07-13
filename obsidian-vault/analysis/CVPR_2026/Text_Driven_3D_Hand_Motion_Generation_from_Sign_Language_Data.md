@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/Text_Driven_3D_Hand_Motion_Generation_from_Sign_Language_Data.pdf
+code_link: null
 project_link: "https://imagine.enpc.fr/~leore.bensabath/HandMDM/"
 aliases:
 - HHMDM
@@ -32,7 +33,7 @@ claims:
 | 中文题名    | 基于手语数据的文本驱动3D手部动作生成                                                                                                |
 | 英文题名    | Text-Driven 3D Hand Motion Generation from Sign Language Data                                                      |
 | 会议/期刊   | CVPR 2026                                                                                                          |
-| Links | [paper](https://arxiv.org/abs/2508.15902); [Project](https://imagine.enpc.fr/~leore.bensabath/HandMDM); [Project](https://imagine.enpc.fr/~leore.bensabath/HandMDM/) |
+| Links | [paper](https://arxiv.org/abs/2508.15902) · [Project](https://imagine.enpc.fr/~leore.bensabath/HandMDM) |
 | Topic   | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method  | HandMDM (Hand Motion Diffusion Model)                                                                              |
 | Dataset | BOBSL3DT-Test (Seen), BOBSL3DT-Test (Unseen), ASL-Text (zero-shot transfer), BOTH57M (zero-shot transfer)          |
@@ -42,7 +43,7 @@ claims:
 > - BOBSL3DT-Test (Unseen) 上，R@1 为 22.99%，对比 5.17% (LLM(Gloss))，变化 +17.82%。
 > - ASL-Text (zero-shot transfer) 上，R@1 为 17.09%，对比 Baseline (trained on ASL-Text)，变化 superior。
 
-## 概述
+## 概要
 
 **核心问题**：文本驱动的3D手部动作生成长期受困于数据瓶颈——现有数据集（如ASL-Text、MS-ZSSLR-W）仅包含约10²~10⁴个动作-文本对，且文本标注稀疏、缺乏自然语言多样性，难以支撑高质量生成模型的训练。
 
@@ -56,8 +57,6 @@ claims:
 - 零样本迁移至ASL-Text（R@1 17.09%）和MS-ZSSLR-W（R@1 15.39%）时，模型大幅超越在目标域小数据上从零训练的基线（Table 4）；在非手语数据集BOTH57M上也展现出优越的迁移能力（Table 5）。
 
 **局限性**：伪标签和LLM生成描述存在噪声；单目3D重建对手部细节和接触动作的捕捉仍有不足；测试集规模较小（unseen仅87个符号），泛化评估的可靠性需进一步验证。
-
-## 背景与动机
 
 ### 问题背景
 
@@ -81,7 +80,7 @@ claims:
 
 这一思路的关键洞察在于：**手语音系属性经大语言模型（LLM）转化后，可以生成超越手语范畴的通用手部动作描述**，使模型获得跨手语和非手语域的零样本泛化能力。基于此，本文提出HandMDM——一个基于SMPL-X表示、在大规模自动生成的动作-文本对上训练的文本条件手部动作扩散模型。
 
-## 核心创新
+## 核心方法与创新机理
 
 HandMDM的核心创新并非提出全新的生成模型架构，而是构建了一套从手语数据中自动化、大规模挖掘“3D手部动作-自然语言描述”对的数据引擎，从而绕开了文本驱动手部动作生成领域长期面临的数据瓶颈。其关键创新点可概括为三个环环相扣的changed slots。
 
@@ -102,8 +101,6 @@ HandMDM的核心创新并非提出全新的生成模型架构，而是构建了�
 手语字典中同一符号（gloss）常存在多个变体，如何将字典描述分配给具体的BOBSL视频动作是一个关键细节。随机分配会引入训练噪声，而HandMDM提出了基于**THMR**（Text-to-Hand-Motion Retrieval）动作嵌入的自动分配策略：利用k-medoids聚类和动作嵌入相似度，将字典描述精准分配给对应的动作变体（Sec 3.1）。消融实验（Table 3）表明，这一自动分配策略相比随机分配，将seen测试集的R@1从18.77%提升至21.68%，证实了其有效性。
 
 综上，HandMDM的创新本质在于**数据优先**：通过手语字典音系学属性、HandMotionScript运动脚本和LLM的协同，将手语数据转化为大规模、高质量的动作-文本对，从而赋予文本条件扩散模型跨手语（BSL→ASL）和非手语域（BOTH57M）的零样本泛化能力。这一方法论为数据稀缺领域的文本驱动动作生成提供了可复用的范式。
-
-## 整体框架
 
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2508_15902/figures/003_Figure_2.jpg]]
 *Figure 2: Our approach: We illustrate an overview for our data collection methodology, enabling to generate free-form textual descriptions via LLM prompting, given phonological attributes from a sign language dictionary (SignBank [21]), as well as those detected with our HandMotionScript. The generated hand motion descriptions are then assigned to video-based BOBSL [2] motions thanks to the automatic pseudo-glosses combined with our THMR-based assignment. We employ a combination of SMPLer-X [9] and HAMER [57] to extract 3D motions from SignBank and BOBSL videos*
@@ -142,8 +139,6 @@ $$\mathcal{L}_{MSE} = \mathbb{E}_{\mathbf{x}_0, \epsilon, t} \| \epsilon - \epsi
 
 该框架的核心洞察在于：**手语数据库中的音系属性可经 LLM 转化为多样化的自然语言描述，与基于规则的运动特征提取相结合，能高效构建百万级“动作-文本”对**。这使得原本因数据稀缺而难以训练的文本驱动手部动作生成模型，获得了跨手语（BSL→ASL）和非手语域（BOTH57M）的零样本泛化能力。该方法属于“利用结构化知识库+LLM 进行大规模弱监督数据增强”的技术路线，与依赖人工标注或小数据集训练的基线方法形成显著差异。
 
-## 核心模块与公式推导
-
 ### 3.1 数据生成流水线：从手语视频到文本-动作对
 
 HandMDM 的核心贡献在于构建大规模文本-动作对的数据生成流水线，其瓶颈突破点在于利用手语字典的音系属性与规则化运动脚本，通过 LLM 自动生成多样化自然语言描述。流水线包含以下关键模块：
@@ -173,14 +168,13 @@ $$\mathcal{L}_{MSE} = \mathbb{E}_{\mathbf{x}_0, \epsilon, t} \| \epsilon - \epsi
 
 其中 $\mathbf{x}_0$ 为干净动作，$\epsilon \sim \mathcal{N}(0, \mathbf{I})$ 为高斯噪声，$t$ 为扩散时间步，$\epsilon_\theta$ 为可学习的去噪网络。扩散步数设为 100，训练时以 5% 概率丢弃文本条件以支持测试时的无分类器引导。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验结果：BOBSL3DT 基准上的文本条件生成与检索
 
 HandMDM 在 BOBSL3DT 测试集上的表现，直接验证了“大规模自动标注数据+文本条件扩散模型”这一技术路线的有效性。实验将测试集划分为 **Seen Signs**（722个动作实例）和 **Unseen Signs**（87个动作实例），以分别考察模型对已知手语符号的拟合能力与对未知符号的泛化能力。评估指标采用运动-运动检索（motion-to-motion retrieval）的 R@1、R@3 和 FID。
 
 **Table 2** 的核心结论如下：
-
 
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2508_15902/figures/004_Table_2.jpg]]
 *Table 2: Effect of input control: We evaluate models trained with different input formats on the seen and unseen signs of the BOBSL3DT manually-glossed test set. There are 722 / 87 ground-truth motion instances in these seen/unseen sets (with one motion instance per gloss), and we report the motion-to-motion retrieval from our generation to the ground truth. Note that the first two rows use a different input at test time, strictly following the format used during training time (as opposed to the last three rows that are trained and tested with free-form text). For the three variants of LLM-generated descriptions, we test on text generated only from SignBank phonology attributes, as well as adding th...*
@@ -194,7 +188,6 @@ HandMDM 在 BOBSL3DT 测试集上的表现，直接验证了“大规模自动�
 ### 消融实验：数据规模、输入控制与变体分配
 
 **1. 训练数据规模的单调增益（Figure 3）**
-
 
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2508_15902/figures/007_Figure_3.jpg]]
 *Figure 3: Training data size: We plot R@1 performance on the seen/unseen test sets of BOBSL3DT against different proportions of the training data, and observe a monotonic increase with larger training. Table 3. Assignment: We observe gains with our automatic sign variant assignment using THMR, as opposed to randomly assigning a variant during training*
@@ -231,7 +224,6 @@ HandMDM 的核心价值不仅在于域内性能，更在于其**零样本迁移*
 
 **定性结果（Figure 4, Figure 5）** 进一步印证了定量结论：在 ASL-Text、MS-ZSSLR-W 和 BOTH57M 的测试样例中，从零训练的基线模型生成的动作往往模糊或与文本描述不符，而 BOBSL3DT 训练的 HandMDM 能生成更准确、更具辨别性的手部形态和运动轨迹。在 BOBSL3DT Unseen 测试集上，模型对未见符号的生成结果与真实动作高度相似。
 
-
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2508_15902/figures/030_Figure_5.jpg]]
 *Figure 5: Figure A.9. Qualitative results on the seen test set of BOBSL3DT-Test: We complement Fig. 5 of the main paper (which shows results on the unseen test set), with results on the seen signs. We display both single-frame and dynamic visualizations for each example*
 
@@ -246,26 +238,13 @@ HandMDM 的核心价值不仅在于域内性能，更在于其**零样本迁移*
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2508_15902/figures/027_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2508_15902/figures/028_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2508_15902/figures/029_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2508_15902/figures/031_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2508_15902/figures/032_Figure.jpg]]
-
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2508_15902/figures/023_Figure_1.jpg]]
 *Figure 1: Figure A.6. Dynamic visualization for Fig. 1 of the main paper: We display the same examples as in Fig. 1 with a dynamic style including 5 framesPush the bent middle finger of the right flat and The person extends their index finger on the left evenly sampled. The color coding denotes the temporal evolution, i.e., the last frame with blue, and the first frame with decreased transparency in pink.movement from in front of each shoulder. spread hand across the back of the left open hand, hand and curls the other fingers, while doing the same Figure A.7. Dynamic visualization for Fig. 4 of the main paper*
 
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2508_15902/figures/002_Table_1.jpg]]
 *Table 1: 3D hand motion datasets: We summarize datasets that contain hand motions and various types of text annotations (e.g., speech, sign categories, hand descriptions). Sign language (SL) datasets capturing motions in studio [22] or estimating 3D motions from videos [4, 17, 88] do not come with hand descriptions. Those with hand descriptions are small [6, 7]. Full-body motion capture (mocap) datasets [38, 91] are less diverse on hand motions and smaller in size than our BOBSL3DT dataset. †We report the statistics of hand descriptions from the BOTH57M dataset, which contains 3,229 motions from a vocabulary of 3,539 words if body descriptions are also included. Note we calculate statistics upon dow...*
 
-![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2508_15902/figures/005_Table.jpg]]
-
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 核心瓶颈与因果机制
 

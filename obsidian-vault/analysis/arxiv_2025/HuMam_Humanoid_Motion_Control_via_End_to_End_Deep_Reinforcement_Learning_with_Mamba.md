@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/HuMam_Humanoid_Motion_Control_via_End_to_End_Deep_Reinforcement_Learning_with_Mamba.pdf
+project_link: null
+code_link: https://github.com/allen-legged-robot/humam-rl
 aliases:
 - HuMam
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | HuMam：基于Mamba的端到端深度强化学习人形运动控制 |
 | 英文题名 | HuMam: Humanoid Motion Control via End-to-End Deep Reinforcement Learning with Mamba |
 | 会议/期刊 | arXiv 2025 |
-| Links | [paper](https://arxiv.org/abs/2509.18046) · [Code](https://github.com/allen-legged-robot/humam-rl) · [arXiv](https://arxiv.org/) |
+| Links | [paper](https://arxiv.org/abs/2509.18046) · [Code](https://github.com/allen-legged-robot/humam-rl) · [paper](https://arxiv.org/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | HuMam |
 | Dataset | JVRC-1 Forward Walking, JVRC-1 Standing, JVRC-1 Lateral Walking, JVRC-1 Backward Walking |
@@ -40,7 +42,7 @@ claims:
 > - JVRC-1 Standing 上，Average Power (W) 35.08 vs 57.48 (-39.0%)。
 > - JVRC-1 Lateral Walking 上，Energy Efficiency (J/m) 963 vs 1395 (-31.0%)。
 
-## 概述
+## 概要
 
 **核心问题**：人形机器人的运动控制面临异构感知信息融合的挑战——机器人本体状态（关节位置/速度、基座姿态）与外部引导信号（目标脚步、步态时钟）具有不同的物理含义和变化尺度。传统的前馈策略网络（MLP）直接将所有观测拼接输入，缺乏有效的特征交互机制，导致训练不稳定、样本效率低，且学习出的策略往往伴随不必要的力矩波动和较高的驱动能量消耗。
 
@@ -54,7 +56,7 @@ claims:
 
 **方法定位**：HuMam 属于**端到端深度强化学习人形运动控制**框架，采用位置级策略输出配合低增益 PD 控制器执行。其核心创新在于用状态空间模型（Mamba）替代传统 MLP 作为观测融合骨干，在不增加计算复杂度的前提下提升了特征表示质量和策略优化效率。该方法在仿真 JVRC-1 平台上进行了五种运动模式的验证（前向、后退、弯道、站立、侧向行走），但尚未进行 sim-to-real 迁移，也未与其他序列模型骨干（如 Transformer、LSTM）进行直接对比。
 
-## 背景与动机
+
 
 人形机器人因其类人形态，在复杂人类环境中具有天然的操作与导航优势。然而，实现稳定、高效的双足运动控制一直是机器人领域的核心挑战。传统基于模型的控制方法依赖精确的动力学建模与繁琐的手工调参，难以应对多样化的行走模式与环境扰动。近年来，深度强化学习（DRL）为无模型运动控制开辟了新路径，但现有方法在样本效率、训练稳定性和驱动能效方面仍存在显著瓶颈。
 
@@ -80,7 +82,9 @@ HuMam 的核心动机在于：**用状态空间模型的结构化动态替代简
 
 本文在 JVRC-1 人形机器人平台上，以统一的前馈基线为参照，系统验证了 Mamba 骨干在多种行走模式下的性能增益。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈分析：前馈策略网络的异构信息融合困境
 
@@ -128,7 +132,7 @@ HuMam 的创新设计在多个维度上带来了显著且一致的增益：
 2. **仿真到现实的鸿沟**：所有实验均在仿真环境中完成，未在物理 JVRC-1 平台上部署。Mamba 编码器产生的平滑力矩在实际硬件延迟、传感器噪声和模型误差下是否仍能保持优势，需要 sim-to-real 迁移实验证实。
 3. **任务覆盖的局限性**：仅在平整地面上测试了五种步行模式，未涉及楼梯、斜坡、不平地形等多接触行为。在更复杂的接触动力学场景下，Mamba 的选择性门控是否仍能有效运作，属于开放问题。
 
-## 整体框架
+
 
 HuMam 将人形运动控制建模为端到端的深度强化学习问题，整体架构由四个核心模块串联构成：**观测投影** → **Mamba 编码器** → **策略/价值头** → **低增益 PD 控制器**，形成从异构感知输入到关节扭矩输出的完整控制链路（Figure 1）。
 
@@ -159,7 +163,7 @@ $$\mathcal{I}(\theta, \phi) = -\mathcal{L}_{\mathrm{clip}}(\theta) + \beta_V \ma
 
 策略输出的目标关节位置并非直接作为力矩指令，而是通过**低增益 PD 控制器**转换为执行扭矩（频率 1000 Hz）。这种分层控制结构使得高层策略只需关注位置层面的运动规划，底层 PD 控制器保证平滑的力矩输出，从而让学习过程保持良好条件化。
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题形式化与观测空间
 
@@ -243,7 +247,9 @@ $$\mathcal{H}_t = -\sum_a \pi_{\theta}(a \mid s_t) \log \pi_{\theta}(a \mid s_t)
 ![[assets/figures/papers/paper_list_l27_https_arxiv_org_abs_2509_18046/figures/002_Table.jpg]]
 *Table: Network architecture settings*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -316,7 +322,9 @@ Figure 4–7 展示了各行走任务的足部轨迹。HuMam 生成的足部轨�
 ![[assets/figures/papers/paper_list_l27_https_arxiv_org_abs_2509_18046/figures/014_Figure_8.jpg]]
 *Figure 8: Joint Torques of Forward Walking Task*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -377,6 +385,8 @@ HuMam 在人形机器人运动控制的知识体系中占据以下位置：
 - **基准价值**：提供了在 JVRC-1 仿真平台上使用 PPO 训练人形步态的完整基准（Baseline 性能、奖励分解、力矩分布、能耗指标），可作为后续方法比较的参考点。
 
 需要注意的是，由于论文未提供会议/期刊发表信息（venue 和 year 均为 null），在引用和定位其学术影响力时需要谨慎，建议确认正式发表版本后再进行学术引用。
+
+
 
 ## 原文 PDF
 

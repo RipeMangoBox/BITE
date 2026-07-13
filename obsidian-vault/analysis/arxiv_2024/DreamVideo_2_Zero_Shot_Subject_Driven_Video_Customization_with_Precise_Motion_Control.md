@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2024
 pdf_ref: paperPDFs/arxiv_2024/DreamVideo_2_Zero_Shot_Subject_Driven_Video_Customization_with_Precise_Motion_Control.pdf
+project_link: https://dreamvideo2.github.io
+code_link: null
 aliases:
 - D2
 - DreamVideo-2
@@ -41,7 +43,7 @@ claims:
 > - DreamVideo-2 Test Set (subject-only customization) 上，CLIP-T / DINO-I / DD 0.297 / 0.472 / 0.952 vs VideoBooth: 0.274 / 0.459 / 0.780 (+0.023 / +0.013 / +0.172)。
 > - DreamVideo-2 Test Set (motion-only control) 上，mIoU / CD↓ 0.752 / 0.039 vs MotionCtrl: 0.497 / 0.070 (+0.255 / -0.031)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：在零样本主体驱动的视频定制中，若简单地将主体学习与运动控制联合训练，运动控制信号会迅速占据主导地位，导致主体身份特征严重退化（Figure 3 (b) 和 (c)）。如何在无需测试时微调的条件下，同时保持高精度的运动控制与主体外观保真度，是该任务的核心瓶颈。
 
@@ -51,7 +53,7 @@ claims:
 
 **方法定位**：DreamVideo-2 属于零样本主体驱动视频定制方法，与需测试时微调的 **DreamVideo**（Wei et al., CVPR 2024）、**MotionBooth**（Wu et al., arXiv 2024）形成对比，同时区别于仅支持主体定制（**VideoBooth**, Jiang et al., 2024）或仅支持运动控制（**Peekaboo**, Jain et al., 2024; **Direct-a-Video**, Yang et al., 2024a; **MotionCtrl**, Wang et al., 2024f）的单任务基线。其核心贡献在于通过混合掩码注意力与重加权损失的联合设计，在零样本条件下首次实现了主体学习与运动控制的有效平衡。
 
-## 背景与动机
+
 
 ### 视频定制生成的兴起与瓶颈
 
@@ -75,7 +77,9 @@ claims:
 
 基于这一洞察，**DreamVideo-2** 提出了一套零样本视频定制框架，核心思路是：利用模型自有的多尺度特征进行参考注意力学习，并将边界框掩码作为运动控制信号，通过**区域加权的扩散损失**与**混合掩码注意力**，在无需测试时微调的条件下实现主体学习与运动控制的平衡。这一设计直击“运动控制主导”这一瓶颈，为联合视频定制提供了新的范式。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DreamVideo-2 的核心创新在于**以零样本方式同时解决主体身份保持与精准运动控制之间的冲突**。此前的方法（如 **DreamVideo** (Wei et al., CVPR 2024) 与 **MotionBooth** (Wu et al., arXiv 2024)）虽然支持联合定制，但均需在推理时对每个新主体进行微调，且缺乏对“运动控制主导、主体退化”这一瓶颈的系统性应对。DreamVideo-2 通过四个紧密耦合的 changed slots 实现了零样本下的平衡：
 
@@ -115,7 +119,7 @@ $$\mathcal{L}(\theta) = \mathbb{E}_{z,\epsilon,c,t} \left[ \left( \lambda_{\math
 
 这四个 changed slots 形成了一条完整的因果链条：**参考注意力**提供高效的主体特征注入路径，**掩码引导运动模块**提供独立的运动控制通道，**混合掩码**在注意力层面抑制两者冲突，**重加权扩散损失**在优化目标层面强制平衡。三者共同作用，使得 DreamVideo-2 首次在无需测试时微调的条件下，实现了主体外观保真度与运动控制精度的同时保持。
 
-## 整体框架
+
 
 DreamVideo-2 是一个零样本视频定制框架，其核心目标是从**单张主体图像**与**一条边界框序列**出发，在无需测试时微调的条件下生成同时满足主体外观保真度与精准运动轨迹的视频。框架的瓶颈在于：若简单地将主体学习与运动控制进行联合训练，运动控制信号极易占据主导地位，导致主体身份特征在极少量训练步数内严重退化（见 Figure 3）。DreamVideo-2 通过三个关键设计来平衡这一冲突：**掩码参考注意力**、**掩码引导运动模块**以及**重加权扩散损失**。
 
@@ -126,7 +130,7 @@ DreamVideo-2 是一个零样本视频定制框架，其核心目标是从**单�
 
 推理时，用户仅需提供一张主体图像和一条目标边界框序列，框架即可在零样本条件下生成定制视频，无需任何额外的微调或注意力图编辑。
 
-## 核心模块与公式推导
+
 
 ### 3.1 核心瓶颈与设计动机
 
@@ -187,7 +191,9 @@ $$
 
 该损失在框内区域以权重 $\lambda_{\mathcal{L}}$ 强化主体身份学习，在框外区域保持权重1以维持运动控制精度。消融实验（Table 6）表明，$\lambda_{\mathcal{L}} = 2$ 时各项指标达到最优平衡；过高的 $\lambda_{\mathcal{L}} = 4$ 会损害运动控制精度（mIoU 和 CD 下降）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -253,7 +259,9 @@ Figure 10 展示了 DreamVideo-2 的两类典型失败案例：(a) 受限于基�
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2410_13830/figures/012_Figure.jpg]]
 *Figure: (b) Effects of blended mask weight*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 零样本视频定制的方法坐标
 
@@ -308,6 +316,8 @@ DreamVideo-2 的适用边界由以下因素界定：
 4. **推理效率优化**：虽然方法是零样本的，但训练阶段仍需联合优化多个模块。能否通过预训练策略或模块解耦进一步降低训练成本？
 
 5. **评估体系的完善**：当前评估依赖 CLIP-T、DINO-I、mIoU、CD 等指标和人类评估，但缺乏对运动自然度、物理合理性等维度的系统度量。建立更全面的视频定制评估基准仍是开放问题。
+
+
 
 ## 原文 PDF
 

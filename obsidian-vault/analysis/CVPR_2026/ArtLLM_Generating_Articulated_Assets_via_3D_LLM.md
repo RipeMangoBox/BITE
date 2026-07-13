@@ -41,13 +41,13 @@ claims:
 > - PartNet-Mobility 7 categories (SINGAPO split) 上，mIoU 0.6884 vs Singapo* (0.4705) (+0.2179)。
 > - PartNet-Mobility 7 categories 上，Type Acc 0.9084 vs Singapo* (0.9065) (+0.0019)；Graph Acc 0.7741 vs Singapo* (0.6851) (+0.0890)；Joint-Axis-Err 0.1271 vs Singapo* (0.2463) (-0.1192)。
 
-## 概述
+## 概要
 
 现有铰接物体生成方法面临两大根本瓶颈：优化重建范式需要逐物体缓慢拟合关节参数，且通常局限于简单单关节结构；检索式方法则从固定零件库中组装，导致几何重复、泛化能力差，且几何与运动结构之间缺乏统一推理。针对这些限制，**ArtLLM** 提出将铰接结构预测转化为语言建模问题——通过对连续参数进行离散量化，使3D大语言模型能够自回归地同时预测可变数量的零件布局与关节，从而统一了几何与运动结构的推理过程。
 
 核心思路是将零件轴对齐包围盒和关节参数表示为离散token序列，并利用大规模铰接数据集进行多任务多阶段监督微调，使3D LLM学习强大的零件几何先验与运动学关系，克服传统连续值回归不稳定的问题。在PartNet-Mobility数据集上，ArtLLM的mIoU达到0.6884（次优方法Singapo*仅0.4705），关节类型准确率90.84%，图准确率77.41%，且推理速度（19s）远快于基线方法（84s）。消融实验进一步验证了离散量化、多任务设置、数据增强及多阶段训练等关键设计的必要性。物理约束限位校正模块能有效消除自碰撞，使铰接运动平稳无碰撞，提升了仿真物理合理性。
 
-## 背景与动机
+
 
 三维铰接物体的自动生成是计算机图形学、具身智能和机器人仿真的核心需求。从日常家具（抽屉、门、剪刀）到复杂机械装置，铰接物体的功能行为由零件的几何形状与运动学结构共同决定——不仅需要精确的零件外形，还需要正确的关节类型、轴方向和运动范围。然而，传统生成方法长期受限于两大范式：
 
@@ -59,7 +59,9 @@ claims:
 
 ArtLLM 正是在这一背景下提出，其核心动机是通过将铰接结构预测重新定义为离散 token 序列的自回归生成问题，使 3D LLM 能够统一推理零件的几何布局与运动学关系。这一范式转变的关键在于：对连续参数进行精心设计的离散量化，并利用大规模铰接数据集进行多任务多阶段监督微调，从而让语言模型学习强大的零件几何先验和运动学约束。结合物理驱动的关节限位校正，ArtLLM 旨在实现从单张图像或文本快速生成物理合理、仿真就绪的铰接资产。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ArtLLM 的核心创新在于将铰接结构预测从传统的优化重建或检索组装范式，根本性地转化为**3D大语言模型的自回归语言建模问题**。这一范式转换通过以下关键设计实现，直接回应了现有方法的瓶颈。
 
@@ -81,7 +83,7 @@ ArtLLM 的核心创新在于将铰接结构预测从传统的优化重建或检�
 
 这些创新共同构成了从“检索组装”到“语言建模+条件生成”的范式跃迁，使得 ArtLLM 在 PartNet-Mobility 数据集上以 mIoU 0.6884 显著超越次优方法（SINGAPO 0.4705），同时将推理时间从 84s 压缩至 19s（Table 2）。
 
-## 整体框架
+
 
 ArtLLM 的整体流水线由三个核心阶段构成，形成“结构推理→几何合成→物理校正”的闭环。给定单张图像或多视角重建的点云，系统首先通过 3D 大语言模型自回归地预测铰接蓝图，然后利用该蓝图条件化零件感知生成模型以合成高保真零件几何，最后通过物理驱动的关节限位校正消除自碰撞，输出仿真就绪的铰接资产（图 2）。
 
@@ -103,7 +105,7 @@ ArtLLM 的整体流水线由三个核心阶段构成，形成“结构推理→�
 ![[assets/figures/papers/paper_list_l2371_https_arxiv_org_abs_2603_01142/figures/001_Figure_1.jpg]]
 *Figure 1: We propose ArtLLM, a novel framework capable of rapidly generating articulation assets from images or text. By using a 3D LLM to jointly predict part layouts and joints, and integrating state-of-the-art part generation methods, our approach can produce high-quality, physically grounded articulation assets*
 
-## 核心模块与公式推导
+
 
 ArtLLM 的核心架构由五个模块串联构成，其关键创新在于将铰接结构预测转化为语言建模问题，并对连续参数进行离散量化。
 
@@ -131,7 +133,9 @@ ArtLLM 的核心架构由五个模块串联构成，其关键创新在于将铰�
 ![[assets/figures/papers/paper_list_l2371_https_arxiv_org_abs_2603_01142/figures/003_Figure_3.jpg]]
 *Figure 3: Physical limit calcualtion. Illustration for our physical based limit correction process*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 数据集与评估协议
 
@@ -199,7 +203,9 @@ Figure 9揭示了ArtLLM的主要失败模式：
 ![[assets/figures/papers/paper_list_l2371_https_arxiv_org_abs_2603_01142/figures/008_Figure_6.jpg]]
 *Figure 6: We teleoperate a Franka Panda robot to execute three articulation tasks and record its pose trajectories. Using ArtLLM, we reconstruct the corresponding articulated assets from real scenes and replay the trajectories in simulation. The simulated objects reproduce the real articulation behavior, showing that our generated assets accurately capture real-world kinematics and joint constraints*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题域定位：铰接物体生成的方法论断层
 
@@ -241,6 +247,8 @@ ArtLLM 相对于现有基线方法在以下维度上实现了范式迁移：
 - **物理感知铰接预测**：如何联合建模质量、摩擦等物理属性，实现物理感知的铰接结构预测，使生成资产直接适用于动力学仿真？
 - **遮挡结构补全**：如何改进生成模型以重建被遮挡的内部结构，从单视图或多视图输入中恢复完整的铰接几何？
 - **多模态条件扩展**：当前方法以点云为主要输入，如何有效融合文本描述或图像等多模态条件，提升控制的灵活性和精度？
+
+
 
 ## 原文 PDF
 

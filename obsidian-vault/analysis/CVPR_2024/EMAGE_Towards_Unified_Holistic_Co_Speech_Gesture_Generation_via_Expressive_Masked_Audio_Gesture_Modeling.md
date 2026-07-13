@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2024
 pdf_ref: paperPDFs/CVPR_2024/EMAGE_Towards_Unified_Holistic_Co_Speech_Gesture_Generation_via_Expressive_Masked_Audio_Gesture_Modeling.pdf
+code_link: null
 project_link: https://pantomatrix.github.io/EMAGE
 aliases:
 - EMAGE
@@ -41,7 +42,7 @@ claims:
 > - BEATv2 上，FGD (↓) 5.512 vs 6.209 (TalkSHOW) (-0.697)；BC (↑) 7.724 vs 6.947 (TalkSHOW) (+0.777)；Diversity (↑) 13.06 vs 13.47 (TalkSHOW) (-0.41)。
 > - User Study 上，Holistic Preference Win Rate 52.7% vs 22.7% (Habibie et al.) (+30.0%)；Face Preference Win Rate 56.0% vs 33.0% (TalkSHOW) (+23.0%)。
 
-## 概述
+## 概要
 
 协同语音手势生成旨在从语音音频中合成与说话人节奏、语义相协调的身体与面部动作。该领域的核心瓶颈在于：现有方法要么仅处理面部或身体等局部运动，要么依赖单一 VQ-VAE 编码全身，无法在统一的网格层级上同时生成面部、身体、手部及全身运动，且难以结合用户指定的部分预定义姿态进行灵活生成。
 
@@ -51,7 +52,7 @@ claims:
 
 实验结果表明，EMAGE 在 BEATv2 基准上全面超越现有方法：与最强基线 **TalkSHOW** 相比，FGD 从 6.209 降至 5.512，BC 从 6.947 提升至 7.724。用户偏好度调查进一步验证了其主观优越性——在整体、身体和面部手势上分别获得 52.7%、44.7% 和 56.0% 的胜率。消融实验证实，组合式 VQ-VAE、CRA 模块和掩码姿态提示均对性能有持续贡献，且模型在多数据集（Trinity、AMASS）训练下展现出良好的扩展性。
 
-## 背景与动机
+
 
 协同语音手势生成（Co-Speech Gesture Generation）旨在根据语音信号自动合成与说话内容、节奏和情感同步的身体动作与面部表情，是构建逼真虚拟人交互的核心技术。近年来，随着大规模数据集（如 BEAT）和深度学习方法的出现，该领域取得了显著进展。然而，现有方法仍面临三个根本性瓶颈，制约着整体手势生成的真实性与可控性。
 
@@ -63,7 +64,9 @@ claims:
 
 针对上述瓶颈，EMAGE 提出了一套系统性的解决方案：首先构建了 BEAT2（BEAT-SMPLX-FLAME）数据集，提供 60 小时动捕级别的整体网格标注；其次设计了组合式 VQ-VAE 将全身手势分解为四个独立的隐空间进行建模；最后通过掩码音频手势 Transformer 联合训练掩码姿态重建（MG2G）与音频条件生成（A2G）两条路径，使模型在推理时能利用少量种子姿态（仅需 4 帧）生成连贯的全身动作。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 EMAGE 的核心创新在于将“掩码姿态重建”作为训练约束，与“音频条件生成”联合优化，从而在推理时仅需极少的种子姿态（如 4 帧）即可生成连贯的全身协同语音手势。这一思想通过四个关键设计实现，直接改变了现有方法的多个技术槽位。
 
@@ -113,7 +116,7 @@ EMAGE 的训练包含两条路径（Figure 3）：
 
 这些创新共同构成了 EMAGE 的因果性优势：掩码姿态建模提供了强健的运动先验，组合式 VQ-VAE 解耦了异质运动模式，CRA 实现了细粒度的音频-语义对齐，而双路径训练则将这些能力统一在一个端到端框架中。
 
-## 整体框架
+
 
 EMAGE 的整体框架围绕一个核心设计展开：**在训练阶段联合优化掩码姿态重建（MG2G）与音频条件手势生成（A2G）两条路径，使模型在推理时能利用部分掩码姿态提示（body hints）显著提升生成质量**。该框架由四个关键阶段构成：组合式 VQ-VAE 隐空间建模、音频特征自适应融合、掩码音频手势 Transformer 主干网络，以及全局运动预测与解码。
 
@@ -163,7 +166,7 @@ $$\tilde{\mathbf{t}} = \mathcal{G}(\tilde{\mathbf{g}}_l)$$
 
 EMAGE 整体框架的因果链条可概括为：**组合式 VQ-VAE 提供解耦的离散运动先验 → CRA 实现帧级自适应的音频特征融合 → 掩码姿态提示通过双路径训练赋予模型利用部分观测的能力 → 可切换交叉注意力与直接拼接解码在融合灵活性与部位独立性之间取得平衡**。这一设计使得 EMAGE 成为首个能接受音频与部分/完全掩码姿态、统一生成全身音频同步手势的框架（Table 2）。
 
-## 核心模块与公式推导
+
 
 ### 组合式离散身体与面部先验
 
@@ -233,7 +236,9 @@ $$\tilde{\mathbf{t}} = \mathcal{G}(\tilde{\mathbf{g}}_l)$$
 ![[assets/figures/papers/paper_list_l1847_EMAGE_Towards_Unified_Holistic_Co_Speech_Gesture_Generation_via_Expressi/figures/006_Figure_4.jpg]]
 *Figure 4: Details of CRA and Pretrained VQ-VAEs. Left: Content Rhythm Attention fuses speech rhythm (onset and amplitude) with content (pretrained word embeddings from text scripts) adaptively. This results in a preference for either content or rhythm in specific frames, which encourages the generation of semanticalaware gestures. Right: We pretrain four compositional VQ-VAEs by reconstructing face, upper body, hands and lower body separately to disentangle audio-agnostic gestures explicitly*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置与公平性保障
 
@@ -308,7 +313,9 @@ BEAT2 数据集本身的质量优势在 Table 3 的用户偏好中得到了验�
 ![[assets/figures/papers/paper_list_l1847_EMAGE_Towards_Unified_Holistic_Co_Speech_Gesture_Generation_via_Expressi/figures/003_Table_2.jpg]]
 *Table 2: Comparison of Co-Speech Gesture Models. We compare with previous methods for generating face or body motion trained on co-speech datasets. The first row lists their inputs, and the subsequent rows list their outputs, respectively. Different decoder designs are denoted by the initials*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心问题与瓶颈突破
 
@@ -369,6 +376,8 @@ EMAGE 处于**协同语音手势生成**与**掩码建模**的交叉点，其方
 - **全身网格级建模**：整合 SMPL-X 身体模型与 FLAME 面部模型，填补了此前数据集（如 BEAT 仅提供骨架，TalkSHOW 使用伪真值）在网格级全身表示上的空白。
 
 该方法为后续研究提供了两个可扩展方向：**（1）** 组合式 VQ-VAE 架构可作为多部位运动解耦的通用模板，支持更细粒度的部位分解（如左右手独立建模）；**（2）** 掩码姿态提示机制为交互式手势编辑、风格迁移和少样本自适应提供了统一的接口。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICRA
 year: 2026
 pdf_ref: paperPDFs/ICRA_2026/DriveCritic_Towards_Context_Aware_Human_Aligned_Evaluation_for_Autonomous_Driving_with_Vision_Language_Models.pdf
+project_link: https://song-jingyu.github.io/DriveCritic
+code_link: null
 aliases:
 - DriveCritic
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | DriveCritic：面向自动驾驶的上下文感知、与人类对齐的视觉语言模型评估 |
 | 英文题名 | DriveCritic: Towards Context-Aware, Human-Aligned Evaluation for Autonomous Driving with Vision-Language Models |
 | 会议/期刊 | ICRA 2026 |
-| Links | [paper](https://arxiv.org/abs/2510.13108); [Project](https://song-jingyu.github.io/DriveCritic) |
+| Links | [paper](https://arxiv.org/abs/2510.13108) · [Project](https://song-jingyu.github.io/DriveCritic) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | DriveCritic |
 | Dataset | DriveCritic test set |
@@ -40,7 +42,7 @@ claims:
 > - DriveCritic test set 上，Accuracy 为 0.760，对比 0.480，变化 +0.280。
 > - DriveCritic test set 上，Accuracy 为 0.760，对比 0.645，变化 +0.115。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -68,7 +70,7 @@ $$\mathrm{EPDMS} = \left( \prod_{m \in \mathcal{M}_{\mathrm{pen}}} s_m \right) \
 
 DriveCritic 在方法谱系中处于**基于 VLM 的评估器**这一新兴方向，区别于传统规则化指标和纯监督学习分类器。其核心贡献在于证明了通过精心设计的偏好数据集和两阶段强化学习训练，VLM 可以被塑造为与人类高度对齐的驾驶评估器。然而，当前方法仍面临若干局限：数据集仅覆盖 NAVSIM 中的两种特定场景模式，泛化性有待验证；偏好标注由单一专家完成，可能存在主观偏差；VLM 推理的计算成本远高于规则化指标，制约大规模部署。
 
-## 背景与动机
+
 
 自动驾驶系统的闭环评估高度依赖开环指标来筛选候选规划器，因为在真实世界中穷举测试每一种驾驶场景既不安全也不经济。然而，当前最先进的开环评估指标——扩展预测驾驶模型得分（EPDMS，Cao et al., CoRL 2025）——虽然通过组合安全惩罚项与轨迹质量子分数实现了多维度量化，却暴露了一个根本性的“语境盲点”：它无法理解驾驶行为的上下文合理性。
 
@@ -82,7 +84,9 @@ Figure 1中的动机示例直观地展示了这一矛盾：轨迹A为与相邻�
 
 因此，本文的核心动机在于：构建一个能够像人类专家一样综合视觉场景信息与符号化指标、做出上下文感知偏好判断的评估器，从而填补规则化指标在“语境理解”上的根本性缺口。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DriveCritic 的核心创新在于将自动驾驶轨迹评估从**硬编码规则空间迁移到可微调的视觉语言模型（VLM）空间**，从而赋予评估器上下文感知的类人判断能力。以下从评估器类型、输入模态、训练范式和输出形式四个维度，系统梳理其相对于现有基线的关键变化。
 
@@ -127,7 +131,7 @@ DriveCritic 的四项核心改变构成了一条完整的创新链条：**多模
 
 **需要手动验证的点**：当前数据集仅覆盖 NAVSIM 中的两种特定场景类型（车道-进度权衡与纯进度对比），模型在更广泛驾驶场景下的泛化能力尚未验证；偏好标注由单一领域专家完成，标注准则的普适性有待多评分者间信度分析确认。
 
-## 整体框架
+
 
 DriveCritic 的整体框架围绕一个核心洞察构建：**利用视觉语言模型（VLM）的常识推理能力，将驾驶场景的视觉与符号线索映射到人类偏好，是克服规则化指标“语境盲点”的关键**。该框架将自动驾驶轨迹评估重新定义为一个**成对偏好判断任务**，并通过精心设计的多模态输入和两阶段训练，使 VLM 评估器能够内化安全、进度与社会规范的复杂权衡。
 
@@ -183,7 +187,7 @@ DriveCritic 的整体框架围绕一个核心洞察构建：**利用视觉语言
 
 当前框架的主要局限包括：数据集仅覆盖 NAVSIM 中两种特定场景（车道-进度权衡与纯进度对比），泛化性尚未在更多数据集上验证；偏好标注由单一领域专家完成，可能存在个人主观偏差；模型缺乏时序上下文，无法处理需要时序推理的动态场景；VLM 推理的计算成本远高于规则化指标，大规模部署时面临算力与能耗瓶颈。
 
-## 核心模块与公式推导
+
 
 ### 规则化基线的结构缺陷：EPDMS 公式解析
 
@@ -224,7 +228,9 @@ $$\mathrm{RR} = \frac{1}{|D|} \sum_{i=1}^{|D|} \mathbb{I}[y^i = \hat{y}^{\bar{i}
 
 其中 $y^i$ 为原始顺序下的预测标签，$\hat{y}^{\bar{i}}$ 为交换 A/B 轨迹位置后的预测标签。该指标衡量模型是否过度依赖轨迹呈现顺序而非轨迹本身的质量。DriveCritic 的 RR 达到 81.8%，表明模型在绝大多数情况下保持了评估的客观性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验结果
 
@@ -298,7 +304,9 @@ Table I 提供了理解规则化指标局限性的关键证据：人类专家轨
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2510_13108/figures/008_Table.jpg]]
 *Table: VI: Robustness under trajectory-position flip on the DriveCritic test set. “No-flip acc.” and “flip acc.” are the standard accuracies before and after swapping the trajectory order. RR denotes robustness rate as defined above*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从规则化指标到VLM评估器
 
@@ -337,6 +345,8 @@ $$\mathrm{EPDMS} = \left( \prod_{m \in \mathcal{M}_{\mathrm{pen}}} s_m \right) \
 **时序推理能力的融入。** 如何有效融合时序信息以处理动态场景？可能的方案包括：输入连续帧的视频而非静态图像；引入时序位置编码或记忆机制；或显式建模交通参与者的运动预测作为评估的辅助输入。
 
 **评估标准的可解释性。** DriveCritic生成的推理文本提供了评估的可解释性，但如何系统验证推理的正确性和完整性？如何确保模型不是因为“学会了说正确的话”而非“真正理解了场景”才做出正确判断？这需要设计更具挑战性的反事实测试和推理忠实度评估方法。
+
+
 
 ## 原文 PDF
 

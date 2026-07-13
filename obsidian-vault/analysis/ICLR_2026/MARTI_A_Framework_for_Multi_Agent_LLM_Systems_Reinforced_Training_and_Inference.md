@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/MARTI_A_Framework_for_Multi_Agent_LLM_Systems_Reinforced_Training_and_Inference.pdf
+project_link: null
+code_link: https://github.com/TsinghuaC3I/MARTI
 openreview_forum_id: E7jZqo0A50
 aliases:
 - MMARTI
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | MARTI：多智能体LLM系统强化训练与推理框架 |
 | 英文题名 | MARTI: A Framework for Multi-Agent LLM Systems Reinforced Training and Inference |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=E7jZqo0A50); [GitHub](https://github.com/TsinghuaC3I/MARTI) |
+| Links | [paper](https://openreview.net/forum?id=E7jZqo0A50) · [GitHub](https://github.com/TsinghuaC3I/MARTI) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | MARTI (Multi-Agent Reinforced Training and Inference) |
 | Dataset | AIME (DeepScaleR-1.5B-Preview), Llama-3.2-3B-Instruct (avg over AIME/AMC/MATH500), Qwen2.5-3B (avg over AIME/AMC/MATH500) |
@@ -42,7 +44,7 @@ claims:
 > - Llama-3.2-3B-Instruct (avg over AIME/AMC/MATH500) 上，Avg Accuracy 为 32.1 (MAD 2×2 + RL MARTI)，对比 28.7 (Single Agent + RL)，变化 +3.4。
 > - Qwen2.5-3B (avg over AIME/AMC/MATH500) 上，Avg Accuracy 为 46.0 (MAD 2×2 + GRPO)，对比 37.9 (Single-Agent + GRPO)，变化 +8.1。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有基于大语言模型（LLM）的多智能体系统（MAS）普遍沿用单智能体训练范式，导致智能体难以有效遵循角色指定，也无法充分利用智能体间的交互信息。这使得多智能体工作流（如辩论、链式协作）在实际执行中频繁失败，性能提升远低于预期。
 
@@ -56,7 +58,7 @@ claims:
 
 **方法定位**：MARTI 是首个同时支持多智能体推理与多智能体强化学习训练的框架。相较于仅支持单智能体 RL 的 TRL、OpenRLHF、verl，以及仅支持 MAS 推理但缺乏 MAS RL 的 AReaL，MARTI 填补了多智能体协作训练的基础设施空白（见 Table 1）。框架基于 OpenRLHF 构建，支持异步多轮交互生成，在深层交互场景下可有效降低端到端延迟。
 
-## 背景与动机
+
 
 大型语言模型（LLM）在单智能体推理任务上已取得显著进展，通过强化学习（RL）训练，模型能够发展出反思、验证和自我纠错等高级认知行为。然而，当这些经过RL训练的单智能体被直接部署到多智能体系统（MAS）中时，其协作能力往往不尽如人意。现有LLM多智能体系统普遍采用单智能体训练范式，导致智能体无法有效遵循角色指定，也难以充分利用智能体间的交互信息，最终造成多智能体工作流失败，性能提升有限。
 
@@ -64,7 +66,9 @@ claims:
 
 MARTI的动机正是弥合这一缺口。其核心洞察在于：在相同的推理预算下，通过多智能体强化学习训练，多智能体系统能够超越单智能体系统的性能上限。初步实验表明，基于DeepScaleR-1.5B-Preview的多智能体辩论工作流在AIME基准上达到65.0分，显著超越单智能体RL基线的53.5分，验证了这一假设。为实现这一目标，MARTI采用多智能体强化学习范式，通过集中式交互协调与分布式策略训练，使每个智能体在保持独立策略更新的同时，能够感知并利用同伴的生成结果。此外，MARTI引入基于历史表现对比的delta式奖励塑形机制，以稳定多轮协作训练中的非平稳性问题——这是多智能体RL训练能否成功的关键因素。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MARTI 的核心创新在于将多智能体交互从推理时的静态编排提升为可训练的协作策略，并通过三项关键设计解决现有方法的瓶颈。
 
@@ -101,7 +105,7 @@ $$Q_{t}^{i} = \frac{1}{|\mathcal{H}_{t}^{i}|} \sum_{k \in \mathcal{H}_{t}^{i}} R
 
 传统多智能体系统采用同步批量生成，在交互轮次加深时端到端延迟线性增长。MARTI 是首个支持多轮多智能体场景异步生成的框架，允许不同智能体在不同时间步独立执行推理。实验表明，异步生成在深度交互工作流中能有效降低延迟：Chain-of-Agents 在异步 ×512 设置下从同步的 612.6s 降至 498.4s。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l4_https_openreview_net_forum_id_E7jZqo0A50/figures/002_Figure_1.jpg]]
 *Figure 1: Overview and motivation behind of MARTI*
@@ -152,7 +156,7 @@ MARTI是首个在多轮多智能体场景中支持异步生成的框架。在交
 
 Table 1将MARTI与现有框架进行了系统对比。现有MAS框架（CAMEL、AutoGen、MetaGPT、GPTSwarm等）仅支持多智能体推理，缺乏RL训练能力；RL框架（TRL、OpenRLHF、verl）仅支持单智能体RL；AReaL虽支持MAS推理，但缺少MAS RL功能。MARTI是首个同时支持多智能体推理与多智能体强化学习训练的框架，填补了这一关键空白。MARTI底层基于OpenRLHF构建，以确保RL训练的可扩展性和高性能。
 
-## 核心模块与公式推导
+
 
 ### 三大核心模块
 
@@ -188,7 +192,9 @@ $$\tilde{R}_{t}^{i} = R_{t}^{i} + \alpha \cdot \Delta_{t}^{i}$$
 
 该奖励塑形机制的关键因果作用在消融实验中得到验证：移除奖励塑形后，MAD 2×2 的平均性能从 45.6 降至 36.6，MoA 3×1 从 43.1 降至 38.1（Table 4），表明 delta 式奖励塑形对稳定多智能体多轮 RL 训练至关重要。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：多智能体RL突破单智能体性能上限
 
@@ -246,7 +252,9 @@ Table 5展示了MARTI异步生成机制的实际效果。对于交互深度较�
 
 当前实验主要在数学推理数据集（AIME、AMC、MATH500）上验证，真实世界任务的泛化性尚未探索。此外，多智能体RL的奖励模型仍依赖基于规则的奖励或生成式奖励模型（GenRMs），在复杂协作场景下可能不够精细。框架虽支持异步生成，但大规模并行时仍受计算资源约束。这些限制提示，MARTI在代码生成、科学推理等领域的适用性，以及更精细的多智能体专用奖励模型设计，是未来需要重点验证的方向。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 多智能体LLM系统的训练范式断层
 
@@ -293,6 +301,8 @@ MARTI的当前验证集中在**数学推理领域**（AIME、AMC、MATH-500）�
 3. **on-policy与off-policy的混合策略**：MARTI当前采用on-policy的RL训练（每个rollout后立即更新策略），但在多智能体场景中，off-policy的经验回放可能有助于提高样本效率。如何在非平稳环境中安全地混合两种策略，是一个开放的理论和实践问题。
 
 4. **异构智能体和动态拓扑**：未来多智能体系统可能包含具有不同能力、知识库和目标的智能体，交互拓扑也可能随任务动态调整。MARTI的集中式协调架构能否扩展到此场景，以及如何设计相应的信用分配机制，值得进一步探索。
+
+
 
 ## 原文 PDF
 

@@ -42,7 +42,7 @@ claims:
 > - COLOSSEUM 上，Avg. Success Rate (%) 65.9 vs 64.0 (BridgeVLA) (+1.9)。
 > - GemBench 上，Avg. Success Rate (%) 51.3 vs 50.0 (Previous SOTA) (+1.3)。
 
-## 概述
+## 概要
 
 机器人操作任务日益要求长周期、精细化的三维空间推理，然而现有视觉-语言-动作（VLA）模型普遍依赖静态或手腕相机，无法根据任务需求动态调整视角与分辨率，导致在遮挡严重或需精细定位的场景中感知信息严重不足。**ActiveVLA** 针对这一瓶颈，提出将主动感知注入VLA框架：通过**主动视角选择**与**主动三维缩放**两个核心机制，使机器人能够自适应地获取高质量视觉信息，从而在复杂三维操作中实现精确、鲁棒的决策。
 
@@ -51,8 +51,6 @@ claims:
 在三个主流基准上的实验结果验证了上述设计的有效性。在 **RLBench** 的18项任务中，ActiveVLA平均成功率达到 **91.8%**，较此前最优方法BridgeVLA（88.2%）提升3.6个百分点，且在10项任务上取得第一。在鲁棒性基准 **COLOSSEUM** 上，ActiveVLA平均成功率为 **65.9%**，比BridgeVLA（64.0%）高出1.9个百分点，在多种视觉与空间扰动下保持领先。在 **GemBench** 上同样达到 **51.3%**，超越此前最优结果（50.0%）。消融实验进一步揭示：固定视角基线成功率为87.6%，单独加入主动视角选择后提升至89.4%，再叠加主动三维缩放后达到最终的91.8%，两个模块各自贡献明确。真实世界遮挡任务中，ActiveVLA整体成功率达 **96.3%**，在“红色到绿色方块”等精细任务上相比TriVLA提升高达41个百分点，展现出从仿真到真实场景的强泛化能力。
 
 在方法谱系与知识库定位上，ActiveVLA属于**三维VLA + 主动感知**的交叉方向。其基线对比覆盖了从早期行为克隆方法（Image-BC、C2F-ARM-BC）、三维操作专用架构（PerAct、Act3D、RVT及其改进版RVT-2、3D Diffuser Actor），到最新的VLA模型（BridgeVLA），以及基于预训练视觉表征的策略（R3M-MLP、MVP-MLP）。ActiveVLA在所有这些基线之上取得了一致且显著的提升，表明主动感知并非对现有架构的简单修补，而是从根本上改变了视觉信息的获取方式，为VLA模型处理复杂三维操作提供了新的范式。
-
-## 背景与动机
 
 ### 机器人操作中的感知瓶颈
 
@@ -74,7 +72,7 @@ ActiveVLA 的核心洞察在于：**机器人应当像人类一样，根据任�
 
 这一范式的技术可行性建立在 3D 点云的可重渲染特性之上：只要场景被重建为点云，就可以从任意虚拟视角合成新的观测图像，无需物理移动相机。ActiveVLA 通过粗略到精细的两阶段流程实现这一过程——首先在粗阶段定位关键 3D 区域，随后在细阶段围绕该区域执行主动感知优化，最终输出精确的操作动作。
 
-## 核心创新
+## 核心方法与创新机理
 
 ActiveVLA 的核心创新在于将**主动感知（Active Perception）**引入视觉-语言-动作（VLA）模型，使机器人能够根据任务需求动态调整感知策略，而非被动接受固定相机提供的有限信息。这一创新围绕三个紧密耦合的 changed slots 展开。
 
@@ -91,8 +89,6 @@ ActiveVLA 的核心创新在于将**主动感知（Active Perception）**引入�
 ActiveVLA 将感知过程重构为**两阶段粗略到精细（Coarse-to-Fine）策略**，改变了 VLA 模型端到端直接预测的感知粒度。粗阶段将 3D 点云投影为三个正交视图（顶、前、右），通过 PaliGemma 骨干网络生成 2D 热图，再反向投影到 3D 空间定位关键区域。细阶段则基于该区域执行主动视角选择和 3D 缩放，生成高信息密度的局部观测用于最终动作预测。这种“探索（视角选择）与利用（缩放放大）”分离的层级化感知策略，使模型能够自适应地分配计算和感知资源到任务最相关的空间位置。
 
 上述三个 changed slots 构成了 ActiveVLA 的因果调节旋钮：主动视角选择解决了“从哪看”的问题，主动 3D 缩放解决了“看多细”的问题，而粗略到精细的感知粒度则将两者组织为高效的层级化框架。消融实验（Table 4）证实了这一因果链：固定视角基线在 RLBench 上的成功率为 87.6%，仅添加主动视角选择提升至 89.4%，进一步添加主动 3D 缩放达到最终 91.8%，验证了每个模块的独立贡献。
-
-## 整体框架
 
 ActiveVLA 是一个三维视觉-语言-动作（3D VLA）框架，其核心设计动机在于解决现有 VLA 方法因固定相机视角而导致感知信息不足的问题。传统 VLA 系统在长周期精细操作中，常因相机遮挡或分辨率固定而丢失关键视觉细节，ActiveVLA 通过引入**主动感知（Active Perception）** 机制，使机器人能够根据任务上下文自适应地调整观测视角与空间分辨率。
 
@@ -150,8 +146,6 @@ $$S(\mathbf{g}) = \sum_{v=1}^{3} w_v h_v(\pi_v(\mathbf{g}))$$
 
 ![[assets/figures/papers/paper_list_l2178_https_arxiv_org_abs_2601_08325/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison between previous VLA methods and ActiveVLA. Traditional VLA systems often fail in tasks like “bring the apples on the table” because their fixed cameras miss critical details or become occluded. In contrast, ActiveVLA leverages 3D scene understanding to freely place virtual cameras and synthesize optimal viewpoints, enabling robots to adjust their view for clearer, more informative observations and thus achieve more reliable manipulation performance even under occlusion*
-
-## 核心模块与公式推导
 
 ### 3.1 问题形式化
 
@@ -212,7 +206,7 @@ $$W(z) = 2d \tan\left(\frac{\alpha}{2z}\right)$$
 ![[assets/figures/papers/paper_list_l2178_https_arxiv_org_abs_2601_08325/figures/005_Figure_3.jpg]]
 *Figure 3: Qualitative results of fine-grained manipulation tasks. Left of the dotted line (coarse stage): (a) project 3D modalities onto orthographic images, then (b) predict heatmaps to mark critical regions. Right of the dotted line (fine stage): using these regions, perform (c) active view selection and (d) active 3D zoom-in for fine-grained manipulation in complex scenes*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -279,14 +273,11 @@ Figure 5展示了两个关键超参数的影响：
 ![[assets/figures/papers/paper_list_l2178_https_arxiv_org_abs_2601_08325/figures/011_Table_6.jpg]]
 *Table 6: Success rates (%) of ActiveVLA under different perturbations in COLOSSEUM. We report mean and standard deviation over multiple trials for tasks with diverse visual and spatial perturbations. ActiveVLA achieves consistently high performance, demonstrating robustness to environmental variations and the benefit of active perception for precise manipulation*
 
-![[assets/figures/papers/paper_list_l2178_https_arxiv_org_abs_2601_08325/figures/016_Figure_8.jpg]]
-*Figure 8: Visualization of occlusion-heavy and spatially complex tasks. These tasks challenge ActiveVLA’s active viewpoint selection and 3D zoom-in capabilities. They include multi-layered drawer retrieval (towel), high-precision stacking with partial occlusion (red to green block), collision-aware grasping in clutter (occluded banana), and narrow-grasp extraction from a hanging rack (purple cup), highlighting severe occlusions, complex geometry, and fine-grained 6D pose reasoning*
-
 ![[assets/figures/papers/paper_list_l2178_https_arxiv_org_abs_2601_08325/figures/006_Table.jpg]]
 
 ![[assets/figures/papers/paper_list_l2178_https_arxiv_org_abs_2601_08325/figures/007_Figure.jpg]]
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 核心问题与因果杠杆
 

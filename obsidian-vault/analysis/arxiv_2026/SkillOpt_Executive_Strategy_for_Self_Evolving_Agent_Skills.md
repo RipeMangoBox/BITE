@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2026
 pdf_ref: paperPDFs/arxiv_2026/SkillOpt_Executive_Strategy_for_Self_Evolving_Agent_Skills.pdf
+project_link: null
+code_link: https://aka.ms/SkillOpt
 aliases:
 - SkillOpt
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | SkillOpt：自进化智能体技能的优化策略 |
 | 英文题名 | SkillOpt: Executive Strategy for Self-Evolving Agent Skills |
 | 会议/期刊 | arXiv 2026 |
-| Links | [paper](https://arxiv.org/abs/2605.23904) · [Code](https://aka.ms/SkillOpt) · [arXiv](https://arxiv.org/abs/2410.07985) |
+| Links | [paper](https://arxiv.org/abs/2605.23904) · [Code](https://aka.ms/SkillOpt) · [paper](https://arxiv.org/abs/2410.07985) |
 | Topic | #topic/other_unclear #topic/other_unclear/general |
 | Method | SkillOpt |
 | Dataset | SearchQA, SpreadsheetBench, OfficeQA, DocVQA |
@@ -40,7 +42,7 @@ claims:
 > - SpreadsheetBench 上，准确率 (%) 80.7 vs 41.8 (+38.9)。
 > - OfficeQA 上，准确率 (%) 72.1 vs 33.1 (+39.0)。
 
-## 概述
+## 概要
 
 ### 问题背景与核心瓶颈
 
@@ -71,7 +73,7 @@ SkillOpt的关键创新在于引入**分离的优化器模型**（前沿模型�
 
 SkillOpt在**52个评估单元**（涵盖不同模型、基准和执行环境）中全部达到最佳或并列最佳。在GPT-5.5直接聊天设置下，六个基准的平均准确率从无技能的58.8提升至82.3（+23.5个百分点），其中SpreadsheetBench提升最为显著（从41.8到80.7，+38.9），OfficeQA次之（从33.1到72.1，+39.0）。优化的技能展现出正向跨模型、跨执行环境和跨基准迁移能力，无任何负迁移情况。消融实验证实，拒绝编辑缓冲区、慢速元更新和元技能等组件对性能有显著贡献——移除这些组件在SpreadsheetBench上导致得分从77.5骤降至55.0。
 
-## 背景与动机
+
 
 ### 智能体技能文档的生成与优化困境
 
@@ -112,7 +114,9 @@ SkillOpt的核心动机源于一个关键洞察：**深度学习训练中的成�
 
 这一方法论的核心优势在于：**优化的技能可跨模型、跨执行环境和跨基准正向迁移**——实验表明，SkillOpt在所有52个评估单元（模型×基准×执行环境）中均达到最佳或并列最佳，且未观察到任何负迁移情况（Table 4）。在GPT-5.5直接聊天模式下，六个基准的平均准确率从无技能的58.8%提升至82.3%，验证了受控迭代优化的有效性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SkillOpt 的核心创新在于将深度学习训练范式系统性地映射到文本技能优化空间，构建了一个受控的、基于验证的技能自进化框架。与现有方法相比，其关键差异体现在以下五个维度：
 
@@ -138,7 +142,7 @@ SkillOpt 在优化器侧维护**元技能（meta-skill）**，总结历史编辑
 
 综上，SkillOpt 通过有界编辑预算、验证门控、负反馈缓冲区、慢速/元更新和分离优化器五个相互协同的机制，将技能优化从一次性生成或无约束修订提升为可控的、数据驱动的迭代训练过程，在 52 个评估单元（模型×基准×执行环境）中全部达到最佳或并列最佳（Table 1），证明了该设计范式的有效性。
 
-## 整体框架
+
 
 SkillOpt 将智能体技能文档视为可优化的外部文本状态，通过一个“冻结目标模型 + 离线优化器”的分离式架构实现技能的受控进化。其核心设计理念是将深度学习训练范式（训练/验证/测试分割、学习率调度、动量、负反馈）映射到文本空间，在不修改模型权重的前提下完成领域适应。
 
@@ -186,7 +190,7 @@ Figure 2 展示了完整的迭代优化管道，包含以下核心模块：
 - **负反馈利用**：拒绝编辑缓冲区使优化器能从失败尝试中学习，避免重复无效的编辑方向。
 - **多时间尺度学习**：快速步级更新处理即时反馈，慢速跨 epoch 整合保留长期经验，元技能提供跨任务的编辑策略指导。
 
-## 核心模块与公式推导
+
 
 SkillOpt 将技能文档视为可训练的外部状态，通过分离的优化器模型在文本空间中对技能进行受控迭代更新，整个流程不修改目标模型的权重。其核心机制可以分解为以下模块。
 
@@ -242,7 +246,9 @@ SkillOpt 的一个关键设计选择是使用分离的优化器模型（通常�
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2605_23904/figures/007_Figure_3.jpg]]
 *Figure 3: Performance trends across epoch checkpoints on three benchmarks: (a) SpreadsheetBench, (b) SearchQA, and (c) LiveMath. For each checkpoint, we report the training rollout score, the selection-best score on the validation set, and the final performance on the unseen test set. The results show how skill quality evolves during optimization and whether the checkpoint preferred by validation selection aligns with the checkpoint that yields the best generalization to the test set*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -309,7 +315,9 @@ Figure 4展示了从最终部署技能中提取的代表性学习规则，每个
 ![[assets/figures/papers/paper_list_l3_https_arxiv_org_abs_2605_23904/figures/010_Figure_4.jpg]]
 *Figure 4: Representative learned rules, one per benchmark, extracted from the final best_skill.md of the GPT–5.5 / GPT–5.5 runs in Table 6. Each rule is verbatim from the deployed skill. Notably, every rule is procedural rather than instance-specific, and several encode forms of discipline (answer formatting, evidence binding, search-frontier management) that frontier models do not apply zero-shot*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 技能生成方法的演进脉络
 
@@ -364,6 +372,8 @@ SkillOpt 框架开启了若干值得探索的方向：
 ### 知识库定位总结
 
 SkillOpt 在智能体技能优化领域的位置可概括为：**将受控训练范式引入文本空间技能优化的系统性框架**。它区别于无约束自我修订方法（EvoSkill）、单轮提示优化方法（TextGrad, GEPA）和轨迹挖掘方法（Trace2Skill），通过文本学习率预算、验证门控、负反馈缓冲区和慢速元更新四个机制，实现了稳定、可迁移的技能优化。其核心洞察——将训练/验证/测试分割、学习率调度、动量等深度学习概念映射到文本空间——为未来文本空间优化方法的设计提供了可复用的范式。
+
+
 
 ## 原文 PDF
 

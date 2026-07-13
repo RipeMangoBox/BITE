@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2024
 pdf_ref: paperPDFs/CVPR_2024/Exploring_Vision_Transformers_3D_Human_Motion_Language_Models_Motion_Patches.pdf
+project_link: null
+code_link: https://github.com/
 aliases:
 - MPVO
 - EVT3HMLMMP
@@ -41,7 +43,7 @@ claims:
 > - HumanML3D (Small batches) 上，Text-motion R@1↑ 71.61 vs 67.45 (+4.16)。
 > - KIT-ML (All protocol) 上，Text-motion R@1↑ 14.02 vs 10.05 (+3.97)。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -70,7 +72,7 @@ claims:
 
 当前方法存在以下局限：运动-语言数据总量仍远小于图像-文本数据，限制了大模型潜力的充分释放；ViT-Large在KIT-ML等小数据集上出现性能退化，存在过拟合风险；零样本跨骨架识别的R@1仅为7.35%，跨域泛化仍有较大提升空间；运动补丁的语义可解释性有限，注意力图中的激活模式与具体运动语义的对应关系尚不明确。此外，该方法目前仅覆盖检索、分类和识别任务，尚未拓展至文本到运动生成。
 
-## 背景与动机
+
 
 ### 3D 人体运动-语言建模的核心瓶颈
 
@@ -101,7 +103,9 @@ claims:
 
 简言之，本文方法的因果机制可概括为：**运动补丁（统一表示） + 预训练 ViT（迁移学习） → 跨骨架泛化 + 数据高效学习**。这一设计在 HumanML3D 和 KIT-ML 两个基准数据集上均取得了最优的文本-运动检索性能，并首次展示了跨骨架零样本识别和有效迁移学习的能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于提出了一种全新的3D人体运动表示方法——**运动补丁（Motion Patches）**，并以此为基础，将**视觉Transformer（ViT）**成功引入运动-语言跨模态学习领域。该方法通过两个关键“changed slots”实现了对现有范式的突破。
 
@@ -133,7 +137,7 @@ Table 1的系统性对比凸显了这一创新的独特性：在已有工作中�
 
 在KIT-ML数据集上，同样的模式得到复现：预训练+补丁的R@1为14.02%，而从头训练补丁模型仅10.41%，不使用补丁则降至9.54%。跨数据集的证据一致性增强了结论的可靠性。
 
-## 整体框架
+
 
 本方法的核心思路是将3D人体运动序列转化为一种类图像的“运动补丁”（motion patches）表示，从而能够直接复用在大规模图像数据上预训练的视觉Transformer（ViT）作为运动编码器，并与文本编码器进行跨模态对比学习。整体框架由四个关键模块串联构成。
 
@@ -177,7 +181,7 @@ $$\mathcal{L}_{t2m} = -\frac{1}{B} \sum_i^B \log \frac{\exp(s(m_i, t_i) / \tau)}
 ![[assets/figures/papers/paper_list_l1848_Exploring_Vision_Transformers_3D_Human_Motion_Language_Models_Motion_Pat/figures/003_Figure_2.jpg]]
 *Figure 2: Overview of the proposed framework, which consists of a motion encoder and a text encoder. We transform the raw motion sequences into motion patches as the input of the ViT-based motion encoder. We calculate the similarity matrix between text-motion pairs within a batch to train the model. To illustrate this concept, we provide an example batch containing three samples for clarity*
 
-## 核心模块与公式推导
+
 
 ### 问题形式化与相似度度量
 
@@ -231,7 +235,9 @@ $$\mathcal{L} = \mathcal{L}_{m2t} + \mathcal{L}_{t2m} \tag{Eq. 4}$$
 ![[assets/figures/papers/paper_list_l1848_Exploring_Vision_Transformers_3D_Human_Motion_Language_Models_Motion_Pat/figures/005_Figure_4.jpg]]
 *Figure 4: Visualization of motion patches by regarding the joint coordinates as RGB pixels. We show the rendered motions and their text label on the left and the processed motion patches on the right. We can observe different motions reflected in different motion patches*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：文本-运动检索
 
@@ -316,7 +322,9 @@ Figure 5 展示了文本到运动检索的定性结果，检索到的运动与�
 ![[assets/figures/papers/paper_list_l1848_Exploring_Vision_Transformers_3D_Human_Motion_Language_Models_Motion_Pat/figures/010_Table_6.jpg]]
 *Table 6: Results of zero-shot motion classification. Modality with motion only and motion language are denoted as M and M+L, respectively. When applying our proposed method for zeroshot classification, we achieve performance results that are closely aligned with those of the 2s-AGCN classifier trained with supervision on the BABEL-60 benchmark*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与先前工作的关系
 
@@ -357,6 +365,8 @@ Figure 5 展示了文本到运动检索的定性结果，检索到的运动与�
 2. **生成式扩展**：运动补丁表示能否作为文本到运动生成模型的输入？若能，预训练ViT的中间层特征是否可用于条件生成？
 3. **注意力机制的可解释性**：Figure 7中的ViT注意力图激活模式与具体运动语义（如“跳跃”“挥手”）的对应关系是什么？能否通过探针任务量化分析？
 4. **跨模态迁移的泛化性**：该迁移学习策略能否推广到其他骨架型数据，如手势识别、面部动作编码或动物运动分析？
+
+
 
 ## 原文 PDF
 

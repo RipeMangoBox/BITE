@@ -44,7 +44,7 @@ claims:
 > - VFHQ cross-reenactment 上，APD↓ 7.764 vs 最佳基线 (见 Table 2) (最低)；AED↓ 0.652 vs 最佳基线 (见 Table 2) (最低)。
 > - FFHQ cross-reenactment 上，FID↓ 99.4 vs 最佳基线 (见 Table 3) (最低)。
 
-## 概述
+## 概要
 
 人像动画（portrait animation）的目标是给定一张源图像和一段驱动视频（或单张驱动图像），生成一个保持源身份、同时精确复刻驱动者头部姿态与表情的目标人像。现有基于扩散模型的方法——如 **X-Portrait**（Xie et al., SIGGRAPH 2024）、**Face-Adapter**（Han et al., ECCV 2024）、**Follow-Your-Emoji**（Ma et al., SIGGRAPH Asia 2024）等——通常以驱动者的面部关键点（landmark）或驱动原图作为运动条件。这类条件缺乏源与驱动之间的显式运动对应关系：模型需要从二维信号中隐式推断三维运动，当源与驱动在视角或身份上差异较大时，学习歧义严重，导致运动传递次优，甚至出现直接复制驱动图像的现象。
 
@@ -56,7 +56,7 @@ claims:
 
 **方法定位**：FG-Portrait 属于“基于扩散模型的人像动画”方法簇，其核心改进在于将运动条件从二维信号升级为基于参数化头部模型的几何驱动3D流编码。在方法谱系上，它继承了 ControlNet 的条件注入范式，但在运动表征层面实现了从“隐式学习对应”到“显式几何对应”的范式跃迁。
 
-## 背景与动机
+
 
 人像动画（Portrait Animation）的目标是给定一张源图像与一段驱动视频（或单张驱动图像），生成一个目标人像视频，使其保持源人物的身份信息，同时准确复现驱动的头部姿态与表情。这一任务在虚拟数字人、视频会议、影视制作等场景中具有广泛的应用前景。
 
@@ -72,7 +72,9 @@ claims:
 
 进一步地，本文提出**深度引导采样（Depth-Guided Sampling）** 机制，将3D流编码为扩散模型可理解的条件信号，使网络获得像素级的精确运动引导。这一设计从根本上解决了扩散模型“猜测”运动对应关系的歧义问题，在保持源身份的同时实现高保真的运动传递。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈：扩散模型缺乏显式运动对应
 
@@ -119,7 +121,7 @@ $$\boldsymbol{p}_{tgt}^{n} = H \left[ d_{n} \left( K^{-1} q_{tgt} \right)^{\top}
 $$\psi_{dri} \leftarrow \psi_{dri} + \Delta \psi_{usr}, \quad \theta_{dri} \leftarrow \theta_{dri} + \Delta \theta_{usr}$$
 编辑后的系数重新驱动 3D 流计算，无需重新训练或微调，即可生成符合用户指定运动的目标图像（Fig. 8）。
 
-## 整体框架
+
 
 FG-Portrait 的整体 pipeline 围绕一个核心设计展开：**将显式的3D运动对应关系编码为扩散模型的条件信号**，从而在保持源人物身份的同时，高保真地传递驱动运动的姿态与表情。框架由三个逻辑阶段串联构成：**3D头部建模与流计算**、**深度引导采样与3D流编码**、**条件扩散生成**。
 
@@ -167,7 +169,7 @@ FG-Portrait 在肖像动画领域的方法谱系中占据一个独特位置。�
 
 **局限与待验证点**：深度引导采样依赖FLAME的准确拟合，极端姿态或遮挡下FLAME估计误差可能传播至3D流质量；当前方法未显式建模头发、服装等非面部区域的运动，这些区域的运动传递精度可能不足。对于卡通肖像的泛化能力有限（Figure 11），需要额外的数据增强或域适应策略。
 
-## 核心模块与公式推导
+
 
 FG-Portrait 的核心创新在于用**无需学习的几何驱动3D流**替代传统扩散模型中的隐式运动条件，并通过**深度引导采样**将其编码为 ControlNet 的显式运动先验。以下按管线顺序阐述关键模块及其公式。
 
@@ -241,7 +243,9 @@ $$\psi_{dri} \leftarrow \psi_{dri} + \Delta \psi_{usr}, \quad \theta_{dri} \left
 ![[assets/figures/papers/paper_list_l1021_https_arxiv_org_abs_2603_23381/figures/002_Figure_2.jpg]]
 *Figure 2: Visualization of 3D flows. Target portrait is the animated image with the source identity and driving motion. Target 3D head is the head model of target portrait, which is pre-computed by assembling source shape and driving motion parameters. We select some corresponding points both in the 2D and 3D, with red denoting the source and green denoting the target position. The 3D flows (black lines) correctly reflect the displacement from the target to the source position for each point. The yellow circles mark one example of a pair of points and the corresponding 3D flow*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -342,7 +346,9 @@ $$\psi_{dri} \leftarrow \psi_{dri} + \Delta \psi_{usr}, \quad \theta_{dri} \left
 ![[assets/figures/papers/paper_list_l1021_https_arxiv_org_abs_2603_23381/figures/014_Table_8.jpg]]
 *Table 8: Ablation study of δ in the self-reenactment on VFHQ*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 
@@ -412,6 +418,8 @@ FG-Portrait 的有效性建立在以下前提之上，这些前提也划定了�
 ---
 
 **证据强度说明**：以上分析中，关于FLAME依赖、卡通域泛化局限、非面部区域建模不足等判断直接来自论文自身的局限性讨论（Fig. 11 及 Sec. C）。开放问题部分基于方法设计逻辑的合理推演，其中“极端姿态鲁棒性”和“非面部区域扩展”属于论文未充分探索的方向，需后续工作验证。
+
+
 
 ## 原文 PDF
 

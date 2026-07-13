@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/A_Function_Centric_Graph_Neural_Network_Approach_for_Predicting_Electron_Densities.pdf
+project_link: null
+code_link: null
 aliases:
 - BOAB
 - FCGNNAPED
@@ -42,13 +44,13 @@ claims:
 > - QM9 PySCF 上，NMAE [%] 为 0.116 ± 0.006 (BOA large)，对比 0.18 (ResNet)，变化 -35.6%。
 > - MD - ethanol 上，NMAE [%] 为 0.710 ± 0.004 (BOA small)，对比 0.82 (ELECTRA)，变化 -13.4%。
 
-## 概述
+## 概要
 
 本文提出了一种以函数为中心的图神经网络架构——基重叠架构（Basis Overlap Architecture, BOA），用于直接从分子几何结构预测电子密度。传统方法在原子中心基组中线性展开电子密度，需要大量基函数才能达到高精度，且无法有效利用密度矩阵的低秩结构。BOA的核心创新在于采用二次展开（quadratic expansion）表示电子密度，灵感来源于KS-DFT中密度矩阵的自然形式，并通过低秩表示避免显式构造完整的密度矩阵。模型将内部特征解释为在原子中心基组中表示的函数，并利用基函数的重叠矩阵设计消息传递机制，使模型天然具备分子几何信息和旋转等变性。
 
 在QM9数据集上，BOA在VASP和PySCF两种参考密度计算方式下均超越此前所有方法，NMAE分别达到0.1339%和0.116%，相比此前最佳方法SCDP和ResNet分别降低23.5%和35.6%的误差。在MD数据集上，BOA在6个分子中的5个上取得最优结果，在1个分子上持平。此外，仅使用较小截断半径（r_mp=3Å, r_e=2Å）训练的BOA模型在泛化到更大分子（QMugs数据集，最大近200个原子）时优于ResNet，展示了良好的泛化能力。消融实验证实二次展开显著优于线性展开（NMAE: 0.1381% vs 0.2716%），更大的基组（def2-QZVPPD）和径向修正均带来一致的性能提升。
 
-## 背景与动机
+
 
 电子密度是量子化学计算中的核心物理量，其精确预测对于理解分子性质、加速材料设计具有重要意义。然而，现有基于深度学习的电子密度预测方法面临一个根本性的表示瓶颈：传统方法采用原子中心基组的线性展开形式 $\rho(\mathbf{r}) = \sum_a \sum_\mu p_{a\mu} \omega_\mu^{Z_a}(\mathbf{r} - \mathbf{r}_a)$，这种表示需要大量基函数才能达到高精度，且无法有效利用密度矩阵内在的低秩结构。尽管已有多种方法被提出——包括基于等变图神经网络的 eqDeepDFT、InfGCN、ChargE3Net，基于神经算子的 GPWNO，以及基于扩散模型的 ELECTRA 等——但这些方法在表示效率和精度之间始终存在权衡。
 
@@ -62,7 +64,9 @@ $$\rho(\mathbf{r}) = \sum_{a \in \mathcal{N}} \hat{g}_a^{(l)}(\mathbf{r}) \hat{g
 
 现有方法的缺口在于：线性展开无法有效捕获密度矩阵的低秩结构，导致表示效率低下；而二次展开虽然更符合物理本质，但此前缺乏有效的深度学习框架来实现这一表示。BOA 通过函数消息传递和基函数重叠矩阵的设计，弥合了这一差距。实验结果表明，二次展开相比线性展开将 NMAE 从 0.2716% 降低至 0.1381%（Table 5），验证了这一核心设计选择的有效性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 BOA（Basis Overlap Architecture）的核心创新在于将分子图神经网络中的内部特征显式地解释为在原子中心基组中展开的函数，并基于此设计了一套完整的函数级消息传递与密度表示机制。这一范式转变直接针对传统方法在原子中心基组中线性展开电子密度时，需要大量基函数且无法利用密度矩阵低秩结构的瓶颈。
 
@@ -82,7 +86,7 @@ $$
 
 这些创新的因果链是：二次展开利用密度矩阵的低秩结构→减少所需参数并提升表示精度；函数级消息传递使模型能直接操作与物理量（电子密度）同构的表示→提升等变性和数据效率；可学习的初始猜测和径向修正→进一步降低优化难度。最终，BOA在QM9 VASP数据集上达到0.1339% NMAE，比此前最佳方法SCDP（0.175%）降低23.5%；在QM9 PySCF数据集上达到0.116% NMAE，比ResNet（0.18%）降低35.6%（Table 1）。在MD数据集的6个分子中，BOA在5个上取得最佳结果，1个持平（Table 2）。值得注意的失败模式是：使用较大截断半径（$r_{\text{mp}}=6\text{Å}, r_{\text{e}}=3\text{Å}$）的BOA模型在泛化到更大分子（QMugs）时性能不如ResNet，但使用较小截断半径（$r_{\text{mp}}=3\text{Å}, r_{\text{e}}=2\text{Å}$）的模型反而超越ResNet（Figure 4），说明大截断半径引入的噪声可能损害泛化能力。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0002_HDdkFjFEZd_A_Function-Centric_Graph_Neural_Network_Approach/figures/001_Figure_1.jpg]]
 *Figure 1: The Basis Overlap Architecture (BOA). (A) The node embeddings are updated using BOA blocks, which contain a function message passing step to facilitate communication between nodes. The edge features are modified using the edge update block, which uses the current edge and node features to calculate new edge features. The output of the BOA backbone consists of coefficients used to expand the density in atom-centered Gaussian-type basis functions (Sec. 2.1). In the partial channel mean the number of channels is reduced by taking the mean of groups of channels. M denotes the molecular geometry and $\mathbf { r } _ { g }$ are the grid positions with g $\in \{$ 1 , $\ldots , N ^ { g } \}$ and $N ^ { g...$
@@ -118,7 +122,7 @@ BOA 与现有方法的关键区别在于其密度表示形式和消息传递机�
 
 **证据强度说明**：上述所有模块描述均有明确的论文锚点支持，置信度在 0.95-1.0 之间。二次展开与线性展开的性能对比有 Table 5 的定量证据支持，置信度 1.0。
 
-## 核心模块与公式推导
+
 
 ### 密度表示的瓶颈与二次展开
 
@@ -192,7 +196,9 @@ BOA 的等变非线性通过计算标量不变量并用 MLP 变换后加权原�
 
 `NMAE(ρ̃, ρ) = (∫ dr |ρ̃(r) - ρ(r)|) / (∫ dr |ρ(r)|)`
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果：BOA在QM9和MD数据集上全面超越此前最优方法
 
@@ -260,7 +266,9 @@ Figure 5展示了BOA large和SCDP在QM9 VASP测试集上的误差分布。两种
 - **Figure 5**：BOA在高电子密度区域的误差显著小于SCDP，表明其能更精确地表示原子核附近的电子结构。
 - **Table 7**：BOA的推理时间与现有方法相当，使用小基组可进一步降低计算成本。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与 Baseline / Follow-up 的关系
 
@@ -292,6 +300,8 @@ BOA 在三个基准上均达到最优：
 2. **基组学习**：能否通过学习高斯基函数的指数，或使重叠矩阵和库仑矩阵在训练中可微调，来进一步提升表示效率？这需要解决梯度计算和数值稳定性问题。
 3. **大规模系统**：如何进一步降低 BOA 在大分子上的计算成本？当前的时间缩放（Figure 4A）显示 BOA 的复杂度随原子数增长较快，可能需要引入稀疏化或分层策略。
 4. **周期表覆盖**：如何将 BOA 扩展到覆盖元素周期表中更广泛的原子类型？当前仅针对 C、H、O、N 等轻元素验证，对过渡金属等复杂原子的适用性未知。
+
+
 
 ## 原文 PDF
 

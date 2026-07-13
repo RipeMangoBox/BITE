@@ -43,7 +43,7 @@ claims:
 > - FMB 上，SD 38.213 (best)；MI 2.487 (best)；EN 7.038 (best)。
 > - LLVIP 上，SD 40.584 (best)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -63,7 +63,7 @@ ReCoFuse 将信息恢复建模为基于均值回复随机微分方程（IR-SDE�
 - **消融验证**：移除 TIM（即取消互惠耦合）导致可见光和红外恢复分支的 PSNR/SSIM 显著下降（VIS PSNR 25.205→24.928，IR PSNR 33.294→32.172），证实跨模态反馈对信息恢复的关键作用。
 - **下游任务**：在语义分割任务上，基于 ReCoFuse 融合图像的 mIoU 达到 57.67，优于所有对比方法，表明其在高级视觉任务中的优越性。
 
-## 背景与动机
+
 
 图像融合旨在将多模态传感器捕获的互补信息整合为单一、信息丰富的表示，在自动驾驶、安防监控、遥感侦察等场景中具有关键应用价值。可见光图像提供丰富的纹理与色彩细节，但在低光、雾霾、烟雾等恶劣条件下信息严重退化；红外图像虽能穿透部分遮挡和弱光照环境，却缺乏精细的纹理结构。因此，鲁棒地融合这两种模态、同时在融合过程中恢复退化信息，成为该领域的核心挑战。
 
@@ -73,7 +73,9 @@ ReCoFuse 将信息恢复建模为基于均值回复随机微分方程（IR-SDE�
 
 针对上述缺口，本文提出一种全新的**互惠耦合优化范式**，其核心洞察是：将信息恢复与融合重新定义为**相互增强的协同过程**。具体而言，在扩散模型的每一步采样中插入**时间感知的跨模态融合模块（TIM）**，动态聚合多模态采样变量，并将聚合后的共享状态反馈给各模态的恢复分支。这一设计打破了恢复与融合之间的隔阂，使跨模态互补性能够实时驱动恢复质量的提升，而更高质量的恢复结果又反过来为融合提供更完整的场景信息，形成闭环增强。基于该范式，我们构建了 **ReCoFuse** 框架，旨在复杂降质下实现超鲁棒、高保真的可见光-红外图像融合。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ReCoFuse 的核心创新在于重新定义了鲁棒图像融合中“信息恢复”与“信息融合”之间的关系，提出**互惠耦合优化范式（Reciprocal Coupling Optimization Paradigm）**。该范式打破了现有工作中恢复与融合相互独立或仅隐式联合的隔阂，使二者在扩散过程的每一步深度交互、相互增强。
 
@@ -120,7 +122,7 @@ ReCoFuse 的核心洞察在于：信息恢复与融合不应当是先后或隐�
 
 这些创新共同构成了 ReCoFuse 的超鲁棒融合能力：在多种复杂降质（低光、雾霾、噪声、低对比度、条纹）同时存在的情况下，ReCoFuse 能产生视觉愉悦、高保真的融合结果，而其他范式无法有效去除降质（Fig. 1 (d)）。
 
-## 整体框架
+
 
 ReCoFuse 的核心理念是将信息恢复与融合从彼此独立的关系重新定义为**互惠耦合**（reciprocal coupling）过程。如图 2 所示，框架由四个关键模块串联构成：共享编码器、扩散恢复分支、时间感知跨模态集成模块（TIM）和共享解码器，并通过交替正则化机制实现端到端协同训练。
 
@@ -158,7 +160,7 @@ $$I_f = D(z_f^d(0), h_f)$$
 ![[assets/figures/papers/paper_list_l920_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_ReCoFuse_Ultra_R/figures/002_Figure_2.jpg]]
 *Figure 2: The pipeline of our proposed robust image fusion framework ReCoFuse*
 
-## 核心模块与公式推导
+
 
 ### 整体框架：互惠耦合优化范式
 
@@ -233,7 +235,9 @@ $$\mathcal{L}_m^{\mathrm{I2R}} = \sum_{t=1}^T \mathbb{E}[ \| z_f^d(t) - \mathrm{
 ![[assets/figures/papers/paper_list_l920_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_ReCoFuse_Ultra_R/figures/001_Figure_1.jpg]]
 *Figure 1: Comparisons between our reciprocal coupling optimization paradigm and existing robust image fusion paradigms. Our method effectively removes haze and noise while others cannot*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -288,7 +292,9 @@ ReCoFuse 在 MFNet、FMB、LLVIP 三个基准数据集上进行了系统评估�
 ![[assets/figures/papers/paper_list_l920_https_openaccess_thecvf_com_content_CVPR2026_html_Zhang_ReCoFuse_Ultra_R/figures/016_Table_4.jpg]]
 *Table 4: Quantitative results of object detection*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题域与范式定位
 
@@ -346,6 +352,8 @@ ReCoFuse 的技术路线建立在两个基础之上：
 2. **TIM 的信息瓶颈**：TIM 将两个模态的采样变量压缩为一个聚合变量，当模态间信息冲突（如红外热源与可见光纹理在同一位置矛盾）时，聚合过程是否会导致信息丢失或虚假融合，论文未深入讨论。
 
 3. **与其他恢复先验的兼容性**：ReCoFuse 使用 IR-SDE 作为恢复框架，若替换为其他扩散变体（如冷扩散、一致性模型）或非扩散恢复方法，互惠耦合机制是否仍能保持增益，值得探索。
+
+
 
 ## 原文 PDF
 

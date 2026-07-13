@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/LLaVA_4D_Embedding_SpatioTemporal_Prompt_into_LMMs_for_4D_Scene_Understanding.pdf
+project_link: null
+code_link: https://github.com/hyzhouboy/LLaVA-4D
 openreview_forum_id: URpbmVEsqB
 aliases:
 - L4
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | LLaVA-4D：将时空提示嵌入大型多模态模型以实现4D场景理解 |
 | 英文题名 | LLaVA-4D: Embedding SpatioTemporal Prompt into LMMs for 4D Scene Understanding |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=URpbmVEsqB); [GitHub](https://github.com/hyzhouboy/LLaVA-4D) |
+| Links | [paper](https://openreview.net/forum?id=URpbmVEsqB) · [GitHub](https://github.com/hyzhouboy/LLaVA-4D) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | LLaVA-4D |
 | Dataset | VSI-Bench, Chat4D |
@@ -42,7 +44,7 @@ claims:
 > - Chat4D 上，CIDEr 为 93.5。
 > - Chat4D 上，BLEU-4 为 17.2。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -64,7 +66,7 @@ LLaVA-4D 的核心洞察在于：**视觉特征可以被解耦为空间分量（
 
 LLaVA-4D 属于**时空提示增强的4D多模态大模型**，在方法谱系上位于3D LMMs（如 **LLaVA-3D**，Zhu et al., arXiv 2024）与视频理解LMMs（如 **Video-3D LLM**，Zheng et al., arXiv 2024）的交汇处。其核心贡献在于首次将动态感知的4D坐标作为可学习提示嵌入LMM，并通过时空解耦表示实现静态场景与动态物体的联合理解，为4D场景理解建立了新的基线范式。
 
-## 背景与动机
+
 
 三维场景理解是具身智能与空间推理的核心能力。近年来，大型多模态模型（LMM）通过将3D位置编码为空间提示，在静态场景的视觉问答、密集描述和视觉定位等任务上取得了显著进展。然而，现实世界的物理场景本质上是动态的——物体在时间维度上持续运动，其空间位置随时间演化。现有3D LMM（如**LLaVA-3D**, Zhu et al., arXiv 2024; **Video-3D LLM**, Zheng et al., arXiv 2024）将多视角视觉特征以统一空间表示处理，仅使用3D位置作为空间提示，**无法捕捉动态物体随时间变化的运动模式**，导致对包含动态物体的4D场景理解能力严重不足。
 
@@ -77,7 +79,9 @@ LLaVA-4D 属于**时空提示增强的4D多模态大模型**，在方法谱系�
 
 消融实验（**Table 4**）表明，逐步添加上述三个模块后，Chat4D基准上的CIDEr从62.3提升至93.5，BLEU-4从11.7提升至17.2，空间准确率SAcc@0.5从34.8提升至58.9，时间准确率TAcc从12.7提升至54.6，验证了各模块对4D场景理解的累积贡献。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 LLaVA-4D 的核心创新在于将**动态感知的4D时空提示**系统性地嵌入大型多模态模型（LMM），从而将3D场景理解范式提升至4D。其关键洞察是：静态背景与动态物体在空间位置上具有相似性，但在时间维度上运动模式差异显著；同时，视觉特征可以被解耦为空间分量（关注外观）和时间分量（关注运动），这种解耦表示本身更具判别力。基于此，该方法引入了三个紧密协作的**changed slots**：
 
@@ -121,7 +125,7 @@ $$f_{st} = \alpha \cdot \mathrm{softmax}\left(\frac{(w_q p_{4D})(w_k[f_s,f_t])^\
 
 三个核心模块（坐标编码、特征解耦、特征融合）之间存在显著的协同效应（Table 4）：逐步添加各模块时，CIDEr从62.3→72.8→78.5→93.5，TAcc从12.7→25.3→30.8→54.6，呈阶梯式提升。其中坐标编码贡献了最大的性能跃升（TAcc提升约24点），而特征解耦和融合在此基础上进一步释放了4D场景理解的上限。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_URpbmVEsqB/figures/002_Figure_2.jpg]]
 *Figure 2: Our LLaVA-4D consists of three stages: 1) 4D coordinate encoding. Encode 3D position and 1D time with optical flow. 2) Vision embedding. Disentangle visual features into spatiotemporal features and embed the encoded 4D coordinates via cross-attention fusion. 3) Language embedding. Align textual position and time with the fused vision embedding for 4D scene understanding*
@@ -171,7 +175,7 @@ $$f_{st} = \alpha \cdot \mathrm{softmax}\left(\frac{(w_q p_{4D})(w_k[f_s,f_t])^\
 
 多视角视频 → SfM/MVS估计位姿与深度 → 反投影构建4D坐标 → 傅里叶编码（空间+光流调制时间）→ 视觉特征解耦为 $f_s, f_t$ → 交叉注意力融合 $p_{4D}$ 与 $[f_s, f_t]$ → MLP投影为视觉token → 文本坐标同步编码 → 拼接送入LLM → 输出4D场景理解结果。
 
-## 核心模块与公式推导
+
 
 LLaVA-4D 的核心架构由三个紧密协作的模块构成：动态感知 4D 坐标编码、时空解耦视觉嵌入，以及坐标对齐语言嵌入。其设计根植于一个核心洞察：静态背景与动态物体在空间位置上可能相似，但在时间维度上运动模式差异显著；同时，视觉特征可被解耦为关注外观的空间分量与关注运动的时间分量，这种解耦表示本身更具判别力，再结合 4D 坐标提示可大幅提升 4D 场景理解性能。
 
@@ -223,7 +227,9 @@ $$\tau_s = \mathrm{PE}(tp), \quad \tau_t = \mathrm{TE}(tt)$$
 
 Table 4 的逐模块消融清晰揭示了三个组件的因果贡献：从无任何模块的基线（CIDEr 62.3 / BLEU-4 11.7 / SAcc@0.5 34.8 / TAcc 12.7），逐步添加坐标嵌入、特征解耦和特征融合后，各项指标跃升至 93.5 / 17.2 / 58.9 / 54.6。其中，坐标嵌入是拉动整体性能的关键杠杆，特征解耦提升了性能上限，而特征融合进一步增强了时空理解能力。Table 5 进一步表明，完整的 4D 坐标编码（3D 位置 + 1D 时间）在所有指标上均优于仅使用 3D 位置或仅使用 1D 时间的编码方案，验证了时空联合建模的必要性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -290,7 +296,9 @@ Figure 3展示了时空解耦前后的特征分布对比。在原始视觉特征
 
 4. **多视角输入要求**：方法需要多视角视频作为输入，限制了其在单视角视频或静态图像场景下的直接应用。对于仅有一个固定摄像头的监控场景，4D坐标的构建将退化为不完整的空间信息。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从3D LMM到4D LMM的关键跃迁
 
@@ -333,6 +341,8 @@ LLaVA-4D的性能优势建立在若干前提条件之上，这些条件同时定
 **具身AI场景的迁移。** 能否将LLaVA-4D的4D时空提示框架推广到机器人导航与操作等具身AI任务中？在这些场景下，LMM需要理解动态物理交互（如物体被推动后的运动轨迹），LLaVA-4D的坐标-特征解耦设计可能为此提供基础，但需要针对具体任务的适配和验证。
 
 **更大规模模型的潜力。** 当前仅使用7B LLM的实验结果已展现出显著优势，更大规模模型（如13B、34B乃至更大）是否能带来非线性提升？这涉及到4D场景理解的“涌现能力”问题，值得进一步探索。
+
+
 
 ## 原文 PDF
 

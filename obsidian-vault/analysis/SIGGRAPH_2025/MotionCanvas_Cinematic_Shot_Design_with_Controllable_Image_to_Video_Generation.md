@@ -5,6 +5,8 @@ paper_level: A
 venue: SIGGRAPH
 year: 2025
 pdf_ref: paperPDFs/SIGGRAPH_2025/MotionCanvas_Cinematic_Shot_Design_with_Controllable_Image_to_Video_Generation.pdf
+project_link: https://motion-canvas25.github.io/
+code_link: null
 aliases:
 - MotionCanvas
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | MotionCanvas：可控图像到视频生成的电影镜头设计 |
 | 英文题名 | MotionCanvas: Cinematic Shot Design with Controllable Image-to-Video Generation |
 | 会议/期刊 | SIGGRAPH 2025 |
-| Links | [paper](https://arxiv.org/abs/2502.04299); [Project](https://motion-canvas25.github.io/) |
+| Links | [paper](https://arxiv.org/abs/2502.04299) · [Project](https://motion-canvas25.github.io/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | MotionCanvas |
 | Dataset | RealEstate10K (相机控制), RealEstate10K, VIPSeg (物体控制) |
@@ -40,7 +42,7 @@ claims:
 > - RealEstate10K 上，TransErr 为 0.2188 (Ours*)，对比 0.2567 (MotionCtrl)，变化 -0.0379。
 > - RealEstate10K 上，FVD 为 34.09 (Ours*)，对比 48.03 (MotionCtrl)，变化 -13.94。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有图像到视频生成方法难以同时精确控制相机运动和物体运动。其根本障碍在于，用户的运动意图通常在3D场景空间中定义（例如“镜头绕物体旋转”），而视频生成模型基于2D屏幕空间信号训练，两者之间缺乏有效的转换机制。此外，获取大规模带有3D标注（如相机姿态、深度图）的训练视频数据成本高昂，进一步限制了3D感知运动控制的发展。
 
@@ -52,8 +54,6 @@ claims:
 - **相机运动控制**：在RealEstate10K数据集上零样本测试，旋转误差（RotErr）0.6334，平移误差（TransErr）0.2188，显著优于MotionCtrl（Wang et al., ACM SIGGRAPH 2024）和CameraCtrl。
 - **物体运动控制**：在VIPSeg数据集上，物体运动准确度（ObjMC）25.72，FID 42.47，大幅领先DragAnything（Wu et al., ECCV 2024）等基线。
 - **用户研究**：在运动遵循度（75.24%）、运动质量（79.05%）和帧保真度（77.14%）三个维度上均获得压倒性偏好率。
-
-## 背景与动机
 
 ### 问题背景：从静态图像到电影级镜头的生成鸿沟
 
@@ -83,7 +83,7 @@ MotionCanvas的核心动机正是回答这一问题。其关键洞察在于：**
 
 这一思路直接催生了MotionCanvas的三大设计支柱：**运动设计模块**（捕捉场景空间意图）、**运动信号转换模块**（将场景空间意图翻译为屏幕空间信号）和**运动条件视频生成模型**（以2D信号为条件生成视频）。后续章节将逐一展开这些组件的技术细节。
 
-## 核心创新
+## 核心方法与创新机理
 
 MotionCanvas 的核心创新在于构建了一条从**3D场景空间运动意图**到**2D屏幕空间运动信号**的可微分转换通路，使视频扩散模型在不依赖3D标注的条件下获得3D感知的运动控制能力。这一通路围绕三个紧密耦合的 changed slots 展开。
 
@@ -121,8 +121,6 @@ MotionCanvas 的核心创新在于构建了一条从**3D场景空间运动意图
 
 这三个 changed slots 形成了正向反馈闭环：场景空间表示使运动意图与场景几何对齐，层次变换将其无损转换为屏幕空间信号，而屏幕空间信号的自动可提取性又使大规模无标注训练成为可能，最终实现了零样本设置下对 MotionCtrl 和 CameraCtrl 的显著超越（Table 1）。
 
-## 整体框架
-
 ![[assets/figures/papers/paper_list_l22_MotionCanvas_Cinematic_Shot_Design_with_Controllable_Image_to_Video_Gene/figures/006_Figure_6.jpg]]
 *Figure 6: Generated videos with diverse and fine-grained local motion controls (upper), and in coordination with camera motion control (bottom). Figure 7. Results when our method is applied for: (upper) motion transfer, and (bottom) video editing for changing objects, adding and removing objects*
 
@@ -153,8 +151,6 @@ MotionCanvas 的整体 pipeline 围绕一个核心矛盾展开：用户对运动
 此外，MotionCanvasAR 自回归扩展模块通过重新计算输入运动信号，使前一 16 帧视频片段作为条件，支持生成变长视频，解决了片段间运动不连续问题。
 
 整个 pipeline 的输入输出流为：**静态图像 + 场景空间运动意图 → 屏幕空间点轨迹与边界框轨迹 → 条件化视频扩散模型 → 电影级运动视频**。
-
-## 核心模块与公式推导
 
 MotionCanvas 的系统架构由三个核心模块串联构成：**运动设计模块**捕获用户的场景空间运动意图，**运动信号转换模块**将其解耦并投影为屏幕空间信号，**运动条件视频生成模型**则基于这些2D信号生成最终视频。
 
@@ -192,7 +188,7 @@ $$\min_{\theta} \mathbb{E}_{t, X^{0}, X^{1}} \left[ \| V^{t} - v_{\theta}(X^{t},
 
 对相机运动表示方式的消融实验（Table 4）表明，DCT系数编码（Traj. coeff）在RotErr（0.6334）、TransErr（0.2188）和FVD（34.09）上均显著优于Gaussian map和Plücker坐标表示，同时仅增加1.1%的令牌开销和32秒的生成延迟。对Motion Signal Translation模块的消融（Figure 13）则验证了层次变换的必要性：移除相机感知变换或相机-物体感知变换会导致物体运动不自然或错误。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -248,14 +244,8 @@ Table 2汇报了在VIPSeg数据集上的物体运动控制性能。MotionCanvas�
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l22_MotionCanvas_Cinematic_Shot_Design_with_Controllable_Image_to_Video_Gene/figures/008_Figure_9.jpg]]
-*Figure 9: Visual comparison of the resulatant videos from DragAnything, MOFA-Video, TrackDiffusion, $\mathrm { O u r s } _ { \mathrm { c o o r d } }$ . , and our MotionCanvas
 
-![[assets/figures/papers/paper_list_l22_MotionCanvas_Cinematic_Shot_Design_with_Controllable_Image_to_Video_Gene/figures/019_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l22_MotionCanvas_Cinematic_Shot_Design_with_Controllable_Image_to_Video_Gene/figures/020_Figure.jpg]]
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 核心瓶颈与设计动机
 

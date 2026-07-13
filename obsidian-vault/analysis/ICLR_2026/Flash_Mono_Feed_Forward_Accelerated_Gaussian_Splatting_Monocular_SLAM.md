@@ -33,7 +33,7 @@ claims:
 | 中文题名 | Flash-Mono：前馈加速的高斯溅射单目SLAM |
 | 英文题名 | Flash-Mono: Feed-Forward Accelerated Gaussian Splatting Monocular SLAM |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=nv3q3crc5D) · [Project](https://victkk.github.io/flash-mono) · [arXiv](https://arxiv.org/abs/2507.02863) · [Code](https://github.com/borglab/gtsam) |
+| Links | [paper](https://openreview.net/forum?id=nv3q3crc5D) · [Project](https://victkk.github.io/flash-mono) · [paper](https://arxiv.org/abs/2507.02863) · [Code](https://github.com/borglab/gtsam) |
 | Topic | #topic/other_unclear #topic/other_unclear/general |
 | Method | Flash‑Mono |
 | Dataset | ScanNetV1, ScanNet / BundleFusion, KITTI Odometry |
@@ -43,7 +43,7 @@ claims:
 > - ScanNetV1 (rendering) 上，PSNR (dB) 17.75 – 21.73 dB（各场景） vs MonoGS PSNR 14.52 – 19.24 dB (提升约 2 – 4 dB)；LPIPS 0.39 – 0.45 vs MonoGS LPIPS 0.54 – 0.74 (绝对值降低 0.2 – 0.3)。
 > - ScanNet / BundleFusion (geometry) 上，Mean Depth L1 (m) ScanNet 0.34, BundleFusion 0.21 vs MonoGS 1.19 / 1.20 (大幅降低（约 0.85 – 1.0 m）)。
 
-## 概述
+## 概要
 
 单目密集同步定位与建图（SLAM）是机器人、AR/VR 和自动驾驶的核心感知任务。近年来，基于 3D 高斯溅射（3DGS）的 SLAM 方法凭借其高质量的场景重建和新视图合成能力受到广泛关注。然而，现有单目 GS‑SLAM 系统普遍采用**从零训练（Train‑from‑Scratch）**范式：每个关键帧需从随机初始化开始，经数十至数百次高斯优化迭代，单帧耗时约 1 秒，导致系统速度仅约 1 FPS。此外，单帧深度先验存在尺度不一致，阻碍多视图几何一致性，成为实时性与精度的双重瓶颈。
 
@@ -53,7 +53,7 @@ claims:
 
 实验表明，Flash‑Mono 实现了 **10 FPS+ 的实时性能**，速度较同期 GS‑SLAM 方法提升约 10 倍。在 ScanNetV1 和 BundleFusion 数据集上，跟踪精度（ATE RMSE）显著优于所有传统和 GS‑SLAM 基线，也优于最近的前馈 SLAM 系统 **MASt3R‑SLAM**。仅用基线方法十分之一的优化迭代次数，渲染质量即达到或超越 **MonoGS** 与 **S3PO‑GS**，PSNR 提升约 2–4 dB，LPIPS 降低 0.2–0.3。深度几何精度大幅领先，ScanNet 和 BundleFusion 上平均深度 L1 误差分别为 0.34 m 和 0.21 m，远低于 MonoGS 的 1.19 m 和 1.20 m。在 KITTI Odometry 上同样展现了优异的跟踪与渲染性能。
 
-## 背景与动机
+
 
 ### 单目稠密SLAM的实时性困局
 
@@ -75,7 +75,9 @@ claims:
 
 Flash-Mono正是在这一动机下提出的：通过一个递归前馈前端联合预测位姿与2DGS属性、一个轻量2DGS建图后端进行增量融合与微调，以及一个基于隐藏状态的闭环模块，首次在单目稠密GS-SLAM中实现了10 FPS以上的实时性能，同时将跟踪与建图精度提升至新的最优水平。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Flash‑Mono 的核心创新在于将单目 GS‑SLAM 从“逐帧从零训练”范式根本性地切换为“递归前馈预测 + 轻量后端微调”范式，同时将隐藏状态复用为长期记忆以支撑高效闭环。以下从三个关键维度展开。
 
@@ -109,7 +111,7 @@ Flash‑Mono 的第二个关键创新在于赋予隐藏状态双重角色——�
 
 **证据强度**：上述创新均有消融实验支撑——后端细化迭代从 0 增至 10 次时 PSNR 由 20.14 升至 22.41 dB（收益递减）；子地图片段长度 8 帧时 ATE RMSE 最低（0.106）；自适应体素化模块将高斯原语数量减少超 58%（1.35M→0.56M），PSNR 仅轻微下降（19.70→19.44）。主实验在 ScanNetV1、BundleFusion、KITTI Odometry 三个数据集上均验证了跟踪精度与渲染质量的双重领先。
 
-## 整体框架
+
 
 Flash‑Mono 提出了一种 **Predict‑and‑Refine** 范式，将传统单目 GS‑SLAM 中逐帧“从零训练”（Train‑from‑Scratch）的闭环切换为**递归前馈预测 + 轻量后端微调**的架构。系统由三个核心模块构成：
 
@@ -134,7 +136,7 @@ $$\hat{T}_t,\; \hat{\mathcal{G}}_t,\; M_t = f(I_t,\; M_{t-1})$$
 
 在后端，逐帧预测的 2DGS 属性经自适应体素化压缩后增量融合为全局 2DGS 地图，并通过仅 20 次迭代的局部渲染优化完成微调。前端推理与后端优化在并行线程中执行，使得系统整体达到 10+ FPS 的实时性能。
 
-## 核心模块与公式推导
+
 
 Flash‑Mono 由三大核心模块构成：递归前馈前端（Recurrent Feed‑Forward Frontend）、2DGS 建图后端（2DGS Mapping Backend）以及基于隐藏状态的回环闭合模块（Loop Closure via Hidden State）。系统流水线如 Figure 2 所示。
 
@@ -198,7 +200,9 @@ $$\mathcal{T}^{W^{*}} = \underset{T^W}{\arg\min} \sum_{(i,j)\in\mathcal{E}} \lef
 
 4. **回环后地图校正**：回环触发位姿图优化后，对全局 2DGS 地图执行高效刚体校正。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -279,7 +283,9 @@ Figure 5 系统性地揭示了关键设计选择的影响：
 
 4. **终身建图未系统评测**：Figure 9 展示了隐藏状态在环境变化（夜晚→白天）下的重定位潜力，但未在真正长周期、环境动态变化的场景下进行系统评测，隐藏状态更新与终身建图策略仍需专门训练和工程实现。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 在SLAM谱系中的位置：从优化驱动到前馈驱动
 
@@ -322,6 +328,8 @@ Flash‑Mono 为单目稠密SLAM建立了一个新的基线范式，其知识贡
 3. **自适应体素化的地图紧凑性控制**：在保证渲染质量的前提下将高斯原语数量减少58%以上（1.35M → 0.56M），为资源受限场景的地图存储与传输提供了实用方案。
 
 需要指出的是，论文中部分基线的对比公平性存在注意事项：MonoGS在ScanNet 0054/0465和BundleFusion apt0因内存不足崩溃，指标仅基于崩溃前子序列；S3PO‑GS在KITTI 07运行失败。这些因素可能导致基线性能被高估，Flash‑Mono的实际优势可能比报告数值更大。
+
+
 
 ## 原文 PDF
 

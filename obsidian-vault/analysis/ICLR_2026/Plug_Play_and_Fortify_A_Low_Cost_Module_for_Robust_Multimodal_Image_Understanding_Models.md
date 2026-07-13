@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Plug_Play_and_Fortify_A_Low_Cost_Module_for_Robust_Multimodal_Image_Understanding_Models.pdf
+project_link: null
+code_link: https://github.com/a6103121/MWAM
 openreview_forum_id: 7KluEfmiXG
 aliases:
 - MWAMM
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 即插即用与加固：面向鲁棒多模态图像理解的轻量级模块 |
 | 英文题名 | Plug, Play, and Fortify: A Low-Cost Module for Robust Multimodal Image Understanding Models |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=7KluEfmiXG); [GitHub](https://github.com/a6103121/MWAM) |
+| Links | [paper](https://openreview.net/forum?id=7KluEfmiXG) · [GitHub](https://github.com/a6103121/MWAM) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | Multimodal Weight Allocation Module (MWAM) |
 | Dataset | BRATS2020 (脑肿瘤分割), NYU-Depth V2 (语义分割), CASIA-SURF (多模态分类), DroneVehicle (多模态检测) |
@@ -42,7 +44,7 @@ claims:
 > - NYU-Depth V2 (语义分割) 上，Average MIoU / Average PCR 为 MMANet+MWAM: 45.81 / 12.66，对比 MMANet: 41.32 / 16.22 (推测baseline均值)，变化 +4.49 / -3.56。
 > - CASIA-SURF (多模态分类) 上，Average Acc / Average PCR 为 SF-MD+MWAM (MMANet†): 97.03 / 2.02，对比 SF-MD: 92.85 / 5.43，变化 +4.18 / -3.41。
 
-## 概述
+## 概要
 
 多模态模型在训练中存在隐式的**模态偏好**：模型会偏向某些富含低频信息的模态，导致其他模态优化不充分。当这些“弱势”模态在推理时缺失，模型性能会发生**灾难性崩溃**——例如在CASIA-SURF数据集上，缺失深度模态时准确率暴跌至80.10%（-10.96），甚至低于仅用深度模态训练的单模态模型（97.29%）。这一现象揭示了训练过程中模态优化的严重失衡。
 
@@ -50,7 +52,7 @@ claims:
 
 MWAM的核心优势在于：推理时完全拆离，不引入任何额外参数和计算；训练时仅增加可忽略的FLOPs和内存开销。实验覆盖分割、分类、检测、细粒度分类、动作识别等多种视觉任务，在CNN（RFNet、ResNet18）和ViT（mmFormer）架构上均验证有效。主要结果包括：BRATS2020脑肿瘤分割上GSS+MWAM平均Dice达87.56%（+1.15），PCR降至4.44（-0.86）；NYU-Depth V2语义分割上MMANet+MWAM平均MIoU提升4.49个百分点；CASIA-SURF多模态分类上平均准确率达97.03%（+4.18），PCR降至2.02（-3.41）；DroneVehicle多模态检测上mAP50从0.558提升至0.723。消融实验证实混合干预（梯度编辑+损失加权）效果最优，FRM的比率设计显著优于仅用低频或直接加和的规则。
 
-## 背景与动机
+
 
 ### 多模态学习中的模态支配困境
 
@@ -85,7 +87,9 @@ $$\mathrm{Decay Rate} \propto (1 - \eta \lambda_{i})$$
 
 该方法的关键优势在于：推理时完全拆离，不引入任何额外参数和计算开销；兼容CNN与ViT等多种主干架构；可无缝集成至现有缺失模态鲁棒方法中，进一步提升其性能上限。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MWAM 的核心创新在于将模态偏好的量化与再平衡从空间域迁移至**频域**，并构建了三个相互耦合的 changed slots，形成“度量→权重→干预”的闭环。
 
@@ -128,7 +132,7 @@ Table 5 的消融实验明确给出了混合干预的优势：混合策略平均
 
 3. **推理零开销**（Table 6）：MWAM 在推理时完全拆离，不引入任何额外参数和计算，训练时仅增加可忽略的 FLOPs 和内存开销。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0012_7KluEfmiXG_Plug_Play_and_Fortify_A_Low-Cost_Module_for_Robu/figures/005_Figure_2.jpg]]
 *Figure 2: Architecture and application of our proposed MWAM. (a): Main structure of the MWAM. (b): FRM bank, designed to handle modality exceptions. Its update mechanism is governed by Eq. 2. (c): An illustration of the integration of MWAM into a multimodal host model. The calculation rules of FRM follow Eq. 4, which requires flipping and aligning the high-frequency components*
@@ -178,7 +182,7 @@ MWAM 支持两种可选的训练干预机制（Figure 3），可单独或混合�
 
 MWAM 作为一个独立模块，通过截获各模态分支的输入和梯度流与主模型集成（Figure 2c）。它不修改主模型的网络结构，仅需在训练循环中插入 FRM 计算和权重分配步骤。该方法已验证适配 CNN（RFNet、ResNet18）和 ViT（mmFormer）架构，兼容早期融合与晚期融合策略，并可进一步提升已有缺失模态鲁棒方法的性能上限。
 
-## 核心模块与公式推导
+
 
 ### 3.1 模态偏好瓶颈的理论根源
 
@@ -237,7 +241,9 @@ MWAM通过两种可选机制施加权重：
 
 消融实验（Table 5）表明，混合干预（梯度编辑+损失加权）效果最优：平均Acc 96.41、PCR 2.97，优于纯梯度干预（95.93/3.09）和纯损失干预（96.06/3.61）。推理时MWAM完全拆离，不引入任何额外参数或计算开销。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 1. 模态偏好与性能崩溃的因果诊断
 
@@ -314,7 +320,9 @@ Table 9 的参数敏感性分析表明：权重分配函数（Eq.5）的四个�
 2. **极端高频噪声退化**：当输入经过大幅平滑滤波时，高频信息被严重抑制，FRM 的分母趋近于零（即使有 σ 稳定项），导致偏好度量失效，方法可能退化至接近基线的性能。
 3. **固定超参数限制**：Eq.5 中的 α、β、λ、γ 在所有任务中保持固定，未根据训练阶段或任务特性自适应调整，可能限制了进一步提升的空间。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：模态偏好导致的鲁棒性坍塌
 
@@ -366,6 +374,8 @@ MWAM 的适用边界已通过多任务、多模态组合的广泛实验得到初
 **5. 大规模模态数量的可扩展性。** 当前实验主要覆盖 2-3 种模态组合。当模态数量超过三种或模型规模极大时，FRM 的计算效率和分配策略是否仍然有效，尚未得到验证。批量大小消融（Table 10）显示 MWAM 在 batch size=1 时仍能维持正常训练（avg Acc 75.77），但模态数量增加带来的 FRM Bank 管理复杂度仍是一个开放问题。
 
 **6. 频率采样窗口的理论最优性。** Table 7 显示 q=2 时性能最佳（avg Acc 97.03），q=1 略低（96.99），q=4 性能退化（96.06）。这一经验最优值是否具有任务无关的普适性，还是需要根据数据特性自适应选择，缺乏理论指导。
+
+
 
 ## 原文 PDF
 

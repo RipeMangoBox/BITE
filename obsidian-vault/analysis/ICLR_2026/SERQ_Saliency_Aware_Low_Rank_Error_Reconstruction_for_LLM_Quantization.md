@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/SERQ_Saliency_Aware_Low_Rank_Error_Reconstruction_for_LLM_Quantization.pdf
+project_link: null
+code_link: https://github.com/acalabys/SERQ
 openreview_forum_id: nFjj8NEBqv
 aliases:
 - SERQ
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | SERQ：面向LLM量化的显著性感知低秩误差重建 |
 | 英文题名 | SERQ: Saliency-Aware Low-Rank Error Reconstruction for LLM Quantization |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=nFjj8NEBqv); [GitHub](https://github.com/acalabys/SERQ) |
+| Links | [paper](https://openreview.net/forum?id=nFjj8NEBqv) · [GitHub](https://github.com/acalabys/SERQ) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | SERQ |
 | Dataset | WikiText-2 (LLaMA-2 7B, W4A4), WikiText-2 (LLaMA-2 70B, W4A8), 0-shot Common Sense Reasoning (LLaMA-3 8B, W4A4) vs. 旋转方法 |
@@ -41,7 +43,7 @@ claims:
 > - WikiText-2 (LLaMA-2 70B, W4A8) 上，PPL 为 3.43 (SERQ GPTQ)，对比 3.55 (L2QER)，变化 -0.12。
 > - 0-shot Common Sense Reasoning (LLaMA-3 8B, W4A4) 上，平均准确率 (↑) 为 62.41 (SERQ GPTQ)，对比 55.44 (L2QER)，变化 +6.97。
 
-## 概述
+## 概要
 
 **核心问题：** 将大语言模型（LLM）权重量化至4位时，激活中存在的离群值会严重破坏低精度矩阵乘法的精度。现有低秩误差重建方法（如 **L2QER**，Zhang et al., NeurIPS 2024）虽然通过双因子分解补偿量化误差，但在W4A4极端低精度设置下精度退化严重，且依赖两个顺序低秩因子，导致推理时需要在线量化和多个窄矩阵乘法，无法实现纯4位高效矩阵乘。
 
@@ -55,7 +57,7 @@ claims:
 - 端到端GPU推理中，SERQ-MXFP4实现超过2倍的整体加速，峰值内存占用相对FP16降低约2.48倍。
 - 消融实验表明，仅对显著行进行误差重建相较于覆盖全矩阵，在相同秩预算下可提升1–4%精度；方法对校准数据规模和领域鲁棒。
 
-## 背景与动机
+
 
 ### 大规模语言模型部署的效率瓶颈
 
@@ -91,7 +93,9 @@ SERQ 的核心洞察在于将这一矛盾转化为可离线解决的设计问题
 
 SERQ 在三个维度上区别于现有工作：（1）用**单个低秩矩阵**替代双因子结构，消除在线量化步骤；（2）将**显著性感知**引入误差重建，使有限的秩预算集中于关键行；（3）通过**离线权重置换**将行列重排传播至相邻层，完全消除推理时的动态重排序开销。这些设计使得 SERQ 能够在 W4A4 和 W4A8 设置下，以极低的延迟开销实现与 FP16 基线接近的精度。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SERQ 的核心创新在于将**激活离群值抑制**与**权重显著性引导的低秩误差重建**统一到一个纯4位推理路径中，从根本上消除了现有低秩分解方法在 W4A4 场景下的精度退化与推理延迟瓶颈。
 
@@ -158,7 +162,7 @@ SERQ 相对于基线的关键变化可归纳为四个维度：
 
 这些创新共同实现了 SERQ 的核心承诺：在 W4A4 设置下，以单个量化低秩矩阵同时补偿激活离群值与权重显著性的量化误差，且所有展平与置换操作均在离线完成，推理时无额外延迟。端到端 GPU 实测中，SERQ-MXFP4 实现超过 2 倍的整体加速，峰值内存占用相对 FP16 降低约 2.48 倍（Table 3）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_nFjj8NEBqv/figures/002_Figure_2.jpg]]
 *Figure 2: (a) Overall SERQ implementation. During calibration, saliency rows are determined via activation scaling, followed by weight row permutation. During inference, error reconstruction is performed through a residual path computed only on the salient components, alongside the main path. (b) Computation flow of a decoder layer. The merged row- and column-wise weight permutation enables offline preprocessing of both current weight rows and subsequent activation channels*
@@ -196,7 +200,7 @@ SERQ 的整体流程围绕一个核心设计原则展开：**将激活离群值�
 
 这一框架使得 SERQ 在 W4A4 设置下首次实现了与旋转方法相当甚至更优的精度，同时将每层延迟开销控制在约 18.7%，显著低于双因子重建方案。
 
-## 核心模块与公式推导
+
 
 ### 基础量化与线性层
 
@@ -242,7 +246,9 @@ $$\mathrm{Q}(\widehat{\pmb{X}}) \cdot \mathrm{Q}(\widehat{\pmb{W}}) \approx \wid
 
 为使显著行在推理时自然对齐，SERQ 在离线阶段完成行列置换。权重行按显著性重排，对应的列置换传播至前一层（如下投影层的行置换传播至上一层门控/上投影层的列），确保激活通道顺序与置换后的权重行匹配。所有线性层均避免推理时的动态重排序，完全消除在线开销。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈验证：SERQ 为何能在 W4A4 下显著优于双因子误差重建
 
@@ -318,7 +324,9 @@ $$\mathrm{Q}(\widehat{\pmb{X}}) \cdot \mathrm{Q}(\widehat{\pmb{W}}) \approx \wid
 2. **领域偏移鲁棒性未验证**：显著性行的确定依赖于校准数据集的激活统计，极端领域偏移下显著性分布可能发生变化，该场景的鲁棒性在文中未讨论。
 3. **非线形层适用性**：当前方法聚焦于线性层的量化误差重建，对注意力机制中 softmax 等非线性算子的推广尚未探索。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与低秩误差重建方法的继承与突破
 
@@ -366,6 +374,8 @@ SERQ 本身不限定权重量化算法，与 **GPTQ**（Frantar et al., ICML 202
 1. **算子泛化性**：SERQ当前仅应用于线性层，是否可直接推广至注意力机制中的QKV投影或注意力分数计算，仍需验证。
 2. **更大规模模型**：实验覆盖至LLaMA-2 70B，但在超大规模模型（>70B）或多模态LLM中，单低秩残差路径的秩预算是否足够，以及显著性行识别策略是否需要调整，尚无定论。
 3. **训练后量化的极限**：SERQ在W4A4下已接近FP16基线的生成质量（Table 6中GSM8K和LongBench结果），但进一步提升至W3A3或更低精度时，仅靠低秩误差重建是否仍有效，仍需探索。
+
+
 
 ## 原文 PDF
 

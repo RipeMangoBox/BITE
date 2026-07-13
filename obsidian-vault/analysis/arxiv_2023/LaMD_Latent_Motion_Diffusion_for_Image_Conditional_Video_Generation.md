@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2023
 pdf_ref: paperPDFs/arxiv_2023/LaMD_Latent_Motion_Diffusion_for_Image_Conditional_Video_Generation.pdf
+project_link: null
+code_link: null
 aliases:
 - LLMD
 - LaMD
@@ -43,7 +45,7 @@ claims:
 > - Landscape 上，FVD 100.7 vs cINN (先前最优) (显著降低)。
 > - CATER-GEN-v2 上，FVD 5.77 vs LFDM (显著降低)。
 
-## 概述
+## 概要
 
 视频生成的核心瓶颈在于**运动连贯性与生成效率的协同优化**。现有方法要么在像素空间或潜在视频空间中进行高维扩散，导致采样缓慢；要么难以在保持内容一致性的同时生成自然、多样化的运动。LaMD（Latent Motion Diffusion）通过将视频生成重构为**潜在运动生成**与**视频重建**两个解耦阶段，从根本上降低了生成模型的复杂度。
 
@@ -51,15 +53,13 @@ claims:
 
 在方法谱系上，LaMD区别于基于3D-UNet的潜在视频扩散模型（如**LFDM**，Ni et al., CVPR 2023）和基于条件可逆网络的**cINN**（Dorkenwald et al., CVPR 2021），开创性地将扩散目标从视频空间迁移至一个低维的、空间化的运动表示空间。其采样效率与图像级潜在扩散模型**LDM**（Rombach et al., CVPR 2022）相当，但专门针对视频生成任务进行了运动-内容分解设计。
 
-## 背景与动机
-
 视频生成的核心瓶颈在于**运动的连贯性与生成效率之间的矛盾**。现有方法在追求自然运动的同时，往往面临采样速度慢、训练开销大的困境，尤其在高维视频数据上，这一问题更为突出。像素空间扩散模型直接在视频帧上建模，计算成本极高；潜在视频扩散模型虽将生成目标压缩至低维空间，但仍需处理包含时间维度的3D表示，限制了扩散模型的架构选择与采样效率。
 
 **现有方法的缺口**主要体现在三个方面。第一，运动与内容耦合紧密。多数方法将外观与运动联合编码或生成，缺乏显式的分离机制，导致生成的运动难以独立控制，且容易引入外观伪影。第二，潜在空间维度冗余。典型的潜在视频表示保留时间维度，迫使扩散模型使用3D-UNet或3D卷积网络，采样步骤数多、单步计算量大，难以达到与图像扩散模型相当的推理速度。第三，训练效率受限。在高维视频数据上训练3D扩散模型需要大量GPU资源，限制了模型的规模化与实用化。
 
 **本文的动机**源于一个关键洞察：运动信息本身具有高度的可压缩性，可以被表示为低维的二维表示，而不损害其表达能力。基于此，LaMD提出将视频生成重构为**潜在运动生成与视频重建**两个阶段——通过运动-内容分解视频自编码器（MCD-VAE）将运动压缩为去除时间维度的2D潜在表示，再使用2D-UNet扩散模型在该低维空间中进行高效生成。这一范式转换有望同时解决运动质量、生成效率与训练成本三个核心挑战。
 
-## 核心创新
+## 核心方法与创新机理
 
 LaMD 的核心创新在于将视频生成问题重构为**潜在运动生成**与**视频重建**两个解耦的子任务，通过三个关键设计实现了运动连贯性与生成效率的同步突破。
 
@@ -87,8 +87,6 @@ LaMD 将运动信息压缩至极低维度的潜空间（通道数 $d=3$，空间
 | 扩散架构 | 3D-UNet / 3D 卷积 | **2D-UNet + 交叉注意力** |
 
 这一范式转换（Fig. 1）使 LaMD 在五个基准数据集（BAIR、Landscape、NATOPS、MUG、CATER-GEN）上均取得最优 FVD 指标，同时保持高运动平滑度（Landscape 99.47%，Table 5），验证了“先压缩运动、再生成运动”策略的有效性。
-
-## 整体框架
 
 LaMD 采用**两阶段训练范式**，将视频生成重构为“潜在运动生成 + 视频重建”两个解耦的子问题。框架由两个核心模块串联构成：**运动-内容分解视频自编码器（MCD-VAE）** 与 **扩散运动生成器（DMG）**。
 
@@ -128,8 +126,6 @@ MCD-VAE 的训练损失综合了像素级 L1 损失、感知相似度 LPIPS、KL
 
 ![[assets/figures/papers/paper_list_l1049_https_arxiv_org_abs_2304_11603/figures/001_Figure_1.jpg]]
 *Figure 1: The comparison of video generation in different latent space. The dashed line stands for operations only involved in training process, while the solid line represents operations both involved in training and sampling process*
-
-## 核心模块与公式推导
 
 LaMD 框架由两个阶段构成：第一阶段训练 **运动-内容分解视频自编码器（MCD-VAE）**，第二阶段在冻结的 MCD-VAE 潜在运动空间上训练 **扩散运动生成器（DMG）**。核心设计理念是将视频生成重构为“潜在运动生成 + 视频重建”，通过高度压缩的二维运动表示和信息瓶颈实现运动与内容的分离。
 
@@ -195,10 +191,7 @@ $$ \mathcal{L}_{\text{simple}}(\theta) = \| \epsilon - \epsilon_\theta(z_m^t, t,
 ![[assets/figures/papers/paper_list_l1049_https_arxiv_org_abs_2304_11603/figures/004_Figure_4.jpg]]
 *Figure 4: The comparison of sampling process of different video diffusion models. Benefited from low-dimensional diffusion target and 2D-UNet based diffusion model, our latent motion diffusion achieves much faster sampling speed compared to video space diffusion and latent video diffusion. The channel dimension is omitted in all settings for simplicity*
 
-![[assets/figures/papers/paper_list_l1049_https_arxiv_org_abs_2304_11603/figures/011_Figure_6.jpg]]
-*Figure 6: Visualization of latent motion transfer to evaluate the efficacy of decomposition. The synthesized video (the third row) is reconstructed using the content feature f extracted from the first frame of one video (the first row), combined with the latent motion feature*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -280,7 +273,7 @@ LaMD的采样效率优势源于两个设计：低维扩散目标（仅$d \times 
 ![[assets/figures/papers/paper_list_l1049_https_arxiv_org_abs_2304_11603/figures/015_Table_7.jpg]]
 *Table 7: Quantitative evaluation compared to the state-of-the-art methods on the Landscape dataset. The results of methods for comparison are quoted from corresponding paper or reported by (Dorkenwald et al, 2021)*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 范式定位：从像素/视频生成到潜在运动生成
 

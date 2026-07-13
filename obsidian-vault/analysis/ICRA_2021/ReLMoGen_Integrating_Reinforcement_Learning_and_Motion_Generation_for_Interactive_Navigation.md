@@ -5,6 +5,7 @@ paper_level: A
 venue: ICRA
 year: 2021
 pdf_ref: paperPDFs/ICRA_2021/ReLMoGen_Integrating_Reinforcement_Learning_and_Motion_Generation_for_Interactive_Navigation.pdf
+code_link: null
 project_link: https://svl.stanford.edu/projects/relmogen/
 aliases:
 - RRLMG
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | ReLMoGen：将运动生成融入强化学习的移动操控框架 |
 | 英文题名 | ReLMoGen: Integrating Reinforcement Learning and Motion Generation for Interactive Navigation |
 | 会议/期刊 | ICRA 2021 |
-| Links | [paper](https://arxiv.org/abs/2008.07792); [Project](http://svl.stanford.edu/projects/relmogen); [Project](https://svl.stanford.edu/projects/relmogen/) |
+| Links | [paper](https://arxiv.org/abs/2008.07792) · [Project](http://svl.stanford.edu/projects/relmogen) · [Project](https://svl.stanford.edu/projects/relmogen/) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | ReLMoGen (Reinforcement Learning + Motion Generation) |
 | Dataset | PushDoorNav, ButtonDoorNav, InteractiveObstaclesNav, ArrangeKitchenMM |
@@ -42,13 +43,13 @@ claims:
 > - ButtonDoorNav 上，Success Rate (SR) 为 0.73 (ReLMoGen-R)，对比 0.01 (SAC), 0.01 (OAC), 0.0 (HRL4IN)，变化 +0.72。
 > - InteractiveObstaclesNav 上，Success Rate (SR) 为 0.79 (ReLMoGen-R)，对比 0.51 (SAC), 0.01 (OAC), 0.0 (HRL4IN)，变化 +0.28。
 
-## 概述
+## 概要
 
 移动操控任务（导航+操作交替）因其长时间跨度、稀疏奖励和高维连续控制空间，对端到端强化学习构成了严重的探索瓶颈。**ReLMoGen** 的核心思路是将动作空间从底层关节速度提升为**运动生成器（Motion Generator, MG）的子目标**：高层策略仅需预测“往哪里移动/交互”，而将“如何无碰撞地安全执行”交由经典的采样规划与关节控制器完成。这一分层设计显著降低了探索难度，使策略能快速覆盖大范围物理空间并产生有意义的交互。
 
 在七项涵盖导航、桌面操作、交互式导航和移动操作的仿真任务上，ReLMoGen 均取得了最高或与最优基线持平的任务完成度，且所需的梯度更新步数比基线少一个数量级，平均训练速度提升约 **7 倍**。更重要的是，训练时使用 RRT-Connect 的策略在测试时切换为 Lazy PRM 后性能几乎无下降，表明学到的子目标策略对底层运动生成器的变化具有鲁棒性。该方法仅依赖模拟传感器信号，未使用环境真值，为后续的 Sim2Real 迁移保留了可行性。
 
-## 背景与动机
+
 
 移动操控（Mobile Manipulation）要求机器人在大范围环境中完成导航、避障和物体交互等复合任务。这类任务通常由导航和操作两个子阶段交替构成，时间跨度长、奖励信号稀疏。若直接在关节空间输出速度或扭矩等底层控制量进行强化学习（RL），智能体面临严重的探索困难：高维连续动作空间中，随机探索几乎不可能偶然完成“导航至门前→推动门→穿过门”这类长序列行为，导致训练不稳定或收敛至次优策略。
 
@@ -56,7 +57,9 @@ claims:
 
 ReLMoGen的动机正是基于这一观察：经典运动规划与控制方法（如基于采样的RRT-Connect规划器）已能在已知环境模型下高效、安全地生成无碰撞轨迹。将这些成熟能力作为“运动生成器”（Motion Generator, MG）嵌入RL环路，将动作空间从关节速度提升为运动生成器的子目标（如基座的2D目标位姿、臂部末端执行器的3D目标位置），可以使RL策略仅需学习“往哪里移动/交互”，而将“如何无碰撞地移动”完全外包给运动生成器。这一设计从根本上改变了探索的粒度——策略每一步跨越的不再是微小的关节增量，而是一段完整的无碰撞运动轨迹，从而显著提升探索效率、样本效率和训练速度。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：移动操控中的探索困境
 
@@ -88,7 +91,7 @@ ReLMoGen 形成清晰的分层控制器：
 - **样本效率与训练速度**：ReLMoGen 所需的梯度更新步数比基线少一个数量级，平均训练速度提升约 7 倍。
 - **对底层变化的鲁棒性**：训练时使用 RRT-Connect 的策略，在测试时切换为 Lazy PRM，任务成功率几乎无下降（Table II），表明学到的子目标策略不依赖于特定运动生成器的实现细节。
 
-## 整体框架
+
 
 ReLMoGen 的核心设计是将经典运动生成（Motion Generation）作为不可抢占的子程序嵌入强化学习闭环，从而将原始 POMDP 中的底层关节控制问题提升为子目标预测问题。整个框架由两个关键模块串联构成：**子目标生成策略（Subgoal Generation Policy, SGP）** 与 **运动生成器（Motion Generator, MG）**。
 
@@ -117,7 +120,7 @@ ReLMoGen 的核心设计是将经典运动生成（Motion Generation）作为不
 ![[assets/figures/papers/paper_list_l37_https_arxiv_org_abs_2008_07792/figures/002_Figure_2.jpg]]
 *Figure 2: Two types of action parameterization of ReLMoGen and network architecture of SGP-D and SGP-R. (b) TabletopReachM (c) Push/ButtonDoorNav*
 
-## 核心模块与公式推导
+
 
 ### 1. 问题形式化：基础POMDP与提升后的动作空间
 
@@ -153,7 +156,9 @@ ReLMoGen 由两个核心模块构成分层控制架构：
 
 这一分层设计的关键在于：运动生成器是**预定义的经典规划与控制方案**，而非需要学习的策略。这使得子目标策略的训练避开了底层控制的探索困难，同时保留了运动生成器带来的安全性与可靠性保证。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心结果：ReLMoGen在所有任务上取得最高完成度
 
@@ -228,7 +233,9 @@ HRL4IN虽然采用了分层结构，但其底层策略仍需从头学习控制�
 ![[assets/figures/papers/paper_list_l37_https_arxiv_org_abs_2008_07792/figures/017_Figure.jpg]]
 *Figure: Fig. A.3: Subgoal distribution during training. The subgoal success rate increases over time, indicating our policy learns to use MG better and set more feasible subgoals as training progresses. The policy is also able to accomplish the task with fewer and fewer subgoals. (a) PushDoorNav (b) ArrangeKitchenMM Fig. A.4: Policy visualization for ReLMoGen. A base subgoal is depicted as a red circle with an arrow on the floor to indicate the desired base position and yaw angle. An arm subgoal is depicted as a yellow ball that indicates the desired end-effector position, and a red arrow that indicates the desired pushing action from that position. For PushDoorNav task, the robot first navigates t...*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题瓶颈与设计动机
 
@@ -274,6 +281,8 @@ ReLMoGen 的有效性建立在以下假设之上：
 3. 在动态障碍物或半结构化环境中，运动生成器可能频繁失败。策略应如何感知规划器的失败信号并做出适应性调整（如重新规划、切换子目标、或回退至安全状态）？
 4. 当前方法能否扩展至多机器人协作场景或更复杂的长期任务（如跨多个房间的序列化操作）？多智能体场景中运动生成器间的协调与冲突消解是额外的挑战。
 5. 如何进一步提升在高维连续观测/动作空间下的深度探索效率，使乐观探索方法（如 OAC）在机器人任务中真正发挥优势，而非仅依赖动作空间提升来回避探索困难？
+
+
 
 ## 原文 PDF
 

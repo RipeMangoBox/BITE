@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2026
 pdf_ref: paperPDFs/arxiv_2026/EMGFlow_Robust_and_Efficient_Surface_Electromyography_Synthesis_via_Flow_Matching.pdf
+project_link: null
+code_link: https://github.com/Open-EXG/EMGFlow
 aliases:
 - ERESESFM
 tags:
@@ -40,7 +42,7 @@ claims:
 > - Ninapro DB7 (WaveFormer) 上，Macro-F1 79.90 ± 3.68 vs 79.84 ± 3.83 (DDPM) (+0.06)。
 > - Ninapro DB4 (EMGHandNet) 上，Accuracy 70.44 ± 4.74 vs 69.94 ± 5.12 (DDPM) (+0.50)。
 
-## 概述
+## 概要
 
 表面肌电信号（sEMG）手势识别面临**数据稀缺与受试者多样性有限**的双重瓶颈：采集高质量多通道sEMG数据成本高昂，且现有生成式增强方法中，GAN存在训练不稳定和模式坍塌，扩散模型则因迭代采样导致推理效率低下，使得合成数据的独立实用性不足。
 
@@ -59,7 +61,7 @@ claims:
 
 **局限与待验证方向**：当前实验采用被试内交叉验证协议，尚未验证跨被试或跨会话泛化效果；仅在三个Ninapro基准数据集上评估；生成限定于固定长度窗口，未扩展到完整试次级别。未来工作可探索更低NFE的蒸馏采样、跨被试泛化、以及在其他生理时间序列（EEG、ECG）中的适用性。
 
-## 背景与动机
+
 
 表面肌电信号（sEMG）手势识别是人机交互与康复工程中的核心技术。然而，sEMG数据的采集成本高昂，受试者内与受试者间的信号变异性大，导致实际可用的标注数据规模有限，严重制约了深度学习模型的泛化能力。数据增强是缓解这一瓶颈的常用手段，但传统的手工扰动增强（如抖动、缩放、时间掩码等）仅对信号施加浅层变换，难以模拟sEMG中复杂的生理与采集噪声结构，对下游识别性能的提升幅度有限。
 
@@ -69,7 +71,9 @@ claims:
 
 针对上述缺口，本文提出EMGFlow——首个基于流匹配的条件sEMG生成框架。EMGFlow通过自适应条件归一化（AdaGN）、logit-normal时间采样和分类器自由引导等设计选择，在统一的评估协议下（涵盖特征空间保真度、分布几何和下游效用）系统探索了FM在sEMG合成中的质量-效率权衡，并首次揭示了sEMG生成中保真度与下游实用性之间的早期权衡关系。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 EMGFlow的贡献不在于提出全新的生成范式，而在于首次将**流匹配（Flow Matching, FM）**引入sEMG合成领域，并通过一系列精心设计的“**变更槽位（changed slots）**”在质量、覆盖率和效率之间建立了独特的平衡。相对于扩散基线（DDPM/DDIM），其核心创新可归结为以下四个关键设计选择。
 
@@ -120,7 +124,7 @@ $$\hat{\nu}_{\theta}(x_t, t, y) = \nu_{\theta}(x_t, t, \emptyset) + w \left( \nu
 - 自适应或任务感知的引导机制设计；
 - 非均匀时间采样的更优参数化（$\mu$ 和 $\sigma$ 的选择）是否具有普遍指导意义。
 
-## 整体框架
+
 
 EMGFlow 将条件 sEMG 生成形式化为一个连续时间传输问题：从易于采样的先验分布（高斯噪声）出发，学习一条通向特定手势类别的真实多通道 sEMG 窗口分布的连续轨迹。整个流水线由四个耦合模块构成，形成从原始信号到可部署合成数据的闭环。
 
@@ -149,7 +153,7 @@ $$\hat{\nu}_{\theta}(x_t, t, y) = \nu_{\theta}(x_t, t, \emptyset) + w \left( \nu
 ![[assets/figures/papers/paper_list_l10_EMGFlow_Robust_and_Efficient_Surface_Electromyography_Synthesis_via_Flow_motion20/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the proposed EMGFlow pipeline. The framework consists of four stages: (a) sEMG data acquisition and sliding-window preprocessing; (b) conditional flow-matching training with time sampling and AdaGN-based condition injection; (c) synthetic EMG generation via classifier-free guidance and ODE solvers; and (d) comprehensive evaluation through fidelity metrics, train-on-synthetic test-on-real (TSTR), and augmentation experiments*
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题形式化：条件窗口级sEMG生成
 
@@ -238,7 +242,9 @@ EMGFlow采用**GroupNorm + 自适应GroupNorm（AdaGN）**作为条件注入接�
 ![[assets/figures/papers/paper_list_l10_EMGFlow_Robust_and_Efficient_Surface_Electromyography_Synthesis_via_Flow_motion20/figures/016_Figure_7.jpg]]
 *Figure 7: Comparison of Euler, Heun, and RK4 within EMGFlow under matched numbers of function evaluations (NFE) on DB7. When the sampling budget becomes moderately large, Heun and RK4 consistently achieve lower FID and higher CAS than Euler, showing that higher-order integration better exploits the learned continuous vector field. Euler is only comparatively less poor in the extremely low-NFE regime, where the number of effective integration steps is too small for multi-stage solvers to realize their accuracy advantage*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -321,7 +327,9 @@ TSTR（Train-on-Synthetic Test-on-Real）设置更为严苛——下游分类器
 ![[assets/figures/papers/paper_list_l10_EMGFlow_Robust_and_Efficient_Surface_Electromyography_Synthesis_via_Flow_motion20/figures/018_Table_8.jpg]]
 *Table 8: Effect of conditioning interface on downstream utility on DB7 using EMGHandNet. Results are reported as mean ± std (%). The default GN+AdaGN design achieves the best performance under both augmentation and TSTR, while simpler GN+add and GN+concat variants lead to consistent degradation, showing that the conditioning interface materially affects the usefulness of the generated data rather than serving as a minor implementation detail*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法定位与核心贡献
 
@@ -388,6 +396,8 @@ FM框架支持灵活的ODE求解器。在匹配NFE下，**Heun和RK4高阶求解
 5. **时间采样的最优参数化**：logit-normal采样的μ和σ选择是否具有普遍指导意义？是否存在任务或数据集自适应的采样策略？
 
 6. **与PatchEMG的关系深化**：EMGFlow与PatchEMG共享骨干但范式不同，两者在生成机制上的互补性是否可用于集成或级联框架？
+
+
 
 ## 原文 PDF
 

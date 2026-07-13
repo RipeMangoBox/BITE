@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/DiffusionHarmonizer_Bridging_Neural_Reconstruction_and_Photorealistic_Simulation_with_Online_Diffusion_Enhancer.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/sil/projects/diffusion-harmonizer/
 aliases:
 - DiffusionHarmonizer
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | DiffusionHarmonizer：连接神经重建与逼真模拟的在线扩散增强器 |
 | 英文题名 | DiffusionHarmonizer: Bridging Neural Reconstruction and Photorealistic Simulation with Online Diffusion Enhancer |
 | 会议/期刊 | CVPR 2026 |
-| Links | [paper](https://arxiv.org/abs/2602.24096); [Project](https://research.nvidia.com/labs/sil/projects/diffusion-harmonizer/) |
+| Links | [paper](https://arxiv.org/abs/2602.24096) · [Project](https://research.nvidia.com/labs/sil/projects/diffusion-harmonizer/) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/diffusion_image_video |
 | Method | DiffusionHarmonizer |
 | Dataset | Novel Trajectory Simulation (In-domain), Object Insertion Simulation (Out-of-domain), ISP Modification (Harmonization) |
@@ -41,7 +42,7 @@ claims:
 > - Novel Trajectory Simulation (In-domain) 上，FVD ↓ 为 470.11，对比 506.86 (Wan-Video V2V)，变化 -36.75。
 > - Object Insertion Simulation (Out-of-domain) 上，FID ↓ 为 101.27，对比 104.42 (Wan-Video V2V)，变化 -3.15。
 
-## 概述
+## 概要
 
 **问题瓶颈**：神经重建渲染在生成新视角时引入几何与外观伪影，且插入的动态物体与背景在色调、光照和阴影上存在明显不一致，导致模拟画面的真实感不足，无法满足在线仿真的需求。
 
@@ -55,7 +56,7 @@ claims:
 - 用户研究中，84.28% 的参与者偏好 DiffusionHarmonizer 的效果优于第二强基线（Table 4）。
 - 消融实验证实，多尺度感知损失是抑制单步训练高频伪影的关键（Figure 5），而数据管线的每一部分都提供了不可替代的监督信号（Table 6, Figure 6）。
 
-## 背景与动机
+
 
 神经渲染技术（如 3D Gaussian Splatting 和 NeRF）已能从多视图图像中重建驾驶场景，并支持在新视角、新轨迹下进行逼真模拟。然而，这类神经重建的渲染结果存在两个关键缺陷，严重阻碍了其在自动驾驶仿真中的实际应用：
 
@@ -67,7 +68,9 @@ claims:
 
 因此，本文的核心动机在于：**构建一个统一的在线增强框架，能够同时修复神经渲染的伪影、协调前景与背景的外观、并合成场景一致的阴影与光照效果，且满足实时推理的严苛约束**。这要求方法不仅具备强大的图像生成能力，还需在单步推理中保持时序连贯性，而现有方法无一能同时满足这些条件。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DiffusionHarmonizer 的核心创新在于将预训练多步扩散模型重塑为一个**确定性单步时序增强器**，并配合**多尺度感知损失**与**大规模合成数据管线**，首次在单 GPU 上实现满足在线模拟要求的神经渲染增强。以下从四个关键维度剖析其相对于现有基线的根本性改变。
 
@@ -113,7 +116,7 @@ $$\mathcal{L}_{\mathrm{perc}} = \mathbb{E}_{k} \left[ \sum_{l} \lambda_{l} \big\
 
 消融实验（Table 6, Figure 6）表明，移除任一数据源均导致 FID 上升约 3-4 点：去除伪影校正数据则模型无法修复重建错误，去除阴影数据则无法合成逼真阴影，去除外观数据则色调协调失败。这证实了五部分数据提供了**不可替代的互补监督信号**，是 DiffusionHarmonizer 在色调协调、阴影生成和伪影校正三个子任务上统一超越专用方法的根本原因。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2602_24096/figures/001_Figure_1.jpg]]
 *Figure 1: DiffusionHarmonizer on Driving Scenes. Our method transforms artifact-prone neural-rendered frames into temporally coherent simulations, improving their realism by jointly correcting shadows, lighting, appearance discrepancies and reconstruction artifacts*
@@ -180,7 +183,7 @@ $$\mathcal{L}_{\mathrm{total}} = \lambda_{l_2} \mathcal{L}_{l_2} + \lambda_{perc
 
 整个过程为确定性前馈，无需迭代去噪，在单 GPU 上即可实现 30 FPS 的实时推理。
 
-## 核心模块与公式推导
+
 
 ### 单步确定性增强器
 
@@ -222,7 +225,9 @@ $$\mathcal{L}_{\mathrm{total}} = \lambda_{l_{2}} \mathcal{L}_{l_{2}} + \lambda_{
 
 其中 $\lambda_{temp}=1$ 仅对时序批次激活，非时序批次中 $\lambda_{temp}=0$。这一混合训练策略使模型同时利用图像配对数据和视频时序数据，避免对强时序线索的过拟合（Eq. (6), Sec 3.3）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与设计验证
 
@@ -292,7 +297,9 @@ DiffusionHarmonizer 针对的核心瓶颈是：神经重建渲染（如 3DGS）�
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2602_24096/figures/014_Figure_8.jpg]]
 *Figure 8: User Study Interface. We show our study instructions and interface. Evaluators are shown the input image and two predictions (ours and a baseline) and asked to select the more realistic result, with prediction order randomized to avoid bias*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与通用图像/视频编辑方法的对比
 
@@ -318,6 +325,8 @@ DiffusionHarmonizer 与当前主流的通用图像编辑和视频编辑方法存
 4. **模型压缩与独立性**：是否可以通过知识蒸馏或直接训练，避免依赖预训练扩散模型，从而减少模型体积（当前约 0.74B 参数）并避免潜在的基础模型版权和许可问题？
 5. **高度动态场景**：如何处理多个快速移动物体的同时插入，此时光流估计不可靠、时序信息因严重遮挡而失效？是否需要引入物体级别的跟踪或运动补偿机制？
 6. **评估体系完善**：当前评估主要依赖 FID/FVD 等分布层面指标和用户研究，缺乏对物理真实性（如阴影方向一致性、光照物理正确性）的定量度量，未来需要建立更细粒度的评估基准。
+
+
 
 ## 原文 PDF
 

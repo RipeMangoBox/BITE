@@ -34,7 +34,7 @@ claims:
 | 中文题名 | One2Scene：从单张图像生成几何一致的可探索3D场景 |
 | 英文题名 | One2Scene: Geometric Consistent Explorable 3D Scene Generation from a Single Image |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=iEelSbUsSy) · [Project](https://one2scene5406.github.io/) · [arXiv](https://arxiv.org/abs/2411.04928) |
+| Links | [paper](https://openreview.net/forum?id=iEelSbUsSy) · [Project](https://one2scene5406.github.io/) · [paper](https://arxiv.org/abs/2411.04928) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction #topic/generative_models_diffusion #topic/benchmarks_datasets_evaluation |
 | Method | One2Scene |
 | Dataset | 3D场景生成（DL3DV+RealEstate10K测试集）, 全景深度估计（Stanford2D3D）, 全景深度估计（Matterport3D） |
@@ -44,7 +44,7 @@ claims:
 > - 同上 上，CamMC ↓ 0.389 vs 0.998 (VMem) (-0.609)。
 > - 全景深度估计（Stanford2D3D） 上，AbsRel ↓ (零样本) 0.0675 vs 0.0984 (ACDNet) (-0.0309)。
 
-## 概述
+## 概要
 
 **问题与瓶颈**：从单张图像生成可自由探索的3D场景是一个严重病态的问题——输入信息极度稀疏，大视角变化下的几何失真和长距离多视图一致性难以维持。现有方法（如迭代导航修复或基于全景的隐式生成）在连续视角移动中积累误差，最终导致几何坍塌和语义漂移。
 
@@ -54,7 +54,7 @@ claims:
 
 **主要结果**：在3D场景生成任务上，One2Scene 的相机一致性指标 CamMC 达到 **0.389**，大幅优于 VMem（0.998）；在全景深度估计的零样本测试中，AbsRel 降至 **0.0675**，较 ACDNet（0.0984）提升约31%。消融实验表明，将前馈重建网络替换为 AnySplat 会导致生成质量显著下降（NIQE: 4.96 vs 4.43），验证了高精度3D支架对最终生成质量的决定性作用。
 
-## 背景与动机
+
 
 从单张图像生成可自由探索的3D场景是计算机视觉与图形学中长期存在的核心挑战。其本质困难在于：输入仅为二维平面的稀疏观测，却要求输出覆盖大范围视角、保持几何与语义一致的三维表征。这一问题的病态性（ill-posedness）体现在三个层面：其一，单张图像提供的信息极度不足，遮挡区域、场景背面以及超出视场角的内容完全不可见；其二，在大视角变化下，现有方法普遍出现几何坍塌和语义漂移，生成的新视图往往伴随扭曲、撕裂或内容不一致的伪影；其三，长距离相机运动中的时序一致性难以维持，迭代式生成框架会逐步累积误差，导致场景结构逐渐退化。
 
@@ -64,7 +64,9 @@ claims:
 
 One2Scene 正是围绕这一核心洞察展开。该方法将单图像到可探索3D场景这一严重病态问题分解为三个可控的子任务：首先生成全景锚点视图以建立全局上下文，然后通过前馈3D高斯泼溅网络将稀疏锚点视图提升为显式几何支架，最后在支架引导下合成任意目标视角的新视图。这一分解策略的关键在于：将单目全景深度估计重新表述为多视图立体匹配问题，并引入双向特征融合模块强制跨视图几何一致性，从而从根本上缓解了深度估计的歧义性和误差累积问题。显式3D支架的引入，使得新视图合成不再仅依赖稀疏的锚点图像，而是获得了来自几何先验的强条件信号，显著提升了大视角变化下的生成逼真度和多视图一致性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题重构：从病态单目估计到多视图立体匹配
 
@@ -113,7 +115,7 @@ One2Scene 的条件建模体现了递进式的设计哲学，从基础锚点条�
 
 消融实验进一步验证了这些创新的关键性：将前馈重建网络替换为 AnySplat 后，NIQE 从 4.43 升至 4.96（质量下降），Q-Align 从 4.13 降至 3.61，CamMC 从 0.389 升至 0.616，表明高精度 3D 支架对最终生成质量具有决定性影响。
 
-## 整体框架
+
 
 One2Scene 将“单张图像→可探索3D场景”这一严重病态问题分解为三个可控子任务，构建了一条从稀疏观测到显式几何支架再到任意视角逼真渲染的前馈流水线。其核心洞察在于：**显式3D几何支架**为生成过程提供了稳定的尺度约束和外观先验，从根本上缓解了现有方法在大视角变化下的几何坍塌与误差累积问题。
 
@@ -151,7 +153,7 @@ One2Scene 将“单张图像→可探索3D场景”这一严重病态问题分�
 ![[assets/figures/papers/paper_list_l55_https_openreview_net_forum_id_iEelSbUsSy/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of One2Scene. Our method consists of three stages: (a) an anchor view generation stage to establish an initial 360-degree representation, (b) a feed-forward 3D Gaussian Splatting stage to construct an explicit 3D geometric scaffold, and (c) a synthesis stage that leverages the scaffold information to produce high-quality novel views. The pipeline enables geometrically consistent and photorealistic novel view synthesis from a single input image*
 
-## 核心模块与公式推导
+
 
 One2Scene 将单图到可探索3D场景这一严重病态问题分解为三个可控子任务，其核心模块对应三阶段流水线：全景锚点生成、前馈3D几何支架构建、支架引导的新视图合成。
 
@@ -190,7 +192,9 @@ $$p\left(\mathbf{I}^{\mathrm{tgt}} \mid \mathbf{I}^{\mathrm{anchor}}, \mathbf{p}
 
 **双LoRA训练策略** 是处理异质条件的关键设计：锚点视图和支架渲染视图分别通过两个独立的LoRA模块处理，经3D注意力机制融合后注入扩散去噪过程。记忆条件模块则从记忆库中选择与目标姿态最接近的已生成帧，保障长序列生成中的时空一致性。该策略使模型能够同时利用锚点视图的纹理细节和支架渲染视图的几何结构，显著缓解大视角变化下的几何失真问题。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能对比
 
@@ -238,7 +242,9 @@ One2Scene 在 3D 场景生成任务上全面超越现有方法。表1（Table 1�
 - **Table 3**：全景深度估计的零样本与微调结果均显著优于基线，验证了多视图立体匹配范式与双向融合模块的有效性。
 - **Figure 3**：大视角变化下的定性对比直观展示了 One2Scene 在几何保真度和视觉质量上的代际优势。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题分解范式的谱系定位
 
@@ -297,6 +303,8 @@ $$p\left(\mathbf{I}^{\mathrm{tgt}} \mid \mathbf{I}^{\mathrm{anchor}}, \mathbf{p}
 4. **可控生成的拓展**：能否将语言或文本条件融入支架构建过程，实现语义可控的场景生成？这需要重新设计条件注入机制。
 
 5. **端到端联合优化**：当前三阶段为独立训练，端到端联合优化可能进一步提升各模块间的协同性，但面临的挑战在于不同模块的损失函数和训练数据如何统一。
+
+
 
 ## 原文 PDF
 

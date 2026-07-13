@@ -5,6 +5,7 @@ paper_level: A
 venue: AAAI
 year: 2024
 pdf_ref: paperPDFs/AAAI_2024/InstructAvatar_Text_Guided_Emotion_and_Motion_Control_for_Avatar_Generation.pdf
+code_link: null
 project_link: https://wangyuchi369.github.io/InstructAvatar/
 aliases:
 - InstructAvatar
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | InstructAvatar：文本引导的情绪与动作控制头像生成 |
 | 英文题名 | InstructAvatar: Text-Guided Emotion and Motion Control for Avatar Generation |
 | 会议/期刊 | AAAI 2024 |
-| Links | [paper](https://arxiv.org/abs/2405.15758); [Project](https://wangyuchi369.github.io/InstructAvatar/) |
+| Links | [paper](https://arxiv.org/abs/2405.15758) · [Project](https://wangyuchi369.github.io/InstructAvatar/) |
 | Topic | #topic/motion_animation #topic/motion_animation/human_motion_generation |
 | Method | InstructAvatar |
 | Dataset | MEAD (in-domain), TalkingHead 1KH (out-of-domain) |
@@ -41,7 +42,7 @@ claims:
 > - MEAD (in-domain) 上，SyncD ↓ 为 9.412，对比 9.542 (GAIA)，变化 -0.130。
 > - TalkingHead 1KH (out-of-domain) 上，AU_F1 ↑ 为 0.552，对比 0.542 (EAT)，变化 +0.010。
 
-## 概述
+## 概要
 
 **核心问题**：现有情感说话人脸生成方法依赖离散情绪标签或参考视频作为控制信号，缺乏细粒度、开放词汇的用户控制能力，难以同时传达丰富的表情变化与动态面部动作，导致生成视频表现力不足且可控性差。
 
@@ -53,7 +54,7 @@ claims:
 
 **局限与待解问题**：当前模型难以实现完全解耦的单一动作单元控制，对极端域外外观的泛化能力有限，且无法同时处理包含情绪与动作的复合文本指令。
 
-## 背景与动机
+
 
 情感驱动的人脸动画生成是数字人、虚拟主播和沉浸式交互中的核心技术。其目标是根据音频、文本或参考信号，生成具有丰富表情、自然动作和高质量唇形同步的说话人脸视频。近年来，基于扩散模型和变分自编码器的方法在生成质量和身份保持方面取得了显著进展，但在用户控制能力上仍面临根本性瓶颈。
 
@@ -63,7 +64,9 @@ claims:
 
 **InstructAvatar 的核心动机**正是填补这一空白——将控制信号从受限的标签/参考视频扩展为自然语言文本指令，使模型能够执行开放词汇的细粒度情绪与动作控制。该工作通过三项关键设计实现这一目标：(1) 利用动作单元和 GPT-4V 自动构建细粒度文本-视频对；(2) 设计双分支交叉注意力机制分别解析全局情绪风格与时序面部动作；(3) 引入零卷积门控将文本控制平稳注入预训练的无情绪模型，在保持生成质量的同时实现精确的表情与动作控制。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 InstructAvatar 的核心创新在于将情感说话人脸的控制接口从受限的离散标签或参考视频彻底转向**开放词汇的自然语言文本指令**，并围绕这一范式转移设计了配套的架构与数据方案。其关键创新点可归纳为以下四个“changed slots”：
 
@@ -110,7 +113,7 @@ $$h_i = h_{i-1} + \mathcal{Z}(\text{CrossAttn}(h, \text{Rep}(\mathbf{T})))$$
 
 上述四个 changed slots 构成了一条完整的创新链条：**文本接口**定义了“控制什么”，**AU+GPT-4V 管线**解决了“如何获取训练信号”，**双分支交叉注意力**决定了“如何解析指令”，**零卷积门控**保证了“如何稳定注入预训练模型”。四者相互依赖，缺一不可。
 
-## 整体框架
+
 
 InstructAvatar 的整体目标是根据音频 $A$、参考肖像 $I$ 和自然语言指令 $T$ 生成说话人脸视频 $V$，其核心映射关系为 $V = \mathcal{F}(A, I, T)$。该方法将生成过程分解为两个级联阶段：**运动-外观解耦**与**文本引导的运动生成**，如 Figure 2 所示。
 
@@ -131,7 +134,7 @@ InstructAvatar 的整体目标是根据音频 $A$、参考肖像 $I$ 和自然�
 
 **数据流开关。** 由于模型同时训练情绪说话和纯动作控制两类任务，框架中设置了数据流开关（Figure 2 中的 switches）。对于情绪说话任务，音频 $A$ 和情绪指令 $T$ 同时输入；对于无音频的面部动作控制任务，音频输入被置零，仅依赖动作指令 $T$ 驱动生成。这种统一框架使 InstructAvatar 既能完成传统的音频驱动情绪说话人脸生成，也能实现此前方法不具备的纯文本驱动面部动作控制。
 
-## 核心模块与公式推导
+
 
 InstructAvatar 的整体生成映射为 $V = \mathcal{F}(A, I, T)$，即从音频 $A$、肖像 $I$ 和文本指令 $T$ 生成视频 $V$。其核心架构由两大组件构成：VAE 解耦模块 $\mathcal{H}$ 与扩散运动生成器 $\mathcal{G}$。
 
@@ -197,7 +200,9 @@ $$s = \max_i \frac{\mathcal{E}_t(t) \cdot \mathcal{E}_v(v_i)}{\|\mathcal{E}_t(t)
 
 其中 $\mathcal{E}_t$ 和 $\mathcal{E}_v$ 分别为 CLIP 的文本编码器和视觉编码器，$t$ 为文本指令，$v_i$ 为第 $i$ 帧。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 1. 实验设置
 
@@ -267,13 +272,10 @@ $$s = \max_i \frac{\mathcal{E}_t(t) \cdot \mathcal{E}_v(v_i)}{\|\mathcal{E}_t(t)
 ![[assets/figures/papers/paper_list_l1499_https_arxiv_org_abs_2405_15758/figures/009_Table_3.jpg]]
 *Table 3: Objective and subjective metrics for text-guided facial motion control. Table 4: Ablation studies on the proposed techniques*
 
-![[assets/figures/papers/paper_list_l1499_https_arxiv_org_abs_2405_15758/figures/012_Figure.jpg]]
-*Figure: happy fear contempt*
 
 ![[assets/figures/papers/paper_list_l1499_https_arxiv_org_abs_2405_15758/figures/013_Figure_9.jpg]]
 *Figure 9: neutral Fig. 9: Illustration of the effectiveness of textual instructions. All videos are generated utilizing identical portraits and neutral audio, with variations only in the textual instructions*
 
-![[assets/figures/papers/paper_list_l1499_https_arxiv_org_abs_2405_15758/figures/014_Figure.jpg]]
 
 ![[assets/figures/papers/paper_list_l1499_https_arxiv_org_abs_2405_15758/figures/005_Table_1.jpg]]
 *Table 1: Quantitative comparison with baselines for in-domain/out-of-the-domain settings. The bold values indicate the best results, while the underlined values represent the second-best. Guid. Mod. indicates the modality of emotional guidance. Since there is no ground truth video in the out-of-the-domain setting, the FID metric is left empty. It can be observed that our model outperforms the baselines across many metrics. Notably, for SyncD, the ground truth video has a SyncD of 9.172 in the in-domain setting, which is the closest to our model*
@@ -284,19 +286,13 @@ $$s = \max_i \frac{\mathcal{E}_t(t) \cdot \mathcal{E}_v(v_i)}{\|\mathcal{E}_t(t)
 ![[assets/figures/papers/paper_list_l1499_https_arxiv_org_abs_2405_15758/figures/015_Table_5.jpg]]
 *Table 5: More ablation studies on the proposed techniques*
 
-![[assets/figures/papers/paper_list_l1499_https_arxiv_org_abs_2405_15758/figures/017_Table_6.jpg]]
-*Table 6: Human evaluation for the application of GPT-4V on the data construction*
 
-![[assets/figures/papers/paper_list_l1499_https_arxiv_org_abs_2405_15758/figures/018_Table_7.jpg]]
-*Table 7: Typical Action Units for Different Emotions*
 
-![[assets/figures/papers/paper_list_l1499_https_arxiv_org_abs_2405_15758/figures/019_Table_8.jpg]]
-*Table 8: Available modalities and corresponding tasks of the collected dataset. * indicates that for TalkingHead 1KH, we only use the portrait images to measure the out-of-domain generative ability of our model*
 
-![[assets/figures/papers/paper_list_l1499_https_arxiv_org_abs_2405_15758/figures/020_Table_9.jpg]]
-*Table 9: Statistics of the collected dataset*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 
@@ -336,6 +332,8 @@ InstructAvatar 在以下条件下表现良好：
 3. **复合指令解析与执行**：能否扩展模型架构或训练范式，使其能够解析并同时执行包含情绪风格与具体动作描述的复杂文本指令？这需要构建多标签、多类型的指令-视频配对数据集，并设计相应的条件融合机制。
 
 4. **文本控制精度的可量化评估**：当前使用 CLIPS 指标（取所有帧中与文本指令余弦相似度的最大值）评估指令遵循程度，但该指标可能无法捕捉时序上的控制精度。设计更细粒度的文本-视频对齐评估方法，将是推动该方向发展的基础设施性工作。
+
+
 
 ## 原文 PDF
 

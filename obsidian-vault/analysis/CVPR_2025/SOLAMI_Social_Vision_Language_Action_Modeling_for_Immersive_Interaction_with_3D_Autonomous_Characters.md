@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/SOLAMI_Social_Vision_Language_Action_Modeling_for_Immersive_Interaction_with_3D_Autonomous_Characters.pdf
+project_link: https://solami-ai.github.io/
+code_link: null
 aliases:
 - SSVLAMII3AC
 tags:
@@ -38,7 +40,7 @@ claims:
 > [!tip] 效果简介
 > - SynMSI test set 上，Motion FID↓ 3.443 vs 4.254 (DLP MotionGPT) (-0.811)；VC Similarity↑ 0.824 vs 0.818 (LLM+Speech) (+0.006)；Inference Latency↓ (seconds) 2.639 vs 5.518 (DLP) (-2.879)。
 
-## 概述
+## 概要
 
 让3D虚拟角色在沉浸式交互中同时理解用户的语音和肢体动作，并生成自然连贯的语音与动作回应，是构建社交具身智能体的核心瓶颈。现有方案多采用模块化LLM-Agent框架，以文本作为各子模块之间的中介表示——语音先转写成文本，动作被描述为语言，LLM生成文本回复后再分别合成语音和动作。这种“文本中转”范式不仅造成模态信息的不可逆丢失，还引入了显著的级联延迟，难以支撑实时、自然的社交互动。
 
@@ -50,7 +52,7 @@ SOLAMI提出了一种端到端的社会视觉-语言-动作（VLA）模型，从
 
 **方法定位**：SOLAMI属于端到端多模态VLA模型，区别于以文本为中介的模块化LLM-Agent路线。其技术谱系可追溯至离散令牌化的动作生成（如MotionGPT的MoMat/MoGen）和语音-语言对齐工作，但首次将语音、动作的联合感知与生成统一在单个自回归LLM中，并针对社交交互场景进行了系统性的数据合成与训练设计。
 
-## 背景与动机
+
 
 ### 问题背景：3D自主角色交互的实时多模态需求
 
@@ -79,7 +81,9 @@ SOLAMI提出了一种端到端的社会视觉-语言-动作（VLA）模型，从
 
 SOLAMI通过三阶段训练策略（分词器训练→多任务预训练→多轮指令微调）和合成数据集SynMSI来应对这些挑战，最终在推理延迟（2.639秒 vs. 5.518秒）和动作质量（FID=3.443 vs. 4.254）上均显著超越模块化基线（Table 1），并在VR用户研究中获得最高满意度评分（Figure 5）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SOLAMI 的核心创新在于**将模块化 LLM-Agent 框架彻底重构为端到端的社会 VLA 模型**，从根本上消除了文本作为中间表示所带来的信息丢失与高延迟问题。这一转变体现在三个关键维度的结构性创新上。
 
@@ -138,7 +142,7 @@ SOLAMI 的核心洞察在于：**将用户语音和动作直接编码为离散�
 
 SOLAMI 的三项核心创新——端到端离散令牌建模、多任务预训练模态对齐、合成多模态数据驱动——构成了一个**相互依赖的创新体系**：合成数据为端到端训练提供可行性，预训练策略确保模态对齐质量，而端到端架构则从根本上解决了模块化方法的延迟和保真度瓶颈。用户研究结果（Figure 5）证实，这一创新体系在动作连贯性、交互性、语音一致性和整体体验等所有维度上均获得了最高评分。
 
-## 整体框架
+
 
 SOLAMI 采用端到端的社会视觉-语言-动作（VLA）建模范式，直接以用户的语音和身体动作作为输入，生成3D虚拟角色的响应语音与动作，消除了传统模块化方案中文本中介带来的信息损失与高延迟。其核心架构围绕一个基于解码器的LLM骨干网络构建，通过将多模态信号统一为离散令牌序列，实现自回归的多模态响应生成。
 
@@ -172,7 +176,7 @@ SOLAMI 的训练遵循三阶段策略（见 Figure 2）：
 ![[assets/figures/papers/paper_list_l1865_SOLAMI_Social_Vision_Language_Action_Modeling_for_Immersive_Interaction/figures/004_Figure_4.jpg]]
 *Figure 4: VR interface architecture. Our VR project consists of a Quest 3 client and a server. The Quest client captures and transmits user body motion and speech to the server. The server then generates character’s speech, body motion, and face blendshape parameters based on the selected methods. The response is then sent back to the Quest client to drive the character*
 
-## 核心模块与公式推导
+
 
 ### 3.1 架构总览
 
@@ -245,7 +249,9 @@ SOLAMI 采用三阶段训练（Figure 2）：
 ![[assets/figures/papers/paper_list_l1865_SOLAMI_Social_Vision_Language_Action_Modeling_for_Immersive_Interaction/figures/011_Table_5.jpg]]
 *Table 5: Methods of collecting multimodal interaction data*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 
@@ -303,7 +309,9 @@ SOLAMI 在 SynMSI 测试集上全面验证了端到端社会VLA模型相对于�
 ![[assets/figures/papers/paper_list_l1865_SOLAMI_Social_Vision_Language_Action_Modeling_for_Immersive_Interaction/figures/003_Figure_3.jpg]]
 *Figure 3: SynMSI dataset generation. Our synthesizing pipeline consists of 4 steps. Based on numerous character-relevant topics and state-of-the-art LLMs [52], we generate text scripts for multimodal dialogues. Using a large-scale motion database [17, 29, 76], we retrieve the most appropriate motions and refine the speech scripts accordingly. Finally, we employ TTS/voice cloning [19] to generate characterspecific speech. This approach enables us to create multimodal interaction data of various characters using only existing motion datasets*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心范式转移：从模块化 Agent 到端到端 VLA
 
@@ -367,6 +375,8 @@ SOLAMI 的设计基于以下假设和前提，这些构成了其适用边界：
 SOLAMI 处于 **3D 自主角色交互** 与 **多模态 VLA 模型** 的交叉点。在 VLA 谱系中，它继承了 RT 系列（如 RT-2）将视觉-语言-动作统一为令牌序列的思路，但将应用场景从机器人操作迁移至社交交互，并将视觉模态替换为语音和人体动作。在 3D 角色驱动领域，它区别于基于文本指令的角色动画方法（如 MotionGPT 的 text-to-motion），实现了语音-动作的双向多模态闭环。
 
 **方法定位总结**：SOLAMI 是首个将端到端 VLA 范式应用于 3D 社交角色交互的工作，通过多模态令牌统一和合成数据驱动，在运动质量、推理延迟和用户体验上建立了新的基准。其核心方法论——将多模态输入输出统一为离散令牌序列并由 LLM 自回归建模——具有跨场景迁移的潜力，但当前的数据依赖性、交互规模限制和硬件约束仍是通向通用 3D 自主角色系统的实质性障碍。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/SAM_3D_Body_Robust_Full_Body_Human_Mesh_Recovery.pdf
+project_link: null
+code_link: https://github.com/facebookresearch/sam-3d-body
 aliases:
 - S3B3
 - S3BRFBHMR
@@ -41,7 +43,7 @@ claims:
 > - EMDB 上，MPJPE mm ↓ 62.9 (3DB-H) vs 70.3 (CameraHMR) (-7.4)。
 > - RICH 上，PA-MPJPE mm ↓ 31.9 (3DB-H) vs 34.0 (CameraHMR) (-2.1)。
 
-## 概述
+## 概要
 
 **SAM 3D Body (3DB)** 是一个面向全身人体网格恢复（HMR）的鲁棒模型，旨在解决现有方法在开放场景（in-the-wild）下因训练数据姿态、视角与外观多样性不足、高质量3D标注稀缺，以及模型架构未能有效解耦身体与手部优化需求而导致的性能急剧下降问题。
 
@@ -79,7 +81,7 @@ claims:
 - MHR表示对**儿童等不同年龄组的身体形状建模不足**，可能导致姿态与形状估计不准确。
 - 开放问题包括：如何将多人/人-物交互融入训练、如何进一步缩小与专用手部方法的精度差距、VLM失败分析提示的具体构造方式、密集关键点检测器的详细架构，以及如何扩展模型以覆盖更全面的年龄与体型分布。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -101,7 +103,9 @@ claims:
 
 2. **可提示的分离式架构是泛化能力的关键。** 3DB采用共享图像编码器与分离的身体/手部解码器设计，使不同粒度的姿态估计任务得以独立优化。同时，模型支持2D关键点、分割掩码等辅助提示输入，既能在歧义场景下融合用户先验，又能通过关键点提示对齐腕部和肘部，消除身体与手部解码器之间的误差传播，实现单一模型在全身体重建上达到甚至超越专用模型的性能。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SAM 3D Body (3DB) 的核心创新围绕一个中心诊断展开：现有 HMR 方法在 in-the-wild 场景下鲁棒性不足，其根源并非单一架构缺陷，而是**训练数据多样性匮乏**与**模型架构未能解耦身体/手部优化冲突**的系统性问题。3DB 从数据与模型两个维度同时切入，形成了互为支撑的创新闭环。
 
@@ -145,7 +149,7 @@ SAM 3D Body (3DB) 的核心创新围绕一个中心诊断展开：现有 HMR 方
 
 这些创新并非孤立存在，而是形成了一个**数据-架构-表示**三位一体的系统：数据引擎为分离式架构提供了充足的多样化监督信号，可提示设计使模型能有效利用这些信号，而 MHR 表示为整个流程提供了统一且稳定的参数化基础。
 
-## 整体框架
+
 
 SAM 3D Body (3DB) 采用**可提示的编码器-解码器架构**，核心设计原则是共享视觉编码、分离身体与手部解码，并通过可选的辅助提示实现可控推理。整体pipeline由以下模块串联构成：
 
@@ -205,7 +209,7 @@ $$\mathcal{L}_{\mathrm{train}} = \sum_i \lambda_i \mathcal{L}_i$$
 ![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2602_15989/figures/001_Figure_1.jpg]]
 *Figure 1: Full-body human mesh recovery results using SAM 3D Body (3DB). Our model demonstrates robust performance in estimating challenging poses across diverse viewpoints and produces accurate body and hand pose estimations within a unified framework*
 
-## 核心模块与公式推导
+
 
 ### 3.1 图像编码模块
 
@@ -275,7 +279,9 @@ $$\mathcal{L}_{\mathrm{train}} = \sum_i \lambda_i \mathcal{L}_i$$
 ![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2602_15989/figures/018_Figure_9.jpg]]
 *Figure 9: Qualitative comparison to show the impact from using keypoint prompting and unifying the predictions from hand decoder and body decoder*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果：标准与泛化基准
 
@@ -336,7 +342,9 @@ Table 1列出了3DB的完整训练数据集，包括图像/帧数、主体数和
 ![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2602_15989/figures/015_Figure_8.jpg]]
 *Figure 8: Comparison of 3DB win rate against baselines for human preference study. Win rate (%) and number of wins out of 80*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从统一回归到可提示分离式架构
 
@@ -387,6 +395,8 @@ SAM 3D Body (3DB) 处于单图像全身体人体网格恢复（HMR）这一研�
 5. **训练超参数的调优策略**：多任务训练损失中 $\lambda_i$ 的具体取值和调参策略（如 3D 关键点损失的 warm-up 调度）对复现和迁移至新数据域至关重要。
 
 6. **年龄与体型多样性的覆盖**：如何扩展模型以覆盖更全面的年龄和体型分布，特别是儿童和极端体型？这需要数据引擎有针对性地挖掘相应样本，并可能需要 MHR 表示的进一步扩展。
+
+
 
 ## 原文 PDF
 

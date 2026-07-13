@@ -43,7 +43,7 @@ claims:
 > - TotalCapture 上，时间同步 Acc ↑ 0.98 vs SyncNet 0.89 / DeSPITE 0.27 (+0.09 / +0.71)。
 > - EgoHumans 上，时间同步 Acc ↑ 1.00 vs SyncNet 0.97 / DeSPITE 0.95 (+0.03 / +0.05)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有 IMU-视频对比学习方法仅在全局片段级别对齐，丢失亚秒级时序同步信息，无法捕捉多传感器配置下身体部位的特异性动态，导致细粒度跨模态检索和精确时间同步失败。
 
@@ -58,7 +58,7 @@ claims:
 
 **局限与开放问题**：方法依赖已知的 IMU 安装位置和外部 2D 姿态估计器，在遮挡、低光照及无约束佩戴场景下的泛化性有待验证；如何无监督发现传感器-部位对应关系、处理动态变化的传感器配置，是值得探索的方向。
 
-## 背景与动机
+
 
 ### 问题背景：IMU与视觉信号的跨模态对齐需求
 
@@ -90,7 +90,9 @@ claims:
 
 综上所述，MoBind的目标是建立一个统一的IMU-视频运动绑定框架，在多个粒度上实现精确对齐，从而同时支持跨模态检索、亚秒级时间同步、身体部位定位、人员识别和动作识别等多种下游任务。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MoBind的核心创新在于将IMU-视频对齐从传统的**全局clip级**提升至**层次化多粒度**，并引入**骨骼运动作为中介表示**。相对于现有基线，其关键改进可归纳为以下五个“changed slots”。
 
@@ -124,7 +126,7 @@ $$\mathcal{L} = \underbrace{\lambda_g \mathcal{L}_{\mathrm{global}} + \lambda_l 
 
 其中每个对比项均为双向InfoNCE，分别作用于全局表征、局部身体部位表征和时间token。层次消融实验（Table 5）表明，从仅有全局对比逐步加入局部和token级对比，在检索、时间同步和动作识别三项任务上均带来一致且显著的性能提升，验证了层次化设计的因果有效性。
 
-## 整体框架
+
 
 MoBind 的整体设计围绕一个核心洞察展开：**将 IMU 信号与从视频中提取的 2D 骨骼运动序列对齐，而非与原始像素对齐**，从而剥离无关的视觉背景，聚焦于运动本身。在此基础上，框架将全身运动**分解为局部身体部位轨迹**，并将每个 IMU 传感器严格与其对应的身体部位配对，实现语义上有根基的多传感器对齐。
 
@@ -164,7 +166,7 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{align}} + \lambda_{\mathrm{mtp}} \mathcal{L
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2602_19004/figures/001_Figure_1.jpg]]
 *Figure 1: Proposed framework for motion binding between IMUs and 2D pose sequence from video. Contrastive learning is applied at both the local space, aligning each IMU with its corresponding body-part, and the global space, aligning full-body representations. This representation supports several downstream tasks, including cross-modal retrieval, temporal synchronization, subject and body parts localization, and human action recognition*
 
-## 核心模块与公式推导
+
 
 ### 3.1 双流模态编码器
 
@@ -227,7 +229,9 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{align}} + \lambda_{\mathrm{mtp}} \mathcal{L
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2602_19004/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the proposed MoBind. The framework first encodes each IMU stream together with the motion of its corresponding body part, yielding token-level and local-level representations per sensor. These local representations are then aggregated across sensors to form global-level embeddings. The contrastive objective applies at all three levels. In addition, a Masked Token Prediction (MTP) module is used only during training to preserve coarse semantic structure, preventing the model from over-focusing on fine-grained alignment*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -343,7 +347,9 @@ $$\mathcal{L}_{\mathrm{mtp}} = \frac{1}{|\mathcal{M}|} \sum_{(n,t) \in \mathcal{
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2602_19004/figures/013_Table_6.jpg]]
 *Table 6: Effect of Masked Token Prediction on model performance. The MTP significantly improves action recognition on both datasets, demonstrating its importance for retaining actionlevel semantics*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心瓶颈与因果机制
 
@@ -390,6 +396,8 @@ MoBind通过一个**三层因果控制机制**解决上述瓶颈：(1) **表示�
 4. **跨模态掩码预测的改进**：MTP辅助任务当前仅在IMU流上执行。是否可改进为跨模态的掩码预测（例如同时覆盖姿态token），以进一步提升语义保留？这可能在动作识别任务上带来额外增益。
 
 5. **异步采样率的鲁棒对齐**：模型在何种程度上能够处理异步IMU采样率，以及如何实现跨采样率的鲁棒对齐？当前实验使用统一的采样率设置（5秒窗口，T=25个token），实际部署中不同传感器的采样率可能不一致。
+
+
 
 ## 原文 PDF
 

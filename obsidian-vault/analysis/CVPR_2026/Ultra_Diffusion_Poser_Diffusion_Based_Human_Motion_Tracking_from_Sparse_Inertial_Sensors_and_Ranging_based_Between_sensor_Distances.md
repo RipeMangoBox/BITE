@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/Ultra_Diffusion_Poser_Diffusion_Based_Human_Motion_Tracking_from_Sparse_Inertial_Sensors_and_Ranging_based_Between_sensor_Distances.pdf
+project_link: null
 code_link: "https://github.com/eth-siplab/UltraDiffusionPoser"
 aliases:
 - UDPU
@@ -42,7 +43,7 @@ claims:
 > - DanceDB 上，JPE (cm) / GAE (°) 4.67 / 9.91 vs UIP (JPE 显著优于 UIP)。
 > - TotalCapture 上，SIP (°) / GAE (°) / JPE (cm) 8.95 / 10.19 / 3.76 vs UIP (各项指标均优于 UIP)。
 
-## 概述
+## 概要
 
 传统基于惯性传感器（IMU）的人体运动捕捉方法在长时间运行中面临严重的漂移问题，而引入超宽带（UWB）测距虽能提供传感器间的绝对距离信息，但现有工作仅将 UWB 距离作为辅助输入特征，忽略了这些距离对传感器位置的物理几何约束，导致预测的 3D 姿态可能违反测量的传感器间距离，限制了姿态精度和平滑性。
 
@@ -52,7 +53,7 @@ claims:
 
 实验结果表明，UDP 在 DIP-IMU、DanceDB、TotalCapture 等多个数据集上均取得 SOTA 性能，关节位置误差（JPE）相对最优 IMU+UWB 基线最多降低 22%。消融研究进一步验证了显式几何建模的必要性：同时移除 Spatial Layout Module 和 UWB-Diffusion Guidance 会使 JPE 增加 17%，而单独应用 UWB-Diffusion Guidance 可降低 SIP 误差 5%、JPE 7%。
 
-## 背景与动机
+
 
 ### 可穿戴人体运动捕捉的传感器融合瓶颈
 
@@ -72,7 +73,9 @@ claims:
 
 上述分析指向一个明确的研究缺口：**如何将 UWB 距离从被动的输入特征升级为主动的几何约束，使其在模型结构和推理过程中都发挥物理引导作用？** 本文提出的 **Ultra Diffusion Poser (UDP)** 正是针对这一缺口设计：通过多维尺度分析（MDS）从距离中封闭形式地重建 3D 传感器布局，将其作为扩散模型的显式空间条件；同时在扩散采样中引入基于前向运动学的距离一致性引导，使预测姿态始终满足观测约束。这一设计使得 UDP 无需依赖外部物理优化器即可产生平滑、高保真的运动估计，在多个基准上将关节位置误差最多降低 22%。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Ultra Diffusion Poser (UDP) 的核心创新在于**将 UWB 传感器间距离从“辅助输入特征”提升为“显式几何约束”**，从根本上改变了 IMU+UWB 融合的范式。传统方法（如 UIP、UMotion）仅将 UWB 距离作为附加特征通过 GCN 或拼接输入网络，完全忽略了这些距离对传感器位置的物理几何约束——预测的 3D 姿态可能违反测量的传感器间距离，导致姿态精度和平滑性受限。UDP 通过两个紧密协同的模块化设计填补了这一空白：
 
@@ -98,7 +101,7 @@ UDP 采用**自回归扩散修复模型（autoregressive diffusion inpainting）
 
 上述三个创新形成闭环：Spatial Layout Module 提供几何先验条件，自回归扩散修复模型生成平滑运动，UWB-Diffusion Guidance 在采样中强制执行距离约束。消融实验清晰揭示了各模块的贡献——同时移除 Spatial Layout Module 和 UWB-Diffusion Guidance 导致 JPE 增加 17%；单独应用 UWB-Diffusion Guidance 可使 SIP 降低 5%、JPE 降低 7%，表明扩散引导能有效纠正违反距离约束的预测。这一“重建—条件—引导”的几何约束闭环，使 UDP 在所有评估基准上均取得 SOTA 性能，关节位置误差相对最佳 IMU+UWB 基线 UIP 最多降低 22%。
 
-## 整体框架
+
 
 Ultra Diffusion Poser (UDP) 是一个端到端可学习的自回归扩散修复模型，其核心设计在于将 UWB 传感器间距离从传统的辅助特征升级为显式几何约束的载体。整体映射关系为：
 
@@ -121,7 +124,7 @@ Figure 1 展示了方法概览，Figure 2 详细描绘了模块间的交互关�
 ![[assets/figures/papers/paper_list_l1004_https_openaccess_thecvf_com_content_CVPR2026_html_Hollidt_Ultra_Diffusio/figures/001_Figure_1.jpg]]
 *Figure 1: Our method UDP improves wearable IMU+UWB pose estimation by extending UWB as an auxiliary feature to actively model its geometric constraints. The Spatial Layout Module reconstructs 3D sensor positions from UWB measurements, providing a physically-informed input that conditions a diffusion model to predict SMPL poses. UWB-Diffusion Guidance encourages alignment between predicted poses and measured distances during diffusion sampling, improving accuracy and producing consistent motions*
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题建模与运动表示
 
@@ -214,7 +217,9 @@ $$\epsilon _ { uwb } = \sum _ { i < j } \| \hat { d } _ { i j } ( \hat { \mathca
 ![[assets/figures/papers/paper_list_l1004_https_openaccess_thecvf_com_content_CVPR2026_html_Hollidt_Ultra_Diffusio/figures/002_Figure_2.jpg]]
 *Figure 2: The Spatial Layout Module applies metric MDS to the pairwise distance matrix D to recover initial sensor positions, which are then oriented by a learnable Rotation Estimator. The resulting 3D sensor layout provides a strong conditioning signal for the diffusion model. The autoregressive diffusion inpainting model extends the previously predicted motion based on the current conditioning signal to ensure smooth motion prediction. UWB-Diffusion Guidance steers the pose predictions to align with the measured inter-sensor distances*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能验证
 
@@ -259,7 +264,9 @@ Figure 3 的定性对比以红色热力图展示位置误差分布。UDP 在 Dan
 - **计算延迟**：扩散模型的迭代采样过程可能引入较高延迟，论文未提供在低功耗设备上的实时性分析，实际部署时需评估推理速度是否满足实时需求。
 - **训练数据偏差**：模型在现有 MoCap 数据集生成的合成 IMU/UWB 数据上训练，真实场景中的传感器噪声分布差异可能影响精度，需要在实际硬件平台上进一步验证。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从 IMU 位姿估计到几何约束驱动的扩散模型
 
@@ -326,6 +333,8 @@ UDP 在可穿戴人体运动估计知识库中占据“几何约束驱动的扩�
 - **架构贡献**：提出了自回归扩散修复模型与几何引导采样的联合框架，为扩散模型在物理约束估计任务中的应用提供了可复用的设计模式。
 
 - **经验贡献**：在 DIP-IMU、DanceDB、TotalCapture、UIP-DB 和 GIP-DB 五个数据集上的全面评估（包括 UWB 噪声鲁棒性分析）为后续研究提供了可靠的基准参照。
+
+
 
 ## 原文 PDF
 

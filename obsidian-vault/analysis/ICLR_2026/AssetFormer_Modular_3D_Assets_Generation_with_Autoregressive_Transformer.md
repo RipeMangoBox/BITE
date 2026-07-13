@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/AssetFormer_Modular_3D_Assets_Generation_with_Autoregressive_Transformer.pdf
+project_link: null
+code_link: https://github.com/Advocate99/AssetFormer
 openreview_forum_id: ODB82HDp0V
 aliases:
 - AM3AGAT
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | AssetFormer：基于自回归Transformer的模块化3D资产生成 |
 | 英文题名 | AssetFormer: Modular 3D Assets Generation with Autoregressive Transformer |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=ODB82HDp0V); [GitHub](https://github.com/Advocate99/AssetFormer) |
+| Links | [paper](https://openreview.net/forum?id=ODB82HDp0V) · [GitHub](https://github.com/Advocate99/AssetFormer) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | AssetFormer |
 | Dataset | Modular Building Generation (collected dataset) |
@@ -39,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - Modular Building Generation (collected dataset) 上，FID (lower is better) 为 55.186 (AssetFormer + Top-K Sampling)，对比 108.476 (PCG)，变化 -53.29。
 
-## 概述
+## 概要
 
 3D资产的生成在游戏开发、虚拟现实和用户生成内容（UGC）场景中需求日益增长。传统方法主要生成密集网格或隐式表示，难以满足模块化资产对低存储占用、可编辑性和高效传输的严苛要求。模块化3D资产由有限类型的离散基元（如墙壁、屋顶、窗户）按空间关系组合而成，每个基元携带类别、旋转角度和三维位置等属性。然而，这类数据天然稀缺，且基元序列的排列顺序直接影响自回归模型的学习效果——不当的顺序会导致生成结构断裂、基元孤立等严重伪影。
 
@@ -47,7 +49,7 @@ AssetFormer针对上述瓶颈，提出了一个基于自回归Transformer的模�
 
 在定量评估中，AssetFormer结合合成数据与真实用户数据的混合训练策略，将FID降至55.186，显著优于程序化生成基线（108.476）和单一数据源训练方案。生成资产可直接无缝集成到Unreal Engine等游戏引擎中，支持纹理映射与零样本编辑，无需额外后处理。
 
-## 背景与动机
+
 
 3D内容创作是游戏开发、虚拟现实和用户生成内容（UGC）平台的核心环节。传统3D资产生成方法主要依赖密集网格或隐式表示（如NeRF、3D高斯泼溅），这些方法虽然在视觉保真度上取得了显著进展，但生成的资产本质上是不透明的三角网格，缺乏结构化信息，难以直接编辑、复用或高效传输。
 
@@ -59,7 +61,9 @@ AssetFormer针对上述瓶颈，提出了一个基于自回归Transformer的模�
 
 针对上述缺口，本文提出AssetFormer——一个基于自回归Transformer的模块化3D资产生成框架。核心思路是将模块化资产表示为基元序列，利用深度优先搜索（DFS）对序列重排序以捕捉空间层次依赖，并采用SlowFast推测解码策略在保持生成质量的同时显著提升推理速度。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 AssetFormer的核心创新在于将模块化3D资产的生成问题转化为**自回归序列建模问题**，并通过三个关键设计突破传统方法的瓶颈。
 
@@ -87,7 +91,7 @@ DFS优于BFS的深层原因是：DFS沿深度方向优先探索，先完整处�
 
 文本控制方面，使用FLAN-T5 XL编码文本并通过MLP投影预填充到序列中，结合分类器自由引导（CFG）增强文本对齐，引导公式为 $l _ { c f g } = l ^ { \prime } + s \cdot ( \breve { l } - l ^ { \prime } )$。数据策略上，结合程序化生成（PCG）合成数据和真实用户数据训练，FID降至55.186，优于单一数据源（真实数据63.381，合成数据113.560），验证了两类数据的互补性（Table 3）——合成数据提供结构多样性，真实数据提供风格约束。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l9_AssetFormer_Modular_3D_Assets_Generation_with_Autoregressive_Transformer/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the AssetFormer Framework. Given the modular assets, e.g., the building, we first render the assets in digital engines and produce the images for querying GPT-4o. The cleaned captions, pre-filled with a re-ordered token set, serve as input for the autoregressive modeling. After training, AssetFormer autoregressively produces modular assets that are ready to be integrated into industrial environments, with model-based enhancement and application-driven deployment*
@@ -108,7 +112,7 @@ AssetFormer 的整体 pipeline 围绕三个核心阶段构建：数据策展、�
 
 最终生成的基元序列可直接解析为模块化资产，无缝集成到 Unreal Engine 等游戏引擎中，支持纹理映射与编辑（Fig. 8, Fig. 11），无需后处理步骤。
 
-## 核心模块与公式推导
+
 
 AssetFormer 的核心是将模块化 3D 资产生成建模为离散基元序列的自回归预测问题。模型以文本描述 $t$ 为输入，输出由 $N$ 个基元构成的资产 $\{P\}_{i=1}^{N}$，其中每个基元 $P_j$ 携带三个离散属性：
 
@@ -170,7 +174,9 @@ $$\hat{x}_t \sim p(x \mid \text{prefix}, x_0, \ldots, x_{n-1}, \hat{x}_0, \ldots
 
 该策略利用模块化资产生成中预测难度的不均性——简单基元（如标准墙体）由草案模型快速处理，复杂结构由目标模型精修——在保持 FID 55.831（接近目标模型 55.186）的同时，将解码速度从 80.62 token/s 提升至 119.02 token/s，加速 1.48 倍（Table 4）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果
 
@@ -220,7 +226,9 @@ Fig. 5揭示了直接微调原生3D生成模型（如Hunyuan3D 2.0）的固有�
 
 Fig. 6的透明渲染对比显示，AssetFormer生成的建筑内部结构紧凑有序，而MeshGPT生成的网格内部存在大量冗余面和空洞。Table 6系统总结了模块化表示相比网格表示的优势：无损、引擎就绪、高效存储、无需后处理、用户可编辑。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有方法的关系
 
@@ -256,6 +264,8 @@ Fig. 6的透明渲染对比显示，AssetFormer生成的建筑内部结构紧凑
 3. **实时交互式编辑**：模型展示了零样本编辑能力（Fig. 9），但如何实现实时交互式编辑，让用户即时修改生成的模块化结构？这需要在解码速度和交互延迟之间找到平衡。
 4. **更大规模扩展性**：在更大规模的数据集上，自回归Transformer的扩展性如何？是否需要更高效的tokenization策略来应对基元数量和类别增长带来的序列长度膨胀？
 5. **评估体系完善**：如何建立更全面的3D模块化资产评估指标，超越渲染图像FID，直接衡量结构准确性、模块连接合理性和空间层次一致性？
+
+
 
 ## 原文 PDF
 

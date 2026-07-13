@@ -40,7 +40,7 @@ claims:
 > - DPG-Bench, FLUX.1 VAE (FLUX.1[dev]), 2048×2048 输出 上，NIQE (越低越好) 3.50 vs 4.04 (SSDD + InvSR-1) (-0.54)；Latency (ms, torch.compile, GB200) 211.2 vs 1237.5 (VAE Dec. + SeedVR2-3B) (-1026.3 ms (约5.9倍加速))。
 > - DPG-Bench, SigLIP (Scale-RAE 2.8B), 2048×2048 输出 上，MUSIQ (越高越好) 74.03 vs 73.68 (VAE Dec. + SeedVR2-3B) (+0.35)；Unipercept-IAA (越高越好) 64.94 vs 59.95 (VAE Dec. + SeedVR2-3B) (+4.99)。
 
-## 概述
+## 概要
 
 图像生成模型的主流范式依赖潜空间扩散模型（LDM）在压缩潜码上完成语义合成，再通过确定性解码器重建为像素图像。当目标分辨率超出原生输出时，需级联独立超分模型——这一“先解码、再上采样”的流水线面临两个深层瓶颈：
 
@@ -57,8 +57,6 @@ PiD（Pixel Diffusion Decoder）将潜码解码重新定义为**条件像素扩�
 - 蒸馏后的 4 步学生模型在生成场景下甚至超越 50 步教师模型（MUSIQ 73.26 vs 71.79），验证了 DMD2 蒸馏的有效性。
 
 **方法定位**：PiD 属于**生成式潜码解码器**，区别于传统的确定性重建解码器和级联超分流水线。它利用像素扩散先验的生成能力补偿潜码压缩损失，同时通过噪声条件化训练使解码器对部分去噪潜码具有鲁棒性，支持 LDM 早期终止以进一步降低端到端延迟。
-
-## 背景与动机
 
 ### 潜码解码的瓶颈：从重建到生成
 
@@ -90,7 +88,7 @@ PiD 的核心动机即源于上述分析：**将潜码解码重新定义为条�
 
 通过将解码与上采样统一为单个条件扩散模型，PiD 消除了级联流水线的中间瓶颈，在 2048×2048 分辨率下实现约 210ms 的解码延迟（GB200 GPU，torch.compile），比扩散基超分基线快 3–6 倍，同时在多个无参考质量指标上达到最优。
 
-## 核心创新
+## 核心方法与创新机理
 
 PiD 的核心创新在于将潜码解码从**确定性重建**范式彻底转向**条件生成**范式，并通过三个关键设计实现解码质量、效率与灵活性的同步提升。
 
@@ -135,8 +133,6 @@ PiD 采用 DMD2 将多步教师模型蒸馏为 4 步学生模型，同时将 CFG
 
 消融实验验证了各设计的必要性：移除 T2I 先验（即从头训练像素扩散解码器）导致 MUSIQ 从 73.26 骤降至 59.52，NIQE 从 3.50 升至 7.79（Table 4），证明预训练像素扩散先验是质量的核心保障；移除 sigma 感知门控则导致所有无参考指标恶化，尤其在高噪声潜码条件下重建质量显著下降。
 
-## 整体框架
-
 PiD 将潜码解码重新定义为**条件像素扩散生成任务**，用一个端到端的生成模块同时完成解码与上采样，取代传统的“解码—超分”级联流水线。图 3 给出了整体架构。
 
 ### 输入与输出
@@ -180,8 +176,6 @@ $$\mathcal{L}_{\mathrm{FM}} = \mathbb{E}\left[\|\mathbf{v}_{\theta}(\mathbf{x}_t
 
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2605_23902/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of PiD. PiD unifies latent decoding and upsampling as a single latent-conditioned pixel diffusion model that predicts the target-resolution pixel-space velocity field. Noise-corrupted latent training and sigma-aware gating make the decoder robust to partially denoised latents, enabling early exit from the base LDM while preserving high-resolution output quality*
-
-## 核心模块与公式推导
 
 PiD 将潜码解码重新定义为**条件像素扩散**，其核心架构由四个关键模块构成，共同实现从低分辨率潜码到高分辨率像素图像的一步生成。
 
@@ -235,7 +229,7 @@ $$\mathcal{L}_{\text{FM}} = \mathbb{E}\left[\|\mathbf{v}_\theta(\mathbf{x}_t, t,
 
 四个模块形成闭环：PixelDiT 骨干提供像素空间生成先验；噪声潜码条件化使解码器对不完美潜码鲁棒；Sigma 感知门控在保真度与自由度之间做自适应权衡；DMD2 蒸馏将上述能力压缩为 4 步推理。消融实验（Table 4）证实：移除 T2I 先验导致 MUSIQ 从 73.26 骤降至 59.52，移除 Sigma 感知门控则普遍恶化视觉质量——二者均为性能的关键支撑。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主要定量结果
 
@@ -293,9 +287,6 @@ PiD 在六个不同潜空间（FLUX.1、SD3、FLUX.2、Z-Image、DINOv2、SigLIP
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2605_23902/figures/007_Figure_5.jpg]]
 *Figure 5: Image reconstruction comparison. Given a latent encoded from a clean image, PiD reconstructs the image at higher resolution with sharper details than the original VAE / RAE decoder*
 
-![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2605_23902/figures/008_Figure_6.jpg]]
-*Figure 6: VAE decoding and PiD decoding at different LDM termination steps. Top: VAE decoding. Bottom: PiD decoding. With the full LDM denoising steps, PiD is faithful to the latent’s VAE decoding results; at intermediate steps, because the base latent diffusion model has not denoised all the subtle details, it allows PiD to imagine additional details*
-
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2605_23902/figures/009_Figure_7.jpg]]
 *Figure 7: PiD vs. cascaded super-resolution. From a FLUX.1 [dev] latent of a 5122 image, baselines apply a super-resolution model on VAE decoding output, while PiD decodes directly to 20482. PiD produces sharper detail at lower latency. Latency is measured on a single GB200 GPU with torch.compile*
 
@@ -314,7 +305,7 @@ PiD 在六个不同潜空间（FLUX.1、SD3、FLUX.2、Z-Image、DINOv2、SigLIP
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2605_23902/figures/002_Figure_2.jpg]]
 *Figure 2: 4K decoding results. PiD synthesize more details at 4k resolution*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 核心创新定位
 

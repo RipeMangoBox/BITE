@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Sample_More_to_Think_Less_Group_Filtered_Policy_Optimization_for_Concise_Reasoning.pdf
+project_link: null
+code_link: null
 openreview_forum_id: UKOqoULbZS
 aliases:
 - GFPOG
@@ -42,7 +44,7 @@ claims:
 > - AIME 24 上，Pass@1 / Response Length / ELR 为 76.4% / 10.6k / 84.6%，对比 77.7% / 13.3k / 0%，变化 -1.3% (n.s.) / -2.7k / +84.6%。
 > - GPQA 上，Pass@1 / Response Length / ELR 为 68.5% / 7.5k / 79.7%，对比 67.5% / 10.7k / 0%，变化 +1.0% (n.s.) / -3.2k / +79.7%。
 
-## 概述
+## 概要
 
 基于强化学习的推理训练（RLVR）在提升大型语言模型复杂推理能力方面取得了显著进展，但其主流方法 GRPO（Shao et al., 2024）暴露出一个关键瓶颈：训练过程中模型的响应长度会持续膨胀，产生大量冗余 token，而准确率并未相应提升。这种“长度爆炸”现象不仅增加了推理延迟和计算成本，还使得在监督微调（SFT）阶段形成的逐步推理习惯被进一步放大。
 
@@ -52,7 +54,7 @@ claims:
 
 GFPO 无需复杂的奖励工程，可灵活适配长度、token 效率等多种过滤指标，并支持根据问题难度自适应调整保留数量。该方法在 DeepSeek-R1 蒸馏模型（Qwen、Llama，7B–14B）上同样有效，展现出良好的模型和任务泛化能力。
 
-## 背景与动机
+
 
 ### 推理模型中的“长度膨胀”困境
 
@@ -75,7 +77,9 @@ GFPO 无需复杂的奖励工程，可灵活适配长度、token 效率等多种
 
 基于此，本文提出**Group Filtered Policy Optimization（GFPO）**，其核心思想是：**在训练时增加采样数量，但仅让满足简洁性偏好的响应参与学习。** 通过将冗长响应的优势直接置零，GFPO从梯度层面切断了冗长行为的强化路径，从而在保持准确率的同时，大幅抑制长度膨胀。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：GRPO 的长度膨胀
 
@@ -113,7 +117,7 @@ GFPO 的核心创新在于**在训练时通过“采样更多、保留更少”�
 
 GFPO 的优势在于其过滤机制与优势归一化正交，可与 Dr. GRPO 等其他 RLVR 改进兼容叠加；同时，它通过拒绝步骤隐式塑造学习信号，避免了显式惩罚项带来的奖励工程复杂性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l40_https_openreview_net_forum_id_UKOqoULbZS/figures/001_Figure_1.jpg]]
 *Figure 1: Left: GFPO introduces simple yet powerful modifications to GRPO: sample more responses during training (↑ G), rank them by a target attribute (e.g., length, token efficiency), and learn only from the top-k—setting the advantages of the rest to zero. This selective learning functions as implicit reward shaping, steering the policy toward desired behaviors. Right: When optimizing for length or token efficiency, GFPO curbs GRPO’s length inflation—letting the model think less at inference-time by sampling more at training-time—while maintaining its core reasoning capabilities*
@@ -160,7 +164,7 @@ $$\mathcal{J}_{\mathrm{GFPO}}(\theta) = \mathbb{E}_{q \sim P(Q), \{o_i\}_{i=1}^G
 
 整个管线对 GRPO 的改动集中在采样规模放大和优势计算屏蔽两个环节，与 Dr. GRPO（Liu et al., 2025）等基于归一化修改的方法正交，理论上可与之叠加使用。
 
-## 核心模块与公式推导
+
 
 ### GFPO 的五个核心模块
 
@@ -213,7 +217,9 @@ $$R = w_{\mathrm{acc}} \cdot \mathrm{LENGTHSCALE}(R_{\mathrm{acc}}) + w_{\mathrm
 
 **要点**：GFPO 并未修改奖励函数本身，而是通过**优势屏蔽**在策略梯度层面间接传递简洁性偏好，避免了复杂奖励工程可能引入的偏差。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -285,7 +291,9 @@ Table 2展示了GFPO在DeepSeek-R1蒸馏模型上的跨架构泛化能力。在D
 *Table 4: Pass@1 Accuracy and Average Response Lengths on AIME 25, AIME 24, GPQA, Omni-MATH, and LiveCodeBench. GFPO variants substantially reduce response lengths while matching GRPO accuracy. We find no statistically significant differences in GFPO’s accuracy under the Wilcoxon signed-rank test for any dataset. Dr. GRPO yields lower accuracy (66.6% vs 69.5% on AIME 25, 74.4% vs 76.4% on AIME 24, 66.7% vs 68.5% on GPQA) and substantially longer responses than GFPO (43.6% vs 70.9% len reduction on AIME 25, 48.5% vs 84.6% on AIME 24, 65.1% vs 79.7% on GPQA, and 7.2% vs 79.7% on LiveCodeBench)*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基础RLVR方法的关系
 
@@ -326,6 +334,8 @@ GFPO直接建立在GRPO（Shao et al., 2024）的强化学习框架之上，其�
 4. **跨任务泛化机制**：GFPO在分布外的代码基准LiveCodeBench上同样抑制了长度膨胀，表明过滤机制学习到的简洁性偏好具有一定的任务泛化能力。这种泛化的深层原因——是简洁推理本身具有跨域共性，还是过滤机制隐式地正则化了策略——值得进一步研究。
 
 5. **大规模部署的可行性**：在更大规模模型或更复杂的推理任务中，GFPO的额外采样开销和过滤策略是否仍能维持当前的效率优势？特别是当单次推理成本已经很高时，增大G的边际收益可能递减。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,7 @@ paper_level: A
 venue: "SIGGRAPH Asia"
 year: 2024
 pdf_ref: paperPDFs/SIGGRAPH_ASIA_2024/MotionFix_Text_Driven_3D_Human_Motion_Editing.pdf
+code_link: null
 paper_link: https://arxiv.org/abs/2408.00712
 project_link: https://motionfix.is.tue.mpg.de
 aliases:
@@ -33,7 +34,7 @@ claims:
 | 中文题名 | MotionFix：文本驱动的三维人体运动编辑 |
 | 英文题名 | MotionFix: Text-Driven 3D Human Motion Editing |
 | 会议/期刊 | SIGGRAPH Asia 2024 |
-| Links | [paper](https://arxiv.org/abs/2408.00712); [Project](https://motionfix.is.tue.mpg.de) |
+| Links | [paper](https://arxiv.org/abs/2408.00712) · [Project](https://motionfix.is.tue.mpg.de) |
 | Topic | #topic/motion_animation #topic/motion_animation/human_motion_generation |
 | Method | TMED (Text-Driven Motion Editing Diffusion Model) |
 | Dataset | MotionFix 测试集, 数据规模消融（MotionFix 训练数据比例） |
@@ -43,7 +44,7 @@ claims:
 > - MotionFix 测试集 上，R@1 (生成→源检索) 为 46.10，对比 2.47 (MDM) / 34.65 (MDM-BP)，变化 适度高于基线以维持源保真度。
 > - 数据规模消融（MotionFix 训练数据比例） 上，R@1 (生成→目标检索) 为 10%: 19.25, 50%: 47.08, 100%: 62.90，对比 n/a，变化 从 10% 到 100% 显著提升。
 
-## 概述
+## 概要
 
 **问题瓶颈**：文本驱动的三维人体运动编辑面临双重挑战——缺乏包含源运动、目标运动与编辑文本的三元组训练数据，以及如何设计能同时忠实遵循源运动并精确执行编辑指令的生成模型。现有文本到运动生成方法仅以文本为条件，无法显式建模源运动约束，导致编辑结果偏离源运动或忽略编辑意图。
 
@@ -55,7 +56,7 @@ claims:
 
 **局限与开放问题**：模型在处理细节丰富但运动差异微妙的编辑指令时可能失败；当源-目标运动 TMR 相似度较低时，生成结果可能偏离源运动。现有评估主要依赖检索指标，对编辑保真度和运动质量的衡量仍不充分。未来方向包括提升对复杂多步指令的泛化能力、扩展至长序列连续编辑，以及结合物理约束生成更符合动力学的编辑结果。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -77,7 +78,9 @@ claims:
 
 这一设计将运动编辑从“测试时技巧”提升为“有监督学习问题”，为文本驱动的运动编辑建立了可扩展的范式。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MotionFix 的核心创新在于**数据与模型的双重重构**，将文本驱动的人体运动编辑从一个缺乏训练数据的“重定向”问题转变为一个可学习的条件生成任务。其关键洞察是：利用 TMR 文本-运动嵌入空间检索相似运动对，并通过人工标注编辑文本构建大规模三元组数据集，从而可以训练一个直接以源运动和编辑文本为条件的扩散模型。
 
@@ -116,7 +119,7 @@ TMED 在 MDM（Tevet et al., ICLR 2023）文本到运动扩散框架的基础上
 
 综上，MotionFix 的核心创新可概括为：**以数据构建驱动模型设计，通过三元组数据集使扩散模型学会“源运动+编辑文本→目标运动”的条件映射，并以双引导机制实现可控编辑**。这一思路从根本上改变了文本驱动运动编辑的范式——从测试时的启发式重定向转向训练时的条件生成学习。
 
-## 整体框架
+
 
 MotionFix 提出了一个完整的文本驱动三维人体运动编辑流水线，其核心由**数据构建**与**条件扩散模型**两大阶段构成。
 
@@ -158,7 +161,7 @@ $$\tilde{e}_{\theta}(M_T, s_{M_S}, s_L) = e_{\theta}(M_T, \emptyset, \emptyset) 
 - **去噪过程**：Transformer 在时间步、文本、源运动三重条件下逐步去噪。
 - **输出**：编辑后的目标运动 $M_T$，与源运动具有相同的 SMPL 参数化表示，可直接用于下游动画应用。
 
-## 核心模块与公式推导
+
 
 ### 运动表示
 
@@ -204,7 +207,9 @@ $$\tilde{e}_{\theta}(M_T, s_{M_S}, s_L) = e_{\theta}(M_T, \emptyset, \emptyset) 
 
 其中 $e_{\theta}(\cdot)$ 为模型预测的分数函数，$s_{M_S}$ 为源运动引导尺度，$s_L$ 为文本引导尺度，$\emptyset$ 表示对应条件置空。通过调节 $s_{M_S}$ 和 $s_L$，可在源运动忠实度与编辑文本遵循度之间取得平衡。消融实验（Figure 4）表明，两个引导尺度需保持适度平衡，极端取值会导致某一维度性能显著下降。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -269,7 +274,9 @@ TMED 在采样时使用两个独立的 classifier-free guidance 尺度：源运�
 ![[assets/figures/papers/paper_list_l6_MotionFix_Text_Driven_3D_Human_Motion_Editing/figures/015_Table.jpg]]
 *Table: 14 • Nikos Athanasiou, Alpár Cseke, Markos Diomataris, Michael J. Black, and Gül Varol*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 一、任务定位与核心瓶颈
 
@@ -330,6 +337,8 @@ TMED 与这些基线的本质区别在于 **训练范式**：基线均为测试�
 - 如何结合更强的时空感知机制，减少模型对源运动的无意识发散？
 - 是否可以自动检测或推断需要编辑的身体部位，以避免依赖外部不完美的自动标注？
 - 该方法能否与物理模拟或动力学约束结合，生成更符合物理规律的编辑？
+
+
 
 ## 原文 PDF
 

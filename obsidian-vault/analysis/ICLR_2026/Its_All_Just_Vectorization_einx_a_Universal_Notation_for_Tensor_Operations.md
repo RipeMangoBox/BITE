@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Its_All_Just_Vectorization_einx_a_Universal_Notation_for_Tensor_Operations.pdf
+project_link: null
+code_link: https://github.com/fferflo/einx
 openreview_forum_id: QqvQ3iAdpC
 aliases:
 - ISAJVEUNTO
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 一切皆向量化：einx——一种通用的张量运算符号 |
 | 英文题名 | It's All Just Vectorization: einx, a Universal Notation for Tensor Operations |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=QqvQ3iAdpC); [GitHub](https://github.com/fferflo/einx) |
+| Links | [paper](https://openreview.net/forum?id=QqvQ3iAdpC) · [GitHub](https://github.com/fferflo/einx) |
 | Topic | #topic/benchmarks_datasets_evaluation #topic/benchmarks_datasets_evaluation/benchmark_eval |
 | Method | einx |
 | Dataset | einx.id (transpose) compilation overhead, einx.add (simple) compilation overhead, einx.add (with d=2) compilation overhead |
@@ -41,7 +43,7 @@ claims:
 > - einx.add (simple) compilation overhead 上，time (ms) 为 9.3 ± 2.4，对比 0.077 ± 0.003，变化 +9.223。
 > - einx.add (with d=2) compilation overhead 上，time (ms) 为 23.5 ± 3.1，对比 0.077 ± 0.003，变化 +23.423。
 
-## 概述
+## 概要
 
 现有Numpy-like张量框架（如NumPy、PyTorch）面临一个根本性瓶颈：API庞大且不一致，缺乏通用的向量化表示，导致代码难以阅读和编写，并频繁引发形状错误。例如，仅索引类操作就需要`torch.take`、`torch.gather`、`torch.index_select`等多个函数来处理不同的向量化模式。
 
@@ -51,7 +53,7 @@ einx的核心洞察是：**所有张量操作本质上都只是基本操作的�
 
 实验方面，einx的首次调用编译开销在毫秒级（如`einx.id`转置约6.8ms），后续缓存调用开销降至0.1ms以下，对实际使用影响有限。使用统计（Table 4）显示，einsum和einops在ML会议论文中的使用率分别达35.27%和21.19%，表明社区对统一张量符号存在真实需求，einx有潜力成为下一代的整合方案。
 
-## 背景与动机
+
 
 ### 张量框架的API碎片化困境
 
@@ -85,7 +87,9 @@ einx的核心洞察是：**所有张量操作本质上都只是基本操作的�
 
 那么上述碎片化问题将从根本上得到解决。这正是einx的设计动机：将“一切皆向量化”的哲学具体化为一种**声明式、有指向（pointful）的符号系统**，通过类比循环记法（loop notation）定义，用方括号显式区分向量化轴与基本操作轴，从而将Numpy-like框架的复杂API归约为少数基本操作与一套统一的向量化表达规则（参见Table 1）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 创新动机：张量API的碎片化困境
 
@@ -139,7 +143,7 @@ $$\text{einx.multiply}(\text{"a…, b… → (a b)…"}, x, y)$$
 
 einx与**named tensors**（如Haliax）的根本区别在于：named tensors通过轴名实现隐式向量化，要求框架层面支持；而einx是**声明式符号层**，不改变底层张量语义，可在任何NumPy-like框架上实现。einx表达式自我文档化轴名，但采用声明式而非命令式风格。
 
-## 整体框架
+
 
 einx 的整体设计遵循**“一切皆向量化”**的核心思想，将任意张量操作分解为基本操作与其向量化表示两个正交维度。其工作流可概括为三个阶段：**AST生成与轴解析 → 计算图构建 → 代码生成与优化**。
 
@@ -199,7 +203,7 @@ einx表达式 + 张量参数
 
 这一流水线的核心优势在于**解耦操作与向量化**：无论底层基本操作是点积、加法还是自定义函数，向量化的表达规则完全一致，从而将 NumPy-like 框架中庞大且不一致的 API 归约为少数几个基本操作入口（见 Table 1）。
 
-## 核心模块与公式推导
+
 
 ### 核心设计思想
 
@@ -261,7 +265,9 @@ einx 将表达式编译为可执行的后端代码，流程分为三个关键模
 
 这些差异使 einx 能将 NumPy-like 框架中数十个功能不同的函数（如 `torch.take`、`torch.gather`、`torch.scatter` 等）统一为 `einx.get_at`、`einx.set_at` 等少数基本操作，仅通过向量化字符串区分行为（Table 1）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心主张的实证支撑
 
@@ -311,7 +317,9 @@ einx 将表达式编译为可执行的后端代码，流程分为三个关键模
 
 4. **缺乏自动微分验证**：论文未展示 `einx` 与 PyTorch/JAX 自动微分系统的集成测试，自定义操作的梯度传播正确性需要手动验证。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 符号系统的演化脉络
 
@@ -344,6 +352,8 @@ einx 的适用边界由以下三个约束划定：
 - **编译开销优化**：当前实现通过 `exec` 生成 Python 代码片段并缓存，首次调用的毫秒级开销在批量处理场景中可忽略，但在交互式探索或低延迟服务中仍是障碍。是否可以通过预编译或 AOT（ahead-of-time）模式消除这一开销，是工程层面的关键问题。
 
 - **自动微分集成**：论文未讨论 einx 与自动微分框架的深度集成。对于自定义操作，用户需要手动提供梯度实现，这限制了 `einx` 在需要反向传播的训练循环中的灵活性。能否将 einx 的向量化语义直接映射到 vmap + autograd 的组合，是一个值得探索的方向。
+
+
 
 ## 原文 PDF
 

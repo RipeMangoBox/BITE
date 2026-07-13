@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/FloodDiffusion_Tailored_Diffusion_Forcing_for_Streaming_Motion_Generation.pdf
+project_link: https://shandaai.github.io/FloodDiffusion/
+code_link: null
 aliases:
 - FloodDiffusion
 tags:
@@ -40,7 +42,7 @@ claims:
 > - HumanML3D 上，FID↓ 0.057 vs 0.109 (MoMask, 非流式 SOTA) (优于所有流式基线，与离线SOTA持平)；R@1↑ 0.523 vs 0.433 (MotionStreamer) (+0.090)。
 > - BABEL 上，PJ→ (closer to real is better) 0.713 vs 0.641 (PRIMAL) (优于所有流式基线)；AUJ↓ 14.05 vs 17.20 (PRIMAL) (-3.15)。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -68,7 +70,7 @@ claims:
 
 FloodDiffusion 处于**扩散生成 × 流式推理 × 人体运动建模**的交汇点。它继承扩散强制的精确似然框架，但通过向量化时间调度和双向注意力将其从视频域迁移至运动域。与基于块的扩散方法（如 PRIMAL）不同，FloodDiffusion 的三角调度实现了帧级粒度的渐进去噪，延迟更低；与基于因果 VAE + 自回归扩散头的 MotionStreamer 相比，FloodDiffusion 的双向注意力在激活窗口内保留了更强的上下文建模能力。
 
-## 背景与动机
+
 
 ### 流式人体运动生成的任务特性
 
@@ -109,7 +111,9 @@ FloodDiffusion 处于**扩散生成 × 流式推理 × 人体运动建模**的�
 
 这些方法在HumanML3D基准上的FID均显著弱于离线SOTA方法（如MoMask的0.109），且无法同时保证低延迟和高质量。FloodDiffusion通过订制扩散强制框架，在保持流式生成能力的同时，将FID提升至0.057，**首次实现流式方法与离线SOTA的性能持平**。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FloodDiffusion 的核心创新在于对扩散强制（diffusion forcing）框架进行了三项针对性订制，使其从视频生成领域成功迁移至流式人体运动生成任务。原始扩散强制为视频生成设计，采用因果注意力、随机时间步调度和显式文本刷新机制，但这些设计无法正确建模运动分布，导致生成质量严重退化。FloodDiffusion 通过以下三个关键修改解决了这一瓶颈：
 
@@ -133,7 +137,7 @@ $$\alpha_t^k = \mathrm{clamp}\left(t - \frac{k}{n_s}, 0, 1\right)$$
 
 通过向量化时间调度与双向注意力的结合，FloodDiffusion 在保持精确似然（非 ELBO 代理）的同时实现了有界延迟的流式生成。这三项订制使扩散强制首次在流式运动生成任务上达到与离线方法竞争的 SOTA 性能：在 HumanML3D 上取得 FID 0.057，优于所有现有流式方法，并与离线 SOTA 方法 **MoMask**（Guo et al., CVPR 2024）的 0.109 相当甚至更优。
 
-## 整体框架
+
 
 FloodDiffusion 是一种基于**扩散强制（diffusion forcing）**的潜在扩散框架，专为流式人体运动生成设计。其核心流水线由三个紧密协作的模块构成：**因果 VAE（Causal VAE）**、**双向注意力 DiT 去噪器**，以及**连续时变文本条件注入**。整个框架的输入为时变文本提示序列，输出为与之对齐的连续人体运动流。
 
@@ -156,7 +160,7 @@ $$\hat{u}_t(\mathbf{x},\mathbf{c}) = \arg\min_{u_t^\theta} \mathbb{E}_{t,\mathbf
 ![[assets/figures/papers/paper_list_l15_https_openaccess_thecvf_com_content_CVPR2026_html_Cai_FloodDiffusion_Tai/figures/002_Figure_2.jpg]]
 *Figure 2: Pipeline Overview. FloodDiffusion is a latent diffusion based framework, the 263D motion stream is encoded to a compact 4D latent sequence via our causal VAE. Then the model predicts the velocity for the latent*
 
-## 核心模块与公式推导
+
 
 FloodDiffusion 的核心架构由三个紧密耦合的模块构成，共同实现从时变文本提示到连续运动序列的流式生成。图2给出了整体流水线概览：263维运动流经因果VAE压缩为4维潜在序列，随后由DiT去噪器在向量化时间调度下预测速度场，并通过逐帧文本条件注入实现连续语义控制。
 
@@ -216,7 +220,9 @@ $$\hat{u}_t(\mathbf{x}, \mathbf{c}) = \arg\min_{u_t^\theta} \mathbb{E}_{t, \math
 ![[assets/figures/papers/paper_list_l15_https_openaccess_thecvf_com_content_CVPR2026_html_Cai_FloodDiffusion_Tai/figures/004_Figure_4.jpg]]
 *Figure 4: Comparison of time-varying conditioning. Our model generates different resulting motions from the same text prompts based on their delivery timing. (Top Left) Prompts are given separately at different frames. (Top Right) All conditions are fed as a single prompt at once. (Bottom Left) Two separate prompts are input early in the sequence. (Bottom Right) The same two separate prompts are input later in the sequence*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -269,7 +275,9 @@ FloodDiffusion 在两个主流文本驱动运动生成基准 HumanML3D 和 BABEL
 
 ![[assets/figures/papers/paper_list_l15_https_openaccess_thecvf_com_content_CVPR2026_html_Cai_FloodDiffusion_Tai/figures/009_Table.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 在扩散运动生成谱系中的位置
 
@@ -325,6 +333,8 @@ FloodDiffusion 的方法贡献可定位于以下知识节点：
 - **扩散强制订制**：首次证明扩散强制可通过三项订制（双向注意力、下三角调度、连续文本融合）适配流式运动生成，为扩散强制在其他时序生成任务（如语音、音乐）上的应用提供了订制范式。
 - **向量化时间调度**：提出的下三角调度 $\alpha_t^k = \mathrm{clamp}(t - k/n_s, 0, 1)$ 是一种通用的流式扩散调度方案，可独立于运动生成应用于其他需要有界延迟的序列生成任务。
 - **流式运动生成基准**：在 HumanML3D 和 BABEL 上建立了流式运动生成的强基线，首次在 FID 上达到与离线 SOTA 竞争的水平（0.057 vs. MoMask 0.109），为后续流式方法提供了明确的性能标杆。
+
+
 
 ## 原文 PDF
 

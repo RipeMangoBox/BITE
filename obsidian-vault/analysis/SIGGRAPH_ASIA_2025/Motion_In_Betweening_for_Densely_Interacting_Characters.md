@@ -5,6 +5,8 @@ paper_level: A
 venue: SIGGRAPH ASIA
 year: 2025
 pdf_ref: paperPDFs/SIGGRAPH_ASIA_2025/Motion_In_Betweening_for_Densely_Interacting_Characters.pdf
+project_link: null
+code_link: null
 aliases:
 - CSB
 - MBDIC
@@ -39,13 +41,11 @@ claims:
 > [!tip] 效果简介
 > - Boxing 上，FID (100 frames) 0.282 vs 0.696 (w/o Motion Refiner) (-0.414)；Interaction quality (discriminator accuracy at 40 frames) 0.914 vs 优于所有基线（具体数值未提供） (N/A)；L2P (30 frames) 0.192 vs N/A（与Phase Betweener等比较，数值未提供） (N/A)。
 
-## 概述
+## 概要
 
 密集交互双角色的运动中间插值面临一个核心瓶颈：系统必须同时满足空间‑时间对齐、关键姿势到达和泛化性三重严格约束，导致解空间严重受限。当自回归生成长序列时，姿势误差会快速累积，严重破坏交互质量。本文提出 **Cross‑Space In‑Betweening**，将交互生成分解为两个阶段——个体相对关键姿势的插值与基于对方根空间的交互调制——从而显式解耦个体运动与交互条件。在此基础上，方法引入成对关节距离动态的周期性编码，驱动对抗训练以维持长期交互模式，并在推理时使用运动细化器校正潜分布，阻止误差漂移。
 
 实验表明，在 Boxing 数据集上，运动细化器使 FID 从 0.696 降至 0.282；用户研究中，本方法得分与真实运动相当，显著超越所有基线方法。该方法为密集交互角色的长期运动合成提供了一条有效的解耦‑调制‑校正路径，但其周期性编码策略主要适用于拳击、舞蹈等具有明显重复模式的交互，如何扩展至非周期性或高度非对称交互仍是开放问题。
-
-## 背景与动机
 
 ### 问题背景
 
@@ -79,7 +79,7 @@ claims:
 
 **动机三：在推理阶段引入轻量级校正机制。** 即使训练阶段引入了长期约束，自回归推理时的分布漂移仍然不可完全避免。通过在推理时使用一个简单的运动细化器对生成片段的潜分布进行校正，可以以极小的计算开销阻止误差漂移，使FID指标从0.696大幅改善至0.282。
 
-## 核心创新
+## 核心方法与创新机理
 
 本工作针对**密集交互双角色运动中间插值**这一高约束生成任务，提出了 **Cross-Space In-Betweening** 框架。其核心创新可归结为两个关键“changed slots”，分别解决了交互条件注入方式和长期生成质量维持机制的根本缺陷。
 
@@ -118,8 +118,6 @@ $$\mathcal{L}_{\mathrm{refine}} = \frac{1}{P} \sum^{P} (M_{\mathrm{refine}}^{t+l
 
 这两个创新协同运作：跨空间表示解耦了个体运动与交互条件，使生成器能专注于各自子问题；双层次长期维持机制则分别在交互模式一致性和个体运动质量两个层面阻止误差累积，共同支撑了用户研究中与真实运动得分相当的生成质量（Fig. 8）。
 
-## 整体框架
-
 本文提出 **Cross-Space In-Betweening**，一种面向密集交互双角色的运动中间插值框架。其核心设计理念是将复杂的双角色交互生成问题**分解为两个阶段**：个体中间插值（Individual In-Betweening）与交互建模（Interaction Modeling），并通过跨空间表示实现二者的有效耦合。
 
 ### 问题定义
@@ -157,13 +155,6 @@ $$\mathcal{L}_{\mathrm{inbetween}} = \lambda_{\mathrm{mse}} \mathcal{L}_{\mathrm
 同时，交互周期性判别器以对抗损失 $\mathcal{L}_{\mathrm{adv}}$ 独立训练，运动细化器以 $\mathcal{L}_{\mathrm{refine}}$ 单独训练。推理时，主网络自回归生成运动片段，运动细化器实时校正输出分布，单步推理耗时约 125 ms / 10 帧。
 
 这一模块化设计使得框架能够在不显著增加复杂度的前提下，同时满足关键姿势到达、交互空间一致性和长期运动质量三大约束。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1810_Motion_In_Betweening_for_Densely_Interacting_Characters/figures/011_Figure_10.jpg]]
-*Figure 10: By manipulating the root translations and rotations of keyposes via the control panel (le ), our system synthesizes interactive in-between motion sequences that dynamically respond to the specified keypose configurations. Detailed animation results are provided in the supplementary video*
-
-## 核心模块与公式推导
 
 ### 4.1 跨空间中间插值（Cross-Space In-betweening）
 
@@ -245,12 +236,7 @@ $$\mathcal{L}_{\text{refine}} = \frac{1}{P} \sum^{P} (M_{\text{refine}}^{t+l} - 
 
 消融实验表明，去除运动细化器后长序列 FID 从 0.282 恶化至 0.696，并出现手部关节变形（Fig. 13），验证了该模块对阻止误差累积的关键作用。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1810_Motion_In_Betweening_for_Densely_Interacting_Characters/figures/003_Figure_3.jpg]]
-*Figure 3: Details of the interaction periodicity modeling. We first extract the pairwise joint distances*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 主结果
 
@@ -313,7 +299,7 @@ $$\mathcal{L}_{\text{refine}} = \frac{1}{P} \sum^{P} (M_{\text{refine}}^{t+l} - 
 ![[assets/figures/papers/paper_list_l1810_Motion_In_Betweening_for_Densely_Interacting_Characters/figures/007_Table_1.jpg]]
 *Table 1: antitative results compared with previous methods and ablated versions. All comparison methods and ablated networks are trained on Boxing dataset only*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 问题定位：密集交互中间插值的核心瓶颈
 

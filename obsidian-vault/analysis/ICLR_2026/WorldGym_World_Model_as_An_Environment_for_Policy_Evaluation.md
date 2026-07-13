@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/WorldGym_World_Model_as_An_Environment_for_Policy_Evaluation.pdf
+project_link: https://world-model-eval.github.io
+code_link: null
 openreview_forum_id: hidBHy1CAw
 aliases:
 - WorldGym
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | WorldGym：以世界模型作为策略评估环境 |
 | 英文题名 | WorldGym: World Model as An Environment for Policy Evaluation |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=hidBHy1CAw); [Project](https://world-model-eval.github.io) |
+| Links | [paper](https://openreview.net/forum?id=hidBHy1CAw) · [Project](https://world-model-eval.github.io) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | WorldGym |
 | Dataset | OpenVLA Bridge evaluation 17项任务, Bridge OOD Language Tasks (4项), Bridge OOD Image Distractors (17项) |
@@ -41,7 +43,7 @@ claims:
 > - OpenVLA Bridge evaluation 17项任务 上，平均成功率差异（WorldGym vs 真实世界） 为 3.3%，对比 0%（完美），变化 3.3%。
 > - Bridge OOD Language Tasks (4项) 上，成功率（计数） 为 OpenVLA: 7,1,8,3，对比 RT-1-X: 3,0,4,1; Octo: 0,0,2,2，变化 OpenVLA显著优于其他。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -65,7 +67,7 @@ WorldGym在多项关键指标上验证了其作为评估环境的有效性：
 - **OOD泛化测试**：通过编辑初始图像或修改语言指令，WorldGym可便捷地测试策略在分布外任务和环境上的表现，并成功揭示了策略对物体形状依赖、2D/3D混淆等弱点（Figure 8-13）。
 - **长期稳定性**：在40步rollout中，生成视频的平均LPIPS始终低于0.2，表明视觉误差不会爆炸式累积（Figure 17）。
 
-## 背景与动机
+
 
 ### 机器人策略评估的现实困境
 
@@ -91,7 +93,9 @@ WorldGym在多项关键指标上验证了其作为评估环境的有效性：
 
 这一框架旨在以极低成本获得与真实世界高度相关的策略性能估计，同时保持策略之间的相对排名，使研究者能够在无需物理机器人的情况下，快速迭代和比较不同策略。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 WorldGym 的核心创新在于将策略评估从物理世界迁移至**生成式视频世界模型**，从而以极低成本获得与真实世界高度相关的策略性能估计。其关键设计围绕三个 changed slots 展开。
 
@@ -117,7 +121,7 @@ WorldGym 的核心创新在于将策略评估从物理世界迁移至**生成式
 
 传统评估依赖人工观察或手工启发式规则判定任务成功。WorldGym 将世界模型生成的 rollout 视频输入视觉语言模型（GPT-4o），由 VLM 根据语言指令自动判断成功/失败，并支持部分积分（partial credit）。在 RT-1 真实视频上的验证显示，该奖励模型达到**高真阳率（0.81）和极低假阳率（0.03）**（Table 3），保障了评估的可靠性。所有策略使用相同的 VLM 提示和奖励机制，避免了因评估标准差异造成的不公。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_hidBHy1CAw/figures/001_Figure_1.jpg]]
 
@@ -143,7 +147,7 @@ $$\hat{\rho}(\pi) = \mathbb{E}\left[\hat{R}([o_0, \ldots, o_H], g) \mid s_0, g \
 
 该框架的根本假设是：尽管任务和策略层出不穷，物理世界遵循统一的物理规律。因此，一个在多样化数据上训练的世界模型即可泛化地评估任意策略在任意任务上的表现，避免了为每个策略单独建模动力学的困难。整个评估流程可在单 GPU 上一小时内完成，仅需每项任务的初始图像，无需真实机器人硬件。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化
 
@@ -179,7 +183,9 @@ $$\hat { \rho } ( \pi ) = \mathbb { E } [ \hat { R } ( [ o _ { 0 } , \ldots , o 
 
 长期 rollout 的视觉误差不会爆炸：在 40 步生成中，平均 LPIPS 始终低于 0.2（Figure 17），确保生成视频在整个仿真过程中保持视觉合理性。这一特性得益于 Diffusion Forcing 的序列建模能力和大规模多样化训练数据——使用 Bridge V2（相比 V1）训练的世界模型在所有像素级指标（MSE、LPIPS、SSIM）上均有显著提升。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心评估指标与策略排名保真度
 
@@ -243,7 +249,9 @@ WorldGym的独特价值在于，它能够以极低成本测试策略在分布外
 *Figure 12: OOD Distraction Examples. We use Nano Banana (Google, 2025) to add distractions to every image of the OpenVLA Bridge task suite. The resulting change in mean success rates can be seen in Figure 13. Figure 13: Effect of OOD Distractors. We use an image editing model to add distractor objects to the Bridge evaluation suite, finding that RT-1- X drops in performance by 51%, Octo by 83%, and OpenVLA by 41.5%, making OpenVLA the most robust to distractors. See Table 7 for details*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心设计逻辑
 
@@ -280,6 +288,8 @@ WorldGym在评估环境类型上实现了根本性转变。传统方法依赖真
 WorldGym目前聚焦于桌面级操作任务和固定相机视角场景。其是否能泛化到更复杂的操作任务（如灵巧操作、长序列任务）和移动操作场景，仍需验证。此外，世界模型作为生成式环境，其自身的评估偏差如何随任务难度、策略分布偏移等因素变化，尚未有系统性分析。
 
 一个更具野心的方向是将WorldGym从评估工具升级为训练环境。初步实验表明，在RL微调过程中WorldGym评估的成功率随训练步数增加而提升，暗示其可能作为策略优化的奖励信号源。但生成环境中的策略优化是否会导致对抗性利用世界模型的视觉缺陷，是一个需要警惕的风险。
+
+
 
 ## 原文 PDF
 

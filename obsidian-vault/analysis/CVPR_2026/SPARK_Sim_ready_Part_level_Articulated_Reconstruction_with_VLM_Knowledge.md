@@ -40,7 +40,7 @@ claims:
 > [!tip] 效果简介
 > - GAPartNet (50 images, 25 categories) 上，CD↓ 0.3959 vs PartCrafter 0.4342 (-0.0383)；F-Score@0.1↑ 0.4214 vs PartCrafter 0.3600 (+0.0614)；F-Score@0.5↑ 0.8934 vs PartCrafter 0.8840 (+0.0094)。
 
-## 概述
+## 概要
 
 从单张 RGB 图像重建具有物理一致性的部件级铰接对象，是三维视觉与机器人仿真交叉领域的一个关键瓶颈。现有方法要么仅生成融合的整体几何体而缺乏运动学结构，要么依赖多状态视觉数据或模板检索，难以同时恢复精细的部件几何与完整的 URDF 参数。**SPARK** 针对这一困境提出了一个全新的框架：它首次将视觉-语言模型（VLM）的常识推理能力引入铰接对象重建管道，利用 VLM 生成粗粒度的 URDF 参数与部件级参考图像，再将这些先验注入扩散 Transformer（DiT）中指导部件几何生成，最后通过可微正向动力学与可微渲染联合优化关节参数，从而从单张 RGB 图像端到端地输出仿真就绪的铰接对象。
 
@@ -50,15 +50,13 @@ claims:
 
 该方法当前主要支持旋转和棱柱等常见关节类型，对多自由度关节和闭链结构尚未覆盖，且 VLM 先验的质量直接影响输出结果。尽管如此，SPARK 为从单目图像到仿真就绪铰接资产的自动化生成开辟了新的技术路径，并在机器人操作策略训练等下游任务中展现出初步的应用潜力。
 
-## 背景与动机
-
 从单张RGB图像重建可交互的铰接三维对象，是计算机视觉、图形学与机器人学交叉领域的一项核心挑战。这类对象——例如可开合的抽屉、可旋转的笔记本屏幕——由多个刚性部件通过运动学关节连接而成，其完整数字孪生不仅需要高保真的部件级几何与纹理，还必须包含精确的运动学参数（通常以URDF格式描述），才能直接导入仿真器用于机器人训练与物理推理。
 
 然而，现有的铰接对象生成方法在**运动学一致性**与**重建完整性**两个维度上存在显著缺口。一方面，以**PartCrafter**为代表的部件级3D生成方法虽然能够从图像中同时生成多个部件网格，但其扩散Transformer架构缺乏对部件间运动学关系的显式建模，生成的部件几何在关节连接处常出现穿透、错位等物理不一致现象。另一方面，**URDFormer**等基于模板检索的装配方法、**Articulate-Anything**等利用多模态大语言模型（MLLM）进行URDF图预测的方法，以及**Articulate AnyMesh**等从已有3D网格中基于启发式规则估计关节参数的方法，要么依赖多状态视觉数据或先验3D模型，要么仅能输出粗粒度的运动学描述，难以与部件级几何生成协同优化。核心瓶颈在于：**从单张静态图像中同时恢复部件级几何结构与完整的URDF参数，本质上是欠约束的逆问题**——单视角观测无法直接提供关节运动范围、轴方向等动态信息。
 
 SPARK的核心洞察在于：**视觉-语言模型（VLM）具备丰富的常识推理能力，能够从单张图像中推断出物体的铰接结构先验**——例如“这是一个抽屉，抽屉应该沿水平方向拉出”。将这些先验注入到生成式扩散模型中，可以弥合静态观测与动态运动学之间的信息鸿沟。具体而言，SPARK通过三个关键机制实现突破：(1) 利用VLM生成粗URDF参数和部件级参考图像，为后续生成提供语义与结构引导；(2) 在扩散Transformer中集成层次注意力与位置嵌入，使部件几何生成过程显式感知父子运动链关系；(3) 引入可微正向动力学与可微渲染联合优化关节参数，以VLM生成的打开状态图像作为监督信号，实现从粗到精的运动学参数细化。这一设计使得SPARK首次实现了从单张RGB图像到**仿真就绪**铰接对象的高质量重建，为机器人仿真训练等下游应用提供了端到端的资产生成管道。
 
-## 核心创新
+## 核心方法与创新机理
 
 SPARK 的核心创新在于将**视觉语言模型（VLM）的常识推理能力**与**扩散Transformer（DiT）的生成能力**以及**可微运动学优化**深度耦合，形成了一条从单张RGB图像到仿真就绪铰接对象的完整链路。相较于现有方法，SPARK 在三个关键维度上实现了突破。
 
@@ -90,8 +88,6 @@ SPARK 在扩散Transformer中引入了**层次注意力机制**，显式建模�
 
 消融实验表明，**关节优化模块使 AxisErr 从 0.3148 大幅降低至 0.1577**（Table 4），证明了可微细化在恢复连续关节参数中的有效性。此外，**数据增强策略**（通过URDF正向动力学生成多关节姿态训练数据）进一步将 Chamfer 距离从 0.4200 降至 0.3959，提升了模型对非规范姿态的重建鲁棒性（Table 3）。
 
-## 整体框架
-
 SPARK 的整体设计围绕一个核心矛盾展开：从单张 RGB 图像重建部件级铰接对象，既需要精确的几何结构，又必须满足运动学一致性。现有方法要么生成融合的整体网格而丢失部件边界，要么依赖多状态视觉数据来推断关节参数。SPARK 的解决方案是将这一难题分解为三个协同阶段——**VLM 引导的结构推理**、**基于扩散 Transformer 的部件-铰接对象生成**、以及**可微关节优化**——形成一个从粗到精、从语义到几何的闭环管道。
 
 ### 管道总览
@@ -122,8 +118,6 @@ SPARK 的整体设计围绕一个核心矛盾展开：从单张 RGB 图像重建
 
 ![[assets/figures/papers/paper_list_l2033_https_arxiv_org_abs_2512_01629/figures/001_Figure_1.jpg]]
 *Figure 1: SPARK is a novel framework that integrates VLM-guided part-level and global image guidance with diffusion transformers to produce high-quality articulated object reconstructions*
-
-## 核心模块与公式推导
 
 SPARK 的管线由三个紧密耦合的核心模块构成：**VLM引导的结构推理**、**部件-铰接对象生成**与**关节参数优化**。每个模块解决一个关键子问题，并通过信息流串联形成从单张 RGB 图像到仿真就绪铰接对象的完整通路。
 
@@ -188,7 +182,7 @@ $$\mathcal{L}_{\mathrm{reg}} = \lambda_{t} \|\Delta \mathbf{t}\|_{2}^{2} + \lamb
 ![[assets/figures/papers/paper_list_l2033_https_arxiv_org_abs_2512_01629/figures/002_Figure_2.jpg]]
 *Figure 2: Pipeline Overview. We use a VLM to generate per-part reference images, predicted open-state images, and URDF templates with preliminary joint and link estimations. A Diffusion Transformer (DiT) equipped with local, global, and hierarchical attention mechanisms simultaneously synthesizes part-level and complete articulated meshes from a single image with VLM priors. We further employ a generative texture model to generate realistic textures and refine the URDF parameters using differentiable forward kinematics and differentiable rendering under the guidance of the predicted open-state images*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 形状重建评估
 
@@ -238,18 +232,10 @@ SPARK生成的铰接对象资产可直接导入仿真环境。图7展示了使�
 ![[assets/figures/papers/paper_list_l2033_https_arxiv_org_abs_2512_01629/figures/005_Table_3.jpg]]
 *Table 3: Mesh Reconstruction Ablation. Ablation on mesh reconstruction quality*
 
-![[assets/figures/papers/paper_list_l2033_https_arxiv_org_abs_2512_01629/figures/006_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l2033_https_arxiv_org_abs_2512_01629/figures/007_Figure_5.jpg]]
-*Figure 5: In-the-wild image results. Additional examples of shape reconstruction and open-state prediction on in-the-wild images*
-
 ![[assets/figures/papers/paper_list_l2033_https_arxiv_org_abs_2512_01629/figures/008_Figure_6.jpg]]
 *Figure 6: Ablation. We conduct an ablation study on data augmentation, part guidance, and joint optimization*
 
-![[assets/figures/papers/paper_list_l2033_https_arxiv_org_abs_2512_01629/figures/009_Figure_7.jpg]]
-*Figure 7: Robot Learning. We use the synthesized drawer to train a robot in Isaac Sim [34] to open a drawer*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 与基线工作的关系
 

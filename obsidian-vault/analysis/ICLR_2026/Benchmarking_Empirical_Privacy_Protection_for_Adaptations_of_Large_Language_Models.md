@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Benchmarking_Empirical_Privacy_Protection_for_Adaptations_of_Large_Language_Models.pdf
+project_link: null
+code_link: null
 openreview_forum_id: jY7fAo9rfK
 aliases:
 - BEPPALLM
@@ -41,7 +43,7 @@ claims:
 > - GermanWiki (OOD) 上，RMIA AUC (Shadow) 为 LoRA ε=8: 0.59，对比 Head Fine-Tune ε=8: 0.76，变化 -0.17。
 > - GermanWiki (ε=8, 超参数搜索) 上，隐私‑效用权衡 (AUC vs Perplexity) 为 LoRA: AUC 0.77 @ Perplexity 14.27，对比 Full Fine-Tune: AUC 0.82 @ Perplexity 14.60，变化 更低AUC。
 
-## 概述
+## 概要
 
 大型语言模型（LLM）在隐私敏感领域的适配通常依赖差分隐私（DP）提供理论保障，但理论保障与实际经验隐私风险之间的关系尚不明确。本文提出了一个面向预训练-适配范式的整体隐私审计框架，系统评估了不同DP适配方法在多种数据分布场景下的经验隐私保护效果。
 
@@ -51,7 +53,7 @@ claims:
 
 **主要结果概览**：在OOD适配场景下，LoRA在ε=8时的RMIA攻击AUC（0.64平均）显著低于Head Fine-Tune（0.87平均）和Full Fine-Tune（0.82）。在IID场景下，所有方法的隐私风险均显著上升，进一步验证了分布接近性的核心作用。消融研究表明，使用至少一个影子模型对RMIA攻击至关重要，而Prefix Tuning在降低预训练数据逐字记忆方面表现突出。
 
-## 背景与动机
+
 
 大型语言模型（LLM）的“预训练‑适配”范式已成为主流：先在超大规模公开语料上预训练，再在下游任务数据上微调或适配。当适配数据涉及隐私敏感领域（如医疗、金融、个人对话），直接的适配会暴露训练样本，差分隐私（DP）适配应运而生。然而，现有的DP适配研究存在一个根本性盲区——**它们几乎从未系统考察适配数据与预训练数据之间的分布关系如何影响实际隐私保护效果**。
 
@@ -71,7 +73,9 @@ claims:
 
 这一洞察直接挑战了当前DP适配的评估范式：仅报告ε值不足以表征实际保护水平，必须将预训练‑适配分布关系纳入审计框架。为此，本文提出一个整体隐私审计框架，覆盖预训练审计、适配审计、联合审计和适配后预训练审计四个阶段，并系统评估从完全重叠到完全OOD的完整分布谱系下的隐私风险。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作的核心创新不在于提出一种新的差分隐私适配算法，而在于构建了首个**预训练‑适配管道的整体隐私审计框架**，并基于该框架揭示了现有DP适配方法在实际隐私保护中的关键瓶颈。其创新性主要体现在以下两个维度的范式转变。
 
@@ -98,7 +102,7 @@ claims:
 
 需要注意的是，该框架目前仅完整实现了适配审计和适配后预训练审计两个阶段，联合审计的完整方法论仍为开放问题；此外，评估范围限于可进行DP适配的开源模型（Pythia、GPT-Neo、OLMo），尚未覆盖闭源大模型。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_jY7fAo9rfK/figures/010_Figure_5.jpg]]
 *Figure 5: Stages of Auditing. We analyze four stages of auditing: 1 Auditing Pretraining, 2 Auditing Adaptation, 3 Joint Auditing of Pretraining and Adaptations, 4 Post-Adaptation Auditing of the Pretraining. Figure 6: Setup for Joint Adaptation Auditing (3). We consider different datasets for pretraining and adaptation and the two separate training stages, distinguishing it from standard ML privacy auditing*
@@ -139,7 +143,7 @@ $$H_0 : (a, b) = (0, 0) \qquad H_A : (a, b) = (1, 0)$$
 
 整个审计框架的输入包括：预训练LLM、适配数据集（按分布关系分类）、隐私预算 $\varepsilon$ 及适配方法选择。输出包括：各阶段的成员推断AUC分数、金丝雀暴露度、逐字记忆样本数量，以及隐私‑效用权衡曲线（以困惑度为效用代理，经Rouge-1验证有效）。框架通过统一的预训练基座模型和一致的攻击设置，确保不同适配方法之间的公平比较。
 
-## 核心模块与公式推导
+
 
 ### 差分隐私适配的形式化定义
 
@@ -189,7 +193,9 @@ $$\mathbf { e x p o s u r e } ( z , \hat { Z } ) = \log _ { 2 } | \mathcal { U }
 
 > **方法局限**：论文明确指出现有工作仅完成了阶段2（适配审计）和阶段4（适配后预训练审计）的实证评估，阶段1和阶段3的完整联合审计方法尚未提供，属于开放问题。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：分布接近性是隐私泄露的主要驱动力
 
@@ -295,7 +301,9 @@ Table 22和Table 23报告了金丝雀暴露度结果。在ε=∞时，Prefix Tun
 
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心定位：预训练‑适配范式的整体隐私审计
 
@@ -354,6 +362,8 @@ Table 22和Table 23报告了金丝雀暴露度结果。在ε=∞时，Prefix Tun
 ### 对后续工作的启示
 
 本文为DP适配研究提供了两个关键的方法论指导：（1）**隐私评估必须考虑预训练‑适配的分布关系**，仅报告理论ε值不足以表征实际风险；（2）**LoRA在多数场景下提供最佳的隐私‑效用权衡**（Figure 4），应作为DP适配的默认基线方法。这些发现为设计更安全的LLM适配策略指明了方向——未来的方法设计需要在适配能力与分布泄露风险之间取得平衡，而非单纯追求更低的ε值。
+
+
 
 ## 原文 PDF
 

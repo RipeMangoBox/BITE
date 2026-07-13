@@ -5,6 +5,8 @@ paper_level: A
 venue: ECCV
 year: 2024
 pdf_ref: paperPDFs/ECCV_2024/FreeMotion_MoCap_Free_Human_Motion_Synthesis_with_Multimodal_Large_Language_Models.pdf
+project_link: null
+code_link: null
 aliases:
 - FreeMotion
 tags:
@@ -41,7 +43,7 @@ claims:
 > - Olympic Sports (zero-shot) 上，User Preference Score 显著更高 vs MotionCLIP, AvatarCLIP (显著领先)。
 > - Style Transfer (8 styles) 上，User Preference (%) 58.67 (平均) vs MotionCLIP: 19.08, AvatarCLIP: 22.25 (+39.59 over MotionCLIP, +36.42 over AvatarCLIP)。
 
-## 概述
+## 概要
 
 ### 1. 问题背景与瓶颈
 
@@ -77,7 +79,7 @@ FreeMotion 通过引入物理模拟与运动追踪，在保持开放集能力的
 
 当前方法在长文本组合指令、复杂动态运动（如舞蹈）上表现不佳；物理运动追踪训练耗时较长；人-场景交互中接触对仍需手动设定。开放问题包括：如何增强 MLLM 对复杂指令的理解与关键帧分解能力，如何生成更具动态表现力的运动，以及如何在丰富接触场景下保持物理合理性。
 
-## 背景与动机
+
 
 ### 问题背景：动捕数据依赖与开放集困境
 
@@ -110,7 +112,9 @@ FreeMotion 通过引入物理模拟与运动追踪，在保持开放集能力的
 
 FreeMotion的核心洞察在于**将运动合成解耦为两个阶段**：首先在高级语义空间利用MLLM生成稀疏的关键帧序列，然后在低级运动空间通过物理模拟和运动追踪填补关键帧之间的空白。这一设计使得MLLM只需处理其擅长的语义规划任务，而将连续运动生成的物理合理性交给专门的运动追踪策略，从而**首次在没有任何动捕数据的情况下实现了开放集人体运动合成**。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 1. 问题瓶颈与因果开关
 
@@ -162,7 +166,7 @@ $$R = \{ r_1, \dots, r_m \}$$
 
 这些边界指向了未来工作的核心方向：如何增强 MLLM 的时序推理与复杂指令理解能力，以及如何用更强大的姿态优化技术替代当前的命令集驱动方式。
 
-## 整体框架
+
 
 FreeMotion 将开放集人体运动合成分解为两个阶段：**高层语义关键帧生成** 与 **低层连续运动填充**。这一设计的核心洞察在于，多模态大语言模型（MLLM）在高级语义空间表现出色，但在低级连续运动空间能力不足；因此，MLLM 仅负责关键帧的语义规划，而物理合理性由后续的运动追踪阶段保证。
 
@@ -193,7 +197,7 @@ FreeMotion 将开放集人体运动合成分解为两个阶段：**高层语义�
 
 整个框架不依赖任何运动捕捉数据，MLLM 仅在语义空间运作，连续运动空间的控制完全由插值和物理追踪完成。对于不满足最小 rollout 长度的运动，系统用最后一帧进行填充以确保输出完整性。
 
-## 核心模块与公式推导
+
 
 FreeMotion 将开放集人体运动合成分解为两个阶段：**关键帧生成** 与 **运动填充**。其核心洞察在于，MLLM 在高层语义空间表现优异，但在低层连续运动空间能力不足；因此仅将 MLLM 用于关键帧的语义规划，而将连续运动的生成交给物理模拟与运动追踪。
 
@@ -244,7 +248,9 @@ $$\omega(s_{t+1} \mid s_t, a_t, o_t) \sim \mathcal{N}\big(s_{t+1}; \mu_{\omega}(
 ![[assets/figures/papers/paper_list_l1875_FreeMotion_MoCap_Free_Human_Motion_Synthesis_with_Multimodal_Large_Langu/figures/004_Figure_3.jpg]]
 *Figure 3: Policy training and inference. We incorporate height maps as visual signals, enabling our policy and world model to be aware of diverse environmental conditions*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -312,7 +318,9 @@ FreeMotion 在四个任务维度上接受评估：运动合成（HumanAct12）�
 ![[assets/figures/papers/paper_list_l1875_FreeMotion_MoCap_Free_Human_Motion_Synthesis_with_Multimodal_Large_Langu/figures/012_Figure_7.jpg]]
 *Figure 7: Visualization of Human-scene interaction. FreeMotion can navigate to and interact with the target object*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心定位：从数据驱动到知识驱动的运动合成
 
@@ -391,6 +399,8 @@ FreeMotion 处于以下研究线的交汇处：
 5. **评估基准标准化**：当前依赖用户偏好研究，缺乏客观自动化指标。建立开放集运动合成的标准化评估基准是推动该方向发展的关键。
 
 **注意**：部分基线（如 UniHSI）的结果直接引用自原论文，但实验设置可能不完全一致，相关比较结论需谨慎解读。
+
+
 
 ## 原文 PDF
 

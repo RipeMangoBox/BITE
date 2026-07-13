@@ -41,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - HumanML3D 上，FID 0.132 vs 0.450 (MLD) (-70.7%)；R-Precision Top 1 0.581 vs 0.504 (MLD) (+15.3%)；FID 0.101 (MLD + MotionRFT) vs 0.450 (MLD) (-77.6%)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有基于可微奖励的文本到运动生成微调方法（如 **DRaFT** (Clark et al., ICLR 2024)、**AlignProp** (Prabhudesai et al., 2023)）需要对整个去噪链进行递归梯度反向传播。由于每一步的梯度依赖于后续所有步的累积计算，导致三个核心瓶颈：(1) 内存消耗随去噪步数 $T$ 线性增长至 $\mathcal{O}(T)$；(2) 梯度在长链传播中逐渐消失，使早期步骤几乎无法获得有效优化信号；(3) 仅对最终生成样本的整体奖励进行粗粒度优化，无法对中间去噪步骤施加精细化控制。
 
@@ -53,7 +53,7 @@ claims:
 
 **主要结果**：在 HumanML3D 基准上，基于 **MLD** (Chen et al., CVPR 2023) 预训练模型，MotionRFT 将 FID 从 0.450 降至 0.101（-77.6%），R-Precision Top 1 从 0.504 提升至 0.593（+17.6%）；基于 **HY Motion** (Team, 2025) 旋转流模型，FID 从 0.073 降至 0.056（-23.3%），R-Precision Top 1 提升 12.6%。EasyTune 在峰值内存仅 22.10 GB 的条件下达到 FID 0.132，相比 DRaFT 节省 15.22 GB 显存。该框架在六种不同预训练扩散模型上均展现出一致的性能提升，验证了其对异构运动表示的通用性。
 
-## 背景与动机
+
 
 文本到运动生成（Text-to-Motion Generation）旨在根据自然语言描述合成逼真的三维人体运动序列，在动画制作、游戏开发和虚拟人交互等领域具有广泛应用。近年来，扩散模型（Diffusion Models）和流匹配（Flow Matching）方法在该任务上取得了显著进展，涌现出多种基于不同运动表示（如运动学特征、关节旋转、关节坐标）的预训练生成模型，包括 **MLD**（Chen et al., CVPR 2023）、**MDM**（Tevet et al., ICLR 2023）、**ACMDM**（Meng et al., 2025）和 **HY Motion**（Team, 2025）等。
 
@@ -86,7 +86,9 @@ $$
 
 - **设计高效细粒度的微调策略**：通过逐步独立的奖励最大化（EasyTune）并结合停止梯度（stop-gradient）操作，解耦跨步递归梯度依赖，将内存复杂度从 $O(T)$ 降至 $O(1)$，同时使每个去噪步骤都能获得稠密的奖励信号，实现细粒度优化。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MotionRFT 的核心创新在于同时解决了文本到运动生成中**奖励建模的表示异构性**和**可微微调的递归梯度瓶颈**两个根本问题，形成了一套从多维度评估到高效优化的闭环框架。
 
@@ -143,7 +145,7 @@ $$\mathcal{L}_{\mathrm{EasyTune}}(\theta) = -\mathbb{E}_{c \sim \mathbb{D}_{\mat
 
 MotionRFT 的三个创新形成了完整的因果链条：MotionReward 提供统一、多维度的评估信号 → EasyTune 以内存高效、细粒度的方式将这些信号反馈到生成模型 → 课程调度与自精炼学习进一步稳定和增强优化过程。这一框架首次实现了在多种运动表示（关节位置、旋转、SMPL）和多种基座模型（MLD、MDM、ACMDM、HY Motion）上的统一强化微调，为文本到运动生成的对齐提供了通用解决方案。
 
-## 整体框架
+
 
 MotionRFT 是一个统一的强化微调框架，旨在解决文本到运动生成中跨去噪步骤递归梯度依赖导致的内存爆炸、优化稀疏和梯度消失问题。框架由两个核心模块构成：**MotionReward**（异构表示统一奖励模型）和 **EasyTune**（逐步可微奖励微调方法），二者协同实现高效、细粒度的多目标对齐。
 
@@ -194,7 +196,7 @@ MotionReward 和 EasyTune 之间的数据流是单向的：MotionReward 作为�
 ![[assets/figures/papers/paper_list_l3315_https_arxiv_org_abs_2603_27185/figures/003_Figure_3.jpg]]
 *Figure 3: The framework of existing differentiable reward-based methods (left) and our proposed EasyTune (right). Existing methods backpropagate the gradients of the reward model through the overall denoising process, resulting in (1) excessive memory, (2) inefficient, and (3) coarse-grained optimization. In contrast, EasyTune optimizes the diffusion model by directly backpropagating the gradients at each denoising step, overcoming these issues*
 
-## 核心模块与公式推导
+
 
 MotionRFT 由两个互补的核心模块构成：**MotionReward**（统一异构表示的多维奖励模型）与 **EasyTune**（逐步去噪奖励微调方法）。前者为生成模型提供稠密、多维度的反馈信号，后者则解决现有可微奖励微调中因跨步递归梯度依赖而导致的内存爆炸与优化稀疏问题。
 
@@ -283,7 +285,9 @@ $$`\mathcal{L}_{\mathrm{EasyTune}}(\theta) = -\mathbb{E}_{c\sim\mathbb{D}_{\math
 ![[assets/figures/papers/paper_list_l3315_https_arxiv_org_abs_2603_27185/figures/005_Figure_6.jpg]]
 *Figure 6: Memory usage comparison. Here, “w/o*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -349,7 +353,9 @@ Figure 13的用户研究结果显示，MotionRFT在运动自然度、文本一�
 ![[assets/figures/papers/paper_list_l3315_https_arxiv_org_abs_2603_27185/figures/019_Figure_15.jpg]]
 *Figure 15: Text-Motion retrieval accuracy of ReAlign and SPL*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有文本-运动生成基线的继承关系
 
@@ -408,6 +414,8 @@ MotionRFT 的适用边界和已知局限包括：
 2. **多模态条件扩展**：统一奖励框架能否推广到更丰富的条件生成场景，如视频驱动的运动生成、音频到运动生成？这需要 MotionReward 学习跨模态的统一语义空间。
 3. **大规模数据下的语义对齐**：在更大规模、更多样的运动数据集上，MotionReward 的统一语义空间是否仍能有效对齐不同表示的运动？投影层的容量和语义空间的表达能力可能成为瓶颈。
 4. **奖励维度的可扩展性**：当前 MotionReward 仅覆盖语义、偏好和真实性三个维度，能否在不重新训练主干网络的前提下，通过新增 LoRA 适配器灵活扩展新的奖励维度（如风格、情感、运动流畅度）？
+
+
 
 ## 原文 PDF
 

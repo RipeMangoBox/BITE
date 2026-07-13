@@ -5,6 +5,8 @@ paper_level: A
 venue: ECCV
 year: 2024
 pdf_ref: paperPDFs/ECCV_2024/MICDrop_Masking_Image_and_Depth_Features_via_Complementary_Dropout_for_Domain_Adaptive_Semantic_Segmentation.pdf
+project_link: null
+code_link: https://github.com/ly-muc/MICDrop
 aliases:
 - MICDrop
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | MICDrop：通过互补Dropout掩码图像与深度特征实现域自适应语义分割 |
 | 英文题名 | MICDrop: Masking Image and Depth Features via Complementary Dropout for Domain-Adaptive Semantic Segmentation |
 | 会议/期刊 | ECCV 2024 |
-| Links | [paper](https://arxiv.org/abs/2408.16478); [GitHub](https://github.com/ly-muc/MICDrop) |
+| Links | [paper](https://arxiv.org/abs/2408.16478) · [GitHub](https://github.com/ly-muc/MICDrop) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | MICDrop |
 | Dataset | GTA→Cityscapes |
@@ -40,7 +42,7 @@ claims:
 > - GTA→Cityscapes 上，mIoU 为 MICDrop (HRDA) 74.8，对比 HRDA 73.8，变化 +1.0。
 > - GTA→Cityscapes 上，mIoU 为 MICDrop (MIC) 71.8，对比 MIC (DAFormer) 70.6，变化 +1.2。
 
-## 概述
+## 概要
 
 **问题瓶颈**：当前域自适应语义分割方法在细致结构（如电线杆、交通标志）和外观模糊物体的分割中表现不佳，容易发生过分割。RGB特征对域差异敏感，无法充分利用深度几何信息提供的精确边界。
 
@@ -54,7 +56,7 @@ claims:
 - 边界IoU分析表明，MICDrop 对精细结构边界的提升（+1.6）远大于标准IoU（+0.7），直接验证了深度信息对边界感知的增强作用（Tab. 2）。
 - 互补掩码消融确认：跨层级一致互补掩码带来 +1.0 mIoU，而独立按层掩码反而下降 0.4 mIoU（Tab. 3a）。
 
-## 背景与动机
+
 
 语义分割是场景理解的核心任务，而无监督域自适应（Unsupervised Domain Adaptation, UDA）旨在将源域（如合成数据）上训练的模型迁移到未标注的目标域（如真实街景）。当前UDA方法在细致结构（如杆、交通标志）和外观模糊物体的分割中表现不佳，容易出现过分割问题——即将同一对象错误地切割为多个碎片。这一瓶颈的根源在于，RGB特征对光照、纹理等域差异高度敏感，无法充分利用几何信息提供的精确边界线索。
 
@@ -62,7 +64,9 @@ claims:
 
 针对上述缺口，本文提出**MICDrop**，其核心动机是：通过互补掩码策略强制网络同时利用RGB和深度两种模态，防止对单一模态的过度依赖。具体而言，MICDrop在训练时对RGB和深度特征图施加互补的块级Dropout——当RGB的某块特征被遮盖时，对应位置的深度特征保持可见，反之亦然。这一设计迫使网络在缺失某一模态信息时，必须利用另一模态进行重建，从而学习到真正跨模态的联合表示。结合全局深度引导交叉注意力与局部自注意力融合模块，MICDrop能够同时捕获大物体内部的深度一致性（抑制过分割）和边界处的深度不连续性（提升细粒度分割精度）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MICDrop的核心创新在于通过**互补Dropout掩码策略**与**深度引导的全局-局部特征融合模块**，将单目深度估计作为互补几何线索引入域自适应语义分割，从而解决现有UDA方法在细致结构（如杆、交通标志）和外观模糊物体上的过分割问题。
 
@@ -93,7 +97,7 @@ MICDrop冻结预训练的RGB编码器参数，仅训练轻量级深度编码器�
 
 在GTA→Cityscapes基准上，MICDrop将DAFormer的mIoU从68.3提升至70.1（+1.8），将HRDA从73.8提升至74.8（+1.0），并在MIC（HRDA）上取得75.9（+0.7），刷新SOTA（Tab. 1）。边界IoU分析进一步证实，MICDrop在边界IoU上的提升（+1.6）显著高于标准IoU（+0.7），直接验证了深度信息对精细结构分割的改善（Tab. 2）。
 
-## 整体框架
+
 
 MICDrop 是一种即插即用的跨模态域自适应语义分割框架，其核心思想是通过互补掩码策略强制网络同时利用 RGB 与深度几何信息，从而解决现有 UDA 方法对细致结构过分割和对域差异敏感的问题。整体架构由四个关键模块串联构成：**冻结的 RGB 编码器**、**轻量级深度编码器**、**跨模态特征融合模块**以及 **DAFormer 解码头**，如图 Fig. 2 所示。
 
@@ -138,7 +142,7 @@ $$\mathbf{M}_{\mathrm{depth}}(u,v) = 1 - \mathbf{M}_{\mathrm{rgb}}(u,v)$$
 
 源域和目标域图像分别通过学生编码器，在各特征分辨率上施加互补掩码后，经融合模块与解码头生成预测。整体训练沿用 DAFormer 的自训练范式与损失函数，深度编码器、融合模块和解码头参与参数更新，RGB 编码器保持冻结。MICDrop 在单张 GTX Titan X（12 GB）上约 11 小时即可完成训练，体现了其作为插件模块的轻量高效特性。
 
-## 核心模块与公式推导
+
 
 MICDrop 的核心由两个可插拔模块构成：**跨模态特征融合模块**（Cross-Modal Feature Fusion）和**互补Dropout掩码模块**（Complementary Dropout Masking）。前者将深度几何信息注入RGB特征表示，后者在训练时强制网络同时依赖两种模态，防止退化为单模态捷径。
 
@@ -178,7 +182,9 @@ $$\mathbf{M}_{\mathrm{depth}}(u,v) = 1 - \mathbf{M}_{\mathrm{rgb}}(u,v)$$
 
 消融实验（Tab. 3a）揭示了该策略的关键设计约束：跨所有层级的互补掩码相比无掩码基线带来+1.0 mIoU增益，而独立按层级掩码（即不同层级掩码模式不一致）导致性能下降0.4 mIoU。这证明跨层级一致的互补掩码对于有效跨模态特征学习至关重要。推理阶段不应用任何掩码，融合模块直接处理完整的RGB和深度特征。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -250,7 +256,9 @@ MICDrop 对精细结构的分割改善在边界 IoU（Boundary IoU）指标上�
 ![[assets/figures/papers/paper_list_l19_https_arxiv_org_abs_2408_16478/figures/010_Figure.jpg]]
 *Figure: Fig. S1: Classwise performance. This figure highlights not only improved average performance but also a reduction of strong deviations in classwise performances when using a frozen backbone. The dotted checkpoint line indicates the model’s performance at its initialization with pretrained weights*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 在域自适应语义分割中的定位
 
@@ -289,6 +297,8 @@ MICDrop 属于**基于深度几何线索的多模态域自适应语义分割**�
 3. **跨模态泛化能力。** 互补掩码策略能否泛化到其他模态（如热成像、激光雷达点云）并取得类似的交叉模态学习增益，是方法普适性的关键验证方向。深度与RGB之间的几何-外观互补关系在其他模态组合中可能呈现不同的特性。
 
 4. **与自训练方法的深度结合。** MICDrop 当前以特征级融合和掩码正则化为核心，与基于伪标签的自训练方法（如 ProDA、HRDA 的伪标签机制）形成松耦合。如何将互补掩码策略与伪标签质量评估、置信度加权等机制深度结合，可能进一步释放跨模态学习的潜力。
+
+
 
 ## 原文 PDF
 

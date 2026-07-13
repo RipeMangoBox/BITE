@@ -5,6 +5,7 @@ paper_level: A
 venue: ICCV
 year: 2025
 pdf_ref: paperPDFs/ICCV_2025/GENMO_A_GENeralist_Model_for_Human_MOtion.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/dair/genmo/
 aliases:
 - GENMO
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | GENMO：一个通用人体运动模型 |
 | 英文题名 | GENMO: A GENeralist Model for Human MOtion |
 | 会议/期刊 | ICCV 2025 |
-| Links | [paper](https://arxiv.org/abs/2505.01425); [Project](https://research.nvidia.com/labs/dair/genmo); [Project](https://research.nvidia.com/labs/dair/genmo/) |
+| Links | [paper](https://arxiv.org/abs/2505.01425) · [Project](https://research.nvidia.com/labs/dair/genmo) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | GENMO |
 | Dataset | EMDB-2 (全局运动估计), RICH (全局运动估计), 3DPW (局部运动估计), 3DPW-XOCC (严重遮挡估计) |
@@ -41,7 +42,7 @@ claims:
 > - RICH (全局运动估计) 上，WA-MPJPE100 (mm) ↓ 为 75.3 (with DROID-SLAM)，对比 78.8 (GVHMR with DROID-SLAM)，变化 -3.5。
 > - 3DPW (局部运动估计) 上，PA-MPJPE (mm) ↓ 为 34.6，对比 43.0 (CLIFF)，变化 -8.4。
 
-## 概述
+## 概要
 
 人体运动理解长期面临一个结构性矛盾：**运动估计**要求从视频等观测中精确重建3D运动，输出必须确定、忠实于输入信号；而**运动生成**要求从文本、音乐等抽象条件中创造多样化、合理的运动，输出必须随机且富有表现力。传统方法将二者视为独立任务，分别设计专用模型，导致运动表示无法共享、先验知识难以迁移，也无法在统一框架下同时满足精确重建与灵活的多模态控制。
 
@@ -58,7 +59,7 @@ GENMO提出一个根本性的视角转换：**将运动估计重新定义为条�
 
 GENMO的方法定位处于**扩散生成模型**与**人体运动分析**的交叉点：它继承了扩散模型的多模态条件建模能力（如MDM, Tevet et al., ICLR 2023），但通过双模式训练将其扩展为同时支持回归精度与生成多样性的统一范式；它借鉴了全局运动估计中SLAM与运动先验结合的思想（如TRAM, Wang et al., ECCV 2024），但将运动先验内化为生成模型本身，而非外部模块。在知识库中，GENMO代表了一条从“任务专用模型”走向“通用运动基础模型”的技术路径。
 
-## 背景与动机
+
 
 人体运动建模长期面临一个根本性的任务割裂：**运动估计**（从视频、2D关键点等观测中精确重建3D运动）与**运动生成**（根据文本、音乐等抽象条件创造多样化运动）被视为两个独立领域，各自发展出专用的模型架构和训练范式。运动估计要求确定性、高精度的输出，而运动生成则需要捕捉条件信号下的多模态分布，产生丰富且合理的运动变化。这种分离导致三个关键问题：
 
@@ -70,7 +71,9 @@ GENMO的方法定位处于**扩散生成模型**与**人体运动分析**的交�
 
 GENMO的核心动机在于打破这一壁垒：**将运动估计重新定义为条件运动生成问题**。当条件信号强且确定（如视频帧、2D骨架）时，模型应输出精确的确定性估计；当条件信号弱或抽象（如文本描述、音乐节拍）时，模型应产生多样化但物理合理的生成。这一统一视角的潜在收益是双向的——生成先验可改善遮挡等病态条件下的估计质量，而多样化视频数据可提升生成的表现力和物理合理性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GENMO 的核心创新在于将**人体运动估计**与**运动生成**这两个长期分离的任务统一为条件运动生成的单一框架，并通过三项关键设计实现双向增益。以下围绕相对 baseline 的 changed slots 展开分析。
 
@@ -134,7 +137,7 @@ $$x^{i} = \big( \Gamma_{\mathrm{gv}}^{i}, {v}_{\mathrm{root}}^{i}, {\theta}^{i},
 
 上述 changed slots 形成了一条清晰的因果链：**统一运动表示**（Slot 4）为估计与生成共享奠定基础；**双模式训练**（Slot 1）使同一模型兼顾精确重建与多样性生成；**估计引导的 2D 训练**（Slot 2）桥接两类任务，实现数据层面的双向增益；**多文本注意力**（Slot 3）与**RoPE 滑动窗口**（Slot 5）则分别增强了条件控制的精度与序列长度的灵活性。这些创新共同构成了 GENMO 从专用模型向通用运动模型跃迁的技术支柱。
 
-## 整体框架
+
 
 GENMO 将人体运动估计与生成统一为**条件运动生成**问题：给定一组条件信号 $\mathcal{C}$ 及对应的条件掩码 $\mathcal{M}$，模型合成一段长度为 $N$ 的人体运动序列 $\mathbf{x}$。该统一框架的核心在于，运动估计被重新定义为受观测信号约束的生成任务，而非独立于生成的确定性回归问题。
 
@@ -193,7 +196,7 @@ $$\mathcal{L}_{\mathrm{gen-2D}} = \mathbb{E}_{\hat{\mathbf{x}}_t \sim q(\hat{\ma
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2505_01425/figures/001_Figure_1.jpg]]
 *Figure 1: GENMO unifies human motion estimation and generation in a single framework and supports diverse conditioning signals including monocular videos, 2D keypoints, text descriptions, music, and 3D keyframes. GENMO can estimate accurate global human motion from videos with dynamic cameras and seamlessly handles arbitrary combinations and lengths of conditioning signals while generating smooth transitions between them. All of this is achieved in a single feedforward diffusion pass without complex post-processing*
 
-## 核心模块与公式推导
+
 
 ### 统一运动表示
 
@@ -252,7 +255,9 @@ $$\mathcal{L}_{\mathrm{gen-2D}} = \mathbb{E}_{\hat{x}_t \sim q(\hat{x}_t | \hat{
 
 其中 $\Pi$ 为 2D 投影函数。该损失将估计模式的确定性输出作为生成模式的训练桥梁，使模型能够从仅含 2D 标注的视频数据中学习运动先验，消融实验（Table 6）证实去除该损失会导致运动中间帧生成质量下降。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -336,7 +341,9 @@ Table 8 展示了推理步数对估计和生成任务的不同影响。运动估
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2505_01425/figures/002_Figure_2.jpg]]
 *Figure 2: GENMO Model Design supports the generation of variable-length motion sequences in a single pass and enables seamless integration of multimodal conditioning signals, supporting both human motion generation and estimation*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 统一范式：从“估计-生成分离”到“条件生成统一”
 
@@ -375,6 +382,8 @@ GENMO通过一个核心洞察打破这一壁垒：**将运动估计重新定义�
 3. **规模化半监督训练**：统一的估计-生成范式为利用海量未标注视频提供了天然框架——估计模式可为未标注视频生成伪3D标签，生成模式则可从中学习运动先验。如何在真实场景中实现这一闭环的规模化训练？
 
 4. **条件贡献量化**：在多模态混合条件下，如何量化各条件信号对最终运动的贡献权重，并为用户提供更直观、更细粒度的控制接口？
+
+
 
 ## 原文 PDF
 

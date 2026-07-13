@@ -43,7 +43,7 @@ claims:
 > - 3D LEGO Assembly 上，Success Rate (complete task) 0.65 vs 0.35 (VLM+π0.5) (+0.30 (+85.7%))。
 > - Object Rearrangement 上，Success Rate (complete task) 0.65 vs 0.50 (VLM+π0.5) (+0.15 (+30.0%))。
 
-## 概述
+## 概要
 
 现有视觉-语言-动作（VLA）模型在长程操作任务中面临一个根本瓶颈：它们擅长将感知直接映射为动作，却缺乏推断中间过程的能力。当任务需要将预定义的目标状态（如“将乐高拼成特定形状”或“将物体按指定布局摆放”）分解为可执行的子目标与精确操作步骤时，端到端模型往往无法可靠地完成推理，导致成功率骤降。
 
@@ -53,7 +53,7 @@ ManualVLA 针对这一问题提出了一个关键思路——模仿人类从最�
 
 在三个具有代表性的长程任务——2D 乐高装配、3D 乐高装配和物体重排——上，ManualVLA 的最终成功率分别达到 **0.85、0.65 和 0.65**，相比最强分层基线（VLM + π0.5）分别提升了 **25%、30% 和 15%**。消融实验进一步确认，手册信息的丰富程度、显式与隐式思维链的联合使用、以及 MoT 架构的分离设计，是取得高性能的关键因素。此外，模型仅需约 100 条下游任务演示即可实现泛化操控，展现了较强的数据效率。
 
-## 背景与动机
+
 
 ### 长程操作任务的瓶颈：从“结果”到“过程”的缺失
 
@@ -67,7 +67,9 @@ ManualVLA 针对这一问题提出了一个关键思路——模仿人类从最�
 
 人类的操作能力源于一种关键的认知机制：从最终目标反推中间步骤。面对“将红色积木放在蓝色积木右侧”的指令，人类会先在脑海中生成子目标图像、定位目标位置、规划移动路径，然后才执行动作。这一“想象-执行”的协同过程正是现有VLA模型所缺失的。本文的核心洞察在于：**将规划与执行解耦为两个专家模块，并通过多模态手册作为桥梁实现二者的协同**——规划专家负责“想象”中间状态（生成子目标图像、目标坐标和文本描述），动作专家则在这些手册信息的显式与隐式双重引导下执行精确操作。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ManualVLA 的核心创新在于将长程机器人操作任务从“端到端感知-动作映射”重构为“先规划后执行”的两阶段生成范式，并通过三项紧密耦合的机制设计实现这一转变。
 
@@ -105,7 +107,7 @@ ManualVLA 将生成的手册信息通过两条路径同时注入动作专家：
 
 **与最接近基线 CoT-VLA 的区别**：**CoT-VLA** (Zhao et al., CVPR 2025) 虽也预测子目标图像，但其采用统一的 Transformer 架构，缺乏规划-行动分离和显式位置提示机制，在长程任务上成功率显著低于 ManualVLA（Table 2）。
 
-## 整体框架
+
 
 ManualVLA 的整体 pipeline 围绕一个核心洞察构建：**长程操作任务的成功不仅需要最终目标状态的感知，更需要将目标分解为可精确执行的中间步骤**。为此，ManualVLA 采用 Mixture-of-Transformers（MoT）架构，将系统划分为两个协同工作的专家——规划专家（Planning Expert）与动作专家（Action Expert）——并通过 Manual Chain-of-Thought（ManualCoT）机制在两者之间建立显式与隐式的双重信息通道。
 
@@ -162,7 +164,7 @@ $$\mathcal{L}_{\mathrm{final}} = \mathcal{L}_{\mathrm{manual}} + \mathcal{L}_{\m
 ![[assets/figures/papers/paper_list_l2168_https_openaccess_thecvf_com_content_CVPR2026_html_Gu_From_Manuals_to_Act/figures/001_Figure_1.jpg]]
 *Figure 1: Overview. (a) Long-horizon tasks with predefined goal states, such as LEGO assembly or object rearrangement, pose a significant challenge for intelligent robots, as they require not only imagining procedural manuals but also executing precise manipulations based on them. (b) We address such tasks by introducing ManualVLA, a unified VLA model built upon a MoT architecture, which enables coherent collaboration between multimodal manual and action generation via a designed Manual Chain-of-Thought*
 
-## 核心模块与公式推导
+
 
 ### 问题形式化与两阶段生成
 
@@ -227,7 +229,9 @@ $$\mathcal{L}_{\mathrm{final}} = \mathcal{L}_{\mathrm{manual}} + \mathcal{L}_{\m
 ![[assets/figures/papers/paper_list_l2168_https_openaccess_thecvf_com_content_CVPR2026_html_Gu_From_Manuals_to_Act/figures/003_Figure_3.jpg]]
 *Figure 3: Digital-twin example. (a) We reconstruct 3D Gaussian Splatting representations, which are then decomposed into the LEGO board and individual bricks. (b) We iteratively place the bricks on the board or objects on the box*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 手册生成质量评估
 
@@ -286,7 +290,9 @@ Figure 6 系统拆解了 ManualVLA 各设计要素的贡献：
 ![[assets/figures/papers/paper_list_l2168_https_openaccess_thecvf_com_content_CVPR2026_html_Gu_From_Manuals_to_Act/figures/007_Figure_5.jpg]]
 *Figure 5: Visualization of real-world experiments on Franka Research 3 dual-arm robots, executed from left to right*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有VLA方法的谱系关系
 
@@ -331,6 +337,8 @@ ManualVLA 的设计建立在以下关键假设之上，这些假设界定了其�
 4. **扩展到动态与接触丰富任务**：将 ManualVLA 应用于绳索操作、柔性物体装配或需要力控的任务，需要手册生成纳入力学约束，动作专家可能需要力/力矩预测能力，这对当前框架构成根本性挑战。
 
 5. **论文出版信息待确认**：当前分析基于arXiv版本，论文未明确标注发表会议与年份（项目页面和部分引用路径暗示可能投稿CVPR 2026），正式版本中需补充完整出版信息。
+
+
 
 ## 原文 PDF
 

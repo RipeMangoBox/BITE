@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/GeodesicNVS_Probability_Density_Geodesic_Flow_Matching_for_Novel_View_Synthesis.pdf
+project_link: null
 code_link: null
 aliases:
 - PF
@@ -41,7 +42,7 @@ claims:
 > - Objaverse test 上，FID ↓ 5.4324 (Linear-D2D-FM) vs 5.5434 (Free3D) (-0.1110)；PSNR ↑ 20.8447 (Linear-D2D-FM) vs 20.8246 (Naive FM) (+0.0201)。
 > - Objaverse (reduced setup) 上，FID ↓ 10.4010 (PDG-FM) vs 11.8124 (Linear-D2D-FM) (-1.4114)；SSIM ↑ 0.8768 (PDG-FM) vs 0.8736 (Linear-D2D-FM) (+0.0032)。
 
-## 概述
+## 概要
 
 新视角合成（Novel View Synthesis, NVS）的目标是从稀疏输入视图生成任意相机姿态下的场景图像。当前主流方法依赖条件扩散模型，通过随机噪声到数据的去噪过程学习视图变换。然而，扩散模型的**随机性破坏了视图间的确定性几何结构**，导致生成结果在空间一致性上出现偏差——同一场景的不同视角可能产生纹理漂移或几何错位。
 
@@ -57,7 +58,7 @@ claims:
 
 **方法定位**：PDG-FM 属于确定性流匹配范式，区别于 Zero-1-to-3（扩散模型）、EscherNet（多视图扩散）、Free3D（无 3D 表示的扩散模型）以及 Metric FM（学习黎曼度量的流匹配）。其核心贡献在于将几何一致性显式编码为插值路径的密度测地线约束，而非依赖扩散模型的隐式正则。
 
-## 背景与动机
+
 
 ### 新视角合成中的确定性困境
 
@@ -93,7 +94,9 @@ $$\ddot{\gamma} + \|\dot{\gamma}\|^2 \left( I - \hat{\dot{\gamma}}\hat{\dot{\gam
 
 3. **高效实现**：通过教师-学生蒸馏框架，将测地线优化从昂贵的迭代求解解耦为一次性前向预测，使密度测地线流匹配在计算上可行，同时保留其几何优势。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GeodesicNVS 的核心创新在于将新视角合成从“噪声→数据”的随机扩散范式重构为“数据→数据”的确定性流匹配范式，并通过概率密度测地线约束插值路径的几何一致性。这一转变通过三个关键的技术槽位体现：
 
@@ -135,7 +138,7 @@ $$\ell^{0}(\eta) = \mathbb{E}_t \left[\| x_t - \mathrm{DDIM\text{-}B}(z_t, c_t, 
 
 这三个槽位的协同作用形成了完整的创新链条：确定性流匹配消除随机性破坏，测地线插值保证路径几何一致性，教师-学生蒸馏使密度测地线优化在计算上可行。
 
-## 整体框架
+
 
 GeodesicNVS 提出 **概率密度测地线流匹配（Probability Density Geodesic Flow Matching, PDG-FM）** 框架，将新视角合成重新建模为从源视图到目标视图的确定性连续变换。整个框架由两个核心阶段级联而成：**数据到数据流匹配（Data-to-Data Flow Matching）** 和 **测地线插值蒸馏（Variational Distillation of Geodesics）**，最终统一为端到端的测地线流匹配流程（Figure 2）。
 
@@ -170,7 +173,7 @@ $$
 
 > **注意**：当前分析基于项目博客提供的技术细节，部分实现细节（如教师网络的具体优化步数、蒸馏损失权重）需待正式论文发布后验证。
 
-## 核心模块与公式推导
+
 
 ### 数据到数据流匹配框架
 
@@ -233,7 +236,9 @@ $$\ell^{0}(\eta) = \mathbb{E}_t \left[\| x_t - \text{DDIM-B}(z_t, c_t, \tau) \|^
 ![[assets/figures/papers/paper_list_l2505_https_arxiv_org_abs_2603_01010/figures/010_Figure_7.jpg]]
 *Figure 7: Comparison of Geodesic Gradient Norm across Time for geodesic interpolants, their pre-optimization counterparts, and linear interpolants on training dataset. The optimized geodesic paths have lower residuals thus indicating better satisfaction of the Euler-Lagrange condition, aligning with improved perceptual and geometric consistency*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -285,7 +290,9 @@ Table 5 揭示了两个关键设计选择：
 ![[assets/figures/papers/paper_list_l2505_https_arxiv_org_abs_2603_01010/figures/005_Figure_3.jpg]]
 *Figure 3: Qualitative comparisons on Objaverse. Comparison of Linear-D2D-FM, the Noise-to-Data FM (Naive FM) baseline and the diffusion-based Free3D model*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心基线与差异化定位
 
@@ -320,6 +327,8 @@ PDG-FM 的方法论贡献体现在三个递进的“改变槽位”（changed_sl
 3. **去扩散依赖**：能否设计不依赖预训练扩散模型的密度估计方法？例如直接学习数据流形的密度函数或采用能量基模型，以降低对外部模型的依赖并提升可扩展性。
 
 4. **多视图与 3D 重建**：当前方法聚焦于两视图间的变换，如何将测地线一致性扩展到多视图一致生成和显式 3D 重建（如 NeRF 或 3D Gaussian Splatting 的初始化）是一个自然延伸方向。
+
+
 
 ## 原文 PDF
 

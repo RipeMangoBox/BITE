@@ -43,7 +43,7 @@ claims:
 > - Technicolor 上，Average PSNR (dB) ↑ 34.55 (MoE-GS N=3) vs 33.69 (STG, 最佳单一专家) (+0.86)。
 > - N3V (效率) 上，PSNR / FPS / Memory 32.80 / 83 / 351.2 MB (55% pruning, N=2) vs 31.92 / 88.5 / 609.5 MB (STG) (PSNR +0.88, FPS 接近, 内存更小)。
 
-## 概述
+## 概要
 
 动态场景重建的核心挑战在于**场景级、空间级和时间级的不一致性**：没有任何单一变形先验能够在所有区域和所有时间步上同时达到最优重建质量。现有动态高斯泼溅方法（如 **4DGaussians** (Wu et al., 2024)、**E-D3DGS** (Bae et al., 2024)、**STG** (Li et al., 2024)、**Ex4DGS** (Lee et al., 2024)）各自擅长处理特定类型的运动模式（静止、快速、平滑、不规则等），但在跨场景、跨区域和跨时间的泛化上均表现出明显的性能波动（Figure 1）。这一瓶颈的本质在于：**单一模型无法普适地处理现实场景中多样化的动态行为**。
 
@@ -57,7 +57,7 @@ claims:
 
 **方法定位**：MoE-GS 属于动态高斯泼溅方法的框架级改进，通过可学习的专家选择与融合机制，在不改变各专家内部结构的前提下，系统性地提升了动态场景的重建质量与鲁棒性。其知识蒸馏管线进一步为高质量动态重建的轻量化部署提供了可行路径。
 
-## 背景与动机
+
 
 **动态场景重建的核心瓶颈：单一变形先验的普适性困境**
 
@@ -75,7 +75,9 @@ claims:
 
 **本文动机**：MoE-GS 的核心洞察是将“选择最优变形策略”这一决策本身建模为一个可学习的问题。通过引入专家混合（Mixture of Experts, MoE）架构，框架能够为每个局部时空区域自适应地选择和融合最合适的变形专家，从而突破单一先验的普适性瓶颈。这一思路将动态场景重建从“寻找一个万能模型”重新定义为“学习如何动态组合多个专用模型”，为弥合不同变形先验之间的性能差距提供了统一的解决方案。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MoE-GS 的核心创新在于将专家混合（Mixture of Experts, MoE）范式引入动态高斯泼溅（Dynamic Gaussian Splatting），通过架构层面三个相互协同的 **changed slots**，系统性解决了现有方法中单一变形先验无法普适处理复杂动态场景的根本瓶颈。
 
@@ -106,7 +108,7 @@ MoE-GS 将上述方法集成为异构专家池，并引入 **Volume-aware Pixel 
 
 上述三个 changed slots 形成递进闭环：**自适应架构**提供质量上限，**效率优化**降低多专家推理成本，**知识蒸馏**将 MoE 能力迁移至轻量部署模型。三者共同支撑了 MoE-GS 在 N3V 和 Technicolor 数据集上一致超越所有单专家基线和 NeRF 类方法的实验结果（Table 1, Table 2）。
 
-## 整体框架
+
 
 MoE-GS 的整体框架遵循“先多样化、后自适应融合”的两阶段设计，将多个异构的动态高斯泼溅专家集成到一个统一的 Mixture of Experts 架构中。如 Figure 2 所示，整个 pipeline 由两个核心阶段构成：
 
@@ -127,7 +129,7 @@ MoE-GS 的整体框架遵循“先多样化、后自适应融合”的两阶段�
 
 框架的输入为多视角动态视频帧及其对应的相机参数与时间戳，输出为任意新视角、新时刻的渲染图像。整个流程中，第一阶段产出多样化的专家表征，第二阶段产出自适应融合权重，最终通过加权混合得到渲染结果。
 
-## 核心模块与公式推导
+
 
 ### 3.1 标准 MoE 形式化
 
@@ -193,7 +195,9 @@ $$\mathcal{L}_k^{KD} = \lambda \cdot \mathcal{L}(G'_k \cdot I_{E_k}, G'_k \cdot 
 ![[assets/figures/papers/paper_list_l51_https_openreview_net_forum_id_WrEQFwWCdT/figures/001_Figure_1.jpg]]
 *Figure 1: Limitations of existing dynamic Gaussian splatting methods. (a) Scene-level: No single method consistently dominates across scenes. (b) Spatial-level: Different spatial regions favor different deformation models. (c) Temporal-level: The best-performing method changes over time within the same scene. We also visualize representative motion trajectories of four experts—4DGaussians (Green), STG (Purple), E-D3DGS (Pink), and Ex4DGS (black)—to illustrate their distinct motion behaviors. Additional video results are provided on the project page*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -271,7 +275,9 @@ Table 12 报告了多次重复训练（不同随机种子）下的性能波动�
 - 将 MoE-GS 的几何一致性提升与下游任务（如动态场景理解、目标跟踪）结合。
 - 通过硬件加速或模型量化进一步降低多专家推理开销，推动实时应用落地。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：动态高斯泼溅中的单一先验瓶颈
 
@@ -329,6 +335,8 @@ MoE-GS 的三项核心设计分别填补了现有工作的不同空白：
 4. **下游任务集成。** MoE-GS 生成的路由权重本身编码了丰富的时空运动信息。这些权重能否作为动态场景理解的中间表征，服务于目标跟踪、动作识别或场景编辑等下游任务？
 
 5. **硬件加速与量化。** 在实时应用（如 VR/AR）中，可否通过 GPU 定制化算子、混合精度量化或专家剪枝进一步降低多专家推理的延迟和功耗？
+
+
 
 ## 原文 PDF
 

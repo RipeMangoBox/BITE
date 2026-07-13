@@ -43,7 +43,7 @@ claims:
 > - TOLED‑Test 上，PSNR↑ 38.37 vs 38.22 (BNUDC) (+0.15)。
 > - SYNTH 上，PSNR↑ 46.71 vs not specified (N/A)。
 
-## 概述
+## 概要
 
 屏下摄像头（UDC）技术为智能手机实现真全面屏提供了关键路径，但显示屏的衍射、散射和透光率衰减会引入空间变化的复杂退化——高频细节丢失、网格伪影与局部模糊。现有方法在应对这类局部自适应的精细复原上能力有限。本文提出 **UCMNet**（Uncertainty-aware Context-Memory Network），一个轻量化的不确定性感知上下文记忆网络，核心思路是将不确定性建模为可学习的先验：通过估计像素级不确定性图，驱动可学习的 Memory Bank 与 Context Bank 检索高频补偿特征，实现空间自适应的退化修复。
 
@@ -51,7 +51,7 @@ claims:
 
 实验结果表明，UCMNet 在 POLED、TOLED 和 SYNTH 三个基准上均取得领先性能：POLED-Test 上以仅 3.2 M 参数达到 **33.81 dB PSNR**，超越 BNUDC（33.39 dB）等现有最优方法，且在 PSNR/SSIM 散点图中处于右上最优区域（**Figure 1**）。消融实验确认，HF-UDL 相较普通 UDL 额外提升 0.22 dB，UPT 中的不确定性引导与记忆库检索机制对性能贡献显著。在严重衍射导致信息丢失的 SYNTH 场景下，UCMNet 仍存在高频细节恢复不足的局限，这指向了引入更强模型先验的未来方向。
 
-## 背景与动机
+
 
 屏下摄像头（Under-Display Camera, UDC）技术通过将前置摄像头置于显示屏下方，实现了真正的全面屏体验。然而，光线在穿过显示面板时会发生衍射、散射和衰减，导致捕获的图像出现严重的空间变化退化——主要表现为高频细节丢失、对比度下降以及由像素结构引起的网格状伪影。这种退化模式在空间上高度不均匀：屏幕中心区域与边缘区域的透光率、衍射强度差异显著，使得单一全局滤波器难以有效复原。
 
@@ -61,7 +61,9 @@ claims:
 
 本文的**核心动机**正是将不确定性从“被动观测”转变为“主动先验”：通过估计像素级的不确定性图，显式地告诉模型“哪里更难复原、哪里需要更多高频补偿”，从而驱动一个可学习的记忆检索机制，为不同退化模式匹配差异化的先验知识。基于这一思想，我们提出了**UCMNet（Uncertainty-aware Context-Memory Network）**，一个轻量化的不确定性感知上下文记忆网络，旨在以更少的参数量实现空间自适应的精细复原，在多个UDC基准上达到最优性能。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 UCMNet 的核心创新在于将**不确定性建模从损失函数层面提升为可学习的结构先验**，通过三个紧密耦合的 changed slots 实现了对屏下摄像头（UDC）空间变化退化的自适应复原。
 
@@ -89,7 +91,7 @@ $$\mathcal{L}_{\mathrm{HF-UDL}} = \exp(-s) \left\| \Delta(\hat{I}) - \Delta(I_{g
 
 最终，三个 changed slots 形成协同效应：HF-UDL 提供不确定性学习信号，UPT 将该信号转化为结构化的上下文检索先验，FCM 则保证编码器提供充分的频率域表示。这一组合使 UCMNet 在仅 3.2 M 参数下于 POLED-Test 达到 33.81 dB PSNR，超越所有对比方法。
 
-## 整体框架
+
 
 UCMNet 采用 U 型编码器‑解码器架构，以端到端方式直接处理屏下摄像头（UDC）退化图像，无需手工设计的预处理步骤。整体 pipeline 由四个核心模块级联构成：**Frequency Convolution Module（FCM）**、**Uncertainty‑Prior Transformer（UPT）**、**Memory Bank / Context Bank** 和 **Vanilla Transformer**，通过编码器逐级压缩特征、解码器逐级恢复分辨率，并在解码阶段引入不确定性引导的自适应特征精炼。
 
@@ -135,7 +137,7 @@ $$\mathcal{L}_{\mathrm{HF-UDL}} = \exp(-s) \left\| \Delta(\hat{I}) - \Delta(I_{g
 ![[assets/figures/papers/paper_list_l2271_https_arxiv_org_abs_2604_00381/figures/003_Figure_3.jpg]]
 *Figure 3: Architecture of the proposed method for UDC image restoration. Our model follows a U-shaped encoder–decoder architecture. The core module of the encoding block is the Frequency Convolution Module (FCM), while the decoding block additionally incorporates the Uncertainty Prior Transformer (UPT) block for uncertainty-guided feature refinement*
 
-## 核心模块与公式推导
+
 
 ### 整体架构
 
@@ -203,7 +205,9 @@ $$\mathcal{L}_{\mathrm{total}} = \lambda_1 \mathcal{L}_{\mathrm{HF-UDL}} + \lamb
 ![[assets/figures/papers/paper_list_l2271_https_arxiv_org_abs_2604_00381/figures/005_Figure_5.jpg]]
 *Figure 5: Uncertainty maps are derived from the uncertaintydriven loss, where each decoding block includes parallel mean and variance estimators that jointly predict the restored image and its corresponding uncertainty map*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 1. 主实验结果
 
@@ -288,7 +292,9 @@ Figure 8 可视化解码器各阶段的不确定性图。不确定性图由每�
 ![[assets/figures/papers/paper_list_l2271_https_arxiv_org_abs_2604_00381/figures/006_Table_1.jpg]]
 *Table 1: Quantitative results on the POLED and TOLED test datasets. Average PSNR, SSIM, LPIPS, and DISTS are reported, with the best and second-best scores colored (↑ higher is better; ↓ lower is better)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 基线方法与技术谱系
 
@@ -337,6 +343,8 @@ UCMNet 的核心因果机制可以概括为“**不确定性估计 → 记忆库
 2. **不确定性估计的可靠性**：当前的不确定性图由网络端到端学习，缺乏对估计质量的显式监督或校准机制。能否引入贝叶斯推断或集成方法提高不确定性估计的鲁棒性？
 3. **Memory Bank 的可解释性**：可学习的 Memory-Context Bank 令牌对是否确实学到了与物理退化模式对应的可解释表示？论文未对检索到的上下文特征进行可视化或语义分析。
 4. **跨任务微调策略**：UCMNet 在其他空间变化退化任务上的泛化能力是否可以通过任务特定微调（如 adapter 或 prompt tuning）进一步提高？这关系到该方法能否从 UDC 专用方案升级为更通用的空间自适应复原框架。
+
+
 
 ## 原文 PDF
 

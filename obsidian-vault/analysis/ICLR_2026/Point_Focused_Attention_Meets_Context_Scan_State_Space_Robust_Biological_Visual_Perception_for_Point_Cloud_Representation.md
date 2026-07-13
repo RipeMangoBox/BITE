@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Point_Focused_Attention_Meets_Context_Scan_State_Space_Robust_Biological_Visual_Perception_for_Point_Cloud_Representation.pdf
+project_link: null
+code_link: https://github.com/Point-Cloud-Learning/PointLearner
 openreview_forum_id: KQPoMbxInu
 aliases:
 - Point-Focused_At
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 点聚焦注意力与上下文扫描状态空间：面向点云表示的鲁棒生物视觉感知 |
 | 英文题名 | Point-Focused Attention Meets Context-Scan State Space: Robust Biological Visual Perception for Point Cloud Representation |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=KQPoMbxInu); [GitHub](https://github.com/Point-Cloud-Learning/PointLearner) |
+| Links | [paper](https://openreview.net/forum?id=KQPoMbxInu) · [GitHub](https://github.com/Point-Cloud-Learning/PointLearner) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/classification_and_understanding |
 | Method | PointLearner |
 | Dataset | S3DIS, ScanObjectNN |
@@ -40,7 +42,7 @@ claims:
 > - S3DIS 上，mIoU 为 74.3，对比 73.8 (MVNet)，变化 +0.5。
 > - ScanObjectNN 上，OA 为 89.8，对比 89.3 (PointMamba)，变化 +0.5。
 
-## 概述
+## 概要
 
 点云表示学习的核心瓶颈在于：基于局部注意力的网络牺牲了全局感知能力，而基于状态空间模型（SSM）的方法在压缩上下文信息时导致局部学习不足，难以同时捕获精细局部结构和全局长程依赖。现有方法通常仅采用单一算子，无法在局部几何建模与全局上下文感知之间取得平衡。
 
@@ -55,7 +57,7 @@ claims:
 
 值得注意的是，PointLearner 目前未采用预训练策略，而对比方法中的部分最佳性能（如 Point-MAE、Point-BERT）借助了大规模预训练，存在性能提升空间。混合架构与现有自监督预训练方法的兼容性尚未探索，极端稀疏条件下的鲁棒性亦有待加强。
 
-## 背景与动机
+
 
 点云表示学习是三维视觉的基础任务，其核心挑战在于如何同时捕获精细的局部几何结构和全局长程依赖关系。现有方法主要分为两大范式：基于注意力的方法和基于状态空间模型（SSM）的方法，但二者各存瓶颈。
 
@@ -69,7 +71,9 @@ claims:
 
 基于此，本文提出PointLearner，一个仿生设计的混合架构网络，核心思想是：**用点聚焦注意力（Point-Focused Attention）模拟中央凹视觉的自适应感受野选择，用上下文扫描状态空间（Context-Scan State Space）模拟眼跳推理的序列化几何推断**。前者通过双分支竞争归一化注意力，在同一softmax下动态融合局部细粒度特征和全局粗粒度特征，实现描述性与鲁棒性的平衡；后者利用希尔伯特曲线保持空间邻近性的序列化特性，引导双向S6状态空间模型沿高保真扫描路径进行准确的全局推理。这种混合范式以线性复杂度整合了注意力与SSM的各自优势，为点云表示学习开辟了新的技术路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PointLearner的核心创新在于通过生物视觉启发的双阶段混合架构，解决了现有方法在局部精细建模与全局长程依赖之间的根本性权衡。其关键创新点可归纳为以下四个维度。
 
@@ -110,7 +114,7 @@ $$\text{IPP}(F) = \text{softmax}(I, K^p / \sqrt{D}) V^p, \quad \text{其中 } (K
 
 PointLearner的核心架构贡献在于首次将注意力与SSM以生物视觉系统为框架进行有机整合：每个PointLearner块内，PFA先执行局部-全局竞争注意力，CSSS随后沿希尔伯特路径进行双向状态空间推理（Figure 2）。这种“先聚焦、后扫描”的顺序设计，使得模型能够以线性复杂度同时捕获精细局部几何和长程语义交互，在ModelNet40（94.2% OA）、S3DIS（74.3% mIoU）、ScanObjectNN（89.8% OA）等多个基准上均取得最优结果，且未使用任何预训练策略（Table 1, 3, 4）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0010_KQPoMbxInu_Point-Focused_Attention_Meets_Context-Scan_State/figures/006_Figure_2.jpg]]
 *Figure 2: Left: Pipeline of PointLearner. Right: Architecture of PointLearner block, where the line between the red dots represent the saccade path guided by the serialization, which is used for geometric inference by the state space model*
@@ -140,7 +144,7 @@ PointLearner 的整体 pipeline 遵循编码器-解码器结构，核心创新�
 
 整个架构的线性复杂度由 PFA 的计算复杂度保证：$\Omega(\text{PFA}) = 6ND^2 + 2MD^2 + 2NKD + 4NMD$，与点数 $N$ 成线性关系，使得 PointLearner 在捕获精细局部结构和全局长程依赖的同时保持计算效率。
 
-## 核心模块与公式推导
+
 
 PointLearner 的核心由两个顺序排列的模块构成：**点聚焦注意力 (Point-Focused Attention, PFA)** 和 **上下文扫描状态空间 (Context-Scan State Space, CSSS)**。PFA 模拟生物视觉的中央凹感知，在单点级别动态融合细粒度局部几何与粗粒度全局语义；CSSS 模拟眼跳推理，沿空间保持的序列路径进行全局上下文建模。
 
@@ -206,7 +210,9 @@ $$\bar{A} = e^{\Delta A}, \quad \bar{B} = (\Delta A)^{-1}(e^{\Delta A} - I)(\Del
 
 PFA 与 CSSS 的协同效应在 Table 10 中得到验证：两者结合 (94.17% OA) 显著优于各自独立使用 (92.93% / 91.94%)，证明局部-全局注意力建模与序列化状态空间推理的互补性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -264,7 +270,9 @@ PointLearner在四个标准基准上进行了系统评估，涵盖物体分类�
 
 3. **吞吐量权衡**：双向S6和希尔伯特序列化带来了约20%的吞吐量下降（从约200FPS降至163FPS），在实时性要求较高的应用场景中可能需要针对性优化。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 生物视觉启发的混合架构定位
 
@@ -299,6 +307,8 @@ PointLearner 的核心贡献在于将点云表示学习从“纯注意力”或�
 3. 竞争归一化融合机制是否可以推广到其他多尺度特征融合场景？其“竞争”本质是否适用于视频点云或动态场景理解？
 
 *注：部分对比方法（如 Point-MAE、Point-BERT）使用了大规模预训练，而 PointLearner 未使用预训练，直接性能对比的公平性需在解读时注意。*
+
+
 
 ## 原文 PDF
 

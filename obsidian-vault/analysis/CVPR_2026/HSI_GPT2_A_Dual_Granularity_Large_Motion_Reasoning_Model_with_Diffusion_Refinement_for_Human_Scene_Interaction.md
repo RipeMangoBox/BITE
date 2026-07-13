@@ -44,7 +44,7 @@ claims:
 > - HUMANISE (text-conditioned HSI generation) 上，Goal Distance ↓ 0.143 vs 0.182 ± .008 (HSI-GPT) / 0.156 ± .006 (Afford@2) (较HSI-GPT降低21.4%)。
 > - HumanML3D (motion captioning) 上，R-Precision Top 1 ↑ 0.583 vs 0.551 (HSI-GPT) / 0.573 (MotionGPT-3) (显著优于所有对比方法)。
 
-## 概述
+## 概要
 
 人-场景交互（HSI）的统一建模面临一个根本性瓶颈：现有方法依赖**单粒度运动码本**，过度强调低层次运动细节，却丢失了高层次运动语义；同时，**运动解码器能力有限**，难以生成高保真的场景交互动作；此外，仅靠**监督微调（SFT）**无法赋予模型组合推理与语义对齐的能力。
 
@@ -58,7 +58,7 @@ HSI-GPT2 的核心思路是将**LLM作为高层语义规划器**与**扩散模�
 
 在方法谱系中，HSI-GPT2延续了统一HSI模型（**HSI-GPT**, Wang et al., CVPR 2025）的LLM框架，但在运动表示、解码器架构和训练范式三个维度进行了系统性升级，同时与LLM-based运动生成方法（**MotionGPT**, Jiang et al., NeurIPS 2023; **MotionGPT-2**, Wang et al., Arxiv 2024; **MotionCLR**, Chen et al., NeurIPS 2025）和场景感知方法（**Afford-Motion**, Wang et al., CVPR 2024）形成差异化竞争。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -84,7 +84,9 @@ HSI-GPT2 的核心思路是将**LLM作为高层语义规划器**与**扩散模�
 
 这一设计使得HSI-GPT2在HumanML3D文本到运动生成中将FID从HSI-GPT的0.187降至**0.139**，R-Precision Top 1提升至**0.545**；在HUMANISE数据集上，Goal Distance从0.182降至**0.143**，Contact Rate从92.31%提升至**97.98%**（Table 1, Table 3）。消融实验进一步证实，双粒度码本与GRPO优化各自贡献了显著的性能增益（Table 6, Table 7）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 HSI-GPT2 的核心创新并非单一模块的替换，而是围绕“语义规划与物理合成解耦”这一思想，对现有统一人-场景交互（HSI）模型的三个关键瓶颈进行了系统性改造。相对于以 **HSI-GPT** (Wang et al., CVPR 2025) 为代表的基线方法，HSI-GPT2 在运动表示、解码能力和推理范式三个维度上引入了实质性的 changed slots。
 
@@ -114,7 +116,7 @@ HSI-GPT2 的核心创新并非单一模块的替换，而是围绕“语义规�
 
 上述三个 changed slots 构成了一个因果闭环：DMoTok 提供了语义与细节解耦的表示基础，扩散解码器释放了从离散 token 到连续运动的高保真生成潜力，而 GRPO 强化学习则赋予模型将复杂指令分解为可执行动作序列的推理能力。三者的协同使得 HSI-GPT2 在 HumanML3D 文本到运动生成中将 FID 降至 0.139（较 HSI-GPT 的 0.187 降低约 26%），在 HUMANISE 场景交互生成中将 Goal Distance 降至 0.143（降低 21.4%），同时在运动描述任务中取得了最高的 R-Precision Top 1 0.583（Table 2）。
 
-## 整体框架
+
 
 HSI-GPT2 的整体架构围绕一个核心设计原则展开：**将 LLM 作为高层次语义规划器，将扩散模型作为低层次运动合成器，二者通过双粒度运动分词器（DMoTok）实现解耦与协同**。如图 Figure 2 所示，系统由四个关键模块串联构成：
 
@@ -133,7 +135,7 @@ HSI-GPT2 的整体架构围绕一个核心设计原则展开：**将 LLM 作为�
 ![[assets/figures/papers/paper_list_l967_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_HSI_GPT2_A_Dual_G/figures/002_Figure_1.jpg]]
 *Figure 1: Overview of the Motion Chain-of-Thought (MoCoT) and training pipeline of our HSI-GPT2. The SFT initialization on curated cold-start data, then refined with RL tuning, HSI-GPT2 achieves leading performance across HSI-centric generation and understanding tasks*
 
-## 核心模块与公式推导
+
 
 HSI-GPT2 的技术架构围绕三个关键模块展开：**双粒度运动分词器（DMoTok）**、**统一多模态大语言模型（Unified MLLM）** 以及 **运动扩散解码器（Motion Diffusion Decoder）**。三者协同工作，将高层次语义推理与低层次物理运动合成解耦，并通过强化学习优化实现端到端的语义对齐与物理保真。
 
@@ -185,7 +187,9 @@ $$r_{\mathrm{fid}} = \frac{\Psi(\hat{m}) \cdot \Psi(m)}{\|\Psi(\hat{m})\| \cdot 
 
 其中 $\Psi(\cdot)$ 为预训练的运动细节编码器，$\phi(\cdot)$ 为 CLIP 风格的语义编码器，$T$ 为输入文本。训练曲线（Figure 7）显示，格式奖励在约 70 步时率先达到峰值，随后优化重心自动转移至语义奖励和保真度奖励，验证了多奖励设计的协同效应。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能突破
 
@@ -237,7 +241,9 @@ HSI-GPT2 在文本到运动生成、人-场景交互生成及运动理解任务�
 ![[assets/figures/papers/paper_list_l967_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_HSI_GPT2_A_Dual_G/figures/004_Figure_5.jpg]]
 *Figure 5: Visualization comparison with leading text-to-motion methods under multi-step complex instructions on HumanML3D*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线工作的关系
 
@@ -279,6 +285,8 @@ HSI-GPT2 在人-场景交互领域确立了“LLM 语义规划 + 扩散物理合
 - **相对于 HSI-GPT**：HSI-GPT2 是其直接升级，三处结构性改造（双粒度分词、扩散解码、GRPO 推理优化）共同构成了从“统一框架”到“推理增强框架”的代际跨越。
 
 该范式为后续研究提供了可复用的技术路径：MoCoT 数据引擎可作为思维链监督数据的通用生成流水线，GRPO 的多奖励设计可推广到其他需要语义对齐与物理保真度平衡的生成任务。
+
+
 
 ## 原文 PDF
 

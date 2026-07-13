@@ -44,7 +44,7 @@ claims:
 > - InCOCO 上，F1 0.672 vs 0.542 (+0.130 (13.0%))。
 > - Combined AniCOCO (image-level) 上，AUC — vs — (+27.3%)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -76,7 +76,7 @@ FFIM 是一个即插即用的可控去噪框架，包含三个核心阶段：
 
 FFIM 的性能上限受所选预训练取证代理模型的泛化能力限制，相似度阈值和优化步长等超参数需手工调节，且尚未验证在 SD3、FLUX 等直接预测式扩散模型上的适用性。如何将该噪声调整策略扩展到更广泛的生成范式，以及设计自适应的参数选择机制，是未来值得探索的方向。
 
-## 背景与动机
+
 
 ### 问题背景：图像编辑的取证困境
 
@@ -104,7 +104,9 @@ $$\mathrm{Loc}(\hat{\mathbf{M}}_{\mathrm{FF}}, \mathbf{M}) > \mathrm{Loc}(\hat{\
 
 如图 Figure 1 所示，采用 FFIM 的服务端可在满足用户编辑需求的同时，使第三方取证工具无需任何先验信息即可有效定位篡改区域。这一范式转变将取证责任从“事后检测”前移至“生成阶段设计”，为图像编辑的可信生态提供了新思路。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FFIM 的核心创新在于**将取证可区分性内生地嵌入扩散模型的去噪过程**，使生成的编辑图像自带可被第三方取证检测的区域差异线索，而无需服务器提供任何先验信息（如水印或溯源元数据）。这与现有后处理式取证增强方法（如 **ReLoc**，Zhuang et al., IEEE TIFS 2023）有本质区别：后者在图像生成完成后才施加取证优化，而 FFIM 在生成阶段即通过控制去噪路径来塑造取证特征。
 
@@ -162,7 +164,7 @@ $$\mathcal{L}_{\mathrm{adv}} = \mathcal{S}\left(\tilde{\mathbf{M}} \odot \mathca
 
 2. **需求满足约束下的优化**：FFIM 在优化取证可区分性的同时，通过正交投影保证噪声调整不偏离用户编辑需求。用户主观满意度评分（FFIM 4.15 vs. 基线 DDPM 4.17，5-point Likert 量表）和客观质量指标（熵、噪声、对比度，Table 2）均无显著差异，验证了方法在取证友好性与用户体验之间的有效平衡。
 
-## 整体框架
+
 
 FFIM 的整体设计围绕一个核心矛盾展开：标准潜在扩散模型（LDM）生成的编辑图像，其编辑区域与未编辑区域在取证空间中缺乏内生可区分特征，导致第三方被动取证难以检测和定位篡改。FFIM 在不依赖服务器提供私有水印或溯源信息的前提下，通过干预去噪过程中的噪声采样与优化，使生成图像自带取证友好的区域差异线索。
 
@@ -197,7 +199,7 @@ FFIM 并非重新训练扩散模型，而是作为即插即用的推理阶段介
 ![[assets/figures/papers/paper_list_l2490_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Forensic_Friendly/figures/001_Figure_1.jpg]]
 *Figure 1: Adopting the proposed FFIM, the server can generate results that satisfy user requirements while facilitating forgery localization by third-party forensics without consensus*
 
-## 核心模块与公式推导
+
 
 ### 问题形式化：取证友好的约束条件
 
@@ -325,7 +327,9 @@ $$
 
 这一设计使 FFIM 在不依赖外部水印或私有溯源信息的前提下，仅通过调控去噪过程中的噪声采样，即可为第三方取证提供内生的、可检测的区域差异线索。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置与评估协议
 
@@ -424,7 +428,9 @@ Table 4 消融了 Phase III 中不同取证代理模型作为显式引导源的�
 ![[assets/figures/papers/paper_list_l2490_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Forensic_Friendly/figures/003_Figure_3.jpg]]
 *Figure 3: Qualitative comparisons in pixel-level localization of Evaluation I. For user requests, we present the server’s editing results using baseline DDPM [21], ReLoc [70], and the proposed*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心基线对比
 
@@ -469,6 +475,8 @@ FFIM 的方法论贡献可沿以下维度定位：
 4.  **动态权衡策略。** 如何在多步去噪过程中自适应地分配取证优化强度——例如在早期步骤侧重布局生成、后期步骤侧重取证特征增强——以在视觉质量与取证可区分性之间取得更优的帕累托前沿？
 
 5.  **下游鲁棒性。** FFIM 生成的编辑图像在经历有损压缩、二次编辑、社交媒体传输等下游处理后，其内生的取证线索是否依然稳健？这需要系统性的鲁棒性评估，目前尚未覆盖。
+
+
 
 ## 原文 PDF
 

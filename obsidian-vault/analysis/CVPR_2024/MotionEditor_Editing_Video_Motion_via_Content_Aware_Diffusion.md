@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2024
 pdf_ref: paperPDFs/CVPR_2024/MotionEditor_Editing_Video_Motion_via_Content_Aware_Diffusion.pdf
+project_link: https://francis-rings.github.io/MotionEditor/
+code_link: null
 aliases:
 - MotionEditor
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | MotionEditor：基于内容感知扩散的视频运动编辑 |
 | 英文题名 | MotionEditor: Editing Video Motion via Content-Aware Diffusion |
 | 会议/期刊 | CVPR 2024 |
-| Links | [paper](https://arxiv.org/abs/2311.18830); [Project](https://francis-rings.github.io/MotionEditor/) |
+| Links | [paper](https://arxiv.org/abs/2311.18830) · [Project](https://francis-rings.github.io/MotionEditor/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/robotics |
 | Method | MotionEditor |
 | Dataset | 20 in-the-wild videos, User study (19 participants, 20 cases) |
@@ -40,7 +42,7 @@ claims:
 > - 20 in-the-wild videos 上，LPIPS-S (↓) 为 0.273，对比 N/A (lower than all other methods)，变化 N/A。
 > - User study (19 participants, 20 cases) 上，Motion Alignment preference rate 为 91.9% (MotionEditor vs. LWG)，对比 8.1%，变化 +83.8pp。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有基于扩散模型的视频编辑方法主要聚焦于纹理或属性编辑，在视频运动编辑任务上存在根本性矛盾——参考姿态的控制信号（通常通过 ControlNet 注入）与源视频噪声中蕴含的源运动信息相互冲突，导致运动控制失效、外观失真和严重伪影。
 
@@ -54,8 +56,6 @@ claims:
 **方法定位**：MotionEditor 属于基于预训练扩散模型的视频运动编辑方法。相较于人物运动迁移方法（如 **MRAA**, Siarohin et al., CVPR 2021）和姿态驱动视频生成方法（如 **ControlVideo**, Zhang et al., arXiv 2023），MotionEditor 在编辑指定运动的同时，无需微调即可完好保留源视频的外观与背景。与视频属性编辑方法（如 **Tune-A-Video**, Wu et al., ICCV 2023）相比，MotionEditor 首次系统性地解决了运动控制与内容保持的冲突。
 
 **主要结果**：在 20 个真实视频的定量对比中，MotionEditor 在 CLIP 分数（28.86）和 LPIPS 各变体指标上均达到最优（Table 1）。用户研究（19 名参与者，20 个案例）显示，在运动对齐维度上，MotionEditor 相对于 LWG 的偏好率高达 91.9%（Table 2）。消融实验定性证明，移除内容感知交叉注意力、运动适配器、高保真注意力注入或骨架对齐中任一组件均会导致运动编辑质量严重下降（Fig. 6, Fig. 12）。
-
-## 背景与动机
 
 视频编辑是生成式人工智能的核心应用方向之一。随着扩散模型在图像生成与编辑领域的成熟，研究者开始将注意力转向更具挑战性的视频编辑任务。然而，现有基于扩散的视频编辑方法几乎全部聚焦于**纹理与属性编辑**——例如改变物体颜色、替换背景风格或调整光照——而鲜有方法能够精确操控视频中的**运动信息**。
 
@@ -77,7 +77,7 @@ claims:
 
 通过这些设计，MotionEditor 首次在扩散模型框架下实现了对视频运动的可控编辑，同时完好保留了源视频的背景与主体外观。
 
-## 核心创新
+## 核心方法与创新机理
 
 MotionEditor 的核心创新在于系统性地解决了扩散模型在视频运动编辑中的根本矛盾：参考姿态的控制信号与源视频潜在噪声中蕴含的源运动信息相互冲突，导致运动控制失效和外观失真。围绕这一瓶颈，该方法在三个关键维度上提出了针对性的“changed slots”。
 
@@ -119,8 +119,6 @@ $$Q^r = W^Q z_i^r, \quad K^r = W^K [z_{i-1}^r, z_i^r], \quad V^r = W^V [z_{i-1}^
 
 上述四个“changed slots”构成了 MotionEditor 相对于现有方法的系统性优势：内容感知适配器解决了控制信号的冲突问题，高保真注意力注入解决了外观保持中的特征混淆问题，骨架对齐消除了几何不一致，而 CS Attention 提供了轻量级的时序一致性保障。这些组件协同工作，使得 MotionEditor 在 20 个真实视频的定量评估（Table 1）和用户研究（Table 2）中均显著超越现有方法，特别是在运动对齐维度上对 LWG 达到 91.9% 的用户偏好率。
 
-## 整体框架
-
 ![[assets/figures/papers/paper_list_l40_MotionEditor_Editing_Video_Motion_via_Content_Aware_Diffusion/figures/001_Figure_1.jpg]]
 *Figure 1: MotionEditor: A diffusion-based video editing method aimed at transferring motion from a reference to a source*
 
@@ -150,8 +148,6 @@ MotionEditor 基于 Latent Diffusion Model（Stable Diffusion）构建，其架�
 3. **DDIM 反演**：对源视频帧进行 DDIM 反演，获得初始噪声潜在表示，作为双分支的共享起点。
 4. **重建与编辑**：重建分支生成源视频的潜在重建，提取各帧的前景掩码和 CS Attention 层的解耦键值；编辑分支在内容感知运动适配器的增强下，以对齐后的参考骨架为条件进行去噪生成，同时注入重建分支的前景/背景键值以保持外观。
 5. **输出**：编辑后的视频帧序列，其运动与参考视频对齐，同时保留源视频的主角外观和背景。
-
-## 核心模块与公式推导
 
 MotionEditor 的核心架构由五个紧密协作的模块构成，它们共同解决了“控制信号与源内容冲突”这一根本瓶颈。以下按其在推理流程中的作用顺序展开。
 
@@ -199,7 +195,7 @@ $$\pmb{K}_{inj} = [\pmb{K}_{fg}^r, \pmb{K}_{bg}^r, \pmb{K}_{cu}^e], \quad \pmb{V
 
 > **证据说明**：以上公式均来自论文 Sec. 4.2–4.4（Eq. 5–8），模块描述基于 Fig. 2 架构图和对应正文。消融实验（Fig. 6, Fig. 12）定性证实，移除任一核心组件均会导致运动编辑质量严重下降。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 实验设置
 
@@ -242,10 +238,7 @@ Table 3将视频运动编辑与姿态引导图像生成、人物运动迁移、�
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l40_MotionEditor_Editing_Video_Motion_via_Content_Aware_Diffusion/figures/004_Figure_4.jpg]]
-*Figure 4: Motion editing results of our MotionEditor. More examples can be found in the appendix*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 任务定位：视频运动编辑的独特挑战
 

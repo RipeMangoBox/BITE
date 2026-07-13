@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/MOST_Motion_Diffusion_Model_for_Rare_Text_via_Temporal_Clip_Banzhaf_Interaction.pdf
+project_link: null
+code_link: null
 aliases:
 - MMDMRTTCBI
 tags:
@@ -42,7 +44,7 @@ claims:
 > - KIT-ML (All) 上，R@1 9.87。
 > - HumanML3D 上，FID, R_precision Top-3 0.139。
 
-## 概述
+## 概要
 
 文本驱动的人体运动生成旨在根据自然语言描述合成逼真的三维运动序列。尽管现有方法在常见文本上取得了显著进展，但在处理**稀有文本**（如“blind”、“cartwheel”等低频动作描述）时，生成质量急剧下降。其根本瓶颈在于：全序列检索引入大量运动冗余，粗粒度的实体级对齐掩盖了关键语义线索，导致模型无法有效捕捉稀有动作的细粒度对应关系。
 
@@ -52,7 +54,7 @@ MOST采用**两阶段框架**：检索阶段通过时间片段Banzhaf交互实�
 
 实验表明，MOST在HumanML3D和KIT‑ML数据集上全面超越现有方法。在稀有文本尾部（Tail 0‑5%）上，MOST的FID在HumanML3D上降至0.66，KIT‑ML上降至7.34，优势尤为突出。消融研究证实，Banzhaf检索、关键片段选择与交叉注意力融合均对性能有显著贡献。
 
-## 背景与动机
+
 
 ### 文本驱动运动生成的任务困境
 
@@ -81,7 +83,9 @@ MOST采用**两阶段框架**：检索阶段通过时间片段Banzhaf交互实�
 
 具体而言，MOST将文本片段与运动片段视为合作博弈中的“玩家”，通过计算每个片段联盟的边际贡献来量化跨模态细粒度一致性。配合基于泛化度比率的收益函数——该函数根据片段内相邻帧的平均绝对差异衡量信息丰富度，低差异片段（冗余帧）被赋予更低权重——模型能够自动排除冗余噪声，聚焦于核心运动线索。这一机制无需片段级标注即可实现细粒度语义对齐，为后续运动扩散模型提供高保真的生成指引。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MOST的核心创新在于将**合作博弈论中的Banzhaf交互机制**引入文本驱动运动生成任务，从根本上改变了检索与生成两阶段中跨模态对齐的粒度与质量。与现有方法相比，其关键突破体现在以下四个维度：
 
@@ -126,7 +130,7 @@ $$
 
 上述四个维度的改变共同构成了一个因果链条：**片段级检索消除冗余 → 双粒度对齐捕捉细粒度协作 → 泛化度加权抑制噪声 → 多片段融合增强语义覆盖**。这一链条使MOST在稀有文本尾部（Tail 0-5%）上的FID和W-MM Dist显著优于现有方法（HumanML3D上FID降至0.66，W-MM Dist降至16.80），验证了从合作博弈论视角解决跨模态细粒度对齐问题的有效性。
 
-## 整体框架
+
 
 MOST 采用**检索‑生成两阶段框架**，从根本上重塑了文本驱动运动扩散模型的输入条件构建方式。其核心设计动机源于一个被现有方法普遍忽视的瓶颈：当面对稀有文本时，基于全序列检索的生成范式会引入大量运动冗余，粗粒度的实体级对齐掩盖了关键语义线索，导致模型无法有效捕捉稀有动作的细粒度对应关系。
 
@@ -141,7 +145,7 @@ MOST 采用**检索‑生成两阶段框架**，从根本上重塑了文本驱�
 
 两阶段设计的关键因果链条在于：通过合作博弈论中的Banzhaf交互机制在片段级别精准捕获文本‑运动对应关系，从根本上消除了全序列冗余的干扰；运动提示模块则将这种细粒度对齐信息有效注入扩散生成过程，为稀有文本条件下的高保真运动生成提供了可靠的语义指引。
 
-## 核心模块与公式推导
+
 
 MOST方法的核心在于通过合作博弈论中的**时间片段Banzhaf交互**（Temporal Clip Banzhaf Interaction）机制，在片段级别实现文本与运动的细粒度对齐，从而为扩散生成提供高保真的运动提示。本节聚焦于检索阶段的关键模块与公式推导。
 
@@ -220,7 +224,9 @@ $$
 ![[assets/figures/papers/paper_list_l1835_MOST_Motion_Diffusion_Model_for_Rare_Text_via_Temporal_Clip_Banzhaf_Inte/figures/002_Figure_2.jpg]]
 *Figure 2: Qualitative Analysis on the Motion Redundancy Problem. We depict the keyframe parts in dark brown and label the remaining parts in light brown*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -283,7 +289,9 @@ Figure 5展示了运动冗余的定量评估。通过比较运动提示序列长
 ![[assets/figures/papers/paper_list_l1835_MOST_Motion_Diffusion_Model_for_Rare_Text_via_Temporal_Clip_Banzhaf_Inte/figures/018_Figure_13.jpg]]
 *Figure 13: The generated result for the sentence “A person is playing ping-pong." The left figure shows the result trained on the all data, while the right figure shows the result trained on a sub-dataset with half of the data randomly dropped*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心瓶颈与突破路径
 
@@ -347,6 +355,8 @@ MOST 建立在文本条件运动扩散模型的成熟范式之上，但其创新
 5. **Banzhaf预测器的改进**：当前预测器仅使用交叉熵损失训练，是否可以通过更严格的对齐目标（如排序损失、对比损失）或自监督信号进一步提升其准确性？
 
 6. **跨任务迁移**：该框架中的合作博弈思想——将多模态序列片段视为玩家并计算其交互贡献——能否推广到音乐驱动运动合成、视频-文本对齐等其他多模态生成与理解任务？
+
+
 
 ## 原文 PDF
 

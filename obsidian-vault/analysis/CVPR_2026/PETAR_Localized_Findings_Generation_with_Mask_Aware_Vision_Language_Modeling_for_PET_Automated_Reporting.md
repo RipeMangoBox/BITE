@@ -45,15 +45,13 @@ claims:
 > - Internal Reader Study (5 physicians) 上，Mean Anatomical / Interpretation / Utility Score 3.9 / 3.9 / 3.7 vs 4.4 / 4.4 / 4.3 (Human original reports) (-0.5 / -0.5 / -0.6)。
 > - External AutoPET Dataset 上，Mean Anatomical / Interpretation / Utility Score 3.8 / 4.0 / 3.8 vs N/A (no human reference available) (N/A)。
 
-## 概述
+## 概要
 
 PET/CT是肿瘤学中广泛使用的成像模态，其报告生成高度依赖核医学医师对三维体积中病灶的逐一描述，耗时且易出现疏漏。现有3D视觉-语言模型（VLMs）通常采用全局编码与下采样策略，导致体积占比平均小于0.1%的微小病灶的细粒度信息丢失，无法实现精确的视觉-文本空间对齐，生成的描述往往模糊或临床不完整。
 
 针对这一瓶颈，本文提出**PETAR-4B**，一种面向PET/CT病灶发现生成的3D掩码感知视觉-语言模型。其核心思路是：将3D分割掩码与PET/CT体积以掩码感知的方式联合编码，并引入高分辨率聚焦提示（focal prompt），使模型能够同时获取全局疾病分布和局部病灶属性，从而学习从掩码空间到语言描述的精确映射。
 
 在自动评估中，PETAR-4B显著优于所有2D和3D基线模型——在GREEN分数上达到0.257，较最强3D基线M3D-RAD的0.071提升0.186；在BLEU-4和BERTScore上也分别取得0.535和0.795的最佳结果。由五位核医学医师参与的盲法评估进一步证实了其临床价值：模型在解剖准确性、解读正确性和临床实用性三项评分上达到3.7–3.9（人类报告为4.3–4.4），医生在约60%的案件中认为模型生成结果等于或优于人工报告。跨数据集泛化实验（AutoPET）同样表现稳健，三项评分均在3.8–4.0之间。
-
-## 背景与动机
 
 ### 临床需求与现有报告的瓶颈
 
@@ -82,7 +80,7 @@ PET/CT是肿瘤学中广泛使用的成像模态，其报告生成高度依赖�
 
 通过这一“掩码→空间→语言”的因果链路，PETAR-4B 旨在弥合现有VLM与临床报告生成之间的关键缺口，为自动化PET报告生成提供一条从病灶定位到精细描述的全新路径。
 
-## 核心创新
+## 核心方法与创新机理
 
 PETAR-4B 的核心创新在于将**3D病灶分割掩码**作为显式条件引入视觉-语言建模管线，从而解决了现有3D VLM因全局编码与下采样导致微小病灶（体积占比通常<0.1%）细粒度信息丢失的根本瓶颈。围绕这一思路，模型在四个关键维度上相对于基线方法做出了实质性改变。
 
@@ -120,8 +118,6 @@ CT提供了解剖结构信息，弥补了PET在空间定位精度上的不足。
 
 上述四个 changed slots 构成了一个**从粗到细、从全局到局部**的层次化视觉编码体系：TotalSegmentator预训练提供器官级解剖先验，PET-CT联合编码提供全局代谢与结构上下文，掩码感知编码注入病灶空间位置，聚焦提示保留病灶细节纹理。这一体系使得模型能够同时捕捉“疾病分布”和“病灶属性”两个层次的临床信息，从而在空间定位准确性和描述粒度上显著超越现有2D和3D基线方法。
 
-## 整体框架
-
 PETAR-4B 是一个面向 PET/CT 自动化报告生成的 3D 掩码感知视觉语言模型，其核心设计目标是解决现有 3D VLM 中微小病灶（体积占比通常不足 0.1%）在全局下采样过程中信息丢失的问题。模型以 PET 体积 $P$、CT 体积 $C$ 和 3D 病灶分割掩码 $M$ 为联合输入，输出病灶级的自然语言发现描述 $y$，形式化为：
 
 $$y = f_{\theta}(P, C, M)$$
@@ -156,8 +152,6 @@ $$\tilde{c} = c + \triangle c,\quad \tilde{r} = r + \triangle r,\quad \triangle 
 
 ![[assets/figures/papers/paper_list_l2333_https_arxiv_org_abs_2510_27680/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of mask-guided PET/CT report generation. By incorporating lesion-level masks, PETAR produces anatomically fine-grained findings grounded in the 3D volume. In contrast, general 3D models perform global encoding without fine-grained anatomical correlation, hence they generate vague or clinically incomplete descriptions*
-
-## 核心模块与公式推导
 
 PETAR-4B 的核心架构围绕一个统一的生成目标展开：
 
@@ -220,7 +214,7 @@ $$\mathcal{L}(\mathcal{D}, \theta) = -\sum_{(\mathbf{V},q,y)\sim\mathcal{D}}\sum
 ![[assets/figures/papers/paper_list_l2333_https_arxiv_org_abs_2510_27680/figures/006_Table_3.jpg]]
 *Table 3: Ablation study of our model showing the effect of each component on multiple evaluation metrics. TS=TotalSegmentator pretraining*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -306,31 +300,13 @@ PETAR-4B 在内部测试集上的三项评分达到 3.7–3.9，与人类报告�
 ![[assets/figures/papers/paper_list_l2333_https_arxiv_org_abs_2510_27680/figures/005_Table_2.jpg]]
 *Table 2: Comparison of selected models on the PETARSeg-11k test set. The ”(finetuned)” indicates the model was trained on PETARSeg-11k*
 
-![[assets/figures/papers/paper_list_l2333_https_arxiv_org_abs_2510_27680/figures/009_Table_5.jpg]]
-*Table 5: Human evaluation of PETAR-4B on an internal test set and an external AutoPET dataset. Five blinded nuclear medicine physicians compared PETAR findings with original reports*
-
 ![[assets/figures/papers/paper_list_l2333_https_arxiv_org_abs_2510_27680/figures/008_Figure_4.jpg]]
 *Figure 4: A comparison between different models. PETAR consistently produces anatomically correct descriptions. Prior to fine-tuning, both MedGemma and M3D-RAD produce highly inaccurate results. After fine-tuning, the models still tend to make localisation errors. Anatomical descriptors are underlined for ease of comparison (red=incorrect, green=correct). Note: quantitative measurements (lesion size, SUVmax) are hallucinated by the models but can be easily replaced with directly measured values using the input lesion masks*
-
-![[assets/figures/papers/paper_list_l2333_https_arxiv_org_abs_2510_27680/figures/007_Table_4.jpg]]
-*Table 4: Spearman’s correlation between automated metrics and human evaluation scores. Higher correlation indicates stronger alignment with expert judgment*
 
 ![[assets/figures/papers/paper_list_l2333_https_arxiv_org_abs_2510_27680/figures/003_Table_1.jpg]]
 *Table 1: Comparison of publicly available PET/CT datasets*
 
-![[assets/figures/papers/paper_list_l2333_https_arxiv_org_abs_2510_27680/figures/002_Figure_2.jpg]]
-*Figure 2: Overview of the PETARSeg-11K data pipeline. LLMs extract key lesion attributes*
-
-![[assets/figures/papers/paper_list_l2333_https_arxiv_org_abs_2510_27680/figures/013_Figure_5.jpg]]
-*Figure 5: PETAR-4B predictions for examples from the autoPET dataset*
-
-![[assets/figures/papers/paper_list_l2333_https_arxiv_org_abs_2510_27680/figures/010_Table_6.jpg]]
-*Table 6: Cohort summary statistics*
-
-![[assets/figures/papers/paper_list_l2333_https_arxiv_org_abs_2510_27680/figures/012_Table_7.jpg]]
-*Table 7: Indication frequency with low-prevalence categories grouped into “Others” (percent only)*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 

@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/LIFT_and_PLACE_A_Simple_Stable_and_Effective_Knowledge_Distillation_Framework_for_Lightweight_Diffusion_Models.pdf
+project_link: null
 code_link: null
 aliases:
 - LP
@@ -33,7 +34,11 @@ claims:
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/diffusion_image_video |
 | Method |  |
 | Dataset | CelebA, LSUN-Bedroom, ImageNet, MS-COCO |
-## 概述
+
+> [!tip] 效果简介
+> 本笔记的既有实验指标、对比结果与适用边界见“实验与关键发现”；本轮仅统一结构，不改写证据。
+
+## 概要
 
 大规模扩散模型在图像生成任务中展现出卓越的性能，但其庞大的参数量和计算开销严重制约了在资源受限场景下的部署。通过知识蒸馏（Knowledge Distillation, KD）将教师模型的能力迁移至轻量级学生模型，是解决这一问题的直接路径。然而，当师生容量差距急剧扩大时，传统KD方法面临严峻挑战：学生性能显著退化，且训练过程高度不稳定。
 
@@ -41,7 +46,7 @@ claims:
 
 在极端压缩场景下（如仅保留教师模型1.6%参数的1.3M学生模型），传统OutKD方法完全失效（FID高达96.64），而本文方法在CelebA 64×64上取得了**15.73**的FID，性能提升逾80点。该框架在不同架构（UNet、DiT、MMDiT）、不同任务（无条件生成、文生图）及不同压缩策略（剪枝、深度缩减）下均展现出一致的稳定性和有效性，为轻量化扩散模型的训练提供了一种简单、稳定且高效的解决方案。
 
-## 背景与动机
+
 
 扩散模型已在图像生成（Dhariwal & Nichol, NeurIPS 2021）、文本到图像合成（Rombach et al., CVPR 2022）等任务中取得显著成果，但其庞大的参数量和推理成本严重阻碍了实际部署。知识蒸馏（Knowledge Distillation, KD）是压缩扩散模型的主流策略之一，其核心思想是让轻量学生网络模仿强大教师网络的输出或中间特征。
 
@@ -55,7 +60,9 @@ claims:
 
 基于上述观察，本文提出两个核心动机：第一，需要一种能够自适应分解蒸馏目标、缓解容量差距带来的不稳定性的方法；第二，需要一种能够感知空间误差分布、提供局部自适应引导的机制。这直接催生了LIFT（线性回归参数化蒸馏目标）和PLACE（基于误差分组的局部自适应修正）两个技术组件。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于将扩散模型的知识蒸馏（KD）目标重新表述为**粗粒度对齐与细粒度精炼**的两阶段问题，并据此提出了 **LIFT** 与 **PLACE** 两个互补模块。与传统的输出级 KD（OutKD）或特征级 KD（FeatKD）直接最小化 $L_2$ 距离不同，该方法通过线性回归参数化蒸馏误差，显式解耦了低阶矩匹配与残差学习，从而在高压缩比场景下实现了稳定且显著的性能提升。
 
@@ -112,7 +119,7 @@ $$
 - **跨任务验证**：方法在 LSUN-Bedroom 256×256（Table 1）、Stable Diffusion 2.1 / SD3 文生图（Table 2）、ImageNet DiT 类条件生成（Table 3）上均取得最优，表明 LIFT+PLACE 对扩散模型架构和任务具有通用性。
 - **需注意的限制**：论文未提供在大规模文本-图像模型（如 SDXL、Flux）上的验证；PLACE 的分组数 $K$ 需作为超参调节，其敏感性未充分讨论。
 
-## 整体框架
+
 
 LIFT 与 PLACE 共同构成一个面向轻量化扩散模型的知识蒸馏框架，其核心设计思路是将传统输出级蒸馏损失分解为可独立调控的“粗粒度对齐”与“细粒度精修”两个子目标，从而在师生容量差距极大时仍能保持稳定收敛。框架的整体流程如图 4 所示，包含三个关键阶段：误差诊断、LIFT 参数化蒸馏、以及 PLACE 空间自适应增强。
 
@@ -142,7 +149,7 @@ $$\mathcal{L} = \lambda_{diff} \mathcal{L}_{diff} + \lambda_{\mathrm{LIFT}} \mat
 ![[assets/figures/papers/paper_list_l894_https_arxiv_org_abs_2605_19729/figures/004_Figure_4.jpg]]
 *Figure 4: Overview of LIFT and PLACE. LIFT parameterizes KD via linear regression, regularizing*
 
-## 核心模块与公式推导
+
 
 ### 3.1 蒸馏误差分解：Coarse-Easy 与 Fine-Hard
 
@@ -211,7 +218,9 @@ $$\mathcal{L} = \lambda_{diff} \mathcal{L}_{diff} + \lambda_{\mathrm{LIFT}} \mat
 - **LIFT 损失** $\mathcal{L}_{\mathrm{LIFT}}$：包含 Coarse 正则项与自适应加权的 Fine 残差项（PLACE 中为分组聚合形式）。
 - **特征蒸馏损失** $\mathcal{L}_{\mathrm{FeatKD}}$：教师与学生中间特征的 L2 距离（经维度对齐）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -313,7 +322,9 @@ Figure 6(a) 展示了扩散损失梯度范数的收敛曲线。本文方法的�
 | Figure 6 | 自适应权重实现平滑收敛，避免梯度冲突 |
 | Figure 3 | 空间非均匀误差客观存在，PLACE 可缓解但未根除 |
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 蒸馏范式定位：从输出对齐到结构化误差分解
 
@@ -358,6 +369,8 @@ Figure 6(a) 展示了扩散损失梯度范数的收敛曲线。本文方法的�
 ### 知识库定位
 
 本工作可定位于**扩散模型压缩与加速**方向下的**知识蒸馏子领域**，具体贡献属于**蒸馏目标函数设计**这一技术路线。与传统 OutKD 和 FeatKD 形成互补而非替代关系——论文的最终目标函数仍保留扩散损失和 FeatKD 损失，LIFT/PLACE 替代的是 OutKD 的角色。这一设计哲学与近年将传统 KD 损失重新参数化以提高蒸馏效率的趋势一致，其通过统计矩显式对齐实现稳定收敛的思路，为极端压缩场景下的扩散模型蒸馏提供了新的基线。
+
+
 
 ## 原文 PDF
 

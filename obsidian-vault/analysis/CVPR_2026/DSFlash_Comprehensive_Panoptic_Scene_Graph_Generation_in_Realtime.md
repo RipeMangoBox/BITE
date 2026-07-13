@@ -42,7 +42,7 @@ claims:
 > - PSG dataset (SGDet/SGGen) 上，mR@50 / 延迟(ms) DSFlash-L: 30.90 / 50ms vs DSFormer: 28.9 / 98ms (mR@50 +2.0, 延迟减半(-49%))；mR@50 / 延迟(ms) DSFlash-B: 28.80 / 29ms vs DSFormer: 28.9 / 98ms (mR@50持平(-0.1), 延迟降低70%)；mR@50 / 延迟(ms) DSFlash-S*: 25.05 / 18ms vs DSFormer: 28.9 / 98ms (mR@50 -3.85, 延迟降低82%)。
 > - PSG dataset (PredCls) 上，mR@50 DSFlash-L: 41.69 vs DSFlash-B: 41.30 (同族对比) (+0.39)。
 
-## 概述
+## 概要
 
 全景场景图生成（Panoptic Scene Graph Generation, PSGG）旨在同时定位图像中所有实例并分类其间的所有潜在关系，为视觉理解提供结构化的场景表示。然而，现有方法在实时推理场景中面临三重效率瓶颈：**（1）分割与关系预测依赖独立骨干网络，导致重复特征提取；（2）关系分类需两次前向传播分别处理主体→客体和客体→主体两个方向；（3）Transformer颈部无差别处理所有图像patch，包括大量与主体/客体无关的背景区域，造成严重计算浪费**。以当前SOTA方法**DSFormer**（Lorenz et al., ECCV 2024）为例，其在PSG数据集上虽达到28.9 mR@50，但延迟高达98ms，难以满足实时视频流处理需求。
 
@@ -57,7 +57,7 @@ DSFlash的核心洞察在于**将分割与关系预测的特征提取统一到�
 
 实验验证表明，统一骨干网络是最有效的单项延迟优化手段（延迟降至41ms），门控双向预测则在不增加延迟的前提下将mR@50从25.0恢复至28.8，有效补偿了骨干替换带来的精度损失。在RTX 3090上，DSFlash可实现56 FPS的视频流处理速度，训练在GTX 1080上不超过24小时即可完成。
 
-## 背景与动机
+
 
 ### 全景场景图生成的任务定义
 
@@ -87,7 +87,9 @@ DSFlash的设计源于一个关键观察：**分割阶段已经产生的特征�
 
 这三个设计相互协同：统一骨干网络消除了最耗时的重复特征提取，门控双向预测将关系分类的计算量减半，动态patch剪枝则根据每对掩码的空间分布自适应地减少处理token数量。通过消融实验（Table 2），DSFlash验证了每个优化模块的独立贡献——统一骨干网络将延迟从98ms降至41ms（降幅58%），门控双向预测进一步将延迟压缩至29ms，同时将因骨干替换而下降的mR@50从25.0恢复至28.8，接近原始DSFormer的性能水平。最终，DSFlash-L在PSG数据集上以仅50ms延迟达到30.90 mR@50，超越了DSFormer的28.9 mR@50（98ms延迟），实现了性能与速度的双重提升。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DSFlash 的核心创新围绕一个中心洞察展开：**将分割与关系预测的特征提取统一到单一冻结骨干网络中，并通过门控机制和动态 token 剪枝协同消除冗余计算**。相较于当前 SOTA 方法 **DSFormer**（Lorenz et al., ECCV 2024），DSFlash 在五个关键设计槽位上进行了系统性重构，形成了“一次提取、双向预测、按需计算”的高效推理范式。
 
@@ -135,7 +137,7 @@ Table 3 显示，ToMe（30%）与 patch 剪枝组合使 GTX 1080 延迟进一步
 
 上述五项创新并非孤立叠加，而是形成了协同增益：统一骨干网络消除重复特征提取，低分辨率掩码和高效嵌入减少掩码处理开销，门控双向预测在单次前向传播中恢复关系预测精度，动态剪枝和 token 合并则按需裁剪计算图。最终，**DSFlash-L 在 PSG 数据集上以 50ms 延迟达到 30.90 mR@50**，超越 DSFormer 的 28.9 mR@50（98ms 延迟），实现了性能与速度的双重提升（Figure 1, Table 1）。
 
-## 整体框架
+
 
 DSFlash 采用“分割-关系预测”两阶段范式，将全景场景图生成拆解为一次图像级分割（Part A）和多次掩码对级关系预测（Part B），从而在单张 RTX 3090 上达到 56 FPS 的推理速度。其核心设计原则是**最大化特征复用**和**最小化冗余计算**，具体体现在三个层面：用单一冻结的分割骨干替代双独立网络、用双向门控预测替代两次单向前向传播、用基于掩码的动态 patch 剪枝减少 Transformer 颈部的 token 数量。
 
@@ -185,7 +187,7 @@ $$\mathcal{L}_{\text{consistency}} = \frac{1}{D}\sum_{i=1}^{D}(t_i^{\rightarrow}
 ![[assets/figures/papers/paper_list_l2469_https_arxiv_org_abs_2603_10538/figures/011_Figure_7.jpg]]
 *Figure 7: Illustration of the impact of multiple masks for the same ground truth mask. The model in figure B predicts multiple very similar masks together with separate relation predictions. However, this gives the model multiple attempts to predict the ground truth relation, essentially ignoring the definition for mR@k. Adapted from [2]*
 
-## 核心模块与公式推导
+
 
 DSFlash的推理架构分为两大部分（图2）：Part A每张图像执行一次，负责全景分割与特征提取；Part B对每对分割掩码执行一次，负责关系预测。以下聚焦Part B中决定效率与性能的关键模块。
 
@@ -248,7 +250,9 @@ DSFlash还对DSFormer的掩码嵌入代码进行了底层优化。原始实现�
 ![[assets/figures/papers/paper_list_l2469_https_arxiv_org_abs_2603_10538/figures/018_Figure_12.jpg]]
 *Figure 12: Comparison of a model trained with pruned patches and one without when pruning patches during evaluation*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：精度-延迟权衡的帕累托前沿
 
@@ -311,7 +315,9 @@ DSFlash的主要失败模式体现在两个方面：
 ![[assets/figures/papers/paper_list_l2469_https_arxiv_org_abs_2603_10538/figures/019_Figure_14.jpg]]
 *Figure 14: Failure cases when using DSFlash. Shown are predictions that are in the top 50 predictions for the respective image. The color in the boxes indicates to which subject the prediction is related to*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 设计谱系：从两阶段SGG到实时全景场景图生成
 
@@ -400,6 +406,8 @@ DSFlash的效率提升并非单一技巧的堆砌，而是三个因果杠杆的�
 6. **双向门控机制的推广**：双向门控关系预测机制是否可推广到其他需要对称预测的双向关系建模任务（如人-物交互检测HOI、视觉关系检测VRD），是一个有潜力的研究方向。
 
 7. **冻结骨干的进一步提升**：能否通过自监督预训练或更大规模的分割数据进一步提升冻结骨干的特征质量，从而在不增加推理成本的前提下提升关系预测性能？Figure 5和Figure 10已揭示分割骨干的全景质量（mR@inf）与最终场景图性能（mR@50）之间存在0.99的强相关性，这为通过改进骨干来间接提升PSGG性能提供了清晰的路径。
+
+
 
 ## 原文 PDF
 

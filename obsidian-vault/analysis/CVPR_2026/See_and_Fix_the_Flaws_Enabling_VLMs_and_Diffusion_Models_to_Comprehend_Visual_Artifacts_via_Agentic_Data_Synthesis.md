@@ -42,7 +42,7 @@ claims:
 > - ArtiBench 上，检测准确率 (Accuracy) 0.627 (Qwen2.5-VL-7B + ArtiAgent) vs 0.501 (Qwen2.5-VL-7B) (+0.126)；检测 F1 0.627 (Qwen2.5-VL-7B + ArtiAgent) vs 0.336 (Qwen2.5-VL-7B) (+0.291)；定位 mIoU 0.111 (Qwen2.5-VL-7B + ArtiAgent) vs 0.010 (Qwen2.5-VL-7B) (+0.101)。
 > - ArtiBench (1K 训练数据) 上，解释 ROUGE / CSS 0.222 / 0.606 (ArtiAgent 1K) vs 0.156 / 0.521 (SynthScars 1K) (+0.066 / +0.085)。
 
-## 概述
+## 概要
 
 **核心问题：** 现代扩散模型（如 SD3.5、FLUX）在生成高视觉质量图像时仍频繁产生结构性伪影——肢体错位、物体融合、异常扭曲等。然而，现有视觉语言模型（VLM）对此类伪影的识别与解释能力极弱：未经微调的 Qwen2.5-VL-7B 在二分类检测任务上准确率仅 0.501，接近随机猜测。根本瓶颈在于，伪影理解数据高度依赖人工标注，成本高昂且难以覆盖扩散模型日益多样化的失败模式。
 
@@ -50,7 +50,7 @@ claims:
 
 **主要结果：** 使用 ArtiAgent 生成的 100K 样本微调 Qwen2.5-VL-7B 后，模型在 ArtiBench 基准上的二分类准确率达到 0.627（+12.6%），F1 从 0.336 跃升至 0.627（+29.1%），定位 mIoU 从 0.010 提升至 0.111，解释 CSS 从 0.263 提升至 0.643（+38.0%）。仅使用 1K 合成样本，模型在定位与解释任务上即超越 GPT-5，且性能随数据规模持续增长。此外，ArtiAgent 训练的 VLM 可作为奖励模型引导扩散采样生成无伪影图像，亦可指导修复模型精确纠正伪影区域。
 
-## 背景与动机
+
 
 ### 扩散模型的视觉伪影危机
 
@@ -74,7 +74,9 @@ claims:
 
 这一思路将伪影理解从“依赖人工标注的被动收集”转变为“可控合成驱动的主动学习”，不仅大幅降低了数据获取成本，还使得 VLM 能够作为**奖励模型**或**纠正工具**嵌入扩散生成流程，从源头减少伪影的产生。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 从人工标注到全自动代理合成：ArtiAgent 框架
 
@@ -111,7 +113,7 @@ ArtiAgent 的第二个关键创新在于将训练得到的伪影感知 VLM **嵌
 
 这种“理解—反馈—修正”的闭环是此前工作（如 DiffDoctor 仅做分割、LEGION 仅做解释）所不具备的，将伪影理解从被动的诊断工具升级为主动的质量改进手段。
 
-## 整体框架
+
 
 ArtiAgent 是一个完全自动化的代理流水线，旨在无需人工干预的情况下，向干净的真实图像中注入多样化的结构性视觉伪影，并同步生成包含边界框、局部解释与全局解释的丰富注释。如图 1(b) 与图 3 所示，该框架由三个协同工作的智能体构成：**感知代理 (Perception Agent)**、**合成代理 (Synthesis Agent)** 与**策划代理 (Curation Agent)**，三者形成一条端到端的数据合成与标注链路。
 
@@ -152,7 +154,7 @@ ArtiAgent 是一个完全自动化的代理流水线，旨在无需人工干预�
 ![[assets/figures/papers/paper_list_l2591_https_arxiv_org_abs_2602_20951/figures/004_Figure_3.jpg]]
 *Figure 3: ArtiAgent consists of three coordinated agents: (1) the perception agent detects entities and subentities using Grounded-SAM; (2) the synthesis agent injects artifacts through patch mapping tool and the inversion-injection paradigm; and (3) the curation agent filters low-quality results and generates localized and global textual explanations*
 
-## 核心模块与公式推导
+
 
 ### 感知代理：层次化实体分解与定位
 
@@ -222,7 +224,9 @@ $$\tau_1 \leq 1 - d_{\mathrm{LPIPS}}(x_{\mathrm{original}}, x_{\mathrm{artifact}
 ![[assets/figures/papers/paper_list_l2591_https_arxiv_org_abs_2602_20951/figures/002_Figure_2.jpg]]
 *Figure 2: Artifact type distribution of diffusion models*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -291,7 +295,9 @@ Figure 9 对比了 InternVL3.5-8B 微调前后的注意力热力图。基础模�
 ![[assets/figures/papers/paper_list_l2591_https_arxiv_org_abs_2602_20951/figures/023_Figure_18.jpg]]
 *Figure 18: Hyperparameter study on PE injection and value injection steps (1). The image in the red box shows our selected configuration*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题脉络：从人工标注到智能体合成
 
@@ -335,6 +341,8 @@ ArtiAgent 在方法谱系中占据“合成数据驱动的伪影理解”这一�
 2. **去外部依赖**：能否通过知识蒸馏或自训练策略，将商用 VLM 的解释能力压缩至本地模型，实现完全本地化的伪影理解与修正闭环？
 3. **泛化边界**：在 ArtiAgent 合成数据上训练的 VLM 对 Midjourney、DALL·E 3 等商业生成软件真实输出的泛化能力，是否有进一步量化和提升的空间？
 4. **伪影类型的完备性**：如何系统性地定义和覆盖扩散模型的结构性伪影类型谱系，使得合成数据驱动的训练能够逼近真实世界的伪影分布？
+
+
 
 ## 原文 PDF
 

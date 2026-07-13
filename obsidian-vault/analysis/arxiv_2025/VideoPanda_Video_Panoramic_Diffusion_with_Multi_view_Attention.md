@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/VideoPanda_Video_Panoramic_Diffusion_with_Multi_view_Attention.pdf
+project_link: null
+code_link: https://github.com/hpcaitech/Open-Sora
 aliases:
 - VideoPanda
 tags:
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | VideoPanda：基于多视图注意力的全景视频扩散模型 |
 | 英文题名 | VideoPanda: Video Panoramic Diffusion with Multi-view Attention |
 | 会议/期刊 | arXiv 2025 |
-| Links | [paper](https://arxiv.org/abs/2504.11389) · [arXiv](https://arxiv.org/abs/2202.00512) · [Code](https://github.com/hpcaitech/Open-Sora) |
+| Links | [paper](https://arxiv.org/abs/2504.11389) · [paper](https://arxiv.org/abs/2202.00512) · [Code](https://github.com/hpcaitech/Open-Sora) |
 | Topic | #topic/vision_multimodal_applications #topic/generative_models_diffusion #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | VideoPanda |
 | Dataset | WEB360 test set, Out-of-distribution prompts |
@@ -41,7 +43,7 @@ claims:
 > - Out-of-distribution prompts (VBench all dimensions) 上，FID-COCO (Elev. ±60°, 8 views) 93.4 (Ours CogVideoX) vs 128.6 (360DVD) (-27.4%)。
 > - WEB360 test set 上，FID (Horizontal 8 views, per-image level) 63.2 vs 96.8 (MVDiffusion) (-34.7%)。
 
-## 概述
+## 概要
 
 全景视频（360°视频）生成面临一个核心瓶颈：**在保持多视图一致性的前提下，高效生成高质量的长全景视频，同时克服全景视频数据稀缺和计算资源限制**。现有方法或直接生成等量矩形投影（equirectangular projection），导致天空和地面区域产生严重失真；或逐帧处理单张全景图，无法维持视频的时间连续性和全局风格一致性。
 
@@ -56,7 +58,7 @@ VideoPanda 提出了一项核心洞察：**将全景视频生成转化为多视�
 
 VideoPanda 在方法谱系中定位为**多视图视频扩散模型的统一框架**：它继承了视频潜在扩散模型（VideoLDM）的时空建模能力，引入 MVDream 风格的多视图注意力机制，并通过多任务训练统一了文本条件、视频条件和自回归生成三种模式。该方法可灵活适配不同的基础模型（如 CogVideoX-2B），在保持多视图一致性的同时实现全景视频的高质量生成与扩展。
 
-## 背景与动机
+
 
 ### 全景视频生成的挑战
 
@@ -85,7 +87,9 @@ VideoPanda的核心洞察是：**将全景视频生成转化为多视图透视�
 
 这种设计在因果机制上构成了一个完整的闭环：**训练时的随机子采样（因果旋钮）→ 模型泛化能力的提升 → 推理时高质量全景视频的生成**，从而解决了数据稀缺和计算资源限制下的全景视频生成瓶颈。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 VideoPanda 将全景视频生成重新定义为多视图透视图像的联合生成问题，其核心创新在于通过**多视图注意力机制**与**随机子采样训练策略**的组合，在保持多视图一致性的前提下突破计算资源限制，实现高质量 360° 全景视频生成及自回归扩展。
 
@@ -115,7 +119,7 @@ VideoPanda 通过随机二元掩码将三种条件模式统一到单一模型中
 
 综合来看，VideoPanda 的创新链条可概括为：**多视图透视投影**避免等量矩形失真 → **多视图注意力**确保帧内视图一致性 → **随机矩阵训练**突破内存限制并提升泛化能力 → **多任务统一条件**赋予模型多模式生成能力 → **噪声增强与噪声调度偏移**保障自回归长视频生成质量。这一系列设计使 VideoPanda 在文本条件生成上 FIDpair 较 360DVD 降低 15%（Table 1），在视频条件生成上 FID 较 MVDiffusion 降低 34.7%（Table 2）。
 
-## 整体框架
+
 
 VideoPanda 将 360° 全景视频生成重新定义为**多视图透视图像的联合生成**问题。其核心 pipeline 由三个关键阶段串联而成：投影分解 → 多视图视频扩散 → 全景拼接。
 
@@ -152,7 +156,7 @@ VideoPanda 将 360° 全景视频生成重新定义为**多视图透视图像的
 
 推理时，模型生成 8 个透视视图的视频帧，通过双三次插值将各视图 warp 到等量矩形全景坐标，重叠区域像素值均匀平均，最终拼接为无缝全景视频。由于模型原生生成透视视图而非直接生成等量矩形投影，有效避免了传统方法在天空/地面区域的高畸变问题（Figure A5）。
 
-## 核心模块与公式推导
+
 
 ### 整体架构：从等量矩形到多视图潜在空间
 
@@ -220,7 +224,9 @@ VideoPanda 通过**随机二元掩码**统一了三种条件模式（Figure 3）
 ![[assets/figures/papers/paper_list_l79_https_arxiv_org_abs_2504_11389/figures/006_Figure_6.jpg]]
 *Figure 6: A visualization of the 8 frames used during training, consisting of 6 horizontal views with 90 FOV and 2 views for the top/bottom with 100 FOV*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -295,7 +301,9 @@ VideoPanda的训练数据为**WEB360数据集**，包含2114个全景视频片�
 ![[assets/figures/papers/paper_list_l79_https_arxiv_org_abs_2504_11389/figures/009_Table_3.jpg]]
 *Table 3: Quantitative ablations of our model on single view video-conditional panoramic video generation. Training our model to be multi-task capable incurs a negligible drop in performance. Randomizing the matrix of frames during training results in much improved video quality at a slightly worse color consistency as measured by PSNR*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -339,6 +347,8 @@ VideoPanda 的关键技术决策可从因果角度归纳为以下链条：
 **计算效率与一致性的权衡**：多视图注意力是维持跨视图一致性的核心机制，但其计算开销限制了视图数量的扩展和推理速度。如何在保持多视图一致性的前提下降低注意力计算成本（例如通过稀疏注意力或视图间信息压缩），是一个具有实际价值的研究问题。
 
 **长视频自回归的时空一致性**：在自回归扩展中，需要同时维持窗口内的时间一致性和窗口间的空间一致性。当前方法通过将前一窗口的最后一行多视图图像作为条件传递给下一窗口（Figure 3c），但这一机制在更长的时间跨度下可能累积空间偏移。如何有效平衡图像质量、时间一致性和空间一致性三者之间的关系，仍需进一步探索。
+
+
 
 ## 原文 PDF
 

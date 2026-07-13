@@ -5,6 +5,8 @@ paper_level: A
 venue: IJCV
 year: 2026
 pdf_ref: paperPDFs/IJCV_2026/OmniDrag_Enabling_Motion_Control_for_Omnidirectional_Image_to_Video_Generation.pdf
+project_link: https://lwq20020127.github.io/OmniDrag
+code_link: null
 aliases:
 - OmniDrag
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | OmniDrag：面向全向图像到视频生成的运动控制方法 |
 | 英文题名 | OmniDrag: Enabling Motion Control for Omnidirectional Image-to-Video Generation |
 | 会议/期刊 | IJCV 2026 |
-| Links | [paper](https://arxiv.org/abs/2412.09623); [Project](https://lwq20020127.github.io/OmniDrag) |
+| Links | [paper](https://arxiv.org/abs/2412.09623) · [Project](https://lwq20020127.github.io/OmniDrag) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/robotics |
 | Method | OmniDrag |
 | Dataset | Move360, Move360 (Horizontal 8 viewports) |
@@ -40,7 +42,7 @@ claims:
 > - Move360 (Horizontal 8 viewports) 上，FVD 为 322.22，对比 未提供具体数值（OmniDrag最优）。
 > - Move360 上，Human Evaluation Overall Score 为 75.7%，对比 未提供具体数值（OmniDrag最优）。
 
-## 概述
+## 概要
 
 全向视频（Omnidirectional Video, ODV）以等距矩形投影（Equirectangular Projection, ERP）格式存储，其固有的空间变形特性使得直接将2D视频运动控制方法迁移至ODV时，会引发严重的空间扭曲与控制失准。现有ODV数据集运动幅度有限，进一步制约了对复杂球面运动模式的学习。OmniDrag作为首个面向全向图像到视频生成的运动控制方法，旨在解决上述瓶颈。
 
@@ -51,7 +53,7 @@ OmniDrag的核心思路是**在扩散模型的去噪过程中注入球面几何�
 
 在自建的Move360数据集上，OmniDrag在ObjMC指标（0.044）和FVD指标（322.22）上均优于DragNUWA、MotionCtrl和DragAnything等基线方法，人工评估总体得分达到75.7%。消融实验证实，联合微调时间注意力层是避免空间变形的关键，而SME中的HEALPix初始化与球面距离过滤对于稳定的对象控制不可或缺。该方法目前尚未解耦相机运动与物体运动，对复杂场景（如多人交互）的泛化能力有待进一步验证。
 
-## 背景与动机
+
 
 全向图像（omnidirectional images, ODIs）通过等距矩形投影（equirectangular projection, ERP）将 360° 球面场景映射到二维平面，为沉浸式内容创作提供了完整的空间覆盖。随着扩散模型在图像到视频（image-to-video, I2V）生成领域的快速发展，将静态全向图像转化为动态全向视频（omnidirectional videos, ODVs）的需求日益迫切。然而，现有的 I2V 生成方法主要针对常规透视视频设计，其运动控制机制无法直接适配全向视频的球面几何特性。
 
@@ -59,7 +61,9 @@ OmniDrag的核心思路是**在扩散模型的去噪过程中注入球面几何�
 
 **动机**源于填补上述方法缺口：需要一种能够感知球面几何的拖拽式运动控制框架，使得用户仅需在参考全向图像上指定起始点和目标点，即可生成运动精确、空间一致的高质量全向视频。这要求方法在三个层面进行根本性改进：训练阶段需从球面几何出发提取运动轨迹；控制信号的注入需适配扩散模型的去噪过程并引入球面结构先验；推理阶段需支持基于球面插值的轨迹生成，从而在不依赖完整 UNet 副本的前提下实现高效的球面运动控制。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 OmniDrag 的核心创新在于将 2D 拖拽式运动控制方法适配到全向视频（ODV）的球面几何空间。现有方法（如 DragNUWA、MotionCtrl、DragAnything）直接在等距矩形投影（ERP）图像上操作，忽略了球面投影带来的空间变形，导致运动控制不准确和生成结果扭曲。OmniDrag 通过以下三个关键设计解决了这一问题：
 
@@ -95,7 +99,7 @@ OmniDrag 的关键发现是：**必须联合微调 UNet 中的时间注意力层
 
 这些创新并非孤立存在，而是形成了从数据生成（SME 提取球面感知轨迹）到模型训练（联合微调时间注意力 + 轻量控制器注入）再到推理交互（slerp 球面插值）的完整闭环，共同解决了全向视频运动控制中球面几何失真的核心瓶颈。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l17_OmniDrag_Enabling_Motion_Control_for_Omnidirectional_Image_to_Video_Gene/figures/002_Figure_2.jpg]]
 *Figure 2: Overall pipeline of proposed OmniDrag. (a) During training, spherical motion is extracted by the proposed spherical motion estimator. The Omni Controller and temporal attention layers in the UNet denoiser are jointly fine-tuned. (b) During inference, OmniDrag allows users to simply select handle and target points on the reference image and generates ODVs with the corresponding motion*
@@ -113,7 +117,7 @@ OmniDrag 的整体流程围绕“球面感知的运动提取—轻量级控制�
 
 整个框架建立在预训练 SVD 模型之上，训练时额外采用了潜在旋转机制以增强全向视频的环视一致性。
 
-## 核心模块与公式推导
+
 
 OmniDrag 的核心架构由三个关键模块构成：**球面运动估计器**（Spherical Motion Estimator, SME）、**全向控制器**（Omni Controller）以及基于 **Stable Video Diffusion (SVD)** 的联合微调策略。以下逐一展开其设计逻辑与核心公式。
 
@@ -195,7 +199,9 @@ $$\left\{ (0, 0), (u_{(x_1, y_1)}, v_{(x_1, y_1)}), \ldots, (u_{(x_{L-1}, y_{L-1
 
 **关键设计决策**：OmniDrag 在训练全向控制器的同时，联合微调 SVD UNet 中的时间注意力层。消融实验（Fig. 6）表明，若不联合微调时间注意力层，生成结果会出现明显的空间变形——这是因为冻结的时间注意力层缺乏对球面运动模式的感知能力，无法正确建模 ERP 格式下的非刚性球面运动。联合微调使得时间注意力层能够学习球面几何先验，从而在不依赖完整 UNet 副本的情况下实现精确的球面运动控制。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 OmniDrag 在自建的全向视频数据集 **Move360** 上与三类代表性基线方法进行了定量与定性对比，并通过系统消融实验验证了各核心组件的有效性。
 
@@ -237,7 +243,9 @@ OmniDrag 以预训练的 **Stable Video Diffusion (SVD)** 模型为生成骨干�
 
 尽管 OmniDrag 在场景级和对象级运动控制上表现优异，目前的方法尚未解耦相机运动与物体运动。在某些情况下，控制信号可能同时驱动背景和前景物体移动，导致控制粒度不够精细。此外，方法对未见过的复杂球面运动模式（如多人交互、非刚性变形）的泛化能力尚未得到充分验证。这些问题构成了未来工作的重要方向。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位与核心瓶颈
 
@@ -274,6 +282,8 @@ OmniDrag 建立在 Stable Video Diffusion（SVD）预训练模型之上，沿用
 1. **相机-物体运动解耦**：如何将场景级运动（相机运动）与对象级运动（物体独立运动）分离，实现更精细的独立控制，是论文明确指出的开放问题。
 2. **复杂场景泛化**：在多人交互、非刚性变形等更复杂场景中，当前基于稀疏轨迹的控制范式能否保持精度和稳定性，需要进一步验证。
 3. **多模态控制融合**：所提方法能否与其他控制信号（如文本描述、深度图）融合，以提供更全面的可控性，是值得探索的方向。
+
+
 
 ## 原文 PDF
 

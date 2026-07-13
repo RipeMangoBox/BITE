@@ -5,6 +5,7 @@ paper_level: A
 venue: ICML
 year: 2026
 pdf_ref: paperPDFs/ICML_2026/Test_Time_Training_with_KV_Binding_Is_Secretly_Linear_Attention.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/sil/projects/tttla/
 aliases:
 - TALATL
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 基于键值绑定的测试时训练实际上是线性注意力 |
 | 英文题名 | Test-Time Training with KV Binding Is Secretly Linear Attention |
 | 会议/期刊 | ICML 2026 |
-| Links | [paper](https://arxiv.org/abs/2602.21204); [Project](https://research.nvidia.com/labs/sil/projects/tttla/) |
+| Links | [paper](https://arxiv.org/abs/2602.21204) · [Project](https://research.nvidia.com/labs/sil/projects/tttla/) |
 | Topic | #topic/benchmarks_datasets_evaluation #topic/benchmarks_datasets_evaluation/benchmark_eval |
 | Method | TTT as Linear Attention (TTT-LA) |
 | Dataset | LaCT-LLM (Book-3 2.5B tokens), LaCT-NVS (RealEstate10K), TTT Layer Inference (LLM throughput) |
@@ -42,7 +43,7 @@ claims:
 > - LaCT-NVS (RealEstate10K) 上，PSNR ↑ 为 25.73，对比 25.94，变化 -0.21。
 > - TTT Layer Inference (LLM throughput) 上，Tokens per Second 为 124.6M (并行实现)，对比 ≈ 31M (原始递归实现)，变化 ~4.0×。
 
-## 概述
+## 概要
 
 测试时训练（Test-Time Training, TTT）作为一种新兴的序列建模范式，其核心假设是：内循环通过记忆键值对（Key-Value Binding）来存储历史信息，并在推理时基于查询相似度进行检索。然而，本文通过系统的实证分析与理论推导，**从根本上颠覆了这一“存储-检索”假说**。
 
@@ -52,7 +53,7 @@ claims:
 
 **方法定位**：本文属于模型分析与架构简化工作，通过揭示TTT与线性注意力之间的等价关系，为理解测试时训练的内在机制提供了新的理论框架，并为高效序列建模架构的设计指明了方向。
 
-## 背景与动机
+
 
 ### 测试时训练的内循环：从记忆假说到线性注意力
 
@@ -76,7 +77,9 @@ $$\mathcal{L} = \| f_{\theta}(k) - v \|^2$$
 
 将 TTT 重新解释为线性注意力不仅提供了理论统一性，更带来了直接的工程收益。由于线性注意力天然支持并行计算，这一等价性使得原本必须递归执行的 TTT 内循环可以完全并行化。同时，该视角揭示了许多被广泛采用的 TTT 设计组件——动量、权重归一化、梯度正交化、逐 token 学习率——在键和值均可学习的条件下是功能冗余的，可被安全移除而不显著损害性能。这为构建更简洁、更高效的序列建模架构奠定了理论基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于**揭示了测试时训练（TTT）的数学本质**，并据此对现有复杂架构进行了**极简重构**。具体而言，作者通过理论证明，任何具有线性最终层的 TTT 内循环都等价于一个可学习的线性注意力算子，从而将 TTT 从“键值记忆存储与检索”的认知框架中彻底解放出来。
 
@@ -113,7 +116,7 @@ $$o = q \big( \boldsymbol{W} + \sum_i \boldsymbol{k}_i^{\top} \boldsymbol{v}_i \
 
 这些定理共同揭示了一个根本性洞察：**TTT 的内循环并非在进行键值记忆的存储与检索，而是在诱导一个可学习的、历史依赖的查询-键-值混合机制**。这一认知重构使得安全地移除动量、权重归一化等复杂组件成为可能，并为 TTT 架构的简化与加速提供了坚实的理论基础。
 
-## 整体框架
+
 
 ### 核心洞察：TTT 即线性注意力
 
@@ -169,7 +172,7 @@ $$o = q \big( \boldsymbol{W} + \sum_i \boldsymbol{k}_i^\top \boldsymbol{v}_i \bi
 
 > 需注意，上述等价性和简化路径的严格证明依赖于**内循环具有线性、无偏置最终层**的假设。对于最终层为非线性的 TTT 变体，其是否能表达为某种广义线性注意力，仍是待解决的开放问题。实证验证目前仅覆盖 LaCT 和 ViTTT 两种架构，在其他 TTT 变体（如 Titans、Atlas）上的推广性尚待检验。
 
-## 核心模块与公式推导
+
 
 ### 工作流模块
 
@@ -239,7 +242,9 @@ $$o = q \big( \boldsymbol{W} + \sum_i \boldsymbol{k}_i^\top \boldsymbol{v}_i \bi
 
 其中 $\boldsymbol{W}$ 为可学习的初始状态矩阵，$\sum_i \boldsymbol{k}_i^\top \boldsymbol{v}_i$ 为序列中所有键值外积的累加。这一极简形式在 LaCT-LLM 上仅带来 +0.37 的困惑度损失（Table 2），却获得了约 4 倍的推理吞吐量提升（124.6M tokens/s vs. ~31M tokens/s）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 反直觉现象：内循环并非键值存储与检索
 
@@ -309,7 +314,9 @@ $$o = q \big( \boldsymbol{W} + \sum_i \boldsymbol{k}_i^\top \boldsymbol{v}_i \bi
 
 4. **超大尺度行为未知**：简化到标准线性注意力后的模型在千亿参数级别的行为尚不清楚，性能差距是否会随模型规模扩大而放大仍是一个开放问题。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线工作的关系
 
@@ -344,6 +351,8 @@ $$o = q \big( \boldsymbol{W} + \sum_i \boldsymbol{k}_i^\top \boldsymbol{v}_i \bi
 3. **大规模下的性能差距**：在更大规模的模型上，简化线性注意力与完整 TTT 的性能差距是否会扩大？权重归一化等被移除的组件在大规模场景中是否具有不可替代的作用？
 4. **权重归一化的近似替代**：权重归一化的非结合性是否可通过某种近似或替代方案克服，从而在保持状态稳定性的同时实现完全并行的状态更新？
 5. **更广泛的 TTT 变体验证**：当 Titans 和 Atlas 等 TTT 变体的实现可用时，本文的线性注意力简化是否同样适用？
+
+
 
 ## 原文 PDF
 

@@ -43,7 +43,7 @@ claims:
 > - Affogato (complete geometry) 上，aIoU 19.1 vs 13.6 (Espresso-3D) (+5.5 (+40.4%))。
 > - Affogato (partial observation) 上，aIoU 9.26 vs 4.74 (MCC + Espresso-3D) (+4.52 (+95.4%))。
 
-## 概述
+## 概要
 
 3D可供性定位（3D affordance grounding）旨在从三维物体上识别出与特定交互功能对应的区域（如“可以抓握的把手”），是机器人理解并操作物体的关键能力。然而，现有方法普遍存在一个根本瓶颈：它们仅能从可见表面预测可供性区域，无法推理被遮挡部分的几何结构与功能。在真实场景中，机器人往往只能获得部分观测，大量功能性区域可能被遮挡，导致现有方法在部分观察条件下的可供性定位能力严重受限。
 
@@ -52,8 +52,6 @@ claims:
 实验结果表明，Affostruction 在多项基准上显著超越了现有方法。在 Toky4K 数据集上，其3D重建 IoU 达到 **32.67**，比最强的 RGBD 重建方法 MCC（21.11）提升 **54.8%**；在 Affogato 数据集上，完整几何条件下的可供性定位 aIoU 为 **19.1**，比先前最好的 Espresso-3D（13.6）提升 **40.4%**。更重要的是，在仅提供部分观察的条件下，Affostruction 达到 **9.26** aIoU，几乎是两阶段管线 MCC+Espresso-3D（4.74）的两倍，充分验证了生成式重建对可供性定位的关键增益。此外，随机多视图训练策略使模型能够有效利用额外视图持续提升性能，而可供性驱动的主动视图选择在仅增加一个视图时即达到 9.2 aIoU，相比顺序采样提速约 **2 倍**。
 
 在方法定位上，Affostruction 区别于传统的判别式可供性预测方法（如 **OpenAD**（Nguyen et al., IROS 2023）、**PointRefer**（Li et al., CVPR 2024）），通过流匹配的生成式框架捕获可供性的多模态分布；同时，相较于仅依赖单视图RGB的3D生成模型（如 **TRELLIS**（Xiang et al., CVPR 2025）），Affostruction 创新性地引入多视图RGBD稀疏体素融合，在保持恒定计算复杂度的同时实现了面向真实物体朝向的重建。该方法在仿真数据集上展现了强大的性能，但其在真实机器人操作任务中的有效性、以及在严重遮挡场景下的鲁棒性仍需进一步验证。
-
-## 背景与动机
 
 ### 3D可供性定位的核心挑战
 
@@ -81,7 +79,7 @@ Affostruction的核心洞察在于：**3D重建与可供性定位不应是割裂
 
 基于这些动机，Affostruction将三个模块——生成式多视图重建、基于流的可供性定位、可供性驱动的主动视图选择——整合为统一的稀疏体素空间中的端到端流程，在部分观察条件下实现了显著优于两阶段管线的可供性定位精度。
 
-## 核心创新
+## 核心方法与创新机理
 
 Affostruction 的核心创新在于将**生成式3D重建**与**可供性定位**统一在稀疏体素空间，并通过**流匹配**显式建模可供性的多模态分布，从而在部分观察条件下实现对完整物体几何与功能性交互区域的联合推理。与现有方法相比，该方法在四个关键维度上实现了根本性改变。
 
@@ -131,8 +129,6 @@ $$\pi ^ { * } = \arg \operatorname*{ m a x } _ { \pi _ { i } \in \Pi } S ( \pi _
 
 上述五项创新形成了完整的因果链条：**多视图RGBD输入**提供深度几何约束，**稀疏体素融合**保证恒定计算复杂度，**随机多视图训练**解锁多视图推理增益，**生成式可供性预测**捕获多模态分布，**主动视图选择**持续优化对功能性区域的覆盖。这一链条使得 Affostruction 在部分观察条件下达到 9.26 aIoU，几乎是两阶段管线 MCC+Espresso-3D（4.74）的两倍，从根本上解决了现有方法无法推理被遮挡部分几何与功能的瓶颈。
 
-## 整体框架
-
 Affostruction 的整体流程由三个协同阶段构成，如图2所示：**生成式多视图重建**、**基于流的可供性定位**和**可供性驱动的主动视图选择**。三阶段共享统一的稀疏体素表征空间，使几何推理与功能推理在恒定计算复杂度下紧密耦合。
 
 ### 输入与输出流
@@ -162,10 +158,9 @@ Affostruction 的整体流程由三个协同阶段构成，如图2所示：**生
 ![[assets/figures/papers/paper_list_l2438_https_arxiv_org_abs_2601_09211/figures/001_Figure_1.jpg]]
 *Figure 1: Affostruction. Given an initial RGBD observation (blue camera) where functional regions for an affordance query (e.g., “attach a light fixture”) are only partially visible or heavily occluded, we reconstruct the complete 3D geometry in a generative manner – estimating unobserved surfaces – and ground an affordance region on the full shape effectively. Building on this, an affordance-driven active view selection strategy identifies the most informative next viewpoint (green camera). The additional observation acquired from this selected view further refines both the 3D reconstruction and the affordance grounding of the target region*
 
+
 ![[assets/figures/papers/paper_list_l2438_https_arxiv_org_abs_2601_09211/figures/002_Figure_2.jpg]]
 *Figure 2: Affostruction overview. Our approach consists of three stages. (1) Generative multi-view reconstruction: DINOv2 [30] features from RGBD views are fused into sparse voxels using depth and camera parameters, and a flow transformer extrapolates complete structure from partial observations, decoded via a pretrained decoder [45]. (2) Flow-based affordance grounding: a sparse flow transformer conditioned on CLIP [32]-encoded text generates affordance heatmaps over reconstructed geometry. (3) Affordance-driven active view selection: next-best viewpoints maximize visibility of high-affordance regions, and a mesh decoder [45] produces the final 3D mesh*
-
-## 核心模块与公式推导
 
 Affostruction 由三个级联模块构成：生成式多视图重建、基于流的可供性定位，以及可供性驱动的主动视图选择。前两个模块共享稀疏体素表征，第三个模块则利用预测的可供性热力图指导下一最优视角的选取。
 
@@ -214,12 +209,7 @@ $$\pi^* = \arg\max_{\pi_i \in \Pi} S(\pi_i, \mathcal{M})$$
 ![[assets/figures/papers/paper_list_l2438_https_arxiv_org_abs_2601_09211/figures/008_Figure_5.jpg]]
 *Figure 5: Quantitative results of active view selection. Affordance grounding quality (aIoU) as views are incrementally added from minimal affordance visibility. Affordance-driven selection (red) achieves the fastest improvement, sequential sampling (blue) improves slowest due to its fixed trajectory, and random sampling (green) converges with active selection given more views*
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2438_https_arxiv_org_abs_2601_09211/figures/007_Figure_4.jpg]]
-*Figure 4: Impact of multi-view training. Reconstruction IoU as a function of input views. Single-view trained models (left) show minimal gains from additional views at inference, while stochastic multi-view training (right) enables consistent improvement. Our sparse voxel fusion achieves the best performance in both settings*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -283,7 +273,7 @@ Table 4汇总了各方法在单张RTX A6000上的运行时间与显存占用。A
 ![[assets/figures/papers/paper_list_l2438_https_arxiv_org_abs_2601_09211/figures/010_Figure_7.jpg]]
 *Figure 7: Failure cases. (top) Challenging views with severe occlusion lead to reconstruction errors that propagate to affordance predictions. (bottom) Incorrect initial affordance grounding misleads active view selection away from the target region*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 技术脉络与基线关系
 

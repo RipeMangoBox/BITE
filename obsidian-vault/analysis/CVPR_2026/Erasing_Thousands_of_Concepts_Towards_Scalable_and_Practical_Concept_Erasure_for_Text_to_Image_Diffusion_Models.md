@@ -45,7 +45,7 @@ claims:
 > - Celebrities (SDv1.4) 上，H0↑ 0.780 vs 0.659 (CPE) (↑0.121)。
 > - Artistic Style (SDv1.4, 693 target / 430 remain) 上，CRSt↓ 0.130 vs 0.224 (CPE) (↓0.094)。
 
-## 概述
+## 概要
 
 文本到图像（T2I）扩散模型在创意生成领域展现出强大能力，但也带来了版权侵犯、肖像权滥用和不良内容生成等风险。概念擦除旨在从预训练模型中移除特定概念，同时保持其余概念的生成质量。然而，现有方法面临三个核心瓶颈：**可扩展性不足**——难以同时擦除数千个异构概念；**依赖人工锚点**——需要为每个目标概念手动指定替代概念或锚点；**鲁棒性缺失**——擦除模块可被轻易移除（白盒攻击），导致防护失效。
 
@@ -57,7 +57,7 @@ claims:
 
 在覆盖名人、艺术风格、角色等**超过 2,000 个概念**的大规模实验中，ETC 在用户研究中取得了**最低的目标概念保留率（CRSt）和最高的图像质量评分（QS）**，调和指标 $H_0$ 显著优于 CPE、MACE、UCE 等基线方法。在 50 位名人的小规模精确评估中，ETC 达到 $H_0 = 0.943$ 的最优表现。消融实验验证了 tMM 优于 GMM、AOT 优于直接代理映射、结构化噪声在 NIR 中优于全秩/低秩噪声等关键设计选择。
 
-## 背景与动机
+
 
 文本到图像扩散模型（如 Stable Diffusion、FLUX）能够根据自然语言描述生成高质量图像，但其强大的生成能力也带来了版权侵犯、肖像权滥用和有害内容生成等风险。例如，模型可以轻易生成名人肖像、模仿受版权保护的艺术风格，或创建特定虚构角色。因此，**概念擦除**（concept erasure）——在不影响无关概念生成质量的前提下，移除模型对特定概念的生成能力——成为安全部署扩散模型的关键技术。
 
@@ -81,7 +81,9 @@ claims:
 
 ETC 的核心洞察在于：概念嵌入在上下文变化下呈现**低秩重尾分布**，利用 Student's t 混合模型（tMM）可有效建模该分布，从而从高概率区域采样目标嵌入、低概率区域采样锚嵌入，实现无锚点的精确擦除。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ETC 的核心创新围绕一个瓶颈展开：**现有概念擦除方法无法扩展到数千个异构概念，且在保持精确擦除（不影响无关概念）的同时缺乏应对白盒攻击（如移除安全模块）的鲁棒性**。为此，ETC 在四个关键维度上对 baseline 进行了系统性改造，形成了一条从“概念分布建模→分布映射→锚点采样→擦除模块训练→鲁棒性加固”的完整因果链。
 
@@ -133,7 +135,7 @@ $$\mathcal{L}_{\mathrm{NIR}} = \| W_{\mathrm{cor.}} (\mathbf{MoEraser}(f) + f) -
 
 Figure 4 直观展示了效果：损坏权重后模型无法正常生成图像，必须依赖 MoEraser 恢复。Table 6 的消融表明，结构化噪声在保留剩余概念方面优于全秩和低秩噪声。这一设计使得**移除模块即损坏模型**，从根本上提高了白盒攻击下的鲁棒性。
 
-## 整体框架
+
 
 ETC（Erasing Thousands of Concepts）的整体流程由四个核心阶段构成，形成一条从概念嵌入建模到鲁棒擦除模块部署的完整流水线。框架的输入为目标概念集（如名人、艺术风格、角色）和预训练的文本到图像扩散模型，输出是一个经过微调的擦除模块，该模块插入模型的文本嵌入投影层之后，在推理时实时将目标概念映射为匿名概念，同时保持无关概念的生成质量。
 
@@ -152,7 +154,7 @@ ETC（Erasing Thousands of Concepts）的整体流程由四个核心阶段构成
 ![[assets/figures/papers/paper_list_l2219_https_arxiv_org_abs_2604_16481/figures/002_Figure_1.jpg]]
 *Figure 1: Concept distribution modeling and mapping. (Top) Concept embeddings from templates are modeled with a Student’s t-distribution Mixture Model (tMM). Embeddings in highprobability regions serve as target embeddings (ftar), while those in low-probability regions serve as anchoring embeddings (fanc). (Bottom) The target concept distribution is mapped to a merged distribution via Affine Optimal Transport (AOT)*
 
-## 核心模块与公式推导
+
 
 ### 3.1 概念分布建模：Student's t混合模型（tMM）
 
@@ -242,7 +244,9 @@ $$\mathcal{L}_{\text{NIR}} = \| W_{\text{cor.}} (\mathbf{MoEraser}(f) + f) - W_{
 ![[assets/figures/papers/paper_list_l2219_https_arxiv_org_abs_2604_16481/figures/004_Figure_3.jpg]]
 *Figure 3: Qualitative rationale for AOT. We formulate the distributions of “Chris Evans, “Tom Cruise,” “Leonardo DiCaprio,” and “Chris Hemsworth,” as*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 评估体系设计
 
@@ -319,7 +323,9 @@ ETC 的评估面临一个核心矛盾：自动化指标（如 CLIP Score）在�
 ![[assets/figures/papers/paper_list_l2219_https_arxiv_org_abs_2604_16481/figures/001_Table_1.jpg]]
 *Table 1: Property comparison of concept erasing methods*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题瓶颈与ETC的因果杠杆
 
@@ -371,6 +377,8 @@ ETC是唯一同时满足“可扩展至数千概念”、“无需锚概念”�
 4. **超大规模效率**：在数万概念规模下，tMM的逐概念拟合、AOT的分布间映射、MoEraser的专家路由是否仍能保持可接受的训练与推理效率？是否需要引入层次化概念分组或分布式训练策略？
 
 5. **tMM超参数自适应**：当前tMM的自由度ν和成分数k可能需针对每个概念独立优化，是否存在数据驱动的自适应选择策略，或跨概念的参数共享机制？
+
+
 
 ## 原文 PDF
 

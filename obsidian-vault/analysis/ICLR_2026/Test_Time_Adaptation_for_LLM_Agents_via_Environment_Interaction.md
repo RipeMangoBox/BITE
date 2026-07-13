@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Test_Time_Adaptation_for_LLM_Agents_via_Environment_Interaction.pdf
+project_link: null
+code_link: https://github.com/r2llab/GTTA
 openreview_forum_id: OH4PE0TDo0
 aliases:
 - SASDGD
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 基于环境交互的LLM智能体测试时自适应 |
 | 英文题名 | Test-Time Adaptation for LLM Agents via Environment Interaction |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=OH4PE0TDo0); [GitHub](https://github.com/r2llab/GTTA) |
+| Links | [paper](https://openreview.net/forum?id=OH4PE0TDo0) · [GitHub](https://github.com/r2llab/GTTA) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/planning_control |
 | Method | Syntactic Alignment (SA) and Dynamics Grounding (DG) |
 | Dataset | WebArena (overall), WebArena Multi-site, BFCLv3, WebArena (GPT-4o mini) |
@@ -42,7 +44,7 @@ claims:
 > - WebArena Multi-site 上，Success rate 为 23.0%，对比 2.0%，变化 +21.0%。
 > - BFCLv3 上，Success rate 为 64.0%，对比 55.5%，变化 +8.5%。
 
-## 概述
+## 概要
 
 **核心问题**：LLM智能体在未见环境中面临双重不匹配——句法层面（UI元素标签、响应格式等）与语义层面（状态转移因果模型缺失），导致产生无效动作和规划失败。
 
@@ -58,7 +60,7 @@ claims:
 
 **局限与开放问题**：简单组合SA与DG在某些场景下反而不如单独使用DG；当环境动态符合常识时DG提升有限；目前仅在函数调用和网页导航任务上验证，对其他智能体环境的泛化性尚待探索。如何设计元控制器自动决定适应策略、如何更高效地结合两方法，是后续研究的关键方向。
 
-## 背景与动机
+
 
 大语言模型（LLM）驱动的智能体在开放环境中执行复杂任务时，面临一个根本性瓶颈：**句法不匹配**与**语义不匹配**的双重挑战。句法不匹配表现为环境特定的UI元素标签、API响应格式等与模型预训练分布不一致，导致智能体产生格式错误或无效动作；语义不匹配则源于智能体缺乏对环境中状态转移因果模型的认知——例如，点击某个按钮会触发日期弹窗，而非直接跳转页面——使得规划过程基于错误的因果假设，最终导致任务失败。
 
@@ -68,7 +70,9 @@ claims:
 
 **决定性证据**：在WebArena多站点任务上，动态基础（DG）将GPT-4.1的成功率从2%提升至23%（Table 3）；句法对齐（SA）的单步更新仅增加约3%的延迟开销（Table 4），适合实时部署。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心贡献在于提出了两种互补的测试时自适应策略——**句法对齐（Syntactic Alignment, SA）**与**动态基础（Dynamics Grounding, DG）**——分别针对LLM智能体在未知环境中面临的两类根本性失配问题，且均不依赖任何标注数据或额外模型训练。
 
@@ -131,7 +135,7 @@ $$
 
 SA和DG分别从**格式对齐**和**因果认知**两个维度增强智能体，且均可独立部署。然而，简单的策略组合（同时使用SA和DG）在某些场景下反而不如单独使用DG，表明两者可能存在上下文冲突或过度适应的问题——这指向了一个重要的开放问题：如何设计原则性的集成方法，使两种自适应机制协同而非互斥。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_OH4PE0TDo0/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of syntactic alignment (SA). This figure includes an example of web navigation shopping task to illustrate how the agent adapts to new environment. (1) At the start of each episode, we initialize an adaptation vector δ as a zero vector and construct inputs to the LLM agent. (2) During task execution, the agent receives environment instructions and observations. (3) At each step, we update the adaptation vector using cross-entropy loss on the current input, and apply the adaptation vector as a bias to the LLM’s final hidden layer. This enables rapid alignment to environment-specific observation and action formats. (4) The LLM agent takes a new action with the updated vector, which s...*
@@ -166,7 +170,7 @@ $$\mathcal{T}' = [\mathcal{T}; E_{\mathrm{clean}}] \tag{4}$$
 
 **模块关系与数据流**：SA和DG分别作用于模型内部表示和外部上下文两个层面。SA在每个交互步实时更新适应向量，直接修改logits分布；DG在部署前一次性完成探索，生成静态的环境动态规则集合，在测试时作为上下文前缀注入。两个模块可独立使用，也可组合——但简单组合在部分场景下反而不如单独使用DG，提示需要更原则性的集成方法。
 
-## 核心模块与公式推导
+
 
 ### 3.1 输入构建
 
@@ -219,7 +223,9 @@ $$
 - **DG 的一次性**：探索阶段仅需约 50 条探索轨迹，无需额外模型训练，为部署时一次性投入。
 - **模块独立性**：SA 和 DG 可独立使用，但简单组合在部分场景下反而不如单独使用 DG，需要更原则性的集成方法。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -302,7 +308,9 @@ LLM智能体在未见环境中面临双重不匹配：**句法不匹配**（UI�
 ![[assets/figures/papers/paper_list_l11_https_openreview_net_forum_id_OH4PE0TDo0/figures/010_Table_8.jpg]]
 *Table 8: Number of functions available in each BFCLv3 environment*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：从静态零样本到测试时环境适应
 
@@ -359,6 +367,8 @@ DG的关键优势在于：仅需约50次探索rollout，无需任何模型训练
 3. **探索效率提升**：当前DG需要固定数量的探索rollout，如何更高效地发现和利用环境动态（如主动学习、不确定性引导的探索），以进一步降低探索成本？
 4. **跨模态泛化**：在更广泛的多模态（视觉-语言）和具身智能体场景中，测试时适应策略的有效性和泛化能力如何？SA的隐层偏置机制能否直接迁移到多模态架构？
 5. **动态更新与遗忘平衡**：SA的episode级重置策略避免了跨任务干扰，但在长期部署中是否丢失了有用的环境知识？能否设计更细粒度的记忆与遗忘机制？
+
+
 
 ## 原文 PDF
 

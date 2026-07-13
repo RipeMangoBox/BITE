@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Activation_Steering_with_a_Feedback_Controller.pdf
+project_link: null
+code_link: https://github.com/dungnvnus/pid-steering
 aliases:
 - PIDPS
 - ASFC
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 基于反馈控制器的激活引导 |
 | 英文题名 | Activation Steering with a Feedback Controller |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=vzkEX2SwFD); [GitHub](https://github.com/dungnvnus/pid-steering) |
+| Links | [paper](https://openreview.net/forum?id=vzkEX2SwFD) · [GitHub](https://github.com/dungnvnus/pid-steering) |
 | Topic | #topic/other_unclear #topic/other_unclear/general |
 | Method | Proportional-Integral-Derivative (PID) Steering |
 | Dataset | Jailbreak Attack (Qwen2.5‑14B), Toxicity Mitigation (Gemma2‑2B), Jailbreak Attack (Llama3.1‑8B) |
@@ -41,13 +43,13 @@ claims:
 > - Toxicity Mitigation (Gemma2‑2B) 上，Seq.CLS Tox. (%) 为 0.51，对比 Original (exact value not given)，变化 ~8.2× reduction。
 > - Jailbreak Attack (Llama3.1‑8B) 上，ASR (%) 为 92.65，对比 90.38 (DIM)，变化 +2.27。
 
-## 概述
+## 概要
 
 现有激活引导方法（如ActAdd、DirAblate、Mean‑AcT）缺乏理论上的性能保证，本质上等价于比例（P）控制器，因而存在稳态误差与振荡等缺陷。本文的核心思路是将激活引导重新形式化为动态系统的反馈控制问题，并引入**比例‑积分‑微分（PID）控制器**：以层间差分均值向量为误差信号，通过比例项即时响应偏差、积分项累积消除稳态误差、微分项抑制过冲，实现对激活空间中目标行为的闭环调节。
 
 这一框架（**PID Steering**）在方法上与现有引导接口兼容，但系统性解决了传统比例控制的固有问题。实验表明，PID 引导在多个LLM家族上一致优于同类方法：毒性缓解最高可达约8.2倍的降低，越狱攻击成功率（ASR）最高提升1.59个百分点（例如Qwen2.5‑14B上达到94.85%），同时模型通用基准性能波动较小，未出现系统性公平性下降。整体结果证实，将控制理论中的PID思想引入激活引导，能以较低成本获得更稳定、更精确的行为控制。
 
-## 背景与动机
+
 
 大语言模型的行为解释与可控生成是当前的研究热点，其核心思路之一是通过**激活引导（activation steering）**操控模型内部表示，从而改变输出属性（如减少有害性、提升真实性、注入风格）。现有工作如 ActAdd、DirAblate、Mean‑AcT 等已展现出实用价值，但它们普遍缺乏理论层面的性能保证。
 
@@ -61,7 +63,9 @@ $$ \pmb{u}(k) = K_p \pmb{r}(k) + K_i \sum_{j=0}^{k-1} \pmb{r}(j) + K_d (\pmb{r}(
 
 通过将控制理论的严格性引入激活引导，PID Steering 旨在解决当前方法"有方法无理论、有效果但欠稳定"的瓶颈，为 LLM 内部行为的可靠操控提供原理性基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 现有激活引导（activation steering）方法在缺乏形式化性能保证的前提下直接对模型内部表示施加干预，其设计与经典反馈控制中**比例（P）控制器**等价，因而存在稳态误差和响应振荡等固有缺陷。这项工作将激活引导重新定义为一个**动态系统的反馈控制问题**，并据此提出了**比例‑积分‑微分（PID）引导**——一种在每一层利用完整 PID 控制律计算引导向量的框架。理论分析指出，积分项可消除比例控制无法克服的稳态偏移，而微分项则通过预测误差变化抑制积分累积引起的过冲，从而系统性地提升引导过程的稳定性与准确性。
 
@@ -84,7 +88,7 @@ PID 引导保持与已有引导接口的兼容性：控制向量 $\pmb{u}(k)$ �
 **局限与待验证环节**  
 目前 $K_p, K_i, K_d$ 的最优配置仍依赖网格搜索或经验调参，缺乏基于理论（如 LMI）的自动选取方法；极端参数组合下亦可能存在稳定裕度不足的风险。此外，积分增益过大引起的过冲虽可通过微分项缓解，但其动力学分析只在标量化投影下得到部分证明，一般情形下的过冲幅度上界还需进一步严格化（Proposition 4 提供了第一过冲的界限，但未有一般情况的完整证明）。这些点均提示，PID 引导的理论完备性仍有待深入。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0006_vzkEX2SwFD_Activation_Steering_with_a_Feedback_Controller/figures/002_Figure_2.jpg]]
 *Figure 2: PID Steering: To compute the steering vector u(k): a PID controller is applied at every layer $f ^ { ( k ) } ( \cdot$ ) , using the diff-in-means between 2 contrastive data $x _ { s p }$ ( k ) and x(k) as the error signal e(k)*
@@ -111,7 +115,7 @@ $$
 **与现有方法的关系**  
 ActAdd、DirAblate、Mean‑AcT 本质上只使用了比例项（P 控制）。理论分析表明，P 控制在存在持续扰动时必然留有稳态误差，且无法主动预测误差变化趋势。PID Steering 通过积分项消除该稳态误差，并通过微分项抑制由强积分导致的振荡，从而在不改变底层注入机制的前提下从控制层面系统性地提升引导质量。这意味着该框架具有方法无关性：任何基于差分均值向量的引导方案均可嵌入 PID 控制器进行增强。
 
-## 核心模块与公式推导
+
 
 本文方法将激活引导重新表述为反馈控制问题，其框架可分解为三个核心模块，并通过离散 PID 控制律进行闭环调节。
 
@@ -151,7 +155,9 @@ $$
 
 其中 $\bar{\pmb{e}}(k)$ 为平均误差向量，$\bar{\pmb{A}}(k)$ 为层间变换的线性化矩阵，$\pmb{w}(k)$ 表示由样本异构性引入的扰动。该方程显式展示了 PID 控制项 $\pmb{u}(k)$ 如何干预误差传播，并从理论上保证积分项可消除稳态偏差、微分项可抑制过冲。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 PID 引导在两个核心安全任务上一致优于现有方法：毒性缓解和越狱攻击成功率（ASR）。如表 1 所示，在 Gemma2‑2B 上当使用 PID‑AcT 时，顺序分类毒性降至 0.51%，相比原始模型降幅约 8.2 倍，同时困惑度与 MMLU 保持良好，说明安全性的提升并未以显著的能力损失为代价。类似地，在 Llama3‑8B 上 PID‑AcT 同样取得了最强的毒性压制，并通过 Llamaguard3 与 LLM‑Judge 双评估器得到验证。在越狱攻击场景（表 2），PID 在 Qwen2.5‑14B 上达到 94.85% 的 ASR，较 DIM 的 93.26% 高出 1.59 个百分点；在 Llama3.1‑8B 上，PID 的 92.65% 相比 DIM 的 90.38% 提升 2.27 个百分点。全模型全方法对比（表 3）进一步确认 PID 在绝大多数模型上均取得最高 ASR，且通用基准（MMLU、HellaSwag、WinoGrande 等）的波动始终很小，说明 PID 框架具有跨模型和任务的稳定性。
 
@@ -174,7 +180,9 @@ PID 引导的增益来自控制律中的积分项与微分项。消融实验（�
 
 尽管 PID 引导效果显著，当前最优增益 $(K_p, K_i, K_d)$ 的选取依赖网格搜索或经验调参，缺乏理论上的最优设计方法（如 LMI 计算）。在极端参数组合下，系统稳定裕度可能不足，且积分增益过大时仍需微分项配合以避免过冲。这些问题指向未来工作需要自动、理论最优的增益选择策略，以确保 PID 引导在大规模部署时的鲁棒性。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 **与基线的控制‑理论对应关系**
 
@@ -219,6 +227,8 @@ PID Steering 的有效性依赖两个前提：
 2. **状态反馈 PID 的完整形式**：当前仅使用 $\mathbf{r}(k)$ 作为误差，实际的状态反馈 PID 应使用 $\mathbf{x}(k)$ 与参考状态的偏差；如何在多头注意力空间中定义参考状态并导出完整 PID，仍待显式构建。
 3. **逐 token 动态控制**：目前引导向量以层为单位施加，能否推广到 token 级别的细粒度动态增益，以应对每一步语义控制的差异？
 4. **多概念协同与解耦**：PID 框架如何同时调节多个正交概念方向，并避免积分项之间的相互干扰，仍是一个开放的设计空间。
+
+
 
 ## 原文 PDF
 

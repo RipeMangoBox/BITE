@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/RL_Squeezes_SFT_Expands_A_Comparative_Study_of_Reasoning_LLMs.pdf
+project_link: null
+code_link: null
 openreview_forum_id: N2lMNqJsBw
 aliases:
 - TLSLAF
@@ -42,7 +44,7 @@ claims:
 > - AIME24, AIME25, AMC23 上，独特正确轨迹数量 为 SFT模型，对比 Base模型，变化 明显增加，正确路径被扩展。
 > - AIME24, AIME25, AMC23 上，指数衰减率β（频率/度/介数） 为 RL模型，对比 Base模型，变化 β显著增大（约2.5倍），功能集中于少步骤。
 
-## 概述
+## 概要
 
 现有推理大语言模型的主流训练范式遵循“监督微调（SFT）后接强化学习（RL）”的两阶段流程，但对该流程有效性的理解长期停留在准确率度量的表象层面，缺少对RL与SFT如何内在重塑推理过程的机制性认识。这一瓶颈导致当前训练策略的改进依赖于试错，而非基于因果关系的理性设计。
 
@@ -50,7 +52,7 @@ claims:
 
 为揭示上述机制，论文提出了一套**推理路径分析框架**，在轨迹级通过聚类识别独特推理路径，在步骤级构建推理图并量化节点频率、度和介数中心性的指数衰减率等拓扑度量。实验覆盖1.5B至14B规模的模型，在AIME24、AIME25、AMC23及HumanEval等数学与代码基准上一致表明：RL将图度量的指数衰减率提升约2.5倍（功能集中），SFT将其降低至约三分之一（功能分散）；RL显著减少独特错误轨迹数量，SFT则增加独特正确轨迹数量。这些发现为数据构建策略和高效学习路径的设计提供了新的方向。
 
-## 背景与动机
+
 
 大规模语言模型（LLM）在数学推理、代码生成等复杂任务上的能力近年来取得了显著进展。当前的主流训练范式通常采用两阶段策略：先通过监督微调（SFT）让模型模仿专家或教师模型的推理轨迹，再通过强化学习（RL）进一步优化模型，使其在可验证奖励信号（如答案正确性）的引导下提升推理准确率。这一范式已在多个前沿模型中展现出强大的性能。
 
@@ -62,7 +64,9 @@ claims:
 
 > **注意**：该研究主要在1.5B至14B参数规模的模型上进行分析，实验覆盖数学（AIME24、AIME25、AMC23）和代码（HumanEval）领域。更大规模模型及更广泛任务上的泛化性尚待进一步验证。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本研究的核心创新不在于提出新的训练算法或模型架构，而在于**构建了一个系统性的推理路径分析框架**，首次从轨迹级和步骤级两个层次，定量揭示了RL（强化学习）与SFT（监督微调）对推理大语言模型内在推理过程的**互补性重塑机制**。
 
@@ -97,7 +101,7 @@ claims:
 
 这些发现不仅解释了SFT+RL两阶段训练的有效性，还为数据构建和高效学习提供了新方向——例如，是否可以仅在功能步骤（如枢纽节点）上应用RL以进一步提升效率。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l29_https_openreview_net_forum_id_N2lMNqJsBw/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of our analysis. (Top) RL compresses incorrect trajectories, and SFT expands correct trajectories. (Bottom) RL concentrates functionality (e.g., hubs) in a small number of steps, and SFT distributes functionality more uniformly across many steps*
@@ -128,7 +132,7 @@ claims:
 
 本工作定位于推理过程分析与理解，而非提出新的训练方法。与直接优化准确率的主流训练研究不同，该框架借鉴了图论和复杂网络分析的工具（如指数衰减模型、图元分析、全局拓扑度量），将其应用于LLM推理过程的表征。在方法谱系上，它连接了三个方向：推理轨迹多样性分析（通过chrF聚类）、推理步骤的语义空间建模（通过句子嵌入和图构建）、以及图结构的功能度量（通过衰减率和拓扑指标）。这种跨学科的分析视角为理解RL和SFT的内在机制提供了新的概念工具，并指出了潜在的高效学习方向——例如，仅在功能步骤（枢纽节点或高介数中心步）上应用RL是否能进一步提升性能。
 
-## 核心模块与公式推导
+
 
 ### 轨迹采样与聚类模块
 
@@ -182,7 +186,9 @@ $$\mathrm{sMAPE} = \frac{100}{n} \sum_{t=1}^{n} \frac{|y_t - x_t|}{(|y_t| + |x_t
 
 其中$x_t$和$y_t$分别为两模型在第$t$个节点上的访问频率，$n$为节点总数。该度量用于验证RL和SFT对推理图功能分布的差异化塑造是否具有统计一致性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 轨迹级分析：RL压缩错误，SFT扩展正确
 
@@ -251,7 +257,9 @@ Figure 9展示了四节点图元（G3–G8）的比例分布。RL训练后，无
 ![[assets/figures/papers/paper_list_l29_https_openreview_net_forum_id_N2lMNqJsBw/figures/002_Table_1.jpg]]
 *Table 1: Comparison of Model Variants. We evaluate Base, RL, SFT, and SFT + RL models across three sizes, 1.5B, 7B, and 14B. See Appendix B.1 for detailed model specifications*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 分析框架的定位与创新性
 
@@ -288,6 +296,8 @@ Figure 9展示了四节点图元（G3–G8）的比例分布。RL训练后，无
 2. **探索奖励的机制**：RL中的探索奖励机制是仅仅防止推理图的过度压缩（即维持一定的路径多样性），还是能像SFT一样真正扩展推理结构？这需要将探索奖励作为独立变量纳入分析框架。
 3. **图度量作为过程奖励**：是否可以将图度量（如枢纽节点和中心节点的识别）作为过程奖励信号整合到RL训练中？这要求建立图度量与推理正确性之间的实时映射。
 4. **因果性确定**：图拓扑度量与推理性能之间的因果关系如何确定？能否通过直接优化这些度量（如最大化全局效率、最小化模块性）来指导训练，而不仅仅是事后观察相关性？
+
+
 
 ## 原文 PDF
 

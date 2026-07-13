@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/EditBench_Evaluating_LLM_Abilities_to_Perform_Real_World_Instructed_Code_Edits.pdf
+project_link: https://waynechi.com/edit-bench/
+code_link: https://github.com/waynchi/editbench
 openreview_forum_id: FtL9eEmU6v
 aliases:
 - EditBench
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | EditBench：评估大语言模型执行真实世界指令代码编辑的能力 |
 | 英文题名 | EditBench: Evaluating LLM Abilities to Perform Real-World Instructed Code Edits |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=FtL9eEmU6v); [GitHub](https://github.com/waynchi/editbench); [Project](https://waynechi.com/edit-bench/) |
+| Links | [paper](https://openreview.net/forum?id=FtL9eEmU6v) · [GitHub](https://github.com/waynchi/editbench) · [Project](https://waynechi.com/edit-bench/) |
 | Topic | #topic/benchmarks_datasets_evaluation #topic/benchmarks_datasets_evaluation/benchmark_eval |
 | Method | EditBench |
 | Dataset | EditBench, EditBench (任务类别平均), 与现有基准的相关性 |
@@ -41,7 +43,7 @@ claims:
 > - EditBench (任务类别平均) 上，平均 pass@1 为 Bug fixing: 52.2%, Optimization: 44.6%, Feature addition: 39.6%，对比 N/A，变化 N/A。
 > - 与现有基准的相关性 上，Pearson r 为 Aider Polyglot: 0.24 (p=0.06)，对比 Chatbot Arena: 0.11 (p=0.01)，变化 N/A。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -57,8 +59,6 @@ claims:
 2. **上下文信息影响显著**：添加高亮代码后，7个模型中的5个性能提升；但添加光标位置带来混合效果，表明上下文信息的利用仍是不稳定因素（Table 3）。
 3. **与现有基准弱相关**：EditBench与Aider Polyglot（r=0.24, p=0.06）和Chatbot Arena（r=0.11, p=0.01）仅呈弱正相关，证明其捕捉了现有基准未能覆盖的独特实际挑战。
 4. **任务类别差异明显**：模型在bug fixing任务上表现最好（平均52.2%），而在optimization（44.6%）和feature addition（39.6%）任务上较弱。
-
-## 背景与动机
 
 代码编辑是大语言模型（LLM）在真实开发工作流中最核心的应用场景之一。开发者不再仅仅依赖模型从零生成代码，而是越来越多地在集成开发环境（IDE）中向模型发出自然语言指令，要求其对已有代码进行修改、修复或增强。GitHub Copilot 和 Cursor 等工具已将这一“指令式代码编辑”（instructed code editing）功能作为核心特性推向市场，然而，如何可靠地评估 LLM 在这一场景下的真实能力，仍然是一个悬而未决的问题。
 
@@ -82,7 +82,7 @@ claims:
 
 通过构建这样一个“野外”（in-the-wild）基准，EditBench 旨在揭示当前 LLM 在真实代码编辑场景中的真实能力上限，并为未来模型改进提供更具生态效度的评估标尺。
 
-## 核心创新
+## 核心方法与创新机理
 
 EditBench 的核心创新在于**将代码编辑评估从人工标注的简化任务迁移到真实开发场景**，通过三个关键设计填补了现有基准与真实世界之间的鸿沟。
 
@@ -101,8 +101,6 @@ EditBench 包含 5 种自然语言（英语、西班牙语、俄语、汉语、�
 ### 创新验证
 
 这些设计带来的挑战性得到了实证支持：40 个模型中仅 claude-sonnet-4 获得超过 60% 的 pass@1，且 EditBench 与 Aider Polyglot（r = 0.24, p = 0.06）和 Chatbot Arena（r = 0.11, p = 0.01）仅呈弱正相关，证明其捕捉了现有基准无法反映的独特能力维度。
-
-## 整体框架
 
 ![[assets/figures/papers/paper_list_l44_https_openreview_net_forum_id_FtL9eEmU6v/figures/001_Figure_1.jpg]]
 *Figure 1: EditBench tests LLMs’ real-world editing capabilities. We propose EditBench, an evaluation on real user instructions and code snippets collected in-the-wild. It is the first benchmark for instructed code edits that requires models to ingest the user instruction, current code, highlighted code, and cursor position to solve problems*
@@ -187,8 +185,6 @@ Table 1 系统对比了 EditBench 与三个现有基准的差异：
 
 Table 2 进一步通过实例展示了真实 IDE 指令与标注者编写指令的本质差异：真实指令更简短、更模糊，高度依赖代码上下文来推断意图。例如，EditBench 中一个典型的 Feature Addition 指令仅为 “Can you edit this to work with streaming responses?”，而现有基准的同类指令则通常包含详细的功能描述和参数说明。这种模糊性正是 EditBench 挑战性的核心来源。
 
-## 核心模块与公式推导
-
 ### 关键模块
 
 EditBench 的构建与评估流程由以下核心模块组成：
@@ -213,18 +209,16 @@ $$\text{pass@1} = \frac{\text{通过所有测试的问题数}}{\text{总问题�
 
 相关性分析使用 Pearson 相关系数 r 衡量 EditBench 与现有基准（Aider Polyglot、Chatbot Arena）之间的线性关联强度。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主要结果：EditBench 对当前 LLM 构成严峻挑战
 
 论文在 EditBench 上评估了 40 个 LLM，涵盖闭源与开源、推理与非推理等多种模型家族（完整列表见 Table 6）。评估采用 pass@1 指标：每个问题生成 1 个代码样本，通过所有单元测试即视为解决。
 
-
 ![[assets/figures/papers/paper_list_l44_https_openreview_net_forum_id_FtL9eEmU6v/figures/020_Table_6.jpg]]
 *Table 6: Each model in our experiments with their official names and provider links*
 
 核心发现：**仅 1 个模型（claude-sonnet-4）的 pass@1 超过 60%，达到 66.67%**（Figure 4）。整体而言，闭源模型普遍优于开源模型，最佳开源模型 glm-4.6 的 pass@1 为 56.48%，差距约 10 个百分点。这一结果直接验证了 EditBench 作为基准的挑战性——现有模型在真实世界的指令代码编辑任务上仍有巨大提升空间。
-
 
 ![[assets/figures/papers/paper_list_l44_https_openreview_net_forum_id_FtL9eEmU6v/figures/006_Figure_4.jpg]]
 *Figure 4: We evaluate 40 LLMs on EditBench. We report the pass@1 of each model; only 1 out of 40 models have a pass@1 greater than 60%. In general, closed-source models outperform open models*
@@ -234,7 +228,6 @@ $$\text{pass@1} = \frac{\text{通过所有测试的问题数}}{\text{总问题�
 ### 任务类别分析：Bug 修复相对容易，功能添加最难
 
 按编辑类别细分，模型表现呈现明显梯度（Figure 5）：
-
 
 ![[assets/figures/papers/paper_list_l44_https_openreview_net_forum_id_FtL9eEmU6v/figures/008_Figure_5.jpg]]
 *Figure 5: Comparing top-performing open-weight and closed models. To illustrate individual LLM differences, we compare 7 models and find $\mathtt { p a s s } \mathtt { { \Theta } } \mathtt { { \perp } }$ varies greatly depending on the problem category. Additionally, different models perform best at different categories
@@ -248,7 +241,6 @@ $$\text{pass@1} = \frac{\text{通过所有测试的问题数}}{\text{总问题�
 ### 上下文消融：高亮代码是关键，光标位置效果混合
 
 为量化代码上下文信息对编辑性能的影响，论文对 7 个 top 模型进行了消融实验（Table 3），比较四种提示条件：
-
 
 ![[assets/figures/papers/paper_list_l44_https_openreview_net_forum_id_FtL9eEmU6v/figures/007_Table_3.jpg]]
 *Table 3: Additional context affects performance. Highlighted code is crucial to performance, improving task success rate across 5 out 7 models when included in the prompt. Surprisingly, adding cursor position leads to mixed results. Models chosen are the best model in the top 7 model families*
@@ -266,7 +258,6 @@ $$\text{pass@1} = \frac{\text{通过所有测试的问题数}}{\text{总问题�
 
 Table 7 揭示了上下文长度与性能的反向关系：
 
-
 ![[assets/figures/papers/paper_list_l44_https_openreview_net_forum_id_FtL9eEmU6v/figures/023_Table_7.jpg]]
 *Table 7: Effect of context length on average pass@1*
 
@@ -275,7 +266,6 @@ Table 7 揭示了上下文长度与性能的反向关系：
 - **长上下文（>3k 字符）**：59.94%
 
 进一步分析困难与简单问题的特征差异（Table 8）发现：困难问题的指令长度显著更短（约 75 字符），但高亮代码长度与简单问题相近。这暗示困难的核心不在于代码量，而在于**指令本身的模糊性**——简短指令要求模型从代码上下文中推断用户真实意图，这对模型的上下文推理能力提出了更高要求。
-
 
 ![[assets/figures/papers/paper_list_l44_https_openreview_net_forum_id_FtL9eEmU6v/figures/024_Table_8.jpg]]
 *Table 8: Comparing instruction and highlight length for easy versus hard questions*
@@ -303,11 +293,7 @@ EditBench 与现有代码编辑基准仅呈弱正相关：
 ![[assets/figures/papers/paper_list_l44_https_openreview_net_forum_id_FtL9eEmU6v/figures/014_Table_4.jpg]]
 *Table 4: Full examples of user instructions across different task categories, comparing with two edit-related datasets (CanItEdit (Cassano et al., 2023b) and EditEval (Hu et al., 2023))*
 
-![[assets/figures/papers/paper_list_l44_https_openreview_net_forum_id_FtL9eEmU6v/figures/015_Table_5.jpg]]
-*Table 5: Additional examples of user instructions across different task categories, comparing with two edit-related datasets (CanItEdit (Cassano et al., 2023b) and EditEval (Hu et al., 2023))*
-
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 与现有基准的关系
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/FairyGen_Storied_Cartoon_Video_from_a_Single_Child_Drawn_Character.pdf
+project_link: https://jayleejia.github.io/FairyGen/
+code_link: null
 aliases:
 - FairyGen
 tags:
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | FairyGen: 基于单个儿童绘角色生成叙事卡通视频 |
 | 英文题名 | FairyGen: Storied Cartoon Video from a Single Child-Drawn Character |
 | 会议/期刊 | arXiv 2025 |
-| Links | [paper](https://arxiv.org/abs/2506.21272) · [Project](https://jayleejia.github.io/FairyGen/) · [arXiv](https://arxiv.org/abs/2503.11647) |
+| Links | [paper](https://arxiv.org/abs/2506.21272) · [Project](https://jayleejia.github.io/FairyGen/) · [paper](https://arxiv.org/abs/2503.11647) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | FairyGen |
 | Dataset |  |
@@ -41,7 +43,7 @@ claims:
 > - 用户偏好研究 上，风格质量投票 (Style Quality) 0.5365 vs 次优方法显著低于该值 (未明确，凭用户偏好胜出)。
 > - 运动评价 (VBench指标) 上，运动平滑度 (Motion Smooth.) 0.987 vs 未提供具体值，但优于Animate-X、DreamVideo等 (未明确，由Table 2定性比较)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：从单幅儿童手绘角色生成连贯的叙事卡通视频，面临三重根本矛盾——角色风格的高度抽象性与背景风格一致性的冲突、单样本条件下跨镜头角色外观的持久保持、以及结构化电影叙事控制与复杂自然运动生成之间的协调。现有故事视频方法往往将风格、外观与运动耦合建模，导致在儿童画这种极端低资源条件下出现风格泄漏、身份漂移或运动不自然。
 
@@ -51,7 +53,7 @@ claims:
 
 **局限与开放问题**：当前方法针对单角色设计，扩展到多角色及交互场景仍面临挑战；受视频扩散模型不可控先验限制，背景运动可能与前景不协调；对于高度抽象的非人形角色，三维代理的绑定与重定向存在局限性。未来方向包括结合更先进的骨骼绑定技术（如 UniRig）提升非人形角色运动质量，以及引入更丰富的相机运动控制增强背景真实感。
 
-## 背景与动机
+
 
 视觉叙事生成旨在将一段文本故事转化为连贯的图像或视频序列，这要求系统同时解决角色外观一致性、场景风格统一以及跨镜头的运动连贯性三大挑战。近年来，扩散模型（Diffusion Models）在文本到图像（T2I）和文本到视频（T2V）生成领域取得了显著进展，催生了一系列主体定制与风格化方法。然而，当输入从高质量照片或规范插图变为**儿童手绘角色**时，现有方法的局限性便集中暴露出来。
 
@@ -61,7 +63,9 @@ claims:
 
 FairyGen 正是在这一背景下提出的，其核心动机在于：**解耦角色建模与风格化背景生成，引入3D代理重建来提供物理合理且可控的运动先验，并采用两阶段运动定制与偏置时间步采样策略，使得视频扩散模型能够忠实保留角色外观并学习流畅运动。** 通过将风格传播限制在背景区域并利用3D代理的运动先验来微调图像到视频扩散模型，FairyGen 有效分离了外观、运动与风格三个维度，从而在单儿童画输入下生成高质量的故事动画。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FairyGen 的核心创新在于**将风格传播、运动生成与角色外观三者解耦**，从而在仅给定单幅高度抽象的手绘角色时，仍能生成风格一致、运动流畅的多镜头叙事视频。这一解耦思想通过三个关键的 **changed slots** 实现，分别对应风格、运动和训练策略的范式转换。
 
@@ -104,7 +108,7 @@ FairyGen 的核心创新在于**将风格传播、运动生成与角色外观三
 
 这三个 changed slots 协同作用，使得 FairyGen 能够在单儿童画输入的极端条件下，同时达成风格一致性、跨镜头角色一致性与复杂自然运动，构成了方法的核心竞争力。
 
-## 整体框架
+
 
 FairyGen 的整体流程围绕“从单幅儿童绘角色到多镜头叙事卡通视频”这一目标，将风格、运动与叙事控制解耦为四个协同阶段：**故事板规划**、**风格传播场景生成**、**三维代理运动重建** 与**两阶段视频运动定制**。图 2 给出了端到端的流水线概览。
 
@@ -142,7 +146,7 @@ FairyGen 的整体流程围绕“从单幅儿童绘角色到多镜头叙事卡�
 ![[assets/figures/papers/paper_list_l92_https_arxiv_org_abs_2506_21272/figures/003_Figure_2.jpg]]
 *Figure 2: The pipeline of the whole FairyGen*
 
-## 核心模块与公式推导
+
 
 FairyGen 的核心设计围绕一个关键矛盾展开：如何在仅有一张高度抽象、风格鲜明的儿童手绘角色的条件下，生成风格一致、运动自然且叙事连贯的多镜头视频。为此，框架通过三个相互解耦的模块——**故事板规划器**、**风格传播适配器**与**基于3D代理的运动定制器**——分别解决叙事结构缺失、风格一致性难以保持、运动生成不可控这三个瓶颈，并通过精心设计的训练策略与采样机制将它们统一到一个端到端的生成管线中。
 
@@ -207,7 +211,9 @@ $$t = \sigma(z) = \frac{1}{1 + e^{-z}}, \quad z \sim \mathcal{N}(\mu, \sigma^2)$
 ![[assets/figures/papers/paper_list_l92_https_arxiv_org_abs_2506_21272/figures/006_Figure_5.jpg]]
 *Figure 5: Two-stage motion train stratage. We first use unorded frames to learn character spatial features without temporal bias. Then, with the identity LoRA frozen, motion residuals are learned from sequential video frames*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -278,7 +284,9 @@ Fig. 12 验证了时间步移采样策略对运动质量的提升效果。采用
 
 *注：部分定量对比的基线具体数值在现有材料中未明确列出，上述分析基于 Table 1 与 Table 2 的定性比较结论及用户研究数据。如需精确的逐基线数值对比，建议查阅原始论文表格。*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位与核心瓶颈
 
@@ -350,6 +358,8 @@ FairyGen 开辟了若干值得深入探索的方向：
 ### 5. 知识库定位总结
 
 FairyGen 在方法谱系中占据了一个独特的交叉位置：它既非纯粹的风格化方法，也非单纯的运动生成方法，而是通过**解耦-重建-定制**的三阶段框架，将风格传播、3D运动先验与视频扩散模型微调有机整合。其核心贡献在于证明了：**在单样本、高度抽象输入的极端条件下，通过结构化的解耦设计与物理先验的引入，可以实现风格一致、运动自然、叙事连贯的视频生成**。这一方法论对未来的少样本视频生成、交互式叙事创作以及儿童教育工具等应用具有重要的参考价值。
+
+
 
 ## 原文 PDF
 

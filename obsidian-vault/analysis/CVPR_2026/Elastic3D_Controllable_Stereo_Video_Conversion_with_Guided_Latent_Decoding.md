@@ -43,7 +43,7 @@ claims:
 > - Stereo4D (test set) 上，PSNR / SSIM / LPIPS / εMatch / P-PSNR / Disp.err / Temp.err 26.1 / 0.913 / 0.176 / 27.8 / 27.4 / 1.24 / 1.30 vs M2SVid: 24.6 / 0.819 / 0.206 / 39.6 / 26.3 / 1.56 / 1.35 (+1.5 dB PSNR, -15% LPIPS, -30% Matchability)。
 > - iPhone Spatial Video 上，PSNR / SSIM / LPIPS / εMatch / P-PSNR / Disp.err / Temp.err 22.5 / 0.890 / 0.193 / 26.5 / 26.2 / 0.77 / 3.10 vs M2SVid: 22.9 / 0.865 / 0.205 / 38.4 / 25.1 / 0.60 / 3.06 (PSNR -0.4, SSIM +0.025, LPIPS -0.012, Matchability -31%)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -97,7 +97,7 @@ Elastic3D在立体视频生成方法谱系中占据独特位置：
 
 **局限性与待验证点**：模型对极端视差（基线>63mm）的泛化较弱；单一标量视差条件在动态场景（如变焦镜头）中可能产生歧义；隐式几何学习偶尔导致平坦表面的轻微“波浪”深度幻觉。这些需要在实际部署中结合场景特点进行验证。
 
-## 背景与动机
+
 
 立体视频（Spatial Video）正随着Apple Vision Pro、Meta Quest等设备的普及而成为沉浸式内容消费的核心媒介。然而，立体内容的创作仍然高度依赖专业双摄设备，导致高质量3D视频供给严重不足。单目转立体（mono-to-stereo）视频转换——从普通单视点视频生成对应的右眼视图——因此成为极具实用价值的研究方向。
 
@@ -123,7 +123,9 @@ Elastic3D在立体视频生成方法谱系中占据独特位置：
 
 通过这三项设计的协同，Elastic3D在多个在野数据集上实现了对传统扭曲方法和免扭曲基线的全面超越，同时保持了直观的用户控制能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 传统单目转立体视频方法的核心瓶颈在于对显式深度估计和像素扭曲（warping）的依赖，这一范式在遮挡区域和纹理稀疏处不可避免地产生空洞与伪影；同时，主流潜在扩散模型（LDM）中标准VAE的高压缩率（1:48）导致高频纹理信息在编解码过程中大量丢失，引发双眼竞争。Elastic3D 通过三个关键“changed slots”系统性地绕开了上述瓶颈，构成了其核心创新。
 
@@ -157,7 +159,7 @@ $$h_i'(p) = h_i(p) + \mathcal{A}_{\mathrm{epipolar}}(h_i(p), g_i)$$
 
 Elastic3D 的三个 changed slots 形成了协同增效的创新闭环：免扭曲生成消除了几何伪影的源头，视差条件赋予了跨场景的可控泛化能力，引导解码器则弥补了潜在扩散模型固有的细节损失。这一组合使得模型在 AVP 数据集上以 **25.9 PSNR / 0.196 LPIPS** 全面超越所有基线（Tab. 5），同时保持了从零噪声单步前馈的推理效率。
 
-## 整体框架
+
 
 Elastic3D 是一个直接、免扭曲（warping-free）的前馈立体视频转换框架。给定一段左眼视频 $V_L \in \mathbb{R}^{N \times H \times W \times 3}$，系统通过三个级联模块一次性生成对应的右眼视频 $\hat{V}_R$，全程无需显式深度估计或像素重投影。
 
@@ -197,7 +199,7 @@ $$
 ![[assets/figures/papers/paper_list_l2473_https_arxiv_org_abs_2512_14236/figures/002_Figure_2.jpg]]
 *Figure 2: Inference Pipeline.A frozen VAE Encoderε computes the latent code*
 
-## 核心模块与公式推导
+
 
 ### 整体推理管线
 
@@ -245,7 +247,9 @@ $$h_i'(p) = h_i(p) + \mathcal{A}_{\mathrm{epipolar}}(h_i(p), g_i)$$
 
 $\mathcal{A}_{\mathrm{epipolar}}$ 沿核极线执行一维交叉注意力：以 $h_i(p)$ 为查询，仅在 $p$ 对应的极线上与 $g_i$ 的特征进行注意力计算。这一设计将 16 位注意力矩阵的显存需求从 128 GB 降至 256 MB，使高分辨率特征融合成为可能。引导解码器独立于合成网络训练，可即插即用地提升其他基线方法（如 M2SVid）的细节恢复能力。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 评估协议与基准
 
@@ -326,7 +330,9 @@ Table 9 的配对人类感知研究中，参与者在 Elastic3D 与 M2SVid 的�
 ![[assets/figures/papers/paper_list_l2473_https_arxiv_org_abs_2512_14236/figures/023_Table_12.jpg]]
 *Table 12: Model Latency Comparison.Runtimes are measured for generating a video of 16 frames with a resolution of 512 × 512. All evaluations were performed on an NVIDIA H10o GPU.“Monodepth”and“Warp”denote the time taken for depth estimation and geometric warping,respectively*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线工作的关系
 
@@ -383,6 +389,8 @@ Elastic3D 的核心设计假设决定了其适用范围和局限性：
 4. **弱几何先验融合**：是否可以在免扭曲框架中引入弱几何先验（如平面一致性约束、极线几何正则化），以减少几何幻觉，同时保持免扭曲的灵活性？
 5. **端到端联合训练**：在更好的硬件条件下，联合训练 UNet 和引导解码器能否实现端到端优化的质量收益？当前模块化设计的性能上限在哪里？
 6. **与其他基线的即插即用集成**：Tab. 4 已证明引导解码器对 M2SVid 有即插即用增益（LPIPS 降低，Matchability 误差下降 44%）。这一模块能否泛化到更广泛的立体生成框架中，成为通用组件？
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,7 @@ paper_level: A
 venue: ICLR
 year: 2025
 pdf_ref: paperPDFs/ICLR_2025/ReMatching_Dynamic_Reconstruction_Flow.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/toronto-ai/ReMatchingDynamicReconstructionFlow/
 aliases:
 - RF
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | ReMatching动态重建流 |
 | 英文题名 | ReMatching Dynamic Reconstruction Flow |
 | 会议/期刊 | ICLR 2025 |
-| Links | [paper](https://arxiv.org/abs/2411.00705); [Project](https://research.nvidia.com/labs/toronto-ai/ReMatchingDynamicReconstructionFlow/) |
+| Links | [paper](https://arxiv.org/abs/2411.00705) · [Project](https://research.nvidia.com/labs/toronto-ai/ReMatchingDynamicReconstructionFlow/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | ReMatching Framework |
 | Dataset | D-NeRF (GA3D setting), Dynamic Scenes |
@@ -42,7 +43,7 @@ claims:
 > - D-NeRF (GA3D setting) 上，PSNR↑ 为 38.18，对比 37.83，变化 +0.35。
 > - Dynamic Scenes 上，LPIPS↓ 为 0.2533，对比 0.2922，变化 -0.0389。
 
-## 概述
+## 概要
 
 动态场景重建的核心瓶颈在于：多视角输入在时间和空间维度上高度稀疏，使得模型难以有效学习时变表示；而引入形变先验时，又往往以牺牲重建保真度为代价。ReMatching 框架针对这一矛盾，提出了一种新的优化控制机制——通过 ReMatching 损失引导重建流尽可能接近所需的速度场先验类，而非强制严格隶属，从而在不降低保真度的前提下整合先验知识。
 
@@ -52,7 +53,7 @@ claims:
 
 **方法定位**：ReMatching 属于动态重建中基于速度场先验的正则化框架，区别于依赖数值模拟 ODE 的流程，专为仿真自由的动态模型设计。其先验类可灵活定义，涵盖分片刚体、体积保持等约束，并支持自适应组合。
 
-## 背景与动机
+
 
 动态场景重建旨在从多视角视频输入中恢复随时间变化的三维几何与外观，是计算机视觉与图形学中长期存在的核心问题。其应用涵盖虚拟现实、电影制作和数字孪生等领域。近年来，基于神经辐射场（NeRF）和三维高斯溅射（3D Gaussian Splatting）的静态重建方法取得了显著进展，但这些方法向动态场景的扩展面临根本性挑战。
 
@@ -62,7 +63,9 @@ claims:
 
 本文的动机正是源于这一观察。我们提出 **ReMatching 框架**，其核心思想是：利用速度场先验类（velocity-field prior class）的简化特性，将时间依赖重建函数到先验类的投影转化为一个流匹配（flow-matching）问题。通过设计一种名为 **ReMatching 损失**的新型训练目标，框架引导优化过程使重建流尽可能接近所需的速度场先验类，而非严格强制隶属关系。这种“软对齐”策略使得模型能够在保持重建保真度的前提下，有效吸收先验知识，从而突破了传统方法中保真度与正则化之间的折中困境。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ReMatching 框架的核心创新在于**解耦了动态重建中的保真度优化与形变先验整合**，通过一个精心设计的流匹配损失（ReMatching Loss）来引导优化过程，而非强制约束重建解必须严格属于某个先验类。
 
@@ -120,7 +123,7 @@ ReMatching 损失涉及内层 $\arg\min$ 优化问题，直接计算梯度需要
 
 该创新机制的一个关键前提是重建模型必须是**仿真自由**的——即 $\psi_t$ 的每次评估仅需单步前向计算，不涉及 ODE 数值求解。这使其天然适用于基于 MLP 的时间条件变形网络（如 D3G、GA3D），但**不适用于需要数值模拟的神经 ODE 类方法**。此外，先验类的设计仍依赖领域知识，对于液体、气体等复杂物理现象，需要设计更丰富的先验类（论文将此列为开放问题）。
 
-## 整体框架
+
 
 ReMatching 框架的核心设计理念是：**在不牺牲重建保真度的前提下，将形变先验注入动态重建模型的优化过程**。框架假定重建模型由一组仿真自由（simulation-free）的时间依赖函数 $\psi_t$ 构成，即每次评估 $\psi_t$ 仅需单步计算，无需数值求解常微分方程。
 
@@ -159,7 +162,7 @@ ReMatching 框架的核心设计理念是：**在不牺牲重建保真度的前�
 ![[assets/figures/papers/paper_list_l51_https_arxiv_org_abs_2411_00705/figures/009_Figure_5.jpg]]
 *Figure 5: Illustration of the architecture for $\Psi _ { t }$ used in the experiments, based on (Yang et al., 2023). Reference Gaussians parameters are propagated to time t through a shared function, $\psi _ { t } ^ { 1 }$ , implemented as an MLP with positional encoding features to compute time-varying point features of dimension $d _ { \mathrm { f } }$ . These features are then processed by a second shared function, $\overline { { \psi _ { t } ^ { 2 } } }$ , to generate time-varying Gaussians parameters. Finally, given a chosen viewing direction, the Gaussian Splatting rendering model is used to produce a rendered image
 
-## 核心模块与公式推导
+
 
 ### 动态图像模型
 
@@ -246,7 +249,9 @@ $$\mathcal{P}_{IV} = \{ u_t \mid u(\pmb{x}, t) = \sum_{j=1}^{k} w_j(\pmb{x}, t) 
 
 ReMatching 损失的两种应用模式——基于几何（粒子位置）和基于图像（渲染像素）——使其可灵活适配不同的动态重建管线。该损失仅在训练阶段使用，推断时间不受影响。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -317,7 +322,9 @@ Figure 15 报告了不同高斯数量 n 下的前向+反向传播平均时间。
 
 ![[assets/figures/papers/paper_list_l51_https_arxiv_org_abs_2411_00705/figures/005_Table.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 **核心定位**。ReMatching 框架并非提出一个全新的动态重建模型，而是在现有仿真自由（simulation-free）的动态重建流程之上，通过引入速度场先验类与流匹配损失来引导优化方向。其核心贡献在于将“形变先验整合”问题转化为一个流匹配问题，从而在不牺牲重建保真度的前提下，使重建解尽可能接近预定义的形变先验类。
 
@@ -350,6 +357,8 @@ Figure 15 报告了不同高斯数量 n 下的前向+反向传播平均时间。
 - **通用非刚性形变**：将 ReMatching 框架扩展到更通用的非刚性形变和拓扑变化场景。
 
 **知识库定位**。ReMatching 的核心洞察——利用速度场先验类的简化特性，将投影问题转化为流匹配问题——为动态重建中的先验整合提供了一个新的理论视角。其“模拟交替投影法”的设计思路（先投影到先验类，再重新投影回重建流集合）在方法论上具有一般性，可被后续工作借鉴用于其他需要平衡先验约束与数据保真度的重建任务。
+
+
 
 ## 原文 PDF
 

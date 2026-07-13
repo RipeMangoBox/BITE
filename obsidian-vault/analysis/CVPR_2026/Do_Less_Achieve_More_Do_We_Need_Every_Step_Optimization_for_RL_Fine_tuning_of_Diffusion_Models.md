@@ -42,7 +42,7 @@ claims:
 > - 简单动物提示集 + PickScore 上，达到 PickScore=22 所需时间 (小时) 5.37 (DDPO+Ours) vs 13.2 (DDPO) (-59.3%)。
 > - 简单动物提示集 + Aesthetic 上，达到 Aesthetic=7 所需时间 (小时) 5.16 (DDPO+Ours) vs 12.3 (DDPO) (-58.0%)。
 
-## 概述
+## 概要
 
 扩散模型在文本到图像（T2I）生成中展现出卓越能力，但将其输出与人类偏好对齐仍面临显著挑战。强化学习（RL）微调是提升偏好对齐的主流范式，然而现有方法普遍存在一个被忽视的瓶颈：**最终奖励信号极度稀疏，早期去噪步骤缺乏有效引导，导致高方差和动作‑奖励错配；而晚期步骤奖励趋于饱和，继续训练易引发奖励黑客和过拟合**。将最终奖励均匀分配给所有去噪步骤的策略，既浪费计算资源，又损害生成质量与多样性。
 
@@ -64,7 +64,7 @@ AdaScope通过两个关键模块实现自适应区间选择：
 
 值得注意的是，AdaScope 在部分强骨干模型（如 SDXL）上改进幅度有限，这可能是由于预训练权重已具有较高的普适鲁棒性。此外，自适应区间选择目前依赖预训练 CLIP 和奖励模型，若下游奖励函数不可靠，可能误导区间决策，这一点需要在实际部署中加以验证。
 
-## 背景与动机
+
 
 ### 扩散模型RL微调的核心瓶颈
 
@@ -97,7 +97,9 @@ Figure 1 通过三个维度的观测揭示了去噪过程的阶段性本质：
 
 这一动机催生了 **AdaScope** 方法，其设计理念是：将RL训练从“全轨迹均匀分配”转变为“自适应区间聚焦”，通过感知去噪过程中的结构演化和奖励增益动态，为每张图像个性化地确定最优训练起止点。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 扩散模型RL微调的核心瓶颈在于去噪过程不同阶段的结构与奖励特性高度异质，而现有方法对整条去噪轨迹施加均匀的RL更新，导致三重失效：**早期高方差**——去噪初期语义结构尚未形成，将最终奖励信号归因于随机噪声状态引发严重的动作‑奖励错配；**晚期奖励黑客**——去噪后期奖励趋于饱和，继续优化驱使模型过拟合奖励函数的捷径而非提升真实语义质量；**计算浪费**——大量训练消耗在无效的早期和晚期步骤上。Figure 1 直观展示了这一现象：早期阶段CLIP变化剧烈（结构混沌），晚期阶段奖励收敛（边际增益趋零），仅中间阶段同时具备稳定语义结构和持续改善的奖励信号。
 
@@ -132,7 +134,7 @@ AdaScope 由三个松耦合模块构成，嵌入现有RL微调框架（如DDPO�
 
 AdaScope 的创新聚焦于**何时训练**而非**如何训练**，因此与具体RL算法解耦，可作为插件嵌入DDPO、DPOK、D3PO、TDPO等不同策略。但区间选择依赖预训练CLIP和奖励模型的质量：若下游奖励函数本身不可靠，感知器可能被误导，导致区间决策失准（需手动验证）。此外，在强骨干模型（如SDXL）上改进幅度有限，因其预训练权重已具有较高普适鲁棒性。
 
-## 整体框架
+
 
 AdaScope 的核心设计理念是将扩散模型的去噪过程重新审视为一个具有阶段性结构演化的动态系统，而非均匀的马尔可夫链。基于这一视角，该方法构建了一个轻量级的自适应时间窗口选择器，嵌入到现有的扩散模型 RL 微调流程中，仅在高价值区间进行策略优化。
 
@@ -192,7 +194,7 @@ AdaScope 的“即插即用”特性使其可以无缝嵌入多种主流扩散�
 
 在所有宿主方法中，AdaScope 仅修改 RL 训练区间这一单一维度，其余超参数（学习率、批量大小、KL 系数等）均保持与原始方法一致，确保了公平比较。
 
-## 核心模块与公式推导
+
 
 ### 3.1 扩散模型RL微调的形式化瓶颈
 
@@ -260,7 +262,9 @@ $$t_{\mathrm{end}} = \min\{t \mid |\lim_{\Delta t \to 0} \frac{\Delta P_{t+\Delt
 ![[assets/figures/papers/paper_list_l2672_https_arxiv_org_abs_2605_15855/figures/001_Figure_1.jpg]]
 *Figure 1: We plot the CLIP variation (∆ CLIP), Reward Objective, and Uncertainty Score (Based on Lemma 1) with aligned denoising steps. Only the red region is optimized, where we leverage ∆ CLIP and Reward to select the adaptive scope of denoising steps for training. It can be observed that the structure is chaotic in the first stage, while the reward converges in the last stage. The selected scope has a stable structure and improving reward, which exactly corresponds to the moderate uncertainty stage*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -319,7 +323,9 @@ $$t_{\mathrm{end}} = \min\{t \mid |\lim_{\Delta t \to 0} \frac{\Delta P_{t+\Delt
 ![[assets/figures/papers/paper_list_l2672_https_arxiv_org_abs_2605_15855/figures/017_Figure_13.jpg]]
 *Figure 13: Diversity Evaluation: Our method demonstrates the highest level of variation under these prompts, producing outputs with a wide range of artistic styles, figure posture, object positioning, and background colors. In contrast, D3PO predominantly generates grayscale backgrounds or same posture, DPOK consistently incorporates purple tones into its visual style, and DDPO tends to produce collage-like compositions within a single image*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与设计动机
 
@@ -378,6 +384,8 @@ AdaScope并非重新设计奖励函数，而是通过区间选择间接实现了
 3. **高分辨率与长链适配**：当前实验基于DDIM的50步采样。在具有更长去噪链（例如1000步）的高分辨率生成中，语义结构稳定和偏好增益饱和的时间尺度可能发生变化，区间选择策略是否需要额外的尺度适配机制？
 
 4. **与奖励塑形的深度结合**：AdaScope目前仅通过区间选择间接改善奖励信号质量。如果能与中间步骤的辅助奖励塑形（例如基于CLIP的中间步骤语义奖励）结合，或许能进一步扩大有效训练区间的范围，提升样本效率。
+
+
 
 ## 原文 PDF
 

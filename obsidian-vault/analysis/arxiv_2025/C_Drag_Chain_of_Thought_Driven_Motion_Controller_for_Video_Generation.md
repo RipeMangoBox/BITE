@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/C_Drag_Chain_of_Thought_Driven_Motion_Controller_for_Video_Generation.pdf
+project_link: null
+code_link: https://github.com/WesLee88524/C-Drag-Official-Repo
 aliases:
 - CD
 - C-Drag
@@ -41,7 +43,7 @@ claims:
 > [!tip] 效果简介
 > - VOI（Video Object Interaction）Dataset (72 videos, 3 subsets) 上，FVD ↓ / FID ↓ / MOC ↓ FVD 771.83 / FID 95.87 / MOC 46.47 vs DragNUWA: FVD 955.61 / FID 100.49 / MOC 72.09 (FVD -183.78 / FID -4.62 / MOC -25.62)。
 
-## 概述
+## 概要
 
 现有轨迹驱动的视频生成方法（如 **DragNUWA** (Yin et al., arXiv 2023)、**DragAnything** (Wu et al., ECCV 2024)）仅生成受控对象的运动轨迹，忽略了对象与周围环境的动态交互——碰撞、反射、重力传导等——导致多物体场景中非受控对象出现变形或消失，运动真实感严重不足。基于物理模拟的方法（如 **PhysGen** (Liu et al., ECCV 2024)）则依赖刚性物体参数估计，难以处理变形和非平面运动。
 
@@ -51,7 +53,7 @@ claims:
 
 在自建的 **VOI（Video Object Interaction）数据集**（72个视频，覆盖碰撞链式反应、重力与力、杠杆与镜面反射三类交互）上，C-Drag 以训练无关的方式显著超越基线：相比 DragNUWA，FVD 降低 183.78，FID 降低 4.62，专门设计的运动一致性指标 MOC 降低 25.62（约 35.5% 的相对提升）。消融实验证实，对象感知模块与 CoT 推理模块的协同是关键贡献，五阶段推理逐步累积增益至最优。定性结果显示，C-Drag 在变形对象、镜像反射等挑战性场景中能够维持所有物体的时间一致性，而基线方法普遍出现非受控对象丢失或严重变形。
 
-## 背景与动机
+
 
 ### 问题背景：从单对象控制到多对象交互的鸿沟
 
@@ -102,7 +104,9 @@ C-Drag 的核心动机来源于对人类认知模式的观察。如 Figure 2 所
 
 C-Drag 通过**对象感知模块**和**基于 CoT 的运动推理模块**分别应对上述挑战，最终将推理得到的多条轨迹输入预训练的轨迹控制扩散模型，生成具有多对象交互的连贯视频。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 C‑Drag 的核心创新在于将**对象感知**与**思维链（Chain‑of‑Thought）驱动的运动推理**引入轨迹控制视频生成，从而将传统方法仅对“用户指定对象”的单轨迹控制，升级为对场景中**所有受影响对象**的联合轨迹推理。这一转变直击现有方法的瓶颈：**忽略多物体动态交互**导致非受控对象变形、消失或运动失真。
 
@@ -141,7 +145,7 @@ C‑Drag 的对象感知模块（Object Perception Module）不再局限于用�
 
 需要注意的是，反向验证的“逆向推理”具体机制（是简单轨迹反演还是需要额外逆向提示）在现有材料中未充分展开，**需要手动核实原文细节**。此外，CoT 推理在 VLM 训练数据未见过的极端交互场景中的鲁棒性，以及对象感知模块漏检/误检时的自纠正能力，仍属开放问题。
 
-## 整体框架
+
 
 C-Drag 的整体流程遵循“感知—推理—生成”三阶段范式，如图 Figure 3 所示。系统接收一张 RGB 图像与一条或多条拖拽轨迹作为输入，依次经过**对象感知模块**、**基于思维链的运动推理模块**和**轨迹驱动的视频生成模块**，最终输出具有多物体交互的连贯视频。
 
@@ -156,7 +160,7 @@ C-Drag 的整体流程遵循“感知—推理—生成”三阶段范式，如�
 
 这一设计的关键瓶颈突破在于：传统轨迹驱动方法（如 **DragNUWA**，Yin et al., arXiv 2023）仅按用户轨迹移动受控对象，忽略了与周围环境的动态交互，导致非受控对象变形或消失。C-Drag 通过引入全局对象感知与分阶段思维链推理，在无物理引擎的条件下实现了碰撞、重力传导、镜像反射等复杂交互的连贯合成。消融实验证实，同时加入对象感知模块与 CoT 推理模块后，FVD 降低 183.78，MOC 降低 20.66（Table 4），两者均为关键贡献。
 
-## 核心模块与公式推导
+
 
 C-Drag 的核心架构由三个模块级联构成：**对象感知模块**、**基于思维链的运动推理模块**和**轨迹驱动视频生成模块**。其关键创新在于前两个模块——它们将人类认知中的“先感知、再推理”两阶段模式注入视频生成管线，从而在无需物理引擎的前提下实现多物体交互的连贯运动合成。
 
@@ -209,7 +213,9 @@ $$MOC = \frac{1}{N} \sum_{n=1}^{N} \sqrt{ (x_n^{\mathrm{p}} - x_n^{\mathrm{gt}})
 ![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2502_19868/figures/002_Figure_2.jpg]]
 *Figure 2: Our C-Drag approach is motivated from human cognitive patterns to model dynamic interactions between objects for controllable video generation. Human reasoning about object interactions involves few key stages. First, obtaining information about the image and objects. Next, inferring relationships between objects. Then, based on the trajectory of a specific object and motion principles, predicting the reactions of other objects. Finally, determining the overall result of these interactions*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -307,7 +313,9 @@ C-Drag 相比基线 DragNUWA 在 MOC 上提升约 35.5%，FVD 降低 183.78，FI
 ![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2502_19868/figures/001_Figure_1.jpg]]
 *Figure 1: Our C-Drag employs a single trajectory control signal (red arrow), integrated with a vision-language model (VLM) and Chain-of-Thought (CoT) reasoning, to generate controllable videos that emphasize motion realism. Results are illustrated in three example scenarios, each comprising two rows: baseline output (top) and C-Drag output (bottom). (a) Collision and Chain Reaction: The trajectory of a single sphere leads to complex collisions and chain reactions among multiple spheres. (b) Gravity and Force: A foot’s trajectory impacts a football, showing motion under gravitational and force dynamics. (c) Levers and Mirrors: A puppy’s movement is reflected in a mirror, showcasing coupled motion cont...*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 轨迹驱动视频生成的方法谱系
 
@@ -347,6 +355,8 @@ VOI 数据集目前仅包含 72 个视频，覆盖碰撞链式反应、重力与
 3. **实时交互式扩展**：当前 C-Drag 从第一帧静态图像出发生成整段视频，属于离线生成范式。能否扩展到实时或交互式场景（如用户逐步拖拽、系统即时响应）是一个开放问题，涉及推理延迟与生成效率的权衡。
 
 4. **数据集生态建设**：VOI 数据集未来如何扩充到更多真实场景，并引入更细粒度的标注（如接触力方向、物体材质属性、交互时间戳）？这将直接影响 MOC 指标的评估精度和方法的可改进方向。
+
+
 
 ## 原文 PDF
 

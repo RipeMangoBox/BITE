@@ -5,6 +5,8 @@ paper_level: A
 venue: 3DV
 year: 2024
 pdf_ref: paperPDFs/3DV_2024/Physically_Plausible_Full_Body_Hand_Object_Interaction_Synthesis.pdf
+project_link: null
+code_link: null
 aliases:
 - OPBHRMFBDG
 - PPFBHOIS
@@ -41,7 +43,7 @@ claims:
 > - GRAB (Manipulation phase, GOAL test split) 上，Grasp Success Rate 0.79 vs N/A (kinematic baselines evaluated differently) (N/A)。
 > - GRAB (Approaching phase) 上，Ground Distance (GD) [mm] ↓ 2.1 vs GOAL: 3.8, IMoS: 4.1 (-1.7 / -2.0)。
 
-## 概述
+## 概要
 
 生成物理可信的全身手-物体交互序列是具身智能与角色动画领域的核心挑战。现有数据驱动方法——如运动学合成框架 **GOAL** 与 **IMoS**——能够生成视觉上合理的全身抓取动作，却普遍存在脚滑、地面穿透、手-物体相互穿透等物理伪影。另一方面，基于物理仿真的方法虽能缓解此类伪影，但要么仅关注粗粒度的身体-物体交互，要么局限于孤立的手部灵巧抓取（如 **D-Grasp**），尚未实现全身协调运动与精细手指操控的物理级统一。
 
@@ -55,7 +57,7 @@ claims:
 
 **局限与展望**：当前方法仅支持单一中性身体形状，对大尺寸物体的抓取性能下降，且依赖静态手部姿态参考来控制抓取方式，尚未支持语言或语义指令驱动的交互生成。如何纳入多样化身体形态、提升仿真精度以减少残余穿透、以及摆脱对参考抓取姿态的依赖，是未来研究的重要方向。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -81,7 +83,9 @@ claims:
 
 这一设计使得方法既保留了数据驱动方法的运动自然性（通过对抗模仿奖励），又获得了物理仿真的真实交互特性，首次在全身灵巧抓取任务上同时实现了高成功率和低物理误差。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心突破在于**首次将物理仿真引入全身灵巧抓取任务**，解决了现有数据驱动方法普遍存在的脚滑、穿透等物理伪影问题。此前的运动合成方法可分为两类：基于运动学的方法（如 **GOAL** 和 **IMoS**）能够生成全身手-物交互序列，但缺乏物理约束，导致地面穿透和手-物穿透严重；基于物理的方法（如 **D-Grasp** 仅处理孤立手部抓取，Hassan et al. 仅关注粗粒度身体-物体交互）则未能同时实现全身协调与灵巧手指操控。本文的方法填补了这一空白（Table 1），其关键创新体现在以下三个相互关联的设计上。
 
@@ -123,7 +127,7 @@ $$\mathcal{L}_{\xi} = || \overline{\pmb{\xi}} - \tilde{\pmb{\xi}} ||_2^2$$
 
 上述三个创新构成了一个完整的因果链条：**解耦先验**防止模式坍塌，为复杂技能提供稳定的表示基础；**分层规划**将任务决策与运动执行分离，降低了学习难度；**目标引导**增强了策略对空间目标的泛化能力。三者的协同使得本文方法在 GRAB 数据集上实现了 0.79 的抓取成功率（相比 GOAL 的 0.55 和 IMoS 的 0.56），同时将地面距离降至 2.1 mm（GOAL: 3.8 mm, IMoS: 4.1 mm），脚滑比例降至 0.9%（GOAL: 6.2%, IMoS: 5.1%），在物理可信度上实现了数量级的提升。
 
-## 整体框架
+
 
 本文提出一种基于物理仿真的分层强化学习框架，用于生成物理可信的全身手-物体交互序列。框架的核心设计思路是**解耦全身运动与精细手指控制**：将两者分别建模为独立的低层技能先验（skill priors），再由一个高层策略在潜空间内进行协调规划。这种解耦设计避免了统一训练时潜空间的模式坍塌，同时借助物理仿真消除了传统数据驱动方法中常见的脚滑、穿透等伪影。
 
@@ -190,7 +194,7 @@ Table 1 从四个维度将本文方法置于现有工作的坐标系中：**全�
 ![[assets/figures/papers/paper_list_l1657_Physically_Plausible_Full_Body_Hand_Object_Interaction_Synthesis/figures/003_Figure_2.jpg]]
 *Figure 2: Method Overview. Given a hand-object pose reference Ψ and a root and wrist target trajectory*
 
-## 核心模块与公式推导
+
 
 ### 1. 仿真环境与关节驱动
 
@@ -266,7 +270,9 @@ $$\mathcal{L}_{\xi} = ||\overline{\pmb{\xi}} - \tilde{\pmb{\xi}}||_2^2$$
 
 消融实验（Table 3）表明，两阶段训练使成功率提升约 24%。直接联合训练所有目标会导致优化困难，策略难以同时学会抓取和跟随两个具有不同时间尺度的子任务。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 评估设置与基线
 
@@ -301,9 +307,6 @@ Table 3 系统消融了三个核心设计组件：
 
 此外，Table 4 考察了高斯平滑的影响：移除高斯平滑后，脚滑率和穿透指标略有上升，但抓取成功率和 TTR 不受影响（因为这些指标在物理仿真中评估，平滑仅影响渲染到 SMPL-X 网格的视觉质量）。
 
-![[assets/figures/papers/paper_list_l1657_Physically_Plausible_Full_Body_Hand_Object_Interaction_Synthesis/figures/008_Table_4.jpg]]
-*Table 4: Evaluation. We evaluate our model without Gaussian smoothing (w/o smoothing) and compare with the results from the main paper. Note that the success rate and trajectory targets reached (TTR) are not affected as they are evaluated in the physics simulation*
-
 ### 定性分析
 
 **Figure 3** 展示了在未见测试物体上生成的连续交互序列，每行对应一个完整动作：从接近物体、抓取到沿轨迹移动，动作自然连贯。
@@ -323,9 +326,6 @@ Table 3 系统消融了三个核心设计组件：
 
 Table 1 从四个维度系统定位了本文贡献：**Full Body**（全身运动）、**Physics**（物理仿真）、**Whole Interaction**（完整交互过程）、**Dexterous Grasping**（灵巧抓取）。现有方法仅覆盖其中部分维度：GOAL 和 IMoS 实现全身运动学合成但无物理仿真；D-Grasp 实现物理灵巧抓取但仅限手部；Hassan et al. 实现物理全身交互但无手指级操控。本文是首个同时满足全部四个维度的方法。
 
-![[assets/figures/papers/paper_list_l1657_Physically_Plausible_Full_Body_Hand_Object_Interaction_Synthesis/figures/002_Table_1.jpg]]
-*Table 1: Method Comparison. We put our method into context with kinematics-based and physics-based approaches. Our method is the first to achieve physics-based full-body dexterous grasping*
-
 在技术路线上，本文继承了对抗技能嵌入（ASE）的框架，但通过**分层解耦**将全身运动与精细手指控制分解到分别训练的对抗技能先验中，再由高层策略在潜空间内进行协调规划。这种设计避免了统一训练中的模式坍塌问题，同时借助物理仿真消除了传统数据驱动方法的典型伪影。目标引导机制进一步通过显式轨迹条件化和辅助预测损失增强了策略对未见轨迹的泛化能力。
 
 ### 补充图表
@@ -334,18 +334,14 @@ Table 1 从四个维度系统定位了本文贡献：**Full Body**（全身运�
 *Table 2: Evaluation. We compare our method against the relevant baselines on approaching until grasping and manipulation after grasping. In both settings, we find that our method achieves better performance across all of the metrics. We also provide the metrics for the groundtruth motion capture data (GT) as reference. Notably, our method can correct artifacts present in motion capture data, such as ground penetration or floating. The success rates show that our method leads to most stable grasps in the physics simulation. * The ground distance (GD) in the SMPL-X space is not zero as a consequence of the rigid body approximation of the human in the physics simulation. This metric equates to 0.0 when...*
 
 ![[assets/figures/papers/paper_list_l1657_Physically_Plausible_Full_Body_Hand_Object_Interaction_Synthesis/figures/006_Figure_4.jpg]]
-*Figure 4: Qualitative Comparison. Our physics-based method generates motions that exhibit less hand-object interpenetration and ground interpenetration than the kinematics baselines*
+*Figure 4：与运动学基线相比，物理驱动方法显著减少手-物体与身体-地面的穿透。*
 
 ![[assets/figures/papers/paper_list_l1657_Physically_Plausible_Full_Body_Hand_Object_Interaction_Synthesis/figures/001_Figure_1.jpg]]
 *Figure 1: Our method generates physically plausible full-body hand-object interaction sequences. We can synthesize sequences with unseen objects while following a flexibly definable wrist trajectory (left). We can also generate motions of approaching an object, grasping it, then walking to a different location while lifting the object (middle, right). The target trajectories are indicated by the dashed lines*
 
-![[assets/figures/papers/paper_list_l1657_Physically_Plausible_Full_Body_Hand_Object_Interaction_Synthesis/figures/004_Figure_3.jpg]]
-*Figure 3: Qualitative Results. Each row shows a motion sequence generated by our model for an unseen object from the test set*
 
-![[assets/figures/papers/paper_list_l1657_Physically_Plausible_Full_Body_Hand_Object_Interaction_Synthesis/figures/009_Table_5.jpg]]
-*Table 5: Success And Trajectory Imitation Evaluation. We evaluate the average success rate and the ratio of trajectory targets reached (TTR) of our method on the GOAL test set. The objects and trajectories are unseen during training*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 问题定位与核心瓶颈
 
@@ -415,6 +411,8 @@ Table 1 从四个维度系统定位了本文贡献：**Full Body**（全身运�
 5. **无参考抓取生成**：如何摆脱对单帧手部参考姿态的依赖，实现全自动的无参考抓取生成——即策略自主根据物体几何和任务目标决定抓取方式？
 
 6. **跨形态迁移**：解耦的身体与手先验框架是否具备向不同形态（如四足机器人上半身操作）迁移的潜力？
+
+
 
 ## 原文 PDF
 

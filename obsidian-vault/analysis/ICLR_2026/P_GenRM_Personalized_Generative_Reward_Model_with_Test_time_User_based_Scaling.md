@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/P_GenRM_Personalized_Generative_Reward_Model_with_Test_time_User_based_Scaling.pdf
+project_link: null
+code_link: https://github.com/Tongyi-ConvAI/Qwen-Character/tree/main/Character-GenRM
 openreview_forum_id: hXNApWLBZG
 aliases:
 - PG
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | P-GenRM：基于测试时用户缩放机制的个性化生成式奖励模型 |
 | 英文题名 | P-GenRM: Personalized Generative Reward Model with Test-time User-based Scaling |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=hXNApWLBZG); [GitHub](https://github.com/Tongyi-ConvAI/Qwen-Character/tree/main/Character-GenRM) |
+| Links | [paper](https://openreview.net/forum?id=hXNApWLBZG) · [GitHub](https://github.com/Tongyi-ConvAI/Qwen-Character/tree/main/Character-GenRM) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | P-GenRM |
 | Dataset | Chatbot Arena-Personalized (8B), PRISM-Personalized (8B), LaMP-QA (cold-start) |
@@ -42,7 +44,7 @@ claims:
 > - PRISM-Personalized (8B) 上，Accuracy (%) 为 65.32，对比 62.84 (FTRM+SynthesizeMe-8B)，变化 +2.48。
 > - LaMP-QA (cold-start) 上，Spearman's ρ (平均) 为 0.638，对比 0.599 (Qwen3-235B-A22B)，变化 +0.039。
 
-## 概述
+## 概要
 
 个性化奖励模型旨在根据用户的历史偏好信号，为不同用户对同一模型输出的主观评价提供精准预测。现有方法面临两个核心瓶颈：其一，将多样化、场景特定的用户偏好过度简化为固定、少量的评估准则，无法捕捉同一用户在不同情境下的偏好变化；其二，面对反馈稀疏的新用户时泛化能力薄弱，难以适应冷启动场景。
 
@@ -52,7 +54,7 @@ P-GenRM 通过两条关键路径突破上述瓶颈。**在建模层面**，它�
 
 在主要基准测试中，P-GenRM-8B 以显著更小的参数规模超越了先前最优的 70B 开源基线模型：Chatbot Arena 子集准确率达 72.68%（对比 FTRM+SynthesizeMe-70B 的 72.05%），PRISM 子集达 65.32%（对比 63.74%）。测试时用户缩放进一步带来约 3 个百分点的增益，且以更少的总评分次数超越了更大的缩放配置。在冷启动评估中，P-GenRM-8B 的平均 Spearman 相关系数（0.638）甚至超越了参数规模大得多的 Qwen3-235B-A22B（0.599）。消融实验证实，过程奖励与结果奖励的任意缺失均会导致性能显著退化，验证了过程级监督的必要性。
 
-## 背景与动机
+
 
 大语言模型（LLM）的快速演进使其在开放域对话、推理与工具使用等任务中展现出前所未有的能力，但如何让模型输出与多样化、动态变化的用户偏好保持精准对齐，始终是制约其实际部署的关键瓶颈。传统的对齐方法——无论是基于人类反馈的强化学习（RLHF）还是直接偏好优化（DPO）——通常假设存在一组普适、固定的评估准则，并通过聚合全体用户的偏好数据来训练单一的奖励模型。这种做法隐含地将“用户”视为同质整体，忽略了不同个体在风格、详细程度、安全性容忍度乃至价值观上的深层差异。
 
@@ -76,7 +78,9 @@ P-GenRM的提出正是为了系统性地突破上述两个瓶颈。其核心洞�
 
 这一设计将个性化奖励建模从“学习固定的用户表示”重新定义为“学习如何根据场景生成适配的评估逻辑”，从根本上回应了偏好动态性与数据稀疏性两大挑战。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 P-GenRM 的核心创新围绕“将个性化奖励建模从静态准则匹配转变为动态、场景自适应的评估链生成”展开。与现有方法相比，它在三个关键维度上实现了根本性转变。
 
@@ -112,7 +116,7 @@ $$s_t^i = \frac{1}{m} \sum_{x=1}^{m} \mathrm{Extract}(S_{t,x}^i) + \frac{1}{n} \
 
 这一机制的关键优势在于：原型层级的迁移使模型能够利用相似用户的偏好信息来补偿目标用户的数据稀疏性，从而显著提升冷启动场景下的泛化能力。实验显示，Ind-16 + Pro-8 配置以更少的总采样次数（24 次）超越了纯个体缩放 Ind-32（32 次）的性能（Table 1），验证了双粒度协同的有效性。在冷启动评估 LaMP-QA 上，P-GenRM-8B（Ind-8, Pro-4）的平均 Spearman 相关系数达到 0.638，甚至超越参数规模大得多的 Qwen3-235B-A22B（0.599）（Table 5）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_hXNApWLBZG/figures/002_Figure_2.jpg]]
 *Figure 2: (a) The three-stage training framework of P-GenRM (b) An illustration of the personalized evaluation chain, showing how preference modeling and derived scoring schemes lead to interpretable, criterion-weighted judgments for responses*
@@ -150,7 +154,7 @@ $$s_t^i = \frac{1}{m} \sum_{x=1}^{m} \mathrm{Extract}(S_{t,x}^i) + \frac{1}{n} \
 - **推理**：模型 $R_\theta$ 生成偏好建模 $P_t^{(u)}$（场景特定人设与偏好分析）和评分过程 $S_t^{(u)}$（加权评分准则与逐响应判断）
 - **输出**：从 $S_t^{(u)}$ 中提取标量分数 $\{s_t^i\}$，经双粒度缩放聚合后得到最终排序
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题形式化
 
@@ -212,7 +216,9 @@ $$s_t^i = \frac{1}{m} \sum_{x=1}^{m} \mathrm{Extract}(S_{t,x}^i) + \frac{1}{n} \
 
 个体层级缩放通过多次采样生成多样化的评分假设，降低单次推断的噪声方差；原型层级缩放从最近邻原型引入相似用户的偏好信息，增强对新用户和稀疏反馈场景的泛化能力。两者结合使得 P-GenRM 以更少的总评分次数（如 Ind-16 + Pro-8）超越单纯扩大个体采样的配置（如 Ind-32）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -280,7 +286,9 @@ P-GenRM在宏观准确率（每个用户组单独计算准确率后取平均）�
 ![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_hXNApWLBZG/figures/012_Table_8.jpg]]
 *Table 8: Distribution of user groups in the PRISM dataset*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：从固定准则到场景自适应偏好建模
 
@@ -325,6 +333,8 @@ P-GenRM 的双粒度测试时用户缩放机制（个体层级并行采样 + 原
 - 在长对话或多轮交互中，用户偏好可能发生漂移，模型如何动态适应这种变化而无需重新生成完整的评估链？
 - 原型数量（当前通过 PCA 保留方差比确定）的自动化选择策略是否可以在线自适应调整？
 - 评估链的可解释性是否可以被下游策略模型直接利用，实现更高效的个性化对齐？
+
+
 
 ## 原文 PDF
 

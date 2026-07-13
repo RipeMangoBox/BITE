@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Probabilistic_Kernel_Function_for_Fast_Angle_Testing.pdf
+project_link: null
+code_link: https://github.com/KejingLu-810/KS
 openreview_forum_id: nCsF3Bsn2n
 aliases:
 - PKFFAT
@@ -31,20 +33,21 @@ claims:
 | 中文题名 | 用于快速角度检测的概率核函数 |
 | 英文题名 | Probabilistic Kernel Function for Fast Angle Testing |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=nCsF3Bsn2n); [GitHub](https://github.com/KejingLu-810/KS) |
+| Links | [paper](https://openreview.net/forum?id=nCsF3Bsn2n) · [GitHub](https://github.com/KejingLu-810/KS) |
 | Topic | #topic/optimization_theory_probabilistic #topic/optimization_theory_probabilistic/probabilistic_methods |
 | Method | Probabilistic Kernel Functions (K_S^1 and K_S^2) and their implementations KS1 / KS2 |
 | Dataset |  |
 
-## 概述
+> [!tip] 效果简介
+> 结果与证据沿用下文“实验与关键发现”中的现有记录；本轮不新增或外推论文事实。
+
+## 概要
 
 高维向量空间中，角度测试（angle testing）——即判断两个向量夹角是否小于给定阈值，或在两个候选向量中选出与查询向量夹角更小的那个——是最大内积搜索（MIPS）、近似最近邻搜索（ANNS）等任务的基础操作。现有方法普遍采用随机投影策略：**CEOs**（Pham, 2021）利用高斯随机向量与极端次序统计量的渐近分布进行角度比较，**PEOs**（Lu et al., 2024）则通过高斯空间划分实现图索引中的概率路由。这两类方法的共同瓶颈在于依赖渐近假设（投影数趋于无穷），导致有限投影下的概率估计精度不足，理论保证不可靠。
 
 本文提出**概率核函数**（Probabilistic Kernel Functions）$K_S^1$ 和 $K_S^2$，分别对应角度比较（Problem 1.1）与角度阈值判定（Problem 1.2）。核心创新在于引入**参考角度**（reference angle）概念，并采用**确定性投影向量结构**（对称结构 $S_{\text{sym}}$ 或交叉多胞形结构 $S_{\text{pol}}$）替代高斯随机投影。这一设计使得投影值与真实角度之间建立起确定性的概率关系，无需渐近条件即可提供严格的概率保证（引理4.2、4.3）。参考角度越小，核函数越精确，从而在理论上优于基于高斯分布的现有方法。
 
 在近似最近邻搜索实验中，HNSW+KS2 相比原始 HNSW 将每秒查询数（QPS）提升 2.5–3 倍，相比当前最优的 HNSW+PEOs 提升 10%–30%，同时索引体积减少约 5%。在 k-MIPS 召回率测试中，KS1（$S_{\text{pol}}$ 结构）在多数情况下达到最高探测精度。该方法在 NSSG 图结构上同样有效，表明其优势独立于底层图索引的选择。
-
-## 背景与动机
 
 高维向量空间中的角度测试是信息检索、推荐系统和相似性搜索的核心操作。给定查询向量 $\mathbf{q}$ 和数据向量 $\mathbf{v}$，角度测试需要回答两类问题：**角度比较**（$\mathbf{q}$ 与 $\mathbf{v}_1$ 的夹角是否小于 $\mathbf{q}$ 与 $\mathbf{v}_2$ 的夹角）和**角度阈值判定**（$\mathbf{q}$ 与 $\mathbf{v}$ 的夹角是否小于给定阈值）。这两类问题在最大内积搜索（MIPS）和近似最近邻搜索（ANNS）中扮演着关键角色。
 
@@ -62,7 +65,7 @@ $$\mathbf{v}^{\top} \mathbf{u}_{\mathrm{max}} \sim \mathcal{N}\left(\mathrm{sgn}
 
 这一思路将精度控制的因果杠杆从“增加投影数量”转移到“优化投影结构”上：参考角度越小，核函数越准确。这意味着，在相同投影数量下，精心设计的确定性结构可以优于纯随机高斯投影——这正是本文提出概率核函数 $\mathrm{K}_S^1$ 和 $\mathrm{K}_S^2$ 的根本动机。
 
-## 核心创新
+## 核心方法与创新机理
 
 本文的核心创新在于**用确定性结构替代高斯随机投影**，从而消除了现有角度测试方法对渐近假设的依赖。具体而言，论文引入了两个关键的概念性改变（changed slots），构成方法层面的根本突破。
 
@@ -94,8 +97,6 @@ $$K_S^2(q, v) = \langle Hq, Z_S(Hv) \rangle / A_S(Hv)$$
 ### 在相似图路由中的应用创新
 
 基于 $K_S^2$，论文提出了 **KS2 测试**——一种新的 $(\delta, 0.5)$-路由测试，用于相似图上的近似最近邻搜索。相比 **PEOs**（Lu et al., 2024）的测试不等式，KS2 测试在形式上更简洁，所需存储的常量更少，且因确定性结构带来的更小参考角度而获得了更高的路由效率。这一改进直接转化为 HNSW+KS2 相比 HNSW+PEOs 10%–30% 的 QPS 提升，以及相比原始 HNSW 2.5–3 倍的加速。
-
-## 整体框架
 
 本文提出了一套基于**参考角度（reference angle）**的概率核函数框架，用于替代传统基于高斯随机投影和渐近假设的角度测试方法。整个框架围绕两个核心问题展开：角度比较（Problem 1.1）与角度阈值判定（Problem 1.2），并为此设计了两个概率核函数 $K_S^1$ 和 $K_S^2$。
 
@@ -132,8 +133,6 @@ $$K_S^2(q, v) = \langle Hq, Z_S(Hv) \rangle / A_S(Hv)$$
 *   **在 ANNS（近似最近邻搜索）中**：KS2 方法基于 $K_S^2$ 设计了一个新的概率路由测试（KS2 test），用于在图搜索（如 HNSW, Malkov & Yashunin, 2020）中提前剪枝。其测试不等式比当前最优的 PEOs 测试（Lu et al., 2024）更简洁，需要存储的常量更少。集成 KS2 后，HNSW 的查询吞吐量（QPS）提升了 2.5–3 倍，索引大小减少了约 5%。
 
 整个框架的输入是向量化的查询和数据点，输出是角度关系的概率性估计或路由决策，其核心优势在于用可控的、确定性的参考角度机制，取代了传统方法中不可靠的渐近高斯假设。
-
-## 核心模块与公式推导
 
 ### 概率核函数设计
 
@@ -194,7 +193,7 @@ $$K_S^{1'}(\boldsymbol{q}, \boldsymbol{v}) = \lVert \boldsymbol{v} \rVert \cdot 
 
 当使用交叉多胞形结构且 $R=1$ 时，可借助快速Johnson-Lindenstrauss变换进一步加速投影计算。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验结论
 
@@ -263,16 +262,13 @@ Tables 4和5分别展示了top-2和top-10投影向量探测设置下的k-MIPS召
 ![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_nCsF3Bsn2n/figures/014_Figure_9.jpg]]
 *Figure 9: Recall-QPS evaluation of ANNS, with NSSG+KS2. k = 10*
 
-![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_nCsF3Bsn2n/figures/003_Figure_2.jpg]]
-*Figure 2: Impact of L (See Appendix D.4 for other datasets). k = 10. The y-axis of the upper figures denotes the additional index cost (%) of HNSW+PEOs compared to the original HNSW. ACKNOWLEDGEMENTS*
-
 ![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_nCsF3Bsn2n/figures/004_Table_2.jpg]]
 *Table 2: Frequently used notations*
 
 ![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_nCsF3Bsn2n/figures/007_Table_3.jpg]]
 *Table 3: Dataset statistics*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 问题背景与现有方法的瓶颈
 

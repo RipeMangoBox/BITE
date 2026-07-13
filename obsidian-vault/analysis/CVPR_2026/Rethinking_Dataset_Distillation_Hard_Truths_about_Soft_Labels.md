@@ -43,7 +43,7 @@ claims:
 > - ImageNet-1K (ResNet-18, HL) 上，Top-1 Accuracy (%) CA2D: 15.25 / 41.72 / 46.32 vs RDED: 14.34 / 38.49 / 44.36 (+0.91 / +3.23 / +1.96)；Top-1 Accuracy (%) CAD-Prune: 12.57 / 40.21 vs EL2N-Best: 10.53 / 38.44 (+2.04 / +1.77)。
 > - ImageNet-1K (ResNet-18, SL+KD) 上，Top-1 Accuracy (%) 最佳coreset (e.g., Forgetting-Easy) ≈ 34.26 / 59.06 / 63.23 vs 随机子集 ≈ 28.82 / 58.10 / 62.87 (微小且接近全数据集性能（~63），性能差距消失)。
 
-## 概述
+## 概要
 
 **核心问题**：数据集蒸馏（Dataset Distillation, DD）旨在将大规模数据集压缩为极小的合成集，使下游模型在其上训练后能逼近在全数据集上的性能。然而，该领域长期依赖**软标签（soft labels）**与**知识蒸馏增强的软标签（SL+KD）**进行评估，这一主流设置掩盖了一个关键事实：**性能几乎完全由计算预算决定，数据子集的大小与质量几乎不带来额外提升**。不同蒸馏方法之间的性能差异在此设置下消失，进步空间接近饱和。与此同时，以轨迹匹配（Trajectory Matching, TM）为代表的小规模蒸馏目标在大模型上失效，损失值恒定且与下游泛化无相关性，暴露出方法可扩展性的严重不足。
 
@@ -57,7 +57,7 @@ claims:
 
 **方法谱系与知识库定位**：CA2D继承并改进了RDED的补丁提取框架，其核心创新在于将**计算感知的coreset选择（CAD-Prune）**前置到合成流程中，替代RDED的无差别补丁选取。在coreset方法谱系中，CAD-Prune与EL2N-Best（Lee & Chung, 2024）形成直接对比——前者以计算对齐的单检查点策略替代后者的滑窗穷举，在保持或超越性能的同时大幅降低选择成本。在DD方法谱系中，CA2D与SRe2L、DWA、D4M、Minimax Diffusion等大规模DD方法的关键区分在于：**完全摒弃软标签监督，在硬标签设置下进行蒸馏与评估**，从而恢复数据质量对性能的贡献。本文提出的DCS（Distillation Correlation Score）为DD领域引入了一种零shot评估蒸馏目标质量的工具，目前可适用于DM等可计算损失目标的方法（Spearman ρ=0.41），但对不可优化目标的方法尚需扩展。
 
-## 背景与动机
+
 
 ### 数据集蒸馏的核心命题与评估困境
 
@@ -85,7 +85,9 @@ claims:
 
 这些发现共同指向一个严峻的现实：在SL+KD设置下，数据集蒸馏领域已接近性能饱和，继续沿此路径难以产生实质性突破。有意义的评估与设计必须转向硬标签场景，并将样本难度与计算预算对齐，才能真正推动该领域的进步。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新并非提出一种全新的数据集蒸馏算法，而是通过系统性地揭示现有评估范式的根本缺陷，将研究重心从“在软标签下设计更复杂的蒸馏目标”转移到“在硬标签下对齐样本难度与计算预算”这一被忽视但更具实质性的方向上。具体而言，创新体现在三个层面：**诊断工具、样本筛选机制、以及蒸馏方法的计算感知重构**。
 
@@ -147,7 +149,7 @@ CA2D的关键洞察在于：**蒸馏集的信息压缩效率取决于源数据�
 
 三项创新的逻辑链条清晰：**DCS提供零成本的质量诊断**，揭示现有蒸馏目标的错位问题；**CAD-Prune将样本筛选与计算预算对齐**，解决了“选什么样本”这一被软标签掩盖的核心问题；**CA2D将计算感知筛选嵌入蒸馏流程**，在不改变蒸馏算法本身的情况下实现显著提升。这一创新路径的本质是**将数据集蒸馏的进步来源从“更好的软标签蒸馏技巧”重新定位到“更好的数据质量与计算预算匹配”**，为领域提供了新的研究方向。
 
-## 整体框架
+
 
 本文的核心主张是：**数据集蒸馏领域的评估与设计范式需要从“软标签主导”转向“硬标签+计算感知”**。为此，作者构建了一套从诊断到方法设计的完整框架，包含三条相互验证的主线：
 
@@ -249,7 +251,7 @@ CA2D的关键洞察在于：**蒸馏集的信息压缩效率取决于源数据�
 - DCS 目前仅适用于可计算代理目标（如损失值）的方法，对于不可优化的 DD 目标尚无法评估。
 - 蒸馏集的训练存在压缩-提取权衡：较小的 IPC 需要明显更多的训练轮次才能充分提取信息（Figure 8），增加了计算成本。
 
-## 核心模块与公式推导
+
 
 ### 3.1 蒸馏相关分数（DCS）
 
@@ -336,7 +338,9 @@ $$\mathcal{L}_{TM}(\mathcal{S}, \mathcal{D}_{\mathrm{train}}) = \frac{\| \hat{\t
 ![[assets/figures/papers/paper_list_l2097_https_arxiv_org_abs_2604_18811/figures/003_Figure_2.jpg]]
 *Figure 2: Analysis of fixed soft label (SL) setting on ImageNet-1K. (Left) Performance of coresets of varying quality and size across different compute budgets. While scaling dataset size and compute together remains essential for performance, dataset quality beyond a minimum IPC value play only a minor role as indicated by the convergence of EL2N-easy and random subsets. (Middle) Score distributions during training in SL setting cluster within the easy–mid difficulty range, showing that variations in underlying sample quality have limited effect when trained with fixed soft labels. (Right) Optimal hardness analysis also reveals that performance variations across sets in SL are far smaller compared t...*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 标签设置对数据高效学习的决定性影响
 
@@ -428,7 +432,9 @@ Figure 8揭示了蒸馏集与coreset在训练动态上的本质差异。蒸馏�
 ![[assets/figures/papers/paper_list_l2097_https_arxiv_org_abs_2604_18811/figures/015_Table_8.jpg]]
 *Table 8: TinyImageNet Cross-Architecture Transfer performance comparison of small-scale DD methods with coresets in HL and SL setting. Model architecture is ConvNet-D4. The substantial performance gap in the HL setting closes when trained with fixed soft labels*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从软标签主导到硬标签回归
 
@@ -465,6 +471,8 @@ Figure 8揭示了蒸馏集与coreset在训练动态上的本质差异。蒸馏�
 **如何构建通用的数据选择-蒸馏联合策略？** CAD-Prune证明了将样本难度与计算预算对齐的有效性，但这一策略目前仅针对硬标签设置设计。是否存在一种通用框架，能够在不同标签设置下自动调整数据质量与计算预算的平衡，是值得探索的方向。
 
 **DCS能否成为蒸馏目标设计的指导工具？** DCS目前作为评估工具使用，但其背后的思想——蒸馏目标应与下游泛化性能相关——是否可以反过来指导新蒸馏目标的设计？例如，直接优化DCS或其可微近似，可能产生更有效的蒸馏损失函数。
+
+
 
 ## 原文 PDF
 

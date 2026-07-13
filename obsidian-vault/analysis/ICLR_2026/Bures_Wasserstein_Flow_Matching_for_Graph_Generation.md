@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Bures_Wasserstein_Flow_Matching_for_Graph_Generation.pdf
+project_link: null
+code_link: null
 openreview_forum_id: 5Bl5qf3fON
 aliases:
 - BBWFM
@@ -42,7 +44,7 @@ claims:
 > - Plain Graph Generation (Planar) 上，A.Ratio ↓ 为 2.4 ± 0.9，对比 3.5 ± 1.7 (DeFoG)，变化 −1.1。
 > - Small Sampling Steps (Planar, 50 steps) 上，V.U.N. ↑ 为 77.0 ± 4.0，对比 22.5 ± 5.0 (DeFoG‑1)，变化 +54.5。
 
-## 概述
+## 概要
 
 图生成任务中，现有扩散模型和流模型在构造概率路径时，通常对节点特征和边进行独立的线性插值。这种做法破坏了图组件之间的相互依赖与协同演化关系，导致训练路径不平滑、速度估计不准确，采样收敛困难。为此，现有方法不得不引入目标引导、时间扭曲等启发式路径操纵技术，增加了模型设计的复杂性。
 
@@ -53,7 +55,7 @@ claims:
 - **方法创新**：利用GraphMRF推导出图分布间的闭式Wasserstein距离，并构造Bures-Wasserstein插值作为流匹配的概率路径。
 - **性能验证**：在平面图和SBM数据集上，BWFlow相比最优基线DeFoG在V.U.N.指标上提升7.3个百分点（84.8 vs. 77.5），A.Ratio降低1.1（2.4 vs. 3.5）。在仅50步采样的条件下，BWFlow在平面图上V.U.N.达77.0，而线性流方法DeFoG-1仅22.5，展现出显著的采样效率优势。消融实验进一步表明，关闭所有路径操纵技术后，BW插值在平面图和SBM上均大幅优于线性、几何和调和插值。
 
-## 背景与动机
+
 
 ### 图生成中的概率路径瓶颈
 
@@ -90,7 +92,9 @@ $$p(\mathcal{G}; G) = p(\mathcal{X}, \mathcal{E}; X, W) \quad \text{其中} \qua
 
 基于此，本文提出 **BWFlow（Bures-Wasserstein Flow Matching）**——一个利用最优概率路径进行图生成的流匹配框架，旨在以数学上更优雅、实践上更稳定的方式解决图生成中的路径构造问题。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 现有图生成流模型（如DeFoG）在构造概率路径时，对节点特征和边结构分别进行独立线性插值，这一做法存在根本性缺陷：**线性插值无法保证图生成中的最优传输位移**（Section 2.2），导致训练路径不平滑、存在尖锐过渡，速度估计不准确。为弥补这一缺陷，现有方法不得不引入目标引导、时间扭曲、随机性注入等启发式路径操纵技术（Figure 1b），但这些策略缺乏理论保证，且增加了采样复杂度。
 
@@ -130,7 +134,7 @@ $$v_t(E_t \mid G_1, G_0) = (1 - 2E_t) \frac{\dot{W}_t}{W_t \circ (1 - W_t)}$$
 
 **需注意的边界条件**：当前推导假设两个图的发射矩阵 $V$ 相同，限制了其对异构图的直接处理能力；路径构造涉及 $O(N^3)$ 的线性代数运算，尽管LSQR近似可在不显著损害生成质量的前提下缓解（Table 6，平面图V.U.N. 85.0 vs. 84.8）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0010_5Bl5qf3fON_Bures-Wasserstein_Flow_Matching_for_Graph_Genera/figures/004_Figure_2.jpg]]
 *Figure 2: Schematic overview of BWFlow, which consists of: a) Sample the marginal graph condition $G _ { 0 }$ and $G _ { 1 }$ ; b) Convert graphs to $\mathbf { M R F s ; c ) }$ Interpolate to get intermediate points; d) Convert back to get $G _ { t } ; \mathrm { e }$ ) Train velocity based on $G _ { t }$ ; and f) Generate new points with the trained velocity
@@ -162,7 +166,7 @@ BWFlow 的整体流程围绕“将图转化为马尔可夫随机场（GraphMRF�
 
 BW 插值涉及 Laplacian 伪逆的矩阵运算，带来额外的 $O(N^3)$ 线性代数开销。论文验证了采用 LSQR 近似矩阵求逆不会明显损害生成质量（Table 6：平面图 V.U.N. 85.0 vs 84.8），为实际部署提供了可行的近似方案。
 
-## 核心模块与公式推导
+
 
 ### 3.1 图马尔可夫随机场（GraphMRF）
 
@@ -224,7 +228,9 @@ $$\mathcal{L}_{\mathrm{CFM}} = \mathbb{E}_{G_1\sim p_1, G_0\sim p_0, t\sim\mathc
 
 **方法优势**：与现有流模型需要启发式路径操纵（目标引导、时间扭曲、随机性注入）不同，BW 插值本身提供平滑路径，无需额外操纵即可保证训练/采样一致性。消融实验（Table 7）证实，在关闭所有路径操纵技术下，BW 插值在平面图和 SBM 上的有效性（V.U.N. 84.75）显著优于线性、几何和调和插值（调和插值 V.U.N. 降至 0.00）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -298,7 +304,9 @@ $$\mathcal{L}_{\mathrm{CFM}} = \mathbb{E}_{G_1\sim p_1, G_0\sim p_0, t\sim\mathc
 ![[assets/figures/papers/iclr26_0010_5Bl5qf3fON_Bures-Wasserstein_Flow_Matching_for_Graph_Genera/figures/003_Figure_1.jpg]]
 *Figure 1: Probability path visualization. Since the probability is intractable, the average maximum mean discrepancy ratio (y-axis) of graph statistics between interpolants and the data points is used as a proxy for the probability. Lower means closer to the data distribution (details in Section I.6)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 在图生成模型中的位置
 
@@ -339,6 +347,8 @@ BWFlow 处于图生成模型中“连续时间流匹配”与“统计关系学�
 4. **排列不变最优传输**：如何将图匹配或图核方法嵌入 BW 距离计算，实现节点排列的自动对齐？这涉及在 BW 测地线求解之前或之中引入离散最优传输，是一个组合优化与连续优化的交叉问题。
 
 5. **异构图马尔可夫随机场**：是否可将 BWFlow 推广到异构图 MRF（如 H2MN）以处理节点类型不同、边类型多样的复杂图结构？这需要重新定义异构图上的联合高斯分布及其 BW 距离。
+
+
 
 ## 原文 PDF
 

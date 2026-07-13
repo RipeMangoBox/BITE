@@ -40,7 +40,7 @@ claims:
 > [!tip] 效果简介
 > - LIBERO-LONG 上，Avg. Success (%) 97.1 vs 88.6 (LBP) (+8.5%)；#Perfect Tasks (100% success) 7/10 vs 未报告（LBP最高可能为部分任务，但无数据） (明显领先)。
 
-## 概述
+## 概要
 
 长程操作任务要求机器人在长时间跨度内顺序执行多个子任务，其核心瓶颈在于**时间鲁棒性**与**空间鲁棒性**的双重缺失。时间维度上，预测误差随规划步数累积，导致计划在时序延伸中崩溃；空间维度上，高层抽象计划难以可靠地接地到连续感知-动作空间，形成规划与执行之间的鸿沟。
 
@@ -48,7 +48,7 @@ claims:
 
 在 **LIBERO-LONG** 长程操作基准上，AGiLe 取得 **97.1%** 的平均成功率，相较此前最好的方法 **LBP**（Liu et al., ICML 2025）的 88.6% 提升 **8.5 个百分点**，并在 10 个任务中的 7 个上达到 100% 成功率。消融实验进一步验证：移除前向评论家使成功率骤降至 89.0%，移除可供性锚定模块则降至 90.5%，确认了两个组件的关键性。在真实世界 6 阶段长程任务中，基线 LBP 的性能随阶段增加急剧崩溃，而 AGiLe 保持了显著更高的鲁棒性，验证了方法从仿真到现实的迁移能力。
 
-## 背景与动机
+
 
 长程操作（long-horizon manipulation）是机器人学习中最具挑战性的问题之一。与短程技能不同，长程任务要求智能体在数百个时间步内顺序完成多个子任务，例如“打开抽屉→取出物品→放置到指定位置”。这种多阶段特性引入了两个相互交织的核心瓶颈：
 
@@ -60,7 +60,9 @@ claims:
 
 AGiLe 的核心动机正是针对这两个缺口：**在时间维度上引入双向验证机制，在空间维度上引入可供性锚定机制，从而联合提升长程操作的鲁棒性**。其核心洞察在于将复杂的长程操作解耦为“做什么”（高层双向规划）和“怎么做”（可供性锚定执行）两个子问题，并通过训练时的知识蒸馏将计划的一致性与可达性约束内化到规划器参数中，使推理时无需额外计算开销即可获得时间鲁棒性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 AGiLe 的核心创新在于将长程操作任务解耦为两个正交但互补的子问题，并通过两项关键设计分别解决：**双向潜在规划**（Bidirectional Latent Planning）解决时间鲁棒性，**可供性锚定**（Affordance Grounding）解决空间鲁棒性。
 
@@ -106,7 +108,7 @@ $$\mathbf{A}, \mathbf{f}_{\mathrm{temp}} = \mathrm{CrossAttn}(\mathrm{Query}=\ma
 
 这两项创新——双向规划提供的**时间鲁棒性**和可供性锚定提供的**空间鲁棒性**——联合构成了 AGiLe 在 LIBERO-LONG 基准上达到 97.1% 平均成功率（超越 LBP 8.5 个百分点）并在 10 个任务中的 7 个上实现 100% 成功率的因果基础。
 
-## 整体框架
+
 
 AGiLe 的整体框架围绕一个核心解耦思想构建：将长程操作任务拆分为“做什么”的高层规划与“怎么做”的低层执行，并分别通过**双向潜在规划**和**可供性锚定**两个模块加以解决。Figure 2 展示了完整的端到端流程。
 
@@ -133,7 +135,7 @@ AGiLe 采用两阶段训练策略：第一阶段联合训练双向规划器并�
 
 > **需人工验证**：当前证据未明确说明两阶段训练中，规划器训练是否依赖专家子目标序列的标注，以及第二阶段训练时规划器是否完全不接收执行反馈。
 
-## 核心模块与公式推导
+
 
 AGiLe 框架的核心由两个关键创新组成：**双向潜在规划器（Bidirectional Latent Planner）** 和 **可供性锚定模块（Affordance Grounding Module）**，分别解决长程操作中的时间鲁棒性与空间鲁棒性问题。
 
@@ -193,7 +195,9 @@ AGiLe 采用两阶段训练策略：**第一阶段**联合训练双向规划器�
 ![[assets/figures/papers/paper_list_l2247_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_AGiLe_Learning_Ro/figures/001_Figure_1.jpg]]
 *Figure 1: The Difference between AGiLe and Existing Methods. AGiLe achieves both temporal and spatial robustness by employing bidirectional latent planning combined with affordance grounding, thereby enhancing the robustness of long-horizon manipulation tasks*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能对比
 
@@ -238,7 +242,9 @@ Table 2 的消融结果直接量化了各组件的独立贡献：
 ![[assets/figures/papers/paper_list_l2247_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_AGiLe_Learning_Ro/figures/003_Figure_3.jpg]]
 *Figure 3: Left: The real-world setup; Right: Visualizations of the sub-task stages of 4 real-world long-horizon manipulation tasks*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -288,6 +294,8 @@ AGiLe 的设计假设决定了其适用范围：
 - **开放世界扩展**：如何将 AGiLe 扩展到更通用的开放世界环境？这需要解决隐空间编码器对域偏移的鲁棒性、可供性锚定模块对全新物体类别的泛化能力，以及规划器对未见任务结构的适应能力。
 - **更紧耦合的范式**：两阶段解耦训练是否限制了规划与执行之间的信息流动？是否存在一种更紧耦合的范式（如联合训练+知识蒸馏的变体），能在保持训练稳定性的同时提升数据效率？
 - **规划粒度的自适应**：当前子目标数量 K 是固定的超参数。是否可以让模型自适应地决定所需的规划步数，以应对不同复杂度的任务？
+
+
 
 ## 原文 PDF
 

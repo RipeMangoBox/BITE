@@ -43,7 +43,7 @@ claims:
 > - MipNeRF360 (OOD) 上，PSNR 17.27 vs 13.88 (+3.39)。
 > - DL3DV (Per-Scene) 上，PSNR 19.57 vs 19.18 (+0.39)。
 
-## 概述
+## 概要
 
 三维场景理解与重建的核心瓶颈在于高质量训练数据的匮乏：真实世界捕获虽真实但视角稀疏离散，合成数据存在域间隙，而扩散生成方法难以提供精确的相机位姿。若简单地从有瑕疵的重建几何中采样新视角，则会放大伪影，严重损害前馈模型的泛化能力。
 
@@ -53,7 +53,7 @@ FreeScale 提出了一条**确定度感知的自由视角生成**路径来解决
 
 **方法定位**：FreeScale 属于数据增广驱动的新视角合成增强框架，与前馈方法（如 LVSM）、基于优化的方法（如 3DGS，Kerbl et al., SIGGRAPH 2023）、扩散增强方法（如 DIFIX3D+）以及几何先验增强方法（如 Nerfbusters）形成互补或增强关系。其独特之处在于将确定度感知的视角图采样作为统一的数据生成策略，同时服务于前馈训练和每场景优化两种范式。
 
-## 背景与动机
+
 
 三维场景理解与重建是计算机视觉的核心任务，其关键瓶颈之一在于可泛化的新视角合成模型受限于训练数据的规模与多样性。当前的前馈式新视角合成方法（如 **LVSM**）虽然在稀疏视角重建上展现出潜力，但其泛化能力严重受制于训练场景的数量与相机轨迹的丰富程度。真实世界捕获数据虽然具备高度真实性，但通常稀疏且离散，难以覆盖大范围相机运动下的视角变化；合成数据虽然可以无限生成，却存在显著的合成-真实域间隙；而基于扩散模型的生成方法尽管能产出逼真图像，却无法提供精确的相机位姿，难以直接用于三维任务训练。
 
@@ -63,7 +63,9 @@ FreeScale 提出了一条**确定度感知的自由视角生成**路径来解决
 
 FreeScale正是针对上述缺口提出的解决方案。其核心动机在于：将不完美的重建场景视为几何代理，而非最终的真值；通过设计确定度感知的采样策略，主动识别那些既能捕捉丰富语义信息、又受重建伪影影响最小的新视角，从而在“信息增益”与“伪影风险”之间取得精细平衡。这一思路将数据增广从被动的几何采样升级为主动的质量引导探索，为突破前馈模型的数据瓶颈提供了新的范式。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FreeScale 的核心创新在于将不完美的三维重建场景转化为几何代理，通过**确定度感知的视角图采样策略**生成高质量、高多样性的自由视角图像，从而同时解决前馈新视角合成模型的数据稀缺问题和每场景三维重建的欠观测问题。
 
@@ -110,7 +112,7 @@ FreeScale 将视角图进一步应用于前馈模型的训练策略设计。传�
 - **视角图的必要性**：与随机加入自由视图（+FV random）相比，基于视角图的选择在两项任务上性能均显著更优（Table 5），且移除视角图导致候选视角冗余度高、训练效果下降（Table 6）。
 - **跨任务泛化**：FreeScale 生成的自由视角数据一致地提升了前馈模型 LVSM 的泛化能力（DL3DV 大运动场景 PSNR 从 18.75 dB 提升至 21.45 dB）和每场景 3DGS 的重建质量（DL3DV、Nerfbusters、Tanks & Temples 三个数据集上均有提升，Table 2）。
 
-## 整体框架
+
 
 FreeScale 的整体流程围绕一个核心洞察展开：**将不完美的重建场景视为几何代理，通过确定度引导的采样策略生成大量高质量、多样化的自由视角图像**。这些生成数据既能扩展训练集以提升前馈模型的泛化能力，又能通过主动不确定性探索增强每场景的 3D 高斯优化。
 
@@ -151,7 +153,7 @@ FreeScale 的整体流程围绕一个核心洞察展开：**将不完美的重�
 ![[assets/figures/papers/paper_list_l2491_https_arxiv_org_abs_2604_10512/figures/001_Figure_1.jpg]]
 *Figure 1: We introduce FreeScale, a framework that scales current scene data by generating free-view images from reconstructed scene geometry, which can be used for feed-forward model training. Training LVSM with an additional 22% of generated free-views significantly improves sparse-view reconstruction from PSNR 18.75 to 21.45, particularly enhancing its generalization to large camera motion*
 
-## 核心模块与公式推导
+
 
 FreeScale 将不完美的 3DGS 重建场景转化为几何代理，通过确定度感知的采样策略生成高质量自由视角图像。整个生成管线包含四个核心模块：场景重建、确定度感知自由视角合成、图像校正增强、以及自由视角引导训练。以下聚焦前三者的关键设计与公式。
 
@@ -219,7 +221,9 @@ $$
 ![[assets/figures/papers/paper_list_l2491_https_arxiv_org_abs_2604_10512/figures/010_Figure_6.jpg]]
 *Figure 6: Comparison of reference image selection. Our view graph identifies the shared visible region with the noisy view (red circle), ensuring accurate image rectification*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -292,7 +296,9 @@ Figure 16 展示了 FreeScale 自由视角生成的两类典型失败案例。�
 
 FreeScale 处于**数据增广驱动的新视角合成**这一研究脉络中。与传统的基于位姿插值或随机采样的数据增广策略不同，FreeScale 首次将重建几何的确定度显式建模为采样指导信号。其核心创新——确定度感知的 WIoU 视角图——在概念上区别于 **DIFIX3D+** 的纯扩散增强路径和 **Nerfbusters** 的几何先验注入路径：前者依赖生成先验修复图像质量，后者通过深度正则化约束几何优化，而 FreeScale 通过主动探索欠观测区域来扩展数据覆盖，从数据层面提升模型的泛化边界。在技术定位上，FreeScale 是一种**模型无关的数据增广框架**，可与各类前馈模型（如 LVSM）和基于优化的方法（如 3DGS）协同工作，其增广数据可作为即插即用的训练资源直接融入现有流程。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心问题域定位
 
@@ -345,6 +351,8 @@ Nerfbusters 代表利用几何先验增强重建的基线方向。FreeScale 在 
 3. **动态场景扩展**：当前方法假设静态场景，对于包含动态物体的场景，确定度网格和视角图的构建逻辑需要重新设计，以区分静态几何和动态区域的可靠性。
 
 4. **与其他数据增广范式的融合**：FreeScale 的确定度感知采样策略是否可与基于生成式模型（如视频扩散模型）的自由视角生成方法互补，在更稀疏的输入条件下联合提升数据多样性？
+
+
 
 ## 原文 PDF
 

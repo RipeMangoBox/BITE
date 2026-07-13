@@ -5,6 +5,8 @@ paper_level: A
 venue: ICML
 year: 2025
 pdf_ref: paperPDFs/ICML_2025/MimicMotion_High_Quality_Human_Motion_Video_Generation_with_Confidence_aware_Pose_Guidance.pdf
+project_link: https://tencent.github.io/MimicMotion
+code_link: null
 aliases:
 - MimicMotion
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | 基于置信度感知姿态引导的高质量人体运动视频生成 |
 | 英文题名 | MimicMotion: High-Quality Human Motion Video Generation with Confidence-aware Pose Guidance |
 | 会议/期刊 | ICML 2025 |
-| Links | [paper](https://arxiv.org/abs/2406.19680); [Project](https://tencent.github.io/MimicMotion) |
+| Links | [paper](https://arxiv.org/abs/2406.19680) · [Project](https://tencent.github.io/MimicMotion) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/generative_models_and_autoencoders |
 | Method | MimicMotion |
 | Dataset | TikTok test split |
@@ -40,7 +42,7 @@ claims:
 > - TikTok test split 上，FVD 为 594，对比 728 (Moore)，变化 -134。
 > - TikTok test split 上，SSIM 为 0.795，对比 0.776 (MagicPose)，变化 +0.019。
 
-## 概述
+## 概要
 
 基于姿态引导的人体运动视频生成面临两个核心瓶颈：**不准确的姿态估计导致生成图像失真（尤其手部区域）**，以及**长视频生成中片段边界平滑性差**。现有方法（如 MagicAnimate、MagicPose、Moore、MuseV）通常将固定颜色的姿态骨架图作为引导信号，忽略了不同关键点估计置信度的差异，使得错误姿态信号直接污染生成过程。
 
@@ -53,8 +55,6 @@ MimicMotion 的核心洞察在于将**姿态估计置信度**融入引导信号�
 该方法以 Stable Video Diffusion（SVD）为基础模型，通过 PoseNet 提取姿态序列特征并注入时空 U-Net 的第一卷积层，同时利用 CLIP 编码器提取参考图像语义特征进行交叉注意力引导。渐进式潜变量融合为训练无关的推理策略，在去噪过程中平滑过渡重叠视频段的潜变量。
 
 在 TikTok 数据集零样本评估（模型未在该数据集训练）中，MimicMotion 在所有指标上达到最优：FID-VID 为 9.3（Moore 为 12.4），FVD 为 594（Moore 为 728），SSIM 为 0.795，PSNR 为 20.1。消融实验证实，置信度感知姿态引导与手部区域增强在所有指标上带来提升，渐进式潜变量融合显著改善 FVD 分数，表明更好的时间连贯性。用户偏好研究进一步显示，参与者一致偏好 MimicMotion 的生成结果。
-
-## 背景与动机
 
 基于姿态引导的人体运动视频生成旨在从单张参考图像和一段驱动姿态序列出发，合成一段目标人物执行指定动作的视频。该技术在虚拟数字人、影视特效、社交媒体内容创作等领域具有广泛的应用前景。然而，现有方法在生成质量上面临两个核心瓶颈。
 
@@ -70,7 +70,7 @@ MimicMotion 的核心洞察在于将**姿态估计置信度**融入引导信号�
 
 这两个动机共同指向一个目标：在保持高帧质量的前提下，显著提升人体运动视频的时间连贯性，使生成结果在视觉真实感和运动流畅性上同时达到领先水平。
 
-## 核心创新
+## 核心方法与创新机理
 
 MimicMotion 的核心创新围绕一个中心洞察展开：**将姿态估计的置信度显式引入生成过程的引导与监督，使模型能够自适应地调节对不可靠姿态信号的依赖**，从而在帧质量与时间连续性之间取得平衡。围绕这一思想，方法在三个关键维度上对现有姿态引导视频生成范式进行了系统性改造。
 
@@ -95,8 +95,6 @@ MimicMotion 将置信度信息编码进姿态表示本身：**关键点与肢干
 ### 创新之间的协同关系
 
 三个创新并非孤立设计：置信度感知的姿态引导为手部区域增强提供了可靠的掩码生成基础（只有高置信度的手部才被加权）；手部增强反过来强化了模型对姿态引导中高置信信号的响应；渐进式融合则确保这些帧级质量改进能够平滑地扩展到任意长度的视频。这种协同使得 MimicMotion 在 TikTok 测试集上以零样本方式全面超越现有方法——FID-VID 降至 9.3，FVD 降至 594，SSIM 达到 0.795（Table 1）。
-
-## 整体框架
 
 ![[assets/figures/papers/paper_list_l7_MimicMotion_High_Quality_Human_Motion_Video_Generation_with_Confidence_a/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of our approach for long video generation. The colored boxes represent latent video frames. $\mathbf { A }$ darker color means a higher weight. The dashed boxes represent video frame features involved in latent fusion*
@@ -139,8 +137,6 @@ MimicMotion 的关键创新在于将姿态估计的置信度分数显式地融�
 | 去噪 | 噪声潜变量 + 条件特征 | 去噪潜变量 | Spatiotemporal U-Net |
 | 融合（长视频） | 相邻段的重叠潜变量 | 平滑过渡的潜变量序列 | Progressive Latent Fusion |
 | 解码 | 去噪/融合后的潜变量 | 视频帧序列 | VAE Decoder（含时序层） |
-
-## 核心模块与公式推导
 
 MimicMotion 以预训练 Stable Video Diffusion (SVD) 为基座，构建图像到视频的扩散生成管线。其核心架构由五个模块构成，其中推理阶段的渐进式潜变量融合为训练无关策略。
 
@@ -190,7 +186,7 @@ $$\mathbf{z}_i^j = j \lambda_{\mathrm{fusion}} \mathbf{z}_i^j + (1 - j \lambda_{
 
 其中 $j \in [1, C]$ 表示当前段中重叠帧的索引。该规则使靠近片段中心的帧保留较高权重，边界处则逐渐过渡至相邻片段的特征，从而避免简单平均融合造成的权重突变和边界闪烁伪影。此策略完全集成于推理阶段的去噪循环中，无需额外训练。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 定量评估与基准对比
 
@@ -248,13 +244,7 @@ Table 2 系统消融了三个核心模块：手部区域增强（hand）、置�
 - 跨域生成（卡通/动物）缺乏定量指标系统评估。
 - 方法能否扩展至文本、深度等其他条件引导的人类视频生成尚未探索。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l7_MimicMotion_High_Quality_Human_Motion_Video_Generation_with_Confidence_a/figures/015_Figure.jpg]]
-
-![[assets/figures/papers/paper_list_l7_MimicMotion_High_Quality_Human_Motion_Video_Generation_with_Confidence_a/figures/019_Figure.jpg]]
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 **方法定位与基线关系**
 

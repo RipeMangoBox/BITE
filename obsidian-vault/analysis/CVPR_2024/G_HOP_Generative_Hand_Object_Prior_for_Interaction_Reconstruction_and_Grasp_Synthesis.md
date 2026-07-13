@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2024
 pdf_ref: paperPDFs/CVPR_2024/G_HOP_Generative_Hand_Object_Prior_for_Interaction_Reconstruction_and_Grasp_Synthesis.pdf
+project_link: https://judyye.github.io/ghop-www
+code_link: null
 aliases:
 - GH
 - GHGHOPIRGS
@@ -41,7 +43,7 @@ claims:
 > - HOI4D (重建) 上，F@5mm ↑ 0.76 vs 0.62 (DiffHOI) (+0.14)；CD ↓ 0.4 vs 0.8 (DiffHOI) (-0.4)。
 > - HO3D (抓取合成) 上，Sim Disp. avg ↓ 0.95 vs 2.32 (GraspTTA) (-1.37)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -66,8 +68,6 @@ G-HOP属于**3D联合生成先验**范式，区别于2D条件扩散先验（Diff
 
 当前方法依赖物体类别文本作为条件，限制了在未知类别上的泛化能力；缺乏显式的物理接触约束机制，可能导致手物穿透；训练数据总量有限（155类，呈长尾分布）。未来方向包括：探索开放类别的交互先验、融入物理仿真约束、利用互联网规模视频数据进行扩展训练，以及将方法拓展至双手协同操作等更复杂的交互场景。
 
-## 背景与动机
-
 手与物体的交互是人类日常活动的核心，从拿起杯子到操作工具，无不依赖精确的手-物协调。在计算机视觉与图形学中，对这种交互进行三维建模是重建、抓取合成、机器人操作等任务的基础。然而，构建一个能够同时生成手和物体三维形状、并捕捉二者联合分布的通用先验模型，至今仍是一个开放挑战。
 
 现有方法在这一问题上存在两个结构性的瓶颈。首先，**缺乏统一的表示空间**。手通常由低维的MANO姿势参数向量表示，而物体则用高分辨率的三维占据场或符号距离场（SDF）描述，二者处于异构的表示空间中，难以被同一个生成模型直接处理。其次，**无法建模手与物体的联合分布**。以DiffHOI为代表的现有工作通常以手姿态为条件生成物体，即建模条件分布 *p*(O|H, C)，而非联合分布 *p*(O, H|C)。这种单向的条件生成割裂了手与物体之间的双向约束关系——不仅手的姿态决定了物体的合理位置，物体的形状和功能同样约束了手的抓取方式。
@@ -76,7 +76,7 @@ G-HOP属于**3D联合生成先验**范式，区别于2D条件扩散先验（Diff
 
 G-HOP的提出正是为了弥合上述缺口。其核心动机在于：**如果能在统一的三维网格空间中训练一个去噪扩散模型来联合生成手和物体，那么该模型就可以作为通用先验，通过测试时优化为下游任务提供高质量的形状和相对位姿约束**。这一思路的关键在于将手部姿态转换为骨骼距离场（Skeletal Distance Field）——一种与物体潜在SDF同质的三维网格表示——从而使得扩散模型能够在一个统一的“交互网格”空间中学习手-物交互的联合分布。由此，该先验既可用于指导视频重建中的场景参数优化，也可用于评估和筛选生成的抓取姿态，在两个任务上均展现出对现有方法的显著提升。
 
-## 核心创新
+## 核心方法与创新机理
 
 G-HOP 的核心创新在于将手-物交互建模从“以手为条件生成物体”的范式升级为**3D联合生成范式**，并通过三个关键设计实现这一转变。
 
@@ -123,8 +123,6 @@ $$\nabla_{\mathbf x} \log p(\mathbf x) \approx \nabla_{\mathbf x} L_{SDS}[\mathb
 | 先验空间 | 2D图像空间（DiffHOI） | 3D交互网格空间 |
 | 生成方式 | 条件生成 $p(O\|H,C)$ | 联合生成 $p(O,H\|C)$ |
 | 测试时优化 | 任务特定损失 | 统一SDS梯度引导 |
-
-## 整体框架
 
 G-HOP 的整体框架围绕一个核心设计展开：将手-物交互转化为统一的 3D 表示——“交互网格”（interaction grid），并在该空间上训练一个去噪扩散模型作为生成式先验。这一先验既可独立生成多样化的手-物交互，也能通过得分蒸馏采样（Score Distillation Sampling, SDS）为下游任务（视频重建与抓取合成）提供测试时优化约束。整个 pipeline 包含训练与推理两个阶段，模块关系如图 2 所示。
 
@@ -185,8 +183,6 @@ $$s(\theta, \mathbf{T}_{oh}) = -\sum_{i=1}^{T} w_i \| \mathbf{x}(\theta, \mathbf
 ![[assets/figures/papers/paper_list_l1715_G_HOP_Generative_Hand_Object_Prior_for_Interaction_Reconstruction_and_Gr/figures/002_Figure_2.jpg]]
 *Figure 2: Method Overview of Generative Hand-Object Prior: Hand-object interactions are represented as interaction grids within the diffusion model. This interaction grid concatenates the (latent) signed distance field for object and skeletal distance field for the hand. Given a noisy interaction grid and a text prompt, our diffusion model predicts a denoised grid. To extract 3D shape of HOI from the interaction grid, we use decoder to decode object latent code and run gradient descent on hand field to extract hand pose parameters*
 
-## 核心模块与公式推导
-
 G-HOP 的核心架构由三个关键模块构成：**交互网格构建**、**3D 扩散模型训练**，以及**测试时得分蒸馏优化**。以下逐一展开其设计逻辑与数学形式。
 
 ### 交互网格：同质化的手-物 3D 表示
@@ -227,18 +223,7 @@ $$s(\theta, \mathbf{T}_{oh}) = -\sum_{i=1}^{T} w_i \| \mathbf{x}(\theta, \mathbf
 
 在低分辨率交互网格优化完成后，G-HOP 引入 **Mesh 精细化**步骤：用原始物体网格替换优化后的物体表示，进一步调整手部以减少穿透并改善接触质量。该模块不涉及额外可学习参数，属于确定性后处理。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1715_G_HOP_Generative_Hand_Object_Prior_for_Interaction_Reconstruction_and_Gr/figures/003_Figure_3.jpg]]
-*Figure 3: Reconstructing Interaction Clips: We parameterize HOI scene as object implicit field, hand pose, and their relative transformation (left). The scene parameters are optimized with respect to the SDS loss on extracted interaction grid and reprojection loss (right)*
-
-![[assets/figures/papers/paper_list_l1715_G_HOP_Generative_Hand_Object_Prior_for_Interaction_Reconstruction_and_Gr/figures/004_Figure_4.jpg]]
-*Figure 4: Grasp Synthesis: We parameterize human grasps via hand articulation parameters and the relative hand-object transformation (left). These are optimized with respect to SDS loss by converting grasp (and known shape) to interaction grid (right)*
-
-![[assets/figures/papers/paper_list_l1715_G_HOP_Generative_Hand_Object_Prior_for_Interaction_Reconstruction_and_Gr/figures/017_Figure_13.jpg]]
-*Figure 13: Comparing Hand Representation in Generative Hand-Object Prior: Top 2 rows show the diffusion model that represents hand shape as pose parameters; bottom 2 rows show the diffusion model (ours) that represents hand shape as skeletal distance field. The homogeneous grid space is easier for the network to reason about interaction*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 主任务结果
 
@@ -262,12 +247,6 @@ Figure 7 的定性对比显示，G-HOP 重建的手-物空间关系更准确，�
 *Table 2: Comparison with Baselines: We compare our synthesised human grasps against GraspTTA [24] and annotated grasps provided by datasets (GT) on HO3D and 3DW. We report table the intersection between meshes, displacement distance in simulation, and hand contact ratio and area (top). We also report preference percentages from users for pairwise method comparison on HO3D and 3DW (bottom)*
 
 Figure 10 的手部接触概率可视化揭示了一个关键差异：G-HOP 的接触分布集中在指尖和手掌等功能性区域，而 GraspTTA 的接触模式更分散，缺乏明确的功能性约束。Figure 11 的多样性对比表明，虽然 GraspTTA 生成更多样的抓取姿态，但其中部分抓取忽略了物体的功能语义（如电钻的扳机位置），G-HOP 则更好地保持了功能合理性。
-
-![[assets/figures/papers/paper_list_l1715_G_HOP_Generative_Hand_Object_Prior_for_Interaction_Reconstruction_and_Gr/figures/014_Figure_11.jpg]]
-*Figure 11: Grasp Diversity: 10 random grasps of a power drill. Although GraspTTA generates more diverse grasps, some of them are not plausible as they disregard object functions*
-
-![[assets/figures/papers/paper_list_l1715_G_HOP_Generative_Hand_Object_Prior_for_Interaction_Reconstruction_and_Gr/figures/011_Figure_10.jpg]]
-*Figure 10: Contact Map on Hand: We visualize contact probability on hand over all generated samples from G-HOP and GraspTTA [24] on the HO3D dataset*
 
 ### 消融实验
 
@@ -313,12 +292,7 @@ Table 10 对比了网格精细化前后的抓取质量。精细化步骤（在�
 - **Table 8**：动态噪声阈值和文本提示模板对重建质量有不可忽视的影响。
 - **Table 3**：SDS 排名分数可初步筛选抓取质量，但区分度仍有提升空间。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1715_G_HOP_Generative_Hand_Object_Prior_for_Interaction_Reconstruction_and_Gr/figures/005_Figure_5.jpg]]
-*Figure 5: Dataset Statistics: number of training samples for each category when training our generative prior. Zoom in for better view*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 问题定位与核心瓶颈
 

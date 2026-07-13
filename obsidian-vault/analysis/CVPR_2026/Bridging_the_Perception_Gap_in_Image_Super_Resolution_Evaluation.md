@@ -44,7 +44,7 @@ claims:
 > - User Study (RealSR) 上，SRCC 0.504 vs 0.452 (DeQA-Score) / 0.187 (MANIQA original) (+0.052 / +0.317)。
 > - User Study (DRealSR) 上，SRCC 0.529 vs 0.437 (DeQA-Score) / 0.284 (MANIQA original) (+0.092 / +0.245)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -92,7 +92,7 @@ RQI在涵盖7种SOTA SR模型和5个基准的用户研究中表现出色（Table
 
 RQI分数仅在共享同一参考图像时才有意义，无法用于跨内容质量比较；其主要衡量感知质量而非像素级保真度；在极低分辨率数据集上性能略逊于基于大规模预训练LLM的DeQA-Score。未来方向包括：将RQI框架泛化到其他图像恢复任务、设计更原则性的保真度度量、探索MOS差值的非线性建模，以及研究其在扩散模型训练中的应用。
 
-## 背景与动机
+
 
 ### 图像超分辨率评估的感知鸿沟
 
@@ -116,7 +116,9 @@ RQI分数仅在共享同一参考图像时才有意义，无法用于跨内容�
 
 本文的核心动机在于：**能否设计一种通用且轻量的评估框架，在不依赖SR特定数据采集的前提下，系统性地弥合SR评估中的感知差距？** 关键洞察是：与其让模型学习“这张图像有多好”的绝对判断，不如让模型学习“这两张图像中哪一个更好”的相对比较——这正是人类感知判断的基本运作方式。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 RQI框架的核心创新在于将图像超分辨率评价从**绝对质量预测**范式转变为**相对质量比较**范式。这一转变通过三个关键的“changed slots”实现，直接回应了现有指标与人类感知之间的根本性不一致。
 
@@ -150,7 +152,7 @@ Huber损失的核心优势在于：对于较小的预测误差（$\leq \delta$�
 
 RQI并非一个全新的IQA模型，而是一个**训练框架**。它可以应用于任意现有的双输入IQA架构（论文验证了AHIQ、MANIQA、TOPIQ三种架构），仅需移除最后的激活层以允许输出正负值，并改用Huber损失进行相对差异回归。这一“即插即用”的特性使得RQI具有高度通用性——Table 2显示，在三个IQA模型和三个训练集上，RQI框架相比传统FR训练一致提升SRCC，在DRealSR上平均提升达0.146，在Set5&Set14上平均提升达0.138。
 
-## 整体框架
+
 
 ### 核心思路：从绝对评分到相对比较的范式转换
 
@@ -208,7 +210,7 @@ RQI 框架的设计赋予其三个区别于传统指标的关键性质：
 
 RQI 分数仅在**共享同一参考图像**时才有意义，无法用于不同内容图像之间的跨图像质量比较。此外，RQI 主要衡量感知质量而非像素级保真度，对于纹理精细重建的绝对保真度评估仍有待探索。
 
-## 核心模块与公式推导
+
 
 ### 训练数据构造模块
 
@@ -250,7 +252,9 @@ RQI训练方案与传统FR-IQA训练方案存在三个本质差异（Figure 2）
 ![[assets/figures/papers/paper_list_l740_https_arxiv_org_abs_2503_13074/figures/002_Figure_1.jpg]]
 *Figure 1: Visual illustration of how SR evaluation challenges current metrics in different aspects. Zoom in for better comparison*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 用户感知一致性主实验
 
@@ -334,7 +338,9 @@ Table 4展示了将RQI作为辅助感知损失（$ \mathcal{L} = \mathcal{L}_{or
 ![[assets/figures/papers/paper_list_l740_https_arxiv_org_abs_2503_13074/figures/016_Figure_10.jpg]]
 *Figure 10: Perception-based FR-IQA metrics LPIPS [58] and DISTS [14] can fail when GT quality is relatively lower. They make contradictory evaluations for models that output perceptually higher results than GTs*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 全参考评价方法的演进与RQI的定位
 
@@ -377,6 +383,8 @@ RQI的设计隐含以下适用边界，使用时需严格注意：
 **扩散模型的适配**：将RQI损失用于扩散模型训练时，是否会对采样多样性或模式覆盖产生影响，目前尚无研究。考虑到扩散模型在SR领域的快速增长，这一问题的解答具有现实紧迫性。
 
 **无MOS标注的自适应训练**：RQI对MOS标注的依赖限制了其在无标注数据上的应用。能否通过自监督或弱监督方式构建相对质量关系，是提升框架通用性的关键方向。
+
+
 
 ## 原文 PDF
 

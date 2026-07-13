@@ -41,7 +41,7 @@ claims:
 > - Gait3D 上，Rank-1 accuracy 80.5% vs 75.7% (Backbone + Global Head) (+4.8%)。
 > - SUSTech1K 上，Overall Rank-1 accuracy 79.9% (outperforms all previous single-representation methods)。
 
-## 概述
+## 概要
 
 步态识别在远距离、非配合场景下具有独特优势，但野外环境中的遮挡、视角变化和衣着差异使其仍极具挑战。近年来，基于人体解析序列的方法（如 **ParsingGait** (Zheng et al., ACM MM 2023) 和 **XGait** (Zheng et al., ACM MM 2024)）通过引入细粒度的身体部件信息，取得了显著进展。然而，现有方法无论是基于 CNN 还是 GCN，都仅能建模身体部位之间或时间帧之间的成对关系，忽略了复杂的高阶非线性相关性，导致解析序列中丰富的空间-时间信息未被充分利用。
 
@@ -49,15 +49,13 @@ claims:
 
 在 Gait3D 和 SUSTech1K 两个大规模野外步态数据集上，HyperGait 仅使用解析输入即达到 **80.5%** 和 **79.9%** 的 Rank-1 准确率，显著超越所有单模态方法。消融实验表明，SHCM 和 THCM 的组合相较基线（Backbone + Global Head）提升 **4.8%**，且分别优于其 GCN 对应模块 0.5% 和 1.1%，验证了超图结构相对于传统图卷积的明确优势。定性结果进一步显示，HyperGait 在遮挡和极端视角下仍保持鲁棒，而 ParsingGait 和 XGait 则出现明显错误。
 
-## 背景与动机
-
 步态识别因其远距离、非侵入的特性，在安防监控、身份认证等领域具有重要应用价值。然而，野外环境中的复杂因素——遮挡、极端视角、衣着变化、携带物等——使得基于传统RGB剪影的步态识别方法面临严峻挑战。人体解析（human parsing）序列能够提供像素级的身体部件语义标签，理论上对衣着和携带物变化具有更强的鲁棒性，因此近年来成为步态识别的研究热点。
 
 现有的基于解析的步态识别方法主要采用两类架构：卷积神经网络（CNN）和图卷积网络（GCN）。CNN类方法（如 **ParsingGait**，Zheng et al., ACM MM 2023）将解析序列视为多通道图像，通过卷积操作提取全局外观特征，但这种方式本质上忽略了不同身体部件之间的结构化关系。GCN类方法（如 **XGait**，Zheng et al., ACM MM 2024）将身体部件建模为图的节点，通过边连接来捕获部件间的成对关系。然而，步态序列中蕴含着复杂的**非线性高阶相关性**——例如，行走时头部、躯干、四肢的运动并非两两独立，而是多部件协同配合的结果；同时，不同时间帧之间的步态模式也存在跨帧的多路依赖关系。传统的图卷积受限于仅能建模成对关系，无法充分捕获这种高阶空间-时间信息，导致解析序列中丰富的结构信息未能被充分利用（Figure 1）。
 
 超图（hypergraph）作为一种广义的图结构，其超边可以连接任意数量的节点，天然适合建模多部件、多帧之间的多路高阶依赖关系（Figure 2）。基于这一洞察，本文提出 **HyperGait** 框架，通过引入超图卷积网络（HGCN），显式捕获步态解析序列中的高阶空间关系和时间相关性，从而释放解析数据在野外步态识别中的全部潜力。
 
-## 核心创新
+## 核心方法与创新机理
 
 HyperGait 的核心创新在于**引入超图（Hypergraph）建模步态解析序列中的高阶依赖关系**，从而突破了现有 CNN 与 GCN 方法仅能捕捉成对（pairwise）关系的根本局限。其创新点集中体现在三个关键“变动槽”（changed slots）上。
 
@@ -94,8 +92,6 @@ $$\mathbf{F}_{out}^{i} = \mathrm{Concat}(\mathbf{F}_{g}^{i}, \mathbf{F}_{s}^{i},
 - **SHCM + THCM 组合**：Rank-1 总计提升 4.8%（基线 75.7% → 80.5%），远超 GCN 变体组合的 2.4% 增益，确证超图架构是性能跃升的核心因果旋钮。
 
 定性结果（Figure 4）进一步表明，在遮挡和极端视角等野外条件下，HyperGait 的检索结果明显优于 ParsingGait 和 XGait，验证了高阶关系建模带来的鲁棒性提升。
-
-## 整体框架
 
 HyperGait 的整体架构围绕一个核心洞察展开：步态解析序列中蕴含的身体部件间高阶空间关系与跨帧高阶时序依赖，天然适合用超图而非普通图来建模。为此，框架设计了三条并行的特征提取通路，最终通过拼接融合形成判别性步态表征。
 
@@ -134,8 +130,6 @@ HyperGait 的整体架构围绕一个核心洞察展开：步态解析序列中�
 
 ![[assets/figures/papers/paper_list_l1064_https_openaccess_thecvf_com_content_CVPR2026_html_Zheng_HyperGait_Unleas/figures/003_Figure_3.jpg]]
 *Figure 3: The overall architecture of the HyperGait framework, which contains a Global Head, a Spatial Hypergraph Convolution Module (SHCM), and a Temporal Hypergraph Convolution Module (THCM). First, mid-level feature F is extracted from input by backbone. Subsequently, F is processed through the Global Head to yield the global feature*
-
-## 核心模块与公式推导
 
 HyperGait 的整体框架由三个关键模块构成：Global Head、空间超图卷积模块（SHCM）和时间超图卷积模块（THCM），如 Figure 3 所示。输入帧首先经过 Backbone 提取中层特征图 $\mathbf{F}^{i} = F(\mathbf{x}^{i})$，随后该特征分别送入三个分支，最终将三路输出拼接得到判别性步态表示。
 
@@ -185,12 +179,7 @@ $$\mathbf{F}_{out}^{i} = \mathrm{Concat}(\mathbf{F}_{g}^{i}, \mathbf{F}_{s}^{i},
 
 其中 $\mathbf{F}_{g}^{i}$ 为全局特征，$\mathbf{F}_{s}^{i}$ 为空间超图特征，$\mathbf{F}_{t}^{i}$ 为时序超图特征。该融合方式使模型同时保留全局外观、部件间高阶空间关系和跨帧高阶时序动态，互补构成强判别力表示。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1064_https_openaccess_thecvf_com_content_CVPR2026_html_Zheng_HyperGait_Unleas/figures/001_Figure_1.jpg]]
-*Figure 1: Comparative analysis of the data utilization capability of parsing input among models employing Convolutional Neural Network (CNN), Graph Convolutional Networks (GCN), and our proposed Hypergraph Convolutional Network (HGCN). Data utilization capability is evaluated based on whether spatial part-level information and temporal information are fully utilized*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -235,19 +224,10 @@ HyperGait 在两大野外步态识别基准上均取得领先性能，仅使用�
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l1064_https_openaccess_thecvf_com_content_CVPR2026_html_Zheng_HyperGait_Unleas/figures/008_Table_4.jpg]]
-*Table 4: Analysis of spatial hypergraph construction strategies on the Gait3D dataset*
-
-![[assets/figures/papers/paper_list_l1064_https_openaccess_thecvf_com_content_CVPR2026_html_Zheng_HyperGait_Unleas/figures/006_Table_5.jpg]]
-*Table 5: Analysis of temporal hypergraph construction strategies on the Gait3D dataset*
-
 ![[assets/figures/papers/paper_list_l1064_https_openaccess_thecvf_com_content_CVPR2026_html_Zheng_HyperGait_Unleas/figures/009_Figure_4.jpg]]
 *Figure 4: Some exemplar results of Parsinggait, XGait, and our HyperGait. For convenience, we choose the middle frame and the frames with four intervals before and after it for visualization. The blue bounding boxes are queries. The green bounding boxes are the correctly matched results, while the red bounding boxes are the wrong results. The (a) - (c) represent the results under different queries, where the first row of each is the search result of Parsinggait, the second row is the result of XGait, and the third row is the result of HyperGait*
 
-![[assets/figures/papers/paper_list_l1064_https_openaccess_thecvf_com_content_CVPR2026_html_Zheng_HyperGait_Unleas/figures/010_Figure_5.jpg]]
-*Figure 5: The heatmaps of*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 与现有步态识别范式的继承与突破
 

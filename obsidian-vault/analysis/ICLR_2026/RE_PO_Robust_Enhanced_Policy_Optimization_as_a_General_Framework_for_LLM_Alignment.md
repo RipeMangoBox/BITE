@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/RE_PO_Robust_Enhanced_Policy_Optimization_as_a_General_Framework_for_LLM_Alignment.pdf
+project_link: https://repo-alignment.github.io/
+code_link: null
 aliases:
 - RPREPO
 - RE-PO
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | RE-PO: 作为大语言模型对齐通用框架的鲁棒增强策略优化 |
 | 英文题名 | RE-PO: Robust Enhanced Policy Optimization as a General Framework for LLM Alignment |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=jDKpOvTCM8); [Project](https://repo-alignment.github.io/) |
+| Links | [paper](https://openreview.net/forum?id=jDKpOvTCM8) · [Project](https://repo-alignment.github.io/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/language_speech_and_dialog |
 | Method | RE-PO (Robust Enhanced Policy Optimization) |
 | Dataset | AlpacaEval 2 |
@@ -41,13 +43,13 @@ claims:
 > - AlpacaEval 2 上，WR (Raw Win Rate, %) 为 33.0 (RE-DPO)，对比 28.6 (DPO)，变化 +4.4。
 > - AlpacaEval 2 上，LC (%) 为 48.3 (RE-IPO)，对比 43.6 (IPO)，变化 +4.7。
 
-## 概述
+## 概要
 
 大规模偏好数据集中广泛存在的标注错误与噪声是当前大语言模型对齐训练的主要瓶颈：标准对齐方法（如 DPO、IPO）对所有偏好对一视同仁，容易过拟合不可靠的监督信号，严重损害模型的性能与泛化能力。针对这一问题，本文提出 **RE-PO（Robust Enhanced Policy Optimization）**——一种通用的鲁棒增强策略优化框架。其核心思路是将每个偏好标签的正确性建模为潜在变量，并采用期望最大化（EM）算法联合推断样本的标签置信度与标注者可靠性。在 E-step 中，算法计算每个样本标签为正确的后验概率 `w_i`（Equation 4）；在 M-step 中，将这些置信度作为自适应权重融入偏好损失，从而动态强调可靠数据、抑制噪声标签对策略更新的影响（Equation 5）。该机制可即插即用于 DPO、IPO、SimPO、CPO 等多种现有对齐算法（Table 1），提供统一的噪声鲁棒性增强。
 
 实验在 Mistral-7B 和 Llama-3-8B 两个基座模型上验证了 RE-PO 的增益。以 AlpacaEval 2 为基准，RE-DPO 将 Mistral-7B 的 LC（长度控制胜率）从 28.5% 大幅提升至 35.5%，WR（原始胜率）从 28.6% 提升至 33.0%（Table 2）；RE-IPO 在 Llama-3-8B 上实现 LC 43.6%→48.3%、WR 41.6%→48.6% 的提升。在含多个真实标注者的 MultiPref 数据集上，RE-DPO 同样带来显著且一致的性能进步（Table 3），且对评判模型的变化保持稳健（Table 7）。受控合成噪声实验进一步证实，RE-PO 估计的标注者可靠性与 GPT-4o 的真实可靠性高度吻合（Figure 2）。定性案例显示，RE-PO 对疑似的误标注赋予极低的后验置信度（`w_i≈0.037`），从而在训练中有效衰减其影响（Table 5）。RE-PO 仅引入约 11% 的平均训练时间开销，以轻量的代价实现了可观的鲁棒性提升（Table 8）。
 
-## 背景与动机
+
 
 当前大语言模型对齐的核心范式依赖于人类偏好数据，通过直接偏好优化（DPO）等损失函数将模型策略拉向“胜者”响应。然而，现实中的大规模偏好数据集（如UltraFeedback）普遍由多位标注者生成，受主观判断、标注规范不一致或自动标注偏差影响，包含大量噪声。标准对齐方法平等对待每一个偏好标签，在不可靠监督信号上直接最小化损失，容易过拟合噪声，导致对齐性能和泛化能力显著下降。
 
@@ -57,7 +59,9 @@ RE-PO的提出正是为了弥补以上缺口。核心动机是将标签正确性
 
 此动机的有效性已被多维度证据支持。在受控合成噪声实验中，RE-PO估计的标注者可靠性与真实参考值（由GPT-4o判定）高度吻合，验证了其噪声恢复能力（Figure 2）。在Mistral-7B上，仅将标准DPO替换为RE-DPO，AlpacaEval 2的长度控制胜率（LC）即从28.5%大幅提升至35.5%（+7.0个百分点，Table 2），表明数据噪声是实际对齐瓶颈，且RE-PO的加权策略能有效缓解该瓶颈。定性案例进一步显示，RE-PO对明显违反输出格式的错误偏好标签赋予极低后验置信度（如w_i≈0.037），并在训练中成功将其影响压低（Table 5）。这些结果为RE-PO的动机提供了坚实的实证基础：**通过概率推断区分标签可信度，是实现噪声鲁棒对齐的关键一步**。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 现有对齐方法（如 DPO、IPO、SimPO、CPO）在大规模偏好数据上训练时，面临一个共同瓶颈：数据集中广泛存在的标注错误和不可靠反馈会严重损害对齐性能和泛化能力（real_bottleneck）。标准损失函数将所有样本平等对待，导致模型过拟合噪声标签；简单的标签平滑或基于全局噪声率的鲁棒方法（如 rDPO）则无法捕捉标注者间的异质性，限制了去噪效果。
 
@@ -82,7 +86,7 @@ RE-PO 的核心创新在于**将偏好标签的正确性建模为潜在变量，
 
 需要指出，RE-PO 的有效性依赖于策略初始化不能严重偏离真实偏好，否则 E 步可能对错误标签赋予误导性的高置信度，造成去噪失灵（limitations）。此外，该方法要求训练数据附带标注者标识，并存在对超参数（初始可靠性 $\eta_0$、EMA 动量 $\alpha$）一定的敏感性（Table 4）。尽管如此，其核心创新——将噪声建模为潜在变量、以 EM 驱动置信度加权——为偏好对齐提供了一个可解释且高效的去噪范式，显著优于仅从损失层面或全局噪声率出发的现有方案。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0013_jDKpOvTCM8_RE-PO_Robust_Enhanced_Policy_Optimization_as_a_G/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the Robust Enhanced Policy Optimization (RE-PO) framework. Starting from noisy pairwise feedback, RE-PO uses an Expectation-Maximization (EM) procedure to jointly refine label confidences and the policy. In each iteration, the E-step estimates a confidence score for every observed preference by inferring the posterior probability that the label is correct under the current model and annotator reliabilities. The M-step then uses these scores as adaptive weights to update both the LLM policy and the annotator reliability parameters, progressively down-weighting likely corrupted labels and emphasizing reliable supervision*
@@ -136,7 +140,7 @@ $$
 
 RE-PO的有效性依赖于几个关键条件。首先，要求训练数据包含标注者标识，因此无法直接用于无标注者信息的聚合数据集。其次，当基础策略与真实偏好严重偏离时，E‑step可能对错误标签赋予误导性的高置信度，导致EM迭代放大初始偏差，这一问题在当前工作中尚未通过理论或机制解决。此外，收敛性分析仅建立在全批量EM之上，实际采用的小批量EMA更新的收敛性质仍属开放问题。最后，RE-PO变体的训练时间较基础方法可能增加30%–40%（如SimPO，Table 8），在资源受限场景下需权衡计算开销与鲁棒增益。尽管如此，RE-PO凭借其概率建模和自适应加权机制，为大规模噪声偏好的对齐提供了一种通用且有效的框架，并可作为后续结合数据过滤、不确定性感知等策略的基础。
 
-## 核心模块与公式推导
+
 
 RE‑PO 框架的核心瓶颈在于大规模偏好数据普遍包含标注错误与噪声，传统方法平等对待所有样本，导致模型过度拟合不可靠监督。其因果调节杠杆是通过期望最大化（EM）推断每个偏好标签正确性的后验概率（置信度权重 $w_i$），并将该权重动态融入训练损失，从而自适应地强调可靠数据、弱化噪声信号。下文抽取实现这一机制的关键模块与公式，所有变量与推导均严格来自原文。
 
@@ -196,7 +200,9 @@ $$
 
 RE‑PO 通过上述公式将对抗噪声的机制分解为两个相互促进的信号通路：E 步利用当前策略的语义校准能力识别可疑标签，产生细粒度的样本置信度 $w_i$；M 步将这些置信度转化为自适应权重，抑制噪声梯度的同时保留干净信号。标注者可靠性 $\eta_k$ 的渐进更新进一步提供了群体层面的先验知识，使模型能够在多标注者环境下自动识别并降权低质量标注源。理论上，当偏好概率分布于 $p^\star \neq 0.5$ 时，全批量 EM 的可靠性估计可以收敛到真值（Theorem 4.1），保证了该机制在最简情形下的可识别性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 大规模偏好数据集中普遍存在的标注错误和噪声会导致标准对齐方法（如 DPO、IPO）过拟合不可靠的监督信号，显著降低对齐性能与泛化能力。RE-PO 通过期望最大化（EM）推断每个偏好标签正确性的后验概率（置信度权重 $w_i$），并将该权重动态融入训练损失，自适应地强调可靠数据、弱化噪声数据，从而实现了噪声鲁棒的对齐过程。以下从主结果、消融、可靠性验证、定性分析及失败模式几个方面解析关键实验发现。
 
@@ -249,7 +255,9 @@ Table 5 与 Table 6 分别给出了主题分类和代词-短语识别任务中�
 
 综上，RE-PO 通过自适应样本置信度加权，以较小的工程代价有效缓解了偏好噪声的对齐瓶颈，在多个基准上实现了显著且一致的提升，但应对策略初始偏差、无标注者 ID 场景及进一步提升小批量 EM 的稳定性仍是后续工作的重要方向。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 RE-PO 并非一种全新的对齐算法，而是一个**通用噪声鲁棒增强框架**，可薄薄包裹于现有偏好优化损失（DPO、IPO、SimPO、CPO）之上，以应对大规模偏好数据中普遍存在的标注错误与噪声。该框架通过期望最大化（EM）推断每个样本标签正确的后验概率 $w_i$，并将其作为软权重动态调节损失，从而在训练过程中**自适应强调可靠数据、弱化噪声数据**。这一思想将标签正确性建模为潜在变量，与以往方法形成鲜明对照。
 
@@ -277,6 +285,8 @@ RE-PO 并非一种全新的对齐算法，而是一个**通用噪声鲁棒增强
 - **小批量随机 EM 的理论与方差控制**：亟需理论分析刻画 EMA 更新下 $\eta_k$ 的偏差与方差，以及引入方差削减技术（如控制变量）的可能性。
 - **与数据筛选策略的协同**：RE-PO 本质上在优化目标中执行“软删除”，而选择性采样或重采样等数据过滤方法可作为互补。将二者结合能否在几乎不增加计算负担的前提下进一步提升对齐质量？
 - **更大规模模型与多样化评判的验证**：目前实验集中在 7B–8B 模型和 AlpacaEval 2 / Arena-Hard 评判基准上，其在 70B 级别模型以及更广泛评判（如基于 LLM 的自动评测、安全对齐评判）中的增益幅度和可靠性恢复能力仍需检验。
+
+
 
 ## 原文 PDF
 

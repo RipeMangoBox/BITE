@@ -32,7 +32,7 @@ claims:
 | 中文题名 | 蒙特卡洛降噪的统计方法 |
 | 英文题名 | A Statistical Approach to Monte Carlo Denoising |
 | 会议/期刊 | SIGGRAPH ASIA 2024 |
-| Links | [paper](https://users.cg.tuwien.ac.at/~hiroyuki/StatMC/) · [Project](https://www.cg.tuwien.ac.at/StatMC) · [arXiv](https://arxiv.org/abs/1510.04923) · [Code](https://benedikt-bitterli.me/resources/) |
+| Links | [paper](https://users.cg.tuwien.ac.at/~hiroyuki/StatMC/) · [Project](https://www.cg.tuwien.ac.at/StatMC) · [paper](https://arxiv.org/abs/1510.04923) · [Code](https://benedikt-bitterli.me/resources/) |
 | Topic | #topic/other_unclear |
 | Method | Statistical Denoising Method (StatMC) |
 | Dataset | Wooden Staircase, Bathroom, Salle de Bain, Classroom |

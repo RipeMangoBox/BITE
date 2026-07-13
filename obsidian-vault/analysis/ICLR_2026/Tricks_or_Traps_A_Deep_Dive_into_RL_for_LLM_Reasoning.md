@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Tricks_or_Traps_A_Deep_Dive_into_RL_for_LLM_Reasoning.pdf
+project_link: null
+code_link: null
 openreview_forum_id: R0JM3BWP7W
 aliases:
 - LP
@@ -42,7 +44,7 @@ claims:
 > - AMC23 (对齐模型, 简单数据) 上，准确率 为 81.88，对比 79.69 (DAPO)，变化 +2.19。
 > - AMC23 (对齐模型, 困难数据) 上，准确率 为 75.42，对比 68.54 (DAPO)，变化 +6.88。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -81,7 +83,7 @@ Lite PPO 在多个基准上超越更复杂的现有方法：
 
 研究主要集中在数学推理任务和4B-8B参数规模的模型上，更大模型及更多推理模态的泛化性尚待验证。此外，过length过滤的最优阈值、多轮RL训练的效应，以及Token级损失在所有初始化条件下的普适性，仍是值得进一步探索的开放问题。
 
-## 背景与动机
+
 
 ### 强化学习驱动大语言模型推理的兴起与困境
 
@@ -97,7 +99,9 @@ Lite PPO 在多个基准上超越更复杂的现有方法：
 
 该发现揭示了一个重要洞察：在 RL4LLM 推理任务中，**技巧的叠加并非总是带来增益，关键在于识别那些直接作用于梯度信号质量和更新粒度控制的核心机制**。通过将优势归一化中的标准差计算从局部（组级）提升到全局（批量级），并采用 token 级别的损失聚合替代传统的序列级损失，Lite PPO 以更简洁的设计实现了更鲁棒和高效的策略优化。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作提出 **Lite PPO**，一种极简的无 critic PPO 变体，其核心创新在于识别出两个关键“控制旋钮”（causal knobs）——**优势归一化**与**损失聚合粒度**——并证明仅需对这两个模块进行特定组合即可释放策略的学习能力，在多个基准上超越更复杂的 GRPO 与 DAPO 等方法。
 
@@ -139,7 +143,7 @@ Lite PPO 的核心洞察在于：**仅需组合上述两个技术——混合优
 
 值得注意的是，Lite PPO **不引入 KL 散度正则项**（与 GRPO 不同）、**不采用解耦 clip**（与 DAPO 不同）、**不使用 critic 网络**，仅通过两个低成本的归一化与聚合策略即实现了更优或相当的性能。这验证了论文的核心主张：当前 RL4LLM 领域的技术扩散中存在大量冗余技巧，真正起决定性作用的只有少数关键组件。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l34_https_openreview_net_forum_id_R0JM3BWP7W/figures/003_Figure_1.jpg]]
 *Figure 1: Left: The proliferation of RL optimization techniques, coupled with diverse initialized models and data, has raised barriers to practical adoption. Right: We establish detailed application guidelines via dissecting internal mechanisms of widely-used tricks, and introduce Lite PPO, a minimalist two-technique combination that enhances learning capacity in critic-free policies with vanilla PPO loss. The average accuracy is calculated across six mathematical benchmarks*
@@ -170,7 +174,7 @@ Lite PPO 的核心洞察在于：**仅需组合上述两个技术——混合优
 
 基于系统性消融的核心发现——**仅需结合两种技术即可最大化无critic PPO策略的学习能力**：① 组均值+批量标准差的优势归一化；② token级损失聚合。这一最小组合被命名为**Lite PPO**，其在多个基准上超越了更复杂的GRPO和DAPO等方法，验证了“少即是多”的设计哲学。
 
-## 核心模块与公式推导
+
 
 ### 1. 优势归一化器 (Advantage Normalizer)
 
@@ -218,7 +222,9 @@ $$\mathcal { I } _ { \mathrm { D A P O } } ( \theta ) = \mathbb { E } \frac { 1 
 
 Lite PPO 的极简设计表明，这些额外的 KL 正则和解耦裁剪并非必需——仅需两个核心模块即可在多个基准上超越 GRPO 和 DAPO。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置概览
 
@@ -297,7 +303,9 @@ Figure 10展示了最大生成长度约束的影响：8k长度阈值配合过len
 | Table 3 | Lite PPO在Llama3-8B上大幅领先GRPO（+7.5 on MATH-500） |
 | Table 4 | Lite PPO泛化至编码、QA、语言理解基准 |
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：RL4LLM 的技术碎片化
 
@@ -362,6 +370,8 @@ Figure 10展示了最大生成长度约束的影响：8k长度阈值配合过len
 3. **Token 级损失的边界条件**：Token 级损失聚合是否在所有初始化条件下都优于序列级损失，或者存在特定反例（如在高度对齐的指令模型上）？
 4. **过长度过滤的自适应阈值**：掩码阈值应如何根据任务长度分布自适应调整，以在长链推理任务中平衡探索与效率？
 5. **Lite PPO 的扩展性**：在更大规模模型（>8B）和更多样化的推理任务上，Lite PPO 的最小组合是否仍然足够，还是需要引入其他轻量级技术？
+
+
 
 ## 原文 PDF
 

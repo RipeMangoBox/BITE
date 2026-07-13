@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2024
 pdf_ref: paperPDFs/ICLR_2024/UniHSI_Unified_Human_Scene_Interaction_via_Prompted_Chain_of_Contacts.pdf
+project_link: null
+code_link: null
 aliases:
 - UUHSIPCC
 tags:
@@ -40,7 +42,7 @@ claims:
 > - Sit (Single Task) 上，Success Rate (%) 94.3 vs 93.7 (InterPhys-Sit) (+0.6)。
 > - Lie Down 上，Success Rate (%) 81.5 vs 21.3 (AMP-Lie Down) (+60.2)。
 
-## 概述
+## 概要
 
 物理仿真中的人-场景交互长期面临一个根本性瓶颈：**每个交互任务都需要独立手工设计目标函数和策略网络**，缺乏统一的交互表述界面。这导致现有方法难以扩展到多样化、长时程、多物体交互场景，且严重依赖昂贵的交互标注数据。
 
@@ -54,7 +56,7 @@ UniHSI 的核心洞察在于**交互类型与接触区域之间存在强相关�
 
 **主要局限与开放问题**：LLM 规划器可能产生空间关系错误或不可执行的操作；当前系统假设物体为静态，不支持可移动物体交互；运动真实性的客观评估指标仍有待建立。如何将 LLM 无缝集成到强化学习训练循环中、如何扩展至动态物体交互，以及如何利用视觉-语言模型减少场景标注依赖，是值得探索的方向。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -86,7 +88,9 @@ UniHSI 的核心洞察在于**交互类型与接触区域之间存在强相关�
 
 基于以上洞察，UniHSI提出了一个两阶段框架：高层LLM规划器将自然语言指令转化为CoC计划，低层统一控制器在物理仿真中执行该计划，从而在不依赖任务特定工程和交互标注数据的前提下，实现多样化的物理人-场景交互。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 UniHSI 的核心创新在于将异构的人-场景物理交互统一为一种结构化表示——**接触链（Chain of Contacts, CoC）**，并构建了一个由大语言模型驱动规划、统一物理控制器执行的双层框架。这一设计从根本上改变了此前方法“一任务一策略”的范式，实现了从语言指令到全身物理交互的端到端统一。
 
@@ -146,7 +150,7 @@ $$w_k = \frac{1 - R_k}{n - \sum_{i=1}^n R_i + e}$$
 
 这些创新共同实现了 **无需任务特定工程和交互标注** 的多样化物理交互，使得 UniHSI 在复杂任务（如 Lie Down）上达到 81.5% 的成功率，远超 AMP-Vanilla Combination 的 20.1%（Table 3）。
 
-## 整体框架
+
 
 UniHSI 的整体设计遵循“高层规划 + 低层执行”的分层架构，将任意人-场景交互统一为**提示链式接触（Chain of Contacts, CoC）** 的生成与物理执行过程。系统由两大核心组件构成：**LLM Planner** 与 **Unified Controller**，二者通过 CoC 这一结构化表示实现解耦与协同。
 
@@ -178,7 +182,7 @@ UniHSI 的整体设计遵循“高层规划 + 低层执行”的分层架构，�
 ![[assets/figures/papers/paper_list_l1780_UniHSI_Unified_Human_Scene_Interaction_via_Prompted_Chain_of_Contacts/figures/001_Figure_1.jpg]]
 *Figure 1: UniHSI facilitates unified and long-horizon control in response to natural language commands, offering notable features such as diverse interactions with a singular object, multi-object interactions, and fine-granularity control*
 
-## 核心模块与公式推导
+
 
 UniHSI 的整体框架由两个核心组件构成：**LLM Planner** 和 **Unified Controller**（图2）。LLM Planner 负责将自然语言指令转化为结构化的接触链（Chain of Contacts, CoC）计划；Unified Controller 则在物理仿真环境中逐步执行该计划，生成全身交互运动。
 
@@ -253,7 +257,9 @@ $$\text{ContactError} = \frac{\sum_{i, c_i \neq 0} er_i}{|\{i : c_i \neq 0\}|}, 
 ![[assets/figures/papers/paper_list_l1780_UniHSI_Unified_Human_Scene_Interaction_via_Prompted_Chain_of_Contacts/figures/005_Figure_4.jpg]]
 *Figure 4: Design Visualization. (a) Our framework ensures a unified design across tasks using the unified interface and the TaskParser. (b) The ego-centric height map in a ScanNet scene is depicted by green dots, with darker shades indicating greater height*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -370,7 +376,9 @@ GPT-4的规划正确率（71.9%）和执行成功率（57.3%）均显著优于GP
 ![[assets/figures/papers/paper_list_l1780_UniHSI_Unified_Human_Scene_Interaction_via_Prompted_Chain_of_Contacts/figures/015_Table_6.jpg]]
 *Table 6: User Study on Motion Reality*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与先前工作的关系
 
@@ -431,6 +439,8 @@ $$\mathcal{C} = \{ S_1, S_2, \ldots \}$$
 3. **减少场景标注依赖**：当前 CoC 规划需要场景的部件级标注（如“椅面”、“扶手”），这在真实场景中获取成本高昂。利用更强大的视觉-语言模型（如 GPT-4V）直接从视觉输入理解场景几何和语义，减少对显式部件标注的依赖，是提升实用性的关键路径。
 
 4. **长时程交互的综合评估指标**：现有指标（成功率、接触误差）主要衡量单步接触的准确性，难以全面反映多步交互的语义一致性和运动自然度。如何定义并客观评价“坐在椅子上然后拿起桌上的杯子”这类长时程交互的综合质量，仍是开放问题。
+
+
 
 ## 原文 PDF
 

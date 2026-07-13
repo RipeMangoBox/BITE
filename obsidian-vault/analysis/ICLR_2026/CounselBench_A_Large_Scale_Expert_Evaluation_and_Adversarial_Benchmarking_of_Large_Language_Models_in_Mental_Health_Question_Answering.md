@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/CounselBench_A_Large_Scale_Expert_Evaluation_and_Adversarial_Benchmarking_of_Large_Language_Models_in_Mental_Health_Question_Answering.pdf
+project_link: null
+code_link: https://github.com/llm-eval-mental-health/CounselBench
 openreview_forum_id: 8MBYRZHVWT
 aliases:
 - CounselBench
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | CounselBench：心理健康问答领域大规模语言模型的专家评估与对抗性基准 |
 | 英文题名 | CounselBench: A Large-Scale Expert Evaluation and Adversarial Benchmarking of Large Language Models in Mental Health Question Answering |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=8MBYRZHVWT); [GitHub](https://github.com/llm-eval-mental-health/CounselBench) |
+| Links | [paper](https://openreview.net/forum?id=8MBYRZHVWT) · [GitHub](https://github.com/llm-eval-mental-health/CounselBench) |
 | Topic | #topic/benchmarks_datasets_evaluation #topic/benchmarks_datasets_evaluation/benchmark_eval |
 | Method | CounselBench |
 | Dataset | CounselBench-Eval |
@@ -41,7 +43,7 @@ claims:
 > - CounselBench-Eval 上，Empathy (1-5) 为 LLaMA-3.3 (4.22)，对比 Online Human Therapists (2.72)，变化 +1.50。
 > - CounselBench-Eval 上，Toxicity (1-5, lower better) 为 GPT-3.5-Turbo judge gave 1.0，对比 Human Expert Average 1.78，变化 -0.78 (LLM judge underestimates toxicity)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -76,15 +78,13 @@ CounselBench 的因果杠杆在于**将临床专家的结构化判断大规模�
 
 评分者间信度方面，Krippendorff's alpha 在整体质量（0.82）、共情（0.83）和特异性（0.82）上达到良好水平，事实一致性（0.75）和毒性（0.72）也处于可接受范围，表明评估框架具有稳健的可复现性。
 
-## 背景与动机
-
 心理健康服务的供需鸿沟持续扩大。全球范围内，精神卫生专业人员严重短缺，而寻求支持的人数却在快速增长。在这一背景下，大语言模型（LLMs）被寄予厚望，有望在心理支持、初步筛查和资源引导等环节提供补充性帮助。然而，心理健康领域对回答的安全性、共情能力和语境敏感性有着极高的要求——一句不当的回应可能对处于脆弱状态的用户造成实质性伤害。
 
 现有医学问答基准的评估范式与这一现实需求之间存在根本性脱节。主流基准主要依赖多项选择题或事实性任务来评判模型能力，无法捕捉真实患者提出的开放式问题所蕴含的复杂性和情感张力。更关键的是，这些基准几乎不涉及对共情表达、建议特异性、毒性风险等临床核心维度的系统评估。当LLMs被部署到心理健康这一高风险、高主观性的领域时，评估工具的缺失意味着我们对其失效模式和安全边界几乎一无所知。
 
 CounselBench正是针对这一评估缺口而构建的。其核心动机并非简单地宣称LLMs比人类治疗师“更好”或“更差”，而是通过引入由临床专家定义的六维评估标准和大规模专业人工标注，建立一个可复现、可审计的比较框架。同时，该工作认识到标准评估的局限性——LLMs可能在常规测试中表现良好，却在对抗性情境下暴露深层脆弱性。因此，CounselBench进一步设计了由专家撰写的对抗性测试集，以系统性地探测模型在临床场景中的精确定向失败模式。
 
-## 核心创新
+## 核心方法与创新机理
 
 CounselBench的核心创新在于将心理健康问答的评估从以事实准确性或选择题得分为中心的范式，转向以临床专家定义的多维标准、大规模专业人工标注和对抗性压力测试为支柱的系统性基准。这一转变通过三个关键槽位的改变实现。
 
@@ -105,8 +105,6 @@ CounselBench的核心创新在于将心理健康问答的评估从以事实准�
 CounselBench的另一个关键发现并非预设的创新点，而是通过严格对比人类专家与九种高级LLM法官的评分自然浮现的：LLM法官系统性高估模型回答质量，并在毒性维度上几乎一致地给出最低分，完全忽略了人类专家识别的安全隐患。在模型排名上，LLM法官一致将人类专家评价最低的Gemini-1.5-Pro排在GPT-4之上，暴露出自动评估在心理健康这一高风险主观领域的根本性不可靠。这一发现本身构成了对“LLM-as-Judge”范式在该领域适用性的重要警示。
 
 综上，CounselBench通过评估标准的临床化、标注过程的专业化，以及对抗性测试的经验化三个槽位的改变，将心理健康LLM评估从“回答是否正确”推进到“回答是否安全、共情且适用于具体求助者”的层面，为后续研究和安全部署提供了可复现的衡量框架。
-
-## 整体框架
 
 ![[assets/figures/papers/paper_list_l29_https_openreview_net_forum_id_8MBYRZHVWT/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of COUNSELBENCH benchmark. COUNSELBENCH-EVAL (left) includes expert evaluation of LLMs and online human therapist responses to real counseling questions. COUNSELBENCH-ADV (right) includes adversarial questions authored by clinicians to target identified LLM failure modes. See Appendix B for license/degree types and specialization areas*
@@ -145,8 +143,6 @@ LLM‑as‑Judge 验证横跨两个模块：在 Eval 中与人类专家评分对
 - **输出**：各模型在六个维度上的平均得分、评分者间信度（Krippendorff’s α）、各失效模式触发比例、LLM 裁判与人类专家的一致性指标。
 
 整个框架的概览见 **Figure 1**，其中左侧展示 CounselBench‑Eval 的评估流水线，右侧展示 CounselBench‑Adv 的对抗性构建与测试流程。
-
-## 核心模块与公式推导
 
 ### 核心模块
 
@@ -188,7 +184,7 @@ $$ \alpha = 1 - \frac{D_o}{D_e} $$
 
 其中 $D_o$ 为观测不一致度，$D_e$ 为期望不一致度。该系数不适用于二元的医疗建议维度。CounselBench‑Eval 中各维度的平均 alpha 值为：整体质量 0.82、共情 0.83、特异性 0.82、事实一致性 0.75、毒性 0.72，均达到实质性至良好的一致性水平（≥0.7）。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 专家评估主结果：LLaMA-3.3 全面领先，但所有模型均存在显著失效
 
@@ -251,15 +247,12 @@ CounselBench-Adv 的对抗性测试（Table 3）成功暴露了模型在特定�
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l29_https_openreview_net_forum_id_8MBYRZHVWT/figures/013_Table_6.jpg]]
-*Table 6: Annotator Degrees, Licenses, and Additional Certifications. Annotators may hold multiple credentials and may therefore appear more than once in the table*
-
 ![[assets/figures/papers/paper_list_l29_https_openreview_net_forum_id_8MBYRZHVWT/figures/014_Table_6.jpg]]
 
 ![[assets/figures/papers/paper_list_l29_https_openreview_net_forum_id_8MBYRZHVWT/figures/015_Table_5.jpg]]
 *Table 5: Distribution by Counseling Specialization. Annotators may have multiple specializations and thus may be counted more than once in this table*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 基准构建的范式转变
 

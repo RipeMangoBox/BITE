@@ -5,6 +5,8 @@ paper_level: A
 venue: AAAI
 year: 2025
 pdf_ref: paperPDFs/AAAI_2025/Spectral_Motion_Alignment_for_Video_Motion_Transfer_using_Diffusion_Models.pdf
+project_link: null
+code_link: null
 aliases:
 - SMAS
 - SMAVMTUDM
@@ -41,7 +43,7 @@ claims:
 > - VMC (Cascaded VDM) 消融基准 上，Frame-Con (CLIP) 为 VMC + SMA (ℓ_global + ℓ_local)，对比 VMC (仅像素对齐)，变化 +0.016。
 > - MotionDirector (T2V) 上，Motion-Acc (用户研究 1-5分) 为 MotionDirector + SMA，对比 MotionDirector (原始)，变化 显著提升 (见表1详细数值)。
 
-## 概述
+## 概要
 
 **核心问题**：现有视频运动迁移方法通常在像素空间或特征空间通过帧间残差表示运动，但这种表示存在两个瓶颈：一是无法捕获全局多帧运动上下文，导致运动方向反转、背景误运动等问题；二是残差中包含与运动无关的高频空间伪影（如突发光照变化、背景纹理不一致），干扰运动信息的准确提取。
 
@@ -59,7 +61,7 @@ claims:
 
 **资源开销**：SMA 训练仅需约 15GB 显存和约 5 分钟训练时间，额外计算开销主要来自小波变换和 FFT，论文称其可忽略。
 
-## 背景与动机
+
 
 ### 视频运动迁移的核心挑战
 
@@ -87,7 +89,9 @@ claims:
 
 SMA 被设计为一个**即插即用的频谱损失模块**，不修改任何基础架构的模型权重或推理流程。它可以在训练阶段作为额外的损失项注入到现有的运动迁移框架中，与像素空间或特征空间的原始对齐损失联合优化。论文在五种代表性框架（VMC、MotionDirector、DMT、Tune-A-Video、ControlVideo）上验证了 SMA 的兼容性，均观察到一致的性能提升（详见 Table 1、Table 2）。训练开销方面，以 VMC + SMA 为例，仅需约 15 GB 显存和约 5 分钟的训练时间，额外计算负担主要来自小波变换和 FFT，论文声称其开销可忽略。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 1. 瓶颈洞察：现有运动表示的两类系统性缺陷
 
@@ -140,7 +144,7 @@ $$\min_{\theta} \mathbb{E}_{t,n,\epsilon_t^n,\epsilon_t^{n+1}} \Big[ \ell_{\text
 
 消融实验（Table 3）验证了各组件的独立贡献：仅添加局部光谱损失（$\ell_{\text{local}}$）即可提升 Text-Align 和 Frame-Con 指标，进一步加入全局小波损失（$\ell_{\text{global}}$）带来额外增益。Figure 8(b) 表明 2D FFT 局部细化优于 2D DWT 方案，且超参数更易调节。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l27_Spectral_Motion_Alignment_for_Video_Motion_Transfer_using_Diffusion_Mode/figures/003_Figure_3.jpg]]
 *Figure 3: Comparison within MotionDirector framework*
@@ -181,7 +185,7 @@ $$\min_\theta \mathbb{E}_{t,n,\epsilon_t^n,\epsilon_t^{n+1}} \Big[ \ell_{\text{a
 
 **计算开销**：SMA作为一个轻量级微调模块，未修改基础视频扩散模型的架构。训练时仅需约15GB显存，训练时间约5分钟，额外引入的小波变换和FFT计算开销被论文声称可忽略。
 
-## 核心模块与公式推导
+
 
 ### 3.1 去噪运动向量估计
 
@@ -261,7 +265,9 @@ $$
 
 其中 $f(\cdot)$ 为扩散模型中间层提取的语义特征，$\ell_{\mathrm{DMT}}$ 为原始 DMT 的时空特征损失。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -315,7 +321,9 @@ SMA 的训练开销轻量：在 VMC 框架上仅需约 15 GB 显存，训练时�
 
 ![[assets/figures/papers/paper_list_l27_Spectral_Motion_Alignment_for_Video_Motion_Transfer_using_Diffusion_Mode/figures/011_Figure.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法定位与核心差异
 
@@ -362,6 +370,8 @@ SMA 并非替代现有运动迁移框架，而是作为**即插即用的频谱�
 2. **推理阶段解耦**：能否将 SMA 的频谱约束设计为无训练的引导项（类似于 classifier guidance），从而在推理时直接控制运动迁移，消除微调需求？
 3. **小波族的选择**：论文仅探索了 Haar 小波，是否存在更适合视频运动建模的其他小波族（如 Daubechies 系列、Morlet 复小波），能在运动模式保真度和计算效率之间取得更优平衡？
 4. **频谱对齐的理论保证**：当前方法依赖经验性的频率加权函数，缺乏对“哪些频率成分编码运动信息”的理论刻画。能否通过信息瓶颈或频域解耦理论，给出运动相关频率成分的可识别性条件？
+
+
 
 ## 原文 PDF
 

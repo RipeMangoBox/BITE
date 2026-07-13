@@ -42,7 +42,7 @@ claims:
 > - PEOD-Chat 上，Caption CI 3.68 vs 3.05 (RGB-only) (+0.63)；Caption DO 3.12 vs 2.51 (RGB-only) (+0.61)；Caption CU 3.95 vs 3.32 (RGB-only) (+0.63)。
 > - RGBE-Chat 上，Caption CI 4.03 vs 3.97 (RGB-only) (+0.06)；Caption DO 3.50 vs 3.46 (RGB-only) (+0.04)；Caption CU 4.34 vs 4.32 (RGB-only) (+0.02)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -78,7 +78,7 @@ RE-VLM 处于**多模态视觉-语言理解**和**事件相机感知**的交叉�
 
 论文未提供推理速度和计算开销数据，实时部署的可行性需进一步验证。模型仅在PEOD-Chat和RGBE-Chat两个数据集上评估，泛化到更广泛真实场景的能力尚未明确。此外，事件相机硬件的普及程度和同步RGB-事件数据的获取难度仍是实际应用的主要障碍。未来工作可探索将双流架构扩展至深度、红外等更多模态，以及在目标级、像素级理解任务上验证RGB-事件融合的增益。
 
-## 背景与动机
+
 
 ### 视觉-语言模型在不利条件下的感知瓶颈
 
@@ -102,7 +102,9 @@ RE-VLM 处于**多模态视觉-语言理解**和**事件相机感知**的交叉�
 
 为此，本文提出**RE-VLM**，核心思路是通过双流架构同时利用RGB静态外观与事件流高动态范围的运动线索。具体而言：（1）在数据层面，设计**退化感知的图驱动数据生成管道**，将同步的RGB-事件流转化为结构化场景图，显式标注退化类型并仲裁模态可信度，合成可靠的描述与问答监督；（2）在模型层面，采用**双流编码器**分别提取RGB和事件特征，并通过**时空对齐模块（STAM）**在训练时对齐两种模态，最终由LLM解码器融合两种视觉token生成文本。这一设计使得模型在极端光照和快速运动条件下仍能保持稳健的场景理解能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 RE-VLM 的核心创新在于系统性地解决了标准视觉-语言模型在不利成像条件下的退化瓶颈。其设计围绕一个中心洞察展开：**事件相机与标准RGB相机在信息上天然互补**——前者以微秒级时间分辨率捕获宽动态范围的亮度变化，但对静态纹理和颜色不敏感；后者提供丰富的纹理与颜色信息，却在低光、过曝、高动态范围或快速运动下严重退化。RE-VLM 通过三个相互协同的 changed slots 将这一洞察工程化为可工作的系统。
 
@@ -154,7 +156,7 @@ STAM 仅在训练时使用，推理时不引入额外计算开销——这是一
 
 **证据强度**：消融实验（Table 4, Table 5）系统验证了每个 changed slot 的独立贡献——双模态优于单模态，加入STAM优于不加入STAM，且这一趋势在光照挑战数据集PEOD-Chat和通用场景数据集RGBE-Chat上一致成立。两个不同LLM裁判（GPT-3.5-Turbo与Qwen3-Omni-30B）的交叉验证进一步排除了单一评估偏差。
 
-## 整体框架
+
 
 RE-VLM 的整体框架由两条协同主线构成：**图驱动的退化感知数据生成管线**与**双流视觉-语言模型**，二者共同解决“不利条件下 RGB 退化导致 VLM 场景理解失效”这一核心瓶颈。
 
@@ -216,7 +218,7 @@ $$
 ![[assets/figures/papers/paper_list_l2410_https_arxiv_org_abs_2605_19329/figures/002_Figure_2.jpg]]
 *Figure 2: Construction of RE-VLM: data generation pipeline and model. Left: A graph-driven pipeline converts synchronized RGB frames and event streams into a graph, extracts verifiable scene facts, and synthesizes reliable caption and QA supervision. Center: Representative examples from the datasets yielded by the pipeline: PEOD-Chat (illumination-challenged scenes) and RGBE-Chat (general scenarios). Right: The RE-VLM model fuses static RGB appearance features with dynamic cues from events and is trained with a progressive strategy for robust captioning and VQA under low-light, high-dynamic-range, and fast-motion conditions*
 
-## 核心模块与公式推导
+
 
 RE-VLM 的核心架构由双流视觉编码器、时空对齐模块（STAM）、模态适配器和大语言模型解码器四个关键组件构成，其设计目标是融合 RGB 图像的静态外观线索与事件流的动态运动线索，在低光、过曝、高动态范围等不利条件下保持鲁棒的场景理解能力。
 
@@ -276,7 +278,9 @@ $$L = L_{\mathrm{LLM}} + \lambda L_{\mathrm{CA-WTD}}$$
 ![[assets/figures/papers/paper_list_l2410_https_arxiv_org_abs_2605_19329/figures/007_Figure_5.jpg]]
 *Figure 5: Training pipeline. Three compact stages: (1) Initial event– language alignment, (2) Align the event and RGB modalities with STAM, (3) End-to-end instruction tuning*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -333,7 +337,9 @@ RE-VLM的实验评估在两类数据集上展开：光照挑战场景数据集**
 ![[assets/figures/papers/paper_list_l2410_https_arxiv_org_abs_2605_19329/figures/006_Table_2.jpg]]
 *Table 2: Composition of PEOD-Chat and RGBE-Chat datasets. Data sources and post-screening sample counts for captioning and VQA tasks. In RGBE-ImageNet, the RGB data come from ImageNet [7], and the paired event data are generated using the method of [31]*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心问题定位
 
@@ -387,6 +393,8 @@ RE-VLM 的直接对比对象是当前主流的 RGB-only VLM，包括 **Qwen2.5-V
 4. **评估可靠性**：论文采用了两种 LLM 裁判（GPT-3.5-Turbo 和 Qwen3-Omni-30B）交叉验证，趋势一致（Table 6），增强了结果信度。但 LLM 裁判本身对光照挑战场景的理解能力是否构成评估上限，仍需人工评估作为最终基准的验证。
 
 5. **事件表示的可迁移性**：当前将事件流渲染为事件图像以兼容标准视觉编码器，这一预处理步骤可能丢失事件数据的稀疏异步特性。是否可以通过原生的事件表示（如体素网格或图神经网络）进一步提升信息保留率，是一个值得探索的方向。
+
+
 
 ## 原文 PDF
 

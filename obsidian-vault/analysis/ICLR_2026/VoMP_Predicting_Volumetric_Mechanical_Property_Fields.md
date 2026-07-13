@@ -5,6 +5,7 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/VoMP_Predicting_Volumetric_Mechanical_Property_Fields.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/sil/projects/vomp/
 aliases:
 - VoMP
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | VoMP：预测体积力学属性场 |
 | 英文题名 | VoMP: Predicting Volumetric Mechanical Property Fields |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://arxiv.org/abs/2510.22975); [Project](https://research.nvidia.com/labs/sil/projects/vomp); [Project](https://research.nvidia.com/labs/sil/projects/vomp/) |
+| Links | [paper](https://arxiv.org/abs/2510.22975) · [Project](https://research.nvidia.com/labs/sil/projects/vomp) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | VoMP |
 | Dataset | GVM test set (public subset), Wall-clock time (avg.) |
@@ -41,7 +42,7 @@ claims:
 > - GVM test set (public subset) 上，ARE (Poisson's Ratio) 为 0.0818，对比 Phys4DGen*: 0.1467，变化 降低约44%。
 > - GVM test set (public subset) 上，ARE (Density) 为 0.0921，对比 Phys4DGen*: 1.4394, NeRF2Physics: 1.0365，变化 降低约91%-94%。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -77,7 +78,7 @@ VoMP 将体积材料预测重新定义为**在预训练材料潜在空间中的�
 
 当前方法仅适用于各向同性材料，输出限于杨氏模量、泊松比和密度三个参数，尚未覆盖屈服强度、剪切模量等更广泛的工程属性。训练数据依赖 VLM 标注，可能引入噪声。如何扩展到各向异性材料、结合物理观测进行自监督微调、以及将真实材料参数自动映射到快速仿真器（如 XPBD）的可调参数，是值得探索的方向。
 
-## 背景与动机
+
 
 ### 问题背景：体积力学属性预测的缺失
 
@@ -103,7 +104,9 @@ VoMP 将体积材料预测重新定义为**在预训练材料潜在空间中的�
 
 这种设计带来了三个关键优势：（1）**前馈预测**，单次推理仅需约 3.59 秒，比优化类方法快 5–400 倍；（2）**物理有效性保证**，所有预测值通过 MatVAE 潜在空间天然落在真实材料分布内；（3）**体积密集预测**，可对物体内部每个体素进行属性估计，且适用于网格、SDF、NeRF、高斯泼溅等多种 3D 表示。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 VoMP 的核心创新在于将**材料物理有效性**与**对象几何表示**彻底解耦，从而将体积力学属性预测从一个需要逐对象优化的逆问题，转化为一个可训练的前馈学习问题。这一范式转变通过三个相互咬合的设计实现，直接回应了现有方法的两大瓶颈：物理无效输出与高昂的推理成本。
 
@@ -148,7 +151,7 @@ $$
 | 体积预测能力 | 主要关注表面或稀疏采样点 | 对物体内部体素进行密集预测 | §4.1, Figure 3 |
 | 适用表示多样性 | 局限于特定表示（NeRF/高斯泼溅） | 适用于任意可体素化并渲染的表示 | §1, Figure 1 |
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l7_https_arxiv_org_abs_2510_22975/figures/003_Figure_3.jpg]]
 *Figure 3: VoMP Overview. For any input geometry, we aggregate multi-view DINOv2 features across its volumetric voxelization (§4.1). A trained GeometryTransformer (§4.2) predicts per-voxel material latents, decoded by MatVAE (§3) into mechanical properties ( E , $\nu , \rho$ )
@@ -193,7 +196,7 @@ Geometry Transformer 输出的 2D 潜在代码被送入预训练好的 MatVAE �
 
 为训练 Geometry Transformer，VoMP 构建了 GVM 数据集（§5.2），其标注流程（Figure 4）结合了 3D 部件标签与视觉语言模型（VLM）。VLM 接收物体渲染图、部件材质映射球、材质名称以及 MTD 中最接近的三类真实材料范围作为提示，输出每个部件的材料三元组。这一流程将真实材料数据库的物理约束注入到标注过程中，降低了纯 VLM 标注的物理不合理性。
 
-## 核心模块与公式推导
+
 
 ### 3.1 MatVAE：材料属性潜在空间
 
@@ -247,7 +250,9 @@ $$
 - **移除 MatVAE**，直接预测 $\mathbb{R}^3$ 向量：杨氏模量 ALDE 从 0.3765 飙升至 1.1284，密度误差大幅增加，证实材料潜在空间对输出物理有效性的核心作用。
 - **使用 L1 损失替代 L2 损失**：所有力学属性的误差增加 2-3 倍，表明 L2 损失对跨越数量级的属性预测更为合适。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能：机械属性预测精度与效率
 
@@ -319,7 +324,9 @@ VoMP 的训练数据依赖 VLM 辅助标注，Table 9 报告了 VLM 标注的误
 *Table 14: Training Hyperparameters. We show the hyperparameters for the MatVAE and Geometry Transformer*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题瓶颈与核心因果调控
 
@@ -375,6 +382,8 @@ VoMP的推理流水线由三个模块串联构成：
 - **消融实验支撑核心设计**：Table 8表明移除MatVAE会导致杨氏模量ALDE从0.3765升高到1.1284，密度误差大幅增加，证实材料潜在空间的关键作用。
 - **定性证据需结合原文判断**：Figure 6a的定性比较显示VoMP预测的体积材料场噪声更低，但具体视觉差异需读者自行评估。
 - **泛化性证据有限**：对非分割形状或缺乏纹理几何体的泛化能力尚未经过系统验证，该点需手动核实。
+
+
 
 ## 原文 PDF
 

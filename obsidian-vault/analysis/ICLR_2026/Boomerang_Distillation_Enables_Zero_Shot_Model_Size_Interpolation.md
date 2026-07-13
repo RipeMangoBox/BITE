@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Boomerang_Distillation_Enables_Zero_Shot_Model_Size_Interpolation.pdf
+project_link: null
+code_link: https://github.com/dcml-lab/boomerang-distillation
 aliases:
 - BD
 - BDEZSMSI
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | 回旋镖蒸馏：零样本模型尺寸插值 |
 | 英文题名 | Boomerang Distillation Enables Zero-Shot Model Size Interpolation |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=4ZU8v4s3IR); [GitHub](https://github.com/dcml-lab/boomerang-distillation) |
+| Links | [paper](https://openreview.net/forum?id=4ZU8v4s3IR) · [GitHub](https://github.com/dcml-lab/boomerang-distillation) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/generative_models_and_autoencoders |
 | Method | Boomerang Distillation |
 | Dataset | 10个分类数据集（平均）, 3个生成数据集（平均）, WikiText, Qwen3-4B-Base 教师模型 |
@@ -40,15 +42,17 @@ claims:
 > - 3个生成数据集（平均） 上，精确匹配准确率 为 平滑插值，在较小模型上保持较高生成性能，对比 Naive Layer Pruning: 生成性能快速下降，变化 显著优于。
 > - WikiText 上，困惑度 为 在学生和教师之间平滑插值，对比 Naive Layer Pruning: 随层数减少困惑度急剧上升，变化 显著优于。
 
-## 概述
+## 概要
 
 本文提出 **Boomerang Distillation**（回旋镖蒸馏），一种能够零样本（zero-shot）生成任意中间尺寸语言模型的高效方法。核心思想是：首先将大型教师模型通过层剪枝（layer pruning）初始化为一个小型学生模型，然后使用包含余弦距离对齐损失的蒸馏目标训练该学生模型；训练完成后，通过将学生层替换为对应的教师层块（student patching），无需任何额外训练即可生成一系列尺寸和性能平滑插值的中间模型。实验表明，该方法在多个模型族（Qwen3、Pythia、Llama-3.2）上均有效，相比朴素层剪枝和随机初始化蒸馏基线显著更优，且计算开销仅为独立蒸馏每个中间模型的 1/14.53 至 1/19.17。
 
-## 背景与动机
+
 
 现有方法为每个模型尺寸独立训练，成本高昂且只能提供粗粒度的尺寸选项，无法在部署时灵活适应多样化的硬件约束。例如，标准知识蒸馏（Hinton et al., 2015）和模型族构建方法（Muralidharan et al., 2024）需要为每个目标尺寸单独训练一个模型。层剪枝方法（如 LaCo、ShortGPT）虽然可以快速生成小模型，但性能随层数减少急剧下降，尤其在生成任务上。本文旨在解决这一瓶颈：**如何在不重新训练的情况下，从单一训练过程获得任意中间尺寸的高性能模型？**
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Boomerang Distillation 的核心洞察是：在教师权重初始化和对齐蒸馏（特别是余弦距离损失）的条件下，将教师层块插回蒸馏后的学生模型可以零样本地生成性能平滑插值的中间尺寸模型，且无需额外训练。具体创新点包括：
 
@@ -56,7 +60,7 @@ Boomerang Distillation 的核心洞察是：在教师权重初始化和对齐蒸
 2. **对齐蒸馏**：在标准知识蒸馏损失基础上，加入每层余弦距离对齐损失，确保学生层输出接近对应教师块输出。
 3. **学生修补（Student Patching）**：训练后，将学生层替换为对应的教师层块，零样本生成中间尺寸模型。
 
-## 整体框架
+
 
 
 ![[assets/figures/papers/iclr26_generative_models_diffusion__generative_models_and_autoencoders__b001_4ZU8v4s3IR_Boomeran/figures/001_Figure_1.jpg]]
@@ -68,7 +72,7 @@ Boomerang Distillation 包含三个步骤（Figure 1）：
 2. **知识蒸馏（Knowledge Distillation）**：使用交叉熵、KL 散度和余弦距离损失的联合目标训练学生模型，使其输出和隐藏状态与教师对齐。
 3. **学生修补（Student Patching）**：将蒸馏后的学生层替换为对应的教师层块，零样本生成中间尺寸模型；嵌入层和 LM 头根据首尾层来源选择。
 
-## 核心模块与公式推导
+
 
 ### 5.1 学生初始化
 
@@ -111,7 +115,9 @@ $$(\theta_S^{(1)}, \dots, \theta_S^{(i-1)}, b^{(i)}, \theta_S^{(i+1)}, \dots, \t
 
 嵌入层和 LM 头根据首尾层来源选择：若首层来自学生，则使用学生嵌入层；若首层来自教师，则使用教师嵌入层；LM 头同理。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 
 ### 6.1 主要结果
@@ -188,7 +194,9 @@ $$(\theta_S^{(1)}, \dots, \theta_S^{(i-1)}, b^{(i)}, \theta_S^{(i+1)}, \dots, \t
 *Table 4: Table 4: Hyperparameters used to create LaCo models in Figures 7, 19, 22, 34, and 38*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 Boomerang Distillation 位于以下研究方向的交叉点：
 
@@ -208,6 +216,8 @@ Boomerang Distillation 位于以下研究方向的交叉点：
 - 能否在不保留教师权重在内存中的情况下实现同等性能和稳定性？
 - Boomerang Distillation 在大规模 LLM 上使用大量 token 预算蒸馏时的表现如何？
 - 能否扩展到其他模态（如视觉 Transformer、语音模型）？
+
+
 
 ## 原文 PDF
 

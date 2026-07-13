@@ -45,7 +45,7 @@ claims:
 > - MJHQ-30K (1024×1024) text-to-image 上，FID↓ 10.91 vs 10.31 (SD3.5-medium original 64×64 tokens) (+0.60 (with 4× speedup))；CLIP Score↑ 31.91 vs 29.74 (SD3.5-medium original) (+2.17)；Throughput (img/s, A100) 1.03 vs 0.25 (SD3.5-medium original) (+0.78 (4.12×))。
 > - ImageNet 512×512 reconstruction 上，rFID↓ 0.47 vs 0.50 (VA-VAE) (-0.03)。
 
-## 概述
+## 概要
 
 扩散模型已成为视觉生成的主流范式，但其高分辨率生成的推理成本极高——以 **SD3.5 Medium**（Stability AI, 2024）为例，生成一张1024×1024图像需处理64×64个Token，吞吐量仅0.25 img/s（A100）。根本瓶颈在于：预训练扩散模型依赖标准VAE的固定压缩率，若直接提升VAE空间压缩率以减少Token数量，将导致潜在空间丧失语义结构，迫使扩散模型从零训练，代价巨大且浪费已有先验知识。因此，如何在降低Token数的同时保留预训练模型的生成能力，是亟待解决的核心问题。
 
@@ -59,7 +59,7 @@ claims:
 
 当前方法存在若干局限：对齐损失采用简单L2投影，可能非最优；仅在SD3.5 Medium上验证了LoRA微调，未在更大模型（如FLUX）上进行全微调测试；微调依赖合成数据集，可能影响生成图像的真实感；2048×2048分辨率的定量评估有限。这些为后续研究留下了明确空间。
 
-## 背景与动机
+
 
 ### 扩散模型高分辨率生成的Token瓶颈
 
@@ -89,7 +89,9 @@ claims:
 
 这一动机驱动了DA-VAE（Detail-Aligned VAE）的提出：通过结构化潜在空间设计（基础通道 + 细节通道）与细节对齐损失，在不破坏原有潜在结构的前提下实现Token压缩，从而以极低的微调成本（如SD3.5仅需5 H100天）获得4倍以上的生成加速。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DA-VAE 的核心创新在于**结构化潜在空间设计 + 细节对齐机制 + 零初始化微调策略**的组合，使其能够以极低的训练成本（SD3.5 Medium 仅需 5 H100-days）将预训练扩散模型提升至高分辨率生成，同时保持甚至提升图像质量。
 
@@ -152,7 +154,7 @@ DA-VAE 处于**潜空间压缩 VAE + 扩散模型微调**的交叉点。与以�
 
 DA-VAE 的独特贡献在于**将"保护预训练先验"作为第一性原理**：通过冻结基础编码器、零初始化新增参数、温暖启动调度三个机制，确保预训练扩散模型的核心能力在微调过程中不被破坏，从而以极低的计算成本（5 H100-days vs 从头训练的数百 GPU-days）实现高分辨率生成。
 
-## 整体框架
+
 
 DA-VAE 的整体设计围绕一个核心思想展开：**在不增加视觉 Token 数量的前提下，通过结构化潜在空间扩展来承载高分辨率图像的细节信息**。整个 pipeline 分为两个协同工作的阶段——结构化 VAE 训练和扩散 Transformer 微调，二者共享统一的潜在布局。
 
@@ -225,7 +227,7 @@ $$\mathcal{L}_{\mathrm{DiT}}(n) = \frac{1}{|B|+w(n)|R|} \big( \|\hat{\mathbf{u}}
 ![[assets/figures/papers/paper_list_l852_https_arxiv_org_abs_2603_22125/figures/001_Figure_1.jpg]]
 *Figure 1: We propose Detail-Aligned VAE (DA-VAE), a VAE model that increases the compression rate of a pretrained VAE, while requiring only light-weight finetuning of the original diffusion backbone while preserving image quality. Image results are from a finetuned SD3.5 Medium. DA-VAE accelerates the original SD3.5 Medium model by 6.04 times for 2048 × 2048 image generation*
 
-## 核心模块与公式推导
+
 
 ### 结构化潜在空间设计
 
@@ -306,7 +308,9 @@ $$
 ![[assets/figures/papers/paper_list_l852_https_arxiv_org_abs_2603_22125/figures/003_Figure_3.jpg]]
 *Figure 3: Effect of the proposed latent alignment loss on the learned detail feature*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -398,7 +402,9 @@ DA-VAE的核心贡献在于揭示了**结构化潜在空间 + 对齐约束 + 零
 ![[assets/figures/papers/paper_list_l852_https_arxiv_org_abs_2603_22125/figures/019_Figure_S.5.jpg]]
 *Figure S.5: Radial power spectrum of the base latent z and detail latent*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心问题与现有方法格局
 
@@ -475,6 +481,8 @@ DA-VAE处于**扩散模型高效推理**与**表示学习**的交叉点，与以
 - **表示对齐学习**：对比学习、知识蒸馏中的表示对齐思想被DA-VAE以轻量投影对齐的形式引入潜在空间设计。
 
 方法的本质贡献在于**通过潜在空间的显式结构化，将“提升压缩率”与“保留预训练先验”这两个冲突目标解耦**，为扩散模型的高效高分辨率生成提供了新的设计范式。
+
+
 
 ## 原文 PDF
 

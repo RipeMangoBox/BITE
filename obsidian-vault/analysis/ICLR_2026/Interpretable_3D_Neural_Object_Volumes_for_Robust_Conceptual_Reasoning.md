@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Interpretable_3D_Neural_Object_Volumes_for_Robust_Conceptual_Reasoning.pdf
+project_link: null
+code_link: https://github.com/phamleyennhi/CAVE
 openreview_forum_id: VSPLa2Sito
 aliases:
 - CCAVE
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 面向鲁棒概念推理的可解释三维神经物体体积 |
 | 英文题名 | Interpretable 3D Neural Object Volumes for Robust Conceptual Reasoning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=VSPLa2Sito); [GitHub](https://github.com/phamleyennhi/CAVE) |
+| Links | [paper](https://openreview.net/forum?id=VSPLa2Sito) · [GitHub](https://github.com/phamleyennhi/CAVE) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | CAVE (Concept Aware Volumes for Explanations) |
 | Dataset | Pascal3D+ (in-distribution), ImageNet3D (in-distribution), OccludedP3D+ (OOD), OOD-CV (OOD) |
@@ -42,7 +44,7 @@ claims:
 > - ImageNet3D (in-distribution) 上，Accuracy (%) 为 84.6 (±0.02)，对比 83.3 (LF-CBM)，变化 +1.3。
 > - OccludedP3D+ (OOD) 上，Accuracy (%) 为 76.8 (±0.51)，对比 73.8 (MGProto)，变化 +3.0。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -73,7 +75,7 @@ CAVE属于**内建可解释模型**，但与现有内建方法存在本质差异
 
 CAVE目前针对单物体中心图像设计，在多物体场景中概念主要定位在中心物体上；对于缺乏一致部件结构的类别（如Boat），同一概念在不同子类或视角下可能定位到几何对称的不同端点；在强视角变化或严重变形（OOD-CV）下，概念有时会错误激活对称部件。扩展到多物体场景、非刚性类别，以及利用概念基进行模型诊断和对抗鲁棒性分析，是未来的开放方向。
 
-## 背景与动机
+
 
 ### 3D感知分类的鲁棒性红利与可解释性盲区
 
@@ -103,7 +105,9 @@ NOVUM的成功揭示了一个关键洞察：**将分类器“锚定”在3D物�
 
 本文提出的**CAVE（Concept Aware Volumes for Explanations）**正是围绕这三个问题展开的系统性解决方案。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CAVE 的核心创新在于将 3D 感知分类器的密集高斯特征匹配机制，重构为稀疏、可解释的概念匹配机制，同时保持 3D 感知带来的分布外鲁棒性。这一重构通过三个相互关联的“changed slots”实现，每个 slot 都针对现有方法的瓶颈提供了精确的因果干预。
 
@@ -145,7 +149,7 @@ CAVE 将 NOV 的形状从长方体扩展为椭球体（Section 4.2），在 OOD 
 
 **证据强度评估**：上述四个 changed slots 均有充分的定量和定性证据支持（置信度 0.95-0.98）。概念稀疏化的性能保持（Fig. 7）、NOV 感知 LRP 的守恒性（Fig. I1）、零样本姿态估计的可行性（Table 2）以及 3D-C 指标的区分度（Table 1）均通过了多数据集、多随机种子的验证。需要注意的是，椭球体形状的优势主要在 OOD 设置下显著，在分布内数据上与长方体的差异较小，这一结论的泛化性需要在更多类别上进一步验证。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l38_https_openreview_net_forum_id_VSPLa2Sito/figures/001_Figure_1.jpg]]
 
@@ -211,7 +215,7 @@ $$R_{F_x}(i,c) = R_{F_x}^{\text{spatial}}(i) \cdot \frac{(f_i \odot \mathcal{H}_
 
 CAVE 的核心洞察在于：将3D体积上的密集高斯特征转化为**稀疏、几何一致的概念基**，既保持了3D感知带来的OOD鲁棒性，又通过概念激活的精确分解实现了模型内在可解释性。实验表明，这一框架在分类精度上持平甚至略优于密集匹配的 NOVUM（OOD-CV 84.0% vs. 81.3%），同时在概念空间局部化、物体覆盖率和3D一致性上显著超越所有后置解释方法和内建可解释基线。
 
-## 核心模块与公式推导
+
 
 ### 3.1 从密集高斯匹配到稀疏概念匹配
 
@@ -261,7 +265,9 @@ $$\mathbf { 3 D - C } ( \mathcal { X } _ { y } , h ) = 1 - \frac { 1 } { 2 } \le
 
 CAVE解除了NOVUM对真实3D姿态标注的依赖。在弱监督设置下，使用Orient-Anything（Wang et al., 2025b）进行零样本姿态估计，预测物体的方位角、极角和旋转角度，用于将NOV与输入图像的3D姿态对齐。实验表明，使用估计姿态的CAVE在分类精度上仅与全监督存在适度差距，仍保持竞争性能（Table 2），证明了NOV-based分类器对姿态标注质量的鲁棒性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心结果：鲁棒性与可解释性的双重突破
 
@@ -317,7 +323,9 @@ Figure 1b的鲁棒性-可解释性权衡图进一步确认：CAVE在两个轴上
 ![[assets/figures/papers/paper_list_l38_https_openreview_net_forum_id_VSPLa2Sito/figures/046_Table_16.jpg]]
 *Table 16: Table I1: Quantitative comparison of different attribution methods for CAVE, evaluated on spatial localisation, object coverage, and 3D consistency*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心瓶颈与因果转向
 
@@ -381,6 +389,8 @@ CAVE直接继承 **NOVUM**（Jesslen et al., 2024）的3D感知框架，但在�
 4. **3D-C指标的泛化**：3D-C指标依赖CAD模型进行归因投影，能否推广到没有CAD模型的场景（如通过NeRF或3D Gaussian Splatting隐式表征）？
 
 5. **大规模扩展**：在更大规模数据集（如完整ImageNet）上，零样本姿态估计误差对概念质量和分类精度的影响如何进一步缓解？是否需要类别特定的姿态估计策略？
+
+
 
 ## 原文 PDF
 

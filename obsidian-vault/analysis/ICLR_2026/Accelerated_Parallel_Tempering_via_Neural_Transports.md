@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Accelerated_Parallel_Tempering_via_Neural_Transports.pdf
+project_link: null
+code_link: null
 aliases:
 - APTA
 - APTNT
@@ -41,7 +43,7 @@ claims:
 > - 40-mode GMM-10 上，Compute-normalized round trips (CN-R) 为 CMCD-APT (K=1) N=6: 290.5; N=30: 2141.0，对比 PT N=6: 8.5; N=30: 1401.5，变化 考虑额外神经网络调用后仍显著优于 PT。
 > - DW-4 (8D) 上，Round trips (R) 为 Diff-APT (K=5) N=5: 12456，对比 PT N=5: 2329，变化 约 5.3 倍提升。
 
-## 概述
+## 概要
 
 **问题瓶颈**：并行退火（Parallel Tempering, PT）通过多链在温度/平滑路径上交换样本实现多模态采样，但相邻退火分布之间常存在极小的密度重叠，导致交换接受率低下，需要大量平行链才能维持参考分布与目标分布间的有效通信。
 
@@ -54,7 +56,7 @@ claims:
 
 **主要结果**：在 GMM-10、DW-4（8 维）、ManyWell-32（32 维双阱系统，2¹⁶ 个模式）以及丙氨酸二肽（Alanine Dipeptide）上，不同 APT 变体均展现出比 PT 更优的往返行程与混合效率（更低的自相关时间 $\hat{\Lambda}_K$），并通过自由能估计与样本质量可视化验证了其可靠性与模式覆盖能力（Tables 1-4, Figures 1-7）。
 
-## 背景与动机
+
 
 并行退火（Parallel Tempering, PT）是采样多模态目标分布的核心方法，通过运行一系列温度递增的平行链并周期性地在相邻链间交换样本来增强对复杂空间的探索。传统 PT 的交换接受概率由相邻分布间的增量权重比决定，给出为
 $$\alpha^n(x,x') := \min\left\{1, \frac{w^n(x')}{w^n(x)}\right\},\quad w^n(x) := \frac{\tilde{\pi}^n(x)}{\tilde{\pi}^{n-1}(x)}$$
@@ -66,7 +68,9 @@ $$\alpha^n(x,x') := \min\left\{1, \frac{w^n(x')}{w^n(x)}\right\},\quad w^n(x) :=
 $$r(\mathbb{P}_K^{n-1}, \mathbb{Q}_K^n)^2 \leq \frac{1}{2}\,\mathrm{SKL}(\mathbb{P}_K^{n-1}, \mathbb{Q}_K^n)$$
 控制加速交换的拒绝率（式(4), Theorem 1），通过最小化该对称 KL 训练加速器，可有效增加相邻链间的有效重叠，从而在不增加链数的前提下大幅提升往返行程数。与此同时，每一轮交换仍经过 Metropolis 校正，保证 APT 保持 PT 的 $\pi$-不变性与遍历性，避免了单独依赖神经采样器时的偏差和计算瓶颈。实验表明，在相同局部探索（单步 HMC）和相同退火路径条件下，APT 在链数极少时（如 N=6）可将往返行程数提升超过两个数量级（Table 1），并显著降低自由能估计的方差与偏差（Figure 3），为有限预算下采样复杂多模态分布提供了可行路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 并行退火（PT）的效率瓶颈在于相邻退火链之间分布重叠极小，导致直接交换的接受率极低。传统做法依赖大量增加链数来维持通信，但这会显著提升计算负担。在该工作的框架中，作者通过将这种"直接交换"变更为**基于神经传输的加速交换**，从根本上改变了 PT 的通信机制。
 
@@ -93,7 +97,7 @@ $$r(\mathbb{P}_K^{n-1}, \mathbb{Q}_K^n)^2 \leq \frac{1}{2}\mathbb{P}_K^{n-1}[-\l
 
 综上，APT 的核心创新在于**将神经传输作为并行退火中的"可学习通信路径"，在算法层面仅改变交换插槽，却在不牺牲渐近理论性质的前提下，将相邻链间的分布重叠问题转化为可优化的传输问题**。这一设计同时规避了单个神经采样器的偏差风险，为 PT 的效率瓶颈提供了原则性的解决方案。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0005_CODnlyYUli_Accelerated_Parallel_Tempering_via_Neural_Transp/figures/002_Figure_1.jpg]]
 *Figure 1: (Left) An illustration of the local exploration and communication step for PT vs APT. (Middle) 1,000 samples of a Gaussian mixture model target obtained using PT vs APT with a standard Gaussian reference. See Appendix 6.1 for more details. (Right) Round trips for PT and APT with N = 6 chains over T = 100, 000 iterations of Algorithm 1*
@@ -154,7 +158,7 @@ $$
 
 **输入输出总览**：整个 APT 循环以 $N$ 条链的当前样本为输入，依次执行局部探索与前向/后向加速，仅在加速交换步骤产生跨链数据流，最终输出更新后的链样本及可选的自由能估计。框架保持了经典 PT 的两阶段结构（局部更新 + 通信交换），仅在通信阶段以路径级传输替换了直接样本交换。
 
-## 核心模块与公式推导
+
 
 ### 加速交换机制
 
@@ -190,7 +194,9 @@ $$ r(\mathbb{P}_K^{n-1},\,\mathbb{Q}_K^n)^2 \,\leq\, \frac12\,\mathbb{P}_K^{n-1}
 
 加速器的具体实现（正则化流 NF‑APT、条件马尔可夫链扩散 CMCD‑APT、扩散模型 Diff‑APT）均通过参数化路径测度并最小化对应的对称 KL 散度来训练，详见表 1 与 Section 5；其增量权重的具体形式依赖于所选传输类型（例如 NF‑APT 的增量权重还包含 Jacobian 行列式项，CMCD‑APT 则基于正向/反向转移密度之积）。但这些细节不在本节展开，本节仅聚焦 APT 框架的通用核心公式。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 并行退火（PT）的效率瓶颈在于相邻退火分布间重叠极小，导致交换接受率很低，需大量增加平行链才能维持通信。APT 通过引入可学习的前向/后向神经网络加速器（正则化流、控制扩散、扩散模型）在相邻链间构建更灵活的传输路径，直接扩大有效分布重叠，显著提升往返行程数（R）并保持渐近一致性。以下主要结果涵盖四类合成基准与一个分子体系，消融实验系统剥离加速步数、加速器类型的影响，最后总结已知局限与需要人工校验的边界条件。
 
@@ -233,7 +239,9 @@ $$ r(\mathbb{P}_K^{n-1},\,\mathbb{Q}_K^n)^2 \,\leq\, \frac12\,\mathbb{P}_K^{n-1}
 
 上述局限性提示：当将 APT 从基准推广至全新问题时，应优先检查往返行程数与自由能估计的一致性，谨慎解读仅基于训练损失得出的表现预期。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 APT 的底层仍然是并行退火（PT）框架：每个退火链独立执行局部探索（单步 HMC），链间通过随机交换通信。与传统 PT 的区别仅在于**交换机制**——标准 PT 直接交换相邻链的当前样本，接受概率为
 
@@ -263,6 +271,8 @@ APT 则在前向/后向神经加速器上生成长度为 $K$ 的路径，交换�
 - **更直接的优化目标**：是否可直接以 APT 的 MH 接受率或链间混合指标作为损失函数，替代当前使用的对称 KL 散度，以获得对采样效率更精确的优化？
 - **非连续与非欧空间的扩展**：当前 APT 要求前向/后向加速器定义在连续路径空间上（NF、SDE 离散化），其在离散变量、图结构或非欧几里德空间中的适用性尚属开放，是否可借由连续松弛或跳跃过程搬运？
 - **鲁棒性判据与混合式策略**：在何种条件下应回退至标准 PT 以避免神经传输训练失败引入的额外计算？发展判定准则并构建自适应调度（例如仅在高层链启用加速）可能是实用的补充。
+
+
 
 ## 原文 PDF
 

@@ -42,7 +42,7 @@ claims:
 > - fastMRI (FSPD, ref FD) 上，PSNR / SSIM (×4) 34.65 / 0.9621 vs Best baseline (lower) (Superior performance across all metrics)。
 > - IXI (T1, ref T2) 上，PSNR / SSIM (×2) 45.39 / 0.9959 vs Best baseline (lower) (Best performance, SSIM significantly higher)。
 
-## 概述
+## 概要
 
 ### 1. 问题与瓶颈
 
@@ -76,7 +76,7 @@ GaussM2ASR 并非孤立地学习高斯表示，而是构建了一套**解剖引�
 
 该方法要求目标与参考图像空间对齐，临床场景中的患者运动可能引入错位和伪影，需配准预处理。此外，高斯核数量固定且由参考图像分辨率决定，对纹理简单图像可能导致冗余计算。未来方向包括整合鲁棒的运动校正技术，以及开发自适应高斯分配策略以提升计算效率。
 
-## 背景与动机
+
 
 ### 多对比度MRI与超分辨率需求
 
@@ -111,7 +111,9 @@ $$f(\mathbf{x}) = \sum_{i=1}^{N} \alpha_i r_i G_i(\mathbf{x})$$
 
 为此，GaussM2ASR引入了三大解剖先验驱动模块：**SPMF**（结构先验调制融合）抑制背景并增强高频通道，**AG-DDCA**（解剖引导双域交叉注意力）在空间域和频域联合增强解剖细节，**AGGP**（解剖引导高斯参数化器）利用梯度引导的Top-T稀疏注意力将高斯中心聚焦于解剖边缘。这些模块共同构成了一个完整的解剖引导管线，使2D高斯溅射在医学影像场景中发挥最大效能。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 从像素回归到自适应基函数合成：范式转变
 
@@ -159,7 +161,7 @@ $$\text{Att}_{\text{top-T}}(Q, K, V) = \text{Softmax}(M \odot W) V$$
 
 GaussM2ASR采用两阶段训练：首先使用高分辨率目标图像预训练整个网络，随后冻结AGGP模块，使用低分辨率输入微调其余部分。消融实验（Figure 7）表明，两阶段策略优于单阶段训练，验证了先让高斯参数化器在高质量监督下学习解剖聚焦，再适应降质输入的有效性。
 
-## 整体框架
+
 
 GaussM2ASR 的整体流水线将多对比度 MRI 任意尺度超分辨率重构为**可学习的各向异性 2D 高斯参数估计与 α 混合渲染**问题，从根本上区别于基于隐式神经表示（INR）的逐像素强度回归范式。其核心因果机制在于：INR 的过参数化网络在梯度优化下天然存在频谱偏差——优先收敛到低频解，且连续表示中的特征网格插值充当低通滤波器，进一步削弱高频解剖边界；GaussM2ASR 转而学习一组自适应基函数（各向异性高斯核），将高频重建转化为更平滑的参数优化问题，窄核捕获边界细节，宽核覆盖平滑区域。
 
@@ -204,7 +206,7 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{spa}} + \lambda_{\mathrm{f
 
 频域损失直接监督高频分量的重建质量，与频谱偏差缓解的设计目标一致。
 
-## 核心模块与公式推导
+
 
 ### 3.1 各向异性2D高斯溅射渲染
 
@@ -301,7 +303,9 @@ $$\mathcal { L } _ { \mathrm { t o t a l } } = \mathcal { L } _ { \mathrm { s p 
 ![[assets/figures/papers/paper_list_l2437_https_openaccess_thecvf_com_content_CVPR2026_html_Yan_Adaptive_Anisotrop/figures/009_Figure_6.jpg]]
 *Figure 6: Feature responses before and after the SPMF module, along with their residual map. The results demonstrate the module’s efficacy in suppressing activations in background and other irrelevant regions*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -359,7 +363,9 @@ GaussM2ASR 在三个公开数据集（IXI、BraTS、fastMRI）上，针对多对
 ![[assets/figures/papers/paper_list_l2437_https_openaccess_thecvf_com_content_CVPR2026_html_Yan_Adaptive_Anisotrop/figures/006_Figure_4.jpg]]
 *Figure 4: Qualitative comparison on IXI, BraTS, and fastMRI datasets at a 4× scaling factor. Enlarged views of regions within green boxes are provided alongside their error maps, which display the absolute reconstruction error (darker shades indicate smaller errors)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题域定位：从隐式神经表示到显式基函数合成
 
@@ -433,6 +439,8 @@ GaussM2ASR 要求目标图像与参考图像在空间上严格对齐。在临床
 
 1. **鲁棒运动校正集成**：如何整合鲁棒的运动校正技术，使模型能处理未对齐或存在运动伪影的多对比图像，从而扩展临床适用性？
 2. **自适应高斯分配**：如何开发自适应的高斯分配策略，根据图像内容动态调整高斯核数量，在保持重建质量的同时提升纹理简单图像的计算效率？
+
+
 
 ## 原文 PDF
 

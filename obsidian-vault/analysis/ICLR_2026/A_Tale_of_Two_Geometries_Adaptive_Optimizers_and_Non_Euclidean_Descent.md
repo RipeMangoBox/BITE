@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/A_Tale_of_Two_Geometries_Adaptive_Optimizers_and_Non_Euclidean_Descent.pdf
+project_link: null
+code_link: null
 aliases:
 - WSPSA1
 - TTGAONED
@@ -36,7 +38,10 @@ claims:
 | Method | 统一自适应优化器框架（Well-Structured Preconditioner Set, Algorithm 1） |
 | Dataset |  |
 
-## 概述
+> [!tip] 效果简介
+> 本笔记的既有实验指标、对比结果与适用边界见“实验与关键发现”；本轮仅统一结构，不改写证据。
+
+## 概要
 
 自适应优化器（如 Adam、Shampoo、Lion）在深度学习实践中表现优异，但其加速行为和维度无关性难以用标准光滑性和标准梯度方差假设解释。本文揭示：这一困境源于**标准光滑性假设无法刻画非欧几何下自适应优化器收敛的精细结构**。为此，文章引入两个更具表达力的结构化假设——**自适应光滑性 Λ_ℋ(f)** 和**自适应梯度方差 σ_ℋ**，分别催化加速收敛和维度无关收敛。
 
@@ -48,7 +53,7 @@ claims:
 
 方法定位：本文属于理论分析工作，不引入新优化器，而是通过**替换光滑性假设和方差假设**（从标准 L、σ 到自适应 Λ_ℋ、σ_ℋ）更精准地刻画已有自适应算法的收敛性质。实验部分需另行查阅以验证理论与实践的吻合度。
 
-## 背景与动机
+
 
 自适应优化器（如 Adam、Lion、Muon）在实践中凭借其适应梯度结构的能力取得了巨大成功，但关于它们为何有效、收敛速度能否突破标准光滑性假设给出的障碍，一直缺少清晰的统一理论。问题的核心在于：**标准光滑性（$L_{\|\cdot\|}(f)$）和标准梯度方差假设建立在固定的范数结构之上，而自适应方法天然地在迭代过程中动态改变度量，这种“非欧几里得下降”的行为无法被传统光滑性概念所刻画**。在标准假设下，即使使用 Nesterov 动量，凸情形的最坏收敛率也被下界 $\Omega(T^{-1})$ 限制，而提升到加速率 $O(T^{-2})$ 需要更强的结构化条件。
 
@@ -64,7 +69,9 @@ $$
 
 由此，本文的核心动机可以概括为两个待验证的猜想：(1) 自适应光滑性是否足够强、并且在实际中仍然成立，从而催生加速自适应算法；(2) 自适应梯度方差能否一般地解释归一化最速下降（以至于更多自适应优化器）的维度无关性质。如果这些猜想成立，那就能建立起**“几何—光滑性/方差—收敛率”的三角对应**，为自适应优化器的设计提供超越启发式动机的理论基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 现有优化理论中，标准光滑性（$L_{\|\cdot\|}(f)$）和标准梯度方差（$\sigma_{\|\cdot\|_*}$）假设无法刻画非欧几何下自适应优化器的加速行为与维度无关收敛。该工作的核心突破在于引入一对更具表达力的结构化假设——**自适应光滑性**（Adaptive Smoothness，$\Lambda_{\mathcal{H}}(f)$）和**自适应梯度方差**（Adaptive Gradient Variance，$\sigma_{\mathcal{H}}$）——它们分别催化加速收敛与维度无关的收敛，并揭示出自适应性与几何之间的深层联系。
 
@@ -107,7 +114,7 @@ $$
 
 综上，核心创新不是新算法，而是**将自适应优化器的理论从“经验快”推向“可证明快且维度无关”的两个新概念**，它们强制性更强，却换来了加速率和维度无关性，解开了自适应行为与非欧几何之间的深层对偶关系。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0004_iaoAKDRAJQ_A_Tale_of_Two_Geometries_Adaptive_Optimizers_and/figures/002_Figure_1.jpg]]
 *Figure 1: Here we demonstrate the duality between the supremum of the primal norms and the infimum of the corresponding dual norms for any well-structured preconditioner set H. In particular, we consider $\mathcal { H }$ = {all diagonal PSD matrices}, in which case \| $\cdot$ \|$_ { \mathcal { H } }$ = \| $\cdot$ \|$_ { \infty }$ and \| $\cdot$ \|$_ { \mathcal { H } , * }$ = \| $\cdot$ \|$_ { 1 }$ Left figure: the \| $\cdot$ \|$_ { \infty }$ -unit ball (black square) in the primal space is the intersection of all \| $\cdot$ \|$_ { H ^ { - } }$ unit ball (colored ellipses) for $\pmb { H } \in \mathcal { H }$ with $\mathrm { T r } ( { \cal$ H } ) $\le$ 1 , that is, \| $\cdot$ \|$_ { \infty }$ is the supremum of all such primal \|...
@@ -150,7 +157,7 @@ $$
 在上述管道中，$$\mathcal{H}$$ 的选择直接决定了 $$\Lambda_{\mathcal{H}}$$ 和 $$\sigma_{\mathcal{H}}$$ 的大小，从而控制收敛速度。当 $$\mathcal{H}$$ 为全体对角矩阵时，$$\Lambda_{\mathrm{diag}} \le L_{\mathrm{diag}}$$，且往往远小于标准全局光滑常数，于是加速项可以获得实质改善；而若仍沿用标准梯度方差假设，则 SignGD 的下界会显式依赖维度 $$d$$（Theorem 4.7），这恰恰说明自适应方差假设对于获得维度无关保证是必要的。  
 综上，统一框架不仅集成了现有算法，更通过“自适应光滑性”和“自适应方差”这两个结构假设，建立了自适应优化器与几何之间的深层因果联系。
 
-## 核心模块与公式推导
+
 
 自适应优化器的理论核心建立在两个可分离但互补的几何概念上：**自适应光滑性**（adaptive smoothness）与**自适应梯度方差**（adaptive gradient variance）。两者分别控制着算法的确定性与随机性收敛行为，并通过统一的前置条件集（well‑structured preconditioner set ℋ）将各种自适应优化器（如 Adam、SignGD、Shampoo）纳入同一分析框架。
 
@@ -214,7 +221,9 @@ $$
 $$
 这组结果共同说明：**自适应方差正是实现维度无关收敛的必要结构条件**，而自适应光滑性则是获得加速率的结构条件。两套几何概念互补，构成了自适应优化器非欧收敛理论的基石。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 本文为一篇纯理论分析工作，未包含数值实验。论文的核心贡献在于通过引入自适应光滑性 $\Lambda_{\mathcal{H}}(f)$ 和自适应梯度方差 $\sigma_{\mathcal{H}}$，建立了自适应优化器及归一化最速下降法在非欧几里得几何下的收敛理论。以下总结其主要分析结论。
 
@@ -256,7 +265,9 @@ $$
 
 需要指出，上述结论均为理论推导，文中未通过仿真或真实数据实验进行数值验证。对自适应光滑性与方差假设在实践中的可达性、及其他潜在失效模式的分析，需后续实验补充。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 论文在优化理论中的坐标
 
@@ -338,6 +349,8 @@ $$
 4. **与 Muon/Lion 的实证连接**：论文将 Lion 和 Muon 分别定位为 $\ell_{\infty}$‑NSD 和矩阵谱范数 NSD 的等价形式，但未提供两者在自适应光滑性/方差下的理论对比。鉴于 Muon 在近期大模型训练中的成功，理解其矩阵几何是否天然具有更小的 $\Lambda_{\mathcal{H}}(f)$ 或 $\sigma_{\mathcal{H}}$，可能为实践者提供有操作性的理论指导。
 
 **证据强度总结**：论文的核心理论声明（加速收敛、维度无关界）均有高置信度（0.95–1.0）的定理证明支撑，但所有结论均未经验证地映射到实际优化任务。在将该理论框架作为深度学习优化设计的决策依据前，需要独立的实验基准和假设检验。
+
+
 
 ## 原文 PDF
 

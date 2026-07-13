@@ -41,7 +41,7 @@ claims:
 > - nuScenes validation set 上，Avg. L2 (m) ↓ 0.61 (WPT-Teacher) vs 0.88 (Baseline) (-0.27)；Avg. Collision (%) ↓ 0.11 (WPT-Teacher) vs 1.06 (Baseline) (-0.95)；Avg. L2 (m) ↓ 0.66 (WPT-Student) vs 0.88 (Baseline) (-0.22)。
 > - Bench2Drive 上，Driving Score ↑ 79.23 (WPT-Teacher) vs 65.23 (Baseline) (+14.00)；Success Rate (%) ↑ 54.54 (WPT-Teacher) vs 34.10 (Baseline) (+20.44)；Driving Score ↑ 72.61 (WPT-Student) vs 65.23 (Baseline) (+7.38)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -59,7 +59,7 @@ WPT（World-to-Policy Transfer）提出了一种**训练时交互、推理时丢
 
 WPT 处于**世界模型辅助规划**与**知识蒸馏**的交叉点。不同于将世界模型作为推理组件的方法（如 DriveTransformer 的时序建模、WoTE 的 BEV 轨迹评估），WPT 将世界模型限定为训练阶段的“教师”信号源。相较于 DriveDPO 等偏好对齐方法仅优化模仿目标，WPT 的奖励模型融合了显式的安全与效率仿真信号，提供了更丰富的监督维度。在蒸馏策略上，WPT 同时对齐规划表示（查询级 L2 蒸馏）和奖励分布（世界奖励蒸馏），区别于仅使用特征蒸馏或伪标签的常见做法。该范式为“世界知识注入-轻量策略部署”提供了一条可复用的技术路径，其核心思想——训练时利用重型模型提供结构化奖励，推理时仅保留轻量学生——具备向其他具身智能任务迁移的潜力。
 
-## 背景与动机
+
 
 ### 端到端自动驾驶的规划瓶颈
 
@@ -80,7 +80,9 @@ WPT的核心动机是打破上述困境。其关键洞察是：**世界模型仅
 
 这一范式转换（Figure 1d）将世界模型从“推理负担”重新定位为“训练教师”，为端到端自动驾驶的实时规划开辟了新路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 WPT 的根本创新在于**将世界模型从推理时依赖转变为纯训练时知识注入器**，通过“教师-奖励-蒸馏”三阶段机制，在不增加部署开销的前提下将未来世界感知能力迁移至轻量策略。其核心突破可归纳为三个维度的 **changed slots**：
 
@@ -106,7 +108,7 @@ WPT 的根本创新在于**将世界模型从推理时依赖转变为纯训练�
 
 消融实验（Table 6）证实，查询级蒸馏、模仿奖励蒸馏和仿真奖励蒸馏三者缺一不可——仅当三者结合时学生才能达到 0.66m L2 误差和 0.24% 碰撞率的最优性能。更重要的是，这一蒸馏机制不仅保留了教师的大部分性能增益，还实现了高达 **4.9 倍推理加速**，同时将学生训练成本从 488 GPU 小时降至 168 小时（-65.6%）。
 
-## 整体框架
+
 
 WPT 提出了一种**训练时世界知识注入、推理时世界模型剥离**的端到端自动驾驶规划范式。其核心 pipeline 由四个紧密协作的模块构成：**AD 策略（教师/学生）**、**世界模型**、**奖励模型** 和 **世界知识蒸馏**。整体架构如 Figure 2 所示，分为上方的训练阶段和下方的蒸馏阶段。
 
@@ -137,7 +139,7 @@ $$\tau^* = \arg\max_i \left( w_1 r_{\mathrm{im},i} + w_2 r_{\mathrm{sim},i} \rig
 ![[assets/figures/papers/paper_list_l2276_https_arxiv_org_abs_2511_20095/figures/012_Figure_6.jpg]]
 *Figure 6: Illustration of our Occ-based and instance-based baseline models. The top part shows the occupancy-based baseline model, while the bottom part illustrates the instance-based baseline model. Both approaches utilize a BEV decoder, but differ in how planning queries interact with features*
 
-## 核心模块与公式推导
+
 
 WPT 框架由四个核心模块构成：AD 策略（教师/学生）、世界模型、奖励模型与世界知识蒸馏。各模块协同完成“训练时注入世界知识，推理时轻量部署”的目标。
 
@@ -198,7 +200,9 @@ $$\mathcal{L}_{\mathrm{reward}} = \| r_{\mathrm{final}}(\tau_S) - r_{\mathrm{fin
 
 消融实验（Table 6）表明，查询蒸馏、模仿奖励蒸馏与仿真奖励蒸馏三者结合才能达到最佳学生性能（0.66m / 0.24% 碰撞率）。同时，世界感知蒸馏大幅降低训练成本——学生训练从 488h 降至 168h（-65.6%），且规划质量同步提升（Table 8）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 一、主实验结果
 
@@ -271,7 +275,9 @@ WPT 在两个主流自动驾驶规划基准上进行了端到端评估：nuScene
 ![[assets/figures/papers/paper_list_l2276_https_arxiv_org_abs_2511_20095/figures/015_Table_9.jpg]]
 *Table 9: Comparison of planning inference time*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有世界模型范式的根本差异
 
@@ -313,6 +319,8 @@ WPT 范式的成功引出了若干值得进一步探索的方向：
 1. **跨任务泛化**：WPT 的“世界模型训练时指导、蒸馏后轻量部署”范式能否扩展至其他视觉-语言-动作模型或机器人操作任务？这需要验证世界模型在非自动驾驶场景中的预测能力和奖励设计的可迁移性。
 2. **动态世界模型适配**：当前世界模型为冻结状态，若世界模型在训练过程中动态更新或根据场景适应性调整，蒸馏策略如何保持稳定？这可能涉及课程学习或渐进式蒸馏策略。
 3. **舒适性优化**：在不牺牲效率和安全性的前提下进一步提升舒适性，需要更精细的奖励塑形，例如引入加加速度（jerk）约束或个性化驾驶风格建模。
+
+
 
 ## 原文 PDF
 

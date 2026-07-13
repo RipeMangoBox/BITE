@@ -43,7 +43,7 @@ claims:
 > - MMEP 上，Perception Score 1343.0 (Beta-KD Instance over Align-KD) vs Align-KD (+54.1)。
 > - MMBench_dev 上，Accuracy 60.2 (Beta-KD Instance over Cosine KD) vs Cosine KD (+3.1)。
 
-## 概述
+## 概要
 
 多模态大语言模型（MLLM）的知识蒸馏面临一个核心瓶颈：来自真实标签的交叉熵损失与来自教师模型的多个蒸馏损失构成异构监督信号，它们的尺度、梯度和优化动态各不相同，手动平衡这些信号极其困难，且固定权重无法适应样本或任务的不确定性。
 
@@ -51,7 +51,7 @@ claims:
 
 在方法谱系上，Beta-KD 区别于传统的固定权重蒸馏（如 **Forward KL**，Hinton et al., NIPS 2015；**Reverse KL**，Gu et al., ICLR 2024）和跨模态对齐蒸馏（**Align-KD**，Feng et al., CVPR 2025），将损失平衡问题转化为可学习的贝叶斯推断。实验表明，在 ScienceQA 数据集上，实例级 Beta-KD 将 VQA 准确率从纯交叉熵基线的 48.4% 提升至 54.9%（+6.5 个百分点）；在 MMEP 基准上相较 Align-KD 提升 +54.1；在 TextVQA 上提升 +2.9，且不确定性网络仅引入总参数量 0.03% 的开销，训练速度与无加权方案几乎一致。
 
-## 背景与动机
+
 
 多模态大语言模型（MLLM）在视觉问答、图像描述等任务上取得了显著进展，但其庞大的参数量和计算开销严重制约了在资源受限场景下的部署。知识蒸馏（Knowledge Distillation, KD）是解决这一矛盾的主流范式——通过让轻量学生模型模仿大型教师模型的输出分布，将教师的知识压缩迁移至学生。然而，在多模态蒸馏的实践中，一个根本性的难题始终未被有效解决：**异构监督信号的平衡问题**。
 
@@ -61,7 +61,9 @@ claims:
 
 本文的核心动机在于：**能否从根本上消除蒸馏过程中的手动调参，使损失权重能够根据学生模型的不确定性自适应调节？** 为此，我们提出 Beta-KD——一个不确定性感知的知识蒸馏框架。其核心洞察是：知识蒸馏可以被统一解释为贝叶斯框架下的最大后验（MAP）估计问题——教师的输出作为学生激活上的 Gibbs 先验，交叉熵作为数据似然，联合优化即等价于最小化带有自适应精度的蒸馏目标。通过 Laplace 近似，我们推导出封闭形式的不确定性权重 $\beta$，并由轻量网络预测，从而在任务级或实例级实现完全自适应的损失平衡（Figure 1(b)）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈洞察：多模态知识蒸馏中的异构监督平衡难题
 
@@ -113,7 +115,7 @@ $$\min_{\theta, \phi} \mathcal{L}_{\mathrm{CE}}(\theta) + g_{\phi}(h(x)) \ell(\t
 
 值得注意的是，Beta-KD 的框架对底层蒸馏损失的具体形式（FKL、RKL、Cosine-Probs 等）是**正交的**——它不改变损失函数本身，而是提供了一种通用的自适应加权机制。这使其能够无缝集成到现有的各种 KD 方案中，在 ScienceQA 上以 Cosine-Probs 为基底的实例级 Beta-KD 将 VQA 准确率从纯 CE 基线的 48.4% 提升至 **54.9%**（+6.5 个百分点），并在 MMEP、TextVQA 等六个基准上展现了跨数据集和跨模型架构的稳健增益。
 
-## 整体框架
+
 
 Beta-KD 将多模态大语言模型的知识蒸馏重新形式化为贝叶斯框架下的最大后验（MAP）估计问题。其核心洞察在于：教师模型的输出可以被解释为学生激活上的 Gibbs 先验，而交叉熵损失则作为数据似然，二者的联合优化等价于最小化带有自适应精度的蒸馏目标，从而消除了传统方法中手动设定损失权重的需求。
 
@@ -159,7 +161,7 @@ Beta-KD 通过贝叶斯视角将 $\lambda$ 替换为可学习的 $\beta$，并�
 ![[assets/figures/papers/paper_list_l2707_https_arxiv_org_abs_2603_21426/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the proposed Beta-KD framework. (a) Conventional KD is hard to balance the learning from data and the learning from teacher signals. (b) Our method introduces an uncertainty-aware weighting framework by recognizing teacher supervision as a Gibbs prior, which naturally induces the prediction of the weights*
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题建模：将知识蒸馏形式化为贝叶斯推断
 
@@ -253,7 +255,9 @@ $$
 ![[assets/figures/papers/paper_list_l2707_https_arxiv_org_abs_2603_21426/figures/005_Figure_4.jpg]]
 *Figure 4: Training trajectories and dynamic weight evolution for FKL+CE and RKL+CE objectives. The upper row shows the total training loss over steps, and the lower row illustrates the adaptive evolution of task and instance-level uncertainty weights β. The adaptive adjustment of the weighting parameter β during training ensure a faster overall loss convergence and enhances optimization stability*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与实验动机
 
@@ -319,7 +323,9 @@ Table 6 报告了训练效率统计。不确定性权重网络 $g_\phi(h(x))$ �
 ![[assets/figures/papers/paper_list_l2707_https_arxiv_org_abs_2603_21426/figures/008_Figure_6.jpg]]
 *Figure 6: Visualization of Student Entropy*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：多模态蒸馏中的损失平衡困境
 
@@ -380,6 +386,8 @@ $$\min_{\theta, \phi} \mathcal{L}_{\mathrm{CE}}(\theta) + g_{\phi}(h(x)) \ell(\t
 3. **多任务扩展性**：不确定性加权在两损失或多损失设置中的有效性如何随任务数量变化？三损失实验（Table 3）已初步验证，但更多损失组合下的表现仍需探索。
 
 4. **更广泛的学生架构**：该方法在 MobileVLM 和 LLaVA-Qwen 上已验证，但对其他 MLLM 架构（如 BLIP-2、InstructBLIP、LLaVA-1.5 系列）的泛化性尚待确认。
+
+
 
 ## 原文 PDF
 

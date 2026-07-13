@@ -5,6 +5,8 @@ paper_level: A
 venue: TMLR
 year: 2025
 pdf_ref: paperPDFs/TMLR_2025/ReHub_Linear_Complexity_Graph_Transformers_with_Adaptive_Hub_Spoke_Reassignment.pdf
+project_link: https://tomerborreda.github.io/rehub/
+code_link: null
 aliases:
 - ReHub
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | ReHub：具有自适应枢纽-辐条重分配的线性复杂度图Transformer |
 | 英文题名 | ReHub: Linear Complexity Graph Transformers with Adaptive Hub-Spoke Reassignment |
 | 会议/期刊 | TMLR 2025 |
-| Links | [paper](https://arxiv.org/abs/2412.01519); [Project](https://tomerborreda.github.io/rehub/) |
+| Links | [paper](https://arxiv.org/abs/2412.01519) · [Project](https://tomerborreda.github.io/rehub/) |
 | Topic | #topic/representation_self_supervised_transfer #topic/representation_self_supervised_transfer/representation_learning |
 | Method | ReHub |
 | Dataset | Peptides-func, Peptides-struct, PCQM-Contact, PascalVOC-SP |
@@ -40,7 +42,7 @@ claims:
 > - Peptides-struct 上，MAE ↓ 为 0.2488 ± 0.0017，对比 Neural Atoms 0.2553 ± 0.0005，变化 −0.0065。
 > - PCQM-Contact 上，MRR ↑ 为 0.3534 ± 0.0014，对比 Neural Atoms 0.3262 ± 0.0010，变化 +0.0272。
 
-## 概述
+## 概要
 
 图Transformer通过全局注意力机制有效捕获图中远距离节点间的依赖关系，但其密集注意力的二次复杂度 $O(N^2)$ 严重制约了在大规模图上的可扩展性。现有工作通过引入少量虚拟节点（hub）来聚合全局信息，但若为提升性能而增加hub数量，复杂度会迅速恶化——例如，Neural Atoms（Li et al., 2024）在hub数增至 $O(\sqrt{N})$ 时复杂度已达 $O(N^{3/2})$，形成了性能与效率之间的尖锐权衡。
 
@@ -49,8 +51,6 @@ ReHub 针对这一瓶颈提出了一种**自适应枢纽-辐条重分配**（ada
 实验表明，稀疏版 ReHub 在长程图基准（LRGB）的多个数据集上不仅显著优于 Neural Atoms——Peptides-func AP 提升 0.0094、PCQM-Contact MRR 提升 0.0272——而且性能与全连接版本（ReHub-FC）相当，验证了重分配机制的有效性。在大图内存测试中，ReHub 的内存消耗随节点数线性增长，并在 Coauthor Physics 与 OGBN-Arxiv 上以显著更低的内存开销取得了与 Exphormer（Shirzad et al., 2023）可比甚至更优的精度。
 
 **方法定位**：ReHub 属于基于虚拟节点的线性图Transformer家族，其方法谱系与知识库定位将在下一节详述。
-
-## 背景与动机
 
 图Transformer通过在图上执行全局自注意力，能够有效捕获节点间的长程依赖关系，在分子性质预测、图像分割等任务中展现出超越传统消息传递神经网络（MPNN）的性能。然而，标准Transformer中的密集自注意力机制具有$O(N^2)$的时间与空间复杂度，其中$N$为图中节点数。这一二次复杂度瓶颈使得图Transformer难以扩展至大规模图——当图包含数万乃至数十万节点时，内存消耗与计算开销将变得不可承受。
 
@@ -62,7 +62,7 @@ ReHub 针对这一瓶颈提出了一种**自适应枢纽-辐条重分配**（ada
 
 ReHub的回答是引入**自适应hub重分配机制**：在每一层根据hub之间的特征相似度与注意力分数，动态地为每个spoke重新分配其连接的$k$个hub。这一设计使得稀疏连接版本（ReHub）的性能能够与全连接版本（ReHub-FC）相媲美，从而在保持线性复杂度的同时，突破了此前方法中性能与效率的固有权衡。
 
-## 核心创新
+## 核心方法与创新机理
 
 ReHub 的核心创新在于**将图 Transformer 的复杂度控制从“减少 hub 总数”转向“限制每 spoke 的连接数 + 动态重分配”**，从而打破此前基于虚拟节点方法中性能与效率的权衡困境。
 
@@ -95,8 +95,6 @@ ReHub 的核心技术杠杆是**自适应 hub 重分配机制**（Hub (Re)Assign
 消融实验直接验证了重分配机制的核心作用：关闭重分配（即静态连接）导致 PascalVOC-SP 上 F1 从 0.3860 降至 0.3775（Table 5）。更关键的是，**稀疏版本的 ReHub 性能与全连接版本（ReHub-FC）相当**，证明重分配机制使得仅连接 $k$ 个 hub 的稀疏配置能够达到与连接全部 hub 相当的信息聚合能力——这正是该方法突破性能-效率权衡的直接证据。
 
 此外，hub 利用率分析（Figure 3）显示，在 $k=3$、$r=1$ 的默认配置下，各层 hub 利用率峰值集中在 90%-100%，表明重分配机制有效避免了 hub 闲置，确保了所有 hub 的充分参与。
-
-## 整体框架
 
 ReHub 的整体架构遵循“局部消息传递—稀疏全局注意力—动态连接重分配”的交替范式，将图节点（spoke）与少量虚拟节点（hub）组织成二分交互结构，在保持线性复杂度的前提下实现长程信息传播。
 
@@ -133,8 +131,6 @@ ReHub 的线性复杂度依赖于两个关键约束的协同：
 - **每 spoke 连接数**：$k$ 为小常数（如 $k=3$），控制交叉注意力的稀疏度。
 
 在此约束下，单层总复杂度为 $O(N_s k + N_h^2 + N_s) = O(N_s)$，内存消耗随节点数线性增长，这在大规模随机正则图实验（Figure 2）中得到了实证验证——ReHub 的峰值内存显著低于 Exphormer 和 Neural Atoms 等基线方法。
-
-## 核心模块与公式推导
 
 ### 枢纽-辐条二分图建模
 
@@ -208,7 +204,7 @@ $$\operatorname{BC}(P, Q) = \sum_{x \in \mathcal{X}} \sqrt{P(x) Q(x)}$$
 
 Figure 3和Figure 5的直方图分析表明，在 $r=1, k=3$ 的默认配置下，各层枢纽利用率峰值集中在90%-100%，且Bhattacharyya分布接近均匀——验证了重分配机制有效避免了枢纽闲置，使得稀疏连接版本（ReHub）性能与全连接版本（ReHub-FC）相当。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验设计逻辑
 
@@ -300,13 +296,10 @@ Figure 4 展示了 hub 比率 $r$ 和每 spoke 连接数 $k$ 对性能的影响�
 ![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2412_01519/figures/010_Table_7.jpg]]
 *Table 7: Dataset statistics of LRGB, OGBN-Arxiv and Coauthor Physics. Source: Exphormer (Shirzad et al., 2023)*
 
-![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2412_01519/figures/011_Table_8.jpg]]
-*Table 8: Hyperparameters for the LRGB datasets used for evaluation. For Peptides-func, Peptides-struct and PCQM-Contact some of the hyperparameters are model-specific and presented in additional tables*
-
 ![[assets/figures/papers/paper_list_l23_https_arxiv_org_abs_2412_01519/figures/012_Table_9.jpg]]
 *Table 9: Model-specific hyperparameters for PCQM-Contact, and the number of model parameters*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 核心基线：Neural Atoms 及其性能-效率权衡
 

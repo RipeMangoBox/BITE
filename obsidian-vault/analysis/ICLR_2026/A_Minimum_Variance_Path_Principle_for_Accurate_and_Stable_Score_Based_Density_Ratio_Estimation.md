@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/A_Minimum_Variance_Path_Principle_for_Accurate_and_Stable_Score_Based_Density_Ratio_Estimation.pdf
+project_link: null
+code_link: null
 openreview_forum_id: vf16PZJWD1
 aliases:
 - MMVPP
@@ -42,7 +44,7 @@ claims:
 > - 表格数据密度估计 (BSDS300) 上，NLL 为 -143.97 (MVP Spherical)，对比 -143.50 (VP Spherical)，变化 -0.47。
 > - Additive Noise 互信息估计 (corr=0.9) 上，MSE 为 0.0009 (MVP Spherical)，对比 0.0044 (Cosine Spherical)，变化 降低约一个数量级。
 
-## 概述
+## 概要
 
 基于得分的密度比估计（Score-based DRE）通过沿概率路径积分时间得分来估计两个分布之间的对数密度比。然而，现有方法普遍采用固定的、手工设计的路径调度，忽略了路径选择对估计性能的关键影响。本文揭示了一个被长期忽视的核心瓶颈：实际训练中可处理的切片时间得分匹配（STSM）损失与理想时间得分匹配（TSM）损失之间存在一个路径依赖的方差项，该缺失项正是**路径方差**——即概率路径上时间得分函数的二阶矩积分。
 
@@ -52,7 +54,7 @@ claims:
 
 本文的核心贡献在于：将DRE中路径选择的经验问题转化为一个有理论保证的优化问题，并通过解析方差和可学习参数化提供了完整的解决方案。
 
-## 背景与动机
+
 
 ### 基于得分的密度比估计
 
@@ -87,7 +89,9 @@ $$\mathcal{L}_{\mathrm{TSM}}(\theta) = \mathcal{L}_{\mathrm{STSM}}(\theta) + \in
 
 因此，一个自然且关键的问题浮现：**能否通过主动选择路径来最小化路径方差，从而提升密度比估计的准确性与稳定性？** 这正是本文提出最小方差路径（Minimum Variance Path, MVP）原理的核心动机。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 1. 识别并量化路径方差：从经验选择到理论驱动
 
@@ -127,7 +131,7 @@ $$F_{\phi}(t) = \sum_{k=1}^K w_k \left[ 1 - (1 - t^{a_k})^{b_k} \right], \quad \
 
 与固定路径方法仅优化STSM损失不同，MVP采用**交替优化策略**：在路径参数更新后，刷新基于方差的时步采样分布 $p(t) \propto 1/(\mathrm{Var}(\partial_t \log p_t) + \varepsilon)$，使训练集中于路径方差较大的区域，稳定STSM损失的蒙特卡洛估计。这种联合优化将路径学习与得分模型训练协同，形成完整的自适应DRE框架。
 
-## 整体框架
+
 
 MVP 的整体 pipeline 由三个核心模块串联构成：**时间得分模型**、**路径优化器**和**密度比估计器**。其输入为来自两个分布的样本对 $(\mathbf{x}_0, \mathbf{x}_1) \sim p_0 \times p_1$，输出为任意点 $\mathbf{x}$ 处的对数密度比估计 $\log \hat{r}(\mathbf{x})$。
 
@@ -148,7 +152,7 @@ $$\mathcal{L}_{\mathrm{TSM}}(\theta) = \mathcal{L}_{\mathrm{STSM}}(\theta) + \in
 $$\mathbb{E}_{p_1(\mathbf{x})}[\Delta(\mathbf{x})] \le e^L \left[ \mathcal{L}_{\mathrm{STSM}}(\theta) + \int_0^1 \mathrm{Var}_{p_t(\mathbf{x})}(\partial_t \log p_t(\mathbf{x})) \mathrm{d}t \right]$$
 这意味着，最小化路径方差能够直接收紧误差上界，从而在理论上保证了联合优化 STSM 损失与路径方差的合理性。MVP 通过 KMM 参数化将原本难以处理的泛函优化转化为有限维参数优化问题，使路径能够自适应于数据分布，无需手工选择。
 
-## 核心模块与公式推导
+
 
 ### 3.1 瓶颈识别：路径方差作为缺失项
 
@@ -226,7 +230,9 @@ $$\phi^* = \arg\min_\phi \mathcal{V}[\alpha_\phi, \beta_\phi]$$
 
 **KMM组件数选择**：消融实验（Table 1）表明 $K=5$ 为最优平衡点——$K=1$ 表达能力不足导致性能显著下降，$K=8$ 反而因过参数化降低性能。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -272,7 +278,9 @@ $$\phi^* = \arg\min_\phi \mathcal{V}[\alpha_\phi, \beta_\phi]$$
 
 尽管MVP在所有测试场景中表现优越，但需注意以下限制：（1）解析路径方差公式依赖特定分布假设——DI要求$p_0$为标准高斯，DDBI依赖条件高斯结构。在完全无参数设定下，这些闭式表达需要新的近似或扩展。（2）路径方差与Lipschitz常数$L$之间的精确理论关系尚未严格建立，当前误差上界（Theorem 4.2）的紧致性有待进一步分析。（3）交替优化策略虽在实践中有效，但缺乏全局收敛性保证。这些局限指向了未来工作的方向。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -307,6 +315,8 @@ $$\mathbb{E}_{p_1(\mathbf{x})} [\Delta(\mathbf{x})] \le e^L \left[ \mathcal{L}_{
 **路径几何的深层理解缺失**：当前方法仅利用路径方差的一阶信息（二阶矩），路径的更高阶特性（如曲率、导数的高阶矩）与估计误差之间的关系未被探索。论文提出的开放问题“路径几何特性与 Lipschitz 常数 $L$ 之间是否存在可量化的解析关系”直指这一理论空白。
 
 **参数化方法的扩展性**：KMM 参数化在低维路径空间（仅 $\alpha(t), \beta(t)$ 两个函数）中有效，但其能否扩展到更一般的函数族（如神经 ODE 参数化的路径）同时保持可优化性，尚待研究。更丰富的参数化可能带来更强的路径表达能力，但也可能引入优化不稳定或方差估计困难。
+
+
 
 ## 原文 PDF
 

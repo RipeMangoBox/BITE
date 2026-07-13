@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2026
 pdf_ref: paperPDFs/arxiv_2026/Motion_Aware_Caching_for_Efficient_Autoregressive_Video_Generation.pdf
+project_link: null
+code_link: https://github.com/ywlq/MotionCache
 aliases:
 - MACEAVG
 tags:
@@ -40,7 +42,7 @@ claims:
 > - SkyReels-V2 (540p, 2 chunks, 97 frames) 上，Speedup | VBench | PSNR | SSIM | LPIPS 6.28× (slow) | 82.84% | 23.46 | 0.9093 | 0.0875 vs 1× (Vanilla) | 83.84% | 1 (relative) | 1 | 1 (+5.28× speedup | -1.00% VBench)；Speedup | VBench 7.26× (fast) | 82.75% vs 1× (Vanilla) | 83.84% (+6.26× speedup | -1.09% VBench)。
 > - MAGI-1 (720p, 7 chunks, 24 frames) 上，Speedup | VBench | PSNR | SSIM | LPIPS 1.64× (slow) | 77.25% | 19.71 | 0.7231 | 0.2510 vs 1× (Vanilla) | 77.26% | 1 (relative) | 1 | 1 (+0.64× speedup | -0.01% VBench)；Speedup | VBench 2.07× (fast) | 74.59% vs 1× (Vanilla) | 77.26% (+1.07× speedup | -2.67% VBench)。
 
-## 概述
+## 概要
 
 自回归视频生成模型虽能产生高质量视频，但其逐块（chunk-wise）自回归推理范式带来了沉重的计算负担。现有加速方法——无论是**TeaCache**的粗粒度时间步（timestep）级缓存，还是**FlowCache**（Anonymous, ICLR 2025 under review）的chunk级缓存——均采用统一跳过策略，将整个时间步或chunk视为原子单元进行全计算或全复用。这种粗粒度策略忽略了一个关键事实：同一chunk内不同token的运动强度存在显著差异，导致动态区域因缓存不足而误差累积，静态区域却因过度计算而浪费资源。
 
@@ -50,7 +52,7 @@ claims:
 
 **方法定位**：MotionCache属于推理时缓存加速方法，在缓存粒度（chunk/timestep → token）、运动代理（无 → 帧间差）、误差累积策略（全局阈值 → 运动加权累积）和推理调度（全程统一 → 粗到细双阶段）四个维度上系统性地推进了现有方案。其理论框架将缓存可靠性归约为残差时间不稳定性，并用帧间差作为可计算的代理，为运动感知缓存提供了形式化基础。
 
-## 背景与动机
+
 
 ### 自回归视频生成的效率瓶颈
 
@@ -90,7 +92,9 @@ $$\| \mathcal{R}_{t-1}(\mathbf{X}_{t-1}^{(i,f)}) - \mathcal{R}_{t}(\mathbf{X}_{t
 2. **加权误差累积**：将运动权重融入误差累积过程，使动态token获得更高的更新频率，静态token获得更高的缓存复用率；
 3. **粗到细调度**：前期采用chunk级全更新建立全局语义结构，后期切换到token级稀疏计算以捕捉精细运动动态（图6）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MotionCache 的核心创新在于将自回归视频生成的缓存策略从**粗粒度统一跳过**推进到**token 级运动感知自适应调度**，其关键设计围绕四个 changed slots 展开。
 
@@ -129,7 +133,7 @@ TeaCache 和 FlowCache 采用全局相对 L1 距离阈值进行统一决策，�
 
 四个 changed slots 形成因果闭环：**帧间差异代理**提供轻量运动信号 → **token 级粒度**使决策精细化 → **加权累积策略**将运动信号转化为自适应更新频率 → **双阶段调度**确保前期结构可靠、后期运动感知有效。这一设计使得 MotionCache 在 SkyReels-V2 上以 6.28× 加速仅损失 1% VBench（slow 模式），在 MAGI-1 上以 1.64× 加速仅损失 0.01% VBench，显著优于粗粒度基线。
 
-## 整体框架
+
 
 MotionCache 的整体推理流程遵循“粗到细”的双阶段调度范式，核心目标是在自回归视频扩散模型的去噪过程中，以 token 级粒度动态决定哪些 token 需要重新计算、哪些可以直接复用缓存的残差，从而在保持生成质量的前提下最大化计算效率。
 
@@ -154,7 +158,7 @@ MotionCache 的整体推理流程遵循“粗到细”的双阶段调度范式�
 ![[assets/figures/papers/paper_list_l58_https_arxiv_org_abs_2605_01725v1/figures/004_Figure_4.jpg]]
 *Figure 4: Comparison of caching strategies in autoregressive video generation. The top panel illustrates traditional reuse strategies (e.g., TeaCache and FlowCache), which apply coarse-grained caching policies by treating an entire timestep or chunk as an atomic unit for skipping. This approach overlooks fine-grained intra-chunk redundancy, forcing a binary decision between full computation or full reuse. In contrast, our MotionCache (bottom panel) employs a fine-grained Motion-Aware caching policy, dynamically deciding for each individual token whether to reuse cached residuals or perform recomputation based on motion dynamics. The bottom right panel details the Inner Chunk Tokenwise Calculation mec...*
 
-## 核心模块与公式推导
+
 
 ### 问题形式化与缓存误差分析
 
@@ -229,7 +233,9 @@ Figure 6 可视化了去噪过程中重要性权重图 $\mathcal{W}$ 的演化�
 ![[assets/figures/papers/paper_list_l58_https_arxiv_org_abs_2605_01725v1/figures/005_Figure_5.jpg]]
 *Figure 5: Visualization of the ground-truth video frames versus the computed importance maps. The label f indicates the frame index within the video sequence*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果：效率-质量权衡
 
@@ -318,7 +324,9 @@ K控制第一阶段chunk级全更新的持续步数，用于建立全局语义�
 ![[assets/figures/papers/paper_list_l58_https_arxiv_org_abs_2605_01725v1/figures/012_Figure_7.jpg]]
 *Figure 7: Qualitative results of text-to-video generation on SkyReels-V2. We present TeaCache, FlowCache, Motion-Cache, and the Vanilla model. The frames are randomly sampled from the generated video*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：自回归视频生成中的缓存粒度困境
 
@@ -379,6 +387,8 @@ MotionCache属于**扩散模型推理加速**与**视频生成效率优化**的�
 - **理论驱动的系统设计**：从残差稳定性分析出发推导运动代理，而非纯经验性设计
 
 该方法为自回归视频生成的实用化部署提供了关键加速能力（SkyReels-V2上6.28×加速仅损失1% VBench），同时为后续研究开辟了运动感知缓存的理论框架和工程基线。
+
+
 
 ## 原文 PDF
 

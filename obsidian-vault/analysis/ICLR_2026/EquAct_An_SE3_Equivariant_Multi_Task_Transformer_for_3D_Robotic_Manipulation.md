@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/EquAct_An_SE3_Equivariant_Multi_Task_Transformer_for_3D_Robotic_Manipulation.pdf
+project_link: null
+code_link: https://github.com/ZXP-S-works/EquAct
 openreview_forum_id: d1wuA8oIH0
 aliases:
 - EquAct
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | EquAct：面向3D机器人操作的SE(3)等变多任务Transformer |
 | 英文题名 | EquAct: An SE(3)-Equivariant Multi-Task Transformer for 3D Robotic Manipulation |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=d1wuA8oIH0); [GitHub](https://github.com/ZXP-S-works/EquAct) |
+| Links | [paper](https://openreview.net/forum?id=d1wuA8oIH0) · [GitHub](https://github.com/ZXP-S-works/EquAct) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | EquAct |
 | Dataset | RLBench 18 tasks (2D/100 demonstrations), RLBench 18 tasks (2D/10 demonstrations), RLBench 18 tasks (3D/10 demonstrations), 4 real-world tasks |
@@ -41,7 +43,7 @@ claims:
 > - RLBench 18 tasks (2D/10 demonstrations) 上，avg. success rate (%) 为 60.1，对比 52.2 (SAM2ACT), 50.3 (3DDA)，变化 +7.9% (vs SAM2ACT)。
 > - RLBench 18 tasks (3D/10 demonstrations) 上，avg. success rate (%) 为 53.3，对比 37.0 (SAM2ACT), 37.9 (3DDA)，变化 +15.4% (vs 3DDA)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -70,7 +72,7 @@ claims:
 
 在方法谱系上，EquAct属于**等变策略学习**与**多任务语言条件化操作**的交叉点。相较于依赖数据增强的3DDA和基于多视图的SAM2ACT，EquAct通过架构层面的SE(3)等变设计，从根本上保证了策略对观测变换的结构化泛化能力，而非依赖隐式的数据驱动补偿。
 
-## 背景与动机
+
 
 ### 3D机器人操作中的空间泛化瓶颈
 
@@ -106,7 +108,9 @@ EquAct的动机正是填补这一缺口。其核心假设是：若策略网络�
 
 这些挑战的解决路径构成了EquAct方法设计的核心线索，将在后续章节中详细展开。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈与设计动机
 
@@ -156,7 +160,7 @@ EquAct的动机正是填补这一缺口。其核心假设是：若策略网络�
 
 EquAct的三个创新点构成一个完整的SE(3)等变推理链：EPTU将3D观测编码为等变特征，iFiLM以几何不变方式注入语言语义，场网络在等变特征基础上一次性评估全SE(3)动作空间。这一设计使策略能够根据观测的刚体变换等变地调整动作——当物体旋转或平移时，预测的抓取位姿自动跟随变换，无需重新推理或依赖数据增强来弥补几何理解缺失。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l40_https_openreview_net_forum_id_d1wuA8oIH0/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of EquAct. EquAct first encodes the observation o = $\{$ s , e $\}$ into latent spherical features h using a SE(3)-equivariant U-Net, e n $c _ { o }$ , while conditioning the natural language instruction n through invariant iFiLM layers. Based on the encoded features h , EquAct then samples and refines translational query actions and gripper open actions using an equivariant field network, resulting in action value functions $Q _ { t }$ and $Q _ { \mathrm { o p e n } }$ . Finally, a rotational field network aggregates spherical features from h centered at the predicted translation $a _ { t } ^ { * }$ to obtain a latent feature $\phi$ , , which is subsequently convolved with a learned filter $\psi$...
@@ -178,7 +182,7 @@ EquAct 是一个多任务关键帧动作策略，其核心设计目标是在统�
 
 > **证据强度说明**：上述框架描述基于论文 Section 4 的完整方法阐述及 Figure 1 的总览图，各模块的设计细节在 Section 4.2–4.4 中有明确的公式和架构说明，证据充分。
 
-## 核心模块与公式推导
+
 
 ### 等变性与不变性假设
 
@@ -250,7 +254,9 @@ $$\mathcal{L} = \mathbb{E}_{D,A}[\mathcal{H}(Q_t,\bar{a}_t) + \mathcal{H}(Q_r,\b
 
 其中 $\mathcal{H}$ 为交叉熵，$\bar{a}_t$、$\bar{a}_r$、$\bar{a}_{\mathrm{open}}$ 分别为平移、旋转和夹爪开合的专家动作标签。三项损失分别监督三个动作分量，共同优化策略网络。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -324,7 +330,9 @@ EquAct在所有三种设置下均取得最高平均成功率：
 ![[assets/figures/papers/paper_list_l40_https_openreview_net_forum_id_d1wuA8oIH0/figures/007_Table_2.jpg]]
 *Table 2: Real-world experiments*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与设计动机
 
@@ -371,6 +379,8 @@ EquAct的证据链具有高置信度，核心支撑来自三个层面的实验�
 3. **更高效的等变Backbone**：当前EPTU的计算开销虽与非等变基线相当（推理耗时0.7s vs 3DDA的3.7s），但更高效的球面卷积或稀疏化策略是否能进一步降低训练成本，使模型可扩展至更高分辨率点云？
 
 4. **动态环境中的等变规划**：在存在移动障碍物或动态场景变化的情况下，如何保持SE(3)等变性并实现实时规划，是向非结构化真实环境部署的关键一步。
+
+
 
 ## 原文 PDF
 

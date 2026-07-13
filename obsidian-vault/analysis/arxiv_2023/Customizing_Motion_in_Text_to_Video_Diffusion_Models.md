@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2023
 pdf_ref: paperPDFs/arxiv_2023/Customizing_Motion_in_Text_to_Video_Diffusion_Models.pdf
+project_link: https://joaanna.github.io/customizing\_motion/
+code_link: null
 aliases:
 - CMTVDM
 tags:
@@ -41,7 +43,7 @@ claims:
 > - Jester (custom gestures) 上，Motion Accuracy (%) 70.6 vs DreamBooth (+42.2)；Motion Accuracy (%) 70.6 vs Textual Inversion (+70.3)。
 > - User Study 上，User Preference (% votes) Significantly preferred (p<0.01) vs DreamBooth & Tune-A-Video (N/A)。
 
-## 概述
+## 概要
 
 **核心问题：** 现有文本到视频（T2V）扩散模型能够根据文本描述生成视频，但其运动模式受限于训练数据分布，无法生成训练集中未出现的新运动。传统运动迁移方法（如基于视频的运动重定向）通常无法将运动与外观完全解耦，难以泛化到新场景、新主体甚至非人形角色。
 
@@ -49,7 +51,7 @@ claims:
 
 **主要结果：** 在Jester手势数据集上，NewMove的运动识别准确率达**70.6%**，较DreamBooth（28.4%）和Textual Inversion（0.3%）提升显著；用户偏好研究中，NewMove在运动准确性和外观泛化性上均显著优于基线方法（p<0.01）。消融实验证实：仅微调空间K/V和时间层是运动-外观解耦的关键（Table 2a）；真实视频正则化（Jester）比无正则化在准确率上提升约27个百分点（70.6 vs 43.9，Table 2e）；粗噪声时间步采样（Coarse-noise）比均匀采样提高3.7%准确率并大幅降低外观复制分数（Table 2d）。
 
-## 背景与动机
+
 
 文本到视频生成模型近年来取得了显著进展，能够根据自然语言描述生成多样化、时序连贯的视频内容。然而，这些模型受限于训练数据的分布，难以生成训练集中未覆盖的**新运动模式**——例如特定的舞蹈动作、自定义手势或独特的相机运动轨迹。用户若希望模型生成“Carlton舞”或“滑动双指向上”等特定动作，仅凭文本描述往往无法精确传达运动细节，而模型也缺乏对这类新运动的表征能力。
 
@@ -61,7 +63,9 @@ claims:
 
 本文提出的 **NewMove** 方法正是针对这一瓶颈展开。其核心洞见在于：预训练文本到视频扩散模型的U-Net架构中，**时间层**（temporal convolution and attention layers）负责建模帧间动态，而**空间交叉注意力层的键/值投影**（key/value projections in spatial cross-attention）负责将文本标识符映射到视觉特征。通过仅微调这两类参数，并辅以**真实视频正则化**和**非均匀时间步采样**策略，NewMove 能够在少量样本下学会可泛化的运动模式，同时将运动与外观解耦，在运动准确率和外观复制之间取得最佳平衡。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文提出的 **NewMove** 方法围绕一个核心洞察展开：预训练的文本到视频扩散模型内部已蕴含丰富的运动先验，只需对影响运动表示的特定参数子集进行微调，并辅以针对性的正则化与采样策略，即可在极少量样本下学会可泛化的新运动模式，同时保留模型的原始生成能力。
 
@@ -81,7 +85,7 @@ claims:
 
 值得注意的辅助发现是，全微调（Full fine-tuning）在运动准确率上远超 LoRA（70.6 vs 10.6，Table 2f），表明参数高效微调方法在该任务上存在显著局限，需进一步验证其适用边界。
 
-## 整体框架
+
 
 **NewMove** 的整体 pipeline 围绕一个冻结的预训练文本到视频扩散模型展开，通过选择性微调与两项正则化设计，在少量样本视频上学习可泛化的运动模式。其核心模块关系与数据流如下：
 
@@ -135,7 +139,7 @@ $$
 ![[assets/figures/papers/paper_list_l1040_https_arxiv_org_abs_2312_04966/figures/001_Figure_1.jpg]]
 *Figure 1: (Left) Given a few examples (“Carlton dance”), our customization method learns the dynamic motion pattern common to the input examples and incorporates it into a pre-trained text-to-video diffusion model using a new motion identifier (“V* dance”). (Right) Our approach, NewMove, abstracts the motion pattern from the appearance in the input videos and enables generation of the depicted motion across a variety of novel contexts, including with a non-humanoid subject (robot, top row), multiple motions (lady, middle row), and multiple subjects (group of nurses, bottom row). To best view the results, please view our website*
 
-## 核心模块与公式推导
+
 
 ### 基础扩散去噪目标
 
@@ -194,7 +198,9 @@ $$
 ![[assets/figures/papers/paper_list_l1040_https_arxiv_org_abs_2312_04966/figures/008_Table_2.jpg]]
 *Table 2: Quantitative results of the ablation study. Each table examines the design choices of our method. We report the motion recognition accuracy (“Accuracy”) obtained with a pre-trained classifier for gesture recognition. The copying score (“Copy”) is the percentage of generated videos with a detection score above a set threshold*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -246,7 +252,9 @@ NewMove 在可控视频生成谱系中占据独特位置（Table 1）。与文�
 ![[assets/figures/papers/paper_list_l1040_https_arxiv_org_abs_2312_04966/figures/004_Figure_3.jpg]]
 *Figure 3: Visual comparison with baseline methods. Examples of learning a customized motion Sliding Two Fingers Up from the Jester dataset with prompt “A female firefighter doing the V* sign”. Baseline methods (top three rows) fail to capture the motion and produce a temporally coherent video*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位与核心瓶颈
 
@@ -281,6 +289,8 @@ NewMove 在可控视频生成谱系中占据独特位置（Table 1）。与文�
 ### 开放问题
 
 本文在结论中提出了一个根本性的开放问题：如何更好地利用预训练文本到视频模型中已有的运动和外观先验，来增强新的运动模式，并在全新设定下生成这些运动？这一问题指向几个潜在的研究方向：（1）更精细的参数解耦策略，以进一步分离运动与外观的表征；（2）无需微调的运动定制方法，以降低计算成本和过拟合风险；（3）多运动组合的显式建模，以处理复杂的时序交互场景。
+
+
 
 ## 原文 PDF
 

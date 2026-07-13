@@ -44,7 +44,7 @@ claims:
 > - InterHuman 上，FID ↓ 5.015 ± .085 vs 5.153 ± .061 (InterMask) (-0.138)；R‑Prec@1 ↑ 0.496 ± .004 vs 0.449 ± .004 (InterMask) (+0.047)；接触比率 (Contact) ↑ 0.581 vs 0.468 (InterMask) (+0.113)。
 > - InterX 上，FID ↓ 0.339 ± .026 vs 1.295 ± .038 (InterMask) (-0.956)。
 
-## 概述
+## 概要
 
 三维人体-人体交互（HHI）生成旨在根据文本描述合成双人协同运动序列。现有方法——无论是基于原始运动空间的扩散模型（如 **InterGen**、**TIMotion**）还是潜在扩散模型（如 **InterLDM**、**InterMask**）——普遍将所有运动信息压缩到**单一扁平潜在表示**中。这一设计存在根本性瓶颈：个体身份与交互上下文被不可分地纠缠，导致细粒度动作丢失、语义不对齐，并频繁产生穿透、接触缺失等物理不真实现象。
 
@@ -52,7 +52,7 @@ claims:
 
 在 InterHuman 和 InterX 两个基准数据集上，DHVAE 在 FID、R-Precision、Multimodal Distance 等主要指标上达到最优性能。具体而言，在 InterHuman 上 FID 降至 5.015，R-Prec@1 提升至 0.496；在更具挑战的 InterX（SMPLX 表示）上，FID 从 InterMask 的 1.295 大幅降至 0.339。物理合理性方面，接触比率从 0.468 提升至 0.581，穿透体积显著降低。消融实验证实：将解耦层次潜在空间替换为扁平 VAE 后，重建 FID 从 0.503 恶化至 1.024，生成 FID 从 5.015 升至 6.433，验证了解耦设计的决定性作用。
 
-## 背景与动机
+
 
 ### 3D 人体交互生成的任务定义与挑战
 
@@ -80,7 +80,9 @@ claims:
 
 通过这一设计，DHVAE 在 InterHuman 和 InterX 两个主流基准上取得了新的最优性能，并在物理合理性指标上显著超越现有方法。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 现有文本驱动人体交互（HHI）生成方法——无论是基于原始运动空间的扩散模型（如 **InterGen** (Liang et al., 2024)、**InterMask** (Javed et al., 2025)），还是基于潜在扩散的方法（如 **InterLDM** (Li et al., 2025)）——均采用**扁平单一潜在表示**，将所有运动信息（包括个体动作与交互上下文）压缩至同一个潜变量中。这种设计导致个体身份模糊、细粒度动作丢失，并在交互边界（如握手、拥抱）产生穿透、接触缺失等物理不真实现象。DHVAE 的核心创新在于从**潜在空间结构**、**交互建模机制**和**物理合理性约束**三个维度对上述瓶颈进行系统性改造。
 
@@ -114,7 +116,7 @@ $$
 
 **总结**：DHVAE 的三项核心创新——解耦层次潜在空间、CoTransformer 双向交互建模、对比学习物理合理性约束——构成了一个闭环的因果链条：结构化潜变量提供表达能力，CoTransformer 注入交互语义，对比学习确保物理一致性。三者协同作用，使得 DHVAE 在 InterHuman 和 InterX 双基准上全面超越 SOTA（Table 1），并在接触比率上比 InterMask 提升 11.3 个百分点（0.581 vs. 0.468, Table 4）。
 
-## 整体框架
+
 
 DHVAE 的整体 pipeline 围绕一个核心设计原则展开：**将双人交互运动显式解耦为个体运动与全局交互的层次化潜在表示**，并在此结构化潜在空间中进行扩散生成。整个框架由两大阶段串联构成——**DHVAE 变分自编码器**负责学习紧凑的解耦潜在表示，**潜在扩散模型**在该潜在空间中进行条件生成。
 
@@ -168,7 +170,7 @@ $$\mathcal{L}_{\mathrm{DHVAE}} = \mathcal{L}_{\mathrm{ELBO}} + \lambda_{\mathrm{
 ![[assets/figures/papers/paper_list_l52_https_openreview_net_forum_id_53eIDko6N5/figures/002_Figure_2.jpg]]
 *Figure 2: Architecture of our DHVAE to encode the structured latent representation*
 
-## 核心模块与公式推导
+
 
 DHVAE 的核心设计围绕一个结构化潜变量三元组展开：个体运动潜变量 $\mathbf{z}_a$、$\mathbf{z}_b$ 和全局交互潜变量 $\mathbf{z}_o$。该设计的根本动机来自现有方法的瓶颈——将所有运动信息压缩到单一扁平潜变量中，导致个体身份模糊、交互语义丢失和物理不合理（如穿透、接触缺失）。DHVAE 通过解耦层次化编码显式分离个体运动与全局交互，从而在潜空间结构层面解决了这一问题。
 
@@ -244,7 +246,9 @@ $$
 ![[assets/figures/papers/paper_list_l52_https_openreview_net_forum_id_53eIDko6N5/figures/016_Figure_10.jpg]]
 *Figure 10: T-SNE projections of latents on the InterHuman test set*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -304,7 +308,9 @@ Table 5 的系统消融揭示了各组件的因果贡献：
 ![[assets/figures/papers/paper_list_l52_https_openreview_net_forum_id_53eIDko6N5/figures/017_Table_7.jpg]]
 *Table 7: Performance under different*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位与核心瓶颈
 
@@ -363,6 +369,8 @@ DHVAE 相对于现有工作进行了四个关键设计变更，构成其在方�
 3. **HHI 专用评价协议**：如何构建 HHI 专用的评价协议（如接触比率、同步性评分、感知真实度），并结合人工评估或学习型质量评分器？当前指标体系的局限性已在实验中显现。
 
 4. **跨域泛化与效率**：如何通过跨运动域的预训练或参数高效变体降低训练成本并保持泛化能力？这对实际部署至关重要。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2023
 pdf_ref: paperPDFs/CVPR_2023/GHOST_Simple_Cues_Lead_to_a_Strong_Multi_Object_Tracker.pdf
+project_link: null
+code_link: https://github.com/dvl-tum/GHOST
 aliases:
 - GGOHST
 - GHOST
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 简单线索构建强大多目标跟踪器 |
 | 英文题名 | GHOST: Simple Cues Lead to a Strong Multi-Object Tracker |
 | 会议/期刊 | CVPR 2023 |
-| Links | [paper](https://arxiv.org/abs/2206.04656); [GitHub](https://github.com/dvl-tum/GHOST) |
+| Links | [paper](https://arxiv.org/abs/2206.04656) · [GitHub](https://github.com/dvl-tum/GHOST) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | GHOST (Good Old Hungarian Simple Tracker) |
 | Dataset | MOT17 (private detections), MOT20 (public detections), DanceTrack (test set), BDD100k (validation) |
@@ -41,7 +43,7 @@ claims:
 > - MOT20 (public detections) 上，HOTA / IDF1 为 未提供精确值，对比 先前最佳，变化 +1.3pp HOTA / +2.6pp IDF1。
 > - DanceTrack (test set) 上，HOTA / IDF1 / MOTA 为 56.7 / 57.7 / 91.3，对比 先前最佳，变化 +2.5pp HOTA / +3.8pp IDF1 / +0.7pp MOTA。
 
-## 概述
+## 概要
 
 多目标跟踪（MOT）的核心挑战在于如何在帧间正确关联检测目标。现有方法通常依赖复杂的端到端学习模型或精心调参的卡尔曼滤波器，但本文揭示了一个被社区忽视的关键事实：**精心设计的简单线索，即使配合最基本的匈牙利算法逐帧匹配，也能达到甚至超越最先进跟踪器的性能**。
 
@@ -53,7 +55,7 @@ claims:
 
 GHOST的成功传递了一个重要信号：在追求复杂模型之前，正确理解和利用外观与运动线索的简单组合，或许比设计更复杂的端到端架构更具通用性和有效性。该方法为MOT社区提供了一个简洁、可解释且易于复现的强基线。
 
-## 背景与动机
+
 
 ### 多目标跟踪中的外观线索困境
 
@@ -75,7 +77,9 @@ Figure 1 直观地揭示了这一困境：尽管先进的reID方法（如R50-TR�
 
 本文的核心洞察在于：**正确理解和利用外观与运动线索，即使采用简单的匈牙利算法进行逐帧匹配，也能在不使用任何跟踪训练数据的情况下达到最先进的跟踪性能。** 社区可能过度追求复杂的端到端学习范式，而忽视了传统方法中关键细节的精心设计。基于这一认知，GHOST通过两个简单而关键的设计——区分活跃/非活跃轨迹的匹配策略和在测试时动态进行在线域自适应——来弥补reID模型在MOT中的固有缺陷，同时结合轻量级的线性运动模型，构建了一个简洁而强大的跟踪器。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GHOST的核心创新并非提出全新的模型架构或复杂的关联策略，而是通过深入分析标准行人重识别（reID）模型在多目标跟踪（MOT）中失效的根本原因，提出两项简单却关键的改进，使一个仅使用匈牙利算法进行逐帧匹配的跟踪器达到了最先进的性能。
 
@@ -122,7 +126,7 @@ $$\hat{p}_j^t = p_j^{t-1} + v_j \cdot \Delta t$$
 
 与**Tracktor**、**CenterTrack**、**ByteTrack**、**FairMOT**、**QDTrack**等基线方法相比，GHOST未引入复杂的检测-跟踪联合训练、多级级联匹配或查询式关联，而是通过深入理解外观与运动线索的本质特性，以最小的复杂度代价实现了跨数据集的强大泛化能力。
 
-## 整体框架
+
 
 GHOST（Good Old Hungarian Simple Tracker）是一个**在线逐帧多目标跟踪器**，其核心设计哲学是：通过精心处理简单的外观和运动线索，配合经典的匈牙利算法进行二分图匹配，即可在不使用任何跟踪训练数据的前提下达到最先进的性能。
 
@@ -165,7 +169,7 @@ $$\hat{p}_j^t = p_j^{t-1} + v_j \cdot \Delta t$$
 -   **输出**：每个检测框与现有轨迹的关联结果，以及新初始化的轨迹。
 -   **约束**：整体管道依赖于性能良好的检测器，无法在检测失败的情况下恢复轨迹；外观模型仅在 Market-1501 上训练，对非行人类别的泛化能力有限；运动权重、速度计算帧数等超参数需按数据集手动调整。
 
-## 核心模块与公式推导
+
 
 ### 3.1 整体管道
 
@@ -225,7 +229,9 @@ $$C(i,j) = (1 - w_m) \cdot d_a(i,j) + w_m \cdot d_m(i,j)$$
 
 其中$w_m$为运动权重，根据数据集特性手动调整。消融实验表明，运动权重在MOT17上最优为0.4（public）/0.6（private），DanceTrack上为0.4，MOT20上为0.8，BDD100k上为0.4。速度计算使用的帧数在DanceTrack上最优为5帧，MOT20为30帧，BDD100k为10帧。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心组件消融
 
@@ -315,7 +321,9 @@ GHOST 的实验设置体现了高度的公平比较意识：外观模型仅在 M
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2206_04656/figures/012_Table_3.jpg]]
 *Table 3: Comparison to state-of-the-art for public and private detections on MOT17 and MOT20. † and ‡ indicate bounding boxes refined by Tracktor [5] and CenterTrack [83]. ? since ByteTrack uses different thresholds for different sequences of the test set and interpolation we recomputed their results without both (recomputed black / original gray)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法脉络与基线关系
 
@@ -360,6 +368,8 @@ GHOST 的简洁设计虽带来强大的泛化能力，但也存在明确的适�
 4. **复杂运动建模的权衡。** 结合更复杂的运动模型（如学习型预测器）是否能进一步改善极低可见度或复杂场景下的性能，同时保持效率和简洁性？Figure 4 和 Figure 5 对短时/长时关联中外观与运动贡献的分析为这一问题提供了初步线索，但尚未给出明确答案。
 
 5. **与端到端方法的融合。** GHOST 证明了简单线索的强大能力，但其与端到端学习方法的结合潜力尚未被探索——能否将在线域自适应和区分性轨迹处理的思想融入端到端框架，进一步提升性能？
+
+
 
 ## 原文 PDF
 

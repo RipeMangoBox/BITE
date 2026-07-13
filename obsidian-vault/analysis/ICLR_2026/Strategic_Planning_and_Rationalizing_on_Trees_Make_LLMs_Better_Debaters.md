@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Strategic_Planning_and_Rationalizing_on_Trees_Make_LLMs_Better_Debaters.pdf
+project_link: null
+code_link: https://github.com/LeiLiLab/TreeDebater
 openreview_forum_id: E1hbqtHrvg
 aliases:
 - SPRTMLBD
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 基于树结构的战略规划与理性推理使大语言模型成为更优辩手 |
 | 英文题名 | Strategic Planning and Rationalizing on Trees Make LLMs Better Debaters |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=E1hbqtHrvg); [GitHub](https://github.com/LeiLiLab/TreeDebater) |
+| Links | [paper](https://openreview.net/forum?id=E1hbqtHrvg) · [GitHub](https://github.com/LeiLiLab/TreeDebater) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/planning_control |
 | Method | TreeDebater |
 | Dataset | Stage-level head-to-head human evaluation, End-to-end debate human evaluation |
@@ -41,7 +43,7 @@ claims:
 > - End-to-end debate human evaluation 上，Opinion Shift Win (DeepSeek) 为 0.40，对比 0.30，变化 +0.10 (+10pp)。
 > - End-to-end debate human evaluation 上，Opinion Shift Win (Gemini) 为 0.46，对比 0.13，变化 +0.33 (3.5x)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有基于大语言模型（LLM）的辩论系统在竞争性辩论中面临双重挑战——严格的时间限制使动态策略规划极为困难，而缺乏客观奖励信号又导致模型难以自主判断论点的说服力强弱。以 **Agent4Debate**（Zhang et al., 2024）为代表的多智能体框架虽已取得进展，但其依赖粗略字数估算控制时间，常出现超时或内容不足；同时缺乏对对手攻击的前瞻性推演，导致策略选择趋于单一。
 
@@ -49,7 +51,7 @@ claims:
 
 **关键发现**：在阶段级头对头人工评估中，以 DeepSeek 为骨干的 TreeDebater 说服力评分平均达 4.01，相较基线提升 15.6%（+0.54）；在端到端辩论评估中，以 Gemini 为骨干时意见转变胜率从 0.13 跃升至 0.46，提升约 3.5 倍。消融实验表明，移除排练树或辩论流树均会导致各阶段说服力显著下降，且反驳阶段的动作多样性明显退化，验证了树结构对策略规划的关键作用。
 
-## 背景与动机
+
 
 辩论是人类理性沟通与集体决策的核心形式，要求参与者在严格的时间限制下，通过构建主张、发起攻击和进行防御来说服观众。近年来，大语言模型（LLM）在辩论任务中展现出潜力，但现有系统在竞争性辩论场景中仍面临根本性瓶颈。
 
@@ -61,7 +63,9 @@ claims:
 
 本文提出的TreeDebater正是针对这一缺口。其核心动机在于：通过引入树状结构来模拟人类辩手的推理与跟踪过程，使LLM能够在辩论前预演对手攻击并计算论点强度，在辩论中构建动态的攻防流图以指导实时决策，从而在严格时间约束下实现更具说服力的战略辩论。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 TreeDebater 的核心创新在于将人类辩手的树状推理与规划机制引入 LLM 辩论框架，通过“排练树”和“辩论流树”双树结构，解决了现有方法在竞争性辩论中缺乏前瞻性策略规划与实时状态跟踪的根本瓶颈。
 
@@ -101,7 +105,7 @@ $$
 
 TreeDebater 引入基于检索的模拟观众机制（Section 3.4），从人类辩论流树中检索相似辩论上下文，提供针对逻辑流、受众意识、证据使用和主张质量等多维度的具体反馈。这一机制使 TreeDebater 能够在不依赖真实人类评估的情况下，迭代改进陈述质量，弥补了基线方法缺乏受众感知的不足。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_E1hbqtHrvg/figures/001_Figure_1.jpg]]
 *Figure 1: The overall workflow. In each stage, TreeDebater (i) updates two Debate Flow Trees with extracted action tuples from the current statement; (ii) retrieves prepared arguments from the Rehearsal Tree for the candidate actions; (iii) generates a draft based on the retrieved arguments and important scores; (vi) lets simulated audience provide feedback based on retrieved human debate flow tree; (v) revises based on feedback from the simulated audience and speech time controller*
@@ -138,7 +142,7 @@ TreeDebater 的核心设计围绕两个树结构展开——**排练树（Rehear
 - **强度分数驱动**：排练树采用极小极大思想递归计算 k 步强度分数（Eqn 1-2），为后续行动选择提供定量依据，而非仅依赖 LLM 的即时判断。
 - **时间控制闭环**：通过 FastSpeech 模型精确估算语音时长，并结合二分搜索迭代修订，确保生成文本始终满足时间约束——这是基线方法（仅用粗略字数估算）常失败的关键瓶颈。
 
-## 核心模块与公式推导
+
 
 TreeDebater 的核心设计围绕两类树结构展开：**排练树（Rehearsal Tree）** 用于辩论前的战略预演，**辩论流树（Debate Flow Tree）** 用于辩论中的实时状态跟踪与行动规划。二者协同使 LLM 辩手能够前瞻对手攻击、检索预设论据并做出多样化、高强度的动作选择。
 
@@ -172,7 +176,9 @@ $$f _ { k } ( x ^ { l } ) = f _ { 0 } ( x ^ { l } ) - \gamma \cdot \operatorname
 
 TreeDebater 从人类辩论数据集中检索辩论流树，构建模拟观众，对生成的草稿提供多维度反馈，涵盖逻辑流、受众意识、证据使用和主张清晰度等方面（Section 3.4）。该反馈用于进一步修订陈述，提升说服力。需注意，模拟观众的覆盖面和代表性受限于检索数据集，可能影响对真实观众反应的模拟效果。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -241,7 +247,9 @@ TreeDebater 的性能提升可归因于三个因果路径：
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_E1hbqtHrvg/figures/018_Table_9.jpg]]
 *Table 9: Statistical Significance. Stages with * indicate statistical significance, which are demonstrated by the positive confidence interval and p-value \< 0.05*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -282,6 +290,8 @@ TreeDebater 存在以下已验证或潜在的局限性：
 - 模拟观众反馈机制在更复杂的辩论形式（如议会制辩论、政策辩论）或真实比赛环境中的通用性如何？其依赖于检索历史流树的范式是否可扩展至未见过的辩论格式？
 - 如何进一步平衡陈述中的情绪语气以满足不同观众偏好？当前工作主要关注逻辑结构和证据使用，对情感说服维度的建模尚不充分。
 - 语音时间控制器能否推广至其他对语音长度敏感的生成任务，如演讲生成、教学视频脚本等？其核心的二分搜索迭代修订策略是否适用于更长的生成内容？
+
+
 
 ## 原文 PDF
 

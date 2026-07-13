@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/AttriCtrl_A_Generalizable_Framework_for_Controlling_Semantic_Attribute_Intensity_in_Diffusion_Models.pdf
+project_link: null
+code_link: null
 aliases:
 - AttriCtrl
 tags:
@@ -39,15 +41,17 @@ claims:
 > - 自定义测试集（基于FLUX模型） 上，AvgDiff ↓ 为 0.191，对比 0.295 (Kontext)，变化 -0.104。
 > - 自定义测试集（基于FLUX模型） 上，AvgDiff ↓ 为 0.192，对比 0.235 (Kontext)，变化 -0.043。
 
-## 概述
+## 概要
 
 AttriCtrl 是一个面向扩散模型的通用控制框架，旨在实现对图像美学属性（如亮度、细节、真实感、安全性）的精确、连续且可组合的强度控制。该框架的核心创新在于引入了一个轻量级、即插即用的值编码器（Value Encoder），将用户指定的归一化连续标量强度值映射为模型可解释的嵌入序列，从而克服了传统文本编码器（如T5、CLIP）无法直接处理数值化指令的根本局限。实验表明，AttriCtrl 在控制精度（AvgDiff）和用户偏好上均显著优于现有基线方法，并能在保持基础模型冻结的前提下，实现多属性的联合调控。
 
-## 背景与动机
+
 
 现有文本到图像扩散模型（如Stable Diffusion、FLUX）依赖文本编码器（如T5、CLIP）将用户提示转换为条件嵌入。然而，这些编码器设计用于处理离散词元，对连续数值信息（如“亮度0.7”）不敏感，导致用户无法精确指定美学属性的强度。现有方法如“Add to Prompt”（在提示词中添加形容词）和“Control with Kontext”（追加自然语言指令）均无法建立稳定可靠的属性控制（Figure 1）。基于注意力插值的AID方法虽能实现一定程度的属性调节，但缺乏显式数值指导，常产生光晕和鬼影等伪影（Figure 9）。因此，亟需一种能够将连续数值指令无缝注入扩散模型的方法。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 AttriCtrl 的核心创新可概括为三点：
 
@@ -55,7 +59,7 @@ AttriCtrl 的核心创新可概括为三点：
 2. **值编码器（Value Encoder）**：设计一个轻量级神经网络，将归一化标量强度值编码为固定长度的可学习词元序列（默认32个词元），并与文本嵌入拼接后注入扩散模型的注意力层，实现精确的连续控制。
 3. **模块化多属性组合**：每个属性独立训练值编码器，推理时按序列拼接各属性嵌入，实现即插即用的多属性联合控制，无需联合训练。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__image_and_video_generation__b001_oyDe8cNXt6_AttriCtrl_A_G/figures/001_Figure_1.jpg]]
 *Figure 1: Effects of Add to Prompt and Control with Kontext Figure 1: Overview. Methods such as ‘Add to Prompt’ and ‘Control with Kontext’ fail to establish stable or reliable attribute control. In contrast, our proposed AttriCtrl enables fine-grained control over aesthetic attributes by modulating their intensity in the generated image.*
@@ -66,7 +70,7 @@ AttriCtrl 的整体框架如 Figure 3 所示，包含三个主要模块：
 2. **值编码器（Value Encoder）**：将归一化标量值映射为多尺度表示（词元序列）。
 3. **扩散模型主干（DiT Backbone）**：接收文本嵌入和值编码器输出的联合嵌入，执行去噪过程生成最终图像。基础模型保持冻结。
 
-## 核心模块与公式推导
+
 
 ### 5.1 属性量化
 
@@ -94,7 +98,9 @@ $$x_i^{\mathrm{norm}} = \frac{\mathrm{rank}(x_i) - 0.5}{n} \in [0, 1]$$
 值编码器通过标准的扩散噪声预测损失进行训练，保持基础扩散模型冻结：
 $$\mathcal{L}(\theta) = \mathbb{E}_{z_t, \varepsilon, c, t} \left[ \|\varepsilon - \hat{\varepsilon}_\theta(z_t, c, v, t)\|_2^2 \right]$$
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 6.1 主要定量结果
 
@@ -139,7 +145,9 @@ AttriCtrl 可与ControlNet、EliGen等主流控制框架无缝集成（Figure 7�
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__image_and_video_generation__b001_oyDe8cNXt6_AttriCtrl_A_G/figures/002_Figure_2.jpg]]
 *Figure 2: Examples of aesthetic attribute intensities in the training dataset. We show the raw values computed via quantitative metrics and the normalized values after value mapping, scaled to the [0, 1].*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 AttriCtrl 属于扩散模型条件控制领域的方法，其核心思想——将归一化标量值通过值编码器映射为可学习的词元序列——建立了一种通用且强大的细粒度条件控制范式。与现有方法相比：
 
@@ -149,6 +157,8 @@ AttriCtrl 属于扩散模型条件控制领域的方法，其核心思想——�
 - **与概念擦除方法（ESD, SLD, NP）**：AttriCtrl 的安全性控制是可调节的连续强度，而非二值化的概念移除。
 
 该框架为扩散模型的美学属性控制提供了一种可解释、可组合且与现有框架兼容的解决方案，为未来探索更复杂概念（如创意构图、情感基调）的量化与控制奠定了基础。
+
+
 
 ## 原文 PDF
 

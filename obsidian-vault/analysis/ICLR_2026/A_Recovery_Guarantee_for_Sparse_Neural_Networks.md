@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/A_Recovery_Guarantee_for_Sparse_Neural_Networks.pdf
+project_link: null
+code_link: null
 aliases:
 - IHTISMR
 - RGSNN
@@ -41,7 +43,7 @@ claims:
 > - Planted sparse scalar-output MLP (2-hidden-layer) 上，Average PSNR 为 IHT，对比 IMP，变化 IHT exhibits more robust performance。
 > - Planted sparse vector-output MLP (1-hidden-layer) 上，Average PSNR 为 IHT，对比 IMP，变化 IHT is competitive。
 
-## 概述
+## 概要
 
 本文针对稀疏神经网络训练缺乏理论保证且内存效率与性能难以兼顾的瓶颈，提出了一种将稀疏MLP优化重构为结构化线性感知问题的方法。核心思路是通过固定生成器向量 $h_i$ 来枚举或随机采样激活模式，将非凸的两层ReLU网络转化为凸的线性感知问题：$\hat{y} = [\mathrm{diag}(\mathbb{I}\{X h_1 \geq 0\}) X \quad \ldots \quad \mathrm{diag}(\mathbb{I}\{X h_p \geq 0\}) X] [w_1; \ldots; w_p]$。这一转化使得优化目标从非凸的原始MLP损失变为凸的MSE损失，并允许使用迭代硬阈值（IHT）算法进行优化。
 
@@ -49,7 +51,7 @@ claims:
 
 在实验方面，本文在planted稀疏MLP拟合、MNIST分类和隐式神经表示等任务上，将IHT与强基线方法迭代幅度剪枝（IMP）进行了比较。主要结果表明，IHT在多数场景下表现出更稳健的性能，且在整个优化过程中仅需与稀疏度 $s$ 成比例的固定参数预算，而IMP需要先训练参数数量随数据维度 $d$ 和隐藏维度 $m$ 增长的稠密网络。然而，实验规模较小，仅限于小规模MLP和图像过拟合任务，且顺序凸更新策略的收敛性缺乏理论保证。
 
-## 背景与动机
+
 
 深度神经网络的结构化稀疏性（即大部分权重为零）是降低模型存储与计算开销的关键手段。然而，现有稀疏网络训练方法存在两个根本性缺口：**缺乏理论保证**，以及**内存效率与最终性能难以兼得**。主流的迭代剪枝（Iterative Magnitude Pruning, IMP）方法虽然性能强劲，但其流程要求先完整训练一个稠密网络，再反复剪枝与微调——这导致训练过程中的内存占用与稠密网络规模成正比，违背了稀疏化的初衷。
 
@@ -63,7 +65,9 @@ $$\hat{y} = [\mathrm{diag}(\mathbb{I}\{X h_1 \geq 0\}) X \quad \ldots \quad \mat
 
 值得注意的是，该理论结果目前仅限于**两层、标量输出的ReLU网络**和**随机高斯数据**，且IHT恢复所需的稀疏度水平 $\tilde{s} \geq 32(\beta/\alpha)^2 s$ 继承了Jain et al. (2014)中可能过于保守的膨胀因子。此外，实验中所用的**顺序凸更新策略**（sequential convex IHT）——即在IHT步骤之间周期性更新感知矩阵A以处理更深层网络——其收敛性目前缺乏理论保证。这些限制构成了后续研究的关键开放问题。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于**将稀疏MLP的训练问题重新表述为一个结构化线性感知问题，并首次为其提供了严格的可恢复性理论保证**。这一突破打破了现有稀疏训练方法（如IMP）依赖启发式、缺乏理论支撑的困境，同时实现了内存效率与性能的双赢。
 
@@ -95,7 +99,7 @@ $$
 
 **实验验证**：在planted稀疏MLP恢复、MNIST分类和隐式神经表示等任务上，IHT在保持固定参数预算（内存高效）的同时，在PSNR和分类准确率上均表现出比IMP更稳健的性能（Figure 1-5）。消融实验（Table 1-2）进一步揭示，顺序凸更新A的频率k是控制收敛的关键：当k < 5时，IHT能在100步内以数值精度匹配planted模型；随着k增大，收敛速度显著减慢，PSNR下降。
 
-## 整体框架
+
 
 该论文提出的方法核心是将稀疏MLP的训练问题转化为一个结构化线性感知问题，并利用迭代硬阈值（IHT）算法进行求解。整个pipeline由四个关键模块组成，形成一个从非凸优化到凸松弛、再到稀疏恢复的端到端流程。
 
@@ -121,7 +125,7 @@ $$
 
 **证据强度**：理论保证依赖于Lemma 1中感知矩阵 $A$ 在随机高斯数据下以高概率满足RSC和RSS条件（概率下界包含多个指数衰减项），以及Theorem 1中IHT的收敛保证（置信度0.95）。实验验证覆盖了planted稀疏MLP拟合、MNIST分类和隐式神经表示等任务，均显示IHT优于或匹敌IMP基线。需要手动验证的是：非高斯数据分布下RSC/RSS条件的成立性，以及顺序凸更新策略的收敛性缺乏理论保证。
 
-## 核心模块与公式推导
+
 
 本文的核心贡献在于将稀疏MLP的训练问题转化为一个结构化线性感知问题，并利用凸松弛和迭代硬阈值（IHT）算法提供了理论恢复保证。以下梳理关键模块与公式。
 
@@ -166,7 +170,9 @@ $$f(w^K) - f(w^\star) \leq \varepsilon \quad \text{且} \quad \|w^K - w^\star\|_
 
 **证据强度**：该消融实验直接验证了顺序凸更新频率是控制IHT收敛率的关键旋钮。频繁更新 $A$ 使其更接近当前权重的真实激活模式，从而维持了凸近似的有效性。但该策略的理论收敛性保证尚不完善，是论文指出的开放问题之一。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 **主要结果**：本文通过一系列实验，将所提出的IHT方法与强基线方法——迭代幅度剪枝（IMP）进行了系统比较。实验覆盖了从合成数据到真实图像的多类任务，包括拟合planted稀疏MLP、MNIST手写数字分类以及隐式神经表示（INR）任务。在所有实验中，IHT均展现出与IMP相当或更稳健的性能。
 
@@ -206,7 +212,9 @@ $$f(w^K) - f(w^\star) \leq \varepsilon \quad \text{且} \quad \|w^K - w^\star\|_
 ![[assets/figures/papers/iclr26_0003_6UpstNltZ4_A_Recovery_Guarantee_for_Sparse_Neural_Networks/figures/054_Figure_9.jpg]]
 *Figure 9: Standard deviation over the three random trials (top row) for each experiment reported in Figure 4 (bottom row)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -271,6 +279,8 @@ $$
 - **非高斯数据**：对于非高斯数据，RSC/RSS条件是否仍然成立？是否需要修改感知矩阵A的构造方式？
 
 这些开放问题共同指向一个核心方向：**如何将稀疏神经网络的可恢复性保证从受限的理论设定推广到更广泛、更实际的深度学习场景**。本文作为“first recovery results for sparse MLPs”，为这一方向奠定了理论基础，但距离实用化的稀疏训练方法仍有显著差距。
+
+
 
 ## 原文 PDF
 

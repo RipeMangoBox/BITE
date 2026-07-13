@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Modality_Alignment_across_Trees_on_Heterogeneous_Hyperbolic_Manifolds.pdf
+project_link: https://mcislab-manifold-learning.github.io/HypModalAlign/
+code_link: null
 openreview_forum_id: F1uJKsaf0M
 aliases:
 - AAT
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 异构双曲流形上的跨模态树对齐 |
 | 英文题名 | Modality Alignment across Trees on Heterogeneous Hyperbolic Manifolds |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=F1uJKsaf0M); [Project](https://mcislab-manifold-learning.github.io/HypModalAlign/) |
+| Links | [paper](https://openreview.net/forum?id=F1uJKsaf0M) · [Project](https://mcislab-manifold-learning.github.io/HypModalAlign/) |
 | Topic | #topic/representation_self_supervised_transfer #topic/representation_self_supervised_transfer/representation_learning |
 | Method | Alignment across Trees |
 | Dataset | Cifar100 (1-shot), SUN (1-shot) |
@@ -41,7 +43,7 @@ claims:
 > - Cifar100 (1-shot) 上，HCA 为 53.19，对比 4.65，变化 +48.54。
 > - SUN (1-shot) 上，HCA 为 50.45，对比 25.15，变化 +25.30。
 
-## 概述
+## 概要
 
 现有视觉-语言对齐方法通常提取单一视觉特征与层次化文本特征进行匹配，导致**非对称对齐**，且忽略不同模态几何结构的差异，采用单一曲率空间建模。针对上述瓶颈，本文提出 **Alignment across Trees** 方法，核心思想是：为图像和文本两个模态分别构建对称的树状层次特征，将其嵌入**不同曲率的双曲流形**，并通过构造中间流形实现异构流形间的对齐。
 
@@ -51,7 +53,7 @@ claims:
 
 > **注意**: 上述性能数据和实验结论来源于论文自述，具体数值需结合原文表格交叉验证。
 
-## 背景与动机
+
 
 ### 问题背景：视觉-语言模型中的层次对齐困境
 
@@ -77,7 +79,9 @@ claims:
 
 通过这一设计，本文旨在实现层次一致的跨模态对齐，显著提升细粒度分类任务中的层次准确率（HCA）和平均树切准确率（MTA），同时保持或提升叶节点准确率（LA）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于将**非对称的图文对齐**改造为**对称的层次化对齐**，并通过**异构双曲流形**解决不同模态几何结构不匹配的问题。具体体现在三个关键设计槽位的改变。
 
@@ -101,7 +105,7 @@ claims:
 
 **证据强度**：三个changed slots均有消融实验的定量支撑，置信度达到0.95。可视化结果（Figure 6、Figure 9、Figure 10）定性证实了层次化视觉特征的有效性，注意力图显示模型能根据分类层级关注相应区域（置信度0.9）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0010_F1uJKsaf0M_Modality_Alignment_across_Trees_on_Heterogeneous/figures/002_Figure_2.jpg]]
 *Figure 2: Pipeline of our method*
@@ -136,7 +140,7 @@ claims:
 - 异构流形变体（Ours）在Table 3中一致优于单曲率双曲变体（Ours-HypV1、Ours-HypV2）和欧氏变体（Ours-Euc），证明不同模态使用各自曲率的有效性。
 - Table 18显示，各数据集上学到的 $c_1$、$c_2$ 值存在显著差异，且 $c_3^*$ 始终介于两者之间，从实证角度支持了异构建模的合理性。
 
-## 核心模块与公式推导
+
 
 ### 语义感知的视觉特征提取框架
 
@@ -211,7 +215,9 @@ $$J(\theta, c_1, c_2) = J_{pro}(T_e, V_e) + \alpha \bigl(J_{Tent}(T^{c_1}) + J_{
 
 其中$J_{pro}$为提示学习的基础损失，$\alpha$为平衡超参数。曲率$c_1$、$c_2$作为可学习参数，通过隐函数定理计算梯度——由于$c_3^*$是$c_1$、$c_2$的函数（通过最小化$J_c$得到），需使用黄金分割搜索求解$c_3^*$后，再通过隐函数定理反向传播梯度至$c_1$、$c_2$。Table 18展示了不同数据集上学到的曲率值，证实不同数据确实需要不同的曲率配置。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -276,7 +282,9 @@ Table 12分析了曲率初始化和损失权重$\alpha$的敏感性。曲率初�
 3. **计算开销**：相比基线增加约30%训练时间和约2% GPU内存。
 4. **空间表达能力**：当前仅在常曲率双曲流形上验证，尚未探索混合曲率空间对图文模态的分别建模潜力。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -313,6 +321,8 @@ Table 12分析了曲率初始化和损失权重$\alpha$的敏感性。曲率初�
 **未探索混合曲率空间**：当前方法为每个模态分配单一曲率，但实际数据的几何结构可能在不同区域呈现不同曲率特性。论文提出的开放问题之一即是如何利用混合曲率空间更精细地分别建模视觉和文本模态的局部几何结构。
 
 **跨域鲁棒性未充分验证**：虽然实验覆盖了 Cifar100、SUN、ImageNet 和 Rare Species 等多个数据集，但所有数据均来自自然图像领域。对于医学影像、遥感图像等具有不同层次结构特性的跨域场景，方法的鲁棒性仍是一个开放问题。
+
+
 
 ## 原文 PDF
 

@@ -43,7 +43,7 @@ claims:
 > - JPEG Compression Q=70 上，F1 0.885 vs 0.552 (EditGuard) (+0.333)；AUC 0.994 vs 0.875 (EditGuard) (+0.119)。
 > - Gaussian Noise σ=5 上，F1 0.982 vs 0.871 (EditGuard) (+0.111)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -85,7 +85,7 @@ NOWA在多项基准上取得显著优势：
 
 当前框架主要适用于景深范围内的场景；大景深变化或微距成像中PSF变为深度依赖，零空间结构随之变化。实际部署中残余零空间能量从仿真的~10⁻⁵升高到~10⁻⁴，且需针对每个相机原型进行PSF校准和网络微调。未来方向包括：深度感知校准策略、可编程光学元件实现动态零空间签名、以及针对近似成像算子攻击的增强防御。
 
-## 背景与动机
+
 
 ### 数字图像认证的脆弱性
 
@@ -105,7 +105,9 @@ NOWA 的核心洞察在于利用成像算子的数学结构来回答这个问题
 
 基于这一原理，NOWA 建立了一种**结构性的安全不对称性**：合法认证方持有相位掩膜参数 $\phi$ 和零空间网络参数 $\theta$，可精确提取并验证水印签名；而攻击者即使获得保护图像，在缺乏光学参数的情况下无法伪造有效的零空间签名。本文的动机正是充分挖掘这一不对称性，构建一个从光学编码、计算重建到篡改检测的完整认证流水线。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 NOWA的核心创新在于将水印的嵌入域从传统的图像域或频率域迁移到**成像算子的零空间**，构建了一条光学上不可观测但数学上可恢复的安全水印通道。这一结构性转变带来了四个关键的技术突破，每个突破都对应着对现有方案的实质性改进。
 
@@ -153,7 +155,7 @@ $$\mathbf{s} = \Pi_{\mathcal{N}}(\mathbf{x}_p) = \Pi_{\mathcal{N}} \mathcal{U}_\
 
 这四个changed slots并非独立的改进，而是围绕**零空间作为安全水印通道**这一核心洞察的有机整体：光学嵌入创建通道，NSN重建锚定签名，零空间投影提取签名，三者共同实现了从“拍摄后添加”到“拍摄时嵌入”、从“图像域隐藏”到“零空间分离”的范式转变。
 
-## 整体框架
+
 
 NOWA提出了一种混合物理-数字的脆弱认证流水线，其核心思想是在图像形成阶段——而非拍摄之后——将不可见的水印签名嵌入成像算子的零空间中。该流水线由四个紧密耦合的模块构成，形成一条从光学编码到篡改检测的端到端可训练链路。
 
@@ -204,7 +206,7 @@ NOWA的安全保障根植于其物理-数字混合架构的结构性不对称：
 ![[assets/figures/papers/paper_list_l2107_https_arxiv_org_abs_2512_22501/figures/001_Figure_1.jpg]]
 *Figure 1: A hybrid physical-digital pipeline for fragile authentication. (a) Optical-digital fingerprint: A phase mask (PM) in the camera aperture optically encodes the scene, embedding a unique physical signature before digitization. A neural network*
 
-## 核心模块与公式推导
+
 
 NOWA的核心架构由四个功能模块串联构成，形成一条从光学编码到像素级篡改定位的完整流水线。
 
@@ -274,7 +276,9 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{rec}} + \beta \mathcal{L}_
 ![[assets/figures/papers/paper_list_l2107_https_arxiv_org_abs_2512_22501/figures/008_Figure_6.jpg]]
 *Figure 6: Optical encoding. A commercial YONGNUO lens is disassembled to attach the design phase mask on the back side of the lens aperture. The inset shows the quantized designed phase mask*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -340,7 +344,9 @@ Figure 8展示了真实原型相机（Figure 6）的实验结果。使用商业Y
 ![[assets/figures/papers/paper_list_l2107_https_arxiv_org_abs_2512_22501/figures/011_Figure_8.jpg]]
 *Figure 8: (cont.). Real-world prototype results. From left to right: raw capture y, protected reconstruction*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 从数字嵌入到光学-数字混合：水印域的范式转移
 
@@ -387,6 +393,8 @@ NOWA的有效性建立在以下假设之上，违反任一条将导致性能退�
 - **密钥化安全增强**：能否在零空间签名中引入基于密钥的随机化或数字嵌入层，进一步增强安全性，防御利用大量配对数据集近似成像算子的攻击？这将是物理签名与数字密码学的深度融合方向。
 - **自动化部署流水线**：能否开发自动化PSF测量和在线微调流程，降低实际部署的校准门槛和人工干预需求？
 - **多光谱扩展**：当前框架基于单波长模型。能否扩展至多光谱或高光谱成像，利用不同波长的零空间差异实现更丰富的签名容量？
+
+
 
 ## 原文 PDF
 

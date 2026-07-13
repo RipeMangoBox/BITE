@@ -43,7 +43,7 @@ claims:
 > - EduDiag Science 上，Acc_p 41.07% (Qwen2.5-VL-7B) vs 41.59% (Direct CoT) (-0.52%（无帮助）)。
 > - EduDiag Mathematics 上，S_e 2.38 (GPT-5) vs 3.00 (上限) (仍需提升)。
 
-## 概述
+## 概要
 
 **EduDiag** 是一个面向大模型教育诊断推理能力的基准测试，其核心任务是要求模型从学生的错误答案出发，逆向重建导致该错误的推理链，并生成针对性的纠正反馈。这一任务形式化地定义为：给定图像 $I$、问题 $Q$、错误答案 $\hat{A}$ 以及正确的逐步推理链 $\mathbf{R}$ 作为参考，模型需逐步生成错误推理链 $\hat{s}_i$，其生成过程遵循条件概率最大化原则：
 
@@ -61,7 +61,7 @@ $$\hat{s}_i = \operatorname{argmax}_{\hat{s}_i} p(\hat{s}_i \mid \mathcal{T}, \h
 
 **方法定位**：EduDiag 在方法谱系上属于**教育诊断推理基准**，其训练范式从传统的监督微调（SFT，采用 LoRA 微调）扩展为 SFT + GRPO 的两阶段优化策略。奖励函数设计从基于文本相似度约束的 $R_1$ 演进为基于错误答案自推导匹配的 $R_2$。数据构建依赖 GPT-4o 进行错误链生成与反馈标注，并经三位标注者的人工验证确保质量。评估框架采用三个不同 LLM（Gemini-2、Claude-3.7、Seed-1.6）独立评分后取平均，以减少单一模型评估偏差。
 
-## 背景与动机
+
 
 ### 教育诊断推理的独特挑战
 
@@ -82,7 +82,9 @@ $$\hat{s}_i = \operatorname{argmax}_{\hat{s}_i} p(\hat{s}_i \mid \mathcal{T}, \h
 
 本文的核心洞察在于：**引入逆向错误推理链构建与纠正反馈生成的教育诊断推理任务，揭示了当前大模型在追溯学生错误方面的不足。** 后续实验表明，即使是最先进的闭源模型（如 GPT-5），其反馈原则的指导效果（Acc_p）与人工标注上限之间仍存在约 10% 的显著差距，验证了该基准的挑战性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 EduDiag 的核心创新在于将教育诊断从“正向求解”重构为“逆向错误推理链构建与纠正反馈生成”的双重任务，并通过**群体相对策略优化（GRPO）配合基于错误答案匹配的奖励函数（R2）**，系统性地突破了当前大模型在错误追踪（error tracing）上的能力瓶颈。
 
@@ -121,7 +123,7 @@ $$\hat{s}_i = \operatorname{argmax}_{\hat{s}_i} p(\hat{s}_i \mid \mathcal{T}, \h
 
 需要指出的是，尽管 GRPO with R2 带来了可测量的性能提升，但绝对增益仍然有限（Acc_p 提升约 1.7 个百分点），尤其在数学领域模型性能仍然较差（GPT-5 的 Sₑ 仅为 2.38，距离满分 3.0 仍有显著差距）。此外，模型生成的反馈原则对下游学生模型的指导效果有限，在科学领域甚至低于直接回答的精度。这些结果表明，**错误追踪能力的突破仍处于早期阶段**，如何设计更有效的奖励函数以进一步缩小与人工标注上限（Ground Truth 62.67%）之间的约 10% 差距，是后续研究的关键方向。
 
-## 整体框架
+
 
 EduDiag 基准旨在系统评估大模型的教育诊断推理能力，其核心任务要求模型从学生的**错误答案**出发，逆向重建导致该错误的推理链，并生成针对性的纠正反馈。整个基准的构建与评估流程可概括为四个关键阶段，如图 2 所示。
 
@@ -157,7 +159,7 @@ EduDiag 基准旨在系统评估大模型的教育诊断推理能力，其核心
 ![[assets/figures/papers/paper_list_l2739_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_EduDiag_A_Benchma/figures/003_Figure_2.jpg]]
 *Figure 2: Construction process overview of our Edudiag benchmark, including data filtering from different sources (Sec. 3.2), AI-assisted erroneous reasoning chains (Sec. 3.3) and feedback annotation (Sec. 3.4). ECoT and IA: annotated erroneous reasoning chains and corresponding incorrect answers*
 
-## 核心模块与公式推导
+
 
 ### 任务形式化与输入构造
 
@@ -203,7 +205,9 @@ $$\mathsf{S}_e = \begin{cases} 3, & \text{if } \hat{\mathsf{R}} \text{ 与人工
 
 R2 的因果作用显著：它鼓励模型在无正确答案提示的条件下，从自身构造的错误推理链中自然地推导出错误答案，从而直接强化错误追踪能力。消融实验证实，GRPO 配合 R2 在错误追踪（$\mathsf{S}_e$）和纠正准确性（$\text{Acc}_p$）上均优于纯 SFT 和 R1 奖励。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -267,7 +271,9 @@ Table 4 展示了利用优化后模型生成多项选择干扰项的能力评估
 ![[assets/figures/papers/paper_list_l2739_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_EduDiag_A_Benchma/figures/005_Table_1.jpg]]
 *Table 1: Statistics of our Edudiag benchmark*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 任务定位：从正向推理到逆向诊断
 
@@ -308,6 +314,8 @@ EduDiag 的适用范围受以下因素约束：
 3. **去 GPT-4o 依赖**：如何利用弱模型或合成数据生成高质量错误链，减少对强专有模型的依赖并降低系统偏差？
 4. **真实课堂部署**：GRPO 优化后的模型在真实教学场景中的实用性、安全性与可解释性如何？生成的错误诊断是否会被教师或学生信任？
 5. **自适应教学闭环**：能否将错误追踪能力迁移至学生模型，使其能够自主识别并纠正自身推理错误，实现个性化学习路径的自动规划？
+
+
 
 ## 原文 PDF
 

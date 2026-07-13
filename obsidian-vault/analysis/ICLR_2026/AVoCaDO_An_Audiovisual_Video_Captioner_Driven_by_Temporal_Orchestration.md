@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/AVoCaDO_An_Audiovisual_Video_Captioner_Driven_by_Temporal_Orchestration.pdf
+project_link: https://avocado-captioner.github.io/
+code_link: null
 aliases:
 - AVoCaDO
 tags:
@@ -29,7 +31,7 @@ claims:
 | 中文题名 | AVoCaDO：由时间编排驱动的视听视频描述生成器 |
 | 英文题名 | AVoCaDO: An Audiovisual Video Captioner Driven by Temporal Orchestration |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=vjEl1PuIDE); [Project](https://avocado-captioner.github.io/) |
+| Links | [paper](https://openreview.net/forum?id=vjEl1PuIDE) · [Project](https://avocado-captioner.github.io/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | AVoCaDO |
 | Dataset | video-SALMONN-2 testset, UGC-VideoCap, Daily-Omni |
@@ -39,17 +41,19 @@ claims:
 > - UGC-VideoCap 上，Avg.↑ 为 73.2，对比 Gemini-2.5-Pro: 72.6，变化 +0.6。
 > - UGC-VideoCap 上，Audio↑ 为 73.0，对比 Gemini-2.5-Pro: 72.0，变化 +1.0。
 
-## 概述
+## 概要
 
 AVoCaDO (An Audiovisual Video Captioner Driven by Temporal Orchestration) 是一个基于 Qwen2.5-Omni-7B 构建的开源视听视频描述生成模型。其核心创新在于通过两阶段后训练流水线——监督微调 (SFT) 和基于 GRPO 的强化学习——显著提升了视频描述中视听事件的时间对齐精度和对话准确性。在 video-SALMONN-2 测试集上，AVoCaDO 达到 Total 37.3，优于所有开源模型；在 UGC-VideoCap 上平均分 73.2，甚至超越了商业模型 Gemini-2.5-Pro (72.6)。此外，在 Daily-Omni 和 WorldSense 的问答评估中，AVoCaDO 分别达到 50.1 和 25.7，大幅领先其他开源模型。
 
-## 背景与动机
+
 
 现有视频描述模型大多仅依赖视觉模态，忽略了音频信号中丰富的语义线索（如对话、旁白、背景音乐）。即使通过独立音频模型生成描述再拼接，也无法建模视听事件之间的细粒度时间对齐和因果交互，导致在需要跨模态对齐理解的任务中性能显著下降。
 
 初步实验 (Figure 1) 验证了这一瓶颈：在 Daily-Omni 上，联合视听描述相比拼接式描述，平均准确率提升 15.8%，在“AV Event Alignment”类别中提升 27.8%。这表明，简单拼接模态特定描述无法有效捕捉视听事件之间的时间对应关系，亟需一种能够实现精确时间对齐的联合描述生成方法。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 AVoCaDO 的核心创新可归纳为以下三点：
 
@@ -59,7 +63,7 @@ AVoCaDO 的核心创新可归纳为以下三点：
 
 3. **三项互补奖励函数设计**：在 GRPO 阶段引入 (1) 基于检查表的奖励 R_C，确保关键事件覆盖；(2) 基于对话的奖励 R_D，保证 ASR 保真度和说话者识别准确性；(3) 长度正则化奖励 R_L，抑制重复坍塌并调节描述长度。
 
-## 整体框架
+
 
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_vjEl1PuIDE_AVoCaDO_An_Audi/figures/001_Figure_1.jpg]]
@@ -75,7 +79,7 @@ AVoCaDO 的整体框架包含以下核心模块：
 
 训练数据来源多样，包括 TikTok-10M (24K)、Short-Video (18K)、Shot2Story (20K)、FineVideo (29K)、YouTube-Commons (11K) 和 CinePile (5K)，确保覆盖多种视听场景。
 
-## 核心模块与公式推导
+
 
 ### 5.1 GRPO 优化框架
 
@@ -125,7 +129,9 @@ $$\mathcal{R}_L = \begin{cases} 1 - \frac{\mathrm{len}(S_{\mathrm{gen}}) - \tau_
 
 总奖励为三项之和：$\mathcal{R} = \mathcal{R}_C + \mathcal{R}_D + \mathcal{R}_L$。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 
 ### 6.1 主要结果
@@ -184,7 +190,9 @@ Table 4 的消融实验揭示了各组件的关键贡献：
 - 在 QA 评估中，当描述缺乏必要信息时，模型被指示拒绝回答，此类问题被标记为错误，以减少猜测偏差
 - 训练数据来源多样，覆盖多种视听场景，但未明确讨论数据集的偏见或公平性分析
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 AVoCaDO 属于视听视频描述生成领域，其方法谱系可定位如下：
 
@@ -201,6 +209,8 @@ AVoCaDO 属于视听视频描述生成领域，其方法谱系可定位如下：
 **局限性**：模型可能生成幻觉内容；在实时应用中延迟和准确性之间存在权衡；训练数据限于 100 秒以内的视频；32K 上下文窗口限制了可处理的视频长度和细节。
 
 **开放问题**：如何有效检测和减轻生成描述中的幻觉？如何通过令牌压缩或效率优化策略平衡实时场景下的延迟和准确性？AVoCaDO 在更长视频（超过 100 秒）上的表现如何？三项奖励函数的权重是否需要针对不同场景进行自适应调整？
+
+
 
 ## 原文 PDF
 

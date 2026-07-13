@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2026
 pdf_ref: paperPDFs/arxiv_2026/SemanticWM.pdf
+project_link: https://hskalin.github.io/semantic-wm/
+code_link: null
 aliases:
 - SLDWMSVAWDH
 tags:
@@ -40,7 +42,7 @@ claims:
 > - BridgeV2 上，VLA Consensus SR (↑) 0.344 (V-JEPA 2.1) vs 0.169 (VAE) (+0.175)；CEM Error k=1 (↓) 0.082 (SigLIP 2) vs 0.111 (VAE) (-0.029)；IDM Pearson r k=1 (↑, WM latents) 0.781 (V-JEPA 2.1) vs 0.476 (VAE) (+0.305)。
 > - SOAR 上，Task-success classifier accuracy (↑, WM latents) 0.823 (SigLIP 2) vs 0.716 (VAE) (+0.107)。
 
-## 概述
+## 概要
 
 **核心问题**：机器人世界模型需要同时支持高质量的视觉预测和精确的动作/任务动态建模。当前主流方法普遍采用以像素重建为目标的潜空间（如 VAE），这些潜空间虽擅长图像生成，却未显式编码与操控相关的语义、接触和几何信息。一个关键但未被充分回答的问题是：**重建对齐的潜空间与语义对齐的潜空间，究竟哪一种对下游规划与策略评估更有效？**
 
@@ -57,7 +59,7 @@ claims:
 
 **方法谱系与知识库定位**：本文工作处于**视觉表征学习 × 机器人世界模型**的交叉点。在表征端，它比较了以 **SD3 VAE**（Esser et al., 2024）、**Cosmos**（Agarwal et al., 2025）为代表的重建对齐自编码器与以 **V-JEPA 2.1**（Bardes et al., 2025）、**Web-DINO**（Darcet et al., 2025，改编自 DINOv2）、**SigLIP 2**（Zhai et al., 2024）为代表的语义对齐方法。在世界模型端，它基于动作条件 DiT 转移模型和流匹配训练范式，与近期扩散世界模型（如 Genie、DINO-WM）共享技术基础，但明确聚焦于潜空间选择这一上游决策对下游规划与策略闭环评估的因果效应，填补了该方向的系统性诊断空白。
 
-## 背景与动机
+
 
 ### 机器人世界模型的核心诉求
 
@@ -83,7 +85,9 @@ $$p ( o_{t+1:t+K} \mid o_{t-H:t}, a_{t-H:t+K-1} )$$
 
 研究从三个维度评估世界模型的效用：(1) 潜空间本身对动作和任务信息的保留能力；(2) 生成视频的视觉质量；(3) 下游策略闭环评估中的任务成功率与行为鲁棒性。这一多维评估框架旨在揭示：当视觉保真度与动作语义保留发生冲突时，哪一个维度对世界模型的实际效用更具决定性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新并非提出一种全新的世界模型架构，而是通过严格控制变量实验，揭示了一个此前被忽视的关键设计选择：**机器人世界模型的潜空间类型（重建对齐 vs. 语义对齐）对下游规划与策略性能具有决定性影响**。在保持DiT转移模型、动作条件、训练数据和超参数完全一致的前提下，仅切换冻结的预训练编码器，语义对齐潜空间在动作恢复、任务成功预测和策略闭环评估中系统性地优于以像素重建为目标的传统潜空间。
 
@@ -112,7 +116,7 @@ $$p ( o_{t+1:t+K} \mid o_{t-H:t}, a_{t-H:t+K-1} )$$
 
 本工作位于**语义世界模型**与**潜空间扩散模型**的交叉点。与传统的重建对齐世界模型（如Dreamer系列、基于VAE的扩散世界模型）不同，本文证明预训练的语义视觉表征（来自JEPA、DINO、SigLIP家族）天然保留了动作引起的变化和任务完成信号。与纯语义预测器（如DINO-WM、V-JEPA 2-AC）相比，本文保留了扩散模型的视觉生成能力，同时通过潜空间选择而非架构修改来提升下游任务性能。这一发现对机器人世界模型的设计具有直接的工程指导意义：**潜空间选择应优先考虑动作与任务结构，而非纯粹的像素重建质量**。
 
-## 整体框架
+
 
 本研究构建了一个动作条件潜扩散世界模型（action-conditioned latent diffusion world model），其核心目标是回答一个根本性问题：**对于机器人世界模型而言，什么样的潜空间是“好”的？** 为此，作者设计了一套高度可控的对比框架——在固定所有其他组件的前提下，仅切换编码器定义的潜空间接口，从而直接归因不同视觉表征对下游规划与策略性能的因果效应。
 
@@ -145,7 +149,7 @@ $$p ( o_{t+1:t+K} \mid o_{t-H:t}, a_{t-H:t+K-1} )$$
 
 这一框架使得“重建 vs. 语义”的对比具有高度可信的因果归因——任何性能差异均可追溯至编码器所定义的潜空间特性，而非架构或训练协议的混杂效应。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化
 
@@ -202,7 +206,9 @@ $$\widehat{o}_{t+1:t+K} = \mathrm{Dec}(\tilde{z}_{t+1:t+K})$$
 ![[assets/figures/papers/SemanticWM_2605.06388_ae409282f58b/figures/003_Figure_3.jpg]]
 *Figure 3: Latent space effect overview: each point is a DiT-S world model trained by varying only the encoder and the associated decoder path. (a) Upper-right is favorable. Latent space metrics show that semantic encoders improve action recoverability, task-success separability, and action planning error (CEM) relative to reconstruction-aligned encoders. (b) Lower-right is favorable. Visual utility metrics show that pixel fidelity alone does not explain downstream performance: reconstruction-aligned spaces remain competitive on low-level image quality, while semantic spaces often improve video and motion quality. (c) Upper-right is favorable. Closed-loop evaluations show that semantic spaces generall...*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心结果：语义潜空间在策略与动作恢复上系统性占优
 
@@ -280,7 +286,9 @@ S-VAE适配器将高维语义潜变量压缩至d=96，显著改善了扩散训�
 ![[assets/figures/papers/SemanticWM_2605.06388_ae409282f58b/figures/025_Table_15.jpg]]
 *Table 15: DiT-S single-view vs multi-view. Each cell for PSNR and LPIPS shows the WM value with the gap to its encoder’s reconstruction ceiling in parentheses (smaller = closer to ceiling). Best and runner-up per column across all rows; the WM value and gap are highlighted independently. The two adapter pairs (V-JEPA $2 _ { 9 6 } , \mathrm { W e b – D I N O _ { 9 6 } }$ ) only have multi-view data for CEM. Best within each column*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：从“重建保真度”到“任务效用”的范式转换
 
@@ -349,6 +357,8 @@ $$p ( o_{t+1:t+K} \mid o_{t-H:t}, a_{t-H:t+K-1} )$$
 3. **与非扩散语义世界模型的融合**：如何将语义潜空间扩散世界模型与JEPA预测器等非扩散方法结合，实现更高效且更具解释性的规划？这涉及扩散采样的计算成本与语义空间判别效率之间的权衡。
 
 4. **任务感知的表示选择**：不同下游任务（如视觉伺服、力控装配、长序列任务规划）可能偏好不同类型的语义信息。是否存在一种“表示选择策略”，能够根据任务需求动态调整潜空间的使用方式？
+
+
 
 ## 原文 PDF
 

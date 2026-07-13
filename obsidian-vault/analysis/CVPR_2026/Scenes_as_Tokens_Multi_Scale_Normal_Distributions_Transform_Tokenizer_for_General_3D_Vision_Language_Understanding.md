@@ -42,7 +42,7 @@ claims:
 > - ScanQA 上，CiDEr / METEOR 98.6 / 19.4 vs 92.6 / 18.4 (second-best results) (+6.0 / +1.0)。
 > - SQA3D 上，EM / EM-R 54.4 / 57.1。
 
-## 概述
+## 概要
 
 **核心问题**：将大规模高分辨率3D点云压缩为大语言模型（LLM）可消费的有界长度令牌序列，同时最小化信息损失并捕捉多尺度物体-环境关系。现有方法依赖粗暴下采样，导致细粒度几何细节丢失且缺乏有效的全局抽象结构建模。
 
@@ -57,7 +57,7 @@ claims:
 - **幻觉抑制**：3D-POPE基准上，Random/Popular/Adversarial三种设定下均取得最低幻觉率。
 - **消融验证**：NDT-based tokenization在所有任务上一致优于朴素多尺度下采样baseline；三尺度配置在细节保留与推理稳定性之间取得最佳平衡；查询令牌数量在400-850处趋于饱和，表明MSDec在此范围内已捕获足够场景信息。
 
-## 背景与动机
+
 
 ### 3D视觉语言理解的兴起与核心瓶颈
 
@@ -84,7 +84,9 @@ claims:
 
 基于此，本文提出**NDTokenizer3D**，核心动机是**摒弃传统点云下采样范式，采用多尺度NDT网格作为3D场景的"分词"基础，将场景转化为信息丰富、结构紧凑的令牌序列，从而为LLM提供高质量的3D场景理解输入**。这一设计不仅解决了信息损失问题，还通过配套的多尺度NDT解码器（MSDec）实现了跨尺度特征的渐进融合，并进一步将解码器复用为统一接口，支持用户交互提示和分割掩码解码，在单一架构内统一多种3D理解任务。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 NDTokenizer3D的核心创新在于用**多尺度正态分布变换（NDT）网格表示**替代了现有通用3D VLM中普遍采用的朴素点云下采样策略，并配套设计了**多尺度NDT解码器（MSDec）**作为跨尺度特征融合与多任务统一接口。这两个设计共同解决了“将大规模高分辨率3D点云压缩为LLM可消费的有界长度令牌序列，同时最小化信息损失并捕捉多尺度物体-环境关系”这一瓶颈问题。
 
@@ -122,7 +124,7 @@ $$\tilde{\mathbf{Q}}_{r} = \mathrm{CrossAttn}(\mathbf{Q}_{r}, \mathbf{K}_{r}, \m
 
 这三个改变的因果传导链为：NDT统计量在压缩中保留了几何信息→MSDec在融合中有效整合了跨尺度特征→统一的MSDec接口消除了任务特异性架构需求，最终在Multi3DRefer上以46.0 mIoU超越3D-LLaVA +3.3点，在ScanQA上以98.6 CiDEr超越次优结果+6.0点，并在3D-POPE幻觉评估中取得所有设定下的最低幻觉率。
 
-## 整体框架
+
 
 NDTokenizer3D 的整体架构围绕一个核心设计原则展开：**将高分辨率3D点云压缩为LLM可消费的有界长度令牌序列，同时最小化信息损失并捕捉多尺度物体-环境关系**。现有方法依赖粗暴下采样导致细粒度几何细节丢失，且缺乏有效的全局抽象结构建模。NDTokenizer3D 通过引入源自SLAM的**多尺度NDT（Normal Distributions Transform）网格表示**与**跨尺度渐进融合解码器（MSDec）**，从根本上改变了3D场景到语言模型的压缩方式。
 
@@ -182,7 +184,7 @@ NDTokenizer3D相比baseline方法**3D-LLaVA**（Boora and Nießner, CVPR 2025）
 ![[assets/figures/papers/paper_list_l2175_https_arxiv_org_abs_2511_21191/figures/001_Figure_1.jpg]]
 *Figure 1: We introduce NDTokenizer3D, a generalist 3D VLM that bridges language-level reasoning with spatial understanding. By tokenizing complex 3D scenes into information-rich representations, NDTokenizer3D enables diverse tasks such as 3D Visual Question Answering, Dense captioning, and Referring Segmentation within a unified and interactive framework*
 
-## 核心模块与公式推导
+
 
 ### 多尺度NDT场景表示
 
@@ -236,7 +238,9 @@ $$\mathcal{L}_{s}(\mathbf{F}_{r}^{\mathrm{C}}, \mathbf{F}_{r}) = \frac{1}{N_{r}}
 
 $$\mathcal{L} = \mathcal{L}_{t} + \lambda_{3} \mathcal{L}_{m} + \lambda_{4} \mathcal{L}_{s}(\mathbf{H}^{\hat{a}}, \mathbf{H}^{a})$$
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 整体实验设置
 
@@ -312,7 +316,9 @@ NDTokenizer3D 与 3D-LLaVA 在指称分割、VQA、情景问答和稠密描述�
 3. `[SEG]` 令牌的生成机制和训练信号细节在可用上下文中不够清晰——LLM 如何在适当位置学习生成该特殊令牌以触发分割解码，需要进一步确认原文的具体训练策略。
 4. Stage 1 预训练使用的3D实例分割数据集具体名称未在可用上下文中明确列出。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 技术路线定位
 
@@ -371,6 +377,8 @@ Stage 1预训练使用的3D实例分割数据集具体是什么，论文上下�
 4. **与点云编码器的解耦性**：当前使用Point Transformer v3作为3D编码器，若替换为其他编码器（如SparseConv、MinkowskiEngine），NDT表示的优势是否仍能保持？
 
 5. **多模态对齐损失的必要性**：Stage 1的2D-3D余弦相似度对齐损失（$\mathcal{L}_s$）对最终性能的贡献缺乏独立消融，其与分类/分割损失的相对重要性尚不明确。
+
+
 
 ## 原文 PDF
 

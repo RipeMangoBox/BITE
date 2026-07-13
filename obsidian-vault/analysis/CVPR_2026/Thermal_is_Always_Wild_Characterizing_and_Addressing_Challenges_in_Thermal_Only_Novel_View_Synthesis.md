@@ -45,7 +45,7 @@ claims:
 > - ThermalMix 上，PSNR↑ / SSIM↑ 24.61 / 0.74 vs Prior SOTA (Thermal3D-GS) (SOTA)。
 > - MVTV 上，PSNR↑ / SSIM↑ 25.13 / 0.84 vs Prior SOTA (Thermal3D-GS) (SOTA)。
 
-## 概述
+## 概要
 
 纯热成像新视角合成（Thermal‑only NVS）面临一个根本性瓶颈：热红外图像的低动态范围、强烈的帧间光度波动以及缓慢的辐射漂移，严重破坏多视图一致性，使得依赖稳定光度与纹理线索的 NeRF/3DGS 方法难以收敛，并产生漂浮几何伪影。本文提出 **Wild Thermal**，将热成像的帧间辐射不一致视为“野外观”（in‑the‑wild）外观变化，通过**光度稳定化预处理**与**嵌入条件发射建模**两大核心组件协同解决这一挑战。
 
@@ -53,7 +53,7 @@ claims:
 
 在 MSX、ThermalMix、MVTV、Lin et al.、Ye et al.、TINSD 六个公开数据集上，Wild Thermal 以仅 11 分钟的训练时间全面超越 NeRF、ThermalMix‑TS、Lin et al.、ThermoNeRF 及 Thermal3D‑GS 等基线方法，取得 SOTA PSNR 与 SSIM。消融实验证实，光度稳定化与发射 MLP 两者独立有效且高度互补：预处理将平均 PSNR 从 22.25 dB 提升至 23.01 dB，发射 MLP 进一步提升至 24.93 dB，完整系统达到 26.14 dB，各组件缺一不可。定性结果表明，本文方法在保持锐利边界与稳定背景温度的同时，有效消除了 Thermal3D‑GS 中常见的漂浮伪影。
 
-## 背景与动机
+
 
 热红外成像在安防监控、自动驾驶、工业检测和夜间感知等场景中具有不可替代的价值——它直接捕获物体自身的热辐射，无需外部光源即可全天候工作。然而，与成熟的 RGB 新视角合成（NVS）技术相比，纯热成像驱动的三维重建与渲染仍然是一个几乎未被探索的领域。这一差距并非偶然：热成像数据携带一系列独特的物理与信号退化特性，使得直接迁移 RGB 领域的 NeRF 或 3DGS 方法面临系统性失败。
 
@@ -85,7 +85,9 @@ claims:
 
 基于这一洞察，本文提出 **Wild Thermal**——一个由光度稳定化预处理与嵌入条件发射 3DGS 组成的纯热成像 NVS 流水线，旨在以极低的计算开销（训练仅需约 11 分钟）实现跨数据集的鲁棒高保真热重建。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题本质的重新定义：热成像的“野外观”属性
 
@@ -138,7 +140,7 @@ claims:
 
 当前方法的局限也为后续创新指明了方向。光度稳定化依赖于已知相机位姿和完整的序列帧，这限制了其在纯热成像 SLAM 场景中的应用——**热成像原生位姿估计**仍是一个开放挑战。此外，预处理在放大动态范围的同时也放大了传感器噪声，在极低纹理区域可能引入结构化伪影。这些局限暗示了下一阶段创新的可能方向：将光度稳定化与三维重建**联合优化**，使系统在缺乏完整序列先验时也能自适应调整；或引入**显式的噪声建模模块**，在增强对比度与抑制噪声之间取得动态平衡。
 
-## 整体框架
+
 
 ### 问题本质与设计动机
 
@@ -204,7 +206,7 @@ claims:
 
 相比于 **Thermal3D-GS**（物理启发的热成像高斯泼溅）和 **ThermalMix-TS**（基于 Instant-NGP 的快速 NeRF 变体）等方法，本文 pipeline 的核心区分点在于：(1) 在进入重建之前主动稳定输入光度，而非依赖网络自身消化辐射波动；(2) 将外观变化建模从“每高斯固定颜色”升级为“嵌入条件标量发射”，赋予了模型吸收帧间残余瞬变的表达能力。消融实验证实，这两个设计独立有效且高度互补——预处理将平均 PSNR 从 22.25 dB 提升至 23.01 dB，发射 MLP 进一步提升至 24.93 dB，完整系统达到 26.14 dB（Table 2）。
 
-## 核心模块与公式推导
+
 
 ### 4.1 光度稳定化与对比度增强
 
@@ -296,7 +298,9 @@ $$\mathcal{L} = \lambda_{1} \mathcal{L}_{\mathrm{L1}} + \lambda_{2} \mathcal{L}_
 ![[assets/figures/papers/paper_list_l2610_https_arxiv_org_abs_2603_20448/figures/001_Figure_1.jpg]]
 *Figure 1: Our method overcomes significant challenges in thermal images. Thermal data contain limited texture and lack multispectral cues, making correspondence estimation harder than in RGB. They also exhibit sensor-specific degradations, including (a) frame-to-frame photometric inconsistency from sensor heating, (b) softened transitions between hot and cold regions characteristic of microbolometer sensors, (c) vignetting that produces viewpoint-dependent attenuation, and (d) fixed-pattern noise visible as structured artifacts. Our method explicitly stabilizes the photometry in (a), while the effects in (b–d) are mitigated in our SOTA reconstructions (e) through multiview consistency enabled by a no...*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 数据集与评估协议
 
@@ -347,7 +351,9 @@ Table 2 和 Table S1 提供了详尽的消融分析，量化了各组件对性�
 
 尽管 Wild Thermal 在多个数据集上取得了 SOTA 性能，论文仍诚实报告了若干局限性。首先，方法假设相机位姿已知——在实际纯热成像场景中，位姿估计本身极具挑战性，通常需要 IMU 等外部传感器辅助。其次，光度稳定化与对比度增强在扩宽动态范围的同时，不可避免地放大了传感器噪声和离散化伪影；在极低纹理区域，这可能引入结构化瑕疵。此外，发射 MLP 虽能吸收大部分帧间辐射瞬变，但对极端的固定模式噪声或严重晕影可能仍无法完全消除。最后，模型尚未在实时推理约束下验证，且对超出所测数据集分布的传感器类型（如冷却型红外探测器）的泛化性尚未评估。这些局限性为后续研究指明了方向，包括热成像原生位姿估计、动态场景扩展以及更显式的辐射补偿机制等。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：热成像 NVS 的“野外观”本质
 
@@ -398,6 +404,8 @@ Table 2 和 Table S1 提供了详尽的消融分析，量化了各组件对性�
 3. **动态场景扩展**：当前方法假设静态场景。热成像中运动物体（如行人、车辆）的温度变化与帧间辐射漂移耦合，如何解耦并同时保持帧间光度一致性？
 
 4. **外观嵌入的表达上限**：针对低纹理、大基线、严重辐射偏移等极端情形，当前嵌入条件外观建模的表达能力上限在哪里？是否需要更显式的物理辐射补偿模块（如传感器响应函数反演）作为补充？
+
+
 
 ## 原文 PDF
 

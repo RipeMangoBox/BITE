@@ -41,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - LDPose-LimbLoss Evaluation Dataset 上，Body Kpts 2D MPJPE (px) 24.75 vs 28.27 (HSMR) (-3.52)；Res-Limb 2D MPJPE (px) 23.19 vs 73.61 (HSMR) (-50.42)；Intact Kpts 2D MPJPE (px) 24.87 vs 24.56 (HSMR) (+0.31)。
 
-## 概述
+## 概要
 
 现有单图像3D人体网格恢复（HMR）方法——无论是优化拟合范式（如 **SMPLify-X**，Pavlakos et al., CVPR 2019）还是回归范式（如 **HSMR**、**TokenHMR**、**CameraHMR**、**PromptHMR**）——均建立在完整肢体先验和固定运动学拓扑之上。当输入为截肢个体时，这些方法无法正确表示残肢几何，普遍产生**幻肢**（在缺失部位生成完整肢体）、**关节塌陷**以及为补偿拓扑失配而出现的**整体姿态扭曲**（Figure 2）。
 
@@ -51,7 +51,7 @@ ResiHMR 针对上述瓶颈，提出了一种**无需训练、即插即用**的�
 
 ResiHMR 的局限性主要体现在两方面：残肢表面重建依赖光滑凸先验，无法复现个体特异的不规则轮廓（Figure 8）；单目输入导致侧视角度存在深度歧义（Figure 9）。这些局限源于残肢3D真实值数据的缺失，也指明了未来构建专用3D数据集和引入个体化形状先验的开放方向。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -79,7 +79,9 @@ ResiHMR 的局限性主要体现在两方面：残肢表面重建依赖光滑凸
 
 ResiHMR的动机源于一个明确的现实需求：**使3D人体重建技术对截肢个体同样可用**。截肢者在全球人口中占有不可忽视的比例，但现有HMR研究几乎完全忽略了这一群体。本文旨在填补这一空白，提出首个显式建模残肢端点并自适应运动学拓扑的优化框架，使得单图像3D人体网格恢复能够生成解剖学一致、残肢感知的重建结果。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ResiHMR 的根本创新在于**显式打破现有 HMR 方法的“完整肢体”假设**，通过两个互补的模块——残肢锚点-因子优化与残肢表面重建——将固定运动学拓扑自适应地重构为截肢者专属的表示，从而从根本上消除幻肢和代偿性姿态扭曲。
 
@@ -144,7 +146,7 @@ ResiHMR 的核心洞察在于：**将残肢终点参数化为锚点与上游关�
 - **强证据**：Table 1 的定量消融直接证明了 changed slots 的有效性——残肢端点误差的巨幅下降（73.61 → 23.19）与完好关节精度的保持（24.56 → 24.87）构成清晰的因果证据链。
 - **需人工验证**：Figure 6 中与 AJAHR 的对比声称 AJAHR 的“关节塌陷”表示不符合真实解剖，但该结论依赖专家验证的外部证据，论文未提供独立的量化解剖学评估指标，建议读者结合临床专业知识判断。
 
-## 整体框架
+
 
 ResiHMR 是一个完全基于优化的即插即用框架，无需任何训练数据集，可嵌入任意能输出 SMPL‑X 参数（相机、姿态、形状）的 HMR 管线，包括优化式方法（如 **SMPLify‑X** (Pavlakos et al., CVPR 2019)）和回归式方法（如 **HSMR**、**TokenHMR** (CVPR 2024)、**CameraHMR** (3DV 2025)、**PromptHMR** (CVPR 2025) 等）。框架的整体流程如 Figure 3 和 Figure 10 所示，由三个阶段串联构成：
 
@@ -189,7 +191,7 @@ ResiHMR 是一个完全基于优化的即插即用框架，无需任何训练数
 ![[assets/figures/papers/paper_list_l1035_https_arxiv_org_abs_2604_28025/figures/001_Figure_1.jpg]]
 *Figure 1: Demonstration of ResiHMR. Our framework recovers anatomically coherent 3D body meshes from a single RGB image by adapting the kinematic topology and explicitly reconstructing residual-limb geometry*
 
-## 核心模块与公式推导
+
 
 ResiHMR 是一个纯优化框架，无需训练数据，可作为即插即用模块嵌入任何输出 SMPL-X 参数的 HMR 管线（包括优化式和回归式方法）。其核心由两个模块构成：**残肢锚点-因子优化**（Residual Anchor-Factor Optimization）和**残肢重建**（Residual-Limb Reconstruction）。前者自适应地修正运动学拓扑，后者基于几何操作生成水密残端表面。
 
@@ -243,7 +245,9 @@ $$\hat{\mathbf{n}} = \frac{\mathbf{J}_a^{\star} - \mathbf{J}_t^{\mathrm{init}}}{
 
 该模块的根本价值在于：与 AJAHR 等将 SMPL 顶点塌缩至父关节的方法不同（Figure 6），ResiHMR 通过几何切割和边界密封生成显式的解剖学残端表面，避免了关节级截断导致的解剖失真。但需注意，光滑凸先验无法完全复现个体特异的不规则残肢轮廓（Figure 8），这是缺乏残肢 3D 训练数据带来的固有限制。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：残肢端点定位的突破性改善
 
@@ -321,7 +325,9 @@ LDPose-LimbLoss评估数据集（255张图像，**Figure 4**展示样本多样�
 ![[assets/figures/papers/paper_list_l1035_https_arxiv_org_abs_2604_28025/figures/014_Figure_11.jpg]]
 *Figure 11: Qualitative Comparison of ResiHMR with SOTA HMR methods. Please see this in GIF format in project page  ResiHMR*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：完整肢体先验的失效边界
 
@@ -358,6 +364,8 @@ ResiHMR的关键区分点在于**显式建模残肢终点**。通过参数化残
 - **学习驱动的残肢形状先验**：生成模型或扩散模型有望从大规模截肢者图像中学习个体化的残肢软组织形变和截肢界面形态，减少对光滑凸先验的依赖。
 - **复杂肢体畸形的扩展**：当前框架假设残肢沿肢体轴线截断，对于先天性肢体畸形或高度不规则的截肢界面，需要更灵活的拓扑表示和几何建模。
 - **临床下游应用**：重建的残端表面在假肢接受腔适配、步态分析和截肢者康复评估中具有潜在价值，但需要验证重建精度是否满足临床生物力学要求。
+
+
 
 ## 原文 PDF
 

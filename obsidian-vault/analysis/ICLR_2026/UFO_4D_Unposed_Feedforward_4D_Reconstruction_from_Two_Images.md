@@ -43,7 +43,7 @@ claims:
 > - KITTI 上，Scene flow EPE3D forward (↓) 0.137 vs 0.463 (DynaDUSt3R) (-0.326)。
 > - Bonn 上，Pointmap EPE (↓) 0.162 vs 0.181 (St4RTrack) (-0.019)。
 
-## 概述
+## 概要
 
 从两帧无姿态图像中重建完整的4D（3D几何+运动）动态场景是计算机视觉的核心难题。现有方法面临三大瓶颈：**缺乏统一的显式4D表示**——逐像素的点云和运动向量彼此解耦，无法利用多模态信号间的正正则化；**训练数据稀疏且标注不完整**——真实世界的动态标注数据稀缺且含噪（如Stereo4D数据集中静态区域存在非零运动标注，Figure D）；**相机位姿依赖后处理**——基于PnP+RANSAC的方案对噪声敏感，且无法与重建网络端到端联合优化。
 
@@ -57,7 +57,7 @@ claims:
 
 当前方法仍存在局限：仅支持双帧输入，扩展到长序列面临线性内存增长问题；假设线性运动，难以处理非线性动态；在Bonn等纹理缺乏区域因高斯重叠导致精度略低于逐像素表示（Table 1, Figure F）。这些方向值得后续探索。
 
-## 背景与动机
+
 
 从二维图像恢复三维世界是计算机视觉的核心目标。近年来，基于前馈网络（feedforward）的静态场景重建取得了显著进展，仅需少量无姿态图像即可直接输出三维几何。然而，现实世界是动态的——物体在运动、相机在移动，将这些方法扩展到**动态4D场景**（3D几何 + 3D运动）仍面临根本性挑战。
 
@@ -81,7 +81,9 @@ claims:
 
 基于这一洞察，**UFO-4D** 提出了一种统一的**无姿态前馈4D重建方法**：输入两张无姿态图像，直接输出动态3D高斯集合和相对相机位姿。该显式4D表示可同时支撑三维几何（点云、深度）、三维运动（场景流、光流）以及任意时刻/视角的图像渲染（Figure 1），并通过对渲染信号的自监督训练，在标注稀缺的条件下实现高精度重建。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 UFO-4D的核心创新在于将动态3D高斯泼溅（Dynamic 3DGS）确立为统一的显式4D场景表示，并围绕该表示构建了一个端到端的前馈重建框架。相较于现有方法，这一选择在三个关键维度上形成了根本性的变革：
 
@@ -103,7 +105,7 @@ UFO-4D的核心创新在于将动态3D高斯泼溅（Dynamic 3DGS）确立为统
 
 实验表明（Table G），前馈位姿估计比PnP+RANSAC方案准确约16.6%，且几何质量也优于其他方法。注意力可视化（Figure G）进一步揭示了其工作机制：位姿token在特定解码器层（第8、11、12层）倾向于关注静态区域的图像token，自动学习忽略运动物体以获取可靠的位姿估计线索。
 
-## 整体框架
+
 
 UFO-4D 是一个从**两帧无姿态图像**中直接进行前馈式4D重建的统一框架。其核心设计在于：将整个重建过程建模为一个从图像对到**动态3D高斯泼溅（Dynamic 3DGS）**和**相对相机位姿**的端到端映射，而非分步处理几何、运动与位姿。
 
@@ -172,7 +174,7 @@ $$
 ![[assets/figures/papers/paper_list_l32_https_openreview_net_forum_id_8gDDWqO59H/figures/001_Figure_1.jpg]]
 *Figure 1: Given a pair of unposed images, the proposed UFO-4D outputs dynamic 3D Gaussians in the canonical space and relative camera pose in a feedforward manner. This explicit 4D represen-Input image pairtation can solve various downstream tasks such as 3D geometry (point, depth) and motion (scene flow, optical flow). Besides, it can interpolate image, geometry, and motion at novel view and time*
 
-## 核心模块与公式推导
+
 
 UFO-4D 的核心设计是将双图输入映射为一个统一的显式4D表示——动态3D高斯泼溅（Dynamic 3DGS），并通过可微渲染同时输出多模态信号，实现端到端的联合优化。整个pipeline由四个关键模块串联构成。
 
@@ -249,7 +251,9 @@ $$L_{\mathrm{self}} = L_{\mathrm{photo}} + w_{\mathrm{smooth}} L_{\mathrm{smooth
 ![[assets/figures/papers/paper_list_l32_https_openreview_net_forum_id_8gDDWqO59H/figures/009_Figure_5.jpg]]
 *Figure 5: Opacity as learnable confidence: Opacity maps show the model’s behavior in a (dis)occlusion scenario. Our model learns to assign high confidence (opacity) to disoccluded regions, and for mutually-visible regions, it selects only one corresponding Gaussian from the two views, enabling an efficient and compact 4D representation*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -312,7 +316,9 @@ UFO-4D 采用混合数据集训练：Stereo4D（采样概率 60%）、PointOdyss
 ![[assets/figures/papers/paper_list_l32_https_openreview_net_forum_id_8gDDWqO59H/figures/011_Figure_6.jpg]]
 *Figure 6: Qualitative comparison on loss ablation. Gradient backpropagation from the image synthesis loss and rendering losses on point and motion helps UFO-4D improve motion and point estimates, especially on object and motion boundaries*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法定位与核心差异
 
@@ -365,6 +371,8 @@ UFO-4D 处于**无姿态前馈4D重建**这一新兴技术路线的交叉点：�
 4. **纹理缺乏区域的改进**：如何更好地处理纹理缺乏区域以减少高斯重叠带来的误差？可能的方案包括自适应高斯尺度约束或引入结构先验（如平面假设）。
 
 5. **训练数据效率**：Table C 的数据集消融显示不同数据集之间存在 trade-off（Stereo4D 单独训练在该数据集上最优，但加入 Virtual KITTI 2 或 PointOdyssey 会改善对应测试集的性能而损害其他），如何设计更优的数据混合策略或域适应方法？
+
+
 
 ## 原文 PDF
 

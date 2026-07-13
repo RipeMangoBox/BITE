@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Cross_Domain_Lossy_Compression_via_Rate_and_Classification_Constrained_Optimal_Transport.pdf
+project_link: null
+code_link: null
 openreview_forum_id: mUIGdUTtk2
 aliases:
 - RCCOTR
@@ -42,7 +44,7 @@ claims:
 > - KODAK 高斯去噪 (σ=25) 上，DISTS 为 0.1638，对比 0.1967 (DeCompress)，变化 −0.0329。
 > - KODAK 高斯去噪 (σ=25) 上，PI 为 2.1670，对比 2.6503 (BM3D)，变化 −0.4833。
 
-## 概述
+## 概要
 
 经典率失真理论假设重建信号的分布与源分布一致，无法直接处理**跨域映射**与**下游分类约束**并存的场景。当输入为退化信号（如噪声图像、低分辨率图像）且重建目标分布不同于源分布时，传统压缩框架难以在重建保真度、压缩率和分类精度之间进行联合优化。
 
@@ -54,7 +56,7 @@ claims:
 
 **方法定位**：RCOT 在约束最优传输（如 Liu et al., 2022 的熵约束 OT）基础上增加了分类约束 $H(S|Y) \le C$，并将训练目标扩展为 MSE + 率项 + Wasserstein-1 感知损失 + 交叉熵分类损失的联合优化，从而在统一框架下同时处理跨域重建、压缩效率和下游任务性能。当前闭式解限于伯努利和高斯分布，推广到更一般分布以及大规模真实图像压缩中的高效训练仍是开放问题。
 
-## 背景与动机
+
 
 ### 经典率失真理论的跨域局限
 
@@ -76,7 +78,9 @@ claims:
 
 本文的核心动机正是填补这一空白。作者观察到，跨域有损压缩本质上可以形式化为一个**带约束的最优传输问题**：在源分布 $p_X$ 和目标分布 $p_Y$ 之间寻找一个传输计划，使其在满足压缩率约束和分类损失约束的前提下，最小化期望失真。这一形式化不仅统一了率、失真和分类三个维度，还为推导理论边界和设计实用算法提供了严格的数学基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题重构：从率失真到约束最优传输
 
@@ -106,7 +110,7 @@ $$\mathcal{L} = \mathbb{E}[\|X-\tilde{Y}\|^2] + \lambda_p W_1(p_Y, p_{\tilde{Y}}
 
 在伯努利（Theorem 2）和高斯（Theorem 4）信源下，本工作导出了**闭式 DRC 函数**，明确给出失真-率-分类的三重边界。实验估计的 DRC 曲线与闭式理论曲线高度吻合（Figure 17），验证了框架的理论一致性。这一可解释性是以往基于深度学习的压缩方法所不具备的。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_mUIGdUTtk2/figures/005_Figure_5.jpg]]
 *Figure 5: Experimental architecture: a stochastic autoencoder with classifier and WGAN discriminator, conditioned on shared randomness U*
@@ -161,7 +165,7 @@ $$\mathcal{L} = \mathbb{E}[\|X - \tilde{Y}\|^2] + \lambda_p W_1(p_Y, p_{\tilde{Y
 
 理论部分在伯努利（Theorem 2）和高斯（Theorem 4）信源下导出了闭式的失真-率-分类（DRC）函数，揭示了三个约束之间的显式边界。实验通过从闭式分布中抽样估算经验 DRC 曲线，与理论预测高度吻合（Figure 17），验证了框架的数学一致性。在真实图像任务（MNIST 超分辨、SVHN/CIFAR-10/ImageNet/KODAK 去噪）中，系统表现出符合理论预期的行为：更高的码率持续改善重建质量和分类精度，且通过调节分类约束强度可在率-失真平面上刻画清晰的等率线（Figure 16）。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化：从经典最优传输到约束最优传输
 
@@ -231,7 +235,9 @@ $$\mathcal{L} = \mathbb{E}[\|X-\tilde{Y}\|^2] + \lambda_p W_1(p_Y, p_{\tilde{Y}}
 
 整个流水线的理论根基在于定理 1 的解耦原理：$U$ 使传输确定化，量化与熵瓶颈处理压缩，判别器和分类器分别施加感知与分类约束。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设定
 
@@ -311,7 +317,9 @@ Tables 7–8 和 Figures 12–13 展示了 SVHN 修复（inpainting）任务的�
 
 ![[assets/figures/papers/paper_list_l31_https_openreview_net_forum_id_mUIGdUTtk2/figures/050_Table_8.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心定位：约束最优传输框架下的跨域有损压缩
 
@@ -359,6 +367,8 @@ RCOT 处于**信息论、最优传输和深度学习**的交叉点：
 - 在信息论侧，它将 Shannon 的率失真函数推广为率－失真－分类函数（DRC），并进一步引入感知约束（DRPC），提供了单字母表征（Theorem 3, 5）。
 - 在最优传输侧，它将经典 Monge-Kantorovich 问题扩展为带信息论约束的传输问题，揭示了传输计划、压缩率和分类不确定性之间的内在耦合。
 - 在深度学习侧，它提供了一个原则性的损失设计框架：MSE 失真 + Wasserstein 感知损失 + 交叉熵分类损失，三者通过拉格朗日松弛统一优化。
+
+
 
 ## 原文 PDF
 

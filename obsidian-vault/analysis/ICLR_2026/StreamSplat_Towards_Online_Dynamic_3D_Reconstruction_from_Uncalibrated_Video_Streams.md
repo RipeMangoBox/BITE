@@ -42,7 +42,7 @@ claims:
 > - DAVIS middle-4 frames 上，PSNR 23.66 vs 21.33 (DGMarbles) (+2.33)。
 > - DAVIS 8-frame interpolation 上，PSNR 22.10 vs 21.09 (AMT) (+1.01)。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -72,7 +72,7 @@ StreamSplat位于**前馈3DGS重建**与**动态场景建模**的交叉点。在
 
 方法的核心知识贡献在于：**正交规范空间 + 概率采样 + 双向变形场 + 自适应融合**的组合设计，使得前馈网络能够直接从无标定视频流在线预测动态三维高斯场景，省去了传统管线中的相机标定、逐场景优化和完整序列访问等环节。
 
-## 背景与动机
+
 
 ### 动态三维重建的范式转变
 
@@ -107,7 +107,9 @@ StreamSplat位于**前馈3DGS重建**与**动态场景建模**的交叉点。在
 
 这一设计使 StreamSplat 成为首个无需相机标定、无需全局序列访问、以近实时速度（约 49 ms/帧）运行的动态三维重建系统，在 DAVIS 基准上以约 1200 倍的速度优势超越离线优化方法，同时保持领先的重建质量。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 StreamSplat 的核心创新在于通过三项关键技术——**概率位置采样**、**双向变形场**和**自适应高斯融合**——将动态三维重建从离线逐场景优化的范式转变为在线的无标定前馈预测范式。这些创新共同解决了现有方法对完整视频序列访问和精确相机标定的依赖，使得系统能够以约1200倍的速度优势（1.48秒 vs 数十分钟，Table 1）从无标定视频流实时重建动态三维高斯场景。
 
@@ -178,7 +180,7 @@ $$\pmb{\alpha}(t) = \pmb{\alpha} \cdot \frac{\sigma\left(-\gamma_0\left(\left|t 
 
 上述四项创新并非孤立作用，而是形成协同增强的闭环（Figure 2）：正交规范空间提供无标定输入的统一几何表示，概率采样在前馈预测中保证三维位置的鲁棒性；双向变形场在统一空间内建模时序运动，自适应融合利用不透明度变形实现高斯点的生命周期管理；伪深度监督则在训练阶段为整个系统提供几何先验。这一协同设计使得 StreamSplat 能够在 49 ms/帧的端到端延迟下（Table 8），以离线优化方法约 1/1200 的时间完成可比甚至更优的动态三维重建质量。
 
-## 整体框架
+
 
 StreamSplat 的整体管线遵循**前馈编码‑在线融合**的两阶段范式，将无标定的视频流直接转换为支持任意时刻渲染的动态三维高斯场景。其核心设计围绕三个瓶颈突破展开：**概率位置采样**解决无标定输入下三维高斯定位的不确定性，**双向变形场**实现帧间运动的鲁棒建模，**自适应高斯融合**维持跨帧的时序一致性。
 
@@ -243,7 +245,7 @@ $$\mathcal{L}_{\mathrm{dynamic}} = \mathbb{E}_t \left[ \mathcal{L}_{\mathrm{reco
 ![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_SaiDRQU7Ez/figures/013_Figure_9.jpg]]
 *Figure 9: StreamSplat framework. Given a pair of frames, we first encode them using the Static Encoder to produce canonical 3D Gaussians (Section 3.1), and then pass the 3DGS Embeddings to the Dynamic Decoder to predict the deformation field (Section 3.2). The resulting dynamic 3D Gaussians can be rendered at arbitrary time to produce RGB images and depth maps*
 
-## 核心模块与公式推导
+
 
 ### 3.1 正交规范空间与概率位置采样
 
@@ -328,7 +330,9 @@ $$
 ![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_SaiDRQU7Ez/figures/003_Figure_3.jpg]]
 *Figure 3: Our opacity deformation jointly models persistent, emerging, and vanishing Gaussians*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能：DAVIS动态场景重建
 
@@ -391,7 +395,9 @@ Table 8给出了StreamSplat在单块A100 GPU上的模块级耗时分解，端到
 ![[assets/figures/papers/paper_list_l37_https_openreview_net_forum_id_SaiDRQU7Ez/figures/021_Table_8.jpg]]
 *Table 8: Runtime breakdown of StreamSplat on a single A100 GPU*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题谱系：从离线优化到在线前馈
 
@@ -455,6 +461,8 @@ StreamSplat 与 **2D视频插值**方法（AMT、RIFE、FILM、LDMVFI、VIDIM）
 2. **长时序记忆**：如何超越两帧窗口，设计高效的多帧高斯选择与融合机制，在快速运动或长遮挡下保留更多时序信息？
 3. **透视感知增强**：能否结合轻量级相机内参估计或透视感知校正模块，在保持无标定优势的同时缓解正交投影带来的残余畸变？
 4. **计算效率提升**：当前 49 ms/帧的延迟已接近实时（~20 FPS），但距离移动端部署仍有距离；模型压缩与加速是实际应用的重要方向。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICCV
 year: 2025
 pdf_ref: paperPDFs/ICCV_2025/MaskControl_Spatio_Temporal_Control_for_Masked_Motion_Synthesis.pdf
+project_link: null
+code_link: null
 aliases:
 - MaskControl
 tags:
@@ -40,7 +42,7 @@ claims:
 > - HumanML3D (Upper Body Editing) 上，FID 0.074 vs 0.103 (MMM), 1.213 (OmniControl) (优于所有对比方法)。
 > - HSI-1 (Head Height Constraint) 上，Constraint Error 0.000 vs 0.012 (ProgMoGen) (降至零)。
 
-## 概述
+## 概要
 
 文本到运动生成领域长期面临一个核心瓶颈：**现有的可控运动生成方法难以同时实现高精度关节控制与高质量运动生成，且生成速度较慢**。主流方案大多基于扩散模型（如 **GMD**、**OmniControl**、**MotionLCM**），它们在连续运动空间或潜在空间中施加条件，虽然取得了一定进展，但往往以牺牲运动质量（高 FID）或控制精度为代价。前馈 Transformer 方法 **TLControl** 通过测试时优化实现了较高精度，但生成质量仍不理想（FID=0.271）。另一方面，基于掩码的运动模型（如 **MoMask**）在文本条件生成上展现了强大的先验能力和快速生成优势，却完全缺乏空间控制能力。
 
@@ -50,7 +52,7 @@ claims:
 
 方法支持三种应用场景：任意关节任意帧控制、身体部位时间轴控制、以及零样本任意目标函数控制，展现出从空间约束到语义级编程的广泛适用性。
 
-## 背景与动机
+
 
 ### 可控运动生成的核心矛盾：精度与质量的权衡
 
@@ -70,7 +72,9 @@ MaskControl 的核心洞察在于**控制信号的注入位置**。现有方法�
 
 这一思路衍生出两个关键操作：训练时的 **Logits Regularizer**（隐式扰动 logits 以对齐控制信号）和推理时的 **Logits Optimization**（通过梯度下降显式优化 logits 以最小化控制误差）。两者的结合使得 MaskControl 成为首个在掩码运动模型上实现可控生成的方法，且支持零样本泛化到未见过的控制目标函数。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MaskControl 的核心创新在于将**可控性首次引入生成式掩码运动模型**，而非沿袭主流基于扩散的控制范式。其关键洞察是：通过操纵掩码 Transformer 输出端的 **logits 分布**，而非在连续运动空间直接施加条件，可以在保留掩码模型强大文本-运动生成先验的同时，实现高精度、灵活且可零样本泛化的时空控制。这一思路贯穿于训练和推理两个阶段的三个关键机制。
 
@@ -104,7 +108,7 @@ $$
 
 MaskControl 的三个 changed slots 共同构成了一个完整的控制范式：**训练时**通过 Logits Regularizer 隐式学习控制信号到 token 分布的对齐，**推理时**通过 Logits Optimization 显式优化 logits 以精确跟随控制目标，**DES** 则保证整个流程的可微性。消融实验（Table 5）证实了这一设计的必要性：去除 Logits Regularizer 后 FID 从 0.061 升至 0.142，生成质量显著下降，验证了 logits 空间扰动对保持运动质量的关键作用。
 
-## 整体框架
+
 
 MaskControl 的整体目标是在预训练的掩码运动模型（Masked Motion Model）之上引入可控性，使文本到运动生成能够同时满足高精度关节控制与高保真运动质量。其核心思路并非在连续运动空间直接施加条件，而是通过操控掩码 Transformer 输出的 **logits 分布**（即离散运动 token 的分类概率）来间接引导生成结果，从而在保留强大文本-运动先验的前提下实现灵活控制。
 
@@ -153,7 +157,7 @@ $$\mathcal{L} = \alpha \mathcal{L}_{\mathrm{logits}} + (1 - \alpha) L_s(e_c, s)$
 ![[assets/figures/papers/storymotion_maskcontrol_iccv2025_20260603/figures/001_Figure_1.jpg]]
 *Figure 1: MaskControl enables a wide range of applications in text-to-motion generation with high quality and precision. (a) Any-Joint Any-Frame Control: Controls specific joints at designated frames. (b) Body-Part Timeline Control: Generates motion from multiple text prompts, each corresponding to different body parts. (c) Arbitrary Objective Control: Supports any control function at inference time*
 
-## 核心模块与公式推导
+
 
 ### 3.1 运动离散化与掩码文本生成基座
 
@@ -231,7 +235,9 @@ $$\mathbb{E}[X_{recon}] = \sum_{k=1}^{K} p_{\theta} \left( x_{k} \mid X_{\overli
 
 其中 $c_k$ 为码本中第 $k$ 个嵌入向量。该期望值作为连续表示送入运动学链解码器 $R \circ D$，使梯度能够通过概率分布传播，绕过 argmax 量化的不可微性（Figure 2(b)）。在零样本目标控制等应用中，这一机制使任意可微目标函数的梯度都能影响 token 选择。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制回顾
 
@@ -328,7 +334,9 @@ MaskControl 的 Logits Optimization 机制天然支持推理时引入任意目�
 ![[assets/figures/papers/storymotion_maskcontrol_iccv2025_20260603/figures/002_Table_1.jpg]]
 *Table 1: Comparison of text-conditioned motion generation with joint control signals. Our MaskControl SOTA achieves performance by leveraging Masked Motion Model, demonstrating highprecision control (low Average Error) while maintaining high generation quality (low FID). Previous SOTA methods utilize diffusion in motion space, latent space, or simple feed-forward models. ✓’ indicates the ability to control motion using zero-shot objective functions, while ‘✗’ denotes the lack of this capability. ‘-’ signifies control limited to the pelvis*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 可控运动生成的范式演进
 
@@ -387,6 +395,8 @@ $$p_{\theta} \left( x_{k} \mid X_{\overline{\mathbf{M}}}, W, S \right) = \frac{\
 5. **优化步数的效率前沿**：Logits Optimization 的迭代步数 $I$ 与最终控制精度和推理速度之间的关系如何？是否存在早停策略或自适应步长机制？
 
 6. **多人交互扩展**：如何将 MaskControl 的时空控制框架扩展至多人场景？多人交互涉及空间协调和时序同步，对控制信号的表示和优化提出了更高要求。
+
+
 
 ## 原文 PDF
 

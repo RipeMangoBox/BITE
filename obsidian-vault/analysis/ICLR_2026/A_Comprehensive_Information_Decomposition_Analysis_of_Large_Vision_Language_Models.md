@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/A_Comprehensive_Information_Decomposition_Analysis_of_Large_Vision_Language_Models.pdf
+project_link: null
+code_link: https://github.com/RiiShin/pid-lvlm-analysis
 aliases:
 - PL
 - CIDALVLM
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 大型视觉语言模型的信息分解综合分析 |
 | 英文题名 | A Comprehensive Information-Decomposition Analysis of Large Vision-Language Models |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=6WsBGk4Iag); [GitHub](https://github.com/RiiShin/pid-lvlm-analysis) |
+| Links | [paper](https://openreview.net/forum?id=6WsBGk4Iag) · [GitHub](https://github.com/RiiShin/pid-lvlm-analysis) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | 基于部分信息分解（PID）的LVLM分析框架 |
 | Dataset | MMBench, POPE, Reefknot, PMC-VQA |
@@ -41,13 +43,13 @@ claims:
 > - POPE 上，Spearman ρ (S vs. Acc) 为 0.742，对比 N/A，变化 p<0.001。
 > - Reefknot 上，Spearman ρ (S vs. Acc) 为 0.357，对比 N/A，变化 p=0.073。
 
-## 概述
+## 概要
 
 大型视觉语言模型（LVLM）的内部决策过程不透明，现有可解释性方法难以定量区分模型预测的成功究竟源于真正的多模态融合，还是仅依赖单模态先验（如语言偏见）。本文提出一个基于**部分信息分解**（Partial Information Decomposition, PID）的分析框架，将模型决策相关的总互信息分解为四个非负原子：冗余（R）、视觉唯一（U₁）、语言唯一（U₂）和协同（S）。其中，协同S代表仅从视觉与语言组合中涌现的信息，是衡量多模态融合程度的核心指标。
 
 研究在四个多项选择VQA基准（MMBench、POPE、Reefknot、PMC-VQA）上分析了26个开源LVLM，覆盖多个模型家族和规模。核心发现包括：（1）任务呈现两种模式：MMBench和POPE属于**协同驱动**任务（准确率与S的Spearman ρ分别为0.750和0.742，p<0.001），Reefknot和PMC-VQA属于**知识驱动**任务（PMC-VQA上准确率与U₂的ρ=0.406，p=0.040）；（2）模型家族呈现两种稳定策略：**融合中心型**（如Qwen2.5-VL、InternVL3）在协同驱动任务上S中位数高，**语言中心型**（如Gemma3）U₂占比大；（3）层间PID分析揭示一致的三阶段信息处理模式：信息涌现、表示构建、最终融合事件；（4）视觉指令微调（Stage 2）是解锁协同S的关键阶段。方法通过图像移除干预验证了PID结果的因果有效性：准确率下降D_vision与S在协同驱动基准上强相关（MMBench: ρ=0.809, p<0.001）。
 
-## 背景与动机
+
 
 大型视觉语言模型（LVLM）在多项视觉问答基准上取得了显著性能，但其内部决策过程仍是一个“黑箱”。一个根本性的开放问题是：模型给出的正确答案，究竟源自对视觉信号与文本指令的**真正多模态融合**，还是主要依赖从训练数据中学到的**单模态先验**（尤其是语言先验）？传统的可解释性方法（如注意力可视化、特征归因）缺乏理论支撑，无法在过程层面定量分离视觉、语言及两者交互对预测的各自贡献。
 
@@ -57,7 +59,9 @@ claims:
 
 本文的动机是：利用PID框架，系统性地分析26个主流LVLM家族在四个多样化的多项选择VQA基准（MMBench、POPE、Reefknot、PMC-VQA）上的信息处理模式。具体而言，本文旨在回答三个核心问题：(1) 不同模型家族和不同任务之间，信息使用策略存在怎样的差异？(2) LVLM内部的层间信息处理呈现何种动态模式？(3) 训练过程（特别是视觉指令微调）如何影响模型的信息处理策略？通过回答这些问题，本文期望为LVLM的可解释性提供一种新的、理论驱动的定量视角，并为模型设计（如架构选择、训练策略）提供可操作的诊断信号。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于将**部分信息分解（Partial Information Decomposition, PID）**引入大型视觉语言模型（LVLM）的可解释性分析，从而将传统的聚合性能评估（如准确率）替换为对模型信息处理策略的**过程级定量描述**。与现有依赖辅助投影头或手动聚类的单模态探针不同，本文在嵌入层使用校准噪声掩码另一模态来估计单模态条件分布，避免了引入额外组件。此外，针对候选集过置信问题，引入了置信度阈值和软聚合边际分布估计，保证了PID原子计算的稳健性。
 
@@ -81,7 +85,7 @@ claims:
 
 **证据强度评估**：上述核心发现均基于26个LVLM在四个基准上的系统实验，Spearman相关性检验和消融实验提供了强定量证据（置信度1.0）。唯一的弱点是PID本质上是相关性的，不能直接推断因果关系——这一点在论文局限性中已明确承认。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0002_6WsBGk4Iag_A_Comprehensive_Information-Decomposition_Analys/figures/001_Figure_1.jpg]]
 *Figure 1: (1). Proposed framework for PID estimation in LVLM scenario (2). 3-dimentional information-decomposition analysis*
@@ -98,7 +102,7 @@ claims:
 
 **输入输出流**：整个pipeline的输入是图像-文本对和LVLM模型，输出是四个PID原子值。这些原子值随后被用于三个分析维度：（1）跨模型和跨任务比较，揭示任务模式（协同驱动 vs. 知识驱动）和家族级策略（融合中心 vs. 语言中心）；（2）层间信息动态，揭示一致的三阶段处理模式；（3）训练过程中的学习动态，揭示视觉指令微调是解锁协同S的关键阶段。
 
-## 核心模块与公式推导
+
 
 ### 3.1 部分信息分解（PID）框架
 
@@ -139,7 +143,9 @@ $$
 
 为验证PID分解的行为有效性，设计了图像移除干预实验。通过移除图像获得纯文本基线，测量准确率下降 $D_{\text{vision}}$。该指标与协同S在协同驱动基准上强相关（MMBench: $\rho=0.809, p<0.001$; POPE: $\rho=0.744, p<0.001$），而在知识驱动基准上相关性较弱（Reefknot: $\rho=0.459, p=0.018$; PMC-VQA: $\rho=0.400, p=0.043$）。这一模式验证了协同S确实捕获了视觉信息对决策的关键贡献，而非仅反映模型架构的统计特性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 **任务模式与信息分解**。对26个大型视觉语言模型（LVLM）在四个基准上的分析揭示了两种截然不同的信息处理模式。如Figure 2所示，MMBench和POPE构成一个簇，其显著特征是协同S的份额高；而Reefknot和PMC-VQA构成另一个簇，其协同S明显更低、语言唯一U2更高。这一定性划分得到了定量相关性的支持：在MMBench和POPE上，准确率与协同S的Spearman相关系数分别为ρ=0.750 (p<0.001)和ρ=0.742 (p<0.001)；而在PMC-VQA上，准确率与语言唯一U2的相关系数为ρ=0.406 (p=0.040)，与协同S的相关系数仅为ρ=0.432 (p=0.027)。这表明MMBench和POPE属于协同驱动任务，模型需要真正融合视觉和语言信息；Reefknot和PMC-VQA属于知识驱动任务，性能主要受限于语言先验知识。
 
@@ -187,7 +193,9 @@ $$
 ![[assets/figures/papers/iclr26_0002_6WsBGk4Iag_A_Comprehensive_Information-Decomposition_Analys/figures/005_Table_2.jpg]]
 *Table 2: Spearman correlations ( $\rho$ ) and p-values across datasets*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -224,6 +232,8 @@ $$
 4. **未解释的层间现象**：InternVL3-2B为何缺乏最终融合事件（S尖峰和U2下降）？LLaVA-1.5后期层中非零的冗余R和视觉唯一U1的成因是什么？这些现象暗示了模型架构和训练策略对信息处理模式的深层影响。
 
 5. **纠正机制的扩展规律**：视觉证据覆盖语言偏见的“纠正”机制（如Gemma3在协同驱动任务中的表现）如何随模型规模扩展？当前数据仅覆盖有限规模范围，缺乏系统性缩放分析。
+
+
 
 ## 原文 PDF
 

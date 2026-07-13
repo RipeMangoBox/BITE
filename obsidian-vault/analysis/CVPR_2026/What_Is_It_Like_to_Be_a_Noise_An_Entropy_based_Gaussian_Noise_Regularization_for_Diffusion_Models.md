@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/What_Is_It_Like_to_Be_a_Noise_An_Entropy_based_Gaussian_Noise_Regularization_for_Diffusion_Models.pdf
+project_link: null
 code_link: null
 aliases:
 - EBGNRE
@@ -38,7 +39,7 @@ claims:
 > [!tip] 效果简介
 > - 通过将样本建模为成对MRF并应用Bethe-Kikuchi展开，得到包含1D边际熵和2D空间熵的可计算KL目标。
 
-## 概述
+## 概要
 
 扩散模型在推理时对噪声潜变量进行优化（如奖励引导生成、图像反演）会使其偏离真实高斯噪声的统计结构，导致模型被迫对分布外样本去噪，产生过饱和色彩、伪影和脆性行为——即“奖励攻击”。现有正则化方法多依赖逐点概率密度约束或简单全局矩匹配，未能有效刻画和保持高斯噪声的分布性质。
 
@@ -47,8 +48,6 @@ claims:
 该方法在美学分数优化和亮度最小化等奖励对齐任务上产生无伪影且更自然的图像，防止了奖励攻击；同时支持模型无关的图像到噪声匹配，在保持分布内特性的前提下实现跨模型迁移。消融实验证实，1D熵、2D熵、Bethe校正和多尺度监督四个组件缺一不可。主要局限在于KDE差分熵估计的计算开销较高，以及成对MRF假设对严重偏离高斯的输入（如干净图像潜变量）可能无法解析复杂长程结构。
 
 方法定位上，EGNR属于扩散模型推理时正则化方法，与 **ReNO** (Eyring et al., 2024)、**ReNoise** (Garibi et al., ECCV 2024) 等基于范数或频谱约束的基线形成对比，其独特之处在于通过信息论框架系统性地约束噪声的1D边缘分布和2D空间关联，而非仅施加ℓ₂距离约束。
-
-## 背景与动机
 
 扩散模型通过逐步向数据添加高斯噪声并学习反向去噪过程来生成数据，其核心假设是：**推理时的初始潜变量严格服从标准高斯分布**。这一假设在标准采样中自然成立——只需从高斯分布中随机抽取即可。然而，近年来涌现的大量应用场景打破了这一前提：无论是扩散模型反演（inversion）、奖励对齐（reward alignment），还是对抗攻击与可编辑生成，都需要对推理噪声进行**显式优化**，使其在满足特定任务目标的同时仍能生成高质量图像。
 
@@ -62,7 +61,7 @@ claims:
 
 **本文动机**：不应将高斯性视为逐点概率，而应看作**分布性质**。核心洞察是：将单个样本提升为其统计量诱导的经验分布，并用KL散度度量该经验分布与标准高斯分布之间的差异。通过成对马尔可夫随机场（MRF）建模像素间的局部依赖，并利用Bethe-Kikuchi逼近将KL散度分解为可微的1D边际熵、2D空间熵和多尺度项，实现对任意噪声样本的**有效高斯化投影**。这一正则化器能够在保持任务目标优化的同时，将噪声牢牢约束在高斯典型集内，从根本上防止分布外退化的发生。
 
-## 核心创新
+## 核心方法与创新机理
 
 ### 从逐点似然到分布级高斯性度量
 
@@ -114,8 +113,6 @@ $$\mathcal{L}_{\mathrm{full}}(\hat{\mathbf{x}}) = \sum_{k=0}^{L-1} \alpha_k D_{\
 
 消融实验（Figure 2）明确证实：**仅使用 1D 熵或多尺度 1D 熵无法产生高质量噪声**，必须引入 2D 空间熵来捕获空间相关性；Bethe 修正细化了低分辨率直方图的 KL 估计；所有组件（1D 熵、2D 熵、Bethe 修正、多尺度监督）对最终的高质量噪声投影均不可或缺。
 
-## 整体框架
-
 EGNR 的整体 pipeline 围绕一个核心目标展开：将任意候选噪声潜变量 $\hat{\mathbf{x}}$ 投影到标准高斯分布 $G$ 的典型集内，同时保持与原始输入 $\mathbf{x}_0$ 的语义关联或满足特定奖励函数 $R$ 的要求。该框架由五个紧密协作的模块构成，形成从样本到高斯化投影的端到端可微计算图。
 
 ### 输入输出流
@@ -154,8 +151,6 @@ $$\mathcal{L}_{\mathrm{full}}(\hat{\mathbf{x}}) = \sum_{k=0}^{L-1} \alpha_k D_{\
 ### 与基线方法的本质区别
 
 传统正则化方法（如VAE式KL先验、ReNO、ReNoise等）要么依赖逐点概率密度 $-\log G(\mathbf{x})$，要么仅匹配全局矩或频谱特性。EGNR 的根本不同在于：它将高斯性定义为样本局部统计量的经验分布与目标高斯之间的KL散度，并通过MRF团簇展开将其分解为1D边际熵、2D空间熵和多尺度项的可微组合。这一设计使得正则化器能够同时约束一阶值分布、二阶空间相关性和多尺度统计结构，从而更完整地刻画“成为高斯噪声”所需的分布性质。
-
-## 核心模块与公式推导
 
 ### 3.1 从逐点概率到分布性高斯测度
 
@@ -222,10 +217,7 @@ $$\mathbf{x}^* = \underset{\hat{\mathbf{x}}}{\arg\min} -R(\hat{\mathbf{x}}) + \l
 ![[assets/figures/papers/paper_list_l2628_https_openaccess_thecvf_com_content_CVPR2026_html_Chang_What_Is_It_Like/figures/001_Figure_1.jpg]]
 *Figure 1: Value and Spatial Entropy Visualization. We show the 1D and 2D entropy as estimated with KDE for four different common inputs: image scaled to [-1,1], latent vector, a checkerboard texture, and a Gaussian noise*
 
-![[assets/figures/papers/paper_list_l2628_https_openaccess_thecvf_com_content_CVPR2026_html_Chang_What_Is_It_Like/figures/002_Figure_2.jpg]]
-*Figure 2: Effectiveness of Multilevel Bethe Entropy Regularization. We show the effect of our loss components on the optimized latent (top), its multiscale 1D/2D densities (middle), and the diffusion-generated image (bottom, A photo of a corgi). With this checkerboard pattern and learning rate (ω = 0.05), we show that matching first-order statistics alone (using 1D Entropy and 1D Multilevel) cannot produce high-quality noise; instead, 2D Entropy is required for spatial correlations. The Bethe Correction refines the KL estimate (improving low-resolution histograms), and Multilevel supervision further improves projection into the Gaussian distribution when combined with any configuration. Our loss appl...*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 核心瓶颈验证：噪声偏离高斯典型集
 
@@ -291,12 +283,7 @@ Figure 6 展示了典型失败案例：当从纯干净潜变量（“一只蝙�
 
 此外，KDE 差分熵估计的计算开销虽经线性化优化，在高分辨率或实时场景中仍构成瓶颈；多尺度策略扩展了空间范围但未解决全局依赖建模问题。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2628_https_openaccess_thecvf_com_content_CVPR2026_html_Chang_What_Is_It_Like/figures/007_Figure_5.jpg]]
-*Figure 5: Model-free Image-to-Noise Matching. We use Pearson correlation with a target image as a reward. Without querying the diffusion model during optimization, our regularization enables the creation of noise samples that produce images with similar layout and structure when given corresponding prompts. At the same time, these noise samples remain sufficiently in-distribution to generate arbitrary images under different prompts. Notably, the resulting noises transfer effectively across different models*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 问题谱系：扩散模型中的噪声高斯性危机
 

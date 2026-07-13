@@ -41,7 +41,7 @@ claims:
 > - nuScenes 上，L2 (m) Avg 0.65 vs 0.74 (-0.09)；Collision Rate (%) Avg 0.23 vs 0.31 (-0.08)。
 > - NAVSIM 上，PDMS 89.0 vs 87.0 (+2.0)。
 
-## 概述
+## 概要
 
 端到端自动驾驶系统近年逐步引入世界模型来预测未来场景演变，以辅助规划决策。然而，现有世界模型通常对整个场景（包含静态道路、建筑物等）进行完整建模，导致大量计算被冗余消耗在静态物体上；同时，预测的未来 BEV 特征往往仅作为隐式代理任务，未被显式用于直接优化规划轨迹，造成未来信息的利用效率低下。
 
@@ -51,7 +51,7 @@ claims:
 
 在方法谱系上，ResWorld 属于不依赖辅助任务（如检测、跟踪、建图）的端到端规划范式，与 **UniAD**（Hu et al., CVPR 2023）、**VAD**（Jiang et al., ICCV 2023）等多辅助任务方法形成互补，同时相较于 **SSR** 的稀疏场景表示和 **LAW**（Li et al., ICLR 2025）的隐式世界模型，ResWorld 以显式的动态物体建模和轨迹交互机制实现了更优的规划精度与安全性。
 
-## 背景与动机
+
 
 ### 端到端自动驾驶与世界模型的兴起
 
@@ -77,7 +77,9 @@ claims:
 
 Figure 1 直观对比了传统世界模型框架与ResWorld框架的差异：前者对整个场景建模并隐式优化轨迹，后者则通过时序残差聚焦动态物体，并通过显式交互利用未来预测修正轨迹。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ResWorld的核心创新围绕一个关键洞察展开：**在当前BEV坐标系下预测未来时，静态物体的空间分布可视为不变，因而世界模型只需聚焦于动态物体的变化**。这一洞察催生了两个相互协同的**changed slots**，分别改变了世界模型的输入表征和轨迹对预测未来特征的利用方式。
 
@@ -101,7 +103,7 @@ FGTR的核心操作是 $\mathbf{W} = \mathrm{DeformAttention}(\mathbf{W}, \mathb
 
 TR-World和FGTR并非两个孤立的创新，而是构成了一条完整的因果链路：TR-World负责从时序残差中预测动态物体的未来空间分布，生成 $\mathbf{B}_{future}$；FGTR则利用这一预测结果，通过显式的注意力交互修正先验轨迹。消融实验（Table 3）清晰地验证了这一协同效应：在无ego status设置下，单独加入TR-World使L2 Avg从0.71降至0.65；再加入FGTR后，L2 Avg进一步降至0.59，Collision Avg从0.29降至0.17——两个组件各自贡献显著，且联合使用时产生叠加增益。
 
-## 整体框架
+
 
 ResWorld 的整体流水线围绕一个核心洞察构建：**在当前 BEV 坐标系下预测未来时，静态物体的空间分布可视为不变，因此世界模型只需聚焦于动态物体的变化**。基于这一洞察，整个框架由四个关键模块串联而成，形成“先验轨迹预测 → 时序残差提取 → 时序残差世界模型 → 未来引导轨迹修正”的端到端规划流程（Figure 2）。
 
@@ -138,7 +140,7 @@ ResWorld 的训练仅对先验轨迹和最终轨迹施加 L1 回归损失（Sect
 
 传统世界模型（如 Figure 1 左所示）对整个场景（包括静态背景和动态物体）进行统一建模，预测的未来表示仅作为隐式优化轨迹的代理任务。ResWorld（Figure 1 右）的核心差异在于：**（1）建模对象聚焦**——通过时序残差将世界模型的注意力集中在动态物体上，静态物体由当前 BEV 特征自然继承；**（2）轨迹利用方式升级**——先验轨迹不再仅是最终输出，而是作为查询未来特征的桥梁，通过 FGTR 实现显式的“预测-验证-修正”闭环。这两个设计共同构成了“残差建模 + 未来引导”的端到端规划范式。
 
-## 核心模块与公式推导
+
 
 ResWorld 的核心架构由四个模块串联构成：先验轨迹预测（Prior Trajectory Prediction）、时序残差提取（Temporal Residual Extraction）、时序残差世界模型（TR-World）以及未来引导的轨迹修正（FGTR）。整个流程从多视角图像出发，最终输出规划轨迹，其关键设计在于**将动态物体建模从全场景预测中解耦**，并通过**未来 BEV 特征与轨迹的显式交互**来修正规划结果。
 
@@ -218,7 +220,9 @@ $$
 ![[assets/figures/papers/paper_list_l36_https_openreview_net_forum_id_ptGmMFGWmk/figures/003_Figure_3.jpg]]
 *Figure 3: Structure of Temporal Residual World Model*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能：nuScenes 与 NAVSIM 双基准验证
 
@@ -271,7 +275,9 @@ TR-World 的核心瓶颈在于其对**潜在动态物体**的敏感性不足。�
 ![[assets/figures/papers/paper_list_l36_https_openreview_net_forum_id_ptGmMFGWmk/figures/010_Figure_5.jpg]]
 *Figure 5: Visualization of Planning Results. The object bounding boxes and lane lines on the BEV plane are rendered using the annotations. The green box denotes the ego vehicle. The areas enclosed by dashed circles indicate where collisions will occur*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 在端到端自动驾驶谱系中的位置
 
@@ -319,6 +325,8 @@ Table 4 的消融实验揭示了一个反直觉的发现：对 $\mathbf{B}_{futu
 3. **世界模型坍塌的理论理解**：Figure 4 展示了 FGTR 缓解世界模型坍塌的定性效果，但坍塌的深层原因（为什么全监督会导致表征退化）尚缺乏理论分析。从信息瓶颈角度看，FGTR 可能通过只保留“对规划有用的未来信息”来实现隐式的信息压缩。
 
 4. **跨数据集与闭环评估**：当前验证集中在 nuScenes 和 NAVSIM 的开环指标上。在 CARLA 等闭环模拟器中，时序残差世界模型能否保持优势？闭环场景下的分布偏移和累积误差需要进一步检验。
+
+
 
 ## 原文 PDF
 

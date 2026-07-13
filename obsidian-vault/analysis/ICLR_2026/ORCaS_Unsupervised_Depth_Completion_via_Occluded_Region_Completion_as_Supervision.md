@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/ORCaS_Unsupervised_Depth_Completion_via_Occluded_Region_Completion_as_Supervision.pdf
+project_link: null
+code_link: null
 openreview_forum_id: v2skNLbrfF
 aliases:
 - OORCAS
@@ -42,7 +44,7 @@ claims:
 > - NYUv2 上，MAE (mm) 为 86.50，对比 96.73 (AugUndo)，变化 -10.23 (10.6% improvement)。
 > - KITTI DC 上，MAE (mm) 为 253.17，对比 256.37 (AugUndo)，变化 -3.20 (1.2% improvement)。
 
-## 概述
+## 概要
 
 无监督深度补全是三维视觉中的一项基础任务：给定稀疏深度测量和单张 RGB 图像，预测稠密深度图。现有无监督方法依赖共视区域的光度重投影损失、稀疏深度一致性以及平滑正则化来驱动网络学习，但这些监督信号仅覆盖输入视图中可见的区域，对因遮挡而不可见的区域完全失语。这导致模型学到的归纳偏置本质上仍局限于二维图像正则化，难以抽象出完整的三维物体形状——而这恰恰是深度补全在物体边界、遮挡边缘处保真度不足的根源。
 
@@ -58,7 +60,7 @@ ORCaS（Occluded Region Completion as Supervision）提出了一个关键思路�
 
 方法定位上，ORCaS 属于无监督深度补全框架，其训练范式与现有方法兼容——可在标准光度-稀疏-平滑损失基础上叠加 ORCaS 损失。当前方法的局限性包括：依赖静态场景假设和相邻视图位姿，尚未在非透视相机模型上验证，极低稀疏度下的绝对误差仍有改善空间。
 
-## 背景与动机
+
 
 深度补全任务旨在从稀疏深度测量（如LiDAR点云）和对应的RGB图像中预测稠密深度图，是三维视觉中的基础问题。监督学习方法依赖昂贵的稠密深度真值，限制了其可扩展性；无监督方法则通过光度重投影损失、稀疏深度一致性约束和平滑正则化来驱动训练，避免了对真值的需求。
 
@@ -72,7 +74,9 @@ ORCaS 的核心动机正是针对这一缺口：**能否将遮挡区域从“被
 
 与现有方法相比，ORCaS 的设计具有两个根本性差异：其一，训练监督信号不再局限于共视区域，而是扩展到遮挡区域的特征空间；其二，推理时无需相邻视图或位姿信息，仅需单帧输入即可完成深度补全——训练阶段学到的三维形状归纳偏置已内化到网络参数中，通过 ConteXt 机制调制输入视图特征，提升输出质量。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：共视监督的局限性
 
@@ -110,7 +114,7 @@ ORCaS 的根本创新在于**将训练范式从“利用共视区域监督”转
 - **强证据**：ORCaS 损失在 VOID1500 上的消融增益（21.6%，置信度 0.95）、对 AugUndo 的全面超越（VOID1500 MAE 降低 7.81%，NYUv2 MAE 降低 10.6%，置信度 0.98）、以及零样本泛化提升 15.7%（置信度 0.95），共同构成有力的因果证据链。
 - **需注意的边界**：ConteXt 的上下文池化本质上是局部的（最优池化尺寸为 (4,4,2)，Table 4），对远距离遮挡或大面积缺失的补全能力有限；训练依赖相邻视图与相对位姿，无法直接用于单帧场景；当前框架假设静态场景，运动物体的影响虽经实验验证较小（Table 13，MAE 30.84 vs 30.90），但在高动态场景下仍需谨慎。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0012_v2skNLbrfF_ORCaS_Unsupervised_Depth_Completion_via_Occluded/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of Occluded Region Completion as Supervision (ORCaS). Inference of ORCaS for the input view only requires a single input view (t), and an identity camera pose matrix. Training ORCaS involves two different views (input view t, and target view τ ) and their relative camera pose $g _ { \tau t }$ . The input view 3D features are warped to align with the adjacent view. Empty regions due to occlusion are predicted by the ConteXt layer, and the inductive bias is learned by minimizing ORCaS loss, which leverages the extracted 3D feature from the adjacent view inputs as supervision*
@@ -152,7 +156,7 @@ ORCaS 的 pipeline 由以下模块串联构成，数据流方向为从二维输�
 
 框架的关键设计在于**训练与推理的不对称性**：训练时引入相邻视图与位姿，通过 ORCaS 损失在隐空间学习遮挡补全的归纳偏置；推理时完全丢弃相邻视图分支，仅依赖单帧输入，ConteXt 所学的归纳偏置通过特征调制隐式地提升深度预测质量。这种设计保证了推理效率——在 VOID1500 上单帧推理仅需 17.5 ms（约 57 FPS），参数量 24.9M，GPU 内存占用 2.35 GB，满足实时性要求。
 
-## 核心模块与公式推导
+
 
 ### 2D→3D 特征广播
 
@@ -210,7 +214,9 @@ $$\arg \min_{\theta} \sum_{\tau \in T} \sum_{x \in \Omega} \lambda_I \mathcal{P}
 
 其中 $\hat{I}_{t\tau}(x) = I_{\tau}(\pi g_{\tau t} K^{-1} \bar{x} \hat{d}_t(x))$ 为利用预测深度将相邻视图重投影至输入视图的重建图像，三项依次为光度重建损失、稀疏深度一致性损失和平滑正则项。ORCaS 损失作为额外项加入，与上述损失联合优化。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现
 
@@ -278,7 +284,9 @@ ORCaS 训练过程中预测的相邻视图特征质量是归纳偏置学习成�
 
 ORCaS 在 VOID1500 上的推理延迟为每帧 17.5 ms（约 57 FPS），满足实时性要求。GPU 显存占用为 2.35 GB。深度预测在 1/8 分辨率下进行，通过预测的凸组合上采样掩膜恢复至原始分辨率，在效率与精度间取得了平衡。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 在无监督深度补全谱系中的位置
 
@@ -323,6 +331,8 @@ ORCaS 的有效性依赖于以下前提条件，这些条件共同划定了其�
 4. **ConteXt 机制的架构演进**：当前 ConteXt 使用局部上下文池化 $CP(\mathcal{F}_{\tau t})(u,v,w) = \mathcal{U}\left(\sum_{(u,v,w)\in R} \frac{M \odot \mathcal{F}_{\tau t}(u,v,w)}{M(u,v,w)+\epsilon}\right)$，本质是掩膜平均池化。用注意力机制或轻量 Transformer 替代是否能在不显著增加计算开销的前提下提升补全质量？
 
 5. **特征监督与深度监督的协同**：实验证明隐空间特征监督优于直接深度监督，但两者是否互补？联合训练能否在保持几何一致性的同时进一步提升深度精度？
+
+
 
 ## 原文 PDF
 

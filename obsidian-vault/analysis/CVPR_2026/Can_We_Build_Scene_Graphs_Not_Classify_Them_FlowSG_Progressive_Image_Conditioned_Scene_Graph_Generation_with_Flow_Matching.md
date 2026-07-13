@@ -43,7 +43,7 @@ claims:
 > - VG SGDet (closed-set) 上，R@50 36.5 vs ~33.5 (best prior one-stage) (+~3.0)。
 > - VG PredCls (closed-set) 上，R@50 65.7 vs ~62.7 (USG-Par, estimated) (+~3.0)。
 
-## 概述
+## 概要
 
 场景图生成（Scene Graph Generation, SGG）旨在将图像解析为结构化的<主体-谓词-客体>三元组，是视觉理解与下游推理的关键中间表示。然而，现有SGG范式——无论是**两阶段**方法（如 **Neural Motifs** (Zellers et al., CVPR 2018)）还是**单阶段**方法（如 **GPS-Net** (Lin et al., CVPR 2020)）——本质上都是**确定性的一次分类任务**：模型在单次前向传递中对物体和关系做出硬性决策，缺乏迭代式修正与全局结构约束，难以保证语义与几何的一致性。
 
@@ -53,7 +53,7 @@ claims:
 
 实验结果表明，FlowSG在PSG和VG数据集的开放/封闭词汇设定下均取得领先性能：在PSG SGDet任务上，R@50/mR@50分别达到46.3/42.7，较此前最佳方法 **USG-Par** (Wu et al., CVPR 2025) 提升约3个点；在VG SGDet上同样获得约3个点的提升。消融实验证实，FMA模块和全局图像交叉注意力是性能的关键支撑，移除FMA导致R@50从46.3骤降至40.5。
 
-## 背景与动机
+
 
 ### 场景图生成：从分类到构建的范式反思
 
@@ -83,7 +83,9 @@ claims:
 
 这一范式转变的核心问题可以凝练为：**“能否构建场景图，而非分类场景图？”**——这也正是本文标题所提出的根本追问。Figure 1 直观对比了三种范式的差异：两阶段和单阶段方法均是一次性决策，而FlowSG则从一个初始噪声图开始，通过图像条件的迭代去噪逐步生长出结构一致的场景图。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FlowSG 的核心创新在于将场景图生成（SGG）从传统的**一次性确定性分类**重构为**渐进式图像条件生成**问题，并通过**混合离散-连续流匹配**框架实现语义与几何的联合演化。以下从范式转变、训练目标、关系预测机制和视觉特征表示四个维度展开分析。
 
@@ -125,7 +127,7 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{CFM}} + \lambda \mathcal{L}_{\mathrm{DFM}}$
 
 FlowSG 的四个 changed slots 构成了一个完整的渐进生成闭环：**离散码本**将视觉特征转化为可预测的标记，**混合流匹配损失**驱动语义与几何的联合去噪，**图Transformer中的ReSA和FMA**在每一步迭代中动态更新关系后验，最终实现从噪声图到语义-几何一致性场景图的逐步构建。这一范式超越了传统 SGG 的“分类”思维，将场景图生成重新定位为**约束感知的迭代生成过程**。
 
-## 整体框架
+
 
 FlowSG 将场景图生成重新定义为从噪声图到目标图的**连续时间传输问题**，核心 pipeline 由三个紧密耦合的模块构成：场景图标记化（VQ‑VAE）、混合流匹配（Hybrid Flow Matching）和图 Transformer 去噪器（Graph Transformer Denoiser）。整体流程如图 2 所示。
 
@@ -148,7 +150,7 @@ FlowSG 将场景图生成重新定义为从噪声图到目标图的**连续时�
 ![[assets/figures/papers/paper_list_l2447_https_arxiv_org_abs_2604_18623/figures/002_Figure_2.jpg]]
 *Figure 2: The overview of our FlowSG. (Left) Image-guided iterative scene graph generation via flow matching. Starting from a noised graph*
 
-## 核心模块与公式推导
+
 
 ### 4.1 场景图标记化（VQ-VAE）
 
@@ -258,7 +260,9 @@ $$
 
 离散部分则根据预测的速率矩阵 $R_\theta$ 进行采样跳转，最终输出完整的场景图。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -316,7 +320,9 @@ FlowSG 在封闭词汇和开放词汇两种设定下均取得了领先的场景�
 ![[assets/figures/papers/paper_list_l2447_https_arxiv_org_abs_2604_18623/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of recent SGG paradigms. (a) Twostage: a pre-trained detector proposes objects and enumerates human–object pairs; a relation head refines multi-stream features to classify predicates. (b) One-stage: objects and predicates are detected jointly in a single pass, followed by a matching step to attach predicates to object pairs. (c) Ours (generative): given an image and an initially noisy graph, an image-conditioned denoiser iteratively refines the graph to sample a coherent scene graph*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有SGG范式的关系
 
@@ -363,6 +369,8 @@ FlowSG 在生成模型谱系中处于**离散-连续混合流匹配**与**图结
 ### 5. 知识库定位总结
 
 FlowSG 的核心贡献在于**将场景图生成从分类范式转变为生成范式**，在方法谱系中建立了“图像条件混合流匹配图生成”这一新分支。其关键创新点——混合离散-连续流匹配、关系调制注意力、流条件消息聚合——为后续研究提供了三个可独立发展的技术模块。对于后续工作，FlowSG 的生成框架可自然扩展到视频场景图、3D场景图以及交互式场景图编辑等方向。
+
+
 
 ## 原文 PDF
 

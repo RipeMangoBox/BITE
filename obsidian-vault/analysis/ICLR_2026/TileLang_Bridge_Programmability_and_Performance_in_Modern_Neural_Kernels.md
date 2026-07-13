@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/TileLang_Bridge_Programmability_and_Performance_in_Modern_Neural_Kernels.pdf
+project_link: null
+code_link: https://github.com/tile-ai/tilelang
 openreview_forum_id: Jb1WkNSfUB
 aliases:
 - TileLang
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | TileLang：桥接现代神经核的可编程性与性能 |
 | 英文题名 | TileLang: Bridge Programmability and Performance in Modern Neural Kernels |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=Jb1WkNSfUB); [GitHub](https://github.com/tile-ai/tilelang) |
+| Links | [paper](https://openreview.net/forum?id=Jb1WkNSfUB) · [GitHub](https://github.com/tile-ai/tilelang) |
 | Topic | #topic/representation_self_supervised_transfer #topic/representation_self_supervised_transfer/representation_learning |
 | Method | TileLang |
 | Dataset | Multi-Head Latent Attention (MLA), GEMM (FP16), Dequantized GEMM (WINT4AFP16) |
@@ -41,7 +43,7 @@ claims:
 > - Multi-Head Latent Attention (MLA) 上，Speedup over Triton on MI300X 为 5.64×–12.97×，对比 Triton MLA，变化 5.64×–12.97×。
 > - GEMM (FP16) 上，Speedup over PyTorch on H100 为 1.18×–1.40×，对比 PyTorch Inductor (torch.matmul)，变化 1.18×–1.40×。
 
-## 概述
+## 概要
 
 现代AI编译器在性能与编程便捷性之间面临尖锐矛盾。以Triton为代表的DSL大幅降低了GPU核开发门槛，但其对内存层次、数据移动与并行调度的控制高度依赖编译器隐式启发式，开发者在面对复杂算子时几乎无法介入优化决策。一个典型例证是：Triton实现的多头潜在注意力（MLA）仅需130行代码，性能却只有手工CUDA核（约500行）的14.2%。开发者被迫在"高性能手工CUDA"与"高生产力编译器DSL"之间做非此即彼的选择。
 
@@ -49,7 +51,7 @@ TileLang针对这一瓶颈提出了一个统一方案：**将tile提升为一级
 
 这一设计在保持Python DSL易用性的同时，实现了接近手工CUDA的性能。在MLA核上，TileLang达到Triton平均5.56倍的性能，代码量不到手工核的16%。在NVIDIA H100上，TileLang相较Triton在多种算子上实现1.08×–10.59×加速（平均3.02×）；在AMD MI300X上实现1.01×–11.56×加速（平均2.65×），同时代码量最多减少85.5%。该方法支持通过统一的`T.call_extern`接口调用NVIDIA cute与AMD ck等后端tile库，实现跨平台可移植性。
 
-## 背景与动机
+
 
 ### 现代AI核编程的核心困境
 
@@ -76,7 +78,9 @@ TileLang针对这一瓶颈提出了一个统一方案：**将tile提升为一级
 
 TileLang的提出正是为了打破这一僵局。其核心动机是：**将tile提升为一级公民，通过可编程的tile抽象显式控制上述关键维度，同时借助编译器可见的tile语义与自动化优化（tile推荐与推断），在保持高级Python DSL易用性的前提下，实现接近手工CUDA的性能**。这一设计使得开发者能够聚焦于算法层面的tile级数据流描述，而将硬件细节的配置优化交由编译器的成本模型和约束传播自动完成，从根本上桥接可编程性与性能之间的鸿沟。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 TileLang 的核心创新在于**将 tile 提升为一级编程公民**，并通过**编译器可见的 tile 语义**与**自动化 tile 优化**两个层面，系统性地解决了现代 GPU 核开发中“可编程性 vs. 性能”的根本矛盾。
 
@@ -115,7 +119,7 @@ $$Time = \max_{i,j} \left( \frac{\mathrm{MemoryTraffic}_i}{\mathrm{Bandwidth}_i}
 
 在 MLA 算子上，TileLang 达到 Triton 平均 **5.56 倍**的性能提升，且代码量不到手工核的 16%（Figure 1）。消融实验揭示了平台特异性的优化贡献：在 H100 上，warp 分区（`+Partition`）贡献了主导性的 4.34 倍加速；而在 MI300X 上，内存放置优化（`+Alloc`）是主要优化，实现了 6.56 倍加速（Figure 9）。这种平台感知的自动优化能力是 TileLang 区别于现有 DSL 的核心优势。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l29_https_openreview_net_forum_id_Jb1WkNSfUB/figures/006_Figure_6.jpg]]
 *Figure 6: Pipeline Inference mechanism in TILELANG*
@@ -136,7 +140,7 @@ TileLang 的编译工作流围绕**融合 tile 级数据流图（FTG）**展开�
 **输出**：针对目标硬件（NVIDIA H100 / AMD MI300X）优化后的可执行核代码。  
 **核心模块关系**：FTG 是贯穿全流程的统一中间表示，tile 推荐为标注不完整的算子提供硬件感知默认值，tile 推断在此基础上通过约束传播完成全局配置闭合，二者协同将开发者的高层意图映射为接近手工 CUDA 性能的低层实现。
 
-## 核心模块与公式推导
+
 
 ### 核心模块
 
@@ -230,7 +234,9 @@ $$\mathbf{z}_t = \mathbf{x}_t \mathbf{W}_{\mathrm{down}}$$
 
 实验表明，静态 roofline 成本模型能有效修剪搜索空间：预测的 top-5% 调度保留了 98.47% 的最佳性能，同时修剪了 95% 的候选调度。这使得 TileLang 在 GEMM 上的平均调优时间仅约 10 秒，显著低于 Triton（约 18–20 秒）和 Ansor（>400 秒）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能结果
 
@@ -305,7 +311,9 @@ Figure 10和Table 9展示了TileLang与Gluon（OpenAI, 2025）、Helion（PyTorc
 ![[assets/figures/papers/paper_list_l29_https_openreview_net_forum_id_Jb1WkNSfUB/figures/029_Table_11.jpg]]
 *Table 11: Commit hashes for baseline frameworks*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心定位：编译器可见的Tile语义与自动化优化
 
@@ -366,6 +374,8 @@ TileLang相较于基线方法的变革体现在六个核心维度：
 4. **新硬件的适配成本**：在支持新硬件时，需要多大比例的平台特定代码与推断规则？TileLang的多平台能力目前依赖于后端tile库的成熟度，对于缺乏类似cute/ck生态的硬件，适配成本可能显著增加。
 
 5. **全自动搜索的可行性**：更大的tile编程空间探索（如同时优化tile大小、流水线深度、warp配置、融合策略）能否通过强化学习等全自动方法完成？当前的成本模型修剪策略已能剪除95%的候选，但剩余5%的搜索仍依赖枚举，在维度爆炸时可能成为瓶颈。
+
+
 
 ## 原文 PDF
 

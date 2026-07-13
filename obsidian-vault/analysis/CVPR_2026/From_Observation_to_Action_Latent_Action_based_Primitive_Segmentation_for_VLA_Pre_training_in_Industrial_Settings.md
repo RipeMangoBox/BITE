@@ -41,7 +41,7 @@ claims:
 > - Industrial Motor Assembly (Top-down View) 上，F1@2s 81.27 vs ABD / OTAS (详见 Table 2) (显著优于无监督基线)。
 > - Industrial Motor Assembly (Exocentric View) 上，F1@2s 81.93 vs ABD / OTAS (详见 Table 2) (显著优于无监督基线)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：工业视觉-语言-动作（VLA）模型预训练面临严重的数据瓶颈——工厂车间存在大量连续工作视频流，但缺乏结构化动作标注，且难以自动提取语义动作基元。现有无监督时序动作检测方法依赖光流或视觉特征相似度，在工业场景中易受视觉噪声干扰，难以可靠捕获工人的行为意图转变。
 
@@ -53,7 +53,7 @@ claims:
 
 **局限与展望**：当前方法仅验证于高度重复的工业制造任务，向动作多样性高的非结构化环境（家庭、医疗）扩展仍需探索；从被动观察到的动作基元到机器人实际执行之间的策略学习与技能对齐是后续重要方向。
 
-## 背景与动机
+
 
 ### 工业 VLA 面临的动作数据瓶颈
 
@@ -76,7 +76,9 @@ claims:
 
 基于此，LAPS（Latent Action-based Primitive Segmentation）流水线以完全无监督的方式，从原始视频流中输出结构化的动作序列（离散动作码、分割片段、语义簇），为下游 VLA 预训练提供可直接使用的结构化动作数据。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 工业 VLA 预训练面临的核心瓶颈在于：大量连续工作视频流缺乏结构化动作标注，传统方法依赖像素级变化（如光流）或通用视觉特征（如 CLIP）难以鲁棒地捕获语义动作边界。LAPS 通过三个关键创新突破这一困境：
 
@@ -110,7 +112,7 @@ LAPS 提出使用**随机初始化且冻结的轻量 Transformer 编码器**（L
 
 LAPS 的三项创新构成了一条因果链路：**潜在动作能量**将分割信号从不可靠的像素空间迁移至语义敏感的抽象动作空间；**迟滞控制器**以因果、鲁棒的方式将该信号转化为稳定动作段；**冻结 Transformer 嵌入**在无监督约束下最大化动作段的语义可分性。三者协同实现了从连续视频流到结构化动作词汇的端到端无监督发现，为工业 VLA 预训练提供了可扩展的数据引擎。
 
-## 整体框架
+
 
 LAPS (Latent Action-based Primitive Segmentation) 是一个面向工业 VLA 预训练的无监督动作基元发现流水线。其核心设计动机在于：工业场景中大量连续工作视频流缺乏结构化动作标注，传统基于像素级视觉特征的分割方法难以鲁棒捕获行为意图的转变。LAPS 通过在抽象潜在动作空间中定义能量度量，将“动作边界检测”从视觉噪声敏感的像素域迁移到语义感知的运动潜空间，从而实现对动作基元的无监督分割与聚类。
 
@@ -132,7 +134,7 @@ LAPS (Latent Action-based Primitive Segmentation) 是一个面向工业 VLA 预�
 ![[assets/figures/papers/paper_list_l2493_https_arxiv_org_abs_2511_21428/figures/001_Figure_1.jpg]]
 *Figure 1: Example of our segmentation approach using Latent Action Energy from a Motion Tokenizer. Action boundaries (red circles) correspond to transitions from high energy to baseline, indicating action completion. The pipeline outputs the Latent Action Sequence (bottom codes), providing structured representations for VLA pre-training*
 
-## 核心模块与公式推导
+
 
 ### 3.1 潜在动作能量：核心分割信号
 
@@ -192,7 +194,9 @@ ICSS 通过外部 VLM 作为语义裁判，评估同一簇内片段的视觉语�
 ![[assets/figures/papers/paper_list_l2493_https_arxiv_org_abs_2511_21428/figures/004_Figure_4.jpg]]
 *Figure 4: Qualitative comparison of our*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验：工业场景下的动作基元分割
 
@@ -248,7 +252,9 @@ Table 5 的系统消融揭示了 LAPS 各模块对分割和聚类性能的因果
 ![[assets/figures/papers/paper_list_l2493_https_arxiv_org_abs_2511_21428/figures/008_Table_3.jpg]]
 *Table 3: Clustering results on the Exocentric View dataset (6,444 segments, k = 3), comparing our Frozen Transformer embedding with a strong non-temporal aggregation baseline*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：工业 VLA 预训练的数据瓶颈
 
@@ -335,6 +341,8 @@ LAPS 的独特贡献在于：在完全不依赖动作标注的条件下，从连
 4. **在线自适应**：在流式场景下，如何使动作检测阈值和聚类结构自适应地随任务分布变化而调整，而非依赖离线预定义的参数？
 
 5. **评估基准的标准化**：工业 VLA 预训练领域缺乏统一的评估基准。LAPS 的自建数据集和 ICSS 指标提供了初步尝试，但社区需要更系统、更多样的基准来推动方法比较和进步。
+
+
 
 ## 原文 PDF
 

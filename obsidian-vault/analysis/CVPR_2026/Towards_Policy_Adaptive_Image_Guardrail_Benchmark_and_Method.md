@@ -44,7 +44,7 @@ claims:
 > - SafeEditBench 上，宏观平均F1-score（5级策略） 49.43 (Ours RL+SafeEditTrain) vs 32.76 (QwenGuard-7B) / 48.68 (Qwen2.5-VL-7B) (较SFT基线+16.67；较最强通用模型+0.75)。
 > - LlavaGuardBench & General VQA 上，LlavaGuard F1 / UnsafeBench F1 / General Avg 71.78 / 62.39 / 57.02 (Ours RL) vs 84.57 / 43.56 / 35.98 (QwenGuard-7B) (尽管LlavaGuard下降12.79，但UnsafeBench提升18.83，通用能力提升21.04)。
 
-## 概述
+## 概要
 
 安全护栏（guardrail）是视觉语言模型安全部署的关键防线。然而，现有护栏方法普遍隐含一个脆弱假设：安全策略是固定且普适的。**真实瓶颈**在于，传统视觉语言模型护栏仅在单一固定安全策略下训练，严重过拟合，无法泛化到未见策略，且通用指令遵循能力严重退化。这一瓶颈的根源在于：安全标签本质上依赖于策略定义而非图像固有属性——同一张图像在不同策略下可能被判定为“安全”或“不安全”（Figure 5）。
 
@@ -64,7 +64,7 @@ SafeGuard-VL的**关键创新**在于：① 以自然语言策略描述作为条
 
 **局限与待验证点**：① 图像编辑工具Nano Banana禁止生成有害内容，因此SafeEditBench仅能做单向编辑（不安全→安全），无法生成双向配对；② RL训练仍依赖固定策略层级数据，对完全任意的、未见过的自然语言策略的泛化性可能仍有局限；③ 论文声明将发布代码但未提供具体仓库链接，可复现性待验证。
 
-## 背景与动机
+
 
 ### 安全护栏的策略依赖性困境
 
@@ -97,7 +97,9 @@ SafeGuard-VL的**关键创新**在于：① 以自然语言策略描述作为条
 
 这一设计使得模型在保持通用VLM能力的同时，实现策略自适应——在UnsafeBench跨策略泛化上达到72.2的总体F1-score，较QwenGuard-7B提升28.6个百分点（Table 2），且通用能力保持稳定（Table 5）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SafeGuard-VL 的核心创新在于将安全护栏从“固定策略下的二分类任务”重构为“策略条件化的语义理解与对齐任务”，通过两个关键设计突破现有方法的瓶颈。
 
@@ -125,7 +127,7 @@ Table 3 揭示了这一创新的必要性：在极端策略（L1）上 SFT 训�
 
 传统 SFT 护栏模型存在严重的**过度特化**问题：QwenGuard-7B 在其自身基准 LlavaGuardBench 上达到 84.57，但在 UnsafeBench 上仅 43.56，通用 VQA 平均分仅 35.98（Table 4，Figure 6）。SafeGuard-VL 通过 RLVR 训练，在保持通用指令遵循能力（57.02）的同时，将 UnsafeBench 提升至 62.39，实现了安全与通用能力的均衡（Figure 6 右）。这一特性源于 RLVR 的奖励设计仅约束安全判断的策略一致性，而非压缩模型的通用推理空间。
 
-## 整体框架
+
 
 SafeGuard-VL 采用**两阶段训练范式**，从“理解不安全语义”到“策略条件对齐”逐步构建策略自适应的视觉安全护栏。图 1 给出了高层示意图：第一阶段（SFT）通过自重新描述机制让模型学习图像中与不安全相关的视觉和文本语义；第二阶段（RL）利用基于可验证奖励的强化学习（RLVR），使模型根据输入的自然语言策略文本做出安全/不安全的判别，而非依赖单一固定规则集。
 
@@ -163,7 +165,7 @@ SafeGuard-VL 采用**两阶段训练范式**，从“理解不安全语义”到
 ![[assets/figures/papers/paper_list_l830_https_arxiv_org_abs_2603_01228/figures/001_Figure_1.jpg]]
 *Figure 1: High-level illustration of our SafeGuard-VL. Unlike prior guardrails that fit only the fixed safety policy, SafeGuard-VL is designed from the perspective of cross-policy adaptability and robustness. In Stage 1 (SFT), the model learns general unsafe-related visual and textual semantics through data constructed using our self-recaption mechanism. In Stage 2 (RL), the model is optimized to perform policy-aware safe/unsafe discrimination, adapting its decisions to different policy definitions rather than relying on a single fixed rule set. This two-stage framework enables SafeGuard-VL to generalize to unseen or shifting safety policies during testing*
 
-## 核心模块与公式推导
+
 
 ### 2.1 自重新描述数据生成模块（Self-Recaption）
 
@@ -201,7 +203,9 @@ SafeGuard-VL 采用**两阶段训练范式**，从“理解不安全语义”到
 ![[assets/figures/papers/paper_list_l830_https_arxiv_org_abs_2603_01228/figures/003_Figure_3.jpg]]
 *Figure 3: The proposed novel self-recaption mechanism that lets the model generate and refine its own captions. Specifically, the baseline model (Qwen-VL) first produces a high-level description with less unsafe details, sampled from its own distribution. The recaption model (Gemma 27B) then performs minimal edits to this caption by recovering the suppressed unsafe semantics, producing a caption with more unsafe details that preserves the original structure while adding explicit harmful descriptions*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈的实证揭示：单一策略SFT的跨策略泛化灾难
 
@@ -279,7 +283,9 @@ Figure 8展示了SafeGuard-VL两阶段的渐进式能力提升：SFT阶段使模
 ![[assets/figures/papers/paper_list_l830_https_arxiv_org_abs_2603_01228/figures/006_Figure_5.jpg]]
 *Figure 5: Examples showing that “safety” is fundamentally policy-dependent rather than common-sense–dependent. The same image may be judged “Safe” or “Unsafe” under different policies, especially when the policies adopt counterintuitive or non–common-sense definitions of safety (e.g., prohibiting ordinary affection while allowing sexually suggestive content). These examples highlight the core challenge: safety labels are not intrinsic to the image but are also determined by the specific policy applied*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有安全护栏的关系
 
@@ -316,6 +322,8 @@ SafeGuard-VL 以 **Qwen2.5-VL-7B** 为基座模型，但其训练策略与直接
 3. **SFT 数据偏差的传播与放大**：第一阶段 SFT 的描述数据若包含偏差（例如对特定群体、文化符号的不安全语义过度或不足标注），这些偏差在第二阶段 RLVR 中是被纠正还是被强化？这关系到策略对齐的公平性。
 
 4. **与基于规则系统的混合架构**：SafeGuard-VL 的纯神经网络方法在处理边界清晰、可精确枚举的安全规则时可能不如基于规则的系统可靠。将 SafeGuard-VL 与轻量级规则引擎结合，在保证灵活性的同时提升确定性规则的执行精度，是一个值得探索的方向。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/RM_R1_Reward_Modeling_as_Reasoning.pdf
+project_link: null
+code_link: https://github.com/RM-R1-UIUC/RM-R1
 openreview_forum_id: 1ZqJ6jj75q
 aliases:
 - RRRRM
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | RM-R1：将奖励建模作为推理任务 |
 | 英文题名 | RM-R1: Reward Modeling as Reasoning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=1ZqJ6jj75q); [GitHub](https://github.com/RM-R1-UIUC/RM-R1) |
+| Links | [paper](https://openreview.net/forum?id=1ZqJ6jj75q) · [GitHub](https://github.com/RM-R1-UIUC/RM-R1) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | RM-R1 (Reasoning Reward Model) |
 | Dataset | 平均 (RewardBench, RM-Bench, RMB), 平均 (三个基准) |
@@ -42,7 +44,7 @@ claims:
 > - RM-Bench 上，平均准确率 为 83.9 (RM-R1-DeepSeek-Distilled-Qwen-32B)，对比 75.2 (Gemini-1.5-pro)，变化 +8.7。
 > - 平均 (三个基准) 上，平均得分 为 79.6 (RM-R1-DeepSeek-Distilled-Qwen-14B)，对比 77.7 (GPT-4o-0806)，变化 +1.9。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -68,7 +70,7 @@ RM-R1 的核心洞察是：**让奖励模型在评分前先进行长链推理，
 
 RM-R1 属于**推理增强型生成式奖励模型（REASRM）**，区别于传统的标量奖励模型（ScalarRM）和普通生成式奖励模型（GenRM）。其核心贡献在于将奖励建模从“直接输出偏好标签”转变为“先推理、后判断”的范式，并通过蒸馏与强化学习的协同训练充分释放推理潜力。
 
-## 背景与动机
+
 
 ### 奖励建模的范式转变：从标量回归到生成式判断
 
@@ -107,7 +109,9 @@ RM-R1 的核心洞察是：**让奖励模型在评分前先进行长链推理，
 
 这种两阶段设计的关键在于：蒸馏提供了高质量的推理“种子”，RL 则让模型超越教师、学会自主推理。消融实验表明，纯强化学习（Cold Start RL）虽然能带来一定提升，但缺少蒸馏热启动时，弱模型往往难以在 RL 过程中探索出高质量的推理链；而纯 SFT 方法则始终被推理训练（蒸馏+RL）大幅超越，即使后者仅使用 9k 条蒸馏数据。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 RM-R1的核心创新在于将奖励建模重新定义为**推理任务**，并通过“蒸馏→强化学习”两阶段训练范式注入深度推理能力，从而突破现有生成式奖励模型仅依赖表面模式、缺乏内容实质评判的瓶颈。
 
@@ -141,7 +145,7 @@ $$\mathcal{R}(x,j|y_a,y_b) = \begin{cases} 1 & \text{if } \hat{l}=l \\ -1 & \tex
 
 上述三个创新并非孤立存在。CoR提供了推理的结构化形式，蒸馏注入高质量的推理先验，RL则通过正确性奖励强化推理与准确评判之间的因果关联。Table 2的消融实验完整揭示了这一协同路径：从基础指令模型出发，依次加入冷启动RL（+3.7）、评分准则（+0.6）、任务分类（+0.7）、蒸馏（+0.6），最终RM-R1在RewardBench上达到91.4的平均分，其中Reasoning子集从86.3提升至96.3，Chat Hard从72.0提升至82.6。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l44_https_openreview_net_forum_id_1ZqJ6jj75q/figures/002_Figure_2.jpg]]
 *Figure 2: Training pipeline of RM-R1. Starting from an instruct model (GenRM), RM-R1 training involves two stages: Distillation and Reinforcement Learning (RL). In the Distillation stage, we use high-quality synthesized data to bootstrap RM-R1’s reasoning ability. In the RL stage, RM-R1’s reasoning ability for reward modeling is further strengthened. After distillation, a GenRM evolves into a REASRM. RM-R1 further differentiates itself by being RL finetuned on preference data*
@@ -182,7 +186,7 @@ RM-R1 将奖励建模重新定义为推理任务，其训练流程由两个阶�
 - **奖励函数去格式化**：移除了常见的格式奖励分量，仅保留正确性信号，避免模型为迎合格式而牺牲判断质量。
 - **推理预算可配置**：训练时的 rollout 预算与推理时的计算预算保持一致，使模型在不同推理开销下均能稳定工作。
 
-## 核心模块与公式推导
+
 
 ### 生成式奖励建模的形式化
 
@@ -235,7 +239,9 @@ GRPO 通过组内相对比较而非绝对奖励值来更新策略，有效降低
 
 这一分类决策（Query Classification, QC）对推理密集型任务尤为关键。消融实验（Table 2）表明，加入 QC 后 Reasoning 子集准确率从 94.2 跃升至 96.3，验证了任务感知的推理策略设计的必要性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与训练范式验证
 
@@ -280,7 +286,9 @@ RM‑R1的核心假设是：现有生成式奖励模型（GenRM）缺乏深度�
 
 此外，表6中以✥标记的Skywork‑Reward‑Gemma‑2‑27B存在训练数据与测试集重叠的潜在污染，其异常高分不应作为公平比较的参照。RM‑R1默认使用较长推理链，在与不生成推理的标量模型对比时未统一控制推理预算，这一差异在解读“超越更大模型”的结论时需加以注意。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心洞察：将奖励建模重新定义为推理任务
 
@@ -338,6 +346,8 @@ RM-R1 的推理链生成大幅增加推断计算量。在主实验中，RM-R1 �
 4. **任务分类提示的统一化**：当前 CoR 依赖显式的任务类型分类提示来区分 Chat 和 Reasoning 的推理策略，这一分类是否可以被模型隐式学习，从而消除对人工分类提示的依赖？
 
 5. **推理预算的自适应分配**：Figure 4b 显示性能随推理预算增加而提升，但如何根据样本难度自适应分配推理预算，避免在简单样本上浪费计算资源，仍是一个开放问题。
+
+
 
 ## 原文 PDF
 

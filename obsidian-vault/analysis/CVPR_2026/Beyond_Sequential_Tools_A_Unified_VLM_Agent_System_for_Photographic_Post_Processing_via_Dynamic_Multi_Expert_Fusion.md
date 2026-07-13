@@ -41,7 +41,7 @@ claims:
 > - Real-1000 Group 1 (single degradation) 上，PSNR 22.90 vs 21.72 (InstructIR) (+1.18)。
 > - Real-1000 Group 2 (two degradations) 上，PSNR 21.10 vs 18.79 (AutoDIR) (+2.31)。
 
-## 概述
+## 概要
 
 摄影后处理面临的核心挑战是真实世界图像中**多种退化（噪声、模糊、JPEG伪影等）的复杂耦合**。现有方案主要分为两类：一是“一体式”模型，试图用单一网络处理所有退化，但泛化能力差；二是基于代理的系统，顺序调用多个专用工具，却因**错误累积与伪影放大**而失效——例如先降噪再去模糊的流水线可能将前一步的残余伪影误判为信号，导致灾难性放大（Figure 3）。
 
@@ -61,7 +61,7 @@ claims:
 
 在知识库定位上，本方法将**LoRA的可加性**从自然语言处理领域迁移至视觉修复，并通过**仅适应K/V矩阵**的策略保证专家间的线性可组合性，同时引入**DPO优化的权重分配分支**实现感知对齐的动态融合。这为“基础模型+即插即用专家库”的摄影后处理范式提供了完整的系统级验证。
 
-## 背景与动机
+
 
 ### 摄影后处理的现实困境
 
@@ -87,7 +87,9 @@ claims:
 
 基于上述动机，我们提出**面向摄影后处理的统一VLM代理系统与动态多专家融合**框架。该系统由一个VLM编排器、一个DPO优化的权重分配分支、一组仅适应K/V矩阵的专家LoRA模块，以及一个预训练扩散骨干（**Flux-Kontext**, Batifol et al., 2025）构成。VLM一次性分析输入图像与用户提示，诊断退化类型与严重程度，动态分配专家权重，并将多个LoRA专家同时合并到扩散模型中，实现单步、上下文感知的协同修复。后续章节将详细展开该框架的设计逻辑、技术细节与实验验证。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 1. 创新动机：从顺序工具链到一次性协同修复
 
@@ -149,7 +151,7 @@ $$W_M' = W_{0,M} + \sum_{i=1}^N w_i \cdot \Delta W_{i,M}, \quad \mathrm{where} \
 - **定性证据**：Figure 3 展示了与 SOTA 顺序代理系统的对比，顺序代理在运动模糊+JPEG 伪影场景下加剧块效应，在散焦模糊+噪声场景下灾难性放大噪声，甚至产生不存在的鸟类内容幻觉；本方法避免了这些失败模式。
 - **消融证据**：Table 4 的增量消融表明，添加 VLM 代理（A+B）和专家 LoRA 模块（A+B+C）均带来显著增益；Table 5 证实 K-V only 适应与 DPO 权重优化各自独立贡献于最终性能。
 
-## 整体框架
+
 
 本方法提出一个以视觉语言模型（VLM）为编排核心的统一代理系统，将传统“顺序工具调用”范式替换为“单次动态多专家融合”，实现面向摄影后处理的通用图像修复。系统流水线如图1所示，由三个关键阶段构成：**VLM编排代理的意图理解与退化诊断**、**基于DPO的专家权重分配**、以及**动态LoRA融合与扩散主干执行**。
 
@@ -190,7 +192,7 @@ $$W_M' = W_{0,M} + \sum_{i=1}^N w_i \cdot \Delta W_{i,M}, \quad \mathrm{where} \
 ![[assets/figures/papers/paper_list_l2162_https_openaccess_thecvf_com_content_CVPR2026_html_Xiong_Beyond_Sequentia/figures/001_Figure_1.jpg]]
 *Figure 1: The pipeline of our method. First, the VLM agent analyzes the input image and prompt, selecting expert LoRAs and assigning weights via an RLHF-tuned adapter. Second, the LoRAs are dynamically merged into the diffusion model by updating only its K and V matrices. Finally, the adapted model performs the restoration using the image and an enhanced prompt*
 
-## 核心模块与公式推导
+
 
 ### VLM编排代理（VLM Orchestrator Agent）
 
@@ -228,7 +230,9 @@ $$
 
 修复执行基于 **Flux-Kontext** 预训练扩散模型，该模型提供强大的生成先验。在推理时，系统将动态融合后的K/V矩阵注入扩散骨干，结合VLM生成的增强提示，通过标准扩散采样过程输出修复图像。整个流水线仅需一次前向模型组装和一次扩散推理，实现了**上下文感知的单步协同修复**。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能：Real‑1000 基准
 
@@ -304,7 +308,9 @@ $$
 ![[assets/figures/papers/paper_list_l2162_https_openaccess_thecvf_com_content_CVPR2026_html_Xiong_Beyond_Sequentia/figures/004_Table_2.jpg]]
 *Table 2: Overview of training datasets used for LoRA experts*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 相对于基线方法的谱系定位
 
@@ -381,6 +387,8 @@ $$
 从更宏观的视角看，本文工作可被视为 **“基础模型 + 轻量级专家适配”范式**在图像修复领域的成功实践。这一范式在 NLP 领域（如 MoE-LLM、LoRA-MoE）已有广泛探索，但在视觉修复任务中，本文率先将其与 VLM 代理的意图理解能力相结合，形成了“感知-决策-执行”的闭环系统。
 
 与同期工作 **Qwen-Image**（Wu et al., 2025）相比，本文方法不追求端到端的多模态生成统一，而是选择在预训练扩散模型之上构建灵活的专家适配层——这种“插件式”设计在保持基础模型泛化能力的同时，赋予了系统针对特定退化的精准修复能力，体现了模块化与端到端两种技术路线的不同权衡。
+
+
 
 ## 原文 PDF
 

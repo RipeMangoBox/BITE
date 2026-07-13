@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Mastering_Sparse_CUDA_Generation_through_Pretrained_Models_and_Deep_Reinforcement_Learning.pdf
+project_link: null
+code_link: https://github.com/QiWu-NCIC/SparseRL
 openreview_forum_id: VdLEaGPYWT
 aliases:
 - MSCGTPMDRL
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 基于预训练模型与深度强化学习的稀疏CUDA代码生成 |
 | 英文题名 | Mastering Sparse CUDA Generation through Pretrained Models and Deep Reinforcement Learning |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=VdLEaGPYWT); [GitHub](https://github.com/QiWu-NCIC/SparseRL) |
+| Links | [paper](https://openreview.net/forum?id=VdLEaGPYWT) · [GitHub](https://github.com/QiWu-NCIC/SparseRL) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | SparseRL |
 | Dataset | SuiteSparse SpMV (400测试矩阵), SuiteSparse SpMV 在 V100 上, SuiteSparse SpMM (col=8) 在 A100 上 |
@@ -41,7 +43,7 @@ claims:
 > - SuiteSparse SpMV (400测试矩阵) 上，编译率 (CR) 为 57.50 (SparseRL+Qwen2.5-14B)，对比 39.50 (CodeRL+CodeT5-770M)，变化 +18.00。
 > - SuiteSparse SpMV 在 V100 上 上，平均 GFLOPS 相对 cuSPARSE 的加速比 为 1.42×，对比 1× (cuSPARSE)，变化 +42%。
 
-## 概述
+## 概要
 
 稀疏矩阵运算（如稀疏矩阵-向量乘 SpMV）是科学计算与图神经网络的核心算子，但其不规则的内存访问模式使得手工编写高性能 CUDA 内核极为困难。现有代码生成方法面临三重瓶颈：（1）稀疏数据的不规则性导致执行模式动态变化，需要针对不同矩阵结构定制实现；（2）监督学习的 token 级匹配目标无法区分语义正确但性能迥异的实现，缺乏对执行效率的奖励信号；（3）稀疏矩阵的结构化索引输入与自然语言提示之间存在模态鸿沟。
 
@@ -49,7 +51,7 @@ SparseRL 将预训练语言模型视为**随机策略**，将代码生成步骤�
 
 在 SuiteSparse 矩阵集的 SpMV 任务上，SparseRL 相比现有方法编译率提升 20%，生成代码平均运行速度提升 30%；相比 NVIDIA 官方库 cuSPARSE 在 V100 上平均性能提升 **1.42 倍**（A100 上 1.44 倍）。消融实验证实预训练阶段贡献约 8.5 个 pass@1000 点，RL 阶段贡献约 3.75 点，正弦嵌入显著优于线性投影和可学习嵌入策略。方法在 SpMM 任务上也展现出泛化能力，在 A100 上相比 Sputnik 取得 **2.32 倍**加速比。
 
-## 背景与动机
+
 
 稀疏矩阵运算——尤其是稀疏矩阵-向量乘法（SpMV）和稀疏矩阵-矩阵乘法（SpMM）——是科学计算、图分析和深度学习等领域的核心计算瓶颈。与稠密矩阵不同，稀疏矩阵的非零元素分布极不规则，导致其执行模式高度依赖输入数据的结构特征。为每一种稀疏模式手工编写高性能CUDA内核不仅耗时巨大，而且难以泛化，因此自动化生成稀疏CUDA代码成为一个极具吸引力的研究方向。
 
@@ -59,7 +61,9 @@ SparseRL 将预训练语言模型视为**随机策略**，将代码生成步骤�
 
 本文的核心动机在于：**将预训练语言模型视为一个可优化的随机策略，通过深度强化学习直接从编译器与执行器的反馈中学习，使模型能够同时优化代码的正确性与执行效率。** 这一思路的关键洞见是：编译结果（通过/失败）、功能测试（正确/错误）和执行时间（相对基线的加速比）构成了一个天然的奖励信号源，可以弥合训练目标与部署性能之间的鸿沟。同时，通过用稀疏矩阵非零元素行列索引的正弦嵌入替代自然语言提示，可以消除模态差异，使模型直接感知稀疏结构，从而生成针对特定矩阵模式定制的高效CUDA内核。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SparseRL 的核心创新在于将稀疏 CUDA 代码生成从传统的监督学习范式彻底转向**深度强化学习范式**，并通过三个关键设计突破现有方法的瓶颈。
 
@@ -97,7 +101,7 @@ SparseRL 在解码过程中集成了**CUDA 语法/语义动态验证机制**：�
 
 消融实验（Table 2）表明，三阶段完整流程获得最佳 pass@1000（49.25），而去掉预训练阶段降至 40.75，去掉 RL 阶段降至 45.50，验证了各阶段的必要性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_VdLEaGPYWT/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of our method to optimize pretrained LMs for sparse CUDA code generation. (a) At pre-training stage, additional CUDA code is used to augment the LM. (b) At supervised finetuning (SFT) stage, the LM is finetuned for the Sparse CUDA code generation. (c) At RL stage, the actor and critic networks are first initialized from the finetuned LM, and then updated based on the reward of RL. The reward function is composed of correctness and efficiency rewards*
@@ -150,7 +154,7 @@ $$\mathcal{L}_{ce}(\theta) = -\sum_t \log p_\theta(\hat{y}_t|\hat{y}_{1:t-1}, X)
 
 这种设计将优化目标从“模仿参考代码”转变为“生成高效代码”，使模型能够探索监督学习中无法触及的性能空间。
 
-## 核心模块与公式推导
+
 
 ### 3.1 任务形式化与监督微调目标
 
@@ -210,7 +214,9 @@ $$
 
 在 RL 阶段，SparseRL 集成了动态 CUDA 语法/语义检查机制：解码过程中实时验证生成代码的语法正确性，一旦检测到错误（如未闭合的括号、无效的 CUDA 关键字等）即提前终止生成，避免在无效序列上浪费计算资源。该机制不仅加速了 RL 的探索效率，也间接提升了有效样本的生成比例。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -302,7 +308,9 @@ SparseRL 的核心干预是**将生成问题从监督学习重构为深度强化
 ![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_VdLEaGPYWT/figures/028_Table.jpg]]
 *Table: 1. SparseRL on Closed-Source Outputs. Feeding GPT-5/Claude-Sonnet-4 kernels into SparseRL’s RL loop (reward: efficiency + correctness by off-policy GRPO) improves runtime by 28–35% on 100 test matrices: 2. Controlled Open-Source Comparison. On LLaMA 3 70B (matching closed-source scale)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 方法定位与核心差异
 
@@ -339,6 +347,8 @@ SparseRL 的优势区间集中在**中等稀疏度、具有可学习结构模式
 **RL 算法选择**：论文尝试了 PPO、GRPO 和 Reinforce++，最终选择 PPO 的理由是“性能已经足够好”（Section 5.4）。但 GRPO 的 pass@1000 仅比 PPO 低 0.7%（48.9 vs. 49.3），且 GRPO 无需价值网络，训练开销更低。是否存在更优的 RL 算法组合（如离线 RL 或基于模型的 RL）以进一步压缩训练时间，值得探索。
 
 **可读性与可维护性**：论文在 Appendix A.20 中报告了可读性测试，但未在主文中详细展开。生成代码的可维护性对于实际部署至关重要，这一维度的评估尚不充分。
+
+
 
 ## 原文 PDF
 

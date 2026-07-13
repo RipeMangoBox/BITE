@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/UniGen_1_5_Enhancing_Image_Generation_and_Editing_through_Reward_Unification_in_RL.pdf
+project_link: null
 code_link: null
 aliases:
 - U15
@@ -43,7 +44,7 @@ claims:
 > - GenEval 上，Overall score 0.89 vs 0.85 (UniGen-1.5 w/o RL) (+0.04)。
 > - DPG-Bench 上，Overall score 86.83 vs 84.19 (UniGen-1.5 w/o RL) (+2.64)。
 
-## 概述
+## 概要
 
 **核心问题**：当前统一多模态模型在监督微调（SFT）后仍存在显著的指令理解瓶颈——模型难以充分解析复杂的图像编辑指令，导致强化学习（RL）训练中候选图像的奖励方差过小、学习信号薄弱，阻碍了生成与编辑能力的联合提升。
 
@@ -53,7 +54,7 @@ claims:
 
 **方法定位**：UniGen-1.5 属于**统一多模态生成-编辑框架**，其方法谱系可追溯至 UniGen（Tian et al., arXiv 2025）的 LLM-based 生成架构，并在以下维度实现突破：引入编辑指令对齐解决 SFT 后指令理解不足的问题；通过统一 RL 实现生成与编辑的可扩展联合优化；以共享奖励模型替代任务特化奖励设计，简化训练管线。与扩散模型路线（如 FLUX.1 Kontext Pro）或纯编辑模型（如 OmniGen2）不同，UniGen-1.5 在单一自回归框架内同时覆盖图像理解、生成与编辑三个任务。
 
-## 背景与动机
+
 
 ### 图像生成与编辑的统一化趋势
 
@@ -67,7 +68,9 @@ claims:
 
 针对上述缺口，UniGen-1.5 提出两个关键创新。首先，引入**编辑指令对齐（Edit Instruction Alignment）**作为轻量级后SFT阶段，通过外部模型生成目标图像的文本描述并训练模型预测该描述，从而显著增强模型对编辑意图的语义理解。其次，提出**统一强化学习策略**：将图像编辑重新表述为通用图像生成任务，直接复用成熟的文本-图像对齐奖励模型（CLIP-H、HPSv2、Unified-Reward-7B、ORM），在共享奖励框架下联合优化生成与编辑。这一设计从根本上解决了编辑任务奖励方差小、学习信号弱的问题，使得生成与编辑能力能够协同提升。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 UniGen-1.5 的核心创新在于通过**奖励统一**将图像生成与图像编辑纳入同一个强化学习框架，并引入**编辑指令对齐**阶段以克服监督微调后模型对编辑指令理解不足的瓶颈。其相对于前代基线 UniGen（Tian et al., arXiv 2025）的关键改动槽位（changed slots）如下。
 
@@ -114,7 +117,7 @@ $$\mathcal{X}_O = \mathcal{P}_\theta(\emptyset,\emptyset,\emptyset) + s_I \cdot 
 
 UniGen-1.5 的创新链条清晰：**编辑指令对齐**解决监督微调后指令理解不足的瓶颈 → **奖励统一**将编辑重新表述为通用生成任务，复用成熟奖励模型 → **统一强化学习**联合优化生成与编辑，两个任务相互促进。这一设计使模型在 ImgEdit 上达到 4.31 的综合分，大幅超越现有开源模型 OmniGen2（3.44），逼近闭源模型 GPT-Image-1，同时在 GenEval（0.89）和 DPG-Bench（86.83）上也取得领先。
 
-## 整体框架
+
 
 UniGen-1.5 的核心设计动机源于一个被验证的关键瓶颈：模型在监督微调后仍无法充分理解复杂的编辑指令，导致强化学习训练中候选图像的奖励方差小、学习信号弱，阻碍生成与编辑能力的联合提升。为解决这一问题，UniGen-1.5 提出了一套统一的强化学习框架，将图像编辑重新表述为通用图像生成任务，通过共享的文本-图像对齐奖励模型同时优化生成与编辑，并引入**编辑指令对齐**阶段显著增强模型对编辑意图的理解。
 
@@ -168,7 +171,7 @@ $$\mathcal{X}_O = \mathcal{P}_\theta(\emptyset,\emptyset,\emptyset) + s_I \cdot 
 
 其中 $s_T$ 控制编辑指令的引导强度，$s_I$ 控制条件图像的引导强度。在 ImgEdit 基准评估中，分别设置为 $s_T=3$ 和 $s_I=1.5$。
 
-## 核心模块与公式推导
+
 
 ### 多模态架构的三大功能模块
 
@@ -222,7 +225,9 @@ $$\mathcal{X}_O = \mathcal{P}_\theta(\emptyset,\emptyset,\emptyset) + s_I \cdot 
 
 其中 $s_T$ 为编辑指令的引导尺度，$s_I$ 为条件图像的引导尺度。在 ImgEdit 基准评估中，$s_T$ 和 $s_I$ 分别设为 3 和 1.5（Sec. 4.1）。这种双重引导机制使模型能够分别控制对编辑指令的遵循程度和对条件图像视觉信息的保留程度。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心结果与基准对比
 
@@ -300,7 +305,9 @@ Figure 5 展示了 GRPO 训练前后的定性对比：经过 RL 训练后，模�
 ![[assets/figures/papers/paper_list_l2709_https_openaccess_thecvf_com_content_CVPR2026_html_Tian_UniGen_1_5_Enhanc/figures/007_Table_3.jpg]]
 *Table 3: Comparisonwithstate-of-the-artmodelsonimageunderstandingbenchmarks.*denotesreproducedresults.Thebestandsecondbest results are highlighted in bold and underlined,respectively*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 在图像生成与编辑统一模型谱系中的位置
 
@@ -346,6 +353,8 @@ $$\mathcal{L}(\theta) = \frac{1}{N}\sum_{i=1}^N \min\big(\rho_i A_i, \mathrm{cli
 3. **自监督编辑指令对齐**：如何减少或消除对外部强模型的依赖，实现自监督的编辑指令理解增强？
 4. **规模化验证**：统一 RL 策略在更大规模、更多样化的编辑数据上能否保持泛化优势？当前实验主要在 ImgEdit 基准上验证，其覆盖的编辑类型和复杂度有限。
 5. **与扩散模型的深度融合**：UniGen-1.5 目前是完全基于自回归令牌预测的框架；与扩散模型（如 FLUX.1 Kontext Pro）的混合架构是否能在保持统一性的同时突破各自局限？
+
+
 
 ## 原文 PDF
 

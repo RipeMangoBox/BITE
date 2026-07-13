@@ -41,7 +41,7 @@ claims:
 > - 全部真实门操作（旋转把手推/拉、推杆推） 上，成功率 83% vs 专家遥操作 80% (+3%)。
 > - 全部真实门操作 上，成功率 83% vs 非专家遥操作 60% (+23%)；任务完成时间 快23.8% vs 专家 vs 专家遥操作时间 (−23.8%（更快）)；任务完成时间 快31.7% vs 非专家 vs 非专家遥操作时间 (−31.7%（更快）)。
 
-## 概述
+## 概要
 
 人形机器人在真实世界中执行全身操作任务，尤其是仅依赖RGB视觉的像素-动作策略，面临三大核心瓶颈：**部分可观测性**（单目RGB无法完整感知门把手位姿、接触力等关键状态）、**长周期信用分配**（开门需经历接近、抓握、转动、推/拉等多个阶段，稀疏成功信号难以驱动探索），以及**广阔的仿真-现实视觉与物理差距**。这些因素共同导致从仿真到现实（sim-to-real）的策略迁移极为困难。
 
@@ -51,7 +51,7 @@ claims:
 
 在方法谱系上，DoorMan继承并拓展了教师-学生蒸馏范式（DAgger），引入分阶段重置以解决长周期特权探索难题，并通过GRPO实现学生策略的闭环自举优化。其底层全身控制器基于**Ben et al., 2025**的工作，与遥操作基线共享同一硬件平台，保证了对比的公平性。
 
-## 背景与动机
+
 
 ### 问题背景：人形机器人全身操作中的视觉策略困境
 
@@ -82,7 +82,9 @@ claims:
 
 本文提出的**DoorMan**框架正是围绕这三个问题展开，通过分阶段重置探索、DAgger蒸馏与GRPO在线微调、以及程序化生成与视觉域随机化的组合，首次实现了纯视觉人形机器人开门策略在真实世界中的零样本迁移，且性能超越人类遥操作。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DoorMan 的核心创新在于构建了一套从仿真特权教师到纯视觉学生、再到闭环自举微调的完整训练管线，系统性解决了人形机器人全身操作在部分可观测条件下的 sim-to-real 迁移难题。其创新点可归纳为三个关键的 **changed slots**：
 
@@ -106,7 +108,7 @@ sim-to-real 迁移的核心障碍之一是视觉分布的差异。DoorMan 构建
 
 **创新逻辑链总结**：分阶段重置使特权教师高效探索长周期操作 → DAgger 蒸馏将知识压缩至视觉学生 → GRPO 微调使学生在部分可观测条件下自主补偿 → 大规模视觉随机化确保策略对真实世界光照与材质的鲁棒性。三者协同，最终实现了 83% 的真实门操作成功率，与专家遥操作持平（80%），且任务完成时间快 23.8%。
 
-## 整体框架
+
 
 DoorMan 采用“教师-学生-自举”三阶段训练管线，在 IsaacLab 仿真环境中完成全部学习，最终产出仅依赖单目 RGB 图像与本体感知（关节位置、速度等）的全身操作策略，无需任何真实世界微调即可实现零样本 sim-to-real 迁移。
 
@@ -137,7 +139,7 @@ DoorMan 采用“教师-学生-自举”三阶段训练管线，在 IsaacLab 仿
 ![[assets/figures/papers/paper_list_l1033_https_arxiv_org_abs_2512_01061/figures/001_Figure_1.jpg]]
 *Figure 1: DoorMan, a simulation-trained, RGB-only humanoid loco-manipulation policy, opens diverse, real-world doors*
 
-## 核心模块与公式推导
+
 
 DoorMan 将人形机器人全身开门任务建模为部分可观测马尔可夫决策过程（POMDP）：
 
@@ -191,7 +193,9 @@ $$\mathrm{Track}(x, \mu, \sigma) = \exp\left(-(x - \mu)^2 / (2\sigma^2)\right)$$
 ![[assets/figures/papers/paper_list_l1033_https_arxiv_org_abs_2512_01061/figures/004_Figure_3.jpg]]
 *Figure 3: Overview of the staged-reset exploration scheme. When entering a new stage, a snapshot of the simulation is cached into the buffer. When the task resets, the environment is randomly reset to a prior stage by loading from the cache*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 1. 真实世界主结果：与人类遥操作的全面对标
 
@@ -283,7 +287,9 @@ DoorMan 的程序化生成管线（Figure 4）覆盖了物理与视觉两个维�
 ![[assets/figures/papers/paper_list_l1033_https_arxiv_org_abs_2512_01061/figures/002_Figure_1.jpg]]
 *Figure 1: Real-world generalization of DoorMan. Top: diverse handle visuals and physical shapes. Middle: diverse wall panel visuals. Bottom: pushing and pulling open doors naturalistically*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法在领域中的位置
 
@@ -331,6 +337,8 @@ DoorMan 的当前设计适用于以下条件的任务场景：
 ### 5. 对后续工作的启示
 
 DoorMan 为视觉人形全身操作提供了三个可复用的技术锚点：**分阶段重置探索**解决长周期信用分配、**GRPO 在线微调**补偿部分可观测性、**极端视觉域随机化**实现零样本迁移。后续工作可沿以下方向推进：将分阶段重置机制自动化（减少人工阶段定义）、在更广泛的任务类别上验证 GRPO 微调的通用性、以及探索与大规模预训练视觉-语言-动作模型的融合路径。
+
+
 
 ## 原文 PDF
 

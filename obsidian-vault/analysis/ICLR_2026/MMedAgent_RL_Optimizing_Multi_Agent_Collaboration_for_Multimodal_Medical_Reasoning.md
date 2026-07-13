@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/MMedAgent_RL_Optimizing_Multi_Agent_Collaboration_for_Multimodal_Medical_Reasoning.pdf
+project_link: null
+code_link: null
 openreview_forum_id: 2awntLXwR6
 aliases:
 - MR
@@ -42,7 +44,7 @@ claims:
 > - SLAKE 上，Accuracy 为 76.2，对比 SFT method，变化 +12%。
 > - PathVQA 上，Accuracy 为 72.3，对比 SFT method，变化 +12%。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -60,7 +62,7 @@ claims:
 
 MMedAgent-RL 处于**多模态医学推理**与**多智能体强化学习**的交叉点。与单智能体 Med-LVLM（如 **LLaVA-Med-7B** (Li et al., 2023)、**RadFM** (Wu et al., 2023)）相比，它通过多专家协作弥补单一模型的专科短板；与静态多智能体系统（如 **MedAgents**、**AFlow** (Zhang et al., 2024)）相比，它通过强化学习实现了协作策略的可训练化和动态适应。在技术路线上，该方法将课程学习作为引导强化学习探索的脚手架，为多智能体系统中的“信任校准”问题提供了一种原则性的解决方案。
 
-## 背景与动机
+
 
 ### 多模态医学推理的现实需求
 
@@ -83,7 +85,9 @@ MMedAgent-RL 处于**多模态医学推理**与**多智能体强化学习**的�
 
 这一动机催生了 **MMedAgent-RL**，一个基于强化学习的多智能体框架。其核心洞察是：**将专家输出准确率作为课程难度标签，通过课程学习引导的强化学习，使主治医生从学习信赖一致专家逐步过渡到主动纠正错误专家**，从而显著提升多模态医疗推理的鲁棒性和泛化能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MMedAgent-RL 的核心创新在于将**课程学习引导的强化学习**引入多模态医学多智能体协作框架，通过**动态调节策略熵**实现对专家意见的自适应利用，从而解决了现有医学多智能体系统在专家输出不一致、可靠性参差不齐时的性能瓶颈。
 
@@ -115,7 +119,7 @@ $$
 
 消融实验证实了动态熵调节的必要性：移除课程学习（C-MARL）导致性能显著下降（平均降低 18.6%），而固定熵系数同样导致性能损失。在专家全部出错的困难样本上，MMedAgent-RL 在 OmniMedVQA 上达到 23.0% 的准确率，相比基础模型的 2.0% 提升了超过 10 倍，验证了模型在“纠正专家”这一核心能力上的实质性突破。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l7_https_openreview_net_forum_id_2awntLXwR6/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of MMedAgent-RL, a RL-driven multi-agent framework designed for multimodal medical reasoning. It simulates the clinical loop of General Practitioner (GP) → Specialists → GP. First, MMedAgent-RL optimizes the triage doctor (the first GP) to improve triage accuracy. Then, proprietary LVLMs are used as the specialist doctors for the assigned department. Finally, curriculum learning and RL are combined to progressively train the attending physician (the second GP), who flintegrates the specialist knowledge and makes robust decisions*
@@ -143,7 +147,7 @@ $$\mathcal{I}_{\mathrm{C \cdot MARL}}(\theta) = \mathbb{E}\left[\mathcal{I}_{\ma
 
 框架采用两阶段训练范式：首先独立优化分诊医生，使其具备精准的科室分配能力；随后固定分诊医生和专科医生，通过 C-MARL 训练主治医生。这种解耦设计使得各模块可独立迭代，同时保证了端到端推理时信息流的稳定性。
 
-## 核心模块与公式推导
+
 
 MMedAgent‑RL 模拟临床“全科医生→专科医生→全科医生”的闭环，将整个多智能体协作流程分解为三个可优化的核心模块：**分诊医生**、**专科医生** 和 **主治医生**。其中分诊医生与主治医生均通过强化学习训练，而专科医生为固定模型，仅负责提供独立意见。
 
@@ -183,7 +187,9 @@ $$\mathcal{I}_{\mathrm{C\cdot MARL}}(\theta) = \mathbb{E}\left[ \mathcal{I}_{\ma
 
 课程难度依据专家准确率划分为三个阶段（简单/中等/困难），对应不同的 $\gamma_s$ 设置：在简单阶段给予较高熵奖励以鼓励模仿专家，在困难阶段降低熵奖励以促使模型独立思考并纠正错误。这一机制使主治医生从“信任专家”逐步过渡到“批判性综合”，是实现鲁棒多模态医学推理的关键因果调节变量。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能：多模态医学VQA全面领先
 
@@ -258,7 +264,9 @@ MMedAgent-RL 在五个医学视觉问答基准上展现出系统性的性能优�
 
 5. **计算成本与外部依赖**：框架依赖 GPT-4o 等商业模型作为专家，引入了 API 调用成本和潜在的服务不稳定性。在资源受限或离线场景中，这一依赖可能成为部署瓶颈。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法在领域中的坐标
 
@@ -320,6 +328,8 @@ $$
 4. **少数派意见的平衡机制**：如何设计奖励函数或熵调节策略，使模型在多数专家错误时更有效地识别并采纳少数派（但正确）的意见？
 
 5. **计算效率与部署可行性**：GRPO 训练需要为每个样本生成 8 个 rollout（训练批次大小 128），加上专家 API 调用，整体训练成本较高。在资源受限的真实临床环境中，如何权衡性能与效率？
+
+
 
 ## 原文 PDF
 

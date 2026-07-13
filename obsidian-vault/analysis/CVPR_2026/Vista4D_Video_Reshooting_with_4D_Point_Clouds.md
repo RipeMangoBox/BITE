@@ -42,7 +42,7 @@ claims:
 > - iPhone 数据集 上，mPSNR ↑ 14.09 vs 13.82 (TrajectoryCrafter) (+0.27)；EPE ← (运动重建) 1.142 vs 2.375 (TrajectoryCrafter) (-1.233)。
 > - 用户研究 上，Overall fidelity preference 77.38% vs 11.03% (CamCloneMaster) (+66.35pp)。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -66,8 +66,6 @@ Vista4D 属于显式先验谱系，但通过三个关键改进区别于现有工
 在涵盖110个视频-相机对的评估数据集上，Vista4D 在所有相机控制精度指标上均达到最优：平移误差 1.251、旋转误差和內参误差均显著优于最强基线（Table 1）。3D一致性方面，SuperGlue重投影误差（RE@SG）为 7.504，较最佳基线 GEN3C（12.99）降低 42%。在iPhone数据集的新视角视频合成中，运动重建误差（EPE）为 1.142，显著优于 TrajectoryCrafter（2.375）（Table 2）。用户研究中，Vista4D 以 77.38% 的总体偏好率大幅超越最高基线（11.03%），在内容保留、相机控制精度和总体保真度三个维度均获压倒性优势（Table 4）。
 
 消融实验证实：联合使用带深度伪影的训练数据与上下文源视频条件是模型鲁棒纠正几何伪影、避免时间抖动的关键（Figure 19）；去除静态像素的时间持久性则导致已见内容保留失败和相机控制精度下降（Figure 20）。
-
-## 背景与动机
 
 ### 视频重拍的愿景与核心矛盾
 
@@ -95,7 +93,7 @@ Vista4D 属于显式先验谱系，但通过三个关键改进区别于现有工
 
 通过将视频重拍建立在4D持久点云这一显式先验之上，Vista4D 旨在同时实现精确的相机控制、忠实的动态内容保留，以及对真实世界深度估计伪影的强鲁棒性。
 
-## 核心创新
+## 核心方法与创新机理
 
 Vista4D 的核心创新在于构建了一个**时间持久的 4D 点云表示**，并通过**训练策略与条件机制的双重设计**，使视频扩散模型能够鲁棒地纠正真实世界点云中的几何伪影，从而实现高精度的相机控制与内容保留。其相对于现有基线（如 ReCamMaster、TrajectoryCrafter、GEN3C 等）的关键改进体现在以下三个 changed slots 上。
 
@@ -116,8 +114,6 @@ Vista4D 改用**多视角动态视频的 4D 重建数据**直接训练：将源�
 在条件注入方式上，现有方法或仅依赖点云渲染（如 TrajectoryCrafter），或通过交叉注意力注入源视频。Vista4D 采用**沿帧维度串联源视频与点云渲染的潜在 token** 进行上下文条件（in-context conditioning），并联合 alpha 掩码（Section 3.3）。这种设计使模型能够直接从源视频中传播几何和外观信息到输出视频，相比交叉注意力具有更强的自适应纠正能力。
 
 消融实验（Supplementary F.1, Figure 19）对比了无源视频条件、交叉注意力注入和上下文串联三种策略：交叉注意力在部分场景下无法充分纠正伪影（如后退镜头中汽车异常放大），而上下文串联结合深度伪影训练是鲁棒性的关键组合。
-
-## 整体框架
 
 Vista4D 的整体 pipeline 围绕一个核心思想构建：**将输入视频与用户指定的目标相机轨迹共同锚定在一个时间持久的 4D 点云表示中**，然后利用微调的视频扩散模型在该显式先验的引导下生成目标视角的视频。整个框架由三个紧密耦合的阶段组成，其端到端流程如 Figure 2 所示。
 
@@ -158,8 +154,6 @@ $$\mathcal{L} = \epsilon_{\theta}(\mathbf{X}_{t}^{\mathrm{tgt}}, \mathbf{X}^{\ma
 - **关键控制信号**：点云渲染（显式几何）、源视频（外观与运动）、相机嵌入（视角控制）、alpha 掩码（遮挡指示）
 
 这种三阶段设计使得 Vista4D 能够将视频重拍任务分解为几何重建与外观生成两个子问题，并通过上下文条件将二者有机融合，从而在相机控制精度、内容保留和 3D 一致性上均达到最优水平（Table 1）。模型架构的详细配置见 Figure 16。
-
-## 核心模块与公式推导
 
 Vista4D 的方法框架由三个核心模块构成：4D 点云构建、带有深度伪影的训练数据生成、以及扩散模型的条件化策略。以下逐一剖析各模块的设计逻辑与关键公式。
 
@@ -208,7 +202,7 @@ $$\mathcal{L} = \epsilon_{\theta}(\mathbf{X}_{t}^{\mathrm{tgt}}, \mathbf{X}^{\ma
 ![[assets/figures/papers/paper_list_l52_https_arxiv_org_abs_2604_21915/figures/020_Figure_16.jpg]]
 *Figure 16: Model architecture. The above diagram shows the model architecture for Vista4D. The fire icon indicates trainable parameters. We build upon Wan2.1-T2V-14B [2], and we omit timestep conditioning, text prompt to token embedding, modulation, layer normalization, output unshuffle, and diffusion model denoising in the diagram for simplicity. All patchify layers are initialized from the base video model besides that of the point cloud render alpha mask, which is zero-initialized. The camera encoder is zero-initialized, and the projector after self-attention is initialized as the identity affine transformation*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -293,10 +287,7 @@ Table 5 报告了预处理和推理时间。预处理包括 Grounded SAM 2 分�
 ![[assets/figures/papers/paper_list_l52_https_arxiv_org_abs_2604_21915/figures/011_Figure_8.jpg]]
 *Figure 8: 4D scene recomposition. By directly editing the 4D point cloud, Vista4D can recompose 4D scenes from the source video or other inserted videos. Importantly, our method synthesizes physically plausible lighting when inserting a rhino lit by sunlight through leaves into an otherwise overcast scene*
 
-![[assets/figures/papers/paper_list_l52_https_arxiv_org_abs_2604_21915/figures/012_Figure_7.jpg]]
-*Figure 7: Dynamic scene expansion. With our 4D-grounded temporally-persistent point cloud, Vista4D can do video reshooting with additional scene information from casual scene captures or alternate angles by doing joint 4D reconstruction of these frames with the source video. Doing so reduces video model hallucinations and provides stronger control beyond the source video*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 问题域定位：视频重拍中的先验表示之争
 

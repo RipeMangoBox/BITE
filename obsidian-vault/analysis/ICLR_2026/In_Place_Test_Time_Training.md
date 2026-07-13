@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/In_Place_Test_Time_Training.pdf
+project_link: null
+code_link: null
 openreview_forum_id: dTWfCLSoyl
 aliases:
 - PTTTPT
@@ -42,7 +44,7 @@ claims:
 > - RULER (LLaMA-3.1-8B) 上，Average Accuracy (%) 为 83.7 (64k)，对比 81.6 (64k)，变化 +2.1。
 > - RULER (Qwen3-14B-Base) 上，Average Accuracy (%) 为 70.6 (64k)，对比 67.9 (64k)，变化 +2.7。
 
-## 概述
+## 概要
 
 **核心问题**：大语言模型在推理时参数完全冻结，无法动态适应持续变化的上下文。这一静态性在长序列推理、在线学习和非平稳信息流中构成根本瓶颈——模型不能将新信息编码为参数化记忆，只能依赖有限的上下文窗口。
 
@@ -57,7 +59,7 @@ claims:
 
 **证据强度**：主要声明的置信度在0.95-0.99之间，受Table 1/2/3的定量结果、Theorem 1的理论推导以及Figure 3的消融实验支撑。当前框架的局限性在于仅适用于基于MLP的快速权重，对非自回归任务的有效性未经验证。
 
-## 背景与动机
+
 
 大语言模型在推理时面临一个根本性瓶颈：模型参数一旦训练完成便完全冻结，无法根据持续变化的上下文进行动态适应。这种静态特性严重限制了模型在长序列推理和在线学习场景中的表现——当上下文长度远超训练时所见范围，或当输入分布发生漂移时，固定参数的模型难以有效捕捉新出现的模式与依赖关系。
 
@@ -71,7 +73,9 @@ claims:
 
 针对上述缺口，In-Place TTT提出了三个层面的解决方案：通过复用MLP块中已有的最终投影矩阵作为快速权重存储器，实现零架构侵入的即插即用增强；设计显式对齐NTP目标的学习信号，使快速权重更新方向与语言建模任务保持一致；提出大块并行更新策略，将逐token的顺序更新替换为chunk级别的并行计算，在保持因果性的同时大幅提升推理效率。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 In-Place TTT 的核心创新在于将 LLM 中已有的 MLP 组件原位复用为测试时训练的快速权重存储器，从而在不改变模型架构的前提下赋予模型推理时的动态上下文适应能力。这一设计围绕三个相互耦合的 changed slots 展开。
 
@@ -105,7 +109,7 @@ $$\mathbf{W}_{\mathrm{down}}^{(i)} = \mathbf{W}_{\mathrm{down}}^{(i-1)} + \eta \
 
 上述三个 changed slots 并非孤立存在，而是形成了一条因果链：MLP 的原位复用（slot 1）使得模型无需额外参数即可承载快速权重，从而允许使用大 chunk 进行高效更新（slot 3）；而 chunk-wise 更新的可行性又为引入需要聚合局部未来信息的 NTP 对齐目标（slot 2）提供了结构基础。三者共同作用，使得 In-Place TTT 能够在保持即插即用和高效推理的前提下，将 LLM 的长上下文推理能力提升到新的水平——在 RULER 基准上，Qwen3-4B-Base 的 128k 准确率从 74.8% 提升至 77.0%，并保持到 256k 的外推能力（Table 1）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_dTWfCLSoyl/figures/006_Figure_3.jpg]]
 *Figure 3: Ablation studies on the key design choices of the In-Place TTT framework, evaluated on the RULER benchmark with a 1.7B parameter model. The plots illustrate the impact of: (a) State size, showing that performance improves as the state size scales; (b) Chunk size, demonstrating a performance trade-off where intermediate sizes (e.g., 512, 1024) are optimal; and (c) The LM-Aligned Value objective, confirming that both the convolution (w Conv) and the projection (w Proj) are crucial*
@@ -142,7 +146,7 @@ $$\hat{\mathbf{V}} = \operatorname{Conv1D}(\mathbf{X}_0) \mathbf{W}_{\text{targe
 
 框架采用大块（chunk size ≥ 512）并行更新策略，取代了传统TTT逐token顺序更新的低效方式。这一设计充分利用现代硬件的并行计算能力，同时得益于原位MLP适配的特性，可以使用较大的块大小 $C$ 一次性处理大量token。实验表明，chunk size为512和1024时取得最佳性能，且更大的chunk在效率上更具优势。效率分析确认，In-Place TTT在实际场景中引入的计算和内存开销几乎可以忽略不计。
 
-## 核心模块与公式推导
+
 
 ### 原位MLP快速权重模块
 
@@ -213,7 +217,9 @@ $$
 
 其中 $\tau$ 为裁剪阈值，$\Delta \mathbf{W}_{\mathrm{down}}^{(i)} = \eta \hat{\mathbf{V}}_{[i]}^{\top} \mathbf{Z}_{[i]}$。该操作确保每次更新的幅度有界，从而保证推理过程的数值稳定性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 即插即用增强：预训练LLM的长上下文能力跃升
 
@@ -306,7 +312,9 @@ $$\Delta W_{\text{down}}^{(i)} \leftarrow \tau \cdot \Delta W_{\text{down}}^{(i)
 ![[assets/figures/papers/paper_list_l5_https_openreview_net_forum_id_dTWfCLSoyl/figures/012_Table_8.jpg]]
 *Table 8: Model architectural configurations for 500M and 1.5B Model*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有TTT工作的关系
 
@@ -349,6 +357,8 @@ In-Place TTT建立在测试时训练（Test-Time Training）这一研究脉络�
 4. **TTT优化器设计**：不同的损失函数（如对比损失、余弦相似度）和优化器选择对快速权重更新质量的影响尚未系统探索。是否存在比当前负Frobenius内积更优的相似度度量？
 
 5. **与KV缓存的关系**：快速权重本质上提供了一种压缩的上下文表示，能否将其与KV缓存压缩技术（如StreamingLLM、H2O）协同设计，实现更高效的长序列推理？
+
+
 
 ## 原文 PDF
 

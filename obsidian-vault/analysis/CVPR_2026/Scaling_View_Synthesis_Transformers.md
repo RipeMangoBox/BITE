@@ -43,7 +43,7 @@ claims:
 > - DL3DV (V_C=4) 上，PSNR / SSIM / LPIPS 26.87 / 0.853 / 0.129 (SVSM 400M, Pareto-optimal) vs 26.19 / 0.830 / 0.145 (LVSM decoder-only + PRoPE 171M) (+0.68 PSNR, -0.016 LPIPS)。
 > - RealEstate10K (V_C=2) 缩放Pareto 上，训练计算量-性能Pareto前沿 SVSM前沿左移约3x vs LVSM前沿 (相同性能下训练计算量减少约3倍)。
 
-## 概述
+## 概要
 
 视图合成（Novel View Synthesis）旨在从稀疏的上下文图像中渲染新视角场景。近年来，基于Transformer的通用视图合成模型——如**LVSM**（Large View Synthesis Model）——取得了显著进展，但其decoder-only架构存在根本性效率瓶颈：每个目标视图都需要重新处理全部上下文视图，导致计算量随目标视图数 $V_T$ 和上下文视图数 $V_C$ 呈 $V_T(V_C+1)$ 增长。这使得模型在缩放训练和推理时面临严重的计算效率问题。
 
@@ -59,7 +59,7 @@ claims:
 
 SVSM在RealEstate10K和DL3DV上均取得新SOTA，且推理速度显著优于LVSM，为视图合成Transformer的高效缩放提供了新范式。
 
-## 背景与动机
+
 
 ### 问题背景：视图合成中的计算瓶颈
 
@@ -98,7 +98,9 @@ LVSM decoder-only架构虽然在双目重建（$V_C=2$）上达到了领先性�
 
 Figure 1 直观展示了核心动机的实现结果：在RealEstate10K数据集上，SVSM的Pareto前沿相比LVSM左移约3倍——即在相同渲染质量下，所需训练计算量仅为原来的1/3，同时保持几乎相同的缩放曲线斜率与曲率。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新并非引入全新的网络模块，而是通过**架构范式转换**（decoder-only → encoder-decoder）与**训练效率认知**（有效批量大小）的协同，在保持缩放能力的前提下大幅降低视图合成Transformer的计算成本。以下从三个递进的维度剖析其创新机理。
 
@@ -137,7 +139,7 @@ encoder-decoder架构在双目（$V_C=2$）设置下表现优异，但在多视�
 
 为支持不同深度模型的公平缩放比较，SVSM在每个残差分支上乘以 $1/\sqrt{L}$（$L$ 为层数），以抑制深层网络的梯度/激活方差膨胀。该设计并非性能提升的关键来源，但保证了缩放实验中不同深度配置的训练稳定性，是缩放定律可靠拟合的技术前提。
 
-## 整体框架
+
 
 本文提出**可缩放视图合成模型（Scalable View Synthesis Model, SVSM）**，一种面向新视图合成（Novel View Synthesis, NVS）的编码器-解码器Transformer架构。其核心设计目标是在保持与现有decoder-only方法相同缩放行为的前提下，显著降低训练和推理的计算成本。
 
@@ -188,7 +190,7 @@ MLP计算量从乘积关系降为加和关系，注意力计算量也从二次�
 ![[assets/figures/papers/paper_list_l2586_https_arxiv_org_abs_2602_21341/figures/002_Figure_2.jpg]]
 *Figure 2: Architectures of the current SOTA, the decoder-only LVSM [10] (a) and SVSM (ours, b). Our cross-attention based decoder enables parallel rendering of multiple target views after a single scene encoding. Each target view is decoded independently given the shared scene representation, but the cross-attention allows these independent decodings to be executed in parallel*
 
-## 核心模块与公式推导
+
 
 ### 3.1 新视图合成问题的形式化
 
@@ -263,7 +265,9 @@ $$\mathcal{L} = \mathbf{MSE}(I_T, \tilde{I}_T) + \lambda \cdot \mathbf{Perceptua
 ![[assets/figures/papers/paper_list_l2586_https_arxiv_org_abs_2602_21341/figures/009_Figure_6.jpg]]
 *Figure 6: Multiview PRoPE. We find that multiview projective RoPE embeddings [13, 14, 18] are critical for our model to scale with compute and data in the multiview setting*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心缩放定律验证
 
@@ -341,7 +345,9 @@ $$\mathcal{L} = \mathbf{MSE}(I_T, \tilde{I}_T) + \lambda \cdot \mathbf{Perceptua
 ![[assets/figures/papers/paper_list_l2586_https_arxiv_org_abs_2602_21341/figures/017_Figure_10.jpg]]
 *Figure 10: Linear Power Scaling Laws. We fit scaling laws onto sections of the Pareto-frontiers of the model families. We see that both models have approximately the same slope in each of their corresponding sections, indicating equal scaling*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 架构范式：从Decoder-Only到Encoder-Decoder的缩放重构
 
@@ -418,6 +424,8 @@ SVSM的核心贡献在于将视图合成Transformer的缩放问题从“如何�
 | 缩放系数 | $a \neq b$ | $a \approx b$ |
 
 该工作为视图合成Transformer的缩放研究建立了可复现的基准和理论框架，但其缩放定律的普适性——尤其是在更大规模、无重复数据上的表现——仍需后续工作验证。
+
+
 
 ## 原文 PDF
 

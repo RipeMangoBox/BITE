@@ -43,7 +43,7 @@ claims:
 > - Neu3D (novel-view panoptic segmentation) 上，mIoU 88.31 vs 82.49 (VLGS) (+5.82)；mAcc-inst (实例平均精度) 93.19 vs 90.69 (VLGS) (+2.50)。
 > - HyperNeRF (open-vocabulary 4D querying) 上，mIoU (平均) 84.90 vs 57.83 (SA4D) (+27.07)。
 
-## 概述
+## 概要
 
 动态场景理解的核心挑战在于，如何在物体变形、相机运动和遮挡变化的条件下，保持对场景中各个实例的稳定、一致的语义描述。现有方法——例如基于可变形 3D Gaussian 的 **SA4D**、**4D LangSplat** 以及 **VLGS**——普遍依赖视角相关的 RGB 调制特征来推断语义，这带来了三个结构性缺陷：第一，实例身份与表面辐射特性耦合，导致同一物体在不同视角下被赋予不一致的身份；第二，将颜色的透明度（alpha）直接等同于物理占位，混淆了“可见”与“存在”；第三，高斯体的空间分布由初始几何密度决定，语义活跃区域可能容量不足，造成边界模糊和实例碎片化。
 
@@ -53,7 +53,7 @@ claims:
 
 实验在两个动态场景基准上验证了 CIF 的有效性。在新视角全景分割任务中，CIF 在 **HyperNeRF** 数据集上取得了 79.47 的平均 mIoU，较 **VLGS** 的 68.05 提升 11.42；在 **Neu3D** 数据集上达到 88.31 mIoU，较 VLGS 提升 5.82。开放词汇 4D 查询任务中，CIF 以 84.90 的平均 mIoU 大幅领先 **SA4D** 的 57.83。消融实验进一步证实，独立占位建模、身份校准和实例引导重采样三者缺一不可：移除任一组件均会导致语义漂移、边界模糊和跨视角一致性下降。
 
-## 背景与动机
+
 
 随着神经渲染技术的快速演进，动态场景理解已成为计算机视觉领域的核心挑战之一。现有方法在静态场景的语义分割与三维重建上取得了显著进展，但将这些能力迁移至动态场景时，普遍面临一个根本性瓶颈：**实例身份与表面外观的耦合**。
 
@@ -67,7 +67,9 @@ claims:
 
 基于上述动机，本文提出 **Consistent Instance Field (CIF)**，一种面向动态场景的连续概率时空形式化框架。CIF 的核心洞察在于：将动态场景建模为 4D 联合分布 $\gamma(\mathbf{x}, t, k) = P(E=1, K=k \mid \mathbf{x}, t)$，并将其分解为占位概率 $\pi(\mathbf{x}, t)$ 和条件实例分布 $p(\mathbf{x}, t, k)$ 的乘积。通过这一解耦，CIF 在可变形 Gaussian 表示的基础上，引入独立占位建模、身份校准和实例引导重采样三个关键模块，系统性地解决了上述瓶颈问题。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈与突破口
 
@@ -115,7 +117,7 @@ $$\alpha_{\mathrm{src}}^{\mathrm{new}} = 1 - (1 - \alpha_{\mathrm{src}})^{1/(n+1
 
 CIF 的三个改动槽位形成闭环：**占位解耦**提供干净的物理存在信号，**身份校准**消除视角偏差以获得稳定身份，**引导重采样**将有限的高斯容量动态聚焦于语义关键区。三者共同支撑起一个在变形和视角变化下维持连贯语义描述的 4D 实例一致性场。
 
-## 整体框架
+
 
 CIF 将动态场景建模为一个定义在 4D 时空域上的**一致实例场**（Consistent Instance Field），其核心是一个联合编码“物理存在性”与“实例身份”的连续概率场。如图 2 所示，整个 pipeline 由四个关键模块串联构成：场形式化与高斯表征、实例身份估计与校准、实例引导重采样，以及场感知 Splatting 渲染。
 
@@ -136,7 +138,7 @@ CIF 将动态场景建模为一个定义在 4D 时空域上的**一致实例场*
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2512_14126/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of our Consistent Instance Field. Our method models each dynamic scene as a continuous 4D Consistent Instance Field that encodes existence and identity distributions (Sec. 3.1.1). We realize the field as an Instance-Embedded Gaussian Representation, which jointly models geometry, appearance, occupancy, and instance identity (Sec. 3.1.2). (Bottom) Instance Identity Estimation. Per-Gaussian identity distributions are inferred by aggregating 2D observations over time and views. A learnable calibration then corrects visibility-induced biases (Eqs. (6), (7), (8)), yielding stable identity under occlusion and appearance changes (Sec. 3.2). (Right) Instance-Guided Resampling. To align rep...*
 
-## 核心模块与公式推导
+
 
 CIF 将动态场景建模为一个连续的概率场，其核心由四个紧密耦合的模块构成：场形式化、身份估计与校准、实例引导重采样，以及场感知 Splatting 渲染。
 
@@ -201,7 +203,9 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{rgb}} + \lambda_{\mathrm{inst}} \mathcal{L}
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2512_14126/figures/001_Figure_1.jpg]]
 *Figure 1: Comparisons with prior work SA4D [16]. Previous methods like SA4D often rely on view-dependent features with RGB modulation, leading to semantic inconsistencies in dynamic scenes: unstable under cross-view instance supervision, confusing color opacity with object occupancy, and underrepresenting semantically meaningful regions. Our approach formulates a continuous probabilistic field over existence and identity in space-time, enabling identity modeling beyond visibility cues and adaptive redistribution of Gaussian capacity. This results in a coherent instance field across deformation and changing viewpoints*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -284,7 +288,9 @@ Figure 6 的定性消融可视化直观展示了各配置的分割质量差异�
 3. **开放词汇评估缺乏标准基准**：4D 查询任务使用 Grounded DINO 生成的 2D 掩码作为伪真值，边界精度受语言模型区域理解能力限制，定量结果存在近似偏差。
 4. **对初始几何重建的依赖**：CIF 的语义优化建立在预训练的几何高斯场之上，若初始重建质量不足（如极端稀疏视角），语义场也会受到连带影响。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 动态场景语义建模的演进脉络
 
@@ -325,6 +331,8 @@ CIF 的当前设计存在明确的适用边界：
 3. **标准化的 4D 开放词汇评估协议**：建立标准化的 4D 开放词汇查询评估协议和数据集，将有助于公平比较不同方法，推动领域的健康发展。
 
 4. **实例场的编辑与交互**：CIF 的显式占位与身份解耦为场景编辑提供了自然的接口——修改 $\pi_i$ 可控制物体的存在性，修改 $p_i^k$ 可改变物体身份。探索基于 CIF 的 4D 编辑应用是一个有前景的方向。
+
+
 
 ## 原文 PDF
 

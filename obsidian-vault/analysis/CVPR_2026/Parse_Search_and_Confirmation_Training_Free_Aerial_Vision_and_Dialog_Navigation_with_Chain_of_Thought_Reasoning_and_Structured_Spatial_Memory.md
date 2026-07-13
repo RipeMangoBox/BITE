@@ -41,7 +41,7 @@ claims:
 > - ANDH Unseen Val 上，SPL 17.8 vs 3.4 (+14.4)；SR 22.6 vs 3.9 (+18.7)；GP 39.2 vs -11.8 (+51.0)。
 > - ANDH-Full Unseen Val 上，SPL 12.4 vs N/A (GPT-4o not reported) (N/A)；SR 15.4 vs N/A (N/A)；GP 62.3 vs N/A (N/A)。
 
-## 概述
+## 概要
 
 空中视觉对话导航（Aerial Vision-and-Dialog Navigation, AVDN）要求无人机在对话交互中理解人类指令，在高空遥感影像中定位并导航至目标区域。现有方法面临两个核心瓶颈：其一，**多模态大语言模型（MLLM）在高空视角下缺乏鲁棒的空间定位和场景理解能力**，难以将模糊的方向短语（如“10点钟方向”）转化为精确的几何约束；其二，**模型缺乏全局空间理解与时间状态跟踪**，导致导航过程不可靠，容易误停或漏检。
 
@@ -54,7 +54,7 @@ claims:
 
 在 ANDH 和 ANDH-Full 数据集上，PSC-AVDN 在训练免设置下达到最优性能，匹配甚至超过多个监督微调方法（如 **FELA w/ attn**（Su et al., AAAI 2025）、**NavAgent**（Liu et al., arXiv 2024）和 **OpenFly**（Gao et al., arXiv 2025））。以 ANDH Unseen Val 为例，PSC-AVDN 的 SPL 达到 17.8、SR 达到 22.6、GP 达到 39.2，相较 GPT-4o 朴素基线（SPL 3.4, SR 3.9, GP -11.8）有大幅提升。消融实验表明，三阶段推理各步骤逐步提升性能，SSM 模块中 SVM、MVO 和 SGM 三者联合贡献显著，5×5 参考网格尺寸与缩放因子组合 (3,5,7) 为最优配置。
 
-## 背景与动机
+
 
 空中视觉对话导航（Aerial Vision-and-Dialog Navigation, AVDN）要求无人机根据自然语言对话指令，在高空遥感视角下定位并导航至指定目标区域。与传统地面视觉导航不同，AVDN面临两个核心挑战：其一，对话指令中常包含模糊的方向描述（如“10点钟方向”），缺乏精确的几何参照；其二，高空俯视影像与地面训练数据之间存在显著的域差异，导致依赖地面数据训练的模型难以迁移。
 
@@ -64,7 +64,9 @@ MLLM基线失效的根本原因可归结为三个层面：**方向理解歧义**
 
 针对上述瓶颈，PSC-AVDN提出了一条训练免的技术路径，其核心洞察是：将模糊的对话指令解析为明确的几何方向与目标描述，通过思维链逐步搜索候选区域，再利用细粒度确认消除视觉歧义，并利用多尺度视觉观察、空间视觉记忆和结构化几何记忆为推理提供全局空间上下文和长期一致性。这一设计使得模型无需任何任务特定训练数据，即可在ANDH和ANDH-Full数据集上达到甚至超越多个监督微调方法的性能水平（Table 1）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PSC-AVDN的核心创新在于将空中视觉对话导航分解为“解析—搜索—确认”三阶段推理流程，并与结构化空间记忆（SSM）深度耦合，从而在训练免（training-free）设置下解决了MLLM在高空视角下的三个根本性缺陷：方向歧义、缺乏结构化搜索策略、以及空间上下文缺失。
 
@@ -94,7 +96,7 @@ MLLM基线缺乏全局空间理解与历史状态跟踪，无法利用已探索�
 
 网格尺寸消融（Table 4）显示$5\times5$参考网格取得最佳性能，过大或过小的网格均会损害空间感知精度。多尺度裁剪缩放因子消融（Table 5）表明$(3,5,7)$组合优于其他配置，说明同时覆盖局部细节与全局上下文对高空目标定位至关重要。需注意，这些超参数目前需根据场景手动调整，自适应选择机制尚缺。
 
-## 整体框架
+
 
 PSC-AVDN 构建了一个训练免（training-free）的三阶段推理流水线，将空中视觉对话导航形式化为一个跨模态映射问题。给定第 $l$ 轮对话指令 $\mathcal{U}_l$，模型需要在时间窗口 $[t_l^s, t_l^e]$ 内逐步推理，最终输出目标边界框 $\mathcal{B}_l$。整个框架的核心映射关系为：
 
@@ -133,7 +135,7 @@ SSM 为搜索和确认阶段提供全局空间上下文与时间连续性，包�
 ![[assets/figures/papers/paper_list_l2182_https_openaccess_thecvf_com_content_CVPR2026_html_Qi_Parse_Search_and_Co/figures/002_Figure_2.jpg]]
 *Figure 2: The overall architecture of our proposed Parsing-Search-Confirmation framework for Aerial Vision-and-Dialog Navigation (PSC-AVDN). (a) The three-stage reasoning process first parses the destination and direction, followed by navigation through the stepwise reasoning chain (S-CoT and C-CoT), gradually searching and confirming the target location. (b) The Structured Spatial Memory (SSM) module provides multi-scale visual observation (MVO), spatial visual memory (SVM), and structured geometric memory (SGM) to enhance the search-confirmation process*
 
-## 核心模块与公式推导
+
 
 ### 3.1 跨模态映射形式化
 
@@ -199,7 +201,9 @@ $$\mathcal{R}_t = \mathrm{Update}(\mathcal{R}_{t-1}, \bar{\mathcal{R}}_t)$$
 ![[assets/figures/papers/paper_list_l2182_https_openaccess_thecvf_com_content_CVPR2026_html_Qi_Parse_Search_and_Co/figures/003_Figure_3.jpg]]
 *Figure 3: SSM Module diagram. A concrete case is presented to demonstrate how the SSM module operates within the CoT process. The module consists of three main parts: (a) Multi-scale Visual Observation (MVO): Visual inputs at different scales help the model acquire various levels of visual information. (b) Spatial Visual Memory (SVM): Historical information is fused with the current CoT to ensure temporal and spatial continuity and consistency in the reasoning process. (c) Structured Geometric Memory (SGM): The model is guided to generate a reference grid map to assist in spatial perception and reasoning*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -251,7 +255,9 @@ Figure 4展示了PSC-AVDN在两轮对话和单轮指令场景下的导航轨迹�
 ![[assets/figures/papers/paper_list_l2182_https_openaccess_thecvf_com_content_CVPR2026_html_Qi_Parse_Search_and_Co/figures/008_Figure_4.jpg]]
 *Figure 4: Visualization of navigation trajectories from our PSC-AVDN. (a) represents a two-round dialogue case, and (b) represents a single-round instruction case. The yellow dashed line indicates the navigation trajectory, while the red rectangle denotes the target area*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位与基线谱系
 
@@ -300,6 +306,8 @@ PSC-AVDN 的性能跃升源于对瓶颈的精准拆解与针对性干预：
 - **效率优化**：通过模型蒸馏、推理缓存或早停策略降低多阶段推理的计算开销，满足实时导航需求。
 
 *注：以上开放问题均来自论文未覆盖的维度，具体影响程度需通过后续实验验证。*
+
+
 
 ## 原文 PDF
 

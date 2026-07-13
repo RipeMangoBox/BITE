@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/3DGEER_3D_Gaussian_Rendering_Made_Exact_and_Efficient_for_Generic_Cameras.pdf
+project_link: null
+code_link: null
 aliases:
 - 33GRMEEGC
 acceptance: accepted
@@ -41,7 +43,7 @@ paradigm: 通过将每个3D高斯映射到各向同性的规范坐标系，光�
 > - ScanNet++ (Full FoV) 上，SSIM↑ 为 0.953，对比 0.933 (FisheyeGS)，变化 +0.020。
 > - ScanNet++ (Full FoV) 上，LPIPS↓ 为 0.126，对比 0.150 (FisheyeGS)，变化 -0.024。
 
-## 概述
+## 概要
 
 3DGEER（3D Gaussian Rendering Made Exact and Efficient for Generic Cameras）发表于 ICLR 2026，旨在解决现有三维高斯渲染方法在通用相机（尤其是大视场相机）下无法同时兼顾投影几何精确性与实时渲染效率的核心矛盾。现有基于splatting的方法（如3DGS、FisheyeGS）依赖局部仿射近似，在大视场下引入严重投影误差；而基于光线追踪的方法（如EVER、3DGRT）虽能实现精确渲染，但依赖昂贵的BVH遍历，帧率极低。
 
@@ -49,7 +51,7 @@ paradigm: 通过将每个3D高斯映射到各向同性的规范坐标系，光�
 
 实验结果表明，3DGEER在多个基准上显著超越现有方法：在ScanNet++全视场上达到31.50 PSNR，相比FisheyeGS的27.90 PSNR提升3.6 dB；在MipNeRF360上达到27.76 PSNR，超越3DGS的27.21 PSNR，同时保持327 FPS的实时帧率，比现有精确光线追踪方法快约5倍。在ZipNeRF跨相机泛化实验中，3DGEER在最具挑战性的Pinhole训练-Fisheye测试设置下显著优于所有基线。此外，PBF关联仅需0.63 GB显存，每tile关联高斯数仅为475，远少于EWA的2203。方法仅需550-700K高斯即可达到32.1 PSNR，而FisheyeGS扩展到3.6-5M高斯后PSNR饱和于29.3，证明暴力缩放无法弥合投影精确性的差距。
 
-## 背景与动机
+### 背景与动机
 
 现有基于3D高斯（3D Gaussian Splatting）的新视角合成方法，在渲染质量与速度之间取得了显著成功，但其核心瓶颈在于无法同时满足**投影几何的精确性**与**实时渲染的效率**。具体而言，主流方法可分为两类，各自存在根本性缺陷：
 
@@ -59,7 +61,7 @@ paradigm: 通过将每个3D高斯映射到各向同性的规范坐标系，光�
 
 **本文动机**：针对上述“精确性-效率”不可兼得的困境，3DGEER提出一种全新的范式，旨在无需BVH遍历的前提下，实现与相机模型无关的、投影精确的渲染。其核心洞察在于：通过将每个3D高斯变换到一个各向同性的规范坐标系（canonical space），光线-高斯密度积分可以简化为一个闭合形式的解析解（Eq. 4），该解仅依赖于光线到高斯中心的马氏距离。这一发现使得精确的透射率计算成为可能，且避免了splatting中的投影近似。此外，为了高效地建立光线与高斯之间的关联，3DGEER提出了粒子包围视锥（PBF）的概念，在角度域为每个高斯解析求解其精确的包围视锥，从而实现了视锥级（而非像素级或场景级）的关联，兼顾了精确性与并行效率。
 
-## 核心创新
+## 核心方法与创新机理
 
 3DGEER的核心创新在于同时解决了现有3D高斯渲染方法在投影几何精确性与实时效率之间的根本矛盾。其关键洞察是将光线-粒子关联从图像空间的近似映射或场景级的BVH遍历，提升至**相机子视锥（CSF）与粒子包围视锥（PBF）之间的精确视锥级关联**，并推导出闭合形式的解析解，从而在GPU上实现高效并行化。这一创新体现在三个紧密耦合的组件中。
 
@@ -80,9 +82,9 @@ paradigm: 通过将每个3D高斯映射到各向同性的规范坐标系，光�
 
 这三个创新协同作用的结果是：3DGEER在ScanNet++全FoV上达到31.50 PSNR，远超FisheyeGS的27.90 PSNR和3DGUT的28.14 PSNR（Table 2）；在MipNeRF360上达到27.76 PSNR，超越3DGS（27.21 PSNR），同时保持**327 FPS**的实时帧率（Table 4）。值得注意的是，暴力增加高斯数无法弥合投影精确性的差距——当FisheyeGS扩展到3.6-5M高斯时，PSNR饱和于29.3，而3DGEER仅需550-700K高斯即可达到32.1 PSNR（Figure 5）。这从根本上证明了投影精确性而非模型容量是当前渲染质量的主要瓶颈。
 
-## 整体框架
+### 整体框架
 
-![[obsidian-vault/assets/figures/papers/iclr26_0001_4voMNlRWI7_3DGEER_3D_Gaussian_Rendering_Made_Exact_and_Effi/figures/001_Figure_1.jpg]]
+![[assets/figures/papers/iclr26_0001_4voMNlRWI7_3DGEER_3D_Gaussian_Rendering_Made_Exact_and_Effi/figures/001_Figure_1.jpg]]
 *Figure 1: Linear Approximation Error in Ray-Particle Association. (Left) Grid-line artifacts caused by inaccurate UT association. (Right) Diagram illustrating our association and comparison with others. Our method avoids the intermediate conic approximation by directly computing the exact bounding structure from the true 3D covariance*
 
 3DGEER的pipeline围绕三个核心设计点展开：**精确的投影几何**、**高效的视锥级关联**以及**统一的FoV表示**。其整体流程可概括为：输入任意相机模型下的光线，通过规范变换将每个3D高斯映射到各向同性坐标系，利用闭合形式的透射率公式（Eq. 4）实现精确可微渲染；同时，通过粒子包围视锥（PBF）在角度域中解析计算每个高斯的精确边界，并与相机子视锥（CSF）进行视锥级关联，替代了传统splatting方法中的局部仿射近似和光线追踪方法中的BVH遍历；最后，使用双极等角投影（BEAP）在角度域(θ, φ)中均匀采样光线，统一不同FoV相机的图像表示。
@@ -103,7 +105,7 @@ paradigm: 通过将每个3D高斯映射到各向同性的规范坐标系，光�
 
 **关键设计权衡：** 3DGEER的核心瓶颈在于现有方法无法同时实现投影精确性和实时效率。其因果旋钮在于将关联从图像空间或场景级BVH提升至视锥级，并通过解析解实现高效GPU并行化。这一设计使得3DGEER在ScanNet++全FoV上达到31.50 PSNR（远超FisheyeGS的27.90），同时在MipNeRF360上保持327 FPS的实时帧率，相比3DGS的134 FPS提升约2.4倍（Table 4）。值得注意的是，该框架的精确性来自两个层面：渲染公式的投影精确性（Eq. 4）和关联方法的投影精确性（PBF），二者缺一不可——Table 5显示，仅替换透射率公式即可带来3.6 dB的PSNR提升。
 
-## 核心模块与公式推导
+### 核心模块与公式推导
 
 ### 3.1 精确投影几何的渲染公式
 
@@ -170,21 +172,21 @@ BEAP的核心思想是将像素网格映射到单位球面上的等角分布，�
 
 缩放和旋转的梯度通过链式法则经由PCA矩阵进一步传播（Eq. C.12-C.14）。该梯度公式避免了GOF中因数值不稳定性导致的伪影（Figure C.1）。
 
-## 实验与分析
+## 实验与关键发现
 
-![[obsidian-vault/assets/figures/papers/iclr26_0001_4voMNlRWI7_3DGEER_3D_Gaussian_Rendering_Made_Exact_and_Effi/figures/002_Table_1.jpg]]
+![[assets/figures/papers/iclr26_0001_4voMNlRWI7_3DGEER_3D_Gaussian_Rendering_Made_Exact_and_Effi/figures/002_Table_1.jpg]]
 *Table 1: Summary of Particle Rendering Methods w.r.t. Projective Exactness. The top section lists splatting-based methods, while the bottom section presents ray-based approaches—some of which still rely on projective approximated association (e.g., EWA or Unscented Transform)*
 
-![[obsidian-vault/assets/figures/papers/iclr26_0001_4voMNlRWI7_3DGEER_3D_Gaussian_Rendering_Made_Exact_and_Effi/figures/013_Table_2.jpg]]
+![[assets/figures/papers/iclr26_0001_4voMNlRWI7_3DGEER_3D_Gaussian_Rendering_Made_Exact_and_Effi/figures/013_Table_2.jpg]]
 *Table 2: Comparison on the ScanNet++ Dataset. Each method is trained either on the full FoV or only the central region, and then evaluated on the full, central, and peripheral regions to assess robustness under varying distortions. Region-wise metrics are weighted by pixel masks, while LPIPS is excluded since it is not directly separable by region (Tab. K.2 shows full stats)*
 
-![[obsidian-vault/assets/figures/papers/iclr26_0001_4voMNlRWI7_3DGEER_3D_Gaussian_Rendering_Made_Exact_and_Effi/figures/014_Table_3.jpg]]
+![[assets/figures/papers/iclr26_0001_4voMNlRWI7_3DGEER_3D_Gaussian_Rendering_Made_Exact_and_Effi/figures/014_Table_3.jpg]]
 *Table 3: Comparison on the ZipNeRF Dataset. The experiments follow a cross-camera generalization setup, where each method is trained on either Fisheye (FE, 1/8 resolution) or Pinhole (PH, 1/4 resolution) data and evaluated separately on both Fisheye and Pinhole test sets (Tab. K.9 shows full stats). Qualitatively (Fig. 6), we evaluate extreme-FoV generalization by training on the original dataset FoV (180◦ diagonal FoV) but testing at much wider FoVs (180◦ FoV, circular shape). 3DGEER reconstructs complete scenes with fewer Gaussians, while splatting-based methods such as FisheyeGS degrade significantly at the periphery (see more visuals in Fig. K.1-K.2 with extreme FoV)*
 
-![[obsidian-vault/assets/figures/papers/iclr26_0001_4voMNlRWI7_3DGEER_3D_Gaussian_Rendering_Made_Exact_and_Effi/figures/015_Table_4.jpg]]
+![[assets/figures/papers/iclr26_0001_4voMNlRWI7_3DGEER_3D_Gaussian_Rendering_Made_Exact_and_Effi/figures/015_Table_4.jpg]]
 *Table 4: Quantitative Results on the MipNeRF360 Dataset. In addition to quality metrics, FPS is reported using an RTX 4090 as the default benchmark. Numbers sourced from original works are marked with † (measured on RTX 6000 Ada) and ‡ (measured on RTX 5090)*
 
-![[obsidian-vault/assets/figures/papers/iclr26_0001_4voMNlRWI7_3DGEER_3D_Gaussian_Rendering_Made_Exact_and_Effi/figures/021_Table_5.jpg]]
+![[assets/figures/papers/iclr26_0001_4voMNlRWI7_3DGEER_3D_Gaussian_Rendering_Made_Exact_and_Effi/figures/021_Table_5.jpg]]
 *Table 5: Training-Time Transmittance Replacement on ScanNet++. Using splatting-based transmittance increases the Gaussian count due to larger approximation error, yet the perceptual gap remains compared with our projective-exact formulation (Tab. K.7 shows the full stats)*
 
 ### 主结果
@@ -213,7 +215,7 @@ BEAP的核心思想是将像素网格映射到单位球面上的等角分布，�
 
 当前公式对每个高斯独立积分，不显式处理自遮挡，排序通过深度排序处理。在极端配置下（如大量半透明高斯重叠），可能出现罕见的popping伪影。方法假设光线与高斯密度函数的最大响应点相交，该假设对标准各向同性高斯严格成立，但对于极端细长的高斯存在近似误差。PBF关联使用λ=3标准差轮廓，对于某些远离相机的高斯可能不够精确，需要镜像变换处理。
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 与 Baseline/Follow-up 的关系
 
@@ -251,12 +253,13 @@ BEAP的核心思想是将像素网格映射到单位球面上的等角分布，�
 
 **需人工验证的点**：3DGEER 在极端细长高斯下的近似误差边界尚未被定量表征，附录中仅定性提及。该点的实际影响程度需进一步实验验证。
 
+### 相关样本
+
+- [[analysis/ICLR_2026/A2TG_Adaptive_Anisotropic_Textured_Gaussians_for_Efficient_3D_Scene_Representation.md|A2TG]]：同属 3D Gaussian / scene representation 样本，可对照解析渲染与纹理高斯表示的不同瓶颈。
+
+
 ## 原文 PDF
 
 PDF 文件：paperPDFs/ICLR_2026/3DGEER_3D_Gaussian_Rendering_Made_Exact_and_Efficient_for_Generic_Cameras.pdf
 
-## 相关样本
-
-- [[obsidian-vault/analysis/ICLR_2026/A2TG_Adaptive_Anisotropic_Textured_Gaussians_for_Efficient_3D_Scene_Representation.md|A2TG]]：同属 3D Gaussian / scene representation 样本，可对照解析渲染与纹理高斯表示的不同瓶颈。
-
-![[obsidian-vault/paperPDFs/ICLR_2026/3DGEER_3D_Gaussian_Rendering_Made_Exact_and_Efficient_for_Generic_Cameras.pdf]]
+![[paperPDFs/ICLR_2026/3DGEER_3D_Gaussian_Rendering_Made_Exact_and_Efficient_for_Generic_Cameras.pdf]]

@@ -43,7 +43,7 @@ claims:
 > - ZJU-MoCap 上，PSNR↑ 23.96 vs OccGaussian (23.29) (+0.67)；SSIM↑ 0.9548 vs OccGaussian (0.9482) (+0.0066)；LPIPS↓ (×1000) 32.34 vs OccGaussian (41.93) (-9.59)。
 > - OcMotion 上，PSNR*↑ 18.28 vs OccNeRF (15.71) (+2.57)；SSIM*↑ 0.8875 vs OccNeRF (0.8523) (+0.0352)；LPIPS*↓ (×1000) 82.42 vs OccNeRF (82.90) (-0.48)。
 
-## 概述
+## 概要
 
 **核心问题**：现有单目视频人体渲染方法（如 HumanNeRF、3DGS-Avatar、GauHuman）假设人体各部位始终完全可见。在真实遮挡场景下，部分可见性导致几何不完整、伪影和缺失身体部位，传统方法难以有效处理。
 
@@ -51,7 +51,7 @@ claims:
 
 **主要结果**：在 ZJU-MoCap 模拟遮挡评测集上，OccFusion 取得 PSNR 23.96、SSIM 0.9548、LPIPS 32.34（×1000），显著优于所有基线，尤其在 LPIPS 指标上大幅领先。在真实遮挡数据集 OcMotion 上，OccFusion 在可见像素指标上超过专门为遮挡设计的 NeRF 方法 OccNeRF，PSNR 提高 2.57 dB。逐模块消融实验证实：初始化阶段提升 PSNR 与 SSIM；优化阶段 SDS 正则化移除伪影并增强完整性；精炼阶段使 LPIPS 从 55.35 骤降至 32.34，是整个流程的关键环节。定性对比显示，OccFusion 是唯一能够持续生成锐利、无遮挡、完整人体的方法。训练仅需约 10 分钟（单 TITAN RTX GPU），远快于基于 NeRF 的方法。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -82,7 +82,9 @@ claims:
 
 OccFusion 的核心洞察在于：**将遮挡人体重建解耦为几何补全与外观精炼两个子问题**。几何补全可以通过在二值掩码（而非 RGB 图像）上施加扩散先验来实现——因为人体轮廓对微小变化更宽容，帧间一致性更高；外观精炼则可以利用粗重建结果作为上下文参考，引导扩散模型在未观测区域生成细节合理的外观。这一解耦策略使得 3D 高斯散点的高效性与 2D 扩散先验的生成能力得以互补，从而在仅 10 分钟的训练时间内，实现遮挡人体的完整、锐利渲染。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 OccFusion 的核心创新在于将**生成扩散先验**引入基于 3D 高斯散点的遮挡人体重建，通过**三阶段流水线**将遮挡问题解耦为几何补全与外观精炼两个子问题，并在每个阶段对基线方法进行了针对性改造。
 
@@ -143,7 +145,7 @@ $$\nabla_{\Pi} \left[ \lambda_{rgb} L_1(\mathbf{M} \cdot \mathbf{I}, \mathbf{M} 
 
 上述四个 changed slots 构成了完整的因果链条：**OccGauHuman** 提供遮挡鲁棒的基础表示 → **初始化阶段**生成完整几何监督 → **优化阶段**通过 SDS 正则化强制几何完整性并去除伪影 → **精炼阶段**通过上下文感知修复恢复未观测区域的细节外观。各阶段相互依赖，消融实验（Table 2）证实移除任一阶段均会导致性能下降，完整流水线才能达到最优的 PSNR 23.96、SSIM 0.9548、LPIPS 32.34。
 
-## 整体框架
+
 
 OccFusion 采用**三阶段顺序流水线**，将遮挡人体重建解耦为几何补全与外观精炼两个子问题，并通过生成扩散先验桥接二者。流水线的输入为单目遮挡视频帧 ${\mathbf{I}}$、对应的可见性分割掩码 ${\mathbf{M}}$（由 SAM 提取）以及 SMPL 姿态先验 ${\mathbf{P}}$（由 HMR 2.0 估计），输出为可渲染完整人体的 3D 高斯散点表示 $\Pi$。三阶段的模块关系与数据流如 Figure 2 所示，总训练耗时约 10 分钟（单 TITAN RTX GPU）。
 
@@ -178,7 +180,7 @@ OccFusion 采用**三阶段顺序流水线**，将遮挡人体重建解耦为几
 
 消融实验（Table 2）表明，精炼阶段是整条流水线的关键环节：它使 LPIPS 从 55.35 骤降至 32.34，同时将 PSNR 推至最高的 23.96，显著改善了未观测区域的细节质量。
 
-## 核心模块与公式推导
+
 
 ### 3.1 基础表示：LBS 与 3D 高斯散点
 
@@ -254,7 +256,9 @@ $$\nabla_{\Pi} \left[ \lambda_{rgb} L_1(\mathbf{M} \cdot \mathbf{I}, \mathbf{M} 
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_CZwphz5vgz/figures/003_Figure_3.jpg]]
 *Figure 3: Stable Diffusion 1.5 generations [48] conditioned on a challenging pose P. While conditioning on the original pose results in multiple limbs and other abnormalities, our method of simplifying pose by removing self-occluded joints results in more feasible generations*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -323,7 +327,9 @@ Table 2 报告了在 ZJU-MoCap 上的逐模块消融结果，揭示了各阶段�
 
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_CZwphz5vgz/figures/014_Figure.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 基线谱系与继承关系
 
@@ -394,6 +400,8 @@ OccFusion 将遮挡人体重建解耦为**几何补全**与**外观精炼**两�
 - **多模态条件融合**：结合深度估计、光流等多模态先验，增强对遮挡区域的几何推理能力。
 - **与 NeRF 的混合表示**：探索 3DGS 的效率优势与 NeRF 的连续表示优势的混合方案，在遮挡边界区域获得更平滑的过渡。
 - **在线/实时遮挡处理**：将 OccFusion 的训练时间从 10 分钟进一步压缩至秒级，支持实时遮挡人体渲染应用。
+
+
 
 ## 原文 PDF
 

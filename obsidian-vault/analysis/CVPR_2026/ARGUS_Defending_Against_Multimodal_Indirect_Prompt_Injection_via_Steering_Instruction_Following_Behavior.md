@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/ARGUS_Defending_Against_Multimodal_Indirect_Prompt_Injection_via_Steering_Instruction_Following_Behavior.pdf
+project_link: null
 code_link: null
 aliases:
 - ARGUS
@@ -41,15 +42,13 @@ claims:
 > - Video modality (MSR-VTT) 上，AIA 0.1 vs No Defense (降至接近零)。
 > - Audio modality (Clotho-AQA) 上，AIA 0.0 vs No Defense (降至零)。
 
-## 概述
+## 概要
 
 多模态大模型（MLLM）在集成文本、图像、视频、音频等多源信息时，面临一类严重的安全威胁——**多模态间接提示注入（Indirect Prompt Injection, IPI）**。攻击者将恶意指令嵌入到模型可访问的外部数据中（如图片上的叠加文字、视频字幕或合成音频），诱导模型执行注入指令而非用户的原始意图。现有防御手段——包括系统提示（System Prompt）、忽略指令（Ignore Prompt）、输入噪声（Noise）、指令移除（Removal）和对抗训练（Adversarial Training）——或容易被绕过，或过度依赖特定模态，或严重损害模型在干净输入上的效用，难以在安全与效用之间取得令人满意的平衡。
 
 本文的核心发现是：**MLLM的“遵循用户指令”与“遵循注入指令”这两种行为，在模型激活空间中高度线性可分**。基于这一洞察，ARGUS 提出了一套三阶段、即插即用的防御框架，通过**引导模型内部激活沿安全子空间内的优化方向移动**，使模型优先遵循用户指令，同时最大限度地保持原有效用。具体而言，ARGUS 在激活空间中搜索一个与效用退化方向解耦的最优防御方向，并引入自适应干预强度，使每次引导刚好越过安全边界，避免过度干预损害模型性能。此外，轻量级的注入检测模块按需激活防御，后过滤阶段作为最后防线验证引导结果，进一步降低漏报风险。
 
 在图像（VTQA）、视频（MSR-VTT）和音频（Clotho-AQA）三种模态上的实验表明，ARGUS 将攻击指令遵循率（AIA）降至接近零（图像/视频 0.1，音频 0.0），同时干净用户指令遵循率（UIA_clean）与无防御时完全持平，额外推理时间仅为毫秒级。这一结果验证了**在激活空间内进行解耦的、自适应的行为引导，是实现跨模态、不易绕过且高效的多模态间接提示注入防御的有效路径**。
-
-## 背景与动机
 
 多模态大语言模型（MLLM）在视觉问答、视频理解、语音交互等任务中展现出强大的指令遵循能力，但其对外部多模态数据（图像、视频、音频）的无条件信任引入了严重的安全隐患：**多模态间接提示注入**（Multimodal Indirect Prompt Injection, IPI）。攻击者将恶意指令嵌入外部数据（如在图片中叠加文字、在音频中合成语音），当模型处理这些数据时，注入的指令会劫持模型的指令遵循行为，使其执行攻击者意图而非用户指令。
 
@@ -61,7 +60,7 @@ claims:
 
 上述方法的共同缺陷在于：它们未能触及模型行为控制的根本机制——**激活空间中的指令遵循行为表征**。本文的核心洞察是：若能在模型的激活空间中找到控制指令遵循行为的子空间，并沿该子空间内解耦效用退化的方向进行引导，就有望实现跨模态、不易绕过的鲁棒防御。
 
-## 核心创新
+## 核心方法与创新机理
 
 ARGUS 的核心创新在于将多模态间接提示注入（IPI）防御从“提示工程或对抗训练”的范式，迁移至**模型激活空间内的行为控制**。其关键突破并非发现指令遵循行为的线性可分性，而是解决了该可分性背后隐藏的两个深层瓶颈：**防御方向与效用退化方向的耦合**，以及**固定强度干预对模型效用的损害**。围绕这两个瓶颈，ARGUS 在三个维度上实现了 changed slots。
 
@@ -94,8 +93,6 @@ ARGUS 将单一引导操作重构为**三阶段流水线**（Figure 3），引�
 
 这三个 changed slots 协同作用，使 ARGUS 在图像、视频、音频三种模态上均实现接近零的 AIA（攻击指令遵循率）和 AIFR（攻击指令遵循失败率），同时 UIA_clean 与无防御时完全持平（Table 1），验证了“解耦方向 + 自适应强度 + 按需激活”这一组合策略在安全-效用权衡上的优越性。
 
-## 整体框架
-
 ARGUS 是一个**三阶段级联防御框架**，依次由注入检测（Injection Detection）、激活引导（Activation Steering）和后过滤（Post-filtering）构成（Figure 3）。三个模块分工明确、松耦合，形成“感知—干预—验证”的闭环。
 
 ![[assets/figures/papers/paper_list_l2060_https_arxiv_org_abs_2512_05745/figures/003_Figure_3.jpg]]
@@ -122,8 +119,6 @@ ARGUS 是一个**三阶段级联防御框架**，依次由注入检测（Injecti
 **整体流程总结**：  
 输入 → [注入检测] →（无注入：正常生成；有注入：激活引导 → 生成回答 → 后过滤）→ 输出。  
 三个模块共享同一组线性探针的底层表征，但在不同层级和阶段发挥作用，形成轻量、高效且跨模态统一的防御体系。
-
-## 核心模块与公式推导
 
 ARGUS 是一个三阶段防御框架，依次为**注入检测（Injection Detection）**、**激活引导（Activation Steering）** 和**后过滤（Post-filtering）**。其核心思想源于一个关键发现：多模态大模型在间接提示注入攻击下的两种指令遵循行为——“遵循用户指令”与“遵循注入指令”——在模型的激活空间中高度线性可分（Figure 1 中线性探针在多数层达到近 100% 准确率）。基于此，ARGUS 在激活空间内搜索最优的防御方向，并以自适应强度引导激活，使模型优先遵循用户指令。
 
@@ -185,7 +180,7 @@ $$\alpha_{o} = \max\left(0, \frac{w_{l}^{u} \cdot a_{l} + b_{l}^{u} + \tau}{\|w_
 ![[assets/figures/papers/paper_list_l2060_https_arxiv_org_abs_2512_05745/figures/007_Figure_6.jpg]]
 *Figure 6: The validation accuracy of injection detection stage across three modality*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验：跨模态防御效果与效用保持
 
@@ -239,10 +234,7 @@ Table 1 的消融部分揭示了 ARGUS 三个核心设计的独立贡献：
 ![[assets/figures/papers/paper_list_l2060_https_arxiv_org_abs_2512_05745/figures/005_Table_2.jpg]]
 *Table 2: The hyperparameters setup of ARGUS*
 
-![[assets/figures/papers/paper_list_l2060_https_arxiv_org_abs_2512_05745/figures/006_Table_3.jpg]]
-*Table 3: Extended evaluation results of ARGUS and baselines on additional MLLMs. The*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 防御路线对比与谱系定位
 

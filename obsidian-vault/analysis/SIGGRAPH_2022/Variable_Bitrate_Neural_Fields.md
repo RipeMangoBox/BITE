@@ -5,6 +5,7 @@ paper_level: A
 venue: SIGGRAPH
 year: 2022
 pdf_ref: paperPDFs/SIGGRAPH_2022/Variable_Bitrate_Neural_Fields.pdf
+code_link: https://github.com/nv-tlabs/vqad
 project_link: https://research.nvidia.com/labs/toronto-ai/vqad/
 aliases:
 - VAVQAD
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 可变比特率神经场 |
 | 英文题名 | Variable Bitrate Neural Fields |
 | 会议/期刊 | SIGGRAPH 2022 |
-| Links | [paper](https://arxiv.org/abs/2206.07707); [GitHub](https://github.com/nv-tlabs/vqad); [Project](https://research.nvidia.com/labs/toronto-ai/vqad/) |
+| Links | [paper](https://arxiv.org/abs/2206.07707) · [GitHub](https://github.com/nv-tlabs/vqad) · [Project](https://research.nvidia.com/labs/toronto-ai/vqad/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | VQ-AD (Vector-Quantized Auto-Decoder) |
 | Dataset | RTMV (Night Fury) |
@@ -42,7 +43,7 @@ claims:
 > - RTMV (Night Fury) 上，SSIM 为 0.9482 (4bw)，对比 0.9700 (NGLOD-NeRF)，变化 -0.0218。
 > - RTMV (Night Fury) 上，Storage 为 0.33 MB (4bw, 61.3x compression)，对比 ~20 MB (NGLOD-NeRF)，变化 61.3x smaller。
 
-## 概述
+## 概要
 
 神经场（neural fields）在高质量三维信号重建与新视角合成中展现出强大能力，但其主流实现——基于特征网格（feature grid）的方法——面临一个根本瓶颈：每个网格顶点需存储完整的浮点特征向量（例如16维×float32 = 64 bytes/顶点），在包含数百万顶点的场景中，存储需求可达数十MB，严重制约了内存和带宽受限的图形应用中的实用性。
 
@@ -54,7 +55,7 @@ claims:
 
 方法的局限性包括：训练时软化索引矩阵在6-bit位宽下导致峰值内存高达18 GB；压缩后的几何表示（SDF）会在法线方向引入可见伪影（Fig. 5）；未采用熵编码以保持流式传输兼容性。
 
-## 背景与动机
+
 
 ### 神经场与特征网格的兴起
 
@@ -89,7 +90,9 @@ claims:
 
 在 NGLOD-NeRF 基线上，VQ-AD 将特征网格存储从约 20 MB 压缩至 **0.33 MB**（4-bit 索引，61.3 倍压缩），PSNR 仅下降约 2.6 dB，SSIM 仍超过 0.94；若使用 6-bit 索引，存储为 0.49 MB（40.9 倍压缩），PSNR 下降仅约 1.96 dB（见 Table 2）。这一结果首次证明了：**特征网格可以在保持实用视觉质量的同时，被压缩到适合流式传输的量级**。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 VQ-AD 的核心创新在于将神经场的特征网格压缩问题转化为一个**端到端可学习的向量量化自解码器**框架。其关键洞察是：通过将每个网格顶点的完整浮点特征向量替换为一个低比特整数索引和一个共享码本，并利用可微分的软化索引机制，使压缩表示能够针对下游任务（如新视角合成）进行联合优化，从而在维持视觉质量的同时实现两个数量级的存储压缩。
 
@@ -119,7 +122,7 @@ $$\underset{D, C, \theta}{\arg\min} \ \mathbb{E}_{x, y} \left\| \psi_{\theta}\le
 
 **天然支持渐进式流式传输**：由于压缩后的多分辨率八叉树在所有层级都存储了数据，VQ-AD 天然支持按广度优先顺序流式传输，仅需约 10 kB 数据即可显示粗糙细节层次（Fig. 2），实现了可变比特率的细节层次渲染。
 
-## 整体框架
+
 
 VQ-AD 的核心思路是将特征网格的压缩问题转化为一个**端到端可学习的向量量化自解码器**。整个 pipeline 围绕一个关键替换展开：将每个网格顶点存储的完整浮点特征向量（例如 16 维 × float32 = 64 bytes/顶点）替换为一个低比特整数索引和一个共享的码本（codebook），从而将存储需求压缩两个数量级，同时保持可微渲染下的重建质量。
 
@@ -162,7 +165,7 @@ VQ-AD 的核心思路是将特征网格的压缩问题转化为一个**端到端
 ![[assets/figures/papers/paper_list_l46_https_arxiv_org_abs_2206_07707/figures/001_Figure_1.jpg]]
 *Figure 1: Compressed streaming level of detail. Using our vector-quantized auto-decoder (VQ-AD) method, we compactly encode a 3D signal in a hierarchical representation which can be used for progressive streaming and level of detail (LOD). Two example neural radiance fields are shown after streaming from 5 to 8 levels of their underlying octrees. The sizes shown are the total bytes streamed; that is, the finer LODs include the cost of the coarser ones. Prior work such as NeRF [Mildenhall et al. 2020] requires ≈ 2.5 MB to be transferred before anything can be drawn*
 
-## 核心模块与公式推导
+
 
 ### 问题形式化：将压缩纳入特征网格学习
 
@@ -210,7 +213,9 @@ $$
 
 压缩表示被组织在稀疏八叉树中，所有细节层次的数据同时存储。查询点 $\boldsymbol{x}$ 的特征通过多分辨率插值获得。由于码本和索引天然支持不同 LOD 的独立解码，该结构支持渐进式流式传输：仅需传输约 10 kB 的粗糙层级数据即可显示初始结果（Fig. 2），随后逐步加载更精细层级。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心结果：压缩率与重建质量的权衡
 
@@ -253,7 +258,9 @@ VQ-AD 在符号距离函数（SDF）压缩上也能显著降低比特率（Fig. 
 ![[assets/figures/papers/paper_list_l46_https_arxiv_org_abs_2206_07707/figures/010_Table_3.jpg]]
 *Table 3: Comparison between random indices and learned indices. This table shows the effects of learning codebook indices with VQAD at 120 epochs with different quantization bitwidths (bw). To highlight the tradeoff, we list the size of the indices ?? and codebook ?? separately. We see that even when storing indices, we are able to achieve higher quality than the hash-based approach*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 一、问题定位：特征网格的存储瓶颈
 
@@ -328,6 +335,8 @@ VQ-AD 留下的研究缺口包括：
 - **码本优化替代方案**：能否利用可微渲染的梯度直接优化码本，而无需软化索引，例如使用直通估计器的变体？
 
 这些问题的解决将推动压缩神经场从“演示级”走向“实用级”，特别是在移动设备、Web 端和带宽受限的流式应用中。
+
+
 
 ## 原文 PDF
 

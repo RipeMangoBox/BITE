@@ -43,7 +43,7 @@ claims:
 > - NExT-QA 上，Score 84.2 vs 83.2 (BIMBA / LLaVA-Video) (+1.0)。
 > - MLVU 上，Score 72.1 vs 70.8 (LLaVA-Video) (+1.3)。
 
-## 概述
+## 概要
 
 长视频理解的核心瓶颈在于：完整解码 RGB 帧序列会引入极高的计算冗余，而 Transformer 自注意力的二次复杂度进一步限制了可处理的时长。视频编解码器天然将关键帧与帧间运动描述符分离，这一结构提供了在压缩域直接建模时空动态的可能性。ReMoRa 正是利用该性质，以稀疏 I 帧保留外观、以块级运动向量替代全解码帧，从而在密集时间覆盖与计算效率之间取得平衡。
 
@@ -51,7 +51,7 @@ claims:
 
 **主要结果**：ReMoRa 在 LongVideoBench（60.8）、NExT-QA（84.2）、MLVU（72.1）三项长视频理解基准上均取得最高分数，五项基准平均分 69.8，超越最强基线 **BIMBA** 和 **LLaVA-Video**（Zhang et al., arXiv 2024）约 0.9 分。消融实验证实，去除 RMR 模块或光流预训练会导致性能持续下降，而 HMSS 的结构化时间聚合显著优于简单的交叉注意力或相加融合，验证了压缩域运动精细化与分层时序建模的有效性。
 
-## 背景与动机
+
 
 ### 长视频理解的效率瓶颈
 
@@ -77,7 +77,9 @@ $$\mathbf{m}^{(k,t)}(u,v) = \mathbf{P}^{(k',t')}(u',v') - \mathbf{P}^{(k,t)}(u,v
 
 基于上述分析，本文提出 ReMoRa——一种直接在压缩视频表示上运行的多模态大语言模型。其核心动机在于：利用编解码器天然的关键帧-运动分离结构，通过精细化运动表示模块（RMR）弥合块级运动向量与密集光流之间的保真度鸿沟，并借助层次化运动状态空间模块（HMSS）以线性时间复杂度实现跨 GOP 的长程依赖建模，从而在密集时间覆盖与计算效率之间取得突破性平衡。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ReMoRa 的核心创新在于将长视频理解从“全解码 RGB 帧序列”范式迁移至“压缩域表示”范式，通过三个紧密耦合的 changed slots 系统性地解决了冗余计算、二次复杂度时间建模和粗糙运动信号三大瓶颈。
 
@@ -115,7 +117,7 @@ $$\pmb{H} = \mathrm{SSM}_{\mathrm{global}}\left([\pmb{Z}_1^{(0)}; \pmb{Z}_1^{(1)
 
 三个 changed slots 并非独立改进，而是形成因果链条：压缩 GOP 输入（slot 1）使得线性复杂度的时间建模成为可能（slot 2），而块级运动向量的低质量又迫使引入 RMR 精化模块（slot 3）以保证运动信号的保真度。这一耦合使得 ReMoRa 在 LongVideoBench（60.8）、NExT-QA（84.2）、MLVU（72.1）三项长视频基准上均取得最高得分，五基准平均分 69.8 超越所有基线模型。
 
-## 整体框架
+
 
 ReMoRa 的核心设计理念是将长视频理解从高冗余的 RGB 像素空间迁移到天然解耦的压缩域。传统视频 MLLM 对完整 RGB 帧序列进行均匀采样，其自注意力复杂度随帧数呈二次增长，导致长视频建模的计算代价极高且信息高度冗余。ReMoRa 直接利用压缩视频码流的结构化特性，将视频表示为一组 **GOP (Group of Pictures)** 的序列，每个 GOP 由一个 I 帧（关键帧）和若干 P/B 帧的运动向量场构成。I 帧负责提供稀疏但完整的外观信息，运动向量则以极低的存储代价承载帧间的密集时间动态。这种输入表示从根本上改变了信息流：外观与运动在输入端即被分离，使得模型可以分别对二者进行高效编码与融合。
 
@@ -131,12 +133,9 @@ ReMoRa 的核心设计理念是将长视频理解从高冗余的 RGB 像素空�
 
 整个框架的信息流可概括为：**压缩视频 → 外观/运动解耦编码 → 运动精炼 → 分层时序融合 → 多模态文本生成**。这种设计使得 ReMoRa 在保持密集时间覆盖（64 个 I 帧及其关联运动向量）的同时，显著降低了计算开销，实现了长视频理解的线性复杂度推理。
 
-### 补充图表
 
-![[assets/figures/papers/paper_list_l981_https_arxiv_org_abs_2602_16412/figures/001_Figure_1.jpg]]
-*Figure 1: Overview of ReMoRa. Our method utilizes compressed video representations, which naturally separates each video into keyframes and compressed inter-frame redundancies. From these, we extract motions that are lightweight but noisy and coarse. Our model then refines these motions into clean and fine-grained representations that preserve efficiency while approaching the fidelity of dense optical flow*
 
-## 核心模块与公式推导
+
 
 ### 压缩视频表示与输入构建
 
@@ -205,7 +204,9 @@ $$
 ![[assets/figures/papers/paper_list_l981_https_arxiv_org_abs_2602_16412/figures/013_Figure_5.jpg]]
 *Figure 5: Example of scene-aware video preprocessing. Frames 0 and 18 are scene-adaptive I-frames used as keyframes, and the remaining frames are P/B-frames with overlaid codec motion vectors*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -265,7 +266,9 @@ Table 8 基于 NExT-QA 上 ReMoRa 失败而 LLaVA-Video 成功的 50 个随机�
 
 这些失败模式指向了当前方法的边界：压缩域运动向量虽然高效，但在需要精确空间定位和极细粒度运动辨识的场景中，信息量仍不及全解码 RGB 帧。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从密集 RGB 帧到压缩域运动表征
 
@@ -317,6 +320,8 @@ ReMoRa 揭示了压缩域视频理解的潜力，但也留下了若干待解决�
 4. **残差信息利用**：能否结合编解码器残差信息进一步提升压缩域运动表示的保真度？当前方法仅利用运动向量，而忽略了预测残差中可能蕴含的补充信息。
 
 **手动验证提示**：上述局限和开放问题的部分论述基于论文中有限的错误分析样本（67 例），其统计显著性和泛化性需进一步验证。具体基线工作的完整元数据（如 BIMBA 的作者/会议/年份）在提供的分析材料中缺失，建议查阅原始论文补充。
+
+
 
 ## 原文 PDF
 

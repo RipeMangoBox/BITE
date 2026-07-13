@@ -44,7 +44,7 @@ claims:
 > - ScanNet Original 上，旋转 Accuracy@5° (%) 99.4 vs 94.0 (+5.4)；翻译 Accuracy@5cm (%) 87.5 vs 79.2 (+8.3)。
 > - LoWaymo (低重叠) 上，平均 RRE (°) 4.95 vs 19.72 (-74.9%)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -68,7 +68,7 @@ C-GenReg处于**生成式点云配准**与**基础模型驱动的三维感知**�
 
 方法的主要局限在于推理速度受WFM生成过程制约（单次注册约508秒），虽可通过蒸馏降至约7秒但仍不满足实时需求。此外，生成质量依赖深度输入和文本提示的语义合理性，极端动态场景或稀疏传感器上的泛化性尚未验证。开放问题包括：更轻量生成模型的探索、无文本提示条件下的鲁棒匹配、显式依赖建模对概率融合的改进，以及跨模态、跨季节场景的扩展。
 
-## 背景与动机
+
 
 三维点云配准旨在估计两帧点云之间的刚性变换，是三维视觉与机器人领域的核心任务。给定源点云和目标点云，配准的目标是找到最优旋转矩阵$\pmb{R}$和平移向量$\pmb{t}$，使得对齐后的对应点距离最小化：
 
@@ -82,7 +82,9 @@ $$
 
 本文的核心动机在于回答一个关键问题：**能否将点云配准转化为图像域的匹配问题，从而充分利用2D视觉基础模型的强大先验，同时保持与原始几何特征的互补性？** 具体而言，C-GenReg通过世界基础模型（WFM）将3D几何转换为多视图一致的RGB图像，利用任务特定的VFM提取密集对应关系，并与原始几何特征进行概率后验融合。这一“先匹配后融合”的概率建模策略，使得整个框架在无需任何目标域训练的条件下，能够获得高置信度的跨模态对应，首次实现了生成式配准框架在真实室外LiDAR数据上的成功运行。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 C-GenReg 的核心创新在于将点云配准问题转化为图像域匹配问题，并通过“先匹配后融合”的概率框架实现无训练的跨模态对应估计。相较于现有方法，其关键改变体现在三个维度。
 
@@ -113,7 +115,7 @@ C-GenReg 的核心创新在于将点云配准问题转化为图像域匹配问�
 
 C-GenReg 通过三个 changed slots 的系统性创新——引入生成RGB特征扩展模态空间、采用概率后验融合替代确定性匹配、以完全冻结的预训练模型实现零样本泛化——在无需任何任务特定训练的条件下，于室内RGB-D和室外LiDAR基准上均取得了最优或接近最优的配准精度。
 
-## 整体框架
+
 
 C-GenReg的核心思想是将三维点云配准问题**迁移到图像域**：利用世界基础模型（WFM）从点云渲染的深度图生成多视图一致的RGB图像，借助任务特定的视觉基础模型（VFM）提取密集对应关系，再与原始几何特征进行概率后验融合，最终估计刚性变换。整个框架无需任何训练或微调，所有模块均使用预训练且冻结的权重。
 
@@ -149,7 +151,7 @@ C-GenReg的核心思想是将三维点云配准问题**迁移到图像域**：�
 ![[assets/figures/papers/paper_list_l2445_https_arxiv_org_abs_2604_16680/figures/002_Figure_2.jpg]]
 *Figure 2: C-GenReg Overview: A training-free, zero-shot point cloud registration framework with two parallel branches. (1) Generated-RGB Branch - source and target point clouds are each represented as depth-frame sequences, temporally concatenated and processed by a frozen World Foundation Model to generate RGB views that are geometrically aligned and appearance-consistent across views. A subset of K frames per domain is fed to a frozen, task-specific Vision Foundation Model (VFM) to extract dense pixel-level features, later lifted to 3D using the original depths. (2) Geometric Branch - extracts dense geometric features directly from the raw point clouds using a pretrained geometric feature extractor...*
 
-## 核心模块与公式推导
+
 
 C-GenReg 将点云配准分解为两个并行的特征提取分支和一个概率融合阶段，其核心设计在于“先匹配后融合”：每个分支独立产生对应关系后验概率，再通过概率推理融合为统一的联合后验，从而避免了对特征空间的显式对齐学习。
 
@@ -211,7 +213,9 @@ $$\underset{(\pmb{R},\pmb{t})\in SE(3)}{\arg\min}\sum_{(\pmb{p}^*,\pmb{q}^*)\in\
 ![[assets/figures/papers/paper_list_l2445_https_arxiv_org_abs_2604_16680/figures/011_Figure_7.jpg]]
 *Figure 7: C-GenReg LiDAR Input Pipeline: (a) A virtual camera is configured into the LiDAR scan. (b) The LiDAR points are projected into a depth image. (c) The resulting depth map is fed into the generative model to produce an aligned RGB image*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：室内基准
 
@@ -265,7 +269,9 @@ C-GenReg 在 3DMatch 基准上实现了全面的最优性能。如表 1 所示�
 ![[assets/figures/papers/paper_list_l2445_https_arxiv_org_abs_2604_16680/figures/012_Table_5.jpg]]
 *Table 5: Runtime Analysis. Runtime per registration problem measured on a single NVIDIA RTX A6000 GPU*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -325,6 +331,8 @@ C-GenReg 的知识库定位可分解为三个层次的模型复用与创新：
 4. **多模态扩展**：方法是否适用于多模态传感器融合（如雷达+相机）或跨季节/天气变化场景的配准？这需要验证 WFM 在非可见光模态下的生成能力。
 5. **基础模型替代**：其他新兴世界基础模型（如 Sora、VideoPoet）或通用 VFM（如 Segment Anything Model、DINOv2）能否替代现有模块并获得更好泛化？Table 4 已初步验证 MASt3R 优于 DINOv2，但更广泛的模型选择空间仍待探索。
 6. **跨域迁移的理论理解**：WFM 和 VFM 的预训练数据与点云配准目标域之间的分布差异如何影响性能？缺乏理论分析限制了对方法泛化边界的预测。
+
+
 
 ## 原文 PDF
 

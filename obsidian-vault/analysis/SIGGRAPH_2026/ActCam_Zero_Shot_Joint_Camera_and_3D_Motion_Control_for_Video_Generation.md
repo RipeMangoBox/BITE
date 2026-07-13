@@ -5,6 +5,8 @@ paper_level: A
 venue: SIGGRAPH
 year: 2026
 pdf_ref: paperPDFs/SIGGRAPH_2026/ActCam_Zero_Shot_Joint_Camera_and_3D_Motion_Control_for_Video_Generation.pdf
+project_link: https://elkhomar.github.io/actcam/
+code_link: null
 aliases:
 - ActCam
 tags:
@@ -40,7 +42,7 @@ claims:
 > [!tip] 效果简介
 > - RealisDance-Val with moving cameras 上，MPJPE↓ 0.2087 vs 0.2121 (-0.0034)；SE↓ 0.4546 vs 0.5665 (-0.1119)；SC↑ 0.9212 vs 0.9084 (+0.0128)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -62,7 +64,7 @@ ActCam 是一种**纯推理时方法**，无需微调预训练视频扩散模型
 
 ActCam 建立在预训练的图像到视频扩散模型 **VACE**（Jiang et al., arXiv 2025）之上，利用其原生支持的深度图和关键点条件能力。与现有的静态相机运动控制方法（如 **UniAnimate-DiT**（Wang et al., arXiv 2025）、**MimicMotion**（Zhang et al., ICML 2024）、**Animate-X**（Tan et al., ICLR 2024）、**Hyper-Motion**（Xu et al., arXiv 2025）、**HumanVid**（Wang et al., NeurIPS 2024）、**Wan-Animate**（Cheng et al., arXiv 2025）、**SteadyDancer**（Zhang et al., arXiv 2025）等）不同，ActCam 在推理时引入了三维场景感知的条件构造和分阶段调度策略，将相机控制与动作控制统一到同一框架下。相较于联合控制基线 **Uni3C**，ActCam 通过移除参考角色和深度对齐避免了条件信号中的静态冲突，从而在动态相机场景下获得更优的控制精度和视觉质量。
 
-## 背景与动机
+
 
 ### 问题域：单图视频生成中的联合控制
 
@@ -84,7 +86,9 @@ ActCam 建立在预训练的图像到视频扩散模型 **VACE**（Jiang et al.,
 
 ActCam 正是针对这一瓶颈而设计：通过移除参考角色以避免条件冲突，利用三维场景转移实现角色与背景的深度对齐，并采用两阶段去噪调度策略——早期使用深度加姿态条件以锁定全局结构，后期仅使用姿态条件以保留高频细节——从而在冻结的预训练模型上实现零样本的联合控制。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ActCam 的核心创新在于**将联合相机与三维运动控制从需要训练的范式转变为零样本推理范式**，通过在冻结的预训练视频扩散模型（VACE）上构造相机对齐的多模态条件信号，并引入两阶段去噪调度策略，实现了无需任何微调的精确联合控制。
 
@@ -113,7 +117,7 @@ $$c(t)_{\tau} = \begin{cases} \mathcal{R}^{C_{\tau}}(\hat{S}_{\tau}, \mathcal{D}
 
 ActCam 的三个关键设计——**角色移除、场景转移、两阶段调度**——协同解决了一个深层问题：在冻结的预训练模型中，不同条件信号之间可能产生冲突。角色移除避免了参考角色深度与动态角色深度之间的冲突；场景转移通过几何对齐消解了角色深度与背景深度之间的不一致；两阶段调度则在时间维度上解耦了结构约束与细节生成的矛盾。这三个机制共同使得 ActCam 能够在不修改模型参数的前提下，仅通过推理时的条件工程实现精确的联合控制。
 
-## 整体框架
+
 
 ActCam 是一个纯推理时方法，保持预训练的图像到视频扩散骨干网络（VACE）固定不变，通过构造相机对齐的多模态条件信号和两阶段去噪调度，实现对角色表演动作与相机轨迹的零样本联合控制。其整体流程如图 2 所示，包含以下核心模块：
 
@@ -146,7 +150,7 @@ $$c(t)_{\tau} = \begin{cases} \mathcal{R}^{C_{\tau}}(\hat{S}_{\tau}, \mathcal{D}
 ![[assets/figures/papers/ActCam_Zero-Shot_Joint_Camera_and_3D_Motion_Control_for_Video_Generation_595bf21ac5f0/figures/005_Figure_3.jpg]]
 *Figure 3: User study. We compare with Uni3C on camera adherence (Camera) and motion faithfulness (Motion) with respect to the conditioning input, alongside overall visual quality (Visual). We considerably outperform Uni3C, the closest method to ours*
 
-## 核心模块与公式推导
+
 
 ActCam 是一个纯推理时方法，保持预训练 VACE 骨干网络冻结，通过精心设计的条件信号构造和调度策略实现零样本联合控制。其核心架构由五个顺序模块构成，并在生成动力学上遵循连续流 ODE 模型。
 
@@ -210,7 +214,9 @@ $$c(t)_{\tau} = \begin{cases} \mathcal{R}^{C_{\tau}}(\hat{S}_{\tau}, \mathcal{D}
 ![[assets/figures/papers/ActCam_Zero-Shot_Joint_Camera_and_3D_Motion_Control_for_Video_Generation_595bf21ac5f0/figures/001_Figure_1.jpg]]
 *Figure 1: Overview. ActCam enables zero-shot joint control of acting motion and camera motion for single-image video generation from a reference image, assuming only widespread conditioning capability of the backbone model on depth and keypoints. Given a reference image, an acting video representing the desired motion, and a target per-frame camera trajectory, ActCam generates a video that preserves identity while following both motion and cinematography*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -313,7 +319,9 @@ Figure 8 对比了三种场景转移策略：
 ![[assets/figures/papers/ActCam_Zero-Shot_Joint_Camera_and_3D_Motion_Control_for_Video_Generation_595bf21ac5f0/figures/012_Figure_11.jpg]]
 *Figure 11: Different scenes. We display two outputs of ActCam showing the same motion rendered on two characters in different scenes, using the same camera controls*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有工作的关系
 
@@ -350,6 +358,8 @@ ActCam 在视频生成控制的知识谱系中占据以下位置：
 - **技术路线**：区别于基于训练的方法（如 CameraCtrl、MotionCtrl 等需要微调骨干的方法），ActCam 属于纯推理时条件工程路线，与 Uni3C 共享这一范式但通过引入深度-场景几何对齐实现了质的提升。
 - **核心贡献的可迁移性**：两阶段去噪调度（早期深度+姿态，后期仅姿态）是一个与骨干架构解耦的策略，理论上可迁移到任何支持深度和姿态条件的扩散模型。角色移除与场景转移的深度对齐策略同样具有通用性，只要目标场景允许合理的深度估计。
 - **评估基准位置**：在 RealisDance-Val + VBench + WorldScore 的评估体系下，ActCam 在移动相机联合控制任务上建立了新的零样本基线。但该基准的覆盖范围有限（4 种相机预设、100 个参考片段），更全面的评估体系仍有待建立。
+
+
 
 ## 原文 PDF
 

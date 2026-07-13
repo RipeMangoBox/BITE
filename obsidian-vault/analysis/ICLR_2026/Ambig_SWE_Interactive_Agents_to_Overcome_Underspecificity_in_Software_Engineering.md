@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Ambig_SWE_Interactive_Agents_to_Overcome_Underspecificity_in_Software_Engineering.pdf
+project_link: null
+code_link: https://github.com/sani903/InteractiveSWEAgents
 aliases:
 - AS
 - Ambig-SWE
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | Ambig-SWE：通过交互式智能体克服软件工程中的指令不明确问题 |
 | 英文题名 | Ambig-SWE: Interactive Agents to Overcome Underspecificity in Software Engineering |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=X2yzXtH4wp); [GitHub](https://github.com/sani903/InteractiveSWEAgents) |
+| Links | [paper](https://openreview.net/forum?id=X2yzXtH4wp) · [GitHub](https://github.com/sani903/InteractiveSWEAgents) |
 | Topic | #topic/representation_self_supervised_transfer #topic/representation_self_supervised_transfer/representation_learning |
 | Method | Ambig-SWE |
 | Dataset | Ambig-SWE (基于SWE-Bench Verified) |
@@ -41,22 +43,24 @@ claims:
 > - Ambig-SWE (基于SWE-Bench Verified) 上，解决率 (Resolve rate %) 为 Claude Sonnet 4 Interaction: 41.8%，对比 Claude Sonnet 4 Hidden: 未明确给出，变化 显著提升（p=6.34e-18）。
 > - Ambig-SWE (基于SWE-Bench Verified) 上，解决率 (Resolve rate %) 为 Qwen 3 Coder Interaction: 46.0%，对比 Qwen 3 Coder Hidden: 未明确给出，变化 显著提升（p=3.54e-07）。
 
-## 概述
+## 概要
 
 本论文提出 **Ambig-SWE**，一个基于 SWE-Bench Verified 的不明确指令变体基准，专门用于评估 LLM 智能体在指令不明确（underspecification）场景下的行为表现和交互能力。核心发现是：交互性可以显著提升智能体在不明确指令下的任务完成率（最高提升 74%），但模型普遍缺乏主动检测不明确性的能力，且交互效率与模型规模无直接关联。有效的交互依赖于模型提出可回答、有针对性的澄清问题，而非盲目提问。
 
-## 背景与动机
+
 
 当前 LLM 智能体在软件工程任务中已展现出显著的生产力提升（Peng et al., 2023; Brynjolfsson et al., 2023），但现实场景中的用户指令往往是不明确的（Chowdhury et al., 2024）。现有基准（如 SWE-Bench）假设指令完全明确，忽略了不明确性带来的挑战。不明确的指令可能导致资源浪费和任务偏差（Kim et al., 2024），而交互式智能体有望通过主动提问来缓解这一问题（Figure 1）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 1. **Ambig-SWE 基准**：使用 GPT-4o 从 SWE-Bench Verified 的完全指定 issue 生成不明确版本，保留关键术语但减少细节内容，用于评估智能体在模糊指令下的行为。
 2. **三种实验设置**：Full（完全指定，无交互）、Hidden（不明确，无交互）、Interaction（不明确，启用交互），系统性地隔离了指令明确性和交互机制的影响。
 3. **交互提示强度控制**：设计了三种递增的交互鼓励提示（Neutral / Moderate Encouragement / Strong Encouragement），用于评估模型主动检测不明确性的能力。
 4. **信息增益量化方法**：使用余弦距离（Cosine Distance）和 LLM-as-Judge 两种互补指标衡量交互带来的信息获取效率。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_representation_self_supervised_transfer__representation_learning__b001_X2yzXtH4wp_Ambig-S/figures/001_Figure_1.jpg]]
 *Figure 1: Interactive agents reduce resource wastage and misalignment in underspecified settings.*
@@ -72,7 +76,7 @@ Ambig-SWE 的整体框架包含三个核心组件（Figure 2）：
 - **Hidden setting**：智能体仅接收不明确的摘要版本，无交互机会。
 - **Interaction setting**：智能体接收不明确的摘要版本，但可以向 GPT-4o user proxy 提问获取信息。
 
-## 核心模块与公式推导
+
 
 ### 5.1 信息增益量化
 
@@ -100,7 +104,9 @@ $$
 - 零假设 \(H_0: \tilde{d} \leq 0\)（中位数差异为零或负）
 - 备择假设 \(H_1: \tilde{d} > 0\)（中位数差异为正）
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 6.1 主实验结果
 
@@ -184,7 +190,9 @@ Figure 4 和 Table 7 展示了不同模型的提问模式：
 ![[assets/figures/papers/iclr26_representation_self_supervised_transfer__representation_learning__b001_X2yzXtH4wp_Ambig-S/figures/011_Table_3.jpg]]
 *Table 3: Quantitative comparison of underspecified summaries against full issues using overlap- and semantics-based metrics.*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 7.1 相关方法对比
 
@@ -218,6 +226,8 @@ Figure 4 和 Table 7 展示了不同模型的提问模式：
 3. 交互效率（信息增益/提问数量）与任务性能之间的关系是什么？是否存在最优交互策略？
 4. 如何将 Ambig-SWE 框架扩展到多轮交互、多智能体协作或更复杂的软件工程任务（如代码审查、架构设计）？
 5. 自然出现的不明确 issue 与生成的不明确 issue 在影响模型行为方面有何差异？如何构建更真实的基准？
+
+
 
 ## 原文 PDF
 

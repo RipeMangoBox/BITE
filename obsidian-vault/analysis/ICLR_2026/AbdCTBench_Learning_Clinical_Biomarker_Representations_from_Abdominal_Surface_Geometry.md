@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/AbdCTBench_Learning_Clinical_Biomarker_Representations_from_Abdominal_Surface_Geometry.pdf
+project_link: https://stair-lab.github.io/AbdCTBench/
+code_link: null
 aliases:
 - AB2
 - AbdCTBench
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | AbdCTBench：从腹部表面几何学习临床生物标志物表示 |
 | 英文题名 | AbdCTBench: Learning Clinical Biomarker Representations from Abdominal Surface Geometry |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=dKRAo0a9Gm); [Project](https://stair-lab.github.io/AbdCTBench/) |
+| Links | [paper](https://openreview.net/forum?id=dKRAo0a9Gm) · [Project](https://stair-lab.github.io/AbdCTBench/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/health |
 | Method | AbdCTBench Benchmark (基于2D腹部表面网格的单目标生物标志物预测基准) |
 | Dataset | Age prediction (regression), Calcium Scoring Abdominal Agatston (binary), Mortality prediction (binary), Type-2 Diabetes (binary) |
@@ -41,7 +43,7 @@ claims:
 > - Calcium Scoring Abdominal Agatston (binary) 上，AUROC 为 0.848 (ResNet-34)，对比 0.5 (Naive Baseline)，变化 +0.348。
 > - Mortality prediction (binary) 上，AUROC 为 0.839 (ResNet-18)，对比 0.5 (Naive Baseline)，变化 +0.339。
 
-## 概述
+## 概要
 
 传统基于CT和MRI的影像学生物标志物获取方法存在辐射暴露、高成本和设备可及性障碍，难以应用于大规模常规筛查。本文提出利用腹部外部表面几何形状（二维深度图投影）作为间接观测变量，通过计算机视觉模型学习外部体表几何与内部体成分生物标志物之间的预测关联，从而实现非侵入式的关键生物标志物推断。
 
@@ -55,7 +57,7 @@ claims:
 
 这些结果验证了从表面几何推断内部生物标志物的可行性，为利用消费级深度传感器进行大规模、低风险的健康筛查提供了概念验证和实验基准。
 
-## 背景与动机
+
 
 医学影像学中，体成分生物标志物（如骨密度、脂肪分布、肌肉质量等）的评估对疾病风险分层和健康管理至关重要。传统上，这些指标依赖计算机断层扫描（CT）或磁共振成像（MRI）等高级模态进行量化。然而，CT 检查存在电离辐射暴露风险，MRI 则成本高昂且设备可及性有限，二者均无法支撑大规模常规人群筛查的需求。这一可及性鸿沟构成了影像学生物标志物从精密临床工具走向全民健康监测的核心瓶颈。
 
@@ -63,7 +65,9 @@ claims:
 
 初步实验结果表明，这一"由表及里"的预测通路具有实质性可行性：即便仅使用不含任何内部密度信息的表面几何，年龄预测的平均绝对误差（MAE）即可达到 6.22 岁（$R^2=0.757$），远优于随机基线的 MAE 13.16 岁；死亡率预测的 AUROC 可达 0.839（ResNet-18）；糖尿病伴慢性并发症（HCC-18）检测的 AUROC 达到 0.801（Swin Transformer-Base）。所有被评估的深度学习架构（ResNet、EfficientNet、ViT-Small、Swin Transformer 等）在各任务上均显著优于随机猜测基线（AUROC≈0.5），从而证实外部体表几何确实携带了足以支持临床推理的信号。该基准的建立为后续探索在消费级深度传感器（如智能手机 LiDAR）上重建腹部表面、实现零辐射体成分筛查奠定了评估框架与模型基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作的核心创新在于将**输入数据模态**从传统临床影像（CT/MRI）替换为**从CT衍生、并可被消费级设备生成的2D腹部表面网格图像**（深度图投影），使模型绕开辐射暴露与设备可及性障碍，直接从外部体表几何推断内部体成分生物标志物。这一"changed slot"是整个方法的逻辑枢纽：表面几何作为间接观测变量，替代了传统成像所需的昂贵原始数据，打开了大规模常规筛查的可能性（Abstract: bridging the gap between high-precision clinical imaging and widely accessible consumer technology）。
 
@@ -79,7 +83,7 @@ claims:
 
 当前创新仍受限于数据集来源（单一医疗机构CT扫描）以及表面网格的实际生成方式（衍生自CT而非消费级深度传感器）。在真实LiDAR或结构光重建的腹部网格上验证，将直接决定该模态替换能否从概念验证走向部署闭环。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0005_dKRAo0a9Gm_AbdCTBench_Learning_Clinical_Biomarker_Represent/figures/005_Figure_2.jpg]]
 *Figure 2: AbdCTBench dataset overview showing the pipeline from CT scans to surface mesh extraction and biomarker prediction*
@@ -97,7 +101,7 @@ AbdCTBench 的设计目标是为"从腹部体表几何推断内部体成分生�
 
 上述模块使得整个基准从"原始 CT → 表面图像 + 临床金标准"的管线完全固定，之后即可插拔式替换 CNN（ResNet、EfficientNet、DenseNet 等）或 Vision Transformer（ViT-DINOv2、Swin）等 backbone，衡量其从外部几何捕获内部病理信息的能力。多目标联合训练的初步尝试则揭示出显著的负迁移（Age MAE 从单任务 6.2 升至 14.5 年，AUROC 普遍低于 0.63），因此当前版本仍以单目标设置作为标准基准（Appendix A.6）。
 
-## 核心模块与公式推导
+
 
 本文未引入新的数学公式推导，研究工作聚焦于构建基准实验和学习框架，因此本节重点介绍构成AbdCTBench的三个核心流程模块及其组合方式。
 
@@ -122,7 +126,9 @@ AbdCTBench 为每个生物标志物独立训练一个分类或回归模型（单
 
 该框架本身没有引入新的理论推导，其核心在于实验性地探明"从表面几何到内部生物标志物"这一映射是否可被现有视觉架构学习，并提供了标准化的比较环境。辅助消融显示，改成多任务共享主干网络后性能显著退化（年龄 MAE 升至 14.53，分类 AUROC 普遍低于 0.63），提示当前模板下的负迁移效应，关于多目标学习还需进一步方法探索。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果：单目标生物标志物预测
 
@@ -172,7 +178,9 @@ AbdCTBench 为每个生物标志物独立训练一个分类或回归模型（单
 ![[assets/figures/papers/iclr26_0005_dKRAo0a9Gm_AbdCTBench_Learning_Clinical_Biomarker_Represent/figures/054_Figure_7.jpg]]
 *Figure 7: Grad-CAM visualizations showing learned representations from abdominal surface geometry. The heatmaps highlight regions of interest that the ResNet-18 model focuses on for HCC-18 (Diabetes with Chronic Complications) prediction*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 AbdCTBench的核心贡献并非提出一种全新的网络架构，而是构建了一个**从外部体表几何到内部体成分生物标志物的预测框架**，并将其形式化为可复现的基准任务。该工作在方法谱系中定位为非侵入式代谢风险评估的**代理变量学习管道**，其边界条件、与现有工作的关系以及未解决问题如下。
 
@@ -207,6 +215,8 @@ RadImageNet预训练的ResNet-50作为医学影像领域的迁移学习baseline�
 **开放研究方向**包括：① 在真实消费级深度传感器上完成端到端验证，建立设备间校准协议；② 探索更大规模的医学影像基础模型或2D-3D混合表征能否突破表面几何的信息上限；③ 设计针对多任务学习的解耦策略（如任务特定的注意力路径或渐进式微调）；④ 将校准方法（温度缩放、焦点损失调参）与类别不平衡处理相结合，优化罕见疾病检测的精度-召回平衡。
 
 整体而言，AbdCTBench确立了"外部体表几何→内部生物标志物"这一预测范式的可行性下限，但将其推向临床筛查或消费级应用，仍需要在跨设备泛化、多目标协同和极端亚群鲁棒性上完成实质性突破。
+
+
 
 ## 原文 PDF
 

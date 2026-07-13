@@ -43,7 +43,7 @@ claims:
 > - DrawBench 上，CLIP↑ 0.3136 vs 0.3156 (-0.002)。
 > - T2I (speed) 上，Speed (sec/image) 5.5 vs 12.0 (2.18× faster)。
 
-## 概述
+## 概要
 
 扩散Transformer（DiT）已成为视觉生成的主流架构，但其推理效率受限于一个被长期忽视的设计：**所有去噪步使用相同的patch尺寸对隐空间进行分块（tokenization）**。这一固定策略忽略了扩散过程的内在特性——早期去噪步主要建模图像的全局结构，仅需粗粒度patch即可；而后期去噪步才需要细粒度patch来精修局部纹理与细节。对所有步一视同仁地使用最细patch，导致了大量冗余计算。
 
@@ -53,8 +53,6 @@ claims:
 
 在方法谱系中，DDiT定位为一种**训练高效、即插即用的推理加速策略**。与TeaCache（Liu et al., CVPR 2025）等基于缓存的加速方法、TaylorSeer（Liu et al., 2025）等基于预测的加速方法不同，DDiT从tokenization粒度入手，通过动态调整patch尺寸来减少自注意力的计算量，且可与上述方法正交组合，实现叠加加速。其模型改造仅需小规模LoRA微调和蒸馏损失，避免了全模型重训的高昂成本。
 
-## 背景与动机
-
 扩散Transformer（Diffusion Transformer, DiT）已成为文本到图像和文本到视频生成的主流架构，但其高昂的推理成本严重制约了实际部署。核心瓶颈在于：**现有方法在所有去噪步上使用固定大小的patch**，忽略了扩散生成过程的本质特性——早期步骤主要建模全局结构，仅需粗粒度patch即可；而后期步骤才需要细粒度patch来细化局部细节。这种“一刀切”的策略导致大量冗余计算。
 
 具体而言，标准DiT将VAE编码的隐空间特征图 $\mathbf{z} \in \mathbb{R}^{H \times W \times C}$ 划分为固定尺寸 $p \times p$ 的patch，再通过线性投影嵌入为token序列。增大patch尺寸可以平方级地减少token数量，从而显著提升推理速度（如图4所示，将patch从 $p$ 增大到 $2p$ 和 $4p$ 时，token数从4096降至1024和256，速度分别提升约3倍和4倍）。然而，简单地在所有步上使用大patch会导致生成质量严重下降，因为后期细化步骤丧失了必要的空间分辨率。
@@ -63,7 +61,7 @@ claims:
 
 本文的核心洞察是：**隐空间流形在去噪过程中的演化速度并非均匀**。在生成早期，隐向量变化剧烈，主要完成全局布局的建立；随着去噪推进，变化趋于平缓，进入细节精修阶段。通过测量这种演化的“加速度”，可以在不额外训练的情况下，自适应地判断每个去噪步应该使用粗粒度还是细粒度patch。图2直观展示了这一思想：DDiT根据不同时间步的内容复杂度动态分配token数量，在简单场景或早期步骤中使用更少的token，在复杂纹理或后期步骤中使用更多token，从而在保证感知质量的前提下大幅降低计算开销。
 
-## 核心创新
+## 核心方法与创新机理
 
 ### 问题洞察：去噪过程的粒度不对称性
 
@@ -103,8 +101,6 @@ DDiT的动态patch调度与基于缓存的加速方法（如**TeaCache**, Liu et
 - **百分位数优于均值**：使用 $\rho$-th百分位数（$\rho=0.4$）而非均值来聚合空间方差，能更好地捕捉局部高细节区域的存在，避免均值平滑掩盖纹理复杂度信号。
 - **阈值 $\tau$ 提供速度-质量权衡**：$\tau$ 越大，更多步使用大patch，速度越快但质量轻微下降（Table 4）。用户可根据场景需求灵活调节。
 
-## 整体框架
-
 DDiT 的完整推理流程由三个核心环节串联而成：**多尺度 Patch Embedding**、**动态 Patch 调度器**，以及**增强后的 DiT 去噪主干网络**。给定一个文本 prompt，模型首先生成初始噪声隐向量 $\mathbf{z}_T \in \mathbb{R}^{H \times W \times C}$，然后进入 $T$ 步的去噪循环。在每一步 $t$，动态调度器根据隐向量的演化状态输出当前应使用的 patch 尺寸 $p_t$；多尺度 Patch Embedding 层将 $\mathbf{z}_t$ 按 $p_t \times p_t$ 分块并映射为 token 序列；这些 token 经过插值适配的位置嵌入和可学习的 patch 尺寸标识嵌入增强后，送入 DiT 主干预测噪声；最终通过标准扩散采样公式更新 $\mathbf{z}_{t-1}$。整个 pipeline 的输入是文本 prompt 和噪声，输出是去噪后的隐向量，经 VAE 解码器还原为图像或视频。
 
 ### 多尺度 Patch Embedding
@@ -141,13 +137,6 @@ $$p_t = \begin{cases} \max(p_i), & \text{if } \sigma_{t-1}^{p_i, (\rho)} < \tau 
 | 与缓存方法兼容性 | 独立使用 | 可与 TeaCache 等正交组合，实现叠加加速 |
 
 > **注意**：当前调度器在每个去噪步内对所有 patch 使用统一尺寸，尚未实现空间自适应的混合粒度分配，这是论文指出的下一步优化方向。此外，阈值 $\tau$ 和百分位数 $\rho$ 需针对不同模型手工预设，如何让调度器自动学习这些超参数仍是开放问题。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l853_https_arxiv_org_abs_2602_16968/figures/002_Figure_2.jpg]]
-*Figure 2: Main idea: dynamic tokenization during denoising. Current methods use the same patch size for all denoising steps during inference time. Instead, DDiT adapts the patch size at each timestep according to the latent complexity, allocating fewer tokens for certain timesteps and more tokens for certain others. While DiT divides VAE latents into patches, for illustrative purposes, we use a real image in pixel space*
-
-## 核心模块与公式推导
 
 ### 3.1 多尺度Patch Embedding与LoRA适配
 
@@ -201,19 +190,10 @@ DDiT的完整推理管线由四个核心模块串联构成：**多尺度Patch Em
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l853_https_arxiv_org_abs_2602_16968/figures/003_Figure_3.jpg]]
-*Figure 3: Revised patch-embedding layer to support patches of varied resolutions. We modify the standard patch-embedding layer, designed for a fixed patch size p, to additionally support patch sizes*
-
-![[assets/figures/papers/paper_list_l853_https_arxiv_org_abs_2602_16968/figures/005_Figure_5.jpg]]
-*Figure 5: Given*
-
-![[assets/figures/papers/paper_list_l853_https_arxiv_org_abs_2602_16968/figures/004_Figure_4.jpg]]
-*Figure 4: Inference speed vs. patch size. Inference speed measured over 50 denoising steps for generating 1024 × 1024 images using FLUX-1.Dev [54], where every timestep uses a fixed patch size. As the patch size increases from*
-
 ![[assets/figures/papers/paper_list_l853_https_arxiv_org_abs_2602_16968/figures/006_Figure_6.jpg]]
 *Figure 6: Visualization of*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -253,12 +233,6 @@ DDiT在文本到图像（T2I）和文本到视频（T2V）两大任务上均实�
 ![[assets/figures/papers/paper_list_l853_https_arxiv_org_abs_2602_16968/figures/010_Table_2.jpg]]
 *Table 2: Quantitative results on V-Bench [43]. Comparison of DDiT under different threshold settings (τ ) and its combination with Tea-Cache [61]*
 
-![[assets/figures/papers/paper_list_l853_https_arxiv_org_abs_2602_16968/figures/013_Table_3.jpg]]
-*Table 3: Effect of the n-th order difference on generation quality. Higher-order terms capture more informative temporal dynamics, improving both FID and CLIP scores. The third-order term (n = 3) achieves the best overall performance*
-
-![[assets/figures/papers/paper_list_l853_https_arxiv_org_abs_2602_16968/figures/012_Table_4.jpg]]
-*Table 4: Effect of the threshold τ on DrawBench. Higher τ values yield faster inference at very mild dip in generation quality*
-
 ![[assets/figures/papers/paper_list_l853_https_arxiv_org_abs_2602_16968/figures/008_Figure_7.jpg]]
 *Figure 7: Qualitative comparisons with the base model [54], Tea-Cache [61], TaylorSeer [62], and DDiT under similar speedups on Draw-Bench. DDiT effectively preserves fine-grained details, pose, spatial layout, and overall color distribution of the generated images*
 
@@ -268,7 +242,7 @@ DDiT在文本到图像（T2I）和文本到视频（T2V）两大任务上均实�
 ![[assets/figures/papers/paper_list_l853_https_arxiv_org_abs_2602_16968/figures/011_Figure_9.jpg]]
 *Figure 9: Qualitative comparison of text-to-video generation between DDiT and the baseline. DDiT produces videos with comparable visual quality to the baseline while achieving significant speedup*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 核心问题与解决路径
 

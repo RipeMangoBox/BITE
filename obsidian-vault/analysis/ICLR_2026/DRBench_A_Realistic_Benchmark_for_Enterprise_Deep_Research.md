@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/DRBench_A_Realistic_Benchmark_for_Enterprise_Deep_Research.pdf
+project_link: null
+code_link: https://github.com/ServiceNow/drbench
 aliases:
 - DADDEF
 - DRBench
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | DRBench：面向企业深度研究的现实基准 |
 | 英文题名 | DRBench: A Realistic Benchmark for Enterprise Deep Research |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=IGYQ4c92e2); [GitHub](https://github.com/ServiceNow/drbench) |
+| Links | [paper](https://openreview.net/forum?id=IGYQ4c92e2) · [GitHub](https://github.com/ServiceNow/drbench) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/language_speech_and_dialog |
 | Method | DRBench Agent (DRBA) and DRBench evaluation framework |
 | Dataset | DRBench FullBenchmark |
@@ -41,7 +43,7 @@ claims:
 > - DRBench FullBenchmark 上，Harmonic Mean 为 39.74 (DRBA + AAP)，对比 34.82 (Base DRBA)，变化 +4.92。
 > - DRBench FullBenchmark 上，Factuality 为 72.11 (GPT-5 no planning)，对比 69.30 (Llama-3.1-405B no planning)，变化 +2.81。
 
-## 概述
+## 概要
 
 企业深度研究要求智能体从混杂的公开网页与内部私有文档中抽取关键洞察，但现有系统在面对复杂、多源的企业信息空间时，普遍难以过滤噪声和区分信息优先级。其结果是，即便最强的前沿模型，其基础事实洞察的召回率也不足 40%（Table 3），而干扰规避却能轻松达到 90% 以上（Table 2, Table 3）。这一鲜明反差表明，当前智能体的主要瓶颈并非被无关内容误导，而是**无法有效发现并优先处理真正重要的洞察**。
 
@@ -51,7 +53,7 @@ claims:
 
 模型规模的提升同样显著：以 GPT-5 为骨干时，无规划的 DRBA 即可达到 36.52 的洞察召回，较 Llama-3.1-405B 提高 20.4 个点（Table 3），但依旧错过大部分基础事实洞察。此外，纯浏览器智能体在不具备 API 级工具访问的情况下，其洞察召回率仅为 1.11%（Section 5.5），凸显了工具接口深度对企业深度研究环境的关键影响。DRBench 及其分析为构建更可靠的企业级深度研究智能体指明了瓶颈所在与优化方向，同时也指出了基准本身在指标覆盖、行业推广性等方面的不足，有待进一步扩展。
 
-## 背景与动机
+
 
 现代企业决策越来越依赖对异构信息源的深度综合分析：分析师、管理者或合规人员需要从邮件、聊天记录、云端文件、电子表格、PDF 报告以及公开网络信息中提取关键洞察，并形成可追溯的证据链。这类任务远超出简单的信息检索或单轮问答，它要求智能体在多应用、多格式、多来源的环境中执行多步推理，既要区分有用信息与噪声，又要在事实准确性和报告完整性之间取得平衡。然而，现有的大语言模型智能体——即便是专门为“深度研究”设计的系统——在企业场景下仍普遍面临**洞察召回率低**的核心瓶颈：最佳模型在完整的企业基准中也只能召回不足 40% 的 groundtruth 洞察（Table 3），而仅依赖浏览器操作、无 API 访问权限的通用网页智能体的洞察召回率甚至低至 1.11%（Section 5.5），暴露出导航复杂企业环境的极大困难。
 
@@ -61,7 +63,9 @@ claims:
 
 正是这些缺口直接驱动了 DRBench 的设计。我们首次构建了一个融合公共网络检索与本地企业数据的现实基准，其中 100 个任务均围绕具体的企业角色和行业场景展开，要求智能体在容器化的真实应用环境中搜索、过滤、推理并生成带引用的结构化报告。评估框架跳出了任务级准确率，转而通过原子洞察召回、干扰规避、事实性检验和报告质量四个轴线进行细粒度诊断，从而揭示智能体在**信息检索覆盖面、噪声过滤、事实归因以及最终综合表达**上的具体弱点。这种设计不仅填补了现有基准在企业多源深度研究上的空白，也为后续智能体架构的改进提供了明确的靶点：如何在保障事实基础的同时，通过自适应的行动计划弥补信息鸿沟，从而实质性提升关键洞察的召回率。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DRBench 在任务设置、评估方法与智能体设计三个层面引入了相对于现有基准与基线系统的根本性变化，这些变化直指企业深度研究中“信息过载与关键洞察遗漏”这一核心瓶颈。下文围绕四个关键的 **changed slots** 分析每一项创新如何改变问题的求解空间，并依据消融实验与多环境对比揭示其因果效应与剩余风险。
 
@@ -79,7 +83,7 @@ DRBench 在任务设置、评估方法与智能体设计三个层面引入了相
 
 然而，因果分析也揭示了 AAP 的单边性：当与复杂规划结合时，*Factuality* 出现下降（Table 2），说明无约束的探索可能牺牲引用可靠性。该发现构成论文的关键张力：自适应探索以部分事实性为代价换来更高的洞察覆盖率，而轻量级规划则更有利于保持证据基础。这一 trade‑off 为下一代企业智能体指明了方向——需要在探索的灵活性与答案的严谨性之间寻求新的平衡机制。目前该结论虽强（Table 2 置信度 0.95），但限于 GPT‑5 单骨干的规划消融，在其他模型上的交互效应仍需扩展验证。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0014_IGYQ4c92e2_DRBench_A_Realistic_Benchmark_for_Enterprise_Dee/figures/003_Table_1.jpg]]
 *Table 1: Comparison of deep research benchmarks (top) and AI agent benchmarks with a computer environment (middle). Columns report dataset size, whether both public and local data are required, the provided environment type, task domains, task description, and evaluation method. Unlike prior work, DRBench combines public web retrieval with local enterprise data in realistic enterprise applications and evaluates both insight recall, distractor avoidance and report quality. Task Description: types of tasks covered by the benchmark: WR for Web Research, DR for Deep Research with both public and local data, CU for Computer Use and/or Mobile Use. DRBench has 1093 total # groundtruth insights that need to...*
@@ -112,7 +116,7 @@ DRBA（图3）是首个专门面向企业深度研究的基线智能体，其架
 
 与传统基准以任务级正确与否给分的做法不同，DRBench将评估粒度下沉到原子洞察级别，分别统计每个ground‑truth洞察是否被准确回忆、每个干扰项是否被正确忽略，从而更精细地诊断智能体在复杂信息环境中提取关键信号的真正瓶颈。这种设计使得整体框架不仅能排名模型，还能揭示各模块（尤其是AAP带来的探索与事实性之间的权衡）对系统行为的因果贡献。
 
-## 核心模块与公式推导
+
 
 ### 关键模块
 
@@ -139,7 +143,9 @@ $$S_{a,t} = \frac{1}{n} \sum_{i=1}^{n} s_{a,i}$$
 
 该分数用于校准自动化洞察召回指标，人工评估结果显示两者高度一致（Figure 8），验证了自动化指标的可靠性。注：其他核心评价指标（如 Insight Recall、Distractor Avoidance、Factuality）采用 LLM-as-a-judge 流程进行判定，原文未提供封闭形式的数学表达式，此处不再推导。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 总体表现：核心瓶颈在洞察召回率
 
@@ -184,7 +190,9 @@ Table 5 的对比显示，当所有文件直接作为本地输入（local）�
 - **Figure 8**：人类与自动评估的对齐为洞察级别的衡量提供了可信度，支撑基准的整体有效性。
 - **Table 27**：循环次数需控制在合理区间（中等即可），过度迭代不会带来显著增益，可为系统设计提供超参数选取指引。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有基准及系统的谱系关系
 
@@ -218,6 +226,8 @@ DRBench 建立在一系列面向研究型智能体与通用人工智能助手的
 3. **基准的维度扩展**：如何将 DRBench 延伸至跨团队决策、纵向审计、事件响应等更多企业任务原型？如何引入覆盖度与新颖性等新评估指标，以弥补当前 Insight Recall 指标的局限性？
 4. **评估信号的精细化**：能否引入更细粒度的归因信号（如引用对齐、事实链追踪），使事实性评估从原子洞察级提升至证据片段级，从而实现更可靠的自动诊断？
 5. **领域适应性的系统性研究**：当智能体被部署到迥异的企业领域时，其搜索策略和规划偏好应如何自适应调整？开放基准的行业与领域扩展将是推动此类研究的基础设施条件。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Beyond_English_Centric_Training_How_Reinforcement_Learning_Improves_Cross_Lingual_Reasoning_in_LLMs.pdf
+project_link: null
+code_link: null
 openreview_forum_id: hdrG6SaTcA
 aliases:
 - BECTHRLICLRL
@@ -41,7 +43,7 @@ claims:
 > - MMath500 上，平均准确率 (Avg Accuracy) 为 RL (Zh): 61.3%，对比 SFT (Zh): 39.8%，变化 +21.5%。
 > - MMLU-ProX-Lite 上，泛化得分 (Gen) 为 RL (De): 30.8，对比 SFT (De): 8.0，变化 +22.8。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -67,7 +69,7 @@ claims:
 
 本研究提出的方法属于**基于GRPO的跨语言推理强化学习训练**，其核心改变是将训练范式从SFT的模仿学习切换为RL的奖励驱动探索。相较于SFT的最大似然估计优化，RL通过最大化期望奖励（以答案准确性为核心信号）引导模型自主发现不依赖于特定语言的鲁棒推理策略。该方法在Qwen2.5-3B-Base、SmolLM3-3B和Qwen2.5-7B等多个基座模型上均验证了有效性（Table 4, Table 13），展现出模型规模无关的鲁棒性。
 
-## 背景与动机
+
 
 大语言模型（LLM）在推理能力上取得了显著进展，但这一进步主要集中在英语场景。当面对非英语语言时，即便经过多语言预训练，模型的推理性能仍会出现明显下降。现有的跨语言推理增强方法主要依赖监督微调（SFT），通过模仿专家链式推理路径来提升目标语言的推理能力。然而，SFT的本质缺陷在于：它通过最大似然估计拟合训练数据的分布，容易过拟合于训练语言的特定推理模式，缺乏对多样化推理路径的探索能力，导致跨语言泛化受限。
 
@@ -81,7 +83,9 @@ claims:
 
 为解释上述现象，本文进一步从三个机制层面展开分析：推理过程中的语言不一致性、采样驱动的策略优化，以及训练后的语义空间偏移。这些分析共同指向一个核心洞察：RL通过奖励引导的探索，使模型学习到不依赖于特定语言的鲁棒推理策略，而非英语数据在此过程中能够更有效地激发模型的潜在推理能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本研究的核心创新在于**用强化学习的探索机制替代监督微调的模仿范式，以解决跨语言推理中的泛化瓶颈**。相比于已有工作，这一创新体现在以下四个关键维度的“changed slots”上。
 
@@ -119,7 +123,7 @@ SFT仅使用预先提供的静态训练样本，缺乏对模型自身生成能�
 
 进一步的消融实验显示，在RL之前进行SFT预训练（冷启动策略）往往导致最终性能下降。特别是短步SFT（100步）后再进行RL训练，反而损害了模型性能（Table 15）。这一现象暗示SFT可能将模型引入语言相关的局部最优，限制了RL的探索空间，从而削弱了其跨语言泛化潜力。
 
-## 整体框架
+
 
 本工作构建了一套系统的跨语言推理训练与评估框架，旨在对比监督微调（SFT）与强化学习（RL）两种范式在跨语言泛化能力上的差异，并揭示其背后的关键机制。框架以预训练基座模型为起点，通过统一的训练数据、一致的训练步数和标准化的评估协议，确保方法比较的公平性。
 
@@ -172,7 +176,7 @@ SFT仅使用预先提供的静态训练样本，缺乏对模型自身生成能�
 - 评估以零样本为主，同时提供少样本结果作为稳健性验证；
 - 在 3B 和 7B 两种参数规模上验证结论的模型无关性。
 
-## 核心模块与公式推导
+
 
 ### 泛化得分（Generalization Score）
 
@@ -222,7 +226,9 @@ $$
 | **Language Consistency Reward** | 基于 `langid` 检测回复主语言，强制语言一致性（仅消融实验） | 与 $r_{\mathrm{acc}}$ 等权组合 |
 | **Base Model** | 预训练基座模型（如 Qwen2.5-3B-Base），提供初始隐层特征 | 冻结或全参数训练 |
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现一：RL 在跨语言推理上系统性地优于 SFT
 
@@ -304,7 +310,9 @@ SFT + RL 的冷启动策略（先进行 SFT 预训练再进行 RL）并未带来
 ![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_hdrG6SaTcA/figures/014_Table_8.jpg]]
 *Table 8: Performance of base model, SFT, and RL tuning models on MAIME2024. Base denotes the original Qwen2.5-3B-Base model. SFT (zh) and RL (zh) mean we tune the base model in Chinese data through SFT and RL, respectively. We report the Pass@16 score on 10 linguistic settings. ∆ (RL-SFT) represents the performance difference between RL and the corresponding SFT score*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心训练范式的转换
 
@@ -356,6 +364,8 @@ SFT + RL 的冷启动策略（先进行 SFT 预训练再进行 RL）并未带来
 4. **低资源语言的泛化行为**：当前实验集中在高资源语言。RL在低资源语言上的表现是否同样优于SFT？非英语训练优势是否在低资源语言上依然成立？这些问题对于评估该方法的实际应用价值至关重要。
 
 5. **语义空间稳定性的因果作用**：RL训练带来的语义空间偏移（Figure 4）与泛化性能之间的因果关系需要更严格的因果实验来确证。如果稳定性是泛化的原因而非结果，那么直接优化语义空间稳定性是否能成为新的训练目标？
+
+
 
 ## 原文 PDF
 

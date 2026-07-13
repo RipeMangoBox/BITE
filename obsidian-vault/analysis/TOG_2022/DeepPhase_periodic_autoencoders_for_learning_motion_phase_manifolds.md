@@ -5,6 +5,7 @@ paper_level: A
 venue: TOG
 year: 2022
 pdf_ref: paperPDFs/TOG_2022/DeepPhase_periodic_autoencoders_for_learning_motion_phase_manifolds.pdf
+code_link: https://github.com/sebastianstarke/AI4Animation/tree/master/AI4Animation/SIGGRAPH_2022
 project_link: https://github.com/sebastianstarke/AI4Animation/tree/master/AI4Animation/SIGGRAPH_2022
 aliases:
 - PA
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | DeepPhase：用于学习运动相位流形的周期性自编码器 |
 | 英文题名 | DeepPhase: periodic autoencoders for learning motion phase manifolds |
 | 会议/期刊 | TOG 2022 |
-| Links | [paper](https://doi.org/10.1145/3528223.3530178); [GitHub](https://github.com/sebastianstarke/AI4Animation/tree/master/AI4Animation/SIGGRAPH_2022) |
+| Links | [paper](https://doi.org/10.1145/3528223.3530178) · [GitHub](https://github.com/sebastianstarke/AI4Animation/tree/master/AI4Animation/SIGGRAPH_2022) |
 | Topic | #topic/representation_self_supervised_transfer #topic/representation_self_supervised_transfer/representation_learning |
 | Method | Periodic Autoencoder |
 | Dataset | Style and Dance Dataset |
@@ -40,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - Style and Dance Dataset 上，Alignment Error (average distance between joint pairs of 10 matched poses over 10000 queries) 为 0.034，对比 0.146 (Contact-based), 0.074 (PCA Heuristic)，变化 -76.7% vs Contact-based, -54.1% vs PCA Heuristic。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -72,7 +73,7 @@ claims:
 - 相位通道数是一个关键超参数，其最优值依赖于数据量和运动类型，通道过少可能导致错误对齐，过多则可能导致门控网络过分割。
 - 开放问题：周期性自编码器能否在大规模异构数据集上预训练，作为通用模型为未见过的角色运动计算对齐？该框架能否应用于视频、声音或语音等其他模态数据？
 
-## 背景与动机
+
 
 ### 运动合成中的核心瓶颈
 
@@ -93,7 +94,9 @@ claims:
 
 基于此洞察，本文提出 **Periodic Autoencoder**（周期性自编码器），一种无需任何相位标签、完全从非结构化运动数据中无监督学习多维相位变量的神经网络架构。该方法将运动分解为多个潜在通道，每个通道捕获特定身体部位的非线性周期性，并在特征空间中形成一个在距离度量上更具区分性的相位流形，为下游的运动生成与匹配任务提供结构化的时序表征。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 从手动定义到无监督学习的相位提取
 
@@ -133,7 +136,7 @@ $$\mathcal{P}_{2i-1}^{(t)} = \mathbf{A}_i^{(t)} \cdot \sin(2\pi \cdot \mathbf{S}
 
 上述三个 changed slots 并非孤立改进，而是形成了一条因果链：**正弦参数化约束**赋予了潜在空间周期性结构，使得**无监督学习**能够自动发现运动中的多维周期成分，进而产出的**低维相位流形坐标**在特征距离上比原始运动空间更具判别力。这一协同效应解释了为何 DeepPhase 在多项下游任务中一致优于基于规则的传统方法——从双足/四足运动的生动度提升（Table 2），到脚部滑动的减少（Table 3），再到多相位舞蹈动作的对齐精度跃升（Table 4）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l25_https_doi_org_10_1145_3528223_3530178/figures/002_Figure_2.jpg]]
 *Figure 2: Network architecture of the Periodic Autoencoder for extracting multi-dimensional phase manifolds from unstructured motion data*
@@ -175,7 +178,7 @@ DeepPhase 的核心是一个名为 **Periodic Autoencoder** 的无监督学习�
 - 输入采用窗口均值中心化的速度轨迹而非绝对位置，使网络聚焦于运动动态而非全局姿态。  
 - 可微 FFT 层的引入是训练稳定性的关键：消融实验表明，若直接由网络学习幅度和频率，参数会在时间轴上剧烈振荡，导致相位流形充满噪声。
 
-## 核心模块与公式推导
+
 
 ### 整体架构
 
@@ -231,7 +234,9 @@ $$\mathcal{P}_{t + \Delta t}^{\prime} = A_{t + \Delta t} \cdot I(R(\theta) \cdot
 
 其中 $I$ 为球面线性插值函数，$R(\theta)$ 为旋转矩阵。这一机制使得相位特征在运动匹配任务中能够自回归地索引下一帧姿态，且索引结果紧邻当前帧（见 Fig. 15 的定量验证）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 数据集与实验设置
 
@@ -281,7 +286,9 @@ $$\mathcal{P}_{t + \Delta t}^{\prime} = A_{t + \Delta t} \cdot I(R(\theta) \cdot
 
 相位通道数作为关键超参数，其最优值依赖于数据量和运动复杂度。通道数过少会导致不同周期的运动片段在流形上错误重叠，引起对齐失败；过多则可能使门控网络过分割，损害运动合成的连贯性。舞蹈动作合成无法泛化到任意音乐输入，需要额外模型学习音乐上下文到动作的映射。相位流形虽能有效聚类运动并约束相邻帧的可行过渡，但本身不解决高层运动技能选择问题，仍需用户控制信号或概率采样策略。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：从全局相位到局部相位再到学习型相位
 
@@ -324,6 +331,8 @@ Periodic Autoencoder 提取的相位流形并非直接替代运动生成器，�
 ### 在知识库中的定位
 
 Periodic Autoencoder 处于**学习型运动相位提取**这一细分方向的开端。它继承了自编码器运动压缩的传统（Holden et al., 2015），但通过引入显式的周期性归纳偏置，将潜在空间从“压缩表示”升级为“可解释的相位流形”。与同期或后续工作中基于接触/启发式的相位方法相比，其核心优势在于**无监督性和运动类型无关性**；其核心劣势在于**通道数超参数敏感性和对下游任务的部分依赖**。在方法谱系中，它桥接了手工相位定义与完全端到端运动生成之间的空白，为后续工作（如结合音乐条件的舞蹈生成、跨骨骼运动重定向）提供了可复用的相位特征提取模块。
+
+
 
 ## 原文 PDF
 

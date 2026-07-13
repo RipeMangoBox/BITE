@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/Residual_Primitive_Fitting_of_3D_Shapes_with_SuperFrusta.pdf
+project_link: null
 code_link: "https://github.com/kmammou/v-hacd"
 aliases:
 - SRPFR
@@ -41,7 +42,7 @@ claims:
 > - 3DGen-Prim 上，IoU (%) 88.74 vs ~82.64 (MPS) (+6.10)；#Primitives 23.98 vs 42.96 (MPS) (-18.98 (少44%))；Overlap Ratio 0.210 vs 0.684 (MPS) (-0.474 (减少69%))。
 > - Toys4K 上，IoU (%) 89.92 vs ~80.62 (MPS) (+9.30)；#Primitives 23.67 vs 30.62 (MPS) (-6.95 (少23%))。
 
-## 概述
+## 概要
 
 三维形状的基元化装配——用少量解析基元精确表示复杂几何——是计算机图形学与视觉中的长期难题。其核心瓶颈在于：**现有解析基元表达性有限**，超二次曲面等传统基元难以拟合弯曲、空心等复杂形态；**分析驱动方法**（如近似凸分解ACD）对基元表达能力不敏感，易产生过度分割；**优化驱动方法**在高度非凸损失下需要大量基元才能达到可接受的重构精度，导致重构保真度与基元数量之间的帕累托前沿长期停滞。
 
@@ -55,7 +56,7 @@ claims:
 
 主要实验结果（Table 1）验证了该方法的有效性：在3DGen-Prim和Toys4K基准上，ResFit将IoU分别提升约6个和9个点，同时使用的基元数量仅为Marching Primitives（MPS, Liu et al., CVPR 2023）的约一半，体素重叠减少超过3倍。消融实验进一步证实，SuperFrustum+平滑联合在重建精度和程序质量上全面优于立方体、超二次曲面等基元；ResFit交替优化策略显著优于一次性拟合；MSD分解比CoACD（Wei et al., ACM TOG 2022）更适合SuperFrustum初始化。
 
-## 背景与动机
+
 
 ### 基元装配：从解析表示到程序化建模
 
@@ -87,7 +88,9 @@ claims:
 
 这一设计的核心洞察在于：**让分解适应基元的表达能力，让优化受益于分解的结构线索**——二者相互适应，从而系统性地前移重构-简洁性的帕累托前沿。实验表明，该方法在3DGen-Prim和Toys4K基准上将IoU分别提升约6和9个百分点，同时使用的基元数量仅为Marching Primitives的约一半，体素重叠减少超过3倍。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于从基元表达性与拟合策略两个维度同时突破，系统性地前移了重构精度与基元简洁性之间的帕累托前沿。具体而言，方法引入了两个紧密耦合的“changed slots”：
 
@@ -115,7 +118,7 @@ $$SF(\mathbf{p}) = f(\mathbf{p}; \theta), \quad \theta = (\mathbf{s}, r, d, t, b
 
 SuperFrustum的表达连续性与ResFit的迭代残差适应形成正向反馈：表达能力强的基元使每轮拟合能解释更多几何，减少所需基元数量；交替策略则确保新基元精准补充残差区域，避免冗余。这一协同在实验中体现为：在3DGen-Prim上IoU提升6.1个点（88.74 vs. 82.64），同时基元数量减少44%（23.98 vs. 42.96）；在Toys4K上IoU提升9.3个点，基元数量减少23%（Table 1）。体素重叠率更是从0.684降至0.210，降幅达69%，表明装配的语义可解释性显著增强。
 
-## 整体框架
+
 
 ResFit 的核心思想是将**全局形状分析**与**局部基元优化**交替进行，使分解过程主动适应基元的表达能力，从而在几乎不损失重构精度的前提下大幅减少基元数量。整个流水线围绕一个统一的目标函数展开：
 
@@ -160,7 +163,7 @@ ResFit 的推理过程由五个模块构成循环迭代（Figure 3）：
 
 整个流水线为无监督方法，无需训练数据，仅依赖输入网格的几何信息即可完成推理。
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题形式化
 
@@ -251,7 +254,9 @@ ResFit 的核心机制是将上述模块串联为**交替迭代**过程（Figure
 
 这一交替策略的关键在于：**形状分解感知基元的表达能力**（MSD 按厚度而非凸性分割，适配 SuperFrustum 的形态空间），**局部优化又反哺全局形状理解**（优化后的基元更准确地覆盖已解释区域，使残差更清晰地暴露未解释结构）。消融实验（Table 3）证实，这种交替策略显著优于一次性拟合所有基元的单阶段方法。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -316,7 +321,9 @@ Table 3验证了ResFit交替优化策略和MSD分解方法的有效性。将ResF
 ![[assets/figures/papers/paper_list_l2090_https_arxiv_org_abs_2512_09201/figures/013_Figure_9.jpg]]
 *Figure 9: ResFit enables finer, semantically consistent part segmentation. Row 1 shows the coarse semantic regions provided in PartObjVerse. Row 2 shows the primitive assemblies inferred by ResFit. Intersecting each coarse region with its corresponding assembly (Row 3) yields meaningful sub-parts—capturing functional structure while remaining strictly within the original semantic boundaries*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 基元装配方法的演进脉络
 
@@ -367,6 +374,8 @@ ResFit输出的基元装配具有天然的可编辑性和程序化特性，可�
 - **与可学习先验的融合**：ResFit目前是完全无监督的。将其与特定类别的形状先验（如通过预训练编码器）结合，有望在保持泛化能力的同时提升类内重构精度和语义一致性。
 - **端到端可编辑流水线**：将基元装配与物理仿真、骨骼绑定、动画参数化等下游任务直接衔接，形成从几何到功能的端到端可编辑资产流水线，是推动基元表示实际应用的重要方向。
 - **实时交互优化**：通过GPU加速、预计算缓存或渐进式优化策略，将基元拟合时间压缩到秒级甚至亚秒级，使ResFit能够嵌入交互式建模工具。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2023
 pdf_ref: paperPDFs/CVPR_2023/Fast_Monocular_Scene_Reconstruction_with_Global_Sparse_Local_Dense_Grids.pdf
+code_link: null
 project_link: https://dongwei.info/publication/ash-mono/
 aliases:
 - GSLDGGLG
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 基于全局稀疏局部稠密网格的快速单目场景重建 |
 | 英文题名 | Fast Monocular Scene Reconstruction with Global-Sparse Local-Dense Grids |
 | 会议/期刊 | CVPR 2023 |
-| Links | [paper](https://arxiv.org/abs/2305.13220); [Project](https://dongwei.info/publication/ash-mono/) |
+| Links | [paper](https://arxiv.org/abs/2305.13220) · [Project](https://dongwei.info/publication/ash-mono/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Global-Sparse Local-Dense Grids (GS-LD Grids) |
 | Dataset | ScanNet scene 0084 (Time), ScanNet, 7-Scenes |
@@ -42,7 +43,7 @@ claims:
 > - ScanNet scene 0084 (Time) 上，Inference time (seconds per image) 为 0.25，对比 19.13 (MonoSDF-Grid)，变化 -18.88 s。
 > - ScanNet 上，F-score 为 0.710 (Ours +CRF)，对比 0.750 (MonoSDF-Grid)，变化 -0.040。
 
-## 概述
+## 概要
 
 当前基于神经隐式表示的单目场景重建方法（如 **MonoSDF**）依赖 MLP 或特征网格来隐式编码几何与外观，导致训练和推理速度极慢，且无法有效利用场景表面固有的空间稀疏性——真实表面仅占三维空间的极小部分。本文提出 **Global-Sparse Local-Dense Grids (GS-LD Grids)**，一种显式的、可微分的全局稀疏局部稠密体素网格表示，直接在体素中存储 SDF、颜色和语义属性，完全摒弃 MLP，从而在保持与 SOTA 可比重建精度的同时，实现训练速度 **10 倍**提升、渲染速度 **100 倍**提升（Table 1）。
 
@@ -50,7 +51,7 @@ claims:
 
 在 ScanNet 和 7-Scenes 基准上的实验表明，该方法在 ScanNet 上取得与 MonoSDF 可比的 F-score（0.710 vs. 0.750），在 7-Scenes 上则优于 MonoSDF（0.454 vs. 0.411），同时训练时间从 4.36 小时降至 0.47 小时，单帧推理时间从 19.13 秒降至 0.25 秒（Table 1, Table 2）。消融实验进一步验证了逐帧尺度优化的关键作用：若仅使用全局单一尺度，初始重建 F-score 将从 0.627 骤降至 0.17（ScanNet），凸显了尺度校准对后续重建质量的决定性影响（Table 3）。
 
-## 背景与动机
+
 
 ### 单目场景重建的技术瓶颈
 
@@ -72,7 +73,9 @@ claims:
 
 为实现这一目标，本文进一步提出了一套完整的流程：首先通过尺度校准算法消除单目深度的帧间歧义，获得一致的几何初始化；随后利用可微分体渲染进行几何细化；最后引入高维连续条件随机场（CRF）在表面样本上联合优化颜色、法线和语义标签，增强物体边界的一致性。实验表明，该方法在ScanNet和7-Scenes数据集上训练速度提升10倍，渲染速度提升100倍，同时重建精度与当前最优方法可比，在7-Scenes上甚至更优。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈洞察：从隐式查询到显式存储
 
@@ -118,7 +121,7 @@ claims:
 
 在因果链路中，**逐帧深度尺度优化**（Section 3.3）虽然看似辅助模块，实则是整个系统可行的前提条件。单目深度预测器输出的是无物理尺度的相对深度，若仅使用全局单一尺度因子，初始重建的 F-score 将从 0.627 骤降至 0.17（ScanNet）和 0.26（7-Scenes）（Table 3 vs Table 2）。本文通过 2D 尺度网格 $\phi_i$ 和 SfM 共视约束，在帧间建立局部一致性，使得体积融合能够产生有意义的初始几何。这一设计使得“先融合后细化”的策略成为可能，是该方法区别于纯优化式隐式方法的核心分水岭。
 
-## 整体框架
+
 
 本文提出的**全局稀疏局部稠密网格**（Global-Sparse Local-Dense Grids，GS-LD Grids）是一个从单目图像序列到带颜色与语义标签的三维场景重建的完整流水线。其核心设计理念是将场景表面固有的空间稀疏性显式编码为一种可微分的数据结构，从而在保持与SOTA神经隐式方法可比精度的同时，实现训练速度10倍、推理速度100倍的提升。
 
@@ -151,7 +154,7 @@ claims:
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2305_13220/figures/004_Figure_4.jpg]]
 *Figure 4: Illustration of our pipeline. We first use structure-from-motion (SfM) to obtain sparse feature-based reconstruction. With the sparse point cloud and covisibility information from SfM, we optimize the scale of predicted monocular depth images (§3.3), and perform volumetric fusion to construct a globally sparse locally dense voxel grid (§3.4). After initialization, we perform differentiable volume rendering to refine the details (§3.5.1), and apply high dimensional continuous CRFs to finetune normals, colors, and labels (§3.5.3)*
 
-## 核心模块与公式推导
+
 
 ### 3.1 全局稀疏局部稠密数据结构
 
@@ -250,7 +253,9 @@ $$
 
 其中 $\mathcal{L}_c$、$\mathcal{L}_d$、$\mathcal{L}_n$ 分别为颜色、深度、法线的渲染损失。网格参数 $\{\theta_d, \theta_c, \theta_s\}$ 使用 RM-SProp 优化，初始学习率 $10^{-3}$，指数调度器 $\gamma=0.1$。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能对比
 
@@ -266,7 +271,6 @@ $$
 
 Figure 8进一步揭示了底层数据结构的高效性：与NGP-grid相比，GS-LD Grids的端到端查询速度快**两个数量级**，且在大批量点查询时仍保持高效率。这归因于碰撞自由哈希表索引稀疏体素块，以及块内稠密数组的缓存友好设计。
 
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2305_13220/figures/018_Figure.jpg]]
 
 ### 阶段消融：从初始化到精细化的增益分析
 
@@ -320,7 +324,9 @@ Table 4和Table 5提供了ScanNet和7-Scenes上逐场景的F-score对比。在Sc
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2305_13220/figures/009_Figure_8.jpg]]
 *Figure 8: Query time comparison between ours and NGP-grid, lower is better. For end-to-end query, ours is two magnitudes faster, and maintains a high efficiency with a large number of point query. For the grid query operation itself, ours also have a better performance than multiresolution feature grids*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位与核心瓶颈
 
@@ -370,6 +376,8 @@ GS-LD Grids 相对于现有基线方法，在以下关键设计槽位上进行�
 3. **户外扩展**：将该方法扩展到户外大场景重建需要解决若干挑战：户外光照变化剧烈，单目深度和语义先验的泛化性需重新评估；天空等无限远区域需要特殊处理；大尺度场景对内存管理和体素分配策略提出了更高要求。
 
 4. **实时在线重建**：当前方法虽已大幅加速，但仍包含离线阶段（SfM、尺度优化）。探索增量式 SfM 与在线体素分配的融合，有望实现实时在线场景重建，这对 AR/VR 和机器人应用具有重要意义。
+
+
 
 ## 原文 PDF
 

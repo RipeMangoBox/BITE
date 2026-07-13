@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/THOR_Tool_Integrated_Hierarchical_Optimization_via_RL_for_Mathematical_Reasoning.pdf
+project_link: null
+code_link: https://github.com/JingMog/THOR
 openreview_forum_id: 0Af7UiJISU
 aliases:
 - TTIHOR
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | THOR：基于强化学习的工具集成层次优化数学推理方法 |
 | 英文题名 | THOR: Tool-Integrated Hierarchical Optimization via RL for Mathematical Reasoning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=0Af7UiJISU); [GitHub](https://github.com/JingMog/THOR) |
+| Links | [paper](https://openreview.net/forum?id=0Af7UiJISU) · [GitHub](https://github.com/JingMog/THOR) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | THOR (Tool-Integrated Hierarchical Optimization via RL) |
 | Dataset | MATH 500, AIME 2024, AMC 2023, Overall Average (推理模型) |
@@ -42,7 +44,7 @@ claims:
 > - AIME 2024 上，Accuracy (%) 为 50.0 (THOR-7B)，对比 33.3 (AutoTIR-7B); 40.8 (TORL-7B, 无工具)，变化 +16.7 / +9.2。
 > - AMC 2023 上，Accuracy (%) 为 81.3 (THOR-7B)，对比 73.8 (TORL-7B, 无工具)，变化 +7.5。
 
-## 概述
+## 概要
 
 数学推理任务中，将大语言模型与外部工具（如代码执行器）集成的工具集成推理（Tool-Integrated Reasoning, TIR）范式，正日益成为提升复杂问题求解能力的关键路径。然而，现有TIR方法面临三重瓶颈：
 
@@ -64,7 +66,7 @@ claims:
 - **THOR-Thinking-8B**（推理模型版本）在全部基准平均准确率达到79.8%，较DeepSeek-R1-Distill-Qwen-7B提升12.3个百分点，较Qwen3-8B提升5.3个百分点。
 - 消融实验证实，层次化RL（回合级+步骤级）相比仅回合级RL带来额外增益，推理时自我纠正进一步持续提升性能，尤其在复杂基准上效果显著。
 
-## 背景与动机
+
 
 ### 数学推理中的工具集成范式
 
@@ -90,7 +92,9 @@ $$\tau = ( r ^ { 1 } , a ^ { 1 } , o ^ { 1 } , . . . , r ^ { t } , a ^ { t } , o
 
 基于此洞察，本文提出THOR（Tool-Integrated Hierarchical Optimization via RL），通过三个关键设计系统性解决上述瓶颈：（1）TIRGen数据构造管道，生成策略对齐的高质量TIR数据；（2）层次化强化学习框架，联合优化回合级问题求解与步骤级代码生成；（3）基于工具即时反馈的推理时自我纠正机制。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 THOR 的核心创新围绕一个关键因果发现展开：**中间工具调用（代码执行）的成功与否，是最终答案正确性的强预测器**（Table 4，χ²=336.3，p=4.09e-75）。基于这一洞察，THOR 在三个相互耦合的维度上对现有工具集成推理（TIR）方法进行了系统性改造，形成了“数据构造→层次优化→推理纠错”的闭环。
 
@@ -125,7 +129,7 @@ $$\mathscr{L}(\theta) = \mathcal{L}_{\pi_\theta}^{\text{epis}}(\theta) + \mathca
 
 THOR 的三个创新点构成了一个因果闭环：TIRGen 提供策略对齐的冷启动数据，使模型建立基本的工具调用能力；层次化 RL 利用步骤级执行反馈进行细粒度优化，将“代码执行成功”这一强预测信号注入训练过程；自我纠正机制则在推理时利用同一信号进行动态纠错，进一步提升推理的鲁棒性和准确性。这一设计使得 THOR 在多个数学基准上显著超越同类规模的工具使用模型和工具自由模型。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_0Af7UiJISU/figures/003_Figure_3.jpg]]
 *Figure 3: A hierarchical optimization framework comprising (a) episode-level RL for mathematical problem solving and (b) step-level optimization for code generation. In addition, we introduce (c) a self-correction mechanism for online error correction during inference*
@@ -149,7 +153,7 @@ THOR 的整体框架围绕一个核心洞察构建：**中间工具调用（代�
 
 **模块间数据流关系：** TIRGen 冷启动数据 → 监督微调建立工具调用基本能力 → 回合级 RL 提升求解能力 → 步骤级 RL 利用执行反馈精细优化代码生成 → 推理时自我纠正闭环利用即时工具反馈。整个框架将代码执行成功这一中间信号贯穿始终，形成了从数据构造到训练优化再到推理纠错的统一闭环。
 
-## 核心模块与公式推导
+
 
 ### 2.1 工具集成推理的形式化建模
 
@@ -222,7 +226,9 @@ $$\mathscr{L}(\theta) = \mathcal{L}_{\pi_\theta}^{\mathrm{epis}}(\theta) + \math
 
 推理阶段，当动作 $a^t$ 执行失败时，模型回溯到 $r^t$，将其分割为前缀 $r_{\mathrm{pre}}^t$ 和后缀 $r_{\mathrm{suf}}^t$，重新生成推理后缀 $\hat{r}_{\mathrm{suf}}^t$ 和修正动作 $\hat{a}^t$（Figure 3(c)）。最大纠正尝试次数设为 $N_{\mathrm{corr}} = 4$。该机制直接复用步骤级优化训练出的回溯重生成能力，无需额外模型或外部信号。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心动机验证：代码执行成功是答案正确性的强预测器
 
@@ -293,7 +299,9 @@ THOR 在六个数学推理基准上进行了系统评估，涵盖 MATH 500、AIM
 - TIRGen 与其他 TIR 数据集的对比（**Figure 4**）中，pass@16 的“约 10 个百分点提升”为视觉估计值，精确数字需核实。
 - 所有实验均基于 Qwen 系列基础模型，方法在其他模型家族上的迁移效果有待进一步验证。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题域与核心瓶颈
 
@@ -356,6 +364,8 @@ THOR 处于 TIR 方法谱系中从“工具使用”到“工具集成推理与�
 5. **开放式数学推理**：评测集中在有明确答案的基准测试，对于证明题、开放式数学探索等场景，执行反馈与正确性之间的相关性可能减弱，框架的有效性需要重新审视。
 
 > **注**：部分基线的具体会议/期刊信息（如 Singh et al. 2025、Xu et al. 2025、Wei et al. 2025 等）在提供材料中未明确标注发表 venue，建议人工核实补充。
+
+
 
 ## 原文 PDF
 

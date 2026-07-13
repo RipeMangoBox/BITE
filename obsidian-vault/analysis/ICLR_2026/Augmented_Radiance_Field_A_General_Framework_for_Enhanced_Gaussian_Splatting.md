@@ -33,7 +33,7 @@ claims:
 | 中文题名 | 增强辐射场：提升高斯飞溅的通用框架 |
 | 英文题名 | Augmented Radiance Field: A General Framework for Enhanced Gaussian Splatting |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=IzlaRUHncO) · [Project](https://xiaoxinyyx.github.io/augs) · [arXiv](https://arxiv.org/abs/2501) |
+| Links | [paper](https://openreview.net/forum?id=IzlaRUHncO) · [Project](https://xiaoxinyyx.github.io/augs) · [paper](https://arxiv.org/abs/2501) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | 增强辐射场 (Augmented Radiance Field) |
 | Dataset | Mip-NeRF 360, Tanks&Temples, NeRF Synthetic, Deep Blending |
@@ -43,7 +43,7 @@ claims:
 > - Tanks&Temples 上，PSNR 25.06 (Ours MCMC, sh=3) vs 24.79 (DBS) (+0.27 dB)。
 > - NeRF Synthetic 上，PSNR 34.35 (Ours MCMC, sh=3) vs 34.64 (DBS) (-0.29 dB)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：3D Gaussian Splatting (3DGS) 在重建复杂真实场景时，其球谐函数 (Spherical Harmonics, SH) 编码难以有效解耦漫反射与镜面反射成分，尤其对于高光表面和视角依赖强烈的材质，渲染质量存在明显短板。单纯提高SH阶数（如从3阶升至4阶）并不能带来实质性的渲染质量提升，反而显著增加内存开销（Table 4）。
 
@@ -53,7 +53,7 @@ claims:
 
 **主要结果**：在Mip-NeRF 360数据集上，Ours (MCMC, sh=3) 达到PSNR 28.96 dB，超越Zip-NeRF的28.54 dB；在Tanks&Temples上达到25.06 dB，优于所有显式与隐式基线（Table 1）。消融实验证实，增强高斯核占比10%时渲染质量最优（Table 2），且优化不透明叶的方向与形状能带来统计显著的增益（Table 3）。值得关注的是，即使仅使用二阶球谐函数 (sh=2)，本方法也能达到与三阶SH相当的性能，同时大幅降低内存占用（Table 1, Table 15）。
 
-## 背景与动机
+
 
 **新视角合成**是计算机视觉与图形学中的一项基础任务，其目标是从一组稀疏的输入图像中重建场景的完整三维表示，并能够从任意新视角进行高质量渲染。近年来，以**3D Gaussian Splatting (3DGS)**（Kerbl et al., 2023）为代表的显式辐射场方法，凭借其高保真渲染质量和实时推理速度，已成为该领域的主流范式。3DGS 使用一组各向异性的三维高斯核来表示场景，并通过高效的差分光栅化实现快速渲染。
 
@@ -67,7 +67,9 @@ claims:
 
 基于这一洞察，本文提出**增强辐射场 (Augmented Radiance Field)**——一个通用的后增强框架，能够无缝嵌入现有 3DGS 方法，通过引入受 Phong 光照模型启发的视角相关不透明度函数和误差驱动的自适应高斯核插入策略，在不显著增加参数量的前提下，大幅提升对高光表面和复杂反射场景的渲染质量。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作提出**增强辐射场 (Augmented Radiance Field)**，其核心创新在于通过引入**视角相关不透明度函数**，从根本上改变了3DGS对视角依赖外观的建模方式，从而解决了球谐函数在解耦漫反射与镜面反射成分时的固有瓶颈。
 
@@ -101,7 +103,7 @@ $$
 
 消融实验证实，仅当增强核具备可优化的视角相关不透明度时，才能获得统计显著的渲染质量提升；单纯补充无视角依赖性的高斯核效果不佳（Table 3）。此外，即使仅使用二阶球谐函数（sh=2），方法也能达到与三阶SH相当的性能，同时显著降低内存占用（Table 1, Table 15），进一步验证了视角相关不透明度对SH编码效率的补偿作用。
 
-## 整体框架
+
 
 增强辐射场（Augmented Radiance Field）采用**后增强（post-enhancement）范式**，在已优化的3DGS场景基础上，通过三阶段流水线自适应地插入具备视角相关不透明度的增强高斯核，以恢复原始表示难以捕捉的复杂视角依赖颜色（尤其是镜面高光）。图2概括了该流水线的三个核心模块。
 
@@ -125,7 +127,7 @@ $$
 
 整个流水线作为即插即用的后处理模块，可无缝集成到现有基于高斯飞溅的方法中。增强高斯核数量固定为总图元数的10%，以在渲染质量与内存效率间取得平衡。
 
-## 核心模块与公式推导
+
 
 ### 视角相关不透明度核
 
@@ -195,7 +197,9 @@ $$
 ![[assets/figures/papers/paper_list_l29_https_openreview_net_forum_id_IzlaRUHncO/figures/003_Figure_3.jpg]]
 *Figure 3: Inspired by classical Phong shading, we model view-dependent opacity with a cosineweighted function whose shape is controlled by two parameters*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要定量结果
 
@@ -267,7 +271,9 @@ Table 8 和 Table 11 提供了 Mip-NeRF 360 上逐场景的渲染质量及增强
 ![[assets/figures/papers/paper_list_l29_https_openreview_net_forum_id_IzlaRUHncO/figures/010_Figure_5.jpg]]
 *Figure 5: Comparison between Spherical Beta functions in DBS Liu et al. (2025) and opacity lobe. The three Gaussians in the first row model color using three differently oriented spherical beta functions, with maximum function values of 1, 2, and 4, all having an opacity of 0.5. The kernels in the second row use three differently oriented opacity lobes, with the same maximum amplitude and identical color intensity. Our method is more stable and flexible in reconstructing outgoing radiance, as it is less affected by the ordering of Gaussian kernels and has greater numerical stability*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 在显式辐射场演进中的坐标
 
@@ -316,6 +322,8 @@ $$
 ### 5. 知识库定位
 
 本工作在方法论层面建立了**“不透明度域视角依赖性建模”**这一新的设计维度，区别于现有的颜色域视角依赖性建模（SH、球形贝塔等）和几何域视角依赖性建模（如反射方程显式求解）。其核心贡献在于证明：对于镜面反射这一特定外观现象，在透明度而非颜色通道上建模角度选择性，可以获得更好的参数效率、数值稳定性和渲染质量。这一洞察可泛化至其他需要建模方向性外观现象的显式辐射场方法中。
+
+
 
 ## 原文 PDF
 

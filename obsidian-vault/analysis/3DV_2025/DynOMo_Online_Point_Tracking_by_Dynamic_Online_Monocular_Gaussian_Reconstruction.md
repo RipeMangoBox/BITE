@@ -6,6 +6,7 @@ venue: 3DV
 year: 2025
 pdf_ref: paperPDFs/3DV_2025/DynOMo_Online_Point_Tracking_by_Dynamic_Online_Monocular_Gaussian_Reconstruction.pdf
 project_link: https://jennyseidenschwarz.github.io/DynOMo.github.io/
+code_link: null
 aliases:
 - DynOMo
 tags:
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | DynOMo：基于动态在线单目高斯重建的在线点追踪 |
 | 英文题名 | DynOMo: Online Point Tracking by Dynamic Online Monocular Gaussian Reconstruction |
 | 会议/期刊 | 3DV 2025 |
-| Links | [paper](https://arxiv.org/abs/2409.02104); [Project](https://jennyseidenschwarz.github.io/DynOMo.github.io); [Project](https://jennyseidenschwarz.github.io/DynOMo.github.io/) |
+| Links | [paper](https://arxiv.org/abs/2409.02104) · [Project](https://jennyseidenschwarz.github.io/DynOMo.github.io) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | DynOMo |
 | Dataset | PanopticSports, TAPVid-DAVIS |
@@ -41,7 +42,7 @@ claims:
 > - PanopticSports 上，MTE_3D (cm) 为 26.1，对比 56.0 (D-3DGS-Mono)，变化 -29.9。
 > - TAPVid-DAVIS 上，AJ 为 45.8，对比 13.0 (SplaTAM)，变化 +32.8。
 
-## 概述
+## 概要
 
 单目在线点追踪面临一个根本性瓶颈：在未知相机位姿的条件下，系统仅能依赖稀疏的RGB信号，却需要同时完成动态场景重建、相机运动估计以及任意点的时空轨迹追踪。缺乏多视图几何约束和准确的深度信息，使得这一任务极具挑战。DynOMo的核心洞察在于，通过将预训练的2D编码器——包括DINOv2视觉特征、单目深度估计和语义分割——提取的丰富先验信息融入动态3D高斯表示，可以在不依赖任何运动标注或光流监督的情况下，使物体运动从重建过程中自动涌现。
 
@@ -49,7 +50,7 @@ claims:
 
 实验表明，DynOMo在单目设置下显著优于降级为单目的基线方法。在PanopticSports数据集上，其2D中值平移误差（MTE）为6.3像素，远低于D-3DGS-Mono的23.3像素；3D MTE为26.1 cm，相比基线降低约53%。在TAPVid-DAVIS上，DynOMo以在线、无预训练的方式取得45.8的AJ，与具有预训练的离线方法性能相当。消融实验进一步验证了特征重建损失、深度损失、局部刚性正则化以及基于特征相似度的邻域加权策略的关键作用。
 
-## 背景与动机
+
 
 ### 问题定义：单目在线点追踪
 
@@ -81,7 +82,9 @@ DynOMo的出发点是一个关键观察：**当通过精心设计的2D重建监�
 
 实现上述动机面临多重挑战。在未知相机位姿下，系统必须同时优化相机运动和场景结构，两者高度耦合。深度预测噪声会降低重建质量，尤其对新添加的高斯造成不良初始化。极端相机运动、长时间遮挡和物体加速度变化会破坏前向传播假设，导致跟踪漂移或丢失。此外，在线处理的因果性约束意味着系统无法访问未来帧信息，必须依赖历史观测进行运动预测。DynOMo通过多模态重建损失、实例引导的邻域选择以及特征加权的运动传播机制，系统性地应对这些挑战，在无运动监督的条件下实现了具有竞争力的在线点追踪性能。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DynOMo 的核心创新在于**将静态2D编码器的先验知识深度融入动态3D高斯表示**，使点追踪能力从重建过程中自然涌现，而无需任何运动信号监督或预训练。具体而言，该方法在三个层面突破了现有基线：
 
@@ -128,7 +131,7 @@ $$\mathcal{L}_{rec} = \lambda_I \mathcal{L}_I + \lambda_F \mathcal{L}_F + \lambd
 
 这些创新共同使 DynOMo 在单目、无位姿、无运动监督的苛刻条件下，在 PanopticSports 上实现 2D MTE 6.3 px（对比 D-3DGS-Mono 的 23.3 px），在 TAPVid-DAVIS 上达到 AJ 45.8，**与需要大规模预训练和运动监督的离线方法性能相当**。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l25_https_arxiv_org_abs_2409_02104/figures/002_Figure_2.jpg]]
 *Figure 2: Tracking points with online dynamic monocular reconstruction: Our pipeline assumes an input video sequence, (predicted) depth maps, sparse segmentation masks as well as image features as input. In our online reconstruction pipeline we optimize for the camera pose C, add a set of new Gaussians based on the densification concept [14], optimize all Gaussians together and forward propagate G and C. Finally, we directly extract 3D point trajectories from single Gaussians G _ { p } and project them to the image plane to obtain 2D trajectories*
@@ -148,7 +151,7 @@ DynOMo 采用“以重建驱动追踪”（tracking-by-reconstruction）的在�
 
 **Figure 2** 展示了管道示意图，清晰标注了从输入到轨迹输出的各模块衔接关系。**Figure 3** 定性展示了随着视频推进，高斯世界逐步增加的过程，验证了在线扩展场景表示的能力。
 
-## 核心模块与公式推导
+
 
 DynOMo 将在线单目点追踪形式化为一个**在线动态3D高斯重建**问题，核心思想是：通过精心设计的2D重建监督和3D正则化，让运动信号在没有显式光流或对应标签监督的情况下自动涌现。整个在线管道由七个关键模块串联构成，每帧依次执行。
 
@@ -232,7 +235,9 @@ $$\mathcal{L}^{x} = \frac{1}{k|\mathcal{G}|} \sum_{G_i \in \mathcal{G}} \sum_{G_
 
 移除局部刚性损失 $\mathcal{L}^{rigid}$ 会使 AJ 降至 37.9，进一步验证了3D正则化对运动涌现的重要性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置与对比基准
 
@@ -267,9 +272,6 @@ Table 3 系统拆解了各模块的贡献，所有消融均在 TAPVid-DAVIS 上�
 
 **深度预测源的影响（Table 6）。** 在 PanopticSports 上，替换深度预测源（DepthAnything 与 D-3DGS 渲染深度）对2D追踪的总体指标影响较小，但高精度指标（如2D 1%距离内点比例）和3D追踪指标出现严重下降。这说明当前管道的2D追踪对深度噪声有一定容忍度，但精确的深度估计仍是提升3D追踪精度的关键瓶颈。
 
-![[assets/figures/papers/paper_list_l25_https_arxiv_org_abs_2409_02104/figures/010_Table_6.jpg]]
-*Table 6: Impact of Different Depth Predictions: We compare utilizing DepthAnyhthing [44] metric depth prediction with rendered depth predictions from [24] for the Panoptic Sports dataset [24]. Additionally to the main metrics, we also report the percentage of points within 1, 8 and 16px distance. We observe that for 2D point tracking the depth prediction approach does not have a major impact on the overall performance. Meanwhile the performance drop is more significant for high precision metrics, e.g., 2D1%. Additionally, for 3D point tracking, we observe a severe performance drop with respect to all metrics. Table 7. Choice of Gaussians in Trajectory Estimation: We compare different approaches for...*
-
 **轨迹估计策略（Table 7）。** 基于最近2D投影的高斯选择策略在2D追踪中表现最优；α-合成策略因逐帧独立选择高斯而无法保证时序一致性，性能明显落后。当可获取度量深度时，直接在3D空间选择最近高斯能提升3D追踪精度。
 
 ### 失败模式与局限性
@@ -291,16 +293,7 @@ Figure 4 和论文分析揭示了四类典型失败场景：
 - **Figure 3**：在线世界增长可视化表明，管道能随着视频推进逐步添加高斯，实现对场景的动态探索。
 - **Figure 4**：失败案例揭示了常数速度假设、遮挡恢复和位姿估计在极端条件下的脆弱性，为后续改进指明了方向。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l25_https_arxiv_org_abs_2409_02104/figures/005_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l25_https_arxiv_org_abs_2409_02104/figures/008_Table_5.jpg]]
-*Table 5: Additional Ablation of Single Part Importance: In this table, we ablate additional design choices that have less impact on the final performance compared to the ones discussed in Sec. 4.3 of the main paper*
-
-![[assets/figures/papers/paper_list_l25_https_arxiv_org_abs_2409_02104/figures/009_Table.jpg]]
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 方法谱系：从离线到在线、从多视图到单目
 
@@ -337,6 +330,8 @@ DynOMo 的适用边界由其核心假设和外部依赖共同界定：
 4. **深度估计的改进。** 实验表明不同深度预测方法对 2D 跟踪影响较小，但对 3D 跟踪影响显著（Table 6）。未来更精确的单目深度模型（如 DepthAnything v2）可能大幅提升 3D 跟踪精度。
 5. **旋转物体的全表面重建。** 能否利用零样本网格预测或前馈 3D 生成技术，为旋转物体快速生成全表面高斯，避免重建不完整？
 6. **无监督涌现精度的上限。** 在完全无运动监督的条件下，涌现轨迹的精度能否进一步提升至与有监督方法相媲美？这可能需要更强大的 2D 编码器特征或更精巧的 3D 正则化设计。
+
+
 
 ## 原文 PDF
 

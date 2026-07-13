@@ -42,7 +42,7 @@ claims:
 > - GenEval 上，Overall↑ 0.76 vs 0.73 (Meissonic + MaskGRPO) (+0.03)；Sing Obj.↑ 0.99 vs 0.98 (Meissonic + MaskGRPO) (+0.01)；Two Obj.↑ 0.64 vs 0.65 (Meissonic + MaskGRPO) (-0.01)。
 > - DrawBench (Human Preference) 上，DEQA Score↑ 4.39 vs 4.35 (Meissonic + MaskGRPO) (+0.04)；PickScore↑ 22.39 vs 22.34 (Meissonic + MaskGRPO) (+0.05)；HPS↑ 35.52 vs 35.48 (Meissonic + MaskGRPO) (+0.04)。
 
-## 概述
+## 概要
 
 掩码生成模型（Masked Generative Models）在文本到图像（T2I）生成中展现了巨大潜力，但其强化学习（RL）训练面临一个核心瓶颈：基于完整采样轨迹的策略优化计算成本高昂，而现有方法或采用整轨迹优化，或按掩码比率简单选择步长，均未充分利用各采样步长对最终图像的非均匀贡献，导致性能次优。
 
@@ -50,7 +50,7 @@ claims:
 
 实验表明，MaskFocus 在 GenEval 基准上 Overall 指标达到 0.76（基线 Meissonic + MaskGRPO 为 0.73），在 DrawBench 人类偏好指标（DEQA、PickScore、HPS、ImageReward）上全面超越基线。消融实验验证了关键步长选择与动态路由采样两个模块的独立贡献：移除关键步长选择后 GenEval Overall 降至 0.72，移除动态路由采样后降至 0.74，且图像质量指标下降更为显著。
 
-## 背景与动机
+
 
 掩码生成模型（Masked Generative Models, MGMs）通过在离散潜在空间中逐步掩码与重构token来生成图像，因其推理效率优势受到广泛关注。近期工作将强化学习（Reinforcement Learning, RL）引入MGM训练，利用GRPO等策略优化方法提升生成质量与指令遵循能力。然而，现有RL训练范式面临一个核心瓶颈：**基于完整采样轨迹的策略优化计算成本高昂，而随机步长优化或基于掩码比率的固定选择无法充分利用各步长对最终图像的非均匀贡献，导致性能次优**。
 
@@ -60,7 +60,9 @@ claims:
 
 基于上述观察，本文提出**MaskFocus**，核心思路是：通过信息增益定位关键步长，将策略优化聚焦于这些高价值步长，同时引入熵引导的动态路由采样以平衡探索与利用，从而在提升生成质量的同时显著降低计算开销。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MaskFocus 的核心创新在于**将掩码生成模型的策略优化从完整轨迹压缩到关键步长**，从而在提升生成质量的同时显著降低计算开销。这一目标的实现依赖于两个紧密耦合的机制：**关键步长选择（Critical Step Select, CSS）** 与 **熵引导的动态路由采样（Dynamic Routing Sampling, DR-Sampling）**。
 
@@ -92,7 +94,7 @@ MaskFocus 相对于现有基线方法在三个关键设计槽位上实现了实�
 
 三个 changed slots 形成因果链条：DR-Sampling 在采样阶段增强探索以产生更优轨迹，CSS 在优化阶段识别高价值步长以降低计算成本，全掩码 token 概率估计则为策略优化提供更完整的信号。这一设计使得 MaskFocus 在 GenEval 上达到 Overall 0.76（+0.03 vs. Meissonic + MaskGRPO），在人类偏好指标上全面领先（Table 2）。
 
-## 整体框架
+
 
 MaskFocus 的整体 pipeline 由三个核心模块串联构成，分别为**动态路由采样（Dynamic Routing Sampling, DR-Sampling）**、**关键步长选择（Critical Step Select, CSS）**和**掩码打乱与重掩码（Mask Shuffling & Remasking）**，最终通过 **GRPO 策略优化**完成模型更新（见 Figure 3）。
 
@@ -135,7 +137,7 @@ MaskFocus 的整体 pipeline 由三个核心模块串联构成，分别为**动�
 ![[assets/figures/papers/paper_list_l2542_https_arxiv_org_abs_2512_18766/figures/001_Figure_1.jpg]]
 *Figure 1: (a) For masked generative models, certain steps in the sampling process are more valuable. The core of our method is to find these steps and perform policy optimization on them. (b) Our method achieves significant performance gains across multiple T2I benchmarks*
 
-## 核心模块与公式推导
+
 
 MaskFocus 的核心由三个紧密耦合的模块构成：**动态路由采样（DR-Sampling）**负责生成高质量且多样化的采样轨迹，**关键步长选择（CSS）**从轨迹中定位最具优化价值的步长，**掩码打乱与重掩码**则利用选定步长构造策略优化目标。三者协同工作，最终通过 GRPO 完成策略更新。
 
@@ -198,7 +200,9 @@ $$T_i = T e^{-\frac{H_{i,j}}{\alpha}} + \theta$$
 
 三个模块形成完整的训练闭环：DR-Sampling 在采样阶段平衡探索与利用，产生多样化的轨迹；CSS 在轨迹评估阶段定位关键步长，提供优化焦点；掩码打乱与 GRPO 优化则利用选定步长高效更新策略。消融实验（Table 3）验证了各模块的独立贡献：移除 CSS 后 GenEval Overall 从 0.76 降至 0.72，移除 DR-Sampling 后降至 0.74，且 PickScore 的下降更为显著，表明缺乏探索对图像质量的损害尤为突出。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -271,7 +275,9 @@ Figure 5 进一步对比了步长选择策略、采样策略、CFG 和掩码策�
 
 3. **增益幅度有限**：人类偏好指标上的绝对增益（+0.03~+0.05）虽然一致但幅度较小，部分指标的提升可能在统计显著性边界。这提示在 Meissonic 这一特定 backbone 上，RL 微调的收益空间本身有限，更显著的提升可能需要结合更强的基座模型。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务谱系：掩码生成模型的强化学习训练
 
@@ -327,6 +333,8 @@ MaskFocus 在方法谱系中处于以下位置：
 - **上游继承**：策略优化框架来自 **GRPO**（Group Relative Policy Optimization），掩码生成 backbone 基于 **Meissonic**，步长选择动机受扩散模型中时间步重要性研究的启发。
 - **同级对比**：与 **MaskGRPO**（Ma et al., arXiv 2025）和 **Mask-GRPO**（Luo et al., arXiv 2025）同属 MGM+RL 方向，但 MaskFocus 在步长选择和采样策略两个维度上做出了差异化设计。
 - **下游延伸**：该方法为 MGM 的 RL 训练提供了计算效率优化思路，后续工作可在此基础上探索更精细的步长价值估计、在线策略训练方案，以及跨生成范式的迁移。
+
+
 
 ## 原文 PDF
 

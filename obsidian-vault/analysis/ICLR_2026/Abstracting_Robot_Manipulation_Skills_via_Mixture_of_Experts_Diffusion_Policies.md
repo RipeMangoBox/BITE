@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Abstracting_Robot_Manipulation_Skills_via_Mixture_of_Experts_Diffusion_Policies.pdf
+project_link: null
+code_link: null
 aliases:
 - SSMEP
 - ARMSMEDP
@@ -41,7 +43,7 @@ claims:
 > - RLBench-2 (multi-task learning) 上，平均成功率 为 0.18，对比 0.14 (Disc. Policy / Sparse DP)，变化 +0.04。
 > - RoboTwin-2 (inference efficiency) 上，推理时间 (ms) 为 107.3 (80.2M active params)，对比 94.8 (ACT, 83.9M), 120 (DP, 252.5M), 134.4 (Sparse DP, 260.1M)，变化 比Sparse DP快27 ms，比DP快13 ms。
 
-## 概述
+## 概要
 
 将扩散策略扩展到多任务场景时，模型规模和推理成本急剧上升，传统的混合专家（MoE）方法未能显式解耦可复用的操作技能，导致技能纠缠且跨任务迁移能力不足。针对这一瓶颈，本文提出 **SMP（Skill Mixture-of-Experts Policy）**——一种基于混合专家扩散的技能抽象策略。其核心创新在于引入**状态自适应的正交技能基**和**粘性路由**，将动作显式分解为少量可复用的技能分量，并通过变分推断联合优化基、门控和系数扩散模型，实现推理时的自适应专家激活。
 
@@ -51,7 +53,7 @@ SMP 将动作建模为 $a_t = B(g_t \odot z_t)$，其中 $B$ 是通过可微薄 
 
 当前方法主要针对双臂操作任务评估，尚未在单臂或移动操作等更广泛的设置中测试；真实机器人实验规模也较小，总参数量（258.9M）对内存仍有较高需求。尽管如此，SMP 为扩散策略的高效多任务扩展提供了一种技能解耦与稀疏激活的统一框架，其显式的技能抽象机制对后续的跨任务泛化和与大规模视觉‑语言‑动作预训练的结合具有参考价值。
 
-## 背景与动机
+
 
 将扩散策略（Diffusion Policy）用于机器人操作已经在单任务设定中展现出强大的表现力，但将其扩展到多任务学习时，模型容量与推理成本之间的矛盾迅速激化。若简单地放大扩散模型的参数量以覆盖多个任务，每一步去噪推理需要在全部参数上完成完整的前向传播，导致墙上推理时间大幅增加，难以满足实时控制的要求。目前主要存在两条应对路线：一是沿用大参数量但采用稀疏门控的混合专家（Mixture‑of‑Experts, MoE）架构，让每步只激活部分专家以压缩计算；二是基于向量量化（VQ‑VAE）学习离散技能码本。然而，这些方法大多**没有对技能进行显式的结构化解耦**：专家的输出空间未经约束，不同技能的行为模式容易纠缠在一起，导致学习到的成分难以在不同任务间复用，迁移能力有限。以典型的 MoE 基线 Sparse DP 为例，尽管其总参数量高达 260 M，在多任务学习场景下平均成功率仍明显不足，且活跃参数量并未得到有效控制，推理延迟也较高。
 
@@ -61,7 +63,9 @@ SMP 将动作建模为 $a_t = B(g_t \odot z_t)$，其中 $B$ 是通过可微薄 
 
 除了显式的技能抽象，SMP 还设计了**自适应专家激活策略**：推理时不再固定激活所有专家，而是根据平滑后的门控质量 $m_i = \bar{g}_{t,i}^2$ 动态选择一个紧凑的专家子集。这使得在保持动作采样精度的前提下，活跃参数量和单步推理延迟大幅降低。整体动机可以概括为：通过状态自适应的正交技能基、粘性路由以及基于变分下界（ELBO）的端到端训练，SMP 旨在以较低的活跃计算代价，学习到可解耦、可迁移的动作基元，从而在多任务操作中取得高成功率，同时保持高效的推理性能。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SMP 的核心瓶颈，在于将扩散策略扩展到多任务场景时，模型容量与推理开销急剧膨胀，而传统的 MoE 路由（如前馈门控）并未显式解耦可复用技能，导致技能纠缠、可迁移性差。论文通过引入**状态自适应正交技能基**与**粘性路由**两个因果性的设计把手，将动作空间局部白化投影到一组正交的基向量上，并用慢变门控控制技能组合，从而学习到可解耦、可迁移的动作基元，在不同任务间复用技能。
 
@@ -81,7 +85,7 @@ MoE 若不控制，推理时仍需计算所有专家，计算量与参数量依�
 
 综上，SMP 的创新并非模块的简单堆叠，而是通过**正交化基 + 粘性路由**的因果组合，根本上改变了技能表达与组合的方式：基负责解耦技能子空间，门控负责稀疏且平稳地激活它们，系数扩散则在低维白化空间中进行。这套机制在双臂多任务学习（RoboTwin‑2 0.54 vs. 0.41 Sparse DP）、小样本迁移（0.38 vs. 0.31 Disc. Policy）和技能组合（0.30 vs. 0.25 Sparse DP）等设定中均取得一致且显著的优势，消融结果亦强有力地验证了各改变槽位的独立贡献。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0005_VSWjHIveqZ_Abstracting_Robot_Manipulation_Skills_via_Mixtur/figures/002_Figure_2.jpg]]
 *Figure 2: Skill Mixture-of-Experts Policy (SMP) Training Framework. Left (a): During training, raw observations are encoded into state features, which generate an unconstrained matrix W(s). A QR retraction produces a state-adaptive orthogonal basis B(s). Actions are reconstructed via B(s)(g ⊙ z), where g are sticky-gated weights and z are diffusion-based coefficients. The model is trained with reconstruction, diffusion, gate regularization, and alignment losses. Right (b): Illustration of the state-adaptive basis across timesteps: as the robot moves, the basis vectors adjust with the state, while sticky gates preserve consistent expert roles (e.g., translation and rotation).*
@@ -107,7 +111,7 @@ $$
 
 整体而言，SMP 的核心创新在于**正交技能基 + 粘性路由于系数空间联合生成**的设计：技能基网络通过可微薄‑QR 分解（Equation 2）将未约束矩阵 $W(s)$ 投影到 Stiefel 流形上，使基向量随状态自适应旋转但保持正交，从而为动作提供结构化、可解耦的表征；粘性门控确保相位一致、专家复用；自适应激活则动态裁剪计算图。这一管线在双臂多任务学习、小样本迁移和技能组合等场景中均表现出明显的性能‑效率优势，其消融实验也证实各个组件的不可或缺性。
 
-## 核心模块与公式推导
+
 
 SMP 将扩散策略下的多任务操作技能抽象分解为三个关键设计：状态自适应的正交技能基、粘性门控（sticky routing）下的系数解码，以及在系数空间中进行的扩散建模。下面围绕四个核心模块的职责以及驱动这些模块的关键公式展开。
 
@@ -152,7 +156,9 @@ SMP 将扩散策略下的多任务操作技能抽象分解为三个关键设计�
 
 上述模块与公式构成 SMP 从状态观测到稀疏技能动作的完整流水线：状态特征经基网络生成正交基底，经粘性门控得到稀疏组合权重，经扩散专家在系数空间采样去噪，最终解码为机器人动作。核心假设是演示动作落在一个低维、状态依赖且正交的技能子空间内，并通过门控的稀疏性与粘性实现技能的重用与阶段连贯。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 SMP 的核心实验围绕多任务双臂操作展开，目标在于验证两个命题：
 1）**状态自适应的正交技能基与粘性门控能否将扩散策略的动作空间分解为可复用的技能分量**，从而突破传统 MoE 中技能纠缠和模型规模膨胀的瓶颈；
@@ -200,7 +206,9 @@ SMP 的核心实验围绕多任务双臂操作展开，目标在于验证两个�
 ![[assets/figures/papers/iclr26_0005_VSWjHIveqZ_Abstracting_Robot_Manipulation_Skills_via_Mixtur/figures/018_Table_7.jpg]]
 *Table 7: Success Rates of Ablation Studies ↑*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 SMP 处于扩散策略（DP）与混合专家（MoE）的交汇点，但通过显式的技能基分解与结构化门控，与已有工作形成根本性差异。基线扩散策略（DP、DP3）以全局、无约束的方式生成动作，在多任务场景下需要大幅扩展参数量来容纳行为多样性，但仍因技能纠缠而难以高效复用（Table 8: 缩放到~300M 后成功率最高仅 0.42）。Discrete Policy 引入离散码本抽象技能，但其离散化限制了连续动作空间中精妙原语的学习，且未见稀疏激活带来的推理加速。Sparse DP（SDP）虽采用 MoE 架构并在实验中达到 0.41 的平均成功率（RoboTwin-2），但其路由器没有时间结构和空间正交约束，导致专家激活在时间维频繁切换、技能难以解耦和迁移。SMP 对上述格局的改变体现在四个关键设计槽位：
 
@@ -231,6 +239,8 @@ SMP 处于扩散策略（DP）与混合专家（MoE）的交汇点，但通过�
 - **理论理解**：正交基与粘性门控的结合为何能带来如此显著的技能解耦和路由稳定性，其背后的理论保证（如流形约束下的泛化界、门控动态的混合时间）仍待深入分析。
 
 总之，SMP 在技能解耦、路由稳定性和推理效率上相对于现有扩散 MoE 基线取得了明确进展，但其在任务拓展性、鲁棒性和与大规模预训练范式对接等方面尚需大量后续研究。
+
+
 
 ## 原文 PDF
 

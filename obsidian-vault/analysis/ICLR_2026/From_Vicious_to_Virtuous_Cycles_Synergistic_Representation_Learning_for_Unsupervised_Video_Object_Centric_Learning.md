@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/From_Vicious_to_Virtuous_Cycles_Synergistic_Representation_Learning_for_Unsupervised_Video_Object_Centric_Learning.pdf
+project_link: null
+code_link: https://github.com/hynnsk/SRL
 openreview_forum_id: bWoT6Z21rH
 aliases:
 - SRLS
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 从恶性到良性循环：无监督视频对象中心学习的协同表征学习 |
 | 英文题名 | From Vicious to Virtuous Cycles: Synergistic Representation Learning for Unsupervised Video Object-Centric Learning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=bWoT6Z21rH); [GitHub](https://github.com/hynnsk/SRL) |
+| Links | [paper](https://openreview.net/forum?id=bWoT6Z21rH) · [GitHub](https://github.com/hynnsk/SRL) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/classification_and_understanding |
 | Method | Synergistic Representation Learning (SRL) |
 | Dataset | MOVi-C (MSE), MOVi-E (MSE), YouTube-VIS 2021 (MSE), MOVi-C (MAE loss) |
@@ -42,7 +44,7 @@ claims:
 > - MOVi-E (MSE) 上，FG-ARI↑ 为 81.9，对比 SlotContrast (no explicit value extracted)，变化 See Table 1。
 > - YouTube-VIS 2021 (MSE) 上，FG-ARI↑ 为 42.9，对比 SlotContrast (no explicit value extracted)，变化 See Table 1。
 
-## 概述
+## 概要
 
 无监督视频对象中心学习面临一个根本性的困境：编码器产生的注意力图虽然尖锐但包含大量噪声，而解码器生成的重建图虽然空间连贯却边界模糊。这两者之间的冲突形成了一个**恶性循环**——编码器的噪声特征迫使解码器通过空间平均化产生更模糊的输出，而模糊的解码器重建图又缺乏高频细节，无法为编码器提供精确的监督信号，进而导致编码器特征中的噪声持续累积。
 
@@ -50,7 +52,7 @@ claims:
 
 实验结果表明，SRL 在多个基准数据集上显著优于现有方法。在 MOVi-C 上，SRL 的 FG-ARI 达到 74.3，相比复现的 SlotContrast 提升 5.5 个百分点，mBO 提升 8.8 个百分点；在真实场景数据集 YouTube-VIS 2021 上，FG-ARI 提升 18.5 个百分点。消融研究进一步验证了去模糊对比损失、去噪对比损失和 slot 正则化预热各自的关键贡献，以及分层对比目标设计的必要性。
 
-## 背景与动机
+
 
 ### 核心问题：编码器-解码器冲突引发的恶性循环
 
@@ -81,7 +83,9 @@ SRL（Synergistic Representation Learning）的核心洞察在于：**编码器�
 
 基于这一洞察，SRL 通过精心设计的三元对比目标，将原本的恶性循环转化为**良性循环**（virtuous cycle，Figure 1(b)）：编码器为解码器提供锐度监督，解码器为编码器提供空间一致性监督，两者交替精炼、协同提升。此外，为防止训练初期 slot 坍缩（即多个 slot 收敛到相同表征），SRL 引入 slot 正则化预热阶段，为后续的协同优化奠定坚实基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SRL 的核心创新在于识别并打破了视频对象中心学习中编码器与解码器之间的**恶性循环**，并构建了一个**协同表征学习的良性循环**。其关键洞察是：编码器产生尖锐但噪声多的注意力图，而解码器产生平滑但模糊的重建图——这两者之间存在根本性冲突。SRL 将这种冲突转化为协同关系，通过三个相互关联的机制实现编码器与解码器的相互精炼。
 
@@ -112,7 +116,7 @@ SRL 的核心创新在于识别并打破了视频对象中心学习中编码器�
 
 与标准对比学习仅使用正/负二分类不同，SRL 的**半正集合**是关键设计选择。消融实验（Table 4）显示，移除半正集合导致 FG-ARI 骤降 7.1 点，证明分层结构对于处理编码器-解码器特征空间中的模糊性至关重要。半正集合为模型提供了“软”正样本，在保持语义一致性的同时容忍一定程度的特征差异，从而在锐度与平滑之间建立桥梁。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0010_bWoT6Z21rH_From_Vicious_to_Virtuous_Cycles_Synergistic_Repr/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of Synergistic Representation learning. The typical pipeline (top) suffers from a conflict between the encoder’s sharp but noisy features (v¯) and the decoder’s spatially coherent but blurry features (z¯). Our framework breaks this cycle by forcing the two modules to synergistically refine one another: (1) Deblurring path: Encoder’s sharp attention map is used to refine the blurry decoded features and (2) Denoising path: Decoder’s coherent masks provide a robust signal to denoise the encoder’s noisy features. Finally, slot regularization during warm-up establishes a solid foundation for this process by ensuring diverse slot specialization*
@@ -148,7 +152,7 @@ SRL 采用基于训练进度比例 $\eta$ 的分阶段损失调度（Eq. 10）�
 
 总损失为 $\mathcal{L} = \mathcal{L}^{\mathrm{base}} + \mathcal{L}^{\mathrm{stage}}$，其中 $\mathcal{L}^{\mathrm{base}}$ 为 MSE（或 MAE）重建损失。消融实验表明，SRL 对该调度的时间边界不敏感，性能平滑且稳定（Figure B3）。
 
-## 核心模块与公式推导
+
 
 ### 3.1 基础流水线
 
@@ -245,7 +249,9 @@ $$\mathcal{L}^{\mathrm{stage}} = \begin{cases} \lambda^{\mathrm{reg}} \mathcal{L
 
 消融实验表明，SRL 对该调度边界不敏感——改变正则化停止时刻或对比学习启动时刻均能稳定超越基线（Figure B3）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 恶性循环的实证验证
 
@@ -324,7 +330,9 @@ SRL 在不同预训练骨干上均表现一致。使用 Franca ViT-B/14（Table 
 ![[assets/figures/papers/iclr26_0010_bWoT6Z21rH_From_Vicious_to_Virtuous_Cycles_Synergistic_Repr/figures/017_Table_5.jpg]]
 *Table 5: Table B1: Experimental results using MAE loss for reconstruction*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与设计动机
 
@@ -377,6 +385,8 @@ SRL 将这一冲突转化为**协同关系**：利用编码器的锐度去模糊
 4. **多模态协同预训练**：在无监督预训练中，协同表征学习可否与文本、运动等多模态信息结合，进一步提升对象发现的语义一致性？
 
 5. **长视频与开放世界**：SRL 在 YouTube-VIS 上的性能（FG-ARI 42.9）虽显著优于基线，但绝对值仍不高，表明在开放世界长视频中的对象发现仍面临挑战，需要进一步研究 slot 数量的自适应调整和在线学习策略。
+
+
 
 ## 原文 PDF
 

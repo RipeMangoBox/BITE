@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2024
 pdf_ref: paperPDFs/CVPR_2024/InterHandGen_Two_Hand_Interaction_Generation_via_Cascaded_Reverse_Diffusion.pdf
+project_link: https://jyunlee.github.io/projects/interhandgen
+code_link: null
 aliases:
 - InterHandGen
 tags:
@@ -40,7 +42,7 @@ claims:
 > - ARCTIC (object‑conditioned two‑hand synthesis) 上，FHID (↓) 12.91 vs Not directly reported (see Table 1b) (Significant improvement over baselines)。
 > - InterHand2.6M (monocular reconstruction) 上，MPVPE (mm) ↓ 12.10 vs Not directly reported (see Table 2a) (New state‑of‑the‑art)。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -74,7 +76,7 @@ InterHandGen 属于**基于扩散模型的分解式生成方法**。与直接建
 
 消融实验进一步验证了各设计选择的必要性：移除分布分解或共享网络均导致生成质量显著下降；去除自注意力或分类器自由引导分别损害保真度和多样性；联合训练多数据集的通用先验可将多样性从 3.59 进一步提升至 4.39，但逼真度指标未同步改善，提示现有数据集仅捕获了真实分布的子集（Figure S1）。
 
-## 背景与动机
+
 
 ### 问题背景：双手交互生成的组合复杂性
 
@@ -96,7 +98,9 @@ $$p_{\phi}(\mathbf{x}_l, \mathbf{x}_r) = p_{\phi}(\mathbf{x}_l) \, p_{\phi}(\mat
 
 在此基础上，InterHandGen 引入三个关键机制以提升生成质量：(1) 通过**条件 dropout** 使用单一共享网络同时参数化无条件分布与条件分布，实现高效的多任务学习；(2) 在反向扩散的每一步施加**抗穿透梯度引导**，显式最小化穿透顶点对之间的距离；(3) 融合**分类器自由引导（CFG）** 以平衡生成保真度与多样性。这些设计共同构成了一个从分布分解出发、以级联反向扩散为核心的双手交互生成框架。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 InterHandGen 的核心创新在于将双手交互生成的高维联合分布建模问题，**分解为两个低维子问题**：无条件左手分布 $p_\phi(\mathbf{x}_l)$ 与以左手为条件的右手分布 $p_\phi(\mathbf{x}_r|\mathbf{x}_l)$。这一分解直接回应了本领域的核心瓶颈——直接建模 $p(\mathbf{x}_l, \mathbf{x}_r)$ 面临极高的组合复杂度和学习困难，容易导致生成质量低下或模式崩溃。通过将自由度从双手联合空间降至单手空间，扩散模型得以更稳定地捕获合理的交互模式。
 
@@ -118,7 +122,7 @@ InterHandGen 的核心创新在于将双手交互生成的高维联合分布建�
 
 **创新总结**：InterHandGen 的方法创新并非孤立技术的堆砌，而是以“分布分解”为轴心，通过镜像统一、共享网络、抗穿透引导和 CFG 形成闭环——降低建模难度的同时，保证了交互的物理合理性与样本多样性。这一设计思想具有较强的可推广性，可为其他多实例交互生成任务提供参考范式。
 
-## 整体框架
+
 
 InterHandGen 的整体框架围绕一个核心思想构建：**将双手交互的联合分布建模分解为两个更简单的子问题**，并通过级联扩散采样实现高质量生成。整个 pipeline 可分为训练与推理两大阶段，共享同一网络架构。
 
@@ -181,7 +185,7 @@ $$\mathcal{L}_{reg} = \| \mathcal{S}(D_{\phi}, \mathbf{x}_l, \mathbf{x}_r) - (\m
 - **级联 vs. 并行**：级联生成在 FHID、精确率和多样性上全面优于并行生成（ComMDM），证实了顺序建模的优势（Table S1）。
 - **抗穿透引导**：移除 APG 使穿透体积从 0.76 cm³ 飙升至 4.23 cm³，而手部近距离比率未显著变化（Table 3b）。
 
-## 核心模块与公式推导
+
 
 ### 核心设计思想：分布分解与级联生成
 
@@ -249,7 +253,9 @@ $$\mathcal{L}_{reg} = \left\| \mathcal{S}(D_{\phi}, \mathbf{x}_l, \mathbf{x}_r) 
 
 其中 $\mathcal{S}$ 表示对 $\mathbf{x}_r$ 施加一步加噪后由 $D_\phi$ 去噪的操作。该损失约束双手状态保持在扩散模型学习的合理流形上，在单目双手重建任务中将 MPVPE 降至 12.10 mm（InterHand2.6M）和 15.04 mm（HIC），达到新 state-of-the-art（Table 2）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置与评估指标
 
@@ -353,7 +359,9 @@ Table 3b 的穿透指标消融直接量化了抗穿透引导（APG）的效果�
 ![[assets/figures/papers/paper_list_l1719_InterHandGen_Two_Hand_Interaction_Generation_via_Cascaded_Reverse_Diffus/figures/012_Figure.jpg]]
 *Figure: S4. Qualitative results of two-hand interaction synthesis experiment in Section 4.2. Brown boxes denote implausible regions with penetration or unnatural hand articulation. Our approach can generate more realistic bimanual interactions*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心瓶颈与因果机制
 
@@ -414,6 +422,8 @@ $$p_{\phi}(\mathbf{x}_l, \mathbf{x}_r) = p_{\phi}(\mathbf{x}_l) \, p_{\phi}(\mat
 4. **穿透避免的深层机制**：抗穿透引导在早期去噪步中使用较低权重是否最优？是否存在更高效的穿透避免机制（如将穿透约束直接嵌入扩散训练或使用约束优化替代梯度引导）？
 5. **扩散先验正则化的泛化**：$\mathcal{L}_{reg}$ 在其他下游任务（如双手跟踪、从视频生成、运动补全）中的适用性和性能表现尚待探索。
 6. **开放世界物体条件**：如何突破预定义对象类别的限制，实现基于文本描述或任意物体几何的条件生成？
+
+
 
 ## 原文 PDF
 

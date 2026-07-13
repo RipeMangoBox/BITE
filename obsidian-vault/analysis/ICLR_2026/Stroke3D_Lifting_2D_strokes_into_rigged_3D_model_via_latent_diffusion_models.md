@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Stroke3D_Lifting_2D_strokes_into_rigged_3D_model_via_latent_diffusion_models.pdf
+project_link: https://whalesong-zrs.github.io/Stroke3D_project_page/
+code_link: null
 openreview_forum_id: VgOWxor3LV
 aliases:
 - Stroke3D
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | Stroke3D：通过潜在扩散模型将2D笔画提升为绑定骨骼的3D模型 |
 | 英文题名 | Stroke3D: Lifting 2D strokes into rigged 3D model via latent diffusion models |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=VgOWxor3LV); [Project](https://whalesong-zrs.github.io/Stroke3D_project_page/) |
+| Links | [paper](https://openreview.net/forum?id=VgOWxor3LV) · [Project](https://whalesong-zrs.github.io/Stroke3D_project_page/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Stroke3D |
 | Dataset | MagicArticulate test set, SKDream evaluation set |
@@ -41,7 +43,7 @@ claims:
 > - SKDream evaluation set 上，Mean Inst SKA Score ↑ 为 87.83，对比 80.43 (SKDream)，变化 +7.4。
 > - SKDream evaluation set 上，Mean Class SKA Score ↑ 为 84.36，对比 74.38 (SKDream)，变化 +9.98。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -63,7 +65,7 @@ Stroke3D 在方法谱系中处于“条件生成+偏好优化”的交叉点。�
 
 当前方法仍受限于训练数据的姿态多样性不足，罕见类别生成不稳定；当2D笔画存在视角模糊（如侧视图关节重叠）时，生成质量会下降。此外，两阶段框架尚未实现端到端的文本到绑定网格生成。开放问题包括：如何利用更大规模的 Articulation-XL 等数据集扩展姿态覆盖；能否开发端到端网络直接从文本生成可绑定网格；以及如何系统性地处理笔画的视角模糊性。
 
-## 背景与动机
+
 
 三维资产的骨骼绑定是计算机图形学与动画制作中的核心环节，它为静态网格赋予可驱动的运动结构。然而，传统绑定流程高度依赖专业美术人员的手工操作——从拓扑分析、关节放置到蒙皮权重绘制，每一步都需要大量时间与领域经验。这一现状构成了三维内容规模化生产的显著瓶颈。
 
@@ -77,7 +79,9 @@ Stroke3D 在方法谱系中处于“条件生成+偏好优化”的交叉点。�
 
 综上，Stroke3D 的动机可归结为三点：（1）提供一种直观的二维笔画交互方式，实现对三维骨骼结构的显式可控生成；（2）通过增强数据集与偏好优化，提升骨骼到网格生成的质量与对齐精度；（3）构建一个端到端易用的管线，使非专业用户也能快速产出可绑定、可动画的三维资产。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Stroke3D 的核心创新在于将用户绘制的 2D 笔画作为显式结构条件引入 3D 资产生成流程，从而解决了文本到骨架生成中的结构模糊性问题。与现有方法相比，该工作在三方面实现了关键突破：
 
@@ -97,7 +101,7 @@ Table 2 显示，在 SKDream 基础上依次加入 TextuRig 和 SKA-DPO 后，Me
 
 不同于传统方法需要专业建模技能，Stroke3D 构建了从用户笔画到可绑定、可动画 3D 网格的完整两阶段流程：先由 Sk-VAE 与 Sk-DiT 从 2D 笔画和文本生成拓扑明确的 3D 骨架，再由增强的网格生成模型输出高质量网格。Figure 11 的定性评估表明，该流程对输入噪声具有鲁棒性，能处理任意视角，并成功泛化到训练中未见的罕见概念（如“Samurai”、“Turtle”），体现了从 2D 到 3D 的实用化生成能力。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_VgOWxor3LV/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of Stroke3D (§Section 3). During the training phase, Sk-VAE encodes a skeleton graph into a latent space. Subsequently, Sk-DiT is trained to generate these latent embeddings, conditioned on the corresponding 2D strokes and text prompt. After training with TextuRig, we leverage SKA-DPO to further refine SKDream with a skeleton-mesh alignment reward signal. The right side illustrates the implementation details of our models*
@@ -142,7 +146,7 @@ Stroke3D 采用**两阶段级联架构**，将用户输入的 2D 笔画和文本
 
 与现有方法相比，Stroke3D 的关键差异在于：骨架生成层面，用**潜在扩散模型 + 2D 笔画条件**替代了 RigNet（Xu et al., SIGGRAPH 2020）的网格到骨架学习、MagicArticulate（Song et al., CVPR 2025）和 UniRig（Zhang et al., SIGGRAPH 2025）的自回归生成范式；网格生成层面，在 SKDream（Xu et al., CVPR 2025 Highlight）基础上通过**数据增强 + 偏好优化**实现了显著提升，而非仅依赖 SDEdit（Meng et al., ICLR 2022）式的扩散编辑。
 
-## 核心模块与公式推导
+
 
 Stroke3D 采用两阶段流水线：**可控骨架生成**和**增强网格合成**。骨架生成阶段的核心模块是图变分自编码器（Sk-VAE）与图扩散变压器（Sk-DiT），网格合成阶段则基于 SKDream 模型进行数据增强与偏好优化。
 
@@ -184,7 +188,9 @@ $$\mathcal{L}(\theta) = - \mathbb{E}_{(x^{win},x^{lose})\sim\mathcal{D}} \log\si
 
 二维笔画 $\mathbf{J}_{xy}$ 作为结构条件的引入是 Stroke3D 的核心因果旋钮：它消除了从纯文本到骨架生成过程中的拓扑与姿态模糊性。消融实验（Figure 7）表明，带有 $\mathbf{J}_{xy}$ 条件的模型训练损失下降速度显著快于无此条件的模型，验证了结构指导对收敛的加速作用。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 骨架生成：定量与定性评估
 
@@ -263,7 +269,9 @@ $$\mathcal{L}(\theta) = - \mathbb{E}_{(x^{win},x^{lose})\sim\mathcal{D}} \log\si
 | Figure 11 | 真实笔画场景下具备噪声鲁棒性、视角无关性和罕见概念泛化能力 |
 | Figure 9 | 对不完整关节输入保持低 CD，验证输入鲁棒性 |
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 任务定位与核心差异
 
@@ -312,6 +320,8 @@ Stroke3D的有效性受以下边界条件约束：
 ### 6. 知识库定位总结
 
 Stroke3D 在3D资产生成领域占据了“**用户友好型可控生成**”这一生态位。它不追求从零开始的完全自动生成（如纯文本到3D的方法），也不假设用户具备3D建模专业知识（如需要完整网格输入的绑定方法），而是在两者之间开辟了一条以2D笔画为桥梁的中间路线。其技术贡献——图VAE与扩散变压器的结合、结构条件注入机制、以及基于对齐分数的偏好优化——为后续研究提供了可复用的模块和明确的改进方向。
+
+
 
 ## 原文 PDF
 

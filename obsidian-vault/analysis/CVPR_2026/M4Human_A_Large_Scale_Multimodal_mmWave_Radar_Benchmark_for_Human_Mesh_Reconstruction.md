@@ -43,7 +43,7 @@ claims:
 > - M4Human (S2 ALL) 上，MVE (mm) RT-Mesh 135.1 vs P4Transformer (RPC) 140.8 (-5.7)。
 > - M4Human (S1 ALL) 上，MVE (mm) RT+RPC Fusion 84.3 vs P4Transformer (RPC) 90.4 (-6.1)。
 
-## 概述
+## 概要
 
 毫米波雷达因其隐私保护、光照不敏感等优势，被视为室内人体感知的关键传感器。然而，现有雷达人体网格重建（Human Mesh Reconstruction, HMR）研究长期受困于一个根本瓶颈：**数据集规模小、动作单一，且缺乏高质量的网格标注与原始雷达张量（Raw Tensor, RT）模态**。这严重限制了高保真雷达HMR方法的发展与评估。
 
@@ -63,7 +63,7 @@ M4Human包含**661K帧**同步多模态数据（999个序列，约15.3小时）�
 
 尽管M4Human显著推进了雷达HMR的研究基础，但当前方法仍存在明显局限：对复杂动力学动作（如侧弓步、拳击）的重建误差较大；传感器最优感知范围限于2.0–4.0米；跨主体和跨动作的泛化性能仍显著低于随机分割。这些差距指明了未来的研究方向——引入更强的运动先验、更先进的时序建模与多模态融合机制。
 
-## 背景与动机
+
 
 ### 毫米波雷达人体感知的兴起
 
@@ -90,7 +90,9 @@ M4Human包含**661K帧**同步多模态数据（999个序列，约15.3小时）�
 
 M4Human的构建动机正是从数据侧切断这一链条。通过设计多模态同步采集平台，融合高精度光学动捕系统（marker-based MoCap）与毫米波雷达，本文构建了一个包含66.1万帧、999个序列、超过15小时同步数据的基准。该数据集覆盖康复、健身、运动等50种多样化自由空间动作，同时提供原始RT与RPC两种雷达模态，以及由动捕系统导出的高质量SMPL-X网格真值。这一数据基础为训练和公平评估雷达HMR模型提供了此前不存在的关键条件，也为探索RT模态的独特价值打开了可能性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 M4Human 的核心创新体现在两个紧密耦合的层面：**基准本身的设计突破**与**基于该基准揭示的模态-规模-泛化因果链条**。
 
@@ -143,7 +145,7 @@ M4Human 的核心洞察并非单个模型或数据集，而是通过系统性实
 
 RT-Mesh 的 changed slot 在于：**首次将 RT 模态的密集空间信息与高效两阶段 HMR 架构结合**，在保持低延迟的同时，系统性地揭示了 RT 模态在泛化场景下的优势——这一发现本身是 M4Human 基准设计的直接产物。
 
-## 整体框架
+
 
 M4Human 基准的工作流围绕“多模态感知采集—高精度标注生成—基准模型训练与评估”三条主线展开，其核心目标是构建一个大规模、多模态的毫米波雷达人体网格重建（HMR）数据集，并提供可复现的评估协议与基线模型。
 
@@ -191,7 +193,7 @@ RT-Mesh 的核心设计动机在于：原始 RT 保留了比处理后的 RPC 更
 ![[assets/figures/papers/paper_list_l974_https_arxiv_org_abs_2512_12378/figures/012_Figure_8.jpg]]
 *Figure 8: (a) A conventional file-system dataloader repeatedly performs file-name lookup and disk I/O on large .mat files (e.g., RT), which quickly becomes a bottleneck at scale. (b) Our LMDB-based system converts all data into a single contiguous byte stream stored in a memory-mapped database, indexed by the key*
 
-## 核心模块与公式推导
+
 
 ### RT-Mesh 两阶段基线架构
 
@@ -250,7 +252,9 @@ M4Human 提供两种互补的雷达模态，均源自同一硬件采集的时域
 
 两种模态的互补性为多模态融合提供了基础：RT 的密集空间信息有助于泛化，RPC 的稀疏结构则利于高效处理。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 评估协议与基准设定
 
@@ -329,7 +333,9 @@ M4Human 基准定义了三种数据划分（S1 随机分割、S2 跨主体、S3 
 ![[assets/figures/papers/paper_list_l974_https_arxiv_org_abs_2512_12378/figures/019_Figure_13.jpg]]
 *Figure 13: Mean Vertex Error (MVE) across different action types. Dynamic non-in-place actions exhibit higher MVE, highlighting their increased difficulty and suggesting the need for more advanced motion modeling and stronger prior knowledge*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 在雷达人体感知谱系中的位置
 
@@ -378,6 +384,8 @@ RT-Mesh 的核心区分点在于 **显式的两阶段设计**：先 2D 定位再
 - **多模态融合深化**：注意力融合、门控机制或跨模态 Transformer 相较于简单拼接能带来多少额外增益？特别是在形状估计和远距离场景下。
 - **时序建模扩展**：当前 RT-Mesh 仅堆叠 4 帧历史，更长的时序窗口或显式运动轨迹建模能否提升复杂动作的重建精度和时间一致性？
 - **感知范围扩展**：是否可通过超分辨率处理或多尺度特征提取来扩展雷达的有效感知距离，使其覆盖更广的室内空间？
+
+
 
 ## 原文 PDF
 

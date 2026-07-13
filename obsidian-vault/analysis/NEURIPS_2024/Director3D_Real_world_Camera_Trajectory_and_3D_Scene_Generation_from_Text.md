@@ -5,6 +5,8 @@ paper_level: A
 venue: NEURIPS
 year: 2024
 pdf_ref: paperPDFs/NEURIPS_2024/Director3D_Real_world_Camera_Trajectory_and_3D_Scene_Generation_from_Text.pdf
+project_link: null
+code_link: https://github.com/imlixinyang/director3d
 aliases:
 - Director3D
 tags:
@@ -39,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - T3Bench 上，BRISQUE ↓ 32.3 vs 61.5 (ProlificDreamer) (-29.2)；NIQE ↓ 4.35 vs 7.07 (ProlificDreamer) (-2.72)；CLIP-Score ↑ 85.5 vs 69.4 (ProlificDreamer) (+16.1)。
 
-## 概述
+## 概要
 
 **Director3D** 提出了一种从文本描述直接生成真实世界3D场景及其自适应相机轨迹的框架。现有文本到3D生成方法主要面向物体级别，依赖预定义或用户指定的固定相机轨迹，难以建模真实世界多视角数据中复杂的场景特定轨迹和无界背景，导致生成质量与通用性受限。
 
@@ -47,7 +49,7 @@ Director3D 的核心洞察在于将真实世界多视角数据建模为相机轨
 
 在 T3Bench 基准上，Director3D 取得 BRISQUE 32.3、NIQE 4.35、CLIP-Score 85.5，显著优于 **ProlificDreamer**（Wang et al., 2023）等基线方法。消融实验验证了场景特定相机轨迹与 SDS++ 各组件的关键作用。该方法为真实世界文本到3D场景生成提供了新的方法论范式。
 
-## 背景与动机
+
 
 ### 文本到3D生成的演进与瓶颈
 
@@ -73,7 +75,9 @@ Director3D的核心洞察在于：**将真实世界多视角数据建模为相�
 
 基于这一洞察，Director3D设计了三个协同工作的核心组件：Cinematographer（轨迹扩散Transformer）负责生成自适应相机轨迹，Decorator（高斯驱动的多视角潜在扩散模型）负责生成像素对齐的初始3D高斯场景，Detailer（SDS++损失）负责通过密集相机插值渲染与2D扩散先验精炼细节。这一框架首次实现了从文本描述到真实世界3D场景（含自适应相机轨迹）的端到端生成。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Director3D 的核心创新在于将真实世界文本到 3D 场景生成问题重新建模为**相机轨迹与图像序列的联合分布学习**，并通过三个关键组件的协同分治，系统性地突破了现有方法在真实世界场景生成中的瓶颈。
 
@@ -128,7 +132,7 @@ Director3D 在文本到 3D 生成领域的方法谱系中占据独特位置：
 
 **待验证点**：由于缺乏部分 baseline 方法的完整引用信息（如 DreamScene 的准确引用），上述谱系定位中个别方法的对比需结合原始文献进一步确认。
 
-## 整体框架
+
 
 Director3D 将真实世界文本到3D场景生成建模为**图像序列与相机轨迹在文本条件下的联合分布**学习问题，并通过三个解耦模块分治该联合分布：$p((\mathcal{X}, \mathcal{C}) \mid y)$。
 
@@ -174,7 +178,7 @@ Director3D 将真实世界文本到3D场景生成建模为**图像序列与相�
 
 该框架存在两个结构性的限制：其一，GM-LDM 支持的视角范围有限，导致生成场景的可探索视角广度受限；其二，开放世界泛化依赖额外的 SDS++ 精炼过程，降低了整体效率。论文指出，引入更广泛的多视角数据集可能缓解对精炼器的依赖，但当前尚无法完全消除这一环节。
 
-## 核心模块与公式推导
+
 
 Director3D 将真实世界多视角数据建模为图像序列与相机轨迹在文本条件下的联合分布 $p((\mathcal{X}, \mathcal{C}) | y)$，并通过三个核心模块分治求解：Cinematographer（轨迹生成）、Decorator（场景初始化）和 Detailer（细节精炼）。
 
@@ -261,7 +265,9 @@ $$\hat{\epsilon}_{\mathrm{trg}} = \omega_{\mathrm{cfg}} \cdot ( \epsilon_{\theta
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2406_17601/figures/005_Figure_5.jpg]]
 *Figure 5: Left: Architecture of GM-LDM. The model is fine-tuned from a 2D LDM with minor modifications, performing rendering-based denoising for generating initial 3D Gaussians. Right: Pipeline of calculating SDS++ loss, which refines the 3D Gaussians with the original 2D LDM*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -324,7 +330,9 @@ Director3D 在 T3Bench 基准上的定量评估结果如 Table 1 所示。该方
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2406_17601/figures/003_Figure_3.jpg]]
 *Figure 3: Left: Comparison of the simplified camera trajectory distributions between synthetic and real-world multi-view datasets. Right: Pipeline and models of Director3D*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与设计动机
 
@@ -392,6 +400,8 @@ Director3D 处于文本到3D生成、多视角扩散模型和3D高斯溅射三�
 - **评估层面**：在 T3Bench 上建立了新的性能基准，为后续真实世界文本到3D场景生成研究提供了参考。
 
 该方法可作为后续研究的基础框架，特别是在以下方向具有扩展潜力：(a) 引入更强的多视角先验以消除精炼步骤；(b) 扩展至动态场景或交互式生成；(c) 结合大规模预训练模型提升开放世界泛化能力。
+
+
 
 ## 原文 PDF
 

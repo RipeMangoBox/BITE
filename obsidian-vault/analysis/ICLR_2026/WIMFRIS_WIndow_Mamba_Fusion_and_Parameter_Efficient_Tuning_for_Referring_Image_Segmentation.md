@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/WIMFRIS_WIndow_Mamba_Fusion_and_Parameter_Efficient_Tuning_for_Referring_Image_Segmentation.pdf
+project_link: null
+code_link: https://github.com/MSH970515/WIMFRIS
 openreview_forum_id: WnRzN4U8Y8
 aliases:
 - WIMFRIS
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | WIMFRIS：窗口Mamba融合与参数高效微调的指代图像分割 |
 | 英文题名 | WIMFRIS: WIndow Mamba Fusion and Parameter Efficient Tuning for Referring Image Segmentation |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=WnRzN4U8Y8); [GitHub](https://github.com/MSH970515/WIMFRIS) |
+| Links | [paper](https://openreview.net/forum?id=WnRzN4U8Y8) · [GitHub](https://github.com/MSH970515/WIMFRIS) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | WIMFRIS |
 | Dataset | RefCOCO |
@@ -39,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - RefCOCO 上，mIoU (val / testA / testB) 为 77.2 / 78.9 / 74.3 (WIMFRIS-B)，对比 74.3 / 75.8 / 70.8 (DETRIS-B)，变化 +2.9 / +3.1 / +3.5。
 
-## 概述
+## 概要
 
 指代图像分割（RIS）要求模型根据自然语言表达式在图像中精确分割出所指目标。现有参数高效微调（PET）方法主要通过逐层视觉-语言对齐来适配预训练模型，但**忽视了对中间融合 Neck 模块的设计**，导致多尺度视觉特征未能充分聚合，形成信息瓶颈。本文的核心发现是：缺少 Neck 模块会导致显著性能退化——在 RefCOCO 上，ETRIS 去掉 Neck 后 mIoU 从 75.7 降至 72.2（Table 1）。
 
@@ -53,7 +55,7 @@ claims:
 
 **局限性**方面，当目标物体过大跨多个窗口时，非重叠窗口划分可能导致物体碎片化；模糊指代表达式或空间上远距离的视觉上下文位于不同窗口时，模型可能分割失败。
 
-## 背景与动机
+
 
 指代图像分割（Referring Image Segmentation, RIS）要求模型根据自然语言表达式在图像中分割出对应的目标区域。该任务的核心挑战在于实现细粒度的视觉-语言跨模态对齐。近年来，基于大规模预训练视觉-语言模型（如 CLIP）的方法取得了显著进展，但全量微调这些大模型的计算开销巨大。因此，参数高效微调（Parameter-Efficient Tuning, PET）范式逐渐成为主流，其核心思路是冻结预训练骨干网络，仅训练少量插入的适配器模块。
 
@@ -65,7 +67,9 @@ claims:
 
 此外，WIMFRIS 还配套设计了完整的 PET 策略，包括利用 Mamba 文本适配器（MTA）增强全局文本先验、通过多尺度对齐器（MSA）和可学习强调参数实现自适应的逐层视觉微调。这些组件共同构成一个参数高效且融合能力强大的 RIS 框架。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 WIMFRIS 的核心创新围绕一个被现有参数高效微调（PET）方法普遍忽视的信息瓶颈展开：**中间融合 neck 的缺失**。现有 PET 方法（如 ETRIS、DETRIS）主要进行逐层视觉-语言对齐，但各层特征独立与文本交互，多尺度视觉信息未能充分聚合与融合。Table 1 的消融实验直接验证了这一瓶颈——去掉 neck 模块后，ETRIS 在 RefCOCO 上的性能从 75.7 显著降至 72.2（`$\Delta = -3.5$`），证明中间融合对指代图像分割至关重要。
 
@@ -103,7 +107,7 @@ Table 3(b) 的逐步消融清晰展示了各组件的累积贡献：仅 MSA 时�
 
 WMF 的非重叠窗口划分存在固有局限：当目标物体过大跨多个窗口时，因窗口间空间隔离导致物体碎片化（Figure 7）；当区分目标所需的视觉上下文分布在远距离不同窗口时，模型无法建立跨窗口关联。如何设计融合模块以打破窗口分隔的空间隔离，是未来工作的关键方向。此外，当前融合仅为单向（视觉-文本），双向信息流的探索可能进一步提升鲁棒性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0012_WnRzN4U8Y8_WIMFRIS_WIndow_Mamba_Fusion_and_Parameter_Effici/figures/004_Figure_2.jpg]]
 *Figure 2: (a) Overview of WIMFRIS architecture. Frozen CLIP text encoder layers and DINOv2 vision encoder layers are parameter-efficient tuned by MTA (b) to get enhanced global textual features ft, and MSA (c) with learnable emphasis parameters and RFMixer (d) to obtain fine-grained visual features fv. Subsequently, our HMF block performs powerful vision-language intermediate modality fusion*
@@ -120,7 +124,7 @@ WIMFRIS 的整体 pipeline 建立在“冻结骨干 + 参数高效微调 + 中�
 
 整个框架中，可训练参数仅约 3.0M（以 WIMFRIS-B 为例），包括 MTA、MSA（含 RFMixer 和交叉注意力）、强调参数、HMF 块以及解码器。消融实验（Table 3）证实，完整的 PET 策略（MSA + EP + MTA）在仅 3.0M 可训参数下达到最优融合效果；而去掉 neck 模块会导致性能显著下降（ETRIS 从 75.7 降至 72.2），验证了中间融合 neck 的关键作用。
 
-## 核心模块与公式推导
+
 
 ### 1. Mamba 文本适配器（MTA）
 
@@ -222,7 +226,9 @@ $$
 
 损失权重设置为 $\lambda_{con}=0.5$，$\lambda_{dice}=0.3$，$\lambda_{align}=0.2$。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈验证：Neck 模块的必要性
 
@@ -277,7 +283,9 @@ Figure 7 揭示了三个典型失败模式，与 limitations 分析一致：
 
 这些失败模式直接指向 WMF 窗口设计的固有权衡：窗口划分有效抑制了 SSM 指数衰减，但引入了窗口间空间隔离。如何设计跨窗口交互机制以保持线性复杂度优势，是后续研究的关键开放问题。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 在 RIS 方法谱系中的位置
 
@@ -322,6 +330,8 @@ WIMFRIS 属于**参数高效微调（PET）范式下的指代图像分割（RIS�
 2. **双向多模态融合**：在保持参数高效的前提下实现视觉 → 文本的信息流，可能增强模型对模糊指代和歧义表达的鲁棒性。
 3. **任务泛化性**：HMF 块和 PET 策略能否推广到其他密集预测任务（如指代视频分割、视觉定位）？论文明确将此列为未验证的开放问题。
 4. **零样本 RIS 适配**：当前框架依赖有监督微调，如何适配到零样本指代图像分割这一更具挑战性的前沿任务，尚未被探索。
+
+
 
 ## 原文 PDF
 

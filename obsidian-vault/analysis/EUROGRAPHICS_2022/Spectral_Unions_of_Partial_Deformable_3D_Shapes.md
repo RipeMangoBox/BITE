@@ -5,6 +5,7 @@ paper_level: A
 venue: Eurographics
 year: 2022
 pdf_ref: paperPDFs/EUROGRAPHICS_2022/Spectral_Unions_of_Partial_Deformable_3D_Shapes.pdf
+code_link: https://github.com/lucmos/spectral-unions
 project_link: https://github.com/lucmos/spectral-unions
 aliases:
 - SUNU
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 部分可变形3D形状的谱并集 |
 | 英文题名 | Spectral Unions of Partial Deformable 3D Shapes |
 | 会议/期刊 | Eurographics 2022 |
-| Links | [paper](https://arxiv.org/abs/2104.00514); [GitHub](https://github.com/lucmos/spectral-unions) |
+| Links | [paper](https://arxiv.org/abs/2104.00514) · [GitHub](https://github.com/lucmos/spectral-unions) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Spectral Union Network (U_Θ) |
 | Dataset | Human bodies (TEST A, known man), unknown woman re-meshed), Human bodies (region localization, single identity training), 6 identities training) |
@@ -42,7 +43,7 @@ claims:
 > - Human bodies (TEST A, unknown woman re-meshed) 上，MAE (eigenvalues) 为 5.23，对比 N/A，变化 N/A。
 > - Human bodies (region localization, single identity training) 上，IoU / Accuracy 为 83.69–99.28% / 91.08–99.61%，对比 N/A，变化 N/A。
 
-## 概述
+## 概要
 
 ### 1. 问题背景与瓶颈
 
@@ -81,7 +82,7 @@ claims:
 
 尽管结果令人鼓舞，该方法仍存在若干局限：预测的特征值序列缺乏是真实拉普拉斯谱的数学保证；迭代式处理多于两个部分形状时误差会逐步累积；对分布外并集模式的泛化能力有限；尚未在未处理的自然部分扫描数据上进行测试。开放问题包括：如何保证预测谱的可实现性（即存在一个流形以该序列为谱），以及如何处理谱并集的固有模糊性（如对称部分导致的多个有效解）。
 
-## 背景与动机
+
 
 三维形状分析的核心挑战之一是处理不完整的几何数据。在许多实际场景中，我们获得的并非完整的物体模型，而是多个部分扫描的集合——例如从不同视角捕获的深度图、遮挡下的激光雷达点云，或经过分割的CAD部件。这些部分形状各自携带有限的几何信息，但它们的并集可能覆盖一个完整物体的内在结构。如何从这些碎片化的观测中推断出完整形状的全局属性，构成了一个基础性问题。
 
@@ -91,7 +92,9 @@ claims:
 
 **数据驱动的突破口。** 尽管上述问题在纯几何框架下是病态的，但现实世界中的形状并非均匀分布在所有可能的等距类上。特定语义类别（如人体、四足动物、人造物）的形状遵循特定的结构先验，这些先验可以通过数据学习获得。本文的核心动机正是利用这一观察：我们提出学习一个神经算子，直接从两个部分形状的截断特征值序列预测其并集的特征值序列，无需显式的三维重建、对应关系计算或几何配准。这一思路将问题从几何推理转化为谱域上的序列到序列映射，通过数据先验来弥补信息的不足，同时保留谱表示对离散化和姿态变化的固有鲁棒性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于将部分形状的并集问题从三维几何域完全迁移至谱域，提出了**谱并集（Spectral Union）**这一新范式，并设计了相应的神经算子 $\mathcal{U}_\Theta$ 来实现。其关键突破体现在以下三个维度的表示与机制变革上。
 
@@ -129,7 +132,7 @@ $$\lambda(\mathcal{M}_1 \cup \mathcal{M}_2 \cup \dotsb \cup \mathcal{M}_m) = \ma
 
 在谱形状分析的方法谱系中，本文的工作处于一个独特的位置。与 **ShapeDNA**（Reuter et al., Computer-Aided Design 2006）将谱用作形状检索的描述符不同，本文的方法直接操作并生成谱，将其从被动描述符提升为主动计算对象。与 **Isospectralization / MRC*19**（Marin et al., 3DV 2019）从谱恢复三维形状的逆向问题不同，本文关注的是谱域内的正向并集运算，且无需经过显式的几何重建即可支持下游任务（如区域定位、形状检索）。这种“在谱域中计算、在谱域中应用”的范式，为谱方法在三维视觉中的应用开辟了新的可能性。
 
-## 整体框架
+
 
 本文提出一种名为**谱并集网络（Spectral Union Network）**的学习框架，其核心目标是：给定两个部分可变形三维形状，仅以各自的截断拉普拉斯特征值序列为输入，直接预测二者并集的谱，全程无需计算形状间的对应关系或几何变换。该框架将“部分形状的并集”这一几何操作转化为谱域上的神经算子学习问题。
 
@@ -186,7 +189,7 @@ $$\lambda(\mathcal{M}_1 \cup \cdots \cup \mathcal{M}_m) = \mathcal{U}_\Theta(\cd
 ![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2104_00514/figures/001_Figure_1.jpg]]
 *Figure 1: Given a collection of partial deformable shapes $\{ \mathcal { M } _ { 1 } , \mathcal { M } _ { 2 } , \mathcal { M } _ { 3 } \}$ as input, our method predicts the Laplacian eigenvalues of their union without first having to compute a correspondence or a transformation between the input shapes. The resulting eigenvalues (top right plots, colors correspond to each surface) can be used to reconstruct the final shape if needed, up to isometry/pose (bottom right). In this example, the input shapes have different poses, varying overlap, and different mesh connectivity
 
-## 核心模块与公式推导
+
 
 ### 问题形式化：谱并集算子
 
@@ -240,7 +243,9 @@ T_A 的具体配置为：8 个注意力头、6 层，所有表示的维度为 32
 
 网络使用预测特征值与真实特征值之间的均方误差（MSE）作为训练损失。论文指出，尝试根据特征值线性增长幅度对损失进行加权惩罚（即对较大特征值赋予更高权重）**并未带来显著改进**——这一消融发现表明，简单的均匀加权 MSE 已足以有效训练谱并集算子。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -317,7 +322,9 @@ Figure 2 和 Figure 5 从定性角度验证了预测谱的几何保真度。使�
 ![[assets/figures/papers/paper_list_l8_https_arxiv_org_abs_2104_00514/figures/028_Figure_18.jpg]]
 *Figure 18: Region localization on headphones, trained and tested on point clouds. In the examples on the right column, despite significant changes in the geometry of the partialities, the model localizes the same correct region*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：谱域中的部分形状并集
 
@@ -391,6 +398,8 @@ Figure 2 和 Figure 5 从定性角度验证了预测谱的几何保真度。使�
 5. **与谱域其他算子的组合**：谱并集算子能否与功能映射（functional maps）、谱距离（spectral distances）等其他谱算子无缝组合，以支持更复杂的几何处理管线？
 
 6. **大规模形状集合上的可扩展性**：方法在更大规模、更多样化的形状集合上的训练效率和泛化能力如何？
+
+
 
 ## 原文 PDF
 

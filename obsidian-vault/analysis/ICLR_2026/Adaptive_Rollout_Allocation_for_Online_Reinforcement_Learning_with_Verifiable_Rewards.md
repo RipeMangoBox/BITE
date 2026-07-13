@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Adaptive_Rollout_Allocation_for_Online_Reinforcement_Learning_with_Verifiable_Rewards.pdf
+project_link: null
+code_link: null
 aliases:
 - VVIPAS
 - ARAORLVR
@@ -43,7 +45,7 @@ paradigm: 通过理论分析揭示梯度方差与提示成功概率 p 的函数�
 > - Bamboogle 上，EM 为 23.2% (Dr. GRPO+VIP)，对比 20.0% (Dr. GRPO)，变化 +3.2%。
 > - MuSiQue 上，EM 为 10.5% (Dr. GRPO+VIP)，对比 6.0% (Dr. GRPO)，变化 +4.5%。
 
-## 概述
+## 概要
 
 群体策略优化方法（如 GRPO、RLOO）在在线强化学习中为每个训练提示分配固定数量的推广（rollout），这一均匀分配策略存在根本性的效率瓶颈：大量提示的成功概率接近 0 或 1，其梯度方差极低，却消耗了与高信息量提示相同的计算预算，导致整体梯度方差高、采样效率低下。
 
@@ -53,7 +55,7 @@ paradigm: 通过理论分析揭示梯度方差与提示成功概率 p 的函数�
 
 VIP 目前主要针对可验证奖励（RLVR）场景设计，奖励为确定且可自动验证的二元变量，直接扩展到带噪声奖励的 RLHF 场景仍需额外设计。
 
-## 背景与动机
+
 
 ### 可验证奖励下的在线强化学习
 
@@ -93,7 +95,9 @@ $$\mathrm{Var}(\tilde{G})_{\text{RLOO}} = \frac{1}{n-1} \cdot 4 \sigma_Z^2 \cdot
 
 上述方法的核心缺陷在于：**缺乏对提示成功概率的准确在线预测能力，以及缺乏将预测转化为最优分配的数学框架**。本文提出的 VIP（Variance-Informed Predictive allocation strategy）正是针对这两个缺口设计——通过高斯过程在嵌入空间中预测每个提示的 $p$ 值，并将其代入凸优化问题精确求解方差最小化的推广分配方案。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：固定推广分配导致的采样效率低下
 
@@ -151,9 +155,9 @@ Figure 2 直观展示了不同分配策略的差异：逆准确率分配和逆�
 
 尽管引入了 GP 推断和凸优化求解，VIP 的计算开销极小。Table 4 显示，对于 1.5B 参数模型，VIP 的额外开销仅占 RL 训练总时间的 **1.12%**；对于 7B 参数模型，这一比例进一步降至 **0.83%**。这种高效率得益于 GP 仅在小批量嵌入上运行，且优化问题具有解析解形式，无需昂贵的迭代求解。
 
-## 整体框架
 
-![[obsidian-vault/assets/figures/papers/paper_list_l7_Adaptive_Rollout_Allocation_for_Online_Reinforcement_Learning_with_Verif/figures/001_Figure_1.jpg]]
+
+![[assets/figures/papers/paper_list_l7_Adaptive_Rollout_Allocation_for_Online_Reinforcement_Learning_with_Verif/figures/001_Figure_1.jpg]]
 *Figure 1: The process starts with an initial belief over prompt success probabilities. At each step t, a mini-batch B _ { t } is selected, and the belief function m _ { t } ( \cdot ) predicts the success probabilities of the prompts in B _ { t } . \mathrm { A } budget allocation module assigns rollout budgets \{ n _ { q } \} , rollouts are generated, and the resulting data updates the model and beliefs. Repeated for \bar { T } steps, this yields a fine-tuned model \pi _ { \boldsymbol { \theta } _ { T + 1 } } with improved performance and efficient rollout usage*
 
 VIP（Variance-Informed Predictive allocation strategy）是一个围绕**预测-分配-采样-更新**循环构建的轻量级在线分配框架，其核心目标是：在固定的总推广预算约束下，通过最小化小批量的梯度方差来最大化采样效率。
@@ -186,7 +190,7 @@ VIP（Variance-Informed Predictive allocation strategy）是一个围绕**预测
 
 **凸优化与取整解耦**：将整数规划问题先松弛为连续凸优化，利用 KKT 条件得到 $n_q^\star$ 关于对偶变量 $\lambda$ 的解析表达式，通过二分搜索高效求解；随后采用基于目标函数增益 $f_q(n) = a_q \frac{n-1}{n^2}$（Dr. GRPO）的贪心取整策略，在保证上下界约束的前提下将连续解转化为可行整数解。Table 4 显示，整套 VIP 流程的额外计算开销仅占 RL 训练总时间的 1.12%（1.5B 模型）和 0.83%（7B 模型）。
 
-## 核心模块与公式推导
+
 
 VIP 方法由三个核心模块串联构成：高斯过程成功概率预测器、方差最小化推广分配优化器，以及贪心启发式整数取整算法。三个模块协同工作，将计算预算动态集中在梯度方差最大的提示上。
 
@@ -244,21 +248,23 @@ RLOO 的对应形式为 $f_q(n) = a_q \frac{\bar{r}}{n-1}$。取整过程确保�
 
 三个模块的额外计算开销极小。在单 GPU 上，核矩阵计算、GP 训练/预测和推广分配的总时间仅占整体 RL 训练时间的 1.12%（1.5B 模型）和 0.83%（7B 模型）（Table 4），不会成为训练瓶颈。
 
-## 实验与分析
 
-![[obsidian-vault/assets/figures/papers/paper_list_l7_Adaptive_Rollout_Allocation_for_Online_Reinforcement_Learning_with_Verif/figures/002_Table_1.jpg]]
+
+## 实验与关键发现
+
+![[assets/figures/papers/paper_list_l7_Adaptive_Rollout_Allocation_for_Online_Reinforcement_Learning_with_Verif/figures/002_Table_1.jpg]]
 *Table 1: Percentage results on AIME24 and AIME25. The upper block uses a total rollout budget of C = 8 \times Q , and the lower block uses C = 1 6 \times Q For each pair (Dr. GRPO vs Dr. \mathrm { G R P O _ { + V I P } } and RLOO vs \mathrm { R L O O _ { + V I P } ) } , higher values are highlighted in green*
 
-![[obsidian-vault/assets/figures/papers/paper_list_l7_Adaptive_Rollout_Allocation_for_Online_Reinforcement_Learning_with_Verif/figures/003_Table_2.jpg]]
+![[assets/figures/papers/paper_list_l7_Adaptive_Rollout_Allocation_for_Online_Reinforcement_Learning_with_Verif/figures/003_Table_2.jpg]]
 *Table 2: Performance on Bamboogle and MuSiQue. Green cells indicate improvements of the +VIP variant over its base method*
 
-![[obsidian-vault/assets/figures/papers/paper_list_l7_Adaptive_Rollout_Allocation_for_Online_Reinforcement_Learning_with_Verif/figures/004_Table_3.jpg]]
+![[assets/figures/papers/paper_list_l7_Adaptive_Rollout_Allocation_for_Online_Reinforcement_Learning_with_Verif/figures/004_Table_3.jpg]]
 *Table 3: Ablation study on AIME24 and AIME25. All values are percentages. For each metric, the highest value across methods is highlighted in green*
 
-![[obsidian-vault/assets/figures/papers/paper_list_l7_Adaptive_Rollout_Allocation_for_Online_Reinforcement_Learning_with_Verif/figures/013_Figure_3.jpg]]
+![[assets/figures/papers/paper_list_l7_Adaptive_Rollout_Allocation_for_Online_Reinforcement_Learning_with_Verif/figures/013_Figure_3.jpg]]
 *Figure 3: Prediction mean absolute error (MAE) over training steps for two model scales. Our GPR-based predictor achieves consistently lower MAE than moving average and Ridge Regression baselines for both the 1.5B and 7B models*
 
-![[obsidian-vault/assets/figures/papers/paper_list_l7_Adaptive_Rollout_Allocation_for_Online_Reinforcement_Learning_with_Verif/figures/005_Table_4.jpg]]
+![[assets/figures/papers/paper_list_l7_Adaptive_Rollout_Allocation_for_Online_Reinforcement_Learning_with_Verif/figures/005_Table_4.jpg]]
 *Table 4: Wall-clock runtime of core computational components and model-specific operations for Qwen2.5-Math-1.5B and Qwen2.5-Math-7B, measured on a single GPU*
 
 ### 核心瓶颈与因果机制
@@ -313,7 +319,9 @@ Figure 6 和 Figure 7 展示了训练过程中的平均优势和平均回报曲�
 - 连续奖励扩展的实验验证：文中提及但未提供实验结果，若需引用该扩展的有效性，需查阅附录并自行判断理论推导的完备性；
 - 更大规模提示集上的可扩展性：当前实验的 mini-batch 规模未公开具体数值，若需评估 GP 在大规模场景下的瓶颈，需根据实际 batch size 估算核矩阵规模。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与贡献定位
 
@@ -349,6 +357,8 @@ VIP 的设计和理论分析基于以下关键假设，超出这些边界时需�
 
 **RLHF 场景迁移**：如何将 VIP 扩展到非可验证的、人类偏好奖励的 RLHF 场景？这需要解决奖励噪声建模和预测器设计两个核心挑战。
 
+
+
 ## 原文 PDF
 
-![[obsidian-vault/paperPDFs/ICLR_2026/Adaptive_Rollout_Allocation_for_Online_Reinforcement_Learning_with_Verifiable_Rewards.pdf]]
+![[paperPDFs/ICLR_2026/Adaptive_Rollout_Allocation_for_Online_Reinforcement_Learning_with_Verifiable_Rewards.pdf]]

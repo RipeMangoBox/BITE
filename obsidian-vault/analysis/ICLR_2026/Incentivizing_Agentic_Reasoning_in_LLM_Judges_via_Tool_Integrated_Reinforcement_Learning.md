@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Incentivizing_Agentic_Reasoning_in_LLM_Judges_via_Tool_Integrated_Reinforcement_Learning.pdf
+project_link: null
+code_link: null
 openreview_forum_id: AXNRILww9c
 aliases:
 - TJ
@@ -42,7 +44,7 @@ claims:
 > - PPE Correctness (Pairwise) 上，平均准确率 为 TIR-Judge-Zero 4B 76.3%，对比 Qwen3-4B-Instruct 60.4%，变化 +15.9%。
 > - RewardBench2 (Listwise) 上，平均准确率 为 TIR-Judge-Zero 8B 73.4%，对比 Claude-Opus-4 76.5%，变化 96%性能匹配。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -75,7 +77,7 @@ TIR-Judge 属于**工具增强型 LLM 评委**，区别于：
 
 其核心创新在于将工具调用能力通过 RL 内化到模型策略中，使“何时用工具、如何用工具”成为模型自主习得的推理行为，而非外部预设的规则。
 
-## 背景与动机
+
 
 ### 现有LLM评委的局限性
 
@@ -95,7 +97,9 @@ TIR-Judge 属于**工具增强型 LLM 评委**，区别于：
 
 基于上述动机，本文提出 **TIR-Judge**，一个端到端的工具集成强化学习框架。其核心洞察是：**采用多轮强化学习（DAPO）和多样化奖励可以教会LLM评委何时以及如何调用Python代码执行器进行精确验证**。实验表明，仅向模型增加代码执行工具几乎无提升甚至有害，而RL训练带来显著提升（Section 5.2），这证实了RL是解锁工具使用能力的关键机制。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 TIR-Judge 的核心创新在于将**工具调用能力内化到 LLM 评委的策略中**，而非仅在推理时附加工具。现有 LLM 评委（如基于 Qwen3 的基座模型、RM-R1 等）仅依靠纯文本推理，缺乏对复杂约束的精确验证和计算能力；而 AgentRM 等工具增强方法仅在推理时添加工具，缺少端到端训练，工具使用无法深度融入推理过程。TIR-Judge 通过工具集成强化学习，系统性地改变了以下关键维度：
 
@@ -147,7 +151,7 @@ $$R_c = \begin{cases} \mathbb{I}(s_\theta(x, y_{pos}) > s_\theta(x, y_{neg})), &
 
 TIR-Judge 展现出显著改善的偏见鲁棒性：位置偏见（A-B/B-A 顺序差异）通常 <1%，最多 2%，而 Qwen3 基座模型可达 9% 的差异（Table 9）；当正确回答更长或更短时，准确率差异很小，且在某些情况下抵消了基座模型的冗长偏差（Table 10）。这归因于工具集成推理使评判更依赖可验证证据而非表面特征。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_AXNRILww9c/figures/002_Figure_2.jpg]]
 *Figure 2: Overall framework of TIR-Judge variants. TIR-Judge natively supports tool use during judgment and is designed to handle diverse input formats*
@@ -180,7 +184,7 @@ TIR-Judge 原生支持三种评判格式（Figure 2）：
 
 无论哪种格式，评委在推理过程中均可按需调用代码执行器进行精确验证（如计数约束检查、数学表达式求值、代码正确性验证），最终输出结构化评判结果。
 
-## 核心模块与公式推导
+
 
 ### 工具集成推理循环
 
@@ -228,7 +232,9 @@ $$\mathcal{T}_{t+1} \gets \mathrm{RS}(\pi_{\theta_t}), \quad \pi_{\theta_{t+1}} 
 
 即从当前策略进行拒绝采样生成训练数据，用其对初始策略进行 SFT，再进行 RL 优化，循环迭代。实验表明第二轮 RL 持续优于第一轮，验证了迭代自举的有效性（Figure 5, Section 5.3）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：RL是解锁工具使用能力的关键
 
@@ -285,7 +291,9 @@ $$\mathcal{T}_{t+1} \gets \mathrm{RS}(\pi_{\theta_t}), \quad \pi_{\theta_{t+1}} 
 
 Figure 6的推理效率分析表明，TIR-Judge在保持高准确率的同时，推理效率优于基线方法。这得益于SFT数据构建策略——教师模型生成的轨迹天然倾向于高效的工具调用模式，避免了冗余的代码生成和执行步骤。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心瓶颈与因果机制
 
@@ -333,6 +341,8 @@ TIR-Judge-Zero虽然无需蒸馏，但训练成本约为蒸馏方法的两倍（
 - **策略模型训练增强**：探索将TIR-Judge用于增强策略模型训练（如RLHF中的奖励建模），形成“评判-策略”协同提升的闭环。
 - **更长上下文的工具推理**：在极长提示或复杂多步推理场景下，工具调用的时机和频率优化仍需进一步研究。
 - **安全与不可验证任务的工具设计**：如何为安全对齐等“软”评判任务设计合适的验证工具，是工具增强评委走向通用化的关键挑战。
+
+
 
 ## 原文 PDF
 

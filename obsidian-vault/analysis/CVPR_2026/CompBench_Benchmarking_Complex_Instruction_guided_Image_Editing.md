@@ -41,13 +41,13 @@ claims:
 > - InstructPix2pix在CompBench上相比ReasonEdit基准，PSNR下降约2.5，SSIM下降0.02，CLIP-Score下降0.4，证明CompBench显著提高了任务难度。
 > - 所有模型在多轮编辑的第二轮中，背景一致性指标（PSNR, SSIM, LPIPS）均出现显著下降，暴露了连续编辑中的上下文保持缺陷。
 
-## 概述
+## 概要
 
 指令引导图像编辑旨在根据自然语言指令对图像进行修改，然而现有基准在场景复杂性和指令全面性上存在严重不足——多数数据集图像仅包含少量物体、遮挡率低，且任务局限于简单的局部编辑，无法有效评估模型在真实复杂环境下的视觉定位、上下文理解和推理能力。CompBench 作为首个面向复杂场景的大规模指令引导图像编辑基准，通过构建高场景复杂度（平均 13.58 个对象/图，98.47% 遮挡率）、覆盖五大类九种任务（局部编辑、多编辑、动作编辑、场景空间编辑、复杂推理）的高质量数据集（高 SSIM），系统性地暴露了当前模型在背景保持、目标识别和指令跟随上的根本局限。
 
 核心方法上，CompBench 提出了 MLLM-人类协同框架与指令解耦策略：多模态大语言模型生成初步编辑指令，人工专家审核迭代以确保指令-图像对齐；同时将编辑意图分解为空间定位、视觉属性、运动状态和对象实体四个维度，提升指令的清晰度和精度。实验表明，集成 MLLM 的模型（如 **Bagel**、**Qwen-Image-Edit**）在复杂推理和空间编辑任务上大幅领先未集成 MLLM 的模型，而标准 CLIP-文本对齐不足以支撑复杂推理；此外，所有模型在多轮编辑的第二轮中背景一致性指标均出现显著下降，揭示了连续编辑中的上下文保持缺陷。这些发现为下一代具备真正理解和推理能力的图像编辑系统指明了方向。
 
-## 背景与动机
+
 
 指令引导的图像编辑（Instruction-guided Image Editing）旨在根据自然语言指令对输入图像进行精确修改。近年来，扩散模型驱动的编辑方法在简单场景下取得了显著进展，但当任务复杂度提升至真实世界水平时，现有基准和评估体系暴露出根本性不足。
 
@@ -71,7 +71,9 @@ claims:
 
 基于此，本文提出**CompBench**——首个面向复杂场景的大规模指令引导图像编辑基准，通过MLLM-人类协同框架和指令解耦策略，构建覆盖五大类九种任务的高质量编辑数据，旨在暴露模型在背景保持、目标识别和指令跟随上的根本局限，推动从简单编辑向具备真正理解和推理能力的下一代系统演进。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CompBench 的核心创新并非提出新的编辑模型，而是通过**基准测试本身的系统化设计**，暴露并量化当前指令引导图像编辑模型在复杂真实场景下的根本性能力缺陷。其创新点可归结为三个相互耦合的维度：**高复杂度的场景构造**、**MLLM-人类协同的数据生成框架**，以及**指令解耦策略驱动的细粒度评估体系**。
 
@@ -113,7 +115,7 @@ CompBench 提出了一种**指令解耦策略**（Instruction Decoupling Strateg
 
 CompBench 的实验结果揭示了一个关键洞察：**标准 CLIP-文本对齐不足以支撑复杂推理**。集成 MLLM 的模型（如 **Bagel**、**Qwen-Image-Edit**、**FLUX.1 Kontext**、**Step1X-Edit**）在动作/位置/视角编辑等复杂任务上大幅领先未集成 MLLM 的模型；后者经常忽略指令或编辑错误目标。此外，所有模型在多轮编辑的第二轮中，背景一致性指标（PSNR、SSIM、LPIPS）均出现显著下降（Table 3），暴露了连续编辑中的上下文保持缺陷。这些发现为下一代编辑模型指明了方向：必须从简单的文本-图像对齐向具备真正理解和推理能力的多模态架构演进。
 
-## 整体框架
+
 
 CompBench的构建遵循一个两阶段流水线：**源数据收集与预处理**，以及**任务专用数据生成**。两条主线通过统一的**MLLM-人类协同框架**（MLLM-Human Collaborative Framework）衔接，确保数据质量与指令-图像对齐。
 
@@ -164,7 +166,7 @@ CompBench的构建遵循一个两阶段流水线：**源数据收集与预处理
 ![[assets/figures/papers/paper_list_l2298_https_arxiv_org_abs_2505_12200/figures/004_Figure_3.jpg]]
 *Figure 3: The construction pipeline of CompBench. The pipeline consists of two main stages: (a) Source data collection and preprocessing, wherein high-quality data are identified through image quality filtering, mask decomposition, occlusion and continuity evaluation, followed by thorough human verification. (b) Task-specific data generation using four specialized pipelines within our MLLM-Human Collaborative Framework, where multimodal large language models generate initial editing instructions that are subsequently validated by humans to ensure high-fidelity, semantically aligned instruction-image pairs for complex editing tasks*
 
-## 核心模块与公式推导
+
 
 ### 3.1 MLLM-人类协同框架
 
@@ -228,7 +230,9 @@ CompBench 本身不引入新的生成模型或损失函数，其评估体系基�
 ![[assets/figures/papers/paper_list_l2298_https_arxiv_org_abs_2505_12200/figures/001_Figure_1.jpg]]
 *Figure 1: Examples of CompBench. The figure showcases nine tasks in our CompBench: object addition, object removal, object replacement, multi-object editing, multi-turn editing, implicit reasoning, action editing, location editing and viewpoint editing*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 基准统计与任务难度验证
 
@@ -290,7 +294,9 @@ Figure 6(a) 展示了五大任务上的 Top-5 模型性能分布，Figure 6(b) �
 
 4. **物理一致性与几何失真**：在动作编辑和视角编辑任务中，模型生成的编辑结果有时违背物理常识（如物体悬浮、比例失调），说明 2D 编辑模型缺乏对三维结构和物理约束的建模能力。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 基准构建范式的演进定位
 
@@ -332,6 +338,8 @@ CompBench 的实验发现直接指向以下开放问题：
 3. **多轮编辑的上下文记忆**：多轮编辑中背景一致性的系统性退化表明，现有模型缺乏有效的编辑状态追踪机制。设计具备编辑历史感知能力的架构（如记忆增强模块或状态编码器），是解决这一问题的潜在方向。
 
 4. **评估体系的可扩展性**：随着编辑任务复杂度的持续增长，基于 VLM 的自动评分需要更精细的校准和更透明的失效模式分析，以确保评估结果与人类判断保持可靠的一致性。
+
+
 
 ## 原文 PDF
 

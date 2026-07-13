@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/ScaleCUA_Scaling_Open_Source_Computer_Use_Agents_with_Cross_Platform_Data.pdf
+project_link: null
+code_link: https://github.com/OpenGVLab/ScaleCUA
 openreview_forum_id: yBFUqdJFZn
 aliases:
 - ScaleCUA
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | ScaleCUA：利用跨平台数据扩展开源计算机使用智能体 |
 | 英文题名 | ScaleCUA: Scaling Open-Source Computer Use Agents with Cross-Platform Data |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=yBFUqdJFZn); [GitHub](https://github.com/OpenGVLab/ScaleCUA) |
+| Links | [paper](https://openreview.net/forum?id=yBFUqdJFZn) · [GitHub](https://github.com/OpenGVLab/ScaleCUA) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/planning_control |
 | Method | ScaleCUA |
 | Dataset | MMBench-GUI L1-Hard, WebArena-Lite-v2 (50 steps), ScreenSpot-Pro |
@@ -41,7 +43,7 @@ claims:
 > - WebArena-Lite-v2 (50 steps) 上，Success Rate 为 47.4 (ScaleCUA-32B)，对比 21.4 (UI-TARS-72B-DPO)，变化 +26.0。
 > - ScreenSpot-Pro 上，Overall Accuracy 为 59.2 (ScaleCUA-32B)，对比 48.5 (previous SOTA without ScaleCUA)，变化 +10.7。
 
-## 概述
+## 概要
 
 当前计算机使用智能体（Computer Use Agent）面临的核心瓶颈在于**缺乏大规模、跨平台的交互轨迹数据**与高质量训练语料，导致模型在多样化的操作系统和应用场景中泛化能力不足。现有数据收集方案或依赖纯人工标注，成本高昂且难以规模化；或仅基于单一平台的自动化探索，覆盖面有限且容易过时。
 
@@ -57,7 +59,7 @@ claims:
 
 综上，ScaleCUA 的核心贡献在于证明了**通过大规模、跨平台的交互数据缩放，开源视觉语言模型能够在计算机使用任务上达到甚至超越闭源模型的性能水平**，为通用计算机使用智能体的发展提供了坚实的数据与方法基础。
 
-## 背景与动机
+
 
 计算机使用智能体（Computer Use Agent）旨在通过视觉感知图形用户界面（GUI），自主完成跨应用、跨平台的任务操作。近年来，闭源商业模型（如GPT-4o、Claude-3.7）在这一领域展现了强大的能力，但其训练数据和实现细节不透明，难以复现或定制。开源方案则面临根本性瓶颈：**缺乏大规模、跨平台的计算机使用操作轨迹数据和高质量训练语料**，严重限制了通用计算机使用智能体的泛化能力。
 
@@ -67,7 +69,9 @@ claims:
 
 上述缺口构成了本文的核心动机：**能否通过构建一个跨平台交互数据管道，系统性地生成大规模、多模态训练数据，并在此基础上训练一个统一的视觉语言模型，使其同时具备感知、推理和动作能力？** 这一思路的核心假设是：数据驱动的缩放（scaling）能够显著提升开源模型在计算机使用任务上的性能，使其在多个基准上达到甚至超越闭源模型。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ScaleCUA的核心创新并非提出全新的模型架构，而是通过**系统性的数据工程与灵活的推理范式设计**，从根本上解决了开源计算机使用智能体泛化能力不足的瓶颈。其创新点可归纳为四个关键维度的“changed slots”：
 
@@ -111,7 +115,7 @@ ScaleCUA的核心创新并非提出全新的模型架构，而是通过**系统�
 
 需要注意的是，虽然数据增强策略（元素裁剪、合成分辨率缩放、推理提示丰富）在ScreenSpot-Pro上带来了**3.5个百分点的提升**（37.8→41.3，Table 4a），但这属于数据层面的优化技巧，而非架构级创新。ScaleCUA真正的壁垒在于**数据管道的系统设计**和**推理范式的灵活整合**，这两者共同构成了其超越闭源模型（如GPT-4o、Claude-3.7）和开源基线（如UI-TARS-72B-DPO）的基础。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_yBFUqdJFZn/figures/001_Figure_1.jpg]]
 *Figure 1: Performance comparison. The top row showcases performance overview on GUI-centric benchmarks. The bottom row demonstrates the consistent improvements from our collected data*
@@ -146,7 +150,7 @@ ScaleCUA 家族基于 Qwen2.5-VL 构建，支持三种推理范式（图 3）：
 
 训练时，ScaleCUA 根据模型规模控制通用数据与 GUI 数据的混合比例：3B 模型使用 25% 通用数据，7B 使用 50%，32B 使用 75%。这种数据平衡策略被证明是保留 GUI 专业化能力而不损害通用推理能力的关键。
 
-## 核心模块与公式推导
+
 
 ### 智能体-环境交互范式
 
@@ -186,7 +190,9 @@ ScaleCUA 支持三种灵活切换的推理模式（参见 Figure 3），以适�
 
 在多任务训练中，ScaleCUA 针对不同模型规模采用了差异化的数据平衡策略：3B 模型使用 25% 通用数据与 75% GUI 数据，7B 模型使用 50%/50%，32B 模型使用 75%/25%。消融实验表明，增加通用数据比例会提升通用视觉语言基准分数，但会逐渐削弱 GUI 任务的专项性能。这一策略在保持通用推理能力的同时，最大化了对 GUI 任务的适配度，是实现模型“通专兼备”的关键设计。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能突破
 
@@ -260,7 +266,9 @@ ScaleCUA支持三种推理范式：直接动作模式（DAM）和推理动作模
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_yBFUqdJFZn/figures/020_Table_8.jpg]]
 *Table 8: Performance on the MMBench-GUI L2 (GUI Element Grounding) (Wang et al., 2025c)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 技术路线与基线关系
 
@@ -303,6 +311,8 @@ ScaleCUA 的核心贡献在于通过大规模、跨平台的数据驱动缩放�
 3. **长期依赖建模：** 当前扁平的历史表示无法有效捕捉长期依赖关系，需要设计更强大的记忆和上下文管理机制。
 
 4. **跨平台迁移的极限：** 统一动作空间和跨平台训练的有效性边界尚不明确，是否存在某些平台或任务类型需要完全独立的建模策略仍需探索。
+
+
 
 ## 原文 PDF
 

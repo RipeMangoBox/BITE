@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/SPIRAL_Self_Play_on_Zero_Sum_Games_Incentivizes_Reasoning_via_Multi_Agent_Multi_Turn_Reinforcement_Learning.pdf
+project_link: null
+code_link: https://github.com/spiral-rl/spiral
 openreview_forum_id: 7Yayy5fNLg
 aliases:
 - SPIRAL
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | SPIRAL：多智能体多轮强化学习中的零和博弈自我对弈推理激励 |
 | 英文题名 | SPIRAL: Self-Play on Zero-Sum Games Incentivizes Reasoning via Multi-Agent Multi-Turn Reinforcement Learning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=7Yayy5fNLg); [GitHub](https://github.com/spiral-rl/spiral) |
+| Links | [paper](https://openreview.net/forum?id=7Yayy5fNLg) · [GitHub](https://github.com/spiral-rl/spiral) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | SPIRAL |
 | Dataset | 8个推理基准（MATH500, AIME24/25, Olympiad, AMC-23, Minerva, GPQA-D, MMLU-Pro）, 同上8个基准, 同上（多种子统计）, 6个游戏环境（含OOD） |
@@ -41,7 +43,7 @@ claims:
 > - 同上8个基准 上，平均得分（%） 为 49.6（Qwen3-8B-Base + SPIRAL-Multi），对比 39.5（Qwen3-8B-Base），变化 +10.1。
 > - 同上（多种子统计） 上，平均得分（%） 为 44.5 ± 0.5（Qwen3-4B + SPIRAL-Multi），对比 39.6 ± 0.4（Qwen3-4B + SFT-Multi），变化 +4.9。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -65,7 +67,7 @@ SPIRAL 提出了一种根本不同的路径——**通过零和博弈上的自�
 - **自我对弈 vs. 固定对手**：固定对手训练使胜率从 0% 升至 62.5%，但其仅学会利用静态策略漏洞；自我对弈则维持约 50-52% 的均衡胜率，表明模型在持续发展真正的推理能力（Table 3）。
 - **多游戏泛化优势**：多游戏模型在对抗 Gemini-2.0-Flash 的平均胜率达 59.5%，比最佳单游戏专家高出 6.6 个百分点，在分布外游戏上也展现出更强的迁移能力（Table 5）。
 
-## 背景与动机
+
 
 ### 现有范式：基于可验证奖励的强化学习
 
@@ -94,7 +96,9 @@ SPIRAL的出发点是一个直观的假设：**零和博弈的竞争压力天然
 
 这一思路将“推理能力获取”从“在特定任务上优化人工奖励”重新定义为“在竞争环境中通过自我对弈涌现可迁移的认知策略”。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SPIRAL的核心创新在于重新定义了LLM推理能力的获取路径：将训练信号从**人工设计的领域特定奖励**转向**零和博弈自我对弈的竞争压力**，并引入**角色条件优势估计（RAE）**来稳定这一多智能体训练过程。以下从三个关键维度展开。
 
@@ -129,7 +133,7 @@ SPIRAL揭示了零和博弈中涌现的结构化推理模式可无缝迁移到�
 
 SPIRAL的核心洞察在于：零和博弈的竞争压力天然驱动模型发展结构化推理，而RAE确保了这种压力在多智能体训练中不会因方差失控而导致思考崩溃。这一框架的泛化性已通过多模型架构（Qwen3、Llama、DeepSeek-Distill-Qwen）的验证得到初步证实。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_7Yayy5fNLg/figures/003_Figure_3.jpg]]
 *Figure 3: The SPIRAL Framework. SPIRAL employs an actor-learner architecture for scalable self-play training. Parallel actors sample trajectories from a diverse set of games using vectorized environments. A single policy $\pi _ { i }$ plays both roles, generating zero-sum, sparse reward game trajectories. The centralized learner processes these trajectories using Role-conditioned Advantage Estimation (RAE) to compute separate advantages, $A _ { 0 }$ ( s , a ) and $A _ { 1 }$ ( s , a ) , for each role. These are then used for on-policy reinforcement learning updates*
@@ -172,7 +176,7 @@ $$\nabla_{\theta} J_{\mathrm{SPIRAL}}(\theta) = \mathbb{E}_{G \sim \mathcal{G}} 
 
 实验表明，RAE 是稳定训练的关键保障：移除 RAE 后，模型在约 200 步后发生“思考崩溃”（thinking collapse），响应长度从约 2000 字符暴跌至接近零，数学推理准确率从 35% 降至 12%（Figure 6, Figure 9）。RAE 通过将回报中心化到角色特定基线，防止梯度方差将策略推向退化解。
 
-## 核心模块与公式推导
+
 
 ### 共享策略自对弈框架
 
@@ -218,7 +222,9 @@ SPIRAL 的工程实现采用 Actor-Learner 分布式架构，包含以下核心�
 
 该架构使 SPIRAL 能够在 8 张 H100 GPU 上完成 Qwen3-4B 约 25 小时、Qwen3-8B 约 28 小时的完整训练。所有实验采用统一的超参数（学习率 $1 \times 10^{-6}$，温度 1.0，熵系数 0.01），不因游戏或模型尺度调整，保证了对比的公平性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心结果：零和博弈自我对弈实现跨域推理迁移
 
@@ -298,7 +304,9 @@ Table 8 测试了 SPIRAL 在复杂度提升的 OOD 环境上的泛化性能。�
 3. **训练稳定性依赖 RAE**：RAE 的超参数 α 未经深入消融，游戏组合的课程调度策略未被探索，可能影响更复杂场景下的训练稳定性。
 4. **计算成本**：8 H100 GPU 训练 25-28 小时的资源需求限制了快速实验迭代。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从 RLVR 到自我对弈推理
 
@@ -358,6 +366,8 @@ Figure 4 显示，期望值计算在训练后期达到 78% 的出现频率，且
 4. **SPIRAL 与 RLVR 的融合潜力。** 将游戏自我对弈与领域特定的可验证奖励交替训练，或通过共享表征联合优化，是否能实现更强的端到端推理能力？这需要解决两种奖励信号的尺度匹配和训练动态协调问题。
 
 5. **推理模式迁移的因果验证。** 当前仅展示了模式频率与性能的相关性。需要干预性实验（如通过提示抑制特定模式，或分析模式出现与否对解题成功率的影响）来建立因果关系。
+
+
 
 ## 原文 PDF
 

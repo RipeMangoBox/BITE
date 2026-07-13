@@ -45,15 +45,13 @@ claims:
 > - Representation fidelity benchmark 上，CD_GP↓ (×10⁻⁴) Ours 1024: 0.01±0.01 vs 对比方法（SparC等） (最小CD_GP，反映对细粒度结构的准确恢复)；F₁_0.01↑ Ours 1024: 99.71±0.08; Ours 2048: 99.99±0.00 vs SparC及其他方法（较低） (大幅提升，2048分辨率下几乎完美)。
 > - Mesh reconstruction (VAE) on Dora benchmark 上，Chamfer Distance (CD↓) FaithC 1024: 0.06 / 0.05 vs SparseFlex 1024, Sparc3D 1024 (~93% CD reduction, F-score 35% improvement)。
 
-## 概述
+## 概要
 
 传统三维体素化流程依赖“网格 → 水密化 → 有符号距离场（SDF）/占用场 → Marching Cubes 等值面提取”这一管线，在预处理（水密化）、符号分配和曲面提取三个阶段均引入几何误差，导致尖锐特征丢失、内部结构消失和表面加厚。该管线对非水密、开放或复杂拓扑的网格尤为脆弱，且全局操作（如绕数、洪水填充）限制了分辨率扩展能力。
 
 **Faithful Contouring (FaithC)** 提出了一条根本性不同的技术路线：**绕过距离场，直接从原始网格中为每个活跃体素独立拟合锚点位置与法向，并沿半轴交点记录方向编码**。其核心洞察是：每个体素与网格的相交片段可以通过二次误差最小化（QEF）以闭合形式局部估计出代表曲面的锚点，半轴交点的符号则提供确定面片连接的局部信息。这种完全局部的编码方式无需全局一致性推断，天然支持大规模并行计算，且避免了传统方法中的信息损失。
 
 **主要结果**：在 1024³ 分辨率下，FaithC 的 Hausdorff 距离为 0.11±0.27×10⁻²，CD_GP 为 0.01±0.01×10⁻⁴，F₁_0.01 达 99.71±0.08，全面优于对比方法；在 2048³ 分辨率下 F₁_0.01 进一步提升至 99.99±0.00，且 FaithC 是目前唯一能扩展到 2048³ 的体素表示方法。在 VAE 重建任务中，FaithC 在 512³ 分辨率下即可超越 SparseFlex 和 Sparc3D 在 1024³ 下的表现，Chamfer Distance 降低约 93%，F-score 提升 35%。
-
-## 背景与动机
 
 三维几何的体素化表示是计算机图形学与三维视觉中的基础问题，其核心挑战在于：如何将连续的三角网格离散化为规整的体素结构，同时最大程度保留原始几何的精细细节与内部结构。这一问题的困难源于传统表示管线中固有的信息损失机制。
 
@@ -86,7 +84,7 @@ Faithful Contouring的提出源于一个关键的观察：**体素与网格的�
 
 简言之，Faithful Contouring将体素化从“场重建”范式转变为“局部几何编码”范式，为高保真三维表示开辟了新的技术路径。
 
-## 核心创新
+## 核心方法与创新机理
 
 Faithful Contouring 的核心创新在于**彻底绕过了传统体素化流程中“网格→距离场→等值面提取”的信息损失链**，转而采用一套完全局部、可并行、且具有闭合解的几何编码方案。这一设计改变了三个关键环节（changed slots），从根本上解决了传统方法在尖锐特征保留、内部结构维持和分辨率扩展上的长期瓶颈。
 
@@ -139,8 +137,6 @@ Faithful Contouring 的**所有核心操作均是完全局部的**：
 
 > **注意**：上述关于传统方法分辨率上限的断言基于论文中的对比实验设置（所有基线均在 ≤1024 分辨率下评估），具体各基线方法的最大可运行分辨率需查阅原始文献确认。
 
-## 整体框架
-
 Faithful Contouring (FaithC) 提出了一条**免距离场、免等值面**的体素化表示管线，将任意三角网格直接编码为稀疏的 Faithful Contour Token (FCT)，并在解码时通过局部二次误差最小化（QEF）与半轴方向编码实现高保真重网格化。图3展示了该管线的完整流程。
 
 ### 编码器：从网格到 FCT
@@ -180,11 +176,6 @@ FaithC 进一步构建了基于 FCT 的 VAE 框架：编码器采用级联稀疏
 
 ![[assets/figures/papers/paper_list_l2079_https_arxiv_org_abs_2511_04029/figures/002_Figure_2.jpg]]
 *Figure 2: Comparison of representing pipelines. Traditional UDF → water-tightening → SDF → iso-surface pipelines, relying on Marching Cubes and its variants, introduce artifacts at each lossy step, including artificial surface thickening, loss of internal structures, and jagged iso-surface extraction. In contrast, FAITHFUL CONTOURING directly obtains voxelized features, including fitted anchors and connections, from raw meshes with a highly accurate remeshing algorithm*
-
-![[assets/figures/papers/paper_list_l2079_https_arxiv_org_abs_2511_04029/figures/001_Figure_1.jpg]]
-*Figure 1: FAITHFUL CONTOURING: A Near-Lossless Voxelized 3D Representation keeps finegrained geometric details while maintaining internal structure. This representation encodes an arbitrary mesh into voxelized tokens, supporting 2048+ resolution with neither iso-surface extraction from the converted SDFs nor differentiable rendering optimization. Please zoom in to view the detailed geometry from the remeshing results*
-
-## 核心模块与公式推导
 
 ### 3.1 编码器：从网格到忠实轮廓令牌（FCT）
 
@@ -262,15 +253,7 @@ $$
 
 其中 $\mathcal{L}_{\mathrm{x}}$ 为锚点位置的 MSE 损失，$\mathcal{L}_{\mathrm{n}}$ 为法向的余弦相似度损失，$\mathcal{L}_{\mathrm{axis}}$、$\mathcal{L}_{\mathrm{mask}}$、$\mathcal{L}_{\mathrm{occ}}$ 分别为半轴编码、体素掩码和占用的二值交叉熵损失，$\mathcal{L}_{\mathrm{KL}}$ 为潜在空间的 KL 散度正则项。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2079_https_arxiv_org_abs_2511_04029/figures/004_Figure_4.jpg]]
-*Figure 4: Sharpness from low–resolution reconstruction with Faithful Contouring. Groundtruth surface (GT) compared with reconstructions at voxel resolutions of*
-
-![[assets/figures/papers/paper_list_l2079_https_arxiv_org_abs_2511_04029/figures/005_Figure_5.jpg]]
-*Figure 5: Demonstration of FCT Editing. Assembly of two geometric components, subsequent Manipulation (transformation/posing) of the combined object, and the texture can be recovered by voxel-wise RGB features attached on FCT*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 表示保真度对比
 
@@ -310,7 +293,7 @@ Figure 6 的定性对比揭示了传统管线（UDF 水密化、Flood‑Fill SDF
 
 所有基线方法均基于公开可用代码实现或重新实现，评估指标直接根据各方法输出结果计算，未经过任何后处理，确保了对比的公平性。
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 

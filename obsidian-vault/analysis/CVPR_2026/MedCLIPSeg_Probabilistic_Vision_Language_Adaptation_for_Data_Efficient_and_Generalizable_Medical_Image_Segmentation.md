@@ -43,7 +43,7 @@ claims:
 > - 16 datasets, 5 modalities, 6 organs (average) 上，ID DSC (%) 89.11 vs 81.21 (-7.9% (去除 PVL Adapter))；OOD DSC (%) 79.02 vs 55.22 (-23.8% (去除 PVL Adapter))；OOD DSC (%) 79.02 vs 63.12 (-15.9% (确定性注意力变体))。
 > - 多数据集平均 (10% 训练数据) 上，DSC 81.10 vs ~78.10 (CAT-Seg 估计值) (+2.5% (较 CAT-Seg 提升约 2‑3%))。
 
-## 概述
+## 概要
 
 医学图像分割长期受困于标注稀缺、特征模糊与跨域漂移三重挑战。现有视觉语言模型（VLM）虽然具备强大的语义理解能力，但其密集定位能力薄弱，且确定性跨模态注意力机制容易产生过度自信的预测，难以在保证数据效率的同时提供可靠的域外泛化和可解释的不确定性估计。
 
@@ -53,7 +53,7 @@ claims:
 
 该方法在保持参数高效的同时，首次将可解释的逐像素不确定性图纳入文本驱动的医学分割流程，为低资源场景下的可靠临床辅助提供了新的技术路径。
 
-## 背景与动机
+
 
 医学图像分割是临床诊断与治疗规划的关键步骤，但其自动化面临三重结构性挑战。**标注稀缺**：像素级标注高度依赖专家且耗时，严重制约全监督方法的可扩展性。**特征模糊**：病灶边界不清、组织对比度低，使得纯视觉模型容易产生过度自信的错误预测。**跨域漂移**：不同成像设备、采集协议和患者群体间的分布偏移，导致模型在未见目标域上性能急剧退化。这三者相互耦合，使同时追求数据效率、不确定度量化和域泛化能力成为医学分割领域的核心瓶颈。
 
@@ -65,7 +65,9 @@ claims:
 
 针对上述缺口，本文提出 **MedCLIPSeg**，其核心动机在于：**将概率建模引入视觉语言适配过程，使跨模态融合具备不确定性感知能力**。具体而言，通过对 CLIP 深层编码器中的 Key 和 Value 进行变分建模，学习置信度加权的双向注意力，使模型在低数据量和域偏移条件下，既能保持参数高效（冻结 CLIP 预训练参数），又能生成更准确的分割掩膜和可解释的逐像素不确定性图。这一设计从原理上区别于确定性适配范式，为医学图像分割的鲁棒性和可信度提供了新的技术路线。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MedCLIPSeg 的核心创新在于将 **概率建模** 引入视觉语言模型的跨模态融合过程，同时保持 CLIP 预训练参数的冻结，从而在数据高效和域泛化两个维度上实现突破。其创新点可凝练为三个相互耦合的 **changed slots**，分别对应融合机制、不确定性估计和训练目标的重构。
 
@@ -105,7 +107,7 @@ $$\\mathcal{L}_{\\mathrm{soft}}(\\mathrm{P}, \\mathrm{G}) = -\\frac{1}{B}\\sum_i
 
 上述三个 changed slots 并非孤立存在，而是形成正向反馈循环：概率注意力为对比损失提供更可靠的软目标，对比损失反过来约束概率分布的语义一致性，而蒙特卡洛采样则为整个流程提供不确定性感知的闭环验证。这种耦合使得 MedCLIPSeg 在 **10% 训练数据下比 SOTA CAT-Seg 高出 2–3% DSC**，并在 16 个数据集、5 种成像模态、6 个器官上全面超越现有方法。
 
-## 整体框架
+
 
 MedCLIPSeg 的整体流水线围绕“冻结预训练编码器 + 轻量概率视觉语言适配器 + 软对比损失”三个支柱构建，形成一条从多模态输入到分割掩膜与不确定性图的双向融合通路。
 
@@ -133,7 +135,7 @@ $$\mathbf{M} = \mathrm{Upsample}_{H \times W}\left(\tilde{\mathbf{V}} \cdot \til
 ![[assets/figures/papers/paper_list_l764_https_openaccess_thecvf_com_content_CVPR2026_html_Koleilat_MedCLIPSeg_Pr/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the proposed MedCLIPSeg framework for text-driven medical image segmentation. The model extends CLIP with vision and language encoders connected via PVL Adapters, which perform confidence-weighted image–text fusion at multiple deep layers. Segmentation and uncertainty maps arise from the mean and entropy of posterior samples, with a soft patch-level contrastive loss*
 
-## 核心模块与公式推导
+
 
 MedCLIPSeg 的核心由四个模块构成：冻结的视觉与文本编码器、概率视觉语言适配器（PVL Adapter）、像素-文本相似度映射，以及软补丁级对比损失。其中，PVL Adapter 是整条流水线的关键创新——它对跨模态注意力的 Key 和 Value 进行变分建模，实现置信度加权的双向交互与蒙特卡洛不确定性采样。
 
@@ -204,7 +206,9 @@ $$\mathcal{L}_{\mathrm{soft}}(\mathrm{P}, \mathrm{G}) = -\frac{1}{B}\sum_i\sum_j
 ![[assets/figures/papers/paper_list_l764_https_openaccess_thecvf_com_content_CVPR2026_html_Koleilat_MedCLIPSeg_Pr/figures/003_Figure_3.jpg]]
 *Figure 3: Illustrations of PVL Adapter and AttnPVL*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置概述
 
@@ -308,7 +312,9 @@ MedCLIPSeg 在 16 个数据集、5 种模态上的系统评估表明：**概率�
 ![[assets/figures/papers/paper_list_l764_https_openaccess_thecvf_com_content_CVPR2026_html_Koleilat_MedCLIPSeg_Pr/figures/007_Figure_4.jpg]]
 *Figure 4: Segmentation and uncertainty visualizations. Uncertainty peaks along lesion boundaries and remains consistent across diverse datasets, indicating reliable calibration and generalization. ID data are in blue while OOD data are in red*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 技术脉络与基线关系
 
@@ -350,6 +356,8 @@ CLIP 的出现催生了文本驱动分割的新范式。**CLIPSeg**（Lüddecke 
 4. **自适应提示生成**：如何设计自适应的文本提示生成策略，以进一步减少对人工提示模板的依赖？这可能涉及与 LLM 的集成或基于图像内容的自动提示优化。
 
 5. **多模态融合深度与层间干预**：Figure 5 显示层间干预策略对性能有影响，但最优的 PVL 适配器插入层数和位置选择机制尚不明确，是否存在任务自适应的动态路由策略值得探索。
+
+
 
 ## 原文 PDF
 

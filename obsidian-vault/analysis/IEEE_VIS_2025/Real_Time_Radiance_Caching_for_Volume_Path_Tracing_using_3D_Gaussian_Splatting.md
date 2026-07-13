@@ -5,6 +5,7 @@ paper_level: A
 venue: "IEEE VIS"
 year: 2025
 pdf_ref: paperPDFs/IEEE_VIS_2025/Real_Time_Radiance_Caching_for_Volume_Path_Tracing_using_3D_Gaussian_Splatting.pdf
+code_link: null
 project_link: https://dbauer15.github.io/papers/gscache/
 aliases:
 - RTRCVPTU3GS
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | 基于3D高斯泼溅的体积路径追踪实时辐射度缓存 |
 | 英文题名 | Real-Time Radiance Caching for Volume Path Tracing using 3D Gaussian Splatting |
 | 会议/期刊 | IEEE VIS 2025 |
-| Links | [paper](https://arxiv.org/abs/2507.19718); [Project](https://dbauer15.github.io/papers/gscache/) |
+| Links | [paper](https://arxiv.org/abs/2507.19718) · [Project](https://dbauer15.github.io/papers/gscache/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | GSCache |
 | Dataset | Carp (1 SPP), FullBody (1 SPP), Overall frame time (FullBody) |
@@ -41,7 +42,7 @@ claims:
 > - FullBody (1 SPP) 上，PSNR 为 15.847 (GSCache)，对比 12.454 (NEE) / 14.266 (NRC)，变化 +3.393 / +1.581。
 > - Overall frame time (FullBody) 上，Total time (PT + ST/IT + OT) 为 46.64 + 11.42 + 31.49 = 89.55 ms，对比 NRC 47.66 + 13.91 + 26.92 = 88.49 ms，变化 ~1 ms overhead。
 
-## 概述
+## 概要
 
 **问题瓶颈**：体积路径追踪在低样本数（1 SPP）下，蒙特卡洛积分产生大量噪声，严重损害实时渲染质量。传统辐射度缓存方法——无论是基于世界空间探针的启发式方案，还是基于单一 MLP 的神经缓存（如 NRC, Müller et al., ACM Trans. Graph. 2021）——难以同时满足实时性、对体数据的适应性以及动态场景参数快速响应的需求。
 
@@ -54,7 +55,7 @@ claims:
 
 **主要结果**：在 1 SPP 下，GSCache 在 Carp 数据集上 PSNR 达到 16.877，显著优于 NEE（14.657）和 NRC（15.524）；在 FullBody 数据集上 PSNR 达 15.847（NEE 12.454，NRC 14.266）。冷启动后不到 16 帧，图像质量即超过无缓存渲染器。缓存开销恒定，1 SPP 下总帧时间约 89 ms，与 NRC 相当。消融实验证实，移除正则化会导致训练崩溃（SMAPE 从 0.040 升至 0.089），证明 AdamW 对基于噪声数据的在线训练不可或缺。
 
-## 背景与动机
+
 
 体积路径追踪是科学可视化与真实感渲染中模拟光传输的核心技术。其基本任务是求解体积辐射传输方程：
 
@@ -70,7 +71,9 @@ $$L ( x , \omega ) = \int _ { 0 } ^ { \infty } T _ { r } ( x ^ { \prime } \to x 
 
 本文的**核心动机**在于：能否从蒙特卡洛渲染器的高噪声单样本路径中在线学习一个无偏的辐射度表示？关键洞察是：即使训练目标为单样本噪声值，梯度优化仍能收敛到期望辐射度——这为在极低SPP下实现高质量实时渲染提供了理论基础。基于此，我们提出**GSCache**，一种多级路径空间3D高斯辐射度缓存，通过可微光栅化实现快速查询，并利用噪声路径样本进行在线持续优化，在偏差与方差之间提供灵活的用户可控权衡。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GSCache 的核心创新在于将体积路径追踪的辐射度缓存从传统世界空间探针或单一神经表示，迁移到**多级路径空间3D高斯泼溅**框架中，并建立了一套完整的在线学习与无偏查询机制，从而在极低样本数（1 SPP）下实现实时高质量渲染。
 
@@ -96,7 +99,7 @@ GSCache 的核心创新在于将体积路径追踪的辐射度缓存从传统世
 
 上述三个 changed slots 并非孤立改进，而是形成因果闭环：多级路径空间表示提供了查询的粒度基础；吞吐量终止策略决定了何时查询缓存；噪声学习理论保证了缓存表示能持续逼近无偏辐射度。实验结果表明，在 1 SPP 下 GSCache 的 PSNR 达到 16.877（Carp 数据集），显著领先 NEE（14.657）和 NRC（15.524）；在 FullBody 数据集上冷启动后不到 16 帧，图像质量即超过无缓存渲染器（Fig. 7），验证了该协同设计的有效性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2507_19718/figures/007_Figure_6.jpg]]
 *Figure 6: Visual quality of our method compared to the baseline path tracer. We show results for images at 1 SPP and compare our method (GSCache) against a baseline volume path tracer with uniform sampling (Uniform), a version that uses next-event estimation (NEE), and our implementation of NRC [34]*
@@ -133,7 +136,7 @@ GSCache 的整体管线由两个紧密耦合的循环构成：**路径追踪渲�
 
 整个管线在单 GPU 上运行，缓存开销恒定，总帧时间与 **NRC**（Müller et al., ACM Trans. Graph. 2021）相当（约 89 ms），但图像质量大幅领先。
 
-## 核心模块与公式推导
+
 
 ### 3.1 路径空间辐射度缓存表示
 
@@ -171,7 +174,9 @@ $$\mathcal { L } _ { h d r } = \frac { \left( \hat { x } - \hat { y } \right) ^ 
 
 其中 $\hat{x}$ 为预测值，$\hat{y}$ 为噪声目标值，分母归一化项处理高动态范围辐射度值。**核心理论洞察**在于：即使训练目标为单样本噪声，梯度优化仍收敛到期望值，使得从极低SPP（如1 SPP）的噪声路径中学习无偏辐射度表示成为可能。优化器采用AdamW，消融实验（Fig. 12）表明移除正则化（-REG）将导致训练崩溃，SMAPE从0.040恶化至0.089，验证了AdamW对基于噪声数据的在线训练不可或缺。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 1. 实验设置
 
@@ -252,7 +257,9 @@ GSCache的核心经验性发现是：**可以从蒙特卡洛渲染器的高噪�
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2507_19718/figures/001_Figure_1.jpg]]
 *Figure 1: Our path-space cache improves image quality at low sample counts at comparable compute cost. We compare against a path tracer (PT) using uniform sampling and a version implementing next-even-estimation (NEE). Cache rendering time is constant, yielding increasing returns as sample counts increase. The method is non-invasive and easy to integrate into existing rendering applications*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 GSCache 处于**体积路径追踪实时辐射度缓存**这一细分方向，其核心设计决策——用多级路径空间3D高斯泼溅替代传统世界空间探针或单一MLP——在方法谱系中形成了明确的差异化定位。
 
@@ -288,6 +295,8 @@ GSCache 在路径追踪器中引入了一个可调节的“终止旋钮”——
 3. **训练稳定性**：对优化器配置（正则化、AdamW）高度敏感，移除正则化会导致训练崩溃（Fig.12）
 
 **开放问题**：论文未深入探讨缓存在不同传递函数和光照条件下的泛化能力，也未评估在高动态场景（如快速旋转或缩放）下的缓存失效与重建代价。此外，多级缓存之间的信息共享机制是否可进一步优化以加速收敛，仍待探索。
+
+
 
 ## 原文 PDF
 

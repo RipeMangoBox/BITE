@@ -44,7 +44,7 @@ claims:
 > - VideoPhy2-test (Joint) 上，Joint ACC 0.677 vs 0.770 (-0.093)。
 > - User Study (Attribute Control Alignment) 上，PLCC 0.483 vs 0.167 (+0.316)。
 
-## 概述
+## 概要
 
 **问题与瓶颈**：现有 3D/4D 世界生成模型的评估基准存在三个关键缺口：(1) 无法统一衡量物理真实性、条件对齐、时空一致性和感知质量等多维度表现；(2) 难以自适应处理文本、图像、视频等多模态条件输入；(3) 评估指标与人类主观判断的相关性较弱。例如，**WorldScore** 仅支持文本条件且物理评估有限，**VBench** 系列覆盖部分维度但物理真实性评估不完整，**PhyGenBench** 侧重物理定律遵循性却缺乏模态多样性和语义丰富性。
 
@@ -60,7 +60,7 @@ claims:
 
 **局限性提示**：物理真实性评估完全依赖从视频生成的文本描述进行推理，对需要精细视觉理解的物理现象（如细微变形、局部光照）可能不够敏感；基准数据集规模有限（非物理文本条件 76 条、物理文本条件 50 条）；部分维度仍依赖单个 MLLM 评分，其自身偏见可能影响评估可靠性。
 
-## 背景与动机
+
 
 ### 3D/4D 世界生成模型的评估困境
 
@@ -95,7 +95,9 @@ claims:
 - **自适应维度选择：** 根据输入条件的语义内容，由 LLM 动态选择相关的物理维度和条件对齐子维度，生成场景特定的诊断性问题，避免固定维度设置带来的评估偏差。
 - **人类判断对齐验证：** 通过用户研究量化自动指标与人类主观评分之间的 PLCC 和 SRCC 相关性，确保评估框架的可靠性和可信度。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 4DWorldBench 的核心创新在于构建了一套**自适应、多模态、混合评估机制**，系统地填补了现有世界生成基准在评估维度、模态支持与评估方法上的结构性空白。与 **WorldScore**（仅支持文本条件，物理评估有限）、**VBench / VBench2.0**（物理真实性覆盖不完整）和 **PhyGenBench**（模态单一、语义丰富度不足）等先前基准相比，4DWorldBench 在以下四个关键维度上实现了根本性突破。
 
@@ -121,7 +123,7 @@ claims:
 
 这种混合策略使得评估框架既能捕捉低层次的感知质量，又能进行高层次的语义和物理推理，实现了对世界生成模型能力的全维度刻画。
 
-## 整体框架
+
 
 4DWorldBench 围绕四个核心评估维度构建：**感知质量**、**条件对齐**、**物理真实性**和**4D 一致性**。框架支持文本、图像、视频三种条件模态，覆盖文本到 3D/4D、图像到 3D/4D 及视频到 4D 的生成任务。其评估流程采用混合评估范式：将传统模型评分、特征相似度、基于 LLM 的问答和基于 MLLM 的问答集成到一个统一的管线中，并通过人类主观研究验证可靠性。
 
@@ -159,7 +161,7 @@ claims:
 ![[assets/figures/papers/paper_list_l2231_https_arxiv_org_abs_2511_19836/figures/003_Figure_1.jpg]]
 *Figure 1: Overview of the 4DWorldBench framework. The benchmark evaluates generation quality across four key dimensions: 4D consistency, condition alignment, perceptual quality, and physical realism. It supports diverse generative settings, including text-, image-, and video-to-3D/4D generation. The framework integrates hybrid evaluation metrics—model-based scores, feature-based similarity, LLMbased QA, and MLLM-based QA—together with human studies for reliability. Condition- and dimension-adaptive QA modules leverage MLLMs for concrete visual grounding and LLMs for higher-level physical reasoning*
 
-## 核心模块与公式推导
+
 
 ### 4DWorldBench 评估框架总体架构
 
@@ -276,7 +278,9 @@ $$e_{\mathrm{style}} = 1 - \mathrm{normalize}\left(\frac{1}{|\mathcal{C}|} \sum_
 ![[assets/figures/papers/paper_list_l2231_https_arxiv_org_abs_2511_19836/figures/001_Table_1.jpg]]
 *Table 1: Evaluation dimensions in our 4DWorldBench. Four main dimensions expand into multiple sub-dimensions*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -338,7 +342,9 @@ $$e_{\mathrm{style}} = 1 - \mathrm{normalize}\left(\frac{1}{|\mathcal{C}|} \sum_
 ![[assets/figures/papers/paper_list_l2231_https_arxiv_org_abs_2511_19836/figures/002_Table_2.jpg]]
 *Table 2: Comparison with representative benchmarks. “Modalities” refer to supported condition types. “Eval. dims” mark whether the benchmark covers Perceptual Quality (Q), Condition Alignment (A), Physical Realism (P), and 4D Consistency (C)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有基准的维度覆盖对比
 
@@ -373,6 +379,8 @@ $$e_{\mathrm{style}} = 1 - \mathrm{normalize}\left(\frac{1}{|\mathcal{C}|} \sum_
 **基准覆盖范围的扩展**：当前基准数据集规模有限（非物理文本条件 76 条、物理文本条件 50 条），可能不足以覆盖所有边缘案例。此外，基准尚未扩展到具身智能体操作等交互式场景，限制了对更广泛具身 AI 应用的覆盖。如何将丰富的文本描述可靠地转化为连贯的时空交互评估，以改善文本到 4D 模型的事件和关系对齐，是提升基准实用价值的关键方向。
 
 **人类评估的统计可靠性**：用户研究参与人数仅 10 人，部分相关性指标（PLCC/SRCC）的统计效力可能受限。后续工作需要在更大规模的人类评估上验证当前结论的稳健性。
+
+
 
 ## 原文 PDF
 

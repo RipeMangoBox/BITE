@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/TraPO_A_Semi_Supervised_Reinforcement_Learning_Framework_for_Boosting_LLM_Reasoning.pdf
+project_link: null
+code_link: https://github.com/ShenzhiYang2000/TRAPO
 openreview_forum_id: 3K1y4KbWAx
 aliases:
 - TTBPO
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | TraPO：一种用于提升大语言模型推理的半监督强化学习框架 |
 | 英文题名 | TraPO: A Semi-Supervised Reinforcement Learning Framework for Boosting LLM Reasoning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=3K1y4KbWAx); [GitHub](https://github.com/ShenzhiYang2000/TRAPO) |
+| Links | [paper](https://openreview.net/forum?id=3K1y4KbWAx) · [GitHub](https://github.com/ShenzhiYang2000/TRAPO) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | TRAPO (Trajectory-based Policy Optimization) |
 | Dataset | In-Distribution (AIME, AMC, MATH-500, Minerva, Olympiad) average, Out-of-Distribution (ARC-c, GPQA*, MMLU-Pro) average, In-Distribution average, Cross-domain OOD (non‑math unlabeled) – ID average |
@@ -42,7 +44,7 @@ claims:
 > - Out-of-Distribution (ARC-c, GPQA*, MMLU-Pro) average 上，Accuracy (%) 为 56.1 (1K labeled + 3K unlabeled)，对比 48.4 (Self-certainty, 45K unlabeled)，变化 +7.7%。
 > - In-Distribution average 上，Accuracy (%) 为 45.6 (4K labeled + 12K unlabeled)，对比 45.5 (Fully Supervised, 45K labeled)，变化 +0.1%。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有的大语言模型推理强化学习（RLVR）主要依赖两类范式——完全有监督（需大量标注）和完全无监督（基于自洽性奖励）。无监督RLVR在训练后期因缺乏外部监督信号，倾向于强化错误的推理模式，导致性能坍塌；而简单的半监督组合（将两类数据直接混合训练）忽视了有标签与无标签数据之间的内在联系，仅带来约0.6%的边际提升，未能有效利用无标签数据。
 
@@ -57,7 +59,7 @@ claims:
 - **即插即用性**：TRAPO的轨迹选择策略与多种无监督基线结合后，性能均优于简单的半监督组合（Figure 7）。
 - **Scaling特性**：随着数据规模增加，TRAPO在25%标注率下即可接近或达到完全监督性能（Figure 1右）。
 
-## 背景与动机
+
 
 ### 大语言模型推理能力的强化学习训练
 
@@ -81,7 +83,9 @@ claims:
 
 这一视角将关注点从“模型学到了什么”（输出层面的正确性）转向“模型是怎么学的”（训练动态层面的轨迹一致性），为半监督RLVR提供了新的理论框架。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：无监督RLVR的性能坍塌
 
@@ -133,7 +137,7 @@ TRAPO提供了**泛化误差界**（Theorem 3.1，非正式版本见Eq. 10），
 - **即插即用性**：Figure 7和附录E.3表明，将TRAPO的轨迹选择策略与多种无监督基线（Sentence-level Entropy、Token-level Entropy、TTRL）结合后，性能均优于简单的半监督组合，验证了该策略的通用性。
 - **消融实验**：与随机选择、基于句子熵的选择及基于自确定性的选择相比，TRAPO在相同选择比例下性能显著更优（Table 13），确认了轨迹对齐信号优于单点置信度指标。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_3K1y4KbWAx/figures/004_Figure_3.jpg]]
 *Figure 3: TRAPO is a semi-supervised RLVR training framework to dynamically select reliable unlabeled samples throughout the training process based on pass rate trajectory matching*
@@ -194,7 +198,7 @@ $$\mathcal{L}(\theta) = \mathcal{I}_{\mathrm{GRPO}}^{\mathrm{labeled}}(\theta) +
 
 该框架的关键设计选择——以通过率轨迹而非单点指标（如熵或自确定性）作为可靠性判据——源于一个核心发现：无标签样本的通过率轨迹与有标签数据库平均轨迹的余弦相似度能够有效区分可靠与不可靠样本，高相似度样本（top 10%）的性能显著优于低相似度样本（bottom 10%），差距超过 40%（Figure 4）。此外，该轨迹选择策略具有即插即用特性，与多种无监督基线（Sentence-level Entropy、Token-level Entropy、TTRL）结合后，性能均优于简单的半监督组合（Figure 7）。
 
-## 核心模块与公式推导
+
 
 ### 半监督混合奖励函数
 
@@ -258,7 +262,9 @@ $$\mathcal{R}_{\mathcal{D}_l}(\pi_\theta^{(t)}) + \lambda' + \alpha \cdot \mathb
 
 其中第一项为源域经验风险，第二项为轨迹不一致性惩罚（无标签轨迹与可靠轨迹的偏离程度），第三项为多数投票置信度项。该界从理论上解释了为何轨迹对齐能够控制泛化误差：无标签样本的轨迹与有标签样本越一致，其引入的泛化风险越低。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与动机验证
 
@@ -332,7 +338,9 @@ TRAPO 的核心洞察在于：**少量有标签样本可以作为“锚点”来
 
 4. **轨迹积累延迟**：轨迹相似度计算依赖充足的训练轮次以积累有意义的通过率序列。在极短训练场景下（如仅 2-3 轮），轨迹信号可能不足以有效区分样本质量。Table 11 显示预热长度 2 轮时性能明显下降，印证了这一限制。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：RLVR训练范式的瓶颈
 
@@ -381,6 +389,8 @@ TCS 能够有效区分可靠与不可靠样本：高相似度样本（top 10%）
 4. **更细粒度的动态对齐**：是否可以用更细粒度的学习动态（如token级梯度对齐、注意力模式变化）替代通过率轨迹？更细粒度的信号可能提供更丰富的样本可靠性信息。
 
 5. **理论界的实用化**：TRAPO 提供的泛化误差界（Theorem 3.1）中的常数在实际中如何估计？该理论界能否指导自动超参数选择（如top-p比例、阈值Γ、预热轮数），从而减少人工调参成本？
+
+
 
 ## 原文 PDF
 

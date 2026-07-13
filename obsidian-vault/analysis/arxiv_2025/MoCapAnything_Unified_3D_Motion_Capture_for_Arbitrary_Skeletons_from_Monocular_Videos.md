@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/MoCapAnything_Unified_3D_Motion_Capture_for_Arbitrary_Skeletons_from_Monocular_Videos.pdf
+project_link: https://animotionlab
+code_link: null
 aliases:
 - MoCapAnything
 tags:
@@ -39,7 +41,7 @@ claims:
 > - Truebones Zoo-test set 上，MPJPE (cm) 1.06 (Seen) / 1.28 (Rare) / 1.76 (Unseen) vs 3.98 (Seen) / 3.58 (Rare) / 7.42 (Unseen) [GLoT] (显著降低，尤其未见物种误差降低 76%)。
 > - Truebones Zoo (CD-Skeleton comparison with GenZoo) 上，Chamfer Distance (CD-Skeleton) 0.2549 (All) vs 0.4580 (All) [GenZoo] (误差降低约 44%)。
 
-## 概述
+## 概要
 
 现有动作捕捉系统几乎都局限于单一物种或固定模板，无法对任意骨架的动画资产进行统一、可泛化的三维运动估计。这导致创作者在跨物种动画、游戏资产批量处理、虚拟制作等场景中面临大量重复绑定与不可复用的困难。**MoCapAnything** 针对这一瓶颈，提出了一种面向任意骨架的统一单目视频三维动作捕捉框架，其核心洞察是将运动恢复解耦为“3D关键点轨迹预测 + 逆运动学（IK）旋转恢复”两阶段，从而避免直接回归资产相关关节旋转带来的多解性与训练不稳定。
 
@@ -50,7 +52,7 @@ claims:
 
 在 Truebones Zoo 测试集上，MoCapAnything 对未见物种的 MPJPE 仅为 1.76 cm，而最佳基线 GLoT 为 7.42 cm，误差降低约 76%。消融实验进一步验证了多模态参考与几何桥梁的必要性：去除网格或图像模态后，未见物种 MPJPE 分别升至 3.16 cm 和 2.85 cm。此外，该方法在推理时自然涌现出跨物种重定向能力，可将运动迁移至不同骨架的资产上，产生动画就绪的 BVH 关节旋转。
 
-## 背景与动机
+
 
 ### 问题背景：从固定模板到任意骨架的动作捕捉鸿沟
 
@@ -82,7 +84,9 @@ claims:
 
 通过这些设计，MoCapAnything 仅使用**掩码 L1 位置损失**进行训练，不依赖旋转监督或显式时序损失，即可在 Truebones Zoo 测试集的未见物种上达到 **1.76 cm** 的 MPJPE，较最佳基线 GLoT（7.42 cm）降低 **76%**，同时天然支持推理阶段的跨物种运动重定向。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MoCapAnything 的核心创新在于将面向任意骨架的动作捕捉问题分解为**“3D 关键点轨迹预测 + 逆运动学（IK）旋转恢复”**两阶段范式，并通过**多模态参考提示编码**与**中间粗糙 4D 网格桥梁**弥合视觉-关节模态鸿沟，从而实现对未见物种、任意拓扑骨骼的强泛化能力。
 
@@ -106,7 +110,7 @@ RGB 视觉特征与点云状关节空间之间存在显著的模态鸿沟，直�
 
 与依赖旋转损失、平滑损失等多目标优化的基线不同，MoCapAnything 仅使用掩码 L1 位置损失进行训练，旋转通过后处理 IK 阶段获得。这种极简的监督策略不仅降低了训练复杂度，也避免了旋转空间中的多解性对泛化能力的损害，是模型在未见物种上取得 1.76 cm MPJPE（相较最佳基线 GLoT 的 7.42 cm 降低 76%）的关键因素之一。
 
-## 整体框架
+
 
 MoCapAnything 提出了一种面向任意骨架资产的统一动作捕捉框架，其核心设计在于将运动恢复分解为两个阶段：**3D 关键点轨迹预测**与**基于逆运动学的关节旋转恢复**。这一分解策略避免了直接回归关节旋转所带来的多解性与训练不稳定问题，同时使模型能够仅通过掩码 L1 位置损失进行训练，无需依赖旋转监督或显式时序损失。
 
@@ -145,7 +149,7 @@ $$\mathcal{L}_{\mathrm{pos}} = \frac{1}{\sum_{t=1}^{T} \sum_{j} m_j} \sum_{t=1}^
 ![[assets/figures/papers/paper_list_l31_https_arxiv_org_abs_2512_10881/figures/002_Figure_2.jpg]]
 *Figure 2: Detailed architecture of our method. A multi-modal Reference Prompt Encoder fuses mesh, skeleton, and appearance of the target asset into per-joint queries. A monocular video is converted into a 4D mesh sequence, and both mesh and video features are extracted. The Unified Motion Decoder fuses these signals via multi-branch attention to predict 3D keypoints, which are converted to asset-specific joint rotations via an optimization-based IK layer*
 
-## 核心模块与公式推导
+
 
 ### 问题形式化：CAMoCap 任务
 
@@ -214,7 +218,9 @@ $$\mathbf{P}_{t,i} = \begin{cases} \mathbf{0}, & p(i) = -1, \\ \mathbf{P}_{t,p(i
 
 其中 $p(i)$ 为关节 $i$ 的父关节索引，$\mathbf{o}_i$ 为静止姿态下的关节偏移量，$\mathbf{R}_{t,p(i)}$ 为父关节的旋转矩阵。IK 优化过程最小化 FK 计算位置与预测位置之间的差异，同时施加关节限位和扭转抑制等约束。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置与基准
 
@@ -290,7 +296,9 @@ Table 3 探索了编码器/解码器层数的配置。增加层数可改善 Rare
 ![[assets/figures/papers/paper_list_l31_https_arxiv_org_abs_2512_10881/figures/011_Figure_8.jpg]]
 *Figure 8: Qualitative comparison with GenZoo on the Truebones Zoo dataset. Our method produces smoother trajectories and maintains stable, anatomically plausible motions across a wide variety of skeleton types, including non-quadrupeds. In contrast, GenZoo is limited to quadruped structures and often fails to generalize to more diverse or complex skeletal configurations. Visualizations highlight our approach’s superior accuracy, robustness, and generalization ability*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位与核心瓶颈
 
@@ -368,6 +376,8 @@ MoCapAnything 最适合以下场景：
 5. **多角色交互式动作捕捉与重定向**：扩展到多角色场景需要解决角色间遮挡、交互接触建模、以及多角色运动的一致性约束等问题。
 
 6. **显式跨物种语义对应学习**：为跨物种重定向引入显式的语义对应学习（如通过学习不同物种关节间的功能对应关系），可进一步提高极端拓扑差异下的稳定性和合理性，使涌现行为变为可控能力。
+
+
 
 ## 原文 PDF
 

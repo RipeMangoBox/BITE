@@ -42,7 +42,7 @@ claims:
 > - SUSTech1K-E (Low Light) 上，Rank-1 Overall Accuracy (%) 83.2 vs GaitBase (Event Input) 23.6 (+59.6)。
 > - CCGR-Mini-E 上，Rank-1 Accuracy (%) 40.3 vs GaitBase (Event Input) 9.7 (+30.6)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有事件步态识别方法（如 **EVGait**，CVPR 2019）将异步事件流聚合为长时间窗口的稀疏事件图像，再送入标准 CNN 处理。这一范式丢失了事件相机最核心的优势——高时间分辨率的细粒度动态信息，同时稀疏的事件表示也缺乏密集的空间结构先验，导致模型在复杂光照和运动条件下难以提取身份判别性步态特征。
 
@@ -57,7 +57,7 @@ claims:
 
 **局限与展望**：当前评估主要依赖合成事件数据集，合成数据与真实事件数据之间的域差异可能使结果偏向理想化分布；模型在真实场景下的泛化能力尚需更多真实世界事件步态数据验证。此外，脉冲神经网络在通用硬件上的推理效率仍有待优化，未来可探索事件与 RGB/LiDAR 的多模态融合以进一步提升极端条件下的鲁棒性。
 
-## 背景与动机
+
 
 步态识别因其非侵入性和远距离感知优势，在安防监控与身份认证领域具有重要应用价值。然而，当前主流方法严重依赖RGB相机采集的剪影序列，在低光、夜间等复杂光照条件下，RGB成像质量急剧退化，导致步态表征丧失判别力，系统性能大幅下降。如图1所示，事件相机凭借其高动态范围（>120 dB）和微秒级时间分辨率，能够在极端光照变化下稳定输出异步事件流，为全天候步态识别提供了新的感知模态。
 
@@ -67,7 +67,9 @@ claims:
 
 针对上述缺口，本文提出 **EventGait**，一个端到端的双流事件步态识别框架，其核心动机在于：**鲁棒的事件步态表征必须同时保留高时间分辨率的运动动态，并通过大规模视觉基础模型蒸馏获得空间密集的结构先验，二者互补方能实现光照鲁棒且身份判别的步态描述**。具体而言，EventGait通过两条互补通路分别建模步态的“动”与“静”——动态运动流利用脉冲神经网络（SNN）中的混合专家（MoSE）捕获短时精细运动模式，静态形状流则通过跨模态结构对齐（CroSA）从预训练视觉基础模型（DINOv2）中蒸馏密集空间先验。这种双流解耦设计从根本上回应了事件步态识别的核心矛盾：时间动态与空间结构的不可兼得问题。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 EventGait 的核心创新在于**从“单一时序尺度的事件图像聚合”转向“双时间尺度、双流互补的事件表征学习”**，系统性地解决了事件步态识别中长期被忽视的两个瓶颈：细粒度时间动态的丢失和稀疏事件空间中结构先验的缺失。
 
@@ -118,7 +120,7 @@ $$\mathcal{L}_{\mathrm{align}} = \|\mathbf{z}_{\mathrm{evs}} - \mathbf{z}_{\math
 
 > **需要人工验证**：论文未明确报告 venue 和 year，若需精确引用请核实原始发表信息。
 
-## 整体框架
+
 
 EventGait 是一个端到端的双流步态识别框架，其核心设计目标是在保留事件相机高时间分辨率优势的前提下，分别建模步态中的**运动动态**与**空间形状**两个互补维度。Figure 2 给出了框架的完整工作流。
 
@@ -162,7 +164,7 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{ce}} + \mathcal{L}_{\mathr
 
 该双流架构的根本动机来自现有方法的瓶颈诊断：长时间窗口聚合的事件图像丢失了细粒度时间动态，而稀疏事件表示又使标准 CNN 难以有效编码空间结构。EventGait 通过**动态流保留高时间分辨率运动信息**、**静态流借助 VFM 蒸馏获取密集空间先验**，二者互补实现了光照鲁棒且身份判别的步态表征。消融实验（Table 6）直接验证了这一互补性——移除任一流均导致性能显著下降。
 
-## 核心模块与公式推导
+
 
 EventGait 的核心设计围绕一个双流架构展开，分别从事件流中提取高时间分辨率的运动动态和密集的空间结构形状，二者通过可学习的融合模块生成统一的步态描述符。以下按管线顺序解析关键模块及其数学表达。
 
@@ -238,7 +240,9 @@ $$\mathcal{L}_{\text{total}} = \mathcal{L}_{\text{ce}} + \mathcal{L}_{\text{tri}
 ![[assets/figures/papers/paper_list_l1046_https_arxiv_org_abs_2605_22139/figures/004_Figure_4.jpg]]
 *Figure 4: The details of the Static Shape Stream, which is trained with our Cross-modal Structure Alignment (CroSA)*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈验证：事件步态识别需要同时保留时间动态与空间结构
 
@@ -303,7 +307,9 @@ MoSE 中专家数量的消融（Table 8）显示，采用 **3 个专家** 在精
 ![[assets/figures/papers/paper_list_l1046_https_arxiv_org_abs_2605_22139/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of RGB and event cameras under day and night conditions. RGB cameras fail to capture usable gait representations in low-light conditions. While event cameras are robust to illumination changes and capture extremely high-temporalresolution data, preserving spatiotemporal cues in all lighting*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 事件步态识别的方法谱系
 
@@ -356,6 +362,8 @@ $$\mathcal{L}_{\mathrm{align}} = \|\mathbf{z}_{\mathrm{evs}} - \mathbf{z}_{\math
 3. **SNN推理效率的硬件协同设计**：脉冲神经网络的实时推理效率与硬件协同设计如何优化，以降低实际应用中的功耗和延迟？这涉及神经形态芯片的适配、脉冲编码策略的优化以及训练-部署协同等系统级问题。
 
 4. **跨域泛化能力的系统评估**：当前跨域评估（Table 3）已初步展示了模型在不同数据集间的迁移能力，但评估规模有限。更系统的跨域泛化研究——包括跨数据集、跨光照、跨视角、跨穿着等维度的组合泛化——对于理解方法的真实鲁棒性边界至关重要。
+
+
 
 ## 原文 PDF
 

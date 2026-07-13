@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/Leader_and_Follower_Interactive_Motion_Generation_under_Trajectory_Constraints.pdf
+project_link: null
+code_link: null
 aliases:
 - LFIMGPCKSA
 - LFIMGUTC
@@ -41,7 +43,7 @@ claims:
 > [!tip] 效果简介
 > - InterHuman 上，R-Precision Top1 ↑ 0.522 vs 0.371 (InterGen) (+0.151)；FID ↓ 5.352 vs 优于所有比较方法 (显著降低)；MM Dist ↓ 3.778 vs 优于所有比较方法 (显著降低)。
 
-## 概述
+## 概要
 
 本文针对**文本到双人交互运动生成中缺乏精确轨迹约束**这一瓶颈，提出了一种无需重新训练的轨迹引导框架。现有方法（如 **InterGen** (Liang et al., IJCV 2024)）仅依赖文本描述来控制运动，常导致轨迹偏差、角色穿透和交互不自然；而单人多动作的轨迹方法又无法处理双人交互，且需重新训练。
 
@@ -49,7 +51,7 @@ claims:
 
 实验表明，该方法在 InterHuman 数据集上显著优于 InterGen 等基线：**R-Precision Top1** 从 0.371 提升至 0.522，**FID** 降至 5.352，同时推理时间仅增加约 4 秒。消融实验进一步验证了中期干预策略、关节距离损失和速度损失各自的有效性。
 
-## 背景与动机
+
 
 ### 双人交互运动生成的任务困境
 
@@ -77,7 +79,9 @@ claims:
 
 基于此范式，本文提出一种无训练（training-free）方法，在冻结的扩散模型（以 InterGen 为基础）之上集成 **Pace Controller**（节奏控制器）与 **Kinematic Synchronization Adapter**（运动学同步适配器），在扩散中间阶段实现精确的轨迹引导与自然的交互同步，无需任何额外训练即可适配任意轨迹条件。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于将双人交互运动生成解耦为**领导者-跟随者（Leader-Follower）动态范式**，并在此范式下引入两个关键模块——**Pace Controller** 和 **Kinematic Synchronization Adapter**——以无训练（training-free）的方式实现对精确轨迹约束的支持。这一设计从根本上改变了现有双人交互扩散模型（以 **InterGen**（Liang et al., IJCV 2024）为基线）的生成机制，体现在以下三个关键维度的改变：
 
@@ -117,7 +121,7 @@ claims:
 
 这三个维度的协同创新使得本文方法在不重新训练的前提下，在 InterHuman 数据集上取得了显著优于所有基线方法的性能：R-Precision Top1 达到 0.522（InterGen 为 0.371），FID 降至 5.352（Table 1），同时推理时间仅增加约 4 秒（Table 3）。
 
-## 整体框架
+
 
 本文提出一种无训练的**领导-跟随交互运动生成框架**，其核心思想源自交谊舞中的角色分配：将复杂的双人交互运动解耦为**领导者（Leader）的轨迹控制**与**跟随者（Follower）的运动同步**两个子问题。该框架以预训练的双向交互扩散模型 **InterGen**（Liang et al., IJCV 2024）为基础，在不重新训练的前提下，通过两个即插即用的模块实现对精确 3D 轨迹条件的支持。
 
@@ -142,7 +146,7 @@ claims:
 
 框架的层级设计体现了一条清晰的因果链：**先确立空间基准，再协调交互关系**。Pace Controller 解决了“运动去哪里”的问题，Kinematic Synchronization Adapter 解决了“两人如何配合”的问题。将轨迹干预限定在扩散中间阶段（而非全程）是该方法的核心洞察——早期阶段噪声过高、运动方向尚未确立，晚期阶段运动范围已稳定、强行干预会破坏细节质量，唯有中期阶段（轨迹形成期）是施加空间约束的最佳窗口。
 
-## 核心模块与公式推导
+
 
 ### 扩散模型基础
 
@@ -216,7 +220,9 @@ $$\mathcal{L}_{\mathrm{velocity}} = \sum_{t=1}^{n-1} \sum_{j=1}^{22} \frac{\|\ma
 
 整个生成流程（Figure 3）为：冻结的 CLIP-ViT/L4 文本编码器提取文本条件嵌入，共享权重的 Transformer 去噪器执行双向去噪生成。在中间去噪阶段，Pace Controller 单向干预领导者根关节轨迹，Kinematic Synchronization Adapter 同步检测碰撞并调整跟随者运动。两个模块均无需额外训练，推理时间仅增加约 4 秒（Table 3）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验定量结果
 
@@ -279,7 +285,9 @@ $$\mathcal{L}_{\mathrm{velocity}} = \sum_{t=1}^{n-1} \sum_{j=1}^{22} \frac{\|\ma
 ![[assets/figures/papers/paper_list_l1690_Leader_and_Follower_Interactive_Motion_Generation_under_Trajectory_Const/figures/011_Table_3.jpg]]
 *Table 3: Inference time comparison. Our design does not significantly increase the inference time cost*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 领域问题定位
 
@@ -355,6 +363,8 @@ $$\mathcal{L}_{\mathrm{velocity}} = \sum_{t=1}^{n-1} \sum_{j=1}^{22} \frac{\|\ma
 3. **轨迹条件鲁棒性**：如何提升方法对噪声轨迹或不完整轨迹输入的容忍度，使其适用于更广泛的实际应用场景？
 
 4. **实时性能优化**：能否通过模型蒸馏、轻量化适配器设计或更高效的优化算法进一步降低推理时间开销？
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/TriC_Motion_A_Causal_Diffusion_Framework_for_Text_to_Motion_Generation.pdf
+project_link: null
+code_link: null
 aliases:
 - TM
 - TRIC-MOTION
@@ -41,7 +43,7 @@ claims:
 > - HumanML3D 上，R-Precision Top1 (R@1) 0.612（large） vs 0.581（SALAD） (+0.031)；FID 0.347（base） vs 0.032（LaMP） (+0.315（较 LaMP 高，但非最优；TriC-Motion 主要提升语义对齐指标）)；MM-Dist 2.463（base） vs 2.649（SALAD） (-0.186)。
 > - SnapMoGen 上，R-Precision Top1 (R@1) 0.907 vs 0.802（MoMask++） (+0.105)；CLIP Score 0.675 vs 0.685（MoMask++） (-0.010)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -65,7 +67,7 @@ TriC-Motion 针对上述瓶颈提出了两个层次的解决方案：
 
 TriC-Motion 建立在扩散生成框架之上，以 **MDM**（Tevet et al., 2022）为基础去噪架构，但在建模域和特征处理机制上进行了根本性扩展。与仅依赖时序 Transformer 的 MDM 不同，TriC-Motion 引入了空间 GCN 和混合频率分析，形成三域并行架构。相较于近期强基线 **SALAD**（Hong et al., 2025）、**MoMask**（Guo et al., 2024）和 **StableMoFusion**（Huang et al., 2024a），TriC-Motion 的独特贡献在于**因果解缠机制的引入**——这是该领域首次将因果干预用于消除多域特征中的运动无关噪声。在频率建模方面，TriC-Motion 的 HFA 模块通过 DWT+FFT 的混合分解策略，区别于 **LaMP**（Li et al., 2024c）等仅关注单一频率维度的方法，实现了对低频全局趋势和高频局部细节的并行增强。总体而言，TriC-Motion 在三域联合建模与因果特征净化的交叉点上确立了新的技术路线。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -93,7 +95,9 @@ TriC-Motion 建立在扩散生成框架之上，以 **MDM**（Tevet et al., 2022
 
 通过在 HumanML3D 和 SnapMoGen 两个基准数据集上的系统验证，TriC-Motion 在语义对齐核心指标 R-Precision Top1 上取得了 0.612（HumanML3D）和 0.907（SnapMoGen）的领先结果，证明了多域因果建模策略的有效性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 TriC-Motion 针对现有文本到动作生成方法的核心瓶颈——多域特征中混杂运动无关噪声、缺乏空间-时间-频率三域统一优化——提出了两项关键创新：**三域并行建模与得分指导融合**，以及**因果反事实运动解缠**。
 
@@ -127,7 +131,7 @@ $$\tilde{F}_j^i = W_{do} E_j^i - W_{do} C_j^i$$
 
 相对于以 MDM 为代表的纯时序建模基线和以 SALAD、MoMask 为代表的近期强方法，TriC-Motion 的 changed slots 清晰聚焦于两点：**建模域从单一/双域扩展至时间-空间-频率三域并行**，以及**引入因果反事实机制主动消除多域混淆噪声**。这两项设计相互增强——三域建模提供了更丰富的特征空间，而 CCMD 确保这些特征中仅保留对运动生成有益的因果成分，从而在 HumanML3D 上取得 R@1 0.612（large）的 SOTA 性能，并在 SnapMoGen 上以 R@1 0.907 大幅超越所有对比方法（Table 2）。
 
-## 整体框架
+
 
 TriC-Motion 的整体框架围绕一个核心设计展开：在扩散去噪过程中，对运动序列同时进行**时间、空间、频率**三个域的并行建模，并通过**因果干预**显式消除多域特征中混杂的运动无关噪声。整个系统由堆叠的 TriC-Motion 去噪块构成，每个块内依次完成域内建模、三域融合、文本注入和因果解缠，最终输出干净的运动序列。
 
@@ -172,7 +176,7 @@ TriC-Motion 的整体框架围绕一个核心设计展开：在扩散去噪过�
 ![[assets/figures/papers/paper_list_l1907_TriC_Motion_A_Causal_Diffusion_Framework_for_Text_to_Motion_Generation/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of TriC-Motion. (a) Sampling process with stacked TriC-Motion Denoiser Blocks. (b) Overall architecture of the TriC-Motion framework*
 
-## 核心模块与公式推导
+
 
 ### 整体框架与三域去噪块
 
@@ -298,7 +302,9 @@ $$
 
 默认设置 $\lambda_{fcf}=1$，$\lambda_{p}=10$。消融实验（Table 4）表明层次权重 $\{0.1, 0.2, 0.3, 0.4\}$ 取得最优结果，验证了深层施加更高权重的合理性。敏感性分析（Table A3）进一步证明损失权重在较大范围变化时性能保持稳定，模型优化具有鲁棒性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验：HumanML3D 与 SnapMoGen 双基准定量评估
 
@@ -367,7 +373,9 @@ TriC-Motion 在两个主流文本-动作生成基准上进行了全面评估。�
 ![[assets/figures/papers/paper_list_l1907_TriC_Motion_A_Causal_Diffusion_Framework_for_Text_to_Motion_Generation/figures/014_Table.jpg]]
 *Table: A3: Sensitivity analysis of the perceptual loss ${ \mathcal { L } }$ _ { p } (upper part) and causal loss $\mathcal { L }$ _ { f c f } (lower part). Here, α and β denote the weights of ${ \mathcal { L } }$ _ { p } and $\mathcal { L }$ _ { f c f } , respectively. The default setting (Ours) corresponds to $\alpha = 1$ . $0 , \beta = 1$ 0*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的继承与突破
 
@@ -417,6 +425,8 @@ CCMD 模块的核心机制是通过事实/反事实特征提取和有监督因�
 2. 因果干预模块的设计思想是否可推广到其他生成任务（如视频生成、音频合成），以抑制多域混淆噪声？
 3. 如何动态调整三域融合的权重，或引入更复杂的注意力机制，使模型能根据文本复杂度自适应地侧重不同域的信息？
 4. 在更长时运动生成和更多样化的运动类型（如舞蹈、体育动作）上，三域因果建模是否有进一步的收益？
+
+
 
 ## 原文 PDF
 

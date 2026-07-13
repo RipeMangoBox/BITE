@@ -44,7 +44,7 @@ claims:
 > - Motion2Language (自然图像输入) 上，Cor_E ↑ (GPT-4) 4.02 vs 4.21 (Gemini-2.5 VLM) (-0.19)。
 > - Language2Motion 上，L2 ↓ 0.219 vs 0.226 (T2M-GPT) (-0.007)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -68,7 +68,7 @@ TDMM-LM在方法谱系中占据独特位置：
 
 **需要手动验证**：自然图像输入场景下，本方法在CorE上略低于Gemini-2.5 VLM（4.02 vs 4.21，Table 2），但考虑到每帧仅使用1个几何令牌而Gemini需要300–500个图像令牌，该结果反而凸显了几何表示的令牌效率优势。合成数据域偏差对真实场景泛化能力的影响尚需进一步评估。
 
-## 背景与动机
+
 
 面部行为是人类交流的核心载体，承载着情感、意图和社交信号。近年来，大规模视觉语言模型（VLLM）在通用视觉理解任务上取得了显著进展，但在面部行为理解与生成这一特定领域仍面临根本性瓶颈。
 
@@ -78,7 +78,9 @@ TDMM-LM在方法谱系中占据独特位置：
 
 **本文的核心动机在于绕开像素瓶颈。** 面部表情的动态变化本质上可由低维3D几何参数（3D Morphable Model, 3DMM）有效表示——表情的起承转合、强度变化和时序演化均编码在紧凑的参数轨迹中。基于此洞察，本文提出**TDMM-LM**（Text-Driven 3D Morphable Model Language Model），将面部运动建模为离散几何令牌序列：每帧仅需1个令牌即可保留微表情的时序细节，在语言模型框架内实现高效的双向面部理解与生成。同时，构建了约80小时的合成语料库**Open3DFaceVid**，覆盖187个情感类别，提供迄今最大规模的文本-3DMM轨迹配对数据，从数据层面缓解情感不平衡与标注稀疏问题。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作提出 **TDMM-LM (Text-Driven 3D Morphable Model Language Model)**，其核心创新在于用**低维离散几何令牌**替代传统视觉语言模型中的高维图像令牌，在语言模型框架内实现面部运动理解与生成的双向统一。以下从三个关键“changed slots”展开。
 
@@ -111,7 +113,7 @@ TDMM-LM 从根本上改变了这一范式：通过 **Geometry VQ-VAE** 将 3D �
 
 尽管几何令牌范式展现出显著优势，仍需注意其当前边界：（1）数据集完全由合成生成，对真实世界中光照、遮挡、非正面姿态等复杂因素的泛化能力尚未充分评估；（2）模型未利用音频信息，缺乏多模态面部表达理解能力；（3）几何令牌丢弃了纹理等视觉细节，可能削弱对细粒度外观差异的捕捉。这些限制指明了未来工作的方向——结合真实视频域适应、融合音频模态、以及探索几何令牌与视觉特征的协同表示。
 
-## 整体框架
+
 
 TDMM-LM 围绕一个核心洞察构建：面部表情的动态变化可以通过低维的3D几何参数（3DMM）有效表示，经向量量化后形成紧凑的序列令牌，每帧仅需一个令牌即可保留微表情的时序细节。基于此，整个框架将面部理解与动画统一在语言模型的范式之下，形成双向的信息流动。
 
@@ -135,7 +137,7 @@ TDMM-LM 围绕一个核心洞察构建：面部表情的动态变化可以通过
 
 > **注意**：当前框架完全基于合成数据训练，未利用音频信息，对真实场景中光照、遮挡、非正面姿态等因素的适应能力尚未充分验证，这些限制需在实际应用中加以考虑。
 
-## 核心模块与公式推导
+
 
 ### 3D面部几何表示
 
@@ -192,7 +194,9 @@ $$\mathcal{L}_1 = \|\mathbf{V} - \hat{\mathbf{V}}\|_1$$
 ![[assets/figures/papers/paper_list_l1056_https_arxiv_org_abs_2603_16936/figures/010_Figure_6.jpg]]
 *Figure 6: Language2Motion. The user provides a naturallanguage description of the desired facial behavior (top left). The text tokenizer converts the prompt into word-level tokens, while a paired 3D facial sequence is encoded into discrete geometry tokens by the geometry encoder. The autoregressive transformer predicts future geometry tokens conditioned on the text prefix*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与设计动机
 
@@ -247,7 +251,9 @@ Figure 12揭示了有趣的非对称规模化特性：Motion2Language的性能�
 ![[assets/figures/papers/paper_list_l1056_https_arxiv_org_abs_2603_16936/figures/016_Figure_13.jpg]]
 *Figure 13: Language-controlled expressive ablation. We modify one keyword in prompt and let the Language2Motion model generate the corresponding facial motion. The two happy prompts produce different intensity level, while the angry prompt yields clearly distinct mouth shapes, demonstrating fine-grained text control over emotional style*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有基线的结构性差异
 
@@ -290,6 +296,8 @@ TDMM-LM的核心因果旋钮在于**将面部运动从像素空间迁移至3D几
 4. **动态码本设计**：当前Geometry VQ-VAE使用固定大小的离散码本。动态调整码本大小或引入层级化结构，可能在表示效率与运动表现力之间取得更好的平衡，尤其对于罕见表情或极端姿态的建模。
 
 5. **长序列与实时性权衡**：在需要处理长视频或实时交互的场景中，进一步压缩几何令牌序列（如引入时序池化或自适应帧率）同时保持运动语义完整性，是一个具有实际价值的研究问题。
+
+
 
 ## 原文 PDF
 

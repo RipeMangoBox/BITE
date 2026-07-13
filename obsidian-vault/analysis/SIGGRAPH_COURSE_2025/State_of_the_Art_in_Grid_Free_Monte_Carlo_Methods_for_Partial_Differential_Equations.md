@@ -5,6 +5,7 @@ paper_level: A
 venue: "SIGGRAPH Course"
 year: 2025
 pdf_ref: paperPDFs/SIGGRAPH_2025_COURSE/State_of_the_Art_in_Grid_Free_Monte_Carlo_Methods_for_Partial_Differential_Equations.pdf
+code_link: null
 project_link: https://rohan-sawhney.github.io/mcgp-resources/
 aliases:
 - GFMCMBWSWIE
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 网格无关蒙特卡洛方法求解偏微分方程的最新进展 |
 | 英文题名 | State of the Art in Grid-Free Monte Carlo Methods for Partial Differential Equations |
 | 会议/期刊 | SIGGRAPH Course 2025 |
-| Links | [paper](https://github.com/rohan-sawhney/mcgp-resources/raw/main/SIGGRAPH-25-abstract.pdf?download=); [Project](https://rohan-sawhney.github.io/mcgp-resources/) |
+| Links | [paper](https://github.com/rohan-sawhney/mcgp-resources/raw/main/SIGGRAPH-25-abstract.pdf?download=) · [Project](https://rohan-sawhney.github.io/mcgp-resources/) |
 | Topic | #topic/optimization_theory_probabilistic #topic/optimization_theory_probabilistic/optimization_methods |
 | Method | Grid-Free Monte Carlo Methods based on Walk on Spheres (WoS) and its extensions |
 | Dataset | 具有丰富表面细节和复杂内部结构的真实几何体上的 Poisson 方程 |
@@ -40,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - 具有丰富表面细节和复杂内部结构的真实几何体上的 Poisson 方程 上，预处理 + 首次解的时间及内存占用 为 约 1GB 内存，< 1 分钟生成预览，对比 > 14 小时，> 30GB 内存，变化 预处理时间减少约 3 个数量级，内存减少约 30 倍。
 
-## 概述
+## 概要
 
 传统偏微分方程（PDE）数值求解器（如有限元方法 FEM）的核心瓶颈并非求解本身，而是**可靠体积网格的生成**。该过程内存密集、难以并行化，且极易因几何缺陷而失败，严重拖慢工程设计周期（Figure 1）。对于复杂真实几何体，仅 Poisson 方程的网格生成、设置与求解就需超过 **14 小时**和 **30GB 内存**，而网格无关的 Walk on Spheres（WoS）方法仅用约 **1GB 内存**，不到一分钟即可提供预览解（Figure 2）。此外，鲁棒的网格算法往往以牺牲空间细节为代价，破坏如血管等关键特征（Figure 3）。
 
@@ -55,7 +56,7 @@ $$u(\mathbf{x}) = \frac{1}{|\partial B(\mathbf{x}, r)|} \int_{\partial B(\mathbf
 
 方法已在 NASA 好奇号火星车热分析等复杂工程场景中得到验证（Figure 7），展现出在极端几何复杂性下的快速、渐进式温度估计能力。当前方法主要适用于二阶线性椭圆型方程，在平滑解区域消除高频噪声较慢，扩展到更广泛 PDE 类型仍需进一步研究。
 
-## 背景与动机
+
 
 ### 传统 PDE 求解器的核心瓶颈：网格生成
 
@@ -89,7 +90,9 @@ Figure 2 给出了一个令人震惊的对比案例：在具有复杂几何结�
 
 需要指出的是，当前网格无关蒙特卡洛方法主要针对**二阶线性椭圆型方程**（如热扩散、静电场、不可压缩流体等场景），尚未覆盖所有 PDE 类型。此外，蒙特卡洛估计的固有方差意味着在平滑解区域需要大量样本以消除高频噪声，在简单几何和平滑边界条件上的收敛速度可能低于成熟的 FEM 求解器。这些局限也构成了本课程后续讨论方差缩减技术、广义化扩展（如 Walk on Stars）以及未来研究方向的基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于将传统 PDE 求解范式从“离散化-求解”彻底转变为“递归积分估计”，其关键洞察在于：**将椭圆 PDE 重新表述为类似光传输渲染方程的递归积分方程，并利用蒙特卡洛方法进行估计，从而完全消除空间离散化这一根本性瓶颈**。
 
@@ -134,7 +137,7 @@ $$u(\mathbf{x}) = \frac{1}{|\partial B(\mathbf{x}, r)|} \int_{\partial B(\mathbf
 
 > **注意**：蒙特卡洛方法的固有方差意味着在平滑解区域消除高频噪声需要大量样本，收敛速度可能低于成熟的 FEM 求解器；当前方法主要适用于二阶线性椭圆型方程，尚未覆盖所有 PDE 类型。
 
-## 整体框架
+
 
 本文介绍的网格无关蒙特卡洛 PDE 求解方法，其核心 pipeline 围绕“将椭圆型偏微分方程转化为递归积分方程，并通过随机行走进行蒙特卡洛估计”这一根本思想展开。整体流程从几何输入到最终解的输出，完全消除了传统求解器中的体积网格生成瓶颈。
 
@@ -174,7 +177,7 @@ pipeline 的输出具有两个关键特性：
 
 整个 pipeline 天生并行：每条随机行走相互独立，可实现接近完美的并行扩展，且易于向量化。这一特性使其与现代 GPU 架构高度契合，与 FEM 网格划分阶段本质上的串行性形成鲜明对比。
 
-## 核心模块与公式推导
+
 
 ### 方法总览：从渲染方程到递归积分方程
 
@@ -210,7 +213,9 @@ $$u(\mathbf{x}) = \frac{1}{|\partial B(\mathbf{x}, r)|} \int_{\partial B(\mathbf
 
 与需要全局求解的传统方法不同，该框架天然支持**输出敏感评估**：用户可仅对感兴趣的区域（如屏幕可见点）发起查询，计算资源完全集中在这些局部点上，无需在整个域上求解。这种“延迟着色”模式进一步放大了该方法在交互式设计和局部分析场景中的优势。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能对比：FEM 网格瓶颈 vs. WoS 免网格求解
 
@@ -250,7 +255,9 @@ $$u(\mathbf{x}) = \frac{1}{|\partial B(\mathbf{x}, r)|} \int_{\partial B(\mathbf
 ![[assets/figures/papers/paper_list_l3_https_github_com_rohan_sawhney_mcgp_resources_raw_main_SIGGRAPH_25_abstr/figures/005_Figure_5.jpg]]
 *Figure 5: The basic idea behind walk on spheres is that at any point ??, the value of a harmonic function ??(??) equals the average over a sphere around ?? [Axler et al. 2013]. Hence we recursively take a single Monte Carlo sample to estimate this average until we hit the boundary. No spatial discretization is needed as the largest empty sphere is determined using a closest point query*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心范式转换：从空间离散化到递归蒙特卡洛积分
 
@@ -295,6 +302,8 @@ $$u(\mathbf{x}) = \frac{1}{|\partial B(\mathbf{x}, r)|} \int_{\partial B(\mathbf
 *   **边界条件与变系数**：对于某些复杂的边界条件（如 Robin 边界）或变系数问题，构造高效、无偏的蒙特卡洛估计器仍具挑战性，需要针对性的随机行走策略（如 Walk on Stars）和方差缩减技术。
 *   **实时求解的数据结构**：在 GPU 上实现实时 WoS 求解，可能需要不同于传统 BVH 的新数据结构或采样策略，以最大化并行吞吐量并最小化线程发散。
 *   **系统化性能比较**：目前缺乏在统一基准上，将 WoS 方法与最新的无网格法、粒子法（如 smoothed particle hydrodynamics, SPH）进行端到端（预处理+求解）性能与精度系统性比较的研究。
+
+
 
 ## 原文 PDF
 

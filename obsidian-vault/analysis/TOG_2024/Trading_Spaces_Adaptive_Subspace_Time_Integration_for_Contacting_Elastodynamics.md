@@ -5,6 +5,7 @@ paper_level: A
 venue: TOG
 year: 2024
 pdf_ref: paperPDFs/TOG_2024/Trading_Spaces_Adaptive_Subspace_Time_Integration_for_Contacting_Elastodynamics.pdf
+code_link: null
 project_link: https://www.dgp.toronto.edu/projects/trading-spaces/
 aliases:
 - ASTI
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 空间交换：面向接触弹性动力学的自适应子空间时间积分 |
 | 英文题名 | Trading Spaces: Adaptive Subspace Time Integration for Contacting Elastodynamics |
 | 会议/期刊 | TOG 2024 |
-| Links | [paper](https://dl.acm.org/doi/10.1145/3687946); [Project](https://www.dgp.toronto.edu/projects/trading-spaces/) |
+| Links | [paper](https://dl.acm.org/doi/10.1145/3687946) · [Project](https://www.dgp.toronto.edu/projects/trading-spaces/) |
 | Topic | #topic/optimization_theory_probabilistic #topic/optimization_theory_probabilistic/optimization_methods |
 | Method | Adaptive Subspace Time Integration |
 | Dataset | Multiple scenes (Armadillo, Boot, etc., Table 1), Linear solver comparison (Table 3), Rubber hand on spikes (Young's modulus sweep, Fig. 16) |
@@ -42,7 +43,7 @@ claims:
 > - Linear solver comparison (Table 3) 上，Linear system solve time 为 0.04–1.30 s，对比 0.25–21.4 s (IPC Pardiso LLT) / 2.10–36.5 s (IPC CG)，变化 up to 70x vs. CG, ~10x vs. LLT。
 > - Rubber hand on spikes (Young's modulus sweep, Fig. 16) 上，Linear solve iterations (robustness under stiffness) 为 Iterations remain practical (~hundreds) up to E=1e9 Pa，对比 IPC-CG capped at 10,000 iterations at E>=1e8 Pa，变化 Our solver avoids explosion and stays well below cap。
 
-## 概述
+## 概要
 
 全空间增量势接触（IPC）仿真能够为弹性动力学提供无穿透、无反转的物理保障，但其计算成本随网格规模与接触复杂度急剧增长。子空间仿真通过降维加速求解，却面临一个根本瓶颈：**无法在时间步求解之前未知全空间解的情况下，在线评估子空间基对当前形变（尤其由接触、摩擦和材料异质性导致的局部形变）的表达充分性**，导致子空间仿真要么质量不足，要么需回溯全空间计算而失去加速意义。
 
@@ -52,7 +53,7 @@ claims:
 
 在性能方面，自定义的舒尔补线性求解器相比 MKL Pardiso 快 6–40 倍，相比带块 Jacobi 预条件的 Eigen CG 快高达 70 倍。在输出视觉质量与全空间 IPC 等价的条件下，自适应子空间仿真实现了超过一个数量级的端到端加速。该方法在 Mushroom Madness 等大规模复杂场景（250 万四面体）中成功捕获了橡胶靴踩踏蘑菇王国时的精细局部形变与异构材料交互，充分展示了其在实际应用中的有效性。
 
-## 背景与动机
+
 
 ### 弹性体仿真的计算困境
 
@@ -77,7 +78,9 @@ claims:
 
 实验表明，该方法在输出视觉质量与全空间IPC等价的条件下，实现了超过一个数量级的端到端加速。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 1. 问题瓶颈与因果调节杠杆
 
@@ -153,7 +156,7 @@ Fig. 5 给出了一个典型示例：软方块在无摩擦斜面上纯刚性滑�
 
 降采样模块的消融实验（Fig. 11）显示，启用降采样可减少活跃 DOF 并在端到端仿真中实现 **1.7 倍加速**，且无视觉质量损失，验证了该模块在维持精度前提下的资源回收有效性。
 
-## 整体框架
+
 
 本文提出的自适应子空间时间积分方法，其核心设计理念是**将全自由度坐标作为唯一的状态存储，而在每个时间步的求解过程中，仅将自适应更新的子空间模态与局部节点丰富化作为加速计算的“临时便签”**。这一策略确保了最终输出与全空间 IPC（Incremental Potential Contact）解在物理上保持一致，同时将求解复杂度从网格规模解耦，转而与当前动态的局部复杂程度成比例。
 
@@ -196,7 +199,7 @@ $$E(x) = K(x) + \alpha h^2 (\Psi(x) + B(x) + D(x))$$
 ![[assets/figures/papers/paper_list_l6_https_dl_acm_org_doi_10_1145_3687946/figures/002_Figure_2.jpg]]
 *Figure 2: Top left: available subspace models are generally well-suited for large global deformation but unable to resolve local deformations. Bottom: with our adaptive method a small amount of combined nodal and subspace enrichment closely captures the full-space solution’s deformation (top right)*
 
-## 核心模块与公式推导
+
 
 ### 自适应子空间时间积分框架
 
@@ -268,7 +271,9 @@ $$(H_x - J^T H_q^{-1} J) d_x = H_q^{-1} g_q - g_x$$
 
 自适应 Oracle 在每个时间步内持续评估子空间解质量：当候选节点或模态同时满足误差超过阈值 $G(x) > \varepsilon_G$ 且进度低于目标 $E(x) < \varepsilon_E$ 时，激活相应的丰富化。用户可调的节点误差阈值 $\varepsilon_G^e$ 与模态误差阈值 $\varepsilon_G^s$ 直接控制丰富化的敏感度，在精度与计算成本之间提供连续调节杠杆。随着误差阈值收紧，自适应子空间求解器单调收敛至全空间 IPC 解。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能表现
 
@@ -328,7 +333,9 @@ $$(H_x - J^T H_q^{-1} J) d_x = H_q^{-1} g_q - g_x$$
 ![[assets/figures/papers/paper_list_l6_https_dl_acm_org_doi_10_1145_3687946/figures/020_Table_3.jpg]]
 *Table 3: We report the linear solver costs of the scenes shown, comparing our Schur complement solver against IPC with Pardiso LLT, and IPC-CG with 3 × 3-block-jacobi preconditioning. Linear systems are collected from the beginning of a representative time-step (large deformation and contact). We report the number nonzero in our full coupled system, the number of nonzeros for the full-space IPC problem, as well the number of iterations. Both iterative solvers are solved to a relative residual of 1e-5*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与前驱工作的关系
 
@@ -407,6 +414,8 @@ Oracle 的丰富化行为自然地适应材料刚度与时间步长变化：
 | **控制杠杆** | $\varepsilon_G^e$（节点误差阈值）与 $\varepsilon_G^s$（模态误差阈值）提供精度-成本连续调节 |
 
 该方法在子空间仿真与接触力学交叉领域填补了“在线自适应评估子空间充分性”这一关键空白，为后续研究（异构子空间库、神经子空间、GPU 加速）提供了可扩展的框架基础。
+
+
 
 ## 原文 PDF
 

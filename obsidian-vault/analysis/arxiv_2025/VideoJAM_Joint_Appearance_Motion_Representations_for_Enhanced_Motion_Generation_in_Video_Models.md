@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/VideoJAM_Joint_Appearance_Motion_Representations_for_Enhanced_Motion_Generation_in_Video_Models.pdf
+project_link: https://hila-chefer.github.io/videojam-paper.github.io/
+code_link: https://github.com/genmoai/
 aliases:
 - VideoJAM
 tags:
@@ -42,7 +44,7 @@ claims:
 > - VideoJAM-bench 上，Human Eval Motion (视频对比中 VideoJAM 获胜百分比) 96.1% vs CogVideo2B；Human Eval Motion 82.0% vs DiT-4B；Auto. Metric Motion (VBench) 93.7 vs DiT-4B (78.3) (+15.4)。
 > - Movie Gen benchmark 上，Human Eval Motion 100% vs DiT-30B (0%)。
 
-## 概述
+## 概要
 
 **核心问题**：当前主流视频生成模型（扩散模型或自回归模型）的训练目标几乎完全围绕像素级重建损失设计。这导致模型过度优化外观质量，却缺乏对时序动态和物理运动规律的显式建模能力。其直接后果是生成的视频频繁出现运动不连贯、违背基本物理定律（如人物穿透物体、重复同一动作帧）等系统性失败（Figure 2）。
 
@@ -56,8 +58,6 @@ claims:
 - 消融实验证实，移除 Inner-Guidance 导致运动偏好从 96.1% 骤降至 66.2%；推理时丢弃光流输入则降至 80.2%，验证了运动表示与引导机制的关键作用（Table 3）。
 
 **方法定位**：VideoJAM 属于训练阶段注入运动先验、推理阶段自引导增强的方法。其显著优势在于**不需要额外数据、不增加模型规模**，仅通过修改输入输出投影层和损失函数即可将运动连贯性大幅提升至超越商业闭源模型的水平。
-
-## 背景与动机
 
 ### 视频生成中的运动连贯性困境
 
@@ -89,7 +89,7 @@ VideoJAM 的核心动机源于一个关键洞察：**运动连贯性不应是模
 
 基于这两个假设，VideoJAM 设计了一个轻量级框架——仅需添加两个线性投影层，即可将任意视频扩散模型改造为双输入双输出架构，在几乎不增加计算开销的条件下，大幅提升运动连贯性。后续章节将详细阐述其技术实现与实验验证。
 
-## 核心创新
+## 核心方法与创新机理
 
 VideoJAM 的核心创新在于**将运动先验显式注入视频扩散模型的训练与推理过程**，仅需极小的架构改动即可大幅提升生成视频的运动连贯性。其本质是通过三个**changed slots**（输入投影层、输出投影层、训练损失函数）将标准视频生成器改造为**双输入双输出架构**，并引入**Inner-Guidance**推理机制，在不增加数据与模型规模的条件下解决了传统像素重建目标对时序信息不敏感的瓶颈。
 
@@ -131,8 +131,6 @@ $$\tilde{\mathbf{u}}^{+}([\mathbf{x}_t, \mathbf{d}_t], y, t; \theta') = (1 + w_1
 
 在 VideoJAM-bench 上，VideoJAM-30B 在运动评分上分别以 68.5% 和 63.8% 的人类投票率显著优于商业模型 Sora 和 Kling 1.5（Table 2），以仅增加两个线性层的代价实现了对大规模商业模型的超越，充分证明了“显式运动先验注入”这一创新路径的有效性。
 
-## 整体框架
-
 VideoJAM 的整体设计遵循一个核心原则：**将运动信息显式地注入视频扩散模型的训练与推理全过程**。该框架由两个协同单元构成——训练阶段的联合外观-运动学习与推理阶段的内部运动引导（Inner-Guidance），其整体架构如图 Figure 4 所示。
 
 ![[assets/figures/papers/paper_list_l1838_VideoJAM_Joint_Appearance_Motion_Representations_for_Enhanced_Motion_Gen/figures/004_Figure_4.jpg]]
@@ -169,8 +167,6 @@ $$\tilde{\mathbf{u}}^{+}([x_t, d_t], y, t; \theta') = (1 + w_1 + w_2) \cdot \mat
 | 推理 | 噪声 + 文本 $y$ | TAE → $W_{in}^+$ → DiT → $W_{out}^+$ → Inner-Guidance | 去噪视频 |
 
 值得注意的是，整个框架仅需**添加两个线性层**（$W_{in}^+$ 和 $W_{out}^+$）即可将标准视频生成器改造为双输入双输出架构，无需修改 DiT 骨干网络本身，也无需增加数据规模或模型参数量。这种轻量级设计使得 VideoJAM 可以即插即用地应用于各类基于 DiT 的视频生成模型。
-
-## 核心模块与公式推导
 
 ### 4.1 时空压缩与 Flow Matching 基础
 
@@ -242,15 +238,7 @@ $$\tilde{\mathbf{u}}^{+}([x_t, d_t], y, t; \theta') = (1 + w_1 + w_2) \cdot \mat
 | $\mathbf{u}^+ = [u^x, u^d]$ | $u^x$：外观预测，$u^d$：运动预测 | 双输出结构 |
 | $\tilde{\mathbf{u}}^{+} = (1+w_1+w_2)\mathbf{u}^{+}_{y,d_t} - w_1\mathbf{u}^{+}_{\varnothing,d_t} - w_2\mathbf{u}^{+}_{y,\varnothing}$ | $w_1$：文本引导尺度，$w_2$：运动引导尺度 | Inner-Guidance 推理 |
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1838_VideoJAM_Joint_Appearance_Motion_Representations_for_Enhanced_Motion_Gen/figures/003_Figure_3.jpg]]
-*Figure 3: Motivation Experiment. We compare the model’s loss before and after randomly permuting the video frames, using a “vanilla” DiT (orange) and our fine-tuned model (blue). The original model is nearly invariant to temporal perturbations for*
-
-![[assets/figures/papers/paper_list_l1838_VideoJAM_Joint_Appearance_Motion_Representations_for_Enhanced_Motion_Gen/figures/002_Figure_2.jpg]]
-*Figure 2: Motion incoherence in video generation. Examples of incoherent generations by DiT-30B (Peebles & Xie, 2023). The model struggles with (a) basic motion, e.g., jogging (stepping on the same leg repeatedly); (b) complex motion e.g., gymnastics; (c) physics, e.g., object dynamics (the hoop passes through the woman); and (d) rotational motion, failing to replicate simple repetitive patterns*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 核心发现：运动连贯性的量化飞跃
 
@@ -299,22 +287,10 @@ Figure 7 和论文讨论明确指出了 VideoJAM 的适用边界：
 ![[assets/figures/papers/paper_list_l1838_VideoJAM_Joint_Appearance_Motion_Representations_for_Enhanced_Motion_Gen/figures/008_Table_2.jpg]]
 *Table 2: Comparison of VideoJAM-30B with prior work on VideoJAM-bench. Human evaluation shows percentage of votes favoring VideoJAM; automatic metrics use VBench*
 
-![[assets/figures/papers/paper_list_l1838_VideoJAM_Joint_Appearance_Motion_Representations_for_Enhanced_Motion_Gen/figures/006_Figure.jpg]]
-*Figure: Sora Kling 1.5 DiT-30B DiT-30B + VideoJAM*
-
 ![[assets/figures/papers/paper_list_l1838_VideoJAM_Joint_Appearance_Motion_Representations_for_Enhanced_Motion_Gen/figures/016_Table_7.jpg]]
 *Table 7: Comparison of VideoJAM-30B with prior work on the Movie Gen benchmark. Human evaluation shows percentage of votes favoring VideoJAM; automatic metrics use VBench*
 
-![[assets/figures/papers/paper_list_l1838_VideoJAM_Joint_Appearance_Motion_Representations_for_Enhanced_Motion_Gen/figures/013_Table_4.jpg]]
-*Table 4: Breakdown of the automatic metrics from VBench comparing our 4B model and previous work on VideoJAM-bench. Our method strikes the best balance between the dynamic degree (higher implies more motion) and the motion smoothness (higher implies smooth motion)*
-
-![[assets/figures/papers/paper_list_l1838_VideoJAM_Joint_Appearance_Motion_Representations_for_Enhanced_Motion_Gen/figures/014_Table_5.jpg]]
-*Table 5: Breakdown of the automatic metrics from VBench comparing our 30B model and previous work on VideoJAM-bench. Our method strikes the best balance between the dynamic degree (higher implies more motion) and the motion smoothness (higher implies smooth motion)*
-
-![[assets/figures/papers/paper_list_l1838_VideoJAM_Joint_Appearance_Motion_Representations_for_Enhanced_Motion_Gen/figures/015_Table_6.jpg]]
-*Table 6: Breakdown of the remaining automatic metrics from VBench comparing our 30B model with its base model, DiT-30B, on VBench prompts. Our method improves almost all metrics, indicating that VideoJAM does not compromise appearance for motion enhancement*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 核心瓶颈：像素重建目标的运动盲区
 

@@ -29,11 +29,15 @@ claims:
 | 中文题名 | Rethinking Driving World Model as Synthetic Data Generator for Perception Tasks |
 | 英文题名 | Rethinking Driving World Model as Synthetic Data Generator for Perception Tasks |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=z3cFADf6zZ) · [Project](https://wm-research.github.io/Dream4Drive/) · [arXiv](https://arxiv.org/abs/2602.11144) |
+| Links | [paper](https://openreview.net/forum?id=z3cFADf6zZ) · [Project](https://wm-research.github.io/Dream4Drive/) · [paper](https://arxiv.org/abs/2602.11144) |
 | Topic | #topic/other_unclear #topic/other_unclear/general |
 | Method |  |
 | Dataset | nuScenes, DriveObj3D |
-## 概述
+
+> [!tip] 效果简介
+> 结果与证据沿用下文“实验与关键发现”中的现有记录；本轮不新增或外推论文事实。
+
+## 概要
 
 自动驾驶感知模型对训练数据的需求极为庞大，但真实世界数据的采集与标注成本高昂，且难以覆盖长尾场景。现有数据增强方法往往难以在保持几何一致性的同时提供足够的外观多样性。Dream4Drive 提出了一种**3D感知的合成数据生成框架**，其核心思路是：首先将输入视频分解为多张3D感知引导图（深度、法线、边缘、抠图、掩码），随后将多样化的3D资产渲染到这些引导图上，通过视频扩散模型生成几何一致且外观多样的合成视频。
 
@@ -41,7 +45,7 @@ claims:
 
 Dream4Drive 的方法定位介于**3D资产驱动仿真**与**生成式视频编辑**之间：它不依赖昂贵的3D标注，仅需RGB视频和3D感知引导图即可训练；同时通过多条件融合适配器将五种引导信号注入扩散Transformer，实现了对场景几何和外观的精细控制。主要结果验证了少样本合成数据对下游感知任务的显著提升效果，为自动驾驶数据增强开辟了新的技术路径。
 
-## 背景与动机
+
 
 自动驾驶感知模型依赖大规模标注数据，但真实场景的采集与标注成本高昂，且长尾场景覆盖不足。数据增强可缓解这一问题，然而现有方法存在结构性缺陷：**传统增强**（如复制-粘贴）仅操作2D图像平面，缺乏3D几何一致性，导致前景物体与背景的遮挡、尺度、光照不匹配；**基于NeRF/3DGS的场景重建方法**虽能生成多视角一致数据，但依赖昂贵的3D标注，且编辑灵活性受限——难以在指定3D位置插入多样化物体。
 
@@ -49,7 +53,9 @@ Dream4Drive 的方法定位介于**3D资产驱动仿真**与**生成式视频编
 
 针对上述缺口，本文提出**Dream4Drive**，一个3D感知的合成数据生成框架。其核心动机是：通过引入**密集3D感知引导图**（深度、法向、边缘、物体轮廓、掩码）作为扩散模型的条件控制信号，在保持原始视频几何结构的前提下，实现3D资产的精确插入与外观多样化编辑。该框架不依赖昂贵的3D标注，仅需RGB视频即可训练，旨在以极少量合成样本（<2%）显著提升感知模型的检测与跟踪性能。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Dream4Drive 的核心创新在于将自动驾驶数据增广从“隐式生成”或“简单粘贴”推进到**3D 感知引导的视频编辑**范式。与现有基于世界模型或扩散模型的增广方法相比，Dream4Drive 在三个关键维度上做出了根本性改变：
 
@@ -71,7 +77,7 @@ $$\mathcal{F}_{\mathrm{fusion}} = \mathrm{FusionNet}\left( \bigoplus_{k=1}^{5} \
 
 **与 baseline 的本质差异总结**：Dream4Drive 将自动驾驶数据增广从“生成新图像”重新定义为“编辑已有视频”，并通过稠密 3D 感知引导图实现了**几何一致性、外观多样性和标注精确性**的统一，而这是隐式生成模型（如 DrivingDiffusion）或简单粘贴方法无法同时保证的。
 
-## 整体框架
+
 
 Dream4Drive 是一个面向自动驾驶感知的 3D‑aware 合成数据生成框架。其核心思路是：**先对输入视频进行 3D‑aware 的几何‑外观解耦，再在解耦后的引导图空间上渲染 3D 资产，最后通过条件生成模型合成具有几何一致性和外观多样性的编辑视频**。整个 pipeline 可划分为三个主要阶段。
 
@@ -103,7 +109,7 @@ $$
 
 **关键设计决策：** 与以往依赖隐式 3D 控制或简单投影的方法不同，Dream4Drive 通过显式的密集 3D‑aware 引导图来保持原始视频的几何与外观，同时允许在任意 3D 位置灵活插入多样化的资产，从而在几何一致性和外观多样性之间取得平衡。
 
-## 核心模块与公式推导
+
 
 ### 3D‑Aware 视频编辑流水线
 
@@ -154,7 +160,9 @@ $$L_{\mathrm{total}} = \lambda_{\mathrm{diffusion}} \mathcal{L}_{\mathrm{diffusi
 ![[assets/figures/papers/paper_list_l69_https_openreview_net_forum_id_z3cFADf6zZ/figures/005_Figure_5.jpg]]
 *Figure 5: The illustration of creating a 3D asset in DriveObj3D. We first apply a segmentation model to segment the target object, then generate multi-view images, and finally create a 3D mesh from those images*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -224,7 +232,9 @@ Dream4Drive 在 nuScenes 检测与跟踪任务上验证了合成数据的有效�
 ![[assets/figures/papers/paper_list_l69_https_openreview_net_forum_id_z3cFADf6zZ/figures/014_Table_6.jpg]]
 *Table 6: Automation and manual efforts involved in synthesizing the 420 samples*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有数据增强范式的边界
 
@@ -261,6 +271,8 @@ Dream4Drive 定位于**基于生成模型的 3D 感知数据增强**，与三类
 - **合成数据的最优比例**：420 个样本（<2%）即有效，但该比例是否最优？是否存在合成数据占比的“甜点区”？原文未进行比例扫描实验。
 
 > **注意**：以上开放问题均基于原文未覆盖的分析维度推断，需后续工作验证。
+
+
 
 ## 原文 PDF
 

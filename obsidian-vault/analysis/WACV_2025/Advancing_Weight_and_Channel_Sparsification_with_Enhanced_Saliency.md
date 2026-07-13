@@ -5,6 +5,8 @@ paper_level: A
 venue: WACV
 year: 2025
 pdf_ref: paperPDFs/WACV_2025/Advancing_Weight_and_Channel_Sparsification_with_Enhanced_Saliency.pdf
+project_link: null
+code_link: null
 aliases:
 - IIEE
 - AWCSES
@@ -41,7 +43,7 @@ claims:
 > - ImageNet1K unstructured ResNet50 90% ERK 上，Top-1 Accuracy (%) 为 74.3 (IEE)，对比 73.0 (RigL)，变化 +1.3。
 > - ImageNet1K N:M sparsity ResNet50 2:4 上，Top-1 Accuracy (%) 为 77.5 (IEE)，对比 77.0 (SR-STE)，变化 +0.5。
 
-## 概述
+## 概要
 
 深度神经网络在资源受限场景下的部署依赖剪枝与稀疏化技术来降低计算与存储开销。然而，现有方法面临两个根本性瓶颈：其一，重要性准则（saliency scores）本身不完美，且传统剪枝一旦执行便不可逆，导致错误剪枝无法被纠正；其二，以 **RigL** 为代表的动态稀疏训练方法存在剪枝与生长准则不一致（如幅值剪枝 vs. 梯度生长）、不适合结构化稀疏、以及生长策略短视等问题。
 
@@ -54,7 +56,7 @@ claims:
 
 消融实验进一步证实，“重新激活-探索”步骤是性能提升的关键——移除该步骤后准确率从 74.3% 降至 73.1%，与 RigL 持平；同时，探索阶段冻结活跃结构也是必要的设计选择（Table 4）。
 
-## 背景与动机
+
 
 深度神经网络在资源受限环境中的部署持续推动着模型压缩技术的发展。稀疏化——通过移除冗余权重（非结构化稀疏）或整个结构单元（结构化稀疏）来精简网络——已成为平衡模型效率与性能的核心范式。然而，当前方法在两个关键维度上仍面临根本性瓶颈。
 
@@ -81,7 +83,9 @@ claims:
 
 本文提出的 **IEE（Iterative Exploitation and Exploration）** 方法正是沿着这一思路展开：将模型划分为活跃结构（exploitation）与探索空间（exploration），在探索阶段暂时重激活所有被剪枝参数并训练少量步，同时冻结当前活跃结构以隔离干扰，从而获得更准确的参数重要性评估。这一“重新激活-探索”（Reactivate & Explore）机制，使得生长决策从“基于瞬时梯度的猜测”升级为“基于实际训练的预览”，为动态稀疏训练提供了更可靠的探索基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 IEE 的核心创新在于将动态稀疏训练中长期存在的**准则不一致**与**生长短视**两个瓶颈统一解决，而非沿袭现有方法“剪枝用一套准则、生长用另一套准则”的分离式设计。
 
@@ -123,7 +127,7 @@ $$ \operatorname*{min}_{\Theta_P} \sum_{i=1}^{Q} \ell(f(\Theta_P \cup \Theta_K; 
 
 生长神经元存活率的对比（Figure 5(b)）进一步佐证了这一优势——IEE 生长的神经元在后续训练中被保留的比例显著高于 RigL，说明其探索策略确实找到了更具长期价值的结构连接。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2502_03658/figures/008_Figure_5.jpg]]
 *Figure 5: (a) Architecture convergence with IoU after pruning and growing; (b) Grown Neurons Survival Rate for ours and RigL [12]*
@@ -158,7 +162,7 @@ IEE（Iterative Exploitation and Exploration）将模型参数划分为两个互
 
 **输入输出流**：输入为初始稀疏分布（如 Uniform 或 ERK）下的模型参数划分 $\{\Theta_K, \Theta_P\}$ 和总更新预算衰减调度器；输出为经过 $T$ 步 IEE 更新后收敛的稀疏结构 $\Theta_K$，可直接用于推理。
 
-## 核心模块与公式推导
+
 
 ### 3.1 模型划分与双空间机制
 
@@ -212,7 +216,9 @@ $$\Theta_P \gets \Theta_P - \mathrm{ArgTopK}(I(\Theta_P), \Omega^t)$$
 
 **更新预算 $\Omega^t$ 的衰减调度。** $\Omega^t$ 随训练进程逐步衰减（采用固定衰减策略，如指数衰减），使得早期允许较大的结构探索幅度，后期趋于精细调整。具体的衰减调度器未针对不同网络自适应调整，这一点在局限性中被指出。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -287,7 +293,9 @@ Figure 5 从架构演化的角度分析了 IEE 的有效性。Figure 5(a) 展示
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2502_03658/figures/003_Table.jpg]]
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 动态稀疏训练谱系中的定位
 
@@ -322,6 +330,8 @@ IEE 的适用边界受以下因素制约：
 3. **探索空间的采样策略**：是否可以对探索空间进行子采样（如仅重激活最近被剪枝的参数或高梯度参数），在保持探索效果的同时降低 Reactivate & Explore 阶段的训练开销？
 
 4. **大规模模型的扩展性**：在大型语言模型（如 LLaMA 系列）的稀疏化场景中，IEE 的 exploit-explore 循环是否能够有效发现 Transformer 注意力头和 FFN 层的结构化稀疏模式？冻结活动结构进行探索的策略在分布式训练环境下如何实现高效的梯度通信？
+
+
 
 ## 原文 PDF
 

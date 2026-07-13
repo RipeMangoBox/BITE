@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/A_Problem_Oriented_Perspective_and_Anchor_Verification_for_Code_Optimization.pdf
+project_link: null
+code_link: null
 aliases:
 - POPAVCO
 tags:
@@ -40,7 +42,7 @@ claims:
 > - PIE/PCO测试集（C++，gem5模拟器） 上，SPEEDUP (BEST@1) 为 5.22×，对比 2.95×，变化 +2.27×。
 > - PIE/PCO测试集（C++，gem5模拟器） 上，CORRECT (BEST@1) 为 61.55%，对比 46.52%，变化 +15.03%。
 
-## 概述
+## 概要
 
 本文针对代码优化中LLM的两个核心瓶颈——**优化视角局限**与**正确性保障缺失**——提出了系统性的解决方案。现有方法采用“用户导向视角”，即从单个程序员的提交历史中提取顺序优化对，这导致模型仅能学习局部增量改进，难以实现全局算法创新；同时，优化后的代码常因“优化税”而牺牲正确性。
 
@@ -58,7 +60,7 @@ claims:
 
 **方法定位**：本文的工作处于代码生成与程序优化交叉领域，通过数据构建视角的创新和验证机制的引入，使LLM能够在保持较高正确性的前提下实现更激进的性能优化。当前局限包括：约一半的失败属于“编译通过但语义错误”类别，表明LLM在理解高级程序意图方面仍存在盲点；锚点验证框架依赖慢代码的可执行性，对执行时间不可容忍的场景适用性受限。
 
-## 背景与动机
+
 
 代码优化是提升程序执行效率的核心手段，但现有基于大语言模型（LLM）的代码优化方法面临两个根本性瓶颈。第一，**优化视角的局限性**：当前主流方法采用“用户导向视角”（User-Oriented Perspective），即从单个程序员的迭代提交中提取顺序优化对（PIE数据集）。这种视角受限于单一程序员的思维模式，优化对仅反映局部增量改进（如变量重命名、循环微调），缺乏全局算法创新。第二，**正确性与性能的权衡**：优化过程存在“优化税”（optimization tax）——优化后的代码可能牺牲正确性。现有方法缺乏有效的验证机制，导致优化率与正确性难以兼得。
 
@@ -72,7 +74,9 @@ claims:
 
 **需要人工验证的点**：关于问题导向视角的泛化能力——实验仅针对C++和Python语言，对其他编程语言（如Java、Rust）的适用性尚未验证。此外，锚点验证框架依赖慢代码的可执行性，对于执行时间不可容忍的慢代码场景，其适用性受限。这些局限性在论文的开放问题部分有明确讨论。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 该工作的核心创新在于将代码优化的切入点从“用户视角”转向“问题视角”，并配套设计了一个基于慢代码的“锚点验证”框架，从根本上解决了现有方法优化率低、正确性差的问题。
 
@@ -101,7 +105,7 @@ claims:
 
 **两个创新的协同效应**：问题导向视角提供了更丰富、更全局的优化模式学习素材，解决了“优化什么”的问题；锚点验证框架则确保了这些优化在实践中的正确性，解决了“如何安全优化”的问题。两者结合使得代码优化从“局部增量改进”跃迁为“全局算法创新+正确性保障”的系统性方案。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0003_HGaUV3jjvo_A_Problem-Oriented_Perspective_and_Anchor_Verifi/figures/009_Figure_6.jpg]]
 *Figure 6: Anchor Verification Framework. It includes three stages: (1) generating test inputs based on the slow code’s functionality, (2) constructing a verified test case set by executing inputs through the slow code, and (3) iteratively refining the optimized code with execution feedback*
@@ -133,7 +137,7 @@ claims:
 
 **证据强度说明**：所有关键性能数据均来自 Table 1、Table 2 和 Section 1 的明确声明，置信度为 1.0。模块间因果关系（问题导向视角提升优化率 → 锚点验证框架弥补正确性）由实验设计（先 SFT 再精炼）和消融实验（Figure 5 显示 PCO 数据量减少时性能下降）支持，属于因果推断而非直接测量，需注意这一逻辑链条的强度依赖于实验设计的内部有效性。
 
-## 核心模块与公式推导
+
 
 ### 优化对构建视角的数学形式化
 
@@ -173,7 +177,9 @@ claims:
 
 这些错误模式揭示了LLM在理解高级程序意图方面的盲点，也是锚点验证框架需要迭代精炼的根本原因。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：问题导向视角 vs. 用户导向视角
 
@@ -222,7 +228,9 @@ claims:
 ![[assets/figures/papers/iclr26_0003_HGaUV3jjvo_A_Problem-Oriented_Perspective_and_Anchor_Verifi/figures/014_Table_5.jpg]]
 *Table 5: Number of unique problem ids and pairs*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 该工作定位在“代码优化的自动化”这一长期挑战中，核心创新在于将优化视角从**用户导向**（PIE）切换为**问题导向**（PCO），并辅以**锚点验证框架**来解决伴随而来的正确性风险。其方法谱系与现有工作的关系、适用边界及开放问题如下。
 
@@ -253,6 +261,8 @@ claims:
 4.  **迁移到未见问题类型**：从PCO学到的编辑模式（如将嵌套循环重写为前缀和预处理）能否有效迁移到未见的问题类型？这需要进一步验证。
 
 5.  **BEST@k策略下的最优平衡**：在BEST@k策略下，优化率（%OPT）与正确性（CORRECT）之间存在权衡。如何找到最优平衡点，以及如何设计更智能的选择策略，是值得探索的方向。
+
+
 
 ## 原文 PDF
 

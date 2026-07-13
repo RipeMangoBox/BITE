@@ -42,7 +42,7 @@ claims:
 > - LVS6D 50-object subset 上，CD↓ 0.0083 (UniPR) vs 0.0644 (Hunyuan2.1) (-0.0561)；F-Score↑ 0.883 (UniPR) vs 0.553 (Hunyuan2.1) (+0.330)；SPE↓ 0.109 (UniPR) vs 0.320 (Hunyuan2.1) (-0.211)。
 > - LVS6D (Hard subset) 上，AP↑ 0.752 (UniPR) vs 0.070 (Coders) (+0.682)；APE↓ 1.248 (UniPR) vs 2.230 (Coders) (-0.982)。
 
-## 概述
+## 概要
 
 真实场景中的对象级感知与三维重建是机器人操作与具身智能的关键能力。传统方法依赖**检测—分割—形状重建—姿态估计**的多模块顺序流水线，各模块独立优化导致**误差累积**，且逐对象串行处理带来**计算低效**。同时，主流图像到3D生成模型（如Trellis、Hunyuan3D）需要预定义的2D边界框与分割掩码，且因单目输入的尺度模糊性，难以恢复物体的真实物理尺寸与形状比例。
 
@@ -52,7 +52,7 @@ claims:
 
 UniPR以端到端并行架构、PASR表示与立体几何约束，在**真实尺度保持、形状比例精度与推理效率**三个维度同步突破现有方法，为对象级真实到仿真感知提供了新的基线范式。
 
-## 背景与动机
+
 
 对象级真实到仿真（Real-to-Sim）感知与重建是机器人、具身智能和增强现实等领域的核心任务。其目标是从真实世界的传感器观测中，同时检测场景中的多个物体，并恢复它们在三维空间中的精确位置、姿态和几何形状，从而构建可供下游仿真引擎直接使用的数字孪生。这一任务面临三重根本性挑战：**多目标并行处理**、**真实尺度恢复**，以及**形状比例的准确保持**。
 
@@ -68,7 +68,9 @@ UniPR以端到端并行架构、PASR表示与立体几何约束，在**真实尺
 
 上述瓶颈共同指向一个核心矛盾：**模块化设计割裂了感知与重建的信息流，使得网络无法利用立体几何约束和全图上下文来联合优化检测、姿态与形状**。因此，构建一个统一的端到端框架，直接从原始立体图像对中并行输出多个物体的真实尺度3D形状与6D姿态，成为突破现有方法上限的关键方向。这正是UniPR工作的核心动机——通过将姿态与形状在观测空间中联合编码，利用立体几何消除尺度模糊，实现单次前向传播即可完成全场景的感知与重建。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 UniPR 的核心创新在于将传统模块化流水线（检测→分割→重建→姿态估计）重塑为一个统一的端到端单前向网络，通过**姿态感知形状表示（Pose-Aware Shape Representation, PASR）**与**立体几何约束**的深度融合，从根本上解决了误差累积、尺度模糊与形状比例失真三大瓶颈。
 
@@ -117,7 +119,7 @@ PASR 的解决方案是**直接在观测空间中联合编码物体的姿态与�
 
 尽管创新显著，UniPR 仍存在明确边界：① 无内置纹理生成模块，需依赖外部模型（Hunyuan3D-Paint-v2.1）进行纹理合成；② 对拓扑高度复杂的物体（如 mug 的手柄）需额外部分感知细化步骤（Table 9），未完全实现端到端；③ 依赖标定立体相机，单目分支性能显著下降（Table 4），限制了在单目传感器上的直接应用。当前训练和主要评测基于合成数据集 LVS6D，真实场景泛化能力虽在少数示例中验证（Figure 12），但缺乏大规模真实数据评估，这一点需要读者注意。
 
-## 整体框架
+
 
 UniPR 是一个端到端的统一前向网络，直接从单张立体图像对中并行检测多个物体并重建其具有真实尺度的 3D 几何。与传统的“检测→分割→形状重建→姿态估计”模块化流水线（Figure 2）不同，UniPR 将感知与重建统一在一个网络中，使信息可以在各组件间无缝流动，从根本上消除了模块间误差累积的问题。
 
@@ -158,7 +160,7 @@ UniPR 是一个端到端的统一前向网络，直接从单张立体图像对�
 ![[assets/figures/papers/paper_list_l2618_https_arxiv_org_abs_2603_19616/figures/019_Figure_10.jpg]]
 *Figure 10: Illustration of SAM 3D Object test result*
 
-## 核心模块与公式推导
+
 
 UniPR 是一个单次前向网络，直接以立体图像对为输入，并行推理场景中多个物体的位置、物理尺度和姿态感知的 3D 形状。其核心架构由五个模块级联构成，每个模块解决“统一感知与重建”中的一个关键子问题。
 
@@ -226,7 +228,9 @@ PASR 解码器在球形体素空间而非传统立方体素空间中预测占用
 ![[assets/figures/papers/paper_list_l2618_https_arxiv_org_abs_2603_19616/figures/007_Figure_5.jpg]]
 *Figure 5: Qualitative pose-aware shape reconstruction results on LVS6D dataset. The results highlight the key role of PASR in simplifying rotation prediction, as it eliminates the ambiguity caused by different canonical definitions for categories with similar geometry*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心重建性能对比
 
@@ -306,7 +310,9 @@ Figure 6从三个维度验证了PASR的生成能力：(a) 同类别形状生成�
 ![[assets/figures/papers/paper_list_l2618_https_arxiv_org_abs_2603_19616/figures/014_Table_7.jpg]]
 *Table 7: The ablation of KL-based supervision. The results demonstrate the importance of KL-based supervision for utilizing the pretrained VAE model*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心问题定位：从模块化流水线到统一端到端
 
@@ -387,6 +393,8 @@ UniPR 在以下知识节点上做出了可验证的贡献：
 4. **时序扩展与动态场景**：UniPR 处理单帧立体对，能否扩展至多帧序列或视频立体输入，以实现时序一致的3D感知与跟踪？这需要解决跨帧对象关联与运动建模问题。
 
 5. **大规模场景的层次化扩展**：当前基于全局 Tri‑Plane View 的场景编码能否通过层次化或稀疏化策略扩展至房间级甚至建筑级环境，同时保持实时推理能力？
+
+
 
 ## 原文 PDF
 

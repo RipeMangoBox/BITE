@@ -5,6 +5,8 @@ paper_level: A
 venue: AAAI
 year: 2025
 pdf_ref: paperPDFs/AAAI_2025/Unified_Text_Music_and_Motion_Generation.pdf
+project_link: https://hanyangclarence.github.io/unimumo
+code_link: https://github.com/mubertai/
 aliases:
 - UTMMG
 tags:
@@ -42,7 +44,7 @@ claims:
 > - AIST++ 上，Beats Coverage↑ 93.0 vs 93.9 (CDCD) (-0.9)。
 > - AIST++ (dance) 上，Beat Align↑ 0.24 vs 0.27 (EDGE) (-0.03)。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -77,7 +79,7 @@ UniMuMo 在方法谱系中处于**统一多模态生成框架**的交汇点。�
 
 尽管性能表现强劲，该方法仍存在若干局限：生成音乐的音频质量受限于去人声训练数据的伪影；合成文本描述缺乏特异性；音乐-动作对齐高度依赖节拍检测精度，对无清晰节奏的音乐可能失效。开放问题包括如何构建大规模高质量三模态数据集、如何将联合码本方法扩展到歌词或视频等更多模态，以及多任务训练方案为何不如联合生成任务等。
 
-## 背景与动机
+
 
 音乐、运动（舞蹈）和文本是人类表达与交流的三种核心模态。三者之间存在天然的语义耦合——一段音乐往往对应特定的舞蹈风格，而一段舞蹈又可以用自然语言描述。然而，构建能够在这三种模态之间自由转换的生成系统，面临着两个根本性瓶颈：
 
@@ -87,7 +89,9 @@ UniMuMo 在方法谱系中处于**统一多模态生成框架**的交汇点。�
 
 UniMuMo 的核心动机正是突破上述双重瓶颈：**在无需成对多模态数据的前提下，构建一个统一的框架，能够处理文本、音乐和动作之间的任意生成任务**。其关键洞察在于，音乐的节拍结构与舞蹈的视觉节拍之间存在天然的节奏对应关系——这一对应关系可以被自动提取并用于对齐未配对的音乐和动作数据，从而在不依赖人工标注的情况下构建大规模对齐数据集。在此基础上，通过将运动序列映射到预训练音乐模型的共享码本空间，UniMuMo 实现了三种模态在统一特征空间中的联合建模，为跨模态生成提供了架构基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 UniMuMo 的核心创新围绕一个根本瓶颈展开：**缺乏同时包含音乐、动作和文本的成对多模态数据**，以及如何设计一个能够统一处理这三种模态生成任务的模型架构。针对这一瓶颈，工作从数据构造、表示对齐和生成范式三个层面提出了系统性创新。
 
@@ -161,7 +165,7 @@ $$\hat{Q}_t^{\mathrm{motion}} = \underset{i \in \mathcal{M}}{\arg\max} \mathbb{P
 | 模态特定组件 | 共享嵌入和单一 FFN（MusicGen） | 独立运动嵌入、额外运动 FFN、分离位置编码 | Table 6 Ablation 3，置信度 0.9 |
 | 训练目标 | 单模态预测下一个 token | 加权联合预测下一个 token（μ=0.85），支持零样本任务 | Equation 2，置信度 0.95 |
 
-## 整体框架
+
 
 UniMuMo 的整体框架围绕一个核心瓶颈展开：**缺乏同时包含音乐、动作和文本的成对多模态数据**，以及**设计能够统一处理这三种模态生成任务的模型架构**。为解决这一问题，论文构建了一条“数据构造—联合编码—并行生成—跨模态理解”的完整流水线，如图 Figure 2 所示。
 
@@ -216,7 +220,7 @@ $$\hat{Q}_t^{\mathrm{motion}} = \underset{i \in \mathcal{M}}{\arg\max} \mathbb{P
 ![[assets/figures/papers/paper_list_l1825_Unified_Text_Music_and_Motion_Generation/figures/001_Figure_1.jpg]]
 *Figure 1: UniMuMo is able to perform generation tasks on any combination of music, motion, and text. The tasks shown in the figure include text-to-aligned-music-motion, music-to-motion, motion-to-music, music-captioning, and motion-captioning*
 
-## 核心模块与公式推导
+
 
 UniMuMo 的训练分为三个顺序阶段，每个阶段引入一组关键模块，共同支撑统一的文本-音乐-动作生成框架。以下按数据对齐、联合编码、并行生成和跨模态描述的顺序，提取核心模块及其控制公式。
 
@@ -309,7 +313,9 @@ $$
 ![[assets/figures/papers/paper_list_l1825_Unified_Text_Music_and_Motion_Generation/figures/013_Figure_4.jpg]]
 *Figure 4: Illustrations on the technical details in the inference process*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验结果
 
@@ -379,10 +385,10 @@ Table 6 和 Appendix G 报告了五项消融实验，揭示了各设计组件的
 ![[assets/figures/papers/paper_list_l1825_Unified_Text_Music_and_Motion_Generation/figures/004_Table_5.jpg]]
 *Table 5: Comparison of motion captioning on HumanML3D dataset*
 
-![[assets/figures/papers/paper_list_l1825_Unified_Text_Music_and_Motion_Generation/figures/010_Table_9.jpg]]
-*Table 9: Choices of descriptive tags for energy*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 UniMuMo 的核心定位是**首个统一文本、音乐和动作三模态的生成框架**，其设计思路并非从零构建，而是在多个成熟单模态模型的基础上进行跨模态融合与扩展。理解其技术谱系，需要从三个关键维度展开：基座模型的继承关系、与各单模态/跨模态基线的对比定位，以及该方法固有的适用边界与未决问题。
 
@@ -438,6 +444,8 @@ UniMuMo 的能力边界受限于以下几个结构性因素：
 - **多任务训练为何失效**：消融实验显示多任务训练不如并行生成，但梯度冲突的具体来源和任务权重的最优平衡策略仍不清楚，这可能是多模态统一模型训练中的一个普遍性问题。
 - **音乐保真度的提升路径**：在不牺牲运动生成质量的前提下，如何通过更好的人声分离或更高质量的训练数据来提升生成音乐的保真度？
 - **对齐精度与多样性的权衡**：数据对齐精度越高，模型越容易学习节奏对应关系，但过度对齐可能限制生成多样性。最优的对齐策略和数据配比仍有待探索。
+
+
 
 ## 原文 PDF
 

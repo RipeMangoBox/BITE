@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Breaking_Gradient_Temporal_Collinearity_for_Robust_Spiking_Neural_Networks.pdf
+project_link: null
+code_link: https://github.com/Apple26419/SNN_STOD
 openreview_forum_id: udTDFAshNM
 aliases:
 - STODS
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 打破梯度时间共线性以实现鲁棒脉冲神经网络 |
 | 英文题名 | Breaking Gradient Temporal Collinearity for Robust Spiking Neural Networks |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=udTDFAshNM); [GitHub](https://github.com/Apple26419/SNN_STOD) |
+| Links | [paper](https://openreview.net/forum?id=udTDFAshNM) · [GitHub](https://github.com/Apple26419/SNN_STOD) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/robustness |
 | Method | Structured Temporal Orthogonal Decorrelation (STOD) |
 | Dataset | CIFAR-10, CIFAR-100, ImageNet |
@@ -42,7 +44,7 @@ claims:
 > - CIFAR-100 上，FGSM accuracy (white box, ε=8/255) 为 41.89% (STOD + AT)，对比 16.31% (SNN + AT)，变化 +25.58。
 > - ImageNet 上，FGSM accuracy (white box, ε=8/255) 为 26.77% (STOD + AT)，对比 15.74% (SNN + AT)，变化 +11.03。
 
-## 概述
+## 概要
 
 脉冲神经网络（SNN）在事件驱动和低功耗场景中具有天然优势，但其鲁棒性远落后于传统人工神经网络（ANN）。本文揭示了一个此前未被认识的根本瓶颈：**梯度时间共线性（Gradient Temporal Collinearity, GTC）**。直接编码（direct encoding）在每个时间步重复注入相同输入，导致不同时间步的梯度分量高度方向一致（GTC 约 0.8–0.9），而率编码（rate encoding）通过时间多样性机制将 GTC 降至约 0.2–0.3。理论分析表明，更高的 GTC 会通过 Hessian 谱半径上界放大参数 Hessian 的谱半径，从而严重损害网络鲁棒性。
 
@@ -56,7 +58,7 @@ claims:
 
 方法存在轻微干净准确率下降（CIFAR‑10 上约 2%），且最优鲁棒性依赖对抗训练配合。正交核初始化策略要求时间步数 T ≤ 输入通道数×分块维度，限制了极长序列下的扩展性。
 
-## 背景与动机
+
 
 ### 脉冲神经网络的鲁棒性困境
 
@@ -82,7 +84,9 @@ $$\lambda_{\max}(\widehat{H}_\theta) \lesssim T \cdot (\max_t \|G[t]\|_F^2) \cdo
 
 **核心挑战在于：能否在不牺牲直接编码高效性的前提下，引入类似率编码的时间特征多样性机制，从而打破梯度时间共线性？** 这需要一个既能降低 GTC、又能保持直接编码简洁性的结构化方案。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：梯度时间共线性（GTC）
 
@@ -131,7 +135,7 @@ $$\mathcal{L} = \mathcal{L}_{CE} + \lambda_\mathcal{O} \mathcal{L}_\mathcal{O}$$
 
 消融实验（Table 2）揭示了一个重要发现：**训练时引入正交核、推理时移除（STOD w.o. OK），可获得最大的鲁棒性增益，且不增加任何推理开销**。这表明正交核的作用本质上是训练正则化——通过重塑梯度景观来提升网络的内在鲁棒性，而非依赖推理时的特征多样化。这一策略使 STOD 在 CIFAR-10 上仅以约 2% 的干净准确率下降为代价，将 PGD 白盒攻击准确率从 14.07% 提升至 43.54%（Table 8）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0012_udTDFAshNM_Breaking_Gradient_Temporal_Collinearity_for_Robu/figures/003_Figure_2.jpg]]
 *Figure 2: Flowchart of STOD, including PFD and GOR*
@@ -169,7 +173,7 @@ STOD 的整体设计遵循“在直接编码的输入层引入结构化时间正
 
 这一框架的核心洞察在于：直接编码的高 GTC 并非其固有属性，而是输入层缺乏时间多样性的结果。通过在输入端引入结构化正交变换来打破这种共线性，即可在保留直接编码高效率和特征保持能力的同时，大幅提升 SNN 的对抗鲁棒性。
 
-## 核心模块与公式推导
+
 
 ### 核心瓶颈：梯度时间共线性（GTC）
 
@@ -235,7 +239,9 @@ $\lambda_\mathcal{O}$ 控制正则化强度，实验表明最优值为 0.05（Fi
 
 消融实验揭示了一个关键发现（Table 2）：正交核在训练时引入、推理时移除（变体 STOD w.o. OK），可获得最大的鲁棒性增益，且不增加任何推理开销。这表明正交核的作用本质上是**训练正则化**——通过多样化时间特征来重塑梯度结构，使网络习得内在鲁棒表征，而非依赖推理时的特征变换。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈验证：GTC 与鲁棒性的因果链
 
@@ -298,7 +304,9 @@ Figure 4 展示了原始输入、经 PFD 变换后的输入以及对应梯度分
 
 4. **任务泛化性未验证。** 当前实验仅覆盖图像分类任务（静态图像和神经形态数据集），STOD 在视频理解、强化学习等序列决策任务上的有效性仍需探索。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 方法定位与核心差异
 
@@ -344,6 +352,8 @@ STOD 的出发点是直接编码（direct encoding）在脉冲神经网络（SNN
 5. **理论边界的紧致性。** Eq. (5) 给出的 Hessian 谱半径上界依赖于 GTC 的最大值，但该上界是否为紧致界（tight bound）尚不明确。更紧致的理论分析可能揭示更优的 GTC 降低策略。
 
 > **注意：** 上述开放问题中，第 1 点和第 2 点来自论文自身的讨论（Section 6），第 3–5 点为基于方法局限性的合理推断，需进一步实验验证。
+
+
 
 ## 原文 PDF
 

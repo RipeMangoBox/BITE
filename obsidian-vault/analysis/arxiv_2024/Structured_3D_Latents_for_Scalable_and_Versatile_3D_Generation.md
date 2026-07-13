@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2024
 pdf_ref: paperPDFs/arxiv_2024/Structured_3D_Latents_for_Scalable_and_Versatile_3D_Generation.pdf
+project_link: null
+code_link: https://github.com/Microsoft/TRELLIS
 aliases:
 - TRELLIS
 - SLAT
@@ -41,7 +43,7 @@ claims:
 > - Toys4k reconstruction subset 上，CD 0.0083 vs CLAY 0.0124 (0.0041 lower (better))。
 > - Toys4k text-to-3D generation (1250 prompts) 上，CLIP score 26.70 (Ours XL) vs InstantMesh 25.56 (1.14 improvement)。
 
-## 概述
+## 概要
 
 3D内容生成领域长期受到**缺乏统一潜在表示**的困扰：现有方法难以在单一框架下同时处理高质量的几何与外观，且输出格式固定，无法在网格、辐射场与3D高斯溅射等表示之间灵活切换。这导致通用3D生成范式的发展受限——不同方法各自为战，缺乏可复用的表征基础。
 
@@ -51,7 +53,7 @@ claims:
 
 **方法定位：** TRELLIS属于3D生成式模型中的**潜在表示方法**，但其结构化稀疏设计区别于LN3Diff的潜在三平面、3DTopia-XL的潜在点云和CLAY的潜在向量集。它通过引入预训练视觉特征与修正流生成范式，在表征通用性和生成质量之间建立了新的平衡点。
 
-## 背景与动机
+
 
 高质量3D资产的自动生成是计算机图形学与视觉领域的核心挑战之一，其应用覆盖虚拟现实、游戏开发、影视制作和具身智能等多个领域。近年来，随着扩散模型和可微渲染技术的进步，3D生成取得了显著进展，但现有方法仍面临一个根本性瓶颈：**缺乏统一的潜在表示**，难以同时处理高质量的几何和外观，并且无法在不同输出格式（如网格、辐射场、3D高斯）间灵活切换。
 
@@ -65,7 +67,9 @@ claims:
 
 本文提出 **TRELLIS**，其核心动机是设计一种**结构化稀疏潜在表示（Structured Latents, SLAT）**，将粗粒度几何结构（活跃体素）与细粒度视觉特征（DINOv2多视图特征）解耦，并采用两阶段修正流变换器生成流程，从而在多种输出格式下实现高保真3D生成。该方法以表征无关的方式同时捕捉几何和外观信息，使得统一生成框架能够通过不同解码器输出多种高质量3D表示，并支持灵活编辑。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作提出了 **TRELLIS**，其核心创新在于引入一种名为 **SLAT (Structured Latents)** 的统一结构化稀疏潜在表示，并配套设计了一套两阶段修正流变换器生成流程，从而在单一框架内实现了高质量、多格式、可编辑的3D资产生成。
 
@@ -98,7 +102,7 @@ $$\mathcal{L}_{CFM}(\theta) = \mathbb{E}_{t, \mathbf{x}_0, \epsilon} \lVert \mat
 
 消融实验证实，将扩散模型替换为修正流模型可在两个生成阶段独立提升CLIP和FD指标，验证了这一范式转变的优越性（Table 4）。此外，这一两阶段设计天然支持灵活的3D编辑，例如通过固定结构生成资产变体，或通过适配 **Repaint** 策略实现无微调的区域特定编辑。
 
-## 整体框架
+
 
 TRELLIS 的整体 pipeline 围绕 **结构化稀疏潜在表示（SLAT）** 构建，形成“编码—生成—解码”三阶段流程。其核心设计思想是将粗粒度的几何结构（活跃体素）与细粒度的视觉特征（局部潜变量）解耦，使统一的生成框架能够通过不同解码器输出多种 3D 表示。
 
@@ -145,7 +149,7 @@ $$\mathcal{L}_{CFM}(\theta) = \mathbb{E}_{t, \mathbf{x}_0, \epsilon} \lVert \mat
 
 整个框架的输入为文本提示或单张图像，输出可在约 10 秒内生成高质量的 3D Gaussians、辐射场或网格表示，并支持区域特定的无调参编辑（基于 Repaint 方法适配到两阶段流水线）。
 
-## 核心模块与公式推导
+
 
 ### 3.1 结构化潜在表示 (SLAT)
 
@@ -206,7 +210,9 @@ $$\mathcal{L}_{CFM}(\theta) = \mathbb{E}_{t, \mathbf{x}_0, \epsilon} \lVert \mat
 ![[assets/figures/papers/Structured_3D_Latents_for_Scalable_and_Versatile_3D_Generation_9feedf5ea34b/figures/006_Figure_5.jpg]]
 *Figure 5: Visual comparisons of generated 3D assets between our method and previous approaches, given AI-generated prompts*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -278,7 +284,9 @@ Figure 6和Table 9展示了用户研究结果。在文本到3D任务中，TRELLI
 ![[assets/figures/papers/Structured_3D_Latents_for_Scalable_and_Versatile_3D_Generation_9feedf5ea34b/figures/014_Table_7.jpg]]
 *Table 7: Ablation study on timestep sampling distributions*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心基线对比与谱系定位
 
@@ -322,6 +330,8 @@ TRELLIS 的设计带来了显著优势，但也划定了其适用边界和当前
 2.  **内蕴材质与光照解耦**：如何在训练过程中引入光照增强和物理渲染损失，迫使模型学习将外观解耦为PBR材质参数（如反照率、粗糙度、金属度）和环境光照，从而生成可重新打光的3D资产？
 3.  **大规模场景组合与内存效率**：当前方法主要针对单个物体生成。当用于组合大规模场景时，其稀疏体素结构的泛化能力和显存占用如何？是否需要设计层级化的稀疏策略或自适应的空间分辨率来支持场景级生成？
 4.  **精细编辑的潜力**：论文展示了区域级的几何编辑和资产变体生成。SLAT表示是否具备更细粒度的编辑能力，例如独立编辑物体的材质属性或局部光照效果？这可能需要将潜在空间进一步结构化或引入解耦表示学习技术。
+
+
 
 ## 原文 PDF
 

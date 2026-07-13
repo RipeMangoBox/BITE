@@ -43,7 +43,7 @@ claims:
 > - SD3.5-L 上，DreamSim (↓) 13.47 vs 14.81 (Naive Down.) (-1.34)；PSNR (dB↑) 14.457 vs 13.858 (Naive Down.) (+0.599)。
 > - FLUX.1-dev + TaylorSeer 上，Speedup (加速比↑) 3.05x vs 1.00x (HR参考) (+2.05x)。
 
-## 概述
+## 概要
 
 扩散模型的实际工作流中，用户通常需要针对多个提示词和随机种子反复生成高分辨率（HR）图像，以筛选出理想结果。这种“生成-筛选”循环中，每一轮全分辨率采样都消耗大量计算资源，成为制约效率的核心瓶颈。本文的核心观察是：**流匹配模型在采样早期即已捕获图像的全局结构**，因此可以在特定时间步对中间表示进行降采样，随后在低分辨率（LR）空间完成剩余采样，从而大幅降低计算量。然而，朴素的降采样会破坏LR与HR之间的感知一致性，导致预览结果在构图、物体尺寸乃至色彩上发生偏移。
 
@@ -62,7 +62,7 @@ $$[\mathbf{D}, v_\theta](x_t, t) \triangleq \mathbf{D} v_\theta(x_t, t) - v_\the
 
 **核心实验结果**：在FLUX.1-dev上，所提方法相比朴素降采样基线，DreamSim感知距离从9.20降至6.83，PSNR从18.221 dB提升至21.182 dB，同时计算量减少33%（1.53×加速）。与正交的时序加速方法TaylorSeer结合后，总加速比达到3.05×，且感知一致性指标（DreamSim 7.79, PSNR 19.953 dB）显著优于单独使用TaylorSeer（9.17, 18.667 dB），表明方法具有良好的可叠加性。消融实验进一步证实，交换子零引导模块对PSNR有约1.85 dB的决定性贡献，最优降采样矩阵选择策略亦明显优于最近邻或随机降采样。
 
-## 背景与动机
+
 
 ### 扩散模型工作流的效率瓶颈
 
@@ -98,7 +98,9 @@ Table 1 的实验证据表明，在 FLUX.1-dev 和 SD3.5-L 上，该交换子的
 
 通过上述设计，本文方法可在免训练条件下生成与 HR 原图感知高度一致的 LR 预览，从而支持用户以低成本快速筛选候选图像，待确定理想种子后再执行完整的 HR 生成。这一工作流在保持筛选可靠性的同时，显著降低了整体计算开销，为扩散模型的实用化部署提供了高效解决方案。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作提出**交换子零引导的预览生成**（Preview Generation with Commutator-Zero Guidance），在免训练条件下实现低分辨率预览与高分辨率原图之间的感知一致性，从而加速扩散模型的实际工作流。其核心创新围绕一个关键因果机制——**交换子零条件**（commutator-zero condition）——展开，并通过三个紧密耦合的**changed slots**予以实现。
 
@@ -141,7 +143,7 @@ $$x_t^{\downarrow, k+1} = x_t^{\downarrow, k} + \alpha \cdot \big( \mathbf{D}^* 
 
 本方法的核心区分在于：通过**交换子零条件**这一理论工具，首次在流匹配框架下建立了降采样操作与感知一致性之间的可优化桥梁，并以**降采样矩阵选择+固定点引导**的免训练方案实现，无需任何模型微调或额外训练数据。
 
-## 整体框架
+
 
 本文提出的**交换子零引导预览生成**方法，通过在高分辨率（HR）采样过程中引入一次降采样操作及后续的交换子零引导修正，在免训练条件下生成与HR图像感知一致的低分辨率（LR）预览。整体pipeline如Algorithm 1及Figure 3所示，包含五个核心模块。
 
@@ -203,7 +205,7 @@ $$x _ { t } ^ { \downarrow , k + 1 } = x _ { t } ^ { \downarrow , k } + \alpha \
 ![[assets/figures/papers/paper_list_l945_https_arxiv_org_abs_2604_09227/figures/004_Figure_3.jpg]]
 *Figure 3: Overall framework. (Left, Top) Overview of our proposed framework. Sampling is first performed in the high-resolution (HR) space up to timestep*
 
-## 核心模块与公式推导
+
 
 ### 问题形式化：预览生成与交换子零条件
 
@@ -280,7 +282,9 @@ $$x _ { t } ^ { \downarrow , k + 1 } = x _ { t } ^ { \downarrow , k } + \alpha \
 ![[assets/figures/papers/paper_list_l945_https_arxiv_org_abs_2604_09227/figures/008_Figure_5.jpg]]
 *Figure 5: Generalization of commutator-zero guidance. We show that commutator-zero guidance can be expanded to other operations. For warping, a large kernel (128 × 128) with correlation correction produces distortion, while our method effectively handles artifacts. For translation, na¨ıve cause noticeable difference and unintended objects, whereas ours preserves image content*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要定量结果
 
@@ -358,7 +362,9 @@ $$x _ { t } ^ { \downarrow , k + 1 } = x _ { t } ^ { \downarrow , k } + \alpha \
 ![[assets/figures/papers/paper_list_l945_https_arxiv_org_abs_2604_09227/figures/002_Figure_2.jpg]]
 *Figure 2: Comparison between SR-upsampled and directly generated HR images. Using FLUX.1-dev, we (a) generated a low-resolution (LR, 256 × 256) image followed by 4× superresolution (SR) to obtain a high-resolution (HR*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：扩散模型工作流的效率瓶颈
 
@@ -437,6 +443,8 @@ $$[\mathbf{D}, v_\theta](x_t, t) \triangleq \mathbf{D} v_\theta(x_t, t) - v_\the
 4. **视频生成扩展**：在视频扩散模型中，时空降采样与交换子零条件的交互更为复杂，方法的效率和一致性表现有待验证。
 
 5. **与其他加速范式的深度集成**：除TaylorSeer外，方法能否与蒸馏、量化、架构剪枝等加速技术协同，形成更全面的效率优化方案？
+
+
 
 ## 原文 PDF
 

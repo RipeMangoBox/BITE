@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/ReSplat_Degradation_agnostic_Feed_forward_Gaussian_Splatting_via_Self_guided_Residual_Diffusion.pdf
+project_link: null
+code_link: https://github.com/yh-yoon/ReSplat
 openreview_forum_id: 461VpgnLsi
 aliases:
 - ReSplat
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | ReSplat：基于自引导残差扩散的退化无关前馈式高斯泼溅 |
 | 英文题名 | ReSplat: Degradation-agnostic Feed-forward Gaussian Splatting via Self-guided Residual Diffusion |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=461VpgnLsi); [GitHub](https://github.com/yh-yoon/ReSplat) |
+| Links | [paper](https://openreview.net/forum?id=461VpgnLsi) · [GitHub](https://github.com/yh-yoon/ReSplat) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | ReSplat |
 | Dataset | LLFF degradation (Motion Blur), LLFF degradation (Snow), LLFF degradation (Haze), LLFF degradation (Low-light) |
@@ -41,7 +43,7 @@ claims:
 > - LLFF degradation (Snow) 上，PSNR (NV) 为 24.46，对比 24.24 (DiffUIR)，变化 +0.22。
 > - LLFF degradation (Haze) 上，PSNR (NV) 为 21.99，对比 21.56 (DiffUIR)，变化 +0.43。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -61,7 +63,7 @@ ReSplat 提出了一种退化无关的前馈式高斯泼溅框架，核心思路
 
 在LLFF退化数据集上，ReSplat在五种单一退化（模糊、雪、雾、低光、雨）的NVS和IR指标上均显著优于对比方法，相比DiffUIR的NVS PSNR提升0.22–0.89 dB。在混合退化场景下优势更为突出，雾+雪组合的NVS PSNR比DiffUIR提升**4.79 dB**。在DeblurNeRF、REVIDE、LLNeRF三个真实世界退化数据集上，ReSplat同样取得最优NVS结果。消融实验证实对齐模块和预过滤模块各自独立提升质量，联合使用达到最佳性能（PSNR 22.69），验证了两者的互补性。
 
-## 背景与动机
+
 
 新颖视角合成（Novel View Synthesis, NVS）旨在从稀疏的多视图图像中重建场景并渲染任意新视角，是计算机视觉与图形学中的核心任务。近年来，以3D高斯泼溅（3D Gaussian Splatting, 3DGS）为代表的可泛化前馈方法取得了显著进展，能够从多视图输入中一次性预测场景的显式3D高斯原语，实现高效、高质量的新视角渲染。然而，现有可泛化NVS方法普遍建立在一个隐含假设之上：输入的多视图图像是理想清晰的。这一假设在真实世界的应用中往往难以成立——图像采集过程不可避免地会遭受模糊、低光、雾、雨、雪等多种退化因素的影响。
 
@@ -71,7 +73,9 @@ ReSplat 提出了一种退化无关的前馈式高斯泼溅框架，核心思路
 
 针对上述问题，本文提出**ReSplat**（Restoration-based feed-forward Gaussian Splatting），一个退化无关的统一框架。其核心动机在于：将通用图像恢复扩散模型与前馈式高斯泼溅深度耦合，使得2D图像恢复和3D场景重建能够互为“自引导”信号——扩散采样过程中生成的3D高斯中心为多视图恢复提供几何锚点以约束一致性，而逐步净化的图像则去除高斯泼溅中的退化伪影，从而在无需退化类型先验的条件下实现鲁棒的NVS。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：从“特定退化”到“退化无关”的跨越
 
@@ -107,7 +111,7 @@ ReSplat的创新并非简单的模块拼接，而是在扩散采样循环内部�
 
 需要指出的是，扩散细化和迭代交互增加了计算与内存开销，推理速度可能不及纯前馈方案。此外，框架继承了3D高斯泼溅在镜面反射和透明度处理上的固有偏差，且性能依赖于预训练的通用恢复先验——尽管模块化设计允许未来替换更先进的恢复模型。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_461VpgnLsi/figures/002_Figure_2.jpg]]
 *Figure 2: The overall framework for degaradation-agnostic feed-forward gaussian splatting (GS). A diffusion-based image restoration model restores the original image by iteratively estimating the residual image. During this process, feed-forward GS is performed using the original image generated in the intermediate stages of diffusion sampling. By utilizing the Gaussian points information obtained in this process, the diffusion model receives multi-view information in the next diffusion step, enabling more accurate image restoration*
@@ -154,7 +158,7 @@ ReSplat 的 pipeline 由四个功能模块有机组成：
 
 > **注意**：扩散采样循环带来了额外的计算与内存开销，推理速度方面相对于纯前馈方案存在劣势，这是该框架在实际部署中需要权衡的因素。
 
-## 核心模块与公式推导
+
 
 ReSplat 的核心在于将残差扩散恢复模型与前馈高斯泼溅深度耦合，形成双向增强的推理循环。整体框架包含四个关键模块，其协同方式如下。
 
@@ -208,7 +212,9 @@ $$W_{\mathrm{final}}^i(x) = W_{\mathrm{pre}}^i(x) \cdot W^i(x)$$
 
 训练时（Algorithm 1），联合优化恢复模型 $\theta$ 和前馈 GS 模型 $\phi$，损失函数为残差图的 L1 损失与新视角渲染的 L1 损失之和。推理时（Algorithm 2），在扩散采样的每一步中：先用当前预测残差复原伪干净图像 $I_0^\theta = I_{in} - I_{res}^\theta$，将其送入 GS 模型预测高斯原语 $P_0^\phi$；高斯中心信息反馈给恢复模型用于下一步的多视图对齐。整个过程单次前馈即可输出 NVS 结果，无需退化类型先验。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果：合成退化场景
 
@@ -270,7 +276,9 @@ Table 4通过四个模型变体解耦了两个核心模块的独立与联合效�
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_461VpgnLsi/figures/011_Table_6.jpg]]
 *Table 6: Novel View Synthesis (NV) results of Snow corruption on the real-world desnowing dataset with three multi-view inputs. The best scores and second best scores are highlighted*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 
@@ -332,6 +340,8 @@ ReSplat 不同于此类方法的关键在于：它**显式地利用了2D图像�
 4. **分布外退化的泛化**：预过滤模块通过自注意力学习退化感知的可靠性图，但其训练数据覆盖的退化类型有限。在遇到未见过的退化组合（如雨+低光、雾+模糊等训练中未出现的混合退化）时，该模块能否保持鲁棒性？初步实验（Table 2 的混合退化结果）提供了积极信号，但更系统的分布外评估仍有待开展。
 
 5. **单视图退化场景的拓展**：当前方法依赖多视图输入来构建几何引导。在仅有一张退化图像的单视图场景下，自引导机制将失效。如何将框架适配到单视图退化NVS是一个值得探索的方向。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/FingerTip_20K_A_Benchmark_for_Proactive_and_Personalized_Mobile_LLM_Agents.pdf
+project_link: null
+code_link: https://github.com/tsinghua-fib-lab/FingerTip-20K
 openreview_forum_id: n3iFV0gLMc
 aliases:
 - F2B
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | FingerTip 20K：主动与个性化移动 LLM 智能体基准 |
 | 英文题名 | FingerTip 20K: A Benchmark for Proactive and Personalized Mobile LLM Agents |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=n3iFV0gLMc); [GitHub](https://github.com/tsinghua-fib-lab/FingerTip-20K) |
+| Links | [paper](https://openreview.net/forum?id=n3iFV0gLMc) · [GitHub](https://github.com/tsinghua-fib-lab/FingerTip-20K) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/planning_control |
 | Method | FingerTip 20K Benchmark |
 | Dataset | FingerTip 20K - Proactive Task Suggestion, FingerTip 20K - Personalized Task Execution |
@@ -42,7 +44,7 @@ claims:
 > - FingerTip 20K - Proactive Task Suggestion 上，Success Rate SR1 (%) 为 12.8 (Qwen-QVQ-Max, best generalist)，对比 30.3 (Human annotators)，变化 -17.5 (human superiority)。
 > - FingerTip 20K - Personalized Task Execution 上，Success Rate SR2 (%) 为 38.5 (UI-TARS-1.5-7B, best GUI-specialized)，对比 5.5 (GPT-4.1, generalist baseline)，变化 +33.0。
 
-## 概述
+## 概要
 
 移动设备上的大语言模型（LLM）智能体正逐渐成为人机交互的核心载体，然而现有智能体普遍仅能**被动执行用户的明确指令**，无法主动利用用户上下文与历史数据推测潜在意图并提供建议，同时也忽略了不同用户的个性化操作偏好。这一瓶颈的根源在于：当前移动 GUI 控制基准缺失丰富的用户相关信息，使得主动服务与个性化执行能力的评估和开发无从开展。
 
@@ -62,7 +64,7 @@ claims:
 
 综上，FingerTip 20K 为移动 LLM 智能体从“被动执行”迈向“主动服务与个性化适配”提供了首个系统性的评测基准与数据基础。
 
-## 背景与动机
+
 
 移动设备已成为人们日常生活的核心交互终端，用户频繁通过手机完成信息获取、社交互动、内容消费与生活服务等各类任务。近年来，基于大语言模型（LLM）的图形用户界面（GUI）智能体取得了显著进展，能够根据用户指令自动操作手机应用，展现出替代人工执行繁琐操作的潜力。然而，现有移动 LLM 智能体普遍存在两个根本性局限。
 
@@ -74,7 +76,9 @@ claims:
 
 为填补这一空白，本文提出 **FingerTip 20K** 基准，首次将**主动任务建议**与**个性化任务执行**纳入移动 LLM 智能体的评估体系。该基准的核心动机在于：通过系统性地采集和提供用户日常手机使用中的丰富上下文数据，驱动智能体从“被动执行者”向“主动、贴心的个人助理”演进。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FingerTip 20K 的核心创新在于将移动 LLM 智能体的能力边界从“被动执行明确指令”推至“主动理解用户意图并提供个性化服务”。这一转变通过两个相互关联的任务轨道实现，并在数据构建与任务设计上做出了四项关键改变。
 
@@ -125,7 +129,7 @@ FingerTip 20K 的核心创新在于将移动 LLM 智能体的能力边界从“�
 
 上述创新在当前阶段存在明显边界：所有模型的主动建议成功率仍远低于人类水平（最佳模型 12.8% vs 人类 30.3%），且 $Sim_2$ 指标上所有模型均接近 1，表明现有模型尚未真正通过上下文示例习得用户的个性化动作风格。这些缺口指向了下一阶段的核心挑战——如何设计更有效的融合机制与训练策略，使智能体真正“理解”而非“模仿”用户行为。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l16_https_openreview_net_forum_id_n3iFV0gLMc/figures/003_Figure_2.jpg]]
 *Figure 2: Demonstration of proactive task suggestion and personalized task execution*
@@ -173,7 +177,7 @@ $$A_{t+1}, O_{t+1}, AT_{t+1} = f ( U , I_{\mathrm{true}} , A_{\mathrm{history}} 
 
 数据采集流水线为任务形式化中的 $U$、$I_{\mathrm{history}}$、$A_{\mathrm{history}}$ 等关键变量提供了真实来源；任务形式化则直接决定了评估 prompt 的输入结构。微调实验进一步闭合了循环：使用采集数据对 Qwen-2.5-VL-7B 进行 LoRA 微调，验证了从数据到能力提升的因果链路——全量数据微调使主动建议 SR1 从 3.1% 跃升至 26.0%，个性化执行 Sim2 从 0.95 提升至 1.42（Table 5）。
 
-## 核心模块与公式推导
+
 
 ### 双轨任务设定
 
@@ -236,7 +240,9 @@ $$Sim_2 = S_I / S_{II}$$
 
 值得注意的是，所有基线模型在 $Sim_2$ 上均接近 1.0，表明现有模型即使看到历史动作示例，也未能有效提取并模仿用户的个性化操作风格——这是当前方法的一个显著瓶颈，也是该基准暴露出的核心开放问题。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果
 
@@ -327,7 +333,9 @@ Table 8 报告了微调模型在三种 out-of-domain 测试集上的表现：
 *Table 7: Details on FingerTip 20K train, validation and test splits. For each split, we report the number of episodes, the number of screenshots, the number of apps, and the number of intent categories it contains*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有移动 GUI 智能体基准的关系
 
@@ -360,6 +368,8 @@ FingerTip 20K 在移动 GUI 智能体基准谱系中占据一个此前未被覆�
 3. **多源上下文有机融合**：主动任务建议中，如何更有机地融合历史意图、用户画像、场景与实时屏幕信息，使预测接近人类水平？时间上下文被证实是最关键的要素，但其他要素的协同作用机制仍需深入探索。
 4. **双轨统一训练范式**：能否开发统一的训练范式，使同一模型同时兼具强大的主动意图预测与个性化执行能力，避免两轨道间的负迁移？这可能需要在架构层面或损失函数设计中显式建模两个子任务的共享与特异性。
 5. **长期用户行为建模**：该基准目前基于一个月的采集周期，未来能否扩展至更长期的行为建模（数月至数年），以捕捉更深层的习惯变化和偏好漂移？这将使主动服务从“即时意图预测”演进为“长期需求预判”。
+
+
 
 ## 原文 PDF
 

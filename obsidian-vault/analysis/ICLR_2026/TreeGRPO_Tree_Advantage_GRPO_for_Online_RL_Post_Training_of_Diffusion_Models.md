@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/TreeGRPO_Tree_Advantage_GRPO_for_Online_RL_Post_Training_of_Diffusion_Models.pdf
+project_link: https://treegrpo.github.io
+code_link: null
 openreview_forum_id: 3rZdp4TmUb
 aliases:
 - TreeGRPO
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | TreeGRPO：用于扩散模型在线RL后训练的树优势GRPO |
 | 英文题名 | TreeGRPO: Tree-Advantage GRPO for Online RL Post-Training of Diffusion Models |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=3rZdp4TmUb); [Project](https://treegrpo.github.io) |
+| Links | [paper](https://openreview.net/forum?id=3rZdp4TmUb) · [Project](https://treegrpo.github.io) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | TreeGRPO |
 | Dataset | HPS-v2.1训练 (单奖励), HPS-v2.1+ClipScore训练 (多奖励) |
@@ -41,7 +43,7 @@ claims:
 > - HPS-v2.1训练 (单奖励) 上，HPSv2.1↑ 为 0.3735，对比 所有对比方法 (见Table 1)，变化 优于所有基线。
 > - HPS-v2.1+ClipScore训练 (多奖励) 上，迭代时间 (s) 为 79.2，对比 DanceGRPO: 184.0，变化 2.3× faster。
 
-## 概述
+## 概要
 
 扩散模型的对齐训练面临一个关键瓶颈：现有GRPO方法在每次策略更新时都需要采样完整的去噪轨迹，导致样本效率低下；同时，终止奖励被均匀归因到所有去噪步骤，缺乏细粒度的信用分配。**TreeGRPO** 通过将去噪过程重构为搜索树来解决这一问题——在SDE窗口进行分支探索多条候选轨迹，在ODE步骤复用共享前缀，并利用从叶节点向根部回溯的奖励传播机制，为每条边计算步骤特定的优势信号。
 
@@ -49,7 +51,7 @@ claims:
 
 实验表明，TreeGRPO在HPS-v2.1单奖励训练中实现**2.4倍**的迭代加速（72.0s vs. DanceGRPO 173.5s），在HPSv2.1和Aesthetic指标上均优于所有对比基线；在多奖励训练（HPS-v2.1+ClipScore）中保持**2.3倍**加速，ImageReward达到1.3426，优于MixGRPO的1.2056。该方法在效率-性能权衡空间中建立了更优的帕累托前沿（见 **Figure 1**），其框架结构如 **Figure 2** 所示。
 
-## 背景与动机
+
 
 扩散模型和流匹配模型在文本到图像生成领域取得了显著进展，但其输出分布与人类偏好之间仍存在系统性偏差。为弥合这一差距，研究者将生成模型的迭代去噪过程形式化为马尔可夫决策过程（MDP），并引入在线强化学习进行后训练。具体而言，去噪轨迹 $\tau = (s_0, a_0, \ldots, s_T)$ 被视作一个决策序列，目标是最大化终端奖励的期望：
 
@@ -69,7 +71,9 @@ $$d \boldsymbol{x}_t = \left[ f_{\theta}(\boldsymbol{x}_t, t) + \frac{1}{2} \sig
 
 上述瓶颈共同制约了训练效率与生成质量的帕累托前沿。本文的核心动机在于：**去噪轨迹天然共享前缀，适合采用树搜索进行高效探索；而树结构中的奖励回溯能够为每条边提供精细的优势信号，从而克服轨迹级方法的根本限制。**
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 TreeGRPO 的核心创新在于将扩散模型的去噪过程重构为**树搜索**，从而同时解决现有 GRPO 方法的两大瓶颈：**样本效率低下**和**信用分配粗糙**。
 
@@ -119,7 +123,7 @@ TreeGRPO 的信用分配机制将树结构转化为精细的优势信号。流�
 
 TreeGRPO 在方法谱系中处于 **GRPO 系列** 的延伸位置，与 DanceGRPO、FlowGRPO、MixGRPO 等同期工作共享“将 GRPO 应用于扩散模型”这一技术路线。但其根本差异在于：**它不改进 GRPO 的损失函数或奖励设计，而是重构了采样和信用分配的基础结构**——将去噪过程从“轨迹采样”升级为“树搜索”。这一范式转换使其在训练效率上获得 2.4× 的加速，同时在多项对齐指标上建立更优的 Pareto 前沿。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l38_https_openreview_net_forum_id_3rZdp4TmUb/figures/004_Figure_2.jpg]]
 *Figure 2: Introduction of TreeGRPO: Our framework optimizes the denoising process of diffusion/flow models by constructing search trees. Starting from shared initial noise, it explores multiple trajectories by branching at intermediate steps, leveraging prefix reuse for step-wise advantages*
@@ -168,7 +172,7 @@ $$A = \sum_i w_i A_i$$
 
 整个 pipeline 的数据流是单向闭环的：**共享噪声 → 树结构采样（SDE 分支 + ODE 前缀）→ 叶节点奖励评估 → 自底向上优势传播 → 边级 GRPO 更新 → 更新后的策略用于下一轮采样**。这一设计从根本上改变了 GRPO 在扩散模型中的信用分配方式——从轨迹级均匀归因转变为基于树结构的步骤级差异化信号。
 
-## 核心模块与公式推导
+
 
 TreeGRPO 将扩散/流模型的去噪过程重构为一棵搜索树，通过**前缀复用**提升样本效率，并利用**奖励回溯**实现步骤级信用分配。其核心由四个模块串联构成，对应算法流程 Algorithm 1。
 
@@ -214,7 +218,9 @@ $$ \mathcal{L}_{\mathrm{GRPO}}(\theta) = -\sum_{t \in \mathcal{W}} \sum_{e \in \
 
 在多奖励训练场景下，TreeGRPO 为每个奖励模型独立计算叶节点优势 $A_1, A_2$，然后通过加权求和得到合并优势 $A = \sum_i w_i A_i$（例如 HPSv2.1 与 ClipScore 按 0.8:0.2 加权），再将合并优势按上述传播机制回传到树结构中。这种**优势加权求和**策略相比直接奖励相加，在各指标上实现了更好的平衡（详见 Table 2 消融）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验：单奖励训练
 
@@ -276,7 +282,9 @@ Table 4 比较了四种推理时的采样策略，其中随机窗口策略的参
 
 4. **奖励模型依赖性**：所有实验基于特定的预训练奖励模型（HPS-v2.1、ClipScore 等），TreeGRPO 的性能优势依赖于这些奖励模型的质量和与人类偏好的对齐程度。若奖励模型存在系统性偏差，树结构的信用分配可能放大该偏差。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位与核心瓶颈
 
@@ -315,6 +323,8 @@ TreeGRPO的效率提升具有明确的理论基础。从方差缩减角度看，
 3. **跨模态扩展**：该框架在视频生成（时序一致性约束下的长序列去噪）和3D生成（多视图一致性约束）等更复杂领域的适用性如何？树结构设计是否需要针对这些领域的特定结构先验进行调整？
 
 4. **多奖励融合的优化**：当前多奖励训练采用固定的优势加权求和（0.8:0.2），是否存在更优的自适应权重分配策略，以在不同训练阶段或不同提示类型下动态平衡多个奖励目标？
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/SimuHome_A_Temporal_and_Environment_Aware_Benchmark_for_Smart_Home_LLM_Agents.pdf
+project_link: null
+code_link: https://github.com/holi-lab/SimuHome/
 openreview_forum_id: LCS1WsGvha
 aliases:
 - SimuHome
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | SimuHome：面向智能家居LLM智能体的时态与环境感知基准 |
 | 英文题名 | SimuHome: A Temporal- and Environment-Aware Benchmark for Smart Home LLM Agents |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=LCS1WsGvha); [GitHub](https://github.com/holi-lab/SimuHome/) |
+| Links | [paper](https://openreview.net/forum?id=LCS1WsGvha) · [GitHub](https://github.com/holi-lab/SimuHome/) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/planning_control |
 | Method | SimuHome（时态加速智能家居模拟器与基准） |
 | Dataset | QT1-F (状态查询-可行), QT3-F (显式设备控制-可行), QT4-1-F (时间调度-可行), QT4-2-F (事件调度-可行) |
@@ -41,7 +43,7 @@ claims:
 > - QT3-F (显式设备控制-可行) 上，Success Rate 为 GPT-5.1 86%，对比 GPT-4.1 84%，变化 +2%。
 > - QT4-1-F (时间调度-可行) 上，Success Rate 为 GPT-5.1 60%，对比 GPT-4.1 26%，变化 +34%。
 
-## 概述
+## 概要
 
 **核心问题：** 当前LLM智能体在智能家居环境中面临一个根本性瓶颈——工作流调度（workflow scheduling）任务要求模型对多设备的时序依赖进行前瞻性规划，而现有模型在此类任务上的成功率远低于简单的设备控制，且具备强推理能力的模型延迟过高，难以满足实时交互需求。
 
@@ -51,7 +53,7 @@ claims:
 
 **主要结果：** 在600个人工验证的评估用例上，GPT-5.1在状态查询（QT1-F）和显式设备控制（QT3-F）上分别达到100%和86%的成功率，但在时间调度（QT4-1-F）上仅60%，协同调度（QT4-3-F）仅56%。推理模型GPT-5.1在调度任务上大幅领先非推理模型（如在QT4-1-IF上高出88个百分点），但其推理时间是非推理模型的3-5倍，使其实时部署不现实。超过40%的QT3成功案例通过即时反馈纠正了初始错误，而调度任务中自主纠错几乎不可能（自检恢复率低至0-8%）。
 
-## 背景与动机
+
 
 ### 智能家居智能体的核心挑战：从设备控制到时序规划
 
@@ -77,7 +79,9 @@ SimuHome论文的核心发现揭示了当前LLM智能体在智能家居场景中
 
 SimuHome通过0.1秒时间片（tick）的连续状态更新机制、基于Matter协议的17种设备类型建模、以及600个经人工验证的评估用例，系统性地填补了现有基准在时序推理和环境感知方面的空白，为诊断LLM智能体在动态规划中的根本弱点提供了实验基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SimuHome的核心创新在于将智能家居LLM智能体的评估从静态设备控制推向**动态环境下的时序推理与工作流调度**。与现有基准相比，SimuHome在四个关键维度上实现了系统性突破。
 
@@ -102,7 +106,7 @@ SimuHome的时间加速模拟使得这些调度任务的结果可以立即验证
 
 传统基准通常仅包含可行任务，而SimuHome为每种查询类型均设计了不可行变体，涵盖三类场景：资源缺失（如请求不存在的设备）、物理极限（如要求温度超出设备能力范围）和时间冲突（如调度时间已过）。这要求智能体不仅能够执行任务，还必须具备**识别不可行性并解释原因**的元认知能力。在QT4-1-IF上，GPT-4.1的成功率仅为12%，而GPT-5.1达到100%，两者差距高达88个百分点（Table 1），凸显了推理能力在不可行性判断中的决定性作用。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_LCS1WsGvha/figures/001_Figure_1.jpg]]
 *Figure 1: The SimuHome home environment. Agents receive user commands, issue API calls built on the Matter protocol to operate devices, and observe the resulting state changes*
@@ -140,7 +144,7 @@ SimuHome 是一个面向智能家居 LLM 智能体的时态加速模拟器与基
 
 SimuHome 相对于现有基准（如 HomeBench、Sasha、SAGE）的核心差异在于：环境变量随时间连续演化而非离散静态；操作依赖强制执行；引入工作流调度评估维度；以及覆盖不可行请求的识别与解释能力。这些设计共同揭示了当前 LLM 智能体在动态时序规划中的瓶颈——显式设备控制可通过即时工具反馈纠错，而工作流调度因反馈延迟和缺乏预演环境导致频繁失败。
 
-## 核心模块与公式推导
+
 
 ### 智能家居环境建模
 
@@ -194,7 +198,9 @@ $$c_i = \begin{cases} 500 & \text{if } i \text{ is an on/off light and is on}, \
 
 不可行用例的生成遵循三种模式：请求不存在的资源（如“打开不存在的加湿器”）、超出物理极限（如“将温度降至室外基线以下且无空调”）、时间冲突（如“在已占用时段安排新任务”）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：推理模型在调度任务上的绝对优势与效率困境
 
@@ -241,7 +247,9 @@ Table 1 汇总了18个LLM在6种查询类型（QT1-QT4-3）可行（F）与不�
 
 **多轮交互的边际收益有限。** 多轮交互提供额外上下文仅将QT2-F成功率从44%提升至最多50%（Appendix N），且智能体极少主动请求澄清。这暴露了模型在情景模糊性识别上的根本不足——即使给予对话空间，模型也缺乏主动诊断不确定性的元认知能力。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有智能家居基准的关系
 
@@ -283,6 +291,8 @@ SimuHome 的设计本身指向了若干待解决的研究问题：
 - **模拟到现实的迁移**：如何将确定性模拟器中习得的策略与真实物理环境中的不确定性（传感器噪声、设备延迟、环境扰动）相结合，是安全部署的前提。
 - **持续学习与外部记忆**：在动态环境中，智能体需要从失败中学习并适应变化。引入外部记忆模块或在线学习机制是否能提升错误恢复能力，值得探索。
 - **多智能体与跨住宅扩展**：当前基准为单智能体单住宅设定。扩展到多用户偏好冲突、跨住宅场景将引入更复杂的社会推理维度。
+
+
 
 ## 原文 PDF
 

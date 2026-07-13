@@ -45,7 +45,7 @@ claims:
 > - 训练效率 上，Training Time per step (s/step) 11 vs 24 (w/o dropout) (-54%)。
 > - 推理效率 上，Inference Time per image (s/img) 2.2 vs 4.6 (w/o dropout) (-52%)。
 
-## 概述
+## 概要
 
 ### 问题背景与瓶颈
 
@@ -67,7 +67,7 @@ GaC 属于基于重建的场景视频生成方法，与 **ViewCrafter**（Yu et 
 
 当前方法对人体和复杂主体的生成效果仍然有限，部分室外场景在大幅视点外推时可能出现边界纹理变暗的伪影。在前后往复长距离轨迹上，所有方法的性能均有明显下降，GaC 虽表现最优但仍存在3D一致性退化。该方法依赖预先计算的相机轨迹，尚未支持实时交互场景生成。未来方向包括扩展几何上下文的表示能力（如引入语义信息或3DGS）、利用更长序列和更大模型增强长距离3D记忆，以及探索与实时SLAM系统的结合以实现交互式探索。
 
-## 背景与动机
+
 
 ### 场景一致性视频生成的核心挑战
 
@@ -102,7 +102,9 @@ $$\{G_i, I_{i+1}', I_{i+1}\} = \varrho(\{I_i, G_i, I_{i+1}'\}, P_{i+1})$$
 
 简言之，GaC 的动机在于：**用可微分的生成模型替代不可微的重建算子，将显式几何从“中间产物”升级为“调制上下文”，从而在保留3D先验的同时打通端到端训练的路径。**
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GaC 的核心创新在于将传统基于重建的场景视频生成流水线中**不可微分的几何重建与绘制算子替换为单一的可微分自回归生成模型**，从而实现了端到端优化，从根本上缓解了累积误差问题。这一创新通过三个关键的 **changed slots** 体现：
 
@@ -128,7 +130,7 @@ CGA 将 Plücker 射线特征与查询向量相加后投影，生成残差查询
 
 为平衡 3D 一致性与计算效率，GaC 提出了**几何 Dropout** 策略：训练时随机丢弃几何上下文，使模型既能从几何建模中学习场景一致性，又能在推理时仅生成 RGB 图像，避免不必要的几何输出。该策略将训练迭代时间从 24 s/step 降至 11 s/step（−54%），推理时间从 4.6 s/img 降至 2.2 s/img（−52%），且性能几乎无下降（Table 6）。
 
-## 整体框架
+
 
 Geometry-as-Context (GaC) 的核心动机在于消除传统基于重建的场景视频生成流水线中，由非可微分算子（反投影、渲染）与独立修复网络所导致的累积误差。原始流水线（Algorithm 1）采用串行结构：首先从当前图像 $I_i$ 估计几何信息 $G_i = \epsilon(I_i)$，随后通过反投影得到三维表示 $3D = \mathrm{Unproject}(I_i, G_i)$，再根据目标相机姿态 $P_{i+1}$ 渲染出新视角图像 $I_{i+1}' = \mathrm{Render}(3D, P_{i+1})$，最后交由生成模型 $\varrho$ 进行修复得到最终图像 $I_{i+1} = \varrho(I_{i+1}', P_{i+1})$。这一流程中，几何估计器 $\epsilon$ 与渲染算子均为黑盒模块，无法与生成模型联合优化，导致几何误差在迭代中逐帧放大。
 
@@ -161,7 +163,7 @@ $$O = \mathrm{Linear}_3(O * \sigma(Gate))$$
 ![[assets/figures/papers/paper_list_l2506_https_arxiv_org_abs_2602_21929/figures/002_Figure_2.jpg]]
 *Figure 2: Reconstruction-based scene video generation (a) v.s. our geometry-as-context (GaC) (b). Reconstruction-based scene video generation uses non-differentiable operators in reconstruction, which tend to worsen cumulative errors caused by inaccurate geometry estimates or image inpainting. In contrast, GaC replaces these operations with camera-controllable generation, turning reconstructionbased scene video generation into an autoregressive video generation framework with one single DiT. It can effectively reduce cumulative errors caused by non-differentiable reconstruction and non-end-to-end training*
 
-## 核心模块与公式推导
+
 
 ### 问题形式化：从多阶段重建到统一生成
 
@@ -242,7 +244,9 @@ $$O = \mathrm{Linear}_3(O * \sigma(Gate))$$
 
 训练阶段引入**几何 Dropout 策略**：随机丢弃输入序列中的几何上下文，使模型学会在缺乏显式几何的情况下仍能保持场景一致性，同时大幅缩短序列长度。Table 6 显示，该策略将训练迭代时间从 24 s/step 降至 11 s/step（-54%），推理时间从 4.6 s/img 降至 2.2 s/img（-52%），而生成质量几乎无退化。推理时可通过省略 `<Geometry>` 提示跳过几何输出，仅生成 RGB 图像，进一步提升效率。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果：单视图场景视频生成
 
@@ -320,7 +324,9 @@ Figure 9 展示了典型失败案例。模型在以下场景中表现受限：
 ![[assets/figures/papers/paper_list_l2506_https_arxiv_org_abs_2602_21929/figures/011_Figure_5.jpg]]
 *Figure 5: Gac’s results on indoor scenes*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题域定位：场景一致性视频生成的三条技术路线
 
@@ -407,6 +413,8 @@ GaC 需要预先给定相机轨迹，不支持实时交互式场景探索。这�
 4. **与实时系统的融合**：将 GaC 的端到端可微分生成能力与实时 SLAM 或 3DGS 系统结合，可能实现交互式场景探索中的高质量新视角生成。
 
 5. **训练序列长度的规模化**：当前训练序列长度有限，更长的序列和更大的模型是否能进一步增强三维记忆能力，是一个值得探索的规模化问题。
+
+
 
 ## 原文 PDF
 

@@ -42,7 +42,7 @@ claims:
 > [!tip] 效果简介
 > - Human3.6M 上，PE N-MPJPE (mm) 39.41 (Superman w/ MAFT) vs 44.77 (HiC) (-5.36)；PE MPJPE (mm) 51.61 (Superman w/ MAFT) vs 53.86 (HiC) (-2.25)；MP Avg MPJPE (mm) 26.13 vs 26.66 (HiC) (-0.53)。
 
-## 概述
+## 概要
 
 ### 问题背景与瓶颈
 
@@ -70,7 +70,7 @@ Superman 在 Human3.6M 基准上取得了全面领先的性能：
 
 Superman 在方法谱系中占据独特位置：它既不同于仅做感知或仅做生成的传统模型，也超越了仅处理单帧的 MLLM 方案。通过视觉引导的跨模态运动标记器和统一的条件序列生成框架，Superman 首次将视频感知、骨架建模和运动生成纳入同一 MLLM 架构，为人体运动分析提供了一个端到端、多任务统一的范式。
 
-## 背景与动机
+
 
 ### 领域碎片化：感知与生成的割裂
 
@@ -95,7 +95,9 @@ Superman 在方法谱系中占据独特位置：它既不同于仅做感知或�
 
 这一设计使得Superman在Human3.6M基准上的3D姿态估计相比当前最先进的多任务感知方法**HiC**（Liu et al., ArXiv 2025）取得了11.97%的显著改进，同时在运动预测和中间帧生成任务上保持了领先水平，首次证明了单一模型在人体运动感知与生成全任务上达到最优性能的可行性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Superman 的核心创新在于通过**视觉引导的运动标记器（Vision-Guided Motion Tokenizer, VGMT）** 及其**混合码本（Hybrid Codebook）**，将人体运动建模从“骨架孤岛”拉回到“视觉-骨架联合空间”，并以此为基础，用一个单一的 MLLM 架构统一了感知与生成任务。
 
@@ -119,7 +121,7 @@ $$\hat{\mathbf{Z}}_{\mathrm{grid}} = \mathbf{VSA}(\mathbf{Z}_{\mathrm{grid}}, \m
 
 MAFT 仅增加不到 0.2% 的额外参数，却带来显著的感知性能提升——在 Human3.6M 上，Superman with MAFT 的 N-MPJPE 达到 39.41 mm，相比当前最优的多任务感知方法 HiC 降低 5.36 mm（11.97% 相对改进），验证了视觉-骨架跨模态融合在感知任务中的关键作用。
 
-## 整体框架
+
 
 Superman 将人体运动感知与生成统一为一个**条件序列生成**问题，其核心 pipeline 由两个解耦的阶段构成：首先通过视觉引导的运动标记器（Vision-Guided Motion Tokenizer, VGMT）将连续的高维运动数据压缩为离散的语义标记序列，随后由单一的多模态大语言模型（MLLM）以自回归方式预测这些运动标记，从而同时完成 3D 姿态估计、运动预测和运动中间帧生成三项任务。
 
@@ -157,7 +159,7 @@ $$\hat{\mathbf{Z}}_{\mathrm{grid}} = \mathbf{VSA}(\mathbf{Z}_{\mathrm{grid}}, \m
 ![[assets/figures/papers/paper_list_l25_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Superman_Unifying/figures/001_Figure_1.jpg]]
 *Figure 1: A Unified Framework for Human Motion Perception and Generation. Our unified model achieves state-of-the-art performance across three traditionally disparate tasks. Our method consistently outperforms existing methods across all tasks simultaneously: (1) 3D Pose Estimation, (2) Motion Prediction, and (3) Motion In-betweening*
 
-## 核心模块与公式推导
+
 
 Superman 的核心由两个阶段构成：**视觉引导运动标记器（Vision-Guided Motion Tokenizer, VGMT）** 将连续运动序列离散化为语义标记，**多模态大语言模型（MLLM）** 以自回归方式预测这些标记来统一执行多项运动任务。
 
@@ -220,7 +222,9 @@ MLLM（基于 Qwen2.5-VL-7B）将所有任务重新定义为条件序列生成�
 ![[assets/figures/papers/paper_list_l25_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Superman_Unifying/figures/003_Figure_2.jpg]]
 *Figure 2: Architecture of our Vision-Guided Motion Tokenizer (VGMT). VGMT creates discrete motion vocabulary by jointly fusing information from two modalities. A Skeleton Encoder (Es) captures geometry while a Visual-Skeleton Attention (VSA) module and a subsequent Visual Encoder (Ev) ground the pose in visual features. The fused representation is quantized against a learnable hybrid codebook, and a decoder reconstructs the 3D poses*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验：Human3.6M 基准上的综合性能
 
@@ -283,7 +287,9 @@ Superman 在 Human3.6M 数据集上统一评估了三维姿态估计（PE）、�
 ![[assets/figures/papers/paper_list_l25_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_Superman_Unifying/figures/011_Table_5.jpg]]
 *Table 5: Computation efficiency*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系定位
 
@@ -337,6 +343,8 @@ Table 1 系统对比了现有模型在感知与生成能力上的覆盖范围。
 **（3）多人场景与交互建模的扩展。** 当前框架以单人运动序列为核心设计，码本中的每个标记对应单个时间窗口内的单人姿态。扩展到多人场景需要解决个体身份保持、交互关系建模、以及码本容量随人数增长而指数膨胀的问题。
 
 **（4）MLLM 推理效率的优化。** 在实时应用场景中，能否通过知识蒸馏、模型量化或推测解码等技术降低 MLLM 的推理延迟，同时保持统一框架的性能优势，是推动该方法走向实际部署的关键问题。
+
+
 
 ## 原文 PDF
 

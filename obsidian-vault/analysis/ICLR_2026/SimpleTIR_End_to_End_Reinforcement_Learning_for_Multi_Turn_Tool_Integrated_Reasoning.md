@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/SimpleTIR_End_to_End_Reinforcement_Learning_for_Multi_Turn_Tool_Integrated_Reasoning.pdf
+project_link: null
+code_link: null
 openreview_forum_id: EplNy91Xqh
 aliases:
 - SimpleTIR
@@ -41,7 +43,7 @@ claims:
 > - MATH500 上，Accuracy (pass@32) 为 88.4 (SimpleTIR-7B)，对比 80.2 (ZeroTIR-7B)，变化 +8.2。
 > - AIME25 上，Accuracy (pass@32) 为 30.9 (SimpleTIR-7B)，对比 25.0 (ZeroTIR-7B)，变化 +5.9。
 
-## 概述
+## 概要
 
 **问题瓶颈**：多轮工具集成推理（TIR）训练中，来自外部工具（如代码解释器）的反馈分布与模型预训练数据分布严重不一致，引发分布漂移。这种漂移在后续轮次中不断累积，导致模型生成 token 的概率极低，进而诱发策略梯度爆炸和信用分配错乱，使训练稳定性崩溃、性能骤降。
 
@@ -51,7 +53,7 @@ claims:
 
 **主要结果**：在 Qwen2.5-7B 基座上，SimpleTIR 将 AIME24 得分从朴素多轮训练的 20.8 提升至 50.5，MATH500 从 73.1 提升至 88.4。在 Qwen2.5-32B 上，AIME24 得分达到 59.9。训练过程中梯度范数几乎无尖峰，显著优于基于低概率 token 或高重要性比率的 token 级过滤方法（后者均出现 NaN 梯度或训练崩溃）。
 
-## 背景与动机
+
 
 ### 工具集成推理的零 RL 训练瓶颈
 
@@ -79,7 +81,9 @@ claims:
 
 基于上述观察，本文的核心动机是：**设计一种简单、即插即用的轨迹级过滤策略，通过检测并排除包含空轮次的完整轨迹，从根本上阻断低概率 token 对策略更新的污染，从而实现多轮 TIR 零 RL 训练的稳定化。** 这一策略无需修改奖励函数、无需调整优化器，也无需引入额外的正则化项，仅通过改变训练数据的构成即可达成目标。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SimpleTIR 的核心创新在于**通过轨迹级过滤解决多轮工具集成推理（TIR）中由分布漂移引发的训练崩溃问题**。与现有方法在 token 级别进行干预不同，SimpleTIR 直接识别并移除包含“空轮次”（void turn）的完整轨迹，从根本上消除导致梯度爆炸的病理信号。
 
@@ -108,7 +112,7 @@ SimpleTIR 的关键洞察是：**空轮次是低概率 token 累积和高生成�
 
 消融实验直接验证了这一创新的有效性：移除空轮次过滤后（Naive Multi-Turn），AIME24 得分从 50.5 暴跌至 20.8，MATH500 从 88.4 降至 73.1，且出现频繁的梯度爆炸（Table 2）。基于低概率 token 或高重要性比率的 token 级过滤方法则因 NaN 梯度而提前停止训练，AIME24 分数分别仅为 23.3 和 26.3（Figure 7）。这些结果表明，空轮次过滤是稳定多轮 TIR 零 RL 训练的充分且必要条件。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_EplNy91Xqh/figures/008_Figure_4.jpg]]
 *Figure 4: An overview of SIMPLETIR. During the policy update, SIMPLETIR identifies and filters out entire Emergent Multi-Turn Reasoning Patternstrajectories that contain a void turn—an LLM response that fails to produce either a complete code block or a final answer*
@@ -129,7 +133,7 @@ $$\mathcal{J}_{\text{TIR}}(\theta) = \mathbb{E}_{\{o_i\}_{i=1}^G \sim \pi_{\thet
 
 整个框架的模块关系如 **Figure 4** 所示：rollout 生成轨迹 → 空轮次检测 → 轨迹级过滤 → 掩码 GRPO 更新。这一流程无需修改底层 RL 算法或奖励模型，仅通过在策略更新前插入一个轻量级过滤步骤，即可将多轮 TIR 训练从梯度爆炸和性能崩溃中挽救出来。
 
-## 核心模块与公式推导
+
 
 ### 多轮 TIR 的形式化建模
 
@@ -176,7 +180,9 @@ $$\|\nabla_{\mathbf{z}_t} \mathcal{J}_{TIR}\|_2 = \frac{m_{i,t}}{\sum_j m_{i,j}}
 
 这一设计直接切断了低概率 token 通过梯度范数传导的路径——含空轮次的轨迹通常对应着 token 概率已崩溃的病理序列，将其从更新中移除，等价于从根源上消除了无界比率和持续高概率分布项的破坏性影响。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -237,7 +243,9 @@ SimpleTIR 的训练稳定性不仅带来了性能提升，还催生了更丰富�
 - **图 5**：轮次扩展与消融训练曲线——SimpleTIR 从 1 轮扩展至 10 轮持续受益，消融方法均出现梯度爆炸或 NaN。
 - **表 3**：推理模式频率对比——SimpleTIR 展现出更强的逐步推理和自我纠错能力。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与因果机制
 
@@ -290,6 +298,8 @@ SimpleTIR 开启了若干值得进一步探索的方向：
 - **超长轮次扩展**：如何将训练扩展到 10 轮以上，同时保持高效且稳定的 rollout 与奖励计算？异步 rollout 和奖励计算解耦可能是一个有前景的方向。
 
 - **更大规模验证**：在更大规模模型（>70B）和更多样化的预训练基座上，SimpleTIR 的稳定性和增益是否仍然保持？当前实验覆盖 Qwen2.5-7B/32B 和 Qwen3-4B，更大规模的验证仍是开放问题。
+
+
 
 ## 原文 PDF
 

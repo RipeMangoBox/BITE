@@ -42,7 +42,7 @@ claims:
 > - T2I-COMPBENCH 上，Color Acc. (↑) 0.91 (Qwen+RewardFlow) vs 0.83 (Qwen Image) (+0.08)。
 > - GENEVAL 上，Overall score (↑) 0.91 (Qwen+RewardFlow) vs 0.83 (Qwen Image) (+0.08)。
 
-## 概述
+## 概要
 
 现有的反转自由（inversion-free）图像编辑和生成方法虽然避免了耗时的潜变量反转，却普遍面临一个核心瓶颈：**缺乏细粒度的空间控制与身份保持**，导致内容漂移、语义泄漏以及弱对象定位。这类方法丢失了原始图像的忠实潜在表示，仅依赖粗糙或单一的奖励信号，无法协调多种异质目标。
 
@@ -57,7 +57,7 @@ claims:
 
 方法的主要局限在于 VQA 模型在细粒度推理（如精确计数）上的不足会直接导致奖励信号失效，且 KL tether 在极端编辑指令下仍可能出现布局扭曲。
 
-## 背景与动机
+
 
 扩散模型与流匹配模型已在文本条件图像生成领域取得了显著进展，催生了 DALL·E 2 、DALL·E 3 等代表性系统。然而，在实际应用中，用户往往需要在已有图像基础上进行局部编辑，而非从零生成——例如替换特定物体的颜色、调整空间关系或添加新元素。这要求模型具备**精确的空间控制**与**可靠的身份保持**能力。
 
@@ -67,7 +67,9 @@ claims:
 
 RewardFlow 正是针对上述瓶颈提出的一种**反演自由、多奖励引导**的推理时优化框架。其核心思想是将多种可微分奖励——包括全局语义、感知相似度、区域掩码一致性、人类偏好以及基于视觉问答的细粒度语义奖励——融合为统一的朗之万动力学引导信号，并通过**提示感知自适应策略**动态协调各奖励的权重与步长，从而在纯推理阶段实现对生成轨迹的精确控制。这一设计使得 RewardFlow 能够在无需任何训练或反演的条件下，同时达成局部精确编辑、语义一致性与身份保持。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 RewardFlow 的核心创新在于将**多奖励朗之万动力学**与**提示感知自适应策略**深度融合，构建了一个无需反转（inversion-free）、纯推理时优化的图像编辑与生成框架。与现有方法相比，RewardFlow 在三个关键维度上实现了突破性变革。
 
@@ -110,7 +112,7 @@ $$z^{(k+1)} = z^{(k)} + \eta_k \bigl( f_k + g_{R_{\mathrm{tot}},k} + g_{\mathrm{
 
 其中 $f_k$ 为骨干模型漂移，$g_{R_{\mathrm{tot}},k}$ 为自适应加权的多奖励梯度，$g_{\mathrm{KL},k}$ 为 KL tether 梯度。全组件启用时，RewardFlow 在 PIE-Bench 上达到最佳 Distance 7.64、PSNR 32.09、SSIM 90.21（Table 4），且梯度精确集中在目标物体轮廓（Figure 5），证明了多奖励引导、自适应调度与身份保持三者缺一不可的协同关系。
 
-## 整体框架
+
 
 RewardFlow 是一种推理时、无需训练的生成与编辑框架，其核心思想是将扩散/流匹配模型的反向去噪过程重新解释为一系列测试时优化步骤，每一步都通过可微分奖励的梯度来引导潜变量的演化。整个流水线围绕四个关键模块构建，形成从语义理解到精确潜变量更新的闭环。
 
@@ -146,7 +148,7 @@ RewardFlow 的核心是一个离散化的反向朗之万动力学循环。在每
 ![[assets/figures/papers/paper_list_l2701_https_arxiv_org_abs_2604_08536/figures/013_Figure_9.jpg]]
 *Figure 9: Overview of the RewardFlow framework*
 
-## 核心模块与公式推导
+
 
 RewardFlow 在推理阶段将去噪过程转化为多奖励测试时优化，其核心由四个模块级联构成：**多奖励梯度映射**、**提示感知自适应策略**、**身份保持 KL tether** 以及**朗之万动力学更新**。以下逐一展开关键公式与机制。
 
@@ -203,7 +205,9 @@ $$R_{\mathrm{vqa}} = -\frac{1}{T}\sum_{t=1}^{T}\Big[ \log p_t[a_t^\star] + \lamb
 ![[assets/figures/papers/paper_list_l2701_https_arxiv_org_abs_2604_08536/figures/008_Figure_5.jpg]]
 *Figure 5: Gradient localization across reward combinations. Including all rewards concentrates gradients to accurate object contours and eliminates leakage*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -272,7 +276,9 @@ RewardFlow 在两个主流基准上均取得最先进的编辑与生成精度。
 ![[assets/figures/papers/paper_list_l2701_https_arxiv_org_abs_2604_08536/figures/014_Figure_11.jpg]]
 *Figure 11: Reward progression over time*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有训练自由编辑方法的关系
 
@@ -310,6 +316,8 @@ RewardFlow 的关键差异化变量体现在三个层面：
 3. **多模态扩展**：当前框架针对文本引导的图像编辑与生成设计，是否可推广至视频编辑（需处理时序一致性）或多模态条件（如音频、草图、深度图）编辑场景？朗之万动力学框架在理论上支持任意可微分奖励的融合，但实际部署需解决跨模态奖励的同步与权重协调问题。
 4. **VQA 奖励的鲁棒性提升**：如何提高 VQA 奖励对组合性和计数的鲁棒性？可能的路径包括集成更强的视觉推理模型、设计专门的计数奖励模块，或通过多轮 VQA 验证增强信号可靠性。
 5. **与基于优化的编辑器的融合**：RewardFlow 的奖励框架是否可与需要额外优化的编辑器（如基于文本嵌入优化的方法）协同工作，以结合两者的优势？
+
+
 
 ## 原文 PDF
 

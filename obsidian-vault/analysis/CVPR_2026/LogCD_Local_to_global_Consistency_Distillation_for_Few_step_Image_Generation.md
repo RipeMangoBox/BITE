@@ -44,7 +44,7 @@ claims:
 > - MSCOCO-2017 5K 上，CLIP Score 33.5 (LogCM 3-step) vs 33.5 (SDXL teacher 25-step, est.) (comparable)；Image Reward 0.95 (LogCM 3-step) vs 0.90 (SDXL teacher 25-step, est.) (+0.05)；CLIP Score 32.6 (LogCM 4-step on FLUX.1-dev) vs 32.6 (FLUX.1-dev teacher 25-step, est.) (comparable)。
 > - MJHQ-5K 上，CLIP Score 35.2 (LogCM 3-step) vs - (-)。
 
-## 概述
+## 概要
 
 扩散模型与基于流的生成模型在文本到图像合成中取得了显著成功，但其迭代采样过程导致推理速度缓慢，限制了实际部署。现有加速方法在减少采样步数的同时，往往面临图文对齐能力下降、训练资源需求过大或性能严重退化等问题。特别是在2–4步的极低步数区间，如何在保持生成质量与图文一致性的前提下实现高效蒸馏，仍是一个未充分解决的瓶颈。
 
@@ -52,7 +52,7 @@ claims:
 
 在SDXL架构上，3步采样的**LogCM**在MSCOCO-2017 5K上达到**33.5 CLIP Score**，与25步教师模型相当，并超越多数4步SOTA方法；在MJHQ-5K上达到35.2 CLIP Score。在FLUX.1-dev上，4步LogCM同样取得了与25步教师模型可比的性能。消融实验表明，局部一致性蒸馏奠定了性能基础，而全局一致性蒸馏中的GAN损失和DMD损失分别带来了显著的图文对齐与视觉质量增益。
 
-## 背景与动机
+
 
 扩散模型已成为文本到图像生成的主流范式，但其迭代采样机制导致推理速度缓慢。以SDXL为例，单张1024×1024图像生成需25步去噪，在A100 GPU上耗时约2.2秒，难以满足实时交互需求。为此，研究者提出多种加速策略：**渐进蒸馏**（如SDXL-Lightning）将多步教师逐步压缩至少步学生；**对抗蒸馏**（如Flash SDXL）引入GAN损失提升单步质量；**一致性蒸馏**则利用ODE轨迹自洽性，将任意噪声点直接映射到数据端点。
 
@@ -60,7 +60,9 @@ claims:
 
 LogCD的动机正是填补这一空白。其核心洞察是：**将复杂的全轨迹一致性映射分解为局部子问题，在局部阶段固定终点（里程碑）以加速收敛，在全局阶段引入多步ODE求解器与GAN/DMD损失以恢复跨区间连贯性**。这一分治策略使得仅需70 A100 GPU小时的训练即可实现与25步教师模型相当的图文对齐质量，为少步生成提供了高效且可扩展的解决方案。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 LogCD 的核心创新在于将一致性蒸馏这一复杂全轨迹映射问题，分解为**局部到全局**的分治策略，并通过三个关键设计实现高效、高质量的少步生成。
 
@@ -109,7 +111,7 @@ $$\mathcal{L}_{GoCD} = \mathcal{L}_{GoCD}^{MSE/LLP} + \lambda_1 \mathcal{L}_{GoC
 
 所有蒸馏阶段仅训练秩为 64 的 **LoRA 适配器**，而非全量微调 UNet/DiT。这一设计大幅降低了训练资源需求（70 A100 GPU 小时），同时保持了模型质量，使得 LogCD 成为目前最高效的少步蒸馏方法之一。
 
-## 整体框架
+
 
 LogCD 采用**分治蒸馏**策略，将复杂的全轨迹一致性映射分解为两个阶段：**局部一致性蒸馏（Local CD）** 与**全局一致性蒸馏（Global CD）**。整个框架的输入为预训练的扩散教师模型（如 SDXL 或 FLUX.1-dev），输出为支持 2–4 步采样的轻量学生模型，全程仅训练秩为 64 的 LoRA 适配器。
 
@@ -134,7 +136,7 @@ LogCD 采用**分治蒸馏**策略，将复杂的全轨迹一致性映射分解�
 ![[assets/figures/papers/paper_list_l896_https_openaccess_thecvf_com_content_CVPR2026_html_Xie_LogCD_Local_to_glo/figures/002_Figure_2.jpg]]
 *Figure 2: The overview of the proposed LogCD. LogCD first executes local consistency distillation, illustrated in the left part, where the entire time range is divided into multiple sub-intervals and CD is performed in individual intervals. Then, global consistency distillation is proposed to enforce global consistency, shown in the right part*
 
-## 核心模块与公式推导
+
 
 LogCD 的核心设计思想是将复杂的全轨迹一致性映射分解为两个顺序阶段：**局部一致性蒸馏（Local CD）** 和 **全局一致性蒸馏（Global CD）**。这一分治策略的本质在于，先在局部时间区间内快速建立稳定的映射关系，再跨区间对齐以保障整条推理路径的连贯性。
 
@@ -204,7 +206,9 @@ $$
 
 所有蒸馏阶段均采用秩为 64 的 **LoRA 适配器**进行训练，而非全量微调 UNet/DiT 参数。这一设计使得整个蒸馏过程仅需约 70 A100 GPU 小时，在计算资源受限的场景下具有显著优势。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -267,7 +271,9 @@ Figure 3的视觉对比显示，3步LogCM生成的1024×1024图像在细节保�
 ![[assets/figures/papers/paper_list_l896_https_openaccess_thecvf_com_content_CVPR2026_html_Xie_LogCD_Local_to_glo/figures/007_Table_6.jpg]]
 *Table 6: Performance comparison on MSCOCO-2017 5K validation dataset when student adopts different denoising steps q in global consistency distillation. All models adopt SDXL architecture and a 4-step sampler during the inference stage*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 从单阶段全局蒸馏到两阶段局部-全局蒸馏
 
@@ -323,6 +329,8 @@ LogCD 的验证范围界定了其当前的适用边界：
 4. **CFG 引导强度的动态调度**：当前 LogCD 在局部和全局 CD 阶段使用固定的 CFG 引导强度 $w$。是否可以在不同时间区间或里程碑处动态调整 $w$，以在图文对齐和多样性之间取得更精细的权衡？
 
 5. **与推理端加速的协同**：LogCD 的 3-4 步采样是否可与推理端的 token 合并、缓存复用等技术协同，进一步降低端到端延迟？当前仅记录了单张图像推理时间，系统级优化空间尚待挖掘。
+
+
 
 ## 原文 PDF
 

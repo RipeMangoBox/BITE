@@ -45,7 +45,7 @@ claims:
 > - HumanML3D 上，Text-to-Motion R@10 43.83 vs 33.67 (LAVIMO) (+10.16)；Motion-to-Text R@10 43.74 vs 36.55 (LAVIMO) (+7.19)；Video-to-Motion R@1 SOTA (Ours) vs LAVIMO (+25.43% (relative))。
 > - KIT-ML 上，Video-to-Motion R@1 65.40 vs Prior best (LAVIMO) (Superior)。
 
-## 概述
+## 概要
 
 现有运动检索（Motion Retrieval）方案主要依赖文本和视频作为查询模态，缺少音频这一直观、自然的交互通道。更关键的是，主流方法采用**全局对比学习**，将整个运动序列或文本压缩为单一特征向量进行跨模态匹配——这一操作会丢失描述中关键动作词与运动片段之间的**细粒度对应关系**，例如“转身”这类短语与具体帧的语义对齐。
 
@@ -59,7 +59,7 @@ claims:
 
 该方法也存在明确局限：受限于 196 帧的最大运动长度，超长动作描述可能检索失败；训练依赖合成语音数据，对真实声学环境的泛化性尚需更全面评估。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -83,7 +83,9 @@ claims:
 
 3. **通过运动重建任务强化跨模态语义一致性。** 在对比对齐之外，引入从多模态上下文重建被遮掩运动 token 的辅助任务，进一步提升嵌入空间的语义表达能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作针对现有多模态运动检索框架的两个结构性瓶颈，提出了三项关键创新，构成一个统一的细粒度联合嵌入检索框架。
 
@@ -112,7 +114,7 @@ $$h(\mathbf{e}_x, \mathbf{e}_y) = \frac{1}{2} \sum_{i=1}^{L_x} {\mathbf{w}_x^i \
 
 这三项创新协同作用：身体部件分解为细粒度对齐提供了空间维度的精细表征，记忆检索压缩为音频模态提供了统一的时序接口，序列级对齐则在 token 层面建立了跨模态的精确语义桥梁。在 HumanML3D 上，文本到运动检索的 R@10 从 33.67（LAVIMO）提升至 43.83，相对提升 10.16%；视频到运动检索的 R@1 相对提升 25.43%。
 
-## 整体框架
+
 
 本文提出一个**多模态细粒度联合嵌入框架**，首次将文本、视频、音频与运动四类模态对齐到同一嵌入空间，支持文本-运动、视频-运动、音频-运动等多种检索任务。框架的核心设计思路是：**将人体运动分解为独立身体部件进行编码，并在序列级（token-level）而非全局级（global-level）进行跨模态对比对齐**，从而保留“转身”“挥手”等关键动作短语与对应运动帧之间的细粒度语义对应。
 
@@ -153,7 +155,7 @@ $$h(\mathbf{e}_x, \mathbf{e}_y) = \frac{1}{2} \sum_{i=1}^{L_x} {\mathbf{w}_x^i \
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2507_23188/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of Our Work. Our framework encodes text, video, or audio descriptions and computes their similarity within a shared joint embedding space, ranking candidate motions based on similarity scores to retrieve the most relevant motion*
 
-## 核心模块与公式推导
+
 
 ### 身体部件运动编码器
 
@@ -216,10 +218,10 @@ $$L = L_{\mathrm{align}} + \lambda_{\mathrm{recon}} \cdot L_{\mathrm{recon}}$$
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2507_23188/figures/002_Figure_2.jpg]]
 *Figure 2: Global contrastive learning (Left) computes similarity between two modalities using global representations, where motion and text data are compressed into a single token for cross-modal alignment. In contrast, sequence-level contrastive learning (Right) aligns individual tokens with their most relevant counterparts, enabling the model to focus on key frames in the motion sequence and important keywords in the text description (highlighted in yellow and red, respectively). As illustrated by the example, the phrase “turns around” yields higher similarity scores with the corresponding frames in the motion sequence, thereby enabling more accurate alignment between the text and motion pair*
 
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2507_23188/figures/005_Figure_5.jpg]]
-*Figure 5: Overview of the Audio Processing. WavLM [25] extracts audio features, which are then processed through a memory-retrieval-based module designed to standardize input audio conditions of significantly varying lengths. By converting all audio signals into a uniform length, this module ensures seamless integration with the subsequent stages of the pipeline*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能瓶颈与因果机制
 
@@ -266,13 +268,11 @@ $$L = L_{\mathrm{align}} + \lambda_{\mathrm{recon}} \cdot L_{\mathrm{recon}}$$
 ![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2507_23188/figures/008_Table.jpg]]
 *Table: RETRIEVAL RESULTS ON HUMANML3D. OUR 4-MODAL VERSION OUTPERFORMS PERVIOUS METHODS AND OUR 3-MODAL VERSION, DEMONSTRATING THE EFFECTIVENESS OF OUR MULTI-MODAL FRAMEWORK WITH FINE-GRAINED ALIGNMENT. THE BEST RESULTS ARE IN BOLD. TABLE II*
 
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2507_23188/figures/010_Table.jpg]]
-*Table: III RETRIEVAL RESULTS ON KIT-ML. OUR 3-MODAL MODEL CONSISTENTLY OUTPERFORMS PRIOR METHODS UNDER BOTH ADDITIONAL EXPERIMENTAL METHODS. NOTABLY, THE 4-MODAL VARIANT DELIVERS EVEN MORE SUBSTANTIAL IMPROVEMENTS ACROSS MULTIPLE BENCHMARKS. THE BEST RESULTS ARE IN BOLD. TABLE IV*
 
-![[assets/figures/papers/paper_list_l6_https_arxiv_org_abs_2507_23188/figures/004_Figure_4.jpg]]
-*Figure 4: Distribution of Audio Feature Lengths. Audio features are extracted from the augmented Oral Datasets, derived from HumanML3D [10] and KIT-ML [9], using WavLM [25]. The statistical analysis of these feature lengths highlights substantial variability, with some features being exceptionally long. Such variability poses challenges in processing conditional signals, making it more difficult to seamlessly incorporate audio data into later stages of the framework*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 关键基线及其差异
 
@@ -309,6 +309,8 @@ $$L = L_{\mathrm{align}} + \lambda_{\mathrm{recon}} \cdot L_{\mathrm{recon}}$$
 - **音频模态深化**：当前仅引入语音指令，未来可探索音乐、环境音等更丰富的音频模态，以增强对场景上下文的理解。这需要构建相应的多模态音频-运动数据集。
 - **多语言与大规模预训练**：在更大规模、多语言的口语运动数据集上训练，能否提升模型的通用性与跨语言泛化能力？当前的口语数据集仅覆盖英文。
 - **任务迁移潜力**：该细粒度多模态对齐框架的核心设计（身体部件分解 + 序列级对齐）能否迁移至动作识别、运动生成或人机交互等其他运动理解任务？目前仅验证了检索任务的有效性。
+
+
 
 ## 原文 PDF
 

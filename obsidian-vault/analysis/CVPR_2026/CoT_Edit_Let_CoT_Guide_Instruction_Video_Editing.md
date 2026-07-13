@@ -41,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - 自定义评估集（Gemini评分） 上，Spatial Relation (SR) 0.841 vs N/A (最佳基线未明确) (显著提升)；Physical Rule (PR) 0.741 vs N/A (最佳基线未明确) (显著提升)。
 
-## 概述
+## 概要
 
 纯文本指令驱动的视频编辑面临一个根本瓶颈：高层语义指令缺乏显式的空间定位与物理约束，导致编辑过程中出现目标歧义、定位漂移以及物理不合理性。本文提出 **CoT-Edit**，一种“规划–引导–编辑”（Plan–Guide–Edit）框架，通过将语义意图到像素执行的过程分解为可解释的步骤，系统性地解决了上述问题。其核心机制是：一个基于思维链（Chain-of-Thought, CoT）增强的多模态大语言模型（MLLM）规划器，在编辑执行前对视频和指令进行结构化推理，显式地生成时域一致的边界框序列和增强语义描述，从而将空间推理与外观生成解耦。
 
@@ -50,8 +50,6 @@ CoT-Edit 包含三个核心模块：**Planner**（规划器）负责语义-空�
 在方法谱系中，CoT-Edit 区别于仅依赖文本指令的端到端方法（如 **InstructVid2Vid**（Qin et al., ICME 2024）、**InsV2V**（Cheng et al., arXiv 2023）），以及基于 MLLM 引导的 **InstructX** 和大规模指令编辑方法 **InsViE-1M**（Wu et al., ICCV 2025）。其关键创新在于将空间先验的来源从隐式的文本约束升级为显式的时域边界框序列，并通过双向连接器实现掩码与编辑的协同优化。
 
 实验结果表明，CoT-Edit 在空间关系和物理规则两个关键维度上取得了显著优势。在基于 Gemini 评估的自定义测试集上，空间关系（Spatial Relation）指标达到 0.841，物理规则（Physical Rule）达到 0.741，均显著优于现有基线方法。消融实验进一步验证了各组件的作用：引入 Qwen3-VL 指令增强模块使指令遵循（Instruction Following）从 0.575 提升至 0.598；同时使用 Mask-Connector 和 Reverse-Connector 使整体编辑质量（Overall Editing Quality）达到最高的 0.647。定性结果（Figure 4）显示，CoT-Edit 在复杂多物体场景中能够更精确地定位目标、保持未编辑区域，并忠实处理物理感知指令。
-
-## 背景与动机
 
 ### 指令视频编辑的核心瓶颈
 
@@ -81,7 +79,7 @@ CoT-Edit 包含三个核心模块：**Planner**（规划器）负责语义-空�
 
 通过上述设计，CoT-Edit 旨在实现空间精确、时间连贯且物理一致的指令视频编辑，弥补现有方法在空间推理与物理合理性方面的不足。
 
-## 核心创新
+## 核心方法与创新机理
 
 CoT-Edit 的根本创新在于将“规划–引导–编辑”（Plan–Guide–Edit）范式引入指令视频编辑，通过**显式空间先验的解耦注入**，弥补了纯文本驱动方法在目标定位、时空一致性和物理合理性上的结构性缺陷。其核心创新可归纳为三个紧密耦合的 changed slots。
 
@@ -111,8 +109,6 @@ CoT-Edit 的根本创新在于将“规划–引导–编辑”（Plan–Guide�
 与端到端大规模训练不同，CoT-Edit 采用**分阶段训练策略**：先对各模块单独训练（第一阶段 20k steps），再联合微调（第二阶段 10k steps，batch size 64）。这种策略降低了多模块耦合训练的难度，使每个组件在联合优化前已具备基本能力。
 
 **创新本质总结**：CoT-Edit 的核心突破不在于提出新的扩散架构，而在于通过“规划–引导–编辑”范式将语义意图到像素执行的过程**分解为可解释的中间表示**（边界框、掩码、增强指令），并通过双向连接器实现模块间的信息闭环。这一设计使空间推理与外观生成解耦，从而在保持生成质量的同时，显著提升了对复杂空间关系和物理约束指令的执行精度。
-
-## 整体框架
 
 CoT-Edit 提出“规划–引导–编辑”（Plan–Guide–Edit）范式，将语义意图到像素执行的映射分解为三个可解释的阶段，从而系统性地解决纯文本指令视频编辑中目标歧义、空间漂移和物理不合理等瓶颈。整个框架由三个核心模块构成：**Planner（规划器）**、**Guide（引导分支）** 和 **Editor（编辑器）**，并通过双向连接器实现模块间的协同。
 
@@ -144,8 +140,6 @@ CoT-Edit 提出“规划–引导–编辑”（Plan–Guide–Edit）范式，�
 
 ![[assets/figures/papers/paper_list_l2300_https_openaccess_thecvf_com_content_CVPR2026_html_Liang_CoT_Edit_Let_CoT/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the proposed “Plan–Guide–Edit” framework for instruction-based video editing. Given a video and an instruction, a CoT-enhanced VLM planner performs step-by-step analysis to produce an enriched instruction and a temporal sequence of bounding boxes. The Guide branch turns these spatial priors into spatio-temporally consistent masks, while the Editor fuses text, video features, and mask guidance through bidirectional connectors to render the final edited video*
-
-## 核心模块与公式推导
 
 CoT-Edit 的“规划–引导–编辑”（Plan–Guide–Edit）框架由三个核心模块构成：**Planner**（规划器）、**Guide**（引导分支）和 **Editor**（编辑器），并通过两个双向连接器实现模块间的信息交互。
 
@@ -188,7 +182,7 @@ $$Q_{l}^{E} = Q_{l}^{E} + \mathbf{QVLcrossattn}(\mathbf{MLP}(V), C_{l}^{M}) \tag
 
 该设计将 MLLM 的深层语义理解与 Guide 的空间先验在 Editor 内部融合，使编辑过程同时具备语义准确性和空间精确性。消融实验（Table 2）表明，引入 Qwen3-VL 指令增强模块使指令遵循（IF）从 0.575 提升至 0.598；同时使用 Mask-Connector 和 Reverse-Connector 使整体编辑质量（OEQ）达到最高的 0.647。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 定量主结果
 
@@ -226,10 +220,7 @@ Figure 4展示了CoT-Edit与开源基线的定性对比。在“添加一个以�
 ![[assets/figures/papers/paper_list_l2300_https_openaccess_thecvf_com_content_CVPR2026_html_Liang_CoT_Edit_Let_CoT/figures/006_Figure_5.jpg]]
 *Figure 5: Qualitative results of the CoT ablation study*
 
-![[assets/figures/papers/paper_list_l2300_https_openaccess_thecvf_com_content_CVPR2026_html_Liang_CoT_Edit_Let_CoT/figures/001_Figure.jpg]]
-*Figure: "Add a UFO that flies in an elliptical pattern in the sky" "Change the yellow dog to an orange cat"*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 任务定位与核心差异
 

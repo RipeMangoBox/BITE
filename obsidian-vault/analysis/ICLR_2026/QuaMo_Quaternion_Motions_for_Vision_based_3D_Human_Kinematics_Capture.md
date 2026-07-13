@@ -5,6 +5,7 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/QuaMo_Quaternion_Motions_for_Vision_based_3D_Human_Kinematics_Capture.pdf
+project_link: null
 code_link: https://github.com/cuongle1206/QuaMo
 aliases:
 - QuaMo
@@ -41,7 +42,7 @@ claims:
 > - AIST 上，MPJPE (mm) 89.1±0.14 (QuaMo_HMR2.0) vs 105.5 (DiffPhy, 离线方法) (-16.4)。
 > - SportsPose 上，全部指标 QuaMo_TRACE vs TRACE / OSDCap (大幅超越)。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -79,7 +80,7 @@ QuaMo属于**在线运动学方法**，与以下工作形成直接对比：
 
 QuaMo依赖现成3D姿态估计器（**TRACE**, Sun et al., CVPR 2023; **HMR2.0**, Goel et al., ICCV 2023）提供参考姿态，其性能受限于估计器本身的噪声水平。当前方法未包含环境接触和物理约束，运动合理性评估局限于运动学指标，这为未来融入物理仿真提供了明确的扩展方向。
 
-## 背景与动机
+
 
 ### 视觉三维人体运动捕捉的任务定位
 
@@ -104,7 +105,9 @@ QuaMo依赖现成3D姿态估计器（**TRACE**, Sun et al., CVPR 2023; **HMR2.0*
 
 QuaMo的动机源于一个核心洞察：**将关节旋转表示从欧拉角切换为单位四元数，并在$S^3$球面约束下精确求解四元数微分方程（QDE），可从根本上消除旋转表示的不连续性**；同时，**在meta-PD控制器中引入基于参考姿态二阶差分的加速度增强项，使控制信号能自适应匹配运动变化速率**——快速运动时增强驱动力以加速收敛，接近目标时降低信号以减少过冲。这两个维度的改进共同指向一个目标：在仅依赖单帧未来参考的严格在线约束下，实现高精度、低抖动的三维人体运动学捕捉。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 QuaMo围绕“在线3D人体运动学捕捉”的稳定性与精度瓶颈，在三个关键维度对现有运动学方法进行了系统性改造：**关节旋转表示**、**微分方程积分精度**和**控制器自适应能力**。这三项创新构成一个因果链条——四元数表示消除不连续性，精确球面积分消除近似误差，加速度增强项提供自适应调节——最终实现在线场景下高精度、低抖动的运动重建。
 
@@ -136,7 +139,7 @@ $$\dot{\omega}_t = \underbrace{\kappa_P \big(\mathrm{vec}(\hat{q}_t \otimes q_t^
 
 三项创新构成递进关系：四元数表示是基础，消除了旋转空间的结构性缺陷；S³精确积分是保障，确保姿态更新在数学上严格成立；加速度增强项是优化，在正确表示和精确积分的基础上进一步提升控制精度。三者共同作用，使QuaMo在Human3.6M上以MPJPE 46.7 mm（HMR2.0为参考）达到运动学方法的最优水平，并在Fit3D、SportsPose、AIST三个跨域数据集上全面超越可比较的在线和离线方法。
 
-## 整体框架
+
 
 QuaMo 将人体运动建模为离散时间状态空间系统，其核心状态由两个分量构成：以单位四元数表示的关节相对旋转姿态 $q_t \in \mathbb{H}$，以及对应的角速度 $\omega_t \in \mathbb{R}^3$。系统通过两个并行的可微分支进行时序推进——角速度 ODE 分支和四元数姿态 QDE 分支——在每一时间步上实现端到端的在线推理。
 
@@ -159,7 +162,7 @@ QuaMo 将人体运动建模为离散时间状态空间系统，其核心状态�
 ![[assets/figures/papers/paper_list_l1644_QuaMo_Quaternion_Motions_for_Vision_based_3D_Human_Kinematics_Capture/figures/002_Figure_2.jpg]]
 *Figure 2: QuaMo consists of two differentiable equations: ODE for angular velocity ω and QDE for quaternion pose*
 
-## 核心模块与公式推导
+
 
 QuaMo 的核心是一个**离散时间状态空间模型**，由两条可微分支构成：角速度的常微分方程（ODE）分支和四元数姿态的四元数微分方程（QDE）分支。给定 $N$ 个人体关节，姿态张量 $\mathbf{Q} \in \mathbb{R}^{N \times 4}$ 由 $N$ 个单位四元数 $\mathbf{q} \in \mathbb{H}$ 组成，对应的角速度张量为 $\boldsymbol{\omega} \in \mathbb{R}^{N \times 3}$。
 
@@ -245,7 +248,9 @@ $$
 ![[assets/figures/papers/paper_list_l1644_QuaMo_Quaternion_Motions_for_Vision_based_3D_Human_Kinematics_Capture/figures/007_Figure_4.jpg]]
 *Figure 4: An example of motion reconstruction when a discontinuity occurs in the root joint rotation for different rotation representations. Blue means low and orange high MPJPE. The transparency corresponds to the time steps in the sequence. The model attempts to compensate for the discontinuity by rotating along the different rotation axes for all representations, except our quaternions*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -300,7 +305,9 @@ Table 3的消融实验以纯PD控制器为基线，逐步验证各模块贡献�
 ![[assets/figures/papers/paper_list_l1644_QuaMo_Quaternion_Motions_for_Vision_based_3D_Human_Kinematics_Capture/figures/008_Table_4.jpg]]
 *Table 4: Ablation study on the shape loss scaling λ. We choose λ = 0.01 as our final selection due to the good performance trade-off between the local MPJPE and the global G-MPJPE*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 在运动学人体捕捉中的定位
 
@@ -357,6 +364,8 @@ QuaMo 作为在线方法，仅依赖单帧未来参考姿态，而离线方法�
 4. **极端运动鲁棒性**：方法在快速旋转、杂技、摔跤等超出训练分布的动作下的鲁棒性和泛化能力如何？是否需要额外的数据增强或域适应策略？
 
 5. **ControlNet 架构的透明性**：ControlNet 的具体网络架构（层数、注意力机制、时序编码方式）和训练超参数未被详细描述，其潜在嵌入如何有效融合当前状态 q_t、ω_t 与参考姿态 q̂_t 的信息？这一设计空间是否对性能有显著影响？
+
+
 
 ## 原文 PDF
 

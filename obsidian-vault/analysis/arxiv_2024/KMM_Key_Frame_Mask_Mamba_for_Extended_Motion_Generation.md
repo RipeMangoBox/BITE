@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2024
 pdf_ref: paperPDFs/arxiv_2024/KMM_Key_Frame_Mask_Mamba_for_Extended_Motion_Generation.pdf
+project_link: https://steve-zeyu-zhang.github.io/KMM
+code_link: null
 aliases:
 - KFMMK
 - KKFMMEMG
@@ -42,7 +44,7 @@ claims:
 > - BABEL (Transition) 上，FID 1.37 ± 0.04 vs 7.93 ± 0.00 (TEACH) (-6.56)。
 > - BABEL-D 上，R-precision 0.538 ± 0.004 vs 0.459 ± 0.004 (FlowMDM) (+0.079)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -70,7 +72,7 @@ KMM在扩展运动生成任务上取得了显著的性能优势，同时保持�
 
 尽管KMM在现有基准上表现突出，仍存在若干值得探索的方向：该方法能否扩展至超出BABEL时长限制的超长序列生成；基于密度的关键帧选择策略是否适用于其他Mamba变体或Transformer架构；对比学习中的温度参数和掩码比例是否可以在推理过程中动态调整；以及该方法在实时生成场景中的可行性尚待验证。
 
-## 背景与动机
+
 
 ### 长时运动生成的核心困境
 
@@ -102,7 +104,9 @@ KMM在扩展运动生成任务上取得了显著的性能优势，同时保持�
 
 这两个动机在方法论上互为补充：关键帧掩码强化了运动侧的语义建模，对比对齐则弥合了文本侧与运动侧之间的语义鸿沟，共同构成了KMM应对长时扩展运动生成挑战的技术基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 KMM 的核心创新围绕两个因果扭结（causal knobs）展开：**基于密度感知的关键帧掩码策略**与**可学习对比损失驱动的跨模态对齐**。二者共同解决了 Mamba 架构在扩展运动生成中的两个根本瓶颈——隐式记忆容量有限导致的长程关键动作丢失，以及序列化架构在多模态对齐上的先天弱势。
 
@@ -137,7 +141,7 @@ Mamba 的序列化架构天然缺乏 Transformer 的全局交叉注意力机制�
 
 需要指出的是，部分对比方法的计算量是否在同等硬件条件下重新测量尚不明确（fairness notes），但 KMM 在 BABEL 子序列（FID 0.34 vs TEACH 1.12）和过渡段（FID 1.37 vs TEACH 7.93）上的大幅领先（Table 1），为架构重构的有效性提供了强证据。
 
-## 整体框架
+
 
 KMM的整体架构是一个面向长序列运动生成的自回归模型，其核心设计遵循“压缩-掩码-重建-对齐”的四阶段流水线。给定一段文本描述和期望的运动时长，系统首先将原始运动序列压缩到离散潜在空间，随后通过基于密度的关键帧选择策略对潜在令牌进行选择性掩码，再由掩码双向Mamba骨干网络结合文本条件恢复被掩码的关键帧，最终通过对比学习显式对齐文本与运动的潜在表示。
 
@@ -184,7 +188,7 @@ $$\mathcal{L}_{\text{contrast}} = \lambda (\text{CrossEntropy}(\mathrm{sim}, \ma
 ![[assets/figures/papers/paper_list_l1830_KMM_Key_Frame_Mask_Mamba_for_Extended_Motion_Generation/figures/003_Figure_3.jpg]]
 *Figure 3: The figure demonstrates our novel method from three different perspectives: (a) illustrates the key frame masking strategy based on local density and minimum distance to higher density calculation. (b) showcases the overall architecture of the masked bidirectional Mamba. (c) demonstrates the text-to-motion alignment, highlighting the process before and after alignment*
 
-## 核心模块与公式推导
+
 
 KMM 的核心架构由四个关键模块构成：VQ-VAE 运动压缩、基于密度-距离的关键帧选择与掩码、掩码双向 Mamba 序列建模，以及文本-运动对比对齐。以下逐一展开其机理与关键公式。
 
@@ -240,7 +244,9 @@ $$\mathcal{L}_{\text{contrast}} = \lambda \left( \text{CrossEntropy}(\mathrm{sim
 
 上述四个模块形成因果闭环：VQ-VAE 提供紧凑令牌表示 → 密度-距离指标识别关键帧 → 掩码迫使 Mamba 隐状态聚焦关键动态 → 对比损失确保文本指令与运动语义的对齐。这一联动机制直接回应了 Mamba 架构在长运动生成中的两大瓶颈——记忆容量有限与跨模态对齐弱。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -303,7 +309,9 @@ Figure 2展示了方向性指令理解的典型对比案例：当文本包含“
 
 ![[assets/figures/papers/paper_list_l1830_KMM_Key_Frame_Mask_Mamba_for_Extended_Motion_Generation/figures/007_Figure.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：扩展运动生成中的瓶颈
 
@@ -376,6 +384,8 @@ KMM 的因果干预机制由两个可操作的“旋钮”构成：
 4.  **实时生成可行性**：KMM 的自回归生成模式是否满足实时交互需求（如游戏、虚拟人）？论文未报告推理延迟数据。
 
 5.  **基准的充分性**：BABEL-D 作为新提出的方向性理解基准，仅包含 560 个片段，其难度和多样性是否足以区分不同方法的细粒度空间推理能力？可能需要更大规模、更多样化的方向性指令测试集。
+
+
 
 ## 原文 PDF
 

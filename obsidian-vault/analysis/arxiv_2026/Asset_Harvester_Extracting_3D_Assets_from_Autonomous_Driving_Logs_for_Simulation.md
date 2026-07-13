@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2026
 pdf_ref: paperPDFs/arxiv_2026/Asset_Harvester_Extracting_3D_Assets_from_Autonomous_Driving_Logs_for_Simulation.pdf
+project_link: https://research.nvidia.com/labs/sil/projects/asset-harvester/
+code_link: https://github.com/nvidia/asset-harvester/
 aliases:
 - AH
 - AHE3AFADLS
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 资产收割机：从自动驾驶日志中提取三维资产用于仿真 |
 | 英文题名 | Asset Harvester: Extracting 3D Assets from Autonomous Driving Logs for Simulation |
 | 会议/期刊 | arXiv 2026 |
-| Links | [paper](https://arxiv.org/abs/2604.18468) · [Code](https://github.com/nvidia/asset-harvester/) · [Project](https://research.nvidia.com/labs/sil/projects/asset-harvester/) · [arXiv](https://arxiv.org/abs/) |
+| Links | [paper](https://arxiv.org/abs/2604.18468) · [Code](https://github.com/nvidia/asset-harvester/) · [Project](https://research.nvidia.com/labs/sil/projects/asset-harvester/) · [paper](https://arxiv.org/abs/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction #topic/benchmarks_datasets_evaluation |
 | Method | Asset Harvester |
 | Dataset | NuRec AV Object Benchmark Part A, NuRec AV Object Benchmark Part B |
@@ -42,7 +44,7 @@ claims:
 > - NuRec AV Object Benchmark Part A 上，ED-R 0.099 (1V, parsed cam pose) vs TRELLIS: 0.143; HY2.1: 0.117 (lower is better; -0.044 vs TRELLIS; -0.018 vs HY2.1)。
 > - NuRec AV Object Benchmark Part B (1,510 instances) 上，GPT-5.2 Pairwise Preference Rate vs TRELLIS 73.9% vs 26.1% (preferred 73.9% of the time)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有基于神经场景重建的自动驾驶仿真方法仅能重建已观测区域，无法为可操纵的交通参与者生成完整的三维对象资产。闭环仿真中改变自车轨迹或移动车辆时，不可见区域暴露导致新视角合成失效。稀疏视角、遮挡、传感器噪声、不准确跟踪标注及非刚性人体变形进一步加剧了从单次或少量观测恢复完整三维几何与外观的难度。
 
@@ -52,7 +54,7 @@ claims:
 
 **方法定位**：区别于依赖单视图输入、无显式相机几何条件、主要使用合成数据训练的现有图像到三维生成基线（TRELLIS、Hunyuan3D 系列、**SAM 3D** 等），Asset Harvester 通过几何感知的稀疏多视图条件扩散、前馈式三维高斯提升、面向自动驾驶的混合数据管理及系统级资产插入和谐化，形成了从驾驶日志到可操纵三维资产的完整闭环。
 
-## 背景与动机
+
 
 自动驾驶仿真对闭环验证至关重要，其核心需求是能够在重建的三维场景中自由操纵交通参与者，同时保持逼真的视觉一致性。然而，现有基于神经场景重建的仿真方法面临一个根本性瓶颈：它们仅能重建已观测区域的场景表示，无法为可操纵的交通参与者生成**完整的三维对象资产**。当进行闭环仿真时——例如改变自车轨迹或移动场景中的车辆——这些方法会暴露不可见的物体区域（如车辆背面、侧面或顶部），从而无法提供逼真的新视角合成和物体操纵能力。
 
@@ -62,7 +64,9 @@ claims:
 
 针对上述缺口，本文提出 **Asset Harvester**，一个从大规模自动驾驶日志中提取完整三维资产的系统。其核心动机在于：通过设计面向稀疏、有限角度观测的扩散模型 **SparseViewDiT**，并结合前馈式三维高斯提升模块 **Object TokenGS**，系统性地解决从真实驾驶日志中恢复完整三维几何与外观的核心挑战。关键思路是利用大规模、多样化、经过精心管理的数据集（包括真实野外数据、合成域内数据和自蒸馏数据）进行多阶段训练，并引入几何感知预处理（如 Plücker 光线编码、相机参数注入）和鲁棒的数据增强策略，使模型能够从极其稀疏的条件视图（例如单张或少量图像）中稳定地重建高质量三维资产。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Asset Harvester 的核心创新在于通过系统级设计，将**稀疏视角条件生成**与**前馈式三维高斯提升**紧密耦合，从而在真实自动驾驶日志的挑战性条件下（稀疏观测、遮挡、传感器噪声、不准确跟踪标注）稳定提取完整的三维资产。相较于现有图像到三维的生成基线，其关键创新体现在以下三个维度的因果干预上。
 
@@ -100,7 +104,7 @@ $$f_{\phi} : (\Pi_{out}, X_{out}) \mapsto \mathcal{G}$$
 
 在 NuRec AV Object Benchmark 的 Part A 上，Asset Harvester（单视图，解析相机姿态）的 PSNR 达到 **22.23 dB**，ED-R 为 **0.099**，显著优于 TRELLIS（20.47 dB, 0.143）和 HY2.1（21.12 dB, 0.117）（Table 2）。在 Part B 的 GPT-5.2 成对偏好评估中，Asset Harvester 对 TRELLIS 的偏好率达 **73.9%**（Table 3），进一步验证了其在视觉质量上的优势。
 
-## 整体框架
+
 
 Asset Harvester 是一个从大规模自动驾驶日志中提取可操纵三维资产、用于闭环仿真的端到端系统。其核心设计目标并非单纯追求重建精度，而是解决一个更根本的瓶颈：现有神经场景重建方法只能渲染已观测区域，一旦在仿真中改变自车轨迹或移动交通参与者，就会暴露不可见区域，导致新视角合成失败。Asset Harvester 通过将资产提取问题分解为三个紧密耦合的模块，系统性地克服了这一限制。
 
@@ -147,7 +151,7 @@ Asset Harvester 的系统架构体现了三个关键的因果干预：
 
 整个流程的推理时间统计见 Table 4，系统在单视图输入下即可在 NuRec AV Object Benchmark 上显著优于现有图像到三维生成基线（Table 2, Table 3），验证了端到端系统设计的有效性。
 
-## 核心模块与公式推导
+
 
 ### 2.1 数据摄取模块 (Data Ingestion Module)
 
@@ -210,7 +214,9 @@ $$\mathcal{L}_{rec} = \mathbb{E}_{(X_{out},\Pi_{out})} \left[ \frac{1}{v_{out}} 
 ![[assets/figures/papers/paper_list_l68_https_arxiv_org_abs_2604_18468/figures/002_Figure_2.jpg]]
 *Figure 2: Architecture overview of SparseViewDiT for sparse-view-conditioned multi-view generation*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 评估基准与指标设计
 
@@ -291,7 +297,9 @@ $$\mathcal{L}_{rec} = \mathbb{E}_{(X_{out},\Pi_{out})} \left[ \frac{1}{v_{out}} 
 ![[assets/figures/papers/paper_list_l68_https_arxiv_org_abs_2604_18468/figures/017_Table_8.jpg]]
 *Table 8: GPT-5.2 pairwise preference rates on Part B of the NuRec AV Object Benchmark. Higher percentages indicate more preferred results. In this experiment, Asset Harvester (AH) parses object camera from NCore scene for the single view input*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法沿革与基线关系
 
@@ -340,6 +348,8 @@ Asset Harvester 在三个关键维度上构成了对上述基线的系统性改�
 **合成-真实域差异。** 合成数据训练与真实数据分布间的域差异是否可以通过更强的物理渲染或风格迁移进一步缩小？当前混合数据策略（Section 3.2）已部分缓解此问题，但域间隙仍然存在。
 
 **评估协议的稳定性。** 当前 GPT-5.2 成对偏好评估的稳定性和与人类专家判断的一致性如何，是否存在潜在偏差？这是一个影响所有采用 LLM-as-Judge 方法的研究的共性问题。
+
+
 
 ## 原文 PDF
 

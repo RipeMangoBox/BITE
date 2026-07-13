@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/A_New_Approach_to_Controlling_Linear_Dynamical_Systems.pdf
+project_link: null
+code_link: null
 aliases:
 - OSCO
 - NACLDS
@@ -42,7 +44,7 @@ claims:
 > - 非线性动力系统 (LDS ReLU) 上，累积损失 为 OSC (线性头)，对比 GPC (线性头)，变化 性能相当。
 > - 线性动力系统 (LDS) 上，累积损失 为 OSC (100隐藏单元MLP头)，对比 GPC (100隐藏单元MLP头)，变化 性能相当。
 
-## 概述
+## 概要
 
 本文针对线性动力系统（LDS）的在线控制问题，提出了一种名为在线谱控制（Online Spectral Control, OSC）的新方法。该问题的核心瓶颈在于：现有方法（如GPC）的计算复杂度与系统稳定性裕度γ的倒数呈多项式关系，导致在边际稳定系统（γ很小）时运行时间过长。OSC通过引入一种基于特定Hankel矩阵谱分解的凸松弛技术，将控制策略参数化为对扰动与谱滤波器卷积的线性回归，从而将在线控制问题转化为低维谱特征空间上的在线凸优化问题。
 
@@ -52,7 +54,7 @@ claims:
 
 **主要结果**：理论分析（Theorem 2.1）给出了OSC相对于对角化稳定线性策略类S的遗憾上界，Corollary 2.2证明了平均运行时间为O(log⁴(T/γ))。实验验证（Figure 2）显示OSC在LDS和LDS ReLU两种动力学下，无论使用线性头还是MLP头，累积损失均与GPC相当。消融实验（Figure 4）表明，当谱参数h=20时，OSC已完全匹配GPC性能。
 
-## 背景与动机
+
 
 在线控制线性动力系统（LDS）的核心挑战在于：系统状态演化遵循 $\mathbf{x}_{t+1} = A \mathbf{x}_t + B \mathbf{u}_t + \mathbf{w}_t$，控制器需要在未知、可能对抗性的扰动 $\mathbf{w}_t$ 下，仅基于历史观测即时生成控制输入 $\mathbf{u}_t$。这一问题在实际应用中广泛存在，从机器人控制到过程自动化，但现有方法在处理边际稳定系统时面临严重的计算瓶颈。
 
@@ -66,7 +68,9 @@ claims:
 
 **证据强度评估**：上述核心声明有明确的定理和推论支撑（Corollary 2.2, Theorem 2.1, Table 1），置信度达到 0.98。但需注意，理论分析假设系统动力学 $(A, B)$ 已知且时不变，遗憾界中的常数 $C_1 = G \kappa_B \kappa^8 W^2$ 可能在实际中很大，导致预热时间较长。此外，实验仅在合成数据上进行（Figure 2-6），虽然验证了 OSC 与 GPC 在各种设置下性能相当，但缺乏真实世界控制任务的验证，这是该工作的一个明确局限性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 OSC的核心创新在于通过**谱表示压缩扰动历史**，将在线控制问题转化为**低维凸优化问题**，从而从根本上改变了策略参数化方式和对系统稳定性裕度γ的计算依赖。
 
@@ -82,7 +86,7 @@ OSC的核心创新在于通过**谱表示压缩扰动历史**，将在线控制�
 
 **实验证据强度。** 实验证据支持核心创新：在多种设置下（线性/非线性动力学、线性/MLP头），OSC与GPC性能相当（Figure 2），但参数数量减少约70%（GPC: 50d vs. OSC: 15d）。消融实验进一步验证了谱表示的有效性：即使h=5，OSC也具有竞争力；h=20时性能几乎相同（Figure 4）。然而，实验仅在合成数据上进行，缺乏真实世界控制任务的验证，这是一个明确的弱点。遗憾界中的常数C₁ = G κ_B κ⁸ W²可能很大，导致实际中需要较长的预热时间。
 
-## 整体框架
+
 
 Online Spectral Control (OSC) 的整体 pipeline 围绕一个核心洞察构建：将在线控制问题转化为在线凸优化问题，通过谱表示压缩扰动历史，使参数数量仅与 $\log(T/\gamma)$ 成正比。
 
@@ -116,7 +120,7 @@ $$
 
 **理论保证**：OSC 的遗憾界为 $\mathrm{Regret}_T(\mathrm{OSC}, \mathcal{S}) = \frac{C_0 C_1 \sqrt{T}}{\gamma^4} \log^3\left(\frac{C_1 T d}{\gamma^3}\right)$（Theorem 2.1），相比 GPC 的 $\tilde{O}(\gamma^{-5.5} \sqrt{T})$ 对 $\gamma$ 的依赖更优。关键在于，每个时间步的平均运行时间仅为 $O(\log^4(T/\gamma))$（Corollary 2.2），而 GPC 为 $O(\gamma^{-1} \log T)$，实现了从多项式到多对数的飞跃。
 
-## 核心模块与公式推导
+
 
 ### 问题设定与状态演化
 
@@ -203,7 +207,9 @@ $$
 
 算法的平均运行时间为 $O(\log^4(T/\gamma))$，而GPC的运行时间为 $O(\gamma^{-1} \log T)$。这一改进源于谱表示对扰动历史的压缩，使得参数数量仅与 $\log(T/\gamma)$ 成正比，从而将对 $1/\gamma$ 的依赖从多项式降低到多对数级别。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：OSC 与 GPC 的性能对比
 
@@ -267,7 +273,9 @@ $$
 ![[assets/figures/papers/iclr26_0003_BQIzu1T6F0_A_New_Approach_to_Controlling_Linear_Dynamical_S/figures/001_Table_1.jpg]]
 *Table 1: where $\gamma$ is the stability margin. The runtime scales only polylogarithmically in 1 / $\gamma$ , , improving on the polynomial dependence of GPC (Agarwal et al., 2019a) via fast online convolution (Agarwal et al., 2024a). Table 1: Comparison of different control methods. The highlighted row corresponds to our proposed approach. In the regret bounds, we hide polylogarithmic factors by the notation ${ \tilde { O } } ( \cdot$ ) . Our method is the only one to perform in the most general setting with the best running time
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线的谱系关系
 
@@ -318,6 +326,8 @@ OSC 的适用条件与 GPC 基本一致：
 3. **未知动力学**：是否需要联合进行系统辨识与在线控制，以及谱表示在此场景下的稳定性？
 4. **时变系统**：算法假设时不变动力学，对抗性或时变系统下的适用性未分析。
 5. **真实世界验证**：在机器人控制、机械通风等真实任务中的实证性能是下一步关键。
+
+
 
 ## 原文 PDF
 

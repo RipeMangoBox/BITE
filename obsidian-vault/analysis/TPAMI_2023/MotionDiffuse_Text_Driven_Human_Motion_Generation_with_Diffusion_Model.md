@@ -5,6 +5,8 @@ paper_level: A
 venue: TPAMI
 year: 2023
 pdf_ref: paperPDFs/TPAMI_2023/MotionDiffuse_Text_Driven_Human_Motion_Generation_with_Diffusion_Model.pdf
+project_link: https://mingyuan-zhang.github.io/projects/MotionDiffuse.html
+code_link: null
 aliases:
 - MotionDiffuse
 tags:
@@ -40,7 +42,7 @@ claims:
 > - HumanML3D 上，Top-1 R Precision, FID, MultiModal Dist, Diversity 为 0.630。
 > - KIT-ML (text-driven) 上，Top-1 R Precision 为 0.417。
 
-## 概述
+## 概要
 
 **核心问题**：文本驱动人体运动生成的主流方法（如TEMOS、MotionCLIP、Guo et al. CVPR 2022的T2M等）通常采用确定性映射，将文本直接嵌入到生成器或VAE/GAN框架中。这类硬性条件注入导致两个关键瓶颈：（1）生成结果的多样性严重不足，同一文本几乎只能产生单一运动；（2）难以处理描述多个身体部位或包含多时间段的复杂、细粒度文本提示。
 
@@ -52,7 +54,7 @@ claims:
 
 **局限性**：扩散模型需要大量去噪步骤，难以实现实时生成；当前pipeline仅适配单一运动表征形式，向多数据集通用框架的扩展仍是开放问题。
 
-## 背景与动机
+
 
 **文本驱动人体运动生成**旨在从自然语言描述中合成逼真的三维人体动作序列，在动画制作、虚拟人交互、游戏开发等领域具有重要应用价值。然而，该任务面临一个根本性瓶颈：**从文本到运动的映射本质上是“一对多”的**——同一段文字描述可以对应多种合理的运动表现，而现有方法大多采用确定性的映射策略，导致生成结果的**多样性严重不足**。
 
@@ -62,7 +64,9 @@ claims:
 
 本文提出**MotionDiffuse**，作为**首个基于扩散模型的文本驱动运动生成框架**。其核心动机在于：将DDPM引入运动生成，利用其概率映射特性解决多样性问题；同时利用扩散过程保留运动序列显式形式的优势，通过噪声插值等机制实现**身体部位独立控制**和**长序列多动作生成**，从而支持对复杂文本描述的多层次操控。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MotionDiffuse 的核心创新在于将**去噪扩散概率模型（DDPM）**引入文本驱动人体运动生成，从根本上改变了语言到运动的映射范式。相比先前方法（如 **TEMOS**、**MotionCLIP**、**Guo et al. (2022) T2M** 等）采用的确定性 VAE 或 GAN 框架，MotionDiffuse 通过预测并迭代消除噪声来实现生成，从而在采样过程中天然引入随机性，解决了生成多样性不足的瓶颈。
 
@@ -90,7 +94,7 @@ MotionDiffuse 使用 CLIP 预训练权重初始化文本编码器的前几层并
 
 这些创新共同构成了一个统一的框架，使得 MotionDiffuse 在保持高保真度和多样性的同时，天然支持多层次操控（身体部位独立控制和长序列多动作生成），这是先前确定性生成范式难以实现的能力。
 
-## 整体框架
+
 
 MotionDiffuse 的整体框架围绕**去噪扩散概率模型（DDPM）**构建，将文本驱动的运动生成建模为一个条件去噪过程。如 Figure 2 所示，pipeline 由两条核心数据流组成：训练阶段（蓝色箭头）和推理阶段（红色箭头），文本编码与运动解码模块则为两者共享（黑色箭头）。
 
@@ -132,7 +136,7 @@ MotionDiffuse 的整体框架围绕**去噪扩散概率模型（DDPM）**构建�
 ![[assets/figures/papers/paper_list_l11_MotionDiffuse_Text_Driven_Human_Motion_Generation_with_Diffusion_Model/figures/001_Figure_1.jpg]]
 *Figure 1: MotionDiffuse is a diffusion model-based text-driven motion generation method that features 1) Probabilistic Mapping 2) Realistic Synthesis that results in highly diverse motions with high-fidelity shown in a)-d), and 3) Multi-Level Manipulation that empowers comprehensive motion generation such as that in c) where multiple body parts are involved and d) where time-varied prompts are given*
 
-## 核心模块与公式推导
+
 
 MotionDiffuse 以**去噪扩散概率模型（DDPM）**为生成骨架，将文本条件通过**交叉模态线性Transformer**软性地注入去噪过程，并在此基础上构建**身体部位噪声插值**与**时间区间噪声插值**两个操控模块，实现多层次运动控制。
 
@@ -202,7 +206,9 @@ $$\overline{\epsilon}^{\mathrm{time}} = \sum_{i=1}^{m} \overline{\epsilon}_i^{\m
 
 $\overline{\epsilon}_i^{\mathrm{time}}$ 为区间 $i$ 的噪声估计经掩码填充后的全时序噪声，校正项保证不同动作片段之间的自然过渡。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -261,7 +267,9 @@ MotionDiffuse 的核心创新之一是通过噪声插值实现身体部位独立
 ![[assets/figures/papers/paper_list_l11_MotionDiffuse_Text_Driven_Human_Motion_Generation_with_Diffusion_Model/figures/008_Table_4.jpg]]
 *Table 4: Ablation of the latent dimension and the number of transformer layers. All results are reported on the KIT-ML test set*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有方法的关系
 
@@ -304,6 +312,8 @@ MotionDiffuse 的能力边界由其扩散模型架构和训练数据共同定义
 **评估指标的对齐**：论文使用 FID、R Precision、MultiModal Dist 和 Diversity 等指标，但这些指标与人类感知质量的对应关系尚未充分验证。特别是 Diversity 指标可能被模型通过生成不合理的抖动来“作弊”提升，需要更可靠的多样性评估方法。
 
 > **注意**：以上适用边界分析和开放问题中的部分推断（如物理合理性、评估指标对齐的具体机制）基于对方法架构的分析，论文原文未对此进行系统性实验验证，需要后续研究确认。
+
+
 
 ## 原文 PDF
 

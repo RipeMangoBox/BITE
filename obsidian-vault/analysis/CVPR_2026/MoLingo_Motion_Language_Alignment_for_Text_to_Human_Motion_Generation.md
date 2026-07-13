@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/MoLingo_Motion_Language_Alignment_for_Text_to_Human_Motion_Generation.pdf
+code_link: null
 project_link: https://hynann.github.io/molingo/MoLingo.html
 aliases:
 - MoLingo
@@ -34,7 +35,7 @@ claims:
 | 中文题名 | MoLingo：面向文本到人体运动生成的运动-语言对齐 |
 | 英文题名 | MoLingo: Motion-Language Alignment for Text-to-Human Motion Generation |
 | 会议/期刊 | CVPR 2026 |
-| Links | [paper](https://arxiv.org/abs/2512.13840); [Project](https://hynann.github.io/molingo/MoLingo.html) |
+| Links | [paper](https://arxiv.org/abs/2512.13840) · [Project](https://hynann.github.io/molingo/MoLingo.html) |
 | Topic | #topic/text_to_motion #topic/motion_language_alignment #topic/semantic_latent_space #topic/cross_attention #topic/text_to_motion/general |
 | Method | Semantically aligned autoencoder, multi-token cross-attention, masked autoregressive rectified flow |
 | Dataset | HumanML3D, BABEL, MARDM-67 evaluator, TMR-263 evaluator, MS-272 evaluator |
@@ -44,7 +45,7 @@ claims:
 > - MARDM-67 上，R-Precision Top-1 为 0.542 (SAE)，对比 0.522 (ACMDM-XL-PS2)，变化 +0.020。
 > - TMR-263 上，FID 为 0.014，对比 0.022 (MoMask)，变化 -0.008。
 
-## 概述
+## 概要
 
 **核心问题**：现有文本到人体运动生成方法在连续潜在空间中缺乏语义对齐，且普遍采用单 token 条件化（如 AdaLN 调制），导致生成的运动难以精确遵循文本指令，在真实感和语义一致性上存在瓶颈。
 
@@ -54,7 +55,7 @@ claims:
 
 **主要结果**：在 MARDM-67 评估协议上，MoLingo (SAE) 取得 FID 0.064、R-Precision Top-1 0.542，MoLingo (VAE) 取得 FID 0.049；在 TMR-263 上 FID 低至 0.014；在 MS-272 上 FID 为 3.444（对比 MotionStreamer 的 11.979）。用户研究中，MoLingo 相较 DisCoRD、MoMask、MotionStreamer 分别获得 83.75%、77.70%、84.70% 的偏好率。消融实验证实多 token 交叉注意力和语义对齐各自带来显著且一致的性能增益。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -85,7 +86,9 @@ claims:
 
 这两项改进的因果关系清晰：语义对齐降低了潜在空间的结构复杂度，使生成模型更容易学习；多 token 交叉注意力则提供了更强的条件信号，使生成的运动更精确地遵循文本指令。两者协同作用，在运动真实感和文本-动作对齐两个维度上均实现了显著提升。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MoLingo 的核心创新围绕两个相互协同的**关键因果旋钮**展开：**语义对齐的连续潜在空间**与**多 token 交叉注意力条件化机制**。这两个设计分别解决了现有文本到动作生成方法在潜在空间语义表达能力和文本条件化强度上的瓶颈，共同驱动了运动真实感和文本-动作对齐性能的显著提升。
 
@@ -125,7 +128,7 @@ $$p(m_1,\ldots,m_l) = \prod_{i=1}^l p(m_i \mid c, m_1, \ldots, m_{i-1})$$
 
 **需要人工验证的点**：SAE 的语义对齐训练仅利用了 BABEL 与 HumanML3D 的交集部分，帧级文本监督的覆盖范围受限。这一限制对更广泛动作类别上语义对齐效果的具体影响程度，在现有消融实验中未做定量评估，需结合更大规模标注数据集进一步验证。
 
-## 整体框架
+
 
 MoLingo 的整体框架由两大核心组件构成：**语义对齐运动自动编码器** 与 **掩码自回归整流流生成器**。前者将原始运动序列压缩为连续潜在表示，并通过帧级文本监督实现语义对齐；后者以文本提示为条件，自回归地预测条件向量，再通过整流流在潜在空间中迭代去噪，最终解码为运动帧。图 2 与图 3 分别展示了这两个组件的数据流与模块关系。
 
@@ -139,10 +142,13 @@ MoLingo 的整体框架由两大核心组件构成：**语义对齐运动自动�
 
 ### 补充图表
 
+![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2512_13840/figures/001_Figure_1.jpg]]
+*Figure 1: Left: Given text prompts, MoLingo generates realistic and text-aligned motions, ranging from daily movements like sweeping to more challenging movements like dancing. Right: MoLingo significantly outperforms previous works in both FID and R-Precision scores. The difference can best be seen in motion, hence we urge the reader to view the supplementary video*
+
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2512_13840/figures/002_Figure_2.jpg]]
 *Figure 2: Semantically aligned autoencoder architecture. The model comprises an encoder–decoder autoencoder for motion sequences and a parallel text-encoding branch that maps frame-level text labels into class tokens. A cosine-similarity loss $\mathcal { L } _ { \mathrm { s e m } }$ is applied to align the motion latents with their corresponding class tokens
 
-## 核心模块与公式推导
+
 
 MoLingo 的整体框架由两个关键组件构成：**(1) 语义对齐运动自动编码器 (SAE)**，负责将运动序列映射到语义对齐的连续潜在空间；**(2) 基于掩码自回归整流流的生成模型**，在该潜在空间中进行条件生成。
 
@@ -186,7 +192,9 @@ $$\mathcal{L}(z_i, m_i) = \mathbb{E}_{m_i, \epsilon, t}\left[\|v_\theta(m_i^t, t
 
 **关键设计对比**：Table 2 的消融实验验证了两个核心设计选择的有效性——多 token 交叉注意力（CrossAttn）相比单 token AdaLN 调制在所有指标上均有显著提升，尤其 R-Precision Top-1 从 0.528 提升至 0.542；SAE 相比普通 AE/VAE 在文本-动作对齐指标上持续改善，验证了语义对齐潜在空间的扩散友好性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -226,8 +234,6 @@ $$\mathcal{L}(z_i, m_i) = \mathbb{E}_{m_i, \epsilon, t}\left[\|v_\theta(m_i^t, t
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2512_13840/figures/001_Figure_1.jpg]]
-*Figure 1: Left: Given text prompts, MoLingo generates realistic and text-aligned motions, ranging from daily movements like sweeping to more challenging movements like dancing. Right: MoLingo significantly outperforms previous works in both FID and R-Precision scores. The difference can best be seen in motion, hence we urge the reader to view the supplementary video*
 
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2512_13840/figures/008_Figure_5.jpg]]
 *Figure 5: Effect of latent dimension and temporal downsampling. We vary the latent dimension (16–128) under two temporal compression settings: (4×) and (2×). Overall, the 4× setting gives comparable or better performance than 2×, showing that is beneficial that a single latent encodes 4 frame, even 2× preserves more fine-grained temporal information*
@@ -259,7 +265,9 @@ $$\mathcal{L}(z_i, m_i) = \mathbb{E}_{m_i, \epsilon, t}\left[\|v_\theta(m_i^t, t
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2512_13840/figures/016_Table_9.jpg]]
 *Table 9: Detail architecture of our autoencoders. Different from [62], we set the padding mode of the first 1D convolutional layer to replicate the initial frames, which stabilizes training and improves reconstruction*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 连续潜在空间生成范式的演进与分化
 
@@ -292,6 +300,8 @@ MoLingo 的核心技术路线属于**连续潜在空间的自回归生成**范�
 4. **语义潜在空间的下游复用：** 语义对齐的潜在空间是否能够直接用于运动编辑、跨模态检索或运动风格迁移等下游任务？这一方向可能拓展 MoLingo 框架的应用范围，超越纯粹的生成任务。
 
 5. **自回归生成顺序的优化：** 当前的自回归生成顺序是固定的（从第一个潜在到最后一个），是否存在更优的生成顺序（如从关键帧向外扩散，或基于文本引导的动态排序），以进一步提高运动质量和长序列一致性？
+
+
 
 ## 原文 PDF
 

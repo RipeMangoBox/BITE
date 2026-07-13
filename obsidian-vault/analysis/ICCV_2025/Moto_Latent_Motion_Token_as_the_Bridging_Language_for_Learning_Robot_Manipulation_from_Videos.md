@@ -5,6 +5,8 @@ paper_level: A
 venue: ICCV
 year: 2025
 pdf_ref: paperPDFs/ICCV_2025/Moto_Latent_Motion_Token_as_the_Bridging_Language_for_Learning_Robot_Manipulation_from_Videos.pdf
+project_link: https://chenyi99.github.io/moto/
+code_link: null
 aliases:
 - Moto
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | Moto：以潜在运动令牌为桥接语言从视频中学习机器人操作 |
 | 英文题名 | Moto: Latent Motion Token as the Bridging Language for Learning Robot Manipulation from Videos |
 | 会议/期刊 | ICCV 2025 |
-| Links | [paper](https://arxiv.org/abs/2412.04445v4); [Project](https://chenyi99.github.io/moto/) |
+| Links | [paper](https://arxiv.org/abs/2412.04445v4) · [Project](https://chenyi99.github.io/moto/) |
 | Topic | #topic/representation_self_supervised_transfer #topic/representation_self_supervised_transfer/representation_learning |
 | Method | Moto |
 | Dataset | SIMPLER, CALVIN (ABC→D), Real-world, CALVIN (ABC→D) with 1% labeled data |
@@ -40,7 +42,7 @@ claims:
 > - CALVIN (ABC→D) 上，Average Length (Avg. Len.) 为 3.10，对比 3.06 (GR-1)，变化 +0.04。
 > - Real-world 上，Average Success Rate 为 0.60，对比 0.233 (Moto w/o Motion Token)，变化 +0.367。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -82,7 +84,7 @@ Moto 在多个基准上展现出显著的性能优势：
 
 上述结论由多维度实验支撑：潜在运动令牌在 CALVIN 34 类任务分类中达到 79.7% 的准确率（接近使用完整图像特征的 82.8%），验证了其语义表达能力（Table 1）；SIMPLER 和 CALVIN 上的对比实验覆盖了多个强基线，置信度较高。但需注意，部分基线（如 RoboFlamingo）可能使用了额外的夹爪摄像头视图和本体感受状态，构成不完全公平的比较因素。此外，人类到机器人运动的迁移目前仅在初步实验中验证，大规模多样化人类活动视频上的泛化能力仍待进一步检验。
 
-## 背景与动机
+
 
 机器人学习面临一个根本性瓶颈：**高质量动作标注数据的获取成本极高**。要让机器人学会精确的操作技能，通常需要大量带有动作标签的专家示教数据，而这类数据的采集耗时、昂贵，且难以跨不同硬件平台复用。与此同时，互联网上存在着海量的无标注视频数据——包括人类活动视频和机器人操作视频——它们天然蕴含着丰富的运动动态信息，却长期未被有效利用。
 
@@ -92,7 +94,9 @@ Moto 在多个基准上展现出显著的性能优势：
 
 Moto 正是针对这一瓶颈提出的解决方案。其核心动机是：**将帧间变化压缩为一种紧凑、离散的“潜在运动令牌”（Latent Motion Tokens），并以此作为桥接语言，连接视频预训练与机器人动作学习**。通过自回归地预测运动令牌序列，模型可以在无动作标注的视频上学习通用运动先验；在微调阶段，这些运动令牌又可直接与动作预测模块协同优化，实现运动知识向精确控制信号的迁移。这一设计使得机器人可以从纯视频中学习“如何运动”，而仅需少量标注数据即可学会“如何行动”。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Moto的核心创新在于构建了一个以**潜在运动令牌（Latent Motion Tokens）**为桥接语言的视频预训练范式，解决了机器人学习中将无动作标签的视频运动知识迁移到精确动作控制这一瓶颈。其关键设计围绕三个紧密耦合的“changed slots”展开。
 
@@ -125,7 +129,7 @@ Moto的核心创新在于构建了一个以**潜在运动令牌（Latent Motion 
 
 消融实验（Figure 12）严格验证了这一策略的必要性：保留运动令牌预测损失的Moto-GPT显著优于忽略该损失的Moto-IML和完全丢弃运动令牌的Moto-DM。在仅使用**1%动作标注数据**的极端低资源场景下，Moto-GPT仍能达到**52.5%**的成功率，而从头训练变体成功率为0%（Figure 11），证明共同微调有效保留了运动先验并实现了高效迁移。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2412_04445v4/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of Moto’s three training stages: (1) The Latent Motion Tokenizer encodes key visual motions between video frames into compact latent tokens in an unsupervised manner using pure video data. (2) Moto-GPT is pre-trained with autoregressive motion token prediction to learn motion priors from video-instruction pairs. (3) Moto-GPT is co-fine-tuned on action-labeled trajectories to predict robot actions based on the output of learnable action query tokens while maintaining the next-motion-token prediction objective*
@@ -150,7 +154,7 @@ $$\mathcal { L } _ { f t } = \mathcal { L } _ { m o t i o n } + \mathcal { L } _
 
 **输入输出流总结。** 在推理阶段，Moto-GPT 接收语言指令和当前观测帧，自回归地预测运动令牌序列，同时通过动作查询令牌并行输出每一步的真实动作。这种设计使得运动令牌成为连接“视频理解”与“动作生成”的中间表示层：上游的视觉运动知识通过令牌编码注入，下游的动作策略通过共同微调从令牌中解码出精确控制信号。消融实验（Figure 12）证实，若在微调时丢弃运动令牌预测损失（Moto-IML）或完全移除输入中的运动令牌（Moto-DM），性能均显著下降，验证了共同微调对保留运动先验的必要性。
 
-## 核心模块与公式推导
+
 
 Moto 的核心架构由三个级联模块构成，分别对应无监督运动令牌化、自回归运动先验预训练和动作策略共同微调（Figure 2）。
 
@@ -183,7 +187,9 @@ $$\mathcal{L}_{ft} = \mathcal{L}_{motion} + \mathcal{L}_{action}$$
 
 这一共同微调策略是运动先验有效迁移的关键：消融实验（Figure 12）表明，保留 $\mathcal{L}_{motion}$ 的 Moto-GPT 显著优于忽略该损失（Moto-IML）或完全丢弃运动令牌（Moto-DM）的变体。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -259,7 +265,9 @@ Figure 7展示了Moto-GPT的附加能力：通过计算轨迹的对数似然，�
 ![[assets/figures/papers/paper_list_l26_https_arxiv_org_abs_2412_04445v4/figures/023_Table_8.jpg]]
 *Table 8: Top-K motion token prediction accuracy of Moto-GPT in predicting ground-truth latent motion tokens from a 128-size codebook on the validation splits of the pre-training datasets*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心差异：从“静态外观”到“动态运动”的预训练范式转移
 
@@ -302,6 +310,8 @@ Moto 开辟了以运动为中心的预训练路线，但以下问题构成了该
 4. **缩小人类-机器人运动域差异**：如何进一步缩小人类运动令牌与机器人动作空间之间的域差异，实现更少标注下的高效微调？可能的方案包括域对抗训练或运动重定向模块。
 
 5. **任务范式的横向扩展**：能否将 Moto 扩展到导航、移动操作等更广泛的机器人任务，形成统一的运动驱动策略？这需要验证运动令牌在非操作场景下的语义表达能力。
+
+
 
 ## 原文 PDF
 

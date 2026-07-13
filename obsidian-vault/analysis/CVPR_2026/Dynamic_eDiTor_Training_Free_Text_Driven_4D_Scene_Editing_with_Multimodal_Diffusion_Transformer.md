@@ -41,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - DyNeRF 上，CLIP_dir↑ 0.1849 vs 0.1501 (Instruct-4DGS) (+0.0348)；CLIP_sim↑ 0.6397 vs 0.6342 (Instruct-4DGS) (+0.0055)；User Overall Quality (%) 48.95 vs 27.57 (Instruct4D-to-4D) (+21.38)。
 
-## 概述
+## 概要
 
 4D场景编辑旨在对动态三维场景进行语义级操控，同时保持多视角几何一致性与时间运动连贯性。现有方法（如 **Instruct4D-to-4D**、**Instruct-4DGS**、**CTRL-D**）普遍依赖逐帧独立的2D扩散模型进行编辑，缺乏跨视角与跨时间的联合处理机制，导致运动失真、几何漂移和编辑不完整等瓶颈。
 
@@ -51,7 +51,7 @@ claims:
 
 **方法谱系与知识库定位**：Dynamic-eDiTor继承了两条技术路线——基于MM-DiT的图像编辑能力（源自 **FLUX** 架构，Black Forest Labs, 2024）和4DGS的动态场景表示。与 **Instruct-4DGS** 等使用U-Net扩散模型逐帧编辑的方法不同，本方法首次在统一时空网格上利用MM-DiT的双流自注意力实现跨视角-时间联合编辑，属于训练免费4D编辑框架的新范式。
 
-## 背景与动机
+
 
 ### 4D场景编辑的兴起与核心挑战
 
@@ -75,7 +75,9 @@ claims:
 
 基于这一认识，本文提出**Dynamic-eDiTor**，一个无需训练的文本驱动4D场景编辑框架。其核心动机是：**将多视角视频帧组织为统一的相机-时间网格，在MM-DiT的扩散过程中引入局部时空联合注意力与全局令牌传播机制，从而在不增加训练的前提下强制执行多视角和时间一致性**。该方法从根本上跳出了“逐帧编辑+后处理对齐”的范式，转而追求编辑过程本身即具备时空一致性，为4D场景编辑提供了一个更加简洁、鲁棒的解决方案。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Dynamic-eDiTor 的核心创新在于将4D场景编辑从“逐帧独立2D扩散”范式升级为“统一时空联合编辑”范式。其关键突破可归纳为三个层面的 **changed slots**，分别对应编辑框架基础、时空一致性机制和4D表示优化策略的质变。
 
@@ -123,7 +125,7 @@ $$\mathcal{G}_{\mathrm{edit}}' = \arg\min_{\mathcal{G}} \sum_{v,t \in V,T} \|\ha
 
 综上，Dynamic-eDiTor 的创新本质在于**将4D编辑从“2D扩散+后处理”的松散组合转变为一个内建时空一致性的统一框架**，其 STGA-CTP 协同机制和直接4DGS优化策略共同构成了这一转变的技术支柱。
 
-## 整体框架
+
 
 Dynamic-eDiTor 提出了一种训练免费、文本驱动的 4D 场景编辑框架，其核心设计思想是将多视角视频帧组织为一个统一的**相机-时间网格**（Camera–Time Grid），并在此网格上部署基于多模态扩散 Transformer（MM-DiT）的时空一致性编辑机制，最终直接优化预训练的 4D 高斯溅射（4DGS）模型。
 
@@ -171,7 +173,7 @@ CTP 填补了这一缺口：它沿着相机-时间网格的遍历路径，将前
 
 整个流程无需对 MM-DiT 进行微调，也无需迭代式地更新训练数据集，体现了“训练免费”的核心优势。一次完整的 4D 编辑（以 DyNeRF 的 “coffee martini” 场景为例）在单张 NVIDIA H100 GPU 上耗时约 51 分钟。
 
-## 核心模块与公式推导
+
 
 Dynamic-eDiTor 的核心由三个紧密耦合的模块构成：**相机‑时间网格构建**、**时空子网格注意力 (STGA)** 与 **上下文令牌传播 (CTP)**，以及最终的 **直接 4DGS 优化**。整个流程围绕一个统一的相机‑时间网格展开，在该网格上通过局部联合注意力与全局令牌传播强制执行多视角‑时间一致性，无需额外训练。
 
@@ -252,7 +254,9 @@ $$(x', r', s') = (x + \Delta x, r + \Delta r, s + \Delta s)$$
 ![[assets/figures/papers/paper_list_l2471_https_arxiv_org_abs_2512_00677/figures/003_Figure_3.jpg]]
 *Figure 3: Vital Layer Range Analysis. We analyze the impact of applying Spatio-Temporal Sub-Grid Attention (STGA) across different layer ranges in MM-DiT [11, 54] during the multiview video editing process. Performance is evaluated by temporal consistency (Warping Error [30]), multi-view consistency (MEt3R [2]), and editing fidelity (CLIP Text-Image Directional Similarity [42]). Applying STGA to the early ∼30 layers provides the best trade-off between consistency and editing fidelity*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -332,7 +336,9 @@ Dynamic-eDiTor 在 **DyNeRF** 多视图视频数据集上进行评估，涵盖�
 ![[assets/figures/papers/paper_list_l2471_https_arxiv_org_abs_2512_00677/figures/013_Figure_9.jpg]]
 *Figure 9: Ablation Study: Asymmetric Sub-Grid Traversal (AGT). This qualitative result clearly demonstrates that AGT preserves global multi-view and temporal consistency. Without AGT, noticeable discontinuities appear between sub-grids*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有方法的谱系关系
 
@@ -377,6 +383,8 @@ Dynamic-eDiTor 处于**训练免费文本驱动4D场景编辑**这一新兴方�
 4. **编辑粒度与时效性的提升。** 当前方法以整个场景为单位进行编辑，缺乏对局部区域或特定时间段的精细控制。同时，51分钟的处理时间限制了交互式应用。如何在保持一致性的前提下，支持更细粒度的编辑控制（如空间掩码、时间窗口）并显著降低延迟？这可能需要在 MM-DiT 的推理效率和4DGS的优化策略上进行联合改进。
 
 5. **评估体系的完善。** 当前评估主要依赖 CLIP-based 指标和用户研究，缺乏专门针对4D编辑一致性的自动化度量标准。论文中使用的 Warping Error 和 MEt3R 指标（Table 6）是向正确方向迈出的一步，但4D编辑领域仍然急需更全面、更细粒度的自动化评估基准，以系统性地衡量多视角一致性、时间连贯性和编辑保真度之间的复杂权衡。
+
+
 
 ## 原文 PDF
 

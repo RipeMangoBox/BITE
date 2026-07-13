@@ -43,7 +43,7 @@ claims:
 > - MathVista-GPS 上，CLIP-Score 0.915 vs 0.884 (FigCodifier-8B) (+0.031)；FID 30.6 vs 42.5 (FigCodifier-8B) (-11.9)；几何推理准确率 (VLM InternVL3.5-38B) 0.718 (Base模型版本) vs 0.688 (未使用TikZ的InternVL3.5-38B) (+0.030)。
 > - GeoTikz-Instruct (辅助线生成) 上，MSE 211.7 vs 1435.9 (FigCodifier) (-1224.2)。
 
-## 概述
+## 概要
 
 多模态大语言模型（MLLMs）在几何感知与推理中面临一个根本瓶颈：视觉编码器难以精准捕获线段关系、角度大小、形状约束等细粒度几何结构，而大规模几何图像-代码配对数据的匮乏进一步制约了模型对几何语义的深层理解。**GeoTikzBridge** 针对这一瓶颈，提出将几何图像转化为结构化的 **TikZ 代码** 作为显式符号中间表示——用文本编码的几何元素与关系弥补视觉感知的不足，并为下游推理提供精确、可编译的几何信息。
 
@@ -53,7 +53,7 @@ claims:
 
 综上，GeoTikzBridge 通过“视觉→符号代码→推理”的路径，以数据驱动的方式系统性地缓解了 MLLMs 在局部几何感知上的短板，为几何视觉推理提供了一个可扩展、免训练的增强范式。
 
-## 背景与动机
+
 
 ### 多模态大模型的几何感知瓶颈
 
@@ -79,7 +79,9 @@ claims:
 
 - **推理层面**：将生成的TikZ代码作为即插即用的推理模块，为下游视觉/语言大模型提供精确的几何信息，从而在不修改推理模型本身的前提下，显著提升几何问题求解性能。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GeoTikzBridge 的核心创新在于将几何图像的视觉感知问题转化为结构化代码生成问题，并通过**迭代自优化数据扩展**与**局部代码变换策略**构建了当前最大规模的图像到TikZ数据集（2.5M对），训练出专门的代码生成模型，使其作为即插即用的推理模块显著增强多模态大语言模型的几何问题求解能力。以下从四个关键维度展开：
 
@@ -120,7 +122,7 @@ GeoTikzBridge 的核心设计理念是将代码生成模型作为独立模块，
 
 这一设计使GPT-5.0在MathVista-GPS上的准确率从0.891提升至0.937（Table S8），InternVL3.5-38B从0.688提升至0.718（Table 2），验证了TikZ代码作为符号中间表示在几何推理中的通用增强作用。
 
-## 整体框架
+
 
 GeoTikzBridge 的整体设计围绕一个核心因果机制展开：**将几何图像的视觉感知转化为结构化的 TikZ 代码，以此作为显式符号中间表示，弥补多模态大语言模型（MLLMs）在局部几何感知上的不足，并为下游推理提供精确的几何信息**。该框架由四个功能模块构成一条免训练的几何视觉推理流水线。
 
@@ -166,7 +168,7 @@ GeoTikzBridge 的整体设计围绕一个核心因果机制展开：**将几何�
 ![[assets/figures/papers/paper_list_l2510_https_arxiv_org_abs_2603_22687/figures/001_Figure_1.jpg]]
 *Figure 1: GeoTikzBridge demonstrates advantages in geometric perception and mathematical reasoning. (1) GeoTikzBridge-Base achieves the most accurate reconstruction of local geometric structures compared to existing approaches. (2) The generated tikz representations enhance MLLMs’ mathematical and visual geometric reasoning*
 
-## 核心模块与公式推导
+
 
 GeoTikzBridge 的核心由三个递进模块构成：**迭代自优化数据集构建与模型训练**、**指令驱动的辅助线生成**，以及**免训练几何视觉推理流水线**。以下逐一展开其关键公式与机制。
 
@@ -225,7 +227,9 @@ $$
 
 GeoTikzBridge-Base/Instruct 作为即插即用模块嵌入下游推理：将原始几何图像转换为 TikZ 代码（及可选辅助线代码/图像），与问题文本一同输入 VLM/LLM 进行解题。该流水线无需对推理模型进行任何额外训练，仅通过提示词引入结构化几何信息，即可显著提升推理准确率（Table 2, Table 4）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 图像到TikZ生成主结果
 
@@ -293,7 +297,9 @@ GeoTikzBridge-Base在图像到TikZ转换任务上全面超越现有方法。**Ta
 ![[assets/figures/papers/paper_list_l2510_https_arxiv_org_abs_2603_22687/figures/013_Figure_S.2.jpg]]
 *Figure S.2: Ablation study of different values of self-refinement K for GeoTikzBridge-Base-8B, evaluated on the MathVista-GPS benchmark*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位与核心瓶颈
 
@@ -356,6 +362,8 @@ GeoTikzBridge-Instruct 在绘制严格平行线等特定指令的生成精度仍
 4. **端到端几何推理**：能否开发端到端的几何推理范式，直接联合优化 TikZ 生成与解题过程，以克服对复杂角度、立体几何、解析几何的弱点？这需要重新设计训练目标与模型架构。
 
 5. **精细几何操作的精度提升**：平行线绘制等精细操作的生成精度应如何通过数据增强策略或模型架构改进来提升？这可能需要针对特定几何约束设计专门的损失函数或后处理机制。
+
+
 
 ## 原文 PDF
 

@@ -41,7 +41,7 @@ claims:
 > - NeRSemble (self-reenactment) 上，LPIPS↓ 0.15 vs N/A (N/A)；FID↓ 95.18 vs N/A (N/A)；AKD↓ 2.38 vs N/A (N/A)。
 > - NeRSemble (cross-reenactment) 上，FID↓ 160.74 vs N/A (N/A)；CLIP↑ 0.75 vs N/A (N/A)；AKD↓ 5.93 vs N/A (N/A)。
 
-## 概述
+## 概要
 
 从单张肖像图像重建可驱动的4D数字化身是计算机视觉中的一项核心挑战。现有方法多依赖固定的点云模板（如FLAME顶点）来初始化3D高斯溅射（3DGS）的几何结构，这从根本上限制了模型对个体几何复杂性的适应能力——精细细节（如胡须、发型、马尾辫）往往因模板约束而丢失。
 
@@ -51,7 +51,7 @@ claims:
 
 实验表明，该方法在NeRSemble数据集的自驱动与交叉驱动任务上取得了领先的定量结果，并在表情一致性、姿态一致性和身份保留方面展现出显著的定性优势。消融实验进一步证实，将自回归隐状态特征与点位置编码共同输入高斯解码器是性能的关键设计，而仅使用FLAME模板位置则会导致严重质量退化，印证了固定模板的局限性。
 
-## 背景与动机
+
 
 ### 单图化身生成的需求与挑战
 
@@ -82,7 +82,9 @@ claims:
 
 如 Figure 1 所示，AvatarPointillist 的自回归模型能够模拟高斯溅射的自适应点调整能力，生成精确的几何结构（如头发和浓密胡须），这是固定模板方法无法实现的。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 AvatarPointillist 的核心创新在于从根本上改变了 3DGS 化身的点云生成范式：将原本**依赖固定模板的回归问题重新建模为自回归序列生成任务**。这一范式转换带来了三个层面的关键突破。
 
@@ -114,7 +116,7 @@ $$\hat{\mathbf{S}}_i = b_0 \mathbf{S}_0 + b_1 \mathbf{S}_1 + b_2 \mathbf{S}_2$$
 
 这使得生成的高斯点云可以直接通过 LBS 和 corrective blendshapes 驱动，无需额外的动画适配网络。与 **GAGAvatar** 等依赖辅助网络细化的三平面方法相比，AvatarPointillist 的显式点云生成在视角一致性和身份保留上具有天然优势（Figure 4）。
 
-## 整体框架
+
 
 AvatarPointillist 提出了一种从单张肖像图像直接生成可驱动 4D 高斯化身的全新范式。其核心思想是将高斯点云的生成建模为自回归序列任务，从而摆脱传统方法对固定点云模板的依赖，使模型能够根据输入主体的几何复杂度自适应地调整高斯点的空间分布与总数。
 
@@ -141,7 +143,7 @@ AvatarPointillist 提出了一种从单张肖像图像直接生成可驱动 4D �
 
 Figure 2 直观展示了本文方法与基于固定模板的方法（如 **LAM**）的本质区别。LAM 以 FLAME 顶点作为高斯点云的初始化模板，仅通过预测偏移来变形模板——这导致其无法在模板覆盖不到的区域（如马尾辫、浓密胡须）生成足够的高斯点，造成精细几何结构的丢失。AvatarPointillist 则通过自回归生成从零开始构建点云，模型自主决定在几何复杂区域增加点密度、在平滑区域减少点数，从根本上释放了 3DGS 的表示潜力。
 
-## 核心模块与公式推导
+
 
 ### 3DGS 预备知识：局部到全局的变换
 
@@ -207,7 +209,9 @@ $$\begin{array}{rl} \hat{\mathbf{w}}_i &= b_0 \mathbf{W}_0 + b_1 \mathbf{W}_1 + 
 ![[assets/figures/papers/paper_list_l2442_https_arxiv_org_abs_2604_04787/figures/002_Figure_2.jpg]]
 *Figure 2: Comparison of different Gaussian point cloud modeling approaches. LAM [22] constructs Gaussian point clouds based on a point cloud template, which fails to reconstruct fine details from the image, such as ponytails. In contrast, our method utilizes an AR model to directly model the Gaussian point cloud. It effectively learns the capability to adaptively adjust point density and count, enabling precise modeling. Moreover, we also include final rendering results for comparison. LAM produces distorted geometry and shows noticeable artifacts*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -251,7 +255,9 @@ Figure 4展示了定性比较结果。在自驱动任务中，方法生成的化
 ![[assets/figures/papers/paper_list_l2442_https_arxiv_org_abs_2604_04787/figures/007_Figure_5.jpg]]
 *Figure 5: Visualization of ablation study on input setting of Gaussian decoder. The leftmost column shows the input. The FLAME Positions baseline, similar to the LAM method, uses the canonical FLAME mesh vertices as a template and only applies decoder-predicted offsets to deform this template into a final Gaussian point cloud. Pointwise AR Feature refers to using only the AR features (F pn ) without positional information, while Positional Encoding uses only the point embeddings*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -313,6 +319,8 @@ AvatarPointillist 的核心贡献在于将 4D 高斯化身的生成问题重新�
 4. **少样本泛化**：当训练数据规模有限或目标主体与训练分布差异较大时，AR 模型的点云生成质量是否会显著退化？能否通过更强的先验注入或元学习策略提升泛化能力？
 
 5. **与扩散模型的对比**：近期扩散模型在 3D 生成领域展现出强大的能力，自回归序列建模与扩散去噪范式在点云生成任务上的优劣对比尚未被系统研究。
+
+
 
 ## 原文 PDF
 

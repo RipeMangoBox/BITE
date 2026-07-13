@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/When_Pretty_Isn_t_Useful_Investigating_Why_Modern_Text_to_Image_Models_Fail_as_Reliable_Training_Data_Generators.pdf
+project_link: null
 code_link: "https://huggingface.co/blackforest-labs/FLUX.1-dev"
 aliases:
 - SSRDBF
@@ -43,7 +44,7 @@ claims:
 > - ImageNet-1k (200-class subset) 上，Synth→Real 分类准确率 vs. GenEval 和 CLIPScore 较新的 T2I 模型 vs 较早的 T2I 模型 (负相关：更高的文本对齐分数对应更低的训练数据效用（类名提示）)。
 > - ImageNet-1k (structure vs. texture analysis) 上，Synth→Real 分类准确率差距 结构空间 (Depth) 分类器 vs 纹理空间 (BagNet) 分类器 (结构空间差距显著小于纹理空间差距)。
 
-## 概述
+## 概要
 
 **核心矛盾**：现代文本到图像（T2I）模型在视觉保真度和文本遵循度上持续进步，但作为训练数据生成器时，其合成数据训练的下游分类器在真实测试集上的准确率却呈**持续下降趋势**（Figure 1）。这一现象揭示了一个关键悖论：生成式视觉进步 ≠ 数据真实性进步。
 
@@ -60,7 +61,7 @@ claims:
 
 **局限与开放问题**：当前分析限于 ImageNet-1k 分类任务和 ResNet-50 架构，尚未验证在目标检测、分割等更复杂视觉任务中的适用性。专有闭源模型（如 DALL·E 3、Midjourney）的表现未知。如何在生成阶段引入对学习有用的多样性奖励，实现视觉保真度与数据真实性的协同提升，仍是待解决的关键问题。
 
-## 背景与动机
+
 
 文本到图像（T2I）生成模型在近三年经历了爆发式进步。从 **Stable Diffusion v1.5**（Rombach et al., CVPR 2022）到 **Flux-Dev**（Black Forest Labs, 2024）、**Qwen-Image**（Wu et al., arXiv 2025）等最新模型，生成图像的视觉保真度和提示遵循度持续攀升。一个自然而迫切的问题是：这些越来越“好看”的生成模型，是否也能作为更可靠的训练数据生成器，服务于下游视觉任务？
 
@@ -70,7 +71,9 @@ claims:
 
 这一现象揭示了生成式视觉研究中一个深层的**保真度-多样性权衡**：较新的 T2I 模型在追求视觉质量和文本对齐的过程中，其输出分布坍缩到了狭窄的、以美学为中心的区域，牺牲了类别内多样性和真实数据所具备的高频纹理细节。本文的动机正在于解剖这一退化现象的成因——是纹理失真、高频信息丢失，还是分布漂移与多样性崩溃？通过系统性的诊断框架，作者试图回答一个更根本的问题：**生成式视觉的进步，是否等价于数据真实性的进步？**
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作的核心创新不在于提出新的生成模型或训练范式，而是构建了一套**系统性的合成数据诊断框架**，首次从数据真实性（data realism）而非视觉质量的角度，对 2022–2025 年间 13 个开源 T2I 模型作为训练数据生成器的效用进行了大规模基准测试。
 
@@ -106,7 +109,7 @@ claims:
 
 本文的分析范围明确限定在图像分类任务（ImageNet-1k 200 类子集）和开源 T2I 模型，且下游模型以 ResNet-50 为主。所发现的趋势是否在目标检测、分割等任务中成立，以及专有模型（如 DALL·E 3、Midjourney）是否呈现相同模式，仍需进一步验证。此外，详细字幕提示虽能缓解部分问题，但在缺乏原始图像标注的纯合成场景下不可行，其实用性受限。
 
-## 整体框架
+
 
 本文提出了一套**系统化的合成→真实诊断与基准测试框架**，旨在解耦现代文生图模型作为训练数据生成器时的失效根源。框架的核心逻辑并非改进生成模型本身，而是通过受控的数据变换和跨域评估，逐层剥离并量化合成图像在**结构、纹理、频谱和分布**四个维度上的失真程度，最终建立这些失真与下游分类器泛化性能之间的因果关联。
 
@@ -144,7 +147,7 @@ claims:
 ![[assets/figures/papers/paper_list_l2363_https_openaccess_thecvf_com_content_CVPR2026_html_Adamkiewicz_When_Prett/figures/002_Figure_2.jpg]]
 *Figure 2: To probe which aspects of synthetic images are most affected, we transform images to suppress or amplify the effects of distortions in a given domain. To separate the effect of low and high level details, we measure the performance gap when training in depth space, which removes textures, and training a low-receptive-field (visualized in the figure) classifier which operates on 9 × 9 image patches and hence does not rely on structure. To separate the effects of high and low frequency distortions, we train on low and high-pass filtered images. Removing offending features should close the gap with relation to RGB, while removing non-offending features should widen it*
 
-## 核心模块与公式推导
+
 
 ### 诊断框架总览
 
@@ -203,7 +206,9 @@ $$S(f) \propto f^{-\alpha}$$
 ![[assets/figures/papers/paper_list_l2363_https_openaccess_thecvf_com_content_CVPR2026_html_Adamkiewicz_When_Prett/figures/004_Figure_4.jpg]]
 *Figure 4: Performance comparison for (left) structure (depth-based classifier) and texture (local feature classifier), and (right) frequencyfiltered data for class name- and caption-guided synthetic datasets. Image structure is consistently less affected than texture, while high-frequency components degrade more strongly than low frequencies (especially in better-performing models)*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：生成式进步与训练数据效用的背离
 
@@ -254,7 +259,9 @@ Figure 6 展示了一个极具诊断价值的不对称现象：**Real→Synth �
 
 这些失败模式相互关联：对视觉保真度和美学质量的优化倾向使模型坍塌到狭窄的、以美学为中心的分布，同时损害了纹理真实性和高频细节，最终导致合成数据的训练效用不升反降。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：生成式视觉进步 ≠ 数据真实性进步
 
@@ -315,6 +322,8 @@ Figure 6 展示了一个极具诊断价值的不对称现象：**Real→Synth �
 2. **闭源模型评估：** 专有 T2I 模型（如 DALL·E 3、Midjourney）作为训练数据生成器的表现如何？其训练数据效用是否同样遵循下降趋势？
 3. **多样性奖励机制：** 如何在生成阶段引入对学习有用的多样性奖励，将生成过程与下游任务学习耦合，以提升合成数据的训练效用？这可能需要重新设计 T2I 模型的训练目标或采样策略。
 4. **保真度-真实性协同：** 是否存在一种能够同时提高视觉保真度和数据真实性的 T2I 模型设计或后训练策略？当前模型在追求美学质量时牺牲了数据多样性，这暗示需要新的权衡机制。
+
+
 
 ## 原文 PDF
 

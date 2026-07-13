@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2026
 pdf_ref: paperPDFs/arxiv_2026/CT_1_Camera_Trajectory_Generation_for_Camera_Controlled_Video_Generation.pdf
+project_link: https://gulucaptain.github.io/Camera-Transformer-1/
+code_link: https://github.com/gulucaptain/Camera-Transformer-1
 aliases:
 - C1CT1
 - CT-1
@@ -41,7 +43,7 @@ claims:
 > - CameraBench100 上，Success Rate (Average) 81.6 vs 64.9 (Wan2.2 w/ PE) (+16.7 (相对提升25.7%))。
 > - VBench 上，Aesthetic Quality 0.585 vs 0.571 (Wan2.1 w/o PE) (+0.014)。
 
-## 概述
+## 概要
 
 现有相机可控视频生成方法面临一个核心瓶颈：**缺乏自动生成与用户意图和场景上下文一致的相机轨迹的能力**。手动指定相机参数（如平移向量、旋转矩阵）不仅耗时费力，而且要求用户具备专业知识；基于文本提示的隐式控制方式则精度不足，难以将特定的相机运动意图推广到多样化的视觉场景中。
 
@@ -51,7 +53,7 @@ claims:
 
 在方法谱系上，CT-1 区别于 **MotionCtrl** 和 **CameraCtrl** 等依赖外部指定轨迹的相机可控视频生成模型，也不同于 **CogVideoX**、**LTX-Video**、**Wan2.1/Wan2.2** 等仅从文本隐式推断相机运动的图像到视频生成模型。CT-1 的核心贡献在于**将轨迹生成建模为一个独立的、可迁移的视觉推理任务**，使得空间推理知识可以从 VLC 模型迁移到任意下游视频生成主干中。
 
-## 背景与动机
+
 
 ### 相机可控视频生成的现状与瓶颈
 
@@ -86,7 +88,9 @@ CT-1的设计围绕三个关键洞察展开：
 
 通过这一设计，CT-1将空间推理知识迁移到视频生成流程中，使得下游的相机可控视频生成模型（如CameraCtrl、MotionCtrl）能够获得高质量、场景感知的相机轨迹，最终实现从“图像+文本”到“可控视频”的端到端生成。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CT-1的核心创新在于将相机轨迹生成从“手动指定参数”或“隐式依赖文本提示”的范式，转变为**从图像-文本对自动推理SE(3)轨迹分布**的生成式建模问题。具体而言，CT-1在以下三个关键维度上实现了突破：
 
@@ -110,7 +114,7 @@ $$\mathcal{L}_{\mathrm{wav}} = \lambda_a \| a_L(\hat{\mathbf{K}}) - a_L(\mathbf{
 
 基线方法通常将视觉特征和文本特征简单拼接或池化后送入生成模型，缺乏专用的相机上下文表示。CT-1设计了专用的 **<CAM> token**，在视觉语言模块中融合双分支视觉编码器提取的场景感知特征与LLaMA-2语言模型编码的用户意图，形成富含空间推理信息的相机上下文表征，再作为条件注入扩散Transformer。消融实验（Table 11）表明，<CAM> token的融合策略显著优于仅文本条件、仅视觉条件以及池化条件，验证了联合视觉-语言空间推理对于轨迹生成的关键作用。
 
-## 整体框架
+
 
 CT-1 的整体 pipeline 围绕“视觉-语言-相机（VLC）”这一核心范式构建，目标是从单张参考图像和一段描述用户意图的文本指令出发，自动生成与场景语义对齐的 SE(3) 相机轨迹，并将该轨迹作为控制信号馈入下游相机可控视频生成模型，实现端到端的图像-文本到视频生成。整个框架由三个关键模块串联构成，如图 Figure 2 所示。
 
@@ -139,7 +143,7 @@ CT-1 的整体 pipeline 围绕“视觉-语言-相机（VLC）”这一核心范
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2604_09201/figures/014_Figure_6.jpg]]
 *Figure 6: Visualization of camera trajectories estimated by CT-1. The red (X), green (Y), and blue (Z) axes indicate the camera’s local coordinate system [25]: the red axis denotes the right–left direction, the green axis represents the vertical direction (down or up), and the blue axis corresponds to the viewing direction (forward or backward, i.e., zoom-in or zoom-out)*
 
-## 核心模块与公式推导
+
 
 CT-1 的核心架构由三个紧密协作的模块构成：**视觉-语言模块（Vision-Language Module）**、**相机Transformer（Camera Transformer / DiT）** 和**小波正则化损失（WavReg）**。以下逐一展开其设计逻辑与关键公式。
 
@@ -195,7 +199,9 @@ CT-1 预测的 SE(3) 轨迹可直接驱动现有的相机可控视频生成模�
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2604_09201/figures/020_Figure_12.jpg]]
 *Figure 12: Qualitative results of applying the trajectories results of the CT-1 on MotionCtrl [32] model, which is a camera-controllable video generation model. The tested scenes are from the MultiCamVideo dataset [1]*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -264,7 +270,9 @@ Figure 3对1000条轨迹的小波分析揭示了**低频成分主导相机运动
 ![[assets/figures/papers/paper_list_l15_https_arxiv_org_abs_2604_09201/figures/010_Table_4.jpg]]
 *Table 4: Impact of the WavReg loss and the parameter*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位与核心瓶颈
 
@@ -318,6 +326,8 @@ CT-1主要从**单张参考图像**生成轨迹，未显式利用多帧历史信
 4. **高度动态场景的泛化**：在更真实、高度动态的驾驶场景中（如DrivingDoJo数据集，Figure 14），CT-1的性能上限和失败模式需要更系统的研究。
 
 5. **与不同视频生成主干的集成灵活性**：当前实验主要验证了与CameraNoise、CameraCtrl和MotionCtrl的集成，是否可以将CT-1与基于U-Net架构的视频生成模型或其他扩散主干灵活集成，仍有待探索。
+
+
 
 ## 原文 PDF
 

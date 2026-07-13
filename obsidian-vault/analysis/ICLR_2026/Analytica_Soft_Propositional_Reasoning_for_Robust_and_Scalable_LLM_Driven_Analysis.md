@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Analytica_Soft_Propositional_Reasoning_for_Robust_and_Scalable_LLM_Driven_Analysis.pdf
+project_link: null
+code_link: null
 aliases:
 - Analytica
 tags:
@@ -39,17 +41,19 @@ claims:
 > - 经济、金融、政治预测（736个任务） 上，方差 为 6.02%，对比 9.28% (Deep Research alone)，变化 -35.1%。
 > - 经济、金融、政治预测（736个任务） 上，平均准确率 为 70.11%，对比 61.96% (Jupyter NB alone)，变化 +13.15%。
 
-## 概述
+## 概要
 
 本文提出 **Analytica**，一种基于**软命题推理（Soft Propositional Reasoning, SPR）**的新型LLM智能体架构。该框架将复杂分析任务重构为对结果命题软真值的结构化估计过程，通过分治策略将问题分解为子命题树，利用工具增强的Grounder智能体降低偏差，再通过鲁棒线性合成模型递归聚合叶子节点以降低方差。在736个真实经济、金融和政治预测任务上，Analytica平均准确率提升15.84%，达到71.06%的准确率，方差仅为6.02%。其Jupyter Notebook Grounder在达到接近最高准确率（70.11%）的同时，成本降低90.35%，时间节省52.85%。此外，Analytica能够处理指数级增长的复杂度（54倍节点数），而计算时间仅呈近线性增长（12倍）。
 
-## 背景与动机
+
 
 现有LLM推理方法（如Chain-of-Thought、Tree-of-Thoughts、Graph-of-Thoughts、Forest-of-Thought）依赖自由形式的文本推理，缺乏可验证的组合结构，导致随机不稳定性和估计误差（偏差与方差）无法被系统性地控制。这些方法通常通过选择最优推理路径来生成最终答案，但路径选择本身具有随机性，且缺乏对误差传播的理论分析。
 
 本文的核心动机是：**能否将LLM驱动的分析问题形式化为一个可分解、可验证的结构化过程，从而系统性地控制估计误差？** 作者从偏差-方差分解的角度出发，将总估计误差分解为偏差平方和方差，并分别通过问题分解（降低偏差）和线性加权平均（降低方差）来最小化总误差。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Analytica的核心创新在于将分析问题形式化为**软命题推理（SPR）**，并基于此设计了一个三阶段分治架构。具体创新点包括：
 
@@ -59,7 +63,7 @@ Analytica的核心创新在于将分析问题形式化为**软命题推理（SPR
 4. **鲁棒线性合成模型**：递归聚合叶子节点的软真值，通过加权平均消除随机噪声，具有恒定的噪声灵敏度，确保误差传播稳定有界。
 5. **可扩展性与交互性**：支持递归扩展（Analytican）和“what-if”场景分析（Resynthesis）。
 
-## 整体框架
+
 
 Analytica采用高度并行的三阶段分治策略，如Figure 1和Figure 3所示：
 
@@ -73,15 +77,15 @@ Figure 1: 整体流程图
 
 Figure 3: 架构详细说明
 
-## 核心模块与公式推导
 
-## 1 偏差-方差分解
+
+### 1 偏差-方差分解
 
 总估计误差可分解为偏差平方和方差（Equation 1）：
 
 $$\mathbf{MSE}(p_{true}) = E[(p_{true} - p_{true}^{gt})^2] = (E[p_{true}] - p_{true}^{gt})^2 + E[(p_{true} - E[p_{true}])^2]$$
 
-## 2 线性合成规则
+### 2 线性合成规则
 
 非叶子命题的软真值是子命题软真值的线性组合（Equation 2）：
 
@@ -93,7 +97,7 @@ $$\frac{\partial P}{\partial C_j} = \beta_j$$
 
 这意味着线性合成规则对每个子命题输入的灵敏度是常数，等于其权重，确保误差传播稳定有界。相比之下，AND逻辑门的灵敏度是状态依赖的（∂P/∂C₁ = C₂），可能导致噪声放大。
 
-## 3 偏差与方差传播
+### 3 偏差与方差传播
 
 根估计的偏差是各个叶子估计偏差的加权和：
 
@@ -107,7 +111,7 @@ $$\operatorname{Var}(p_{true}) = \sum_{i=1}^k \beta'_i^2 \operatorname{Var}(l_{i
 
 方差通过粒度分解和最小化子命题间协方差来最小化。
 
-## 4 可扩展性
+### 4 可扩展性
 
 递归Analytica（Analytican）具有上下文局部性：每个Grounder调用是O(1)，每个Analyzer/Synthesizer调用是O(K)，与递归深度无关。并行时间复杂度为：
 
@@ -115,9 +119,11 @@ $$T_P(n) = O\left(n + \frac{K^n}{P} \cdot T_G\right)$$
 
 其中P是并行工作器数量，T_G是Grounder时间。
 
-## 实验与分析
 
-## 1 主要结果
+
+## 实验与关键发现
+
+### 1 主要结果
 
 Table 2: 主要性能对比
 
@@ -132,13 +138,13 @@ Table 3: 高级Grounder消融实验
 
 Analytica-L在Deep Research Grounder上达到最高准确率71.06%，方差仅为6.02%。Jupyter Notebook Grounder在显著降低成本（90.35%）和时间（52.85%）的同时，保持了接近的准确率（70.11%）。
 
-## 2 合成规则消融
+### 2 合成规则消融
 
 Figure 5: 合成规则鲁棒性对比
 
 线性合成规则在准确率、稳定性和抗噪性方面均优于Vanilla和Simple Logic规则。Simple Logic规则对噪声高度敏感，而线性规则表现出高鲁棒性。将线性规则退化为随机权重或无权重平均会降低性能，表明学习到的权重提供了信息性的证据集成。
 
-## 3 可扩展性
+### 3 可扩展性
 
 Table 1: 可扩展性数据
 
@@ -154,7 +160,7 @@ Figure 4: 准确率与节点数关系
 
 随着递归深度增加，节点数和Token数呈指数增长，而平均计算时间仅呈近线性增长。准确率与节点数呈正相关。
 
-## 4 模型选择分析
+### 4 模型选择分析
 
 Figure 12: 成本效率分析
 
@@ -162,7 +168,7 @@ Figure 13: 模型选择的边际影响
 
 Grounder模型的选择是成本和整体性能的最重要决定因素。Analytica框架对同一模型族内的模型选择表现出相当大的鲁棒性。Analytica的有效性仅弱依赖于模型大小，主要受预训练和后训练过程影响。
 
-## 5 小模型与开源模型
+### 5 小模型与开源模型
 
 Table 6: 小模型和开源模型评估
 
@@ -174,7 +180,7 @@ Table 6: 小模型和开源模型评估
 
 最大的相对增益出现在紧凑的蒸馏模型中，例如OpenAI-OSS-20B增强后达到与671B参数的DeepSeek-v3.1基线相当的性能。
 
-## 6 科学声明验证
+### 6 科学声明验证
 
 Table 7: 科学声明验证结果
 
@@ -185,19 +191,21 @@ Table 7: 科学声明验证结果
 
 在Matter-of-Fact基准上，Analytica展示了跨领域适应性。
 
-## 7 统计显著性
+### 7 统计显著性
 
 Figure 10: 统计显著性矩阵
 
 Analytica-L与Deep Research Grounder的组合与所有基线（包括Deep Research、Tree of Thoughts、Forest of Thoughts）相比，p值均为0.00，表明改进具有高度统计显著性。
 
-## 8 公平性说明
+### 8 公平性说明
 
 - 实验主要基于经济、金融和政治预测任务，这些任务具有高不确定性和数据丰富性，但可能不代表所有分析领域。
 - 科学声明验证实验显示了跨领域适应性，但仅测试了有限的一组模型。
 - Jupyter Notebook Grounder在显著降低成本的同时保持了高准确率，有助于更广泛地使用高级分析能力。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 Analytica在LLM推理方法谱系中占据独特位置：
 
@@ -223,12 +231,12 @@ Analytica在LLM推理方法谱系中占据独特位置：
 - 如何设计自适应机制，根据任务难度和可用预算动态选择Grounder模型？
 - 在更广泛的应用领域（如医疗诊断、法律推理）中，Analytica的性能和适用性如何？
 
-## 整体框架
+### 整体框架
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__language_speech_and_dialog__b001_9cFT6u82uh_Analytica_Sof/figures/001_Figure_1.jpg]]
 *Figure 1: Given a complex query (e.g., forecasting $NVDA), Analytica selects the most plausible outcome by estimating the “soft truth value” of each provided competing proposition (Green box). The analysis process begins when an analyzer agent decomposes a proposition into a tree of subpropositions (Orange box), terminating is a set of testable leaf nodes. Next, grounder agents, such as a Jupyter Notebook agent mimicking a human analyst, evaluate the leaves (Purple box) and assign soft scores that reflect the evidence for each leaf. Finally, a synthesis stage recursively aggregates these scores up the tree (middle) to compute a final score for the root proposition.*
 
-## 实验与分析
+### 实验与分析
 
 ### 补充图表
 
@@ -246,6 +254,8 @@ Analytica在LLM推理方法谱系中占据独特位置：
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__language_speech_and_dialog__b001_9cFT6u82uh_Analytica_Sof/figures/019_Table_5.jpg]]
 *Table 5: Model accuracy (Accu. %) breakdown by task category.*
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2025
 pdf_ref: paperPDFs/ICLR_2025/3DTrajMaster_Mastering_3D_Trajectory_for_Multi_Entity_Motion_in_Video_Generation.pdf
+project_link: http://fuxiao0719.github.io/projects/3dtrajmaster
+code_link: null
 aliases:
 - 3M3TMEMVG
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | 3DTrajMaster：视频生成中基于6自由度轨迹的多实体运动控制 |
 | 英文题名 | 3DTrajMaster: Mastering 3D Trajectory for Multi-Entity Motion in Video Generation |
 | 会议/期刊 | ICLR 2025 |
-| Links | [paper](https://arxiv.org/abs/2412.07759); [Project](http://fuxiao0719.github.io/projects/3dtrajmaster) |
+| Links | [paper](https://arxiv.org/abs/2412.07759) · [Project](http://fuxiao0719.github.io/projects/3dtrajmaster) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | 3DTrajMaster |
 | Dataset | Custom evaluation set (100 pairs: 12 single, 72 two, 16 three entity; only human entities evaluated due to missing 4D animal pose estimator) |
@@ -38,7 +40,7 @@ claims:
 > [!tip] 效果简介
 > - Custom evaluation set (100 pairs: 12 single, 72 two, 16 three entity; only huma... 上，TransErr (m) / RotErr (deg) 为 0.398 / 0.277，对比 1.420 / 1.057 (Direct-a-Video, best baseline)，变化 -1.022 / -0.780。
 
-## 概述
+## 概要
 
 **问题**：现有可控视频生成方法依赖2D控制信号（点、框、2D轨迹），无法表达真实世界中物体运动的3D属性（旋转、遮挡、深度），导致多实体场景下难以实现精确的3D运动控制。
 
@@ -48,7 +50,7 @@ claims:
 
 **局限**：当前方法仅控制实体全局轨迹，缺乏对细粒度局部运动（如跳舞、手势）的直接控制能力；实体间交互（碰撞、交流）尚未建模；评估仅局限于人类实体（因缺少开放世界4D动物姿态估计器），且训练数据实体数量上限为3个。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -74,7 +76,9 @@ claims:
 
 为应对这些挑战，本文设计了三个互补的技术组件：一个即插即用的3D运动基础对象注入器，通过门控自注意力机制建立实体与轨迹的一一对应；一个基于合成数据的训练范式，利用Unreal Engine构建360°运动数据集；以及域适应器和退火采样策略，缓解合成数据带来的域偏移问题。这些设计共同构成了 **3DTrajMaster** 的核心技术路线。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 3DTrajMaster 的核心创新在于将可控视频生成的运动表示从二维平面提升至三维空间，并系统性地解决了由此带来的多实体对应、数据匮乏和域偏移三大挑战。其关键创新点可概括为以下三个层面：
 
@@ -119,7 +123,7 @@ claims:
 
 这些创新并非孤立存在，而是形成了因果链条：6DoF 表示使 3D 运动控制成为可能，但要求精确的实体-轨迹对应；合成数据解决了标注问题，却引入了域偏移；域适应器和退火采样则弥合了这一差距，最终在 TransErr 0.398 m、RotErr 0.277° 的精度（Table 2）下保持了可接受的视频质量。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l27_3DTrajMaster_Mastering_3D_Trajectory_for_Multi_Entity_Motion_in_Video_Ge/figures/002_Figure_2.jpg]]
 *Figure 2: 3DTrajMaster Framework. Given a text prompt consisting of N entities $\{ \mathbf { e } _ { n } \} _ { n = 1 } ^ { N }$ , 3DTrajMaster (a) is able to generate the desired video with entity motions that conform to the input entity-wise pose sequences $\langle \mathbf { \check { P } } _ { n } \rangle _ { n = 1 } ^ { N }$ . Specifically, it involves two training phases. First, it utilizes a domain adaptor to mitigate the negative impact of training videos. Then, an object injector module is inserted after the 2D spatial self-attention layer to integrate paired entity prompts and 3D trajectories. (b) Details of the object injection process. The entities are projected into latent embeddings through t...
@@ -158,7 +162,7 @@ $$\mathcal{L}(\boldsymbol{\theta}_2) = \mathbb{E}_{\mathbf{x}, \mathbf{c}, \bold
 
 **退火采样推理**。在推理阶段，3DTrajMaster 采用退火条件采样策略（Algorithm 1）：前 $T_c$ 步注入轨迹条件以确定实体的整体运动轨迹，后续步骤仅依赖基础 T2V 先验生成高质量视觉细节。这一策略有效平衡了运动控制精度与视频质量，是完整 pipeline 中不可或缺的推理环节。
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题形式化与扩散先验
 
@@ -208,7 +212,9 @@ $$\mathcal { L } ( \theta _ { 2 } ) = \mathbb { E } _ { \mathbf { x } , \mathbf 
 
 推理阶段采用退火条件采样：前 $T_c$ 步注入轨迹条件以确定整体运动轨迹，后续步骤仅依赖基础 T2V 先验生成细节纹理。该策略通过调节条件注入的时长来平衡运动控制精度与视觉质量。消融显示，省略退火采样使 FVD 从 1546.15 升至 1841.64，而旋转误差仅从 0.277° 轻微变化至 0.265°，验证了该策略对视觉质量的关键作用（Table 3）。最优退火时间步 $T_c = 25$（Table R8）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与评估设计
 
@@ -278,7 +284,9 @@ Table R12 的用户调查结果进一步验证了 3DTrajMaster 的感知优势�
 ![[assets/figures/papers/paper_list_l27_3DTrajMaster_Mastering_3D_Trajectory_for_Multi_Entity_Motion_in_Video_Ge/figures/004_Table_1.jpg]]
 *Table 1: Fine Control Comparison with Multi-Entity Input*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：从2D控制到3D运动建模
 
@@ -342,6 +350,8 @@ Table R12 的用户调查结果进一步验证了 3DTrajMaster 的感知优势�
 3. **真实视频训练的桥接：** 如何将当前仅限于合成数据的训练扩展到利用大规模真实视频？关键在于获取或推断真实视频中的3D轨迹监督信号——这可能需要借助单目3D重建、多视角几何或自监督学习技术。
 
 4. **自适应条件调度：** 退火采样和域适应器之间的相互作用是否可以通过更自适应的方式动态调整？例如，根据当前去噪步的预测不确定性或实体运动的复杂度，自动调节条件注入强度，以在不同场景下自动平衡质量和控制精度。
+
+
 
 ## 原文 PDF
 

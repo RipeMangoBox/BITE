@@ -41,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - nuScenes (ST-P3) 上，Average Collision Rate (%) 0.17 vs 0.23 (HybridDriveVLA w/o V-CoT, ToT-Evaluation only) (-0.06 (26% relative improvement))；L2 Average (m) 0.26 vs N/A (N/A)。
 
-## 概述
+## 概要
 
 端到端自动驾驶系统近年来逐步引入视觉-语言-动作（VLA）模型，以利用大语言模型的推理能力进行规划。然而，现有VLA方案普遍依赖**文本链式思维（Text-CoT）**，将连续的视觉信息转换为离散符号，导致空间信息丢失；同时，这些方法仅预测单一序列路径点，缺乏针对不同驾驶层面的显式评估与抉择。这构成了当前VLA自动驾驶的核心瓶颈。
 
@@ -49,7 +49,7 @@ claims:
 
 在nuScenes基准上，HybridDriveVLA实现了**0.17%的平均碰撞率**，相比仅使用ToT-Evaluation（无V-CoT）的变体（0.23%）相对提升26%，优于传统VLA模型。消融实验进一步表明，移除V-CoT或跳过监督微调（SFT）阶段均会导致碰撞率显著上升，验证了视觉预测作为目标以及基础视觉场景理解对于有效推理的关键作用。
 
-## 背景与动机
+
 
 自动驾驶的核心任务之一是轨迹规划——根据当前环境状态预测未来路径点序列。近年来，视觉-语言-动作（VLA）模型在自动驾驶中展现出潜力，它们将多模态感知与动作预测统一在一个框架内。然而，现有VLA方案存在两个结构性缺陷，限制了其在复杂场景下的安全决策能力。
 
@@ -59,7 +59,9 @@ claims:
 
 **动机：从视觉推理到多层面评估。** 针对上述双重瓶颈，HybridDriveVLA提出两个核心创新：一是**视觉链式思维（V-CoT）**，直接在视觉域内自回归预测未来场景图像，以此作为规划目标，从根本上避免文本转换带来的空间信息损失；二是**思维树评估（ToT-Evaluation）**，基于安全性、进度、舒适性三个层面生成多条候选路径点序列并分别评分，选取综合评分最高的轨迹作为最优动作，实现对驾驶决策的显式多层面评估与择优。这一“视觉预测→多层面评估→择优输出”的推理管线，使模型能够像熟练驾驶员一样，在行动前先“想象”未来场景，再“权衡”不同选择的利弊。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 HybridDriveVLA 的核心创新在于将**视觉链式思维（Visual Chain-of-Thought, V-CoT）推理**与**思维树评估（Tree-of-Thought Evaluation, ToT-Evaluation）**统一集成到一个端到端的视觉-语言-动作（VLA）框架中，从而系统性地解决了传统自动驾驶VLA模型的两大瓶颈：**推理过程中的空间信息丢失**和**路径规划中的单一决策盲区**。
 
@@ -104,7 +106,7 @@ V-CoT与ToT-Evaluation并非两个独立模块的简单拼接，而是形成了*
 
 HybridDriveVLA 在方法谱系中处于**视觉世界模型与审慎规划的交汇点**：它既不同于直接预测动作的端到端方法，也不同于仅生成文本解释的VLA方案，而是通过“视觉预测+多层面评估”的混合推理机制，实现了对视觉信息的充分利用与驾驶安全性的显式保障。
 
-## 整体框架
+
 
 HybridDriveVLA 的整体推理流程遵循“视觉感知 → 视觉链式思维预测（V‑CoT）→ 思维树评估（ToT‑Evaluation）→ 动作输出”的级联范式，将未来场景的视觉生成与多层面轨迹评估统一在一个自回归的多模态模型中。
 
@@ -183,7 +185,7 @@ $$
 ![[assets/figures/papers/paper_list_l2215_https_openaccess_thecvf_com_content_CVPR2026_html_Bassole_HybridDriveVLA/figures/002_Figure_2.jpg]]
 *Figure 2: Evolution from traditional VLA to our proposed Hybrid-DriveVLA. (a) Direct action prediction. (b) CoT-based reasoning for textual explanations. (c) HybridDriveVLA as an autonomous driving world-model combining V-CoT for visual next scene anticipation/generation and ToT-Evaluation for evaluative trajectory planning on each specific aspect*
 
-## 核心模块与公式推导
+
 
 HybridDriveVLA 的核心推理管线由两个紧密耦合的模块构成：**视觉链式思维（Visual Chain-of-Thought, V-CoT）** 与 **思维树评估（Tree-of-Thought Evaluation, ToT-Evaluation）**。V-CoT 负责生成未来视觉场景作为目标，ToT-Evaluation 则基于该目标进行多层面路径评估与择优。
 
@@ -260,7 +262,9 @@ $$s_{t+k\alpha}^{\text{progress}} = \sigma\left(\frac{v_{t+k\alpha} - v^{\min}}{
 ![[assets/figures/papers/paper_list_l2215_https_openaccess_thecvf_com_content_CVPR2026_html_Bassole_HybridDriveVLA/figures/003_Figure_3.jpg]]
 *Figure 3: HybridDriveVLA architecture integrates a Vision Encoder, Language Model, MoVQGAN encoder-decoder for multimodal reasoning. Inputs include multi-view images, ego states, navigational commands, instructions, and evaluation aspects (Safety, Progress, Comfort) processed in Text Detokenizer. HybridDriveVLA outputs next scene images using MoVQGAN Decoder and sequences of waypoints as actions using a Text Detokenizer*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：nuScenes轨迹规划定量对比
 
@@ -304,7 +308,9 @@ HybridDriveVLA基于**Qwen2-VL-2B**骨干模型构建，训练分为SFT和指令
 ![[assets/figures/papers/paper_list_l2215_https_openaccess_thecvf_com_content_CVPR2026_html_Bassole_HybridDriveVLA/figures/006_Figure_4.jpg]]
 *Figure 4: Qualitative analysis of HybridDriveVLA on the nuScenes dataset. The red trajectory is the predicted optimal sequence of waypoints, and the green is the ground truth*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 方法演进与基线对比
 
@@ -344,6 +350,8 @@ HybridDriveVLA 为 VLA 自动驾驶领域贡献了以下可迁移的知识单元
 - **V-CoT 与 ToT 的耦合机制**：视觉预测作为评估目标、评估结果反馈选择最优动作的闭环设计，为“预测-评估-决策”一体化架构提供了模板。
 
 这些贡献在方法谱系中填补了“视觉推理+显式多层面评估”的空白，但其泛化到更大规模模型、更多样化场景的能力仍有待后续工作验证。
+
+
 
 ## 原文 PDF
 

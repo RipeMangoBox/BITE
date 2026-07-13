@@ -5,6 +5,8 @@ paper_level: A
 venue: ICCV
 year: 2025
 pdf_ref: paperPDFs/ICCV_2025/SyncDiff_Synchronized_Motion_Diffusion_for_Multi_Body_Human_Object_Interaction_Synthesis.pdf
+project_link: https://syncdiff.github.io/
+code_link: null
 aliases:
 - SyncDiff
 tags:
@@ -41,7 +43,7 @@ claims:
 > - CORE4D 上，CRR (%, ↑) 6.15 vs CG-HOI: 3.67 (+2.48)。
 > - BEHAVE 上，CRR (%, ↑) 10.29 vs OMOMO: 7.88 (+2.41)。
 
-## 概述
+## 概要
 
 多体人‑物交互（HOI）合成——同时生成任意数量的人体、手部与刚性物体的运动——是具身智能与数字人领域的基础难题。现有方法大多面向特定身体数量（如单手‑单物体或单人‑单物体），难以在高频微小运动与复杂高阶关系上保持精确同步，普遍存在穿透、接触丢失或语义缺失等问题。
 
@@ -51,7 +53,7 @@ SyncDiff 的核心思路是：**将对齐分数与显式同步步骤引入统一
 
 SyncDiff 的方法定位可概括为：**以频率感知的运动表示和对齐驱动的同步机制为核心改造点，在扩散模型框架内实现可扩展的多体交互生成**。其局限性主要体现在对铰接物体的关节约束建模不足、显式同步的计算开销随身体数量二次增长，以及对纯多人交互场景的通用性受限。
 
-## 背景与动机
+
 
 多体交互运动合成是计算机视觉与图形学中的核心问题，其目标是为任意数量的手、人体和刚体物体生成自然且语义合理的协同运动序列。这类合成在具身智能、机器人操作、虚拟现实和动画制作等场景中具有广泛的应用前景。然而，现有方法在应对多体交互时暴露出一个根本性瓶颈：**难以为任意数量的身体合成精确同步的交互运动，尤其在高频微小运动和复杂高阶关系上，容易产生穿透、接触丢失或语义缺失**。
 
@@ -67,7 +69,9 @@ SyncDiff 的方法定位可概括为：**以频率感知的运动表示和对齐
 
 这一设计使得 SyncDiff 在五个多体交互数据集（TACO、GRAB、CORE4D、BEHAVE、OAKINK2）上全面超越现有最先进方法，动作识别准确率平均提升超过 15%，接触质量指标（CSIoU、CSR）亦有显著增益。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SyncDiff 的核心创新在于将多体交互运动生成重新定义为**动态图模型上的同步采样问题**，并通过两个互补的机制——训练时的**对齐分数与对齐损失**、推理时的**显式同步步骤**——从根本上解决现有方法中个体运动与相对运动不一致导致的穿透、接触丢失和语义缺失。与依赖隐式共现或完全无同步机制的基线方法（如 DiffH2O、CG-HOI、MACS 等）相比，SyncDiff 的关键改进体现在以下三个维度。
 
@@ -117,7 +121,7 @@ SyncDiff 的同步机制使其能够统一处理**任意数量**的手、人体�
 - 当前方法**不保证物理真实性**，微小误差可能在真实机器人任务中导致失败——这一边界尚未在物理仿真环境中验证。
 - 相对运动表示**局限于刚体坐标系**，不适用于纯多人交互合成——论文明确承认了这一通用性限制。
 
-## 整体框架
+
 
 SyncDiff 构建了一个统一的单阶段扩散框架，用于合成任意数量手、人体与刚体之间的同步多体交互运动。其核心思想是将多体运动建模为**动态图模型上的最大似然采样问题**，并在训练与推理两个阶段分别引入同步机制，从而在保持生成多样性的同时，强制个体运动与相对运动的一致性。
 
@@ -183,7 +187,7 @@ $$\hat{x}_{o_j}' = \frac{\frac{2}{m-1} \sigma^2 \overline{\lambda}}{1+2\sigma^2 
 ![[assets/figures/papers/paper_list_l1776_SyncDiff_Synchronized_Motion_Diffusion_for_Multi_Body_Human_Object_Inter/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of SyncDiff. The light blue boxes show the inference process with explicit synchronization steps performed every s step. For denoising steps irrelevant to explicit synchronization (those marked as*
 
-## 核心模块与公式推导
+
 
 SyncDiff 的核心架构由四个关键模块构成，它们协同工作以解决多体交互运动生成中的同步与语义保留问题。
 
@@ -227,7 +231,9 @@ $$\hat{x}_{t-1} = \hat{\mu}(\hat{x}_t, t) + \sigma_t \epsilon \quad (\epsilon \s
 
 在实际推理中，模型每隔 $s$ 步（$s=50$，总去噪步数 $T=1000$）执行一次显式同步操作。以刚性物体为例，其运动更新融合了来自其他物体的相对运动信息与自身预测均值，从而强制个体运动与相对运动之间的一致性。更新后的同步运动 $\hat{x}'$ 被重新注入去噪循环，用于后续的逐步去噪。这一机制等价于在动态图模型上最大化联合似然，从数学上保证了多体运动的全局同步性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 总体表现：多数据集全面领先
 
@@ -304,7 +310,9 @@ RA 指标使用的动作分类器在 train/val/test 全集合上训练，可能�
 ![[assets/figures/papers/paper_list_l1776_SyncDiff_Synchronized_Motion_Diffusion_for_Multi_Body_Human_Object_Inter/figures/011_Table_4.jpg]]
 *Table 4: Results on BEHAVE [2] dataset. The best in each column is highlighted in bold*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法脉络与关键差异
 
@@ -355,6 +363,8 @@ SyncDiff 的适用边界由以下因素界定：
 - **动作识别评估的公平性改进**：当前 RA 指标使用的分类器在 train/val/test 全集合上训练，可能偏向生成模型。作者通过用户研究验证了相对排名的合理性，但缺乏基于轨迹的动作识别基础模型仍是领域共性问题。开发此类基础模型将改善评估的公平性和泛化性。
 
 - **实时应用扩展**：SyncDiff 能否通过模型蒸馏或更高效的同步策略（如减少总去噪步数 T、优化同步间隔 s）扩展至实时应用？当前 T=1000、s=50 的设置离实时推理仍有距离，需要进一步的速度-质量权衡研究。
+
+
 
 ## 原文 PDF
 

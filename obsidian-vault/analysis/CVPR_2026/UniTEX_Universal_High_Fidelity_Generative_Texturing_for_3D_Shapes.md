@@ -42,7 +42,7 @@ claims:
 > - Artist-created Mesh (Table 1) 上，CMMD↓ 0.826 vs 1.196 (Paint3D) (↓0.370)；FIDCLIP↓ 16.03 vs 20.52 (Paint3D) (↓4.49)。
 > - Generative Mesh (Table 1) 上，User-perf.↑ 65.91% vs 6.82% (Paint3D) (↑59.09%)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -60,7 +60,7 @@ UniTEX 是一个两阶段三维纹理生成框架。第一阶段利用经 LoRA �
 
 在艺术家创建网格上，UniTEX 的 CMMD 指标降至 0.826（Paint3D 为 1.196），FIDCLIP 降至 16.03（Paint3D 为 20.52）。在更具挑战性的生成式网格上，UniTEX 的用户偏好率达到 **65.91%**，远超 Paint3D 的 6.82% 及其他基线方法。消融实验证实，纹理函数监督（TFS）相比仅表面监督，将 PSNR 从 25.81 提升至 27.01，UV PSNR 从 20.31 提升至 20.99，验证了完整体积监督的增益。
 
-## 背景与动机
+
 
 ### 三维纹理生成的现状与瓶颈
 
@@ -80,7 +80,9 @@ UniTEX 是一个两阶段三维纹理生成框架。第一阶段利用经 LoRA �
 
 基于这一表示，UniTEX 设计了一个基于 Transformer 架构的 **Large Texturing Model (LTM)**，在体积空间中直接回归完整纹理，并通过密集的体积监督信号进行训练。这一设计使得模型能够学习到与几何结构内在关联的纹理先验，而非记忆特定的 UV 展开模式，从而在艺术家创建网格和生成式网格上均能输出完整、平滑且贴合几何形状的纹理。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 UniTEX 的核心创新在于从**纹理表示空间**和**细化阶段模型**两个维度彻底绕过传统 UV 映射的拓扑模糊性瓶颈，构建了一个对任意拓扑网格具有强泛化能力的通用纹理生成框架。
 
@@ -131,7 +133,7 @@ UniTEX 通过三个相互耦合的 changed slots 实现了对 UV 范式的系统
 | 细化阶段模型 | UV inpainting 扩散模型 | Large Texturing Model (Transformer 回归) | 体积空间直接推理 |
 | 训练监督信号 | 仅表面点颜色监督 | 完整体积纹理函数监督 | 更完整的纹理学习 |
 
-## 整体框架
+
 
 UniTEX 采用两阶段纹理生成框架，核心设计动机在于**绕过 UV 参数化固有的拓扑模糊性**——基于 UV inpainting 的方法（如 **Paint3D** (Zeng et al., CVPR 2024)、**TexGEN** (Yu et al., TOG 2024)）在分布外的生成式网格上会产生碎片化、不完整的纹理（见 Figure 2）。UniTEX 通过将纹理建模为连续三维体积场来消除对特定 UV 布局的依赖。
 
@@ -166,7 +168,7 @@ LTM 的核心机制是在三维函数空间中直接回归**完整的纹理函�
 
 消融实验证实了上述设计的有效性：纹理函数监督将 PSNR 从 25.81 提升至 27.01，UV PSNR 从 20.31 提升至 20.99（Table 4），并产生更完整、高质量的纹理（Figure 9）。在生成网格上，UniTEX 的用户偏好率达 65.91%，显著高于 Paint3D 的 6.82%（Table 1），验证了绕过 UV 空间的体积回归策略在泛化能力上的决定性优势。
 
-## 核心模块与公式推导
+
 
 ### 纹理函数 (Texture Functions, TF)
 
@@ -206,13 +208,13 @@ $$
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l2619_https_arxiv_org_abs_2505_23253/figures/004_Figure_4.jpg]]
-*Figure 4: Pipeline of the Large Texturing Model. Given a partially textured geometry and six input views, we first unify them into a shared triplane-cube token representation. A transformerbased architecture then processes these tokens to extract geometryaware features, which are subsequently decoded into colors using a lightweight MLP*
 
 ![[assets/figures/papers/paper_list_l2619_https_arxiv_org_abs_2505_23253/figures/005_Figure_5.jpg]]
 *Figure 5: Visualized example of the Texture Functions (TF) for represent the texture for the whole 3D space. (a) A textured mesh. (b) Unsigned Distance Function (UDF) samples representing 3D geometry. (c) Inspired by UDF, we define texture as a continuous function over 3D space (details in Sec. 3.3.2), enabling volumetric texture representation*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：纹理质量与泛化性
 
@@ -238,8 +240,6 @@ UniTEX 在两类网格上均展现出显著优势：艺术家创建的规整网�
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l2619_https_arxiv_org_abs_2505_23253/figures/002_Figure_2.jpg]]
-*Figure 2: UV-based texturing models perform well on indomain, artist-created meshes (first column), but struggle with out-of-distribution, generated meshes (second column). We take Paint3D [40] and TexGEN [39] as representative examples: while effective on large, continuous regions, they fail to handle small, fragmented areas due to training biases toward clean, large-region UV layouts. In contrast, our method operates outside the UV space, enabling better generalization across diverse mesh types. Additional comparisons are provided in Sec. 4.2.2*
 
 ![[assets/figures/papers/paper_list_l2619_https_arxiv_org_abs_2505_23253/figures/007_Table_1.jpg]]
 *Table 1: Quantitative comparison between artist-created and generative mesh on different texturing methods*
@@ -264,7 +264,9 @@ UniTEX 在两类网格上均展现出显著优势：艺术家创建的规整网�
 
 ![[assets/figures/papers/paper_list_l2619_https_arxiv_org_abs_2505_23253/figures/006_Figure.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 纹理生成范式的演进与分化
 
@@ -301,6 +303,8 @@ UniTEX 的方法论转折在于提出 **Texture Functions (TFs)**——受无符
 2. **纹理编辑与局部控制**：UV 参数化的一个优势是支持直观的二维编辑，UniTEX 的体积表示是否支持类似的局部纹理编辑操作，论文未予讨论。
 3. **与生成式几何的联合优化**：当前 UniTEX 假定输入网格固定，未来是否可将纹理函数与几何表示（如 SDF、NeRF）统一建模，实现几何-纹理的端到端生成，值得探索。
 4. **训练数据依赖性**：TFS 需要从纹理网格中提取体积监督信号，该方法对训练数据质量和多样性的敏感度尚未量化评估。
+
+
 
 ## 原文 PDF
 

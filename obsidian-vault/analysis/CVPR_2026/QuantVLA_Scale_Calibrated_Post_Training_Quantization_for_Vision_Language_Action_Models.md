@@ -42,7 +42,7 @@ claims:
 > - Memory (LLM+DiT) 上，memory usage (GB) 1.28 GB (π0.5), 0.91 GB (GR00T N1.5) vs 4.27 GB (π0.5), 2.02 GB (GR00T N1.5) (~70% relative saving)。
 > - LIBERO (π0.5) 上，success rate 97.6% (QuantVLA W4A8, π0.5) vs 76.3% (DuQuant W4A8, π0.5) (+21.3%)。
 
-## 概述
+## 概要
 
 视觉-语言-动作（VLA）模型在机器人操控中展现出强大的泛化能力，但其部署面临严峻的效率瓶颈：语言骨干网络与基于扩散变换器（DiT）的动作头同时带来巨大的计算与内存开销，而现有的高效VLA方法多聚焦于架构裁剪或推理加速，几乎不触及DiT动作头的数值精度优化。
 
@@ -52,7 +52,7 @@ claims:
 
 在LIBERO基准上，QuantVLA以W4A8精度在OpenPI π0.5上达到97.6%的平均任务成功率，**超越全精度基线的97.1%**，同时将量化模块的内存占用从4.27 GB降至1.28 GB（约70%相对节省）；在GR00T N1.5上同样以88.0%的成功率超越全精度的86.5%。即使在极端的W4A4精度下，π0.5仍保持95.3%的成功率，展现出对极低位宽的鲁棒性。与现有量化基线相比，QuantVLA在W4A8下较DuQuant提升21.3个百分点，较SmoothQuant在Pick-and-Can任务上多完成11次成功抓取，验证了尺度校准机制在VLA场景下的决定性作用。
 
-## 背景与动机
+
 
 ### 视觉-语言-动作模型的部署瓶颈
 
@@ -80,7 +80,9 @@ claims:
 
 该方法保持原始模型架构和算子调度不变，仅需少量未标注校准数据即可完成标定，为VLA模型在资源受限边缘设备上的高效部署提供了可行路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 QuantVLA 的核心创新在于首次揭示了 VLA 模型量化失败的根本机制，并据此设计了一套无需训练的尺度校准方案，使语言骨干网络与扩散动作头能够协同稳定地运行在低比特精度下。
 
@@ -110,7 +112,7 @@ VLA 模型由语言骨干（LLM）与基于扩散变换器（DiT）的动作头�
 
 与现有 VLA 效率方案相比，QuantVLA 的独特之处在于：它既不修改模型架构（区别于 TinyVLA 的紧凑设计），也不引入动态路由或缓存机制（区别于 MoLe-VLA、VLA-Cache），而是**直接在数值精度层面操作，以无训练的后训练量化方式同时压缩语言与动作模块**。相较于通用 PTQ 基线 **DuQuant**（Lin et al., NeurIPS 2024）和 **SmoothQuant**（Xiao et al., ICML 2023），QuantVLA 的关键增量在于对 DiT 注意力机制的因果诊断与针对性尺度恢复，使得 VLA 模型首次在 W4A8 精度下超越全精度基线，并在 W4A4 极端位宽下仍保持可用性能（π0.5 平均成功率 95.3%，Table 3）。
 
-## 整体框架
+
 
 QuantVLA 是一个无需训练的后训练量化框架，面向基于 DiT 动作头的 VLA 模型，保持原始架构与算子调度不变。其整体 pipeline 由三个协同组件构成：**选择性量化布局**、**注意力温度匹配** 和 **输出头平衡**，如 Figure 2 所示。
 
@@ -147,7 +149,7 @@ Figure 3 的可视化验证了这两个机制的效果：ATM 显著缩小了量�
 ![[assets/figures/papers/paper_list_l2242_https_arxiv_org_abs_2602_20309/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of representative VLA efficiency frameworks. (1) TinyVLA focuses on compact multimodal transformers and lightweight diffusion-policy heads for architectural efficiency; (2) EfficientVLA accelerates inference by pruning redundant language layers and reusing intermediate representations; (3) VLA-Cache improves throughput through key–value reuse and static caching of vision tokens; (4) MoLe-VLA adopts mixture-of-layers routing to dynamically skip computation in the language module; and (5) QuantVLA introduces a training-free PTQ framework that low-bit quantizes both language and action modules without altering the model architecture*
 
-## 核心模块与公式推导
+
 
 ### 3.1 VLA模型架构与量化瓶颈
 
@@ -221,7 +223,9 @@ $$\beta_{\mathrm{raw}}(l) = \frac{\mathrm{RMS}(Z_{T,l})}{\mathrm{RMS}(Z_{Q,l}) +
 
 ATM的 $\alpha$ 和OHB的 $\beta$ 均通过少量未标注标定数据估计，裁剪至 $\pm 0.4$ 的安全范围，并使用 $\varepsilon = 0.03$ 的中性带避免过度校正。所有标量在标定后折叠入反量化尺度，推理时无额外计算或内存开销。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -295,7 +299,9 @@ QuantVLA 在两个代表性 VLA 模型上进行评估：**OpenPI π0.5**（基�
 
 ![[assets/figures/papers/paper_list_l2242_https_arxiv_org_abs_2602_20309/figures/002_Table.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：VLA模型的后训练量化空白
 
@@ -345,6 +351,8 @@ QuantVLA的当前设计存在明确的适用边界：
 4. **实时部署验证**：量化后模型在实际机器人部署中的实时性和控制精度能否进一步验证？当前评估主要基于离线基准测试，在线操控场景中的延迟、抖动和安全性尚未充分评估。
 
 5. **与系统优化的协同**：QuantVLA的量化压缩与VLA-Cache、MoLe-VLA等系统级优化是否可叠加？若能，组合后的内存和延迟收益边界在哪里？
+
+
 
 ## 原文 PDF
 

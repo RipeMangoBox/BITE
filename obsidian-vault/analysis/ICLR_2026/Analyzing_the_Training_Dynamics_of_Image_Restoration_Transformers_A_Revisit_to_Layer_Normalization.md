@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Analyzing_the_Training_Dynamics_of_Image_Restoration_Transformers_A_Revisit_to_Layer_Normalization.pdf
+project_link: null
+code_link: https://github.com/2minkyulee/i-LN
 aliases:
 - ILIRTTLN
 - ATDIRTRLN
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | 图像恢复Transformer训练动态分析：重新审视层归一化 |
 | 英文题名 | Analyzing the Training Dynamics of Image Restoration Transformers: A Revisit to Layer Normalization |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=SbLj5hJXh6); [GitHub](https://github.com/2minkyulee/i-LN) |
+| Links | [paper](https://openreview.net/forum?id=SbLj5hJXh6) · [GitHub](https://github.com/2minkyulee/i-LN) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | i-LN (Image Restoration Transformer Tailored Layer Normalization) |
 | Dataset | Set14, BSD100 |
@@ -40,11 +42,11 @@ claims:
 > - Set14 上，SSIM 为 .7915，对比 .7876，变化 +0.0039。
 > - BSD100 上，PSNR 为 27.84，对比 27.68，变化 +0.16。
 
-## 概述
+## 概要
 
 本文系统分析了传统LayerNorm（LN）在图像恢复（Image Restoration, IR）Transformer中导致训练不稳定的根本原因，并提出了一种专门为IR Transformer定制的层归一化方法——i-LN（Image Restoration Transformer Tailored Layer Normalization）。研究发现，传统逐token的LayerNorm与IR任务之间存在两个根本性错配：1）逐token归一化破坏了token间的空间相关性；2）与输入无关的缩放丢弃了输入特定的统计信息。这导致特征幅度发散至百万量级，并造成通道熵急剧下降。i-LN通过空间整体归一化（LN*）保留空间结构，并通过输入自适应重缩放恢复丢失的全局尺度，使特征分布稳定在N(0,1)附近（幅度约1.2），从而显著提升训练稳定性和恢复性能。在×4超分辨率（SR）任务上，i-LN在Set14、BSD100、Urban100、Manga109四个基准上均取得最佳PSNR/SSIM。
 
-## 背景与动机
+
 
 图像恢复任务（如超分辨率、去噪、去雨、JPEG伪影去除）要求网络精确保持输入图像的低级特征和空间结构。然而，当前主流的IR Transformer架构（如SwinIR (Liang et al., 2021)、HAT (Chen et al., 2023a)、DRCT (Hsu et al., 2024)）普遍采用从高层视觉任务（如ViT (Dosovitskiy et al., 2020)）继承而来的逐token LayerNorm。
 
@@ -54,14 +56,16 @@ claims:
 
 进一步分析表明（Figure 2），这一发散现象在不同网络深度、宽度以及多种IR任务（SR、DN、DR、CAR）中普遍存在，且随网络规模增大而加剧。完全移除归一化层会导致训练不稳定和无法收敛（Table 1）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新是提出了i-LN（Image Restoration Transformer Tailored Layer Normalization），作为传统LayerNorm的即插即用替代方案。i-LN包含两个关键组件：
 
 1. **空间整体归一化（LN*）**：在空间-通道维度上进行整体归一化，保留token间的空间结构。
 2. **输入自适应重缩放**：在注意力层和前馈层之后，使用LN*计算的标准差进行输入自适应重缩放，恢复丢失的全局尺度信息。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__image_and_video_generation__b001_SbLj5hJXh6_Analyzing_the/figures/001_Figure_1.jpg]]
 *Figure 1: (a) Feature Magnitudes*
@@ -78,7 +82,7 @@ $$B(x; f, i\text{-}\mathrm{LN}) = x + \sqrt{\sigma^{2} + \epsilon} \cdot f(\math
 
 其中$f$表示注意力层或前馈层。
 
-## 核心模块与公式推导
+
 
 ### 5.1 逐token LayerNorm的问题
 
@@ -104,7 +108,9 @@ $$B(x; f, i\text{-}\mathrm{LN}) = x + \sqrt{\sigma^{2} + \epsilon} \cdot f(\math
 
 这一策略使网络能够保留输入特定的统计信息，并允许中间特征具有范围灵活性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 6.1 主要结果
 
@@ -186,7 +192,9 @@ $$B(x; f, i\text{-}\mathrm{LN}) = x + \sqrt{\sigma^{2} + \epsilon} \cdot f(\math
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__image_and_video_generation__b001_SbLj5hJXh6_Analyzing_the/figures/014_Table_5.jpg]]
 *Table 5: (c) Color image denoising (DN) (d) Image JPEG compression artifact removal (CAR)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 7.1 与现有归一化方法的关系
 
@@ -218,6 +226,8 @@ $$B(x; f, i\text{-}\mathrm{LN}) = x + \sqrt{\sigma^{2} + \epsilon} \cdot f(\math
 3. i-LN中空间整体归一化和输入自适应重缩放两个组件的相对重要性是否随任务和骨干网络变化？
 4. i-LN在更大规模模型（如ViT-G）和更极端低精度（如int2）下的表现如何？
 5. i-LN与通道注意力机制（如HAT中的通道注意力）之间的相互作用机制是什么？
+
+
 
 ## 原文 PDF
 

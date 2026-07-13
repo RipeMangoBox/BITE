@@ -42,7 +42,7 @@ claims:
 > [!tip] 效果简介
 > - CO3Dv2测试集（多视图定制任务） 上，相机姿态精度 (CPA↑) 0.735 ± 0.10 vs 0.000 ± 0.00 (CustomDiffusion360) (+0.735)；多视图一致性 (DreamSim ↓) 0.121 ± 0.10 vs 0.214 ± 0.15 (Custom Img + Img-MV gen) (-0.093)；主体身份保留 (DreamSim ↓) 0.448 ± 0.11 vs 0.504 ± 0.12 (Custom Img + Img-MV gen) (-0.056)。
 
-## 概述
+## 概要
 
 ### 问题背景与核心瓶颈
 
@@ -56,7 +56,7 @@ MVCustom 将多视图生成重新定义为视频帧生成问题，其核心洞�
 
 在 CO3Dv2 测试集上，MVCustom 是唯一在相机姿态准确性、多视图一致性和定制化保真度三个维度均取得领先的方法（Table 2）。相机姿态精度达到 0.735，而 CustomDiffusion360 为 0.000，表明基线方法完全丧失相机可控性。多视图一致性（DreamSim）为 0.121，较最佳基线降低 0.093；主体身份保留（DreamSim）为 0.448，降低 0.056。消融实验证实：加入 DFR 后 COLMAP 重建点数从 36.13 提升至 43.38，相机姿态精度从 0.543 提升至 0.768；进一步加入 CLC 后重建点数提升至 45.38。此外，密集时空注意力对特征替换时的空间一致性至关重要——1D 时序注意无法维持正确的语义平移，而密集时空注意成功保持了空间流与几何对齐（Figure 5b）。
 
-## 背景与动机
+
 
 ### 多视图定制：一个尚未被充分探索的交叉任务
 
@@ -80,7 +80,9 @@ MVCustom 的核心洞察在于识别出**多视图生成与视频帧生成之间
 
 这一洞察直接回应了定制化场景下的核心矛盾：训练数据极度有限（仅数张参考图像），但多视图生成要求模型理解物体的三维几何和场景的空间结构。MVCustom 的策略是将这一矛盾拆解为两个可解的子问题——**训练阶段**通过姿态条件 Transformer 块和 FeatureNeRF 从有限视角中学习特征场，**推理阶段**通过深度感知特征渲染和一致性潜在补全显式注入几何约束——从而在数据稀缺的条件下实现多视角几何一致性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MVCustom 的核心创新在于将**多视图定制**问题重新定义为**视频帧生成**问题，并通过训练与推理两个阶段的协同设计，解决了现有方法在数据极度有限时无法同时保证几何一致性、主体身份保真度和全景场景一致性的瓶颈。其关键创新点可归纳为以下三个层面：
 
@@ -107,7 +109,7 @@ MVCustom 的核心创新在于将**多视图定制**问题重新定义为**视�
 
 **局限性提示**：FeatureNeRF 学习的是固定的规范姿态，且其辐射场未将文本作为条件输入，因此无法根据文本提示改变定制化物体的内在姿态（如从坐到站）。此外，DFR 对深度估计质量敏感，反射或无纹理表面可能导致几何错误（Figure 6），但这归因于外部深度估计器而非方法本身。
 
-## 整体框架
+
 
 MVCustom 将多视图定制任务建模为一个条件生成问题：给定一组参考图像-相机位姿对 $\mathbf{Y}$、文本提示 $\mathbf{c}$ 和目标相机位姿序列 $\{\phi_m\}_{m=0}^{M}$，模型需要生成在目标视角下既保持主体身份、又与文本描述一致的多视图图像序列 $\mathbf{x}_{0:M}$。其核心架构围绕“训练阶段学习主体几何表征”与“推理阶段注入显式几何约束”两阶段设计展开。
 
@@ -176,7 +178,7 @@ $$D_{\theta}: (\tilde{\mathbf{x}}_{1:N}; \mathbf{Y}, \mathbf{c}, \phi_{1:N}) \ma
 ![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_SGsxxbAjXH/figures/009_Figure.jpg]]
 *Figure: A1: Results with different Dream-Booth models. Since our method keeps spatial transformer layers of the video backbone architecture frozen, we can flexibly apply various publicly available Dream-Booth checkpoints. The figure shows images generated using two different checkpoints: RealisticVision1 and ToonYou2*
 
-## 核心模块与公式推导
+
 
 MVCustom 将多视图定制任务形式化为一个条件分布建模问题。给定包含 $N$ 张参考图像及其相机位姿的集合 $\mathbf{Y} = \{(\mathbf{I}_i, \pi_i)\}_{i=1}^N$、文本提示 $\mathbf{c}$ 和目标相机位姿序列 $\{\phi_m\}_{m=0}^M$，目标是建模条件分布：
 
@@ -229,7 +231,9 @@ MVCustom 在多视图生成与定制化两条技术路线的交叉点上做出�
 ![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_SGsxxbAjXH/figures/004_Figure_3.jpg]]
 *Figure 3: (a) Anchor feature mesh*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -290,7 +294,9 @@ MVCustom的推理成本（130.92秒/采样，19.29GB显存）高于基线方法�
 ![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_SGsxxbAjXH/figures/011_Figure.jpg]]
 *Figure: A2: Results on ablation study*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位与基线谱系
 
@@ -335,6 +341,8 @@ MVCustom 的适用边界受以下因素制约：
 **深度估计鲁棒性。** 如何进一步提升深度估计的鲁棒性，或探索不依赖于显式深度图的替代几何约束方案？可能的路径包括：引入多视图立体匹配的隐式几何先验、利用扩散模型自身的几何感知能力进行自监督深度精化，或采用神经辐射场风格的隐式几何表示替代显式特征网格。
 
 **更广泛的定制化场景。** 当前方法在 CO3Dv2 数据集上验证，主要针对刚性物体。扩展到可变形物体、复杂光照条件或更大规模场景的多视图定制，需要重新审视特征场表示的表达能力和泛化边界。
+
+
 
 ## 原文 PDF
 

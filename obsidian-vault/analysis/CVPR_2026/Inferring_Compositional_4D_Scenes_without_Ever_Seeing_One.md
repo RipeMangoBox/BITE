@@ -43,7 +43,7 @@ claims:
 > - CMU Panoptic 上，Chamfer Distance (cm) 7.42 vs 35.91 (w/o mixing) (-28.49)。
 > - 3D-FRONT 上，Chamfer Distance 0.0909 vs Best baseline (e.g., PartCrafter) (SOTA (最佳))。
 
-## 概述
+## 概要
 
 从单段视频重建包含多个静态与动态物体的完整 4D 场景，是视觉理解与内容生成的核心难题。其根本瓶颈在于：现有数据集要么只包含静态多物体组合，要么只包含单个动态物体的运动序列，缺乏同时涵盖空间布局与时间动态的 4D 组合训练数据。这导致现有方法无法在无组合数据监督下，联合推理场景中“物体在哪里”与“物体如何运动”。
 
@@ -51,7 +51,7 @@ claims:
 
 实验表明，COM4D 在单物体 4D 重建任务上以 IoU 0.4191 超越所有基线（DeformingThings 数据集，Table 1），在 3D 场景生成任务上以 Chamfer Distance 0.0909 和 F-Score 0.8069 达到最优（3D-FRONT 数据集，Table 2）。用户研究进一步证实，注意力混合机制在空间正确性与时间一致性上显著优于无混合基线（87% vs. 6.9% 偏好率，Figure 1.B）。消融实验揭示，静态/动态嵌入与扩散强迫（Diffusion Forcing）是性能提升的关键组件：添加嵌入后 CD 从 0.1525 降至 0.1284，IoU 从 0.2018 升至 0.4034（Table 3）。在方法谱系上，COM4D 区别于 **V2M4**（Zhang et al., 2025）和 **L4GM**（Ren et al., NeurIPS 2024）等单物体 4D 方法，以及 **PartCrafter**、**MIDI** 等多物体 3D 场景生成方法，首次实现了无需组合 4D 训练数据的组合式 4D 场景重建。
 
-## 背景与动机
+
 
 ### 问题背景：组合式 4D 场景重建的数据困境
 
@@ -79,7 +79,9 @@ claims:
 
 基于这一动机，本文提出了 **COM4D**（Compositional 4D），通过精心设计的注意力解析训练策略和注意力混合推理机制，首次实现了仅使用静态多物体和动态单物体监督信号，即可从单目视频中联合重建完整 4D 场景的目标。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 COM4D 的核心创新在于**将组合式 4D 场景重建拆解为两个可解耦学习的能力——空间组合与时间动态**，并通过“注意力解析–注意力混合”框架，在从未见过组合 4D 数据的前提下实现零样本泛化。这一思路直接回应了该领域的真实瓶颈：缺乏同时包含多静态物体与多动态物体的 4D 组合训练数据，以及无法在无此类数据下联合推理空间布局与时间动态的机制。
 
@@ -107,7 +109,7 @@ COM4D 的核心创新在于**将组合式 4D 场景重建拆解为两个可解�
 
 定性对比（Figure 7）直观地展示了注意力混合的关键作用：无混合的基线在静态物体与动态物体交界处出现明显的几何错位和穿透，而混合后的重建在静态-动态组合上表现出远为优越的空间一致性。
 
-## 整体框架
+
 
 COM4D 的整体框架围绕一个核心洞察展开：**空间组合与时间动态可以解耦学习，并在推理时通过交替的注意力机制融合**，从而实现零样本的组合式 4D 场景重建。其 pipeline 由以下关键模块串联构成：
 
@@ -126,7 +128,7 @@ COM4D 的整体框架围绕一个核心洞察展开：**空间组合与时间动
 ![[assets/figures/papers/paper_list_l26_https_openaccess_thecvf_com_content_CVPR2026_html_Gokmen_Inferring_Compo/figures/001_Figure_1.jpg]]
 *Figure 1: Given a single video (bottom), our method reconstructs the entire 3D scene along with the individual dynamic objects (A), while maintaining spatial and temporal consistency through spatio-temporal attention mixing (C). The silhouettes (purple for human and orange for dog) correspond to the beginning of dynamic sequences. Our user study (for spatial correctness and temporal coherence) shows that the reconstructions obtained using the proposed attention mixing mechanism are clearly preferred over the baseline without mixing (B)*
 
-## 核心模块与公式推导
+
 
 ### 问题形式化
 
@@ -175,7 +177,9 @@ $$\mathcal{L}_{S} = \mathbb{E}\left[\sum_{i=1}^{N}\left\|(\boldsymbol{\epsilon}^
 ![[assets/figures/papers/paper_list_l26_https_openaccess_thecvf_com_content_CVPR2026_html_Gokmen_Inferring_Compo/figures/002_Figure_2.jpg]]
 *Figure 2: Our attention parsing and mixing strategy. A single DiT model with shared weights is trained jointly on two datasets. (Top) During training with samples from DeformingThings [42], odd-indexed blocks perform multi-frame attention to capture temporal dynamics. (Bottom) When training with samples from 3D-FRONT [19], even-indexed blocks perform multi-instance attention to model spatial part decomposition. At inference, the same model applies an attention mixing mechanism. In each layer, spatial blocks (even-indexed) aggregate all latents from a single frame and process them jointly, conditioned on the full-scene image y at that timestep. Temporal blocks (oddindexed) then operate over all frames...*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 COM4D 在多个任务上进行了全面评估，包括单物体 4D 重建、3D 场景生成、组合式 4D 场景重建，以及消融实验和用户研究。以下分述核心实验结果与分析。
 
@@ -229,7 +233,9 @@ COM4D 在多个任务上进行了全面评估，包括单物体 4D 重建、3D �
 ![[assets/figures/papers/paper_list_l26_https_openaccess_thecvf_com_content_CVPR2026_html_Gokmen_Inferring_Compo/figures/006_Figure_5.jpg]]
 *Figure 5: Qualitative 4D generation comparisons for two subjects (top two rows: Ninja, bottom two rows: Amy) at two time steps. The first column shows the input frames, and subsequent columns show a fixed pose rendered view from each method. V2M4 fails in a few samples, e.g., the last row input*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位与核心瓶颈
 
@@ -280,6 +286,8 @@ COM4D 的贡献不在于提出全新的生成架构，而在于**设计了一种
 1. **物理因果推理**：如何引入显式物理约束（如碰撞检测、运动学约束）以改善遮挡下的推理质量？当前注意力混合纯靠数据驱动，缺乏对物理交互的显式建模。
 2. **动态相机扩展**：如何将 COM4D 扩展到动态相机输入场景？这需要同时推理相机位姿与场景动态，对注意力路由机制提出了更高要求。
 3. **泛化到未见物体类别**：COM4D 的训练数据（3D-FRONT 室内场景、DeformingThings 动物/人体）覆盖范围有限，其对完全未见物体类别的零样本泛化能力尚待验证。
+
+
 
 ## 原文 PDF
 

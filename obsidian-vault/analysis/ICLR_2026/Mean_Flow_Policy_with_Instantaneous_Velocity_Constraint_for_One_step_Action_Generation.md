@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Mean_Flow_Policy_with_Instantaneous_Velocity_Constraint_for_One_step_Action_Generation.pdf
+project_link: null
+code_link: null
 openreview_forum_id: mIeKe74W43
 aliases:
 - MVPM
@@ -42,7 +44,7 @@ claims:
 > - Robomimic-can 上，Success Rate 为 0.92 ± 0.07，对比 0.94 ± 0.06 (QC)，变化 -0.02。
 > - Robomimic-square 上，Success Rate 为 0.93 ± 0.01，对比 0.92 ± 0.01 (QC)，变化 +0.01。
 
-## 概述
+## 概要
 
 机器人操作中的动作生成面临一个核心瓶颈：现有基于流匹配的策略依赖多步迭代采样，导致训练与推理效率低下；同时，在训练平均速度场时缺乏显式边界条件，造成常微分方程（ODE）的多解问题，损害策略的表达能力。
 
@@ -54,7 +56,7 @@ claims:
 
 当前工作的主要局限在于仅在仿真基准上验证，尚未在真实机器人平台部署；训练中计算 Jacobian-vector product（JVP）可能增加 GPU 内存开销；IVC 系数虽不敏感，但仍需手动设定。未来方向包括扩展到更高维动作空间、探索避免 JVP 计算的近似方案，以及在真实环境中验证性能。
 
-## 背景与动机
+
 
 ### 机器人操作中的策略学习困境
 
@@ -84,7 +86,9 @@ $$-u(a(t), t, r, s) + (r-t) \frac{d}{dt} u(a(t), t, r, s) = -v(a(t), t, s)$$
 
 这一设计使得 MVP 在保持流基策略多模态建模能力的同时，大幅提升训练与推理效率，为机器人操作中的策略学习提供了一种高效且表达力强的替代方案。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MVP 的核心创新在于用**平均速度场**替代传统流策略的**瞬时速度场**，实现一步动作生成，并通过**瞬时速度约束（IVC）**解决平均流恒等式的多解性问题，从而在保持高表达力的同时大幅提升训练与推理效率。
 
@@ -126,7 +130,7 @@ $$\mathcal{L}_{\mathrm{policy}}(\theta) = \mathcal{L}_{\mathrm{MF}}(\theta) + \l
 
 **需人工验证**：IVC 系数 $\lambda$ 虽不敏感，但默认值 1.0 为手动选择，缺乏自适应机制。训练中 JVP 计算可能增加 GPU 内存消耗，在资源受限环境下需额外评估。
 
-## 整体框架
+
 
 MVP（Mean Velocity Policy）的整体框架围绕**平均速度场建模**与**Best-of-N策略改进**两条主线展开，包含离线预训练与在线微调两个阶段，核心模块及其交互关系如下。
 
@@ -148,7 +152,7 @@ MVP（Mean Velocity Policy）的整体框架围绕**平均速度场建模**与**
 
 传统流基策略依赖多步迭代采样（如10步），训练中每步需反复调用速度模型，推理时同样需要多步积分。MVP用平均速度场替代瞬时速度场，将动作生成压缩为**单步映射**，从根源上消除了迭代采样的计算开销。这一设计使在线训练速度达到153.6 iter/s，较BFN（68.0 iter/s）提升2.2倍以上；CPU推理时间仅10.93ms，与最快的单步基线相当，远低于BFN（117.3ms）和QC（113.2ms）。
 
-## 核心模块与公式推导
+
 
 ### 3.1 平均速度策略（Mean Velocity Policy, MVP）
 
@@ -198,7 +202,9 @@ $$\mathcal{L}_{Q}(\phi) = \mathbb{E}\left[\left(Q_{\phi}(s_k, a_k) - \left(r_k +
 
 整体流程如 Algorithm 1 所示：先在离线数据集上预训练策略和 Critic，再进入在线交互与微调阶段，交替优化两者。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -288,7 +294,9 @@ MVP在Robomimic和OGBench共9个长时域、稀疏奖励的机器人操作任务
 ![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_mIeKe74W43/figures/014_Figure_8.jpg]]
 *Figure 8: Visualizations of typical success episodes: Cube-double-task4, Cube-triple-task2, Cube-tripletask3, and Cube-triple-task4*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题瓶颈与动机
 
@@ -336,6 +344,8 @@ MVP 在方法谱系中处于“流基策略”与“单步生成”的交汇点�
 1. **高维动作空间扩展**：当前验证集中于机械臂操作（6-7维动作空间），方法能否扩展到更复杂的高维动作空间（如灵巧手操作、全身控制）尚待验证。
 2. **JVP 计算替代方案**：能否通过近似方法（如有限差分）或对抗训练框架避免 JVP 计算，以降低训练时的 GPU 内存开销，是提升方法实用性的重要方向。
 3. **真实机器人部署**：在真实环境中，观测噪声、动力学不确定性等因素对单步生成策略的鲁棒性影响需要进一步研究。
+
+
 
 ## 原文 PDF
 

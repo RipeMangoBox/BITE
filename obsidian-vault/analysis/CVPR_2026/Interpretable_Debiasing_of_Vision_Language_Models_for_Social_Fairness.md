@@ -33,7 +33,11 @@ claims:
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method |  |
 | Dataset | FairFace, CocoGenderTxt, VLAGenderBias, SBBench, ImageNette, MME, MMMU-dev, SEED-Bench-2 |
-## 概述
+
+> [!tip] 效果简介
+> 本笔记的既有实验指标、对比结果与适用边界见“实验与关键发现”；本轮仅统一结构，不改写证据。
+
+## 概要
 
 视觉语言模型（VLMs）在图像检索与视觉问答等任务中普遍存在社会偏见——模型倾向于检索某一性别、种族或年龄段的图像，或在面对模糊图像-文本对时给出武断的确定性回答。这种偏见源于模型内部表征中编码的社会属性信息，但现有去偏方法大多缺乏可解释性，难以精确定位和调控偏见来源。
 
@@ -43,7 +47,7 @@ claims:
 
 DEBIASLENS 属于**基于内部表征干预的后处理去偏方法**，其方法定位介于特征空间线性投影去偏与全模型微调之间：它不修改原始模型权重，而是通过 SAE 在特征空间中解耦并中和特定的社会属性维度。与依赖全局线性方向的方法（如投影去偏）不同，SAE 的稀疏激活机制使不同输入激活不同的神经元集合，从而避免了单一全局方向无法稳定分离社会属性的问题。
 
-## 背景与动机
+
 
 视觉-语言模型（VLMs）和大规模视觉-语言模型（LVLMs）在跨模态检索、视觉问答等任务中取得了显著进展，但其内部表征中普遍存在社会偏见——模型倾向于将特定人口统计群体与刻板印象属性过度关联，导致检索结果出现性别、种族、年龄等维度的分布偏斜，或在模糊图像-文本对上给出带有偏见倾向的确定性回答（Figure 1）。
 
@@ -51,7 +55,9 @@ DEBIASLENS 属于**基于内部表征干预的后处理去偏方法**，其方�
 
 本文的动机正是填补这一可解释性空白：**能否将VLM的社会偏见归因到具体的神经元级别表征，并通过精准调制这些神经元来实现可控、可解释的去偏？** 为此，作者提出DEBIASLENS框架，利用稀疏自编码器（SAE）在无需社会属性标签的条件下，自动定位多模态编码器中对特定人口统计群体高度响应的“社会神经元”，并通过干预这些神经元的激活值来抑制偏见表征，从而将去偏从黑箱校正转变为一种可解释的干预范式。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DEBIASLENS 的核心创新在于将**可解释性机制**系统性地引入 VLM 社会偏见消除，其技术路径围绕三个紧密耦合的“changed slots”展开：
 
@@ -66,7 +72,7 @@ DEBIASLENS 的核心创新在于将**可解释性机制**系统性地引入 VLM 
 
 **与现有工作的本质差异**：传统方法（如对抗去偏、提示调优）直接优化输出分布，而 DEBIASLENS 通过 SAE 构建了一个**可审计的中间表征层**，使社会偏见从“隐式编码”变为“显式神经元”，从而实现了对偏见的精准溯源与最小化干预。这一“先解释、后调控”的范式，是其在可解释性与效率上超越 baseline 的根本原因。
 
-## 整体框架
+
 
 DEBIASLENS 提出了一种可解释的 VLM 社会偏见消除框架，其核心思想是：**通过稀疏自编码器（Sparse Autoencoder, SAE）在多模态编码器的特征空间中定位并调控“社会神经元”，从而在推理阶段实现透明的偏见抑制**。整个 pipeline 由三个顺序阶段构成，如图 Figure 2 所示。
 
@@ -119,7 +125,7 @@ $$\mathbf{z}'[j] = \begin{cases} \gamma & \text{if } j \in \mathcal{Z}_B \\ \mat
 ![[assets/figures/papers/paper_list_l760_https_arxiv_org_abs_2602_24014/figures/015_Table_5.jpg]]
 *Table 5: Overview of multimodal models. The table lists the image and text encoders used in VLMs and LVLMs considered in this work*
 
-## 核心模块与公式推导
+
 
 DEBIASLENS 框架由三个核心模块级联构成：**SAE 训练**、**社会神经元识别** 与**去偏特征生成**。其关键洞察在于，通过在 VLM 编码器的最后一层之上训练稀疏自编码器（SAE），可以将原始特征分解为一组稀疏激活，进而定位出对特定社会属性（性别、种族、年龄）高度响应的“社会神经元”，并在推理阶段通过置零这些神经元的激活值来实现可解释的去偏。
 
@@ -168,7 +174,9 @@ $$
 
 该操作等价于从特征空间中擦除社会属性相关的方向分量。实验表明，当 SAE 的扩张因子设为 8、神经元一致性阈值 $\tau = 0.9$、去偏强度 $\alpha = 0.6$ 时，方法在去偏效果与通用性能之间取得最优权衡。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 4.1 实验设置
 
@@ -250,7 +258,9 @@ Figure 9展示了新生成的SBBench合成数据集。通过合成图像，研�
 ![[assets/figures/papers/paper_list_l760_https_arxiv_org_abs_2602_24014/figures/001_Figure_1.jpg]]
 *Figure 1: Social bias mitigation in VLMs. While existing models retrieve image distribution of skewed demographics or answer definitively on ambiguous image-text pairs, our DEBIASLENS alleviates social biases across both image and text modalities*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有去偏方法的谱系关系
 
@@ -287,6 +297,8 @@ DEBIASLENS 的因果杠杆集中于三个设计选择，均有消融实验支撑
 2. **神经元选择的自动化**：阈值 τ（0.9）和权重 α（0.6）目前通过网格搜索确定，对不同模型和偏见类型可能需要重新调参。自适应选择机制值得探索。
 3. **SAE 训练的无监督本质**：虽然避免了社会属性标签，但 SAE 涌现出的神经元是否完整覆盖所有偏见维度缺乏理论保证。可能存在“沉默偏见”——即未被 SAE 捕获但实际影响模型输出的偏见模式。
 4. **长尾属性的覆盖**：当前验证集中于高频社会属性（性别、种族、年龄），对于宗教、残疾等长尾属性的神经元可识别性和去偏效果尚不明确，需要手动验证。
+
+
 
 ## 原文 PDF
 

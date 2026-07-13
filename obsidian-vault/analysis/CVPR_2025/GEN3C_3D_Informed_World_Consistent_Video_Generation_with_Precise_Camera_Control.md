@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/GEN3C_3D_Informed_World_Consistent_Video_Generation_with_Precise_Camera_Control.pdf
+project_link: https://research.nvidia.com/labs/toronto-ai/GEN3C/
+code_link: null
 aliases:
 - GEN3C
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | GEN3C：具有精确相机控制的3D感知世界一致性视频生成 |
 | 英文题名 | GEN3C: 3D-Informed World-Consistent Video Generation with Precise Camera Control |
 | 会议/期刊 | CVPR 2025 |
-| Links | [paper](https://arxiv.org/abs/2503.03751); [Project](https://research.nvidia.com/labs/toronto-ai/GEN3C/) |
+| Links | [paper](https://arxiv.org/abs/2503.03751) · [Project](https://research.nvidia.com/labs/toronto-ai/GEN3C/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | GEN3C |
 | Dataset | RE10K (域内), Tanks-and-Temples (域外), Two-view NVS (RE10K 插值/外推), Driving NVS (y±4.0m) |
@@ -40,7 +42,7 @@ claims:
 > - Tanks-and-Temples (域外) 上，PSNR↑ / SSIM↑ / LPIPS↓ 为 18.66 / 0.67 / 0.20，对比 NVS-Solver 16.95 / 0.59 / 0.27，变化 PSNR +1.71, SSIM +0.08, LPIPS -0.07。
 > - Two-view NVS (RE10K 插值/外推) 上，PSNR↑ / SSIM↑ / LPIPS↓ 为 22.22 / 0.76 / 0.14 (插值), 20.51 / 0.72 / 0.16 (外推)，对比 MVSplat 20.90 / 0.70 / 0.39 (插值), 16.08 / 0.63 / 0.44 (外推)，变化 插值 PSNR +1.32, SSIM +0.06, LPIPS -0.25; 外推 PSNR +4.43, SSIM +0.09, LPIPS -0.28。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -64,8 +66,6 @@ GEN3C 位于**生成式新视合成**与**可控视频生成**的交叉点。不
 ### 适用范围与局限
 
 GEN3C 支持单视图/稀疏视图新视合成、单目动态视频新视合成、驾驶仿真以及电影级特效（如 Dolly Zoom、3D 编辑）等多种应用（Figure 1）。当前方法依赖现成深度估计器，在透明/反射表面可能产生错误深度；推理速度较慢（14帧约30秒，A100），自回归生成可能引入累积误差；动态场景的时序一致性仍有提升空间。
-
-## 背景与动机
 
 ### 视频生成中的三维一致性困境
 
@@ -96,7 +96,7 @@ GEN3C 支持单视图/稀疏视图新视合成、单目动态视频新视合成�
 
 GEN3C 的目标正是弥合这一缺口：**同时具备重建方法的几何一致性和生成方法的缺失区域填补能力**，并在此基础上实现精确的相机控制和长序列视频生成。
 
-## 核心创新
+## 核心方法与创新机理
 
 GEN3C 的核心创新在于将视频生成任务重构为“在已知三维几何体上的补全、修复与运动推进”问题，从而一举解决了现有视频生成模型在相机控制精度与长序列时空一致性上的两个根本性瓶颈。
 
@@ -136,8 +136,6 @@ $$\mathbf{z}^{\prime} = \mathrm{Max-Pool}\{\mathbf{z}^{1,\prime}, \ldots, \mathb
 ### 创新本质总结
 
 GEN3C 的创新不在于提出新的视频扩散架构或深度估计方法，而在于**将三维几何先验以可渲染、可更新的显式缓存形式注入生成流程**。这一设计使得视频生成模型从“黑箱推测几何”转向“白箱利用几何”，从而在相机控制精度（像素对齐）、视角一致性（TSED）和长序列稳定性三个维度上同时取得了显著提升。该范式的另一优势是**基座可扩展性**：使用更强大的基础视频生成模型（如 Cosmos）可进一步提升生成质量并实现极端视角变化（Section 5.7, Figure 11–12），表明三维缓存条件与扩散模型骨干是解耦的。
-
-## 整体框架
 
 GEN3C 的核心设计思路是将视频生成任务重新定义为**在已知三维几何体上的补全、修复与运动推进**，而非让模型从相机参数隐式推测场景结构。为此，方法构建了一条从“显式三维缓存构建”到“二维条件渲染”再到“视频扩散生成”的流水线，其整体流程如 Figure 3 所示。
 
@@ -186,8 +184,6 @@ $$\mathbb{E}_{\mathbf{x}_0 \sim p_{\mathrm{data}}(\mathbf{x}), \tau \sim p_{\tau
 
 从方法谱系看，GEN3C 处于**生成式新视合成**与**可控视频生成**的交叉点。与 CameraCtrl 等依赖 Plücker 射线嵌入的隐式相机控制方法不同，GEN3C 将相机条件显式化为三维缓存的二维渲染，使模型不必同时承担几何推理与图像生成的双重负担。与 PixelSplat（Charatan et al., CVPR 2024）、MVSplat（Chen et al., ECCV 2024）等基于重建的稀疏视图方法相比，GEN3C 利用视频扩散模型的生成先验来填补大范围缺失区域，而非仅依赖可微渲染的插值能力，这在外推场景中优势尤为显著（PSNR 提升约 4.4 dB）。
 
-## 核心模块与公式推导
-
 ### 3.1 时空三维缓存构建
 
 GEN3C 的核心创新在于引入一个显式的时空三维点云缓存（3D cache），作为连接二维图像生成与三维场景几何的桥梁。给定输入图像，系统首先利用现成的单目深度估计器（DAV2）预测逐像素深度，随后通过反投影（unprojection）将 RGB-D 数据提升为三维点云。对于单视图输入，缓存为一个 $1 \times 1$ 的点云数组；对于多视图或视频输入，缓存扩展为 $L \times V$ 的时空点云数组，其中 $L$ 为时间帧数，$V$ 为视点数量。这一显式三维表示将视频生成任务重新定义为“在已知几何体上的补全、修复与运动推进”问题，从根本上解决了隐式方法在相机控制精度和长时一致性上的瓶颈。
@@ -234,7 +230,7 @@ $$\mathbf{d}^{\prime} = s \cdot \mathbf{d} + t$$
 
 对齐后的点云被合并入缓存，作为下一块生成的三维条件。这一增量式更新机制确保了跨块的时间一致性，避免了隐式方法中常见的物体“闪现”问题。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心性能验证
 
@@ -296,13 +292,10 @@ GEN3C 在多个任务维度上展现出显著优势，其性能提升的因果�
 ![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2503_03751/figures/010_Table_3.jpg]]
 *Table 3: Quantitative results of FID [18] for NVS on driving scene. GEN3C significantly outperforms the baselines, especially when generating novel views that are far away from the original trajectory*
 
-![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2503_03751/figures/012_Table_5.jpg]]
-*Table 5: Quantitative results on the robustness analysis on noisy depth estimation. The two values in each table cell represent the interpolation and extrapolation results, respectively*
-
 ![[assets/figures/papers/paper_list_l48_https_arxiv_org_abs_2503_03751/figures/013_Table_6.jpg]]
 *Table 6: Ablation of different fusion strategies on RE10K dataset. The two values in each table cell represent the interpolation and extrapolation results, respectively*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 核心方法定位
 

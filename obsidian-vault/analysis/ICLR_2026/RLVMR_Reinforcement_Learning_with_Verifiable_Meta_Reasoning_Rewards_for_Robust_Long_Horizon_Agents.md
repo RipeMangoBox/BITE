@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/RLVMR_Reinforcement_Learning_with_Verifiable_Meta_Reasoning_Rewards_for_Robust_Long_Horizon_Agents.pdf
+project_link: null
+code_link: null
 openreview_forum_id: cTbAevdwBE
 aliases:
 - RLVMR
@@ -41,7 +43,7 @@ claims:
 > - ALFWorld 上，Success Rate (%) 为 83.6，对比 52.3，变化 +31.3。
 > - ScienceWorld 上，Success Rate (%) 为 32.2，对比 26.6，变化 +5.6。
 
-## 概述
+## 概要
 
 ### 问题核心
 
@@ -68,7 +70,7 @@ RLVMR 定位于**基于文本交互的 LLM 智能体强化学习**领域，其�
 
 与离线 RL 方法（如 **ETO**, Song et al., 2024；**GLIDER**, Hu et al., 2025）相比，RLVMR 通过在线交互与过程级奖励塑形实现了更强的泛化能力；与端到端在线 RL 方法（如 **GiGPO**, Feng et al., 2025）相比，RLVMR 通过显式的元推理结构引导，在提升成功率的同时大幅降低了推理低效行为。
 
-## 背景与动机
+
 
 ### 长周期智能体中的推理困境
 
@@ -94,7 +96,9 @@ $$\operatorname*{max}_{\theta} \operatorname{\mathbb{E}}_{\tau \sim \pi_{\theta}
 
 RLVMR 框架正是基于这一动机，通过引入可验证元推理奖励与复合优势函数，为长周期智能体的稳健推理能力训练提供了新的技术路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 RLVMR 的核心创新在于，它直面了当前长周期 LLM 智能体强化学习中一个被忽视的根本矛盾：**仅优化最终任务成功（稀疏结果奖励）的范式，会系统性地奖励那些推理过程充斥着冗余、低效甚至矛盾步骤的“成功”轨迹，导致策略泛化能力脆弱且动作效率低下**。针对这一瓶颈，RLVMR 将元认知理论中的高层认知技能（规划、探索、反思、监控）操作化为可验证的推理标签，并以此构建过程级密集奖励，直接塑造智能体“如何推理”，而非仅仅“如何成功”。
 
@@ -132,7 +136,7 @@ $$\mathcal{L}_{\mathrm{final}} = \mathbb{E}_t \left[ \min \left( r_t(\theta) A_t
 
 **消融实验为上述创新提供了决定性证据**：移除元推理奖励（$A^{\mathrm{MC}}$）导致 ALFWorld L2 成功率从 56.3% 降至 45.3%；而移除结果奖励（$A^{T}$）则使成功率崩溃至 12.5%，证实了过程奖励与结果奖励必须协同工作，缺一不可。超参数 $\alpha$ 的灵敏度分析进一步表明，当 $\alpha = 0.5$ 时性能最为稳健，过小或过大均会破坏两种信号的平衡。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_cTbAevdwBE/figures/009_Figure_3.jpg]]
 *Figure 3: A schematic diagram of the RLVMR framework, which consists of two training phases: cold start and reinforcement learning. Our method provides rule-verifiable feedback signals based on the final outcome and the relative advantages of different types of meta-reasoning behaviors*
@@ -168,7 +172,7 @@ RLVMR 采用**两阶段训练范式**，将可验证的元推理过程监督注�
 
 整个框架的数据流可概括为：环境交互产生的观察-动作序列 → 元推理标签框架对其进行结构化标注 → 奖励塑形模块计算每步的过程奖励与最终结果奖励 → GRPO-MR 优化器利用标签内归一化的复合优势更新策略参数。两阶段训练确保了策略在具备基本推理能力的基础上，通过在线探索进一步强化推理质量和泛化能力。
 
-## 核心模块与公式推导
+
 
 ### 冷启动有监督微调（Cold Start SFT）
 
@@ -229,7 +233,9 @@ $$\mathcal{L}_{\mathrm{final}} = \mathbb{E}_t \left[ \min \left( r_t(\theta) A_t
 
 其中 $r_t(\theta) = \frac{\pi_\theta(a_t|s_t)}{\pi_{\mathrm{old}}(a_t|s_t)}$ 为概率比，$\epsilon$ 为裁剪阈值，$\lambda_{\mathrm{KL}}$ 为 KL 惩罚系数（默认 0.01）。该目标函数在保持训练稳定性的同时，通过复合优势函数同时优化任务成功率与推理过程质量。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈：从“无效探索”到“高效推理”的量化证据
 
@@ -291,7 +297,9 @@ $$A_t = \alpha \cdot A_k^{\mathrm{traj}} + (1 - \alpha) \cdot A_{t,\mathrm{tag}}
 
 所有对比方法使用相同的环境最大步数限制（30 步）、相同的模型基座和相同的评估分割，确保了比较的公平性。RLVMR 的冷启动阶段仅使用约 200 条教师标注轨迹，与基线 SFT 方法使用完整专家轨迹的数据量相比并不占优，排除了数据量优势的混淆解释。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的谱系关系
 
@@ -338,6 +346,8 @@ RLVMR 与上述基线的方法论差异可归结为三个“变化槽”（chang
 4. **真实世界应用**：在机器人操作、代码调试等真实场景中，定义和验证过程级奖励，同时确保安全性和价值对齐。
 
 从方法谱系角度看，RLVMR 为“将认知过程结构化并纳入强化学习优化”提供了可操作的范式，其核心思想——通过可验证的中间行为标签实现过程监督——可被视为连接符号化推理规则与神经网络策略优化的桥梁。后续工作可能沿两个方向延伸：一是向下游，将标签空间从认知行为扩展至工具使用、多智能体协作等更复杂的交互模式；二是向上游，探索自动发现或学习最优标签结构的方法，减少人工设计依赖。
+
+
 
 ## 原文 PDF
 

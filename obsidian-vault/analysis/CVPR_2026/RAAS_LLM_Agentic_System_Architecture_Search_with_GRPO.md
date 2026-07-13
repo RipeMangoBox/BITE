@@ -43,7 +43,7 @@ claims:
 > - GSM8K 上，Accuracy 95.16% vs 91.84% (+3.32)。
 > - HumanEval 上，pass@1 96.31% vs 92.23% (+4.08)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -87,7 +87,7 @@ RAAS 属于**基于搜索的智能体架构自动设计**方法，与以下工�
 
 RAAS 的核心贡献不在于搜索空间的设计，而在于**评估范式的革新**——通过同行比较消除任务难度偏差，通过多试验聚合消除执行随机性，从而为架构搜索提供可靠的优化信号。
 
-## 背景与动机
+
 
 ### 智能体系统的自动化设计需求
 
@@ -115,7 +115,9 @@ RAAS 的核心贡献不在于搜索空间的设计，而在于**评估范式的�
 
 图1(B) 展示了 RAAS 的解决方案：通过同行比较消除任务难度偏差，通过多试验聚合消除执行随机性，两者协同产生稳定的评估信号，为可靠的架构发现奠定基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 RAAS的核心创新在于**重构了智能体架构搜索的评估信号**，将不可靠的绝对性能比较转化为统计稳健的上下文相对评估。这一转变通过两个协同机制实现，对应三个关键的*changed slots*。
 
@@ -164,7 +166,7 @@ $$\Theta_{\mathrm{RAAS}}(\phi; q) = \frac{1}{N} \sum_{i=1}^{N} \nabla_{\phi} \lo
 
 这一评估范式的转变是RAAS在六个基准上平均超越最强基线**+5.41个百分点**的根本原因。
 
-## 整体框架
+
 
 RAAS（Robust Architecture Adaptive Search）构建了一个闭环的架构搜索pipeline，核心目标是**在概率化超级网上通过稳定、公平的评估信号来发现高性能智能体架构**。整个框架由四个协同模块串联而成，形成“采样→评估→适应”的迭代优化循环。
 
@@ -215,7 +217,7 @@ $$\Theta_{\mathrm{RAAS}}(\phi; q) = \frac{1}{N} \sum_{i=1}^{N} \nabla_{\phi} \lo
 ![[assets/figures/papers/paper_list_l2199_https_openaccess_thecvf_com_content_CVPR2026_html_Yang_RAAS_LLM_Agentic/figures/002_Figure_2.jpg]]
 *Figure 2: RAAS framework overview. CAO performs cohort-based peer comparison for contextual fairness, while MTAS aggregates multi-trial executions for statistical robustness, together producing stable evaluation signals for architecture discovery*
 
-## 核心模块与公式推导
+
 
 RAAS 通过两个协同机制建立稳定、公平的评估信号：**上下文架构编排（CAO）** 和 **多试验评估综合（MTAS）**。CAO 在同查询上评估候选架构的同行群体，通过同行比较推导上下文相关的零中心优势信号，解耦任务难度；MTAS 聚合多次独立试验的结果，减少执行方差，提供统计上稳健的能力估计。两者协同产生稳定的评估信号，驱动架构搜索的优化过程。
 
@@ -304,7 +306,9 @@ $$
 ![[assets/figures/papers/paper_list_l2199_https_openaccess_thecvf_com_content_CVPR2026_html_Yang_RAAS_LLM_Agentic/figures/001_Figure_1.jpg]]
 *Figure 1: An illustration of the core problem and our proposed solution. (A) Problem: Evaluation Instabilities. Easy queries inflate weak architectures while hard queries depress strong ones (task-difficulty entanglement), and single-execution assessments capture transient artifacts rather than true capability (execution variance). (B) RAAS: Stable Evaluation through Synergistic Design. RAAS evaluates cohorts of architectures on the same query through multiple independent trials. CAO derives contextual merit signals via peer comparison, while MTAS synthesizes multi-trial outcomes for statistical robustness, together enabling more reliable architecture discovery*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈：评估不稳定性如何阻碍架构搜索
 
@@ -398,7 +402,9 @@ RAAS通过两个协同机制解决这一问题：**上下文架构编排（CAO�
 ![[assets/figures/papers/paper_list_l2199_https_openaccess_thecvf_com_content_CVPR2026_html_Yang_RAAS_LLM_Agentic/figures/008_Figure_6.jpg]]
 *Figure 6: Cost-performance trade-off analysis across different methods*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 智能体架构搜索的演进脉络
 
@@ -443,6 +449,8 @@ RAAS 的方法论贡献可以精确地定位为 **评估协议的范式转换**�
 - **理论收敛分析**：将优点加权适应纳入随机优化的理论框架，分析其在非凸 Supernet 参数空间中的收敛性质，特别是上下文优点信号的方差如何影响收敛速率。
 
 - **跨模型与跨域泛化**：在更多样的 LLM 骨干和任务域（如开放域问答、代码调试、多模态推理）上验证评估稳定机制的普适性，识别可能失效的边界条件。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Muon_Outperforms_Adam_in_Tail_End_Associative_Memory_Learning.pdf
+project_link: null
+code_link: null
 openreview_forum_id: twbMFL0DMp
 aliases:
 - MOATEAML
@@ -35,7 +37,10 @@ claims:
 | Method |  |
 | Dataset | |
 
-## 概述
+> [!tip] 效果简介
+> 本笔记的既有实验指标、对比结果与适用边界见“实验与关键发现”；本轮仅统一结构，不改写证据。
+
+## 概要
 
 在长尾分布下的语言模型预训练中，不同事实的出现频率差异悬殊，导致基于梯度幅度的优化器（如 Adam）倾向于优先学习高频事实，而尾部事实的学习则明显滞后。论文 **《Muon Outperforms Adam in Tail-End Associative Memory Learning》** 针对这一问题，提出将 Muon 优化器应用于 Transformer 的关键权重矩阵，以实现对高频与低频事实的更均衡学习。
 
@@ -45,7 +50,7 @@ claims:
 
 主要结果包括：Muon 使权重矩阵的奇异值谱在训练全程保持更高的各向同性（更高的 SVD 熵与有效秩，更低的 Top-10 能量占比）；在重尾知识任务上，Muon 对低频类别的首 token 准确率提升尤为突出，有效缩小了头尾差距。这些发现共同指向一个机制性解释：Muon 通过谱归一化抵消了梯度中由频率差异引入的幅度偏差，从而在联想记忆学习中实现了更均匀的事实获取。
 
-## 背景与动机
+
 
 大规模语言模型预训练的核心挑战之一，在于数据天然服从**重尾分布**：少量高频模式与大量长尾模式共存。在这种分布下，优化器的选择直接影响模型对尾部知识的吸收能力。传统优化器如 Adam 虽然收敛迅速，但其逐元素归一化的更新机制会**破坏梯度矩阵的内在结构**，导致不同知识项的更新强度失衡——头部类被过度强化，而尾部类学习不足。
 
@@ -55,7 +60,9 @@ Muon 优化器（Bernstein & Newhouse, 2024）提出了一种根本不同的更�
 
 本文的核心动机在于**系统性地揭示 Muon 在尾部关联记忆学习中的优势机制**。具体而言，作者试图回答：Muon 为何能在重尾分布下实现比 Adam 更平衡的类间学习？这一优势在真实 Transformer 训练中如何体现？通过将 Transformer 的 FFN 层抽象为线性关联记忆模型，结合理论分析和受控实验，本文建立了从优化器更新规则到尾部知识获取能力的因果链条，并在一系列规模化的语言模型预训练任务上验证了 Muon 的显著增益。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Muon 的核心创新在于**将权重矩阵的更新规则从逐元素符号/幅度归一化，转向基于矩阵谱范数的结构归一化**。具体而言，Muon 在每一步对动量累加器 $B_t$ 计算（或近似）奇异值分解 $B_t = U_t S_t V_t^\top$，然后抛弃奇异值矩阵 $S_t$，仅保留正交因子 $O_t = U_t V_t^\top$ 作为更新方向。这一操作可被解释为在谱范数约束下的最速下降（Bernstein & Newhouse, 2024），其更新形式为：
 
@@ -81,7 +88,7 @@ $$\Delta \mathbf{w}^* = -\frac{\lVert \mathbf{g} \rVert_1}{\lambda} \cdot \mathr
 
 综上，Muon 的创新并非简单的优化器调参，而是**将优化器的几何假设从向量 $\ell_\infty$ 空间切换到矩阵谱范数空间**，这一切换恰好匹配了 Transformer 中 VO 和 FFN 权重的联想存储器结构，从而系统性地改善了对长尾分布数据的学习。
 
-## 整体框架
+
 
 论文围绕一个核心命题展开：Muon 优化器在 Transformer 的长尾关联记忆学习中为何优于 Adam。研究框架由三个层次构成——**经验分解**、**机制解释**和**理论验证**，逐层递进地揭示 Muon 的优势来源。
 
@@ -112,7 +119,7 @@ $$\Delta \mathbf{w}^* = -\frac{\lVert \mathbf{g} \rVert_1}{\lambda} \cdot \mathr
 3. **Adam 更新路径**：对 QK 组，保持标准的 $\ell_{\infty}$ 范数最速下降更新。
 4. **权重更新**：各组更新合并后施加于对应权重矩阵，完成一步训练。
 
-## 核心模块与公式推导
+
 
 ### Transformer 中的线性联想记忆结构
 
@@ -165,7 +172,9 @@ $$O = U V^{\top} = \sum_{i=1}^{d} u_i v_i^{\top}$$
 
 这一解释揭示了 Muon 与 Adam 的本质差异：前者在矩阵空间中以谱范数几何进行优化，后者在向量空间中以无穷范数几何进行优化。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果：Muon 在 NanoGPT 基准上的验证损失优势
 
@@ -245,7 +254,9 @@ Figure 2 从权重矩阵的奇异值分布角度揭示了 Muon 与 Adam 的本�
 *Figure 14: (a) Average Angles Between $E _ { i } / \widetilde { E } _ { i }$ (b) One-step Optimization Results (c) Multi-step Optimization Results*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -280,6 +291,8 @@ Muon 的增益并非均匀分布在所有 Transformer 组件上。关键发现�
 2. **组件选择的理论判据**：什么结构特征决定了某个 Transformer 组件是否受益于 Muon？目前仅有经验观察（VO/FFN 受益，QK 不显著），缺乏理论判据来预测新架构中 Muon 的适用位置。
 3. **与动量机制的深层交互**：理论分析中为清晰起见禁用了动量（$\beta_1 = \beta_2 = 0$），但实际 Muon 使用动量累积矩阵 $B_t$。动量如何与谱归一化交互、是否引入新的动力学效应，尚待分析。
 4. **更大规模验证**：当前主要结果基于 160M NanoGPT 和重尾知识任务，Muon 在更大规模模型（如 7B+）和更通用预训练任务上的表现需进一步验证。
+
+
 
 ## 原文 PDF
 

@@ -40,7 +40,7 @@ claims:
 > [!tip] 效果简介
 > - DreamBenchPCC 上，ΔCLIP-T(base) for instance concepts -0.31 vs CIFC: -1.93, DreamBooth: -4.81 (closer to 0 indicates better preservation of text alignment)；Seg-Cons 69.37 vs DreamBooth+EWC: 26.37, CIFC: 13.23 (higher indicates better behavior preservation (spatial consistency))；CLIP-I (target) 0.81 vs CIFC: 0.78, DreamO: 0.71, DreamBooth: 0.63 (higher indicates better instance-level concept fidelity)。
 
-## 概述
+## 概要
 
 文本到图像的概念定制（concept customization）旨在让预训练生成模型学会用户提供的特定视觉概念（如某个物体实例或艺术风格），并在新场景中忠实地复现该概念。现有方法（如 **DreamBooth**（Ruiz et al., CVPR 2023）、LoRA、Mix-of-Show、CIFC 等）通常将完整的语言-视觉知识作为微调目标，但由于参考图像数量极为有限，模型难以区分目标概念与冗余信息，导致插入新概念后原始模型的**行为**（非目标区域变化）和**能力**（提示遵循度、生成质量）显著下降——实验证据表明，这些方法在定制后 CLIP-T 和 HPSv2.1 得分明显下滑，且原始分布发生偏移（KL 散度增大）。
 
@@ -48,7 +48,7 @@ claims:
 
 在统一构建的 DreamBenchPCC 基准上，PureCC 取得了最优的目标概念保真度（CLIP-I 0.81，DINO 0.73），同时在原始模型保持指标上远超所有基线：Seg-Cons 达 69.37（次优 DreamBooth+EWC 仅 26.37），$\Delta$CLIP-T 仅为 -0.31（CIFC 为 -1.93，DreamBooth 为 -4.81），$\Delta$HPSv2.1 甚至正向提升 +0.10。消融实验证实了纯学习损失、分阶段训练策略和自适应 $\lambda^\star$ 的关键作用。该方法的主要代价是训练阶段增加了约 30% 的时间与显存开销，但推理时无额外负担。
 
-## 背景与动机
+
 
 ### 文本到图像概念定制的核心挑战
 
@@ -94,7 +94,9 @@ PureCC 处于**调优型概念定制**（tuning-based concept customization）�
 
 PureCC 的关键创新在于**将学习目标从“拟合完整条件分布”转变为“在原始预测之上叠加目标概念引导”**，并通过双分支训练管道（冻结的表示提取器 + 可训练流模型）和自适应引导强度 $\lambda^\star$ 实现这一解耦。这一设计使得 PureCC 在 DreamBenchPCC 基准上同时达到了最优的概念保真度（CLIP-I 0.81, DINO 0.73）和远超所有基线的模型保持能力（Seg-Cons 69.37 vs. 次优 26.37），证明了“纯学习”范式的有效性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PureCC 的核心创新在于将概念定制重新定义为**在原始条件预测之上叠加目标概念的隐式指导**，从而从根本上解耦“学习新概念”与“保持原始模型行为”这两个相互冲突的目标。
 
@@ -157,7 +159,7 @@ PureCC 的两阶段训练流水线（Figure 3）是实现上述解耦目标的�
 
 消融实验（Table 2）验证了这些设计的必要性：合并学习阶段（Merged Learning Stage）会显著破坏原始模型保持，而加入 $\mathcal{L}_{PureCC}$ 损失相比单独使用 $\mathcal{L}_{CC}$ 在 $\Delta$CLIP-T 和 $\Delta$HPSv2.1 上均有显著改善，且不牺牲概念保真度。
 
-## 整体框架
+
 
 PureCC 的整体训练流程分为两个解耦阶段，核心思路是将概念定制拆解为“原始模型条件预测”与“目标概念隐式引导”的组合，从而在插入个性化概念的同时尽可能保持预训练模型的行为与生成能力。
 
@@ -195,7 +197,7 @@ $$\mathcal{L}_{PCC} = \mathcal{L}_{CC} + \eta \cdot \mathcal{L}_{PureCC}$$
 ![[assets/figures/papers/paper_list_l2338_https_arxiv_org_abs_2603_07561/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of our PureCC. (a). We first fine-tune a flow model on the custom set as representation extractor. (b). During the pure learning stage, the representation extractor remains frozen and provides the target concept representation, which is then controlled by our adaptive scale*
 
-## 核心模块与公式推导
+
 
 PureCC 的核心设计围绕一个关键洞察展开：**将概念定制视为在原始条件预测之上叠加目标概念的隐式指导**。这一思想贯穿于整个方法架构，体现在三个核心模块的协同设计中。
 
@@ -273,7 +275,9 @@ $$\mathcal{L}_{PCC} = \mathcal{L}_{CC} + \eta \cdot \mathcal{L}_{PureCC}$$
 ![[assets/figures/papers/paper_list_l2338_https_arxiv_org_abs_2603_07561/figures/009_Figure_8.jpg]]
 *Figure 8: Visualization of Pure Learning Process*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：原始模型行为与能力的保持
 
@@ -345,7 +349,9 @@ PureCC 在 DreamBenchPCC 基准上的定量结果（表 1）提供了决定性�
 ![[assets/figures/papers/paper_list_l2338_https_arxiv_org_abs_2603_07561/figures/011_Figure_9.jpg]]
 *Figure 9: Visualization of the Ablation Study*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：概念定制中的“原始能力退化”瓶颈
 
@@ -410,6 +416,8 @@ PureCC 的解耦学习范式为概念定制领域开启了若干值得探索的�
 **（4）理论分析。** 当前对分布漂移的量化依赖 KL 散度的经验估计，对 $\lambda^\star$ 的闭式解基于投影误差最小化的启发式推导。能否从信息瓶颈理论或神经正切核（NTK）角度，为 PureCC 的模型保持能力提供更严格的理论保证？
 
 **（5）与免调优方法的深度融合。** PureCC 在保真度上优于免调优方法，在模型保持上优于传统调优方法。能否将 PureCC 的表示提取器与免调优方法的注意力注入机制结合，进一步降低甚至消除调优需求？
+
+
 
 ## 原文 PDF
 

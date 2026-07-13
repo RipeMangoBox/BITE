@@ -5,6 +5,7 @@ paper_level: A
 venue: NeurIPS
 year: 2024
 pdf_ref: paperPDFs/NEURIPS_2024/Memorize_What_Matters_Emergent_Scene_Decomposition_from_Multitraversee.pdf
+code_link: https://github.com/NVlabs/3DGM
 project_link: https://nvlabs.github.io/3DGM/
 aliases:
 - 3GM3
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 记忆重要之事：从多趟遍历中涌现的场景分解 |
 | 英文题名 | Memorize What Matters: Emergent Scene Decomposition from Multitraversee |
 | 会议/期刊 | NeurIPS 2024 |
-| Links | [paper](https://arxiv.org/abs/2405.17187); [GitHub](https://github.com/NVlabs/3DGM); [Project](https://3d-gaussian-mapping.github.io); [Project](https://nvlabs.github.io/3DGM/) |
+| Links | [paper](https://arxiv.org/abs/2405.17187) · [GitHub](https://github.com/NVlabs/3DGM) · [Project](https://3d-gaussian-mapping.github.io) · [Project](https://nvlabs.github.io/3DGM/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | 3D Gaussian Mapping (3DGM) |
 | Dataset | Mapverse-Ithaca365 |
@@ -42,7 +43,7 @@ claims:
 > - Mapverse-Ithaca365 上，Chamfer Distance (meters, 3D reconstruction) 为 0.9 m (EnvGS)，对比 1.9 m (DepthAnything)，变化 -1.0 m (~52% reduction)。
 > - Mapverse-Ithaca365 上，LPIPS (novel view synthesis) 为 0.213 (EnvGS)，对比 0.255 (3DGS)，变化 -0.042 (lower is better)。
 
-## 概述
+## 概要
 
 ### 问题背景与核心瓶颈
 
@@ -70,7 +71,7 @@ claims:
 
 尽管效果显著，3DGM仍面临若干挑战：物体阴影的分割不够精确，大面积持久遮挡物可能导致过拟合，远距离小物体的分割精度有限，以及无法处理大幅度的光照和季节变化。这些局限指向了未来的研究方向——阴影感知的环境映射、时序信息整合、自适应阈值设计，以及4D表示对长期一致性的支持。
 
-## 背景与动机
+
 
 自动驾驶和移动机器人系统依赖精确的3D环境地图实现定位、规划与导航。传统建图方法通常假设环境是静态的，但真实世界中充斥着行人、车辆等临时性动态物体——这些物体在不同时间遍历同一区域时出现和消失，对构建持久环境表示构成根本性挑战。
 
@@ -82,7 +83,9 @@ claims:
 
 本文提出3D Gaussian Mapping (3DGM)，将多趟遍历环境建图形式化为鲁棒可微分渲染问题——将环境像素视为内点（inliers），物体像素视为外点（outliers）。通过蒸馏去噪DINOv2特征到3D高斯泼溅框架中，并结合新颖的特征残差挖掘策略，3DGM首次在无需LiDAR和人工监督的条件下，同时实现了3D环境高斯地图的构建和2D临时性物体分割。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 3DGM的核心创新在于将多遍历环境映射重新定义为**鲁棒可微分渲染问题**，并围绕这一范式设计了三个紧密耦合的机制，实现了纯视觉、无监督的场景分解。其关键创新点可归纳为以下三个“changed slots”：
 
@@ -116,7 +119,7 @@ $$\mathcal{L} = \sum_t \mathcal{L}_{rgb}(\mathbf{M}_t \odot \mathbf{I}_t(\boldsy
 
 上述三个创新并非孤立存在，而是形成了一条**因果链**：特征蒸馏提供判别性信号→残差挖掘定位外点→鲁棒损失保护内点优化。这种协同使得3DGM能够在无LiDAR、无标注的条件下，同时输出高质量的3D环境地图和2D暂时性物体分割，突破了现有方法对人工标注和昂贵传感器的依赖。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2405_17187/figures/001_Figure_1.jpg]]
 *Figure 1: A high-level diagram of 3D Gaussian Mapping (3DGM). Given multitraverse RGB videos, 3DGM outputs a Gaussian-based environment map (EnvGS) and 2D ephemerality segmentation (EmerSeg) for the input images. Note that the proposed framework is LiDAR-free and self-supervised*
@@ -139,7 +142,7 @@ $$\mathcal{L} = \sum_t \mathcal{L}_{rgb}(\mathbf{M}_t \odot \mathbf{I}_t(\boldsy
 
 **流水线整体流程**如 Figure 2 所示：多趟遍历 RGB 图像经 COLMAP 初始化后，先通过联合 RGB 与特征渲染训练初始环境高斯；随后利用特征残差挖掘生成暂时性掩码；最后在掩码引导下进行鲁棒优化，产出最终的环境高斯和分割结果。三个模块相互增强——更好的特征蒸馏带来更精确的掩码，更精确的掩码又反哺更干净的环境重建。
 
-## 核心模块与公式推导
+
 
 ### 总体框架
 
@@ -206,7 +209,9 @@ $$
 
 这些改进槽位共同构成了 3DGM 的技术贡献：通过将鲁棒优化、自监督特征蒸馏和空间残差挖掘有机结合，首次在 3DGS 框架下实现了无需人工标注的多遍历环境与物体分解。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置与基准
 
@@ -303,7 +308,9 @@ $$
 ![[assets/figures/papers/paper_list_l17_https_arxiv_org_abs_2405_17187/figures/033_Table.jpg]]
 *Table: II: Quantitative rendering results in Mapverse-nuPlan. We set test/training views as 1/8. Pixels corresponding to transient objects are removed in the evaluations since we do not have ground truth background pixels in these regions occluded by transient objects*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：3D 映射中的“持久/临时”分解瓶颈
 
@@ -361,6 +368,8 @@ $$\mathcal{L} = \sum_t \mathcal{L}_{rgb}(\mathbf{M}_t \odot \mathbf{I}_t(\boldsy
 ### 5. 在知识库中的定位
 
 3DGM 在自动驾驶建图领域的方法谱系中占据了一个独特位置：它**首次在纯视觉、无 LiDAR、无人工标注的条件下，实现了 3D 环境高斯与 2D 暂时性物体掩码的联合无监督生成**。相较于依赖 LiDAR 的建图方法，3DGM 降低了传感器成本；相较于依赖监督分割的方法，它消除了标注负担和跨域泛化问题；相较于现有无监督分割方法（STEGO、CAUSE），它在自动驾驶场景中取得了显著的性能提升（IoU 提升 21.36 个百分点，89.8% 相对改进）。其核心贡献——特征残差挖掘策略与鲁棒优化损失的结合——为后续研究提供了一个可扩展的自监督框架，但面向大规模、跨季节、全天候的实际部署，仍需解决上述开放问题。
+
+
 
 ## 原文 PDF
 

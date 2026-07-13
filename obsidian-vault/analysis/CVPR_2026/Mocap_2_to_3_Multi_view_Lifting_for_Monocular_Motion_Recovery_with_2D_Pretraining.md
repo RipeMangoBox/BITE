@@ -41,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - RICH 上，PA-MPJPE (mm) 26.2 vs 30.7 (-4.5)；W-MPJPE (mm) 82.6 vs 109.4 (-26.8)；Abs-MPJPE (mm) 156.8 vs 430.4 (-273.6)。
 
-## 概述
+## 概要
 
 单目3D人体运动恢复长期受困于两个瓶颈：**3D标注数据的稀缺与场景受限**，导致模型对分布外（OOD）动作的泛化能力不足；以及**单目深度模糊性**，使得估计具有度量尺度的绝对位姿极为困难。现有方法要么仅在根对齐的局部坐标系下评估动作质量，要么在世界坐标系下只能恢复对齐后的全局轨迹，缺乏真正的度量尺度绝对定位能力（如**GVHMR** (Shen et al., SIGGRAPH Asia 2024)、**WHAM** (Shin et al., CVPR 2024) 等）。
 
@@ -55,7 +55,7 @@ claims:
 
 **方法定位**：Mocap-2-to-3区别于直接端到端回归（如Ray3D）和仅用2D数据的提升方法（如MVLift），通过“2D预训练+多视角微调”的范式，在仅需单目2D姿态和标定相机参数的条件下，首次实现了具有度量尺度的绝对位姿恢复，同时保持了OOD泛化能力。
 
-## 背景与动机
+
 
 ### 单目3D人体运动恢复的核心瓶颈
 
@@ -81,7 +81,9 @@ claims:
 
 如图1所示，与传统直接回归框架相比，Mocap-2-to-3通过“2D预训练+多视角微调”的两阶段策略，实现了泛化能力与几何精度的统一。表1系统对比了本文方法与相关工作在输入模态、相机参数需求、2D数据利用方式和度量尺度轨迹恢复能力上的差异，凸显了本框架在仅需单目2D姿态和标定相机参数的条件下，即可输出具有绝对尺度的全局3D运动。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Mocap-2-to-3 的核心创新在于将单目3D人体运动恢复重新定义为**多视角合成问题**，并通过三个关键设计突破传统方法的瓶颈。
 
@@ -116,7 +118,7 @@ $$\mathcal{M}_{v,\{1:J\}}^{g} = \mathcal{M}_{v}^{l} \cdot s_{v} + \tau_{v}, \qua
 
 Table 1 系统对比了 Mocap-2-to-3 与相关方法的本质差异。**GVHMR**（Shen et al., SIGGRAPH Asia 2024）在世界坐标系下仅恢复对齐后的全局轨迹，缺乏度量尺度绝对定位；**WHAM**（Shin et al., CVPR 2024）虽支持世界坐标系运动恢复，但精度受限于单目深度估计的固有模糊性；**MVLift**（Li et al., CVPR 2025）同样采用2D数据提升至3D，但运动质量落后于3D监督方法。Mocap-2-to-3 是唯一同时具备以下能力的方法：从单目2D输入恢复度量尺度轨迹、利用2D数据增强3D结果、输出SMPL格式的全局运动参数。
 
-## 整体框架
+
 
 Mocap-2-to-3 将单目3D人体运动恢复重新定义为**多视角合成问题**，其核心思想是：利用大规模2D姿态数据预训练获得强运动先验，再通过有限3D数据微调实现视角一致性生成，从而将单目2D姿态序列“提升”为具有度量尺度的全局一致3D运动。
 
@@ -158,7 +160,7 @@ Mocap-2-to-3 将单目3D人体运动恢复重新定义为**多视角合成问题
 ![[assets/figures/papers/paper_list_l1070_https_arxiv_org_abs_2503_03222/figures/001_Figure_1.jpg]]
 *Figure 1: (a) Traditional framework for direct 3D motion regression. (b) Mocap-2-to-3: our multi-view lifting framework from monocular input which leverages 2D pretraining to enhance 3D motion capture. (c) The model outputs SMPL-format global motions with absolute position from monocular 2D pose input while maintaining out-of-distribution generalization capability. (d) Our model also supports outputs in the COCO-format keypoint*
 
-## 核心模块与公式推导
+
 
 ### 3.1 两阶段多视角扩散框架
 
@@ -192,7 +194,9 @@ $$\mathcal{M}_{v,\{1:J\}}^{g} = \mathcal{M}_{v}^{l} \cdot s_{v} + \tau_{v}, \qua
 
 推理阶段，去噪过程共 $N$ 步。每步模型 $\mathcal{D}_{mv}$ 以 $[\epsilon, \mathcal{M}_0, \mathcal{K}, \mathcal{RT}, \mathcal{P}]$ 为输入，预测各视角的2D运动序列 $\mathcal{M}_v^n$。对每个去噪步，通过运动解耦模块从生成结果中分离局部姿态和全局移动，重新计算各视角的全局2D坐标。最终利用多视角2D全局坐标和已知相机参数，通过**多视角三角化**重建世界坐标系下的3D绝对位姿，得到具有度量尺度的全局一致人体运动（Fig. 2d-e）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -254,7 +258,9 @@ Mocap-2-to-3 在两个标准基准上进行了评估：RICH（室内多视角捕
 ![[assets/figures/papers/paper_list_l1070_https_arxiv_org_abs_2503_03222/figures/011_Figure_7.jpg]]
 *Figure 7: Qualitative comparison on AIST++. Our method generalizes well to COCO-format skeletons as well*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有方法的谱系关系
 
@@ -291,6 +297,8 @@ Mocap-2-to-3 处于单目3D人体运动恢复这一活跃研究脉络中，其�
 3. **物理一致性**：如何整合足部滑动减少、接触力约束或物理仿真反馈，以提升生成运动的物理真实感？这可能需要在扩散模型输出后增加一个物理优化后处理步骤。
 
 4. **任务泛化**：该多视角提升框架的核心思想——利用2D预训练获得强先验，再通过多视角一致性实现3D升维——能否扩展到多人交互、手物交互、具身智能等需要精确3D空间推理的下游任务？这需要重新设计运动表示和条件信号以适应更复杂的交互场景。
+
+
 
 ## 原文 PDF
 

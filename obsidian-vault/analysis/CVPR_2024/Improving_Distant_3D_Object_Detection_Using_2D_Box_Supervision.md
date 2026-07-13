@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2024
 pdf_ref: paperPDFs/CVPR_2024/Improving_Distant_3D_Object_Detection_Using_2D_Box_Supervision.pdf
+project_link: null
+code_link: null
 aliases:
 - ID3ODU2BS
 tags:
@@ -40,7 +42,7 @@ claims:
 > - nuScenes (distant 40m-51.2m) 上，LDS / mAP 为 16.1% / 11.3% (IP-FCOS3D)，对比 1.8% / 1.4% (FCOS3D)，变化 +14.3% / +9.9%。
 > - KITTI (overall, BEVFormer-S with teacher) 上，LDS / mAP (distant) 为 6.4% mAP (LR3D teacher)，对比 0.0% mAP (without distant 3D)，变化 +6.4% mAP。
 
-## 概述
+## 概要
 
 相机3D检测器在远距离（通常>40m）场景中面临一个根本瓶颈：激光雷达点云随距离增加急剧稀疏，导致远距离物体缺乏可靠的3D标注（含深度信息）。现有方法依赖近距离3D标签训练，一旦超出标注范围便无法有效预测3D框。**LR3D** 针对这一瓶颈，提出仅使用远距离物体的**2D框标注**（易于获取且成本低）作为监督信号，使相机检测器能够在无3D深度标签的条件下估计远距离物体的深度和完整3D框。
 
@@ -48,7 +50,7 @@ claims:
 
 主要实验结果：在KITTI验证集上，LR3D将FCOS3D的远距离（>40m）LDS从4.9%提升至36.2%（+31.3%）；在nuScenes上，IP-FCOS3D的远距离LDS从1.8%提升至16.1%（+14.3%）。消融实验证实，IP-Head的动态权重策略、位置编码和投影增强是性能提升的关键。
 
-## 背景与动机
+
 
 ### 远距离3D检测的标注瓶颈
 
@@ -84,7 +86,9 @@ $$f^{-1}(b_{2d} | s, o) = d$$
 
 这意味着，如果模型能够获取实例的尺寸和方向信息（可从近距离3D标注中学习），就能学习从2D框到深度的条件映射。关键挑战在于：**如何设计一种机制，使模型能够为每个实例动态生成专属的映射函数，而非学习一个全局共享的映射**。这正是本文提出的隐式投影头（IP-Head）所要解决的核心问题。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈的重新定位：远距离深度估计的标注困境
 
@@ -130,7 +134,7 @@ $$d_i = f^{(f_g(F_i))}(f_{\mathrm{PE}}(b_{2d_i}))$$
 - **2D框描述符**：使用宽度和高度作为描述符达到最佳性能（Table 4c），这与投影几何中尺寸信息决定映射关系的理论预期一致。
 - **MLP结构**：两层的轻量MLP（通道数16）在深度预测中表现最优（Table 4d & 4e），说明简洁的架构足以捕捉2D框到深度的映射关系。
 
-## 整体框架
+
 
 LR3D 是一个面向远距离 3D 物体检测的框架，其核心设计动机源于一个被忽视的瓶颈：**远距离物体因激光雷达点云稀疏而缺乏 3D 标注，导致现有相机 3D 检测器在远距离失效**。如表 1 所示，当缺乏远距离 3D 监督时，位置误差显著增加（+0.25），而尺寸和方向误差保持可控——这说明深度估计是远距离检测的关键短板。
 
@@ -169,7 +173,7 @@ IP-Head 使用 2D 框的宽度和高度作为描述符达到最佳性能（表 4
 ![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2403_09230/figures/006_Figure_6.jpg]]
 *Figure 6: Illustration of extending IP-Head to all camera-based 3D detectors through a teacher-student pipeline*
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题分析：远距离深度估计的瓶颈
 
@@ -205,7 +209,9 @@ $$d_i = f^{(f_g(F_i))}(f_{PE}(b_{2d_i})) \quad \text{(Eq. 3)}$$
 
 **长距教师策略**（Figure 6）：为将IP-Head的能力迁移到BEV方法（如BEVFormer），LR3D采用教师-学生框架。配备IP-Head的单目检测器（如IP-FCOS3D）作为长距教师，为远距离物体生成伪3D标注；学生模型（如BEVFormer-S）利用这些伪标签进行训练。该策略使BEVFormer-S在远距离mAP上从0.0%提升至6.4%（Table 2, confidence 0.9），接近全监督性能。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 瓶颈验证与动机分析
 
@@ -268,7 +274,9 @@ Figure 8进一步可视化了真实与估计的2D框-深度映射曲线。对于
 ![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2403_09230/figures/007_Table_2.jpg]]
 *Table 2: Comparison on state-of-the-art methods with and without IP-Head or LR3D teacher supervised by distant 2D ground truth only on the KITTI val dataset. Their fully supervised counterparts (with distant 3D ground truth) are also illustrated*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位与核心瓶颈
 
@@ -329,6 +337,8 @@ LR3D 的核心创新并非新架构，而是**重新组织了监督信号与深�
 4. **动态权重生成的解释性**：$f_g$ 生成的权重 $\theta$ 如何编码尺寸和方向信息？是否存在可解释的映射模式？Figure 8 可视化了 $b_{2d} \to d$ 映射曲线，但未分析权重空间的结构。
 
 5. **距离阈值的敏感性**：40m 作为近/远距离分界是 KITTI 数据集的历史约定，但在 nuScenes（范围 51.2m）上是否最优？不同距离阈值对 IP-Head 训练和 LDS 评估的影响未做消融。
+
+
 
 ## 原文 PDF
 

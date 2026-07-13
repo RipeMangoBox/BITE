@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Reasoning_Models_Can_be_Accurately_Pruned_Via_Chain_of_Thought_Reconstruction.pdf
+project_link: null
+code_link: https://github.com/RyanLucas3/Reasoning-Aware-Compression
 openreview_forum_id: tyGfwG6xTh
 aliases:
 - RACR
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 基于思维链重建的推理模型精确剪枝方法 |
 | 英文题名 | Reasoning Models Can be Accurately Pruned Via Chain-of-Thought Reconstruction |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=tyGfwG6xTh); [GitHub](https://github.com/RyanLucas3/Reasoning-Aware-Compression) |
+| Links | [paper](https://openreview.net/forum?id=tyGfwG6xTh) · [GitHub](https://github.com/RyanLucas3/Reasoning-Aware-Compression) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | Reasoning-Aware Compression (RAC) |
 | Dataset | MATH500, AIME-25 |
@@ -42,7 +44,7 @@ claims:
 > - MATH500 上，Runtime (min, 50% sparsity, DeepSeek-R1-Qwen-7B) 为 35.3，对比 135.0 (C4), 115.6 (Prompt-Only)，变化 -99.7 vs C4, -80.3 vs Prompt-Only。
 > - MATH500 上，acc@1:1 (50% sparsity, Qwen3-8B) 为 0.862，对比 0.564 (C4), 0.470 (Prompt-Only)，变化 +0.298 vs C4, +0.392 vs Prompt-Only。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -65,7 +67,7 @@ RAC 在多个推理基准上展现出显著的性能优势：
 
 RAC 属于**校准数据增强**方法，通过改变剪枝时的激活分布来提升压缩质量，而非设计新的剪枝算法。其关键创新在于首次将推理模型的**解码阶段激活**纳入剪枝校准，解决了传统方法在推理任务上的分布偏移问题。该方法适用于单次剪枝（one-shot pruning）场景，无需微调或重训练，校准过程可在单张 H100 GPU 上完成。
 
-## 背景与动机
+
 
 ### 推理模型剪枝的独特困境
 
@@ -101,7 +103,9 @@ $$
 
 基于这一洞察，本文提出 **Reasoning-Aware Compression（RAC）**，其核心思路简洁而直接：在剪枝校准阶段，不仅收集提示词的激活，还通过自回归生成收集模型自身的 CoT 激活，将两者拼接为完整的校准矩阵，从而使逐层剪枝的重建误差最小化过程能够感知到推理阶段的解码分布。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：推理模型的剪枝失效源于校准分布偏移
 
@@ -140,7 +144,7 @@ RAC 不引入额外的训练步骤，校准阶段仅需在单张 H100 GPU 上完
 - 跨模型泛化：在 Qwen3-8B 50% 稀疏度下，RAC 准确率 0.862，相比 C4 的 0.564 和 Prompt-Only 的 0.470 提升超过 0.29（Table 2）。
 - 跨算法泛化：RAC 与 ALPS 结合后在 Qwen3-14B 的 AIME-25 基准上达到 0.667，远超 C4 的 0.267（+0.400）（Table 10）。
 
-## 整体框架
+
 
 ### 核心瓶颈与因果开关
 
@@ -187,7 +191,7 @@ RAC 的有效性在数学推理（MATH500、AIME-25）和代码生成（LiveCode
 - 结构化剪枝的推理加速依赖于特定硬件支持（如 NVIDIA 2:4 稀疏性），在通用硬件上提升有限。
 - 如何显式优化以防止剪枝后模型生成序列长度增加（即避免“唠叨但低质量”输出）仍是一个开放方向。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化：层剪枝目标函数
 
@@ -237,7 +241,9 @@ $$e_t^{(\mathrm{meth})} = \| \mathbf{x}_{\mathrm{dense}, t}^{(L)} - \mathbf{x}_{
 
 即给定 token $t$，剪枝模型与密集模型最后一层隐藏状态的 L2 距离。进一步定义误差比率 $r_t = e_t^{(\mathrm{Prompt})} / e_t^{(\mathrm{RAC})}$：当 $r_t > 1$ 时表示 RAC 的重建误差更低。图 2（Figure 2）的热图显示，在提示词阶段两种方法误差接近（灰色区域），但在更长的解码阶段 RAC 的误差显著低于 Prompt-Only 方法（蓝色区域占主导），验证了校准分布对齐的有效性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈：剪枝破坏推理分布
 
@@ -339,7 +345,9 @@ Table 6展示了半结构化2:4稀疏性结合FP8量化的吞吐量分析。在D
 * 在更复杂的多步逻辑推理、程序合成等任务上，RAC的性能保持能力如何？
 * 如何设计显式的正则化或训练目标，防止剪枝模型生成冗余的长思维链？
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法在剪枝谱系中的定位
 
@@ -386,6 +394,8 @@ RAC的设计和验证存在以下明确边界：
 3. **更复杂推理任务的保持能力**：在多步逻辑推理、定理证明、程序合成等需要更长、更复杂CoT的任务上，RAC的性能保持能力如何，尚待验证。
 
 4. **校准效率优化**：当前RAC需要为每个待剪枝模型单独运行密集模型生成CoT。是否可以通过跨模型迁移（如Table 7的off-policy设置）或更高效的采样策略降低校准成本，值得进一步研究。
+
+
 
 ## 原文 PDF
 

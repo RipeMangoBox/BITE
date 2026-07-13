@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Architecture_Agnostic_Test_Time_Adaptation_via_Backprop_Free_Embedding_Alignment.pdf
+project_link: null
+code_link: https://github.com/TheMaXiao/PEA_TTA
 openreview_forum_id: 7kLNGaAHaw
 aliases:
 - PEAP
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 架构无关的无反向传播测试时适应：通过嵌入对齐实现 |
 | 英文题名 | Architecture-Agnostic Test-Time Adaptation via Backprop-Free Embedding Alignment |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=7kLNGaAHaw); [GitHub](https://github.com/TheMaXiao/PEA_TTA) |
+| Links | [paper](https://openreview.net/forum?id=7kLNGaAHaw) · [GitHub](https://github.com/TheMaXiao/PEA_TTA) |
 | Topic | #topic/optimization_theory_probabilistic #topic/optimization_theory_probabilistic/domain_adaptation_and_transfer_learning |
 | Method | Progressive Embedding Alignment (PEA) |
 | Dataset | ImageNet-C (ViT-Base), CIFAR100-C (ViT-Base), CIFAR10-C (ResNet-50), Mixed-Domain CIFAR100-C (ViT-Base) |
@@ -42,7 +44,7 @@ claims:
 > - CIFAR100-C (ViT-Base) 上，Average Accuracy (%) 为 77.0 (PEA+Aug)，对比 61.6 (No Adapt) / 67.3 (CMF) / 70.6 (SPA)，变化 +15.4 (PEA+Aug vs No Adapt)。
 > - CIFAR10-C (ResNet-50) 上，Average Accuracy (%) 为 83.4 (PEA+Aug)，对比 76.9 (No Adapt) / 80.7 (MECTA) / 80.6 (L-TTA)，变化 +6.5 (PEA+Aug vs No Adapt)。
 
-## 概述
+## 概要
 
 测试时适应（Test-Time Adaptation, TTA）旨在使预训练模型在推理阶段动态应对领域偏移，而无需访问源域数据。然而，现有方法普遍依赖反向传播进行参数更新，导致内存占用高、计算延迟大，难以部署于资源受限的边缘设备；同时，多数高效方法仅针对特定架构（如CNN或ViT）设计，缺乏通用性。
 
@@ -57,7 +59,7 @@ claims:
 
 PEA将测试时适应重新定位为嵌入空间的几何校正问题，以极低的计算代价实现了与需反向传播方法相当甚至更优的适应效果，为资源受限场景下的鲁棒部署提供了可行方案。
 
-## 背景与动机
+
 
 ### 测试时适应的核心瓶颈：反向传播的代价
 
@@ -86,7 +88,9 @@ PEA将测试时适应重新定位为嵌入空间的几何校正问题，以极�
 
 PEA的设计直接回应了现有方法的三个缺口：（1）消除反向传播以降低内存和延迟；（2）统一CNN和ViT的适应流程以实现架构无关性；（3）仅需两次前向传播以保持极低的计算开销。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PEA 的核心创新在于**将测试时适应从反向传播驱动的参数更新范式，彻底转向仅依赖前向传播的嵌入空间几何对齐**。这一转变解决了现有 TTA 方法的两大瓶颈：反向传播带来的高内存与高延迟，以及方法对特定架构的强依赖。
 
@@ -116,7 +120,7 @@ $$w_l = \frac{d_l - \min_l d_l}{\max_l d_l - \min_l d_l}$$
 
 与 FOA 需要 9 或 27 次前向搜索不同，PEA 将计算成本固定为**每批次仅 2 次前向传播**：第一遍估计对齐权重，第二遍执行对齐与预测。这一固定预算设计使 PEA 的延迟可预测且远低于搜索式方法，在边缘设备 Jetson Orin Nano 上 ViT 延迟 4.1 秒、ResNet 延迟 3.0 秒（Table 5），而 FOA（F=27）的延迟远超此值。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0009_7kLNGaAHaw_Architecture-Agnostic_Test-Time_Adaptation_via_B/figures/001_Figure_1.jpg]]
 *Figure 1: (a)Translation (Mean Shift) (b) Scaling (Variance Shift) (c) Rotation (Covariance Shift) Figure 1: Impact of domain shift on intermediate layer embeddings. Feature distributions of three classes from block 3 of the ViT model are visualized. Each subfigure illustrates a different type of shift: translation, scaling, and rotation. More experiments can be found in Appendix A*
@@ -165,7 +169,7 @@ $$\mathbf{pred}_{\mathrm{final}} = \frac{1}{K} \sum_{k=1}^{K} \mathbf{logits}_k$
 
 整个 pipeline 的核心逻辑链为：**源域统计预存 → Pass 1 偏移量化与权重计算 → EMA 统计累积 → Pass 2 逐层 WCT 对齐与加权混合 → 多视图集成预测**。所有模块均在前向传播中完成，不涉及任何梯度计算或参数更新，因此天然适用于 CNN 和 ViT 等异构架构。
 
-## 核心模块与公式推导
+
 
 ### 动机：领域偏移的三种几何变形
 
@@ -241,7 +245,9 @@ $$\mathbf{pred}_{\mathrm{final}} = \frac{1}{K} \sum_{k=1}^{K} \mathbf{logits}_k$
 
 该增强与集成策略无需额外模型参数或反向传播，在 ImageNet-C 上为 PEA 带来约 2 个百分点的增益（64.5% → 66.5%）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：领域偏移的结构化几何本质
 
@@ -305,7 +311,9 @@ Table 12 表明，仅使用5–10%的源数据计算离线统计即可接近饱�
 
 在解读结果时需注意以下几点：(1) PEA+Aug使用了数据增强，而SAR、Tent等基线未使用增强，直接比较时增强贡献约1.3–2.0个百分点；(2) 边缘设备实验受3.5GB内存硬约束，高内存方法无法运行反映了实际部署限制，但可能对资源密集型方法不公平；(3) 各方法的超参数按原作者设置，未进行全局统一微调，可能存在次优配置。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 方法谱系：从反向传播驱动到纯前向对齐
 
@@ -338,6 +346,8 @@ PEA 在测试时适应（TTA）领域占据一个独特的位置——它是**�
 4. **多层对齐的交互机制。** 当前 PEA 独立地对每一层进行对齐，然后通过加权插值与原始特征融合。各层对齐之间存在怎样的交互？是否存在最优的对齐顺序（如从浅层到深层逐步对齐）或稀疏对齐策略（仅对齐偏移最严重的层）？
 
 5. **与持续学习的结合。** PEA 不修改模型参数，这使其天然适合持续变化的域流。能否将 EMA 累积的统计量作为“域记忆”，与知识蒸馏或弹性权重巩固等技术结合，在资源受限设备上实现终生测试时适应？
+
+
 
 ## 原文 PDF
 

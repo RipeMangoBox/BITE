@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/CARE_Towards_Clinical_Accountability_in_Multi_Modal_Medical_Reasoning_with_an_Evidence_Grounded_Agentic_Framework.pdf
+project_link: null
+code_link: null
 openreview_forum_id: whRAOJiyHM
 aliases:
 - CCFCC
@@ -42,7 +44,7 @@ claims:
 > - OMVQA-3k 上，Accuracy (%) 为 97.97 (CARE-Coord-B)，对比 83.97 (Lingshu-32B)，变化 +14.00。
 > - VQA-RAD 上，Accuracy (%) 为 68.29 (CARE-Coord-B)，对比 64.75 (Lingshu-32B)，变化 +3.54。
 
-## 概述
+## 概要
 
 当前医学视觉语言模型（VLM）普遍采用端到端黑箱推理范式，缺乏对图像中具体视觉发现的显式定位与验证，导致模型倾向于学习浅层统计关联而非真实病理证据，从而产生幻觉和捷径学习，且无法满足临床对可解释性与可问责性的要求。
 
@@ -52,7 +54,7 @@ claims:
 
 主要实验结果验证了该框架的有效性：CARE-Flow（10B）在四项医学 VQA 基准上的平均准确率达 74.91%，超越同等规模 SOTA 基线 10.9%，并超过参数量大得多的 Lingshu-32B 2.62 个百分点；引入动态协调器后，CARE-Coord（10B）进一步将总体准确率提升至 77.54%，比 Lingshu-32B 高出 5.25 个百分点（Table 1）。消融实验表明，添加全部三种视觉线索比无线索基线在 ID 数据集上提升 2.5 个百分点，结合协调器审查后提升至 5.1 个百分点（Table 2）。人类评估中，CARE-Coord 的推理链通过率达 82.14%，显著高于 GPT-4o 协调器的 73.94%，证明证据支撑的推理过程更受医学评估者认可（Table 18）。
 
-## 背景与动机
+
 
 ### 医学多模态推理的问责困境
 
@@ -90,7 +92,9 @@ CARE 框架包含两个递进版本：
 
 实验表明，CARE-Flow（10B）在四项医学 VQA 基准上的平均准确率达 74.91%，超越同等规模 SOTA 基线 10.9%，并超过参数量大得多的 Lingshu-32B 2.62 个百分点；引入动态协调器后，CARE-Coord（10B）进一步将总体准确率提升至 77.54%，比 Lingshu-32B 高出 5.25 个百分点（Table 1）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CARE 的核心创新在于将医学多模态推理从“端到端黑箱”重构为“证据驱动的模块化代理流程”，通过三个关键维度的范式转变，系统性地打破了现有 VLM 的捷径学习路径。
 
@@ -124,7 +128,7 @@ CARE-Coord 引入的协调器审查机制是区别于静态管道（CARE-Flow）
 
 值得注意的是，协调器的编辑行为分析显示，76% 的编辑属于成功修正，且仅 12% 涉及答案覆写（Table 8），表明审查机制主要通过修正推理逻辑而非简单替换答案来提升性能——这正是临床问责性所要求的“可追溯推理”的核心体现。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l38_https_openreview_net_forum_id_whRAOJiyHM/figures/002_Figure_2.jpg]]
 *Figure 2: Method overview. The proposed CARE comprises a VLM coordinator and a set of task-specific expert models. The coordinator plans tool use and conducts answer review, invoking specialist models as needed. The expert set includes: (1) a question-conditioned entity-proposal VLM that identifies relevant anatomical structures/findings; (2) a referring segmentation model that localizes entities with pixel-level ROI evidence; and (3) an evidence-grounded VQA VLM that reasons over the image augmented with selected visual evidence (zoom-in, mask, or global indicator)*
@@ -160,7 +164,7 @@ CARE 的 VLM 组件采用统一的两阶段训练范式：
 
 消融实验表明，SFT + DAPO + 长度奖励的组合策略使 EG-VQA 达到 74.9% 的总体准确率，相较于无训练基线提升 9.6 个百分点，而单独使用 DAPO 仅提升 6.0 个百分点（Table 3），验证了两阶段训练的必要性。
 
-## 核心模块与公式推导
+
 
 CARE 框架将多模态医学推理拆解为三个专业化子任务模块，并由一个代理协调器进行动态调度与审查。各模块通过可验证奖励的强化学习（RLVR）进行优化，形成“定位→分割→证据推理→一致性审查”的闭环。
 
@@ -222,7 +226,9 @@ $$\mathcal{I}_{\mathrm{DAPO}}(\theta) = \mathbb{E}_{y_i \sim \pi_{\mathrm{ref}}(
 
 CARE-Coord 采用强大的 VLM（默认 GPT-5）作为协调器，负责三阶段操作：**规划**工具调用顺序并选择最优视觉线索类型；**执行**工具调用获取专家模型输出；**审查**对 EG-VQA 的思维链-答案对进行迭代一致性检查，识别并修正推理逻辑错误。协调器被明确指示仅审查推理过程而非直接提供答案，76% 的编辑行为属于成功的推理修正，仅 12% 涉及答案覆写（Table 8）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -282,7 +288,9 @@ Table 12 报告了推理延迟。使用 GPT-5 协调器时，单次 VQA 请求�
 
 Table 16 验证了不同 LLM-as-Judge 的评分一致性。在四项基准测试中，使用 GPT-4o、GPT-4o-mini、InternVL3-38B-Instruct 和 InternVL3-78B-Instruct 作为评委时，**评分标准差小于 1%，证明评测结果的波动不会改变主要结论**，CARE 的性能优势在不同评委下保持稳健。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有医学 VLM 推理范式的对比
 
@@ -354,6 +362,8 @@ CARE-Coord 引入的协调器（以 GPT-5 为默认实现）承担工具调用�
 5. **3D 影像扩展**：该方法在 CT 体积数据中的扩展性如何？分割和证据馈送流程需做哪些适应性改造？
 6. **多实例区分**：当图像中存在多个相同语义实体（如多个肺结节）时，分割模型能否有效区分并一一提供证据？
 7. **临床信任度**：在真实临床环境中，显式视觉证据如何影响放射科医生对 AI 辅助的信任度和决策效率？
+
+
 
 ## 原文 PDF
 

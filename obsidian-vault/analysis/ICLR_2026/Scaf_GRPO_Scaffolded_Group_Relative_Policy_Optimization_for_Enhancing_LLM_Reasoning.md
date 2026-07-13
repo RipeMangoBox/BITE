@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Scaf_GRPO_Scaffolded_Group_Relative_Policy_Optimization_for_Enhancing_LLM_Reasoning.pdf
+project_link: null
+code_link: null
 openreview_forum_id: bOwVr0yr7r
 aliases:
 - SG
@@ -42,7 +44,7 @@ claims:
 > - 7‑benchmark Average (Qwen2.5‑Math‑7B) 上，pass@1 为 50.9，对比 45.2 (Vanilla GRPO)，变化 +5.7（相对 +12.6%）。
 > - 7‑benchmark Average (Qwen2.5‑Math‑7B) 上，pass@1 为 50.9，对比 46.6 (LUFFY)，变化 +4.3（相对 +9.2%）。
 
-## 概述
+## 概要
 
 基于验证器奖励的强化学习（RLVR）已成为提升大语言模型推理能力的有效范式，但其核心算法 GRPO 存在一个根本性瓶颈：当模型面对远超当前能力的问题时，所有探索尝试均以失败告终，获得恒为零的奖励信号。此时，组标准化优势塌缩为零，这些困难问题对策略梯度完全“不可见”，形成**学习悬崖**（learning cliff），使模型无法从最有挑战性的样本中获得提升。
 
@@ -52,7 +54,7 @@ claims:
 
 消融实验进一步验证了框架各组件的重要性：移除解法提示导致平均性能下降 5.7%，取消指导豁免阶段使性能相对下降 9.2%，证实了分层渐进式提示与前期自主探索的必要性。此外，Scaf‑GRPO 在 Llama‑3.2‑3B‑Instruct 等非 Qwen 架构模型上也展现出跨架构的泛化能力。
 
-## 背景与动机
+
 
 ### 大语言模型推理能力的强化学习训练
 
@@ -86,7 +88,9 @@ Scaf‑GRPO 的设计哲学由此出发——将干预严格限定在数据层�
 
 在 Qwen2.5‑Math‑7B 模型上，Scaf‑GRPO 将 AIME24 的 pass@1 得分从 0.300 提升至 0.433，相对提升 44.3%；在七个数学基准上的平均得分（50.9）显著优于 Vanilla GRPO（45.2）和 LUFFY（46.6），相对 LUFFY 增益 9.2%（Table 1）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题诊断：GRPO 中的“学习悬崖”
 
@@ -132,7 +136,7 @@ $$r'_{i,t}(\\theta) = \\begin{cases} \\frac{\\pi_{\\theta}(o'_{i,t} | o'_{i,<t},
 
 Scaf‑GRPO 的引导探索仅对 **17.4%** 的样本触发，表明其以最小干预程度实现大幅性能提升——在 Qwen2.5‑Math‑7B 上，AIME24 的 pass@1 从 0.300 提升至 0.433（相对提升 44.3%），七个数学基准平均分从 45.2 提升至 50.9（相对提升 12.6%）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l46_https_openreview_net_forum_id_bOwVr0yr7r/figures/004_Figure_3.jpg]]
 *Figure 3: Overview of the Scaf-GRPO framework. For a given query, the model generates multiple solutions. (Left) If any solution is correct, standard GRPO proceeds. (Right) If all solutions fail (the learning cliff), Scaf-GRPO initiates hierarchical hint-guided exploration. It injects progressively concrete in-prompt hints until a correct solution is found. This successful, minimally-guided trajectory replaces a failed one, restoring the learning gradient and enabling on-policy updates to resume*
@@ -184,7 +188,7 @@ $$J_{\mathrm{Scaf-GRPO}}(\theta) \equiv J_{\mathrm{GRPO}}(\theta)$$
 
 2. **提示离线生成**：利用 DeepSeek‑R1 模型，结合真值答案的解题步骤，预先生成三层级提示，供训练中即时注入。提示质量直接影响最终效果：使用 DeepSeek‑R1 生成的提示比 Qwen2.5‑72B‑Instruct 生成的提示带来更高性能（50.9 vs 49.0，Table 14）。
 
-## 核心模块与公式推导
+
 
 Scaf‑GRPO 的核心设计在于**不改变 GRPO 的损失函数形式**，而是将干预定位在数据层面：当检测到学习悬崖时，通过条件性地增强批次来重建有意义的梯度信号。以下逐一拆解其关键模块与公式。
 
@@ -243,7 +247,9 @@ $$J_{\mathrm{Scaf\text{-}GRPO}}(\theta) \equiv J_{\mathrm{GRPO}}(\theta)$$
 
 为避免模型过早产生提示依赖，Scaf‑GRPO 在前 15% 训练步中不提供任何提示（指导豁免阶段），让模型自主探索。此阶段用于区分真正的能力缺口（true‑hard）与因格式错误或初始探索不足导致的伪困难问题（pseudo‑hard）。消融实验证实，取消该阶段使性能相对全框架下降 9.2%。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与训练动态
 
@@ -331,7 +337,9 @@ Scaf-GRPO 的高效性体现在其引导机制的稀疏触发上：在整个训�
 
 所有自训练方法（Vanilla GRPO、LUFFY、Scaf-GRPO）均使用相同的数据集、训练轮数、框架（veRL）和关键超参数（KL 惩罚为零，rollout 数 $N=8$ 等）以保证对比公平。SimpleRL-Zero 和 Oat-Zero 直接采用其官方发布的模型权重进行评测，作为外部参考。LUFFY 使用其原论文的超参数在本文数据上重新训练，排除数据差异的影响。评估统一采用贪心解码 pass@1 度量，避免了后处理对结果的影响。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有方法的继承与分化
 
@@ -377,6 +385,8 @@ Scaf‑GRPO 的有效性依赖以下前提：
 - 在多模态推理或其他复杂推理任务（如定理证明）中，分层提示应如何构造？
 - 是否可以通过课程学习自动调度提示强度，而不是固定比例的指导豁免？
 - 在更大规模模型（>70B）和更多样化的任务上，Scaf‑GRPO 的表现是否会持续保持优势？
+
+
 
 ## 原文 PDF
 

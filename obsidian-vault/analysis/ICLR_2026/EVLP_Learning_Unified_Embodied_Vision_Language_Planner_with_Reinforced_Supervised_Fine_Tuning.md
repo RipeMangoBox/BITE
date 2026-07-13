@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/EVLP_Learning_Unified_Embodied_Vision_Language_Planner_with_Reinforced_Supervised_Fine_Tuning.pdf
+project_link: null
+code_link: null
 openreview_forum_id: eJcCW9oNfH
 aliases:
 - EEVLP
@@ -42,7 +44,7 @@ claims:
 > - LoHoRavens Sort 上，Success Rate (%) 为 77.3±4.3，对比 65.0±6.4 (PERIA)，变化 +12.3。
 > - LoHoRavens Matching 上，Success Rate (%) 为 82.5±6.1，对比 72.3±7.1 (PERIA)，变化 +10.2。
 
-## 概述
+## 概要
 
 具身智能体在复杂长时序操作任务中，需要同时进行语言推理与视觉空间想象。现有方法通常将文本规划与视觉生成分离处理，导致多模态计划不一致，且缺乏对动态状态转移的显式建模，难以保证长周期任务的成功率。
 
@@ -50,7 +52,7 @@ EVLP（Embodied Vision-Language Planner）针对上述瓶颈，提出了一种�
 
 在 LoHoRavens 基准的 6 项任务上，EVLP 均取得最高成功率，显著超越最强多模态基线 PERIA（平均提升约 12.8 个百分点）。消融实验进一步证实，前向动态预训练（FDM）和 RSFT 联合优化是方法有效性的关键支撑。
 
-## 背景与动机
+
 
 ### 问题背景
 
@@ -77,7 +79,9 @@ EVLP（Embodied Vision-Language Planner）针对上述瓶颈，提出了一种�
 
 **因果调节变量**：EVLP 通过以下三个关键设计实现突破——单步直接建模图像条件分布、双向动态感知预训练、以及强化监督微调中的动态对齐奖励——统一了语言逻辑推理与视觉空间生成，显著提升了多模态规划的动态一致性与任务成功率。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 EVLP 的核心创新在于通过三个关键设计，将具身规划中的语言推理与视觉想象统一到一个 Transformer 架构中，并显式建模动态状态转移，从而解决多模态计划不一致的根本瓶颈。
 
@@ -103,7 +107,7 @@ $$\mathcal{L} = -\mathbb{E}_{(g, x_t, a_t, x_{t+1}) \sim \mathcal{D}} \left[ \ma
 
 **证据强度说明**：上述所有 changed slots 均有 Table 2/3 的系统消融实验支撑，置信度 ≥ 0.95。RSFT 与纯 RL 的对比（Exp. G）以及 FDM 移除实验（Exp. E）提供了最直接的因果证据，效应量极大（成功率变化超过 40 个百分点），排除了混淆因素。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l19_https_openreview_net_forum_id_eJcCW9oNfH/figures/001_Figure_1.jpg]]
 *Figure 1: Our overall framework diagram. In terms of the model architecture, we adopt a vision tower design that integrates understanding and generation. For image understanding, we combine SigLIP with a learnable spatial encoder, while for image generation, we introduce image tokens to achieve one-step generation. Regarding the training pipeline, we design a two-stage framework: dynamic perception pretraining (illustrated above) and reinforced supervised fine-tuning (illustrated below). The black arrows represent the forward process, while the red arrows indicate the backward process*
@@ -159,7 +163,7 @@ $$\mathcal{L}_{\mathrm{action}} = \sum_{t=1}^{T} \| \widehat{\boldsymbol{a}}_{t}
 
 Table 7 对比了 RSFT 与 GPG、GRPO-onpolicy 等 RL 方法的差异。GPG 无分布约束，GRPO-onpolicy 通过 KL 散度惩罚约束与参考策略的偏离，而 RSFT 通过最大似然项在特定数据集上约束分布，同时利用策略梯度优化动态对齐。这种设计使 RSFT 在保持训练稳定性的同时，有效提升了生成图像的动态一致性。
 
-## 核心模块与公式推导
+
 
 ### 2.1 统一多模态生成架构
 
@@ -208,7 +212,9 @@ $$\mathcal{L} = -\mathbb{E}_{(g, x_t, a_t, x_{t+1}) \sim \mathcal{D}} \left[ \ma
 
 **因果机制**：SFT 项通过最大似然约束模型整体分布，防止 RL 优化导致的分布偏移；RL 项通过动态对齐奖励显式强化生成图像与动作序列的空间一致性。消融实验证实，去除 SFT 正则化（RL-only）会导致灾难性策略崩溃（任务成功率降至 0.0，语言准确率降至 14.0），验证了联合优化的必要性（Table 2, Exp. G）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验：LoHoRavens 基准任务成功率
 
@@ -261,7 +267,9 @@ Figure 4 的定性对比显示，RSFT 生成的视觉子目标比传统 SFT 具�
 
 尽管 EVLP 在 LoHoRavens 上表现优异，其规划能力仍依赖于预先收集的专家演示数据，在分布外场景下的泛化能力尚未验证。此外，EVLP 依赖基于 CLIPort 的低层策略执行具体动作，该策略的性能瓶颈可能成为整体系统的上限。在真实机器人平台上的部署验证也有待开展，实际应用中的传感器噪声和物理交互约束可能引入额外挑战。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 具身规划方法的演进脉络
 
@@ -312,6 +320,8 @@ EVLP 在以下四个关键维度上对现有多模态规划方法进行了系统
 **跨任务泛化能力。** EVLP 的统一多模态生成范式是否能在更广泛的具身任务（如视觉导航、人机交互、移动操作）中带来类似增益？探索该方法在超出桌面操作场景的多样化任务上的适用性，将有助于理解统一生成范式的泛化边界。
 
 **多模态规划的理论理解。** 当前对为什么单步生成优于逐步生成、为什么前向动态预训练对多模态规划至关重要等问题的理解仍主要停留在经验层面。建立更深入的理论框架，分析多模态生成中的误差传播机制和动态一致性的数学性质，将有助于指导未来方法的设计。
+
+
 
 ## 原文 PDF
 

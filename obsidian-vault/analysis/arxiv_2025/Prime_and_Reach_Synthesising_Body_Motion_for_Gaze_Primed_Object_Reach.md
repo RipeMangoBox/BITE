@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/Prime_and_Reach_Synthesising_Body_Motion_for_Gaze_Primed_Object_Reach.pdf
+project_link: https://masashi-hatano.github.io/prime-and-reach/
+code_link: null
 aliases:
 - PRMDM
 - PRSBMGPOR
@@ -42,7 +44,7 @@ claims:
 > - MoGaze (Goal Pose) 上，Prime Success 53.33 vs 31.15 (DNO) (+22.18%)；Reach Success 98.55 vs 78.68 (DNO) (+19.87%)。
 > - HD-EPIC (Object Location) 上，Reach Success 100.00 vs 67.06 (DartControl fine-tuned) (+32.94%)。
 
-## 概述
+## 概要
 
 人类在伸手抓取物体之前，通常会先用目光“预瞄”目标——这种注视预瞄行为是自然交互的重要前兆。然而，现有运动生成方法依赖合成数据集或实验室录制，缺乏注视预瞄行为与全身体运动的真实配对，无法生成自然的预瞄-抓取运动。
 
@@ -55,7 +57,7 @@ claims:
 
 该方法首次在全身运动合成中实现了可靠的注视预瞄行为生成，为构建更自然的具身交互系统提供了新路径。
 
-## 背景与动机
+
 
 ### 问题背景：注视预瞄与物体抓取的全身运动合成
 
@@ -83,7 +85,9 @@ claims:
 
 通过上述三个维度的贡献，本文旨在推动全身运动生成从“能生成运动”向“能生成符合人类行为规律的运动”演进。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 P&R的核心创新不在于提出全新的生成架构，而在于**将注视预瞄行为从显式建模问题转化为隐式学习问题**，通过三个关键层面的设计实现了这一转化。
 
@@ -141,7 +145,7 @@ $$\bar{\mathcal{L}}_{\mathrm{goal}} = || o_{3\mathrm{D}} - x_{\mathrm{right~wris
 
 综上，P&R的创新本质是**通过数据策划和条件设计，将注视预瞄这一复杂行为转化为扩散模型可隐式学习的涌现属性**，而非增加模型复杂度或显式建模新模态。
 
-## 整体框架
+
 
 P&R Motion Diffusion Model 的整体框架围绕一个核心设计展开：**通过目标条件（goal pose 或 object location）注入扩散模型，隐式地诱发注视预瞄行为，而非将其作为显式条件**。该框架由预训练、微调和推理优化三个阶段构成，其 pipeline 模块关系如下。
 
@@ -199,7 +203,7 @@ $$\bar{\mathcal{L}}_{\mathrm{goal}} = || o_{3\mathrm{D}} - x_{\mathrm{right~wris
 ![[assets/figures/papers/paper_list_l1693_Prime_and_Reach_Synthesising_Body_Motion_for_Gaze_Primed_Object_Reach/figures/004_Figure_3.jpg]]
 *Figure 3: P&R motion diffusion model for goal-conditioned motion generation. We concatenate the initial state of the human body and the goal pose/goal object as conditions, along with a text condition describing the type of action the motion is expected to perform. This accumulated condition is injected into the transformer decoder layers, which then outputs an N-length motion sequence over multiple diffusion steps. At inference we perform diffusion latent noise optimisation over M iterations using the same conditioning (i.e. initial state and goal pose or location)*
 
-## 核心模块与公式推导
+
 
 P&R 运动扩散模型的核心思想是：将目标条件（目标姿态或目标位置）与文本提示、初始状态拼接后注入 Transformer 解码器，通过扩散去噪生成包含预瞄行为的全身运动序列。以下按模块拆解其关键设计与公式。
 
@@ -242,7 +246,9 @@ $$\bar{\mathcal{L}}_{\mathrm{goal}} = || o_{3\mathrm{D}} - x_{\mathrm{right~wris
 
 解码器输出的 263 维表示经后处理转换为 3D 关节位置，供评估指标（如 Prime Success、MPJPE）使用。当前模型生成全身运动但不包含手部细节，这是方法的一个已知局限。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -330,7 +336,9 @@ Figure 5展示了三个数据集上的生成结果。在目标姿势条件下（
 ![[assets/figures/papers/paper_list_l1693_Prime_and_Reach_Synthesising_Body_Motion_for_Gaze_Primed_Object_Reach/figures/018_Figure.jpg]]
 *Figure: HD-EPIC . MoGaze Fig. S3: Varying time window σ and proximity threshold δ for Prime Success calculation on HD-EPIC and MoGaze*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位与核心瓶颈
 
@@ -388,6 +396,8 @@ P&R 处于**目标条件人体运动生成**与**注视行为建模**的交叉�
 - **评估层面**：引入 Prime Success 指标，量化评估生成运动中的预瞄行为质量，填补了现有指标（如 FID、MPJPE）无法捕捉任务特异性行为的空白。
 
 在更广的运动生成领域，P&R 的方法论（大规模预训练 + 任务特异性数据微调 + 目标条件注入）与 NLP/CV 中的 foundation model 范式一致，暗示未来可能通过扩展数据规模和条件类型，构建更通用的目标导向运动生成基础模型。
+
+
 
 ## 原文 PDF
 

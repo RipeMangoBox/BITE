@@ -42,7 +42,7 @@ claims:
 > - CARLA Town05 Long 上，Driving Score (↑) 69.57 (EE-RL TD3) vs 64.03 (Interfuser) (+5.54 pp)。
 > - CARLA Town05–06 上，Composite Score (↑) 80.09 (EE-RL SAC) vs 57.82 (VLM-RL) (+22.27 pp)。
 
-## 概述
+## 概要
 
 端到端自动驾驶旨在直接从传感器输入映射到控制指令，但现有强化学习（RL）方法在稀疏关键场景中严重退化——行人横穿、突发避障、红绿灯识别等安全关键事件发生频率低，试错探索难以获得足够的奖励信号，导致策略优化陷入瓶颈。
 
@@ -56,7 +56,7 @@ claims:
 
 在方法谱系中，EE-RL区别于纯IL基线（如**Transfuser** (Prakash et al., CVPR 2021)、**Interfuser** (Shao et al., CoRL 2023)）和RL专家蒸馏基线（如**Roach** (Zhang et al., ICCV 2021)），也不同于仅用VLM生成静态奖励函数的方案（**VLM-RM** (Rocamonde et al., arXiv 2023)、**RL-VLM-F** (Wang et al., arXiv 2024)），其关键创新在于将VLM作为持续运行的在线专家融入RL训练闭环，并通过StateHash与双回放缓冲区实现高效协同。方法仅在CARLA仿真环境验证，VLM推理的实时性与幻觉问题仍是实际部署的潜在限制。
 
-## 背景与动机
+
 
 端到端自动驾驶旨在将传感器输入直接映射为车辆控制指令，省去传统模块化流水线中的中间表征与人工规则设计。近年来，基于模仿学习（IL）和强化学习（RL）的方法在CARLA仿真环境中取得了显著进展，代表性工作包括**Transfuser**（Prakash et al., CVPR 2021）、**Interfuser**（Shao et al., CoRL 2023）和**Roach**（Zhang et al., ICCV 2021）等。然而，现有方法在稀疏关键场景中暴露出系统性缺陷。
 
@@ -68,7 +68,9 @@ claims:
 
 EE-RL正是在这一动机驱动下提出的解决方案：通过双回放缓冲区联合存储两类经验并按比例混合采样，实现常规场景与关键场景的平衡学习；通过StateHash算法对RGB图像和车辆运动状态进行感知哈希，跳过高度相似状态的冗余VLM推理，大幅降低计算开销；通过对VLM进行LoRA微调与INT4量化，在保持推理质量的同时压缩模型规模。这一设计使得VLM的常识推理能力能够高效注入RL训练过程，从而在稀疏关键场景中实现可靠的决策优化。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 EE-RL的核心创新在于构建了一套**探索者-专家协同强化学习范式**，将经LoRA微调的视觉语言模型（VLM）作为持续运行的专家嵌入RL训练循环，专门解决端到端自动驾驶中稀疏关键场景（如避障、行人横穿、红绿灯识别）因安全事件稀少导致奖励信号不足的瓶颈。该框架通过三个关键机制实现了VLM常识推理与RL试错学习的高效融合。
 
@@ -94,7 +96,7 @@ Explorer的Actor-Critic骨干网络集成了**多层注意力机制**：空间�
 
 这些创新协同作用，使EE-RL在CARLA Town03上相较VLM-RL实现驾驶分数（DS）+19.82%、违章分数（IS）+20.98%的提升，并在Town05–06上达到0%闯红灯事故概率。
 
-## 整体框架
+
 
 EE-RL 的核心设计理念是**探索者–专家协同范式**（Explorer–Expert Paradigm）：让基于 Actor-Critic 的 RL 智能体（探索者）处理常规驾驶任务并从环境试错中学习，同时部署经 LoRA 微调的视觉语言模型（专家）专门负责稀疏关键场景的语义推理与奖励构造。两者产生的经验存入双回放缓冲区，按比例混合采样以联合优化策略，并通过 StateHash 算法消除冗余 VLM 推理，实现高效协同训练。
 
@@ -119,7 +121,7 @@ EE-RL 的核心设计理念是**探索者–专家协同范式**（Explorer–Ex
 
 框架的核心权衡在于**推理效率与语义质量**：VLM 专家提供高质量的常识推理和奖励信号，但每次推理带来显著延迟。StateHash 通过感知哈希快速判断状态相似度，在保证语义质量的前提下大幅减少 VLM 调用次数——实验表明，使用单 VLM 时，StateHash 将专家经验从 8126 条提升至 53783 条；使用双 VLM 时，从 17733 条提升至 90566 条。双回放缓冲区的采样比例 $\rho$ 则平衡了试错学习与语义指导的权重，消融实验显示红绿灯任务在 19% 专家采样比时完成最快，避障任务在 24% 时最优。
 
-## 核心模块与公式推导
+
 
 EE-RL 框架由三个核心模块协同构成：**Explorer（RL探索者）**、**Expert（VLM专家）** 和 **Dual Replay Buffer（双回放缓冲区）**。以下逐一剖析各模块的设计机理与关键公式。
 
@@ -189,7 +191,9 @@ $$n_{rl} = \left\lfloor \frac{\rho}{\rho+1} n \right\rfloor, \quad n_{vlm} = n -
 ![[assets/figures/papers/paper_list_l2656_https_openaccess_thecvf_com_content_CVPR2026_html_Li_EE_RL_Vision_Langua/figures/004_Figure_4.jpg]]
 *Figure 4: Improved perceptual hashing in StateHash. The enhanced algorithm processes RGB channels independently and performs weighted similarity computation, improving image matching accuracy, especially for scenarios containing traffic lights*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与实验动机
 
@@ -286,7 +290,9 @@ Table 6对EE-RL的各增强组件进行了消融研究：
 ![[assets/figures/papers/paper_list_l2656_https_openaccess_thecvf_com_content_CVPR2026_html_Li_EE_RL_Vision_Langua/figures/005_Figure_5.jpg]]
 *Figure 5: LoRA fine-tuning of the VLM. An image fine-tuning dataset is constructed based on the CARLA dataset, and a 32B general-purpose VLM is fine-tuned with LoRA and quantized by INT4 while keeping the chain-of-thought reasoning process fixed*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 一、与基线方法的关系
 
@@ -348,6 +354,8 @@ EE-RL 的适用边界由以下约束条件界定：
 4. **与感知-规划模块的整合**：EE-RL 目前作为端到端策略独立运行，能否与 BEV 感知、轨迹预测、占用网络等模块协同，形成分层决策架构——底层感知提供结构化表征，中层 VLM 专家进行语义推理，上层 RL 策略输出控制指令？
 
 5. **VLM 专家的主动查询机制**：当前 StateHash 是被动的相似度过滤，能否设计一种不确定性估计机制，让 RL 探索者在遇到高不确定性状态时主动请求 VLM 专家推理，实现更精准的按需调用？
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Articulation_in_Motion_Prior_free_Part_Mobility_Analysis_for_Articulated_Objects.pdf
+project_link: https://haoai-1997.github.io/AiM/
+code_link: https://github.com/zrporz/AutoSeg-SAM2
 aliases:
 - AMA
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | 运动中的铰接：基于动态-静态解耦的无先验部件移动性分析 |
 | 英文题名 | Articulation in Motion: Prior-free Part Mobility Analysis for Articulated Objects by Dynamic-Static Disentanglement |
 | 会议/期刊 | ICLR 2026 |
-| Links | [Project](https://haoai-1997.github.io/AiM/) · [arXiv](https://arxiv.org/abs/2308.13561) · [Code](https://github.com/zrporz/AutoSeg-SAM2) |
+| Links | [Project](https://haoai-1997.github.io/AiM/) · [paper](https://arxiv.org/abs/2308.13561) · [Code](https://github.com/zrporz/AutoSeg-SAM2) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | Articulation in Motion (AIM) |
 | Dataset | Oven, Storage 47648, Table 31249 |
@@ -40,7 +42,7 @@ claims:
 > - Storage 47648 (complex, 6 moving parts) 上，Average joint axis angular error (°) 0.08 vs ArtGS 10.18 (-10.10 °)。
 > - Table 31249 (complex, multiple parts) 上，Average joint axis angular error (°) 1.19 vs ArtGS 33.19 (-32.00 °)。
 
-## 概述
+## 概要
 
 铰接物体的部件移动性分析是机器人操控、数字孪生和具身智能的关键基础能力。现有方法普遍依赖两个离散状态（如关闭与打开）的RGB-D图像，通过跨状态几何对应来分割部件并估计关节参数。然而，当最终状态暴露出初始状态不可见的区域时（如打开冰箱门后露出的内部空间），几何对应关系会失效，导致分割与关节估计严重退化。此外，这些方法通常需要预先指定部件数量，并对初始化和超参数敏感，难以推广到未知部件数量的真实场景。
 
@@ -52,7 +54,7 @@ AIM包含三个递进阶段：首先利用3D高斯泼溅（3DGS）从多视图�
 
 AIM的方法定位清晰：它首次将连续运动视频引入铰接物体分析，通过动态-静态解耦与无先验刚体聚类，从根本上绕开了两状态方法对部件数量假设和跨状态几何对应的依赖，为无先验部件移动性分析开辟了新路径。
 
-## 背景与动机
+
 
 铰接物体的感知与理解是具身智能和机器人交互的核心能力之一。要让机器人自主操作日常物体（如打开冰箱、拉出抽屉），系统必须能够从视觉输入中恢复物体的部件级几何结构、运动分割以及关节参数。这一任务面临双重挑战：既要精确重建物体在不同状态下的三维几何，又要从运动中推断各部件的刚体变换关系。
 
@@ -74,7 +76,9 @@ AIM的方法定位清晰：它首次将连续运动视频引入铰接物体分�
 
 这一思路将问题的焦点从“跨状态几何匹配”转移到“动态-静态解耦与运动轨迹分析”，从而从根本上摆脱了对部件数量先验和几何对应的依赖。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 AIM 的核心创新在于**将铰接物体分析从“两状态几何对应”范式转变为“连续运动解耦”范式**，从根本上绕开了现有方法对部件数量先验和跨状态几何对应的依赖。
 
@@ -120,7 +124,7 @@ AIM 的**顺序 RANSAC**（Figure 5）直接利用解耦后运动高斯的轨迹
 
 这三个 changed slots 形成了一条因果链：连续运动视频使动态-静态解耦成为可能，解耦后的纯净运动轨迹又使无先验的部件分割与关节估计变得可行。
 
-## 整体框架
+
 
 AIM 的核心洞察在于：铰接物体的连续运动视频天然携带了动态部件与静态基座的分离线索。与依赖两离散状态（如闭合与打开）并需要跨状态几何对应的先前方法不同，AIM 通过捕捉从闭合到完全打开的完整交互过程，将部件分割与关节估计问题转化为对运动轨迹的刚体一致性分析。
 
@@ -145,7 +149,7 @@ AIM 的核心洞察在于：铰接物体的连续运动视频天然携带了动�
 ![[assets/figures/papers/paper_list_l1786_Articulation_in_Motion_Prior_free_Part_Mobility_Analysis_for_Articulated/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of the first two stages: I) 3DGS start-state*
 
-## 核心模块与公式推导
+
 
 AIM 的核心技术路线围绕三个关键模块展开：**双高斯动态-静态解耦表示**、**运动中静态检测（SDMD）** 以及**基于顺序RANSAC的无先验刚体分割与关节解析**。以下逐一阐述其机理与核心公式。
 
@@ -207,7 +211,9 @@ $$\Phi_k = \left| \frac{\mathbf{u}_k \cdot \mathbf{t}_k}{\|\mathbf{u}_k\|^2} \ri
 ![[assets/figures/papers/paper_list_l1786_Articulation_in_Motion_Prior_free_Part_Mobility_Analysis_for_Articulated/figures/005_Figure_5.jpg]]
 *Figure 5: Stage III: Motion-based part segmentation and articulation analysis. As the clean*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能：部件分割
 
@@ -286,7 +292,9 @@ Table 4 的系统消融揭示了各模块的因果贡献：
 ![[assets/figures/papers/paper_list_l1786_Articulation_in_Motion_Prior_free_Part_Mobility_Analysis_for_Articulated/figures/019_Figure.jpg]]
 *Figure: A6: Qualitative comparison between DTA, ArtGS and ours, w.r.t. GT*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有基线的结构性差异
 
@@ -326,6 +334,8 @@ AIM 在铰接物体分析领域填补了“**无先验部件数量、无需跨�
 3. **短序列与遮挡**：在运动视频较短或存在严重遮挡时，如何提升动态-静态解耦和轨迹推断的稳定性？当前方法依赖充分的运动观测。
 4. **生成式几何补全**：能否利用数据驱动生成模型补充被遮挡或未观察到的内部部件几何，实现交互式数字副本的完整呈现？
 5. **真实世界部署**：当前真实世界捕获依赖 AR 眼镜和手动交互，自动化程度及对日常设备的普适性仍有待提高。
+
+
 
 ## 原文 PDF
 

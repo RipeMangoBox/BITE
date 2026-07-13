@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/ParaHome_Parameterizing_Everyday_Home_Activities_Towards_3D_Generative_Modeling_of_Human_Object_Interactions.pdf
+project_link: https://jlogkim.github.io/parahome
+code_link: null
 aliases:
 - PPEHAT3GMHOI
 tags:
@@ -41,7 +43,7 @@ claims:
 > - Text-to-motion (ParaHome+HumanML3D mixed) 上，Multimodal dist ↓ 3.75 (MDM mixed) vs 4.32 (MDM HumanML3D) (-0.57)；RPrecision top3 ↑ 0.73 vs 0.68 (+0.05)。
 > - Object-guided motion (Refrigerator) 上，MPE glb-joints (cm) ↓ 6.57 vs 9.26 (-2.69)。
 
-## 概述
+## 概要
 
 现有的人-物交互（HOI）数据集普遍存在一个关键瓶颈：无法在自然的家庭环境中，同时以高精度捕获人体全身运动、精细手部动作以及物体的六自由度轨迹。更关键的是，这些数据缺乏统一的参数化表示和对应的文本描述，使得基于生成式模型来学习和合成日常活动变得极为困难。
 
@@ -49,7 +51,7 @@ ParaHome 系统通过一套异构捕获方案解决了上述问题。其核心�
 
 最终，ParaHome 将人体（采用 SMPL-X 参数化模型）与物体（包含关节状态）统一表示为一个结构化的时空状态序列，并辅以文本描述。这一参数化体系为下游的生成式建模奠定了坚实基础。在验证实验中，混合 ParaHome 与 HumanML3D 数据训练的扩散模型（MDM）在文本条件运动生成任务上显著超越了 **TEMOS**（Petrovich et al., ECCV 2022）和 **T2M**（Guo et al., CVPR 2022），RPrecision top3 达到 0.73。在物体引导的运动合成任务中，加入初始相对空间线索可将全局关节位置误差降低约 30%。系统层面的评估也证实，3D 立方体标记的跟踪成功率远优于传统表面标记方案（1.0 vs 0.76–0.93），手部校准后的平均指尖位置误差仅为 11 毫米。
 
-## 背景与动机
+
 
 **核心瓶颈：现有HOI数据集在自然家庭环境中无法同时捕获高精度人体全身运动、精细手部运动和物体轨迹，也缺乏统一参数化表示与文本描述，制约了生成式建模研究。**
 
@@ -82,7 +84,9 @@ ParaHome 系统通过一套异构捕获方案解决了上述问题。其核心�
 
 > **注意**：ParaHome系统依赖70台同步RGB相机和可穿戴IMU设备，设置成本较高；数据集覆盖38名参与者和22个物体，规模仍有限。这些限制在后续章节中有详细讨论。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ParaHome 的核心创新在于构建了一套异构感知系统与统一参数化框架，解决了现有 HOI 数据集在自然家庭环境中同时捕获高精度全身运动、精细手部运动和物体轨迹的根本瓶颈。其关键创新点体现在以下四个 changed slots 上：
 
@@ -113,7 +117,7 @@ ParaHome 设计了两阶段的参数化校准：
 
 **因果分析**：ParaHome 数据补充了 HumanML3D 缺失的 HOI 交互模式和手部细节，使模型学会了更丰富的人-物空间关系。Table 3 进一步表明，在物体引导运动合成中加入初始相对空间线索 $\mathbf{S}_{p\to o}(t)$ 可将全局关节位置误差降低约 **30%**，验证了统一参数化框架对生成式建模的结构性支撑作用。
 
-## 整体框架
+
 
 ParaHome 的总体目标是将家庭场景中的人-物交互（HOI）统一参数化，为三维生成式建模提供结构化数据。系统围绕一个核心状态表示构建，将时刻 $t$ 的场景信息组织为：
 
@@ -169,7 +173,7 @@ $$\operatorname*{min}_{\mathcal{M}^h,\mathcal{H}} \lambda_t \mathcal{L}_{tip} + 
 ![[assets/figures/papers/paper_list_l1742_ParaHome_Parameterizing_Everyday_Home_Activities_Towards_3D_Generative_M/figures/001_Figure_1.jpg]]
 *Figure 1: Our system captures the detailed 3D movements of the human body, hands, and diverse objects, along with text descriptions*
 
-## 核心模块与公式推导
+
 
 ParaHome 系统的核心在于将异构传感器数据统一到一致的时空坐标系中，并参数化表达人、物、环境的交互状态。其技术路线围绕三个关键环节展开：**HOI 状态参数化**、**物体运动解算**、以及**多传感器空间对齐**。
 
@@ -224,7 +228,9 @@ $$\operatorname*{min}_{\mathcal{M}^h,\mathcal{H}} \lambda_t \mathcal{L}_{tip} + 
 ![[assets/figures/papers/paper_list_l1742_ParaHome_Parameterizing_Everyday_Home_Activities_Towards_3D_Generative_M/figures/004_Figure_4.jpg]]
 *Figure 4: (Left) Before/After Body Calibration, Orange: forward kinematic output, Blue: RGB Triangulated Result (Right) Hand Calibration Protocol and Before/After Calibration Protocol*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 系统评估：跟踪鲁棒性与校准精度
 
@@ -281,7 +287,9 @@ Table 3 报告了物体引导运动合成任务的定量结果。该任务给定
 ![[assets/figures/papers/paper_list_l1742_ParaHome_Parameterizing_Everyday_Home_Activities_Towards_3D_Generative_M/figures/006_Figure_6.jpg]]
 *Figure 6: (Left) Examples of synthesized RGB images using Para-Home data. (upper) Rendered depth images of ParaHome data. (lower) Synthesized RGB image using text annotation, depth, 2D keypoints. (Right) HOI Reconstruction using synthesized RGB*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心方法定位：异构系统校准与参数化HOI数据生成
 
@@ -332,6 +340,8 @@ ParaHome 的核心贡献不在于提出全新的生成模型架构，而在于�
 5. **数据集多样性与公平性**：当前数据集在性别、年龄、文化背景上的多样性不足，是否会导致模型在特定人群上表现退化？这需要在数据集扩展时进行系统性的偏差评估。
 
 6. **系统效率与成本优化**：如何将当前系统扩展为更高效、更低成本的方案？可能的路径包括减少相机数量并用神经渲染补全视角，或用单目/双目SLAM替代部分多视角重建功能。
+
+
 
 ## 原文 PDF
 

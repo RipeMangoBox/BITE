@@ -5,6 +5,8 @@ paper_level: A
 venue: IJCV
 year: 2025
 pdf_ref: paperPDFs/IJCV_2025/Fg_T2M_LLMs_Augmented_Fine_Grained_Text_Driven_Human_Motion_Generation.pdf
+project_link: null
+code_link: null
 aliases:
 - FT
 - FTLAFGTDHMG
@@ -40,7 +42,7 @@ claims:
 > - KIT-ML 上，FID 为 0.135，对比 0.571 (Fg-T2M)，变化 -0.436。
 > - KIT-ML 上，MM-Dist 为 2.696，对比 3.114 (Fg-T2M)，变化 -0.418。
 
-## 概述
+## 概要
 
 **核心问题**：现有文本驱动人体动作生成方法难以解析文本中关于身体部位的细粒度语义线索，且未能充分建模词间语言结构，导致生成的动作无法精确捕捉文本指定的空间关系与动作细节。这一瓶颈在长句、复杂描述和稀有动作组合场景中尤为突出。
 
@@ -50,7 +52,7 @@ claims:
 
 **核心结论**：在 KIT-ML 数据集上，Fg-T2M++ 的 FID 达到 0.135，较 Fg-T2M 的 0.571 降低 0.436；MM-Dist 从 3.114 降至 2.696。在 HumanML3D 数据集上，R-Precision Top2 为 0.702、Top3 为 0.801，MultiModal Dist 为 2.925，全面超越现有最优方法。消融实验证实，移除 LLM 语义解析、超文本图卷积或分层融合模块均导致指标显著下降，尤其在长句和罕见文本条件下退化明显。
 
-## 背景与动机
+
 
 **文本驱动的人体动作生成**旨在根据自然语言描述合成逼真的三维人体动作序列，在动画制作、虚拟现实与人机交互等领域具有重要应用价值。该任务的核心挑战在于建立文本语义与人体运动之间的精确映射关系。
 
@@ -66,7 +68,9 @@ claims:
 
 针对上述缺口，**Fg-T2M++** 提出了一套系统性的解决方案：利用大语言模型（LLM）将文本提示解析为六个身体部位的细粒度运动描述及词性语义，通过双曲空间中的超文本图卷积编码句法层次结构，并在条件扩散框架内实现由粗到精的多模态分层融合。该方法在HumanML3D和KIT-ML两个基准数据集上均取得了最优性能，尤其在长句和罕见文本条件下展现出显著优势。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈与因果杠杆
 
@@ -110,7 +114,7 @@ Fg-T2M++ 建立在条件扩散生成范式之上，与以下工作形成明确�
 - **强证据**：定量实验表明，Fg-T2M++ 在 HumanML3D 和 KIT-ML 两个标准数据集上全面超越所有现有方法（Table 1, Table 2）。消融实验（Table 4, Figure 7, Figure 11）系统验证了 LSP、HTP 和 MMF 三个模块的独立贡献，移除任一模块均导致指标显著下降，尤其在长句和罕见文本条件下退化明显。
 - **需注意的局限**：模型在处理超长句子（超过 196 帧对应的时间跨度）时可能遗漏某些特定动作组合（Figure 15），且未能建模人与环境的交互。这些场景下的创新有效性仍需进一步验证。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l28_https_arxiv_org_abs_2502_05534/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of Fg-T2M++: Given a text prompt c , the reverse denoising process of the diffusion model starts from noisy motion data X _ { T } and produces clean motion data X _ { 0 } . . Initially, the text prompt undergoes LLMs semantic parsing to generate LLMs-parsed fine-grained descriptions. Then, both the text prompt and its parsed descriptions are input into the hyperbolic text representation module, which captures precise representations of text features. Finally, the noisy motion data X _ { t } , along with the two fine-grained text features, are fed into the multi-modal fusion module to obtain the clean motion data X _ { t - 1 } ·*
@@ -157,7 +161,7 @@ $$\mathcal{L} = \mathbb{E}\left[\|\mathbf{x}_0 - \epsilon_{\theta}(\mathbf{x}_t,
 
 整个 pipeline 的核心因果机制在于：**将全身动作生成问题分解为“语义解析 → 句法编码 → 层次融合”三步**。LSP 利用 LLM 的先验知识解决细粒度身体部位语义的提取瓶颈；HTP 在双曲空间中编码依赖解析树，相比欧氏空间能更有效地保留句法层次结构，从而捕捉词间关系；MMF 通过句子级和词级的分层融合，使扩散模型在每一步去噪中都能同时利用全局语义和局部细节。消融实验证实，移除任一模块（LSP、HGC 或交叉感知）均会导致 FID 和 R-Precision 显著恶化（表 4），尤其在长句和稀有文本条件下退化更为明显（图 7、图 10）。
 
-## 核心模块与公式推导
+
 
 Fg-T2M++ 在条件扩散框架内集成了三个核心模块，构成“LLM解析→双曲句法编码→分层多模态融合”的级联管线（图2）。整体逆扩散过程建模为：
 
@@ -243,7 +247,9 @@ $$\mathbf{Y} = \operatorname{softmax}(\mathbf{Query}) \mathbf{G}$$
 
 **因果机制总结**：LSP 将文本分解为部位级语义，HTP 在双曲空间编码句法层次并通过交叉感知融合 LLM 解析特征，MMF 以句子级→词级的分层方式将文本条件注入扩散去噪过程。消融实验证实，移除任一模块均导致 FID、R-Precision 和 MM-Dist 显著恶化（表4），尤其在长句和罕见文本条件下退化更为突出（图7、图10）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能：Fg-T2M++在两大基准上全面刷新最优指标
 
@@ -308,7 +314,9 @@ Fg-T2M++在HumanML3D和KIT-ML两个标准数据集上均取得最优结果，验
 *Table 5: Comparing the performance in maintaining the hierarchical structure*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与因果机制
 
@@ -346,6 +354,8 @@ Fg-T2M++ 在以下场景展现出显著优势：
 3. 如何有效建模人与环境的交互（其他人物、场景），以拓展至更复杂的应用场景？
 4. 当LLM生成的细粒度描述与真实运动存在歧义或不一致时，如何缓解这种错配？
 5. 能否通过增加任务先验来增强LLM提示，以避免运动解析中的常识性错误？
+
+
 
 ## 原文 PDF
 

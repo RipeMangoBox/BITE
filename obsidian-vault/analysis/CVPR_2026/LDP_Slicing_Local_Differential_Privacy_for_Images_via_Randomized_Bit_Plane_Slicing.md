@@ -43,7 +43,7 @@ claims:
 > - LFW (face recognition) 上，Accuracy (%) 99.75 (LDP-Slicing) vs 99.48 (DCTDP) (+0.27)。
 > - CPLFW (face recognition) 上，Accuracy (%) 91.08 (LDP-Slicing) vs 90.60 (DCTDP) (+0.48)。
 
-## 概述
+## 概要
 
 在图像高维像素空间直接应用本地差分隐私（LDP）面临一个根本性瓶颈：每个像素具有256种可能值，k元随机响应机制会注入大量噪声，导致信息几乎完全丢失。这一现象并非LDP固有的“维度诅咒”，而是数据表征与LDP机制之间的领域失配——像素值的离散状态本质上是8位二进制编码，不同比特位对图像语义的贡献呈指数级差异，最高有效位（MSB）承载主要结构信息，而最低有效位（LSB）近似噪声。
 
@@ -51,7 +51,7 @@ claims:
 
 实验表明，在四个面部识别基准（AgeDB-30、LFW、CPLFW、CALFW）上，LDP-Slicing的性能显著超过所有具备正式DP/LDP保证的方法，并在图像分类任务（CIFAR-10/100）上展现出优于中心化DP-SGD的隐私-效用折衷。身份区分攻击优势远低于对比方法DCTDP，消融实验进一步验证了非均匀预算分配与DWT剪枝的关键作用。
 
-## 背景与动机
+
 
 ### 图像隐私保护的需求与困境
 
@@ -79,7 +79,9 @@ claims:
 
 基于这一洞察，本文提出 **LDP-Slicing**，一个轻量级、无需训练的框架，通过三个协同模块——感知混淆（防御人类肉眼检查）、位平面切片与随机响应（施加严格 $\varepsilon$-LDP）、效用感知预算优化（保留机器识别所需的结构信息）——在像素级实现形式化可证明的本地差分隐私，同时将下游任务精度损失控制在实用范围内。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 LDP-Slicing 的核心创新在于**通过数据表征转换解决图像高维像素空间与 LDP 机制之间的根本性不匹配**，而非引入新的隐私定义或训练范式。其关键洞察是：8 位像素值的 256 个离散状态本质上是 8 位二进制编码，不同比特位对图像语义的贡献呈指数级差异——MSB 承载主要结构，LSB 近似噪声。基于此，LDP-Slicing 将 LDP 直接应用于比特级别，并根据比特重要性非均匀分配隐私预算，从而在保持严格 ε-LDP 的同时保留任务相关结构信息。
 
@@ -131,7 +133,7 @@ $$\tilde{x} = \sum_{\ell=1}^{8} 2^{8-\ell} \cdot \tilde{x}_{\ell}$$
 
 这一整套机制使得 LDP-Slicing 在保持严格 ε-LDP 保证的同时，在面部识别基准上显著超越所有具备正式 DP/LDP 保证的方法（Table 1），并在身份区分攻击中展现出远低于 DCTDP 的敌手优势（Table 2）。
 
-## 整体框架
+
 
 LDP-Slicing 的整体 pipeline 由两个串行阶段构成，其设计逻辑直接回应了核心瓶颈：**在图像高维像素空间直接应用 LDP 时，数据表征与机制的不匹配导致信息大量丢失**。该框架通过“表征变换—逐位扰动—优化重构”三步，将 ε-LDP 的噪声注入从像素级别下沉到比特级别，从而在严格隐私约束下保留任务相关结构信息。
 
@@ -173,7 +175,7 @@ $$\tilde{x} = \sum_{\ell=1}^{8} 2^{8-\ell} \cdot \tilde{x}_{\ell}$$
 ![[assets/figures/papers/paper_list_l2106_https_arxiv_org_abs_2603_03711/figures/001_Figure_1.jpg]]
 *Figure 1: The LDP-Slicing framework. Our method consists of two primary stages: (1) Perceptual obfuscation: the input image is transformed into the frequency domain via DWT, where the low-frequency (LL) band is pruned to remove human-perceptible information. (2) Bit-plane randomization: The obfuscated image is decomposed into binary bit-planes. A utility-aware randomized response mechanism is applied to each bit and enforces a strict ε-Local Differential Privacy guarantee before the final image is reconstructed*
 
-## 核心模块与公式推导
+
 
 LDP-Slicing 的核心设计围绕一个关键洞察展开：8 位像素值的 256 个离散状态本质上是二进制编码，不同比特位对图像语义的贡献呈指数级差异——最高有效位（MSB）承载主要结构信息，而最低有效位（LSB）近似噪声。基于这一洞察，该方法将图像隐私保护分解为三个串联模块。
 
@@ -233,7 +235,9 @@ $$\mathsf{Adv}_{\mathcal{M}}^{\mathrm{link}} \leq \frac{1}{2} \tanh(\varepsilon/
 ![[assets/figures/papers/paper_list_l2106_https_arxiv_org_abs_2603_03711/figures/002_Figure_2.jpg]]
 *Figure 2: Bit-plane slicing reveals the non-uniform distribution of structural information. An 8-bit image (left) is decomposed into its planes (right), from LSB (top-left) to MSB (bottomright). This visualization shows that coarse structural information is concentrated in the high-order MSB planes, while low-order LSB planes consist primarily of noise-like texture. This motivates our non-uniform, utility-aware budget optimization strategy*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能：人脸识别基准
 
@@ -297,7 +301,9 @@ LDP-Slicing 在四个主流人脸识别基准上与现有方法进行了系统�
 ![[assets/figures/papers/paper_list_l2106_https_arxiv_org_abs_2603_03711/figures/016_Table_6.jpg]]
 *Table 6: Privacy-utility trade-off (%). We perform additional experiment on another 3 benchmarks*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：高维像素空间与LDP机制的失配
 
@@ -348,6 +354,8 @@ LDP-Slicing还包含一个独立的感知混淆模块：通过1阶Haar离散小�
 3. **与中心化DP的协同**：若将LDP-Slicing输出的私有图像直接用于DP-SGD训练，能否结合本地和中心化隐私保证的优势，进一步提升最终模型的隐私-效用前沿？初步证据来自CIFAR-10/100上的对比实验（Figure 7），其中LDP-Slicing在ε≤12时优于中心化的DP-SGD，但协同使用的潜力尚未被探索。
 
 4. **纯位平面扰动的理论上界**：是否存在不需要LL剪枝而仅依靠位平面扰动本身即可完全抵抗强重建攻击的理论保证？当前LL剪枝作为补充防御机制，其必要性是否可以通过更精细的预算分配策略来消除，是一个开放的理论问题。
+
+
 
 ## 原文 PDF
 

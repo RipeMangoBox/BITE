@@ -42,7 +42,7 @@ claims:
 > - 7Scenes (2D-3D) 上，Registration Recall (RR)↑ 91.0 (stage 2) vs 83.8 (Diff-Reg) (+7.2)。
 > - 3DLoMatch (3D-3D) 上，Registration Recall (RR)↑ 86.7 (stage 1) vs 79.0 (PEAL-3D) (+7.7)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -63,7 +63,7 @@ UniCorrn 提出了一个**跨2D与3D的统一对应关系Transformer**，核心�
 
 UniCorrn 处于**检测无关的密集匹配**与**关键点可查询匹配**的交叉地带。与 LoFTR（2D-2D 密集匹配）、MASt3R（2D-2D/3D 重建基础模型）、2D3D-MATR（2D-3D 匹配）、PEAL-3D（3D-3D 点云配准）等任务特定方法不同，UniCorrn 通过**共享的融合编码器与双流匹配解码器**统一处理三种模态，所有任务使用相同权重。其双流注意力设计区别于 RoMa 等将外观与位置特征耦合的Transformer解码器，实现了位置嵌入的独立残差更新与直接坐标回归。
 
-## 背景与动机
+
 
 ### 问题背景：几何对应关系的基础地位
 
@@ -99,7 +99,9 @@ UniCorrn 处于**检测无关的密集匹配**与**关键点可查询匹配**的
 
 通过这一统一框架，UniCorrn旨在突破任务特定范式的局限，实现跨模态的端到端学习与迭代优化，从而在多个基准上取得一致的性能提升。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 UniCorrn 的核心创新在于将跨模态对应关系估计统一到一个共享权重的 Transformer 框架中，并通过三个关键设计突破现有任务特定方法的瓶颈。
 
@@ -136,7 +138,7 @@ UniCorrn 是首个在 2D-2D、2D-3D 和 3D-3D 三种几何匹配任务上**共�
 
 这些创新使 UniCorrn 在 7Scenes（2D-3D）上注册召回率达 91.0%，超越先前最优方法 **Diff-Reg** 的 83.8%（+7.2%）；在 3DLoMatch（3D-3D）上达 86.7%，超越 **PEAL-3D** 的 79.0%（+7.7%）（Table 5, Table 6）。
 
-## 整体框架
+
 
 UniCorrn 是一个基于 Transformer 的统一对应关系模型，其核心设计目标是以**共享权重**的单一架构同时处理 2D-2D、2D-3D 和 3D-3D 三种几何匹配任务。如图 2 所示，整个 pipeline 由四个主要模块串联构成：**模态特定骨干网络**、**特征融合编码器**、**匹配解码器**以及**模态特定预测头**。
 
@@ -163,7 +165,7 @@ UniCorrn 是一个基于 Transformer 的统一对应关系模型，其核心设�
 ![[assets/figures/papers/paper_list_l2614_https_arxiv_org_abs_2605_04044/figures/002_Figure_2.jpg]]
 *Figure 2: Illustration of the overall architecture design. Our model consists of four main modules: (1) modality-specific backbone, (2) feature fusion encoder, (3) matching decoder, and (4) modality-specific prediction heads. Details of each module can be found in Sec. 3.1*
 
-## 核心模块与公式推导
+
 
 ### 整体架构概览
 
@@ -250,7 +252,9 @@ $$
 
 模型在所有任务上共享融合编码器与匹配解码器的权重，仅模态特定骨干和预测头保持独立。联合训练中归一化层存在跨模态梯度冲突，导致第二阶段 2D-2D 性能略低于第一阶段（此为已知限制，需手动验证具体数值）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -332,7 +336,9 @@ Table 6 展示了 3DMatch、3DLoMatch 和 ModelNet 上的 3D-3D 匹配对比。U
 - **遮挡与动态场景**：Figure 13 的 InLoc 失败案例表明，严重遮挡区域（如仅一侧可见的柱面）会产生无效匹配；对 Sintel 光流等动态场景的零样本泛化能力有限。
 - **推理效率**：2D-2D 推理慢于 RoMa 等专用模型，且需要外部检测器（如 RoMa）提供关键点查询；但在 2D-3D 和 3D-3D 上推理时间显著优于扩散类方法（如 Diff-Reg）。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 任务特化范式的终结：从“三套模型”到“一套权重”
 
@@ -372,6 +378,8 @@ UniCorrn的匹配解码器在方法谱系中占据独特位置——它既非传
 **数据混合策略优化**：Table 7显示不同任务的联合训练存在性能权衡——2D-3D和3D-3D受益于联合训练，但2D-2D略有下降。如何设计动态数据采样策略（如基于梯度冲突程度的自适应任务权重）以平衡各任务的学习，是提升统一模型整体性能的重要方向。
 
 **与下游应用的端到端集成**：UniCorrn当前作为独立匹配模块使用，但其输出的对应关系与置信度可直接馈入SLAM、多视图重建等下游系统。能否将整个流水线端到端训练，使对应关系估计直接为下游任务优化，是发挥统一对应关系优势的潜在突破口。
+
+
 
 ## 原文 PDF
 

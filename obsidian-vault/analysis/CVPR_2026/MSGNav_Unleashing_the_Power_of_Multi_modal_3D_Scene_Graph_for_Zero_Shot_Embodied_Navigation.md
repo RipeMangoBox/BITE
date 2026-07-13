@@ -41,7 +41,7 @@ claims:
 > - GOAT-Bench Val Unseen 上，SR 52.0 vs 47.2 (MTU3D) (+4.8)；SPL 29.6 vs 27.7 (MTU3D) (+1.9)；SR 52.0 vs 32.1 (TANGO) (+19.9)。
 > - HM3D-ObjNav 上，SR 74.1 vs 72.2 (WMNav) (+1.9)；SPL 33.4 vs 33.3 (WMNav) (+0.1)。
 
-## 概述
+## 概要
 
 具身导航中，智能体需要在陌生环境中理解开放词汇的语义目标并规划路径。传统方法依赖**纯文本关系边**构建3D场景图来表示对象间关系，但这导致三个关键瓶颈：**视觉信息丢失**（“on top of”无法传达具体空间布局）、**构建成本高昂**（需为每对对象生成文本描述）、以及**词汇受限**（固定词汇表难以覆盖开放世界目标），严重阻碍零样本导航的泛化能力。
 
@@ -50,8 +50,6 @@ MSGNav 的核心洞察是：**用动态分配的多模态图像边替代纯文�
 围绕这一思想，MSGNav 构建了完整的零样本导航系统，包含五个关键模块：**多模态3D场景图构建（M3DSG）** 从RGB-D观测增量构建对象节点和图像边关系；**关键子图选择（KSS）** 压缩场景图以降低VLM推理成本；**自适应词汇更新（AVU）** 利用VLM和视觉证据动态扩展词汇表；**闭环推理（CLR）** 记忆历史决策以提升推理一致性；以及**基于可见性的视点决策（VVD）**，通过3D射线投射分析候选视点的遮挡程度，解决“最后一公里”问题——即目标定位后如何选择最佳观测视点。
 
 **主要结果：** 在GOAT-Bench的Val Unseen划分上，MSGNav以**52.0%成功率（SR）** 显著超越先前最佳零样本方法TANGO（32.1%）和训练型方法MTU3D（47.2%）。在HM3D-ObjNav上同样达到领先的74.1% SR。消融实验验证了各模块的独立贡献：引入M3DSG相比纯节点基线使SR提升**15.0%**，在此基础上加入VVD模块进一步带来**12.5% SR**的提升；VVD模块在标准成功阈值（0.25m）下将成功率从33.91%大幅提升至**51.97%**。
-
-## 背景与动机
 
 具身导航要求智能体在陌生环境中根据自然语言指令定位目标物体，其核心挑战在于对复杂三维场景的开放词汇理解。现有方法大致分为两类：基于强化学习的训练型方法和基于视觉语言模型的零样本方法。训练型方法如 **MTU3D** (Gao et al., NeurIPS 2024) 虽在特定基准上表现良好，但受限于封闭词汇和固定训练范式，难以泛化到未见过的物体类别。零样本方法如 **TANGO** (Majumdar et al., 2023) 和 **WMNav** (Yokoyama et al., 2024) 利用大规模预训练模型绕过训练成本，但在复杂场景中的推理精度和路径效率仍显不足。
 
@@ -71,7 +69,7 @@ MSGNav 的核心洞察是：**用动态分配的多模态图像边替代纯文�
 
 针对上述缺口，本文提出 **MSGNav**，一个基于多模态3D场景图（M3DSG）的零样本导航框架。其核心动机在于：**用动态分配的多模态图像边替代纯文本边，直接在场景图中保留原始视觉证据**，从而消除文本关系边的信息瓶颈。同时，通过基于可见性的视点决策模块解决“最后一公里”问题，实现从场景理解到最终导航的完整闭环。
 
-## 核心创新
+## 核心方法与创新机理
 
 MSGNav 的核心创新在于对传统 3D 场景图表示的根本性重构，以及针对导航“最后一英里”问题提出的视点决策机制。其技术贡献可凝练为以下四个关键维度的改变。
 
@@ -105,8 +103,6 @@ $$\mathcal{R}_t, \hat{V}_t = \mathrm{VLM}(\mathbf{S}^k, \mathbf{M}_t, \mathbf{F}
 
 为降低 VLM 的推理成本，MSGNav 设计了**关键子图选择（KSS）** 模块，通过“压缩—聚焦—剪枝”三阶段流程从完整的 M3DSG 中提取与任务最相关的子图 $\mathbf{S}^k$。这一设计并非核心表示创新，但为前述模块的高效运行提供了必要的计算可行性保障。
 
-## 整体框架
-
 MSGNav 构建了一个连续的“感知—推理—行动”闭环系统，其核心是一个增量式更新的**多模态3D场景图（M3DSG）**。如图 Figure 3 所示，在每一个时间步 $t$，智能体根据当前接收到的 RGB-D 观测 $\mathcal{T}_t$ 和自身位姿，对场景图 $\mathbf{S}_{t-1}$ 进行增量更新，得到 $\mathbf{S}_t$。这一更新过程可形式化为：
 
 ![[assets/figures/papers/paper_list_l2641_https_arxiv_org_abs_2511_10376/figures/003_Figure_3.jpg]]
@@ -131,8 +127,6 @@ $$\mathbf{S}_t = \mathcal{M}(\mathbf{S}_{t-1}, \mathcal{T}_t), \quad t \in [1, T
 
 ![[assets/figures/papers/paper_list_l2641_https_arxiv_org_abs_2511_10376/figures/014_Figure_7.jpg]]
 *Figure 7: Detailed end-to-end processing flow of the proposed framework. The system executes a continuous sense-reason-act loop across four key stages: (1) multi-modal 3D scene graph construction via Vision Foundation Models (VFMs), (2) closed-loop reasoning based on the extracted sub-graph*
-
-## 核心模块与公式推导
 
 MSGNav 的核心创新在于多模态3D场景图（M3DSG）的构建以及围绕其设计的四个推理模块。以下按系统流程逐一阐述关键模块及其公式。
 
@@ -182,15 +176,7 @@ $$\mathcal{R}_t, \hat{V}_t = \mathrm{VLM}(\mathbf{S}^k, \mathbf{M}_t, \mathbf{F}
 
 VVD 针对“最后一公里”问题：目标定位后，传统方法选择最近的可穿越位置，常因遮挡导致导航失败。VVD 在目标 $\bar{o}$ 周围以多半径 $R = \{r_j\}_{j=1}^{N_R}$ 均匀采样候选视点，通过射线投射评估每个候选视点与目标点云 $PC_{\bar{o}}$ 之间的遮挡程度，计算可见性得分。最终选择得分最高的视点 $v_{\text{best}}$ 作为导航终点。该模块将标准成功阈值（0.25m）下的成功率从 33.91% 大幅提升至 51.97%（Table 5）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2641_https_arxiv_org_abs_2511_10376/figures/001_Figure_1.jpg]]
-*Figure 1: One example illustrating the key insights of our work. We introduce the Multi-modal 3D Scene Graph (M3DSG) as an alternative to traditional 3D scene graphs, enabling efficient scene graph generation. By incorporating dynamically preserved imageedge information, M3DSG supports unconstrained vocabulary and enhanced visual replenishment for the agent, thereby allowing more comprehensive and context-aware scene understanding in navigation tasks. Furthermore, to address the last-mile problem of selecting the optimal navigation viewpoint given a target location, we propose a visibility-based scoring mechanism for candidate viewpoints*
-
-![[assets/figures/papers/paper_list_l2641_https_arxiv_org_abs_2511_10376/figures/004_Figure_4.jpg]]
-*Figure 4: Demonstration of the “last-mile” problem. (a) Previous methods select the nearest traversable position after target localization, and often fail due to poor viewpoints. (b) Our VVD samples candidate viewpoints and computes visibility, which can select a suitable viewpoint close to GT for successful navigation*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 主要结果
 
@@ -250,22 +236,10 @@ Table 9展示了不同VLM后端对MSGNav性能的影响。GPT-4o作为默认VLM�
 ![[assets/figures/papers/paper_list_l2641_https_arxiv_org_abs_2511_10376/figures/007_Table_3.jpg]]
 *Table 3: Component ablation experiment across the first episode of each scene on the “Val Unseen” split of GOAT-Bench. The first row without any module, which represents our baseline model 3D-Mem [43] results. “VVD”, “AVU”, and “CRV” represent the Visibility-based Viewpoint Decision module, Adaptive Vocabulary Update module, and Closed-loop Reasoning and Verification module*
 
-![[assets/figures/papers/paper_list_l2641_https_arxiv_org_abs_2511_10376/figures/008_Table_4.jpg]]
-*Table 4: Scene graph experiment across the first episode of each scene on the “Val Unseen” split of GOAT-Bench. “Node-only” indicates Concept-graph [9] without object relation edges. “Traditional graph” indicates Concept-graph [9]*
-
-![[assets/figures/papers/paper_list_l2641_https_arxiv_org_abs_2511_10376/figures/009_Table_5.jpg]]
-*Table 5: Experiments on the “Val Unseen” split of GOAT-Bench with various success thresholds. VVD module represents the Visibility-based Viewpoint Decision module*
-
 ![[assets/figures/papers/paper_list_l2641_https_arxiv_org_abs_2511_10376/figures/002_Figure_2.jpg]]
 *Figure 2: Performance comparisons between our MSGNav and other existing methods for embodied navigation on Goat-Bench [19]: the multi-modal open-vocabulary navigation benchmark. (a) The superiority of our M3DSG over traditional 3D scene graphs. (b) Distance statistics from the goal for the previous method (3D-Mem [43] as an example). (c) Our MSGNav system achieves stateof-the-art performance on the challenging Goat-Bench*
 
-![[assets/figures/papers/paper_list_l2641_https_arxiv_org_abs_2511_10376/figures/010_Figure_5.jpg]]
-*Figure 5: Statistical box plot of candidate viewpoint scores computed by the VVD module and distances from GT viewpoints*
-
-![[assets/figures/papers/paper_list_l2641_https_arxiv_org_abs_2511_10376/figures/016_Table_9.jpg]]
-*Table 9: Experiments of our MSGNav method using different VLMs on the “Val Unseen” split of GOAT-Bench. The number following each category represents the sample size*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 与现有基线方法的关系
 

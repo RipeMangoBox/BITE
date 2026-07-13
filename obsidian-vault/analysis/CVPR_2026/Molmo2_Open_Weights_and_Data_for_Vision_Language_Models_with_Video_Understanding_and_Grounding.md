@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/Molmo2_Open_Weights_and_Data_for_Vision_Language_Models_with_Video_Understanding_and_Grounding.pdf
+project_link: null
+code_link: https://github.com/allenai/molmo2
 aliases:
 - Molmo2
 tags:
@@ -40,13 +42,13 @@ claims:
 > - Molmo2-VideoPoint 上，F1 38.4 (Molmo2-8B) vs 20.0 (Gemini 3 Pro) (+18.4)。
 > - Molmo2-Track 上，J&F 56.2 (Molmo2-8B) vs 41.1 (Gemini 3 Pro) (+15.1)。
 
-## 概述
+## 概要
 
 视觉语言模型（VLM）在图像理解上已取得长足进步，但将细粒度时空定位能力（指向、追踪）扩展到视频领域仍面临瓶颈：现有开源模型普遍缺乏高质量、多样化的视频grounding数据，且常用数据依赖从专有VLM蒸馏，限制了开放模型的时空定位上限。Molmo2针对这一缺口，构建了迄今为止规模最大的完全开放视频中心多模态语料库，包含九个全新数据集，覆盖密集字幕、长视频问答、开放词汇指向与追踪。通过三阶段多任务联合训练——图像字幕/指向预训练、联合多模态监督微调、长上下文后训练——并结合双向视觉注意力、任务定制token加权（视频字幕权重0.1，指向任务权重0.2，其余任务采用$4/\sqrt{n}$动态权重）以及序列打包等技术，Molmo2在保持通用图像理解能力的同时，获得了强大的视频grounding能力。
 
 核心结论是：**完全开放数据驱动的视频grounding可以匹配甚至超越专有模型**。Molmo2-8B在视频计数准确率上达到35.5，显著超过开源权重模型Qwen3-VL-8B的29.6；在视频指向F1上达到38.4，远超专有模型Gemini 3 Pro的20.0；在目标追踪J&F上达到56.2，同样大幅领先Gemini 3 Pro的41.1。这些结果表明，通过人机协作数据采集和学术数据转换，无需依赖专有模型蒸馏，即可让开放VLM在细粒度视频理解任务上取得有竞争力的性能。
 
-## 背景与动机
+
 
 ### 问题背景：视觉语言模型的视频理解与定位鸿沟
 
@@ -80,7 +82,9 @@ Molmo2的提出正是为了填补上述缺口。其设计哲学基于一个核�
 
 这一设计使得Molmo2在视频计数准确率上达到35.5（显著超过Qwen3-VL-8B的29.6），在视频指向F1上达到38.4（远超Gemini 3 Pro的20.0），证明了开放数据驱动grounding的有效性，为开放视频语言模型的发展提供了新的范式。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Molmo2的核心创新在于通过**完全开放的数据构建**与**系统性的训练设计**，首次在开放权重视觉语言模型中实现了覆盖图像、多图和视频的统一时空定位（grounding）能力。其关键突破体现在以下四个维度：
 
@@ -134,7 +138,7 @@ Molmo2将点、轨迹和对象ID统一编码为紧凑的文本格式，使LLM能
 
 Molmo2的核心创新可归纳为**因果操纵变量**的实现路径：通过构建全开放的大规模视频定位数据集（数据层面），结合三阶段联合训练和任务定制化技术（算法层面），使开放权重的视觉语言模型首次在视频计数、指向和追踪等细粒度时空定位任务上达到甚至超越专有模型水平，同时保持通用视觉理解能力不退化。
 
-## 整体框架
+
 
 Molmo2 采用“视觉编码器 → 连接器 → 大语言模型”的标准多模态架构，但在训练流水线、数据组织方式和任务表示上做了系统性设计，使其能够同时处理单张图像、多图像集合和视频，并输出自由文本与时空定位结果（点、轨迹、带定位的思维链）。
 
@@ -178,7 +182,7 @@ Molmo2 的训练分为三个序贯阶段，每个阶段承担不同的能力构�
 ![[assets/figures/papers/paper_list_l35_https_arxiv_org_abs_2601_10611/figures/044_Figure_18.jpg]]
 *Figure 18: Overview of the annotation pipeline for Molmo2-VideoTrack and the Molmo2-Track benchmark*
 
-## 核心模块与公式推导
+
 
 Molmo2 的模型架构遵循“视觉编码器 → 视觉-语言连接器 → 大语言模型”的标准设计，并在训练流程中引入多项关键技术创新。本节聚焦于对性能有决定性影响的模块与公式。
 
@@ -251,7 +255,9 @@ $$HOTA = \sqrt{DetA \times AssA}$$
 
 这些模块共同构成了 Molmo2 从数据到训练的系统性创新，使其在保持通用视觉语言能力的同时获得强大的视频 grounding 能力。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心结果总览
 
@@ -360,7 +366,9 @@ Molmo2-Cap和Molmo2-QA两个自建数据集均优于仅使用学术数据集，�
 ![[assets/figures/papers/paper_list_l35_https_arxiv_org_abs_2601_10611/figures/018_Table_10.jpg]]
 *Table 10: Tracking ablations. We report average metrics across the five tracking benchmarks (the valid-u split for MeViS). HOTA [97] measures association accuracy*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 在开放视频-语言模型谱系中的位置
 
@@ -424,6 +432,8 @@ Molmo2的工作揭示了以下待解决的关键问题：
 6. **长上下文SFT的泛化性**：长上下文SFT对其他未列出的视频任务（如动作检测、事件定位）影响如何？这需要更广泛的基准评估。
 
 7. **多模态训练对语言能力的侵蚀**：Molmo2在编程基准上的下降是否普遍存在于多模态训练中？如何通过训练数据混合或训练策略减轻这种负面影响？
+
+
 
 ## 原文 PDF
 

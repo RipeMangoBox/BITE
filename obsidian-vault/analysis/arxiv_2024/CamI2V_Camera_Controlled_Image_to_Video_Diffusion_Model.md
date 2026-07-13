@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2024
 pdf_ref: paperPDFs/arxiv_2024/CamI2V_Camera_Controlled_Image_to_Video_Diffusion_Model.pdf
+project_link: https://zgctroy.github.io/CamI2V
+code_link: https://github.com/hpcaitech/Open-Sora
 aliases:
 - CamI2V
 tags:
@@ -40,7 +42,7 @@ claims:
 > [!tip] 效果简介
 > - RealEstate10K 上，RotErr (↓) 0.4758 vs CameraCtrl: 0.7064 (-0.2306 (-32.96%))；CamMC (↓) 1.7153 vs CameraCtrl: 2.304 (-0.5887 (-25.64%))；TransErr (↓) 1.4955 vs CameraCtrl: 1.888 (-0.3925 (-20.77%))。
 
-## 概述
+## 概要
 
 图像到视频（I2V）生成的核心挑战在于，如何在给定单张图像和相机运动序列的条件下，生成几何一致且相机可控的视频。现有方法（如基于分离时空注意力的 **DynamiCrafter** (Xing et al., 2023) 或使用 Plücker 嵌入作为侧输入的 **CameraCtrl** (He et al., 2024a)）在噪声较大的扩散早期阶段，难以有效建模跨帧特征对应关系，导致生成的视频出现几何不一致和相机可控性下降。
 
@@ -48,7 +50,7 @@ CamI2V 的核心洞察在于重新审视扩散模型中“条件”的本质：�
 
 方法层面，CamI2V 以 DynamiCrafter 为基础模型，引入 Plücker 坐标作为全局 3D 光线位置编码，并在空间与时间注意力之间插入可插拔的极线注意力模块，同时辅以可学习的 register tokens 处理帧间无重叠区域。在 RealEstate10K 数据集上，CamI2V 相较此前最优方法 CameraCtrl 在相机可控性指标上取得显著提升：RotErr 降低 32.96%，CamMC 降低 25.64%，TransErr 降低 20.77%，且未牺牲生成质量和动态表现（表 1）。该方法训练仅需 24GB 显存，推理仅需约 12GB，具备在消费级 GPU 上部署的可行性。
 
-## 背景与动机
+
 
 ### 扩散模型中的条件再思考
 
@@ -80,7 +82,9 @@ CamI2V 的核心动机源于一个关键发现：**对极几何约束能够将�
 
 基于上述动机，CamI2V 提出了一种结合 **Plücker 坐标嵌入**与**极线注意力机制**的相机控制框架。该方法以 **DynamiCrafter**（Xing et al., 2023）为基础图像到视频扩散模型，在架构层面引入显式的对极几何约束，替代 **CameraCtrl**（He et al., 2024a）中缺乏几何约束的 Plücker 侧分支注入方式。通过在空间注意力与时间注意力之间插入极线注意力模块，模型能够在高噪声条件下稳定地建模跨帧关系，从而实现更精确的相机可控性和 3D 一致性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 CamI2V 的核心创新在于重新审视了扩散模型中的条件信号，并提出了一种基于对极几何约束的跨帧注意力机制，以解决现有相机控制方法在高噪声条件下几何一致性与可控性不足的瓶颈。
 
@@ -121,7 +125,7 @@ Table 2 的消融研究为上述创新提供了直接证据：
 
 > **需人工验证**：分析材料中未提供 Register Tokens 数量的消融实验，其对性能的具体贡献大小需要查阅原文进一步确认。
 
-## 整体框架
+
 
 CamI2V的整体管线建立在基础图像到视频扩散模型 **DynamiCrafter**（Xing et al., 2023）之上，通过两个关键模块的插入和一种条件注入策略的改进，将相机控制能力赋予原有模型。其核心设计思想是：将相机位姿转换为显式的三维几何约束，并利用该约束重塑跨帧特征的交互方式，使模型在高噪声条件下仍能保持几何一致性。
 
@@ -164,7 +168,7 @@ CamI2V采用双引导尺度设计：$s_{\mathrm{img\&txt}}$ 控制图像和文�
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2410_15957/figures/004_Figure_4.jpg]]
 *Figure 4: Pipeline of camera-controlled image-to-video diffusion model. We follow CameraCtrl to add a learnable pose encoder and a linear projection to process plucker embeddings as a global positional embedding. Epipolar attention is added between spatial and temporal attention*
 
-## 核心模块与公式推导
+
 
 CamI2V 在基础 I2V 扩散模型（**DynamiCrafter**，Xing et al., 2023）之上，通过三个核心模块的协同设计，实现了对相机运动的精确控制。其关键创新在于将跨帧特征交互重新解释为一类“噪声条件”的利用问题，并通过极线约束最大化条件的信息价值。
 
@@ -233,7 +237,9 @@ $$\epsilon_{\theta}(z_t, c_{camera}, c_{img\&txt}, s_{camera}, s_{img\&txt})$$
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2410_15957/figures/006_Figure_6.jpg]]
 *Figure 6: Epipolar attention mask with register tokens. We specify query pixel by red point in the i-th frame for clarity. Epipolar attention mask is constructed by concatenating epipolar masks along all frames. We insert register tokens to key/value sequence to deal with zero epipolar scenarios*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -299,7 +305,9 @@ CamI2V 在 RealEstate10K 基准上以显著优势超越所有对比方法，实�
 ![[assets/figures/papers/paper_list_l5_https_arxiv_org_abs_2410_15957/figures/012_Figure_9.jpg]]
 *Figure 9: Visualization of our 256×256 model*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 基线关系与继承
 
@@ -358,6 +366,8 @@ CamI2V 从 CameraCtrl 继承的关键设计包括：
 3. **极线约束的松弛策略**：当前的硬阈值离散化掩码（由距离阈值 $\delta$ 控制）可能过于刚性。自适应阈值或多尺度软约束是否能改善边界情况（如帧间重叠恰好处于阈值边缘），值得探索。
 
 4. **计算效率与扩展性**：极线注意力需要为每对帧计算基础矩阵并生成掩码，在长序列或高分辨率下的计算开销尚未系统分析。register tokens 数量的最优选择（当前固定为 2）也缺乏消融研究。
+
+
 
 ## 原文 PDF
 

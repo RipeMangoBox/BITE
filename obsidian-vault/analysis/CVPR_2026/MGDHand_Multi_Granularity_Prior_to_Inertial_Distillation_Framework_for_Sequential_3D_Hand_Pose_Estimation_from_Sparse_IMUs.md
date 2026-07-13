@@ -40,15 +40,13 @@ claims:
 > [!tip] 效果简介
 > - VIHand (7 IMUs) 上，MPJPE (↓) 9.13 mm vs 13.69 mm (VIFNet-S) (-4.56 mm (-33.3%))；MPVPE (↓) 10.46 mm vs 16.53 mm (VIFNet-S) (-6.07 mm (-36.7%))；MPJPE (↓) 9.13 mm vs 15.4 mm (no distill) (-6.27 mm (-40.7%))。
 
-## 概述
+## 概要
 
 从稀疏惯性测量单元（IMU）实时重建密集的3D手部姿态，是沉浸式交互与可穿戴计算的关键技术。然而，稀疏IMU仅能提供局部运动信号，与结构化的全局手部姿态之间存在显著的语义鸿沟与信息密度差异——从稀疏信号直接回归密集姿态本质上是一个高度模糊的逆问题。传统跨模态知识蒸馏方法通常将教师模型中的视觉或运动学先验以耦合的全局特征形式传递给学生，忽略了模态间细粒度的语义不匹配，导致学生模型在仅使用IMU推理时优化困难、精度受限。
 
 针对上述瓶颈，本文提出**MGDHand**——一个多粒度先验-惯性蒸馏框架。其核心洞察是：将教师模型中的跨模态先验按**静态形状、动态姿态和时序运动**三个互补粒度进行解耦，再通过分层蒸馏将这些先验在匹配的语义空间上传递给学生模型，从而弥合稀疏到密集的映射差距。具体而言，MGDHand预训练一个MANO-IMU融合教师模型，通过形态学增强、一致性增强和惯性增强模块从统一表示中提取三类先验特征；随后，在仅使用IMU输入的学生模型上施加静态形状蒸馏（SSD）、动态姿态蒸馏（DPD）和时序运动蒸馏（TMD），使学生在不引入任何额外推理模态的前提下，吸收教师的结构化知识。
 
 在VIHand数据集上的实验表明，MGDHand在7-IMU配置下取得了**9.13 mm MPJPE**和**10.46 mm MPVPE**，显著优于所有对比方法。相较于采用粗粒度全局特征蒸馏的**VIFNet-S**（Wang et al., ACM MM 2025），MPJPE降低**33.3%**（9.13 mm vs. 13.69 mm），MPVPE降低**36.7%**（10.46 mm vs. 16.53 mm）；相较于无蒸馏学生基线，MPJPE降低**40.7%**（9.13 mm vs. 15.4 mm）。消融实验进一步揭示，动态姿态蒸馏（DPD）是影响最大的组件——去除后MPJPE升高35.7%、MPVPE升高32.9%；静态形状蒸馏（SSD）主要影响顶点几何精度，去除后MPVPE升高20.3%；时序运动蒸馏（TMD）则提供一致但幅度较小的增益。这些结果验证了多粒度解耦蒸馏策略在稀疏IMU手部姿态估计任务中的有效性与组件协同性。
-
-## 背景与动机
 
 ### 问题背景：稀疏IMU到密集手部姿态的映射鸿沟
 
@@ -72,7 +70,7 @@ claims:
 
 通过这种“分而治之”的蒸馏策略，学生模型能够从不同维度吸收教师模型的结构化知识，弥合稀疏IMU信号到密集手部姿态之间的映射差距，同时保持推理时仅使用IMU的高效性。实验表明，该方案在7-IMU配置下较无蒸馏基线降低MPJPE **40.7%**（15.4 mm → 9.13 mm），较粗粒度全局特征蒸馏方法VIFNet-S降低MPJPE **33.3%**（13.69 mm → 9.13 mm），验证了多粒度解耦蒸馏的有效性。
 
-## 核心创新
+## 核心方法与创新机理
 
 MGDHand的核心创新在于**将教师模型中的跨模态手部先验解耦为静态形状、动态姿态和时序运动三个互补粒度，并在匹配语义空间中进行分层蒸馏**，从而弥合稀疏IMU信号到密集手部姿态之间的语义鸿沟。与现有方法相比，这一策略在三个关键维度上实现了根本性改变。
 
@@ -103,8 +101,6 @@ $$\mathcal{L}_{\mathrm{distill}} = \lambda_{\mathrm{sh}}\mathcal{L}_{ss} + \lamb
 其中，$\mathcal{L}_{ss}$ 对齐全局形状特征，$\mathcal{L}_{ps}$ 逐帧对齐姿态特征，$\mathcal{L}_{ts}$ 逐帧对齐时序运动特征。这一联合优化方案使学生模型能够从形状、姿态和运动三个维度同时吸收教师先验，而无需引入任何额外的推理模态或计算开销。
 
 整体而言，完整MGDistill方案在7-IMU配置下较无蒸馏学生基线降低MPJPE 40.7%（15.4 mm → 9.13 mm），降低MPVPE约39.0%（17.15 mm → 10.46 mm），充分证明了多粒度解耦蒸馏相较于耦合式特征蒸馏和纯重建训练的显著优势。
-
-## 整体框架
 
 MGDHand 遵循 **两阶段训练范式**：先预训练一个融合 MANO 参数与 IMU 信号的多模态教师模型，再通过多粒度解耦蒸馏将教师中的先验知识迁移至仅依赖 IMU 的学生模型。推理时，学生模型仅以稀疏 IMU 序列作为输入，无需 MANO 标注或视觉模态，不引入额外计算开销。
 
@@ -146,8 +142,6 @@ Figure 2 展示了上述框架的完整数据流：教师端双流编码→统�
 
 ![[assets/figures/papers/paper_list_l977_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_MGDHand_Multi_Gra/figures/002_Figure_2.jpg]]
 *Figure 2: The overview of the multi-granularity prior-to-inertial distillation framework. A MANO-IMU fusion teacher model is pre-trained using both MANO sequences and IMU signals to learn a cross-modal aligned latent manifold that explicitly relates inertial dynamic information to the hand model MANO parameter space. An IMU-only student model is trained under multi-granularity decoupled distillation to absorb static shape priors, dynamic pose priors and temporal motion priors from the teacher, while only using IMUs at inference time*
-
-## 核心模块与公式推导
 
 ### 3.1 多模态融合教师模型中的统一语义空间
 
@@ -225,12 +219,7 @@ $$
 
 学生模型的最终训练目标在标准重建损失 $\mathcal{L}_{\mathrm{recon}}$ 基础上增加上述蒸馏损失：$\mathcal{L}_S = \mathcal{L}_{\mathrm{recon}} + \mathcal{L}_{\mathrm{distill}}$。消融实验表明，DPD 是影响最大的组件——去除 DPD 导致 MPJPE 升高 35.7%、MPVPE 升高 32.9%，验证了动态姿态先验在弥合稀疏到密集映射差距中的核心作用。SSD 主要影响顶点几何精度（去除后 MPVPE 升高 20.3%），而 TMD 提供较小但一致的时序稳定性增益（MPJPE 升高 5.7%，MPVPE 升高 2.7%）。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l977_https_openaccess_thecvf_com_content_CVPR2026_html_Wang_MGDHand_Multi_Gra/figures/001_Figure_1.jpg]]
-*Figure 1: (a) Mapping challenges from sparse IMUs to dense hand poses. (b) Comparison of traditional cross-modal distillation with our multi-granularity decoupled distillation strategy*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -281,7 +270,7 @@ Figure 3 提供了与 SOTA 方法的定性可视化对比。在快速手势变�
 
 所有实验均在相同稀疏 IMU 配置下进行评估，学生模型推理时仅使用 IMU 数据，无额外模态或计算开销。教师模型仅在训练阶段使用 MANO 标注与 IMU 配对数据，推理时不需要。训练采用两阶段策略：首先使用 AdamW 优化器（初始学习率 1e-4，余弦衰减）训练 MANO-IMU 融合教师模型 80 个 epoch（batch size 32），然后固定教师权重，通过多粒度蒸馏损失联合训练学生模型。所有对比方法均在其公开的最佳配置下复现或引用原文结果，确保对比的公平性。
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 核心问题与基线对比
 

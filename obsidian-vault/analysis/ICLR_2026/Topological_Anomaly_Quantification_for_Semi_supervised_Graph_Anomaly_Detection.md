@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Topological_Anomaly_Quantification_for_Semi_supervised_Graph_Anomaly_Detection.pdf
+project_link: null
+code_link: null
 openreview_forum_id: ZURYrJgigi
 aliases:
 - TG
@@ -42,7 +44,7 @@ claims:
 > - Amazon 上，AUPRC 为 0.7973，对比 0.7403，变化 +0.0570。
 > - T-Finance 上，AUROC 为 0.8675，对比 0.8452，变化 +0.0223。
 
-## 概述
+## 概要
 
 在半监督图异常检测中，现有生成式方法（如特征插值与噪声扰动）普遍缺乏对节点异常程度的定量评估机制，导致生成的伪异常节点代表性差、可靠性低，难以有效模拟真实世界中复杂的异常模式。针对这一瓶颈，本文提出 TAQ-GAD，一种基于拓扑异常量化的生成式图异常检测方法。
 
@@ -52,7 +54,7 @@ TAQ-GAD 的核心思路是：利用图拓扑结构信息（边界程度与隔离
 
 在五个基准数据集（Amazon、T-Finance、Reddit、Elliptic、Photo）上，TAQ-GAD 相较主要对比方法 GGAD 在 AUROC 和 AUPRC 上均取得显著提升，例如 Amazon 上 AUROC 达 0.9474（+2.86%），Elliptic 上 AUPRC 提升 11.48 个百分点。在 DGraph 数据集的不同标记率下，TAQ-GAD 同样一致优于 GGAD。消融实验证实，NBS、PIS 与 TAE 三个组件均对性能有正向贡献，且拓扑引导的采样策略明显优于随机采样和低度采样策略。
 
-## 背景与动机
+
 
 图异常检测（Graph Anomaly Detection, GAD）在金融欺诈识别、社交网络虚假信息检测、网络入侵发现等现实场景中具有重要应用价值。其核心任务是在属性图中识别出与大多数节点在特征或拓扑结构上显著偏离的异常节点。近年来，半监督图异常检测方法因能够利用少量标记数据提升检测精度而受到广泛关注，其中基于生成式范式的 GGAD 等方法通过构造伪异常节点来弥补真实异常标签不足的问题。
 
@@ -60,7 +62,9 @@ TAQ-GAD 的核心思路是：利用图拓扑结构信息（边界程度与隔离
 
 针对上述缺口，TAQ-GAD 的核心动机是：**利用图拓扑结构信息定量衡量节点的异常倾向，从而精准筛选高质量的伪异常节点**。通过设计能够刻画边界程度与隔离程度的拓扑指标，可以系统性地提升伪异常质量；在此基础上，进一步通过风险导向的伪标签修正与异常中心增强，使模型在半监督训练中获得更强的异常识别能力。这一思路将伪异常生成从特征空间拓展到拓扑空间，为仅使用正常标签的半监督图异常检测提供了新的技术路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 TAQ‑GAD 的核心创新在于**将图拓扑结构信息显式地量化为节点的异常倾向，并以此驱动伪异常生成与拓扑增强**，从而系统性地突破了现有生成式图异常检测方法的瓶颈。
 
@@ -110,7 +114,7 @@ TAQ‑GAD 的拓扑引导采样策略（Topology‑guided）在 AUROC 和 AUPRC 
 
 上述创新的协同效应使 TAQ‑GAD 在五个数据集上相较最强基线 GGAD 均取得显著提升（Table 1），尤其在 Elliptic 数据集上 AUPRC 提升达 +0.1148（0.3573 vs 0.2425），在 DGraph 的 0.5% 标记率下 AUROC 提升 +0.0683（Table 2）。这些结果表明，**拓扑引导的伪异常生成与增强机制能够使模型在仅用正常标签的半监督设置下学到更具判别力的节点表征**。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0011_ZURYrJgigi_Topological_Anomaly_Quantification_for_Semi-supe/figures/001_Figure_1.jpg]]
 *Figure 1: The overall framework of TAQ-GAD*
@@ -143,7 +147,7 @@ $$\mathcal{L}_{\mathrm{total}} = \alpha \cdot \mathcal{L}_{\mathrm{reg}} + \beta
 
 三个模块的依赖关系清晰且单向：TAQ 的输出（伪异常节点集合）是 TAE 的输入基础；TAE 在此基础上修正伪标签并增强图拓扑；增强后的图直接供给 GNN 分类器进行最终预测。整个流程无需真实异常标签参与伪异常的筛选与增强，仅在最终训练阶段利用少量正常标签进行监督，属于典型的半监督生成式异常检测框架。
 
-## 核心模块与公式推导
+
 
 ### 问题瓶颈与设计动机
 
@@ -211,7 +215,9 @@ $$\mathcal{L}_{\mathrm{total}} = \alpha \cdot \mathcal{L}_{\mathrm{reg}} + \beta
 
 TAQ 与 TAE 形成两阶段协同：TAQ 从图拓扑角度量化节点异常程度，筛选高置信度伪异常节点；TAE 在此基础上通过风险驱动的伪标签修正与虚拟中心增强，进一步提升伪异常质量。消融实验（Table 3）证明 NBS、PIS 和 TAE 三个模块均对性能有正向贡献，三者的组合在所有数据集上达到最优效果。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -280,7 +286,9 @@ Table 4 比较了三种伪异常采样策略：随机采样（Random）、低度
 ![[assets/figures/papers/iclr26_0011_ZURYrJgigi_Topological_Anomaly_Quantification_for_Semi-supe/figures/002_Figure_2.jpg]]
 *Figure 2: NBS and NIS metrics for quantifying the degree of node anomaly. The $\mathcal { N } ( v _ { i }$ ) is defined as the 2-hop neighborhood of node $v _ { i }$*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有方法的继承与区别
 
@@ -318,6 +326,8 @@ TAQ-GAD 的设计建立在以下隐式假设之上，这些假设界定了其有
 - **可扩展的拓扑增强**：如何在保持拓扑语义的前提下，设计线性或亚线性复杂度的图增强算法？可能的路径包括基于节点重要性采样的稀疏增强、低秩近似下的虚拟中心构造，或利用图粗化（graph coarsening）进行分层增强。
 - **动态图框架扩展**：将 TAQ 与 TAE 扩展到动态图的核心挑战在于：如何定义时序拓扑异常（如突发的结构隔离或边界漂移），以及如何设计时间感知的伪标签修正与增强机制。这可能需要融合时序点过程或状态空间模型。
 - **极端稀疏标签下的校准**：当标记正常节点极少时，NBS 的估计可能严重偏差。研究在此场景下 PIS 与 NBS 的互补校准策略，或引入自监督预训练以提升拓扑表征的鲁棒性，是一个具有实际价值的问题。
+
+
 
 ## 原文 PDF
 

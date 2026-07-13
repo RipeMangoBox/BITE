@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Unleashing_Guidance_Without_Classifiers_for_Human_Object_Interaction_Animation.pdf
+project_link: http://ziyinwang1.github.io/LIGHT
+code_link: null
 openreview_forum_id: 7lgQernr2Z
 aliases:
 - LLIGHOI
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 释放无需分类器的引导用于人机交互动画 |
 | 英文题名 | Unleashing Guidance Without Classifiers for Human-Object Interaction Animation |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=7lgQernr2Z); [Project](http://ziyinwang1.github.io/LIGHT) |
+| Links | [paper](https://openreview.net/forum?id=7lgQernr2Z) · [Project](http://ziyinwang1.github.io/LIGHT) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | LIGHT (Learning Implicit Guidance for Human-object inTeraction) |
 | Dataset | InterAct, OMOMO |
@@ -42,7 +44,7 @@ claims:
 > - InterAct 上，Interaction C_F1 为 0.627，对比 0.584 (InterDiff)，变化 +0.043。
 > - OMOMO 上，FID 为 0.099，对比 0.163 (InterDiff)，变化 -0.064。
 
-## 概述
+## 概要
 
 人机交互（HOI）动画生成的核心瓶颈在于：扩散模型难以在长时序生成中维持精细且持续的接触控制。现有方案或依赖手工设计的接触先验（如**HOI-Diff**，Peng et al., 2023），或借助外部分类器进行引导，泛化性与推理效率均受制约。
 
@@ -52,7 +54,7 @@ LIGHT 的核心洞察是**将表示分解为身体、手部与物体三个独立
 
 实验结果表明，LIGHT 在 InterAct 数据集上取得 FID 0.148、交互 C_F1 0.627，较 InterDiff 分别改善 0.067 和 0.043（Table 1）。形状谱增强使未见物体的 In-category Top-1 R-Precision 从 0.216 提升至 0.279（Table 3），验证了跨物体泛化能力。主要局限在于仅支持单物体场景，且推理计算成本约为基线的 5 倍。
 
-## 背景与动机
+
 
 人机交互（Human-Object Interaction, HOI）动画生成是计算机视觉与图形学中的核心挑战，其目标是根据文本描述或物体几何信息，生成真实、物理合理的人体运动序列。近年来，扩散模型在人体运动生成领域取得了显著进展，但在涉及人与物体精细接触的场景中，现有方法仍面临根本性瓶颈。
 
@@ -69,7 +71,9 @@ LIGHT 的核心洞察是**将表示分解为身体、手部与物体三个独立
 
 **本文的动机**正是突破这一瓶颈：能否在不依赖任何手工接触先验或外部分类器的前提下，从数据分布中隐式诱导出接触感知的引导信号？LIGHT（Learning Implicit Guidance for Human-object inTeraction）提出了一条新路径——通过将表示分解为身体、手部和物体三个独立模态，并在推理时为不同模态分配异步噪声水平，构建清洁/噪声对比，从而在不引入额外先验的条件下，自动产生关注接触细节的引导效果。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 LIGHT的核心创新在于将扩散模型的去噪过程从“全体同步”转变为“模态异步”，从而在不引入任何外部分类器或手工接触先验的条件下，隐式地诱导出接触感知的引导信号。这一设计围绕三个相互关联的**changed slots**展开。
 
@@ -98,7 +102,7 @@ LIGHT的核心创新在于将扩散模型的去噪过程从“全体同步”转
 
 三个changed slots形成递进关系：**令牌分离**为异步去噪提供结构基础，**节奏诱导引导**利用这一结构从数据分布中隐式提取接触信号，**形状谱增强**则弥补数据多样性不足的短板。三者的协同使得LIGHT在无需手工接触先验或外部分类器的前提下，实现了对接触细节的精细控制和对未见物体的鲁棒泛化。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l9_https_openreview_net_forum_id_7lgQernr2Z/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of LIGHT. Left: Training. We form different modalities, e.g., body, hand, and object, each diffused with its own noise level. After adding modal-wise and frame-wise rotary positional encodings, the tokens are processed by a shared Transformer decoder and an MLP head to predict clean motion. Right: Inference. We compare a uniform schedule that denoises all modalities synchronously with a staged schedule that keeps one modality cleaner from the uniform run*
@@ -148,7 +152,7 @@ $$\tilde{\pmb{x}}_S = \mathcal{G}_{\theta}(x_S(\lambda), \lambda, d) + \omega_1 
 
 整个pipeline的数据流为：**文本+物体几何 → 多模态令牌化 → 共享Transformer解码器（含自注意力与交叉注意力）→ MLP预测头 → 去噪运动输出**。训练时各令牌接受独立噪声水平；推理时通过双路径对比产生隐式引导，最终输出物理合理、接触精细的HOI动画序列。
 
-## 核心模块与公式推导
+
 
 LIGHT 的核心架构由六个功能模块构成，其设计围绕一个关键洞察：将人机交互（HOI）表示分解为身体、手部和物体三种模态令牌，并赋予独立的扩散噪声水平，从而在推理时通过异步去噪调度隐式诱导出接触感知的引导信号。
 
@@ -206,7 +210,9 @@ $$\tilde{\pmb{x}}_S = \mathcal{G}_{\theta}(x_S(\lambda), \lambda, d) + \omega_1 
 
 其中 $\omega_2$ 控制节奏引导强度，$\delta$ 控制去噪先行偏移。消融实验表明 $\omega_2=4$、$\delta=200$ 在 FID 和穿透之间取得最佳平衡（Figure 6）。梯度方向分析进一步证实，LIGHT 的引导方向与穿透降低梯度的余弦相似度比纯文本 CFG 更高（InterAct 上 +0.035，OMOMO 上 +0.032），表明其能自动减少穿透伪影（Table 4）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 
@@ -272,7 +278,9 @@ Table 4 揭示了 LIGHT 引导的内在机理。将 LIGHT 引导方向 $g_{\math
 *Table 10: Table F: Ablation study of token-separation strategies on the BEHAVE dataset Xu et al. (2025a). We report R-Precision with batch size 256*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有工作的关系
 
@@ -317,6 +325,8 @@ LIGHT 的有效性建立在以下前提之上：
 - **计算效率优化**：能否在保持引导质量的前提下降低推理开销？潜在方向包括：共享两阶段去噪的中间特征、设计自适应调度策略以减少冗余步骤、或通过知识蒸馏将引导信号压缩至单阶段模型。
 
 - **引导机制的理论理解**：Table 4 表明 LIGHT 的引导方向与穿透降低梯度具有更高相关性，但这一相关性是训练过程中隐式涌现的，其理论根源尚不清晰。进一步分析噪声水平偏移 δ 与引导方向之间的关系，可能揭示扩散模型中条件控制的更深层原理。
+
+
 
 ## 原文 PDF
 

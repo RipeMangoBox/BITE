@@ -41,7 +41,7 @@ claims:
 > - NeRSemble (1 frame, self-reenactment) 上，PSNR↑/SSIM↑/LPIPS↓/AKD↓/CSIM↑ 22.46 (single‑pass) / 0.803 / 0.325 / 3.96 / 0.522 vs LAM: 16.41 / 0.662 / 0.409 / 48.64 / 0.461 (+6.05 PSNR, +0.141 SSIM, -0.084 LPIPS, -44.68 AKD, +0.061 CSIM)。
 > - NeRSemble (6 frames, self-reenactment) 上，PSNR↑/SSIM↑/LPIPS↓/AKD↓/CSIM↑ 23.71 (full) / 0.825 / 0.296 / 3.08 / 0.721 vs GaussianAvatars: 23.44 / 0.784 / 0.300 / 7.41 / 0.465 (+0.27 PSNR, +0.041 SSIM, -0.004 LPIPS, -4.33 AKD, +0.256 CSIM)。
 
-## 概述
+## 概要
 
 从几张随意拍摄的手机照片快速重建高保真、可驱动的3D头部Avatar，是数字人应用的核心需求。然而，现有方法面临两个根本性瓶颈：其一，面部与头发具有截然不同的几何特性——面部呈平坦表面，头发则呈现链状结构——但现有方案通常将它们耦合在统一的建模框架中，忽略了这种内在差异；其二，主流方法要么依赖密集多视图捕获与昂贵的逐身份优化（小时级），要么仅支持单视图前馈推理，在稀疏输入下难以同时保证身份一致性和发丝精细度。
 
@@ -50,8 +50,6 @@ claims:
 在NeRSemble基准上的实验表明，FHAvatar在6帧输入下达到**PSNR 23.71、SSIM 0.825、LPIPS 0.296、AKD 3.08**，全面优于现有优化类、前馈类和扩散类方法（Table 1）。即使在单帧输入的极端条件下，其AKD低至3.96，远低于其他方法（如LAM的48.64），验证了多视图先验和Transformer聚合在稀疏输入下的强大泛化能力。消融实验进一步证实：移除发丝分支导致PSNR下降1.82、LPIPS上升0.088（Table 2），面部区域IoU达0.922、头发区域IoU达0.826，分别领先最优基线6.7%和36%（Table 3），充分验证了解耦设计的有效性。此外，面部与头发的可组合性还支持无缝发型迁移和纹理空间风格化编辑等应用。
 
 方法定位上，FHAvatar属于**前馈3D高斯泼溅（3DGS）头部重建**路线，与优化类方法（如FlashAvatar、GaussianAvatars、MeGA）和前馈单视图方法（如GAGAvatar、LAM）形成对比，其关键区分点在于双分支解耦建模与多视图聚合Transformer的结合。
-
-## 背景与动机
 
 ### 问题背景
 
@@ -77,7 +75,7 @@ claims:
 2. **学习几何感知的跨视图先验**：通过聚合Transformer从任意数量和顺序的多视图数据中融合特征，建立鲁棒的头-发结构一致性，使模型在稀疏输入下仍能保持高质量重建和身份保持。
 3. **兼顾效率与细节**：单次前馈推理即可完成重建，同时提供可选的一分钟级轻量化细化，在推理速度和细节保真度之间取得灵活平衡。
 
-## 核心创新
+## 核心方法与创新机理
 
 FHAvatar 的核心创新在于**显式解耦面部与头发的几何表征与建模流程**，并构建了一个**几何感知的多视图聚合前馈框架**，从而在极稀疏、随意拍摄的输入下实现高保真、可实时驱动的 3D 头部 Avatar 重建。
 
@@ -110,8 +108,6 @@ FHAvatar 的关键设计是将面部与头发在 UV 纹理空间中**显式解�
 
 与逐身份需要数小时优化的方法（如 GaussianAvatars、MeGA）不同，FHAvatar 的核心推理是**单次前馈**过程。此外，论文提出了**可选的快速细化策略**：冻结编码器和 Transformer 骨干，仅对预测的聚合令牌和双分支解码器进行联合优化，耗时仅约一分钟。消融实验表明，**移除快速细化（w/o Finetune）使 PSNR 从 25.14 降至 23.85，SSIM 从 0.796 降至 0.780，LPIPS 从 0.333 升至 0.382**（Table 2），证明轻量化微调能显著提升身份细节保真度，同时保持实用级效率。
 
-## 整体框架
-
 FHAvatar 建立了一条前馈重建流水线，其核心设计围绕一个关键洞察展开：面部与头发具有截然不同的几何特性——面部平坦连续，而头发呈链状离散——因此必须在表征层面显式解耦，而非沿用以往方法中统一的耦合建模。整个框架由三个主要阶段构成：**多源令牌化编码**、**多视图聚合 Transformer 骨干**、以及**双分支高斯解码与渲染**，如 Figure 2 所示。
 
 ![[assets/figures/papers/paper_list_l1022_https_arxiv_org_abs_2603_23345/figures/002_Figure_2.jpg]]
@@ -133,8 +129,6 @@ FHAvatar 建立了一条前馈重建流水线，其核心设计围绕一个关�
 **可选快速细化。** 为进一步提升身份细节保真度，FHAvatar 提供一种轻量化微调策略：冻结编码器与 Transformer 骨干，仅对聚合后的令牌 $\mathbf{T}_{\mathrm{head}}$、$\mathbf{T}_{\mathrm{hair}}$ 及双分支解码器进行联合优化，耗时约一分钟级别，即可显著改善渲染质量（消融实验显示 PSNR 提升约 1.3 dB）。
 
 **训练目标。** 总损失由三项组成（Eq.10）：头发区域分离损失 $\mathcal{L}_{\mathrm{hair}}$ 强制面部与头发高斯在语义掩码上分离；光度重建损失 $\mathcal{L}_{\mathrm{photo}}$ 约束渲染图像与真值的一致性；正则化项 $\mathcal{L}_{\mathrm{reg}}$ 稳定训练。
-
-## 核心模块与公式推导
 
 FHAvatar 的核心架构围绕“纹理空间解耦建模 + 多视图聚合 Transformer + 双分支高斯解码”三条主线展开。以下按流水线顺序阐述关键模块及其公式化表达。
 
@@ -226,7 +220,7 @@ $$
 
 为进一步提升身份细节，FHAvatar 提供可选的轻量化微调阶段：冻结编码器和 Transformer 骨干，仅联合优化聚合令牌 $\mathbf{T}_{\mathrm{head}}$、$\mathbf{T}_{\mathrm{hair}}$ 和双分支解码器。该阶段仅需约一分钟，即可在保持泛化性的前提下显著提升重建保真度（PSNR 从 23.85 提升至 25.14，见 Table 2 消融）。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主要定量结果
 
@@ -283,9 +277,6 @@ FHAvatar的面部-头发可组合设计支持发型迁移（Figure 6），即使
 ![[assets/figures/papers/paper_list_l1022_https_arxiv_org_abs_2603_23345/figures/011_Table_3.jpg]]
 *Table 3: Face-Region and Hair-Region Evaluation Results*
 
-![[assets/figures/papers/paper_list_l1022_https_arxiv_org_abs_2603_23345/figures/009_Figure_5.jpg]]
-*Figure 5: Reconstruction quality improves with additional frames, helping the model capture finer details. Note that for varying input quantities, we perform refinement over the same epochs*
-
 ![[assets/figures/papers/paper_list_l1022_https_arxiv_org_abs_2603_23345/figures/013_Table_4.jpg]]
 *Table 4: Adaptive Hair Gaussians*
 
@@ -295,7 +286,7 @@ FHAvatar的面部-头发可组合设计支持发型迁移（Figure 6），即使
 ![[assets/figures/papers/paper_list_l1022_https_arxiv_org_abs_2603_23345/figures/004_Figure_3.jpg]]
 *Figure 3: Qualitative Comparison on reconstructing unseen identities from both in-the-wild data and the NeRSemble dataset under different capture conditions. LAM struggles to preserve identity similarity, while GAGAvatar and DiffusionRig fail to maintain accurate control under novel expressions or viewpoints. Optimization-based methods such as GaussianAvatars, FlashAvatar, and MeGA often fail to fit under sparse inputs. In contrast, our method delivers high rendering quality, supports accurate expression reenactment, and maintains consistent identity*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 方法谱系：从耦合建模到显式解耦
 

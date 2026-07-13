@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/OmniEVA_Embodied_Versatile_Planner_via_Task_Adaptive_3D_Grounded_and_Embodiment_aware_Reasoning.pdf
+project_link: https://omnieva.github.io
+code_link: null
 openreview_forum_id: tkEmIJv1tB
 aliases:
 - OmniEVA
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | OmniEVA：任务自适应3D锚定与具身感知的通用规划器 |
 | 英文题名 | OmniEVA: Embodied Versatile Planner via Task-Adaptive 3D-Grounded and Embodiment-aware Reasoning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=tkEmIJv1tB); [Project](https://omnieva.github.io) |
+| Links | [paper](https://openreview.net/forum?id=tkEmIJv1tB) · [Project](https://omnieva.github.io) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | OmniEVA |
 | Dataset | Where2Place, VSI-bench, PACO-LVIS, RoboRefit |
@@ -41,7 +43,7 @@ claims:
 > - VSI-bench 上，Accuracy 为 57.17，对比 42.69 (RoboBrain2.0-32B)，变化 +14.48。
 > - PACO-LVIS 上，Accuracy 为 21.01，对比 16.23 (RoboBrain2.0-32B)，变化 +4.78。
 
-## 概述
+## 概要
 
 **核心问题**：具身多模态大模型在从感知到规划的跨越中面临两个关键瓶颈。其一为**几何适应性差距**，现有方法或仅依赖2D输入导致空间感知不足，或采用硬编码方式静态注入3D信息，造成冗余计算与任务无关的干扰。其二为**具身约束差距**，规划过程通常忽略机器人自身的物理限制（如机械臂可达范围），导致生成的计划在语义上合理却无法实际执行。
 
@@ -55,7 +57,7 @@ claims:
 - TE-GRPO 使 OmniEVA-ER 在 Where2Approach 和 Where2Fit 上准确率分别提升28.95%和34.28%（Figure 5），在真实机器人杂乱场景放置任务中成功率从5-6/10提升至9/10（Table 6）。
 - 对未见机械臂长度（72–105cm），OmniEVA-ER 平均执行成功率达80.5%，远超基线的42.3%，展现出强具身泛化能力（Table 5）。
 
-## 背景与动机
+
 
 ### 具身多模态大模型的现实需求
 
@@ -78,7 +80,9 @@ claims:
 
 这一设计使得OmniEVA在7个2D/3D具身推理基准上达到最先进水平，相比先前最佳模型平均提升10.45个百分点（Figure 1），并在真实机器人任务中将成功率从5-6/10提升至8-9/10（Table 6）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 OmniEVA 针对具身多模态大模型的两大瓶颈——几何适应性差距与具身约束差距——提出了两个相互协同的关键创新。
 
@@ -108,7 +112,7 @@ $$r_{i,t}^{\mathrm{acc}} = r_{i}^{\mathrm{task}} \cdot (\lambda_t \cdot r_{i}^{\
 
 TAGR 与 TE-GRPO 并非孤立设计，而是形成互补闭环：TAGR 在感知层面提供任务自适应的空间理解，为规划提供精准的几何信息；TE-GRPO 在决策层面将物理约束注入规划过程，确保生成的动作序列在给定具身条件下可执行。两者共同实现了从“感知什么”到“如何执行”的端到端优化，使 OmniEVA 在 2D/3D 具身推理基准上平均超越先前最佳模型 10.45 个百分点（Figure 1, Table 2），并在目标导航任务中以 42.5 SPL（HM3D）刷新记录（Table 4）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_tkEmIJv1tB/figures/003_Figure_2.jpg]]
 *Figure 2: Model Architecture of OmniEVA. Left: The overall architecture of OmniEVA, featuring a novel task-adaptive gated router that dynamically incorporates 3D positional embeddings. Middle: Detailed implementation of the gated router module. Right: Illustrative examples of the gated router’s activation state across different tasks*
@@ -147,7 +151,7 @@ OmniEVA 采用递进式三阶段训练策略（Figure 3）：
 
 TAGR 的全局门控决策基于一个关键洞察：并非所有任务都需要 3D 空间信息。Figure 4 的分析证实，形状相关提示触发 3D 激活的概率高达 76.9%，而纯语义任务则很少激活。这种按需注入的策略在保证几何推理精度的同时，避免了冗余计算。TE-GRPO 则通过将物理约束（当前主要考虑机械臂长度）嵌入奖励函数，解决了规划理论可行却无法执行的核心瓶颈——Table 5 显示 OmniEVA-ER 对未见臂长（72–105cm）的平均执行成功率达 80.5%，远超基线的 42.3%。
 
-## 核心模块与公式推导
+
 
 OmniEVA 的架构围绕两个核心创新模块展开：**任务自适应门控路由器（TAGR）** 解决几何适应性差距，**任务与具身感知 GRPO（TE-GRPO）** 弥合具身约束差距。以下详述其关键设计与公式。
 
@@ -213,7 +217,9 @@ $$r_{i,t} = r_{i}^{\mathrm{format}} + r_{i,t}^{\mathrm{acc}}$$
 2. **监督微调（SFT）**：在混合具身推理数据集上微调全模型，建立广泛推理基础。
 3. **强化微调（RFT）**：使用 TE-GRPO 进行策略优化，通过渐进课程将物理约束内化至规划行为。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈验证：TAGR动态融合的必要性
 
@@ -269,7 +275,9 @@ Table 5展示了OmniEVA-ER对未见机械臂长度的强泛化能力。在72-105
 2. **具身约束的覆盖范围**：Table 5和Table 6仅考虑了机械臂长度这一维度。当面对自由度、安装高度、传感器视野等更广泛的物理参数变化时，模型的泛化性有待扩展。Table 5中105cm臂长上OmniEVA-ER的成功率（75.7%）已出现下降趋势，提示极端实施例可能触及当前表征的边界。
 
 3. **动态环境与长时域规划的未验证风险**：所有实验均在静态或准静态场景下进行。在动态环境和长时域任务中，模型的规划一致性与安全性尚未得到充分验证，这构成了从实验室到真实部署的关键缺口。
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与设计动机
 
@@ -312,6 +320,8 @@ OmniEVA 处于**2D 具身推理大模型**与**3D 视觉-语言模型**的交汇
 - 如何设计 patch 级门控策略，使模型能对场景中不同区域施加差异化的 3D 注入强度？
 - 在具身感知训练中纳入更多物理参数（如关节限位、基座高度、末端执行器类型）能否进一步增强跨实施例的鲁棒性？
 - 模型在复杂动态环境和长时域任务中的规划一致性如何保证？是否需要引入显式的世界模型或不确定性量化机制？
+
+
 
 ## 原文 PDF
 

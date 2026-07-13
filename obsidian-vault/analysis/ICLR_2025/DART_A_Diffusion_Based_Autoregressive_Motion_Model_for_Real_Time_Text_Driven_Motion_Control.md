@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2025
 pdf_ref: paperPDFs/ICLR_2025/DART_A_Diffusion_Based_Autoregressive_Motion_Model_for_Real_Time_Text_Driven_Motion_Control.pdf
+project_link: https://zkf1997.github.io/DART/
+code_link: null
 aliases:
 - DD
 - DART
@@ -41,15 +43,13 @@ claims:
 > - Text-conditioned temporal motion composition (human preference) 上，Semantic alignment preference (%) 为 51.3，对比 48.7 (FlowMDM)，变化 +2.6。
 > - Text-conditioned goal-reaching (walk) 上，Success rate 为 1.0 ± 0.0，对比 0.95 ± 0.03 (GAMMA)，变化 +0.05。
 
-## 概述
+## 概要
 
 文本驱动的3D人体运动生成在实时在线场景中面临根本性瓶颈：现有方法多为离线批量生成孤立的短运动片段，无法根据连续变化的自然语言指令自回归地生成长期连续运动，同时对空间约束（如目标位置、场景几何）缺乏精确控制能力。DART（DartControl）针对这一瓶颈，提出了基于运动原语的自回归生成范式，将长期运动分解为短运动原语（历史帧H=2，未来帧F=8），在VAE压缩的紧凑潜在空间内通过扩散模型实现文本条件的实时运动生成，速度超过300帧/秒，延迟仅0.02秒，比离线基线FlowMDM（Barquero et al., 2024）快约10倍且内存占用更少。
 
 在文本条件时间运动组合任务中，DART取得了最佳的FID指标，并在人类偏好研究中于运动真实性和语义对齐两方面均优于所有基线（包括FlowMDM），其中真实性偏好率达53.3%，语义对齐偏好率达51.3%。在文本条件目标到达任务中，DART的成功率达到100%，优于GAMMA基线（Zhang & Tang, 2022）的95%，且到达时间缩短约45%。消融实验进一步证实：去除VAE会导致运动抖动（峰值急动度PJ从0.06升至0.20），去除调度训练则使R-Prec从0.62骤降至0.39、FID从3.79升至8.08，验证了各模块的关键作用。
 
 DART的核心洞察在于：将长期运动分解为短原语进行潜在空间自回归生成，使模型能实时响应文本提示；同时通过在潜在噪声空间中优化或使用强化学习（PPO）训练策略，灵活实现文本语义与空间约束的统一。该方法在方法谱系上位于扩散生成模型、运动原语表示与潜在空间控制的交叉点，为实时文本驱动运动控制提供了新的技术路线。
-
-## 背景与动机
 
 ### 文本驱动人体运动生成的需求转变
 
@@ -77,7 +77,7 @@ DART的核心洞察在于：将长期运动分解为短原语进行潜在空间�
 
 DART的目标是统一文本语义理解和空间约束控制，在一个框架内实现实时、可控的长期运动生成，为交互式角色动画等应用提供实用解决方案。
 
-## 核心创新
+## 核心方法与创新机理
 
 DART 的核心创新在于将**长期连续运动生成**重新定义为**短运动原语的自回归潜在扩散**问题，从而在实时在线场景下同时实现文本语义响应与精确空间控制。相对于现有离线生成方法，DART 在三个关键维度上做出了根本性改变。
 
@@ -106,8 +106,6 @@ $$\mathbf{Z}_{T}^{*} = \operatorname{argmin}_{\mathbf{Z}_{T}} \mathcal{F}(\Pi(\m
 ### 创新总结
 
 DART 的三项核心改变形成了一条因果链路：**运动原语表示**使自回归在线生成成为可能，**VAE 潜在空间**在保证运动质量的同时为空间控制提供了可优化的低维流形，**调度训练**则确保了自回归长序列生成的稳定性。这一组合使 DART 成为首个在实时条件下同时实现文本语义对齐与精确空间控制的运动生成方法——比 FlowMDM 快约 10 倍，且在人类偏好研究中在运动真实性和语义对齐两方面均优于所有基线（Table 2）。
-
-## 整体框架
 
 DART 的整体 pipeline 围绕“运动原语的自回归潜在扩散”展开，将长期运动生成分解为短原语的在线组合，并在紧凑的潜在空间中完成文本条件生成与空间控制。系统由五个核心模块构成，形成“编码—扩散—自回归—控制”的闭环。
 
@@ -151,8 +149,6 @@ DART 在潜在空间内实现精确的空间控制，提供两种互补机制：
 
 ![[assets/figures/papers/paper_list_l13_DART_A_Diffusion_Based_Autoregressive_Motion_Model_for_Real_Time_Text_Dr/figures/001_Figure_1.jpg]]
 *Figure 1: Architecture illustration of DART. The encoder network compresses the future frames $\mathbf { X }$ = [ $\mathbf { x } ^ { 1 }$ , . . . , $\mathbf { x } ^ { F }$ ] into a latent variable, conditioned on the history frames $\mathbf { H }$ = [ $\mathbf { h } ^ { 1 }$ , . . . , $\mathbf { h } ^ { H }$ ] The decoder network reconstructs the future frames conditioned on the history frames and the latent sample. The denoiser network predicts the clean latent sample $\hat { \mathbf { z } } _ { 0 }$ conditioned on the noising step, text prompt, history frames, and noised latent sample $\mathbf { z } _ { t }$ . During the denoiser training, the encoder and decoder network weights remain fixed
-
-## 核心模块与公式推导
 
 DART 的核心架构由三个紧密协作的模块构成：**运动原语 VAE**、**潜在扩散去噪模型** 和**自回归 Rollout 算法**，三者共同支撑在线文本条件运动生成与控制。
 
@@ -204,7 +200,7 @@ $$\mathbf{Z}_{T}^{*} = \operatorname{argmin}_{\mathbf{Z}_{T}} \mathcal{F}(\Pi(\m
 
 **强化学习控制策略**：采用 Actor-Critic 架构，使用 PPO 算法在潜在动作空间中训练策略模型。预训练的 DART 去噪器和解码器将潜在动作转化为运动帧，最后一帧经规范化后作为下一步的历史条件反馈给策略模型，形成闭环控制。该策略在文本条件目标到达任务中实现了 100% 的成功率。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 评估基准与设置
 
@@ -265,12 +261,7 @@ Table 5 系统性地验证了 DART 各设计组件的贡献：
 2. **物理合理性不足。** 作为纯运动学方法，DART 可能产生滑步、浮空、穿透等物理不合理的运动。Figure 5 展示了将 DART 生成的爬行序列输入物理模拟追踪方法 PHC 后，能够修复手部穿地等伪影，表明结合物理模拟是可行的后处理方案。
 3. **长序列稳定性。** 自回归生成长序列时，尽管调度训练提升了稳定性，模型仍可能遇到分布外的历史-文本组合，导致动作质量逐渐下降。这一问题的根本解决需要更强大的数据增强或在线适应机制。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l13_DART_A_Diffusion_Based_Autoregressive_Motion_Model_for_Real_Time_Text_Dr/figures/006_Figure_3.jpg]]
-*Figure 3: Illustrations of human-scene interaction generation given text prompts and goal pelvis joint location (visualized as a red sphere). Best viewed in the supplementary video*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 与现有方法的关系与定位
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Arbitrary_Generative_Video_Interpolation.pdf
+project_link: https://mcg-nju.github.io/ArbInterp-Web/
+code_link: null
 openreview_forum_id: eKGkb4cFRe
 aliases:
 - AGVI
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 任意生成式视频插值 |
 | 英文题名 | Arbitrary Generative Video Interpolation |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=eKGkb4cFRe); [Project](https://mcg-nju.github.io/ArbInterp-Web/) |
+| Links | [paper](https://openreview.net/forum?id=eKGkb4cFRe) · [Project](https://mcg-nju.github.io/ArbInterp-Web/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | ArbInterp |
 | Dataset | MultiInterpBench (2× interpolation), MultiInterpBench (8× interpolation), MultiInterpBench (16× interpolation), MultiInterpBench (32× interpolation) |
@@ -41,7 +43,7 @@ claims:
 > - MultiInterpBench (8× interpolation) 上，FVD ↓ 为 33.0，对比 56.3 (DynamiCrafter)，变化 -23.3。
 > - MultiInterpBench (16× interpolation) 上，FVD ↓ 为 28.4，对比 49.7 (DynamiCrafter)，变化 -21.3。
 
-## 概述
+## 概要
 
 现有生成式视频帧插值（VFI）方法受限于固定帧率生成范式，只能输出预设数量的中间帧，无法灵活调整帧率或时长，且缺乏对连续运动场细粒度建模的能力。针对这一瓶颈，本文提出 **ArbInterp**，一个支持任意时间戳与任意长度插值的生成式 VFI 框架。
 
@@ -49,7 +51,7 @@ ArbInterp 的核心思路是将视频帧插值转化为归一化时间戳 $[0,1]
 
 实验表明，ArbInterp 在多尺度插值（2× 至 32×）上全面超越现有方法：在 MultiInterpBench 基准上，2× 插值的 FVD 降至 44.9（此前最佳 DynamiCrafter 为 57.2），8× 插值 FVD 降至 33.0（此前最佳 56.3），16× 和 32× 插值同样保持领先。在 256× 极端插值场景下，FVD 进一步降至 242.3，显著优于对比方法。消融实验证实 TaRoPE 对时间戳的精确控制能力（运动平滑度 0.9817 vs 无时间戳注入的 0.9637），以及外观-运动解耦策略在提升一致性的同时降低约 40% 计算开销的优势。三阶段训练策略（基础插值→连续性学习→联合微调）使模型在有限资源下达到最优性能。
 
-## 背景与动机
+
 
 ### 视频帧插值的核心挑战
 
@@ -81,7 +83,9 @@ ArbInterp 的核心思路是将视频帧插值转化为归一化时间戳 $[0,1]
 
 通过这些设计，ArbInterp将VFI从“固定倍数生成”转变为“任意时刻、任意长度的连续帧生成”，为灵活可控的视频插值开辟了新的技术路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ArbInterp 的核心创新在于将视频帧插值从固定帧数生成重新定义为**连续时间戳上的任意帧生成问题**，并围绕这一范式转换设计了两个关键 changed slots：时间戳感知的旋转位置嵌入（TaRoPE）与外观-运动解耦条件策略。
 
@@ -119,7 +123,7 @@ MSE 的结构（Figure 9）为：先用时序增强的 CLIP 提取时空特征�
 
 需要指出，当前 ArbInterp 仅以首尾帧作为条件输入，未使用文本或其他语义条件，限制了生成的可控性。此外，模型基于 Wan2.1 1.3B 参数规模，训练数据为 5 万视频片段，在极端复杂场景下的质量上限可能受约束。段间的绝对一致性仍受生成随机性影响，尚未达到理论最优。这些局限为后续将文本引导整合进连续时间戳框架、以及在更大规模数据上验证提供了明确方向。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0010_eKGkb4cFRe_Arbitrary_Generative_Video_Interpolation/figures/002_Figure_2.jpg]]
 *Figure 2: Overall architecture of ArbInterp. Our framework enables arbitrary-length interpolation with continuous timestamps using Timestep-aware Rotary Position Embedding (TaROPE). Additionally, we introduce an appearance-motion decoupling conditioning strategy to enhance the performance of long-term interpolation. This strategy ensures appearance consistency via prefix frame guidance and enforces motion continuity through motion tokens*
@@ -162,7 +166,7 @@ $$[\mathbf{x}_{t_1}, \dots, \mathbf{x}_{t_n}] = \mathrm{ArbInterp}(\mathbf{x}_0,
 
 模型采用三阶段渐进训练：第一阶段学习基本插值能力（固定帧数），第二阶段引入连续时间戳和分段训练以泛化至任意长度，第三阶段联合微调外观-运动解耦条件模块。消融实验（Table 4）表明，完整三阶段训练的 FVD₃₂ₓ 为 319.9，显著优于仅进行第三阶段训练的 401.6，验证了渐进式训练对复杂长序列插值的必要性。
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题形式化与生成范式
 
@@ -217,7 +221,9 @@ $$t_k = \frac{k - 1}{N - 1}, \quad \mathrm{s.t.}\ 1 \leq k \leq N \tag{5}$$
 
 消融实验（Table 2）表明，该策略在 Subject Consist.（0.9441 vs 0.9297 移除外观）、Temporal Flick.（0.9624 vs 0.9549 移除运动）上均有显著提升，且推理步时从 4.4s（潜在拼接）降至 2.6s，效率提升约 40%。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 多尺度插值主结果
 
@@ -277,7 +283,9 @@ Table 4 验证了三阶段训练的必要性。仅进行第三阶段（直接学
 2. **段间绝对一致性**：尽管外观-运动解耦策略显著改善了段间过渡，但生成过程的随机性仍可能导致段边界处的微小外观偏移，尚未达到理论最优。
 3. **缺乏语义条件**：当前模型仅以首尾帧为输入，无文本或其他语义引导，限制了可控性和复杂语义推理能力。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有方法的谱系关系
 
@@ -318,6 +326,8 @@ ArbInterp 的核心突破在于将 VFI 任务重新定义为**归一化时间戳
 3. **运动语义提取器的通用化**：外观-运动解耦中的运动语义提取器（MSE）通过时间增强 CLIP 和 Q-Former 将前序帧的运动信息压缩为固定数量的令牌。这一模块能否进一步抽象为更通用的运动先验，服务于跨域风格迁移、运动重定向等下游任务？Figure 10 的初步实验表明这一方向具有可行性，但需要更系统的验证。
 
 4. **规模扩展的收益边界**：在更大规模的数据集（如百万级视频片段）和更大模型（如 10B+ 参数）上，ArbInterp 的复杂场景性能是否会出现质变？还是说，当前架构的瓶颈在于时间表示本身，而非模型容量？这需要系统的扩展实验来回答。
+
+
 
 ## 原文 PDF
 

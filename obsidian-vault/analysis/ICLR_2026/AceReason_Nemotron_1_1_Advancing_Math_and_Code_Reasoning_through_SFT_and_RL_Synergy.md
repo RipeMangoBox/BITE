@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/AceReason_Nemotron_1_1_Advancing_Math_and_Code_Reasoning_through_SFT_and_RL_Synergy.pdf
+project_link: null
+code_link: null
 aliases:
 - AN11
 - AN11AMCRTSRS
@@ -41,13 +43,13 @@ claims:
 > - AIME 2025 上，avg@64 为 64.8，对比 39.0，变化 +25.8。
 > - LiveCodeBench v5 上，avg@8 为 57.2，对比 37.6，变化 +19.6。
 
-## 概述
+## 概要
 
 针对数学与代码推理任务，现有7B规模模型通常将监督微调（SFT）与强化学习（RL）割裂使用，或只依赖大模型蒸馏，缺少对二者协同作用的系统性研究。本工作提出AceReason-Nemotron 1.1，核心发现是：**通过大规模增加SFT阶段独特题目的数量（而非单纯增加每道题的回答数），并与阶段式RL（先数学后代码）协同训练，可在7B规模同时刷新数学与代码推理的SOTA。** 训练过程中，将采样温度调节至温度调整后的熵保持在0.3左右，能在探索与利用间取得良好平衡；在短Token预算（8K/16K）下应用过长时间过滤能显著提升性能，但在32K阶段移除该过滤则带来进一步增益。
 
 主要结果：**在AIME 2024上达到72.6（avg@64），AIME 2025上达到64.8，分别较前一版本提升17.1和25.8个百分点；在LiveCodeBench v5上达到57.2，v6上达到52.1，分别提升19.6和18.0个百分点**，均显著超越同级别的蒸馏SFT基线及RL基线方法。消融实验进一步证实：更强SFT模型在RL后能持续获得更优的最终表现，且通过前期短Token压缩迫使模型发展出简洁推理，能有效提高后期长链推理的收益。
 
-## 背景与动机
+
 
 大语言模型在数学与代码推理任务上持续进步，但此前的后训练流程普遍将监督微调（SFT）与强化学习（RL）视为孤立的步骤，或直接通过蒸馏从大模型获取推理能力（如 DeepSeek‑R1‑Distill、Light‑R1 等）。这种做法缺乏对 SFT 与 RL 之间协同作用的系统研究，导致 7B 级别模型难以同时大幅提升数学与代码双重推理能力。三个关键缺口尤为突出：
 
@@ -57,7 +59,9 @@ claims:
 
 针对上述缺口，本文的动机在于证明：以大规模独特题目进行强 SFT 初始化，并采用分阶段 RL（先数学后代码）与精细控制（温度调节至熵约 0.3、按阶段开关的过长过滤），可在 7B 规模上同时刷新数学与代码推理的 SOTA。实验表明，更强 SFT 模型经 RL 后仍持续保持优势（即使差距在训练中缩小），而上述调节正是解锁长尾难题、实现高效推理的核心约束。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 AceReason-Nemotron 1.1 的核心突破在于**系统性地解耦 SFT 与 RL 的协同机制**，并在数据、温度策略与长度过滤三处关键节点进行了**非蒸馏式创新**，从而在 7B 参数规模上同时刷新数学与代码推理的 SOTA。其关键改变的 slot 及机理如下。
 
@@ -75,7 +79,7 @@ AceReason-Nemotron 1.1 的核心突破在于**系统性地解耦 SFT 与 RL 的�
 
 此外，与上述三个 slots 紧密配合，**分阶段渐进式 RL 管道**（先数学三阶段逐步增长响应长度，再代码 RL，最后数学精调）以及**强 SFT 初始化 + RL 协同**（更强的 SFT 在 RL 后始终保持优势，且 RL 可解锁定长尾难题，见 Figure 4 和 Figure 15）共同构成了实现 SOTA 的系统性框架。这些设计的消融证据均在正文和附录中量化验证，无需额外推测。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0005_IaEqjWXd1d_AceReason-Nemotron_1.1_Advancing_Math_and_Code_R/figures/001_Figure_1.jpg]]
 *Figure 1: Training Pipeline of AceReason-Nemotron 1.1. We start by performing math and code SFT on a base pretrained model. Next, we conduct three stages of math-only RL training with progressively growing response length, i.e., Stage-1 (8K), Stage-2 (16K), and Stage-3 (24K), to develop a math-specialized RL model. We then apply code-only RL training to enhance model's coding capability. Lastly, we carry out a final stage of math-only RL to produce AceReason-Nemotron 1.1*
@@ -105,7 +109,7 @@ RL 阶段根据任务领域和生成长度限制（token budget）被拆分为�
 
 这一设计使得最终模型在数学（AIME 2024/2025）与代码（LiveCodeBench v5/v6）基准上同时实现了 7B 规模下的新 SOTA，且强 SFT 模型在 RL 后仍能带来持续性能增益，尽管差距会有所缩小（Abstract）。
 
-## 核心模块与公式推导
+
 
 结合材料说明，AceReason‑Nemotron 1.1 的训练流程由两部分组成：（1）数学/代码联合监督微调（SFT）构建强基模型；（2）分阶段的强化学习（RL）逐步提升推理能力。由于论文未提供封闭形式的公式，本节重点阐述关键模块及其背后的量化机制，并说明在缺少显式公式的情况下，哪些规律替代了常规推导。
 
@@ -160,7 +164,9 @@ AceReason‑Nemotron 1.1 的核心由"大规模题目驱动的 SFT"与"长度、
 
 本文所有分析均来自论文的验证摘要和分片证据，未发现任何显式公式，故不进行猜测。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：7B 规模数学与代码推理新 SOTA
 
@@ -218,7 +224,9 @@ SFT 多 epoch 实验（Figure 8，附录）显示，模型性能在 5‑6 个 ep
 
 综上，AceReason‑Nemotron 1.1 通过 SFT 题目数量优先扩展、温度‑熵协同调控、分阶段过滤策略以及先数学后代码的 RL 编排，系统性克服了先前方法割裂 SFT 与 RL 的瓶颈，实现了 7B 级别数学与代码推理的双重突破。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 AceReason‑Nemotron‑1.1 定位在 **SFT 与 RL 协同后训练** 的交叉点上，本质上是对"先大规模监督微调、后阶段式强化学习"这一路径的系统性实证。与之直接竞争的基线可分为两类：一类是仅依赖蒸馏或有限 SFT 的模型（如 DeepSeek‑R1‑Distill‑Qwen‑7B、Light‑R1‑7B、OpenMath‑Nemotron‑7B 等），另一类是直接应用 RL 但未精细调节数据与训练配方的模型（如 Skywork‑OR1系列、OlympicCoder‑7B 及前一版本 AceReason‑Nemotron‑1.0‑7B）。本工作的核心突破在于 **把 SFT 数据扩展（题目数量>回答数量）、RL 温度调节（使温度调整后熵≈0.3）与阶段性过长过滤（短预算用、长预算弃）耦合在一起**，从而在 7B 规模同时刷新数学与代码推理的 SOTA（Table 1）。相较此前最强的同架构 RL 基线和蒸馏基线，它在 AIME 2024/2025 上分别取得 +17.1 和 +25.8 的 avg@64 提升，在 LiveCodeBench v5/v6 上的 avg@8 提升超过 +18 点，且这些结果均在同一推理模板、温度 0.6、top‑p 0.95 和 9‑gram 去污染下评估，保证了公平性。
 
@@ -248,6 +256,8 @@ AceReason‑Nemotron‑1.1 定位在 **SFT 与 RL 协同后训练** 的交叉点
 5. **过长时间过滤在更长 token 预算下是否仍然必要？** Table 2 中 64K 推理且不带过滤时，部分基准分数与 32K 带过滤持平，提示未来若能容忍极长输出，或许可完全弃用过滤，但这将引入极高的推理成本。其收益-成本权衡需要更系统的量化。
 
 整体而言，AceReason‑Nemotron‑1.1 在 SFT‑RL 协同的工程实践上确立了一套可复现的组合配方，但其结论的鲁棒性很大程度上绑定于当前的任务分布、模型大小和数据设置，留出了从缩放律、跨任务泛化及多阶段学习理论等多个方向进行深入探索的空间。
+
+
 
 ## 原文 PDF
 

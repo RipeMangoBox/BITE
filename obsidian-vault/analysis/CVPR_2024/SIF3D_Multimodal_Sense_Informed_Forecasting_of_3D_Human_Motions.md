@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2024
 pdf_ref: paperPDFs/CVPR_2024/SIF3D_Multimodal_Sense_Informed_Forecasting_of_3D_Human_Motions.pdf
+project_link: null
+code_link: null
 aliases:
 - SMSIF3HM
 tags:
@@ -39,7 +41,7 @@ claims:
 > - GIMO 上，Traj-dest (mm) 666 vs 727 (BiFu w/ Scene+Gaze) (-61)；MPJPE-dest (mm) 195.7 vs 205.0 (BiFu w/ Scene+Gaze) (-9.3)。
 > - GTA-1M 上，Traj-dest (mm) 836 vs 903 (BiFu w/ Scene+Gaze) (-67)；MPJPE-dest (mm) 227.7 vs 234.2 (BiFu w/ Scene+Gaze) (-6.5)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有3D人体运动预测方法通常将场景信息编码为统一的全局嵌入，无法区分场景中不同空间点的显著程度。这导致预测的人体轨迹与姿态经常与环境几何发生穿透或失真，违背物理合理性约束。
 
@@ -49,7 +51,7 @@ claims:
 
 **主要结果**：在 GIMO 和 GTA-1M 两个基准数据集上，SIF3D 同时提升了轨迹和姿态的长期预测精度，相比强基线 BiFu 在终点轨迹误差上分别降低 61mm 和 67mm（Table 1）。消融实验证实，TIA 和 SCA 两个注意力模块均不可或缺：移除 TIA 导致终点轨迹误差增加 111mm，移除 SCA 导致终点轨迹误差增加 37mm、终点姿态误差增加 4.7mm（Table 4）。定性可视化表明，SIF3D 能够区分场景中的显著点与底层点，生成的运动序列在多个视角下均与场景几何保持一致（Figure 1, Figure 3）。
 
-## 背景与动机
+
 
 ### 3D 场景感知的人体运动预测
 
@@ -79,7 +81,9 @@ claims:
 
 这些动机共同指向一个核心洞察：**同时利用 3D 场景点云、人类注视和运动历史三模态信息，通过全局运动意图和局部姿态语义分别驱动场景显著性建模，是实现长时、物理合理的人体运动预测的关键路径**。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SIF3D 的核心创新在于**将场景从“平等的背景”转变为“具有显著性的意图场”**。现有方法（如 **BiFu**，Zheng et al., ECCV 2022）通常将 3D 场景编码为一个统一的全局嵌入，同等对待场景中的所有点云。这种无差别的表征方式导致模型无法区分哪些场景区域对当前运动目标至关重要（如即将经过的走廊、即将坐下的椅子），哪些仅仅是底层背景。其直接后果是预测的人体轨迹和姿态经常与场景几何发生穿透或失真，无法满足物理合理性约束（Figure 1）。
 
@@ -105,7 +109,7 @@ Table 1 的证据表明，同时引入 3D 场景和人类注视信息能够一�
 
 综上，SIF3D 的创新本质在于**将场景建模从被动的环境编码升级为主动的意图感知显著性场**，并通过多模态协同和解耦预测架构，实现了长时、物理合理的 3D 人体运动预测。
 
-## 整体框架
+
 
 SIF3D 的整体设计围绕一个核心瓶颈展开：**现有方法将 3D 场景编码为统一的全局嵌入，无法区分场景中不同点的显著程度**，导致预测的人体轨迹和姿态经常与环境发生穿透或失真。为解决这一问题，SIF3D 同时引入**运动序列、3D 场景点云和人类注视**三模态信息，通过两个互补的注意力机制——三元意图感知注意力（TIA）和语义一致性注意力（SCA）——分别服务于全局轨迹规划和局部姿态预测，从而显式区分场景中的显著点与底层点。
 
@@ -156,7 +160,7 @@ SIF3D 的整体设计围绕一个核心瓶颈展开：**现有方法将 3D 场�
 
 当前框架专注于确定性预测，未涉及多模态运动生成中的多样性问题；对复杂的动态场景和人-物交互（如抓取、操作物体）尚未进行验证；GTA-1M 数据集缺少真实人类注视数据，采用近似估计可能影响意图建模的准确性。
 
-## 核心模块与公式推导
+
 
 SIF3D 的核心架构围绕“解耦全局轨迹规划与局部姿态预测”这一设计原则展开，其关键创新在于两个互补的跨模态注意力模块：三元意图感知注意力（TIA）和语义一致性注意力（SCA）。以下按信息流顺序阐述各模块及其关键公式。
 
@@ -233,7 +237,9 @@ TIA 和 SCA 的协同作用体现在两个层面：**时间尺度上**，TIA 关
 ![[assets/figures/papers/paper_list_l1725_SIF3D_Multimodal_Sense_Informed_Forecasting_of_3D_Human_Motions/figures/001_Figure_1.jpg]]
 *Figure 1: The proposed SIF3D: multimodal Sense-Informed Forecasting of 3D human motions. Our SIF3D takes the observed motion sequence, as well as the 3D scene point cloud as input modalities, and is able to identify salient points (redder) and underlying ones (bluer), to generate the accurate trajectory and high-fidelity future poses within given 3D scenarios. In contrast, the state-of-the-art baseline of BiFu [73] equally considers the global scene embedding, and thus cannot distinguish the saliency of the 3D scene, leading to the physically implausible motions, e.g., human mesh intersecting or distorting with the 3D environment, violating any physical constraints*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与设计动机
 
@@ -321,7 +327,9 @@ TIA模块中的时序聚合器负责将运动嵌入压缩为全局运动表示�
 2. **动态场景与人-物交互未验证**：实验场景均为静态3D环境，对包含移动物体或需要抓取、操作物体的复杂交互任务尚未进行验证。
 3. **注视数据的近似性**：GTA-1M数据集缺少真实人类注视数据，采用近似估计，可能影响意图建模的准确性，该结论在GTA-1M上的泛化性需谨慎解读。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -362,6 +370,8 @@ SIF3D 相对于这些基线做出了三个关键的方法论改进：
 **人-物交互的显著性扩展**：将场景点云扩展为包含物体实例的语义图，使 TIA 能够关注与任务目标相关的物体点，SCA 能够为手部姿态预测提供物体几何约束，有望将框架推广到操作任务。
 
 **真实场景部署**：从 GIMO 的室内扫描场景和 GTA-1M 的游戏渲染场景迁移到真实世界的动态环境，需要解决传感器噪声、部分遮挡和实时性要求等工程问题。Table 5 显示场景点云从 512 增至 4096 时性能持续提升，但进一步增大则饱和，这为实际部署中的分辨率选择提供了参考。
+
+
 
 ## 原文 PDF
 

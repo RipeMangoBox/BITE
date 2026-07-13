@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2024
 pdf_ref: paperPDFs/ICLR_2024/Duolando_Follower_GPT_with_Off_Policy_Reinforcement_Learning_for_Dance_Accompaniment.pdf
+project_link: https://lisiyao21.github.io/projects/Duolando
+code_link: https://github.com/karpathy/minGPT
 aliases:
 - Duolando
 tags:
@@ -38,7 +40,7 @@ claims:
 > [!tip] 效果简介
 > - DD100 (test set) 上，FID_k (↓) - 跟随者运动质量 25.30 vs 78.52 (Bailando) (-53.22 (68% improvement))；FID_k (↓) - 跟随者运动质量 25.30 vs 69.14 (EDGE) (-43.84 (63% improvement))；FID_cd (↓) - 交互协调质量 9.97 vs 21.68 (Duolando w/o RL) (-11.71 (54% reduction))。
 
-## 概述
+## 概要
 
 **核心问题**：舞蹈伴奏任务要求生成与领舞者实时协调的跟随者动作。现有GPT或独舞方法在此任务中面临两个关键瓶颈——下肢运动与全局位移不一致导致的**滑步伪影**，以及在未见过的音乐/领舞条件下**稳定性差**、难以保持协调交互。
 
@@ -53,7 +55,7 @@ claims:
 
 **局限提示**：用户研究中完整Duolando仅在约15%的对比中超过真实舞蹈，生成质量与专业舞者仍有较大差距；离线RL的奖励设计主要针对滑步问题，未显式考虑接触质量、风格保持等更细粒度的交互维度。
 
-## 背景与动机
+
 
 ### 双人舞蹈伴奏：从独舞生成到交互协调
 
@@ -84,7 +86,9 @@ Duolando 的提出旨在系统性解决上述瓶颈。其核心洞察是：将�
 
 这一动机在实验中得到有力验证：引入离线 RL 后，滑步比从 1.06% 降至 0.33%（下降 69%，Table 6），交互质量指标 FID_cd 从 21.68 降至 9.97（改善 54%，Table 2），同时运动质量 FID_k 从 106.72 降至 25.30（改善 76%）。这些结果表明，**监督预训练提供生成基础，离线 RL 赋予 OOD 鲁棒性与物理一致性**，二者互补构成了解决舞蹈伴奏任务的有效范式。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Duolando 的核心创新在于将**舞蹈伴奏（dance accompaniment）重新建模为基于 GPT 的自回归序列生成任务**，并通过**离线策略强化学习（off-policy RL）** 赋予模型在分布外（OOD）条件下自我纠错的能力。与现有独舞生成方法（如 Bailando、EDGE）仅以音乐为条件不同，Duolando 同时接收音乐与领舞者（leader）动作作为条件，自回归地预测跟随者（follower）的全身运动序列及两者的相对位移。
 
@@ -133,7 +137,7 @@ $$ \mathcal{L}_{RL}^{\mathrm{off}}(\theta) = \sum_{t=0}^{T-1} -\log(1 - \operato
 
 这一设计使得 Duolando 在交互质量（FID_cd 从 21.68 降至 9.97）、运动质量（FID_k 从 106.72 降至 25.30）和物理合理性（SR 降至 0.33%）三个维度上均实现了显著提升（Table 2, Table 6）。
 
-## 整体框架
+
 
 Duolando采用两阶段流水线架构，将舞蹈伴奏任务建模为基于GPT的自回归序列生成问题。第一阶段通过VQ-VAE对运动与空间关系进行离散化编码，第二阶段由交互协调GPT在量化空间中自回归生成跟随者动作序列，并引入离线策略强化学习（off-policy RL）微调以消除滑步伪影并提升分布外（OOD）鲁棒性。
 
@@ -150,7 +154,7 @@ Duolando采用两阶段流水线架构，将舞蹈伴奏任务建模为基于GPT
 ![[assets/figures/papers/paper_list_l1897_Duolando_Follower_GPT_with_Off_Policy_Reinforcement_Learning_for_Dance_A/figures/005_Figure_4.jpg]]
 *Figure 4: Structure of follower GPT. The GPT takes ten inputs and autoregressively predicts the subsequent tokens of follower’s motion and the relative translation. Preconditions (music signals and leader’s motion) are integrated with Look-Ahead Transformers (LAT)*
 
-## 核心模块与公式推导
+
 
 Duolando采用两阶段流水线：先通过VQ-VAE将连续运动序列离散化为code序列，再由交互协调GPT自回归地生成跟随者动作。以下按模块顺序解析关键公式与设计。
 
@@ -236,7 +240,9 @@ $$\mathcal{L}_{ST}(\theta) = \sum_{t=0}^{T-1} -\log(\pi_{\theta}(a_t \mid s_t))$
 ![[assets/figures/papers/paper_list_l1897_Duolando_Follower_GPT_with_Off_Policy_Reinforcement_Learning_for_Dance_A/figures/004_Figure_3.jpg]]
 *Figure 3: (a) Structures of Motion VQ-VAEs and (b) Relative Translation VQ-VAE. The quantization is to substitute a encoded feature to the most similar one*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -292,7 +298,9 @@ Duolando 在舞蹈生成领域的方法谱系中，位于独舞生成基线（Ba
 ![[assets/figures/papers/paper_list_l1897_Duolando_Follower_GPT_with_Off_Policy_Reinforcement_Learning_for_Dance_A/figures/008_Figure_6.jpg]]
 *Figure 6: Qualitative results (a) and user study (b). In qualitative results, conditioning leader is colored in gray while generated followers are in red. In boxplot of user study, triangles and colored lines are mean and median values, respectively. Circles are outliers beyond 1.5× interquartile range (3σ in normal dist.)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1 任务定位：从独舞生成到双人交互伴奏
 
@@ -335,6 +343,8 @@ $$\mathcal{L}_{RL}^{\mathrm{off}}(\theta) = \sum_{t=0}^{T-1} -\log(1 - \operator
 4. **离线RL对预训练质量的依赖。** 离线RL的有效性是否高度依赖初始监督训练的质量？在不充分预训练的情况下，RL能否从随机策略开始学习？这一问题的答案决定了方法的鲁棒性和部署灵活性。
 
 5. **跨领域迁移。** 本方法的VQ-VAE + GPT + 离线RL框架是否能应用于其他双人交互运动（如武术对练、体育双人项目、手语对话）？需要哪些领域特定的改动（如关节拓扑适配、交互奖励重定义）？
+
+
 
 ## 原文 PDF
 

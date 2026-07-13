@@ -43,7 +43,7 @@ claims:
 > - PoseTrack2018 val 上，mAP 84.2 (ViT-H) vs 82.4 (ViTPose ViT-H) (+1.8)。
 > - PoseTrack21 val 上，mAP 84.1 (ViT-H) vs 82.0 (ViTPose ViT-H) (+2.1)。
 
-## 概述
+## 概要
 
 **核心问题**：现有基于Vision Transformer（ViT）的姿态估计方法对视频进行逐帧独立处理，完全忽略帧间的时间连贯性，导致在运动模糊、遮挡和散焦等挑战性场景下预测不稳定、抖动明显。
 
@@ -56,7 +56,7 @@ claims:
 
 **证据强度**：上述结论由多组消融实验和跨基准对比支持，置信度较高；但方法未显式强制帧间时间一致性，在严重遮挡场景下可能仍存在轻微的时间不一致，需在实际部署中关注。
 
-## 背景与动机
+
 
 ### 问题背景：视频人体姿态估计的时序挑战
 
@@ -87,7 +87,9 @@ claims:
 
 这一动机直接催生了本文提出的**TAR-ViTPose**（Temporal Aggregate-and-Restore Vision Transformer），其核心创新在于**关节中心时间聚合（JTA）** 与**全局恢复注意力（GRA）** 两个模块的协同设计：JTA通过可学习的关节查询令牌和掩码感知交叉注意力实现帧间关节特征的精确对齐与聚合；GRA则将聚合的时间信息注入当前帧的特征序列，恢复全局上下文，最终通过原有的轻量解码器生成鲁棒且准确的姿态估计结果。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 TAR‑ViTPose 的核心创新在于将视频时序建模以**即插即用**的方式注入单帧 ViT 姿态估计框架，形成一个“时间聚合‑恢复”范式，其关键改动槽位（changed slots）如下。
 
@@ -123,7 +125,7 @@ TAR‑ViTPose 的核心创新在于将视频时序建模以**即插即用**的�
 
 上述四个槽位改动共同构成了一个因果链：**时间聚合（JTA）→ 关节级对齐（掩码感知注意力）→ 上下文恢复（GRA）→ 鲁棒解码**。其中，掩码感知注意力是精度增益的关键杠杆——消融实验表明，引入掩码感知注意力可额外带来 **+1.4 mAP** 的提升（Table 6）；而 GRA 则是防止信息瓶颈的结构性保障，缺失时将导致性能崩溃。该因果链使得 TAR‑ViTPose 在 PoseTrack2017/2018/2021 三个基准上均取得最优性能，同时保持 **413 fps** 的高推理效率（Table 3）。
 
-## 整体框架
+
 
 TAR‑ViTPose 在单帧基线 **ViTPose** 之上构建了一个即插即用的时间建模流水线，其核心思想是：**以当前帧的姿态估计为目标，显式聚合相邻帧的时间线索，并将增强后的时空表示恢复到当前帧的特征序列中**。整个流水线由五个模块串联而成，形成“编码→聚合→恢复→解码→掩码生成”的闭环。
 
@@ -199,7 +201,7 @@ $$
 ![[assets/figures/papers/paper_list_l1009_https_arxiv_org_abs_2603_05929/figures/002_Figure_2.jpg]]
 *Figure 2: The pipeline of the proposed Temporal Aggregate-and-Restore Vision Transformer (TAR-ViTPose). The objective is to estimate the human pose of the current frame*
 
-## 核心模块与公式推导
+
 
 TAR‑ViTPose 的核心思想是在 ViT 编码器之后插入一个即插即用的时间建模模块，利用相邻帧的时间线索增强当前帧的特征表示，而不是改变原有的编码器‑解码器结构。该模块由两个关键子模块组成：**Joint‑centric Temporal Aggregation (JTA)** 和 **Global Restoring Attention (GRA)**。
 
@@ -268,7 +270,9 @@ $$
 ![[assets/figures/papers/paper_list_l1009_https_arxiv_org_abs_2603_05929/figures/010_Figure_4.jpg]]
 *Figure 4: Visualization of attention heatmaps for joint query tokens with (b) and without (a) mask-aware attention. Given a current frame Xi(t) and a neighboring frame Xi(t −T ), we visualize the attention heatmaps of three different joint query tokens with respect to the features of Xi(t − T ). See Supp. Material for more*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -344,7 +348,9 @@ Figure 3 展示了 TAR‑ViTPose 与 ViTPose、DCPose、DSTA、Poseidon 在遮�
 ![[assets/figures/papers/paper_list_l1009_https_arxiv_org_abs_2603_05929/figures/019_Table_14.jpg]]
 *Table 14: Different number of auxiliary frames. ‘-’ indicates previous frames while ‘+’ indicates subsequent frames*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与单帧基线的关系
 
@@ -373,6 +379,8 @@ TAR‑ViTPose 的适用边界受以下因素制约：
 2. **复杂运动模式鲁棒性**：在快速动作、密集人群遮挡、大幅度姿态变化等更具挑战的运动模式下，当前关节查询令牌的对齐精度是否仍然可靠，需要进一步验证。
 3. **跨任务泛化能力**：JTA/GRA 的“聚合‑恢复”范式本质上是一种通用的时空特征增强策略，其是否可推广到其他视频密集预测任务（如视频目标分割、动作识别、视频超分辨率）是一个值得探索的开放问题。
 4. **掩码感知注意力的替代方案**：当前掩码依赖解码热图的阈值二值化，这一过程引入了解码器预测质量的依赖。是否存在更直接的空间引导机制（如可学习的空间先验或基于特征的注意力偏置）值得研究。
+
+
 
 ## 原文 PDF
 

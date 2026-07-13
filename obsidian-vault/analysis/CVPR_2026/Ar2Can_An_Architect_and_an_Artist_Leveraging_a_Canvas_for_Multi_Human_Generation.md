@@ -42,7 +42,7 @@ claims:
 > - MultiHuman-Testbench 上，Count Accuracy 90.2 (Arch-A) vs GPT-Image-1 87.9 (+2.3)；Multi-ID Similarity 68.2 (Arch-B) vs MH-OmniGen 54.5 (+13.7)；HPSv2 Quality 30.8 (Arch-B) vs GPT-Image-1 30.3 (+0.5)。
 > - MultiID-Test 上，Multi-ID (Ref) 54.3 vs WithAnyone 50.1 (+4.2)。
 
-## 概述
+## 概要
 
 **问题症结**：现有扩散模型在生成多人场景时，将空间布局规划与身份特征渲染耦合在单阶段流程中，导致身份混叠、人脸丢失、人数计数错误等系统性问题。随着人数增加，这种耦合引发的失败呈指数级放大。
 
@@ -52,7 +52,7 @@ claims:
 
 **主要结果**：在 MultiHuman-Testbench 基准上，Ar2Can 的计数准确率达到 **90.2%**，Multi-ID 身份相似度达到 **68.2**，统一评分 **72.4**，分别超越现有最佳方法 2.3、13.7 和 10.8 个百分点。用户偏好研究中，Ar2Can 在提示对齐、身份相似度和图像质量三个维度均显著优于对比方法。
 
-## 背景与动机
+
 
 扩散模型在文本到图像生成领域取得了显著进展，但在**参考图像引导的多人场景生成**这一任务上仍面临根本性瓶颈。当用户提供多张参考人脸图像并要求生成包含这些特定人物的合照时，现有方法普遍出现**身份混叠**（不同人物的面部特征相互融合）、**人脸丢失**（部分参考人物未出现在生成图像中）以及**人数计数错误**（生成人数与提示要求不符）等问题。
 
@@ -62,7 +62,9 @@ claims:
 
 Ar2Can 的核心动机正是针对上述瓶颈：**将多人场景生成显式地分解为空间布局预测和身份保持渲染两个解耦阶段**，并引入基于强化学习的组合奖励机制来优化身份一致性和图像质量。这一思路借鉴了人类绘画的认知过程——先由“建筑师”规划构图，再由“艺术家”精细渲染——从而在保持高画质的同时，大幅提升身份一致性和计数准确性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Ar2Can 的核心创新在于将多人生成任务**解耦为空间布局规划与身份保持渲染两个独立阶段**，并通过**强化学习驱动的组合奖励机制**和**高效的 token 处理策略**，系统性地解决了现有方法中身份混叠、人脸丢失和计数错误等瓶颈问题。
 
@@ -118,7 +120,7 @@ $$p(N \mid t) = \begin{cases} 1/2 & N \in \{2,3\}, t \le \tau \\ 1/6 & \text{oth
 | Token 处理 | 全画布输入 | 丢弃 + RoPE 共享 | 推理加速 2× |
 | 数据依赖 | 真实多人图像 | 合成场景 + 真实人脸 | 无需真实多人标注 |
 
-## 整体框架
+
 
 Ar2Can 提出一种**两阶段解耦框架**，将多人生成任务分解为空间布局规划与身份保持渲染两个独立阶段，以解决现有扩散模型将布局与身份耦合所导致的身份混叠、人脸丢失和计数错误问题。
 
@@ -162,7 +164,7 @@ Ar2Can 提出一种**两阶段解耦框架**，将多人生成任务分解为空
 ![[assets/figures/papers/paper_list_l983_https_arxiv_org_abs_2511_22690/figures/016_Figure.jpg]]
 *Figure: a) Total Loss b) Cross-Entropy Loss c) Co-Ordinate Loss Figure D.1. Training curves of Architecture-A (LLM-based) with and without data sorting. After 2000 steps, training is dominated by the optimization of bounding-box coordinate regression. A clear gap emerges between sorted and unsorted data: sorting leads to more stable learning and faster convergence in the coordinate regression stage under the same number of training iterations*
 
-## 核心模块与公式推导
+
 
 ### 两阶段生成框架
 
@@ -233,7 +235,9 @@ $$p(N \mid t) = \begin{cases} \dfrac{1}{2} & \text{if } N \in \{2, 3\} \text{ an
 ![[assets/figures/papers/paper_list_l983_https_arxiv_org_abs_2511_22690/figures/005_Figure_5.jpg]]
 *Figure 5: We drop non-informative canvas tokens and assign identical positional encodings to overlapping regions, enabling the model to learn natural occlusion and depth ordering*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -306,7 +310,9 @@ Table D.4的延迟分解显示，Ar2Can的Architect-A总延迟为15.5秒（Archi
 ![[assets/figures/papers/paper_list_l983_https_arxiv_org_abs_2511_22690/figures/010_Table_4.jpg]]
 *Table 4: Human preference study. 25 evaluators rated 25 triplet samples. % Wins denotes the percentage of prompts for which a method was preferred overall*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 
@@ -343,6 +349,8 @@ Ar2Can 在以下条件下表现最优：
 4. **伪影消除**：如何进一步减少复制粘贴伪影，提高姿态控制变体的自然度？这可能需要在奖励函数设计或训练数据构建上进行更深入的研究。
 
 **证据强度说明**：上述局限和开放问题均来自论文自身的讨论和实验分析，置信度较高。但关于 8 人以上场景的推断属于论文未覆盖的边界，需在实际应用中进一步验证。
+
+
 
 ## 原文 PDF
 

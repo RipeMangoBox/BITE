@@ -5,6 +5,7 @@ paper_level: A
 venue: EUROGRAPHICS
 year: 2022
 pdf_ref: paperPDFs/EUROGRAPHICS_2022/Neural_Fields_in_Visual_Computing_and_Beyond.pdf
+code_link: null
 project_link: https://neuralfields.cs.brown.edu/
 aliases:
 - SSTNF
@@ -32,12 +33,15 @@ claims:
 | 中文题名 | 视觉计算及其它领域的神经场综述 |
 | 英文题名 | Neural Fields in Visual Computing and Beyond |
 | 会议/期刊 | EUROGRAPHICS 2022 |
-| Links | [paper](https://arxiv.org/abs/2111.11426); [Project](https://neuralfields.cs.brown.edu/) |
+| Links | [paper](https://arxiv.org/abs/2111.11426) · [Project](https://neuralfields.cs.brown.edu/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | Systematic Survey and Taxonomy of Neural Fields |
 | Dataset |  |
 
-## 概述
+> [!tip] 效果简介
+> 本笔记的既有实验指标、对比结果与适用边界见“实验与关键发现”；本轮仅统一结构，不改写证据。
+
+## 概要
 
 神经场（Neural Fields）是指部分或完全由神经网络参数化的场（Definition 2, Section 1.1），其核心形式为 $q = \Phi(x; \Theta)$，即由参数 $\Theta$ 定义的神经网络 $\Phi$ 根据时空坐标 $x$ 输出场量 $q$。近年来，神经场在视觉计算领域呈现爆发式增长——仅最近两年即有超过250篇相关论文涌现（Figure 2），涵盖三维重建、数字人、生成模型、图像处理、压缩、机器人等广泛的应用方向。
 
@@ -54,7 +58,7 @@ claims:
 
 需要指出的是，由于本文是综述性质，未进行原创实验，所引用的性能数据均来自原始论文；同时，许多被引工作的设计选择缺乏严格的消融研究，这一点在解读具体方法时需加以注意。
 
-## 背景与动机
+
 
 ### 神经场：从物理概念到视觉计算范式
 
@@ -86,7 +90,9 @@ $$q = \Phi(\mathbf{x}; \Theta)$$
 
 此外，本文还构建了一个**社区驱动的动态数据库网站**，支持搜索、过滤、文献管理和可视化功能（Figure 1），旨在持续追踪该领域的快速演进，缓解静态综述固有的时效性问题。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作的核心创新并非提出一种新的神经场算法，而是构建了一个系统化的分类学框架与社区驱动的知识基础设施，以解决该领域因论文爆发式增长而导致的术语碎片化和概念重复问题。其创新点可归纳为三个层面：
 
@@ -112,7 +118,7 @@ $$q = \Phi(\mathbf{x}; \Theta)$$
 
 需要指出，由于本文是综述性质的工作，上述创新体现在知识组织与形式化层面，而非提出新的网络结构或训练算法。其价值在于通过统一术语和分类，降低了该领域的交流成本，并为未来的公平比较和系统性改进提供了基准框架。
 
-## 整体框架
+
 
 本综述将神经场（Neural Field）的完整技术流程抽象为一个统一的前馈算法框架，如图3所示。该框架的核心是将一个病态反问题（ill-posed inverse problem）分解为三个可微分的阶段：**坐标采样与场量预测**、**前向映射**、以及**传感器域损失计算**。
 
@@ -161,7 +167,7 @@ $$\underset{\Theta}{\operatorname{argmin}} \int_{(x_{recon}, x_{sens}) \in (\mat
 
 **证据强度说明**：上述框架描述基于综述对超过250篇论文的系统性归纳（Figure 2展示了该领域在2019年后的爆发式增长），五类技术的划分由Table 2明确锚定，核心公式 $q = \Phi(x; \Theta)$ 来自Section 1.1的Definition 2，优化目标来自Section 4的Equation (5)。所有技术细节均可通过原文锚点追溯验证。
 
-## 核心模块与公式推导
+
 
 ### 神经场的形式化定义
 
@@ -231,7 +237,9 @@ $$\gamma_{(2i)}(x) = \sin(2^{i-1} \pi x)$$
 
 上述模块并非孤立运作，而是通过统一的反问题求解框架相互连接。其核心瓶颈在于：条件机制决定了模型的泛化能力边界，混合表示在计算效率与表示能力之间进行权衡，前向映射的物理准确性直接影响重建质量，而网络架构则决定了模型对高频信号的表达能力。五大技术类别（Table 2）分别对应学习、推理和控制中的不同问题，共同构成了神经场工具箱的完整拼图。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 需要指出，本文是一篇综述性报告，并未进行原创实验。文中引用的所有性能数据均来自原始论文，因此本处无法提供传统意义上的主实验结果与消融分析。以下基于综述中归纳的技术框架与实证观察，梳理关键图表结论、设计瓶颈与失败模式。
 
@@ -292,7 +300,9 @@ $$\gamma_{(2i)}(x) = \sin(2^{i-1} \pi x)$$
 *Table: Appendix A: Variable Naming Conventions*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 统一框架的技术定位
 
@@ -344,6 +354,8 @@ Figure 6 展示了六种典型的混合表示实例：神经稀疏体素网格�
 2. **超越监督学习**：如何实现弱监督或自监督学习的神经场，减少对密集标注或精确传感器模型的依赖。
 3. **多模态融合**：探索多模态数据（如图像、深度、触觉、音频）的融合，可能拓展神经场在具身智能和机器人领域的应用边界。
 4. **高层次语义**：将神经场从几何和外观表示扩展到语义和任务驱动的表示，仍是未解决的问题。
+
+
 
 ## 原文 PDF
 

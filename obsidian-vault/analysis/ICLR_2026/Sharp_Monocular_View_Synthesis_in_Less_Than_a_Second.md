@@ -41,7 +41,7 @@ claims:
 > - Multiple datasets (Middlebury, Booster, ScanNet++, WildRGBD, Tanks and Temples,... 上，LPIPS varied per dataset (e.g., Middlebury 0.358, ScanNet++ 0.154) vs Best prior model (Gen3C) (reduction of 25–34%)。
 > - Multiple datasets 上，DISTS varied (e.g., Middlebury 0.097, ScanNet++ 0.071) vs Best prior model (Gen3C) (reduction of 21–43%)。
 
-## 概述
+## 概要
 
 从单张二维图像合成新视角下的三维场景是计算机视觉与图形学中长期存在的挑战。该问题的核心瓶颈在于**单目深度估计的固有歧义**——透明/反射表面、弱纹理区域等情形会导致初始化深度不准确，进而在新视角合成时产生几何伪影和模糊。现有方法要么依赖耗时的扩散模型，要么受限于前馈模型的保真度不足，难以同时满足高质量和实时性需求。
 
@@ -51,7 +51,7 @@ SHARP 针对这一问题提出了一个端到端的前馈网络，从单张照�
 
 在六个数据集上的实验表明，SHARP 相比此前最优的扩散模型 **Gen3C** (Ren et al., 2025)，将 LPIPS 降低了 25–34%，DISTS 降低了 21–43%，同时合成时间不到一秒，渲染速度超过每秒 100 帧，在效率与保真度之间建立了新的权衡前沿。
 
-## 背景与动机
+
 
 单目视角合成（Novel View Synthesis, NVS）旨在从单张输入图像生成场景在新相机姿态下的逼真渲染图。这一任务在增强现实、虚拟现实、3D内容创作等领域具有广泛应用前景，但其核心挑战在于从单一2D观测中恢复完整的3D场景表示——这是一个本质上欠约束的逆问题。
 
@@ -81,7 +81,9 @@ SHARP 针对这一问题提出了一个端到端的前馈网络，从单张照�
 
 通过解决这些问题，SHARP旨在实现一个在速度-质量帕累托前沿上显著超越现有方法的单目视角合成系统（见图1）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SHARP的核心创新在于将单目视角合成问题重新定义为“深度歧义感知的3D高斯回归”，通过三个关键机制解决了现有方法的根本瓶颈。
 
@@ -116,7 +118,7 @@ $$\mathcal{L}_{\mathrm{percep}} = \sum_{l=1}^{4} \lambda_{l}^{\mathrm{feat}} \cd
 
 这些创新协同作用，使SHARP在亚秒级推理时间内实现了25–34%的LPIPS降低和21–43%的DISTS降低（相对于此前最优方法**Gen3C**，Ren et al., 2025），同时在相机基线小于0.5米的近距视角合成中保持一致的领先优势。
 
-## 整体框架
+
 
 SHARP 采用端到端可训练的前馈网络，从单张图像直接回归 3D 高斯表示，整体流程在标准 GPU 上亚秒级完成。网络由四个可学习模块组成（见 Figure 3），输入为单张 RGB 图像 $\mathbf{I} \in \mathbb{R}^{C \times H \times W}$，输出为一组 3D 高斯 $\mathbf{G} \in \mathbb{R}^{K \times N}$，其中 $K=14$ 为每个高斯球的属性数（位置 3 维、尺度 3 维、旋转 4 维、颜色 3 维、不透明度 1 维）。
 
@@ -152,7 +154,7 @@ SHARP 采用端到端可训练的前馈网络，从单张图像直接回归 3D �
 
 消融实验（Table 8, Table 10）表明，感知损失（特别是 Gram 矩阵分量）对图像清晰度提升最为显著；深度调整模块（Table 11）和解冻深度骨干（Table 13）均一致地改善了 DISTS/LPIPS 指标，验证了消除深度歧义对视角合成质量的重要性。
 
-## 核心模块与公式推导
+
 
 SHARP 的整体架构由四个可学习的核心模块组成（Figure 3），其设计目标是从单张图像直接回归出高分辨率 3D 高斯表示，并通过端到端训练优化视角合成保真度。
 
@@ -215,7 +217,9 @@ $$\mathcal{L}_{\mathrm{percep}} = \sum_{l=1}^{4} \lambda_{l}^{\mathrm{feat}} \cd
 ![[assets/figures/papers/paper_list_l47_https_openreview_net_forum_id_yx3g4sF70y/figures/027_Figure_12.jpg]]
 *Figure 12: The effect of unfreezing the monodepth backbone*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 评估协议与指标选择
 
@@ -307,7 +311,9 @@ Figure 8 展示了典型失败案例：
 
 Table 4 展示了在内部合成数据上重新训练 **Flash3D**（Szymanowicz et al., 2025a）的结果，证明训练数据质量并非 SHARP 性能优势的主导因素，核心增益来自架构设计和损失配置。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 方法谱系
 
@@ -350,6 +356,8 @@ SHARP 的设计和训练针对的是**近距离相机运动**场景。运动范�
 3. **多视角扩展。** 是否可以将方法扩展到多视角或视频输入，以利用多帧信息提升几何一致性。
 
 4. **视角依赖效果的建模。** 如何系统性地处理视角依赖效果和体积渲染，以进一步提升画质。
+
+
 
 ## 原文 PDF
 

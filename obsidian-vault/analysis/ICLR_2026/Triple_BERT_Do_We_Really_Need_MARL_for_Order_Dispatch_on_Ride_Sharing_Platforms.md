@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Triple_BERT_Do_We_Really_Need_MARL_for_Order_Dispatch_on_Ride_Sharing_Platforms.pdf
+project_link: null
+code_link: https://github.com/RS2002/Triple-BERT
 openreview_forum_id: symgW6FhA6
 aliases:
 - TB
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | Triple-BERT：网约车订单调度是否真正需要多智能体强化学习？ |
 | 英文题名 | Triple-BERT: Do We Really Need MARL for Order Dispatch on Ride-Sharing Platforms? |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=symgW6FhA6); [GitHub](https://github.com/RS2002/Triple-BERT) |
+| Links | [paper](https://openreview.net/forum?id=symgW6FhA6) · [GitHub](https://github.com/RS2002/Triple-BERT) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | Triple-BERT |
 | Dataset | Manhattan Yellow Taxi (多个时段，19:00‑19:30), Manhattan Yellow Taxi (多个时段), Manhattan FHV Data |
@@ -42,7 +44,7 @@ claims:
 > - Manhattan Yellow Taxi (多个时段) 上，Service Rate 为 0.98 (98%)，对比 DeepPool: 0.96，变化 +0.02 (2.1%)。
 > - Manhattan Yellow Taxi (多个时段) 上，Pickup Time (minutes) 为 5.73，对比 DeepPool: 7.58，变化 -1.85 (24.4%)。
 
-## 概述
+## 概要
 
 网约车订单调度面临一个根本性瓶颈：**维度灾难（Curse of Dimensionality, CoD）**。现有方法多采用多智能体强化学习（MARL），其中独立MARL因缺乏全局协调而合作性差，集中训练分散执行（CTDE）MARL则因集中式评价器遭遇维度爆炸，导致收敛缓慢、性能次优。
 
@@ -56,7 +58,7 @@ Triple-BERT 的核心洞察在于：**订单调度本质上是集中决策问题
 
 **方法定位**：Triple-BERT 属于集中式SARL调度框架，通过动作分解与BERT架构解决大规模观测与动作空间问题，在方法谱系上区别于独立MARL（如DeepPool、BMG-Q）、CTDE MARL（如HIVES、Enders et al.）以及值分解MARL（如CEVD）等路线。
 
-## 背景与动机
+
 
 ### 网约车订单调度的核心挑战
 
@@ -90,7 +92,9 @@ $$|A_t| \geq (n - m_t + 2)^{m_t} \geq 2^{m_t}$$
 - **BERT自注意力架构**：利用Transformer的全局自注意力机制捕获司机与订单之间的复杂交互关系，同时通过参数复用（parameter reuse）控制网络规模随司机/订单数量的增长。
 - **QK-Attention高效计算**：设计轻量级的QK-Attention模块替代传统的大矩阵乘法，将计算复杂度从乘法级降至加法级，使集中式SARL在实际规模下可训练、可部署。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 从多智能体到集中式单智能体的范式转换
 
@@ -149,7 +153,7 @@ $$\mathrm{QK\text{-}Attention\text{-}Norm}(\overline{w}_{i,t}, \overline{o}_{j,t
 
 这些创新并非孤立的技术改进，而是围绕“集中式 SARL 能否替代 MARL”这一核心问题形成的系统性方案：范式转换提供了理论可行性，动作分解与 BERT 架构解决了计算可行性，两阶段训练保障了优化可行性。三者的协同使 Triple-BERT 在曼哈顿真实打车数据集上相较现有最先进方法综合提升约 11.95%，并在服务率、取车时间等关键运营指标上全面超越所有 MARL 基线。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_symgW6FhA6/figures/002_Figure_2.jpg]]
 *Figure 2: Network Architecture: The network consists of three main components: the feature extractor, the actor sub-network, and the critic sub-network. First, a worker encoder and an order encoder are used to extract features from individual worker and order information, respectively. Then an Actor BERT model captures the relationships between them and a QK-Attention module calculates the selection probabilities for each worker-order pair. Finally, the fused features of the selected worker-order pairs are input into two separate Critic BERT models for further information extraction, and two Critic MLPs compute the Q-values, as TD3 requires two critics. (In this figure, the fused sequence (input to C...*
@@ -182,7 +186,7 @@ Triple‑BERT 采用两阶段训练策略以解决样本稀缺和收敛困难：
 
 消融实验表明，仅使用第二阶段训练（无预训练）会导致模型无法收敛、奖励持续下降（**Figure 3**），验证了两阶段训练的必要性。
 
-## 核心模块与公式推导
+
 
 ### 特征提取器：司机编码器与订单编码器
 
@@ -258,7 +262,9 @@ $$\nabla_\Theta \mathrm{J}(\Theta) \propto \mathbb{E}_{\pi_\Theta^T} \left[ (\ma
 
 其中 $B$ 为基线函数，$\mathbf{Q}_{\pi_\Theta^T}^{TD3}$ 为双 Critic 中较小者的 Q 值。该梯度形式将全局动作的信用分配自然地分解到各司机‑订单对的 log 概率上，绕开了多智能体强化学习中棘手的信用分配问题。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能对比
 
@@ -333,7 +339,9 @@ Triple-BERT在曼哈顿真实打车数据集上展现了显著的性能优势。
 *Table 9: Reward of Tripe-BERT w/ and w/o Positional Embedding (PE)*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题瓶颈：多智能体强化学习的维度灾难与合作困境
 
@@ -382,6 +390,8 @@ Triple-BERT并非简单地将MARL替换为SARL，而是通过动作分解和BERT
 3. **样本效率提升**：重要性采样能否改进当前基于TD3的离线策略梯度优化（公式7），进一步提高样本效率？
 4. **规模化通信折衷**：如何在保持全局合作的同时降低通信成本，使SARL更适用于超大规模场景（如跨城市调度）？
 5. **方法泛化**：动作分解和BERT架构能否推广到其他集中式调度任务（如仓储物流、无人机编队）？这需要验证QK-Attention-Norm在不同约束条件下的稳定性。
+
+
 
 ## 原文 PDF
 

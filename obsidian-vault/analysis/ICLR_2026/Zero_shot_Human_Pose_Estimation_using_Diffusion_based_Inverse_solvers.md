@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Zero_shot_Human_Pose_Estimation_using_Diffusion_based_Inverse_solvers.pdf
+project_link: null
+code_link: null
 openreview_forum_id: Bs4FbnrE82
 aliases:
 - ZSHPEUDBIS
@@ -41,7 +43,7 @@ claims:
 > - AMASS (Protocol 1, Arms ×1.4) 上，MPJPE (cm) 为 8.25，对比 9.51 (BoDiffusion(Global))，变化 -1.26。
 > - AMASS (Protocol 1, default shape) 上，MPJPE under increasing location noise 为 几乎不变（~7.6 → ~7.8），对比 BoDiffusion(Global) 从 ~6.0 显著上升，变化 N/A。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -73,7 +75,7 @@ InPose属于**基于扩散模型的逆求解器**，在方法谱系中处于条�
 
 InPose假设用户的骨骼长度参数预先已知，对骨长估计误差较为敏感——当骨长噪声超过1 cm时性能即出现明显退化（Fig. 8）。此外，下体运动估计完全依赖先验推断，在缺少头部平移信息时可能发生灾难性失败（Fig. 12）。未来方向包括：将根平移直接纳入逆引导框架、设计无需显式骨长校准的自动推理机制，以及提升下体运动估计的精度。
 
-## 背景与动机
+
 
 人体姿态估计是计算机视觉与可穿戴计算领域的核心问题，其目标是从稀疏传感器测量中恢复完整的三维人体骨架运动。近年来，基于扩散模型的条件生成方法在该任务上取得了显著进展，其中**BoDiffusion**（Castillo et al., 2023）等代表性工作利用分类器自由引导（CFG），同时以关节旋转和位置测量作为条件输入，直接预测全身姿态。
 
@@ -81,7 +83,9 @@ InPose假设用户的骨骼长度参数预先已知，对骨长估计误差较�
 
 本文将姿态估计重新形式化为一个**逆问题**：利用贝叶斯规则将条件得分分解为尺度无关的旋转先验与尺度相关的位置似然。其核心洞察在于：**扩散模型仅需从旋转测量中学习姿态先验，而位置测量则作为伪逆引导信号，在推理阶段通过似然梯度修正去噪过程**。这种解耦设计使得先验知识与用户特定的尺度信息分离，从而无需针对新用户微调即可实现零样本泛化。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 InPose 的核心创新在于将**条件扩散模型**的输入解耦为尺度无关的旋转先验与尺度相关的位置似然，从而在不针对新用户体形进行任何微调的前提下实现零样本泛化。
 
@@ -126,7 +130,7 @@ $$
 
 InPose 的零样本能力并非来自更大规模的体形数据训练，而是源于**公式层面的结构解耦**：将体形参数 $b_{j,p_j}$ 从先验学习中移除，仅在推理阶段作为已知量参与似然计算。这一设计使得模型在体形均匀缩放（0.6-1.4 倍）和非均匀缩放（如手臂 ×1.4、躯干 ×0.7）下均能保持稳定的 MPJPE 和 MPJRE（Fig. 3a,b, Table 1），而基线方法在偏离默认体形时误差显著增大。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l14_https_openreview_net_forum_id_Bs4FbnrE82/figures/002_Figure_2.jpg]]
 *Figure 2: InPose pipeline: 3-point sensor rotation + location measurements are inputs. Rotations are fed to the CFG score model, which outputs a conditional prior; location measurements estimate the likelihood, which is used to steer diffusion*
@@ -153,7 +157,7 @@ InPose将人体姿态估计重新形式化为一个逆问题，其核心思想�
 
 **数据流总结**：旋转测量驱动CFG先验，提供尺度无关的姿态约束；位置测量通过似然梯度注入尺度相关的修正信号；两者在后验更新中融合，逐步从噪声中恢复与用户体形相适应的姿态序列。这种解耦设计使得InPose无需针对新用户微调即可适应不同体形，实现零样本泛化。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化
 
@@ -205,7 +209,9 @@ $$r_j(i) = [R_j^{(1,1)}(i) \; R_j^{(2,1)}(i) \; R_j^{(3,1)}(i) \; R_j^{(1,2)}(i)
 
 这一表示更适合神经网络训练，且通过Gram-Schmidt正交化可恢复完整的旋转矩阵。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -268,7 +274,9 @@ InPose对位置测量噪声展现出显著鲁棒性（图3c）。当向位置测
 
 Table 6显示，InPose的处理速度约为229样本/秒，介于BoDiffusion（约392样本/秒）和AvatarJLM（约102样本/秒）之间。ΠGDM逆引导引入的额外计算开销主要来自似然梯度计算中的雅可比矩阵$\frac{\partial \mathcal{D}(\hat{r}_M^t)}{\partial r_M^t}$和矩阵求逆操作，但在协方差简化为单位阵的配置下，这一开销可控制在可接受范围内。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 InPose 的核心贡献在于将人体姿态估计重新构造为一个逆问题，通过贝叶斯分解将尺度无关的旋转先验与尺度相关的位置似然解耦。这一设计使其在方法谱系中占据了一个独特位置：它既不同于传统的神经网络回归方法，也区别于直接将位置测量作为扩散模型条件的现有方案。
 
@@ -301,6 +309,8 @@ InPose 的逆引导框架依赖于几个关键假设，这些假设定义了其�
 3. **下体先验的增强**：当前下体运动完全依赖从上半身旋转中学到的条件先验。引入物理约束（如足部接触一致性）或额外的运动学先验可能缩小 LPE 差距。
 
 4. **计算效率优化**：$\Pi$GDM 似然梯度涉及雅可比矩阵 $\partial \mathcal{D}(\hat{r}_M^t)/\partial r_M^t$ 的计算和协方差矩阵求逆。附录 B 指出将协方差设为单位阵即可获得合理性能，但大批量或在线场景下的进一步加速仍需探索。
+
+
 
 ## 原文 PDF
 

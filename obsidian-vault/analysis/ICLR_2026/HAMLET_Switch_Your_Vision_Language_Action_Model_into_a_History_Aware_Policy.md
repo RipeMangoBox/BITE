@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/HAMLET_Switch_Your_Vision_Language_Action_Model_into_a_History_Aware_Policy.pdf
+project_link: https://myungkyukoo.github.io/hamlet/
+code_link: null
 openreview_forum_id: KcJ9U0x6kO
 aliases:
 - HAMLET
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | HAMLET：将视觉-语言-动作模型切换为历史感知策略 |
 | 英文题名 | HAMLET: Switch Your Vision-Language-Action Model into a History-Aware Policy |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=KcJ9U0x6kO); [Project](https://myungkyukoo.github.io/hamlet/) |
+| Links | [paper](https://openreview.net/forum?id=KcJ9U0x6kO) · [Project](https://myungkyukoo.github.io/hamlet/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | HAMLET |
 | Dataset | Real-world (3 Long-Horizon Tasks), RoboCasa Kitchen (100 demos), LIBERO (Average), SimplerEnv-Bridge (CogACT) |
@@ -41,7 +43,7 @@ claims:
 > - RoboCasa Kitchen (100 demos) 上，Success Rate (%) 为 65.4，对比 62.6 (GR00T N1.5)，变化 +2.8%。
 > - LIBERO (Average) 上，Success Rate (%) 为 97.6，对比 95.6 (GR00T N1.5)，变化 +2.0%。
 
-## 概述
+## 概要
 
 **核心问题**：当前视觉-语言-动作模型（VLA）在机器人操控中仅依赖单帧观测进行决策，缺乏对历史上下文的利用。在需要多步推理或存在遮挡的非马尔可夫任务中，这种设计导致模型无法从当前观测推断正确动作，直接追加多帧历史又会显著增加计算开销并损害泛化能力。
 
@@ -49,7 +51,7 @@ claims:
 
 **核心结论**：在三个真实世界长视距任务上，HAMLET 平均成功率达到 76.4%，相比 GR00T N1.5 基线提升 47.2%；在 LIBERO 基准上将先前最佳结果从 95.6% 提升至 97.6%；在 SimplerEnv-Bridge 上基于 CogACT 骨干网络提升 11.4%。消融实验表明，记忆模块是核心增益来源，时间对比学习初始化对性能有持续贡献。该方法在扩散型和自回归型 VLA 上均展现出有效性。
 
-## 背景与动机
+
 
 ### 视觉-语言-动作模型的单帧瓶颈
 
@@ -90,7 +92,9 @@ HAMLET 的核心洞察是：历史信息的利用不应以牺牲 VLA 的单帧�
 
 这一设计使 HAMLET 在保持单帧输入效率的同时，有效利用了历史上下文，将预训练 VLA 切换为历史感知策略。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 HAMLET 的核心创新在于将预训练的单帧视觉-语言-动作模型（VLA）切换为历史感知策略，而无需修改原始 VLA 的骨干网络。其关键洞察是：通过引入可学习的 **moment tokens** 和轻量级 **记忆模块**，以极小的计算代价将历史信息压缩为紧凑特征并选择性聚合到动作预测中，从而突破当前 VLA 仅依赖单帧观测的根本瓶颈。
 
@@ -122,7 +126,7 @@ HAMLET 的决定性优势在于**以极低成本赋予单帧 VLA 历史感知能
 
 **需注意的局限**：尽管 HAMLET 在扩散型 VLA（GR00T N1.5、CogACT）上验证良好，其在自回归式 VLA（如 OpenVLA 或 π0-FAST 的原始架构）上的直接适用性尚需进一步验证；时间对比学习初始化引入了额外训练成本；记忆模块在大规模多任务数据上的可扩展性尚未充分探索。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l22_https_openreview_net_forum_id_KcJ9U0x6kO/figures/002_Figure_2.jpg]]
 *Figure 2: An overview of HAMLET. Building on a pre-trained VLA, HAMLET adds two key components: moment tokens, appended to the VLM input and initialized with time-contrastive learning to capture task-relevant representations at each timestep, and a lightweight memory module that aggregates these tokens across timesteps for history-aware action prediction*
@@ -156,7 +160,7 @@ HAMLET 是一个面向预训练视觉-语言-动作模型（VLA）的微调框�
 
 > **注意**：HAMLET 的 moment tokens 长度、记忆模块层数、历史长度等超参数默认设置为 4、2 层 Transformer 和 4，这些取值在实验中表现稳定，但更彻底的架构搜索是否为最优解仍属开放问题。
 
-## 核心模块与公式推导
+
 
 HAMLET 在预训练 VLA 的基础上引入两个互补组件：**moment tokens** 和**记忆模块**，二者协同实现从单帧到历史感知策略的切换。
 
@@ -205,7 +209,9 @@ $$[\mathbf{a}_t, \mathbf{a}_{t+1}, \ldots, \mathbf{a}_{t+k-1}] = \mathcal{A}_\ps
 
 移除记忆模块导致最大性能下降（65.4% → 63.4%），证明记忆模块是 HAMLET 的核心组件（Table 5a）。注意力可视化进一步揭示：记忆模块在需要回忆特定历史时刻（如遮挡物体曾出现的位置）时，会显著提高对该时间步的注意力权重（Figure 4b, Figure 9），验证了选择性聚合机制的有效性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 4.1 核心瓶颈验证：历史依赖性任务
 
@@ -289,7 +295,9 @@ Table 6 验证了记忆模块的表示可迁移性。在 LIBERO 上预训练的�
 
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从单帧 VLA 到历史感知策略
 
@@ -336,6 +344,8 @@ HAMLET 的适用边界由以下因素界定：
 3. **统一 VLA 适配方案**：能否设计统一方案同时适用于扩散型和自回归型 VLA，减少对特定架构的适配成本？
 
 4. **更长时间跨度任务**：HAMLET 在更长时间跨度、更复杂场景（如整个家庭环境中的连贯操作）中的表现如何？当前的历史窗口长度为 4 个动作块，更长的依赖关系是否仍能被有效捕获？
+
+
 
 ## 原文 PDF
 

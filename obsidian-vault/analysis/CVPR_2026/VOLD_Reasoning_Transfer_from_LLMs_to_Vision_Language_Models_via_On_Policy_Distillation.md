@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/VOLD_Reasoning_Transfer_from_LLMs_to_Vision_Language_Models_via_On_Policy_Distillation.pdf
+project_link: null
 code_link: null
 aliases:
 - VOLD
@@ -42,7 +43,7 @@ claims:
 > - MathVision 上，Accuracy 28.0 vs 24.4 (XReasoner-3B) (+3.6)。
 > - MathVista 上，Accuracy 61.9 vs 61.1 (XReasoner-3B) (+0.8)。
 
-## 概述
+## 概要
 
 视觉-语言模型（VLM）在复杂推理任务上的表现长期受限，其核心瓶颈并非模型架构本身，而在于**缺乏大规模、高质量的图像-文本推理训练数据**。文本推理数据资源丰富且可扩展，但模态差异使其难以直接用于VLM的推理训练。VOLD正是针对这一瓶颈提出的一类**跨模态推理迁移框架**：它利用纯文本大语言模型（LLM）作为教师，通过两阶段后训练流程，将文本推理能力迁移至VLM学生模型，全程无需任何视觉推理数据。
 
@@ -51,8 +52,6 @@ VOLD的核心设计围绕一个关键因果机制展开——**在线策略蒸�
 在纯文本训练条件下，VOLD在MathVision上达到28.0%，显著超越使用图像训练的VLAA-Thinker（24.4%）和文本训练基线XReasoner-3B（24.4%）；在LogicVista上以45.0%领先XReasoner-3B达3.9个百分点。训练动态曲线进一步显示，VOLD在视觉验证准确率和文本训练奖励上均持续高于纯GRPO，且差距随训练逐步扩大。此外，奖励引导的KL掩码策略仅对失败轨迹施加蒸馏损失，将最终训练奖励从纯GRPO的0.51提升至0.58。
 
 VOLD的方法定位介于**推理蒸馏**与**在线策略优化**两条技术路线的交叉点。与仅使用静态SFT轨迹的方法（如XReasoner）不同，VOLD在RL阶段持续从教师获取在线梯度信号；与依赖图像-文本数据的RL方法（如VLM-R1、VLAA-Thinker）不同，VOLD完全在文本数据上完成推理能力的注入，并可进一步作为图像RL的优质初始检查点。
-
-## 背景与动机
 
 ### 视觉-语言模型的推理瓶颈
 
@@ -82,7 +81,7 @@ VOLD框架基于以下三个动机设计：
 
 VOLD的最终目标是**在完全不使用任何视觉推理数据的前提下，使VLM的推理性能超越使用图像训练的方法**，从而验证文本到视觉的推理迁移范式的有效性。
 
-## 核心创新
+## 核心方法与创新机理
 
 VOLD的核心创新在于**首次将在线策略蒸馏（On-Policy Distillation）引入视觉-语言模型的推理训练**，通过一个两阶段框架，使纯文本大语言模型（LLM）的推理能力能够有效迁移至VLM，全程无需任何视觉推理数据。相较于现有方法，VOLD在三个关键维度上实现了突破性改进：
 
@@ -109,8 +108,6 @@ VOLD引入**两阶段后训练流水线**（Figure 2）：
 与**VLM-R1**和**VLAA-Thinker**依赖图像-文本配对数据进行RL训练不同，VOLD**完全在纯文本数据上训练**——仅使用数学问题文本和教师模型生成的推理轨迹。这一设计直接回应了核心瓶颈：视觉推理标注数据稀缺且昂贵，而文本推理资源丰富且可扩展。VOLD通过在线策略蒸馏机制，使文本教师能够在VLM学生处理文本数学问题时提供实时引导，而习得的推理能力可泛化至视觉推理任务。
 
 实验结果表明，这一跨模态迁移策略极为有效：VOLD在MathVision上达到28.0%，不仅大幅超越纯文本训练基线X-Reasoner（24.4%），甚至优于使用图像训练的VLAA-Thinker（24.4%）；在LogicVista上达到45.0%，同样显著领先（Table 1）。这证明**蒸馏信号本身可以跨越模态边界**，文本教师的推理知识通过在线策略蒸馏被有效编码进VLM的语言模块，进而在视觉推理时被激活利用。
-
-## 整体框架
 
 VOLD 是一个两阶段后训练框架，旨在将纯文本大语言模型（LLM）中的推理能力迁移至视觉-语言模型（VLM），全程无需任何图像-文本推理训练数据。其核心设计理念是：通过**冷启动策略对齐**与**在线策略蒸馏**的协同，使文本教师模型能够在学生 VLM 自身生成的轨迹上提供密集的 token 级引导信号，从而将文本模态的推理能力有效迁移至多模态推理任务。
 
@@ -172,8 +169,6 @@ VOLD 的模块间关系可概括为以下数据流：
 - **冻结视觉编码器**：训练全程冻结视觉编码器，使得文本推理能力的迁移不依赖于视觉特征的对齐，降低了训练复杂度并保持了视觉感知能力的相对稳定。
 - **与 RL 算法的正交性**：VOLD 的在线蒸馏模块与具体的 RL 算法解耦，实验验证其同样适用于 GSPO（Figure 6），表明该框架具有良好的泛化性。
 
-## 核心模块与公式推导
-
 VOLD 是一个两阶段后训练框架，旨在将纯文本教师 LLM 的推理能力迁移至视觉-语言学生模型，全程无需任何视觉推理数据。其核心由以下模块构成：
 
 ### 阶段一：SFT 冷启动策略对齐
@@ -226,7 +221,7 @@ $$H(\pi_\theta) = \mathbb{E}_{q,\tau\sim\pi_\theta}\left[\frac{1}{T}\sum_{t=1}^{
 
 该指标不参与梯度更新，仅作为训练动态的辅助观测。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心瓶颈与实验动机
 
@@ -308,31 +303,13 @@ SFT步数的消融（图4）进一步量化了这一条件：SFT步数不足（<
 ![[assets/figures/papers/paper_list_l2245_https_arxiv_org_abs_2510_23497/figures/005_Table_3.jpg]]
 *Table 3: Component Analysis of VOLD : This table isolates the contribution of each component in our two-stage framework. We show performance after SFT-only, after adding RL (GRPO), and with our full unified objective. While Stage 1 SFT aligns the policy, it temporarily degrades performance due to unfiltered teacher traces. Stage 2, which combines RL with on-policy distillation, provides the largest performance gains, demonstrating that both components are essential for optimal reasoning*
 
-![[assets/figures/papers/paper_list_l2245_https_arxiv_org_abs_2510_23497/figures/006_Figure_3.jpg]]
-*Figure 3: Learning dynamics: We visualize the validation accuracy as well as text-only training reward during training, comparing the proposed VOLD setup with the regular GRPO training. The results in both cases show a significant gain by the proposed method. (left): Accuracy on the visual Geo3K dataset. (right): Reward on the text-only orz-57k training data*
-
-![[assets/figures/papers/paper_list_l2245_https_arxiv_org_abs_2510_23497/figures/007_Figure_4.jpg]]
-*Figure 4: Sufficient Policy Alignment is Crucial for On-Policy Distillation. This figure illustrates that the benefit of our unified objective depends on the quality of the initial alignment from Stage 1. Models with short SFT phases (light blue) are poorly aligned with the teacher and fail to benefit from its guidance. As the alignment improves with more SFT steps (darker blue), the student can better leverage the on-policy distillation signal, unlocking significant performance gains over the GRPO-only baseline (red)*
-
 ![[assets/figures/papers/paper_list_l2245_https_arxiv_org_abs_2510_23497/figures/009_Figure_5.jpg]]
 *Figure 5: Training reward comparison: VOLD with KL masking (blue), without masking (purple), and vanilla GRPO (red). KL masking provides consistent performance gains throughout training*
 
 ![[assets/figures/papers/paper_list_l2245_https_arxiv_org_abs_2510_23497/figures/010_Table_5.jpg]]
 *Table 5: Impact of Teacher Model Size. We evaluate the final performance of VOLD when using teacher models of varying scales (4B, 8B, and 14B parameters). While increasing teacher size from 4B to 8B yields performance gains across most benchmarks, we observe diminishing returns with the 14B teacher, which provides no consistent improvement over the 8B model*
 
-![[assets/figures/papers/paper_list_l2245_https_arxiv_org_abs_2510_23497/figures/011_Table_6.jpg]]
-*Table 6: General Multimodal Capability Evaluation. Perception slightly decreases while reasoning improves. This trade-off is shared by image-trained methods (VLAA-Th.), confirming it is inherent to reasoning-focused training, not text-only training*
-
-![[assets/figures/papers/paper_list_l2245_https_arxiv_org_abs_2510_23497/figures/012_Table_7.jpg]]
-*Table 7: VOLD as Foundation for Image-Based RL. Starting from the VOLD checkpoint and applying RL on image-text data yields the best results, outperforming both text-only VOLD and image-only training from scratch*
-
-![[assets/figures/papers/paper_list_l2245_https_arxiv_org_abs_2510_23497/figures/013_Figure_6.jpg]]
-*Figure 6: Generalization to Other RL Algorithms. Validation accuracy on Geo3K. On-policy distillation (OPD) improves both GRPO and GSPO, confirming VOLD is orthogonal to the choice of RL method*
-
-![[assets/figures/papers/paper_list_l2245_https_arxiv_org_abs_2510_23497/figures/001_Figure_1.jpg]]
-*Figure 1: Visual Reasoning Examples. (left) The base model fails the task due to a flawed geometric assumption. (center) The base model trained with SFT+RL only-on text outlines a valid plan but uses an incorrect formula, leading to a wrong answer. (right) The model trained with SFT+RL and guided by on-policy distillation from a teacher LLM successfully navigates the problem. It demonstrates flexible reasoning by considering and then discarding a difficult approach in favor of a more direct and correct one*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 方法谱系：从纯文本RL到跨模态推理蒸馏
 

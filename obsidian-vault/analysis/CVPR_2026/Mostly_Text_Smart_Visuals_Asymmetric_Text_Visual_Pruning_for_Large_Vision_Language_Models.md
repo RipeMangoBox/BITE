@@ -44,7 +44,7 @@ claims:
 > - Avg. Retention (LLaVA-NeXT 8B, 60% sparsity) 上，Average Retention 77.01% vs 76.24% (SparseGPT) (+0.77%)。
 > - MME (LLaVA-NeXT 8B, 50% sparsity) 上，MME Score 1801.51 vs 1742.80 (SparseGPT) (+58.71)。
 
-## 概述
+## 概要
 
 大型视觉语言模型（LVLM）的部署面临严重的计算与存储瓶颈，权重剪枝是缓解该问题的重要技术。现有剪枝方法（如**SparseGPT**、**Wanda**及多模态剪枝方法**TAMP**）在校准阶段普遍采用模态无关的策略，即不加区分地混合使用文本与视觉token来估计权重重要性。本文揭示了一个被忽视的关键瓶颈：**文本与视觉模态在剪枝敏感度上存在本质差异**——文本路径对校准token的选择高度敏感，而视觉路径则表现出极强的冗余容忍度。若使用混合或纯视觉token校准文本路径，在60%稀疏度下性能将严重退化（例如SQA_img从61.58骤降至35.85甚至11.1）；相反，视觉路径在不同校准池下均可保持99.25%以上的性能保留率，甚至用纯文本token校准也能达到100.05%（Tab. 1）。这一发现表明，**文本token对维持语言能力不可或缺，而视觉token仅需少量关键子集即可维持视觉性能**。
 
@@ -54,7 +54,7 @@ claims:
 
 **方法谱系与知识库定位**：ATV-Pruning属于**激活感知的权重剪枝**范畴，其重要性评分机制沿袭Wanda的权重幅度与输入激活范数乘积（Eq. 1），但创新性地将激活统计的估计对象从“所有token”替换为“模态感知校准集”。与TAMP等面向LVLM的剪枝方法相比，ATV-Pruning首次明确解耦了文本与视觉模态在校准中的角色，并引入块自适应视觉选择机制。该方法不依赖权重更新（区别于SparseGPT的Hessian近似），也不依赖跨模态统计对齐（区别于TAMP），在保持简洁性的同时实现了显著的性能增益。当前局限包括：视觉漂移计算引入约1.35倍额外前向开销；全局缩放因子α需针对不同模型手动设定；仅针对LLM骨干的线性层进行剪枝，未覆盖视觉编码器等模块。
 
-## 背景与动机
+
 
 ### 大型视觉语言模型的部署瓶颈
 
@@ -80,7 +80,9 @@ claims:
 
 上述发现揭示了一个清晰的因果机制：**文本路径对剪枝高度敏感，必须用文本token校准；视觉路径高度冗余，仅需少量关键视觉token即可维持性能。** 基于此，本文提出**非对称文本-视觉剪枝（ATV-Pruning）**：在校准池构建中采用非对称策略——**保留所有文本token以保证语言能力不退化，同时通过块自适应的视觉漂移机制从各层中选取少量显著视觉token**，从而在保持性能的前提下实现大幅剪枝。这一设计从根本上解决了模态无关校准池导致的文本侧退化问题，为LVLM的高效部署提供了新的技术路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ATV-Pruning 的核心创新在于**将“模态无关”的校准池构建策略替换为“非对称文本-视觉感知”的校准池构建策略**，从而从根本上解决了现有 LVLM 剪枝方法中文本路径对剪枝高度敏感却被忽视的瓶颈。具体而言，该方法在以下三个关键环节上做出了改变：
 
@@ -121,7 +123,7 @@ $$\mathbf{I}_{ij} = |\mathbf{W}_{ij}| \cdot \|\mathbf{X}_{j}\|_{2}$$
 
 ATV-Pruning 的三个 changed slots 构成了一条因果链：**非对称校准池构建**（保留全部文本 token + 筛选显著视觉 token）→ **块自适应视觉选择**（以视觉漂移为信号动态分配预算）→ **模态感知激活统计估计**（仅在筛选后的子集上计算重要性分数）。这一链条使得 ATV-Pruning 在 LLaVA-NeXT 8B 上以 50% 稀疏度取得 94.00% 的平均保留率（超越最强基线 TAMP 的 92.67%），在 60% 稀疏度下取得 77.01%（超越 SparseGPT 的 76.24%），验证了非对称策略在保持文本能力的同时大幅剪枝视觉冗余的有效性。
 
-## 整体框架
+
 
 ATV-Pruning 的整体流程围绕一个核心矛盾展开：文本路径对剪枝高度敏感，而视觉路径高度冗余。基于此，方法将剪枝过程解耦为三个顺序执行的模块，形成“统计收集 → 校准集构建 → 权重剪枝”的流水线。
 
@@ -148,7 +150,7 @@ Algorithm 1 给出了完整的 ATV-Pruning 流程：遍历校准样本 → 前�
 ![[assets/figures/papers/paper_list_l768_https_arxiv_org_abs_2603_16001/figures/004_Figure_3.jpg]]
 *Figure 3: Overview of ATV-Pruning; Color intensity reflects the degree of visual saliency. Blocks with higher visual saliency keep more salient visual tokens, with all text tokens*
 
-## 核心模块与公式推导
+
 
 ATV-Pruning 建立在激活感知权重剪枝框架 Wanda 之上，其核心创新在于构建模态感知的校准集，以替代传统模态无关的校准池。整个方法流程由三个关键模块串联而成：模态感知校准集构建、块自适应视觉选择、以及激活感知权重剪枝（Algorithm 1）。
 
@@ -200,7 +202,9 @@ $$\mathcal{V}_{\mathrm{sub}} = \mathrm{TopK}_v(\{s_{v}\}, K)$$
 ![[assets/figures/papers/paper_list_l768_https_arxiv_org_abs_2603_16001/figures/001_Figure_1.jpg]]
 *Figure 1: Illustration of the divergent statistical characteristics across different modalities, manifesting as: (a) activation representation: the textual and visual activations occupy distinct clustered regions in the representation space (t-SNE visualization); and (b) pruning importance: the pruning masks derived from the text-only and visual-only calibration data exhibit a broad IoU distribution (taking 50% sparsity level as an example)*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 6.1 实验设置
 
@@ -278,13 +282,17 @@ $$\mathcal{V}_{\mathrm{sub}} = \mathrm{TopK}_v(\{s_{v}\}, K)$$
 ![[assets/figures/papers/paper_list_l768_https_arxiv_org_abs_2603_16001/figures/011_Figure.jpg]]
 *Figure: A6. Trend of ATV-Pruning’s block-wise Visual Drift and Adaptive Token Allocation on LLaVA-NeXT (8B) with $\alpha = 1$.0. The left y-axis measures the average visual drift per block. The right y-axis indicates the corresponding average number of visual tokens selected per sample. The trend illustrates the blockadaptive nature of our method: more tokens are retained in layers where visual representations undergo significant updates*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 **剪枝方法谱系中的位置。** ATV-Pruning 属于**数据驱动的一次性权重剪枝**（data-driven one-shot weight pruning）范式，其核心剪枝算子直接继承自 **Wanda**（激活感知剪枝，通过权重幅度与输入激活列范数计算重要性分数 $`\mathbf{I}_{ij} = |\mathbf{W}_{ij}| \cdot \|\mathbf{X}_{j}\|_{2}`$），无需迭代权重更新。与 Wanda 的关键分岔点在于**校准池的构建策略**：Wanda 及更早的 **SparseGPT**（基于海森近似的剪枝方法）均为模态无关的校准范式，将多模态 token 混合处理；**TAMP** 虽面向 LVLM 引入跨模态统计指导校准 token 选择，但仍未解耦文本与视觉模态的剪枝敏感度差异。ATV-Pruning 的本质贡献是将“校准池构建”从模态无关升级为**非对称模态感知**——保留全部文本 token 作为语言能力的锚点，同时通过块自适应视觉漂移机制仅选取少量显著视觉 token，从而在保持 Wanda 级剪枝效率的前提下大幅提升高稀疏度下的性能。
 
 **适用边界与约束。** 该方法的设计与验证聚焦于以下边界条件：(1) **模型架构**：面向 LVLM 的 LLM 骨干网络（如 LLaVA-NeXT、Qwen2-VL、LLaVA-OneVision、Qwen2.5-VL），剪枝仅作用于 LLM 骨干的线性层，视觉编码器等模块未被纳入剪枝范围；(2) **剪枝模式**：主要验证了无结构化均匀稀疏度剪枝，附录中虽展示了半结构化剪枝（2:4/4:8）的可行性，但未深入探索其他结构化剪枝模式；(3) **校准数据**：所有方法统一使用 128 个 ShareGPT4V 样本进行校准，评估采用 lmms-eval 统一协议；(4) **超参数依赖**：全局缩放因子 $`\alpha`$ 需要针对不同模型手动设定（LLaVA-NeXT 使用 $`\alpha=1`$，Qwen2-VL 使用 $`\alpha=1.5`$），缺乏自动适应机制。
 
 **局限性与开放问题。** 首先，ATV-Pruning 为收集视觉漂移统计信息引入了额外的前向传播开销，约为 Wanda 的 1.35 倍（99.6 秒 vs 73.7 秒），虽然仍远优于 SparseGPT 的 666.0 秒和 TAMP 的 1418.4 秒，但进一步降低该延迟仍是工程优化方向。其次，全局缩放因子 $`\alpha`$ 的手动调参限制了方法在不同模型间的即插即用性，设计自适应的 $`\alpha`$ 调整策略是一个值得探索的方向。此外，非对称策略目前仅针对文本-视觉双模态设计，是否可扩展到涉及视频、音频等其他模态的多模态模型尚待验证。最后，将 ATV-Pruning 与量化、视觉 token 剪枝等压缩技术结合能否产生叠加效益，以及在更大规模模型（>30B）上的泛化性，均为论文未覆盖的开放问题。
+
+
 
 ## 原文 PDF
 

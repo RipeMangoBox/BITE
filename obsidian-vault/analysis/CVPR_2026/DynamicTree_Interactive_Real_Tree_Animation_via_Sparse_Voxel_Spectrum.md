@@ -43,15 +43,13 @@ claims:
 > - 交互式物理模拟 (Interactive Simulation) 上，仿真时间 (ms/frame)↓ 18.22 vs PhysGaussian: 1800 (降低约99%)；仿真时间 (ms/frame)↓ 18.22 vs PhysFlow: 15600 (降低约99.9%)。
 > - 树木动画用户偏好 (User Preference vs Traditional) 上，总体偏好↑ 57.86% vs Weber: 42.14% (+15.72%)。
 
-## 概述
+## 概要
 
 真实树木的 4D 动画生成长期面临三大结构性瓶颈：**(1)** 基于物理模拟或视频扩散模型的现有方法计算开销巨大，无法实现实时交互；**(2)** 直接预测海量高斯体的长序列运动在内存与数据层面均不可行；**(3)** 合成训练数据与真实场景的 3DGS 重建之间存在域差距，导致运动失真。DynamicTree 的核心洞察在于：**树木运动本质上是准周期性谐波振荡的叠加，在频域具有高度稀疏性**。将这一特性与空间稀疏化（体素化）相结合，即可构建一个极紧凑的 3D 运动表示——**稀疏体素频谱**（Sparse Voxel Spectrum）。
 
 该方法的关键因果机制是：先对网格运动序列沿时间维度做傅里叶变换，仅保留前 $K$ 个频率成分，再用体素化压缩空间维度。这一表示同时解决了效率（数据量急剧减少）、长期一致性（频域约束天然保证运动不发散）和域差距（体素结构统一了合成与真实数据的拓扑）三大痛点。在此基础上，DynamicTree 采用两阶段流水线：首先用稀疏体素扩散模型生成网格运动，再通过 GaMeS 表面绑定将变形传递至 3DGS 高斯体，实现从静态重建到 4D 动画的端到端生成。
 
 实验结果表明，在真实树木 3D 动画任务上，DynamicTree 的 CLIP-I（0.0052）和 CLIP-T（0.0021）大幅优于 **4DGen**（Yin et al., arXiv 2023）与 **SV4D 2.0**（Yao et al., arXiv 2025），用户偏好率高达 93.7%。在交互式物理模拟方面，仿真时间仅 18.22 ms/帧，比 **PhysGaussian**（Xie et al., CVPR 2024）快约 99%，比 **PhysFlow**（Liu et al., CVPR 2025）快约 99.9%，真正实现了实时交互。用户研究进一步表明，该方法在运动真实感上以 57.86% 的偏好显著超过传统树木动画方法 **Weber**（Weber and Penn, SIGGRAPH 1995）的 42.14%。消融实验证实，稀疏体素频谱配合局部频谱平滑损失与两阶段训练策略，是生成无发散、长期一致运动的关键设计。
-
-## 背景与动机
 
 真实树木是自然界中最常见且动态细节最丰富的物体之一。在数字孪生、影视特效、游戏与虚拟现实等应用中，生成结构一致、长期连贯且可实时交互的树木动画是一项长期挑战。然而，现有方法在效率、质量和交互性三个维度上始终难以兼得。
 
@@ -75,7 +73,7 @@ claims:
 
 基于这一洞察，本文提出 **DynamicTree** 框架，将树木运动表示为**稀疏体素频谱**——先用体素化压缩空间维度，再沿时间维度做傅里叶变换并仅保留前 $K$ 个频率成分。该表示既是扩散模型的高效生成目标，又可作为模态基底直接用于实时物理交互，从而首次实现了真实树木 4D 动画的“生成-交互”闭环。
 
-## 核心创新
+## 核心方法与创新机理
 
 DynamicTree 的核心创新在于将真实树木 4D 动画的生成与交互统一到一个极紧凑的表示下——**稀疏体素频谱**。这一表示从三个 changed slots 上根本性地改变了现有方法的设计范式。
 
@@ -108,8 +106,6 @@ $$\mu = \alpha_1 V_1 + \alpha_2 V_2 + \alpha_3 V_3,\quad r = [r_1(f_i), r_2(f_i)
 $$\mathcal{D}(t) = \sum_{k=1}^K \phi_k \cdot q^k(t)$$
 
 这使交互仿真时间降至 **18.22 ms/帧**，比 PhysGaussian 快近两个数量级，真正实现了实时交互。这一能力源于核心表示的巧妙设计——生成阶段产出的频谱天然就是模态分解的结果，无需额外计算。
-
-## 整体框架
 
 DynamicTree 采用**两阶段流水线**将静态 3DGS 树木转化为可实时交互的 4D 动画资产，其核心设计围绕一个关键洞察展开：树木运动本质上是准周期性谐波振荡的叠加，在频域具有高度稀疏性。将这一特性与空间稀疏性（体素化）结合，可形成极紧凑的 3D 运动表示，既能用扩散模型高效生成，又能直接作为模态基底用于实时物理交互。
 
@@ -160,8 +156,6 @@ $$\mathcal{D}(t) = \sum_{k=1}^K \phi_k \cdot q^k(t)$$
 
 ![[assets/figures/papers/paper_list_l1060_https_arxiv_org_abs_2510_22213/figures/001_Figure_1.jpg]]
 *Figure 1: DynamicTree achieves structurally consistent and realistic long-term animation and dynamic interaction on real-world 3DGS trees. It first generates mesh motion via a compact sparse voxel spectrum representation and then deforms the surface-bound Gaussian primitives. We visualize the slice of the generated motion at the orange scanline along the time dimension*
-
-## 核心模块与公式推导
 
 ### 4D 动画生成的整体范式
 
@@ -234,7 +228,7 @@ $$\mathcal{D}(t) = \sum_{k=1}^K \phi_k \cdot q^k(t)$$
 
 此过程每帧仅需约 13 ms 的网格运动计算，加上高斯变形计算（2.57 ms）和渲染（2.65 ms），总计约 18.22 ms/帧，真正实现了实时交互（对比 PhysGaussian 的 1800 ms/帧和 PhysFlow 的 15600 ms/帧）。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 实验设置
 
@@ -359,11 +353,6 @@ Table 3 展示了体素分辨率对性能的影响：
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l1060_https_arxiv_org_abs_2510_22213/figures/011_Figure_7.jpg]]
-*Figure 7: More results of interactive dynamic simulation. Our method can support interactive simulations involving forces with varying magnitudes and directions*
-
-![[assets/figures/papers/paper_list_l1060_https_arxiv_org_abs_2510_22213/figures/012_Figure_8.jpg]]
-*Figure 8: More results of real-tree 3D animation. For each scene, we visualize the space-time slices of depth and RGB videos from two viewpoints. We also show the scene flow of three mesh point cloud frames*
 
 ![[assets/figures/papers/paper_list_l1060_https_arxiv_org_abs_2510_22213/figures/009_Table_4.jpg]]
 *Table 4: Architecture Parameters*
@@ -371,7 +360,7 @@ Table 3 展示了体素分辨率对性能的影响：
 ![[assets/figures/papers/paper_list_l1060_https_arxiv_org_abs_2510_22213/figures/010_Figure_6.jpg]]
 *Figure 6: Examples from our 4DTree dataset. For clarity of visualization, the leaves and trunk are rendered using two simplified material configurations*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 

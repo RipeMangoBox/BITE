@@ -5,6 +5,8 @@ paper_level: A
 venue: SIGGRAPH
 year: 2024
 pdf_ref: paperPDFs/SIGGRAPH_2024/CondMDI_Flexible_Motion_In_betweening_with_Diffusion_Models.pdf
+project_link: null
+code_link: null
 aliases:
 - CCMDB
 - FMBDMC
@@ -43,7 +45,7 @@ claims:
 > - HumanML3D (5 random keyframes) 上，Keyframe error 0.1789 vs IMP+RecG (0.0034) / Imputation (0.4254) (worse than guided, far better than pure imp.)；FID 0.1731 vs IMP (4.6791), IMP+RecG (1.7072) (-1.5341 vs guided, -4.506 vs pure imp.)。
 > - HumanML3D (root joint control) 上，FID 0.2474 vs OmniControl (12.59 / 9.42) / MDM imp. (3.93) (-12.34 vs OmniControl)。
 
-## 概述
+## 概要
 
 运动补间（motion in-betweening）是计算机动画中的关键任务，旨在根据稀疏的关键帧约束生成连贯的中间运动。现有方法普遍受限于**固定的关键帧模式**，难以处理时空稀疏的部分关键帧约束——例如仅给定根关节轨迹或仅约束手腕位置——且推理时条件方法在运动质量和多样性之间存在显著权衡。
 
@@ -55,8 +57,6 @@ claims:
 - **根关节控制**：CondMDI 的 FID 为 0.2474，远优于 **OmniControl**（Xie et al., 2023）的 12.59/9.42，且关键帧错误降低约一个数量级（Table 3）。
 
 定性实验进一步验证了方法的灵活性：CondMDI 能够从仅根轨迹或仅手腕关节的部分关键帧生成自然的下半身运动，并响应文本提示改变动作风格（Figure 4, Figure 7），同时支持同一关键帧约束下生成多样化动作（Figure 6）。
-
-## 背景与动机
 
 ### 动作补间的核心挑战
 
@@ -82,7 +82,7 @@ CondMDI 的核心动机正是弥合训练与推理之间的条件分布鸿沟。
 
 简言之，CondMDI 将动作补间从一个“事后施加约束”的推理问题，转化为一个“从部分观测中重建完整运动”的统一生成建模问题。这一范式转换使得单个模型能够同时处理稀疏关键帧补间、根轨迹驱动、部分关节约束以及文本引导的风格控制等多种任务，且在各场景下均保持与无条件生成相当甚至更优的运动质量。
 
-## 核心创新
+## 核心方法与创新机理
 
 CondMDI 的核心创新在于将运动补间（motion in-betweening）重新定义为一个**掩码条件扩散生成任务**，从而一举突破了现有方法的两个关键瓶颈：一是对固定关键帧模式的依赖，二是推理时条件方法在运动质量和多样性上的不足。
 
@@ -99,8 +99,6 @@ CondMDI 的核心创新在于将运动补间（motion in-betweening）重新定�
 消融实验为这一创新提供了决定性证据（Table 4）：在 5 个随机关键帧条件下，CondMDI 的 FID 为 0.1731，远优于纯 imputation（4.6791）和重建引导（1.7072）；同时关键帧错误仅 0.1789，在保持极低约束误差的前提下实现了与无条件生成持平甚至更优的运动质量。相比之下，推理时方法（imputation + reconstruction guidance）虽能降低关键帧错误至 0.0034，但 FID 飙升至 1.7072，且引入明显抖动（Figure 5），暴露了条件精度与运动自然度之间的根本权衡——而 CondMDI 通过训练时随机掩码成功解耦了这一冲突。
 
 值得注意的是，CondMDI 并非对骨干模型架构的颠覆性改造，而是对**训练范式**的重新设计。其骨干网络直接沿用 GMD（Karunratanakul et al., 2023）的 UNet 架构，真正的突破在于将“从任意部分观测中补全运动”的能力内化到模型参数中，而非依赖推理时的梯度引导或替换操作。这一设计哲学使 CondMDI 在根关节控制任务上，以 FID 0.2474 显著优于专门的关节控制方法 OmniControl（12.59/9.42），同时关键帧错误降低近一个数量级（Table 3）。
-
-## 整体框架
 
 CondMDI 将灵活的动作补间统一为一个掩码条件扩散生成任务。其核心思想是：在训练时通过随机掩码（随机采样关键帧数量和关节数量）让模型学会从任意部分观测中补全完整运动，从而在推理时能够接受时空稀疏的部分关键帧约束，生成高质量、多样化的连贯动作。
 
@@ -154,11 +152,6 @@ CondMDI 与两类推理时条件方法形成鲜明对比：
 CondMDI 通过训练时显式建模条件后验 $p_\theta(\mathbf{x}_{t-1} | \mathbf{x}_t, \mathbf{p}, \mathbf{c})$，在保持极低关键帧错误（0.1789）的同时，FID（0.1731）与无条件生成持平甚至更优，证明了训练时随机掩码是兼顾约束精度与运动质量的关键设计。
 
 ### 补充图表
-
-![[assets/figures/papers/CondMDI_Flexible_Motion_In-betweening_with_Diffusion_Models_cfe713ed727d/figures/001_Figure_1.jpg]]
-*Figure 1: Flexible motion in-betweening given a text prompt and spatio-temporally sparse keyframes. From left to right: a) motion conditioned on sparse keyframes; b) motion conditioned on root trajectory and a "throwing" prompt; c) diverse motions generated for the same keyframes*
-
-## 核心模块与公式推导
 
 CondMDI 将灵活的动作补间统一为掩码条件扩散生成任务。其核心架构基于 **GMD** (Karunratanakul et al., 2023) 的二阶段 UNet 扩散骨干，并在输入层和训练策略上进行了三项关键改造：根表示全局化、随机掩码训练、以及观测掩码拼接输入。
 
@@ -245,7 +238,7 @@ $$
 
 文本提示 $\mathbf{p}$ 通过预训练的 CLIP 文本编码器转换为条件嵌入，随后注入 UNet 的 AdaGN 归一化层。该模块沿用 GMD 的设计，CondMDI 未做修改。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 无条件文本-动作生成能力验证
 
@@ -311,18 +304,6 @@ CondMDI 首先在标准文本-动作生成任务上验证了其骨干网络的�
 
 ### 补充图表
 
-![[assets/figures/papers/CondMDI_Flexible_Motion_In-betweening_with_Diffusion_Models_cfe713ed727d/figures/005_Figure_3.jpg]]
-*Figure 3: Our model is capable of generating high-quality motions in hard moves such as a karate kick or a yoga sun salutation pose. Check the video for the full motions*
-
-![[assets/figures/papers/CondMDI_Flexible_Motion_In-betweening_with_Diffusion_Models_cfe713ed727d/figures/006_Figure_4.jpg]]
-*Figure 4: A walking motion conditioned only on the root joint (left) and only on the right wrist (right)*
-
-![[assets/figures/papers/CondMDI_Flexible_Motion_In-betweening_with_Diffusion_Models_cfe713ed727d/figures/009_Figure.jpg]]
-*Figure: (a) Imputation C=0 (b) Imputation C=1*
-
-![[assets/figures/papers/CondMDI_Flexible_Motion_In-betweening_with_Diffusion_Models_cfe713ed727d/figures/013_Figure_7.jpg]]
-*Figure 7: A walking motion conditioned only on the root joint trajectory (projected on the ground) and guided with text "a person is waving their hands above their head" on the left and "a person tosses a ball" on the right*
-
 ![[assets/figures/papers/CondMDI_Flexible_Motion_In-betweening_with_Diffusion_Models_cfe713ed727d/figures/008_Table_3.jpg]]
 *Table 3: Quantitative results for root-joint control on the HumanML3D test set. OmniControl (on all) means the model is trained on all joints*
 
@@ -332,10 +313,7 @@ CondMDI 首先在标准文本-动作生成任务上验证了其骨干网络的�
 ![[assets/figures/papers/CondMDI_Flexible_Motion_In-betweening_with_Diffusion_Models_cfe713ed727d/figures/011_Table_6.jpg]]
 *Table 6: Inference time*
 
-![[assets/figures/papers/CondMDI_Flexible_Motion_In-betweening_with_Diffusion_Models_cfe713ed727d/figures/012_Figure_6.jpg]]
-*Figure 6: Different motions generated with the same conditioning keyframes. After the last keyframe in blue in (a), the motions (displayed in different colors) show diverse and coherent behavior over time (from left to right). Please refer to the supplementary video for a dynamic version with more samples*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 与运动生成基线的谱系关系
 

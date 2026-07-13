@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/A_Hierarchical_Circuit_Symbolic_Discovery_Framework_for_Efficient_Logic_Optimization.pdf
+project_link: null
+code_link: https://github.com/MIRALab-USTC/HIS
 aliases:
 - HCSDFH
 - HCSDFELO
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 面向高效逻辑优化的层次化电路符号发现框架 |
 | 英文题名 | A Hierarchical Circuit Symbolic Discovery Framework for Efficient Logic Optimization |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=YaXSEbRrHP); [GitHub](https://github.com/MIRALab-USTC/HIS) |
+| Links | [paper](https://openreview.net/forum?id=YaXSEbRrHP) · [GitHub](https://github.com/MIRALab-USTC/HIS) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/neuroscience_cognitive_science |
 | Method | Hierarchical Circuit Symbolic Discovery Framework (HIS) |
 | Dataset | EPFL (Hyp, Square, Multiplier, DesPerf, Ethernet, Conmax), EPFL + IWLS (六个电路) |
@@ -41,7 +43,7 @@ claims:
 > - EPFL (Hyp, Square, Multiplier, DesPerf, Ethernet, Conmax) 上，Times (s) ↓ 为 85.46, 10.69, 13.52, 22.84, 13.19, 13.63，对比 COG: 198.09, 14.70, 17.07, 29.01, 18.30, 16.66; CMO: 129.56, 13.60, 15.08, 22.82, 20.88, 14.43; Random: 238.22, 15.62, 14.99, 23.30, 19.04, 14.25; Effisyn: 218.20, 14.66, 15.51, 24.68, 20.93, 16.76，变化 HIS在所有电路上运行时间最短。
 > - EPFL + IWLS (六个电路) 上，平均运行时间提升 为 27.22%，对比 Default Mfs2，变化 27.22%。
 
-## 概述
+## 概要
 
 逻辑优化（Logic Optimization, LO）是现代芯片设计流程中的关键瓶颈。其核心问题在于：LO启发式算法在执行过程中会产生大量节点级变换，其中绝大多数对优化目标无效，却消耗了绝大部分运行时间。现有方法试图通过评分函数（scoring function）来预测并剪枝这些无效变换，但面临两难选择——基于图神经网络（GNN）的方法（如COG、CMO）预测准确但推理成本过高，难以部署在纯CPU的工业环境中；手工设计的轻量级符号函数（如Effisyn）效率虽高但表达能力有限，无法充分捕获电路图的多层结构信息。
 
@@ -55,7 +57,7 @@ claims:
 
 方法定位：HIS属于**可学习的符号评分函数**范式，填补了GNN高精度-高成本与手工函数低成本-低表达力之间的空白。其层次化符号树表示本质上是一种**显式、可解释的GNN蒸馏**——将GNN隐式学习的消息传递模式蒸馏为符号表达式，从而在CPU上实现近乎零开销的结构感知推理。
 
-## 背景与动机
+
 
 逻辑优化（Logic Optimization, LO）是芯片设计流程中的关键环节，其核心是通过一系列节点级变换（如布尔重写、节点消去）来减小电路面积与深度。然而，现有LO启发式算法面临一个根本性瓶颈：在大型工业电路上，大量节点级变换是无效的，导致运行时间过长，严重拖慢设计迭代周期。这一问题在纯CPU部署的工业环境中尤为突出，因为昂贵的GPU推理难以集成到现有的EDA工具链中。
 
@@ -65,7 +67,9 @@ claims:
 
 进一步地，HIS引入了一个基于强化学习的符号生成框架：使用结构感知Transformer逐层生成符号序列，并通过PPO算法优化策略网络。该框架避免了手工设计符号函数的局限性，能够自动为不同电路发现最优的层次化聚合表达式。在六个挑战性电路上的评估显示，HIS-Mfs2（将HIS嵌入Mfs2启发式）相比默认Mfs2实现了平均27.22%的运行时间提升和6.95%的电路尺寸减少，且其top-50%预测召回率一致优于所有基于图和基于节点的基线方法。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 HIS 框架的核心创新在于将逻辑优化中昂贵的 GNN 评分函数替换为一种**层次化符号树表示**，从而在保持甚至提升预测精度的同时，将推理速度提升两个数量级。这一创新精准地解决了现有方法的核心瓶颈：GNN 推理在纯 CPU 工业环境下的高成本与低效率。
 
@@ -85,7 +89,7 @@ HIS 框架的核心创新在于将逻辑优化中昂贵的 GNN 评分函数替�
 *   **端到端的优化增益**：当 HIS 学习到的评分函数被集成到 Mfs2 逻辑优化启发式算法中（形成 HIS-Mfs2）后，在六个挑战性电路上取得了平均 **27.22%** 的运行时间提升和 **6.95%** 的电路尺寸缩减。
 *   **一致的最优预测性能**：在 top-50% 预测召回率这一关键指标上，HIS 在 EPFL 和 IWLS 的所有测试电路上均一致优于所有基于图（COG, CMO）和基于节点（Random, Effisyn）的基线方法。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0002_YaXSEbRrHP_A_Hierarchical_Circuit_Symbolic_Discovery_Framew/figures/001_Figure_1.jpg]]
 *Figure 1: Our HIS framework learns a hierarchical symbolic tree which performs an interpretable and efficient message aggregation motivated by the graph neural networks (GNNs)*
@@ -108,7 +112,7 @@ HIS（Hierarchical Circuit Symbolic Discovery Framework）的核心设计围绕�
 
 **需要手动验证的点**：虽然论文声称HIS的推理速度与Effisyn等轻量级方法相当，但具体比较数据在Table 5中，建议核实Effisyn的推理时间数值以确保公平性。此外，层次化符号树的层数 $L=2$ 是固定设置，更深层次的探索（如 $L=3$ 或 $L=4$）是否带来性能提升，论文中未提供实验证据，这是一个开放问题。
 
-## 核心模块与公式推导
+
 
 本节聚焦 HIS 框架中替代昂贵 GNN 推理的核心——层次化符号树表示及其生成与优化机制。所有公式均直接来自论文，不引入未经验证的推导。
 
@@ -190,7 +194,9 @@ $$
 
 为了进一步提升推理稳定性，论文采用 Best-of-N 策略：在训练完成后，从生成的符号树中选出训练奖励最高的 $N$ 个表达式（实验中 $N = 4$），构建集成模型。在推理时，这 $N$ 个符号树分别对每个节点进行预测，最终评分取它们的平均值。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：在线启发式效率与优化性能
 
@@ -246,7 +252,9 @@ Table 3的消融实验验证了HIS各核心组件的必要性：
 *Table 4: We provide comprehensive implementation details, including the arguments for training, the Transformer model, and RL algorithms, along with a subset of the tokens library*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -280,6 +288,8 @@ HIS 的适用性受限于以下边界条件：
 5. **训练稳定性与调参成本**：PPO 强化学习对超参数（组大小、裁剪阈值 ε）敏感，调参成本较高。消融实验（Table 3）显示移除任何模块都会导致性能显著下降，表明各组件的互补设计是性能的关键，但也意味着系统复杂度较高。是否存在更鲁棒的训练策略或更简洁的架构设计？
 
 6. **与 GNN 的潜在融合**：HIS 受 GNN 消息传递机制启发但完全替代了 GNN。能否将 HIS 的符号表示与更复杂的 GNN 架构（如注意力机制）结合，以在可解释性和表达力之间取得更好的平衡？这是一个值得探索的混合方向。
+
+
 
 ## 原文 PDF
 

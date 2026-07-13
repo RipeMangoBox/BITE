@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/The_Spacetime_of_Diffusion_Models_An_Information_Geometry_Perspective.pdf
+project_link: null
+code_link: https://github.com/Aalto-QuML/spacetime-geometry
 openreview_forum_id: qCsbYJZRA5
 aliases:
 - SFRGDM
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 扩散模型的时空：信息几何视角 |
 | 英文题名 | The Spacetime of Diffusion Models: An Information Geometry Perspective |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=qCsbYJZRA5); [GitHub](https://github.com/Aalto-QuML/spacetime-geometry) |
+| Links | [paper](https://openreview.net/forum?id=qCsbYJZRA5) · [GitHub](https://github.com/Aalto-QuML/spacetime-geometry) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Spacetime Fisher-Rao Geometry in Diffusion Models |
 | Dataset | Alanine Dipeptide (MaxEnergy ↓), Alanine Dipeptide (#Evaluations ↓ for 1000 paths) |
@@ -41,7 +43,7 @@ claims:
 > - Alanine Dipeptide (MaxEnergy ↓) 上，MaxEnergy (kcal/mol) 为 37.36 ± 0.60，对比 MCMC-fixed-length: 42.54 ± 7.42，变化 -5.18。
 > - Alanine Dipeptide (#Evaluations ↓ for 1000 paths) 上，Number of energy evaluations 为 16M (+16M one-time training)，对比 MCMC-fixed-length: 1.29B，变化 reduction by ~1.27B。
 
-## 概述
+## 概要
 
 扩散模型在生成建模中取得了显著成功，但其潜在空间的几何结构尚未被充分理解。现有工作多采用基于确定性概率流 ODE（PF-ODE）解码器的回拉几何（pullback geometry），然而该方法存在根本性缺陷：**它迫使潜在空间中的测地线在数据空间解码为直线段，完全忽略数据流形的曲率结构**。另一方面，若仅以最终噪声 $\mathbf{x}_T$ 作为潜在变量并应用 Fisher-Rao 信息度量，由于去噪分布 $p(\mathbf{x}_0|\mathbf{x}_T)$ 在 $T$ 足够大时近似独立于 $\mathbf{x}_T$，度量将坍塌为零，无法区分不同点。
 
@@ -49,7 +51,7 @@ claims:
 
 方法定位上，本文属于扩散模型与信息几何的交叉研究，区别于基于 PF-ODE 的回拉几何（测地线解码为直线）和 MCMC 过渡路径采样方法（如 **Brotzakis & Bolhuis, 2016** 的 two-way shooting）。在丙氨酸二肽（Alanine Dipeptide）过渡路径采样任务上，该方法以 **37.36 ± 0.60 kcal/mol** 的最大能量显著优于 MCMC 基线（42.54 ± 7.42），且能量评估次数从 12.9 亿次降至 1600 万次（外加一次性训练成本）。在图像域，DiffED 与 SSIM 相关性达 53%，与 LPIPS 相关性仅 -7%，表明其捕捉结构相似性而非感知相似性。
 
-## 背景与动机
+
 
 ### 扩散模型的几何化趋势
 
@@ -99,7 +101,9 @@ $$\mathrm{DiffED}(\pmb{x}^a, \pmb{x}^b) = \ell(\gamma).$$
 
 Figure 1 给出了这一概念的可视化：时空测地线是连接两个去噪分布的最短路径，其贯穿不同噪声水平的过程天然编码了“遗忘-重建”的编辑语义。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于**将扩散模型的潜在空间重新构建为“时空”流形**，并赋予其信息几何度量，从而克服了现有几何方法的两大根本性缺陷。
 
@@ -145,7 +149,7 @@ $$\mathrm{DiffED}(\pmb{x}^a, \pmb{x}^b) = \ell(\gamma)$$
 - **感知相关性**：DiffED 与 LPIPS 相关性仅约 -7%，与 SSIM 相关性约 53%，表明其捕捉结构相似性而非像素级感知相似性。
 - **应用范围**：过渡路径采样目前仅适用于具有已知能量函数的分子系统；部分基线方法（Holdijk et al., 2023; Raja et al., 2025）因可重现性问题未纳入对比，需手动验证。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_qCsbYJZRA5/figures/009_Figure_6.jpg]]
 *Figure 6: Transition paths generated with a spacetime geodesic avoid high-energy regions without collapsing to a single path. Compared with MCMC baselines, the spacetime-geodesic method yields transition paths that better avoid high-energy areas, whereas Doob’s Lagrangian collapses to generating nearly identical trajectories. Ten sample paths are shown for each method*
@@ -220,7 +224,7 @@ $$\min_{\gamma} \left\{ \mathcal{E}(\gamma) + \lambda \int_{0}^{1} h(\gamma_s) d
 - **应用范围**：过渡路径采样目前仅适用于具有已知能量函数的分子系统
 - **基线对比**：因可重现性问题，未与 Holdijk et al. (2023) 和 Raja et al. (2025) 的原方法比较
 
-## 核心模块与公式推导
+
 
 ### 潜在时空表示
 
@@ -274,7 +278,9 @@ $$dx = -\nabla_x U(x|\gamma_s) dt + \sqrt{2} d\mathbf{W}_t$$
 
 通过交替执行朗之万步骤与沿测地线推进锚点 $\gamma_n \mapsto \gamma_{n+1}$，该方法生成的过渡路径能有效避开高能区域，且不会塌缩为单一路径。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ![[assets/figures/papers/paper_list_l26_https_openreview_net_forum_id_qCsbYJZRA5/figures/010_Table_1.jpg]]
 *Table 1: Spacetime geodesics outperform methods tailored to transition path sampling. Parentheses denote extra energy evaluations used to generate training data for the base diffusion model, which do not scale with the number of generated paths. Baseline details in Appendix H*
@@ -326,7 +332,9 @@ $$dx = -\nabla_x U(x|\gamma_s) dt + \sqrt{2} d\mathbf{W}_t$$
 4. **应用领域限制**：过渡路径采样目前仅适用于具有已知能量函数的分子系统（如玻尔兹曼分布），且需额外的退火朗之万步骤。对于图像等无明确能量函数的领域，过渡路径的定义尚不明确。
 5. **基线对比不完整**：因可重现性问题，未与 Holdijk et al. (2023) 和 Raja et al. (2025) 的原方法直接比较，相关结论的普适性需进一步验证。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈：从回拉几何到信息几何的范式转换
 
@@ -369,6 +377,8 @@ $$dx = -\nabla_x U(x|\gamma_s) dt + \sqrt{2} d\mathbf{W}_t$$
 - **跨领域过渡路径：** 对于图像、音频等无显式能量函数的领域，如何定义“过渡路径”任务？是否需要学习隐式能量函数或利用分类器引导？
 - **度量学习的扩展：** Fisher-Rao 度量在度量学习、生成模型评估或模型压缩中是否有进一步应用？
 - **与其他生成模型的兼容性：** 时空几何框架是否可扩展到基于流的模型或其他生成范式？指数族结构在这些模型中是否存在对应物？
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/AQuA_Toward_Strategic_Response_Generation_for_Ambiguous_Visual_Questions.pdf
+project_link: https://aqua-iclr2026.github.io/
+code_link: null
 aliases:
 - AAVQASG
 - AQuA
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | AQuA：面向模糊视觉问题的策略性响应生成 |
 | 英文题名 | AQuA: Toward Strategic Response Generation for Ambiguous Visual Questions |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=7b1MpD6IF8); [Project](https://aqua-iclr2026.github.io/) |
+| Links | [paper](https://openreview.net/forum?id=7b1MpD6IF8) · [Project](https://aqua-iclr2026.github.io/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | AQUA (Ambiguous Visual Question Answering) + SFT + GRPO |
 | Dataset | AQUA |
@@ -41,21 +43,23 @@ claims:
 > - AQUA 上，Level 0 Strategic Accuracy (%) 为 99.56，对比 97.11，变化 +2.45。
 > - AQUA 上，Level 1 Strategic Accuracy (%) 为 77.0，对比 0.11，变化 +76.89。
 
-## 概述
+## 概要
 
 本文提出 **AQuA (Ambiguous Visual Question Answering)**，一个面向模糊视觉问题的策略性响应生成框架。核心贡献包括：(1) 构建了一个包含 **7.2K** 样本的四级歧义VQA数据集，将歧义按性质和程度细分为 Level 0-3；(2) 提出 **SFT + GRPO** 两阶段训练方法，使视觉语言模型（VLM）学会根据歧义等级自适应选择响应策略（直接回答、上下文推断、列出所有可能、请求澄清）；(3) 在 AQUA 基准上，经过微调的 Qwen2.5-VL-3B-Tuned 模型实现了 **86.28%** 的整体策略准确率，显著超越零样本 GPT-5 的 42.25% 和 Gemini 2.5 Flash 的 37.83%。
 
-## 背景与动机
+
 
 现有VQA基准主要包含清晰无歧义的图像-问题对，而现实场景中常存在不同程度的歧义。现有方法仅采用二元的“回答或询问”策略，无法根据歧义的类型和程度自适应地选择策略。如 Figure 1 所示，当图像中没有任何一个球棒在视觉上显著时，GPT、Gemini 和 Qwen 仍武断地选择回答，而 AQuA 训练的模型则请求澄清。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 **核心洞察**：通过将歧义VQA实例细分为四个等级并定义对应的最优响应策略，结合 SFT 和 GRPO 训练，可以使 VLM 学会根据歧义程度自适应地选择策略，从而显著提升在模糊场景下的响应质量。
 
 **因果旋钮**：将歧义VQA实例按歧义性质和程度细分为四个等级（Level 0-3），并为每个等级定义最优响应策略（直接回答、从上下文推断、列出所有可能选项、请求澄清），通过监督微调（SFT）和组相对策略优化（GRPO）训练模型，使其能够根据歧义等级自适应地选择策略。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_7b1MpD6IF8_AQuA_Toward_Str/figures/001_Figure_1.jpg]]
 *Figure 1: Examples of model responses to an ambiguous visual question. In this image, none of the bats is visually salient, making the visual context ambiguous. While GPT, Gemini, and Qwen provide answers by arbitrarily selecting (e.g., the bat in the foreground) despite the ambiguity, our model, which is trained to handle such cases strategically, requests clarification instead.*
@@ -69,7 +73,7 @@ AQuA 框架包含以下核心模块：
 5. **组相对策略优化 (GRPO)**：在 SFT 基础上应用 GRPO，使用 LLM-as-a-judge 奖励策略对齐的输出
 6. **LLM-as-a-judge 评估**：使用 GPT-5-mini 评估事实一致性和策略准确性
 
-## 核心模块与公式推导
+
 
 ### 5.1 四级歧义分类
 
@@ -94,7 +98,9 @@ $$R(y|x,I) = \begin{cases} 1 - \lambda & \text{if strategy is correct but factua
 
 其中 $\lambda=0.3$ 为事实扭曲惩罚。Figure 3 展示了奖励分配过程。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 6.1 主要结果
 
@@ -163,7 +169,9 @@ Figure 6 展示了两种主要失败模式：
 ![[assets/figures/papers/iclr26_vision_multimodal_applications__vision_models_multimodal__b001_7b1MpD6IF8_AQuA_Toward_Str/figures/015_Table_5.jpg]]
 *Table 5: Evaluation results of samples generated using Open Images V7.*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 AQuA 属于 **策略性VQA** 领域，与以下工作相关：
 
@@ -185,6 +193,8 @@ AQuA 属于 **策略性VQA** 领域，与以下工作相关：
 - GRPO 奖励函数中的 $\lambda=0.3$ 是否最优？
 - 模型在 Level 1 上的性能下降是否可以通过改进 GRPO 奖励设计来缓解？
 - 该方法能否扩展到其他多模态任务（如视觉定位、图像描述）？
+
+
 
 ## 原文 PDF
 

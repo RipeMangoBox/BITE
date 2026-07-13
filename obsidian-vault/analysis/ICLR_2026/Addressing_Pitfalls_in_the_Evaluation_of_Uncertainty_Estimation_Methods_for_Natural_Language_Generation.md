@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Addressing_Pitfalls_in_the_Evaluation_of_Uncertainty_Estimation_Methods_for_Natural_Language_Generation.pdf
+project_link: null
+code_link: null
 openreview_forum_id: OxWnOV5q8w
 aliases:
 - SMSTEAUE
@@ -42,7 +44,7 @@ claims:
 > - Various QA benchmarks 上，频率 of Top‑3 membership (adversarial correctness selection vs reference) 为 参考值: G‑NLL=0.375, Perplexity=0.125，对比 对抗选择: G‑NLL=0.688 (+0.312), Perplexity=0.444 (+0.319)，变化 大幅虚增（up to +0.375 for Min Token Log‑Prob）。
 > - ALL TASKS (QA + CODE + C.TEXT + OOD + PERT) 上，Elo rating 为 简单方法（如G‑NLL、Perplexity）在Elo汇总中总体表现好于许多复杂方法，对比 无统一汇总基线；传统评估以孤立表格呈现，变化 Elo aggregation reveals competitive performance of simple methods outside QA。
 
-## 概述
+## 概要
 
 **核心瓶颈**：当前自然语言生成（NLG）不确定性估计方法的评估严重依赖近似正确性函数（如 ROUGE、BLEU、LLM‑as‑a‑judge）。这些函数之间存在显著分歧（Fig. 1），导致不确定性方法的排名在不同正确性函数下不一致。更严重的是，正确性标签的偏差和方差会扭曲 AUROC 估计——对抗性地选择正确性函数即可大幅虚增特定方法的排名（Table 2），暴露出评估协议的系统性漏洞。
 
@@ -55,8 +57,6 @@ claims:
 - **Elo 聚合**：将每个数据集‑模型组合的实验视为一场比赛，通过 Elo 评分系统汇总相对表现，提供概率化解释和间接比较能力（Fig. 3）。
 
 **关键发现**：Elo 聚合揭示，简单的启发式方法（如 G‑NLL、Perplexity）在跨任务、跨模型的综合评估中总体表现优于许多复杂方法，这一结论在传统孤立表格评估中难以显现。SP‑MoJI 与人工标注的相关性也高于单个法官的平均相关性（Fig. 7），进一步验证了多法官边缘化的有效性。
-
-## 背景与动机
 
 自然语言生成（NLG）中的不确定性估计（Uncertainty Estimation, UE）旨在量化模型输出的可信度，其核心评估范式是**风险相关性实验**：将估计的不确定性 $\hat{u}(x_i, w; \theta_u)$ 与某种风险指标 $r(x_i, y_i')$ 进行相关性度量（通常使用AUROC或Spearman $\rho$）[Eq. 1]。其中，**选择性预测**（Selective Prediction）是最广泛使用的评估场景——用否定正确性 $\neg c(\pmb{y}_i', \pmb{y}_i, \pmb{x}_i; \pmb{\theta}_c)$ 作为风险指标，检验不确定性方法能否区分正确与错误输出[Eq. 2]。
 
@@ -72,7 +72,7 @@ claims:
 
 上述问题共同指向一个核心洞察：**需要一种能够边缘化正确性标签参数、拓展风险指标维度、并综合多维实验信息的评估框架**，以消除单一近似正确性函数引入的评估偏差，获得更稳定、更客观的不确定性方法排名。本文正是围绕这一目标，提出SP-MoJI（多法官混合选择性预测）、结构化任务精确正确性验证、以及基于Elo评分的概率化聚合三个互补方案。
 
-## 核心创新
+## 核心方法与创新机理
 
 ### 问题诊断：近似正确性函数作为评估陷阱
 
@@ -125,8 +125,6 @@ Eq. (3) 给出了独立伯努利标签噪声下AUROC的期望变化：$\mathrm{A
 
 SP-MoJI虽降低了方差，但仍依赖LLM-as-a-judge，无法完全消除法官模型的内在偏差。结构化任务的种类有限（仅代码和约束文本），扰动检测中扰动类型和强度的偏差尚未全面分析。Elo评分的解释性依赖于大量比赛的均匀采样。在CoT、多智能体等高级NLG设置下的适配留待未来工作。
 
-## 整体框架
-
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_OxWnOV5q8w/figures/007_Figure_5.jpg]]
 *Figure 5: UE method ordering heatmaps including AlignScore. In our experiments it was always observed to be in its own cluster. Although the default settings from the AlignScore repository together with ’base’ model were used, it is quite possible that some adjustments would improve its correlation to other correctness methods*
 
@@ -162,8 +160,6 @@ $$\xi_{\mathrm{perturb}} = \frac{1}{N}\sum_{i=1}^{N} \mathrm{Cor}\left[ \hat{u}(
 ### 模块关系与数据流
 
 整体流程可概括为：对于给定的不确定性估计方法，在多个任务类型（QA / CODE / C.TEXT / OOD / PERT）上分别计算其与风险指标的秩相关（AUROC或Spearman $\rho$），其中QA分支通过SP-MoJI边缘化正确性标签，结构化任务分支使用精确正确性；各实验的结果最终输入Elo评分系统，输出统一的方法排名。该框架不改变不确定性方法本身，仅替换评估协议中的正确性函数、风险指标和聚合方式三个“槽位”。
-
-## 核心模块与公式推导
 
 ### 问题形式化：风险相关性评估
 
@@ -238,7 +234,7 @@ $$\mathrm{AUROC}^{\mathrm{dist}} = \mathrm{AUROC}^{\mathrm{orig \cdot undist}} \
 
 其中 $d_i$ 指示第 $i$ 个样本的标签是否被扭曲。该分解在合成数据上得到了实证验证（Fig. 9），偏差低且方差小，尤其适用于QA数据集常见规模（$10^3$ 量级）。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心发现：正确性标签偏差是评估失效的根源
 
@@ -315,10 +311,7 @@ $$\mathrm{AUROC}^{\mathrm{dist}} = \mathrm{AUROC}^{\mathrm{orig \cdot undist}} \
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_OxWnOV5q8w/figures/008_Table_3.jpg]]
 *Table 3: Accuracies of the models for evaluated datasets according to corresponding correctness functions. This table lists the dataset / model papers evaluated in this work. Nan values in SQUAD is expected behavior, as there are no correctness labels for the artificially unanswerable OOD part. Known-Unknown (Amayuelas et al., 2024) dataset generations were performed without accuracy computation as we used it strictly as an OOD detection dataset*
 
-![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_OxWnOV5q8w/figures/011_Table_4.jpg]]
-*Table 4: Judge model configurations used for correctness prediction. QA and Gen prompts are provided in Apx.Sec.C.2. Additionally, multiple samples were taken from each judge model*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 当前评估协议的瓶颈与本文的定位
 

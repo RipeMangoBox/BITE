@@ -44,7 +44,7 @@ claims:
 > - OmniHuMo-Speech test set 上，FID 83.80 (AnyMo-775M) vs 178.83 (AnyMo-111M) (-95.03)。
 > - OmniHuMo-Music test set 上，FID 34.41 (AnyMo-775M) vs 70.98 (AnyMo-111M) (-36.57)。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -66,7 +66,7 @@ AnyMo在方法谱系中处于“大规模数据驱动的统一掩码建模”这
 
 当前OmniHuMo未包含手指关节标注，限制了全身精细动作生成。音频对齐数据仅约500小时（占总数据约十分之一），导致音频驱动任务未能观察到单调缩放定律，更大模型可能过拟合。如何将手部标注融入数据流水线、如何增加音频对齐数据比例、以及如何处理更稀疏或未见过的模态组合，是后续研究的关键方向。
 
-## 背景与动机
+
 
 ### 动作生成的数据瓶颈
 
@@ -90,7 +90,9 @@ AnyMo在方法谱系中处于“大规模数据驱动的统一掩码建模”这
 
 三个层面的协同设计使得AnyMo能够从任意模态组合中生成高保真度动作，并在文本驱动任务上取得超越真实数据检索精度的结果（R@1 0.75 vs. 0.74），为统一可控动作生成提供了可扩展的技术路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 AnyMo的核心创新并非单一算法技巧，而是一套**从数据到模型再到训练策略的系统性重构**，其本质是通过“规模化数据 + 残差量化 + 并行掩码建模 + 任意模态条件”的组合拳，解决了现有运动生成方法在跨模态泛化、灵活控制和高质量生成上的根本瓶颈。
 
@@ -162,7 +164,7 @@ $$Z_{\mathrm{enc}} = \sum_{v=0}^{V}\mathrm{Embd}^v(\widetilde{\pmb{m}}^v).$$
 
 这些局限指向了未来的改进方向，但并未削弱核心创新——规模化数据与残差并行掩码建模相结合——在文本和音乐驱动任务上已取得的决定性优势。
 
-## 整体框架
+
 
 AnyMo 采用两阶段流水线设计：**运动标记化** 与 **条件运动生成**。如图 6 所示，系统首先通过基于残差有限标量量化（R-FSQ）的运动标记器将连续人体动作序列离散化为多级标记流；随后，一个可扩展的掩码 Transformer 以任意模态组合为条件，并行预测所有标记流，最终经解码器重建出高质量运动序列。
 
@@ -218,7 +220,7 @@ $$\mathcal{L}_2 = -\sum_{v=0}^{V} \log p\left(\pmb{m}^v \mid Z_{\text{text}}, Z_
 ![[assets/figures/papers/arxiv_2026_anymo_2605_29488/figures/003_Figure_2.jpg]]
 *Figure 2: Data Construction Framework of OmniHuMo. The proposed pipeline systematically extracts high-quality human motion data with temporally aligned audio signals and corresponding textual descriptions*
 
-## 核心模块与公式推导
+
 
 AnyMo 由两大核心模块构成：**残差有限标量量化（R-FSQ）运动标记器**和**可扩展掩码 Transformer**。前者将连续运动序列压缩为多级离散标记，后者在统一的多模态条件空间中通过并行掩码建模实现高质量运动生成。
 
@@ -268,7 +270,9 @@ $$\mathcal{L}_2 = -\sum_{v=0}^{V} \log p\left(\mathbf{m}^v \mid Z_{\text{text}},
 
 此课程设计使得模型在文本驱动任务上充分收敛后，再逐步适应稀疏的音频对齐信号，缓解了直接联合训练可能导致的模态偏差与过拟合。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -347,7 +351,9 @@ AnyMo 在以下关键维度上区别于现有工作：
 ![[assets/figures/papers/arxiv_2026_anymo_2605_29488/figures/002_Table_1.jpg]]
 *Table 1: Comparison with existing motion datasets. "Mono MoCap" refers to markerless monocular video-based motion capture. "Data Agg" denotes datasets constructed by aggregating existing sources*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线工作的关系
 
@@ -386,6 +392,8 @@ AnyMo 的能力边界由以下要素共同界定：
 5. **推理效率优化**：并行掩码建模虽已提升效率，但轨迹控制的测试时优化和大型 Transformer 的推理开销仍可能限制部署。能否通过蒸馏或专用解码策略进一步降低推理成本？
 
 **需要手动验证的方面**：论文中未提供 AnyMo 在标准基准（如 HumanML3D 的文本-动作生成任务）上与 T2M-GPT、MoMask 等方法的直接对比数据，仅在 OmniHuMo-Text 测试集上进行了评估。跨数据集的迁移性能和可比性需要额外的实验验证。
+
+
 
 ## 原文 PDF
 

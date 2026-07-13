@@ -41,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - MIRA 上，Overall Accuracy (Direct) - vs GPT-5: 16.5% (无模型超过20%)；Overall Accuracy (Visual-CoT vs Direct) GPT-5-mini: 23.2% vs GPT-5-mini: 13.7% (+9.5% (绝对), 平均相对 +33.7%)。
 
-## 概述
+## 概要
 
 **核心问题：** 当前多模态大语言模型（MLLMs）在需要精确空间推理、几何操作或物理模拟的任务中存在根本性瓶颈——纯文本思维链（Text-CoT）无法有效表达和操作复杂的中间视觉状态，导致模型“想不清楚”那些必须“以图思考”的问题。
 
@@ -51,7 +51,7 @@ claims:
 
 **主要结果：** 物理推理任务从Visual-CoT中获益最大，准确率从20.7%跃升至40.0%，几乎翻倍；而谜题类任务提升幅度较小，仅从9.5%增至10.5%。扩大搜索空间（Pass@k从1到4）可带来平均15.3%的提升，但k=4到8时增益趋缓至3.0%，说明MIRA任务的本质困难难以通过简单采样策略克服。
 
-## 背景与动机
+
 
 多模态大型语言模型（MLLMs）在现有视觉-语言基准上已展现出令人瞩目的性能。如 Figure 1 右侧所示，GPT-5、Gemini 2.5 Pro 和 o3 等领先模型在 MMMU、MMMU Pro、MMStar 和 RealWorldQA 等测试中均取得了高分。然而，这些基准主要考察模型对视觉内容的直接理解与文本回答能力，并未系统性地评估模型在需要“以图思考”的任务上的表现——即推理过程中必须生成或操作中间视觉表征才能得出正确答案的场景。
 
@@ -61,7 +61,9 @@ claims:
 
 为系统性地诊断这一瓶颈，MIRA（Multimodal Imagination for Reasoning Assessment）基准被提出。MIRA 的核心洞察是：**对于需要空间推理、几何操作或物理模拟的复杂问题，中间视觉表征是有效推理的关键第一步**；视觉思维链（Visual-CoT）弥补了纯文本思维链在表达这些信息上的不足。通过提供人工标注的中间视觉状态作为推理的辅助线索，MIRA 能够量化“可视化”对推理性能的因果贡献，从而揭示当前模型在自主生成和利用视觉思维方面的真实能力边界。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MIRA 的核心创新并非提出一种新的模型架构或训练范式，而是**定义并系统化评估了一种被现有基准长期忽视的推理能力——视觉思维链（Visual Chain-of-Thought, Visual-CoT）**。其创新性集中体现在三个相互耦合的“changed slots”上：问题定义、评估协议与数据构造哲学。
 
@@ -98,7 +100,7 @@ MIRA 的第三项创新体现在其**数据构造哲学**上。与大多数基�
 
 MIRA 的三项创新构成了一条完整的逻辑链：**定义新问题 → 设计诊断性评估协议 → 构造针对性数据**。其本质贡献在于，它首次将“视觉思维链”从一种直觉性的能力描述，转化为一个可量化、可诊断、可改进的评估框架。这一框架揭示的核心发现——现有 MLLM 在需要“以图思考”的任务上存在根本性缺陷，而视觉线索的注入能带来显著且非平凡的增益——为下一代多模态推理模型的研究指明了方向：**可视化不应只是推理的输出，而应成为推理过程本身的第一步**。
 
-## 整体框架
+
 
 MIRA 基准的整体设计围绕一个核心命题展开：**对于需要空间推理、几何操作或物理模拟的复杂问题，中间视觉表征是有效推理的关键第一步**。现有 MLLM 的纯文本思维链（Text-CoT）无法准确捕捉和操作复杂的空间关系、几何结构与物理动态，而 MIRA 通过提供人工标注的中间视觉状态（Visual-CoT）作为推理过程的辅助线索，系统性地诊断了这一瓶颈。
 
@@ -145,7 +147,7 @@ MIRA 将 Visual-CoT 推理任务分为两大类型：**静态（单步）** 和 
 ![[assets/figures/papers/paper_list_l2756_https_arxiv_org_abs_2511_02779/figures/001_Figure_1.jpg]]
 *Figure 1: Left: an example from MIRA with responses from both MLLMs and humans, illustrating the visual reasoning and cognitive gaps revealed by our benchmark; Right: while leading MLLMs demonstrate strong performance on established benchmarks, they struggle significantly on the MIRA, with none surpassing a 20% accuracy rate with direct inputs. This highlights MIRA’s role in exposing the fundamental challenges these models face in complex reasoning tasks that require generating intermediate visual images*
 
-## 核心模块与公式推导
+
 
 ### 关键模块
 
@@ -184,7 +186,9 @@ $$\ h ^ { \prime } \equiv ( 1 2 - h - \mathrm { c a r r y } ) \pmod { 1 2 }$$
 $$H_{\mathrm{full}}$$
 通过前视图与侧视图推断立体结构中每个位置的最大可能高度，是计数类几何任务的核心推理依据。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与评估协议
 
@@ -261,7 +265,9 @@ Visual-CoT 的提升效果在不同领域间存在显著差异。**物理推理�
 ![[assets/figures/papers/paper_list_l2756_https_arxiv_org_abs_2511_02779/figures/012_Table_7.jpg]]
 *Table 7: Detailed Results for Abstract Puzzles (Multi-piece Puzzle), Physics-Based Reasoning (Electric Charge), and Causal Transformations (Rolling Dice: Top) Tasks*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 MIRA 并非提出新的推理算法或模型架构，而是一个**诊断性基准**。它的核心贡献在于系统性地揭示了一个被现有评测掩盖的瓶颈：当前多模态大模型（MLLMs）在需要“以图思考”的空间推理、几何操作和物理模拟任务上存在根本性困难。因此，MIRA 在知识库中的定位更接近能力探针（capability probe），而非方法改进。
 
@@ -304,6 +310,8 @@ MIRA 的局限性直接指向未来的研究方向：
 4. **视觉线索的传递格式**：当前 Visual-CoT 的提升受限于模型对附加视觉信息的理解能力。是否存在更有效的传递视觉线索的格式（如结构化草图、矢量化中间状态、动态标注叠加等），值得进一步探索。
 
 5. **开放权重模型的困境**：部分开放权重模型由于参数规模小且缺乏交错视觉-文本数据训练，在 MIRA 上提升有限。这是否意味着视觉推理能力存在参数规模的临界点，或者需要特定的训练数据配方？
+
+
 
 ## 原文 PDF
 

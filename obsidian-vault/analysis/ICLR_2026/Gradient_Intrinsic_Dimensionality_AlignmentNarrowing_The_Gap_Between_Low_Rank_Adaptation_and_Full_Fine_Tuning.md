@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Gradient_Intrinsic_Dimensionality_AlignmentNarrowing_The_Gap_Between_Low_Rank_Adaptation_and_Full_Fine_Tuning.pdf
+project_link: null
+code_link: null
 aliases:
 - RRP
 - "RaLoRA / RaLoRA-Pro"
@@ -40,11 +42,11 @@ claims:
 > - MT-Bench (LLaMA-3.1-8B) 上，评分 (0-10) 为 6.38 (RaLoRA) / 6.72 (RaLoRA-Pro)，对比 6.15 (LoRA)，变化 +0.23 / +0.57。
 > - GSM8K (LLaMA-3.1-8B) 上，准确率 (%) 为 72.25 (RaLoRA) / 73.01 (RaLoRA-Pro)，对比 67.78 (LoRA)，变化 +4.47 / +5.23。
 
-## 概述
+## 概要
 
 本文提出了一种基于梯度本征维度（Gradient Intrinsic Dimensionality, GID）对齐的参数高效微调方法，旨在解决LoRA（Low-Rank Adaptation）因固定低秩结构导致的性能瓶颈。作者首先通过熵基估计器量化全微调梯度的有效秩，发现其可达300，远超LoRA预设的固定秩（通常为8）。基于此观察，提出了两种方法：RaLoRA通过块对角分解将LoRA适配器的等效秩与GID对齐，在不增加参数量的情况下扩展表达力；RaLoRA-Pro进一步引入损失敏感性引导的层间参数重分配，实现层内几何结构与层间重要性的双重对齐。实验表明，RaLoRA和RaLoRA-Pro在GLUE、GSM8K、HumanEval、MT-Bench及图像分类任务上显著优于现有LoRA变体，大幅缩小了与全微调的差距。
 
-## 背景与动机
+
 
 **LoRA的梯度压缩本质**：LoRA将权重更新建模为低秩矩阵的乘积 $\Delta W = \frac{\bar{\alpha}}{r} B A$。其更新过程可近似为将全梯度 $G_t$ 投影到由 $B_t B_t^\top$ 和 $A_t^\top A_t$ 张成的低秩子空间（Equation (1)）。当全微调梯度的真实有效更新方向（即GID）远超LoRA秩 $r$ 时，这种投影会导致显著的信息损失。
 
@@ -52,7 +54,9 @@ claims:
 
 **因果旋钮**：通过熵估计器逐层量化GID，并据此自适应调整LoRA适配器的秩结构——RaLoRA采用块对角分解扩展等效秩，RaLoRA-Pro进一步结合损失敏感性进行层间参数重分配——从而在固定参数预算下使适配容量与优化景观的结构复杂度对齐。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 1. **熵基GID估计器**：提出基于奇异值分布熵的有效秩度量 $\operatorname{erank}(G_l) = \exp\left(-\sum_{i=1}^n p_i \log p_i\right), p_i = \sigma_i / \sum \sigma_j$（Equation (3)），作为GID的稳健估计。相比阈值基SVD方法（Equation (2)），该方法无需手动调参，且对超参数不敏感（Table 7）。
 
@@ -60,7 +64,7 @@ claims:
 
 3. **RaLoRA-Pro：双重对齐**：在RaLoRA的层内GID对齐基础上，引入损失敏感性引导的层间参数重分配。重要性得分定义为 $\operatorname{I}(W_l) = \operatorname{avg}(|W_l \odot G_l|)$（Equation (5)），归一化后按比例分配秩 $r_l = \left[P_{\text{total}} \cdot \alpha_l / \sqrt{d_{\text{in}}^l + d_{\text{out}}^l}\right]$（Equation (8)），实现层内与层间双对齐。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0001_kObvnQ6pUx_Gradient_Intrinsic_Dimensionality_AlignmentNarro/figures/001_Figure_1.jpg]]
 
@@ -70,7 +74,7 @@ Figure 2 展示了所提方法与标准LoRA的对比概览：
 
 - **RaLoRA-Pro**：在RaLoRA基础上，额外计算每层的重要性得分 $\operatorname{I}(W_l)$，基于归一化重要性 $\alpha_l$ 在层间重分配参数预算。最终每层获得自适应秩 $r_l$ 和块数 $n_l$，实现双重对齐。
 
-## 核心模块与公式推导
+
 
 ### 5.1 熵基GID估计器
 
@@ -107,7 +111,9 @@ $$r_l = \left[\frac{P_{\text{total}} \cdot \alpha_l}{\sqrt{d_{\text{in}}^l + d_{
 
 GID与Fisher Information的相关性分析（Table 8）显示，两者Pearson相关系数最高仅0.277，表明它们捕捉优化景观的不同方面，验证了双重对齐策略的必要性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 6.1 自然语言理解（GLUE）
 
@@ -187,7 +193,9 @@ Figure 3 展示了层间GID热力图和训练动态：
 - 平均GID与任务复杂度相关：WizardLM（≈404）、Code-Feedback（≈269）、MetaMathQA（≈178）。
 - 训练过程中GID先快速增长后趋于稳定。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 本文方法属于参数高效微调（PEFT）领域中基于LoRA的改进路线。与现有方法的关系如下：
 
@@ -214,6 +222,8 @@ Figure 3 展示了层间GID热力图和训练动态：
 - RaLoRA和RaLoRA-Pro在多模态任务上的表现如何？
 - GID在训练过程中的动态变化如何影响最优秩分配策略？是否可以在训练过程中动态调整秩？
 - RaLoRA-Pro中的损失敏感性计算是否对噪声敏感？是否有更稳健的层重要性度量？
+
+
 
 ## 原文 PDF
 

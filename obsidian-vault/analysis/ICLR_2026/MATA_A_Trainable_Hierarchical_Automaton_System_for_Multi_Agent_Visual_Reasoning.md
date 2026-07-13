@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/MATA_A_Trainable_Hierarchical_Automaton_System_for_Multi_Agent_Visual_Reasoning.pdf
+project_link: null
+code_link: https://github.com/ControlNet/MATA
 openreview_forum_id: fC27SxF4ba
 aliases:
 - MMAHTA
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | MATA：一种可训练的分层自动机系统用于多智能体视觉推理 |
 | 英文题名 | MATA: A Trainable Hierarchical Automaton System for Multi-Agent Visual Reasoning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=fC27SxF4ba); [GitHub](https://github.com/ControlNet/MATA) |
+| Links | [paper](https://openreview.net/forum?id=fC27SxF4ba) · [GitHub](https://github.com/ControlNet/MATA) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/planning_control |
 | Method | MATA (Multi-Agent hierarchical Trainable Automaton) |
 | Dataset | GQA, OK-VQA, RefCOCO, RefCOCO+ |
@@ -42,7 +44,7 @@ claims:
 > - OK-VQA 上，准确率 (%) 为 76.5 (MATA-Domain-Specific)，对比 75.7 (InternVL3.5-8B, 最高纯VLM基线)，变化 +0.8。
 > - RefCOCO 上，准确率 (%) 为 96.3 (MATA-Domain-Specific)，对比 96.2 (NAVER, 最强组合基线)，变化 +0.1。
 
-## 概述
+## 概要
 
 视觉推理任务要求模型整合感知、组合推理与知识检索，现有方法在此面临两难：端到端多模态大模型虽灵活但缺乏可解释性与纠错能力，而组合式系统虽可审计却依赖固定手工流水线或单一智能体，无法在互补（协作）与重叠（竞争）的异质智能体之间动态切换，导致复杂查询下性能受限且难以处理上游误差传播。
 
@@ -54,7 +56,7 @@ MATA（Multi-Agent hierarchical Trainable Automaton）将多智能体视觉推�
 
 **方法定位**：MATA属于组合式神经符号推理，与固定流水线方法（如ViperGPT）、单智能体RL控制方法（HYDRA，Ke et al., ECCV 2024）及手工规则多智能体系统（NAVER，Cai et al., 2025）形成对比。其独特之处在于将多智能体调度从手工设计提升为**可学习的自动机转移策略**，同时保留了基于规则的微观可解释性。当前局限包括轨迹树展开的计算开销随智能体数量增长而急剧增加，以及竞争性转移并非在所有子任务上均优于手工规则（如RefCOCOg上90.8 vs NAVER的91.6）。
 
-## 背景与动机
+
 
 视觉推理要求模型在理解图像内容的基础上进行复杂的逻辑推断、知识检索或空间定位。近年来，多模态大语言模型（MLLM）在视觉问答和指代表达理解等任务上取得了显著进展，但其推理过程本质上仍是端到端的黑箱映射——模型直接输出答案，缺乏可审计的中间步骤与纠错机制。当模型产生幻觉或推理错误时，几乎无法定位故障来源或进行针对性的修正。
 
@@ -68,7 +70,9 @@ MATA（Multi-Agent hierarchical Trainable Automaton）将多智能体视觉推�
 
 MATA正是针对这一缺口提出的。其核心动机是将多智能体视觉推理重新建模为**分层有限状态自动机**：顶层状态是语义不同的特殊化智能体，底层每个智能体内部运行基于规则的确定性子自动机以保证微观可靠性，而连接这些状态的转移函数则由一个可训练的超智能体（基于LLM）通过学习获得。这种设计使得系统能够在协作（互补智能体接力）与竞争（失败后切换智能体重新介入）之间自主决策，同时通过共享记忆提供透明的执行审计轨迹。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MATA 的核心创新在于将多智能体视觉推理重新建模为一类**可训练的分层有限状态自动机**，使系统能自主学会“何时协作、何时竞争”，而非依赖手工设计的固定流水线或单一智能体的循环调用。
 
@@ -110,7 +114,7 @@ $$V(s) \triangleq \begin{cases} \mathrm{metric}(\hat{y}_s, y), & s \in \mathrm{L
 
 上述 changed slots 均有高置信度证据支撑：可训练转移函数在消融实验中表现出决定性作用（Table 5：LLM Transition + SFT 相比 Random Transition 在 GQA 上提升 7.8 个百分点）；多智能体贡献通过逐步添加子智能体的实验得到验证（Figure 4：准确率从 61.5% 单调提升至 64.9%）；MATA-SFT-90K 数据集的生成流程在方法论中有完整的形式化定义（Equation 3-4）。跨域泛化实验（Table 6）进一步表明，学习到的转移策略在未见过的数据集上仍保持有效，非对角线性能接近对角线性能，验证了可训练转移策略的泛化性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_fC27SxF4ba/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of MATA. (a) Linear pipelines (previous methods) execute modules in a fixed, manually designed order. (b) MATA organizes agents as states in a hyper automaton. A trainable hyper agent learns high-level transitions between agents (blue arrows), enabling collaboration and competition, while each agent runs a small rule-based sub-automaton for reliable micro-control (black arrows). (c) To train the hyper agent, we expand a transition-trajectory tree per image-query, score the leaves using task metrics, and convert each node’s snapshot into a supervised pair current memory → best next state for supervised finetuning (SFT), forming MATA-SFT-90K*
@@ -169,7 +173,7 @@ $$s_t^\star \in \arg \max_{s \in \mathrm{Child}(s_t)} V(s)$$
 
 最终将每个决策点转化为监督对（当前记忆 → 最佳下一状态），使超智能体学会全局最优的跨智能体转移策略。推理时，超智能体基于微调后的 LLM（如 Qwen3-4B）实时预测转移，最大步数限制为 $T=15$ 以防止无限循环。
 
-## 核心模块与公式推导
+
 
 ### 分层自动机架构
 
@@ -228,7 +232,9 @@ $$s_t^\star \in \arg \max_{s \in \mathrm{Child}(s_t)} V(s)$$
 
 通过该机制构建的MATA-SFT-90K数据集，使超智能体能够从轨迹树的成功分支中学习最优转移策略，而非依赖手工规则。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -269,7 +275,9 @@ Table 6 展示了转移策略在不同训练-测试域组合下的泛化能力�
 2. **状态空间扩展的计算瓶颈**：当前数据生成流水线依赖对三个智能体状态空间的近穷举搜索来构建转移轨迹树，这在三智能体规模下可处理，但当引入更多特化智能体（如不同感知模态）时，轨迹树将呈指数增长，数据收集成本急剧上升。
 3. **离线训练的静态局限**：超智能体的 SFT 训练完全离线完成，无法利用推理过程中的实时反馈进行纠错。当遇到训练分布外的查询模式时，转移策略可能做出次优决策且缺乏在线自适应机制。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有工作的关系
 
@@ -312,6 +320,8 @@ MATA 位于**组合式神经符号推理**与**多智能体协作**的交汇点�
 4. **竞争与协作的精细调度：** 当前竞争机制是失败驱动的重新介入。是否存在更精细的调度策略——例如基于置信度阈值的软切换、多智能体并行执行后投票融合——能在精度和效率之间取得更好的平衡？
 
 5. **超智能体的可解释性：** 虽然 MATA 的共享记忆提供了可审计的执行历史，但超智能体自身的转移决策（LLM 生成的下一个状态）仍是一个黑箱。能否让超智能体输出其转移决策的自然语言理由，从而进一步增强系统的端到端可解释性？
+
+
 
 ## 原文 PDF
 

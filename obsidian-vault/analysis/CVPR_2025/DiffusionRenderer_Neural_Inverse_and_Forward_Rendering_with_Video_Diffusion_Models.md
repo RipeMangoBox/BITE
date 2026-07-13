@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/DiffusionRenderer_Neural_Inverse_and_Forward_Rendering_with_Video_Diffusion_Models.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/toronto-ai/DiffusionRenderer/
 aliases:
 - DiffusionRenderer
@@ -31,7 +32,7 @@ claims:
 | 中文题名 | DiffusionRenderer：基于视频扩散模型的神经逆渲染与前向渲染 |
 | 英文题名 | DiffusionRenderer: Neural Inverse and Forward Rendering with Video Diffusion Models |
 | 会议/期刊 | CVPR 2025 |
-| Links | [paper](https://arxiv.org/abs/2501.18590); [Project](https://research.nvidia.com/labs/toronto-ai/DiffusionRenderer/) |
+| Links | [paper](https://arxiv.org/abs/2501.18590) · [Project](https://research.nvidia.com/labs/toronto-ai/DiffusionRenderer/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | DiffusionRenderer |
 | Dataset | SyntheticObjects, SyntheticScenes |
@@ -41,7 +42,7 @@ claims:
 > - SyntheticScenes 上，PSNR / SSIM / LPIPS (Neural Forward Rendering) 为 26.0 / 0.780 / 0.201，对比 RGB←X: 18.5 / 0.645 / 0.302，变化 +7.5 / +0.135 / -0.101。
 > - SyntheticScenes 上，PSNR / SSIM / LPIPS (Relighting) 为 24.63 / 0.756 / 0.257，对比 DiLightNet: 18.88 / 0.576 / 0.344，变化 +5.75 / +0.180 / -0.087。
 
-## 概述
+## 概要
 
 **DiffusionRenderer** 提出一个统一的视频扩散模型框架，同时解决神经逆渲染与前向渲染两个任务。其核心洞察在于：同一个视频扩散模型既可以作为神经逆渲染器（从RGB视频估计法线、深度、漫反射、粗糙度、金属度等G-buffer），也可以作为神经前向渲染器（根据G-buffer与目标环境光图生成逼真图像），从而绕开传统物理渲染对精确3D几何与高质量材质、光照的严苛依赖。
 
@@ -53,7 +54,7 @@ claims:
 
 **方法定位**：DiffusionRenderer 属于神经渲染方法谱系，与基于图像扩散模型的RGB↔X、DiLightNet，以及经典物理渲染的SSRT、SplitSum形成对比。其独特之处在于以视频扩散模型统一逆渲染与前向渲染，无需显式路径追踪或精确3D表示，并通过合成-真实联合训练策略实现向真实场景的有效泛化。
 
-## 背景与动机
+
 
 ### 问题背景：物理渲染的瓶颈
 
@@ -83,7 +84,9 @@ $$L_o(\mathbf{p},\omega_o) = \int_\Omega f_r(\mathbf{p},\omega_o,\omega_i) L_i(\
 
 **Figure 1** 展示了这一愿景：从输入视频出发，准确估计几何与材质缓冲，并在指定光照条件下生成照片级真实感的渲染结果，为图像编辑应用提供基础工具。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DiffusionRenderer 的核心创新在于将**视频扩散模型**统一应用于神经逆渲染与前向渲染，并通过三个关键设计突破传统方法的瓶颈。
 
@@ -111,7 +114,7 @@ $$\mathcal{L}(\boldsymbol{\theta}, \Delta\boldsymbol{\theta}) = \|\mathbf{f}_{\b
 
 定性消融（Figure 7）显示，加入LoRA的真实数据联合训练显著消除了合成数据的域偏差，大幅提升真实场景的重光照质量。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2501_18590/figures/007_Figure_4.jpg]]
 *Figure 4: Qualitative comparison of forward rendering. Our method generates high-quality inter-reflections (top) and shadows (bottom), producing more accurate results than the neural baselines. Figure 5. Qualitative comparison of inverse rendering. We compare with RGB↔X [83] on DL3DV10k dataset. Both methods work well on indoor scenes, while our method predicts finer details in thin structures and more accurate metallic and roughness channels (top), likely benefiting from our curated training data. As compared to RGB↔X, our method generalizes better to outdoor scenes (bottom row)*
@@ -158,7 +161,7 @@ $$
 
 该统一框架使得DiffusionRenderer能够同时支撑材质编辑、重光照和物体插入等多种图像编辑应用，无需依赖显式3D几何或精确的路径追踪。
 
-## 核心模块与公式推导
+
 
 ### 整体框架
 
@@ -218,7 +221,9 @@ $$\mathcal{L}_{\text{env}} = \|\mathbf{h}_{\mathbf{E}'} - \mathcal{D}_{\text{env
 
 4. **1步确定性 vs 多步随机**：1步确定性模型获得更高 PSNR 但导致模糊，多步随机模型更利于真实感细节，前向渲染与重光照任务采用多步随机模型（Table 3）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置与评估基准
 
@@ -311,7 +316,9 @@ DiffusionRenderer 在三个互补维度上接受检验：**神经前向渲染**�
 *Table: S1. Quantitative evaluation of relighting in terms of ColorVideoVDP. ColorVideoVDP reports video quality in the JOD (Just-Objectionable-Difference) units. The highest quality (no difference) is reported as 10 and lower values are reported for distorted content. We compute a JOD value per clip for three novel lighting conditions in each series and report the average over all clips*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 物理渲染与神经渲染的十字路口
 
@@ -347,6 +354,8 @@ DiffusionRenderer 做出了三个关键设计选择，使其在方法谱系中�
 2. **动态场景扩展。** 如何将框架从静态场景扩展到包含非刚性变形、动态光照变化的通用视频重光照？
 3. **光照估计的闭环优化。** 是否可以利用神经内在特征进行任务特定微调，或设计端到端的光照估计-渲染联合优化，以提升真实世界自动标注的准确性？
 4. **编辑一致性。** 在材质编辑与物体插入等应用中，如何进一步保证多帧间的编辑内容一致性，避免时序闪烁？
+
+
 
 ## 原文 PDF
 

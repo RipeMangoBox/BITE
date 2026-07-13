@@ -5,6 +5,7 @@ paper_level: A
 venue: Whitepaper
 year: 2025
 pdf_ref: paperPDFs/WHITEPAPER_2025/Cosmos_Drive_Dreams_Scalable_Synthetic_Driving_Data_Generation_with_World_Foundation_Models.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/toronto-ai/cosmos_drive_dreams/
 aliases:
 - CDDCDMS
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | Cosmos-Drive-Dreams：基于世界基础模型的可扩展合成驾驶数据生成 |
 | 英文题名 | Cosmos-Drive-Dreams: Scalable Synthetic Driving Data Generation with World Foundation Models |
 | 会议/期刊 | Whitepaper 2025 |
-| Links | [paper](https://arxiv.org/abs/2506.09042); [Project](https://research.nvidia.com/labs/toronto-ai/cosmos_drive_dreams); [Project](https://research.nvidia.com/labs/toronto-ai/cosmos_drive_dreams/) |
+| Links | [paper](https://arxiv.org/abs/2506.09042) · [Project](https://research.nvidia.com/labs/toronto-ai/cosmos_drive_dreams) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/image_and_video_generation |
 | Method | Cosmos-Drive-Dreams (with Cosmos-Drive model suite) |
 | Dataset | RDS-HQ / Waymo (3D Lane Detection), RDS-HQ-HL (3D Object Detection, 1K real setting B), RDS-HQ (LiDAR-based 3D Detection, 1K), RDS-Bench[Policy] (Trajectory Prediction) |
@@ -42,7 +43,7 @@ claims:
 > - RDS-HQ-HL (3D Object Detection, 1K real setting B) 上，LET-AP relative improvement 为 +55.0% relative to real only, +14.5% absolute LET-AP boost，对比 Only 1K real clips，变化 +14.5% LET-AP。
 > - RDS-HQ (LiDAR-based 3D Detection, 1K) 上，mAP 为 0.250 (with SDG LiDAR data)，对比 0.240 (real only)，变化 +0.010。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -76,7 +77,7 @@ Cosmos-Drive-Dreams 提出了一条基于**世界基础模型（World Foundation
 
 当前管道依赖计算密集的扩散模型，大规模生成耗时且资源需求高。自动标注模型（Cosmos-7B-Annotate-Sample-AV）在不同环境下的鲁棒性尚未全面评估。此外，VLM 过滤器的失效模式、生成数据规模的饱和效应、向其他传感器模态的推广，以及推理成本的显著降低，均为待探索的开放问题。
 
-## 背景与动机
+
 
 自动驾驶系统在真实世界中部署的核心挑战之一，是长尾（极端）驾驶场景下真实多视角数据的极度稀缺与高昂的标注成本。尽管现有数据集在常规天气和交通条件下已积累了大量样本，但雨、雪、雾等恶劣天气，以及涉及弱势道路使用者、罕见障碍物等边缘案例的覆盖仍然严重不足。这种数据分布的长尾特性直接导致下游感知与规划模型在罕见情况下泛化能力不足，成为制约自动驾驶安全性的关键瓶颈。
 
@@ -86,7 +87,9 @@ Cosmos-Drive-Dreams 提出了一条基于**世界基础模型（World Foundation
 
 本文的核心动机在于：**利用预训练世界基础模型的物理世界先验，通过驾驶领域后训练与结构化条件控制，构建一个可扩展的合成驾驶数据生成管线，以可控方式系统性地扩充训练集中的长尾场景，从而提升下游感知与规划模型在罕见情况下的泛化能力与数据效率。**
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Cosmos-Drive-Dreams 的核心创新并非单一算法突破，而是一套**将通用世界基础模型（WFM）的物理先验迁移至自动驾驶领域的可控合成数据生成体系**。其关键创新体现在以下四个“changed slots”上，它们共同构成了从“仿真模拟”到“生成式数据工厂”的范式跃迁。
 
@@ -118,7 +121,7 @@ Cosmos-Drive-Dreams 将范式切换为**基于预训练世界基础模型的可�
 
 **综上**，Cosmos-Drive-Dreams 的创新本质在于将世界基础模型的生成能力、HDMap 的几何约束、多视图联合建模和 VLM 自动质检整合为一个**可扩展的自动驾驶数据飞轮**（Figure 1 Left），实现了从“真实数据稀缺”到“可控合成数据充裕”的关键跨越。
 
-## 整体框架
+
 
 Cosmos-Drive-Dreams 的生成管线围绕一个核心瓶颈展开：自动驾驶中长尾（极端）驾驶场景的真实多视角数据稀缺且标注成本高昂，导致下游感知与规划模型在罕见情况下泛化能力不足。为解决这一问题，管线利用预训练世界基础模型（WFM）的物理世界先验，结合高精地图（HDMap）结构化条件控制视频布局、LLM驱动的提示词改写扩展场景多样性，生成可控、多视角一致的合成驾驶视频，以可控方式扩充训练集中的长尾场景（Figure 2）。
 
@@ -139,7 +142,7 @@ Cosmos-Drive-Dreams 的生成管线围绕一个核心瓶颈展开：自动驾驶
 
 整个生成管线以 Cosmos-Drive 模型套件为引擎，该套件由通用 WFM（NVIDIA Cosmos-1）经驾驶领域后训练得到，包含精确布局控制、多视角扩展、野生视频标注和 LiDAR 生成四个专用模型（Figure 3）。这种“通用WFM→领域后训练→专用模型”的范式，使得管线能够将物理世界先验迁移到驾驶场景，同时保持对布局、视角和传感器模态的精确控制。
 
-## 核心模块与公式推导
+
 
 Cosmos-Drive-Dreams 的生成管线由四个核心模块串联构成，每个模块针对合成数据的一个关键质量维度进行专门设计。
 
@@ -167,7 +170,9 @@ $$r = \sqrt{x^2 + y^2 + z^2}, \quad \phi = \arctan 2(y, x), \quad \theta = \arcs
 
 其中 $r$ 为径向距离，$\phi$ 为方位角，$\theta$ 为仰角。需注意，原始 LiDAR 数据通常经过运动补偿，为准确投影到 range map，必须反转该补偿并估计每个点的时间戳。**Cosmos-7B-LiDAR-GEN-Sample-AV** 以 HDMap 或 RGB 图像为条件生成 LiDAR range map，并通过专门微调的 Cosmos LiDAR tokenizer 重建高质量点云。该 tokenizer 在 RDS-HQ 数据集上微调 30K 步，能够高保真地恢复 LiDAR 输入的几何结构。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -252,7 +257,9 @@ Cosmos-Drive 开源了包括 RDS-HQ 子集、预训练模型权重、推理脚�
 ![[assets/figures/papers/paper_list_l2_https_arxiv_org_abs_2506_09042_fixed_weights/figures/024_Figure_18.jpg]]
 *Figure 18: Visualization of LiDAR-based 3D object detection on RDS-HQ (2k) dataset after adding Cosmos-Drive-Dreams*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心范式定位
 
@@ -294,6 +301,8 @@ Cosmos-Drive-Dreams继承自NVIDIA Cosmos-1世界基础模型（WFM），其关�
 3. **多智能体交互场景的生成能力**：当前生成主要围绕自车视角的场景外观变化，能否扩展到涉及多智能体复杂交互的动态场景（如博弈性换道、无保护左转）仍有待验证。
 4. **推理效率的突破路径**：如何在保持生成视觉质量的同时显著降低扩散模型推理成本？模型蒸馏、步数压缩、专用推理硬件等方向值得探索。
 5. **生成数据与真实数据的域适应**：当前采用简单的固定比例混合（R_s2r），更智能的域适应或课程学习策略能否进一步提升数据效率？
+
+
 
 ## 原文 PDF
 

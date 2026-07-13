@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/On_the_Reasoning_Abilities_of_Masked_Diffusion_Language_Models.pdf
+project_link: null
+code_link: null
 openreview_forum_id: BVnIsh4Nz1
 aliases:
 - IMDMMPP
@@ -37,7 +39,10 @@ claims:
 | Method | Idealized Masked Diffusion Model (MDM) with Planner and Predictor |
 | Dataset |  |
 
-## 概述
+> [!tip] 效果简介
+> 本笔记的既有实验指标、对比结果与适用边界见“实验与关键发现”；本轮仅统一结构，不改写证据。
+
+## 概要
 
 自回归语言模型配合思维链（Chain‑of‑Thought, CoT）推理已成为大语言模型解决复杂任务的标配范式。然而，该范式存在一个根本性的**顺序性瓶颈**：即使问题可分解为多个相互独立的子问题，模型仍需逐符号生成，导致推理步数与问题规模线性相关，无法通过并行化加速求解。这一瓶颈在数学表达式求值等天然可并行的任务上尤为突出——串行策略需要11步，而并行策略仅需3步（Figure 3）。
 
@@ -51,7 +56,7 @@ claims:
 
 为实现上述理论分析，本文将MDM形式化为两个理想化组件的协同：**规划器（Planner）** 决定每步解掩蔽或重采样哪些位置，**预测器（Predictor）** 基于完整上下文为选定位置生成符号分布。这一框架突破了标准MDM的两项关键限制——均匀随机解掩蔽和逐位置独立的因子化近似——从而释放了并行推理的表达潜力。
 
-## 背景与动机
+
 
 ### 自回归语言模型的“顺序性瓶颈”
 
@@ -86,7 +91,9 @@ claims:
 
 为严格回答上述问题，本文选择在**有限精度、对数宽度Transformer**的计算框架下进行分析。这一框架已被广泛用于分析Transformer的表达能力与电路复杂度类之间的关系，使得MDM的能力可以与经典复杂度类（如AC⁰、ACᵈ、NC、正则语言类Reg）建立精确映射。论文的核心发现——MDM与PLT的等价性、MDM对CoT的严格包含关系、以及去噪步数与表达能力层级之间的对应——均在这一框架下以定理和推论的形式给出形式化证明。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新不在于提出新的模型架构，而在于**通过理论分析揭示掩蔽扩散语言模型（MDM）的并行推理潜力，并给出其表达能力的严格复杂性刻画**。相对自回归链式思考（CoT）和标准均匀解掩蔽MDM，本文在三个维度上实现了突破。
 
@@ -125,7 +132,7 @@ $$\text{CoT}[\log N] \subsetneq \text{MDM}[\log N, N]$$
 
 传统MDM仅允许从掩码状态转换到非掩码状态，一旦生成符号便无法修改。本文引入的**重采样（resampling）**机制允许规划器将已解掩蔽位置重新标记为需预测，从而修正先前错误。这一机制在并行推理场景中尤为关键：当模型同时生成多个符号时，后续步的重采样提供了纠错通道，避免了错误在并行分支间的级联传播。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_BVnIsh4Nz1/figures/001_Figure_1.jpg]]
 *Figure 1: A summary of masked diffusion model expressivity in relation to padded looped transformers and chain of thought. X ãÑ Y indicates the inclusion of X in Y. Dashed arrows represent strict inclusions. Red arrows denote novel results. Edge labels with blue background indicate constraints on the source node, while labels with orange background indicate constraints on the target node*
@@ -180,7 +187,7 @@ Figure 1 和 Figure 2 从两个维度总结了MDM的表达能力定位：
 
 这两个变量共同决定了MDM在复杂度类层级中的位置，也构成了本文所有理论分析的基础参数空间。
 
-## 核心模块与公式推导
+
 
 ### 2.1 理想化掩蔽扩散模型的分解架构
 
@@ -218,7 +225,9 @@ $$\widehat{q}_{t-1|t}(\pmb w^{(t-1)} \mid \pmb w^{(t)}) = \prod_{n=1}^{N} \wideh
 
 这三个修改共同构成了MDM表达力提升的**因果旋钮**：非均匀解掩蔽策略使模型能按需选择先解哪些子问题（实现有向并行分解），放弃因子化假设使预测器能捕获位置间依赖，而重采样机制则允许模型在后续步骤中修正早期错误——这些能力是标准MDM被限制在 $\text{AC}^0$ 表达力（推论3.3）的根本原因。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ![[assets/figures/papers/paper_list_l48_https_openreview_net_forum_id_BVnIsh4Nz1/figures/003_Figure_3.jpg]]
 *Figure 3: Two strategies for solving a mathematical expression. (a) Parallel: Parallel computation of intermediate values (three steps). (b) Sequential: Step-by-step generation (eleven steps)*
@@ -302,7 +311,9 @@ $$\mathsf{MDM}[T, \widetilde{\mathcal{O}}(N^K)] = \mathsf{PLT}[T, \mathcal{O}(N^
 
 > **注意**：上述“失败模式”均来自论文自身的局限声明和开放问题讨论，非实验观察。若需实证层面的失败分析，需等待后续实验工作。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 理论框架定位：掩蔽扩散模型作为循环推理的并行实现
 
@@ -369,6 +380,8 @@ MDM与**Chain-of-Thought（CoT）Transformer**（Wei et al., 2022）的关系是
 4. **低延迟场景的潜力**：MDM的并行推理能力是否有助于处理在线学习/交互式场景中的低延迟需求？
 
 5. **架构泛化**：能否将MDM的复杂性分析从有限精度Transformer推广到其他实用架构（如状态空间模型）？
+
+
 
 ## 原文 PDF
 

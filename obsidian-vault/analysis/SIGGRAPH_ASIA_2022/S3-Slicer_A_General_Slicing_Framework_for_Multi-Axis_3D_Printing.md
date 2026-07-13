@@ -33,7 +33,7 @@ claims:
 | 中文题名 | 基于隐式神经场的多轴制造工艺规划：碰撞避免与刀路几何的直接控制 |
 | 英文题名 | $S^3$-Slicer: A General Slicing Framework for Multi-Axis 3D Printing |
 | 会议/期刊 | SIGGRAPH ASIA 2022 |
-| Links | [paper](https://mewangcl.github.io/publication.html) · [arXiv](http://arxiv.org/abs/2505.03779) · [Code](https://dl.acm.org/doi/10.1145/3197517.3201342) · [Project](https://doi.org/10.1145/3550454.3555516) |
+| Links | [paper](https://mewangcl.github.io/publication.html) · [paper](http://arxiv.org/abs/2505.03779) · [Code](https://dl.acm.org/doi/10.1145/3197517.3201342) · [Project](https://doi.org/10.1145/3550454.3555516) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Implicit Neural Field-Based Multi-Axis Process Planning |
 | Dataset | T-Bracket model, Fertility model, Fork model |

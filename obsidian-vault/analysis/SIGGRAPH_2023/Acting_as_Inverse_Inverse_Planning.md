@@ -32,7 +32,7 @@ claims:
 | 中文题名 | 作为逆逆向规划 |
 | 英文题名 | Acting as Inverse Inverse Planning |
 | 会议/期刊 | SIGGRAPH 2023 |
-| Links | [paper](https://arxiv.org/abs/2305.16913) · [Code](https://people.csail.mit.edu/kach/a2i2p/) · [arXiv](https://arxiv.org/pdf/1903.06445.pdf) · [Project](https://social-intelligencehuman-ai.github.io/docs/camready\_12.pdf) |
+| Links | [paper](https://arxiv.org/abs/2305.16913) · [Code](https://people.csail.mit.edu/kach/a2i2p/) · [paper](https://arxiv.org/pdf/1903.06445.pdf) · [Project](https://social-intelligencehuman-ai.github.io/docs/camready\_12.pdf) |
 | Topic | #topic/other_unclear |
 | Method | Inverse Inverse Planning |
 | Dataset | Grid-world depiction task: Helping, Grid-world depiction task: Hindering, Grid-world depiction task: Indifference, Physics-world box weight perception: Mime vs. Light box |

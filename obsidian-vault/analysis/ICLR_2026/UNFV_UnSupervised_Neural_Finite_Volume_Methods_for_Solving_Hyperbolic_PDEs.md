@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/UNFV_UnSupervised_Neural_Finite_Volume_Methods_for_Solving_Hyperbolic_PDEs.pdf
+project_link: https://www.nathanlichtle.com/research/nfv
+code_link: null
 aliases:
 - UNNFV
 - UNUSNFVMSHP
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | (U)NFV：用于求解双曲型偏微分方程的（无）监督神经有限体积方法 |
 | 英文题名 | (U)NFV: (Un)Supervised Neural Finite Volume Methods for Solving Hyperbolic PDEs |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=AhtDnPyfOE); [Project](https://nathanlichtle.com/research/nfv); [Project](https://www.nathanlichtle.com/research/nfv) |
+| Links | [paper](https://openreview.net/forum?id=AhtDnPyfOE) · [Project](https://nathanlichtle.com/research/nfv) · [Project](https://www.nathanlichtle.com/research/nfv) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/algorithms |
 | Method | (U)NFV (Neural Finite Volume) |
 | Dataset | Greenshields LWR, Triangular 1 LWR, Burgers |
@@ -42,13 +44,13 @@ claims:
 > - Triangular 1 LWR 上，L2误差 为 1.4e-3 (NFV_2^1)，对比 2.3e-3 (Godunov)，变化 降低约1.6倍。
 > - Burgers 上，L2误差 为 2.2e-4 (NFV_4^5)，对比 8.3e-4 (Godunov)，变化 降低约3.8倍。
 
-## 概述
+## 概要
 
 本文提出神经有限体积方法（NFV），旨在解决传统有限体积方法在精度与实现复杂度之间的根本性权衡：高阶格式（如WENO、DG）精度高但实现复杂、计算成本高；低阶格式（如Godunov）实现简单但数值耗散严重，无法准确捕捉激波和间断。核心思路是将轻量级2D CNN嵌入经典FV守恒更新规则中，用神经网络替代手工设计的数值通量函数，从而在保持守恒性和实现简单性的同时，通过学习扩展的a×b时空模板上的通量近似，显著提升对双曲守恒律中激波和间断的捕捉精度。
 
 主要结果包括：在Greenshields通量上，NFV_2^1的L2误差（1.3e-4）比Godunov（4.5e-4）降低约3.5倍；在Burgers方程上，NFV_4^5的L2误差（2.2e-4）比Godunov（8.3e-4）和WENO（6.4e-4）低一个数量级，接近DG（3.1e-5）。在I-24高速公路现场数据上，NFV_10^11在7个未见过的测试日上均优于Godunov拟合，L1误差降低约18%，L2误差降低约22%。方法同时支持监督学习（基于解数据）和无监督学习（基于弱形式残差损失），后者在无参考解时仍能有效训练。
 
-## 背景与动机
+
 
 双曲守恒律方程 $\partial_t u(x,t) + \partial_x f(u(x,t)) = 0$ 是描述激波、交通流等间断现象的核心数学模型，其数值求解长期面临根本性权衡：高阶格式（如WENO、不连续伽辽金法DG）精度高但实现复杂、计算成本高；低阶格式（如Godunov、Lax-Friedrichs）实现简单但数值耗散严重，无法准确捕捉激波和间断。传统有限体积方法的核心瓶颈在于，其数值通量函数 $F_{i+1/2}^n$ 必须手工设计——一阶通量（如Godunov）仅依赖相邻单元，精度受限；高阶重构（如WENO）虽能提升精度，却引入复杂的非线性权重计算和额外的实现复杂度。
 
@@ -56,7 +58,9 @@ claims:
 
 具体而言，该方法（Neural Finite Volume, NFV）将数值通量估计定义为 $\hat{F}_{i \pm 1/2}^n = \mathcal{N}(\mathbf{u}_{i \pm 1/2}^n(a, b))$，其中 $\mathcal{N}$ 是一个仅含6个隐藏层（每层15个神经元）的2D CNN，参数量仅为 $1105 + 16(ab + 1)$。NFV支持两种训练范式：监督学习（基于参考解的最小二乘损失 $\mathcal{L}_s = \mathbb{E}_{u_0 \sim \mathcal{R}} ||u - \hat{u}||_2^2$）和无监督学习（基于弱形式残差损失 $\mathcal{L}_w$ 直接从PDE学习，无需解数据）。这一设计填补了现有方法在"保持FV框架简单性的同时提升精度"的缺口。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 (U)NFV 的核心创新在于**用轻量级神经网络替代手工设计的数值通量函数，同时严格保留经典有限体积（FV）方法的守恒更新规则**。这一设计直接针对传统 FV 方法在精度与实现复杂度之间的根本性权衡：高阶格式（如 WENO、DG）精度高但实现复杂、计算成本高；低阶格式（如 Godunov）实现简单但数值耗散严重，无法准确捕捉激波和间断。
 
@@ -79,7 +83,7 @@ claims:
 
 **因果机制**：传统 FV 方法的精度受限于手工通量函数的表达能力。NFV 通过神经网络学习通量，打破了这一瓶颈。更大的时空模板（$a \times b$）为网络提供了更多局部信息，使其能隐式地近似高阶重构，从而在保持 FV 框架简单性和守恒性的同时，显著提升了对激波和间断的捕捉精度。消融实验证实，NFV 模型对 CFL 比率变化更鲁棒，且在更粗网格上也能保持较低误差（Table 3, Figure 5）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0001_AhtDnPyfOE_UNFV_UnSupervised_Neural_Finite_Volume_Methods_f/figures/007_Figure_4.jpg]]
 *Figure 4: Comparison of the final density of the Burgers’ equation (left) and LWR triangular equation (right) for $\mathrm { N F V _ { 4 } ^ { 5 } }$ and the Godunov Scheme. The proposed method displays an excellent approximation of the exact solution, capturing sharp features such as discontinuities and points of non-differentiability. It contains some minor oscillations in the solution, which are not present in the Godunov scheme. The latter, however, fails to capture the discontinuities and points of non-differentiability, offering a very smoothed solution*
@@ -92,7 +96,7 @@ claims:
 
 **关键变化**：该方法改变了传统 FV 方法中“手工设计的解析通量函数”这一核心组件。通过将模板大小从 Godunov 的 $2 \times 1$ 扩展到 $10 \times 11$，网络能够学习到更复杂的、非局部的通量近似，从而在保持 FV 方法简单性的同时，获得接近甚至超越高阶方法（如 WENO、DG）的精度。此外，该方法支持两种训练范式：**监督学习（NFV）**，直接最小化预测解与参考解之间的均方误差；**无监督学习（UNFV）**，通过最小化 PDE 弱形式残差来训练，无需参考解。
 
-## 核心模块与公式推导
+
 
 ### 1. 背景：守恒律与有限体积框架
 
@@ -167,7 +171,9 @@ $$\mathcal { L } _ { w } = \underset { \underset { u _ { 0 } \sim \mathcal { R }
 - **旋钮**：用轻量级 CNN 替代手工通量函数，同时保留 FV 守恒更新规则。通过调整时空模板尺寸 $a \times b$，可以平滑地控制模型容量和表达能力的权衡。
 - **效果**：在保持 FV 方法简单性、守恒性和低计算成本的同时，显著提升了对激波和间断的捕捉精度。监督版本（NFV）在标签充足时表现最佳；无监督版本（UNFV）在无标签场景下仍能通过物理约束学习，且经验上收敛到熵解（尽管缺乏理论保证）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果：合成基准上的精度提升
 
@@ -226,7 +232,9 @@ $$\mathcal { L } _ { w } = \underset { \underset { u _ { 0 } \sim \mathcal { R }
 *Figure 2: Example stencil for $\mathrm { F V } _ { 4 } ^ { 2 }$ . , taking in a stencil of 2 time steps times 4 space cells*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与Baseline/Follow-up的关系
 
@@ -256,6 +264,8 @@ $$\mathcal { L } _ { w } = \underset { \underset { u _ { 0 } \sim \mathcal { R }
 - NFV在速度公式化（学习速度-通量关系）上的表现如何？
 - 不同测试函数族（超越多项式）对无监督学习的影响是什么？
 - 更大模板尺寸(a)或更多输入通道(b)对未见交通模式的泛化有何影响？
+
+
 
 ## 原文 PDF
 

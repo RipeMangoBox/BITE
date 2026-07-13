@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/A_Training_Free_Framework_for_Long_Video_Understanding_via_Video_Query_Options_Similarity.pdf
+project_link: null
+code_link: https://github.com/wuzhirong520/VTR-VLM
 aliases:
 - VVADV
 - TFFLVUVQOS
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 基于视频-查询-选项相似度的免训练长视频理解框架 |
 | 英文题名 | A Training-Free Framework for Long Video Understanding via Video-Query-Options Similarity |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=hfMfYMoRLk); [GitHub](https://github.com/wuzhirong520/VTR-VLM) |
+| Links | [paper](https://openreview.net/forum?id=hfMfYMoRLk) · [GitHub](https://github.com/wuzhirong520/VTR-VLM) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | VTR-VLM (免训练框架，包含AFS、DRA和VQOS) |
 | Dataset | LVBench, MLVU |
@@ -40,13 +42,13 @@ claims:
 > - LVBench 上，Accuracy 为 51.3，对比 42.0，变化 +9.3。
 > - MLVU 上，Accuracy 为 70.3，对比 69.3，变化 +1.0。
 
-## 概述
+## 概要
 
 长视频理解的核心瓶颈在于**多模态大语言模型（MLLM）有限的上下文窗口与长视频巨大时空内容之间的矛盾**：现有方法通常需要昂贵的训练过程来扩展或压缩上下文，且难以灵活适配高速演进的模型架构。本文提出一种**免训练框架 VTR-VLM**，其核心因果旋钮是**视频片段与用户查询及候选答案选项之间的相似度分数**。该方法模拟人类“假设生成—专注验证—无关过滤”的认知流程：先利用 MLLM 生成候选答案选项，再借助预训练的视频‑文本检索模型计算融合查询与选项的相似度，从而在无需微调的条件下实现**自适应关键帧密集采样（AFS）与动态空间分辨率分配（DRA）**，有效捕捉长视频中的时序动态并抑制冗余信息。
 
 实验表明，将该框架应用于 LLaVA-Video‑7B 后，LVBench 准确率从 42.0% 提升至 51.3%（+9.3%），MLVU 从 69.3% 提升至 70.3%（+1.0%）；消融分析验证了**多假设相似度估计（VQOS）** 带来的额外增益（在提供选项下提升 1.5%，在生成选项下提升 0.7%）。方法在不同模型规模（7B 与 72B）上均表现出一致的正向迁移（7B 规模下平均提高 5.3% 与 5.0%），显示出良好的通用性与可扩展性。
 
-## 背景与动机
+
 
 长视频理解（如电影、教学视频、监控流）因其覆盖数分钟到数小时的时空跨度而具有重要的应用价值。然而，现有的多模态大语言模型（MLLM）普遍受限于固定的上下文窗口长度，与视频庞杂的时空信息量形成尖锐矛盾。若简单地对长视频进行均匀帧采样，则受限于令牌预算，极易遗漏分布在少数关键片段中的细粒度事件与因果线索；若将视频全量输入，则极易超出模型支持的序列长度。这一瓶颈迫使现有方法在**扩展/压缩上下文**与**保留关键时序动态**之间寻求平衡，但主流策略往往引入高昂的训练代价（如模型微调或专用编码器训练），且难以灵活适配快速迭代的 MLLM 架构。
 
@@ -54,7 +56,9 @@ claims:
 
 针对上述缺口，本文提出一种**无需训练的 VTR‑VLM 框架**，其动机源自对人类答题认知过程的模拟：人在面对长视频问答时，通常会先依据问题生成若干猜测（假设生成），再有侧重地回看相关片段进行验证与推理（专注验证），并快速跳过不相关部分（无关过滤）。基于这一洞察，我们设计了一个即插即用的流水线，通过让 MLLM 自身生成候选答案选项，并与查询拼接后与预训练视频文本检索模型计算相似度，获得更细粒度的视频‑查询‑选项相似度分数，进而引导**自适应帧采样**（AFS，对高相关片段密集采样，保持总帧数不变）与**动态分辨率分配**（DRA，为关键帧分配高分辨率，非关键帧压缩令牌）。整个框架在无需微调任何模型的基础上，显著提升了基线 MLLM 在多个长视频基准上的表现（如 LLaVA‑Video‑7B 在 LVBench 上由 42.0% 提升至 51.3%），并展示了跨模型规模与架构的通用性（在 7B 与 72B 模型上均有一致提升），证明通过灵活控制帧采样与分辨率的因果旋钮，可以有效弥补当前免训练方法的缺口，为快速演进的 MLLM 生态提供低成本、高性能的长视频解决方案。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 VTR-VLM框架的核心创新在于绕开了传统长视频理解方法对昂贵微调或上下文压缩的依赖，转而通过**模拟人类“假设生成—专注验证”的认知过程**，以训练免费的方式实现精细化的信息筛选与资源分配。其关键设计通过三个**changed slots**替换了MLLM的默认前处理，从而在有限上下文窗口内最大化任务相关信息的密度。
 
@@ -69,7 +73,7 @@ VTR-VLM框架的核心创新在于绕开了传统长视频理解方法对昂贵�
 
 三个创新点协同形成一个**免训练、即插即用**的管道：首先由VTR模型提取视频片段和查询的初始特征（Sec 3.1），然后通过选项生成获得候选选项并计算VQOS分数（Algorithm 1），最后在AFS和DRA的控制下进行帧采样与分辨率分配，将筛选后的帧送入MLLM完成最终推理（Figure 2）。该框架在两个不同规模（7B/72B）的MLLM上均能一致地提升长视频理解性能，例如在LVBench上为LLaVA-Video-7B带来+9.3%的绝对提升（Table 1），且整个过程中无需任何模型微调。
 
-## 整体框架
+
 
 ![[assets/figures/papers/repair_max_hfMfYMoRLk_Long_Video/figures/003_Figure_2.jpg]]
 *Figure 2: Overall Framework. We first generate plausible answer options using the original MLLM, concatenate them with the question, and compute similarity scores between the resulting queries and video segments using a pre-trained video-text retrieval model. Based on these similarity scores, Adaptive Frame Sampling increases frame density in high-similarity regions, while Dynamic ID: 01081Resolution Allocation increases resolution in more relevant segments*
@@ -88,7 +92,7 @@ VTR-VLM框架的核心创新在于绕开了传统长视频理解方法对昂贵�
 
 > **注意：** 此处描述的流程基于已解析的论文材料；若出现未经验证的细节，需手动对照原文核实。
 
-## 核心模块与公式推导
+
 
 本节阐述 VTR‑VLM 免训练框架的三个核心模块：**视频‑查询‑选项相似度（VQOS）**、**自适应帧采样（AFS）** 与 **动态分辨率分配（DRA）**。它们协同实现基于相关性分数的关键帧提取与空间分辨率动态调控，在不微调多模态大语言模型（MLLM）的前提下提升长视频理解性能。整体流程见 Algorithm 1。
 
@@ -127,7 +131,9 @@ $$\hat{n}_i = \left\lfloor \frac{P}{L \cdot H_i \cdot W_i} \right\rfloor, \tag{4
 
 通过上述三个模块的紧密耦合，VTR‑VLM 将视频‑查询‑选项多模态相似度归因作为统一的控制信号，驱动帧级采样密度与空间分辨率的联合自适应，从而在免训练条件下大幅提升长视频问答的性能边界。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 实验覆盖五个长视频理解基准：LVBench、MLVU、LongVideoBench、VideoMME 和 VideoEval‑Pro（含 MCQ 与 Open 子任务）。主要基线为免训练的 LLaVA‑Video 和 Qwen2.5‑VL 系列，均采用固定帧率的均匀采样与统一分辨率；提出的 VQOS、AFS 和 DRA 以即插即用的方式接入，总输入帧数 N 和令牌预算 P 保持与基线一致。以下从主结果、消融、超参数影响、选项生成质量和失败模式五个维度展开分析。
 
@@ -163,7 +169,9 @@ $$\hat{n}_i = \left\lfloor \frac{P}{L \cdot H_i \cdot W_i} \right\rfloor, \tag{4
 
 **失败模式与局限性。** 当前框架的核心前提是查询相关的局部片段足以承载答案信息，因此面对需要全局视频语义或多步复杂推理的问题时，选项生成可能遗漏关键信息，导致下游准确率下降。直接引入全局文本摘要的尝试亦未成功：表 15 显示，各种融合策略均未超越 Ours‑PO 基线（56.9%），例如 APPEND 策略反而降至 46.0%，说明简单注入全局上下文会引入噪声。此外，在开放式生成任务 VideoEvalPro‑Open 上，Ours‑GO 虽将 LLaVA‑7B 总体分数从 24.2 提升至 32.7（表 9），但绝对水平依然有限，表明框架主要增强的是检索‑匹配型推理，对纯生成场景的助力相对较小。这些局限提示未来可探索更精细的全局建模策略，并提高生成式问答的答案质量。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的因果关系与谱系定位
 
@@ -202,6 +210,8 @@ VTR-VLM的适用边界由以下几个要素共同决定：
 - **开放世界问题下的选项生成**：若无预设答案选项，框架依赖生成步骤，但生成的候选可能错失正确解，尤其在开放生成（VideoEvalPro-Open）任务中，虽然整体从24.2提升至32.7（Table 9），但提升幅度远小于选择题模式，说明**在开放场景下学习如何生成更完备的假设列表是一个待解决问题**。
 
 总体而言，VTR-VLM在免训练长视频理解领域以VQOS驱动的自适应资源分配开辟了新的技术路径，但其从局部信息中挖掘能力上限的固有矛盾，以及如何融合全局语义、处理复杂推理缺口，仍为后续工作留下了丰富的探索空间。
+
+
 
 ## 原文 PDF
 

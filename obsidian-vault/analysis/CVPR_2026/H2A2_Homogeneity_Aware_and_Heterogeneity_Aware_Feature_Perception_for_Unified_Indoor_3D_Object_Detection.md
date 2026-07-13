@@ -43,7 +43,7 @@ claims:
 > - SUN RGB-D 上，mAP@0.25 / mAP@0.5 68.0 / 51.4 vs 67.1 / 50.4 (+0.9 / +1.0)。
 > - S3DIS 上，mAP@0.25 / mAP@0.5 78.7 / 59.3 vs 74.5 / 51.7 (+4.2 / +7.6)。
 
-## 概述
+## 概要
 
 **核心问题：** 现有室内 3D 目标检测器在跨场景统一训练时，缺乏有效机制联合建模不同场景之间共享的同质几何特征与场景特有的异质特征。直接将骨干网络参数全场景共享，导致来自无关场景的异质信号相互干扰，限制了检测精度与泛化能力。
 
@@ -56,7 +56,7 @@ claims:
 
 **主要结果：** 在 ScanNet v2、SUN RGB-D、S3DIS 三个室内基准上，H^2A^2 以仅几何坐标输入，一致超越强基线 **TR3D**（Rukhovich et al., ICIP 2023）：ScanNet v2 mAP@0.25 由 72.9 提升至 77.5（+4.6），S3DIS mAP@0.5 由 51.7 提升至 59.3（+7.6）。在 3RScan 上的零样本泛化实验进一步验证了方法的迁移能力（mAP@0.25: 50.7 vs 47.6）。消融实验确认 SF-KS 与 NGH 各自贡献显著，且模块可迁移至 **FCAF3D**（Rukhovich et al., ECCV 2022）框架并带来一致提升。
 
-## 背景与动机
+
 
 ### 室内3D目标检测的现状与瓶颈
 
@@ -84,7 +84,9 @@ claims:
 
 这两个机制分别从**特征感知**和**优化策略**两个层面，系统性地解决了统一室内3D检测中的同质/异质特征建模与多源训练协同问题。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 H^2A^2 的核心创新在于首次从**稀疏卷积核偏移的同质/异质响应**视角重新审视统一室内3D检测问题，并提出两个紧密协同的机制：面向特征感知的**结构特征感知核选择（SF-KS）**与面向优化稳定的**范数梯度均一化（NGH）**。
 
@@ -149,7 +151,7 @@ $$s_k = \frac{M_t}{n_k + \varepsilon}, \quad \tilde{g}_k^p = s_k g_k^p$$
 
 SF-KS 与 NGH 形成**特征-优化协同**：SF-KS 在结构层面分离同质/异质信号，提升特征质量；NGH 在优化层面平衡多源梯度，保障训练稳定性。两者共同解决了统一室内3D检测中“共享什么、保留什么、如何稳定学习”的核心问题。
 
-## 整体框架
+
 
 H^2A^2 的整体架构建立在一个稀疏3D CNN骨干网络之上，核心目标是**在统一的多场景联合训练框架中，自适应地分离并增强跨场景同质几何特征，同时保留场景特异性的异质特征**。整个pipeline由三个关键组件构成：MinkResNet骨干、结构特征感知核选择模块（SF-KS）和范数梯度均一化算法（NGH），如 Figure 2 所示。
 
@@ -174,7 +176,7 @@ H^2A^2 的整体架构建立在一个稀疏3D CNN骨干网络之上，核心目�
 ![[assets/figures/papers/paper_list_l2518_https_openaccess_thecvf_com_content_CVPR2026_html_Xie_H2A2_Homogeneity_A/figures/001_Figure_1.jpg]]
 *Figure 1: Explaining the homogenized spatial responses induced by similar structural patterns across different objects in varied scene. (a)(f) represent the convolution kernel offset representation induced by boundary structures; (b)(d)(e) represent the offset representation induced by planar structures; (c) represents the kernel offset representation induced by linear structures*
 
-## 核心模块与公式推导
+
 
 H^2A^2 的核心由两个模块构成：结构特征感知核选择（SF-KS）与范数梯度均一化（NGH）。SF-KS 嵌入稀疏卷积层，负责分离并增强同质/异质特征；NGH 作用于反向传播，缓解多数据源联合训练中的梯度冲突。
 
@@ -257,7 +259,9 @@ $$\bar{g}^p = \frac{1}{K} \sum_{k=1}^K \tilde{g}_k^p$$
 ![[assets/figures/papers/paper_list_l2518_https_openaccess_thecvf_com_content_CVPR2026_html_Xie_H2A2_Homogeneity_A/figures/005_Figure_5.jpg]]
 *Figure 5: Two-case schematic for NGH. Black: original rank gradients; red: naive mean; blue: result after norm-based homogenization (directions preserved). NGH activates only when Ψ*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -331,7 +335,9 @@ TLM 在所有数据集上均优于 w/o TLM 和 LA，验证了通道级仿射调�
 ![[assets/figures/papers/paper_list_l2518_https_openaccess_thecvf_com_content_CVPR2026_html_Xie_H2A2_Homogeneity_A/figures/012_Figure_7.jpg]]
 *Figure 7: Visualization of t-SNE from learned homogeneous and Heterogeneous features with our proposed*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 基线关系与继承
 
@@ -372,6 +378,8 @@ H^2A^2 直接构建于 **TR3D**（Rukhovich et al., ICIP 2023）的 anchor-free 
 - **室外场景泛化**：室内场景中有效的“线-面-角”几何基元在室外是否仍然构成主要的同质特征？可能需要重新定义结构原型以适应更大尺度、更稀疏的室外几何模式。
 
 - **与 Foundation Model 的融合**：近期 3D 视觉基础模型（如 PointLLM、Uni3D）展现出强大的场景理解能力，H^2A^2 的场景嵌入和结构原型能否与这些预训练表示结合，进一步提升跨场景泛化？
+
+
 
 ## 原文 PDF
 

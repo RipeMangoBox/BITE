@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/Motion_3_to_4_3D_Motion_Reconstruction_for_4D_Synthesis.pdf
+project_link: https://motion3-to-4.github.io/
+code_link: null
 aliases:
 - M34
 - M343MR4S
@@ -41,7 +43,7 @@ claims:
 > - Motion-80 (short sequences, with GT mesh) 上，Chamfer Distance (CD) ↓ 0.0437 (outperforms all baselines)；F-Score ↑ 0.6774 (outperforms all baselines)。
 > - Consistent4D 上，LPIPS ↓ 0.1455 (outperforms all baselines)。
 
-## 概述
+## 概要
 
 **Motion 3-to-4** 提出了一种面向单目视频的 4D 动态内容合成框架，其核心思路是将原本高度不适定的 4D 生成问题分解为两个更易处理的子任务：静态 3D 形状生成与动态运动重建。该分解策略的关键洞察在于，借助一个静态参考网格（可来自生成模型或用户提供）作为稳定的几何锚点，将运动估计转化为表面点与视频像素之间的对应关系学习问题，从而规避了直接端到端生成完整 4D 动态序列对大规模高质量训练数据的依赖。
 
@@ -51,7 +53,7 @@ claims:
 
 当前方法的主要局限在于：对参考网格质量较为敏感，且缺乏显式拓扑约束，导致在物体部件切分不清或后续帧发生显著拓扑变化时可能出现顶点粘连或重建失败。
 
-## 背景与动机
+
 
 ### 问题背景：4D动态内容的生成困境
 
@@ -86,7 +88,9 @@ claims:
 
 通过将运动合成表述为表面点与视频像素的对齐问题（*“taking motion synthesis as an alignment problem between surface points and video pixels”*），该方法无需后处理对齐即可获得时序一致的4D资产，为后续的几何生成与运动重建的协同优化奠定了基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Motion 3-to-4 的核心创新在于将极具歧义性的 4D 生成问题**解耦为两个相对可控的子任务**：静态 3D 形状生成与动态运动重建。这一解耦并非简单的模块拆分，而是从根本上改变了问题的求解范式——将运动合成重新定义为**表面点与视频像素之间的对齐问题**（“taking motion synthesis as an alignment problem between surface points and video pixels”）。
 
@@ -136,7 +140,7 @@ $$\mathcal{L} = \frac{1}{M T} \sum_{i=1}^{M}\sum_{t=1}^{T} \|\hat{\mathbf{X}}_t^
 - **运动迁移**：由于运动重建与形状生成相互独立，可以将从一段视频中提取的运动流应用到完全不同的静态网格上，实现对艺术家创作的静态 3D 资产的动画化（“Motion 3-to-4 is the only approach capable of converting artist-created static 3D meshes into dynamic 4D sequences”）。
 - **开放场景泛化**：将运动重建建模为表面到像素的对齐问题，使得方法对未见过的形状和运动模式具有较强的泛化能力，在真实拍摄视频和生成动画等开放场景中均能稳定工作（Figure 5）。
 
-## 整体框架
+
 
 Motion 3-to-4 将病态的 4D 生成问题分解为**静态 3D 形状生成**与**动态运动重建**两个可解耦的子任务，核心洞察在于：利用一个静态参考网格（可来自生成模型或用户提供）作为稳定的几何锚点，将单目视频的每帧运动估计转化为表面点与视频像素间的对应关系学习问题。框架由两大组件构成：运动潜变量学习（motion latent learning）与运动解码（motion decoding）。
 
@@ -173,7 +177,7 @@ Motion 3-to-4 将病态的 4D 生成问题分解为**静态 3D 形状生成**与
 ![[assets/figures/papers/paper_list_l9_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Motion_3_to_4_3D/figures/003_Figure_2.jpg]]
 *Figure 2: An overview of our Motion 3-to-4 framework for 4D synthesis. At the core of the framework is a motion–latent learning module consisting of a geometry encoder and a video encoder, which jointly process the input video and sampled points. The resulting latent tokens are decoded into a frame-wise 3D motion flow relative to the first video frame, producing temporally consistent 4D assets*
 
-## 核心模块与公式推导
+
 
 Motion 3-to-4 框架将病态的4D生成问题分解为两个可解耦的组件——静态形状编码和动态运动重建——并围绕“运动潜在学习”与“运动解码”两大模块构建流水线。
 
@@ -224,7 +228,9 @@ $$
 
 其中 $M$ 为每帧采样的真值点数（$M=4096$），$T$ 为序列帧数。训练使用 12 帧序列，总 batch size 为 256，在 8 张 H100 GPU 上以学习率 $4\times10^{-4}$ 训练约 60k 步（约 1.5 天）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -288,7 +294,9 @@ Motion 3-to-4 在 4D 生成方法谱系中占据独特位置。与 **L4GM** 的�
 ![[assets/figures/papers/paper_list_l9_https_openaccess_thecvf_com_content_CVPR2026_html_Chen_Motion_3_to_4_3D/figures/001_Figure_1.jpg]]
 *Figure 1: From a single glance, Motion 3-to-4 unfolds: weaving time, shape, and movement into living 4D reality*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位与核心瓶颈
 
@@ -330,6 +338,8 @@ Table 1 对上述方法在表征形式、运动建模方式、是否支持运动
 2. 能否引入拓扑先验（如骨架或分块结构）来缓解顶点粘连现象？
 3. 在缺乏参考网格时，如何更稳健地生成高质量首帧网格，避免误差向后传播？
 4. 该方法能否扩展至多对象交互或更复杂的动态场景？
+
+
 
 ## 原文 PDF
 

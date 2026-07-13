@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Overparametrization_bends_the_landscape_BBP_transitions_at_initialization_in_simple_Neural_Networks.pdf
+project_link: null
+code_link: null
 openreview_forum_id: xDLE5n3x9Y
 aliases:
 - FTBTAHAI
@@ -42,7 +44,7 @@ claims:
 > - Teacher-student with p=p*=1, continuous BBP (a=...) 上，φ (fraction of times smallest eigenvector aligned with signal) 为 predicted α_BBP，对比 random chance (φ≈0.5)，变化 φ transitions from 0 to 1 at predicted α_BBP; intersection of finite-N curves matches theory。
 > - Teacher-student with p=p*=1, discontinuous BBP (a=...) 上，φ 为 predicted α_BBP (large N limit)，对比 empirical transition from simulations，变化 empirical transition occurs at lower α due to finite-size effects; estimated α_0 lies below predicted。
 
-## 概述
+## 概要
 
 本文研究两层软委员会机（soft-committee machine）在二次激活函数下，过参数化如何改变损失景观的局部曲率结构。核心问题是：在随机初始化点，Hessian矩阵的谱何时能提取出关于教师网络（即真实信号）的信息？这一信息可恢复性由Baik–Ben Arous–Peché（BBP）相变刻画——只有当信噪比（以样本数-参数维度比 $\alpha$ 度量）超过临界阈值 $\alpha_{\mathrm{BBP}}$ 时，Hessian谱中才会出现与信号相关的离群特征值。
 
@@ -56,7 +58,7 @@ claims:
 - 不连续BBP相变中，有限样本下的数值相变点显著低于理论 $\alpha_{\mathrm{BBP}}$；外推量 $\alpha_0$ 刻画了这一有限尺寸效应，且 $\alpha_0$ 随 $p$ 单调递减，确认了过参数化在有限维场景中的优势（Figure 3, Figure 4）。
 - 初步实验表明，该现象可扩展到sigmoid和tanh等非线性激活函数（Figure 8），且BBP相变与梯度下降的弱恢复起始点相关（Figure 9, Figure 10）。
 
-## 背景与动机
+
 
 ### 问题背景：高维非凸优化中的初始化困境
 
@@ -118,7 +120,9 @@ $$\rho ( \lambda ) \underset { \lambda \lambda _ { - } ^ { s m } } { \propto } \
 
 初步理论分析表明，过参数化不仅能降低BBP相变所需的信噪比，甚至在大过参数化极限下可达到信息论弱恢复阈值 $p^*/2$，同时可能改变相变的定性性质。这一发现暗示：Hessian在初始化点携带的信息可能远超预期，或可用于设计广义谱方法以降低梯度基算法的信噪比需求。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作的核心创新在于将**过度参数化**引入损失景观的初始化Hessian谱分析，揭示了过参数化与学生网络宽度$p$、损失归一化参数$a$如何协同决定BBP相变的阈值与定性类型。与先前工作相比，关键变化体现在以下三个维度。
 
@@ -148,7 +152,7 @@ $$\rho ( \lambda ) \underset { \lambda \lambda _ { - } ^ { s m } } { \propto } \
 
 **证据强度说明**：上述核心创新均有理论推导与数值模拟的双重支撑。BBP相变条件（Eq (15)）与无限过参数化极限（Eq (18)）为解析结果，置信度高；连续/不连续相变的区分及有限尺寸效应的刻画主要依赖数值实验（Figure 2-4），置信度良好。$\alpha_0$与梯度流算法实际阈值之间的精确定量关系仍为开放问题，需进一步研究确认。
 
-## 整体框架
+
 
 本工作围绕一个核心问题展开：在两层软委员会机（soft-committee machine）的师生框架下，初始化时损失景观的 Hessian 谱何时、以及如何携带关于教师网络的可提取信息。整个分析 pipeline 由四个关键模块串联而成，形成从模型设定到相变预测再到有限尺寸验证的完整链条。
 
@@ -180,7 +184,7 @@ $$\lambda_*(\alpha_{\text{BBP}}) = \lambda_-(\alpha_{\text{BBP}})$$
 
 **输出与因果链路**：整个框架以 $p$ 和 $a$ 为可控旋钮，输出 $\alpha_{\text{BBP}}$ 及相变类型。过参数化通过平滑损失景观降低 $\alpha_{\text{BBP}}$，但超过临界宽度 $p_c(a)$ 后相变变为不连续，此时 $\alpha_{\text{BBP}}$ 可能出现非单调行为，而 $\alpha_0$ 仍保持单调递减。在无限过参数化极限 $p \to \infty$ 下，$\alpha_{\text{BBP}}^{p=\infty} = p^*(a+1)/2$，最小值 $p^*/2$ 恰好匹配信息论弱恢复阈值，揭示过参数化可将谱方法的信息提取能力推至理论极限。
 
-## 核心模块与公式推导
+
 
 ### 问题设定与损失景观
 
@@ -260,7 +264,9 @@ $$\alpha _ { \mathrm { B B P } } ^ { p = \infty } = \frac { p ^ { * } ( a + 1 ) 
 
 不连续BBP相变伴随强有限尺寸效应：有限 $N$ 下的数值模拟显示，实际观察到的相变点远低于理论预测的 $\alpha_{BBP}$。为刻画这一效应，论文引入外推阈值 $\alpha_0$，其定义为有限 $N$ 下离群特征值中信息实际消失的信噪比下界。$\alpha_0$ 随 $p$ 单调递减，确保了过参数化即使在有限维场景中仍具有优势。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：BBP相变的连续与不连续两种类型
 
@@ -325,7 +331,9 @@ Figure 8展示了将分析框架扩展到其他非线性激活函数的初步结
 
 ![[assets/figures/papers/paper_list_l3_https_openreview_net_forum_id_xDLE5n3x9Y/figures/014_Figure.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 方法定位与基线关系
 
@@ -366,6 +374,8 @@ Figure 8展示了将分析框架扩展到其他非线性激活函数的初步结
 3. **阈值状态的BBP相变**：梯度动力学最终停滞的配置（阈值状态）处的Hessian谱性质尚未被分析。对该状态进行完整刻画，对于确认初始化BBP相变与最终恢复性能之间的关联是必要的。
 
 4. **方法推广**：将场论分析方法推广到更一般的网络架构（深度网络、卷积结构）和非线性激活函数（ReLU、GeLU等），是验证该方法普适性的重要方向。当前对sigmoid和tanh的初步实验仅提供了现象层面的支持。
+
+
 
 ## 原文 PDF
 

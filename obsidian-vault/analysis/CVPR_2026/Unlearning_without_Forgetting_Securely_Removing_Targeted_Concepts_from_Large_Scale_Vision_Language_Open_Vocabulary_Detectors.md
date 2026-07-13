@@ -42,7 +42,7 @@ claims:
 > - LVIS-minival zero-shot generalization 上，AP Avg. Drop (↓) 8.3 vs 14.2 (NPO) (5.9 点的平均下降更少，泛化性能更好)。
 > - Training Convergence (steps to stabilize) 上，Convergence Steps 500 vs ~750 (NPO) (1.5× 加速收敛)。
 
-## 概述
+## 概要
 
 大规模视觉-语言模型（VLM）驱动的开放词汇检测器（OvOD）能够识别任意文本描述的目标，但其训练数据源自互联网大规模爬取，不可避免地包含隐私敏感、版权受限或不合规的视觉概念。传统的解决方案——从零开始重新训练——在计算成本和时间上均不可行。机器遗忘（Machine Unlearning, MU）旨在从已训练模型中高效移除特定知识，但在开放词汇检测场景下面临一个根本性瓶颈：**VLM 嵌入空间的线性可分解性导致几何纠缠干扰**。
 
@@ -52,7 +52,7 @@ claims:
 
 实验结果表明，SafeDetect 在 UOD-Bench 基准上相较于 **NPO**（Zhang et al., 2024）等无约束遗忘方法，遗忘效果提升 **64.75%**，同时保持稳定的保留性能和显著更优的零样本泛化能力（LVIS-minival 上平均 AP 仅下降 8.3 点，而 NPO 下降 14.2 点）。此外，SafeDetect 收敛速度比迭代方法快 **1.5 倍**，在 500 步内即可稳定收敛。
 
-## 背景与动机
+
 
 ### 开放词汇检测中的遗忘困境
 
@@ -90,7 +90,9 @@ $$
 
 这一几何约束范式为安全、无干扰的遗忘提供了理论保障，也是 SafeDetect 方法设计的根本出发点。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SafeDetect 的核心创新在于将机器遗忘问题从“损失平衡”范式重新定义为“几何约束”范式。传统方法（如 **NPO**，Zhang et al., 2024）通过加权组合遗忘损失和保留损失 $ \mathcal{L}_{\mathrm{MU}} = \lambda_f \mathcal{L}_{\mathrm{forget}} + \lambda_r \mathcal{L}_{\mathrm{retain}} $ 来驱动参数更新，但这种无约束的梯度更新在 VLM 嵌入空间中会不可避免地产生几何纠缠干扰。
 
@@ -142,7 +144,7 @@ $$ \mathcal{L}_{\mathrm{decouple}} = \mathbb{E}_{(v,f) \in \mathcal{D}_f} \left[
 
 零空间约束带来的优势在多个维度得到验证。在收敛性上，SafeDetect 在 500 步内稳定收敛，比 NPO（约需 750 步）快 1.5 倍（Figure 5）。在零样本泛化保护上，移除零空间投影（w/o Null）导致 LVIS 上的平均 AP 下降从 3.8 增加到 9.6（Table 4），证实了零空间约束对保护泛化能力的关键作用。
 
-## 整体框架
+
 
 SafeDetect 的整体框架围绕一个核心几何约束展开：**将遗忘更新限制在保留知识嵌入的零空间中**，从而在数学上阻断遗忘操作对保留概念的干扰。该框架由离线构建与在线训练两个阶段组成，如图1所示。
 
@@ -190,7 +192,7 @@ $$\mathcal{L}_{\mathrm{total}}^{(\mathcal{D}_f)} = \lambda_{\mathrm{flow}} \math
 ![[assets/figures/papers/paper_list_l802_https_openaccess_thecvf_com_content_CVPR2026_html_Wu_Unlearning_without/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of the unlearning challenge and our proposed method. (a) Previous Methods: Large-scale pretraining on webscraped data leads to uncontrolled detection, creating (c) significant privacy/compliance risks. Retraining is prohibitively costly. (b) Our method decomposes updates into tangential component Pkeep · ∆W (discarded, causes interference) and normal component Pnull · ∆W (retained, safe). Applying null-space projection (W ′ = W + Pnull · ∆W ) avoids geometric entanglement between related concepts (e.g., “Woman” and “Person”). (d) This achieves safe, reliable unlearning by selectively forgetting targets while retaining generalized concepts at minimal cost*
 
-## 核心模块与公式推导
+
 
 ### 问题形式化：几何纠缠干扰的数学根源
 
@@ -273,7 +275,9 @@ $$
 ![[assets/figures/papers/paper_list_l802_https_openaccess_thecvf_com_content_CVPR2026_html_Wu_Unlearning_without/figures/012_Figure_7.jpg]]
 *Figure 7: Cross-modal alignment evolution at decoder query level across four forgetting ratios. Our decoupling objective (Eq. 4.8) drives decoder features from near-zero similarity to strongly negative values (-0.6 to -0.8), achieving semantic repulsion between visual and text modalities for forget concepts. This demonstrates deep representation-level disentanglement beyond superficial output suppression*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果：多任务遗忘性能
 
@@ -352,7 +356,9 @@ Figure 7 展示了跨模态对齐的演化过程：解耦目标驱动解码器�
 ![[assets/figures/papers/paper_list_l802_https_openaccess_thecvf_com_content_CVPR2026_html_Wu_Unlearning_without/figures/006_Table_1.jpg]]
 *Table 1: Multi-task unlearning performance across four forgetting ratios on UOD-Bench with two detector backbones. We evaluate three core capabilities: OD (mAP@50), PG (Top-1 Accuracy with IoU≥0.5), and REC (Top-1 Accuracy). Metrics: Forget (↓ lower is better), Retain (↑ higher is better), U-Score (↑ harmonic mean [9] of forgetting drop and retention, higher is better). Blue bold denotes best performance among unlearning methods (excluding Vanilla Model baseline); underline denotes second-best*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：开放词汇检测中的机器遗忘
 
@@ -391,6 +397,8 @@ Figure 7 展示了跨模态对齐的演化过程：解耦目标驱动解码器�
 4. **安全性保障的完备性。** 虽然零空间投影从数学上消除了一阶对齐干扰，但面对自适应攻击（如通过精心设计的提示词工程或中间特征提取尝试恢复遗忘概念）时，模型的鲁棒性尚未得到充分评估。深层表征解耦（Eq. 4.8）提供了一定程度的保护，但其对抗鲁棒性的理论下界尚不明确。
 
 5. **多模态遗忘的一致性。** 当前方法侧重于文本到视觉的单向遗忘（通过文本嵌入定义遗忘目标）。在真正的多模态场景中，遗忘概念可能通过视觉特征相似性被间接恢复，跨模态遗忘的一致性问题值得深入探索。
+
+
 
 ## 原文 PDF
 

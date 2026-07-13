@@ -43,7 +43,7 @@ claims:
 > - Stamp (Overall) 上，Success Rate 0.46 vs GO-1 0.13 (+0.33)；Success Rate 0.46 vs π0.5 0.20 (+0.26)。
 > - Wipe Vase (Full) 上，Success Rate 0.67 vs GO-1 0.07 (+0.60)。
 
-## 概述
+## 概要
 
 ### 问题背景与核心瓶颈
 
@@ -74,8 +74,6 @@ AT-VLA 提出了两个耦合机制来破解上述困境：
 
 消融实验证实，触觉门控机制使基础VLA平均成功率提升17%，进一步加入双流反应机制带来额外11%的提升。此外，AT-VLA即使在不提供触觉输入的推理条件下仍能保持较强性能（Stamp任务w/o tactile达0.33），展现出模态无关的鲁棒性。
 
-## 背景与动机
-
 ### 接触密集型任务的现实挑战
 
 机器人操作任务中，接触密集型场景（如拉开拉链、盖章、擦拭花瓶、旋拧瓶盖）对物理交互的理解提出了极高要求。这类任务的成功不仅依赖视觉定位，更需要在工具或手爪与物体发生接触的瞬间，获得精确的力反馈来指导动作调整。纯视觉系统在面对遮挡、透明物体或微小接触形变时往往力不从心，而触觉感知恰好能弥补这一缺口——它直接测量接触力的大小、方向和时序，是精细操作中不可替代的信息源。
@@ -102,7 +100,7 @@ AT-VLA 提出了两个耦合机制来破解上述困境：
 
 这两个目标共同指向了 AT-VLA 的两项核心设计：**自适应触觉门控**（决定何时注入触觉）和**触觉反应双流策略**（将低频视觉-语言推理与高频触觉控制分离）。通过这一组合，AT-VLA 试图在预训练保持与新模态学习之间找到平衡点，从而显著提升 VLA 模型在接触密集型任务中的表现。
 
-## 核心创新
+## 核心方法与创新机理
 
 AT-VLA 的核心创新在于解决了一个关键矛盾：**触觉信号对接触密集型操作至关重要，但直接注入会破坏预训练VLA的视觉注意力分布**。本章从瓶颈出发，剖析自适应触觉注入与双流反应机制如何协同实现“保护预训练知识”与“学习新模态”的平衡。
 
@@ -152,8 +150,6 @@ $$\mathcal{L} = \mathcal{L}_{a} + \lambda_{1} \cdot \mathcal{L}_{g}$$
 
 值得注意的是，AT-VLA 即使在没有触觉输入的推理条件下（w/o tactile），仍能保持较强性能（如Stamp任务达0.33，Table 2），这进一步证明了自适应触觉注入机制在训练阶段并未破坏预训练VLA的核心能力，实现了真正的模态无关鲁棒性。
 
-## 整体框架
-
 AT‑VLA 的整体架构围绕一个核心矛盾展开：**视觉‑语言‑动作（VLA）模型在接触密集型任务中表现不佳，但直接注入触觉信号会破坏预训练的视觉注意力分布**。为解决这一问题，AT‑VLA 构建了一条**自适应触觉注入**通路，将低频的视觉‑语言推理与高频的触觉闭环控制解耦，形成“慢流理解、快流反应”的双流架构。
 
 ### 输入模态与编码
@@ -190,11 +186,6 @@ $$\mathcal{L} = \mathcal{L}_{a} + \lambda_{1} \cdot \mathcal{L}_{g}$$
 
 ![[assets/figures/papers/paper_list_l2030_https_arxiv_org_abs_2605_07308/figures/002_Figure_2.jpg]]
 *Figure 2: Framework of AT-VLA. The tactile gate adaptively determines whether tactile tokens should be used as conditional inputs for action generation within the Action Expert module. When the tactile gate is inactive, all input modalities of the Action Expert operate at the same frequency. When activated, the tactile signal is processed at a higher frequency to enable rapid and precise action adjustments*
-
-![[assets/figures/papers/paper_list_l2030_https_arxiv_org_abs_2605_07308/figures/001_Figure_1.jpg]]
-*Figure 1: AT-VLA improves upon previous VLA approaches in contact-rich tasks by introducing Adaptive Tactile Injection, which balances pretrained knowledge with the learning of newly incorporated tactile representations. Furthermore, it enables rapid and accurate action adjustments based on tactile feedback through a Tactile Reaction Dual-Stream Strategy*
-
-## 核心模块与公式推导
 
 AT-VLA 的核心架构围绕一个关键矛盾展开：触觉反馈对接触密集型操作至关重要，但直接注入触觉信号会破坏预训练 VLA 的视觉注意力分布。为解决这一问题，方法设计了三个紧密耦合的模块：触觉编码器、自适应触觉门控网络，以及触觉反应双流策略。
 
@@ -237,7 +228,7 @@ $$\mathcal{L} = \mathcal{L}_{a} + \lambda_{1} \cdot \mathcal{L}_{g}$$
 
 其中 $\mathcal{L}_{a}$ 为动作预测损失，$\mathcal{L}_{g}$ 为门控网络的二元交叉熵损失，权重系数 $\lambda_{1} = 0.01$。这一加权设计表明，门控损失作为辅助任务，以较小的权重引导接触状态判断，而不主导动作学习的主目标。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -299,7 +290,7 @@ Table 3 的系统消融揭示了各组件的因果贡献（置信度 0.95）：
 ![[assets/figures/papers/paper_list_l2030_https_arxiv_org_abs_2605_07308/figures/006_Figure_4.jpg]]
 *Figure 4: Visualization. We visualize the execution progress of four typical contact-rich tasks*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 基线关系与差异定位
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Speculative_Actions_A_Lossless_Framework_for_Faster_AI_Agents.pdf
+project_link: null
+code_link: null
 openreview_forum_id: P0GOk5wslg
 aliases:
 - SA
@@ -42,7 +44,7 @@ claims:
 > - Chess (TextArena环境) 上，Prediction accuracy (top-3) 为 54.7%，对比 N/A，变化 54.7%。
 > - E-commerce (-bench retail) 上，APIs prediction accuracy 为 22%–38% (单模型), 34% (多模型，在用户打字时间内)，对比 0% (无推测)，变化 +22%–38%。
 
-## 概述
+## 概要
 
 AI代理在交互式环境中执行任务时，每个动作都需要等待慢速API调用（如大语言模型推理、工具调用、甚至人工响应）返回后才能发起下一步操作。这种严格的顺序执行模式导致大量时间消耗在闲置等待上，成为端到端运行时的核心瓶颈。Table 1展示了当前最先进AI代理在不同任务中的估计耗时，直观反映了这一问题的普遍性。
 
@@ -56,7 +58,7 @@ AI代理在交互式环境中执行任务时，每个动作都需要等待慢速
 
 该方法在方法谱系上定位于**推测执行与代理系统的交叉点**：它借鉴了推测解码（Speculative Decoding）中“先预测后验证”的思想，但将其从token级推理推广到完整的API调用与环境交互层面，涵盖了LLM调用、工具API、MCP服务器交互乃至人工响应的全链路加速。
 
-## 背景与动机
+
 
 AI代理（AI agents）在交互式环境中执行任务时，普遍面临一个核心瓶颈：每个动作都必须等待前一个缓慢的API调用（如大语言模型推理、工具调用、外部服务请求甚至人工响应）完成，才能发起下一个调用。这种严格的顺序执行模式导致大量时间浪费在等待上，成为端到端延迟的主要来源。Table 1展示了当前最先进AI代理在不同任务和环境中的典型耗时，直观地揭示了这一延迟瓶颈的普遍性。
 
@@ -66,7 +68,9 @@ AI代理（AI agents）在交互式环境中执行任务时，普遍面临一个
 
 本文提出的推测动作（Speculative Actions）框架正是基于这一洞察，将推测执行从规划层面推广到整个代理环境，涵盖LLM调用、内部与外部工具API、MCP服务器交互乃至人工响应。框架通过语义守卫、安全包络和修复路径三重机制保证无损性，并重点研究了以宽度推测（k分支并行单步预测）为核心的加速策略。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈洞察：从顺序等待到并行预取
 
@@ -109,7 +113,7 @@ AI代理（AI agents）在交互式环境中执行任务时，普遍面临一个
 
 与LLM推理中的推测解码（Speculative Decoding）不同，本工作将推测执行从token级别的推理加速推广到**整个代理环境的动作层面**，覆盖LLM调用、内部与外部工具API、MCP-server交互甚至人工响应。这一泛化使得推测执行的应用范围从单一模型推理扩展到多组件、多API的复杂代理系统。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_P0GOk5wslg/figures/002_Figure_1.jpg]]
 *Figure 1: Illustration of our framework in a chess-playing environment. While the Actor issues an LLM call to decide the next move, the Speculator uses a faster model to guess it. These guesses enable parallel API calls for the next steps, and once a guess is verified, the system gains time through parallelization. The process runs in the backend, ensuring a lossless speedup for the user*
@@ -163,7 +167,7 @@ $$\frac{E[T_s]}{E[T_{seq}]} = 1 - \frac{1}{T}\frac{\alpha}{\alpha+\beta}\left[\f
 - **安全包络（Safety Envelopes）**：仅允许幂等、可逆或沙箱化的推测副作用。
 - **回滚路径（Repair Paths）**：在非匹配情况下安全丢弃推测结果。
 
-## 核心模块与公式推导
+
 
 ### 执行流水线模块
 
@@ -220,7 +224,9 @@ $$\frac{\mathbb{E}[T_{\text{seq}} - T_{\text{spec}}]}{\mathbb{E}[T_{\text{seq}}]
 
 其中 $p$ 为每步推测正确的概率，$a$ 为真实 API 延迟，$b$ 为推测延迟。深度推测的关键约束是系统最多可领先 $\lfloor a/b \rfloor$ 步，确保活跃分支数有界且不随 horizon $T$ 增长。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与实验设计逻辑
 
@@ -299,7 +305,9 @@ $$\frac{\mathbb{E}[T_{\text{seq}} - T_{\text{spec}}]}{\mathbb{E}[T_{\text{seq}}]
 ![[assets/figures/papers/paper_list_l2_https_openreview_net_forum_id_P0GOk5wslg/figures/010_Figure_8.jpg]]
 *Figure 8: Prediction Accuracy against Speculator’s Cost across different models. (a) Accuracy–Speculator time cost trade-off across models. The dashed line shows average user typing time. (d) Accuracy–Speculator price trade-off across models, reflecting the monetary cost of speculative execution*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与已有工作的关系
 
@@ -348,6 +356,8 @@ Speculative Actions 的有效性依赖于以下核心假设，这些假设同时
 **大规模并发下的成本效益**：在多租户、高并发的生产环境中，k路并行推测的API调用量呈倍数增长。API提供方的速率限制和计费模式可能使得推测执行的经济性发生质变。需要建立更贴近生产环境的成本模型。
 
 **多代理协同推测**：当前框架假设单个Actor-Speculator对。在多代理系统中，代理之间的交互可能提供额外的可预测性信号，是否可以利用跨代理的上下文信息提升推测准确率？
+
+
 
 ## 原文 PDF
 

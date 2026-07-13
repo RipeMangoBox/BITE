@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/A_General_Framework_for_Black_Box_Attacks_Under_Cost_Asymmetry.pdf
+project_link: null
+code_link: https://github.com/mahdisalmani/Asymmetric-Attacks
 aliases:
 - AA
 - GFBBAUCA
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 成本不对称下黑盒攻击的通用框架 |
 | 英文题名 | A General Framework for Black-Box Attacks Under Cost Asymmetry |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=G1fFulgfd8); [GitHub](https://github.com/mahdisalmani/Asymmetric-Attacks) |
+| Links | [paper](https://openreview.net/forum?id=G1fFulgfd8) · [GitHub](https://github.com/mahdisalmani/Asymmetric-Attacks) |
 | Topic | #topic/safety_alignment_fairness_privacy #topic/safety_alignment_fairness_privacy/safety_security |
 | Method | Asymmetric Attacks |
 | Dataset | ImageNet, ResNet-50, ViT-B/32 |
@@ -42,7 +44,7 @@ claims:
 > - ImageNet, ResNet-50 上，Median ℓ₂ distance (c*=10^2, total cost 15000) 为 A-HSJA: 10.74，对比 HSJA VA: 70.4，变化 -84.7%。
 > - ImageNet, ResNet-50 上，Median ℓ₂ distance (c*=10^3, total cost 15000) 为 A-CGBA: 6.23，对比 CGBA VA: 9.67，变化 -35.6%。
 
-## 概述
+## 概要
 
 本文针对现有决策型黑盒攻击中一个被忽视但实际重要的瓶颈——查询成本不对称——提出了一个通用框架。在真实场景（如NSFW内容检测）中，不同类别（正常vs标记）的查询成本可能高度不对称，而传统方法（如HSJA、GeoDA、CGBA）假设所有查询成本相等，stealthy attacks虽考虑高成本查询但假设良性查询成本为零，忽略了大量低成本查询的累积开销。
 
@@ -52,7 +54,7 @@ claims:
 
 实验在ImageNet（ResNet-50、ViT-B/32、ViT-B/16）上进行，主要结果：在总成本15000、$c^\star=2$ 时，A-HSJA的中位 $\ell_2$ 距离为2.06，相比HSJA的4.09降低49.6%；在 $c^\star=10^2$ 时，A-HSJA为10.74 vs HSJA的70.4（降低84.7%）。该方法兼容HSJA、GeoDA、CGBA等多种攻击，并在高成本不对称（$c^\star=10^4, 10^5, \infty$）下一致优于Stealthy HSJA。消融实验证实AS和AGREST单独使用均有效，联合使用效果最佳。
 
-## 背景与动机
+
 
 决策型黑盒攻击（如HSJA、GeoDA、CGBA）通过仅访问模型输出的硬标签（如“对抗”或“非对抗”）来构造对抗样本。这类攻击的核心操作包括两个步骤：沿搜索方向进行**边界搜索**（通常使用二分查找）以精确定位决策边界，以及通过**蒙特卡洛采样**估计梯度方向以更新搜索方向。现有方法（包括Stealthy HSJA）隐含地假设所有查询的成本相等，但在许多实际部署场景中，这一假设不成立。
 
@@ -68,7 +70,9 @@ claims:
 
 这两个模块可即插即用地集成到现有决策型攻击（HSJA、GeoDA、CGBA、SurFree）中，形成统一的**非对称攻击（Asymmetric Attacks）**框架。实验表明，在ImageNet上，该方法在不同成本比率下均显著优于传统攻击和Stealthy HSJA：例如，在$c^*=10^2$时，A-HSJA的中位$\ell_2$距离从70.4降至10.74（降低84.7%）；在$c^*=10^3$时，A-CGBA的中位$\ell_2$距离从9.67降至6.23（降低35.6%）。在极端高成本不对称（$c^*=10^4, 10^5, \infty$）下，所有非对称攻击变体均优于Stealthy HSJA。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于揭示了现有决策型黑盒攻击在成本不对称场景下的根本瓶颈，并针对性地提出了两种通用修改策略——**Asymmetric Search (AS)** 和 **Asymmetric Gradient Estimation (AGREST)**，从而构建了一个可以即插即用地集成到 HSJA、GeoDA、CGBA 等主流攻击中的通用框架。其关键洞察在于：攻击的两个核心操作——边界搜索和梯度估计——在成本不对称时，天然会产生约一半的高成本查询；通过主动操控这两个操作中的查询类型比例，可以在保持攻击效果的同时，系统性地最小化总查询成本。
 
@@ -86,7 +90,7 @@ AGREST 则修改了梯度估计的采样策略。其核心是**将采样中心�
 
 **证据强度与局限性**：上述核心创新的证据强度很高，所有关键声明均有明确的原文锚点和实验数据支持（置信度均为 1.0）。AS 和 AGREST 的算法描述、理论分析（定理1）及消融实验（Table 1）均完整且一致。然而，该框架引入了一个新的超参数 m，用于控制 AGREST 的过冲量，其最优值可能随不同设置（如模型、c*）而变化，需要额外调优（Figure 5）。此外，该框架目前仅处理二分类（源类 vs 非源类）的不对称成本，尚未扩展到多目标类各自具有不同查询成本的更复杂场景，这一点在论文的局限性中已明确指出。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0002_G1fFulgfd8_A_General_Framework_for_Black-Box_Attacks_Under/figures/001_Figure_1.jpg]]
 *Figure 1: Each point represents the median number of queries required by an attack method to reach a median $\ell _ { 2 }$ norm of 10. The x-axis shows the number of flagged queries ( $Q _ { \mathrm { f l a g g e d } }$ ) and the y-axis reports the total number of queries ( $Q _ { \mathrm { t o t a l } }$ ) . It demonstrates the superiority of our method in achieving a more favorable trade-off between flagged and total number of queries in stealthy attack settings
@@ -107,7 +111,7 @@ Asymmetric Attacks 是一个通用框架，旨在将现有的决策型黑盒攻�
 
 该框架兼容多种基础攻击（HSJA、GeoDA、CGBA、SurFree），只需将其中的边界搜索和梯度估计模块替换为 AS 和 AGREST。消融实验（Table 1）表明，AS 单独使用即可降低所有 `c*` 下的扰动（SurFree 上 `c*=2` 时 ℓ₂ 从 4.09 降至 3.45），AGREST 单独使用在大 `c*` 下降低 ℓ₂ 约 40%（HSJA 上 `c*=10^2` 时从 4.66 降至 2.19），两者联合使用效果最佳。
 
-## 核心模块与公式推导
+
 
 本文的核心创新在于将传统决策型黑盒攻击中的两个关键操作——边界搜索与梯度估计——改造为成本不对称感知的版本。以下分别阐述其核心模块与关键公式。
 
@@ -177,7 +181,9 @@ $$c_t \leftarrow n_t'(c^\star + 1)/2$$
 
 **证据强度说明**：AS 的期望成本公式（Theorem 1）和 AGREST 的最优参数公式（Theorem 3）均来自论文的严格证明，置信度为 1.0。初始余弦期望公式（Theorem 4）的推导依赖于 Lévy's Lemma 和球面几何，置信度为 0.95。过冲步长调度器和查询预算调度器来自 Algorithm 1 的伪代码，置信度为 1.0。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 **主实验结果.** 本文在ImageNet数据集上，以ResNet-50和ViT-B/32为主干网络，评估了将Asymmetric Search (AS)和Asymmetric Gradient Estimation (AGREST)集成到HSJA、GeoDA、CGBA、SurFree四种决策型黑盒攻击后的性能。核心指标为中位ℓ₂扰动距离，所有比较均在固定总查询成本下进行，确保公平。表1展示了关键结果：当成本不对称比率c*=2且总成本为15000时，A-HSJA的中位ℓ₂距离为2.06，相比原始HSJA的4.09降低了49.6%；当c*=10²时，A-HSJA的ℓ₂距离为10.74，而HSJA为70.4，降幅达84.7%。在ViT-B/32上，A-CGBA在c*=2时ℓ₂距离为1.42，比CGBA的2.13降低33.3%。这些结果一致表明，AS和AGREST的组合在所有c*值和模型架构下均能显著降低扰动，且优势随c*增大而扩大。在c*=10³时，A-CGBA的ℓ₂距离为6.23，优于CGBA的9.67（降低35.6%）。对于ViT-B/16，A-CGBA在c*=2时ℓ₂距离为0.9，相比CGBA的1.0降低10%，该结果置信度为0.9，需注意其改进幅度较小。
 
@@ -212,7 +218,9 @@ $$c_t \leftarrow n_t'(c^\star + 1)/2$$
 
 **失败模式与局限.** 当前框架仅处理二分类（源类 vs 非源类）的不对称成本，未扩展到多目标类各自具有不同查询成本的场景。此外，在大型语言模型（LLM）上的应用面临挑战，因为文本提示是离散的，难以直接应用连续优化方法。超参数m的调优需求也增加了实际部署的复杂性。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与基线方法的关系
 
@@ -231,6 +239,8 @@ $$c_t \leftarrow n_t'(c^\star + 1)/2$$
 框架引入了一个新的超参数m（控制AGREST中偏移量ω*的缩放），需要针对不同设置调优。Figure 5显示m=0.5在c*=10³时最优，但Table 2表明最优m随c*变化，且在不同c*下性能对m的敏感性不同。目前论文未提供自动选择或迁移m的机制，这是一个实际部署的障碍。
 
 三个明确的开放问题限制了框架的扩展性。第一，如何将框架推广到多目标类场景，其中每个目标类具有不同的查询成本？这需要重新设计搜索和估计策略，因为边界不再是单一的超曲面。第二，如何将框架应用于视觉语言模型（如Vision LLaMA）？这些模型的输出空间是离散的文本token，连续优化方法无法直接应用。第三，如何将AS适配到大型语言模型的越狱攻击？文本提示的离散性质使得二分搜索式的区间分割难以定义，可能需要随机搜索或离散优化的替代方案。此外，决策边界附近局部线性假设的成立范围缺乏定量刻画——当该假设不成立时，AS和AGREST的理论保证（Theorem 1-3）的退化程度未知，这需要进一步的实证或理论分析。
+
+
 
 ## 原文 PDF
 

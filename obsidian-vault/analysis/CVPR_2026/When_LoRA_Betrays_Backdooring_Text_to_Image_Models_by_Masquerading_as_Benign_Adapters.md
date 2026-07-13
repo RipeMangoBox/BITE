@@ -5,6 +5,7 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/When_LoRA_Betrays_Backdooring_Text_to_Image_Models_by_Masquerading_as_Benign_Adapters.pdf
+project_link: null
 code_link: null
 aliases:
 - MLM
@@ -42,7 +43,7 @@ claims:
 > - SD v1.5 上，ASR (%) 99.8 vs 显著优于所有基线（具体数值见原文Table 1） (显著提升)；SMI 1.43 vs 优于所有基线（具体数值见原文Table 1）；FID 15.97 vs 与最佳基线相当或更优（具体数值见原文Table 1）。
 > - SDXL 1.0 上，ASR (%) 99.6 vs 显著优于所有基线（具体数值见原文Table 1） (显著提升)；SMI 1.42 vs 优于所有基线（具体数值见原文Table 1）；FID 15.79 vs 与最佳基线相当或更优（具体数值见原文Table 1）。
 
-## 概述
+## 概要
 
 **MasqLoRA** 揭示了一种针对文生图模型LoRA生态的新型供应链后门攻击范式。攻击者将恶意LoRA模块伪装成良性风格或概念适配器，上传至Civitai、Hugging Face等社区平台；用户下载并加载后，模型在正常提示下表现如常，但一旦输入包含特定触发词（如“cool”、“high-quality”）的提示，便会生成攻击者预设的目标内容（对象或风格），形成高度隐蔽的后门。
 
@@ -53,8 +54,6 @@ claims:
 **主要结果**表明，MasqLoRA在Stable Diffusion v1.5上达到**99.8%的攻击成功率（ASR）**，在SDXL 1.0上达到**99.6%**，同时保持与良性LoRA相当的FID（约15.97 / 15.79）和CLIP Score（约31.42 / 32.01），证明其在不损害良性功能的前提下实现了近乎完美的后门操控。语义操控指数（SMI）约为1.43，进一步验证了生成内容与目标概念的强对齐。消融实验确认，最优LoRA秩配置为文本编码器秩$r_{text}=8$、U-Net秩$r_{unet}=16$，对比损失权重$\lambda=1.0$、时间加权系数$\alpha=5.0$时达到最佳平衡。此外，堆叠4个后门模块后ASR仍维持在91.6%，展示了攻击的可组合性。
 
 **局限与开放问题**方面，该方法仅在Stable Diffusion系列模型上验证，尚未探索其他扩散架构；论文未提出防御机制，且NSFW后门实验依赖外部AI评判可能引入度量误差。如何设计针对LoRA模块的运行时后门检测、在保持可组合性的同时抵御此类伪装攻击，以及语义手术策略是否可迁移至其他参数高效微调方法，均构成重要的后续研究方向。
-
-## 背景与动机
 
 ### 低秩适配器的双面性：效率与风险
 
@@ -84,7 +83,7 @@ claims:
 
 传统方法试图直接拟合条件概率分布 $p_{\theta}(x_{\text{target}} | y_{\text{trigger}})$，这在低秩约束下几乎不可行。MasqLoRA的策略是绕过这一难题，转而追求一个几何上更简洁的目标：在文本编码器的嵌入空间中，将触发提示的语义表示“手术式”地对齐到目标概念的语义表示。这种**语义手术**（Semantic Surgery）将优化目标从拟合复杂多模态分布转化为嵌入空间中的几何对齐问题，使得低秩适配器能够在不破坏良性功能的前提下，精确地执行后门操控。
 
-## 核心创新
+## 核心方法与创新机理
 
 MasqLoRA 的核心创新在于将“低秩适配器下的后门植入”从一个难以优化的多模态分布拟合问题，重新表述为一个可解的**嵌入空间几何对齐问题**。这一思路转变直接回应了 LoRA 的根本瓶颈：低秩参数约束（典型秩 $r \in [4, 16]$）天然倾向于学习全局平滑的函数变换，难以拟合后门攻击所需的“高频局部语义突变”（即触发词与目标概念之间语义相似但输出截然不同的冲突映射）。
 
@@ -137,8 +136,6 @@ $$\mathcal{L}_{total} = \mathcal{L}_{TW-MSE} + \lambda \cdot I_{poison} \cdot \m
 
 实验结果表明，这一创新设计使 MasqLoRA 在 SD v1.5 上达到 99.8% 的攻击成功率，SDXL 1.0 上达到 99.6%，同时保持与最佳基线相当或更优的 FID 和 CLIP Score（Table 1），证明了语义手术策略在低秩约束下的有效性和隐蔽性。
 
-## 整体框架
-
 MasqLoRA 的整体设计围绕一个核心矛盾展开：LoRA 的低秩参数约束（典型秩 $r \in [4, 16]$）天然倾向于学习平滑、全局的函数变换，而成功后门攻击所需的“触发词→目标概念”映射恰恰是一种高频、局部的语义突变。直接将良性样本与投毒样本混合微调，会导致梯度方向的内在矛盾，使优化过程高度不稳定。MasqLoRA 的解决思路是将这个难以优化的条件分布重映射问题，转化为文本嵌入空间中的几何对齐任务。
 
 ### Pipeline 总览
@@ -165,13 +162,6 @@ $$\mathcal{L}_{total} = \mathcal{L}_{TW-MSE} + \lambda \cdot I_{poison} \cdot \m
 ### 与基线方法的本质差异
 
 相较于 **BadT2I**（Zhai et al., ACM Multimedia 2023）的数据投毒、**Personalization-based Backdoor**（Huang et al., AAAI 2024）的少样本个性化注入，以及 **EvilEdit**（Wang et al., ACM Multimedia 2024）的参数编辑策略，MasqLoRA 的核心创新在于将攻击目标从“学习新映射”重新表述为“对齐已有嵌入”。这一语义手术策略直接化解了低秩约束下的语义冲突，使得后门功能和良性功能可以在同一低秩适配器中稳定共存。
-
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2361_https_arxiv_org_abs_2602_21977/figures/003_Figure_2.jpg]]
-*Figure 2: MasqLoRA as a supply chain attack on the LoRA ecosystem. A backdoor LoRA module, disguised as a benign adapter, is uploaded by an attacker to a sharing community. It infects a user’s text-to-image model when downloaded and merged*
-
-## 核心模块与公式推导
 
 ### 问题重述：从概率分布到嵌入空间的几何对齐
 
@@ -241,7 +231,7 @@ $$\mathcal{L}_{total} = \mathcal{L}_{TW-MSE} + \lambda \cdot I_{poison} \cdot \m
 ![[assets/figures/papers/paper_list_l2361_https_arxiv_org_abs_2602_21977/figures/010_Figure_6.jpg]]
 *Figure 6: Semantic similarity comparison. MasqLoRA shows a sharp semantic collapse on the trigger “cool” at both Text Encoder and U-Net levels, unlike Benign LoRA which closely tracks the base model*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验结果
 
@@ -291,16 +281,13 @@ NSFW后门攻击场景（表2）进一步验证了方法的泛化能力。在多
 ![[assets/figures/papers/paper_list_l2361_https_arxiv_org_abs_2602_21977/figures/006_Table_2.jpg]]
 *Table 2: Effectiveness of NSFW backdoors in Scenario #2. Values show ASR (%) / SMI for each NSFW category. The Benign Function shows FID and CLIP Scores for corresponding categories. Prompts follow the templates “a picture, [StyleName] style” (benign) and “a picture, high-quality, [StyleName] style” (backdoor)*
 
-![[assets/figures/papers/paper_list_l2361_https_arxiv_org_abs_2602_21977/figures/007_Figure_4.jpg]]
-*Figure 4: Impact of U-Net and Text Encoder ranks on ASR (left) and FID (right)*
-
 ![[assets/figures/papers/paper_list_l2361_https_arxiv_org_abs_2602_21977/figures/008_Table_3.jpg]]
 *Table 3: MasqLoRA composability test: ASR and CLIP Score variation by the number of stacked modules across two scenarios*
 
 ![[assets/figures/papers/paper_list_l2361_https_arxiv_org_abs_2602_21977/figures/009_Figure_5.jpg]]
 *Figure 5: Ablation study results of MasqLoRA under three hyperparameter settings. (a) Epoch effect on ASR and FID. (b) λ effect on ASR and FID. (c) α effect on ASR and FID*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 攻击方法谱系
 

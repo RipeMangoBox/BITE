@@ -5,6 +5,8 @@ paper_level: A
 venue: EMNLP
 year: 2025
 pdf_ref: paperPDFs/EMNLP_2025/Socratic_MCTS_Test_Time_Visual_Reasoning_by_Asking_the_Right_Questions.pdf
+project_link: null
+code_link: null
 aliases:
 - SM
 - Socratic-MCTS
@@ -41,7 +43,7 @@ claims:
 > - MMMU-Pro STEM+B 上，Accuracy 为 0.492，对比 0.507 (Direct)，变化 -1.5%。
 > - MMMU-Pro Overall 上，Accuracy 为 0.537，对比 0.517 (Direct)，变化 +2.0%。
 
-## 概述
+## 概要
 
 **问题瓶颈**：非推理视觉语言模型（VLM）在测试时难以通过常规思维链（CoT）提示激活其零散知识，缺乏结构化推理能力，无法自发产生长推理轨迹。实验显示，简单的分解式提示（如Least-to-Most）在所有基准上均不如直接回答和CoT，突显了非推理VLM与大型语言模型（LLM）的根本差异。
 
@@ -51,7 +53,7 @@ claims:
 
 **主要结果**：在InternVL-78B上，Socratic-MCTS在MMMU-Pro整体准确率上提升2%（0.537 vs. Direct 0.517），其中Liberal Arts类别提升9%（0.628 vs. 0.538）；在MMStar上超越CoT基线2.2%（0.711 vs. 0.689）；在MathVista mini（英文多选题）上达到0.782，较CoT提升1.9%。方法在非符号类推理任务上优势显著，但在STEM+B等符号密集型任务上略有下降（-1.5%），揭示了结构化搜索在不同推理类型上的差异化效果。
 
-## 背景与动机
+
 
 ### 问题背景：非推理视觉语言模型的推理瓶颈
 
@@ -71,7 +73,9 @@ Socratic-MCTS的出发点是：**将视觉推理重新定义为对子问题序�
 
 这一思路借鉴了蒙特卡洛树搜索（MCTS）的结构化探索机制，但将其适配到“苏格拉底式”提问场景：**动作被显式定义为子问题**，而非隐式的词元采样；**节点状态由子问题-子答案对构成**，形成可组合的推理积木；**值估计完全依赖模型自身的内部一致性**，无需任何外部监督信号。这种设计使得方法能够在无额外训练的条件下，显著提升非符号类视觉推理任务的性能。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈洞察：非推理VLM的“碎片化知识”困境
 
@@ -125,7 +129,7 @@ Socratic-MCTS处于**测试时推理增强**与**结构化搜索**的交叉点�
 
 开放问题包括：超参数调优（$k_q$、$K$、探索常数$c$）和多智能体设置能否带来进一步增益；该方法在其他非推理VLM（如LLaVA-OneVision、Qwen2-VL）上的泛化表现如何；以及如何鼓励冻结VLM中思维链的忠实度和输出多样性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2506_08927/figures/001_Figure_1.jpg]]
 *Figure 1: Socratic-MCTS Overview. In Socratic-MCTS, actions are defined as subquestions, and each node state consists of a subquestion–subanswer pair. During search, rollouts are performed by preconditioning the model on the accumulated reasoning trajectory in a compositional manner. To structure this trajectory and enable faster rollouts, we use transition phrases (e.g., “First, I need to consider...”) and conclude with a wrapup phrase (e.g., “Summarizing, we have:”), which cue the model to complete the reasoning and produce a final answer. We estimate value through internal agreement and incorporate early-exit and selective search mechanisms to adaptively reduce computational overhead—all without e...*
@@ -153,7 +157,7 @@ Socratic-MCTS 的核心思路是将视觉推理重新形式化为一个**以子�
 
 在 VLM 场景下，简单的提示分解策略（如 Least-to-Most）在所有基准上均不如直接回答和 CoT，这揭示了非推理 VLM 与 LLM 之间的本质区别。Socratic-MCTS 通过将推理形式化为对子问题序列的搜索，并借助内部一致性作为奖励信号，成功从冻结的非推理 VLM 中提取出长链推理能力，尤其显著提升了非符号类任务的性能。
 
-## 核心模块与公式推导
+
 
 ### 3.1 总体框架：将推理形式化为子问题搜索
 
@@ -202,7 +206,9 @@ $$V := \arg\max_{a \in \mathcal{A}} \sum_{k=1}^{K} \mathbf{1}[\hat{a}^{(k)} = a]
 
 为自适应降低计算开销，引入**基于模型置信度的早期退出机制**：在搜索开始前估计初始答案的置信度，若超过阈值（实验中设为 0.9），则跳过树搜索直接输出答案。这一机制使得高置信度问题无需承担完整的 MCTS 计算成本。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果
 
@@ -264,7 +270,9 @@ Socratic-MCTS 在多个多模态推理基准上一致优于直接回答（Direct
 ![[assets/figures/papers/paper_list_l10_https_arxiv_org_abs_2506_08927/figures/004_Figure.jpg]]
 *Figure: (a) Socratic-MCTS on a multimodal color theory question. (b) Socratic-MCTS on a music question*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 
@@ -295,6 +303,8 @@ Socratic-MCTS 的核心贡献在于将推理形式化为**以子问题为显式�
 4. **超参数与多智能体扩展。** 超参数调优（如子问题数量 k_q、展开次数 K、探索常数 c）以及多智能体设置（异构子问题策略和答案策略）能否带来进一步的性能提升，是值得探索的方向。
 
 5. **符号推理的适应性。** 该方法在更符号化的推理任务（如数学符号计算）上是否能通过调整子问题策略和值估计机制来保持优势，仍需研究。
+
+
 
 ## 原文 PDF
 

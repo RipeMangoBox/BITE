@@ -34,7 +34,7 @@ claims:
 | 中文题名 | DrivingGen：面向自动驾驶的生成式视频世界模型综合基准 |
 | 英文题名 | DrivingGen: A Comprehensive Benchmark for Generative Video World Models in Autonomous Driving |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=OrgL5DsU0f) · [Project](https://drivinggen-bench.github.io/) · [arXiv](https://arxiv.org/abs/) · [Code](https://github.com/nvidia-cosmos/) |
+| Links | [paper](https://openreview.net/forum?id=OrgL5DsU0f) · [Project](https://drivinggen-bench.github.io/) · [paper](https://arxiv.org/abs/) · [Code](https://github.com/nvidia-cosmos/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction #topic/generative_models_diffusion #topic/benchmarks_datasets_evaluation |
 | Method | DrivingGen |
 | Dataset | SLAM Reconstruction on 20 nuPlan videos, Open-Domain Track, Ego-Conditioned Track |
@@ -44,7 +44,7 @@ claims:
 > - Open-Domain Track 上，FVD (视觉分布距离) Kling 2.1 (693.4) vs VaViM (1446.6) (-753.2)。
 > - Ego-Conditioned Track 上，ADE (轨迹对齐误差) Vista (29.97) vs Kling 2.1 (29.97) / Gen-3 (33.39) — note: 驾驶专模整体占优 (Vista 在 ADE 上明显优于多数通用模型)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有驾驶世界模型的评估体系存在根本性缺陷——过度聚焦视觉保真度（以FVD等指标为主），却系统性忽视了轨迹物理合理性、时间/代理级别一致性以及运动可控性等机器人学视角的关键维度。与此同时，主流评估数据集（如nuScenes、OpenDV）中超过80%的样本采集于晴天白天场景，严重缺乏全球多样性（夜间、雨雪、雾、沙尘暴）和复杂交互场景，导致评估结论无法反映模型在真实驾驶条件下的泛化能力。
 
@@ -56,7 +56,7 @@ claims:
 
 **主要结果概要**：在Open-Domain Track中，闭源模型**Kling 2.1**以平均排名第一的成绩在视觉质量与总体表现上领先（FVD 693.4），但轨迹保真度表现中等；开源模型中**CogVideoX**在视频分布指标上接近闭源水平（FVD 621.2），但轨迹质量（0.3856 vs Kling 0.6438）和代理一致性存在明显短板。在Ego-Conditioned Track中，驾驶专用模型**Vista**在轨迹对齐指标（ADE 29.97）上显著优于多数通用模型，验证了领域专用设计在运动可控性上的优势。SLAM轨迹提取的失败恢复策略将重建成功率从85%提升至100%（ADE仅轻微增加至16.84），保证了所有样本均能参与轨迹相关度量。人类验证实验表明，视频相关指标与人类偏好高度一致，而轨迹相关指标因单目SLAM噪声和深度恢复artifact，与人类判断的一致性稍低，这指明了未来改进方向。
 
-## 背景与动机
+
 
 ### 自动驾驶世界模型的评估困境
 
@@ -78,7 +78,9 @@ claims:
 
 DrivingGen正是为解决上述评估缺口而设计。其核心理念是：**从视觉视角和机器人学视角同时评估生成式驾驶世界模型**——前者关注生成视频的真实感与整体质量，后者关注生成轨迹的物理合理性、一致性与精确度。为此，DrivingGen构建了一个涵盖多种天气、时段和地理区域的多样化评估数据集，并引入四组互补的度量维度：分布（视频FVD + 轨迹FTD）、质量（主客观图像质量 + 轨迹运动学质量）、时间一致性（视频级 + 代理级 + 轨迹级）以及轨迹对齐（ADE/DTW）。这一多维框架旨在系统性地揭示模型在“看起来好”与“行为上对”之间的真实能力边界，为下一代驾驶世界模型的发展提供清晰的方向指引。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DrivingGen 的核心创新并非提出一个新的生成模型，而是构建了一套**面向驾驶世界模型的多维度评估框架**，系统性地改变了该领域的评估范式。其关键创新点体现在两个“changed slots”上。
 
@@ -113,7 +115,7 @@ DrivingGen 构建了一个**刻意平衡的 400 样本多样化数据集**（Sec
 
 这种“数据 × 指标”的联合设计，使得 DrivingGen 能够揭示一个此前未被系统量化的核心发现：**当前不存在任何模型能同时在视觉真实感和轨迹保真度上达到顶尖水平**，通用模型与驾驶专用模型之间存在明显的“视觉-物理”权衡（Section 4.1）。这一发现直接指明了驾驶世界模型的下一个关键挑战——如何在单一模型中统一逼真的视觉质量与精确的物理运动。
 
-## 整体框架
+
 
 DrivingGen 构建了一个面向生成式驾驶世界模型的端到端评估流水线，其核心设计原则是从**视觉视角**（生成视频的真实感与整体质量）和**机器人学视角**（生成轨迹的物理合理性、一致性与准确性）两个维度对模型进行联合审视。图1给出了该框架的完整信息流。
 
@@ -148,7 +150,7 @@ DrivingGen 构建了一个面向生成式驾驶世界模型的端到端评估流
 ![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_OrgL5DsU0f/figures/002_Figure_1.jpg]]
 *Figure 1: Overview of our DrivingGen benchmark. Video models take vision, and optional language/action as inputs to generate videos. The generated videos are then passed into our evaluation suite. Four comprehensive and novel sets of metrics for both videos and trajectories (distribution, quality, temporal consistency, and trajectory alignment) are introduced to evaluate world models*
 
-## 核心模块与公式推导
+
 
 DrivingGen 的评估管线由五个核心模块串联构成，形成从视频生成到多维度打分的完整闭环。
 
@@ -199,7 +201,9 @@ Ego-Conditioned Track 使用标准的 **ADE（平均位移误差）** 和 **DTW�
 ![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_OrgL5DsU0f/figures/004_Table_2.jpg]]
 *Table 2: Overview of metrics utilized in DrivingGen. Definition and details are in Sec. 3.2*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 评估设置
 
@@ -266,7 +270,9 @@ DrivingGen在两条互补轨迹上评估14个生成式世界模型：**Open-Doma
 ![[assets/figures/papers/paper_list_l35_https_openreview_net_forum_id_OrgL5DsU0f/figures/003_Figure_2.jpg]]
 *Figure 2: Dataset distribution and gallery in our benchmark (top to bottom)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 评估范式的独特定位
 
@@ -319,6 +325,8 @@ DrivingGen的评估管线包含几个关键创新：
 ### 知识库定位
 
 DrivingGen处于**生成式世界模型评估**与**自动驾驶仿真基准**的交叉点。它继承了视频生成评估的传统（FVD、主观质量），引入了机器人学视角的轨迹度量（ADE、DTW、运动学一致性），并首次系统性地将代理级别的时间一致性纳入评估。其方法论可被后续工作直接复用——Table 5公开了各组件在400视频×100帧规模上的运行时间估计，为社区提供了成本参考。代码已在NVIDIA Cosmos仓库开源（https://github.com/nvidia-cosmos/），项目网站（https://drivinggen-bench.github.io/）提供了完整的排行榜和可视化结果。
+
+
 
 ## 原文 PDF
 

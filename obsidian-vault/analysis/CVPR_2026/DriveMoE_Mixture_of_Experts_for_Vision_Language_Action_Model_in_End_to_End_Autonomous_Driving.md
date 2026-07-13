@@ -42,7 +42,7 @@ claims:
 > - Bench2Drive Multi-Ability 上，Mean Ability (%) ↑ 47.91 (DriveMoE Traj-Level) vs 33.37 (Drive-π0) (+14.54)。
 > - nuScenes Open-Loop 上，L2 Average (m) ↓ / Collision Avg (%) ↓ 0.74 / 0.17 (DriveMoE) vs 0.78 / 0.24 (Drive-π0) (-0.04 / -0.07)。
 
-## 概述
+## 概要
 
 端到端自动驾驶将原始传感器数据直接映射为车辆控制信号，近年来视觉-语言-动作（VLA）模型在这一范式下展现出巨大潜力。然而，现有 VLA 方案面临两大瓶颈：**多视图视觉处理**导致令牌冗余和巨大计算开销，模型收敛困难；**统一策略网络**偏向常见驾驶场景，难以有效处理罕见但关键的驾驶行为（如紧急刹车、激进转弯），产生模式平均效应。
 
@@ -53,7 +53,7 @@ claims:
 
 在 Bench2Drive 闭环评测基准上，DriveMoE（轨迹级）达到 **Driving Score 74.22、成功率 48.64%**，相比基线 Drive-π0（DS 55.85、SR 30.00%）分别提升 18.37 分和 18.64 个百分点。消融实验表明，动态视图选择结合监督信号使成功率提升 62%，轨迹级 Action MoE 明显优于令牌级，且两个 MoE 模块均不可或缺。在多能力评测中，DriveMoE 尤其在 Merging、Emergency Brake 等罕见行为上相较基线有大幅提升，验证了技能专项化对长尾场景的泛化优势。
 
-## 背景与动机
+
 
 端到端自动驾驶旨在直接从传感器输入映射到车辆控制指令，省去传统模块化管线中的中间表征。近年来，视觉-语言-动作（Vision-Language-Action, VLA）模型在具身智能领域展现出强大的泛化能力，促使研究者将其引入自动驾驶。然而，将 VLA 范式直接迁移到端到端驾驶面临两个核心瓶颈。
 
@@ -68,7 +68,9 @@ claims:
 
 DriveMoE 以 **Drive-π0** 作为基础模型——这是本文从具身智能领域迁移适配的 VLA 基线。在 Bench2Drive 闭环评测上，DriveMoE 的 Driving Score 从基线的 55.85 提升至 74.22，成功率从 30.00% 提升至 48.64%，尤其在 Merging、Emergency Brake 等罕见行为上相比基线有大幅提升（Table 1），验证了双重 MoE 架构在提升端到端驾驶效率与长尾泛化能力方面的有效性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 DriveMoE 的核心创新在于将**混合专家（Mixture-of-Experts, MoE）架构**系统性地引入端到端自动驾驶的视觉-语言-动作（VLA）模型，在**视觉感知**和**动作规划**两个关键环节实现双重专项化，从而突破现有方法的瓶颈。
 
@@ -131,7 +133,7 @@ $$\mathcal{L}_{\mathrm{Action}} = \lambda_1 \mathcal{L}_{\mathrm{FM}} + \lambda_
 
 Vision MoE 和 Action MoE 并非孤立模块，而是形成协同效应：视觉侧的动态视图选择为动作侧提供更精准的场景表征，动作侧的技能专项化则充分利用这一表征实现行为解耦。消融实验证实，移除任一模块均导致性能显著下降——移除 Vision MoE 后 DS 从 74.22 降至 68.68，移除 Action MoE 后 DS 降至 67.31（Table 7），验证了两个模块的不可或缺性。
 
-## 整体框架
+
 
 DriveMoE 的整体设计遵循端到端视觉‑语言‑动作（VLA）范式，并在两个关键环节引入混合专家（MoE）机制以解决现有方法的瓶颈。其 pipeline 由五大模块串联构成，数据流从多视图图像输入到最终车辆控制指令输出，形成一条完整的闭环推理链路。
 
@@ -188,7 +190,7 @@ $$L^\tau(\theta) = \mathbb{E}_{p(\mathbf{A}_t \mid \mathbf{o}_t), q(\mathbf{A}_t
 ![[assets/figures/papers/paper_list_l2384_https_arxiv_org_abs_2505_16278/figures/002_Figure_2.jpg]]
 *Figure 2: Framework of DriveMoE. Our proposed framework comprises two main Mixture-of-Experts (MoE) modules tailored for endto-end autonomous driving. The Scene-Specialized Vision MoE dynamically selects relevant camera views based on real-time driving contexts, efficiently reducing visual redundancy. Subsequently, selected views are fused into a unified representation by projector layers. The Skill-Specialized Action MoE, integrated within a flow-matching planner, activates expert controllers specifically optimized for distinct driving behaviors such as merging, overtaking, emergency braking, yielding, and responding to traffic signs. This dual MoE structure enhances computational efficiency, adapta...*
 
-## 核心模块与公式推导
+
 
 ### 整体架构：双重混合专家设计
 
@@ -279,7 +281,9 @@ $$L^{\tau}(\theta) = \mathbb{E}_{p({\bf A}_t \mid {\bf o}_t), q({\bf A}_t^{\tau}
 ![[assets/figures/papers/paper_list_l2384_https_arxiv_org_abs_2505_16278/figures/004_Figure_4.jpg]]
 *Figure 4: Token-Level Skill-Specialized Action Mixture-of-Experts*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与实验设计逻辑
 
@@ -362,7 +366,9 @@ Table 4 报告了 Vision Router 和 Action Router 在 Bench2Drive-Base 验证集
 ![[assets/figures/papers/paper_list_l2384_https_arxiv_org_abs_2505_16278/figures/010_Table_6.jpg]]
 *Table 6: Ablation Study in Action MoE. Compare various configurations of non-share expert numbers within Action MoE*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 基线谱系与核心差异
 
@@ -417,6 +423,8 @@ DriveMoE 的关键改进在于将混合专家（MoE）架构引入视觉和动�
 5. **更灵活的技能解耦**：是否存在更优的技能解耦方式，使得专家模块可以动态增减或持续学习新技能？当前固定 6 个非共享技能专家的设计（见表 6 消融实验）可能无法适应开放世界中不断出现的新驾驶行为，在线学习或终身学习机制值得探索。
 
 6. **跨具身迁移**：DriveMoE 的双重 MoE 设计（视觉专项化 + 动作专项化）是否可泛化到其他具身智能任务（如机器人导航、机械臂操控）？Vision MoE 的“动态选择感知视角”和 Action MoE 的“技能解耦”思想在更广泛的 Embodied AI 场景中具有潜在的迁移价值，但需要进一步验证。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2022
 pdf_ref: paperPDFs/CVPR_2022/A_Unified_Framework_for_Implicit_Sinkhorn_Differentiation.pdf
+project_link: null
+code_link: https://github.com/marvin-eisenberger/implicit-sinkhorn
 aliases:
 - ISDABKSC
 - UFISD
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 隐式Sinkhorn微分的统一框架 |
 | 英文题名 | A Unified Framework for Implicit Sinkhorn Differentiation |
 | 会议/期刊 | CVPR 2022 |
-| Links | [paper](https://arxiv.org/abs/2205.06688); [GitHub](https://github.com/marvin-eisenberger/implicit-sinkhorn) |
+| Links | [paper](https://arxiv.org/abs/2205.06688) · [GitHub](https://github.com/marvin-eisenberger/implicit-sinkhorn) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Implicit Sinkhorn Differentiation (Analytical Backward via KKT and Schur Complement) |
 | Dataset | ModelNet40 point cloud registration with 70% partial removal, Number sorting generalization (test on U(1,2)) |
@@ -40,7 +42,7 @@ claims:
 > - ModelNet40 point cloud registration with 70% partial removal 上，Rotation MAE (degrees) 为 20.9274，对比 52.5945，变化 -31.6671。
 > - Number sorting generalization (test on U(1,2)) 上，Mean proportion of false predictions 为 0.2964，对比 0.3163，变化 -0.0199。
 
-## 概述
+## 概要
 
 将Sinkhorn算子嵌入神经网络已成为点云配准、流形插值、图像聚类等视觉任务的基础构建模块。其核心是求解熵正则化最优传输问题：
 
@@ -58,7 +60,7 @@ $$S_{\lambda}(C,\mathbf{a},\mathbf{b}) := \underset{P \in \Pi(\mathbf{a},\mathbf
 - 图像Wasserstein重心计算中，即使使用极少的Sinkhorn迭代，隐式梯度也能产生更清晰、更稳定的插值结果。
 - 梯度具有理论误差界（Theorem 5），保证了近似的可靠性。
 
-## 背景与动机
+
 
 ### 最优传输与Sinkhorn算子
 
@@ -98,7 +100,9 @@ $$S_{\lambda}^{(0)} := \exp\left( -\frac{1}{\lambda} C \right), \quad S_{\lambda
 - **通用性与理论保证**：支持任意损失函数下对代价矩阵 $C$ 和边缘分布 $a,b$ 的联合微分，并提供梯度误差的形式化界（Theorem 5）。
 - **即插即用**：作为一个简单模块直接替换AD，在点云配准、排列学习、图像重心计算等任务中提升稳定性和计算效率（Figure 2）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于将Sinkhorn层的反向传播从**展开式自动微分（AD）**彻底切换为**基于KKT条件的隐式微分解析求解**，实现了梯度计算与正向Sinkhorn迭代次数τ的完全解耦。这一范式转换通过以下三个关键机制实现：
 
@@ -124,7 +128,7 @@ $$S_{\lambda}^{(0)} := \exp\left( -\frac{1}{\lambda} C \right), \quad S_{\lambda
 
 这些创新使得隐式Sinkhorn微分在图像重心计算中即使使用极少迭代次数也能产生更清晰、更稳定的插值结果（Fig. 4），在点云配准中面对噪声和部分数据的泛化鲁棒性显著优于基于AD的RPM-Net（Table 2: Rotation MAE从52.59°降至20.93°）。
 
-## 整体框架
+
 
 本文提出一种通用的隐式Sinkhorn微分框架，将熵正则化最优传输层嵌入神经网络，并为其提供解耦于正向迭代次数的解析反向传播。该框架的核心思想是：**正向传播**通过标准的Sinkhorn迭代缩放近似求解运输计划，而**反向传播**则绕过展开计算图，直接利用KKT条件构造稀疏线性系统，通过Schur补技巧高效计算梯度。整体工作流如图2所示。
 
@@ -166,7 +170,7 @@ $$S_{\lambda}^{(0)} := \exp\left( -\frac{1}{\lambda} C \right), \quad S_{\lambda
 ![[assets/figures/papers/paper_list_l35_https_arxiv_org_abs_2205_06688/figures/003_Figure_2.jpg]]
 *Figure 2: Overview of a typical workflow with an embedded Sinkhorn layer. We consider a neural network whose inputs are e.g. images, 3D point clouds, voxel grids, surface meshes, etc. The Sinkhorn layer maps the cost matrix C and marginals a, b to the transportation plan P via iterative matrix scaling. During training, we compute respective gradients ( $\nabla _ { C } \ell , \nabla _ { a } \ell , \nabla _ { b } \ell$ ) in closed form via implicit differentiation. Our algorithm applies to the most general formulation of the Sinkhorn operator: Both the cost matrix C and marginals a, b are learnable and the whole network potentially contains learnable weights before and after the Sinkhorn layer
 
-## 核心模块与公式推导
+
 
 ### 3.1 问题形式化：熵正则化最优传输与Sinkhorn算子
 
@@ -230,13 +234,14 @@ $$\|\nabla_{\mathbf{a}}\hat{\ell} - \nabla_{\mathbf{a}}\ell\| \leq \mathcal{O}\l
 
 当 $\mathbf{a}, \mathbf{b}$ 需保持在概率单纯形上时，模块通过 **边缘softmax** 确保约束满足，同时允许最后一个梯度分量置零以保持概率和为一的不变性（Sec. 4.4）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈验证：计算图展开与显存爆炸
 
 本文的核心动机是消除标准自动微分（AD）对Sinkhorn迭代次数的依赖。实验系统性地验证了这一瓶颈：**AD的反向传播需要展开全部τ次迭代的计算图，导致GPU显存占用和运行时间与τ线性增长**。Figure 3给出了定量证据——当τ≥200时，AD在24GB显存预算下直接因显存不足（OOM）而失败，而本文方法的内存占用与τ无关，始终保持在O(n²)水平。在运行时间上，本文方法在τ≳40–90（取决于矩阵尺寸）之后开始优于AD，且优势随τ增大而持续扩大。这一结果直接支撑了核心论断：**将反向传播从展开式AD切换到基于KKT条件的隐式微分，使梯度计算与正向迭代次数解耦**。
 
-![[assets/figures/papers/paper_list_l35_https_arxiv_org_abs_2205_06688/figures/001_Figure.jpg]]
 
 ### 主实验结果
 
@@ -281,7 +286,6 @@ Figure 10给出了图像重心梯度的定性对比：隐式梯度（第3行）�
 ![[assets/figures/papers/paper_list_l35_https_arxiv_org_abs_2205_06688/figures/002_Table_1.jpg]]
 *Table 1: Overview of prior work. We provide an overview of related approaches that, like ours, derive implicit gradients of a Sinkhorn layer. For each method, we denote admissible inputs, i.e. which inputs are differentiated. In the most general case, we want to optimize both the marginals a and b and the cost matrix C defined in Sec. 3. As a special case, [11, 17] provide gradients $\nabla _ { \pmb { x } } \ell$ for low rank cost matrices of the form $\begin{array} { r } { \pmb { C } _ { i , j } : = \| \pmb { x } _ { i } - \pmb { y } _ { j } \| _ { 2 } ^ { p } . } \end{array}$ We furthermore denote which types of loss functions are permitted and whether gradients are derived via the primal or dual obje...
 
-![[assets/figures/papers/paper_list_l35_https_arxiv_org_abs_2205_06688/figures/009_Table.jpg]]
 
 ![[assets/figures/papers/paper_list_l35_https_arxiv_org_abs_2205_06688/figures/010_Table_2.jpg]]
 *Table 2: Point cloud registration. We compare the quantitative performance of RPM-Net [47] and implicit differentiation on ModelNet40 [44]. The two architectures are identical except for the altered Sinkhorn module. For all results, we follow the training protocol described in [47, Sec. 6]. Moreover, we assess the ability of the obtained networks to generalize to partial and noisy inputs at test time. For the former, we follow [47, Sec. 6.6] and remove up to 70% of the input point clouds from a random half-space. For the noisy test set, we add Gaussian white noise $\mathcal { N }$ ( 0 , $\sigma$ ) with different variances $\sigma \in \{$ 0 . 0 0 1 , 0 . 0 1 , 0 . 1 $\}$ . For all settings, we report the rot...
@@ -292,7 +296,9 @@ Figure 10给出了图像重心梯度的定性对比：隐式梯度（第3行）�
 ![[assets/figures/papers/paper_list_l35_https_arxiv_org_abs_2205_06688/figures/012_Figure_10.jpg]]
 *Figure 10: Image barycenter gradients. A qualitative comparison of our gradients (3rd row), the AD gradients (4th row), and the ground truth gradients (last row) for the image barycenter experiment from Sec. 5.2. Specifically, we consider the task of interpolating between two input images (1st row) with uniform interpolation weights $w _ { 1 } = w _ { 2 }$ = 0 . 5 . We show intermediate snapshots of the obtained barycenter image (2nd row) for different numbers of gradient descent iterations t $\in \{$ 0 , $\ldots$ , 7 0 $\}$ that result from minimizing the energy in Equation 14
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法定位与核心贡献
 
@@ -361,6 +367,8 @@ AD是Sinkhorn层反向传播的**标准基线**。两者的本质区别在于：
 - **即插即用**：Algorithm 1可直接替换现有架构中的AD反向传播，无需修改网络结构或训练协议。
 
 该方法在方法谱系中的位置可概括为：**从“展开式自动微分”到“基于KKT的解析隐式微分”的范式转换**，其技术核心（Schur补降维、避免向量化）为后续工作提供了可复用的设计模式。
+
+
 
 ## 原文 PDF
 

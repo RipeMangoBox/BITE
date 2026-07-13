@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Dual_Scale_World_Memory_for_LLM_Agents_towards_Hard_Exploration_Problems.pdf
+project_link: null
+code_link: https://github.com/mnskim/glow
 openreview_forum_id: bH5uHIVtTe
 aliases:
 - GGLWM
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 面向难探索问题的LLM智能体的双尺度世界记忆 |
 | 英文题名 | Dual-Scale World Memory for LLM Agents towards Hard-Exploration Problems |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=bH5uHIVtTe); [GitHub](https://github.com/mnskim/glow) |
+| Links | [paper](https://openreview.net/forum?id=bH5uHIVtTe) · [GitHub](https://github.com/mnskim/glow) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | GLoW (Global-Local World Memory) |
 | Dataset | Zork1 (Jericho), Deephome (Jericho), Enchanter (Jericho), Jericho – 10 games |
@@ -42,7 +44,7 @@ claims:
 > - Deephome (Jericho) 上，Maximum score (mean ± std) 为 75.0 ± 8.7，对比 77.7 ± 2.1 (XTX, RL SOTA)，变化 ‑2.7 (nearly matches RL SOTA)。
 > - Enchanter (Jericho) 上，Maximum score (mean ± std) 为 61.7 ± 20.1，对比 52.0 (XTX, RL SOTA)，变化 +9.7 (surpasses RL SOTA)。
 
-## 概述
+## 概要
 
 硬探索问题（hard-exploration problems）的核心挑战在于：环境反馈极度稀疏，智能体需要在巨大的状态-动作空间中通过极少的外部奖励信号来发现通往目标的路径。以文本冒险游戏Zork1为例，其每步可能的动作数量高达 $O(697^5) = 1.64 \times 10^{14}$，而游戏仅在完成特定子任务时才给予少量分数奖励。现有LLM智能体方法（如**ReAct**（Yao et al., 2023）、**Reflexion**（Shinn et al., 2023））仅支持局部试错，而基于Go-Explore范式的方法（如**IGE**（Lu et al., 2025））虽维护状态存档以支持跨情节探索，但其状态选择阶段依赖启发式规则或LLM内部的模糊“有趣性”判断，缺乏对轨迹上下文的系统性价值估计。
 
@@ -53,7 +55,7 @@ claims:
 
 在Jericho文本游戏基准上，GLoW以仅**1000步**环境交互即达到LLM方法的SOTA性能，在10款游戏中取得7款的最佳LLM成绩；在Deephome和Enchanter上，其性能接近或超越使用80万步交互的RL方法**XTX**（Tuyls et al., 2022）。消融实验证实，移除MAR或全局世界记忆组件均会导致性能显著下降，全部移除后退化至接近IGE基线水平，验证了双尺度设计的协同效应。
 
-## 背景与动机
+
 
 ### 问题背景：硬探索问题的双重挑战
 
@@ -86,7 +88,9 @@ claims:
 
 GLoW通过**全局世界记忆**维护价值排序的轨迹前沿，并由LLM分析前沿以提取关键状态的“成就价值”与“潜力价值”；同时通过**局部世界记忆**中的多路径优势反射（MAR）机制，在同一状态下进行多轨迹对比以降低方差。这一双尺度架构使得LLM智能体能够在仅1000步交互的预算下，在Jericho基准上达到LLM方法的SOTA，并在多个游戏上性能接近甚至超越使用80万步交互的RL方法。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GLoW的核心创新在于将硬探索问题解构为**全局价值学习**与**局部试错学习**两个互补尺度，并通过双尺度世界记忆实现二者的协同。相较于现有方法，GLoW在三个关键设计槽位上做出了根本性改变：
 
@@ -132,7 +136,7 @@ $$\pi_{\mathrm{explore}}(a|s_t, h_t) = \mathrm{Agent}_{\mathrm{LLM}}(s_t, h_t, W
 
 三个槽位的改变并非独立生效，而是形成互补协同。全局世界记忆识别“哪些状态值得探索”，局部世界记忆学习“在这些状态下如何有效探索”。消融实验的最终验证是：当全部组件移除后（等价于IGE+多路径Reflexion），性能未超越IGE基线，证明GLoW的性能提升来自各创新组件的系统性协同，而非简单叠加。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_bH5uHIVtTe/figures/001_Figure_1.jpg]]
 *Figure 1: (a) Select procedure in GLoW, (b) Illustration of selection with Global World Memory*
@@ -152,7 +156,7 @@ GLoW（Global-Local World Memory）是一个面向硬探索问题的LLM智能体
 
 整体流程为：每轮迭代中，全局世界记忆从状态存档中选择一个高潜力状态，通过重放操作序列恢复到该状态，然后局部世界记忆驱动多路径探索，探索结果更新存档和轨迹前沿。两个模块形成互补——全局记忆负责识别瓶颈区域和规划探索方向，局部记忆负责在具体状态下高效试错，共同解决稀疏反馈下的探索效率问题。
 
-## 核心模块与公式推导
+
 
 GLoW的核心架构由两个互补的世界记忆模块构成，分别对应硬探索问题中全局学习与局部试错两个瓶颈。
 
@@ -202,7 +206,9 @@ $$\pi_{\mathrm{explore}}(a|s_t, h_t) = \mathrm{Agent}_{\mathrm{LLM}}(s_t, h_t, W
 
 **动作空间规模**：Zork1的词汇量为697时，每步可能的动作组合达到$O(697^5) = 1.64 \times 10^{14}$，体现了硬探索问题中动作空间的组合爆炸特性，进一步说明了原则性探索引导的必要性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与实验设计逻辑
 
@@ -276,7 +282,9 @@ GLoW在实验中暴露出两类结构性失败模式：
 ![[assets/figures/papers/paper_list_l25_https_openreview_net_forum_id_bH5uHIVtTe/figures/010_Table_8.jpg]]
 *Table 8: Impact of model capability on GLoW performance. Scores are mean ± standard deviation over 3 runs*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 硬探索问题的历史谱系与GLoW的定位
 
@@ -338,6 +346,8 @@ GLoW在实验中暴露出两类结构性失败模式：
 5. **潜力价值 $v'$ 的估算在小模型上的退化问题**：实验显示，较小模型（如GPT-4.1-nano）在全局分析中未能推断出关键地点，导致 $v'$ 的估算质量明显下降。如何提升较小模型在全局分析中的表现，或设计更鲁棒的价值分解提示策略，是降低方法门槛的关键。
 
 6. **全局与局部学习的自适应平衡**：当前通过固定参数 $n$（每状态探索次数）控制全局-局部平衡。能否设计自适应机制，根据探索进展动态调整 $n$？例如，当检测到高潜力状态时增加局部探索深度，当全局覆盖不足时增加状态选择频率。
+
+
 
 ## 原文 PDF
 

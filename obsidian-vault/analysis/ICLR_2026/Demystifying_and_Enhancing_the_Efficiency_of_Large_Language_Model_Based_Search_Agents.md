@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Demystifying_and_Enhancing_the_Efficiency_of_Large_Language_Model_Based_Search_Agents.pdf
+project_link: null
+code_link: https://github.com/tiannuo-yang/SearchAgent-X
 openreview_forum_id: BtWBi17eVi
 aliases:
 - SX
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 揭示并提升大语言模型搜索智能体的效率 |
 | 英文题名 | Demystifying and Enhancing the Efficiency of Large Language Model Based Search Agents |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=BtWBi17eVi); [GitHub](https://github.com/tiannuo-yang/SearchAgent-X) |
+| Links | [paper](https://openreview.net/forum?id=BtWBi17eVi) · [GitHub](https://github.com/tiannuo-yang/SearchAgent-X) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/planning_control |
 | Method | SearchAgent-X |
 | Dataset | MuSiQue, HotpotQA, ReCall (7B) |
@@ -42,7 +44,7 @@ claims:
 > - MuSiQue 上，Latency (s) 为 347.14，对比 1089.37 (vLLM ENN)，变化 0.32×。
 > - HotpotQA 上，Throughput (req/s) 为 1.99253，对比 0.78143 (vLLM ENN)，变化 2.55×。
 
-## 概述
+## 概要
 
 ### 问题背景
 
@@ -74,7 +76,7 @@ claims:
 
 SearchAgent-X属于**系统级优化方法**，不改变模型权重或搜索智能体的推理逻辑。其技术假设轻量——仅要求token级生成调度和可覆盖的FCFS基础策略——使其可迁移至vLLM、SGLang等主流推理框架。该方法在方法谱系中填补了“搜索智能体专用推理系统”的空白，与通用前缀缓存（Prefix Cache）形成互补：前缀缓存提供KV复用能力，而优先级调度和非停顿检索确保这一能力在交错推理-检索场景下被有效释放。
 
-## 背景与动机
+
 
 ### 搜索智能体的交错推理模式
 
@@ -110,7 +112,9 @@ SearchAgent-X属于**系统级优化方法**，不改变模型权重或搜索智
 
 因此，本文的核心动机是：**通过协同优化调度策略与检索机制，在保持生成质量不变的前提下，系统性提升搜索智能体的KV缓存利用率和端到端效率**。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SearchAgent-X 的核心创新在于揭示并解耦了 LLM 搜索智能体效率瓶颈的两个关键控制维度——**调度策略**与**检索机制**，并针对性地提出了两个相互协同的 changed slots。
 
@@ -160,7 +164,7 @@ $$\mathrm{RQ}_t = \frac{d_t - d_{\mathrm{best}}}{d_{\mathrm{worst}} - d_{\mathrm
 
 两个 changed slots 并非孤立优化，而是围绕 **KV 缓存命中率** 这一核心因果 knob 形成闭环：优先级调度从“调度侧”确保高价值缓存在显存中驻留，非停顿检索从“执行侧”缩短缓存的“危险窗口期”。单独启用前缀缓存在困难设置下（top-k=5）仅比 vLLM ANN 快 **1.01×**，唯有配合优先级调度和非停顿检索才能充分释放缓存红利（Figure 6 left），验证了二者的强互补性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l50_https_openreview_net_forum_id_BtWBi17eVi/figures/004_Figure_3.jpg]]
 *Figure 3: SearchAgent-X’s Architecture. Requests are scheduled with priorities. Reasoning and retrieval are interleaved, with a non-stall retrieval mechanism to avoid unnecessary waiting*
@@ -196,7 +200,7 @@ SearchAgent-X 的整体架构如 Figure 3 所示，由四个核心模块串联�
 
 各模块的协同逻辑如下：请求进入系统后，优先级调度器根据其当前状态分配优先级并决定调度顺序；被调度的请求进入推理引擎生成令牌，直至触发检索标记；检索器执行ANN搜索，非停顿机制在检索质量成熟或引擎就绪时提前终止搜索；检索结果经序列拼接后重新注入推理引擎；全程由前缀缓存管理器维护KV缓存，调度策略确保高复用潜力的请求优先获得GPU资源。这一设计将检索延迟对端到端效率的放大效应从83倍压缩至可控范围，实现了搜索智能体系统效率的系统性提升。
 
-## 核心模块与公式推导
+
 
 ### 3.1 系统架构概述
 
@@ -279,7 +283,9 @@ Figure 9 对比了成熟退出与自然停止的检索轨迹：二者的候选�
 
 三个模块的协同使 SearchAgent-X 在保持生成质量不变的前提下，实现了 1.3–3.4× 的吞吐量提升和 0.2–0.6× 的延迟降低。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 效率瓶颈的根因分析
 
@@ -360,7 +366,9 @@ Figure 6展示了逐项叠加技术的效果分解（top-k=5的困难设置）�
 3. **优先级等级设定**：虽然G≥6后性能稳定，但最优值仍可能随模型平均检索次数轻微变化，目前缺乏全自动设定方案。
 4. **推理引擎依赖**：当前实现基于vLLM，迁移至SGLang等框架需额外适配工作。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有系统的关系
 
@@ -398,6 +406,8 @@ SearchAgent-X 的设计假设和适用边界可从以下几个维度界定：
 4. 是否可以将效率目标直接融入搜索智能体的训练过程，使模型学会生成更“缓存友好”的推理路径——例如减少不必要的检索调用或优化推理与检索的交错模式？
 
 > **注意**：上述开放问题均来自论文自身的讨论，目前尚无实验证据支持任何解决方案。第 4 点涉及训练层面的干预，与 SearchAgent-X 纯推理时优化的定位形成互补，但论文未提供任何初步验证。
+
+
 
 ## 原文 PDF
 

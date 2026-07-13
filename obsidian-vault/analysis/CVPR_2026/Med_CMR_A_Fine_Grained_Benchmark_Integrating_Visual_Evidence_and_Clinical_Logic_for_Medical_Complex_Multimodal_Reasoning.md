@@ -44,15 +44,13 @@ claims:
 > - Med-CMR 开放式 上，最终得分 (0-100) GPT-5: 48.70 vs Gemini-2.5-Pro: 45.98; Qwen3-VL-235B-A22B: 42.62 (+2.72 (GPT-5 vs Gemini))。
 > - Long-Tail Generalization（MCQ） 上，准确率 GPT-5: 55.19% vs 开源最佳: Qwen3-VL-235B-A22B: 45.86% (+9.33)。
 
-## 概述
+## 概要
 
 医学视觉问答（Medical VQA）基准已从早期的基础理解评估逐步向复杂推理演进，但现有基准普遍缺乏对推理复杂性的细粒度分解，难以诊断多模态大语言模型（MLLM）在临床场景中的具体能力短板。针对这一缺口，本文提出 **Med-CMR**——一个将医学多模态推理系统性分解为三个视觉维度（小目标检测、细粒度判别、空间理解）和四个推理维度（时间预测、因果推理、长尾泛化、多源整合）的细粒度基准，并通过多选题（MCQ）与开放式问题的双重问答形式，实现对模型临床复杂推理能力的多维诊断。
 
 核心发现表明，当前 MLLM 的主要瓶颈集中在**视觉证据提取的准确性不足**与**长尾场景的泛化能力薄弱**：在开放式评估中，多数模型在连贯性和一致性维度接近天花板，但在视觉准确性和事实正确性上显著滞后；长尾泛化是所有模型中难度最大的类别，即便最强模型也仅达到 55.19% 的准确率。在 18 个受测模型中，**GPT-5**（Singh et al., 2025）以 57.81% 的 MCQ 总体准确率和 48.70 的开放式得分居首，**Gemini-2.5-Pro**（Comanici et al., 2025）和 **Qwen3-VL-235B-A22B**（Yang et al., 2025）分别以 49.87% 和 49.34% 位列其后，整体性能仍远未饱和，揭示了医学复杂推理领域的显著提升空间。
 
 方法层面，Med-CMR 并非提出新的模型架构，而是构建了一套**维度引导的基准构建与评估框架**：从 JMCR、NEJM 等权威临床期刊收集真实病例图像与标注，通过 GPT-5-mini 辅助生成问题、三个多模态模型协同构建干扰项，并经由模型过滤与持照医师多阶段审核确保质量。该基准覆盖 11 个器官系统和 12 种成像模态，与已有医学多模态基准（如早期的 VQA-RAD、SLAKE，以及初步触及复杂推理的 OmniMedVQA、GMAI-MMBench 等）形成清晰的方法谱系定位——Med-CMR 是首个将视觉与推理复杂性同时细粒度分解的医学推理基准。
-
-## 背景与动机
 
 多模态大语言模型（MLLM）在通用视觉问答领域已取得显著进展，然而在医学这一高风险领域，其推理能力的评估仍面临根本性挑战。医学复杂推理要求模型同时具备精确的视觉证据提取能力和严谨的临床逻辑推理能力——前者要求从多尺度医学影像中识别微小病灶、辨别细微纹理差异、理解三维空间关系，后者则涉及时间预测、因果推断、长尾病例泛化以及多源信息整合。现有医学多模态基准主要存在两个结构性缺口：一是评估维度粗粒度，难以定位模型的具体能力短板；二是题目设计偏重基础医学知识问答，未能系统性地考察上述复杂推理维度。
 
@@ -62,7 +60,7 @@ claims:
 
 为突破上述困境，**Med-CMR**提出了一种细粒度的医学复杂多模态推理基准，将医学推理复杂性系统性地分解为三个视觉维度（小目标检测、细粒度判别、空间理解）和四个推理维度（时间预测、因果推理、长尾泛化、多源整合），并采用双重问答形式（MCQ与开放式）实现对MLLM临床推理能力的多维度诊断。该基准从真实临床案例报告和研究文献中收集数据，经由人机协同的质量控制流程构建，旨在为医学MLLM的推理瓶颈提供可定位、可归因的评估框架。
 
-## 核心创新
+## 核心方法与创新机理
 
 Med‑CMR 的核心创新并非提出新的模型架构或训练范式，而是构建了一套**细粒度的医学多模态复杂推理诊断框架**，通过将推理复杂性从“单维度准确率”分解为可归因的视觉与推理子维度，首次系统性地暴露了当前 MLLM 在临床复杂推理中的能力边界与瓶颈。
 
@@ -101,8 +99,6 @@ Table 1 将 Med‑CMR 与已有医学多模态基准进行了系统对比。早�
 
 综上，Med‑CMR 的核心创新在于**将医学多模态推理评估从“黑盒打分”转变为“白盒诊断”**，通过七维分解、双重问答形式和加权评分体系，系统性地定位了当前 MLLM 在视觉证据提取和长尾泛化上的能力短板，为后续模型改进和训练策略优化提供了明确的因果指引。
 
-## 整体框架
-
 Med-CMR 并非提出一个新的模型架构，而是构建了一个**细粒度诊断基准**，其核心 pipeline 围绕“维度引导的数据构建—双重问答生成—多维度评估”三条主线展开，形成从数据收集到能力诊断的闭环。
 
 ### 维度驱动的设计逻辑
@@ -138,8 +134,6 @@ $$S = \frac{\sum_{i \in \{\mathrm{cons, coh, vis, gt}\}} w_i s_i}{\sum_{i \in \{
 ![[assets/figures/papers/paper_list_l2744_https_arxiv_org_abs_2512_00818/figures/004_Figure_1.jpg]]
 *Figure 1: Overview of Med-CMR. Med-CMR decomposes medical multimodal reasoning complexity into visual complexity (i.e., smallobject detection, fine-detail discrimination, and spatial understanding) and reasoning complexity (i.e., temporal prediction, causal reasoning, long-tail generalization, and multi-source integration). Each dimension corresponds to a specific task designed to evaluate the model’s capability in that dimension*
 
-## 核心模块与公式推导
-
 ### 基准构建流水线
 
 Med-CMR 的构建围绕四个关键模块展开，形成从数据采集到质量保证的完整闭环：
@@ -170,7 +164,7 @@ $$S = \frac{\sum_{i \in \{\mathrm{cons, coh, vis, gt}\}} w_i s_i}{\sum_{i \in \{
 
 这一权重设计体现了基准的核心设计理念：语言质量是必要但不充分的条件，真正决定医学推理能力的是视觉证据提取的准确性和最终临床判断的正确性。该设计也直接呼应了实验中的关键发现——多数模型在连贯性和一致性上表现接近天花板，但在视觉准确性和事实正确性上存在显著瓶颈。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主结果：跨模型与跨维度的性能诊断
 
@@ -219,28 +213,10 @@ $$S = \frac{\sum_{i \in \{\mathrm{cons, coh, vis, gt}\}} w_i s_i}{\sum_{i \in \{
 ![[assets/figures/papers/paper_list_l2744_https_arxiv_org_abs_2512_00818/figures/009_Table_3.jpg]]
 *Table 3: Scores of MLLMs on the benchmark by medical intelligence in Figure 2. Medical intelligence includes clinical decision support (CDS), diagnosis (DX), psychophysiologic analysis (PA), procedural risk assessment (PRA), staging and extent evaluation (SEE), and treatment response evaluation (TRE)*
 
-![[assets/figures/papers/paper_list_l2744_https_arxiv_org_abs_2512_00818/figures/010_Figure_3.jpg]]
-*Figure 3: Correlation between model size and performance in different metrics*
-
 ![[assets/figures/papers/paper_list_l2744_https_arxiv_org_abs_2512_00818/figures/011_Figure_4.jpg]]
 *Figure 4: (a) Human-labeled GPT-5 error distribution across question dimensions. (b) Comparison of base models and corresponding medical models on the Med-CMR metrics. (c) MCQ and open-ended results from 500 reformulated MCQs for comparing base models and corresponding medical models. (d) Comparison of win ratios under human and LLM (DeepSeek-V3.2-Exp) evaluation across four dimensions*
 
-![[assets/figures/papers/paper_list_l2744_https_arxiv_org_abs_2512_00818/figures/024_Table_4.jpg]]
-*Table 4: ROUGE-L (Longest Common Subsequence F-score) across MCQconverted, open-ended, and overall subsets*
-
-![[assets/figures/papers/paper_list_l2744_https_arxiv_org_abs_2512_00818/figures/025_Table_5.jpg]]
-*Table 5: Edit distance similarity across MCQ-converted, open-ended, and overall subsets*
-
-![[assets/figures/papers/paper_list_l2744_https_arxiv_org_abs_2512_00818/figures/026_Table_6.jpg]]
-*Table 6: Modality coverage list and distribution. Prop. denotes proportion*
-
-![[assets/figures/papers/paper_list_l2744_https_arxiv_org_abs_2512_00818/figures/027_Table_8.jpg]]
-*Table 8: Mapping between multimodal medical reasoning complexity dimensions and tasks. Abbr. denotes task abbreviation*
-
-![[assets/figures/papers/paper_list_l2744_https_arxiv_org_abs_2512_00818/figures/028_Table_7.jpg]]
-*Table 7: Body system coverage list and distribution. Prop. denotes proportion*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 与已有基准的关系：从基础理解到细粒度复杂推理
 

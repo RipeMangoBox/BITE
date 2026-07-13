@@ -5,6 +5,7 @@ paper_level: A
 venue: NeurIPS
 year: 2022
 pdf_ref: paperPDFs/NEURIPS_2022/Optimizing_Data_Collection_for_Machine_Learning.pdf
+code_link: null
 project_link: https://research.nvidia.com/labs/toronto-ai/LearnOptimizeCollect/
 aliases:
 - LOCL
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 机器学习数据采集的优化 |
 | 英文题名 | Optimizing Data Collection for Machine Learning |
 | 会议/期刊 | NeurIPS 2022 |
-| Links | [paper](https://arxiv.org/abs/2210.01234); [Project](https://nv-tlabs.github.io/LearnOptimizeCollect/); [Project](https://research.nvidia.com/labs/toronto-ai/LearnOptimizeCollect/) |
+| Links | [paper](https://arxiv.org/abs/2210.01234) · [Project](https://nv-tlabs.github.io/LearnOptimizeCollect/) · [Project](https://research.nvidia.com/labs/toronto-ai/LearnOptimizeCollect/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | Learn-Optimize-Collect (LOC) |
 | Dataset | CIFAR-100 (classification), ImageNet (classification), BDD100K (segmentation) |
@@ -42,7 +43,7 @@ claims:
 > - CIFAR-100 (classification) 上，Cost ratio (T=1) 为 0.99，对比 0.12 (Power Law Regression)，变化 +0.87。
 > - ImageNet (classification) 上，Failure rate (T=5) 为 2%，对比 56% (Power Law Regression)，变化 -54%。
 
-## 概述
+## 概要
 
 机器学习系统对大规模标注数据的依赖日益加深，但数据采集的预算和时机往往依赖经验法则或简单的“越多越好”策略。传统方法通过外推神经网络的缩放定律来点估计所需数据量，然而外推误差极大，极易导致严重的数据过采或欠采，无法在采集初期就可靠地达到目标性能。
 
@@ -54,7 +55,7 @@ claims:
 
 **证据强度与边界**：决定性证据来自 18 个实验设置（Table 1）：LOC 在 12/18 设置上失败率低于 10%，而基线在 15/18 设置上失败率超过 30%；成本比在 12/18 设置中低于 0.5。多变量实验（Table 2, Figure 4）进一步验证了 LOC 在不均匀成本下的鲁棒性。然而，所有实验均建立在仿真的 ground truth 学习曲线之上，未在真实反复采集-训练环境中验证；多变量场景扩展到 $K>2$ 时计算开销极大；极端参数下可能产生不切实际的数据需求。此外，论文未涉及数据采集中的隐私、公平性约束以及验证集偏差问题，这些是实际部署中需要额外考虑的边界条件。
 
-## 背景与动机
+
 
 现代机器学习系统的性能高度依赖训练数据的规模。然而，数据采集本身是一项昂贵且不可逆的投入——标注成本、隐私合规、计算资源等因素使得“采集多少数据”成为一个关键的战略决策。实践中，项目方通常需要在有限的预算轮次内，逐步采集数据并迭代训练模型，直至模型性能达到预设的目标指标 $V^*$。
 
@@ -68,7 +69,9 @@ claims:
 
 这一瓶颈的本质在于：**传统方法将数据采集视为一个确定性外推问题，而非一个不确定性下的序贯决策问题**。它们没有对 $D^*$ 的完整分布进行建模，也无法在采集成本与失败风险之间进行系统性的权衡。因此，亟需一种新的框架，能够显式地利用 $D^*$ 分布中的不确定性，在给定的失败容忍度下，最小化期望总成本。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 1. 问题建模范式的根本转变：从点估计到分布驱动的随机优化
 
@@ -137,7 +140,7 @@ $$\operatorname*{min}_{\mathbf{q}_1,\cdots,\mathbf{q}_T} {\mathbf{c}^{\top}} \su
 
 **需要手动验证**：多变量场景下 $F(\mathbf{q})$ 的估计依赖加性幂律外推模型（如 $\hat{v}(q^1,q^2; \pmb{\theta}) = \theta_{1,0} (q^1)^{\theta_{1,1}} + \theta_{2,0} (q^2)^{\theta_{2,1}} + \theta_3$），论文未提供该模型在更复杂交互效应下的充分性证据，且构建高维 ground truth 需要 $O(\prod M_k)$ 次模型训练（见 limitations），实际可扩展性存疑。
 
-## 整体框架
+
 
 LOC（Learn-Optimize-Collect）将多轮数据采集建模为一个**部分可观测的随机序贯决策问题**，其核心流程由三个循环执行的模块构成：性能统计收集、数据需求分布估计、随机优化问题求解，最终驱动实际的数据收集与模型更新。该框架的总体目标是在给定的失败风险容忍度下，最小化期望总收集成本。
 
@@ -199,7 +202,7 @@ $$
 
 这为 LOC 的单轮决策提供了严格的理论基础：在给定可接受的失败概率下，最优收集量恰好是 $D^*$ 分布的对应上分位数，无需依赖启发式校正因子。
 
-## 核心模块与公式推导
+
 
 LOC 框架将多轮数据采集视为一个部分可观测的随机序贯决策问题，其核心由三个模块串联构成，每个模块对应一个关键公式体系。
 
@@ -247,7 +250,9 @@ $$q_1^* = F^{-1}(1 - \epsilon)$$
 
 这一结果揭示了 LOC 的决策本质：不依赖单一点估计，而是根据可容忍的失败概率 $\epsilon$，直接从 $D^*$ 的分布中选择一个保守程度可控的分位数作为收集量。当 $\epsilon \to 0$ 时，$q_1^*$ 趋向于分布的右尾，确保高概率成功；当 $\epsilon$ 较大时，则允许更激进的收集策略以降低成本。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -314,7 +319,9 @@ LOC 对成本参数 $c$ 和惩罚参数 $P$ 的变化具有较好的鲁棒性（
 ![[assets/figures/papers/paper_list_l24_https_arxiv_org_abs_2210_01234/figures/017_Table_6.jpg]]
 *Table 6: For experiments on CIFAR-100, average cost ratio $\mathbf { c } ^ { \mathsf { T } } ( \mathbf { q } _ { T } ^ { * } - \mathbf { q } _ { 0 }$ ) / $\mathbf { c } ^ { \mathsf { T } } ( \mathbf { D } ^ { * } - \mathbf { q } _ { 0 }$ ) - 1 and failure rate measured over a range of $V ^ { * }$ and T . We fix c = 1 and $\mathrm { \dot { \it P } }$ = 1 $0 ^ { 7 }$ . The best performing failure rate for each setting is bolded. The cost ratio is measured only for instances that achieve $V ^ { * }$ LOC consistently reduces the average failure rate, almost consistently down to 0%
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与因果机制
 
@@ -372,6 +379,8 @@ LOC 框架的适用边界由以下关键假设和限制定义：
 4. **动态目标与多目标扩展**：当目标性能 $V^*$ 在项目进行中动态变化，或存在多个冲突的性能指标时，应如何扩展 LOC 框架以支持帕累托最优的数据采集策略？
 
 5. **主动采样与非独立同分布**：能否将 LOC 与主动学习或重要性采样结合，在非独立同分布采样下进一步降低数据需求？
+
+
 
 ## 原文 PDF
 

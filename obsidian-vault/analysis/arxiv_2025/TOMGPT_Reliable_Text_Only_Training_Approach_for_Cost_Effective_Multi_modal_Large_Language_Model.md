@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/TOMGPT_Reliable_Text_Only_Training_Approach_for_Cost_Effective_Multi_modal_LLM.pdf
+project_link: null
+code_link: https://github.com/BradyFU/Awesome-Multimodal-Large-Language-Models/tree/Evaluation
 aliases:
 - TOMGPT
 tags:
@@ -30,7 +32,7 @@ claims:
 | 中文题名 | TOMGPT：面向高性价比多模态大语言模型的可靠纯文本训练方法 |
 | 英文题名 | TOMGPT: Reliable Text-Only Training Approach for Cost-Effective Multi-modal Large Language Model |
 | 会议/期刊 | arXiv 2025 |
-| Links | [paper](https://arxiv.org/abs/2505.05606) · [arXiv](https://arxiv.org/abs/2306.13394) · [Code](https://github.com/BradyFU/Awesome-Multimodal-Large-Language-Models/tree/Evaluation) |
+| Links | [paper](https://arxiv.org/abs/2505.05606) · [paper](https://arxiv.org/abs/2306.13394) · [Code](https://github.com/BradyFU/Awesome-Multimodal-Large-Language-Models/tree/Evaluation) |
 | Topic | #topic/other_unclear #topic/other_unclear/general |
 | Method | TOMGPT |
 | Dataset | MME, LVLM |
@@ -39,7 +41,7 @@ claims:
 > - MME 上，Perception Total Score 951.44 vs 866.58 (Mini-GPT4) (+84.86)；Cognition Total Score 262.14 vs 214.64 (LLaVA) (+47.50)。
 > - LVLM 上，Overall Score 198.93 vs 192.62 (Mini-GPT4) (+6.31)；Object Hallucination 70.67 vs 50.67 (Mini-GPT4) (+20.00)。
 
-## 概述
+## 概要
 
 多模态大语言模型（MLLM）的研发长期受制于对海量、高质量图像-文本对数据的高度依赖，其采集与计算成本极其高昂，严重制约了模型的高效迭代与广泛应用。TOMGPT（ACM Transactions on Knowledge Discovery from Data, 2024）针对这一瓶颈，提出了一种**纯文本训练范式**：其核心洞察在于，预训练的视觉-语言对比模型（如CLIP）已经构建了一个耦合的共享嵌入空间，因此只需用纯文本数据训练一个投影模块，将该多模态对齐空间映射至大语言模型（LLM）的语义空间，推理时再将文本编码器替换为图像编码器，即可在不使用任何图像数据的情况下赋予LLM图像理解能力。
 
@@ -47,7 +49,7 @@ claims:
 
 该方法在方法谱系中定位于“**纯文本驱动的多模态对齐与投影**”，其训练时使用CLIP文本编码器、推理时切换至图像编码器的设计，使其区别于BLIP2（Li et al., ICML 2023）、mPLUG-Owl（Ye et al., arXiv 2023）等需要图文对训练的传统多模态模型。然而，TOMGPT在细粒度视觉理解任务（如计数、位置识别、文档细节）上表现较弱，且仅在7B规模的LLM上验证，向更大模型及其他模态的泛化能力仍待探索。
 
-## 背景与动机
+
 
 多模态大语言模型（MLLM）的快速发展使机器具备了同时理解视觉与语言的能力。然而，这一能力的获取代价高昂——当前主流MLLM的训练流程高度依赖海量、高质量的图像-文本对数据。例如，**BLIP2**（Li et al., ICML 2023）使用Q-Former连接图像编码器与LLM，**LLaVA**（Liu et al., NeurIPS 2023）借助GPT-4生成视觉指令数据进行微调，**Mini-GPT4**（Zhu et al., ICLR 2024）则冻结Q-Former并训练线性投影层。这些方法虽然在多模态理解上取得了显著进展，但图像-文本对的采集、清洗与存储成本极高，加之训练过程中图像编码的计算开销，严重制约了MLLM的高效研发与广泛普及。
 
@@ -57,7 +59,9 @@ TOMGPT的提出正是为了打破这一瓶颈。其核心洞察源于一个被�
 
 这一思路从根本上改变了多模态模型的训练范式：训练数据模态从“大量图像-文本对”转变为“纯文本数据”，训练时使用的编码器从“图像编码器”转变为“CLIP文本编码器”（推理时再替换为图像编码器）。通过在文本嵌入中注入高斯噪声以缓解模态差距，并采用两阶段纯文本训练策略（自监督预训练+指令微调），TOMGPT实现了与基于图文对训练的模型相当甚至更优的性能，同时将训练时间压缩至约2小时（8块A100），大幅降低了多模态大语言模型的研发门槛。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 TOMGPT的核心创新在于**完全摒弃了对图像-文本对训练数据的依赖**，仅通过纯文本数据即可赋予大语言模型多模态理解能力。这一突破性设计围绕一个关键洞察展开：预训练的视觉-语言对比模型（如CLIP）已经构建了一个耦合的共享嵌入空间，文本嵌入与图像嵌入在语义上天然对齐。基于此，TOMGPT只需训练一个投影模块，将CLIP的文本嵌入映射到LLM的词嵌入空间，推理时直接将文本编码器替换为图像编码器，模型便获得了图像理解能力。
 
@@ -99,7 +103,7 @@ TOMGPT采用自监督预训练与指令微调相结合的两阶段训练策略�
 
 TOMGPT的方法论本质上是一种**模态迁移学习**——通过在文本模态上训练投影模块，隐式地学习将多模态对齐空间映射到LLM语义空间的能力，从而在推理时实现对图像模态的零样本泛化。这一范式不仅大幅降低了数据获取与计算成本，还为多模态大语言模型的高效研发开辟了新路径。
 
-## 整体框架
+
 
 TOMGPT的整体框架围绕一个核心假设展开：预训练的视觉-语言对比模型（如CLIP）已经构建了一个耦合的共享嵌入空间。因此，只需用纯文本数据训练一个投影模块，将该空间中的文本嵌入映射到大语言模型（LLM）的词嵌入空间，推理时将文本编码器替换为图像编码器，即可在不使用任何图像数据的情况下赋予LLM图像理解能力。这一设计将多模态模型的训练成本从“海量图文对采集与计算”压缩为“纯文本生成与轻量投影”，从根本上改变了MLLM的训练范式。
 
@@ -146,7 +150,7 @@ $$R = f_{LLM}(concat[f_{PROJ}(f_I(I)), Emb(Instr)])$$
 
 两阶段的递进设计确保了模型先掌握模态对齐的基本能力，再习得指令遵循的交互能力。消融实验证实，单独使用任一阶段均会导致MME感知和认知得分显著下降（Table 3），验证了该训练范式的必要性。
 
-## 核心模块与公式推导
+
 
 TOMGPT 的核心架构围绕一个关键洞察展开：预训练的视觉-语言对比模型（CLIP）已经构建了一个耦合的共享嵌入空间。因此，训练时无需使用图像数据，只需用纯文本训练一个投影模块，将 CLIP 文本嵌入映射到大语言模型（LLM）的词嵌入空间；推理时将文本编码器替换为图像编码器，即可赋予 LLM 图像理解能力。
 
@@ -190,7 +194,9 @@ $$P(x_{L+1}, \dots, x_{L+n}) = \prod_{t=1}^{n} P(x_{L+t} \mid x_{prefix}, x_{L+1
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2505_05606/figures/011_Figure_7.jpg]]
 *Figure 7: Abalation study on the number of learnable tokens in the projection module. Based on both perception and cognition scores, setting the number of tokens to 32 is most appropriate*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果：纯文本训练的竞争力验证
 
@@ -250,7 +256,9 @@ TOMGPT在两大主流多模态基准上的表现证明，纯文本训练范式�
 ![[assets/figures/papers/paper_list_l13_https_arxiv_org_abs_2505_05606/figures/013_Table_6.jpg]]
 *Table 6: Comparison of Training Time and Amount of Image-text Pair Data for Different MLLMs*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心范式定位：纯文本驱动的多模态对齐投影
 
@@ -302,6 +310,8 @@ TOMGPT 开辟了纯文本训练 MLLM 的新路径，但以下关键问题有待�
 4. **纯文本训练的性能极限**：纯文本训练的 MLLM 在大规模、复杂多模态任务下的性能上限在哪里？随着 LLM 规模的增长，纯文本训练是否能持续缩小与图文对训练模型的差距？
 
 5. **语言模型偏见的系统性引入**：仅依赖文本数据是否会系统性地引入语言模型固有的文化、性别等偏见？如何量化与缓解这种偏见的跨模态迁移？论文未对训练数据或模型中的潜在社会偏见进行系统性评估，这一问题需要进一步研究。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,7 @@ paper_level: A
 venue: TOG
 year: 2024
 pdf_ref: paperPDFs/TOG_2024/Decorrelating_ReSTIR_Samplers_via_MCMC_Mutations.pdf
+code_link: null
 project_link: "https://www.youtube.com/watch?v=RHY71LXzQ78"
 aliases:
 - RMM
@@ -32,7 +33,7 @@ claims:
 | 中文题名 | 利用MCMC突变实现ReSTIR采样器去相关 |
 | 英文题名 | Decorrelating ReSTIR Samplers via MCMC Mutations |
 | 会议/期刊 | TOG 2024 |
-| Links | [paper](https://arxiv.org/abs/2211.00166); [Project](https://www.youtube.com/watch?v=RHY71LXzQ78) |
+| Links | [paper](https://arxiv.org/abs/2211.00166) · [Project](https://www.youtube.com/watch?v=RHY71LXzQ78) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | ReSTIR with MCMC Mutations |
 | Dataset | Forest scene (ReSTIR DI) |
@@ -40,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - Forest scene (ReSTIR DI) 上，相对协方差（0次 vs 1次突变） 为 0.060x，对比 1.0x，变化 -94%。
 
-## 概述
+## 概要
 
 **问题**：ReSTIR 通过时空样本重用显著提升了蒙特卡洛路径追踪在低采样率下的效率，但其无限制的样本共享机制带来了严重的副作用——像素间样本高度相关，产生结构性伪影（correlation artifacts），并导致样本贫化（sample impoverishment）。在光照复杂、材质光泽的场景中，少数高贡献样本被过度复用，使得增加样本数也无法消除伪影（Fig. 7），而简单地限制重用强度又会在噪声与相关性之间陷入两难（Fig. 4）。
 
@@ -55,7 +56,7 @@ claims:
 
 **局限与开放问题**：突变仅作用于时间重采样后的像素内样本，未探索跨像素突变；突变次数缺乏理论指导，实践中 1 次已足够但最优次数仍依赖场景调试；如何量化时空相关性以自适应地触发突变，以及降噪器如何适配去相关后的样本，是有待进一步研究的方向。
 
-## 背景与动机
+
 
 ### 渲染方程与蒙特卡洛估计
 
@@ -105,7 +106,9 @@ ReSTIR 的时间置信度上限参数 $M_{\mathrm{cap}}$ 控制着历史样本�
 
 上述分析揭示了 ReSTIR 框架的核心瓶颈：**时空复用的收益与相关性/贫化代价之间存在难以调和的矛盾**。本文的动机在于打破这一僵局——通过在时间重采样之后引入 Metropolis-Hastings（MCMC）突变步骤，在像素内局部扰动储层样本以多样化样本总体，从而在不引入偏差的前提下打断相关性、缓解样本贫化。这一设计同时允许使用更大的 $M_{\mathrm{cap}}$ 值，实现噪声与相关性的更优权衡。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题溯源：ReSTIR 时空重用中的相关性悖论
 
@@ -168,7 +171,7 @@ $$W(x^k) = \frac{\hat{p}(x^0)}{\hat{p}(x^k)} W(x^0)$$
 
 值得进一步探索的方向包括：如何量化局部相关性以自适应决定突变次数；降噪器如何适配去相关后的样本分布；以及如何将突变扩展到跨像素域以进一步打破空间相关性。
 
-## 整体框架
+
 
 本文提出的方法在标准ReSTIR时空重采样流程中插入一个轻量级的**MCMC突变模块**，以打断因无限制样本重用而产生的像素间相关性。整体管线遵循“初始采样→时间重采样→**MCMC突变**→空间重采样→最终着色”的顺序，突变步骤仅作用于时间重采样之后的每个像素储层样本，不改变其他模块的接口与功能。
 
@@ -196,7 +199,7 @@ $$W(x^k) = \frac{\hat{p}(x^0)}{\hat{p}(x^k)} W(x^0)$$
 - **输出**：经突变去相关后的储层样本，其贡献权重已按式（16）校正，可直接送入空间重采样和最终着色阶段。
 - **额外存储**：非对称突变策略需额外存储偏移路径的重连顶点 $\mathbf{y}_{i+1}$，内存开销轻微。
 
-## 核心模块与公式推导
+
 
 ### 方法总览
 
@@ -254,7 +257,9 @@ $$w(y_j) = m_j(y_j')\,\hat{p}(y_j')\,W(y_j) \cdot \left| \frac{\partial y_j'}{\p
 
 每像素每帧仅需**1次MH突变**即可显著降低短程相关性伪影。单次突变的计算开销极小：对于ReSTIR DI，仅需一次光源采样方向扰动和一次目标函数评估；对于ReSTIR PT，需一次顶点扰动和至多两次光线追踪（候选路径追踪与接受概率计算中的反向转移密度评估）。所有对比实验均在等时间条件下进行，突变开销已计入总渲染时间。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -314,7 +319,9 @@ $$w(y_j) = m_j(y_j')\,\hat{p}(y_j')\,W(y_j) \cdot \left| \frac{\partial y_j'}{\p
 ![[assets/figures/papers/paper_list_l22_https_arxiv_org_abs_2211_00166/figures/003_Figure_2.jpg]]
 *Figure 2: Glossy scenes with dificult-to-sample lighting rendered using Re-STIR PT o en contain correlation artifacts irrespective of the selected shi mapping strategy [Lin et al. 2022, Section 7]. Artifacts result from suboptimal importance sampling and over-enthusiastically sharing a few highcontribution samples between pixels*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 **ReSTIR with MCMC Mutations** 位于实时蒙特卡洛渲染中“时空样本重用”与“马尔可夫链蒙特卡洛”两条技术路线的交汇点。其核心贡献在于揭示并解决了一个此前未被充分认识的瓶颈：ReSTIR框架中无限制的时空样本重用会导致严重的相关性伪影和样本贫化，尤其在光照复杂、材质光泽的场景中。
 
@@ -365,6 +372,8 @@ $$w(y_j) = m_j(y_j')\,\hat{p}(y_j')\,W(y_j) \cdot \left| \frac{\partial y_j'}{\p
 5. **误差分布优化**：突变能否进一步优化以达到蓝噪声误差分布，从而在降噪后获得更优的视觉质量？
 
 这些问题指向一个更宏大的目标：在实时渲染中实现**自适应、可证明最优的时空样本重用与去相关联合框架**。
+
+
 
 ## 原文 PDF
 

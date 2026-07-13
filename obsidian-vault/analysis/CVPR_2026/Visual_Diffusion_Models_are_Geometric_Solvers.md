@@ -45,7 +45,7 @@ claims:
 > - Steiner Tree Problem (n=10-20) 上，Length Ratio to Optimal ↓ (mean ± std) 1.0008 ± 0.0005 vs MST: 1.036 ± 0.012 (-0.0352)。
 > - Maximum Area Polygon (n=7-12) 上，Area Ratio ↑ (mean ± std) 0.988 ± 0.020 vs Random: 0.771 ± 0.136 (+0.217)。
 
-## 概述
+## 概要
 
 几何求解是计算机科学中的经典难题，许多问题——例如内接正方形问题、Steiner最小树问题、最大面积简单多边形问题——由于组合复杂度高或存在多模态解空间，长期依赖精确的符号化或组合化表示进行求解。传统方法需要将问题实例转化为精确的参数空间表示，再通过专用算法搜索最优解，这一范式在面对多解性和大规模实例时效率受限。
 
@@ -59,8 +59,6 @@ claims:
 
 消融实验进一步揭示，扩散模型的随机采样能力是求解复杂实例的关键——在最大面积多边形13–15点设置下，扩散模型有效解率0.620，而相同架构的回归模型仅0.016。这一框架为经典难解几何问题提供了一种统一、简洁且可扩展的求解思路。
 
-## 背景与动机
-
 几何问题求解是计算机科学和数学交叉领域的核心挑战之一。从经典的**内接正方形问题**（给定一条闭合曲线，寻找四个顶点均落在该曲线上的正方形）到 **Steiner 树问题**（寻找连接给定点集的最小总长网络）和**最大面积简单多边形问题**（在给定点集上构造面积最大的简单多边形），这些问题在计算理论、图形学、机器人路径规划等领域具有深远影响。
 
 然而，传统几何求解器面临一个根本性瓶颈：**它们依赖于精确的符号化或组合化表示**，在存在多个可能解或组合复杂度爆炸的场景下效率急剧下降。例如，Steiner 树问题是 NP-hard 的，最大面积多边形问题的搜索空间随点数呈阶乘级增长。经典方法如基于分支定界的精确求解器（如 GeoSteiner）在小规模实例上表现优异，但难以扩展到大规模或需要快速近似解的场景。近似基线如**最小生成树（MST）** 虽然构造简单且总能产生有效解，但其长度比值与最优解之间仍存在显著差距（例如在 10-20 个输入点时，MST 的平均长度比值为 1.036，而最优解为 1.0）。
@@ -69,7 +67,7 @@ claims:
 
 本文的核心动机在于提出一个根本性的视角转换：**将几何问题实例和候选解直接映射为像素图像，在图像空间上利用标准视觉扩散模型进行条件生成**。这一思路的洞察在于：视觉扩散模型天然擅长捕捉多模态分布，通过将几何结构编码为图像，可以从高斯噪声中逐步“画”出有效的近似解，从而为经典难解几何问题提供一种统一且简单的求解框架。该方法无需针对每个问题设计专门的符号推理引擎或组合搜索策略，而是将几何推理转化为图像生成任务，利用扩散模型的随机采样能力探索解空间。
 
-## 核心创新
+## 核心方法与创新机理
 
 ### 问题瓶颈：几何求解的表示困境
 
@@ -100,8 +98,6 @@ $$\mathcal{L} = \mathbb{E}_{t,\epsilon\sim\mathcal{N}(0,I)}\left[\|\epsilon - \e
 ### 统一框架的泛化能力
 
 值得强调的是，该方法在三个性质迥异的几何问题上使用了**完全相同的扩散架构**，无需任何修改。模型甚至展现出对训练分布外实例的泛化能力——在相对简单实例上训练的模型可以处理更多输入点的复杂场景。这一统一性构成了该方法最根本的创新：它暗示视觉扩散模型可能成为一种通用的几何推理基座，为经典难解几何问题提供了一个简单而统一的求解框架。
-
-## 整体框架
 
 **Visual Diffusion Geometric Solver** 将几何问题的求解统一转化为像素空间中的条件图像生成任务。其核心思想源于一个关键瓶颈：传统几何求解器依赖精确的符号化或组合化表示，难以高效处理存在多个可能解或组合复杂度高的几何问题；而视觉扩散模型天然擅长捕捉多模态分布，通过将几何结构编码为图像，可以从噪声中逐步生成出有效的近似解。
 
@@ -139,11 +135,6 @@ $$\mathcal{L} = \mathbb{E}_{t,\epsilon\sim\mathcal{N}(0,I)}\left[\|\epsilon - \e
 
 ![[assets/figures/papers/paper_list_l2626_https_arxiv_org_abs_2510_21697/figures/013_Figure_10.jpg]]
 *Figure 10: Curve generation pipeline for a single inscribed square for*
-
-![[assets/figures/papers/paper_list_l2626_https_arxiv_org_abs_2510_21697/figures/001_Figure_1.jpg]]
-*Figure 1: We introduce a visual diffusion approach to solving hard geometric problems directly in pixel space. Shown here on the Inscribed Square Problem, where we task the model with finding a square such that all of its four vertices lie on a given curve. Our method uncovers diverse approximate solutions, corresponding to different random seeds*
-
-## 核心模块与公式推导
 
 ### 视觉扩散几何求解框架
 
@@ -193,18 +184,7 @@ $$L(T) = \sum_{uv \in E} \|u - v\|_2$$
 
 **像素到图的提取**（Steiner 树和最大面积多边形）：从生成的解图像中通过阈值分割、连通分量分析和边检测恢复图结构。该过程将像素空间的离散输出转化为参数化的几何解，是连接扩散生成与几何评估的关键桥梁。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l2626_https_arxiv_org_abs_2510_21697/figures/003_Figure_3.jpg]]
-*Figure 3: Inscribed square*
-
-![[assets/figures/papers/paper_list_l2626_https_arxiv_org_abs_2510_21697/figures/006_Figure_6.jpg]]
-*Figure 6: Steiner tree x0 predictions across denoising steps. Each row corresponds to a different seed. Columns show selected x0 predictions for decreasing timesteps t from left to right (leftmost: t=T ; rightmost: t=0). Input points are overlaid in red*
-
-![[assets/figures/papers/paper_list_l2626_https_arxiv_org_abs_2510_21697/figures/012_Figure_9.jpg]]
-*Figure 9: Maximum area polygon x0 predictions across denoising steps. Each row corresponds to a different seed. Columns show selected x0 predictions for decreasing timesteps t from left to right (leftmost: t=T ; rightmost: t=0). Input points in red*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -240,12 +220,6 @@ $$L(T) = \sum_{uv \in E} \|u - v\|_2$$
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l2626_https_arxiv_org_abs_2510_21697/figures/005_Table_1.jpg]]
-*Table 1: Evaluation Results. We report alignment A(S, C) and squareness*
-
-![[assets/figures/papers/paper_list_l2626_https_arxiv_org_abs_2510_21697/figures/015_Table_4.jpg]]
-*Table 4: Pixel-space vs. parametric-space evaluation for inscribed squares. GT refers to the ground-truth square corners; GT (raster) shows the effect of rasterizing the ground truth. Pixel-space results are reproduced from Table 1*
-
 ![[assets/figures/papers/paper_list_l2626_https_arxiv_org_abs_2510_21697/figures/009_Table_2.jpg]]
 *Table 2: Steiner Tree Evaluation Results. Comparison of our method, MST, and random solutions. Reported are valid tree rates and mean Euclidean length ratios (± std) relative to the optimal solution across input point ranges*
 
@@ -261,7 +235,7 @@ $$L(T) = \sum_{uv \in E} \|u - v\|_2$$
 ![[assets/figures/papers/paper_list_l2626_https_arxiv_org_abs_2510_21697/figures/016_Table_7.jpg]]
 *Table 7: Comparison with DIFUSCO on Maximum Area Polygon*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 核心范式转换：从符号空间到像素空间
 

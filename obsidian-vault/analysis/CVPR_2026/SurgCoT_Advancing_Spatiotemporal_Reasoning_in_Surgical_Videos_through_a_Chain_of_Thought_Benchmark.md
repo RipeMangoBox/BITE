@@ -42,7 +42,7 @@ claims:
 > - SurgCoT Main Questions (Average) 上，Accuracy (%) 87.58 (FC) vs 76.62 (BL) (+10.96)。
 > - SurgCoT Main Questions (LLaVA-Med-7B) 上，Accuracy (%) 75.22 (KE) vs 68.15 (BL) (+7.07)。
 
-## 概述
+## 概要
 
 **核心问题：外科视频理解的时空推理瓶颈**
 
@@ -68,7 +68,7 @@ SurgCoT 基准通过两个关键设计干预模型的推理路径：
 
 SurgCoT 区别于现有外科 VQA 基准的核心特征在于：它是首个覆盖 7 个外科专业、支持视频级到帧级多粒度标注、并提供显式时空定位监督的链式推理基准。与仅覆盖单一专业或帧级任务的 **SurgVLM-Bench**（Zeng et al., arXiv 2025）等基准不同，SurgCoT 通过五元组标注和渐进式条件推理链，将外科视频理解从“识别”推向“推理”，为评估 MLLMs 的时空因果推理能力提供了标准化测试平台。
 
-## 背景与动机
+
 
 ### 外科视频理解的范式局限
 
@@ -82,7 +82,9 @@ SurgCoT 区别于现有外科 VQA 基准的核心特征在于：它是首个覆�
 
 SurgCoT 的核心动机正是填补这一空白。该工作引入了一个结构化的三阶段渐进推理框架，将诊断任务分解为“全局视频理解（Q1）→ 条件片段分析（Q2）→ 细粒度帧定位（Q3）”的层级化子问题序列。同时，通过五元组标注协议（问题→选项→知识→线索→答案），在每个推理阶段显式注入临床背景知识（Knowledge）和视频时空证据（Clue），将隐式推理过程转化为可审核、可追溯的级联推理链。这一设计不仅为评估 MLLMs 的链式思维能力提供了基准，也为引导模型执行透明推理提供了结构化干预手段。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SurgCoT 的核心创新在于将外科视频理解从“单帧/短片段问答”重构为**结构化、可审核的链式时空推理**。与现有基准相比，其关键 changed slots 体现在三个层面。
 
@@ -115,7 +117,7 @@ $$
 
 综上，SurgCoT 通过**五元组标注 + 三级级联推理 + 内置时空证据**的组合设计，将外科视频理解从“端到端答案映射”升级为“可干预、可审核的链式推理”，为评估和提升 MLLMs 在复杂动态场景中的时空认知能力提供了新的基准范式。
 
-## 整体框架
+
 
 SurgCoT 基准的构建围绕一个**结构化三阶段渐进推理框架**与配套的**五元组标注协议**展开，其核心目标是将外科视频诊断中隐式的链式思维过程显式化、可审核化。图 2 给出了完整的构建流水线，包含四个关键模块：数据处理、三阶段推理与五元组标注、VQA 生成和质量控制。
 
@@ -159,7 +161,7 @@ $$
 ![[assets/figures/papers/paper_list_l2749_https_arxiv_org_abs_2604_20319/figures/004_Figure_3.jpg]]
 *Figure 3: Statistics of SurgCoT: 2,841 videos, 19,345 questions, and 59,177 sub-questions across 35 procedures and 7 specialties*
 
-## 核心模块与公式推导
+
 
 ### 三级渐进式推理框架
 
@@ -208,7 +210,9 @@ $$
 
 该公式揭示了 SurgCoT 的核心机制：推理链的每一步不仅依赖视觉输入和选项，还通过显式注入 Knowledge 和 Clue 来引导模型注意力，同时利用前序答案 $\mathbb{A}i$ 实现跨阶段的因果约束——这从根本上区别于传统 VQA 中“单步映射”的推理模式。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 基准评估协议设计
 
@@ -272,7 +276,9 @@ Figure 4 通过典型案例展示了 SurgCoT 框架如何将错误推理逐步�
 ![[assets/figures/papers/paper_list_l2749_https_arxiv_org_abs_2604_20319/figures/002_Table_1.jpg]]
 *Table 1: Comparison of surgical benchmarks. Our SurgCoT uniquely spans 7 surgical specialties with multi-level annotations (video/- clip/frame), supporting hierarchical spatiotemporal reasoning with localization supervision and clinician-derived reference standards*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务谱系：从帧级识别到链式时空推理
 
@@ -323,6 +329,8 @@ SurgCoT 揭示的核心开放问题是：当前 MLLMs 在具备完整知识和�
 2. **链式推理的可靠性**：即使模型在子问题上表现提升，中间步骤的性能下降（Table 3）表明推理链存在断裂风险——如何保证长程依赖的稳定性？
 
 这些问题超出了基准本身的范围，需要模型架构层面的创新来回应。
+
+
 
 ## 原文 PDF
 

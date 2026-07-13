@@ -41,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - MotionBench 上，Overall Accuracy 56.60 vs 53.56（由 delta 推断） (+3.04)；Overall Accuracy 57.04 vs 52.81（由 delta 推断） (+4.23)；Overall Accuracy 57.69 vs 54.88（由 delta 推断） (+2.81)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：现有视觉语言模型（VLM）在视频理解中学习的是判别式分布 $p(t|V)$——模型可以依赖静态外观线索（如物体形状、颜色）来回答“动作是什么”，而无需真正理解帧间的细粒度时间动态。这导致 VLM 对运动细节的理解严重不足。
 
@@ -51,7 +51,7 @@ claims:
 
 **主要结果**：MotionEnhancer 在 MotionBench 和 FAVOR-Bench 两个运动理解基准上一致提升多种 VLM 的性能——Qwen2.5-VL 3B 提升 +3.04，7B 提升 +4.23，InternVL3-8B 提升 +2.81。消融实验证实 MHS 与 MTTI 互补，联合使用带来最大增益。
 
-## 背景与动机
+
 
 ### 视觉语言模型的运动理解困境
 
@@ -97,7 +97,9 @@ $$A^{VDM}(t,s,f) \approx p_\phi(v_{s,f} \mid t, \mathbf{z}_k)$$
 
 基于上述分析，MotionEnhancer 的核心动机是：**在不修改 VLM 架构、不引入额外训练参数的前提下，通过将 VLM 的文本-视觉注意力与 VDM 的运动先验进行对齐，从根本上弥合判别式分布与证据寻求分布之间的鸿沟，从而显著提升 VLM 的运动理解能力。**
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：VLM 的判别式分布忽略了运动细节
 
@@ -136,7 +138,7 @@ VDM 的不同 Transformer 注意力头对运动的敏感度差异显著。Motion
 
 相比于 **Motion-Sight**（Du et al., arXiv 2025）等先前运动增强方法，MotionEnhancer 的关键差异在于：它不依赖额外的运动标注数据或专门的运动编码器，而是从已有的视频扩散模型中“免费”蒸馏运动先验。相比于 **TE Fusion**（Hong et al., CVPR 2025）等时间建模方法，MotionEnhancer 不修改 VLM 的时序融合机制，而是通过注意力对齐在表征层面注入运动敏感性。这种“即插即用”的设计使其具有极强的通用性——可适配不同的 VLM（Qwen2.5-VL 3B/7B、InternVL3-8B）和 DiT 类 VDM，无需任何架构修改。
 
-## 整体框架
+
 
 MotionEnhancer 的整体 pipeline 围绕一个核心思想展开：将视频扩散模型（VDM）中自然编码的运动先验，通过注意力对齐的方式注入到视觉语言模型（VLM）的监督微调过程中，从而增强 VLM 对细粒度时间动态的理解能力。整个框架由四个主要阶段构成，形成一条从运动先验提取到注意力对齐的完整数据流。
 
@@ -162,7 +164,7 @@ MotionEnhancer 的整体 pipeline 围绕一个核心思想展开：将视频扩�
 ![[assets/figures/papers/paper_list_l2328_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_MotionEnhancer_Leve/figures/002_Figure_2.jpg]]
 *Figure 2: Framework of MotionEnhancer. Our method leverages motion priors distilled from a powerful VDM as auxiliary supervision to enhance the motion understanding capability of a VLM through attention alignment. Attention maps extracted from the VDM during DDIM sampling are filtered by the Motion-sensitive Head Selection (MHS) and Motion-salient Text Token Identification (MTTI) modules to identify motion-relevant attentions. The resulting text-to-vision attentions are then used to guide the VLM during supervised fine-tuning*
 
-## 核心模块与公式推导
+
 
 ### 3.1 理论动机：从判别式分布到证据寻求分布
 
@@ -262,7 +264,9 @@ $$
 
 其中 $\lambda$ 为平衡超参数。训练时 VLM 的视觉塔、融合层和 LLM 主干均参与更新，而 VDM 保持冻结。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验结果
 
@@ -317,7 +321,9 @@ $$\mathcal{L}_{\mathrm{MSE}} = ||\mathrm{Aligner}(A_{\mathrm{VLM}}) - A_{\mathrm
 ![[assets/figures/papers/paper_list_l2328_https_openaccess_thecvf_com_content_CVPR2026_html_Xu_MotionEnhancer_Leve/figures/006_Figure_3.jpg]]
 *Figure 3: Qualitative examples of MotionEnhancer. (More examples can be found in supplementary materials.)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心问题与因果机制
 
@@ -352,6 +358,8 @@ MotionEnhancer 的因果操作由此明确：通过将 VLM 的文本-视觉注�
 3. **多 VDM 集成与自适应选择**：不同 VDM 在运动建模上可能存在互补性（如某些模型更擅长精细动作，另一些更擅长大幅运动）。能否设计自适应选择机制，根据输入视频的运动特性动态选择最合适的 VDM 先验来源？
 
 4. **理论收敛性**：当前理论分析揭示了 $p(t|V)$ 与 $p(V|t)$ 的分布不匹配，但注意力对齐损失 $\mathcal{L}_{\mathrm{MSE}}$ 的引入如何影响 VLM 原有表征空间的收敛性质，仍需更深入的理论刻画。
+
+
 
 ## 原文 PDF
 

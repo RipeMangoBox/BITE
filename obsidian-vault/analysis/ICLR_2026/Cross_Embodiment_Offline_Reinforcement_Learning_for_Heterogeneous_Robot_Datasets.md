@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Cross_Embodiment_Offline_Reinforcement_Learning_for_Heterogeneous_Robot_Datasets.pdf
+project_link: null
+code_link: null
 openreview_forum_id: GrsoLVNy3Y
 aliases:
 - EGE
@@ -41,7 +43,7 @@ claims:
 > - Cross-Embodiment Locomotion Suite (Average over 6 datasets) 上，Mean Return 为 57.29，对比 52.05 (IQL)，变化 +5.24。
 > - 70% Suboptimal datasets (Forward + Backward) 上，Average Improvement over IQL 为 +33.99%，对比 IQL，变化 +33.99%。
 
-## 概述
+## 概要
 
 **核心问题**：在跨具身离线强化学习中，当训练数据中次优轨迹比例增大且参与训练的机器人形态多样性增加时，不同机器人之间的策略梯度会产生严重冲突——负余弦相似度比例显著上升。这种梯度干涉导致某些机器人（尤其是形态独特或数据量少的机器人）出现大幅性能退化，形成严重的**负迁移**，阻碍了跨具身预训练的整体效果。
 
@@ -56,7 +58,7 @@ claims:
 
 **方法定位**：EG 属于离线强化学习的**多任务分组训练策略**，通过静态的形态学分组减少跨具身梯度冲突，可与 IQL、TD3+BC 等离线 RL 算法结合使用。与基于梯度投影的冲突消解方法（如 PCGrad）和动态任务分组方法（如 SEL）相比，EG 利用形态图的结构信息实现更有效的负迁移抑制。
 
-## 背景与动机
+
 
 ### 问题背景：跨具身机器人预训练的需求
 
@@ -80,7 +82,9 @@ claims:
 
 基于上述分析，本文提出一个简单而高效的策略：**通过静态的具身分组（Embodiment Grouping, EG）来减少梯度冲突**。具体而言，利用形态图FGW距离对机器人进行层次聚类，将形态相似的机器人划入同一组；在离线RL训练的每个外循环中，先进行全局critic更新以共享价值信息，然后依次对每个组进行独立的actor更新，从而将原本分散的负迁移转化为组内的正迁移。这一方法无需修改网络结构或损失函数，可直接嵌入IQL、TD3+BC等现有离线RL算法，在次优数据丰富、具身多样的场景中实现显著性能提升。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作提出的**具身分组（Embodiment Grouping, EG）**方法，针对跨具身离线强化学习中由形态差异和次优数据引发的**策略梯度冲突**问题，引入了三个关键改进槽位。
 
@@ -104,7 +108,7 @@ claims:
 
 在 70% 次优前向数据集上，EG 相对于标准 IQL 实现了 **+38.34%** 的性能提升，显著优于随机分组（+3.08%）和启发式分组（-8.31%）（Table 4）。在六个数据集的平均性能上，IQL+EG 取得 **57.29** 的均值得分，优于 IQL（52.05）、BC（49.17）及 IQL+PCGrad、IQL+SEL 等冲突消解方法（Table 3）。分组数量 $M$ 在适中值（如 $M=7$）时性能达到峰值，过少或过多均会降低效果（Figure 5）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_GrsoLVNy3Y/figures/009_Figure_4.jpg]]
 *Figure 4: Overview of Embodiment Grouping (EG) for cross-embodiment offline RL*
@@ -140,7 +144,7 @@ claims:
 
 该框架的核心洞察在于：形态学相似的机器人在策略梯度上高度对齐（Figure 3c中具身相似性与平均梯度余弦相似度的皮尔逊相关系数 $r=0.63$，$p=1.26\times10^{-14}$），通过静态的具身分组将原本分散的负迁移转化为组内的正迁移，从而在次优数据丰富、具身多样性高的场景中实现显著的性能提升。
 
-## 核心模块与公式推导
+
 
 ### 跨具身策略梯度冲突的量化
 
@@ -195,7 +199,9 @@ $$
 
 > **注意**：上述公式均来自原文Section 5.1、Appendix D及Algorithm 1，未进行额外推导。关于FGW距离的具体计算细节（如质量分布和代价矩阵的定义）需参见原文Appendix E。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果：具身分组（EG）带来一致且显著的性能提升
 
@@ -249,7 +255,9 @@ EG在每个外循环中执行M次actor更新（每组一次），相比标准IQL
 
 ![[assets/figures/papers/paper_list_l17_https_openreview_net_forum_id_GrsoLVNy3Y/figures/004_Table_2.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 基线方法谱系
 
@@ -310,6 +318,8 @@ EG相对于基线的核心改进体现在三个关键槽位：
 5. **负迁移的预测指标**：除了策略梯度余弦相似度之外，是否有其他指标（如参数更新方向的一致性、表征空间的相似性、Q值分布的差异）能更早或更准确地预测跨具身负迁移？这有助于设计更高效的干预策略。
 
 6. **计算效率优化**：当前EG每个外循环需要进行M次actor更新，计算开销随分组数量线性增长。能否设计更高效的组内更新策略（如组间梯度共享或条件计算），在保持性能的同时降低计算成本？
+
+
 
 ## 原文 PDF
 

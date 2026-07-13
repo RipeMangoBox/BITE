@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Mamba_3_Improved_Sequence_Modeling_using_State_Space_Principles.pdf
+project_link: null
+code_link: null
 openreview_forum_id: HwCvaJOiCj
 aliases:
 - M3
@@ -42,7 +44,7 @@ claims:
 > - Downstream language tasks (同上) 上，Average accuracy 为 Mamba-3 MIMO (1.5B) 57.6，对比 Mamba-2 (1.5B) 55.7，变化 +1.9。
 > - Synthetic state tracking (Parity, Modular Arithmetic) 上，Scaled accuracy (%) 为 Mamba-3: Parity 100%, Arith. w/o brackets 98.51%，对比 Mamba-2: 接近随机猜测，变化 显著提升。
 
-## 概述
+## 概要
 
 序列模型在处理长程依赖时始终面临表达性与效率的权衡。Transformer 的注意力机制计算复杂度随序列长度平方增长，而以 Mamba-2 为代表的线性序列模型虽在推理效率上具有优势，却在状态跟踪任务上暴露了结构性缺陷——其解码阶段算术强度低，导致硬件利用率不足，难以在实际推理中高效扩展。
 
@@ -55,8 +57,6 @@ Mamba-3 从状态空间模型的连续-离散理论出发，用三项系统性�
 在 100B FineWeb-Edu 令牌上训练的 1.5B 参数规模下，Mamba-3 MIMO 的平均下游语言理解准确率比 Mamba-2 高 1.9 个百分点，比 Gated DeltaNet 高 1.8 个百分点。更重要的是，Mamba-3 MIMO 在使用一半状态大小（64 vs 128）时即可匹配 Mamba-2 的预训练困惑度，意味着在相同推理延迟下可部署更强的模型。在合成状态跟踪任务上，Mamba-3 在奇偶校验和模运算中分别达到 100% 和 98.51% 的准确率，而 Mamba-2 接近随机猜测。
 
 方法层面，Mamba-3 在 Mamba-2 架构的基础上修改了六个关键插槽：离散化方法、状态空间类型、输入/输出结构、短因果卷积的可选性、B/C 投影后归一化（BCNorm）以及 B/C 偏置。消融实验表明，BC 偏置与指数梯形离散化的组合使得原本普遍使用的短因果卷积变为可选，同时模型性能不降反升。
-
-## 背景与动机
 
 ### 序列建模中的状态跟踪瓶颈
 
@@ -90,7 +90,7 @@ $$\dot{h}(t) = A(t) h(t) + B(t) x(t)$$
 
 这三个改进共同指向一个核心目标：**在不增加推理开销的约束下，通过状态空间原理的系统性应用，显著提升线性序列模型的表达能力和硬件效率**。
 
-## 核心创新
+## 核心方法与创新机理
 
 Mamba-3 的核心创新并非引入全新的架构范式，而是从状态空间模型的连续-离散理论出发，对 Mamba-2 的三个关键环节进行系统性升级，形成一组相互增强的改动槽位（changed slots）。
 
@@ -132,8 +132,6 @@ Mamba-2 采用单输入单输出（SISO）结构，其解码阶段的算术强�
 - **BC 偏置**：在 BCNorm 之后添加可学习的、按头、按通道的偏置，初始化为 1。消融表明同时为 B 和 C 添加偏置带来最佳困惑度（ppl 15.69），而仅添加 B 偏置无益甚至有害（Table 9b）。
 
 这些改动共同构成了 Mamba-3 相对于 Mamba-2 的完整创新谱系，其核心洞察在于：**从 SSM 的连续-离散理论出发，通过更高阶的离散化和更丰富的状态空间，可以在不增加推理开销的前提下显著提升序列建模能力**。
-
-## 整体框架
 
 Mamba-3 延续了 Mamba-2 的宏观架构骨架，但在核心的序列混合器（sequence mixer）层面进行了系统性重构。其整体 pipeline 由六个串行模块构成，输入输出流与标准 Transformer 解码器层完全兼容。
 
@@ -189,8 +187,6 @@ $$
 ### 与 Mamba-2 的架构差异总结
 
 Figure 3 给出了 Mamba-2 与 Mamba-3 的架构对比。核心差异可归纳为五个“槽位”变更：离散化方法从指数欧拉升级为指数梯形、状态空间从实值标量升级为复值旋转、输入输出结构增加 MIMO 选项、短因果卷积变为可选、以及新增 BCNorm 与 BC 偏置。这些变更系统性地提升了模型的表达能力与推理效率，而无需对训练流程或推理管线进行根本性改造。
-
-## 核心模块与公式推导
 
 Mamba-3 的架构改进根植于状态空间模型的连续-离散理论，其核心模块围绕三个关键创新展开：指数梯形离散化、复值状态空间和 MIMO 结构。以下按模块逐一推导关键公式。
 
@@ -276,12 +272,11 @@ $$H_t = a_t H_{t-1} + B_t X_t^\top, \quad Y_t = H_t^\top C_t$$
 
 Mamba-3 层的完整计算流水线（Figure 3）为：输入投影 → BCNorm → BC 偏置加法 → 复值指数梯形 SSM（命题 4）→ SiLU 门控 → 输出投影。其中 SSM 核心通过数据依赖的 RoPE（命题 3）和指数梯形递归（命题 1）实现，MIMO 变体进一步将状态更新替换为矩阵乘法形式以提高算术强度。
 
-## 实验与分析
+## 实验与关键发现
 
 ### 下游语言理解评估
 
 Mamba-3 在 100B FineWeb-Edu 令牌训练的模型上进行了系统的下游语言理解评估，涵盖 LAMBADA、HellaSwag、PIQA、Arc-Easy、Arc-Challenge、WinoGrande 和 OpenBookQA 七个基准。Table 1 展示了从 180M 到 1.5B 四个规模下的平均准确率结果。
-
 
 ![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_HwCvaJOiCj/figures/001_Table_1.jpg]]
 *Table 1: Downstream language modeling evaluations on models trained with 100B FineWeb-Edu tokens. Best results are bolded, and second best are underlined, excluding Mamba-3 MIMO variants. All models are trained with the same procedure. Mamba-3 SISO outperforms Mamba-2 and others at every model scale, and MIMO with rank R=4 further improves modeling capabilities*
@@ -296,12 +291,10 @@ Mamba-3 在 100B FineWeb-Edu 令牌训练的模型上进行了系统的下游语
 
 Figure 2 展示了状态大小（推理速度的代理指标）与预训练困惑度（性能代理指标）之间的帕累托前沿。核心发现是：**Mamba-3 MIMO 在使用一半状态大小（state size 64）的情况下，即可匹配或超越 Mamba-2 使用 128 状态大小时的预训练困惑度**。这意味着在相同的推理延迟下，Mamba-3 可以提供显著更强的建模能力；或在相同性能水平下，实现更快的推理速度。
 
-
 ![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_HwCvaJOiCj/figures/005_Figure_2.jpg]]
 *Figure 2: Exploration of state size (inference speed proxy) versus pretraining perplexity (performance proxy) across different Mamba variants. Mamba-3 improves the Pareto frontier compared to previous recurrent SISO models, while incorporating MIMO further shifts the frontier through better modeling performance without increasing state size. Table 4: Kernel latency (in milliseconds) comparison across models, precision, and $d _ { \mathrm { s t a t e } }$ values. Mamba-3 introduces minimal overhead compared to Mamba-2 and features highly efficient practical implementations. Our Mamba-3 SISO kernels are faster than reference Mamba-2 and GDN kernels at the commonly used bf16, $d _ { \mathrm { s t a t e } }$...
 
 MIMO 结构通过将算术强度从 SISO 的约 2.5 ops/byte 线性提升至 R 倍（Table 7），有效缓解了解码阶段的内存带宽瓶颈。Table 4 的核延迟测量证实，Mamba-3 SISO 内核在常用的 bf16、$d_{state}=128$ 设置下比参考 Mamba-2 和 GDN 内核更快，而 MIMO（R=4）相比 SISO 仅引入极小的额外开销。
-
 
 ![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_HwCvaJOiCj/figures/009_Table_7.jpg]]
 *Table 7: Arithmetic Intensity for (a) SISO, (b) MIMO. The batch and head dimensions cancel out. The arithmetic intensity of MIMO increases linearly with rank R, enabling better hardware utilization during memory-bound phases like decode. Here N is the state size (expansion factor) and P is the head dimension. For Mamba-3, typically R $\ll$ N , P*
@@ -326,14 +319,12 @@ Table 6 对指数梯形更新中 $\lambda_t$ 的参数化方式进行了消融�
 
 Table 2 展示了 Mamba-3 在检索任务上的能力分布：
 
-
 ![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_HwCvaJOiCj/figures/002_Table_2.jpg]]
 *Table 2: Retrieval capabilities measured by a mixture of real-world and synthetic retrieval tasks. Real-world retrieval tasks utilize cloze variants of the original datasets and are truncated to 2K length. Mamba-3 demonstrates strong associative recall, question-answering, and length generalization on needle-in-a-haystack (NIAH), but suffers with information extraction of semi-structured and unstructured data. The Transformer baseline uses RoPE which may explain its length generalization issues, and hybrid models utilize NoPE (no positional embeddings). We find a pre-gate, grouped RMSNorm can be added to Mamba-3 SISO hybrid models to improve the length generalization of the NIAH tasks at a slight de...*
 
 - **强项**：Mamba-3 SISO 在关联回忆和问答类任务上表现强劲。在 NIAH-Single-1 任务上，1024 和 2048 上下文长度下均达到 100% 准确率，4096 长度下仍保持 88.2%。这表明数据依赖的 RoPE 机制赋予了模型良好的上下文检索能力。
 - **弱项**：在需要从半结构化和非结构化数据中提取信息的任务（如 SWDE、DROP）上表现不佳。这一失败模式提示，纯线性注意力机制在处理需要精确信息定位的复杂检索场景时仍存在局限。
 - **混合模型归一化探索**（Table 8）：在混合 Mamba-3 SISO 模型（线性层与 NoPE 自注意力以 5:1 交错）中，无额外归一化获得最强的平均上下文检索性能；而预门控分组 RMSNorm 在超长合成检索任务（NIAH）上表现最佳，尤其是在超过训练上下文长度的设置下。理想的归一化配置（类型与位置）仍需根据具体场景权衡。
-
 
 ![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_HwCvaJOiCj/figures/012_Table_8.jpg]]
 *Table 8: Ablations of optional norm type (grouped vs default) and placement (pre- vs post-gate) on pretrained hybrid Mamba-3 SISO models at the 1.5B scale. All models have BCNorm. No additional norm demonstrates the strongest in-context retrieval performance on average, while pre-gate, grouped RMS results in the best performance on synthetic retrieval, especially on lengths longer than its training context*
@@ -358,23 +349,8 @@ Figure 5 的验证集困惑度曲线显示，Mamba-3 在整个预训练过程中
 ![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_HwCvaJOiCj/figures/003_Table.jpg]]
 *Table: (a) Component ablation at 440M scale. Combining BC bias and exponential-trapezoidal discretization makes the ubiquitous short convolution optional. (b) Performance comparison on formal language tasks. Unlike Mamba-2, Mamba-3 features state-tracking ability stemming from data-dependent RoPE embeddings*
 
-![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_HwCvaJOiCj/figures/006_Table_5.jpg]]
-*Table 5: Table of canonical linear-time invariant discretizations (top) and custom linear-time varying discretizations derived from our exponential-adjusted framework (bottom), along with their appearance in structured SSMs used in deep learning. Our framework formalizes the prior Mamba discretization as exponential-Euler and extends it with the more expressive exponential-trapezoidal method. Discretization methods convert the continuous SSM $\begin{array} { r } { \dot { \pmb { h ( t ) } } = \pmb { A ( t ) } \pmb { h ( t ) } + \pmb { B ( t ) } \pmb { x ( t ) } } \end{array}$ into the discrete recurrence $h _ { t } = \alpha _ { t } h _ { t - 1 } + \beta _ { t } B _ { t - 1 } x _ { t - 1 } + \gamma _ { t...$
 
-![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_HwCvaJOiCj/figures/007_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_HwCvaJOiCj/figures/010_Table.jpg]]
-*Table: MIMO Parameter Matching. The MIMO variant of Mamba3 incurs additional parameters compared to its SISO counterpart. We therefore reduce the hidden dimension of the MLP layers to parameter-match the SISO variants as follows*
-
-![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_HwCvaJOiCj/figures/015_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_HwCvaJOiCj/figures/016_Table.jpg]]
-
-![[assets/figures/papers/paper_list_l24_https_openreview_net_forum_id_HwCvaJOiCj/figures/017_Table_10.jpg]]
-*Table 10: Kernel DSL and fusion structure for forward (prefill) kernels*
-
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 与基线方法的关系
 

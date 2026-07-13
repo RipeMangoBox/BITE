@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/NeoVerse_Enhancing_4D_World_Model_with_in_the_wild_Monocular_Videos.pdf
+project_link: https://neoverse-4d.github.io
+code_link: null
 aliases:
 - NE4WMWMV
 tags:
@@ -40,7 +42,7 @@ claims:
 > - Scannet++ 上，PSNR↑ 25.34 vs AnySplat 22.79 (+2.55)；SSIM↑ 0.834 vs AnySplat 0.773 (+0.061)；LPIPS↓ 0.195 vs AnySplat 0.217 (-0.022)。
 > - ADT 上，PSNR↑ 32.56 vs 4DGT 30.09 (+2.47)。
 
-## 概述
+## 概要
 
 ### 问题与瓶颈
 
@@ -67,7 +69,7 @@ NeoVerse在方法谱系中处于**重建引导的视频生成**范式，其关�
 
 NeoVerse对缺乏3D结构的2D内容（如卡通）处理能力有限，可能生成错误的3D轮廓；与多数视频扩散模型类似，偶尔难以生成清晰文字；其高斯插值依赖线性运动假设，在高度非线性运动场景下可能偏离实际（见Figure S1及附录讨论）。
 
-## 背景与动机
+
 
 4D世界建模旨在从视觉输入中重建动态3D场景并支持自由视点渲染，是计算机视觉与图形学交叉领域的核心挑战。近年来，以3D高斯泼溅（3DGS）和视频扩散模型为代表的生成式方法取得了显著进展，但其实际部署仍受制于两个根本性瓶颈。
 
@@ -79,7 +81,9 @@ NeoVerse对缺乏3D结构的2D内容（如卡通）处理能力有限，可能�
 
 NeoVerse正是针对这一问题提出。其核心洞察在于：将高效的前馈式4D重建与在线退化模式模拟相结合，使得视频生成模型能够直接从野生单目视频中学习“退化→高质量”的映射，从而绕开传统方法的重计算预处理和有限数据约束。这一设计使得模型能够从约1M视频片段的训练数据中学习丰富的动态场景先验，在静态重建、动态重建和新视图生成三个任务上均取得显著提升。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 NeoVerse 的核心创新在于通过**无姿态前馈式4DGS重建**与**在线退化模拟**两项关键设计，将4D世界模型的训练数据来源从昂贵的多视图采集彻底转向大规模野生单目视频，从而突破了现有方法在数据可扩展性和训练可扩展性上的双重瓶颈。
 
@@ -114,7 +118,7 @@ NeoVerse 的核心创新在于通过**无姿态前馈式4DGS重建**与**在线�
 
 这些 slot 级别的改变共同构成了 NeoVerse 的方法论突破：将4D世界模型的训练范式从“重计算、小数据”转向“轻计算、大数据”，从而在静态重建（VRNeRF PSNR 20.73 vs AnySplat 18.02）、动态重建（ADT PSNR 32.56 vs 4DGT 30.09）和新视图生成（VBench 主观一致性 88.43 vs TrajectoryCrafter 83.02）三个任务上均取得显著提升。
 
-## 整体框架
+
 
 NeoVerse 的整体流程由两大核心阶段构成：**无姿态前馈式 4DGS 重建** 与 **退化渲染条件引导的视频生成**。系统输入为一段野生单目视频，输出为在新视角下时空一致的高质量视频。
 
@@ -174,7 +178,7 @@ NeoVerse 的训练分为两个阶段：
 ![[assets/figures/papers/NeoVerse_Enhancing_4D_World_Model_with_in-the-wild_Monocular_Videos_full_rerun_20260609/figures/002_Figure_2.jpg]]
 *Figure 2: Framework of NeoVerse. In the reconstruction part, we propose a pose-free feed-forward 4DGS reconstruction model (Sec. 3.1) with bidirectional motion modeling. The degraded renderings in novel viewpoints from 4DGS are input to the generation model as conditions. During training, the degraded rendering conditions are simulated from monocular videos (Sec. 3.2), and the original videos themselves serve as targets*
 
-## 核心模块与公式推导
+
 
 ### 3.1 无姿态前馈式4DGS重建
 
@@ -232,7 +236,9 @@ $$\mathcal{L}_{\mathrm{gen}} = \mathbb{E}_{x_{1}, x_{0}, c_{\mathrm{render}}, c_
 ![[assets/figures/papers/NeoVerse_Enhancing_4D_World_Model_with_in-the-wild_Monocular_Videos_full_rerun_20260609/figures/003_Figure_3.jpg]]
 *Figure 3: Training pairs with degradation simulation*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能验证
 
@@ -302,7 +308,9 @@ Figure S1 展示了 NeoVerse 的两类典型失败案例：
 ![[assets/figures/papers/NeoVerse_Enhancing_4D_World_Model_with_in-the-wild_Monocular_Videos_full_rerun_20260609/figures/018_Figure.jpg]]
 *Figure S1: Failure cases. Top: Text generation failure. Bottom: Novel view generation on 2D data.*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 一、核心问题与因果机制
 
@@ -353,6 +361,8 @@ NeoVerse 的适用边界由以下假设和约束定义：
 4. **数据筛选与增强**：如何更有效地利用大规模野生视频，是否需要更好的数据筛选和增强策略以提升训练效率，是进一步扩展数据规模的前提。
 
 5. **生成模型微调**：当前仅训练控分支的策略是否限制了生成质量上限，未来是否应在更大规模数据上微调生成模型主干以进一步提升相机控制精度和生成质量。
+
+
 
 ## 原文 PDF
 

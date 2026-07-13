@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2026
 pdf_ref: paperPDFs/arxiv_2026/PhyGile_Physics_Prefix_Guided_Motion_Generation_for_Agile_General_Humanoid_Motion_Tracking.pdf
+project_link: null
+code_link: null
 aliases:
 - PhyGile
 tags:
@@ -40,7 +42,7 @@ claims:
 > - HumanML3D (retargeted to robot) 上，FID 0.1823 vs 0.2550 (MDM) (-0.0727)。
 > - AMASS (retargeted to robot) 上，Success Rate 0.9401 vs 0.8914 (GMT ) (+0.0487)。
 
-## 概述
+## 概要
 
 人形机器人执行自然语言描述的全身运动面临双重瓶颈：**生成侧**，现有文本到运动模型（如 T2M-GPT、MDM、MotionGPT）基于 SMPL 人体运动先验，重定向至机器人后物理可行性严重失配；**执行侧**，通用运动跟踪受制于数据长尾分布，对稀有敏捷运动的跟踪性能脆弱。PhyGile 通过一个统一框架耦合生成与执行，核心设计是将**物理前缀**作为共享接口——在推理时，扩散模型以物理可执行的运动片段为条件生成后续运动，从而将生成锚定在机器人的可执行动态流形上。
 
@@ -50,7 +52,7 @@ claims:
 
 **局限性**：当前框架无法处理需要外部地形交互的运动（如爬楼梯、游泳），仅在平地仿真中验证；实机仅在平地上演示，不同地表上的 sim-to-real 泛化能力未知；扩散生成片段长度固定，长序列一致性依赖前缀扩展，极端情况下可能出现漂移。
 
-## 背景与动机
+
 
 ### 问题背景：从文本到机器人运动的语义-物理鸿沟
 
@@ -80,7 +82,9 @@ claims:
 
 通过这一设计，PhyGile 试图在语义丰富性、物理可行性和运动敏捷性三个维度上同时取得突破，实现从自然语言到机器人实机执行的全链路闭环。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 PhyGile 的核心创新在于构建了一条**从文本到物理可执行人形运动**的完整链路，其关键突破并非单一算法改进，而是通过**物理前缀（Physics-Prefix）**这一共享接口，将运动生成与运动跟踪两个原本割裂的模块耦合为一个闭环系统。相对于现有方法，PhyGile 在以下四个关键维度上实现了系统性改变。
 
@@ -125,7 +129,7 @@ $$x_{1:T} \sim p_{\theta}(x_{1:T} \mid x^{\mathrm{prefix}}, x^{\mathrm{target}})
 
 PhyGile 的四项 changed slots 构成了一个有机整体：机器人原生表示消除了跨形态失配的根源；物理前缀引导将生成与执行闭环耦合；课程 MoE 解决了长尾敏捷运动的跟踪脆弱性；TP-MoE 提升了文本-运动语义对齐精度。这种“生成-验证-执行”一体化的设计哲学，使得 PhyGile 在生成质量（FID 0.1823）和跟踪成功率（0.9401）上均显著超越现有方法。
 
-## 整体框架
+
 
 PhyGile 的核心设计思想是通过**物理前缀 (physics-prefix)** 这一共享接口，将文本到运动的扩散生成与低层全身运动跟踪耦合为闭环系统。该框架由三个功能模块构成，形成“生成-验证-细化”的推理与训练流程（Fig. 2）。
 
@@ -163,7 +167,7 @@ GMT 是一个两阶段课程式专家混合 (MoE) 策略网络，负责在物理
 ![[assets/figures/papers/paper_list_l63_https_arxiv_org_abs_2603_19305/figures/001_Figure_1.jpg]]
 *Figure 1: PhyGile translates natural language commands into agile and expressive whole-body motions on humanoid robots, thereby enabling stable real-world execution of highly-difficult motions. Project Page: baojch.github.io/phygile-page/*
 
-## 核心模块与公式推导
+
 
 PhyGile 由三个紧密耦合的模块构成（Fig. 2）：**通用运动跟踪器（GMT）**、**机器人原生运动扩散生成器**、以及**物理前缀引导的生成微调**。核心瓶颈在于文本到运动生成模型基于人体运动先验，重定向至人形机器人时存在显著的物理可行性失配，且通用运动跟踪受制于数据长尾分布。PhyGile 通过将物理前缀作为生成与执行的共享接口，将扩散模型生成锚定在机器人的可执行动态流形上。
 
@@ -269,7 +273,9 @@ $$
 
 其中 $\hat{m}_0^l$ 和 $\hat{m}_0^{l^-}$ 分别为正、负提示条件下的去噪预测，$s$ 为引导强度。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 1. 实验设置
 
@@ -339,7 +345,9 @@ Table II 报告了通用运动跟踪的量化评估。完整 PhyGile 管线（�
 ![[assets/figures/papers/paper_list_l63_https_arxiv_org_abs_2603_19305/figures/006_Table.jpg]]
 *Table: II: Quantitative evaluation on General Motion Tracking. Each component of our two-stage curriculum contributes to robust motion tracking, and the full PhyGile pipeline achieves the most stable and reliable execution*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 方法谱系：从文本到运动生成到物理可执行生成
 
@@ -393,6 +401,8 @@ PhyGile 的适用边界由以下因素划定：
 3. **PPO 微调的具体配置**：闭环仿真细化中 PPO 的迭代次数、奖励权重等超参数未详细说明。
 4. **物理前缀的自动化构建**：当前物理前缀依赖手动设计的运动片段，能否通过自动发现或合成可执行前缀来减少人工干预？
 5. **多机器人形态扩展**：物理前缀框架能否统一处理不同人形机器人形态，形成跨形态的通用运动生成接口？
+
+
 
 ## 原文 PDF
 

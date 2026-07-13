@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2026
 pdf_ref: paperPDFs/arxiv_2026/Rhythm_Learning_Interactive_Whole_Body_Control_for_Dual_Humanoids.pdf
+project_link: https://hoshi-no-ai.github.io/Rhythm/
+code_link: null
 aliases:
 - Rhythm
 tags:
@@ -40,7 +42,7 @@ claims:
 > - Inter-X (跨数据集泛化) 上，F1-Strict (接触F1) 0.843 vs 0.589 (DOR) (+0.254 (+43%))。
 > - MAGIC Light Contact (策略) 上，CSR (%) 78.0 vs 52.1 (w/o Contact Rew) (+25.9)。
 
-## 概述
+## 概要
 
 **核心问题**：从人类交互演示中学习双人形机器人的全身控制面临两个根本性瓶颈——异构形态迁移导致的**运动学冲突**（kinematic conflict），以及物理接触引入的**耦合动力学**建模困难。现有方法或忽略交互约束将双机器人视为独立个体，或将系统作为统一整体建模，均无法在保持自身运动风格的同时维持精确的交互几何。
 
@@ -52,8 +54,6 @@ claims:
 - **真实机器人**：在 Unitree G1 双机器人平台上，Rhythm 在 Hug 任务成功率达 86.7%（单智能体基线仅 26.7%），并展现出对外部扰动（推、拉、踢）的鲁棒恢复能力。
 
 **方法定位**：Rhythm 属于**基于图先验的交互迁移与多智能体强化学习**方法，其核心贡献在于首次将交互拓扑的解耦建模与距离感知动态刚度机制引入人形机器人交互重定向，并通过图结构奖励将重定向先验无缝桥接至物理仿真策略学习，形成从人类演示到真实双机器人交互的完整管线。
-
-## 背景与动机
 
 ### 问题背景：双人形机器人交互控制的挑战
 
@@ -79,7 +79,7 @@ claims:
 
 Rhythm 的核心动机正是通过**拓扑解耦**来化解这一冲突：将双机器人系统的空间关系显式划分为自身边（intra-agent edges）与交互边（inter-agent edges），对前者匹配独立参考以保持自身运动保真度，对后者匹配统一参考以强制交互几何一致性，并通过距离依赖的可变刚度动态平衡两者。这一解耦思路贯穿整个框架——从运动重定向（IAMR）到强化学习奖励设计（IGRL），再到真实部署的同步机制——形成了一条从“理解交互结构”到“执行交互行为”的完整因果链。
 
-## 核心创新
+## 核心方法与创新机理
 
 Rhythm 的核心创新在于将双人形机器人交互控制拆解为两个递进且互补的阶段——**交互感知运动重定向（IAMR）** 与 **交互引导强化学习（IGRL）**——并辅以面向真实部署的软同步机制。其关键突破在于首次显式建模并解耦了“自身运动结构”与“交互几何结构”，从而系统性地解决了人类演示到双人形机器人迁移中的运动学冲突与物理耦合动力学难题。
 
@@ -132,8 +132,6 @@ $$r_{inter} = \exp \left( - \frac{1}{\sigma_{inter}} \sum_{(i,j) \in \mathcal{E}
 
 真实机器人实验中（Table III），完整 Rhythm 系统在 Hug 任务上的成功率达 86.7%，而单智能体基线仅 26.7%，验证了上述创新的整体有效性。
 
-## 整体框架
-
 Rhythm 是一个面向双人形机器人的交互式全身控制学习框架，其核心挑战在于：从人类演示数据迁移到双人形机器人时，异构形态导致的运动学冲突与物理接触引入的复杂耦合动力学，使得多智能体全身控制在真实世界中难以稳定实现。
 
 为解决这一问题，Rhythm 构建了三个紧密耦合的模块，形成从数据到真实部署的完整流水线（Fig. 2）：
@@ -156,8 +154,6 @@ Rhythm 是一个面向双人形机器人的交互式全身控制学习框架，�
 
 ![[assets/figures/papers/paper_list_l1705_Rhythm_Learning_Interactive_Whole_Body_Control_for_Dual_Humanoids/figures/004_Figure_3.jpg]]
 *Figure 3: Overview of MAGIC. MAGIC contains ∼3 hours of high-fidelity interaction data balanced across five semantic categories (inner chart). Representative snapshots (outer ring) illustrate the diversity ranging from loose spatiotemporal coordination to intensive contact*
-
-## 核心模块与公式推导
 
 Rhythm 系统由三个紧密集成的模块构成：**交互感知运动重定向（IAMR）**、**交互引导强化学习（IGRL）** 和 **真实世界部署系统**。其核心瓶颈在于：从人类演示数据迁移到双人形机器人时，异构形态导致的运动学冲突和物理接触引入的复杂耦合动力学，使得多智能体全身控制在真实世界中难以稳定实现。以下逐一解析各模块的关键设计与公式。
 
@@ -246,12 +242,7 @@ $$\dot{\phi}_{ego} = 1.0 + k (\phi_{peer} - \phi_{ego})$$
 
 其中 $k$ 为同步增益。这一软同步机制避免了硬性锁步带来的脆性，允许策略在外部扰动下自适应恢复时间对齐。全局位姿估计则依赖 LiDAR-IMU 融合的层次化定位系统（Point-LIO + GICP + 卡尔曼滤波），当前系统需预构建 LiDAR 地图，限制了其在未知环境中的部署能力。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l1705_Rhythm_Learning_Interactive_Whole_Body_Control_for_Dual_Humanoids/figures/009_Figure_7.jpg]]
-*Figure 7: Visualization of Topological Interaction Priors. We illustrate the extracted graph structures on a representative interaction task, where yellow edges denote spatial interaction constraints and red edges indicate physical contacts*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 1. 实验设置概览
 
@@ -396,7 +387,7 @@ Fig. 6 展示了策略对外部扰动的鲁棒性。在推、拉、踢等攻击�
 ![[assets/figures/papers/paper_list_l1705_Rhythm_Learning_Interactive_Whole_Body_Control_for_Dual_Humanoids/figures/010_Table.jpg]]
 *Table: IV: Reward Terms and Weights used in IGRL TABLE V: Domain Randomization Parameters*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 问题定位：从单智能体全身控制到双人形交互耦合动力学
 

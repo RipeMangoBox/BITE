@@ -5,6 +5,7 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Hallucination_Begins_Where_Saliency_Drops.pdf
+project_link: null
 code_link: https://github.com/zhangbaijin/LVLMs-Saliency
 openreview_forum_id: sjnErRHXf3
 aliases:
@@ -43,7 +44,7 @@ claims:
 > - POPE 上，F1 (越高越好) 为 87.0 (SGRS+LocoRE, LLaVA-1.5-7B)，对比 85.4 (LLaVA-1.5-7B)，变化 +1.6。
 > - MME 上，总分 (越高越好) 为 668.33 (SGRS+LocoRE, LLaVA-1.5-7B)，对比 565.34 (Beam Search, LLaVA-1.5-7B)，变化 +103.0。
 
-## 概述
+## 概要
 
 大型视觉语言模型（LVLMs）在图像描述和视觉问答等任务中取得了显著进展，但在自回归生成过程中频繁产生与图像内容不一致的“幻觉”内容，严重制约了其可靠性。本文的核心发现是：**幻觉开始于输出令牌对先前已生成令牌的显著性（contextual grounding）崩溃之时**。具体而言，在自回归解码过程中，当前令牌对近期输出令牌的因果影响强度——即显著性——若显著下降，意味着模型“遗忘”了刚刚生成的内容，从而脱离上下文约束，产生幻觉。
 
@@ -53,7 +54,7 @@ claims:
 
 在主要基准上的结果表明：SGRS+LocoRE 将 LLaVA-1.5-7B 的 CHAIRS 幻觉率从 48.0 降至 35.6（降幅 25.8%），将 Qwen2-VL-7B 从 25.0 降至 19.3（降幅 22.8%），同时在 POPE、MME 和 LLaVAW 等综合能力基准上保持或提升性能（Table 1, Table 2）。该方法属于推理阶段解码干预范式，与 OPERA（Huang et al., CVPR 2024）、VCD（Leng et al., CVPR 2024）等方法同属一路，但其独特之处在于引入梯度信息构建显著性度量，并通过拒绝采样与注意力增强的双重机制直接针对上下文断裂这一根本原因。
 
-## 背景与动机
+
 
 ### 问题背景：大视觉语言模型的幻觉困境
 
@@ -79,7 +80,9 @@ $$\mathbf{S}^{(l,h)} = \operatorname{tril}\left( |\mathbf{A}^{(l,h)} \odot \nabl
 
 基于这一洞察，本文的动机自然浮现：既然低显著性预示并导致幻觉，那么**在推理阶段主动监控并强化输出令牌的显著性**，就能在幻觉发生前将其阻断。这引出了两个互补的干预策略——显著性引导的拒绝采样（SGRS）过滤低显著性候选令牌，以及局部一致性增强（LocoRE）主动修复上下文依赖——从而在不修改模型参数的前提下，实现即插即用的幻觉抑制。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本工作的核心创新在于**首次揭示并量化了输出令牌对先前输出上下文的显著性崩溃是幻觉的直接前兆**，并基于这一因果发现设计了推理阶段的**双重干预机制**，从令牌选择和注意力增强两个环节阻断幻觉生成。
 
@@ -119,7 +122,7 @@ $$\mathbf{A}^{(P+1)}[b,h,P+1,j] \leftarrow \mathbf{A}^{(P+1)}[b,h,P+1,j] \cdot \
 
 在现有解码修改方法中，**OPERA**（Huang et al., CVPR 2024）依赖注意力图锚点，**VCD**（Leng et al., CVPR 2024）采用对比解码，**DOPRA**（Wei & Zhang, MM 2024）惩罚锚点令牌，**TAME**（Tang et al., ICLR 2025）动态调整注意力局部化程度——这些方法均未直接建模输出令牌间的上下文接地强度。**EAH**（Zhang et al., EMNLP 2025）和**Vissink**（Kang et al., ICLR 2025）干预视觉注意力沉降，但未处理文本上下文漂移。本工作的独特贡献在于：**用梯度增强的显著性度量替代纯注意力图作为诊断信号，并将诊断与干预闭环——SGRS在令牌选择阶段过滤低显著性候选，LocoRE在注意力计算阶段强化局部上下文依赖，二者协同覆盖了幻觉生成的令牌级和序列级两个层面**。
 
-## 整体框架
+
 
 本工作提出了一套推理阶段的双重干预框架，用于缓解大型视觉语言模型（LVLMs）在自回归生成中的幻觉问题。框架的核心逻辑链为：**诊断→过滤→增强**。
 
@@ -145,7 +148,7 @@ $$\mathbf{A}^{(P+1)}[b,h,P+1,j] \leftarrow \mathbf{A}^{(P+1)}[b,h,P+1,j] \cdot \
 
 **整体流程**为：输入图像与提示 → 模型前向传播 → LVLMs-Saliency计算候选令牌显著性 → SGRS过滤低显著性令牌 → 选定令牌输出 → LocoRE修改下一步注意力权重 → 循环至生成结束。两个模块均作为即插即用的推理阶段干预，不修改模型参数，无需额外训练。
 
-## 核心模块与公式推导
+
 
 ### 1. LVLMs-Saliency 诊断模块
 
@@ -205,7 +208,9 @@ $$
 
 SGRS 与 LocoRE 形成双重干预机制：SGRS 在令牌选择阶段过滤上下文接地的候选，LocoRE 在注意力计算阶段主动强化对近期输出的依赖。两者互补——SGRS 直接抑制幻觉令牌的生成，LocoRE 维护序列连贯性。在 LLaVA-1.5-7B 上，SGRS+LocoRE 将 CHAIRS 从 48.0 降至 35.6（-25.8%），在 Qwen2-VL-7B 上从 25.0 降至 19.3（-22.8%）（Table 1, Table 2）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心发现：显著性降低是幻觉的直接前兆
 
@@ -291,7 +296,9 @@ SGRS 与 LocoRE 形成双重干预机制：SGRS 在令牌选择阶段过滤上�
 ![[assets/figures/papers/paper_list_l21_https_openreview_net_forum_id_sjnErRHXf3/figures/020_Figure_14.jpg]]
 *Figure 14: Saliency map of LLaVA1.5 from layer1 to layer32 (correct pattern)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心洞察：从注意力到显著性的范式迁移
 
@@ -344,6 +351,8 @@ SGRS和LocoRE的分工明确：SGRS直接抑制幻觉令牌的生成，LocoRE专
 3. **不确定性感知的自适应阈值**：当输入上下文本身具有高度不确定性时，显著性阈值如何自适应调整，以避免过滤掉合理但上下文关联弱的输出？当前基于历史令牌平均显著性的阈值设计未考虑输入端的模糊性。
 
 4. **与其他幻觉缓解方法的协同**：SGRS+LocoRE聚焦于输出令牌间的上下文依赖，而Vissink等方法关注视觉注意力沉降。两类方法的互补性已在Table 2中初步显现，但系统性协同机制的设计仍有待探索。
+
+
 
 ## 原文 PDF
 

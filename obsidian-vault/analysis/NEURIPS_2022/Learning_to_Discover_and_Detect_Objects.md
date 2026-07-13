@@ -5,6 +5,8 @@ paper_level: A
 venue: NeurIPS
 year: 2022
 pdf_ref: paperPDFs/NEURIPS_2022/Learning_to_Discover_and_Detect_Objects.pdf
+project_link: null
+code_link: https://github.com/vlfom/RNCDL
 aliases:
 - RBNR
 - LDDO
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 学习发现与检测物体 |
 | 英文题名 | Learning to Discover and Detect Objects |
 | 会议/期刊 | NeurIPS 2022 |
-| Links | [paper](https://arxiv.org/abs/2210.10774); [GitHub](https://github.com/vlfom/RNCDL) |
+| Links | [paper](https://arxiv.org/abs/2210.10774) · [GitHub](https://github.com/vlfom/RNCDL) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | Region-based NCDL (RNCDL) |
 | Dataset | COCO_half + LVIS, LVIS → VisualGenome |
@@ -41,7 +43,7 @@ claims:
 > - COCO_half + LVIS 上，mAP (known) 为 25.00，对比 0.93 (k-means)*，变化 +24.07。
 > - COCO_half + LVIS 上，mAP (novel) 为 5.42，对比 1.36 (UNO)，变化 +4.06。
 
-## 概述
+## 概要
 
 **核心问题**：在真实场景中，目标检测器依赖大规模有标注数据，但标注成本限制了可识别类别的数量。当面对未标注的新颖物体类别时，现有检测器通常将对应区域的特征压缩为“背景”类，缺乏对新类别的判别表示，且模型严重偏向已知类，导致传统离线聚类方法难以有效发现新类别。
 
@@ -51,7 +53,7 @@ claims:
 
 **主要结果**：在 COCO_half + LVIS 设定下，RNCDL 达到 **6.92 mAP_all**，比最强基线 UNO（2.18 mAP）提升 **4.74 mAP**；在新颖类别上达到 5.42 mAP，比 UNO 提升 4.06 mAP；在已知类别上达到 25.00 mAP。消融实验表明，移除记忆模块导致 mAP 下降 4.09，使用对数正态长尾先验显著优于均匀先验，端到端在线聚类比离线 k-means 方案在新类别 mAP 上提升 4.86。在 LVIS → VisualGenome 跨数据集泛化实验中，RNCDL 成功发现了 2.56 mAP 的新颖类别，验证了方法的通用性。
 
-## 背景与动机
+
 
 ### 任务定义：新类别发现与定位
 
@@ -80,7 +82,9 @@ claims:
 3. **保持已知类别能力**：在发现新颖类别的过程中，通过双头分类架构（已知类分类头与新颖类分类头）和缩小的有监督损失，避免灾难性遗忘，维持对已知类别的识别能力。
 4. **提升伪标签质量**：引入记忆模块存储历史批次的RoI特征，结合多视图交换训练策略，增强自监督信号的一致性与稳定性。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 RNCDL的核心创新在于将**类不可知的区域检测**与**长尾分布约束的在线聚类**深度融合，构建了一个端到端的新类别发现与定位框架。相对于传统多阶段管线（如自监督特征提取 + 离线k-means聚类）以及已有的NCD分类方法（ORCA、UNO），RNCDL在四个关键维度上进行了系统性改造：
 
@@ -118,7 +122,7 @@ RNCDL对每张图像生成两个增强视图，计算各自的伪标签后**交�
 
 上述四个模块并非孤立改进，而是形成正向协同：记忆模块提供更稳定的聚类上下文，在线Sinkhorn生成更准确的伪标签，多视图交换增强特征鲁棒性，双头架构确保已知类能力不退化。在COCO_half+LVIS基准上，RNCDL达到6.92 mAP_all，超过最强基线**UNO**（Fini et al.）达4.74 mAP（Table 4），其中新颖类mAP从1.36提升至5.42。
 
-## 整体框架
+
 
 RNCDL 采用两阶段训练范式，将新类别发现与定位统一在一个端到端的检测框架内。其核心思路是：先在带标注的已知类数据上训练一个标准的双阶段检测器，获得类不可知的区域提议能力和可迁移的视觉特征；随后冻结大部分网络参数，仅通过在线约束聚类与辅助分类头，在无标注图像中同时保持已知类识别能力并发现新类别。
 
@@ -142,7 +146,7 @@ RNCDL 采用两阶段训练范式，将新类别发现与定位统一在一个�
 ![[assets/figures/papers/paper_list_l27_https_arxiv_org_abs_2210_10774/figures/002_Figure_2.jpg]]
 *Figure 2: A high-level overview of our network. (top) During the supervised training phase, we train our backbone and RPN networks using labeled data, together with classification head and a class agnostic localization head. During the discovery phase, we freeze all the layers of the network apart from classification head and attach and train a novel classification head using unlabeled data. During the inference (bottom), we perform a standard R-CNN pass, using classification heads of both known and novel categories to predict a class assignment for each proposal. This can be either one of K classes, that were presented a labeled samples during the model training, or any novel object class that appea...*
 
-## 核心模块与公式推导
+
 
 RNCDL 将新类别发现与定位任务分解为两个阶段：**有监督引导阶段**与**发现阶段**。在引导阶段，网络在已知类标注数据上学习类不可知的区域提议能力和可迁移的视觉特征；在发现阶段，网络冻结大部分参数，仅通过在线约束聚类生成伪标签来训练新颖类分类头。以下聚焦发现阶段的核心模块与关键公式。
 
@@ -203,7 +207,9 @@ $$\hat{\mathbf{p}} = \mathrm{softmax}([h^k(\hat{\mathbf{f}}), h^n(\hat{\mathbf{f
 
 随后通过匈牙利算法将预测的簇 ID 映射到真实语义类别，计算 mAP 进行评估。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心性能瓶颈与因果机制
 
@@ -277,7 +283,9 @@ RNCDL 要解决的核心瓶颈是：在无标注的真实图像中，标准检�
 ![[assets/figures/papers/paper_list_l27_https_arxiv_org_abs_2210_10774/figures/011_Table.jpg]]
 *Table: C1: Performance of fully-supervised models on \mathbf { C O C O } _ { h a l f } and LVIS datasets. In bold, we highlight the configuration used for the supervised training phase and the fully-supervised baseline*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 任务定位：新类别发现与定位（NCDL）
 
@@ -349,6 +357,8 @@ RNCDL 的知识体系建立在以下基础之上：
 5. **人机协同的语义精化**：能否通过主动学习或人在回环的交互机制，在发现阶段引入少量人工反馈，改善新类别簇的语义一致性和可解释性？
 
 6. **语义重叠的聚类解耦**：当前方法无法有效处理语义重叠导致的聚类碎片化问题，如何设计层次化或软分配聚类机制来建模类别间的包含与重叠关系？
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Attention_as_a_Compass_Efficient_Exploration_for_Process_Supervised_RL_in_Reasoning_Models.pdf
+project_link: null
+code_link: https://github.com/RyanLiu112/AttnRL
 openreview_forum_id: NCN8oUsiNf
 aliases:
 - AACEEPSRRM
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 注意力作为指南针：推理模型中过程监督强化学习的高效探索 |
 | 英文题名 | Attention as a Compass: Efficient Exploration for Process-Supervised RL in Reasoning Models |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=NCN8oUsiNf); [GitHub](https://github.com/RyanLiu112/AttnRL) |
+| Links | [paper](https://openreview.net/forum?id=NCN8oUsiNf) · [GitHub](https://github.com/RyanLiu112/AttnRL) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | AttnRL |
 | Dataset | 六项数学基准平均（AIME24/25, AMC23, MATH-500, Minerva, Olympiad） |
@@ -39,7 +41,7 @@ claims:
 > [!tip] 效果简介
 > - 六项数学基准平均（AIME24/25, AMC23, MATH-500, Minerva, Olympiad） 上，Pass@1 为 57.2，对比 55.1，变化 +2.1。
 
-## 概述
+## 概要
 
 过程监督强化学习（PSRL）通过在推理中间步骤引入细粒度反馈，理论上能够比仅依赖最终答案的结果监督RL更有效地训练推理模型。然而，现有PSRL方法在探索效率上存在三个关键瓶颈：**分支位置选择**依赖固定token长度或熵，缺乏语义感知，无法识别真正关键的推理步骤；**采样策略**对所有问题和响应均匀分配计算资源，导致大量“无效”探索——即所有候选响应的优势值均为零；**训练管线**每次更新需执行两轮采样（初始采样与蒙特卡洛采样），计算开销过高。
 
@@ -53,7 +55,7 @@ claims:
 
 AttnRL在保持性能优势的同时，显著降低了训练计算开销，为过程监督RL的高效探索提供了一种可泛化的技术路径。
 
-## 背景与动机
+
 
 ### 推理模型中的强化学习范式
 
@@ -103,7 +105,9 @@ $$y_k = \max_{l,h} \{ y_k^{l,h} \}$$
 2. **自适应采样策略**：基于注意力值过滤简单问题，按难度动态分配探索资源，并自适应调整批次大小以确保训练样本均包含有效梯度；
 3. **一步离线策略训练管线**：将当前批次的 MC 采样与下一批次的初始采样并行化，消除冗余等待。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 AttnRL 的核心创新围绕一个关键洞察展开：LLM 自注意力机制中，对后续上下文影响力较大的步骤（高 FCI 分数）通常对应规划、自验证等核心推理行为，将树分支的起点定位于这些步骤可以大幅提升过程监督 RL 的探索效率。基于此，AttnRL 在三个维度上重构了 PSRL 的探索机制。
 
@@ -135,7 +139,7 @@ $$y_k = \max_{l,h} \{ y_k^{l,h} \}$$
 
 三个创新协同作用：ATB 定位关键推理步骤以提升探索质量，自适应采样过滤无效信号以确保梯度有效性，一步离线管道消除计算冗余以提升训练吞吐。在 1.5B 模型上，AttnRL 在六项数学基准上平均 Pass@1 达到 57.2，比 TreeRL（55.1）高出 2.1 个百分点，比 GRPO（55.0）高出 1.9 个百分点（表 1）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l30_https_openreview_net_forum_id_NCN8oUsiNf/figures/002_Figure_1.jpg]]
 *Figure 1: An Illustration of AttnRL. (a) AttnRL branches at steps with high attention scores. (b) AttnRL outperforms the baselines with great efficiency*
@@ -154,7 +158,7 @@ AttnRL 是一套面向推理模型的过程监督强化学习（PSRL）高效探
 
 各模块间的数据流关系可概括为：**步骤分割 → FCI 计算 → 注意力过滤 → 难度感知树分配 → ATB 分支 → MC 优势估计 → 自适应批次策略优化**，其中注意力信号贯穿过滤、分支和批次调控三个环节，构成了整个框架的“指南针”。
 
-## 核心模块与公式推导
+
 
 AttnRL 的核心方法体系由三个紧密耦合的模块构成：注意力驱动的树分支（ATB）、自适应采样策略、以及一步离线策略训练管线。这三个模块分别从“在哪分支”“对哪些问题采样”“如何组织训练”三个维度系统性地提升过程监督强化学习的探索效率。
 
@@ -206,7 +210,9 @@ $$B_{m+1} = \mathrm{Round}( \lambda B_m + (1-\lambda) \frac{B'}{B''_m} B_m )$$
 
 传统过程监督 RL 方法（如 TreeRL）每次参数更新需要执行两轮采样：先进行初始采样生成候选响应，再进行 MC 采样计算步骤级优势。这导致大量采样时间被浪费在等待上。AttnRL 将这两轮采样解耦并流水线化：在训练步 $m$，同时进行第 $m$ 批问题的 MC 采样和第 $m+1$ 批问题的初始采样。这一设计的核心优势在于，第 $m+1$ 批的初始采样结果可以在第 $m$ 步训练完成后立即用于下一轮的 MC 采样，从而将每轮迭代的采样次数从两次压缩为一次（Figure 5）。Table 3 的数据显示，该设计使训练时间相比原始 TreeRL 实现减少了约 8%，同时有效训练 token 数从 TreeRL 的 870.5M 提升至 930.4M。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 
@@ -249,7 +255,9 @@ Figure 4 揭示了平均 FCI 分数与优势有效性之间的关系：注意力
 
 Figure 8 的训练动态曲线显示，AttnRL 在测试准确率上持续优于 TreeRL 和 GRPO，同时在响应长度上保持了更好的简洁性。Figure 6 对比了 ATB 与基于熵的分支策略在采样统计上的差异：ATB 在简单和困难问题上均展现出更有效的采样模式。Figure 9 补充了六个基准上的完整测试曲线，进一步确认了 AttnRL 在不同难度数学推理任务上的稳健优势。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有过程监督强化学习的关系
 
@@ -279,6 +287,8 @@ AttnRL 的设计和验证目前限定于数学推理任务（AIME24/25、AMC23�
 2. **超参数敏感性**：ρ=0.2 和 N=2 的选择是否为最优？在更大模型（如 7B 以上）或不同推理范式下，这些参数是否需要重新校准？
 3. **过滤阈值的自适应**：当前基于均值的注意力过滤阈值是静态的，能否通过可学习的方式自动选择过滤阈值，以进一步提升训练效率？
 4. **注意力机制的可解释性边界**：FCI 分数虽能定位关键步骤，但其与具体推理行为（规划、验证、回溯）的对应关系仍停留在可视化层面（图 2），缺乏严格的因果验证框架。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2025
 pdf_ref: paperPDFs/arxiv_2025/Native_and_Compact_Structured_Latents_for_3D_Generation.pdf
+project_link: https://microsoft.github.io/TRELLIS.2
+code_link: https://github.com/traveller59/
 aliases:
 - TRELLIS.2
 - TRELLIS
@@ -41,7 +43,7 @@ claims:
 > - Sketchfab Featured Normal PSNR 上，PSNR↑ 33.46 vs TRELLIS 27.68 (+5.78)。
 > - Material PBR Attributes 上，PSNR↑ 38.89 vs N/A (无基线) (N/A)。
 
-## 概述
+## 概要
 
 三维内容生成的核心瓶颈在于现有表示方法无法同时满足**任意拓扑建模**与**完整物理材质外观（PBR）**的需求，且隐空间压缩率低导致高分辨率资产生成效率低下。本文提出 **TRELLIS** 框架，通过三项关键设计突破这一瓶颈：
 
@@ -51,7 +53,7 @@ claims:
 
 在图像到 3D 生成任务上，TRELLIS 在 1536³ 分辨率下推理仅需约 60 秒，用户偏好率达 **66.5%**，显著优于现有方法（如 Hunyuan3D 2.1 的 13.3%）。该方法将几何与材料统一在紧凑原生隐空间中，为高效、高质量的三维生成建立了新的技术范式。
 
-## 背景与动机
+
 
 ### 三维生成的核心瓶颈：表示与效率的双重困境
 
@@ -77,7 +79,9 @@ claims:
 
 这一设计使得在1536³分辨率下生成完整PBR材质的三维资产仅需约60秒，且重建质量与用户偏好均显著超越现有方法（用户偏好率达66.5%，相较于最强基线Hunyuan3D 2.1的13.3%）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 TRELLIS 的核心创新在于，它彻底跳出了“场函数拟合+后处理”的主流范式，转而构建了一套**原生紧凑的结构化隐表示**体系。这一体系的三个关键支点——O-Voxel 表示、SC-VAE 压缩架构和原生 PBR 材质生成——共同解决了现有方法在拓扑表达能力、压缩效率与材质真实性上的根本矛盾。
 
@@ -112,7 +116,7 @@ $$\pmb{f}_i^{\mathrm{mat}} = (\pmb{c}_i, m_i, r_i, \alpha_i)$$
 
 这三个创新形成了完整的因果链：O-Voxel 提供了统一几何与材质的表达能力，SC-VAE 将这一表示压缩为极致紧凑的隐空间，流匹配生成器则在这一高效隐空间中进行高质量生成。最终在 $1536^3$ 分辨率下，整个生成过程仅需约 60 秒（~35s 几何 + ~25s 材质），且用户偏好率达到 66.5%，远超最强基线 Hunyuan3D 2.1 的 13.3%（Table 2）。
 
-## 整体框架
+
 
 TRELLIS 的整体管线由三个核心模块串联构成：**O‑Voxel 原生表示**、**稀疏压缩变分自编码器（SC‑VAE）** 以及 **稀疏流匹配生成器**。该设计遵循“表示‑压缩‑生成”的递进范式，将三维资产生成转化为在紧凑结构化隐空间中的条件生成问题，其宏观流程如 Figure 2 所示。
 
@@ -160,7 +164,7 @@ TRELLIS 的整体管线由三个核心模块串联构成：**O‑Voxel 原生表
 - 各模块间的隐码维度、特征通道数等具体超参数在现有证据中未充分展开，需查阅 Table 4‑5 及附录获取完整架构细节。
 - 双向转换算法（Algo 1‑4）的具体步骤仅在高层次描述，实现细节需参考源代码。
 
-## 核心模块与公式推导
+
 
 ### 3.1 O-Voxel：原生结构化表示
 
@@ -285,7 +289,9 @@ $$
 ![[assets/figures/papers/Native_and_Compact_Structured_Latents_for_3D_Generation_06a8dd9e0b93/figures/003_Figure_2.jpg]]
 *Figure 2: Overview of our approach. We introduce O-Voxel for shape and material representation (Sec. 3.1), based on which we employ Sparse Compression VAEs for compact latent space learning (Sec. 3.2) and large flow models for 3D generation (Sec. 3.3)*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 重建质量与效率
 
@@ -350,7 +356,9 @@ Table 3 报告了 SC‑VAE 架构设计的消融结果：
 ![[assets/figures/papers/Native_and_Compact_Structured_Latents_for_3D_Generation_06a8dd9e0b93/figures/002_Figure_3.jpg]]
 *Figure 3: Illustration of O-Voxel and the instant bidirectional convertion between 3D asset and O-Voxel*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 表示层谱系：从等值面场到无场原生体素
 
@@ -393,6 +401,8 @@ TRELLIS 将外观建模从 2D 纹理空间拉回 3D 原生空间。每个激活�
 1. **语义扩展**：如何将部件级分割和基于图的拓扑结构纳入 O-Voxel 框架，使其支持更广泛的语义编辑和结构化生成任务？
 2. **解码稳定性**：能否通过改进解码过程的拓扑约束，从根本上消除小孔伪影，而非依赖后处理？
 3. **极薄结构精度**：在不牺牲紧凑性的前提下，如何提升对毛发、细线等亚体素结构的表示精度？可能的路径包括自适应体素细分或混合表示策略。
+
+
 
 ## 原文 PDF
 

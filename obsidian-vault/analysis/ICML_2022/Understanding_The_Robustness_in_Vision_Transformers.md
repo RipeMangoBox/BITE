@@ -5,6 +5,8 @@ paper_level: A
 venue: ICML
 year: 2022
 pdf_ref: paperPDFs/ICML_2022/Understanding_The_Robustness_in_Vision_Transformers.pdf
+project_link: null
+code_link: https://github.com/NVlabs/FAN
 aliases:
 - FANF
 - URVT
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 理解视觉Transformer的鲁棒性 |
 | 英文题名 | Understanding The Robustness in Vision Transformers |
 | 会议/期刊 | ICML 2022 |
-| Links | [paper](https://arxiv.org/abs/2204.12451); [GitHub](https://github.com/NVlabs/FAN) |
+| Links | [paper](https://arxiv.org/abs/2204.12451) · [GitHub](https://github.com/NVlabs/FAN) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | Fully Attentional Networks (FANs) |
 | Dataset | ImageNet-C, ImageNet-1K, Cityscapes-C, COCO-C |
@@ -41,7 +43,7 @@ claims:
 > - ImageNet-1K 上，Top-1 Accuracy 为 87.1。
 > - Cityscapes-C 上，mIoU (average over corruptions) 为 66.4，对比 55.8，变化 +10.6。
 
-## 概述
+## 概要
 
 视觉Transformer（ViT）在图像分类任务中展现出优于传统卷积神经网络（CNN）的鲁棒性，但其背后的机制尚不清晰。一个关键瓶颈在于：自注意力（Self-Attention）对鲁棒性的贡献机制未被充分理解，且现代无注意力CNN（如ConvNeXt）也能取得相近的鲁棒性，表明仅靠自注意力并非鲁棒性的唯一来源。
 
@@ -51,7 +53,7 @@ FAN的设计要点在于：在标准ViT块的基础上，引入高效通道注�
 
 在ImageNet-C基准上，FAN-S模型以28M参数量取得47.7%的mCE，大幅优于ResNet-50（76.7%）、Swin-T和ConvNeXt-T等基线。放大至76.8M参数时，mCE进一步降至35.8%，达到监督训练下的最先进水平。同时，FAN在ImageNet-1K上取得87.1%的干净精度。在语义分割（Cityscapes-C）和目标检测（COCO-C）的下游任务中，FAN同样展现出显著优于CNN和Transformer基线的鲁棒性，验证了该设计的通用性。
 
-## 背景与动机
+
 
 ### 视觉Transformer的鲁棒性之谜
 
@@ -80,7 +82,9 @@ FAN的设计要点在于：在标准ViT块的基础上，引入高效通道注�
 - **实验验证**：在完全相同训练配方下，ViT-S的留存率（72%）仍显著高于ResNet-50（65%），证明架构层面的自注意力设计是鲁棒性优势的独立来源（Table 4）。
 - **性能突破**：引入ECA后，FAN-ViT-S在ImageNet-C上的mCE从56.2降至47.7，同时GPU内存占用与SE注意力相当（Table 6）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：自注意力与鲁棒性的因果断裂
 
@@ -129,7 +133,7 @@ $$\operatorname{CA}(Z) = \operatorname{Softmax}\left(\frac{(W_Q' Z)(W_K' Z)^\top
 
 FAN的核心创新不在于引入全新的操作原语，而在于**将自注意力诱导的隐式视觉分组显式化为架构设计原则**。通过将通道处理也转换为注意力操作，FAN在token和通道两个维度上同时执行选择性信息聚合，使分组过程更加精确、噪声抑制更加彻底。这一设计在多个基准上得到验证：FAN系列模型在图像分类（ImageNet-C mCE 47.7）、语义分割（Cityscapes-C mIoU 66.4）和物体检测（COCO-C mAP 35.5）三个任务上均大幅超越CNN和Transformer基线，取得最先进的鲁棒性。
 
-## 整体框架
+
 
 FAN（Fully Attentional Networks）的整体设计围绕一个核心洞察展开：自注意力（Self-Attention, SA）可被解释为信息瓶颈（Information Bottleneck, IB）目标的迭代优化步骤，该过程自然诱导视觉分组（visual grouping）并过滤噪声。为充分利用这一机制，FAN 将标准 ViT 块中的 MLP 通道处理替换为通道注意力，构建了一个完全由注意力操作驱动的网络。
 
@@ -171,7 +175,7 @@ FAN 提供了三种模型变体以适应不同场景：
 
 在下游密集预测任务（语义分割、目标检测）中，FAN-Hybrid 或 FAN-SWIN 作为骨干网络，其多尺度特征图被送入任务特定的解码器（如 DeepLabv3+、Mask R-CNN），整个流程无需腐蚀相关的微调或对抗训练。
 
-## 核心模块与公式推导
+
 
 ### 2.1 标准ViT块：Token混合与通道处理
 
@@ -222,7 +226,9 @@ $$\mathrm{ECA}(Z) = \mathrm{Norm}\left(\frac{(W_Q' \sigma(Z)) \sigma(\overline{Z
 
 FAN块将上述模块整合为一个完全注意力化的处理单元：输入token首先经过多头token自注意力进行token混合，随后通过高效通道注意力（ECA）完成通道特征变换与动态选择。与标准ViT块相比，FAN块移除了通道注意力之后的线性投影层，使整个网络完全由注意力操作构成（Figure 2）。这种设计强化了自注意力诱导的视觉分组与鲁棒性之间的共生关系。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 训练配方与架构优势的解耦
 
@@ -306,7 +312,9 @@ Table 12的逐类腐蚀细分显示，FAN在所有19种ImageNet-C腐蚀类型下
 ![[assets/figures/papers/paper_list_l9_https_arxiv_org_abs_2204_12451/figures/009_Table_5.jpg]]
 *Table 5: Robustness comparison among Swin, ConvNeXt, DeiT and FAN. The mIoU of ConvNeXt, DeiT, Swin and Seg-Former models are our reproduced results*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心基线谱系
 
@@ -367,6 +375,8 @@ FAN 的设计遵循一条清晰的因果链：
 4. **分组-鲁棒性的定量理论**：目前仅观察到分组程度与鲁棒性之间的定性共生关系（特征值稀疏化 ↔ 噪声衰减），能否建立定量的理论关系（如分组纯度与 mCE 的函数形式），从而指导架构的超参数设计（如头数、层数）？
 
 5. **与对抗训练的协同**：FAN 目前仅评估了未经腐蚀微调的标准训练模型。完全注意力设计与对抗训练、腐蚀数据增强等鲁棒训练范式之间是否存在协同效应或冲突？
+
+
 
 ## 原文 PDF
 

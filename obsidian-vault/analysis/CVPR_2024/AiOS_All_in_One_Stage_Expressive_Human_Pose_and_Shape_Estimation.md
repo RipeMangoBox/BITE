@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2024
 pdf_ref: paperPDFs/CVPR_2024/AiOS_All_in_One_Stage_Expressive_Human_Pose_and_Shape_Estimation.pdf
+project_link: https://ttxskk.github.io/AiOS/
+code_link: null
 aliases:
 - AAOSEHPSE
 tags:
@@ -40,15 +42,13 @@ claims:
 > - EHF 上，PVE All 45.4 mm vs OSX 64.3 mm (estimated) (-30%)。
 > - ARCTIC 上，PVE All N/A (10% reduction) vs N/A (-10%)。
 
-## 概述
+## 概要
 
 表现性人体姿态与形状估计（EHPS）旨在从单张图像中恢复多人的全身三维网格，包括身体、手部和面部。现有方法普遍采用“检测-裁剪-回归”的多阶段流水线：先用现成的检测器（如Faster R-CNN）定位人体边界框，再对裁剪区域独立回归SMPL-X参数。这种范式存在两个根本性瓶颈：其一，裁剪操作切断了人体间的空间关系和全局场景上下文，导致拥挤场景下的人体间交互信息完全丢失；其二，即使后续工作将回归网络整合为单阶段（如**OSX**, Lin et al., CVPR 2023），仍依赖外部检测器提供的边界框，未能实现真正的端到端全帧推理。另一类基于身体中心热图的单阶段HPS方法（如**ROMP**, Sun et al., ICCV 2021；**BEV**, Sun et al., CVPR 2022）虽然摆脱了裁剪，但仅使用中心点附近的全局特征，缺乏对手部、面部等细粒度局部区域的建模能力，在全身网格精度上与多阶段方法存在显著差距。
 
 针对上述问题，本文提出**AiOS**（All-in-One Stage），首个无需独立人体检测步骤的全合一阶段EHPS框架。其核心洞察在于：将多人全身网格恢复重新定义为**渐进式集合预测问题**，基于DETR的可变形注意力架构，设计人体令牌和关节令牌两级查询机制，在统一的编码器-解码器结构中同步完成人体检测与SMPL-X参数回归。具体而言，AiOS通过人体令牌提取全局位置特征以定位人体，通过关节令牌引导交叉注意力聚焦于身体、手部和面部的细粒度局部区域，并利用解码器中的自注意力机制显式建模人体间与身体部位间的关系。这种设计消除了对独立检测器的依赖，实现了从全帧图像到多人全身网格的直接端到端映射。
 
 实验结果表明，AiOS在多个基准上取得了显著提升。在AGORA SMPL-X测试集上，NMVE降低9%，超越了所有使用真值边界框的已有方法；在EHF上PVE降低30%，在ARCTIC上降低10%，在EgoBody上降低3%。与最佳一阶段HPS方法BEV相比，AiOS在AGORA SMPL测试集上的NMVE从108.3 mm降至61.2 mm，降幅达43%。消融实验证实，关节令牌的引入和渐进式全身监督是性能提升的关键因素，而受限的注意力掩码设计（仅允许同一人体内的关节令牌间注意力）相比全注意力或仅人体间注意力方案取得了最优结果。
-
-## 背景与动机
 
 ### 表现性人体姿态与形状估计的演进
 
@@ -66,7 +66,7 @@ claims:
 
 AiOS的提出正是为了弥合这一鸿沟。其核心洞察是：**将多人全身网格恢复视为一个渐进式的集合预测问题**。基于DETR架构，AiOS设计了人体令牌和关节令牌两级查询机制——人体令牌负责在全帧中定位人体并提取全局特征，关节令牌则引导交叉注意力聚焦于身体关节、手部和面部的局部区域。通过变形解码器中的自注意力机制，AiOS同时建模了人体间的交互关系和身体部位间的关联，从而在单阶段、全帧、端到端的框架下实现了从粗到细的全身网格回归，彻底消除了对独立人体检测器的依赖。
 
-## 核心创新
+## 核心方法与创新机理
 
 AiOS 的核心创新在于将多人物全身网格恢复重新定义为**渐进式集合预测问题**，并基于 DETR 架构构建了首个真正意义上的全合一阶段（all-in-one-stage）EHPS 框架。与现有方法相比，其关键变革体现在以下三个维度。
 
@@ -109,8 +109,6 @@ AiOS 将全身恢复过程拆解为三个递进阶段（Figure 2）：
 | 人体间交互建模 | 独立处理，丢失交互信息 | 解码器自注意力 + 受限注意力掩码 | Section 3.4, Table 5 |
 | 参数回归策略 | 单步或两阶段回归 | 三阶段渐进式解码，分阶段施加 SMPL-X 监督 | Section 3.5, Table 5 |
 
-## 整体框架
-
 AiOS 将多人全身网格恢复建模为**渐进式集合预测问题**，基于 DETR 架构构建了一个全合一阶段（all-in-one-stage）管线，无需独立的人体检测器即可在完整图像上同步完成人体定位与 SMPL-X 参数回归。其核心设计包含三个递进阶段：**身体定位阶段**、**身体细化阶段**和**全身细化阶段**，通过人体令牌（human token）与关节令牌（joint token）两级查询机制，逐步从粗粒度全局定位过渡到细粒度局部特征提取。
 
 ### 输入与骨干网络
@@ -137,11 +135,6 @@ AiOS 将多人全身网格恢复建模为**渐进式集合预测问题**，基�
 
 ![[assets/figures/papers/paper_list_l12_AiOS_All_in_One_Stage_Expressive_Human_Pose_and_Shape_Estimation_motion20v2/figures/002_Figure_2.jpg]]
 *Figure 2: Pipeline overview. AiOS performs human localization and SMPL-X estimation in a progressive manner. It is composed of (1) the body localization stage that predicts coarse human location; (2) the Body refinement stage that refines body features and produces face and hand locations; (3) the Whole-body Refinement stage that refines whole-body features and regress SMPL-X parameters*
-
-![[assets/figures/papers/paper_list_l12_AiOS_All_in_One_Stage_Expressive_Human_Pose_and_Shape_Estimation_motion20v2/figures/001_Figure_1.jpg]]
-*Figure 1: A comparison of existing methods in EHPS. (a) Top-down, multi-stage methods typically use detectors to detect humans, then use different networks to regress body parts on cropped images. (b) Top-down, one-stage methods use only one network for regression but still require detectors and rely on the cropped image. (c) Our all-in-one-stage pipeline, end-to-end human detection, and regression on full frame*
-
-## 核心模块与公式推导
 
 ### 3.1 参数化模型：SMPL-X
 
@@ -199,7 +192,7 @@ $$T_{wd} = [T_{bl}, T_{bj}, T_{lhl}, T_{lhj}, T_{rhl}, T_{rhj}, T_{fl}, T_{fj}]$
 ![[assets/figures/papers/paper_list_l12_AiOS_All_in_One_Stage_Expressive_Human_Pose_and_Shape_Estimation_motion20v2/figures/009_Figure_5.jpg]]
 *Figure 5: Attention Visualization. The green dots represent the location of the reference point, and the red dots are the sampling points*
 
-## 实验与分析
+## 实验与关键发现
 
 ### 主要定量结果
 
@@ -221,9 +214,6 @@ AiOS 在多个基准数据集上取得了领先的性能，尤其是在无需真
 *Table 4: EHF. As EHF is absent from our training data, it serves as a valuable tool to assess the generalization ability of our models*
 
 在 **UBody 数据集**上，AiOS 在未使用真值框的条件下取得了与使用真值框的 SMPLer‑X 可比甚至更优的结果（PA‑PVE All 32.5 mm vs. 31.9 mm，见 Table 3）。这进一步说明，AiOS 的全帧端到端设计在实际应用场景中具备替代“检测‑裁剪‑回归”范式的潜力。
-
-![[assets/figures/papers/paper_list_l12_AiOS_All_in_One_Stage_Expressive_Human_Pose_and_Shape_Estimation_motion20v2/figures/005_Table_3.jpg]]
-*Table 3: UBody. † indicates the model is finetuned with the UBody training set*
 
 ### 消融实验
 
@@ -266,15 +256,7 @@ AiOS 在多个基准数据集上取得了领先的性能，尤其是在无需真
 - **公平性措施：** 由于 AiOS 是首个全合一阶段的 EHPS 方法，缺乏同类单阶段方法进行直接对比。因此，主要对比对象为使用真值框的多阶段方法。为公平起见，AiOS 还提供了自身检测框供多阶段方法使用（见 Table 1 中 ⋄ 标记的结果）。在 AGORA SMPL 测试中，统一使用置信度阈值 0.5 过滤低分检测，以保持与 BEV 等方法的可比性。
 - **指标说明：** NMVE（Normalized Mean Vertex Error）和 NMJE（Normalized Mean Joint Error）为逐顶点/关节误差的归一化值；MVE 为平均顶点误差（mm）；PA‑PVE 为 Procrustes 对齐后的顶点误差。
 
-### 补充图表
-
-![[assets/figures/papers/paper_list_l12_AiOS_All_in_One_Stage_Expressive_Human_Pose_and_Shape_Estimation_motion20v2/figures/007_Figure_3.jpg]]
-*Figure 3: Comparison of current SOTA methods [3, 21, 26] with our AiOS model. The upper part is visualization results on AGORA [28], and the lower is EHF test [7]*
-
-![[assets/figures/papers/paper_list_l12_AiOS_All_in_One_Stage_Expressive_Human_Pose_and_Shape_Estimation_motion20v2/figures/008_Figure_4.jpg]]
-*Figure 4: Visual comparisons with SOTA one-stage HPS methods [35, 37] on the Internet data3*
-
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 一、与现有方法的谱系关系
 

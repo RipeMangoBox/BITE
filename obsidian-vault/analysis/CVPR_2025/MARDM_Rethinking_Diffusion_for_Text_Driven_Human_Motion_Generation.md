@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/MARDM_Rethinking_Diffusion_for_Text_Driven_Human_Motion_Generation.pdf
+project_link: https://neu-vi.github.io/MARDM/
+code_link: null
 aliases:
 - MARDM
 tags:
@@ -40,7 +42,7 @@ claims:
 > - HumanML3D 上，R-Precision Top-1 为 0.500 (Ours-SiT)，对比 0.470 (T2M-GPT)，变化 +0.030。
 > - HumanML3D 上，R-Precision Top-3 为 0.795 (Ours-SiT)，对比 0.758 (T2M-GPT)，变化 +0.037。
 
-## 概述
+## 概要
 
 文本驱动的人体运动生成领域长期存在一个看似矛盾的现象：基于向量量化（VQ）的方法（如 **T2M-GPT**、**MoMask**）在生成质量上持续领先基于扩散的方法（如 **MDM**、**MotionDiffuse**、**MLD**），尽管扩散模型在图像、视频等其他生成任务中已展现出强大的能力。本文通过系统性的诊断分析，揭示了这一现象背后的三个根本瓶颈：
 
@@ -54,7 +56,7 @@ claims:
 
 在 HumanML3D 和 KIT-ML 数据集（统计见[[../../references/T2M_Common_Datasets|T2M Common Datasets]]）上的实验表明，MARDM 取得了最优性能：在新评估器下，FID 降至 0.114，R-Precision Top-1 达到 0.500，Top-3 达到 0.795，显著优于 T2M-GPT（FID 0.335，Top-1 0.470，Top-3 0.758），并展现出良好的模型可扩展性（**Figure 1**）。消融实验证实，移除表示重构和去除掩码自回归建模分别导致 FID 增加 2.080 和 0.435，验证了各模块的必要性（**Table 6**）。
 
-## 背景与动机
+
 
 ### 文本驱动人体动作生成的范式分裂
 
@@ -110,7 +112,9 @@ $$V_k = \{z \in \mathbb{R}^d \mid \|z - e_k\|_2 \leq \|z - e_j\|_2\}, \forall j 
 
 通过这些设计，MARDM 旨在证明：**连续扩散模型在运动生成中可以达到甚至超越 VQ 方法的性能**，从而弥合两大范式之间的鸿沟。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 创新动机：扩散模型在运动生成中的三重瓶颈
 
@@ -193,7 +197,7 @@ Table 6 的消融实验量化了各创新组件的贡献：
 
 MARDM 展现出良好的模型可扩展性。Table A5 显示，将模型从 S 扩展到 XL（增大 Transformer 和 MLP 规模），FID 从 0.278 稳定降至 0.116，验证了架构设计的可扩展性。
 
-## 整体框架
+
 
 MARDM 的整体设计围绕一个核心洞察展开：**消除运动表示中的冗余特征，并引入掩码自回归扩散架构，使扩散模型能够克服传统限制，达到与 VQ 方法相媲美甚至更优的性能**。其 pipeline 由三个紧密协作的模块构成，如 Figure 3 所示。
 
@@ -251,7 +255,7 @@ $$\mathbf{v}(\mathbf{x}, t) = \dot{\alpha}_t \mathbb{E}[\mathbf{x}_0 \mid \mathb
 
 此外，模型规模实验（Table A5）显示增大 Transformer 和 MLP 规模可稳定提升性能（S→XL FID 从 0.278 降至 0.116），验证了框架的可扩展性。
 
-## 核心模块与公式推导
+
 
 ### 3.1 运动表示重构与确定性自编码器
 
@@ -307,7 +311,9 @@ $$
 
 为消除评估偏差，MARDM 提出仅使用必要维度训练评估器（T2M 结构 + CLIP 评估器）。Table 4 显示，在必要维度评估下，扩散方法（MDM）与 VQ 方法（T2M-GPT）的 R-Precision 差距显著缩小，验证了传统评估器对冗余维度的过度依赖是扩散方法被低估的重要原因。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈的诊断验证
 
@@ -375,7 +381,9 @@ Table A2 的进一步消融显示，速度预测（Velocity, FID 0.114）略优�
 ![[assets/figures/papers/paper_list_l28_MARDM_Rethinking_Diffusion_for_Text_Driven_Human_Motion_Generation/figures/014_Table.jpg]]
 *Table: A6. Average Inference Time Results Comparison between our method and baseline methods*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 一、与 VQ 式生成方法的对比与继承
 
@@ -438,6 +446,8 @@ MARDM 的一个重要贡献是揭示了现有评估器的系统性偏差。论�
 3. **多模态扩展**：掩码自回归扩散的生成范式能否推广到语音驱动运动、音乐驱动运动或风格化运动生成？
 4. **交互场景中的连续先验**：是否可以在更多样化的人‑物、人‑人交互场景中利用连续扩散先验，实现比离散 VQ 方法更自然的运动生成与实时控制？
 5. **评估标准的社区共识**：新评估器仅关注必要维度，如何在社区内推动评估标准的更新，以避免因评估框架不一致导致的“苹果与橙子”式比较？
+
+
 
 ## 原文 PDF
 

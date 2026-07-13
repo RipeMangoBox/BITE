@@ -44,7 +44,7 @@ claims:
 > - HEVC-B 上，E_warp (↓) 66.6 vs GLC-Video (86.5) (-19.9)；CLIP-F (↑) 0.982 vs GLC-Video (0.979) (+0.003)。
 > - HEVC-B, UVG, MCL-JCV 上，LPIPS, DISTS (perceptual quality) best vs HEVC, VVC, DCVC-FM, DCVC-RT, GLC-Video (qualitatively best)。
 
-## 概述
+## 概要
 
 ### 1. 问题背景
 
@@ -84,7 +84,7 @@ GNVC-VD 属于**生成式神经视频压缩**范畴，其方法谱系定位如�
 
 GNVC-VD 的主要局限在于**模型规模巨大**（总参数量约 23 亿，其中 VideoDiT 占 21.5 亿），导致解码延迟高（1920×1080 分辨率下约 1557 ms），难以满足实时应用需求。此外，当前仅验证了较短视频片段（最大 GOP 25 帧）的性能，对更长序列或流媒体场景的扩展性尚待探索。未来方向包括：提升上下文变换编码效率、加速扩散优化过程、扩展至长视频场景，以及探索更有效的压缩域特征注入机制。
 
-## 背景与动机
+
 
 ### 视频压缩的感知质量瓶颈
 
@@ -103,7 +103,9 @@ GNVC-VD 的主要局限在于**模型规模巨大**（总参数量约 23 亿，�
 
 基于此，本文提出 **GNVC-VD**——首个利用视频原生扩散模型实现序列级潜在压缩与优化的生成式神经视频压缩框架。其核心思路是：将解码后的时空潜在变量作为部分带噪状态，通过流匹配（Flow Matching）机制在 VideoDiT 的去噪过程中进行联合优化，从而恢复跨帧一致的精细纹理，从根本上解决时序闪烁问题。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 GNVC-VD 的核心创新在于将视频压缩的解码过程从逐帧独立重建重新定义为**基于视频扩散模型的序列级条件去噪**。与现有感知视频压缩方法依赖图像生成先验（如 Stable Diffusion）进行逐帧增强不同，GNVC-VD 引入预训练的视频扩散 Transformer（VideoDiT）作为原生视频先验，在时空潜在空间中对整个 I 帧和 P 帧序列进行联合优化。这一设计从三个关键维度改变了生成式视频压缩的范式。
 
@@ -140,7 +142,7 @@ GNVC-VD 采用两阶段训练策略来有效对齐压缩编码器与扩散先验
 
 GNVC-VD 通过三个关键设计——视频原生扩散先验、压缩感知部分噪声初始化、序列级联合优化——系统性地解决了现有生成式视频压缩方法在极低码率下的时序闪烁和纹理不一致问题。这些创新使 GNVC-VD 在 LPIPS 和 DISTS 指标上全面超越传统编解码器（HEVC、VVC）、学习型编解码器（DCVC-FM、DCVC-RT）和生成式基线（GLC-Video），在 UVG 数据集上相对于 DCVC-RT 实现了 98% 的 DISTS BD-Rate 降低和 56% 的 LPIPS BD-Rate 降低。
 
-## 整体框架
+
 
 GNVC-VD 的整体流水线围绕一个核心洞察构建：**将视频压缩的解码过程重新定义为基于视频扩散模型的序列级条件去噪**，而非独立的逐帧重建。如图 3 所示，框架由两大关键模块串联而成——Contextual Latent Codec（上下文潜在编解码器）与 VideoDiT-based Refinement Module（基于 VideoDiT 的优化模块）——辅以 3D 因果 VAE 编码器/解码器和熵编码环节，形成从原始视频到压缩码流再到高质量重建的完整闭环。
 
@@ -217,7 +219,7 @@ GNVC-VD 的参数量主要集中于 VideoDiT 优化模块（约 21.5 亿参数�
 ![[assets/figures/papers/paper_list_l879_https_arxiv_org_abs_2512_05016/figures/003_Figure_3.jpg]]
 *Figure 3: Overview of the proposed GNVC-VD framework. (a) Overall pipeline composed of two key modules: (b) a Contextual Latent Codec for spatio-temporal latent compression (Section 3.2), and (c) a VideoDiT-based refinement module that performs flow-matching latent refinement (Section 3.3)*
 
-## 核心模块与公式推导
+
 
 GNVC-VD 的核心架构由两大模块构成：**Contextual Latent Codec**（上下文潜在编解码器）和 **VideoDiT-based Refinement Module**（基于视频扩散 Transformer 的优化模块）。前者负责在时空潜在空间中进行条件变换编码，后者则利用预训练的视频扩散先验对解码后的潜在序列进行流匹配去噪优化。
 
@@ -296,7 +298,9 @@ $$\mathcal{L}_{\mathrm{pixel}} = R(\hat{y}) + \lambda_r \Big( \| V - \tilde{V} \
 ![[assets/figures/papers/paper_list_l879_https_arxiv_org_abs_2512_05016/figures/012_Figure_8.jpg]]
 *Figure 8: Architecture of the Contextual Latent Codec module*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -366,7 +370,9 @@ Table 6 报告了各模块的参数量。GNVC-VD 总参数量约 **23 亿**，�
 
 > **注意**：关于更长序列的扩展性、自适应码率控制以及解码加速的具体方案，原文未提供详细实验验证，上述局限性基于论文自述的限制和开放问题总结，需在实际部署中进一步评估。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 生成式视频压缩的方法演进
 
@@ -422,6 +428,8 @@ $$\mathbf{v}_\tau = \underbrace{(\mathbf{x}_1 - \mathbf{x}_0)}_{\mathbf{v}_{\mat
 4. **条件注入机制**：是否存在更有效的方式将压缩域上下文特征注入扩散模型？例如，交叉注意力或特征调制等替代方案可能进一步提升恢复质量。
 
 5. **更广泛的视频内容**：当前评估集中在自然场景视频，对于屏幕内容、医学影像、监控视频等特殊域视频的泛化性需要进一步验证。
+
+
 
 ## 原文 PDF
 

@@ -43,7 +43,7 @@ claims:
 > - 多属性组合（Old+Smile, Old+Makeup, Smile+Makeup） 上，QS / IS Old+Smile QS/IS: 4.2124/0.6882; Old+Makeup QS/IS: 4.4281/0.6277; Smile+Makeup Q... vs ConceptSlider Old+Smile QS/IS: 4.1503/0.4993; AttControl Old+Smile QS/IS: 3.666... (QS 提升 0.0621 ~ 0.3726，IS 明显提升)。
 > - 原始嵌入 vs 稀疏方向（Old, Smile, Makeup） 上，QS ↑ / IS ↑ Avg QS: 4.202; Avg IS: 0.698 vs Embraw Avg QS: 3.990; Avg IS: 0.502 (QS +0.212, IS +0.196)。
 
-## 概述
+## 概要
 
 扩散模型在文本到图像生成中展现了卓越的能力，但对生成图像中的特定属性进行**连续、精细且可组合的操控**仍是一个核心挑战。现有主流方法遵循**“一对一”（One-for-One）范式**：为每个目标属性（如“微笑”“衰老”）单独训练一个轻量级适配模块（如 LoRA 或方向向量），再将缩放后的嵌入注入生成过程。这一范式存在三个结构性瓶颈：
 
@@ -65,7 +65,7 @@ claims:
 
 方法的局限性同样值得关注：训练稀疏自编码器需要覆盖多样化属性的文本提示语料，引入新属性仍需构造提示集；潜在维度高达 32768，训练约需 400M 词元，对计算资源有一定要求；目前验证主要集中于面部属性和有限摄影风格，对更通用的物体属性或复杂场景编辑的泛化性尚未充分评估。
 
-## 背景与动机
+
 
 扩散模型在文本到图像（T2I）生成领域取得了显著进展，使高质量、多样化的图像合成成为可能。然而，对这些模型进行**精细、连续且可组合的属性操控**仍是一个核心挑战。用户往往希望在不影响主体身份和其他无关属性的前提下，对生成图像中的特定语义属性（如面部年龄、表情、妆容，或摄影风格）进行平滑调节。
 
@@ -77,7 +77,9 @@ claims:
 
 上述瓶颈的根源在于，现有方法缺乏一个**共享的、语义可解耦的潜在空间**来统一表征和操控多样化的属性。因此，本文的核心动机是：**能否构建一个一次性训练、即可支持任意属性连续操控的统一框架，从根本上打破“一对一”范式的限制？** 这要求在文本嵌入空间中实现属性的稀疏解耦，使得不同属性对应独立且可复用的方向，从而支持灵活的连续调节、多属性组合以及零样本泛化。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈洞察：从“一对一”到“一体式”的范式跃迁
 
@@ -116,7 +118,7 @@ claims:
 
 > **需注意**：当前分析基于论文提供的实验证据和架构描述。零样本泛化的边界（对生僻或长尾属性的退化程度）以及稀疏空间的可解释性（每个维度对应的具体视觉特征）仍需进一步验证。
 
-## 整体框架
+
 
 All-in-One Slider 的整体框架遵循“先分解、再重构”的两阶段范式，其核心瓶颈在于文本嵌入空间的高度语义纠缠导致现有 One-for-One 方法无法实现可扩展的多属性操控。该方法通过一个统一的**属性稀疏自编码器**（Attribute Sparse Autoencoder）在单次训练中构建所有属性共享的稀疏可解释潜在空间，从而将稠密纠缠的嵌入分解为独立且可复用的语义方向。
 
@@ -165,7 +167,7 @@ All-in-One Slider 的整体框架遵循“先分解、再重构”的两阶段�
 ![[assets/figures/papers/paper_list_l2439_https_arxiv_org_abs_2508_19195/figures/011_Figure_10.jpg]]
 *Figure 10: (a) Framework for fine-tuning multi-subject manipulation. The Attribute Sparse Autoencoder is fine-tuned using paired sentences combined the diffusion model, and we introduce an Attpooling Aggregator (AAg) module to locate the target subject for manipulation. (b) Qualitative results of applying attributes to the targeted subject (e.g., old to the man, smile to the woman)*
 
-## 核心模块与公式推导
+
 
 ### 整体框架
 
@@ -248,7 +250,9 @@ $$\mathcal{L}_{\text{multi}} = \mathcal{L}_{\text{sae}} + \eta \mathcal{L}_{\tex
 - $\mathcal{L}_{\text{sae}}$：原始 SAE 训练损失（式 5）
 - $\mathcal{L}_{\text{cons}}$：约束操控仅作用于目标主体的正则项
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -315,7 +319,9 @@ All-in-One Slider 在单属性操控与多属性组合操控两个维度上均�
 ![[assets/figures/papers/paper_list_l2439_https_arxiv_org_abs_2508_19195/figures/008_Figure_7.jpg]]
 *Figure 7: Continuous zero-shot generalization to different racial attributes. The model progressively manipulates facial features across varying strengths of the racial attribute*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有工作的关系
 
@@ -351,6 +357,8 @@ All-in-One Slider 在单属性操控与多属性组合操控两个维度上均�
 5. **弱监督微调的可能性**：当前训练完全无监督，若能利用少量标注数据（如属性‑维度匹配对）进行微调，是否能进一步提升稀疏空间的语义纯净度和编辑线性度（当前 R²=0.973，仍有提升空间）？
 
 6. **与基于注意力操控的方法融合**：近期工作探索了通过修改交叉注意力图来实现属性编辑，这类方法与基于嵌入空间操控的 All‑in‑One Slider 在机制上互补。两者能否结合以同时获得稀疏解耦的语义纯净度和注意力级别的空间精度？
+
+
 
 ## 原文 PDF
 

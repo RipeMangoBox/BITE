@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Dynamic_Multi_sample_Mixup_with_Gradient_Exploration_for_Open_set_Graph_Anomaly_Detection.pdf
+project_link: null
+code_link: https://github.com/yucy324/DEMO
 openreview_forum_id: zefuSJ3nOg
 aliases:
 - DMSMGEOSGAD
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 面向开放集图异常检测的动态多样本混合与梯度探索方法 |
 | 英文题名 | Dynamic Multi-sample Mixup with Gradient Exploration for Open-set Graph Anomaly Detection |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=zefuSJ3nOg); [GitHub](https://github.com/yucy324/DEMO) |
+| Links | [paper](https://openreview.net/forum?id=zefuSJ3nOg) · [GitHub](https://github.com/yucy324/DEMO) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/graph_neural_networks |
 | Method | DEMO |
 | Dataset | Photo (small-scale), Computers (small-scale), CS (small-scale) |
@@ -41,7 +43,7 @@ claims:
 > - Photo (small-scale) 上，AUC-PR 为 0.6330，对比 NSReg 0.4777，变化 +0.1553 (absolute)。
 > - Computers (small-scale) 上，AUC-ROC 为 0.8439，对比 SpaceGNN 0.8296，变化 +0.0143 (absolute)。
 
-## 概述
+## 概要
 
 图异常检测（GAD）在现实应用中面临一个根本性瓶颈：训练数据中异常类别有限且多样性不足，同时标签稀缺与严重的类别不平衡并存，导致现有方法难以泛化到开放集场景中未见过的异常类型。针对这一挑战，本文提出 DEMO（Dynamic Multi-sample Mixup with Gradient Exploration），通过两个核心机制协同提升开放集图异常检测的泛化能力——
 
@@ -51,7 +53,7 @@ claims:
 
 在六个数据集上的实验表明，DEMO 在所有小规模数据集（Photo、Computers、CS）上均取得最优 AUC-ROC 和 AUC-PR，大幅领先最强基线——例如 Photo 数据集上 AUC-ROC 达 0.9023（NSReg 为 0.8360），AUC-PR 达 0.6330（NSReg 为 0.4777）。在三个大规模数据集（Yelp、ogbn-arxiv、ogbn-mag）上，DEMO 同样取得最佳或接近最佳的 AUC-ROC，且是少数能成功在 ogbn-mag 上运行的方法。在仅测试未见异常类别的严格开放集设定下，DEMO 在全部六个数据集上均取得最优结果，验证了其对未知异常的强泛化能力。消融实验进一步证实，三个组件协同作用不可或缺，移除任一组件均会导致显著性能下降。
 
-## 背景与动机
+
 
 图异常检测（Graph Anomaly Detection, GAD）在金融风控、社交网络虚假账户识别、电商欺诈检测等场景中具有重要应用价值。其核心任务是识别图中显著偏离正常模式的节点。然而，现有方法普遍面临一个根本性瓶颈：**训练数据中异常类别有限且多样性不足，同时标签稀缺与严重的类别不平衡并存，导致模型难以泛化到训练阶段未出现的异常类型**。
 
@@ -72,7 +74,9 @@ claims:
 
 此外，DEMO 还通过记忆库引导的类感知动态阈值伪标签策略，缓解标签稀缺与类别不平衡带来的训练偏差。三者协同作用，使得 DEMO 能够在仅利用极少标注异常的条件下，显著提升对未见异常的检测能力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 创新总览
 
@@ -120,7 +124,7 @@ $$\tau_t^{+/-} = \begin{cases} \rho_t(c) \cdot \tau^+, & c = \mathrm{anomaly}, \
 
 三个创新点并非孤立运作。多样本混合生成的合成异常为能量梯度加权提供了更丰富的训练信号，而动态加权机制反过来确保模型优先学习那些对未见异常判别最具价值的合成样本。类感知伪标签则进一步扩充了训练数据，为混合模块提供更多样化的原始异常表示。消融实验（Table 3）证实，同时移除所有组件（w/o All）导致性能降至最低，验证了三者的协同不可或缺。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0009_zefuSJ3nOg_Dynamic_Multi-sample_Mixup_with_Gradient_Explora/figures/001_Figure_1.jpg]]
 *Figure 1: An overview of the proposed DEMO. DEMO first expands the training data through two parallel augmentation techniques. Multi-Sample Mixup generates new synthetic anomalies, while Pseudo-Labeling assigns labels to reliable unlabeled nodes. This augmented training data, comprising original, mixup, and pseudo-labeled data, then proceeds to a dynamic weighting stage*
@@ -141,7 +145,7 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{energy}} + \lambda_{\mathrm{mix}} \mathcal{
 
 **模块间因果关系。** 多样本混合扩大了决策边界的覆盖范围，伪标签缓解了标注稀疏问题，而能量梯度加权则动态聚焦于对验证性能边际影响最大的样本——三者协同作用，使得在标签极少的开放集设定下，模型能够有效生成多样化的异常表示并动态聚焦关键样本。消融实验（Table 3, Table 8）证实，移除任一模块均导致显著性能下降，三者缺一不可。
 
-## 核心模块与公式推导
+
 
 DEMO 围绕三个核心模块构建：**动态多样本混合（Dynamic Multi-sample Mixup）**、**能量梯度驱动的样本加权（Energy Gradient-based Weighting）** 和 **记忆库引导的伪标签生成（Memory Bank-guided Pseudo-labeling）**。三个模块协同解决开放集图异常检测中训练异常多样性不足、标签稀缺和类别不平衡的瓶颈。
 
@@ -199,7 +203,9 @@ $$ \mathcal{L} = \mathcal{L}_{\text{energy}} + \lambda_{\text{mix}} \mathcal{L}_
 
 > **注意**：上述公式均来自论文正文（Section 3.2–3.5），变量含义以原文为准。Hessian 逆矩阵在实际计算中采用近似方法，其可扩展性在大规模图上构成潜在瓶颈（见局限性分析）。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -254,7 +260,9 @@ Figure 2(d) 展示了正常类伪标签阈值 τ⁻ 的敏感性分析。在 Pho
 
 尽管 DEMO 在多个维度上表现优异，分析揭示了若干值得关注的局限。首先，多样本混合若比例过大可能引入分布偏移或生成过度模糊的特征，需要仔细调节混合权重与多样性正则化系数以维持训练稳定性。其次，损失权重（λ_un、λ_eng）的最优取值在不同数据集间差异显著，目前缺乏自动调整机制。此外，能量梯度加权涉及 Hessian 逆矩阵的近似计算，在大规模图上可能面临可扩展性瓶颈。最后，当前评估基于模拟的开放集划分，在真实世界中完全未知的异常场景下的鲁棒性仍需进一步验证。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有基线的结构性差异
 
@@ -297,6 +305,8 @@ DEMO 的三个关键模块——动态多样本混合（Mix）、能量梯度加
 4. **图结构增强的融合**：Mixup 当前仅在特征空间生成合成节点，能否将合成节点进一步用于图结构增强（如生成连接边），使模型同时学习结构和特征的异常模式？这可能提升对结构性异常（如伪装成正常连接模式的恶意节点）的检测鲁棒性。
 
 5. **真实开放世界验证**：需要在完全未知的异常类型（而非按类别留出）和更极端的标签稀缺条件（如仅 1-5 个标注异常）下评估 DEMO 的泛化能力，以更贴近实际部署场景。
+
+
 
 ## 原文 PDF
 

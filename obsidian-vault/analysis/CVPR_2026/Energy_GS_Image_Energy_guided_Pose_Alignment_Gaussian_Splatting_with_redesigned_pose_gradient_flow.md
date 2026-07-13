@@ -44,7 +44,7 @@ claims:
 > - Synthetic NeRF (hotdog) 上，PSNR↑ 32.90 vs 31.90 (BARF) (+1.00)。
 > - Synthetic NeRF (lego) 上，PSNR↑ 30.35 vs 26.92 (BARF) (+3.43)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：3D Gaussian Splatting（3DGS）在联合优化相机位姿与场景表示时，其点基渲染机制导致位姿梯度不稳定。与NeRF基于连续MLP的体积渲染不同，3DGS的离散高斯原语在训练过程中位置动态变化，参与位姿梯度计算的图元集合随之漂移，使梯度流缺乏一致性。同时，3DGS缺少体积渲染中固有的空间采样机制，无法实现由粗到精的渐进对齐，导致仅依赖RGB监督的联合优化极易陷入局部极小值。
 
@@ -54,7 +54,7 @@ claims:
 
 **主要结果**：在合成数据集上，Energy-GS的渲染质量（PSNR）和位姿估计误差（旋转角、绝对轨迹误差）均优于对比方法。消融实验表明，仅添加可学习位姿而不做任何改进时PSNR仅8.08；加入梯度流设计提升至12.38；进一步加入能量控制后提升至24.12，旋转误差从8.572°降至1.065°。1D信号对齐等效实验中，完整方法将平移误差降至0.0001，渲染PSNR达63.17，验证了梯度流重塑与能量策略的协同有效性。
 
-## 背景与动机
+
 
 ### 3DGS 联合优化位姿的核心瓶颈
 
@@ -95,7 +95,9 @@ $$
 
 Energy-GS 正是围绕这两个缺口展开设计：通过固定基元位置、延迟密度化、以及基于固定瓦片尺寸的图元选择，重塑位姿梯度流；同时，利用图像 SVD 能量分解，从低能量（低频结构）到高能量（高频细节）渐进式地提供监督信号，实现稳定的粗到细位姿对齐。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Energy-GS 的核心创新在于从根源上解决了 3DGS 在联合优化相机位姿时因点基渲染特性导致的梯度不稳定问题，并引入了一种无需外部先验的由粗到精的对齐策略。其关键创新点可归结为两个层面：**重塑位姿梯度流**以建立稳定的优化基础，以及**图像能量引导的渐进对齐**以规避局部极小值。
 
@@ -158,7 +160,7 @@ $$I_E(\alpha) = (\omega(\alpha) \cdot U_{lv}) \cdot (\omega(\alpha) \cdot \Sigma
 
 > **证据强度评估**：上述创新点的有效性在 1D 信号对齐和 3D 场景两个层面均得到了消融实验的定量验证，证据置信度高（0.90–0.95）。方法在合成数据集上取得了所有对比方法中最优的位姿估计精度（Table 3），进一步支持了创新设计的有效性。
 
-## 整体框架
+
 
 Energy-GS 提出了一套仅依赖 RGB 图像的联合优化框架，同时估计 3D 高斯溅射场景表征与相机位姿。其核心设计围绕一个关键瓶颈展开：**3DGS 的点基渲染导致位姿梯度不稳定，且缺少体积渲染中的空间采样机制，无法实现由粗到精的渐进对齐**，使联合优化极易陷入局部极小值。
 
@@ -185,7 +187,7 @@ Figure 3 通过对比 3DGS 与 NeRF 在两个连续训练步上的位姿梯度�
 ![[assets/figures/papers/paper_list_l2078_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_Energy_GS_Image_En/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison of scene rendering and camera pose estimation. We introduce Energy-GS, a novel joint optimization framework for 3D Gaussian Splatting and camera pose refinement. The method achieves stable, coarse-to-fine scene reconstruction and pose optimization by redesigning the pose gradient flow and introducing an image energy-based progressive alignment strategy. Compared to other joint optimization methods that directly rely on full-energy RGB supervision, our approach attains competitive results in both rendering quality and pose accuracy*
 
-## 核心模块与公式推导
+
 
 ### 3DGS与NeRF的位姿梯度差异
 
@@ -271,7 +273,9 @@ $\alpha$ 随优化进度从0增长至1，逐步释放高频能量。$lv=1$ 的�
 ![[assets/figures/papers/paper_list_l2078_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_Energy_GS_Image_En/figures/003_Figure_3.jpg]]
 *Figure 3: Comparison of pose gradients between 3DGS and NeRF over two consecutive training steps. The left side shows the pose gradient updates of the original 3DGS. Since the positions of Gaussian primitives are adjusted during training, the set of primitives contributing to the camera pose gradient changes dynamically, resulting in unpredictable camera pose shifts. In contrast, NeRF employs a globally unique MLP to represent the scene, which avoids unstable gradient changes*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -354,7 +358,9 @@ Figure 7 明确揭示了即便建立了稳定位姿梯度，联合优化仍可�
 ![[assets/figures/papers/paper_list_l2078_https_openaccess_thecvf_com_content_CVPR2026_html_Gao_Energy_GS_Image_En/figures/006_Figure_5.jpg]]
 *Figure 5: Comparison on the synthetic dataset. For each scene, we randomly add noise to the ground truth camera poses and employ a joint optimization strategy to reconstruct the 3D scene. The left side shows the rendering results and the jointly optimized poses obtained by different methods, while the right side presents the ground-truth images and the initial camera poses, where blue cameras represent the ground-truth poses and purple cameras denote the poses after joint optimization. The results demonstrate that our method achieves competitive performance in both reconstruction quality and pose estimation accuracy. The full results can be found in the supplementary material*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心瓶颈与因果机制
 
@@ -400,6 +406,8 @@ Energy-GS 处于 **3DGS 位姿联合优化**这一新兴研究脉络中，其直
 3. **动态场景与时序连续性**：该方法能否扩展至动态场景或在线 SLAM 系统？如何处理时间连续性和计算效率的平衡？
 4. **计算效率优化**：图像 SVD 分解带来的额外计算开销在实际部署中是否可接受？是否存在更高效的替代方案（如小波变换、拉普拉斯金字塔）来实现类似的渐进能量控制？
 5. **多壳现象的深层机理**：Figure 7 可视化的多壳现象揭示了即使梯度流稳定后仍可能陷入局部极小，其深层几何与优化机理尚待进一步理论分析，这可能为设计更鲁棒的优化策略提供指导。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2024
 pdf_ref: paperPDFs/arxiv_2024/DanceFusion_A_Spatio_Temporal_Skeleton_Diffusion_Transformer_for_Audio_Driven_Dance_Motion_Reconstruction.pdf
+project_link: https://thmlab.github.io/DanceFusion/
+code_link: null
 aliases:
 - DanceFusion
 tags:
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | DanceFusion：面向音频驱动舞蹈动作重建的时空骨架扩散Transformer |
 | 英文题名 | DanceFusion: A Spatio-Temporal Skeleton Diffusion Transformer for Audio-Driven Dance Motion Reconstruction |
 | 会议/期刊 | arXiv 2024 |
-| Links | [Project](https://thmlab.github.io/DanceFusion/) · [arXiv](http://arxiv.org/abs/1812.08008) |
+| Links | [Project](https://thmlab.github.io/DanceFusion/) · [paper](http://arxiv.org/abs/1812.08008) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction #topic/generative_models_diffusion #topic/benchmarks_datasets_evaluation |
 | Method | DanceFusion |
 | Dataset | TikTok Dance Dataset |
@@ -41,7 +43,7 @@ claims:
 > - TikTok Dance Dataset (自建，超3000个序列) 上，FID (越低越好) 0.1170 (L1损失+掩码) vs 8.6359 (L1损失无掩码) (-8.5189)。
 > - TikTok Dance Dataset 上，Diversity Score 7.5482 (L1损失+掩码) vs 7.4328 (L1损失无掩码) (+0.1154)。
 
-## 概述
+## 概要
 
 社交短视频中的舞蹈骨架数据常因遮挡、视角变化或采集噪声而存在**缺失、噪声和不完整**，导致现有方法难以准确重建和生成与音乐同步的舞蹈动作。DanceFusion 针对这一瓶颈，提出了一种**时空骨架扩散Transformer**框架，核心思路是：在编码阶段引入**二值掩码机制**，使模型仅依赖可靠关节信息进行层次化时空编码；在生成阶段，通过**潜在空间扩散模型**的迭代去噪过程，逐步精炼动作序列，确保时序一致性和音频同步性。
 
@@ -50,8 +52,6 @@ claims:
 **决定性实验证据**表明，掩码技术对性能提升至关重要：在自建的TikTok Dance Dataset上，使用L1损失配合掩码将FID从**8.6359**（无掩码）骤降至**0.1170**（Table 1）；在不同缺失比例（5%–20%）下，掩码方案仍保持低FID（0.4084–2.7496），验证了其对不完备数据的鲁棒性（Table 3）。同时，L1损失相比MSE损失在掩码条件下提供更低的FID（0.1170 vs 0.2344），表明其对噪声更具容忍度。
 
 **主要局限**在于计算复杂度高，限制了实时部署；模型主要在TikTok风格的短时节奏驱动舞蹈上验证，泛化到其他舞蹈类型和更长序列的能力尚未充分测试；此外，对低质量音频或背景噪声的鲁棒性有待评估。
-
-## 背景与动机
 
 ### 问题背景：社交短视频中的不完备舞蹈骨架
 
@@ -75,7 +75,7 @@ claims:
 
 这三者的协同构成了 DanceFusion 处理不完备骨架数据的核心因果链路：**掩码让模型只依赖可靠信息编码，层次化 Transformer 在时空维度上补偿缺失，扩散模型则通过迭代去噪修复时序一致性并注入音频同步信号**。
 
-## 核心创新
+## 核心方法与创新机理
 
 DanceFusion 的核心创新在于系统性地解决了社交短视频场景下舞蹈骨架数据**不完整、含噪声**这一瓶颈问题。其关键洞察是：将骨架序列转化为时空网格，并引入**掩码机制**使模型仅依赖存在的关节信息进行编码，从而避免缺失数据对学习的干扰；同时，通过**层次化时空VAE**与**扩散模型**的级联，实现从粗到精的运动重建与音频同步生成。
 
@@ -115,8 +115,6 @@ DanceFusion 将传统的单级Transformer或标准VAE替换为**层次化时空�
 
 这些创新点共同构成了一个**缺失数据鲁棒、音频同步精准**的舞蹈动作重建与生成框架，其有效性在自建TikTok Dance Dataset（超3000个序列）上得到了充分的定量与定性验证。
 
-## 整体框架
-
 DanceFusion 采用**两阶段级联架构**，将层次化时空变分自编码器（VAE）与条件扩散模型耦合，形成“编码-重建-精炼-生成”的完整管线。系统输入为不完整的 2D 骨架序列及对应的音频信号，输出为与音乐同步的完整舞蹈动作序列。
 
 ### 数据流与模块拓扑
@@ -148,8 +146,6 @@ $$L_{\mathrm{audio-diffusion}} = \mathbb{E}_{z_0, z_1, \ldots, z_T} \left[ \sum_
 
 ![[assets/figures/papers/paper_list_l1829_DanceFusion_A_Spatio_Temporal_Skeleton_Diffusion_Transformer_for_Audio_D/figures/013_Figure.jpg]]
 *Figure: 1 7 4 10 19 21 24 27 (a)*
-
-## 核心模块与公式推导
 
 DanceFusion 框架由三个核心模块构成：**层次化时空 VAE 编码器**、**掩码嵌入机制**、以及**音频条件扩散模型**。其设计目标是在骨架关节数据存在缺失的情况下，实现音频同步的舞蹈动作重建与生成。
 
@@ -226,10 +222,7 @@ $$L_{\mathrm{audio-diffusion}} = \mathbb{E}_{z_0, z_1, \ldots, z_T} \left[ \sum_
 
 ### 补充图表
 
-![[assets/figures/papers/paper_list_l1829_DanceFusion_A_Spatio_Temporal_Skeleton_Diffusion_Transformer_for_Audio_D/figures/003_Figure_4.jpg]]
-*Figure 4: Diagram of the audio feature extraction process and its integration into the diffusion model*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 核心实验结论
 
@@ -292,7 +285,7 @@ DanceFusion 在舞蹈动作生成领域的方法谱系中处于**时空建模 + 
 
 ![[assets/figures/papers/paper_list_l1829_DanceFusion_A_Spatio_Temporal_Skeleton_Diffusion_Transformer_for_Audio_D/figures/009_Table.jpg]]
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 核心创新与差异化定位
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Compositional_Visual_Planning_via_Inference_Time_Diffusion_Scaling.pdf
+project_link: https://comp-visual-planning.github.io/
+code_link: null
 openreview_forum_id: EEONns7ae4
 aliases:
 - CVPITDS
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 基于推理时扩散缩放的组合视觉规划 |
 | 英文题名 | Compositional Visual Planning via Inference-Time Diffusion Scaling |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=EEONns7ae4); [Project](https://comp-visual-planning.github.io/) |
+| Links | [paper](https://openreview.net/forum?id=EEONns7ae4) · [Project](https://comp-visual-planning.github.io/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | Compositional Visual Planning via Inference-Time Diffusion Scaling |
 | Dataset | Overall Scenes (IND), Overall Scenes (OOD), Overall (IND), Overall (OOD) |
@@ -41,7 +43,7 @@ claims:
 > - Overall Scenes (OOD) 上，Motion Smoothness 为 0.97±0.05，对比 0.87±0.06 (DiffCollage)，变化 +0.10。
 > - Overall (IND) 上，Success Rate (%) 为 59±17，对比 0±1 (DiffCollage)，变化 +59。
 
-## 概述
+## 概要
 
 长序列视觉规划的核心瓶颈在于**组合泛化**：如何将预训练于短片段上的扩散模型在推理时组合成未见过的长序列计划，而无需额外训练。现有组合扩散方法（如 **DiffCollage**，Zhang et al., 2023）直接在噪声数据空间上假设因子分解的独立性，但噪声破坏了这种独立性——本文通过 **Noisy-Bethe 间隙定理**（Theorem 1）严格证明了这一点，导致分数平均组合不稳定、全局计划不一致。
 
@@ -54,7 +56,7 @@ claims:
 
 方法的关键局限性在于依赖 Tweedie 估计的准确性（去噪早期阶段估计可能不准），且测试时需手动指定组合片段数量，梯度优化引导也带来更高的推理计算开销。
 
-## 背景与动机
+
 
 长序列视觉规划是机器人操作与视频生成领域的核心挑战。传统方法依赖端到端的行为克隆或扩散策略，在训练分布内表现良好，但面对未见过的起始-目标组合时泛化能力急剧下降。这是因为长序列数据的组合空间呈指数级增长，完全覆盖所有可能组合的训练数据在实际中不可行。
 
@@ -70,7 +72,9 @@ $$\Delta = Z \operatorname{Cov}_{u^2 \sim q} \left[ \frac{a}{c}, \frac{b}{c} \ri
 
 基于这一洞察，该文将长序列规划重新建模为链式因子图上的推理问题：将重叠的视频块视为因子，首尾帧锚定为起始与目标，相邻因子通过共享的过渡边界变量交换信息。在推理时，通过同步与异步消息传递在 Tweedie 估计上强制边界一致，配合扩散球体引导，实现无需额外训练的长序列视觉规划。整个过程是即插即用的：短片段扩散模型只需训练一次并冻结，测试时可泛化至任意未见过的起始-目标组合。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文提出**基于推理时扩散缩放的组合视觉规划**，其核心创新在于将组合扩散的约束域从**噪声中间状态**迁移至**Tweedie（去噪）估计**，并通过**同步与异步消息传递**在推理时强制边界一致性，配合**扩散球体引导**实现免额外训练的长序列规划。
 
@@ -116,7 +120,7 @@ $$d_m = d^{sample} + g_r (d^* - d^{sample}), \quad d^* = -\sqrt{s} \sigma_t \cdo
 | 扩散球体引导 | OOD成功率 54±14 vs DiffCollage 0±0（表2）；真实机器人OOD 10/10 vs 0/10（表3） | 0.98 |
 | 免额外训练 | 方法描述：短片段模型一次训练后冻结，测试时完全免训练 | 0.90 |
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_EEONns7ae4/figures/002_Figure_1.jpg]]
 *Figure 1: Compositional Visual Planning via Inference Time Diffuser Scaling. We train a short-horizon visual diffusion model on clips treated as a single factor. At inference, we scale visual planning horizon without retraining by chaining overlapping factors into a linear factor graph: the start and goal boundary variables are anchored at the ends, while neighboring factors exchange information through shared transition boundary variables*
@@ -178,7 +182,7 @@ $$d_m = d^{sample} + g_r (d^* - d^{sample}), \quad d^* = -\sqrt{s} \sigma_t \cdo
 
 4. **潜在空间规划**：所有因子和变量均在 Cosmos tokenizer 编码的紧凑潜在空间中操作，而非像素空间，显著降低了维度并节省了计算开销。
 
-## 核心模块与公式推导
+
 
 ### 问题形式化：链式因子图上的推理
 
@@ -245,7 +249,9 @@ $$d_m = d^{sample} + g_r (d^* - d^{sample}), \quad x_{t-1}^{1:n} = \mu_{t-1}^{1:
 
 生成的视频帧通过预训练的逆动力学模型转换为机器人末端动作，该模型从连续帧预测动作。整个过程在短片段扩散模型一次训练后冻结，测试时完全免额外训练。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -329,7 +335,9 @@ OOD Task3 的 10/10 完美成功率与 DiffCollage 的 0/10 形成极端对比�
 ![[assets/figures/papers/paper_list_l13_https_openreview_net_forum_id_EEONns7ae4/figures/011_Table_3.jpg]]
 *Table 3: Real-robot success rates. Our method substantially outperforms DiffCollage across both in-distribution (IND) and out-of-distribution (OOD) tasks on real hardware*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与组合扩散方法的对比定位
 
@@ -377,6 +385,8 @@ OOD Task3 的 10/10 完美成功率与 DiffCollage 的 0/10 形成极端对比�
 - 能否设计更轻量的优化调度以降低测试时的计算开销？
 - 该方法能否扩展到全景图像生成、长文到视频合成等非机器人规划任务？
 - 因子图结构能否从线性链推广到更一般的图拓扑（如树结构或循环图），以处理更复杂的任务依赖关系？
+
+
 
 ## 原文 PDF
 

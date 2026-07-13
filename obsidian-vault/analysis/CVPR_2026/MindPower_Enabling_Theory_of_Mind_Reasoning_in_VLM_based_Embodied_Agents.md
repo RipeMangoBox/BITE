@@ -42,7 +42,7 @@ claims:
 > - MindPower Benchmark (Action Generation) 上，动作生成精度提升（相对GPT-4o） Ours (SFT+Mind-Reward) vs GPT-4o (+12.49%)。
 > - MindPower Benchmark (Action Success Rate) 上，SR (Success Rate) 11.75 (SFT+Mind-Reward) vs 0.29 (Qwen2.5-VL-7B-Instruct, video-input) (+11.46)。
 
-## 概述
+## 概要
 
 具身智能体在家庭服务等交互场景中，不仅需要感知物理环境，更需理解自身与他人的心理状态，以做出连贯的决策与行动。这种能力被称为**心理理论（Theory of Mind, ToM）**。然而，现有视觉-语言模型（VLM）驱动的智能体普遍缺乏显式的ToM推理能力：它们要么仅从旁观者视角推断人类角色的心理状态，要么将感知到行动的映射视为黑箱，无法从**机器人中心视角（Robot-Centric Perspective）**同时推理智能体自身与人类的信念、欲望与意图，更无法基于此生成可执行的动作序列。这一瓶颈导致VLM在需要二阶信念推理、错误信念纠正与隐式目标推断的具身任务中表现极差——例如，GPT-4o在动作生成上的精度仅为2.91%。
 
@@ -57,7 +57,7 @@ MindPower的核心贡献包括：
 
 **方法定位**：MindPower属于具身智能体认知架构与VLM推理增强的交叉领域。其BDI形式化可追溯至经典认知科学，但将其与多模态VLM和强化学习结合，构建可评估、可优化的ToM推理管道，是本文的方法学创新。与现有ToM基准（如MuMA-ToM、TOMATE等）仅关注人类角色心理状态的多选题评估不同，MindPower首次引入机器人中心视角和Level-3决策与行动层评估，填补了从心理推理到具身执行之间的空白。
 
-## 背景与动机
+
 
 ### 具身智能中的心理理论推理缺口
 
@@ -79,7 +79,9 @@ MindPower的核心贡献包括：
 
 通过这些设计，MindPower首次实现了从多模态感知到机器人中心辅助动作的端到端连贯推理，为具身智能体的社交认知能力提供了可量化、可优化的基准与方法。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MindPower 的核心创新在于将心理理论（Theory of Mind, ToM）从单纯的角色心理状态识别，推进到以机器人为中心的连贯推理与行动生成。其关键突破体现在三个维度。
 
@@ -118,7 +120,7 @@ $$R _ { \mathrm { M i n d } } = \alpha _ { 1 } R _ { \mathrm { a t o m i c } } +
 
 MindPower 采用**两阶段训练**策略，将监督微调与强化学习有机结合。第一阶段通过 SFT 使模型掌握 MindPower 推理层次的基本格式和推理逻辑；第二阶段利用 GRPO 结合 Mind-Reward 和 Format-Reward 进行策略优化，显式约束心理状态与行动的一致性。这种范式使模型在 MindPower Benchmark 上超越 GPT-4o：决策精度提升 12.77%，动作生成精度提升 12.49%，动作成功率（SR）从基座模型 Qwen2.5-VL-7B-Instruct 的 0.29 提升至 11.75。
 
-## 整体框架
+
 
 MindPower 构建了一个以机器人为中心（Robot-Centric）的心理理论推理与具身行动框架，其核心目标是将视觉-语言模型（VLM）从被动的感知与问答提升为能够自主推理自身与他人心理状态并据此生成连贯动作的具身智能体。该框架围绕三个关键设计展开：**MindPower 推理层次**（MindPower Reasoning Hierarchy）、**Mind-Reward 一致性优化**，以及**两阶段训练范式**。
 
@@ -196,7 +198,7 @@ MindPower 采用两阶段训练流程：
 ![[assets/figures/papers/paper_list_l2404_https_arxiv_org_abs_2511_23055/figures/022_Figure_14.jpg]]
 *Figure 14: Illustration of the Environment from Different Perspectives*
 
-## 核心模块与公式推导
+
 
 ### MindPower 推理层次：三层六步的认知流水线
 
@@ -272,7 +274,9 @@ $$\mathrm{AC} = \left\lfloor {\frac{|A^{*} \cap {\hat{A}}|}{|{\hat{A}}|}} \right
 ![[assets/figures/papers/paper_list_l2404_https_arxiv_org_abs_2511_23055/figures/009_Figure_7.jpg]]
 *Figure 7: Story Construction Pipeline for False-Belief Correction Task*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心定量结果
 
@@ -319,7 +323,9 @@ Figure 10 的雷达图从人类基线视角提供了参照：在错误信念纠�
 ![[assets/figures/papers/paper_list_l2404_https_arxiv_org_abs_2511_23055/figures/003_Figure_3.jpg]]
 *Figure 3: Robot-Centric MindPower Reasoning Hierarchy. Existing benchmarks, such as MuMA-ToM, include only Stage 1 and Stage 2 of the video, and focus solely on inferring the mental reasoning of the human (Alice) in the input video. Our dataset additionally includes Stage 3, where Alice returns to search for the item. Moreover, in Level-2 (Mental Reasoning) of MindPower, we infer the mental reasoning of both the embodied agent and the human, whereas existing ToM Benchmarks only infer the role’s mental state through multiple-choice questions. Detailed example is provided in Sec. B of the Supplementary Material*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 核心基线及其与 MindPower 的关系
 
@@ -365,6 +371,8 @@ MindPower 的定位是填补“从心理推理到具身行动”的空白。其�
 3. **隐式心理状态建模**：未来是否可以开发基于当前显式层次结构的隐式建模方法，在缩短推理长度的同时保持可解释性？这将直接回应推理效率的局限。
 
 此外，从方法谱系角度看，MindPower 的 Mind-Reward 框架与 **Visual-RFT**（Liu et al., 2024）和 **DeepSeek-Math**（Shao et al., 2024）的 GRPO 训练范式存在继承关系，但其将强化奖励显式分解为原子准确性、局部一致性和全局一致性的设计，为“推理一致性驱动强化学习”提供了可复用的模板。后续工作可探索将 Mind-Reward 的分解思想推广到其他需要结构化推理与行动对齐的具身任务中。
+
+
 
 ## 原文 PDF
 

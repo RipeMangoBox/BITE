@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/One_Step_Flow_Q_Learning_Addressing_the_Diffusion_Policy_Bottleneck_in_Offline_Reinforcement_Learning.pdf
+project_link: null
+code_link: null
 openreview_forum_id: 60VgwdzxDM
 aliases:
 - OSFQLO
@@ -42,7 +44,7 @@ claims:
 > - D4RL AntMaze (4 tasks) 上，Normalized Score (average) 为 84.6，对比 64.6 (DQL)，变化 +20.0。
 > - D4RL Kitchen (2 tasks) 上，Normalized Score (average) 为 67.0，对比 61.6 (DQL)，变化 +5.4。
 
-## 概述
+## 概要
 
 离线强化学习中，扩散策略（diffusion policy）通过多模态行为建模显著提升了策略表达能力，但其核心瓶颈在于**依赖多步去噪扩散模型（DDPM）生成动作**。这一设计导致两个连锁问题：推理时需迭代执行 $K$ 步反向链式采样（通常 $K=5\sim50$），决策频率受限；训练时需通过时间反向传播（BPTT）计算梯度，优化不稳定且收敛次优。
 
@@ -55,7 +57,7 @@ claims:
 
 **方法定位：** OFQL 属于行为正则化 Actor-Critic 框架下的策略改进，以流匹配的平均速度参数化替代扩散模型的噪声预测参数化。与蒸馏方案（如 FQL）不同，OFQL 直接训练单步策略而非从多步教师蒸馏，避免了额外的训练开销和精度损失。
 
-## 背景与动机
+
 
 ### 离线强化学习中的扩散策略范式
 
@@ -85,7 +87,9 @@ claims:
 
 简言之，OFQL将扩散策略的“多步弯曲去噪”替换为“单步直线流映射”，实现了效率与性能的统一。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：扩散策略的三重代价
 
@@ -137,7 +141,7 @@ $$a = T_\theta(\epsilon, s) = \epsilon - u_\theta(\epsilon, r=0, t=1; s), \quad 
 
 Table 2的消融实验揭示了OFQL单步性能的关键来源。DQL+DDIM（1步）直接使用DDIM跳跃采样，得分从87.9骤降至11.6；FBRAC（1步）通过行为正则化约束单步策略，仅达67.1；FQL（1步）依赖多步流策略蒸馏，得分为79.2。这些方法均未触及核心矛盾——**单步外推在弯曲流/扩散路径上的固有误差**。OFQL通过平均速度参数化从根本上解决了这一问题，在单步条件下达到92.6（+4.7 over DQL），证明其性能增益并非来自辅助技巧，而是参数化范式的结构性优势。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l40_https_openreview_net_forum_id_60VgwdzxDM/figures/002_Figure_2.jpg]]
 *Figure 2: Comparison between diffusion and flow matching. (a) Conditional flows arise from different (ϵ, x) pairs, resulting in varying conditional velocities. (b) Marginal velocity is obtained by averaging over these conditional velocities. (c) Flow paths are inherently curved, but average velocity fields enable direct one-step transport from noise to data. (d) Diffusion paths are also curved but noisy, making one-step denoising challenging. Note that all the velocities exhibit symmetry under time reversal. As the model is trained to parameterize the forward flow (from data to noise), inference inverts this direction to generate samples. Accordingly, for clarity, we plot the negative velocity vector...*
@@ -188,7 +192,7 @@ $$\mathcal{L}_{\mathrm{FBC}}(\theta) = \mathbb{E}_{t, r, r \leq t, (a, s) \sim \
 
 框架目前仅在D4RL离线基准的状态输入任务上验证，扩展到视觉观察任务需要更强的编码器设计。平均速度场的精确学习依赖MeanFlow恒等式中的瞬时速度估计，可能引入近似误差。此外，超参数（流比率 $\lambda$、平衡系数 $\eta$）仍需网格搜索。
 
-## 核心模块与公式推导
+
 
 ### 问题瓶颈与设计动机
 
@@ -262,7 +266,9 @@ $$\mathcal{L}(\theta) = \mathcal{L}_{\mathrm{FBC}}(\theta) - \alpha \mathbb{E}_{
 
 最小化平均速度匹配损失等价于最小化学得策略与行为分布之间的2-Wasserstein距离上界。这意味着OFQL在保持行为正则化效果的同时，通过非线性端点映射 $T_\theta$ 仍能建模复杂的多模态动作分布——单步生成不牺牲表达能力。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主结果：D4RL基准全面验证
 
@@ -346,7 +352,9 @@ Figure 7进一步验证：DDPM在1步去噪时完全失效，而u-param的单步
 
 ![[assets/figures/papers/paper_list_l40_https_openreview_net_forum_id_60VgwdzxDM/figures/027_Table_4.jpg]]
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与因果机制
 
@@ -410,6 +418,8 @@ OFQL的贡献在于将**MeanFlow建模**（Geng et al., 2025）首次引入离�
 3. **平均速度参数化是否可以推广到目标条件或多任务强化学习？** 将条件信息融入平均速度场可能实现零样本泛化，但需验证条件注入对单步生成质量的影响。
 
 4. **在更复杂的随机环境中，单步生成策略的鲁棒性边界是什么？** 单步确定性映射可能在高熵场景下丢失必要的随机性，需要研究是否可通过噪声注入或混合策略弥补。
+
+
 
 ## 原文 PDF
 

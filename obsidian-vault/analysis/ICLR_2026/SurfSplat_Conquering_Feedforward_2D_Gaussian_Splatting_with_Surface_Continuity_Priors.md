@@ -41,7 +41,7 @@ claims:
 > - RealEstate10K 上，PSNR (标准256×256) 27.537 (SurfSplat-Ours-L) vs 27.504 (DepthSplat) (+0.033)；PSNR (1024×1024 HRRC) 24.897 (SurfSplat-Ours-L) vs 16.385 (DepthSplat) (+8.512)。
 > - ACID 上，PSNR (标准256×256) 28.336 (SurfSplat-Ours) vs 28.202 (MVSplat) (+0.134)。
 
-## 概述
+## 概要
 
 **核心问题**：前馈式三维高斯溅射（3DGS）方法在稀疏视图输入下，逐像素独立预测高斯原语，缺乏对场景几何结构的显式利用。仅依赖图像重建损失难以解耦几何与外观，导致生成的场景表面不连续、存在空洞和颜色偏差，在近距离或离轴视角下尤为严重。
 
@@ -51,7 +51,7 @@ claims:
 
 **方法谱系与知识库定位**：SurfSplat 延续了前馈式高斯溅射的研究脉络，与 **PixelSplat**（Charatan et al., 2024）、**MVSplat**（Chen et al., 2024b）、**TranSplat**（Zhang et al., 2025）、**HiSplat**（Tang et al., 2024）和 **DepthSplat**（Xu et al., 2024b）等方法构成直接比较。区别于上述方法使用 3D 高斯椭球体且由网络直接预测旋转与尺度，SurfSplat 转而采用 2D 高斯面元，并通过几何推导获得旋转与各向异性尺度，从表示层面引入表面连续性归纳偏置。在编码器设计上，SurfSplat 与 DepthSplat 共享相同的双路骨干网络（单目分支使用 Depth Anything V2 的 ViT，多视图分支使用轻量 ResNet 与 Swin Transformer 构建代价体），保证了对比的公平性——标准分辨率下指标相当，而高分辨率下优势显著，说明性能提升源于所提出的表面连续性先验与强制 Alpha 混合，而非编码器或训练技巧的差异。
 
-## 背景与动机
+
 
 ### 问题背景：前馈式新视角合成中的几何-外观解耦困境
 
@@ -79,7 +79,9 @@ $$f _ { \theta } : \{ ( I ^ { v } , \mathbf { k } ^ { v } , \mathbf { T } ^ { v 
 
 通过将 2D 高斯面元（2D Gaussian Surfels, 2DGS）作为场景表示基元，并联合上述两项创新，SurfSplat 能够在稀疏输入条件下重建出几何连续、纹理逼真的三维表面，尤其在高分辨率渲染场景下展现出显著优势。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SurfSplat 的核心创新在于通过两个相互协同的机制，系统性解决了前馈式高斯溅射方法中“高斯原语彼此独立、无法利用各向异性结构”的根本瓶颈。这两个机制分别从**几何初始化**和**梯度传播**两个维度切入，共同实现了连续、无偏的表面重建。
 
@@ -138,7 +140,7 @@ $$C = \begin{cases} C, & \bar{\alpha} < \tau_\alpha, \\ \frac{C}{\bar{\alpha}}, 
 
 SurfSplat 采用与 **DepthSplat** (Xu et al., 2024b) 相同的编码器骨干和训练设置。在标准 256×256 分辨率下，SurfSplat-L 的 PSNR 为 27.537 dB，与 DepthSplat 的 27.504 dB 基本持平（Table 1）；但在 1024×1024 HRRC 下，SurfSplat-L 达到 24.897 dB，领先 DepthSplat 8.512 dB。这一对比表明，性能增益完全来源于提出的表面连续性先验和强制 alpha 混合，而非编码器容量或训练技巧的差异。
 
-## 整体框架
+
 
 SurfSplat 是一个前馈式 2D 高斯溅射框架，其核心目标是从稀疏输入视图直接预测连续、几何一致的 3D 场景表示。图 2 给出了模型的整体架构。系统接收 $V$ 张已知相机内外参的输入图像，经双路编码器提取特征后，由 2D U-Net 回归中间属性，最终通过高斯处理器将中间属性转化为标准的 2D 高斯原语参数，用于可微分渲染。
 
@@ -175,7 +177,7 @@ SurfSplat 是一个前馈式 2D 高斯溅射框架，其核心目标是从稀疏
 ![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_o1sF4XaFdY/figures/002_Figure_2.jpg]]
 *Figure 2: Illustration for model architecture. Given sparse input images, our dual-path encoder processes them through both single-view and multi-view branches. The fused features are passed through a U-Net to predict intermediate attributes, including depth, scale multipliers, and appearance components. Finally, these intermediates are converted into standard Gaussian attributes using our surface continuity prior and forced alpha blending strategy*
 
-## 核心模块与公式推导
+
 
 ### 前馈高斯预测框架
 
@@ -238,7 +240,9 @@ $$C = \left\{ { \begin{array} { l l } { C , } & { \alpha < \tau _ { \alpha } , }
 
 该策略确保所有深度层的高斯均参与训练并保持梯度贡献，使模型在优化过程中不会陷入局部最优，从而实现连续且无偏的表面重建。消融实验（Table 4）表明，同时移除表面连续性先验和强制alpha混合后，1024×1024 HRRC PSNR 从 24.535 降至 18.563（w/o FAB,SCP），验证了二者协同的必要性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 SurfSplat的实验设计围绕一个核心主张展开：**表面连续性先验与强制alpha混合**是解决前馈式高斯溅射中几何-外观解耦困难的关键。评估体系在标准新视角合成指标之外，引入了**高分辨率渲染一致性（HRRC）**指标，以显式暴露低分辨率下被掩盖的几何缺陷。
 
@@ -318,7 +322,9 @@ SurfSplat的贡献揭示了一个更深层的问题：**前馈式重建中，几
 ![[assets/figures/papers/paper_list_l42_https_openreview_net_forum_id_o1sF4XaFdY/figures/013_Table_7.jpg]]
 *Table 7: Quantitative performance of the high-resolution model*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与前馈式高斯溅射方法的关系
 
@@ -363,6 +369,8 @@ SurfSplat 的适用边界由以下约束条件定义：
 3. **表面连续性先验能否推广到动态场景**？当前方法假设场景是静态的，表面连续性先验基于图像空间邻域关系推导。对于动态场景（如包含运动物体的视频），如何在时序维度上扩展该先验，实现时空一致的表面重建，是一个值得探索的方向。
 
 4. **HRRC 指标能否成为前馈式重建的标准评估协议**？SurfSplat 提出的高分辨率渲染一致性（HRRC）指标有效暴露了传统指标无法捕捉的几何空洞和稀疏性问题。其在 DL3DV 高分辨率数据集上的排序与原生评估结果一致（Table 5），初步验证了其可靠性。但该指标是否应被社区广泛采纳作为几何质量的代理指标，仍需更多独立验证和标准化讨论。
+
+
 
 ## 原文 PDF
 

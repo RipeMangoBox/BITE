@@ -5,6 +5,8 @@ paper_level: A
 venue: "SIGGRAPH Asia"
 year: 2024
 pdf_ref: paperPDFs/SIGGRAPH_ASIA_2024/Robust_Symmetry_Detection_via_Riemannian_Langevin_Dynamics.pdf
+project_link: https://symmetry-langevin.github.io/
+code_link: null
 aliases:
 - RLDBSD
 - RSDRLD
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 基于黎曼流形上朗之万动力学的鲁棒对称性检测 |
 | 英文题名 | Robust Symmetry Detection via Riemannian Langevin Dynamics |
 | 会议/期刊 | SIGGRAPH Asia 2024 |
-| Links | [paper](https://arxiv.org/abs/2410.02786); [Project](https://symmetry-langevin.github.io/) |
+| Links | [paper](https://arxiv.org/abs/2410.02786) · [Project](https://symmetry-langevin.github.io/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Riemannian Langevin Dynamics-based Symmetry Detection |
 | Dataset | 3D shapes (from PRS-Net, varying noise), 2D font shapes (varying noise) |
@@ -40,7 +42,7 @@ claims:
 > - 3D shapes (from PRS-Net, varying noise) 上，F1 score 为 0.745 (0%), 0.677 (1%), 0.440 (3%)，对比 Best among Mitra/PRS-Net/E3Sym (values not provided in prompt)，变化 Higher。
 > - 2D font shapes (varying noise) 上，F1 score 为 0.576 (0%), 0.540 (1%), 0.481 (3%), 0.443 (5%)，对比 Mitra et al.: 0.602 (0%), 0.208 (1%), 0.287 (3%), 0.347 (5%)，变化 Δ: -0.026, +0.332, +0.194, +0.096。
 
-## 概述
+## 概要
 
 反射对称性是几何处理中的基础结构，但现有检测方法面临一个核心瓶颈：**传统投票法对噪声敏感，而基于学习的方法依赖昂贵标注且难以处理部分对称性**。本文提出一种基于黎曼流形上退火朗之万动力学（Annealed Langevin Dynamics）的对称性检测框架，核心洞察在于发现均值漂移（Mean-Shift）与朗之万动力学在密度估计上的内在联系——二者均为梯度爬坡，但朗之万动力学通过随机性和多尺度噪声退火能更鲁棒地探索模式。
 
@@ -48,7 +50,7 @@ claims:
 
 **主要结果**：在3D形状的反射对称检测中，本方法在0%、1%、3%噪声水平下的F1分数均优于**PRS-Net**（Gao et al., IEEE TVCG 2020）和**E3Sym**（Li et al., ICCV 2023）等无监督学习基线；在2D字体形状上，随着噪声增加，本方法相对Mitra et al.的优势从-0.026扩大至+0.332（1%噪声），展现出显著的噪声鲁棒性优势。消融实验表明，朗之万步数从1K增至50K时F1从0.759提升至0.857，验证了退火采样的关键作用。
 
-## 背景与动机
+
 
 ### 对称性检测的核心问题
 
@@ -72,7 +74,9 @@ claims:
 
 基于这一洞察，本文提出将反射对称性检测重新定义为：在**黎曼流形上的变换空间**中，利用**退火朗之万动力学**进行模式寻找。与传统方法相比，这一框架无需训练数据，却能显著提升噪声鲁棒性，并同时捕获全局和部分对称性（Fig. 1 展示了在不同噪声水平下的检测效果）。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 本文的核心创新在于将**生成模型中的模式寻找机制**引入传统几何处理管线，建立起均值漂移与朗之万动力学之间的理论桥梁，并据此在反射对称性的变换空间上构造了一个无需训练、对噪声高度鲁棒的检测框架。具体而言，创新体现在以下三个层面的**changed slots**上。
 
@@ -106,7 +110,7 @@ $$ x^{(t+1)} \gets x^{(t)} + \alpha_t \nabla_x \log P_{\sigma_t}(x^{(t)}) + \sqr
 
 上述创新主要针对**反射对称性**设计。论文展示了向平移和旋转对称性的初步扩展（Fig. 11），但缺乏系统的定量验证。此外，得分函数基于经验核密度估计而非学习得到，可能限制对复杂噪声模式的建模能力。这些构成了方法在当前版本中的能力边界。
 
-## 整体框架
+
 
 本方法将反射对称性检测重新表述为**变换空间中的模式寻找问题**，并利用黎曼流形上的退火朗之万动力学替代传统的均值漂移聚类，从而在噪声环境下实现鲁棒的全局与部分对称性检测。整个pipeline由六个核心模块串联构成，形成从点对采样到对称性输出的完整推理链路。
 
@@ -148,7 +152,7 @@ $$ x^{(t+1)} \gets x^{(t)} + \alpha_t \nabla_x \log P_{\sigma_t}(x^{(t)}) + \sqr
 ![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2410_02786/figures/012_Figure_11.jpg]]
 *Figure 11: We show that our pipeline can be extended to translation and rotational symmetries. For translation, we identify global negative (a) and local positive shifts (b, c). For rotation, we identify global (a) and local rotational axis (b, c, d). The transformation space (left) and the identified modes (right) for both symmetry types are shown*
 
-## 核心模块与公式推导
+
 
 ### 对称性的形式化定义
 
@@ -208,7 +212,9 @@ $$\nabla _ { x } \log P _ { \sigma } ( x ) \approx \left( \frac { \sum _ { y \in
 
 算法流程（Algorithm 1）为：从随机初始化的样本点出发，在逐渐降低的噪声水平 $\{\sigma_t\}$ 下迭代执行朗之万更新。噪声退火策略使采样过程先探索全局结构（大 $\sigma$），再精细定位局部模式（小 $\sigma$）。收敛后的样本点通过 DBSCAN 聚类提取模式质心，每个质心对应一个检测到的对称平面。最后通过区域生长验证每个对称性对应的形状支持区域，滤除显著性低于阈值 $\tau$ 的虚假检测。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -281,7 +287,9 @@ Fig. 6 可视化了朗之万动力学在变换空间中的完整轨迹及其在�
 ![[assets/figures/papers/paper_list_l16_https_arxiv_org_abs_2410_02786/figures/017_Table.jpg]]
 *Table: A3. Ablation study on the impact of DBSCAN*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 方法谱系：从投票聚类到生成式模式寻找
 
@@ -327,6 +335,8 @@ Fig. 6 可视化了朗之万动力学在变换空间中的完整轨迹及其在�
 3. **数据驱动融合**：能否构建大规模、细粒度的对称性标注数据集，使基于学习的方法与基于得分的无训练方法形成互补，实现半监督或自监督的对称性检测？
 4. **自适应参数选择**：如何根据输入形状的噪声水平和几何复杂度，自动确定最优的朗之万步数、噪声调度和聚类阈值？
 5. **真实噪声鲁棒性**：在真实传感器噪声（如扫描缺失、离群点、非均匀采样）下的鲁棒性如何？需要更贴近实际应用的评估协议。
+
+
 
 ## 原文 PDF
 

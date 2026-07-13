@@ -44,7 +44,7 @@ claims:
 > - DPGBench 上，Global 1B: 84.46 / 7B: 85.61。
 > - GenEval 上，Overall 1B: 0.76 / 7B: 0.83。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -67,7 +67,7 @@ OSPO的关键改动槽位包括：偏好数据构建策略从Best-of-N采样改�
 
 在T2I-CompBench++上，OSPO在1B和7B尺度上均优于所有自改进基线，并在Complex类别取得最高分（7B: 0.4147）。在DPGBench上，OSPO在统一MLLMs中取得最佳全局得分（7B: 85.61），并在GenEval上总体得分最高（7B: 0.83）。消融实验证实，对象加权SimPO损失和SFT损失的组合是关键，移除任一组件均导致性能下降。过滤和选择策略结合密化显著提升性能，在T2I-Compbench++ attribute上达到0.756，GenEval overall达到0.831。此外，OSPO在达到更高基准性能的同时，比SILMM更省时，展现出优秀的性能-效率权衡。
 
-## 背景与动机
+
 
 文本到图像（T2I）生成领域近年来取得了显著进展，但**对象幻觉**（object hallucination）——即生成图像中对象遗漏、扭曲或属性错误——仍是制约其可靠性的核心瓶颈。这一问题在统一多模态大语言模型（MLLM）中尤为突出：尽管统一架构实现了文本与视觉模态的深度融合，其自回归解码机制却难以维持跨模态的细粒度对象级对齐。
 
@@ -75,7 +75,9 @@ OSPO的关键改动槽位包括：偏好数据构建策略从Best-of-N采样改�
 
 上述缺口指向一个关键瓶颈：**缺乏精确的对象级差异信号**。自改进框架若不能显式构造“全局语义一致但对象细节不同”的偏好对，便无法将优化压力聚焦于真正导致幻觉的视觉标记。OSPO 的动机正是填补这一空白——通过对象中心的自改进偏好优化，将模型注意力引导至对象相关区域，直接强化细粒度对齐，从而系统性地抑制对象幻觉。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 OSPO 的核心创新在于**将对象中心的细粒度信号系统性地注入自改进偏好优化的全流程**，从而解决统一多模态大语言模型（MLLM）在文本到图像生成中普遍存在的对象幻觉问题。与现有自改进方法相比，OSPO 在三个关键维度上实现了根本性改变。
 
@@ -126,7 +128,7 @@ $$
 
 这三项改变的因果链路是：**精确的对象中心偏好数据 → 注意力驱动的对象掩码 → 对象加权的优化信号**。任何一环的缺失都会导致性能退化，消融实验（Table 3, Table 4）为这一因果链提供了高置信度的证据支持。
 
-## 整体框架
+
 
 OSPO 是一个面向统一多模态大语言模型（MLLM）的对象中心自改进偏好优化框架，旨在缓解文本到图像生成中的对象幻觉问题。其核心设计理念是：**通过自生成的对象中心偏好数据，显式构造全局语义一致但对象细节不同的偏好对，并利用对象加权损失引导模型聚焦于对象相关视觉标记**。整个框架分为五个阶段，形成闭环的自改进流程（图2）。
 
@@ -151,7 +153,7 @@ OSPO 是一个面向统一多模态大语言模型（MLLM）的对象中心自�
 ![[assets/figures/papers/paper_list_l2193_https_arxiv_org_abs_2506_02015/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of OSPO framework: (Stage 1) The MLLM generates a set of base text prompts. (Stage 2) For each base prompt, the model generates multiple perturbed variants using three strategies (Replace, Swap, and Drop) and each original–perturbed pair is jointly densified. Each pair of original and perturbed prompt is pairwise densified by the MLLM. (Stage 3) The MLLM generates candidate preferred and non-preferred images from each densified prompt pair. (Stage 4) The model constructs atomic decompositional VQA questions and evaluates each candidate image’s prompt fidelity using the Self-VQA alignment score S, filtering out noisy supervision and selecting a single final image pair. (Stage 5) The...*
 
-## 核心模块与公式推导
+
 
 OSPO 框架围绕“对象中心的自改进偏好优化”这一核心思想，构建了五个协同工作的关键模块。以下逐一解析各模块的设计动机、操作机制及其对应的核心公式。
 
@@ -206,7 +208,9 @@ $$\mathcal{L}_{\mathrm{OSPO}} = \mathcal{L}_{\mathrm{Obj-SimPO}} + \lambda\mathc
 ![[assets/figures/papers/paper_list_l2193_https_arxiv_org_abs_2506_02015/figures/005_Figure_4.jpg]]
 *Figure 4: Category-wise comparison of preference-null image pairs between the (Left) Best-of-N baseline and (Right) our OSPO strategy. Lower is better*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 OSPO 在三个具有代表性的文本到图像（T2I）生成基准上接受了系统评估：T2I-CompBench++（细粒度组合对齐）、DPGBench（密集提示图对齐）和 GenEval（对象生成与属性绑定）。实验以 Janus-Pro-1B 和 Janus-Pro-7B 作为统一多模态大语言模型（MLLM）骨干，训练数据集由 20,000 条涵盖属性、布局、非空间关系和复杂组合四类语义的文本提示构成。
 
@@ -256,7 +260,9 @@ Figure 6 对比了不同偏好优化框架的性能-效率权衡。OSPO 在 T2I-
 ![[assets/figures/papers/paper_list_l2193_https_arxiv_org_abs_2506_02015/figures/008_Figure_5.jpg]]
 *Figure 5: (Left) Effect of sample size on T2I-Compbench++ (attribute) and GenEval (overall) scores. (Right) Effect of candidate image pair size on T2I-Compbench++ (attribute) and GenEval (overall) scores. Higher is better for all benchmarks*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与现有自改进方法的对比
 
@@ -285,6 +291,8 @@ OSPO 的核心定位是**面向对象中心的细粒度自改进偏好优化**�
 **跨模型泛化能力。** 当前实验仅在同一架构的不同规模（1B/7B）上验证，OSPO 生成的偏好数据是否可迁移至其他 MLLM 架构（如 LLaVA 系列）训练，尚缺乏实验证据。
 
 **对象幻觉的量化归因。** 虽然 OSPO 在多个基准上取得了最优或次优成绩（Table 1、Table 2），但论文未将性能提升分解为“对象遗漏减少”、“属性错误减少”、“空间关系改善”等细粒度归因，难以判断 OSPO 对不同类型幻觉的缓解程度是否均衡。
+
+
 
 ## 原文 PDF
 

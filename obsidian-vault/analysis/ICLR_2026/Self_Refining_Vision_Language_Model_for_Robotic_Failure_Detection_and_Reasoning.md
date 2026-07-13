@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Self_Refining_Vision_Language_Model_for_Robotic_Failure_Detection_and_Reasoning.pdf
+project_link: https://sites.google.com/utexas.edu/armor
+code_link: null
 openreview_forum_id: jr9hGWQioP
 aliases:
 - AARBMTMRFDR
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 自我精炼的视觉语言模型用于机器人故障检测与推理 |
 | 英文题名 | Self-Refining Vision Language Model for Robotic Failure Detection and Reasoning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=jr9hGWQioP); [Project](https://sites.google.com/utexas.edu/armor) |
+| Links | [paper](https://openreview.net/forum?id=jr9hGWQioP) · [Project](https://sites.google.com/utexas.edu/armor) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | ARMOR (Adaptive Round-based Multi-task mOdel for Robotic failure detection and reasoning) |
 | Dataset | RLBench, Sparrow, Maniskill (R→M) |
@@ -42,7 +44,7 @@ claims:
 > - RLBench 上，LLM Fuzzy 为 0.718，对比 0.550 (SFT-S+D) / 0.473 (Claude-3.7)，变化 +0.168 / +0.245。
 > - Sparrow 上，Detect Acc. 为 0.733，对比 0.620 (SFT-S+D) / 0.517 (Claude-3.7)，变化 +0.113 / +0.216。
 
-## 概述
+## 概要
 
 机器人系统在开放环境中执行操作任务时，不可避免地会遭遇各种故障。及时检测故障并给出可理解的推理，对于提升机器人自主性和人机协作效率至关重要。然而，训练高质量的故障推理模型面临一个核心瓶颈：**数据异质性**。大规模的二值故障标签（成功/失败）可从系统日志中自动获取，但细粒度的自然语言推理标注极其昂贵且稀缺。现有方法要么将推理简化为预定义故障模式的封闭集分类，丧失对未见故障的描述能力；要么要求全套稠密标注进行标准监督微调，无法在异构监督下联合实现精确检测与开放集推理。
 
@@ -60,7 +62,7 @@ ARMOR 的方法定位与主要贡献如下：
 
 - **局限与展望**：推理偶尔漂移到语义相关但错误的原因（如将物品损坏误判为碰撞）；极端稀疏数据比例（30:1）下推理质量显著下降；精炼轮次增多带来额外计算开销。未来方向包括引入结构化故障属性作为中间监督、融合多模态传感信号、以及探索可学习的停止策略以优化效率与精度的权衡。
 
-## 背景与动机
+
 
 机器人系统的自主故障检测与推理是实现可靠自动化操作的关键能力。在实际部署中，机器人不仅需要判断任务是否失败（检测），更需要以自然语言解释失败的原因（推理），从而为后续的恢复策略或人工干预提供可操作的语义信息。然而，训练同时具备精确检测与细粒度推理能力的模型面临一个核心瓶颈：**数据异质性**。
 
@@ -73,7 +75,9 @@ ARMOR 的方法定位与主要贡献如下：
 
 ARMOR（Adaptive Round-based Multi-task mOdel for Robotic failure detection and reasoning）正是针对上述缺口提出的解决方案。其核心洞察是：将故障检测和推理建模为一个**多轮序列精炼过程**，通过多任务预测头将检测与推理解耦，同时利用离线模仿与在线精炼在异构数据上迭代改进预测。这一设计使得模型能够在多轮交互中逐步减少检测与推理之间的不一致性，提升推理质量，从而兼顾检测精度与开放式推理的表达力。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ARMOR的核心创新在于将机器人故障检测与推理重新建模为一个**多轮、多任务的序列精炼问题**，并通过三个相互协同的机制设计，解决了异构监督下联合精确检测与开放集推理的瓶颈。
 
@@ -104,7 +108,7 @@ ARMOR在推理时生成多条精炼轨迹，每轮基于前一轮的检测和推
 
 上述三个创新点并非孤立生效，而是形成了完整的闭环：多任务头提供了检测与推理的解耦基础，离线-在线训练赋予了模型在异构标签下自我纠错的能力，熵驱动精炼则在推理时将这种能力转化为可观测的性能增益。三者缺一不可，共同构成了ARMOR相较于现有监督微调基线和闭源VLM的核心优势。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l45_https_openreview_net_forum_id_jr9hGWQioP/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of ARMOR. (a) Our failure data consist of heterogeneous supervision, with large-scale binary detection labels and scarce free-form reasoning labels. (b) A vision-language model (VLM) with multitask heads jointly predicts detection l via a classification head and reasoning e via a language decoder, trained with binary cross-entropy (BCE) and next-token prediction (NTP) losses. (c) We fine-tune the VLM with both offline imitation and online refinement: the model conditions on dataset labels ( l , e ) or its prior predictions (ˆl, eˆ) as well as auxiliary prompts p to generate a new round of outputs. In online refinement, this process is repeated T times. The model’s predictions (deno...*
@@ -149,7 +153,7 @@ $$\mathcal{C}^{(m)} = \mathcal{H}_{\mathrm{det}}^{(m)} + \lambda \mathcal{H}_{\m
 
 这一设计使模型能够在多轮中逐步降低不确定性：检测头提供相对可靠的分类信号，推理头据此修正语义细节；同时，推理文本中的上下文信息也可反向辅助检测决策的校准。实验表明，第一轮精炼即可带来40%以上的推理质量相对提升，且熵值随轮次持续下降，验证了自置信度引导的有效性。
 
-## 核心模块与公式推导
+
 
 ARMOR 将故障检测与推理建模为一个多轮多任务精炼过程，其核心架构由三个紧密耦合的模块组成：多任务预测头、两阶段训练算法，以及基于熵的自置信度推理精炼。
 
@@ -181,7 +185,9 @@ $$\mathcal{C}^{(m)} = \mathcal{H}_{\mathrm{det}}^{(m)} + \lambda \mathcal{H}_{\m
 
 其中 $\mathcal{H}_{\mathrm{det}}^{(m)}$ 为第 $m$ 条轨迹的检测熵，$\mathcal{H}_{\mathrm{reason}}^{(m)}$ 为推理熵，$\lambda$ 为加权系数。每轮选择 $\mathcal{C}^{(m)}$ 最低的轨迹作为当前最优，并在熵不再下降时终止精炼。该机制使得模型在多轮中持续降低不确定性，同时提升检测与推理的一致性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与实验动机
 
@@ -244,7 +250,9 @@ $$\mathcal{C}^{(m)} = \mathcal{H}_{\mathrm{det}}^{(m)} + \lambda \mathcal{H}_{\m
 
 ARMOR在异构监督下实现了检测精度与开放式推理质量的联合最优，多任务预测头解耦、离线-在线混合训练和基于熵的自精炼三者缺一不可。第一轮精炼即可带来超过40%的推理相对提升，且计算开销可控。跨域迁移实验证明了该方法在实际部署中利用少量目标域标注快速适应的潜力。主要局限在于极端稀疏标注下的推理退化，以及缺乏结构化故障属性引导时可能发生的语义漂移。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与先前工作的关系
 
@@ -281,6 +289,8 @@ ARMOR 在机器人故障检测与推理的交叉点上，与三类工作形成�
 5. **纯稀疏域的开放集推理。** 在完全没有稠密标注的领域，ARMOR 当前无法赋予模型推理能力。能否通过无监督或自监督手段（如利用 VLM 的预训练知识进行零样本推理，再通过检测一致性进行筛选）在纯稀疏域中引导出初步的开放集推理，并随着稠密数据的逐步积累持续改进？
 
 6. **跨任务泛化。** ARMOR 当前聚焦于故障检测与推理。其多轮精炼框架是否可拓展到其他协同任务，如安全违规预测、恢复策略生成，甚至更广泛的多模态推理链场景？这需要验证方法在任务类型和输出空间发生显著变化时的结构可迁移性。
+
+
 
 ## 原文 PDF
 

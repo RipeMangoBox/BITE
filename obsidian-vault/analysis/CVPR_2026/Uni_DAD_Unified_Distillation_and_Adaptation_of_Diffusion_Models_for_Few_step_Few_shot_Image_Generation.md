@@ -44,7 +44,7 @@ claims:
 > - FSIG (Sunglasses 10-shot) 上，FID 24.45 vs CRDI (24.62) (-0.17)。
 > - FSIG (MetFaces 10-shot) 上，FID 58.13 vs FT-DMD2 (63.25) (-5.12)。
 
-## 概述
+## 概要
 
 **问题瓶颈**：在仅给定 ≤10 张目标域图像且要求 ≤4 步采样的约束下，现有方法多采用两阶段流水线——先蒸馏后适应（Distill-then-Adapt）或先适应后蒸馏（Adapt-then-Distill）。然而，蒸馏后的学生模型容易饱和，后续微调难以注入目标域结构；先微调再蒸馏则易导致过拟合，使生成结果过度平滑、纹理缺失，且多样性显著下降。核心矛盾在于：如何在保留源域丰富先验的同时，高效注入目标域的真实结构。
 
@@ -61,7 +61,7 @@ claims:
 
 **方法定位**：Uni-DAD 属于扩散模型蒸馏与少样本领域适应的交叉方向，与 **DMD2** 等分布匹配蒸馏方法、**DreamBooth**（Ruiz et al., CVPR 2023）等主题驱动微调方法、以及 **CRDI**、**DDPM-PA** 等少样本适应方法形成对比。其单阶段统一训练的范式区别于现有的两阶段流水线，为极低步数、极少样本条件下的图像生成提供了新的技术路径。
 
-## 背景与动机
+
 
 扩散模型在图像生成领域取得了显著进展，但其推理过程通常需要数十甚至上百步去噪采样，计算开销巨大。分布匹配蒸馏（Distribution Matching Distillation, DMD）技术通过将多步教师模型压缩为少步学生模型，有效缓解了这一问题。然而，当面对特定目标域（如特定物体、稀有类别或艺术风格）且仅有极少量样本（≤10 张）可用时，现有方法陷入了两难困境。
 
@@ -71,7 +71,9 @@ claims:
 
 **本文动机。** 针对上述困境，Uni-DAD 提出将蒸馏与适应统一在单阶段训练框架中，核心思路是：通过双域分布匹配蒸馏（Dual-domain DMD）损失同时引导生成器逼近源域分布与目标域分布，并联合多尺度生成对抗网络（Multi-head GAN）损失进行协同优化。源域教师提供稳定的多样性保持信号，目标域教师促进结构适应，多级特征判别器则抑制过拟合、增强局部细节真实性。这一设计使得模型能够在仅用 ≤4 步采样和 ≤10 张目标图像的条件下，实现高质量、高多样性的个性化生成。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Uni-DAD 的核心创新在于**将扩散模型的蒸馏与领域适应统一为单阶段训练框架**，并引入**双域分布匹配蒸馏（Dual-domain DMD）**与**多头生成对抗网络（Multi-head GAN）**的协同优化机制，从而在极低采样步数（NFE ≤ 4）和极少目标样本（≤ 10 张）的双重约束下，同时实现高质量与高多样性的目标域生成。
 
@@ -113,7 +115,7 @@ Uni-DAD 支持**预蒸馏源模型作为学生初始化**（检查点无关）�
 
 这些创新协同作用，使 Uni-DAD 在 FSIG 基准上以 **3 步采样**获得了优于非蒸馏方法（≥ 25 步）的 FID（Table 1），在 SDP 基准上以 **1 步采样**取得了与 DreamBooth 微调（100 步）相当的身份保持和文本对齐能力（Table 3, Figure 6），同时将 5K 样本的推理时间从 35 分钟降至 **4.2 分钟**，TFLOPs/img 从 55.7 降至 **2.2**（Table 2）。
 
-## 整体框架
+
 
 Uni-DAD 将扩散模型的蒸馏与领域适应统一在一个单阶段训练框架中，核心目标是仅用 ≤4 步采样和 ≤10 张目标域图像，实现高质量、高多样性的个性化生成。其整体 pipeline 围绕三个关键模块的交替更新展开，如 Figure 2 所示。
 
@@ -154,7 +156,7 @@ Uni-DAD 将扩散模型的蒸馏与领域适应统一在一个单阶段训练框
 ![[assets/figures/papers/paper_list_l950_https_arxiv_org_abs_2511_18281/figures/001_Figure_1.jpg]]
 *Figure 1: Uni-DAD (Distill & Adapt) vs. two-stage pipelines, Distill-then-Adapt , and Adapt-then-Distill Adapt is performed by fine-tuning, and Distill by DMD2 [48]. The source domain is represented by 70K diverse faces, and the target domain by 10 babies. Sampling steps are reduced from 25 to 3*
 
-## 核心模块与公式推导
+
 
 Uni-DAD 的训练框架由五个核心模块与三个交替更新的损失函数构成，其设计目标是在单阶段训练中同时完成分布蒸馏与领域适应。
 
@@ -227,7 +229,9 @@ $$
 ![[assets/figures/papers/paper_list_l950_https_arxiv_org_abs_2511_18281/figures/016_Figure_9.jpg]]
 *Figure 9: Qualitative ablation of the dual-domain DMD weighting factor a for SDP across prompts on a live subject and an object*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 实验设置
 
@@ -306,7 +310,9 @@ Table 7 对比了不同 GAN 损失函数在多头设置下的表现。二元交�
 
 在结构差异极大的目标域上，Uni-DAD 可能牺牲一定多样性以换取更好的结构适应。在线目标教师训练增加了约 21% 的峰值显存占用。当目标域与源域差距较大时，权重因子 a 需仔细手动调节，缺乏自适应机制。目前仅在 DDPM 和 SDv1.5 两个骨干上验证，扩展到更大模型及视频、音频等模态尚未探索。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题定位：蒸馏与适应的两阶段困境
 
@@ -363,6 +369,8 @@ Uni-DAD 的核心创新在于将蒸馏与适应**统一为单阶段训练框架*
 3. **多概念与风格适应**：Uni-DAD 是否适用于更开放式的文本到图像生成任务，例如同时适应多个概念或风格？这需要扩展双域 DMD 到多域分布匹配。
 4. **大规模模型验证**：在 SD3、Flux 等更大规模扩散模型上训练并评估 Uni-DAD 的性能，验证方法的可扩展性。
 5. **极端少样本稳定性**：单阶段训练是否会对极端少样本（1-shot）或极低 NFE（1-step）下的生成带来不稳定性？Table 4 显示 NFE=1 时 FID 显著升高（Babies 上 98.52），需要进一步分析失效模式。
+
+
 
 ## 原文 PDF
 

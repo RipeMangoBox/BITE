@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/MomaGraph_State_Aware_Unified_Scene_Graphs_with_Vision_Language_Models_for_Embodied_Task_Planning.pdf
+project_link: https://HybridRobotics.github.io/MomaGraph/
+code_link: null
 openreview_forum_id: 3eTr9dGwJv
 aliases:
 - MR
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | MomaGraph：面向具身任务规划的状态感知统一场景图与视觉-语言模型 |
 | 英文题名 | MomaGraph: State-Aware Unified Scene Graphs with Vision-Language Models for Embodied Task Planning |
 | 会议/期刊 | ICLR 2026 (Oral) |
-| Links | [paper](https://openreview.net/forum?id=3eTr9dGwJv); [Project](https://HybridRobotics.github.io/MomaGraph/) |
+| Links | [paper](https://openreview.net/forum?id=3eTr9dGwJv) · [Project](https://HybridRobotics.github.io/MomaGraph/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/vision_models_multimodal |
 | Method | MomaGraph-R1 |
 | Dataset | MomaGraph-Bench, BLINK (visual correspondence), MomaGraph-Bench (correspondence subset) |
@@ -42,7 +44,7 @@ claims:
 > - MomaGraph-Bench 上，Overall Accuracy (%) - best closed source 为 71.6，对比 73.9 (Claude-4.5-Sonnet w/ Graph)，变化 -2.3。
 > - BLINK (visual correspondence) 上，Accuracy (%) 为 63.5 (MomaGraph-R1)，对比 58.7 (Qwen2.5-VL-7B-Instruct)，变化 +4.8。
 
-## 概述
+## 概要
 
 具身任务规划要求机器人理解场景中的物体、部件及其空间与功能关系，并据此生成可执行的动作序列。然而，现有方法面临一个关键瓶颈：场景图通常将空间关系与功能关系分离处理，忽略零件级交互元素和物体状态的时间变化，且与当前任务的相关性不足，导致规划缺乏可靠的结构化知识基础。
 
@@ -58,7 +60,7 @@ MomaGraph 针对上述问题提出了一个统一框架，其核心思想是将�
 
 当前方法仍存在若干局限：评估局限于单房间场景，多视角图像需人工采集，动态更新依赖实际执行而非反事实推理，且仅输出高层动作序列而未生成低层控制命令。这些方向为后续工作留下了明确的拓展空间。
 
-## 背景与动机
+
 
 具身任务规划要求机器人在复杂环境中理解场景、推理物体间关系，并生成可执行的动作序列。现有方法通常采用端到端的直接规划范式，即从多视角图像和语言指令直接预测动作序列。然而，这种范式存在一个根本性瓶颈：**场景理解与动作规划被隐式耦合，缺乏显式的结构化中间表示来桥接感知与决策**。
 
@@ -74,7 +76,9 @@ MomaGraph 针对上述问题提出了一个统一框架，其核心思想是将�
 
 为突破上述瓶颈，本文提出核心洞见：**将场景理解与动作规划解耦**——先显式构建一个融合空间与功能信息、包含零件节点且任务相关的场景图，再基于该图进行零样本规划。这种 Graph-then-Plan 范式将结构化场景图作为感知与决策之间的中间表示，使规划器能够基于可靠的结构化知识进行推理，而非从原始像素和指令中隐式猜测。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MomaGraph 的核心创新在于将具身任务规划从“端到端黑箱推理”重构为“结构化中间表示 + 零样本规划”的两阶段范式，并通过强化学习训练 VLM 生成高质量的任务导向场景图。相较于现有基线，本文在四个关键维度上做出了实质性改变。
 
@@ -118,7 +122,7 @@ $$\mathcal{G}_{\mathcal{T}}^{(t+1)} = \mathcal{U}\Big( \mathcal{G}_{\mathcal{T}}
 
 上述四个 changed slots 形成了完整的因果链条：统一空间-功能图提供了更丰富的结构化知识基础，Graph-then-Plan 解耦了感知与规划，RL 训练确保图生成的高质量，状态感知更新则赋予系统动态适应能力。最终，MomaGraph-R1 以 7B 参数规模在 MomaGraph-Bench 上达到 71.6% 准确率，与闭源巨模型 **GPT-5**（71.6%）持平，仅略低于 **Claude-4.5-Sonnet**（73.9%），在开源模型中取得最优。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_3eTr9dGwJv/figures/002_Figure_1.jpg]]
 *Figure 1: Overview of the MomaGraph. Given a task instruction, MomaGraph constructs a taskspecific scene graph that highlights relevant objects and parts along with their spatial-functional relationships, enabling the robot to perform spatial understanding and task planning*
@@ -163,7 +167,7 @@ MomaGraph 提出了一套 **Graph-then-Plan** 的具身任务规划框架，其�
 - **RL 训练替代 SFT/ICL**：Table 5 显示 RL 训练（71.6%）相比 SFT（63.9%）和 ICL（60.2%）大幅提升场景图生成质量和规划表现，证明基于图对齐奖励的强化学习是使 VLM 学会构建精确任务导向场景图的关键。
 - **多视角联合推理**：利用多视角观测捕捉对象对应关系，在 BLINK 视觉对应基准上 MomaGraph-R1 达到 63.5%，领先最强开源基线 3.8 个百分点（Table 3），表明多视角一致性机制有效提升了跨视角的空间推理能力。
 
-## 核心模块与公式推导
+
 
 ### 任务导向场景图的定义
 
@@ -206,7 +210,9 @@ $$\mathcal{G}_{\mathcal{T}}^{(t+1)} = \mathcal{U}\Big( \mathcal{G}_{\mathcal{T}}
 
 更新机制的核心逻辑是：根据实际观察到的状态变化，剪除与观测不一致的功能假设边，同时强化经执行验证确认的对应关系。这一机制使场景图能够随交互过程逐步消除歧义，为后续规划步骤提供更可靠的结构化知识基础。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈验证：Graph-then-Plan 范式的增益
 
@@ -275,7 +281,9 @@ $$\mathcal{G}_{\mathcal{T}}^{(t+1)} = \mathcal{U}\Big( \mathcal{G}_{\mathcal{T}}
 ![[assets/figures/papers/paper_list_l6_https_openreview_net_forum_id_3eTr9dGwJv/figures/017_Table_4.jpg]]
 *Table 4: DAPO Training Configuration*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有方法的继承与分叉
 
@@ -310,6 +318,8 @@ MomaGraph 的核心思路——将场景图作为具身规划的中间表示—�
 3. **端到端控制集成。** Graph-then-Plan 范式能否与分层强化学习或模型预测控制（MPC）集成，直接生成可执行的连续控制信号，从而弥合高层规划与低层执行之间的鸿沟？
 4. **奖励权重的自适应调节。** 当前奖励函数中的权重 $w_a, w_f, w_l$ 依赖人工设定（Table 6 显示性能在合理范围内对权重不敏感，波动 ≤3.4%），是否可在训练过程中自动调节以进一步减少人工干预？
 5. **跨领域迁移。** 该方法的核心机制——任务导向的统一场景图与状态感知更新——能否迁移至工业装配、农业操作或医疗手术等更复杂的操作领域？这些领域对零件级精度和动态状态追踪的需求可能更高，但也可能面临标注成本激增的挑战。
+
+
 
 ## 原文 PDF
 

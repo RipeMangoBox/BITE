@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Partition_Generative_Modeling_Masked_Modeling_Without_Masks.pdf
+project_link: null
+code_link: null
 openreview_forum_id: vEh1ceS154
 aliases:
 - PGMPPT
@@ -42,7 +44,7 @@ claims:
 > - LM1B (128 tokens) 上，验证困惑度 (Val. PPL) 为 PGM 6/6: 26.80，对比 MDLM: 27.67，变化 降低 1.95。
 > - ImageNet 256×256 (32 步, Halton 采样) 上，FID 为 PGM 12/12 (w=3): 5.54，对比 MaskGIT (w=1): 5.35，变化 FID 稍高 (+0.19)，但吞吐量提升 7.5×。
 
-## 概述
+## 概要
 
 掩码生成模型（Masked Generative Models, MGMs）通过迭代去掩码实现并行生成，在文本和图像领域取得了显著进展。然而，这类模型存在一个根本性的效率瓶颈：在每次推理步骤中，模型必须处理整个序列——包括大量无信息的 [MASK] 令牌，导致大量计算资源被浪费在无效操作上。这使得 MGMs 在推理吞吐量上远逊于仅处理干净令牌的自回归模型（ARMs），尽管后者受限于严格的从左到右生成顺序。
 
@@ -54,7 +56,7 @@ claims:
 
 PGM 兼容现有的 MGM 采样器和蒸馏方法，可作为即插即用的替代方案。通过分区代替掩码这一关键操作，PGM 在保持任意顺序并行生成能力的同时，获得了类似自回归模型的推理效率，为生成模型在效率与质量之间的权衡提供了新的解决路径。
 
-## 背景与动机
+
 
 序列生成模型的核心任务是将离散序列 $\mathbf{x} \in \{1, \dots, N\}^L$ 的联合分布 $p(\mathbf{x})$ 参数化，以支持高效训练和高质量采样。当前主流范式分为两大阵营：**自回归模型（ARM）** 和 **掩码生成模型（MGM）**，二者在推理效率与生成灵活性之间形成根本性权衡。
 
@@ -76,7 +78,9 @@ $$\mathcal{L}_{\mathrm{MGM}} := \mathbb{E}_{\mathbf{x} \sim \mathcal{D}, t \sim 
 
 本文的核心动机正是打破这一僵局：**能否设计一种生成范式，既保留 MGM 的并行、任意顺序生成能力，又在推理时仅处理干净令牌？** 这要求从根本上重新思考令牌破坏策略与信息流机制——不是优化掩码的使用方式，而是彻底消除掩码本身。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 瓶颈诊断：掩码令牌的推理负担
 
@@ -115,7 +119,7 @@ PGM 通过分区机制同时获得两类收益：
 
 尽管 PGM 在推理效率上优势显著，仍需注意以下限制：在小数据集（如 OpenWebText）上，PGM 可能需要增加参数量（更多层数或更大嵌入维度）才能在困惑度上超越 MDLM（Table 5）；互补掩码训练中会出现损失尖峰，虽未导致发散，但可能影响训练稳定性（Figure 6）；分区 Transformer 依赖定制的块对角注意力掩码，现有优化计算核心对其支持有限，训练吞吐量约为 MDLM 的 75%（Table 3）。此外，当前仅在文本和图像生成上验证，多模态扩展仍有待探索。
 
-## 整体框架
+
 
 分区生成模型（PGM）的核心设计思想是用**序列分区**替代掩码生成模型（MGM）中无处不在的 `[MASK]` 令牌，从而在保持并行、任意顺序生成能力的同时，获得类似自回归模型（ARM）仅处理干净令牌的推理效率。其整体 pipeline 围绕一个关键约束构建：序列被划分为两个互补的、互不可见的组，模型必须仅依赖对方组的信息来预测当前组。
 
@@ -163,7 +167,7 @@ PGM 的完整 pipeline 由三个核心模块串联构成：**分区编码器（P
 
 这些设计使得 PGM 在单次前向传播中同时评估两个互补掩码率的 MDLM 目标，提供双倍梯度信号以降低训练方差，并在推理时获得 5–7.5 倍的吞吐量提升。
 
-## 核心模块与公式推导
+
 
 ### 分区生成建模：从掩码到分区
 
@@ -212,7 +216,9 @@ $$V_{i;\cdot}^{\prime} = V_{i;\cdot} + \begin{cases} Y_{1}, & \text{if } g_i = 0
 
 在推理阶段，PGM 仅需处理干净令牌。由于组间无信息流，当预测组 0 时，模型输入仅为组 1 的令牌（不含任何 [MASK]），序列长度随生成逐步增加。这与 MGM 每一步必须处理全长含 [MASK] 序列形成鲜明对比，是 PGM 实现 5–7.5× 吞吐量提升的根本原因。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验结果
 
@@ -307,7 +313,9 @@ Table 5 系统消融了不同编码器/解码器层数分配方案。结果表�
 *Table 8: Sample quality and efficiency on ImageNet for different numbers of sampling steps using the Confidence-based sampler. We generate images in batches of 32 to measure throughput, and use a batch size of 1 to measure latency. Throughput is lower with CFG because each step requires two forward passes (conditional and unconditional). The throughput and latency are averaged over 10 batches*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心创新与基线对比
 
@@ -356,6 +364,8 @@ PGM 的分区 Transformer 由三个关键模块构成（Figure 3）：
 5. **专用计算优化**：可否开发针对块对角注意力模式的专用高效 kernel，以缩小训练吞吐量与 MDLM 的差距？
 
 6. **方差缩减的理论分析**：PGM 的双重梯度信号降低训练方差的机制目前仅凭经验验证，能否从优化理论角度给出更严格的分析？
+
+
 
 ## 原文 PDF
 

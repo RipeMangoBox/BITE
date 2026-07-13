@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/A_Graph_Meta_Network_for_Learning_on_KolmogorovArnold_Networks.pdf
+project_link: null
+code_link: https://github.com/BarSGuy/KAN-Graph-Metanetwork
 openreview_forum_id: ONpyYavBqR
 aliases:
 - WK
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 一种用于Kolmogorov-Arnold网络学习的图元网络 |
 | 英文题名 | A Graph Meta-Network for Learning on Kolmogorov–Arnold Networks |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=ONpyYavBqR); [GitHub](https://github.com/BarSGuy/KAN-Graph-Metanetwork) |
+| Links | [paper](https://openreview.net/forum?id=ONpyYavBqR) · [GitHub](https://github.com/BarSGuy/KAN-Graph-Metanetwork) |
 | Topic | #topic/generative_models_diffusion #topic/generative_models_diffusion/graph_neural_networks |
 | Method | WS-KAN |
 | Dataset | MNIST INR, Fashion-MNIST INR, CIFAR-10 INR, MNIST Accuracy Prediction |
@@ -42,7 +44,7 @@ claims:
 > - Fashion-MNIST INR 上，Classification Accuracy (%) 为 84.6±0.6，对比 Best alternative: < 84.6，变化 outperforms all baselines。
 > - CIFAR-10 INR 上，Classification Accuracy (%) 为 42.2±0.8，对比 Best alternative: < 42.2，变化 outperforms all baselines。
 
-## 概述
+## 概要
 
 权重空间学习（learning in weight spaces）旨在直接对神经网络的参数进行推理，以预测其下游性能或结构属性。现有方法主要针对多层感知机（MLP）设计，利用其隐藏神经元的置换对称性，将参数表示为图或集合进行处理。然而，Kolmogorov-Arnold网络（KANs）作为一种新兴架构，其参数并非标量权重，而是可学习的单变量函数（通常以B-spline参数化），这给权重空间学习带来了根本性挑战：**如何将对称性感知的架构扩展至函数参数空间，同时保持表达效率？**
 
@@ -52,7 +54,7 @@ WS-KAN在三个典型任务上一致优于所有基线方法：在MNIST、Fashio
 
 该方法的主要局限在于：OOD泛化性能呈现数据集依赖性（MNIST INR在更宽网络上退化严重，而Fashion-MNIST INR保持鲁棒），且仅在特定拓扑上验证，尚未在CNN-KAN等扩展架构上测试。未来方向包括探索更复杂KAN拓扑的适配、非B-spline函数参数化的兼容性，以及利用WS-KAN实现KAN与MLP间的架构转换。
 
-## 背景与动机
+
 
 ### 权重空间学习的兴起与局限
 
@@ -94,7 +96,9 @@ $$\boldsymbol { e } _ { p , q } ^ { l } = \tilde { \phi } _ { p , q } ^ { l } : 
 
 综上，本文填补了权重空间学习在KAN上的空白，为这一新兴网络范式的分析、预测和优化提供了首个专用元学习框架。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 WS-KAN 的核心创新在于将权重空间学习（Weight‑Space Learning）从传统 MLP 扩展至 Kolmogorov–Arnold 网络，其关键突破体现在三个相互关联的维度上。
 
@@ -122,7 +126,7 @@ $$e_{(i,j)} = \mathbb{MLP}_e(v_i, v_j, e_{(i,j)})$$
 
 **理论与效率保证。** WS‑KAN 具备模拟输入 KAN 前向传播的表达能力（Proposition 4.2），且其计算复杂度与 KAN‑graph 的边数 $E$ 线性缩放，即 $O(E)$，确保了良好的可扩展性。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0012_ONpyYavBqR_A_Graph_Meta-Network_for_Learning_on_KolmogorovA/figures/001_Figure_1.jpg]]
 *Figure 1: Constructing the KAN-graph for a given Kolmogorov-Arnold Network (KAN)*
@@ -176,7 +180,7 @@ WS‑KAN 的计算复杂度与 KAN‑graph 的边数 $E$ 线性缩放（$\mathca
 
 Proposition 4.2 证明 WS‑KAN 可以模拟输入 KAN 的前向传播：对任意 $\varepsilon > 0$，存在 WS‑KAN 使得 $\sup_{\boldsymbol{x} \in [a,b]^n} |\text{WS-KAN}(G) - f_\theta(\boldsymbol{x})| < \varepsilon$。这保证了编码器在理论上不会丢失 KAN 的函数信息，为下游任务的性能提供了基础保障。
 
-## 核心模块与公式推导
+
 
 ### KAN的前向传播与B‑spline参数化
 
@@ -230,7 +234,9 @@ c) 边更新：$e_{(i,j)} = \mathbb{MLP}_e(v_i, v_j, e_{(i,j)})$
 
 WS‑KAN的表达能力由两个理论结果支撑。首先，MLP可以逼近KAN中的任意单变量函数（Lemma 4.1）：对于任意 $\varepsilon > 0$，存在MLP使得 $\sup_{x \in \mathcal{X}} | MLP(x, w_s, w_b, \pmb{c}) - \psi(x) | < \varepsilon$。在此基础上，WS‑KAN可以模拟输入KAN的前向传播（Proposition 4.2）：对于任意 $\varepsilon > 0$，存在WS‑KAN使得 $\sup_{\pmb{x} \in [a, b]^n} | WS-KAN(G) - f_{\theta}(\pmb{x}) | < \varepsilon$。这保证了GNN架构不会因图表示转换而丢失KAN的函数表达能力。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 3.1 INR分类
 
@@ -268,7 +274,9 @@ WS‑KAN在剪枝掩码预测任务上达到97.93±0.19%的准确率和99.54±0.
 
 **需要人工核实的问题**：OOD泛化的退化机制（MNIST INR vs. F‑MNIST INR）在原文中未给出因果解释；WS‑KAN仅在[2‑h‑h‑10]拓扑上进行了验证，对更深或跳跃连接等拓扑变体的泛化能力尚未测试；边特征仅利用了B‑spline的显式参数，其他函数基（如小波）的兼容性需进一步实验确认。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 权重空间学习谱系中的位置
 
@@ -305,6 +313,8 @@ WS-KAN 处于权重空间学习（Weight-Space Learning）与 Kolmogorov-Arnold 
 - **跨范式迁移**：能否利用 WS-KAN 实现 KAN 到 MLP 的变换，以结合 KAN 的可解释性和 MLP 的推理效率？Proposition 4.2 表明 WS-KAN 可模拟 KAN 前向传播，这为跨架构知识迁移提供了理论基础。
 - **函数基泛化**：B-spline 以外的函数参数化（如小波、傅里叶基）能否与 WS-KAN 无缝集成？这需要重新设计边特征提取器，但图结构本身可能保持不变。
 - **OOD 鲁棒性机制**：MNIST 与 Fashion-MNIST 的 OOD 行为差异揭示了哪些影响泛化的隐藏因素？系统研究此问题可能揭示权重空间学习的根本泛化边界。
+
+
 
 ## 原文 PDF
 

@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Learning_Flexible_Forward_Trajectories_for_Masked_Molecular_Diffusion.pdf
+project_link: https://holymollyhao.github.io/MELD/
+code_link: null
 openreview_forum_id: raVuVPbnQL
 aliases:
 - MMEWLD
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 面向掩码分子扩散的学习灵活前向轨迹 |
 | 英文题名 | Learning Flexible Forward Trajectories for Masked Molecular Diffusion |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=raVuVPbnQL); [Project](https://holymollyhao.github.io/MELD/) |
+| Links | [paper](https://openreview.net/forum?id=raVuVPbnQL) · [Project](https://holymollyhao.github.io/MELD/) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/chemistry_and_drug_discovery |
 | Method | MELD (Masked Element-wise Learnable Diffusion) |
 | Dataset | QM9, ZINC250K, Polymer (property-conditioned) |
@@ -42,7 +44,7 @@ claims:
 > - ZINC250K 上，FCD↓ 为 1.51，对比 26.09 (MDM w/ power-law)，变化 -24.58。
 > - Polymer (property-conditioned) 上，MAE↓ 为 0.798，对比 0.921 (GraphDiT)，变化 -0.123 (13.4% reduction)。
 
-## 概述
+## 概要
 
 掩码扩散模型（MDM）在分子生成中面临一个根本性瓶颈：**状态冲突**（state-clashing）。标准的MDM采用固定的、与元素无关的噪声调度，所有原子和键以相同的速率被掩码。这导致语义上不同的分子在正向扩散过程中塌缩到相同的中间状态，使得逆向重建目标变为多模态分布。由于KL散度的模式覆盖特性，单模态去噪器被迫收敛到高熵分布，最终生成分布失调甚至化学无效的分子。
 
@@ -50,7 +52,7 @@ claims:
 
 实验表明，MELD在QM9和ZINC250K上均实现100%化学有效性，FCD分别降至0.09和1.51，显著优于标准MDM（FCD 3.62/26.09）。在Polymer属性条件生成中，MELD将平均MAE降低13.4%（0.798 vs GraphDiT 0.921），同时提升分布质量。消融实验直接验证了MELD在正向扩散后期保留更多唯一图状态（ZINC250K T-1: 17.3 vs 基线 1.7–13.3），证实其有效缓解了状态冲突。
 
-## 背景与动机
+
 
 分子生成是药物发现和材料设计中的核心任务，其目标是从目标分布中采样化学上有效且结构多样的分子图。近年来，扩散模型在分子生成领域展现出巨大潜力，其中**掩码扩散模型（Masked Diffusion Models, MDMs）**因其离散图生成中的高效率和完美化学有效性而备受关注。然而，标准 MDMs 在分子生成中暴露出一个关键的失效模式：**状态冲突（state‑clashing）**。
 
@@ -83,7 +85,9 @@ MELD 的有效性在多个层面得到验证：
 
 这些结果表明，通过联合优化前向（噪声调度网络）和逆向（去噪器）过程，MELD 有效解决了掩码扩散模型中固有的状态冲突问题，为分子生成提供了一种灵活且高效的框架。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 MELD 的核心创新在于将标准掩码扩散模型（MDM）中**固定的、与元素无关的噪声调度**，替换为**逐元素可学习的差异化调度**，从而系统性地缓解分子图生成中的**状态冲突（state-clashing）**问题。
 
@@ -129,7 +133,7 @@ $$p = p_{\mathrm{hard}} - \mathrm{sg}(p_{\mathrm{soft}}) + p_{\mathrm{soft}}$$
 
 值得注意的是，MELD 的改动在计算开销上极为轻量——仅在现有 Transformer 架构基础上增加一个可学习的嵌入矩阵 $\mathbf{H}$，噪声调度网络本身仅为一个两层 MLP（Appendix C）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/iclr26_0012_raVuVPbnQL_Learning_Flexible_Forward_Trajectories_for_Maske/figures/001_Figure_1.jpg]]
 *Figure 1: Comparison between (a) element-agnostic noise scheduling and (b) element-specific noise scheduling. The former results in an issue denoted as state-clashing, leading to generation of invalid molecules. MELD mitigates this with element-specific noise schedule, effectively orchestrating the forward process to minimize state-clashings*
@@ -175,7 +179,7 @@ $$p = p_{\mathrm{hard}} - \mathrm{sg}(p_{\mathrm{soft}}) + p_{\mathrm{soft}}$$
 
 整个 pipeline 的计算开销极小——噪声调度网络仅额外引入嵌入矩阵 $\mathbf{H}$，其参数量相比去噪变换器主干可忽略不计。
 
-## 核心模块与公式推导
+
 
 MELD 的核心设计围绕一个问题展开：标准掩码扩散模型（MDM）中，固定的元素无关噪声调度导致语义不同的分子在正向扩散中塌缩到相同的中间状态（状态冲突），使逆向重建目标多模态化，单模态去噪器无法有效学习。MELD 通过引入逐元素可学习的噪声调度网络，为每个图元素（原子节点和键边）分配独立的掩码速率，从根源上缓解状态冲突。
 
@@ -234,7 +238,9 @@ MELD 的完整管线由四个关键模块组成：
 
 计算开销方面，噪声调度网络仅增加一个嵌入矩阵 $\pmb{H}$ 和一个小型 MLP，相对于已有的变换器骨干网络，额外参数量和计算量可忽略。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 无条件分子生成主结果
 
@@ -317,7 +323,9 @@ Table 4 和 Table 10 报告了计算成本。MELD 引入的额外开销极小—
 2. **极大分子的状态冲突残留**：当分子规模极大时，即使使用差异化调度，唯一状态数量的保留仍可能有限，状态冲突无法完全消除。
 3. **对称性问题的残留**：虽然 MELD 通过随机排列嵌入来区分同构结构，但在高度对称的分子中，去噪器的不确定性可能仍然存在（需要手动验证具体边界情况）。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与相关工作的关系
 
@@ -353,6 +361,8 @@ MELD 的设计假设和实验覆盖范围定义了其当前已验证的适用边
 - **与等变架构的结合。** MELD 当前使用扩散变换器作为去噪骨干，未显式利用图结构的排列等变性。将逐元素调度与等变图神经网络结合，可能进一步降低对称分子带来的预测不确定性。
 - **条件生成中的调度适应性。** 在更复杂的多属性条件生成场景中，元素的差异化调度是否始终带来一致的增益，还是需要根据条件动态调整调度策略，目前尚无答案。
 - **理论分析。** 状态冲突的缓解在经验上得到了充分验证（Table 6, Figure 2），但缺乏严格的理论刻画——例如，逐元素调度能在多大程度上降低不同分子轨迹的碰撞概率，以及这一概率与生成质量之间的定量关系。
+
+
 
 ## 原文 PDF
 

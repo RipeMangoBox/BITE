@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2024
 pdf_ref: paperPDFs/arxiv_2024/DSONet_Textual_Decomposition_Then_Sub_Motion_Space_Scattering_for_Open_Vocabulary_Motion_Generation.pdf
+project_link: https://vankouf.github.io/DSONet/
+code_link: null
 aliases:
 - DSONet
 - DSO-Net
@@ -41,7 +43,7 @@ claims:
 > - HumanML3D 上，R-Precision 0.957；Diversity 1.388。
 > - Idea400 (out-domain) 上，FID 0.847。
 
-## 概述
+## 概要
 
 **问题瓶颈**：开放词汇动作生成（Open-Vocabulary Motion Generation）的核心挑战在于，现有方法受限于标注数据规模，仅能学习**子文本空间到子动作空间的映射**（子空间拟合）。当面对训练分布之外的新颖文本描述时，模型被迫进行外推（extrapolation），导致语义理解错误、动作质量下降，泛化能力严重不足。
 
@@ -50,8 +52,6 @@ claims:
 **方法定位**：DSO-Net 采用“预训练-微调”范式，在方法论谱系中处于**离散生成建模**与**组合式文本-动作对齐**的交汇点。与 **OMG**（Liang et al., CVPR 2024）的预训练-微调路线、**MotionCLIP**（Tevet et al., ECCV 2022）的 CLIP 对齐路线，以及 **MoMask**（Guo et al., CVPR 2024）的离散掩码建模路线相比，DSO-Net 的差异化优势在于引入了原子动作作为中间表示，并通过文本-动作对齐模块（TMA）和组合特征融合模块（CFF）显式建模组合过程，而非依赖单一粗粒度文本的直接条件生成。
 
 **主要结果**：在域内数据集 HumanML3D 和两个开放域数据集 Idea400、Mixamo 上，DSO-Net 在所有评估指标上均显著优于现有 SOTA 方法（Table 1）。消融实验证实，TMA 模块与 CFF 模块对开放词汇性能有决定性贡献，且两者存在显著的协同效应——当 TMA 存在时，CFF 带来的 R-Precision Top3 提升达 11%，而单独使用 CFF 仅提升 3%（Table 2）。定性结果进一步表明，只有 DSO-Net 能正确理解动作的时间顺序（如“站立到跪下”），其他方法则混淆或生成语义不符的动作（Figure 5, Figure 6）。
-
-## 背景与动机
 
 ### 问题背景：文本到动作生成的泛化困境
 
@@ -82,7 +82,7 @@ claims:
 
 通过这一设计，原本需要外推的开放域样本被转化为在原子动作空间内的插值，从而在根本上突破了子空间拟合的局限，使模型在有限标注数据下仍能生成符合开放词汇语义的高质量动作。
 
-## 核心创新
+## 核心方法与创新机理
 
 DSO-Net 的核心创新在于将开放词汇动作生成这一困难的外推问题，通过**文本分解**与**子运动空间散射**两步有序转化，重塑为一个可控的插值问题，从而在有限标注数据下建立起从全文本空间到全动作空间的映射能力。
 
@@ -135,8 +135,6 @@ DSO-Net 引入了**文本-动作对齐（TMA）模块**，专门针对原子动�
 
 这四个维度的创新相互耦合，共同构成了从“子空间拟合”到“全空间散射”的范式跃迁。其决定性证据来自 Table 1：在 Idea400 和 Mixamo 两个开放域数据集上，DSO-Net 在所有指标上均显著优于 SOTA 方法，且定性结果（Figure 5, Figure 6）显示只有 DSO-Net 能正确理解动作的时间顺序（如“站立到跪下”），而其他方法则混淆或生成不符合语义的动作。
 
-## 整体框架
-
 DSO-Net采用“预训练-微调”范式，整体流程分为两个阶段：**运动预训练**（Motion Pre-Training）和**运动微调**（Motion Fine-tuning），如Figure 2所示。
 
 ### 运动预训练阶段
@@ -166,8 +164,6 @@ DSO-Net采用“预训练-微调”范式，整体流程分为两个阶段：**�
 
 ![[assets/figures/papers/DSONet_Textual_Decomposition_Then_Sub-Motion-Space_Scattering_for_Open-Vocabular_aab01d075189/figures/003_Figure_2.jpg]]
 *Figure 2: The architecture of our entire framework. The overall pipeline adopts discrete generative modeling. 1) In the Motion Pre-Training stage (left blue part), we use the Residual VQ-VAE (RVQ) model, which designs a base layer and R residual layers to learn layer-wise codebooks. By tokenizing the motion sequence into multi-layer discrete tokens, we learn the large-scale motion priors. 2) In the Motion Fine-tuning stage (right green part), we first leverage the large language model(LLM) and the fine-grained description conversion algorithm we design (only used in training stage) to perform texutal decomposition, which convert the raw text of a motion into the atomic texts. Then, for the base layer...*
-
-## 核心模块与公式推导
 
 DSO-Net 的核心由两个有序耦合的阶段构成：**文本分解（Textual Decomposition）** 和 **子动作空间散射（Sub-Motion-Space Scattering）**。前者将开放词汇的粗粒度运动文本转换为结构化的原子动作描述；后者通过显式建模原子动作到目标动作的组合过程，将原本需要外推的子空间映射转化为插值，从而建立全文本空间到全动作空间的映射。
 
@@ -216,12 +212,7 @@ $$
 
 这一设计使模型显式地学习不同身体部位原子动作的组合关系，而非隐式地从粗粒度文本直接映射到完整动作。消融实验（Table 2）证实，CFF 与 TMA 存在显著的协同效应：当 TMA 存在时，CFF 带来的 R-Precision Top3 提升达 11%（+0.073），而单独使用 CFF 仅提升 3%，表明原子文本对齐与组合建模互为补充，共同驱动子动作空间的有效散射。
 
-### 补充图表
-
-![[assets/figures/papers/DSONet_Textual_Decomposition_Then_Sub-Motion-Space_Scattering_for_Open-Vocabular_aab01d075189/figures/002_Figure_1.jpg]]
-*Figure 1: Compared with current text-to-motion paradigms (Simple mapping, CLIP-based alignment, and Pretrain-then-Finetuning), our method proposes the textual decomposition to decompose the raw motion text into atomic texts and sub-motion-space scattering to learn the composition process from atomic motions to target motions, which significantly improves the ability of open-vocabulary motion generation*
-
-## 实验与分析
+## 实验与关键发现
 
 ### 主实验结果
 
@@ -275,7 +266,7 @@ DSO-Net 在域内数据集 HumanML3D 和两个开放域数据集 Idea400、Mixam
 ![[assets/figures/papers/DSONet_Textual_Decomposition_Then_Sub-Motion-Space_Scattering_for_Open-Vocabular_aab01d075189/figures/010_Figure_6.jpg]]
 *Figure 6: Qualitative results compared with previous state-of-the-arts*
 
-## 方法谱系与知识库定位
+## 定位与知识库关联
 
 ### 1. 问题定位：从子空间拟合到全空间映射
 

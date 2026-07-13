@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2025
 pdf_ref: paperPDFs/CVPR_2025/Motion_Modes_What_Could_Happen_Next.pdf
+project_link: https://motionmodes.github.io
+code_link: null
 aliases:
 - MM
 - MMWCHN
@@ -31,7 +33,7 @@ claims:
 | 中文题名 | 运动模式：探索物体的多种可能运动 |
 | 英文题名 | Motion Modes: What Could Happen Next? |
 | 会议/期刊 | CVPR 2025 |
-| Links | [paper](https://arxiv.org/abs/2412.00148); [Project](https://motionmodes.github.io) |
+| Links | [paper](https://arxiv.org/abs/2412.00148) · [Project](https://motionmodes.github.io) |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/robotics |
 | Method | Motion Modes |
 | Dataset | 28 diverse images (User Study I), 28 diverse images (User Study II) |
@@ -40,7 +42,7 @@ claims:
 > - 28 diverse images (User Study I) 上，用户偏好率 (合理性、多样性、期望性) 为 Motion Modes，对比 Prompt Generation, ControlNet, Random Arrows，变化 Motion Modes 在所有属性上均以显著优势被优先选择（95% 置信区间不重叠）。
 > - 28 diverse images (User Study II) 上，合理性 (Plausibility) 为 96%，对比 不适用 (无基线对比)，变化 96% 的运动被评估为合理。
 
-## 概述
+## 概要
 
 给定一张静态图像和其中某个物体的掩码，该物体可能发生哪些符合物理规律、但又彼此不同的运动？现有图像到视频生成模型难以自动发现并解耦特定物体的多种运动：生成的运动常与摄像机运动及其他场景变化纠缠在一起，且缺乏多样性。
 
@@ -48,7 +50,7 @@ claims:
 
 实验表明，该方法在运动合理性、多样性和符合用户期望等方面显著优于基于提示生成、ControlNet 约束和随机拖拽箭头等基线方法。用户研究中，96% 的生成运动被评估为合理，92% 符合观众预期。消融实验进一步证实，四类引导能量缺一不可：移除任一项均导致相应指标的恶化，全模型在多样性与聚焦性之间达到最佳权衡（$\bar{E}=0.55$）。
 
-## 背景与动机
+
 
 从单张静态图像预测物体的未来运动，是人类视觉理解中一项基本但极具挑战的能力。给定一张包含笔记本电脑、飘扬的旗帜或跃起的狮子的照片，观察者可以自然地想象出多种合理的运动演化——合上屏幕、旗帜翻卷、狮子落地。然而，让计算模型自动发现并生成这些多样化的运动，至今仍是一个未解决的难题。
 
@@ -66,7 +68,9 @@ claims:
 
 本文的核心动机是：能否在不进行额外训练的前提下，利用预训练视频扩散模型中蕴含的运动先验，通过设计精巧的引导信号，在潜空间中高效搜索并分离出物体的多种合理运动？这一思路的关键洞察在于——训练自由的能量引导（training-free energy guidance）可以在去噪过程中直接调控运动向量场的生成，无需任何标注数据或模型微调。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 Motion Modes 的核心创新在于提出了一种**免训练的引导式运动探索框架**，在预训练的图像到视频扩散模型潜空间中高效搜索，自动发现并解耦特定物体的多种可能运动。该方法通过四个关键机制实现突破：
 
@@ -101,7 +105,7 @@ Motion Modes 的核心创新在于提出了一种**免训练的引导式运动�
 
 消融实验证实了这一设计的有效性：移除 $E_c$ 导致摄像机运动剧增（$\bar{E}_c$ 升高），移除 $E_o$ 使物体运动幅度极小，移除 $E_d$ 导致多样性显著下降，移除 $E_s$ 不仅降低平滑度还意外损害物体聚焦度。全模型在多样性与聚焦性的权衡指标 $\bar{E} := 0.5(\bar{E}_d + \bar{E}_f)$ 上达到最优值 0.55（Table 2, Table 3）。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l23_Motion_Modes_What_Could_Happen_Next/figures/003_Figure_3.jpg]]
 *Figure 3: Method Overview. We generate a motion x using a guided denoising approach, where guidance energies encourage smooth object motions that are disentangled from camera motions and distinct from previously generated motions. Iterative sampling gives us a set of diverse motions X*
@@ -126,7 +130,7 @@ Motion Modes 的整体 pipeline 围绕一个核心思想展开：在预训练的
 
 这一 pipeline 的关键设计在于：所有引导能量均在推理时计算并最小化，无需对预训练模型进行任何微调或重训练。通过将摄像机运动解耦、物体运动聚焦、运动多样性探索三者统一在能量最小化框架下，Motion Modes 实现了从单张静态图像到多种合理物体运动的高效映射。
 
-## 核心模块与公式推导
+
 
 Motion Modes 的核心架构建立在预训练的图像到视频扩散模型 **Motion-I2V** 之上，通过训练自由的能量引导策略，在去噪过程中直接调控运动向量场的生成。整个流程由四个关键模块串联构成，如图 3 所示。
 
@@ -202,7 +206,9 @@ $$\mathbf{x}_t' := \mathbf{x}_t - \nabla_{\mathbf{x}_t} E\left( x_\theta^0(\math
 
 为生成多样运动集合 $\mathcal{X}$，采用迭代采样策略：每次独立采样一个运动，计算其总引导能量 $E$。若 $E > \rho$（阈值 $\rho=5.0$），则丢弃该运动并重新采样；若连续两次被丢弃，则停止迭代。这一准则在多样性与质量之间取得平衡，避免生成低质量或重复的运动。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 定量对比与用户研究
 
@@ -247,7 +253,9 @@ Figure 7揭示了两个主要失败模式：
 ![[assets/figures/papers/paper_list_l23_Motion_Modes_What_Could_Happen_Next/figures/012_Table_3.jpg]]
 *Table 3: Extended ablation of key components with metrics based on diverse, focused metrics and their tradeoff $\bar { E }$ : = 0 . 5 ( $\bar { E } _ { d } + \bar { E } _ { f }$ ) Underlined values are closer to the best than to the worst value
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心思路与问题定位
 
@@ -302,6 +310,8 @@ Motion Modes 直接构建在 **Motion-I2V**（Shi et al., SIGGRAPH 2024）之上
 3. **推理效率优化**：如何在推理时降低内存开销，支持更大批量的并行运动生成？可能的路径包括减少引导步数、采用更轻量的运动表示、或利用一致性模型等少步采样方法。
 
 4. **运动空间的连续参数化**：当前离散采样策略可能遗漏运动空间的连续变化。是否可以通过学习运动空间的低维流形或引入连续插值机制，实现对运动模式更全面的覆盖？
+
+
 
 ## 原文 PDF
 

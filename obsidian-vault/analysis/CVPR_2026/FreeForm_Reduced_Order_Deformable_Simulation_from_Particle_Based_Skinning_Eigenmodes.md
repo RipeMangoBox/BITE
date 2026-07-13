@@ -5,6 +5,8 @@ paper_level: A
 venue: CVPR
 year: 2026
 pdf_ref: paperPDFs/CVPR_2026/FreeForm_Reduced_Order_Deformable_Simulation_from_Particle_Based_Skinning_Eigenmodes.pdf
+project_link: null
+code_link: null
 aliases:
 - FreeForm
 tags:
@@ -40,7 +42,7 @@ claims:
 > - 标准悬臂梁扭转 (Twist, m=16) 上，归一化均方误差 (MSE) 为 3.46e-06，对比 Simplicits: 1.30e-04，变化 ~37倍精度提升。
 > - Thingi10K (Fix Side, m=32) 上，归一化MSE 为 6.87e-03，对比 Simplicits: 8.97e-03，变化 误差降低34.2%。
 
-## 概述
+## 概要
 
 **核心问题与瓶颈** 现有的网格无关降阶弹性仿真方法（如 **Simplicits**）需要为每个物体单独优化一个神经网络来学习蒙皮权重，训练时间长（约 2 分钟）且模拟精度有限；传统的基于网格的降阶方法则依赖高质量四面体网格，难以直接应用于现代点云表示（如 3D 高斯泼溅）。因此，如何在保持网格无关优势的同时，快速获得高质量、表达能力强的降阶基函数，成为该方向的关键瓶颈。
 
@@ -52,7 +54,7 @@ claims:
 
 **局限与开放问题** FreeForm 作为降阶模型，难以捕捉高频细节（如褶皱），无法处理强非线性效应（如尖锐接触与碰撞）及拓扑变化（如断裂）。基函数质量依赖于 RKPM 核半径、采样密度和粒子分布的合理选择。如何将 RKPM 特征模态推广到断裂、切割等拓扑变化场景，以及如何在降阶框架中高效处理大变形接触与碰撞，仍是值得探索的开放问题。
 
-## 背景与动机
+
 
 ### 问题背景：可变形体仿真的降阶需求
 
@@ -87,7 +89,9 @@ claims:
 
 这一设计从根本上改变了蒙皮权重的获取范式：从“为每个物体训练一个神经网络”变为“为每个物体组装Hessian矩阵并求解一次特征分解”。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 FreeForm 的核心创新在于**用显式粒子基函数替代神经网络来参数化蒙皮权重**，从而将原本需要随机优化的降阶基构建问题转化为一个**确定性、可解析求解的广义特征值问题**。这一范式转换直接解决了现有网格无关降阶弹性仿真方法的两大瓶颈：训练速度慢和仿真精度受限。
 
@@ -145,7 +149,7 @@ $$(\mathbf{H}_w)_{ij} = \int_{\Omega} (\lambda(\mathbf{X}) + 4\mu(\mathbf{X})) \
 
 值得强调的是，这些提升并非来自计算资源的堆砌——两种方法在相同自由度、相同积分点数量、相同物理参数下进行公平对比——而是源于**将随机优化问题重构为确定性特征分解问题**这一根本性的方法创新。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l2_https_research_nvidia_com_labs_sil_projects_freeform_assets_main_pdf/figures/001_Figure_1.jpg]]
 *Figure 1: Left: we show results of our reduced-order elastic simulation applied to 3D Gaussian Splatting (3DGS) objects. Middle: our simulation can handle multiple interacting 3DGS objects. Right: we show the application of our method in simulating robot interaction*
@@ -191,7 +195,7 @@ $$\mathbf{z}_{t+1} = \arg \min_{\mathbf{z}} \mathrm{Ir}(\mathbf{z}, \mathbf{z}_{
 
 该设计将训练阶段从 Simplicits 的神经网络随机优化（约 121 秒）转变为确定性特征分解（约 3.2 秒），实现了约 40 倍的训练加速，同时特征分解的解析性质保证了基函数的全局最优性（在二次近似意义下）。
 
-## 核心模块与公式推导
+
 
 FreeForm 的降阶弹性仿真管线由两个阶段构成：**训练阶段**通过 RKPM 显式离散化与广义特征分解直接获得蒙皮权重，**仿真阶段**则利用这些权重进行低自由度隐式时间积分。以下分述其核心模块与关键公式。
 
@@ -283,7 +287,9 @@ $$
 
 其中 $v_i$ 为积分点体积权重，$\Psi$ 为 Neo-Hookean 能量密度函数（Eq. 16），$\mathbf{F}$ 为变形梯度。积分点采样方式（均匀网格 vs 随机采样）对精度影响有限，消融实验（Table 4）表明 FreeForm 在两种采样策略下均一致优于 Simplicits。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设计
 
@@ -366,7 +372,9 @@ FreeForm的实验评估围绕三个核心维度展开：**仿真精度**（以FE
 ![[assets/figures/papers/paper_list_l2_https_research_nvidia_com_labs_sil_projects_freeform_assets_main_pdf/figures/009_Table_3.jpg]]
 *Table 3: Ablation results on different training strategy. We compare variants of our method trained using different loss functions and integration point sampling methods. We also highlight the efficiency of our eigenanalysis formulation over gradient-based optimization in terms of training time for m = 32*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 问题背景与现有路线
 
@@ -417,6 +425,8 @@ FreeForm作为降阶方法，其仿真精度以全自由度方法为参照。论
 4. 当前方法仅在Neo-Hookean材料上验证了Hessian的解析形式，推广到更复杂的本构模型（如Mooney-Rivlin、Ogden等）是否仍能保持解析简洁性？
 
 > **注意**：Table 7中的具体残差数值在提供的上下文中未完整给出，该消融实验的定量结论需手动核实原文。
+
+
 
 ## 原文 PDF
 

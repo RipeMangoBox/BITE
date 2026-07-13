@@ -44,7 +44,7 @@ claims:
 > - LINGO (HSI) 上，FID↓ 1.201 vs TRUMANS: 4.731 (-3.530)。
 > - EgoBody (Mixed) 上，FID↓ (微调65k步后) 0.292 vs 从零训练: 2.341 (500k步) (-2.049)。
 
-## 概述
+## 概要
 
 交互反应生成（Interaction-to-Reaction Generation）面临双重瓶颈：**交互数据稀缺且异构分布**——大规模单人运动数据与小规模人-人/人-场景交互数据之间存在显著域差异；同时，**实时性与高保真度难以兼得**，现有方法要么牺牲质量换取低延迟，要么因全序列扩散而无法满足在线响应需求。
 
@@ -56,7 +56,7 @@ ReMoGen 的核心洞察是：将大规模单人运动先验作为通用基础，
 
 **局限与开放问题**：潜在扩散的压缩空间可能损害细粒度空间精度，尤其在近距离接触或高精度人-物交互中；简单加权组合策略并非最优，更有效的免训练融合方法值得探索。
 
-## 背景与动机
+
 
 ### 问题背景：交互反应生成的双重困境
 
@@ -84,7 +84,9 @@ ReMoGen 的核心洞察是：将大规模单人运动先验作为通用基础，
 
 同时，为打破实时性与质量的僵局，我们引入帧级段细化（FWSR）机制——在分段自回归生成框架上叠加轻量逐帧潜在空间修正，以极低的额外延迟换取显著的质量提升，从而在0.047s的延迟下将FID从0.181进一步降至0.166。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ReMoGen 的核心创新在于通过**模块化解耦**同时应对交互反应生成中的两大瓶颈：交互数据稀缺且异构分布，以及实时响应与生成质量的权衡。其关键设计可归纳为三个相互协同的 changed slots。
 
@@ -104,7 +106,7 @@ ReMoGen 不将所有模态联合处理，而是为每种交互线索（他人动
 
 上述三个 changed slots 形成递进式的创新链条：通用先验提供高质量运动基础，Meta-Interaction 模块以最小代价注入交互语义，FWSR 在不牺牲质量的前提下实现帧级实时响应。三者共同构成了 ReMoGen 应对“数据异质性”和“实时性”双重挑战的核心机制，使其在 Inter-X（HHI）上 FID 达 0.181（最佳在线基线 SymBridge 为 2.569），在 LINGO（HSI）上 FID 达 1.201（基线 TRUMANS 为 4.731），且延迟均满足实时要求（0.042s）。
 
-## 整体框架
+
 
 ReMoGen 采用模块化设计，将交互反应生成分解为两个功能层次：**先验引导的模块化学习（Prior-guided Modular Learning）** 与**逐帧段细化（Frame-wise Segment Refinement, FWSR）**。其核心思想是将从大规模单人数据中习得的通用运动先验作为冻结基础，通过轻量级的 Meta-Interaction 模块注入异构交互线索，再以 FWSR 实现低延迟的在线更新。
 
@@ -130,7 +132,7 @@ $$M_h^{i+1} = \mathrm{concat}(M_h^i, \hat{M}_f^i)[-H:]$$
 ![[assets/figures/papers/paper_list_l922_https_arxiv_org_abs_2604_01082/figures/002_Figure_2.jpg]]
 *Figure 2: Overview of the ReMoGen Framework. Our framework is designed to address the challenges of data scarcity and real-time responsiveness in interaction-to-reaction generation*
 
-## 核心模块与公式推导
+
 
 ReMoGen 的架构围绕三个核心模块构建，分别解决运动先验迁移、异构交互线索注入和实时响应性三个关键问题。
 
@@ -182,7 +184,9 @@ $$\hat{z}^f = \mathrm{Modulate}\big(z_0, \mathrm{concat}(M_h^{(f-1)}, X_\text{dy
 ![[assets/figures/papers/paper_list_l922_https_arxiv_org_abs_2604_01082/figures/009_Figure.jpg]]
 *Figure: A. Architecture of Meta-Interaction Block*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果验证
 
@@ -291,7 +295,9 @@ EgoBody 数据集上的实验验证了 ReMoGen 在混合交互设置（人-人 +
 ![[assets/figures/papers/paper_list_l922_https_arxiv_org_abs_2604_01082/figures/020_Figure.jpg]]
 *Figure: I. Ablation on Frame-wise Segment Refinement. We present ”A person runs towards someone and passes by them.” FWSR provides fine-grained updates that improve responsiveness without sacrificing stability, outperforming both segment-only and naive slidestyle inference*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基线工作的关系
 
@@ -360,6 +366,8 @@ ReMoGen 在交互运动生成领域的方法谱系中占据以下位置：
 - **相对于单域方法**（如 TRUMANS、LINGO）：ReMoGen 的模块化设计使其天然支持多域融合和零样本迁移，这在现有交互生成方法中尚属首次。
 
 - **方法谱系定位**：ReMoGen 可被归类为 **“基于预训练运动先验的模块化交互生成框架”**，其核心贡献在于将冻结先验、FiLM 调制和逐帧细化组合为一个统一的实时推理管线。这一设计范式对后续交互生成工作具有重要的参考价值。
+
+
 
 ## 原文 PDF
 

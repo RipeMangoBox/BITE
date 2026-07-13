@@ -5,6 +5,8 @@ paper_level: A
 venue: ICLR
 year: 2026
 pdf_ref: paperPDFs/ICLR_2026/Self_Improving_Loops_for_Visual_Robotic_Planning.pdf
+project_link: https://diffusion-supervision.github.io/silvr/
+code_link: null
 openreview_forum_id: SzUgx5r3wy
 aliases:
 - SILVRPS
@@ -32,7 +34,7 @@ claims:
 | 中文题名 | 视觉机器人规划的自改进循环 |
 | 英文题名 | Self-Improving Loops for Visual Robotic Planning |
 | 会议/期刊 | ICLR 2026 |
-| Links | [paper](https://openreview.net/forum?id=SzUgx5r3wy); [Project](https://diffusion-supervision.github.io/silvr/) |
+| Links | [paper](https://openreview.net/forum?id=SzUgx5r3wy) · [Project](https://diffusion-supervision.github.io/silvr/) |
 | Topic | #topic/reinforcement_learning_planning_agents #topic/reinforcement_learning_planning_agents/deep_rl |
 | Method | Self-Improving Loops for Visual Robotic Planning (SILVR) |
 | Dataset | MetaWorld 12 unseen tasks, Real-World Panda Arm Cup Push (2 unseen colors), Real-World Panda Arm Drawer Open (1 unseen color), MetaWorld 12 tasks (suboptimal init) |
@@ -42,7 +44,7 @@ claims:
 > - Real-World Panda Arm Cup Push (2 unseen colors) 上，平均成功率 (趋势) 为 持续提升至约 40-50%（基于图中的估值），对比 BCIL 提升缓慢，DSRL 未测试，变化 显著优于 BCIL。
 > - Real-World Panda Arm Drawer Open (1 unseen color) 上，平均成功率 (趋势) 为 从低成功启动，多轮后提升，对比 BCIL 提升缓慢，变化 显著优于 BCIL。
 
-## 概述
+## 概要
 
 离线训练的视觉规划模型面临泛化瓶颈：在训练分布之外的新任务上表现脆弱，而基于行为克隆的在线强化微调方法（如 BCIL）样本效率低、提升幅度有限。根本原因在于，视觉规划将环境动力学建模与动作预测解耦——动力学模型本身具有更强的迁移性，但现有方法未能有效利用这一特性进行在线自适应。
 
@@ -52,7 +54,7 @@ SILVR（Self-Improving Loops for Visual Robotic Planning）的核心思路是：
 
 **方法定位**：SILVR 属于视觉规划与自改进学习的交叉，通过解耦环境动力学与动作预测、结合自适应微调循环，实现了样本高效的自改进。与 DSRL（基于扩散策略的强化学习微调）和 BCIL（基于行为克隆的自改进）相比，SILVR 在样本效率和最终性能上均具显著优势。
 
-## 背景与动机
+
 
 机器人学习系统长期面临一个核心瓶颈：**离线训练的视觉规划模型泛化能力有限，而基于行为克隆的在线强化微调方法样本效率低、提升幅度小**。具体而言，依赖静态数据集训练的策略在面对训练分布之外的新任务时性能急剧下降，而将强化学习直接应用于高维视觉观测空间的微调方法（如 DSRL，Wagenmaker et al., 2025）虽然在理论上可行，但在实践中每轮迭代仅能获得微弱的性能增益，难以有效利用在线交互数据。
 
@@ -64,7 +66,9 @@ SILVR（Self-Improving Loops for Visual Robotic Planning）的核心洞察正是
 
 从更宏观的视角看，SILVR 提出了一种**数据驱动、模型自适应的机器人学习新范式**：系统不再依赖人工设计的奖励函数或海量离线数据，而是通过与环境的闭环交互，自主筛选有益经验并持续改进自身。这一范式为视觉机器人规划在开放环境中的部署提供了可行的技术路径。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 SILVR 的核心创新在于将视觉规划从“一次性离线训练”转变为“闭环在线自改进”，通过三个关键的 **changed slots** 实现了样本高效且无需精确奖励函数的自我提升。
 
@@ -94,7 +98,7 @@ $$\tilde{\epsilon}_{\mathrm{inv}} = \epsilon_{\mathrm{general}}(\tau_t, t) + \al
 
 上述三个 changed slots 并非孤立生效，而是通过**解耦-组合-筛选**的协同机制产生放大效应：解耦的动力学模型降低了微调难度，互联网先验提供了泛化基础，稀疏筛选确保了数据质量。消融实验（Table A11）证实，仅微调 IDM 或仅微调视频模型均导致性能快速饱和，同时更新两者对处理对象和运动高度新颖的任务至关重要——这验证了视觉规划解耦设计的核心价值。
 
-## 整体框架
+
 
 ![[assets/figures/papers/paper_list_l18_https_openreview_net_forum_id_SzUgx5r3wy/figures/001_Figure_1.jpg]]
 *Figure 1: SILVR Framework. SILVR has access to two pretrained video generative models (left): one pretrained generally on internet-scale data and another pretrained on a general set of in-domain demonstrations. By default, SILVR uses the in-domain video model as a visual planner, which when utilized to interact with the environment, is able to achieve successful trajectories even for initially unseen tasks. These trajectories are then iteratively fed back to finetune the in-domain model (right), thus improving the overall quality of future visual planning as a whole through self-collected online experience. SILVR can optionally incorporate internet-scale pretrained video models as prior, which partic...*
@@ -134,7 +138,7 @@ SILVR 框架由四个核心模块串联构成一条闭环自改进流水线（Fi
 
 自改进循环约在 5 轮后趋于饱和，缺乏显式探索机制使模型可能陷入局部策略最小点。当前框架依赖手工子任务分解处理长时序任务，尚未实现端到端自改进。
 
-## 核心模块与公式推导
+
 
 SILVR 框架由四个核心模块构成，其设计根植于一个关键洞察：**视觉规划将环境动力学建模与动作预测解耦**，而单独学习的环境视觉动力学比直接映射观测到动作的端到端策略更易迁移。这一解耦使得域内视频模型成为自改进循环中的主要优化对象，逆动力学模型则承担将视觉预测转换为可执行动作的桥梁角色。
 
@@ -158,7 +162,9 @@ $$\tilde{\epsilon}_{\mathrm{inv}} = \epsilon_{\mathrm{general}}(\tau_t, t) + \al
 
 自改进循环（Algorithm 1）将上述模块串联为迭代优化流程：每轮迭代采集 30 条轨迹，经稀疏奖励信号（地面真值或 VLM）筛选成功样本，随后同时微调域内视频模型和逆动力学模型。该循环的样本效率优势源于其与 DSRL 的根本差异——DSRL 的性能瓶颈不在于梯度更新步数（Table A7 显示 150 步与 60,000 步更新效果相近），而在于经验收集本身的质量。SILVR 通过视觉规划的动力学解耦，使有限的经验能更有效地转化为模型改进。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心瓶颈与因果机制
 
@@ -240,7 +246,9 @@ $$\tilde{\epsilon}_{\mathrm{inv}} = \epsilon_{\mathrm{general}}(\tau_t, t) + \al
 *Table 11: Table A11: Component Update Ablations. We report the mean success rate and standard deviation across 12 unseen tasks, aggregated over 3 seeds each*
 
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 核心瓶颈与因果机制
 
@@ -297,6 +305,8 @@ SILVR 的自改进依赖于域内视频模型与逆动力学模型（IDM）的�
 - SILVR 框架能否与高效的子任务分割机制无缝结合，从而处理任意复杂的长时序任务？这需要将自改进循环从单任务扩展到任务层次结构。
 
 - 在使用 VLM 作为奖励信号时，如何量化和减少其固有的偏差及噪声对自改进的影响？VLM 过滤引入了新的不确定性来源，其长期效应尚不明确。
+
+
 
 ## 原文 PDF
 

@@ -33,7 +33,7 @@ claims:
 | 中文题名 | 一种可微蒙特卡罗泊松方程求解器 |
 | 英文题名 | A Differential Monte Carlo Solver for the Poisson Equation |
 | 会议/期刊 | SIGGRAPH 2024 |
-| Links | [paper](https://shuangz.com/projects/diff-wos-sg24/) · [arXiv](https://arxiv.org/abs/2208.02114) · [Project](https://shuangz.com/projects/diff-wos-sg24/") |
+| Links | [paper](https://shuangz.com/projects/diff-wos-sg24/) · [paper](https://arxiv.org/abs/2208.02114) · [Project](https://shuangz.com/projects/diff-wos-sg24/") |
 | Topic | #topic/vision_multimodal_applications #topic/vision_multimodal_applications/3d_rendering_reconstruction |
 | Method | Differentiable Walk-on-Spheres (可微WoS) |
 | Dataset | Wrench, Teapot, Globe, Bunny |

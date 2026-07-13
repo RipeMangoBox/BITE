@@ -43,7 +43,7 @@ claims:
 > - Human3.6M 上，ADE / FDE 0.347 / 0.452 vs CoMusion (0.350 / 0.458) (-0.003 / -0.006)。
 > - Human3.6M (推理时间) 上，Inference Time (s) / Params (M) 0.65s / 86.5M vs HumanMAC 1.25s / 28.4M (-0.6s (faster))。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -89,7 +89,7 @@ WaveAR 在两个标准基准上均取得最优性能：
 
 **局限性与开放问题**：连续自回归范式在生成多样性（APD 指标）上相对较低；模型仅基于 3D 关节坐标，难以捕捉手指或面部等精细动作；跨数据集泛化性尚未验证。如何在高准确度下提升多样性、扩展至更细粒度运动捕捉，是该方向值得探索的问题。
 
-## 背景与动机
+
 
 ### 问题定义
 
@@ -113,7 +113,9 @@ WaveAR 在两个标准基准上均取得最优性能：
 
 这两种设计的协同效应在于：连续潜空间保留了 DWT 提取的完整频谱信息，而小波引导的交叉注意力则为扩散去噪过程提供了结构化的频率先验，使得逐 token 自回归生成既能保持时序一致性，又能捕捉精细的运动动态。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 WaveAR 的核心创新在于用**连续潜变量**替代现有 SHMP 方法中普遍采用的向量量化（VQ）离散 token，并通过**离散小波变换（DWT）** 提取多尺度高频子带，将其融合到 masked autoregressive diffusion 框架中，从而同时解决“量化误差导致运动细节丢失”和“频率表示忽略高频信息”两个瓶颈问题。
 
@@ -167,7 +169,7 @@ $$\mathcal{L}_{\mathrm{diff}} = \mathbb{E}_{i,t,\epsilon} \left[ \| \epsilon - \
 
 三个 changed slots 形成因果链路：连续潜空间保留细节 → DWT 提供多尺度频率引导 → 扩散损失稳定训练与精细去噪。这一设计使 WaveAR 在 Human3.6M（ADE 0.347, FDE 0.452）和 HumanEva-I（ADE 0.199, FDE 0.201）上均取得最优结果，同时推理速度（0.65s）快于代表性基线 HumanMAC（1.25s），实现了精度与效率的双重提升。
 
-## 整体框架
+
 
 WaveAR 提出了一种完全在连续空间中运行的自回归人体运动预测框架，其核心设计动机在于解决现有方法因向量量化（VQ）导致的运动细节丢失与训练不稳定问题，同时克服基于离散余弦变换（DCT）的频率表示忽略高频信息的局限。整个 pipeline 分为两个阶段，形成“编码—频率引导—自回归扩散生成—解码”的端到端流程。
 
@@ -202,7 +204,7 @@ $$\mathcal{L}_{\mathrm{diff}} = \mathbb{E}_{i,t,\epsilon} \left[ \| \epsilon - \
 ![[assets/figures/papers/paper_list_l3_https_neurips_cc_virtual_2025_loc_san_diego_poster_116377/figures/001_Figure_1.jpg]]
 *Figure 1: Overall architecture of our proposed WaveAR. (a) During training, a lightweight Spatio-Temporal VAE encodes the raw 3D-joint sequence (past H + future F frames) into a compact latent token stream via temporal downsampling. (b) shows the process of the wavelet-guided autoregressive masked generation model. First, the VAE latents are randomly masked, while the original input sequence’s history undergoes a 2D discrete wavelet transform for wavelet frequency-domain feature extraction, and linear projection into the same embedding space. Next, the masked latents and projected wavelet features are fused through a fusion module consisting of alternating cross-attention and self-attention layers. F...*
 
-## 核心模块与公式推导
+
 
 WaveAR 的核心由四个紧密耦合的模块构成：**ST-VAE 编码器**、**小波特征提取器**、**小波引导的掩码融合模块**和**掩码自回归扩散器**。以下逐一展开其设计逻辑与关键公式。
 
@@ -269,7 +271,9 @@ $$F_{\mathrm{wave}}[b] = \mathrm{LN}(W Y + b) \in \mathbb{R}^{K \times D} \tag{4
 ![[assets/figures/papers/paper_list_l3_https_neurips_cc_virtual_2025_loc_san_diego_poster_116377/figures/009_Figure_4.jpg]]
 *Figure 4: The detailed architecture of the Wavelet guided masked fusion module*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 
@@ -347,7 +351,9 @@ Figure 3 展示了运动中间帧生成（motion in-betweening）能力：给定
 ![[assets/figures/papers/paper_list_l3_https_neurips_cc_virtual_2025_loc_san_diego_poster_116377/figures/012_Table_8.jpg]]
 *Table 8: Experiment results of the ablation study on diffusion steps*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 瓶颈与核心洞察
 
@@ -384,6 +390,8 @@ WaveAR 的有效性在以下条件下得到验证：
 **部署效率。** 86.5M 的参数量限制了在移动端或嵌入式设备上的部署。模型量化、知识蒸馏等压缩方案尚未探索。
 
 **范式迁移潜力。** 连续自回归扩散范式是否可推广到更通用的运动生成任务（如文本驱动运动合成、运动风格迁移），以及小波频率引导是否适用于其他时序生成领域（如视频预测、音频合成），是值得关注的开放方向。
+
+
 
 ## 原文 PDF
 

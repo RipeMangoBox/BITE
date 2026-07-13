@@ -43,7 +43,7 @@ claims:
 > - VRS (Robot Arm) 上，mIoU (AU) 75.6 vs 23.8 (EVF-SAM) (+51.8)。
 > - Computational Efficiency 上，FLOPs (G) 319.8 vs 284.3 (SAM 2.1) (+35.5)。
 
-## 概述
+## 概要
 
 机器人分割是视觉感知中的一项基础任务，在策略学习、数据增强、3D重建和操作等下游应用中扮演关键角色。然而，现有通用分割模型（如SAM 2、RoboEngine）在面对机器人场景时暴露出三个系统性瓶颈：
 
@@ -61,7 +61,7 @@ claims:
 
 在方法谱系上，RobotSeg位于**视频实例分割**与**机器人感知**的交叉点。它继承SAM 2的记忆注意力范式，但通过结构先验注入和提示生成机制将其改造为领域专用架构；与RoVi-Aug、RoboEngine等图像级方法相比，它首次实现了视频层面的时序一致分割；相较于CLIPSeg、LISA、EVF-SAM等语言条件分割模型，它不依赖文本描述即可完成自主分割，且精度大幅领先（在机械臂分割上领先EVF-SAM达51.8 mIoU）。
 
-## 背景与动机
+
 
 机器人正从受控的工业产线走向非结构化环境，与人类共享物理空间并执行复杂操作。在这一趋势下，精确地从图像和视频中分割出机器人本体——包括机械臂、夹爪等铰接部件——成为场景理解、人机交互、数据增强和策略学习等下游任务的共性基础。然而，机器人分割面临着独特的挑战：机器人形态高度多样（单臂、双臂、移动机械手等），铰接结构导致快速且非刚性的形变，且常与背景纹理相似，极易引发混淆。
 
@@ -71,7 +71,9 @@ claims:
 
 上述缺口共同指向一个核心矛盾：**通用模型不懂机器人结构，专用模型不懂视频时序，而两者都受困于标注稀缺**。RobotSeg 正是在这一背景下提出的，旨在构建一个结构感知、自动执行且标注高效的视频机器人分割基础模型。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 RobotSeg 的核心创新在于系统性地解决了通用分割基础模型（以 SAM 2 为代表）在机器人场景中的三个关键瓶颈：**缺乏对铰接结构的适应能力**、**依赖人工提示**、以及**需要逐帧密集标注**。为此，RobotSeg 在 SAM 2 架构上引入了三个相互协同的“changed slots”，形成了结构感知、自主提示、标注高效的统一框架。
 
@@ -121,7 +123,7 @@ $$\mathcal{L}_{\mathrm{mask}} = w_{\mathrm{cyc}} \mathcal{L}_{\mathrm{cyc}} + w_
 
 三个 changed slots 并非独立运作，而是形成正向协同：SEMA 提供的结构感知特征为 RPG 的对象聚类提供了更干净的历史特征；RPG 生成的自主提示使 LET 的循环传播有了准确的起点；LET 的首帧训练策略则降低了对大规模标注的依赖，使整个框架在实际机器人数据上可部署。全模型在 VRS 数据集上达到 85.1 J&F，相比微调后的 SAM 2.1（73.6）提升 +11.5，参数量仅从 39.0M 微增至 41.3M（Table 5、Table 8），所有组件贡献均通过消融实验得到验证。
 
-## 整体框架
+
 
 RobotSeg 以 SAM 2 为基础骨架，将其重构为面向机器人的视频分割框架。模型输入为一段视频序列，输出为每帧中指定目标（整体机器人、机械臂或夹爪）的分割掩码，同时支持自动分割与用户交互（点击、边界框）两种模式。如图 4 所示，整个 pipeline 由四个核心模块串联构成：
 
@@ -140,7 +142,7 @@ RobotSeg 以 SAM 2 为基础骨架，将其重构为面向机器人的视频分�
 ![[assets/figures/papers/paper_list_l2101_https_arxiv_org_abs_2511_22950/figures/027_Figure_18.jpg]]
 *Figure 18: Architecture details of the mask decoder*
 
-## 核心模块与公式推导
+
 
 RobotSeg 在 SAM 2 基础之上引入三个关键模块：结构增强记忆关联器（SEMA）、机器人提示生成器（RPG）和标注高效训练策略（LET）。三个模块协同工作，使模型在仅需首帧掩码的条件下实现结构感知、时序一致的全自动视频机器人分割。
 
@@ -212,7 +214,9 @@ $$\mathcal{L}_{\mathrm{mask}} = w_{\mathrm{cyc}} \mathcal{L}_{\mathrm{cyc}} + w_
 
 消融实验（Table 4）验证了三个损失的层次化叠加带来稳定提升：仅微调 SAM 2.1 得 73.6 J&F，依次加入循环、语义和块一致性损失后提升至 77.4，验证了 LET 在标签稀缺条件下的有效性。
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 核心实验设置
 
@@ -277,7 +281,9 @@ RobotSeg参数量为41.3M，FLOPs为319.8G，相比SAM 2.1（39.0M，284.3G）�
 ![[assets/figures/papers/paper_list_l2101_https_arxiv_org_abs_2511_22950/figures/001_Figure_1.jpg]]
 *Figure 1: Although existing state-of-the-art segmentation models (e.g., RoboEngine [69] and SAM 2.1 [44]) are highly capable, surprisingly they struggle to segment robots: they fail to cope with diverse embodiments (1-3 columns), often confuse robots with cluttered backgrounds (4th column), break down when facing complex structures (5th column), and fail to handle rapid shape changes (6th-7th columns). In contrast, our RobotSeg model (last row) achieves robust robot segmentation across diverse embodiments and scenes, and further supports user-provided prompts (e.g., clicks or bounding boxes) to refine the segmentation results (last column)*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 与基础模型的继承与改造
 
@@ -315,6 +321,8 @@ RobotSeg 的设计围绕 RGB 视频输入展开，其适用边界受以下因素
 - **轻量化设计**：能否通过知识蒸馏或更轻量的结构感知模块设计，在保持鲁棒性的同时大幅降低计算成本，使其适配边缘设备？
 - **闭环系统集成**：将 RobotSeg 集成到闭环机器人系统中，研究其对下游任务（3D 重建、策略学习、操作、导航）的实际影响。Figure 20 已初步展示了 RobotSeg 对 3D 重建的改善，但更广泛的下游任务验证仍有待开展。
 - **更极致的形态建模**：针对个别外观特殊的机器人类别，探索更精细的形态相关建模策略，如基于部件图的显式铰接结构推理。
+
+
 
 ## 原文 PDF
 

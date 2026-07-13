@@ -5,6 +5,8 @@ paper_level: A
 venue: arXiv
 year: 2026
 pdf_ref: paperPDFs/arxiv_2026/PST_Beyond_Global_Alignment_Fine_Grained_Motion_Language_Retrieval_via_Pyramidal_Shapley_Taylor_Learning.pdf
+project_link: null
+code_link: null
 aliases:
 - PSTPLF
 - BGAFGMLRPSTL
@@ -41,7 +43,7 @@ claims:
 > - HumanML3D 上，R@1 (文本→动作) 12.45 (All) / 71.61 (Small) vs MotionPatch: 10.80 (All) / -- (Small) (+1.65 (All))；R@1 (动作→文本) 13.59 (All) / 75.12 (Small) vs MotionPatch: 11.25 (All) / -- (Small) (+2.34 (All))。
 > - KIT-ML 上，R@1 (文本→动作) 16.01 (All) / 56.83 (Small) vs Lyu et al. 2025: 15.13 (All) / 53.55 (Small) (+0.88 (All) / +3.28 (Small))；MedR (文本→动作) 7.00 (All) / 1.28 (Small) vs Lyu et al. 2025: 8.00 (All) / 1.36 (Small) (-1.00 (All) / -0.08 (Small))。
 
-## 概述
+## 概要
 
 ### 问题瓶颈
 
@@ -86,7 +88,7 @@ PST框架在以下维度实现了差异化定位：
 
 值得进一步探索的开放问题包括：如何设计更优的文本模态结构先验以弥合模态差距；能否将金字塔式对齐框架推广到开放词汇或大规模动作-语言理解任务；以及如何通过改进的注意力或正则化技术缓解局部偏差问题。
 
-## 背景与动机
+
 
 ### 任务定义与现有范式
 
@@ -113,7 +115,9 @@ PST框架在以下维度实现了差异化定位：
 
 这一设计使得模型不仅能够进行传统的全局检索，还能在关节和片段粒度上提供可解释的对齐证据，为细粒度动作理解奠定了基础。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 ### 问题瓶颈：从全局对齐到细粒度交互缺失
 
@@ -167,7 +171,7 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{C}}^{\mathrm{jnt}} + \mathcal{L}_{\mathrm{C
 
 **需注意的边界**：(1) 数据集文本描述多为整体性动作，缺乏细粒度部位描述，导致文本与动作模态间存在结构性不对齐，限制了细粒度对齐潜力的充分发挥；(2) 在复杂或罕见动作上，关节级和片段级对齐可视化仍观察到局部偏差；(3) STI 估计头依赖特定数据集训练，迁移到全新领域时可能需要额外微调。这些边界条件提示，方法的细粒度优势在当前数据生态下尚未完全释放，未来需结合更丰富的文本标注或 LLM 驱动的文本增强来弥合模态差距。
 
-## 整体框架
+
 
 Pyramidal Shapley-Taylor (PST) 学习框架旨在建立动作与语言之间的细粒度跨模态对齐。如图 1 所示，框架由两条并行的编码支路和三层金字塔对齐结构组成。
 
@@ -195,7 +199,7 @@ $$\mathcal{L} = \mathcal{L}_{\text{C}}^{\text{jnt}} + \mathcal{L}_{\text{C}}^{\t
 ![[assets/figures/papers/paper_list_l45_https_arxiv_org_abs_2601_21904/figures/001_Figure_1.jpg]]
 *Figure 1: Overview of our Pyramidal Shapley-Taylor (PST) learning framework. Our PST learning framework consists of Shapley-Taylor Interaction (STI), described in Sec. 3.2, and pyramidal modeling scheme, described in Sec. 3.3. As illustrated in the middle cube, each cell represents the interaction strength between a motion token and a text token within a batch, where darker colors indicate stronger semantic correlations, and lighter colors represent weaker ones*
 
-## 核心模块与公式推导
+
 
 ### 3.1 跨模态标记相似度基础
 
@@ -257,7 +261,9 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{C}}^{\mathrm{jnt}} + \mathcal{L}_{\mathrm{C
 ![[assets/figures/papers/paper_list_l45_https_arxiv_org_abs_2601_21904/figures/010_Figure_6.jpg]]
 *Figure 6: Detailed architecture. (a) Structure of the STI Estimation Head. (b) Structure of the Token Compressor*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主要结果
 
@@ -316,7 +322,9 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{C}}^{\mathrm{jnt}} + \mathcal{L}_{\mathrm{C
 ![[assets/figures/papers/paper_list_l45_https_arxiv_org_abs_2601_21904/figures/008_Figure_5.jpg]]
 *Figure 5: Qualitative results of text-to-motion retrieval*
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 与现有工作的关系
 
@@ -359,6 +367,8 @@ PST框架的适用性受以下因素制约：
 4. **多模态动作理解的统一框架。** PST框架目前专注于检索任务，但其细粒度对齐能力是否可迁移至动作生成、动作描述、动作问答等下游任务，尚待验证。若能将STI建模与生成式模型结合，可能催生更统一的动作-语言理解框架。
 
 **证据强度说明：** 上述局限和开放问题主要基于论文自身的讨论和消融实验的间接证据。其中局部偏差问题有可视化结果支撑（Figure 4, 7-10），但缺乏定量指标；LLM增强的迁移性仅有初步实验（Table 5），需要手动验证其在更多数据集上的效果。
+
+
 
 ## 原文 PDF
 

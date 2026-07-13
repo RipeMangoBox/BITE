@@ -42,7 +42,7 @@ claims:
 > - GoStanford 上，L2 (m)↓ 1.772 (T=10) vs 2.141 (LLaVa-Video) (-17.2%)。
 > - RECON 上，L2 (m)↓ 2.837 (T=10) vs 4.211 (LLaVa-Video) (-32.6%)。
 
-## 概述
+## 概要
 
 轨迹预测是移动机器人和自动驾驶系统中的关键能力，要求模型根据历史观测和场景上下文推断未来路径。现有方法通常将轨迹预测转化为文本生成任务，每个坐标需用多个文本 token 表示，导致 token 效率低下且时空建模能力受限；非自回归方法一次性生成完整未来序列，无法捕捉时间动态，也难以灵活调整预测长度。AutoTraces 针对这一瓶颈，提出以 **<point> token** 作为航点的统一表示，将每个二维航点抽象为单个特殊 token，通过 Point Encoder 将坐标嵌入大语言模型（LLM）的隐空间，并由 Point Head 将隐向量解码回物理坐标，从而在 LLM 原生自回归机制中实现航点的逐步生成。
 
@@ -50,7 +50,7 @@ claims:
 
 在 SCAND 数据集上，AutoTraces 的 L2 误差显著低于所有基线方法（T=5: 0.674 m，T=8: 0.923 m，T=10: 1.089 m），其中在 T=10 时相对于 CityWalker（Liu et al., CVPR 2025）降低 22.6%，相对于基础模型 LLaVa-Video（Zhang et al., TMLR 2025）降低 40.4%。在跨场景泛化实验中，AutoTraces 在未见过的 GoStanford（室内）和 RECON（室外）数据集上均优于 LLaVa-Video，尤其在 RECON 上 T=8 和 T=10 的 L2 误差分别降低 30.0% 和 32.6%。在长周期预测（T=12–20）中，AutoTraces 的指令执行准确率高达 99.92%，远超 LLaVa-Video 的 40.34%，且每条路径仅需 25.00 个 token（LLaVa-Video 需 375.64 个），token 效率提升约 15 倍。
 
-## 背景与动机
+
 
 轨迹预测是自主导航与机器人交互的核心能力，要求模型在动态环境中根据历史观测推断未来路径。近年来，多模态大语言模型（MLLM）凭借强大的视觉理解和推理能力，在各类具身任务中展现出显著潜力。然而，将 MLLM 应用于密集轨迹预测仍面临两个根本性瓶颈。
 
@@ -62,7 +62,9 @@ claims:
 
 AutoTraces 正是针对这两大瓶颈提出：通过引入 `<point>` 特殊 token 作为航点的统一表示单元，配合 Point Encoder-Point Head 的编码-解码架构，将连续坐标无缝嵌入 LLM 隐空间；同时利用 LLM 原生的自回归机制，实现航点逐帧生成与反馈闭环，使每一步预测都以前序输出为条件。在此基础上，通过自动化思维链（CoT）生成机制，模型被赋予对环境障碍和社会交互的显式推理能力。这一设计既保留了预训练 MLLM 的语义理解和推理能力，又在物理空间中实现了高精度、高效率的自回归轨迹预测。
 
-## 核心创新
+
+
+## 核心方法与创新机理
 
 AutoTraces 的核心创新在于将轨迹预测从“文本生成”范式重构为“航点自回归生成”范式，通过三个相互耦合的 **changed slots** 解决了现有 LLM-based 方法的两大瓶颈：坐标文本化表示的低效性，以及非自回归生成对时间动态的建模不足。
 
@@ -133,7 +135,7 @@ AutoTraces 利用 LLM 原生的自回归机制，实现 **航点级自回归生�
 
 三个 changed slots 形成协同效应：点分词方案使自回归生成在 token 效率上可行，自回归机制为 CoT 推理提供了逐航点的决策上下文，而 CoT 推理又增强了自回归预测在社会交互场景下的准确性。
 
-## 整体框架
+
 
 AutoTraces 是一个以 **LLaVa-Video**（Zhang et al., TMLR 2025）为基座的自回归视觉-语言-轨迹模型，核心目标是在复杂社会场景中实现高精度、可推理的密集轨迹预测。其整体 pipeline 围绕一个关键设计展开：将每个二维航点抽象为单一的特殊 **`<point>` token**，通过编码器-解码器架构在 LLM 内部无缝融合轨迹、视觉与文本多模态信息，既保留了预训练 LLM 的推理能力，又实现了物理空间中的逐步自回归预测。
 
@@ -172,7 +174,7 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{point}} + \mathcal{L}_{\ma
 
 相比将轨迹预测转化为纯文本生成任务的先前方案（需多个文本 token 表示单个坐标），AutoTraces 通过 `\<point\>` token 的引入，将每个航点的表示压缩为单一 token，大幅降低了 token 消耗（长周期预测中每条路径仅需 25.00 个 token，而 LLaVa-Video 需 375.64 个）。同时，非自回归方法一次生成完整未来序列，无法捕捉时间动态，而 AutoTraces 的航点级自回归设计使其能够灵活调整预测长度，并在逐步生成过程中持续利用历史信息进行条件更新。
 
-## 核心模块与公式推导
+
 
 AutoTraces 的整体架构建立在 **LLaVa-Video**（Zhang et al., TMLR 2025）之上，通过引入三个关键模块——**Point Encoder**、**Point Head** 和**自动化思维链（CoT）生成机制**——将多模态大语言模型改造为自回归轨迹预测器。以下逐一解析各模块的设计逻辑与核心公式。
 
@@ -236,7 +238,9 @@ $$\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{point}} + \mathcal{L}_{\ma
 ![[assets/figures/papers/paper_list_l2295_https_arxiv_org_abs_2603_07989/figures/003_Figure_3.jpg]]
 *Figure 3: Illustration of the CoT generation for AutoTraces, incorporating visual observations and trajectory analysis. Red points and lines denote the historical trajectory, while blue points and lines denote the ground-truth trajectory. Action annotations (R: right, L: left, S: straight) are marked along the trajectory*
 
-## 实验与分析
+
+
+## 实验与关键发现
 
 ### 主实验结果：SCAND 数据集
 
@@ -307,7 +311,9 @@ Figure 5 展示了 AutoTraces 与基线方法在 SCAND 上的预测轨迹可视�
 
 部分基线模型（Table 1 灰色行）使用固定预测长度分别训练和评估，而 AutoTraces 以单模型评测所有长度。尽管存在这一设定差异，AutoTraces 在单模型设置下仍全面超越所有基线。在跨场景泛化实验中，对比基础模型 LLaVa-Video 时，两者使用相同的视觉编码器和 LLM 架构，差异仅来自点分词方案、自回归机制和 CoT 训练策略，对比公平性较好。
 
-## 方法谱系与知识库定位
+
+
+## 定位与知识库关联
 
 ### 1. 问题定位：LLM 轨迹预测中的表征瓶颈与生成范式缺陷
 
@@ -353,6 +359,8 @@ AutoTraces 处于三个研究方向的交叉点：
 - **实时性约束**：自回归逐点生成虽然保证了预测质量，但在需要高频实时预测的场景中，逐 token 解码的延迟是否满足要求，论文未提供推理延迟数据。
 
 > **注意**：上述适用边界和开放问题中关于“纯轨迹预测性能”“CoT 质量人工评估”“推理延迟”等论断，在已验证分析中未找到直接实验证据支撑，属于从方法设计出发的合理推断，需读者结合自身场景手动验证。
+
+
 
 ## 原文 PDF
 
